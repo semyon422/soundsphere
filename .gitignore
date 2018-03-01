@@ -1,0 +1,6 @@
+userdata
+cache
+libraries/*.dll
+libraries/*.exe
+libraries/*.h
+libraries/love-0.10.2-win64
