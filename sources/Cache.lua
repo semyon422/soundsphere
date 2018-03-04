@@ -20,7 +20,7 @@ Cache.import = function(self)
 	
 	self:clean()
 	
-	self:lookup("userdata/charts/bms")
+	self:lookup("userdata/charts")
 end
 
 Cache.export = function(self)
@@ -74,6 +74,7 @@ Cache.lookup = function(self, directoryPath)
 			if not self.cacheDataDirectoryPathUniqueKey[directoryPath .. "/" .. itemName] then
 				self:generateCacheDataDirectory(directoryPath .. "/" .. itemName)
 				self.cacheDataDirectoryPathUniqueKey[directoryPath .. "/" .. itemName] = true
+				self:lookup(directoryPath .. "/" .. itemName)
 			end
 		elseif love.filesystem.isFile(directoryPath .. "/" .. itemName) then
 			
