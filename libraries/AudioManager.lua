@@ -17,10 +17,13 @@ end
 
 AudioManager.loadChunk = function(self, filePath, group)
 	if not self.chunkData[filePath] then
+		local file = love.filesystem.newFile(filePath)
+		file:open("r")
 		self.chunkData[filePath] = {
-			chunk = bass.BASS_SampleLoad(false, filePath, 0, 0, 32, 0),
+			chunk = bass.BASS_SampleLoad(true, file:read(), 0, file:getSize(), 65535, 0),
 			group = group
 		}
+		file:close()
 	end
 end
 

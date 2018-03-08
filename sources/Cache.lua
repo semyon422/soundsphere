@@ -85,7 +85,7 @@ end
 Cache.generateCacheDataDirectory = function(self, directoryPath)
 	print("checking directory", directoryPath)
 	for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
-		if love.filesystem.isFile(directoryPath .. "/" .. itemName) and itemName:find(".bm[se]$") then
+		if love.filesystem.isFile(directoryPath .. "/" .. itemName) and itemName:find(".bm[s]*[e]*$") then
 			self:generateCacheData(directoryPath, itemName)
 		end
 	end
