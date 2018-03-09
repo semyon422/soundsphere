@@ -9,6 +9,9 @@ List.selectedItemIndex = List.offset + 6
 List.load = function(self)
 	self.items = self.items or {}
 	
+	self.offset = 1 - self:getMiddleOffset()
+	self.targetOffset = self.offset
+	
 	self:calculateButtons()
 	self:loadCallbacks()
 	
@@ -22,7 +25,16 @@ List.unload = function(self)
 	self.loaded = false
 end
 
+List.getMiddleOffset = function(self)
+	return math.ceil(self.buttonCount / 2)
+end
+
 List.update = function(self)
+	if self.targetOffset < 1 - self:getMiddleOffset() then
+		self.targetOffset = 1 - self:getMiddleOffset()
+	elseif self.targetOffset > #self.items - self:getMiddleOffset() then
+		self.targetOffset = #self.items - self:getMiddleOffset()
+	end
 	if (self.scrollDelta > 0 and self.offset + self.scrollDelta > self.targetOffset)
 	or (self.scrollDelta < 0 and self.offset + self.scrollDelta < self.targetOffset)
 	then
@@ -37,7 +49,7 @@ end
 List.calculateButtons = function(self)
 	self.buttons = self.buttons or {}
 	
-	self.selectedItemIndex = self.offset + math.ceil(self.buttonCount / 2)
+	self.selectedItemIndex = self.offset + self:getMiddleOffset()
 	
 	local itemIndexKeys = {}
 	for buttonIndex, button in pairs(self.buttons) do
