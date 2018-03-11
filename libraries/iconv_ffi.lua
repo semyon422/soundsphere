@@ -5,7 +5,7 @@ libiconv = ffi.load("libraries/libiconv-2")
 
 
 iconv = function(instr, tocode, fromcode, outbuff_size)
-	local cd = libiconv.libiconv_open(tocode .. "//IGNORE", fromcode)
+	local cd = libiconv.libiconv_open(tocode, fromcode)
 	
 	local out = {}
 	
@@ -25,7 +25,7 @@ iconv = function(instr, tocode, fromcode, outbuff_size)
 		local err = libiconv.libiconv(cd, inbuff_ptr, inbytesleft, outbuff_ptr, outbytesleft)
 		if err ~= 0 then
 			libiconv.libiconv_close(cd)
-			return "<invalid codepage>"
+			return
 		end
 		table.insert(out, ffi.string(outbuff, outbuff_size - outbytesleft[0]))
 		outbytesleft[0] = outbuff_size

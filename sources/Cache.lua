@@ -112,7 +112,7 @@ Cache.generateBMSCacheData = function(self, directoryPath, fileName)
 	file:open("r")
 	
 	for line in file:lines() do
-		local line = iconv(line, "UTF-8", "SHIFT-JIS")
+		local line = iconv(line, "UTF-8", "SHIFT-JIS") or iconv(line, "UTF-8", "EUC-KR") or line
 		if line:match("#TITLE .+$") then
 			cacheData.title = line:match("#TITLE (.+)$")
 		end

@@ -30,8 +30,8 @@ local background = BackgroundManager:new({
 	drawable = love.graphics.newImage("resources/background.jpg")
 })
 
-mainFont20 = love.graphics.newFont("resources/NotoSansCJKjp-Regular.otf", 20)
-mainFont30 = love.graphics.newFont("resources/NotoSansCJKjp-Regular.otf", 30)
+mainFont20 = love.graphics.newFont("resources/NotoSansCJK-Regular.ttc", 20)
+mainFont30 = love.graphics.newFont("resources/NotoSansCJK-Regular.ttc", 30)
 
 local button = soul.ui.RectangleTextButton:new({
 	x = 0.4, y = 0.4, w = 0.2, h = 0.2,
