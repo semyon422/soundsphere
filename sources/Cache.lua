@@ -85,7 +85,7 @@ end
 Cache.generateCacheDataDirectory = function(self, directoryPath)
 	print("checking directory", directoryPath)
 	for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
-		if love.filesystem.isFile(directoryPath .. "/" .. itemName) and itemName:find(".bm[s]*[e]*$") then
+		if love.filesystem.isFile(directoryPath .. "/" .. itemName) and (itemName:find(".bm[s]*[e]*[l]*$") or itemName:find(".syk$")) then
 			self:generateCacheData(directoryPath, itemName)
 		end
 	end
@@ -93,14 +93,40 @@ end
 
 Cache.generateCacheData = function(self, directoryPath, fileName)
 	print("processing file", fileName)
-	self:addCacheData({
-		directoryPath = directoryPath,
-		fileName = fileName
-	})
+	self:addCacheData(self:generateBMSCacheData(directoryPath, fileName))
 end
 
 Cache.addCacheData = function(self, cacheData)
 	table.insert(self.cacheDatas, cacheData)
 end
 
-
+Cache.generateBMSCacheData = function(self, directoryPath, fileName)
+	local cacheData = {}
+	cacheData.directoryPath = directoryPath
+	cacheData.fileName = fileName
+	cacheData.title = "<title>"
+	cacheData.artist = "<artist>"
+	cacheData.playlevel = "<playlevel>"
+	
+	local file = love.filesystem.newFile(directoryPath .. "/" ..  fileName)
+	file:open("r")
+	
+	for line in file:lines() do
+		local line = iconv(line, "UTF-8", "SHIFT-JIS")
+		if line:match("#TITLE .+$") then
+			cacheData.title = line:match("#TITLE (.+)$")
+		end
+		if line:match("#ARTIST .+$") then
+			cacheData.artist = line:match("#ARTIST (.+)$")
+		end
+		if line:match("#PLAYLEVEL .+$") then
+			cacheData.playlevel = line:match("#PLAYLEVEL (.+)$")
+		end
+		if line:match("#WAV") then
+			break
+		end
+	end
+	file:close()
+	
+	return cacheData
+end
