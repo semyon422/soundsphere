@@ -4,7 +4,6 @@ List.buttonCount = 1
 List.offset = 0
 List.targetOffset = 0
 List.scrollDelta = 0
-List.selectedItemIndex = List.offset + 6
 
 List.load = function(self)
 	self.items = self.items or {}
@@ -23,6 +22,10 @@ List.unload = function(self)
 	self:unloadCallbacks()
 	
 	self.loaded = false
+end
+
+List.clear = function(self)
+	self.items = {}
 end
 
 List.getMiddleOffset = function(self)
@@ -76,8 +79,8 @@ List.calculateButtons = function(self)
 				item = item,
 				itemIndex = itemIndex,
 				
-				text = item.title,
-				action = item.action
+				text = item.text,
+				action = item.onClick
 			})
 			button:activate()
 			
@@ -101,26 +104,24 @@ end
 
 List.loadCallbacks = function(self)
 	soul.setCallback("wheelmoved", self, function(_, direction)
-		self.targetOffset = self.targetOffset + direction
-		self:updateScrollDelta()
+		local x, y, w, h = self.x, self.y, self.w, self.h
+		local mx, my = self.cs:x(love.mouse.getX(), true), self.cs:y(love.mouse.getY(), true)
+		if belong(mx, x, x + w, my, y, y + h) then
+			self.targetOffset = self.targetOffset + direction
+			self:updateScrollDelta()
+		end
 	end)
 	soul.setCallback("keypressed", self, function(key)
-		if key == "up" then
+		if key == self.upScrollKey then
 			self.targetOffset = self.targetOffset - 1
 			self:updateScrollDelta()
-		elseif key == "down" then
+		elseif key == self.downScrollKey then
 			self.targetOffset = self.targetOffset + 1
-			self:updateScrollDelta()
-		elseif key == "left" then
-			self.targetOffset = self.targetOffset - 10
-			self:updateScrollDelta()
-		elseif key == "right" then
-			self.targetOffset = self.targetOffset + 10
 			self:updateScrollDelta()
 		elseif key == "return" then
 			for button in pairs(self.buttons) do
 				if button.itemIndex == self.selectedItemIndex then
-					button.item.action()
+					button.item.onClick(button)
 					break
 				end
 			end
@@ -132,15 +133,12 @@ List.unloadCallbacks = function(self)
 	soul.unsetCallback("keypressed", self)
 end
 
-List.addItem = function(self, title, action)
+List.addItem = function(self, item)
 	if not self.items then
 		self.items = {}
 	end
 	
-	table.insert(self.items, {
-		title = title,
-		action = action
-	})
+	table.insert(self.items, item)
 end
 
 List.Button = createClass(soul.ui.RectangleTextButton)
@@ -150,7 +148,16 @@ List.Button.update = function(self)
 	
 	self.y = self.list.y + (self.itemIndex - self.list.offset - 1) * (self.list.h / self.list.buttonCount)
 	
-	self.rectangleColor = (self.itemIndex == self.list.selectedItemIndex) and self.list.selectedRectangleColor or self.list.rectangleColor
+	if self.itemIndex == self.list.selectedItemIndex then
+		self.rectangleColor = self.list.selectedRectangleColor
+		if not self.selected and self.item.onSelect then
+			self.item.onSelect(self)
+			self.selected = true
+		end
+	else
+		self.selected = false
+		self.rectangleColor = self.list.rectangleColor
+	end
 	
 	if self.y < self.list.y - self.h or self.y > self.list.y + self.list.h then
 		self.list.buttons[self] = nil

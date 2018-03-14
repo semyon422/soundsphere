@@ -48,20 +48,7 @@ local button = soul.ui.RectangleTextButton:new({
 	font = mainFont30
 })
 
-local list = List:new({
-	x = 0, y = 0, w = 1, h = 1,
-	layer = 2,
-	cs = soul.CS:new(nil, 0.5, 0.5, 0.5, 0.5, "h", 768),
-	rectangleColor = {255, 255, 255, 31},
-	selectedRectangleColor = {255, 255, 255, 63},
-	mode = "fill",
-	limit = 1,
-	textAlign = {
-		x = "center", y = "center"
-	},
-	buttonCount = 17,
-	font = mainFont20
-})
+mapList = MapList:new()
 
 currentCacheData = nil
 
@@ -89,16 +76,6 @@ unloadEngine = function()
 	engine:deactivate()
 end
 
-for cacheData in cache:getCacheDataIterator() do
-	list:addItem(
-		utf8validate(cacheData.artist .. " - " .. cacheData.title .. " " .. cacheData.playlevel .. " level"),
-		function()
-			currentCacheData = cacheData
-			stateManager:switchState("playing")
-		end
-	)
-end
-
 stateManager:setState(
 	StateManager.State:new(
 		{
@@ -114,7 +91,7 @@ stateManager:setState(
 stateManager:setState(
 	StateManager.State:new(
 		{
-			list
+			mapList
 		},
 		{
 			button
@@ -128,7 +105,7 @@ stateManager:setState(
 			loadEngine(currentCacheData.directoryPath, currentCacheData.fileName)
 		end,
 		{
-			list
+			mapList
 		}
 	),
 	"playing"
