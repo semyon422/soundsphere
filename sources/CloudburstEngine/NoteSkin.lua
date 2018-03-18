@@ -6,22 +6,30 @@ NoteSkin.cs = soul.CS:new(nil, 0, 0, 0, 0, "h")
 local root = "resources/NoteSkin/"
 
 NoteSkin.drawables = {
-	whiteShortNote = love.graphics.newImage(root .. "shortNote/white.png"),
-	whiteLongNoteBody = love.graphics.newImage(root .. "longNoteBody/white/body-0.png"),
-	whiteLongNoteHead = love.graphics.newImage(root .. "longNoteHead/white.png"),
-	whiteLongNoteTail = love.graphics.newImage(root .. "longNoteTail/white.png"),
-	blueShortNote = love.graphics.newImage(root .. "shortNote/blue.png"),
-	blueLongNoteBody = love.graphics.newImage(root .. "longNoteBody/blue/body-0.png"),
-	blueLongNoteHead = love.graphics.newImage(root .. "longNoteHead/blue.png"),
-	blueLongNoteTail = love.graphics.newImage(root .. "longNoteTail/blue.png"),
-	yellowShortNote = love.graphics.newImage(root .. "shortNote/yellow.png"),
-	yellowLongNoteBody = love.graphics.newImage(root .. "longNoteBody/yellow/body-0.png"),
-	yellowLongNoteHead = love.graphics.newImage(root .. "longNoteHead/yellow.png"),
-	yellowLongNoteTail = love.graphics.newImage(root .. "longNoteTail/yellow.png"),
-	orangeShortNote = love.graphics.newImage(root .. "shortNote/orange.png"),
-	orangeLongNoteBody = love.graphics.newImage(root .. "longNoteBody/orange/body-0.png"),
-	orangeLongNoteHead = love.graphics.newImage(root .. "longNoteHead/orange.png"),
-	orangeLongNoteTail = love.graphics.newImage(root .. "longNoteTail/orange.png"),
+	white = {
+		ShortNote = love.graphics.newImage(root .. "shortNote/white.png"),
+		LongNoteBody = love.graphics.newImage(root .. "longNoteBody/white/body-0.png"),
+		LongNoteHead = love.graphics.newImage(root .. "longNoteHead/white.png"),
+		LongNoteTail = love.graphics.newImage(root .. "longNoteTail/white.png")
+	},
+	blue = {
+		ShortNote = love.graphics.newImage(root .. "shortNote/blue.png"),
+		LongNoteBody = love.graphics.newImage(root .. "longNoteBody/blue/body-0.png"),
+		LongNoteHead = love.graphics.newImage(root .. "longNoteHead/blue.png"),
+		LongNoteTail = love.graphics.newImage(root .. "longNoteTail/blue.png")
+	},
+	yellow = {
+		ShortNote = love.graphics.newImage(root .. "shortNote/yellow.png"),
+		LongNoteBody = love.graphics.newImage(root .. "longNoteBody/yellow/body-0.png"),
+		LongNoteHead = love.graphics.newImage(root .. "longNoteHead/yellow.png"),
+		LongNoteTail = love.graphics.newImage(root .. "longNoteTail/yellow.png")
+	},
+	orange = {
+		ShortNote = love.graphics.newImage(root .. "shortNote/orange.png"),
+		LongNoteBody = love.graphics.newImage(root .. "longNoteBody/orange/body-0.png"),
+		LongNoteHead = love.graphics.newImage(root .. "longNoteHead/orange.png"),
+		LongNoteTail = love.graphics.newImage(root .. "longNoteTail/orange.png")
+	}
 }
 
 NoteSkin.noteWidth = 7 / 9 / 8
@@ -36,6 +44,40 @@ NoteSkin.getColumnIndexNumber = function(self, note)
 		return 0
 	else
 		return note.noteData.columnIndex
+	end
+end
+
+NoteSkin.getNoteColor = function(self, columnType, inputIndex, inputCount)
+	if columnType == "scratch" then
+		return "orange"
+	elseif columnType == "key" then
+		if inputCount % 2 == 1 then
+			local halfInputCount = (inputCount - 1) / 2
+			if (inputCount + 1) / 2 == inputIndex then
+				return "yellow"
+			else
+				if (halfInputCount - inputIndex + 1) % 2 == 1 then
+					return "white"
+				else
+					return "blue"
+				end
+			end
+		else
+			local halfInputCount = inputCount / 2
+			if inputIndex <= inputCount / 2 then
+				if (halfInputCount - inputIndex + 1) % 2 == 1 then
+					return "white"
+				else
+					return "blue"
+				end
+			else
+				if (halfInputCount - inputIndex + 1) % 2 == 1 then
+					return "blue"
+				else
+					return "white"
+				end
+			end
+		end
 	end
 end
 
@@ -60,79 +102,31 @@ end
 --------------------------------
 NoteSkin.getShortNoteDrawable = function(self, note)
 	if note.noteData.columnIndex == "S" then
-		return self.drawables.orangeShortNote
-	elseif note.noteData.columnIndex == 4 then
-		return self.drawables.yellowShortNote
-	elseif note.noteData.columnIndex == 1 or
-			note.noteData.columnIndex == 3 or
-			note.noteData.columnIndex == 5 or
-			note.noteData.columnIndex == 7
-	then
-		return self.drawables.whiteShortNote
-	elseif note.noteData.columnIndex == 2 or
-			note.noteData.columnIndex == 6
-	then
-		return self.drawables.blueShortNote
+		return self.drawables.orange.ShortNote
+	else
+		return self.drawables[self:getNoteColor("key", note.noteData.columnIndex, 7)].ShortNote
 	end
-	
-	return self.drawables.whiteShortNote
 end
 NoteSkin.getLongNoteHeadDrawable = function(self, note)
 	if note.noteData.columnIndex == "S" then
-		return self.drawables.orangeLongNoteHead
-	elseif note.noteData.columnIndex == 4 then
-		return self.drawables.yellowLongNoteHead
-	elseif note.noteData.columnIndex == 1 or
-			note.noteData.columnIndex == 3 or
-			note.noteData.columnIndex == 5 or
-			note.noteData.columnIndex == 7
-	then
-		return self.drawables.whiteLongNoteHead
-	elseif note.noteData.columnIndex == 2 or
-			note.noteData.columnIndex == 6
-	then
-		return self.drawables.blueLongNoteHead
+		return self.drawables.orange.ShortNote
+	else
+		return self.drawables[self:getNoteColor("key", note.noteData.columnIndex, 7)].LongNoteHead
 	end
-	
-	return self.drawables.whiteLongNoteHead
 end
 NoteSkin.getLongNoteTailDrawable = function(self, note)
 	if note.noteData.columnIndex == "S" then
-		return self.drawables.orangeLongNoteTail
-	elseif note.noteData.columnIndex == 4 then
-		return self.drawables.yellowLongNoteTail
-	elseif note.noteData.columnIndex == 1 or
-			note.noteData.columnIndex == 3 or
-			note.noteData.columnIndex == 5 or
-			note.noteData.columnIndex == 7
-	then
-		return self.drawables.whiteLongNoteTail
-	elseif note.noteData.columnIndex == 2 or
-			note.noteData.columnIndex == 6
-	then
-		return self.drawables.blueLongNoteTail
+		return self.drawables.orange.ShortNote
+	else
+		return self.drawables[self:getNoteColor("key", note.noteData.columnIndex, 7)].LongNoteTail
 	end
-	
-	return self.drawables.whiteLongNoteTail
 end
 NoteSkin.getLongNoteBodyDrawable = function(self, note)
 	if note.noteData.columnIndex == "S" then
-		return self.drawables.orangeLongNoteBody
-	elseif note.noteData.columnIndex == 4 then
-		return self.drawables.yellowLongNoteBody
-	elseif note.noteData.columnIndex == 1 or
-			note.noteData.columnIndex == 3 or
-			note.noteData.columnIndex == 5 or
-			note.noteData.columnIndex == 7
-	then
-		return self.drawables.whiteLongNoteBody
-	elseif note.noteData.columnIndex == 2 or
-			note.noteData.columnIndex == 6
-	then
-		return self.drawables.blueLongNoteBody
+		return self.drawables.orange.ShortNote
+	else
+		return self.drawables[self:getNoteColor("key", note.noteData.columnIndex, 7)].LongNoteBody
 	end
-	
-	return self.drawables.whiteLongNoteBody
 end
 
 --------------------------------
