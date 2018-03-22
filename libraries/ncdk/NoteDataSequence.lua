@@ -19,9 +19,11 @@ NoteDataSequence.addNoteData = function(self, noteData)
 	table.insert(self, noteData)
 	self.noteDataCount = self.noteDataCount + 1
 	
-	if not self.layerData.layerDataSequence.columnExisting[noteData.columnIndex] then
-		self.layerData.layerDataSequence.columnExisting[noteData.columnIndex] = true
-		table.insert(self.layerData.layerDataSequence.columnIndexes, noteData.columnIndex)
+	if not (self.layerData.layerDataSequence.inputExisting[noteData.inputType] and
+		self.layerData.layerDataSequence.inputExisting[noteData.inputType][noteData.inputIndex])
+	then
+		self.layerData.layerDataSequence.inputExisting[noteData.inputType] = self.layerData.layerDataSequence.inputExisting[noteData.inputType] or {}
+		self.layerData.layerDataSequence.inputExisting[noteData.inputType][noteData.inputIndex] = true
 	end
 end
 

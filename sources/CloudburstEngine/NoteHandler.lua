@@ -19,7 +19,7 @@ NoteHandler.loadNoteData = function(self)
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 			
-			if noteData.columnIndex == self.columnIndex then
+			if noteData.inputType == self.inputType and noteData.inputIndex == self.inputIndex then
 				local logicalNote = getClassForNote(noteData):new({
 					noteData = noteData,
 					noteHandler = self,
@@ -52,7 +52,7 @@ NoteHandler.loadNoteData = function(self)
 end
 
 NoteHandler.setKeyState = function(self)
-	self.keyBind = KeyBind[self.columnIndex] or tonumber(self.columnIndex)
+	self.keyBind = KeyBind[self.inputType][self.inputIndex] or tonumber(self.inputIndex)
 	self.keyState = love.keyboard.isDown(self.keyBind)
 end
 
@@ -84,8 +84,10 @@ end
 
 NoteHandler.load = function(self)
 	self:loadNoteData()
-	self:setKeyState()
-	self:setCallbacks()
+	if self.inputType ~= "auto" then
+		self:setKeyState()
+		self:setCallbacks()
+	end
 end
 
 NoteHandler.update = function(self)

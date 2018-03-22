@@ -19,8 +19,8 @@ ChannelDataSequence.requireChannelData = function(self, measureIndex, channelInd
 	self.data[measureIndex] = self.data[measureIndex] or {}
 	self.data[measureIndex][channelIndex] = self.data[measureIndex][channelIndex] or bms.ChannelData:new()
 	
-	self.data[measureIndex][channelIndex].compound = channelIndex ~= bms.ChannelEnum.BGM
-	self.data[measureIndex][channelIndex].oneDecimal = channelIndex == bms.ChannelEnum.Signature
+	self.data[measureIndex][channelIndex].compound = bms.ChannelEnum[channelIndex].name ~= "BGM"
+	self.data[measureIndex][channelIndex].oneDecimal = bms.ChannelEnum[channelIndex].name == "Signature"
 	
 	return self.data[measureIndex][channelIndex]
 end

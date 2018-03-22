@@ -12,8 +12,7 @@ LayerDataSequence.new = function(self)
 	
 	layerDataSequence.layerDataIndexes = {}
 	
-	layerDataSequence.columnExisting = {}
-	layerDataSequence.columnIndexes = {}
+	layerDataSequence.inputExisting = {}
 	
 	setmetatable(layerDataSequence, LayerDataSequence_metatable)
 	
@@ -48,14 +47,21 @@ LayerDataSequence.getLayerDataIndexIterator = function(self)
 	end
 end
 
-LayerDataSequence.getColumnIndexIteraator = function(self)
+LayerDataSequence.getInputIteraator = function(self)
+	local inputs = {}
+	for inputType, inputTypeData in pairs(self.inputExisting) do
+		for inputIndex in pairs(inputTypeData) do
+			table.insert(inputs, {inputType, inputIndex})
+		end
+	end
 	local counter = 1
 	
 	return function()
-		local columnIndex = self.columnIndexes[counter]
+		local inputData = inputs[counter]
+		if not inputData then return end
 		
 		counter = counter + 1
 		
-		return columnIndex
+		return unpack(inputData)
 	end
 end

@@ -31,7 +31,7 @@ NoteChart.getLayerDataIndexIterator = function(self)
 	return self.layerDataSequence:getLayerDataIndexIterator()
 end
 
-NoteChart.getColumnIndexIteraator = function(self)
-	return self.layerDataSequence:getColumnIndexIteraator()
+NoteChart.getInputIteraator = function(self)
+	return self.layerDataSequence:getInputIteraator()
 end
 

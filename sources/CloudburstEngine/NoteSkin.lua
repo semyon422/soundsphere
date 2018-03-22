@@ -40,17 +40,17 @@ NoteSkin.getCS = function(self, note)
 end
 
 NoteSkin.getColumnIndexNumber = function(self, note)
-	if note.noteData.columnIndex == "S" then
+	if note.noteData.inputType == "scratch" then
 		return 0
 	else
-		return note.noteData.columnIndex
+		return note.noteData.inputIndex
 	end
 end
 
-NoteSkin.getNoteColor = function(self, columnType, inputIndex, inputCount)
-	if columnType == "scratch" then
+NoteSkin.getNoteColor = function(self, inputType, inputIndex, inputCount)
+	if inputType == "scratch" then
 		return "orange"
-	elseif columnType == "key" then
+	elseif inputType == "key" then
 		if inputCount % 2 == 1 then
 			local halfInputCount = (inputCount - 1) / 2
 			if (inputCount + 1) / 2 == inputIndex then
@@ -101,32 +101,16 @@ end
 -- get*Drawable
 --------------------------------
 NoteSkin.getShortNoteDrawable = function(self, note)
-	if note.noteData.columnIndex == "S" then
-		return self.drawables.orange.ShortNote
-	else
-		return self.drawables[self:getNoteColor("key", note.noteData.columnIndex, 7)].ShortNote
-	end
+	return self.drawables[self:getNoteColor(note.noteData.inputType, note.noteData.inputIndex, 7)].ShortNote
 end
 NoteSkin.getLongNoteHeadDrawable = function(self, note)
-	if note.noteData.columnIndex == "S" then
-		return self.drawables.orange.ShortNote
-	else
-		return self.drawables[self:getNoteColor("key", note.noteData.columnIndex, 7)].LongNoteHead
-	end
+	return self.drawables[self:getNoteColor(note.noteData.inputType, note.noteData.inputIndex, 7)].LongNoteHead
 end
 NoteSkin.getLongNoteTailDrawable = function(self, note)
-	if note.noteData.columnIndex == "S" then
-		return self.drawables.orange.ShortNote
-	else
-		return self.drawables[self:getNoteColor("key", note.noteData.columnIndex, 7)].LongNoteTail
-	end
+	return self.drawables[self:getNoteColor(note.noteData.inputType, note.noteData.inputIndex, 7)].LongNoteTail
 end
 NoteSkin.getLongNoteBodyDrawable = function(self, note)
-	if note.noteData.columnIndex == "S" then
-		return self.drawables.orange.ShortNote
-	else
-		return self.drawables[self:getNoteColor("key", note.noteData.columnIndex, 7)].LongNoteBody
-	end
+	return self.drawables[self:getNoteColor(note.noteData.inputType, note.noteData.inputIndex, 7)].LongNoteBody
 end
 
 --------------------------------

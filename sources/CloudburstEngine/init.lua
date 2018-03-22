@@ -59,12 +59,14 @@ end
 
 CloudburstEngine.loadNoteHandlers = function(self)
 	self.noteHandlers = {}
-	for columnIndex in self.noteChart:getColumnIndexIteraator() do
-		self.noteHandlers[columnIndex] = self.NoteHandler:new({
-			columnIndex = columnIndex,
+	for inputType, inputIndex in self.noteChart:getInputIteraator() do
+		local noteHandlerIndex = {inputType, inputIndex}
+		self.noteHandlers[noteHandlerIndex] = self.NoteHandler:new({
+			inputType = inputType,
+			inputIndex = inputIndex,
 			engine = self
 		})
-		self.noteHandlers[columnIndex]:load()
+		self.noteHandlers[noteHandlerIndex]:load()
 	end
 end
 

@@ -48,8 +48,10 @@ NoteChartImporter.processLine = function(self, line)
 		local measureIndex, channelIndex, indexDataString = line:match("^#(%d%d%d)(%d%d):(.+)$")
 		measureIndex = tonumber(measureIndex)
 		
-		local channelData = self.channelDataSequence:requireChannelData(measureIndex, channelIndex)
-		channelData:addIndexData(indexDataString)
+		if bms.ChannelEnum[channelIndex] then
+			local channelData = self.channelDataSequence:requireChannelData(measureIndex, channelIndex)
+			channelData:addIndexData(indexDataString)
+		end
 	elseif line:find("^#[.%S]+ .+$") then
 		self:processHeaderLine(line)
 	end
@@ -76,7 +78,7 @@ end
 NoteChartImporter.importSignature = function(self)
 	for measureIndex, channelDatas in pairs(self.channelDataSequence.data) do
 		for channelIndex, channelData in pairs(channelDatas) do
-			if channelIndex == bms.ChannelEnum.Signature then
+			if bms.ChannelEnum[channelIndex].name == "Signature" then
 				self.foregroundLayerData:setSignature(
 					measureIndex,
 					ncdk.Fraction:new():fromNumber(channelData.value * 4)
@@ -90,14 +92,14 @@ NoteChartImporter.importTempoData = function(self)
 	for measureIndex, channelDatas in pairs(self.channelDataSequence.data) do
 		for channelIndex, channelData in pairs(channelDatas) do
 			for indexDataIndex, indexData in ipairs(channelData.indexDatas) do
-				if channelIndex == bms.ChannelEnum.Tempo then
+				if bms.ChannelEnum[channelIndex].name == "Tempo" then
 					self.foregroundLayerData:addTempoData(
 						ncdk.TempoData:new(
 							measureIndex + indexData.measureTimeOffset,
 							tonumber(indexData.value, 16)
 						)
 					)
-				elseif channelIndex == bms.ChannelEnum.ExtendedTempo then
+				elseif bms.ChannelEnum[channelIndex].name == "ExtendedTempo" then
 					self.foregroundLayerData:addTempoData(
 						ncdk.TempoData:new(
 							measureIndex + indexData.measureTimeOffset,
@@ -116,7 +118,7 @@ NoteChartImporter.importStopData = function(self)
 	for measureIndex, channelDatas in pairs(self.channelDataSequence.data) do
 		for channelIndex, channelData in pairs(channelDatas) do
 			for indexDataIndex, indexData in ipairs(channelData.indexDatas) do
-				if channelIndex == bms.ChannelEnum.Stop then
+				if bms.ChannelEnum[channelIndex].name == "Stop" then
 					local measureTime = measureIndex + indexData.measureTimeOffset
 					local measureDuration = ncdk.Fraction:new(self.stopDataSequence[indexData.value], 192)
 					
@@ -148,41 +150,45 @@ NoteChartImporter.importNoteData = function(self)
 	for measureIndex, channelDatas in pairs(self.channelDataSequence.data) do
 		for channelIndex, channelData in pairs(channelDatas) do
 			for indexDataIndex, indexData in ipairs(channelData.indexDatas) do
-				local columnIndex = bms.ColumnIndexTable[channelIndex]
+				local channelInfo = bms.ChannelEnum[channelIndex]
 				
-				if columnIndex then
+				if channelInfo and (channelInfo.name == "Note" or channelInfo.name == "BGM") then
 					local measureTime = measureIndex + indexData.measureTimeOffset
 					local startTimePoint = self.foregroundLayerData:getTimePoint(measureTime, 1)
 					startTimePoint.velocityData = self.foregroundLayerData.velocityDataSequence:getVelocityDataByTimePoint(startTimePoint)
 					
 					local noteData
-					if not longNoteData[columnIndex] or not bms.LongNote[channelIndex] then
+					if not (longNoteData[channelInfo.inputType] and longNoteData[channelInfo.inputType][channelInfo.inputIndex]) or
+						not channelInfo.long
+					then
 						noteData = ncdk.NoteData:new(startTimePoint)
-						noteData.columnIndex = columnIndex
+						noteData.inputType = channelInfo.inputType
+						noteData.inputIndex = channelInfo.inputIndex
 					
 						noteData.soundFileName = self.wavDataSequence[indexData.value]
 						noteData.zeroClearVisualStartTime = self.foregroundLayerData:getVisualTime(startTimePoint, self.foregroundLayerData.zeroTimePoint, true)
 						noteData.currentVisualStartTime = noteData.zeroClearVisualStartTime
 					
-						if channelIndex == bms.ChannelEnum.BGM then
+						if channelInfo.inputType == "auto" then
 							noteData.noteType = "SoundNote"
 							self.backgroundLayerData:addNoteData(noteData)
-						elseif bms.LongNote[channelIndex] then
+						elseif channelInfo.long then
 							noteData.noteType = "LongNote"
-							longNoteData[columnIndex] = noteData
+							longNoteData[channelInfo.inputType] = longNoteData[channelInfo.inputType] or {}
+							longNoteData[channelInfo.inputType][channelInfo.inputIndex] = noteData
 							self.foregroundLayerData:addNoteData(noteData)
 						else
 							noteData.noteType = "ShortNote"
 							self.foregroundLayerData:addNoteData(noteData)
 						end
 					else
-						noteData = longNoteData[columnIndex]
+						noteData = longNoteData[channelInfo.inputType][channelInfo.inputIndex]
 						noteData.endTimePoint = startTimePoint
 					
 						noteData.zeroClearVisualEndTime = self.foregroundLayerData:getVisualTime(startTimePoint, self.foregroundLayerData.zeroTimePoint, true)
 						noteData.currentVisualEndTime = noteData.zeroClearVisualEndTime
 						
-						longNoteData[columnIndex] = nil
+						longNoteData[channelInfo.inputType][channelInfo.inputIndex] = nil
 					end
 				end
 			end
