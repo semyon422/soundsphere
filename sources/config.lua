@@ -72,12 +72,18 @@ loadEngine = function(directoryPath, fileName)
 	engine.fileManager = globalFileManager
 	engine:activate()
 	engine.timeManager:play()
+	
+	playField = PlayField:new({
+		engine = engine
+	})
+	playField:activate()
 end
 
 unloadEngine = function()
 	globalFileManager:removePath(currentCacheData.directoryPath)
 	
 	engine:deactivate()
+	playField:deactivate()
 end
 
 stateManager:setState(

@@ -85,7 +85,7 @@ end
 -- get*Layer
 --------------------------------
 NoteSkin.getShortNoteLayer = function(self, note)
-	return 2 * (1000000 - note.noteData.startTimePoint:getAbsoluteTime()) * (self:getColumnIndexNumber(note) + 1) / 1000000000
+	return 2 * (1000000 - note.noteData.startTimePoint:getAbsoluteTime()) * (self:getColumnIndexNumber(note) + 1) / 1000000000 + 16
 end
 NoteSkin.getLongNoteHeadLayer = function(self, note)
 	return self:getShortNoteLayer(note)
@@ -94,7 +94,7 @@ NoteSkin.getLongNoteTailLayer = function(self, note)
 	return self:getShortNoteLayer(note)
 end
 NoteSkin.getLongNoteBodyLayer = function(self, note)
-	return (1000000 - note.noteData.startTimePoint:getAbsoluteTime()) * (self:getColumnIndexNumber(note) + 1) / 1000000000 - 1 / 2000000000
+	return (1000000 - note.noteData.startTimePoint:getAbsoluteTime()) * (self:getColumnIndexNumber(note) + 1) / 1000000000 - 1 / 2000000000 + 16
 end
 
 --------------------------------
