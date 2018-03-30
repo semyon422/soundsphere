@@ -7,5 +7,6 @@ require("List")
 require("Cache")
 require("KeyBindManager")
 require("PlayField")
+require("InputModeLoader")
 
 require("config")

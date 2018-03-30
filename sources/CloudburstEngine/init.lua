@@ -16,6 +16,8 @@ require("CloudburstEngine.NoteSkin")
 require("CloudburstEngine.TimeManager")
 
 CloudburstEngine.load = function(self)
+	self.inputMode = inputModeLoader:getInputMode(self.noteChart.inputMode)
+	
 	self.sharedLogicalNoteData = {}
 	self:loadNoteHandlers()
 	self:loadNoteDrawers()

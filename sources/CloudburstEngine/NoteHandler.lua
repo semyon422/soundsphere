@@ -52,7 +52,7 @@ NoteHandler.loadNoteData = function(self)
 end
 
 NoteHandler.setKeyState = function(self)
-	self.keyBind = KeyBind[self.inputType][self.inputIndex] or tonumber(self.inputIndex)
+	self.keyBind = self.engine.inputMode:getInput(self.inputType, self.inputIndex)
 	self.keyState = love.keyboard.isDown(self.keyBind)
 end
 

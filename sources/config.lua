@@ -1,18 +1,5 @@
-KeyBind = {
-	key = {
-		[1] = "w",
-		[2] = "e",
-		[3] = "r",
-		[4] = "space",
-		[5] = "o",
-		[6] = "p",
-		[7] = "["
-	},
-	scratch = {
-		[1] = "q"
-	}
-}
-
+inputModeLoader = InputModeLoader:new()
+inputModeLoader:load("userdata/input.txt")
 
 cache = Cache:new()
 cache:init()

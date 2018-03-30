@@ -15,16 +15,23 @@ InputMode.new = function(self)
 	return inputMode
 end
 
-InputMode.addInput = function(self, inputType, inputIndex)
+InputMode.setInput = function(self, inputType, inputIndex, binding)
 	self.inputData[inputType] = self.inputData[inputType] or {}
-	self.inputData[inputType][inputIndex] = true
+	self.inputData[inputType][inputIndex] = binding
+end
+
+InputMode.getInput = function(self, inputType, inputIndex)
+	return self.inputData[inputType] and self.inputData[inputType][inputIndex]
 end
 
 InputMode_metatable.__le = function(a, b)
 	for inputType, inputTypeData in pairs(a.inputData) do
-		for inputData in pairs(inputTypeData) do
-			if not (b.inputData[inputType] and b.inputData[inputType][inputIndex]) then
-				return
+		if inputType ~= "auto" then
+			for inputIndex in pairs(inputTypeData) do
+				if not (b.inputData[inputType] and b.inputData[inputType][inputIndex]) then
+					-- print(b.inputData[inputType][inputIndex], a.inputData[inputType][inputIndex])
+					return
+				end
 			end
 		end
 	end
