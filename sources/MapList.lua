@@ -44,7 +44,7 @@ MapList.load = function(self)
 					self.directoryList:updateScrollDelta()
 				end,
 				onSelect = function(button)
-					self:updateFileList(cacheData.directoryPath)
+					self:updateFileList(cacheData.directoryPath, button)
 				end,
 			})
 			paths[cacheData.directoryPath] = true
@@ -59,7 +59,7 @@ MapList.load = function(self)
 	self.loaded = true
 end
 
-MapList.updateFileList = function(self, directoryPath)
+MapList.updateFileList = function(self, directoryPath, button)
 	self.fileList:clear()
 	
 	for cacheData in cache:getCacheDataIterator() do
@@ -71,6 +71,7 @@ MapList.updateFileList = function(self, directoryPath)
 					stateManager:switchState("playing")
 				end,
 				onSelect = function()
+					button.text = utf8validate(cacheData.title)
 				end
 			})
 		end
