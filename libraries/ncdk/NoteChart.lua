@@ -9,6 +9,9 @@ NoteChart.new = function(self)
 	local noteChart = {}
 	
 	noteChart.layerDataSequence = ncdk.LayerDataSequence:new()
+	noteChart.layerDataSequence.noteChart = noteChart
+	
+	noteChart.inputMode = ncdk.InputMode:new()
 	
 	setmetatable(noteChart, NoteChart_metatable)
 	

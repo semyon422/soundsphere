@@ -22,3 +22,5 @@ require("ncdk.SignatureTableImporter")
 require("ncdk.TempoDataImporter")
 require("ncdk.VelocityDataImporter")
 require("ncdk.NoteDataImporter")
+
+require("ncdk.InputMode")
