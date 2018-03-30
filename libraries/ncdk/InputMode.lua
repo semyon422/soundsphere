@@ -29,7 +29,6 @@ InputMode_metatable.__le = function(a, b)
 		if inputType ~= "auto" then
 			for inputIndex in pairs(inputTypeData) do
 				if not (b.inputData[inputType] and b.inputData[inputType][inputIndex]) then
-					-- print(b.inputData[inputType][inputIndex], a.inputData[inputType][inputIndex])
 					return
 				end
 			end
