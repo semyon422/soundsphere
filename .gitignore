@@ -1,4 +1,6 @@
-userdata
+userdata/charts
+userdata/skins
+userdata/plugins
 cache
 libraries/*.dll
 libraries/*.exe
