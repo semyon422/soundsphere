@@ -33,30 +33,49 @@ MapList.load = function(self)
 		upScrollKey = "up",
 		downScrollKey = "down"
 	})
-	
-	local paths = {}
-	for cacheData in cache:getCacheDataIterator() do
-		if not paths[cacheData.directoryPath] then
-			self.directoryList:addItem({
-				text = utf8validate(cacheData.title),
-				onClick = function(button)
-					self.directoryList.targetOffset = button.itemIndex - self.directoryList:getMiddleOffset()
-					self.directoryList:updateScrollDelta()
-				end,
-				onSelect = function(button)
-					self:updateFileList(cacheData.directoryPath, button)
-				end,
-			})
-			paths[cacheData.directoryPath] = true
-		end
-	end
 
 	self.directoryList:activate()
 	self.fileList:activate()
 	
+	self:updateDirectoryList()
+	self:updateFileList()
+	
 	self:loadCallbacks()
 	
 	self.loaded = true
+end
+
+MapList.filter = function(self, cacheData)
+	return true
+end
+
+MapList.updateDirectoryList = function(self)
+	local selectedItem = self.directoryList:getSelectedItem()
+	self.directoryList:clear()
+	
+	local paths = {}
+	for cacheData in cache:getCacheDataIterator() do
+		if self:filter(cacheData) then
+			if not paths[cacheData.directoryPath] then
+				self.directoryList:addItem({
+					text = utf8validate(cacheData.title),
+					onClick = function(button)
+						self.directoryList.targetOffset = button.itemIndex - self.directoryList:getMiddleOffset()
+						self.directoryList:updateScrollDelta()
+					end,
+					onSelect = function(button)
+						self:updateFileList(cacheData.directoryPath, button)
+					end,
+				})
+				paths[cacheData.directoryPath] = true
+			end
+		end
+	end
+	
+	local selectedItemIndex = self.directoryList:getItemIndex(selectedItem)
+	self.directoryList:scrollTo(selectedItemIndex)
+	
+	self.directoryList:reload()
 end
 
 MapList.updateFileList = function(self, directoryPath, button)

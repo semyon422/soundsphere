@@ -52,7 +52,8 @@ end
 List.calculateButtons = function(self)
 	self.buttons = self.buttons or {}
 	
-	self.selectedItemIndex = self.offset + self:getMiddleOffset()
+	self.selectedItemIndex = self.targetOffset + self:getMiddleOffset()
+	self.selectedItem = self:getSelectedItem()
 	
 	local itemIndexKeys = {}
 	for buttonIndex, button in pairs(self.buttons) do
@@ -102,22 +103,47 @@ List.updateScrollDelta = function(self)
 	self.scrollDelta = (self.targetOffset - self.offset) * dt * 16
 end
 
+List.scrollTo = function(self, targetOffset)
+	self.targetOffset = targetOffset
+	self:updateScrollDelta()
+end
+
+List.scrollBy = function(self, targetOffsetDelta)
+	self.targetOffset = self.targetOffset + targetOffsetDelta
+	self:updateScrollDelta()
+end
+
+List.getOffset = function(self)
+	return self.targetOffset
+end
+
+List.getSelectedItem = function(self)
+	return self.items[self.selectedItemIndex]
+end
+
+List.getItemIndex = function(self, item)
+	for itemIndex, currentItem in ipairs(self.items) do
+		if item == currentItem then
+			return itemIndex
+		end
+	end
+	
+	return 1
+end
+
 List.loadCallbacks = function(self)
 	soul.setCallback("wheelmoved", self, function(_, direction)
 		local x, y, w, h = self.x, self.y, self.w, self.h
 		local mx, my = self.cs:x(love.mouse.getX(), true), self.cs:y(love.mouse.getY(), true)
 		if belong(mx, x, x + w, my, y, y + h) then
-			self.targetOffset = self.targetOffset + direction
-			self:updateScrollDelta()
+			self:scrollBy(direction)
 		end
 	end)
 	soul.setCallback("keypressed", self, function(key)
 		if key == self.upScrollKey then
-			self.targetOffset = self.targetOffset - 1
-			self:updateScrollDelta()
+			self:scrollBy(-1)
 		elseif key == self.downScrollKey then
-			self.targetOffset = self.targetOffset + 1
-			self:updateScrollDelta()
+			self:scrollBy(1)
 		elseif key == "return" then
 			for button in pairs(self.buttons) do
 				if button.itemIndex == self.selectedItemIndex then
