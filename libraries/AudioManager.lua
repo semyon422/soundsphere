@@ -12,7 +12,16 @@ AudioManager.unload = function(self)
 end
 
 AudioManager.update = function(self)
-	
+	local stoppedSounds = {}
+	for sound in pairs(self.sounds) do
+		if bass.BASS_ChannelIsActive(sound.channel) == 0 then
+			sound:stop()
+			table.insert(stoppedSounds, sound)
+		end
+	end
+	for _, sound in ipairs(stoppedSounds) do
+		self.sounds[sound] = nil
+	end
 end
 
 AudioManager.loadChunk = function(self, filePath, group)

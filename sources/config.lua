@@ -9,7 +9,7 @@ cache:export()
 globalFileManager = FileManager:new()
 
 audioManager = AudioManager:new()
-audioManager:load()
+audioManager:activate()
 
 stateManager = StateManager:new()
 
