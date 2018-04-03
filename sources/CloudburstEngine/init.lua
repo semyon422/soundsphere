@@ -15,13 +15,19 @@ require("CloudburstEngine.LongGraphicalNote")
 require("CloudburstEngine.NoteSkin")
 require("CloudburstEngine.TimeManager")
 
+require("CloudburstEngine.ResourceObserver")
+
 CloudburstEngine.load = function(self)
 	self.inputMode = inputModeLoader:getInputMode(self.noteChart.inputMode)
 	
 	self.sharedLogicalNoteData = {}
+	self.soundFiles = {}
+	
 	self:loadNoteHandlers()
 	self:loadNoteDrawers()
 	self:loadTimeManager()
+	
+	self:loadResources()
 	
 	self.loaded = true
 end
@@ -37,10 +43,26 @@ CloudburstEngine.unload = function(self)
 	self:unloadNoteHandlers()
 	self:unloadNoteDrawers()
 	
-	audioManager:stopSoundGroup("engine")
-	audioManager:unloadChunkGroup("engine")
+	self:unloadResources()
 	
 	self.loaded = false
+end
+
+CloudburstEngine.loadResources = function(self)
+	self.resourceObserver = self.ResourceObserver:new()
+	self.resourceObserver.engine = self
+	audioManager:addObserver(self.resourceObserver)
+	
+	for _, soundFilePath in pairs(self.soundFiles) do
+		audioManager:loadChunk(soundFilePath, "engine")
+	end
+end
+
+CloudburstEngine.unloadResources = function(self)
+	audioManager:removeObserver(self.resourceObserver)
+	
+	audioManager:stopSoundGroup("engine")
+	audioManager:unloadChunkGroup("engine")
 end
 
 CloudburstEngine.loadTimeManager = function(self)

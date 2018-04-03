@@ -27,11 +27,10 @@ NoteHandler.loadNoteData = function(self)
 				})
 				
 				if noteData.soundFileName then
-					local soundFilePath = self.engine.fileManager:findFile(noteData.soundFileName, "audio")
-					if soundFilePath then
-						logicalNote.soundFilePath = soundFilePath
-						audioManager:loadChunk(soundFilePath, "engine")
+					if not self.engine.soundFiles[noteData.soundFileName] then
+						self.engine.soundFiles[noteData.soundFileName] = self.engine.fileManager:findFile(noteData.soundFileName, "audio")
 					end
+					logicalNote.soundFilePath = self.engine.soundFiles[noteData.soundFileName]
 				end
 				
 				table.insert(self.noteData, logicalNote)

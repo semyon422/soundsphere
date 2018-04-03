@@ -59,7 +59,7 @@ loadEngine = function(directoryPath, fileName)
 	engine.noteSkin = noteSkin
 	engine.fileManager = globalFileManager
 	engine:activate()
-	engine.timeManager:play()
+	-- engine.timeManager:play()
 	
 	playField = PlayField:new({
 		engine = engine

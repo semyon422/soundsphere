@@ -8,6 +8,7 @@ TimeManager.load = function(self)
 end
 
 TimeManager.update = function(self)
+	local deltaTime = love.timer.getDelta()
 	if love.timer.getDelta() > 0.1 then
 		return
 	end
@@ -21,7 +22,7 @@ TimeManager.update = function(self)
 				self.engine.audio:play()
 			end
 		else
-			self.currentTime = self.currentTime + love.timer.getDelta()
+			self.currentTime = self.currentTime + deltaTime
 		end
 	elseif self.state == "started" or self.state == "playing" then
 		if self.engine.audio then
@@ -40,7 +41,7 @@ TimeManager.update = function(self)
 				end
 			end
 		else
-			self.currentTime = self.currentTime + love.timer.getDelta()
+			self.currentTime = self.currentTime + deltaTime
 			self.state = "playing"
 			self.playState = self.state
 		end
@@ -49,7 +50,7 @@ TimeManager.update = function(self)
 			self.engine.audio:pause()
 		end
 	elseif self.state == "ended" then
-		self.currentTime = self.currentTime + love.timer.getDelta()
+		self.currentTime = self.currentTime + deltaTime
 	end
 end
 
