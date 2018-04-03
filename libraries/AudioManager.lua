@@ -1,8 +1,32 @@
 AudioManager = createClass(soul.SoulObject)
 
 AudioManager.load = function(self)
+	self.loadingChunkData = {}
+	self.loadingGroup = {}
+	self.observers = {}
 	self.chunkData = {}
 	self.sounds = {}
+	
+	self.thread = soul.Thread:new({
+		threadName = "AudioManager",
+		messageReceived = function(thread, chunkData)
+			self:setChunkData(chunkData)
+		end,
+		threadFunction = [[
+			ffi = require("ffi")
+			require("love.filesystem")
+			require("libraries.packagePath")
+			require("bass_ffi")
+			receiveMessageCallback = function(chunkData)
+				local file = love.filesystem.newFile(chunkData.filePath)
+				file:open("r")
+				chunkData.chunk = bass.BASS_SampleLoad(true, file:read(), 0, file:getSize(), 65535, 0)
+				file:close()
+				sendMessage(chunkData)
+			end
+		]]
+	})
+	self.thread:activate()
 	
 	self.loaded = true
 end
@@ -24,15 +48,45 @@ AudioManager.update = function(self)
 	end
 end
 
+AudioManager.setChunkData = function(self, chunkData)
+	self.chunkData[chunkData.filePath] = chunkData
+	self.loadingGroup[chunkData.group] = self.loadingGroup[chunkData.group] - 1
+	self.loadingChunkData[chunkData.filePath] = nil
+	
+	self:sendEvent({
+		type = "Group",
+		name = chunkData.group,
+		value = self.loadingGroup[chunkData.group]
+	})
+	self:sendEvent({
+		type = "ChunkData",
+		name = chunkData.filePath,
+		value = false
+	})
+end
+
+AudioManager.addObserver = function(self, observer)
+	self.observers[observer] = true
+end
+
+AudioManager.removeObserver = function(self, observer)
+	self.observers[observer] = nil
+end
+
+AudioManager.sendEvent = function(self, event)
+	for observer in pairs(self.observers) do
+		observer:receiveEvent(event)
+	end
+end
+
 AudioManager.loadChunk = function(self, filePath, group)
-	if not self.chunkData[filePath] then
-		local file = love.filesystem.newFile(filePath)
-		file:open("r")
-		self.chunkData[filePath] = {
-			chunk = bass.BASS_SampleLoad(true, file:read(), 0, file:getSize(), 65535, 0),
+	if not self.chunkData[filePath] and not self.loadingChunkData[filePath] then
+		self.thread:send({
+			filePath = filePath,
 			group = group
-		}
-		file:close()
+		})
+		self.loadingGroup[group] = (self.loadingGroup[group] or 0) + 1
+		self.loadingChunkData[filePath] = true
 	end
 end
 
@@ -67,7 +121,9 @@ AudioManager.addSound = function(self, filePath, group)
 end
 
 AudioManager.playSound = function(self, filePath, group)
-	self:addSound(filePath, group):play()
+	if self.chunkData[filePath] then
+		self:addSound(filePath, group):play()
+	end
 end
 
 AudioManager.playSoundGroup = function(self, group)
