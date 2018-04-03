@@ -2,9 +2,14 @@ soul.Thread = createClass(soul.SoulObject)
 local Thread = soul.Thread
 
 Thread.load = function(self)
-	self.thread = love.thread.newThread(self.threadFunctionHeader .. self.threadFunction .. self.threadFunctionFooter)
-	self.inputChannel = love.thread.getChannel("input")
-	self.outputChannel = love.thread.getChannel("output")
+	self.thread = love.thread.newThread(
+		"threadName = " .. self.threadName .. "\n" ..
+		self:getThreadFunctionHeader() ..
+		self.threadFunction ..
+		self.threadFunctionFooter
+	)
+	self.inputChannel = love.thread.getChannel("input_" .. self.threadName)
+	self.outputChannel = love.thread.getChannel("output_" .. self.threadName)
 	self.thread:start()
 end
 
@@ -35,18 +40,31 @@ end
 
 Thread.messageReceived = function(self, message) end
 
-Thread.threadFunctionHeader = [[
-	inputChannel = love.thread.getChannel("input")
-	outputChannel = love.thread.getChannel("output")
-	threaded = true
-]]
+Thread.getThreadFunctionHeader = function(self)
+	return [[
+		require("love.timer")
+		inputChannel = love.thread.getChannel("input_]] .. self.threadName .. [[")
+		outputChannel = love.thread.getChannel("output_]] .. self.threadName .. [[")
+		
+		sendMessage = function(message)
+			outputChannel:push(message)
+		end
+		
+		threaded = true
+	]]
+end
 
 Thread.threadFunctionFooter = [[
-	if threadMessageReceived then
+	if receiveMessageCallback then
 		while true do
+			local startTime = love.timer.getTime()
 			local message = inputChannel:pop()
 			if message then
-				threadMessageReceived(message)
+				receiveMessageCallback(message)
+			end
+			local deltaTime = love.timer.getTime() - startTime
+			if deltaTime < 0.01 then
+				love.timer.sleep(0.01 - deltaTime)
 			end
 		end
 	end
