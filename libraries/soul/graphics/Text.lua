@@ -1,13 +1,6 @@
 soul.graphics.Text = createClass(soul.graphics.GraphicalObject)
 local Text = soul.graphics.Text
 
-Text.align = {
-	x = "left", y = "bottom"
-}
-Text.font = love.graphics.getFont()
-Text.color = {love.graphics.getColor()}
-Text.limit = math.huge
-
 Text.getY = function(self, lineCount)
 	local y = self.cs:Y(self.y, true)
 	if self.align.y == "center" then

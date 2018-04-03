@@ -1,10 +1,6 @@
 soul.graphics.TextFrame = createClass(soul.graphics.Text)
 local TextFrame = soul.graphics.TextFrame
 
-TextFrame.align = {
-	x = "left", y = "top"
-}
-
 TextFrame.getY = function(self, lineCount)
 	local y = self.cs:Y(self.y, true)
 	local h = self.cs:Y(self.h)

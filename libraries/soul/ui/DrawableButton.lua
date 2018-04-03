@@ -1,16 +1,12 @@
 soul.ui.DrawableButton = createClass(soul.ui.Button)
 local DrawableButton = soul.ui.DrawableButton
 
-DrawableButton.drawablePadding = {
-	x = 0, y = 0
-}
-
 DrawableButton.loadBackground = function(self)
 	self.drawableObject = soul.graphics.DrawableFrame:new({
-		x = self.x + self.drawablePadding.x,
-		y = self.y + self.drawablePadding.y,
-		w = self.w - 2 * self.drawablePadding.x,
-		h = self.h - 2 * self.bdrawablePadding.y,
+		x = self.x,
+		y = self.y,
+		w = self.w,
+		h = self.h,
 		align = self.drawableAlign,
 		drawable = self.drawable,
 		color = self.drawableColor,

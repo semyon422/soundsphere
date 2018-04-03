@@ -74,6 +74,7 @@ List.calculateButtons = function(self)
 				limit = self.limit,
 				textAlign = self.textAlign,
 				rectangleColor = (itemIndex == self.selectedItemIndex) and self.selectedRectangleColor or self.rectangleColor,
+				textColor = self.textColor,
 				font = self.font,
 				
 				list = self,

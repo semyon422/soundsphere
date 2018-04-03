@@ -12,7 +12,7 @@ Drawable.draw = function(self)
 		self.sx,
 		self.sy,
 		self.cs:X(self.ox),
-		self.cs:X(self.oy)
+		self.cs:Y(self.oy)
 	)
 	
 	self:switchColor()
