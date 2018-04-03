@@ -9,6 +9,8 @@ soul.init()
 ffi = require("ffi")
 
 require("bass_ffi")
+bassInit()
+
 require("iconv_ffi")
 
 require("AudioManager")
