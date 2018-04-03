@@ -2,7 +2,7 @@ soul.Thread = createClass(soul.SoulObject)
 local Thread = soul.Thread
 
 Thread.load = function(self)
-	self.thread = love.thread.newThread(self.threadFunctionHeader .. self.threadFunction)
+	self.thread = love.thread.newThread(self.threadFunctionHeader .. self.threadFunction .. self.threadFunctionFooter)
 	self.inputChannel = love.thread.getChannel("input")
 	self.outputChannel = love.thread.getChannel("output")
 	self.thread:start()
@@ -13,6 +13,11 @@ Thread.unload = function(self)
 end
 
 Thread.update = function(self)
+	local threadError = self.thread:getError()
+	if threadError then
+		error(threadError)
+	end
+	
 	local message = self:receive()
 	while message do
 		self:messageReceived(message)
@@ -31,7 +36,20 @@ end
 Thread.messageReceived = function(self, message) end
 
 Thread.threadFunctionHeader = [[
-inputChannel = love.thread.getChannel("input")
-outputChannel = love.thread.getChannel("output")
+	inputChannel = love.thread.getChannel("input")
+	outputChannel = love.thread.getChannel("output")
+	threaded = true
 ]]
+
+Thread.threadFunctionFooter = [[
+	if threadMessageReceived then
+		while true do
+			local message = inputChannel:pop()
+			if message then
+				threadMessageReceived(message)
+			end
+		end
+	end
+]]
+
 Thread.threadFunction = [[]]
