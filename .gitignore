@@ -7,3 +7,5 @@ libraries/*.exe
 libraries/*.h
 libraries/love*
 libraries/rhythm
+libraries/soul
+libraries/tweaks
