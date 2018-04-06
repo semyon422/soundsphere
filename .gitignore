@@ -6,3 +6,4 @@ libraries/*.dll
 libraries/*.exe
 libraries/*.h
 libraries/love*
+libraries/rhythm
