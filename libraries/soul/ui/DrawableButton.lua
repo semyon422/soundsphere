@@ -18,5 +18,5 @@ DrawableButton.loadBackground = function(self)
 end
 
 DrawableButton.unloadBackground = function(self)
-	self.drawableObject:remove()
+	self.drawableObject:deactivate()
 end
