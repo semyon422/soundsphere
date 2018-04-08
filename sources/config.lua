@@ -40,7 +40,23 @@ local button = soul.ui.RectangleTextButton:new({
 	font = mainFont30
 })
 
-mapList = MapList:new()
+mapList = MapList:new({
+		x = -7/9, y = 0, w = 7/9, h = 1,
+		layer = 2,
+		cs = soul.CS:new(nil, 1, 0, 0, 0, "h", 768),
+		rectangleColor = {255, 255, 255, 0},
+		textColor = {255, 255, 255, 255},
+		selectedRectangleColor = {255, 255, 255, 31},
+		mode = "fill",
+		limit = 7/9,
+		textAlign = {
+			x = "left", y = "center"
+		},
+		buttonCount = 17,
+		font = mainFont20,
+		upScrollKey = "left",
+		downScrollKey = "right"
+	})
 
 currentCacheData = nil
 
