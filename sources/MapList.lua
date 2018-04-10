@@ -1,29 +1,38 @@
 MapList = createClass(soul.SoulObject)
 
 MapList.buttonCount = 17
-MapList.offset = 0
-MapList.subOffset = 0
-MapList.targetOffset = 0
-MapList.targetSubOffset = 0
+MapList.visualItemIndex = 1
+MapList.visualSubItemIndex = 1
+MapList.selectedItemIndex = 1
+MapList.selectedSubItemIndex = 1
 MapList.scrollDelta = 0
 MapList.scrollSubDelta = 0
 
-MapList.selectedItemIndex = 1
-MapList.selectedFileIndex = 1
-
-MapList.currentDirectoryPathFileCount = 1
-MapList.currentDirectoryPathFileIndex = 1
+MapList.x = -7/9
+MapList.y = 0
+MapList.w = 7/9
+MapList.h = 1
+MapList.layer = 2
+MapList.rectangleColor = {255, 255, 255, 0}
+MapList.textColor = {255, 255, 255, 255}
+MapList.selectedRectangleColor = {255, 255, 255, 31}
+MapList.mode = "fill"
+MapList.limit = 7/9
+MapList.textAlign = {
+	x = "left", y = "center"
+}
+MapList.buttonCount = 17
+MapList.upScrollKey = "up"
+MapList.downScrollKey = "down"
 
 MapList.load = function(self)
+	self.cs = soul.CS:new(nil, 1, 0, 0, 0, "h", 768)
+	self.font = mainFont20
+
 	self:transformCache()
 	
 	self:updateItems()
 	self:updateSubItems()
-	
-	self.offset = 1 - self:getMiddleOffset()
-	self.subOffset = 1 - self:getMiddleOffset()
-	self.targetOffset = self.offset
-	self.targetSubOffset = self.subOffset
 	
 	self:calculateButtons()
 	self:loadCallbacks()
@@ -37,19 +46,15 @@ MapList.updateItems = function(self)
 		self:addItem({
 			text = utf8validate(cacheDatas[1].title),
 			onClick = function(button)
-				self.targetSubOffset = 1 - self:getMiddleOffset()
-				self.subOffset = 1 - self:getMiddleOffset()
+				self.selectedSubItemIndex = 1
+				self.visualSubItemIndex = 1
 				
-				self.targetOffset = button.itemIndex - self:getMiddleOffset()
+				self.selectedItemIndex = button.itemIndex
 				self:updateScrollDelta()
 				
-				self.currentDirectoryPathFileCount = #self.transformedCache[directoryPath]
-				self.currentDirectoryPathFileIndex = 1
 				self:updateSubItems()
 			end,
 			onSelect = function(button)
-				self.currentDirectoryPathFileCount = #self.transformedCache[directoryPath]
-				self.currentDirectoryPathFileIndex = 1
 				self:updateSubItems()
 			end,
 			directoryPath = directoryPath
@@ -60,26 +65,33 @@ end
 MapList.updateSubItems = function(self)
 	self.subItems = {}
 	local directoryPath = self.items[self.selectedItemIndex].directoryPath
-	for fileIndex, cacheData in pairs(self.transformedCache[directoryPath]) do
+	for subItemIndex, cacheData in pairs(self.transformedCache[directoryPath]) do
 		self:addSubItem({
 			text = utf8validate(cacheData.title),
 			onClick = function(button)
-				if button.fileIndex == self.selectedFileIndex then
+				if button.subItemIndex == self.selectedSubItemIndex then
 					currentCacheData = cacheData
 					stateManager:switchState("playing")
 				else
-					self.targetSubOffset = button.fileIndex - self:getMiddleOffset()
-					self.currentDirectoryPathFileIndex = fileIndex
+					self.selectedSubItemIndex = button.subItemIndex
+					self.selectedSubItemIndex = subItemIndex
 					self:updateScrollSubDelta()
 				end
 			end,
 			onSelect = function(button)
-				self.currentDirectoryPathFileCount = #self.transformedCache[directoryPath]
-				self.currentDirectoryPathFileIndex = fileIndex
+				self.selectedSubItemIndex = subItemIndex
 			end,
 			directoryPath = directoryPath
 		})
 	end
+end
+
+MapList.getItemCount = function(self)
+	return #self.items
+end
+
+MapList.getSubItemCount = function(self)
+	return #self.subItems
 end
 
 MapList.unload = function(self)
@@ -103,32 +115,32 @@ MapList.getMiddleOffset = function(self)
 end
 
 MapList.update = function(self)
-	if self.targetOffset < 1 - self:getMiddleOffset() then
-		self.targetOffset = 1 - self:getMiddleOffset()
-	elseif self.targetOffset > #self.items - self:getMiddleOffset() then
-		self.targetOffset = #self.items - self:getMiddleOffset()
+	if self.selectedItemIndex < 1 then
+		self.selectedItemIndex = 1
+	elseif self.selectedItemIndex > self:getItemCount() then
+		self.selectedItemIndex = self:getItemCount()
 	end
-	if (self.scrollDelta > 0 and self.offset + self.scrollDelta > self.targetOffset)
-	or (self.scrollDelta < 0 and self.offset + self.scrollDelta < self.targetOffset)
+	if (self.scrollDelta > 0 and self.visualItemIndex + self.scrollDelta > self.selectedItemIndex)
+	or (self.scrollDelta < 0 and self.visualItemIndex + self.scrollDelta < self.selectedItemIndex)
 	then
-		self.offset = self.targetOffset
+		self.visualItemIndex = self.selectedItemIndex
 		self.scrollDelta = 0
 	else
-		self.offset = self.offset + self.scrollDelta
+		self.visualItemIndex = self.visualItemIndex + self.scrollDelta
 	end
 	
-	if self.targetSubOffset < 1 - self:getMiddleOffset() then
-		self.targetSubOffset = 1 - self:getMiddleOffset()
-	elseif self.targetSubOffset > #self.subItems - self:getMiddleOffset() then
-		self.targetSubOffset = #self.subItems - self:getMiddleOffset()
+	if self.selectedSubItemIndex < 1 then
+		self.selectedSubItemIndex = 1
+	elseif self.selectedSubItemIndex > self:getSubItemCount() then
+		self.selectedSubItemIndex = self:getSubItemCount()
 	end
-	if (self.scrollSubDelta > 0 and self.subOffset + self.scrollSubDelta > self.targetSubOffset)
-	or (self.scrollSubDelta < 0 and self.subOffset + self.scrollSubDelta < self.targetSubOffset)
+	if (self.scrollSubDelta > 0 and self.visualSubItemIndex + self.scrollSubDelta > self.selectedSubItemIndex)
+	or (self.scrollSubDelta < 0 and self.visualSubItemIndex + self.scrollSubDelta < self.selectedSubItemIndex)
 	then
-		self.subOffset = self.targetSubOffset
+		self.visualSubItemIndex = self.selectedSubItemIndex
 		self.scrollSubDelta = 0
 	else
-		self.subOffset = self.subOffset + self.scrollSubDelta
+		self.visualSubItemIndex = self.visualSubItemIndex + self.scrollSubDelta
 	end
 	
 	self:calculateButtons()
@@ -137,27 +149,23 @@ end
 MapList.calculateButtons = function(self)
 	self.buttons = self.buttons or {}
 	
-	self.selectedItemIndex = self.targetOffset + self:getMiddleOffset()
-	self.selectedFileIndex = self.targetSubOffset + self:getMiddleOffset()
-	self.selectedItem = self:getSelectedItem()
-	
 	local itemIndexKeys = {}
-	local fileIndexKeys = {}
+	local subItemIndexKeys = {}
 	for buttonIndex, button in pairs(self.buttons) do
 		itemIndexKeys[button.itemIndex] = button
 		if button.itemIndex == self.selectedItemIndex then
-			fileIndexKeys[button.fileIndex] = button
+			subItemIndexKeys[button.subItemIndex] = button
 		end
 		button:update()
 	end
 	
-	for itemIndex = 1 + math.floor(self.offset), self.buttonCount + math.ceil(self.offset) do
+	for itemIndex = 1 + math.floor(self.visualItemIndex) - self:getMiddleOffset(), self.buttonCount + math.ceil(self.visualItemIndex) + self:getMiddleOffset() do
 		local item = self.items[itemIndex]
 		if item and not itemIndexKeys[itemIndex] or item and itemIndex == self.selectedItemIndex then
-			local limit = itemIndex == self.selectedItemIndex and self.currentDirectoryPathFileCount or 1
-			for fileIndex = 1, limit do
-				if not fileIndexKeys[fileIndex] and itemIndex == self.selectedItemIndex or itemIndex ~= self.selectedItemIndex then
-					item = (itemIndex == self.selectedItemIndex) and self.subItems[fileIndex] or self.items[itemIndex]
+			local limit = itemIndex == self.selectedItemIndex and self:getSubItemCount() or 1
+			for subItemIndex = 1, limit do
+				if not subItemIndexKeys[subItemIndex] and itemIndex == self.selectedItemIndex or itemIndex ~= self.selectedItemIndex then
+					item = (itemIndex == self.selectedItemIndex) and self.subItems[subItemIndex] or self.items[itemIndex]
 					local button = self.Button:new({
 						x = self.x, y = self.y,
 						w = self.w, h = self.h / (self.buttonCount),
@@ -177,7 +185,7 @@ MapList.calculateButtons = function(self)
 						
 						text = item.text,
 						action = item.onClick,
-						fileIndex = fileIndex
+						subItemIndex = subItemIndex
 					})
 					button:activate()
 					button:update()
@@ -199,52 +207,40 @@ end
 
 MapList.updateScrollDelta = function(self)
 	local dt =  math.min(1/60, love.timer.getDelta())
-	self.scrollDelta = (self.targetOffset - self.offset) * dt * 16
+	self.scrollDelta = (self.selectedItemIndex - self.visualItemIndex) * dt * 16
 end
 
 MapList.updateScrollSubDelta = function(self)
 	local dt =  math.min(1/60, love.timer.getDelta())
-	self.scrollSubDelta = (self.targetSubOffset - self.subOffset) * dt * 16
+	self.scrollSubDelta = (self.selectedSubItemIndex - self.visualSubItemIndex) * dt * 16
 end
 
-MapList.scrollTo = function(self, targetOffset)
-	self.targetOffset = targetOffset
+MapList.scrollTo = function(self, itemIndex)
+	self.selectedItemIndex = itemIndex
 	self:updateScrollDelta()
 end
 
 MapList.scrollBy = function(self, targetOffsetDelta)
-	if self.currentDirectoryPathFileIndex + targetOffsetDelta <= self.currentDirectoryPathFileCount and
-		self.currentDirectoryPathFileIndex + targetOffsetDelta >= 1
+	if self.selectedSubItemIndex + targetOffsetDelta <= self:getSubItemCount() and
+		self.selectedSubItemIndex + targetOffsetDelta >= 1
 	then
-		self.currentDirectoryPathFileIndex = self.currentDirectoryPathFileIndex + targetOffsetDelta
-		self.targetSubOffset = self.targetSubOffset + targetOffsetDelta
+		self.selectedSubItemIndex = self.selectedSubItemIndex + targetOffsetDelta
 		
 		self:updateScrollSubDelta()
-		self.selectedSubItemIndex = self.targetSubOffset + self:getMiddleOffset()
-		self.selectedSubItem = self:getSelectedSubItem()
-		if self.selectedSubItem then self.selectedSubItem.onSelect() end
+		self.selectedSubItemIndex = self.selectedSubItemIndex
+		if self.subItems[self.selectedSubItemIndex] then
+			self.subItems[self.selectedSubItemIndex].onSelect()
+		end
 	else
-		self.targetSubOffset = 1 - self:getMiddleOffset()
-		self.subOffset = 1 - self:getMiddleOffset()
-		self.targetOffset = self.targetOffset + targetOffsetDelta
+		self.selectedSubItemIndex = 1
+		self.visualSubItemIndex = 1
+		self.selectedItemIndex = self.selectedItemIndex + targetOffsetDelta
 		
 		self:updateScrollDelta()
-		self.selectedItemIndex = self.targetOffset + self:getMiddleOffset()
-		self.selectedItem = self:getSelectedItem()
-		if self.selectedItem then self.selectedItem.onSelect() end
+		if self.items[self.selectedItemIndex] then
+			self.items[self.selectedItemIndex].onSelect()
+		end
 	end
-end
-
-MapList.getOffset = function(self)
-	return self.targetOffset
-end
-
-MapList.getSelectedItem = function(self)
-	return self.items[self.selectedItemIndex]
-end
-
-MapList.getSelectedSubItem = function(self)
-	return self.subItems[self.selectedSubItemIndex]
 end
 
 MapList.getItemIndex = function(self, item)
@@ -262,7 +258,7 @@ MapList.loadCallbacks = function(self)
 		local x, y, w, h = self.x, self.y, self.w, self.h
 		local mx, my = self.cs:x(love.mouse.getX(), true), self.cs:y(love.mouse.getY(), true)
 		if belong(mx, x, x + w, my, y, y + h) then
-			self:scrollBy(direction)
+			self:scrollBy(-direction)
 		end
 	end)
 	soul.setCallback("keypressed", self, function(key)
@@ -272,7 +268,7 @@ MapList.loadCallbacks = function(self)
 			self:scrollBy(1)
 		elseif key == "return" then
 			for button in pairs(self.buttons) do
-				if button.itemIndex == self.selectedItemIndex and button.fileIndex == self.selectedSubItemIndex then
+				if button.itemIndex == self.selectedItemIndex and button.subItemIndex == self.selectedSubItemIndex then
 					button.item.onClick(button)
 					break
 				end
@@ -286,32 +282,23 @@ MapList.unloadCallbacks = function(self)
 end
 
 MapList.addItem = function(self, item)
-	if not self.items then
-		self.items = {}
-	end
-	
 	table.insert(self.items, item)
 end
 
 MapList.addSubItem = function(self, item)
-	if not self.subItems then
-		self.subItems = {}
-	end
-	
 	table.insert(self.subItems, item)
 end
 
 MapList.Button = createClass(soul.ui.RectangleTextButton)
 
 MapList.Button.updateY = function(self)
-	self.y = self.list.y + (self.itemIndex - self.list.offset - 1) * (self.list.h / self.list.buttonCount)
+	self.y = self.list.y + (self.list:getMiddleOffset() - self.list.visualSubItemIndex) * (self.list.h / self.list.buttonCount)
 	if self.itemIndex < self.list.selectedItemIndex then
-		self.y = self.y - (self.list.currentDirectoryPathFileIndex - 1 - self.list.targetSubOffset + self.list.subOffset) * (self.list.h / self.list.buttonCount)
+		self.y = self.y + (self.itemIndex - self.list.visualItemIndex) * (self.list.h / self.list.buttonCount)
 	elseif self.itemIndex > self.list.selectedItemIndex then
-		self.y = self.y + (self.list.currentDirectoryPathFileCount - self.list.currentDirectoryPathFileIndex + self.list.targetSubOffset - self.list.subOffset) * (self.list.h / self.list.buttonCount)
+		self.y = self.y + (self.itemIndex - self.list.visualItemIndex + #self.list.subItems - 1) * (self.list.h / self.list.buttonCount)
 	else
-		self.y = self.list.y + (self.fileIndex - self.list.subOffset - 1) * (self.list.h / self.list.buttonCount)
-		-- self.y = self.y + (self.fileIndex - 1 - self.list.currentDirectoryPathFileIndex + 1) * (self.list.h / self.list.buttonCount)
+		self.y = self.y + (self.subItemIndex - 1) * (self.list.h / self.list.buttonCount)
 	end
 end
 
@@ -331,7 +318,7 @@ MapList.Button.update = function(self)
 	
 	if self.itemIndex == self.list.selectedItemIndex then
 		self.rectangleColor = self.list.selectedRectangleColor
-		if not self.selected and self.item.onSelect and self.fileIndex == self.list.currentDirectoryPathFileIndex then
+		if not self.selected and self.item.onSelect and self.subItemIndex == self.list.selectedSubItemIndex then
 			self.item.onSelect(self)
 			self.selected = true
 		end
@@ -340,7 +327,7 @@ MapList.Button.update = function(self)
 		self.rectangleColor = self.list.rectangleColor
 	end
 	
-	if self.y < self.list.y - self.h or self.y > self.list.y + self.list.h or self.fileIndex ~= 1 and self.itemIndex ~= self.list.selectedItemIndex then
+	if self.y < self.list.y - self.h or self.y > self.list.y + self.list.h or self.subItemIndex ~= 1 and self.itemIndex ~= self.list.selectedItemIndex then
 		self.list.buttons[self] = nil
 		self:deactivate()
 	else
