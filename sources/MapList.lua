@@ -5,8 +5,8 @@ MapList.visualItemIndex = 1
 MapList.visualSubItemIndex = 1
 MapList.selectedItemIndex = 1
 MapList.selectedSubItemIndex = 1
-MapList.scrollDelta = 0
-MapList.scrollSubDelta = 0
+MapList.scrollCurrentDelta = 0
+MapList.scrollSubCurrentDelta = 0
 
 MapList.x = -7/9
 MapList.y = 0
@@ -46,13 +46,7 @@ MapList.updateItems = function(self)
 		self:addItem({
 			text = utf8validate(cacheDatas[1].title),
 			onClick = function(button)
-				self.selectedSubItemIndex = 1
-				self.visualSubItemIndex = 1
-				
-				self.selectedItemIndex = button.itemIndex
-				self:updateScrollDelta()
-				
-				self:updateSubItems()
+				self:scroolToItemIndex(button.itemIndex)
 			end,
 			onSelect = function(button)
 				self:updateSubItems()
@@ -73,14 +67,11 @@ MapList.updateSubItems = function(self)
 					currentCacheData = cacheData
 					stateManager:switchState("playing")
 				else
-					self.selectedSubItemIndex = button.subItemIndex
 					self.selectedSubItemIndex = subItemIndex
 					self:updateScrollSubDelta()
 				end
 			end,
-			onSelect = function(button)
-				self.selectedSubItemIndex = subItemIndex
-			end,
+			onSelect = function(button) end,
 			directoryPath = directoryPath
 		})
 	end
@@ -120,13 +111,13 @@ MapList.update = function(self)
 	elseif self.selectedItemIndex > self:getItemCount() then
 		self.selectedItemIndex = self:getItemCount()
 	end
-	if (self.scrollDelta > 0 and self.visualItemIndex + self.scrollDelta > self.selectedItemIndex)
-	or (self.scrollDelta < 0 and self.visualItemIndex + self.scrollDelta < self.selectedItemIndex)
+	if (self.scrollCurrentDelta > 0 and self.visualItemIndex + self.scrollCurrentDelta > self.selectedItemIndex)
+	or (self.scrollCurrentDelta < 0 and self.visualItemIndex + self.scrollCurrentDelta < self.selectedItemIndex)
 	then
 		self.visualItemIndex = self.selectedItemIndex
-		self.scrollDelta = 0
+		self.scrollCurrentDelta = 0
 	else
-		self.visualItemIndex = self.visualItemIndex + self.scrollDelta
+		self.visualItemIndex = self.visualItemIndex + self.scrollCurrentDelta
 	end
 	
 	if self.selectedSubItemIndex < 1 then
@@ -134,13 +125,13 @@ MapList.update = function(self)
 	elseif self.selectedSubItemIndex > self:getSubItemCount() then
 		self.selectedSubItemIndex = self:getSubItemCount()
 	end
-	if (self.scrollSubDelta > 0 and self.visualSubItemIndex + self.scrollSubDelta > self.selectedSubItemIndex)
-	or (self.scrollSubDelta < 0 and self.visualSubItemIndex + self.scrollSubDelta < self.selectedSubItemIndex)
+	if (self.scrollSubCurrentDelta > 0 and self.visualSubItemIndex + self.scrollSubCurrentDelta > self.selectedSubItemIndex)
+	or (self.scrollSubCurrentDelta < 0 and self.visualSubItemIndex + self.scrollSubCurrentDelta < self.selectedSubItemIndex)
 	then
 		self.visualSubItemIndex = self.selectedSubItemIndex
-		self.scrollSubDelta = 0
+		self.scrollSubCurrentDelta = 0
 	else
-		self.visualSubItemIndex = self.visualSubItemIndex + self.scrollSubDelta
+		self.visualSubItemIndex = self.visualSubItemIndex + self.scrollSubCurrentDelta
 	end
 	
 	self:calculateButtons()
@@ -151,22 +142,33 @@ MapList.calculateButtons = function(self)
 	
 	local itemIndexKeys = {}
 	local subItemIndexKeys = {}
-	for buttonIndex, button in pairs(self.buttons) do
-		itemIndexKeys[button.itemIndex] = button
-		if button.itemIndex == self.selectedItemIndex then
-			subItemIndexKeys[button.subItemIndex] = button
-		end
+	for button in pairs(self.buttons) do
 		button:update()
+		if button.loaded then
+			itemIndexKeys[button.itemIndex] = button
+			if button.itemIndex == self.selectedItemIndex then
+				subItemIndexKeys[button.subItemIndex] = button
+			end
+		end
 	end
 	
-	for itemIndex = 1 + math.floor(self.visualItemIndex) - self:getMiddleOffset(), self.buttonCount + math.ceil(self.visualItemIndex) + self:getMiddleOffset() do
+	for itemIndex = math.floor(self.visualItemIndex) - self:getMiddleOffset(), self.buttonCount + math.ceil(self.visualItemIndex) + self:getMiddleOffset() do
 		local item = self.items[itemIndex]
-		if item and not itemIndexKeys[itemIndex] or item and itemIndex == self.selectedItemIndex then
-			local limit = itemIndex == self.selectedItemIndex and self:getSubItemCount() or 1
+		local reSelected = itemIndex == self.selectedItemIndex
+		if item and (not itemIndexKeys[itemIndex] or reSelected) then
+			local limit = reSelected and self:getSubItemCount() or 1
 			for subItemIndex = 1, limit do
-				if not subItemIndexKeys[subItemIndex] and itemIndex == self.selectedItemIndex or itemIndex ~= self.selectedItemIndex then
-					item = (itemIndex == self.selectedItemIndex) and self.subItems[subItemIndex] or self.items[itemIndex]
+				if not subItemIndexKeys[subItemIndex] and reSelected or not reSelected then
+					item = reSelected and self.subItems[subItemIndex] or self.items[itemIndex]
 					local button = self.Button:new({
+						reSelected = reSelected,
+						item = item,
+						itemIndex = itemIndex,
+						text = item.text,
+						action = item.onClick,
+						subItemIndex = subItemIndex,
+						rectangleColor = reSelected and self.selectedRectangleColor or self.rectangleColor,
+						
 						x = self.x, y = self.y,
 						w = self.w, h = self.h / (self.buttonCount),
 						layer = self.layer,
@@ -175,17 +177,9 @@ MapList.calculateButtons = function(self)
 						mode = self.mode,
 						limit = self.limit,
 						textAlign = self.textAlign,
-						rectangleColor = (itemIndex == self.selectedItemIndex) and self.selectedRectangleColor or self.rectangleColor,
 						textColor = self.textColor,
 						font = self.font,
-						
 						list = self,
-						item = item,
-						itemIndex = itemIndex,
-						
-						text = item.text,
-						action = item.onClick,
-						subItemIndex = subItemIndex
 					})
 					button:activate()
 					button:update()
@@ -198,33 +192,61 @@ MapList.calculateButtons = function(self)
 end
 
 MapList.unloadButtons = function(self)
-	for buttonIndex, button in pairs(self.buttons) do
+	for button in pairs(self.buttons) do
 		button:deactivate()
 	end
 	
 	self.buttons = nil
 end
 
-MapList.updateScrollDelta = function(self)
+MapList.updateScrollCurrentDelta = function(self)
 	local dt =  math.min(1/60, love.timer.getDelta())
-	self.scrollDelta = (self.selectedItemIndex - self.visualItemIndex) * dt * 16
+	self.scrollCurrentDelta = (self.selectedItemIndex - self.visualItemIndex) * dt * 8
 end
 
 MapList.updateScrollSubDelta = function(self)
 	local dt =  math.min(1/60, love.timer.getDelta())
-	self.scrollSubDelta = (self.selectedSubItemIndex - self.visualSubItemIndex) * dt * 16
+	self.scrollSubCurrentDelta = (self.selectedSubItemIndex - self.visualSubItemIndex) * dt * 8
 end
 
-MapList.scrollTo = function(self, itemIndex)
-	self.selectedItemIndex = itemIndex
-	self:updateScrollDelta()
+MapList.getButtonByItemIndex = function(self, itemIndex)
+	for button in pairs(self.buttons) do
+		if button.itemIndex == itemIndex then
+			return button
+		end
+	end
 end
 
-MapList.scrollBy = function(self, targetOffsetDelta)
-	if self.selectedSubItemIndex + targetOffsetDelta <= self:getSubItemCount() and
-		self.selectedSubItemIndex + targetOffsetDelta >= 1
+MapList.scroolToItemIndex = function(self, itemIndex)
+		local isAtEnd = self.selectedSubItemIndex == self:getSubItemCount()
+		
+		local oldSelectedItemIndex = self.selectedItemIndex
+		
+		if self.items[itemIndex] then
+			self.selectedItemIndex = itemIndex
+			self.items[self.selectedItemIndex].onSelect(self:getButtonByItemIndex(itemIndex))
+		end
+		local scrollDelta = self.selectedItemIndex - oldSelectedItemIndex
+		
+		self:updateScrollCurrentDelta()
+		
+		self.selectedSubItemIndex = 1
+		if scrollDelta > 0 and isAtEnd then
+			self.selectedSubItemIndex = self:getSubItemCount()
+		end
+		
+		if oldSelectedItemIndex ~= self.selectedItemIndex then
+			self.visualSubItemIndex = self.selectedSubItemIndex - scrollDelta
+			self.visualItemIndex = self.visualItemIndex + scrollDelta
+			self.scrollSubCurrentDelta = self.scrollCurrentDelta
+		end
+end
+
+MapList.scrollBy = function(self, scrollDelta)
+	if self.selectedSubItemIndex + scrollDelta <= self:getSubItemCount() and
+		self.selectedSubItemIndex + scrollDelta >= 1
 	then
-		self.selectedSubItemIndex = self.selectedSubItemIndex + targetOffsetDelta
+		self.selectedSubItemIndex = self.selectedSubItemIndex + scrollDelta
 		
 		self:updateScrollSubDelta()
 		self.selectedSubItemIndex = self.selectedSubItemIndex
@@ -232,13 +254,26 @@ MapList.scrollBy = function(self, targetOffsetDelta)
 			self.subItems[self.selectedSubItemIndex].onSelect()
 		end
 	else
-		self.selectedSubItemIndex = 1
-		self.visualSubItemIndex = 1
-		self.selectedItemIndex = self.selectedItemIndex + targetOffsetDelta
+		local isAtEnd = self.selectedSubItemIndex == self:getSubItemCount()
 		
-		self:updateScrollDelta()
-		if self.items[self.selectedItemIndex] then
+		local oldSelectedItemIndex = self.selectedItemIndex
+		
+		if self.items[self.selectedItemIndex + scrollDelta] then
+			self.selectedItemIndex = self.selectedItemIndex + scrollDelta
 			self.items[self.selectedItemIndex].onSelect()
+		end
+		
+		self:updateScrollCurrentDelta()
+		
+		self.selectedSubItemIndex = 1
+		if scrollDelta > 0 and isAtEnd then
+			self.selectedSubItemIndex = self:getSubItemCount()
+		end
+		
+		if oldSelectedItemIndex ~= self.selectedItemIndex then
+			self.visualSubItemIndex = self.selectedSubItemIndex - scrollDelta
+			self.visualItemIndex = self.visualItemIndex + scrollDelta
+			self.scrollSubCurrentDelta = self.scrollCurrentDelta
 		end
 	end
 end
@@ -296,15 +331,15 @@ MapList.Button.updateY = function(self)
 	if self.itemIndex < self.list.selectedItemIndex then
 		self.y = self.y + (self.itemIndex - self.list.visualItemIndex) * (self.list.h / self.list.buttonCount)
 	elseif self.itemIndex > self.list.selectedItemIndex then
-		self.y = self.y + (self.itemIndex - self.list.visualItemIndex + #self.list.subItems - 1) * (self.list.h / self.list.buttonCount)
+		self.y = self.y + (self.itemIndex - self.list.visualItemIndex + self.list:getSubItemCount() - 1) * (self.list.h / self.list.buttonCount)
 	else
 		self.y = self.y + (self.subItemIndex - 1) * (self.list.h / self.list.buttonCount)
 	end
 end
 
 MapList.Button.updateX = function(self)
-	if self.itemIndex == self.list.selectedItemIndex then
-		self.x = self.list.x - (self.list.h / self.list.buttonCount) / 2
+	if self.itemIndex == self.list.selectedItemIndex and self.subItemIndex ~= self.list.selectedSubItemIndex then
+		self.x = self.list.x + (self.list.h / self.list.buttonCount) / 2
 	else
 		self.x = self.list.x
 	end
@@ -327,7 +362,12 @@ MapList.Button.update = function(self)
 		self.rectangleColor = self.list.rectangleColor
 	end
 	
-	if self.y < self.list.y - self.h or self.y > self.list.y + self.list.h or self.subItemIndex ~= 1 and self.itemIndex ~= self.list.selectedItemIndex then
+	if self.itemIndex < math.floor(self.list.visualItemIndex) - self.list:getMiddleOffset() and
+		self.itemIndex > self.list.buttonCount + math.ceil(self.list.visualItemIndex) + self.list:getMiddleOffset() or
+		self.subItemIndex ~= 1 and self.itemIndex ~= self.list.selectedItemIndex or
+		not self.reSelected and self.itemIndex == self.list.selectedItemIndex or
+		self.reSelected and self.itemIndex ~= self.list.selectedItemIndex
+	then
 		self.list.buttons[self] = nil
 		self:deactivate()
 	else
