@@ -137,6 +137,14 @@ MapList.update = function(self)
 	self:calculateButtons()
 end
 
+MapList.getStartItemIndex = function(self)
+	return math.floor(self.visualItemIndex) - self:getMiddleOffset() + 1
+end
+
+MapList.getEndItemIndex = function(self)
+	return math.ceil(self.visualItemIndex) + self:getMiddleOffset() - 1
+end
+
 MapList.calculateButtons = function(self)
 	self.buttons = self.buttons or {}
 	
@@ -152,7 +160,7 @@ MapList.calculateButtons = function(self)
 		end
 	end
 	
-	for itemIndex = math.floor(self.visualItemIndex) - self:getMiddleOffset(), self.buttonCount + math.ceil(self.visualItemIndex) + self:getMiddleOffset() do
+	for itemIndex = self:getStartItemIndex(), self:getEndItemIndex() do
 		local item = self.items[itemIndex]
 		local reSelected = itemIndex == self.selectedItemIndex
 		if item and (not itemIndexKeys[itemIndex] or reSelected) then
@@ -362,8 +370,8 @@ MapList.Button.update = function(self)
 		self.rectangleColor = self.list.rectangleColor
 	end
 	
-	if self.itemIndex < math.floor(self.list.visualItemIndex) - self.list:getMiddleOffset() and
-		self.itemIndex > self.list.buttonCount + math.ceil(self.list.visualItemIndex) + self.list:getMiddleOffset() or
+	if self.itemIndex < self.list:getStartItemIndex() or
+		self.itemIndex > self.list:getEndItemIndex() or
 		self.subItemIndex ~= 1 and self.itemIndex ~= self.list.selectedItemIndex or
 		not self.reSelected and self.itemIndex == self.list.selectedItemIndex or
 		self.reSelected and self.itemIndex ~= self.list.selectedItemIndex
