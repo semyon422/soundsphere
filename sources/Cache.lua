@@ -72,9 +72,12 @@ Cache.lookup = function(self, directoryPath)
 	for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
 		if love.filesystem.isDirectory(directoryPath .. "/" .. itemName) then
 			if not self.cacheDataDirectoryPathUniqueKey[directoryPath .. "/" .. itemName] then
-				self:generateCacheDataDirectory(directoryPath .. "/" .. itemName)
+				local hasCharts = self:generateCacheDataDirectory(directoryPath .. "/" .. itemName)
 				self.cacheDataDirectoryPathUniqueKey[directoryPath .. "/" .. itemName] = true
-				self:lookup(directoryPath .. "/" .. itemName)
+				
+				if not hasCharts then
+					self:lookup(directoryPath .. "/" .. itemName)
+				end
 			end
 		elseif love.filesystem.isFile(directoryPath .. "/" .. itemName) then
 			
@@ -84,11 +87,15 @@ end
 
 Cache.generateCacheDataDirectory = function(self, directoryPath)
 	print("checking directory", directoryPath)
+	local hasCharts = false
 	for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
 		if love.filesystem.isFile(directoryPath .. "/" .. itemName) and (itemName:find(".bm[s]*[e]*[l]*$") or itemName:find(".syk$")) then
 			self:generateCacheData(directoryPath, itemName)
+			hasCharts = true
 		end
 	end
+	
+	return hasCharts
 end
 
 Cache.generateCacheData = function(self, directoryPath, fileName)
