@@ -398,6 +398,8 @@ MapList.loadCallbacks = function(self)
 end
 
 MapList.unloadCallbacks = function(self)
+	soul.unsetCallback("wheelmoved", self)
+	soul.unsetCallback("mousemoved", self)
 	soul.unsetCallback("keypressed", self)
 end
 
