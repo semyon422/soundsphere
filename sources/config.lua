@@ -114,7 +114,7 @@ stateManager:setState(
 			loadEngine(currentCacheData.directoryPath, currentCacheData.fileName)
 		end,
 		{
-			mapList
+			packList, chartList
 		}
 	),
 	"playing"
