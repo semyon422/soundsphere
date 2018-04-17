@@ -15,7 +15,11 @@ stateManager = StateManager:new()
 
 globalKeyBindManager = KeyBindManager:new()
 globalKeyBindManager:activate()
-globalKeyBindManager:setBinding("escape", function() stateManager:switchState("selectionScreen") _G.unloadEngine() end, nil, true)
+globalKeyBindManager:setBinding("escape", function()
+	if engine and engine.loaded then
+		stateManager:switchState("selectionScreen") _G.unloadEngine()
+	end
+end, nil, true)
 
 local background = BackgroundManager:new({
 	drawable = love.graphics.newImage("resources/background.jpg")
@@ -40,7 +44,14 @@ local button = soul.ui.RectangleTextButton:new({
 	font = mainFont30
 })
 
-mapList = MapList:new()
+chartList = MapList:new({
+	dataMode = "ChartMode"
+})
+packList = MapList:new({
+	dataMode = "PackMode"
+})
+chartList.packList = packList
+packList.chartList = chartList
 
 currentCacheData = nil
 
@@ -89,7 +100,7 @@ stateManager:setState(
 stateManager:setState(
 	StateManager.State:new(
 		{
-			mapList
+			packList
 		},
 		{
 			button
