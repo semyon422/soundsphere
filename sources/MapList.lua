@@ -5,8 +5,6 @@ MapList.visualItemIndex = 1
 MapList.visualSubItemIndex = 1
 MapList.selectedItemIndex = 1
 MapList.selectedSubItemIndex = 1
-MapList.scrollCurrentDelta = 0
-MapList.scrollSubCurrentDelta = 0
 
 MapList.x = -7/9
 MapList.y = 0
@@ -31,6 +29,9 @@ MapList.dataMode = "PackMode"
 MapList.load = function(self)
 	self.cs = soul.CS:new(nil, 1, 0, 0, 0, "h", 768)
 	self.font = mainFont20
+	
+	self.scrollCurrentDelta = 0
+	self.scrollSubCurrentDelta = 0
 
 	self:transformCache()
 	
@@ -41,8 +42,18 @@ MapList.load = function(self)
 		self.updateItems = self.updateItemsPackMode
 		self.updateSubItems = self.updateSubItemsPackMode
 	end
+	
 	self:updateItems()
+	if self.selectedItemIndex > self:getItemCount() then
+		self.selectedItemIndex = self:getItemCount()
+	end
+	self.visualItemIndex = self.selectedItemIndex
+	
 	self:updateSubItems()
+	if self.selectedSubItemIndex > self:getSubItemCount() then
+		self.selectedSubItemIndex = self:getSubItemCount()
+	end
+	self.visualSubItemIndex = self.selectedSubItemIndex
 	
 	self:calculateButtons()
 	self:loadCallbacks()
