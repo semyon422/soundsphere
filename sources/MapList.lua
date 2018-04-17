@@ -25,12 +25,22 @@ MapList.buttonCount = 17
 MapList.upScrollKey = "up"
 MapList.downScrollKey = "down"
 
+-- MapList.dataMode = "ChartMode"
+MapList.dataMode = "PackMode"
+
 MapList.load = function(self)
 	self.cs = soul.CS:new(nil, 1, 0, 0, 0, "h", 768)
 	self.font = mainFont20
 
 	self:transformCache()
 	
+	if self.dataMode == "ChartMode" then
+		self.updateItems = self.updateItemsChartMode
+		self.updateSubItems = self.updateSubItemsChartMode
+	elseif self.dataMode == "PackMode" then
+		self.updateItems = self.updateItemsPackMode
+		self.updateSubItems = self.updateSubItemsPackMode
+	end
 	self:updateItems()
 	self:updateSubItems()
 	
@@ -40,23 +50,25 @@ MapList.load = function(self)
 	self.loaded = true
 end
 
-MapList.updateItems = function(self)
+MapList.updateItemsChartMode = function(self)
 	self.items = {}
 	for directoryPath, cacheDatas in pairs(self.transformedCache) do
-		self:addItem({
-			text = utf8validate(cacheDatas[1].title),
-			onClick = function(button)
-				self:scroolToItemIndex(button.itemIndex)
-			end,
-			onSelect = function(button)
-				self:updateSubItems()
-			end,
-			directoryPath = directoryPath
-		})
+		if directoryPath:find(self.packPath) then
+			self:addItem({
+				text = utf8validate(cacheDatas[1].title),
+				onClick = function(button)
+					self:scroolToItemIndex(button.itemIndex)
+				end,
+				onSelect = function(button)
+					self:updateSubItems()
+				end,
+				directoryPath = directoryPath
+			})
+		end
 	end
 end
 
-MapList.updateSubItems = function(self)
+MapList.updateSubItemsChartMode = function(self)
 	self.subItems = {}
 	local directoryPath = self.items[self.selectedItemIndex].directoryPath
 	for subItemIndex, cacheData in pairs(self.transformedCache[directoryPath]) do
@@ -75,6 +87,49 @@ MapList.updateSubItems = function(self)
 			directoryPath = directoryPath
 		})
 	end
+end
+
+MapList.updateItemsPackMode = function(self)
+	local packPaths = {}
+	self.items = {}
+	for directoryPath, cacheDatas in pairs(self.transformedCache) do
+		local packPath = directoryPath:match("(.+)/")
+		if not packPaths[packPath] then
+			self:addItem({
+				text = directoryPath:match(".+/(.-)/"),
+				onClick = function(button)
+					self:scroolToItemIndex(button.itemIndex)
+				end,
+				onSelect = function(button)
+					self:updateSubItems()
+				end,
+				directoryPath = directoryPath,
+				packPath = directoryPath:match("(.+)/")
+			})
+			packPaths[packPath] = true
+		end
+	end
+end
+
+MapList.updateSubItemsPackMode = function(self)
+	self.subItems = {}
+	local directoryPath = self.items[self.selectedItemIndex].directoryPath
+	local packPath = self.items[self.selectedItemIndex].packPath
+	self:addSubItem({
+		text = directoryPath:match(".+/(.-)/"),
+		onClick = function(button)
+			if button.subItemIndex == self.selectedSubItemIndex then
+				self:deactivate()
+				self.chartList.packPath = packPath
+				self.chartList:activate()
+			else
+				self.selectedSubItemIndex = subItemIndex
+				self:updateScrollSubDelta()
+			end
+		end,
+		onSelect = function(button) end,
+		directoryPath = directoryPath
+	})
 end
 
 MapList.getItemCount = function(self)
@@ -138,11 +193,11 @@ MapList.update = function(self)
 end
 
 MapList.getStartItemIndex = function(self)
-	return math.floor(self.visualItemIndex) - self:getMiddleOffset() + 1
+	return math.floor(self.visualItemIndex) - self:getMiddleOffset()
 end
 
 MapList.getEndItemIndex = function(self)
-	return math.ceil(self.visualItemIndex) + self:getMiddleOffset() - 1
+	return math.ceil(self.visualItemIndex) + self:getMiddleOffset()
 end
 
 MapList.calculateButtons = function(self)
@@ -304,6 +359,14 @@ MapList.loadCallbacks = function(self)
 			self:scrollBy(-direction)
 		end
 	end)
+	soul.setCallback("mousemoved", self, function(x, y)
+		local x, y, w, h = self.x, self.y, self.w, self.h
+		local mx, my = self.cs:x(love.mouse.getX(), true), self.cs:y(love.mouse.getY(), true)
+		if mx >= -1/18 and self.dataMode == "ChartMode" then
+			self:deactivate()
+			self.packList:activate()
+		end
+	end)
 	soul.setCallback("keypressed", self, function(key)
 		if key == self.upScrollKey then
 			self:scrollBy(-1)
@@ -316,6 +379,9 @@ MapList.loadCallbacks = function(self)
 					break
 				end
 			end
+		elseif key == "right" and self.dataMode == "ChartMode" then
+			self:deactivate()
+			self.packList:activate()
 		end
 	end)
 end
