@@ -64,7 +64,7 @@ end
 MapList.updateItemsChartMode = function(self)
 	self.items = {}
 	for directoryPath, cacheDatas in pairs(self.transformedCache) do
-		if directoryPath:find(self.packPath) then
+		if directoryPath:find(self.packPath, 1, true) then
 			self:addItem({
 				text = utf8validate(cacheDatas[1].title),
 				onClick = function(button)
