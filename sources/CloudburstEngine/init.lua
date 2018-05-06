@@ -29,6 +29,8 @@ CloudburstEngine.load = function(self)
 	
 	self:loadResources()
 	
+	self:setCallbacks()
+	
 	self.loaded = true
 end
 
@@ -45,7 +47,21 @@ CloudburstEngine.unload = function(self)
 	
 	self:unloadResources()
 	
+	self:unsetCallbacks()
+	
 	self.loaded = false
+end
+
+CloudburstEngine.setCallbacks = function(self)
+	soul.setCallback("keypressed", self, function(key)
+		if key == "return" then
+			self.timeManager:play()
+		end
+	end)
+end
+
+CloudburstEngine.unsetCallbacks = function(self)
+	soul.unsetCallback("keypressed", self)
 end
 
 CloudburstEngine.loadResources = function(self)
