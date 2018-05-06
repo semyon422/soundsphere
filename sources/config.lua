@@ -55,13 +55,25 @@ packList.chartList = chartList
 
 currentCacheData = nil
 
+getNoteChart = function(filePath)
+	local noteChart
+	if filePath:find(".osu$") then
+		noteChart = osu.NoteChart:new()
+	elseif filePath:find(".bm") then
+		noteChart = bms.NoteChart:new()
+	end
+	
+	local file = love.filesystem.newFile(filePath)
+	file:open("r")
+	noteChart:import(file:read())
+	
+	return noteChart
+end
+
 loadEngine = function(directoryPath, fileName)
 	globalFileManager:addPath(directoryPath)
 	
-	noteChart = bms.NoteChart:new()
-	local file = love.filesystem.newFile(directoryPath .. "/" .. fileName)
-	file:open("r")
-	noteChart:import(file:read())
+	noteChart = getNoteChart(directoryPath .. "/" .. fileName)
 
 	noteSkin = CloudburstEngine.NoteSkin:new()
 
