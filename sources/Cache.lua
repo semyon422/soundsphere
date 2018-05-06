@@ -68,6 +68,31 @@ Cache.clean = function(self)
 	end
 end
 
+Cache.extensions = {
+	{
+		type = "osu",
+		patterns = {
+			".osu$"
+		}
+	},
+	{
+		type = "bms",
+		patterns = {
+			".bms$", ".bme$", ".bml$", 
+		}
+	},
+}
+
+Cache.getExtensionType = function(self, fileName)
+	for _, extensionData in ipairs(self.extensions) do
+		for _, pattern in ipairs(extensionData.patterns) do
+			if fileName:find(pattern) then
+				return extensionData.type
+			end
+		end
+	end
+end
+
 Cache.lookup = function(self, directoryPath)
 	for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
 		if love.filesystem.isDirectory(directoryPath .. "/" .. itemName) then
@@ -89,8 +114,9 @@ Cache.generateCacheDataDirectory = function(self, directoryPath)
 	print("checking directory", directoryPath)
 	local hasCharts = false
 	for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
-		if love.filesystem.isFile(directoryPath .. "/" .. itemName) and (itemName:find(".bm[s]*[e]*[l]*$") or itemName:find(".syk$")) then
-			self:generateCacheData(directoryPath, itemName)
+		local extensionType = self:getExtensionType(itemName)
+		if love.filesystem.isFile(directoryPath .. "/" .. itemName) and extensionType then
+			self:generateCacheData(directoryPath, itemName, extensionType)
 			hasCharts = true
 		end
 	end
@@ -98,9 +124,13 @@ Cache.generateCacheDataDirectory = function(self, directoryPath)
 	return hasCharts
 end
 
-Cache.generateCacheData = function(self, directoryPath, fileName)
+Cache.generateCacheData = function(self, directoryPath, fileName, extensionType)
 	print("processing file", fileName)
-	self:addCacheData(self:generateBMSCacheData(directoryPath, fileName))
+	if extensionType == "bms" then
+		self:addCacheData(self:generateBMSCacheData(directoryPath, fileName))
+	elseif extensionType == "osu" then
+		self:addCacheData(self:generateOsuCacheData(directoryPath, fileName))
+	end
 end
 
 Cache.addCacheData = function(self, cacheData)
@@ -120,16 +150,43 @@ Cache.generateBMSCacheData = function(self, directoryPath, fileName)
 	
 	for line in file:lines() do
 		local line = iconv(line, "UTF-8", "SHIFT-JIS") or iconv(line, "UTF-8", "EUC-KR") or line
-		if line:match("#TITLE .+$") then
+		if line:find("#TITLE .+$") then
 			cacheData.title = line:match("#TITLE (.+)$")
 		end
-		if line:match("#ARTIST .+$") then
+		if line:find("#ARTIST .+$") then
 			cacheData.artist = line:match("#ARTIST (.+)$")
 		end
-		if line:match("#PLAYLEVEL .+$") then
+		if line:find("#PLAYLEVEL .+$") then
 			cacheData.playlevel = line:match("#PLAYLEVEL (.+)$")
 		end
-		if line:match("#WAV") then
+		if line:find("#WAV") then
+			break
+		end
+	end
+	file:close()
+	
+	return cacheData
+end
+
+Cache.generateOsuCacheData = function(self, directoryPath, fileName)
+	local cacheData = {}
+	cacheData.directoryPath = directoryPath
+	cacheData.fileName = fileName
+	cacheData.title = "<title>"
+	cacheData.artist = "<artist>"
+	cacheData.playlevel = "<playlevel>"
+	
+	local file = love.filesystem.newFile(directoryPath .. "/" ..  fileName)
+	file:open("r")
+	
+	for line in file:lines() do
+		if line:find("Title:[ ]?.+$") then
+			cacheData.title = line:match("^Title:[ ]?(.+)$")
+		end
+		if line:find("Artist:[ ]?.+$") then
+			cacheData.artist = line:match("Artist:[ ]?(.+)$")
+		end
+		if line:find("^%[Events%]") then
 			break
 		end
 	end
