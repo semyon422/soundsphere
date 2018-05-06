@@ -3,6 +3,7 @@ require("utf8validate")
 require("soul")
 require("ncdk")
 require("bms")
+require("osu")
 
 soul.init()
 
