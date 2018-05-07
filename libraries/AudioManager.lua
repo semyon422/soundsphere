@@ -169,7 +169,9 @@ Sound.new = function(self)
 end
 
 Sound.play = function(self)
-	self.channel = bass.BASS_SampleGetChannel(self.chunk, false)
+	if not self.channel then
+		self.channel = bass.BASS_SampleGetChannel(self.chunk, false)
+	end
 	bass.BASS_ChannelPlay(self.channel, false)
 end
 
@@ -179,4 +181,8 @@ end
 
 Sound.stop = function(self)
 	bass.BASS_ChannelStop(self.channel)
+end
+
+Sound.getPosition = function(self)
+	return tonumber(bass.BASS_ChannelGetPosition(self.channel, 0)) / 1e5
 end

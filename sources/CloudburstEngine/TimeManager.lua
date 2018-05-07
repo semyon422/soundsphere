@@ -2,55 +2,32 @@ CloudburstEngine.TimeManager = createClass()
 local TimeManager = CloudburstEngine.TimeManager
 
 TimeManager.load = function(self)
-	self.currentTime = -2
+	self.currentTime = -1
+	self.pauseTime = 0
 	self.state = "waiting"
 	self.playState = "delayed"
 end
 
 TimeManager.update = function(self)
-	local deltaTime = love.timer.getDelta()
-	if love.timer.getDelta() > 0.1 then
-		return
-	end
+	local deltaTime = love.timer.getTime() - (self.startTime or 0)
 	
 	if self.state == "waiting" then
 	elseif self.state == "delayed" then
 		if self.currentTime >= 0 then
 			self.state = "started"
 			self.playState = self.state
-			if self.engine.audio then
-				self.engine.audio:play()
-			end
 		else
-			self.currentTime = self.currentTime + deltaTime
+			self.currentTime = deltaTime - self.pauseTime
 		end
 	elseif self.state == "started" or self.state == "playing" then
-		if self.engine.audio then
-			if self.engine.audio:isPaused() then
-				self.engine.audio:play()
-			end
-			local audioCurrentTime = self.engine.audio:tell()
-			if self.engine.audio:isStopped() then
-				self.state = "ended"
-				self.playState = self.state
-			elseif self.state == "started" or audioCurrentTime ~= 0 then
-				self.currentTime = audioCurrentTime
-				if self.state == "started" then
-					self.state = "playing"
-					self.playState = self.state
-				end
-			end
-		else
-			self.currentTime = self.currentTime + deltaTime
-			self.state = "playing"
-			self.playState = self.state
-		end
+		self.state = "playing"
+		self.playState = self.state
+		
+		self.currentTime = deltaTime - self.pauseTime
 	elseif self.state == "paused" then
-		if not self.engine.audio:isPaused() then
-			self.engine.audio:pause()
-		end
+		
 	elseif self.state == "ended" then
-		self.currentTime = self.currentTime + deltaTime
+		self.currentTime = deltaTime - self.pauseTime
 	end
 end
 
@@ -64,8 +41,15 @@ end
 
 TimeManager.pause = function(self)
 	self.state = "paused"
+	self.pauseStartTime = love.timer.getTime()
 end
 
 TimeManager.play = function(self)
-	self.state = self.playState
+	if self.state == "waiting" then
+		self.state = self.playState
+		self.startTime = love.timer.getTime() - self.currentTime
+	elseif self.state == "paused" then
+		self.state = "playing"
+		self.pauseTime = self.pauseTime + love.timer.getTime() - self.pauseStartTime
+	end
 end

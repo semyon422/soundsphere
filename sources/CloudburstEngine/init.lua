@@ -56,6 +56,10 @@ CloudburstEngine.setCallbacks = function(self)
 	soul.setCallback("keypressed", self, function(key)
 		if key == "return" then
 			self.timeManager:play()
+			audioManager:playSoundGroup("engine")
+		elseif key == "f1" then
+			self.timeManager:pause()
+			audioManager:pauseSoundGroup("engine")
 		end
 	end)
 end
