@@ -19,10 +19,10 @@ LongGraphicalNote.update = function(self)
 		self.noteData.currentVisualStartTime = (self.noteData.zeroClearVisualStartTime - self.noteDrawer.currentClearVisualTime) * self.noteDrawer.globalSpeed + self.noteDrawer.currentTimePoint:getAbsoluteTime()
 		self.noteData.currentVisualEndTime = (self.noteData.zeroClearVisualEndTime - self.noteDrawer.currentClearVisualTime) * self.noteDrawer.globalSpeed + self.noteDrawer.currentTimePoint:getAbsoluteTime()
 		
-		if self:willDrawBeforeStart() then
+		if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
 			self:deactivate()
 			self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
-		elseif self:willDrawAfterEnd() then
+		elseif self:willDrawAfterEnd() and self.index == self.noteDrawer.endNoteIndex then
 			self:deactivate()
 			self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
 		else
