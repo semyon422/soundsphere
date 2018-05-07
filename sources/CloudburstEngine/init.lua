@@ -174,6 +174,8 @@ CloudburstEngine.getTimeState = function(self, deltaTime)
 		end
 	elseif math.abs(deltaTime) - self.passEdge <= 0 then
 		return "exactly"
+	elseif deltaTime + self.passEdge < 0 then
+		return "late"
 	else
 		return "none"
 	end
