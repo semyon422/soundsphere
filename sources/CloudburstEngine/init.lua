@@ -131,7 +131,7 @@ CloudburstEngine.loadNoteDrawers = function(self)
 	self.noteDrawers = {}
 	
 	for layerIndex in self.noteChart:getLayerDataIndexIterator() do
-		local layerData = self.noteChart.layerDataSequence:getLayerData(layerIndex)
+		local layerData = self.noteChart:requireLayerData(layerIndex)
 		
 		if not layerData.invisible then
 			self.noteDrawers[layerIndex] = self.NoteDrawer:new({

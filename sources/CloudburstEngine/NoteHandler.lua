@@ -15,7 +15,7 @@ NoteHandler.loadNoteData = function(self)
 	self.noteData = {}
 	
 	for layerDataIndex in self.engine.noteChart:getLayerDataIndexIterator() do
-		local layerData = self.engine.noteChart.layerDataSequence:getLayerData(layerDataIndex)
+		local layerData = self.engine.noteChart:requireLayerData(layerDataIndex)
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 			

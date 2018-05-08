@@ -21,7 +21,7 @@ end
 NoteDrawer.loadNoteData = function(self)
 	self.noteData = {}
 	
-	self.layerData = self.engine.noteChart.layerDataSequence:getLayerData(self.layerIndex)
+	self.layerData = self.engine.noteChart:requireLayerData(self.layerIndex)
 	for noteDataIndex = 1, self.layerData:getNoteDataCount() do
 		local noteData = self.layerData:getNoteData(noteDataIndex)
 		
