@@ -68,7 +68,7 @@ NoteDrawer.update = function(self)
 			end
 		end
 	elseif self.optimisationMode == self.OptimisationModeEnum.UpdateVisible then
-		self.currentClearVisualTime = self.layerData:getVisualTime(self.currentTimePoint, self.layerData.zeroTimePoint, true)
+		self.currentClearVisualTime = self.layerData:getVisualTime(self.currentTimePoint, self.layerData:getZeroTimePoint(), true)
 		self.globalSpeed = self.currentTimePoint.velocityData.globalSpeed:tonumber()
 		
 		for currentNoteIndex = self.startNoteIndex, 0, -1 do
