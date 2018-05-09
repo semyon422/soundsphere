@@ -4,6 +4,7 @@ require("soul")
 require("ncdk")
 require("bms")
 require("osu")
+require("ucs")
 
 soul.init()
 

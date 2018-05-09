@@ -81,6 +81,12 @@ Cache.extensions = {
 			".bms$", ".bme$", ".bml$", 
 		}
 	},
+	{
+		type = "ucs",
+		patterns = {
+			".ucs$"
+		}
+	}
 }
 
 Cache.getExtensionType = function(self, fileName)
@@ -130,6 +136,8 @@ Cache.generateCacheData = function(self, directoryPath, fileName, extensionType)
 		self:addCacheData(self:generateBMSCacheData(directoryPath, fileName))
 	elseif extensionType == "osu" then
 		self:addCacheData(self:generateOsuCacheData(directoryPath, fileName))
+	elseif extensionType == "ucs" then
+		self:addCacheData(self:generateUCSCacheData(directoryPath, fileName))
 	end
 end
 
@@ -191,6 +199,17 @@ Cache.generateOsuCacheData = function(self, directoryPath, fileName)
 		end
 	end
 	file:close()
+	
+	return cacheData
+end
+
+Cache.generateUCSCacheData = function(self, directoryPath, fileName)
+	local cacheData = {}
+	cacheData.directoryPath = directoryPath
+	cacheData.fileName = fileName
+	cacheData.title = fileName:match("^(.+)%.ucs$")
+	cacheData.artist = ""
+	cacheData.playlevel = ""
 	
 	return cacheData
 end

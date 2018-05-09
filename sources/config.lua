@@ -55,12 +55,17 @@ packList.chartList = chartList
 
 currentCacheData = nil
 
-getNoteChart = function(filePath)
+getNoteChart = function(directoryPath, fileName)
+	local filePath = directoryPath .. "/" .. fileName
+	
 	local noteChart
 	if filePath:find(".osu$") then
 		noteChart = osu.NoteChart:new()
 	elseif filePath:find(".bm") then
 		noteChart = bms.NoteChart:new()
+	elseif filePath:find(".ucs") then
+		noteChart = ucs.NoteChart:new()
+		noteChart.audioFileName = fileName:match("^(.+)%.ucs$") .. ".mp3"
 	end
 	
 	local file = love.filesystem.newFile(filePath)
@@ -73,7 +78,7 @@ end
 loadEngine = function(directoryPath, fileName)
 	globalFileManager:addPath(directoryPath)
 	
-	noteChart = getNoteChart(directoryPath .. "/" .. fileName)
+	noteChart = getNoteChart(directoryPath, fileName)
 
 	noteSkin = CloudburstEngine.NoteSkin:new()
 
