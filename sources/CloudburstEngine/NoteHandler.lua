@@ -1,46 +1,67 @@
 CloudburstEngine.NoteHandler = createClass()
 local NoteHandler = CloudburstEngine.NoteHandler
 
-local getClassForNote = function(noteData)
-	if noteData.noteType == "ShortNote" then
-		return CloudburstEngine.ShortLogicalNote
-	elseif noteData.noteType == "LongNote" then
-		return CloudburstEngine.LongLogicalNote
-	elseif noteData.noteType == "SoundNote" then
-		return CloudburstEngine.SoundNote
-	end
-end
-
 NoteHandler.loadNoteData = function(self)
 	self.noteData = {}
 	
+	local currentLogicalNote
 	for layerDataIndex in self.engine.noteChart:getLayerDataIndexIterator() do
 		local layerData = self.engine.noteChart:requireLayerData(layerDataIndex)
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 			
 			if noteData.inputType == self.inputType and noteData.inputIndex == self.inputIndex then
-				local logicalNote = getClassForNote(noteData):new({
-					noteData = noteData,
-					noteHandler = self,
-					engine = self.engine
-				})
+				local logicalNote
 				
+				local soundFilePath
 				if noteData.soundFileName then
 					if not self.engine.soundFiles[noteData.soundFileName] then
 						self.engine.soundFiles[noteData.soundFileName] = self.engine.fileManager:findFile(noteData.soundFileName, "audio")
 					end
-					logicalNote.soundFilePath = self.engine.soundFiles[noteData.soundFileName]
+					soundFilePath = self.engine.soundFiles[noteData.soundFileName]
 				end
 				
-				table.insert(self.noteData, logicalNote)
+				if noteData.noteType == "ShortNote" then
+					logicalNote = self.engine.ShortLogicalNote:new({
+						startNoteData = noteData,
+						pressSoundFilePath = soundFilePath
+					})
+					table.insert(self.noteData, logicalNote)
+				elseif noteData.noteType == "LongNoteStart" then
+					logicalNote = self.engine.LongLogicalNote:new({
+						startNoteData = noteData,
+						pressSoundFilePath = soundFilePath
+					})
+					currentLogicalNote = logicalNote
+					table.insert(self.noteData, logicalNote)
+				elseif noteData.noteType == "LongNoteEnd" then
+					if currentLogicalNote then
+						logicalNote = currentLogicalNote
+						logicalNote.endNoteData = noteData
+						logicalNote.releaseSoundFilePath = soundFilePath
+					end
+					currentLogicalNote = 0
+				elseif noteData.noteType == "SoundNote" then
+					logicalNote = self.engine.SoundNote:new({
+						startNoteData = noteData,
+						pressSoundFilePath = soundFilePath
+					})
+					table.insert(self.noteData, logicalNote)
+				end
 				
-				self.engine.sharedLogicalNoteData[noteData] = logicalNote
+				if logicalNote then
+					logicalNote.noteHandler = self
+					logicalNote.engine = self.engine
+					
+					self.engine.sharedLogicalNoteData[noteData] = logicalNote
+				end
 			end
 		end
 	end
 	
-	table.sort(self.noteData, function(a, b) return a.noteData.startTimePoint < b.noteData.startTimePoint end)
+	table.sort(self.noteData, function(a, b)
+		return a.startNoteData.timePoint < b.startNoteData.timePoint
+	end)
 
 	for index, logicalNote in ipairs(self.noteData) do
 		logicalNote.index = index
@@ -62,8 +83,8 @@ NoteHandler.setCallbacks = function(self)
 				self.keyState = true
 				self.currentNote.keyState = true
 				
-				if self.currentNote.soundFilePath then
-					audioManager:playSound(self.currentNote.soundFilePath, "engine")
+				if self.currentNote.pressSoundFilePath then
+					audioManager:playSound(self.currentNote.pressSoundFilePath, "engine")
 				end
 			end
 		end)
@@ -71,6 +92,10 @@ NoteHandler.setCallbacks = function(self)
 			if key == self.keyBind then
 				self.keyState = false
 				self.currentNote.keyState = false
+				
+				if self.currentNote.releaseSoundFilePath then
+					audioManager:playSound(self.currentNote.releaseSoundFilePath, "engine")
+				end
 			end
 		end)
 	end

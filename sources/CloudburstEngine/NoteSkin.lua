@@ -40,10 +40,10 @@ NoteSkin.getCS = function(self, note)
 end
 
 NoteSkin.getColumnIndexNumber = function(self, note)
-	if note.noteData.inputType == "scratch" then
+	if note.startNoteData.inputType == "scratch" then
 		return 0
 	else
-		return note.noteData.inputIndex
+		return note.startNoteData.inputIndex
 	end
 end
 
@@ -85,7 +85,7 @@ end
 -- get*Layer
 --------------------------------
 NoteSkin.getShortNoteLayer = function(self, note)
-	return 2 * (1000000 - note.noteData.startTimePoint:getAbsoluteTime()) * (self:getColumnIndexNumber(note) + 1) / 1000000000 + 16
+	return 2 * (1000000 - note.startNoteData.timePoint:getAbsoluteTime()) * (self:getColumnIndexNumber(note) + 1) / 1000000000 + 16
 end
 NoteSkin.getLongNoteHeadLayer = function(self, note)
 	return self:getShortNoteLayer(note)
@@ -94,23 +94,23 @@ NoteSkin.getLongNoteTailLayer = function(self, note)
 	return self:getShortNoteLayer(note)
 end
 NoteSkin.getLongNoteBodyLayer = function(self, note)
-	return (1000000 - note.noteData.startTimePoint:getAbsoluteTime()) * (self:getColumnIndexNumber(note) + 1) / 1000000000 - 1 / 2000000000 + 16
+	return (1000000 - note.startNoteData.timePoint:getAbsoluteTime()) * (self:getColumnIndexNumber(note) + 1) / 1000000000 - 1 / 2000000000 + 16
 end
 
 --------------------------------
 -- get*Drawable
 --------------------------------
 NoteSkin.getShortNoteDrawable = function(self, note)
-	return self.drawables[self:getNoteColor(note.noteData.inputType, note.noteData.inputIndex, 7)].ShortNote
+	return self.drawables[self:getNoteColor(note.startNoteData.inputType, note.startNoteData.inputIndex, 7)].ShortNote
 end
 NoteSkin.getLongNoteHeadDrawable = function(self, note)
-	return self.drawables[self:getNoteColor(note.noteData.inputType, note.noteData.inputIndex, 7)].LongNoteHead
+	return self.drawables[self:getNoteColor(note.startNoteData.inputType, note.startNoteData.inputIndex, 7)].LongNoteHead
 end
 NoteSkin.getLongNoteTailDrawable = function(self, note)
-	return self.drawables[self:getNoteColor(note.noteData.inputType, note.noteData.inputIndex, 7)].LongNoteTail
+	return self.drawables[self:getNoteColor(note.startNoteData.inputType, note.startNoteData.inputIndex, 7)].LongNoteTail
 end
 NoteSkin.getLongNoteBodyDrawable = function(self, note)
-	return self.drawables[self:getNoteColor(note.noteData.inputType, note.noteData.inputIndex, 7)].LongNoteBody
+	return self.drawables[self:getNoteColor(note.startNoteData.inputType, note.startNoteData.inputIndex, 7)].LongNoteBody
 end
 
 --------------------------------
@@ -130,16 +130,16 @@ NoteSkin.getLongNoteBodyX = function(self, note)
 end
 
 NoteSkin.getShortNoteY = function(self, note)
-	return 1 - self.speed * (note.noteData.currentVisualStartTime - note.engine.currentTime) - self:getShortNoteHeight(note) / 2
+	return 1 - self.speed * (note.startNoteData.currentVisualTime - note.engine.currentTime) - self:getShortNoteHeight(note) / 2
 end
 NoteSkin.getLongNoteHeadY = function(self, note)
-	return 1 - self.speed * ((note:getLogicalNote().fakeStartTime or note.noteData.currentVisualStartTime) - note.engine.currentTime) - self:getLongNoteHeadHeight(note) / 2
+	return 1 - self.speed * ((note:getLogicalNote().fakeStartTime or note.startNoteData.currentVisualTime) - note.engine.currentTime) - self:getLongNoteHeadHeight(note) / 2
 end
 NoteSkin.getLongNoteTailY = function(self, note)
-	return 1 - self.speed * (note.noteData.currentVisualEndTime - note.engine.currentTime) - self:getLongNoteTailHeight(note) / 2
+	return 1 - self.speed * (note.endNoteData.currentVisualTime - note.engine.currentTime) - self:getLongNoteTailHeight(note) / 2
 end
 NoteSkin.getLongNoteBodyY = function(self, note)
-	return 1 - self.speed * (note.noteData.currentVisualEndTime - note.engine.currentTime)
+	return 1 - self.speed * (note.endNoteData.currentVisualTime - note.engine.currentTime)
 end
 
 --------------------------------
@@ -240,21 +240,23 @@ NoteSkin.getShortNoteColour = function(self, note)
 end
 
 NoteSkin.getLongNoteColour = function(self, note)
-	if note:getLogicalNote().fakeStartTime and note:getLogicalNote().fakeStartTime >= note.noteData.endTimePoint:getAbsoluteTime() then
+	local logicalNote = note:getLogicalNote()
+	
+	if logicalNote.fakeStartTime and logicalNote.fakeStartTime >= note.endNoteData.timePoint:getAbsoluteTime() then
 		return {255, 255, 255, 0}
-	elseif note:getLogicalNote().state == "clear" then
+	elseif logicalNote.state == "clear" then
 		return {255, 255, 255, 255}
-	elseif note:getLogicalNote().state == "startMissed" then
+	elseif logicalNote.state == "startMissed" then
 		return {127, 127, 127, 255}
-	elseif note:getLogicalNote().state == "startMissedPressed" then
+	elseif logicalNote.state == "startMissedPressed" then
 		return {191, 191, 191, 255}
-	elseif note:getLogicalNote().state == "startPassedPressed" then
+	elseif logicalNote.state == "startPassedPressed" then
 		return {255, 255, 255, 255}
-	elseif note:getLogicalNote().state == "endPassed" then
+	elseif logicalNote.state == "endPassed" then
 		return {255, 255, 255, 0}
-	elseif note:getLogicalNote().state == "endMissed" then
+	elseif logicalNote.state == "endMissed" then
 		return {127, 127, 127, 255}
-	elseif note:getLogicalNote().state == "endMissedPassed" then
+	elseif logicalNote.state == "endMissedPassed" then
 		return {127, 127, 127, 255}
 	end
 end

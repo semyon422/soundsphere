@@ -10,7 +10,7 @@ ShortGraphicalNote.update = function(self)
 			self:updateColour(self.drawable.color, self:getColour())
 		end
 	elseif self.noteDrawer.optimisationMode == self.noteDrawer.OptimisationModeEnum.UpdateVisible then
-		self.noteData.currentVisualStartTime = (self.noteData.zeroClearVisualStartTime - self.noteDrawer.currentClearVisualTime) * self.noteDrawer.globalSpeed + self.noteDrawer.currentTimePoint:getAbsoluteTime()
+		self.startNoteData.currentVisualTime = (self.startNoteData.zeroClearVisualTime - self.noteDrawer.currentClearVisualTime) * self.noteDrawer.globalSpeed + self.noteDrawer.currentTimePoint:getAbsoluteTime()
 		
 		if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
 			self:deactivate()

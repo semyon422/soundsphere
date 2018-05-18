@@ -7,8 +7,8 @@ LongLogicalNote.update = function(self)
 		return
 	end
 	
-	local deltaStartTime = self.noteData.startTimePoint:getAbsoluteTime() - self.engine.currentTime
-	local deltaEndTime = self.noteData.endTimePoint:getAbsoluteTime() - self.engine.currentTime
+	local deltaStartTime = self.startNoteData.timePoint:getAbsoluteTime() - self.engine.currentTime
+	local deltaEndTime = self.endNoteData.timePoint:getAbsoluteTime() - self.engine.currentTime
 	
 	local startTimeState = self.engine:getTimeState(deltaStartTime)
 	local endTimeState = self.engine:getTimeState(deltaEndTime)

@@ -6,7 +6,7 @@ ShortLogicalNote.update = function(self)
 		return
 	end
 	
-	local deltaTime = self.noteData.startTimePoint:getAbsoluteTime() - self.engine.currentTime
+	local deltaTime = self.startNoteData.timePoint:getAbsoluteTime() - self.engine.currentTime
 	
 	local timeState = self.engine:getTimeState(deltaTime)
 	

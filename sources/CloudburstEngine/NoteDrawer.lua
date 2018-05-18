@@ -8,30 +8,44 @@ NoteDrawer.OptimisationModeEnum = {
 
 NoteDrawer.optimisationMode = NoteDrawer.OptimisationModeEnum.UpdateVisible
 
-local getClassForNote = function(noteData)
-	if noteData.noteType == "ShortNote" then
-		return CloudburstEngine.ShortGraphicalNote
-	elseif noteData.noteType == "LongNote" then
-		return CloudburstEngine.LongGraphicalNote
-	elseif noteData.noteType == "SoundNote" then
-		return CloudburstEngine.ShortGraphicalNote
-	end
-end
-
 NoteDrawer.loadNoteData = function(self)
 	self.noteData = {}
 	
 	self.layerData = self.engine.noteChart:requireLayerData(self.layerIndex)
+	
+	local currentGraphicalNote
 	for noteDataIndex = 1, self.layerData:getNoteDataCount() do
 		local noteData = self.layerData:getNoteData(noteDataIndex)
 		
-		local graphicalNote = getClassForNote(noteData):new({
-			noteData = noteData,
-			noteDrawer = self,
-			engine = self.engine
-		})
-		
-		table.insert(self.noteData, graphicalNote)
+		local graphicalNote
+		if noteData.noteType == "ShortNote" then
+			graphicalNote = self.engine.ShortGraphicalNote:new({
+				startNoteData = noteData
+			})
+			
+			table.insert(self.noteData, graphicalNote)
+		elseif noteData.noteType == "LongNoteStart" then
+			graphicalNote = self.engine.LongGraphicalNote:new({
+				startNoteData = noteData
+			})
+			currentGraphicalNote = graphicalNote
+			table.insert(self.noteData, graphicalNote)
+		elseif noteData.noteType == "LongNoteEnd" then
+			if currentGraphicalNote then
+				graphicalNote = currentGraphicalNote
+				graphicalNote.endNoteData = noteData
+			end
+			currentGraphicalNote = nil
+		elseif noteData.noteType == "SoundNote" then
+			graphicalNote = self.engine.ShortGraphicalNote:new({
+				startNoteData = noteData
+			})
+			table.insert(self.noteData, graphicalNote)
+		end
+		if graphicalNote then
+			graphicalNote.noteDrawer = self
+			graphicalNote.engine = self.engine
+		end
 	end
 	
 	self.currentTimePoint = self.layerData:getTimePoint(nil, 1)
@@ -39,7 +53,7 @@ NoteDrawer.loadNoteData = function(self)
 	self.currentTimePoint.velocityData = self.layerData:getVelocityDataByTimePoint(self.currentTimePoint)
 	
 	table.sort(self.noteData, function(a, b)
-		return a.noteData.zeroClearVisualStartTime < b.noteData.zeroClearVisualStartTime
+		return a.startNoteData.zeroClearVisualTime < b.startNoteData.zeroClearVisualTime
 	end)
 	
 	for index, graphicalNote in ipairs(self.noteData) do

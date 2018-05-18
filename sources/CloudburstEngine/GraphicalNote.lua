@@ -6,7 +6,7 @@ GraphicalNote.getCS = function(self)
 end
 
 GraphicalNote.getLogicalNote = function(self)
-	return self.engine.sharedLogicalNoteData[self.noteData]
+	return self.engine.sharedLogicalNoteData[self.startNoteData]
 end
 
 GraphicalNote.updateColour = function(self, currentColour, newColour)
