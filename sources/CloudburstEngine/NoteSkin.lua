@@ -197,13 +197,13 @@ NoteSkin.willShortNoteDraw = function(self, note)
 	local shortNoteY = self:getShortNoteY(note)
 	local shortNoteHeight = self:getShortNoteHeight(note)
 	
-	return (shortNoteY + shortNoteHeight / 2 > 0) and (shortNoteY - shortNoteHeight / 2 < 1)
+	return (shortNoteY + shortNoteHeight > 0) and (shortNoteY < 1)
 end
 NoteSkin.willShortNoteDrawBeforeStart = function(self, note)
-	return self:getShortNoteY(note) - self:getShortNoteHeight(note) / 2 >= 1
+	return self:getShortNoteY(note) >= 1
 end
 NoteSkin.willShortNoteDrawAfterEnd = function(self, note)
-	return self:getShortNoteY(note) + self:getShortNoteHeight(note) / 2 <= 0
+	return self:getShortNoteY(note) + self:getShortNoteHeight(note) <= 0
 end
 
 NoteSkin.willLongNoteDraw = function(self, note)
@@ -213,17 +213,18 @@ NoteSkin.willLongNoteDraw = function(self, note)
 	local longNoteTailHeight = self:getLongNoteTailHeight(note)
 	
 	local willDraw = {}
-	willDraw.head = longNoteHeadY + longNoteHeadHeight / 2 > 0 and longNoteHeadY - longNoteHeadHeight / 2 < 1
-	willDraw.tail = longNoteTailY + longNoteTailHeight / 2 > 0 and longNoteTailY - longNoteTailHeight / 2 < 1
-	willDraw.body = longNoteHeadY - longNoteHeadHeight / 2 >= 1 and longNoteTailY + longNoteTailHeight / 2 <= 0
+	
+	willDraw.head = longNoteHeadY + longNoteHeadHeight > 0 and longNoteHeadY < 1
+	willDraw.tail = longNoteTailY + longNoteTailHeight > 0 and longNoteTailY < 1
+	willDraw.body = longNoteHeadY >= 1 and longNoteTailY + longNoteTailHeight <= 0
 	
 	return willDraw.head or willDraw.tail or willDraw.body
 end
 NoteSkin.willLongNoteDrawBeforeStart = function(self, note)
-	return self:getLongNoteTailY(note) - self:getLongNoteTailHeight(note) / 2 >= 1
+	return self:getLongNoteTailY(note) >= 1
 end
 NoteSkin.willLongNoteDrawAfterEnd = function(self, note)
-	return self:getLongNoteHeadY(note) + self:getLongNoteHeadHeight(note) / 2 <= 0
+	return self:getLongNoteHeadY(note) + self:getLongNoteHeadHeight(note) <= 0
 end
 
 --------------------------------
