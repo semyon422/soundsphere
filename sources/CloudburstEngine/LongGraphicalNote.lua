@@ -16,8 +16,7 @@ LongGraphicalNote.update = function(self)
 			self:updateColour(self.bodyDrawable.color, self:getColour())
 		end
 	elseif self.noteDrawer.optimisationMode == self.noteDrawer.OptimisationModeEnum.UpdateVisible then
-		self.startNoteData.currentVisualTime = (self.startNoteData.zeroClearVisualTime - self.noteDrawer.currentClearVisualTime) * self.noteDrawer.globalSpeed + self.noteDrawer.currentTimePoint:getAbsoluteTime()
-		self.endNoteData.currentVisualTime = (self.endNoteData.zeroClearVisualTime - self.noteDrawer.currentClearVisualTime) * self.noteDrawer.globalSpeed + self.noteDrawer.currentTimePoint:getAbsoluteTime()
+		self:computeVisualTime()
 		
 		if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
 			self:deactivate()
@@ -36,6 +35,17 @@ LongGraphicalNote.update = function(self)
 			self:updateColour(self.bodyDrawable.color, self:getColour())
 		end
 	end
+end
+
+LongGraphicalNote.computeVisualTime = function(self)
+	self.startNoteData.currentVisualTime
+		= (self.startNoteData.zeroClearVisualTime - self.noteDrawer.currentClearVisualTime)
+		* self.noteDrawer.globalSpeed
+		+ self.noteDrawer.currentTimePoint:getAbsoluteTime()
+	self.endNoteData.currentVisualTime
+		= (self.endNoteData.zeroClearVisualTime - self.noteDrawer.currentClearVisualTime)
+		* self.noteDrawer.globalSpeed
+		+ self.noteDrawer.currentTimePoint:getAbsoluteTime()
 end
 
 LongGraphicalNote.activate = function(self)

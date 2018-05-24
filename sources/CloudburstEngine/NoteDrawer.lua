@@ -49,8 +49,6 @@ NoteDrawer.loadNoteData = function(self)
 	end
 	
 	self.currentTimePoint = self.layerData:getTimePoint(nil, 1)
-	self.currentTimePoint.absoluteTime = self.engine.currentTime
-	self.currentTimePoint.velocityData = self.layerData:getVelocityDataByTimePoint(self.currentTimePoint)
 	
 	table.sort(self.noteData, function(a, b)
 		return a.startNoteData.zeroClearVisualTime < b.startNoteData.zeroClearVisualTime
@@ -87,20 +85,30 @@ NoteDrawer.update = function(self)
 		
 		for currentNoteIndex = self.startNoteIndex, 0, -1 do
 			local note = self.noteData[currentNoteIndex - 1]
-			if note and note:willDraw() then
-				self.drawingNotes[note] = note
-				self.startNoteIndex = self.startNoteIndex - 1
-				note:activate()
+			if note then
+				note:computeVisualTime()
+				if note:willDrawAfterEnd() or note:willDraw() then
+					self.drawingNotes[note] = note
+					self.startNoteIndex = self.startNoteIndex - 1
+					note:activate()
+				else
+					break
+				end
 			else
 				break
 			end
 		end
 		for currentNoteIndex = self.endNoteIndex, #self.noteData, 1 do
 			local note = self.noteData[currentNoteIndex + 1]
-			if note and note:willDraw() then
-				self.drawingNotes[note] = note
-				self.endNoteIndex = self.endNoteIndex + 1
-				note:activate()
+			if note then
+				note:computeVisualTime()
+				if note:willDrawBeforeStart() or note:willDraw() then
+					self.drawingNotes[note] = note
+					self.endNoteIndex = self.endNoteIndex + 1
+					note:activate()
+				else
+					break
+				end
 			else
 				break
 			end
