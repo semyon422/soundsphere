@@ -13,7 +13,7 @@ NoteDrawer.loadNoteData = function(self)
 	
 	self.layerData = self.engine.noteChart:requireLayerData(self.layerIndex)
 	
-	local currentGraphicalNote
+	local currentGraphicalNotes = {}
 	for noteDataIndex = 1, self.layerData:getNoteDataCount() do
 		local noteData = self.layerData:getNoteData(noteDataIndex)
 		
@@ -28,14 +28,15 @@ NoteDrawer.loadNoteData = function(self)
 			graphicalNote = self.engine.LongGraphicalNote:new({
 				startNoteData = noteData
 			})
-			currentGraphicalNote = graphicalNote
+			currentGraphicalNotes[noteData.inputType] = currentGraphicalNotes[noteData.inputType] or {}
+			currentGraphicalNotes[noteData.inputType][noteData.inputIndex] = graphicalNote
 			table.insert(self.noteData, graphicalNote)
 		elseif noteData.noteType == "LongNoteEnd" then
-			if currentGraphicalNote then
-				graphicalNote = currentGraphicalNote
+			if currentGraphicalNotes[noteData.inputType] and currentGraphicalNotes[noteData.inputType][noteData.inputIndex] then
+				graphicalNote = currentGraphicalNotes[noteData.inputType][noteData.inputIndex]
 				graphicalNote.endNoteData = noteData
 			end
-			currentGraphicalNote = nil
+			currentGraphicalNotes[noteData.inputType][noteData.inputIndex] = nil
 		elseif noteData.noteType == "SoundNote" then
 			graphicalNote = self.engine.ShortGraphicalNote:new({
 				startNoteData = noteData
@@ -48,7 +49,7 @@ NoteDrawer.loadNoteData = function(self)
 		end
 	end
 	
-	self.currentTimePoint = self.layerData:getTimePoint(nil, 1)
+	self.currentTimePoint = self.layerData:getTimePoint()
 	
 	table.sort(self.noteData, function(a, b)
 		return a.startNoteData.zeroClearVisualTime < b.startNoteData.zeroClearVisualTime
