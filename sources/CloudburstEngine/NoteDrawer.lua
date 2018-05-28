@@ -50,6 +50,8 @@ NoteDrawer.loadNoteData = function(self)
 	end
 	
 	self.currentTimePoint = self.layerData:getTimePoint()
+	self.currentClearVisualTime = 0
+	self.currentVelocityDataIndex = 1
 	
 	table.sort(self.noteData, function(a, b)
 		return a.startNoteData.zeroClearVisualTime < b.startNoteData.zeroClearVisualTime
@@ -66,9 +68,29 @@ NoteDrawer.loadNoteData = function(self)
 	end
 end
 
-NoteDrawer.update = function(self)
+NoteDrawer.updateCurrentTime = function(self)
 	self.currentTimePoint.absoluteTime = self.engine.currentTime
-	self.currentTimePoint.velocityData = self.layerData:getVelocityDataByTimePoint(self.currentTimePoint)
+	
+	self.currentVelocityData = self.layerData.spaceData:getVelocityData(self.currentVelocityDataIndex)
+	self.nextVelocityData = self.layerData.spaceData:getVelocityData(self.currentVelocityDataIndex + 1)
+	while true do
+		if self.nextVelocityData and self.nextVelocityData.timePoint <= self.currentTimePoint then
+			self.currentVelocityDataIndex = self.currentVelocityDataIndex + 1
+			self.currentVelocityData = self.layerData.spaceData:getVelocityData(self.currentVelocityDataIndex)
+			self.nextVelocityData = self.layerData.spaceData:getVelocityData(self.currentVelocityDataIndex + 1)
+		else
+			break
+		end
+	end
+	self.currentClearVisualTime
+		= (self.currentTimePoint:getAbsoluteTime() - self.currentVelocityData.timePoint:getAbsoluteTime())
+		* self.currentVelocityData.currentSpeed:tonumber()
+		+ self.currentVelocityData.timePoint.zeroClearVisualTime
+	self.currentTimePoint.velocityData = self.currentVelocityData
+end
+
+NoteDrawer.update = function(self)
+	self:updateCurrentTime()
 	
 	if self.optimisationMode == self.OptimisationModeEnum.UpdateAll then
 		self.layerData:computeVisualTime(self.currentTimePoint)
@@ -81,7 +103,6 @@ NoteDrawer.update = function(self)
 			end
 		end
 	elseif self.optimisationMode == self.OptimisationModeEnum.UpdateVisible then
-		self.currentClearVisualTime = self.layerData:getVisualTime(self.currentTimePoint, self.layerData:getZeroTimePoint(), true)
 		self.globalSpeed = self.currentTimePoint.velocityData.globalSpeed:tonumber()
 		
 		for currentNoteIndex = self.startNoteIndex, 0, -1 do
