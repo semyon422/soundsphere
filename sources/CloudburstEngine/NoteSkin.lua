@@ -33,7 +33,7 @@ NoteSkin.drawables = {
 }
 
 NoteSkin.noteWidth = 7 / 9 / 8
-NoteSkin.speed = 2
+NoteSkin.speed = 1
 
 NoteSkin.getCS = function(self, note)
 	return self.cs

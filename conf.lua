@@ -1,14 +1,14 @@
 function love.conf(t)
 	t.identity = nil
-	t.version = "0.10.1"
+	t.version = "0.10.2"
 	t.console = true
 	t.accelerometerjoystick = true
 	t.gammacorrect = false
 	
 	t.window.title = "soundsphere"
 	t.window.icon = nil
-	t.window.width = 800
-	t.window.height = 600
+	t.window.width = 1024
+	t.window.height = 576
 	t.window.borderless = false
 	t.window.resizable = true
 	t.window.minwidth = 1
