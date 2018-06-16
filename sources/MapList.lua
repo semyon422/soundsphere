@@ -6,16 +6,16 @@ MapList.visualSubItemIndex = 1
 MapList.selectedItemIndex = 1
 MapList.selectedSubItemIndex = 1
 
-MapList.x = -7/9
+MapList.x = 0
 MapList.y = 0
-MapList.w = 7/9
+MapList.w = 1
 MapList.h = 1
 MapList.layer = 2
 MapList.rectangleColor = {255, 255, 255, 0}
 MapList.textColor = {255, 255, 255, 255}
 MapList.selectedRectangleColor = {255, 255, 255, 31}
 MapList.mode = "fill"
-MapList.limit = 7/9
+MapList.limit = 1
 MapList.textAlign = {
 	x = "left", y = "center"
 }
@@ -27,8 +27,8 @@ MapList.downScrollKey = "down"
 MapList.dataMode = "PackMode"
 
 MapList.load = function(self)
-	self.cs = soul.CS:new(nil, 1, 0, 0, 0, "h", 768)
-	self.font = mainFont20
+	self.cs = soul.CS:new(nil, 0.5, 0, 0, 0, "h", 576)
+	self.font = self.core.fonts.main20
 	
 	self.scrollCurrentDelta = 0
 	self.scrollSubCurrentDelta = 0
@@ -87,8 +87,8 @@ MapList.updateSubItemsChartMode = function(self)
 			text = utf8validate(cacheData.title),
 			onClick = function(button)
 				if button.subItemIndex == self.selectedSubItemIndex then
-					currentCacheData = cacheData
-					stateManager:switchState("playing")
+					self.core.currentCacheData = cacheData
+					self.core.stateManager:switchState("playing")
 				else
 					self.selectedSubItemIndex = subItemIndex
 					self:updateScrollSubDelta()
@@ -161,7 +161,7 @@ end
 MapList.transformCache = function(self)
 	self.transformedCache = {}
 	
-	for cacheData in cache:getCacheDataIterator() do
+	for cacheData in self.core.cache:getCacheDataIterator() do
 		self.transformedCache[cacheData.directoryPath] = self.transformedCache[cacheData.directoryPath] or {}
 		table.insert(self.transformedCache[cacheData.directoryPath], cacheData)
 	end
@@ -370,14 +370,6 @@ MapList.loadCallbacks = function(self)
 			self:scrollBy(-direction)
 		end
 	end)
-	soul.setCallback("mousemoved", self, function(x, y)
-		local x, y, w, h = self.x, self.y, self.w, self.h
-		local mx, my = self.cs:x(love.mouse.getX(), true), self.cs:y(love.mouse.getY(), true)
-		if mx >= -1/18 and self.dataMode == "ChartMode" then
-			self:deactivate()
-			self.packList:activate()
-		end
-	end)
 	soul.setCallback("keypressed", self, function(key)
 		if key == self.upScrollKey then
 			self:scrollBy(-1)
@@ -390,7 +382,7 @@ MapList.loadCallbacks = function(self)
 					break
 				end
 			end
-		elseif key == "right" and self.dataMode == "ChartMode" then
+		elseif key == "escape" and self.dataMode == "ChartMode" then
 			self:deactivate()
 			self.packList:activate()
 		end
@@ -399,7 +391,6 @@ end
 
 MapList.unloadCallbacks = function(self)
 	soul.unsetCallback("wheelmoved", self)
-	soul.unsetCallback("mousemoved", self)
 	soul.unsetCallback("keypressed", self)
 end
 
