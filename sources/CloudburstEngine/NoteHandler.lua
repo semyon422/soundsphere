@@ -84,7 +84,7 @@ NoteHandler.setCallbacks = function(self)
 				self.currentNote.keyState = true
 				
 				if self.currentNote.pressSoundFilePath then
-					audioManager:playSound(self.currentNote.pressSoundFilePath, "engine")
+					self.engine.core.audioManager:playSound(self.currentNote.pressSoundFilePath, "engine")
 				end
 			end
 		end)

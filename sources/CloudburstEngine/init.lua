@@ -18,7 +18,7 @@ require("CloudburstEngine.TimeManager")
 require("CloudburstEngine.ResourceObserver")
 
 CloudburstEngine.load = function(self)
-	self.inputMode = inputModeLoader:getInputMode(self.noteChart.inputMode)
+	self.inputMode = self.core.inputModeLoader:getInputMode(self.noteChart.inputMode)
 	
 	self.sharedLogicalNoteData = {}
 	self.soundFiles = {}
@@ -71,18 +71,18 @@ end
 CloudburstEngine.loadResources = function(self)
 	self.resourceObserver = self.ResourceObserver:new()
 	self.resourceObserver.engine = self
-	audioManager:addObserver(self.resourceObserver)
+	self.core.audioManager:addObserver(self.resourceObserver)
 	
 	for _, soundFilePath in pairs(self.soundFiles) do
-		audioManager:loadChunk(soundFilePath, "engine")
+		self.core.audioManager:loadChunk(soundFilePath, "engine")
 	end
 end
 
 CloudburstEngine.unloadResources = function(self)
-	audioManager:removeObserver(self.resourceObserver)
+	self.core.audioManager:removeObserver(self.resourceObserver)
 	
-	audioManager:stopSoundGroup("engine")
-	audioManager:unloadChunkGroup("engine")
+	self.core.audioManager:stopSoundGroup("engine")
+	self.core.audioManager:unloadChunkGroup("engine")
 end
 
 CloudburstEngine.loadTimeManager = function(self)

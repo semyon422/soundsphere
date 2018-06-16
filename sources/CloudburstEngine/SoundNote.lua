@@ -8,7 +8,7 @@ SoundNote.update = function(self)
 	
 	if self.startNoteData.timePoint:getAbsoluteTime() <= self.engine.currentTime then
 		if self.pressSoundFilePath then
-			audioManager:playSound(self.pressSoundFilePath, "engine")
+			self.engine.core.audioManager:playSound(self.pressSoundFilePath, "engine")
 		end
 		
 		self.state = "passed"
