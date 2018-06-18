@@ -1,0 +1,112 @@
+#img01:shortNote/white.png
+#img02:longNoteHead/white.png
+#img03:longNoteTail/white.png
+#img04:longNoteBody/white/body-0.png
+#img05:shortNote/blue.png
+#img06:longNoteHead/blue.png
+#img07:longNoteTail/blue.png
+#img08:longNoteBody/blue/body-0.png
+#img09:shortNote/yellow.png
+#img0a:longNoteHead/yellow.png
+#img0b:longNoteTail/yellow.png
+#img0c:longNoteBody/yellow/body-0.png
+#img0d:shortNote/orange.png
+#img0e:longNoteHead/orange.png
+#img0f:longNoteTail/orange.png
+#img0g:longNoteBody/orange/body-0.png
+
+#imga1:playfield7K1S.png
+
+#cs 0 0 0 0 h
+
+#x01:0
+#x02:0.09
+#x03:0.18
+#x04:0.27
+#x05:0.36
+#x06:0.45
+#x07:0.54
+#x08:0.63
+
+#y01:0
+#w01:0.09
+#h01:1
+
+#playfield mode:01 img:a1 x:01 y:01 h:01
+
+#note 7key1scratch:scratch1:ShortNote x01 w01 img0d
+#note 7key1scratch:scratch1:LongNoteHead x01 w01 img0e
+#note 7key1scratch:scratch1:LongNoteTail x01 w01 img0f
+#note 7key1scratch:scratch1:LongNoteBody x01 w01 img0g
+
+#note 7key1scratch:key1:ShortNote x02 w01 img01
+#note 7key1scratch:key1:LongNoteHead x02 w01 img02
+#note 7key1scratch:key1:LongNoteTail x02 w01 img03
+#note 7key1scratch:key1:LongNoteBody x02 w01 img04
+
+#note 7key1scratch:key2:ShortNote x03 w01 img05
+#note 7key1scratch:key2:LongNoteHead x03 w01 img06
+#note 7key1scratch:key2:LongNoteTail x03 w01 img07
+#note 7key1scratch:key2:LongNoteBody x03 w01 img08
+
+#note 7key1scratch:key3:ShortNote x04 w01 img01
+#note 7key1scratch:key3:LongNoteHead x04 w01 img02
+#note 7key1scratch:key3:LongNoteTail x04 w01 img03
+#note 7key1scratch:key3:LongNoteBody x04 w01 img04
+
+#note 7key1scratch:key4:ShortNote x05 w01 img09
+#note 7key1scratch:key4:LongNoteHead x05 w01 img0a
+#note 7key1scratch:key4:LongNoteTail x05 w01 img0b
+#note 7key1scratch:key4:LongNoteBody x05 w01 img0c
+
+#note 7key1scratch:key5:ShortNote x06 w01 img01
+#note 7key1scratch:key5:LongNoteHead x06 w01 img02
+#note 7key1scratch:key5:LongNoteTail x06 w01 img03
+#note 7key1scratch:key5:LongNoteBody x06 w01 img04
+
+#note 7key1scratch:key6:ShortNote x07 w01 img05
+#note 7key1scratch:key6:LongNoteHead x07 w01 img06
+#note 7key1scratch:key6:LongNoteTail x07 w01 img07
+#note 7key1scratch:key6:LongNoteBody x07 w01 img08
+
+#note 7key1scratch:key7:ShortNote x08 w01 img01
+#note 7key1scratch:key7:LongNoteHead x08 w01 img02
+#note 7key1scratch:key7:LongNoteTail x08 w01 img03
+#note 7key1scratch:key7:LongNoteBody x08 w01 img04
+
+
+
+#img11:arrowSkin/left.png
+#img12:arrowSkin/down.png
+#img13:arrowSkin/up.png
+#img14:arrowSkin/right.png
+#img15:arrowSkin/holdTail.png
+#img16:arrowSkin/holdBody.png
+
+#x11:0.2
+#x12:0.35
+#x13:0.50
+#x14:0.65
+
+#w11:0.15
+
+
+#note 4key:key1:ShortNote x11 w11 img11
+#note 4key:key1:LongNoteHead x11 w11 img11
+#note 4key:key1:LongNoteTail x11 w11 img15
+#note 4key:key1:LongNoteBody x11 w11 img16
+
+#note 4key:key2:ShortNote x12 w11 img12
+#note 4key:key2:LongNoteHead x12 w11 img12
+#note 4key:key2:LongNoteTail x12 w11 img15
+#note 4key:key2:LongNoteBody x12 w11 img16
+
+#note 4key:key3:ShortNote x13 w11 img13
+#note 4key:key3:LongNoteHead x13 w11 img13
+#note 4key:key3:LongNoteTail x13 w11 img15
+#note 4key:key3:LongNoteBody x13 w11 img16
+
+#note 4key:key4:ShortNote x14 w11 img14
+#note 4key:key4:LongNoteHead x14 w11 img14
+#note 4key:key4:LongNoteTail x14 w11 img15
+#note 4key:key4:LongNoteBody x14 w11 img16

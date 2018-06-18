@@ -1,91 +1,85 @@
 CloudburstEngine.NoteSkin = createClass()
 local NoteSkin = CloudburstEngine.NoteSkin
 
-NoteSkin.cs = soul.CS:new(nil, 0, 0, 0, 0, "h")
+NoteSkin.load = function(self, directoryPath, fileName)
+	self.directoryPath, self.fileName = directoryPath, fileName
+	self.filePath = directoryPath .. "/" .. fileName
+	
+	self:readFile()
+	self:processFile()
+end
 
-local root = "resources/NoteSkin/"
+NoteSkin.readFile = function(self)
+	local noteSkinFile = io.open(self.filePath, "r")
+	self.noteSkinString = noteSkinFile:read("*a")
+	noteSkinFile:close()
+end
 
-NoteSkin.drawables = {
-	white = {
-		ShortNote = love.graphics.newImage(root .. "shortNote/white.png"),
-		LongNoteBody = love.graphics.newImage(root .. "longNoteBody/white/body-0.png"),
-		LongNoteHead = love.graphics.newImage(root .. "longNoteHead/white.png"),
-		LongNoteTail = love.graphics.newImage(root .. "longNoteTail/white.png")
-	},
-	blue = {
-		ShortNote = love.graphics.newImage(root .. "shortNote/blue.png"),
-		LongNoteBody = love.graphics.newImage(root .. "longNoteBody/blue/body-0.png"),
-		LongNoteHead = love.graphics.newImage(root .. "longNoteHead/blue.png"),
-		LongNoteTail = love.graphics.newImage(root .. "longNoteTail/blue.png")
-	},
-	yellow = {
-		ShortNote = love.graphics.newImage(root .. "shortNote/yellow.png"),
-		LongNoteBody = love.graphics.newImage(root .. "longNoteBody/yellow/body-0.png"),
-		LongNoteHead = love.graphics.newImage(root .. "longNoteHead/yellow.png"),
-		LongNoteTail = love.graphics.newImage(root .. "longNoteTail/yellow.png")
-	},
-	orange = {
-		ShortNote = love.graphics.newImage(root .. "shortNote/orange.png"),
-		LongNoteBody = love.graphics.newImage(root .. "longNoteBody/orange/body-0.png"),
-		LongNoteHead = love.graphics.newImage(root .. "longNoteHead/orange.png"),
-		LongNoteTail = love.graphics.newImage(root .. "longNoteTail/orange.png")
-	}
-}
+NoteSkin.processFile = function(self)
+	self.variables = {}
+	self.notes = {}
+	for _, line in ipairs(self.noteSkinString:split("\n")) do
+		self:processLine(line:trim())
+	end
+	self:loadImages()
+end
 
-NoteSkin.noteWidth = 7 / 9 / 8
-NoteSkin.speed = 1
+NoteSkin.processLine = function(self, line)
+	if line:find("^#%S+:.+$") then
+		local key, value = line:match("^#(%S+):(.+)$")
+		self.variables[key] = value
+	elseif line:find("^#%S+ .+$") then
+		local type, dataString = line:match("^#(%S+) (.+)$")
+		local data = dataString:split(" ")
+		if type == "note" then
+			local id = data[1]
+			self.notes[id] = {}
+			
+			self.notes[id].x = tonumber(self.variables[data[2] or 0]) or 0
+			self.notes[id].w = tonumber(self.variables[data[3] or 0]) or 0
+			self.notes[id].imagePath = self.variables[data[4] or 0]
+		elseif type == "cs" then
+			self.cs = soul.CS:new(
+				nil,
+				tonumber(data[1]),
+				tonumber(data[2]),
+				tonumber(data[3]),
+				tonumber(data[4]),
+				data[5]
+			)
+		elseif type == "playfield" then
+			self.playfield = dataString
+		end
+	end
+end
+
+NoteSkin.loadImages = function(self)
+	self.images = {}
+	for noteId, data in pairs(self.notes) do
+		if data.imagePath and not self.images[data.imagePath] then
+			self.images[data.imagePath] = love.graphics.newImage(self.directoryPath .. "/" .. data.imagePath)
+		end
+	end
+	
+	self.drawables = {}
+	for noteId, data in pairs(self.notes) do
+		if data.imagePath then
+			self.drawables[noteId] = self.images[data.imagePath]
+		end
+	end
+end
+
+NoteSkin.speed = 2
 
 NoteSkin.getCS = function(self, note)
 	return self.cs
-end
-
-NoteSkin.getColumnIndexNumber = function(self, note)
-	if note.startNoteData.inputType == "scratch" then
-		return 0
-	else
-		return note.startNoteData.inputIndex
-	end
-end
-
-NoteSkin.getNoteColor = function(self, inputType, inputIndex, inputCount)
-	if inputType == "scratch" then
-		return "orange"
-	elseif inputType == "key" then
-		if inputCount % 2 == 1 then
-			local halfInputCount = (inputCount - 1) / 2
-			if (inputCount + 1) / 2 == inputIndex then
-				return "yellow"
-			else
-				if (halfInputCount - inputIndex + 1) % 2 == 1 then
-					return "white"
-				else
-					return "blue"
-				end
-			end
-		else
-			local halfInputCount = inputCount / 2
-			if inputIndex <= inputCount / 2 then
-				if (halfInputCount - inputIndex + 1) % 2 == 1 then
-					return "white"
-				else
-					return "blue"
-				end
-			else
-				if (halfInputCount - inputIndex + 1) % 2 == 1 then
-					return "blue"
-				else
-					return "white"
-				end
-			end
-		end
-	end
 end
 
 --------------------------------
 -- get*Layer
 --------------------------------
 NoteSkin.getShortNoteLayer = function(self, note)
-	return 2 * (1000000 - note.startNoteData.timePoint:getAbsoluteTime()) * (self:getColumnIndexNumber(note) + 1) / 1000000000 + 16
+	return 2 * (1000000 - note.startNoteData.timePoint:getAbsoluteTime()) * (note.startNoteData.inputIndex + 1) / 1000000000 + 16
 end
 NoteSkin.getLongNoteHeadLayer = function(self, note)
 	return self:getShortNoteLayer(note)
@@ -94,39 +88,39 @@ NoteSkin.getLongNoteTailLayer = function(self, note)
 	return self:getShortNoteLayer(note)
 end
 NoteSkin.getLongNoteBodyLayer = function(self, note)
-	return (1000000 - note.startNoteData.timePoint:getAbsoluteTime()) * (self:getColumnIndexNumber(note) + 1) / 1000000000 - 1 / 2000000000 + 16
+	return (1000000 - note.startNoteData.timePoint:getAbsoluteTime()) * (note.startNoteData.inputIndex + 1) / 1000000000 - 1 / 2000000000 + 16
 end
 
 --------------------------------
 -- get*Drawable
 --------------------------------
 NoteSkin.getShortNoteDrawable = function(self, note)
-	return self.drawables[self:getNoteColor(note.startNoteData.inputType, note.startNoteData.inputIndex, 7)].ShortNote
+	return self.drawables[note.id]
 end
 NoteSkin.getLongNoteHeadDrawable = function(self, note)
-	return self.drawables[self:getNoteColor(note.startNoteData.inputType, note.startNoteData.inputIndex, 7)].LongNoteHead
+	return self.drawables[note.id .. "Head"]
 end
 NoteSkin.getLongNoteTailDrawable = function(self, note)
-	return self.drawables[self:getNoteColor(note.startNoteData.inputType, note.startNoteData.inputIndex, 7)].LongNoteTail
+	return self.drawables[note.id .. "Tail"]
 end
 NoteSkin.getLongNoteBodyDrawable = function(self, note)
-	return self.drawables[self:getNoteColor(note.startNoteData.inputType, note.startNoteData.inputIndex, 7)].LongNoteBody
+	return self.drawables[note.id .. "Body"]
 end
 
 --------------------------------
 -- get*X get*Y
 --------------------------------
 NoteSkin.getShortNoteX = function(self, note)
-	return 7 / 9 - self:getNoteWidth(note) * (8 - self:getColumnIndexNumber(note))
+	return self.notes[note.id].x
 end
 NoteSkin.getLongNoteHeadX = function(self, note)
-	return self:getShortNoteX(note)
+	return self.notes[note.id .. "Head"].x
 end
 NoteSkin.getLongNoteTailX = function(self, note)
-	return self:getShortNoteX(note)
+	return self.notes[note.id .. "Tail"].x
 end
 NoteSkin.getLongNoteBodyX = function(self, note)
-	return self:getShortNoteX(note)
+	return self.notes[note.id .. "Body"].x
 end
 
 NoteSkin.getShortNoteY = function(self, note)
@@ -145,36 +139,46 @@ end
 --------------------------------
 -- get*Width get*Height
 --------------------------------
-NoteSkin.getNoteWidth = function(self, note)
-	return self.noteWidth
+NoteSkin.getShortNoteWidth = function(self, note)
+	return self.notes[note.id].w
 end
+NoteSkin.getLongNoteHeadWidth = function(self, note)
+	return self.notes[note.id .. "Head"].w
+end
+NoteSkin.getLongNoteTailWidth = function(self, note)
+	return self.notes[note.id .. "Tail"].w
+end
+NoteSkin.getLongNoteBodyWidth = function(self, note)
+	return self.notes[note.id .. "Body"].w
+end
+
 NoteSkin.getShortNoteHeight = function(self, note)
-	return self:getNoteWidth(note) / (self:getShortNoteDrawable(note):getWidth() / self:getShortNoteDrawable(note):getHeight())
+	return self:getShortNoteWidth(note) / (self:getShortNoteDrawable(note):getWidth() / self:getShortNoteDrawable(note):getHeight())
 end
 NoteSkin.getLongNoteHeadHeight = function(self, note)
-	return self:getNoteWidth(note) / (self:getLongNoteHeadDrawable(note):getWidth() / self:getLongNoteHeadDrawable(note):getHeight())
+	return self:getLongNoteHeadWidth(note) / (self:getLongNoteHeadDrawable(note):getWidth() / self:getLongNoteHeadDrawable(note):getHeight())
 end
 NoteSkin.getLongNoteTailHeight = function(self, note)
-	return self:getNoteWidth(note) / (self:getLongNoteTailDrawable(note):getWidth() / self:getLongNoteTailDrawable(note):getHeight())
+	return self:getLongNoteTailWidth(note) / (self:getLongNoteTailDrawable(note):getWidth() / self:getLongNoteTailDrawable(note):getHeight())
 end
 NoteSkin.getLongNoteBodyHeight = function(self, note)
-	return self:getNoteWidth(note) / (self:getLongNoteBodyDrawable(note):getWidth() / self:getLongNoteBodyDrawable(note):getHeight())
+	return self:getLongNoteBodyWidth(note) / (self:getLongNoteBodyDrawable(note):getWidth() / self:getLongNoteBodyDrawable(note):getHeight())
 end
 
 --------------------------------
 -- get*ScaleX get*ScaleY
 --------------------------------
 NoteSkin.getShortNoteScaleX = function(self, note)
-	return self:getNoteWidth(note) / self.cs:x(self:getShortNoteDrawable(note):getWidth())
+	return self:getShortNoteWidth(note) / self.cs:x(self:getShortNoteDrawable(note):getWidth())
 end
 NoteSkin.getLongNoteHeadScaleX = function(self, note)
-	return self:getNoteWidth(note) / self.cs:x(self:getLongNoteHeadDrawable(note):getWidth())
+	return self:getLongNoteHeadWidth(note) / self.cs:x(self:getLongNoteHeadDrawable(note):getWidth())
 end
 NoteSkin.getLongNoteTailScaleX = function(self, note)
-	return self:getNoteWidth(note) / self.cs:x(self:getLongNoteTailDrawable(note):getWidth())
+	return self:getLongNoteTailWidth(note) / self.cs:x(self:getLongNoteTailDrawable(note):getWidth())
 end
 NoteSkin.getLongNoteBodyScaleX = function(self, note)
-	return self:getNoteWidth(note) / self.cs:x(self:getLongNoteBodyDrawable(note):getWidth())
+	return self:getLongNoteBodyWidth(note) / self.cs:x(self:getLongNoteBodyDrawable(note):getWidth())
 end
 
 NoteSkin.getShortNoteScaleY = function(self, note)

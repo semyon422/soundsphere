@@ -126,6 +126,7 @@ Core.loadEngine = function(self, directoryPath, fileName)
 	local noteChart = self:getNoteChart(directoryPath, fileName)
 
 	local noteSkin = CloudburstEngine.NoteSkin:new()
+	noteSkin:load("resources/NoteSkin", "config.txt")
 
 	self.engine = CloudburstEngine:new()
 	self.engine.noteChart = noteChart

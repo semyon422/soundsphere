@@ -12,6 +12,7 @@ NoteDrawer.loadNoteData = function(self)
 	self.noteData = {}
 	
 	self.layerData = self.engine.noteChart:requireLayerData(self.layerIndex)
+	local inputModeString = self.layerData.layerDataSequence.noteChart.inputMode:getString()
 	
 	local currentGraphicalNotes = {}
 	for noteDataIndex = 1, self.layerData:getNoteDataCount() do
@@ -23,6 +24,11 @@ NoteDrawer.loadNoteData = function(self)
 				startNoteData = noteData
 			})
 			
+			graphicalNote.id =
+				inputModeString .. ":" ..
+				noteData.inputType .. noteData.inputIndex .. ":" ..
+				noteData.noteType
+			
 			table.insert(self.noteData, graphicalNote)
 		elseif noteData.noteType == "LongNoteStart" then
 			graphicalNote = self.engine.LongGraphicalNote:new({
@@ -30,6 +36,12 @@ NoteDrawer.loadNoteData = function(self)
 			})
 			currentGraphicalNotes[noteData.inputType] = currentGraphicalNotes[noteData.inputType] or {}
 			currentGraphicalNotes[noteData.inputType][noteData.inputIndex] = graphicalNote
+			
+			graphicalNote.id =
+				inputModeString .. ":" ..
+				noteData.inputType .. noteData.inputIndex .. ":" ..
+				"LongNote"
+			
 			table.insert(self.noteData, graphicalNote)
 		elseif noteData.noteType == "LongNoteEnd" then
 			if currentGraphicalNotes[noteData.inputType] and currentGraphicalNotes[noteData.inputType][noteData.inputIndex] then

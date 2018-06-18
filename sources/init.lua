@@ -8,7 +8,6 @@ require("Cache")
 require("KeyBindManager")
 require("PlayField")
 require("InputModeLoader")
-require("NoteSkinLoader")
 require("Core")
 
 core = Core:new()
