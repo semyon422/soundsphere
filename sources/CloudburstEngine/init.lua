@@ -60,6 +60,12 @@ CloudburstEngine.setCallbacks = function(self)
 		elseif key == "f1" then
 			self.timeManager:pause()
 			audioManager:pauseSoundGroup("engine")
+		elseif key == "f3" then
+			if CloudburstEngine.NoteSkin.speed - 0.1 >= 0.1 then
+				CloudburstEngine.NoteSkin.speed = CloudburstEngine.NoteSkin.speed - 0.1
+			end
+		elseif key == "f4" then
+			CloudburstEngine.NoteSkin.speed = CloudburstEngine.NoteSkin.speed + 0.1
 		end
 	end)
 end

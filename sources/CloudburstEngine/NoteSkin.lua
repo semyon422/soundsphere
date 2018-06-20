@@ -69,7 +69,7 @@ NoteSkin.loadImages = function(self)
 	end
 end
 
-NoteSkin.speed = 2
+NoteSkin.speed = 1
 
 NoteSkin.getCS = function(self, note)
 	return self.cs
