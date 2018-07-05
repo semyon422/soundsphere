@@ -21,28 +21,29 @@ NoteDrawer.loadNoteData = function(self)
 		local graphicalNote
 		if noteData.noteType == "ShortNote" then
 			graphicalNote = self.engine.ShortGraphicalNote:new({
-				startNoteData = noteData
+				startNoteData = noteData,
+				inputModeString = inputModeString,
+				noteType = "ShortNote"
 			})
 			
-			graphicalNote.id =
-				inputModeString .. ":" ..
-				noteData.inputType .. noteData.inputIndex .. ":" ..
-				noteData.noteType
-			
-			table.insert(self.noteData, graphicalNote)
+			if self.engine.noteSkin:checkNote(graphicalNote) then
+				table.insert(self.noteData, graphicalNote)
+			end
 		elseif noteData.noteType == "LongNoteStart" then
 			graphicalNote = self.engine.LongGraphicalNote:new({
-				startNoteData = noteData
+				startNoteData = noteData,
+				inputModeString = inputModeString,
+				noteType = "LongNote"
 			})
 			currentGraphicalNotes[noteData.inputType] = currentGraphicalNotes[noteData.inputType] or {}
 			currentGraphicalNotes[noteData.inputType][noteData.inputIndex] = graphicalNote
 			
-			graphicalNote.id =
-				inputModeString .. ":" ..
-				noteData.inputType .. noteData.inputIndex .. ":" ..
-				"LongNote"
-			
-			table.insert(self.noteData, graphicalNote)
+			if self.engine.noteSkin:checkNote(graphicalNote, "Head") and
+				self.engine.noteSkin:checkNote(graphicalNote, "Tail") and
+				self.engine.noteSkin:checkNote(graphicalNote, "Body")
+			then
+				table.insert(self.noteData, graphicalNote)
+			end
 		elseif noteData.noteType == "LongNoteEnd" then
 			if currentGraphicalNotes[noteData.inputType] and currentGraphicalNotes[noteData.inputType][noteData.inputIndex] then
 				graphicalNote = currentGraphicalNotes[noteData.inputType][noteData.inputIndex]

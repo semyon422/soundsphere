@@ -66,11 +66,11 @@ ShortGraphicalNote.getLayer = function(self)
 end
 
 ShortGraphicalNote.getDrawable = function(self)
-	return self.engine.noteSkin:getShortNoteDrawable(self)
+	return self.engine.noteSkin:getNoteDrawable(self)
 end
 
 ShortGraphicalNote.getX = function(self)
-	return self.engine.noteSkin:getShortNoteX(self)
+	return self.engine.noteSkin:getNoteX(self)
 end
 
 ShortGraphicalNote.getY = function(self)
@@ -78,11 +78,11 @@ ShortGraphicalNote.getY = function(self)
 end
 
 ShortGraphicalNote.getScaleX = function(self)
-	return self.engine.noteSkin:getShortNoteScaleX(self)
+	return self.engine.noteSkin:getNoteScaleX(self)
 end
 
 ShortGraphicalNote.getScaleY = function(self)
-	return self.engine.noteSkin:getShortNoteScaleY(self)
+	return self.engine.noteSkin:getNoteScaleY(self)
 end
 
 ShortGraphicalNote.willDraw = function(self)

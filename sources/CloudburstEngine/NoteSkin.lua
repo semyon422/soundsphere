@@ -16,29 +16,56 @@ NoteSkin.readFile = function(self)
 end
 
 NoteSkin.processFile = function(self)
-	self.variables = {}
-	self.notes = {}
-	for _, line in ipairs(self.noteSkinString:split("\n")) do
-		self:processLine(line:trim())
+	self.data = {}
+	self.images = {}
+	for _, line in ipairs(self.noteSkinString:split("#")) do
+		self:processLine(line:gsub("\n", " "):trim())
 	end
 	self:loadImages()
 end
 
+NoteSkin.getClearDataTable = function(self, dataTable, removingString)
+	local newDataTable = {}
+	
+	for _, value in ipairs(dataTable) do
+		if value ~= removingString then
+			table.insert(newDataTable, value)
+		end
+	end
+	
+	return newDataTable
+end
+
+NoteSkin.getKeyTable = function(self, key)
+	local lastKeyTable = self.data
+	
+	for _, keyString in ipairs(key) do
+		lastKeyTable[keyString] = lastKeyTable[keyString] or {}
+		lastKeyTable = lastKeyTable[keyString]
+	end
+	
+	return lastKeyTable
+end
+
+NoteSkin.setKeyTableData = function(self, keyTable, data)
+	for _, value in ipairs(data) do
+		if value:find("/") then
+			self.images[value] = true
+		end
+		local value = tonumber((value:gsub(",", "."))) or value
+		table.insert(keyTable, value)
+	end
+end
+
 NoteSkin.processLine = function(self, line)
-	if line:find("^#%S+:.+$") then
-		local key, value = line:match("^#(%S+):(.+)$")
-		self.variables[key] = value
-	elseif line:find("^#%S+ .+$") then
-		local type, dataString = line:match("^#(%S+) (.+)$")
-		local data = dataString:split(" ")
-		if type == "note" then
-			local id = data[1]
-			self.notes[id] = {}
-			
-			self.notes[id].x = tonumber(self.variables[data[2] or 0]) or 0
-			self.notes[id].w = tonumber(self.variables[data[3] or 0]) or 0
-			self.notes[id].imagePath = self.variables[data[4] or 0]
-		elseif type == "cs" then
+	if line:find("^.+:.+$") then
+		local keyString, dataString = line:match("^(.+):(.+)$")
+		local key = self:getClearDataTable(keyString:split("%s+", true), "")
+		local data = self:getClearDataTable(dataString:split("%s+", true), "")
+		
+		self:setKeyTableData(self:getKeyTable(key), data)
+		
+		if key[1] == "cs" then
 			self.cs = soul.CS:new(
 				nil,
 				tonumber(data[1]),
@@ -47,25 +74,13 @@ NoteSkin.processLine = function(self, line)
 				tonumber(data[4]),
 				data[5]
 			)
-		elseif type == "playfield" then
-			self.playfield = dataString
 		end
 	end
 end
 
 NoteSkin.loadImages = function(self)
-	self.images = {}
-	for noteId, data in pairs(self.notes) do
-		if data.imagePath and not self.images[data.imagePath] then
-			self.images[data.imagePath] = love.graphics.newImage(self.directoryPath .. "/" .. data.imagePath)
-		end
-	end
-	
-	self.drawables = {}
-	for noteId, data in pairs(self.notes) do
-		if data.imagePath then
-			self.drawables[noteId] = self.images[data.imagePath]
-		end
+	for imagePath in pairs(self.images) do
+		self.images[imagePath] = love.graphics.newImage(self.directoryPath .. "/" .. imagePath)
 	end
 end
 
@@ -73,6 +88,24 @@ NoteSkin.speed = 1
 
 NoteSkin.getCS = function(self, note)
 	return self.cs
+end
+
+NoteSkin.checkNote = function(self, note, suffix)
+	local a = self.data[note.inputModeString]
+	if a then
+		local b = a[note.startNoteData.inputType]
+		if b then
+			local c1 = b[note.noteType .. (suffix or "")]
+			local c2 = b["x"]
+			local c3 = b["w"]
+			if c2 and c2 and c3 then
+				local d = c1[note.startNoteData.inputIndex]
+				if d then
+					return self.images[d]
+				end
+			end
+		end
+	end
 end
 
 --------------------------------
@@ -94,104 +127,68 @@ end
 --------------------------------
 -- get*Drawable
 --------------------------------
-NoteSkin.getShortNoteDrawable = function(self, note)
-	return self.drawables[note.id]
-end
-NoteSkin.getLongNoteHeadDrawable = function(self, note)
-	return self.drawables[note.id .. "Head"]
-end
-NoteSkin.getLongNoteTailDrawable = function(self, note)
-	return self.drawables[note.id .. "Tail"]
-end
-NoteSkin.getLongNoteBodyDrawable = function(self, note)
-	return self.drawables[note.id .. "Body"]
+NoteSkin.getNoteDrawable = function(self, note, suffix)
+	return self.images[
+		self.data
+		[note.inputModeString]
+		[note.startNoteData.inputType]
+		[note.noteType .. (suffix or "")]
+		[note.startNoteData.inputIndex]
+	]
 end
 
 --------------------------------
 -- get*X get*Y
 --------------------------------
-NoteSkin.getShortNoteX = function(self, note)
-	return self.notes[note.id].x
-end
-NoteSkin.getLongNoteHeadX = function(self, note)
-	return self.notes[note.id .. "Head"].x
-end
-NoteSkin.getLongNoteTailX = function(self, note)
-	return self.notes[note.id .. "Tail"].x
-end
-NoteSkin.getLongNoteBodyX = function(self, note)
-	return self.notes[note.id .. "Body"].x
+NoteSkin.getNoteX = function(self, note)
+	return self.data
+		[note.inputModeString]
+		[note.startNoteData.inputType]
+		["x"]
+		[note.startNoteData.inputIndex]
 end
 
-NoteSkin.getShortNoteY = function(self, note)
-	return 1 - self.speed * (note.startNoteData.currentVisualTime - note.engine.currentTime) - self:getShortNoteHeight(note) / 2
+NoteSkin.getShortNoteY = function(self, note, suffix)
+	return 1 - self.speed * (note.startNoteData.currentVisualTime - note.engine.currentTime) - self:getNoteHeight(note) / 2
 end
-NoteSkin.getLongNoteHeadY = function(self, note)
-	return 1 - self.speed * ((note:getLogicalNote().fakeStartTime or note.startNoteData.currentVisualTime) - note.engine.currentTime) - self:getLongNoteHeadHeight(note) / 2
+NoteSkin.getLongNoteHeadY = function(self, note, suffix)
+	return 1 - self.speed * ((note:getLogicalNote().fakeStartTime or note.startNoteData.currentVisualTime) - note.engine.currentTime) - self:getNoteHeight(note, suffix) / 2
 end
-NoteSkin.getLongNoteTailY = function(self, note)
-	return 1 - self.speed * (note.endNoteData.currentVisualTime - note.engine.currentTime) - self:getLongNoteTailHeight(note) / 2
+NoteSkin.getLongNoteTailY = function(self, note, suffix)
+	return 1 - self.speed * (note.endNoteData.currentVisualTime - note.engine.currentTime) - self:getNoteHeight(note, suffix) / 2
 end
-NoteSkin.getLongNoteBodyY = function(self, note)
+NoteSkin.getLongNoteBodyY = function(self, note, suffix)
 	return 1 - self.speed * (note.endNoteData.currentVisualTime - note.engine.currentTime)
 end
 
 --------------------------------
 -- get*Width get*Height
 --------------------------------
-NoteSkin.getShortNoteWidth = function(self, note)
-	return self.notes[note.id].w
-end
-NoteSkin.getLongNoteHeadWidth = function(self, note)
-	return self.notes[note.id .. "Head"].w
-end
-NoteSkin.getLongNoteTailWidth = function(self, note)
-	return self.notes[note.id .. "Tail"].w
-end
-NoteSkin.getLongNoteBodyWidth = function(self, note)
-	return self.notes[note.id .. "Body"].w
+NoteSkin.getNoteWidth = function(self, note)
+	return self.data
+		[note.inputModeString]
+		[note.startNoteData.inputType]
+		["w"]
+		[note.startNoteData.inputIndex]
 end
 
-NoteSkin.getShortNoteHeight = function(self, note)
-	return self:getShortNoteWidth(note) / (self:getShortNoteDrawable(note):getWidth() / self:getShortNoteDrawable(note):getHeight())
-end
-NoteSkin.getLongNoteHeadHeight = function(self, note)
-	return self:getLongNoteHeadWidth(note) / (self:getLongNoteHeadDrawable(note):getWidth() / self:getLongNoteHeadDrawable(note):getHeight())
-end
-NoteSkin.getLongNoteTailHeight = function(self, note)
-	return self:getLongNoteTailWidth(note) / (self:getLongNoteTailDrawable(note):getWidth() / self:getLongNoteTailDrawable(note):getHeight())
-end
-NoteSkin.getLongNoteBodyHeight = function(self, note)
-	return self:getLongNoteBodyWidth(note) / (self:getLongNoteBodyDrawable(note):getWidth() / self:getLongNoteBodyDrawable(note):getHeight())
+NoteSkin.getNoteHeight = function(self, note, suffix)
+	return self:getNoteWidth(note, suffix) / (self:getNoteDrawable(note, suffix):getWidth() / self:getNoteDrawable(note, suffix):getHeight())
 end
 
 --------------------------------
 -- get*ScaleX get*ScaleY
 --------------------------------
-NoteSkin.getShortNoteScaleX = function(self, note)
-	return self:getShortNoteWidth(note) / self.cs:x(self:getShortNoteDrawable(note):getWidth())
-end
-NoteSkin.getLongNoteHeadScaleX = function(self, note)
-	return self:getLongNoteHeadWidth(note) / self.cs:x(self:getLongNoteHeadDrawable(note):getWidth())
-end
-NoteSkin.getLongNoteTailScaleX = function(self, note)
-	return self:getLongNoteTailWidth(note) / self.cs:x(self:getLongNoteTailDrawable(note):getWidth())
-end
-NoteSkin.getLongNoteBodyScaleX = function(self, note)
-	return self:getLongNoteBodyWidth(note) / self.cs:x(self:getLongNoteBodyDrawable(note):getWidth())
+NoteSkin.getNoteScaleX = function(self, note, suffix)
+	return self:getNoteWidth(note, suffix) / self.cs:x(self:getNoteDrawable(note, suffix):getWidth())
 end
 
-NoteSkin.getShortNoteScaleY = function(self, note)
-	return self:getShortNoteScaleX(note)
-end
-NoteSkin.getLongNoteHeadScaleY = function(self, note)
-	return self:getLongNoteHeadScaleX(note)
-end
-NoteSkin.getLongNoteTailScaleY = function(self, note)
-	return self:getLongNoteTailScaleX(note)
-end
-NoteSkin.getLongNoteBodyScaleY = function(self, note)
-	return (self:getLongNoteHeadY(note) - self:getLongNoteTailY(note)) / self.cs:y(self:getLongNoteBodyDrawable(note):getHeight())
+NoteSkin.getNoteScaleY = function(self, note, suffix)
+	if suffix == "Body" then
+		return (self:getLongNoteHeadY(note, suffix) - self:getLongNoteTailY(note, suffix)) / self.cs:y(self:getNoteDrawable(note, suffix):getHeight())
+	end
+	
+	return self:getNoteScaleX(note, suffix)
 end
 
 --------------------------------
@@ -199,7 +196,7 @@ end
 --------------------------------
 NoteSkin.willShortNoteDraw = function(self, note)
 	local shortNoteY = self:getShortNoteY(note)
-	local shortNoteHeight = self:getShortNoteHeight(note)
+	local shortNoteHeight = self:getNoteHeight(note)
 	
 	return (shortNoteY + shortNoteHeight > 0) and (shortNoteY < 1)
 end
@@ -207,14 +204,14 @@ NoteSkin.willShortNoteDrawBeforeStart = function(self, note)
 	return self:getShortNoteY(note) >= 1
 end
 NoteSkin.willShortNoteDrawAfterEnd = function(self, note)
-	return self:getShortNoteY(note) + self:getShortNoteHeight(note) <= 0
+	return self:getShortNoteY(note) + self:getNoteHeight(note) <= 0
 end
 
 NoteSkin.willLongNoteDraw = function(self, note)
-	local longNoteHeadY = self:getLongNoteHeadY(note)
-	local longNoteTailY = self:getLongNoteTailY(note)
-	local longNoteHeadHeight = self:getLongNoteHeadHeight(note)
-	local longNoteTailHeight = self:getLongNoteTailHeight(note)
+	local longNoteHeadY = self:getLongNoteHeadY(note, "Head")
+	local longNoteTailY = self:getLongNoteTailY(note, "Tail")
+	local longNoteHeadHeight = self:getNoteHeight(note, "Head")
+	local longNoteTailHeight = self:getNoteHeight(note, "Tail")
 	
 	local willDraw = {}
 	
@@ -225,10 +222,10 @@ NoteSkin.willLongNoteDraw = function(self, note)
 	return willDraw.head or willDraw.tail or willDraw.body
 end
 NoteSkin.willLongNoteDrawBeforeStart = function(self, note)
-	return self:getLongNoteTailY(note) >= 1
+	return self:getLongNoteTailY(note, "Tail") >= 1
 end
 NoteSkin.willLongNoteDrawAfterEnd = function(self, note)
-	return self:getLongNoteHeadY(note) + self:getLongNoteHeadHeight(note) <= 0
+	return self:getLongNoteHeadY(note, "Head") + self:getNoteHeight(note, "Head") <= 0
 end
 
 --------------------------------
