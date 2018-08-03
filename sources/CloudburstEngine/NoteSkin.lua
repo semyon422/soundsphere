@@ -1,79 +1,34 @@
-CloudburstEngine.NoteSkin = createClass()
+CloudburstEngine.NoteSkin = createClass(soul.SoulObject)
 local NoteSkin = CloudburstEngine.NoteSkin
 
-NoteSkin.load = function(self, directoryPath, fileName)
-	self.directoryPath, self.fileName = directoryPath, fileName
-	self.filePath = directoryPath .. "/" .. fileName
+NoteSkin.load = function(self)
+	self.filePath = self.directoryPath .. "/" .. self.fileName
 	
-	self:readFile()
-	self:processFile()
-end
-
-NoteSkin.readFile = function(self)
-	local noteSkinFile = io.open(self.filePath, "r")
-	self.noteSkinString = noteSkinFile:read("*a")
-	noteSkinFile:close()
-end
-
-NoteSkin.processFile = function(self)
-	self.data = {}
 	self.images = {}
-	for _, line in ipairs(self.noteSkinString:split("#")) do
-		self:processLine(line:gsub("\n", " "):trim())
-	end
+	
+	self.spaceConfig = SpaceConfig:new()
+	self.spaceConfig:init()
+	self.spaceConfig.observable:addObserver(self.observer)
+	self.spaceConfig:load(self.filePath)
+	self.data = self.spaceConfig.data
+	
 	self:loadImages()
 end
 
-NoteSkin.getClearDataTable = function(self, dataTable, removingString)
-	local newDataTable = {}
-	
-	for _, value in ipairs(dataTable) do
-		if value ~= removingString then
-			table.insert(newDataTable, value)
+NoteSkin.receiveEvent = function(self, event)
+	if event.name == "SpaceConfigAddValue" then
+		if event.key[3] == "image" then
+			self.images[event.value] = true
 		end
-	end
-	
-	return newDataTable
-end
-
-NoteSkin.getKeyTable = function(self, key)
-	local lastKeyTable = self.data
-	
-	for _, keyString in ipairs(key) do
-		lastKeyTable[keyString] = lastKeyTable[keyString] or {}
-		lastKeyTable = lastKeyTable[keyString]
-	end
-	
-	return lastKeyTable
-end
-
-NoteSkin.setKeyTableData = function(self, key, data)
-	local keyTable = self:getKeyTable(key)
-	
-	for _, value in ipairs(data) do
-		if key[3] == "image" then
-			self.images[value] = true
-		end
-		table.insert(keyTable, value)
-	end
-end
-
-NoteSkin.processLine = function(self, line)
-	if line:find("^.+:.+$") then
-		local keyString, dataString = line:match("^(.+):(.+)$")
-		local key = self:getClearDataTable(keyString:split("%s+", true), "")
-		local data = self:getClearDataTable(dataString:split("%s+", true), "")
-		
-		self:setKeyTableData(key, data)
-		
-		if key[1] == "cs" then
+	elseif event.name == "SpaceConfigProcessLine" then
+		if event.key[1] == "cs" then
 			self.cs = soul.CS:new(
 				nil,
-				tonumber(data[1]),
-				tonumber(data[2]),
-				tonumber(data[3]),
-				tonumber(data[4]),
-				data[5]
+				tonumber(event.data[1]),
+				tonumber(event.data[2]),
+				tonumber(event.data[3]),
+				tonumber(event.data[4]),
+				event.data[5]
 			)
 		end
 	end

@@ -11,6 +11,7 @@ require("InputModeLoader")
 require("Core")
 require("ResourceLoader")
 require("Group")
+require("SpaceConfig")
 
 core = Core:new()
 core:activate()
