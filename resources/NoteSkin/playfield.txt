@@ -1,0 +1,2 @@
+#7key1scratch: playfield7K1S.png
+#7key: playfield7K1S.png

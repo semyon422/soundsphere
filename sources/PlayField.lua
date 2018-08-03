@@ -2,11 +2,26 @@ PlayField = createClass(soul.SoulObject)
 
 PlayField.layer = 0.5
 
-PlayField.drawable = love.graphics.newImage("resources/playfield.png")
-
 PlayField.load = function(self)
+	self.filePath = self.directoryPath .. "/" .. self.fileName
 	self.cs = self.engine.noteSkin.cs
 	
+	self.config = SpaceConfig:new()
+	self.config:init()
+	self.config.observable:addObserver(self.observer)
+	self.config:load(self.filePath)
+	
+	local fileName
+	if
+		self.config.data[self.engine.noteChart.inputMode:getString()] and
+		self.config.data[self.engine.noteChart.inputMode:getString()][1]
+	then
+		fileName = self.config.data[self.engine.noteChart.inputMode:getString()][1]
+	else
+		return
+	end
+	
+	self.drawable = love.graphics.newImage(self.directoryPath .. "/" .. fileName)
 	self.drawableObject = soul.graphics.Drawable:new({
 		drawable = self.drawable,
 		layer = self.layer,

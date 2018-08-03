@@ -1,7 +1,5 @@
 #cs: 0 0 0 0 h
 
-#7key1scratch playfield: playfield7K1S.png
-
 #7key1scratch currentTimePosition: 1
 
 #7key1scratch scratch x: 0
@@ -51,8 +49,6 @@ longNoteBody/white.png
 longNoteBody/blue.png
 longNoteBody/white.png
 
-
-#7key1scratch playfield: playfield7K1S.png
 
 #7key key x: 0.09 0.18 0.27 0.36 0.45 0.54 0.63
 #7key key w: 0.09 0.09 0.09 0.09 0.09 0.09 0.09

@@ -144,6 +144,8 @@ Core.loadEngine = function(self, directoryPath, fileName)
 	self.engine:activate()
 	
 	self.playField = PlayField:new()
+	self.playField.directoryPath = "resources/NoteSkin"
+	self.playField.fileName = "playfield.txt"
 	self.playField.engine = self.engine
 	self.playField:activate()
 end

@@ -6,11 +6,11 @@ NoteSkin.load = function(self)
 	
 	self.images = {}
 	
-	self.spaceConfig = SpaceConfig:new()
-	self.spaceConfig:init()
-	self.spaceConfig.observable:addObserver(self.observer)
-	self.spaceConfig:load(self.filePath)
-	self.data = self.spaceConfig.data
+	self.config = SpaceConfig:new()
+	self.config:init()
+	self.config.observable:addObserver(self.observer)
+	self.config:load(self.filePath)
+	self.data = self.config.data
 	
 	self:loadImages()
 end
