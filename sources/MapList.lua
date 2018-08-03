@@ -65,7 +65,7 @@ MapList.updateItemsChartMode = function(self)
 			self:addItem({
 				text = utf8validate(cacheDatas[1].title),
 				onClick = function(button)
-					self:scroolToItemIndex(button.itemIndex)
+					self:scrollToItemIndex(button.itemIndex)
 				end,
 				onSelect = function(button)
 					self:updateSubItems()
@@ -106,7 +106,7 @@ MapList.updateItemsPackMode = function(self)
 			self:addItem({
 				text = directoryPath:match(".+/(.-)/"),
 				onClick = function(button)
-					self:scroolToItemIndex(button.itemIndex)
+					self:scrollToItemIndex(button.itemIndex)
 				end,
 				onSelect = function(button)
 					self:updateSubItems()
@@ -287,29 +287,29 @@ MapList.getButtonByItemIndex = function(self, itemIndex)
 	end
 end
 
-MapList.scroolToItemIndex = function(self, itemIndex)
-		local isAtEnd = self.selectedSubItemIndex == self:getSubItemCount()
-		
-		local oldSelectedItemIndex = self.selectedItemIndex
-		
-		if self.items[itemIndex] then
-			self.selectedItemIndex = itemIndex
-			self.items[self.selectedItemIndex].onSelect(self:getButtonByItemIndex(itemIndex))
-		end
-		local scrollDelta = self.selectedItemIndex - oldSelectedItemIndex
-		
-		self:updateScrollCurrentDelta()
-		
-		self.selectedSubItemIndex = 1
+MapList.scrollToItemIndex = function(self, itemIndex)
+	local isAtEnd = self.selectedSubItemIndex == self:getSubItemCount()
+	
+	local oldSelectedItemIndex = self.selectedItemIndex
+	
+	if self.items[itemIndex] then
+		self.selectedItemIndex = itemIndex
+		self.items[self.selectedItemIndex].onSelect(self:getButtonByItemIndex(itemIndex))
+	end
+	local scrollDelta = self.selectedItemIndex - oldSelectedItemIndex
+	
+	self:updateScrollCurrentDelta()
+	
+	self.selectedSubItemIndex = 1
 		if scrollDelta > 0 and isAtEnd then
-			self.selectedSubItemIndex = self:getSubItemCount()
-		end
-		
-		if oldSelectedItemIndex ~= self.selectedItemIndex then
-			self.visualSubItemIndex = self.selectedSubItemIndex - scrollDelta
-			self.visualItemIndex = self.visualItemIndex + scrollDelta
-			self.scrollSubCurrentDelta = self.scrollCurrentDelta
-		end
+		self.selectedSubItemIndex = self:getSubItemCount()
+	end
+	
+	if oldSelectedItemIndex ~= self.selectedItemIndex then
+		self.visualSubItemIndex = self.selectedSubItemIndex - scrollDelta
+		self.visualItemIndex = self.visualItemIndex + scrollDelta
+		self.scrollSubCurrentDelta = self.scrollCurrentDelta
+	end
 end
 
 MapList.scrollBy = function(self, scrollDelta)
