@@ -1,5 +1,7 @@
 require("tweaks")
 require("utf8validate")
+require("Observer")
+
 require("soul")
 require("ncdk")
 require("bms")

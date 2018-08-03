@@ -9,6 +9,8 @@ require("KeyBindManager")
 require("PlayField")
 require("InputModeLoader")
 require("Core")
+require("ResourceLoader")
+require("Group")
 
 core = Core:new()
 core:activate()

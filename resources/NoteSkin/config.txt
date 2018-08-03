@@ -1,17 +1,21 @@
 #cs: 0 0 0 0 h
 
+#7key1scratch playfield: playfield7K1S.png
+
+#7key1scratch currentTimePosition: 1
+
 #7key1scratch scratch x: 0
 #7key1scratch scratch w: 0.09
 
 #7key1scratch key x: 0.09 0.18 0.27 0.36 0.45 0.54 0.63
 #7key1scratch key w: 0.09 0.09 0.09 0.09 0.09 0.09 0.09
 
-#7key1scratch scratch ShortNote: shortNote/orange.png
-#7key1scratch scratch LongNoteHead: longNoteHead/orange.png
-#7key1scratch scratch LongNoteTail: longNoteTail/orange.png
-#7key1scratch scratch LongNoteBody: longNoteBody/orange.png
+#7key1scratch scratch image ShortNote: shortNote/orange.png
+#7key1scratch scratch image LongNoteHead: longNoteHead/orange.png
+#7key1scratch scratch image LongNoteTail: longNoteTail/orange.png
+#7key1scratch scratch image LongNoteBody: longNoteBody/orange.png
 
-#7key1scratch key ShortNote:
+#7key1scratch key image ShortNote:
 shortNote/white.png
 shortNote/blue.png
 shortNote/white.png
@@ -20,7 +24,7 @@ shortNote/white.png
 shortNote/blue.png
 shortNote/white.png
 
-#7key1scratch key LongNoteHead:
+#7key1scratch key image LongNoteHead:
 longNoteHead/white.png
 longNoteHead/blue.png
 longNoteHead/white.png
@@ -29,7 +33,7 @@ longNoteHead/white.png
 longNoteHead/blue.png
 longNoteHead/white.png
 
-#7key1scratch key LongNoteTail:
+#7key1scratch key image LongNoteTail:
 longNoteTail/white.png
 longNoteTail/blue.png
 longNoteTail/white.png
@@ -38,7 +42,7 @@ longNoteTail/white.png
 longNoteTail/blue.png
 longNoteTail/white.png
 
-#7key1scratch key LongNoteBody:
+#7key1scratch key image LongNoteBody:
 longNoteBody/white.png
 longNoteBody/blue.png
 longNoteBody/white.png
@@ -48,11 +52,12 @@ longNoteBody/blue.png
 longNoteBody/white.png
 
 
+#7key1scratch playfield: playfield7K1S.png
 
 #7key key x: 0.09 0.18 0.27 0.36 0.45 0.54 0.63
 #7key key w: 0.09 0.09 0.09 0.09 0.09 0.09 0.09
 
-#7key key ShortNote:
+#7key key image ShortNote:
 shortNote/white.png
 shortNote/blue.png
 shortNote/white.png
@@ -61,7 +66,7 @@ shortNote/white.png
 shortNote/blue.png
 shortNote/white.png
 
-#7key key LongNoteHead:
+#7key key image LongNoteHead:
 longNoteHead/white.png
 longNoteHead/blue.png
 longNoteHead/white.png
@@ -70,7 +75,7 @@ longNoteHead/white.png
 longNoteHead/blue.png
 longNoteHead/white.png
 
-#7key key LongNoteTail:
+#7key key image LongNoteTail:
 longNoteTail/white.png
 longNoteTail/blue.png
 longNoteTail/white.png
@@ -79,7 +84,7 @@ longNoteTail/white.png
 longNoteTail/blue.png
 longNoteTail/white.png
 
-#7key key LongNoteBody:
+#7key key image LongNoteBody:
 longNoteBody/white.png
 longNoteBody/blue.png
 longNoteBody/white.png

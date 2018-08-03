@@ -18,7 +18,17 @@ PlayField.load = function(self)
 	})
 	self.drawableObject:activate()
 	
-	self.loaded = true
+	self.observer:subscribe(self.engine.observable)
+end
+
+PlayField.receiveEvent = function(self, event)
+	if event.name == "love.update" then
+		self:update()
+	elseif event.name == "logicalNoteUpdated" then
+		print(event.logicalNote.state)
+	elseif event.name == "noteHandlerUpdated" then
+		print(event.noteHandler.keyState, event.noteHandler.keyBind, event.noteHandler.inputType, event.noteHandler.inputIndex)
+	end
 end
 
 PlayField.update = function(self)
@@ -29,6 +39,4 @@ end
 
 PlayField.unload = function(self)
     self.drawableObject:deactivate()
-	
-	self.loaded = false
 end

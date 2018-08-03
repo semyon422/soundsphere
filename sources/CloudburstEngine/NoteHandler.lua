@@ -1,4 +1,4 @@
-CloudburstEngine.NoteHandler = createClass()
+CloudburstEngine.NoteHandler = createClass(soul.SoulObject)
 local NoteHandler = CloudburstEngine.NoteHandler
 
 NoteHandler.loadNoteData = function(self)
@@ -76,48 +76,46 @@ NoteHandler.setKeyState = function(self)
 	self.keyState = love.keyboard.isDown(self.keyBind)
 end
 
-NoteHandler.setCallbacks = function(self)
-	if self.keyBind then
-		soul.setCallback("keypressed", self, function(key)
-			if key == self.keyBind then
-				self.keyState = true
-				self.currentNote.keyState = true
-				
-				if self.currentNote.pressSoundFilePath then
-					self.engine.core.audioManager:playSound(self.currentNote.pressSoundFilePath, "engine")
-				end
+NoteHandler.receiveEvent = function(self, event)
+	if event.name == "love.update" then
+		self.currentNote:update()
+	end
+	
+	local key = event.data and event.data[1]
+	if self.keyBind and key == self.keyBind then
+		if event.name == "love.keypressed" then
+			self.keyState = true
+			self.currentNote.keyState = true
+			self:sendState()
+			
+			if self.currentNote.pressSoundFilePath then
+				self.engine.core.audioManager:playSound(self.currentNote.pressSoundFilePath, "engine")
 			end
-		end)
-		soul.setCallback("keyreleased", self, function(key)
-			if key == self.keyBind then
-				self.keyState = false
-				self.currentNote.keyState = false
-				
-				if self.currentNote.releaseSoundFilePath then
-					audioManager:playSound(self.currentNote.releaseSoundFilePath, "engine")
-				end
+		elseif event.name == "love.keyreleased" then
+			self.keyState = false
+			self.currentNote.keyState = false
+			self:sendState()
+			
+			if self.currentNote.releaseSoundFilePath then
+				audioManager:playSound(self.currentNote.releaseSoundFilePath, "engine")
 			end
-		end)
+		end
 	end
 end
 
-NoteHandler.unsetCallbacks = function(self)
-	soul.unsetCallback("keypressed", self)
-	soul.unsetCallback("keyreleased", self)
+NoteHandler.sendState = function(self)
+	self.engine.observable:sendEvent({
+		name = "noteHandlerUpdated",
+		noteHandler = self
+	})
 end
 
 NoteHandler.load = function(self)
 	self:loadNoteData()
 	if self.inputType ~= "auto" then
 		self:setKeyState()
-		self:setCallbacks()
 	end
 end
 
-NoteHandler.update = function(self)
-	self.currentNote:update()
-end
-
 NoteHandler.unload = function(self)
-	self:unsetCallbacks()
 end

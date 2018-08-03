@@ -20,8 +20,12 @@ BackgroundManager.load = function(self)
 		}
 	})
 	self.drawableObject:activate()
-	
-	self.loaded = true
+end
+
+BackgroundManager.receiveEvent = function(self, event)
+	if event.name == "love.update" then
+		self:update()
+	end
 end
 
 BackgroundManager.update = function(self)
@@ -30,6 +34,4 @@ end
 
 BackgroundManager.unload = function(self)
     self.drawableObject:deactivate()
-	
-	self.loaded = false
 end

@@ -1,8 +1,9 @@
 Core = createClass(soul.SoulObject)
 
 Core.load = function(self)
-	self:loadFonts()
+	self:loadResourceLoader()
 	self:loadAudioManager()
+	self:loadFonts()
 	self:loadInputModeLoader()
 	self:loadCache()
 	self:loadKeyBindManager()
@@ -12,16 +13,21 @@ Core.load = function(self)
 	self:loadStateManager()
 end
 
-Core.loadFonts = function(self)
-	self.fonts = {}
-	self.fonts.main16 = love.graphics.newFont("resources/NotoSansCJK-Regular.ttc", 16)
-	self.fonts.main20 = love.graphics.newFont("resources/NotoSansCJK-Regular.ttc", 20)
-	self.fonts.main30 = love.graphics.newFont("resources/NotoSansCJK-Regular.ttc", 30)
+Core.loadResourceLoader = function(self)
+	self.resourceLoader = ResourceLoader:getGlobal()
+	self.resourceLoader:activate()
 end
 
 Core.loadAudioManager = function(self)
 	self.audioManager = AudioManager:new()
 	self.audioManager:activate()
+end
+
+Core.loadFonts = function(self)
+	self.fonts = {}
+	self.fonts.main16 = love.graphics.newFont("resources/NotoSansCJK-Regular.ttc", 16)
+	self.fonts.main20 = love.graphics.newFont("resources/NotoSansCJK-Regular.ttc", 20)
+	self.fonts.main30 = love.graphics.newFont("resources/NotoSansCJK-Regular.ttc", 30)
 end
 
 Core.loadInputModeLoader = function(self)
@@ -135,9 +141,8 @@ Core.loadEngine = function(self, directoryPath, fileName)
 	self.engine.core = self
 	self.engine:activate()
 	
-	self.playField = PlayField:new({
-		engine = self.engine
-	})
+	self.playField = PlayField:new()
+	self.playField.engine = self.engine
 	self.playField:activate()
 end
 

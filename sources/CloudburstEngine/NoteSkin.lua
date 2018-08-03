@@ -47,12 +47,13 @@ NoteSkin.getKeyTable = function(self, key)
 	return lastKeyTable
 end
 
-NoteSkin.setKeyTableData = function(self, keyTable, data)
+NoteSkin.setKeyTableData = function(self, key, data)
+	local keyTable = self:getKeyTable(key)
+	
 	for _, value in ipairs(data) do
-		if value:find("/") then
+		if key[3] == "image" then
 			self.images[value] = true
 		end
-		local value = tonumber((value:gsub(",", "."))) or value
 		table.insert(keyTable, value)
 	end
 end
@@ -63,7 +64,7 @@ NoteSkin.processLine = function(self, line)
 		local key = self:getClearDataTable(keyString:split("%s+", true), "")
 		local data = self:getClearDataTable(dataString:split("%s+", true), "")
 		
-		self:setKeyTableData(self:getKeyTable(key), data)
+		self:setKeyTableData(key, data)
 		
 		if key[1] == "cs" then
 			self.cs = soul.CS:new(
@@ -95,13 +96,19 @@ NoteSkin.checkNote = function(self, note, suffix)
 	if a then
 		local b = a[note.startNoteData.inputType]
 		if b then
-			local c1 = b[note.noteType .. (suffix or "")]
+			-- local c1 = b[note.noteType .. (suffix or "")]
+			local c1 = b["image"]
 			local c2 = b["x"]
 			local c3 = b["w"]
 			if c2 and c2 and c3 then
-				local d = c1[note.startNoteData.inputIndex]
-				if d then
-					return self.images[d]
+				local d1 = c1[note.noteType .. (suffix or "")]
+				local d2 = c2[note.startNoteData.inputIndex]
+				local d3 = c3[note.startNoteData.inputIndex]
+				if d1 and d2 and d3 then
+					local e = d1[note.startNoteData.inputIndex]
+					if e then
+						return true
+					end
 				end
 			end
 		end
@@ -132,6 +139,7 @@ NoteSkin.getNoteDrawable = function(self, note, suffix)
 		self.data
 		[note.inputModeString]
 		[note.startNoteData.inputType]
+		["image"]
 		[note.noteType .. (suffix or "")]
 		[note.startNoteData.inputIndex]
 	]
@@ -148,17 +156,29 @@ NoteSkin.getNoteX = function(self, note)
 		[note.startNoteData.inputIndex]
 end
 
+NoteSkin.getBaseY = function(self, note)
+	local y
+	
+	if self.data[note.inputModeString].currentTimePosition and self.data[note.inputModeString].currentTimePosition[1] then
+		y = self.data[note.inputModeString].currentTimePosition[1]
+	else
+		y = 1
+	end
+	
+	return y
+end
+
 NoteSkin.getShortNoteY = function(self, note, suffix)
-	return 1 - self.speed * (note.startNoteData.currentVisualTime - note.engine.currentTime) - self:getNoteHeight(note) / 2
+	return self:getBaseY(note) - self.speed * (note.startNoteData.currentVisualTime - note.engine.currentTime) - self:getNoteHeight(note) / 2
 end
 NoteSkin.getLongNoteHeadY = function(self, note, suffix)
-	return 1 - self.speed * ((note:getLogicalNote().fakeStartTime or note.startNoteData.currentVisualTime) - note.engine.currentTime) - self:getNoteHeight(note, suffix) / 2
+	return self:getBaseY(note) - self.speed * ((note:getLogicalNote().fakeStartTime or note.startNoteData.currentVisualTime) - note.engine.currentTime) - self:getNoteHeight(note, suffix) / 2
 end
 NoteSkin.getLongNoteTailY = function(self, note, suffix)
-	return 1 - self.speed * (note.endNoteData.currentVisualTime - note.engine.currentTime) - self:getNoteHeight(note, suffix) / 2
+	return self:getBaseY(note) - self.speed * (note.endNoteData.currentVisualTime - note.engine.currentTime) - self:getNoteHeight(note, suffix) / 2
 end
 NoteSkin.getLongNoteBodyY = function(self, note, suffix)
-	return 1 - self.speed * (note.endNoteData.currentVisualTime - note.engine.currentTime)
+	return self:getBaseY(note) - self.speed * (note.endNoteData.currentVisualTime - note.engine.currentTime)
 end
 
 --------------------------------

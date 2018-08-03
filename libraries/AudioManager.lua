@@ -2,37 +2,45 @@ AudioManager = createClass(soul.SoulObject)
 
 AudioManager.load = function(self)
 	self.loadingChunkData = {}
-	self.loadingGroup = {}
-	self.observers = {}
 	self.chunkData = {}
 	self.sounds = {}
 	
-	self.thread = soul.Thread:new({
-		threadName = "AudioManager",
-		messageReceived = function(thread, chunkData)
-			self:setChunkData(chunkData)
-		end,
-		threadFunction = [[
-			ffi = require("ffi")
-			require("love.filesystem")
-			require("libraries.packagePath")
-			require("bass_ffi")
-			receiveMessageCallback = function(chunkData)
-				local file = love.filesystem.newFile(chunkData.filePath)
-				file:open("r")
-				chunkData.chunk = bass.BASS_SampleLoad(true, file:read(), 0, file:getSize(), 65535, 0)
-				file:close()
-				sendMessage(chunkData)
-			end
-		]]
-	})
-	self.thread:activate()
+	self.resourceLoader = ResourceLoader:getGlobal()
+	self.resourceLoader:addObserver(self.observer)
 	
-	self.loaded = true
+	self.observer:subscribe(self.resourceLoader.observable)
+	self.observable = Observable:new()
+	
+end
+
+AudioManager.getGlobal = function(self)
+	if not AudioManager.global then
+		AudioManager.global = AudioManager:new()
+	end
+	return AudioManager.global
 end
 
 AudioManager.unload = function(self)
-	self.loaded = false
+end
+
+AudioManager.receiveEvent = function(self, event)
+	if event.name == "love.update" then
+		self:update()
+	elseif event.resource then
+		self:setChunkData(event)
+	end
+end
+
+AudioManager.setChunkData = function(self, event)
+	local chunkData = {
+		chunk = event.resource
+	}
+	event.name = "ChunkDataLoaded"
+	event.chunkData = chunkData
+	self.chunkData[event.filePath] = chunkData
+	self.loadingChunkData[event.filePath] = nil
+	
+	self.observable:sendEvent(event)
 end
 
 AudioManager.update = function(self)
@@ -48,44 +56,20 @@ AudioManager.update = function(self)
 	end
 end
 
-AudioManager.setChunkData = function(self, chunkData)
-	self.chunkData[chunkData.filePath] = chunkData
-	self.loadingGroup[chunkData.group] = self.loadingGroup[chunkData.group] - 1
-	self.loadingChunkData[chunkData.filePath] = nil
-	
-	self:sendEvent({
-		type = "Group",
-		name = chunkData.group,
-		value = self.loadingGroup[chunkData.group]
-	})
-	self:sendEvent({
-		type = "ChunkData",
-		name = chunkData.filePath,
-		value = false
-	})
-end
-
 AudioManager.addObserver = function(self, observer)
-	self.observers[observer] = true
+	self.observable:addObserver(observer)
 end
 
 AudioManager.removeObserver = function(self, observer)
-	self.observers[observer] = nil
+	self.observable:removeObserver(observer)
 end
 
-AudioManager.sendEvent = function(self, event)
-	for observer in pairs(self.observers) do
-		observer:receiveEvent(event)
-	end
-end
-
-AudioManager.loadChunk = function(self, filePath, group)
+AudioManager.loadChunk = function(self, filePath)
 	if not self.chunkData[filePath] and not self.loadingChunkData[filePath] then
-		self.thread:send({
-			filePath = filePath,
-			group = group
+		self.resourceLoader:loadData({
+			dataType = "audio",
+			filePath = filePath
 		})
-		self.loadingGroup[group] = (self.loadingGroup[group] or 0) + 1
 		self.loadingChunkData[filePath] = true
 	end
 end
@@ -93,14 +77,6 @@ end
 AudioManager.unloadChunk = function(self, filePath)
 	bass.BASS_SampleFree(self.chunkData[filePath].chunk)
 	self.chunkData[filePath] = nil
-end
-
-AudioManager.unloadChunkGroup = function(self, group)
-	for filePath, chunkData in pairs(self.chunkData) do
-		if chunkData.group == group or group == "*" then
-			self:unloadChunk(filePath)
-		end
-	end
 end
 
 
@@ -112,42 +88,16 @@ AudioManager.getSound = function(self, filePath)
 	return sound
 end
 
-AudioManager.addSound = function(self, filePath, group)
+AudioManager.addSound = function(self, filePath)
 	local sound = self:getSound(filePath)
-	sound.group = group
 	self.sounds[sound] = sound
 	
 	return sound
 end
 
-AudioManager.playSound = function(self, filePath, group)
+AudioManager.playSound = function(self, filePath)
 	if self.chunkData[filePath] then
-		self:addSound(filePath, group):play()
-	end
-end
-
-AudioManager.playSoundGroup = function(self, group)
-	for sound in pairs(self.sounds) do
-		if sound.group == group then
-			sound:play()
-		end
-	end
-end
-
-AudioManager.stopSoundGroup = function(self, group)
-	for sound in pairs(self.sounds) do
-		if sound.group == group then
-			sound:stop()
-			self.sounds[sound] = nil
-		end
-	end
-end
-
-AudioManager.pauseSoundGroup = function(self, group)
-	for sound in pairs(self.sounds) do
-		if sound.group == group then
-			sound:pause()
-		end
+		self:addSound(filePath):play()
 	end
 end
 

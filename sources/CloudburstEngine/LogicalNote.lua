@@ -10,3 +10,10 @@ LogicalNote.next = function(self)
 		self.noteHandler.currentNote:update()
 	end
 end
+
+LogicalNote.sendState = function(self)
+	self.engine.observable:sendEvent({
+		name = "logicalNoteUpdated",
+		logicalNote = self
+	})
+end

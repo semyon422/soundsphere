@@ -11,11 +11,10 @@ require("CloudburstEngine.SoundNote")
 require("CloudburstEngine.GraphicalNote")
 require("CloudburstEngine.ShortGraphicalNote")
 require("CloudburstEngine.LongGraphicalNote")
+require("CloudburstEngine.MeasureLine")
 
 require("CloudburstEngine.NoteSkin")
 require("CloudburstEngine.TimeManager")
-
-require("CloudburstEngine.ResourceObserver")
 
 CloudburstEngine.load = function(self)
 	self.inputMode = self.core.inputModeLoader:getInputMode(self.noteChart.inputMode)
@@ -23,21 +22,21 @@ CloudburstEngine.load = function(self)
 	self.sharedLogicalNoteData = {}
 	self.soundFiles = {}
 	
+	self.observable = Observable:new()
+	
 	self:loadNoteHandlers()
 	self:loadNoteDrawers()
 	self:loadTimeManager()
 	
 	self:loadResources()
-	
-	self:setCallbacks()
-	
-	self.loaded = true
 end
 
 CloudburstEngine.update = function(self)
 	self:updateTimeManager()
-	self:updateNoteHandlers()
 	self:updateNoteDrawers()
+	if not self.resourcesLoaded then
+		self:checkResources()
+	end
 end
 
 CloudburstEngine.unload = function(self)
@@ -46,14 +45,13 @@ CloudburstEngine.unload = function(self)
 	self:unloadNoteDrawers()
 	
 	self:unloadResources()
-	
-	self:unsetCallbacks()
-	
-	self.loaded = false
 end
 
-CloudburstEngine.setCallbacks = function(self)
-	soul.setCallback("keypressed", self, function(key)
+CloudburstEngine.receiveEvent = function(self, event)
+	if event.name == "love.update" then
+		self:update()
+	elseif event.name == "love.keypressed" then
+		local key = event.data[1]
 		if key == "return" then
 			self.timeManager:play()
 			audioManager:playSoundGroup("engine")
@@ -67,28 +65,50 @@ CloudburstEngine.setCallbacks = function(self)
 		elseif key == "f4" then
 			CloudburstEngine.NoteSkin.speed = CloudburstEngine.NoteSkin.speed + 0.1
 		end
-	end)
-end
-
-CloudburstEngine.unsetCallbacks = function(self)
-	soul.unsetCallback("keypressed", self)
-end
-
-CloudburstEngine.loadResources = function(self)
-	self.resourceObserver = self.ResourceObserver:new()
-	self.resourceObserver.engine = self
-	self.core.audioManager:addObserver(self.resourceObserver)
-	
-	for _, soundFilePath in pairs(self.soundFiles) do
-		self.core.audioManager:loadChunk(soundFilePath, "engine")
+	elseif event.name == "resourcesLoaded" then
+		self.timeManager:play()
+	elseif event.name == "ChunkDataLoaded" and self.loadingResources[event.filePath] then
+		self.loadingResources[event.filePath] = nil
+		self.resourceCountLoaded = self.resourceCountLoaded + 1
+		print(self.resourceCountLoaded .. "/" .. self.resourceCount)
 	end
 end
 
-CloudburstEngine.unloadResources = function(self)
-	self.core.audioManager:removeObserver(self.resourceObserver)
+CloudburstEngine.loadResources = function(self)
+	self.resourceCount = 0
+	self.resourceCountLoaded = 0
+	self.resourcesLoaded = false
+	self.loadingResources = {}
+	self.soundFilesGroup = Group:new()
+	self.core.audioManager:addObserver(self.observer)
 	
-	self.core.audioManager:stopSoundGroup("engine")
-	self.core.audioManager:unloadChunkGroup("engine")
+	for _, soundFilePath in pairs(self.soundFiles) do
+		self.soundFilesGroup:addObject(soundFilePath)
+		self.loadingResources[soundFilePath] = true
+		self.resourceCount = self.resourceCount + 1
+	end
+	
+	self.soundFilesGroup:call(function(soundFilePath)
+		self.core.audioManager:loadChunk(soundFilePath)
+	end)
+end
+
+CloudburstEngine.checkResources = function(self)
+	for filePath in pairs(self.loadingResources) do
+		return
+	end
+	self.resourcesLoaded = true
+	self:receiveEvent({
+		name = "resourcesLoaded"
+	})
+end
+
+CloudburstEngine.unloadResources = function(self)
+	self.core.audioManager:removeObserver(self.observer)
+	
+	self.soundFilesGroup:call(function(soundFilePath)
+		self.core.audioManager:unloadChunk(soundFilePath)
+	end)
 end
 
 CloudburstEngine.loadTimeManager = function(self)
@@ -116,19 +136,13 @@ CloudburstEngine.loadNoteHandlers = function(self)
 			inputIndex = inputIndex,
 			engine = self
 		})
-		self.noteHandlers[noteHandlerIndex]:load()
-	end
-end
-
-CloudburstEngine.updateNoteHandlers = function(self)
-	for _, noteHandler in pairs(self.noteHandlers) do
-		noteHandler:update()
+		self.noteHandlers[noteHandlerIndex]:activate()
 	end
 end
 
 CloudburstEngine.unloadNoteHandlers = function(self)
 	for _, noteHandler in pairs(self.noteHandlers) do
-		noteHandler:unload()
+		noteHandler:deactivate()
 	end
 	self.noteHandlers = nil
 end

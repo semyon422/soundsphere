@@ -56,9 +56,6 @@ MapList.load = function(self)
 	self.visualSubItemIndex = self.selectedSubItemIndex
 	
 	self:calculateButtons()
-	self:loadCallbacks()
-	
-	self.loaded = true
 end
 
 MapList.updateItemsChartMode = function(self)
@@ -153,7 +150,6 @@ end
 
 MapList.unload = function(self)
 	self:unloadButtons()
-	self:unloadCallbacks()
 	
 	self.loaded = false
 end
@@ -362,15 +358,18 @@ MapList.getItemIndex = function(self, item)
 	return 1
 end
 
-MapList.loadCallbacks = function(self)
-	soul.setCallback("wheelmoved", self, function(_, direction)
+MapList.receiveEvent = function(self, event)
+	if event.name == "love.update" then
+		self:update()
+	elseif event.name == "love.wheelmoved" then
+		local direction = event.data[2]
 		local x, y, w, h = self.x, self.y, self.w, self.h
 		local mx, my = self.cs:x(love.mouse.getX(), true), self.cs:y(love.mouse.getY(), true)
 		if belong(mx, x, x + w, my, y, y + h) then
 			self:scrollBy(-direction)
 		end
-	end)
-	soul.setCallback("keypressed", self, function(key)
+	elseif event.name == "love.keypressed" then
+		local key = event.data[2]
 		if key == self.upScrollKey then
 			self:scrollBy(-1)
 		elseif key == self.downScrollKey then
@@ -386,12 +385,7 @@ MapList.loadCallbacks = function(self)
 			self:deactivate()
 			self.packList:activate()
 		end
-	end)
-end
-
-MapList.unloadCallbacks = function(self)
-	soul.unsetCallback("wheelmoved", self)
-	soul.unsetCallback("keypressed", self)
+	end
 end
 
 MapList.addItem = function(self, item)
