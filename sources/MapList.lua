@@ -2,9 +2,7 @@ MapList = createClass(soul.SoulObject)
 
 MapList.buttonCount = 17
 MapList.visualItemIndex = 1
-MapList.visualSubItemIndex = 1
 MapList.selectedItemIndex = 1
-MapList.selectedSubItemIndex = 1
 
 MapList.x = 0
 MapList.y = 0
@@ -43,18 +41,27 @@ end
 MapList.loadCache = function(self)
 	self.cacheDatas = {}
 	self.cacheDatasByPath = {}
+	self.cacheDataDirectoryPath = {}
 	
 	for cacheData in self.core.cache:getCacheDataIterator() do
 		table.insert(self.cacheDatas, cacheData)
 		self.cacheDatasByPath[cacheData.directoryPath .. "/" .. cacheData.fileName] = cacheData
+		
+		self.cacheDataDirectoryPath[cacheData.directoryPath] = self.cacheDataDirectoryPath[cacheData.directoryPath] or {}
+		table.insert(self.cacheDataDirectoryPath[cacheData.directoryPath], cacheData)
 	end
 end
 
-MapList.sortCache = function(self) end
+MapList.sortCache = function(self)
+	table.sort(self.cacheDatas, function(a, b)
+		return a.directoryPath .. "/" .. a.fileName < b.directoryPath .. "/" .. b.fileName
+	end)
+end
 
 MapList.selectRandomCacheData = function(self)
-	-- self.currentCacheData = self.cacheDatas[math.random(#self.cacheDatas)]
-	self.currentCacheData = self.cacheDatas[1]
+	math.randomseed(os.time())
+	self.currentCacheData = self.cacheDatas[math.random(#self.cacheDatas)]
+	-- self.currentCacheData = self.cacheDatas[1]
 	self.core.currentCacheData = self.currentCacheData
 	self.selectionKey = (self.currentCacheData.directoryPath .. "/" .. self.currentCacheData.fileName):split("/")
 	-- self.selectionKey = (self.currentCacheData.directoryPath):split("/")
@@ -87,6 +94,13 @@ MapList.updateSelectionList = function(self)
 			end
 		end
 	end
+	
+	for selectionKeyIndex, selectionKey in ipairs(self.selectionList) do
+		if table.equal(selectionKey, self.selectionKey) then
+			self.selectedItemIndex = selectionKeyIndex
+			self.visualItemIndex = selectionKeyIndex
+		end
+	end
 end
 
 MapList.updateItems = function(self)
@@ -94,7 +108,8 @@ MapList.updateItems = function(self)
 	
 	for _, selectionKey in ipairs(self.selectionList) do
 		self:addItem({
-			text = ("/"):rep(#selectionKey - 1) .. utf8validate(selectionKey[#selectionKey]),
+			-- text = ("/"):rep(#selectionKey - 1) .. utf8validate(selectionKey[#selectionKey]),
+			text = utf8validate(self:getItemName(selectionKey)),
 			onClick = function(button)
 				if button.itemIndex == self.selectedItemIndex then
 					self.selectionKey = selectionKey
@@ -111,9 +126,20 @@ MapList.updateItems = function(self)
 				end
 			end,
 			onSelect = function(button)
-				-- self.selectionKey = selectionKey
-				-- self:updateSelectionList()
-				-- self:updateCurrentCacheData()
+				local path = table.concat(selectionKey, "/")
+				if self.cacheDatasByPath[path] then
+					self.selectionKey = selectionKey
+					self:updateCurrentCacheData()
+					-- table.print(self.selectionKey)
+				-- elseif self.cacheDataDirectoryPath[path] then
+					-- local cacheData = self.cacheDataDirectoryPath[path][1]
+					-- self.selectionKey = (cacheData.directoryPath .. "/" .. cacheData.fileName):split("/")
+					-- self:updateSelectionList()
+					-- self:updateItems()
+					-- self:unloadButtons()
+					-- self:calculateButtons()
+					-- table.print(self.selectionKey)
+				end
 			end,
 			selectionKey = selectionKey
 		})
@@ -123,6 +149,22 @@ MapList.updateItems = function(self)
 		self.selectedItemIndex = #self.items
 		self.visualItemIndex = #self.items
 	end
+end
+
+MapList.getItemName = function(self, selectionKey)
+	local cacheDataPath = table.concat(selectionKey, "/")
+	
+	local cacheDataDirectoryPath = self.cacheDataDirectoryPath[cacheDataPath]
+	if cacheDataDirectoryPath then
+		return cacheDataDirectoryPath[1].title
+	end
+	
+	local cacheDataFilePath = self.cacheDatasByPath[cacheDataPath]
+	if cacheDataFilePath then
+		return cacheDataFilePath.title
+	end
+	
+	return cacheDataPath
 end
 
 MapList.addItem = function(self, item)
@@ -183,6 +225,9 @@ MapList.receiveEvent = function(self, event)
 				end
 			end
 		elseif key == "escape" and #self.selectionKey > 1 then
+			if self.cacheDatasByPath[table.concat(self.selectionKey, "/")] then
+				self.selectionKey[#self.selectionKey] = nil
+			end
 			self.selectionKey[#self.selectionKey] = nil
 			self:updateSelectionList()
 			self:updateItems()
@@ -263,7 +308,7 @@ end
 MapList.scrollToItemIndex = function(self, itemIndex)
 	if self.items[itemIndex] then
 		self.selectedItemIndex = itemIndex
-		self.items[self.selectedItemIndex].onSelect(self:getButtonByItemIndex(itemIndex))
+		-- self.items[self.selectedItemIndex].onSelect(self:getButtonByItemIndex(itemIndex))
 	end
 	
 	self:updateScrollCurrentDelta()
