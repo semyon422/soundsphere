@@ -37,7 +37,7 @@ PlayField.load = function(self)
 end
 
 PlayField.receiveEvent = function(self, event)
-	if event.name == "love.update" then
+	if event.name == "love.update" and self.drawable then
 		self:update()
 	elseif event.name == "logicalNoteUpdated" then
 		print(event.logicalNote.state)
@@ -53,5 +53,7 @@ PlayField.update = function(self)
 end
 
 PlayField.unload = function(self)
-    self.drawableObject:deactivate()
+	if self.drawable then
+		self.drawableObject:deactivate()
+	end
 end
