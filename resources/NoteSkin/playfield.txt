@@ -3,6 +3,7 @@
 #7key1scratch static y: 0
 #7key1scratch static w: 1
 #7key1scratch static h: 1
+#7key1scratch static layer: 0.5
 
 #7key1scratch input key image released: key0.png key0.png key0.png key0.png key0.png key0.png key0.png
 #7key1scratch input key image pressed: key1.png key1.png key1.png key1.png key1.png key1.png key1.png
@@ -10,9 +11,11 @@
 #7key1scratch input key y: 0 0 0 0 0 0 0
 #7key1scratch input key w: 0.104 0.104 0.104 0.104 0.104 0.104 0.104
 #7key1scratch input key h: 1 1 1 1 1 1 1
+#7key1scratch input key layer: 1 1 1 1 1 1 1
 #7key1scratch input scratch image pressed: key1.png
 #7key1scratch input scratch image released: key0.png
 #7key1scratch input scratch x: 0
 #7key1scratch input scratch y: 0
 #7key1scratch input scratch w: 0.104
 #7key1scratch input scratch h: 1
+#7key1scratch input scratch layer: 1
