@@ -68,6 +68,7 @@ AudioManager.loadChunk = function(self, filePath)
 	if not self.chunkData[filePath] and not self.loadingChunkData[filePath] then
 		self.resourceLoader:loadData({
 			dataType = "audio",
+			action = "load",
 			filePath = filePath
 		})
 		self.loadingChunkData[filePath] = true

@@ -11,9 +11,15 @@ loadAudio = function(event)
 	file:close()
 end
 
+unloadAudio = function(event)
+	bass.BASS_SampleFree(event.resource)
+end
+
 receiveMessageCallback = function(event)
-	if event.dataType == "audio" then
+	if event.dataType == "audio" and event.action == "load" then
 		loadAudio(event)
 		sendMessage(event)
+	elseif event.dataType == "audio" and event.action == "unload" then
+		unloadAudio(event)
 	end
 end

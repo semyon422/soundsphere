@@ -21,9 +21,9 @@ ResourceLoader.getGlobal = function(self)
 	return ResourceLoader.global
 end
 
-ResourceLoader.messageReceived = function(self, message)
-	self.resources[message.info.index] = message.resource
-	self.observable:sendEvent(message)
+ResourceLoader.messageReceived = function(self, event)
+	self.resources[event.info.index] = event.resource
+	self.observable:sendEvent(event)
 end
 
 ResourceLoader.addObserver = function(self, observer)
