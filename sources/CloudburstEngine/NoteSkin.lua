@@ -10,7 +10,6 @@ NoteSkin.load = function(self)
 	self.config:init()
 	self.config.observable:addObserver(self.observer)
 	self.config:load(self.filePath)
-	self.data = self.config.data
 	
 	self:loadImages()
 end
@@ -47,26 +46,31 @@ NoteSkin.getCS = function(self, note)
 end
 
 NoteSkin.checkNote = function(self, note, suffix)
-	local a = self.data[note.inputModeString]
-	if a then
-		local b = a[note.startNoteData.inputType]
-		if b then
-			-- local c1 = b[note.noteType .. (suffix or "")]
-			local c1 = b["image"]
-			local c2 = b["x"]
-			local c3 = b["w"]
-			if c2 and c2 and c3 then
-				local d1 = c1[note.noteType .. (suffix or "")]
-				local d2 = c2[note.startNoteData.inputIndex]
-				local d3 = c3[note.startNoteData.inputIndex]
-				if d1 and d2 and d3 then
-					local e = d1[note.startNoteData.inputIndex]
-					if e then
-						return true
-					end
-				end
-			end
-		end
+	local key1 = {
+		note.inputModeString,
+		note.startNoteData.inputType,
+		"image",
+		note.noteType .. (suffix or "")
+	}
+	local value1 = self.config:getKeyTable(key1)[note.startNoteData.inputIndex]
+	
+	local key2 = {
+		note.inputModeString,
+		note.startNoteData.inputType,
+		"x"
+	}
+	local value2 = self.config:getKeyTable(key2)[note.startNoteData.inputIndex]
+	
+	local key3 = {
+		note.inputModeString,
+		note.startNoteData.inputType,
+		"w"
+	}
+	local value3 = self.config:getKeyTable(key3)[note.startNoteData.inputIndex]
+	
+	
+	if value1 and value2 and value3 then
+		return true
 	end
 end
 
@@ -90,37 +94,37 @@ end
 -- get*Drawable
 --------------------------------
 NoteSkin.getNoteDrawable = function(self, note, suffix)
-	return self.images[
-		self.data
-		[note.inputModeString]
-		[note.startNoteData.inputType]
-		["image"]
-		[note.noteType .. (suffix or "")]
-		[note.startNoteData.inputIndex]
-	]
+	local key = {
+		note.inputModeString,
+		note.startNoteData.inputType,
+		"image",
+		note.noteType .. (suffix or "")
+	}
+	local value = self.config:getKeyTable(key)[note.startNoteData.inputIndex]
+	
+	return self.images[value]
 end
 
 --------------------------------
 -- get*X get*Y
 --------------------------------
 NoteSkin.getNoteX = function(self, note)
-	return self.data
-		[note.inputModeString]
-		[note.startNoteData.inputType]
-		["x"]
-		[note.startNoteData.inputIndex]
+	local key = {
+		note.inputModeString,
+		note.startNoteData.inputType,
+		"x"
+	}
+	return self.config:getKeyTable(key)[note.startNoteData.inputIndex]
 end
 
 NoteSkin.getBaseY = function(self, note)
-	local y
+	local key = {
+		note.inputModeString,
+		"currentTimePosition"
+	}
+	local value = self.config:getKeyTable(key)[1]
 	
-	if self.data[note.inputModeString].currentTimePosition and self.data[note.inputModeString].currentTimePosition[1] then
-		y = self.data[note.inputModeString].currentTimePosition[1]
-	else
-		y = 1
-	end
-	
-	return y
+	return value or 1
 end
 
 NoteSkin.getShortNoteY = function(self, note, suffix)
@@ -140,11 +144,12 @@ end
 -- get*Width get*Height
 --------------------------------
 NoteSkin.getNoteWidth = function(self, note)
-	return self.data
-		[note.inputModeString]
-		[note.startNoteData.inputType]
-		["w"]
-		[note.startNoteData.inputIndex]
+	local key = {
+		note.inputModeString,
+		note.startNoteData.inputType,
+		"w"
+	}
+	return self.config:getKeyTable(key)[note.startNoteData.inputIndex]
 end
 
 NoteSkin.getNoteHeight = function(self, note, suffix)

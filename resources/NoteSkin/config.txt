@@ -1,12 +1,12 @@
 #cs: 0 0 0 0 h
 
-#7key1scratch currentTimePosition: 1
+#7key1scratch currentTimePosition: 0.906
 
 #7key1scratch scratch x: 0
-#7key1scratch scratch w: 0.09
+#7key1scratch scratch w: 0.104
 
-#7key1scratch key x: 0.09 0.18 0.27 0.36 0.45 0.54 0.63
-#7key1scratch key w: 0.09 0.09 0.09 0.09 0.09 0.09 0.09
+#7key1scratch key x: 0.104 0.208 0.312 0.416 0.520 0.624 0.728
+#7key1scratch key w: 0.104 0.104 0.104 0.104 0.104 0.104 0.104
 
 #7key1scratch scratch image ShortNote: shortNote/orange.png
 #7key1scratch scratch image LongNoteHead: longNoteHead/orange.png
@@ -50,8 +50,8 @@ longNoteBody/blue.png
 longNoteBody/white.png
 
 
-#7key key x: 0.09 0.18 0.27 0.36 0.45 0.54 0.63
-#7key key w: 0.09 0.09 0.09 0.09 0.09 0.09 0.09
+#7key key x: 0.104 0.208 0.312 0.416 0.520 0.624 0.728
+#7key key w: 0.104 0.104 0.104 0.104 0.104 0.104 0.104
 
 #7key key image ShortNote:
 shortNote/white.png

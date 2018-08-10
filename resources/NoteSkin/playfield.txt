@@ -1,2 +1,18 @@
-#7key1scratch: playfield7K1S.png
-#7key: playfield7K1S.png
+#7key1scratch static image: playfield7K1S.png
+#7key1scratch static x: 0
+#7key1scratch static y: 0
+#7key1scratch static w: 1
+#7key1scratch static h: 1
+
+#7key1scratch input key image released: key0.png key0.png key0.png key0.png key0.png key0.png key0.png
+#7key1scratch input key image pressed: key1.png key1.png key1.png key1.png key1.png key1.png key1.png
+#7key1scratch input key x: 0.104 0.208 0.312 0.416 0.520 0.624 0.728
+#7key1scratch input key y: 0 0 0 0 0 0 0
+#7key1scratch input key w: 0.104 0.104 0.104 0.104 0.104 0.104 0.104
+#7key1scratch input key h: 1 1 1 1 1 1 1
+#7key1scratch input scratch image pressed: key1.png
+#7key1scratch input scratch image released: key0.png
+#7key1scratch input scratch x: 0
+#7key1scratch input scratch y: 0
+#7key1scratch input scratch w: 0.104
+#7key1scratch input scratch h: 1

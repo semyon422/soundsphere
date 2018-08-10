@@ -18,6 +18,7 @@ end
 
 SpaceConfig.processFile = function(self)
 	self.data = {}
+	self.keyData = {}
 	for _, line in ipairs(self.configString:split("#")) do
 		self:processLine(line:gsub("\n", " "):trim())
 	end
@@ -61,6 +62,21 @@ SpaceConfig.setKeyTableData = function(self, key, data)
 	end
 end
 
+SpaceConfig.getKeyDataIterator = function(self)
+	local keyDatas = {}
+	for key, data in pairs(self.keyData) do
+		table.insert(keyDatas, {key, data})
+	end
+	
+	local keyDataIndex = 0
+	return function()
+		keyDataIndex = keyDataIndex + 1
+		if keyDatas[keyDataIndex] then
+			return keyDatas[keyDataIndex][1], keyDatas[keyDataIndex][2]
+		end
+	end
+end
+
 SpaceConfig.processLine = function(self, line)
 	if line:find("^.+:.+$") then
 		local keyString, dataString = line:match("^(.+):(.+)$")
@@ -68,6 +84,7 @@ SpaceConfig.processLine = function(self, line)
 		local data = self:getClearDataTable(dataString:split("%s+", true), "")
 		
 		self:setKeyTableData(key, data)
+		self.keyData[key] = data
 		self.observable:sendEvent({
 			name = "SpaceConfigProcessLine",
 			key = key,
