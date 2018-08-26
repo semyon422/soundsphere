@@ -97,7 +97,7 @@ NoteHandler.receiveEvent = function(self, event)
 			self:sendState()
 			
 			if self.currentNote.releaseSoundFilePath then
-				audioManager:playSound(self.currentNote.releaseSoundFilePath, "engine")
+				self.engine.core.audioManager:playSound(self.currentNote.releaseSoundFilePath, "engine")
 			end
 		end
 	end
