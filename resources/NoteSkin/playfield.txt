@@ -19,3 +19,21 @@
 #7key1scratch input scratch w: 0.104
 #7key1scratch input scratch h: 1
 #7key1scratch input scratch layer: 1
+
+
+
+#4key input key image released:
+arrowSkin/key/left.png
+arrowSkin/key/down.png
+arrowSkin/key/up.png
+arrowSkin/key/right.png
+#4key input key image pressed:
+arrowSkin/key/leftD.png
+arrowSkin/key/downD.png
+arrowSkin/key/upD.png
+arrowSkin/key/rightD.png
+#4key input key x: 0 0.133 0.266 0.399
+#4key input key y: 0 0 0 0 0 0 0
+#4key input key w: 0.133 0.133 0.133 0.133
+#4key input key h: 1 1 1 1 1 1 1
+#4key input key layer: 1 1 1 1 1 1 1

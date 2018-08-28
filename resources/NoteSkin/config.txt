@@ -50,6 +50,8 @@ longNoteBody/blue.png
 longNoteBody/white.png
 
 
+#7key currentTimePosition: 0.906
+
 #7key key x: 0.104 0.208 0.312 0.416 0.520 0.624 0.728
 #7key key w: 0.104 0.104 0.104 0.104 0.104 0.104 0.104
 
@@ -88,5 +90,37 @@ longNoteBody/blue.png
 longNoteBody/white.png
 longNoteBody/blue.png
 longNoteBody/white.png
+
+
+
+
+#4key currentTimePosition: 0.891666
+
+#4key key x: 0 0.1328125 0.265625 0.3984375
+#4key key w: 0.1328125 0.1328125 0.1328125 0.1328125
+
+#4key key image ShortNote:
+arrowSkin/left.png
+arrowSkin/down.png
+arrowSkin/up.png
+arrowSkin/right.png
+
+#4key key image LongNoteHead:
+arrowSkin/left.png
+arrowSkin/down.png
+arrowSkin/up.png
+arrowSkin/right.png
+
+#4key key image LongNoteTail:
+arrowSkin/holdTail.png
+arrowSkin/holdTail.png
+arrowSkin/holdTail.png
+arrowSkin/holdTail.png
+
+#4key key image LongNoteBody:
+arrowSkin/holdBody.png
+arrowSkin/holdBody.png
+arrowSkin/holdBody.png
+arrowSkin/holdBody.png
 
 
