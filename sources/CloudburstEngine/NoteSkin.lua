@@ -131,7 +131,7 @@ NoteSkin.getShortNoteY = function(self, note, suffix)
 	return self:getBaseY(note) - self.speed * (note.startNoteData.currentVisualTime - note.engine.currentTime) - self:getNoteHeight(note) / 2
 end
 NoteSkin.getLongNoteHeadY = function(self, note, suffix)
-	return self:getBaseY(note) - self.speed * ((note:getLogicalNote().fakeStartTime or note.startNoteData.currentVisualTime) - note.engine.currentTime) - self:getNoteHeight(note, suffix) / 2
+	return self:getBaseY(note) - self.speed * ((note:getLogicalNote():getFakeStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime) - self:getNoteHeight(note, suffix) / 2
 end
 NoteSkin.getLongNoteTailY = function(self, note, suffix)
 	return self:getBaseY(note) - self.speed * (note.endNoteData.currentVisualTime - note.engine.currentTime) - self:getNoteHeight(note, suffix) / 2

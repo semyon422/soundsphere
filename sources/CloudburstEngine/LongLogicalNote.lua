@@ -70,3 +70,11 @@ LongLogicalNote.update = function(self)
 		end
 	end
 end
+
+LongLogicalNote.getFakeStartTime = function(self)
+	if self.state == "startPassedPressed" and self.fakeStartTime then
+		return self.engine.currentTime
+	else
+		return self.fakeStartTime
+	end
+end
