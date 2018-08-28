@@ -32,7 +32,7 @@ arrowSkin/key/leftD.png
 arrowSkin/key/downD.png
 arrowSkin/key/upD.png
 arrowSkin/key/rightD.png
-#4key input key x: 0 0.133 0.266 0.399
+#4key input key x: -0.266 -0.133 0 0.133
 #4key input key y: 0 0 0 0 0 0 0
 #4key input key w: 0.133 0.133 0.133 0.133
 #4key input key h: 1 1 1 1 1 1 1

@@ -1,4 +1,4 @@
-#cs: 0 0 0 0 h
+#7key1scratch cs: 0 0 0 0 h
 
 #7key1scratch currentTimePosition: 0.906
 
@@ -50,6 +50,8 @@ longNoteBody/blue.png
 longNoteBody/white.png
 
 
+#7key cs: 0 0 0 0 h
+
 #7key currentTimePosition: 0.906
 
 #7key key x: 0.104 0.208 0.312 0.416 0.520 0.624 0.728
@@ -93,11 +95,12 @@ longNoteBody/white.png
 
 
 
+#4key cs: 0.5 0 0 0 h
 
-#4key currentTimePosition: 0.891666
+#4key currentTimePosition: 0.892
 
-#4key key x: 0 0.1328125 0.265625 0.3984375
-#4key key w: 0.1328125 0.1328125 0.1328125 0.1328125
+#4key key x: -0.266 -0.133 0 0.133
+#4key key w: 0.133 0.133 0.133 0.133
 
 #4key key image ShortNote:
 arrowSkin/left.png

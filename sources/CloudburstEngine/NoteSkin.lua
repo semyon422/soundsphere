@@ -5,6 +5,7 @@ NoteSkin.load = function(self)
 	self.filePath = self.directoryPath .. "/" .. self.fileName
 	
 	self.images = {}
+	self.cses = {}
 	
 	self.config = SpaceConfig:new()
 	self.config:init()
@@ -20,8 +21,8 @@ NoteSkin.receiveEvent = function(self, event)
 			self.images[event.value] = true
 		end
 	elseif event.name == "SpaceConfigProcessLine" then
-		if event.key[1] == "cs" then
-			self.cs = soul.CS:new(
+		if event.key[2] == "cs" then
+			self.cses[event.key[1]] = soul.CS:new(
 				nil,
 				tonumber(event.data[1]),
 				tonumber(event.data[2]),
@@ -42,7 +43,7 @@ end
 NoteSkin.speed = 1
 
 NoteSkin.getCS = function(self, note)
-	return self.cs
+	return self.cses[note.inputModeString]
 end
 
 NoteSkin.checkNote = function(self, note, suffix)
@@ -160,12 +161,12 @@ end
 -- get*ScaleX get*ScaleY
 --------------------------------
 NoteSkin.getNoteScaleX = function(self, note, suffix)
-	return self:getNoteWidth(note, suffix) / self.cs:x(self:getNoteDrawable(note, suffix):getWidth())
+	return self:getNoteWidth(note, suffix) / self:getCS(note):x(self:getNoteDrawable(note, suffix):getWidth())
 end
 
 NoteSkin.getNoteScaleY = function(self, note, suffix)
 	if suffix == "Body" then
-		return (self:getLongNoteHeadY(note, suffix) - self:getLongNoteTailY(note, suffix)) / self.cs:y(self:getNoteDrawable(note, suffix):getHeight())
+		return (self:getLongNoteHeadY(note, suffix) - self:getLongNoteTailY(note, suffix)) / self:getCS(note):y(self:getNoteDrawable(note, suffix):getHeight())
 	end
 	
 	return self:getNoteScaleX(note, suffix)

@@ -4,14 +4,16 @@ require("PlayField.InputObject")
 
 PlayField.load = function(self)
 	self.filePath = self.directoryPath .. "/" .. self.fileName
-	self.cs = self.engine.noteSkin.cs
+	self.inputMode = self.engine.noteChart.inputMode:getString()
+	self.cs = self.engine.noteSkin:getCS({
+		inputModeString = self.inputMode
+	})
 	
 	self.config = SpaceConfig:new()
 	self.config:init()
 	self.config.observable:addObserver(self.observer)
 	self.config:load(self.filePath)
 	
-	self.inputMode = self.engine.noteChart.inputMode:getString()
 	
 	self:loadObjects()
 	
