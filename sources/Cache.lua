@@ -158,16 +158,16 @@ Cache.generateBMSCacheData = function(self, directoryPath, fileName)
 	
 	for line in file:lines() do
 		local line = iconv(line, "UTF-8", "SHIFT-JIS") or iconv(line, "UTF-8", "EUC-KR") or line
-		if line:find("#TITLE .+$") then
-			cacheData.title = line:match("#TITLE (.+)$")
+		if line:find("^#TITLE .+$") then
+			cacheData.title = line:match("^#TITLE (.+)$")
 		end
-		if line:find("#ARTIST .+$") then
-			cacheData.artist = line:match("#ARTIST (.+)$")
+		if line:find("^#ARTIST .+$") then
+			cacheData.artist = line:match("^#ARTIST (.+)$")
 		end
-		if line:find("#PLAYLEVEL .+$") then
-			cacheData.playlevel = line:match("#PLAYLEVEL (.+)$")
+		if line:find("^#PLAYLEVEL .+$") then
+			cacheData.playlevel = line:match("^#PLAYLEVEL (.+)$")
 		end
-		if line:find("#WAV") then
+		if line:find("^#WAV") then
 			break
 		end
 	end
