@@ -107,6 +107,10 @@ CloudburstEngine.unloadResources = function(self)
 	self.core.audioManager:removeObserver(self.observer)
 	
 	self.soundFilesGroup:call(function(soundFilePath)
+		self.core.audioManager:stopSound(soundFilePath)
+	end)
+	
+	self.soundFilesGroup:call(function(soundFilePath)
 		self.core.audioManager:unloadChunk(soundFilePath)
 	end)
 end

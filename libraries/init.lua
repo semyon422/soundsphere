@@ -1,5 +1,6 @@
 require("tweaks")
 require("utf8validate")
+require("json")
 require("Observer")
 
 require("soul")
@@ -17,4 +18,5 @@ bassInit()
 
 require("iconv_ffi")
 
+require("ResourceLoader")
 require("AudioManager")

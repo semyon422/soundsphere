@@ -128,8 +128,8 @@ end
 
 Core.loadEngine = function(self, directoryPath, fileName)
 	self.fileManager:addPath(directoryPath)
-	
 	local noteChart = self:getNoteChart(directoryPath, fileName)
+	noteChart.directoryPath = directoryPath
 
 	local noteSkin = CloudburstEngine.NoteSkin:new()
 	noteSkin.directoryPath = "resources/NoteSkin"
@@ -151,7 +151,7 @@ Core.loadEngine = function(self, directoryPath, fileName)
 end
 
 Core.unloadEngine = function(self)
-	self.fileManager:removePath(self.currentCacheData.directoryPath)
+	self.fileManager:removePath(self.engine.noteChart.directoryPath)
 	
 	self.engine:deactivate()
 	self.playField:deactivate()

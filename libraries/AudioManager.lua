@@ -8,9 +8,7 @@ AudioManager.load = function(self)
 	self.resourceLoader = ResourceLoader:getGlobal()
 	self.resourceLoader:addObserver(self.observer)
 	
-	self.observer:subscribe(self.resourceLoader.observable)
 	self.observable = Observable:new()
-	
 end
 
 AudioManager.getGlobal = function(self)
@@ -26,7 +24,7 @@ end
 AudioManager.receiveEvent = function(self, event)
 	if event.name == "love.update" then
 		self:update()
-	elseif event.resource then
+	elseif event.resource and event.action == "load" then
 		self:setChunkData(event)
 	end
 end
@@ -69,14 +67,20 @@ AudioManager.loadChunk = function(self, filePath)
 		self.resourceLoader:loadData({
 			dataType = "audio",
 			action = "load",
-			filePath = filePath
+			filePath = filePath,
+			index = filePath
 		})
 		self.loadingChunkData[filePath] = true
 	end
 end
 
 AudioManager.unloadChunk = function(self, filePath)
-	bass.BASS_SampleFree(self.chunkData[filePath].chunk)
+	self.resourceLoader:unloadData({
+		dataType = "audio",
+		action = "unload",
+		resource = self.chunkData[filePath].chunk,
+		index = filePath
+	})
 	self.chunkData[filePath] = nil
 end
 
@@ -85,6 +89,7 @@ end
 AudioManager.getSound = function(self, filePath)
 	local sound = AudioManager.Sound:new()
 	sound.chunk = self.chunkData[filePath].chunk
+	sound.filePath = filePath
 	
 	return sound
 end
@@ -99,6 +104,14 @@ end
 AudioManager.playSound = function(self, filePath)
 	if self.chunkData[filePath] then
 		self:addSound(filePath):play()
+	end
+end
+
+AudioManager.stopSound = function(self, filePath)
+	for sound in pairs(self.sounds) do
+		if sound.filePath == filePath then
+			sound:stop()
+		end
 	end
 end
 

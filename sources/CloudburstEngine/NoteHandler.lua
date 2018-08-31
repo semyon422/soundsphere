@@ -89,7 +89,7 @@ NoteHandler.receiveEvent = function(self, event)
 			self:sendState()
 			
 			if self.currentNote.pressSoundFilePath then
-				self.engine.core.audioManager:playSound(self.currentNote.pressSoundFilePath, "engine")
+				self.engine.core.audioManager:playSound(self.currentNote.pressSoundFilePath)
 			end
 		elseif event.name == "love.keyreleased" then
 			self.keyState = false
@@ -97,7 +97,7 @@ NoteHandler.receiveEvent = function(self, event)
 			self:sendState()
 			
 			if self.currentNote.releaseSoundFilePath then
-				self.engine.core.audioManager:playSound(self.currentNote.releaseSoundFilePath, "engine")
+				self.engine.core.audioManager:playSound(self.currentNote.releaseSoundFilePath)
 			end
 		end
 	end
