@@ -32,7 +32,7 @@ end
 
 Core.loadInputModeLoader = function(self)
 	self.inputModeLoader = InputModeLoader:new()
-	self.inputModeLoader:load("userdata/input.txt")
+	self.inputModeLoader:load("userdata/input.json")
 end
 
 Core.loadCache = function(self)

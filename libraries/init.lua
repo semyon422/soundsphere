@@ -1,6 +1,6 @@
 require("tweaks")
 require("utf8validate")
-require("json")
+json = require("json")
 require("Observer")
 
 require("soul")

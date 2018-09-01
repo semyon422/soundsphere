@@ -4,25 +4,19 @@ InputModeLoader.load = function(self, filePath)
 	self.inputModes = {}
 	
 	local file = io.open(filePath, "r")
-	for line in file:lines() do
-		if line:trim() ~= "" then
-			self:parseLine(line)
-		end
-	end
-end
-
-InputModeLoader.parseLine = function(self, line)
-	local inputMode = ncdk.InputMode:new()
+	local fileContent = file:read("*all")
+	file:close()
+	local jsonData = json.decode(fileContent)
 	
-	for _, inputData in ipairs(line:split("|")) do
-		local inputType, inputIndexDatas = unpack(inputData:split("#"))
-		for _, inputIndexData in ipairs(inputIndexDatas:split("&")) do
-			local inputIndex, binding = unpack(inputIndexData:split("^"))
-			inputMode:setInput(inputType, tonumber(inputIndex), binding)
+	for _, inputModeData in ipairs(jsonData) do
+		local inputMode = ncdk.InputMode:new()
+		for inputType, inputData in pairs(inputModeData) do
+			for inputIndex, binding in ipairs(inputData) do
+				inputMode:setInput(inputType, inputIndex, binding)
+			end
 		end
+		table.insert(self.inputModes, inputMode)
 	end
-	
-	table.insert(self.inputModes, inputMode)
 end
 
 InputModeLoader.getInputMode = function(self, inputMode)
