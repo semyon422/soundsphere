@@ -4,6 +4,7 @@ Core.load = function(self)
 	self:loadResourceLoader()
 	self:loadAudioManager()
 	self:loadFonts()
+	self:loadNoteSkinManager()
 	self:loadInputModeLoader()
 	self:loadCache()
 	self:loadKeyBindManager()
@@ -35,6 +36,11 @@ Core.loadInputModeLoader = function(self)
 	self.inputModeLoader:load("userdata/input.json")
 end
 
+Core.loadNoteSkinManager = function(self)
+	self.noteSkinManager = NoteSkinManager:new()
+	self.noteSkinManager:load()
+end
+
 Core.loadCache = function(self)
 	self.cache = Cache:new()
 	self.cache:init()
@@ -60,16 +66,8 @@ Core.loadBackgroundManager = function(self)
 end
 
 Core.loadMapList = function(self)
-	self.chartList = MapList:new({
-		dataMode = "ChartMode"
-	})
-	self.packList = MapList:new({
-		dataMode = "PackMode"
-	})
-	self.chartList.packList = self.packList
-	self.packList.chartList = self.chartList
-	self.chartList.core = self
-	self.packList.core = self
+	self.mapList = MapList:new()
+	self.mapList.core = self
 end
 
 Core.loadFileManager = function(self)
@@ -82,7 +80,7 @@ Core.loadStateManager = function(self)
 	self.stateManager:setState(
 		StateManager.State:new(
 			{
-				self.packList
+				self.mapList
 			},
 			{
 				self.button
@@ -96,7 +94,7 @@ Core.loadStateManager = function(self)
 				self:loadEngine(self.currentCacheData.directoryPath, self.currentCacheData.fileName)
 			end,
 			{
-				self.packList, self.chartList
+				self.mapList
 			}
 		),
 		"playing"
@@ -127,15 +125,20 @@ Core.getNoteChart = function(self, directoryPath, fileName)
 end
 
 Core.loadEngine = function(self, directoryPath, fileName)
-	self.fileManager:addPath(directoryPath)
 	local noteChart = self:getNoteChart(directoryPath, fileName)
+	local data = self.noteSkinManager:getNoteSkin(noteChart.inputMode) or {}
+	
+	self.fileManager:addPath(directoryPath)
 	noteChart.directoryPath = directoryPath
-
-	local noteSkin = CloudburstEngine.NoteSkin:new()
-	noteSkin.directoryPath = "resources/NoteSkin"
-	noteSkin.fileName = "config.txt"
-	noteSkin:activate()
-
+	
+	local noteSkin
+	if data.noteSkin then
+		noteSkin = CloudburstEngine.NoteSkin:new()
+		noteSkin.directoryPath = data.directoryPath
+		noteSkin.noteSkinData = data.noteSkin
+		noteSkin:activate()
+	end
+	
 	self.engine = CloudburstEngine:new()
 	self.engine.noteChart = noteChart
 	self.engine.noteSkin = noteSkin
@@ -143,16 +146,23 @@ Core.loadEngine = function(self, directoryPath, fileName)
 	self.engine.core = self
 	self.engine:activate()
 	
-	self.playField = PlayField:new()
-	self.playField.directoryPath = "resources/NoteSkin"
-	self.playField.fileName = "playfield.txt"
-	self.playField.engine = self.engine
-	self.playField:activate()
+	if data.playField then
+		self.playField = PlayField:new()
+		self.playField.directoryPath = data.directoryPath
+		self.playField.noteSkinData = data.noteSkin
+		self.playField.playFieldData = data.playField
+		self.playField.engine = self.engine
+		self.playField:activate()
+	end
 end
 
 Core.unloadEngine = function(self)
-	self.fileManager:removePath(self.engine.noteChart.directoryPath)
-	
-	self.engine:deactivate()
-	self.playField:deactivate()
+	if self.engine then
+		self.fileManager:removePath(self.engine.noteChart.directoryPath)
+		self.engine:deactivate()
+		self.engine = nil
+	end
+	if self.playField then
+		self.playField:deactivate()
+	end
 end

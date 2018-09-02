@@ -30,7 +30,8 @@ LongLogicalNote.update = function(self)
 			end
 		end
 	elseif self.state == "startPassedPressed" then
-		self.fakeStartTime = self.engine.currentTime
+		local startTime = self.startNoteData.timePoint:getAbsoluteTime()
+		self.fakeStartTime = self.engine.currentTime > startTime and self.engine.currentTime or startTime
 		if not self.keyState then
 			if endTimeState == "none" then
 				self.state = "startMissed"
@@ -72,9 +73,18 @@ LongLogicalNote.update = function(self)
 end
 
 LongLogicalNote.getFakeStartTime = function(self)
+	local startTime = self.startNoteData.timePoint:getAbsoluteTime()
 	if self.state == "startPassedPressed" and self.fakeStartTime then
-		return self.engine.currentTime
+		return self.engine.currentTime > startTime and self.engine.currentTime or startTime
 	else
-		return self.fakeStartTime
+		return self.fakeStartTime or self.startNoteData.timePoint:getAbsoluteTime()
+	end
+end
+
+LongLogicalNote.getFakeVelocityData = function(self)
+	if self.state == "startPassedPressed" and self.fakeStartTime then
+		return "current"
+	else
+		return self.fakeVelocityData or self.startNoteData.timePoint.velocityData
 	end
 end

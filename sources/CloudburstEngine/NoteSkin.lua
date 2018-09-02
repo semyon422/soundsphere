@@ -2,77 +2,49 @@ CloudburstEngine.NoteSkin = createClass(soul.SoulObject)
 local NoteSkin = CloudburstEngine.NoteSkin
 
 NoteSkin.load = function(self)
-	self.filePath = self.directoryPath .. "/" .. self.fileName
+	self.cs = soul.CS:new(
+		nil,
+		tonumber(self.noteSkinData.cs[1]),
+		tonumber(self.noteSkinData.cs[2]),
+		tonumber(self.noteSkinData.cs[3]),
+		tonumber(self.noteSkinData.cs[4]),
+		self.noteSkinData.cs[5]
+	)
 	
 	self.images = {}
-	self.cses = {}
-	
-	self.config = SpaceConfig:new()
-	self.config:init()
-	self.config.observable:addObserver(self.observer)
-	self.config:load(self.filePath)
-	
 	self:loadImages()
 end
 
-NoteSkin.receiveEvent = function(self, event)
-	if event.name == "SpaceConfigAddValue" then
-		if event.key[3] == "image" then
-			self.images[event.value] = true
-		end
-	elseif event.name == "SpaceConfigProcessLine" then
-		if event.key[2] == "cs" then
-			self.cses[event.key[1]] = soul.CS:new(
-				nil,
-				tonumber(event.data[1]),
-				tonumber(event.data[2]),
-				tonumber(event.data[3]),
-				tonumber(event.data[4]),
-				event.data[5]
-			)
-		end
-	end
-end
-
 NoteSkin.loadImages = function(self)
-	for imagePath in pairs(self.images) do
-		self.images[imagePath] = love.graphics.newImage(self.directoryPath .. "/" .. imagePath)
+	for inputType in pairs(self.noteSkinData.inputMode) do
+		local inputTypeData = self.noteSkinData[inputType]
+		for noteType, list in pairs(inputTypeData.image) do
+			for _, imagePath in ipairs(list) do
+				self.images[imagePath] = love.graphics.newImage(self.directoryPath .. "/" .. imagePath)
+			end
+		end
 	end
 end
 
 NoteSkin.speed = 1
 
 NoteSkin.getCS = function(self, note)
-	return self.cses[note.inputModeString]
+	return self.cs
 end
 
 NoteSkin.checkNote = function(self, note, suffix)
-	local key1 = {
-		note.inputModeString,
-		note.startNoteData.inputType,
-		"image",
-		note.noteType .. (suffix or "")
-	}
-	local value1 = self.config:getKeyTable(key1)[note.startNoteData.inputIndex]
+	local status, err = pcall(function()
+		local data = self.noteSkinData[note.startNoteData.inputType]
+		local temp
+		temp = data.x[note.startNoteData.inputIndex] or error("x")
+		temp = data.w[note.startNoteData.inputIndex] or error("w")
+		for noteType, list in pairs(data.image) do
+			temp = list[note.startNoteData.inputIndex] or error("image list")
+			temp = self.images[list[note.startNoteData.inputIndex]] or error("image")
+		end
+	end)
 	
-	local key2 = {
-		note.inputModeString,
-		note.startNoteData.inputType,
-		"x"
-	}
-	local value2 = self.config:getKeyTable(key2)[note.startNoteData.inputIndex]
-	
-	local key3 = {
-		note.inputModeString,
-		note.startNoteData.inputType,
-		"w"
-	}
-	local value3 = self.config:getKeyTable(key3)[note.startNoteData.inputIndex]
-	
-	
-	if value1 and value2 and value3 then
-		return true
-	end
+	return status
 end
 
 --------------------------------
@@ -95,35 +67,18 @@ end
 -- get*Drawable
 --------------------------------
 NoteSkin.getNoteDrawable = function(self, note, suffix)
-	local key = {
-		note.inputModeString,
-		note.startNoteData.inputType,
-		"image",
-		note.noteType .. (suffix or "")
-	}
-	local value = self.config:getKeyTable(key)[note.startNoteData.inputIndex]
-	
-	return self.images[value]
+	return self.images[self.noteSkinData[note.startNoteData.inputType].image[note.noteType .. (suffix or "")][note.startNoteData.inputIndex]]
 end
 
 --------------------------------
 -- get*X get*Y
 --------------------------------
 NoteSkin.getNoteX = function(self, note)
-	local key = {
-		note.inputModeString,
-		note.startNoteData.inputType,
-		"x"
-	}
-	return self.config:getKeyTable(key)[note.startNoteData.inputIndex]
+	return self.noteSkinData[note.startNoteData.inputType].x[note.startNoteData.inputIndex]
 end
 
 NoteSkin.getBaseY = function(self, note)
-	local key = {
-		note.inputModeString,
-		"currentTimePosition"
-	}
-	local value = self.config:getKeyTable(key)[1]
+	local value = self.noteSkinData.currentTimePosition
 	
 	return value or 1
 end
@@ -132,7 +87,7 @@ NoteSkin.getShortNoteY = function(self, note, suffix)
 	return self:getBaseY(note) - self.speed * (note.startNoteData.currentVisualTime - note.engine.currentTime) - self:getNoteHeight(note) / 2
 end
 NoteSkin.getLongNoteHeadY = function(self, note, suffix)
-	return self:getBaseY(note) - self.speed * ((note:getLogicalNote():getFakeStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime) - self:getNoteHeight(note, suffix) / 2
+	return self:getBaseY(note) - self.speed * ((note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime) - self:getNoteHeight(note, suffix) / 2
 end
 NoteSkin.getLongNoteTailY = function(self, note, suffix)
 	return self:getBaseY(note) - self.speed * (note.endNoteData.currentVisualTime - note.engine.currentTime) - self:getNoteHeight(note, suffix) / 2
@@ -145,12 +100,7 @@ end
 -- get*Width get*Height
 --------------------------------
 NoteSkin.getNoteWidth = function(self, note)
-	local key = {
-		note.inputModeString,
-		note.startNoteData.inputType,
-		"w"
-	}
-	return self.config:getKeyTable(key)[note.startNoteData.inputIndex]
+	return self.noteSkinData[note.startNoteData.inputType].w[note.startNoteData.inputIndex]
 end
 
 NoteSkin.getNoteHeight = function(self, note, suffix)

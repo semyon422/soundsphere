@@ -10,7 +10,7 @@ require("PlayField")
 require("InputModeLoader")
 require("Core")
 require("Group")
-require("SpaceConfig")
+require("NoteSkinManager")
 
 core = Core:new()
 core:activate()

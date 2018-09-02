@@ -2,7 +2,7 @@ PlayField.StaticObject = createClass(soul.SoulObject)
 local StaticObject = PlayField.StaticObject
 
 StaticObject.load = function(self)
-	self.drawable = love.graphics.newImage(self.filePath)
+	self.drawable = love.graphics.newImage(self.playField.directoryPath .. "/" .. self.image)
 	self.drawableObject = soul.graphics.Drawable:new({
 		drawable = self.drawable,
 		layer = self.layer,

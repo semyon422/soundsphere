@@ -17,7 +17,7 @@ require("CloudburstEngine.NoteSkin")
 require("CloudburstEngine.TimeManager")
 
 CloudburstEngine.load = function(self)
-	self.inputMode = self.core.inputModeLoader:getInputMode(self.noteChart.inputMode)
+	self.inputMode = self.core.inputModeLoader:getInputMode(self.noteChart.inputMode) or self.noteChart.inputMode
 	
 	self.sharedLogicalNoteData = {}
 	self.soundFiles = {}
@@ -25,7 +25,9 @@ CloudburstEngine.load = function(self)
 	self.observable = Observable:new()
 	
 	self:loadNoteHandlers()
-	self:loadNoteDrawers()
+	if self.noteSkin then
+		self:loadNoteDrawers()
+	end
 	self:loadTimeManager()
 	
 	self:loadResources()
@@ -33,7 +35,9 @@ end
 
 CloudburstEngine.update = function(self)
 	self:updateTimeManager()
-	self:updateNoteDrawers()
+	if self.noteSkin then
+		self:updateNoteDrawers()
+	end
 	if not self.resourcesLoaded then
 		self:checkResources()
 	end
@@ -42,7 +46,9 @@ end
 CloudburstEngine.unload = function(self)
 	self:unloadTimeManager()
 	self:unloadNoteHandlers()
-	self:unloadNoteDrawers()
+	if self.noteSkin then
+		self:unloadNoteDrawers()
+	end
 	
 	self:unloadResources()
 end
@@ -54,10 +60,8 @@ CloudburstEngine.receiveEvent = function(self, event)
 		local key = event.data[1]
 		if key == "return" then
 			self.timeManager:play()
-			audioManager:playSoundGroup("engine")
 		elseif key == "f1" then
 			self.timeManager:pause()
-			audioManager:pauseSoundGroup("engine")
 		elseif key == "f3" then
 			if CloudburstEngine.NoteSkin.speed - 0.1 >= 0.1 then
 				CloudburstEngine.NoteSkin.speed = CloudburstEngine.NoteSkin.speed - 0.1

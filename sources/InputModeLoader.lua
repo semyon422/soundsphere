@@ -4,11 +4,8 @@ InputModeLoader.load = function(self, filePath)
 	self.inputModes = {}
 	
 	local file = io.open(filePath, "r")
-	local fileContent = file:read("*all")
-	file:close()
-	local jsonData = json.decode(fileContent)
 	
-	for _, inputModeData in ipairs(jsonData) do
+	for _, inputModeData in ipairs(json.decode(file:read("*all"))) do
 		local inputMode = ncdk.InputMode:new()
 		for inputType, inputData in pairs(inputModeData) do
 			for inputIndex, binding in ipairs(inputData) do
@@ -17,6 +14,8 @@ InputModeLoader.load = function(self, filePath)
 		end
 		table.insert(self.inputModes, inputMode)
 	end
+	
+	file:close()
 end
 
 InputModeLoader.getInputMode = function(self, inputMode)

@@ -48,6 +48,27 @@ LongGraphicalNote.computeVisualTime = function(self)
 		+ self.noteDrawer.currentTimePoint:getAbsoluteTime()
 end
 
+LongGraphicalNote.getFakeVisualStartTime = function(self)
+	local fakeStartTime = self:getLogicalNote():getFakeStartTime()
+	local fakeVelocityData = self:getLogicalNote():getFakeVelocityData()
+	if fakeVelocityData == "current" then
+		fakeVelocityData = self.noteDrawer.currentVelocityData
+		self:getLogicalNote().fakeVelocityData = fakeVelocityData
+	end
+	
+	local fakeVisualClearStartTime
+		= (fakeStartTime - fakeVelocityData.timePoint:getAbsoluteTime())
+		* fakeVelocityData.currentSpeed:tonumber()
+		+ fakeVelocityData.timePoint.zeroClearVisualTime
+		
+	local fakeVisualStartTime
+		= (fakeVisualClearStartTime - self.noteDrawer.currentClearVisualTime)
+		* self.noteDrawer.globalSpeed
+		+ self.noteDrawer.currentTimePoint:getAbsoluteTime()
+		
+	return fakeVisualStartTime
+end
+
 LongGraphicalNote.activate = function(self)
 	self.headDrawable = soul.graphics.Drawable:new({
 		cs = self:getCS(),

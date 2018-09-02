@@ -2,8 +2,8 @@ PlayField.InputObject = createClass(soul.SoulObject)
 local InputObject = PlayField.InputObject
 
 InputObject.load = function(self)
-	self.drawableReleased = love.graphics.newImage(self.filePathReleased)
-	self.drawablePressed = love.graphics.newImage(self.filePathPressed)
+	self.drawableReleased = love.graphics.newImage(self.playField.directoryPath .. "/" .. self.released)
+	self.drawablePressed = love.graphics.newImage(self.playField.directoryPath .. "/" .. (self.pressed or self.released))
 	self.drawableObject = soul.graphics.Drawable:new({
 		drawable = self.drawableReleased,
 		layer = self.layer,
