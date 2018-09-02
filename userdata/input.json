@@ -5,5 +5,12 @@
 	{
 		"scratch": ["q"],
 		"key": ["w", "e", "r", "space", "o", "p", "["]
-	}
+	},
+	{
+		"scratch": ["tab", "delete"],
+		"key": ["q", "w", "e", "r", "space", "ralt", "p", "[", "]", "\\"]
+	},
+	{
+		"key": ["q", "w", "e", "r", "space", "ralt", "p", "[", "]", "\\"]
+	},
 ]
