@@ -20,7 +20,7 @@ end
 
 InputModeLoader.getInputMode = function(self, inputMode)
 	for _, currentInputMode in ipairs(self.inputModes) do
-		if inputMode <= currentInputMode then
+		if inputMode == currentInputMode then
 			return currentInputMode
 		end
 	end
