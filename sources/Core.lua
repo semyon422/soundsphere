@@ -1,6 +1,7 @@
 Core = createClass(soul.SoulObject)
 
 Core.load = function(self)
+	self:loadConfig()
 	self:loadResourceLoader()
 	self:loadAudioManager()
 	self:loadFonts()
@@ -12,6 +13,53 @@ Core.load = function(self)
 	self:loadMapList()
 	self:loadFileManager()
 	self:loadStateManager()
+	self:loadCLI()
+end
+
+Core.loadCLI = function(self)
+	self.cli = CLI:new()
+	self.cli.core = self
+	self.cli:activate()
+	self:loadCLICommands()
+end
+
+Core.loadCLICommands = function(self)
+	self.cli:addCommand(
+		"config",
+		function(...)
+			local args = {...}
+			if args[1] == "set" then
+				local func, err = loadstring("(...)." .. args[2] .. "=" .. args[3])
+				if not func then
+					self.cli:print(err)
+					return
+				end
+				local out = {pcall(func, self.config.data)}
+				for _, value in pairs(out) do
+					self.cli:print(value)
+				end
+			elseif args[1] == "get" then
+				local func, err = loadstring("return (...)." .. args[2])
+				if not func then
+					self.cli:print(err)
+					return
+				end
+				local out = {pcall(func, self.config.data)}
+				for _, value in pairs(out) do
+					self.cli:print(value)
+				end
+			elseif args[1] == "save" then
+				self.config:write("userdata/config.json")
+			elseif args[1] == "load" then
+				self.config:read("userdata/config.json")
+			end
+		end
+	)
+end
+
+Core.loadConfig = function(self)
+	self.config = Config:new()
+	self.config:read("userdata/config.json")
 end
 
 Core.loadResourceLoader = function(self)
@@ -55,6 +103,9 @@ Core.loadKeyBindManager = function(self)
 		if self.engine and self.engine.loaded then
 			self.stateManager:switchState("selectionScreen") self:unloadEngine()
 		end
+	end, nil, true)
+	self.keyBindManager:setBinding("`", function()
+		self.cli:switch()
 	end, nil, true)
 end
 

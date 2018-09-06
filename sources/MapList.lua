@@ -1,6 +1,5 @@
 MapList = createClass(soul.SoulObject)
 
-MapList.buttonCount = 17
 MapList.visualItemIndex = 1
 MapList.selectedItemIndex = 1
 
@@ -21,8 +20,12 @@ MapList.buttonCount = 17
 MapList.upScrollKey = "up"
 MapList.downScrollKey = "down"
 
+MapList.focus = "MapList"
+
 MapList.load = function(self)
-	self.cs = soul.CS:new(nil, 0.5, 0, 0, 0, "h", 576)
+	soul.focus[self.focus] = true
+	
+	self.cs = soul.CS:new(nil, 0, 0, 0, 0, "h", 576)
 	self.font = self.core.fonts.main20
 	
 	self.scrollCurrentDelta = 0
@@ -63,7 +66,8 @@ MapList.selectRandomCacheData = function(self)
 	self.currentCacheData = self.cacheDatas[math.random(#self.cacheDatas)]
 	-- self.currentCacheData = self.cacheDatas[1]
 	self.core.currentCacheData = self.currentCacheData
-	self.selectionKey = (self.currentCacheData.directoryPath .. "/" .. self.currentCacheData.fileName):split("/")
+	-- self.selectionKey = (self.currentCacheData.directoryPath .. "/" .. self.currentCacheData.fileName):split("/")
+	self.selectionKey = {(self.currentCacheData.directoryPath .. "/" .. self.currentCacheData.fileName):split("/")[1]}
 	-- self.selectionKey = (self.currentCacheData.directoryPath):split("/")
 end
 
@@ -108,8 +112,8 @@ MapList.updateItems = function(self)
 	
 	for _, selectionKey in ipairs(self.selectionList) do
 		self:addItem({
-			-- text = ("/"):rep(#selectionKey - 1) .. utf8validate(selectionKey[#selectionKey]),
-			text = utf8validate(self:getItemName(selectionKey)),
+			text = ("    "):rep(#selectionKey - 1) .. utf8validate(self:getItemName(selectionKey)),
+			-- text = utf8validate(self:getItemName(selectionKey)),
 			onClick = function(button)
 				if button.itemIndex == self.selectedItemIndex then
 					self.selectionKey = selectionKey
@@ -177,6 +181,7 @@ end
 
 MapList.unload = function(self)
 	self:unloadButtons()
+	soul.focus[self.focus] = false
 end
 
 MapList.getMiddleOffset = function(self)
@@ -202,16 +207,16 @@ MapList.update = function(self)
 end
 
 MapList.receiveEvent = function(self, event)
-	if event.name == "love.update" then
+	if soul.focus[self.focus] and event.name == "love.update" then
 		self:update()
-	elseif event.name == "love.wheelmoved" then
+	elseif soul.focus[self.focus] and event.name == "love.wheelmoved" then
 		local direction = event.data[2]
-		local x, y, w, h = self.x, self.y, self.w, self.h
-		local mx, my = self.cs:x(love.mouse.getX(), true), self.cs:y(love.mouse.getY(), true)
-		if belong(mx, x, x + w, my, y, y + h) then
+		-- local x, y, w, h = self.x, self.y, self.w, self.h
+		-- local mx, my = self.cs:x(love.mouse.getX(), true), self.cs:y(love.mouse.getY(), true)
+		-- if belong(mx, x, x + w, my, y, y + h) then
 			self:scrollBy(-direction)
-		end
-	elseif event.name == "love.keypressed" then
+		-- end
+	elseif soul.focus[self.focus] and event.name == "love.keypressed" then
 		local key = event.data[2]
 		if key == self.upScrollKey then
 			self:scrollBy(-1)
@@ -329,6 +334,8 @@ MapList.getItemIndex = function(self, item)
 end
 
 MapList.Button = createClass(soul.ui.RectangleTextButton)
+
+MapList.Button.focus = "MapList"
 
 MapList.Button.updateY = function(self)
 	self.y = self.list.y + (self.list:getMiddleOffset() - 1 + self.itemIndex - self.list.visualItemIndex) * (self.list.h / self.list.buttonCount)

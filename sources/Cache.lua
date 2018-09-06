@@ -194,6 +194,10 @@ Cache.generateOsuCacheData = function(self, directoryPath, fileName)
 		if line:find("Artist:[ ]?.+$") then
 			cacheData.artist = line:match("Artist:[ ]?(.+)$")
 		end
+		if line:find("Version:[ ]?.+$") then
+			local version = line:match("Version:[ ]?(.+)$")
+			cacheData.title = cacheData.title .. " [" .. version .. "]"
+		end
 		if line:find("^%[Events%]") then
 			break
 		end
