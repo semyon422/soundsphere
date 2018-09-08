@@ -86,6 +86,12 @@ Cache.extensions = {
 		patterns = {
 			".ucs$"
 		}
+	},
+	{
+		type = "jnc",
+		patterns = {
+			".jnc$"
+		}
 	}
 }
 
@@ -138,6 +144,8 @@ Cache.generateCacheData = function(self, directoryPath, fileName, extensionType)
 		self:addCacheData(self:generateOsuCacheData(directoryPath, fileName))
 	elseif extensionType == "ucs" then
 		self:addCacheData(self:generateUCSCacheData(directoryPath, fileName))
+	elseif extensionType == "jnc" then
+		self:addCacheData(self:generateJNCCacheData(directoryPath, fileName))
 	end
 end
 
@@ -203,6 +211,25 @@ Cache.generateOsuCacheData = function(self, directoryPath, fileName)
 		end
 	end
 	file:close()
+	
+	return cacheData
+end
+
+Cache.generateJNCCacheData = function(self, directoryPath, fileName)
+	local cacheData = {}
+	cacheData.directoryPath = directoryPath
+	cacheData.fileName = fileName
+	cacheData.title = "<title>"
+	cacheData.artist = "<artist>"
+	cacheData.playlevel = "<playlevel>"
+	
+	local file = love.filesystem.newFile(directoryPath .. "/" ..  fileName)
+	file:open("r")
+	local jsonData = json.decode(file:read(file:getSize()))
+	file:close()
+	
+	cacheData.title = jsonData.metaData.title
+	cacheData.artist = jsonData.metaData.artist
 	
 	return cacheData
 end

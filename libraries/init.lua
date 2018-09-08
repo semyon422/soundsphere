@@ -9,6 +9,7 @@ require("ncdk")
 require("bms")
 require("osu")
 require("ucs")
+require("jnc")
 
 soul.init()
 

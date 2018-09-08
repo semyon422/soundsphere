@@ -163,6 +163,8 @@ Core.getNoteChart = function(self, directoryPath, fileName)
 		noteChart = osu.NoteChart:new()
 	elseif filePath:find(".bm") then
 		noteChart = bms.NoteChart:new()
+	elseif filePath:find(".jnc$") then
+		noteChart = jnc.NoteChart:new()
 	elseif filePath:find(".ucs") then
 		noteChart = ucs.NoteChart:new()
 		noteChart.audioFileName = fileName:match("^(.+)%.ucs$") .. ".mp3"
