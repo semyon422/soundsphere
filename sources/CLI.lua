@@ -50,7 +50,7 @@ CLI.receiveEvent = function(self, event)
 				self.currentLine = string.sub(self.currentLine, 1, byteoffset - 1)
 			end
 		elseif event.data[1] == "return" then
-			table.insert(self.log, self.currentLine)
+			table.insert(self.log, "> " .. self.currentLine)
 			local args = self.currentLine:split(" ")
 			local command = args[1]
 			table.remove(args, 1)

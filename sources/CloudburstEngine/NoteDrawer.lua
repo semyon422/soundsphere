@@ -52,7 +52,8 @@ NoteDrawer.loadNoteData = function(self)
 			currentGraphicalNotes[noteData.inputType][noteData.inputIndex] = nil
 		elseif noteData.noteType == "SoundNote" then
 			graphicalNote = self.engine.ShortGraphicalNote:new({
-				startNoteData = noteData
+				startNoteData = noteData,
+				noteType = "ShortNote"
 			})
 			table.insert(self.noteData, graphicalNote)
 		end
