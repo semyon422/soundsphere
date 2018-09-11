@@ -35,7 +35,8 @@ CLI.load = function(self)
 		font = self.core.fonts.mono16,
 		color = {255, 255, 255, 255},
 		layer = self.layer + 2,
-		cs = self.cs
+		cs = self.cs,
+		baseScale = 1
 	})
 	
 	self.cursorObject = soul.graphics.Text:new({
@@ -49,7 +50,8 @@ CLI.load = function(self)
 		font = self.core.fonts.mono16,
 		color = {255, 255, 255, 255},
 		layer = self.layer + 2,
-		cs = self.cs
+		cs = self.cs,
+		baseScale = 1
 	})
 	
 	self:addDefaultCommands()

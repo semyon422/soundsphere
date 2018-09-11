@@ -189,6 +189,12 @@ end
 
 Core.loadCLICommands = function(self)
 	self.cli:addCommand(
+		"fullscreen",
+		function(...)
+			love.window.setFullscreen(not love.window.getFullscreen())
+		end
+	)
+	self.cli:addCommand(
 		"config",
 		function(...)
 			local args = {...}
