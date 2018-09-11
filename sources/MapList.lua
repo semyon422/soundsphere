@@ -25,7 +25,7 @@ MapList.focus = "MapList"
 MapList.load = function(self)
 	soul.focus[self.focus] = true
 	
-	self.cs = soul.CS:new(nil, 0, 0, 0, 0, "h", 576)
+	self.cs = soul.CS:new(nil, 0, 0, 0, 0, "all", 576)
 	self.font = self.core.fonts.main20
 	
 	self.scrollCurrentDelta = 0
