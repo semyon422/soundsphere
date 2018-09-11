@@ -7,14 +7,17 @@ CLI.hidden = true
 CLI.load = function(self)
 	self.commands = {}
 	self.log = {}
-	self.currentLine = "hello"
+	self.history = {}
+	self.currentLine = {"h", "e", "l", "l", "o"}
+	self.currentLineOffset = #self.currentLine
+	self.historyOffset = 0
 	self.cs = soul.CS:new(nil, 0, 0, 0, 0, "all")
 	
 	self.rectangleObject = soul.graphics.Rectangle:new({
 		x = 0,
 		y = 0,
 		w = 1,
-		h = 0.5,
+		h = 1,
 		color = {0, 0, 0, 127},
 		layer = self.layer + 1,
 		cs = self.cs,
@@ -28,8 +31,22 @@ CLI.load = function(self)
 		h = 0,
 		limit = math.huge,
 		align = {x = "left", y = "top"},
-		text = table.concat(self.log, "\n") .. "\n" .. self.currentLine,
-		font = self.core.fonts.main16,
+		text = "",
+		font = self.core.fonts.mono16,
+		color = {255, 255, 255, 255},
+		layer = self.layer + 2,
+		cs = self.cs
+	})
+	
+	self.cursorObject = soul.graphics.Text:new({
+		x = 0,
+		y = 0.5,
+		w = 0,
+		h = 0,
+		limit = math.huge,
+		align = {x = "left", y = "top"},
+		text = "",
+		font = self.core.fonts.mono16,
 		color = {255, 255, 255, 255},
 		layer = self.layer + 2,
 		cs = self.cs
@@ -40,24 +57,116 @@ end
 
 CLI.receiveEvent = function(self, event)
 	if soul.focus[self.focus] and event.name == "love.update" then
-		self.textObject.text = table.concat(self.log, "\n") .. "\n> " .. self.currentLine
+		self.textObject.text = table.concat(self.log, "\n") .. "\n> " .. table.concat(self.currentLine)
+		self.cursorObject.text = (" "):rep(self.currentLineOffset) .. "  _"
 	elseif soul.focus[self.focus] and event.name == "love.textinput" and event.data[1] ~= "`" then
-		self.currentLine = self.currentLine .. event.data[1]
+		self.currentLineOffset = self.currentLineOffset + 1
+		table.insert(self.currentLine, self.currentLineOffset, event.data[1])
 	elseif soul.focus[self.focus] and event.name == "love.keypressed" then
 		if event.data[1] == "backspace" then
-			local byteoffset = utf8.offset(self.currentLine, -1)
-			if byteoffset then
-				self.currentLine = string.sub(self.currentLine, 1, byteoffset - 1)
+			if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
+				self:removeLastWord()
+			else
+				self:removeLastSymbol()
 			end
 		elseif event.data[1] == "return" then
-			table.insert(self.log, "> " .. self.currentLine)
-			local args = self.currentLine:split(" ")
-			local command = args[1]
-			table.remove(args, 1)
-			self.currentLine = ""
-			self:runCommand(command, args)
+			self:processCurrentLine()
+		elseif event.data[1] == "up" then
+			if self.historyOffset > 1 then
+				self.historyOffset = self.historyOffset - 1
+			end
+			if #self.history > 0 then
+				self.currentLine = table.clone(self.history[self.historyOffset])
+				self.currentLineOffset = #self.currentLine
+			end
+		elseif event.data[1] == "down" then
+			if self.historyOffset < #self.history then
+				self.historyOffset = self.historyOffset + 1
+			end
+			if #self.history > 0 then
+				self.currentLine = table.clone(self.history[self.historyOffset])
+				self.currentLineOffset = #self.currentLine
+			end
+		elseif event.data[1] == "left" then
+			if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
+				self:moveByWord("left")
+			else
+				self:moveBySymbol("left")
+			end
+		elseif event.data[1] == "right" then
+			if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
+				self:moveByWord("right")
+			else
+				self:moveBySymbol("right")
+			end
+		elseif event.data[1] == "end" then
+			self.currentLineOffset = #self.currentLine
+		elseif event.data[1] == "home" then
+			self.currentLineOffset = 0
 		end
 	end
+end
+
+CLI.moveBySymbol = function(self, direction)
+	if direction == "left" then
+		if self.currentLineOffset > 0 then
+			self.currentLineOffset = self.currentLineOffset - 1
+		end
+	elseif direction == "right" then
+		if self.currentLineOffset < #self.currentLine then
+			self.currentLineOffset = self.currentLineOffset + 1
+		end
+	end
+end
+
+CLI.moveByWord = function(self, direction)
+	if direction == "left" then
+		while self.currentLineOffset > 0 and self.currentLine[self.currentLineOffset] ~= " " do
+			self.currentLineOffset = self.currentLineOffset - 1
+		end
+		while self.currentLineOffset > 0 and self.currentLine[self.currentLineOffset] == " " do
+			self.currentLineOffset = self.currentLineOffset - 1
+		end
+	elseif direction == "right" then
+		while self.currentLineOffset < #self.currentLine and self.currentLine[self.currentLineOffset + 1] ~= " " do
+			self.currentLineOffset = self.currentLineOffset + 1
+		end
+		while self.currentLineOffset < #self.currentLine and self.currentLine[self.currentLineOffset + 1] == " " do
+			self.currentLineOffset = self.currentLineOffset + 1
+		end
+	end
+end
+
+CLI.removeLastSymbol = function(self)
+	if #self.currentLine > 0 then
+		table.remove(self.currentLine, self.currentLineOffset)
+		self.currentLineOffset = self.currentLineOffset - 1
+	end
+end
+
+CLI.removeLastWord = function(self)
+	while #self.currentLine > 0 and self.currentLine[#self.currentLine] ~= " " do
+		table.remove(self.currentLine, self.currentLineOffset)
+		self.currentLineOffset = self.currentLineOffset - 1
+	end
+	while #self.currentLine > 0 and self.currentLine[#self.currentLine] == " " do
+		table.remove(self.currentLine, self.currentLineOffset)
+		self.currentLineOffset = self.currentLineOffset - 1
+	end
+end
+
+CLI.processCurrentLine = function(self)
+	table.insert(self.log, "> " .. table.concat(self.currentLine))
+	local args = table.concat(self.currentLine):split(" ")
+	local command = args[1]
+	table.remove(args, 1)
+	
+	table.insert(self.history, self.currentLine)
+	self.historyOffset = #self.history + 1
+	
+	self.currentLine = {}
+	self.currentLineOffset = 0
+	self:runCommand(command, args)
 end
 
 CLI.unload = function(self)
@@ -68,6 +177,7 @@ CLI.show = function(self)
 	self.hidden = false
 	self.rectangleObject:activate()
 	self.textObject:activate()
+	self.cursorObject:activate()
 	
 	self.soulFocusTable = soul.cloneFocusTable()
 	soul.focus = {
@@ -79,6 +189,7 @@ CLI.hide = function(self)
 	self.hidden = true
 	self.rectangleObject:deactivate()
 	self.textObject:deactivate()
+	self.cursorObject:deactivate()
 	soul.focus = self.soulFocusTable
 end
 

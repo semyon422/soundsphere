@@ -23,40 +23,6 @@ Core.loadCLI = function(self)
 	self:loadCLICommands()
 end
 
-Core.loadCLICommands = function(self)
-	self.cli:addCommand(
-		"config",
-		function(...)
-			local args = {...}
-			if args[1] == "set" then
-				local func, err = loadstring("(...)." .. args[2] .. "=" .. args[3])
-				if not func then
-					self.cli:print(err)
-					return
-				end
-				local out = {pcall(func, self.config.data)}
-				for _, value in pairs(out) do
-					self.cli:print(value)
-				end
-			elseif args[1] == "get" then
-				local func, err = loadstring("return (...)." .. args[2])
-				if not func then
-					self.cli:print(err)
-					return
-				end
-				local out = {pcall(func, self.config.data)}
-				for _, value in pairs(out) do
-					self.cli:print(value)
-				end
-			elseif args[1] == "save" then
-				self.config:write("userdata/config.json")
-			elseif args[1] == "load" then
-				self.config:read("userdata/config.json")
-			end
-		end
-	)
-end
-
 Core.loadConfig = function(self)
 	self.config = Config:new()
 	self.config:read("userdata/config.json")
@@ -74,6 +40,7 @@ end
 
 Core.loadFonts = function(self)
 	self.fonts = {}
+	self.fonts.mono16 = love.graphics.newFont("resources/NotoMono-Regular.ttf", 16)
 	self.fonts.main16 = love.graphics.newFont("resources/NotoSansCJK-Regular.ttc", 16)
 	self.fonts.main20 = love.graphics.newFont("resources/NotoSansCJK-Regular.ttc", 20)
 	self.fonts.main30 = love.graphics.newFont("resources/NotoSansCJK-Regular.ttc", 30)
@@ -218,4 +185,38 @@ Core.unloadEngine = function(self)
 	if self.playField then
 		self.playField:deactivate()
 	end
+end
+
+Core.loadCLICommands = function(self)
+	self.cli:addCommand(
+		"config",
+		function(...)
+			local args = {...}
+			if args[1] == "set" then
+				local func, err = loadstring("(...)." .. args[2] .. "=" .. args[3])
+				if not func then
+					self.cli:print(err)
+					return
+				end
+				local out = {pcall(func, self.config.data)}
+				for _, value in pairs(out) do
+					self.cli:print(value)
+				end
+			elseif args[1] == "get" then
+				local func, err = loadstring("return (...)." .. args[2])
+				if not func then
+					self.cli:print(err)
+					return
+				end
+				local out = {pcall(func, self.config.data)}
+				for _, value in pairs(out) do
+					self.cli:print(value)
+				end
+			elseif args[1] == "save" then
+				self.config:write("userdata/config.json")
+			elseif args[1] == "load" then
+				self.config:read("userdata/config.json")
+			end
+		end
+	)
 end
