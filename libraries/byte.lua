@@ -4,6 +4,10 @@ byte.bytes = function(s)
 	return s:byte(1, -1)
 end
 
+byte.tostring = function(s)
+	return s:sub(1, (s:find("\0") - 1))
+end
+
 byte.readInteger = function(s, le)
 	local number = 0
 	

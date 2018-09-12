@@ -163,6 +163,10 @@ Cache.addCacheData = function(self, cacheData)
 	table.insert(self.cacheDatas, cacheData)
 end
 
+Cache.fixCharset = function(self, line)
+	return iconv(line, "UTF-8", "SHIFT-JIS") or iconv(line, "UTF-8", "EUC-KR") or iconv(line, "UTF-8", "US-ASCII") or line
+end
+
 Cache.generateBMSCacheData = function(self, directoryPath, fileName)
 	local cacheData = {}
 	cacheData.directoryPath = directoryPath
@@ -175,7 +179,7 @@ Cache.generateBMSCacheData = function(self, directoryPath, fileName)
 	file:open("r")
 	
 	for line in file:lines() do
-		local line = iconv(line, "UTF-8", "SHIFT-JIS") or iconv(line, "UTF-8", "EUC-KR") or line
+		local line = self:fixCharset(line)
 		if line:find("^#TITLE .+$") then
 			cacheData.title = line:match("^#TITLE (.+)$")
 		end
@@ -265,8 +269,8 @@ Cache.generateOJNCacheData = function(self, directoryPath, fileName, chartIndex)
 	
 	cacheData.directoryPath = directoryPath
 	cacheData.fileName = fileName
-	cacheData.title = ojn.str_title .. " [" .. ojn.charts[chartIndex].level .. "]"
-	cacheData.artist = ojn.str_artist
+	cacheData.title = self:fixCharset(ojn.str_title) .. " [" .. ojn.charts[chartIndex].level .. "]"
+	cacheData.artist = self:fixCharset(ojn.str_artist)
 	cacheData.playlevel = ""
 	
 	return cacheData
