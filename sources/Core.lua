@@ -130,6 +130,8 @@ Core.getNoteChart = function(self, directoryPath, fileName)
 		noteChart = osu.NoteChart:new()
 	elseif filePath:find(".bm") then
 		noteChart = bms.NoteChart:new()
+	elseif filePath:find(".ojn$") then
+		noteChart = o2jam.NoteChart:new()
 	elseif filePath:find(".jnc$") then
 		noteChart = jnc.NoteChart:new()
 	elseif filePath:find(".ucs") then
@@ -139,7 +141,7 @@ Core.getNoteChart = function(self, directoryPath, fileName)
 	
 	local file = love.filesystem.newFile(filePath)
 	file:open("r")
-	noteChart:import(file:read())
+	noteChart:import((file:read()))
 	
 	return noteChart
 end

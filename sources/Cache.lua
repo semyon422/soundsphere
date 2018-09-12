@@ -82,6 +82,12 @@ Cache.extensions = {
 		}
 	},
 	{
+		type = "o2jam",
+		patterns = {
+			".ojn$"
+		}
+	},
+	{
 		type = "ucs",
 		patterns = {
 			".ucs$"
@@ -146,6 +152,10 @@ Cache.generateCacheData = function(self, directoryPath, fileName, extensionType)
 		self:addCacheData(self:generateUCSCacheData(directoryPath, fileName))
 	elseif extensionType == "jnc" then
 		self:addCacheData(self:generateJNCCacheData(directoryPath, fileName))
+	elseif extensionType == "o2jam" then
+		self:addCacheData(self:generateOJNCacheData(directoryPath, fileName, 1))
+		self:addCacheData(self:generateOJNCacheData(directoryPath, fileName, 2))
+		self:addCacheData(self:generateOJNCacheData(directoryPath, fileName, 3))
 	end
 end
 
@@ -240,6 +250,23 @@ Cache.generateUCSCacheData = function(self, directoryPath, fileName)
 	cacheData.fileName = fileName
 	cacheData.title = fileName:match("^(.+)%.ucs$")
 	cacheData.artist = ""
+	cacheData.playlevel = ""
+	
+	return cacheData
+end
+
+Cache.generateOJNCacheData = function(self, directoryPath, fileName, chartIndex)
+	local cacheData = {}
+	
+	local file = love.filesystem.newFile(directoryPath .. "/" ..  fileName)
+	file:open("r")
+	local ojn = o2jam.OJN:new(file:read(file:getSize()))
+	file:close()
+	
+	cacheData.directoryPath = directoryPath
+	cacheData.fileName = fileName
+	cacheData.title = ojn.str_title .. " [" .. ojn.charts[chartIndex].level .. "]"
+	cacheData.artist = ojn.str_artist
 	cacheData.playlevel = ""
 	
 	return cacheData
