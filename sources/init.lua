@@ -12,6 +12,7 @@ require("Core")
 require("Group")
 require("NoteSkinManager")
 require("CLI")
+require("Editor")
 
 core = Core:new()
 core:activate()

@@ -109,6 +109,19 @@ Core.loadStateManager = function(self)
 	self.stateManager:setState(
 		StateManager.State:new(
 			function()
+				self.editor = Editor:new()
+				self.editor:activate()
+			end,
+			function()
+				-- self.editor:deactivate()
+				self.mapList:deactivate()
+			end
+		),
+		"editor"
+	)
+	self.stateManager:setState(
+		StateManager.State:new(
+			function()
 				self:loadEngine(self.currentCacheData.directoryPath, self.currentCacheData.fileName)
 			end,
 			{
@@ -119,6 +132,7 @@ Core.loadStateManager = function(self)
 	)
 
 	self.stateManager:switchState("selectionScreen")
+	-- self.stateManager:switchState("editor")
 end
 
 
@@ -190,6 +204,12 @@ Core.unloadEngine = function(self)
 end
 
 Core.loadCLICommands = function(self)
+	self.cli:addCommand(
+		"state",
+		function(state)
+			self.stateManager:switchState(state)
+		end
+	)
 	self.cli:addCommand(
 		"fullscreen",
 		function(...)
