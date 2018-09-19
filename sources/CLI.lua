@@ -12,6 +12,7 @@ CLI.load = function(self)
 	self.currentLineOffset = #self.currentLine
 	self.historyOffset = 0
 	self.cs = soul.CS:new(nil, 0, 0, 0, 0, "all")
+	self.font = self.core.fonts.mono16
 	
 	self.rectangleObject = soul.graphics.Rectangle:new({
 		x = 0,
@@ -47,7 +48,7 @@ CLI.load = function(self)
 		limit = math.huge,
 		align = {x = "left", y = "top"},
 		text = "",
-		font = self.core.fonts.mono16,
+		font = self.font,
 		color = {255, 255, 255, 255},
 		layer = self.layer + 2,
 		cs = self.cs,
@@ -57,9 +58,24 @@ CLI.load = function(self)
 	self:addDefaultCommands()
 end
 
+CLI.concatLog = function(self)
+	local log = {}
+	for i = #self.log, #self.log - self.cs:Y(0.5) / self.font:getHeight(), -1 do
+		local line = self.log[i]
+		if line then
+			if type(line) == "function" then
+				table.insert(log, 1, line())
+			else
+				table.insert(log, 1, tostring(line))
+			end
+		end
+	end
+	return table.concat(log, "\n")
+end
+
 CLI.receiveEvent = function(self, event)
 	if soul.focus[self.focus] and event.name == "love.update" then
-		self.textObject.text = table.concat(self.log, "\n") .. "\n> " .. table.concat(self.currentLine)
+		self.textObject.text = self:concatLog() .. "\n> " .. table.concat(self.currentLine)
 		self.cursorObject.text = (" "):rep(self.currentLineOffset) .. "  _"
 	elseif soul.focus[self.focus] and event.name == "love.textinput" and event.data[1] ~= "`" then
 		self.currentLineOffset = self.currentLineOffset + 1
@@ -204,7 +220,7 @@ CLI.switch = function(self)
 end
 
 CLI.print = function(self, line)
-	table.insert(self.log, tostring(line))
+	table.insert(self.log, line)
 end
 
 CLI.runCommand = function(self, command, args)

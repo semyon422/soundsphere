@@ -205,6 +205,14 @@ end
 
 Core.loadCLICommands = function(self)
 	self.cli:addCommand(
+		"fps",
+		function()
+			self.cli:print(function()
+				return love.timer.getFPS()
+			end)
+		end
+	)
+	self.cli:addCommand(
 		"state",
 		function(state)
 			self.stateManager:switchState(state)
