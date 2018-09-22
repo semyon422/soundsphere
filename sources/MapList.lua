@@ -10,7 +10,8 @@ MapList.h = 1
 MapList.layer = 2
 MapList.rectangleColor = {255, 255, 255, 0}
 MapList.textColor = {255, 255, 255, 255}
-MapList.selectedRectangleColor = {255, 255, 255, 31}
+-- MapList.selectedRectangleColor = {255, 255, 255, 31}
+MapList.selectedRectangleColor = {255, 255, 255, 0}
 MapList.mode = "fill"
 MapList.limit = 2
 MapList.textAlign = {
@@ -26,6 +27,7 @@ MapList.load = function(self)
 	soul.focus[self.focus] = true
 	
 	self.cs = soul.CS:new(nil, 0, 0, 0, 0, "all", 576)
+	self.squarecs = soul.CS:new(nil, 0, 0, 0, 0, "h", 576)
 	self.font = self.core.fonts.main20
 	
 	self.scrollCurrentDelta = 0
@@ -35,6 +37,7 @@ MapList.load = function(self)
 	self:selectRandomCacheData()
 	self:updateSelectionList()
 	
+	self:loadOverlay()
 	self:updateItems()
 	self.visualItemIndex = self.selectedItemIndex
 	
@@ -92,7 +95,10 @@ MapList.selectRandomCacheData = function(self)
 	self.currentCacheData = cacheData
 	self.core.currentCacheData = self.currentCacheData
 	
-	self.selectionKey = {self:getSelectionKey(cacheData)[1]}
+	self.selectionKey = self:getSelectionKey(cacheData)
+	while #self.selectionKey > 2 do
+		self.selectionKey[#self.selectionKey] = nil
+	end
 end
 
 MapList.updateCurrentCacheData = function(self)
@@ -130,7 +136,9 @@ MapList.updateSelectionList = function(self)
 		end
 	end
 	
-	self.core.backgroundManager:setBackground(table.concat(self.selectionKey, "/") .. "/background.jpg")
+	if not self.cacheDatasContainer[table.concat(self.selectionKey, "/")] then
+		self.core.backgroundManager:setBackground(table.concat(self.selectionKey, "/") .. "/background.jpg")
+	end
 end
 
 MapList.updateItems = function(self)
@@ -138,7 +146,7 @@ MapList.updateItems = function(self)
 	
 	for _, selectionKey in ipairs(self.selectionList) do
 		self:addItem({
-			text = ("    "):rep(#selectionKey - 1) .. utf8validate(self:getItemName(selectionKey)),
+			text = ("    "):rep(#selectionKey) .. utf8validate(self:getItemName(selectionKey)),
 			-- text = utf8validate(self:getItemName(selectionKey)),
 			onClick = function(button)
 				if button.itemIndex == self.selectedItemIndex then
@@ -198,6 +206,7 @@ end
 
 MapList.unload = function(self)
 	self:unloadButtons()
+	self:unloadOverlay()
 	soul.focus[self.focus] = false
 end
 
@@ -260,6 +269,33 @@ end
 
 MapList.getEndItemIndex = function(self)
 	return math.ceil(self.visualItemIndex) + self:getMiddleOffset()
+end
+
+MapList.loadOverlay = function(self)
+	self.selectionFrame = soul.graphics.Rectangle:new({
+		x = self.x, y = self.y + (self:getMiddleOffset() - 1) * (self.h / self.buttonCount),
+		w = 0.03, h = self.h / self.buttonCount,
+		layer = self.layer + 1,
+		cs = self.squarecs,
+		color = {255, 255, 255, 255},
+		mode = "fill"
+	})
+	self.selectionFrame:activate()
+	self.selectionBackground = soul.graphics.Rectangle:new({
+		x = self.x, y = self.y,
+		w = self.w, h = self.h,
+		layer = self.layer - 1,
+		cs = self.cs,
+		color = {0, 0, 0, 127},
+		color = {0, 0, 0, 127},
+		mode = "fill"
+	})
+	self.selectionBackground:activate()
+end
+
+MapList.unloadOverlay = function(self)
+	self.selectionFrame:deactivate()
+	self.selectionBackground:deactivate()
 end
 
 MapList.calculateButtons = function(self)

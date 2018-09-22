@@ -6,7 +6,7 @@ BackgroundManager.load = function(self)
 	self.resourceLoader = ResourceLoader:getGlobal()
 	self.resourceLoader:addObserver(self.observer)
 	
-	self.defaultDrawable = love.graphics.newImage("resources/background.jpg")
+	-- self.defaultDrawable = love.graphics.newImage()
 	self.state = 0
 	
 	self.cs = soul.CS:new(nil, 0, 0, 0, 0, "h")
@@ -26,7 +26,6 @@ BackgroundManager.load = function(self)
 		},
 		color = {255, 255, 255, 255}
 	})
-	self.drawableObjectBackground:activate()
 	
 	self.drawableObjectForeground = soul.graphics.DrawableFrame:new({
 		drawable = self.defaultDrawable,
@@ -43,7 +42,6 @@ BackgroundManager.load = function(self)
 		},
 		color = {255, 255, 255, 0}
 	})
-	self.drawableObjectForeground:activate()
 end
 
 BackgroundManager.setBackground = function(self, filePath)
@@ -79,6 +77,13 @@ BackgroundManager.update = function(self)
 	end
 	self.drawableObjectBackground.w = self.cs:x(self.cs.screenWidth)
 	self.drawableObjectForeground.w = self.cs:x(self.cs.screenWidth)
+	
+	if self.drawableObjectBackground.drawable and not self.drawableObjectBackground.loaded then
+		self.drawableObjectBackground:activate()
+	end
+	if self.drawableObjectForeground.drawable and not self.drawableObjectForeground.loaded then
+		self.drawableObjectForeground:activate()
+	end
 end
 
 BackgroundManager.unload = function(self)
