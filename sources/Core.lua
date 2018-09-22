@@ -77,9 +77,8 @@ Core.loadKeyBindManager = function(self)
 end
 
 Core.loadBackgroundManager = function(self)
-	self.backgroundManager = BackgroundManager:new({
-		drawable = love.graphics.newImage("resources/background.jpg")
-	})
+	self.backgroundManager = BackgroundManager:new()
+	self.backgroundManager.core = self
 	self.backgroundManager:activate()
 end
 

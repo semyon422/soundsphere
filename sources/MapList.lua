@@ -129,6 +129,8 @@ MapList.updateSelectionList = function(self)
 			self.visualItemIndex = selectionKeyIndex
 		end
 	end
+	
+	self.core.backgroundManager:setBackground(table.concat(self.selectionKey, "/") .. "/background.jpg")
 end
 
 MapList.updateItems = function(self)

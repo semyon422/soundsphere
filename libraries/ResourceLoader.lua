@@ -4,6 +4,7 @@ require("libraries.packagePath")
 ffi = require("ffi")
 require("bass_ffi")
 require("love.filesystem")
+require("love.image")
 
 loadAudio = function(event)
 	local file = love.filesystem.newFile(event.filePath)
@@ -16,12 +17,21 @@ unloadAudio = function(event)
 	bass.BASS_SampleFree(event.resource)
 end
 
+loadImageData = function(event)
+	if love.filesystem.exists(event.filePath) then
+		event.resource = love.image.newImageData(event.filePath)
+	end
+end
+
 receiveMessageCallback = function(event)
 	if event.dataType == "audio" and event.action == "load" then
 		loadAudio(event)
 		sendMessage(event)
 	elseif event.dataType == "audio" and event.action == "unload" then
 		unloadAudio(event)
+	elseif event.dataType == "imageData" and event.action == "load" then
+		loadImageData(event)
+		sendMessage(event)
 	end
 end
 ]]

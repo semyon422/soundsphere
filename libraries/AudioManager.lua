@@ -24,7 +24,7 @@ end
 AudioManager.receiveEvent = function(self, event)
 	if event.name == "love.update" then
 		self:update()
-	elseif event.resource and event.action == "load" then
+	elseif event.resource and event.action == "load" and event.dataType == "audio" then
 		self:setChunkData(event)
 	end
 end
