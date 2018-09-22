@@ -41,39 +41,63 @@ MapList.load = function(self)
 	self:calculateButtons()
 end
 
+MapList.getSelectionKeyString = function(self, cacheData)
+	local selectionKey
+	
+	if cacheData.container == "directory" or cacheData.container == "file-single" then
+		selectionKey = cacheData.directoryPath .. "/" .. cacheData.fileName
+	elseif cacheData.container == "file-multiple" then
+		selectionKey = cacheData.directoryPath .. "/" .. cacheData.fileName .. "/" .. cacheData.index
+	end
+	
+	return selectionKey
+end
+
+MapList.getSelectionKey = function(self, cacheData)
+	return self:getSelectionKeyString(cacheData):split("/")
+end
+
 MapList.loadCache = function(self)
 	self.cacheDatas = {}
-	self.cacheDatasByPath = {}
-	self.cacheDataDirectoryPath = {}
+	self.cacheDatasKey = {}
+	self.cacheDatasContainer = {}
 	
 	for cacheData in self.core.cache:getCacheDataIterator() do
 		table.insert(self.cacheDatas, cacheData)
-		self.cacheDatasByPath[cacheData.directoryPath .. "/" .. cacheData.fileName] = cacheData
+		self.cacheDatasKey[self:getSelectionKeyString(cacheData)] = cacheData
 		
-		self.cacheDataDirectoryPath[cacheData.directoryPath] = self.cacheDataDirectoryPath[cacheData.directoryPath] or {}
-		table.insert(self.cacheDataDirectoryPath[cacheData.directoryPath], cacheData)
+		local selectionKey = self:getSelectionKey(cacheData)
+		selectionKey[#selectionKey] = nil
+		local container = table.concat(selectionKey, "/")
+		
+		if cacheData.container ~= "file-single" then
+			self.cacheDatasContainer[container] = self.cacheDatasContainer[container] or {}
+			table.insert(self.cacheDatasContainer[container], cacheData)
+		end
 	end
 end
 
 MapList.sortCache = function(self)
 	table.sort(self.cacheDatas, function(a, b)
-		return a.directoryPath .. "/" .. a.fileName < b.directoryPath .. "/" .. b.fileName
+		return
+			self:getSelectionKeyString(a)
+			<
+			self:getSelectionKeyString(b)
 	end)
 end
 
 MapList.selectRandomCacheData = function(self)
 	math.randomseed(os.time())
-	self.currentCacheData = self.cacheDatas[math.random(#self.cacheDatas)]
-	-- self.currentCacheData = self.cacheDatas[1]
+	local cacheData = self.cacheDatas[math.random(#self.cacheDatas)]
+	self.currentCacheData = cacheData
 	self.core.currentCacheData = self.currentCacheData
-	-- self.selectionKey = (self.currentCacheData.directoryPath .. "/" .. self.currentCacheData.fileName):split("/")
-	self.selectionKey = {(self.currentCacheData.directoryPath .. "/" .. self.currentCacheData.fileName):split("/")[1]}
-	-- self.selectionKey = (self.currentCacheData.directoryPath):split("/")
+	
+	self.selectionKey = {self:getSelectionKey(cacheData)[1]}
 end
 
 MapList.updateCurrentCacheData = function(self)
-	if self.cacheDatasByPath[table.concat(self.selectionKey, "/")] then
-		self.currentCacheData = self.cacheDatasByPath[table.concat(self.selectionKey, "/")]
+	if self.cacheDatasKey[table.concat(self.selectionKey, "/")] then
+		self.currentCacheData = self.cacheDatasKey[table.concat(self.selectionKey, "/")]
 		self.core.currentCacheData = self.currentCacheData
 	end
 end
@@ -82,7 +106,7 @@ MapList.updateSelectionList = function(self)
 	self.selectionList = {}
 	
 	for _, cacheData in ipairs(self.cacheDatas) do
-		local selectionKey = (cacheData.directoryPath .. "/" .. cacheData.fileName):split("/")
+		local selectionKey = self:getSelectionKey(cacheData)
 		local newSelectionKey = {}
 		
 		for i = 1, #self.selectionKey do
@@ -122,7 +146,7 @@ MapList.updateItems = function(self)
 					self:updateItems()
 					self:unloadButtons()
 					self:calculateButtons()
-					if self.cacheDatasByPath[table.concat(selectionKey, "/")] then
+					if self.cacheDatasKey[table.concat(selectionKey, "/")] then
 						self.core.stateManager:switchState("playing")
 					end
 				else
@@ -131,18 +155,9 @@ MapList.updateItems = function(self)
 			end,
 			onSelect = function(button)
 				local path = table.concat(selectionKey, "/")
-				if self.cacheDatasByPath[path] then
+				if self.cacheDatasKey[path] then
 					self.selectionKey = selectionKey
 					self:updateCurrentCacheData()
-					-- table.print(self.selectionKey)
-				-- elseif self.cacheDataDirectoryPath[path] then
-					-- local cacheData = self.cacheDataDirectoryPath[path][1]
-					-- self.selectionKey = (cacheData.directoryPath .. "/" .. cacheData.fileName):split("/")
-					-- self:updateSelectionList()
-					-- self:updateItems()
-					-- self:unloadButtons()
-					-- self:calculateButtons()
-					-- table.print(self.selectionKey)
 				end
 			end,
 			selectionKey = selectionKey
@@ -156,19 +171,19 @@ MapList.updateItems = function(self)
 end
 
 MapList.getItemName = function(self, selectionKey)
-	local cacheDataPath = table.concat(selectionKey, "/")
+	local cacheDataKey = table.concat(selectionKey, "/")
 	
-	local cacheDataDirectoryPath = self.cacheDataDirectoryPath[cacheDataPath]
-	if cacheDataDirectoryPath then
-		return cacheDataDirectoryPath[1].title
+	local cacheDatasContainer = self.cacheDatasContainer[cacheDataKey]
+	if cacheDatasContainer then
+		return cacheDatasContainer[1].title
 	end
 	
-	local cacheDataFilePath = self.cacheDatasByPath[cacheDataPath]
+	local cacheDataFilePath = self.cacheDatasKey[cacheDataKey]
 	if cacheDataFilePath then
 		return cacheDataFilePath.title
 	end
 	
-	return cacheDataPath
+	return selectionKey[#selectionKey]
 end
 
 MapList.addItem = function(self, item)
@@ -211,11 +226,7 @@ MapList.receiveEvent = function(self, event)
 		self:update()
 	elseif soul.focus[self.focus] and event.name == "love.wheelmoved" then
 		local direction = event.data[2]
-		-- local x, y, w, h = self.x, self.y, self.w, self.h
-		-- local mx, my = self.cs:x(love.mouse.getX(), true), self.cs:y(love.mouse.getY(), true)
-		-- if belong(mx, x, x + w, my, y, y + h) then
-			self:scrollBy(-direction)
-		-- end
+		self:scrollBy(-direction)
 	elseif soul.focus[self.focus] and event.name == "love.keypressed" then
 		local key = event.data[2]
 		if key == self.upScrollKey then
@@ -230,7 +241,7 @@ MapList.receiveEvent = function(self, event)
 				end
 			end
 		elseif key == "escape" and #self.selectionKey > 1 then
-			if self.cacheDatasByPath[table.concat(self.selectionKey, "/")] then
+			if self.cacheDatasKey[table.concat(self.selectionKey, "/")] then
 				self.selectionKey[#self.selectionKey] = nil
 			end
 			self.selectionKey[#self.selectionKey] = nil
@@ -313,7 +324,6 @@ end
 MapList.scrollToItemIndex = function(self, itemIndex)
 	if self.items[itemIndex] then
 		self.selectedItemIndex = itemIndex
-		-- self.items[self.selectedItemIndex].onSelect(self:getButtonByItemIndex(itemIndex))
 	end
 	
 	self:updateScrollCurrentDelta()

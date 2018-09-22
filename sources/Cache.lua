@@ -173,7 +173,9 @@ Cache.generateBMSCacheData = function(self, directoryPath, fileName)
 	cacheData.fileName = fileName
 	cacheData.title = "<title>"
 	cacheData.artist = "<artist>"
-	cacheData.playlevel = "<playlevel>"
+	cacheData.index = "1"
+	
+	cacheData.container = "directory"
 	
 	local file = love.filesystem.newFile(directoryPath .. "/" ..  fileName)
 	file:open("r")
@@ -204,7 +206,9 @@ Cache.generateOsuCacheData = function(self, directoryPath, fileName)
 	cacheData.fileName = fileName
 	cacheData.title = "<title>"
 	cacheData.artist = "<artist>"
-	cacheData.playlevel = "<playlevel>"
+	cacheData.index = "1"
+	
+	cacheData.container = "directory"
 	
 	local file = love.filesystem.newFile(directoryPath .. "/" ..  fileName)
 	file:open("r")
@@ -235,7 +239,9 @@ Cache.generateJNCCacheData = function(self, directoryPath, fileName)
 	cacheData.fileName = fileName
 	cacheData.title = "<title>"
 	cacheData.artist = "<artist>"
-	cacheData.playlevel = "<playlevel>"
+	cacheData.index = "1"
+	
+	cacheData.container = "directory"
 	
 	local file = love.filesystem.newFile(directoryPath .. "/" ..  fileName)
 	file:open("r")
@@ -253,25 +259,31 @@ Cache.generateUCSCacheData = function(self, directoryPath, fileName)
 	cacheData.directoryPath = directoryPath
 	cacheData.fileName = fileName
 	cacheData.title = fileName:match("^(.+)%.ucs$")
-	cacheData.artist = ""
-	cacheData.playlevel = ""
+	cacheData.artist = "<artist>"
+	cacheData.index = "1"
+	
+	cacheData.container = "file-single"
 	
 	return cacheData
 end
 
 Cache.generateOJNCacheData = function(self, directoryPath, fileName, chartIndex)
 	local cacheData = {}
+	cacheData.directoryPath = directoryPath
+	cacheData.fileName = fileName
+	cacheData.title = "<title>"
+	cacheData.artist = "<artist>"
+	cacheData.index = tostring(chartIndex)
+	
+	cacheData.container = "file-multiple"
 	
 	local file = love.filesystem.newFile(directoryPath .. "/" ..  fileName)
 	file:open("r")
 	local ojn = o2jam.OJN:new(file:read(file:getSize()))
 	file:close()
 	
-	cacheData.directoryPath = directoryPath
-	cacheData.fileName = fileName
 	cacheData.title = self:fixCharset(ojn.str_title) .. " [" .. ojn.charts[chartIndex].level .. "]"
 	cacheData.artist = self:fixCharset(ojn.str_artist)
-	cacheData.playlevel = ""
 	
 	return cacheData
 end
