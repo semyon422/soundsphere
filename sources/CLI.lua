@@ -261,7 +261,8 @@ CLI.addDefaultCommands = function(self)
 			self:print("Hello, World!")
 		end
 	)
-        -- TODO: Fit the output text to the window's width
+
+	-- TODO: Fit the output text to the window's width
 	local helpFunction = function()
 		local cell = 0
 		local commandSet = {}
