@@ -261,4 +261,18 @@ CLI.addDefaultCommands = function(self)
 			self:print("Hello, World!")
 		end
 	)
+        -- TODO: Fit the output text to the window's width
+	local helpFunction = function()
+		local cell = 0
+		local commandSet = {}
+		for key,value in pairs(self.commands) do
+			cell = cell + 1
+			commandSet[cell] = key
+		end
+		self:print("Available commands: ")
+		self:print(table.concat(commandSet, ", "))
+	end
+
+	self:addCommand("help", helpFunction)
+	self:addCommand("?", helpFunction)
 end
