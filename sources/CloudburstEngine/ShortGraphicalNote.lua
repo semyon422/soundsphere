@@ -7,19 +7,23 @@ ShortGraphicalNote.update = function(self)
 			self:deactivate()
 		else
 			self.drawable.y = self:getY()
+			self.drawable.x = self:getX()
 			self:updateColour(self.drawable.color, self:getColour())
 		end
 	elseif self.noteDrawer.optimisationMode == self.noteDrawer.OptimisationModeEnum.UpdateVisible then
 		self:computeVisualTime()
 		
-		if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
+		-- if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
+		if not self:willDraw() and self.index == self.noteDrawer.startNoteIndex then
 			self:deactivate()
 			self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
-		elseif self:willDrawAfterEnd() and self.index == self.noteDrawer.endNoteIndex then
+		-- elseif self:willDrawAfterEnd() and self.index == self.noteDrawer.endNoteIndex then
+		elseif not self:willDraw() and self.index == self.noteDrawer.endNoteIndex then
 			self:deactivate()
 			self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
 		else
 			self.drawable.y = self:getY()
+			self.drawable.x = self:getX()
 			self:updateColour(self.drawable.color, self:getColour())
 		end
 	end
@@ -70,7 +74,7 @@ ShortGraphicalNote.getDrawable = function(self)
 end
 
 ShortGraphicalNote.getX = function(self)
-	return self.engine.noteSkin:getNoteX(self)
+	return self.engine.noteSkin:getShortNoteX(self)
 end
 
 ShortGraphicalNote.getY = function(self)

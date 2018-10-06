@@ -6,6 +6,10 @@ LongGraphicalNote.update = function(self)
 		if not self:willDraw() then
 			self:deactivate()
 		else
+			self.headDrawable.x = self:getHeadX()
+			self.tailDrawable.x = self:getTailX()
+			self.bodyDrawable.x = self:getBodyX()
+			self.bodyDrawable.sx = self:getBodyScaleX()
 			self.headDrawable.y = self:getHeadY()
 			self.tailDrawable.y = self:getTailY()
 			self.bodyDrawable.y = self:getBodyY()
@@ -25,6 +29,10 @@ LongGraphicalNote.update = function(self)
 			self:deactivate()
 			self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
 		else
+			self.headDrawable.x = self:getHeadX()
+			self.tailDrawable.x = self:getTailX()
+			self.bodyDrawable.x = self:getBodyX()
+			self.bodyDrawable.sx = self:getBodyScaleX()
 			self.headDrawable.y = self:getHeadY()
 			self.tailDrawable.y = self:getTailY()
 			self.bodyDrawable.y = self:getBodyY()
@@ -72,7 +80,7 @@ end
 LongGraphicalNote.activate = function(self)
 	self.headDrawable = soul.graphics.Drawable:new({
 		cs = self:getCS(),
-		x = self:getX(),
+		x = self:getHeadX(),
 		y = self:getHeadY(),
 		sx = self:getHeadScaleX(),
 		sy = self:getHeadScaleY(),
@@ -82,7 +90,7 @@ LongGraphicalNote.activate = function(self)
 	})
 	self.tailDrawable = soul.graphics.Drawable:new({
 		cs = self:getCS(),
-		x = self:getX(),
+		x = self:getTailX(),
 		y = self:getTailY(),
 		sx = self:getTailScaleX(),
 		sy = self:getTailScaleY(),
@@ -92,7 +100,7 @@ LongGraphicalNote.activate = function(self)
 	})
 	self.bodyDrawable = soul.graphics.Drawable:new({
 		cs = self:getCS(),
-		x = self:getX(),
+		x = self:getBodyX(),
 		y = self:getBodyY(),
 		sx = self:getBodyScaleX(),
 		sy = self:getBodyScaleY(),
@@ -146,8 +154,14 @@ LongGraphicalNote.getBodyDrawable = function(self)
 	return self.engine.noteSkin:getNoteDrawable(self, "Body")
 end
 
-LongGraphicalNote.getX = function(self)
-	return self.engine.noteSkin:getNoteX(self)
+LongGraphicalNote.getHeadX = function(self)
+	return self.engine.noteSkin:getLongNoteHeadX(self, "Head")
+end
+LongGraphicalNote.getTailX = function(self)
+	return self.engine.noteSkin:getLongNoteTailX(self, "Tail")
+end
+LongGraphicalNote.getBodyX = function(self)
+	return self.engine.noteSkin:getLongNoteBodyX(self, "Body")
 end
 
 LongGraphicalNote.getHeadY = function(self)
