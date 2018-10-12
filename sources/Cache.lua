@@ -1,70 +1,115 @@
 Cache = createClass()
 
+Cache.filePath = "userdata/cache.json"
+
 Cache.init = function(self)
-	self.cacheDatas = {}
-	self.cacheDataDirectoryPathUniqueKey = {}
+	self.data = {}
+	self.dataDict = {}
+	self.indexedPaths = {}
+end
+
+Cache.getList = function(self)
+	return self.data
+end
+
+Cache.getDict = function(self)
+	return self.dataDict
 end
 
 Cache.import = function(self)
-	local status, cacheDatas = pcall(loadfile("cache"))
-	
-	if status then
-		self.cacheDatas = cacheDatas or {}
-		for _, cacheData in ipairs(self.cacheDatas) do
-			self.cacheDataDirectoryPathUniqueKey[cacheData.directoryPath] = true
-		end
-	else
-		print(cacheDatas)
-		self.cacheDatas = {}
+	local file = io.open(self.filePath, "r")
+	local content = file and file:read("*all") or ""
+	self.data = json.decode(content ~= "" and content or "[]")
+	if file then file:close() end
+	for _, cacheData in ipairs(self.data) do
+		self.dataDict[self:getCacheDataFilePath(cacheData)] = cacheData
 	end
-	
 	self:clean()
-	
+	self:translate()
 	self:lookup("userdata/charts")
 end
 
 Cache.export = function(self)
-	local file = io.open("cache", "w")
-	
-	file:write("return {\n")
-	for cacheData in self:getCacheDataIterator() do
-		file:write(table.export(cacheData))
-		file:write(",\n")
+	local data = {}
+	for _, cacheData in pairs(self.dataDict) do
+		table.insert(data, cacheData)
 	end
-	file:write("}")
+	table.sort(data, function(a, b)
+		return self:getCacheDataFilePath(a) < self:getCacheDataFilePath(b)
+	end)
+	local file = io.open(self.filePath, "w")
+	file:write(json.encode(data))
+	file:close()
 end
 
-Cache.update = function(self)
-	
+Cache.clean = function(self)
+	local data = {}
+	for _, cacheData in ipairs(self.data) do
+		if love.filesystem.exists(self:getCacheDataFilePath(cacheData)) then
+			table.insert(data, cacheData)
+		end
+	end
+	self.data = data
+end
+
+Cache.translate = function(self)
+	for _, cacheData in ipairs(self.data) do
+		self:translateItem(cacheData)
+	end
+end
+
+Cache.translateItem = function(self, cacheData)
+	local filePathTable = cacheData.directoryPath:split("/")
+	for level = 1, #filePathTable do
+		self.indexedPaths[table.concat(filePathTable, "/")] = true
+		table.remove(filePathTable, #filePathTable)
+	end
+end
+
+Cache.processFile = function(self, directoryPath, fileName)
+	local extensionType = self:getExtensionType(directoryPath .. "/" .. fileName)
+	if extensionType then
+		self:generateCacheData(directoryPath, fileName, extensionType)
+	end
+end
+
+Cache.lookup = function(self, directoryPath, recursive)
+	for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
+		local filePath = directoryPath .. "/" .. itemName
+		if
+			love.filesystem.isDirectory(filePath) and
+			(recursive or
+			not self.indexedPaths[filePath])
+		then
+			self:lookup(filePath, true)
+			self.indexedPaths[filePath] = true
+		elseif
+			love.filesystem.isFile(filePath) and
+			not self.dataDict[filePath]
+		then
+			self:processFile(directoryPath, itemName)
+		end
+	end
+end
+
+Cache.getCacheDataFilePath = function(self, cacheData)
+	return cacheData.directoryPath .. "/" .. cacheData.fileName
 end
 
 Cache.getCacheDataIterator = function(self)
-	local cacheDatas = {}
+	local data = {}
 	
-	for _, cacheData in pairs(self.cacheDatas) do
-		table.insert(cacheDatas, cacheData)
+	for _, cacheData in pairs(self.data) do
+		table.insert(data, cacheData)
 	end
 	
 	local cacheDataIndex = 1
 	
 	return function()
-		local cacheData = cacheDatas[cacheDataIndex]
+		local cacheData = data[cacheDataIndex]
 		cacheDataIndex = cacheDataIndex + 1
 		
 		return cacheData
-	end
-end
-
-Cache.clean = function(self)
-	for directoryPath in pairs(self.cacheDataDirectoryPathUniqueKey) do
-		if not love.filesystem.exists(directoryPath) then
-			for index, cacheData in pairs(self.cacheDatas) do
-				if cacheData.directoryPath == directoryPath then
-					self.cacheDatas[index] = nil
-					print("removing from cache", directoryPath)
-				end
-			end
-		end
 	end
 end
 
@@ -111,36 +156,19 @@ Cache.getExtensionType = function(self, fileName)
 	end
 end
 
-Cache.lookup = function(self, directoryPath)
-	for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
-		if love.filesystem.isDirectory(directoryPath .. "/" .. itemName) then
-			if not self.cacheDataDirectoryPathUniqueKey[directoryPath .. "/" .. itemName] then
-				local hasCharts = self:generateCacheDataDirectory(directoryPath .. "/" .. itemName)
-				self.cacheDataDirectoryPathUniqueKey[directoryPath .. "/" .. itemName] = true
-				
-				if not hasCharts then
-					self:lookup(directoryPath .. "/" .. itemName)
-				end
-			end
-		elseif love.filesystem.isFile(directoryPath .. "/" .. itemName) then
-			
-		end
-	end
-end
-
-Cache.generateCacheDataDirectory = function(self, directoryPath)
-	print("checking directory", directoryPath)
-	local hasCharts = false
-	for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
-		local extensionType = self:getExtensionType(itemName)
-		if love.filesystem.isFile(directoryPath .. "/" .. itemName) and extensionType then
-			self:generateCacheData(directoryPath, itemName, extensionType)
-			hasCharts = true
-		end
-	end
+-- Cache.generateCacheDataDirectory = function(self, directoryPath)
+	-- print("checking directory", directoryPath)
+	-- local hasCharts = false
+	-- for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
+		-- local extensionType = self:getExtensionType(itemName)
+		-- if love.filesystem.isFile(directoryPath .. "/" .. itemName) and extensionType then
+			-- self:generateCacheData(directoryPath, itemName, extensionType)
+			-- hasCharts = true
+		-- end
+	-- end
 	
-	return hasCharts
-end
+	-- return hasCharts
+-- end
 
 Cache.generateCacheData = function(self, directoryPath, fileName, extensionType)
 	print("processing file", fileName)
@@ -160,7 +188,8 @@ Cache.generateCacheData = function(self, directoryPath, fileName, extensionType)
 end
 
 Cache.addCacheData = function(self, cacheData)
-	table.insert(self.cacheDatas, cacheData)
+	table.insert(self.data, cacheData)
+	self.dataDict[self:getCacheDataFilePath(cacheData)] = cacheData
 end
 
 Cache.fixCharset = function(self, line)
