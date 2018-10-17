@@ -226,18 +226,22 @@ MapList.getMiddleOffset = function(self)
 end
 
 MapList.update = function(self)
+	local dt =  math.min(1/60, love.timer.getDelta())
+	local sign = math.sign(self.scrollCurrentDelta)
+	local scrollCurrentDelta = sign * math.max(math.abs(self.scrollCurrentDelta), 1) * 8 * dt
+	
 	if self.selectedItemIndex < 1 then
 		self.selectedItemIndex = 1
 	elseif self.selectedItemIndex > self:getItemCount() then
 		self.selectedItemIndex = self:getItemCount()
 	end
-	if (self.scrollCurrentDelta > 0 and self.visualItemIndex + self.scrollCurrentDelta > self.selectedItemIndex)
-	or (self.scrollCurrentDelta < 0 and self.visualItemIndex + self.scrollCurrentDelta < self.selectedItemIndex)
+	if (scrollCurrentDelta > 0 and self.visualItemIndex + scrollCurrentDelta > self.selectedItemIndex)
+	or (scrollCurrentDelta < 0 and self.visualItemIndex + scrollCurrentDelta < self.selectedItemIndex)
 	then
 		self.visualItemIndex = self.selectedItemIndex
 		self.scrollCurrentDelta = 0
 	else
-		self.visualItemIndex = self.visualItemIndex + self.scrollCurrentDelta
+		self.visualItemIndex = self.visualItemIndex + scrollCurrentDelta
 	end
 	
 	self:calculateButtons()
@@ -358,8 +362,9 @@ MapList.unloadButtons = function(self)
 end
 
 MapList.updateScrollCurrentDelta = function(self)
-	local dt =  math.min(1/60, love.timer.getDelta())
-	self.scrollCurrentDelta = (self.selectedItemIndex - self.visualItemIndex) * dt * 8
+	-- local dt =  math.min(1/60, love.timer.getDelta())
+	-- self.scrollCurrentDelta = (self.selectedItemIndex - self.visualItemIndex) * dt * 8
+	self.scrollCurrentDelta = (self.selectedItemIndex - self.visualItemIndex)
 end
 
 MapList.getButtonByItemIndex = function(self, itemIndex)
