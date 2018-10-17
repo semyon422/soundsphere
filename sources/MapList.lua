@@ -130,9 +130,10 @@ MapList.updateSelectionList = function(self)
 	end
 	
 	for selectionKeyIndex, selectionKey in ipairs(self.selectionList) do
-		if table.equal(selectionKey, self.selectionKey) then
+		if table.leftequal(self.selectionKey, selectionKey) then
 			self.selectedItemIndex = selectionKeyIndex
 			self.visualItemIndex = selectionKeyIndex
+			break
 		end
 	end
 	
@@ -185,12 +186,22 @@ MapList.getItemName = function(self, selectionKey)
 	
 	local cacheDatasContainer = self.cacheDatasContainer[cacheDataKey]
 	if cacheDatasContainer then
-		return cacheDatasContainer[1].title
+		local artist, title = cacheDatasContainer[1].artist, cacheDatasContainer[1].title
+		if artist and title then
+			return artist .. " - " .. title
+		else
+			return title or ""
+		end
 	end
 	
-	local cacheDataFilePath = self.cacheDatasKey[cacheDataKey]
-	if cacheDataFilePath then
-		return cacheDataFilePath.title
+	local cacheData = self.cacheDatasKey[cacheDataKey]
+	if cacheData then
+		local artist, title = cacheData.artist, cacheData.title
+		if artist and title then
+			return artist .. " - " .. title
+		else
+			return title or ""
+		end
 	end
 	
 	return selectionKey[#selectionKey]
