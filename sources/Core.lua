@@ -59,8 +59,6 @@ end
 Core.loadCache = function(self)
 	self.cache = Cache:new()
 	self.cache:init()
-	self.cache:import()
-	self.cache:export()
 end
 
 Core.loadKeyBindManager = function(self)
@@ -121,7 +119,7 @@ Core.loadStateManager = function(self)
 	self.stateManager:setState(
 		StateManager.State:new(
 			function()
-				self:loadEngine(self.currentCacheData.directoryPath, self.currentCacheData.fileName)
+				self:loadEngine()
 			end,
 			{
 				self.mapList
@@ -135,36 +133,40 @@ Core.loadStateManager = function(self)
 end
 
 
-Core.getNoteChart = function(self, directoryPath, fileName)
-	local filePath = directoryPath .. "/" .. fileName
-	
+Core.getNoteChart = function(self, path)
 	local noteChart
-	if filePath:find(".osu$") then
+	local chartIndex
+	if path:find(".osu$") then
 		noteChart = osu.NoteChart:new()
-	elseif filePath:find(".bm") then
+	elseif path:find(".bm") then
 		noteChart = bms.NoteChart:new()
-	elseif filePath:find(".ojn$") then
+	elseif path:find(".ojn/.$") then
 		noteChart = o2jam.NoteChart:new()
-	elseif filePath:find(".jnc$") then
+		noteChart = o2jam.NoteChart:new()
+		chartIndex = tonumber(path:match("^.+/(.)$"))
+		path = path:match("^(.+)/.$")
+	elseif path:find(".jnc$") then
 		noteChart = jnc.NoteChart:new()
-	elseif filePath:find(".ucs") then
+	elseif path:find(".ucs/.$") then
 		noteChart = ucs.NoteChart:new()
-		noteChart.audioFileName = fileName:match("^(.+)%.ucs$") .. ".mp3"
+		path = path:match("(.+)/.$")
+		noteChart.audioFileName = path:match("([^/]+)%.ucs$") .. ".mp3"
 	end
 	
-	local file = love.filesystem.newFile(filePath)
+	local file = love.filesystem.newFile(path)
 	file:open("r")
-	noteChart:import((file:read()))
+	noteChart:import((file:read()), chartIndex)
 	
 	return noteChart
 end
 
-Core.loadEngine = function(self, directoryPath, fileName)
-	local noteChart = self:getNoteChart(directoryPath, fileName)
+Core.loadEngine = function(self)
+	
+	local noteChart = self:getNoteChart(self.currentCacheData.path)
 	local data = self.noteSkinManager:getNoteSkin(noteChart.inputMode) or {}
 	
-	self.fileManager:addPath(directoryPath)
-	noteChart.directoryPath = directoryPath
+	noteChart.directoryPath = self.currentCacheData.path:match("^(.+)/")
+	self.fileManager:addPath(noteChart.directoryPath)
 	
 	local noteSkin
 	if data.noteSkin then

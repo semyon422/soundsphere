@@ -2,6 +2,7 @@ require("tweaks")
 require("byte")
 require("utf8validate")
 json = require("json")
+sqlite = require("ljsqlite3")
 require("Observer")
 require("Config")
 

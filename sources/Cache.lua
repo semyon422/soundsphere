@@ -1,102 +1,99 @@
 Cache = createClass()
 
-Cache.filePath = "userdata/cache.json"
+Cache.filePath = "userdata/cache.sqlite"
 
 Cache.init = function(self)
-	self.data = {}
-	self.dataDict = {}
-	self.indexedPaths = {}
+	self.db = sqlite.open(self.filePath)
+	
+	self.db:exec[[
+		CREATE TABLE IF NOT EXISTS `cache` (
+			`path` TEXT,
+			`hash` TEXT,
+			`container` INTEGER,
+			`name` TEXT,
+			PRIMARY KEY (`path`)
+		);
+	]]
 end
 
-Cache.getList = function(self)
-	return self.data
+Cache.rowByPath = function(self, path)
+	return self.db:rowexec(("SELECT * FROM cache WHERE path = %q"):format(path))
 end
 
-Cache.getDict = function(self)
-	return self.dataDict
+Cache.setContainer = function(self, path, container)
+	return self.db:exec(([[
+		INSERT OR IGNORE INTO `cache` (path, hash, container, name)
+		VALUES (%q, '', -1, '');
+		UPDATE `cache` SET `container` = %s WHERE `path` == %q;
+	]]):format(path, container, path))
 end
 
-Cache.import = function(self)
-	local file = io.open(self.filePath, "r")
-	local content = file and file:read("*all") or ""
-	self.data = json.decode(content ~= "" and content or "[]")
-	if file then file:close() end
-	for _, cacheData in ipairs(self.data) do
-		self.dataDict[self:getCacheDataFilePath(cacheData)] = cacheData
-	end
-	self:clean()
-	self:translate()
-	self:lookup("userdata/charts")
-end
-
-Cache.export = function(self)
-	local data = {}
-	for _, cacheData in pairs(self.dataDict) do
-		table.insert(data, cacheData)
-	end
-	table.sort(data, function(a, b)
-		return self:getCacheDataFilePath(a) < self:getCacheDataFilePath(b)
-	end)
-	local file = io.open(self.filePath, "w")
-	file:write(json.encode(data))
-	file:close()
-end
-
-Cache.clean = function(self)
-	local data = {}
-	for _, cacheData in ipairs(self.data) do
-		if love.filesystem.exists(self:getCacheDataFilePath(cacheData)) then
-			table.insert(data, cacheData)
-		end
-	end
-	self.data = data
-end
-
-Cache.translate = function(self)
-	for _, cacheData in ipairs(self.data) do
-		self:translateItem(cacheData)
-	end
-end
-
-Cache.translateItem = function(self, cacheData)
-	local filePathTable = cacheData.directoryPath:split("/")
-	for level = 1, #filePathTable do
-		self.indexedPaths[table.concat(filePathTable, "/")] = true
-		table.remove(filePathTable, #filePathTable)
-	end
+Cache.addChart = function(self, path, name)
+	return self.db:exec(([[
+		INSERT INTO `cache` (path, hash, container, name)
+		VALUES (%q, '', 0, %q);
+	]]):format(path, name))
 end
 
 Cache.processFile = function(self, directoryPath, fileName)
 	local extensionType = self:getExtensionType(directoryPath .. "/" .. fileName)
 	if extensionType then
-		self:generateCacheData(directoryPath, fileName, extensionType)
+		return self:generateCacheData(directoryPath, fileName, extensionType)
 	end
 end
 
 Cache.lookup = function(self, directoryPath, recursive)
-	for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
-		local filePath = directoryPath .. "/" .. itemName
-		if
-			love.filesystem.isDirectory(filePath) and
-			(recursive or
-			not self.indexedPaths[filePath])
-		then
-			self:lookup(filePath, true)
-			self.indexedPaths[filePath] = true
-		elseif
-			love.filesystem.isFile(filePath) and
-			not self.dataDict[filePath]
-		then
-			self:processFile(directoryPath, itemName)
+	if love.filesystem.isFile(directoryPath) then
+		return -1
+	end
+	
+	local items = love.filesystem.getDirectoryItems(directoryPath)
+	
+	local charts = 0
+	local containers = 0
+	
+	for _, itemName in ipairs(items) do
+		local path = directoryPath .. "/" .. itemName
+		if love.filesystem.isFile(path) then
+			if not self:rowByPath(path) then
+				if self:processFile(directoryPath, itemName) == 0 then
+					charts = charts + 1
+				else
+					containers = containers + 1
+				end
+			else
+				charts = 1
+			end
 		end
 	end
+	
+	if charts > 0 then
+		self:setContainer(directoryPath, 1)
+		return 1
+	end
+	
+	for _, itemName in ipairs(items) do
+		local path = directoryPath .. "/" .. itemName
+		if love.filesystem.isDirectory(path) and (recursive or not self:rowByPath(path)) then
+			if self:lookup(path, true) > 0 then
+				containers = containers + 1
+			end
+		end
+	end
+	
+	if containers > 0 then
+		self:setContainer(directoryPath, 2)
+		return 2
+	end
+	
+	return -1
 end
 
 Cache.getCacheDataFilePath = function(self, cacheData)
 	return cacheData.directoryPath .. "/" .. cacheData.fileName
 end
 
-Cache.getCacheDataIterator = function(self)
+Cache.select = function(self)
 	local data = {}
 	
 	for _, cacheData in pairs(self.data) do
@@ -156,34 +153,19 @@ Cache.getExtensionType = function(self, fileName)
 	end
 end
 
--- Cache.generateCacheDataDirectory = function(self, directoryPath)
-	-- print("checking directory", directoryPath)
-	-- local hasCharts = false
-	-- for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
-		-- local extensionType = self:getExtensionType(itemName)
-		-- if love.filesystem.isFile(directoryPath .. "/" .. itemName) and extensionType then
-			-- self:generateCacheData(directoryPath, itemName, extensionType)
-			-- hasCharts = true
-		-- end
-	-- end
-	
-	-- return hasCharts
--- end
-
 Cache.generateCacheData = function(self, directoryPath, fileName, extensionType)
 	print("processing file", fileName)
+	
 	if extensionType == "bms" then
-		self:addCacheData(self:generateBMSCacheData(directoryPath, fileName))
+		return self:generateBMSCacheData(directoryPath, fileName)
 	elseif extensionType == "osu" then
-		self:addCacheData(self:generateOsuCacheData(directoryPath, fileName))
+		return self:generateOsuCacheData(directoryPath, fileName)
 	elseif extensionType == "ucs" then
-		self:addCacheData(self:generateUCSCacheData(directoryPath, fileName))
+		return self:generateUCSCacheData(directoryPath, fileName)
 	elseif extensionType == "jnc" then
-		self:addCacheData(self:generateJNCCacheData(directoryPath, fileName))
+		return self:generateJNCCacheData(directoryPath, fileName)
 	elseif extensionType == "o2jam" then
-		self:addCacheData(self:generateOJNCacheData(directoryPath, fileName, 1))
-		self:addCacheData(self:generateOJNCacheData(directoryPath, fileName, 2))
-		self:addCacheData(self:generateOJNCacheData(directoryPath, fileName, 3))
+		return self:generateOJNCacheData(directoryPath, fileName)
 	end
 end
 
@@ -197,28 +179,20 @@ Cache.fixCharset = function(self, line)
 end
 
 Cache.generateBMSCacheData = function(self, directoryPath, fileName)
-	local cacheData = {}
-	cacheData.directoryPath = directoryPath
-	cacheData.fileName = fileName
-	cacheData.title = "<title>"
-	cacheData.artist = "<artist>"
-	cacheData.index = "1"
+	local title = "<title>"
+	local artist = "<artist>"
 	
-	cacheData.container = "directory"
-	
-	local file = love.filesystem.newFile(directoryPath .. "/" ..  fileName)
+	local path = ("%s/%s"):format(directoryPath, fileName)
+	local file = love.filesystem.newFile(path)
 	file:open("r")
 	
 	for line in file:lines() do
 		local line = self:fixCharset(line)
 		if line:find("^#TITLE .+$") then
-			cacheData.title = line:match("^#TITLE (.+)$")
+			title = line:match("^#TITLE (.+)$")
 		end
 		if line:find("^#ARTIST .+$") then
-			cacheData.artist = line:match("^#ARTIST (.+)$")
-		end
-		if line:find("^#PLAYLEVEL .+$") then
-			cacheData.playlevel = line:match("^#PLAYLEVEL (.+)$")
+			artist = line:match("^#ARTIST (.+)$")
 		end
 		if line:find("^#WAV") then
 			break
@@ -226,32 +200,30 @@ Cache.generateBMSCacheData = function(self, directoryPath, fileName)
 	end
 	file:close()
 	
-	return cacheData
+	local name = ("%s - %s"):format(artist, title)
+	self:addChart(path, name)
+	
+	return 0
 end
 
 Cache.generateOsuCacheData = function(self, directoryPath, fileName)
-	local cacheData = {}
-	cacheData.directoryPath = directoryPath
-	cacheData.fileName = fileName
-	cacheData.title = "<title>"
-	cacheData.artist = "<artist>"
-	cacheData.index = "1"
+	local title = "<title>"
+	local artist = "<artist>"
 	
-	cacheData.container = "directory"
-	
-	local file = love.filesystem.newFile(directoryPath .. "/" ..  fileName)
+	local path = ("%s/%s"):format(directoryPath, fileName)
+	local file = love.filesystem.newFile(path)
 	file:open("r")
 	
 	for line in file:lines() do
 		if line:find("Title:[ ]?.+$") then
-			cacheData.title = line:match("^Title:[ ]?(.+)$")
+			title = line:match("^Title:[ ]?(.+)$")
 		end
 		if line:find("Artist:[ ]?.+$") then
-			cacheData.artist = line:match("Artist:[ ]?(.+)$")
+			artist = line:match("Artist:[ ]?(.+)$")
 		end
 		if line:find("Version:[ ]?.+$") then
 			local version = line:match("Version:[ ]?(.+)$")
-			cacheData.title = cacheData.title .. " [" .. version .. "]"
+			title = title .. " [" .. version .. "]"
 		end
 		if line:find("^%[Events%]") then
 			break
@@ -259,60 +231,62 @@ Cache.generateOsuCacheData = function(self, directoryPath, fileName)
 	end
 	file:close()
 	
-	return cacheData
+	local name = ("%s - %s"):format(artist, title)
+	self:addChart(path, name)
+	
+	return 0
 end
 
 Cache.generateJNCCacheData = function(self, directoryPath, fileName)
-	local cacheData = {}
-	cacheData.directoryPath = directoryPath
-	cacheData.fileName = fileName
-	cacheData.title = "<title>"
-	cacheData.artist = "<artist>"
-	cacheData.index = "1"
+	local title = "<title>"
+	local artist = "<artist>"
 	
-	cacheData.container = "directory"
-	
-	local file = love.filesystem.newFile(directoryPath .. "/" ..  fileName)
+	local path = ("%s/%s"):format(directoryPath, fileName)
+	local file = love.filesystem.newFile(path)
 	file:open("r")
 	local jsonData = json.decode(file:read(file:getSize()))
 	file:close()
 	
-	cacheData.title = jsonData.metaData.title
-	cacheData.artist = jsonData.metaData.artist
+	title = jsonData.metaData.title
+	artist = jsonData.metaData.artist
 	
-	return cacheData
+	local name = ("%s - %s"):format(artist, title)
+	self:addChart(path, name)
+	
+	return 0
 end
 
 Cache.generateUCSCacheData = function(self, directoryPath, fileName)
-	local cacheData = {}
-	cacheData.directoryPath = directoryPath
-	cacheData.fileName = fileName
-	cacheData.title = fileName:match("^(.+)%.ucs$")
-	cacheData.artist = "<artist>"
-	cacheData.index = "1"
+	local path = ("%s/%s"):format(directoryPath, fileName)
+	local title = fileName:match("^(.+)%.ucs$")
 	
-	cacheData.container = "file-single"
+	self:setContainer(path, 1)
+	self:addChart(path .. "/1", title)
 	
-	return cacheData
+	return 1
 end
 
-Cache.generateOJNCacheData = function(self, directoryPath, fileName, chartIndex)
-	local cacheData = {}
-	cacheData.directoryPath = directoryPath
-	cacheData.fileName = fileName
-	cacheData.title = "<title>"
-	cacheData.artist = "<artist>"
-	cacheData.index = tostring(chartIndex)
+Cache.generateOJNCacheData = function(self, directoryPath, fileName)
+	local title = "<title>"
+	local artist = "<artist>"
 	
-	cacheData.container = "file-multiple"
-	
-	local file = love.filesystem.newFile(directoryPath .. "/" ..  fileName)
+	local path = ("%s/%s"):format(directoryPath, fileName)
+	local file = love.filesystem.newFile(path)
 	file:open("r")
 	local ojn = o2jam.OJN:new(file:read(file:getSize()))
 	file:close()
 	
-	cacheData.title = self:fixCharset(ojn.str_title) .. " [" .. ojn.charts[chartIndex].level .. "]"
-	cacheData.artist = self:fixCharset(ojn.str_artist)
 	
-	return cacheData
+	self:setContainer(path, 1)
+	
+	local name
+	for i = 1, 3 do
+		title = self:fixCharset(ojn.str_title) .. " [" .. ojn.charts[1].level .. "]"
+		artist = self:fixCharset(ojn.str_artist)
+		name = ("%s - %s"):format(artist, title)
+		
+		self:addChart(path .. "/" .. i, name)
+	end
+	
+	return 1
 end

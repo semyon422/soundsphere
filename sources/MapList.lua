@@ -10,7 +10,6 @@ MapList.h = 1
 MapList.layer = 2
 MapList.rectangleColor = {255, 255, 255, 0}
 MapList.textColor = {255, 255, 255, 255}
--- MapList.selectedRectangleColor = {255, 255, 255, 31}
 MapList.selectedRectangleColor = {255, 255, 255, 0}
 MapList.mode = "fill"
 MapList.limit = 2
@@ -26,16 +25,18 @@ MapList.focus = "MapList"
 MapList.load = function(self)
 	soul.focus[self.focus] = true
 	
+	self.cache = self.core.cache
+	self.db = self.core.cache.db
+	self.db:setscalar("CHECKCACHE", function(...) return self:checkCache(...) end)
+	
 	self.cs = soul.CS:new(nil, 0, 0, 0, 0, "all", 576)
 	self.squarecs = soul.CS:new(nil, 0, 0, 0, 0, "h", 576)
 	self.font = self.core.fonts.main20
 	
 	self.scrollCurrentDelta = 0
 
-	self:loadCache()
-	self:sortCache()
-	self:selectRandomCacheData()
-	self:updateSelectionList()
+	self:initCacheData()
+	self:selectCache()
 	
 	self:loadOverlay()
 	self:updateItems()
@@ -44,89 +45,44 @@ MapList.load = function(self)
 	self:calculateButtons()
 end
 
-MapList.getSelectionKeyString = function(self, cacheData)
-	local selectionKey
-	
-	if cacheData.container == "directory" or cacheData.container == "file-single" then
-		selectionKey = cacheData.directoryPath .. "/" .. cacheData.fileName
-	elseif cacheData.container == "file-multiple" then
-		selectionKey = cacheData.directoryPath .. "/" .. cacheData.fileName .. "/" .. cacheData.index
-	end
-	
-	return selectionKey
-end
-
-MapList.getSelectionKey = function(self, cacheData)
-	return self:getSelectionKeyString(cacheData):split("/")
-end
-
-MapList.loadCache = function(self)
-	self.cacheDatas = {}
-	self.cacheDatasKey = {}
-	self.cacheDatasContainer = {}
-	
-	for cacheData in self.core.cache:getCacheDataIterator() do
-		table.insert(self.cacheDatas, cacheData)
-		self.cacheDatasKey[self:getSelectionKeyString(cacheData)] = cacheData
-		
-		local selectionKey = self:getSelectionKey(cacheData)
-		selectionKey[#selectionKey] = nil
-		local container = table.concat(selectionKey, "/")
-		
-		if cacheData.container ~= "file-single" then
-			self.cacheDatasContainer[container] = self.cacheDatasContainer[container] or {}
-			table.insert(self.cacheDatasContainer[container], cacheData)
-		end
-	end
-end
-
-MapList.sortCache = function(self)
-	table.sort(self.cacheDatas, function(a, b)
-		return
-			self:getSelectionKeyString(a)
-			<
-			self:getSelectionKeyString(b)
-	end)
-end
-
-MapList.selectRandomCacheData = function(self)
-	math.randomseed(os.time())
-	local cacheData = self.cacheDatas[math.random(#self.cacheDatas)]
+MapList.initCacheData = function(self)
+	local cacheData = {path = "userdata/charts"}
 	self.currentCacheData = cacheData
 	self.core.currentCacheData = self.currentCacheData
 	
-	self.selectionKey = self:getSelectionKey(cacheData)
-	while #self.selectionKey > 2 do
-		self.selectionKey[#self.selectionKey] = nil
+	self.selectionKey = cacheData.path:split("/")
+end
+
+MapList.checkCache = function(self, path, container)
+	local subkey = path:split("/")
+	table.remove(subkey, #subkey)
+	if table.leftequal(subkey, self.selectionKey) then
+		return 1
+	else
+		return 0
 	end
 end
 
-MapList.updateCurrentCacheData = function(self)
-	if self.cacheDatasKey[table.concat(self.selectionKey, "/")] then
-		self.currentCacheData = self.cacheDatasKey[table.concat(self.selectionKey, "/")]
-		self.core.currentCacheData = self.currentCacheData
-	end
-end
-
-MapList.updateSelectionList = function(self)
+MapList.selectRequest = "SELECT * FROM `cache` WHERE %s ORDER BY `path`;"
+MapList.selectCache = function(self)
 	self.selectionList = {}
+	self.cacheDatas = {}
+	local result = self.db:exec(self.selectRequest:format("CHECKCACHE(path, container)"))
 	
-	for _, cacheData in ipairs(self.cacheDatas) do
-		local selectionKey = self:getSelectionKey(cacheData)
-		local newSelectionKey = {}
-		
-		for i = 1, #self.selectionKey do
-			table.insert(newSelectionKey, selectionKey[i])
-			if self.selectionKey[i] ~= newSelectionKey[i] or i == #self.selectionKey then
-				if i == #self.selectionKey and self.selectionKey[i] == newSelectionKey[i] and selectionKey[i + 1] then
-					table.insert(newSelectionKey, selectionKey[i + 1])
-				end
-				if not table.equal(newSelectionKey, self.selectionList[#self.selectionList]) then
-					table.insert(self.selectionList, newSelectionKey)
-				end
-				break
-			end
-		end
+	local row = 1
+	while result.path[row] do
+		self.cacheDatas[result.path[row]] = {
+			path = result.path[row],
+			hash = result.hash[row],
+			container = result.container[row],
+			name = result.name[row]
+		}
+		table.insert(self.selectionList, result.path[row])
+		row = row + 1
+	end
+	table.sort(self.selectionList)
+	for i, path in ipairs(self.selectionList) do
+		self.selectionList[i] = path:split("/")
 	end
 	
 	for selectionKeyIndex, selectionKey in ipairs(self.selectionList) do
@@ -137,8 +93,17 @@ MapList.updateSelectionList = function(self)
 		end
 	end
 	
-	if not self.cacheDatasContainer[table.concat(self.selectionKey, "/")] then
-		self.core.backgroundManager:setBackground(table.concat(self.selectionKey, "/") .. "/background.jpg")
+	self.core.backgroundManager:setBackground(table.concat(self.selectionKey, "/") .. "/background.jpg")
+end
+
+MapList.updateCache = function(self, recursive)
+	self.cache:lookup(table.concat(self.selectionKey, "/"), recursive)
+end
+
+MapList.updateCurrentCacheData = function(self)
+	if self.cacheDatas[table.concat(self.selectionKey, "/")] then
+		self.currentCacheData = self.cacheDatas[table.concat(self.selectionKey, "/")]
+		self.core.currentCacheData = self.currentCacheData
 	end
 end
 
@@ -148,16 +113,16 @@ MapList.updateItems = function(self)
 	for _, selectionKey in ipairs(self.selectionList) do
 		self:addItem({
 			text = ("    "):rep(#selectionKey) .. utf8validate(self:getItemName(selectionKey)),
-			-- text = utf8validate(self:getItemName(selectionKey)),
 			onClick = function(button)
 				if button.itemIndex == self.selectedItemIndex then
 					self.selectionKey = selectionKey
-					self:updateSelectionList()
+					self:selectCache()
 					self:updateCurrentCacheData()
 					self:updateItems()
 					self:unloadButtons()
 					self:calculateButtons()
-					if self.cacheDatasKey[table.concat(selectionKey, "/")] then
+					local cacheData = self.cacheDatas[table.concat(selectionKey, "/")]
+					if cacheData and cacheData.container == 0 then
 						self.core.stateManager:switchState("playing")
 					end
 				else
@@ -166,7 +131,7 @@ MapList.updateItems = function(self)
 			end,
 			onSelect = function(button)
 				local path = table.concat(selectionKey, "/")
-				if self.cacheDatasKey[path] then
+				if self.cacheDatas[path] then
 					self.selectionKey = selectionKey
 					self:updateCurrentCacheData()
 				end
@@ -184,24 +149,11 @@ end
 MapList.getItemName = function(self, selectionKey)
 	local cacheDataKey = table.concat(selectionKey, "/")
 	
-	local cacheDatasContainer = self.cacheDatasContainer[cacheDataKey]
-	if cacheDatasContainer then
-		local artist, title = cacheDatasContainer[1].artist, cacheDatasContainer[1].title
-		if artist and title then
-			return artist .. " - " .. title
-		else
-			return title or ""
-		end
-	end
-	
-	local cacheData = self.cacheDatasKey[cacheDataKey]
-	if cacheData then
-		local artist, title = cacheData.artist, cacheData.title
-		if artist and title then
-			return artist .. " - " .. title
-		else
-			return title or ""
-		end
+	local cacheData = self.cacheDatas[cacheDataKey]
+	if cacheData.container == 0 then
+		return cacheData.name
+	else
+		return selectionKey[#selectionKey]
 	end
 	
 	return selectionKey[#selectionKey]
@@ -266,14 +218,14 @@ MapList.receiveEvent = function(self, event)
 					break
 				end
 			end
-		elseif key == "escape" and #self.selectionKey > 1 then
-			if self.cacheDatasKey[table.concat(self.selectionKey, "/")] then
-				self.selectionKey[#self.selectionKey] = nil
-			end
+		elseif key == "escape" and #self.selectionKey > 2 then
 			self.selectionKey[#self.selectionKey] = nil
-			self:updateSelectionList()
+			self:selectCache()
 			self:updateItems()
 			self:unloadButtons()
+		elseif key == "f5" then
+			local recursive = love.keyboard.isDown("lshift")
+			self:updateCache(recursive)
 		end
 	end
 end

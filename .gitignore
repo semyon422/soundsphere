@@ -8,3 +8,4 @@ libraries/rhythm
 libraries/soul
 libraries/tweaks
 libraries/json
+libraries/ljsqlite3
