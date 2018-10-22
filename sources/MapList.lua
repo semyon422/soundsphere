@@ -68,6 +68,7 @@ MapList.selectCache = function(self)
 	self.selectionList = {}
 	self.cacheDatas = {}
 	local result = self.db:exec(self.selectRequest:format("CHECKCACHE(path)"))
+	if not result then return end
 	
 	local row = 1
 	while result.path[row] do
