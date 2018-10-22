@@ -53,7 +53,7 @@ MapList.initCacheData = function(self)
 	self.selectionKey = cacheData.path:split("/")
 end
 
-MapList.checkCache = function(self, path, container)
+MapList.checkCache = function(self, path)
 	local subkey = path:split("/")
 	table.remove(subkey, #subkey)
 	if table.leftequal(subkey, self.selectionKey) then
@@ -67,7 +67,7 @@ MapList.selectRequest = "SELECT * FROM `cache` WHERE %s ORDER BY `path`;"
 MapList.selectCache = function(self)
 	self.selectionList = {}
 	self.cacheDatas = {}
-	local result = self.db:exec(self.selectRequest:format("CHECKCACHE(path, container)"))
+	local result = self.db:exec(self.selectRequest:format("CHECKCACHE(path)"))
 	
 	local row = 1
 	while result.path[row] do
@@ -97,7 +97,23 @@ MapList.selectCache = function(self)
 end
 
 MapList.updateCache = function(self, recursive)
-	self.cache:lookup(table.concat(self.selectionKey, "/"), recursive)
+	if not self.cache.isUpdating then
+		soul.async(
+			"dofile(\"sources/async/updateCache.lua\")",
+			table.concat(self.selectionKey, "/"), recursive
+		):trycatch(
+			function()
+				self:selectCache()
+				self:updateItems()
+				self:unloadButtons()
+				self:calculateButtons()
+				self.cache.isUpdating = false
+			end,
+			function(...)
+				print(...)
+			end)
+		self.cache.isUpdating = true
+	end
 end
 
 MapList.updateCurrentCacheData = function(self)

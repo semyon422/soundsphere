@@ -14,6 +14,18 @@ Cache.init = function(self)
 			PRIMARY KEY (`path`)
 		);
 	]]
+	
+	self.db:setscalar("CHECKVISIBLE", function(...) return self:checkVisible(...) end)
+end
+
+Cache.checkVisible = function(self, path)
+	local subkey = path:split("/")
+	table.remove(subkey, #subkey)
+	if table.leftequal(subkey, self.selectionKey) then
+		return 1
+	else
+		return 0
+	end
 end
 
 Cache.rowByPath = function(self, path)
@@ -39,6 +51,21 @@ Cache.processFile = function(self, directoryPath, fileName)
 	local extensionType = self:getExtensionType(directoryPath .. "/" .. fileName)
 	if extensionType then
 		return self:generateCacheData(directoryPath, fileName, extensionType)
+	end
+end
+
+Cache.clean = function(self, directoryPath)
+	self.selectionKey = directoryPath:split("/")
+	local result = self.db:exec("SELECT * FROM `cache` WHERE CHECKVISIBLE(path) ORDER BY `path`;")
+	
+	local row = 1
+	while result.path[row] do
+		local path = result.path[row]
+		if not love.filesystem.exists(path) then
+			self.db:exec("DELETE FROM `cache` WHERE `path` == " .. string.format("%q", path) .. ";")
+		end
+		
+		row = row + 1
 	end
 end
 
