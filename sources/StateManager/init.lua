@@ -7,6 +7,7 @@ StateManager.new = function(self)
 	local state = {}
 	
 	state.states = {}
+	state.currentStateId = nil
 	
 	setmetatable(state, StateManager_metatable)
 	
@@ -24,5 +25,9 @@ StateManager.getState = function(self, stateId)
 end
 
 StateManager.switchState = function(self, stateId)
-	self.states[stateId]:switch()
+	if self.currentStateId then
+		self.states[self.currentStateId]:deactivate()
+	end
+	self.currentStateId = stateId
+	self.states[self.currentStateId]:activate()
 end

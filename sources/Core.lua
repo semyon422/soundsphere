@@ -64,11 +64,6 @@ end
 Core.loadKeyBindManager = function(self)
 	self.keyBindManager = KeyBindManager:new()
 	self.keyBindManager:activate()
-	self.keyBindManager:setBinding("escape", function()
-		if self.engine and self.engine.loaded then
-			self.stateManager:switchState("selectionScreen") self:unloadEngine()
-		end
-	end, nil, true)
 	self.keyBindManager:setBinding("`", function()
 		self.cli:switch()
 	end, nil, true)
@@ -98,7 +93,7 @@ Core.loadStateManager = function(self)
 				self.mapList
 			},
 			{
-				self.button
+				self.mapList
 			}
 		),
 		"selectionScreen"
@@ -110,8 +105,7 @@ Core.loadStateManager = function(self)
 				self.editor:activate()
 			end,
 			function()
-				-- self.editor:deactivate()
-				self.mapList:deactivate()
+				self.editor:deactivate()
 			end
 		),
 		"editor"
@@ -121,15 +115,14 @@ Core.loadStateManager = function(self)
 			function()
 				self:loadEngine()
 			end,
-			{
-				self.mapList
-			}
+			function()
+				self:unloadEngine()
+			end
 		),
 		"playing"
 	)
 
 	self.stateManager:switchState("selectionScreen")
-	-- self.stateManager:switchState("editor")
 end
 
 

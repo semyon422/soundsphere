@@ -3,30 +3,33 @@ StateManager.State = {}
 StateManager.State_metatable = {}
 StateManager.State_metatable.__index = StateManager.State
 
-StateManager.State.new = function(self, activate, deactivate)
+StateManager.State.new = function(self, activateData, deactivateData)
 	local state = {}
 	
-	state.activate = activate or {}
-	state.deactivate = deactivate or {}
+	state.activateData = activateData or {}
+	state.deactivateData = deactivateData or {}
 	
 	setmetatable(state, StateManager.State_metatable)
 	
 	return state
 end
 
-StateManager.State.switch = function(self)
-	if type(self.deactivate) == "table" then
-		for _, object in pairs(self.deactivate) do
+StateManager.State.deactivate = function(self)
+	if type(self.deactivateData) == "table" then
+		for _, object in pairs(self.deactivateData) do
 			object:deactivate()
 		end
-	elseif type(self.deactivate) == "function" then
-		self.deactivate()
+	elseif type(self.deactivateData) == "function" then
+		self.deactivateData()
 	end
-	if type(self.activate) == "table" then
-		for _, object in pairs(self.activate) do
+end
+
+StateManager.State.activate = function(self)
+	if type(self.activateData) == "table" then
+		for _, object in pairs(self.activateData) do
 			object:activate()
 		end
-	elseif type(self.activate) == "function" then
-		self.activate()
+	elseif type(self.activateData) == "function" then
+		self.activateData()
 	end
 end

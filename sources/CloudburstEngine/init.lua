@@ -16,7 +16,10 @@ require("CloudburstEngine.MeasureLine")
 require("CloudburstEngine.NoteSkin")
 require("CloudburstEngine.TimeManager")
 
+CloudburstEngine.focus = "CloudburstEngine"
+
 CloudburstEngine.load = function(self)
+	soul.focus[self.focus] = true
 	self.inputMode = self.core.inputModeLoader:getInputMode(self.noteChart.inputMode) or self.noteChart.inputMode
 	
 	self.sharedLogicalNoteData = {}
@@ -44,6 +47,7 @@ CloudburstEngine.update = function(self)
 end
 
 CloudburstEngine.unload = function(self)
+	soul.focus[self.focus] = nil
 	self:unloadTimeManager()
 	self:unloadNoteHandlers()
 	if self.noteSkin then
@@ -56,7 +60,7 @@ end
 CloudburstEngine.receiveEvent = function(self, event)
 	if event.name == "love.update" then
 		self:update()
-	elseif event.name == "love.keypressed" then
+	elseif soul.focus[self.focus] and event.name == "love.keypressed" then
 		local key = event.data[1]
 		if key == "return" then
 			self.timeManager:play()
@@ -68,6 +72,8 @@ CloudburstEngine.receiveEvent = function(self, event)
 			end
 		elseif key == "f4" then
 			CloudburstEngine.NoteSkin.speed = CloudburstEngine.NoteSkin.speed + 0.1
+		elseif key == "escape" then
+			self.core.stateManager:switchState("selectionScreen")
 		end
 	elseif event.name == "resourcesLoaded" then
 		self.timeManager:play()
