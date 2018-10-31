@@ -4,7 +4,7 @@ Core.load = function(self)
 	self:loadConfig()
 	self:loadResourceLoader()
 	self:loadAudioManager()
-	self:loadFonts()
+	self:loadFontManager()
 	self:loadNoteSkinManager()
 	self:loadInputModeLoader()
 	self:loadCache()
@@ -16,9 +16,25 @@ Core.load = function(self)
 	self:loadCLI()
 end
 
+Core.receiveEvent = function(self, event)
+	if event.name == "resource" then
+		if event.type == "font" then
+			event.callback(self.fontManager:getFont(event.fontType, event.fontSize))
+		end
+	elseif event.name == "setBackground" then
+		self.backgroundManager:setBackground(event.path)
+	elseif event.name == "mapListSelectedItemClicked" then
+		self.stateManager:switchState("playing")
+	elseif event.name == "cacheDatabase" then
+		event.callback(self.cache.db)
+	elseif event.name == "updateCache" then
+		self.cache:update(event.path, event.recursive, event.callback)
+	end
+end
+
 Core.loadCLI = function(self)
 	self.cli = CLI:new()
-	self.cli.core = self
+	self.observer:subscribe(self.cli.observable)
 	self.cli:activate()
 	self:loadCLICommands()
 end
@@ -29,8 +45,7 @@ Core.loadConfig = function(self)
 end
 
 Core.loadResourceLoader = function(self)
-	self.resourceLoader = ResourceLoader:getGlobal()
-	self.resourceLoader:activate()
+	self.resourceLoader = ResourceLoader:getGlobal():activate()
 end
 
 Core.loadAudioManager = function(self)
@@ -38,12 +53,8 @@ Core.loadAudioManager = function(self)
 	self.audioManager:activate()
 end
 
-Core.loadFonts = function(self)
-	self.fonts = {}
-	self.fonts.mono16 = love.graphics.newFont("resources/NotoMono-Regular.ttf", 16)
-	self.fonts.main16 = love.graphics.newFont("resources/NotoSansCJK-Regular.ttc", 16)
-	self.fonts.main20 = love.graphics.newFont("resources/NotoSansCJK-Regular.ttc", 20)
-	self.fonts.main30 = love.graphics.newFont("resources/NotoSansCJK-Regular.ttc", 30)
+Core.loadFontManager = function(self)
+	self.fontManager = FontManager:new()
 end
 
 Core.loadInputModeLoader = function(self)
@@ -58,7 +69,6 @@ end
 
 Core.loadCache = function(self)
 	self.cache = Cache:new()
-	self.cache:init()
 end
 
 Core.loadKeyBindManager = function(self)
@@ -77,7 +87,7 @@ end
 
 Core.loadMapList = function(self)
 	self.mapList = MapList:new()
-	self.mapList.core = self
+	self.observer:subscribe(self.mapList.observable)
 end
 
 Core.loadFileManager = function(self)
@@ -154,6 +164,7 @@ Core.getNoteChart = function(self, path)
 end
 
 Core.loadEngine = function(self)
+	self.currentCacheData = self.mapList.currentCacheData
 	
 	local noteChart = self:getNoteChart(self.currentCacheData.path)
 	local data = self.noteSkinManager:getNoteSkin(noteChart.inputMode) or {}

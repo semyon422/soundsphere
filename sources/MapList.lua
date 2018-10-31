@@ -19,19 +19,34 @@ MapList.textAlign = {
 MapList.buttonCount = 17
 MapList.upScrollKey = "up"
 MapList.downScrollKey = "down"
+MapList.fontType = "sans-regular"
+MapList.fontSize = 20
 
 MapList.focus = "MapList"
 
 MapList.load = function(self)
 	soul.focus[self.focus] = true
 	
-	self.cache = self.core.cache
-	self.db = self.core.cache.db
+	self:sendEvent({
+		name = "cacheDatabase",
+		callback = function(db)
+			self.db = db
+		end
+	})
 	self.db:setscalar("CHECKCACHE", function(...) return self:checkCache(...) end)
 	
 	self.cs = soul.CS:new(nil, 0, 0, 0, 0, "all", 576)
 	self.squarecs = soul.CS:new(nil, 0, 0, 0, 0, "h", 576)
-	self.font = self.core.fonts.main20
+	
+	self:sendEvent({
+		name = "resource",
+		type = "font",
+		fontType = self.fontType,
+		fontSize = self.fontSize,
+		callback = function(font)
+			self.font = font
+		end
+	})
 	
 	self.scrollCurrentDelta = 0
 
@@ -48,7 +63,6 @@ end
 MapList.initCacheData = function(self)
 	local cacheData = {path = "userdata/charts"}
 	self.currentCacheData = cacheData
-	self.core.currentCacheData = self.currentCacheData
 	
 	self.selectionKey = cacheData.path:split("/")
 end
@@ -94,33 +108,29 @@ MapList.selectCache = function(self)
 		end
 	end
 	
-	self.core.backgroundManager:setBackground(table.concat(self.selectionKey, "/") .. "/background.jpg")
+	self:sendEvent({
+		name = "setBackground",
+		path = table.concat(self.selectionKey, "/") .. "/background.jpg"
+	})
 end
 
 MapList.updateCache = function(self, recursive)
-	if not self.cache.isUpdating then
-		soul.async(
-			"dofile(\"sources/async/updateCache.lua\")",
-			table.concat(self.selectionKey, "/"), recursive
-		):trycatch(
-			function()
-				self:selectCache()
-				self:updateItems()
-				self:unloadButtons()
-				self:calculateButtons()
-				self.cache.isUpdating = false
-			end,
-			function(...)
-				print(...)
-			end)
-		self.cache.isUpdating = true
-	end
+	self:sendEvent({
+		name = "updateCache",
+		path = table.concat(self.selectionKey, "/"),
+		recursive = recursive,
+		callback = function()
+			self:selectCache()
+			self:updateItems()
+			self:unloadButtons()
+			self:calculateButtons()
+		end
+	})
 end
 
 MapList.updateCurrentCacheData = function(self)
 	if self.cacheDatas[table.concat(self.selectionKey, "/")] then
 		self.currentCacheData = self.cacheDatas[table.concat(self.selectionKey, "/")]
-		self.core.currentCacheData = self.currentCacheData
 	end
 end
 
@@ -140,7 +150,9 @@ MapList.updateItems = function(self)
 					self:calculateButtons()
 					local cacheData = self.cacheDatas[table.concat(selectionKey, "/")]
 					if cacheData and cacheData.container == 0 then
-						self.core.stateManager:switchState("playing")
+						self:sendEvent({
+							name = "mapListSelectedItemClicked"
+						})
 					end
 				else
 					self:scrollToItemIndex(button.itemIndex)

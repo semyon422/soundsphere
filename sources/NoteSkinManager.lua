@@ -56,9 +56,10 @@ end
 
 NoteSkinManager.lookup = function(self, directoryPath)
 	for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
-		if love.filesystem.isDirectory(directoryPath .. "/" .. itemName) then
-			if love.filesystem.exists(directoryPath .. "/" .. itemName .. "/config.json") then
-				self.directoryPath = directoryPath .. "/" .. itemName
+		local path = directoryPath .. "/" .. itemName
+		if love.filesystem.isDirectory(path) then
+			if love.filesystem.exists(path .. "/config.json") then
+				self.directoryPath = path
 				self:loadConfig("config.json")
 			end
 		end

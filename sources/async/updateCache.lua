@@ -16,6 +16,5 @@ require("ucs")
 require("jnc")
 
 cache = Cache:new()
-cache:init()
 cache:lookup(args[1], args[2])
 cache:clean(args[1])

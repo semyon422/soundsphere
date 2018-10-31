@@ -2,7 +2,7 @@ Cache = createClass()
 
 Cache.filePath = "userdata/cache.sqlite"
 
-Cache.init = function(self)
+Cache.construct = function(self)
 	self.db = sqlite.open(self.filePath)
 	
 	self.db:exec[[
@@ -16,6 +16,23 @@ Cache.init = function(self)
 	]]
 	
 	self.db:setscalar("CHECKVISIBLE", function(...) return self:checkVisible(...) end)
+end
+
+Cache.update = function(self, path, recursive, callback)
+	if not self.isUpdating then
+		soul.async(
+			"dofile(\"sources/async/updateCache.lua\")",
+			path, recursive
+		):trycatch(
+			function()
+				callback()
+				self.isUpdating = false
+			end,
+			function(...)
+				print(...)
+			end)
+		self.isUpdating = true
+	end
 end
 
 Cache.checkVisible = function(self, path)

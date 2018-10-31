@@ -48,8 +48,6 @@ ResourceLoader.load = function(self)
 	end
 	self.thread.threadFunction = threadFile
 	self.thread:activate()
-	
-	self.observable = Observable:new()
 end
 
 ResourceLoader.getGlobal = function(self)

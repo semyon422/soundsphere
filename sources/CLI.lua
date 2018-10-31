@@ -3,6 +3,8 @@ CLI = createClass(soul.SoulObject)
 CLI.focus = "CLI"
 CLI.layer = 101
 CLI.hidden = true
+CLI.fontType = "mono-regular"
+CLI.fontSize = 16
 
 CLI.load = function(self)
 	self.commands = {}
@@ -12,7 +14,16 @@ CLI.load = function(self)
 	self.currentLineOffset = #self.currentLine
 	self.historyOffset = 0
 	self.cs = soul.CS:new(nil, 0, 0, 0, 0, "all")
-	self.font = self.core.fonts.mono16
+	
+	self:sendEvent({
+		name = "resource",
+		type = "font",
+		fontType = self.fontType,
+		fontSize = self.fontSize,
+		callback = function(font)
+			self.font = font
+		end
+	})
 	
 	self.rectangleObject = soul.graphics.Rectangle:new({
 		x = 0,
@@ -33,7 +44,7 @@ CLI.load = function(self)
 		limit = math.huge,
 		align = {x = "left", y = "top"},
 		text = "",
-		font = self.core.fonts.mono16,
+		font = self.font,
 		color = {255, 255, 255, 255},
 		layer = self.layer + 2,
 		cs = self.cs,
