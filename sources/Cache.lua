@@ -158,31 +158,31 @@ Cache.extensions = {
 	{
 		type = "osu",
 		patterns = {
-			".osu$"
+			"%.osu$"
 		}
 	},
 	{
 		type = "bms",
 		patterns = {
-			".bms$", ".bme$", ".bml$", 
+			"%.bms$", "%.bme$", "%.bml$", 
 		}
 	},
 	{
 		type = "o2jam",
 		patterns = {
-			".ojn$"
+			"%.ojn$"
 		}
 	},
 	{
 		type = "ucs",
 		patterns = {
-			".ucs$"
+			"%.ucs$"
 		}
 	},
 	{
 		type = "jnc",
 		patterns = {
-			".jnc$"
+			"%.jnc$"
 		}
 	}
 }
@@ -195,6 +195,33 @@ Cache.getExtensionType = function(self, fileName)
 			end
 		end
 	end
+end
+
+Cache.getNoteChart = function(self, path)
+	local noteChart
+	local chartIndex
+	
+	if path:find(".osu$") then
+		noteChart = osu.NoteChart:new()
+	elseif path:find(".bm") then
+		noteChart = bms.NoteChart:new()
+	elseif path:find(".ojn/.$") then
+		noteChart = o2jam.NoteChart:new()
+		chartIndex = tonumber(path:match("^.+/(.)$"))
+		path = path:match("^(.+)/.$")
+	elseif path:find(".jnc$") then
+		noteChart = jnc.NoteChart:new()
+	elseif path:find(".ucs/.$") then
+		noteChart = ucs.NoteChart:new()
+		path = path:match("(.+)/.$")
+		noteChart.audioFileName = path:match("([^/]+)%.ucs$") .. ".mp3"
+	end
+	
+	local file = love.filesystem.newFile(path)
+	file:open("r")
+	noteChart:import((file:read()), chartIndex)
+	
+	return noteChart
 end
 
 Cache.generateCacheData = function(self, directoryPath, fileName, extensionType)
