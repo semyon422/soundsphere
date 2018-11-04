@@ -16,6 +16,22 @@ Cache.construct = function(self)
 	]]
 	
 	self.db:setscalar("CHECKVISIBLE", function(...) return self:checkVisible(...) end)
+	
+	self.addChartStatement = self.db:prepare([[
+		INSERT INTO `cache` (path, hash, container, name)
+		VALUES (?, '', 0, ?);
+	]])
+	self.setContainerStatement = self.db:prepare([[
+		INSERT OR IGNORE INTO `cache` (path, hash, container, name)
+		VALUES (?, '', -1, '');
+	]])
+	self.updateContainerStatement = self.db:prepare([[
+		UPDATE `cache` SET `container` = ? WHERE `path` == ?;
+	]])
+	
+	self.rowByPathStatement = self.db:prepare([[
+		SELECT * FROM `cache` WHERE path == ?
+	]])
 end
 
 Cache.update = function(self, path, recursive, callback)
@@ -46,29 +62,16 @@ Cache.checkVisible = function(self, path)
 end
 
 Cache.rowByPath = function(self, path)
-	return self.db:rowexec(("SELECT * FROM cache WHERE path = %q"):format(path))
+	return self.rowByPathStatement:reset():bind(path):step()
 end
 
 Cache.setContainer = function(self, path, container)
-	return self.db:exec(([[
-		INSERT OR IGNORE INTO `cache` (path, hash, container, name)
-		VALUES (%q, '', -1, '');
-		UPDATE `cache` SET `container` = %s WHERE `path` == %q;
-	]]):format(path, container, path))
+	self.setContainerStatement:reset():bind(path):step()
+	self.updateContainerStatement:reset():bind(container, path):step()
 end
 
 Cache.addChart = function(self, path, name)
-	return self.db:exec(([[
-		INSERT INTO `cache` (path, hash, container, name)
-		VALUES (%q, '', 0, %q);
-	]]):format(path, name))
-end
-
-Cache.processFile = function(self, directoryPath, fileName)
-	local extensionType = self:getExtensionType(directoryPath .. "/" .. fileName)
-	if extensionType then
-		return self:generateCacheData(directoryPath, fileName, extensionType)
-	end
+	self.addChartStatement:reset():bind(path, name):step()
 end
 
 Cache.clean = function(self, directoryPath)
@@ -96,11 +99,13 @@ Cache.lookup = function(self, directoryPath, recursive)
 	local charts = 0
 	local containers = 0
 	
+	local extensionType
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
-		if love.filesystem.isFile(path) then
+		extensionType = self:getExtensionType(path)
+		if love.filesystem.isFile(path) and extensionType then
 			if not self:rowByPath(path) then
-				if self:processFile(directoryPath, itemName) == 0 then
+				if self:processFile(directoryPath, itemName, extensionType) == 0 then
 					charts = charts + 1
 				else
 					containers = containers + 1
@@ -187,6 +192,10 @@ Cache.extensions = {
 	}
 }
 
+Cache.isNoteChart = function(self, path)
+	return self:getExtensionType(path)
+end
+
 Cache.getExtensionType = function(self, fileName)
 	for _, extensionData in ipairs(self.extensions) do
 		for _, pattern in ipairs(extensionData.patterns) do
@@ -224,7 +233,7 @@ Cache.getNoteChart = function(self, path)
 	return noteChart
 end
 
-Cache.generateCacheData = function(self, directoryPath, fileName, extensionType)
+Cache.processFile = function(self, directoryPath, fileName, extensionType)
 	print("processing file", fileName)
 	
 	if extensionType == "bms" then
