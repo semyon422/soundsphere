@@ -159,6 +159,10 @@ Core.loadEngine = function(self)
 	self.engine.core = self
 	self.engine:activate()
 	
+	self.score = Score:new()
+	self.score.engine = self.engine
+	self.score:activate()
+	
 	if data.playField then
 		self.playField = PlayField:new()
 		self.playField.directoryPath = data.directoryPath
@@ -173,6 +177,7 @@ Core.unloadEngine = function(self)
 	if self.engine then
 		self.fileManager:removePath(self.engine.noteChart.directoryPath)
 		self.engine:deactivate()
+		self.score:deactivate()
 		self.engine = nil
 	end
 	if self.playField then
