@@ -229,76 +229,103 @@ end
 --------------------------------
 -- will*Draw
 --------------------------------
-NoteSkin.willShortNoteDraw = function(self, note)
+NoteSkin.whereWillShortNoteDraw = function(self, note)
 	local shortNoteY = self:getShortNoteY(note)
 	local shortNoteHeight = self:getNoteHeight(note)
 	local shortNoteX = self:getShortNoteX(note)
 	local shortNoteWidth = self:getNoteWidth(note)
 	
-	return
-		(self.allcs:x(self.cs:X(shortNoteX + shortNoteWidth, true), true) > 0) and (self.allcs:x(self.cs:X(shortNoteX, true), true) < 1) and
-		(self.allcs:y(self.cs:Y(shortNoteY + shortNoteHeight, true), true) > 0) and (self.allcs:y(self.cs:Y(shortNoteY, true), true) < 1)
+	local x, y
+	if (self.allcs:x(self.cs:X(shortNoteX + shortNoteWidth, true), true) > 0) and (self.allcs:x(self.cs:X(shortNoteX, true), true) < 1) then
+		x = 0
+	elseif self.allcs:x(self.cs:X(shortNoteX, true), true) >= 1 then
+		x = 1
+	elseif self.allcs:x(self.cs:X(shortNoteX + shortNoteWidth, true), true) <= 0 then
+		x = -1
+	end
+	if (self.allcs:y(self.cs:Y(shortNoteY + shortNoteHeight, true), true) > 0) and (self.allcs:y(self.cs:Y(shortNoteY, true), true) < 1) then
+		y = 0
+	elseif self.allcs:y(self.cs:Y(shortNoteY, true), true) >= 1 then
+		y = 1
+	elseif self.allcs:y(self.cs:Y(shortNoteY + shortNoteHeight, true), true) <= 0 then
+		y = -1
+	end
+	
+	return x, y
+end
+NoteSkin.willShortNoteDraw = function(self, note)
+	local x, y = self:whereWillShortNoteDraw(note)
+	return x == 0 and y == 0
 end
 NoteSkin.willShortNoteDrawBeforeStart = function(self, note)
-	local shortNoteY = self:getShortNoteY(note)
-	local shortNoteX = self:getShortNoteX(note)
+	local x, y = self:whereWillShortNoteDraw(note)
+	local fx = self.noteSkinData[note.startNoteData.inputType].fx[note.startNoteData.inputIndex]
+	local fy = self.noteSkinData[note.startNoteData.inputType].fy[note.startNoteData.inputIndex]
 	
-	return
-		(self.allcs:x(self.cs:X(shortNoteX, true), true) >= 1) or
-		(self.allcs:y(self.cs:Y(shortNoteY, true), true) >= 1)
+	return fx * x < 0 or fy * y < 0
 end
 NoteSkin.willShortNoteDrawAfterEnd = function(self, note)
-	local shortNoteY = self:getShortNoteY(note)
-	local shortNoteHeight = self:getNoteHeight(note)
-	local shortNoteX = self:getShortNoteX(note)
-	local shortNoteWidth = self:getNoteWidth(note)
+	local x, y = self:whereWillShortNoteDraw(note)
+	local fx = self.noteSkinData[note.startNoteData.inputType].fx[note.startNoteData.inputIndex]
+	local fy = self.noteSkinData[note.startNoteData.inputType].fy[note.startNoteData.inputIndex]
 	
-	return
-		(self.allcs:x(self.cs:X(shortNoteX + shortNoteWidth, true), true) <= 0) or
-		(self.allcs:y(self.cs:Y(shortNoteY + shortNoteHeight, true), true) <= 0)
+	return fx * x > 0 or fy * y > 0
 end
 
-NoteSkin.willLongNoteDraw = function(self, note)
-	local longNoteHeadX = self:getLongNoteHeadY(note, "Head")
+NoteSkin.whereWillLongNoteDraw = function(self, note)
+	local longNoteHeadX = self:getLongNoteHeadX(note, "Head")
 	local longNoteHeadY = self:getLongNoteHeadY(note, "Head")
-	local longNoteTailX = self:getLongNoteTailY(note, "Tail")
+	local longNoteTailX = self:getLongNoteTailX(note, "Tail")
 	local longNoteTailY = self:getLongNoteTailY(note, "Tail")
-	local longNoteHeadWidth = self:getNoteHeight(note, "Head")
+	local longNoteHeadWidth = self:getNoteWidth(note, "Head")
 	local longNoteHeadHeight = self:getNoteHeight(note, "Head")
-	local longNoteTailWidth = self:getNoteHeight(note, "Tail")
+	local longNoteTailWidth = self:getNoteWidth(note, "Tail")
 	local longNoteTailHeight = self:getNoteHeight(note, "Tail")
 	
-	local willDraw = {}
+	local x, y
+	if
+		(self.allcs:x(self.cs:X(longNoteHeadX + longNoteHeadWidth, true), true) > 0) and (self.allcs:x(self.cs:X(longNoteHeadX, true), true) < 1) or
+		(self.allcs:x(self.cs:X(longNoteTailX + longNoteTailWidth, true), true) > 0) and (self.allcs:x(self.cs:X(longNoteTailX, true), true) < 1) or
+		self.allcs:x(self.cs:X(longNoteTailX + longNoteTailWidth, true), true) * self.allcs:x(self.cs:X(longNoteHeadX, true), true) < 0
+	then
+		x = 0
+	elseif self.allcs:x(self.cs:X(longNoteTailX, true), true) >= 1 then
+		x = 1
+	elseif self.allcs:x(self.cs:X(longNoteHeadX + longNoteHeadWidth, true), true) <= 0 then
+		x = -1
+	end
 	
-	willDraw.head = 
-		(self.allcs:x(self.cs:X(longNoteHeadX + longNoteHeadWidth, true), true) > 0) and (self.allcs:x(self.cs:X(longNoteHeadX, true), true) < 1) and
-		(self.allcs:y(self.cs:Y(longNoteHeadY + longNoteHeadHeight, true), true) > 0) and (self.allcs:y(self.cs:Y(longNoteTailY, true), true) < 1)
-	willDraw.tail = 
-		(self.allcs:x(self.cs:X(longNoteTailX + longNoteTailWidth, true), true) > 0) and (self.allcs:x(self.cs:X(longNoteTailX, true), true) < 1) and
-		(self.allcs:y(self.cs:Y(longNoteTailY + longNoteTailHeight, true), true) > 0) and (self.allcs:y(self.cs:Y(longNoteTailY, true), true) < 1)
-	willDraw.body = 
-		(self.allcs:x(self.cs:X(longNoteTailX + longNoteTailWidth, true), true) < 0) and (self.allcs:x(self.cs:X(longNoteHeadX, true), true) >= 1) and
-		(self.allcs:y(self.cs:Y(longNoteTailY + longNoteTailHeight, true), true) < 0) and (self.allcs:y(self.cs:Y(longNoteHeadY, true), true) >= 1)
+	if
+		(self.allcs:y(self.cs:Y(longNoteHeadY + longNoteHeadHeight, true), true) > 0) and (self.allcs:y(self.cs:Y(longNoteTailY, true), true) < 1) or
+		(self.allcs:y(self.cs:Y(longNoteTailY + longNoteTailHeight, true), true) > 0) and (self.allcs:y(self.cs:Y(longNoteTailY, true), true) < 1) or
+		self.allcs:y(self.cs:Y(longNoteTailY + longNoteTailHeight, true), true) * self.allcs:y(self.cs:Y(longNoteHeadY, true), true) < 0
+	then
+		y = 0
+	elseif self.allcs:y(self.cs:Y(longNoteTailY, true), true) >= 1 then
+		y = 1
+	elseif self.allcs:y(self.cs:Y(longNoteHeadY + longNoteHeadHeight, true), true) <= 0 then
+		y = -1
+	end
 	
-	return willDraw.head or willDraw.tail or willDraw.body
+	return x, y
+end
+NoteSkin.willLongNoteDraw = function(self, note)
+	local x, y = self:whereWillLongNoteDraw(note)
+	return x == 0 and y == 0
 end
 NoteSkin.willLongNoteDrawBeforeStart = function(self, note)
-	local longNoteTailX = self:getLongNoteTailY(note, "Tail")
-	local longNoteTailY = self:getLongNoteTailY(note, "Tail")
+	local x, y = self:whereWillLongNoteDraw(note)
+	local fx = self.noteSkinData[note.startNoteData.inputType].fx[note.startNoteData.inputIndex]
+	local fy = self.noteSkinData[note.startNoteData.inputType].fy[note.startNoteData.inputIndex]
 	
-	return
-		(self.allcs:x(self.cs:X(longNoteTailX, true), true) >= 1) or
-		(self.allcs:y(self.cs:Y(longNoteTailY, true), true) >= 1)
+	return fx * x < 0 or fy * y < 0
 end
 NoteSkin.willLongNoteDrawAfterEnd = function(self, note)
-	local longNoteHeadX = self:getLongNoteHeadY(note, "Head")
-	local longNoteHeadY = self:getLongNoteHeadY(note, "Head")
-	local longNoteHeadWidth = self:getNoteHeight(note, "Head")
-	local longNoteHeadHeight = self:getNoteHeight(note, "Head")
+	local x, y = self:whereWillLongNoteDraw(note)
+	local fx = self.noteSkinData[note.startNoteData.inputType].fx[note.startNoteData.inputIndex]
+	local fy = self.noteSkinData[note.startNoteData.inputType].fy[note.startNoteData.inputIndex]
 	
-	return
-		(self.allcs:x(self.cs:X(longNoteHeadX + longNoteHeadWidth, true), true) <= 0) or
-		(self.allcs:y(self.cs:Y(longNoteHeadY + longNoteHeadHeight, true), true) <= 0)
+	return fx * x > 0 or fy * y > 0
 end
 
 --------------------------------

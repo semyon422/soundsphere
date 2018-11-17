@@ -108,6 +108,7 @@ end
 NoteDrawer.update = function(self)
 	self:updateCurrentTime()
 	
+	self.globalSpeed = self.currentTimePoint.velocityData.globalSpeed:tonumber()
 	if self.optimisationMode == self.OptimisationModeEnum.UpdateAll then
 		self.layerData:computeVisualTime(self.currentTimePoint)
 		
@@ -119,8 +120,6 @@ NoteDrawer.update = function(self)
 			end
 		end
 	elseif self.optimisationMode == self.OptimisationModeEnum.UpdateVisible then
-		self.globalSpeed = self.currentTimePoint.velocityData.globalSpeed:tonumber()
-		
 		for currentNoteIndex = self.startNoteIndex, 0, -1 do
 			local note = self.noteData[currentNoteIndex - 1]
 			if note then
