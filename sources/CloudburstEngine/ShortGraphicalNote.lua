@@ -13,12 +13,12 @@ ShortGraphicalNote.update = function(self)
 	elseif self.noteDrawer.optimisationMode == self.noteDrawer.OptimisationModeEnum.UpdateVisible then
 		self:computeVisualTime()
 		
-		-- if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
-		if not self:willDraw() and self.index == self.noteDrawer.startNoteIndex then
+		if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
+		-- if not self:willDraw() and self.index == self.noteDrawer.startNoteIndex then
 			self:deactivate()
 			self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
-		-- elseif self:willDrawAfterEnd() and self.index == self.noteDrawer.endNoteIndex then
-		elseif not self:willDraw() and self.index == self.noteDrawer.endNoteIndex then
+		elseif self:willDrawAfterEnd() and self.index == self.noteDrawer.endNoteIndex then
+		-- elseif not self:willDraw() and self.index == self.noteDrawer.endNoteIndex then
 			self:deactivate()
 			self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
 		else

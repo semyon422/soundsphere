@@ -3,7 +3,7 @@ local LongLogicalNote = CloudburstEngine.LongLogicalNote
 
 
 LongLogicalNote.update = function(self)
-	if self.state == "endPassed" or self.state == "endMissed" or self.state == "endMissedPassed" then
+	if self.ended or self.state == "endPassed" or self.state == "endMissed" or self.state == "endMissedPassed" then
 		return
 	end
 	

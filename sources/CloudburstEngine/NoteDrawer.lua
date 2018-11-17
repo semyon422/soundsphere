@@ -18,48 +18,50 @@ NoteDrawer.loadNoteData = function(self)
 	for noteDataIndex = 1, self.layerData:getNoteDataCount() do
 		local noteData = self.layerData:getNoteData(noteDataIndex)
 		
-		local graphicalNote
-		if noteData.noteType == "ShortNote" then
-			graphicalNote = self.engine.ShortGraphicalNote:new({
-				startNoteData = noteData,
-				inputModeString = inputModeString,
-				noteType = "ShortNote"
-			})
-			
-			if self.engine.noteSkin:checkNote(graphicalNote) then
+		if noteData.inputType == self.inputType and noteData.inputIndex == self.inputIndex then
+			local graphicalNote
+			if noteData.noteType == "ShortNote" then
+				graphicalNote = self.engine.ShortGraphicalNote:new({
+					startNoteData = noteData,
+					inputModeString = inputModeString,
+					noteType = "ShortNote"
+				})
+				
+				if self.engine.noteSkin:checkNote(graphicalNote) then
+					table.insert(self.noteData, graphicalNote)
+				end
+			elseif noteData.noteType == "LongNoteStart" then
+				graphicalNote = self.engine.LongGraphicalNote:new({
+					startNoteData = noteData,
+					inputModeString = inputModeString,
+					noteType = "LongNote"
+				})
+				currentGraphicalNotes[noteData.inputType] = currentGraphicalNotes[noteData.inputType] or {}
+				currentGraphicalNotes[noteData.inputType][noteData.inputIndex] = graphicalNote
+				
+				if self.engine.noteSkin:checkNote(graphicalNote, "Head") and
+					self.engine.noteSkin:checkNote(graphicalNote, "Tail") and
+					self.engine.noteSkin:checkNote(graphicalNote, "Body")
+				then
+					table.insert(self.noteData, graphicalNote)
+				end
+			elseif noteData.noteType == "LongNoteEnd" then
+				if currentGraphicalNotes[noteData.inputType] and currentGraphicalNotes[noteData.inputType][noteData.inputIndex] then
+					graphicalNote = currentGraphicalNotes[noteData.inputType][noteData.inputIndex]
+					graphicalNote.endNoteData = noteData
+				end
+				currentGraphicalNotes[noteData.inputType][noteData.inputIndex] = nil
+			elseif noteData.noteType == "SoundNote" then
+				graphicalNote = self.engine.ShortGraphicalNote:new({
+					startNoteData = noteData,
+					noteType = "ShortNote"
+				})
 				table.insert(self.noteData, graphicalNote)
 			end
-		elseif noteData.noteType == "LongNoteStart" then
-			graphicalNote = self.engine.LongGraphicalNote:new({
-				startNoteData = noteData,
-				inputModeString = inputModeString,
-				noteType = "LongNote"
-			})
-			currentGraphicalNotes[noteData.inputType] = currentGraphicalNotes[noteData.inputType] or {}
-			currentGraphicalNotes[noteData.inputType][noteData.inputIndex] = graphicalNote
-			
-			if self.engine.noteSkin:checkNote(graphicalNote, "Head") and
-				self.engine.noteSkin:checkNote(graphicalNote, "Tail") and
-				self.engine.noteSkin:checkNote(graphicalNote, "Body")
-			then
-				table.insert(self.noteData, graphicalNote)
+			if graphicalNote then
+				graphicalNote.noteDrawer = self
+				graphicalNote.engine = self.engine
 			end
-		elseif noteData.noteType == "LongNoteEnd" then
-			if currentGraphicalNotes[noteData.inputType] and currentGraphicalNotes[noteData.inputType][noteData.inputIndex] then
-				graphicalNote = currentGraphicalNotes[noteData.inputType][noteData.inputIndex]
-				graphicalNote.endNoteData = noteData
-			end
-			currentGraphicalNotes[noteData.inputType][noteData.inputIndex] = nil
-		elseif noteData.noteType == "SoundNote" then
-			graphicalNote = self.engine.ShortGraphicalNote:new({
-				startNoteData = noteData,
-				noteType = "ShortNote"
-			})
-			table.insert(self.noteData, graphicalNote)
-		end
-		if graphicalNote then
-			graphicalNote.noteDrawer = self
-			graphicalNote.engine = self.engine
 		end
 	end
 	

@@ -8,6 +8,8 @@ LogicalNote.next = function(self)
 	if nextNote then
 		self.noteHandler.currentNote = nextNote
 		self.noteHandler.currentNote:update()
+	else
+		self.ended = true
 	end
 end
 

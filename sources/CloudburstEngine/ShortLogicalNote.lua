@@ -2,7 +2,7 @@ CloudburstEngine.ShortLogicalNote = createClass(CloudburstEngine.LogicalNote)
 local ShortLogicalNote = CloudburstEngine.ShortLogicalNote
 
 ShortLogicalNote.update = function(self)
-	if self.state == "passed" then
+	if self.ended or self.state == "passed" then
 		return
 	end
 	

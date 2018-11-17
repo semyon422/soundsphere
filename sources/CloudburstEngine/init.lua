@@ -144,13 +144,13 @@ end
 CloudburstEngine.loadNoteHandlers = function(self)
 	self.noteHandlers = {}
 	for inputType, inputIndex in self.noteChart:getInputIteraator() do
-		local noteHandlerIndex = {inputType, inputIndex}
-		self.noteHandlers[noteHandlerIndex] = self.NoteHandler:new({
+		local noteHandler = self.NoteHandler:new({
 			inputType = inputType,
 			inputIndex = inputIndex,
 			engine = self
 		})
-		self.noteHandlers[noteHandlerIndex]:activate()
+		self.noteHandlers[noteHandler] = noteHandler
+		self.noteHandlers[noteHandler]:activate()
 	end
 end
 
@@ -166,25 +166,29 @@ CloudburstEngine.loadNoteDrawers = function(self)
 	
 	for layerIndex in self.noteChart:getLayerDataIndexIterator() do
 		local layerData = self.noteChart:requireLayerData(layerIndex)
-		
 		if not layerData.invisible then
-			self.noteDrawers[layerIndex] = self.NoteDrawer:new({
-				layerIndex = layerIndex,
-				engine = self
-			})
-			self.noteDrawers[layerIndex]:load()
+			for inputType, inputIndex in self.noteChart:getInputIteraator() do
+				local noteDrawer = self.NoteDrawer:new({
+					layerIndex = layerIndex,
+					inputType = inputType,
+					inputIndex = inputIndex,
+					engine = self
+				})
+				self.noteDrawers[noteDrawer] = noteDrawer
+				self.noteDrawers[noteDrawer]:load()
+			end
 		end
 	end
 end
 
 CloudburstEngine.updateNoteDrawers = function(self)
-	for layerIndex, noteDrawer in pairs(self.noteDrawers) do
+	for _, noteDrawer in pairs(self.noteDrawers) do
 		noteDrawer:update()
 	end
 end
 
 CloudburstEngine.unloadNoteDrawers = function(self)
-	for layerIndex, noteDrawer in pairs(self.noteDrawers) do
+	for _, noteDrawer in pairs(self.noteDrawers) do
 		noteDrawer:unload()
 	end
 	self.noteDrawers = nil
