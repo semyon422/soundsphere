@@ -16,3 +16,10 @@ GraphicalNote.updateColour = function(self, currentColour, newColour)
 		end
 	end
 end
+
+GraphicalNote.updateNext = function(self, index)
+	local nextNote = self.noteDrawer.noteData[index]
+	if nextNote and nextNote.activated then
+		nextNote:update()
+	end
+end

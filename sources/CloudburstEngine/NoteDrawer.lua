@@ -154,16 +154,13 @@ NoteDrawer.update = function(self)
 			end
 		end
 		
-		local c = 0
 		for _, note in pairs(self.drawingNotes) do
 			if note.activated then
 				note:update()
-				c = c + 1
 			else
 				self.drawingNotes[note] = nil
 			end
 		end
-		print(c)
 	end
 end
 

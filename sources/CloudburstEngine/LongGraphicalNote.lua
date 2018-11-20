@@ -24,10 +24,12 @@ LongGraphicalNote.update = function(self)
 		
 		if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
 			self:deactivate()
+			self:updateNext(self.noteDrawer.startNoteIndex)
 			self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
 		elseif self:willDrawAfterEnd() and self.index == self.noteDrawer.endNoteIndex then
 			self:deactivate()
 			self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
+			self:updateNext(self.noteDrawer.endNoteIndex)
 		else
 			self.headDrawable.x = self:getHeadX()
 			self.tailDrawable.x = self:getTailX()
