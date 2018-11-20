@@ -14,13 +14,23 @@ ShortGraphicalNote.update = function(self)
 		self:computeVisualTime()
 		
 		if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
-		-- if not self:willDraw() and self.index == self.noteDrawer.startNoteIndex then
 			self:deactivate()
 			self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
+			if
+				self.noteDrawer.noteData[self.noteDrawer.startNoteIndex] and
+				self.noteDrawer.noteData[self.noteDrawer.startNoteIndex].activated
+			then
+				self.noteDrawer.noteData[self.noteDrawer.startNoteIndex]:update()
+			end
 		elseif self:willDrawAfterEnd() and self.index == self.noteDrawer.endNoteIndex then
-		-- elseif not self:willDraw() and self.index == self.noteDrawer.endNoteIndex then
 			self:deactivate()
 			self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
+			if
+				self.noteDrawer.noteData[self.noteDrawer.endNoteIndex] and
+				self.noteDrawer.noteData[self.noteDrawer.endNoteIndex].activated
+			then
+				self.noteDrawer.noteData[self.noteDrawer.endNoteIndex]:update()
+			end
 		else
 			self.drawable.y = self:getY()
 			self.drawable.x = self:getX()

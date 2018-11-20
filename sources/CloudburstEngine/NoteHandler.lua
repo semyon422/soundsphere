@@ -41,7 +41,7 @@ NoteHandler.loadNoteData = function(self)
 						logicalNote.releaseSoundFilePath = soundFilePath
 					end
 					currentLogicalNote = 0
-				elseif noteData.noteType == "SoundNote" then
+				elseif noteData.noteType == "SoundNote" or noteData.noteType == "FakeNote" then
 					logicalNote = self.engine.SoundNote:new({
 						startNoteData = noteData,
 						pressSoundFilePath = soundFilePath

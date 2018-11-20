@@ -7,6 +7,7 @@ require("CloudburstEngine.LogicalNote")
 require("CloudburstEngine.ShortLogicalNote")
 require("CloudburstEngine.LongLogicalNote")
 require("CloudburstEngine.SoundNote")
+require("CloudburstEngine.FakeNote")
 
 require("CloudburstEngine.GraphicalNote")
 require("CloudburstEngine.ShortGraphicalNote")
