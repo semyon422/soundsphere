@@ -56,7 +56,10 @@ NoteDrawer.loadNoteData = function(self)
 					startNoteData = noteData,
 					noteType = "ShortNote"
 				})
-				table.insert(self.noteData, graphicalNote)
+				
+				if self.engine.noteSkin:checkNote(graphicalNote) then
+					table.insert(self.noteData, graphicalNote)
+				end
 			end
 			if graphicalNote then
 				graphicalNote.noteDrawer = self

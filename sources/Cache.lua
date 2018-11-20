@@ -322,13 +322,10 @@ Cache.generateJNCCacheData = function(self, directoryPath, fileName)
 	local artist = "<artist>"
 	
 	local path = ("%s/%s"):format(directoryPath, fileName)
-	local file = love.filesystem.newFile(path)
-	file:open("r")
-	local jsonData = json.decode(file:read(file:getSize()))
-	file:close()
+	local noteChart = self:getNoteChart(path)
 	
-	title = jsonData.metaData.title
-	artist = jsonData.metaData.artist
+	title = noteChart:hashGet("title")
+	artist = noteChart:hashGet("artist")
 	
 	local name = ("%s - %s"):format(artist, title)
 	self:addChart(path, name)
