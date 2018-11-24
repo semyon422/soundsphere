@@ -64,6 +64,7 @@ NoteDrawer.loadNoteData = function(self)
 			if graphicalNote then
 				graphicalNote.noteDrawer = self
 				graphicalNote.engine = self.engine
+				graphicalNote:updateLogicalNote()
 			end
 		end
 	end

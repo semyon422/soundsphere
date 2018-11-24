@@ -26,8 +26,6 @@ CloudburstEngine.load = function(self)
 	self.sharedLogicalNoteData = {}
 	self.soundFiles = {}
 	
-	self.observable = Observable:new()
-	
 	self:loadNoteHandlers()
 	if self.noteSkin then
 		self:loadNoteDrawers()

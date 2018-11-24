@@ -59,11 +59,11 @@ LongGraphicalNote.computeVisualTime = function(self)
 end
 
 LongGraphicalNote.getFakeVisualStartTime = function(self)
-	local fakeStartTime = self:getLogicalNote():getFakeStartTime()
-	local fakeVelocityData = self:getLogicalNote():getFakeVelocityData()
+	local fakeStartTime = self.logicalNote:getFakeStartTime()
+	local fakeVelocityData = self.logicalNote:getFakeVelocityData()
 	if fakeVelocityData == "current" then
 		fakeVelocityData = self.noteDrawer.currentVelocityData
-		self:getLogicalNote().fakeVelocityData = fakeVelocityData
+		self.logicalNote.fakeVelocityData = fakeVelocityData
 	end
 	
 	local fakeVisualClearStartTime

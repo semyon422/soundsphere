@@ -332,17 +332,17 @@ end
 -- get*Colour
 --------------------------------
 NoteSkin.getShortNoteColour = function(self, note)
-	if note:getLogicalNote().state == "clear" then
+	if note.logicalNote.state == "clear" or note.logicalNote.state == "skipped" then
 		return {255, 255, 255, 255}
-	elseif note:getLogicalNote().state == "missed" then
+	elseif note.logicalNote.state == "missed" then
 		return {127, 127, 127, 255}
-	elseif note:getLogicalNote().state == "passed" then
+	elseif note.logicalNote.state == "passed" then
 		return {255, 255, 255, 0}
 	end
 end
 
 NoteSkin.getLongNoteColour = function(self, note)
-	local logicalNote = note:getLogicalNote()
+	local logicalNote = note.logicalNote
 	
 	if logicalNote.fakeStartTime and logicalNote.fakeStartTime >= note.endNoteData.timePoint:getAbsoluteTime() then
 		return {255, 255, 255, 0}

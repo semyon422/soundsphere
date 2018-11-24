@@ -2,10 +2,10 @@ CloudburstEngine.FakeNote = createClass(CloudburstEngine.LogicalNote)
 local FakeNote = CloudburstEngine.FakeNote
 
 FakeNote.update = function(self)
-	if self.state == "passed" then
+	if self.state == "skipped" then
 		return
 	end
 	
-	self.state = "passed"
+	self.state = "skipped"
 	self:next()
 end

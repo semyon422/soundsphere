@@ -5,8 +5,8 @@ GraphicalNote.getCS = function(self)
 	return self.engine.noteSkin:getCS(self)
 end
 
-GraphicalNote.getLogicalNote = function(self)
-	return self.engine.sharedLogicalNoteData[self.startNoteData]
+GraphicalNote.updateLogicalNote = function(self)
+	self.logicalNote = self.engine.sharedLogicalNoteData[self.startNoteData]
 end
 
 GraphicalNote.updateColour = function(self, currentColour, newColour)
