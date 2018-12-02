@@ -170,7 +170,7 @@ NoteSkin.getLongNoteBodyX = function(self, note, suffix)
 	local lnox = self.data[note.inputPointer].lnox
 	local fx = self.data[note.inputPointer].fx
 	local dt
-	if fy <= 0 then
+	if fx <= 0 then
 		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
 	else
 		dt = (note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime
