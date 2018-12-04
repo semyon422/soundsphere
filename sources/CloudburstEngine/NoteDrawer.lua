@@ -51,10 +51,10 @@ NoteDrawer.loadNoteData = function(self)
 					graphicalNote.endNoteData = noteData
 				end
 				currentGraphicalNotes[noteData.inputType][noteData.inputIndex] = nil
-			elseif noteData.noteType == "SoundNote" or noteData.noteType == "FakeNote" then
+			elseif noteData.noteType == "SoundNote" then
 				graphicalNote = self.engine.ShortGraphicalNote:new({
 					startNoteData = noteData,
-					noteType = "ShortNote"
+					noteType = "SoundNote"
 				})
 				
 				if self.engine.noteSkin:checkNote(graphicalNote) then
