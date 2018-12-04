@@ -2,16 +2,18 @@ CloudburstEngine.SoundNote = createClass(CloudburstEngine.LogicalNote)
 local SoundNote = CloudburstEngine.SoundNote
 
 SoundNote.update = function(self)
-	if self.state == "passed" then
+	if self.state ~= "clear" then
 		return
 	end
 	
-	if self.startNoteData.timePoint:getAbsoluteTime() <= self.engine.currentTime then
+	if
+		not self.pressSoundFilePath or
+		self.startNoteData.timePoint:getAbsoluteTime() <= self.engine.currentTime
+	then
 		if self.pressSoundFilePath then
-			self.engine.core.audioManager:playSound(self.pressSoundFilePath, "engine")
+			self.engine.core.audioManager:playSound(self.pressSoundFilePath)
 		end
-		
-		self.state = "passed"
+		self.state = "skipped"
 		self:next()
 	end
 end

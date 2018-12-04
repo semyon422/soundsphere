@@ -47,11 +47,6 @@ NoteHandler.loadNoteData = function(self)
 						pressSoundFilePath = soundFilePath
 					})
 					table.insert(self.noteData, logicalNote)
-				elseif noteData.noteType == "FakeNote" then
-					logicalNote = self.engine.FakeNote:new({
-						startNoteData = noteData
-					})
-					table.insert(self.noteData, logicalNote)
 				end
 				
 				if logicalNote then
@@ -78,7 +73,7 @@ end
 
 NoteHandler.setKeyState = function(self)
 	self.keyBind = tostring(self.engine.inputMode:getInput(self.inputType, self.inputIndex))
-	self.keyState = love.keyboard.isDown(self.keyBind)
+	self.keyState = love.keyboard.isDown(self.keyBind or "")
 end
 
 NoteHandler.receiveEvent = function(self, event)
@@ -117,9 +112,7 @@ end
 
 NoteHandler.load = function(self)
 	self:loadNoteData()
-	if self.inputType ~= "auto" then
-		self:setKeyState()
-	end
+	self:setKeyState()
 end
 
 NoteHandler.unload = function(self)
