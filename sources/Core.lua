@@ -11,6 +11,7 @@ Core.load = function(self)
 	self:loadKeyBindManager()
 	self:loadBackgroundManager()
 	self:loadMapList()
+	self:loadNotificationLine()
 	self:loadFileManager()
 	self:loadStateManager()
 	self:loadCLI()
@@ -29,6 +30,8 @@ Core.receiveEvent = function(self, event)
 		event.callback(self.cache.db)
 	elseif event.name == "updateCache" then
 		self.cache:update(event.path, event.recursive, event.callback)
+	elseif event.name == "notify" then
+		self.notificationLine:setText(event.text)
 	end
 end
 
@@ -88,6 +91,12 @@ end
 Core.loadMapList = function(self)
 	self.mapList = MapList:new()
 	self.observer:subscribe(self.mapList.observable)
+end
+
+Core.loadNotificationLine = function(self)
+	self.notificationLine = NotificationLine:new()
+	self.observer:subscribe(self.notificationLine.observable)
+	self.notificationLine:activate()
 end
 
 Core.loadFileManager = function(self)
@@ -157,6 +166,7 @@ Core.loadEngine = function(self)
 	self.engine.noteSkin = noteSkin
 	self.engine.fileManager = self.fileManager
 	self.engine.core = self
+	self.observer:subscribe(self.engine.observable)
 	self.engine:activate()
 	
 	self.score = Score:new()

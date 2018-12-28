@@ -78,7 +78,11 @@ CloudburstEngine.receiveEvent = function(self, event)
 	elseif event.name == "ChunkDataLoaded" and self.loadingResources[event.filePath] then
 		self.loadingResources[event.filePath] = nil
 		self.resourceCountLoaded = self.resourceCountLoaded + 1
-		print(self.resourceCountLoaded .. "/" .. self.resourceCount)
+		
+		self:sendEvent({
+			name = "notify",
+			text = self.resourceCountLoaded .. "/" .. self.resourceCount
+		})
 	end
 end
 

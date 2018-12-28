@@ -15,5 +15,6 @@ require("NoteSkinManager")
 require("CLI")
 require("Editor")
 require("Score")
+require("NotificationLine")
 
 core = Core:new():activate()
