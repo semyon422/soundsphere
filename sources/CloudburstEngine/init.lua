@@ -20,7 +20,7 @@ CloudburstEngine.focus = "CloudburstEngine"
 
 CloudburstEngine.load = function(self)
 	soul.focus[self.focus] = true
-	self.inputMode = self.core.inputModeLoader:getInputMode(self.noteChart.inputMode) or self.noteChart.inputMode
+	self.inputMode = self.noteChart.inputMode
 	
 	self.sharedLogicalNoteData = {}
 	self.soundFiles = {}

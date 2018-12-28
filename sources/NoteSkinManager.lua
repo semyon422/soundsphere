@@ -35,8 +35,8 @@ NoteSkinManager.processNoteSkin = function(self, noteSkin)
 	data.noteSkin = noteSkin
 	
 	data.inputMode = ncdk.InputMode:new()
-	for inputType, maxInputIndex in pairs(noteSkin.inputMode) do
-		data.inputMode:setInput(inputType, maxInputIndex, true)
+	for inputType, inputCount in pairs(noteSkin.inputMode) do
+		data.inputMode:setInputCount(inputType, inputCount)
 	end
 	
 	if noteSkin.playfield then

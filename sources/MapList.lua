@@ -17,8 +17,6 @@ MapList.textAlign = {
 	x = "left", y = "center"
 }
 MapList.buttonCount = 17
-MapList.upScrollKey = "up"
-MapList.downScrollKey = "down"
 MapList.fontType = "sans-regular"
 MapList.fontSize = 20
 
@@ -235,10 +233,10 @@ MapList.receiveEvent = function(self, event)
 		local direction = event.data[2]
 		self:scrollBy(-direction)
 	elseif soul.focus[self.focus] and event.name == "love.keypressed" then
-		local key = event.data[2]
-		if key == self.upScrollKey then
+		local key = event.data[1]
+		if key == "maplist:scrollUp" then
 			self:scrollBy(-1)
-		elseif key == self.downScrollKey then
+		elseif key == "maplist:scrollDown" then
 			self:scrollBy(1)
 		elseif key == "return" then
 			for button in pairs(self.buttons) do

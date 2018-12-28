@@ -6,9 +6,8 @@ Core.load = function(self)
 	self:loadAudioManager()
 	self:loadFontManager()
 	self:loadNoteSkinManager()
-	self:loadInputModeLoader()
+	self:loadInputManager()
 	self:loadCache()
-	self:loadKeyBindManager()
 	self:loadBackgroundManager()
 	self:loadMapList()
 	self:loadNotificationLine()
@@ -60,9 +59,9 @@ Core.loadFontManager = function(self)
 	self.fontManager = FontManager:new()
 end
 
-Core.loadInputModeLoader = function(self)
-	self.inputModeLoader = InputModeLoader:new()
-	self.inputModeLoader:load("userdata/input.json")
+Core.loadInputManager = function(self)
+	self.inputManager = InputManager:new()
+	self.inputManager:activate()
 end
 
 Core.loadNoteSkinManager = function(self)
@@ -72,14 +71,6 @@ end
 
 Core.loadCache = function(self)
 	self.cache = Cache:new()
-end
-
-Core.loadKeyBindManager = function(self)
-	self.keyBindManager = KeyBindManager:new()
-	self.keyBindManager:activate()
-	self.keyBindManager:setBinding("`", function()
-		self.cli:switch()
-	end, nil, true)
 end
 
 Core.loadBackgroundManager = function(self)

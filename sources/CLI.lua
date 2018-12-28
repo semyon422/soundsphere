@@ -91,6 +91,8 @@ CLI.receiveEvent = function(self, event)
 	elseif soul.focus[self.focus] and event.name == "love.textinput" and event.data[1] ~= "`" then
 		self.currentLineOffset = self.currentLineOffset + 1
 		table.insert(self.currentLine, self.currentLineOffset, event.data[1])
+	elseif event.name == "love.keypressed" and event.data[1] == "`" then
+		self:switch()
 	elseif soul.focus[self.focus] and event.name == "love.keypressed" then
 		if event.data[1] == "backspace" then
 			if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then

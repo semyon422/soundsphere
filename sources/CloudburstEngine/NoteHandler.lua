@@ -72,8 +72,8 @@ NoteHandler.loadNoteData = function(self)
 end
 
 NoteHandler.setKeyState = function(self)
-	self.keyBind = tostring(self.engine.inputMode:getInput(self.inputType, self.inputIndex))
-	self.keyState = love.keyboard.isDown(self.keyBind or "")
+	self.keyBind = self.engine.inputMode:getString() .. ":" .. self.inputType .. self.inputIndex
+	self.keyState = love.keyboard.isDown(self.keyBind)
 end
 
 NoteHandler.receiveEvent = function(self, event)
