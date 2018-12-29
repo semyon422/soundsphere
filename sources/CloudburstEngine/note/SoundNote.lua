@@ -2,7 +2,7 @@ CloudburstEngine.SoundNote = createClass(CloudburstEngine.LogicalNote)
 local SoundNote = CloudburstEngine.SoundNote
 
 SoundNote.update = function(self)
-	if self.state ~= "clear" then
+	if self.ended or self.state ~= "clear" then
 		return
 	end
 	

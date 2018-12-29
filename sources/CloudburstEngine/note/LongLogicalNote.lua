@@ -13,6 +13,29 @@ LongLogicalNote.update = function(self)
 	local startTimeState = self.engine:getTimeState(deltaStartTime)
 	local endTimeState = self.engine:getTimeState(deltaEndTime)
 	
+	if self.engine.autoplay then
+		if deltaStartTime < 0 and not self.keyState then
+			if self.pressSoundFilePath then
+				self.engine.core.audioManager:playSound(self.pressSoundFilePath)
+			end
+			deltaStartTime = 0
+			endTimeState = "early"
+			self.keyState = true
+			self.state = "startPassedPressed"
+			self:sendState()
+		elseif deltaEndTime < 0 and self.keyState then
+			if self.releaseSoundFilePath then
+				self.engine.core.audioManager:playSound(self.releaseSoundFilePath)
+			end
+			deltaEndTime = 0
+			endTimeState = "exactly"
+			self.keyState = false
+			self.state = "endPassed"
+			self:sendState()
+			self:next()
+		end
+	end
+	
 	self.oldState = self.state
 	if self.keyState and timeState == "none" then
 		self.keyState = false

@@ -9,6 +9,7 @@ require("CloudburstEngine.NoteSkin")
 require("CloudburstEngine.TimeManager")
 
 CloudburstEngine.focus = "CloudburstEngine"
+CloudburstEngine.autoplay = false
 
 CloudburstEngine.load = function(self)
 	soul.focus[self.focus] = true
@@ -62,6 +63,13 @@ CloudburstEngine.receiveEvent = function(self, event)
 			end
 		elseif key == "f4" then
 			CloudburstEngine.NoteSkin.speed = CloudburstEngine.NoteSkin.speed + 0.1
+		elseif key == "f8" then
+			self.autoplay = not self.autoplay
+		
+			self:sendEvent({
+				name = "notify",
+				text = "autoplay: " .. (self.autoplay and "on" or "off")
+			})
 		elseif key == "escape" then
 			self.core.stateManager:switchState("selectionScreen")
 		end
