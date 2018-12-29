@@ -135,7 +135,7 @@ end
 --------------------------------
 -- get*X get*Y
 --------------------------------
-NoteSkin.getShortNoteX = function(self, note, suffix)
+NoteSkin.getShortNoteX = function(self, note)
 	local x = self.data[note.inputPointer].x
 	local ox = self.data[note.inputPointer].ox
 	local fx = self.data[note.inputPointer].fx
@@ -180,6 +180,20 @@ NoteSkin.getLongNoteBodyX = function(self, note, suffix)
 		x
 		+ fx * self.speed * dt
 		+ lnox * self:getNoteWidth(note, "Tail")
+end
+NoteSkin.getLineNoteX = function(self, note)
+	local x = self.data[note.inputPointer].x
+	local fx = self.data[note.inputPointer].fx
+	local dt
+	if fx <= 0 then
+		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
+	else
+		dt = note.startNoteData.currentVisualTime - note.engine.currentTime
+	end
+	
+	return
+		x
+		+ fx * self.speed * dt
 end
 
 NoteSkin.getShortNoteY = function(self, note, suffix)
@@ -228,6 +242,20 @@ NoteSkin.getLongNoteBodyY = function(self, note, suffix)
 		+ fy * self.speed * dt
 		+ lnoy * self:getNoteHeight(note, "Tail")
 end
+NoteSkin.getLineNoteY = function(self, note)
+	local y = self.data[note.inputPointer].y
+	local fy = self.data[note.inputPointer].fy
+	local dt
+	if fy <= 0 then
+		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
+	else
+		dt = note.startNoteData.currentVisualTime - note.engine.currentTime
+	end
+	
+	return
+		y
+		+ fy * self.speed * dt
+end
 
 --------------------------------
 -- get*Width get*Height
@@ -236,8 +264,30 @@ NoteSkin.getNoteWidth = function(self, note)
 	return self.data[note.inputPointer].w
 end
 
-NoteSkin.getNoteHeight = function(self, note, suffix)
+NoteSkin.getNoteHeight = function(self, note)
 	return self.data[note.inputPointer].h
+end
+
+--------------------------------
+-- getLineNoteScaledWidth getLineNoteScaledHeight
+--------------------------------
+
+NoteSkin.getLineNoteScaledWidth = function(self, note)
+	local x = self.data[note.inputPointer].x
+	local lnw = self.data[note.inputPointer].lnw
+	local fx = self.data[note.inputPointer].fx
+	local dt = note.startNoteData.currentVisualTime - note.endNoteData.currentVisualTime
+	
+	return math.max(math.abs(fx * self.speed * dt + lnw), self:getCS():x(1))
+end
+
+NoteSkin.getLineNoteScaledHeight = function(self, note)
+	local y = self.data[note.inputPointer].y
+	local lnh = self.data[note.inputPointer].lnh
+	local fy = self.data[note.inputPointer].fy
+	local dt = note.startNoteData.currentVisualTime - note.endNoteData.currentVisualTime
+	
+	return math.max(math.abs(fy * self.speed * dt + lnh), self:getCS():y(1))
 end
 
 --------------------------------
@@ -363,6 +413,55 @@ NoteSkin.willLongNoteDrawBeforeStart = function(self, note)
 end
 NoteSkin.willLongNoteDrawAfterEnd = function(self, note)
 	local x, y = self:whereWillLongNoteDraw(note)
+	local fx = self.data[note.inputPointer].fx
+	local fy = self.data[note.inputPointer].fy
+	
+	return fx * x > 0 or fy * y > 0
+end
+
+
+NoteSkin.whereWillLineNoteDraw = function(self, note)
+	local notex = self:getLineNoteX(note)
+	local notey = self:getLineNoteY(note)
+	local width = self:getLineNoteScaledWidth(note)
+	local height = self:getLineNoteScaledHeight(note)
+	
+	local x, y
+	if
+		(self.allcs:x(self.cs:X(notex + width, true), true) > 0) and (self.allcs:x(self.cs:X(notex, true), true) < 1)
+	then
+		x = 0
+	elseif self.allcs:x(self.cs:X(notex, true), true) >= 1 then
+		x = 1
+	elseif self.allcs:x(self.cs:X(notex + width, true), true) <= 0 then
+		x = -1
+	end
+	
+	if
+		(self.allcs:y(self.cs:Y(notey + height, true), true) > 0) and (self.allcs:y(self.cs:Y(notey, true), true) < 1)
+	then
+		y = 0
+	elseif self.allcs:y(self.cs:Y(notey, true), true) >= 1 then
+		y = 1
+	elseif self.allcs:y(self.cs:Y(notey + height, true), true) <= 0 then
+		y = -1
+	end
+	
+	return x, y
+end
+NoteSkin.willLineNoteDraw = function(self, note)
+	local x, y = self:whereWillLineNoteDraw(note)
+	return x == 0 and y == 0
+end
+NoteSkin.willLineNoteDrawBeforeStart = function(self, note)
+	local x, y = self:whereWillLineNoteDraw(note)
+	local fx = self.data[note.inputPointer].fx
+	local fy = self.data[note.inputPointer].fy
+	
+	return fx * x < 0 or fy * y < 0
+end
+NoteSkin.willLineNoteDrawAfterEnd = function(self, note)
+	local x, y = self:whereWillLineNoteDraw(note)
 	local fx = self.data[note.inputPointer].fx
 	local fy = self.data[note.inputPointer].fy
 	

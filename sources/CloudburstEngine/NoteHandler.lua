@@ -4,7 +4,6 @@ local NoteHandler = CloudburstEngine.NoteHandler
 NoteHandler.loadNoteData = function(self)
 	self.noteData = {}
 	
-	local currentLogicalNote
 	for layerDataIndex in self.engine.noteChart:getLayerDataIndexIterator() do
 		local layerData = self.engine.noteChart:requireLayerData(layerDataIndex)
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
@@ -26,32 +25,29 @@ NoteHandler.loadNoteData = function(self)
 						startNoteData = noteData,
 						pressSoundFilePath = soundFilePath
 					})
-					table.insert(self.noteData, logicalNote)
 				elseif noteData.noteType == "LongNoteStart" then
 					logicalNote = self.engine.LongLogicalNote:new({
 						startNoteData = noteData,
+						endNoteData = noteData.endNoteData,
 						pressSoundFilePath = soundFilePath
 					})
-					currentLogicalNote = logicalNote
-					table.insert(self.noteData, logicalNote)
-				elseif noteData.noteType == "LongNoteEnd" then
-					if currentLogicalNote then
-						logicalNote = currentLogicalNote
-						logicalNote.endNoteData = noteData
-						logicalNote.releaseSoundFilePath = soundFilePath
-					end
-					currentLogicalNote = 0
+				elseif noteData.noteType == "LineNoteStart" then
+					logicalNote = self.engine.SoundNote:new({
+						startNoteData = noteData,
+						endNoteData = noteData.endNoteData,
+						pressSoundFilePath = soundFilePath
+					})
 				elseif noteData.noteType == "SoundNote" then
 					logicalNote = self.engine.SoundNote:new({
 						startNoteData = noteData,
 						pressSoundFilePath = soundFilePath
 					})
-					table.insert(self.noteData, logicalNote)
 				end
 				
 				if logicalNote then
 					logicalNote.noteHandler = self
 					logicalNote.engine = self.engine
+					table.insert(self.noteData, logicalNote)
 					
 					self.engine.sharedLogicalNoteData[noteData] = logicalNote
 				end

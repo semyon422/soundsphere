@@ -3,15 +3,7 @@ CloudburstEngine = createClass(soul.SoulObject)
 require("CloudburstEngine.NoteHandler")
 require("CloudburstEngine.NoteDrawer")
 
-require("CloudburstEngine.LogicalNote")
-require("CloudburstEngine.ShortLogicalNote")
-require("CloudburstEngine.LongLogicalNote")
-require("CloudburstEngine.SoundNote")
-
-require("CloudburstEngine.GraphicalNote")
-require("CloudburstEngine.ShortGraphicalNote")
-require("CloudburstEngine.LongGraphicalNote")
-require("CloudburstEngine.MeasureLine")
+require("CloudburstEngine.note")
 
 require("CloudburstEngine.NoteSkin")
 require("CloudburstEngine.TimeManager")

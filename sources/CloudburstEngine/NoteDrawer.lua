@@ -14,7 +14,6 @@ NoteDrawer.loadNoteData = function(self)
 	self.layerData = self.engine.noteChart:requireLayerData(self.layerIndex)
 	local inputModeString = self.layerData.layerDataSequence.noteChart.inputMode:getString()
 	
-	local currentGraphicalNotes = {}
 	for noteDataIndex = 1, self.layerData:getNoteDataCount() do
 		local noteData = self.layerData:getNoteData(noteDataIndex)
 		
@@ -33,11 +32,10 @@ NoteDrawer.loadNoteData = function(self)
 			elseif noteData.noteType == "LongNoteStart" then
 				graphicalNote = self.engine.LongGraphicalNote:new({
 					startNoteData = noteData,
+					endNoteData = noteData.endNoteData,
 					inputModeString = inputModeString,
 					noteType = "LongNote"
 				})
-				currentGraphicalNotes[noteData.inputType] = currentGraphicalNotes[noteData.inputType] or {}
-				currentGraphicalNotes[noteData.inputType][noteData.inputIndex] = graphicalNote
 				
 				if self.engine.noteSkin:checkNote(graphicalNote, "Head") and
 					self.engine.noteSkin:checkNote(graphicalNote, "Tail") and
@@ -45,12 +43,15 @@ NoteDrawer.loadNoteData = function(self)
 				then
 					table.insert(self.noteData, graphicalNote)
 				end
-			elseif noteData.noteType == "LongNoteEnd" then
-				if currentGraphicalNotes[noteData.inputType] and currentGraphicalNotes[noteData.inputType][noteData.inputIndex] then
-					graphicalNote = currentGraphicalNotes[noteData.inputType][noteData.inputIndex]
-					graphicalNote.endNoteData = noteData
-				end
-				currentGraphicalNotes[noteData.inputType][noteData.inputIndex] = nil
+			elseif noteData.noteType == "LineNoteStart" then
+				graphicalNote = self.engine.LineGraphicalNote:new({
+					startNoteData = noteData,
+					endNoteData = noteData.endNoteData,
+					inputModeString = inputModeString,
+					noteType = "LineNote"
+				})
+				
+				table.insert(self.noteData, graphicalNote)
 			elseif noteData.noteType == "SoundNote" then
 				graphicalNote = self.engine.ShortGraphicalNote:new({
 					startNoteData = noteData,
