@@ -72,11 +72,11 @@ NoteHandler.setKeyState = function(self)
 	self.keyState = love.keyboard.isDown(self.keyBind)
 end
 
+NoteHandler.update = function(self)
+	self.currentNote:update()
+end
+
 NoteHandler.receiveEvent = function(self, event)
-	if event.name == "love.update" then
-		self.currentNote:update()
-	end
-	
 	local key = event.data and event.data[1]
 	if self.keyBind and key == self.keyBind then
 		if event.name == "love.keypressed" then

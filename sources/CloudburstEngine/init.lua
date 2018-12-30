@@ -29,6 +29,7 @@ end
 
 CloudburstEngine.update = function(self)
 	self:updateTimeManager()
+	self:updateNoteHandlers()
 	if self.noteSkin then
 		self:updateNoteDrawers()
 	end
@@ -58,14 +59,24 @@ CloudburstEngine.receiveEvent = function(self, event)
 		elseif key == "f1" then
 			self.timeManager:pause()
 		elseif key == "f3" then
-			if CloudburstEngine.NoteSkin.speed - 0.1 >= 0.1 then
-				CloudburstEngine.NoteSkin.speed = CloudburstEngine.NoteSkin.speed - 0.1
+			if self.NoteSkin.speed - 0.1 >= 0.1 then
+				self.NoteSkin.speed = self.NoteSkin.speed - 0.1
+			
+				self:sendEvent({
+					name = "notify",
+					text = "speed: " .. self.NoteSkin.speed
+				})
 			end
 		elseif key == "f4" then
-			CloudburstEngine.NoteSkin.speed = CloudburstEngine.NoteSkin.speed + 0.1
+			self.NoteSkin.speed = self.NoteSkin.speed + 0.1
+			
+			self:sendEvent({
+				name = "notify",
+				text = "speed: " .. self.NoteSkin.speed
+			})
 		elseif key == "f8" then
 			self.autoplay = not self.autoplay
-		
+			
 			self:sendEvent({
 				name = "notify",
 				text = "autoplay: " .. (self.autoplay and "on" or "off")
@@ -153,6 +164,12 @@ CloudburstEngine.loadNoteHandlers = function(self)
 		})
 		self.noteHandlers[noteHandler] = noteHandler
 		self.noteHandlers[noteHandler]:activate()
+	end
+end
+
+CloudburstEngine.updateNoteHandlers = function(self)
+	for _, noteHandler in pairs(self.noteHandlers) do
+		noteHandler:update()
 	end
 end
 
