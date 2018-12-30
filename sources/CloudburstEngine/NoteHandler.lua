@@ -1,6 +1,8 @@
 CloudburstEngine.NoteHandler = createClass(soul.SoulObject)
 local NoteHandler = CloudburstEngine.NoteHandler
 
+NoteHandler.autoplayDelay = 1/15
+
 NoteHandler.loadNoteData = function(self)
 	self.noteData = {}
 	
@@ -74,29 +76,46 @@ end
 
 NoteHandler.update = function(self)
 	self.currentNote:update()
+	if self.click then
+		self.keyTimer = self.keyTimer + love.timer.getDelta()
+		if self.keyTimer > self.autoplayDelay then
+			self.click = false
+			self:switchKey(false)
+		end
+	end
 end
 
 NoteHandler.receiveEvent = function(self, event)
 	local key = event.data and event.data[1]
 	if self.keyBind and key == self.keyBind then
 		if event.name == "love.keypressed" then
-			self.keyState = true
 			self.currentNote.keyState = true
-			self:sendState()
+			self:switchKey(true)
 			
 			if self.currentNote.pressSoundFilePath then
 				self.engine.core.audioManager:playSound(self.currentNote.pressSoundFilePath)
 			end
 		elseif event.name == "love.keyreleased" then
-			self.keyState = false
 			self.currentNote.keyState = false
-			self:sendState()
+			self:switchKey(false)
 			
 			if self.currentNote.releaseSoundFilePath then
 				self.engine.core.audioManager:playSound(self.currentNote.releaseSoundFilePath)
 			end
 		end
 	end
+end
+
+NoteHandler.switchKey = function(self, state)
+	self.keyState = state
+	self:sendState()
+end
+
+NoteHandler.clickKey = function(self)
+	self.keyTimer = 0
+	self.click = true
+	self.keyState = true
+	self:sendState()
 end
 
 NoteHandler.sendState = function(self)

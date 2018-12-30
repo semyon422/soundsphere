@@ -8,13 +8,17 @@ ShortLogicalNote.update = function(self)
 	
 	local deltaTime = self.startNoteData.timePoint:getAbsoluteTime() - self.engine.currentTime
 	if self.engine.autoplay and deltaTime < 0 then
+		self.noteHandler:clickKey()
+		
 		if self.pressSoundFilePath then
 			self.engine.core.audioManager:playSound(self.pressSoundFilePath)
 		end
 		deltaTime = 0
+		self.keyState = true
 		self.state = "passed"
 		self:sendState()
 		self:next()
+		return
 	end
 	
 	local timeState = self.engine:getTimeState(deltaTime)

@@ -15,6 +15,9 @@ LongLogicalNote.update = function(self)
 	
 	if self.engine.autoplay then
 		if deltaStartTime < 0 and not self.keyState then
+			self.noteHandler.keyState = true
+			self.noteHandler:sendState()
+			
 			if self.pressSoundFilePath then
 				self.engine.core.audioManager:playSound(self.pressSoundFilePath)
 			end
@@ -24,6 +27,9 @@ LongLogicalNote.update = function(self)
 			self.state = "startPassedPressed"
 			self:sendState()
 		elseif deltaEndTime < 0 and self.keyState then
+			self.noteHandler.keyState = false
+			self.noteHandler:sendState()
+			
 			if self.releaseSoundFilePath then
 				self.engine.core.audioManager:playSound(self.releaseSoundFilePath)
 			end
@@ -33,6 +39,7 @@ LongLogicalNote.update = function(self)
 			self.state = "endPassed"
 			self:sendState()
 			self:next()
+			return
 		end
 	end
 	
