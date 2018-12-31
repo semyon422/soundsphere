@@ -15,5 +15,6 @@ require("CLI")
 require("Editor")
 require("Score")
 require("NotificationLine")
+require("Profiler")
 
 core = Core:new():activate()

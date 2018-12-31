@@ -1,6 +1,12 @@
 CloudburstEngine.NoteSkin = createClass(soul.SoulObject)
 local NoteSkin = CloudburstEngine.NoteSkin
 
+NoteSkin.colour = {
+	clear = {255, 255, 255, 255},
+	missed = {127, 127, 127, 255},
+	passed = {255, 255, 255, 0}
+}
+
 NoteSkin.load = function(self)
 	self.allcs = soul.CS:new(nil, 0, 0, 0, 0, "all")
 	
@@ -473,11 +479,11 @@ end
 --------------------------------
 NoteSkin.getShortNoteColour = function(self, note)
 	if note.logicalNote.state == "clear" or note.logicalNote.state == "skipped" then
-		return {255, 255, 255, 255}
+		return self.colour.clear
 	elseif note.logicalNote.state == "missed" then
-		return {127, 127, 127, 255}
+		return self.colour.missed
 	elseif note.logicalNote.state == "passed" then
-		return {255, 255, 255, 0}
+		return self.colour.passed
 	end
 end
 

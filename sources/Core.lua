@@ -1,6 +1,9 @@
 Core = createClass(soul.SoulObject)
 
 Core.load = function(self)
+	self.profiler = Profiler:new()
+	self.profiler:activate()
+	
 	self:loadConfig()
 	self:loadResourceLoader()
 	self:loadAudioManager()
