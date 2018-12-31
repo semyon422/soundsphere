@@ -1,13 +1,6 @@
 CloudburstEngine.NoteDrawer = createClass()
 local NoteDrawer = CloudburstEngine.NoteDrawer
 
-NoteDrawer.OptimisationModeEnum = {
-	UpdateAll = 0,
-	UpdateVisible = 1
-}
-
-NoteDrawer.optimisationMode = NoteDrawer.OptimisationModeEnum.UpdateVisible
-
 NoteDrawer.loadNoteData = function(self)
 	self.noteData = {}
 	
@@ -83,11 +76,9 @@ NoteDrawer.loadNoteData = function(self)
 		graphicalNote.index = index
 	end
 	
-	if self.optimisationMode == self.OptimisationModeEnum.UpdateVisible then
-		self.startNoteIndex = 1
-		self.endNoteIndex = 0
-		self.drawingNotes = {}
-	end
+	self.startNoteIndex = 1
+	self.endNoteIndex = 0
+	self.drawingNotes = {}
 end
 
 NoteDrawer.updateCurrentTime = function(self)
@@ -115,54 +106,42 @@ NoteDrawer.update = function(self)
 	self:updateCurrentTime()
 	
 	self.globalSpeed = self.currentTimePoint.velocityData.globalSpeed:tonumber()
-	if self.optimisationMode == self.OptimisationModeEnum.UpdateAll then
-		self.layerData:computeVisualTime(self.currentTimePoint)
-		
-		for _, note in ipairs(self.noteData) do
-			if note.activated then
-				note:update()
-			elseif note:willDraw() then
+	for currentNoteIndex = self.startNoteIndex, 0, -1 do
+		local note = self.noteData[currentNoteIndex - 1]
+		if note then
+			note:computeVisualTime()
+			if not note:willDrawBeforeStart() and note.index == self.startNoteIndex - 1 then
+				self.drawingNotes[note] = note
+				self.startNoteIndex = self.startNoteIndex - 1
 				note:activate()
-			end
-		end
-	elseif self.optimisationMode == self.OptimisationModeEnum.UpdateVisible then
-		for currentNoteIndex = self.startNoteIndex, 0, -1 do
-			local note = self.noteData[currentNoteIndex - 1]
-			if note then
-				note:computeVisualTime()
-				if not note:willDrawBeforeStart() and note.index == self.startNoteIndex - 1 then
-					self.drawingNotes[note] = note
-					self.startNoteIndex = self.startNoteIndex - 1
-					note:activate()
-				else
-					break
-				end
 			else
 				break
 			end
+		else
+			break
 		end
-		for currentNoteIndex = self.endNoteIndex, #self.noteData, 1 do
-			local note = self.noteData[currentNoteIndex + 1]
-			if note then
-				note:computeVisualTime()
-				if not note:willDrawAfterEnd() and note.index == self.endNoteIndex + 1 then
-					self.drawingNotes[note] = note
-					self.endNoteIndex = self.endNoteIndex + 1
-					note:activate()
-				else
-					break
-				end
+	end
+	for currentNoteIndex = self.endNoteIndex, #self.noteData, 1 do
+		local note = self.noteData[currentNoteIndex + 1]
+		if note then
+			note:computeVisualTime()
+			if not note:willDrawAfterEnd() and note.index == self.endNoteIndex + 1 then
+				self.drawingNotes[note] = note
+				self.endNoteIndex = self.endNoteIndex + 1
+				note:activate()
 			else
 				break
 			end
+		else
+			break
 		end
-		
-		for _, note in pairs(self.drawingNotes) do
-			if note.activated then
-				note:update()
-			else
-				self.drawingNotes[note] = nil
-			end
+	end
+	
+	for _, note in pairs(self.drawingNotes) do
+		if note.activated then
+			note:update()
+		else
+			self.drawingNotes[note] = nil
 		end
 	end
 end

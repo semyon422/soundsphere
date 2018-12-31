@@ -20,6 +20,6 @@ end
 GraphicalNote.updateNext = function(self, index)
 	local nextNote = self.noteDrawer.noteData[index]
 	if nextNote and nextNote.activated then
-		nextNote:update()
+		return nextNote:update()
 	end
 end

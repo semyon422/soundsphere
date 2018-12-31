@@ -2,28 +2,19 @@ CloudburstEngine.LineGraphicalNote = createClass(CloudburstEngine.GraphicalNote)
 local LineGraphicalNote = CloudburstEngine.LineGraphicalNote
 
 LineGraphicalNote.update = function(self)
-	if self.noteDrawer.optimisationMode == self.noteDrawer.OptimisationModeEnum.UpdateAll then
-		if not self:willDraw() then
-			self:deactivate()
-		else
-			self.rectangle.x = self:getX()
-			self.rectangle.y = self:getY()
-		end
-	elseif self.noteDrawer.optimisationMode == self.noteDrawer.OptimisationModeEnum.UpdateVisible then
-		self:computeVisualTime()
-		
-		if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
-			self:deactivate()
-			self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
-			self:updateNext(self.noteDrawer.startNoteIndex)
-		elseif self:willDrawAfterEnd() and self.index == self.noteDrawer.endNoteIndex then
-			self:deactivate()
-			self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
-			self:updateNext(self.noteDrawer.endNoteIndex)
-		else
-			self.rectangle.x = self:getX()
-			self.rectangle.y = self:getY()
-		end
+	self:computeVisualTime()
+	
+	if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
+		self:deactivate()
+		self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
+		return self:updateNext(self.noteDrawer.startNoteIndex)
+	elseif self:willDrawAfterEnd() and self.index == self.noteDrawer.endNoteIndex then
+		self:deactivate()
+		self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
+		return self:updateNext(self.noteDrawer.endNoteIndex)
+	else
+		self.rectangle.x = self:getX()
+		self.rectangle.y = self:getY()
 	end
 end
 

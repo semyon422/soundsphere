@@ -2,30 +2,20 @@ CloudburstEngine.ShortGraphicalNote = createClass(CloudburstEngine.GraphicalNote
 local ShortGraphicalNote = CloudburstEngine.ShortGraphicalNote
 
 ShortGraphicalNote.update = function(self)
-	if self.noteDrawer.optimisationMode == self.noteDrawer.OptimisationModeEnum.UpdateAll then
-		if not self:willDraw() then
-			self:deactivate()
-		else
-			self.drawable.y = self:getY()
-			self.drawable.x = self:getX()
-			self:updateColour(self.drawable.color, self:getColour())
-		end
-	elseif self.noteDrawer.optimisationMode == self.noteDrawer.OptimisationModeEnum.UpdateVisible then
-		self:computeVisualTime()
-		
-		if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
-			self:deactivate()
-			self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
-			self:updateNext(self.noteDrawer.startNoteIndex)
-		elseif self:willDrawAfterEnd() and self.index == self.noteDrawer.endNoteIndex then
-			self:deactivate()
-			self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
-			self:updateNext(self.noteDrawer.endNoteIndex)
-		else
-			self.drawable.y = self:getY()
-			self.drawable.x = self:getX()
-			self:updateColour(self.drawable.color, self:getColour())
-		end
+	self:computeVisualTime()
+	
+	if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
+		self:deactivate()
+		self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
+		return self:updateNext(self.noteDrawer.startNoteIndex)
+	elseif self:willDrawAfterEnd() and self.index == self.noteDrawer.endNoteIndex then
+		self:deactivate()
+		self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
+		return self:updateNext(self.noteDrawer.endNoteIndex)
+	else
+		self.drawable.y = self:getY()
+		self.drawable.x = self:getX()
+		self:updateColour(self.drawable.color, self:getColour())
 	end
 end
 

@@ -2,48 +2,30 @@ CloudburstEngine.LongGraphicalNote = createClass(CloudburstEngine.GraphicalNote)
 local LongGraphicalNote = CloudburstEngine.LongGraphicalNote
 
 LongGraphicalNote.update = function(self)
-	if self.noteDrawer.optimisationMode == self.noteDrawer.OptimisationModeEnum.UpdateAll then
-		if not self:willDraw() then
-			self:deactivate()
-		else
-			self.headDrawable.x = self:getHeadX()
-			self.tailDrawable.x = self:getTailX()
-			self.bodyDrawable.x = self:getBodyX()
-			self.bodyDrawable.sx = self:getBodyScaleX()
-			self.headDrawable.y = self:getHeadY()
-			self.tailDrawable.y = self:getTailY()
-			self.bodyDrawable.y = self:getBodyY()
-			self.bodyDrawable.sy = self:getBodyScaleY()
-			
-			self:updateColour(self.headDrawable.color, self:getColour())
-			self:updateColour(self.tailDrawable.color, self:getColour())
-			self:updateColour(self.bodyDrawable.color, self:getColour())
-		end
-	elseif self.noteDrawer.optimisationMode == self.noteDrawer.OptimisationModeEnum.UpdateVisible then
-		self:computeVisualTime()
+	self:computeVisualTime()
+	
+	if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
+		self:deactivate()
+		self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
+		return self:updateNext(self.noteDrawer.startNoteIndex)
+	elseif self:willDrawAfterEnd() and self.index == self.noteDrawer.endNoteIndex then
+		self:deactivate()
+		self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
+		return self:updateNext(self.noteDrawer.endNoteIndex)
+	else
+		self.headDrawable.x = self:getHeadX()
+		self.tailDrawable.x = self:getTailX()
+		self.bodyDrawable.x = self:getBodyX()
+		self.bodyDrawable.sx = self:getBodyScaleX()
+		self.headDrawable.y = self:getHeadY()
+		self.tailDrawable.y = self:getTailY()
+		self.bodyDrawable.y = self:getBodyY()
+		self.bodyDrawable.sy = self:getBodyScaleY()
 		
-		if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
-			self:deactivate()
-			self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
-			self:updateNext(self.noteDrawer.startNoteIndex)
-		elseif self:willDrawAfterEnd() and self.index == self.noteDrawer.endNoteIndex then
-			self:deactivate()
-			self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
-			self:updateNext(self.noteDrawer.endNoteIndex)
-		else
-			self.headDrawable.x = self:getHeadX()
-			self.tailDrawable.x = self:getTailX()
-			self.bodyDrawable.x = self:getBodyX()
-			self.bodyDrawable.sx = self:getBodyScaleX()
-			self.headDrawable.y = self:getHeadY()
-			self.tailDrawable.y = self:getTailY()
-			self.bodyDrawable.y = self:getBodyY()
-			self.bodyDrawable.sy = self:getBodyScaleY()
-			
-			self:updateColour(self.headDrawable.color, self:getColour())
-			self:updateColour(self.tailDrawable.color, self:getColour())
-			self:updateColour(self.bodyDrawable.color, self:getColour())
-		end
+		local colour = self:getColour()
+		self:updateColour(self.headDrawable.color, colour)
+		self:updateColour(self.tailDrawable.color, colour)
+		self:updateColour(self.bodyDrawable.color, colour)
 	end
 end
 
