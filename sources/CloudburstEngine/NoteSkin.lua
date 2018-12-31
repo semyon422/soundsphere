@@ -301,9 +301,11 @@ end
 --------------------------------
 NoteSkin.getNoteScaleX = function(self, note, suffix)
 	if suffix == "Body" then
+		local fx = self.data[note.inputPointer].fx
+		local deltax = math.max(-fx * (self:getLongNoteHeadX(note, suffix) - self:getLongNoteTailX(note, suffix)), 0)
 		return
 			(
-				math.abs(self:getLongNoteHeadX(note, suffix) - self:getLongNoteTailX(note, suffix))
+				deltax
 				+ self.data[note.inputPointer].lnw
 			) / self:getCS(note):x(self:getNoteDrawable(note, suffix):getWidth())
 	end
@@ -313,9 +315,11 @@ end
 
 NoteSkin.getNoteScaleY = function(self, note, suffix)
 	if suffix == "Body" then
+		local fy = self.data[note.inputPointer].fy
+		local deltay = math.max(-fy * (self:getLongNoteHeadY(note, suffix) - self:getLongNoteTailY(note, suffix)), 0)
 		return
 			math.abs(
-				math.abs(self:getLongNoteHeadY(note, suffix) - self:getLongNoteTailY(note, suffix))
+				deltay
 				+ self.data[note.inputPointer].lnh
 			) / self:getCS(note):y(self:getNoteDrawable(note, suffix):getHeight())
 	end
