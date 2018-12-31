@@ -108,7 +108,7 @@ NoteSkin.getShortNoteLayer = function(self, note)
 			note.startNoteData.timePoint:getAbsoluteTime(),
 			note.startNoteData.timePoint.firstTimePoint:getAbsoluteTime(),
 			note.startNoteData.timePoint.lastTimePoint:getAbsoluteTime(),
-			0.5,
+			0.75,
 			1
 		)
 end
@@ -126,7 +126,19 @@ NoteSkin.getLongNoteBodyLayer = function(self, note)
 			note.startNoteData.timePoint:getAbsoluteTime(),
 			note.startNoteData.timePoint.firstTimePoint:getAbsoluteTime(),
 			note.startNoteData.timePoint.lastTimePoint:getAbsoluteTime(),
-			0,
+			0.5,
+			0.75
+		)
+end
+NoteSkin.getLineNoteLayer = function(self, note)
+	local layer = self.data[note.inputPointer].layer
+	return
+		layer
+		+ map(
+			note.startNoteData.timePoint:getAbsoluteTime(),
+			note.startNoteData.timePoint.firstTimePoint:getAbsoluteTime(),
+			note.startNoteData.timePoint.lastTimePoint:getAbsoluteTime(),
+			0.25,
 			0.5
 		)
 end

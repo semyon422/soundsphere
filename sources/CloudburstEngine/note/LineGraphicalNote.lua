@@ -64,7 +64,7 @@ LineGraphicalNote.deactivate = function(self)
 end
 
 LineGraphicalNote.getLayer = function(self)
-	return self.engine.noteSkin:getShortNoteLayer(self)
+	return self.engine.noteSkin:getLineNoteLayer(self)
 end
 LineGraphicalNote.getX = function(self)
 	return self.engine.noteSkin:getLineNoteX(self)
