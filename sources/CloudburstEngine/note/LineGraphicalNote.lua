@@ -14,8 +14,8 @@ LineGraphicalNote.update = function(self)
 		
 		if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
 			self:deactivate()
-			self:updateNext(self.noteDrawer.startNoteIndex)
 			self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
+			self:updateNext(self.noteDrawer.startNoteIndex)
 		elseif self:willDrawAfterEnd() and self.index == self.noteDrawer.endNoteIndex then
 			self:deactivate()
 			self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
