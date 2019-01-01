@@ -4,11 +4,11 @@ local LineGraphicalNote = CloudburstEngine.LineGraphicalNote
 LineGraphicalNote.update = function(self)
 	self:computeVisualTime()
 	
-	if self:willDrawBeforeStart() and self.index == self.noteDrawer.startNoteIndex then
+	if self.index == self.noteDrawer.startNoteIndex and self:willDrawBeforeStart() then
 		self:deactivate()
 		self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
 		return self:updateNext(self.noteDrawer.startNoteIndex)
-	elseif self:willDrawAfterEnd() and self.index == self.noteDrawer.endNoteIndex then
+	elseif self.index == self.noteDrawer.endNoteIndex and self:willDrawAfterEnd() then
 		self:deactivate()
 		self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
 		return self:updateNext(self.noteDrawer.endNoteIndex)

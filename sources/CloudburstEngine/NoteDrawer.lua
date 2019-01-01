@@ -78,7 +78,7 @@ NoteDrawer.loadNoteData = function(self)
 	
 	self.startNoteIndex = 1
 	self.endNoteIndex = 0
-	self.drawingNotes = {}
+	-- self.drawingNotes = {}
 end
 
 NoteDrawer.updateCurrentTime = function(self)
@@ -111,7 +111,7 @@ NoteDrawer.update = function(self)
 		if note then
 			note:computeVisualTime()
 			if not note:willDrawBeforeStart() and note.index == self.startNoteIndex - 1 then
-				self.drawingNotes[note] = note
+				-- self.drawingNotes[note] = note
 				self.startNoteIndex = self.startNoteIndex - 1
 				note:activate()
 			else
@@ -126,7 +126,7 @@ NoteDrawer.update = function(self)
 		if note then
 			note:computeVisualTime()
 			if not note:willDrawAfterEnd() and note.index == self.endNoteIndex + 1 then
-				self.drawingNotes[note] = note
+				-- self.drawingNotes[note] = note
 				self.endNoteIndex = self.endNoteIndex + 1
 				note:activate()
 			else
@@ -137,11 +137,11 @@ NoteDrawer.update = function(self)
 		end
 	end
 	
-	for _, note in pairs(self.drawingNotes) do
+	local note
+	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
+		note = self.noteData[currentNoteIndex]
 		if note.activated then
 			note:update()
-		else
-			self.drawingNotes[note] = nil
 		end
 	end
 end
