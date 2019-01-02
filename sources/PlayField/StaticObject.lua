@@ -10,7 +10,8 @@ StaticObject.load = function(self)
 		x = self.x,
 		y = self.y,
 		sx = 1,
-		sy = 1
+		sy = 1,
+		color = {255, 255, 255, 255}
 	})
 	self.drawableObject:activate()
 end
