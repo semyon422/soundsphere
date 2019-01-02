@@ -7,7 +7,7 @@ LogicalNote.next = function(self)
 	local nextNote = self.noteHandler.noteData[self.index + 1]
 	if nextNote then
 		self.noteHandler.currentNote = nextNote
-		self.noteHandler.currentNote:update()
+		return self.noteHandler.currentNote:update()
 	else
 		self.ended = true
 	end

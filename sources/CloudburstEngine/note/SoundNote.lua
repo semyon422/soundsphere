@@ -14,6 +14,6 @@ SoundNote.update = function(self)
 			self.engine.core.audioManager:playSound(self.pressSoundFilePath)
 		end
 		self.state = "skipped"
-		self:next()
+		return self:next()
 	end
 end
