@@ -149,10 +149,10 @@ Core.loadEngine = function(self)
 	
 	local noteSkin
 	if data.noteSkin then
-		noteSkin = CloudburstEngine.NoteSkin:new()
-		noteSkin.directoryPath = data.directoryPath
-		noteSkin.noteSkinData = data.noteSkin
-		noteSkin:activate()
+		noteSkin = CloudburstEngine.NoteSkin:new({
+			directoryPath = data.directoryPath,
+			noteSkinData = data.noteSkin
+		})
 	end
 	
 	self.engine = CloudburstEngine:new()

@@ -18,10 +18,6 @@ NoteDrawer.load = function(self)
 					inputModeString = inputModeString,
 					noteType = "ShortNote"
 				})
-				
-				if self.engine.noteSkin:checkNote(graphicalNote) then
-					table.insert(self.noteData, graphicalNote)
-				end
 			elseif noteData.noteType == "LongNoteStart" then
 				graphicalNote = self.engine.LongGraphicalNote:new({
 					startNoteData = noteData,
@@ -29,13 +25,6 @@ NoteDrawer.load = function(self)
 					inputModeString = inputModeString,
 					noteType = "LongNote"
 				})
-				
-				if self.engine.noteSkin:checkNote(graphicalNote, "Head") and
-					self.engine.noteSkin:checkNote(graphicalNote, "Tail") and
-					self.engine.noteSkin:checkNote(graphicalNote, "Body")
-				then
-					table.insert(self.noteData, graphicalNote)
-				end
 			elseif noteData.noteType == "LineNoteStart" then
 				graphicalNote = self.engine.LineGraphicalNote:new({
 					startNoteData = noteData,
@@ -43,22 +32,18 @@ NoteDrawer.load = function(self)
 					inputModeString = inputModeString,
 					noteType = "LineNote"
 				})
-				
-				table.insert(self.noteData, graphicalNote)
 			elseif noteData.noteType == "SoundNote" then
 				graphicalNote = self.engine.ShortGraphicalNote:new({
 					startNoteData = noteData,
 					noteType = "SoundNote"
 				})
-				
+			end
+			if graphicalNote then
 				if self.engine.noteSkin:checkNote(graphicalNote) then
 					table.insert(self.noteData, graphicalNote)
 				end
-			end
-			if graphicalNote then
 				graphicalNote.noteDrawer = self
 				graphicalNote.engine = self.engine
-				graphicalNote.inputPointer = graphicalNote.startNoteData.inputType .. graphicalNote.startNoteData.inputIndex
 				graphicalNote:updateLogicalNote()
 			end
 		end

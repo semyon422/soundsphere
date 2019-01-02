@@ -55,7 +55,7 @@ LineGraphicalNote.deactivate = function(self)
 end
 
 LineGraphicalNote.getLayer = function(self)
-	return self.engine.noteSkin:getLineNoteLayer(self)
+	return self.engine.noteSkin:getNoteLayer(self, "Head")
 end
 LineGraphicalNote.getX = function(self)
 	return self.engine.noteSkin:getLineNoteX(self)

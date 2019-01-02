@@ -15,7 +15,7 @@ ShortGraphicalNote.update = function(self)
 	else
 		self.drawable.y = self:getY()
 		self.drawable.x = self:getX()
-		self:updateColour(self.drawable.color, self:getColour())
+		self:updateColor(self.drawable.color, self:getColor())
 	end
 end
 
@@ -39,7 +39,7 @@ ShortGraphicalNote.activate = function(self)
 	})
 	self.drawable:activate()
 	
-	self:updateColour(self.drawable.color, self:getColour())
+	self:updateColor(self.drawable.color, self:getColor())
 	
 	self.activated = true
 end
@@ -51,16 +51,16 @@ ShortGraphicalNote.deactivate = function(self)
 	self.activated = false
 end
 
-ShortGraphicalNote.getColour = function(self)
-	return self.engine.noteSkin:getShortNoteColour(self)
+ShortGraphicalNote.getColor = function(self)
+	return self.engine.noteSkin:getShortNoteColor(self)
 end
 
 ShortGraphicalNote.getLayer = function(self)
-	return self.engine.noteSkin:getShortNoteLayer(self)
+	return self.engine.noteSkin:getNoteLayer(self, "Head")
 end
 
 ShortGraphicalNote.getDrawable = function(self)
-	return self.engine.noteSkin:getNoteDrawable(self)
+	return self.engine.noteSkin:getNoteDrawable(self, "Head")
 end
 
 ShortGraphicalNote.getX = function(self)
@@ -72,11 +72,11 @@ ShortGraphicalNote.getY = function(self)
 end
 
 ShortGraphicalNote.getScaleX = function(self)
-	return self.engine.noteSkin:getNoteScaleX(self)
+	return self.engine.noteSkin:getNoteScaleX(self, "Head")
 end
 
 ShortGraphicalNote.getScaleY = function(self)
-	return self.engine.noteSkin:getNoteScaleY(self)
+	return self.engine.noteSkin:getNoteScaleY(self, "Head")
 end
 
 ShortGraphicalNote.willDraw = function(self)
