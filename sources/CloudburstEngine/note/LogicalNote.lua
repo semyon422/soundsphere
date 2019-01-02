@@ -14,7 +14,7 @@ LogicalNote.next = function(self)
 end
 
 LogicalNote.sendState = function(self)
-	self.engine.observable:sendEvent({
+	return self.engine.observable:sendEvent({
 		name = "logicalNoteUpdated",
 		logicalNote = self
 	})

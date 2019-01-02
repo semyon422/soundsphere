@@ -38,8 +38,7 @@ LongLogicalNote.update = function(self)
 			self.keyState = false
 			self.state = "endPassed"
 			self:sendState()
-			self:next()
-			return
+			return self:next()
 		end
 	end
 	
@@ -49,14 +48,14 @@ LongLogicalNote.update = function(self)
 	elseif self.state == "clear" then
 		if startTimeState == "late" then
 			self.state = "startMissed"
-			self:sendState()
+			return self:sendState()
 		elseif self.keyState then
 			if startTimeState == "early" then
 				self.state = "startMissedPressed"
-				self:sendState()
+				return self:sendState()
 			elseif startTimeState == "exactly" then
 				self.state = "startPassedPressed"
-				self:sendState()
+				return self:sendState()
 			end
 		end
 	elseif self.state == "startPassedPressed" then
@@ -64,39 +63,39 @@ LongLogicalNote.update = function(self)
 		if not self.keyState then
 			if endTimeState == "none" then
 				self.state = "startMissed"
-				self:sendState()
+				return self:sendState()
 			elseif endTimeState == "exactly" then
 				self.state = "endPassed"
 				self:sendState()
-				self:next()
+				return self:next()
 			end
 		elseif endTimeState == "late" then
 			self.state = "endMissed"
 			self:sendState()
-			self:next()
+			return self:next()
 		end
 	elseif self.state == "startMissedPressed" then
 		if not self.keyState then
 			if endTimeState == "exactly" then
 				self.state = "endMissedPassed"
 				self:sendState()
-				self:next()
+				return self:next()
 			else
 				self.state = "startMissed"
 			end
 		elseif endTimeState == "late" then
 			self.state = "endMissed"
 			self:sendState()
-			self:next()
+			return self:next()
 		end
 	elseif self.state == "startMissed" then
 		if self.keyState then
 			self.state = "startMissedPressed"
-			self:sendState()
+			return self:sendState()
 		elseif endTimeState == "late" then
 			self.state = "endMissed"
 			self:sendState()
-			self:next()
+			return self:next()
 		end
 	end
 end

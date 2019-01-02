@@ -51,18 +51,18 @@ end
 
 CloudburstEngine.receiveEvent = function(self, event)
 	if event.name == "love.update" then
-		self:update()
+		return self:update()
 	elseif soul.focus[self.focus] and event.name == "love.keypressed" then
 		local key = event.data[1]
 		if key == "return" then
-			self.timeManager:play()
+			return self.timeManager:play()
 		elseif key == "f1" then
-			self.timeManager:pause()
+			return self.timeManager:pause()
 		elseif key == "f3" then
 			if self.NoteSkin.speed - 0.1 >= 0.1 then
 				self.NoteSkin.speed = self.NoteSkin.speed - 0.1
 			
-				self:sendEvent({
+				return self:sendEvent({
 					name = "notify",
 					text = "speed: " .. self.NoteSkin.speed
 				})
@@ -70,27 +70,27 @@ CloudburstEngine.receiveEvent = function(self, event)
 		elseif key == "f4" then
 			self.NoteSkin.speed = self.NoteSkin.speed + 0.1
 			
-			self:sendEvent({
+			return self:sendEvent({
 				name = "notify",
 				text = "speed: " .. self.NoteSkin.speed
 			})
 		elseif key == "f8" then
 			self.autoplay = not self.autoplay
 			
-			self:sendEvent({
+			return self:sendEvent({
 				name = "notify",
 				text = "autoplay: " .. (self.autoplay and "on" or "off")
 			})
 		elseif key == "escape" then
-			self.core.stateManager:switchState("selectionScreen")
+			return self.core.stateManager:switchState("selectionScreen")
 		end
 	elseif event.name == "resourcesLoaded" then
-		self.timeManager:play()
+		return self.timeManager:play()
 	elseif event.name == "ChunkDataLoaded" and self.loadingResources[event.filePath] then
 		self.loadingResources[event.filePath] = nil
 		self.resourceCountLoaded = self.resourceCountLoaded + 1
 		
-		self:sendEvent({
+		return self:sendEvent({
 			name = "notify",
 			text = self.resourceCountLoaded .. "/" .. self.resourceCount
 		})
@@ -112,7 +112,7 @@ CloudburstEngine.loadResources = function(self)
 	end
 	
 	self.soundFilesGroup:call(function(soundFilePath)
-		self.core.audioManager:loadChunk(soundFilePath)
+		return self.core.audioManager:loadChunk(soundFilePath)
 	end)
 end
 
@@ -121,7 +121,7 @@ CloudburstEngine.checkResources = function(self)
 		return
 	end
 	self.resourcesLoaded = true
-	self:receiveEvent({
+	return self:receiveEvent({
 		name = "resourcesLoaded"
 	})
 end
@@ -130,11 +130,11 @@ CloudburstEngine.unloadResources = function(self)
 	self.core.audioManager:removeObserver(self.observer)
 	
 	self.soundFilesGroup:call(function(soundFilePath)
-		self.core.audioManager:stopSound(soundFilePath)
+		return self.core.audioManager:stopSound(soundFilePath)
 	end)
 	
 	self.soundFilesGroup:call(function(soundFilePath)
-		self.core.audioManager:unloadChunk(soundFilePath)
+		return self.core.audioManager:unloadChunk(soundFilePath)
 	end)
 end
 

@@ -17,8 +17,7 @@ ShortLogicalNote.update = function(self)
 		self.keyState = true
 		self.state = "passed"
 		self:sendState()
-		self:next()
-		return
+		return self:next()
 	end
 	
 	local timeState = self.engine:getTimeState(deltaTime)
@@ -29,14 +28,14 @@ ShortLogicalNote.update = function(self)
 	elseif self.keyState and timeState == "early" then
 		self.state = "missed"
 		self:sendState()
-		self:next()
+		return self:next()
 	elseif timeState == "late" then
 		self.state = "missed"
 		self:sendState()
-		self:next()
+		return self:next()
 	elseif self.keyState and timeState == "exactly" then
 		self.state = "passed"
 		self:sendState()
-		self:next()
+		return self:next()
 	end
 end

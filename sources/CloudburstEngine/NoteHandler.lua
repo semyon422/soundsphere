@@ -89,37 +89,37 @@ NoteHandler.receiveEvent = function(self, event)
 	local key = event.data and event.data[1]
 	if self.keyBind and key == self.keyBind then
 		if event.name == "love.keypressed" then
-			self.currentNote.keyState = true
-			self:switchKey(true)
-			
 			if self.currentNote.pressSoundFilePath then
 				self.engine.core.audioManager:playSound(self.currentNote.pressSoundFilePath)
 			end
-		elseif event.name == "love.keyreleased" then
-			self.currentNote.keyState = false
-			self:switchKey(false)
 			
+			self.currentNote.keyState = true
+			return self:switchKey(true)
+		elseif event.name == "love.keyreleased" then
 			if self.currentNote.releaseSoundFilePath then
 				self.engine.core.audioManager:playSound(self.currentNote.releaseSoundFilePath)
 			end
+			
+			self.currentNote.keyState = false
+			return self:switchKey(false)
 		end
 	end
 end
 
 NoteHandler.switchKey = function(self, state)
 	self.keyState = state
-	self:sendState()
+	return self:sendState()
 end
 
 NoteHandler.clickKey = function(self)
 	self.keyTimer = 0
 	self.click = true
 	self.keyState = true
-	self:sendState()
+	return self:sendState()
 end
 
 NoteHandler.sendState = function(self)
-	self.engine.observable:sendEvent({
+	return self.engine.observable:sendEvent({
 		name = "noteHandlerUpdated",
 		noteHandler = self
 	})
@@ -128,7 +128,4 @@ end
 NoteHandler.load = function(self)
 	self:loadNoteData()
 	self:setKeyState()
-end
-
-NoteHandler.unload = function(self)
 end
