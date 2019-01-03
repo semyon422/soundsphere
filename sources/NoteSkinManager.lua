@@ -48,7 +48,7 @@ end
 
 NoteSkinManager.getNoteSkin = function(self, inputMode)
 	for _, data in ipairs(self.data) do
-		if data.inputMode == inputMode then
+		if data.inputMode >= inputMode then
 			return data
 		end
 	end
