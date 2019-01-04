@@ -10,20 +10,57 @@ Cache.construct = function(self)
 			`path` TEXT,
 			`hash` TEXT,
 			`container` INTEGER,
+			
+			`title` TEXT,
+			`artist` TEXT,
+			`source` TEXT,
+			`tags` TEXT,
+
 			`name` TEXT,
+			`creator` TEXT,
+
+			`audioPath` TEXT,
+			`stagePath` TEXT,
+			`previewTime` REAL,
+			`noteCount` INTEGER,
+			`length` REAL,
+			`bpm` REAL,
+			`nps` REAL,
+			`inputMode` TEXT,
 			PRIMARY KEY (`path`)
+		);
+		CREATE TABLE IF NOT EXISTS `version` (
+			`version` INTEGER
 		);
 	]]
 	
 	self.db:setscalar("CHECKVISIBLE", function(...) return self:checkVisible(...) end)
 	
-	self.addChartStatement = self.db:prepare([[
-		INSERT INTO `cache` (path, hash, container, name)
-		VALUES (?, '', 0, ?);
+	self.insertStatement = self.db:prepare([[
+		INSERT INTO `cache` (
+			path,
+			hash,
+			container,
+			title,
+			artist,
+			source,
+			tags,
+			name,
+			creator,
+			audioPath,
+			stagePath,
+			previewTime,
+			noteCount,
+			length,
+			bpm,
+			nps,
+			inputMode
+		)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 	]])
 	self.setContainerStatement = self.db:prepare([[
-		INSERT OR IGNORE INTO `cache` (path, hash, container, name)
-		VALUES (?, '', -1, '');
+		INSERT OR IGNORE INTO `cache` (path, container, name)
+		VALUES (?, -1, '');
 	]])
 	self.updateContainerStatement = self.db:prepare([[
 		UPDATE `cache` SET `container` = ? WHERE `path` == ?;
@@ -36,6 +73,7 @@ end
 
 Cache.update = function(self, path, recursive, callback)
 	if not self.isUpdating then
+		self:clean(path)
 		soul.async(
 			"dofile(\"sources/async/updateCache.lua\")",
 			path, recursive
@@ -70,8 +108,8 @@ Cache.setContainer = function(self, path, container)
 	self.updateContainerStatement:reset():bind(container, path):step()
 end
 
-Cache.addChart = function(self, path, name)
-	self.addChartStatement:reset():bind(path, name):step()
+Cache.addChart = function(self, ...)
+	self.insertStatement:reset():bind(...):step()
 end
 
 Cache.clean = function(self, directoryPath)
@@ -79,13 +117,15 @@ Cache.clean = function(self, directoryPath)
 	local result = self.db:exec("SELECT * FROM `cache` WHERE CHECKVISIBLE(path) ORDER BY `path`;")
 	
 	local row = 1
-	while result.path[row] do
-		local path = result.path[row]
-		if not love.filesystem.exists(path) then
-			self.db:exec("DELETE FROM `cache` WHERE `path` == " .. string.format("%q", path) .. ";")
+	if result then
+		while result.path[row] do
+			local path = result.path[row]
+			if not love.filesystem.exists(path) then
+				self.db:exec("DELETE FROM `cache` WHERE `path` == " .. string.format("%q", path) .. ";")
+			end
+			
+			row = row + 1
 		end
-		
-		row = row + 1
 	end
 end
 
@@ -178,18 +218,18 @@ Cache.extensions = {
 			"%.ojn$"
 		}
 	},
-	{
-		type = "ucs",
-		patterns = {
-			"%.ucs$"
-		}
-	},
-	{
-		type = "jnc",
-		patterns = {
-			"%.jnc$"
-		}
-	}
+	-- {
+		-- type = "ucs",
+		-- patterns = {
+			-- "%.ucs$"
+		-- }
+	-- },
+	-- {
+		-- type = "jnc",
+		-- patterns = {
+			-- "%.jnc$"
+		-- }
+	-- }
 }
 
 Cache.isNoteChart = function(self, path)
@@ -259,110 +299,113 @@ Cache.fixCharset = function(self, line)
 end
 
 Cache.generateBMSCacheData = function(self, directoryPath, fileName)
-	local title = "<title>"
-	local artist = "<artist>"
-	
 	local path = ("%s/%s"):format(directoryPath, fileName)
-	local file = love.filesystem.newFile(path)
-	file:open("r")
-	
-	for line in file:lines() do
-		local line = self:fixCharset(line)
-		if line:find("^#TITLE .+$") then
-			title = line:match("^#TITLE (.+)$")
-		end
-		if line:find("^#ARTIST .+$") then
-			artist = line:match("^#ARTIST (.+)$")
-		end
-		if line:find("^#WAV") then
-			break
-		end
-	end
-	file:close()
-	
-	local name = ("%s - %s"):format(artist, title)
-	self:addChart(path, name)
+	local noteChart = self:getNoteChart(path)
+	self:addChart(
+		path,
+		"",
+		0,
+		self:fixCharset(noteChart:hashGet("TITLE") or "title"),
+		self:fixCharset(noteChart:hashGet("ARTIST") or "artist"),
+		"BMS",
+		"",
+		self:fixCharset(noteChart:hashGet("PLAYLEVEL") or ""),
+		"",
+		"",
+		self:fixCharset(noteChart:hashGet("STAGEFILE") or ""),
+		0,
+		1000,
+		300,
+		120,
+		0,
+		noteChart.inputMode:getString()
+	)
 	
 	return 0
 end
 
 Cache.generateOsuCacheData = function(self, directoryPath, fileName)
-	local title = "<title>"
-	local artist = "<artist>"
-	
-	local path = ("%s/%s"):format(directoryPath, fileName)
-	local file = love.filesystem.newFile(path)
-	file:open("r")
-	
-	for line in file:lines() do
-		if line:find("Title:[ ]?.+$") then
-			title = line:match("^Title:[ ]?(.+)$")
-		end
-		if line:find("Artist:[ ]?.+$") then
-			artist = line:match("Artist:[ ]?(.+)$")
-		end
-		if line:find("Version:[ ]?.+$") then
-			local version = line:match("Version:[ ]?(.+)$")
-			title = title .. " [" .. version .. "]"
-		end
-		if line:find("^%[Events%]") then
-			break
-		end
-	end
-	file:close()
-	
-	local name = ("%s - %s"):format(artist, title)
-	self:addChart(path, name)
-	
-	return 0
-end
-
-Cache.generateJNCCacheData = function(self, directoryPath, fileName)
-	local title = "<title>"
-	local artist = "<artist>"
-	
 	local path = ("%s/%s"):format(directoryPath, fileName)
 	local noteChart = self:getNoteChart(path)
-	
-	title = noteChart:hashGet("title")
-	artist = noteChart:hashGet("artist")
-	
-	local name = ("%s - %s"):format(artist, title)
-	self:addChart(path, name)
+	self:addChart(
+		path,
+		"",
+		0,
+		self:fixCharset(noteChart:hashGet("Title") or "title"),
+		self:fixCharset(noteChart:hashGet("Artist") or "artist"),
+		"BMS",
+		"",
+		self:fixCharset(noteChart:hashGet("Version") or ""),
+		"",
+		"",
+		"",
+		0,
+		1000,
+		300,
+		120,
+		0,
+		noteChart.inputMode:getString()
+	)
 	
 	return 0
 end
 
-Cache.generateUCSCacheData = function(self, directoryPath, fileName)
-	local path = ("%s/%s"):format(directoryPath, fileName)
-	local title = fileName:match("^(.+)%.ucs$")
+-- Cache.generateJNCCacheData = function(self, directoryPath, fileName)
+	-- local title = "<title>"
+	-- local artist = "<artist>"
 	
-	self:setContainer(path, 1)
-	self:addChart(path .. "/1", title)
+	-- local path = ("%s/%s"):format(directoryPath, fileName)
+	-- local noteChart = self:getNoteChart(path)
 	
-	return 1
-end
+	-- title = noteChart:hashGet("title")
+	-- artist = noteChart:hashGet("artist")
+	
+	-- local name = ("%s - %s"):format(artist, title)
+	-- self:addChart(path, name)
+	
+	-- return 0
+-- end
+
+-- Cache.generateUCSCacheData = function(self, directoryPath, fileName)
+	-- local path = ("%s/%s"):format(directoryPath, fileName)
+	-- local title = fileName:match("^(.+)%.ucs$")
+	
+	-- self:setContainer(path, 1)
+	-- self:addChart(path .. "/1", title)
+	
+	-- return 1
+-- end
 
 Cache.generateOJNCacheData = function(self, directoryPath, fileName)
-	local title = "<title>"
-	local artist = "<artist>"
-	
 	local path = ("%s/%s"):format(directoryPath, fileName)
 	local file = love.filesystem.newFile(path)
 	file:open("r")
 	local ojn = o2jam.OJN:new(file:read(file:getSize()))
 	file:close()
 	
-	
 	self:setContainer(path, 1)
 	
 	local name
 	for i = 1, 3 do
-		title = self:fixCharset(ojn.str_title) .. " [" .. ojn.charts[1].level .. "]"
-		artist = self:fixCharset(ojn.str_artist)
-		name = ("%s - %s"):format(artist, title)
-		
-		self:addChart(path .. "/" .. i, name)
+		self:addChart(
+			path .. "/" .. i,
+			"",
+			0,
+			self:fixCharset(ojn.str_title),
+			self:fixCharset(ojn.str_artist),
+			"o2jam",
+			"",
+			ojn.charts[i].level,
+			self:fixCharset(ojn.str_noter),
+			"",
+			"",
+			0,
+			ojn.charts[i].notes,
+			ojn.charts[i].duration,
+			ojn.bpm,
+			ojn.charts[i].notes / ojn.charts[i].duration,
+			"7key"
+		)
 	end
 	
 	return 1

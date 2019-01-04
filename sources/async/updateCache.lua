@@ -6,8 +6,10 @@ sqlite = require("ljsqlite3")
 ffi = require("ffi")
 require("iconv_ffi")
 
+soul = {}
+require("soul.CS")
+
 require("byte")
-require("soul")
 require("ncdk")
 require("bms")
 require("o2jam")

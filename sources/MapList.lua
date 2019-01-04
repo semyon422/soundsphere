@@ -88,7 +88,20 @@ MapList.selectCache = function(self)
 			path = result.path[row],
 			hash = result.hash[row],
 			container = result.container[row],
-			name = result.name[row]
+			title = result.title[row],
+			artist = result.artist[row],
+			source = result.source[row],
+			tags = result.tags[row],
+			name = result.name[row],
+			creator = result.creator[row],
+			audioPath = result.audioPath[row],
+			stagePath = result.stagePath[row],
+			previewTime = result.previewTime[row],
+			noteCount = result.noteCount[row],
+			length = result.length[row],
+			bpm = result.bpm[row],
+			nps = result.nps[row],
+			inputMode = result.inputMode[row]
 		}
 		table.insert(self.selectionList, result.path[row])
 		row = row + 1
@@ -178,7 +191,12 @@ MapList.getItemName = function(self, selectionKey)
 	
 	local cacheData = self.cacheDatas[cacheDataKey]
 	if cacheData.container == 0 then
-		return cacheData.name
+		return
+			cacheData.artist ..
+			" - " ..
+			cacheData.title ..
+			" - " ..
+			cacheData.name
 	else
 		return selectionKey[#selectionKey]
 	end
