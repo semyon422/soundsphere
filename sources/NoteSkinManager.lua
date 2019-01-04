@@ -1,6 +1,6 @@
 NoteSkinManager = createClass()
 
-NoteSkinManager.load = function(self, filePath)
+NoteSkinManager.construct = function(self, filePath)
 	self.data = {}
 	self:lookup("userdata/skins")
 end

@@ -5,20 +5,10 @@ AudioManager.load = function(self)
 	self.chunkData = {}
 	self.sounds = {}
 	
-	self.resourceLoader = ResourceLoader:getGlobal()
+	self.resourceLoader = ResourceLoader:global()
 	self.resourceLoader:addObserver(self.observer)
 	
 	self.observable = Observable:new()
-end
-
-AudioManager.getGlobal = function(self)
-	if not AudioManager.global then
-		AudioManager.global = AudioManager:new()
-	end
-	return AudioManager.global
-end
-
-AudioManager.unload = function(self)
 end
 
 AudioManager.receiveEvent = function(self, event)

@@ -3,7 +3,7 @@ BackgroundManager = createClass(soul.SoulObject)
 BackgroundManager.layer = 0
 
 BackgroundManager.load = function(self)
-	self.resourceLoader = ResourceLoader:getGlobal()
+	self.resourceLoader = ResourceLoader:global()
 	self.resourceLoader:addObserver(self.observer)
 	
 	-- self.defaultDrawable = love.graphics.newImage()

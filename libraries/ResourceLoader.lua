@@ -50,13 +50,6 @@ ResourceLoader.load = function(self)
 	self.thread:activate()
 end
 
-ResourceLoader.getGlobal = function(self)
-	if not ResourceLoader.global then
-		ResourceLoader.global = ResourceLoader:new()
-	end
-	return ResourceLoader.global
-end
-
 ResourceLoader.messageReceived = function(self, event)
 	self.resources[event.index] = event.resource
 	self.observable:sendEvent(event)

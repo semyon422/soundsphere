@@ -1,22 +1,34 @@
 Core = createClass(soul.SoulObject)
 
 Core.load = function(self)
-	self.profiler = Profiler:new()
-	self.profiler:activate()
+	self.profiler = Profiler:new():activate()
+	self.config = Config:new():read("userdata/config.json")
+	self.resourceLoader = ResourceLoader:global():activate()
+	self.audioManager = AudioManager:new():activate()
+	self.fontManager = FontManager:new()
+	self.noteSkinManager = NoteSkinManager:new()
+	self.inputManager = InputManager:new():activate()
+	self.cache = Cache:new()
 	
-	self:loadConfig()
-	self:loadResourceLoader()
-	self:loadAudioManager()
-	self:loadFontManager()
-	self:loadNoteSkinManager()
-	self:loadInputManager()
-	self:loadCache()
-	self:loadBackgroundManager()
-	self:loadMapList()
-	self:loadNotificationLine()
-	self:loadFileManager()
+	self.backgroundManager = BackgroundManager:new({
+		core = self
+	}):activate()
+	
+	self.mapList = MapList:new()
+	self.observer:subscribe(self.mapList.observable)
+	
+	self.notificationLine = NotificationLine:new()
+	self.observer:subscribe(self.notificationLine.observable)
+	self.notificationLine:activate()
+	
+	self.fileManager = FileManager:new()
+	
 	self:loadStateManager()
-	self:loadCLI()
+	
+	self.cli = CLI:new()
+	self.observer:subscribe(self.cli.observable)
+	self.cli:activate()
+	self:loadCLICommands()
 end
 
 Core.receiveEvent = function(self, event)
@@ -35,66 +47,6 @@ Core.receiveEvent = function(self, event)
 	elseif event.name == "notify" then
 		self.notificationLine:setText(event.text)
 	end
-end
-
-Core.loadCLI = function(self)
-	self.cli = CLI:new()
-	self.observer:subscribe(self.cli.observable)
-	self.cli:activate()
-	self:loadCLICommands()
-end
-
-Core.loadConfig = function(self)
-	self.config = Config:new()
-	self.config:read("userdata/config.json")
-end
-
-Core.loadResourceLoader = function(self)
-	self.resourceLoader = ResourceLoader:getGlobal():activate()
-end
-
-Core.loadAudioManager = function(self)
-	self.audioManager = AudioManager:new()
-	self.audioManager:activate()
-end
-
-Core.loadFontManager = function(self)
-	self.fontManager = FontManager:new()
-end
-
-Core.loadInputManager = function(self)
-	self.inputManager = InputManager:new()
-	self.inputManager:activate()
-end
-
-Core.loadNoteSkinManager = function(self)
-	self.noteSkinManager = NoteSkinManager:new()
-	self.noteSkinManager:load()
-end
-
-Core.loadCache = function(self)
-	self.cache = Cache:new()
-end
-
-Core.loadBackgroundManager = function(self)
-	self.backgroundManager = BackgroundManager:new()
-	self.backgroundManager.core = self
-	self.backgroundManager:activate()
-end
-
-Core.loadMapList = function(self)
-	self.mapList = MapList:new()
-	self.observer:subscribe(self.mapList.observable)
-end
-
-Core.loadNotificationLine = function(self)
-	self.notificationLine = NotificationLine:new()
-	self.observer:subscribe(self.notificationLine.observable)
-	self.notificationLine:activate()
-end
-
-Core.loadFileManager = function(self)
-	self.fileManager = FileManager:new()
 end
 
 Core.loadStateManager = function(self)
