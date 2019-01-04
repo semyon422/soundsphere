@@ -45,7 +45,7 @@ BackgroundManager.load = function(self)
 end
 
 BackgroundManager.setBackground = function(self, filePath)
-	self.core.resourceLoader:loadData({
+	self.resourceLoader:loadData({
 		dataType = "imageData",
 		action = "load",
 		filePath = filePath,
@@ -84,7 +84,4 @@ BackgroundManager.update = function(self)
 	if self.drawableObjectForeground.drawable and not self.drawableObjectForeground.loaded then
 		self.drawableObjectForeground:activate()
 	end
-end
-
-BackgroundManager.unload = function(self)
 end

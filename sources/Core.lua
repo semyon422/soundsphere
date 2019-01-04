@@ -10,9 +10,7 @@ Core.load = function(self)
 	self.inputManager = InputManager:new():activate()
 	self.cache = Cache:new()
 	
-	self.backgroundManager = BackgroundManager:new({
-		core = self
-	}):activate()
+	self.backgroundManager = BackgroundManager:new():activate()
 	
 	self.mapList = MapList:new()
 	self.observer:subscribe(self.mapList.observable)
