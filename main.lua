@@ -1,4 +1,9 @@
-require("libraries.packagePath")
+local aquapackage = require("aqua.package")
+aquapackage.add("chartbase")
 
-require("libraries")
-require("sources")
+require("byte")
+
+require("aqua")
+require("sphere")
+
+require("sphere.SphereGame"):run()
