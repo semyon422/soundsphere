@@ -139,7 +139,7 @@ MapList.selectCache = function(self)
 		end
 	end
 	
-	BackgroundManager:loadBackground(table.concat(self.selectionKey, "/") .. "/background.jpg")
+	BackgroundManager:loadDrawableBackground(table.concat(self.selectionKey, "/") .. "/background.jpg")
 end
 
 MapList.updateCache = function(self, recursive)

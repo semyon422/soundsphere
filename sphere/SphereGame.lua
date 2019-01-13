@@ -33,7 +33,7 @@ end
 SphereGame.load = function(self)
 	Cache:load()
 	
-	BackgroundManager:loadBackground("userdata/background.jpg")
+	BackgroundManager:loadDrawableBackground("userdata/background.jpg")
 	ScreenManager:set(SelectionScreen)
 	NotificationLine:notify("welcome")
 end

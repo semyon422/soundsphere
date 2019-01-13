@@ -10,6 +10,7 @@ local NoteSkin = require("sphere.game.CloudburstEngine.NoteSkin")
 local PlayField = require("sphere.game.PlayField")
 local Score = require("sphere.game.Score")
 
+local NotificationLine = require("sphere.ui.NotificationLine")
 local ScreenManager = require("sphere.screen.ScreenManager")
 
 local GameplayScreen = Screen:new()
@@ -51,6 +52,7 @@ GameplayScreen.load = function(self)
 	
 	self.engine.observable:add(self.playField)
 	self.engine.observable:add(self.score)
+	self.engine.observable:add(NotificationLine)
 end
 
 GameplayScreen.unload = function(self)

@@ -75,6 +75,8 @@ NotificationLine.receive = function(self, event)
 	if event.name == "resize" then
 		self.cs:reload()
 		return self.button:reload()
+	elseif event.name == "notify" then
+		return self:notify(event.text)
 	end
 end
 

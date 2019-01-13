@@ -5,8 +5,6 @@ local Observable = require("aqua.util.Observable")
 local AudioManager = require("aqua.audio.AudioManager")
 local sound = require("aqua.sound")
 
-local NotificationLine = require("sphere.ui.NotificationLine")
-
 local CloudburstEngine = Class:new()
 
 local NoteHandler = require("sphere.game.CloudburstEngine.NoteHandler")
@@ -65,17 +63,23 @@ CloudburstEngine.receive = function(self, event)
 		elseif key == "f3" then
 			if NoteSkin.speed - 0.1 >= 0.1 then
 				NoteSkin.speed = NoteSkin.speed - 0.1
-				
-				return NotificationLine:notify("speed: " .. NoteSkin.speed)
+				return self.observable:send({
+					name = "notify",
+					text = "speed: " .. NoteSkin.speed
+				})
 			end
 		elseif key == "f4" then
 			NoteSkin.speed = NoteSkin.speed + 0.1
-			
-			return NotificationLine:notify("speed: " .. NoteSkin.speed)
+			return self.observable:send({
+				name = "notify",
+				text = "speed: " .. NoteSkin.speed
+			})
 		elseif key == "f8" then
 			self.autoplay = not self.autoplay
-			
-			return NotificationLine:notify("autoplay: " .. (self.autoplay and "on" or "off"))
+			return self.observable:send({
+				name = "notify",
+				text = "autoplay: " .. (self.autoplay and "on" or "off")
+			})
 		end
 	end
 end
@@ -98,7 +102,10 @@ CloudburstEngine.loadResources = function(self)
 			self.loadingResources[soundFilePath] = nil
 			self.resourceCountLoaded = self.resourceCountLoaded + 1
 			
-			return NotificationLine:notify(self.resourceCountLoaded .. "/" .. self.resourceCount)
+			return self.observable:send({
+				name = "notify",
+				text = self.resourceCountLoaded .. "/" .. self.resourceCount
+			})
 		end)
 	end)
 end
