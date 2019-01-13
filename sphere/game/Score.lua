@@ -4,6 +4,7 @@ local Score = Class:new()
 
 Score.load = function(self)
 	self.combo = 0
+	self.maxcombo = 0
 end
 
 Score.receive = function(self, event)
@@ -13,10 +14,10 @@ Score.receive = function(self, event)
 			state == "passed" or
 			state == "startPassedPressed"
 		then
-			if self.combo == 0 then
-				print("starting new combo")
-			end
 			self.combo = self.combo + 1
+			if self.combo > self.maxcombo then
+				self.maxcombo = self.combo
+			end
 		elseif (
 			state == "missed" or
 			state == "startMissed" or
@@ -24,14 +25,11 @@ Score.receive = function(self, event)
 			state == "startMissed" or
 			state == "endMissed"
 		) and self.combo ~= 0 then
-			print("combo breaked: " .. self.combo)
 			self.combo = 0
 		end
 	end
 end
 
-Score.unload = function(self)
-	print("latest combo: " .. self.combo)
-end
+Score.unload = function(self) end
 
 return Score

@@ -1,13 +1,16 @@
 local Screen = require("sphere.screen.Screen")
+local FileManager = require("sphere.filesystem.FileManager")
+
 local MapList = require("sphere.game.MapList")
 local NoteChartFactory = require("sphere.game.NoteChartFactory")
 local NoteSkinManager = require("sphere.game.NoteSkinManager")
+local InputManager = require("sphere.game.InputManager")
 local CloudburstEngine = require("sphere.game.CloudburstEngine")
 local NoteSkin = require("sphere.game.CloudburstEngine.NoteSkin")
 local PlayField = require("sphere.game.PlayField")
-local FileManager = require("sphere.filesystem.FileManager")
-local InputManager = require("sphere.game.InputManager")
 local Score = require("sphere.game.Score")
+
+local ScreenManager = require("sphere.screen.ScreenManager")
 
 local GameplayScreen = Screen:new()
 
@@ -73,6 +76,14 @@ GameplayScreen.receive = function(self, event)
 	InputManager:receive(event, self.engine)
 	self.engine:receive(event)
 	self.playField:receive(event)
+	
+	if event.name == "keypressed" and event.args[1] == "escape" then
+		ScreenManager:set(require("sphere.screen.ResultScreen"))
+		ScreenManager:receive({
+			name = "score",
+			score = self.score
+		})
+	end
 end
 
 return GameplayScreen

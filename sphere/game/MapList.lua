@@ -13,6 +13,8 @@ local Cache = require("sphere.game.Cache")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 local NotificationLine = require("sphere.ui.NotificationLine")
 
+local ScreenManager = require("sphere.screen.ScreenManager")
+
 local MapList = {}
 
 MapList.visualItemIndex = 1
@@ -174,10 +176,7 @@ MapList.updateItems = function(self)
 					self:calculateButtons()
 					local cacheData = self.cacheDatas[table.concat(selectionKey, "/")]
 					if cacheData and cacheData.container == 0 then
-						self:send({
-							name = "mapListSelectedItemClicked"
-						})
-						require("sphere.screen.ScreenManager"):set(require("sphere.screen.GameplayScreen"))
+						ScreenManager:set(require("sphere.screen.GameplayScreen"))
 					end
 				else
 					self:scrollToItemIndex(button.itemIndex)

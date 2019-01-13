@@ -76,8 +76,6 @@ CloudburstEngine.receive = function(self, event)
 			self.autoplay = not self.autoplay
 			
 			return NotificationLine:notify("autoplay: " .. (self.autoplay and "on" or "off"))
-		elseif key == "escape" then
-			require("sphere.screen.ScreenManager"):set(require("sphere.screen.SelectionScreen"))
 		end
 	end
 end
