@@ -73,6 +73,9 @@ BackgroundManager.receive = function(self, event)
 	if event.name == "resize" then
 		self:reload()
 	end
+	for i = 1, #self.backgrounds do
+		self.backgrounds[i]:receive(event)
+	end
 end
 
 BackgroundManager.reload = function(self, event)

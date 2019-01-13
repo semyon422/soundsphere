@@ -10,5 +10,6 @@ Background.update = function(self) end
 Background.draw = function(self) end
 Background.fadeIn = function(self) end
 Background.fadeOut = function(self) end
+Background.receive = function(self) end
 
 return Background
