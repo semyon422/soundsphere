@@ -53,7 +53,8 @@ CloudburstEngine.receive = function(self, event)
 	end
 	
 	if event.name == "resize" then
-		self.noteSkin:getCS():reload()
+		self.noteSkin.allcs:reload()
+		self.noteSkin.cs:reload()
 	elseif event.name == "keypressed" then
 		local key = event.args[1]
 		if key == "return" then
