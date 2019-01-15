@@ -120,6 +120,18 @@ LongGraphicalNote.deactivate = function(self)
 	self.activated = false
 end
 
+LongGraphicalNote.reload = function(self)
+	self.headDrawable.sx = self:getHeadScaleX()
+	self.headDrawable.sy = self:getHeadScaleY()
+	self.tailDrawable.sx = self:getTailScaleX()
+	self.tailDrawable.sy = self:getTailScaleY()
+	self.bodyDrawable.sx = self:getBodyScaleX()
+	self.bodyDrawable.sy = self:getBodyScaleY()
+	self.headDrawable:reload()
+	self.tailDrawable:reload()
+	self.bodyDrawable:reload()
+end
+
 LongGraphicalNote.getColor = function(self)
 	return self.noteSkin:getLongNoteColor(self)
 end

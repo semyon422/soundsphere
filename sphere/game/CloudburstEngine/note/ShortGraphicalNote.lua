@@ -53,6 +53,12 @@ ShortGraphicalNote.deactivate = function(self)
 	self.activated = false
 end
 
+ShortGraphicalNote.reload = function(self)
+	self.drawable.sx = self:getScaleX()
+	self.drawable.sy = self:getScaleY()
+	self.drawable:reload()
+end
+
 ShortGraphicalNote.getColor = function(self)
 	return self.noteSkin:getShortNoteColor(self)
 end

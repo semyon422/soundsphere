@@ -56,6 +56,10 @@ LineGraphicalNote.deactivate = function(self)
 	self.activated = false
 end
 
+LineGraphicalNote.reload = function(self)
+	self.rectangle:reload()
+end
+
 LineGraphicalNote.getLayer = function(self)
 	return self.noteSkin:getNoteLayer(self, "Head")
 end

@@ -144,4 +144,14 @@ NoteDrawer.unload = function(self)
 	end
 end
 
+NoteDrawer.reload = function(self)
+	local note
+	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
+		note = self.noteData[currentNoteIndex]
+		if note.activated then
+			note:reload()
+		end
+	end
+end
+
 return NoteDrawer

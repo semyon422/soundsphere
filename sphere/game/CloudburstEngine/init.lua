@@ -28,6 +28,9 @@ CloudburstEngine.load = function(self)
 	self:loadTimeManager()
 	
 	self:loadResources()
+	
+	self.noteSkin.allcs:reload()
+	self.noteSkin.cs:reload()
 end
 
 CloudburstEngine.update = function(self)
@@ -55,6 +58,7 @@ CloudburstEngine.receive = function(self, event)
 	if event.name == "resize" then
 		self.noteSkin.allcs:reload()
 		self.noteSkin.cs:reload()
+		self:reloadNoteDrawers()
 	elseif event.name == "keypressed" then
 		local key = event.args[1]
 		if key == "return" then
@@ -199,6 +203,12 @@ CloudburstEngine.unloadNoteDrawers = function(self)
 		noteDrawer:unload()
 	end
 	self.noteDrawers = nil
+end
+
+CloudburstEngine.reloadNoteDrawers = function(self)
+	for noteDrawer in pairs(self.noteDrawers) do
+		noteDrawer:reload()
+	end
 end
 
 CloudburstEngine.judgeScores = {
