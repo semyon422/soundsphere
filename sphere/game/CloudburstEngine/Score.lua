@@ -25,7 +25,7 @@ Score.getTimeState = function(self, deltaTime)
 end
 
 Score.needAutoplay = function(self, note)
-	return note.engine.autoplay
+	return note.noteType ~= "SoundNote" and note.engine.autoplay
 end
 
 Score.processNote = function(self, note)
