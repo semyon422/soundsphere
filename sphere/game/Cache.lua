@@ -1,4 +1,5 @@
 local sqlite = require("ljsqlite3")
+local o2jam = require("o2jam")
 local NoteChartFactory = require("sphere.game.NoteChartFactory")
 local ThreadPool = require("aqua.thread.ThreadPool")
 local leftequal = require("aqua.table").leftequal
@@ -24,10 +25,11 @@ Cache.load = function(self)
 			`artist` TEXT,
 			`source` TEXT,
 			`tags` TEXT,
-
+			
 			`name` TEXT,
+			`level` INTEGER,
 			`creator` TEXT,
-
+			
 			`audioPath` TEXT,
 			`stagePath` TEXT,
 			`previewTime` REAL,
@@ -52,6 +54,7 @@ Cache.load = function(self)
 			source,
 			tags,
 			name,
+			level,
 			creator,
 			audioPath,
 			stagePath,
@@ -62,7 +65,7 @@ Cache.load = function(self)
 			nps,
 			inputMode
 		)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 	]])
 	self.setContainerStatement = self.db:prepare([[
 		INSERT OR IGNORE INTO `cache` (path, container, name)
@@ -293,7 +296,8 @@ Cache.generateBMSCacheData = function(self, directoryPath, fileName)
 		fix(noteChart:hashGet("ARTIST") or "artist"),
 		"BMS",
 		"",
-		fix(noteChart:hashGet("PLAYLEVEL") or ""),
+		"",
+		tonumber(noteChart:hashGet("PLAYLEVEL")),
 		"",
 		"",
 		fix(noteChart:hashGet("STAGEFILE") or ""),
@@ -317,9 +321,10 @@ Cache.generateOsuCacheData = function(self, directoryPath, fileName)
 		0,
 		fix(noteChart:hashGet("Title") or "title"),
 		fix(noteChart:hashGet("Artist") or "artist"),
-		"BMS",
+		"osu!",
 		"",
 		fix(noteChart:hashGet("Version") or ""),
+		0,
 		"",
 		"",
 		"",
@@ -378,6 +383,7 @@ Cache.generateOJNCacheData = function(self, directoryPath, fileName)
 			fix(ojn.str_title),
 			fix(ojn.str_artist),
 			"o2jam",
+			"",
 			"",
 			ojn.charts[i].level,
 			fix(ojn.str_noter),
