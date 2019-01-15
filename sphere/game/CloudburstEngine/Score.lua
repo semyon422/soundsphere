@@ -81,10 +81,10 @@ Score.processState = function(self, newState, oldState)
 	if newState == "skipped" then
 		return
 	end
-	if
+	if oldState == "clear" and (
 		newState == "passed" or
 		newState == "startPassedPressed"
-	then
+	) then
 		self.combo = self.combo + 1
 		self.maxcombo = math.max(self.combo, self.maxcombo)
 	elseif (
