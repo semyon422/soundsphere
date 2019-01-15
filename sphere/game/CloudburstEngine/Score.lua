@@ -25,7 +25,7 @@ Score.getTimeState = function(self, deltaTime)
 end
 
 Score.needAutoplay = function(self, note)
-	return note.noteType == "SoundNote" or note.engine.autoplay
+	return note.engine.autoplay
 end
 
 Score.processNote = function(self, note)
@@ -38,8 +38,10 @@ Score.processNote = function(self, note)
 	end
 	
 	local oldState = note.state
-	if note.noteType == "ShortNote" or note.noteType == "SoundNote" then
+	if note.noteType == "ShortNote" then
 		self:processShortNote(note)
+	elseif note.noteType == "SoundNote" then
+		self:processSoundNote(note)
 	elseif note.noteType == "LongNote" then
 		self:processLongNote(note)
 	end
@@ -53,6 +55,19 @@ Score.processShortNote = function(self, note)
 	return note:process(timeState)
 end
 
+Score.processSoundNote = function(self, note)
+	if note.pressSoundFilePath then
+		if note.startNoteData.timePoint:getAbsoluteTime() <= note.engine.currentTime then
+			note.noteHandler:playAudio(note.pressSoundFilePath)
+		else
+			return
+		end
+	end
+	
+	note.state = "skipped"
+	return note:next()
+end
+
 Score.processLongNote = function(self, note)
 	local deltaStartTime = note.startNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime
 	local deltaEndTime = note.endNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime
@@ -63,6 +78,9 @@ Score.processLongNote = function(self, note)
 end
 
 Score.processState = function(self, newState, oldState)
+	if newState == "skipped" then
+		return
+	end
 	if
 		newState == "passed" or
 		newState == "startPassedPressed"
