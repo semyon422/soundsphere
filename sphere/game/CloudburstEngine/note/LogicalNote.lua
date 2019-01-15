@@ -5,20 +5,16 @@ local LogicalNote = Class:new()
 LogicalNote.state = "clear"
 
 LogicalNote.next = function(self)
+	self.ended = true
 	local nextNote = self.noteHandler.noteData[self.index + 1]
 	if nextNote then
 		self.noteHandler.currentNote = nextNote
 		return self.noteHandler.currentNote:update()
-	else
-		self.ended = true
 	end
 end
 
-LogicalNote.sendState = function(self)
-	return self.engine.observable:send({
-		name = "logicalNoteUpdated",
-		logicalNote = self
-	})
+LogicalNote.update = function(self)
+	return self.score:processNote(self)
 end
 
 return LogicalNote

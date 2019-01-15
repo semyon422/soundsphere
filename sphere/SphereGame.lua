@@ -42,10 +42,10 @@ SphereGame.unload = function(self)
 	ScreenManager:unload()
 end
 
-SphereGame.update = function(self)
+SphereGame.update = function(self, dt)
 	ThreadPool:update()
 	
-	BackgroundManager:update()
+	BackgroundManager:update(dt)
 	NotificationLine:update()
 	ScreenManager:update()
 	CLI:update()
@@ -60,7 +60,7 @@ end
 
 SphereGame.receive = function(self, event)
 	if event.name == "update" then
-		self:update()
+		self:update(event.args[1])
 	elseif event.name == "draw" then
 		self:draw()
 	end

@@ -5,12 +5,14 @@ local MapList = require("sphere.game.MapList")
 local NoteChartFactory = require("sphere.game.NoteChartFactory")
 local NoteSkinManager = require("sphere.game.NoteSkinManager")
 local InputManager = require("sphere.game.InputManager")
+local PlayField = require("sphere.game.PlayField")
+
 local CloudburstEngine = require("sphere.game.CloudburstEngine")
 local NoteSkin = require("sphere.game.CloudburstEngine.NoteSkin")
-local PlayField = require("sphere.game.PlayField")
-local Score = require("sphere.game.Score")
+local Score = require("sphere.game.CloudburstEngine.Score")
 
 local NotificationLine = require("sphere.ui.NotificationLine")
+local BackgroundManager = require("sphere.ui.BackgroundManager")
 local ScreenManager = require("sphere.screen.ScreenManager")
 
 local GameplayScreen = Screen:new()
@@ -18,6 +20,8 @@ local GameplayScreen = Screen:new()
 Screen.construct(GameplayScreen)
 
 GameplayScreen.load = function(self)
+	BackgroundManager:setColor({63, 63, 63})
+	
 	InputManager:load()
 	
 	local currentCacheData = MapList.currentCacheData
@@ -37,10 +41,8 @@ GameplayScreen.load = function(self)
 	self.engine.noteChart = noteChart
 	self.engine.noteSkin = noteSkin
 	self.engine.container = self.container
+	self.engine.score = Score:new()
 	self.engine:load()
-	
-	self.score = Score:new()
-	self.score:load()
 	
 	self.playField = PlayField:new()
 	self.playField.directoryPath = noteSkinData.directoryPath
@@ -51,14 +53,13 @@ GameplayScreen.load = function(self)
 	self.playField:load()
 	
 	self.engine.observable:add(self.playField)
-	self.engine.observable:add(self.score)
+	-- self.engine.observable:add(self.score)
 	self.engine.observable:add(NotificationLine)
 end
 
 GameplayScreen.unload = function(self)
 	FileManager:removePath(self.engine.noteChart.directoryPath)
 	self.engine:unload()
-	self.score:unload()
 	
 	self.playField:unload()
 end
@@ -83,7 +84,7 @@ GameplayScreen.receive = function(self, event)
 		ScreenManager:set(require("sphere.screen.ResultScreen"))
 		ScreenManager:receive({
 			name = "score",
-			score = self.score
+			score = self.engine.score
 		})
 	end
 end

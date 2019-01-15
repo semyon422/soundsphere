@@ -26,17 +26,27 @@ DrawableBackground.load = function(self)
 	self.drawableFrame:reload()
 end
 
+DrawableBackground.getColor = function(self)
+	return {
+		self.globalColor[1] * self.color[1] / 255,
+		self.globalColor[2] * self.color[2] / 255,
+		self.globalColor[3] * self.color[3] / 255,
+		self.color[4]
+	}
+end
+
 DrawableBackground.reload = function(self)
 	local drawableFrame = self.drawableFrame
 
 	drawableFrame.drawable = self.drawable
 	drawableFrame.cs = self.cs
-	drawableFrame.color = self.color
+	drawableFrame.color = self:getColor()
 	
 	self.drawableFrame:reload()
 end
 
 DrawableBackground.update = function(self)
+	self.drawableFrame.color = self:getColor()
 	self.drawableFrame:update()
 	
 	if self.state == 1 then

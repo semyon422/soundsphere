@@ -405,7 +405,7 @@ end
 NoteSkin.getLongNoteColor = function(self, note)
 	local logicalNote = note.logicalNote
 	
-	if logicalNote.fakeStartTime and logicalNote.fakeStartTime >= note.endNoteData.timePoint:getAbsoluteTime() then
+	if note.fakeStartTime and note.fakeStartTime >= note.endNoteData.timePoint:getAbsoluteTime() then
 		return {255, 255, 255, 0}
 	elseif logicalNote.state == "clear" then
 		return {255, 255, 255, 255}

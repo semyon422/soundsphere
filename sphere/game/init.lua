@@ -6,7 +6,6 @@ game.NoteChartFactory = require("sphere.game.NoteChartFactory")
 game.NoteSkinManager = require("sphere.game.NoteSkinManager")
 game.CloudburstEngine = require("sphere.game.CloudburstEngine")
 game.InputManager = require("sphere.game.InputManager")
-game.Score = require("sphere.game.Score")
 game.TextTable = require("sphere.game.TextTable")
 
 return game

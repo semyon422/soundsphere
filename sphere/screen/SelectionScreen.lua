@@ -1,11 +1,14 @@
 local Screen = require("sphere.screen.Screen")
 local MapList = require("sphere.game.MapList")
 
+local BackgroundManager = require("sphere.ui.BackgroundManager")
+
 local SelectionScreen = Screen:new()
 
 Screen.construct(SelectionScreen)
 
 SelectionScreen.load = function(self)
+	BackgroundManager:setColor({191, 191, 191})
 	MapList:load()
 end
 

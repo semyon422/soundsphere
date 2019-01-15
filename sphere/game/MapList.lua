@@ -1,6 +1,7 @@
 local aquafonts = require("aqua.assets.fonts")
 local CS = require("aqua.graphics.CS")
 local Rectangle = require("aqua.graphics.Rectangle")
+local Stencil = require("aqua.graphics.Stencil")
 local utf8 = require("aqua.utf8")
 local Class = require("aqua.util.Class")
 local Observable = require("aqua.util.Observable")
@@ -50,7 +51,7 @@ MapList.load = function(self)
 		rx = 0,
 		ry = 0,
 		binding = "all",
-		576
+		baseOne = 768
 	})
 	self.cs:reload()
 	
@@ -60,11 +61,11 @@ MapList.load = function(self)
 		rx = 0,
 		ry = 0,
 		binding = "h",
-		576
+		baseOne = 768
 	})
 	self.squarecs:reload()
 	
-	self.font = aquafonts.getFont(spherefonts.NotoSansRegular, 20)
+	self.font = aquafonts.getFont(spherefonts.NotoSansRegular, 28)
 	
 	self.scrollCurrentDelta = 0
 
@@ -80,9 +81,12 @@ end
 MapList.draw = function(self)
 	self.selectionBackground:draw()
 	self.selectionFrame:draw()
+	self.stencil:draw()
+	self.stencil:set("greater", 0)
 	for button in pairs(self.buttons) do
 		button:draw()
 	end
+	self.stencil:set()
 end
 
 MapList.checkCache = function(self, path)
@@ -205,11 +209,7 @@ MapList.getItemName = function(self, selectionKey)
 	local cacheData = self.cacheDatas[cacheDataKey]
 	if cacheData.container == 0 then
 		return
-			cacheData.artist ..
-			" - " ..
-			cacheData.title ..
-			" - " ..
-			cacheData.name
+			cacheData.title
 	else
 		return selectionKey[#selectionKey]
 	end
@@ -270,6 +270,7 @@ MapList.receive = function(self, event)
 		self.squarecs:reload()
 		self.selectionFrame:reload()
 		self.selectionBackground:reload()
+		self.buttonsFrame:reload()
 	elseif event.name == "wheelmoved" then
 		local direction = event.args[2]
 		self:scrollBy(-direction)
@@ -309,7 +310,6 @@ MapList.loadOverlay = function(self)
 	self.selectionFrame = Rectangle:new({
 		x = self.x, y = self.y + (self:getMiddleOffset() - 1) * (self.h / self.buttonCount),
 		w = 0.03, h = self.h / self.buttonCount,
-		layer = self.layer + 1,
 		cs = self.squarecs,
 		color = {255, 255, 255, 255},
 		mode = "fill"
@@ -319,13 +319,31 @@ MapList.loadOverlay = function(self)
 	self.selectionBackground = Rectangle:new({
 		x = self.x, y = self.y,
 		w = self.w, h = self.h,
-		layer = self.layer - 1,
 		cs = self.cs,
-		color = {0, 0, 0, 127},
 		color = {0, 0, 0, 127},
 		mode = "fill"
 	})
 	self.selectionBackground:reload()
+	
+	self.buttonsFrame = Rectangle:new({
+		x = self.x, y = 2 / self.buttonCount,
+		w = self.w, h = (self.buttonCount - 4) / self.buttonCount,
+		cs = self.cs,
+		color = {255, 255, 255, 255},
+		mode = "fill"
+	})
+	self.buttonsFrame:reload()
+	
+	local stencilfunction = function()
+		self.buttonsFrame:draw()
+	end
+	self.stencil = Stencil:new({
+		stencilfunction = stencilfunction,
+		action = "replace",
+		value = 1,
+		keepvalues = false
+	})
+	self.stencil:reload()
 end
 
 MapList.unloadOverlay = function(self)

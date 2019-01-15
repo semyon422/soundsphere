@@ -1,7 +1,6 @@
 local Class = require("aqua.util.Class")
 local ShortLogicalNote = require("sphere.game.CloudburstEngine.note.ShortLogicalNote")
 local LongLogicalNote = require("sphere.game.CloudburstEngine.note.LongLogicalNote")
-local SoundNote = require("sphere.game.CloudburstEngine.note.SoundNote")
 local FileManager = require("sphere.filesystem.FileManager")
 local AudioManager = require("aqua.audio.AudioManager")
 
@@ -31,30 +30,35 @@ NoteHandler.loadNoteData = function(self)
 				if noteData.noteType == "ShortNote" then
 					logicalNote = ShortLogicalNote:new({
 						startNoteData = noteData,
-						pressSoundFilePath = soundFilePath
+						pressSoundFilePath = soundFilePath,
+						noteType = "ShortNote"
 					})
 				elseif noteData.noteType == "LongNoteStart" then
 					logicalNote = LongLogicalNote:new({
 						startNoteData = noteData,
 						endNoteData = noteData.endNoteData,
-						pressSoundFilePath = soundFilePath
+						pressSoundFilePath = soundFilePath,
+						noteType = "LongNote"
 					})
 				elseif noteData.noteType == "LineNoteStart" then
-					logicalNote = SoundNote:new({
+					logicalNote = ShortLogicalNote:new({
 						startNoteData = noteData,
 						endNoteData = noteData.endNoteData,
-						pressSoundFilePath = soundFilePath
+						pressSoundFilePath = soundFilePath,
+						noteType = "SoundNote"
 					})
 				elseif noteData.noteType == "SoundNote" then
-					logicalNote = SoundNote:new({
+					logicalNote = ShortLogicalNote:new({
 						startNoteData = noteData,
-						pressSoundFilePath = soundFilePath
+						pressSoundFilePath = soundFilePath,
+						noteType = "SoundNote"
 					})
 				end
 				
 				if logicalNote then
 					logicalNote.noteHandler = self
 					logicalNote.engine = self.engine
+					logicalNote.score = self.engine.score
 					table.insert(self.noteData, logicalNote)
 					
 					self.engine.sharedLogicalNoteData[noteData] = logicalNote
@@ -95,23 +99,22 @@ NoteHandler.receive = function(self, event)
 	local key = event.args and event.args[1]
 	if self.keyBind and key == self.keyBind then
 		if event.name == "keypressed" then
-			if self.currentNote.pressSoundFilePath then
-				local audio = AudioManager:getAudio(self.currentNote.pressSoundFilePath)
-				if audio then audio:play() end
-			end
+			self:playAudio(self.currentNote.pressSoundFilePath)
 			
 			self.currentNote.keyState = true
 			return self:switchKey(true)
 		elseif event.name == "keyreleased" then
-			if self.currentNote.releaseSoundFilePath then
-				local audio = AudioManager:getAudio(self.currentNote.releaseSoundFilePath)
-				if audio then audio:play() end
-			end
+			self:playAudio(self.currentNote.releaseSoundFilePath)
 			
 			self.currentNote.keyState = false
 			return self:switchKey(false)
 		end
 	end
+end
+
+NoteHandler.playAudio = function(self, path)
+	local audio = AudioManager:getAudio(path)
+	if audio then return audio:play() end
 end
 
 NoteHandler.switchKey = function(self, state)
@@ -123,6 +126,7 @@ NoteHandler.clickKey = function(self)
 	self.keyTimer = 0
 	self.click = true
 	self.keyState = true
+	
 	return self:sendState()
 end
 

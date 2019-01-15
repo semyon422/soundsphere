@@ -31,7 +31,6 @@ InputManager.receive = function(self, event, object)
 			for _, key in ipairs(keyData) do
 				args[1] = key
 				object:receive(newEvent)
-				print(key)
 			end
 		end
 	end

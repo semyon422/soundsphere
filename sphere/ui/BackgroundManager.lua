@@ -4,7 +4,11 @@ local image = require("aqua.image")
 
 local DrawableBackground = require("sphere.ui.DrawableBackground")
 
+local tween = require("tween")
+
 local BackgroundManager = {}
+
+BackgroundManager.color = {0, 0, 0}
 
 BackgroundManager.init = function(self)
 	self.state = 0
@@ -27,12 +31,17 @@ BackgroundManager.loadDrawableBackground = function(self, path)
 	end)
 end
 
+BackgroundManager.setColor = function(self, color)
+	self.colorTween = tween.new(0.5, self.color, color, "inOutQuad")
+end
+
 BackgroundManager.setDrawableBackground = function(self, imageData)
 	self:setBackground(
 		DrawableBackground:new({
 			drawable = love.graphics.newImage(imageData),
 			cs = self.cs,
-			color = {255, 255, 255, 0}
+			color = {255, 255, 255, 0},
+			globalColor = self.color
 		})
 	)
 end
@@ -42,7 +51,9 @@ BackgroundManager.setBackground = function(self, background)
 	background:load()
 end
 
-BackgroundManager.update = function(self)
+BackgroundManager.update = function(self, dt)
+	if self.colorTween then self.colorTween:update(dt) end
+	
 	for i = 1, #self.backgrounds do
 		self.backgrounds[i]:update()
 	end

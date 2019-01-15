@@ -11,6 +11,7 @@ local NoteHandler = require("sphere.game.CloudburstEngine.NoteHandler")
 local NoteDrawer = require("sphere.game.CloudburstEngine.NoteDrawer")
 
 local NoteSkin = require("sphere.game.CloudburstEngine.NoteSkin")
+local Score = require("sphere.game.CloudburstEngine.Score")
 local TimeManager = require("sphere.game.CloudburstEngine.TimeManager")
 
 CloudburstEngine.autoplay = false
@@ -208,39 +209,6 @@ end
 CloudburstEngine.reloadNoteDrawers = function(self)
 	for noteDrawer in pairs(self.noteDrawers) do
 		noteDrawer:reload()
-	end
-end
-
-CloudburstEngine.judgeScores = {
-	{0.016, 2},
-	{0.048, 1},
-	{0.128, 0},
-	{0.160, 0}
-}
-
-CloudburstEngine.passEdge = CloudburstEngine.judgeScores[#CloudburstEngine.judgeScores - 1][1]
-CloudburstEngine.missEdge = CloudburstEngine.judgeScores[#CloudburstEngine.judgeScores][1]
-CloudburstEngine.getTimeState = function(self, deltaTime)
-	if math.abs(deltaTime) - self.passEdge > 0 and math.abs(deltaTime) - self.missEdge <= 0 then
-		if deltaTime > 0 then
-			return "early"
-		else
-			return "late"
-		end
-	elseif math.abs(deltaTime) - self.passEdge <= 0 then
-		return "exactly"
-	elseif deltaTime + self.passEdge < 0 then
-		return "late"
-	else
-		return "none"
-	end
-end
-
-CloudburstEngine.getJudgeScore = function(self, deltaTime)
-	for _, data in ipairs(self.judgeScores) do
-		if math.abs(deltaTime) <= data[1] then
-			return data[2]
-		end
 	end
 end
 
