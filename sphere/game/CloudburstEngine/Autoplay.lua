@@ -3,6 +3,8 @@ local Autoplay = {}
 Autoplay.processNote = function(self, note)
 	if note.noteType == "ShortNote" then
 		self:processShortNote(note)
+	elseif note.noteType == "SoundNote" then
+		self:processSoundNote(note)
 	elseif note.noteType == "LongNote" then
 		self:processLongNote(note)
 	end
@@ -20,6 +22,19 @@ Autoplay.processShortNote = function(self, note)
 		note.state = "passed"
 		return note:next()
 	end
+end
+
+Autoplay.processSoundNote = function(self, note)
+	if note.pressSoundFilePath then
+		if note.startNoteData.timePoint:getAbsoluteTime() <= note.engine.currentTime then
+			note.noteHandler:playAudio(note.pressSoundFilePath)
+		else
+			return
+		end
+	end
+	
+	note.state = "skipped"
+	return note:next()
 end
 
 Autoplay.processLongNote = function(self, note)
