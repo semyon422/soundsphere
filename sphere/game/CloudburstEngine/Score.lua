@@ -8,6 +8,7 @@ local Score = Class:new()
 Score.construct = function(self)
 	self.combo = 0
 	self.maxcombo = 0
+	self.rate = 1
 end
 
 local passEdge = 0.120
@@ -45,15 +46,15 @@ Score.processNote = function(self, note)
 end
 
 Score.processShortNote = function(self, note)
-	local deltaTime = note.startNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime
+	local deltaTime = (note.startNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime) / self.rate
 	local timeState = self:getTimeState(deltaTime)
 	
 	return note:process(timeState)
 end
 
 Score.processLongNote = function(self, note)
-	local deltaStartTime = note.startNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime
-	local deltaEndTime = note.endNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime
+	local deltaStartTime = (note.startNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime) / self.rate
+	local deltaEndTime = (note.endNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime) / self.rate
 	local startTimeState = self:getTimeState(deltaStartTime)
 	local endTimeState = self:getTimeState(deltaEndTime)
 	

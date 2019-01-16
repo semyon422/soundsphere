@@ -79,7 +79,7 @@ CloudburstEngine.receive = function(self, event)
 			NoteSkin.speed = NoteSkin.speed + 0.1
 			return self.observable:send({
 				name = "notify",
-				text = "rate: " .. NoteSkin.speed
+				text = "speed: " .. NoteSkin.speed
 			})
 		elseif key == "f5" then
 			if self.rate - 0.1 >= 0.1 then
@@ -107,6 +107,7 @@ end
 
 CloudburstEngine.setRate = function(self, rate)
 	self.rate = rate
+	self.score.rate = rate
 	self.noteSkin.rate = rate
 	self.timeManager:setRate(rate)
 	AudioManager:rate(rate)
