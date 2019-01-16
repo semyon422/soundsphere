@@ -33,12 +33,10 @@ Score.processNote = function(self, note)
 		return
 	end
 	
-	if self:needAutoplay(note) then
-		return Autoplay:processNote(note)
-	end
-	
 	local oldState = note.state
-	if note.noteType == "ShortNote" then
+	if self:needAutoplay(note) then
+		Autoplay:processNote(note)
+	elseif note.noteType == "ShortNote" then
 		self:processShortNote(note)
 	elseif note.noteType == "LongNote" then
 		self:processLongNote(note)
