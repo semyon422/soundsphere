@@ -10,8 +10,8 @@ ScreenManager.set = function(self, screen)
 	screen:load()
 end
 
-ScreenManager.update = function(self)
-	self.currentScreen:update()
+ScreenManager.update = function(self, dt)
+	self.currentScreen:update(dt)
 end
 
 ScreenManager.draw = function(self)

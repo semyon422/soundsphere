@@ -4,6 +4,7 @@ local Group = require("aqua.util.Group")
 local Observable = require("aqua.util.Observable")
 local AudioManager = require("aqua.audio.AudioManager")
 local sound = require("aqua.sound")
+local tween = require("tween")
 
 local CloudburstEngine = Class:new()
 
@@ -16,6 +17,7 @@ local TimeManager = require("sphere.game.CloudburstEngine.TimeManager")
 
 CloudburstEngine.autoplay = false
 CloudburstEngine.rate = 1
+CloudburstEngine.targetRate = 1
 
 CloudburstEngine.load = function(self)
 	self.observable = Observable:new()
@@ -35,7 +37,14 @@ CloudburstEngine.load = function(self)
 	self.noteSkin.cs:reload()
 end
 
-CloudburstEngine.update = function(self)
+CloudburstEngine.update = function(self, dt)
+	if self.rateTween then
+		self.rateTween:update(dt)
+		self:updateRate()
+	end
+	
+	self.noteSkin:update(dt)
+	
 	self:updateTimeManager()
 	self:updateNoteHandlers()
 	self:updateNoteDrawers()
@@ -68,32 +77,36 @@ CloudburstEngine.receive = function(self, event)
 		elseif key == "f1" then
 			return self.timeManager:pause()
 		elseif key == "f3" then
-			if NoteSkin.speed - 0.1 >= 0.1 then
-				NoteSkin.speed = NoteSkin.speed - 0.1
+			if NoteSkin.targetSpeed - 0.1 >= 0.1 then
+				NoteSkin.targetSpeed = NoteSkin.targetSpeed - 0.1
+				NoteSkin:setSpeed(NoteSkin.targetSpeed)
 				return self.observable:send({
 					name = "notify",
-					text = "speed: " .. NoteSkin.speed
+					text = "speed: " .. NoteSkin.targetSpeed
 				})
 			end
 		elseif key == "f4" then
-			NoteSkin.speed = NoteSkin.speed + 0.1
+			NoteSkin.targetSpeed = NoteSkin.targetSpeed + 0.1
+			NoteSkin:setSpeed(NoteSkin.targetSpeed)
 			return self.observable:send({
 				name = "notify",
-				text = "speed: " .. NoteSkin.speed
+				text = "speed: " .. NoteSkin.targetSpeed
 			})
 		elseif key == "f5" then
-			if self.rate - 0.1 >= 0.1 then
-				self:setRate(self.rate - 0.1)
+			if self.targetRate - 0.1 >= 0.1 then
+				self.targetRate = self.targetRate - 0.1
+				self:setRate(self.targetRate)
 				return self.observable:send({
 					name = "notify",
-					text = "rate: " .. self.rate
+					text = "rate: " .. self.targetRate
 				})
 			end
 		elseif key == "f6" then
-			self:setRate(self.rate + 0.1)
+			self.targetRate = self.targetRate + 0.1
+			self:setRate(self.targetRate)
 			return self.observable:send({
 				name = "notify",
-				text = "rate: " .. self.rate
+				text = "rate: " .. self.targetRate
 			})
 		elseif key == "f8" then
 			self.autoplay = not self.autoplay
@@ -106,11 +119,14 @@ CloudburstEngine.receive = function(self, event)
 end
 
 CloudburstEngine.setRate = function(self, rate)
-	self.rate = rate
-	self.score.rate = rate
-	self.noteSkin.rate = rate
-	self.timeManager:setRate(rate)
-	AudioManager:rate(rate)
+	self.rateTween = tween.new(0.25, self, {rate = rate}, "inOutQuad")
+end
+
+CloudburstEngine.updateRate = function(self)
+	self.score.rate = self.rate
+	self.noteSkin.rate = self.rate
+	self.timeManager:setRate(self.rate)
+	AudioManager:rate(self.rate)
 end
 
 CloudburstEngine.loadResources = function(self)

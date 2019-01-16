@@ -1,6 +1,7 @@
 local Class = require("aqua.util.Class")
 local CS = require("aqua.graphics.CS")
 local map = require("aqua.math").map
+local tween = require("tween")
 
 local NoteSkin = Class:new()
 
@@ -11,6 +12,7 @@ NoteSkin.color = {
 }
 
 NoteSkin.speed = 1
+NoteSkin.targetSpeed = 1
 NoteSkin.rate = 1
 NoteSkin.allcs = CS:new({
 	bx = 0,
@@ -53,12 +55,22 @@ NoteSkin.loadImages = function(self)
 	end
 end
 
-NoteSkin.getCS = function(self, note)
-	return self.cs
+NoteSkin.update = function(self, dt)
+	if self.speedTween then
+		self.speedTween:update(dt)
+	end
+end
+
+NoteSkin.setSpeed = function(self, speed)
+	self.speedTween = tween.new(0.25, self, {speed = speed}, "inOutQuad")
 end
 
 NoteSkin.getSpeed = function(self)
 	return self.speed / self.rate
+end
+
+NoteSkin.getCS = function(self, note)
+	return self.cs
 end
 
 NoteSkin.checkNote = function(self, note)

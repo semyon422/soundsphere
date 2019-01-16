@@ -49,7 +49,7 @@ SphereGame.update = function(self, dt)
 	
 	BackgroundManager:update(dt)
 	NotificationLine:update()
-	ScreenManager:update()
+	ScreenManager:update(dt)
 	CLI:update()
 end
 

@@ -64,10 +64,10 @@ GameplayScreen.unload = function(self)
 	self.playField:unload()
 end
 
-GameplayScreen.update = function(self)
+GameplayScreen.update = function(self, dt)
 	Screen.update(self)
 	
-	self.engine:update()
+	self.engine:update(dt)
 	self.playField:update()
 end
 
