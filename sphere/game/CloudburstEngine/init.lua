@@ -73,8 +73,10 @@ CloudburstEngine.receive = function(self, event)
 	elseif event.name == "keypressed" then
 		local key = event.args[1]
 		if key == "return" then
+			AudioManager:play()
 			return self.timeManager:play()
 		elseif key == "f1" then
+			AudioManager:pause()
 			return self.timeManager:pause()
 		elseif key == "f3" then
 			if NoteSkin.targetSpeed - 0.1 >= 0.1 then

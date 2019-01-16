@@ -7,6 +7,7 @@ TimeManager.rate = 1
 TimeManager.load = function(self)
 	self.currentTime = -1
 	self.pauseTime = 0
+	self.rateDelta = 0
 	self.state = "waiting"
 	self.playState = "delayed"
 end
@@ -20,17 +21,17 @@ TimeManager.update = function(self)
 			self.state = "started"
 			self.playState = self.state
 		else
-			self.currentTime = deltaTime - self.pauseTime
+			self.currentTime = (deltaTime - self.pauseTime - self.rateDelta) * self.rate
 		end
 	elseif self.state == "started" or self.state == "playing" then
 		self.state = "playing"
 		self.playState = self.state
 		
-		self.currentTime = deltaTime - self.pauseTime
+		self.currentTime = (deltaTime - self.pauseTime - self.rateDelta) * self.rate
 	elseif self.state == "paused" then
 		
 	elseif self.state == "ended" then
-		self.currentTime = deltaTime - self.pauseTime
+		self.currentTime = (deltaTime - self.pauseTime - self.rateDelta) * self.rate
 	end
 end
 
@@ -40,14 +41,14 @@ end
 
 TimeManager.setRate = function(self, rate)
 	if self.startTime then
-		local deltaTime = love.timer.getTime() - self.startTime
-		self.pauseTime = (self.pauseTime - deltaTime) * self.rate / rate + deltaTime
+		local deltaTime = love.timer.getTime() - self.startTime - self.pauseTime
+		self.rateDelta = (self.rateDelta - deltaTime) * self.rate / rate + deltaTime
 	end
 	self.rate = rate
 end
 
 TimeManager.getCurrentTime = function(self)
-	return self.currentTime * self.rate
+	return self.currentTime
 end
 
 TimeManager.pause = function(self)
