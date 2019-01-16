@@ -2,6 +2,8 @@ local Class = require("aqua.util.Class")
 
 local TimeManager = Class:new()
 
+TimeManager.rate = 1
+
 TimeManager.load = function(self)
 	self.currentTime = -1
 	self.pauseTime = 0
@@ -36,8 +38,16 @@ TimeManager.unload = function(self)
 
 end
 
+TimeManager.setRate = function(self, rate)
+	if self.startTime then
+		local deltaTime = love.timer.getTime() - self.startTime
+		self.pauseTime = (self.pauseTime - deltaTime) * self.rate / rate + deltaTime
+	end
+	self.rate = rate
+end
+
 TimeManager.getCurrentTime = function(self)
-	return self.currentTime
+	return self.currentTime * self.rate
 end
 
 TimeManager.pause = function(self)

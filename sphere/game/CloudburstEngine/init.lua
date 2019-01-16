@@ -15,6 +15,7 @@ local Score = require("sphere.game.CloudburstEngine.Score")
 local TimeManager = require("sphere.game.CloudburstEngine.TimeManager")
 
 CloudburstEngine.autoplay = false
+CloudburstEngine.rate = 1
 
 CloudburstEngine.load = function(self)
 	self.observable = Observable:new()
@@ -78,7 +79,21 @@ CloudburstEngine.receive = function(self, event)
 			NoteSkin.speed = NoteSkin.speed + 0.1
 			return self.observable:send({
 				name = "notify",
-				text = "speed: " .. NoteSkin.speed
+				text = "rate: " .. NoteSkin.speed
+			})
+		elseif key == "f5" then
+			if self.rate - 0.1 >= 0.1 then
+				self:setRate(self.rate - 0.1)
+				return self.observable:send({
+					name = "notify",
+					text = "rate: " .. self.rate
+				})
+			end
+		elseif key == "f6" then
+			self:setRate(self.rate + 0.1)
+			return self.observable:send({
+				name = "notify",
+				text = "rate: " .. self.rate
 			})
 		elseif key == "f8" then
 			self.autoplay = not self.autoplay
@@ -88,6 +103,13 @@ CloudburstEngine.receive = function(self, event)
 			})
 		end
 	end
+end
+
+CloudburstEngine.setRate = function(self, rate)
+	self.rate = rate
+	self.noteSkin.rate = rate
+	self.timeManager:setRate(rate)
+	AudioManager:rate(rate)
 end
 
 CloudburstEngine.loadResources = function(self)

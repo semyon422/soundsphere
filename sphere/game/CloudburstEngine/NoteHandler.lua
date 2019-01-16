@@ -114,7 +114,10 @@ end
 
 NoteHandler.playAudio = function(self, path)
 	local audio = AudioManager:getAudio(path)
-	if audio then return audio:play() end
+	if audio then
+		audio:play()
+		audio:rate(self.engine.rate)
+	end
 end
 
 NoteHandler.switchKey = function(self, state)

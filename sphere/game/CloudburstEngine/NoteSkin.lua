@@ -11,6 +11,7 @@ NoteSkin.color = {
 }
 
 NoteSkin.speed = 1
+NoteSkin.rate = 1
 NoteSkin.allcs = CS:new({
 	bx = 0,
 	by = 0,
@@ -18,6 +19,7 @@ NoteSkin.allcs = CS:new({
 	ry = 0,
 	binding = "all"
 })
+NoteSkin.cs = NoteSkin.allcs
 
 NoteSkin.construct = function(self)
 	self.cs = CS:new({
@@ -55,6 +57,10 @@ NoteSkin.getCS = function(self, note)
 	return self.cs
 end
 
+NoteSkin.getSpeed = function(self)
+	return self.speed / self.rate
+end
+
 NoteSkin.checkNote = function(self, note)
 	if self.data[note.id] then
 		return true
@@ -84,7 +90,7 @@ NoteSkin.getShortNoteX = function(self, note)
 	local data = self.data[note.id]["Head"]
 	return
 		data.x
-		+ data.fx * self.speed
+		+ data.fx * self:getSpeed()
 			* (note.startNoteData.currentVisualTime - note.engine.currentTime)
 		+ data.ox * self:getNoteWidth(note, "Head")
 end
@@ -92,7 +98,7 @@ NoteSkin.getLongNoteHeadX = function(self, note)
 	local data = self.data[note.id]["Head"]
 	return
 		data.x
-		+ data.fx * self.speed
+		+ data.fx * self:getSpeed()
 			* ((note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime)
 		+ data.ox * self:getNoteWidth(note, "Head")
 end
@@ -101,7 +107,7 @@ NoteSkin.getLongNoteTailX = function(self, note)
 	local dataTail = self.data[note.id]["Tail"]
 	return
 		dataHead.x
-		+ dataHead.fx * self.speed
+		+ dataHead.fx * self:getSpeed()
 			* (note.endNoteData.currentVisualTime - note.engine.currentTime)
 		+ dataTail.ox * self:getNoteWidth(note, "Tail")
 end
@@ -117,7 +123,7 @@ NoteSkin.getLongNoteBodyX = function(self, note)
 	
 	return
 		dataHead.x
-		+ dataHead.fx * self.speed * dt
+		+ dataHead.fx * self:getSpeed() * dt
 		+ dataBody.ox * self:getNoteWidth(note, "Head")
 end
 NoteSkin.getLineNoteX = function(self, note)
@@ -131,14 +137,14 @@ NoteSkin.getLineNoteX = function(self, note)
 	
 	return
 		data.x
-		+ data.fx * self.speed * dt
+		+ data.fx * self:getSpeed() * dt
 end
 
 NoteSkin.getShortNoteY = function(self, note)
 	local data = self.data[note.id]["Head"]
 	return
 		data.y
-		+ data.fy * self.speed
+		+ data.fy * self:getSpeed()
 			* (note.startNoteData.currentVisualTime - note.engine.currentTime)
 		+ data.oy * self:getNoteHeight(note, "Head")
 end
@@ -146,7 +152,7 @@ NoteSkin.getLongNoteHeadY = function(self, note)
 	local data = self.data[note.id]["Head"]
 	return
 		data.y
-		+ data.fy * self.speed
+		+ data.fy * self:getSpeed()
 			* ((note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime)
 		+ data.oy * self:getNoteHeight(note, "Head")
 end
@@ -155,7 +161,7 @@ NoteSkin.getLongNoteTailY = function(self, note)
 	local dataTail = self.data[note.id]["Tail"]
 	return
 		dataHead.y
-		+ dataHead.fy * self.speed
+		+ dataHead.fy * self:getSpeed()
 			* (note.endNoteData.currentVisualTime - note.engine.currentTime)
 		+ dataTail.oy * self:getNoteHeight(note, "Tail")
 end
@@ -171,7 +177,7 @@ NoteSkin.getLongNoteBodyY = function(self, note)
 	
 	return
 		dataHead.y
-		+ dataHead.fy * self.speed * dt
+		+ dataHead.fy * self:getSpeed() * dt
 		+ dataBody.oy * self:getNoteHeight(note, "Head")
 end
 NoteSkin.getLineNoteY = function(self, note)
@@ -185,7 +191,7 @@ NoteSkin.getLineNoteY = function(self, note)
 	
 	return
 		data.y
-		+ data.fy * self.speed * dt
+		+ data.fy * self:getSpeed() * dt
 end
 
 --------------------------------
@@ -206,13 +212,13 @@ end
 NoteSkin.getLineNoteScaledWidth = function(self, note)
 	local data = self.data[note.id]["Head"]
 	local dt = note.startNoteData.currentVisualTime - note.endNoteData.currentVisualTime
-	return math.max(math.abs(data.fx * self.speed * dt + data.w), self:getCS():x(1))
+	return math.max(math.abs(data.fx * self:getSpeed() * dt + data.w), self:getCS():x(1))
 end
 
 NoteSkin.getLineNoteScaledHeight = function(self, note)
 	local data = self.data[note.id]["Head"]
 	local dt = note.startNoteData.currentVisualTime - note.endNoteData.currentVisualTime
-	return math.max(math.abs(data.fy * self.speed * dt + data.h), self:getCS():y(1))
+	return math.max(math.abs(data.fy * self:getSpeed() * dt + data.h), self:getCS():y(1))
 end
 
 --------------------------------
