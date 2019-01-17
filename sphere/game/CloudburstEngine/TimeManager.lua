@@ -41,7 +41,13 @@ end
 
 TimeManager.setRate = function(self, rate)
 	if self.startTime then
-		local deltaTime = love.timer.getTime() - self.startTime - self.pauseTime
+		local pauseTime
+		if self.state == "paused" then
+			pauseTime = self.pauseTime + love.timer.getTime() - self.pauseStartTime
+		else
+			pauseTime = self.pauseTime
+		end
+		local deltaTime = love.timer.getTime() - self.startTime - pauseTime
 		self.rateDelta = (self.rateDelta - deltaTime) * self.rate / rate + deltaTime
 	end
 	self.rate = rate
@@ -63,6 +69,7 @@ TimeManager.play = function(self)
 	elseif self.state == "paused" then
 		self.state = "playing"
 		self.pauseTime = self.pauseTime + love.timer.getTime() - self.pauseStartTime
+		self.pauseStartTime = love.timer.getTime()
 	end
 end
 
