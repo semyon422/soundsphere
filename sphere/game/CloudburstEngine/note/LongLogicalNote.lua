@@ -10,12 +10,14 @@ LongLogicalNote.process = function(self, startTimeState, endTimeState)
 	elseif self.state == "clear" then
 		if startTimeState == "late" then
 			self.state = "startMissed"
+			self.started = true
 		elseif self.keyState then
 			if startTimeState == "early" then
 				self.state = "startMissedPressed"
 			elseif startTimeState == "exactly" then
 				self.state = "startPassedPressed"
 			end
+			self.started = true
 		end
 	elseif self.state == "startPassedPressed" then
 		if not self.keyState then

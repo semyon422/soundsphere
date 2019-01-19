@@ -9,6 +9,7 @@ Score.construct = function(self)
 	self.combo = 0
 	self.maxcombo = 0
 	self.rate = 1
+	self.hits = {}
 end
 
 local passEdge = 0.120
@@ -25,6 +26,12 @@ Score.getTimeState = function(self, deltaTime)
 	end
 end
 
+local interval = 0.004
+Score.hit = function(self, deltaTime)
+	deltaTime = math.floor(deltaTime / interval) * interval
+	self.hits[deltaTime] = (self.hits[deltaTime] or 0) + 1
+end
+
 Score.needAutoplay = function(self, note)
 	return note.noteType == "SoundNote" or note.engine.autoplay
 end
@@ -34,7 +41,6 @@ Score.processNote = function(self, note)
 		return
 	end
 	
-	local oldState = note.state
 	if self:needAutoplay(note) then
 		Autoplay:processNote(note)
 	elseif note.noteType == "ShortNote" then
@@ -42,14 +48,18 @@ Score.processNote = function(self, note)
 	elseif note.noteType == "LongNote" then
 		self:processLongNote(note)
 	end
-	self:processState(note.state, oldState)
 end
 
 Score.processShortNote = function(self, note)
 	local deltaTime = (note.startNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime) / self.rate
 	local timeState = self:getTimeState(deltaTime)
 	
-	return note:process(timeState)
+	note:process(timeState)
+	self:processShortNoteState(note.state)
+	
+	if note.ended then
+		self:hit(deltaTime)
+	end
 end
 
 Score.processLongNote = function(self, note)
@@ -58,22 +68,40 @@ Score.processLongNote = function(self, note)
 	local startTimeState = self:getTimeState(deltaStartTime)
 	local endTimeState = self:getTimeState(deltaEndTime)
 	
-	return note:process(startTimeState, endTimeState)
+	local oldState = note.state
+	note:process(startTimeState, endTimeState)
+	self:processLongNoteState(note.state, oldState)
+	
+	if note.started then
+		self:hit(deltaStartTime)
+		note.started = false
+	end
+	if note.ended then
+		self:hit(deltaEndTime)
+	end
 end
 
-Score.processState = function(self, newState, oldState)
+Score.processShortNoteState = function(self, newState)
+	if newState == "skipped" or newState == "clear" then
+		return
+	end
+	if newState == "passed" then
+		self.combo = self.combo + 1
+		self.maxcombo = math.max(self.combo, self.maxcombo)
+	elseif newState == "missed" then
+		self.combo = 0
+	end
+end
+
+Score.processLongNoteState = function(self, newState, oldState)
 	if newState == "skipped" then
 		return
 	end
-	if oldState == "clear" and (
-		newState == "passed" or
-		newState == "startPassedPressed"
-	) then
+	if oldState == "clear" and newState == "startPassedPressed" then
 		self.combo = self.combo + 1
 		self.maxcombo = math.max(self.combo, self.maxcombo)
 	elseif (
 		(oldState == "clear" or oldState == "startPassedPressed") and (
-			newState == "missed" or
 			newState == "startMissed" or
 			newState == "startMissedPressed" or
 			newState == "endMissed"
