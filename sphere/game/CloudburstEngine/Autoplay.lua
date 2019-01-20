@@ -2,11 +2,11 @@ local Autoplay = {}
 
 Autoplay.processNote = function(self, note)
 	if note.noteType == "ShortNote" then
-		self:processShortNote(note)
+		return self:processShortNote(note)
 	elseif note.noteType == "SoundNote" then
-		self:processSoundNote(note)
+		return self:processSoundNote(note)
 	elseif note.noteType == "LongNote" then
-		self:processLongNote(note)
+		return self:processLongNote(note)
 	end
 end
 
