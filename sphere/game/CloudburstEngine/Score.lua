@@ -42,11 +42,11 @@ Score.processNote = function(self, note)
 	end
 	
 	if self:needAutoplay(note) then
-		Autoplay:processNote(note)
+		return Autoplay:processNote(note)
 	elseif note.noteType == "ShortNote" then
-		self:processShortNote(note)
+		return self:processShortNote(note)
 	elseif note.noteType == "LongNote" then
-		self:processLongNote(note)
+		return self:processLongNote(note)
 	end
 end
 
