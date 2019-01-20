@@ -16,6 +16,7 @@ local Score = require("sphere.game.CloudburstEngine.Score")
 local TimeManager = require("sphere.game.CloudburstEngine.TimeManager")
 
 CloudburstEngine.autoplay = false
+CloudburstEngine.paused = false
 CloudburstEngine.rate = 1
 CloudburstEngine.targetRate = 1
 
@@ -73,11 +74,17 @@ CloudburstEngine.receive = function(self, event)
 	elseif event.name == "keypressed" then
 		local key = event.args[1]
 		if key == "return" then
-			AudioManager:play()
-			return self.timeManager:play()
+			if self.paused then
+				self.paused = false
+				AudioManager:play()
+				return self.timeManager:play()
+			end
 		elseif key == "f1" then
-			AudioManager:pause()
-			return self.timeManager:pause()
+			if not self.paused then
+				self.paused = true
+				AudioManager:pause()
+				return self.timeManager:pause()
+			end
 		elseif key == "f3" then
 			if NoteSkin.targetSpeed - 0.1 >= 0.1 then
 				NoteSkin.targetSpeed = NoteSkin.targetSpeed - 0.1
