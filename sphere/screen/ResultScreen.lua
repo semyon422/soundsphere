@@ -6,6 +6,7 @@ local Screen = require("sphere.screen.Screen")
 local ScreenManager = require("sphere.screen.ScreenManager")
 local TextTable = require("sphere.game.TextTable")
 local AccuracyGraph = require("sphere.game.AccuracyGraph")
+local JudgeTable = require("sphere.game.JudgeTable")
 local spherefonts = require("sphere.assets.fonts")
 
 local ResultScreen = Screen:new()
@@ -53,6 +54,10 @@ ResultScreen.load = function(self)
 		cs = self.cs
 	})
 	self.accuracyGraph:load()
+	
+	self.judgeTable = JudgeTable:new({
+		cs = self.cs
+	})
 end
 
 ResultScreen.unload = function(self)
@@ -71,6 +76,7 @@ ResultScreen.draw = function(self)
 	self.title:draw()
 	self.textTable:draw()
 	self.accuracyGraph:draw()
+	self.judgeTable:draw()
 end
 
 ResultScreen.receive = function(self, event)
@@ -91,6 +97,9 @@ ResultScreen.receive = function(self, event)
 		})
 		self.accuracyGraph.score = event.score
 		self.accuracyGraph:compute()
+		
+		self.judgeTable.score = event.score
+		self.judgeTable:load()
 	end
 end
 

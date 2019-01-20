@@ -6,10 +6,10 @@ local NoteChartFactory = require("sphere.game.NoteChartFactory")
 local NoteSkinManager = require("sphere.game.NoteSkinManager")
 local InputManager = require("sphere.game.InputManager")
 local PlayField = require("sphere.game.PlayField")
+local CustomScore = require("sphere.game.CustomScore")
 
 local CloudburstEngine = require("sphere.game.CloudburstEngine")
 local NoteSkin = require("sphere.game.CloudburstEngine.NoteSkin")
-local Score = require("sphere.game.CloudburstEngine.Score")
 
 local NotificationLine = require("sphere.ui.NotificationLine")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
@@ -41,7 +41,7 @@ GameplayScreen.load = function(self)
 	self.engine.noteChart = noteChart
 	self.engine.noteSkin = noteSkin
 	self.engine.container = self.container
-	self.engine.score = Score:new()
+	self.engine.score = CustomScore:new()
 	self.engine:load()
 	
 	self.playField = PlayField:new()
