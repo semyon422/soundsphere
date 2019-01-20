@@ -85,6 +85,7 @@ ResultScreen.receive = function(self, event)
 		self.title:reload()
 		self.textTable:reload()
 		self.accuracyGraph:reload()
+		self.judgeTable:reload()
 	elseif event.name == "keypressed" and event.args[1] == "escape" then
 		ScreenManager:set(require("sphere.screen.SelectionScreen"))
 	end
