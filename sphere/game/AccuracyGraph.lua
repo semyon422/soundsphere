@@ -19,8 +19,10 @@ AccuracyGraph.load = function(self)
 	table.sort(hits, function(a, b) return a[1] < b[1] end)
 	
 	for i = 1, #hits do
-		self.points[2 * i - 1] = hits[i][1] + 0.5
-		self.points[2 * i] = 1 - hits[i][2] / maxAmount / 3
+		self.points[#self.points + 1] = hits[i][1] * 4 + 0.5
+		self.points[#self.points + 1] = 1 - hits[i][2] / maxAmount / 3
+		self.points[#self.points + 1] = hits[i][1] * 4 + self.score.interval * 4 + 0.5
+		self.points[#self.points + 1] = 1 - hits[i][2] / maxAmount / 3
 	end
 	
 	if #self.points > 0 then
