@@ -68,17 +68,9 @@ CloudburstEngine.receive = function(self, event)
 	elseif event.name == "keypressed" then
 		local key = event.args[1]
 		if key == "return" then
-			if self.paused then
-				self.paused = false
-				AudioManager:play()
-				return self.timeManager:play()
-			end
+			self:play()
 		elseif key == "f1" then
-			if not self.paused then
-				self.paused = true
-				AudioManager:pause()
-				return self.timeManager:pause()
-			end
+			self:pause()
 		elseif key == "f3" then
 			if NoteSkin.targetSpeed - 0.1 >= 0.1 then
 				NoteSkin.targetSpeed = NoteSkin.targetSpeed - 0.1
@@ -118,6 +110,22 @@ CloudburstEngine.receive = function(self, event)
 				text = "autoplay: " .. (self.autoplay and "on" or "off")
 			})
 		end
+	end
+end
+
+CloudburstEngine.play = function(self)
+	if self.paused then
+		self.paused = false
+		AudioManager:play()
+		return self.timeManager:play()
+	end
+end
+
+CloudburstEngine.pause = function(self)
+	if not self.paused then
+		self.paused = true
+		AudioManager:pause()
+		return self.timeManager:pause()
 	end
 end
 

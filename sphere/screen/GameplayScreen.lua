@@ -55,7 +55,7 @@ GameplayScreen.load = function(self)
 	NoteChartResourceLoader.observable:add(NotificationLine)
 	
 	NoteChartResourceLoader:load(currentCacheData.path, noteChart, function()
-		self.engine.timeManager:play()
+		self.engine:play()
 	end)
 end
 
