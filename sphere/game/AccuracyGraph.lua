@@ -9,9 +9,7 @@ AccuracyGraph.load = function(self)
 		points = self.points,
 		cs = self.cs
 	})
-end
-
-AccuracyGraph.compute = function(self)
+	
 	local maxAmount = 0
 	local hits = {}
 	for deltaTime, amount in pairs(self.score.hits) do
@@ -20,27 +18,24 @@ AccuracyGraph.compute = function(self)
 	end
 	table.sort(hits, function(a, b) return a[1] < b[1] end)
 	
-	local points = {}
 	for i = 1, #hits do
-		points[2 * i - 1] = hits[i][1] + 0.5
-		points[2 * i] = 1 - hits[i][2] / maxAmount / 2
+		self.points[2 * i - 1] = hits[i][1] + 0.5
+		self.points[2 * i] = 1 - hits[i][2] / maxAmount / 3
 	end
-	self.points = points
 	
 	if #self.points > 0 then
-		self.line.points = points
 		self.line:reload()
 	end
 end
 
 AccuracyGraph.reload = function(self)
-	if #self.points > 0 then
+	if #self.points >= 4 then
 		self.line:reload()
 	end
 end
 
 AccuracyGraph.draw = function(self)
-	if #self.points > 0 then
+	if #self.points >= 4 then
 		self.line:draw()
 	end
 end
