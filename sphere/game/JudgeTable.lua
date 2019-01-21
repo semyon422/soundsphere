@@ -7,9 +7,9 @@ local spherefonts = require("sphere.assets.fonts")
 local JudgeTable = Class:new()
 
 JudgeTable.rowHeight = 0.06
-JudgeTable.x = 0.15
+JudgeTable.x = 0.2
 JudgeTable.y = 0.3
-JudgeTable.w = 0.2
+JudgeTable.w = 0.25
 JudgeTable.load = function(self)
 	self.judgeNames = {}
 	self.judgeGates = {}

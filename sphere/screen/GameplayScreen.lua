@@ -86,6 +86,10 @@ GameplayScreen.receive = function(self, event)
 			name = "score",
 			score = self.engine.score
 		})
+		ScreenManager:receive({
+			name = "metadata",
+			data = MapList.currentCacheData
+		})
 	end
 end
 

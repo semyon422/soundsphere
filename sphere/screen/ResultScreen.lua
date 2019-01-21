@@ -8,6 +8,7 @@ local ScreenManager = require("sphere.screen.ScreenManager")
 local TextTable = require("sphere.game.TextTable")
 local AccuracyGraph = require("sphere.game.AccuracyGraph")
 local JudgeTable = require("sphere.game.JudgeTable")
+local MetaDataTable = require("sphere.ui.MetaDataTable")
 local spherefonts = require("sphere.assets.fonts")
 
 local ResultScreen = Screen:new()
@@ -27,11 +28,11 @@ ResultScreen.load = function(self)
 	
 	self.resultText = TextFrame:new({
 		text = "Result",
-		x = 0, y = 0.05,
+		x = 0.1, y = 0.15,
 		w = 1, h = 0.1,
 		cs = self.cs,
 		limit = 1,
-		align = {x = "center", "center"},
+		align = {x = "left", "center"},
 		color = {255, 255, 255, 255},
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 48)
 	})
@@ -44,6 +45,10 @@ ResultScreen.load = function(self)
 	self.judgeTable = JudgeTable:new({
 		cs = self.cs
 	})
+	
+	self.metaDataTable = MetaDataTable:new({
+		cs = self.cs
+	})
 end
 
 ResultScreen.unload = function(self)
@@ -52,15 +57,13 @@ end
 
 ResultScreen.update = function(self)
 	Screen.update(self)
-	
-	self.resultText:update()
 end
 
 ResultScreen.draw = function(self)
 	Screen.draw(self)
 	
 	self.resultText:draw()
-		
+	self.metaDataTable:draw()
 	self.accuracyGraph:draw()
 	self.judgeTable:draw()
 end
@@ -70,24 +73,24 @@ ResultScreen.receive = function(self, event)
 		self.cs:reload()
 		
 		self.resultText:reload()
-		
+		self.metaDataTable:reload()
 		self.accuracyGraph:reload()
 		self.judgeTable:reload()
 	elseif event.name == "keypressed" and event.args[1] == "escape" then
 		ScreenManager:set(require("sphere.screen.SelectionScreen"))
 	end
 	
-	-- self.textTable:receive(event)
-	
 	if event.name == "score" then
-		-- self.textTable:setTable({
-			-- {"maxcombo", event.score.maxcombo}
-		-- })
 		self.accuracyGraph.score = event.score
 		self.accuracyGraph:load()
 		
 		self.judgeTable.score = event.score
 		self.judgeTable:load()
+	end
+	
+	if event.name == "metadata" then
+		self.metaDataTable.data = event.data
+		self.metaDataTable:load()
 	end
 end
 
