@@ -1,6 +1,7 @@
 local aquafonts = require("aqua.assets.fonts")
 local CS = require("aqua.graphics.CS")
 local TextFrame = require("aqua.graphics.TextFrame")
+local AudioManager = require("aqua.audio.AudioManager")
 
 local Screen = require("sphere.screen.Screen")
 local ScreenManager = require("sphere.screen.ScreenManager")
@@ -61,6 +62,7 @@ ResultScreen.load = function(self)
 end
 
 ResultScreen.unload = function(self)
+	AudioManager:stop()
 end
 
 ResultScreen.update = function(self)

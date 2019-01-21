@@ -19,38 +19,31 @@ NoteHandler.loadNoteData = function(self)
 			if noteData.inputType == self.inputType and noteData.inputIndex == self.inputIndex then
 				local logicalNote
 				
-				local soundFilePath
-				if noteData.soundFileName then
-					if not self.engine.soundFiles[noteData.soundFileName] then
-						self.engine.soundFiles[noteData.soundFileName] = FileManager:findFile(noteData.soundFileName, "audio")
-					end
-					soundFilePath = self.engine.soundFiles[noteData.soundFileName]
-				end
-				
 				if noteData.noteType == "ShortNote" then
 					logicalNote = ShortLogicalNote:new({
 						startNoteData = noteData,
-						pressSoundFilePath = soundFilePath,
+						pressSoundFilePath = noteData.soundFileName,
 						noteType = "ShortNote"
 					})
 				elseif noteData.noteType == "LongNoteStart" then
 					logicalNote = LongLogicalNote:new({
 						startNoteData = noteData,
 						endNoteData = noteData.endNoteData,
-						pressSoundFilePath = soundFilePath,
+						pressSoundFilePath = noteData.soundFileName,
+						releaseSoundFilePath = noteData.endNoteData.soundFileName,
 						noteType = "LongNote"
 					})
 				elseif noteData.noteType == "LineNoteStart" then
 					logicalNote = ShortLogicalNote:new({
 						startNoteData = noteData,
 						endNoteData = noteData.endNoteData,
-						pressSoundFilePath = soundFilePath,
+						pressSoundFilePath = noteData.soundFileName,
 						noteType = "SoundNote"
 					})
 				elseif noteData.noteType == "SoundNote" then
 					logicalNote = ShortLogicalNote:new({
 						startNoteData = noteData,
-						pressSoundFilePath = soundFilePath,
+						pressSoundFilePath = noteData.soundFileName,
 						noteType = "SoundNote"
 					})
 				end
@@ -113,6 +106,7 @@ NoteHandler.receive = function(self, event)
 end
 
 NoteHandler.playAudio = function(self, path)
+	path = self.engine.aliases[path]
 	local audio = AudioManager:getAudio(path)
 	if audio then
 		audio:play()

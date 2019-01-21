@@ -4,6 +4,7 @@ local Group = require("aqua.util.Group")
 local Observable = require("aqua.util.Observable")
 local AudioManager = require("aqua.audio.AudioManager")
 local sound = require("aqua.sound")
+
 local tween = require("tween")
 
 local CloudburstEngine = Class:new()
@@ -16,7 +17,7 @@ local Score = require("sphere.game.CloudburstEngine.Score")
 local TimeManager = require("sphere.game.CloudburstEngine.TimeManager")
 
 CloudburstEngine.autoplay = false
-CloudburstEngine.paused = false
+CloudburstEngine.paused = true
 CloudburstEngine.rate = 1
 CloudburstEngine.targetRate = 1
 
@@ -31,8 +32,6 @@ CloudburstEngine.load = function(self)
 	self:loadNoteHandlers()
 	self:loadNoteDrawers()
 	self:loadTimeManager()
-	
-	self:loadResources()
 	
 	self.noteSkin.allcs:reload()
 	self.noteSkin.cs:reload()
@@ -49,17 +48,12 @@ CloudburstEngine.update = function(self, dt)
 	self:updateTimeManager()
 	self:updateNoteHandlers()
 	self:updateNoteDrawers()
-	if not self.resourcesLoaded then
-		self:checkResources()
-	end
 end
 
 CloudburstEngine.unload = function(self)
 	self:unloadTimeManager()
 	self:unloadNoteHandlers()
 	self:unloadNoteDrawers()
-	
-	self:unloadResources()
 end
 
 CloudburstEngine.receive = function(self, event)
@@ -136,48 +130,6 @@ CloudburstEngine.updateRate = function(self)
 	self.noteSkin.rate = self.rate
 	self.timeManager:setRate(self.rate)
 	AudioManager:rate(self.rate)
-end
-
-CloudburstEngine.loadResources = function(self)
-	self.resourceCount = 0
-	self.resourceCountLoaded = 0
-	self.resourcesLoaded = false
-	self.loadingResources = {}
-	self.soundFilesGroup = Group:new()
-	
-	for _, soundFilePath in pairs(self.soundFiles) do
-		self.soundFilesGroup:add(soundFilePath)
-		self.loadingResources[soundFilePath] = true
-		self.resourceCount = self.resourceCount + 1
-	end
-	
-	self.soundFilesGroup:call(function(soundFilePath)
-		return sound.load(soundFilePath, function()
-			self.loadingResources[soundFilePath] = nil
-			self.resourceCountLoaded = self.resourceCountLoaded + 1
-			
-			return self.observable:send({
-				name = "notify",
-				text = self.resourceCountLoaded .. "/" .. self.resourceCount
-			})
-		end)
-	end)
-end
-
-CloudburstEngine.unloadResources = function(self)
-	AudioManager:stop()
-	
-	self.soundFilesGroup:call(function(soundFilePath)
-		return sound.unload(soundFilePath, function() end)
-	end)
-end
-
-CloudburstEngine.checkResources = function(self)
-	for filePath in pairs(self.loadingResources) do
-		return
-	end
-	self.resourcesLoaded = true
-	return self.timeManager:play()
 end
 
 CloudburstEngine.loadTimeManager = function(self)

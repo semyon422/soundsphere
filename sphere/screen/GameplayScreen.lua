@@ -1,5 +1,4 @@
 local Screen = require("sphere.screen.Screen")
-local FileManager = require("sphere.filesystem.FileManager")
 
 local MapList = require("sphere.game.MapList")
 local NoteChartFactory = require("sphere.game.NoteChartFactory")
@@ -7,6 +6,7 @@ local NoteSkinManager = require("sphere.game.NoteSkinManager")
 local InputManager = require("sphere.game.InputManager")
 local PlayField = require("sphere.game.PlayField")
 local CustomScore = require("sphere.game.CustomScore")
+local NoteChartResourceLoader = require("sphere.game.NoteChartResourceLoader")
 
 local CloudburstEngine = require("sphere.game.CloudburstEngine")
 local NoteSkin = require("sphere.game.CloudburstEngine.NoteSkin")
@@ -29,9 +29,6 @@ GameplayScreen.load = function(self)
 	local noteChart = NoteChartFactory:getNoteChart(currentCacheData.path)
 	local noteSkinData = NoteSkinManager:getNoteSkin(noteChart.inputMode)
 	
-	noteChart.directoryPath = currentCacheData.path:match("^(.+)/")
-	FileManager:addPath(noteChart.directoryPath)
-	
 	local noteSkin = NoteSkin:new({
 		directoryPath = noteSkinData.directoryPath,
 		noteSkinData = noteSkinData.noteSkin
@@ -42,6 +39,7 @@ GameplayScreen.load = function(self)
 	self.engine.noteSkin = noteSkin
 	self.engine.container = self.container
 	self.engine.score = CustomScore:new()
+	self.engine.aliases = NoteChartResourceLoader.aliases
 	self.engine:load()
 	
 	self.playField = PlayField:new()
@@ -53,14 +51,16 @@ GameplayScreen.load = function(self)
 	self.playField:load()
 	
 	self.engine.observable:add(self.playField)
-	-- self.engine.observable:add(self.score)
 	self.engine.observable:add(NotificationLine)
+	NoteChartResourceLoader.observable:add(NotificationLine)
+	
+	NoteChartResourceLoader:load(currentCacheData.path, noteChart, function()
+		self.engine.timeManager:play()
+	end)
 end
 
 GameplayScreen.unload = function(self)
-	FileManager:removePath(self.engine.noteChart.directoryPath)
 	self.engine:unload()
-	
 	self.playField:unload()
 end
 
