@@ -15,15 +15,15 @@ end
 Score.passEdge = 0.120
 Score.missEdge = 0.160
 Score.getTimeState = function(self, deltaTime)
-	if deltaTime + self.passEdge < 0 then
-		return "late"
-	elseif math.abs(deltaTime) - self.passEdge <= 0 then
+	if math.abs(deltaTime) <= self.passEdge then
 		return "exactly"
-	elseif deltaTime - self.passEdge > 0 and deltaTime - self.missEdge <= 0 then
+	elseif deltaTime > self.passEdge then
+		return "late"
+	elseif deltaTime >= -self.missEdge then
 		return "early"
-	else
-		return "none"
 	end
+	
+	return "none"
 end
 
 Score.timegates = {
@@ -77,7 +77,7 @@ Score.processNote = function(self, note)
 end
 
 Score.processShortNote = function(self, note)
-	local deltaTime = (note.startNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime) / self.rate
+	local deltaTime = (note.engine.currentTime - note.startNoteData.timePoint:getAbsoluteTime()) / self.rate
 	local timeState = self:getTimeState(deltaTime)
 	
 	note:process(timeState)
@@ -89,8 +89,8 @@ Score.processShortNote = function(self, note)
 end
 
 Score.processLongNote = function(self, note)
-	local deltaStartTime = (note.startNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime) / self.rate
-	local deltaEndTime = (note.endNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime) / self.rate
+	local deltaStartTime = (note.engine.currentTime - note.startNoteData.timePoint:getAbsoluteTime()) / self.rate
+	local deltaEndTime = (note.engine.currentTime - note.endNoteData.timePoint:getAbsoluteTime()) / self.rate
 	local startTimeState = self:getTimeState(deltaStartTime)
 	local endTimeState = self:getTimeState(deltaEndTime)
 	
