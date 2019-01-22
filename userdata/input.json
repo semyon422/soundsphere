@@ -1,0 +1,84 @@
+[
+	["4key:key1", "x"],
+	["4key:key2", "c"],
+	["4key:key3", ","],
+	["4key:key4", "."],
+	
+	
+	["5key:key1", "e"],
+	["5key:key2", "r"],
+	["5key:key3", "space"],
+	["5key:key4", "o"],
+	["5key:key5", "p"],
+	
+	
+	["5key1scratch:key1", "e"],
+	["5key1scratch:key2", "r"],
+	["5key1scratch:key3", "space"],
+	["5key1scratch:key4", "o"],
+	["5key1scratch:key5", "p"],
+	["5key1scratch:scratch1", "w"],
+	
+	
+	["7key:key1", "w"],
+	["7key:key2", "e"],
+	["7key:key3", "r"],
+	["7key:key4", "space"],
+	["7key:key5", "o"],
+	["7key:key6", "p"],
+	["7key:key7", "["],
+	
+	
+	["7key1scratch:key1", "w"],
+	["7key1scratch:key2", "e"],
+	["7key1scratch:key3", "r"],
+	["7key1scratch:key4", "space"],
+	["7key1scratch:key5", "o"],
+	["7key1scratch:key6", "p"],
+	["7key1scratch:key7", "["],
+	["7key1scratch:scratch1", "q"],
+	
+	
+	["10key:key1", "q"],
+	["10key:key2", "w"],
+	["10key:key3", "e"],
+	["10key:key4", "r"],
+	["10key:key5", "space"],
+	["10key:key6", "ralt"],
+	["10key:key7", "p"],
+	["10key:key8", "["],
+	["10key:key9", "]"],
+	["10key:key10", "\\"],
+	
+	
+	["10key2scratch:key1", "q"],
+	["10key2scratch:key2", "w"],
+	["10key2scratch:key3", "e"],
+	["10key2scratch:key4", "r"],
+	["10key2scratch:key5", "space"],
+	["10key2scratch:key6", "down"],
+	["10key2scratch:key7", "pagedown"],
+	["10key2scratch:key8", "kp7"],
+	["10key2scratch:key9", "kp8"],
+	["10key2scratch:key10", "kp9"],
+	["10key2scratch:scratch1", "tab"],
+	["10key2scratch:scratch2", "kp+"],
+	
+	
+	["14key2scratch:key1", "x"],
+	["14key2scratch:key2", "d"],
+	["14key2scratch:key3", "c"],
+	["14key2scratch:key4", "f"],
+	["14key2scratch:key5", "v"],
+	["14key2scratch:key6", "g"],
+	["14key2scratch:key7", "b"],
+	["14key2scratch:key8", "n"],
+	["14key2scratch:key9", "j"],
+	["14key2scratch:key10", "m"],
+	["14key2scratch:key11", "k"],
+	["14key2scratch:key12", ","],
+	["14key2scratch:key13", "l"],
+	["14key2scratch:key14", "."],
+	["14key2scratch:scratch1", "s"],
+	["14key2scratch:scratch2", ";"],
+]

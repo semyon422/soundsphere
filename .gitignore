@@ -8,4 +8,6 @@ ljsqlite3
 ncdk
 tween
 debug
-userdata
+userdata/charts
+userdata/skins
+userdata/cache.sqlite
