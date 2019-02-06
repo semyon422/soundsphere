@@ -54,18 +54,21 @@ NoteChartResourceLoader.loadBMS = function(self)
 		end
 	end
 	
+	local directoryPath = self.directoryPath
 	return self.soundGroup:call(function(soundFilePath)
-		return sound.load(soundFilePath, function()
-			self.resourceCountLoaded = self.resourceCountLoaded + 1
-			if self.resourceCountLoaded == self.resourceCount then
-				self.callback()
-			end
-			
-			return self.observable:send({
-				name = "notify",
-				text = self.resourceCountLoaded .. "/" .. self.resourceCount
-			})
-		end)
+		if self.directoryPath == directoryPath then
+			return sound.load(soundFilePath, function()
+				self.resourceCountLoaded = self.resourceCountLoaded + 1
+				if self.resourceCountLoaded == self.resourceCount then
+					self.callback()
+				end
+				
+				return self.observable:send({
+					name = "notify",
+					text = self.resourceCountLoaded .. "/" .. self.resourceCount
+				})
+			end)
+		end
 	end)
 end
 
