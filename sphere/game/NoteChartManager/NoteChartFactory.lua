@@ -6,7 +6,7 @@ local o2jam = require("o2jam")
 local NoteChartFactory = {}
 
 local patterns = {
-	"%.osu$", "%.bms$", "%.bme$", "%.bml$", "%.ojn$"
+	"%.osu$", "%.bm[sel]$", "%.ojn$"
 }
 
 NoteChartFactory.isNoteChart = function(self, path)
@@ -24,7 +24,7 @@ NoteChartFactory.getNoteChart = function(self, path)
 	
 	if path:find("%.osu$") then
 		noteChartImporter = osu.NoteChartImporter:new()
-	elseif path:find("%.bm.$") then
+	elseif path:find("%.bm[sel]$") then
 		noteChartImporter = bms.NoteChartImporter:new()
 	elseif path:find("%.ojn/.$") then
 		noteChartImporter = o2jam.NoteChartImporter:new()

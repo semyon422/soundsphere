@@ -10,7 +10,7 @@ local leftequal = require("aqua.table").leftequal
 local sign = require("aqua.math").sign
 
 local spherefonts = require("sphere.assets.fonts")
-local Cache = require("sphere.game.Cache")
+local Cache = require("sphere.game.NoteChartManager.Cache")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 local NotificationLine = require("sphere.ui.NotificationLine")
 
@@ -124,7 +124,6 @@ MapList.selectCache = function(self)
 			noteCount = result.noteCount[row],
 			length = result.length[row],
 			bpm = result.bpm[row],
-			nps = result.nps[row],
 			inputMode = result.inputMode[row]
 		}
 		table.insert(self.selectionList, result.path[row])
@@ -193,7 +192,8 @@ MapList.updateItems = function(self)
 					self:updateCurrentCacheData()
 				end
 			end,
-			selectionKey = selectionKey
+			selectionKey = selectionKey,
+			cacheData = self.cacheDatas[table.concat(selectionKey, "/")]
 		})
 	end
 	
@@ -208,8 +208,11 @@ MapList.getItemName = function(self, selectionKey)
 	
 	local cacheData = self.cacheDatas[cacheDataKey]
 	if cacheData.container == 0 then
-		return
-			cacheData.title
+		if cacheData.name ~= "" then
+			return cacheData.name
+		else
+			return "."
+		end
 	else
 		return selectionKey[#selectionKey]
 	end
@@ -410,6 +413,9 @@ end
 MapList.scrollToItemIndex = function(self, itemIndex)
 	if self.items[itemIndex] then
 		self.selectedItemIndex = itemIndex
+		self:send({
+			cacheData = self.items[itemIndex].cacheData
+		})
 	end
 	
 	self:updateScrollCurrentDelta()

@@ -45,10 +45,6 @@ ResultScreen.load = function(self)
 	self.judgeTable = JudgeTable:new({
 		cs = self.cs
 	})
-	
-	self.metaDataTable = MetaDataTable:new({
-		cs = self.cs
-	})
 end
 
 ResultScreen.unload = function(self)
@@ -63,7 +59,7 @@ ResultScreen.draw = function(self)
 	Screen.draw(self)
 	
 	self.resultText:draw()
-	self.metaDataTable:draw()
+	MetaDataTable:draw()
 	self.accuracyGraph:draw()
 	self.judgeTable:draw()
 end
@@ -73,7 +69,7 @@ ResultScreen.receive = function(self, event)
 		self.cs:reload()
 		
 		self.resultText:reload()
-		self.metaDataTable:reload()
+		MetaDataTable:reload()
 		self.accuracyGraph:reload()
 		self.judgeTable:reload()
 	elseif event.name == "keypressed" and event.args[1] == "escape" then
@@ -89,8 +85,7 @@ ResultScreen.receive = function(self, event)
 	end
 	
 	if event.name == "metadata" then
-		self.metaDataTable.data = event.data
-		self.metaDataTable:load()
+		MetaDataTable:setData(event.data)
 	end
 end
 

@@ -7,7 +7,7 @@ local aquaio = require("aqua.io")
 local SelectionScreen = require("sphere.screen.SelectionScreen")
 local ScreenManager = require("sphere.screen.ScreenManager")
 
-local Cache = require("sphere.game.Cache")
+local Cache = require("sphere.game.NoteChartManager.Cache")
 
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 local NotificationLine = require("sphere.ui.NotificationLine")
