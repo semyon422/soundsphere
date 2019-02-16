@@ -24,18 +24,30 @@ local fix = function(line)
 	return iconv(line, "UTF-8", "SHIFT-JIS") or iconv(line, "UTF-8", "EUC-KR") or iconv(line, "UTF-8", "US-ASCII") or line
 end
 
+local splitTitle = function(title)
+	if title:find("^.+%s?%[.+%]$") then
+		return title:match("^(.+)%s?%[(.+)%]$")
+	elseif title:find("^.+%s?%(.+%)$") then
+		return title:match("^(.+)%s?%((.+)%)$")
+	elseif title:find("^.+%s?%-.+%-$") then
+		return title:match("^(.+)%s?%-(.+)%-$")
+	else
+		return title, ""
+	end
+end
 CacheDataFactory.getBMS = function(self, path)
 	local noteChart = getNoteChart(path)
 	
+	local title, name = splitTitle(fix(noteChart:hashGet("TITLE") or ""))
 	return {{
 		path = path,
 		hash = "",
 		container = 0,
-		title = fix(noteChart:hashGet("TITLE") or "title"),
+		title = title,
 		artist = fix(noteChart:hashGet("ARTIST") or "artist"),
 		source = "BMS",
 		tags = "",
-		name = "",
+		name = name,
 		level = tonumber(noteChart:hashGet("PLAYLEVEL")),
 		creator = fix(noteChart:hashGet("ARTIST") or "artist"),
 		audioPath = "",
