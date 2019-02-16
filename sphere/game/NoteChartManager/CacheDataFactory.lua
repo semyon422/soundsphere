@@ -38,22 +38,22 @@ end
 
 local trimName = function(name)
 	if name:find("%[.+%]") then
-		return name:match("%[(.+)%]")
+		return name:match("%[(.+)%]"), name:find("%[.+%]")
 	elseif name:find("%(.+%)") then
-		return name:match("%((.+)%)")
+		return name:match("%((.+)%)"), name:find("%(.+%)")
 	elseif name:find("%-.+%-$") then
-		return name:match("%-(.+)%-")
+		return name:match("%-(.+)%-"), name:find("%-.+%-$")
 	else
-		return name
+		return name, #name + 1
 	end
 end
 CacheDataFactory.processCacheDataNames = function(self, cacheDatas)
 	local titleTable = {}
 	local title = cacheDatas[1].title
-	
+	local name, bracketStart = trimName(title)
+	print(title, name, bracketStart)
 	local continue = false
-	for i = 1, #title do
-		if title:find("[%[%(%-]") == i then break end
+	for i = 1, bracketStart - 1 do
 		for j = 1, #cacheDatas - 1 do
 			if cacheDatas[j].title:sub(i, i) ~= cacheDatas[j + 1].title:sub(i, i) then
 				continue = true

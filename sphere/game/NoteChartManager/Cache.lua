@@ -41,7 +41,7 @@ Cache.load = function(self)
 	]]
 	
 	self.insertStatement = self.db:prepare([[
-		INSERT INTO `cache` (
+		INSERT OR IGNORE INTO `cache` (
 			path,
 			hash,
 			container,
