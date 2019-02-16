@@ -9,7 +9,7 @@ local o2jam = require("o2jam")
 
 local CacheDataFactory = {}
 
-CacheDataFactory.getCacheData = function(self, path)
+CacheDataFactory.getCacheDatasForPath = function(self, path)
 	if path:find("%.osu$") then
 		return self:getOsu(path)
 	elseif path:find("%.bm[sel]$") then
@@ -19,35 +19,78 @@ CacheDataFactory.getCacheData = function(self, path)
 	end
 end
 
+CacheDataFactory.getCacheDatas = function(self, chartPaths)
+	local cacheDatas = {}
+	
+	for _, path in ipairs(chartPaths) do
+		for _, cacheData in ipairs(self:getCacheDatasForPath(path)) do
+			cacheDatas[#cacheDatas + 1] = cacheData
+		end
+	end
+	
+	if chartPaths[1]:find("%.bm[sel]$") then
+		self:processCacheDataNames(cacheDatas)
+	end
+	
+	return cacheDatas
+end
+
+
+local trimName = function(name)
+	if name:find("%[.+%]") then
+		return name:match("%[(.+)%]")
+	elseif name:find("%(.+%)") then
+		return name:match("%((.+)%)")
+	elseif name:find("%-.+%-$") then
+		return name:match("%-(.+)%-")
+	else
+		return name
+	end
+end
+CacheDataFactory.processCacheDataNames = function(self, cacheDatas)
+	local titleTable = {}
+	local title = cacheDatas[1].title
+	
+	local continue = false
+	for i = 1, #title do
+		if title:find("[%[%(%-]") == i then break end
+		for j = 1, #cacheDatas - 1 do
+			if cacheDatas[j].title:sub(i, i) ~= cacheDatas[j + 1].title:sub(i, i) then
+				continue = true
+				break
+			elseif j == #cacheDatas - 1 then
+				titleTable[#titleTable + 1] = cacheDatas[1].title:sub(i, i)
+			end
+		end
+		if continue then break end
+	end
+	
+	local title = table.concat(titleTable):trim()
+	for i = 1, #cacheDatas do
+		if not cacheDatas[i].name then
+			cacheDatas[i].name = trimName(cacheDatas[i].title:sub(#title + 1, -1)):trim()
+			cacheDatas[i].title = title
+		end
+	end
+end
+
 local iconv = require("iconv")
 local fix = function(line)
 	return iconv(line, "UTF-8", "SHIFT-JIS") or iconv(line, "UTF-8", "EUC-KR") or iconv(line, "UTF-8", "US-ASCII") or line
 end
 
-local splitTitle = function(title)
-	if title:find("^.+%s?%[.+%]$") then
-		return title:match("^(.+)%s?%[(.+)%]$")
-	elseif title:find("^.+%s?%(.+%)$") then
-		return title:match("^(.+)%s?%((.+)%)$")
-	elseif title:find("^.+%s?%-.+%-$") then
-		return title:match("^(.+)%s?%-(.+)%-$")
-	else
-		return title, ""
-	end
-end
 CacheDataFactory.getBMS = function(self, path)
 	local noteChart = getNoteChart(path)
 	
-	local title, name = splitTitle(fix(noteChart:hashGet("TITLE") or ""))
 	return {{
 		path = path,
 		hash = "",
 		container = 0,
-		title = title,
+		title = fix(noteChart:hashGet("TITLE") or ""),
 		artist = fix(noteChart:hashGet("ARTIST") or "artist"),
 		source = "BMS",
 		tags = "",
-		name = name,
+		name = nil,
 		level = tonumber(noteChart:hashGet("PLAYLEVEL")),
 		creator = fix(noteChart:hashGet("ARTIST") or "artist"),
 		audioPath = "",

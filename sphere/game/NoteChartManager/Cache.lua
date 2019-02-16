@@ -67,7 +67,7 @@ Cache.load = function(self)
 		VALUES (?, -1, '');
 	]])
 	self.updateContainerStatement = self.db:prepare([[
-		UPDATE `cache` SET `container` = ? WHERE `path` == ?;
+		UPDATE `cache` SET `container` = ?, `name` = ? WHERE `path` == ?;
 	]])
 	
 	self.rowByPathStatement = self.db:prepare([[
@@ -108,27 +108,19 @@ Cache.lookup = function(self, directoryPath, recursive)
 	
 	local items = love.filesystem.getDirectoryItems(directoryPath)
 	
-	local charts = 0
+	local chartPaths = {}
 	local containers = 0
 	
-	local extensionType
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
 		if love.filesystem.isFile(path) and NoteChartFactory:isNoteChart(path) then
-			if not self:rowByPath(path) then
-				if self:processFile(path) == 0 then
-					charts = charts + 1
-				else
-					containers = containers + 1
-				end
-			else
-				charts = 1
-			end
+			chartPaths[#chartPaths + 1] = path
 		end
 	end
 	
-	if charts > 0 then
-		self:setContainer(directoryPath, 1)
+	if #chartPaths > 0 then
+		print("processing directory", directoryPath)
+		self:processNoteChartSet(chartPaths, directoryPath)
 		return 1
 	end
 	
@@ -149,6 +141,18 @@ Cache.lookup = function(self, directoryPath, recursive)
 	return -1
 end
 
+Cache.processNoteChartSet = function(self, chartPaths, directoryPath)
+	self:setContainer(directoryPath, 1, "")
+	
+	local cacheDatas = CacheDataFactory:getCacheDatas(chartPaths)
+	
+	for i = 1, #cacheDatas do
+		print("processing file", cacheDatas[i].path)
+		self:setContainer(cacheDatas[i].path:match("^(.+)/.-"), 1, cacheDatas[i].title)
+		self:addChart(cacheDatas[i])
+	end
+end
+
 Cache.select = function(self)
 	local data = {}
 	
@@ -166,9 +170,9 @@ Cache.select = function(self)
 	end
 end
 
-Cache.setContainer = function(self, path, container)
+Cache.setContainer = function(self, path, container, name)
 	self.setContainerStatement:reset():bind(path):step()
-	self.updateContainerStatement:reset():bind(container, path):step()
+	self.updateContainerStatement:reset():bind(container, name, path):step()
 end
 
 Cache.addChart = function(self, cacheData)
@@ -191,19 +195,6 @@ Cache.addChart = function(self, cacheData)
 		cacheData.bpm,
 		cacheData.inputMode
 	):step()
-end
-
-Cache.processFile = function(self, path)
-	print("processing file", path)
-	
-	local cacheDatas = CacheDataFactory:getCacheData(path)
-	if #cacheDatas > 1 then
-		self:setContainer(path, 1)
-	end
-	
-	for i = 1, #cacheDatas do
-		self:addChart(cacheDatas[i])
-	end
 end
 
 return Cache

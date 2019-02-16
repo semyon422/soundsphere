@@ -214,7 +214,9 @@ MapList.getItemName = function(self, selectionKey)
 			return "."
 		end
 	else
-		return selectionKey[#selectionKey]
+		if cacheData.name ~= "" then
+			return cacheData.name or selectionKey[#selectionKey]
+		end
 	end
 	
 	return selectionKey[#selectionKey]
