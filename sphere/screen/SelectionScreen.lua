@@ -12,9 +12,9 @@ local SelectionScreen = Screen:new()
 Screen.construct(SelectionScreen)
 
 SelectionScreen.load = function(self)
-	BackgroundManager:setColor({191, 191, 191})
 	MapList:load()
 	MapList.observable:add(self)
+	BackgroundManager:setColor({127, 127, 127})
 end
 
 SelectionScreen.unload = function(self)

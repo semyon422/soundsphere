@@ -20,8 +20,6 @@ local GameplayScreen = Screen:new()
 Screen.construct(GameplayScreen)
 
 GameplayScreen.load = function(self)
-	BackgroundManager:setColor({63, 63, 63})
-	
 	InputManager:load()
 	
 	local currentCacheData = MapList.currentCacheData
@@ -57,6 +55,8 @@ GameplayScreen.load = function(self)
 	NoteChartResourceLoader:load(currentCacheData.path, noteChart, function()
 		self.engine:play()
 	end)
+	
+	BackgroundManager:setColor({63, 63, 63})
 end
 
 GameplayScreen.unload = function(self)

@@ -79,7 +79,6 @@ MapList.load = function(self)
 end
 
 MapList.draw = function(self)
-	self.selectionBackground:draw()
 	self.selectionFrame:draw()
 	self.stencil:draw()
 	self.stencil:set("greater", 0)
@@ -274,7 +273,6 @@ MapList.receive = function(self, event)
 		self.cs:reload()
 		self.squarecs:reload()
 		self.selectionFrame:reload()
-		self.selectionBackground:reload()
 		self.buttonsFrame:reload()
 	elseif event.name == "wheelmoved" then
 		local direction = event.args[2]
@@ -321,15 +319,6 @@ MapList.loadOverlay = function(self)
 	})
 	self.selectionFrame:reload()
 	
-	self.selectionBackground = Rectangle:new({
-		x = self.x, y = self.y,
-		w = self.w, h = self.h,
-		cs = self.cs,
-		color = {0, 0, 0, 127},
-		mode = "fill"
-	})
-	self.selectionBackground:reload()
-	
 	self.buttonsFrame = Rectangle:new({
 		x = self.x, y = 2 / self.buttonCount,
 		w = self.w, h = (self.buttonCount - 4) / self.buttonCount,
@@ -349,11 +338,6 @@ MapList.loadOverlay = function(self)
 		keepvalues = false
 	})
 	self.stencil:reload()
-end
-
-MapList.unloadOverlay = function(self)
-	-- self.selectionFrame:deactivate()
-	-- self.selectionBackground:deactivate()
 end
 
 MapList.calculateButtons = function(self)
