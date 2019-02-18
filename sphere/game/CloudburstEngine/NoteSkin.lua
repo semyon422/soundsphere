@@ -24,15 +24,17 @@ NoteSkin.allcs = CS:new({
 NoteSkin.cs = NoteSkin.allcs
 
 NoteSkin.construct = function(self)
-	self.cs = CS:new({
-		bx = tonumber(self.noteSkinData.cs[1]),
-		by = tonumber(self.noteSkinData.cs[2]),
-		rx = tonumber(self.noteSkinData.cs[3]),
-		ry = tonumber(self.noteSkinData.cs[4]),
-		binding = self.noteSkinData.cs[5]
-	})
+	if self.noteSkinData.cs then
+		self.cs = CS:new({
+			bx = tonumber(self.noteSkinData.cs[1]),
+			by = tonumber(self.noteSkinData.cs[2]),
+			rx = tonumber(self.noteSkinData.cs[3]),
+			ry = tonumber(self.noteSkinData.cs[4]),
+			binding = self.noteSkinData.cs[5]
+		})
+	end
 	
-	self.data = self.noteSkinData.notes
+	self.data = self.noteSkinData.notes or {}
 	
 	self.images = {}
 	self:loadImages()
