@@ -6,9 +6,16 @@ local tween = require("tween")
 local NoteSkin = Class:new()
 
 NoteSkin.color = {
+	transparent = {255, 255, 255, 0},
 	clear = {255, 255, 255, 255},
 	missed = {127, 127, 127, 255},
-	passed = {255, 255, 255, 0}
+	passed = {255, 255, 255, 0},
+	startMissed = {127, 127, 127, 255},
+	startMissedPressed = {191, 191, 191, 255},
+	startPassedPressed = {255, 255, 255, 255},
+	endPassed = {255, 255, 255, 0},
+	endMissed = {127, 127, 127, 255},
+	endMissedPassed = {127, 127, 127, 255}
 }
 
 NoteSkin.speed = 1
@@ -426,21 +433,21 @@ NoteSkin.getLongNoteColor = function(self, note)
 	local logicalNote = note.logicalNote
 	
 	if note.fakeStartTime and note.fakeStartTime >= note.endNoteData.timePoint:getAbsoluteTime() then
-		return {255, 255, 255, 0}
+		return self.color.transparent
 	elseif logicalNote.state == "clear" then
-		return {255, 255, 255, 255}
+		return self.color.clear
 	elseif logicalNote.state == "startMissed" then
-		return {127, 127, 127, 255}
+		return self.color.startMissed
 	elseif logicalNote.state == "startMissedPressed" then
-		return {191, 191, 191, 255}
+		return self.color.startMissedPressed
 	elseif logicalNote.state == "startPassedPressed" then
-		return {255, 255, 255, 255}
+		return self.color.startPassedPressed
 	elseif logicalNote.state == "endPassed" then
-		return {255, 255, 255, 0}
+		return self.color.endPassed
 	elseif logicalNote.state == "endMissed" then
-		return {127, 127, 127, 255}
+		return self.color.endMissed
 	elseif logicalNote.state == "endMissedPassed" then
-		return {127, 127, 127, 255}
+		return self.color.endMissedPassed
 	end
 end
 
