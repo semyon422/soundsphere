@@ -146,7 +146,7 @@ CLI.receive = function(self, event)
 				self.historyOffset = self.historyOffset + 1
 			end
 			if #self.history > 0 then
-				self.currentLine = table.clone(self.history[self.historyOffset])
+				self.currentLine = clone(self.history[self.historyOffset])
 				self.currentLineOffset = #self.currentLine
 			end
 		elseif key == "left" then
