@@ -11,21 +11,17 @@ FileManager.Formats = {
 FileManager.paths = {}
 
 FileManager.addPath = function(self, path)
-	table.insert(self.paths, path)
+	self.paths[path] = true
 end
 
 FileManager.removePath = function(self, path)
-	for pathIndex, currentPath in pairs(self.paths) do
-		if path == currentPath then
-			table.remove(self.paths, pathIndex)
-		end
-	end
+	self.paths[path] = nil
 end
 
 FileManager.findFile = function(self, fileName, fileType)
 	local fileName = self:removeExtension(fileName, fileType)
 	
-	for _, path in ipairs(self.paths) do
+	for path in pairs(self.paths) do
 		for _, format in ipairs(self.Formats[fileType]) do
 			local filePath = path .. "/" .. fileName .. "." .. format
 			if love.filesystem.exists(filePath) then
