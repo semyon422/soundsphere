@@ -51,7 +51,7 @@ MetaDataTable.init = function(self)
 		color = {255, 255, 255, 255},
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
 	})
-	print(123)
+	
 	self.titleText = TextFrame:new({
 		text = "",
 		x = self.x,
