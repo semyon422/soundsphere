@@ -26,18 +26,6 @@ ResultScreen.load = function(self)
 	})
 	self.cs:reload()
 	
-	self.resultText = TextFrame:new({
-		text = "Result",
-		x = 0.1, y = 0.15,
-		w = 1, h = 0.1,
-		cs = self.cs,
-		limit = 1,
-		align = {x = "left", "center"},
-		color = {255, 255, 255, 255},
-		font = aquafonts.getFont(spherefonts.NotoSansRegular, 48)
-	})
-	self.resultText:reload()
-	
 	self.accuracyGraph = AccuracyGraph:new({
 		cs = self.cs
 	})
@@ -58,7 +46,6 @@ end
 ResultScreen.draw = function(self)
 	Screen.draw(self)
 	
-	self.resultText:draw()
 	MetaDataTable:draw()
 	self.accuracyGraph:draw()
 	self.judgeTable:draw()
@@ -68,7 +55,6 @@ ResultScreen.receive = function(self, event)
 	if event.name == "resize" then
 		self.cs:reload()
 		
-		self.resultText:reload()
 		MetaDataTable:reload()
 		self.accuracyGraph:reload()
 		self.judgeTable:reload()

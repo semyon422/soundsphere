@@ -39,31 +39,22 @@ MapList.buttonCount = 17
 MapList.currentCacheData = {path = "userdata/charts"}
 MapList.selectionKey = MapList.currentCacheData.path:split("/")
 
+MapList.cs = CS:new({
+	bx = 0.5,
+	by = 0,
+	rx = 0,
+	ry = 0,
+	binding = "all",
+	baseOne = 768
+})
+
 MapList.load = function(self)
 	self.observable = Observable:new()
 	
 	self.db = Cache.db
 	self.db:setscalar("CHECKCACHE", function(...) return self:checkCache(...) end)
 	
-	self.cs = self.cs or CS:new({
-		bx = 0,
-		by = 0,
-		rx = 0,
-		ry = 0,
-		binding = "all",
-		baseOne = 768
-	})
 	self.cs:reload()
-	
-	self.squarecs = self.squarecs or CS:new({
-		bx = 0,
-		by = 0,
-		rx = 0,
-		ry = 0,
-		binding = "h",
-		baseOne = 768
-	})
-	self.squarecs:reload()
 	
 	self.font = aquafonts.getFont(spherefonts.NotoSansRegular, 28)
 	
@@ -79,7 +70,7 @@ MapList.load = function(self)
 end
 
 MapList.draw = function(self)
-	self.selectionFrame:draw()
+	-- self.selectionFrame:draw()
 	self.stencil:draw()
 	self.stencil:set("greater", 0)
 	for button in pairs(self.buttons) do
@@ -144,7 +135,8 @@ MapList.selectCache = function(self)
 	BackgroundManager:loadDrawableBackground(table.concat(self.selectionKey, "/") .. "/background.jpg")
 end
 
-MapList.updateCache = function(self, recursive)
+MapList.updateCache = function(self)
+	local recursive = love.keyboard.isDown("lshift")
 	local path = table.concat(self.selectionKey, "/")
 	Cache:update(path, recursive, function()
 		self:selectCache()
@@ -166,34 +158,7 @@ MapList.updateItems = function(self)
 	self.items = {}
 	
 	for _, selectionKey in ipairs(self.selectionList) do
-		self:addItem({
-			text = ("    "):rep(#selectionKey) .. validate(self:getItemName(selectionKey)),
-			onClick = function(button)
-				if button.itemIndex == self.selectedItemIndex then
-					self.selectionKey = selectionKey
-					self:selectCache()
-					self:updateCurrentCacheData()
-					self:updateItems()
-					self:unloadButtons()
-					self:calculateButtons()
-					local cacheData = self.cacheDatas[table.concat(selectionKey, "/")]
-					if cacheData and cacheData.container == 0 then
-						ScreenManager:set(require("sphere.screen.GameplayScreen"))
-					end
-				else
-					self:scrollToItemIndex(button.itemIndex)
-				end
-			end,
-			onSelect = function(button)
-				local path = table.concat(selectionKey, "/")
-				if self.cacheDatas[path] then
-					self.selectionKey = selectionKey
-					self:updateCurrentCacheData()
-				end
-			end,
-			selectionKey = selectionKey,
-			cacheData = self.cacheDatas[table.concat(selectionKey, "/")]
-		})
+		self:addItem(selectionKey)
 	end
 	
 	if self.selectedItemIndex > #self.items then
@@ -202,31 +167,43 @@ MapList.updateItems = function(self)
 	end
 end
 
-MapList.getItemName = function(self, selectionKey)
-	local cacheDataKey = table.concat(selectionKey, "/")
-	
-	local cacheData = self.cacheDatas[cacheDataKey]
-	if cacheData.container == 0 then
-		if cacheData.name ~= "" then
-			return cacheData.name
-		else
-			return "."
-		end
+MapList.getItemName = function(self, cacheData)
+	if cacheData.name and cacheData.name ~= "" then
+		return cacheData.name
+	elseif cacheData.container == 0 then
+		return "."
 	else
-		if cacheData.name ~= "" then
-			return cacheData.name or selectionKey[#selectionKey]
+		return cacheData.path
+	end
+end
+
+MapList.addItem = function(self, selectionKey)
+	local item = {}
+	item.index = #self.items + 1
+	item.selectionKey = selectionKey
+	item.cacheData = self.cacheDatas[table.concat(selectionKey, "/")]
+	item.text = ("    "):rep(#selectionKey - 1) .. self:getItemName(item.cacheData)
+	item.onClick = function()
+		if item.index == self.selectedItemIndex then
+			self.selectionKey = selectionKey
+			self:selectCache()
+			self:updateCurrentCacheData()
+			self:updateItems()
+			self:unloadButtons()
+			self:calculateButtons()
+			if item.cacheData and item.cacheData.container == 0 then
+				ScreenManager:set(require("sphere.screen.GameplayScreen"))
+			end
+		else
+			self:scrollToItemIndex(item.index)
 		end
 	end
+	item.onSelect = function()
+		self.selectionKey = selectionKey
+		self:updateCurrentCacheData()
+	end
 	
-	return selectionKey[#selectionKey]
-end
-
-MapList.addItem = function(self, item)
-	table.insert(self.items, item)
-end
-
-MapList.getItemCount = function(self)
-	return #self.items
+	self.items[#self.items + 1] = item
 end
 
 MapList.unload = function(self)
@@ -245,9 +222,10 @@ MapList.update = function(self)
 	
 	if self.selectedItemIndex < 1 then
 		self.selectedItemIndex = 1
-	elseif self.selectedItemIndex > self:getItemCount() then
-		self.selectedItemIndex = self:getItemCount()
+	elseif self.selectedItemIndex > #self.items then
+		self.selectedItemIndex = #self.items
 	end
+	
 	if (scrollCurrentDelta > 0 and self.visualItemIndex + scrollCurrentDelta > self.selectedItemIndex)
 	or (scrollCurrentDelta < 0 and self.visualItemIndex + scrollCurrentDelta < self.selectedItemIndex)
 	then
@@ -275,8 +253,7 @@ MapList.receive = function(self, event)
 		self.selectionFrame:reload()
 		self.buttonsFrame:reload()
 	elseif event.name == "wheelmoved" then
-		local direction = event.args[2]
-		self:scrollBy(-direction)
+		self:scrollBy(-event.args[2])
 	elseif event.name == "keypressed" then
 		local key = event.args[1]
 		if key == "up" then
@@ -285,8 +262,8 @@ MapList.receive = function(self, event)
 			self:scrollBy(1)
 		elseif key == "return" then
 			for button in pairs(self.buttons) do
-				if button.itemIndex == self.selectedItemIndex then
-					button.item.onClick(button)
+				if button.item.index == self.selectedItemIndex then
+					button.item.onClick()
 					break
 				end
 			end
@@ -296,7 +273,7 @@ MapList.receive = function(self, event)
 			self:updateItems()
 			self:unloadButtons()
 		elseif key == "f5" then
-			self:updateCache(love.keyboard.isDown("lshift"))
+			self:updateCache()
 		end
 	end
 end
@@ -312,9 +289,9 @@ end
 MapList.loadOverlay = function(self)
 	self.selectionFrame = Rectangle:new({
 		x = self.x, y = self.y + (self:getMiddleOffset() - 1) * (self.h / self.buttonCount),
-		w = 0.03, h = self.h / self.buttonCount,
-		cs = self.squarecs,
-		color = {255, 255, 255, 255},
+		w = -0.01, h = self.h / self.buttonCount,
+		cs = self.cs,
+		color = {255, 255, 255, 127},
 		mode = "fill"
 	})
 	self.selectionFrame:reload()
@@ -340,62 +317,6 @@ MapList.loadOverlay = function(self)
 	self.stencil:reload()
 end
 
-MapList.calculateButtons = function(self)
-	self.buttons = self.buttons or {}
-	
-	local itemIndexKeys = {}
-	for button in pairs(self.buttons) do
-		button:update()
-		itemIndexKeys[button.itemIndex] = button
-	end
-	
-	for itemIndex = self:getStartItemIndex(), self:getEndItemIndex() do
-		local item = self.items[itemIndex]
-		if item and not itemIndexKeys[itemIndex] then
-			local button = self.Button:new({
-				item = item,
-				itemIndex = itemIndex,
-				text = item.text,
-				interact = item.onClick,
-				
-				x = self.x, y = self.y,
-				w = self.w, h = self.h / (self.buttonCount),
-				layer = self.layer,
-				cs = self.cs,
-				rectangleColor = self.rectangleColor,
-				mode = self.mode,
-				limit = self.limit,
-				textAlign = self.textAlign,
-				textColor = self.textColor,
-				font = self.font,
-				list = self,
-			})
-			button:reload()
-			button:update()
-			
-			self.buttons[button] = button
-		end
-	end
-end
-
-MapList.unloadButtons = function(self)
-	self.buttons = nil
-end
-
-MapList.updateScrollCurrentDelta = function(self)
-	-- local dt =  math.min(1/60, love.timer.getDelta())
-	-- self.scrollCurrentDelta = (self.selectedItemIndex - self.visualItemIndex) * dt * 8
-	self.scrollCurrentDelta = (self.selectedItemIndex - self.visualItemIndex)
-end
-
-MapList.getButtonByItemIndex = function(self, itemIndex)
-	for button in pairs(self.buttons) do
-		if button.itemIndex == itemIndex then
-			return button
-		end
-	end
-end
-
 MapList.scrollToItemIndex = function(self, itemIndex)
 	if self.items[itemIndex] then
 		self.selectedItemIndex = itemIndex
@@ -404,40 +325,65 @@ MapList.scrollToItemIndex = function(self, itemIndex)
 		})
 	end
 	
-	self:updateScrollCurrentDelta()
+	self.scrollCurrentDelta = (self.selectedItemIndex - self.visualItemIndex)
 end
 
 MapList.scrollBy = function(self, scrollDelta)
 	self:scrollToItemIndex(self.selectedItemIndex + scrollDelta)
 end
 
-MapList.getItemIndex = function(self, item)
-	for itemIndex, currentItem in ipairs(self.items) do
-		if item == currentItem then
-			return itemIndex
-		end
+MapList.calculateButtons = function(self)
+	self.buttons = self.buttons or {}
+	
+	local itemIndexKeys = {}
+	for button in pairs(self.buttons) do
+		button:update()
+		itemIndexKeys[button.item.index] = button
 	end
 	
-	return 1
+	for itemIndex = self:getStartItemIndex(), self:getEndItemIndex() do
+		local item = self.items[itemIndex]
+		if item and not itemIndexKeys[itemIndex] then
+			self:addButton(item)
+		end
+	end
+end
+
+MapList.addButton = function(self, item)
+	local button = self.Button:new({
+		item = item,
+		text = item.text,
+		interact = item.onClick,
+		
+		x = self.x, y = self.y,
+		w = self.w, h = self.h / self.buttonCount,
+		cs = self.cs,
+		rectangleColor = self.rectangleColor,
+		mode = self.mode,
+		limit = self.limit,
+		textAlign = self.textAlign,
+		textColor = self.textColor,
+		font = self.font,
+		list = self,
+	})
+	button:reload()
+	button:update()
+	
+	self.buttons[button] = button
+end
+
+MapList.unloadButtons = function(self)
+	self.buttons = nil
 end
 
 MapList.Button = Button:new()
 
-MapList.Button.updateY = function(self)
-	self.y = self.list.y + (self.list:getMiddleOffset() - 1 + self.itemIndex - self.list.visualItemIndex) * (self.list.h / self.list.buttonCount)
-end
-
-MapList.Button.updateX = function(self)
-	self.x = self.list.x
-end
-
 MapList.Button.update = function(self)
-	local dt =  math.min(1/60, love.timer.getDelta())
+	self.x = self.list.x
+	self.y = self.list.y + (self.list:getMiddleOffset() - 1 + self.item.index - self.list.visualItemIndex) * (self.list.h / self.list.buttonCount)
 	
-	self:updateX()
-	self:updateY()
 	
-	if self.itemIndex == self.list.selectedItemIndex then
+	if self.item.index == self.list.selectedItemIndex then
 		self.rectangleColor = self.list.selectedRectangleColor
 		if not self.selected and self.item.onSelect then
 			self.item.onSelect(self)
@@ -448,14 +394,13 @@ MapList.Button.update = function(self)
 		self.rectangleColor = self.list.rectangleColor
 	end
 	
-	if self.itemIndex < self.list:getStartItemIndex() or
-		self.itemIndex > self.list:getEndItemIndex()
+	if self.item.index < self.list:getStartItemIndex() or
+		self.item.index > self.list:getEndItemIndex()
 	then
 		self.list.buttons[self] = nil
 	else
 		self:reload()
 	end
-	self:reload()
 end
 
 return MapList
