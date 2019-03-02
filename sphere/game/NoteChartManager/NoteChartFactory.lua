@@ -2,11 +2,12 @@ local NoteChart = require("ncdk.NoteChart")
 local bms = require("bms")
 local osu = require("osu")
 local o2jam = require("o2jam")
+local quaver = require("quaver")
 
 local NoteChartFactory = {}
 
 local patterns = {
-	"%.osu$", "%.bm[sel]$", "%.ojn$"
+	"%.osu$", "%.bm[sel]$", "%.ojn$", "%.qua$"
 }
 
 NoteChartFactory.isNoteChart = function(self, path)
@@ -24,6 +25,8 @@ NoteChartFactory.getNoteChart = function(self, path)
 	
 	if path:find("%.osu$") then
 		noteChartImporter = osu.NoteChartImporter:new()
+	elseif path:find("%.qua$") then
+		noteChartImporter = quaver.NoteChartImporter:new()
 	elseif path:find("%.bm[sel]$") then
 		noteChartImporter = bms.NoteChartImporter:new()
 	elseif path:find("%.ojn/.$") then
@@ -32,12 +35,14 @@ NoteChartFactory.getNoteChart = function(self, path)
 		path = path:match("^(.+)/.$")
 	end
 	
-	local file = love.filesystem.newFile(path)
-	file:open("r")
+	local file = io.open(path, "r")
+	-- local file = love.filesystem.newFile(path)
+	-- file:open("r")
 	
 	noteChartImporter.noteChart = noteChart
 	noteChartImporter.chartIndex = chartIndex
-	noteChartImporter:import(file:read())
+	-- noteChartImporter:import(file:read())
+	noteChartImporter:import(file:read("*all"))
 	
 	return noteChart
 end

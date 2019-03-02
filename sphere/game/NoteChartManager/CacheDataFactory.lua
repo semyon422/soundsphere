@@ -6,12 +6,15 @@ local NoteChart = require("ncdk.NoteChart")
 local bms = require("bms")
 local osu = require("osu")
 local o2jam = require("o2jam")
+local quaver = require("quaver")
 
 local CacheDataFactory = {}
 
 CacheDataFactory.getCacheDatasForPath = function(self, path)
 	if path:find("%.osu$") then
 		return self:getOsu(path)
+	elseif path:find("%.qua$") then print(123)
+		return self:getQuaver(path)
 	elseif path:find("%.bm[sel]$") then
 		return self:getBMS(path)
 	elseif path:find("%.ojn$") then
@@ -120,6 +123,30 @@ CacheDataFactory.getOsu = function(self, path)
 		audioPath = "",
 		stagePath = "",
 		previewTime = 0,
+		noteCount = 1000,
+		length = 300,
+		bpm = 120,
+		inputMode = noteChart.inputMode:getString()
+	}}
+end
+
+CacheDataFactory.getQuaver = function(self, path)
+	local noteChart = getNoteChart(path)
+	
+	return {{
+		path = path,
+		hash = "",
+		container = 0,
+		title = fix(noteChart:hashGet("Title") or ""),
+		artist = fix(noteChart:hashGet("Artist") or ""),
+		source = fix(noteChart:hashGet("Source") or ""),
+		tags = fix(noteChart:hashGet("Tags") or ""),
+		name = fix(noteChart:hashGet("DifficultyName") or ""),
+		level = 0,
+		creator = fix(noteChart:hashGet("Creator") or ""),
+		audioPath = fix(noteChart:hashGet("AudioFile") or ""),
+		stagePath = fix(noteChart:hashGet("BackgroundFile") or ""),
+		previewTime = noteChart:hashGet("SongPreviewTime"),
 		noteCount = 1000,
 		length = 300,
 		bpm = 120,

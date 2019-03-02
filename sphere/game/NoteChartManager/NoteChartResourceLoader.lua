@@ -20,7 +20,7 @@ NoteChartResourceLoader.load = function(self, path, noteChart, callback)
 	self.noteChart = noteChart
 	self.callback = callback
 	
-	if self.noteChart.type == "bms" or self.noteChart.type == "osu" then
+	if self.noteChart.type == "bms" or self.noteChart.type == "osu" or self.noteChart.type == "quaver" then
 		self:loadBMS()
 	elseif self.noteChart.type == "o2jam" then
 		self:loadOJM()
