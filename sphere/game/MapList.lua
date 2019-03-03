@@ -249,7 +249,6 @@ MapList.receive = function(self, event)
 	
 	if event.name == "resize" then
 		self.cs:reload()
-		self.squarecs:reload()
 		self.selectionFrame:reload()
 		self.buttonsFrame:reload()
 	elseif event.name == "wheelmoved" then
