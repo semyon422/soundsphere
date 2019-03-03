@@ -35,14 +35,12 @@ NoteChartFactory.getNoteChart = function(self, path)
 		path = path:match("^(.+)/.$")
 	end
 	
-	local file = io.open(path, "r")
-	-- local file = love.filesystem.newFile(path)
-	-- file:open("r")
+	local file = love.filesystem.newFile(path)
+	file:open("r")
 	
 	noteChartImporter.noteChart = noteChart
 	noteChartImporter.chartIndex = chartIndex
-	-- noteChartImporter:import(file:read())
-	noteChartImporter:import(file:read("*all"))
+	noteChartImporter:import(file:read():gsub("\r\n", "\n"))
 	
 	return noteChart
 end
