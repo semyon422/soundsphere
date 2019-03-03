@@ -11,4 +11,5 @@ tinyyaml
 debug
 userdata/charts
 userdata/skins
+userdata/hitsounds
 userdata/cache.sqlite

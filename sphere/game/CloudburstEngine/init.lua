@@ -113,6 +113,17 @@ CloudburstEngine.receive = function(self, event)
 	end
 end
 
+CloudburstEngine.playAudio = function(self, paths)
+	if not paths then return end
+	for i = 1, #paths do
+		local audio = AudioManager:getAudio(self.aliases[paths[i]])
+		if audio then
+			audio:play()
+			audio:rate(self.rate)
+		end
+	end
+end
+
 CloudburstEngine.play = function(self)
 	if self.paused then
 		self.paused = false

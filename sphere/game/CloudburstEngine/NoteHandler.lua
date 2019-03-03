@@ -22,28 +22,28 @@ NoteHandler.loadNoteData = function(self)
 				if noteData.noteType == "ShortNote" then
 					logicalNote = ShortLogicalNote:new({
 						startNoteData = noteData,
-						pressSoundFilePath = noteData.soundFileName,
+						pressSounds = noteData.sounds,
 						noteType = "ShortNote"
 					})
 				elseif noteData.noteType == "LongNoteStart" then
 					logicalNote = LongLogicalNote:new({
 						startNoteData = noteData,
 						endNoteData = noteData.endNoteData,
-						pressSoundFilePath = noteData.soundFileName,
-						releaseSoundFilePath = noteData.endNoteData.soundFileName,
+						pressSounds = noteData.sounds,
+						releaseSounds = noteData.endNoteData.sounds,
 						noteType = "LongNote"
 					})
 				elseif noteData.noteType == "LineNoteStart" then
 					logicalNote = ShortLogicalNote:new({
 						startNoteData = noteData,
 						endNoteData = noteData.endNoteData,
-						pressSoundFilePath = noteData.soundFileName,
+						pressSounds = noteData.sounds,
 						noteType = "SoundNote"
 					})
 				elseif noteData.noteType == "SoundNote" then
 					logicalNote = ShortLogicalNote:new({
 						startNoteData = noteData,
-						pressSoundFilePath = noteData.soundFileName,
+						pressSounds = noteData.sounds,
 						noteType = "SoundNote"
 					})
 				end
@@ -92,25 +92,16 @@ NoteHandler.receive = function(self, event)
 	local key = event.args and event.args[1]
 	if self.keyBind and key == self.keyBind then
 		if event.name == "keypressed" then
-			self:playAudio(self.currentNote.pressSoundFilePath)
+			self.engine:playAudio(self.currentNote.pressSounds)
 			
 			self.currentNote.keyState = true
 			return self:switchKey(true)
 		elseif event.name == "keyreleased" then
-			self:playAudio(self.currentNote.releaseSoundFilePath)
+			self.engine:playAudio(self.currentNote.releaseSounds)
 			
 			self.currentNote.keyState = false
 			return self:switchKey(false)
 		end
-	end
-end
-
-NoteHandler.playAudio = function(self, path)
-	path = self.engine.aliases[path]
-	local audio = AudioManager:getAudio(path)
-	if audio then
-		audio:play()
-		audio:rate(self.engine.rate)
 	end
 end
 
