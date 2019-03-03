@@ -9,6 +9,7 @@ NoteChartResourceLoader.observable = Observable:new()
 
 NoteChartResourceLoader.resourceNames = {}
 NoteChartResourceLoader.aliases = {}
+NoteChartResourceLoader.hitSoundsPath = "userdata/hitsounds"
 
 NoteChartResourceLoader.load = function(self, path, noteChart, callback)
 	local directoryPath = path:match("^(.+)/")
@@ -38,7 +39,8 @@ NoteChartResourceLoader.loadOJM = function(self)
 end
 
 NoteChartResourceLoader.loadBMS = function(self)
-	FileManager:addPath(self.directoryPath)
+	FileManager:addPath(self.directoryPath, 1)
+	FileManager:addPath(self.hitSoundsPath, 0)
 	
 	self.resourceCount = 0
 	self.resourceCountLoaded = 0
@@ -82,6 +84,7 @@ end
 
 NoteChartResourceLoader.unloadBMS = function(self)
 	FileManager:removePath(self.directoryPath)
+	FileManager:removePath(self.hitSoundsPath)
 	
 	return self.soundGroup:call(function(soundFilePath)
 		return sound.unload(soundFilePath, function() end)
