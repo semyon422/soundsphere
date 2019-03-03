@@ -27,7 +27,7 @@ FileManager.removePath = function(self, path)
 	self.priority[path] = nil
 	for i = 1, #self.paths do
 		if self.paths[i] == path then
-			self.paths[i] = nil
+			table.remove(self.paths, i)
 		end
 	end
 end

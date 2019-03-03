@@ -75,7 +75,7 @@ NoteChartResourceLoader.loadBMS = function(self)
 end
 
 NoteChartResourceLoader.unload = function(self)
-	if self.noteChart.type == "bms" or self.noteChart.type == "osu" then
+	if self.noteChart.type == "bms" or self.noteChart.type == "osu" or self.noteChart.type == "quaver" then
 		self:unloadBMS()
 	elseif self.noteChart.type == "o2jam" then
 		self:unloadOJM()
