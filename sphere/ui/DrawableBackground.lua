@@ -24,6 +24,10 @@ DrawableBackground.load = function(self)
 		color = self.color
 	})
 	self.drawableFrame:reload()
+	
+	local mx = self.cs:x(love.mouse.getX(), true)
+	local my = self.cs:y(love.mouse.getY(), true)
+	self:updateParallax(mx, my)
 end
 
 DrawableBackground.getColor = function(self)
@@ -86,12 +90,16 @@ DrawableBackground.receive = function(self, event)
 	if event.name == "mousemoved" then
 		local mx = self.cs:x(event.args[1], true)
 		local my = self.cs:y(event.args[2], true)
-		self.drawableFrame.x = 0 - map(mx, 0, 1, self.parallax, 0)
-		self.drawableFrame.y = 0 - map(my, 0, 1, self.parallax, 0)
-		self.drawableFrame.w = 1 + 2 * self.parallax
-		self.drawableFrame.h = 1 + 2 * self.parallax
-		self.drawableFrame:reload()
+		self:updateParallax(mx, my)
 	end
+end
+
+DrawableBackground.updateParallax = function(self, x, y)
+	self.drawableFrame.x = 0 - map(x, 0, 1, self.parallax, 0)
+	self.drawableFrame.y = 0 - map(y, 0, 1, self.parallax, 0)
+	self.drawableFrame.w = 1 + 2 * self.parallax
+	self.drawableFrame.h = 1 + 2 * self.parallax
+	self.drawableFrame:reload()
 end
 
 return DrawableBackground
