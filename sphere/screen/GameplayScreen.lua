@@ -65,10 +65,10 @@ GameplayScreen.unload = function(self)
 end
 
 GameplayScreen.update = function(self, dt)
-	Screen.update(self)
-	
 	self.engine:update(dt)
 	self.playField:update()
+	
+	Screen.update(self)
 end
 
 GameplayScreen.draw = function(self)
