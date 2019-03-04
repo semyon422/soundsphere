@@ -40,7 +40,14 @@ NoteChartFactory.getNoteChart = function(self, path)
 	
 	noteChartImporter.noteChart = noteChart
 	noteChartImporter.chartIndex = chartIndex
-	noteChartImporter:import(file:read():gsub("\r\n", "\n"))
+	
+	local status, err = pcall(function()
+		return noteChartImporter:import(file:read():gsub("\r\n", "\n"))
+	end)
+	
+	if not status then
+		return print(err)
+	end
 	
 	return noteChart
 end

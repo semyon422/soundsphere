@@ -131,8 +131,6 @@ MapList.selectCache = function(self)
 			break
 		end
 	end
-	
-	BackgroundManager:loadDrawableBackground(table.concat(self.selectionKey, "/") .. "/background.jpg")
 end
 
 MapList.updateCache = function(self)
@@ -148,8 +146,27 @@ MapList.updateCache = function(self)
 end
 
 MapList.updateCurrentCacheData = function(self)
-	if self.cacheDatas[table.concat(self.selectionKey, "/")] then
-		self.currentCacheData = self.cacheDatas[table.concat(self.selectionKey, "/")]
+	local path = table.concat(self.selectionKey, "/")
+	if self.cacheDatas[path] then
+		self.currentCacheData = self.cacheDatas[path]
+		
+		local directoryPath
+		if self.currentCacheData.container == 0 then
+			local directoryPathTable = path:split("/")
+			directoryPathTable[#directoryPathTable] = nil
+			directoryPath = table.concat(directoryPathTable, "/")
+		else
+			directoryPath = path
+		end
+		
+		local stagePath
+		if self.currentCacheData.stagePath and self.currentCacheData.stagePath ~= "" then
+			stagePath = self.currentCacheData.stagePath
+		else
+			stagePath = "background.jpg"
+		end
+		
+		BackgroundManager:loadDrawableBackground(directoryPath .. "/" .. stagePath)
 	end
 end
 
@@ -170,6 +187,8 @@ end
 MapList.getItemName = function(self, cacheData)
 	if cacheData.name and cacheData.name ~= "" then
 		return cacheData.name
+	elseif cacheData.title and cacheData.title ~= "" then
+		return cacheData.title
 	elseif cacheData.container == 0 then
 		return "."
 	else

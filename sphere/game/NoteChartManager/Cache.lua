@@ -19,16 +19,13 @@ Cache.load = function(self)
 			`path` TEXT,
 			`hash` TEXT,
 			`container` INTEGER,
-			
 			`title` TEXT,
 			`artist` TEXT,
 			`source` TEXT,
 			`tags` TEXT,
-			
 			`name` TEXT,
 			`level` INTEGER,
 			`creator` TEXT,
-			
 			`audioPath` TEXT,
 			`stagePath` TEXT,
 			`previewTime` REAL,
@@ -62,16 +59,30 @@ Cache.load = function(self)
 		)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 	]])
-	self.setContainerStatement = self.db:prepare([[
-		INSERT OR IGNORE INTO `cache` (path, container, name)
-		VALUES (?, -1, '');
-	]])
-	self.updateContainerStatement = self.db:prepare([[
-		UPDATE `cache` SET `container` = ?, `name` = ? WHERE `path` == ?;
+	
+	self.updateStatement = self.db:prepare([[
+		UPDATE `cache` SET
+			`hash` = ?,
+			`container` = ?,
+			`title` = ?,
+			`artist` = ?,
+			`source` = ?,
+			`tags` = ?,
+			`name` = ?,
+			`level` = ?,
+			`creator` = ?,
+			`audioPath` = ?,
+			`stagePath` = ?,
+			`previewTime` = ?,
+			`noteCount` = ?,
+			`length` = ?,
+			`bpm` = ?,
+			`inputMode` = ?
+		WHERE `path` = ?;
 	]])
 	
-	self.rowByPathStatement = self.db:prepare([[
-		SELECT * FROM `cache` WHERE path == ?
+	self.selectStatement = self.db:prepare([[
+		SELECT * FROM `cache` WHERE path = ?
 	]])
 end
 
@@ -98,7 +109,7 @@ Cache.update = function(self, path, recursive, callback)
 end
 
 Cache.rowByPath = function(self, path)
-	return self.rowByPathStatement:reset():bind(path):step()
+	return self.selectStatement:reset():bind(path):step()
 end
 
 Cache.lookup = function(self, directoryPath, recursive)
@@ -134,7 +145,12 @@ Cache.lookup = function(self, directoryPath, recursive)
 	end
 	
 	if containers > 0 then
-		self:setContainer(directoryPath, 2)
+		self:setEntry({
+			path = directoryPath,
+			container = 2,
+			title = directoryPath:match("^.+/(.-)$"),
+		})
+		
 		return 2
 	end
 	
@@ -142,14 +158,32 @@ Cache.lookup = function(self, directoryPath, recursive)
 end
 
 Cache.processNoteChartSet = function(self, chartPaths, directoryPath)
-	self:setContainer(directoryPath, 1, "")
+	self:setEntry({
+		path = directoryPath,
+		container = 2,
+		title = directoryPath:match("^.+/(.-)$"),
+	})
 	
 	local cacheDatas = CacheDataFactory:getCacheDatas(chartPaths)
 	
+	if cacheDatas[1] then
+		self:setEntry({
+			path = cacheDatas[1].path:match("^(.+)/.-"),
+			container = 1,
+			
+			title = cacheDatas[1].title,
+			artist = cacheDatas[1].artist,
+			source = cacheDatas[1].source,
+			tags = cacheDatas[1].tags,
+			creator = cacheDatas[1].creator,
+			audioPath = cacheDatas[1].audioPath,
+			stagePath = cacheDatas[1].stagePath,
+			previewTim = cacheDatas[1].previewTime
+		})
+	end
 	for i = 1, #cacheDatas do
 		print("processing file", cacheDatas[i].path)
-		self:setContainer(cacheDatas[i].path:match("^(.+)/.-"), 1, cacheDatas[i].title)
-		self:addChart(cacheDatas[i])
+		self:setEntry(cacheDatas[i])
 	end
 end
 
@@ -170,12 +204,7 @@ Cache.select = function(self)
 	end
 end
 
-Cache.setContainer = function(self, path, container, name)
-	self.setContainerStatement:reset():bind(path):step()
-	self.updateContainerStatement:reset():bind(container, name, path):step()
-end
-
-Cache.addChart = function(self, cacheData)
+Cache.setEntry = function(self, cacheData)
 	self.insertStatement:reset():bind(
 		cacheData.path,
 		cacheData.hash,
@@ -194,6 +223,25 @@ Cache.addChart = function(self, cacheData)
 		cacheData.length,
 		cacheData.bpm,
 		cacheData.inputMode
+	):step()
+	self.updateStatement:reset():bind(
+		cacheData.hash,
+		cacheData.container,
+		cacheData.title,
+		cacheData.artist,
+		cacheData.source,
+		cacheData.tags,
+		cacheData.name,
+		cacheData.level,
+		cacheData.creator,
+		cacheData.audioPath,
+		cacheData.stagePath,
+		cacheData.previewTime,
+		cacheData.noteCount,
+		cacheData.length,
+		cacheData.bpm,
+		cacheData.inputMode,
+		cacheData.path
 	):step()
 end
 

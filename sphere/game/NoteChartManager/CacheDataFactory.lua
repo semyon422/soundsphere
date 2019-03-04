@@ -31,7 +31,7 @@ CacheDataFactory.getCacheDatas = function(self, chartPaths)
 		end
 	end
 	
-	if chartPaths[1]:find("%.bm[sel]$") then
+	if chartPaths[1]:find("%.bm[sel]$") and cacheDatas[1] then
 		self:processCacheDataNames(cacheDatas)
 	end
 	
@@ -78,12 +78,19 @@ CacheDataFactory.processCacheDataNames = function(self, cacheDatas)
 end
 
 local iconv = require("iconv")
+local validate = require("aqua.utf8").validate
 local fix = function(line)
-	return iconv(line, "UTF-8", "SHIFT-JIS") or iconv(line, "UTF-8", "EUC-KR") or iconv(line, "UTF-8", "US-ASCII") or line
+	if validate(line) then
+		return line
+	else
+		return iconv(line, "UTF-8", "SHIFT-JIS") or iconv(line, "UTF-8", "EUC-KR") or iconv(line, "UTF-8", "US-ASCII") or line
+	end
 end
 
 CacheDataFactory.getBMS = function(self, path)
 	local noteChart = getNoteChart(path)
+	
+	if not noteChart then return {} end
 	
 	return {{
 		path = path,
@@ -109,6 +116,8 @@ end
 CacheDataFactory.getOsu = function(self, path)
 	local noteChart = getNoteChart(path)
 	
+	if not noteChart then return {} end
+	
 	return {{
 		path = path,
 		hash = "",
@@ -120,8 +129,8 @@ CacheDataFactory.getOsu = function(self, path)
 		name = fix(noteChart:hashGet("Version") or ""),
 		level = 0,
 		creator = fix(noteChart:hashGet("Creator") or ""),
-		audioPath = "",
-		stagePath = "",
+		audioPath = fix(noteChart:hashGet("AudioFilename") or ""),
+		stagePath = fix(noteChart:hashGet("Background") or ""),
 		previewTime = 0,
 		noteCount = 1000,
 		length = 300,
@@ -132,6 +141,8 @@ end
 
 CacheDataFactory.getQuaver = function(self, path)
 	local noteChart = getNoteChart(path)
+	
+	if not noteChart then return {} end
 	
 	return {{
 		path = path,
