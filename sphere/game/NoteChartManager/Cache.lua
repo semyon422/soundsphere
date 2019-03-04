@@ -105,7 +105,6 @@ Cache.update = function(self, path, recursive, callback)
 		)
 		self.isUpdating = true
 	end
-	-- self:lookup(path, recursive)
 end
 
 Cache.rowByPath = function(self, path)

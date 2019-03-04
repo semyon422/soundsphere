@@ -80,7 +80,7 @@ end
 local iconv = require("iconv")
 local validate = require("aqua.utf8").validate
 local fix = function(line)
-	if validate(line) then
+	if validate(line) == line then
 		return line
 	else
 		return iconv(line, "UTF-8", "SHIFT-JIS") or iconv(line, "UTF-8", "EUC-KR") or iconv(line, "UTF-8", "US-ASCII") or line
