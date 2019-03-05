@@ -166,7 +166,13 @@ MapList.updateCurrentCacheData = function(self)
 			stagePath = "background.jpg"
 		end
 		
-		BackgroundManager:loadDrawableBackground(directoryPath .. "/" .. stagePath)
+		self.backgroundPath = directoryPath .. "/" .. stagePath
+	end
+end
+
+MapList.updateBackground = function(self)
+	if self.backgroundPath then
+		BackgroundManager:loadDrawableBackground(self.backgroundPath)
 	end
 end
 
@@ -250,6 +256,7 @@ MapList.update = function(self)
 	then
 		self.visualItemIndex = self.selectedItemIndex
 		self.scrollCurrentDelta = 0
+		self:updateBackground()
 	else
 		self.visualItemIndex = self.visualItemIndex + scrollCurrentDelta
 	end

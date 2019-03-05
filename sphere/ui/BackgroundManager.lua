@@ -32,6 +32,7 @@ BackgroundManager.loadDrawableBackground = function(self, path)
 end
 
 BackgroundManager.setColor = function(self, color)
+	love.timer.step()
 	self.colorTween = tween.new(0.5, self.color, color, "inOutQuad")
 end
 
@@ -47,7 +48,8 @@ BackgroundManager.setDrawableBackground = function(self, imageData)
 end
 
 BackgroundManager.setBackground = function(self, background)
-	self.backgrounds[#self.backgrounds + 1] = background
+	local layer = math.min(#self.backgrounds + 1, 3)
+	self.backgrounds[layer] = background
 	background:load()
 end
 

@@ -54,13 +54,13 @@ DrawableBackground.update = function(self)
 	self.drawableFrame:update()
 	
 	if self.state == 1 then
-		self.color[4] = math.min(self.color[4] + love.timer.getDelta() * 1000, 255)
+		self.color[4] = math.min(self.color[4] + love.timer.getDelta() * 2000, 255)
 		if self.color[4] == 255 then
 			self.state = 0
 			self.visible = 1
 		end
 	elseif self.state == -1 then
-		self.color[4] = math.max(self.color[4] - love.timer.getDelta() * 1000, 0)
+		self.color[4] = math.max(self.color[4] - love.timer.getDelta() * 2000, 0)
 		if self.color[4] == 0 then
 			self.state = 0
 			self.visible = -1
