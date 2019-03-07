@@ -54,7 +54,7 @@ CacheDataFactory.processCacheDataNames = function(self, cacheDatas)
 	local titleTable = {}
 	local title = cacheDatas[1].title
 	local name, bracketStart = trimName(title)
-	print(title, name, bracketStart)
+	
 	local continue = false
 	for i = 1, bracketStart - 1 do
 		for j = 1, #cacheDatas - 1 do
@@ -106,8 +106,8 @@ CacheDataFactory.getBMS = function(self, path)
 		audioPath = "",
 		stagePath = fix(noteChart:hashGet("STAGEFILE") or ""),
 		previewTime = 0,
-		noteCount = 1000,
-		length = 300,
+		noteCount = noteChart:hashGet("noteCount"),
+		length = noteChart:hashGet("totalLength"),
 		bpm = 120,
 		inputMode = noteChart.inputMode:getString()
 	}}
@@ -125,16 +125,16 @@ CacheDataFactory.getOsu = function(self, path)
 		title = fix(noteChart:hashGet("Title") or ""),
 		artist = fix(noteChart:hashGet("Artist") or ""),
 		source = fix(noteChart:hashGet("Source") or ""),
-		tags = "",
+		tags = fix(noteChart:hashGet("Tags") or ""),
 		name = fix(noteChart:hashGet("Version") or ""),
 		level = 0,
 		creator = fix(noteChart:hashGet("Creator") or ""),
 		audioPath = fix(noteChart:hashGet("AudioFilename") or ""),
 		stagePath = fix(noteChart:hashGet("Background") or ""),
-		previewTime = 0,
-		noteCount = 1000,
-		length = 300,
-		bpm = 120,
+		previewTime = noteChart:hashGet("PreviewTime") / 1000,
+		noteCount = noteChart:hashGet("noteCount"),
+		length = noteChart:hashGet("totalLength") / 1000,
+		bpm = noteChart:hashGet("primaryBPM"),
 		inputMode = noteChart.inputMode:getString()
 	}}
 end
@@ -157,10 +157,10 @@ CacheDataFactory.getQuaver = function(self, path)
 		creator = fix(noteChart:hashGet("Creator") or ""),
 		audioPath = fix(noteChart:hashGet("AudioFile") or ""),
 		stagePath = fix(noteChart:hashGet("BackgroundFile") or ""),
-		previewTime = noteChart:hashGet("SongPreviewTime"),
-		noteCount = 1000,
-		length = 300,
-		bpm = 120,
+		previewTime = noteChart:hashGet("SongPreviewTime") / 1000,
+		noteCount = noteChart:hashGet("noteCount"),
+		length = noteChart:hashGet("totalLength") / 1000,
+		bpm = noteChart:hashGet("primaryBPM"),
 		inputMode = noteChart.inputMode:getString()
 	}}
 end
