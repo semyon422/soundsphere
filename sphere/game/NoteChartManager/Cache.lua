@@ -129,7 +129,6 @@ Cache.lookup = function(self, directoryPath, recursive)
 	end
 	
 	if #chartPaths > 0 then
-		print("processing directory", directoryPath)
 		self:processNoteChartSet(chartPaths, directoryPath)
 		return 1
 	end
@@ -157,31 +156,10 @@ Cache.lookup = function(self, directoryPath, recursive)
 end
 
 Cache.processNoteChartSet = function(self, chartPaths, directoryPath)
-	self:setEntry({
-		path = directoryPath,
-		container = 2,
-		title = directoryPath:match("^.+/(.-)$"),
-	})
-	
 	local cacheDatas = CacheDataFactory:getCacheDatas(chartPaths)
 	
-	if cacheDatas[1] then
-		self:setEntry({
-			path = cacheDatas[1].path:match("^(.+)/.-"),
-			container = 1,
-			
-			title = cacheDatas[1].title,
-			artist = cacheDatas[1].artist,
-			source = cacheDatas[1].source,
-			tags = cacheDatas[1].tags,
-			creator = cacheDatas[1].creator,
-			audioPath = cacheDatas[1].audioPath,
-			stagePath = cacheDatas[1].stagePath,
-			previewTim = cacheDatas[1].previewTime
-		})
-	end
 	for i = 1, #cacheDatas do
-		print("processing file", cacheDatas[i].path)
+		print(cacheDatas[i].path)
 		self:setEntry(cacheDatas[i])
 	end
 end
