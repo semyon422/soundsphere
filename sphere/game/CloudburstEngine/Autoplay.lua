@@ -25,7 +25,7 @@ Autoplay.processShortNote = function(self, note)
 end
 
 Autoplay.processSoundNote = function(self, note)
-	if note.pressSounds then
+	if note.pressSounds and note.pressSounds[1] then
 		if note.startNoteData.timePoint:getAbsoluteTime() <= note.engine.currentTime then
 			note.engine:playAudio(note.pressSounds)
 		else
