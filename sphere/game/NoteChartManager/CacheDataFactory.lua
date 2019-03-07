@@ -255,18 +255,19 @@ CacheDataFactory.getO2Jam = function(self, chartPaths)
 			}
 		end
 		
+		local lastCacheData = cacheDatas[#cacheDatas]
 		cacheDatas[#cacheDatas + 1] = {
-			path = cacheDatas[1].path:match("^(.+)/.-"),
+			path = lastCacheData.path:match("^(.+)/.-"),
 			container = 1,
 			
-			title = cacheDatas[1].title,
-			artist = cacheDatas[1].artist,
-			source = cacheDatas[1].source,
-			tags = cacheDatas[1].tags,
-			creator = cacheDatas[1].creator,
-			audioPath = cacheDatas[1].audioPath,
-			stagePath = cacheDatas[1].stagePath,
-			previewTime = cacheDatas[1].previewTime
+			title = lastCacheData.title,
+			artist = lastCacheData.artist,
+			source = lastCacheData.source,
+			tags = lastCacheData.tags,
+			creator = lastCacheData.creator,
+			audioPath = lastCacheData.audioPath,
+			stagePath = lastCacheData.stagePath,
+			previewTime = lastCacheData.previewTime
 		}
 	end
 	
