@@ -116,10 +116,11 @@ end
 CloudburstEngine.playAudio = function(self, paths)
 	if not paths then return end
 	for i = 1, #paths do
-		local audio = AudioManager:getAudio(self.aliases[paths[i]])
+		local audio = AudioManager:getAudio(self.aliases[paths[i][1]])
 		if audio then
 			audio:play()
 			audio:rate(self.rate)
+			audio:volume(paths[i][2])
 		end
 	end
 end
