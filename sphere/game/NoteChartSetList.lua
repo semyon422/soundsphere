@@ -7,6 +7,7 @@ local Class = require("aqua.util.Class")
 local Observable = require("aqua.util.Observable")
 local Button = require("aqua.ui.Button")
 local sign = require("aqua.math").sign
+local belong = require("aqua.math").belong
 
 local spherefonts = require("sphere.assets.fonts")
 local Cache = require("sphere.game.NoteChartManager.Cache")
@@ -20,11 +21,10 @@ local NoteChartSetList = {}
 NoteChartSetList.visualItemIndex = 1
 NoteChartSetList.selectedItemIndex = 1
 
-NoteChartSetList.x = 0
+NoteChartSetList.x = 0.6
 NoteChartSetList.y = 0
-NoteChartSetList.w = 1
+NoteChartSetList.w = 1 - NoteChartSetList.x
 NoteChartSetList.h = 1
-NoteChartSetList.layer = 2
 NoteChartSetList.rectangleColor = {255, 255, 255, 0}
 NoteChartSetList.textColor = {255, 255, 255, 255}
 NoteChartSetList.selectedRectangleColor = {255, 255, 255, 0}
@@ -39,7 +39,7 @@ NoteChartSetList.basePath = "userdata/charts"
 NoteChartSetList.currentCacheData = {path = "userdata/charts"}
 
 NoteChartSetList.cs = CS:new({
-	bx = 0.6,
+	bx = 0,
 	by = 0,
 	rx = 0,
 	ry = 0,
@@ -47,23 +47,24 @@ NoteChartSetList.cs = CS:new({
 	baseOne = 768
 })
 
+NoteChartSetList.observable = Observable:new()
+NoteChartSetList.font = aquafonts.getFont(spherefonts.NotoSansRegular, 28)
+
 NoteChartSetList.load = function(self)
-	self.observable = Observable:new()
-	
 	self.db = Cache.db
 	
 	self.cs:reload()
-	
-	self.font = aquafonts.getFont(spherefonts.NotoSansRegular, 28)
 	self.scrollCurrentDelta = 0
-
 	self:selectCache()
-	
 	self:loadOverlay()
 	self:updateItems()
 	self.visualItemIndex = self.selectedItemIndex
-	
 	self:calculateButtons()
+end
+
+NoteChartSetList.postLoad = function(self)
+	self.currentKey = self.items[1].cacheData.path
+	self:updateCurrentCacheData()
 end
 
 NoteChartSetList.draw = function(self)
@@ -142,7 +143,7 @@ NoteChartSetList.updateCurrentCacheData = function(self)
 	local path = self.currentKey
 	if self.cacheDatas[path] then
 		self.currentCacheData = self.cacheDatas[path]
-		print(path)
+		-- print(path)
 		
 		local directoryPath
 		if self.currentCacheData.container == 0 then
@@ -161,6 +162,11 @@ NoteChartSetList.updateCurrentCacheData = function(self)
 		end
 		
 		self.backgroundPath = directoryPath .. "/" .. stagePath
+		
+		self:send({
+			action = "select",
+			cacheData = self.currentCacheData
+		})
 	end
 end
 
@@ -204,21 +210,21 @@ NoteChartSetList.addItem = function(self, key)
 	item.text = self:getItemName(item.cacheData)
 	item.onClick = function()
 		if item.index == self.selectedItemIndex then
-			self.key = key
+			self.currentKey = key
 			self:selectCache()
 			self:updateCurrentCacheData()
 			self:updateItems()
 			self:unloadButtons()
 			self:calculateButtons()
-			-- if item.cacheData and item.cacheData.container == 0 then
-				-- ScreenManager:set(require("sphere.screen.GameplayScreen"))
-			-- end
+			if item.cacheData and item.cacheData.container == 0 then
+				ScreenManager:set(require("sphere.screen.GameplayScreen"))
+			end
 		else
 			self:scrollToItemIndex(item.index)
 		end
 	end
 	item.onSelect = function()
-		self.key = key
+		self.currentKey = key
 		self:updateCurrentCacheData()
 	end
 	
@@ -263,8 +269,18 @@ NoteChartSetList.send = function(self, event)
 end
 
 NoteChartSetList.receive = function(self, event)
-	for button in pairs(self.buttons) do
-		button:receive(event)
+	if self.buttons then
+		for button in pairs(self.buttons) do
+			button:receive(event)
+		end
+	end
+	
+	if
+		event.action == "select" and
+		event.cacheData and
+		event.cacheData.container == self.managerContainer
+	then
+		self:setBasePath(event.cacheData.path)
 	end
 	
 	if event.name == "resize" then
@@ -272,7 +288,11 @@ NoteChartSetList.receive = function(self, event)
 		self.selectionFrame:reload()
 		self.buttonsFrame:reload()
 	elseif event.name == "wheelmoved" then
-		self:scrollBy(-event.args[2])
+		local mx = self.cs:x(love.mouse.getX(), true)
+		local my = self.cs:y(love.mouse.getY(), true)
+		if belong(mx, self.x, self.x + self.w) and belong(my, self.y, self.y + self.h) then
+			self:scrollBy(-event.args[2])
+		end
 	elseif event.name == "keypressed" then
 		local key = event.args[1]
 		if key == "up" then
@@ -286,13 +306,8 @@ NoteChartSetList.receive = function(self, event)
 					break
 				end
 			end
-		-- elseif key == "escape" and #self.selectionKey > 2 then
-			-- self.selectionKey[#self.selectionKey] = nil
-			-- self:selectCache()
-			-- self:updateItems()
-			-- self:unloadButtons()
-		elseif key == "f5" then
-			self:updateCache()
+		-- elseif key == "f5" then
+			-- self:updateCache()
 		end
 	end
 end
@@ -316,8 +331,8 @@ NoteChartSetList.loadOverlay = function(self)
 	self.selectionFrame:reload()
 	
 	self.buttonsFrame = Rectangle:new({
-		x = self.x, y = 2 / self.buttonCount,
-		w = self.w, h = (self.buttonCount - 4) / self.buttonCount,
+		x = self.x, y = self.y,
+		w = self.w, h = self.h,
 		cs = self.cs,
 		color = {255, 255, 255, 255},
 		mode = "fill"
@@ -340,6 +355,7 @@ NoteChartSetList.scrollToItemIndex = function(self, itemIndex)
 	if self.items[itemIndex] then
 		self.selectedItemIndex = itemIndex
 		self:send({
+			action = "scroll",
 			cacheData = self.items[itemIndex].cacheData
 		})
 	end

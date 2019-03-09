@@ -1,6 +1,6 @@
 local Screen = require("sphere.screen.Screen")
 
-local MapList = require("sphere.game.MapList")
+local NoteChartList = require("sphere.game.NoteChartList")
 local NoteChartFactory = require("sphere.game.NoteChartManager.NoteChartFactory")
 local NoteSkinManager = require("sphere.game.NoteSkinManager")
 local InputManager = require("sphere.game.InputManager")
@@ -22,7 +22,7 @@ Screen.construct(GameplayScreen)
 GameplayScreen.load = function(self)
 	InputManager:load()
 	
-	local currentCacheData = MapList.currentCacheData
+	local currentCacheData = NoteChartList.currentCacheData
 	
 	local noteChart = NoteChartFactory:getNoteChart(currentCacheData.path)
 	local noteSkinData = NoteSkinManager:getNoteSkin(noteChart.inputMode)
@@ -88,7 +88,7 @@ GameplayScreen.receive = function(self, event)
 		})
 		ScreenManager:receive({
 			name = "metadata",
-			data = MapList.currentCacheData
+			data = NoteChartList.currentCacheData
 		})
 	end
 end
