@@ -29,14 +29,16 @@ NoteChartSetList.rectangleColor = {255, 255, 255, 0}
 NoteChartSetList.textColor = {255, 255, 255, 255}
 NoteChartSetList.selectedRectangleColor = {255, 255, 255, 0}
 NoteChartSetList.mode = "fill"
-NoteChartSetList.limit = 2
+NoteChartSetList.limit = math.huge
 NoteChartSetList.textAlign = {
 	x = "left", y = "center"
 }
 NoteChartSetList.buttonCount = 17
+NoteChartSetList.middleOffset = 9
+NoteChartSetList.startOffset = 9
+NoteChartSetList.endOffset = 9
 
 NoteChartSetList.basePath = "userdata/charts"
-NoteChartSetList.currentCacheData = {path = "userdata/charts"}
 
 NoteChartSetList.cs = CS:new({
 	bx = 0,
@@ -48,10 +50,12 @@ NoteChartSetList.cs = CS:new({
 })
 
 NoteChartSetList.observable = Observable:new()
-NoteChartSetList.font = aquafonts.getFont(spherefonts.NotoSansRegular, 28)
+NoteChartSetList.font = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
 
 NoteChartSetList.load = function(self)
 	self.db = Cache.db
+	
+	self.selectStatement = self.db:prepare(self.selectRequest)
 	
 	self.cs:reload()
 	self.scrollCurrentDelta = 0
@@ -63,7 +67,7 @@ NoteChartSetList.load = function(self)
 end
 
 NoteChartSetList.postLoad = function(self)
-	self.currentKey = self.items[1].cacheData.path
+	self.currentKey = self.currentKey or self.items[1].cacheData.path
 	self:updateCurrentCacheData()
 end
 
@@ -86,35 +90,24 @@ NoteChartSetList.setBasePath = function(self, path)
 	self:calculateButtons()
 end
 
-NoteChartSetList.selectRequest = "SELECT * FROM `cache` WHERE `container` == 1 and INSTR(`path`, '%s') == 1 ORDER BY `path`;"
+local colnames = {
+	"path", "hash", "container", "title", "artist", "source", "tags", "name", "level", "creator", "audioPath", "stagePath", "previewTime", "noteCount", "length", "bpm", "inputMode"
+}
+NoteChartSetList.selectRequest = "SELECT * FROM `cache` WHERE `container` == 1 and INSTR(`path`, ?) == 1 ORDER BY `path`;"
 NoteChartSetList.selectCache = function(self)
 	self.keyList = {}
 	self.cacheDatas = {}
-	local result = self.db:exec(self.selectRequest:format(self.basePath))
-	if not result then return end
 	
-	local row = 1
-	while result.path[row] do
-		self.cacheDatas[result.path[row]] = {
-			path = result.path[row],
-			hash = result.hash[row],
-			container = result.container[row],
-			title = result.title[row],
-			artist = result.artist[row],
-			source = result.source[row],
-			tags = result.tags[row],
-			name = result.name[row],
-			creator = result.creator[row],
-			audioPath = result.audioPath[row],
-			stagePath = result.stagePath[row],
-			previewTime = result.previewTime[row],
-			noteCount = result.noteCount[row],
-			length = result.length[row],
-			bpm = result.bpm[row],
-			inputMode = result.inputMode[row]
-		}
-		table.insert(self.keyList, result.path[row])
-		row = row + 1
+	local stmt = self.selectStatement:reset():bind(self.basePath)
+	local row = stmt:step()
+	while row do
+		local cacheData = {}
+		for i = 1, #colnames do
+			cacheData[colnames[i]] = row[i]
+		end
+		self.cacheDatas[row[1]] = cacheData
+		table.insert(self.keyList, row[1])
+		row = stmt:step()
 	end
 	table.sort(self.keyList)
 	
@@ -236,10 +229,6 @@ NoteChartSetList.unload = function(self)
 	self:unloadOverlay()
 end
 
-NoteChartSetList.getMiddleOffset = function(self)
-	return math.ceil(self.buttonCount / 2)
-end
-
 NoteChartSetList.update = function(self)
 	local dt =  math.min(1/60, love.timer.getDelta())
 	local sign = sign(self.scrollCurrentDelta)
@@ -313,16 +302,16 @@ NoteChartSetList.receive = function(self, event)
 end
 
 NoteChartSetList.getStartItemIndex = function(self)
-	return math.floor(self.visualItemIndex) - self:getMiddleOffset()
+	return math.floor(self.visualItemIndex) - self.startOffset
 end
 
 NoteChartSetList.getEndItemIndex = function(self)
-	return math.ceil(self.visualItemIndex) + self:getMiddleOffset()
+	return math.ceil(self.visualItemIndex) + self.endOffset
 end
 
 NoteChartSetList.loadOverlay = function(self)
 	self.selectionFrame = Rectangle:new({
-		x = self.x, y = self.y + (self:getMiddleOffset() - 1) * (self.h / self.buttonCount),
+		x = self.x, y = self.y + (self.middleOffset - 1) * (self.h / self.buttonCount),
 		w = -0.01, h = self.h / self.buttonCount,
 		cs = self.cs,
 		color = {255, 255, 255, 127},
@@ -415,7 +404,7 @@ NoteChartSetList.Button = Button:new()
 
 NoteChartSetList.Button.update = function(self)
 	self.x = self.list.x
-	self.y = self.list.y + (self.list:getMiddleOffset() - 1 + self.item.index - self.list.visualItemIndex) * (self.list.h / self.list.buttonCount)
+	self.y = self.list.y + (self.list.middleOffset - 1 + self.item.index - self.list.visualItemIndex) * (self.list.h / self.list.buttonCount)
 	
 	
 	if self.item.index == self.list.selectedItemIndex then

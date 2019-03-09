@@ -24,21 +24,23 @@ NoteChartList.visualItemIndex = 1
 NoteChartList.selectedItemIndex = 1
 
 NoteChartList.x = 0.3
-NoteChartList.y = (1 - 8 / 17) / 2
+NoteChartList.y = 4 / 17
 NoteChartList.w = 0.3
-NoteChartList.h = 8 / 17
+NoteChartList.h = 13 / 17
 NoteChartList.rectangleColor = {255, 255, 255, 0}
 NoteChartList.textColor = {255, 255, 255, 255}
 NoteChartList.selectedRectangleColor = {255, 255, 255, 0}
 NoteChartList.mode = "fill"
-NoteChartList.limit = 2
+NoteChartList.limit = math.huge
 NoteChartList.textAlign = {
 	x = "left", y = "center"
 }
-NoteChartList.buttonCount = 8
+NoteChartList.buttonCount = 13
+NoteChartList.middleOffset = 5
+NoteChartList.startOffset = 5
+NoteChartList.endOffset = 13
 
 NoteChartList.basePath = "userdata/charts"
-NoteChartList.currentCacheData = {path = "userdata/charts"}
 
 NoteChartList.managerContainer = 1
 
@@ -48,7 +50,7 @@ NoteChartList.observable = Observable:new()
 NoteChartList.font = NoteChartSetList.font
 NoteChartList.postLoad = NoteChartSetList.postLoad
 
-NoteChartList.selectRequest = "SELECT * FROM `cache` WHERE `container` == 0 and INSTR(`path`, '%s') == 1 ORDER BY `noteCount`;"
+NoteChartList.selectRequest = "SELECT * FROM `cache` WHERE `container` == 0 and INSTR(`path`, ?) == 1 ORDER BY `noteCount`;"
 
 NoteChartList.load = NoteChartSetList.load
 NoteChartList.draw = NoteChartSetList.draw
@@ -61,7 +63,6 @@ NoteChartList.updateItems = NoteChartSetList.updateItems
 NoteChartList.getItemName = NoteChartSetList.getItemName
 NoteChartList.addItem = NoteChartSetList.addItem
 NoteChartList.unload = NoteChartSetList.unload
-NoteChartList.getMiddleOffset = NoteChartSetList.getMiddleOffset
 NoteChartList.update = NoteChartSetList.update
 NoteChartList.send = NoteChartSetList.send
 NoteChartList.receive = NoteChartSetList.receive
