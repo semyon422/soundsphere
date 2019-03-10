@@ -49,6 +49,9 @@ SelectionScreen.receive = function(self, event)
 	if event.cacheData then
 		MetaDataTable:setData(event.cacheData)
 	end
+	if event.backgroundPath then
+		BackgroundManager:loadDrawableBackground(event.backgroundPath)
+	end
 	
 	if event.name == "resize" then
 		MetaDataTable:reload()

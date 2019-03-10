@@ -120,23 +120,22 @@ NoteChartSetList.selectCache = function(self)
 	end
 end
 
--- NoteChartSetList.updateCache = function(self)
-	-- local recursive = love.keyboard.isDown("lshift")
-	-- local path = self.currentKey
-	-- Cache:update(path, recursive, function()
-		-- self:selectCache()
-		-- self:updateItems()
-		-- self:unloadButtons()
-		-- self:calculateButtons()
-		-- NotificationLine:notify("Cache updated. (" .. path .. ")")
-	-- end)
--- end
+NoteChartSetList.updateCache = function(self)
+	local recursive = love.keyboard.isDown("lshift")
+	local path = self.currentKey
+	Cache:update(path, recursive, function()
+		self:selectCache()
+		self:updateItems()
+		self:unloadButtons()
+		self:calculateButtons()
+		NotificationLine:notify("Cache updated. (" .. path .. ")")
+	end)
+end
 
 NoteChartSetList.updateCurrentCacheData = function(self)
 	local path = self.currentKey
 	if self.cacheDatas[path] then
 		self.currentCacheData = self.cacheDatas[path]
-		-- print(path)
 		
 		local directoryPath
 		if self.currentCacheData.container == 0 then
@@ -160,12 +159,9 @@ NoteChartSetList.updateCurrentCacheData = function(self)
 			action = "select",
 			cacheData = self.currentCacheData
 		})
-	end
-end
-
-NoteChartSetList.updateBackground = function(self)
-	if self.backgroundPath then
-		BackgroundManager:loadDrawableBackground(self.backgroundPath)
+		self:send({
+			backgroundPath = self.backgroundPath
+		})
 	end
 end
 
@@ -245,7 +241,6 @@ NoteChartSetList.update = function(self)
 	then
 		self.visualItemIndex = self.selectedItemIndex
 		self.scrollCurrentDelta = 0
-		self:updateBackground()
 	else
 		self.visualItemIndex = self.visualItemIndex + scrollCurrentDelta
 	end
@@ -295,8 +290,12 @@ NoteChartSetList.receive = function(self, event)
 					break
 				end
 			end
-		-- elseif key == "f5" then
-			-- self:updateCache()
+		elseif key == "f5" then
+			local mx = self.cs:x(love.mouse.getX(), true)
+			local my = self.cs:y(love.mouse.getY(), true)
+			if belong(mx, self.x, self.x + self.w) and belong(my, self.y, self.y + self.h) then
+				self:updateCache()
+			end
 		end
 	end
 end
