@@ -69,6 +69,7 @@ end
 NoteChartSetList.postLoad = function(self)
 	self.currentKey = self.currentKey or self.items[1].cacheData.path
 	self:updateCurrentCacheData()
+	self:updateBackground()
 end
 
 NoteChartSetList.draw = function(self)
@@ -159,6 +160,11 @@ NoteChartSetList.updateCurrentCacheData = function(self)
 			action = "select",
 			cacheData = self.currentCacheData
 		})
+	end
+end
+
+NoteChartSetList.updateBackground = function(self)
+	if self.backgroundPath then
 		self:send({
 			backgroundPath = self.backgroundPath
 		})
@@ -241,6 +247,7 @@ NoteChartSetList.update = function(self)
 	then
 		self.visualItemIndex = self.selectedItemIndex
 		self.scrollCurrentDelta = 0
+		self:updateBackground()
 	else
 		self.visualItemIndex = self.visualItemIndex + scrollCurrentDelta
 	end
