@@ -5,58 +5,52 @@ local Screen = require("sphere.screen.Screen")
 local MapList = require("sphere.game.MapList")
 local NoteChartSetList = require("sphere.game.NoteChartSetList")
 local NoteChartList = require("sphere.game.NoteChartList")
-local CustomList = require("sphere.game.CustomList")
 local MetaDataTable = require("sphere.ui.MetaDataTable")
 
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 
-local SelectionScreen = Screen:new()
+local FileManagerScreen = Screen:new()
 
-Screen.construct(SelectionScreen)
+Screen.construct(FileManagerScreen)
 
-SelectionScreen.load = function(self)
+FileManagerScreen.load = function(self)
 	NoteChartSetList:load()
-	-- NoteChartList:load()
+	NoteChartList:load()
 	NoteChartSetList.observable:add(self)
-	-- NoteChartList.observable:add(self)
-	
-	self.customList = CustomList:new()
-	self.customList:load()
-	
-	-- NoteChartSetList:postLoad()
-	-- NoteChartList:postLoad()
-	
+	NoteChartList.observable:add(self)
+	NoteChartSetList:postLoad()
+	NoteChartList:postLoad()
 	BackgroundManager:setColor({127, 127, 127})
 end
 
-SelectionScreen.unload = function(self)
+FileManagerScreen.unload = function(self)
 	NoteChartSetList:unload()
-	-- NoteChartList:unload()
-	self.customList:unload()
+	NoteChartList:unload()
 end
 
-SelectionScreen.unload = function(self) end
+FileManagerScreen.unload = function(self) end
 
-SelectionScreen.update = function(self)
+FileManagerScreen.update = function(self)
 	Screen.update(self)
 	
 	NoteChartSetList:update()
-	-- NoteChartList:update()
-	self.customList:update()
+	NoteChartList:update()
 end
 
-SelectionScreen.draw = function(self)
+FileManagerScreen.draw = function(self)
 	Screen.draw(self)
 	
 	NoteChartSetList:draw()
-	-- NoteChartList:draw()
+	NoteChartList:draw()
 	MetaDataTable:draw()
-	self.customList:draw()
 end
 
-SelectionScreen.receive = function(self, event)
+FileManagerScreen.receive = function(self, event)
 	if event.cacheData then
 		MetaDataTable:setData(event.cacheData)
+	end
+	if event.backgroundPath then
+		BackgroundManager:loadDrawableBackground(event.backgroundPath)
 	end
 	
 	if event.name == "resize" then
@@ -64,8 +58,7 @@ SelectionScreen.receive = function(self, event)
 	end
 	
 	NoteChartSetList:receive(event)
-	-- NoteChartList:receive(event)
-	self.customList:receive(event)
+	NoteChartList:receive(event)
 end
 
-return SelectionScreen
+return FileManagerScreen
