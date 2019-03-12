@@ -19,6 +19,8 @@ local ScreenManager = require("sphere.screen.ScreenManager")
 
 local CustomList = Class:new()
 
+CustomList.sender = "CustomList"
+
 CustomList.visualItemIndex = 1
 CustomList.focusedItemIndex = 1
 
@@ -50,14 +52,15 @@ CustomList.cs = CS:new({
 CustomList.load = function(self)
 	self.items = self.items or {}
 
-	self.observable = Observable:new()
-	self.font = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
+	self.observable = self.observable or Observable:new()
+	self.font = self.font or aquafonts.getFont(spherefonts.NotoSansRegular, 24)
 	
 	self.cs:reload()
 	self.scrollCurrentDelta = 0
 	self:loadStencil()
 	self.visualItemIndex = self.focusedItemIndex
 	self:calculateButtons()
+	self:sendInitial()
 end
 
 CustomList.draw = function(self)
@@ -72,15 +75,32 @@ end
 CustomList.setItems = function(self, items)
 	self.items = items
 	
-	if self.focusedItemIndex > #self.items then
-		self.focusedItemIndex = #self.items
-		self.visualItemIndex = #self.items
+	if self.focusedItemIndex > #items then
+		self.focusedItemIndex = #items
+		self.visualItemIndex = #items
 	end
+	
+	self:sendInitial()
 end
 
 CustomList.unload = function(self)
 	self:unloadButtons()
 	self:unloadStencil()
+end
+
+CustomList.sendInitial = function(self)
+	self:send({
+		sender = self.sender,
+		action = "scrollStop",
+		itemIndex = self.focusedItemIndex,
+		list = self
+	})
+	self:send({
+		sender = self.sender,
+		action = "scrollTarget",
+		itemIndex = self.focusedItemIndex,
+		list = self
+	})
 end
 
 CustomList.update = function(self)
@@ -99,15 +119,18 @@ CustomList.update = function(self)
 	then
 		self.visualItemIndex = self.focusedItemIndex
 		self.scrollCurrentDelta = 0
-	
+		
 		self:send({
+			sender = self.sender,
 			action = "scrollStop",
-			itemIndex = self.focusedItemIndex
+			itemIndex = self.focusedItemIndex,
+			list = self
 		})
 	else
 		self.visualItemIndex = self.visualItemIndex + scrollCurrentDelta
 	end
 	
+	self:unloadButtons()
 	self:calculateButtons()
 end
 
@@ -140,8 +163,10 @@ CustomList.receive = function(self, event)
 				self:scrollBy(1)
 			elseif key == "return" then
 				self:send({
+					sender = self.sender,
 					action = "return",
-					itemIndex = self.focusedItemIndex
+					itemIndex = self.focusedItemIndex,
+					list = self
 				})
 			end
 		end
@@ -181,9 +206,10 @@ CustomList.scrollToItemIndex = function(self, itemIndex)
 		self.scrollCurrentDelta = (self.focusedItemIndex - self.visualItemIndex)
 		
 		self:send({
-			action = "scroll",
+			sender = self.sender,
+			action = "scrollTarget",
 			itemIndex = itemIndex,
-			item = self.items[itemIndex]
+			list = self
 		})
 	end
 end

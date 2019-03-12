@@ -20,6 +20,8 @@ local ScreenManager = require("sphere.screen.ScreenManager")
 
 local NoteChartSetList = CustomList:new()
 
+NoteChartSetList.sender = "NoteChartSetList"
+
 NoteChartSetList.x = 0.6
 NoteChartSetList.y = 0
 NoteChartSetList.w = 1 - NoteChartSetList.x
@@ -28,6 +30,8 @@ NoteChartSetList.buttonCount = 17
 NoteChartSetList.middleOffset = 9
 NoteChartSetList.startOffset = 9
 NoteChartSetList.endOffset = 9
+
+NoteChartSetList.observable = Observable:new()
 
 NoteChartSetList.basePath = "userdata/charts"
 
@@ -57,6 +61,17 @@ NoteChartSetList.send = function(self, event)
 	end
 	
 	CustomList.send(self, event)
+end
+
+NoteChartSetList.receive = function(self, event)
+	if event.action == "scrollTarget" then
+		local cacheData = event.list.items[event.itemIndex].cacheData
+		if cacheData.container == self.managerContainer then
+			self:setBasePath(cacheData.path)
+		end
+	end
+	
+	CustomList.receive(self, event)
 end
 
 NoteChartSetList.setBasePath = function(self, path)
