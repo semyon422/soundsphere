@@ -50,7 +50,7 @@ NoteChartList.send = function(self, event)
 		end
 	elseif event.action == "buttonInteract" then
 		local cacheData = self.items[event.itemIndex].cacheData
-		if cacheData and cacheData.container == 0 then
+		if cacheData then
 			GameplayScreen.cacheData = cacheData
 			ScreenManager:set(GameplayScreen)
 		end

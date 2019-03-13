@@ -17,6 +17,7 @@ local NotificationLine = require("sphere.ui.NotificationLine")
 local CustomList = require("sphere.game.CustomList")
 
 local ScreenManager = require("sphere.screen.ScreenManager")
+local NoteChartSetList = require("sphere.game.NoteChartSetList")
 
 local BrowserList = CustomList:new()
 
@@ -57,6 +58,13 @@ BrowserList.load = function(self)
 end
 
 BrowserList.send = function(self, event)
+	if event.action == "buttonInteract" then
+		local cacheData = self.items[event.itemIndex].cacheData
+		if cacheData then
+			NoteChartSetList.basePath = cacheData.path
+		end
+	end
+	
 	CustomList.send(self, event)
 end
 

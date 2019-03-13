@@ -25,8 +25,6 @@ BrowserScreen.unload = function(self)
 	self.browserList:unload()
 end
 
-BrowserScreen.unload = function(self) end
-
 BrowserScreen.update = function(self)
 	Screen.update(self)
 	

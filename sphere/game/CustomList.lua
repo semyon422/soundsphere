@@ -83,7 +83,6 @@ end
 
 CustomList.unload = function(self)
 	self:unloadButtons()
-	self:unloadStencil()
 end
 
 CustomList.sendInitial = function(self)
