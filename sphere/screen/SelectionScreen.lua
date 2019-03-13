@@ -2,9 +2,9 @@ local Observable = require("aqua.util.Observable")
 local Observer = require("aqua.util.Observer")
 
 local Screen = require("sphere.screen.Screen")
-local MapList = require("sphere.game.MapList")
 local NoteChartSetList = require("sphere.game.NoteChartSetList")
 local NoteChartList = require("sphere.game.NoteChartList")
+local CustomList = require("sphere.game.CustomList")
 local MetaDataTable = require("sphere.ui.MetaDataTable")
 
 local BackgroundManager = require("sphere.ui.BackgroundManager")
@@ -14,18 +14,25 @@ local SelectionScreen = Screen:new()
 Screen.construct(SelectionScreen)
 
 SelectionScreen.load = function(self)
-	NoteChartSetList:load()
-	NoteChartList:load()
-	NoteChartSetList.observable:add(self)
-	NoteChartList.observable:add(self)
-	NoteChartSetList:postLoad()
-	NoteChartList:postLoad()
+	self.noteChartList = NoteChartList:new()
+	self.noteChartSetList = NoteChartSetList:new()
+	
+	self.noteChartList.noteChartSetList = self.noteChartSetList
+	self.noteChartSetList.noteChartList = self.noteChartList
+	
+	self.noteChartList.observable:add(self)
+	self.noteChartSetList.observable:add(self)
+	
+	self.noteChartList:load()
+	self.noteChartSetList:load()
+	self.noteChartSetList:sendInitial()
+	
 	BackgroundManager:setColor({127, 127, 127})
 end
 
 SelectionScreen.unload = function(self)
-	NoteChartSetList:unload()
-	NoteChartList:unload()
+	self.noteChartSetList:unload()
+	self.noteChartList:unload()
 end
 
 SelectionScreen.unload = function(self) end
@@ -33,21 +40,24 @@ SelectionScreen.unload = function(self) end
 SelectionScreen.update = function(self)
 	Screen.update(self)
 	
-	NoteChartSetList:update()
-	NoteChartList:update()
+	self.noteChartSetList:update()
+	self.noteChartList:update()
 end
 
 SelectionScreen.draw = function(self)
 	Screen.draw(self)
 	
-	NoteChartSetList:draw()
-	NoteChartList:draw()
+	self.noteChartSetList:draw()
+	self.noteChartList:draw()
 	MetaDataTable:draw()
 end
 
 SelectionScreen.receive = function(self, event)
-	if event.cacheData then
-		MetaDataTable:setData(event.cacheData)
+	if event.action == "scrollTarget" then
+		local cacheData = event.list.items[event.itemIndex].cacheData
+		if cacheData.container == 0 then
+			MetaDataTable:setData(cacheData)
+		end
 	end
 	if event.backgroundPath then
 		BackgroundManager:loadDrawableBackground(event.backgroundPath)
@@ -57,8 +67,8 @@ SelectionScreen.receive = function(self, event)
 		MetaDataTable:reload()
 	end
 	
-	NoteChartSetList:receive(event)
-	NoteChartList:receive(event)
+	self.noteChartSetList:receive(event)
+	self.noteChartList:receive(event)
 end
 
 return SelectionScreen

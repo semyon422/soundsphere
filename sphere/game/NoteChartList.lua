@@ -10,15 +10,19 @@ local leftequal = require("aqua.table").leftequal
 local sign = require("aqua.math").sign
 
 local spherefonts = require("sphere.assets.fonts")
+local GameplayScreen = require("sphere.screen.GameplayScreen")
 local Cache = require("sphere.game.NoteChartManager.Cache")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 local NotificationLine = require("sphere.ui.NotificationLine")
 
 local NoteChartSetList = require("sphere.game.NoteChartSetList")
+local CustomList = require("sphere.game.CustomList")
 
 local ScreenManager = require("sphere.screen.ScreenManager")
 
-local NoteChartList = {}
+local NoteChartList = NoteChartSetList:new()
+
+NoteChartList.sender = "NoteChartList"
 
 NoteChartList.visualItemIndex = 1
 NoteChartList.selectedItemIndex = 1
@@ -27,14 +31,6 @@ NoteChartList.x = 0.3
 NoteChartList.y = 4 / 17
 NoteChartList.w = 0.3
 NoteChartList.h = 13 / 17
-NoteChartList.rectangleColor = {255, 255, 255, 0}
-NoteChartList.textColor = {255, 255, 255, 255}
-NoteChartList.selectedRectangleColor = {255, 255, 255, 0}
-NoteChartList.mode = "fill"
-NoteChartList.limit = math.huge
-NoteChartList.textAlign = {
-	x = "left", y = "center"
-}
 NoteChartList.buttonCount = 13
 NoteChartList.middleOffset = 5
 NoteChartList.startOffset = 5
@@ -42,38 +38,36 @@ NoteChartList.endOffset = 13
 
 NoteChartList.basePath = "userdata/charts"
 
-NoteChartList.managerContainer = 1
-
-NoteChartList.cs = NoteChartSetList.cs
-
 NoteChartList.observable = Observable:new()
-NoteChartList.font = NoteChartSetList.font
-NoteChartList.postLoad = NoteChartSetList.postLoad
 
 NoteChartList.selectRequest = "SELECT * FROM `cache` WHERE `container` == 0 and INSTR(`path`, ?) == 1 ORDER BY `noteCount`;"
 
-NoteChartList.load = NoteChartSetList.load
-NoteChartList.draw = NoteChartSetList.draw
-NoteChartList.setBasePath = NoteChartSetList.setBasePath
-NoteChartList.selectCache = NoteChartSetList.selectCache
-NoteChartList.updateCache = NoteChartSetList.updateCache
-NoteChartList.updateCurrentCacheData = NoteChartSetList.updateCurrentCacheData
-NoteChartList.updateBackground = NoteChartSetList.updateBackground
-NoteChartList.updateItems = NoteChartSetList.updateItems
-NoteChartList.getItemName = NoteChartSetList.getItemName
-NoteChartList.addItem = NoteChartSetList.addItem
-NoteChartList.unload = NoteChartSetList.unload
-NoteChartList.update = NoteChartSetList.update
-NoteChartList.send = NoteChartSetList.send
-NoteChartList.receive = NoteChartSetList.receive
-NoteChartList.getStartItemIndex = NoteChartSetList.getStartItemIndex
-NoteChartList.getEndItemIndex = NoteChartSetList.getEndItemIndex
-NoteChartList.loadOverlay = NoteChartSetList.loadOverlay
-NoteChartList.scrollToItemIndex = NoteChartSetList.scrollToItemIndex
-NoteChartList.scrollBy = NoteChartSetList.scrollBy
-NoteChartList.calculateButtons = NoteChartSetList.calculateButtons
-NoteChartList.addButton = NoteChartSetList.addButton
-NoteChartList.unloadButtons = NoteChartSetList.unloadButtons
-NoteChartList.Button = NoteChartSetList.Button
+NoteChartList.send = function(self, event)
+	if event.action == "scrollStop" then
+		local cacheData = self.items[event.itemIndex].cacheData
+		if cacheData then
+			self:updateBackground()
+		end
+	elseif event.action == "buttonInteract" then
+		local cacheData = self.items[event.itemIndex].cacheData
+		if cacheData and cacheData.container == 0 then
+			GameplayScreen.cacheData = cacheData
+			ScreenManager:set(GameplayScreen)
+		end
+	end
+	
+	CustomList.send(self, event)
+end
+
+NoteChartList.receive = function(self, event)
+	if event.action == "scrollTarget" then
+		local cacheData = event.list.items[event.itemIndex].cacheData
+		if cacheData.container == 1 then
+			self:setBasePath(cacheData.path)
+		end
+	end
+	
+	CustomList.receive(self, event)
+end
 
 return NoteChartList
