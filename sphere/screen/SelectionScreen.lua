@@ -6,6 +6,7 @@ local NoteChartSetList = require("sphere.game.NoteChartSetList")
 local NoteChartList = require("sphere.game.NoteChartList")
 local CustomList = require("sphere.game.CustomList")
 local MetaDataTable = require("sphere.ui.MetaDataTable")
+local ScreenManager = require("sphere.screen.ScreenManager")
 
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 
@@ -53,6 +54,10 @@ SelectionScreen.draw = function(self)
 end
 
 SelectionScreen.receive = function(self, event)
+	if event.name == "keypressed" and event.args[1] == "tab" then
+		ScreenManager:set(require("sphere.screen.BrowserScreen"))
+	end
+	
 	if event.action == "scrollTarget" then
 		local cacheData = event.list.items[event.itemIndex].cacheData
 		if cacheData then

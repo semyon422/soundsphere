@@ -20,6 +20,7 @@ local ScreenManager = require("sphere.screen.ScreenManager")
 local CustomList = Class:new()
 
 CustomList.sender = "CustomList"
+CustomList.needFocusToInteract = true
 
 CustomList.visualItemIndex = 1
 CustomList.focusedItemIndex = 1
@@ -283,7 +284,11 @@ CustomList.Button.interact = function(self)
 		belong(mx, self.list.x, self.list.x + self.list.w) and
 		belong(my, self.list.y, self.list.y + self.list.h)
 	then
-		if self.itemIndex == self.list.focusedItemIndex then
+		if
+			self.list.needFocusToInteract and
+			self.itemIndex == self.list.focusedItemIndex or
+			not self.list.needFocusToInteract
+		then
 			self.list:send({
 				sender = self.list.sender,
 				action = "buttonInteract",
