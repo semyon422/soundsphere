@@ -60,7 +60,6 @@ CustomList.load = function(self)
 	self:loadStencil()
 	self.visualItemIndex = self.focusedItemIndex
 	self:calculateButtons()
-	self:sendInitial()
 end
 
 CustomList.draw = function(self)
@@ -79,8 +78,6 @@ CustomList.setItems = function(self, items)
 		self.focusedItemIndex = #items
 		self.visualItemIndex = #items
 	end
-	
-	self:sendInitial()
 end
 
 CustomList.unload = function(self)
@@ -91,13 +88,13 @@ end
 CustomList.sendInitial = function(self)
 	self:send({
 		sender = self.sender,
-		action = "scrollStop",
+		action = "scrollTarget",
 		itemIndex = self.focusedItemIndex,
 		list = self
 	})
 	self:send({
 		sender = self.sender,
-		action = "scrollTarget",
+		action = "scrollStop",
 		itemIndex = self.focusedItemIndex,
 		list = self
 	})
@@ -130,7 +127,6 @@ CustomList.update = function(self)
 		self.visualItemIndex = self.visualItemIndex + scrollCurrentDelta
 	end
 	
-	self:unloadButtons()
 	self:calculateButtons()
 end
 
@@ -277,6 +273,26 @@ CustomList.Button.update = function(self)
 		self.list.buttons[self] = nil
 	else
 		self:reload()
+	end
+end
+
+CustomList.Button.interact = function(self)
+	local mx = self.cs:x(love.mouse.getX(), true)
+	local my = self.cs:y(love.mouse.getY(), true)
+	if
+		belong(mx, self.list.x, self.list.x + self.list.w) and
+		belong(my, self.list.y, self.list.y + self.list.h)
+	then
+		if self.itemIndex == self.list.focusedItemIndex then
+			self.list:send({
+				sender = self.list.sender,
+				action = "buttonInteract",
+				itemIndex = self.itemIndex,
+				list = self.list
+			})
+		else
+			self.list:scrollToItemIndex(self.itemIndex)
+		end
 	end
 end
 

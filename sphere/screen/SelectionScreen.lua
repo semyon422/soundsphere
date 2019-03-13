@@ -2,7 +2,6 @@ local Observable = require("aqua.util.Observable")
 local Observer = require("aqua.util.Observer")
 
 local Screen = require("sphere.screen.Screen")
-local MapList = require("sphere.game.MapList")
 local NoteChartSetList = require("sphere.game.NoteChartSetList")
 local NoteChartList = require("sphere.game.NoteChartList")
 local CustomList = require("sphere.game.CustomList")
@@ -26,6 +25,7 @@ SelectionScreen.load = function(self)
 	
 	self.noteChartList:load()
 	self.noteChartSetList:load()
+	self.noteChartSetList:sendInitial()
 	
 	BackgroundManager:setColor({127, 127, 127})
 end

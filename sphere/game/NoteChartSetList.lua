@@ -51,26 +51,17 @@ NoteChartSetList.load = function(self)
 	self:selectCache()
 	
 	CustomList.load(self)
-	
-	self:updateBackground()
 end
 
 NoteChartSetList.send = function(self, event)
 	if event.action == "scrollStop" then
-		self:updateBackground()
+		self.noteChartList:updateBackground()
 	end
 	
 	CustomList.send(self, event)
 end
 
 NoteChartSetList.receive = function(self, event)
-	if event.action == "scrollTarget" then
-		local cacheData = event.list.items[event.itemIndex].cacheData
-		if cacheData.container == self.managerContainer then
-			self:setBasePath(cacheData.path)
-		end
-	end
-	
 	CustomList.receive(self, event)
 end
 
