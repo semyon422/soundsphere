@@ -1,8 +1,3 @@
-local Modifier = require("sphere.game.modifiers.Modifier")
-local ModifierSequence = require("sphere.game.ModifierSequence")
-
-local AutoPlay = require("sphere.game.modifiers.AutoPlay")
-
 local ModifierManager = {}
 
 ModifierManager.apply = function(self)

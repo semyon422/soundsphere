@@ -1,7 +1,4 @@
 local NoteChartFactory = require("sphere.game.NoteChartManager.NoteChartFactory")
-local isNoteChart = function(path) return NoteChartFactory:isNoteChart(path) end
-local getNoteChart = function(path) return NoteChartFactory:getNoteChart(path) end
-
 local NoteChart = require("ncdk.NoteChart")
 local bms = require("bms")
 local osu = require("osu")
@@ -10,7 +7,6 @@ local quaver = require("quaver")
 
 local CacheDataFactory = {}
 
--- CacheDataFactory.getCacheDatasForPath = function(self, path)
 CacheDataFactory.getCacheDatas = function(self, chartPaths)
 	local path = chartPaths[1]
 	if path:find("%.osu$") then
@@ -79,7 +75,7 @@ CacheDataFactory.getBMS = function(self, chartPaths)
 	
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
-		local noteChart = getNoteChart(path)
+		local noteChart = NoteChartFactory:getNoteChart(path)
 		
 		if noteChart then
 			cacheDatas[#cacheDatas + 1] = {
@@ -129,7 +125,7 @@ CacheDataFactory.getOsu = function(self, chartPaths)
 	
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
-		local noteChart = getNoteChart(path)
+		local noteChart = NoteChartFactory:getNoteChart(path)
 		
 		if noteChart then
 			cacheDatas[#cacheDatas + 1] = {
@@ -178,7 +174,7 @@ CacheDataFactory.getQuaver = function(self, chartPaths)
 	
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
-		local noteChart = getNoteChart(path)
+		local noteChart = NoteChartFactory:getNoteChart(path)
 		
 		if noteChart then
 			cacheDatas[#cacheDatas + 1] = {

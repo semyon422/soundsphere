@@ -1,8 +1,8 @@
 local Class = require("aqua.util.Class")
-
-local PlayField = Class:new()
 local StaticObject = require("sphere.game.PlayField.StaticObject")
 local InputObject = require("sphere.game.PlayField.InputObject")
+
+local PlayField = Class:new()
 
 PlayField.load = function(self)
 	self.cs = self.noteSkin:getCS()

@@ -1,4 +1,4 @@
-local Button = require("aqua.ui.Button")
+local Button =  require("aqua.ui.Button")
 local aquafonts = require("aqua.assets.fonts")
 local spherefonts = require("sphere.assets.fonts")
 local CS = require("aqua.graphics.CS")

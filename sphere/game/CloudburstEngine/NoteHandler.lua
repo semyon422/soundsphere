@@ -1,8 +1,6 @@
 local Class = require("aqua.util.Class")
 local ShortLogicalNote = require("sphere.game.CloudburstEngine.note.ShortLogicalNote")
 local LongLogicalNote = require("sphere.game.CloudburstEngine.note.LongLogicalNote")
-local FileManager = require("sphere.filesystem.FileManager")
-local AudioManager = require("aqua.audio.AudioManager")
 
 local NoteHandler = Class:new()
 

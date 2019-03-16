@@ -1,4 +1,3 @@
-local Class = require("aqua.util.Class")
 local CS = require("aqua.graphics.CS")
 local Rectangle = require("aqua.graphics.Rectangle")
 local Text = require("aqua.graphics.Text")

@@ -1,22 +1,7 @@
-local aquafonts = require("aqua.assets.fonts")
-local CS = require("aqua.graphics.CS")
-local Rectangle = require("aqua.graphics.Rectangle")
-local Stencil = require("aqua.graphics.Stencil")
-local utf8 = require("aqua.utf8")
-local Class = require("aqua.util.Class")
 local Observable = require("aqua.util.Observable")
-local Button = require("aqua.ui.Button")
-local sign = require("aqua.math").sign
-local belong = require("aqua.math").belong
-
-local spherefonts = require("sphere.assets.fonts")
 local Cache = require("sphere.game.NoteChartManager.Cache")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
-local NotificationLine = require("sphere.ui.NotificationLine")
-
-local CustomList = require("sphere.game.CustomList")
-
-local ScreenManager = require("sphere.screen.ScreenManager")
+local CustomList = require("sphere.ui.CustomList")
 
 local CacheList = CustomList:new()
 

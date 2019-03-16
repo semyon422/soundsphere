@@ -1,10 +1,6 @@
-local Observable = require("aqua.util.Observable")
-local Observer = require("aqua.util.Observer")
-
 local Screen = require("sphere.screen.Screen")
 local ScreenManager = require("sphere.screen.ScreenManager")
-local BrowserList = require("sphere.game.BrowserList")
-
+local BrowserList = require("sphere.ui.BrowserList")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 
 local BrowserScreen = Screen:new()

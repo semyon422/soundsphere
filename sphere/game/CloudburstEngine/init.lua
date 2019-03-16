@@ -1,20 +1,14 @@
-local Container = require("aqua.graphics.Container")
 local Class = require("aqua.util.Class")
-local Group = require("aqua.util.Group")
 local Observable = require("aqua.util.Observable")
 local AudioManager = require("aqua.audio.AudioManager")
 local sound = require("aqua.sound")
-
 local tween = require("tween")
-
-local CloudburstEngine = Class:new()
-
 local NoteHandler = require("sphere.game.CloudburstEngine.NoteHandler")
 local NoteDrawer = require("sphere.game.CloudburstEngine.NoteDrawer")
-
 local NoteSkin = require("sphere.game.CloudburstEngine.NoteSkin")
-local Score = require("sphere.game.CloudburstEngine.Score")
 local TimeManager = require("sphere.game.CloudburstEngine.TimeManager")
+
+local CloudburstEngine = Class:new()
 
 CloudburstEngine.autoplay = false
 CloudburstEngine.paused = true

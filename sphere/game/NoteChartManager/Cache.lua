@@ -3,9 +3,6 @@ local NoteChartFactory = require("sphere.game.NoteChartManager.NoteChartFactory"
 local CacheDataFactory = require("sphere.game.NoteChartManager.CacheDataFactory")
 local ThreadPool = require("aqua.thread.ThreadPool")
 
-local isNoteChart = function(path) return NoteChartFactory:isNoteChart(path) end
-local getNoteChart = function(path) return NoteChartFactory:getNoteChart(path) end
-
 local Cache = {}
 
 Cache.dbpath = "userdata/cache.sqlite"

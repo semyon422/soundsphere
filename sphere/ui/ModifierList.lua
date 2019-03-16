@@ -1,25 +1,9 @@
-local aquafonts = require("aqua.assets.fonts")
 local CS = require("aqua.graphics.CS")
-local Rectangle = require("aqua.graphics.Rectangle")
-local Stencil = require("aqua.graphics.Stencil")
-local utf8 = require("aqua.utf8")
-local Class = require("aqua.util.Class")
 local Observable = require("aqua.util.Observable")
-local Button = require("aqua.ui.Button")
-local sign = require("aqua.math").sign
-local belong = require("aqua.math").belong
-
-local spherefonts = require("sphere.assets.fonts")
-local Cache = require("sphere.game.NoteChartManager.Cache")
-local BackgroundManager = require("sphere.ui.BackgroundManager")
-local NotificationLine = require("sphere.ui.NotificationLine")
-
-local CustomList = require("sphere.game.CustomList")
-
-local ScreenManager = require("sphere.screen.ScreenManager")
+local CustomList = require("sphere.ui.CustomList")
 local ModifierManager = require("sphere.game.ModifierManager")
 local ModifierSequence = require("sphere.game.ModifierSequence")
-local ModifierDisplay = require("sphere.game.ModifierDisplay")
+local ModifierDisplay = require("sphere.ui.ModifierDisplay")
 local modifiers = require("sphere.game.modifiers")
 
 local ModifierList = CustomList:new()
@@ -51,7 +35,6 @@ ModifierList.send = function(self, event)
 		local modifier = self.items[event.itemIndex].modifier
 		self.modifierSequence:add(modifier)
 		ModifierDisplay:updateText()
-		print(self.modifierSequence:tostring())
 	end
 	
 	CustomList.send(self, event)

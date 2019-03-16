@@ -1,15 +1,10 @@
-local Observable = require("aqua.util.Observable")
-local Observer = require("aqua.util.Observer")
-
 local Screen = require("sphere.screen.Screen")
-local NoteChartSetList = require("sphere.game.NoteChartSetList")
-local NoteChartList = require("sphere.game.NoteChartList")
-local ModifierList = require("sphere.game.ModifierList")
-local CustomList = require("sphere.game.CustomList")
+local NoteChartSetList = require("sphere.ui.NoteChartSetList")
+local NoteChartList = require("sphere.ui.NoteChartList")
+local ModifierList = require("sphere.ui.ModifierList")
 local MetaDataTable = require("sphere.ui.MetaDataTable")
 local ScreenManager = require("sphere.screen.ScreenManager")
-local ModifierDisplay = require("sphere.game.ModifierDisplay")
-
+local ModifierDisplay = require("sphere.ui.ModifierDisplay")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 
 local SelectionScreen = Screen:new()

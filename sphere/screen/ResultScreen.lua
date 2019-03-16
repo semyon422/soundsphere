@@ -1,15 +1,10 @@
-local aquafonts = require("aqua.assets.fonts")
 local CS = require("aqua.graphics.CS")
-local TextFrame = require("aqua.graphics.TextFrame")
 local AudioManager = require("aqua.audio.AudioManager")
-
 local Screen = require("sphere.screen.Screen")
 local ScreenManager = require("sphere.screen.ScreenManager")
-local TextTable = require("sphere.game.TextTable")
-local AccuracyGraph = require("sphere.game.AccuracyGraph")
-local JudgeTable = require("sphere.game.JudgeTable")
+local AccuracyGraph = require("sphere.ui.AccuracyGraph")
+local JudgeTable = require("sphere.ui.JudgeTable")
 local MetaDataTable = require("sphere.ui.MetaDataTable")
-local spherefonts = require("sphere.assets.fonts")
 
 local ResultScreen = Screen:new()
 

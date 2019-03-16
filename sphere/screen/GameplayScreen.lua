@@ -1,15 +1,12 @@
 local Screen = require("sphere.screen.Screen")
-
 local NoteChartFactory = require("sphere.game.NoteChartManager.NoteChartFactory")
 local NoteSkinManager = require("sphere.game.NoteSkinManager")
 local InputManager = require("sphere.game.InputManager")
 local PlayField = require("sphere.game.PlayField")
 local CustomScore = require("sphere.game.CustomScore")
 local NoteChartResourceLoader = require("sphere.game.NoteChartManager.NoteChartResourceLoader")
-
 local CloudburstEngine = require("sphere.game.CloudburstEngine")
 local NoteSkin = require("sphere.game.CloudburstEngine.NoteSkin")
-
 local NotificationLine = require("sphere.ui.NotificationLine")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 local ScreenManager = require("sphere.screen.ScreenManager")

@@ -1,7 +1,5 @@
-local Class = require("aqua.util.Class")
 local CS = require("aqua.graphics.CS")
 local TextFrame = require("aqua.graphics.TextFrame")
-
 local aquafonts = require("aqua.assets.fonts")
 local spherefonts = require("sphere.assets.fonts")
 

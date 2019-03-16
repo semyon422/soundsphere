@@ -1,7 +1,5 @@
-local CS = require("aqua.graphics.CS")
 local map = require("aqua.math").map
 local DrawableFrame = require("aqua.graphics.DrawableFrame")
-
 local Background = require("sphere.ui.Background")
 
 local DrawableBackground = Background:new()

@@ -1,5 +1,3 @@
-local AudioManager = require("aqua.audio.AudioManager")
-
 local LogicalNote = require("sphere.game.CloudburstEngine.note.LogicalNote")
 
 local ShortLogicalNote = LogicalNote:new()

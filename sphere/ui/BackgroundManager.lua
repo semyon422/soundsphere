@@ -1,9 +1,7 @@
 local CS = require("aqua.graphics.CS")
 local DrawableFrame = require("aqua.graphics.DrawableFrame")
 local image = require("aqua.image")
-
 local DrawableBackground = require("sphere.ui.DrawableBackground")
-
 local tween = require("tween")
 
 local BackgroundManager = {}
