@@ -15,25 +15,22 @@ local SelectionScreen = Screen:new()
 Screen.construct(SelectionScreen)
 
 SelectionScreen.load = function(self)
-	self.noteChartList = NoteChartList:new()
-	self.noteChartSetList = NoteChartSetList:new()
+	NoteChartList.NoteChartSetList = NoteChartSetList
+	NoteChartSetList.NoteChartList = NoteChartList
 	
-	self.noteChartList.noteChartSetList = self.noteChartSetList
-	self.noteChartSetList.noteChartList = self.noteChartList
+	NoteChartList.observable:add(self)
+	NoteChartSetList.observable:add(self)
 	
-	self.noteChartList.observable:add(self)
-	self.noteChartSetList.observable:add(self)
-	
-	self.noteChartList:load()
-	self.noteChartSetList:load()
-	self.noteChartSetList:sendInitial()
+	NoteChartList:load()
+	NoteChartSetList:load()
+	NoteChartSetList:sendInitial()
 	
 	BackgroundManager:setColor({127, 127, 127})
 end
 
 SelectionScreen.unload = function(self)
-	self.noteChartSetList:unload()
-	self.noteChartList:unload()
+	NoteChartSetList:unload()
+	NoteChartList:unload()
 end
 
 SelectionScreen.unload = function(self) end
@@ -41,15 +38,15 @@ SelectionScreen.unload = function(self) end
 SelectionScreen.update = function(self)
 	Screen.update(self)
 	
-	self.noteChartSetList:update()
-	self.noteChartList:update()
+	NoteChartSetList:update()
+	NoteChartList:update()
 end
 
 SelectionScreen.draw = function(self)
 	Screen.draw(self)
 	
-	self.noteChartSetList:draw()
-	self.noteChartList:draw()
+	NoteChartSetList:draw()
+	NoteChartList:draw()
 	MetaDataTable:draw()
 end
 
@@ -72,8 +69,8 @@ SelectionScreen.receive = function(self, event)
 		MetaDataTable:reload()
 	end
 	
-	self.noteChartSetList:receive(event)
-	self.noteChartList:receive(event)
+	NoteChartSetList:receive(event)
+	NoteChartList:receive(event)
 end
 
 return SelectionScreen

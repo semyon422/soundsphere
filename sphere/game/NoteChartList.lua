@@ -15,26 +15,22 @@ local Cache = require("sphere.game.NoteChartManager.Cache")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 local NotificationLine = require("sphere.ui.NotificationLine")
 
-local NoteChartSetList = require("sphere.game.NoteChartSetList")
-local CustomList = require("sphere.game.CustomList")
+local CacheList = require("sphere.game.CacheList")
 
 local ScreenManager = require("sphere.screen.ScreenManager")
 
-local NoteChartList = NoteChartSetList:new()
+local NoteChartList = CacheList:new()
 
 NoteChartList.sender = "NoteChartList"
-
-NoteChartList.visualItemIndex = 1
-NoteChartList.selectedItemIndex = 1
 
 NoteChartList.x = 0.3
 NoteChartList.y = 4 / 17
 NoteChartList.w = 0.3
-NoteChartList.h = 13 / 17
-NoteChartList.buttonCount = 13
+NoteChartList.h = 8 / 17
+NoteChartList.buttonCount = 8
 NoteChartList.middleOffset = 5
 NoteChartList.startOffset = 5
-NoteChartList.endOffset = 13
+NoteChartList.endOffset = 5
 
 NoteChartList.basePath = "userdata/charts"
 
@@ -56,7 +52,7 @@ NoteChartList.send = function(self, event)
 		end
 	end
 	
-	CustomList.send(self, event)
+	CacheList.send(self, event)
 end
 
 NoteChartList.receive = function(self, event)
@@ -67,7 +63,7 @@ NoteChartList.receive = function(self, event)
 		end
 	end
 	
-	CustomList.receive(self, event)
+	CacheList.receive(self, event)
 end
 
 return NoteChartList

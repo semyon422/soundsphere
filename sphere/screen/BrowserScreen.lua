@@ -12,29 +12,28 @@ local BrowserScreen = Screen:new()
 Screen.construct(BrowserScreen)
 
 BrowserScreen.load = function(self)
-	self.browserList = BrowserList:new()
-	self.browserList.observable:add(self)
+	BrowserList.observable:add(self)
 	
-	self.browserList:load()
-	self.browserList:sendInitial()
+	BrowserList:load()
+	BrowserList:sendInitial()
 	
 	BackgroundManager:setColor({127, 127, 127})
 end
 
 BrowserScreen.unload = function(self)
-	self.browserList:unload()
+	BrowserList:unload()
 end
 
 BrowserScreen.update = function(self)
 	Screen.update(self)
 	
-	self.browserList:update()
+	BrowserList:update()
 end
 
 BrowserScreen.draw = function(self)
 	Screen.draw(self)
 	
-	self.browserList:draw()
+	BrowserList:draw()
 end
 
 BrowserScreen.receive = function(self, event)
@@ -42,7 +41,7 @@ BrowserScreen.receive = function(self, event)
 		ScreenManager:set(require("sphere.screen.SelectionScreen"))
 	end
 	
-	self.browserList:receive(event)
+	BrowserList:receive(event)
 end
 
 return BrowserScreen
