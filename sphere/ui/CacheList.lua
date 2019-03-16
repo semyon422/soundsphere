@@ -2,6 +2,7 @@ local Observable = require("aqua.util.Observable")
 local Cache = require("sphere.game.NoteChartManager.Cache")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 local CustomList = require("sphere.ui.CustomList")
+local NotificationLine = require("sphere.ui.NotificationLine")
 
 local CacheList = CustomList:new()
 
@@ -15,7 +16,7 @@ CacheList.load = function(self)
 	self.selectStatement = self.db:prepare(self.selectRequest)
 	self:selectCache()
 	
-	CustomList.load(self)
+	return CustomList.load(self)
 end
 
 CacheList.setBasePath = function(self, path)
@@ -35,6 +36,10 @@ CacheList.selectRequest = "SELECT * FROM `cache` WHERE INSTR(`path`, ?) == 1 ORD
 CacheList.selectCache = function(self)
 	local items = {}
 	
+	if CacheList.lock then
+		return self:setItems(items)
+	end
+	
 	local stmt = self.selectStatement:reset():bind(self.basePath)
 	local row = stmt:step()
 	while row do
@@ -49,7 +54,7 @@ CacheList.selectCache = function(self)
 		table.sort(items, self.sortItemsFunction)
 	end
 	
-	self:setItems(items)
+	return self:setItems(items)
 end
 
 CacheList.getItem = function(self, cacheData)
@@ -96,7 +101,16 @@ CacheList.getBackgroundPath = function(self, itemIndex)
 end
 
 CacheList.updateBackground = function(self)
-	BackgroundManager:loadDrawableBackground(self:getBackgroundPath(self.focusedItemIndex))
+	if CacheList.lock then return end
+	return BackgroundManager:loadDrawableBackground(self:getBackgroundPath(self.focusedItemIndex))
+end
+
+CacheList.updateCache = function(self, path)
+	CacheList.lock = true
+	return Cache:update(path, recursive, function()
+		CacheList.lock = false
+		return NotificationLine:notify("Cache updated. (" .. path .. ")")
+	end)
 end
 
 return CacheList

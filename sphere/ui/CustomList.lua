@@ -74,7 +74,7 @@ CustomList.setItems = function(self, items)
 end
 
 CustomList.unload = function(self)
-	self:unloadButtons()
+	return self:unloadButtons()
 end
 
 CustomList.sendInitial = function(self)
@@ -119,7 +119,7 @@ CustomList.update = function(self)
 		self.visualItemIndex = self.visualItemIndex + scrollCurrentDelta
 	end
 	
-	self:calculateButtons()
+	return self:calculateButtons()
 end
 
 CustomList.send = function(self, event)
@@ -203,7 +203,7 @@ CustomList.scrollToItemIndex = function(self, itemIndex)
 end
 
 CustomList.scrollBy = function(self, scrollDelta)
-	self:scrollToItemIndex(self.focusedItemIndex + scrollDelta)
+	return self:scrollToItemIndex(self.focusedItemIndex + scrollDelta)
 end
 
 CustomList.calculateButtons = function(self)
@@ -264,11 +264,11 @@ CustomList.Button.update = function(self)
 	then
 		self.list.buttons[self] = nil
 	else
-		self:reload()
+		return self:reload()
 	end
 end
 
-CustomList.Button.interact = function(self)
+CustomList.Button.interact = function(self, event)
 	local mx = self.cs:x(love.mouse.getX(), true)
 	local my = self.cs:y(love.mouse.getY(), true)
 	if
@@ -284,10 +284,11 @@ CustomList.Button.interact = function(self)
 				sender = self.list.sender,
 				action = "buttonInteract",
 				itemIndex = self.itemIndex,
-				list = self.list
+				list = self.list,
+				button = event.args[3]
 			})
 		else
-			self.list:scrollToItemIndex(self.itemIndex)
+			return self.list:scrollToItemIndex(self.itemIndex)
 		end
 	end
 end

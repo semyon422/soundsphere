@@ -31,13 +31,14 @@ NoteChartSetList.cs = CS:new({
 NoteChartSetList.send = function(self, event)
 	if event.action == "scrollStop" then
 		self.NoteChartList:updateBackground()
+	elseif event.action == "buttonInteract" then
+		local cacheData = self.items[event.itemIndex].cacheData
+		if event.button == 2 then
+			self:updateCache(cacheData.path)
+		end
 	end
 	
-	CacheList.send(self, event)
-end
-
-NoteChartSetList.receive = function(self, event)
-	CacheList.receive(self, event)
+	return CacheList.send(self, event)
 end
 
 NoteChartSetList.selectRequest = [[

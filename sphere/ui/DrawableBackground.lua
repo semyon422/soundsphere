@@ -1,6 +1,7 @@
 local map = require("aqua.math").map
 local DrawableFrame = require("aqua.graphics.DrawableFrame")
 local Background = require("sphere.ui.Background")
+local image = require("aqua.image")
 
 local DrawableBackground = Background:new()
 
@@ -26,6 +27,11 @@ DrawableBackground.load = function(self)
 	local mx = self.cs:x(love.mouse.getX(), true)
 	local my = self.cs:y(love.mouse.getY(), true)
 	self:updateParallax(mx, my)
+end
+
+local emptyFunction = function() end
+DrawableBackground.unload = function(self)
+	image.unload(self.path, emptyFunction)
 end
 
 DrawableBackground.getColor = function(self)

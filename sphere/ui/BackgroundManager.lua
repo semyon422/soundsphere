@@ -27,7 +27,17 @@ BackgroundManager.loadDrawableBackground = function(self, path)
 	if path ~= self.currentPath then
 		self.currentPath = path
 		return image.load(path, function(imageData)
-			if imageData then return self:setDrawableBackground(imageData) end
+			if imageData then
+				return self:setBackground(
+					DrawableBackground:new({
+						drawable = love.graphics.newImage(imageData),
+						cs = self.cs,
+						color = {255, 255, 255, 0},
+						globalColor = self.color,
+						path = path
+					})
+				)
+			end
 		end)
 	end
 end
@@ -35,17 +45,6 @@ end
 BackgroundManager.setColor = function(self, color)
 	love.timer.step()
 	self.colorTween = tween.new(0.5, self.color, color, "inOutQuad")
-end
-
-BackgroundManager.setDrawableBackground = function(self, imageData)
-	self:setBackground(
-		DrawableBackground:new({
-			drawable = love.graphics.newImage(imageData),
-			cs = self.cs,
-			color = {255, 255, 255, 0},
-			globalColor = self.color
-		})
-	)
 end
 
 BackgroundManager.setBackground = function(self, background)
@@ -67,6 +66,7 @@ BackgroundManager.update = function(self, dt)
 			background:fadeIn()
 		end
 		if background.visible == 1 then
+			self.backgrounds[1]:unload()
 			table.remove(self.backgrounds, 1)
 		end
 	elseif #self.backgrounds == 1 then

@@ -33,16 +33,14 @@ BrowserList.cs = CS:new({
 BrowserList.send = function(self, event)
 	if event.action == "buttonInteract" then
 		local cacheData = self.items[event.itemIndex].cacheData
-		if cacheData then
+		if event.button == 1 then
 			NoteChartSetList:setBasePath(cacheData.path)
+		elseif event.button == 2 then
+			self:updateCache(cacheData.path)
 		end
 	end
 	
-	CacheList.send(self, event)
-end
-
-BrowserList.receive = function(self, event)
-	CacheList.receive(self, event)
+	return CacheList.send(self, event)
 end
 
 BrowserList.getItemName = function(self, cacheData)
