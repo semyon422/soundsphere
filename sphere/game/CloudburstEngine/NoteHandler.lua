@@ -78,6 +78,8 @@ NoteHandler.setKeyState = function(self)
 end
 
 NoteHandler.update = function(self)
+	if not self.currentNote then return end
+	
 	self.currentNote:update()
 	if self.click then
 		self.keyTimer = self.keyTimer + love.timer.getDelta()
@@ -89,6 +91,8 @@ NoteHandler.update = function(self)
 end
 
 NoteHandler.receive = function(self, event)
+	if not self.currentNote then return end
+	
 	local key = event.args and event.args[1]
 	if self.keyBind and key == self.keyBind then
 		if event.name == "keypressed" then
