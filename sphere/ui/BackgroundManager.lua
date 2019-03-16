@@ -24,9 +24,12 @@ BackgroundManager.init = function(self)
 end
 
 BackgroundManager.loadDrawableBackground = function(self, path)
-	return image.load(path, function(imageData)
-		if imageData then return self:setDrawableBackground(imageData) end
-	end)
+	if path ~= self.currentPath then
+		self.currentPath = path
+		return image.load(path, function(imageData)
+			if imageData then return self:setDrawableBackground(imageData) end
+		end)
+	end
 end
 
 BackgroundManager.setColor = function(self, color)
