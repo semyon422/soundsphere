@@ -102,6 +102,7 @@ end
 
 CacheList.updateBackground = function(self)
 	if CacheList.lock then return end
+	if not self.items[self.focusedItemIndex] then return end
 	return BackgroundManager:loadDrawableBackground(self:getBackgroundPath(self.focusedItemIndex))
 end
 

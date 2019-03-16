@@ -62,9 +62,9 @@ SelectionScreen.receive = function(self, event)
 	end
 	
 	if event.action == "scrollTarget" then
-		local cacheData = event.list.items[event.itemIndex].cacheData
-		if cacheData then
-			MetaDataTable:setData(cacheData)
+		local item = event.list.items[event.itemIndex]
+		if item and item.cacheData then
+			MetaDataTable:setData(item.cacheData)
 		end
 	end
 	if event.backgroundPath then

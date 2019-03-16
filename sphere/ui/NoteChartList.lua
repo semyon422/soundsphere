@@ -42,9 +42,9 @@ end
 
 NoteChartList.receive = function(self, event)
 	if event.action == "scrollTarget" then
-		local cacheData = event.list.items[event.itemIndex].cacheData
-		if cacheData.container == 1 then
-			self:setBasePath(cacheData.path)
+		local item = event.list.items[event.itemIndex]
+		if item and item.cacheData and item.cacheData.container == 1 then
+			self:setBasePath(item.cacheData.path)
 		end
 	end
 	

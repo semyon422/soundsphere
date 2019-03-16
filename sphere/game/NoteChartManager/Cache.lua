@@ -81,6 +81,12 @@ Cache.load = function(self)
 	self.selectStatement = self.db:prepare([[
 		SELECT * FROM `cache` WHERE path = ?
 	]])
+	
+	self:setEntry({
+		path = self.chartspath,
+		container = 2,
+		title = self.chartspath:match("^.+/(.-)$"),
+	})
 end
 
 Cache.update = function(self, path, recursive, callback)
