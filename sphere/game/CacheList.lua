@@ -20,8 +20,8 @@ local ScreenManager = require("sphere.screen.ScreenManager")
 
 local CacheList = CustomList:new()
 
+CacheList.needItemsSort = false
 CacheList.sender = "CacheList"
-
 CacheList.basePath = ""
 
 CacheList.load = function(self)
@@ -60,7 +60,9 @@ CacheList.selectCache = function(self)
 		items[#items + 1] = self:getItem(cacheData)
 		row = stmt:step()
 	end
-	table.sort(items, self.sortItemsFunction)
+	if self.needItemsSort then
+		table.sort(items, self.sortItemsFunction)
+	end
 	
 	self:setItems(items)
 end

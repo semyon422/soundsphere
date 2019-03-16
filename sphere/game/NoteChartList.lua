@@ -36,8 +36,6 @@ NoteChartList.basePath = "userdata/charts"
 
 NoteChartList.observable = Observable:new()
 
-NoteChartList.selectRequest = "SELECT * FROM `cache` WHERE `container` == 0 and INSTR(`path`, ?) == 1 ORDER BY `noteCount`;"
-
 NoteChartList.send = function(self, event)
 	if event.action == "scrollStop" then
 		local cacheData = self.items[event.itemIndex].cacheData
@@ -65,5 +63,11 @@ NoteChartList.receive = function(self, event)
 	
 	CacheList.receive(self, event)
 end
+
+NoteChartList.selectRequest = [[
+	SELECT * FROM `cache`
+	WHERE `container` == 0 AND INSTR(`path`, ?) == 1
+	ORDER BY `noteCount`;
+]]
 
 return NoteChartList

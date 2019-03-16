@@ -56,6 +56,10 @@ NoteChartSetList.receive = function(self, event)
 	CacheList.receive(self, event)
 end
 
-NoteChartSetList.selectRequest = "SELECT * FROM `cache` WHERE `container` == 1 and INSTR(`path`, ?) == 1 ORDER BY `path`;"
+NoteChartSetList.selectRequest = [[
+	SELECT * FROM `cache`
+	WHERE `container` == 1 AND INSTR(`path`, ?) == 1
+	ORDER BY `path`;
+]]
 
 return NoteChartSetList

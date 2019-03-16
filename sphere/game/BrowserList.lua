@@ -61,15 +61,15 @@ BrowserList.receive = function(self, event)
 	CacheList.receive(self, event)
 end
 
-BrowserList.sortItemsFunction = function(a, b)
-	return a.cacheData.path < b.cacheData.path
-end
-
-BrowserList.selectRequest = "SELECT * FROM `cache` WHERE `container` == 2 and INSTR(`path`, ?) == 1 ORDER BY `path`;"
-
 BrowserList.getItemName = function(self, cacheData)
 	local directoryPath, folderName = cacheData.path:match("^(.+)/(.-)$")
 	return (" "):rep(#directoryPath) .. folderName
 end
+
+BrowserList.selectRequest = [[
+	SELECT * FROM `cache`
+	WHERE `container` == 2 AND INSTR(`path`, ?) == 1
+	ORDER BY `path`;
+]]
 
 return BrowserList
