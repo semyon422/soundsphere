@@ -13,6 +13,7 @@ local NoteSkin = require("sphere.game.CloudburstEngine.NoteSkin")
 local NotificationLine = require("sphere.ui.NotificationLine")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 local ScreenManager = require("sphere.screen.ScreenManager")
+local ModifierManager = require("sphere.game.ModifierManager")
 
 local GameplayScreen = Screen:new()
 
@@ -35,7 +36,6 @@ GameplayScreen.load = function(self)
 	self.engine.container = self.container
 	self.engine.score = CustomScore:new()
 	self.engine.aliases = NoteChartResourceLoader.aliases
-	self.engine:load()
 	
 	self.playField = PlayField:new()
 	self.playField.directoryPath = noteSkinData.directoryPath
@@ -43,6 +43,14 @@ GameplayScreen.load = function(self)
 	self.playField.playFieldData = noteSkinData.playField
 	self.playField.noteSkin = noteSkin
 	self.playField.container = self.container
+	
+	ModifierManager.engine = self.engine
+	ModifierManager.noteChart = noteChart
+	ModifierManager.noteSkin = noteSkin
+	ModifierManager.playField = self.playField
+	ModifierManager:load()
+	ModifierManager:apply()
+	self.engine:load()
 	self.playField:load()
 	
 	self.engine.observable:add(self.playField)
