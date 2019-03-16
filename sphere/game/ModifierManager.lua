@@ -18,9 +18,4 @@ ModifierManager.apply = function(self)
 	self.modifierSequence:apply()
 end
 
-ModifierManager.load = function(self)
-	self.modifierSequence = ModifierSequence:new()
-	self.modifierSequence:add(AutoPlay:new())
-end
-
 return ModifierManager

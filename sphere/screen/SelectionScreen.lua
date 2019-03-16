@@ -4,9 +4,11 @@ local Observer = require("aqua.util.Observer")
 local Screen = require("sphere.screen.Screen")
 local NoteChartSetList = require("sphere.game.NoteChartSetList")
 local NoteChartList = require("sphere.game.NoteChartList")
+local ModifierList = require("sphere.game.ModifierList")
 local CustomList = require("sphere.game.CustomList")
 local MetaDataTable = require("sphere.ui.MetaDataTable")
 local ScreenManager = require("sphere.screen.ScreenManager")
+local ModifierDisplay = require("sphere.game.ModifierDisplay")
 
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 
@@ -25,12 +27,17 @@ SelectionScreen.load = function(self)
 	NoteChartSetList:load()
 	NoteChartSetList:sendInitial()
 	
+	ModifierList:load()
+	ModifierDisplay:reload()
+	
 	BackgroundManager:setColor({127, 127, 127})
 end
 
 SelectionScreen.unload = function(self)
 	NoteChartSetList:unload()
 	NoteChartList:unload()
+	ModifierList:unload()
+	ModifierDisplay:unload()
 end
 
 SelectionScreen.unload = function(self) end
@@ -40,6 +47,8 @@ SelectionScreen.update = function(self)
 	
 	NoteChartSetList:update()
 	NoteChartList:update()
+	ModifierList:update()
+	ModifierDisplay:update()
 end
 
 SelectionScreen.draw = function(self)
@@ -47,6 +56,8 @@ SelectionScreen.draw = function(self)
 	
 	NoteChartSetList:draw()
 	NoteChartList:draw()
+	ModifierList:draw()
+	ModifierDisplay:draw()
 	MetaDataTable:draw()
 end
 
@@ -71,6 +82,8 @@ SelectionScreen.receive = function(self, event)
 	
 	NoteChartSetList:receive(event)
 	NoteChartList:receive(event)
+	ModifierList:receive(event)
+	ModifierDisplay:receive(event)
 end
 
 return SelectionScreen

@@ -48,7 +48,6 @@ GameplayScreen.load = function(self)
 	ModifierManager.noteChart = noteChart
 	ModifierManager.noteSkin = noteSkin
 	ModifierManager.playField = self.playField
-	ModifierManager:load()
 	ModifierManager:apply()
 	self.engine:load()
 	self.playField:load()
