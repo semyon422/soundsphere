@@ -9,6 +9,7 @@ local ScreenManager = require("sphere.screen.ScreenManager")
 
 local Cache = require("sphere.game.NoteChartManager.Cache")
 
+local WindowManager = require("sphere.game.WindowManager")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 local NotificationLine = require("sphere.ui.NotificationLine")
 local CLI = require("sphere.ui.CLI")
@@ -34,6 +35,7 @@ end
 SphereGame.load = function(self)
 	Cache:load()
 	
+	WindowManager:load()
 	BackgroundManager:loadDrawableBackground("userdata/background.jpg")
 	ScreenManager:set(SelectionScreen)
 	NotificationLine:notify("welcome")
@@ -71,6 +73,7 @@ SphereGame.receive = function(self, event)
 		ScreenManager:receive(event)
 		BackgroundManager:receive(event)
 		NotificationLine:receive(event)
+		WindowManager:receive(event)
 	end
 	CLI:receive(event)
 end
