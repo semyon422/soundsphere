@@ -24,7 +24,7 @@ ModifierList.observable = Observable:new()
 ModifierList.load = function(self)
 	self:loadModifiers()
 	
-	self.modifierSequence = ModifierSequence:new()
+	self.modifierSequence = self.modifierSequence or ModifierSequence:new()
 	ModifierManager.modifierSequence = self.modifierSequence
 	
 	CustomList.load(self)

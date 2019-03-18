@@ -45,6 +45,7 @@ end
 ModifierDisplay.reload = function(self)
 	self.cs:reload()
 	Button.reload(self)
+	self:updateText()
 end
 
 return ModifierDisplay
