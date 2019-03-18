@@ -12,7 +12,7 @@ local spherefonts = require("sphere.assets.fonts")
 local CustomList = Class:new()
 
 CustomList.sender = "CustomList"
-CustomList.needFocusToInteract = true
+CustomList.needFocusToInteract = false
 
 CustomList.visualItemIndex = 1
 CustomList.focusedItemIndex = 1

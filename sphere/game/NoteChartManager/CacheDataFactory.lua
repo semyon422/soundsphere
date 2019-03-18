@@ -58,7 +58,7 @@ CacheDataFactory.processCacheDataNames = function(self, cacheDatas)
 	end
 end
 
-local iconv = require("iconv")
+local iconv = require("aqua.iconv").iconv
 local validate = require("aqua.utf8").validate
 local fix = function(line)
 	if not line then

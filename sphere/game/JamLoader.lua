@@ -16,9 +16,7 @@ JamLoader.load = function(self, path, callback)
 		
 		ThreadPool:execute(
 			[[
-				local aquapackage = require("aqua.package")
-				aquapackage.add("chartbase")
-				require("byte")
+				local byte = require("aqua.byte")
 				
 				local file = require("aqua.file")
 				local sound = require("aqua.sound")

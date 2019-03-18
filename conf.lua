@@ -22,7 +22,7 @@ function love.conf(t)
 	t.window.x = nil
 	t.window.y = nil
 
-	t.modules.audio = true
+	t.modules.audio = false
 	t.modules.event = true
 	t.modules.graphics = true
 	t.modules.image = true
@@ -30,8 +30,8 @@ function love.conf(t)
 	t.modules.keyboard = true
 	t.modules.math = true
 	t.modules.mouse = true
-	t.modules.physics = true
-	t.modules.sound = true
+	t.modules.physics = false
+	t.modules.sound = false
 	t.modules.system = true
 	t.modules.timer = true
 	t.modules.touch = true
