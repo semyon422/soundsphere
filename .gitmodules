@@ -1,0 +1,24 @@
+[submodule "ncdk"]
+	path = ncdk
+	url = https://github.com/semyon422/ncdk
+[submodule "chartbase"]
+	path = chartbase
+	url = https://github.com/semyon422/chartbase
+[submodule "aqua"]
+	path = aqua
+	url = https://github.com/semyon422/aqua
+[submodule "tween"]
+	path = tween
+	url = https://github.com/kikito/tween.lua
+[submodule "tinyyaml"]
+	path = tinyyaml
+	url = https://github.com/peposso/lua-tinyyaml
+[submodule "json"]
+	path = json
+	url = https://github.com/rxi/json.lua
+[submodule "ljsqlite3"]
+	path = ljsqlite3
+	url = https://github.com/stepelu/lua-ljsqlite3
+[submodule "soundsphere-skins"]
+	path = userdata/skins
+	url = https://github.com/semyon422/soundsphere-skins

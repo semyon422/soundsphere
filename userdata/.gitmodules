@@ -1,0 +1,3 @@
+[submodule "ncdk"]
+	path = ncdk
+	url = https://github.com/semyon422/ncdk
