@@ -64,6 +64,7 @@ FullLongNote.processNoteData = function(self, noteDataIndex, noteData)
 		table.insert(timePointList, timePoint)
 	end
 	table.sort(timePointList)
+	timePointList = self:cleanTimePointList(timePointList, nNoteData)
 	if timePointList[1] == noteData.timePoint then
 		table.remove(timePointList, 1)
 	end
@@ -98,6 +99,23 @@ FullLongNote.processNoteData = function(self, noteDataIndex, noteData)
 	noteData.endNoteData = endNoteData
 	
 	self.noteDataLayers[noteData]:addNoteData(endNoteData)
+end
+
+FullLongNote.cleanTimePointList = function(self, timePointList, nNoteData)
+	local out = {}
+	out[#out + 1] = timePointList[1]
+	
+	for i = 2, #timePointList do
+		if timePointList[i].absoluteTime - out[#out].absoluteTime >= 0.005 then
+			out[#out + 1] = timePointList[i]
+		end
+	end
+	
+	if nNoteData and nNoteData.timePoint.absoluteTime - out[#out].absoluteTime < 0.005 then
+		out[#out] = nNoteData.timePoint
+	end
+	
+	return out
 end
 
 return FullLongNote
