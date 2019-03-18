@@ -73,6 +73,7 @@ SelectionScreen.receive = function(self, event)
 	
 	if event.name == "resize" then
 		MetaDataTable:reload()
+		ModifierDisplay:reload()
 	end
 	
 	NoteChartSetList:receive(event)

@@ -42,4 +42,9 @@ ModifierDisplay.interact = function(self)
 	self:updateText()
 end
 
+ModifierDisplay.reload = function(self)
+	self.cs:reload()
+	Button.reload(self)
+end
+
 return ModifierDisplay
