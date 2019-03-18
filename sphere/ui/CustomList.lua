@@ -52,6 +52,7 @@ CustomList.load = function(self)
 	self.scrollCurrentDelta = 0
 	self:loadStencil()
 	self.visualItemIndex = self.focusedItemIndex
+	self:unloadButtons()
 	self:calculateButtons()
 end
 
