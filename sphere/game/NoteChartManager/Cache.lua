@@ -94,8 +94,6 @@ Cache.update = function(self, path, recursive, callback)
 		ThreadPool:execute(
 			[[
 				local path, recursive = ...
-				aquapackage = require("aqua.package")
-				aquapackage.add("chartbase")
 				local Cache = require("sphere.game.NoteChartManager.Cache")
 				if not Cache.db then Cache:load() end
 				Cache:lookup(path, recursive)
