@@ -6,6 +6,7 @@ local MetaDataTable = require("sphere.ui.MetaDataTable")
 local ScreenManager = require("sphere.screen.ScreenManager")
 local ModifierDisplay = require("sphere.ui.ModifierDisplay")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
+local CustomTheme = require("sphere.ui.CustomTheme")
 
 local SelectionScreen = Screen:new()
 
@@ -20,10 +21,15 @@ SelectionScreen.load = function(self)
 	
 	NoteChartList:load()
 	NoteChartSetList:load()
-	NoteChartSetList:sendInitial()
 	
 	ModifierList:load()
 	ModifierDisplay:reload()
+	
+	self.theme = CustomTheme:new()
+	self.theme.container = self.container
+	self.theme:load("userdata/theme/SelectionScreen.json")
+	
+	NoteChartSetList:sendInitial()
 	
 	BackgroundManager:setColor({127, 127, 127})
 end
@@ -44,6 +50,7 @@ SelectionScreen.update = function(self)
 	NoteChartList:update()
 	ModifierList:update()
 	ModifierDisplay:update()
+	self.theme:update()
 end
 
 SelectionScreen.draw = function(self)
@@ -80,6 +87,7 @@ SelectionScreen.receive = function(self, event)
 	NoteChartList:receive(event)
 	ModifierList:receive(event)
 	ModifierDisplay:receive(event)
+	self.theme:receive(event)
 end
 
 return SelectionScreen
