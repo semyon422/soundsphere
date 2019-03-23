@@ -73,6 +73,8 @@ GameplayScreen.update = function(self, dt)
 end
 
 GameplayScreen.draw = function(self)
+	self.engine:draw()
+	
 	Screen.draw(self)
 end
 

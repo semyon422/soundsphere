@@ -1,4 +1,3 @@
-local Image = require("aqua.graphics.Image")
 local GraphicalNote = require("sphere.game.CloudburstEngine.note.GraphicalNote")
 
 local LongGraphicalNote = GraphicalNote:new()
@@ -30,9 +29,9 @@ LongGraphicalNote.update = function(self)
 		self.bodyDrawable:reload()
 		
 		local color = self:getColor()
-		self:updateColor(self.headDrawable.color, color)
-		self:updateColor(self.tailDrawable.color, color)
-		self:updateColor(self.bodyDrawable.color, color)
+		self.headDrawable.color = color
+		self.tailDrawable.color = color
+		self.bodyDrawable.color = color
 	end
 end
 
@@ -94,54 +93,26 @@ LongGraphicalNote.getFakeVisualStartTime = function(self)
 end
 
 LongGraphicalNote.activate = function(self)
-	self.headDrawable = Image:new({
-		cs = self:getCS(),
-		x = self:getHeadX(),
-		y = self:getHeadY(),
-		sx = self:getHeadScaleX(),
-		sy = self:getHeadScaleY(),
-		image = self:getHeadDrawable(),
-		layer = self:getHeadLayer(),
-		color = {255, 255, 255, 255}
-	})
-	self.tailDrawable = Image:new({
-		cs = self:getCS(),
-		x = self:getTailX(),
-		y = self:getTailY(),
-		sx = self:getTailScaleX(),
-		sy = self:getTailScaleY(),
-		image = self:getTailDrawable(),
-		layer = self:getTailLayer(),
-		color = {255, 255, 255, 255}
-	})
-	self.bodyDrawable = Image:new({
-		cs = self:getCS(),
-		x = self:getBodyX(),
-		y = self:getBodyY(),
-		sx = self:getBodyScaleX(),
-		sy = self:getBodyScaleY(),
-		image = self:getBodyDrawable(),
-		layer = self:getBodyLayer(),
-		color = {255, 255, 255, 255}
-	})
+	self.headDrawable = self:getHeadDrawable()
+	self.tailDrawable = self:getTailDrawable()
+	self.bodyDrawable = self:getBodyDrawable()
 	self.headDrawable:reload()
 	self.tailDrawable:reload()
 	self.bodyDrawable:reload()
-	self.container:add(self.headDrawable)
-	self.container:add(self.tailDrawable)
-	self.container:add(self.bodyDrawable)
-	
-	self:updateColor(self.headDrawable.color, self:getColor())
-	self:updateColor(self.tailDrawable.color, self:getColor())
-	self:updateColor(self.bodyDrawable.color, self:getColor())
+	self.headContainer = self:getHeadContainer()
+	self.tailContainer = self:getTailContainer()
+	self.bodyContainer = self:getBodyContainer()
+	self.headContainer:add(self.headDrawable)
+	self.tailContainer:add(self.tailDrawable)
+	self.bodyContainer:add(self.bodyDrawable)
 	
 	self.activated = true
 end
 
 LongGraphicalNote.deactivate = function(self)
-	self.container:remove(self.headDrawable)
-	self.container:remove(self.tailDrawable)
-	self.container:remove(self.bodyDrawable)
+	self.headContainer:remove(self.headDrawable)
+	self.tailContainer:remove(self.tailDrawable)
+	self.bodyContainer:remove(self.bodyDrawable)
 	self.activated = false
 end
 
@@ -172,13 +143,23 @@ LongGraphicalNote.getBodyLayer = function(self)
 end
 
 LongGraphicalNote.getHeadDrawable = function(self)
-	return self.noteSkin:getNoteDrawable(self, "Head")
+	return self.noteSkin:getImageDrawable(self, "Head")
 end
 LongGraphicalNote.getTailDrawable = function(self)
-	return self.noteSkin:getNoteDrawable(self, "Tail")
+	return self.noteSkin:getImageDrawable(self, "Tail")
 end
 LongGraphicalNote.getBodyDrawable = function(self)
-	return self.noteSkin:getNoteDrawable(self, "Body")
+	return self.noteSkin:getImageDrawable(self, "Body")
+end
+
+LongGraphicalNote.getHeadContainer = function(self)
+	return self.noteSkin:getImageContainer(self, "Head")
+end
+LongGraphicalNote.getTailContainer = function(self)
+	return self.noteSkin:getImageContainer(self, "Tail")
+end
+LongGraphicalNote.getBodyContainer = function(self)
+	return self.noteSkin:getImageContainer(self, "Body")
 end
 
 LongGraphicalNote.getHeadX = function(self)

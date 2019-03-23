@@ -37,17 +37,21 @@ CloudburstEngine.update = function(self, dt)
 		self:updateRate()
 	end
 	
-	self.noteSkin:update(dt)
-	
 	self:updateTimeManager()
 	self:updateNoteHandlers()
 	self:updateNoteDrawers()
+	
+	self.noteSkin:update(dt)
 end
 
 CloudburstEngine.unload = function(self)
 	self:unloadTimeManager()
 	self:unloadNoteHandlers()
 	self:unloadNoteDrawers()
+end
+
+CloudburstEngine.draw = function(self)
+	self.noteSkin:draw()
 end
 
 CloudburstEngine.receive = function(self, event)

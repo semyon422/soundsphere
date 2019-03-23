@@ -2,6 +2,10 @@ local Class = require("aqua.util.Class")
 local CS = require("aqua.graphics.CS")
 local map = require("aqua.math").map
 local tween = require("tween")
+local Image = require("aqua.graphics.Image")
+local Rectangle = require("aqua.graphics.Rectangle")
+local SpriteBatch = require("aqua.graphics.SpriteBatch")
+local Container = require("aqua.graphics.Container")
 
 local NoteSkin = Class:new()
 
@@ -45,28 +49,52 @@ NoteSkin.construct = function(self)
 	
 	self.images = {}
 	self:loadImages()
+	
+	self.containers = {}
+	self:loadContainers()
 end
 
-NoteSkin.loadImage = function(self, localPath)
-	self.images[localPath]
-		 = self.images[localPath]
-		or love.graphics.newImage(self.directoryPath .. "/" .. localPath)
+local newImage = love.graphics.newImage
+NoteSkin.loadImage = function(self, imageData)
+	self.images[imageData.name] = newImage(self.directoryPath .. "/" .. imageData.path)
 end
 
 NoteSkin.loadImages = function(self)
-	local path
-	for noteId, data in pairs(self.data) do
-		for _, subdata in pairs(data) do
-			if subdata.image then
-				self:loadImage(subdata.image)
-			end
-		end
+	for _, imageData in pairs(self.noteSkinData.images) do
+		self:loadImage(imageData)
 	end
+end
+
+local sortContainers = function(a, b)
+	return a.layer < b.layer
+end
+NoteSkin.loadContainers = function(self)
+	self.containerList = {}
+	for _, imageData in pairs(self.noteSkinData.images) do
+		local container = SpriteBatch:new(nil, self.images[imageData.name])
+		container.layer = imageData.layer
+		self.containers[imageData.name] = container
+		table.insert(self.containerList, container)
+	end
+	table.sort(self.containerList, sortContainers)
+	
+	self.rectangleContainer = Container:new()
+	table.insert(self.containerList, 1, self.rectangleContainer)
 end
 
 NoteSkin.update = function(self, dt)
 	if self.speedTween then
 		self.speedTween:update(dt)
+	end
+	
+	for _, container in ipairs(self.containerList) do
+		container:update()
+	end
+end
+
+NoteSkin.draw = function(self)
+	for _, container in ipairs(self.containerList) do
+		container:draw()
 	end
 end
 
@@ -100,8 +128,44 @@ NoteSkin.getNoteLayer = function(self, note, part)
 		)
 end
 
-NoteSkin.getNoteDrawable = function(self, note, part)
+NoteSkin.getNoteImage = function(self, note, part)
 	return self.images[self.data[note.id][part].image]
+end
+
+NoteSkin.getRectangleDrawable = function(self, note, part)
+	return Rectangle:new({
+		cs = self.cs,
+		mode = "fill",
+		x = 0,
+		y = 0,
+		w = self:getLineNoteScaledWidth(note),
+		h = self:getLineNoteScaledHeight(note),
+		lineStyle = "rough",
+		lineWidth = 1,
+		layer = self:getNoteLayer(note, part),
+		color = self.color.clear
+	})
+end
+
+NoteSkin.getImageDrawable = function(self, note, part)
+	return Image:new({
+		cs = self.cs,
+		x = 0,
+		y = 0,
+		sx = self:getNoteScaleX(note, part),
+		sy = self:getNoteScaleY(note, part),
+		image = self:getNoteImage(note, part),
+		layer = self:getNoteLayer(note, part),
+		color = self.color.clear
+	})
+end
+
+NoteSkin.getImageContainer = function(self, note, part)
+	return self.containers[self.data[note.id][part].image]
+end
+
+NoteSkin.getRectangleContainer = function(self, note, part)
+	return self.rectangleContainer
 end
 
 --------------------------------
@@ -255,10 +319,10 @@ NoteSkin.getNoteScaleX = function(self, note, part)
 					0
 				)
 				+ data.w
-			) / self:getCS(note):x(self:getNoteDrawable(note, part):getWidth())
+			) / self:getCS(note):x(self:getNoteImage(note, part):getWidth())
 	end
 	
-	return self:getNoteWidth(note, part) / self:getCS(note):x(self:getNoteDrawable(note, part):getWidth())
+	return self:getNoteWidth(note, part) / self:getCS(note):x(self:getNoteImage(note, part):getWidth())
 end
 
 NoteSkin.getNoteScaleY = function(self, note, part)
@@ -271,10 +335,10 @@ NoteSkin.getNoteScaleY = function(self, note, part)
 					0
 				)
 				+ data.h
-			) / self:getCS(note):y(self:getNoteDrawable(note, part):getHeight())
+			) / self:getCS(note):y(self:getNoteImage(note, part):getHeight())
 	end
 	
-	return self:getNoteHeight(note, part) / self:getCS(note):y(self:getNoteDrawable(note, part):getHeight())
+	return self:getNoteHeight(note, part) / self:getCS(note):y(self:getNoteImage(note, part):getHeight())
 end
 
 --------------------------------
@@ -420,34 +484,36 @@ end
 -- get*Color
 --------------------------------
 NoteSkin.getShortNoteColor = function(self, note)
+	local color = self.color
 	if note.logicalNote.state == "clear" or note.logicalNote.state == "skipped" then
-		return self.color.clear
+		return color.clear
 	elseif note.logicalNote.state == "missed" then
-		return self.color.missed
+		return color.missed
 	elseif note.logicalNote.state == "passed" then
-		return self.color.passed
+		return color.passed
 	end
 end
 
 NoteSkin.getLongNoteColor = function(self, note)
 	local logicalNote = note.logicalNote
 	
+	local color = self.color
 	if note.fakeStartTime and note.fakeStartTime >= note.endNoteData.timePoint:getAbsoluteTime() then
-		return self.color.transparent
+		return color.transparent
 	elseif logicalNote.state == "clear" then
-		return self.color.clear
+		return color.clear
 	elseif logicalNote.state == "startMissed" then
-		return self.color.startMissed
+		return color.startMissed
 	elseif logicalNote.state == "startMissedPressed" then
-		return self.color.startMissedPressed
+		return color.startMissedPressed
 	elseif logicalNote.state == "startPassedPressed" then
-		return self.color.startPassedPressed
+		return color.startPassedPressed
 	elseif logicalNote.state == "endPassed" then
-		return self.color.endPassed
+		return color.endPassed
 	elseif logicalNote.state == "endMissed" then
-		return self.color.endMissed
+		return color.endMissed
 	elseif logicalNote.state == "endMissedPassed" then
-		return self.color.endMissedPassed
+		return color.endMissedPassed
 	end
 end
 

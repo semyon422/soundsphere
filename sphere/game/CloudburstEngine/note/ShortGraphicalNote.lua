@@ -1,4 +1,3 @@
-local Image = require("aqua.graphics.Image")
 local GraphicalNote = require("sphere.game.CloudburstEngine.note.GraphicalNote")
 
 local ShortGraphicalNote = GraphicalNote:new()
@@ -18,7 +17,7 @@ ShortGraphicalNote.update = function(self)
 		self.drawable.y = self:getY()
 		self.drawable.x = self:getX()
 		self.drawable:reload()
-		return self:updateColor(self.drawable.color, self:getColor())
+		self.drawable.color = self:getColor()
 	end
 end
 
@@ -30,20 +29,10 @@ ShortGraphicalNote.computeVisualTime = function(self)
 end
 
 ShortGraphicalNote.activate = function(self)
-	self.drawable = Image:new({
-		cs = self:getCS(),
-		x = self:getX(),
-		y = self:getY(),
-		sx = self:getScaleX(),
-		sy = self:getScaleY(),
-		image = self:getDrawable(),
-		layer = self:getLayer(),
-		color = {255, 255, 255, 255}
-	})
+	self.drawable = self:getDrawable()
 	self.drawable:reload()
+	self.container = self:getContainer()
 	self.container:add(self.drawable)
-	
-	self:updateColor(self.drawable.color, self:getColor())
 	
 	self.activated = true
 end
@@ -68,7 +57,11 @@ ShortGraphicalNote.getLayer = function(self)
 end
 
 ShortGraphicalNote.getDrawable = function(self)
-	return self.noteSkin:getNoteDrawable(self, "Head")
+	return self.noteSkin:getImageDrawable(self, "Head")
+end
+
+ShortGraphicalNote.getContainer = function(self)
+	return self.noteSkin:getImageContainer(self, "Head")
 end
 
 ShortGraphicalNote.getX = function(self)

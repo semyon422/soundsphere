@@ -15,9 +15,9 @@ LineGraphicalNote.update = function(self)
 		self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
 		return self:updateNext(self.noteDrawer.endNoteIndex)
 	else
-		self.rectangle.x = self:getX()
-		self.rectangle.y = self:getY()
-		self.rectangle:reload()
+		self.drawable.x = self:getX()
+		self.drawable.y = self:getY()
+		self.drawable:reload()
 	end
 end
 
@@ -33,36 +33,35 @@ LineGraphicalNote.computeVisualTime = function(self)
 end
 
 LineGraphicalNote.activate = function(self)
-	self.rectangle = Rectangle:new({
-		cs = self:getCS(),
-		mode = "fill",
-		x = self:getX(),
-		y = self:getY(),
-		w = self:getWidth(),
-		h = self:getHeight(),
-		lineStyle = "rough",
-		lineWidth = 1,
-		layer = self:getLayer(),
-		color = {255, 255, 255, 255}
-	})
-	self.rectangle:reload()
-	self.container:add(self.rectangle)
+	self.drawable = self:getDrawable()
+	self.drawable:reload()
+	self.container = self:getContainer()
+	self.container:add(self.drawable)
 	
 	self.activated = true
 end
 
 LineGraphicalNote.deactivate = function(self)
-	self.container:remove(self.rectangle)
+	self.container:remove(self.drawable)
 	self.activated = false
 end
 
 LineGraphicalNote.reload = function(self)
-	self.rectangle:reload()
+	self.drawable:reload()
 end
 
 LineGraphicalNote.getLayer = function(self)
 	return self.noteSkin:getNoteLayer(self, "Head")
 end
+
+LineGraphicalNote.getDrawable = function(self)
+	return self.noteSkin:getRectangleDrawable(self, "Head")
+end
+
+LineGraphicalNote.getContainer = function(self)
+	return self.noteSkin:getRectangleContainer(self, "Head")
+end
+
 LineGraphicalNote.getX = function(self)
 	return self.noteSkin:getLineNoteX(self)
 end
