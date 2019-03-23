@@ -1,15 +1,15 @@
 local map = require("aqua.math").map
-local DrawableFrame = require("aqua.graphics.DrawableFrame")
+local ImageFrame = require("aqua.graphics.ImageFrame")
 local Background = require("sphere.ui.Background")
 local image = require("aqua.image")
 
-local DrawableBackground = Background:new()
+local ImageBackground = Background:new()
 
-DrawableBackground.parallax = 0.0125
+ImageBackground.parallax = 0.0125
 
-DrawableBackground.load = function(self)
-	self.drawableFrame = DrawableFrame:new({
-		drawable = self.drawable,
+ImageBackground.load = function(self)
+	self.drawable = ImageFrame:new({
+		image = self.image,
 		cs = self.cs,
 		x = 0 - self.parallax,
 		y = 0 - self.parallax,
@@ -22,7 +22,7 @@ DrawableBackground.load = function(self)
 		},
 		color = self.color
 	})
-	self.drawableFrame:reload()
+	self.drawable:reload()
 	
 	local mx = self.cs:x(love.mouse.getX(), true)
 	local my = self.cs:y(love.mouse.getY(), true)
@@ -30,11 +30,11 @@ DrawableBackground.load = function(self)
 end
 
 local emptyFunction = function() end
-DrawableBackground.unload = function(self)
+ImageBackground.unload = function(self)
 	image.unload(self.path, emptyFunction)
 end
 
-DrawableBackground.getColor = function(self)
+ImageBackground.getColor = function(self)
 	return {
 		self.globalColor[1] * self.color[1] / 255,
 		self.globalColor[2] * self.color[2] / 255,
@@ -43,19 +43,19 @@ DrawableBackground.getColor = function(self)
 	}
 end
 
-DrawableBackground.reload = function(self)
-	local drawableFrame = self.drawableFrame
+ImageBackground.reload = function(self)
+	local drawable = self.drawable
 
-	drawableFrame.drawable = self.drawable
-	drawableFrame.cs = self.cs
-	drawableFrame.color = self:getColor()
+	drawable.image = self.image
+	drawable.cs = self.cs
+	drawable.color = self:getColor()
 	
-	self.drawableFrame:reload()
+	drawable:reload()
 end
 
-DrawableBackground.update = function(self)
-	self.drawableFrame.color = self:getColor()
-	self.drawableFrame:update()
+ImageBackground.update = function(self)
+	self.drawable.color = self:getColor()
+	self.drawable:update()
 	
 	if self.state == 1 then
 		self.color[4] = math.min(self.color[4] + love.timer.getDelta() * 2000, 255)
@@ -72,25 +72,25 @@ DrawableBackground.update = function(self)
 	end
 end
 
-DrawableBackground.draw = function(self)
-	self.drawableFrame:draw()
+ImageBackground.draw = function(self)
+	self.drawable:draw()
 end
 
-DrawableBackground.fadeIn = function(self)
+ImageBackground.fadeIn = function(self)
 	if self.visible == -1 then
 		self.state = 1
 		self.visible = 0
 	end
 end
 
-DrawableBackground.fadeOut = function(self)
+ImageBackground.fadeOut = function(self)
 	if self.visible == 1 then
 		self.state = -1
 		self.visible = 0
 	end
 end
 
-DrawableBackground.receive = function(self, event)
+ImageBackground.receive = function(self, event)
 	if event.name == "mousemoved" then
 		local mx = self.cs:x(event.args[1], true)
 		local my = self.cs:y(event.args[2], true)
@@ -98,12 +98,12 @@ DrawableBackground.receive = function(self, event)
 	end
 end
 
-DrawableBackground.updateParallax = function(self, x, y)
-	self.drawableFrame.x = 0 - map(x, 0, 1, self.parallax, 0)
-	self.drawableFrame.y = 0 - map(y, 0, 1, self.parallax, 0)
-	self.drawableFrame.w = 1 + 2 * self.parallax
-	self.drawableFrame.h = 1 + 2 * self.parallax
-	self.drawableFrame:reload()
+ImageBackground.updateParallax = function(self, x, y)
+	self.drawable.x = 0 - map(x, 0, 1, self.parallax, 0)
+	self.drawable.y = 0 - map(y, 0, 1, self.parallax, 0)
+	self.drawable.w = 1 + 2 * self.parallax
+	self.drawable.h = 1 + 2 * self.parallax
+	self.drawable:reload()
 end
 
-return DrawableBackground
+return ImageBackground

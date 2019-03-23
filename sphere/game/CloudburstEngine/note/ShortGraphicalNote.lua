@@ -1,4 +1,4 @@
-local Drawable = require("aqua.graphics.Drawable")
+local Image = require("aqua.graphics.Image")
 local GraphicalNote = require("sphere.game.CloudburstEngine.note.GraphicalNote")
 
 local ShortGraphicalNote = GraphicalNote:new()
@@ -30,13 +30,13 @@ ShortGraphicalNote.computeVisualTime = function(self)
 end
 
 ShortGraphicalNote.activate = function(self)
-	self.drawable = Drawable:new({
+	self.drawable = Image:new({
 		cs = self:getCS(),
 		x = self:getX(),
 		y = self:getY(),
 		sx = self:getScaleX(),
 		sy = self:getScaleY(),
-		drawable = self:getDrawable(),
+		image = self:getDrawable(),
 		layer = self:getLayer(),
 		color = {255, 255, 255, 255}
 	})

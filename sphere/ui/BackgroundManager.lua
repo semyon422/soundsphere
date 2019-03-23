@@ -1,7 +1,6 @@
 local CS = require("aqua.graphics.CS")
-local DrawableFrame = require("aqua.graphics.DrawableFrame")
 local image = require("aqua.image")
-local DrawableBackground = require("sphere.ui.DrawableBackground")
+local ImageBackground = require("sphere.ui.ImageBackground")
 local tween = require("tween")
 
 local BackgroundManager = {}
@@ -10,7 +9,6 @@ BackgroundManager.color = {0, 0, 0}
 
 BackgroundManager.init = function(self)
 	self.state = 0
-	self.defaultDrawable = love.graphics.newImage(love.image.newImageData(1, 1))
 	
 	self.cs = CS:new({
 		bx = 0,
@@ -29,8 +27,8 @@ BackgroundManager.loadDrawableBackground = function(self, path)
 		return image.load(path, function(imageData)
 			if imageData then
 				return self:setBackground(
-					DrawableBackground:new({
-						drawable = love.graphics.newImage(imageData),
+					ImageBackground:new({
+						image = love.graphics.newImage(imageData),
 						cs = self.cs,
 						color = {255, 255, 255, 0},
 						globalColor = self.color,

@@ -1,12 +1,12 @@
 local Class = require("aqua.util.Class")
-local Drawable = require("aqua.graphics.Drawable")
+local Image = require("aqua.graphics.Image")
 
 local StaticObject = Class:new()
 
 StaticObject.load = function(self)
-	self.drawable = love.graphics.newImage(self.playField.directoryPath .. "/" .. self.image)
-	self.drawableObject = Drawable:new({
-		drawable = self.drawable,
+	self.image = love.graphics.newImage(self.playField.directoryPath .. "/" .. self.image)
+	self.drawable = Image:new({
+		image = self.image,
 		layer = self.layer,
 		cs = self.cs,
 		x = self.x,
@@ -15,18 +15,18 @@ StaticObject.load = function(self)
 		sy = 1,
 		color = {255, 255, 255, 255}
 	})
-	self.drawableObject:reload()
-	self.container:add(self.drawableObject)
+	self.drawable:reload()
+	self.container:add(self.drawable)
 end
 
 StaticObject.update = function(self)
-	self.drawableObject.sx = self.cs:X(1) / self.drawable:getWidth() * self.w
-	self.drawableObject.sy = self.cs:Y(1) / self.drawable:getHeight() * self.h
-	self.drawableObject:reload()
+	self.drawable.sx = self.cs:X(1) / self.image:getWidth() * self.w
+	self.drawable.sy = self.cs:Y(1) / self.image:getHeight() * self.h
+	self.drawable:reload()
 end
 
 StaticObject.unload = function(self)
-	self.container:remove(self.drawableObject)
+	self.container:remove(self.drawable)
 end
 
 return StaticObject

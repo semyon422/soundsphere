@@ -1,4 +1,4 @@
-local Drawable = require("aqua.graphics.Drawable")
+local Image = require("aqua.graphics.Image")
 local GraphicalNote = require("sphere.game.CloudburstEngine.note.GraphicalNote")
 
 local LongGraphicalNote = GraphicalNote:new()
@@ -94,33 +94,33 @@ LongGraphicalNote.getFakeVisualStartTime = function(self)
 end
 
 LongGraphicalNote.activate = function(self)
-	self.headDrawable = Drawable:new({
+	self.headDrawable = Image:new({
 		cs = self:getCS(),
 		x = self:getHeadX(),
 		y = self:getHeadY(),
 		sx = self:getHeadScaleX(),
 		sy = self:getHeadScaleY(),
-		drawable = self:getHeadDrawable(),
+		image = self:getHeadDrawable(),
 		layer = self:getHeadLayer(),
 		color = {255, 255, 255, 255}
 	})
-	self.tailDrawable = Drawable:new({
+	self.tailDrawable = Image:new({
 		cs = self:getCS(),
 		x = self:getTailX(),
 		y = self:getTailY(),
 		sx = self:getTailScaleX(),
 		sy = self:getTailScaleY(),
-		drawable = self:getTailDrawable(),
+		image = self:getTailDrawable(),
 		layer = self:getTailLayer(),
 		color = {255, 255, 255, 255}
 	})
-	self.bodyDrawable = Drawable:new({
+	self.bodyDrawable = Image:new({
 		cs = self:getCS(),
 		x = self:getBodyX(),
 		y = self:getBodyY(),
 		sx = self:getBodyScaleX(),
 		sy = self:getBodyScaleY(),
-		drawable = self:getBodyDrawable(),
+		image = self:getBodyDrawable(),
 		layer = self:getBodyLayer(),
 		color = {255, 255, 255, 255}
 	})
