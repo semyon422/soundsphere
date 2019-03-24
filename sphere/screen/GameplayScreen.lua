@@ -83,11 +83,13 @@ GameplayScreen.receive = function(self, event)
 	self.engine:receive(event)
 	self.playField:receive(event)
 	
+	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
 	if
 		event.name == "keypressed" and
 		event.args[1] == "escape" and
-		love.keyboard.isDown("lshift")
+		shift
 	then
+		self.engine:play()
 		ScreenManager:set(require("sphere.screen.ResultScreen"))
 		ScreenManager:receive({
 			name = "score",

@@ -1,10 +1,8 @@
 local CS = require("aqua.graphics.CS")
 local Observable = require("aqua.util.Observable")
-
-local GameplayScreen = require("sphere.screen.GameplayScreen")
-
-local CacheList = require("sphere.ui.CacheList")
 local ScreenManager = require("sphere.screen.ScreenManager")
+local GameplayScreen = require("sphere.screen.GameplayScreen")
+local CacheList = require("sphere.ui.CacheList")
 
 local NoteChartList = CacheList:new()
 
@@ -29,7 +27,7 @@ NoteChartList.send = function(self, event)
 		if cacheData then
 			self:updateBackground()
 		end
-	elseif event.action == "buttonInteract" then
+	elseif event.action == "buttonInteract" or event.action == "return" then
 		local cacheData = self.items[event.itemIndex].cacheData
 		if cacheData then
 			GameplayScreen.cacheData = cacheData
@@ -37,7 +35,7 @@ NoteChartList.send = function(self, event)
 		end
 	end
 	
-	CacheList.send(self, event)
+	return CacheList.send(self, event)
 end
 
 NoteChartList.receive = function(self, event)
@@ -46,9 +44,19 @@ NoteChartList.receive = function(self, event)
 		if item and item.cacheData and item.cacheData.container == 1 then
 			self:setBasePath(item.cacheData.path)
 		end
+	elseif event.name == "keypressed" then
+		local key = event.args[1]
+		if key == "lctrl" or key == "rctrl" then
+			self.keyControl = true
+		end
+	elseif event.name == "keyreleased" then
+		local key = event.args[1]
+		if key == "lctrl" or key == "rctrl" then
+			self.keyControl = false
+		end
 	end
 	
-	CacheList.receive(self, event)
+	return CacheList.receive(self, event)
 end
 
 NoteChartList.selectRequest = [[

@@ -65,13 +65,16 @@ CloudburstEngine.receive = function(self, event)
 		self:reloadNoteDrawers()
 	elseif event.name == "keypressed" then
 		local key = event.args[1]
-		if key == "return" then
-			self:play()
-		elseif key == "escape" then
-			self:pause()
+		local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
+		if key == "escape" and not shift then
+			if self.paused then
+				self:play()
+			else
+				self:pause()
+			end
 		elseif key == "f3" then
 			if NoteSkin.targetSpeed - 0.1 >= 0.1 then
-				NoteSkin.targetSpeed = NoteSkin.targetSpeed - 0.1
+				NoteSkin.targetSpeed = NoteSkin.targetSpeed - (shift and 0.05 or 0.1)
 				NoteSkin:setSpeed(NoteSkin.targetSpeed)
 				return self.observable:send({
 					name = "notify",
@@ -79,7 +82,7 @@ CloudburstEngine.receive = function(self, event)
 				})
 			end
 		elseif key == "f4" then
-			NoteSkin.targetSpeed = NoteSkin.targetSpeed + 0.1
+			NoteSkin.targetSpeed = NoteSkin.targetSpeed + (shift and 0.05 or 0.1)
 			NoteSkin:setSpeed(NoteSkin.targetSpeed)
 			return self.observable:send({
 				name = "notify",
@@ -87,7 +90,7 @@ CloudburstEngine.receive = function(self, event)
 			})
 		elseif key == "f5" then
 			if self.targetRate - 0.1 >= 0.1 then
-				self.targetRate = self.targetRate - 0.1
+				self.targetRate = self.targetRate - (shift and 0.05 or 0.1)
 				self:setRate(self.targetRate)
 				return self.observable:send({
 					name = "notify",
@@ -95,7 +98,7 @@ CloudburstEngine.receive = function(self, event)
 				})
 			end
 		elseif key == "f6" then
-			self.targetRate = self.targetRate + 0.1
+			self.targetRate = self.targetRate + (shift and 0.05 or 0.1)
 			self:setRate(self.targetRate)
 			return self.observable:send({
 				name = "notify",
