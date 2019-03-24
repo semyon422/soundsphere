@@ -94,14 +94,22 @@ CloudburstEngine.receive = function(self, event)
 			if math.abs(NoteSkin.targetSpeed - delta) > 0.001 then
 				NoteSkin.targetSpeed = NoteSkin.targetSpeed - delta
 				NoteSkin:setSpeed(NoteSkin.targetSpeed)
-				return self.observable:send({
-					name = "notify",
-					text = "speed: " .. NoteSkin.targetSpeed
-				})
+			else
+				NoteSkin.targetSpeed = 0
+				NoteSkin:setSpeed(NoteSkin.targetSpeed)
 			end
+			return self.observable:send({
+				name = "notify",
+				text = "speed: " .. NoteSkin.targetSpeed
+			})
 		elseif key == "f4" then
-			NoteSkin.targetSpeed = NoteSkin.targetSpeed + delta
-			NoteSkin:setSpeed(NoteSkin.targetSpeed)
+			if math.abs(NoteSkin.targetSpeed + delta) > 0.001 then
+				NoteSkin.targetSpeed = NoteSkin.targetSpeed + delta
+				NoteSkin:setSpeed(NoteSkin.targetSpeed)
+			else
+				NoteSkin.targetSpeed = 0
+				NoteSkin:setSpeed(NoteSkin.targetSpeed)
+			end
 			return self.observable:send({
 				name = "notify",
 				text = "speed: " .. NoteSkin.targetSpeed
@@ -110,14 +118,16 @@ CloudburstEngine.receive = function(self, event)
 			if math.abs(self.targetRate - delta) > 0.001 then
 				self.targetRate = self.targetRate - delta
 				self:setRate(self.targetRate)
-				return self.observable:send({
-					name = "notify",
-					text = "rate: " .. self.targetRate
-				})
 			end
+			return self.observable:send({
+				name = "notify",
+				text = "rate: " .. self.targetRate
+			})
 		elseif key == "f6" then
-			self.targetRate = self.targetRate + delta
-			self:setRate(self.targetRate)
+			if math.abs(self.targetRate + delta) > 0.001 then
+				self.targetRate = self.targetRate + delta
+				self:setRate(self.targetRate)
+			end
 			return self.observable:send({
 				name = "notify",
 				text = "rate: " .. self.targetRate

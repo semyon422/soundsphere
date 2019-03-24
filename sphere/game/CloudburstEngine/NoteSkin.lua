@@ -72,7 +72,7 @@ end
 NoteSkin.loadContainers = function(self)
 	self.containerList = {}
 	for _, imageData in pairs(self.noteSkinData.images) do
-		local container = SpriteBatch:new(nil, self.images[imageData.name])
+		local container = SpriteBatch:new(nil, self.images[imageData.name], 100)
 		container.layer = imageData.layer
 		self.containers[imageData.name] = container
 		table.insert(self.containerList, container)
