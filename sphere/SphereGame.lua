@@ -67,6 +67,8 @@ SphereGame.receive = function(self, event)
 		self:update(event.args[1])
 	elseif event.name == "draw" then
 		self:draw()
+	elseif event.name == "quit" then
+		os.exit()
 	end
 	
 	if CLI.hidden or event.name == "resize" then

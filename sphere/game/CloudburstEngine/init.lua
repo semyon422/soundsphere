@@ -67,7 +67,7 @@ CloudburstEngine.receive = function(self, event)
 		local key = event.args[1]
 		if key == "return" then
 			self:play()
-		elseif key == "f1" then
+		elseif key == "escape" then
 			self:pause()
 		elseif key == "f3" then
 			if NoteSkin.targetSpeed - 0.1 >= 0.1 then

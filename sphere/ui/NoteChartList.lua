@@ -54,7 +54,10 @@ end
 NoteChartList.selectRequest = [[
 	SELECT * FROM `cache`
 	WHERE `container` == 0 AND INSTR(`path`, ?) == 1
-	ORDER BY `noteCount`;
+	ORDER BY
+	length(`inputMode`) ASC,
+	`inputMode` ASC,
+	`noteCount` / `length` ASC;
 ]]
 
 return NoteChartList
