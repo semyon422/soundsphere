@@ -104,29 +104,21 @@ CustomList.update = function(self)
 		self.focusedItemIndex = #self.items
 	end
 	
+	if self.continueScrolling then
+		scrollCurrentDelta = self.continueScrollDelta * 8 * dt
+	end
+	
 	if (scrollCurrentDelta > 0 and self.visualItemIndex + scrollCurrentDelta > self.focusedItemIndex)
 	or (scrollCurrentDelta < 0 and self.visualItemIndex + scrollCurrentDelta < self.focusedItemIndex)
 	then
-		if self.continueScrolling then
-			if
-				self.visualItemIndex + scrollCurrentDelta > #self.items or
-				self.visualItemIndex + scrollCurrentDelta < 1
-			then
-				self:stopContinueScrolling()
-			else
-				self.visualItemIndex = self.visualItemIndex + scrollCurrentDelta
-				self:scrollBy(self.continueScrollDelta)
-			end
-		else
-			self.visualItemIndex = self.focusedItemIndex
-			self.scrollCurrentDelta = 0
-			self:send({
-				sender = self.sender,
-				action = "scrollStop",
-				itemIndex = self.focusedItemIndex,
-				list = self
-			})
-		end
+		self.visualItemIndex = self.focusedItemIndex
+		self.scrollCurrentDelta = 0
+		self:send({
+			sender = self.sender,
+			action = "scrollStop",
+			itemIndex = self.focusedItemIndex,
+			list = self
+		})
 	else
 		self.visualItemIndex = self.visualItemIndex + scrollCurrentDelta
 	end
@@ -243,12 +235,24 @@ end
 CustomList.stopContinueScrolling = function(self, scrollDelta)
 	if self.continueScrolling then
 		self.continueScrolling = false
+		local scrollTo
+		if self.continueScrollDelta > 0 then
+			scrollTo = math.ceil(self.visualItemIndex)
+		else
+			scrollTo = math.floor(self.visualItemIndex)
+		end
+		self:scrollToItemIndex(scrollTo, self.continueScrollDelta)
 	end
 end
 
 CustomList.continueScrollBy = function(self, scrollDelta)
 	self.continueScrolling = true
 	self.continueScrollDelta = scrollDelta
+	if scrollDelta > 0 then
+		self.focusedItemIndex = #self.items
+	elseif scrollDelta < 0 then
+		self.focusedItemIndex = 1
+	end
 end
 
 CustomList.scrollBy = function(self, scrollDelta)
