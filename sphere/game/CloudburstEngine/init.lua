@@ -66,15 +66,33 @@ CloudburstEngine.receive = function(self, event)
 	elseif event.name == "keypressed" then
 		local key = event.args[1]
 		local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
+		local control = love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")
+		local delta
+		if shift and control then
+			delta = 5
+		elseif shift then
+			delta = 0.05
+		elseif control then
+			delta = 1
+		else
+			delta = 0.1
+		end
 		if key == "escape" and not shift then
 			if self.paused then
 				self:play()
 			else
 				self:pause()
 			end
+		elseif key == "f2" then
+			NoteSkin.targetSpeed = -NoteSkin.targetSpeed
+			NoteSkin:setSpeed(NoteSkin.targetSpeed)
+			return self.observable:send({
+				name = "notify",
+				text = "speed: " .. NoteSkin.targetSpeed
+			})
 		elseif key == "f3" then
-			if NoteSkin.targetSpeed - 0.1 >= 0.1 then
-				NoteSkin.targetSpeed = NoteSkin.targetSpeed - (shift and 0.05 or 0.1)
+			if math.abs(NoteSkin.targetSpeed - delta) > 0.001 then
+				NoteSkin.targetSpeed = NoteSkin.targetSpeed - delta
 				NoteSkin:setSpeed(NoteSkin.targetSpeed)
 				return self.observable:send({
 					name = "notify",
@@ -82,15 +100,15 @@ CloudburstEngine.receive = function(self, event)
 				})
 			end
 		elseif key == "f4" then
-			NoteSkin.targetSpeed = NoteSkin.targetSpeed + (shift and 0.05 or 0.1)
+			NoteSkin.targetSpeed = NoteSkin.targetSpeed + delta
 			NoteSkin:setSpeed(NoteSkin.targetSpeed)
 			return self.observable:send({
 				name = "notify",
 				text = "speed: " .. NoteSkin.targetSpeed
 			})
 		elseif key == "f5" then
-			if self.targetRate - 0.1 >= 0.1 then
-				self.targetRate = self.targetRate - (shift and 0.05 or 0.1)
+			if math.abs(self.targetRate - delta) > 0.001 then
+				self.targetRate = self.targetRate - delta
 				self:setRate(self.targetRate)
 				return self.observable:send({
 					name = "notify",
@@ -98,7 +116,7 @@ CloudburstEngine.receive = function(self, event)
 				})
 			end
 		elseif key == "f6" then
-			self.targetRate = self.targetRate + (shift and 0.05 or 0.1)
+			self.targetRate = self.targetRate + delta
 			self:setRate(self.targetRate)
 			return self.observable:send({
 				name = "notify",

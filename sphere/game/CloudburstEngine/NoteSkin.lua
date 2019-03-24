@@ -1,6 +1,7 @@
 local Class = require("aqua.util.Class")
 local CS = require("aqua.graphics.CS")
 local map = require("aqua.math").map
+local sign = require("aqua.math").sign
 local tween = require("tween")
 local Image = require("aqua.graphics.Image")
 local Rectangle = require("aqua.graphics.Rectangle")
@@ -83,7 +84,7 @@ NoteSkin.loadContainers = function(self)
 end
 
 NoteSkin.update = function(self, dt)
-	if self.speedTween then
+	if self.speedTween and self.updateTween then
 		self.speedTween:update(dt)
 	end
 	
@@ -99,7 +100,13 @@ NoteSkin.draw = function(self)
 end
 
 NoteSkin.setSpeed = function(self, speed)
-	self.speedTween = tween.new(0.25, self, {speed = speed}, "inOutQuad")
+	if speed * self.speed < 0 then
+		self.speed = speed
+		self.updateTween = false
+	else
+		self.updateTween = true
+		self.speedTween = tween.new(0.25, self, {speed = speed}, "inOutQuad")
+	end
 end
 
 NoteSkin.getSpeed = function(self)
@@ -199,8 +206,9 @@ end
 NoteSkin.getLongNoteBodyX = function(self, note)
 	local dataHead = self.data[note.id]["Head"]
 	local dataBody = self.data[note.id]["Body"]
+	local speedSign = sign(self.speed)
 	local dt
-	if dataHead.fx <= 0 then
+	if dataHead.fx * speedSign <= 0 then
 		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
 	else
 		dt = (note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime
@@ -213,8 +221,9 @@ NoteSkin.getLongNoteBodyX = function(self, note)
 end
 NoteSkin.getLineNoteX = function(self, note)
 	local data = self.data[note.id]["Head"]
+	local speedSign = sign(self.speed)
 	local dt
-	if data.fx <= 0 then
+	if data.fx * speedSign <= 0 then
 		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
 	else
 		dt = note.startNoteData.currentVisualTime - note.engine.currentTime
@@ -253,8 +262,9 @@ end
 NoteSkin.getLongNoteBodyY = function(self, note)
 	local dataHead = self.data[note.id]["Head"]
 	local dataBody = self.data[note.id]["Body"]
+	local speedSign = sign(self.speed)
 	local dt
-	if dataHead.fy <= 0 then
+	if dataHead.fy * speedSign <= 0 then
 		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
 	else
 		dt = (note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime
@@ -267,8 +277,9 @@ NoteSkin.getLongNoteBodyY = function(self, note)
 end
 NoteSkin.getLineNoteY = function(self, note)
 	local data = self.data[note.id]["Head"]
+	local speedSign = sign(self.speed)
 	local dt
-	if data.fy <= 0 then
+	if data.fy * speedSign <= 0 then
 		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
 	else
 		dt = note.startNoteData.currentVisualTime - note.engine.currentTime
@@ -312,10 +323,13 @@ end
 NoteSkin.getNoteScaleX = function(self, note, part)
 	local data = self.data[note.id][part]
 	if part == "Body" then
+		local speedSign = sign(self.speed)
 		return
 			(
 				math.max(
-					self.data[note.id]["Head"].fx * (self:getLongNoteTailX(note) - self:getLongNoteHeadX(note)),
+					self.data[note.id]["Head"].fx *
+					(self:getLongNoteTailX(note) - self:getLongNoteHeadX(note)) *
+					speedSign,
 					0
 				)
 				+ data.w
@@ -328,10 +342,13 @@ end
 NoteSkin.getNoteScaleY = function(self, note, part)
 	local data = self.data[note.id][part]
 	if part == "Body" then
+		local speedSign = sign(self.speed)
 		return
 			math.abs(
 				math.max(
-					self.data[note.id]["Head"].fy * (self:getLongNoteTailY(note) - self:getLongNoteHeadY(note)),
+					self.data[note.id]["Head"].fy *
+					(self:getLongNoteTailY(note) - self:getLongNoteHeadY(note)) *
+					speedSign,
 					0
 				)
 				+ data.h
@@ -375,12 +392,14 @@ end
 NoteSkin.willShortNoteDrawBeforeStart = function(self, note)
 	local x, y = self:whereWillShortNoteDraw(note)
 	local data = self.data[note.id]["Head"]
-	return data.fx * x < 0 or data.fy * y < 0
+	local speedSign = sign(self.speed)
+	return data.fx * x * speedSign < 0 or data.fy * y * speedSign < 0
 end
 NoteSkin.willShortNoteDrawAfterEnd = function(self, note)
 	local x, y = self:whereWillShortNoteDraw(note)
 	local data = self.data[note.id]["Head"]
-	return data.fx * x > 0 or data.fy * y > 0
+	local speedSign = sign(self.speed)
+	return data.fx * x * speedSign > 0 or data.fy * y * speedSign > 0
 end
 
 NoteSkin.whereWillLongNoteDraw = function(self, note)
@@ -427,12 +446,14 @@ end
 NoteSkin.willLongNoteDrawBeforeStart = function(self, note)
 	local x, y = self:whereWillLongNoteDraw(note)
 	local data = self.data[note.id]["Head"]
-	return data.fx * x < 0 or data.fy * y < 0
+	local speedSign = sign(self.speed)
+	return data.fx * x * speedSign < 0 or data.fy * y * speedSign < 0
 end
 NoteSkin.willLongNoteDrawAfterEnd = function(self, note)
 	local x, y = self:whereWillLongNoteDraw(note)
 	local data = self.data[note.id]["Head"]
-	return data.fx * x > 0 or data.fy * y > 0
+	local speedSign = sign(self.speed)
+	return data.fx * x * speedSign > 0 or data.fy * y * speedSign > 0
 end
 
 
@@ -472,12 +493,14 @@ end
 NoteSkin.willLineNoteDrawBeforeStart = function(self, note)
 	local x, y = self:whereWillLineNoteDraw(note)
 	local data = self.data[note.id]["Head"]
-	return data.fx * x < 0 or data.fy * y < 0
+	local speedSign = sign(self.speed)
+	return data.fx * x * speedSign < 0 or data.fy * y * speedSign < 0
 end
 NoteSkin.willLineNoteDrawAfterEnd = function(self, note)
 	local x, y = self:whereWillLineNoteDraw(note)
 	local data = self.data[note.id]["Head"]
-	return data.fx * x > 0 or data.fy * y > 0
+	local speedSign = sign(self.speed)
+	return data.fx * x * speedSign > 0 or data.fy * y * speedSign > 0
 end
 
 --------------------------------
