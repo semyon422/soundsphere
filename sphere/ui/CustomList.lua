@@ -107,15 +107,26 @@ CustomList.update = function(self)
 	if (scrollCurrentDelta > 0 and self.visualItemIndex + scrollCurrentDelta > self.focusedItemIndex)
 	or (scrollCurrentDelta < 0 and self.visualItemIndex + scrollCurrentDelta < self.focusedItemIndex)
 	then
-		self.visualItemIndex = self.focusedItemIndex
-		self.scrollCurrentDelta = 0
-		
-		self:send({
-			sender = self.sender,
-			action = "scrollStop",
-			itemIndex = self.focusedItemIndex,
-			list = self
-		})
+		if self.continueScrolling then
+			if
+				self.visualItemIndex + scrollCurrentDelta > #self.items or
+				self.visualItemIndex + scrollCurrentDelta < 1
+			then
+				self:stopContinueScrolling()
+			else
+				self.visualItemIndex = self.visualItemIndex + scrollCurrentDelta
+				self:scrollBy(self.continueScrollDelta)
+			end
+		else
+			self.visualItemIndex = self.focusedItemIndex
+			self.scrollCurrentDelta = 0
+			self:send({
+				sender = self.sender,
+				action = "scrollStop",
+				itemIndex = self.focusedItemIndex,
+				list = self
+			})
+		end
 	else
 		self.visualItemIndex = self.visualItemIndex + scrollCurrentDelta
 	end
@@ -143,12 +154,38 @@ CustomList.receive = function(self, event)
 		if belong(mx, self.x, self.x + self.w) and belong(my, self.y, self.y + self.h) then
 			self:scrollBy(-event.args[2])
 		end
+	elseif event.name == "keyreleased" then
+		local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
+		if not shift then
+			self:stopContinueScrolling()
+		end
 	elseif event.name == "keypressed" then
 		if self.keyControl then
 			local key = event.args[1]
-			if key == "up" then
+			local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
+			if key == "home" then
+				self:scrollToItemIndex(1)
+			elseif key == "end" then
+				self:scrollToItemIndex(#self.items)
+			elseif key == "pageup" then
+				if shift then
+					self:continueScrollBy(-self.buttonCount)
+				end
+				self:scrollBy(-self.buttonCount)
+			elseif key == "pagedown" then
+				if shift then
+					self:continueScrollBy(self.buttonCount)
+				end
+				self:scrollBy(self.buttonCount)
+			elseif key == "up" then
+				if shift then
+					self:continueScrollBy(-1)
+				end
 				self:scrollBy(-1)
 			elseif key == "down" then
+				if shift then
+					self:continueScrollBy(1)
+				end
 				self:scrollBy(1)
 			elseif key == "return" then
 				self:send({
@@ -189,10 +226,10 @@ CustomList.loadStencil = function(self)
 	self.stencil:reload()
 end
 
-CustomList.scrollToItemIndex = function(self, itemIndex)
+CustomList.scrollToItemIndex = function(self, itemIndex, scrollCurrentDelta)
 	if self.items[itemIndex] then
 		self.focusedItemIndex = itemIndex
-		self.scrollCurrentDelta = (self.focusedItemIndex - self.visualItemIndex)
+		self.scrollCurrentDelta = scrollCurrentDelta or (self.focusedItemIndex - self.visualItemIndex)
 		
 		self:send({
 			sender = self.sender,
@@ -203,8 +240,23 @@ CustomList.scrollToItemIndex = function(self, itemIndex)
 	end
 end
 
+CustomList.stopContinueScrolling = function(self, scrollDelta)
+	if self.continueScrolling then
+		self.continueScrolling = false
+	end
+end
+
+CustomList.continueScrollBy = function(self, scrollDelta)
+	self.continueScrolling = true
+	self.continueScrollDelta = scrollDelta
+end
+
 CustomList.scrollBy = function(self, scrollDelta)
-	return self:scrollToItemIndex(self.focusedItemIndex + scrollDelta)
+	local itemIndex = self.focusedItemIndex + scrollDelta
+	return self:scrollToItemIndex(
+		math.min(math.max(itemIndex, 1), #self.items),
+		itemIndex - self.visualItemIndex
+	)
 end
 
 CustomList.calculateButtons = function(self)
