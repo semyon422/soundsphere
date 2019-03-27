@@ -1,6 +1,7 @@
 local Class = require("aqua.util.Class")
 local Observable = require("aqua.util.Observable")
-local AudioManager = require("aqua.audio.AudioManager")
+local AudioContainer = require("aqua.audio.Container")
+local AudioFactory = require("aqua.audio.AudioFactory")
 local sound = require("aqua.sound")
 local tween = require("tween")
 local NoteHandler = require("sphere.game.CloudburstEngine.NoteHandler")
@@ -17,6 +18,7 @@ CloudburstEngine.targetRate = 1
 
 CloudburstEngine.load = function(self)
 	self.observable = Observable:new()
+	self.audioContainer = AudioContainer:new()
 	
 	self.inputMode = self.noteChart.inputMode
 	
@@ -36,6 +38,8 @@ CloudburstEngine.update = function(self, dt)
 		self.rateTween:update(dt)
 		self:updateRate()
 	end
+	
+	self.audioContainer:update()
 	
 	self:updateTimeManager()
 	self:updateNoteHandlers()
@@ -145,11 +149,12 @@ end
 CloudburstEngine.playAudio = function(self, paths)
 	if not paths then return end
 	for i = 1, #paths do
-		local audio = AudioManager:getAudio(self.aliases[paths[i][1]])
+		local audio = AudioFactory:getAudio(self.aliases[paths[i][1]])
 		if audio then
 			audio:play()
-			audio:rate(self.rate)
-			audio:volume(paths[i][2])
+			audio:setRate(self.rate)
+			audio:setVolume(paths[i][2])
+			self.audioContainer:add(audio)
 		end
 	end
 end
@@ -157,7 +162,7 @@ end
 CloudburstEngine.play = function(self)
 	if self.paused then
 		self.paused = false
-		AudioManager:play()
+		self.audioContainer:play()
 		return self.timeManager:play()
 	end
 end
@@ -165,7 +170,7 @@ end
 CloudburstEngine.pause = function(self)
 	if not self.paused then
 		self.paused = true
-		AudioManager:pause()
+		self.audioContainer:pause()
 		return self.timeManager:pause()
 	end
 end
@@ -178,7 +183,7 @@ CloudburstEngine.updateRate = function(self)
 	self.score.rate = self.rate
 	self.noteSkin.rate = self.rate
 	self.timeManager:setRate(self.rate)
-	AudioManager:rate(self.rate)
+	self.audioContainer:setRate(self.rate)
 end
 
 CloudburstEngine.loadTimeManager = function(self)

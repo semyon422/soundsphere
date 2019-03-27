@@ -1,6 +1,5 @@
 local Container = require("aqua.graphics.Container")
 local ThreadPool = require("aqua.thread.ThreadPool")
-local AudioManager = require("aqua.audio.AudioManager")
 local Observer = require("aqua.util.Observer")
 local aquaio = require("aqua.io")
 
@@ -47,7 +46,6 @@ end
 
 SphereGame.update = function(self, dt)
 	ThreadPool:update()
-	AudioManager:update()
 	
 	BackgroundManager:update(dt)
 	NotificationLine:update()

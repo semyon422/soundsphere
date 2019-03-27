@@ -1,5 +1,4 @@
 local CS = require("aqua.graphics.CS")
-local AudioManager = require("aqua.audio.AudioManager")
 local Screen = require("sphere.screen.Screen")
 local ScreenManager = require("sphere.screen.ScreenManager")
 local AccuracyGraph = require("sphere.ui.AccuracyGraph")
@@ -31,7 +30,6 @@ ResultScreen.load = function(self)
 end
 
 ResultScreen.unload = function(self)
-	AudioManager:stop()
 end
 
 ResultScreen.update = function(self)
