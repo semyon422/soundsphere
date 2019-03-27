@@ -72,7 +72,7 @@ end
 NoteSkin.loadContainers = function(self)
 	self.containerList = {}
 	for _, imageData in pairs(self.noteSkinData.images) do
-		local container = SpriteBatch:new(nil, self.images[imageData.name], 100)
+		local container = SpriteBatch:new(nil, self.images[imageData.name], 1000)
 		container.layer = imageData.layer
 		self.containers[imageData.name] = container
 		table.insert(self.containerList, container)
@@ -183,7 +183,7 @@ NoteSkin.getShortNoteX = function(self, note)
 	return
 		data.x
 		+ data.fx * self:getSpeed()
-			* (note.startNoteData.currentVisualTime - note.engine.currentTime)
+			* (note.startNoteData.currentVisualTime - note.engine.roundedTime)
 		+ data.ox * self:getNoteWidth(note, "Head")
 end
 NoteSkin.getLongNoteHeadX = function(self, note)
@@ -191,7 +191,7 @@ NoteSkin.getLongNoteHeadX = function(self, note)
 	return
 		data.x
 		+ data.fx * self:getSpeed()
-			* ((note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime)
+			* ((note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.roundedTime)
 		+ data.ox * self:getNoteWidth(note, "Head")
 end
 NoteSkin.getLongNoteTailX = function(self, note)
@@ -200,7 +200,7 @@ NoteSkin.getLongNoteTailX = function(self, note)
 	return
 		dataHead.x
 		+ dataHead.fx * self:getSpeed()
-			* (note.endNoteData.currentVisualTime - note.engine.currentTime)
+			* (note.endNoteData.currentVisualTime - note.engine.roundedTime)
 		+ dataTail.ox * self:getNoteWidth(note, "Tail")
 end
 NoteSkin.getLongNoteBodyX = function(self, note)
@@ -209,9 +209,9 @@ NoteSkin.getLongNoteBodyX = function(self, note)
 	local speedSign = sign(self.speed)
 	local dt
 	if dataHead.fx * speedSign <= 0 then
-		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
+		dt = note.endNoteData.currentVisualTime - note.engine.roundedTime
 	else
-		dt = (note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime
+		dt = (note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.roundedTime
 	end
 	
 	return
@@ -224,9 +224,9 @@ NoteSkin.getLineNoteX = function(self, note)
 	local speedSign = sign(self.speed)
 	local dt
 	if data.fx * speedSign <= 0 then
-		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
+		dt = note.endNoteData.currentVisualTime - note.engine.roundedTime
 	else
-		dt = note.startNoteData.currentVisualTime - note.engine.currentTime
+		dt = note.startNoteData.currentVisualTime - note.engine.roundedTime
 	end
 	
 	return
@@ -239,7 +239,7 @@ NoteSkin.getShortNoteY = function(self, note)
 	return
 		data.y
 		+ data.fy * self:getSpeed()
-			* (note.startNoteData.currentVisualTime - note.engine.currentTime)
+			* (note.startNoteData.currentVisualTime - note.engine.roundedTime)
 		+ data.oy * self:getNoteHeight(note, "Head")
 end
 NoteSkin.getLongNoteHeadY = function(self, note)
@@ -247,7 +247,7 @@ NoteSkin.getLongNoteHeadY = function(self, note)
 	return
 		data.y
 		+ data.fy * self:getSpeed()
-			* ((note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime)
+			* ((note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.roundedTime)
 		+ data.oy * self:getNoteHeight(note, "Head")
 end
 NoteSkin.getLongNoteTailY = function(self, note)
@@ -256,7 +256,7 @@ NoteSkin.getLongNoteTailY = function(self, note)
 	return
 		dataHead.y
 		+ dataHead.fy * self:getSpeed()
-			* (note.endNoteData.currentVisualTime - note.engine.currentTime)
+			* (note.endNoteData.currentVisualTime - note.engine.roundedTime)
 		+ dataTail.oy * self:getNoteHeight(note, "Tail")
 end
 NoteSkin.getLongNoteBodyY = function(self, note)
@@ -265,9 +265,9 @@ NoteSkin.getLongNoteBodyY = function(self, note)
 	local speedSign = sign(self.speed)
 	local dt
 	if dataHead.fy * speedSign <= 0 then
-		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
+		dt = note.endNoteData.currentVisualTime - note.engine.roundedTime
 	else
-		dt = (note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime
+		dt = (note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.roundedTime
 	end
 	
 	return
@@ -280,9 +280,9 @@ NoteSkin.getLineNoteY = function(self, note)
 	local speedSign = sign(self.speed)
 	local dt
 	if data.fy * speedSign <= 0 then
-		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
+		dt = note.endNoteData.currentVisualTime - note.engine.roundedTime
 	else
-		dt = note.startNoteData.currentVisualTime - note.engine.currentTime
+		dt = note.startNoteData.currentVisualTime - note.engine.roundedTime
 	end
 	
 	return

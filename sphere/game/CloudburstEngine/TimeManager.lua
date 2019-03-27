@@ -112,13 +112,17 @@ TimeManager.setRate = function(self, rate)
 	self.rate = rate
 end
 
-TimeManager.getCurrentTime = function(self)
+TimeManager.getRoundedTime = function(self)
 	local nearestTime = self:getNearestTime()
 	if math.abs(self.currentTime - nearestTime) < math.min(love.timer.getDelta() / 2, 1 / 30) then
 		return nearestTime
 	else
 		return self.currentTime
 	end
+end
+
+TimeManager.getTime = function(self)
+	return self.currentTime
 end
 
 TimeManager.pause = function(self)

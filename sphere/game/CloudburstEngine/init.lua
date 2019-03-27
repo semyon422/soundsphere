@@ -185,12 +185,13 @@ CloudburstEngine.loadTimeManager = function(self)
 	self.timeManager = TimeManager:new()
 	self.timeManager.engine = self
 	self.timeManager:load()
-	self.currentTime = self.timeManager:getCurrentTime()
+	self.currentTime = self.timeManager:getTime()
 end
 
 CloudburstEngine.updateTimeManager = function(self)
 	self.timeManager:update()
-	self.currentTime = self.timeManager:getCurrentTime()
+	self.currentTime = self.timeManager:getTime()
+	self.roundedTime = self.timeManager:getRoundedTime()
 end
 
 CloudburstEngine.unloadTimeManager = function(self)
