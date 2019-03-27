@@ -12,7 +12,7 @@ end
 
 Autoplay.processShortNote = function(self, note)
 	local deltaTime = note.startNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime
-	if deltaTime < 0 then
+	if deltaTime <= 0 then
 		if note.noteType ~= "SoundNote" then
 			note.noteHandler:clickKey()
 		end
@@ -41,7 +41,7 @@ Autoplay.processLongNote = function(self, note)
 	local deltaStartTime = note.startNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime
 	local deltaEndTime = note.endNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime
 	
-	if deltaStartTime < 0 and not note.keyState then
+	if deltaStartTime <= 0 and not note.keyState then
 		if note.noteType ~= "SoundNote" then
 			note.noteHandler:switchKey(true)
 		end
@@ -49,7 +49,7 @@ Autoplay.processLongNote = function(self, note)
 		
 		note.keyState = true
 		note.state = "startPassedPressed"
-	elseif deltaEndTime < 0 and note.keyState then
+	elseif deltaEndTime <= 0 and note.keyState then
 		if note.noteType ~= "SoundNote" then
 			note.noteHandler:switchKey(false)
 		end

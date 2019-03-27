@@ -7,6 +7,7 @@ TimeManager.rate = 1
 TimeManager.load = function(self)
 	self.currentTime = -1
 	self.pauseTime = 0
+	self.adjustDelta = 0
 	self.rateDelta = 0
 	self.state = "waiting"
 	self.playState = "delayed"
@@ -69,8 +70,9 @@ TimeManager.getNearestTime = function(self)
 	end
 end
 
-TimeManager.update = function(self)
+TimeManager.update = function(self, dt)
 	local deltaTime = love.timer.getTime() - (self.startTime or 0)
+	self.deltaTime = deltaTime
 	
 	if self.state == "waiting" then
 	elseif self.state == "delayed" then
@@ -78,24 +80,38 @@ TimeManager.update = function(self)
 			self.state = "started"
 			self.playState = self.state
 		else
-			self.currentTime = (deltaTime - self.pauseTime - self.rateDelta) * self.rate
+			self.currentTime = (deltaTime - self.adjustDelta - self.pauseTime - self.rateDelta) * self.rate
 		end
 	elseif self.state == "started" or self.state == "playing" then
 		self.state = "playing"
 		self.playState = self.state
 		
-		self.currentTime = (deltaTime - self.pauseTime - self.rateDelta) * self.rate
-	elseif self.state == "paused" then
-		
-	elseif self.state == "ended" then
-		self.currentTime = (deltaTime - self.pauseTime - self.rateDelta) * self.rate
+		self.currentTime = (deltaTime - self.adjustDelta - self.pauseTime - self.rateDelta) * self.rate
 	end
+	
+	self:adjustTime(dt)
 	
 	self:updateNextTimeIndex()
 end
 
 TimeManager.unload = function(self)
 
+end
+
+TimeManager.adjustTime = function(self, dt, force)
+	local audioTime = self.engine.audioContainer:getPosition()
+	if audioTime and self.state ~= "paused" then
+		dt = math.min(dt, 1 / 60)
+		local targetAdjustDelta = self.deltaTime - self.rateDelta - self.pauseTime - audioTime / self.rate
+		if force then
+			self.adjustDelta = targetAdjustDelta
+		else
+			self.adjustDelta
+				= self.adjustDelta
+				+ (targetAdjustDelta - self.adjustDelta)
+				* dt
+		end
+	end
 end
 
 TimeManager.setRate = function(self, rate)

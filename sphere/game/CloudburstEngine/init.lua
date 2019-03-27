@@ -34,14 +34,14 @@ CloudburstEngine.load = function(self)
 end
 
 CloudburstEngine.update = function(self, dt)
+	self.audioContainer:update()
+	
 	if self.rateTween then
 		self.rateTween:update(dt)
 		self:updateRate()
 	end
 	
-	self.audioContainer:update()
-	
-	self:updateTimeManager()
+	self:updateTimeManager(dt)
 	self:updateNoteHandlers()
 	self:updateNoteDrawers()
 	
@@ -151,6 +151,7 @@ CloudburstEngine.playAudio = function(self, paths)
 	for i = 1, #paths do
 		local audio = AudioFactory:getAudio(self.aliases[paths[i][1]])
 		if audio then
+			audio.offset = self.timeManager.currentTime
 			audio:play()
 			audio:setRate(self.rate)
 			audio:setVolume(paths[i][2])
@@ -193,8 +194,8 @@ CloudburstEngine.loadTimeManager = function(self)
 	self.currentTime = self.timeManager:getTime()
 end
 
-CloudburstEngine.updateTimeManager = function(self)
-	self.timeManager:update()
+CloudburstEngine.updateTimeManager = function(self, dt)
+	self.timeManager:update(dt)
 	self.currentTime = self.timeManager:getTime()
 	self.roundedTime = self.timeManager:getRoundedTime()
 end
