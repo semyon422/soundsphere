@@ -89,6 +89,14 @@ Cache.load = function(self)
 	})
 end
 
+Cache.begin = function(self)
+	self.db:exec("BEGIN;")
+end
+
+Cache.commit = function(self)
+	self.db:exec("COMMIT;")
+end
+
 Cache.update = function(self, path, recursive, callback)
 	if not self.isUpdating then
 		ThreadPool:execute(
@@ -96,7 +104,9 @@ Cache.update = function(self, path, recursive, callback)
 				local path, recursive = ...
 				local Cache = require("sphere.game.NoteChartManager.Cache")
 				if not Cache.db then Cache:load() end
+				Cache:begin()
 				Cache:lookup(path, recursive)
+				Cache:commit()
 			]],
 			{path, recursive},
 			function(result)

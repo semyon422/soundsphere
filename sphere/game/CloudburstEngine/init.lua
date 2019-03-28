@@ -197,7 +197,6 @@ end
 CloudburstEngine.updateTimeManager = function(self, dt)
 	self.timeManager:update(dt)
 	self.currentTime = self.timeManager:getTime()
-	self.roundedTime = self.timeManager:getRoundedTime()
 end
 
 CloudburstEngine.unloadTimeManager = function(self)

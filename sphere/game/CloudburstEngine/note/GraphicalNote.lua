@@ -14,6 +14,7 @@ GraphicalNote.init = function(self)
 		.. self.startNoteData.inputIndex
 		
 	self.logicalNote = self.engine.sharedLogicalNoteData[self.startNoteData]
+	self.logicalNote.graphicalNote = self
 end
 
 GraphicalNote.getCS = function(self)

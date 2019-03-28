@@ -192,7 +192,7 @@ NoteSkin.getShortNoteX = function(self, note)
 	return
 		data.x
 		+ data.fx * self:getSpeed()
-			* (note.startNoteData.currentVisualTime - note.engine.roundedTime)
+			* (note.startNoteData.currentVisualTime - note.engine.currentTime)
 		+ data.ox * self:getNoteWidth(note, "Head")
 end
 NoteSkin.getLongNoteHeadX = function(self, note)
@@ -200,7 +200,7 @@ NoteSkin.getLongNoteHeadX = function(self, note)
 	return
 		data.x
 		+ data.fx * self:getSpeed()
-			* ((note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.roundedTime)
+			* ((note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime)
 		+ data.ox * self:getNoteWidth(note, "Head")
 end
 NoteSkin.getLongNoteTailX = function(self, note)
@@ -209,7 +209,7 @@ NoteSkin.getLongNoteTailX = function(self, note)
 	return
 		dataHead.x
 		+ dataHead.fx * self:getSpeed()
-			* (note.endNoteData.currentVisualTime - note.engine.roundedTime)
+			* (note.endNoteData.currentVisualTime - note.engine.currentTime)
 		+ dataTail.ox * self:getNoteWidth(note, "Tail")
 end
 NoteSkin.getLongNoteBodyX = function(self, note)
@@ -218,9 +218,9 @@ NoteSkin.getLongNoteBodyX = function(self, note)
 	local speedSign = sign(self.speed)
 	local dt
 	if dataHead.fx * speedSign <= 0 then
-		dt = note.endNoteData.currentVisualTime - note.engine.roundedTime
+		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
 	else
-		dt = (note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.roundedTime
+		dt = (note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime
 	end
 	
 	return
@@ -233,9 +233,9 @@ NoteSkin.getLineNoteX = function(self, note)
 	local speedSign = sign(self.speed)
 	local dt
 	if data.fx * speedSign <= 0 then
-		dt = note.endNoteData.currentVisualTime - note.engine.roundedTime
+		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
 	else
-		dt = note.startNoteData.currentVisualTime - note.engine.roundedTime
+		dt = note.startNoteData.currentVisualTime - note.engine.currentTime
 	end
 	
 	return
@@ -248,7 +248,7 @@ NoteSkin.getShortNoteY = function(self, note)
 	return
 		data.y
 		+ data.fy * self:getSpeed()
-			* (note.startNoteData.currentVisualTime - note.engine.roundedTime)
+			* (note.startNoteData.currentVisualTime - note.engine.currentTime)
 		+ data.oy * self:getNoteHeight(note, "Head")
 end
 NoteSkin.getLongNoteHeadY = function(self, note)
@@ -256,7 +256,7 @@ NoteSkin.getLongNoteHeadY = function(self, note)
 	return
 		data.y
 		+ data.fy * self:getSpeed()
-			* ((note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.roundedTime)
+			* ((note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime)
 		+ data.oy * self:getNoteHeight(note, "Head")
 end
 NoteSkin.getLongNoteTailY = function(self, note)
@@ -265,7 +265,7 @@ NoteSkin.getLongNoteTailY = function(self, note)
 	return
 		dataHead.y
 		+ dataHead.fy * self:getSpeed()
-			* (note.endNoteData.currentVisualTime - note.engine.roundedTime)
+			* (note.endNoteData.currentVisualTime - note.engine.currentTime)
 		+ dataTail.oy * self:getNoteHeight(note, "Tail")
 end
 NoteSkin.getLongNoteBodyY = function(self, note)
@@ -274,9 +274,9 @@ NoteSkin.getLongNoteBodyY = function(self, note)
 	local speedSign = sign(self.speed)
 	local dt
 	if dataHead.fy * speedSign <= 0 then
-		dt = note.endNoteData.currentVisualTime - note.engine.roundedTime
+		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
 	else
-		dt = (note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.roundedTime
+		dt = (note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime
 	end
 	
 	return
@@ -289,9 +289,9 @@ NoteSkin.getLineNoteY = function(self, note)
 	local speedSign = sign(self.speed)
 	local dt
 	if data.fy * speedSign <= 0 then
-		dt = note.endNoteData.currentVisualTime - note.engine.roundedTime
+		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
 	else
-		dt = note.startNoteData.currentVisualTime - note.engine.roundedTime
+		dt = note.startNoteData.currentVisualTime - note.engine.currentTime
 	end
 	
 	return
