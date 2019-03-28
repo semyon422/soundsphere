@@ -61,6 +61,10 @@ NoteSkin.loadImage = function(self, imageData)
 end
 
 NoteSkin.loadImages = function(self)
+	if not self.noteSkinData.images then
+		return
+	end
+	
 	for _, imageData in pairs(self.noteSkinData.images) do
 		self:loadImage(imageData)
 	end
@@ -71,6 +75,11 @@ local sortContainers = function(a, b)
 end
 NoteSkin.loadContainers = function(self)
 	self.containerList = {}
+	
+	if not self.noteSkinData.images then
+		return
+	end
+	
 	for _, imageData in pairs(self.noteSkinData.images) do
 		local container = SpriteBatch:new(nil, self.images[imageData.name], 1000)
 		container.layer = imageData.layer
