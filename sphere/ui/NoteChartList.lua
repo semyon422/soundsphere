@@ -61,7 +61,8 @@ end
 
 NoteChartList.selectRequest = [[
 	SELECT * FROM `cache`
-	WHERE `container` == 0 AND INSTR(`path`, ?) == 1
+	WHERE `container` == 0 AND
+	INSTR(`path`, ? || "/") == 1
 	ORDER BY
 	length(`inputMode`) ASC,
 	`inputMode` ASC,

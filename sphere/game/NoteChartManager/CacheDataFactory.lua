@@ -57,6 +57,14 @@ CacheDataFactory.processCacheDataNames = function(self, cacheDatas)
 		end
 	end
 end
+CacheDataFactory.processCacheDataNameSingle = function(self, cacheDatas)
+	local title = cacheDatas[1].title
+	local name, bracketStart = trimName(title)
+	title = title:sub(1, bracketStart - 1)
+	
+	cacheDatas[1].name = name
+	cacheDatas[1].title = title
+end
 
 local iconv = require("aqua.iconv").iconv
 local validate = require("aqua.utf8").validate
@@ -101,7 +109,11 @@ CacheDataFactory.getBMS = function(self, chartPaths)
 	end
 	
 	if #cacheDatas > 0 then
-		self:processCacheDataNames(cacheDatas)
+		if #cacheDatas == 1 then
+			self:processCacheDataNameSingle(cacheDatas)
+		else
+			self:processCacheDataNames(cacheDatas)
+		end
 		cacheDatas[#cacheDatas + 1] = {
 			path = cacheDatas[1].path:match("^(.+)/.-"),
 			container = 1,
