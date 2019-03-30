@@ -1,5 +1,4 @@
 local NoteChartFactory = require("sphere.game.NoteChartManager.NoteChartFactory")
-local NoteChart = require("ncdk.NoteChart")
 local bms = require("bms")
 local osu = require("osu")
 local o2jam = require("o2jam")
