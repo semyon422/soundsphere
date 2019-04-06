@@ -2,7 +2,7 @@ local Timer = require("aqua.util.Timer")
 
 local TimeManager = Timer:new()
 
-TimeManager.rate = 1
+TimeManager.currentTime = -1
 
 TimeManager.load = function(self)
 	self:loadTimePoints()
