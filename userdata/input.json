@@ -4,6 +4,16 @@
 	["4key:key3", ","],
 	["4key:key4", "."],
 	
+	["9key:key1", "q"],
+	["9key:key2", "w"],
+	["9key:key3", "e"],
+	["9key:key4", "r"],
+	["9key:key5", "ralt"],
+	["9key:key6", "p"],
+	["9key:key7", "["],
+	["9key:key8", "]"],
+	["9key:key9", "\\"],
+	
 	
 	["5key:key1", "e"],
 	["5key:key2", "r"],
