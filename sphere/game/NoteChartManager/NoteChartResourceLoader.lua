@@ -1,6 +1,8 @@
 local Group = require("aqua.util.Group")
 local Observable = require("aqua.util.Observable")
 local sound = require("aqua.sound")
+local image = require("aqua.image")
+local video = require("aqua.video")
 local FileManager = require("sphere.filesystem.FileManager")
 local JamLoader = require("sphere.game.JamLoader")
 
@@ -45,6 +47,8 @@ NoteChartResourceLoader.loadBMS = function(self)
 	self.resourceCount = 0
 	self.resourceCountLoaded = 0
 	self.soundGroup = Group:new()
+	self.imageGroup = Group:new()
+	self.videoGroup = Group:new()
 	for resourceType, resourceName in self.noteChart:getResourceIterator() do
 		if resourceType == "sound" then
 			local soundFilePath = FileManager:findFile(resourceName, "audio")
@@ -53,23 +57,47 @@ NoteChartResourceLoader.loadBMS = function(self)
 				self.resourceCount = self.resourceCount + 1
 				self.aliases[resourceName] = soundFilePath
 			end
+		elseif resourceType == "image" then
+			local imageFilePath = FileManager:findFile(resourceName, "image")
+			local videoFilePath = FileManager:findFile(resourceName, "video")
+			if imageFilePath then
+				self.imageGroup:add(imageFilePath)
+				self.resourceCount = self.resourceCount + 1
+				self.aliases[resourceName] = imageFilePath
+			elseif videoFilePath then
+				self.videoGroup:add(videoFilePath)
+				self.resourceCount = self.resourceCount + 1
+				self.aliases[resourceName] = videoFilePath
+			end
 		end
 	end
 	
+	local resourceLoadedCallback = function()
+		self.resourceCountLoaded = self.resourceCountLoaded + 1
+		if self.resourceCountLoaded == self.resourceCount then
+			self.callback()
+		end
+		
+		return self.observable:send({
+			name = "notify",
+			text = self.resourceCountLoaded .. "/" .. self.resourceCount
+		})
+	end
+	
 	local directoryPath = self.directoryPath
-	return self.soundGroup:call(function(soundFilePath)
+	self.soundGroup:call(function(soundFilePath)
 		if self.directoryPath == directoryPath then
-			return sound.load(soundFilePath, function()
-				self.resourceCountLoaded = self.resourceCountLoaded + 1
-				if self.resourceCountLoaded == self.resourceCount then
-					self.callback()
-				end
-				
-				return self.observable:send({
-					name = "notify",
-					text = self.resourceCountLoaded .. "/" .. self.resourceCount
-				})
-			end)
+			return sound.load(soundFilePath, resourceLoadedCallback)
+		end
+	end)
+	self.imageGroup:call(function(imageFilePath)
+		if self.directoryPath == directoryPath then
+			return image.load(imageFilePath, resourceLoadedCallback)
+		end
+	end)
+	self.videoGroup:call(function(videoFilePath)
+		if self.directoryPath == directoryPath then
+			return video.load(videoFilePath, resourceLoadedCallback)
 		end
 	end)
 end
@@ -86,8 +114,14 @@ NoteChartResourceLoader.unloadBMS = function(self)
 	FileManager:removePath(self.directoryPath)
 	FileManager:removePath(self.hitSoundsPath)
 	
-	return self.soundGroup:call(function(soundFilePath)
+	self.soundGroup:call(function(soundFilePath)
 		return sound.unload(soundFilePath, function() end)
+	end)
+	self.imageGroup:call(function(imageFilePath)
+		return image.unload(imageFilePath, function() end)
+	end)
+	self.videoGroup:call(function(videoFilePath)
+		return video.unload(videoFilePath, function() end)
 	end)
 end
 

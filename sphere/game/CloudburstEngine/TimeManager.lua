@@ -1,18 +1,15 @@
-local Class = require("aqua.util.Class")
+local Timer = require("aqua.util.Timer")
 
-local TimeManager = Class:new()
+local TimeManager = Timer:new()
 
 TimeManager.rate = 1
 
 TimeManager.load = function(self)
-	self.currentTime = -1
-	self.pauseTime = 0
-	self.adjustDelta = 0
-	self.rateDelta = 0
-	self.state = "waiting"
-	self.playState = "delayed"
-	
 	self:loadTimePoints()
+end
+
+TimeManager.getAdjustTime = function(self)
+	return self.engine.audioContainer:getPosition()
 end
 
 TimeManager.loadTimePoints = function(self)
@@ -71,61 +68,13 @@ TimeManager.getNearestTime = function(self)
 end
 
 TimeManager.update = function(self, dt)
-	local deltaTime = love.timer.getTime() - (self.startTime or 0)
-	self.deltaTime = deltaTime
-	
-	if self.state == "waiting" then
-	elseif self.state == "delayed" then
-		if self.currentTime >= 0 then
-			self.state = "started"
-			self.playState = self.state
-		else
-			self.currentTime = (deltaTime - self.adjustDelta - self.pauseTime - self.rateDelta) * self.rate
-		end
-	elseif self.state == "started" or self.state == "playing" then
-		self.state = "playing"
-		self.playState = self.state
-		
-		self.currentTime = (deltaTime - self.adjustDelta - self.pauseTime - self.rateDelta) * self.rate
-	end
-	
-	self:adjustTime(dt)
+	Timer.update(self, dt)
 	
 	self:updateNextTimeIndex()
 end
 
 TimeManager.unload = function(self)
 
-end
-
-TimeManager.adjustTime = function(self, dt, force)
-	local audioTime = self.engine.audioContainer:getPosition()
-	if audioTime and self.state ~= "paused" then
-		dt = math.min(dt, 1 / 60)
-		local targetAdjustDelta = self.deltaTime - self.rateDelta - self.pauseTime - audioTime / self.rate
-		if force then
-			self.adjustDelta = targetAdjustDelta
-		else
-			self.adjustDelta
-				= self.adjustDelta
-				+ (targetAdjustDelta - self.adjustDelta)
-				* dt
-		end
-	end
-end
-
-TimeManager.setRate = function(self, rate)
-	if self.startTime then
-		local pauseTime
-		if self.state == "paused" then
-			pauseTime = self.pauseTime + love.timer.getTime() - self.pauseStartTime
-		else
-			pauseTime = self.pauseTime
-		end
-		local deltaTime = love.timer.getTime() - self.startTime - pauseTime
-		self.rateDelta = (self.rateDelta - deltaTime) * self.rate / rate + deltaTime
-	end
-	self.rate = rate
 end
 
 TimeManager.getTime = function(self)
@@ -137,20 +86,8 @@ TimeManager.getTime = function(self)
 	end
 end
 
-TimeManager.pause = function(self)
-	self.state = "paused"
-	self.pauseStartTime = love.timer.getTime()
-end
-
-TimeManager.play = function(self)
-	if self.state == "waiting" then
-		self.state = self.playState
-		self.startTime = love.timer.getTime() - self.currentTime
-	elseif self.state == "paused" then
-		self.state = "playing"
-		self.pauseTime = self.pauseTime + love.timer.getTime() - self.pauseStartTime
-		self.pauseStartTime = love.timer.getTime()
-	end
+TimeManager.getExactTime = function(self)
+	return self.currentTime
 end
 
 return TimeManager

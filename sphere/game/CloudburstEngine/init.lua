@@ -197,22 +197,36 @@ end
 CloudburstEngine.updateTimeManager = function(self, dt)
 	self.timeManager:update(dt)
 	self.currentTime = self.timeManager:getTime()
+	self.exactCurrentTime = self.timeManager:getExactTime()
 end
 
 CloudburstEngine.unloadTimeManager = function(self)
 	self.timeManager:unload()
 end
 
-CloudburstEngine.loadNoteHandlers = function(self)
-	self.noteHandlers = {}
-	for inputType, inputIndex in self.noteChart:getInputIteraator() do
-		local noteHandler = NoteHandler:new({
+CloudburstEngine.getNoteHandler = function(self, inputType, inputIndex)
+	if
+		inputType == "key" or
+		inputType == "scratch" or
+		inputType == "measure" or
+		inputType == "auto"
+	then
+		return NoteHandler:new({
 			inputType = inputType,
 			inputIndex = inputIndex,
 			engine = self
 		})
-		self.noteHandlers[noteHandler] = noteHandler
-		noteHandler:load()
+	end
+end
+
+CloudburstEngine.loadNoteHandlers = function(self)
+	self.noteHandlers = {}
+	for inputType, inputIndex in self.noteChart:getInputIteraator() do
+		local noteHandler = self:getNoteHandler(inputType, inputIndex)
+		if noteHandler then
+			self.noteHandlers[noteHandler] = noteHandler
+			noteHandler:load()
+		end
 	end
 end
 
@@ -229,20 +243,33 @@ CloudburstEngine.unloadNoteHandlers = function(self)
 	self.noteHandlers = nil
 end
 
+CloudburstEngine.getNoteDrawer = function(self, layerIndex, inputType, inputIndex)
+	if
+		inputType == "key" or
+		inputType == "scratch" or
+		inputType == "measure" or
+		inputType == "auto"
+	then
+		return NoteDrawer:new({
+			layerIndex = layerIndex,
+			inputType = inputType,
+			inputIndex = inputIndex,
+			engine = self
+		})
+	end
+end
+
 CloudburstEngine.loadNoteDrawers = function(self)
 	self.noteDrawers = {}
 	for layerIndex in self.noteChart:getLayerDataIndexIterator() do
 		local layerData = self.noteChart:requireLayerData(layerIndex)
 		if not layerData.invisible then
 			for inputType, inputIndex in self.noteChart:getInputIteraator() do
-				local noteDrawer = NoteDrawer:new({
-					layerIndex = layerIndex,
-					inputType = inputType,
-					inputIndex = inputIndex,
-					engine = self
-				})
-				self.noteDrawers[noteDrawer] = noteDrawer
-				noteDrawer:load()
+				local noteDrawer = self:getNoteDrawer(layerIndex, inputType, inputIndex)
+				if noteDrawer then
+					self.noteDrawers[noteDrawer] = noteDrawer
+					noteDrawer:load()
+				end
 			end
 		end
 	end

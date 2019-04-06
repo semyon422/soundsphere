@@ -4,8 +4,18 @@ FileManager.AudioFormats = {
 	"wav", "ogg", "mp3"
 }
 
+FileManager.ImageFormats = {
+	"png", "bmp", "jpg"
+}
+
+FileManager.VideoFormats = {
+	"mpg", "avi", "mp4"
+}
+
 FileManager.Formats = {
-	audio = FileManager.AudioFormats
+	audio = FileManager.AudioFormats,
+	image = FileManager.ImageFormats,
+	video = FileManager.VideoFormats
 }
 
 FileManager.priority = {}
@@ -47,8 +57,9 @@ end
 
 FileManager.removeExtension = function(self, fileName, fileType)
 	for _, format in ipairs(self.Formats[fileType]) do
-		if fileName:find("%." .. format .. "$") then
-			return fileName:match("^(.+)%." .. format .. "$")
+		local position = fileName:lower():find("%." .. format .. "$")
+		if position then
+			return fileName:sub(1, position - 1)
 		end
 	end
 	

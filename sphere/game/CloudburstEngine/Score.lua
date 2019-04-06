@@ -77,7 +77,7 @@ Score.processNote = function(self, note)
 end
 
 Score.processShortNote = function(self, note)
-	local deltaTime = (note.engine.currentTime - note.startNoteData.timePoint:getAbsoluteTime()) / self.rate
+	local deltaTime = (note.engine.exactCurrentTime - note.startNoteData.timePoint:getAbsoluteTime()) / self.rate
 	local timeState = self:getTimeState(deltaTime)
 	
 	note:process(timeState)
@@ -89,8 +89,8 @@ Score.processShortNote = function(self, note)
 end
 
 Score.processLongNote = function(self, note)
-	local deltaStartTime = (note.engine.currentTime - note.startNoteData.timePoint:getAbsoluteTime()) / self.rate
-	local deltaEndTime = (note.engine.currentTime - note.endNoteData.timePoint:getAbsoluteTime()) / self.rate
+	local deltaStartTime = (note.engine.exactCurrentTime - note.startNoteData.timePoint:getAbsoluteTime()) / self.rate
+	local deltaEndTime = (note.engine.exactCurrentTime - note.endNoteData.timePoint:getAbsoluteTime()) / self.rate
 	local startTimeState = self:getTimeState(deltaStartTime)
 	local endTimeState = self:getTimeState(deltaEndTime)
 	
