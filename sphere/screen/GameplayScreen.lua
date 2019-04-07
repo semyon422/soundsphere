@@ -11,6 +11,7 @@ local NotificationLine = require("sphere.ui.NotificationLine")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 local ScreenManager = require("sphere.screen.ScreenManager")
 local ModifierManager = require("sphere.game.ModifierManager")
+local BMSBGA = require("sphere.game.BMSBGA")
 
 local GameplayScreen = Screen:new()
 
@@ -46,6 +47,12 @@ GameplayScreen.load = function(self)
 	ModifierManager.noteSkin = noteSkin
 	ModifierManager.playField = self.playField
 	ModifierManager:apply()
+	
+	self.bga = BMSBGA:new()
+	self.bga.noteChart = noteChart
+	self.bga.engine = self.engine
+	self.engine.bga = self.bga
+	
 	self.engine:load()
 	self.playField:load()
 	
@@ -54,25 +61,31 @@ GameplayScreen.load = function(self)
 	NoteChartResourceLoader.observable:add(NotificationLine)
 	
 	NoteChartResourceLoader:load(self.cacheData.path, noteChart, function()
+		self.bga:load()
 		self.engine:play()
 	end)
 	
-	BackgroundManager:setColor({63, 63, 63})
+	local color = {127, 127, 127}
+	BackgroundManager:setColor(color)
+	self.bga:setColor(color)
 end
 
 GameplayScreen.unload = function(self)
 	self.engine:unload()
 	self.playField:unload()
+	self.bga:unload()
 end
 
 GameplayScreen.update = function(self, dt)
 	self.engine:update(dt)
 	self.playField:update()
+	self.bga:update(dt)
 	
 	Screen.update(self)
 end
 
 GameplayScreen.draw = function(self)
+	self.bga:draw()
 	self.engine:draw()
 	
 	Screen.draw(self)
@@ -82,6 +95,7 @@ GameplayScreen.receive = function(self, event)
 	InputManager:receive(event, self.engine)
 	self.engine:receive(event)
 	self.playField:receive(event)
+	self.bga:receive(event)
 	
 	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
 	if

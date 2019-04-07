@@ -21,6 +21,16 @@ FileManager.Formats = {
 FileManager.priority = {}
 FileManager.paths = {}
 
+FileManager.getType = function(self, path)
+	for type, formats in pairs(self.Formats) do
+		for _, ext in ipairs(formats) do
+			if path:lower():find("%." .. ext .. "$") then
+				return type
+			end
+		end
+	end
+end
+
 local sortPaths = function(a, b)
 	return FileManager.priority[a] > FileManager.priority[b]
 end

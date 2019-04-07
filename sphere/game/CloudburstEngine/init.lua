@@ -164,7 +164,8 @@ CloudburstEngine.play = function(self)
 	if self.paused then
 		self.paused = false
 		self.audioContainer:play()
-		return self.timeManager:play()
+		self.timeManager:play()
+		self.bga:play()
 	end
 end
 
@@ -172,7 +173,8 @@ CloudburstEngine.pause = function(self)
 	if not self.paused then
 		self.paused = true
 		self.audioContainer:pause()
-		return self.timeManager:pause()
+		self.timeManager:pause()
+		self.bga:pause()
 	end
 end
 
@@ -185,6 +187,7 @@ CloudburstEngine.updateRate = function(self)
 	self.noteSkin.rate = self.rate
 	self.timeManager:setRate(self.rate)
 	self.audioContainer:setRate(self.rate)
+	self.bga:setRate(self.rate)
 end
 
 CloudburstEngine.loadTimeManager = function(self)
