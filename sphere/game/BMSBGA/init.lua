@@ -19,6 +19,7 @@ BMSBGA.setColor = function(self, color)
 end
 
 BMSBGA.load = function(self)
+	self.cs:reload()
 	self:loadNoteHandlers()
 end
 
