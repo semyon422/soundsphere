@@ -9,7 +9,7 @@ FileManager.ImageFormats = {
 }
 
 FileManager.VideoFormats = {
-	"mpg", "avi", "mp4"
+	"mpg", "avi", "mp4", "mpeg"
 }
 
 FileManager.Formats = {
@@ -53,9 +53,17 @@ FileManager.removePath = function(self, path)
 end
 
 FileManager.findFile = function(self, fileName, fileType)
+	local originalFileName = fileName
 	local fileName = self:removeExtension(fileName, fileType)
 	
 	for _, path in ipairs(self.paths) do
+		local originalFilePath = path .. "/" .. originalFileName
+		if
+			love.filesystem.exists(originalFilePath) and
+			self:getType(originalFileName) == fileType
+		then
+			return originalFilePath
+		end
 		for _, format in ipairs(self.Formats[fileType]) do
 			local filePath = path .. "/" .. fileName .. "." .. format
 			if love.filesystem.exists(filePath) then
