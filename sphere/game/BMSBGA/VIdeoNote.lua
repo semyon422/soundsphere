@@ -52,7 +52,8 @@ end
 
 VideoNote.load = function(self)
 	local path = self.engine.aliases[self.images[1][1]]
-	self.video = video.get(path)
+	self.video = video.new(path)
+	self.video:rewind()
 	
 	if self.video then
 		self.drawable = ImageFrame:new({
