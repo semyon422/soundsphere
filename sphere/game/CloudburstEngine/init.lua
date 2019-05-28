@@ -24,6 +24,7 @@ CloudburstEngine.load = function(self)
 	
 	self.sharedLogicalNoteData = {}
 	self.soundFiles = {}
+	self.noteCount = 0
 	
 	self:loadNoteHandlers()
 	self:loadNoteDrawers()

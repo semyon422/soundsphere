@@ -23,6 +23,7 @@ NoteHandler.loadNoteData = function(self)
 						pressSounds = noteData.sounds,
 						noteType = "ShortNote"
 					})
+					self.engine.noteCount = self.engine.noteCount + 1
 				elseif noteData.noteType == "LongNoteStart" then
 					logicalNote = LongLogicalNote:new({
 						startNoteData = noteData,
@@ -31,6 +32,7 @@ NoteHandler.loadNoteData = function(self)
 						releaseSounds = noteData.endNoteData.sounds,
 						noteType = "LongNote"
 					})
+					self.engine.noteCount = self.engine.noteCount + 1
 				elseif noteData.noteType == "LineNoteStart" then
 					logicalNote = ShortLogicalNote:new({
 						startNoteData = noteData,

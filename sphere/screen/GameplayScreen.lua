@@ -52,6 +52,7 @@ GameplayScreen.load = function(self)
 	self.bga.noteChart = noteChart
 	self.bga.engine = self.engine
 	self.engine.bga = self.bga
+	self.engine.score.engine = self.engine
 	
 	self.engine:load()
 	self.playField:load()

@@ -10,6 +10,12 @@ Score.construct = function(self)
 	self.rate = 1
 	self.hits = {}
 	self.judges = {}
+	
+	self.sum = 0
+	self.count = 0
+	self.accuracy = 0
+	
+	self.score = 0
 end
 
 Score.passEdge = 0.120
@@ -46,6 +52,19 @@ Score.hit = function(self, deltaTime)
 	
 	local judgeIndex = self:judge(deltaTime)
 	self.judges[judgeIndex] = (self.judges[judgeIndex] or 0) + 1
+	
+	if math.abs(deltaTime) >= self.timegates[#self.timegates - 1].time then
+		return
+	end
+	
+	self.sum = self.sum + (deltaTime * 1000) ^ 2
+	self.count = self.count + 1
+	self.accuracy = math.sqrt(self.sum / self.count)
+	self.score = self.score
+		+ math.cos(math.pi / 2 * deltaTime / self.timegates[#self.timegates - 1].time)
+		/ self.engine.noteCount
+		* 1000000
+	print(self.score)
 end
 
 Score.judge = function(self, deltaTime)
