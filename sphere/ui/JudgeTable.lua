@@ -131,7 +131,7 @@ JudgeTable.addAccuracy = function(self)
 	self.judgeGates[self.row] = self:getJudgeGateText("", self.row)
 	self.judgeGates[self.row]:reload()
 	
-	self.judgeValues[self.row] = self:getJudgeValueText(math.floor(self.score.accuracy), self.row)
+	self.judgeValues[self.row] = self:getJudgeValueText(("%.2f"):format(self.score.accuracy), self.row)
 	self.judgeValues[self.row]:reload()
 	
 	self.row = self.row + 1
@@ -144,7 +144,7 @@ JudgeTable.addScore = function(self)
 	self.judgeGates[self.row] = self:getJudgeGateText("", self.row)
 	self.judgeGates[self.row]:reload()
 	
-	self.judgeValues[self.row] = self:getJudgeValueText(math.floor(self.score.score), self.row)
+	self.judgeValues[self.row] = self:getJudgeValueText(("%06d"):format(self.score.score), self.row)
 	self.judgeValues[self.row]:reload()
 	
 	self.row = self.row + 1

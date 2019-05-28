@@ -33,16 +33,16 @@ NoteSkin.allcs = CS:new({
 	ry = 0,
 	binding = "all"
 })
-NoteSkin.cs = NoteSkin.allcs
 
 NoteSkin.construct = function(self)
-	if self.noteSkinData.cs then
-		self.cs = CS:new({
-			bx = tonumber(self.noteSkinData.cs[1]),
-			by = tonumber(self.noteSkinData.cs[2]),
-			rx = tonumber(self.noteSkinData.cs[3]),
-			ry = tonumber(self.noteSkinData.cs[4]),
-			binding = self.noteSkinData.cs[5]
+	self.cses = {}
+	for i = 1, #self.noteSkinData.cses do
+		self.cses[i] = CS:new({
+			bx = tonumber(self.noteSkinData.cses[i][1]),
+			by = tonumber(self.noteSkinData.cses[i][2]),
+			rx = tonumber(self.noteSkinData.cses[i][3]),
+			ry = tonumber(self.noteSkinData.cses[i][4]),
+			binding = self.noteSkinData.cses[i][5]
 		})
 	end
 	
@@ -102,6 +102,13 @@ NoteSkin.update = function(self, dt)
 	end
 end
 
+NoteSkin.reloadCS = function(self, dt)
+	self.allcs:reload()
+	for i = 1, #self.cses do
+		self.cses[i]:reload()
+	end
+end
+
 NoteSkin.draw = function(self)
 	for _, container in ipairs(self.containerList) do
 		container:draw()
@@ -123,7 +130,7 @@ NoteSkin.getSpeed = function(self)
 end
 
 NoteSkin.getCS = function(self, note)
-	return self.cs
+	return self.cses[self.data[note.id]["Head"].cs]
 end
 
 NoteSkin.checkNote = function(self, note)
@@ -150,7 +157,7 @@ end
 
 NoteSkin.getRectangleDrawable = function(self, note, part)
 	return Rectangle:new({
-		cs = self.cs,
+		cs = self:getCS(note),
 		mode = "fill",
 		x = 0,
 		y = 0,
@@ -165,7 +172,7 @@ end
 
 NoteSkin.getImageDrawable = function(self, note, part)
 	return Image:new({
-		cs = self.cs,
+		cs = self:getCS(note),
 		x = 0,
 		y = 0,
 		sx = self:getNoteScaleX(note, part),
@@ -317,13 +324,13 @@ end
 NoteSkin.getLineNoteScaledWidth = function(self, note)
 	local data = self.data[note.id]["Head"]
 	local dt = note.startNoteData.currentVisualTime - note.endNoteData.currentVisualTime
-	return math.max(math.abs(data.fx * self:getSpeed() * dt + data.w), self:getCS():x(1))
+	return math.max(math.abs(data.fx * self:getSpeed() * dt + data.w), self:getCS(note):x(1))
 end
 
 NoteSkin.getLineNoteScaledHeight = function(self, note)
 	local data = self.data[note.id]["Head"]
 	local dt = note.startNoteData.currentVisualTime - note.endNoteData.currentVisualTime
-	return math.max(math.abs(data.fy * self:getSpeed() * dt + data.h), self:getCS():y(1))
+	return math.max(math.abs(data.fy * self:getSpeed() * dt + data.h), self:getCS(note):y(1))
 end
 
 --------------------------------
@@ -376,19 +383,21 @@ NoteSkin.whereWillShortNoteDraw = function(self, note)
 	local shortNoteX = self:getShortNoteX(note)
 	local shortNoteWidth = self:getNoteWidth(note, "Head")
 	
+	local cs = self:getCS(note)
+	
 	local x, y
-	if (self.allcs:x(self.cs:X(shortNoteX + shortNoteWidth, true), true) > 0) and (self.allcs:x(self.cs:X(shortNoteX, true), true) < 1) then
+	if (self.allcs:x(cs:X(shortNoteX + shortNoteWidth, true), true) > 0) and (self.allcs:x(cs:X(shortNoteX, true), true) < 1) then
 		x = 0
-	elseif self.allcs:x(self.cs:X(shortNoteX, true), true) >= 1 then
+	elseif self.allcs:x(cs:X(shortNoteX, true), true) >= 1 then
 		x = 1
-	elseif self.allcs:x(self.cs:X(shortNoteX + shortNoteWidth, true), true) <= 0 then
+	elseif self.allcs:x(cs:X(shortNoteX + shortNoteWidth, true), true) <= 0 then
 		x = -1
 	end
-	if (self.allcs:y(self.cs:Y(shortNoteY + shortNoteHeight, true), true) > 0) and (self.allcs:y(self.cs:Y(shortNoteY, true), true) < 1) then
+	if (self.allcs:y(cs:Y(shortNoteY + shortNoteHeight, true), true) > 0) and (self.allcs:y(cs:Y(shortNoteY, true), true) < 1) then
 		y = 0
-	elseif self.allcs:y(self.cs:Y(shortNoteY, true), true) >= 1 then
+	elseif self.allcs:y(cs:Y(shortNoteY, true), true) >= 1 then
 		y = 1
-	elseif self.allcs:y(self.cs:Y(shortNoteY + shortNoteHeight, true), true) <= 0 then
+	elseif self.allcs:y(cs:Y(shortNoteY + shortNoteHeight, true), true) <= 0 then
 		y = -1
 	end
 	
@@ -421,28 +430,30 @@ NoteSkin.whereWillLongNoteDraw = function(self, note)
 	local longNoteTailWidth = self:getNoteWidth(note, "Tail")
 	local longNoteTailHeight = self:getNoteHeight(note, "Tail")
 	
+	local cs = self:getCS(note)
+	
 	local x, y
 	if
-		(self.allcs:x(self.cs:X(longNoteHeadX + longNoteHeadWidth, true), true) > 0) and (self.allcs:x(self.cs:X(longNoteHeadX, true), true) < 1) or
-		(self.allcs:x(self.cs:X(longNoteTailX + longNoteTailWidth, true), true) > 0) and (self.allcs:x(self.cs:X(longNoteTailX, true), true) < 1) or
-		self.allcs:x(self.cs:X(longNoteTailX + longNoteTailWidth, true), true) * self.allcs:x(self.cs:X(longNoteHeadX, true), true) < 0
+		(self.allcs:x(cs:X(longNoteHeadX + longNoteHeadWidth, true), true) > 0) and (self.allcs:x(cs:X(longNoteHeadX, true), true) < 1) or
+		(self.allcs:x(cs:X(longNoteTailX + longNoteTailWidth, true), true) > 0) and (self.allcs:x(cs:X(longNoteTailX, true), true) < 1) or
+		self.allcs:x(cs:X(longNoteTailX + longNoteTailWidth, true), true) * self.allcs:x(cs:X(longNoteHeadX, true), true) < 0
 	then
 		x = 0
-	elseif self.allcs:x(self.cs:X(longNoteTailX, true), true) >= 1 then
+	elseif self.allcs:x(cs:X(longNoteTailX, true), true) >= 1 then
 		x = 1
-	elseif self.allcs:x(self.cs:X(longNoteHeadX + longNoteHeadWidth, true), true) <= 0 then
+	elseif self.allcs:x(cs:X(longNoteHeadX + longNoteHeadWidth, true), true) <= 0 then
 		x = -1
 	end
 	
 	if
-		(self.allcs:y(self.cs:Y(longNoteHeadY + longNoteHeadHeight, true), true) > 0) and (self.allcs:y(self.cs:Y(longNoteHeadY, true), true) < 1) or
-		(self.allcs:y(self.cs:Y(longNoteTailY + longNoteTailHeight, true), true) > 0) and (self.allcs:y(self.cs:Y(longNoteTailY, true), true) < 1) or
-		self.allcs:y(self.cs:Y(longNoteTailY + longNoteTailHeight, true), true) * self.allcs:y(self.cs:Y(longNoteHeadY, true), true) < 0
+		(self.allcs:y(cs:Y(longNoteHeadY + longNoteHeadHeight, true), true) > 0) and (self.allcs:y(cs:Y(longNoteHeadY, true), true) < 1) or
+		(self.allcs:y(cs:Y(longNoteTailY + longNoteTailHeight, true), true) > 0) and (self.allcs:y(cs:Y(longNoteTailY, true), true) < 1) or
+		self.allcs:y(cs:Y(longNoteTailY + longNoteTailHeight, true), true) * self.allcs:y(cs:Y(longNoteHeadY, true), true) < 0
 	then
 		y = 0
-	elseif self.allcs:y(self.cs:Y(longNoteTailY, true), true) >= 1 then
+	elseif self.allcs:y(cs:Y(longNoteTailY, true), true) >= 1 then
 		y = 1
-	elseif self.allcs:y(self.cs:Y(longNoteHeadY + longNoteHeadHeight, true), true) <= 0 then
+	elseif self.allcs:y(cs:Y(longNoteHeadY + longNoteHeadHeight, true), true) <= 0 then
 		y = -1
 	end
 	
@@ -472,24 +483,26 @@ NoteSkin.whereWillLineNoteDraw = function(self, note)
 	local width = self:getLineNoteScaledWidth(note)
 	local height = self:getLineNoteScaledHeight(note)
 	
+	local cs = self:getCS(note)
+	
 	local x, y
 	if
-		(self.allcs:x(self.cs:X(notex + width, true), true) > 0) and (self.allcs:x(self.cs:X(notex, true), true) < 1)
+		(self.allcs:x(cs:X(notex + width, true), true) > 0) and (self.allcs:x(cs:X(notex, true), true) < 1)
 	then
 		x = 0
-	elseif self.allcs:x(self.cs:X(notex, true), true) >= 1 then
+	elseif self.allcs:x(cs:X(notex, true), true) >= 1 then
 		x = 1
-	elseif self.allcs:x(self.cs:X(notex + width, true), true) <= 0 then
+	elseif self.allcs:x(cs:X(notex + width, true), true) <= 0 then
 		x = -1
 	end
 	
 	if
-		(self.allcs:y(self.cs:Y(notey + height, true), true) > 0) and (self.allcs:y(self.cs:Y(notey, true), true) < 1)
+		(self.allcs:y(cs:Y(notey + height, true), true) > 0) and (self.allcs:y(cs:Y(notey, true), true) < 1)
 	then
 		y = 0
-	elseif self.allcs:y(self.cs:Y(notey, true), true) >= 1 then
+	elseif self.allcs:y(cs:Y(notey, true), true) >= 1 then
 		y = 1
-	elseif self.allcs:y(self.cs:Y(notey + height, true), true) <= 0 then
+	elseif self.allcs:y(cs:Y(notey + height, true), true) <= 0 then
 		y = -1
 	end
 	

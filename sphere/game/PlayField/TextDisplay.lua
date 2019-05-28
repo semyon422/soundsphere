@@ -15,9 +15,9 @@ TextDisplay.load = function(self)
 		h = self.h,
 		cs = self.cs,
 		limit = self.w,
-		align = {x = "left", y = "center"},
+		align = self.align,
 		color = {255, 255, 255, 255},
-		font = aquafonts.getFont(spherefonts.NotoSansRegular, 28)
+		font = aquafonts.getFont(spherefonts.NotoSansRegular, self.size)
 	})
 	self.textFrame:reload()
 	self.container:add(self.textFrame)
