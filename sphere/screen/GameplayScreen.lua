@@ -53,6 +53,7 @@ GameplayScreen.load = function(self)
 	self.bga.engine = self.engine
 	self.engine.bga = self.bga
 	self.engine.score.engine = self.engine
+	self.playField.score = self.engine.score
 	
 	self.engine:load()
 	self.playField:load()

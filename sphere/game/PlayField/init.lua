@@ -1,6 +1,8 @@
 local Class = require("aqua.util.Class")
 local StaticObject = require("sphere.game.PlayField.StaticObject")
 local InputObject = require("sphere.game.PlayField.InputObject")
+local TextDisplay = require("sphere.game.PlayField.TextDisplay")
+local ScoreDisplay = require("sphere.game.PlayField.ScoreDisplay")
 
 local PlayField = Class:new()
 
@@ -14,6 +16,8 @@ PlayField.load = function(self)
 			self:loadStaticObject(objectData)
 		elseif objectData.type == "input" then
 			self:loadInputObject(objectData)
+		elseif objectData.type == "score" then
+			self:loadScoreDisplay(objectData)
 		end
 	end
 end
@@ -32,6 +36,16 @@ PlayField.loadInputObject = function(self, objectData)
 	object.playField = self
 	object.container = self.container
 	object.cs = self.cs
+	object:load()
+	table.insert(self.objects, object)
+end
+
+PlayField.loadScoreDisplay = function(self, objectData)
+	local object = ScoreDisplay:new(objectData)
+	object.playField = self
+	object.container = self.container
+	object.cs = self.cs
+	object.score = self.score
 	object:load()
 	table.insert(self.objects, object)
 end

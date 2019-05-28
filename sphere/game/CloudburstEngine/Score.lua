@@ -64,7 +64,6 @@ Score.hit = function(self, deltaTime)
 		+ math.cos(math.pi / 2 * deltaTime / self.timegates[#self.timegates - 1].time)
 		/ self.engine.noteCount
 		* 1000000
-	print(self.score)
 end
 
 Score.judge = function(self, deltaTime)
