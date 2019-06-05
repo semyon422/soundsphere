@@ -28,6 +28,7 @@ WindowManager.setMode = function(self)
 	local mode = self.modes[self.currentMode]
 	love.window.setMode(mode.width, mode.height, mode.flags)
 	love.resize(mode.width, mode.height)
+	print(mode.width, mode.height)
 end
 
 return WindowManager

@@ -26,6 +26,7 @@ NoteChartList.send = function(self, event)
 		local cacheData = self.items[event.itemIndex].cacheData
 		if cacheData then
 			self:updateBackground()
+			self:updateAudio()
 		end
 	elseif event.action == "buttonInteract" or event.action == "return" then
 		local cacheData = self.items[event.itemIndex].cacheData

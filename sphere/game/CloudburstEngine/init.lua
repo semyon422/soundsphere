@@ -148,7 +148,7 @@ end
 CloudburstEngine.playAudio = function(self, paths)
 	if not paths then return end
 	for i = 1, #paths do
-		local audio = AudioFactory:getAudio(self.aliases[paths[i][1]])
+		local audio = AudioFactory:getSample(self.aliases[paths[i][1]])
 		if audio then
 			audio.offset = self.timeManager.currentTime
 			audio:play()

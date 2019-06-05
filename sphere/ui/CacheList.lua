@@ -1,6 +1,7 @@
 local Observable = require("aqua.util.Observable")
 local Cache = require("sphere.game.NoteChartManager.Cache")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
+local PreviewManager = require("sphere.ui.PreviewManager")
 local CustomList = require("sphere.ui.CustomList")
 local NotificationLine = require("sphere.ui.NotificationLine")
 
@@ -100,10 +101,38 @@ CacheList.getBackgroundPath = function(self, itemIndex)
 	return directoryPath .. "/" .. stagePath
 end
 
+CacheList.getAudioPath = function(self, itemIndex)
+	local cacheData = self.items[itemIndex].cacheData
+	
+	local directoryPath
+	if cacheData.container == 0 then
+		local directoryPathTable = cacheData.path:split("/")
+		directoryPathTable[#directoryPathTable] = nil
+		directoryPath = table.concat(directoryPathTable, "/")
+	else
+		directoryPath = cacheData.path
+	end
+	
+	local audioPath
+	if cacheData.audioPath and cacheData.audioPath ~= "" then
+		audioPath = cacheData.audioPath
+	else
+		audioPath = "preview.ogg"
+	end
+	
+	return directoryPath .. "/" .. audioPath, cacheData.previewTime
+end
+
 CacheList.updateBackground = function(self)
 	if CacheList.lock then return end
 	if not self.items[self.focusedItemIndex] then return end
 	return BackgroundManager:loadDrawableBackground(self:getBackgroundPath(self.focusedItemIndex))
+end
+
+CacheList.updateAudio = function(self)
+	if CacheList.lock then return end
+	if not self.items[self.focusedItemIndex] then return end
+	return PreviewManager:playAudio(self:getAudioPath(self.focusedItemIndex))
 end
 
 CacheList.updateCache = function(self, path)

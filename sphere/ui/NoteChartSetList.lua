@@ -34,6 +34,7 @@ NoteChartSetList.cs = CS:new({
 NoteChartSetList.send = function(self, event)
 	if event.action == "scrollStop" then
 		self.NoteChartList:updateBackground()
+		self.NoteChartList:updateAudio()
 	elseif event.action == "buttonInteract" then
 		local cacheData = self.items[event.itemIndex].cacheData
 		if event.button == 2 then

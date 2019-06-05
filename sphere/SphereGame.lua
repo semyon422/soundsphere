@@ -29,12 +29,12 @@ SphereGame.run = function(self)
 	self:init()
 	self:load()
 	aquaio:add(self.observer)
+	WindowManager:load()
 end
 
 SphereGame.load = function(self)
 	Cache:load()
 	
-	WindowManager:load()
 	BackgroundManager:loadDrawableBackground("userdata/background.jpg")
 	ScreenManager:set(SelectionScreen)
 	NotificationLine:notify("welcome")
