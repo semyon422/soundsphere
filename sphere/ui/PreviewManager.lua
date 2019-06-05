@@ -8,15 +8,37 @@ PreviewManager.init = function(self)
 end
 
 PreviewManager.playAudio = function(self, path, position)
-	if not love.filesystem.exists(path) then return end
-	if self.audio then self.audio:stop() end
+	if not love.filesystem.exists(path) then
+		self:stop()
+		return
+	end
+	if self.audio then
+		if self.path ~= path then
+			self.audio:stop()
+		else
+			return
+		end
+	end
 	
+	self.path = path
+	self.position = position
 	self.audio = AudioFactory:getStream(path)
 	self.audio:setPosition(position)
 	self.audio:play()
 end
 
+PreviewManager.stop = function(self)
+	if self.audio then self.audio:stop() end
+	self.audio = nil
+end
+
 PreviewManager.update = function(self, dt)
+	if not self.audio then return end
+	
+	if not self.audio:isPlaying() then
+		self.audio:setPosition(self.position)
+		self.audio:play()
+	end
 end
 
 PreviewManager.receive = function(self, event)

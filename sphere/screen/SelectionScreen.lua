@@ -6,6 +6,7 @@ local MetaDataTable = require("sphere.ui.MetaDataTable")
 local ScreenManager = require("sphere.screen.ScreenManager")
 local ModifierDisplay = require("sphere.ui.ModifierDisplay")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
+local PreviewManager = require("sphere.ui.PreviewManager")
 
 local SelectionScreen = Screen:new()
 
@@ -45,6 +46,7 @@ SelectionScreen.update = function(self)
 	NoteChartList:update()
 	ModifierList:update()
 	ModifierDisplay:update()
+	PreviewManager:update()
 end
 
 SelectionScreen.draw = function(self)
