@@ -3,7 +3,6 @@ local StaticObject = require("sphere.game.PlayField.StaticObject")
 local InputObject = require("sphere.game.PlayField.InputObject")
 local TextDisplay = require("sphere.game.PlayField.TextDisplay")
 local ScoreDisplay = require("sphere.game.PlayField.ScoreDisplay")
-local AccuracyDisplay = require("sphere.game.PlayField.AccuracyDisplay")
 
 local PlayField = Class:new()
 
@@ -17,8 +16,6 @@ PlayField.load = function(self)
 			self:loadInputObject(objectData)
 		elseif objectData.type == "score" then
 			self:loadScoreDisplay(objectData)
-		elseif objectData.type == "accuracy" then
-			self:loadAccuracyDisplay(objectData)
 		end
 	end
 end
@@ -46,17 +43,6 @@ end
 PlayField.loadScoreDisplay = function(self, objectData)
 	objectData.csi = objectData.csi or objectData.cs
 	local object = ScoreDisplay:new(objectData)
-	object.playField = self
-	object.container = self.container
-	object.cs = self.noteSkin.cses[objectData.csi]
-	object.score = self.score
-	object:load()
-	table.insert(self.objects, object)
-end
-
-PlayField.loadAccuracyDisplay = function(self, objectData)
-	objectData.csi = objectData.csi or objectData.cs
-	local object = AccuracyDisplay:new(objectData)
 	object.playField = self
 	object.container = self.container
 	object.cs = self.noteSkin.cses[objectData.csi]

@@ -14,6 +14,7 @@ Score.construct = function(self)
 	self.sum = 0
 	self.count = 0
 	self.accuracy = 0
+	self.timegate = ""
 	
 	self.score = 0
 end
@@ -64,6 +65,8 @@ Score.hit = function(self, deltaTime)
 		+ math.cos(math.pi / 2 * deltaTime / self.timegates[#self.timegates - 1].time)
 		/ self.engine.noteCount
 		* 1000000
+	
+	self.timegate = self.timegates[judgeIndex].name
 end
 
 Score.judge = function(self, deltaTime)
