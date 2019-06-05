@@ -22,3 +22,6 @@
 [submodule "soundsphere-skins"]
 	path = userdata/skins
 	url = https://github.com/semyon422/soundsphere-skins
+[submodule "resources"]
+	path = resources
+	url = https://github.com/semyon422/soundsphere-resources
