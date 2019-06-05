@@ -17,6 +17,10 @@ Score.construct = function(self)
 	self.timegate = ""
 	
 	self.score = 0
+	
+	for i = -math.floor(self.passEdge / self.interval), math.ceil(self.passEdge / self.interval) do
+		self.hits[i] = 0
+	end
 end
 
 Score.passEdge = 0.120
@@ -47,8 +51,8 @@ Score.timegates = {
 Score.interval = 0.004
 Score.hit = function(self, deltaTime)
 	if math.abs(deltaTime) <= self.passEdge then
-		deltaTime = math.floor(deltaTime / self.interval) * self.interval
-		self.hits[deltaTime] = (self.hits[deltaTime] or 0) + 1
+		local hit = math.floor(deltaTime / self.interval)
+		self.hits[hit] = self.hits[hit] + 1
 	end
 	
 	local judgeIndex = self:judge(deltaTime)

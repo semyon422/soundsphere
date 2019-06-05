@@ -7,7 +7,9 @@ AccuracyGraph.load = function(self)
 	self.points = {}
 	self.line = Line:new({
 		points = self.points,
-		cs = self.cs
+		cs = self.cs,
+		lineStyle = "smooth",
+		lineWidth = 2
 	})
 	
 	local maxAmount = 0
@@ -19,10 +21,8 @@ AccuracyGraph.load = function(self)
 	table.sort(hits, function(a, b) return a[1] < b[1] end)
 	
 	for i = 1, #hits do
-		self.points[#self.points + 1] = hits[i][1] * 4 + 0.5
-		self.points[#self.points + 1] = 1 - hits[i][2] / maxAmount / 3
-		self.points[#self.points + 1] = hits[i][1] * 4 + self.score.interval * 4 + 0.5
-		self.points[#self.points + 1] = 1 - hits[i][2] / maxAmount / 3
+		self.points[#self.points + 1] = hits[i][1] * 4 / 250 + 0.5
+		self.points[#self.points + 1] = 1 - hits[i][2] / maxAmount / 4
 	end
 	
 	if #self.points > 0 then
