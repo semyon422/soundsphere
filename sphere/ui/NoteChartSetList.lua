@@ -3,6 +3,7 @@ local Observable = require("aqua.util.Observable")
 local ScreenManager = require("sphere.screen.ScreenManager")
 local GameplayScreen = require("sphere.screen.GameplayScreen")
 local CacheList = require("sphere.ui.CacheList")
+local PreviewManager = require("sphere.ui.PreviewManager")
 
 local NoteChartSetList = CacheList:new()
 
@@ -43,6 +44,7 @@ NoteChartSetList.send = function(self, event)
 	elseif event.action == "return" then
 		local cacheData = self.NoteChartList.items[self.NoteChartList.focusedItemIndex].cacheData
 		if cacheData then
+			PreviewManager:stop()
 			GameplayScreen.cacheData = cacheData
 			ScreenManager:set(GameplayScreen)
 		end
