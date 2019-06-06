@@ -54,7 +54,7 @@ NoteSkinManager.getNoteSkin = function(self, inputMode)
 	end
 	
 	return {
-		noteSkin = {},
+		noteSkin = {cses = {}},
 		playField = {}
 	}
 end
