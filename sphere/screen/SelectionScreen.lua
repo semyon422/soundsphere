@@ -7,6 +7,7 @@ local ScreenManager = require("sphere.screen.ScreenManager")
 local ModifierDisplay = require("sphere.ui.ModifierDisplay")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 local PreviewManager = require("sphere.ui.PreviewManager")
+local Config = require("sphere.game.Config")
 
 local SelectionScreen = Screen:new()
 
@@ -27,7 +28,8 @@ SelectionScreen.load = function(self)
 	
 	NoteChartSetList:sendInitial()
 	
-	BackgroundManager:setColor({127, 127, 127})
+	local dim = 255 * (1 - Config.data.dim.selection)
+	BackgroundManager:setColor({dim, dim, dim})
 end
 
 SelectionScreen.unload = function(self)

@@ -7,6 +7,7 @@ local SelectionScreen = require("sphere.screen.SelectionScreen")
 local ScreenManager = require("sphere.screen.ScreenManager")
 
 local Cache = require("sphere.game.NoteChartManager.Cache")
+local Config = require("sphere.game.Config")
 
 local WindowManager = require("sphere.game.WindowManager")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
@@ -34,6 +35,10 @@ end
 
 SphereGame.load = function(self)
 	Cache:load()
+	Config:read()
+	Config:write()
+	
+	aquaio.fpslimit = Config.data.fps
 	
 	BackgroundManager:loadDrawableBackground("userdata/background.jpg")
 	ScreenManager:set(SelectionScreen)
@@ -42,6 +47,7 @@ end
 
 SphereGame.unload = function(self)
 	ScreenManager:unload()
+	Config:write()
 end
 
 SphereGame.update = function(self, dt)
@@ -66,6 +72,7 @@ SphereGame.receive = function(self, event)
 	elseif event.name == "draw" then
 		self:draw()
 	elseif event.name == "quit" then
+		self:unload()
 		os.exit()
 	end
 	

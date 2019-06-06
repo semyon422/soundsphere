@@ -22,4 +22,8 @@ ScreenManager.receive = function(self, event)
 	self.currentScreen:receive(event)
 end
 
+ScreenManager.unload = function(self)
+	self.currentScreen:unload()
+end
+
 return ScreenManager

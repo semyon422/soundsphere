@@ -8,6 +8,7 @@ local NoteHandler = require("sphere.game.CloudburstEngine.NoteHandler")
 local NoteDrawer = require("sphere.game.CloudburstEngine.NoteDrawer")
 local NoteSkin = require("sphere.game.CloudburstEngine.NoteSkin")
 local TimeManager = require("sphere.game.CloudburstEngine.TimeManager")
+local Config = require("sphere.game.Config")
 
 local CloudburstEngine = Class:new()
 
@@ -31,6 +32,9 @@ CloudburstEngine.load = function(self)
 	self:loadTimeManager()
 	
 	self.noteSkin:reloadCS()
+	
+	NoteSkin.speed = Config.data.speed
+	NoteSkin.targetSpeed = Config.data.speed
 end
 
 CloudburstEngine.update = function(self, dt)

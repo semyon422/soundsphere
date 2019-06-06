@@ -12,6 +12,7 @@ local BackgroundManager = require("sphere.ui.BackgroundManager")
 local ScreenManager = require("sphere.screen.ScreenManager")
 local ModifierManager = require("sphere.game.ModifierManager")
 local BMSBGA = require("sphere.game.BMSBGA")
+local Config = require("sphere.game.Config")
 
 local GameplayScreen = Screen:new()
 
@@ -67,7 +68,8 @@ GameplayScreen.load = function(self)
 		self.engine:play()
 	end)
 	
-	local color = {127, 127, 127}
+	local dim = 255 * (1 - Config.data.dim.gameplay)
+	local color = {dim, dim, dim}
 	BackgroundManager:setColor(color)
 	self.bga:setColor(color)
 end

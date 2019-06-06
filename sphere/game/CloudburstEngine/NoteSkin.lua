@@ -7,6 +7,7 @@ local Image = require("aqua.graphics.Image")
 local Rectangle = require("aqua.graphics.Rectangle")
 local SpriteBatch = require("aqua.graphics.SpriteBatch")
 local Container = require("aqua.graphics.Container")
+local Config = require("sphere.game.Config")
 
 local NoteSkin = Class:new()
 
@@ -123,6 +124,7 @@ NoteSkin.setSpeed = function(self, speed)
 		self.updateTween = true
 		self.speedTween = tween.new(0.25, self, {speed = speed}, "inOutQuad")
 	end
+	Config.data.speed = speed
 end
 
 NoteSkin.getSpeed = function(self)

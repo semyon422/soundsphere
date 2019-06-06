@@ -2,5 +2,6 @@ debug
 userdata/charts/*
 userdata/hitsounds/*
 userdata/cache.sqlite
+userdata/config.json
 !userdata/charts/.keep
 !userdata/hitsounds/.keep
