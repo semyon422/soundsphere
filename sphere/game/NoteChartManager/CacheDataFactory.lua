@@ -3,6 +3,7 @@ local bms = require("bms")
 local osu = require("osu")
 local o2jam = require("o2jam")
 local quaver = require("quaver")
+local utf8 = require("utf8")
 
 local CacheDataFactory = {}
 
@@ -36,13 +37,17 @@ CacheDataFactory.processCacheDataNames = function(self, cacheDatas)
 	local name, bracketStart = trimName(title)
 	
 	local continue = false
+	local byteOffset = 0
+	local byteNext = 0
 	for i = 1, bracketStart - 1 do
+		byteOffset = utf8.offset(title, i)
+		byteNext = utf8.offset(title, i + 1)
 		for j = 1, #cacheDatas - 1 do
-			if cacheDatas[j].title:sub(i, i) ~= cacheDatas[j + 1].title:sub(i, i) then
+			if cacheDatas[j].title:sub(byteOffset, byteNext - 1) ~= cacheDatas[j + 1].title:sub(byteOffset + 1, byteNext) then
 				continue = true
 				break
 			elseif j == #cacheDatas - 1 then
-				titleTable[#titleTable + 1] = cacheDatas[1].title:sub(i, i)
+				titleTable[#titleTable + 1] = cacheDatas[1].title:sub(byteOffset + 1, byteNext)
 			end
 		end
 		if continue then break end
@@ -51,8 +56,14 @@ CacheDataFactory.processCacheDataNames = function(self, cacheDatas)
 	local title = table.concat(titleTable):trim()
 	for i = 1, #cacheDatas do
 		if not cacheDatas[i].name then
-			cacheDatas[i].name = trimName(cacheDatas[i].title:sub(#title + 1, -1)):trim()
-			cacheDatas[i].title = title
+			if #title > 0 then
+				cacheDatas[i].name = trimName(cacheDatas[i].title:sub(#title + 1, -1)):trim()
+				cacheDatas[i].title = title
+			else
+				local name, bracketStart = trimName(cacheDatas[i].title)
+				cacheDatas[i].name = name
+				cacheDatas[i].title = cacheDatas[i].title
+			end
 		end
 	end
 end
@@ -73,7 +84,12 @@ local fix = function(line)
 	elseif validate(line) == line then
 		return line
 	else
-		return iconv(line, "UTF-8", "SHIFT-JIS") or iconv(line, "UTF-8", "EUC-KR") or iconv(line, "UTF-8", "US-ASCII") or line
+		return
+			iconv(line, "UTF-8", "SHIFT-JIS") or
+			iconv(line, "UTF-8", "EUC-KR") or
+			iconv(line, "UTF-8", "US-ASCII") or
+			iconv(line, "UTF-8", "CP1252") or
+			line
 	end
 end
 
