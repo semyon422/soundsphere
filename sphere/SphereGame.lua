@@ -49,7 +49,7 @@ end
 
 SphereGame.unload = function(self)
 	ScreenManager:unload()
-	MountManager:unmount()
+	-- MountManager:unmount()
 	Config:write()
 end
 
