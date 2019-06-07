@@ -9,6 +9,7 @@ local ScreenManager = require("sphere.screen.ScreenManager")
 local Cache = require("sphere.game.NoteChartManager.Cache")
 local Config = require("sphere.game.Config")
 
+local MountManager = require("sphere.game.MountManager")
 local WindowManager = require("sphere.game.WindowManager")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 local NotificationLine = require("sphere.ui.NotificationLine")
@@ -31,6 +32,7 @@ SphereGame.run = function(self)
 	self:load()
 	aquaio:add(self.observer)
 	WindowManager:load()
+	MountManager:mount()
 end
 
 SphereGame.load = function(self)
@@ -47,6 +49,7 @@ end
 
 SphereGame.unload = function(self)
 	ScreenManager:unload()
+	MountManager:unmount()
 	Config:write()
 end
 
