@@ -16,8 +16,8 @@ MountManager.mount = function(self)
 	self.jsonData = json.decode(file:read("*all"))
 	file:close()
 	
-	for mountPoint, newDir in pairs(self.jsonData) do
-		aquafs.mount(newDir, mountPoint, 1)
+	for _, entry in pairs(self.jsonData) do
+		aquafs.mount(entry[1], entry[2], 1)
 	end
 end
 
