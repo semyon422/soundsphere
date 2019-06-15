@@ -14,7 +14,7 @@ PreviewManager.playAudio = function(self, path, position)
 	end
 	if self.audio then
 		if self.path ~= path then
-			self.audio:stop()
+			self:stop()
 		else
 			return
 		end
@@ -28,7 +28,10 @@ PreviewManager.playAudio = function(self, path, position)
 end
 
 PreviewManager.stop = function(self)
-	if self.audio then self.audio:stop() end
+	if self.audio then
+		self.audio:stop()
+		self.audio:free()
+	end
 	self.audio = nil
 end
 
