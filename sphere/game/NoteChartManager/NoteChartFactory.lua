@@ -7,7 +7,7 @@ local quaver = require("quaver")
 local NoteChartFactory = {}
 
 local patterns = {
-	"%.osu$", "%.bm[sel]$", "%.ojn$", "%.qua$"
+	"%.osu$", "%.bm[sel]$", "%.ojn$", "%.qua$", "%.sph$"
 }
 
 NoteChartFactory.isNoteChart = function(self, path)
@@ -33,6 +33,10 @@ NoteChartFactory.getNoteChart = function(self, path)
 		noteChartImporter = o2jam.NoteChartImporter:new()
 		chartIndex = tonumber(path:sub(-1, -1))
 		path = path:match("^(.+)/.$")
+	elseif path:find("%.sph$") then
+		local directoryPath, fileName = path:match("^(.+)/(.-)%.sph$")
+		print(fileName)
+		return dofile(directoryPath .. "/" .. fileName .. ".lua")(directoryPath)
 	end
 	
 	local file = love.filesystem.newFile(path)

@@ -1,4 +1,5 @@
 local NoteChartFactory = require("sphere.game.NoteChartManager.NoteChartFactory")
+local json = require("json")
 local bms = require("bms")
 local osu = require("osu")
 local o2jam = require("o2jam")
@@ -17,6 +18,8 @@ CacheDataFactory.getCacheDatas = function(self, chartPaths)
 		return self:getBMS(chartPaths)
 	elseif path:find("%.ojn$") then
 		return self:getO2Jam(chartPaths)
+	elseif path:find("%.sph$") then
+		return self:getSphere(chartPaths)
 	end
 end
 
@@ -299,6 +302,56 @@ CacheDataFactory.getO2Jam = function(self, chartPaths)
 			path = cacheDatas[1].path:match("^(.+)/.-/.-"),
 			container = 2,
 			title = cacheDatas[1].path:match("^.+/(.-)/.-/.-$"),
+		}
+	end
+	
+	return cacheDatas
+end
+
+CacheDataFactory.getSphere = function(self, chartPaths)
+	local cacheDatas = {}
+	
+	for i = 1, #chartPaths do
+		local path = chartPaths[i]
+		local file = love.filesystem.newFile(path)
+		file:open("r")
+		local data = json.decode(file:read(file:getSize()))
+		file:close()
+		
+		cacheDatas[#cacheDatas + 1] = {
+			path = path,
+			hash = "",
+			container = 0,
+			title = data.title,
+			artist = data.artist,
+			source = data.source,
+			tags = data.tags,
+			name = data.name,
+			level = data.level,
+			creator = data.creator,
+			audioPath = data.audioPath,
+			stagePath = data.stagePath,
+			previewTime = data.previewTime,
+			noteCount = data.noteCount,
+			length = data.length,
+			bpm = data.bpm,
+			inputMode = data.inputMode
+		}
+	end
+	
+	if #cacheDatas > 0 then
+		cacheDatas[#cacheDatas + 1] = {
+			path = cacheDatas[1].path:match("^(.+)/.-"),
+			container = 1,
+			
+			title = cacheDatas[1].title,
+			artist = cacheDatas[1].artist,
+			source = cacheDatas[1].source,
+			tags = cacheDatas[1].tags,
+			creator = cacheDatas[1].creator,
+			audioPath = cacheDatas[1].audioPath,
+			stagePath = cacheDatas[1].stagePath,
+			previewTime = cacheDatas[1].previewTime
 		}
 	end
 	
