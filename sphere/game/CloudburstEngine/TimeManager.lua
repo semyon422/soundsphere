@@ -9,7 +9,7 @@ TimeManager.load = function(self)
 end
 
 TimeManager.getAdjustTime = function(self)
-	return self.engine.audioContainer:getPosition()
+	return self.engine.bgaContainer:getPosition()
 end
 
 TimeManager.loadTimePoints = function(self)

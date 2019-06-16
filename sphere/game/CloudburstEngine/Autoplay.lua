@@ -15,8 +15,10 @@ Autoplay.processShortNote = function(self, note)
 	if deltaTime <= 0 then
 		if note.noteType ~= "SoundNote" then
 			note.noteHandler:clickKey()
+			note.engine:playAudio(note.pressSounds, "fga")
+		else
+			note.engine:playAudio(note.pressSounds, "bga")
 		end
-		note.engine:playAudio(note.pressSounds)
 		
 		note.keyState = true
 		note.state = "passed"
@@ -27,7 +29,7 @@ end
 Autoplay.processSoundNote = function(self, note)
 	if note.pressSounds and note.pressSounds[1] then
 		if note.startNoteData.timePoint:getAbsoluteTime() <= note.engine.currentTime then
-			note.engine:playAudio(note.pressSounds)
+			note.engine:playAudio(note.pressSounds, "bga")
 		else
 			return
 		end
@@ -45,16 +47,20 @@ Autoplay.processLongNote = function(self, note)
 	if deltaStartTime <= 0 and not note.keyState then
 		if note.noteType ~= "SoundNote" then
 			note.noteHandler:switchKey(true)
+			note.engine:playAudio(note.pressSounds, "fga")
+		else
+			note.engine:playAudio(note.pressSounds, "bga")
 		end
-		note.engine:playAudio(note.pressSounds)
 		
 		note.keyState = true
 		note.state = "startPassedPressed"
 	elseif deltaEndTime <= 0 and note.keyState or nextNote and nextNote:isHere() then
 		if note.noteType ~= "SoundNote" then
 			note.noteHandler:switchKey(false)
+			note.engine:playAudio(note.releaseSounds, "fga")
+		else
+			note.engine:playAudio(note.releaseSounds, "bga")
 		end
-		note.engine:playAudio(note.releaseSounds)
 		
 		note.keyState = false
 		note.state = "endPassed"

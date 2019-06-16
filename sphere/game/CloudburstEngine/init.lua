@@ -19,7 +19,12 @@ CloudburstEngine.targetRate = 1
 
 CloudburstEngine.load = function(self)
 	self.observable = Observable:new()
-	self.audioContainer = AudioContainer:new()
+	self.bgaContainer = AudioContainer:new()
+	self.fgaContainer = AudioContainer:new()
+	
+	local volume = Config.data.volume
+	self.bgaContainer:setVolume(volume.main * volume.music)
+	self.fgaContainer:setVolume(volume.main * volume.effects)
 	
 	self.inputMode = self.noteChart.inputMode
 	
@@ -38,7 +43,8 @@ CloudburstEngine.load = function(self)
 end
 
 CloudburstEngine.update = function(self, dt)
-	self.audioContainer:update()
+	self.bgaContainer:update()
+	self.fgaContainer:update()
 	
 	if self.rateTween then
 		self.rateTween:update(dt)
@@ -149,7 +155,7 @@ CloudburstEngine.receive = function(self, event)
 	end
 end
 
-CloudburstEngine.playAudio = function(self, paths)
+CloudburstEngine.playAudio = function(self, paths, layer)
 	if not paths then return end
 	for i = 1, #paths do
 		local audio = AudioFactory:getSample(self.aliases[paths[i][1]])
@@ -157,8 +163,12 @@ CloudburstEngine.playAudio = function(self, paths)
 			audio.offset = self.timeManager.currentTime
 			audio:play()
 			audio:setRate(self.rate)
-			audio:setVolume(paths[i][2])
-			self.audioContainer:add(audio)
+			audio:setBaseVolume(paths[i][2])
+			if layer == "bga" then
+				self.bgaContainer:add(audio)
+			elseif layer == "fga" then
+				self.fgaContainer:add(audio)
+			end
 		end
 	end
 end
@@ -166,7 +176,8 @@ end
 CloudburstEngine.play = function(self)
 	if self.paused then
 		self.paused = false
-		self.audioContainer:play()
+		self.bgaContainer:play()
+		self.fgaContainer:play()
 		self.timeManager:play()
 		self.bga:play()
 	end
@@ -175,7 +186,8 @@ end
 CloudburstEngine.pause = function(self)
 	if not self.paused then
 		self.paused = true
-		self.audioContainer:pause()
+		self.bgaContainer:pause()
+		self.fgaContainer:pause()
 		self.timeManager:pause()
 		self.bga:pause()
 	end
@@ -189,7 +201,8 @@ CloudburstEngine.updateRate = function(self)
 	self.score.rate = self.rate
 	self.noteSkin.rate = self.rate
 	self.timeManager:setRate(self.rate)
-	self.audioContainer:setRate(self.rate)
+	self.bgaContainer:setRate(self.rate)
+	self.fgaContainer:setRate(self.rate)
 	self.bga:setRate(self.rate)
 end
 

@@ -96,12 +96,12 @@ NoteHandler.receive = function(self, event)
 	local key = event.args and event.args[1]
 	if self.keyBind and key == self.keyBind then
 		if event.name == "keypressed" then
-			self.engine:playAudio(self.currentNote.pressSounds)
+			self.engine:playAudio(self.currentNote.pressSounds, "fga")
 			
 			self.currentNote.keyState = true
 			return self:switchKey(true)
 		elseif event.name == "keyreleased" then
-			self.engine:playAudio(self.currentNote.releaseSounds)
+			self.engine:playAudio(self.currentNote.releaseSounds, "fga")
 			
 			self.currentNote.keyState = false
 			return self:switchKey(false)

@@ -107,7 +107,8 @@ GameplayScreen.receive = function(self, event)
 		event.args[1] == "escape" and
 		shift
 	then
-		self.engine.audioContainer:stop()
+		self.engine.bgaContainer:stop()
+		self.engine.fgaContainer:stop()
 		ScreenManager:set(require("sphere.screen.ResultScreen"))
 		ScreenManager:receive({
 			name = "score",
