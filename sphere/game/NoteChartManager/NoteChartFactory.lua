@@ -35,7 +35,6 @@ NoteChartFactory.getNoteChart = function(self, path)
 		path = path:match("^(.+)/.$")
 	elseif path:find("%.sph$") then
 		local directoryPath, fileName = path:match("^(.+)/(.-)%.sph$")
-		print(fileName)
 		return dofile(directoryPath .. "/" .. fileName .. ".lua")(directoryPath)
 	end
 	
