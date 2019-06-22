@@ -48,10 +48,14 @@ BrowserList.getItemName = function(self, cacheData)
 	return (" "):rep(#directoryPath) .. folderName
 end
 
-BrowserList.selectRequest = [[
-	SELECT * FROM `cache`
-	WHERE `container` == 2 AND INSTR(`path`, ?) == 1
-	ORDER BY `path`;
-]]
+BrowserList.checkCacheData = function(self, cacheData)
+	return cacheData.container == 2 and cacheData.path:find(self.basePath)
+end
+
+-- BrowserList.selectRequest = [[
+	-- SELECT * FROM `cache`
+	-- WHERE `container` == 2 AND INSTR(`path`, ?) == 1
+	-- ORDER BY `path`;
+-- ]]
 
 return BrowserList

@@ -1,5 +1,6 @@
 local Observable = require("aqua.util.Observable")
 local Cache = require("sphere.game.NoteChartManager.Cache")
+local CacheDatabase = require("sphere.game.NoteChartManager.CacheDatabase")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 local PreviewManager = require("sphere.ui.PreviewManager")
 local CustomList = require("sphere.ui.CustomList")
@@ -12,9 +13,6 @@ CacheList.sender = "CacheList"
 CacheList.basePath = ""
 
 CacheList.load = function(self)
-	self.db = Cache.db
-	
-	self.selectStatement = self.db:prepare(self.selectRequest)
 	self:selectCache()
 	
 	return CustomList.load(self)
@@ -30,10 +28,11 @@ end
 CacheList.sortItemsFunction = function(a, b)
 	return a.name < b.name
 end
-local colnames = {
-	"path", "hash", "container", "title", "artist", "source", "tags", "name", "level", "creator", "audioPath", "stagePath", "previewTime", "noteCount", "length", "bpm", "inputMode"
-}
-CacheList.selectRequest = "SELECT * FROM `cache` WHERE INSTR(`path`, ?) == 1 ORDER BY `path`;"
+
+CacheList.checkCacheData = function(self, cacheData)
+	return true
+end
+
 CacheList.selectCache = function(self)
 	local items = {}
 	
@@ -41,16 +40,14 @@ CacheList.selectCache = function(self)
 		return self:setItems(items)
 	end
 	
-	local stmt = self.selectStatement:reset():bind(self.basePath)
-	local row = stmt:step()
-	while row do
-		local cacheData = {}
-		for i = 1, #colnames do
-			cacheData[colnames[i]] = row[i]
+	local cacheDatas = Cache.cacheDatas
+	for i = 1, #cacheDatas do
+		local cacheData = cacheDatas[i]
+		if self:checkCacheData(cacheData) then
+			items[#items + 1] = self:getItem(cacheData)
 		end
-		items[#items + 1] = self:getItem(cacheData)
-		row = stmt:step()
 	end
+	
 	if self.needItemsSort then
 		table.sort(items, self.sortItemsFunction)
 	end
@@ -137,7 +134,7 @@ end
 
 CacheList.updateCache = function(self, path)
 	CacheList.lock = true
-	return Cache:update(path, recursive, function()
+	return CacheDatabase:update(path, recursive, function()
 		CacheList.lock = false
 		return NotificationLine:notify("Cache updated. (" .. path .. ")")
 	end)

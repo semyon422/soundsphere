@@ -7,6 +7,7 @@ local ScreenManager = require("sphere.screen.ScreenManager")
 local ModifierDisplay = require("sphere.ui.ModifierDisplay")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 local PreviewManager = require("sphere.ui.PreviewManager")
+local SearchLine = require("sphere.ui.SearchLine")
 local Config = require("sphere.game.Config")
 
 local SelectionScreen = Screen:new()
@@ -27,6 +28,8 @@ SelectionScreen.load = function(self)
 	ModifierDisplay:reload()
 	
 	NoteChartSetList:sendInitial()
+	
+	SearchLine:load()
 	
 	local dim = 255 * (1 - Config.data.dim.selection)
 	BackgroundManager:setColor({dim, dim, dim})
@@ -59,6 +62,8 @@ SelectionScreen.draw = function(self)
 	ModifierList:draw()
 	ModifierDisplay:draw()
 	MetaDataTable:draw()
+	
+	SearchLine:draw()
 end
 
 SelectionScreen.receive = function(self, event)
@@ -85,6 +90,8 @@ SelectionScreen.receive = function(self, event)
 	NoteChartList:receive(event)
 	ModifierList:receive(event)
 	ModifierDisplay:receive(event)
+	
+	SearchLine:receive(event)
 end
 
 return SelectionScreen

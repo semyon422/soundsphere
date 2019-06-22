@@ -18,7 +18,8 @@ NoteChartList.middleOffset = 5
 NoteChartList.startOffset = 5
 NoteChartList.endOffset = 5
 
-NoteChartList.basePath = "userdata/charts"
+NoteChartList.basePath = "?"
+NoteChartList.needItemsSort = true
 
 NoteChartList.observable = Observable:new()
 
@@ -62,14 +63,31 @@ NoteChartList.receive = function(self, event)
 	return CacheList.receive(self, event)
 end
 
-NoteChartList.selectRequest = [[
-	SELECT * FROM `cache`
-	WHERE `container` == 0 AND
-	INSTR(`path`, ? || "/") == 1
-	ORDER BY
-	length(`inputMode`) ASC,
-	`inputMode` ASC,
-	`noteCount` / `length` ASC;
-]]
+NoteChartList.checkCacheData = function(self, cacheData)
+	return
+		cacheData.container == 0 and
+		cacheData.path:find(self.basePath, 1, true)
+end
+
+NoteChartList.sortItemsFunction = function(a, b)
+	a, b = a.cacheData, b.cacheData
+	if
+		#a.inputMode < #b.inputMode or
+		#a.inputMode == #b.inputMode and a.inputMode < b.inputMode or
+		a.inputMode == b.inputMode and a.noteCount / a.length < b.noteCount / b.length
+	then
+		return true
+	end
+end
+
+-- NoteChartList.selectRequest = [[
+	-- SELECT * FROM `cache`
+	-- WHERE `container` == 0 AND
+	-- INSTR(`path`, ? || "/") == 1
+	-- ORDER BY
+	-- length(`inputMode`) ASC,
+	-- `inputMode` ASC,
+	-- `noteCount` / `length` ASC;
+-- ]]
 
 return NoteChartList

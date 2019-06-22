@@ -1,10 +1,10 @@
 local aquafonts = require("aqua.assets.fonts")
 local CS = require("aqua.graphics.CS")
-local Button = require("aqua.ui.Button")
+local Theme = require("aqua.ui.Theme")
 local spherefonts = require("sphere.assets.fonts")
 local ModifierManager = require("sphere.game.ModifierManager")
 
-local ModifierDisplay = Button:new()
+local ModifierDisplay = Theme.Button:new()
 
 ModifierDisplay.sender = "ModifierDisplay"
 
@@ -44,7 +44,7 @@ end
 
 ModifierDisplay.reload = function(self)
 	self.cs:reload()
-	Button.reload(self)
+	Theme.Button.reload(self)
 	self:updateText()
 end
 

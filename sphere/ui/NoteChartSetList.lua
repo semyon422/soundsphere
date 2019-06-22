@@ -4,8 +4,11 @@ local ScreenManager = require("sphere.screen.ScreenManager")
 local GameplayScreen = require("sphere.screen.GameplayScreen")
 local CacheList = require("sphere.ui.CacheList")
 local PreviewManager = require("sphere.ui.PreviewManager")
+local SearchLine = require("sphere.ui.SearchLine")
 
 local NoteChartSetList = CacheList:new()
+
+SearchLine.observable:add(NoteChartSetList)
 
 NoteChartSetList.sender = "NoteChartSetList"
 
@@ -22,6 +25,9 @@ NoteChartSetList.observable = Observable:new()
 
 NoteChartSetList.basePath = "userdata/charts"
 NoteChartSetList.keyControl = true
+NoteChartSetList.needItemsSort = true
+NoteChartSetList.needSearch = false
+NoteChartSetList.searchString = ""
 
 NoteChartSetList.cs = CS:new({
 	bx = 0,
@@ -64,15 +70,50 @@ NoteChartSetList.receive = function(self, event)
 		if key == "lctrl" or key == "rctrl" then
 			self.keyControl = true
 		end
+	elseif event.name == "search" then
+		if event.text == "" then
+			self.needSearch = false
+			self.searchString = ""
+		else
+			self.needSearch = true
+			self.searchString = event.text
+		end
+		self:selectCache()
+		self:unloadButtons()
+		self:calculateButtons()
 	end
 	
 	return CacheList.receive(self, event)
 end
 
-NoteChartSetList.selectRequest = [[
-	SELECT * FROM `cache`
-	WHERE `container` == 1 AND INSTR(`path`, ? || "/") == 1
-	ORDER BY `path`;
-]]
+NoteChartSetList.checkCacheData = function(self, cacheData)
+	local base = cacheData.container == 1 and cacheData.path:find(self.basePath, 1, true)
+	if not base then return false end
+	if not self.needSearch then return true end
+	
+	local searchString = self.searchString:lower()
+	if
+		cacheData.path and cacheData.path:lower():find(searchString, 1, true) or
+		cacheData.artist and cacheData.artist:lower():find(searchString, 1, true) or
+		cacheData.title and cacheData.title:lower():find(searchString, 1, true) or
+		cacheData.name and cacheData.name:lower():find(searchString, 1, true) or
+		cacheData.source and cacheData.source:lower():find(searchString, 1, true) or
+		cacheData.tags and cacheData.tags:lower():find(searchString, 1, true) or
+		cacheData.creator and cacheData.creator:lower():find(searchString, 1, true) or
+		cacheData.inputMode and cacheData.inputMode:lower():find(searchString, 1, true)
+	then
+		return true
+	end
+end
+
+NoteChartSetList.sortItemsFunction = function(a, b)
+	return a.cacheData.path < b.cacheData.path
+end
+
+-- NoteChartSetList.selectRequest = [[
+	-- SELECT * FROM `cache`
+	-- WHERE `container` == 1 AND INSTR(`path`, ? || "/") == 1
+	-- ORDER BY `path`;
+-- ]]
 
 return NoteChartSetList

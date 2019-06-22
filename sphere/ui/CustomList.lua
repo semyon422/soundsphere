@@ -4,7 +4,7 @@ local CS = require("aqua.graphics.CS")
 local Rectangle = require("aqua.graphics.Rectangle")
 local Stencil = require("aqua.graphics.Stencil")
 local Observable = require("aqua.util.Observable")
-local Button = require("aqua.ui.Button")
+local Theme = require("aqua.ui.Theme")
 local sign = require("aqua.math").sign
 local belong = require("aqua.math").belong
 local spherefonts = require("sphere.assets.fonts")
@@ -68,9 +68,10 @@ end
 CustomList.setItems = function(self, items)
 	self.items = items
 	
-	if self.focusedItemIndex > #items then
-		self.focusedItemIndex = #items
-		self.visualItemIndex = #items
+	local numItems = math.max(1, #items)
+	if self.focusedItemIndex > numItems then
+		self.focusedItemIndex = numItems
+		self.visualItemIndex = numItems
 	end
 end
 
@@ -310,7 +311,7 @@ CustomList.unloadButtons = function(self)
 	self.buttons = nil
 end
 
-CustomList.Button = Button:new()
+CustomList.Button = Theme.Button:new()
 
 CustomList.Button.update = function(self)
 	self.x = self.list.x

@@ -1,4 +1,4 @@
-local Button =  require("aqua.ui.Button")
+local Theme = require("aqua.ui.Theme")
 local aquafonts = require("aqua.assets.fonts")
 local spherefonts = require("sphere.assets.fonts")
 local CS = require("aqua.graphics.CS")
@@ -22,7 +22,7 @@ NotificationLine.init = function(self)
 	
 	self.state = 0
 	
-	self.button = Button:new({
+	self.button = Theme.Button:new({
 		text = "",
 		x = 0,
 		y = 8 / 17,

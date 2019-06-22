@@ -6,7 +6,7 @@ local spherefonts = require("sphere.assets.fonts")
 local MetaDataTable = {}
 
 MetaDataTable.x = 0.05
-MetaDataTable.y = 0.05
+MetaDataTable.y = 0.06
 MetaDataTable.w = 1
 MetaDataTable.h = 1
 
