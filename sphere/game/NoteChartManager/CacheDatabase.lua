@@ -130,6 +130,9 @@ CacheDatabase.update = function(self, path, recursive, callback)
 			]],
 			{path, recursive},
 			function(result)
+				if not result[1] then
+					print(result[2])
+				end
 				callback()
 				self.isUpdating = false
 			end
@@ -187,7 +190,7 @@ CacheDatabase.lookup = function(self, directoryPath, recursive)
 end
 
 CacheDatabase.processNoteChartSet = function(self, chartPaths, directoryPath)
-	local cacheDatas = CacheDatabaseDataFactory:getCacheDatabaseDatas(chartPaths)
+	local cacheDatas = CacheDataFactory:getCacheDatas(chartPaths)
 	
 	for i = 1, #cacheDatas do
 		print(cacheDatas[i].path)
