@@ -2,12 +2,13 @@ local NoteChart = require("ncdk.NoteChart")
 local bms = require("bms")
 local osu = require("osu")
 local o2jam = require("o2jam")
+local ksm = require("ksm")
 local quaver = require("quaver")
 
 local NoteChartFactory = {}
 
 local patterns = {
-	"%.osu$", "%.bm[sel]$", "%.ojn$", "%.qua$", "%.sph$"
+	"%.osu$", "%.bm[sel]$", "%.ojn$", "%.qua$", "%.ksh$", "%.sph$"
 }
 
 NoteChartFactory.isNoteChart = function(self, path)
@@ -29,6 +30,8 @@ NoteChartFactory.getNoteChart = function(self, path)
 		noteChartImporter = quaver.NoteChartImporter:new()
 	elseif path:find("%.bm[sel]$") then
 		noteChartImporter = bms.NoteChartImporter:new()
+	elseif path:find("%.ksh$") then
+		noteChartImporter = ksm.NoteChartImporter:new()
 	elseif path:find("%.ojn/.$") then
 		noteChartImporter = o2jam.NoteChartImporter:new()
 		chartIndex = tonumber(path:sub(-1, -1))
@@ -45,7 +48,11 @@ NoteChartFactory.getNoteChart = function(self, path)
 	noteChartImporter.chartIndex = chartIndex
 	
 	local status, err = pcall(function()
-		return noteChartImporter:import(file:read():gsub("\r\n", "\n"))
+		local content = file:read():gsub("\r\n", "\n")
+		if content:sub(1, 3) == string.char(0xEF, 0xBB, 0xBF) then
+			content = content:sub(4, -1)
+		end
+		return noteChartImporter:import(content)
 	end)
 	
 	if not status then

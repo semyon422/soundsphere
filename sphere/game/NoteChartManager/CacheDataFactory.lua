@@ -4,6 +4,7 @@ local bms = require("bms")
 local osu = require("osu")
 local o2jam = require("o2jam")
 local quaver = require("quaver")
+local ksm = require("ksm")
 local utf8 = require("utf8")
 
 local CacheDataFactory = {}
@@ -18,6 +19,8 @@ CacheDataFactory.getCacheDatas = function(self, chartPaths)
 		return self:getBMS(chartPaths)
 	elseif path:find("%.ojn$") then
 		return self:getO2Jam(chartPaths)
+	elseif path:find("%.ksh$") then
+		return self:getKSM(chartPaths)
 	elseif path:find("%.sph$") then
 		return self:getSphere(chartPaths)
 	end
@@ -175,6 +178,55 @@ CacheDataFactory.getOsu = function(self, chartPaths)
 				noteCount = noteChart:hashGet("noteCount"),
 				length = noteChart:hashGet("totalLength") / 1000,
 				bpm = noteChart:hashGet("primaryBPM"),
+				inputMode = noteChart.inputMode:getString()
+			}
+		end
+	end
+	
+	if #cacheDatas > 0 then
+		cacheDatas[#cacheDatas + 1] = {
+			path = cacheDatas[1].path:match("^(.+)/.-"),
+			container = 1,
+			
+			title = cacheDatas[1].title,
+			artist = cacheDatas[1].artist,
+			source = cacheDatas[1].source,
+			tags = cacheDatas[1].tags,
+			creator = cacheDatas[1].creator,
+			audioPath = cacheDatas[1].audioPath,
+			stagePath = cacheDatas[1].stagePath,
+			previewTime = cacheDatas[1].previewTime
+		}
+	end
+	
+	return cacheDatas
+end
+
+CacheDataFactory.getKSM = function(self, chartPaths)
+	local cacheDatas = {}
+	
+	for i = 1, #chartPaths do
+		local path = chartPaths[i]
+		local noteChart = NoteChartFactory:getNoteChart(path)
+		
+		if noteChart then
+			cacheDatas[#cacheDatas + 1] = {
+				path = path,
+				hash = "",
+				container = 0,
+				title = fix(noteChart:hashGet("title")),
+				artist = fix(noteChart:hashGet("artist")),
+				source = "KSM",
+				tags = "",
+				name = fix(noteChart:hashGet("difficulty")),
+				level = fix(noteChart:hashGet("level")),
+				creator = fix(noteChart:hashGet("effect")),
+				audioPath = fix(noteChart:hashGet("m")),
+				stagePath = fix(noteChart:hashGet("jacket")),
+				previewTime = (noteChart:hashGet("plength") or 0) / 1000,
+				noteCount = noteChart:hashGet("noteCount"),
+				length = noteChart:hashGet("totalLength") / 1000,
+				bpm = 0,
 				inputMode = noteChart.inputMode:getString()
 			}
 		end

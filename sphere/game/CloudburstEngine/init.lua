@@ -228,6 +228,10 @@ CloudburstEngine.getNoteHandler = function(self, inputType, inputIndex)
 		inputType == "key" or
 		inputType == "scratch" or
 		inputType == "measure" or
+		inputType == "bt" or
+		inputType == "fx" or
+		inputType == "laserleft" or
+		inputType == "laserright" or
 		inputType == "auto"
 	then
 		return NoteHandler:new({
@@ -267,6 +271,10 @@ CloudburstEngine.getNoteDrawer = function(self, layerIndex, inputType, inputInde
 		inputType == "key" or
 		inputType == "scratch" or
 		inputType == "measure" or
+		inputType == "bt" or
+		inputType == "fx" or
+		inputType == "laserleft" or
+		inputType == "laserright" or
 		inputType == "auto"
 	then
 		return NoteDrawer:new({
