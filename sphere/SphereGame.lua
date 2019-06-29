@@ -10,6 +10,7 @@ local Cache = require("sphere.game.NoteChartManager.Cache")
 local CacheDatabase = require("sphere.game.NoteChartManager.CacheDatabase")
 local Config = require("sphere.game.Config")
 
+local DiscordPresence = require("sphere.game.DiscordPresence")
 local MountManager = require("sphere.game.MountManager")
 local WindowManager = require("sphere.game.WindowManager")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
@@ -43,6 +44,8 @@ SphereGame.load = function(self)
 	Config:read()
 	Config:write()
 	
+	DiscordPresence:load()
+	
 	aquaio.fpslimit = Config.data.fps
 	
 	BackgroundManager:loadDrawableBackground("userdata/background.jpg")
@@ -52,6 +55,7 @@ end
 
 SphereGame.unload = function(self)
 	ScreenManager:unload()
+	DiscordPresence:unload()
 	-- MountManager:unmount()
 	Config:write()
 end
@@ -59,6 +63,7 @@ end
 SphereGame.update = function(self, dt)
 	ThreadPool:update()
 	
+	DiscordPresence:update()
 	BackgroundManager:update(dt)
 	NotificationLine:update()
 	ScreenManager:update(dt)

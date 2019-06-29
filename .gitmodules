@@ -25,3 +25,6 @@
 [submodule "resources"]
 	path = resources
 	url = https://github.com/semyon422/soundsphere-resources
+[submodule "discordrpc"]
+	path = discordrpc
+	url = https://github.com/pfirsich/lua-discordRPC
