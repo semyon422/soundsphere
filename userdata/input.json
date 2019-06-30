@@ -49,6 +49,18 @@
 	["7key1scratch:scratch1", "q"],
 	
 	
+	["4bt2fx2laserleft2laserright:laserleft1", "q"],
+	["4bt2fx2laserleft2laserright:laserright1", "w"],
+	["4bt2fx2laserleft2laserright:bt1", "e"],
+	["4bt2fx2laserleft2laserright:bt2", "r"],
+	["4bt2fx2laserleft2laserright:fx1", "space"],
+	["4bt2fx2laserleft2laserright:fx2", "ralt"],
+	["4bt2fx2laserleft2laserright:bt3", "p"],
+	["4bt2fx2laserleft2laserright:bt4", "["],
+	["4bt2fx2laserleft2laserright:laserleft2", "]"],
+	["4bt2fx2laserleft2laserright:laserright2", "\\"],
+	
+	
 	["10key:key1", "q"],
 	["10key:key2", "w"],
 	["10key:key3", "e"],
