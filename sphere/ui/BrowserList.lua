@@ -18,6 +18,7 @@ BrowserList.buttonCount = 17
 BrowserList.middleOffset = 9
 BrowserList.startOffset = 9
 BrowserList.endOffset = 9
+BrowserList.needItemsSort = true
 
 BrowserList.observable = Observable:new()
 
@@ -58,19 +59,31 @@ BrowserList.receive = function(self, event)
 	return CacheList.receive(self, event)
 end
 
+BrowserList.sortItemsFunction = function(a, b)
+	return a.cacheData.path < b.cacheData.path
+end
+
 BrowserList.getItemName = function(self, cacheData)
 	local directoryPath, folderName = cacheData.path:match("^(.+)/(.-)$")
 	return (" "):rep(#directoryPath) .. folderName
 end
 
-BrowserList.checkCacheData = function(self, cacheData)
-	return cacheData.container == 2 and cacheData.path:find(self.basePath)
+BrowserList.selectCache = function(self)
+	local items = {}
+	
+	local packList = Cache.packList
+	for i = 1, #packList do
+		local packData = packList[i]
+		if packData.path:find(self.basePath) then
+			items[#items + 1] = self:getItem(packData)
+		end
+	end
+	
+	if self.needItemsSort then
+		table.sort(items, self.sortItemsFunction)
+	end
+	
+	return self:setItems(items)
 end
-
--- BrowserList.selectRequest = [[
-	-- SELECT * FROM `cache`
-	-- WHERE `container` == 2 AND INSTR(`path`, ?) == 1
-	-- ORDER BY `path`;
--- ]]
 
 return BrowserList

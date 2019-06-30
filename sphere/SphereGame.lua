@@ -7,7 +7,6 @@ local SelectionScreen = require("sphere.screen.SelectionScreen")
 local ScreenManager = require("sphere.screen.ScreenManager")
 
 local Cache = require("sphere.game.NoteChartManager.Cache")
-local CacheDatabase = require("sphere.game.NoteChartManager.CacheDatabase")
 local Config = require("sphere.game.Config")
 
 local DiscordPresence = require("sphere.game.DiscordPresence")
@@ -38,8 +37,6 @@ SphereGame.run = function(self)
 end
 
 SphereGame.load = function(self)
-	CacheDatabase:load()
-	Cache:load()
 	Cache:select()
 	Config:read()
 	Config:write()

@@ -7,13 +7,25 @@ local quaver = require("quaver")
 
 local NoteChartFactory = {}
 
-local patterns = {
-	"%.osu$", "%.bm[sel]$", "%.ojn$", "%.qua$", "%.ksh$", "%.sph$"
+local chartPatterns = {
+	"%.osu$", "%.bm[sel]$", "%.qua$", "%.ksh$", "%.sph$"
+}
+
+local containerPatterns = {
+	"%.ojn$"
 }
 
 NoteChartFactory.isNoteChart = function(self, path)
-	for i = 1, #patterns do
-		if path:find(patterns[i]) then
+	for i = 1, #chartPatterns do
+		if path:find(chartPatterns[i]) then
+			return true
+		end
+	end
+end
+
+NoteChartFactory.isNoteChartContainer = function(self, path)
+	for i = 1, #containerPatterns do
+		if path:find(containerPatterns[i]) then
 			return true
 		end
 	end

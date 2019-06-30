@@ -5,6 +5,7 @@ local GameplayScreen = require("sphere.screen.GameplayScreen")
 local CacheList = require("sphere.ui.CacheList")
 local PreviewManager = require("sphere.ui.PreviewManager")
 local SearchLine = require("sphere.ui.SearchLine")
+local Cache = require("sphere.game.NoteChartManager.Cache")
 
 local NoteChartSetList = CacheList:new()
 
@@ -88,7 +89,7 @@ NoteChartSetList.receive = function(self, event)
 end
 
 NoteChartSetList.checkCacheData = function(self, cacheData)
-	local base = cacheData.container == 1 and cacheData.path:find(self.basePath, 1, true)
+	local base = cacheData.path:find(self.basePath, 1, true)
 	if not base then return false end
 	if not self.needSearch then return true end
 	
@@ -111,10 +112,22 @@ NoteChartSetList.sortItemsFunction = function(a, b)
 	return a.cacheData.path < b.cacheData.path
 end
 
--- NoteChartSetList.selectRequest = [[
-	-- SELECT * FROM `cache`
-	-- WHERE `container` == 1 AND INSTR(`path`, ? || "/") == 1
-	-- ORDER BY `path`;
--- ]]
+NoteChartSetList.selectCache = function(self)
+	local items = {}
+	
+	local chartSetList = Cache.chartSetList
+	for i = 1, #chartSetList do
+		local chartSetData = chartSetList[i]
+		if self:checkCacheData(chartSetData) then
+			items[#items + 1] = self:getItem(chartSetData)
+		end
+	end
+	
+	if self.needItemsSort then
+		table.sort(items, self.sortItemsFunction)
+	end
+	
+	return self:setItems(items)
+end
 
 return NoteChartSetList

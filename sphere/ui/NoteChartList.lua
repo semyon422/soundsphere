@@ -4,6 +4,7 @@ local ScreenManager = require("sphere.screen.ScreenManager")
 local GameplayScreen = require("sphere.screen.GameplayScreen")
 local CacheList = require("sphere.ui.CacheList")
 local PreviewManager = require("sphere.ui.PreviewManager")
+local Cache = require("sphere.game.NoteChartManager.Cache")
 
 local NoteChartList = CacheList:new()
 
@@ -45,7 +46,7 @@ end
 NoteChartList.receive = function(self, event)
 	if event.action == "scrollTarget" then
 		local item = event.list.items[event.itemIndex]
-		if item and item.cacheData and item.cacheData.container == 1 then
+		if item and item.cacheData and event.list.sender == "NoteChartSetList" then
 			self:setBasePath(item.cacheData.path)
 		end
 	elseif event.name == "keypressed" then
@@ -63,12 +64,6 @@ NoteChartList.receive = function(self, event)
 	return CacheList.receive(self, event)
 end
 
-NoteChartList.checkCacheData = function(self, cacheData)
-	return
-		cacheData.container == 0 and
-		cacheData.path:find(self.basePath, 1, true)
-end
-
 NoteChartList.sortItemsFunction = function(a, b)
 	a, b = a.cacheData, b.cacheData
 	if
@@ -80,14 +75,22 @@ NoteChartList.sortItemsFunction = function(a, b)
 	end
 end
 
--- NoteChartList.selectRequest = [[
-	-- SELECT * FROM `cache`
-	-- WHERE `container` == 0 AND
-	-- INSTR(`path`, ? || "/") == 1
-	-- ORDER BY
-	-- length(`inputMode`) ASC,
-	-- `inputMode` ASC,
-	-- `noteCount` / `length` ASC;
--- ]]
+NoteChartList.selectCache = function(self)
+	local items = {}
+	
+	local chartList = Cache.chartList
+	for i = 1, #chartList do
+		local chartData = chartList[i]
+		if chartData.path:find(self.basePath, 1, true) then
+			items[#items + 1] = self:getItem(chartData)
+		end
+	end
+	
+	if self.needItemsSort then
+		table.sort(items, self.sortItemsFunction)
+	end
+	
+	return self:setItems(items)
+end
 
 return NoteChartList

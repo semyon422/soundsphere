@@ -110,7 +110,6 @@ CacheDataFactory.getBMS = function(self, chartPaths)
 			cacheDatas[#cacheDatas + 1] = {
 				path = path,
 				hash = "",
-				container = 0,
 				title = fix(noteChart:hashGet("TITLE")),
 				artist = fix(noteChart:hashGet("ARTIST")),
 				source = "BMS",
@@ -135,19 +134,6 @@ CacheDataFactory.getBMS = function(self, chartPaths)
 		else
 			self:processCacheDataNames(cacheDatas)
 		end
-		cacheDatas[#cacheDatas + 1] = {
-			path = cacheDatas[1].path:match("^(.+)/.-"),
-			container = 1,
-			
-			title = cacheDatas[1].title,
-			artist = cacheDatas[1].artist,
-			source = cacheDatas[1].source,
-			tags = cacheDatas[1].tags,
-			creator = cacheDatas[1].creator,
-			audioPath = cacheDatas[1].audioPath,
-			stagePath = cacheDatas[1].stagePath,
-			previewTime = cacheDatas[1].previewTime
-		}
 	end
 	
 	return cacheDatas
@@ -164,7 +150,6 @@ CacheDataFactory.getOsu = function(self, chartPaths)
 			cacheDatas[#cacheDatas + 1] = {
 				path = path,
 				hash = "",
-				container = 0,
 				title = fix(noteChart:hashGet("Title")),
 				artist = fix(noteChart:hashGet("Artist")),
 				source = fix(noteChart:hashGet("Source")),
@@ -183,22 +168,6 @@ CacheDataFactory.getOsu = function(self, chartPaths)
 		end
 	end
 	
-	if #cacheDatas > 0 then
-		cacheDatas[#cacheDatas + 1] = {
-			path = cacheDatas[1].path:match("^(.+)/.-"),
-			container = 1,
-			
-			title = cacheDatas[1].title,
-			artist = cacheDatas[1].artist,
-			source = cacheDatas[1].source,
-			tags = cacheDatas[1].tags,
-			creator = cacheDatas[1].creator,
-			audioPath = cacheDatas[1].audioPath,
-			stagePath = cacheDatas[1].stagePath,
-			previewTime = cacheDatas[1].previewTime
-		}
-	end
-	
 	return cacheDatas
 end
 
@@ -213,7 +182,6 @@ CacheDataFactory.getKSM = function(self, chartPaths)
 			cacheDatas[#cacheDatas + 1] = {
 				path = path,
 				hash = "",
-				container = 0,
 				title = fix(noteChart:hashGet("title")),
 				artist = fix(noteChart:hashGet("artist")),
 				source = "KSM",
@@ -232,22 +200,6 @@ CacheDataFactory.getKSM = function(self, chartPaths)
 		end
 	end
 	
-	if #cacheDatas > 0 then
-		cacheDatas[#cacheDatas + 1] = {
-			path = cacheDatas[1].path:match("^(.+)/.-"),
-			container = 1,
-			
-			title = cacheDatas[1].title,
-			artist = cacheDatas[1].artist,
-			source = cacheDatas[1].source,
-			tags = cacheDatas[1].tags,
-			creator = cacheDatas[1].creator,
-			audioPath = cacheDatas[1].audioPath,
-			stagePath = cacheDatas[1].stagePath,
-			previewTime = cacheDatas[1].previewTime
-		}
-	end
-	
 	return cacheDatas
 end
 
@@ -262,7 +214,6 @@ CacheDataFactory.getQuaver = function(self, chartPaths)
 			cacheDatas[#cacheDatas + 1] = {
 				path = path,
 				hash = "",
-				container = 0,
 				title = fix(noteChart:hashGet("Title") or ""),
 				artist = fix(noteChart:hashGet("Artist") or ""),
 				source = fix(noteChart:hashGet("Source") or ""),
@@ -279,22 +230,6 @@ CacheDataFactory.getQuaver = function(self, chartPaths)
 				inputMode = noteChart.inputMode:getString()
 			}
 		end
-	end
-	
-	if #cacheDatas > 0 then
-		cacheDatas[#cacheDatas + 1] = {
-			path = cacheDatas[1].path:match("^(.+)/.-"),
-			container = 1,
-			
-			title = cacheDatas[1].title,
-			artist = cacheDatas[1].artist,
-			source = cacheDatas[1].source,
-			tags = cacheDatas[1].tags,
-			creator = cacheDatas[1].creator,
-			audioPath = cacheDatas[1].audioPath,
-			stagePath = cacheDatas[1].stagePath,
-			previewTime = cacheDatas[1].previewTime
-		}
 	end
 	
 	return cacheDatas
@@ -315,7 +250,6 @@ CacheDataFactory.getO2Jam = function(self, chartPaths)
 			cacheDatas[#cacheDatas + 1] = {
 				path = path .. "/" .. i,
 				hash = "",
-				container = 0,
 				title = fix(ojn.str_title),
 				artist = fix(ojn.str_artist),
 				source = "o2jam",
@@ -332,29 +266,6 @@ CacheDataFactory.getO2Jam = function(self, chartPaths)
 				inputMode = "7key"
 			}
 		end
-		
-		local lastCacheData = cacheDatas[#cacheDatas]
-		cacheDatas[#cacheDatas + 1] = {
-			path = lastCacheData.path:match("^(.+)/.-"),
-			container = 1,
-			
-			title = lastCacheData.title,
-			artist = lastCacheData.artist,
-			source = lastCacheData.source,
-			tags = lastCacheData.tags,
-			creator = lastCacheData.creator,
-			audioPath = lastCacheData.audioPath,
-			stagePath = lastCacheData.stagePath,
-			previewTime = lastCacheData.previewTime
-		}
-	end
-	
-	if #cacheDatas > 0 then
-		cacheDatas[#cacheDatas + 1] = {
-			path = cacheDatas[1].path:match("^(.+)/.-/.-"),
-			container = 2,
-			title = cacheDatas[1].path:match("^.+/(.-)/.-/.-$"),
-		}
 	end
 	
 	return cacheDatas
@@ -373,7 +284,6 @@ CacheDataFactory.getSphere = function(self, chartPaths)
 		cacheDatas[#cacheDatas + 1] = {
 			path = path,
 			hash = "",
-			container = 0,
 			title = data.title,
 			artist = data.artist,
 			source = data.source,
@@ -388,22 +298,6 @@ CacheDataFactory.getSphere = function(self, chartPaths)
 			length = data.length,
 			bpm = data.bpm,
 			inputMode = data.inputMode
-		}
-	end
-	
-	if #cacheDatas > 0 then
-		cacheDatas[#cacheDatas + 1] = {
-			path = cacheDatas[1].path:match("^(.+)/.-"),
-			container = 1,
-			
-			title = cacheDatas[1].title,
-			artist = cacheDatas[1].artist,
-			source = cacheDatas[1].source,
-			tags = cacheDatas[1].tags,
-			creator = cacheDatas[1].creator,
-			audioPath = cacheDatas[1].audioPath,
-			stagePath = cacheDatas[1].stagePath,
-			previewTime = cacheDatas[1].previewTime
 		}
 	end
 	

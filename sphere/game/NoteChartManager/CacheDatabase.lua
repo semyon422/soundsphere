@@ -8,10 +8,12 @@ local CacheDatabase = {}
 CacheDatabase.dbpath = "userdata/cache.sqlite"
 CacheDatabase.chartspath = "userdata/charts"
 
-CacheDatabase.colnames = {
-	"path",
+CacheDatabase.chartColumns = {
+	"id",
+	"chartSetId",
+	"packId",
 	"hash",
-	"container",
+	"path",
 	"title",
 	"artist",
 	"source",
@@ -28,14 +30,32 @@ CacheDatabase.colnames = {
 	"inputMode"
 }
 
+CacheDatabase.chartSetColumns = {
+	"id",
+	"packId",
+	"path"
+}
+
+CacheDatabase.packColumns = {
+	"id",
+	"path"
+}
+
+CacheDatabase.unload = function(self)
+	self.db:close()
+end
+
 CacheDatabase.load = function(self)
 	self.db = sqlite.open(self.dbpath)
 	
 	self.db:exec[[
-		CREATE TABLE IF NOT EXISTS `cache` (
-			`path` TEXT,
-			`hash` TEXT,
-			`container` REAL,
+		CREATE TABLE IF NOT EXISTS `charts` (
+			`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			`chartSetId` INTEGER NOT NULL,
+			`packId` INTEGER NOT NULL,
+			`hash` TEXT NOT NULL DEFAULT '',
+			`path` TEXT UNIQUE,
+			
 			`title` TEXT,
 			`artist` TEXT,
 			`source` TEXT,
@@ -49,16 +69,26 @@ CacheDatabase.load = function(self)
 			`noteCount` REAL,
 			`length` REAL,
 			`bpm` REAL,
-			`inputMode` TEXT,
-			PRIMARY KEY (`path`)
+			`inputMode` TEXT
+		);
+		CREATE TABLE IF NOT EXISTS `chartSets` (
+			`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			`packId` INTEGER NOT NULL,
+			`path` TEXT UNIQUE
+		);
+		CREATE TABLE IF NOT EXISTS `packs` (
+			`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			`path` TEXT UNIQUE
 		);
 	]]
 	
-	self.insertStatement = self.db:prepare([[
-		INSERT OR IGNORE INTO `cache` (
-			path,
+	self.insertChartStatement = self.db:prepare([[
+		INSERT OR IGNORE INTO `charts` (
+			chartSetId,
+			packId,
 			hash,
-			container,
+			path,
+			
 			title,
 			artist,
 			source,
@@ -74,39 +104,61 @@ CacheDatabase.load = function(self)
 			bpm,
 			inputMode
 		)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 	]])
 	
-	self.updateStatement = self.db:prepare([[
-		UPDATE `cache` SET
-			`hash` = ?,
-			`container` = ?,
-			`title` = ?,
-			`artist` = ?,
-			`source` = ?,
-			`tags` = ?,
-			`name` = ?,
-			`level` = ?,
-			`creator` = ?,
-			`audioPath` = ?,
-			`stagePath` = ?,
-			`previewTime` = ?,
-			`noteCount` = ?,
-			`length` = ?,
-			`bpm` = ?,
-			`inputMode` = ?
+	self.updateChartStatement = self.db:prepare([[
+		UPDATE `charts` SET
+			chartSetId = ?,
+			packId = ?,
+			hash = ?,
+			path = ?,
+			
+			title = ?,
+			artist = ?,
+			source = ?,
+			tags = ?,
+			name = ?,
+			level = ?,
+			creator = ?,
+			audioPath = ?,
+			stagePath = ?,
+			previewTime = ?,
+			noteCount = ?,
+			length = ?,
+			bpm = ?,
+			inputMode = ?
 		WHERE `path` = ?;
 	]])
 	
-	self.selectStatement = self.db:prepare([[
-		SELECT * FROM `cache` WHERE path = ?
+	self.insertChartSetStatement = self.db:prepare([[
+		INSERT OR IGNORE INTO `chartSets` (
+			packId,
+			path
+		)
+		VALUES (?, ?);
 	]])
 	
-	self:setEntry({
-		path = self.chartspath,
-		container = 2,
-		title = self.chartspath:match("^.+/(.-)$"),
-	})
+	self.insertPackSetStatement = self.db:prepare([[
+		INSERT OR IGNORE INTO `packs` (
+			path
+		)
+		VALUES (?);
+	]])
+	
+	self.selectChartStatement = self.db:prepare([[
+		SELECT * FROM `charts` WHERE path = ?
+	]])
+	
+	self.selectChartSetStatement = self.db:prepare([[
+		SELECT * FROM `chartSets` WHERE path = ?
+	]])
+	
+	self.selectPackStatement = self.db:prepare([[
+		SELECT * FROM `packs` WHERE path = ?
+	]])
+	
+	self:getPackData(self.chartspath)
 end
 
 CacheDatabase.begin = function(self)
@@ -123,14 +175,12 @@ CacheDatabase.update = function(self, path, recursive, callback)
 			[[
 				local path, recursive = ...
 				local CacheDatabase = require("sphere.game.NoteChartManager.CacheDatabase")
-				if not CacheDatabase.db then CacheDatabase:load() end
+				CacheDatabase:load()
 				CacheDatabase:lookup(path, recursive)
+				CacheDatabase:unload()
 			]],
 			{path, recursive},
 			function(result)
-				if not result[1] then
-					print(result[2])
-				end
 				callback()
 				self.isUpdating = false
 			end
@@ -139,87 +189,115 @@ CacheDatabase.update = function(self, path, recursive, callback)
 	end
 end
 
-CacheDatabase.rowByPath = function(self, path)
-	return self.selectStatement:reset():bind(path):step()
+-- CacheDatabase.getChartData = function(self, path)
+	-- return self.selectChartStatement:reset():bind(path):step()
+-- end
+
+CacheDatabase.checkChartSetData = function(self, path)
+	return self.selectChartSetStatement:reset():bind(path):step()
+end
+
+CacheDatabase.checkPackData = function(self, path)
+	return self.selectPackStatement:reset():bind(path):step()
+end
+
+CacheDatabase.getChartSetData = function(self, packId, path)
+	self.insertChartSetStatement:reset():bind(packId, path):step()
+	return self.selectChartSetStatement:reset():bind(path):step()
+end
+
+CacheDatabase.getPackData = function(self, path)
+	self.insertPackSetStatement:reset():bind(path):step()
+	return self.selectPackStatement:reset():bind(path):step()
 end
 
 CacheDatabase.lookup = function(self, directoryPath, recursive)
 	if love.filesystem.isFile(directoryPath) then
-		return -1
+		return
 	end
 	
 	local items = love.filesystem.getDirectoryItems(directoryPath)
 	
-	local chartPaths = {}
-	local containers = 0
+	local containerPaths = {}
+	for _, itemName in ipairs(items) do
+		local path = directoryPath .. "/" .. itemName
+		if love.filesystem.isFile(path) and NoteChartFactory:isNoteChartContainer(path) then
+			containerPaths[#containerPaths + 1] = path
+			self:lookupContainer(path)
+		end
+	end
+	if #containerPaths > 0 then
+		return
+	end
 	
+	local chartPaths = {}
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
 		if love.filesystem.isFile(path) and NoteChartFactory:isNoteChart(path) then
 			chartPaths[#chartPaths + 1] = path
 		end
 	end
-	
 	if #chartPaths > 0 then
 		self:processNoteChartSet(chartPaths, directoryPath)
-		return 1
+		return
 	end
 	
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
-		if love.filesystem.isDirectory(path) and (recursive or not self:rowByPath(path)) then
-			if self:lookup(path, true) > 0 then
-				containers = containers + 1
+		if love.filesystem.isDirectory(path) and (recursive or not self:checkChartSetData(path) and not self:checkPackData(path)) then
+			self:lookup(path, true)
+			if not self:checkChartSetData(path) then
+				self:getPackData(path)
 			end
 		end
 	end
+end
+
+CacheDatabase.lookupContainer = function(self, containerPath)
+	print(containerPath)
+	local packData = self:getPackData(containerPath:match("^(.+)/.-$"))
+	local chartSetData = self:getChartSetData(packData[1], containerPath)
 	
-	if containers > 0 then
-		self:setEntry({
-			path = directoryPath,
-			container = 2,
-			title = directoryPath:match("^.+/(.-)$"),
-		})
+	local cacheDatas = CacheDataFactory:getCacheDatas({containerPath})
+	
+	self:begin()
+	for i = 1, #cacheDatas do
+		local cacheData = cacheDatas[i]
 		
-		return 2
+		cacheData.chartSetId = chartSetData[1]
+		cacheData.packId = packData[1]
+		
+		self:setChartData(cacheData)
 	end
-	
-	return -1
+	self:commit()
 end
 
 CacheDatabase.processNoteChartSet = function(self, chartPaths, directoryPath)
+	print(directoryPath)
+	local packData = self:getPackData(directoryPath:match("^(.+)/.-$"))
+	local chartSetData = self:getChartSetData(packData[1], directoryPath)
+	
 	local cacheDatas = CacheDataFactory:getCacheDatas(chartPaths)
 	
 	self:begin()
 	for i = 1, #cacheDatas do
-		self:setEntry(cacheDatas[i])
+		local cacheData = cacheDatas[i]
+		
+		cacheData.chartSetId = chartSetData[1]
+		cacheData.packId = packData[1]
+		
+		self:setChartData(cacheData)
 	end
-	print(cacheDatas[#cacheDatas].path)
 	self:commit()
 end
 
-CacheDatabase.select = function(self)
-	local data = {}
-	
-	for _, cacheData in pairs(self.data) do
-		table.insert(data, cacheData)
-	end
-	
-	local cacheDataIndex = 1
-	
-	return function()
-		local cacheData = data[cacheDataIndex]
-		cacheDataIndex = cacheDataIndex + 1
-		
-		return cacheData
-	end
-end
-
-CacheDatabase.setEntry = function(self, cacheData)
-	self.insertStatement:reset():bind(
-		cacheData.path,
+CacheDatabase.setChartData = function(self, cacheData)
+	self.insertChartStatement:reset():bind(
+		cacheData.chartSetId,
+		cacheData.packId,
 		cacheData.hash,
-		cacheData.container,
+		cacheData.path,
+		
 		cacheData.title,
 		cacheData.artist,
 		cacheData.source,
@@ -235,9 +313,12 @@ CacheDatabase.setEntry = function(self, cacheData)
 		cacheData.bpm,
 		cacheData.inputMode
 	):step()
-	self.updateStatement:reset():bind(
+	self.updateChartStatement:reset():bind(
+		cacheData.chartSetId,
+		cacheData.packId,
 		cacheData.hash,
-		cacheData.container,
+		cacheData.path,
+		
 		cacheData.title,
 		cacheData.artist,
 		cacheData.source,
@@ -252,6 +333,7 @@ CacheDatabase.setEntry = function(self, cacheData)
 		cacheData.length,
 		cacheData.bpm,
 		cacheData.inputMode,
+		
 		cacheData.path
 	):step()
 end
