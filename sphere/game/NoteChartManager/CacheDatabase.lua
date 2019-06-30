@@ -124,9 +124,7 @@ CacheDatabase.update = function(self, path, recursive, callback)
 				local path, recursive = ...
 				local CacheDatabase = require("sphere.game.NoteChartManager.CacheDatabase")
 				if not CacheDatabase.db then CacheDatabase:load() end
-				CacheDatabase:begin()
 				CacheDatabase:lookup(path, recursive)
-				CacheDatabase:commit()
 			]],
 			{path, recursive},
 			function(result)
@@ -192,10 +190,12 @@ end
 CacheDatabase.processNoteChartSet = function(self, chartPaths, directoryPath)
 	local cacheDatas = CacheDataFactory:getCacheDatas(chartPaths)
 	
+	self:begin()
 	for i = 1, #cacheDatas do
-		print(cacheDatas[i].path)
 		self:setEntry(cacheDatas[i])
 	end
+	print(cacheDatas[#cacheDatas].path)
+	self:commit()
 end
 
 CacheDatabase.select = function(self)

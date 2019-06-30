@@ -2,6 +2,8 @@ local CS = require("aqua.graphics.CS")
 local Observable = require("aqua.util.Observable")
 local CacheList = require("sphere.ui.CacheList")
 local NoteChartSetList = require("sphere.ui.NoteChartSetList")
+local Cache = require("sphere.game.NoteChartManager.Cache")
+local NotificationLine = require("sphere.ui.NotificationLine")
 
 local BrowserList = CacheList:new()
 
@@ -36,11 +38,24 @@ BrowserList.send = function(self, event)
 		if event.button == 1 then
 			NoteChartSetList:setBasePath(cacheData.path)
 		elseif event.button == 2 then
-			self:updateCache(cacheData.path)
+			local recursive = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
+			self:updateCache(cacheData.path, recursive)
 		end
 	end
 	
 	return CacheList.send(self, event)
+end
+
+BrowserList.receive = function(self, event)
+	if event.name == "keypressed" then
+		local key = event.args[1]
+		if key == "f5" then
+			Cache:select()
+			NotificationLine:notify("Cache reloaded from database")
+		end
+	end
+	
+	return CacheList.receive(self, event)
 end
 
 BrowserList.getItemName = function(self, cacheData)

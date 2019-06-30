@@ -45,7 +45,8 @@ NoteChartSetList.send = function(self, event)
 	elseif event.action == "buttonInteract" then
 		local cacheData = self.items[event.itemIndex].cacheData
 		if event.button == 2 then
-			self:updateCache(cacheData.path)
+			local recursive = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
+			self:updateCache(cacheData.path, recursive)
 		end
 	elseif event.action == "return" then
 		local cacheData = self.NoteChartList.items[self.NoteChartList.focusedItemIndex].cacheData
