@@ -275,12 +275,12 @@ end
 
 CacheDatabase.lookupContainer = function(self, containerPath)
 	print(containerPath)
+	self:begin()
 	local packData = self:getPackData(containerPath:match("^(.+)/.-$"))
 	local chartSetData = self:getChartSetData(packData[1], containerPath)
 	
 	local cacheDatas = CacheDataFactory:getCacheDatas({containerPath})
 	
-	self:begin()
 	for i = 1, #cacheDatas do
 		local cacheData = cacheDatas[i]
 		
@@ -294,12 +294,12 @@ end
 
 CacheDatabase.processNoteChartSet = function(self, chartPaths, directoryPath)
 	print(directoryPath)
+	self:begin()
 	local packData = self:getPackData(directoryPath:match("^(.+)/.-$"))
 	local chartSetData = self:getChartSetData(packData[1], directoryPath)
 	
 	local cacheDatas = CacheDataFactory:getCacheDatas(chartPaths)
 	
-	self:begin()
 	for i = 1, #cacheDatas do
 		local cacheData = cacheDatas[i]
 		
