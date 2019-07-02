@@ -37,16 +37,6 @@ CacheList.getItem = function(self, cacheData)
 	return item
 end
 
-CacheList.getItemName = function(self, cacheData)
-	if cacheData.name and cacheData.name ~= "" then
-		return cacheData.name
-	elseif cacheData.title and cacheData.title ~= "" then
-		return cacheData.title
-	else
-		return cacheData.path
-	end
-end
-
 CacheList.getBackgroundPath = function(self, itemIndex)
 	local cacheData = self.items[itemIndex].cacheData
 	

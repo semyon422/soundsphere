@@ -94,22 +94,39 @@ NoteChartSetList.checkCacheData = function(self, cacheData)
 	if not self.needSearch then return true end
 	
 	local searchString = self.searchString:lower()
-	if
-		cacheData.path and cacheData.path:lower():find(searchString, 1, true) or
-		cacheData.artist and cacheData.artist:lower():find(searchString, 1, true) or
-		cacheData.title and cacheData.title:lower():find(searchString, 1, true) or
-		cacheData.name and cacheData.name:lower():find(searchString, 1, true) or
-		cacheData.source and cacheData.source:lower():find(searchString, 1, true) or
-		cacheData.tags and cacheData.tags:lower():find(searchString, 1, true) or
-		cacheData.creator and cacheData.creator:lower():find(searchString, 1, true) or
-		cacheData.inputMode and cacheData.inputMode:lower():find(searchString, 1, true)
-	then
-		return true
+	
+	local list = Cache.chartsAtSet[cacheData.id]
+	if not list or not list[1] then
+		return
+	end
+	
+	for i = 1, #list do
+		local chart = list[i]
+		if
+			chart.path and chart.path:lower():find(searchString, 1, true) or
+			chart.artist and chart.artist:lower():find(searchString, 1, true) or
+			chart.title and chart.title:lower():find(searchString, 1, true) or
+			chart.name and chart.name:lower():find(searchString, 1, true) or
+			chart.source and chart.source:lower():find(searchString, 1, true) or
+			chart.tags and chart.tags:lower():find(searchString, 1, true) or
+			chart.creator and chart.creator:lower():find(searchString, 1, true) or
+			chart.inputMode and chart.inputMode:lower():find(searchString, 1, true)
+		then
+			return true
+		end
 	end
 end
 
 NoteChartSetList.sortItemsFunction = function(a, b)
 	return a.cacheData.path < b.cacheData.path
+end
+
+NoteChartSetList.getItemName = function(self, cacheData)
+	local list = Cache.chartsAtSet[cacheData.id]
+	if list and list[1] then
+		return list[1].title
+	end
+	return cacheData.path
 end
 
 NoteChartSetList.selectCache = function(self)

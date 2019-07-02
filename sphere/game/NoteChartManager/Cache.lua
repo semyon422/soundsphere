@@ -38,6 +38,9 @@ Cache.select = function(self)
 	local chartColumns = CacheDatabase.chartColumns
 	local chartSetColumns = CacheDatabase.chartSetColumns
 	local packColumns = CacheDatabase.packColumns
+	local chartNumberColumns = CacheDatabase.chartNumberColumns
+	local chartSetNumberColumns = CacheDatabase.chartSetNumberColumns
+	local packNumberColumns = CacheDatabase.packNumberColumns
 	
 	local stmt = self.selectPacksStatement:reset()
 	local row = stmt:step()
@@ -45,6 +48,9 @@ Cache.select = function(self)
 		local packData = {}
 		for i = 1, #packColumns do
 			packData[packColumns[i]] = row[i]
+		end
+		for i = 1, #packNumberColumns do
+			packData[packNumberColumns[i]] = tonumber(packData[packNumberColumns[i]])
 		end
 		packList[#packList + 1] = packData
 		row = stmt:step()
@@ -57,6 +63,9 @@ Cache.select = function(self)
 		for i = 1, #chartSetColumns do
 			chartSetData[chartSetColumns[i]] = row[i]
 		end
+		for i = 1, #chartSetNumberColumns do
+			chartSetData[chartSetNumberColumns[i]] = tonumber(chartSetData[chartSetNumberColumns[i]])
+		end
 		chartSetList[#chartSetList + 1] = chartSetData
 		row = stmt:step()
 	end
@@ -67,6 +76,9 @@ Cache.select = function(self)
 		local chartData = {}
 		for i = 1, #chartColumns do
 			chartData[chartColumns[i]] = row[i]
+		end
+		for i = 1, #chartNumberColumns do
+			chartData[chartNumberColumns[i]] = tonumber(chartData[chartNumberColumns[i]])
 		end
 		chartList[#chartList + 1] = chartData
 		row = stmt:step()
@@ -87,6 +99,23 @@ Cache.select = function(self)
 	end
 	for _, packData in ipairs(packList) do
 		packDict[packData.id] = packData
+	end
+	
+	local chartsAtSet = {}
+	local chartSetsAtPack = {}
+	self.chartsAtSet = chartsAtSet
+	self.chartSetAtPack = chartSetAtPack
+	
+	for _, chartData in ipairs(chartList) do
+		chartsAtSet[chartData.chartSetId] = chartsAtSet[chartData.chartSetId] or {}
+		local list = chartsAtSet[chartData.chartSetId]
+		list[#list + 1] = chartData
+	end
+	
+	for _, chartSetData in ipairs(chartSetList) do
+		chartSetsAtPack[chartSetData.packId] = chartSetsAtPack[chartSetData.packId] or {}
+		local list = chartSetsAtPack[chartSetData.packId]
+		list[#list + 1] = chartSetData
 	end
 	
 	CacheDatabase:unload()

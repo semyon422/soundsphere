@@ -75,6 +75,10 @@ NoteChartList.sortItemsFunction = function(a, b)
 	end
 end
 
+NoteChartList.getItemName = function(self, cacheData)
+	return cacheData.name or "."
+end
+
 NoteChartList.selectCache = function(self)
 	local items = {}
 	

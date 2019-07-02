@@ -41,6 +41,26 @@ CacheDatabase.packColumns = {
 	"path"
 }
 
+CacheDatabase.chartNumberColumns = {
+	"id",
+	"chartSetId",
+	"packId",
+	"level",
+	"previewTime",
+	"noteCount",
+	"length",
+	"bpm"
+}
+
+CacheDatabase.chartSetNumberColumns = {
+	"id",
+	"packId"
+}
+
+CacheDatabase.packNumberColumns = {
+	"id"
+}
+
 CacheDatabase.unload = function(self)
 	self.db:close()
 end
