@@ -29,6 +29,7 @@ NoteChartSetList.keyControl = true
 NoteChartSetList.needItemsSort = true
 NoteChartSetList.needSearch = false
 NoteChartSetList.searchString = ""
+NoteChartSetList.searchTable = {}
 
 NoteChartSetList.cs = CS:new({
 	bx = 0,
@@ -87,9 +88,11 @@ NoteChartSetList.receive = function(self, event)
 		if event.text == "" then
 			self.needSearch = false
 			self.searchString = ""
+			self.searchTable = {}
 		else
 			self.needSearch = true
-			self.searchString = event.text
+			self.searchString = event.text:lower()
+			self.searchTable = self.searchString:split(" ")
 		end
 		self:selectCache()
 		self:unloadButtons()
@@ -104,7 +107,7 @@ NoteChartSetList.checkCacheData = function(self, cacheData)
 	if not base then return false end
 	if not self.needSearch then return true end
 	
-	local searchString = self.searchString:lower()
+	local searchTable = self.searchTable
 	
 	local list = Cache.chartsAtSet[cacheData.id]
 	if not list or not list[1] then
@@ -113,16 +116,24 @@ NoteChartSetList.checkCacheData = function(self, cacheData)
 	
 	for i = 1, #list do
 		local chart = list[i]
-		if
-			chart.path and chart.path:lower():find(searchString, 1, true) or
-			chart.artist and chart.artist:lower():find(searchString, 1, true) or
-			chart.title and chart.title:lower():find(searchString, 1, true) or
-			chart.name and chart.name:lower():find(searchString, 1, true) or
-			chart.source and chart.source:lower():find(searchString, 1, true) or
-			chart.tags and chart.tags:lower():find(searchString, 1, true) or
-			chart.creator and chart.creator:lower():find(searchString, 1, true) or
-			chart.inputMode and chart.inputMode:lower():find(searchString, 1, true)
-		then
+		local found = true
+		for _, searchString in ipairs(searchTable) do
+			if
+				chart.path and chart.path:lower():find(searchString, 1, true) or
+				chart.artist and chart.artist:lower():find(searchString, 1, true) or
+				chart.title and chart.title:lower():find(searchString, 1, true) or
+				chart.name and chart.name:lower():find(searchString, 1, true) or
+				chart.source and chart.source:lower():find(searchString, 1, true) or
+				chart.tags and chart.tags:lower():find(searchString, 1, true) or
+				chart.creator and chart.creator:lower():find(searchString, 1, true) or
+				chart.inputMode and chart.inputMode:lower():find(searchString, 1, true)
+			then
+				-- skip
+			else
+				found = false
+			end
+		end
+		if found == true then
 			return true
 		end
 	end
