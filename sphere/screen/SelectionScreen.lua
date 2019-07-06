@@ -71,11 +71,8 @@ SelectionScreen.receive = function(self, event)
 		ScreenManager:set(require("sphere.screen.BrowserScreen"))
 	end
 	
-	if event.action == "scrollTarget" then
-		local item = event.list.items[event.itemIndex]
-		if item and item.cacheData then
-			MetaDataTable:setData(item.cacheData)
-		end
+	if event.action == "updateMetaData" then
+		MetaDataTable:setData(event.cacheData)
 	end
 	if event.backgroundPath then
 		BackgroundManager:loadDrawableBackground(event.backgroundPath)

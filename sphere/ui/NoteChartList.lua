@@ -38,6 +38,14 @@ NoteChartList.send = function(self, event)
 			GameplayScreen.cacheData = cacheData
 			ScreenManager:set(GameplayScreen)
 		end
+	elseif event.action == "scrollTarget" then
+		local item = self.items[event.itemIndex]
+		if item and item.cacheData then
+			self:send({
+				action = "updateMetaData",
+				cacheData = item.cacheData
+			})
+		end
 	end
 	
 	return CacheList.send(self, event)
