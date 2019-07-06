@@ -33,6 +33,8 @@ local trimName = function(name)
 		return name:match("%((.+)%)"), name:find("%(.+%)")
 	elseif name:find("%-.+%-$") then
 		return name:match("%-(.+)%-"), name:find("%-.+%-$")
+	elseif name:find("\".+\"$") then
+		return name:match("\"(.+)\""), name:find("\".+\"$")
 	else
 		return name, #name + 1
 	end
@@ -45,15 +47,22 @@ CacheDataFactory.processCacheDataNames = function(self, cacheDatas)
 	local continue = false
 	local byteOffset = 0
 	local byteNext = 0
-	for i = 1, bracketStart - 1 do
+	for i = 1, bracketStart do
 		byteOffset = utf8.offset(title, i)
 		byteNext = utf8.offset(title, i + 1)
-		for j = 1, #cacheDatas - 1 do
-			if cacheDatas[j].title:sub(byteOffset, byteNext - 1) ~= cacheDatas[j + 1].title:sub(byteOffset + 1, byteNext) then
+		if not byteOffset or not byteNext then
+			break
+		end
+		local char = title:sub(byteOffset, byteNext - 1)
+		if char and title:find(char, 1, true) == bracketStart then
+			break
+		end
+		for j = 1, #cacheDatas do
+			if char ~= cacheDatas[j].title:sub(byteOffset, byteNext - 1) then
 				continue = true
 				break
 			elseif j == #cacheDatas - 1 then
-				titleTable[#titleTable + 1] = cacheDatas[1].title:sub(byteOffset + 1, byteNext)
+				titleTable[#titleTable + 1] = char
 			end
 		end
 		if continue then break end
