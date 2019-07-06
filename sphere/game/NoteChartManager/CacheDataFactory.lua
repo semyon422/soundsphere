@@ -35,6 +35,8 @@ local trimName = function(name)
 		return name:match("%-(.+)%-"), name:find("%-.+%-$")
 	elseif name:find("\".+\"$") then
 		return name:match("\"(.+)\""), name:find("\".+\"$")
+	elseif name:find("〔.+〕$") then
+		return name:match("〔(.+)〕"), name:find("〔.+〕$")
 	else
 		return name, #name + 1
 	end
