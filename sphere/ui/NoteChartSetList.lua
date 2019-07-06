@@ -94,6 +94,16 @@ NoteChartSetList.receive = function(self, event)
 		self:selectCache()
 		self:unloadButtons()
 		self:calculateButtons()
+		self:send({
+			sender = self.sender,
+			action = "scrollTarget",
+			list = self,
+			itemIndex = self.focusedItemIndex
+		})
+		self:send({
+			sender = self.sender,
+			action = "scrollStop"
+		})
 	end
 	
 	return CacheList.receive(self, event)

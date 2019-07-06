@@ -48,8 +48,12 @@ SearchLine.reload = function(self)
 end
 
 SearchLine.receive = function(self, event)
+	local forceReload = false
 	if event.name == "resize" then
 		self.cs:reload()
+	elseif event.name == "keypressed" and event.args[1] == "escape" then
+		self.textInputFrame.textInput:reset()
+		forceReload = true
 	end
 	
 	if self.textInputFrame then
@@ -57,7 +61,7 @@ SearchLine.receive = function(self, event)
 		self.textInputFrame:receive(event)
 		local newText = self:getText()
 		
-		if oldText ~= newText then
+		if oldText ~= newText or forceReload then
 			self.observable:send({
 				name = "search",
 				text = newText

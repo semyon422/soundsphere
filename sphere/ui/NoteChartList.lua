@@ -44,6 +44,7 @@ NoteChartList.send = function(self, event)
 		local item = self.items[event.itemIndex]
 		if item and item.cacheData then
 			self:send({
+				sender = self.sender,
 				action = "updateMetaData",
 				cacheData = item.cacheData
 			})

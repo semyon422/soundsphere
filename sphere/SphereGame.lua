@@ -30,10 +30,10 @@ end
 
 SphereGame.run = function(self)
 	self:init()
-	self:load()
 	aquaio:add(self.observer)
-	WindowManager:load()
 	MountManager:mount()
+	self:load()
+	WindowManager:load()
 end
 
 SphereGame.load = function(self)
