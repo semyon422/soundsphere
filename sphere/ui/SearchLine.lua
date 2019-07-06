@@ -62,12 +62,12 @@ SearchLine.receive = function(self, event)
 		local newText = self:getText()
 		
 		if oldText ~= newText or forceReload then
+			self.searchString = newText:lower()
+			self.searchTable = self.searchString:split(" ")
 			self.observable:send({
 				name = "search",
 				text = newText
 			})
-			self.searchString = newText:lower()
-			self.searchTable = self.searchString:split(" ")
 		end
 	end
 end
