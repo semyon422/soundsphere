@@ -5,6 +5,7 @@ local GameplayScreen = require("sphere.screen.GameplayScreen")
 local CacheList = require("sphere.ui.CacheList")
 local PreviewManager = require("sphere.ui.PreviewManager")
 local Cache = require("sphere.game.NoteChartManager.Cache")
+local SearchLine = require("sphere.ui.SearchLine")
 
 local NoteChartList = CacheList:new()
 
@@ -20,6 +21,7 @@ NoteChartList.startOffset = 5
 NoteChartList.endOffset = 5
 
 NoteChartList.basePath = "?"
+NoteChartList.chartSetId = 0
 NoteChartList.needItemsSort = true
 
 NoteChartList.observable = Observable:new()
@@ -55,7 +57,10 @@ NoteChartList.receive = function(self, event)
 	if event.action == "scrollTarget" then
 		local item = event.list.items[event.itemIndex]
 		if item and item.cacheData and event.list.sender == "NoteChartSetList" then
-			self:setBasePath(item.cacheData.path)
+			self.chartSetId = item.cacheData.id
+			self:selectCache()
+			self:unloadButtons()
+			self:calculateButtons()
 		end
 	elseif event.name == "keypressed" then
 		local key = event.args[1]
@@ -90,11 +95,13 @@ end
 NoteChartList.selectCache = function(self)
 	local items = {}
 	
-	local chartList = Cache.chartList
-	for i = 1, #chartList do
-		local chartData = chartList[i]
-		if chartData.path:find(self.basePath, 1, true) then
-			items[#items + 1] = self:getItem(chartData)
+	local list = Cache.chartsAtSet[self.chartSetId]
+	if not list or not list[1] then
+		return
+	end
+	for i = 1, #list do
+		if self:checkChartData(list[i], SearchLine.searchTable) then
+			items[#items + 1] = self:getItem(list[i])
 		end
 	end
 	
@@ -103,6 +110,27 @@ NoteChartList.selectCache = function(self)
 	end
 	
 	return self:setItems(items)
+end
+
+NoteChartList.checkChartData = function(self, chart, searchTable)
+	local found = true
+	for _, searchString in ipairs(searchTable) do
+		if
+			chart.path and chart.path:lower():find(searchString, 1, true) or
+			chart.artist and chart.artist:lower():find(searchString, 1, true) or
+			chart.title and chart.title:lower():find(searchString, 1, true) or
+			chart.name and chart.name:lower():find(searchString, 1, true) or
+			chart.source and chart.source:lower():find(searchString, 1, true) or
+			chart.tags and chart.tags:lower():find(searchString, 1, true) or
+			chart.creator and chart.creator:lower():find(searchString, 1, true) or
+			chart.inputMode and chart.inputMode:lower():find(searchString, 1, true)
+		then
+			-- skip
+		else
+			found = false
+		end
+	end
+	return found
 end
 
 return NoteChartList

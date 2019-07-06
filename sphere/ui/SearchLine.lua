@@ -16,9 +16,11 @@ SearchLine.cs = CS:new({
 })
 
 SearchLine.observable = Observable:new()
+SearchLine.searchString = ""
+SearchLine.searchTable = {}
 
 SearchLine.load = function(self)
-	self.textInputFrame = Theme.TextInputFrame:new({
+	self.textInputFrame = self.textInputFrame or Theme.TextInputFrame:new({
 		x = 0.01,
 		y = 0.01,
 		w = 1,
@@ -60,6 +62,8 @@ SearchLine.receive = function(self, event)
 				name = "search",
 				text = newText
 			})
+			self.searchString = newText:lower()
+			self.searchTable = self.searchString:split(" ")
 		end
 	end
 end
