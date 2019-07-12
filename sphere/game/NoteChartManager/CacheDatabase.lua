@@ -298,15 +298,17 @@ CacheDatabase.processNoteChartSet = function(self, chartPaths, directoryPath)
 	local packData = self:getPackData(directoryPath:match("^(.+)/.-$"))
 	local chartSetData = self:getChartSetData(packData[1], directoryPath)
 	
-	local cacheDatas = CacheDataFactory:getCacheDatas(chartPaths)
-	
-	for i = 1, #cacheDatas do
-		local cacheData = cacheDatas[i]
+	for _, paths in ipairs(NoteChartFactory:splitList(chartPaths)) do
+		local cacheDatas = CacheDataFactory:getCacheDatas(paths)
 		
-		cacheData.chartSetId = chartSetData[1]
-		cacheData.packId = packData[1]
-		
-		self:setChartData(cacheData)
+		for i = 1, #cacheDatas do
+			local cacheData = cacheDatas[i]
+			
+			cacheData.chartSetId = chartSetData[1]
+			cacheData.packId = packData[1]
+			
+			self:setChartData(cacheData)
+		end
 	end
 	self:commit()
 end

@@ -31,6 +31,25 @@ NoteChartFactory.isNoteChartContainer = function(self, path)
 	end
 end
 
+NoteChartFactory.splitList = function(self, chartPaths)
+	local dict = {}
+	for _, path in ipairs(chartPaths) do
+		for i = 1, #chartPatterns do
+			if path:find(chartPatterns[i]) then
+				dict[i] = dict[i] or {}
+				table.insert(dict[i], path)
+			end
+		end
+	end
+	
+	local list = {}
+	for _, data in pairs(dict) do
+		list[#list + 1] = data
+	end
+	
+	return list
+end
+
 NoteChartFactory.getNoteChart = function(self, path)
 	local noteChartImporter
 	local noteChart = NoteChart:new()
