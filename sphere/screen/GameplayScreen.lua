@@ -109,15 +109,18 @@ GameplayScreen.receive = function(self, event)
 	then
 		self.engine.bgaContainer:stop()
 		self.engine.fgaContainer:stop()
-		ScreenManager:set(require("sphere.screen.ResultScreen"))
-		ScreenManager:receive({
-			name = "score",
-			score = self.engine.score
-		})
-		ScreenManager:receive({
-			name = "metadata",
-			data = self.cacheData
-		})
+		ScreenManager:set(require("sphere.screen.ResultScreen"),
+			function()
+				ScreenManager:receive({
+					name = "score",
+					score = self.engine.score
+				})
+				ScreenManager:receive({
+					name = "metadata",
+					data = self.cacheData
+				})
+			end
+		)
 	end
 end
 

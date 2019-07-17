@@ -40,6 +40,7 @@ SearchLine.load = function(self)
 		enableStencil = true
 	})
 	
+	self.cs:reload()
 	self.textInputFrame:reload()
 end
 

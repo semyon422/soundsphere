@@ -5,6 +5,7 @@ local aquaio = require("aqua.io")
 
 local SelectionScreen = require("sphere.screen.SelectionScreen")
 local ScreenManager = require("sphere.screen.ScreenManager")
+local TransitionManager = require("sphere.screen.TransitionManager")
 
 local Cache = require("sphere.game.NoteChartManager.Cache")
 local Config = require("sphere.game.Config")
@@ -32,6 +33,7 @@ SphereGame.run = function(self)
 	self:init()
 	aquaio:add(self.observer)
 	MountManager:mount()
+	TransitionManager:init()
 	self:load()
 	WindowManager:load()
 end
