@@ -204,7 +204,7 @@ CacheDataFactory.getKSM = function(self, chartPaths)
 				stagePath = fix(noteChart:hashGet("jacket")),
 				previewTime = (noteChart:hashGet("plength") or 0) / 1000,
 				noteCount = noteChart:hashGet("noteCount"),
-				length = noteChart:hashGet("totalLength") / 1000,
+				length = noteChart:hashGet("totalLength"),
 				bpm = 0,
 				inputMode = noteChart.inputMode:getString()
 			}
