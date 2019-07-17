@@ -6,14 +6,15 @@ local CacheList = require("sphere.ui.CacheList")
 local PreviewManager = require("sphere.ui.PreviewManager")
 local Cache = require("sphere.game.NoteChartManager.Cache")
 local SearchLine = require("sphere.ui.SearchLine")
+local NoteChartListButton = require("sphere.ui.NoteChartListButton")
 
 local NoteChartList = CacheList:new()
 
 NoteChartList.sender = "NoteChartList"
 
-NoteChartList.x = 0.3
+NoteChartList.x = 0.2
 NoteChartList.y = 4 / 17
-NoteChartList.w = 0.3
+NoteChartList.w = 0.4
 NoteChartList.h = 9 / 17
 NoteChartList.buttonCount = 9
 NoteChartList.middleOffset = 5
@@ -25,6 +26,7 @@ NoteChartList.chartSetId = 0
 NoteChartList.needItemsSort = true
 
 NoteChartList.observable = Observable:new()
+NoteChartList.Button = NoteChartListButton
 
 NoteChartList.send = function(self, event)
 	if event.action == "scrollStop" then
