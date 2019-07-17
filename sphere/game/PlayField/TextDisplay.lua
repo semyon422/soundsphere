@@ -16,6 +16,7 @@ TextDisplay.load = function(self)
 		cs = self.cs,
 		limit = self.w,
 		align = self.align,
+		xpadding = 0,
 		color = self.color,
 		font = aquafonts.getFont(self.font, self.size)
 	})
