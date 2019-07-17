@@ -12,9 +12,9 @@ local NoteChartList = CacheList:new()
 
 NoteChartList.sender = "NoteChartList"
 
-NoteChartList.x = 0.2
+NoteChartList.x = 0.1
 NoteChartList.y = 4 / 17
-NoteChartList.w = 0.4
+NoteChartList.w = 0.5
 NoteChartList.h = 9 / 17
 NoteChartList.buttonCount = 9
 NoteChartList.middleOffset = 5
