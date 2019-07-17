@@ -33,7 +33,6 @@ SphereGame.run = function(self)
 	self:init()
 	aquaio:add(self.observer)
 	MountManager:mount()
-	TransitionManager:init()
 	self:load()
 	WindowManager:load()
 end

@@ -29,7 +29,6 @@ end
 
 ScreenManager.receive = function(self, event)
 	self.currentScreen:receive(event)
-	TransitionManager:receive(event)
 end
 
 ScreenManager.unload = function(self)

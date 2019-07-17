@@ -1,6 +1,3 @@
-local Rectangle = require("aqua.graphics.Rectangle")
-local CS = require("aqua.graphics.CS")
-local Stencil = require("aqua.graphics.Stencil")
 local tween = require("tween")
 
 local TransitionManager = {}
@@ -17,40 +14,6 @@ TransitionManager.isTransiting = false
 TransitionManager.needTransit = false
 TransitionManager.alpha = 1
 TransitionManager.phase = 0
-TransitionManager.stencilColor = {0, 0, 0, 255}
-TransitionManager.cs = CS:new({
-	bx = 0,
-	by = 0,
-	rx = 0,
-	ry = 0,
-	binding = "all",
-	baseOne = 768
-})
-
-TransitionManager.init = function(self)
-	self.stencilFrame = Rectangle:new({
-		x = 0,
-		y = 0,
-		w = 1,
-		h = 1,
-		cs = self.cs,
-		mode = "fill",
-		color = self.stencilColor
-	})
-	
-	self:reload()
-end
-
-TransitionManager.reload = function(self)
-	self.cs:reload()
-	self.stencilFrame:reload()
-end
-
-TransitionManager.receive = function(self, event)
-	if event.name == "resize" then
-		return self:reload()
-	end
-end
 
 TransitionManager.update = function(self, dt)
 	if self.phase == 0 then
@@ -86,8 +49,6 @@ TransitionManager.update = function(self, dt)
 			end
 		end
 	end
-	
-	self.stencilFrame.color[4] = self.alpha
 end
 
 TransitionManager.transit = function(self, callbackMiddle, callbackEnd)
