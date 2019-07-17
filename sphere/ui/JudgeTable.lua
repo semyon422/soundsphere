@@ -63,6 +63,7 @@ JudgeTable.getJudgeNameText = function(self, text, row)
 		cs = self.cs,
 		limit = self.w,
 		align = {x = "left", y = "center"},
+		xpadding = 0,
 		color = {255, 255, 255, 255},
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 28)
 	})
@@ -78,6 +79,7 @@ JudgeTable.getJudgeGateText = function(self, text, row)
 		cs = self.cs,
 		limit = self.x,
 		align = {x = "right", y = "center"},
+		xpadding = 0,
 		color = {255, 255, 255, 255},
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 28)
 	})
@@ -93,6 +95,7 @@ JudgeTable.getJudgeValueText = function(self, text, row)
 		cs = self.cs,
 		limit = self.w,
 		align = {x = "right", y = "center"},
+		xpadding = 0,
 		color = {255, 255, 255, 255},
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 28)
 	})
