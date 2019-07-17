@@ -6,3 +6,4 @@ userdata/config.json
 userdata/mount.json
 !userdata/charts/.keep
 !userdata/hitsounds/.keep
+userdata/cache.sqlite-journal
