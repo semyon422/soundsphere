@@ -46,6 +46,7 @@ MetaDataTable.init = function(self)
 		cs = self.cs,
 		limit = self.w - 2 * self.x,
 		align = {x = "left", y = "top"},
+		xpadding = 0,
 		color = {255, 255, 255, 255},
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 22)
 	})
@@ -59,6 +60,7 @@ MetaDataTable.init = function(self)
 		cs = self.cs,
 		limit = self.w - 2 * self.x,
 		align = {x = "left", y = "top"},
+		xpadding = 0,
 		color = {255, 255, 255, 255},
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 28)
 	})
@@ -72,6 +74,7 @@ MetaDataTable.init = function(self)
 		cs = self.cs,
 		limit = self.w - 2 * self.x,
 		align = {x = "left", y = "top"},
+		xpadding = 0,
 		color = {255, 255, 255, 255},
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 22)
 	})

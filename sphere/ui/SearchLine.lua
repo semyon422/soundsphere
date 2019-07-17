@@ -11,7 +11,7 @@ SearchLine.cs = CS:new({
 	by = 0,
 	rx = 0,
 	ry = 0,
-	binding = "h",
+	binding = "all",
 	baseOne = 720
 })
 
@@ -23,18 +23,18 @@ SearchLine.load = function(self)
 	self.textInputFrame = self.textInputFrame or Theme.TextInputFrame:new({
 		x = 0.01,
 		y = 0.01,
-		w = 1,
+		w = 0.58,
 		h = 0.05,
-		rx = 0.02,
-		ry = 0.02,
+		ry = 0.025,
 		backgroundColor = {0, 0, 0, 63},
 		borderColor = {255, 255, 255, 255},
 		textColor = {255, 255, 255, 255},
 		lineStyle = "smooth",
-		lineWidth = 2,
+		lineWidth = 1.5,
 		cs = self.cs,
 		limit = 1,
 		textAlign = {x = "left", y = "center"},
+		xpadding = 0.01,
 		text = "",
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 26),
 		enableStencil = true
