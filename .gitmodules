@@ -28,3 +28,6 @@
 [submodule "discordrpc"]
 	path = discordrpc
 	url = https://github.com/pfirsich/lua-discordRPC
+[submodule "log"]
+	path = log
+	url = https://github.com/rxi/log.lua
