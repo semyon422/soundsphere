@@ -19,13 +19,18 @@ SearchLine.observable = Observable:new()
 SearchLine.searchString = ""
 SearchLine.searchTable = {}
 
+SearchLine.x = 0
+SearchLine.y = 0
+SearchLine.w = 1
+SearchLine.h = 1
+
 SearchLine.load = function(self)
 	self.textInputFrame = self.textInputFrame or Theme.TextInputFrame:new({
-		x = 0.01,
-		y = 0.01,
-		w = 0.58,
-		h = 0.05,
-		ry = 0.025,
+		x = self.x,
+		y = self.y,
+		w = self.w,
+		h = self.h,
+		ry = self.h / 2,
 		backgroundColor = {0, 0, 0, 63},
 		borderColor = {255, 255, 255, 255},
 		textColor = {255, 255, 255, 255},
