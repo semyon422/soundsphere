@@ -1,12 +1,6 @@
-local sqlite = require("ljsqlite3")
-local NoteChartFactory = require("sphere.game.NoteChartManager.NoteChartFactory")
-local CacheDataFactory = require("sphere.game.NoteChartManager.CacheDataFactory")
 local CacheDatabase = require("sphere.game.NoteChartManager.CacheDatabase")
 
 local Cache = {}
-
-Cache.load = function(self)
-end
 
 Cache.selectChartsRequest = [[
 	SELECT * FROM `charts`;
@@ -15,46 +9,26 @@ Cache.selectChartsRequest = [[
 Cache.selectChartSetsRequest = [[
 	SELECT * FROM `chartSets`;
 ]]
-
-Cache.selectPacksRequest = [[
-	SELECT * FROM `packs`;
-]]
-
 Cache.select = function(self)
+	if self.lock then
+		return
+	end
+	
 	CacheDatabase:load()
 	
 	self.db = CacheDatabase.db
 	self.selectChartsStatement = self.db:prepare(self.selectChartsRequest)
 	self.selectChartSetsStatement = self.db:prepare(self.selectChartSetsRequest)
-	self.selectPacksStatement = self.db:prepare(self.selectPacksRequest)
 	
 	local chartList = {}
 	local chartSetList = {}
-	local packList = {}
 	self.chartList = chartList
 	self.chartSetList = chartSetList
-	self.packList = packList
 	
 	local chartColumns = CacheDatabase.chartColumns
 	local chartSetColumns = CacheDatabase.chartSetColumns
-	local packColumns = CacheDatabase.packColumns
 	local chartNumberColumns = CacheDatabase.chartNumberColumns
 	local chartSetNumberColumns = CacheDatabase.chartSetNumberColumns
-	local packNumberColumns = CacheDatabase.packNumberColumns
-	
-	local stmt = self.selectPacksStatement:reset()
-	local row = stmt:step()
-	while row do
-		local packData = {}
-		for i = 1, #packColumns do
-			packData[packColumns[i]] = row[i]
-		end
-		for i = 1, #packNumberColumns do
-			packData[packNumberColumns[i]] = tonumber(packData[packNumberColumns[i]])
-		end
-		packList[#packList + 1] = packData
-		row = stmt:step()
-	end
 	
 	local stmt = self.selectChartSetsStatement:reset()
 	local row = stmt:step()
@@ -86,10 +60,8 @@ Cache.select = function(self)
 	
 	local chartDict = {}
 	local chartSetDict = {}
-	local packDict = {}
 	self.chartDict = chartDict
 	self.chartSetDict = chartSetDict
-	self.packDict = packDict
 	
 	for _, chartData in ipairs(chartList) do
 		chartDict[chartData.id] = chartData
@@ -97,14 +69,9 @@ Cache.select = function(self)
 	for _, chartSetData in ipairs(chartSetList) do
 		chartSetDict[chartSetData.id] = chartSetData
 	end
-	for _, packData in ipairs(packList) do
-		packDict[packData.id] = packData
-	end
 	
 	local chartsAtSet = {}
-	local chartSetsAtPack = {}
 	self.chartsAtSet = chartsAtSet
-	self.chartSetAtPack = chartSetAtPack
 	
 	for _, chartData in ipairs(chartList) do
 		chartsAtSet[chartData.chartSetId] = chartsAtSet[chartData.chartSetId] or {}
@@ -112,17 +79,15 @@ Cache.select = function(self)
 		list[#list + 1] = chartData
 	end
 	
-	for _, chartSetData in ipairs(chartSetList) do
-		chartSetsAtPack[chartSetData.packId] = chartSetsAtPack[chartSetData.packId] or {}
-		local list = chartSetsAtPack[chartSetData.packId]
-		list[#list + 1] = chartSetData
-	end
-	
 	CacheDatabase:unload()
 end
 
-Cache.update = function(self, path, recursive, callback)
-	CacheDatabase:update(path, recursive, callback)
+Cache.update = function(self, path, recursive)
+	self.lock = true
+	return CacheDatabase:update(path, recursive, function()
+		self.lock = false
+		self:select()
+	end)
 end
 
 return Cache

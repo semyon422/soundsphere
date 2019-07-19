@@ -1,11 +1,11 @@
 local CS = require("aqua.graphics.CS")
 local Observable = require("aqua.util.Observable")
-local CacheList = require("sphere.ui.CacheList")
+local CustomList = require("sphere.ui.CustomList")
 local NoteChartSetList = require("sphere.ui.NoteChartSetList")
 local Cache = require("sphere.game.NoteChartManager.Cache")
 local NotificationLine = require("sphere.ui.NotificationLine")
 
-local BrowserList = CacheList:new()
+local BrowserList = CustomList:new()
 
 BrowserList.sender = "BrowserList"
 BrowserList.needFocusToInteract = false
@@ -20,27 +20,29 @@ BrowserList.observable = Observable:new()
 
 BrowserList.basePath = "userdata/charts"
 
-BrowserList.cs = CS:new({
-	bx = 0,
-	by = 0,
-	rx = 0,
-	ry = 0,
-	binding = "all",
-	baseOne = 768
-})
+BrowserList.load = function(self)
+	self:selectCache()
+	
+	return CustomList.load(self)
+end
 
 BrowserList.send = function(self, event)
 	if event.action == "buttonInteract" then
-		local cacheData = self.items[event.itemIndex].cacheData
+		local item = self.items[event.itemIndex]
 		if event.button == 1 then
-			NoteChartSetList:setBasePath(cacheData.path)
+			NoteChartSetList:setBasePath(item.path)
 		elseif event.button == 2 then
-			local recursive = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
-			self:updateCache(cacheData.path, recursive)
+			local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
+			local recursive = love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")
+			if shift then
+				Cache:update(item.path, recursive)
+			else
+				love.system.openURL("file://" .. love.filesystem.getSource() .. "/" .. item.path)
+			end
 		end
 	end
 	
-	return CacheList.send(self, event)
+	return CustomList.send(self, event)
 end
 
 BrowserList.receive = function(self, event)
@@ -52,31 +54,26 @@ BrowserList.receive = function(self, event)
 		end
 	end
 	
-	return CacheList.receive(self, event)
-end
-
-BrowserList.sortItemsFunction = function(a, b)
-	return a.cacheData.path < b.cacheData.path
-end
-
-BrowserList.getItemName = function(self, cacheData)
-	local directoryPath, folderName = cacheData.path:match("^(.+)/(.-)$")
-	return (" "):rep(#directoryPath) .. folderName
+	return CustomList.receive(self, event)
 end
 
 BrowserList.selectCache = function(self)
-	local items = {}
+	local directoryItems = love.filesystem.getDirectoryItems("userdata/charts")
 	
-	local packList = Cache.packList
-	for i = 1, #packList do
-		local packData = packList[i]
-		if packData.path:find(self.basePath) then
-			items[#items + 1] = self:getItem(packData)
+	local items = {
+		{
+			name = "all",
+			path = "userdata/charts"
+		}
+	}
+	for _, name in ipairs(directoryItems) do
+		local path = "userdata/charts/" .. name
+		if love.filesystem.isDirectory(path) then
+			items[#items + 1] = {
+				name = name,
+				path = path
+			}
 		end
-	end
-	
-	if self.needItemsSort then
-		table.sort(items, self.sortItemsFunction)
 	end
 	
 	return self:setItems(items)

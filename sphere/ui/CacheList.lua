@@ -91,13 +91,4 @@ CacheList.updateAudio = function(self)
 	return PreviewManager:playAudio(self:getAudioPath(self.focusedItemIndex))
 end
 
-CacheList.updateCache = function(self, path, recursive)
-	CacheList.lock = true
-	return Cache:update(path, recursive, function()
-		CacheList.lock = false
-		Cache:select()
-		return NotificationLine:notify("Cache updated. (" .. path .. ")")
-	end)
-end
-
 return CacheList

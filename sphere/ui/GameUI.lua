@@ -11,33 +11,42 @@ local CS = require("aqua.graphics.CS")
 local GameUI = {}
 
 GameUI.init = function(self)
-	self.cs = CS:new({
+	self.csh = CS:new({
 		bx = 0, by = 0, rx = 0, ry = 0,
 		binding = "h",
 		baseOne = 768
 	})
-	self.table10x17 = TableMenu:new({
-		x = 0, y = 0, w = 1, h = 1,
-		cols = 10, rows = 17
+	self.csall = CS:new({
+		bx = 0, by = 0, rx = 0, ry = 0,
+		binding = "all",
+		baseOne = 768
 	})
-	self.table17x17 = TableMenu:new({
+	
+	self.table10x17all = TableMenu:new({
+		x = 0, y = 0, w = 1, h = 1,
+		cols = 10, rows = 17,
+		cs = self.csall
+	})
+	self.table17x17h = TableMenu:new({
 		x = 0, y = 0, w = 1, h = 1,
 		cols = 17, rows = 17,
-		cs = self.cs
+		cs = self.csh
 	})
-	self.table10x17:apply(NoteChartSetList, 7, 1, 10, 17)
-	self.table10x17:apply(NoteChartList, 1, 5, 6, 13)
-	self.table10x17:apply(SearchLine, 1, 1, 6, 1, 0.005)
-	self.table10x17:apply(ModifierDisplay, 1, 17, 6, 17)
-	self.table10x17:apply(BrowserList, 2, 1, 9, 17)
 	
-	self.table17x17:apply(ModifierList, 2, 14, 6, 16)
-	self.table17x17:apply(MetaDataTable, 2, 2, 10, 2)
+	self.table10x17all:apply(NoteChartSetList, 7, 1, 10, 17)
+	self.table10x17all:apply(NoteChartList, 1, 5, 6, 13)
+	self.table10x17all:apply(SearchLine, 1, 1, 6, 1, 0.005)
+	self.table10x17all:apply(ModifierDisplay, 1, 17, 6, 17)
+	
+	self.table17x17h:apply(ModifierList, 2, 14, 6, 16)
+	self.table17x17h:apply(MetaDataTable, 2, 2, 10, 2)
+	self.table17x17h:apply(BrowserList, 2, 1, 40, 17)
 end
 
 GameUI.receive = function(self, event)
 	if event.name == "resize" then
-		self.cs:reload()
+		self.csh:reload()
+		self.csall:reload()
 	end
 end
 

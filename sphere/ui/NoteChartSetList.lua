@@ -46,7 +46,7 @@ NoteChartSetList.send = function(self, event)
 		if event.button == 2 then
 			local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
 			if shift then
-				self:updateCache(cacheData.path, recursive)
+				Cache:update(cacheData.path, recursive)
 			else
 				love.system.openURL("file://" .. love.filesystem.getSource() .. "/" .. cacheData.path)
 			end
