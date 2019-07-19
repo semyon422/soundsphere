@@ -19,10 +19,6 @@ SearchLine.observable = Observable:new()
 SearchLine.searchString = ""
 SearchLine.searchTable = {}
 
-SearchLine.x = 0
-SearchLine.y = 0
-SearchLine.w = 1
-SearchLine.h = 1
 
 SearchLine.load = function(self)
 	self.textInputFrame = self.textInputFrame or Theme.TextInputFrame:new({

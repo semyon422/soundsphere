@@ -10,10 +10,6 @@ local ModifierList = CustomList:new()
 
 ModifierList.sender = "ModifierList"
 
-ModifierList.x = 0
-ModifierList.y = 13 / 17
-ModifierList.w = 0.3
-ModifierList.h = 3 / 17
 ModifierList.buttonCount = 3
 ModifierList.middleOffset = 1
 ModifierList.startOffset = 1

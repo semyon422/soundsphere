@@ -10,11 +10,7 @@ ModifierDisplay.sender = "ModifierDisplay"
 
 ModifierDisplay.text = ""
 ModifierDisplay.enableStencil = true
-		
-ModifierDisplay.x = 0
-ModifierDisplay.y = 16 / 17
-ModifierDisplay.w = 0.6
-ModifierDisplay.h = 1 / 17
+
 ModifierDisplay.rectangleColor = {255, 255, 255, 0}
 ModifierDisplay.mode ="fill"
 ModifierDisplay.limit = math.huge

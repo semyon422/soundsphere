@@ -14,10 +14,6 @@ SearchLine.observable:add(NoteChartSetList)
 
 NoteChartSetList.sender = "NoteChartSetList"
 
-NoteChartSetList.x = 0.6
-NoteChartSetList.y = 0
-NoteChartSetList.w = 1 - NoteChartSetList.x
-NoteChartSetList.h = 1
 NoteChartSetList.buttonCount = 17
 NoteChartSetList.middleOffset = 9
 NoteChartSetList.startOffset = 9

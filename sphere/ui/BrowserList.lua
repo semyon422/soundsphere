@@ -10,10 +10,6 @@ local BrowserList = CacheList:new()
 BrowserList.sender = "BrowserList"
 BrowserList.needFocusToInteract = false
 
-BrowserList.x = 0.1
-BrowserList.y = 0
-BrowserList.w = 1 - 2 * BrowserList.x
-BrowserList.h = 1
 BrowserList.buttonCount = 17
 BrowserList.middleOffset = 9
 BrowserList.startOffset = 9

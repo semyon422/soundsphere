@@ -15,6 +15,7 @@ local MountManager = require("sphere.game.MountManager")
 local WindowManager = require("sphere.game.WindowManager")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 local NotificationLine = require("sphere.ui.NotificationLine")
+local GameUI = require("sphere.ui.GameUI")
 local CLI = require("sphere.ui.CLI")
 
 local SphereGame = {}
@@ -23,6 +24,7 @@ SphereGame.init = function(self)
 	self.observer = Observer:new()
 	self.observer.receive = function(_, ...) return self:receive(...) end
 	self.globalUI = Container:new()
+	GameUI:init()
 	
 	BackgroundManager:init()
 	NotificationLine:init()
@@ -86,6 +88,7 @@ SphereGame.receive = function(self, event)
 	end
 	
 	if CLI.hidden or event.name == "resize" then
+		GameUI:receive(event)
 		ScreenManager:receive(event)
 		BackgroundManager:receive(event)
 		NotificationLine:receive(event)

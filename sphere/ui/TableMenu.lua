@@ -32,7 +32,6 @@ TableMenu.apply = function(self, object, colStart, rowStart, colEnd, rowEnd, pad
 	object.y = (rowStart - 1) * rowHeight + padding
 	object.w = colWidth * (colEnd - colStart + 1) - 2 * padding
 	object.h = rowHeight * (rowEnd - rowStart + 1) - 2 * padding
-	print(object.x, object.y)
 end
 
 return TableMenu

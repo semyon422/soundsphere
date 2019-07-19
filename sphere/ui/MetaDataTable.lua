@@ -5,11 +5,6 @@ local spherefonts = require("sphere.assets.fonts")
 
 local MetaDataTable = {}
 
-MetaDataTable.x = 0.05
-MetaDataTable.y = 0.06
-MetaDataTable.w = 1
-MetaDataTable.h = 1
-
 MetaDataTable.cs = CS:new({
 	bx = 0,
 	by = 0,
@@ -35,8 +30,8 @@ MetaDataTable.updateValues = function(self)
 	end
 end
 
-MetaDataTable.init = function(self)
-	self.artistText = TextFrame:new({
+MetaDataTable.load = function(self)
+	self.artistText = self.artistText or TextFrame:new({
 		text = "",
 		x = self.x,
 		y = self.y,
@@ -51,7 +46,7 @@ MetaDataTable.init = function(self)
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 22)
 	})
 	
-	self.titleText = TextFrame:new({
+	self.titleText = self.titleText or TextFrame:new({
 		text = "",
 		x = self.x,
 		y = self.y + 0.045,
@@ -65,7 +60,7 @@ MetaDataTable.init = function(self)
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 28)
 	})
 	
-	self.nameText = TextFrame:new({
+	self.nameText = self.nameText or TextFrame:new({
 		text = "",
 		x = self.x,
 		y = self.y + 0.1,
@@ -78,6 +73,8 @@ MetaDataTable.init = function(self)
 		color = {255, 255, 255, 255},
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 22)
 	})
+	
+	self:reload()
 end
 
 MetaDataTable.reload = function(self)
@@ -92,8 +89,5 @@ MetaDataTable.draw = function(self)
 	self.titleText:draw()
 	self.nameText:draw()
 end
-
-MetaDataTable:init()
-MetaDataTable:reload()
 
 return MetaDataTable

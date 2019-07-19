@@ -10,25 +10,14 @@ local PreviewManager = require("sphere.ui.PreviewManager")
 local SearchLine = require("sphere.ui.SearchLine")
 local TableMenu = require("sphere.ui.TableMenu")
 local Config = require("sphere.game.Config")
+local CS = require("aqua.graphics.CS")
 
 local SelectionScreen = Screen:new()
 
 Screen.construct(SelectionScreen)
 
 SelectionScreen.load = function(self)
-	self.tableMenu = TableMenu:new({
-		x = 0,
-		y = 0,
-		w = 1,
-		h = 1,
-		cols = 10,
-		rows = 17
-	})
-	self.tableMenu:apply(NoteChartSetList, 7, 1, 10, 17)
-	self.tableMenu:apply(NoteChartList, 1, 5, 6, 13)
-	self.tableMenu:apply(SearchLine, 1, 1, 6, 1, 0.005)
-	self.tableMenu:apply(ModifierList, 1, 14, 4, 16)
-	self.tableMenu:apply(ModifierDisplay, 1, 17, 6, 17)
+	MetaDataTable:load()
 	
 	NoteChartList.NoteChartSetList = NoteChartSetList
 	NoteChartSetList.NoteChartList = NoteChartList
