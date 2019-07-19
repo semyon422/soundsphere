@@ -1,12 +1,12 @@
 local Modifier = require("sphere.game.modifiers.Modifier")
 local Fraction = require("ncdk.Fraction")
 
-local NoSpeedVariation = Modifier:new()
+local CMod = Modifier:new()
 
-NoSpeedVariation.name = "NoSpeedVariation"
+CMod.name = "CMod"
 
 local fractionOne = Fraction:new(1)
-NoSpeedVariation.apply = function(self)
+CMod.apply = function(self)
 	local noteChart = self.sequence.noteChart
 	
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
@@ -15,7 +15,6 @@ NoSpeedVariation.apply = function(self)
 		local velocityDataSequence = layerData.spaceData.velocityDataSequence
 		for velocityDataIndex = 1, velocityDataSequence:getVelocityDataCount() do
 			local velocityData = velocityDataSequence:getVelocityData(velocityDataIndex)
-			
 			
 			velocityData.currentSpeed = fractionOne
 			velocityData.localSpeed = fractionOne
@@ -26,4 +25,4 @@ NoSpeedVariation.apply = function(self)
 	noteChart:compute()
 end
 
-return NoSpeedVariation
+return CMod
