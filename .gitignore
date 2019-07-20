@@ -6,10 +6,11 @@ userdata/config.json
 userdata/mount.json
 !userdata/charts/.keep
 !userdata/hitsounds/.keep
-userdata/cache.sqlite-journal
 userdata/cache.log
 userdata/chart.log
 userdata/main.log
 userdata/scores.log
 userdata/charts.db
 userdata/scores.db
+userdata/charts.db-journal
+userdata/charts.db-journal
