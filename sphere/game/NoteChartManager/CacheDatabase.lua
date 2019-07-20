@@ -149,6 +149,14 @@ CacheDatabase.load = function(self)
 	self.selectChartSetStatement = self.db:prepare([[
 		SELECT * FROM `chartSets` WHERE path = ?
 	]])
+	
+	self.deleteChartStatement = self.db:prepare([[
+		DELETE FROM `charts` WHERE INSTR(`path`, ? || "/") == 1
+	]])
+	
+	self.deleteChartSetStatement = self.db:prepare([[
+		DELETE FROM `chartSets` WHERE INSTR(`path`, ? || "/") == 1
+	]])
 end
 
 CacheDatabase.begin = function(self)
@@ -166,6 +174,7 @@ CacheDatabase.update = function(self, path, recursive, callback)
 				local path, recursive = ...
 				local CacheDatabase = require("sphere.game.NoteChartManager.CacheDatabase")
 				CacheDatabase:load()
+				CacheDatabase:clear(path)
 				CacheDatabase:lookup(path, recursive)
 				CacheDatabase:unload()
 			]],
@@ -186,6 +195,14 @@ end
 CacheDatabase.getChartSetData = function(self, path)
 	self.insertChartSetStatement:reset():bind(path):step()
 	return self:checkChartSetData(path)
+end
+
+CacheDatabase.deleteChartData = function(self, path)
+	return self.deleteChartStatement:reset():bind(path):step()
+end
+
+CacheDatabase.deleteChartSetData = function(self, path)
+	return self.deleteChartSetStatement:reset():bind(path):step()
 end
 
 CacheDatabase.lookup = function(self, directoryPath, recursive)
@@ -227,6 +244,17 @@ CacheDatabase.lookup = function(self, directoryPath, recursive)
 			self:lookup(path, recursive)
 		end
 	end
+end
+
+CacheDatabase.clear = function(self, directoryPath)
+	if love.filesystem.exists(directoryPath) then
+		return
+	end
+	
+	self.log:write("clear", directoryPath)
+	
+	self:deleteChartData(directoryPath)
+	self:deleteChartSetData(directoryPath)
 end
 
 CacheDatabase.lookupContainer = function(self, containerPath)
