@@ -6,6 +6,7 @@ local ModifierDisplay = require("sphere.ui.ModifierDisplay")
 local SearchLine = require("sphere.ui.SearchLine")
 local BrowserList = require("sphere.ui.BrowserList")
 local TableMenu = require("sphere.ui.TableMenu")
+local SelectFrame = require("sphere.ui.SelectFrame")
 local CS = require("aqua.graphics.CS")
 
 local GameUI = {}
@@ -37,6 +38,9 @@ GameUI.init = function(self)
 	self.table10x17all:apply(NoteChartList, 1, 5, 6, 13)
 	self.table10x17all:apply(SearchLine, 1, 1, 6, 1, 0.005)
 	self.table10x17all:apply(ModifierDisplay, 1, 17, 6, 17)
+	
+	self.table10x17all:apply(SelectFrame, 6.88, 9, 11, 9)
+	SelectFrame.ry = SelectFrame.h / 2
 	
 	self.table17x17h:apply(ModifierList, 2, 14, 6, 16)
 	self.table17x17h:apply(MetaDataTable, 2, 2, 17, 2)

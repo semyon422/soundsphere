@@ -9,6 +9,7 @@ local BackgroundManager = require("sphere.ui.BackgroundManager")
 local PreviewManager = require("sphere.ui.PreviewManager")
 local SearchLine = require("sphere.ui.SearchLine")
 local TableMenu = require("sphere.ui.TableMenu")
+local SelectFrame = require("sphere.ui.SelectFrame")
 local Config = require("sphere.game.Config")
 local CS = require("aqua.graphics.CS")
 
@@ -34,6 +35,8 @@ SelectionScreen.load = function(self)
 	NoteChartSetList:sendInitial()
 	
 	SearchLine:load()
+	
+	SelectFrame:reload()
 	
 	local dim = 255 * (1 - Config.data.dim.selection)
 	BackgroundManager:setColor({dim, dim, dim})
@@ -66,6 +69,7 @@ SelectionScreen.draw = function(self)
 	ModifierList:draw()
 	ModifierDisplay:draw()
 	MetaDataTable:draw()
+	SelectFrame:draw()
 	
 	SearchLine:draw()
 end
@@ -85,6 +89,7 @@ SelectionScreen.receive = function(self, event)
 	if event.name == "resize" then
 		MetaDataTable:reload()
 		ModifierDisplay:reload()
+		SelectFrame:reload()
 	end
 	
 	NoteChartSetList:receive(event)
