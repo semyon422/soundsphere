@@ -224,7 +224,7 @@ CacheDatabase.lookup = function(self, directoryPath, recursive)
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
 		if love.filesystem.isDirectory(path) and (recursive or not self:checkChartSetData(path)) then
-			self:lookup(path, true)
+			self:lookup(path, recursive)
 		end
 	end
 end

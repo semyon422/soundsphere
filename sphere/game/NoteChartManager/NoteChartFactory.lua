@@ -93,7 +93,10 @@ NoteChartFactory.getNoteChart = function(self, path)
 		return noteChartImporter:import(content)
 	end)
 	
-	self.log:write("status", status, err)
+	if not status then
+		self.log:write("error", err)
+		return
+	end
 	
 	return noteChart
 end
