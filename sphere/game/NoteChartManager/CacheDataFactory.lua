@@ -6,6 +6,7 @@ local o2jam = require("o2jam")
 local quaver = require("quaver")
 local ksm = require("ksm")
 local utf8 = require("utf8")
+local md5 = require("md5")
 
 local CacheDataFactory = {}
 
@@ -120,7 +121,7 @@ CacheDataFactory.getBMS = function(self, chartPaths)
 		if noteChart then
 			cacheDatas[#cacheDatas + 1] = {
 				path = path,
-				hash = "",
+				hash = noteChart.hash,
 				title = fix(noteChart:hashGet("TITLE")),
 				artist = fix(noteChart:hashGet("ARTIST")),
 				source = "BMS",
@@ -160,7 +161,7 @@ CacheDataFactory.getOsu = function(self, chartPaths)
 		if noteChart then
 			cacheDatas[#cacheDatas + 1] = {
 				path = path,
-				hash = "",
+				hash = noteChart.hash,
 				title = fix(noteChart:hashGet("Title")),
 				artist = fix(noteChart:hashGet("Artist")),
 				source = fix(noteChart:hashGet("Source")),
@@ -192,7 +193,7 @@ CacheDataFactory.getKSM = function(self, chartPaths)
 		if noteChart then
 			cacheDatas[#cacheDatas + 1] = {
 				path = path,
-				hash = "",
+				hash = noteChart.hash,
 				title = fix(noteChart:hashGet("title")),
 				artist = fix(noteChart:hashGet("artist")),
 				source = "KSM",
@@ -224,7 +225,7 @@ CacheDataFactory.getQuaver = function(self, chartPaths)
 		if noteChart then
 			cacheDatas[#cacheDatas + 1] = {
 				path = path,
-				hash = "",
+				hash = noteChart.hash,
 				title = fix(noteChart:hashGet("Title") or ""),
 				artist = fix(noteChart:hashGet("Artist") or ""),
 				source = fix(noteChart:hashGet("Source") or ""),
@@ -254,13 +255,15 @@ CacheDataFactory.getO2Jam = function(self, chartPaths)
 		local path = chartPaths[i]
 		local file = love.filesystem.newFile(path)
 		file:open("r")
-		local ojn = o2jam.OJN:new(file:read(file:getSize()))
+		local content = file:read(file:getSize())
+		local hash = md5.sumhexa(content)
+		local ojn = o2jam.OJN:new(content)
 		file:close()
 		
 		for i = 1, 3 do
 			cacheDatas[#cacheDatas + 1] = {
 				path = path .. "/" .. i,
-				hash = "",
+				hash = hash,
 				title = fix(ojn.str_title),
 				artist = fix(ojn.str_artist),
 				source = "o2jam",
@@ -289,12 +292,14 @@ CacheDataFactory.getSphere = function(self, chartPaths)
 		local path = chartPaths[i]
 		local file = love.filesystem.newFile(path)
 		file:open("r")
-		local data = json.decode(file:read(file:getSize()))
+		local content = file:read(file:getSize())
+		local hash = md5.sumhexa(content)
+		local data = json.decode(content)
 		file:close()
 		
 		cacheDatas[#cacheDatas + 1] = {
 			path = path,
-			hash = "",
+			hash = hash,
 			title = data.title,
 			artist = data.artist,
 			source = data.source,

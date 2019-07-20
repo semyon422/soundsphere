@@ -9,7 +9,7 @@ local aquapackage = require("aqua.aqua.package")
 aquapackage.add("aqua")
 aquapackage.add("ncdk")
 aquapackage.add("chartbase")
-aquapackage.add("log")
+aquapackage.add("md5")
 
 local MainLog = require("sphere.MainLog")
 

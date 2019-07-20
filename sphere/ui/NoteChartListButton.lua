@@ -3,6 +3,7 @@ local CustomList = require("sphere.ui.CustomList")
 local CustomListButton = CustomList.Button
 local aquafonts = require("aqua.assets.fonts")
 local spherefonts = require("sphere.assets.fonts")
+local ScoreManager = require("sphere.game.ScoreManager")
 
 local NoteChartListButton = CustomListButton:new()
 	
@@ -47,6 +48,9 @@ NoteChartListButton.reloadTextFrame = function(self)
 	
 	local textFrame = self.scoreTextFrame
 	
+	local scores = ScoreManager.scoresByHash[self.item.cacheData.hash]
+	local score = scores and scores[1] and scores[1].score or 0
+	
 	textFrame.x = self.x + self.w * self.columnX[2]
 	textFrame.y = self.y
 	textFrame.w = self.w * self.columnWidth[2]
@@ -54,7 +58,7 @@ NoteChartListButton.reloadTextFrame = function(self)
 	textFrame.limit = self.w * self.columnWidth[2]
 	textFrame.align = self.scoreTextAlign
 	textFrame.xpadding = 0
-	textFrame.text = "1000000"
+	textFrame.text = ("%7d"):format(score)
 	textFrame.font = self.scoreFont
 	textFrame.color = self.textColor
 	textFrame.cs = self.cs

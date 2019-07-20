@@ -4,6 +4,7 @@ local osu = require("osu")
 local o2jam = require("o2jam")
 local ksm = require("ksm")
 local quaver = require("quaver")
+local md5 = require("md5")
 
 local Log = require("aqua.util.Log")
 
@@ -85,8 +86,11 @@ NoteChartFactory.getNoteChart = function(self, path)
 	noteChartImporter.noteChart = noteChart
 	noteChartImporter.chartIndex = chartIndex
 	
+	local hash = ""
 	local status, err = pcall(function()
-		local content = file:read():gsub("\r\n", "\n")
+		local rawContent = file:read()
+		hash = md5.sumhexa(rawContent)
+		local content = rawContent:gsub("\r\n", "\n")
 		if content:sub(1, 3) == string.char(0xEF, 0xBB, 0xBF) then
 			content = content:sub(4, -1)
 		end
@@ -97,6 +101,8 @@ NoteChartFactory.getNoteChart = function(self, path)
 		self.log:write("error", err)
 		return
 	end
+	
+	noteChart.hash = hash
 	
 	return noteChart
 end

@@ -4,6 +4,7 @@ local ScreenManager = require("sphere.screen.ScreenManager")
 local AccuracyGraph = require("sphere.ui.AccuracyGraph")
 local JudgeTable = require("sphere.ui.JudgeTable")
 local MetaDataTable = require("sphere.ui.MetaDataTable")
+local ScoreManager = require("sphere.game.ScoreManager")
 
 local ResultScreen = Screen:new()
 
@@ -56,11 +57,15 @@ ResultScreen.receive = function(self, event)
 	end
 	
 	if event.name == "score" then
-		self.accuracyGraph.score = event.score
+		local score = event.score
+		
+		self.accuracyGraph.score = score
 		self.accuracyGraph:load()
 		
-		self.judgeTable.score = event.score
+		self.judgeTable.score = score
 		self.judgeTable:load()
+		
+		ScoreManager:insertScore(score.noteChart.hash, score.score, score.accuracy)
 	end
 	
 	if event.name == "metadata" then

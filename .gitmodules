@@ -28,3 +28,6 @@
 [submodule "discordrpc"]
 	path = discordrpc
 	url = https://github.com/pfirsich/lua-discordRPC
+[submodule "md5"]
+	path = md5
+	url = https://github.com/kikito/md5.lua

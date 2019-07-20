@@ -10,3 +10,6 @@ userdata/cache.sqlite-journal
 userdata/cache.log
 userdata/chart.log
 userdata/main.log
+userdata/scores.log
+userdata/charts.db
+userdata/scores.db

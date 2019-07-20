@@ -6,7 +6,7 @@ local Log = require("aqua.util.Log")
 
 local CacheDatabase = {}
 
-CacheDatabase.dbpath = "userdata/cache.sqlite"
+CacheDatabase.dbpath = "userdata/charts.db"
 CacheDatabase.chartspath = "userdata/charts"
 
 CacheDatabase.chartColumns = {

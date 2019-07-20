@@ -39,7 +39,7 @@ GameUI.init = function(self)
 	self.table10x17all:apply(ModifierDisplay, 1, 17, 6, 17)
 	
 	self.table17x17h:apply(ModifierList, 2, 14, 6, 16)
-	self.table17x17h:apply(MetaDataTable, 2, 2, 10, 2)
+	self.table17x17h:apply(MetaDataTable, 2, 2, 17, 2)
 	self.table17x17h:apply(BrowserList, 2, 1, 40, 17)
 end
 
