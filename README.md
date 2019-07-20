@@ -6,6 +6,5 @@ https://github.com/semyon422/soundsphere-updater
 * [tween](https://github.com/kikito/tween.lua "tween") by kikito
 * [tinyyaml](https://github.com/peposso/lua-tinyyaml "tinyyaml") by peposso
 * [json](https://github.com/rxi/json.lua "json") by rxi
-* [log](https://github.com/rxi/log.lua "log") by rxi
 * [lua-ljsqlite3](https://github.com/stepelu/lua-ljsqlite3 "lua-ljsqlite3") by stepelu
 * [lua-discordRPC](https://github.com/pfirsich/lua-discordRPC "lua-ljsqlite3") by pfirsich

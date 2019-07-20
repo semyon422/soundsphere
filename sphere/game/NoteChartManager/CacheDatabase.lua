@@ -2,6 +2,7 @@ local sqlite = require("ljsqlite3")
 local NoteChartFactory = require("sphere.game.NoteChartManager.NoteChartFactory")
 local CacheDataFactory = require("sphere.game.NoteChartManager.CacheDataFactory")
 local ThreadPool = require("aqua.thread.ThreadPool")
+local Log = require("aqua.util.Log")
 
 local CacheDatabase = {}
 
@@ -53,6 +54,10 @@ CacheDatabase.unload = function(self)
 end
 
 CacheDatabase.load = function(self)
+	self.log = Log:new()
+	self.log.console = true
+	self.log.path = "userdata/cache.log"
+	
 	self.db = sqlite.open(self.dbpath)
 	
 	self.db:exec[[
@@ -188,6 +193,8 @@ CacheDatabase.lookup = function(self, directoryPath, recursive)
 		return
 	end
 	
+	self.log:write("lookup", directoryPath)
+	
 	local items = love.filesystem.getDirectoryItems(directoryPath)
 	
 	local containerPaths = {}
@@ -223,7 +230,8 @@ CacheDatabase.lookup = function(self, directoryPath, recursive)
 end
 
 CacheDatabase.lookupContainer = function(self, containerPath)
-	print(containerPath)
+	self.log:write("ncc", containerPath)
+	
 	self:begin()
 	local chartSetData = self:getChartSetData(containerPath)
 	
@@ -231,16 +239,16 @@ CacheDatabase.lookupContainer = function(self, containerPath)
 	
 	for i = 1, #cacheDatas do
 		local cacheData = cacheDatas[i]
-		
 		cacheData.chartSetId = chartSetData[1]
-		
+		self.log:write("chart", cacheData.path)
 		self:setChartData(cacheData)
 	end
 	self:commit()
 end
 
 CacheDatabase.processNoteChartSet = function(self, chartPaths, directoryPath)
-	print(directoryPath)
+	self.log:write("ncs", directoryPath)
+	
 	self:begin()
 	local chartSetData = self:getChartSetData(directoryPath)
 	
@@ -249,9 +257,8 @@ CacheDatabase.processNoteChartSet = function(self, chartPaths, directoryPath)
 		
 		for i = 1, #cacheDatas do
 			local cacheData = cacheDatas[i]
-			
 			cacheData.chartSetId = chartSetData[1]
-			
+			self.log:write("chart", cacheData.path)
 			self:setChartData(cacheData)
 		end
 	end

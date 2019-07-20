@@ -5,7 +5,12 @@ local o2jam = require("o2jam")
 local ksm = require("ksm")
 local quaver = require("quaver")
 
+local Log = require("aqua.util.Log")
+
 local NoteChartFactory = {}
+
+NoteChartFactory.log = Log:new()
+NoteChartFactory.log.path = "userdata/chart.log"
 
 local chartPatterns = {
 	"%.osu$", "%.bm[sel]$", "%.qua$", "%.ksh$", "%.sph$"
@@ -51,6 +56,8 @@ NoteChartFactory.splitList = function(self, chartPaths)
 end
 
 NoteChartFactory.getNoteChart = function(self, path)
+	self.log:write("get", path)
+	
 	local noteChartImporter
 	local noteChart = NoteChart:new()
 	local chartIndex
@@ -86,9 +93,7 @@ NoteChartFactory.getNoteChart = function(self, path)
 		return noteChartImporter:import(content)
 	end)
 	
-	if not status then
-		return print(err)
-	end
+	self.log:write("status", status, err)
 	
 	return noteChart
 end

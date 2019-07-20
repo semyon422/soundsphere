@@ -11,12 +11,9 @@ aquapackage.add("ncdk")
 aquapackage.add("chartbase")
 aquapackage.add("log")
 
-local log = require("log")
-log.usecolor = false
-log.outfile = "userdata/log.txt"
-log.level = "trace"
+local MainLog = require("sphere.MainLog")
 
-log.trace("starting game")
+MainLog:write("trace", "starting game")
 
 require("aqua")
 
