@@ -49,25 +49,32 @@ NoteChartResourceLoader.loadBMS = function(self)
 	self.soundGroup = Group:new()
 	self.imageGroup = Group:new()
 	self.videoGroup = Group:new()
-	for resourceType, resourceName in self.noteChart:getResourceIterator() do
+	for resourceType, name, sequence in self.noteChart:getResourceIterator() do
 		if resourceType == "sound" then
-			local soundFilePath = FileManager:findFile(resourceName, "audio")
-			if soundFilePath then
-				self.soundGroup:add(soundFilePath)
-				self.resourceCount = self.resourceCount + 1
-				self.aliases[resourceName] = soundFilePath
+			for _, path in ipairs(sequence) do
+				local soundFilePath = FileManager:findFile(path, "audio")
+				if soundFilePath then
+					self.soundGroup:add(soundFilePath)
+					self.resourceCount = self.resourceCount + 1
+					self.aliases[name] = soundFilePath
+					break
+				end
 			end
 		elseif resourceType == "image" then
-			local imageFilePath = FileManager:findFile(resourceName, "image")
-			local videoFilePath = FileManager:findFile(resourceName, "video")
-			if imageFilePath then
-				self.imageGroup:add(imageFilePath)
-				self.resourceCount = self.resourceCount + 1
-				self.aliases[resourceName] = imageFilePath
-			elseif videoFilePath then
-				self.videoGroup:add(videoFilePath)
-				self.resourceCount = self.resourceCount + 1
-				self.aliases[resourceName] = videoFilePath
+			for _, path in ipairs(sequence) do
+				local imageFilePath = FileManager:findFile(path, "image")
+				local videoFilePath = FileManager:findFile(path, "video")
+				if imageFilePath then
+					self.imageGroup:add(imageFilePath)
+					self.resourceCount = self.resourceCount + 1
+					self.aliases[name] = imageFilePath
+					break
+				elseif videoFilePath then
+					self.videoGroup:add(videoFilePath)
+					self.resourceCount = self.resourceCount + 1
+					self.aliases[name] = videoFilePath
+					break
+				end
 			end
 		end
 	end
