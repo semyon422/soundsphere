@@ -36,14 +36,8 @@ LongGraphicalNote.update = function(self)
 end
 
 LongGraphicalNote.computeVisualTime = function(self)
-	self.startNoteData.currentVisualTime
-		= (self.startNoteData.zeroClearVisualTime - self.noteDrawer.currentClearVisualTime)
-		* self.noteDrawer.globalSpeed
-		+ self.noteDrawer.currentTimePoint:getAbsoluteTime()
-	self.endNoteData.currentVisualTime
-		= (self.endNoteData.zeroClearVisualTime - self.noteDrawer.currentClearVisualTime)
-		* self.noteDrawer.globalSpeed
-		+ self.noteDrawer.currentTimePoint:getAbsoluteTime()
+	self.startNoteData:computeVisualTime(self.noteDrawer.currentTimePoint)
+	self.endNoteData:computeVisualTime(self.noteDrawer.currentTimePoint)
 end
 
 LongGraphicalNote.updateFakeStartTime = function(self)
@@ -85,7 +79,7 @@ LongGraphicalNote.getFakeVisualStartTime = function(self)
 		+ fakeVelocityData.timePoint.zeroClearVisualTime
 		
 	local fakeVisualStartTime
-		= (fakeVisualClearStartTime - self.noteDrawer.currentClearVisualTime)
+		= (fakeVisualClearStartTime - self.noteDrawer.currentTimePoint.zeroClearVisualTime)
 		* self.noteDrawer.globalSpeed
 		+ self.noteDrawer.currentTimePoint:getAbsoluteTime()
 		
