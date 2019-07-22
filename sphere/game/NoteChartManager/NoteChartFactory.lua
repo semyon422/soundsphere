@@ -14,7 +14,7 @@ NoteChartFactory.log = Log:new()
 NoteChartFactory.log.path = "userdata/chart.log"
 
 local chartPatterns = {
-	"%.osu$", "%.bm[sel]$", "%.qua$", "%.ksh$", "%.sph$"
+	"%.osu$", "%.bm[sel]$", "%.pms$", "%.qua$", "%.ksh$", "%.sph$"
 }
 
 local containerPatterns = {
@@ -69,6 +69,9 @@ NoteChartFactory.getNoteChart = function(self, path)
 		noteChartImporter = quaver.NoteChartImporter:new()
 	elseif path:find("%.bm[sel]$") then
 		noteChartImporter = bms.NoteChartImporter:new()
+	elseif path:find("%.pms$") then
+		noteChartImporter = bms.NoteChartImporter:new()
+		noteChartImporter.pms = true
 	elseif path:find("%.ksh$") then
 		noteChartImporter = ksm.NoteChartImporter:new()
 	elseif path:find("%.ojn/.$") then

@@ -16,7 +16,7 @@ CacheDataFactory.getCacheDatas = function(self, chartPaths)
 		return self:getOsu(chartPaths)
 	elseif path:find("%.qua$") then
 		return self:getQuaver(chartPaths)
-	elseif path:find("%.bm[sel]$") then
+	elseif path:find("%.bm[sel]$") or path:find("%.pms$") then
 		return self:getBMS(chartPaths)
 	elseif path:find("%.ojn$") then
 		return self:getO2Jam(chartPaths)
