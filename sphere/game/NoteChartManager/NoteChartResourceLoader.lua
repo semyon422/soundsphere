@@ -54,9 +54,11 @@ NoteChartResourceLoader.loadBMS = function(self)
 			for _, path in ipairs(sequence) do
 				local soundFilePath = FileManager:findFile(path, "audio")
 				if soundFilePath then
-					self.soundGroup:add(soundFilePath)
-					self.resourceCount = self.resourceCount + 1
-					self.aliases[name] = soundFilePath
+					if not self.soundGroup.objects[soundFilePath] then
+						self.soundGroup:add(soundFilePath)
+						self.resourceCount = self.resourceCount + 1
+						self.aliases[name] = soundFilePath
+					end
 					break
 				end
 			end
@@ -65,14 +67,18 @@ NoteChartResourceLoader.loadBMS = function(self)
 				local imageFilePath = FileManager:findFile(path, "image")
 				local videoFilePath = FileManager:findFile(path, "video")
 				if imageFilePath then
-					self.imageGroup:add(imageFilePath)
-					self.resourceCount = self.resourceCount + 1
-					self.aliases[name] = imageFilePath
+					if not self.imageGroup.objects[imageFilePath] then
+						self.imageGroup:add(imageFilePath)
+						self.resourceCount = self.resourceCount + 1
+						self.aliases[name] = imageFilePath
+					end
 					break
 				elseif videoFilePath then
-					self.videoGroup:add(videoFilePath)
-					self.resourceCount = self.resourceCount + 1
-					self.aliases[name] = videoFilePath
+					if not self.videoGroup.objects[videoFilePath] then
+						self.videoGroup:add(videoFilePath)
+						self.resourceCount = self.resourceCount + 1
+						self.aliases[name] = videoFilePath
+					end
 					break
 				end
 			end
