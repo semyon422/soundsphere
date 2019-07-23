@@ -116,6 +116,7 @@ NoteChartList.checkChartData = function(self, chart, searchTable)
 	for _, searchString in ipairs(searchTable) do
 		if
 			chart.path and chart.path:lower():find(searchString, 1, true) or
+			chart.hash and chart.hash:lower():find(searchString, 1, true) or
 			chart.artist and chart.artist:lower():find(searchString, 1, true) or
 			chart.title and chart.title:lower():find(searchString, 1, true) or
 			chart.name and chart.name:lower():find(searchString, 1, true) or
