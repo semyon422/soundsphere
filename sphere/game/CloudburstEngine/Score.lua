@@ -49,6 +49,7 @@ Score.timegates = {
 }
 
 Score.interval = 0.004
+Score.scale = 0.120
 Score.hit = function(self, deltaTime)
 	if math.abs(deltaTime) <= self.passEdge then
 		local hit = math.floor(deltaTime / self.interval)
@@ -65,8 +66,9 @@ Score.hit = function(self, deltaTime)
 	self.sum = self.sum + (deltaTime * 1000) ^ 2
 	self.count = self.count + 1
 	self.accuracy = math.sqrt(self.sum / self.count)
+	
 	self.score = self.score
-		+ math.cos(math.pi / 2 * deltaTime / self.timegates[#self.timegates - 1].time)
+		+ math.exp(-(2 * deltaTime / self.scale) ^ 2)
 		/ self.engine.noteCount
 		* 1000000
 	
