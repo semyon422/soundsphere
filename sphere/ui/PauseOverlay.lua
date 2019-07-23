@@ -118,6 +118,10 @@ PauseOverlay.receive = function(self, event)
 		self.continueRectangle:reload()
 	end
 	
+	if event.name == "focus" and not self.paused and not event.args[1] then
+		self:pause()
+	end
+	
 	if self.paused then
 		self.continueButton:receive(event)
 		self.retryButton:receive(event)
