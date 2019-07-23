@@ -1,8 +1,10 @@
 local CS = require("aqua.graphics.CS")
+local Rectangle = require("aqua.graphics.Rectangle")
 local aquafonts = require("aqua.assets.fonts")
 local Theme = require("aqua.ui.Theme")
 local spherefonts = require("sphere.assets.fonts")
 local ScreenManager = require("sphere.screen.ScreenManager")
+local tween = require("tween")
 
 local PauseOverlay = {}
 
@@ -12,10 +14,22 @@ PauseOverlay.cs = CS:new({
 	baseOne = 768
 })
 
+PauseOverlay.baseDelay = 1
+
 PauseOverlay.load = function(self)
+	self.delay = self.baseDelay
+	self.font = self.font or aquafonts.getFont(spherefonts.NotoSansRegular, 48)
+	
 	self.cs:reload()
 	
-	self.font = self.font or aquafonts.getFont(spherefonts.NotoSansRegular, 48)
+	self.continueRectangle = Rectangle:new({
+		x = 0, y = 0.99,
+		w = 1, h = 0.01,
+		cs = self.cs,
+		color = {255, 255, 255, 255},
+		mode = "fill"
+	})
+	self.continueRectangle:reload()
 	
 	self.continueButton = Theme.Button:new({
 		text = "continue",
@@ -66,11 +80,23 @@ PauseOverlay.load = function(self)
 	self.menuButton:reload()
 end
 
-PauseOverlay.update = function(self)
+PauseOverlay.update = function(self, dt)
+	if self.continueTween then
+		self.continueTween:update(dt)
+		self.continueRectangle.w = self.delay / self.baseDelay
+		self.continueRectangle:reload()
+	end
+	
 	if self.paused then
 		self.continueButton:update()
 		self.retryButton:update()
 		self.menuButton:update()
+		
+		if self.delay == 0 then
+			self.paused = false
+			self:stopContinue()
+			self:play()
+		end
 	end
 end
 
@@ -79,6 +105,7 @@ PauseOverlay.draw = function(self)
 		self.continueButton:draw()
 		self.retryButton:draw()
 		self.menuButton:draw()
+		self.continueRectangle:draw()
 	end
 end
 
@@ -88,6 +115,7 @@ PauseOverlay.receive = function(self, event)
 		self.continueButton:reload()
 		self.retryButton:reload()
 		self.menuButton:reload()
+		self.continueRectangle:reload()
 	end
 	
 	if self.paused then
@@ -95,10 +123,44 @@ PauseOverlay.receive = function(self, event)
 		self.retryButton:receive(event)
 		self.menuButton:receive(event)
 	end
+	
+	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
+	if event.name == "keypressed" then
+		local key = event.args[1]
+		if key == "escape" and not shift then
+			if self.continueTween then
+				self:stopContinue()
+				return
+			end
+			if self.engine.paused then
+				self:continue()
+			else
+				self:pause()
+			end
+		elseif key == "escape" then
+			self:menu()
+		end
+	end
+end
+
+PauseOverlay.stopContinue = function(self)
+	self.continueTween = nil
+	self.delay = self.baseDelay
+	self.continueRectangle.w = 1
+	self.continueRectangle:reload()
+end
+
+PauseOverlay.play = function(self)
+	self.engine:play()
 end
 
 PauseOverlay.continue = function(self)
-	self:pause()
+	self.continueTween = tween.new(1, self, {delay = 0}, "linear")
+end
+
+PauseOverlay.pause = function(self)
+	self.engine:pause()
+	self.paused = true
 end
 
 PauseOverlay.retry = function(self)
@@ -121,15 +183,6 @@ PauseOverlay.menu = function(self)
 			})
 		end
 	)
-end
-
-PauseOverlay.pause = function(self)
-	if self.engine.paused then
-		self.engine:play()
-	else
-		self.engine:pause()
-	end
-	self.paused = self.engine.paused
 end
 
 return PauseOverlay

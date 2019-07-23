@@ -109,16 +109,6 @@ GameplayScreen.receive = function(self, event)
 	self.playField:receive(event)
 	self.bga:receive(event)
 	PauseOverlay:receive(event)
-	
-	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
-	if event.name == "keypressed" then
-		local key = event.args[1]
-		if key == "escape" and not shift then
-			PauseOverlay:pause()
-		elseif key == "escape" then
-			PauseOverlay:menu()
-		end
-	end
 end
 
 return GameplayScreen
