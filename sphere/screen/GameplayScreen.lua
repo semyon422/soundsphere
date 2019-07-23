@@ -9,6 +9,7 @@ local CloudburstEngine = require("sphere.game.CloudburstEngine")
 local NoteSkin = require("sphere.game.CloudburstEngine.NoteSkin")
 local NotificationLine = require("sphere.ui.NotificationLine")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
+local PauseOverlay = require("sphere.ui.PauseOverlay")
 local ScreenManager = require("sphere.screen.ScreenManager")
 local ModifierManager = require("sphere.game.ModifierManager")
 local BMSBGA = require("sphere.game.BMSBGA")
@@ -69,6 +70,9 @@ GameplayScreen.load = function(self)
 		self.engine:play()
 	end)
 	
+	PauseOverlay.engine = self.engine
+	PauseOverlay:load()
+	
 	local dim = 255 * (1 - Config.data.dim.gameplay)
 	local color = {dim, dim, dim}
 	BackgroundManager:setColor(color)
@@ -85,6 +89,7 @@ GameplayScreen.update = function(self, dt)
 	self.engine:update(dt)
 	self.playField:update()
 	self.bga:update(dt)
+	PauseOverlay:update(dt)
 	
 	Screen.update(self)
 end
@@ -94,6 +99,8 @@ GameplayScreen.draw = function(self)
 	self.engine:draw()
 	
 	Screen.draw(self)
+	
+	PauseOverlay:draw()
 end
 
 GameplayScreen.receive = function(self, event)
@@ -101,27 +108,16 @@ GameplayScreen.receive = function(self, event)
 	self.engine:receive(event)
 	self.playField:receive(event)
 	self.bga:receive(event)
+	PauseOverlay:receive(event)
 	
 	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
-	if
-		event.name == "keypressed" and
-		event.args[1] == "escape" and
-		shift
-	then
-		self.engine.bgaContainer:stop()
-		self.engine.fgaContainer:stop()
-		ScreenManager:set(require("sphere.screen.ResultScreen"),
-			function()
-				ScreenManager:receive({
-					name = "score",
-					score = self.engine.score
-				})
-				ScreenManager:receive({
-					name = "metadata",
-					data = self.cacheData
-				})
-			end
-		)
+	if event.name == "keypressed" then
+		local key = event.args[1]
+		if key == "escape" and not shift then
+			PauseOverlay:pause()
+		elseif key == "escape" then
+			PauseOverlay:menu()
+		end
 	end
 end
 

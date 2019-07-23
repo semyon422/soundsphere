@@ -62,6 +62,9 @@ CloudburstEngine.unload = function(self)
 	self:unloadTimeManager()
 	self:unloadNoteHandlers()
 	self:unloadNoteDrawers()
+	
+	self.bgaContainer:stop()
+	self.fgaContainer:stop()
 end
 
 CloudburstEngine.draw = function(self)
@@ -90,13 +93,7 @@ CloudburstEngine.receive = function(self, event)
 		else
 			delta = 0.1
 		end
-		if key == "escape" and not shift then
-			if self.paused then
-				self:play()
-			else
-				self:pause()
-			end
-		elseif key == "f2" then
+		if key == "f2" then
 			NoteSkin.targetSpeed = -NoteSkin.targetSpeed
 			NoteSkin:setSpeed(NoteSkin.targetSpeed)
 			return self.observable:send({
