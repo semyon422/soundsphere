@@ -17,7 +17,6 @@ PauseOverlay.cs = CS:new({
 PauseOverlay.baseDelay = 1
 
 PauseOverlay.load = function(self)
-	self.delay = self.baseDelay
 	self.font = self.font or aquafonts.getFont(spherefonts.NotoSansRegular, 48)
 	
 	self.cs:reload()
@@ -78,6 +77,9 @@ PauseOverlay.load = function(self)
 		font = self.font,
 	})
 	self.menuButton:reload()
+	
+	self:stopContinue()
+	self.paused = false
 end
 
 PauseOverlay.update = function(self, dt)
