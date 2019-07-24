@@ -10,6 +10,7 @@ local NoteSkin = require("sphere.game.CloudburstEngine.NoteSkin")
 local NotificationLine = require("sphere.ui.NotificationLine")
 local BackgroundManager = require("sphere.ui.BackgroundManager")
 local PauseOverlay = require("sphere.ui.PauseOverlay")
+local ProgressBar = require("sphere.ui.ProgressBar")
 local ScreenManager = require("sphere.screen.ScreenManager")
 local ModifierManager = require("sphere.game.ModifierManager")
 local BMSBGA = require("sphere.game.BMSBGA")
@@ -72,6 +73,8 @@ GameplayScreen.load = function(self)
 	
 	PauseOverlay.engine = self.engine
 	PauseOverlay:load()
+	ProgressBar.engine = self.engine
+	ProgressBar:load()
 	
 	local dim = 255 * (1 - Config.data.dim.gameplay)
 	local color = {dim, dim, dim}
@@ -90,6 +93,7 @@ GameplayScreen.update = function(self, dt)
 	self.playField:update()
 	self.bga:update(dt)
 	PauseOverlay:update(dt)
+	ProgressBar:update(dt)
 	
 	Screen.update(self)
 end
@@ -100,6 +104,7 @@ GameplayScreen.draw = function(self)
 	
 	Screen.draw(self)
 	
+	ProgressBar:draw()
 	PauseOverlay:draw()
 end
 
