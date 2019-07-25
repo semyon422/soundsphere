@@ -158,10 +158,10 @@ CacheDataFactory.getBMS = function(self, chartPaths)
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
 		local noteChart, hash = NoteChartFactory:getNoteChart(path)
-		local bms = noteChart.importer.bms
-		local header = bms.header
 		
 		if noteChart then
+			local bms = noteChart.importer.bms
+			local header = bms.header
 			local cacheData = {
 				path		= path,
 				hash		= hash,
@@ -203,10 +203,10 @@ CacheDataFactory.getOsu = function(self, chartPaths)
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
 		local noteChart, hash = NoteChartFactory:getNoteChart(path)
-		local osu = noteChart.importer.osu
-		local metadata = osu.metadata
 		
 		if noteChart then
+			local osu = noteChart.importer.osu
+			local metadata = osu.metadata
 			local cacheData = {
 				path		= path,
 				hash		= hash,
@@ -240,11 +240,11 @@ CacheDataFactory.getKSM = function(self, chartPaths)
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
 		local noteChart, hash = NoteChartFactory:getNoteChart(path)
-		local importer = noteChart.importer
-		local ksh = importer.ksh
-		local options = ksh.options
 		
 		if noteChart then
+			local importer = noteChart.importer
+			local ksh = importer.ksh
+			local options = ksh.options
 			local cacheData = {
 				path		= path,
 				hash		= hash,
@@ -278,9 +278,9 @@ CacheDataFactory.getQuaver = function(self, chartPaths)
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
 		local noteChart, hash = NoteChartFactory:getNoteChart(path)
-		local qua = noteChart.importer.qua
 		
 		if noteChart then
+			local qua = noteChart.importer.qua
 			local cacheData = {
 				path		= path,
 				hash		= hash,
