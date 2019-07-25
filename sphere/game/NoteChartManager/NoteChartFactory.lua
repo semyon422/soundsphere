@@ -4,6 +4,7 @@ local osu = require("osu")
 local o2jam = require("o2jam")
 local ksm = require("ksm")
 local quaver = require("quaver")
+local sph = require("sph")
 local md5 = require("md5")
 
 local Log = require("aqua.util.Log")
@@ -56,48 +57,64 @@ NoteChartFactory.splitList = function(self, chartPaths)
 	return list
 end
 
+NoteChartFactory.readFile = function(self, path)
+	local file = love.filesystem.newFile(path)
+	file:open("r")
+	local content = file:read()
+	file:close()
+	return content
+end
+
+NoteChartFactory.getNoteChartImporter = function(self, path)
+	if path:find("%.osu$") then
+		return osu.NoteChartImporter:new()
+	elseif path:find("%.qua$") then
+		return quaver.NoteChartImporter:new()
+	elseif path:find("%.bm[sel]$") then
+		return bms.NoteChartImporter:new()
+	elseif path:find("%.pms$") then
+		local noteChartImporter = bms.NoteChartImporter:new()
+		noteChartImporter.pms = true
+		return noteChartImporter
+	elseif path:find("%.ksh$") then
+		return ksm.NoteChartImporter:new()
+	elseif path:find("%.ojn/.$") then
+		local noteChartImporter = o2jam.NoteChartImporter:new()
+		noteChartImporter.chartIndex = tonumber(path:sub(-1, -1))
+		return noteChartImporter
+	elseif path:find("%.sph$") then
+		local noteChartImporter = sph.NoteChartImporter:new()
+		noteChartImporter.path = path
+		return noteChartImporter
+	end
+end
+
+NoteChartFactory.getRealPath = function(self, path)
+	if path:find("%.ojn/.$") then
+		return path:match("^(.+)/.$")
+	end
+	return path
+end
+
+NoteChartFactory.deleteBOM = function(self, content)
+	if content:sub(1, 3) == string.char(0xEF, 0xBB, 0xBF) then
+		return content:sub(4, -1)
+	end
+	return content
+end
+
 NoteChartFactory.getNoteChart = function(self, path)
 	self.log:write("get", path)
 	
-	local noteChartImporter
-	local noteChart = NoteChart:new()
-	local chartIndex
-	
-	if path:find("%.osu$") then
-		noteChartImporter = osu.NoteChartImporter:new()
-	elseif path:find("%.qua$") then
-		noteChartImporter = quaver.NoteChartImporter:new()
-	elseif path:find("%.bm[sel]$") then
-		noteChartImporter = bms.NoteChartImporter:new()
-	elseif path:find("%.pms$") then
-		noteChartImporter = bms.NoteChartImporter:new()
-		noteChartImporter.pms = true
-	elseif path:find("%.ksh$") then
-		noteChartImporter = ksm.NoteChartImporter:new()
-	elseif path:find("%.ojn/.$") then
-		noteChartImporter = o2jam.NoteChartImporter:new()
-		chartIndex = tonumber(path:sub(-1, -1))
-		path = path:match("^(.+)/.$")
-	elseif path:find("%.sph$") then
-		local directoryPath, fileName = path:match("^(.+)/(.-)%.sph$")
-		return dofile(directoryPath .. "/" .. fileName .. ".lua")(directoryPath)
-	end
-	
-	local file = love.filesystem.newFile(path)
-	file:open("r")
-	
-	noteChartImporter.noteChart = noteChart
-	noteChartImporter.chartIndex = chartIndex
-	
-	local hash = ""
+	local noteChart, hash
 	local status, err = pcall(function()
-		local rawContent = file:read()
+		local noteChartImporter = self:getNoteChartImporter(path)
+		local realPath = self:getRealPath(path)
+		
+		local rawContent = self:readFile(realPath)
 		hash = md5.sumhexa(rawContent)
-		local content = rawContent:gsub("\r\n", "\n")
-		if content:sub(1, 3) == string.char(0xEF, 0xBB, 0xBF) then
-			content = content:sub(4, -1)
-		end
-		return noteChartImporter:import(content)
+		local content = self:deleteBOM(rawContent:gsub("\r\n", "\n"))
+		noteChart = noteChartImporter:import(content)
 	end)
 	
 	if not status then
@@ -105,9 +122,7 @@ NoteChartFactory.getNoteChart = function(self, path)
 		return
 	end
 	
-	noteChart.hash = hash
-	
-	return noteChart
+	return noteChart, hash
 end
 
 return NoteChartFactory

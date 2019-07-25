@@ -8,12 +8,19 @@ ScoreDatabase.dbpath = "userdata/scores.db"
 ScoreDatabase.scoreColumns = {
 	"id",
 	"chartHash",
+	"playerName",
+	"time",
 	"score",
-	"accuracy"
+	"accuracy",
+	"maxCombo",
+	"scoreRating",
+	"mods"
 }
 
 ScoreDatabase.scoreNumberColumns = {
-	"id"
+	"id",
+	"time",
+	"maxCombo"
 }
 
 ScoreDatabase.unload = function(self)
@@ -31,18 +38,28 @@ ScoreDatabase.load = function(self)
 		CREATE TABLE IF NOT EXISTS `scores` (
 			`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			`chartHash` TEXT NOT NULL DEFAULT '',
+			`playerName` TEXT,
+			`time` INTEGER,
 			`score` REAL,
-			`accuracy` REAL
+			`accuracy` REAL,
+			`maxCombo` INTEGER,
+			`scoreRating` REAL,
+			`mods` TEXT
 		);
 	]]
 	
 	self.insertScoreStatement = self.db:prepare([[
 		INSERT OR IGNORE INTO `scores` (
 			chartHash,
+			playerName,
+			time,
 			score,
-			accuracy
+			accuracy,
+			maxCombo,
+			scoreRating,
+			mods
 		)
-		VALUES (?, ?, ?);
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 	]])
 	
 	self.selectScoreStatement = self.db:prepare([[
@@ -50,9 +67,18 @@ ScoreDatabase.load = function(self)
 	]])
 end
 
-ScoreDatabase.insertScore = function(self, chartHash, score, accuracy)
-	self.log:write("score", chartHash, score, accuracy)
-	self.insertScoreStatement:reset():bind(chartHash, score, accuracy):step()
+ScoreDatabase.insertScore = function(self, scoreData)
+	self.log:write("score", scoreData.chartHash, scoreData.score)
+	self.insertScoreStatement:reset():bind(
+		scoreData.chartHash,
+		scoreData.playerName,
+		scoreData.time,
+		scoreData.score,
+		scoreData.accuracy,
+		scoreData.maxCombo,
+		scoreData.scoreRating,
+		scoreData.mods
+	):step()
 end
 
 return ScoreDatabase

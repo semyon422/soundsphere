@@ -65,7 +65,7 @@ ResultScreen.receive = function(self, event)
 		self.judgeTable.score = score
 		self.judgeTable:load()
 		
-		ScoreManager:insertScore(score.noteChart.hash, score.score, score.accuracy)
+		ScoreManager:insertScore(score)
 	end
 	
 	if event.name == "metadata" then

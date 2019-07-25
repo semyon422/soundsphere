@@ -207,6 +207,9 @@ end
 
 CacheDatabase.lookup = function(self, directoryPath, recursive)
 	if love.filesystem.isFile(directoryPath) then
+		if NoteChartFactory:isNoteChartContainer(directoryPath) then
+			self:lookupContainer(directoryPath)
+		end
 		return
 	end
 	

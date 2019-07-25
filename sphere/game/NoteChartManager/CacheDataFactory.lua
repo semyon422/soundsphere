@@ -111,32 +111,78 @@ local fix = function(line)
 	end
 end
 
+local numberFields = {
+	"level",
+	"previewTime",
+	"noteCount",
+	"length",
+	"bpm"
+}
+local stringFields = {
+	"path",
+	"hash",
+	"title",
+	"artist",
+	"source",
+	"tags",
+	"name",
+	"creator",
+	"audioPath",
+	"stagePath",
+	"inputMode"
+}
+CacheDataFactory.fixCacheData = function(self, cacheData)
+	for _, field in ipairs(numberFields) do
+		local value = cacheData[field]
+		if not value or not tonumber(value) then
+			cacheData[field] = 0
+			print("no number value", field)
+		else
+			cacheData[field] = tonumber(value)
+		end
+	end
+	for _, field in ipairs(stringFields) do
+		local value = cacheData[field]
+		if not value then
+			cacheData[field] = ""
+			print("no string value", field)
+		else
+			cacheData[field] = fix(value)
+		end
+	end
+end
+
 CacheDataFactory.getBMS = function(self, chartPaths)
 	local cacheDatas = {}
 	
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
-		local noteChart = NoteChartFactory:getNoteChart(path)
+		local noteChart, hash = NoteChartFactory:getNoteChart(path)
+		local bms = noteChart.importer.bms
+		local header = bms.header
 		
 		if noteChart then
-			cacheDatas[#cacheDatas + 1] = {
-				path = path,
-				hash = noteChart.hash,
-				title = fix(noteChart:hashGet("TITLE")),
-				artist = fix(noteChart:hashGet("ARTIST")),
-				source = "BMS",
-				tags = "",
-				name = nil,
-				level = tonumber(noteChart:hashGet("PLAYLEVEL")),
-				creator = fix(noteChart:hashGet("ARTIST")),
-				audioPath = "",
-				stagePath = fix(noteChart:hashGet("STAGEFILE")),
-				previewTime = 0,
-				noteCount = noteChart:hashGet("noteCount"),
-				length = noteChart:hashGet("totalLength"),
-				bpm = 120,
-				inputMode = noteChart.inputMode:getString()
+			local cacheData = {
+				path		= path,
+				hash		= hash,
+				title		= header["TITLE"],
+				artist		= header["ARTIST"],
+				source		= "BMS",
+				tags		= "",
+				name		= nil,
+				level		= header["PLAYLEVEL"],
+				creator		= "",
+				audioPath	= "",
+				stagePath	= header["STAGEFILE"],
+				previewTime	= 0,
+				noteCount	= noteChart:hashGet("noteCount"),
+				length		= noteChart:hashGet("totalLength"),
+				bpm			= bms.baseTempo or 0,
+				inputMode	= noteChart.inputMode:getString()
 			}
+			self:fixCacheData(cacheData)
+			
+			cacheDatas[#cacheDatas + 1] = cacheData
 		end
 	end
 	
@@ -156,27 +202,32 @@ CacheDataFactory.getOsu = function(self, chartPaths)
 	
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
-		local noteChart = NoteChartFactory:getNoteChart(path)
+		local noteChart, hash = NoteChartFactory:getNoteChart(path)
+		local osu = noteChart.importer.osu
+		local metadata = osu.metadata
 		
 		if noteChart then
-			cacheDatas[#cacheDatas + 1] = {
-				path = path,
-				hash = noteChart.hash,
-				title = fix(noteChart:hashGet("Title")),
-				artist = fix(noteChart:hashGet("Artist")),
-				source = fix(noteChart:hashGet("Source")),
-				tags = fix(noteChart:hashGet("Tags")),
-				name = fix(noteChart:hashGet("Version")),
-				level = 0,
-				creator = fix(noteChart:hashGet("Creator")),
-				audioPath = fix(noteChart:hashGet("AudioFilename")),
-				stagePath = fix(noteChart:hashGet("Background")),
-				previewTime = noteChart:hashGet("PreviewTime") / 1000,
-				noteCount = noteChart:hashGet("noteCount"),
-				length = noteChart:hashGet("totalLength") / 1000,
-				bpm = noteChart:hashGet("primaryBPM"),
-				inputMode = noteChart.inputMode:getString()
+			local cacheData = {
+				path		= path,
+				hash		= hash,
+				title		= metadata["Title"],
+				artist		= metadata["Artist"],
+				source		= metadata["Source"],
+				tags		= metadata["Tags"],
+				name		= metadata["Version"],
+				level		= 0,
+				creator		= metadata["Creator"],
+				audioPath	= metadata["AudioFilename"],
+				stagePath	= osu.background,
+				previewTime	= metadata["PreviewTime"] / 1000,
+				noteCount	= noteChart:hashGet("noteCount"),
+				length		= noteChart:hashGet("totalLength"),
+				bpm			= noteChart.importer.primaryBPM,
+				inputMode	= noteChart.inputMode:getString()
 			}
+			self:fixCacheData(cacheData)
+			
+			cacheDatas[#cacheDatas + 1] = cacheData
 		end
 	end
 	
@@ -188,27 +239,33 @@ CacheDataFactory.getKSM = function(self, chartPaths)
 	
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
-		local noteChart = NoteChartFactory:getNoteChart(path)
+		local noteChart, hash = NoteChartFactory:getNoteChart(path)
+		local importer = noteChart.importer
+		local ksh = importer.ksh
+		local options = ksh.options
 		
 		if noteChart then
-			cacheDatas[#cacheDatas + 1] = {
-				path = path,
-				hash = noteChart.hash,
-				title = fix(noteChart:hashGet("title")),
-				artist = fix(noteChart:hashGet("artist")),
-				source = "KSM",
-				tags = "",
-				name = fix(noteChart:hashGet("difficulty")),
-				level = fix(noteChart:hashGet("level")),
-				creator = fix(noteChart:hashGet("effect")),
-				audioPath = fix(noteChart:hashGet("audio")),
-				stagePath = fix(noteChart:hashGet("jacket")),
-				previewTime = (noteChart:hashGet("plength") or 0) / 1000,
-				noteCount = noteChart:hashGet("noteCount"),
-				length = noteChart:hashGet("totalLength"),
-				bpm = 0,
-				inputMode = noteChart.inputMode:getString()
+			local cacheData = {
+				path		= path,
+				hash		= hash,
+				title		= options["title"],
+				artist		= options["artist"],
+				source		= "KSM",
+				tags		= "",
+				name		= options["difficulty"],
+				level		= options["level"],
+				creator		= options["effect"],
+				audioPath	= importer.audioFileName,
+				stagePath	= options["jacket"],
+				previewTime	= (options["plength"] or 0) / 1000,
+				noteCount	= noteChart:hashGet("noteCount"),
+				length		= noteChart:hashGet("totalLength"),
+				bpm			= 0,
+				inputMode	= noteChart.inputMode:getString()
 			}
+			self:fixCacheData(cacheData)
+			
+			cacheDatas[#cacheDatas + 1] = cacheData
 		end
 	end
 	
@@ -220,27 +277,30 @@ CacheDataFactory.getQuaver = function(self, chartPaths)
 	
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
-		local noteChart = NoteChartFactory:getNoteChart(path)
+		local noteChart, hash = NoteChartFactory:getNoteChart(path)
+		local qua = noteChart.importer.qua
 		
 		if noteChart then
-			cacheDatas[#cacheDatas + 1] = {
-				path = path,
-				hash = noteChart.hash,
-				title = fix(noteChart:hashGet("Title") or ""),
-				artist = fix(noteChart:hashGet("Artist") or ""),
-				source = fix(noteChart:hashGet("Source") or ""),
-				tags = fix(noteChart:hashGet("Tags") or ""),
-				name = fix(noteChart:hashGet("DifficultyName") or ""),
-				level = 0,
-				creator = fix(noteChart:hashGet("Creator") or ""),
-				audioPath = fix(noteChart:hashGet("AudioFile") or ""),
-				stagePath = fix(noteChart:hashGet("BackgroundFile") or ""),
-				previewTime = noteChart:hashGet("SongPreviewTime") / 1000,
-				noteCount = noteChart:hashGet("noteCount"),
-				length = noteChart:hashGet("totalLength") / 1000,
-				bpm = noteChart:hashGet("primaryBPM"),
-				inputMode = noteChart.inputMode:getString()
+			local cacheData = {
+				path		= path,
+				hash		= hash,
+				title		= qua["Title"],
+				artist		= qua["Artist"],
+				source		= qua["Source"],
+				tags		= qua["Tags"],
+				name		= qua["DifficultyName"],
+				level		= 0,
+				creator		= qua["Creator"],
+				audioPath	= qua["AudioFile"],
+				stagePath	= qua["BackgroundFile"],
+				previewTime	= qua["SongPreviewTime"] / 1000,
+				noteCount	= noteChart:hashGet("noteCount"),
+				length		= noteChart:hashGet("totalLength"),
+				bpm			= noteChart.importer.primaryBPM,
+				inputMode	= noteChart.inputMode:getString()
 			}
+			
+			cacheDatas[#cacheDatas + 1] = cacheData
 		end
 	end
 	
@@ -261,24 +321,27 @@ CacheDataFactory.getO2Jam = function(self, chartPaths)
 		file:close()
 		
 		for i = 1, 3 do
-			cacheDatas[#cacheDatas + 1] = {
-				path = path .. "/" .. i,
-				hash = hash,
-				title = fix(ojn.str_title),
-				artist = fix(ojn.str_artist),
-				source = "o2jam",
-				tags = "",
-				name = o2jamDifficultyNames[i],
-				level = ojn.charts[i].level,
-				creator = fix(ojn.str_noter),
-				audioPath = "",
-				stagePath = "",
-				previewTime = 0,
-				noteCount = ojn.charts[i].notes,
-				length = ojn.charts[i].duration,
-				bpm = ojn.bpm,
-				inputMode = "7key"
+			local cacheData = {
+				path		= path .. "/" .. i,
+				hash		= hash,
+				title		= ojn.str_title,
+				artist		= ojn.str_artist,
+				source		= "o2jam",
+				tags		= "",
+				name		= o2jamDifficultyNames[i],
+				level		= ojn.charts[i].level,
+				creator		= ojn.str_noter,
+				audioPath	= "",
+				stagePath	= "",
+				previewTime	= 0,
+				noteCount	= ojn.charts[i].notes,
+				length		= ojn.charts[i].duration,
+				bpm			= ojn.bpm,
+				inputMode	= "7key"
 			}
+			self:fixCacheData(cacheData)
+			
+			cacheDatas[#cacheDatas + 1] = cacheData
 		end
 	end
 	
@@ -297,24 +360,27 @@ CacheDataFactory.getSphere = function(self, chartPaths)
 		local data = json.decode(content)
 		file:close()
 		
-		cacheDatas[#cacheDatas + 1] = {
-			path = path,
-			hash = hash,
-			title = data.title,
-			artist = data.artist,
-			source = data.source,
-			tags = data.tags,
-			name = data.name,
-			level = data.level,
-			creator = data.creator,
-			audioPath = data.audioPath,
-			stagePath = data.stagePath,
-			previewTime = data.previewTime,
-			noteCount = data.noteCount,
-			length = data.length,
-			bpm = data.bpm,
-			inputMode = data.inputMode
+		local cacheData = {
+			path		= path,
+			hash		= hash,
+			title		= data.title,
+			artist		= data.artist,
+			source		= data.source,
+			tags		= data.tags,
+			name		= data.name,
+			level		= data.level,
+			creator		= data.creator,
+			audioPath	= data.audioPath,
+			stagePath	= data.stagePath,
+			previewTime	= data.previewTime,
+			noteCount	= data.noteCount,
+			length		= data.length,
+			bpm			= data.bpm,
+			inputMode	= data.inputMode
 		}
+		self:fixCacheData(cacheData)
+		
+		cacheDatas[#cacheDatas + 1] = cacheData
 	end
 	
 	return cacheDatas

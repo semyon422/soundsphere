@@ -62,12 +62,21 @@ ScoreManager.select = function(self)
 	end
 end
 
-ScoreManager.insertScore = function(self, scoreHash, score, accuracy)
-	if score == 0 then
+ScoreManager.insertScore = function(self, score)
+	if score.score == 0 then
 		return
 	end
 	
-	ScoreDatabase:insertScore(scoreHash, score, accuracy)
+	ScoreDatabase:insertScore({
+		chartHash = score.hash,
+		playerName = "Player",
+		time = os.time(),
+		score = score.score,
+		accuracy = score.accuracy,
+		maxCombo = score.maxcombo,
+		scoreRating = 0,
+		mods = "None"
+	})
 	self:select()
 end
 

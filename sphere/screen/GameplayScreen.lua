@@ -23,7 +23,7 @@ Screen.construct(GameplayScreen)
 GameplayScreen.load = function(self)
 	InputManager:load()
 	
-	local noteChart = NoteChartFactory:getNoteChart(self.cacheData.path)
+	local noteChart, hash = NoteChartFactory:getNoteChart(self.cacheData.path)
 	local noteSkinData = NoteSkinManager:getNoteSkin(noteChart.inputMode)
 	
 	local noteSkin = NoteSkin:new({
@@ -57,6 +57,7 @@ GameplayScreen.load = function(self)
 	self.engine.bga = self.bga
 	self.engine.score.engine = self.engine
 	self.engine.score.noteChart = noteChart
+	self.engine.score.hash = hash
 	self.playField.score = self.engine.score
 	
 	self.engine:load()
