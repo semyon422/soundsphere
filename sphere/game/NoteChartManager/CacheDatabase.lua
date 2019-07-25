@@ -261,7 +261,7 @@ CacheDatabase.clear = function(self, directoryPath)
 end
 
 CacheDatabase.lookupContainer = function(self, containerPath)
-	self.log:write("ncc", containerPath)
+	self.log:write("ncc", containerPath:match("^.+/(.-)$"))
 	
 	self:begin()
 	local chartSetData = self:getChartSetData(containerPath)
@@ -271,14 +271,14 @@ CacheDatabase.lookupContainer = function(self, containerPath)
 	for i = 1, #cacheDatas do
 		local cacheData = cacheDatas[i]
 		cacheData.chartSetId = chartSetData[1]
-		self.log:write("chart", cacheData.path)
+		self.log:write("chart", cacheData.path:match("^.+/(.-)$"))
 		self:setChartData(cacheData)
 	end
 	self:commit()
 end
 
 CacheDatabase.processNoteChartSet = function(self, chartPaths, directoryPath)
-	self.log:write("ncs", directoryPath)
+	self.log:write("ncs", directoryPath:match("^.+/(.-)$"))
 	
 	self:begin()
 	local chartSetData = self:getChartSetData(directoryPath)
@@ -289,7 +289,7 @@ CacheDatabase.processNoteChartSet = function(self, chartPaths, directoryPath)
 		for i = 1, #cacheDatas do
 			local cacheData = cacheDatas[i]
 			cacheData.chartSetId = chartSetData[1]
-			self.log:write("chart", cacheData.path)
+			self.log:write("chart", cacheData.path:match("^.+/(.-)$"))
 			self:setChartData(cacheData)
 		end
 	end

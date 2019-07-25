@@ -136,7 +136,6 @@ CacheDataFactory.fixCacheData = function(self, cacheData)
 		local value = cacheData[field]
 		if not value or not tonumber(value) then
 			cacheData[field] = 0
-			print("no number value", field)
 		else
 			cacheData[field] = tonumber(value)
 		end
@@ -145,7 +144,6 @@ CacheDataFactory.fixCacheData = function(self, cacheData)
 		local value = cacheData[field]
 		if not value then
 			cacheData[field] = ""
-			print("no string value", field)
 		else
 			cacheData[field] = fix(value)
 		end
@@ -180,7 +178,6 @@ CacheDataFactory.getBMS = function(self, chartPaths)
 				bpm			= bms.baseTempo or 0,
 				inputMode	= noteChart.inputMode:getString()
 			}
-			self:fixCacheData(cacheData)
 			
 			cacheDatas[#cacheDatas + 1] = cacheData
 		end
@@ -191,6 +188,9 @@ CacheDataFactory.getBMS = function(self, chartPaths)
 			self:processCacheDataNameSingle(cacheDatas)
 		else
 			self:processCacheDataNames(cacheDatas)
+		end
+		for _, cacheData in ipairs(cacheDatas) do
+			self:fixCacheData(cacheData)
 		end
 	end
 	
