@@ -5,6 +5,7 @@ local GameplayScreen = require("sphere.screen.GameplayScreen")
 local CacheList = require("sphere.ui.CacheList")
 local PreviewManager = require("sphere.ui.PreviewManager")
 local Cache = require("sphere.game.NoteChartManager.Cache")
+local SearchManager = require("sphere.game.NoteChartManager.SearchManager")
 local SearchLine = require("sphere.ui.SearchLine")
 local NoteChartListButton = require("sphere.ui.NoteChartListButton")
 
@@ -98,10 +99,9 @@ NoteChartList.selectCache = function(self)
 	if not list or not list[1] then
 		return
 	end
-	for i = 1, #list do
-		if self:checkChartData(list[i], SearchLine.searchTable) then
-			items[#items + 1] = self:getItem(list[i])
-		end
+	local foundList = SearchManager:search(list, SearchLine.searchTable)
+	for i = 1, #foundList do
+		items[#items + 1] = self:getItem(list[i])
 	end
 	
 	if self.needItemsSort then
@@ -109,28 +109,6 @@ NoteChartList.selectCache = function(self)
 	end
 	
 	return self:setItems(items)
-end
-
-NoteChartList.checkChartData = function(self, chart, searchTable)
-	local found = true
-	for _, searchString in ipairs(searchTable) do
-		if
-			chart.path and chart.path:lower():find(searchString, 1, true) or
-			chart.hash and chart.hash:lower():find(searchString, 1, true) or
-			chart.artist and chart.artist:lower():find(searchString, 1, true) or
-			chart.title and chart.title:lower():find(searchString, 1, true) or
-			chart.name and chart.name:lower():find(searchString, 1, true) or
-			chart.source and chart.source:lower():find(searchString, 1, true) or
-			chart.tags and chart.tags:lower():find(searchString, 1, true) or
-			chart.creator and chart.creator:lower():find(searchString, 1, true) or
-			chart.inputMode and chart.inputMode:lower():find(searchString, 1, true)
-		then
-			-- skip
-		else
-			found = false
-		end
-	end
-	return found
 end
 
 return NoteChartList

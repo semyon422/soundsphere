@@ -6,7 +6,7 @@ local CacheList = require("sphere.ui.CacheList")
 local PreviewManager = require("sphere.ui.PreviewManager")
 local SearchLine = require("sphere.ui.SearchLine")
 local Cache = require("sphere.game.NoteChartManager.Cache")
-local SearchLine = require("sphere.ui.SearchLine")
+local SearchManager = require("sphere.game.NoteChartManager.SearchManager")
 
 local NoteChartSetList = CacheList:new()
 
@@ -122,7 +122,7 @@ NoteChartSetList.checkCacheData = function(self, cacheData)
 	end
 	
 	for i = 1, #list do
-		local found = self.NoteChartList:checkChartData(list[i], searchTable)
+		local found = SearchManager:check(list[i], searchTable)
 		if found == true then
 			return true
 		end
