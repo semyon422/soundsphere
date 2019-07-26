@@ -1,5 +1,13 @@
 local ModifierManager = {}
 
+ModifierManager.modifiers = {
+	require("sphere.game.ModifierManager.AutoPlay"),
+	require("sphere.game.ModifierManager.NoLongNote"),
+	require("sphere.game.ModifierManager.NoMeasureLine"),
+	require("sphere.game.ModifierManager.CMod"),
+	require("sphere.game.ModifierManager.FullLongNote"),
+}
+
 ModifierManager.apply = function(self)
 	if not self.modifierSequence then
 		return

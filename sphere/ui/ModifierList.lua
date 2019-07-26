@@ -2,9 +2,8 @@ local CS = require("aqua.graphics.CS")
 local Observable = require("aqua.util.Observable")
 local CustomList = require("sphere.ui.CustomList")
 local ModifierManager = require("sphere.game.ModifierManager")
-local ModifierSequence = require("sphere.game.ModifierSequence")
+local ModifierSequence = require("sphere.game.ModifierManager.ModifierSequence")
 local ModifierDisplay = require("sphere.ui.ModifierDisplay")
-local modifiers = require("sphere.game.modifiers")
 
 local ModifierList = CustomList:new()
 
@@ -39,7 +38,7 @@ end
 ModifierList.loadModifiers = function(self)
 	local items = {}
 	
-	for _, modifier in ipairs(modifiers) do
+	for _, modifier in ipairs(ModifierManager.modifiers) do
 		table.insert(items, self:getItem(modifier))
 	end
 	

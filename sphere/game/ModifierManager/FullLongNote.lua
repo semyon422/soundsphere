@@ -1,4 +1,4 @@
-local Modifier = require("sphere.game.modifiers.Modifier")
+local Modifier = require("sphere.game.ModifierManager.Modifier")
 local NoteData = require("ncdk.NoteData")
 
 local FullLongNote = Modifier:new()

@@ -1,10 +1,10 @@
-local Modifier = require("sphere.game.modifiers.Modifier")
+local Modifier = require("sphere.game.ModifierManager.Modifier")
 
-local NoMeasureLine = Modifier:new()
+local NoLongNote = Modifier:new()
 
-NoMeasureLine.name = "NoMeasureLine"
+NoLongNote.name = "NoLongNote"
 
-NoMeasureLine.apply = function(self)
+NoLongNote.apply = function(self)
 	local noteChart = self.sequence.noteChart
 	
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
@@ -13,13 +13,13 @@ NoMeasureLine.apply = function(self)
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 			
-			if noteData.noteType == "LineNoteStart" then
-				noteData.noteType = "Ignore"
-			elseif noteData.noteType == "LineNoteEnd" then
+			if noteData.noteType == "LongNoteStart" then
+				noteData.noteType = "ShortNote"
+			elseif noteData.noteType == "LongNoteEnd" then
 				noteData.noteType = "Ignore"
 			end
 		end
 	end
 end
 
-return NoMeasureLine
+return NoLongNote
