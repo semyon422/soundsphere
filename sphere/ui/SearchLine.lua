@@ -6,26 +6,28 @@ local CoordinateManager = require("aqua.graphics.CoordinateManager")
 
 local SearchLine = {}
 
-SearchLine.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
+SearchLine.cs1 = CoordinateManager:getCS(0, 0, 0, 0, "h")
+SearchLine.cs2 = CoordinateManager:getCS(0.6, 0, 0, 0, "h")
 
 SearchLine.observable = Observable:new()
 SearchLine.searchString = ""
 SearchLine.searchTable = {}
-
+SearchLine.padding = 0.005
 
 SearchLine.load = function(self)
 	self.textInputFrame = self.textInputFrame or Theme.TextInputFrame:new({
-		x = self.x,
-		y = self.y,
-		w = self.w,
-		h = self.h,
-		ry = self.h / 2,
+		x1 = self.padding,
+		y1 = self.padding,
+		x2 = -self.padding,
+		y2 = 1/17 - self.padding,
+		ry = (1/17 - 2 * self.padding) / 2,
 		backgroundColor = {0, 0, 0, 63},
 		borderColor = {255, 255, 255, 255},
 		textColor = {255, 255, 255, 255},
 		lineStyle = "smooth",
 		lineWidth = 1.5,
-		cs = self.cs,
+		cs1 = self.cs1,
+		cs2 = self.cs2,
 		limit = 1,
 		textAlign = {x = "left", y = "center"},
 		xpadding = 0.01,
