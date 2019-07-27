@@ -28,7 +28,6 @@ GameUI.init = function(self)
 	
 	self.table10x17all:apply(NoteChartSetList, 7, 1, 10, 17)
 	self.table10x17all:apply(NoteChartList, 1, 5, 6, 13)
-	self.table10x17all:apply(SearchLine, 1, 1, 6, 1, 0.005)
 	self.table10x17all:apply(ModifierDisplay, 1, 17, 6, 17)
 	
 	self.table10x17all:apply(SelectFrame, 6.88, 9, 11, 9)
