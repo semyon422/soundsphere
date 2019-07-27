@@ -18,7 +18,16 @@ ModifierSequence.remove = function(self)
 end
 
 ModifierSequence.apply = function(self)
+	local engine = self.manager.engine
+	local noteChart = self.manager.noteChart
+	local noteSkin = self.manager.noteSkin
+	local playField = self.manager.playField
+	
 	for _, modifier in ipairs(self.list) do
+		modifier.engine = engine
+		modifier.noteChart = noteChart
+		modifier.noteSkin = noteSkin
+		modifier.playField = playField
 		modifier:apply()
 	end
 end

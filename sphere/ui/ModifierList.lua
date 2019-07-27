@@ -2,7 +2,6 @@ local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local Observable = require("aqua.util.Observable")
 local CustomList = require("sphere.ui.CustomList")
 local ModifierManager = require("sphere.game.ModifierManager")
-local ModifierSequence = require("sphere.game.ModifierManager.ModifierSequence")
 local ModifierDisplay = require("sphere.ui.ModifierDisplay")
 
 local ModifierList = CustomList:new()
@@ -19,8 +18,7 @@ ModifierList.observable = Observable:new()
 ModifierList.load = function(self)
 	self:loadModifiers()
 	
-	self.modifierSequence = self.modifierSequence or ModifierSequence:new()
-	ModifierManager.modifierSequence = self.modifierSequence
+	self.modifierSequence = ModifierManager:getSequence()
 	
 	CustomList.load(self)
 end

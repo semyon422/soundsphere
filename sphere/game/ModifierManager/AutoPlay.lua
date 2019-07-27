@@ -5,7 +5,7 @@ local AutoPlay = Modifier:new()
 AutoPlay.name = "AutoPlay"
 
 AutoPlay.apply = function(self)
-	self.sequence.engine.autoplay = true
+	self.engine.autoplay = true
 end
 
 return AutoPlay

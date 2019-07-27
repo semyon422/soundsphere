@@ -7,7 +7,7 @@ CMod.name = "CMod"
 
 local fractionOne = Fraction:new(1)
 CMod.apply = function(self)
-	local noteChart = self.sequence.noteChart
+	local noteChart = self.noteChart
 	
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)

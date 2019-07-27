@@ -23,11 +23,11 @@ ModifierDisplay.font = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
 ModifierDisplay.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
 ModifierDisplay.updateText = function(self)
-	self:setText(ModifierManager.modifierSequence:tostring())
+	self:setText(ModifierManager.sequence:tostring())
 end
 
 ModifierDisplay.interact = function(self)
-	ModifierManager.modifierSequence:remove()
+	ModifierManager.sequence:remove()
 	self:updateText()
 end
 

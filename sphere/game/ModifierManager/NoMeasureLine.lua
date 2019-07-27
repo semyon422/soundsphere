@@ -5,7 +5,7 @@ local NoMeasureLine = Modifier:new()
 NoMeasureLine.name = "NoMeasureLine"
 
 NoMeasureLine.apply = function(self)
-	local noteChart = self.sequence.noteChart
+	local noteChart = self.noteChart
 	
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)

@@ -7,7 +7,7 @@ FullLongNote.name = "FullLongNote"
 FullLongNote.level = 3
 
 FullLongNote.apply = function(self)
-	self.noteChart = self.sequence.noteChart
+	self.noteChart = self.noteChart
 	self.noteDatas = {}
 	self.noteDataLayers = {}
 	
