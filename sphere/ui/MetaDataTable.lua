@@ -19,7 +19,7 @@ MetaDataTable.updateValues = function(self)
 	self.nameText.text = self.data.name or ""
 	
 	if self.data.creator then
-		self.nameText.text = "Chartset by " .. self.data.creator
+		self.nameText.text = self.data.creator
 	end
 end
 
@@ -28,40 +28,39 @@ MetaDataTable.load = function(self)
 		text = "",
 		x = self.x,
 		y = self.y,
-		w = self.w - 2 * self.x,
-		h = self.h,
+		w = self.w,
 		h = self.h,
 		cs = self.cs,
-		limit = self.w - 2 * self.x,
-		align = {x = "left", y = "top"},
+		limit = self.w,
+		align = {x = "left", y = "center"},
 		color = {255, 255, 255, 255},
-		font = aquafonts.getFont(spherefonts.NotoSansRegular, 22)
+		font = aquafonts.getFont(spherefonts.NotoSansRegular, 20)
 	})
 	
 	self.titleText = self.titleText or TextFrame:new({
 		text = "",
 		x = self.x,
-		y = self.y + 0.045,
-		w = self.w- 2 * self.x,
+		y = self.y + 1/17,
+		w = self.w,
 		h = self.h,
 		cs = self.cs,
-		limit = self.w - 2 * self.x,
-		align = {x = "left", y = "top"},
+		limit = self.w,
+		align = {x = "left", y = "center"},
 		color = {255, 255, 255, 255},
-		font = aquafonts.getFont(spherefonts.NotoSansRegular, 28)
+		font = aquafonts.getFont(spherefonts.NotoSansRegular, 26)
 	})
 	
 	self.nameText = self.nameText or TextFrame:new({
 		text = "",
 		x = self.x,
-		y = self.y + 0.1,
-		w = self.w - 2 * self.x,
+		y = self.y,
+		w = self.w,
 		h = self.h,
 		cs = self.cs,
 		limit = self.w - 2 * self.x,
-		align = {x = "left", y = "top"},
+		align = {x = "right", y = "center"},
 		color = {255, 255, 255, 255},
-		font = aquafonts.getFont(spherefonts.NotoSansRegular, 22)
+		font = aquafonts.getFont(spherefonts.NotoSansRegular, 20)
 	})
 	
 	self:reload()

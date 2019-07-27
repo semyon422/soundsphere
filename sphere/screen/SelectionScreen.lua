@@ -10,6 +10,8 @@ local PreviewManager = require("sphere.ui.PreviewManager")
 local SearchLine = require("sphere.ui.SearchLine")
 local TableMenu = require("sphere.ui.TableMenu")
 local SelectFrame = require("sphere.ui.SelectFrame")
+local Header = require("sphere.ui.Header")
+local Footer = require("sphere.ui.Footer")
 local Config = require("sphere.game.Config")
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
 
@@ -35,6 +37,8 @@ SelectionScreen.load = function(self)
 	NoteChartSetList:sendInitial()
 	
 	SearchLine:load()
+	Header:load()
+	Footer:load()
 	
 	SelectFrame:reload()
 	
@@ -67,11 +71,14 @@ SelectionScreen.draw = function(self)
 	NoteChartSetList:draw()
 	NoteChartList:draw()
 	ModifierList:draw()
-	ModifierDisplay:draw()
-	MetaDataTable:draw()
 	SelectFrame:draw()
 	
+	Header:draw()
+	Footer:draw()
+	
+	MetaDataTable:draw()
 	SearchLine:draw()
+	ModifierDisplay:draw()
 end
 
 SelectionScreen.receive = function(self, event)
@@ -96,6 +103,8 @@ SelectionScreen.receive = function(self, event)
 	NoteChartList:receive(event)
 	ModifierList:receive(event)
 	ModifierDisplay:receive(event)
+	Header:receive(event)
+	Footer:receive(event)
 	
 	SearchLine:receive(event)
 end

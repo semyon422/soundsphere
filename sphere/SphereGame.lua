@@ -93,7 +93,6 @@ SphereGame.receive = function(self, event)
 	end
 	
 	if CLI.hidden or event.name == "resize" then
-		GameUI:receive(event)
 		ScreenManager:receive(event)
 		BackgroundManager:receive(event)
 		NotificationLine:receive(event)
