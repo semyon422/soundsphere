@@ -1,4 +1,4 @@
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local Observable = require("aqua.util.Observable")
 local ScreenManager = require("sphere.screen.ScreenManager")
 local GameplayScreen = require("sphere.screen.GameplayScreen")

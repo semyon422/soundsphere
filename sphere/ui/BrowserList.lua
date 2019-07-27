@@ -1,4 +1,4 @@
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local Observable = require("aqua.util.Observable")
 local CustomList = require("sphere.ui.CustomList")
 local NoteChartSetList = require("sphere.ui.NoteChartSetList")

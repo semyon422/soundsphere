@@ -7,21 +7,13 @@ local SearchLine = require("sphere.ui.SearchLine")
 local BrowserList = require("sphere.ui.BrowserList")
 local TableMenu = require("sphere.ui.TableMenu")
 local SelectFrame = require("sphere.ui.SelectFrame")
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 
 local GameUI = {}
 
 GameUI.init = function(self)
-	self.csh = CS:new({
-		bx = 0, by = 0, rx = 0, ry = 0,
-		binding = "h",
-		baseOne = 768
-	})
-	self.csall = CS:new({
-		bx = 0, by = 0, rx = 0, ry = 0,
-		binding = "all",
-		baseOne = 768
-	})
+	self.csh = CoordinateManager:getCS(0, 0, 0, 0, "h")
+	self.csall = CoordinateManager:getCS(0, 0, 0, 0, "all")
 	
 	self.table10x17all = TableMenu:new({
 		x = 0, y = 0, w = 1, h = 1,

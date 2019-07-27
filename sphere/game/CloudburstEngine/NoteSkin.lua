@@ -1,5 +1,5 @@
 local Class = require("aqua.util.Class")
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local map = require("aqua.math").map
 local sign = require("aqua.math").sign
 local tween = require("tween")
@@ -27,24 +27,18 @@ NoteSkin.color = {
 NoteSkin.speed = 1
 NoteSkin.targetSpeed = 1
 NoteSkin.rate = 1
-NoteSkin.allcs = CS:new({
-	bx = 0,
-	by = 0,
-	rx = 0,
-	ry = 0,
-	binding = "all"
-})
+NoteSkin.allcs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
 NoteSkin.construct = function(self)
 	self.cses = {}
 	for i = 1, #self.noteSkinData.cses do
-		self.cses[i] = CS:new({
-			bx = tonumber(self.noteSkinData.cses[i][1]),
-			by = tonumber(self.noteSkinData.cses[i][2]),
-			rx = tonumber(self.noteSkinData.cses[i][3]),
-			ry = tonumber(self.noteSkinData.cses[i][4]),
-			binding = self.noteSkinData.cses[i][5]
-		})
+		self.cses[i] = CoordinateManager:getCS(
+			tonumber(self.noteSkinData.cses[i][1]),
+			tonumber(self.noteSkinData.cses[i][2]),
+			tonumber(self.noteSkinData.cses[i][3]),
+			tonumber(self.noteSkinData.cses[i][4]),
+			self.noteSkinData.cses[i][5]
+		)
 	end
 	
 	self.data = self.noteSkinData.notes or {}
@@ -100,13 +94,6 @@ NoteSkin.update = function(self, dt)
 	
 	for _, container in ipairs(self.containerList) do
 		container:update()
-	end
-end
-
-NoteSkin.reloadCS = function(self, dt)
-	self.allcs:reload()
-	for i = 1, #self.cses do
-		self.cses[i]:reload()
 	end
 end
 

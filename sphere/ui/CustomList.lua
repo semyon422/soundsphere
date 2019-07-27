@@ -1,6 +1,6 @@
 local Class = require("aqua.util.Class")
 local aquafonts = require("aqua.assets.fonts")
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local Rectangle = require("aqua.graphics.Rectangle")
 local Stencil = require("aqua.graphics.Stencil")
 local Observable = require("aqua.util.Observable")
@@ -33,14 +33,7 @@ CustomList.middleOffset = 9
 CustomList.startOffset = 9
 CustomList.endOffset = 9
 
-CustomList.cs = CS:new({
-	bx = 0,
-	by = 0,
-	rx = 0,
-	ry = 0,
-	binding = "all",
-	baseOne = 768
-})
+CustomList.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
 CustomList.load = function(self)
 	self.items = self.items or {}
@@ -48,7 +41,6 @@ CustomList.load = function(self)
 	self.observable = self.observable or Observable:new()
 	self.font = self.font or aquafonts.getFont(spherefonts.NotoSansRegular, 24)
 	
-	self.cs:reload()
 	self.scrollCurrentDelta = 0
 	self:loadStencil()
 	self.visualItemIndex = self.focusedItemIndex
@@ -139,7 +131,6 @@ CustomList.receive = function(self, event)
 	end
 	
 	if event.name == "resize" then
-		self.cs:reload()
 		self.buttonsFrame:reload()
 	elseif event.name == "wheelmoved" then
 		local mx = self.cs:x(love.mouse.getX(), true)

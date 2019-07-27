@@ -1,4 +1,5 @@
 local Container = require("aqua.graphics.Container")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local ThreadPool = require("aqua.thread.ThreadPool")
 local Observer = require("aqua.util.Observer")
 local aquaio = require("aqua.io")
@@ -87,6 +88,8 @@ SphereGame.receive = function(self, event)
 	elseif event.name == "quit" then
 		self:unload()
 		os.exit()
+	elseif event.name == "resize" then
+		CoordinateManager:reload()
 	end
 	
 	if CLI.hidden or event.name == "resize" then

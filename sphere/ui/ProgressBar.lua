@@ -1,4 +1,4 @@
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local Rectangle = require("aqua.graphics.Rectangle")
 local aquafonts = require("aqua.assets.fonts")
 local Theme = require("aqua.ui.Theme")
@@ -7,16 +7,10 @@ local spherefonts = require("sphere.assets.fonts")
 
 local ProgressBar = {}
 
-ProgressBar.cs = CS:new({
-	bx = 0, by = 0, rx = 0, ry = 0,
-	binding = "all",
-	baseOne = 768
-})
+ProgressBar.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
 ProgressBar.load = function(self)
 	self.font = self.font or aquafonts.getFont(spherefonts.NotoSansRegular, 48)
-	
-	self.cs:reload()
 	
 	self.progressRectangle = Rectangle:new({
 		x = 0, y = 0.995,
@@ -52,7 +46,6 @@ end
 
 ProgressBar.receive = function(self, event)
 	if event.name == "resize" then
-		self.cs:reload()
 		self.progressRectangle:reload()
 	end
 end

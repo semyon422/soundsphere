@@ -1,4 +1,4 @@
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local Screen = require("sphere.screen.Screen")
 local ScreenManager = require("sphere.screen.ScreenManager")
 local AccuracyGraph = require("sphere.ui.AccuracyGraph")
@@ -11,15 +11,7 @@ local ResultScreen = Screen:new()
 Screen.construct(ResultScreen)
 
 ResultScreen.load = function(self)
-	self.cs = CS:new({
-		bx = 0,
-		by = 0,
-		rx = 0,
-		ry = 0,
-		binding = "all",
-		baseOne = 768
-	})
-	self.cs:reload()
+	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 	
 	self.accuracyGraph = AccuracyGraph:new({
 		cs = self.cs
@@ -47,8 +39,6 @@ end
 
 ResultScreen.receive = function(self, event)
 	if event.name == "resize" then
-		self.cs:reload()
-		
 		MetaDataTable:reload()
 		self.accuracyGraph:reload()
 		self.judgeTable:reload()

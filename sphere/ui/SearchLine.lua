@@ -2,18 +2,11 @@ local Theme = require("aqua.ui.Theme")
 local Observable = require("aqua.util.Observable")
 local aquafonts = require("aqua.assets.fonts")
 local spherefonts = require("sphere.assets.fonts")
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 
 local SearchLine = {}
 
-SearchLine.cs = CS:new({
-	bx = 0,
-	by = 0,
-	rx = 0,
-	ry = 0,
-	binding = "all",
-	baseOne = 720
-})
+SearchLine.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
 SearchLine.observable = Observable:new()
 SearchLine.searchString = ""
@@ -41,7 +34,6 @@ SearchLine.load = function(self)
 		enableStencil = true
 	})
 	
-	self.cs:reload()
 	self.textInputFrame:reload()
 end
 
@@ -51,9 +43,7 @@ end
 
 SearchLine.receive = function(self, event)
 	local forceReload = false
-	if event.name == "resize" then
-		self.cs:reload()
-	elseif event.name == "keypressed" and event.args[1] == "escape" then
+	if event.name == "keypressed" and event.args[1] == "escape" then
 		self.textInputFrame.textInput:reset()
 		forceReload = true
 	end

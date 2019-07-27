@@ -1,4 +1,4 @@
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local Observable = require("aqua.util.Observable")
 local ScreenManager = require("sphere.screen.ScreenManager")
 local GameplayScreen = require("sphere.screen.GameplayScreen")
@@ -28,14 +28,7 @@ NoteChartSetList.needSearch = false
 NoteChartSetList.searchString = ""
 NoteChartSetList.searchTable = {}
 
-NoteChartSetList.cs = CS:new({
-	bx = 0,
-	by = 0,
-	rx = 0,
-	ry = 0,
-	binding = "all",
-	baseOne = 768
-})
+NoteChartSetList.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
 NoteChartSetList.send = function(self, event)
 	if event.action == "scrollStop" then

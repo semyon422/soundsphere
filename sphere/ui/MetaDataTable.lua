@@ -1,18 +1,11 @@
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local TextFrame = require("aqua.graphics.TextFrame")
 local aquafonts = require("aqua.assets.fonts")
 local spherefonts = require("sphere.assets.fonts")
 
 local MetaDataTable = {}
 
-MetaDataTable.cs = CS:new({
-	bx = 0,
-	by = 0,
-	rx = 0,
-	ry = 0,
-	binding = "all",
-	baseOne = 768
-})
+MetaDataTable.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
 MetaDataTable.setData = function(self, data)
 	self.data = data or {}
@@ -78,7 +71,6 @@ MetaDataTable.load = function(self)
 end
 
 MetaDataTable.reload = function(self)
-	self.cs:reload()
 	self.artistText:reload()
 	self.titleText:reload()
 	self.nameText:reload()

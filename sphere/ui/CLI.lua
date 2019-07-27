@@ -1,4 +1,4 @@
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local Rectangle = require("aqua.graphics.Rectangle")
 local Text = require("aqua.graphics.Text")
 local aquafonts = require("aqua.assets.fonts")
@@ -16,13 +16,7 @@ CLI.init = function(self)
 	self.currentLine = {"h", "e", "l", "l", "o"}
 	self.currentLineOffset = #self.currentLine
 	self.historyOffset = 0
-	self.cs = CS:new({
-		bx = 0,
-		by = 0,
-		rx = 0,
-		ry = 0,
-		binding = "all"
-	})
+	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 	
 	self.font = aquafonts.getFont(spherefonts.NotoMonoRegular, 16)
 	
@@ -103,7 +97,6 @@ CLI.draw = function(self)
 end
 
 CLI.reload = function(self)
-	self.cs:reload()
 	self.rectangleObject:reload()
 	self.textObject:reload()
 	self.cursorObject:reload()

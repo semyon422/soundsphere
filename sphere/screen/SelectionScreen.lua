@@ -11,7 +11,7 @@ local SearchLine = require("sphere.ui.SearchLine")
 local TableMenu = require("sphere.ui.TableMenu")
 local SelectFrame = require("sphere.ui.SelectFrame")
 local Config = require("sphere.game.Config")
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 
 local SelectionScreen = Screen:new()
 

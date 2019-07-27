@@ -1,7 +1,7 @@
 local Theme = require("aqua.ui.Theme")
 local aquafonts = require("aqua.assets.fonts")
 local spherefonts = require("sphere.assets.fonts")
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 
 local NotificationLine = {}
 
@@ -11,14 +11,7 @@ NotificationLine.maxlifetime = 1
 NotificationLine.lifetime = 0
 
 NotificationLine.init = function(self)
-	self.cs = CS:new({
-		bx = 0,
-		by = 0,
-		rx = 0,
-		ry = 0,
-		binding = "all",
-		baseOne = 576
-	})
+	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 	
 	self.state = 0
 	
@@ -34,7 +27,7 @@ NotificationLine.init = function(self)
 		textColor = {unpack(self.textColor)},
 		textAlign = {x = "center", y = "center"},
 		limit = 1,
-		font = aquafonts.getFont(spherefonts.NotoSansRegular, 20)
+		font = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
 	})
 	self.button:reload()
 	self.button.rectangleColor[4] = 0
@@ -73,7 +66,6 @@ end
 
 NotificationLine.receive = function(self, event)
 	if event.name == "resize" then
-		self.cs:reload()
 		return self.button:reload()
 	elseif event.name == "notify" then
 		return self:notify(event.text)

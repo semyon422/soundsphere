@@ -1,5 +1,5 @@
 local aquafonts = require("aqua.assets.fonts")
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local Theme = require("aqua.ui.Theme")
 local spherefonts = require("sphere.assets.fonts")
 local ModifierManager = require("sphere.game.ModifierManager")
@@ -20,14 +20,7 @@ ModifierDisplay.textAlign = {
 ModifierDisplay.textColor = {255, 255, 255, 255}
 ModifierDisplay.font = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
 
-ModifierDisplay.cs = CS:new({
-	bx = 0,
-	by = 0,
-	rx = 0,
-	ry = 0,
-	binding = "all",
-	baseOne = 768
-})
+ModifierDisplay.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
 ModifierDisplay.updateText = function(self)
 	self:setText(ModifierManager.modifierSequence:tostring())
@@ -39,7 +32,6 @@ ModifierDisplay.interact = function(self)
 end
 
 ModifierDisplay.reload = function(self)
-	self.cs:reload()
 	Theme.Button.reload(self)
 	self:updateText()
 end

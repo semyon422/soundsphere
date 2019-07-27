@@ -1,4 +1,4 @@
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local image = require("aqua.image")
 local ImageBackground = require("sphere.ui.ImageBackground")
 local tween = require("tween")
@@ -10,13 +10,7 @@ BackgroundManager.color = {0, 0, 0}
 BackgroundManager.init = function(self)
 	self.state = 0
 	
-	self.cs = CS:new({
-		bx = 0,
-		by = 0,
-		rx = 0,
-		ry = 0,
-		binding = "all"
-	})
+	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 	
 	self.backgrounds = {}
 end
@@ -91,7 +85,6 @@ BackgroundManager.receive = function(self, event)
 end
 
 BackgroundManager.reload = function(self, event)
-	self.cs:reload()
 	for i = 1, #self.backgrounds do
 		self.backgrounds[i]:reload()
 	end

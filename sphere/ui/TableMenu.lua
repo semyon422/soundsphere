@@ -1,5 +1,5 @@
 local Class = require("aqua.util.Class")
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 
 local TableMenu = Class:new()
 
@@ -11,14 +11,7 @@ TableMenu.cols = 1
 TableMenu.rows = 1
 TableMenu.padding = 0
 
-TableMenu.cs = CS:new({
-	bx = 0,
-	by = 0,
-	rx = 0,
-	ry = 0,
-	binding = "all",
-	baseOne = 768
-})
+TableMenu.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
 TableMenu.apply = function(self, object, colStart, rowStart, colEnd, rowEnd, padding)
 	padding = padding or self.padding

@@ -36,8 +36,6 @@ CloudburstEngine.load = function(self)
 	self:loadNoteDrawers()
 	self:loadTimeManager()
 	
-	self.noteSkin:reloadCS()
-	
 	NoteSkin.speed = Config.data.speed
 	NoteSkin.targetSpeed = Config.data.speed
 end

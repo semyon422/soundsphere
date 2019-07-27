@@ -1,4 +1,4 @@
-local CS = require("aqua.graphics.CS")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local Rectangle = require("aqua.graphics.Rectangle")
 local aquafonts = require("aqua.assets.fonts")
 local Theme = require("aqua.ui.Theme")
@@ -8,18 +8,12 @@ local tween = require("tween")
 
 local PauseOverlay = {}
 
-PauseOverlay.cs = CS:new({
-	bx = 0, by = 0, rx = 0, ry = 0,
-	binding = "all",
-	baseOne = 768
-})
+PauseOverlay.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
 PauseOverlay.baseDelay = 1
 
 PauseOverlay.load = function(self)
 	self.font = self.font or aquafonts.getFont(spherefonts.NotoSansRegular, 48)
-	
-	self.cs:reload()
 	
 	self.continueRectangle = Rectangle:new({
 		x = 0, y = 0.99,
@@ -113,7 +107,6 @@ end
 
 PauseOverlay.receive = function(self, event)
 	if event.name == "resize" then
-		self.cs:reload()
 		self.continueButton:reload()
 		self.retryButton:reload()
 		self.menuButton:reload()
