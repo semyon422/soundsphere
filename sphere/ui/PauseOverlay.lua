@@ -177,6 +177,7 @@ PauseOverlay.retry = function(self)
 end
 
 PauseOverlay.menu = function(self)
+	local GameplayScreen = require("sphere.screen.GameplayScreen")
 	ScreenManager:set(require("sphere.screen.ResultScreen"),
 		function()
 			ScreenManager:receive({
@@ -185,7 +186,7 @@ PauseOverlay.menu = function(self)
 			})
 			ScreenManager:receive({
 				name = "metadata",
-				data = self.cacheData
+				data = GameplayScreen.cacheData
 			})
 		end
 	)
