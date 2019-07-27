@@ -15,6 +15,7 @@ Score.construct = function(self)
 	self.count = 0
 	self.accuracy = 0
 	self.timegate = ""
+	self.grade = ""
 	
 	self.score = 0
 	
@@ -48,6 +49,28 @@ Score.timegates = {
 	}
 }
 
+Score.grades = {
+	{
+		time = 0.120,
+		name = "S"
+	},
+	{
+		name = "F"
+	}
+}
+
+Score.updateGrade = function(self)
+	local accuracy = self.accuracy / 1000
+	local grades = self.grades
+	for i = 1, #grades - 1 do
+		if accuracy <= grades[i].time then
+			self.grade = grades[i].name
+			return
+		end
+	end
+	self.grade = grades[#grades].name
+end
+
 Score.interval = 0.004
 Score.scale = 0.120
 Score.hit = function(self, deltaTime)
@@ -66,6 +89,7 @@ Score.hit = function(self, deltaTime)
 	self.sum = self.sum + (deltaTime * 1000) ^ 2
 	self.count = self.count + 1
 	self.accuracy = math.sqrt(self.sum / self.count)
+	self:updateGrade()
 	
 	self.score = self.score
 		+ math.exp(-(2 * deltaTime / self.scale) ^ 2)
