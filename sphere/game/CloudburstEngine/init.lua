@@ -75,7 +75,6 @@ CloudburstEngine.receive = function(self, event)
 	end
 	
 	if event.name == "resize" then
-		self.noteSkin:reloadCS()
 		self:reloadNoteDrawers()
 	elseif event.name == "keypressed" then
 		local key = event.args[1]
