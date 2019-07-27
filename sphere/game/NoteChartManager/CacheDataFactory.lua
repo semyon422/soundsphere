@@ -73,15 +73,13 @@ CacheDataFactory.processCacheDataNames = function(self, cacheDatas)
 	
 	local title = table.concat(titleTable):trim()
 	for i = 1, #cacheDatas do
-		if not cacheDatas[i].name then
-			if #title > 0 then
-				cacheDatas[i].name = trimName(cacheDatas[i].title:sub(#title + 1, -1)):trim()
-				cacheDatas[i].title = title
-			else
-				local name, bracketStart = trimName(cacheDatas[i].title)
-				cacheDatas[i].name = name
-				cacheDatas[i].title = cacheDatas[i].title
-			end
+		if #title > 0 then
+			cacheDatas[i].name = trimName(cacheDatas[i].title:sub(#title + 1, -1)):trim()
+			cacheDatas[i].title = title
+		else
+			local name, bracketStart = trimName(cacheDatas[i].title)
+			cacheDatas[i].name = name
+			cacheDatas[i].title = cacheDatas[i].title
 		end
 	end
 end
@@ -184,13 +182,13 @@ CacheDataFactory.getBMS = function(self, chartPaths)
 	end
 	
 	if #cacheDatas > 0 then
+		for _, cacheData in ipairs(cacheDatas) do
+			self:fixCacheData(cacheData)
+		end
 		if #cacheDatas == 1 then
 			self:processCacheDataNameSingle(cacheDatas)
 		else
 			self:processCacheDataNames(cacheDatas)
-		end
-		for _, cacheData in ipairs(cacheDatas) do
-			self:fixCacheData(cacheData)
 		end
 	end
 	
