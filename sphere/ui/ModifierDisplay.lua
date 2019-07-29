@@ -13,7 +13,7 @@ ModifierDisplay.enableStencil = true
 
 ModifierDisplay.rectangleColor = {255, 255, 255, 0}
 ModifierDisplay.mode ="fill"
-ModifierDisplay.limit = math.huge
+ModifierDisplay.limit = 1
 ModifierDisplay.textAlign = {
 	x = "left", y = "center"
 }

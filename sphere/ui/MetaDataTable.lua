@@ -5,8 +5,6 @@ local spherefonts = require("sphere.assets.fonts")
 
 local MetaDataTable = {}
 
-MetaDataTable.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
-
 MetaDataTable.setData = function(self, data)
 	self.data = data or {}
 	self:updateValues()
@@ -26,12 +24,12 @@ end
 MetaDataTable.load = function(self)
 	self.artistText = self.artistText or TextFrame:new({
 		text = "",
-		x = self.x,
-		y = self.y,
-		w = self.w,
-		h = self.h,
-		cs = self.cs,
-		limit = self.w,
+		x1 = self.x1,
+		y1 = self.y1,
+		x2 = self.x2,
+		y2 = self.y2 - (self.y2 - self.y1) / 2,
+		cs1 = self.cs1,
+		cs2 = self.cs2,
 		align = {x = "left", y = "center"},
 		color = {255, 255, 255, 255},
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 20)
@@ -39,12 +37,12 @@ MetaDataTable.load = function(self)
 	
 	self.titleText = self.titleText or TextFrame:new({
 		text = "",
-		x = self.x,
-		y = self.y + 1/17,
-		w = self.w,
-		h = self.h,
-		cs = self.cs,
-		limit = self.w,
+		x1 = self.x1,
+		y1 = self.y1 + (self.y2 - self.y1) / 2,
+		x2 = self.x2,
+		y2 = self.y2,
+		cs1 = self.cs1,
+		cs2 = self.cs2,
 		align = {x = "left", y = "center"},
 		color = {255, 255, 255, 255},
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 26)
@@ -52,12 +50,12 @@ MetaDataTable.load = function(self)
 	
 	self.nameText = self.nameText or TextFrame:new({
 		text = "",
-		x = self.x,
-		y = self.y,
-		w = self.w,
-		h = self.h,
-		cs = self.cs,
-		limit = self.w - 2 * self.x,
+		x1 = self.x1,
+		y1 = self.y1,
+		x2 = self.x2,
+		y2 = self.y2 - (self.y2 - self.y1) / 2,
+		cs1 = self.cs1,
+		cs2 = self.cs2,
 		align = {x = "right", y = "center"},
 		color = {255, 255, 255, 255},
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 20)

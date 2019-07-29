@@ -24,7 +24,7 @@ CustomList.h = 1
 CustomList.textColor = {255, 255, 255, 255}
 CustomList.rectangleColor = {255, 255, 255, 0}
 CustomList.mode = "fill"
-CustomList.limit = math.huge
+CustomList.limit = 1
 CustomList.textAlign = {
 	x = "left", y = "center"
 }

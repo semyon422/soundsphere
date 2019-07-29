@@ -33,6 +33,11 @@ set(SearchLine, {
 	font = aquafonts.getFont(spherefonts.NotoSansRegular, 20)
 })
 
+set(MetaDataTable, {
+	cs1 = cs.h, x1 = 1/17, y1 = 1/17,
+	cs2 = cs.h06, x2 = 0, y2 = 3/17
+})
+
 set(Header, {
 	cs = cs.all,
 	topx = 0, topy = 0, topw = 1, toph = 1/17,
@@ -65,10 +70,6 @@ set(SelectFrame, {
 
 set(ModifierList, {
 	cs = cs.h, x = 1/17, y = 13/17, w = 6/17, h = 3/17
-})
-
-set(MetaDataTable, {
-	cs = cs.h, x = 1/17, y = 1/17, w = 1, h = 1/17
 })
 
 set(BrowserList, {
