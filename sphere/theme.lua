@@ -35,7 +35,7 @@ set(SearchLine, {
 
 set(MetaDataTable, {
 	cs1 = cs.h, x1 = 1/17, y1 = 1/17,
-	cs2 = cs.h06, x2 = 0, y2 = 3/17
+	cs2 = cs.h06, x2 = -1/17, y2 = 3/17
 })
 
 set(Header, {
