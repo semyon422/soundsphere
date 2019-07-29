@@ -101,7 +101,7 @@ NoteChartList.selectCache = function(self)
 	end
 	local foundList = SearchManager:search(list, SearchLine.searchTable)
 	for i = 1, #foundList do
-		items[#items + 1] = self:getItem(list[i])
+		items[#items + 1] = self:getItem(foundList[i])
 	end
 	
 	if self.needItemsSort then
