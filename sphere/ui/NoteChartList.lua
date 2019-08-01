@@ -27,7 +27,8 @@ NoteChartList.Button = NoteChartListButton
 
 NoteChartList.send = function(self, event)
 	if event.action == "scrollStop" then
-		local cacheData = self.items[event.itemIndex].cacheData
+		local item = self.items[event.itemIndex]
+		local cacheData = item and item.cacheData
 		if cacheData then
 			self:updateBackground()
 			self:updateAudio()
@@ -57,10 +58,27 @@ NoteChartList.receive = function(self, event)
 	if event.action == "scrollTarget" then
 		local item = event.list.items[event.itemIndex]
 		if item and item.cacheData and event.list.sender == "NoteChartSetList" then
+			local focusedItem = self.items[self.focusedItemIndex]
+			local cacheData = focusedItem and focusedItem.cacheData
+			
 			self.chartSetId = item.cacheData.id
 			self:selectCache()
 			self:unloadButtons()
 			self:calculateButtons()
+			
+			local itemIndex = self:getItemIndex(cacheData)
+			self.focusedItemIndex = itemIndex
+			self.visualItemIndex = itemIndex
+			self:send({
+				sender = self.sender,
+				action = "scrollTarget",
+				list = self,
+				itemIndex = itemIndex
+			})
+			self:send({
+				sender = self.sender,
+				action = "scrollStop"
+			})
 		end
 	elseif event.name == "keypressed" then
 		local key = event.args[1]

@@ -84,14 +84,22 @@ NoteChartSetList.receive = function(self, event)
 		else
 			self.needSearch = true
 		end
+		
+		local focusedItem = self.items[self.focusedItemIndex]
+		local cacheData = focusedItem and focusedItem.cacheData
+		
 		self:selectCache()
 		self:unloadButtons()
 		self:calculateButtons()
+		
+		local itemIndex = self:getItemIndex(cacheData)
+		self.focusedItemIndex = itemIndex
+		self.visualItemIndex = itemIndex
 		self:send({
 			sender = self.sender,
 			action = "scrollTarget",
 			list = self,
-			itemIndex = self.focusedItemIndex
+			itemIndex = itemIndex
 		})
 		self:send({
 			sender = self.sender,

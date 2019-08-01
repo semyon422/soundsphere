@@ -37,6 +37,21 @@ CacheList.getItem = function(self, cacheData)
 	return item
 end
 
+CacheList.getItemIndex = function(self, cacheData)
+	if not cacheData then
+		return 1
+	end
+	
+	local items = self.items
+	for i = 1, #items do
+		if items[i].cacheData == cacheData then
+			return i
+		end
+	end
+	
+	return 1
+end
+
 CacheList.getBackgroundPath = function(self, itemIndex)
 	local cacheData = self.items[itemIndex].cacheData
 	
