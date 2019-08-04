@@ -149,6 +149,11 @@ Score.processLongNote = function(self, note)
 	note:process(startTimeState, endTimeState)
 	self:processLongNoteState(note.state, oldState)
 	
+	local nextNote = note:getNext()
+	if nextNote and note.state == "startMissed" and nextNote:isReachable() then
+		note:next()
+	end
+	
 	if note.started and not note.judged then
 		self:hit(deltaStartTime)
 		note.judged = true
