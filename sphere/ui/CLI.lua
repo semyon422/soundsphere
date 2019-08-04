@@ -101,7 +101,7 @@ CLI.reload = function(self)
 end
 
 CLI.receive = function(self, event)
-	if event.name == "keypressed" and event.args[1] == "`" then
+	if event.name == "keypressed" and event.args[1] == "`" and love.keyboard.isDown("lctrl") then
 		self:switch()
 	end
 	
