@@ -10,23 +10,21 @@ local PauseOverlay = {}
 
 PauseOverlay.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
-PauseOverlay.baseDelay = 1
-
 PauseOverlay.load = function(self)
 	self.font = self.font or aquafonts.getFont(spherefonts.NotoSansRegular, 48)
 	
-	self.continueRectangle = Rectangle:new({
+	self.progressRectangle = Rectangle:new({
 		x = 0, y = 0.99,
 		w = 1, h = 0.01,
 		cs = self.cs,
 		color = {255, 255, 255, 255},
 		mode = "fill"
 	})
-	self.continueRectangle:reload()
+	self.progressRectangle:reload()
 	
 	self.continueButton = Theme.Button:new({
 		text = "continue",
-		interact = function() self:continue() end,
+		interact = function() self:beginPlay() end,
 		
 		x = 0, y = 0,
 		w = 1, h = 1/3,
@@ -42,7 +40,7 @@ PauseOverlay.load = function(self)
 	
 	self.retryButton = Theme.Button:new({
 		text = "retry",
-		interact = function() self:retry() end,
+		interact = function() self:restart() end,
 		
 		x = 0, y = 1/3,
 		w = 1, h = 1/3,
@@ -72,27 +70,29 @@ PauseOverlay.load = function(self)
 	})
 	self.menuButton:reload()
 	
-	self:stopContinue()
+	self:resetProgress()
 	self.paused = false
 end
 
 PauseOverlay.update = function(self, dt)
-	if self.continueTween then
-		self.continueTween:update(dt)
-		self.continueRectangle.w = self.delay / self.baseDelay
-		self.continueRectangle:reload()
+	if self.progressTween then
+		self.progressTween:update(dt)
+		self.progressRectangle.w = self.delay / self.baseDelay
+		self.progressRectangle:reload()
 	end
 	
 	if self.paused then
 		self.continueButton:update()
 		self.retryButton:update()
 		self.menuButton:update()
-		
-		if self.delay == 0 then
-			self.paused = false
-			self:stopContinue()
-			self:play()
-		end
+	end
+	
+	if self.action == "play" and self.delay / self.baseDelay == 0 then
+		self:resetProgress()
+		self:play()
+	elseif self.action == "restart" and self.delay / self.baseDelay == 1 then
+		self:resetProgress()
+		self:restart()
 	end
 end
 
@@ -101,8 +101,8 @@ PauseOverlay.draw = function(self)
 		self.continueButton:draw()
 		self.retryButton:draw()
 		self.menuButton:draw()
-		self.continueRectangle:draw()
 	end
+	self.progressRectangle:draw()
 end
 
 PauseOverlay.receive = function(self, event)
@@ -110,7 +110,7 @@ PauseOverlay.receive = function(self, event)
 		self.continueButton:reload()
 		self.retryButton:reload()
 		self.menuButton:reload()
-		self.continueRectangle:reload()
+		self.progressRectangle:reload()
 	end
 	
 	if event.name == "focus" and not self.paused and not event.args[1] then
@@ -127,34 +127,53 @@ PauseOverlay.receive = function(self, event)
 	if event.name == "keypressed" then
 		local key = event.args[1]
 		if key == "escape" and not shift then
-			if self.continueTween then
-				self:stopContinue()
+			if self.progressTween then
+				self:resetProgress()
 				return
 			end
 			if self.engine.paused then
-				self:continue()
+				self:beginPlay()
 			else
 				self:pause()
 			end
 		elseif key == "escape" then
 			self:menu()
+		elseif key == "`" then
+			self:beginRestart()
+		end
+	elseif event.name == "keyreleased" then
+		local key = event.args[1]
+		if key == "`" then
+			self:resetProgress()
 		end
 	end
 end
 
-PauseOverlay.stopContinue = function(self)
-	self.continueTween = nil
-	self.delay = self.baseDelay
-	self.continueRectangle.w = 1
-	self.continueRectangle:reload()
+PauseOverlay.resetProgress = function(self)
+	self.action = nil
+	self.progressTween = nil
+	self.delay = 0
+	self.progressRectangle.w = 0
+	self.progressRectangle:reload()
 end
 
 PauseOverlay.play = function(self)
+	self.paused = false
 	self.engine:play()
 end
 
-PauseOverlay.continue = function(self)
-	self.continueTween = tween.new(1, self, {delay = 0}, "linear")
+PauseOverlay.beginPlay = function(self)
+	self.action = "play"
+	self.delay = 0.5
+	self.baseDelay = 0.5
+	self.progressTween = tween.new(self.baseDelay, self, {delay = 0}, "linear")
+end
+
+PauseOverlay.beginRestart = function(self)
+	self.action = "restart"
+	self.delay = 0
+	self.baseDelay = 0.5
+	self.progressTween = tween.new(self.baseDelay, self, {delay = self.baseDelay}, "linear")
 end
 
 PauseOverlay.pause = function(self)
@@ -162,7 +181,7 @@ PauseOverlay.pause = function(self)
 	self.paused = true
 end
 
-PauseOverlay.retry = function(self)
+PauseOverlay.restart = function(self)
 	local GameplayScreen = require("sphere.screen.GameplayScreen")
 	GameplayScreen:unload()
 	GameplayScreen:load()
