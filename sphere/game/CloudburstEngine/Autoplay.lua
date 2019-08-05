@@ -60,7 +60,7 @@ Autoplay.processLongNote = function(self, note)
 		note.keyState = true
 		
 		note:process("exactly", "none")
-		note.score:processLongNoteState("clear", "startPassedPressed")
+		note.score:processLongNoteState("startPassedPressed", "clear")
 		
 		if note.started and not note.judged then
 			note.score:hit(0)
@@ -77,7 +77,7 @@ Autoplay.processLongNote = function(self, note)
 		note.keyState = false
 		
 		note:process("none", "exactly")
-		note.score:processLongNoteState("startPassedPressed", "endPassed")
+		note.score:processLongNoteState("endPassed", "startPassedPressed")
 	end
 end
 
