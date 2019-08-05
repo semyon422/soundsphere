@@ -70,8 +70,27 @@ CloudburstEngine.draw = function(self)
 end
 
 CloudburstEngine.receive = function(self, event)
-	for noteHandler in pairs(self.noteHandlers) do
-		noteHandler:receive(event)
+	if event.name == "keypressed" and self.score.promode then
+		local nearestNote
+		for noteHandler in pairs(self.noteHandlers) do
+			local currentNote = noteHandler.currentNote
+			if
+				(not nearestNote or
+				currentNote.startNoteData.timePoint:getAbsoluteTime() < nearestNote.startNoteData.timePoint:getAbsoluteTime()) and
+				currentNote.state ~= "skipped" and
+				currentNote:isReachable() and
+				not currentNote.autoplay
+			then
+				nearestNote = noteHandler.currentNote
+			end
+		end
+		if nearestNote then
+			nearestNote.autoplay = true
+		end
+	else
+		for noteHandler in pairs(self.noteHandlers) do
+			noteHandler:receive(event)
+		end
 	end
 	
 	if event.name == "resize" then
