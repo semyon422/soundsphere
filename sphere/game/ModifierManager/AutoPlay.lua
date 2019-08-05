@@ -5,7 +5,7 @@ local AutoPlay = Modifier:new()
 AutoPlay.name = "AutoPlay"
 
 AutoPlay.apply = function(self)
-	self.engine.autoplay = true
+	self.engine.score.autoplay = true
 end
 
 return AutoPlay

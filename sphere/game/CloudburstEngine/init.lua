@@ -139,12 +139,6 @@ CloudburstEngine.receive = function(self, event)
 				name = "notify",
 				text = "rate: " .. self.targetRate
 			})
-		elseif key == "f8" then
-			self.autoplay = not self.autoplay
-			return self.observable:send({
-				name = "notify",
-				text = "autoplay: " .. (self.autoplay and "on" or "off")
-			})
 		end
 	end
 end

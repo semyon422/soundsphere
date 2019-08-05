@@ -63,10 +63,6 @@ ScoreManager.select = function(self)
 end
 
 ScoreManager.insertScore = function(self, score)
-	if score.score == 0 then
-		return
-	end
-	
 	ScoreDatabase:insertScore({
 		chartHash = score.hash,
 		playerName = "Player",

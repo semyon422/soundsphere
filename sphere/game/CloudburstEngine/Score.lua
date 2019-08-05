@@ -110,7 +110,11 @@ Score.judge = function(self, deltaTime)
 end
 
 Score.needAutoplay = function(self, note)
-	return note.noteType == "SoundNote" or note.engine.autoplay or note.startNoteData.autoplay
+	return
+		note.noteType == "SoundNote" or
+		self.autoplay or
+		note.startNoteData.autoplay or
+		note.autoplay
 end
 
 Score.processNote = function(self, note)

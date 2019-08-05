@@ -55,7 +55,9 @@ ResultScreen.receive = function(self, event)
 		self.judgeTable.score = score
 		self.judgeTable:load()
 		
-		ScoreManager:insertScore(score)
+		if not score.autoplay and score.score > 0 then
+			ScoreManager:insertScore(score)
+		end
 	end
 	
 	if event.name == "metadata" then

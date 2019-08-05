@@ -21,8 +21,13 @@ Autoplay.processShortNote = function(self, note)
 		end
 		
 		note.keyState = true
-		note.state = "passed"
-		return note:next()
+		
+		note:process("exactly")
+		note.score:processShortNoteState(note.state)
+		
+		if note.ended then
+			note.score:hit(0)
+		end
 	end
 end
 
@@ -53,7 +58,14 @@ Autoplay.processLongNote = function(self, note)
 		end
 		
 		note.keyState = true
-		note.state = "startPassedPressed"
+		
+		note:process("exactly", "none")
+		note.score:processLongNoteState("clear", "startPassedPressed")
+		
+		if note.started and not note.judged then
+			note.score:hit(0)
+			note.judged = true
+		end
 	elseif deltaEndTime <= 0 and note.keyState or nextNote and nextNote:isHere() then
 		if note.noteType ~= "SoundNote" then
 			note.noteHandler:switchKey(false)
@@ -63,8 +75,9 @@ Autoplay.processLongNote = function(self, note)
 		end
 		
 		note.keyState = false
-		note.state = "endPassed"
-		return note:next()
+		
+		note:process("none", "exactly")
+		note.score:processLongNoteState("startPassedPressed", "endPassed")
 	end
 end
 
