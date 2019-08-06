@@ -13,12 +13,14 @@ end
 Autoplay.processShortNote = function(self, note)
 	local deltaTime = note.startNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime
 	if deltaTime <= 0 then
+		local layer
 		if note.noteType ~= "SoundNote" then
 			note.noteHandler:clickKey()
-			note.engine:playAudio(note.pressSounds, "fga")
+			layer = "fga"
 		else
-			note.engine:playAudio(note.pressSounds, "bga")
+			layer = "bga"
 		end
+		note.engine:playAudio(note.pressSounds, layer, note.startNoteData.stream)
 		
 		note.keyState = true
 		
@@ -34,7 +36,7 @@ end
 Autoplay.processSoundNote = function(self, note)
 	if note.pressSounds and note.pressSounds[1] then
 		if note.startNoteData.timePoint:getAbsoluteTime() <= note.engine.currentTime then
-			note.engine:playAudio(note.pressSounds, "bga")
+			note.engine:playAudio(note.pressSounds, "bga", note.startNoteData.stream)
 		else
 			return
 		end
@@ -50,12 +52,14 @@ Autoplay.processLongNote = function(self, note)
 	
 	local nextNote = note:getNext()
 	if deltaStartTime <= 0 and not note.keyState then
+		local layer
 		if note.noteType ~= "SoundNote" then
 			note.noteHandler:switchKey(true)
-			note.engine:playAudio(note.pressSounds, "fga")
+			layer = "fga"
 		else
-			note.engine:playAudio(note.pressSounds, "bga")
+			layer = "bga"
 		end
+		note.engine:playAudio(note.pressSounds, layer, note.startNoteData.stream)
 		
 		note.keyState = true
 		
@@ -67,12 +71,14 @@ Autoplay.processLongNote = function(self, note)
 			note.judged = true
 		end
 	elseif deltaEndTime <= 0 and note.keyState or nextNote and nextNote:isHere() then
+		local layer
 		if note.noteType ~= "SoundNote" then
 			note.noteHandler:switchKey(false)
-			note.engine:playAudio(note.releaseSounds, "fga")
+			layer = "fga"
 		else
-			note.engine:playAudio(note.releaseSounds, "bga")
+			layer = "bga"
 		end
+		note.engine:playAudio(note.releaseSounds, layer, note.startNoteData.stream)
 		
 		note.keyState = false
 		

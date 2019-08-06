@@ -16,6 +16,7 @@ CloudburstEngine.autoplay = false
 CloudburstEngine.paused = true
 CloudburstEngine.rate = 1
 CloudburstEngine.targetRate = 1
+CloudburstEngine.allowStream = true
 
 CloudburstEngine.load = function(self)
 	self.observable = Observable:new()
@@ -162,10 +163,15 @@ CloudburstEngine.receive = function(self, event)
 	end
 end
 
-CloudburstEngine.playAudio = function(self, paths, layer)
+CloudburstEngine.playAudio = function(self, paths, layer, stream)
 	if not paths then return end
 	for i = 1, #paths do
-		local audio = AudioFactory:getSample(self.aliases[paths[i][1]])
+		local audio
+		if not stream then
+			audio = AudioFactory:getSample(self.aliases[paths[i][1]])
+		elseif self.allowStream then
+			audio = AudioFactory:getStream(self.aliases[paths[i][1]])
+		end
 		if audio then
 			audio.offset = self.timeManager.currentTime
 			audio:play()
@@ -208,9 +214,14 @@ CloudburstEngine.updateRate = function(self)
 	self.score.rate = self.rate
 	self.noteSkin.rate = self.rate
 	self.timeManager:setRate(self.rate)
+	self.bga:setRate(self.rate)
+	
 	self.bgaContainer:setRate(self.rate)
 	self.fgaContainer:setRate(self.rate)
-	self.bga:setRate(self.rate)
+	if self.pitch then
+		self.bgaContainer:setPitch(self.rate)
+		self.fgaContainer:setPitch(self.rate)
+	end
 end
 
 CloudburstEngine.loadTimeManager = function(self)

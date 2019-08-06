@@ -5,6 +5,7 @@ local ModifierManager = {}
 ModifierManager.modifiers = {
 	require("sphere.game.ModifierManager.AutoPlay"),
 	require("sphere.game.ModifierManager.ProMode"),
+	require("sphere.game.ModifierManager.Pitch"),
 	require("sphere.game.ModifierManager.NoLongNote"),
 	require("sphere.game.ModifierManager.NoMeasureLine"),
 	require("sphere.game.ModifierManager.CMod"),
@@ -13,6 +14,7 @@ ModifierManager.modifiers = {
 
 ModifierManager.AutoPlay = require("sphere.game.ModifierManager.AutoPlay")
 ModifierManager.ProMode = require("sphere.game.ModifierManager.ProMode")
+ModifierManager.Pitch = require("sphere.game.ModifierManager.Pitch")
 ModifierManager.NoLongNote = require("sphere.game.ModifierManager.NoLongNote")
 ModifierManager.NoMeasureLine = require("sphere.game.ModifierManager.NoMeasureLine")
 ModifierManager.CMod = require("sphere.game.ModifierManager.CMod")
@@ -23,7 +25,8 @@ ModifierManager.sequence.manager = ModifierManager
 
 ModifierManager.engineModifiers = {
 	ModifierManager.AutoPlay,
-	ModifierManager.ProMode
+	ModifierManager.ProMode,
+	ModifierManager.Pitch
 }
 
 ModifierManager.noteChartModifiers = {
