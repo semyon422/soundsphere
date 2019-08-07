@@ -71,8 +71,8 @@ CloudburstEngine.draw = function(self)
 end
 
 CloudburstEngine.receive = function(self, event)
+	local nearestNote
 	if event.name == "keypressed" and self.score.promode then
-		local nearestNote
 		for noteHandler in pairs(self.noteHandlers) do
 			local currentNote = noteHandler.currentNote
 			if
@@ -88,7 +88,8 @@ CloudburstEngine.receive = function(self, event)
 		if nearestNote then
 			nearestNote.autoplay = true
 		end
-	else
+	end
+	if not nearestNote then
 		for noteHandler in pairs(self.noteHandlers) do
 			noteHandler:receive(event)
 		end
