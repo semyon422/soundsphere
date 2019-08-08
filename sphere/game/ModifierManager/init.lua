@@ -10,6 +10,7 @@ ModifierManager.modifiers = {
 	require("sphere.game.ModifierManager.NoMeasureLine"),
 	require("sphere.game.ModifierManager.CMod"),
 	require("sphere.game.ModifierManager.FullLongNote"),
+	require("sphere.game.ModifierManager.ToOsu"),
 }
 
 ModifierManager.AutoPlay = require("sphere.game.ModifierManager.AutoPlay")
@@ -19,6 +20,7 @@ ModifierManager.NoLongNote = require("sphere.game.ModifierManager.NoLongNote")
 ModifierManager.NoMeasureLine = require("sphere.game.ModifierManager.NoMeasureLine")
 ModifierManager.CMod = require("sphere.game.ModifierManager.CMod")
 ModifierManager.FullLongNote = require("sphere.game.ModifierManager.FullLongNote")
+ModifierManager.ToOsu = require("sphere.game.ModifierManager.ToOsu")
 
 ModifierManager.sequence = ModifierSequence:new()
 ModifierManager.sequence.manager = ModifierManager
@@ -33,7 +35,8 @@ ModifierManager.noteChartModifiers = {
 	ModifierManager.CMod,
 	ModifierManager.NoLongNote,
 	ModifierManager.FullLongNote,
-	ModifierManager.NoMeasureLine
+	ModifierManager.NoMeasureLine,
+	ModifierManager.ToOsu
 }
 
 ModifierManager.noteSkinModifiers = {}

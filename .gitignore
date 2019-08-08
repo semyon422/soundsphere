@@ -1,11 +1,13 @@
 debug
 userdata/charts/*
 userdata/hitsounds/*
+userdata/export/*
+!userdata/charts/.keep
+!userdata/hitsounds/.keep
+!userdata/export/.keep
 userdata/cache.sqlite
 userdata/config.json
 userdata/mount.json
-!userdata/charts/.keep
-!userdata/hitsounds/.keep
 userdata/cache.log
 userdata/chart.log
 userdata/main.log
