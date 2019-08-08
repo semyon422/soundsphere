@@ -113,7 +113,7 @@ PauseOverlay.receive = function(self, event)
 		self.progressRectangle:reload()
 	end
 	
-	if event.name == "focus" and not self.paused and not event.args[1] then
+	if event.name == "focus" and not self.paused and not event.args[1] and not self.engine.score.autoplay then
 		self:pause()
 	end
 	
