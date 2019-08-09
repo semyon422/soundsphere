@@ -22,7 +22,7 @@ ShortGraphicalNote.update = function(self)
 end
 
 ShortGraphicalNote.computeVisualTime = function(self)
-	self.startNoteData:computeVisualTime(self.noteDrawer.currentTimePoint)
+	self.startNoteData.timePoint:computeVisualTime(self.noteDrawer.currentTimePoint)
 end
 
 ShortGraphicalNote.activate = function(self)

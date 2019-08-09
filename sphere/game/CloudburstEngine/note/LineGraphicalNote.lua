@@ -22,8 +22,8 @@ LineGraphicalNote.update = function(self)
 end
 
 LineGraphicalNote.computeVisualTime = function(self)
-	self.startNoteData:computeVisualTime(self.noteDrawer.currentTimePoint)
-	self.endNoteData:computeVisualTime(self.noteDrawer.currentTimePoint)
+	self.startNoteData.timePoint:computeVisualTime(self.noteDrawer.currentTimePoint)
+	self.endNoteData.timePoint:computeVisualTime(self.noteDrawer.currentTimePoint)
 end
 
 LineGraphicalNote.activate = function(self)

@@ -19,7 +19,7 @@ ImageNote.next = function(self)
 end
 
 ImageNote.isHere = function(self)
-	return self.noteData.timePoint:getAbsoluteTime() <= self.engine.currentTime
+	return self.noteData.timePoint.absoluteTime <= self.engine.currentTime
 end
 
 ImageNote.update = function(self)

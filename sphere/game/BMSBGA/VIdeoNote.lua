@@ -19,7 +19,7 @@ VideoNote.next = function(self)
 end
 
 VideoNote.isHere = function(self)
-	return self.noteData.timePoint:getAbsoluteTime() <= self.engine.currentTime
+	return self.noteData.timePoint.absoluteTime <= self.engine.currentTime
 end
 
 VideoNote.update = function(self, dt)

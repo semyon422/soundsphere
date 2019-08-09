@@ -77,7 +77,7 @@ CloudburstEngine.receive = function(self, event)
 			local currentNote = noteHandler.currentNote
 			if
 				(not nearestNote or
-				currentNote.startNoteData.timePoint:getAbsoluteTime() < nearestNote.startNoteData.timePoint:getAbsoluteTime()) and
+				currentNote.startNoteData.timePoint.absoluteTime < nearestNote.startNoteData.timePoint.absoluteTime) and
 				currentNote.state ~= "skipped" and
 				currentNote:isReachable() and
 				not currentNote.autoplay

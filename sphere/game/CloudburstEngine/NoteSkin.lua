@@ -132,9 +132,9 @@ NoteSkin.getNoteLayer = function(self, note, part)
 	return
 		self.data[note.id][part].layer
 		+ map(
-			note.startNoteData.timePoint:getAbsoluteTime(),
-			note.startNoteData.timePoint.firstTimePoint:getAbsoluteTime(),
-			note.startNoteData.timePoint.lastTimePoint:getAbsoluteTime(),
+			note.startNoteData.timePoint.absoluteTime,
+			note.startNoteData.timePoint.firstTimePoint.absoluteTime,
+			note.startNoteData.timePoint.lastTimePoint.absoluteTime,
 			0,
 			1
 		)
@@ -188,7 +188,7 @@ NoteSkin.getShortNoteX = function(self, note)
 	return
 		data.x
 		+ data.fx * self:getSpeed()
-			* (note.startNoteData.currentVisualTime - note.engine.currentTime)
+			* (note.startNoteData.timePoint.currentVisualTime - note.engine.currentTime)
 		+ data.ox * self:getNoteWidth(note, "Head")
 end
 NoteSkin.getLongNoteHeadX = function(self, note)
@@ -196,7 +196,7 @@ NoteSkin.getLongNoteHeadX = function(self, note)
 	return
 		data.x
 		+ data.fx * self:getSpeed()
-			* ((note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime)
+			* ((note:getFakeVisualStartTime() or note.startNoteData.timePoint.currentVisualTime) - note.engine.currentTime)
 		+ data.ox * self:getNoteWidth(note, "Head")
 end
 NoteSkin.getLongNoteTailX = function(self, note)
@@ -205,7 +205,7 @@ NoteSkin.getLongNoteTailX = function(self, note)
 	return
 		dataHead.x
 		+ dataHead.fx * self:getSpeed()
-			* (note.endNoteData.currentVisualTime - note.engine.currentTime)
+			* (note.endNoteData.timePoint.currentVisualTime - note.engine.currentTime)
 		+ dataTail.ox * self:getNoteWidth(note, "Tail")
 end
 NoteSkin.getLongNoteBodyX = function(self, note)
@@ -214,9 +214,9 @@ NoteSkin.getLongNoteBodyX = function(self, note)
 	local speedSign = sign(self.speed)
 	local dt
 	if dataHead.fx * speedSign <= 0 then
-		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
+		dt = note.endNoteData.timePoint.currentVisualTime - note.engine.currentTime
 	else
-		dt = (note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime
+		dt = (note:getFakeVisualStartTime() or note.startNoteData.timePoint.currentVisualTime) - note.engine.currentTime
 	end
 	
 	return
@@ -229,9 +229,9 @@ NoteSkin.getLineNoteX = function(self, note)
 	local speedSign = sign(self.speed)
 	local dt
 	if data.fx * speedSign <= 0 then
-		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
+		dt = note.endNoteData.timePoint.currentVisualTime - note.engine.currentTime
 	else
-		dt = note.startNoteData.currentVisualTime - note.engine.currentTime
+		dt = note.startNoteData.timePoint.currentVisualTime - note.engine.currentTime
 	end
 	
 	return
@@ -244,7 +244,7 @@ NoteSkin.getShortNoteY = function(self, note)
 	return
 		data.y
 		+ data.fy * self:getSpeed()
-			* (note.startNoteData.currentVisualTime - note.engine.currentTime)
+			* (note.startNoteData.timePoint.currentVisualTime - note.engine.currentTime)
 		+ data.oy * self:getNoteHeight(note, "Head")
 end
 NoteSkin.getLongNoteHeadY = function(self, note)
@@ -252,7 +252,7 @@ NoteSkin.getLongNoteHeadY = function(self, note)
 	return
 		data.y
 		+ data.fy * self:getSpeed()
-			* ((note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime)
+			* ((note:getFakeVisualStartTime() or note.startNoteData.timePoint.currentVisualTime) - note.engine.currentTime)
 		+ data.oy * self:getNoteHeight(note, "Head")
 end
 NoteSkin.getLongNoteTailY = function(self, note)
@@ -261,7 +261,7 @@ NoteSkin.getLongNoteTailY = function(self, note)
 	return
 		dataHead.y
 		+ dataHead.fy * self:getSpeed()
-			* (note.endNoteData.currentVisualTime - note.engine.currentTime)
+			* (note.endNoteData.timePoint.currentVisualTime - note.engine.currentTime)
 		+ dataTail.oy * self:getNoteHeight(note, "Tail")
 end
 NoteSkin.getLongNoteBodyY = function(self, note)
@@ -270,9 +270,9 @@ NoteSkin.getLongNoteBodyY = function(self, note)
 	local speedSign = sign(self.speed)
 	local dt
 	if dataHead.fy * speedSign <= 0 then
-		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
+		dt = note.endNoteData.timePoint.currentVisualTime - note.engine.currentTime
 	else
-		dt = (note:getFakeVisualStartTime() or note.startNoteData.currentVisualTime) - note.engine.currentTime
+		dt = (note:getFakeVisualStartTime() or note.startNoteData.timePoint.currentVisualTime) - note.engine.currentTime
 	end
 	
 	return
@@ -285,9 +285,9 @@ NoteSkin.getLineNoteY = function(self, note)
 	local speedSign = sign(self.speed)
 	local dt
 	if data.fy * speedSign <= 0 then
-		dt = note.endNoteData.currentVisualTime - note.engine.currentTime
+		dt = note.endNoteData.timePoint.currentVisualTime - note.engine.currentTime
 	else
-		dt = note.startNoteData.currentVisualTime - note.engine.currentTime
+		dt = note.startNoteData.timePoint.currentVisualTime - note.engine.currentTime
 	end
 	
 	return
@@ -312,13 +312,13 @@ end
 
 NoteSkin.getLineNoteScaledWidth = function(self, note)
 	local data = self.data[note.id]["Head"]
-	local dt = note.startNoteData.currentVisualTime - note.endNoteData.currentVisualTime
+	local dt = note.startNoteData.timePoint.currentVisualTime - note.endNoteData.timePoint.currentVisualTime
 	return math.max(math.abs(data.fx * self:getSpeed() * dt + data.w), self:getCS(note):x(1))
 end
 
 NoteSkin.getLineNoteScaledHeight = function(self, note)
 	local data = self.data[note.id]["Head"]
-	local dt = note.startNoteData.currentVisualTime - note.endNoteData.currentVisualTime
+	local dt = note.startNoteData.timePoint.currentVisualTime - note.endNoteData.timePoint.currentVisualTime
 	return math.max(math.abs(data.fy * self:getSpeed() * dt + data.h), self:getCS(note):y(1))
 end
 
@@ -532,7 +532,7 @@ NoteSkin.getLongNoteColor = function(self, note)
 	local logicalNote = note.logicalNote
 	
 	local color = self.color
-	if note.fakeStartTime and note.fakeStartTime >= note.endNoteData.timePoint:getAbsoluteTime() then
+	if note.fakeStartTime and note.fakeStartTime >= note.endNoteData.timePoint.absoluteTime then
 		return color.transparent
 	elseif logicalNote.state == "clear" then
 		return color.clear

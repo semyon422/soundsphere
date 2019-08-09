@@ -11,7 +11,7 @@ Autoplay.processNote = function(self, note)
 end
 
 Autoplay.processShortNote = function(self, note)
-	local deltaTime = note.startNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime
+	local deltaTime = note.startNoteData.timePoint.absoluteTime - note.engine.currentTime
 	if deltaTime <= 0 then
 		local layer
 		if note.noteType ~= "SoundNote" then
@@ -35,7 +35,7 @@ end
 
 Autoplay.processSoundNote = function(self, note)
 	if note.pressSounds and note.pressSounds[1] then
-		if note.startNoteData.timePoint:getAbsoluteTime() <= note.engine.currentTime then
+		if note.startNoteData.timePoint.absoluteTime <= note.engine.currentTime then
 			note.engine:playAudio(note.pressSounds, "bga", note.startNoteData.stream)
 		else
 			return
@@ -47,8 +47,8 @@ Autoplay.processSoundNote = function(self, note)
 end
 
 Autoplay.processLongNote = function(self, note)
-	local deltaStartTime = note.startNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime
-	local deltaEndTime = note.endNoteData.timePoint:getAbsoluteTime() - note.engine.currentTime
+	local deltaStartTime = note.startNoteData.timePoint.absoluteTime - note.engine.currentTime
+	local deltaEndTime = note.endNoteData.timePoint.absoluteTime - note.engine.currentTime
 	
 	local nextNote = note:getNext()
 	if deltaStartTime <= 0 and not note.keyState then

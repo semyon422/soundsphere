@@ -18,11 +18,11 @@ LogicalNote.next = function(self)
 end
 
 LogicalNote.isHere = function(self)
-	return self.startNoteData.timePoint:getAbsoluteTime() <= self.engine.exactCurrentTime
+	return self.startNoteData.timePoint.absoluteTime <= self.engine.exactCurrentTime
 end
 
 LogicalNote.isReachable = function(self)
-	local deltaTime = (self.engine.exactCurrentTime - self.startNoteData.timePoint:getAbsoluteTime()) / self.score.rate
+	local deltaTime = (self.engine.exactCurrentTime - self.startNoteData.timePoint.absoluteTime) / self.score.rate
 	local timeState = self.score:getTimeState(deltaTime)
 	return timeState ~= "none"
 end
