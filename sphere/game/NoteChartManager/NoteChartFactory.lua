@@ -92,7 +92,7 @@ NoteChartFactory.getNoteChart = function(self, path)
 	self.log:write("get", path)
 	
 	local noteChart, hash
-	local status, err = pcall(function()
+	local status, err = xpcall(function()
 		local noteChartImporter = self:getNoteChartImporter(path)
 		local realPath = self:getRealPath(path)
 		
@@ -105,7 +105,7 @@ NoteChartFactory.getNoteChart = function(self, path)
 			content = rawContent
 		end
 		noteChart = noteChartImporter:import(content)
-	end)
+	end, debug.traceback)
 	
 	if not status then
 		self.log:write("error", err)
