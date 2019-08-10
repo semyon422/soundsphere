@@ -36,16 +36,17 @@ CacheDataFactory.getCacheDatas = function(self, chartPaths)
 	local cacheDatas = {}
 	for _, paths in ipairs(self:splitList(chartPaths)) do
 		local path = paths[1]
-		for i = 1, #formats do
-			local pattern = formats[i][1]
-			local getCacheData = formats[i][2]
+		for _, data in ipairs(formats) do
+			local pattern = data[1]
+			local getCacheDatas = data[2]
 			if path:find(pattern) then
-				for _, cacheData in ipairs(getCacheData(self, paths)) do
+				for _, cacheData in ipairs(getCacheDatas(self, paths, NoteChartFactory:getNoteCharts(paths))) do
 					cacheDatas[#cacheDatas + 1] = cacheData
 				end
 			end
 		end
 	end
+	
 	return cacheDatas
 end
 
@@ -170,12 +171,12 @@ CacheDataFactory.fixCacheData = function(self, cacheData)
 	end
 end
 
-CacheDataFactory.getBMS = function(self, chartPaths)
+CacheDataFactory.getBMS = function(self, chartPaths, noteCharts)
 	local cacheDatas = {}
 	
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
-		local noteChart, hash = NoteChartFactory:getNoteChart(path)
+		local noteChart, hash = noteCharts[i][1], noteCharts[i][2]
 		
 		if noteChart then
 			local bms = noteChart.importer.bms
@@ -217,12 +218,12 @@ CacheDataFactory.getBMS = function(self, chartPaths)
 	return cacheDatas
 end
 
-CacheDataFactory.getOsu = function(self, chartPaths)
+CacheDataFactory.getOsu = function(self, chartPaths, noteCharts)
 	local cacheDatas = {}
 	
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
-		local noteChart, hash = NoteChartFactory:getNoteChart(path)
+		local noteChart, hash = noteCharts[i][1], noteCharts[i][2]
 		
 		if noteChart then
 			local osu = noteChart.importer.osu
@@ -254,12 +255,12 @@ CacheDataFactory.getOsu = function(self, chartPaths)
 	return cacheDatas
 end
 
-CacheDataFactory.getKSM = function(self, chartPaths)
+CacheDataFactory.getKSM = function(self, chartPaths, noteCharts)
 	local cacheDatas = {}
 	
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
-		local noteChart, hash = NoteChartFactory:getNoteChart(path)
+		local noteChart, hash = noteCharts[i][1], noteCharts[i][2]
 		
 		if noteChart then
 			local importer = noteChart.importer
@@ -292,12 +293,12 @@ CacheDataFactory.getKSM = function(self, chartPaths)
 	return cacheDatas
 end
 
-CacheDataFactory.getQuaver = function(self, chartPaths)
+CacheDataFactory.getQuaver = function(self, chartPaths, noteCharts)
 	local cacheDatas = {}
 	
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
-		local noteChart, hash = NoteChartFactory:getNoteChart(path)
+		local noteChart, hash = noteCharts[i][1], noteCharts[i][2]
 		
 		if noteChart then
 			local qua = noteChart.importer.qua
@@ -328,17 +329,13 @@ CacheDataFactory.getQuaver = function(self, chartPaths)
 end
 
 local o2jamDifficultyNames = {"Easy", "Normal", "Hard"}
-CacheDataFactory.getO2Jam = function(self, chartPaths)
+CacheDataFactory.getO2Jam = function(self, chartPaths, noteCharts)
 	local cacheDatas = {}
 	
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
-		local file = love.filesystem.newFile(path)
-		file:open("r")
-		local content = file:read(file:getSize())
-		local hash = md5.sumhexa(content)
-		local ojn = o2jam.OJN:new(content)
-		file:close()
+		local noteChart, hash = noteCharts[i][1], noteCharts[i][2]
+		local ojn = noteChart.importer.ojn
 		
 		for i = 1, 3 do
 			local cacheData = {
@@ -368,11 +365,13 @@ CacheDataFactory.getO2Jam = function(self, chartPaths)
 	return cacheDatas
 end
 
-CacheDataFactory.getSphere = function(self, chartPaths)
+CacheDataFactory.getSphere = function(self, chartPaths, noteCharts)
 	local cacheDatas = {}
 	
 	for i = 1, #chartPaths do
 		local path = chartPaths[i]
+		local noteChart, hash = noteCharts[i][1], noteCharts[i][2]
+		
 		local file = love.filesystem.newFile(path)
 		file:open("r")
 		local content = file:read(file:getSize())

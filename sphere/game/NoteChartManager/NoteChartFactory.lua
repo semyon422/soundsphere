@@ -22,6 +22,10 @@ local containerPatterns = {
 	"%.ojn$"
 }
 
+NoteChartFactory.isTextFile = function(self, path)
+	return self:isNoteChart(path)
+end
+
 NoteChartFactory.isNoteChart = function(self, path)
 	for i = 1, #chartPatterns do
 		if path:find(chartPatterns[i]) then
@@ -59,9 +63,9 @@ NoteChartFactory.getNoteChartImporter = function(self, path)
 		return noteChartImporter
 	elseif path:find("%.ksh$") then
 		return ksm.NoteChartImporter:new()
-	elseif path:find("%.ojn/.$") then
+	elseif path:find("%.ojn$") or path:find("%.ojn/.$") then
 		local noteChartImporter = o2jam.NoteChartImporter:new()
-		noteChartImporter.chartIndex = tonumber(path:sub(-1, -1))
+		noteChartImporter.chartIndex = tonumber(path:sub(-1, -1)) or 1
 		return noteChartImporter
 	elseif path:find("%.sph$") then
 		local noteChartImporter = sph.NoteChartImporter:new()
@@ -94,7 +98,12 @@ NoteChartFactory.getNoteChart = function(self, path)
 		
 		local rawContent = self:readFile(realPath)
 		hash = md5.sumhexa(rawContent)
-		local content = self:deleteBOM(rawContent:gsub("\r\n", "\n"))
+		local content
+		if self:isTextFile(realPath) then
+			content = self:deleteBOM(rawContent:gsub("\r\n", "\n"))
+		else
+			content = rawContent
+		end
 		noteChart = noteChartImporter:import(content)
 	end)
 	
@@ -104,6 +113,16 @@ NoteChartFactory.getNoteChart = function(self, path)
 	end
 	
 	return noteChart, hash
+end
+
+NoteChartFactory.getNoteCharts = function(self, paths)
+	local noteCharts = {}
+	
+	for i, path in ipairs(paths) do
+		noteCharts[i] = {self:getNoteChart(path)}
+	end
+	
+	return noteCharts
 end
 
 return NoteChartFactory
