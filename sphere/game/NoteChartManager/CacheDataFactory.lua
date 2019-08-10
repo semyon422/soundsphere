@@ -10,21 +10,43 @@ local md5 = require("md5")
 
 local CacheDataFactory = {}
 
-CacheDataFactory.getCacheDatas = function(self, chartPaths)
-	local path = chartPaths[1]
-	if path:find("%.osu$") then
-		return self:getOsu(chartPaths)
-	elseif path:find("%.qua$") then
-		return self:getQuaver(chartPaths)
-	elseif path:find("%.bm[sel]$") or path:find("%.pms$") then
-		return self:getBMS(chartPaths)
-	elseif path:find("%.ojn$") then
-		return self:getO2Jam(chartPaths)
-	elseif path:find("%.ksh$") then
-		return self:getKSM(chartPaths)
-	elseif path:find("%.sph$") then
-		return self:getSphere(chartPaths)
+CacheDataFactory.splitList = function(self, chartPaths)
+	local dict = {}
+	for _, path in ipairs(chartPaths) do
+		for i = 1, #self.formats do
+			local pattern = self.formats[i][1]
+			if path:find(pattern) then
+				dict[pattern] = dict[pattern] or {}
+				table.insert(dict[pattern], path)
+			end
+		end
 	end
+	
+	local list = {}
+	for _, data in pairs(dict) do
+		list[#list + 1] = data
+	end
+	
+	return list
+end
+
+CacheDataFactory.getCacheDatas = function(self, chartPaths)
+	local formats = self.formats
+	
+	local cacheDatas = {}
+	for _, paths in ipairs(self:splitList(chartPaths)) do
+		local path = paths[1]
+		for i = 1, #formats do
+			local pattern = formats[i][1]
+			local getCacheData = formats[i][2]
+			if path:find(pattern) then
+				for _, cacheData in ipairs(getCacheData(self, paths)) do
+					cacheDatas[#cacheDatas + 1] = cacheData
+				end
+			end
+		end
+	end
+	return cacheDatas
 end
 
 local trimName = function(name)
@@ -383,5 +405,15 @@ CacheDataFactory.getSphere = function(self, chartPaths)
 	
 	return cacheDatas
 end
+
+CacheDataFactory.formats = {
+	{"%.osu", CacheDataFactory.getOsu},
+	{"%.qua", CacheDataFactory.getQuaver},
+	{"%.bm[sel]$", CacheDataFactory.getBMS},
+	{"%.pms", CacheDataFactory.getBMS},
+	{"%.ojn", CacheDataFactory.getO2Jam},
+	{"%.ksh", CacheDataFactory.getKSM},
+	{"%.sph", CacheDataFactory.getSphere}
+}
 
 return CacheDataFactory

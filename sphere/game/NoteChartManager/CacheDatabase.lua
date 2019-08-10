@@ -264,16 +264,10 @@ CacheDatabase.lookupContainer = function(self, containerPath)
 	self.log:write("ncc", containerPath:match("^.+/(.-)$"))
 	
 	self:begin()
-	local chartSetData = self:getChartSetData(containerPath)
-	
-	local cacheDatas = CacheDataFactory:getCacheDatas({containerPath})
-	
-	for i = 1, #cacheDatas do
-		local cacheData = cacheDatas[i]
-		cacheData.chartSetId = chartSetData[1]
-		self.log:write("chart", cacheData.path:match("^.+/(.-)$"))
-		self:setChartData(cacheData)
-	end
+	self:processCacheDatas(
+		CacheDataFactory:getCacheDatas({containerPath}),
+		self:getChartSetData(containerPath)
+	)
 	self:commit()
 end
 
@@ -281,19 +275,20 @@ CacheDatabase.processNoteChartSet = function(self, chartPaths, directoryPath)
 	self.log:write("ncs", directoryPath:match("^.+/(.-)$"))
 	
 	self:begin()
-	local chartSetData = self:getChartSetData(directoryPath)
-	
-	for _, paths in ipairs(NoteChartFactory:splitList(chartPaths)) do
-		local cacheDatas = CacheDataFactory:getCacheDatas(paths)
-		
-		for i = 1, #cacheDatas do
-			local cacheData = cacheDatas[i]
-			cacheData.chartSetId = chartSetData[1]
-			self.log:write("chart", cacheData.path:match("^.+/(.-)$"))
-			self:setChartData(cacheData)
-		end
-	end
+	self:processCacheDatas(
+		CacheDataFactory:getCacheDatas(chartPaths),
+		self:getChartSetData(directoryPath)
+	)
 	self:commit()
+end
+
+CacheDatabase.processCacheDatas = function(self, cacheDatas, chartSetData)
+	for i = 1, #cacheDatas do
+		local cacheData = cacheDatas[i]
+		cacheData.chartSetId = chartSetData[1]
+		self.log:write("chart", cacheData.path:match("^.+/(.-)$"))
+		self:setChartData(cacheData)
+	end
 end
 
 CacheDatabase.setChartData = function(self, cacheData)
