@@ -5,7 +5,6 @@ local CMod = Modifier:new()
 
 CMod.name = "CMod"
 
-local fractionOne = Fraction:new(1)
 CMod.apply = function(self)
 	local noteChart = self.noteChart
 	
@@ -16,9 +15,9 @@ CMod.apply = function(self)
 		for velocityDataIndex = 1, velocityDataSequence:getVelocityDataCount() do
 			local velocityData = velocityDataSequence:getVelocityData(velocityDataIndex)
 			
-			velocityData.currentSpeed = fractionOne
-			velocityData.localSpeed = fractionOne
-			velocityData.globalSpeed = fractionOne
+			velocityData.currentSpeed = 1
+			velocityData.localSpeed = 1
+			velocityData.globalSpeed = 1
 		end
 	end
 	

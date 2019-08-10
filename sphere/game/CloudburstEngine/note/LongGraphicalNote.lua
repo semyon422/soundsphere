@@ -75,7 +75,7 @@ LongGraphicalNote.getFakeVisualStartTime = function(self)
 	
 	local fakeVisualClearStartTime
 		= (fakeStartTime - fakeVelocityData.timePoint.absoluteTime)
-		* fakeVelocityData.currentSpeed:tonumber()
+		* fakeVelocityData.currentSpeed
 		+ fakeVelocityData.timePoint.zeroClearVisualTime
 		
 	local fakeVisualStartTime

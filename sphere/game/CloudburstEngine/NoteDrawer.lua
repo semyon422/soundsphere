@@ -90,7 +90,7 @@ end
 
 NoteDrawer.update = function(self)
 	self:updateCurrentTime()
-	self.globalSpeed = self.currentTimePoint.velocityData.globalSpeed:tonumber()
+	self.globalSpeed = self.currentTimePoint.velocityData.globalSpeed
 	
 	local note
 	for currentNoteIndex = self.startNoteIndex, 0, -1 do
