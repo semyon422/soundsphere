@@ -23,24 +23,26 @@ JamLoader.load = function(self, path, callback)
 				local OJM = require("o2jam.OJM")
 				
 				local fileData = file.new(...)
-				local ojm = OJM:new(fileData.data)
+				local ojm = OJM:new(fileData:getString())
 				local soundDatas = {}
 				
 				for sampleIndex, sampleData in pairs(ojm.samples) do
-					soundDatas[sampleIndex] = sound.new(nil, {
-						data = sampleData.sampleData,
-						length = #sampleData.sampleData
-					})
+					soundDatas[sampleIndex] = sound.new(nil, file.new(sampleData.sampleData, sampleIndex))
 				end
 				
 				return soundDatas
 			]],
 			{path},
 			function(result)
-				local soundDatas = result[2]
+				local soundDatas
+				if result[1] then
+					soundDatas = result[2]
+				else
+					soundDatas = {}
+				end
 				ojms[path] = soundDatas
 				
-				for i, soundData in pairs(ojms[path]) do
+				for i, soundData in pairs(soundDatas) do
 					sound.add(path .. "/" .. i, soundData)
 				end
 				
