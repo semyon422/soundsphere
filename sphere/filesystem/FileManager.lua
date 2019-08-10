@@ -9,7 +9,7 @@ FileManager.ImageFormats = {
 }
 
 FileManager.VideoFormats = {
-	"mpg", "avi", "mp4", "mpeg"
+	"mpg", "avi", "mp4", "mpeg", "wmv"
 }
 
 FileManager.Formats = {
