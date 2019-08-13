@@ -1,5 +1,5 @@
--- local tween = require("tween")
 local AudioFactory = require("aqua.audio.AudioFactory")
+local Config = require("sphere.game.Config")
 
 local PreviewManager = {}
 
@@ -20,10 +20,13 @@ PreviewManager.playAudio = function(self, path, position)
 		end
 	end
 	
+	local volume = Config.data.volume
+	
 	self.path = path
 	self.position = position
 	self.audio = AudioFactory:getStream(path)
 	self.audio:setPosition(position)
+	self.audio:setVolume(volume.main * volume.music)
 	self.audio:play()
 end
 
