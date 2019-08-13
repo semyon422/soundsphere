@@ -123,12 +123,13 @@ local fix = function(line)
 	elseif validate(line) == line then
 		return line
 	else
-		return
+		local validLine =
 			iconv(line, "UTF-8", "SHIFT-JIS") or
 			iconv(line, "UTF-8", "EUC-KR") or
 			iconv(line, "UTF-8", "US-ASCII") or
 			iconv(line, "UTF-8", "CP1252") or
-			line
+			iconv(line, "UTF-8//IGNORE", "SHIFT-JIS")
+		return validate(validLine)
 	end
 end
 
