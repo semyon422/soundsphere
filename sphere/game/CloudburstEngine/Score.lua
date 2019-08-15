@@ -72,7 +72,7 @@ Score.updateGrade = function(self)
 end
 
 Score.interval = 0.004
-Score.scale = 0.120
+Score.scale = 100/6
 Score.hit = function(self, deltaTime)
 	if math.abs(deltaTime) <= self.passEdge then
 		local hit = math.floor(deltaTime / self.interval)
@@ -82,21 +82,30 @@ Score.hit = function(self, deltaTime)
 	local judgeIndex = self:judge(deltaTime)
 	self.judges[judgeIndex] = (self.judges[judgeIndex] or 0) + 1
 	
+	self.count = self.count + 1
 	if math.abs(deltaTime) >= self.timegates[#self.timegates - 1].time then
+		self:updateAccuracy()
 		return
 	end
 	
-	self.sum = self.sum + (deltaTime * 1000) ^ 2
-	self.count = self.count + 1
-	self.accuracy = math.sqrt(self.sum / self.count)
-	self:updateGrade()
+	-- self.count = self.count + 1
+	-- self.sum = self.sum + (deltaTime * 1000) ^ 2
+	-- self.accuracy = math.sqrt(self.sum / self.count)
+	-- self:updateGrade()
 	
 	self.score = self.score
-		+ math.exp(-(2 * deltaTime / self.scale) ^ 2)
+		+ math.exp(-(deltaTime * self.scale) ^ 2)
 		/ self.engine.noteCount
 		* 1000000
 	
+	self:updateAccuracy()
+	
 	self.timegate = self.timegates[judgeIndex].name
+end
+
+Score.updateAccuracy = function(self)
+	self.accuracy = 1000 * math.sqrt(-math.log(self.score / 1000000 * self.engine.noteCount / self.count) / self.scale ^ 2)
+	self:updateGrade()
 end
 
 Score.judge = function(self, deltaTime)
