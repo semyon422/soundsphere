@@ -18,10 +18,6 @@ Score.construct = function(self)
 	self.grade = ""
 	
 	self.score = 0
-	
-	for i = -math.floor(self.passEdge / self.interval), math.ceil(self.passEdge / self.interval) do
-		self.hits[i] = 0
-	end
 end
 
 Score.passEdge = 0.120
@@ -73,11 +69,8 @@ end
 
 Score.interval = 0.004
 Score.scale = 100/6
-Score.hit = function(self, deltaTime)
-	if math.abs(deltaTime) <= self.passEdge then
-		local hit = math.floor(deltaTime / self.interval)
-		self.hits[hit] = self.hits[hit] + 1
-	end
+Score.hit = function(self, deltaTime, time)
+	self.hits[#self.hits + 1] = {time, deltaTime}
 	
 	local judgeIndex = self:judge(deltaTime)
 	self.judges[judgeIndex] = (self.judges[judgeIndex] or 0) + 1
@@ -148,7 +141,7 @@ Score.processShortNote = function(self, note)
 	self:processShortNoteState(note.state)
 	
 	if note.ended then
-		self:hit(deltaTime)
+		self:hit(deltaTime, note.startNoteData.timePoint.absoluteTime)
 	end
 end
 
@@ -168,7 +161,7 @@ Score.processLongNote = function(self, note)
 	end
 	
 	if note.started and not note.judged then
-		self:hit(deltaStartTime)
+		self:hit(deltaStartTime, note.startNoteData.timePoint.absoluteTime)
 		note.judged = true
 	end
 end

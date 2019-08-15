@@ -28,7 +28,7 @@ Autoplay.processShortNote = function(self, note)
 		note.score:processShortNoteState(note.state)
 		
 		if note.ended then
-			note.score:hit(0)
+			note.score:hit(0, note.startNoteData.timePoint.absoluteTime)
 		end
 	end
 end
@@ -67,7 +67,7 @@ Autoplay.processLongNote = function(self, note)
 		note.score:processLongNoteState("startPassedPressed", "clear")
 		
 		if note.started and not note.judged then
-			note.score:hit(0)
+			note.score:hit(0, note.startNoteData.timePoint.absoluteTime)
 			note.judged = true
 		end
 	elseif deltaEndTime <= 0 and note.keyState or nextNote and nextNote:isHere() then
