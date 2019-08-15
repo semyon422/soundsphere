@@ -1,45 +1,61 @@
 local Class = require("aqua.util.Class")
 local Line = require("aqua.graphics.Line")
+local Circle = require("aqua.graphics.Circle")
+local Image = require("aqua.graphics.Image")
+local map = require("aqua.math").map
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 
 local AccuracyGraph = Class:new()
 
+AccuracyGraph.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
+
 AccuracyGraph.load = function(self)
-	self.points = {}
-	self.line = Line:new({
-		points = self.points,
+	self.canvas = love.graphics.newCanvas()
+	
+	love.graphics.setCanvas(self.canvas)
+	
+	local line = Line:new({
+		points = {0, 0.5, 1, 0.5},
 		cs = self.cs,
+		color = {255, 255, 255, 127},
 		lineStyle = "smooth",
-		lineWidth = 2
+		lineWidth = 4
+	})
+	line:reload()
+	line:draw()
+	
+	local circle = Circle:new({
+		x = 0, y = 0, r = 1/360,
+		color = {63, 255, 127, 255},
+		mode = "fill",
+		cs = self.cs
 	})
 	
-	local maxAmount = 0
-	local hits = {}
-	for deltaTime, amount in pairs(self.score.hits) do
-		hits[#hits + 1] = {deltaTime, amount}
-		maxAmount = math.max(maxAmount, amount)
-	end
-	table.sort(hits, function(a, b) return a[1] < b[1] end)
-	
-	for i = 1, #hits do
-		self.points[#self.points + 1] = hits[i][1] * 4 / 250 + 0.5
-		self.points[#self.points + 1] = 1 - hits[i][2] / maxAmount / 4
+	local minTime = self.score.noteChart:hashGet("minTime")
+	local maxTime = self.score.noteChart:hashGet("maxTime")
+	for _, point in ipairs(self.score.hits) do
+		circle.x = map(point[1], minTime, maxTime, 0, 1)
+		circle.y = 0.5 + point[2] * 3
+		circle:reload()
+		circle:draw()
 	end
 	
-	if #self.points > 0 then
-		self.line:reload()
-	end
+	love.graphics.setCanvas()
+	
+	self.image = Image:new({
+		x = 0, y = 0,
+		cs = self.cs,
+		image = self.canvas
+	})
+	self.image:reload()
 end
 
 AccuracyGraph.reload = function(self)
-	if #self.points >= 4 then
-		self.line:reload()
-	end
+	self:load()
 end
 
 AccuracyGraph.draw = function(self)
-	if #self.points >= 4 then
-		self.line:draw()
-	end
+	self.image:draw()
 end
 
 return AccuracyGraph
