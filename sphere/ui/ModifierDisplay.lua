@@ -15,12 +15,16 @@ ModifierDisplay.rectangleColor = {255, 255, 255, 0}
 ModifierDisplay.mode ="fill"
 ModifierDisplay.limit = 1
 ModifierDisplay.textAlign = {
-	x = "left", y = "center"
+	x = "left", y = "bottom"
 }
 ModifierDisplay.textColor = {255, 255, 255, 255}
-ModifierDisplay.font = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
+ModifierDisplay.font = aquafonts.getFont(spherefonts.NotoSansRegular, 14)
 
 ModifierDisplay.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
+ModifierDisplay.x = 30/1920
+ModifierDisplay.y = 1 - 2 * 67/1080
+ModifierDisplay.w = 0.6 - 60/1920
+ModifierDisplay.h = 67/1080
 
 ModifierDisplay.updateText = function(self)
 	self:setText(ModifierManager.sequence:tostring())

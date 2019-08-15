@@ -31,14 +31,13 @@ SelectionScreen.load = function(self)
 	NoteChartList:load()
 	NoteChartSetList:load()
 	
-	ModifierList:load()
 	ModifierDisplay:reload()
-	
-	NoteChartSetList:sendInitial()
 	
 	SearchLine:load()
 	Header:load()
 	Footer:load()
+	
+	NoteChartSetList:sendInitial()
 	
 	SelectFrame:reload()
 	
@@ -49,7 +48,6 @@ end
 SelectionScreen.unload = function(self)
 	NoteChartSetList:unload()
 	NoteChartList:unload()
-	ModifierList:unload()
 	ModifierDisplay:unload()
 end
 
@@ -60,7 +58,6 @@ SelectionScreen.update = function(self)
 	
 	NoteChartSetList:update()
 	NoteChartList:update()
-	ModifierList:update()
 	ModifierDisplay:update()
 	PreviewManager:update()
 end
@@ -70,7 +67,6 @@ SelectionScreen.draw = function(self)
 	
 	NoteChartSetList:draw()
 	NoteChartList:draw()
-	ModifierList:draw()
 	SelectFrame:draw()
 	
 	Header:draw()
@@ -101,7 +97,6 @@ SelectionScreen.receive = function(self, event)
 	
 	NoteChartSetList:receive(event)
 	NoteChartList:receive(event)
-	ModifierList:receive(event)
 	ModifierDisplay:receive(event)
 	Header:receive(event)
 	Footer:receive(event)

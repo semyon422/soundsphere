@@ -19,6 +19,7 @@ local BackgroundManager = require("sphere.ui.BackgroundManager")
 local NotificationLine = require("sphere.ui.NotificationLine")
 local GameUI = require("sphere.ui.GameUI")
 local CLI = require("sphere.ui.CLI")
+local OverlayMenu = require("sphere.ui.OverlayMenu")
 
 local SphereGame = {}
 
@@ -31,6 +32,7 @@ SphereGame.init = function(self)
 	BackgroundManager:init()
 	NotificationLine:init()
 	CLI:init()
+	OverlayMenu:init()
 end
 
 SphereGame.run = function(self)
@@ -71,6 +73,7 @@ SphereGame.update = function(self, dt)
 	NotificationLine:update()
 	ScreenManager:update(dt)
 	CLI:update()
+	OverlayMenu:update()
 end
 
 SphereGame.draw = function(self)
@@ -78,6 +81,7 @@ SphereGame.draw = function(self)
 	ScreenManager:draw()
 	NotificationLine:draw()
 	CLI:draw()
+	OverlayMenu:draw()
 end
 
 SphereGame.receive = function(self, event)
@@ -92,7 +96,9 @@ SphereGame.receive = function(self, event)
 		CoordinateManager:reload()
 	end
 	
-	if CLI.hidden or event.name == "resize" then
+	local overlayHidden = OverlayMenu.hidden
+	OverlayMenu:receive(event)
+	if CLI.hidden and overlayHidden or event.name == "resize" then
 		ScreenManager:receive(event)
 		BackgroundManager:receive(event)
 		NotificationLine:receive(event)

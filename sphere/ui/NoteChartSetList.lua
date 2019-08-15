@@ -7,6 +7,7 @@ local PreviewManager = require("sphere.ui.PreviewManager")
 local SearchLine = require("sphere.ui.SearchLine")
 local Cache = require("sphere.game.NoteChartManager.Cache")
 local SearchManager = require("sphere.game.NoteChartManager.SearchManager")
+local OverlayMenu = require("sphere.ui.OverlayMenu")
 
 local NoteChartSetList = CacheList:new()
 
@@ -37,12 +38,24 @@ NoteChartSetList.send = function(self, event)
 	elseif event.action == "buttonInteract" then
 		local cacheData = self.items[event.itemIndex].cacheData
 		if event.button == 2 then
-			local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
-			if shift then
-				Cache:update(cacheData.path, recursive)
-			else
-				love.system.openURL("file://" .. love.filesystem.getSource() .. "/" .. cacheData.path)
-			end
+			OverlayMenu:show()
+			OverlayMenu:setTitle("Notechart set options")
+			OverlayMenu:setItems({
+				{
+					name = "open folder",
+					onClick = function()
+						love.system.openURL("file://" .. love.filesystem.getSource() .. "/" .. cacheData.path)
+						OverlayMenu:hide()
+					end
+				},
+				{
+					name = "recache",
+					onClick = function()
+						Cache:update(cacheData.path)
+						OverlayMenu:hide()
+					end
+				}
+			})
 		end
 	elseif event.action == "return" then
 		local cacheData = self.NoteChartList.items[self.NoteChartList.focusedItemIndex].cacheData

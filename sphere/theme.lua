@@ -20,36 +20,30 @@ local set = function(object1, object2)
 end
 
 local cs = {
-	all	= CoordinateManager:getCS(0, 0, 0, 0, "all"),
-	h	= CoordinateManager:getCS(0, 0, 0, 0, "h"),
-	h06	= CoordinateManager:getCS(0.6, 0, 0, 0, "h")
+	all		= CoordinateManager:getCS(0, 0, 0, 0, "all"),
+	h		= CoordinateManager:getCS(0, 0, 0, 0, "h"),
+	hright	= CoordinateManager:getCS(1, 0, 0, 0, "h"),
+	h06		= CoordinateManager:getCS(0.6, 0, 0, 0, "h")
 }
 
-local padding = 0.005
 set(SearchLine, {
-	cs1 = cs.h, x1 = padding, y1 = padding,
-	cs2 = cs.h06, x2 = -padding, y2 = 1/17 - padding,
-	ry = (1/17 - 2 * padding) / 2,
-	font = aquafonts.getFont(spherefonts.NotoSansRegular, 20)
+	cs1 = cs.h06, x1 = (988 - 1080) / 1080, y1 = 84/1080,
+	cs2 = cs.hright, x2 = -(1920 - 1892) / 1080, y2 = 129/1080,
+	ry = 10/1080,
+	font = aquafonts.getFont(spherefonts.NotoSansRegular, 18)
 })
 
 set(MetaDataTable, {
-	cs1 = cs.h, x1 = 1/17, y1 = 1/17,
-	cs2 = cs.h06, x2 = -1/17, y2 = 3/17
+	cs1 = cs.h, x1 = 0, y1 = 84/1080,
+	cs2 = cs.h06, x2 = (955 - 1080) / 1080, y2 = 218/1080
 })
 
 set(Header, {
 	cs = cs.all,
-	topx = 0, topy = 0, topw = 1, toph = 1/17,
-	bottomx = 0, bottomy = 1/17, bottomw = 1, bottomh = 2/17,
+	topx = 0, topy = 0, topw = 1, toph = 56/1080,
+	bottomx = 0, bottomy = 56/1080, bottomw = 1, bottomh = 134/1080,
 	topColor = {0, 0, 0, 127},
 	bottomColor = {0, 0, 0, 191}
-})
-
-set(Footer, {
-	cs = cs.all,
-	x = 0, y = 16/17, w = 1, h = 1/17,
-	color = {0, 0, 0, 127}
 })
 
 set(NoteChartSetList, {
@@ -60,16 +54,8 @@ set(NoteChartList, {
 	cs = cs.all, x = 0, y = 4/17, w = 0.6, h = 9/17
 })
 
-set(ModifierDisplay, {
-	cs = cs.all, x = 0, y = 16/17, w = 0.6, h = 1/17
-})
-
 set(SelectFrame, {
 	cs = cs.all, x = 0.588, y = 8/17, w = 0.5, h = 1/17, ry = 1/34
-})
-
-set(ModifierList, {
-	cs = cs.h, x = 1/17, y = 13/17, w = 6/17, h = 3/17
 })
 
 set(BrowserList, {

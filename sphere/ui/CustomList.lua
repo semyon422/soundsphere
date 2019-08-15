@@ -71,6 +71,12 @@ CustomList.unload = function(self)
 	return self:unloadButtons()
 end
 
+CustomList.reload = function(self)
+	self.buttonsFrame:reload()
+	self:unloadButtons()
+	self:calculateButtons()
+end
+
 CustomList.sendInitial = function(self)
 	self:send({
 		sender = self.sender,
