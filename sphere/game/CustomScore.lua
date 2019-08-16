@@ -12,11 +12,15 @@ CustomScore.timegates = {
 	},
 	{
 		time = 0.040,
-		name = "good"
+		name = "good",
+		nameLate = "late good",
+		nameEarly = "early good"
 	},
 	{
 		time = 0.120,
-		name = "bad"
+		name = "bad",
+		nameLate = "late bad",
+		nameEarly = "early bad"
 	},
 	{
 		time = 0.160,

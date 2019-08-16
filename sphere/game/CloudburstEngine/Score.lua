@@ -93,7 +93,14 @@ Score.hit = function(self, deltaTime, time)
 	
 	self:updateAccuracy()
 	
-	self.timegate = self.timegates[judgeIndex].name
+	local timegateData = self.timegates[judgeIndex]
+	if deltaTime < 0 and timegateData.nameEarly then
+		self.timegate = timegateData.nameEarly
+	elseif deltaTime > 0 and timegateData.nameLate then
+		self.timegate = timegateData.nameLate
+	else
+		self.timegate = timegateData.name
+	end
 end
 
 Score.updateAccuracy = function(self)
