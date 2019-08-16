@@ -38,14 +38,6 @@ set(MetaDataTable, {
 	cs2 = cs.h06, x2 = (955 - 1080) / 1080, y2 = 218/1080
 })
 
-set(Header, {
-	cs = cs.all,
-	topx = 0, topy = 0, topw = 1, toph = 56/1080,
-	bottomx = 0, bottomy = 56/1080, bottomw = 1, bottomh = 134/1080,
-	topColor = {0, 0, 0, 127},
-	bottomColor = {0, 0, 0, 191}
-})
-
 set(NoteChartSetList, {
 	cs = cs.all, x = 0.6, y = 0, w = 0.4, h = 1
 })
