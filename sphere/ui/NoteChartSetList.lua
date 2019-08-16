@@ -37,7 +37,7 @@ NoteChartSetList.send = function(self, event)
 		self.NoteChartList:updateAudio()
 	elseif event.action == "buttonInteract" then
 		local cacheData = self.items[event.itemIndex].cacheData
-		if event.button == 2 then
+		if event.button == 2 and event.itemIndex == self.focusedItemIndex then
 			OverlayMenu:show()
 			OverlayMenu:setTitle("Notechart set options")
 			OverlayMenu:setItems({
