@@ -4,8 +4,11 @@ local Circle = require("aqua.graphics.Circle")
 local Image = require("aqua.graphics.Image")
 local map = require("aqua.math").map
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
+local Score = require("sphere.game.CloudburstEngine.Score")
 
 local AccuracyGraph = Class:new()
+
+Score.observable:add(AccuracyGraph)
 
 AccuracyGraph.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
@@ -13,7 +16,6 @@ AccuracyGraph.load = function(self)
 	self.canvas = love.graphics.newCanvas()
 	
 	love.graphics.setCanvas(self.canvas)
-	
 	local line = Line:new({
 		points = {0, 0.5, 1, 0.5},
 		cs = self.cs,
@@ -23,24 +25,20 @@ AccuracyGraph.load = function(self)
 	})
 	line:reload()
 	line:draw()
+	love.graphics.setCanvas()
 	
-	local circle = Circle:new({
+	self.circle = Circle:new({
 		x = 0, y = 0, r = 1/360,
-		color = {63, 255, 127, 255},
+		color = {0, 127, 63, 255},
 		mode = "fill",
 		cs = self.cs
 	})
 	
-	local minTime = self.score.noteChart:hashGet("minTime")
-	local maxTime = self.score.noteChart:hashGet("maxTime")
+	self.minTime = self.score.noteChart:hashGet("minTime")
+	self.maxTime = self.score.noteChart:hashGet("maxTime")
 	for _, point in ipairs(self.score.hits) do
-		circle.x = map(point[1], minTime, maxTime, 0, 1)
-		circle.y = 0.5 + point[2] * 3
-		circle:reload()
-		circle:draw()
+		self:addPoint(point[1], point[2])
 	end
-	
-	love.graphics.setCanvas()
 	
 	self.image = Image:new({
 		x = 0, y = 0,
@@ -50,8 +48,28 @@ AccuracyGraph.load = function(self)
 	self.image:reload()
 end
 
+AccuracyGraph.addPoint = function(self, time, deltaTime)
+	love.graphics.setCanvas(self.canvas)
+	local circle = self.circle
+	
+	circle.x = map(time, self.minTime, self.maxTime, 0, 1)
+	circle.y = 0.5 + deltaTime * 3
+	circle:reload()
+	circle:draw()
+	
+	love.graphics.setCanvas()
+end
+
 AccuracyGraph.reload = function(self)
 	self:load()
+end
+
+AccuracyGraph.receive = function(self, event)
+	if event.name == "resize" then
+		self:reload()
+	elseif event.name == "hit" then
+		self:addPoint(event.time, event.deltaTime)
+	end
 end
 
 AccuracyGraph.draw = function(self)

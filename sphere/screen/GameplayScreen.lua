@@ -15,6 +15,7 @@ local ScreenManager = require("sphere.screen.ScreenManager")
 local ModifierManager = require("sphere.game.ModifierManager")
 local BMSBGA = require("sphere.game.BMSBGA")
 local Config = require("sphere.game.Config")
+local AccuracyGraph = require("sphere.ui.AccuracyGraph")
 
 local GameplayScreen = Screen:new()
 
@@ -76,6 +77,8 @@ GameplayScreen.load = function(self)
 	PauseOverlay:load()
 	ProgressBar.engine = self.engine
 	ProgressBar:load()
+	AccuracyGraph.score = self.engine.score
+	AccuracyGraph:load()
 	
 	local dim = 255 * (1 - Config.data.dim.gameplay)
 	local color = {dim, dim, dim}
@@ -101,6 +104,7 @@ end
 
 GameplayScreen.draw = function(self)
 	self.bga:draw()
+	AccuracyGraph:draw()
 	self.engine:draw()
 	
 	Screen.draw(self)
@@ -115,6 +119,7 @@ GameplayScreen.receive = function(self, event)
 	self.playField:receive(event)
 	self.bga:receive(event)
 	PauseOverlay:receive(event)
+	AccuracyGraph:receive(event)
 end
 
 return GameplayScreen
