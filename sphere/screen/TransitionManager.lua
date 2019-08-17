@@ -2,18 +2,22 @@ local tween = require("tween")
 
 local TransitionManager = {}
 
-TransitionManager.shader = love.graphics.newShader([[
-extern number alpha;
-vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ){
-	vec4 pixel = Texel(texture, texture_coords);
-	return pixel * color * alpha;
-}
-]])
+TransitionManager.shaderText = [[
+	extern number alpha;
+	vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ){
+		vec4 pixel = Texel(texture, texture_coords);
+		return pixel * color * alpha;
+	}
+]]
 
 TransitionManager.isTransiting = false
 TransitionManager.needTransit = false
 TransitionManager.alpha = 1
 TransitionManager.phase = 0
+
+TransitionManager.init = function(self)
+	self.shader = love.graphics.newShader(self.shaderText)
+end
 
 TransitionManager.update = function(self, dt)
 	if self.phase == 0 then

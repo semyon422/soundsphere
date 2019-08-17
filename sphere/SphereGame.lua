@@ -1,49 +1,53 @@
-local Container = require("aqua.graphics.Container")
-local CoordinateManager = require("aqua.graphics.CoordinateManager")
-local ThreadPool = require("aqua.thread.ThreadPool")
-local Observer = require("aqua.util.Observer")
-local aquaio = require("aqua.io")
-
-local SelectionScreen = require("sphere.screen.SelectionScreen")
-local ScreenManager = require("sphere.screen.ScreenManager")
-local TransitionManager = require("sphere.screen.TransitionManager")
-
-local Cache = require("sphere.game.NoteChartManager.Cache")
-local ScoreManager = require("sphere.game.ScoreManager")
-local Config = require("sphere.game.Config")
-
-local DiscordPresence = require("sphere.game.DiscordPresence")
-local MountManager = require("sphere.game.MountManager")
-local WindowManager = require("sphere.game.WindowManager")
-local BackgroundManager = require("sphere.ui.BackgroundManager")
-local NotificationLine = require("sphere.ui.NotificationLine")
-local GameUI = require("sphere.ui.GameUI")
-local CLI = require("sphere.ui.CLI")
-local OverlayMenu = require("sphere.ui.OverlayMenu")
+local aquaevent					= require("aqua.event")
+local CoordinateManager			= require("aqua.graphics.CoordinateManager")
+local ThreadPool				= require("aqua.thread.ThreadPool")
+local MainLog					= require("sphere.MainLog")
+local Config					= require("sphere.config.Config")
+local Cache						= require("sphere.database.Cache")
+local CacheDatabase				= require("sphere.database.CacheDatabase")
+local NoteChartFactory			= require("sphere.database.NoteChartFactory")
+local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
+local ScoreManager				= require("sphere.database.ScoreManager")
+local ScoreDatabase				= require("sphere.database.ScoreDatabase")
+local DiscordPresence			= require("sphere.discord.DiscordPresence")
+local MountManager				= require("sphere.filesystem.MountManager")
+local ScreenManager				= require("sphere.screen.ScreenManager")
+local TransitionManager			= require("sphere.screen.TransitionManager")
+local SelectScreen				= require("sphere.screen.select.SelectScreen")
+local BackgroundManager			= require("sphere.ui.BackgroundManager")
+local CLI						= require("sphere.ui.CLI")
+local GameUI 					= require("sphere.ui.GameUI")
+local NotificationLine			= require("sphere.ui.NotificationLine")
+local OverlayMenu				= require("sphere.ui.OverlayMenu")
+local WindowManager				= require("sphere.window.WindowManager")
 
 local SphereGame = {}
 
+SphereGame.run = function(self)
+	self:init()
+	self:load()
+end
+
 SphereGame.init = function(self)
-	self.observer = Observer:new()
-	self.observer.receive = function(_, ...) return self:receive(...) end
-	self.globalUI = Container:new()
+	MainLog:init()
 	GameUI:init()
 	
+	CacheDatabase:init()
+	ScoreDatabase:init()
+	NoteChartFactory:init()
+	NoteChartResourceLoader:init()
+	
+	ScreenManager:init()
 	BackgroundManager:init()
 	NotificationLine:init()
 	CLI:init()
 	OverlayMenu:init()
-end
-
-SphereGame.run = function(self)
-	self:init()
-	aquaio:add(self.observer)
-	MountManager:mount()
-	self:load()
-	WindowManager:load()
+	
+	aquaevent:add(self)
 end
 
 SphereGame.load = function(self)
+	MountManager:mount()
 	Cache:select()
 	ScoreManager:load()
 	Config:read()
@@ -51,17 +55,15 @@ SphereGame.load = function(self)
 	
 	DiscordPresence:load()
 	
-	aquaio.fpslimit = Config.data.fps
+	aquaevent.fpslimit = Config.data.fps
 	
-	BackgroundManager:loadDrawableBackground("userdata/background.jpg")
-	ScreenManager:set(SelectionScreen)
-	NotificationLine:notify("welcome")
+	ScreenManager:set(SelectScreen)
+	WindowManager:load()
 end
 
 SphereGame.unload = function(self)
 	ScreenManager:unload()
 	DiscordPresence:unload()
-	-- MountManager:unmount()
 	Config:write()
 end
 

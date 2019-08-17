@@ -1,9 +1,23 @@
-local Screen = require("sphere.screen.Screen")
-local TransitionManager = require("sphere.screen.TransitionManager")
+local Screen			= require("sphere.screen.Screen")
+local TransitionManager	= require("sphere.screen.TransitionManager")
 
 local ScreenManager = {}
 
-ScreenManager.currentScreen = Screen:new()
+ScreenManager.init = function(self)
+	self.currentScreen = Screen:new()
+
+	TransitionManager:init()
+	
+	local BrowserScreen		= require("sphere.screen.browser.BrowserScreen")
+	local GameplayScreen	= require("sphere.screen.gameplay.GameplayScreen")
+	local ResultScreen		= require("sphere.screen.result.ResultScreen")
+	local SelectScreen		= require("sphere.screen.select.SelectScreen")
+	
+	BrowserScreen:init()
+	GameplayScreen:init()
+	ResultScreen:init()
+	SelectScreen:init()
+end
 
 ScreenManager.set = function(self, screen, callback)
 	TransitionManager:transit(function()

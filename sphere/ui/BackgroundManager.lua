@@ -1,7 +1,7 @@
-local CoordinateManager = require("aqua.graphics.CoordinateManager")
-local image = require("aqua.image")
-local ImageBackground = require("sphere.ui.ImageBackground")
-local tween = require("tween")
+local CoordinateManager	= require("aqua.graphics.CoordinateManager")
+local image				= require("aqua.image")
+local ImageBackground	= require("sphere.ui.ImageBackground")
+local tween				= require("tween")
 
 local BackgroundManager = {}
 
@@ -9,9 +9,7 @@ BackgroundManager.color = {0, 0, 0}
 
 BackgroundManager.init = function(self)
 	self.state = 0
-	
 	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
-	
 	self.backgrounds = {}
 end
 

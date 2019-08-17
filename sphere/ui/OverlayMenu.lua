@@ -1,9 +1,9 @@
-local CoordinateManager = require("aqua.graphics.CoordinateManager")
-local Rectangle = require("aqua.graphics.Rectangle")
-local TextFrame = require("aqua.graphics.TextFrame")
-local CustomList = require("sphere.ui.CustomList")
-local aquafonts = require("aqua.assets.fonts")
-local spherefonts = require("sphere.assets.fonts")
+local aquafonts			= require("aqua.assets.fonts")
+local CoordinateManager	= require("aqua.graphics.CoordinateManager")
+local Rectangle			= require("aqua.graphics.Rectangle")
+local TextFrame			= require("aqua.graphics.TextFrame")
+local spherefonts		= require("sphere.assets.fonts")
+local CustomList		= require("sphere.ui.CustomList")
 
 local OverlayMenu = {}
 

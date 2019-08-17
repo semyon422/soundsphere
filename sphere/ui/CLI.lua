@@ -1,9 +1,9 @@
-local CoordinateManager = require("aqua.graphics.CoordinateManager")
-local Rectangle = require("aqua.graphics.Rectangle")
-local Text = require("aqua.graphics.Text")
-local aquafonts = require("aqua.assets.fonts")
-local spherefonts = require("sphere.assets.fonts")
-local clone = require("aqua.table").clone
+local aquafonts			= require("aqua.assets.fonts")
+local CoordinateManager	= require("aqua.graphics.CoordinateManager")
+local Rectangle			= require("aqua.graphics.Rectangle")
+local Text				= require("aqua.graphics.Text")
+local clone				= require("aqua.table").clone
+local spherefonts		= require("sphere.assets.fonts")
 
 local CLI = {}
 

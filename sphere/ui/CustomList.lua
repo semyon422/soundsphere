@@ -1,13 +1,13 @@
-local Class = require("aqua.util.Class")
-local aquafonts = require("aqua.assets.fonts")
-local CoordinateManager = require("aqua.graphics.CoordinateManager")
-local Rectangle = require("aqua.graphics.Rectangle")
-local Stencil = require("aqua.graphics.Stencil")
-local Observable = require("aqua.util.Observable")
-local Theme = require("aqua.ui.Theme")
-local sign = require("aqua.math").sign
-local belong = require("aqua.math").belong
-local spherefonts = require("sphere.assets.fonts")
+local aquafonts			= require("aqua.assets.fonts")
+local CoordinateManager	= require("aqua.graphics.CoordinateManager")
+local Rectangle			= require("aqua.graphics.Rectangle")
+local Stencil			= require("aqua.graphics.Stencil")
+local sign				= require("aqua.math").sign
+local belong			= require("aqua.math").belong
+local Class				= require("aqua.util.Class")
+local Observable		= require("aqua.util.Observable")
+local Theme				= require("aqua.ui.Theme")
+local spherefonts		= require("sphere.assets.fonts")
 
 local CustomList = Class:new()
 
@@ -33,14 +33,13 @@ CustomList.middleOffset = 9
 CustomList.startOffset = 9
 CustomList.endOffset = 9
 
-CustomList.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
+CustomList.construct = function(self)
+	self.observable = Observable:new()
+	self.font = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
+	self.items = {}
+end
 
 CustomList.load = function(self)
-	self.items = self.items or {}
-
-	self.observable = self.observable or Observable:new()
-	self.font = self.font or aquafonts.getFont(spherefonts.NotoSansRegular, 24)
-	
 	self.scrollCurrentDelta = 0
 	self:loadStencil()
 	self.visualItemIndex = self.focusedItemIndex

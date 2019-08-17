@@ -1,7 +1,7 @@
-local map = require("aqua.math").map
-local ImageFrame = require("aqua.graphics.ImageFrame")
-local Background = require("sphere.ui.Background")
-local image = require("aqua.image")
+local ImageFrame	= require("aqua.graphics.ImageFrame")
+local image			= require("aqua.image")
+local map			= require("aqua.math").map
+local Background	= require("sphere.ui.Background")
 
 local ImageBackground = Background:new()
 

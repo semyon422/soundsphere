@@ -1,7 +1,7 @@
 local GameUI = {}
 
 GameUI.init = function(self)
-	require("sphere.theme")
+	return require("sphere.theme")
 end
 
 return GameUI

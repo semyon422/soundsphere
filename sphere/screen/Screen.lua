@@ -1,5 +1,5 @@
-local Container = require("aqua.graphics.Container")
-local Class = require("aqua.util.Class")
+local Container	= require("aqua.graphics.Container")
+local Class		= require("aqua.util.Class")
 
 local Screen = Class:new()
 

@@ -12,11 +12,8 @@ aquapackage.add("chartbase")
 aquapackage.add("md5")
 
 local MainLog = require("sphere.MainLog")
-
 MainLog:write("trace", "starting game")
 
 require("aqua")
-
-require("aqua.io"):init()
-
+require("aqua.event"):init()
 require("sphere.SphereGame"):run()

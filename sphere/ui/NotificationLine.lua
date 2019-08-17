@@ -1,7 +1,7 @@
-local Theme = require("aqua.ui.Theme")
-local aquafonts = require("aqua.assets.fonts")
-local spherefonts = require("sphere.assets.fonts")
-local CoordinateManager = require("aqua.graphics.CoordinateManager")
+local aquafonts			= require("aqua.assets.fonts")
+local CoordinateManager	= require("aqua.graphics.CoordinateManager")
+local Theme				= require("aqua.ui.Theme")
+local spherefonts		= require("sphere.assets.fonts")
 
 local NotificationLine = {}
 
