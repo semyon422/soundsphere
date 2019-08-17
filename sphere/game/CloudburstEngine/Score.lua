@@ -1,8 +1,15 @@
 local Class = require("aqua.util.Class")
+local Observable = require("aqua.util.Observable")
 
 local Autoplay = require("sphere.game.CloudburstEngine.Autoplay")
 
 local Score = Class:new()
+
+Score.observable = Observable:new()
+
+Score.send = function(self, event)
+	return self.observable:send(event)
+end
 
 Score.construct = function(self)
 	self.combo = 0
@@ -76,6 +83,13 @@ Score.hit = function(self, deltaTime, time)
 	self.judges[judgeIndex] = (self.judges[judgeIndex] or 0) + 1
 	
 	self.count = self.count + 1
+	
+	self:send({
+		name = "hit",
+		time = time,
+		deltaTime = deltaTime
+	})
+	
 	if math.abs(deltaTime) >= self.timegates[#self.timegates - 1].time then
 		self:updateAccuracy()
 		return
