@@ -75,13 +75,17 @@ GameplayScreen.load = function(self)
 	
 	NoteChartResourceLoader:load(self.cacheData.path, noteChart, function()
 		self.bga:load()
-		self.engine:play()
+		PauseOverlay:play()
 	end)
 	
 	PauseOverlay.engine = self.engine
+	PauseOverlay.noteChart = noteChart
+	PauseOverlay.cacheData = self.cacheData
 	PauseOverlay:load()
+	
 	ProgressBar.engine = self.engine
 	ProgressBar:load()
+	
 	AccuracyGraph.score = self.engine.score
 	AccuracyGraph:load()
 	

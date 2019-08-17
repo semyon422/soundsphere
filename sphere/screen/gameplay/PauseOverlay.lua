@@ -3,6 +3,7 @@ local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Rectangle			= require("aqua.graphics.Rectangle")
 local Theme				= require("aqua.ui.Theme")
 local spherefonts		= require("sphere.assets.fonts")
+local DiscordPresence	= require("sphere.discord.DiscordPresence")
 local ScreenManager		= require("sphere.screen.ScreenManager")
 local tween				= require("tween")
 
@@ -163,6 +164,12 @@ end
 PauseOverlay.play = function(self)
 	self.paused = false
 	self.engine:play()
+	
+	DiscordPresence:setPresence({
+		state = "Playing",
+		details = ("%s - %s [%s]"):format(self.cacheData.artist, self.cacheData.title, self.cacheData.name),
+		endTimestamp = math.floor(os.time() + (self.cacheData.length - self.engine.currentTime) / self.engine.rate)
+	})
 end
 
 PauseOverlay.beginPlay = function(self)
@@ -182,6 +189,11 @@ end
 PauseOverlay.pause = function(self)
 	self.engine:pause()
 	self.paused = true
+	
+	DiscordPresence:setPresence({
+		state = "Playing (paused)",
+		details = ("%s - %s [%s]"):format(self.cacheData.artist, self.cacheData.title, self.cacheData.name)
+	})
 end
 
 PauseOverlay.restart = function(self)
@@ -205,6 +217,8 @@ PauseOverlay.menu = function(self)
 			})
 		end
 	)
+	
+	DiscordPresence:setPresence({})
 end
 
 return PauseOverlay
