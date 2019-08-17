@@ -119,14 +119,4 @@ NoteChartFactory.getNoteChart = function(self, path)
 	return noteChart, hash
 end
 
-NoteChartFactory.getNoteCharts = function(self, paths)
-	local noteCharts = {}
-	
-	for i, path in ipairs(paths) do
-		noteCharts[i] = {self:getNoteChart(path)}
-	end
-	
-	return noteCharts
-end
-
 return NoteChartFactory
