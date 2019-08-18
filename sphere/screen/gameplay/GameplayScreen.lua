@@ -123,12 +123,14 @@ GameplayScreen.draw = function(self)
 end
 
 GameplayScreen.receive = function(self, event)
-	InputManager:receive(event, self.engine)
-	self.engine:receive(event)
-	self.playField:receive(event)
-	self.bga:receive(event)
+	if not PauseOverlay.paused then
+		InputManager:receive(event, self.engine)
+		self.engine:receive(event)
+		self.playField:receive(event)
+		self.bga:receive(event)
+		AccuracyGraph:receive(event)
+	end
 	PauseOverlay:receive(event)
-	AccuracyGraph:receive(event)
 end
 
 return GameplayScreen
