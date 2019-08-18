@@ -145,7 +145,7 @@ local fix = function(line)
 			validLine = cd:convert(line)
 			if validLine then break end
 		end
-		print(validLine)
+		validLine = validLine or "<conversion error>"
 		return validate(validLine)
 	end
 end
