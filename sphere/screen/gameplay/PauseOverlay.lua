@@ -197,7 +197,7 @@ PauseOverlay.pause = function(self)
 end
 
 PauseOverlay.restart = function(self)
-	local GameplayScreen = require("sphere.screen.GameplayScreen")
+	local GameplayScreen = require("sphere.screen.gameplay.GameplayScreen")
 	GameplayScreen:unload()
 	GameplayScreen:load()
 	self.engine:play()
