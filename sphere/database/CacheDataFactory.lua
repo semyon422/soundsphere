@@ -4,7 +4,27 @@ local json	= require("json")
 local md5	= require("md5")
 local utf8	= require("utf8")
 
+local iconv = require("aqua.iconv")
+
 local CacheDataFactory = {}
+
+local charsets = {
+	{"UTF-8", "SHIFT-JIS"},
+	{"UTF-8", "CP932"},
+	{"UTF-8", "EUC-KR"},
+	{"UTF-8", "US-ASCII"},
+	{"UTF-8", "CP1252"},
+	{"UTF-8//IGNORE", "SHIFT-JIS"},
+}
+
+CacheDataFactory.init = function(self)
+	local conversionDescriptors = {}
+	self.conversionDescriptors = conversionDescriptors
+	
+	for i, tofrom in ipairs(charsets) do
+		conversionDescriptors[i] = iconv:open(tofrom[1], tofrom[2])
+	end
+end
 
 CacheDataFactory.splitList = function(self, chartPaths)
 	local dict = {}
@@ -113,7 +133,6 @@ CacheDataFactory.processCacheDataNameSingle = function(self, cacheDatas)
 	cacheDatas[1].title = title
 end
 
-local iconv = require("aqua.iconv").iconv
 local validate = require("aqua.utf8").validate
 local fix = function(line)
 	if not line then
@@ -121,12 +140,12 @@ local fix = function(line)
 	elseif validate(line) == line then
 		return line
 	else
-		local validLine =
-			iconv(line, "UTF-8", "SHIFT-JIS") or
-			iconv(line, "UTF-8", "EUC-KR") or
-			iconv(line, "UTF-8", "US-ASCII") or
-			iconv(line, "UTF-8", "CP1252") or
-			iconv(line, "UTF-8//IGNORE", "SHIFT-JIS")
+		local validLine
+		for i, cd in ipairs(CacheDataFactory.conversionDescriptors) do
+			validLine = cd:convert(line)
+			if validLine then break end
+		end
+		print(validLine)
 		return validate(validLine)
 	end
 end

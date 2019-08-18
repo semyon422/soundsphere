@@ -204,8 +204,10 @@ CacheDatabase.update = function(self, path, recursive, callback)
 				local path, recursive = ...
 				
 				local CacheDatabase = require("sphere.database.CacheDatabase")
+				local CacheDataFactory = require("sphere.database.CacheDataFactory")
 				local NoteChartFactory	= require("sphere.database.NoteChartFactory")
 				CacheDatabase:init()
+				CacheDataFactory:init()
 				NoteChartFactory:init()
 				
 				CacheDatabase:load()
