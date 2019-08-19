@@ -6,11 +6,21 @@ local spherefonts		= require("sphere.assets.fonts")
 
 local SearchLine = {}
 
+SearchLine.x1 = (988 - 1080) / 1080
+SearchLine.y1 = 84/1080
+SearchLine.x2 = -(1920 - 1892) / 1080
+SearchLine.y2 = 129/1080
+SearchLine.ry = 10/1080
+
 SearchLine.searchString = ""
 SearchLine.searchTable = {}
-SearchLine.padding = 0.005
 
 SearchLine.init = function(self)
+	self.cs1 = CoordinateManager:getCS(0.6, 0, 0, 0, "h")
+	self.cs2 = CoordinateManager:getCS(1, 0, 0, 0, "h")
+	
+	self.font = aquafonts.getFont(spherefonts.NotoSansRegular, 18)
+	
 	self.observable = Observable:new()
 	
 	self.textInputFrame = Theme.TextInputFrame:new({
@@ -33,10 +43,6 @@ SearchLine.init = function(self)
 		font = self.font,
 		enableStencil = true
 	})
-end
-
-SearchLine.load = function(self)
-	self:reload()
 end
 
 SearchLine.reload = function(self)

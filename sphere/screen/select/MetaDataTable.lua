@@ -6,7 +6,15 @@ local spherefonts		= require("sphere.assets.fonts")
 
 local MetaDataTable = {}
 
+MetaDataTable.x1 = 0
+MetaDataTable.y1 = 84/1080
+MetaDataTable.x2 = (955 - 1080) / 1080
+MetaDataTable.y2 = 218/1080
+
 MetaDataTable.init = function(self)
+	self.cs1 = CoordinateManager:getCS(0, 0, 0, 0, "h")
+	self.cs2 = CoordinateManager:getCS(0.6, 0, 0, 0, "h")
+	
 	self.background = Rectangle:new({
 		x1 = self.x1 - 1/10,
 		y1 = self.y1,
@@ -70,10 +78,6 @@ MetaDataTable.init = function(self)
 		color = {255, 255, 255, 255},
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 18)
 	})
-end
-
-MetaDataTable.load = function(self)
-	self:reload()
 end
 
 MetaDataTable.setData = function(self, data)

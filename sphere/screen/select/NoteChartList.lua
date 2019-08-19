@@ -11,6 +11,11 @@ local SearchLine			= require("sphere.screen.select.SearchLine")
 
 local NoteChartList = CacheList:new()
 
+NoteChartList.x = 0
+NoteChartList.y = 4/17
+NoteChartList.w = 0.6
+NoteChartList.h = 9/17
+
 NoteChartList.sender = "NoteChartList"
 
 NoteChartList.buttonCount = 9
@@ -23,6 +28,10 @@ NoteChartList.chartSetId = 0
 NoteChartList.needItemsSort = true
 
 NoteChartList.Button = NoteChartListButton
+
+NoteChartList.init = function(self)
+	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
+end
 
 NoteChartList.send = function(self, event)
 	if event.action == "scrollStop" then
@@ -62,22 +71,8 @@ NoteChartList.receive = function(self, event)
 			
 			self.chartSetId = item.cacheData.id
 			self:selectCache()
-			self:unloadButtons()
-			self:calculateButtons()
 			
-			local itemIndex = self:getItemIndex(cacheData)
-			self.focusedItemIndex = itemIndex
-			self.visualItemIndex = itemIndex
-			self:send({
-				sender = self.sender,
-				action = "scrollTarget",
-				list = self,
-				itemIndex = itemIndex
-			})
-			self:send({
-				sender = self.sender,
-				action = "scrollStop"
-			})
+			self:quickScrollToItemIndex(self:getItemIndex(cacheData))
 		end
 	elseif event.name == "keypressed" then
 		local key = event.args[1]

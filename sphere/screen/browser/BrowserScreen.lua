@@ -6,12 +6,12 @@ local BackgroundManager	= require("sphere.ui.BackgroundManager")
 local BrowserScreen = Screen:new()
 
 BrowserScreen.init = function(self)
+	BrowserList:init()
 	BrowserList.observable:add(self)
 end
 
 BrowserScreen.load = function(self)
 	BrowserList:load()
-	BrowserList:sendInitial()
 	
 	BackgroundManager:setColor({127, 127, 127})
 end

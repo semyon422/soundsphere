@@ -11,6 +11,11 @@ local OverlayMenu		= require("sphere.ui.OverlayMenu")
 
 local NoteChartSetList = CacheList:new()
 
+NoteChartSetList.x = 0.6
+NoteChartSetList.y = 0
+NoteChartSetList.w = 0.4
+NoteChartSetList.h = 1
+
 NoteChartSetList.sender = "NoteChartSetList"
 
 NoteChartSetList.buttonCount = 17
@@ -24,6 +29,10 @@ NoteChartSetList.needItemsSort = true
 NoteChartSetList.needSearch = false
 NoteChartSetList.searchString = ""
 NoteChartSetList.searchTable = {}
+
+NoteChartSetList.init = function(self)
+	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
+end
 
 NoteChartSetList.send = function(self, event)
 	if event.action == "scrollStop" then
@@ -96,22 +105,9 @@ NoteChartSetList.receive = function(self, event)
 		local cacheData = focusedItem and focusedItem.cacheData
 		
 		self:selectCache()
-		self:unloadButtons()
-		self:calculateButtons()
 		
-		local itemIndex = self:getItemIndex(cacheData)
-		self.focusedItemIndex = itemIndex
-		self.visualItemIndex = itemIndex
-		self:send({
-			sender = self.sender,
-			action = "scrollTarget",
-			list = self,
-			itemIndex = itemIndex
-		})
-		self:send({
-			sender = self.sender,
-			action = "scrollStop"
-		})
+		self:quickScrollToItemIndex(self:getItemIndex(cacheData))
+		self:sendState()
 	end
 	
 	return CacheList.receive(self, event)

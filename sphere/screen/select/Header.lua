@@ -69,7 +69,7 @@ Header.init = function(self)
 	})
 end
 
-Header.load = function(self)
+Header.reload = function(self)
 	self.topButton:reload()
 	self.bottomButton:reload()
 	self.settingsDrawable:reload()

@@ -21,39 +21,34 @@ SelectScreen.init = function(self)
 	MetaDataTable:init()
 	ModifierDisplay:init()
 	SearchLine:init()
-end
-
-SelectScreen.load = function(self)
-	MetaDataTable:load()
-	
-	NoteChartList.NoteChartSetList = NoteChartSetList
-	NoteChartSetList.NoteChartList = NoteChartList
+	NoteChartList:init()
+	NoteChartSetList:init()
 	
 	NoteChartList.observable:add(self)
 	NoteChartSetList.observable:add(self)
 	SearchLine.observable:add(self)
+	
+	NoteChartList.NoteChartSetList = NoteChartSetList
+	NoteChartSetList.NoteChartList = NoteChartList
+end
+
+SelectScreen.load = function(self)
+	MetaDataTable:reload()
 	
 	NoteChartList:load()
 	NoteChartSetList:load()
 	
 	ModifierDisplay:reload()
 	
-	SearchLine:load()
-	Header:load()
-	Footer:load()
-	
-	NoteChartSetList:sendInitial()
-	
+	SearchLine:reload()
 	SelectFrame:reload()
+	Header:reload()
+	Footer:reload()
+	
+	NoteChartSetList:sendState()
 	
 	local dim = 255 * (1 - Config.data.dim.selection)
 	BackgroundManager:setColor({dim, dim, dim})
-end
-
-SelectScreen.unload = function(self)
-	NoteChartSetList:unload()
-	NoteChartList:unload()
-	ModifierDisplay:unload()
 end
 
 SelectScreen.unload = function(self) end
@@ -63,7 +58,6 @@ SelectScreen.update = function(self)
 	
 	NoteChartSetList:update()
 	NoteChartList:update()
-	ModifierDisplay:update()
 	PreviewManager:update()
 end
 
@@ -84,20 +78,21 @@ end
 
 SelectScreen.receive = function(self, event)
 	if event.name == "keypressed" and event.args[1] == "tab" then
-		ScreenManager:set(require("sphere.screen.browser.BrowserScreen"))
-	end
-	
-	if event.action == "updateMetaData" then
-		MetaDataTable:setData(event.cacheData)
-	end
-	if event.backgroundPath then
-		BackgroundManager:loadDrawableBackground(event.backgroundPath)
-	end
-	
-	if event.name == "resize" then
+		return ScreenManager:set(require("sphere.screen.browser.BrowserScreen"))
+	elseif event.action == "updateMetaData" then
+		return MetaDataTable:setData(event.cacheData)
+	elseif event.backgroundPath then
+		return BackgroundManager:loadDrawableBackground(event.backgroundPath)
+	elseif event.name == "resize" then
 		MetaDataTable:reload()
 		ModifierDisplay:reload()
 		SelectFrame:reload()
+		NoteChartSetList:reload()
+		NoteChartList:reload()
+		Header:reload()
+		Footer:reload()
+		SearchLine:reload()
+		return
 	end
 	
 	NoteChartSetList:receive(event)
@@ -105,7 +100,6 @@ SelectScreen.receive = function(self, event)
 	ModifierDisplay:receive(event)
 	Header:receive(event)
 	Footer:receive(event)
-	
 	SearchLine:receive(event)
 end
 

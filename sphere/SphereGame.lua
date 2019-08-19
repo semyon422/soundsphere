@@ -16,7 +16,6 @@ local TransitionManager			= require("sphere.screen.TransitionManager")
 local SelectScreen				= require("sphere.screen.select.SelectScreen")
 local BackgroundManager			= require("sphere.ui.BackgroundManager")
 local CLI						= require("sphere.ui.CLI")
-local GameUI 					= require("sphere.ui.GameUI")
 local NotificationLine			= require("sphere.ui.NotificationLine")
 local OverlayMenu				= require("sphere.ui.OverlayMenu")
 local WindowManager				= require("sphere.window.WindowManager")
@@ -30,7 +29,6 @@ end
 
 SphereGame.init = function(self)
 	MainLog:init()
-	GameUI:init()
 	
 	CacheDatabase:init()
 	ScoreDatabase:init()

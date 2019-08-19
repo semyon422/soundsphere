@@ -13,8 +13,7 @@ CacheList.basePath = ""
 
 CacheList.load = function(self)
 	self:selectCache()
-	
-	return CustomList.load(self)
+	self:reload()
 end
 
 CacheList.setBasePath = function(self, path)

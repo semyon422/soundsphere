@@ -8,6 +8,11 @@ local NotificationLine	= require("sphere.ui.NotificationLine")
 
 local BrowserList = CustomList:new()
 
+BrowserList.x = 1/17
+BrowserList.y = 0
+BrowserList.w = 10
+BrowserList.h = 1
+
 BrowserList.sender = "BrowserList"
 BrowserList.needFocusToInteract = false
 
@@ -20,10 +25,13 @@ BrowserList.needItemsSort = true
 BrowserList.mode = "filesystem"
 BrowserList.basePath = "userdata/charts"
 
+BrowserList.init = function(self)
+	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "h")
+end
+
 BrowserList.load = function(self)
 	self:selectCache()
-	
-	return CustomList.load(self)
+	self:reload()
 end
 
 BrowserList.send = function(self, event)
@@ -54,13 +62,9 @@ BrowserList.receive = function(self, event)
 		elseif key == "f1" then
 			self.mode = "filesystem"
 			self:selectCache()
-			self:unloadButtons()
-			self:calculateButtons()
 		elseif key == "f2" then
 			self.mode = "cache"
 			self:selectCache()
-			self:unloadButtons()
-			self:calculateButtons()
 		end
 	end
 	

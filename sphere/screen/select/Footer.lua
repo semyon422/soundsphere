@@ -38,7 +38,7 @@ Footer.init = function(self)
 	})
 end
 
-Footer.load = function(self)
+Footer.reload = function(self)
 	self.bottomButton:reload()
 	self.modsButton:reload()
 end

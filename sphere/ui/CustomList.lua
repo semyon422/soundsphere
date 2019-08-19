@@ -16,6 +16,7 @@ CustomList.needFocusToInteract = false
 
 CustomList.visualItemIndex = 1
 CustomList.focusedItemIndex = 1
+CustomList.scrollCurrentDelta = 0
 
 CustomList.x = 0
 CustomList.y = 0
@@ -37,23 +38,51 @@ CustomList.construct = function(self)
 	self.observable = Observable:new()
 	self.font = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
 	self.items = {}
+	self.buttons = {}
+	
+	self.buttonsFrame = Rectangle:new({
+		color = {255, 255, 255, 255},
+		mode = "fill"
+	})
+	
+	local buttonsFrame = self.buttonsFrame
+	self.stencil = Stencil:new({
+		stencilfunction = function() buttonsFrame:draw() end,
+		action = "replace",
+		value = 1,
+		keepvalues = false
+	})
 end
 
-CustomList.load = function(self)
-	self.scrollCurrentDelta = 0
-	self:loadStencil()
-	self.visualItemIndex = self.focusedItemIndex
-	self:unloadButtons()
-	self:calculateButtons()
-end
+CustomList.load = function(self) end
+
+CustomList.unload = function(self) end
 
 CustomList.draw = function(self)
-	self.stencil:draw()
-	self.stencil:set("greater", 0)
+	local stencil = self.stencil
+	stencil:draw()
+	stencil:set("greater", 0)
 	for button in pairs(self.buttons) do
 		button:draw()
 	end
-	self.stencil:set()
+	stencil:set()
+end
+
+CustomList.reload = function(self)
+	local buttonsFrame = self.buttonsFrame
+	
+	buttonsFrame.x = self.x
+	buttonsFrame.y = self.y
+	buttonsFrame.w = self.w
+	buttonsFrame.h = self.h
+	buttonsFrame.cs = self.cs
+	buttonsFrame:reload()
+	
+	self.stencil:reload()
+	
+	for button in pairs(self.buttons) do
+		button:reload()
+	end
 end
 
 CustomList.setItems = function(self, items)
@@ -64,19 +93,12 @@ CustomList.setItems = function(self, items)
 		self.focusedItemIndex = numItems
 		self.visualItemIndex = numItems
 	end
-end
-
-CustomList.unload = function(self)
-	return self:unloadButtons()
-end
-
-CustomList.reload = function(self)
-	self.buttonsFrame:reload()
-	self:unloadButtons()
+	
+	self.buttons = {}
 	self:calculateButtons()
 end
 
-CustomList.sendInitial = function(self)
+CustomList.sendState = function(self)
 	self:send({
 		sender = self.sender,
 		action = "scrollTarget",
@@ -129,10 +151,8 @@ CustomList.send = function(self, event)
 end
 
 CustomList.receive = function(self, event)
-	if self.buttons then
-		for button in pairs(self.buttons) do
-			button:receive(event)
-		end
+	for button in pairs(self.buttons) do
+		button:receive(event)
 	end
 	
 	if event.name == "resize" then
@@ -196,23 +216,9 @@ CustomList.getEndItemIndex = function(self)
 	return math.ceil(self.visualItemIndex) + self.endOffset
 end
 
-CustomList.loadStencil = function(self)
-	self.buttonsFrame = Rectangle:new({
-		x = self.x, y = self.y,
-		w = self.w, h = self.h,
-		cs = self.cs,
-		color = {255, 255, 255, 255},
-		mode = "fill"
-	})
-	self.buttonsFrame:reload()
-	
-	self.stencil = Stencil:new({
-		stencilfunction = function() self.buttonsFrame:draw() end,
-		action = "replace",
-		value = 1,
-		keepvalues = false
-	})
-	self.stencil:reload()
+CustomList.quickScrollToItemIndex = function(self, itemIndex)
+	self.focusedItemIndex = itemIndex
+	self.visualItemIndex = itemIndex
 end
 
 CustomList.scrollToItemIndex = function(self, itemIndex, scrollCurrentDelta)
@@ -261,8 +267,6 @@ CustomList.scrollBy = function(self, scrollDelta)
 end
 
 CustomList.calculateButtons = function(self)
-	self.buttons = self.buttons or {}
-	
 	local itemIndexKeys = {}
 	for button in pairs(self.buttons) do
 		button:update()
@@ -301,10 +305,6 @@ CustomList.addButton = function(self, itemIndex)
 	button:update()
 	
 	self.buttons[button] = button
-end
-
-CustomList.unloadButtons = function(self)
-	self.buttons = nil
 end
 
 CustomList.Button = Theme.Button:new()
