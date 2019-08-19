@@ -53,9 +53,10 @@ end
 VideoNote.load = function(self)
 	local path = self.engine.aliases[self.images[1][1]]
 	self.video = video.new(path)
-	self.video:rewind()
 	
 	if self.video then
+		self.video:rewind()
+		
 		self.drawable = ImageFrame:new({
 			image = self.video.image,
 			cs = self.bga.cs,
