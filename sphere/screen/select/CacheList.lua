@@ -19,8 +19,6 @@ end
 CacheList.setBasePath = function(self, path)
 	self.basePath = path
 	self:selectCache()
-	self:unloadButtons()
-	self:calculateButtons()
 end
 
 CacheList.sortItemsFunction = function(a, b)
