@@ -89,7 +89,7 @@ GameplayScreen.load = function(self)
 	AccuracyGraph.score = self.engine.score
 	AccuracyGraph:load()
 	
-	local dim = 255 * (1 - Config.data.dim.gameplay)
+	local dim = 255 * (1 - Config:get("dim.gameplay"))
 	local color = {dim, dim, dim}
 	BackgroundManager:setColor(color)
 	self.bga:setColor(color)

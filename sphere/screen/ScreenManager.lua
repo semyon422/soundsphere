@@ -12,11 +12,13 @@ ScreenManager.init = function(self)
 	local GameplayScreen	= require("sphere.screen.gameplay.GameplayScreen")
 	local ResultScreen		= require("sphere.screen.result.ResultScreen")
 	local SelectScreen		= require("sphere.screen.select.SelectScreen")
+	local SettingsScreen	= require("sphere.screen.settings.SettingsScreen")
 	
 	BrowserScreen:init()
 	GameplayScreen:init()
 	ResultScreen:init()
 	SelectScreen:init()
+	SettingsScreen:init()
 end
 
 ScreenManager.set = function(self, screen, callback)

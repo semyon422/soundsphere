@@ -23,9 +23,8 @@ CloudburstEngine.load = function(self)
 	self.bgaContainer = AudioContainer:new()
 	self.fgaContainer = AudioContainer:new()
 	
-	local volume = Config.data.volume
-	self.bgaContainer:setVolume(volume.main * volume.music)
-	self.fgaContainer:setVolume(volume.main * volume.effects)
+	self.bgaContainer:setVolume(Config:get("volume.global") * Config:get("volume.music"))
+	self.fgaContainer:setVolume(Config:get("volume.global") * Config:get("volume.effects"))
 	
 	self.inputMode = self.noteChart.inputMode
 	

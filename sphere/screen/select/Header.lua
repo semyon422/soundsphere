@@ -3,7 +3,7 @@ local ImageFrame		= require("aqua.graphics.ImageFrame")
 local ImageButton		= require("aqua.ui.ImageButton")
 local Theme				= require("aqua.ui.Theme")
 local icons				= require("sphere.assets.icons")
-local OverlayMenu		= require("sphere.ui.OverlayMenu")
+local ScreenManager		= require("sphere.screen.ScreenManager")
 
 local Header = {}
 
@@ -43,7 +43,7 @@ Header.init = function(self)
 		x = 0,
 		y = 0,
 		h = self.topHeight,
-		w = self.topHeight,
+		w = self.topHeight * 1.5,
 		scale = 0.66,
 		locate = "in",
 		align = {
@@ -55,16 +55,7 @@ Header.init = function(self)
 	self.settingsButton = ImageButton:new({
 		drawable = self.settingsDrawable,
 		interact = function()
-			OverlayMenu:show()
-			OverlayMenu:setTitle("Settings")
-			OverlayMenu:setItems({
-				{
-					name = "exit game",
-					onClick = function()
-						love.event.quit()
-					end
-				},
-			})
+			return ScreenManager:set(require("sphere.screen.settings.SettingsScreen"))
 		end
 	})
 end

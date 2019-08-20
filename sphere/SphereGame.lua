@@ -28,6 +28,7 @@ SphereGame.run = function(self)
 end
 
 SphereGame.init = function(self)
+	Config:init()
 	MainLog:init()
 	
 	CacheDatabase:init()

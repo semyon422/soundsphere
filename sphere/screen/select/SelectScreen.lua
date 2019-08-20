@@ -23,6 +23,7 @@ SelectScreen.init = function(self)
 	SearchLine:init()
 	NoteChartList:init()
 	NoteChartSetList:init()
+	PreviewManager:init()
 	
 	NoteChartList.observable:add(self)
 	NoteChartSetList.observable:add(self)
@@ -47,7 +48,7 @@ SelectScreen.load = function(self)
 	
 	NoteChartSetList:sendState()
 	
-	local dim = 255 * (1 - Config.data.dim.selection)
+	local dim = 255 * (1 - Config:get("dim.select"))
 	BackgroundManager:setColor({dim, dim, dim})
 end
 
@@ -79,6 +80,8 @@ end
 SelectScreen.receive = function(self, event)
 	if event.name == "keypressed" and event.args[1] == "tab" then
 		return ScreenManager:set(require("sphere.screen.browser.BrowserScreen"))
+	elseif event.name == "keypressed" and event.args[1] == "f1" then
+		return ScreenManager:set(require("sphere.screen.settings.SettingsScreen"))
 	elseif event.action == "updateMetaData" then
 		return MetaDataTable:setData(event.cacheData)
 	elseif event.backgroundPath then

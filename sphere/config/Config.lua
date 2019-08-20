@@ -1,8 +1,17 @@
-local json = require("json")
+local Observable	= require("aqua.util.Observable")
+local json			= require("json")
 
 local Config = {}
 
 Config.path = "userdata/config.json"
+
+Config.init = function(self)
+	self.observable = Observable:new()
+end
+
+Config.send = function(self, event)
+	return self.observable:send(event)
+end
 
 Config.read = function(self)
 	self.data = {}
@@ -20,20 +29,31 @@ Config.write = function(self)
 	return file:close()
 end
 
+Config.get = function(self, key)
+	return self.data[key]
+end
+
+Config.set = function(self, key, value)
+	self.data[key] = value
+	return self:send({
+		name = "Config.set",
+		key = key,
+		value = value
+	})
+end
+
 Config.setDefaultValues = function(self)
 	local data = self.data
 	
-	data.dim = data.dim or {}
-	data.dim.selection = data.dim.selection or 0.5
-	data.dim.gameplay = data.dim.gameplay or 0.75
+	data["dim.select"] = data["dim.select"] or 0.5
+	data["dim.gameplay"] = data["dim.gameplay"] or 0.75
 	
-	data.speed = data.speed or 1
-	data.fps = data.fps or 240
+	data["speed"] = data["speed"] or 1
+	data["fps"] = data["fps"] or 240
 	
-	data.volume = data.volume or {}
-	data.volume.main = data.volume.main or 1
-	data.volume.music = data.volume.music or 1
-	data.volume.effects = data.volume.effects or 1
+	data["volume.global"] = data["volume.global"] or 1
+	data["volume.music"] = data["volume.music"] or 1
+	data["volume.effects"] = data["volume.effects"] or 1
 end
 
 return Config

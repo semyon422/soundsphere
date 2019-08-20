@@ -26,9 +26,7 @@ CustomList.textColor = {255, 255, 255, 255}
 CustomList.rectangleColor = {255, 255, 255, 0}
 CustomList.mode = "fill"
 CustomList.limit = 1
-CustomList.textAlign = {
-	x = "left", y = "center"
-}
+CustomList.textAlign = {x = "left", y = "center"}
 CustomList.buttonCount = 17
 CustomList.middleOffset = 9
 CustomList.startOffset = 9

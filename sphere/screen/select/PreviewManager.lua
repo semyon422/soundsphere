@@ -3,6 +3,10 @@ local Config		= require("sphere.config.Config")
 
 local PreviewManager = {}
 
+PreviewManager.init = function(self)
+	Config.observable:add(self)
+end
+
 PreviewManager.playAudio = function(self, path, position)
 	if not love.filesystem.exists(path) then
 		self:stop()
@@ -16,13 +20,11 @@ PreviewManager.playAudio = function(self, path, position)
 		end
 	end
 	
-	local volume = Config.data.volume
-	
 	self.path = path
 	self.position = position
 	self.audio = AudioFactory:getStream(path)
 	self.audio:setPosition(position)
-	self.audio:setVolume(volume.main * volume.music)
+	self.audio:setVolume(Config:get("volume.global") * Config:get("volume.music"))
 	self.audio:play()
 end
 
@@ -44,6 +46,9 @@ PreviewManager.update = function(self, dt)
 end
 
 PreviewManager.receive = function(self, event)
+	if self.audio and event.name == "Config.set" and (event.key == "volume.global" or event.key == "volume.music") then
+		self.audio:setVolume(Config:get("volume.global") * Config:get("volume.music"))
+	end
 end
 
 PreviewManager.reload = function(self, event)
