@@ -52,9 +52,10 @@ SphereGame.load = function(self)
 	Config:read()
 	Config:write()
 	
-	DiscordPresence:load()
-	
+	Config.observable:add(self)
 	aquaevent.fpslimit = Config.data.fps
+	
+	DiscordPresence:load()
 	
 	ScreenManager:set(SelectScreen)
 	WindowManager:load()
@@ -92,9 +93,13 @@ SphereGame.receive = function(self, event)
 		self:draw()
 	elseif event.name == "quit" then
 		self:unload()
-		os.exit()
+		return os.exit()
 	elseif event.name == "resize" then
 		CoordinateManager:reload()
+	elseif event.name == "Config.set" then
+		if event.key == "fps" then
+			aquaevent.fpslimit = event.value
+		end
 	end
 	
 	local overlayHidden = OverlayMenu.hidden

@@ -68,12 +68,33 @@ SettingsList.addItems = function(self)
 	elseif self.category == "sound" then
 		self:setSoundItems()
 	elseif self.category == "input" then
-		self:setGeneralItems()
+		self:setInputItems()
 	end
 end
 
 SettingsList.setGeneralItems = function(self)
 	local items = {}
+	
+	items[#items + 1] = {
+		name = "FPS limit",
+		configKey = "fps",
+		type = "slider",
+		minValue = 1,
+		maxValue = 1000,
+		minDisplayValue = 1,
+		maxDisplayValue = 1000,
+		format = "%d"
+	}
+	items[#items + 1] = {
+		name = "play speed",
+		configKey = "speed",
+		type = "slider",
+		minValue = 0,
+		maxValue = 3,
+		minDisplayValue = 0,
+		maxDisplayValue = 3,
+		format = "%0.3f"
+	}
 	
 	return self:setItems(items)
 end
@@ -86,14 +107,20 @@ SettingsList.setGraphicsItems = function(self)
 		configKey = "dim.select",
 		type = "slider",
 		minValue = 0,
-		maxValue = 100
+		maxValue = 1,
+		minDisplayValue = 0,
+		maxDisplayValue = 100,
+		format = "%d"
 	}
 	items[#items + 1] = {
 		name = "dim gameplay",
 		configKey = "dim.gameplay",
 		type = "slider",
 		minValue = 0,
-		maxValue = 100
+		maxValue = 1,
+		minDisplayValue = 0,
+		maxDisplayValue = 100,
+		format = "%d"
 	}
 	
 	return self:setItems(items)
@@ -107,22 +134,37 @@ SettingsList.setSoundItems = function(self)
 		configKey = "volume.global",
 		type = "slider",
 		minValue = 0,
-		maxValue = 100
+		maxValue = 1,
+		minDisplayValue = 0,
+		maxDisplayValue = 100,
+		format = "%d"
 	}
 	items[#items + 1] = {
 		name = "music",
 		configKey = "volume.music",
 		type = "slider",
 		minValue = 0,
-		maxValue = 100
+		maxValue = 1,
+		minDisplayValue = 0,
+		maxDisplayValue = 100,
+		format = "%d"
 	}
 	items[#items + 1] = {
 		name = "effects",
 		configKey = "volume.effects",
 		type = "slider",
 		minValue = 0,
-		maxValue = 100
+		maxValue = 1,
+		minDisplayValue = 0,
+		maxDisplayValue = 100,
+		format = "%d"
 	}
+	
+	return self:setItems(items)
+end
+
+SettingsList.setInputItems = function(self)
+	local items = {}
 	
 	return self:setItems(items)
 end

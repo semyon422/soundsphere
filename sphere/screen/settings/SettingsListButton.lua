@@ -3,6 +3,7 @@ local TextFrame		= require("aqua.graphics.TextFrame")
 local map			= require("aqua.math").map
 local spherefonts	= require("sphere.assets.fonts")
 local Config		= require("sphere.config.Config")
+local Checkbox		= require("sphere.ui.Checkbox")
 local CustomList	= require("sphere.ui.CustomList")
 local Slider		= require("sphere.ui.Slider")
 
@@ -22,27 +23,47 @@ SettingsListButton.construct = function(self)
 	
 	self.nameTextFrame = TextFrame:new()
 	self.valueTextFrame = TextFrame:new()
-	self.slider = Slider:new()
 	
-	self.slider.observable:add(self)
+	if self.item.type == "slider" then
+		self.slider = Slider:new()
+		self.slider.item = self.item
+		self.slider.observable:add(self)
+	elseif self.item.type == "checkbox" then
+		self.checkbox = Checkbox:new()
+		self.checkbox.item = self.item
+		self.checkbox.observable:add(self)
+	end
 	
 	CustomList.Button.construct(self)
 end
 
 SettingsListButton.reload = function(self)
-	local slider = self.slider
-	
-	slider.x = self.x + self.w * self.columnX[3]
-	slider.y = self.y
-	slider.w = self.w * self.columnWidth[3]
-	slider.h = self.h
-	slider.barHeight = self.h / 2
-	slider.rectangleColor = self.sliderRectangleColor
-	slider.circleColor = self.sliderCircleColor
-	slider.cs = self.cs
-	slider.value = Config:get(self.item.configKey)
-	
-	slider:reload()
+	if self.item.type == "slider" then
+		local slider = self.slider
+		
+		slider.x = self.x + self.w * self.columnX[3]
+		slider.y = self.y
+		slider.w = self.w * self.columnWidth[3]
+		slider.h = self.h
+		slider.barHeight = self.h / 2
+		slider.rectangleColor = self.sliderRectangleColor
+		slider.circleColor = self.sliderCircleColor
+		slider.cs = self.cs
+		slider.value = Config:get(self.item.configKey)
+		
+		slider:reload()
+	elseif self.item.type == "checkbox" then
+		local checkbox = self.checkbox
+		
+		checkbox.x = self.x + self.w * self.columnX[3]
+		checkbox.y = self.y
+		checkbox.w = self.w * self.columnWidth[3]
+		checkbox.h = self.h
+		checkbox.cs = self.cs
+		checkbox.value = Config:get(self.item.configKey)
+		
+		checkbox:reload()
+	end
 	
 	local textFrame = self.nameTextFrame
 	
@@ -67,7 +88,7 @@ SettingsListButton.reload = function(self)
 	textFrame.h = self.h
 	textFrame.limit = self.w * self.columnWidth[2]
 	textFrame.align = self.valueTextAlign
-	textFrame.text = tostring(self:getValue())
+	textFrame.text = self:getDisplayValue()
 	textFrame.font = self.font
 	textFrame.color = self.textColor
 	textFrame.cs = self.cs
@@ -84,7 +105,9 @@ SettingsListButton.receive = function(self, event)
 		self:updateValue(event.value)
 	end
 	
-	self.slider:receive(event)
+	if self.item.type == "slider" then
+		self.slider:receive(event)
+	end
 	
 	CustomList.Button.receive(self, event)
 end
@@ -92,11 +115,18 @@ end
 SettingsListButton.draw = function(self)
 	self.nameTextFrame:draw()
 	self.valueTextFrame:draw()
-	self.slider:draw()
+	
+	if self.item.type == "slider" then
+		self.slider:draw()
+	end
 end
 
 SettingsListButton.getValue = function(self, value)
-	return math.floor(map(value or self.slider.value, 0, 1, self.item.minValue, self.item.maxValue))
+	return value or self.slider.value
+end
+
+SettingsListButton.getDisplayValue = function(self, value)
+	return self.item.format:format(map(self:getValue(value), self.item.minValue, self.item.maxValue, self.item.minDisplayValue, self.item.maxDisplayValue))
 end
 
 SettingsListButton.updateValue = function(self, value)
