@@ -64,7 +64,7 @@ SettingsList.addItems = function(self)
 	if self.category == "general" then
 		self:setGeneralItems()
 	elseif self.category == "graphics" then
-		self:setGeneralItems()
+		self:setGraphicsItems()
 	elseif self.category == "sound" then
 		self:setSoundItems()
 	elseif self.category == "input" then
@@ -74,6 +74,27 @@ end
 
 SettingsList.setGeneralItems = function(self)
 	local items = {}
+	
+	return self:setItems(items)
+end
+
+SettingsList.setGraphicsItems = function(self)
+	local items = {}
+	
+	items[#items + 1] = {
+		name = "dim select",
+		configKey = "dim.select",
+		type = "slider",
+		minValue = 0,
+		maxValue = 100
+	}
+	items[#items + 1] = {
+		name = "dim gameplay",
+		configKey = "dim.gameplay",
+		type = "slider",
+		minValue = 0,
+		maxValue = 100
+	}
 	
 	return self:setItems(items)
 end
