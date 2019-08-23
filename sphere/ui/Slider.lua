@@ -2,6 +2,7 @@ local Circle		= require("aqua.graphics.Circle")
 local Rectangle		= require("aqua.graphics.Rectangle")
 local belong		= require("aqua.math").belong
 local map			= require("aqua.math").map
+local round			= require("aqua.math").round
 local Class			= require("aqua.util.Class")
 local Observable	= require("aqua.util.Observable")
 
@@ -13,6 +14,11 @@ Slider.construct = function(self)
 	self.observable = Observable:new()
 	self.rectangle = Rectangle:new()
 	self.circle = Circle:new()
+	self.circleLine = Circle:new({
+		lineStyle = "smooth",
+		lineWidth = 4,
+		segments = 30
+	})
 end
 
 Slider.reload = function(self)
@@ -28,7 +34,7 @@ Slider.reload = function(self)
 	rectangle.color = self.rectangleColor
 	rectangle.cs = self.cs
 	
-	self.rectangle:reload()
+	rectangle:reload()
 	
 	local circle = self.circle
 	
@@ -39,7 +45,18 @@ Slider.reload = function(self)
 	circle.color = self.circleColor
 	circle.cs = self.cs
 	
-	self.circle:reload()
+	circle:reload()
+	
+	local circleLine = self.circleLine
+	
+	circleLine.x = map(self.value, self.item.minValue, self.item.maxValue, self.x + self.h / 2, self.x + self.w - self.h / 2)
+	circleLine.y = self.y + self.h / 2
+	circleLine.r = self.barHeight / 2
+	circleLine.mode = "line"
+	circleLine.color = self.circleLineColor
+	circleLine.cs = self.cs
+	
+	circleLine:reload()
 end
 
 Slider.setValue = function(self, value)
@@ -75,7 +92,7 @@ Slider.receive = function(self, event)
 	elseif event.name == "mousemoved" and self.pressed then
 		local mx = self.cs:x(event.args[1], true)
 		local value = map(mx, self.x + self.h / 2, self.x + self.w - self.h / 2, self.item.minValue, self.item.maxValue)
-		self.value = math.min(math.max(value, self.item.minValue), self.item.maxValue)
+		self.value = math.min(math.max(round(value, self.item.step), self.item.minValue), self.item.maxValue)
 		self:reload()
 		
 		self:send({
@@ -88,6 +105,7 @@ end
 Slider.draw = function(self)
 	self.rectangle:draw()
 	self.circle:draw()
+	self.circleLine:draw()
 end
 
 return Slider

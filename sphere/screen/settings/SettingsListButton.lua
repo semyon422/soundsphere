@@ -17,6 +17,7 @@ SettingsListButton.columnWidth = {0.4, 0.2, 0.4}
 
 SettingsListButton.sliderRectangleColor = {63, 63, 63, 255}
 SettingsListButton.sliderCircleColor = {255, 255, 255, 255}
+SettingsListButton.sliderCircleLineColor = {255, 255, 255, 255}
 
 SettingsListButton.construct = function(self)
 	self.font = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
@@ -107,6 +108,8 @@ SettingsListButton.receive = function(self, event)
 	
 	if self.item.type == "slider" then
 		self.slider:receive(event)
+	elseif self.item.type == "checkbox" then
+		self.checkbox:receive(event)
 	end
 	
 	CustomList.Button.receive(self, event)
@@ -118,20 +121,30 @@ SettingsListButton.draw = function(self)
 	
 	if self.item.type == "slider" then
 		self.slider:draw()
+	elseif self.item.type == "checkbox" then
+		self.checkbox:draw()
 	end
 end
 
-SettingsListButton.getValue = function(self, value)
-	return value or self.slider.value
+SettingsListButton.getValue = function(self)
+	if self.item.type == "slider" then
+		return self.slider.value
+	elseif self.item.type == "checkbox" then
+		return self.checkbox.value
+	end
 end
 
-SettingsListButton.getDisplayValue = function(self, value)
-	return self.item.format:format(map(self:getValue(value), self.item.minValue, self.item.maxValue, self.item.minDisplayValue, self.item.maxDisplayValue))
+SettingsListButton.getDisplayValue = function(self)
+	if self.item.type == "slider" then
+		return self.item.format:format(map(self:getValue(), self.item.minValue, self.item.maxValue, self.item.minDisplayValue, self.item.maxDisplayValue))
+	elseif self.item.type == "checkbox" then
+		return self:getValue(value) == self.item.minValue and self.item.minDisplayValue or self.item.maxDisplayValue
+	end
 end
 
 SettingsListButton.updateValue = function(self, value)
 	Config:set(self.item.configKey, value)
-	self.valueTextFrame.text = tostring(self:getValue(value))
+	self.valueTextFrame.text = self:getDisplayValue(value)
 	self.valueTextFrame:reload()
 end
 

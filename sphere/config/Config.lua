@@ -45,6 +45,7 @@ end
 Config.setDefaultValues = function(self)
 	local data = self.data
 	
+	data["cb"] = data["cb"] ~= nil and data["cb"] or true
 	data["dim.select"] = data["dim.select"] or 0.5
 	data["dim.gameplay"] = data["dim.gameplay"] or 0.75
 	

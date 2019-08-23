@@ -10,16 +10,17 @@ local icons			= require("sphere.assets.icons")
 
 local Checkbox = Class:new()
 
-Checkbox.value = 0
+Checkbox.value = false
 	
-Checkbox.settingsImage = love.graphics.newImage(icons.ic_settings_white_48dp)
+Checkbox.checkboxOffImage = love.graphics.newImage(icons.ic_check_box_outline_blank_white_24dp)
+Checkbox.checkboxOnImage = love.graphics.newImage(icons.ic_check_box_white_24dp)
 
 Checkbox.construct = function(self)
 	self.observable = Observable:new()
 	
 	self.settingsDrawable = ImageFrame:new({
-		image = self.settingsImage,
-		scale = 0.66,
+		image = self.checkboxOffImage,
+		scale = 0.75,
 		locate = "in",
 		align = {
 			x = "center",
@@ -41,9 +42,10 @@ Checkbox.reload = function(self)
 	settingsDrawable.x = self.x
 	settingsDrawable.y = self.y
 	settingsDrawable.w = self.w
-	settingsDrawable.h = self.р
+	settingsDrawable.h = self.h
 	settingsDrawable.cs = self.cs
 	
+	self:setValue(self.value)
 	self.settingsDrawable:reload()
 	
 	self.settingsButton:reload()
@@ -51,7 +53,11 @@ end
 
 Checkbox.setValue = function(self, value)
 	self.value = value
-	self:reload()
+	if self.value then
+		self.settingsDrawable.image = self.checkboxOnImage
+	else
+		self.settingsDrawable.image = self.checkboxOffImage
+	end
 end
 
 Checkbox.send = function(self, event)
@@ -65,30 +71,14 @@ Checkbox.receive = function(self, event)
 		local mx = self.cs:x(event.args[1], true)
 		local my = self.cs:y(event.args[2], true)
 		if belong(mx, self.x, self.x + self.w) and belong(my, self.y, self.y + self.h) then
-			self.pressed = true
+			self.value = not self.value
+			self:reload()
 			
 			self:send({
-				name = "pressed",
+				name = "valueChanged",
 				value = self.value
 			})
 		end
-	elseif event.name == "mousereleased" and self.pressed then
-		self.pressed = false
-		
-		self:send({
-			name = "released",
-			value = self.value
-		})
-	elseif event.name == "mousemoved" and self.pressed then
-		local mx = self.cs:x(event.args[1], true)
-		local value = map(mx, self.x + self.h / 2, self.x + self.w - self.h / 2, 0, 1)
-		self.value = math.min(math.max(value, 0), 1)
-		self:reload()
-		
-		self:send({
-			name = "valueChanged",
-			value = self.value
-		})
 	end
 end
 

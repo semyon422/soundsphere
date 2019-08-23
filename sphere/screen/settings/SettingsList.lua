@@ -76,13 +76,23 @@ SettingsList.setGeneralItems = function(self)
 	local items = {}
 	
 	items[#items + 1] = {
+		name = "test checkbox",
+		configKey = "cb",
+		type = "checkbox",
+		minValue = false,
+		maxValue = true,
+		minDisplayValue = "disabled",
+		maxDisplayValue = "enabled"
+	}
+	items[#items + 1] = {
 		name = "FPS limit",
 		configKey = "fps",
 		type = "slider",
-		minValue = 1,
+		minValue = 10,
 		maxValue = 1000,
-		minDisplayValue = 1,
+		minDisplayValue = 10,
 		maxDisplayValue = 1000,
+		step = 10,
 		format = "%d"
 	}
 	items[#items + 1] = {
@@ -93,7 +103,8 @@ SettingsList.setGeneralItems = function(self)
 		maxValue = 3,
 		minDisplayValue = 0,
 		maxDisplayValue = 3,
-		format = "%0.3f"
+		step = 0.05,
+		format = "%0.2f"
 	}
 	
 	return self:setItems(items)
@@ -110,6 +121,7 @@ SettingsList.setGraphicsItems = function(self)
 		maxValue = 1,
 		minDisplayValue = 0,
 		maxDisplayValue = 100,
+		step = 0.01,
 		format = "%d"
 	}
 	items[#items + 1] = {
@@ -120,6 +132,7 @@ SettingsList.setGraphicsItems = function(self)
 		maxValue = 1,
 		minDisplayValue = 0,
 		maxDisplayValue = 100,
+		step = 0.01,
 		format = "%d"
 	}
 	
@@ -137,6 +150,7 @@ SettingsList.setSoundItems = function(self)
 		maxValue = 1,
 		minDisplayValue = 0,
 		maxDisplayValue = 100,
+		step = 0.01,
 		format = "%d"
 	}
 	items[#items + 1] = {
@@ -147,6 +161,7 @@ SettingsList.setSoundItems = function(self)
 		maxValue = 1,
 		minDisplayValue = 0,
 		maxDisplayValue = 100,
+		step = 0.01,
 		format = "%d"
 	}
 	items[#items + 1] = {
@@ -157,6 +172,7 @@ SettingsList.setSoundItems = function(self)
 		maxValue = 1,
 		minDisplayValue = 0,
 		maxDisplayValue = 100,
+		step = 0.01,
 		format = "%d"
 	}
 	
