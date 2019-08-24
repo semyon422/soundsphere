@@ -116,6 +116,10 @@ NoteChartResourceLoader.loadBMS = function(self)
 			return video.load(videoFilePath, resourceLoadedCallback)
 		end
 	end)
+	
+	if self.resourceCountLoaded == self.resourceCount then
+		self.callback()
+	end
 end
 
 NoteChartResourceLoader.unload = function(self)
