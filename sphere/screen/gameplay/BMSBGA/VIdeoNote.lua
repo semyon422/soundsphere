@@ -90,7 +90,9 @@ VideoNote.draw = function(self)
 		return
 	end
 	if not self.started then
-		self.video:play()
+		if self.video then
+			self.video:play()
+		end
 		self.started = true
 	end
 	if self.drawable then
