@@ -73,11 +73,6 @@ GameplayScreen.load = function(self)
 	self.engine.observable:add(NotificationLine)
 	NoteChartResourceLoader.observable:add(NotificationLine)
 	
-	NoteChartResourceLoader:load(self.cacheData.path, noteChart, function()
-		self.bga:load()
-		PauseOverlay:play()
-	end)
-	
 	PauseOverlay.engine = self.engine
 	PauseOverlay.noteChart = noteChart
 	PauseOverlay.cacheData = self.cacheData
@@ -88,6 +83,11 @@ GameplayScreen.load = function(self)
 	
 	AccuracyGraph.score = self.engine.score
 	AccuracyGraph:load()
+	
+	NoteChartResourceLoader:load(self.cacheData.path, noteChart, function()
+		self.bga:load()
+		PauseOverlay:play()
+	end)
 	
 	local dim = 255 * (1 - Config:get("dim.gameplay"))
 	local color = {dim, dim, dim}
