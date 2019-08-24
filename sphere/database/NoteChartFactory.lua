@@ -9,6 +9,9 @@ local osu		= require("osu")
 local quaver	= require("quaver")
 local sph		= require("sph")
 
+local mime		= require("mime")
+local zlib		= require("zlib")
+
 local NoteChartFactory = {}
 
 local chartPatterns = {
@@ -91,14 +94,12 @@ NoteChartFactory.deleteBOM = function(self, content)
 end
 
 NoteChartFactory.getNoteChart = function(self, path)
-	self.log:write("get", path)
-	
-	local noteChart, hash
+	local noteChart, hash, rawContent
 	local status, err = xpcall(function()
 		local noteChartImporter = self:getNoteChartImporter(path)
 		local realPath = self:getRealPath(path)
 		
-		local rawContent = self:readFile(realPath)
+		rawContent = self:readFile(realPath)
 		hash = md5.sumhexa(rawContent)
 		
 		local content
@@ -107,11 +108,13 @@ NoteChartFactory.getNoteChart = function(self, path)
 		else
 			content = rawContent
 		end
-		
+		error()
 		noteChart = noteChartImporter:import(content)
 	end, debug.traceback)
 	
 	if not status then
+		self.log:write("get", path)
+		self.log:write("b64",  ("[[%s]]"):format(mime.b64(zlib.compress(rawContent))))
 		self.log:write("error", err)
 		return
 	end
