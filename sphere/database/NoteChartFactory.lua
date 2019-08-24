@@ -108,7 +108,7 @@ NoteChartFactory.getNoteChart = function(self, path)
 		else
 			content = rawContent
 		end
-		error()
+		
 		noteChart = noteChartImporter:import(content)
 	end, debug.traceback)
 	
