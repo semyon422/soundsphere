@@ -52,7 +52,9 @@ SelectScreen.load = function(self)
 	BackgroundManager:setColor({dim, dim, dim})
 end
 
-SelectScreen.unload = function(self) end
+SelectScreen.unload = function(self)
+	PreviewManager:stop()
+end
 
 SelectScreen.update = function(self)
 	Screen.update(self)

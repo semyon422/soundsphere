@@ -63,7 +63,6 @@ NoteChartSetList.send = function(self, event)
 	elseif event.action == "return" then
 		local cacheData = self.NoteChartList.items[self.NoteChartList.focusedItemIndex].cacheData
 		if cacheData then
-			PreviewManager:stop()
 			GameplayScreen.cacheData = cacheData
 			ScreenManager:set(GameplayScreen)
 		end
