@@ -1,11 +1,12 @@
-local aquafonts		= require("aqua.assets.fonts")
-local TextFrame		= require("aqua.graphics.TextFrame")
-local map			= require("aqua.math").map
-local spherefonts	= require("sphere.assets.fonts")
-local Config		= require("sphere.config.Config")
-local Checkbox		= require("sphere.ui.Checkbox")
-local CustomList	= require("sphere.ui.CustomList")
-local Slider		= require("sphere.ui.Slider")
+local aquafonts			= require("aqua.assets.fonts")
+local TextFrame			= require("aqua.graphics.TextFrame")
+local map				= require("aqua.math").map
+local spherefonts		= require("sphere.assets.fonts")
+local Config			= require("sphere.config.Config")
+local KeybindEditButton	= require("sphere.screen.settings.KeybindEditButton")
+local Checkbox			= require("sphere.ui.Checkbox")
+local CustomList		= require("sphere.ui.CustomList")
+local Slider			= require("sphere.ui.Slider")
 
 local SettingsListButton = CustomList.Button:new()
 
@@ -33,6 +34,10 @@ SettingsListButton.construct = function(self)
 		self.checkbox = Checkbox:new()
 		self.checkbox.item = self.item
 		self.checkbox.observable:add(self)
+	elseif self.item.type == "keybind" then
+		self.keybindEditButton = KeybindEditButton:new()
+		self.keybindEditButton.item = self.item
+		self.keybindEditButton.observable:add(self)
 	end
 	
 	CustomList.Button.construct(self)
@@ -64,6 +69,17 @@ SettingsListButton.reload = function(self)
 		checkbox.value = Config:get(self.item.configKey)
 		
 		checkbox:reload()
+	elseif self.item.type == "keybind" then
+		local keybindEditButton = self.keybindEditButton
+		
+		keybindEditButton.x = self.x + self.w * self.columnX[3]
+		keybindEditButton.y = self.y
+		keybindEditButton.w = self.w * self.columnWidth[3]
+		keybindEditButton.h = self.h
+		keybindEditButton.cs = self.cs
+		keybindEditButton.value = Config:get(self.item.configKey)
+		
+		keybindEditButton:reload()
 	end
 	
 	local textFrame = self.nameTextFrame
@@ -110,6 +126,8 @@ SettingsListButton.receive = function(self, event)
 		self.slider:receive(event)
 	elseif self.item.type == "checkbox" then
 		self.checkbox:receive(event)
+	elseif self.item.type == "keybind" then
+		self.keybindEditButton:receive(event)
 	end
 	
 	CustomList.Button.receive(self, event)
@@ -123,6 +141,8 @@ SettingsListButton.draw = function(self)
 		self.slider:draw()
 	elseif self.item.type == "checkbox" then
 		self.checkbox:draw()
+	elseif self.item.type == "keybind" then
+		self.keybindEditButton:draw()
 	end
 end
 
@@ -131,6 +151,8 @@ SettingsListButton.getValue = function(self)
 		return self.slider.value
 	elseif self.item.type == "checkbox" then
 		return self.checkbox.value
+	elseif self.item.type == "keybind" then
+		return self.keybindEditButton.value
 	end
 end
 
@@ -139,6 +161,8 @@ SettingsListButton.getDisplayValue = function(self)
 		return self.item.format:format(map(self:getValue(), self.item.minValue, self.item.maxValue, self.item.minDisplayValue, self.item.maxDisplayValue))
 	elseif self.item.type == "checkbox" then
 		return self:getValue(value) == self.item.minValue and self.item.minDisplayValue or self.item.maxDisplayValue
+	elseif self.item.type == "keybind" then
+		return self:getValue(value)
 	end
 end
 

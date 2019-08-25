@@ -80,9 +80,9 @@ SelectScreen.draw = function(self)
 end
 
 SelectScreen.receive = function(self, event)
-	if event.name == "keypressed" and event.args[1] == "tab" then
+	if event.name == "keypressed" and event.args[1] == Config:get("screen.browser") then
 		return ScreenManager:set(require("sphere.screen.browser.BrowserScreen"))
-	elseif event.name == "keypressed" and event.args[1] == "f1" then
+	elseif event.name == "keypressed" and event.args[1] == Config:get("screen.settings") then
 		return ScreenManager:set(require("sphere.screen.settings.SettingsScreen"))
 	elseif event.action == "updateMetaData" then
 		return MetaDataTable:setData(event.cacheData)

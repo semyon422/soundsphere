@@ -8,18 +8,17 @@ local Observable	= require("aqua.util.Observable")
 local ImageButton	= require("aqua.ui.ImageButton")
 local icons			= require("sphere.assets.icons")
 
-local Checkbox = Class:new()
+local KeybindEditButton = Class:new()
 
-Checkbox.value = false
-	
-Checkbox.checkboxOffImage = love.graphics.newImage(icons.ic_check_box_outline_blank_white_24dp)
-Checkbox.checkboxOnImage = love.graphics.newImage(icons.ic_check_box_white_24dp)
+KeybindEditButton.value = ""
 
-Checkbox.construct = function(self)
+KeybindEditButton.editButtonImage = love.graphics.newImage(icons.ic_create_white_48dp)
+
+KeybindEditButton.construct = function(self)
 	self.observable = Observable:new()
 	
 	self.drawable = ImageFrame:new({
-		image = self.checkboxOffImage,
+		image = self.editButtonImage,
 		scale = 0.75,
 		locate = "in",
 		align = {
@@ -34,7 +33,7 @@ Checkbox.construct = function(self)
 	})
 end
 
-Checkbox.reload = function(self)
+KeybindEditButton.reload = function(self)
 	local drawable = self.drawable
 	
 	drawable.x = self.x
@@ -43,45 +42,41 @@ Checkbox.reload = function(self)
 	drawable.h = self.h
 	drawable.cs = self.cs
 	
-	self:setValue(self.value)
 	self.drawable:reload()
 	
 	self.button:reload()
 end
 
-Checkbox.setValue = function(self, value)
+KeybindEditButton.setValue = function(self, value)
 	self.value = value
-	if self.value then
-		self.drawable.image = self.checkboxOnImage
-	else
-		self.drawable.image = self.checkboxOffImage
-	end
 end
 
-Checkbox.send = function(self, event)
+KeybindEditButton.send = function(self, event)
 	return self.observable:send(event)
 end
 
-Checkbox.receive = function(self, event)
+KeybindEditButton.receive = function(self, event)
 	if event.name == "resize" then
 		self:reload()
 	elseif event.name == "mousepressed" then
 		local mx = self.cs:x(event.args[1], true)
 		local my = self.cs:y(event.args[2], true)
 		if belong(mx, self.x, self.x + self.w) and belong(my, self.y, self.y + self.h) then
-			self.value = not self.value
-			self:reload()
-			
-			self:send({
-				name = "valueChanged",
-				value = self.value
-			})
+			self.active = true
 		end
+	elseif event.name == "keypressed" and self.active then
+		self.active = false
+		self.value = event.args[1]
+		
+		self:send({
+			name = "valueChanged",
+			value = self.value
+		})
 	end
 end
 
-Checkbox.draw = function(self)
+KeybindEditButton.draw = function(self)
 	self.button:draw()
 end
 
-return Checkbox
+return KeybindEditButton

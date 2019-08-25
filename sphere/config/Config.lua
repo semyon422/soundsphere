@@ -45,16 +45,28 @@ end
 Config.setDefaultValues = function(self)
 	local data = self.data
 	
-	data["cb"] = data["cb"] ~= nil and data["cb"] or true
-	data["dim.select"] = data["dim.select"] or 0.5
-	data["dim.gameplay"] = data["dim.gameplay"] or 0.75
-	
-	data["speed"] = data["speed"] or 1
-	data["fps"] = data["fps"] or 240
-	
-	data["volume.global"] = data["volume.global"] or 1
-	data["volume.music"] = data["volume.music"] or 1
-	data["volume.effects"] = data["volume.effects"] or 1
+	for key, value in pairs(self.defaultValues) do
+		data[key] = data[key] ~= nil and data[key] or value
+	end
 end
+
+Config.defaultValues = {
+	["cb"] = false,
+	["kb"] = "",
+	
+	["dim.select"] = 0.5,
+	["dim.gameplay"] = 0.75,
+	
+	["speed"] = 1,
+	["fps"] = 240,
+	
+	["volume.global"] = 1,
+	["volume.music"] = 1,
+	["volume.effects"] = 1,
+	
+	["screen.settings"] = "f1",
+	["screen.browser"] = "tab",
+	["gameplay.quickRestart"] = "`",
+}
 
 return Config

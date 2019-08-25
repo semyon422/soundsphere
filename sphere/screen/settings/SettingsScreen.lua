@@ -44,7 +44,7 @@ SettingsScreen.draw = function(self)
 end
 
 SettingsScreen.receive = function(self, event)
-	if event.name == "keypressed" and event.args[1] == "f1" then
+	if event.name == "keypressed" and event.args[1] == Config:get("screen.settings") then
 		return ScreenManager:set(require("sphere.screen.select.SelectScreen"))
 	elseif event.name == "resize" then
 		SettingsList:reload()

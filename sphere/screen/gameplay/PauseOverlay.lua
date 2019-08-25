@@ -127,6 +127,7 @@ PauseOverlay.receive = function(self, event)
 		self.menuButton:receive(event)
 	end
 	
+	local quickRestartKey = Config:get("gameplay.quickRestart")
 	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
 	if event.name == "keypressed" then
 		local key = event.args[1]
@@ -142,12 +143,12 @@ PauseOverlay.receive = function(self, event)
 			end
 		elseif key == "escape" then
 			self:menu()
-		elseif key == "`" then
+		elseif key == quickRestartKey then
 			self:beginRestart()
 		end
 	elseif event.name == "keyreleased" then
 		local key = event.args[1]
-		if key == "`" then
+		if key == quickRestartKey then
 			self:resetProgress()
 		end
 	end

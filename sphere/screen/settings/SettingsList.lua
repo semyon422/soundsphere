@@ -182,6 +182,22 @@ end
 SettingsList.setInputItems = function(self)
 	local items = {}
 	
+	items[#items + 1] = {
+		name = "settings",
+		type = "keybind",
+		configKey = "screen.settings"
+	}
+	items[#items + 1] = {
+		name = "browser",
+		type = "keybind",
+		configKey = "screen.browser"
+	}
+	items[#items + 1] = {
+		name = "quick restart",
+		type = "keybind",
+		configKey = "gameplay.quickRestart"
+	}
+	
 	return self:setItems(items)
 end
 
