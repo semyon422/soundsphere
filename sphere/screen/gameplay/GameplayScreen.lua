@@ -20,16 +20,19 @@ local ScreenManager				= require("sphere.screen.ScreenManager")
 local GameplayScreen = Screen:new()
 
 GameplayScreen.init = function(self)
+	InputManager:init()
 	ProgressBar:init()
 	PauseOverlay:init()
 	AccuracyGraph:init()
 end
 
 GameplayScreen.load = function(self)
-	InputManager:load()
+	InputManager:read()
 	NoteSkinManager:load()
 	
 	local noteChart, hash = NoteChartFactory:getNoteChart(self.cacheData.path)
+	InputManager:setInputMode(noteChart.inputMode:getString())
+	
 	local noteSkinData = NoteSkinManager:getNoteSkin(noteChart.inputMode)
 	
 	local noteSkin = NoteSkin:new({
@@ -84,6 +87,8 @@ GameplayScreen.load = function(self)
 	AccuracyGraph.score = self.engine.score
 	AccuracyGraph:load()
 	
+	InputManager.observable:add(self.engine)
+	
 	NoteChartResourceLoader:load(self.cacheData.path, noteChart, function()
 		self.bga:load()
 		PauseOverlay:play()
@@ -99,6 +104,13 @@ GameplayScreen.unload = function(self)
 	self.engine:unload()
 	self.playField:unload()
 	self.bga:unload()
+	
+	if self.engine.score.setinput then
+		InputManager:setKeysFromInputStats(self.engine.inputStats)
+		InputManager:write()
+	end
+	
+	InputManager.observable:remove(self.engine)
 end
 
 GameplayScreen.update = function(self, dt)
@@ -124,8 +136,8 @@ end
 
 GameplayScreen.receive = function(self, event)
 	if not PauseOverlay.paused then
-		InputManager:receive(event, self.engine)
 		self.engine:receive(event)
+		InputManager:receive(event)
 		self.playField:receive(event)
 		self.bga:receive(event)
 		AccuracyGraph:receive(event)

@@ -27,6 +27,7 @@ CloudburstEngine.load = function(self)
 	self.fgaContainer:setVolume(Config:get("volume.global") * Config:get("volume.effects"))
 	
 	self.inputMode = self.noteChart.inputMode
+	self.inputStats = {}
 	
 	self.sharedLogicalNoteData = {}
 	self.soundFiles = {}
@@ -71,24 +72,39 @@ end
 
 CloudburstEngine.receive = function(self, event)
 	local nearestNote
-	if event.name == "keypressed" and self.score.promode then
+	if event.name == "keypressed" and self.score.promode and not event.virtual then
 		for noteHandler in pairs(self.noteHandlers) do
 			local currentNote = noteHandler.currentNote
 			if
-				(not nearestNote or
-				currentNote.startNoteData.timePoint.absoluteTime < nearestNote.startNoteData.timePoint.absoluteTime) and
+				(
+					not nearestNote or
+					currentNote.startNoteData.timePoint.absoluteTime < nearestNote.startNoteData.timePoint.absoluteTime
+				) and
 				currentNote.state ~= "skipped" and
 				currentNote:isReachable() and
+				not currentNote.startNoteData.autoplay and
 				not currentNote.autoplay
 			then
 				nearestNote = noteHandler.currentNote
 			end
 		end
 		if nearestNote then
+			local key = event.args[1]
+			local virtualKey = nearestNote.startNoteData.inputType .. nearestNote.startNoteData.inputIndex
+			
+			self.inputStats[virtualKey] = self.inputStats[virtualKey] or {}
+			local inputCount = self.inputStats[virtualKey]
+			inputCount[key] = (inputCount[key] or 0) + 1
+			
 			nearestNote.autoplay = true
+			self.lastNearestNote = nearestNote
 		end
 	end
-	if not nearestNote then
+	nearestNote = self.lastNearestNote
+	if nearestNote and not nearestNote:isReachable() then
+		nearestNote = nil
+	end
+	if not nearestNote and event.virtual or event.name == "keyreleased" then
 		for noteHandler in pairs(self.noteHandlers) do
 			noteHandler:receive(event)
 		end

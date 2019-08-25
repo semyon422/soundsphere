@@ -24,7 +24,7 @@ end
 LogicalNote.isReachable = function(self)
 	local deltaTime = (self.engine.exactCurrentTime - self.startNoteData.timePoint.absoluteTime) / self.score.rate
 	local timeState = self.score:getTimeState(deltaTime)
-	return timeState ~= "none"
+	return timeState ~= "none" and timeState ~= "late"
 end
 
 LogicalNote.update = function(self)

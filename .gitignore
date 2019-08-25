@@ -6,6 +6,7 @@ userdata/export/*
 !userdata/hitsounds/.keep
 !userdata/export/.keep
 userdata/cache.sqlite
+userdata/input.json
 userdata/config.json
 userdata/mount.json
 userdata/cache.log
