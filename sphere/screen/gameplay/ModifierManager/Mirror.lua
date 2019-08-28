@@ -1,11 +1,12 @@
-local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
+local InconsequentialModifier = require("sphere.screen.gameplay.ModifierManager.InconsequentialModifier")
 
-local Mirror = Modifier:new()
+local Mirror = InconsequentialModifier:new()
 
 Mirror.name = "Mirror"
+Mirror.shortName = "Mirror"
 
 Mirror.apply = function(self)
-	local noteChart = self.noteChart
+	local noteChart = self.sequence.manager.noteChart
 	local keyCount = noteChart.inputMode:getInputCount("key")
 	local scratchCount = noteChart.inputMode:getInputCount("scratch")
 	

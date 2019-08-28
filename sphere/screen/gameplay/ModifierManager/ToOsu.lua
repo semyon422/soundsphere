@@ -1,15 +1,17 @@
-local Modifier			= require("sphere.screen.gameplay.ModifierManager.Modifier")
-local NoteChartExporter	= require("osu.NoteChartExporter")
+local InconsequentialModifier	= require("sphere.screen.gameplay.ModifierManager.InconsequentialModifier")
+local NoteChartExporter			= require("osu.NoteChartExporter")
 
-local ToOsu = Modifier:new()
+local ToOsu = InconsequentialModifier:new()
 
 ToOsu.name = "ToOsu"
+ToOsu.shortName = "ToOsu"
+ToOsu.after = true
 
 ToOsu.apply = function(self)
 	local GameplayScreen = require("sphere.screen.gameplay.GameplayScreen")
 	
 	local nce = NoteChartExporter:new()
-	nce.noteChart = self.noteChart
+	nce.noteChart = self.sequence.manager.noteChart
 	nce.cacheData = GameplayScreen.cacheData
 	
 	local path = GameplayScreen.cacheData.path

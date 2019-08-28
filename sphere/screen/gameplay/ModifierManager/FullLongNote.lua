@@ -1,18 +1,30 @@
-local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
+local clone = require("aqua.table").clone
+local SequentialModifier = require("sphere.screen.gameplay.ModifierManager.SequentialModifier")
 local NoteData = require("ncdk.NoteData")
 
-local FullLongNote = Modifier:new()
+local FullLongNote = SequentialModifier:new()
 
-FullLongNote.name = "FullLongNote"
-FullLongNote.level = 3
+FullLongNote.name = "FLN"
+
+FullLongNote.value = {
+	level = 0
+}
+
+FullLongNote.construct = function(self)
+	self:setValue(FullLongNote.value)
+end
+
+FullLongNote.setValue = function(self, value)
+	self.value = clone(value)
+end
 
 FullLongNote.apply = function(self)
-	self.noteChart = self.noteChart
+	local noteChart = self.sequence.manager.noteChart
 	self.noteDatas = {}
 	self.noteDataLayers = {}
 	
-	for layerIndex in self.noteChart:getLayerDataIndexIterator() do
-		local layerData = self.noteChart:requireLayerData(layerIndex)
+	for layerIndex in noteChart:getLayerDataIndexIterator() do
+		local layerData = noteChart:requireLayerData(layerIndex)
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 			if
@@ -35,7 +47,7 @@ FullLongNote.apply = function(self)
 		self:processNoteData(i, noteDatas[i])
 	end
 	
-	self.noteChart:compute()
+	noteChart:compute()
 end
 
 FullLongNote.processNoteData = function(self, noteDataIndex, noteData)
@@ -70,17 +82,18 @@ FullLongNote.processNoteData = function(self, noteDataIndex, noteData)
 	end
 	
 	local endTimePoint
-	if self.level >= 3 and #timePointList >= 2 then
+	local level = self.value.level
+	if level >= 3 and #timePointList >= 2 then
 		if not nNoteData then
 			endTimePoint = timePointList[#timePointList]
 		else
 			endTimePoint = timePointList[#timePointList - 1]
 		end
-	elseif self.level >= 2 and #timePointList >= 3 then
+	elseif level >= 2 and #timePointList >= 3 then
 		endTimePoint = timePointList[math.ceil(#timePointList / 2)]
-	elseif self.level >= 1 and #timePointList >= 2 and (not nNoteData or nNoteData.timePoint ~= timePointList[2]) then
+	elseif level >= 1 and #timePointList >= 2 and (not nNoteData or nNoteData.timePoint ~= timePointList[2]) then
 		endTimePoint = timePointList[2]
-	elseif self.level >= 0 and #timePointList >= 1 and (not nNoteData or nNoteData.timePoint ~= timePointList[1]) then
+	elseif level >= 0 and #timePointList >= 1 and (not nNoteData or nNoteData.timePoint ~= timePointList[1]) then
 		endTimePoint = timePointList[1]
 	end
 	

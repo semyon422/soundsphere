@@ -6,6 +6,7 @@ local Footer			= require("sphere.screen.select.Footer")
 local Header			= require("sphere.screen.select.Header")
 local MetaDataTable		= require("sphere.screen.select.MetaDataTable")
 local ModifierDisplay	= require("sphere.screen.select.ModifierDisplay")
+local ModifierMenu		= require("sphere.screen.select.ModifierMenu")
 local NoteChartList		= require("sphere.screen.select.NoteChartList")
 local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
 local PreviewManager	= require("sphere.screen.select.PreviewManager")
@@ -20,6 +21,7 @@ SelectScreen.init = function(self)
 	Header:init()
 	MetaDataTable:init()
 	ModifierDisplay:init()
+	ModifierMenu:init()
 	SearchLine:init()
 	NoteChartList:init()
 	NoteChartSetList:init()
@@ -62,6 +64,8 @@ SelectScreen.update = function(self)
 	NoteChartSetList:update()
 	NoteChartList:update()
 	PreviewManager:update()
+	
+	ModifierMenu:update()
 end
 
 SelectScreen.draw = function(self)
@@ -77,9 +81,17 @@ SelectScreen.draw = function(self)
 	MetaDataTable:draw()
 	SearchLine:draw()
 	ModifierDisplay:draw()
+	
+	ModifierMenu:draw()
 end
 
 SelectScreen.receive = function(self, event)
+	local modifierMenuHidden = ModifierMenu.hidden
+	ModifierMenu:receive(event)
+	if not modifierMenuHidden and event.name ~= "resize" then
+		return
+	end
+	
 	if event.name == "keypressed" and event.args[1] == Config:get("screen.browser") then
 		return ScreenManager:set(require("sphere.screen.browser.BrowserScreen"))
 	elseif event.name == "keypressed" and event.args[1] == Config:get("screen.settings") then

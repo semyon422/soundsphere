@@ -30,11 +30,6 @@ ModifierDisplay.updateText = function(self)
 	self:setText(ModifierManager.sequence:tostring())
 end
 
-ModifierDisplay.interact = function(self)
-	ModifierManager.sequence:remove()
-	self:updateText()
-end
-
 ModifierDisplay.reload = function(self)
 	Theme.Button.reload(self)
 	self:updateText()

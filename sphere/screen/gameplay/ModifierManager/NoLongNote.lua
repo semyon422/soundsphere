@@ -1,11 +1,12 @@
-local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
+local InconsequentialModifier = require("sphere.screen.gameplay.ModifierManager.InconsequentialModifier")
 
-local NoLongNote = Modifier:new()
+local NoLongNote = InconsequentialModifier:new()
 
 NoLongNote.name = "NoLongNote"
+NoLongNote.shortName = "NLN"
 
 NoLongNote.apply = function(self)
-	local noteChart = self.noteChart
+	local noteChart = self.sequence.manager.noteChart
 	
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)

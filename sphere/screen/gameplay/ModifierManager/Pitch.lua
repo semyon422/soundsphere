@@ -1,11 +1,12 @@
-local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
+local InconsequentialModifier = require("sphere.screen.gameplay.ModifierManager.InconsequentialModifier")
 
-local Pitch = Modifier:new()
+local Pitch = InconsequentialModifier:new()
 
 Pitch.name = "Pitch"
+Pitch.shortName = "Pitch"
 
 Pitch.apply = function(self)
-	self.engine.pitch = true
+	self.sequence.manager.engine.pitch = true
 end
 
 return Pitch

@@ -1,11 +1,12 @@
-local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
+local InconsequentialModifier = require("sphere.screen.gameplay.ModifierManager.InconsequentialModifier")
 
-local SetInput = Modifier:new()
+local SetInput = InconsequentialModifier:new()
 
 SetInput.name = "SetInput"
+SetInput.shortName = "SetInput"
 
 SetInput.apply = function(self)
-	self.engine.score.setinput = true
+	self.sequence.manager.engine.score.setinput = true
 end
 
 return SetInput

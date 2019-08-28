@@ -1,12 +1,12 @@
-local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
-local Fraction = require("ncdk.Fraction")
+local InconsequentialModifier = require("sphere.screen.gameplay.ModifierManager.InconsequentialModifier")
 
-local CMod = Modifier:new()
+local CMod = InconsequentialModifier:new()
 
 CMod.name = "CMod"
+CMod.shortName = "CMod"
 
 CMod.apply = function(self)
-	local noteChart = self.noteChart
+	local noteChart = self.sequence.manager.noteChart
 	
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)

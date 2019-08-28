@@ -1,11 +1,12 @@
-local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
+local InconsequentialModifier = require("sphere.screen.gameplay.ModifierManager.InconsequentialModifier")
 
-local ProMode = Modifier:new()
+local ProMode = InconsequentialModifier:new()
 
 ProMode.name = "ProMode"
+ProMode.shortName = "ProMode"
 
 ProMode.apply = function(self)
-	self.engine.score.promode = true
+	self.sequence.manager.engine.score.promode = true
 end
 
 return ProMode

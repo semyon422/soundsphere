@@ -2,7 +2,7 @@ local aquafonts			= require("aqua.assets.fonts")
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Theme				= require("aqua.ui.Theme")
 local spherefonts		= require("sphere.assets.fonts")
-local ModsMenu			= require("sphere.screen.select.ModsMenu")
+local ModifierMenu		= require("sphere.screen.select.ModifierMenu")
 
 local Footer = {}
 
@@ -34,7 +34,7 @@ Footer.init = function(self)
 		mode = "fill",
 		textAlign = {x = "center", y = "center"},
 		backgroundColor = {0, 0, 0, 127},
-		interact = function() ModsMenu:show() end
+		interact = function() ModifierMenu:show() end
 	})
 end
 

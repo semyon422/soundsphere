@@ -38,7 +38,7 @@ Slider.reload = function(self)
 	
 	local circle = self.circle
 	
-	circle.x = map(self.value, self.item.minValue, self.item.maxValue, self.x + self.h / 2, self.x + self.w - self.h / 2)
+	circle.x = map(self.value, self.minValue, self.maxValue, self.x + self.h / 2, self.x + self.w - self.h / 2)
 	circle.y = self.y + self.h / 2
 	circle.r = self.barHeight / 2
 	circle.mode = "fill"
@@ -49,7 +49,7 @@ Slider.reload = function(self)
 	
 	local circleLine = self.circleLine
 	
-	circleLine.x = map(self.value, self.item.minValue, self.item.maxValue, self.x + self.h / 2, self.x + self.w - self.h / 2)
+	circleLine.x = map(self.value, self.minValue, self.maxValue, self.x + self.h / 2, self.x + self.w - self.h / 2)
 	circleLine.y = self.y + self.h / 2
 	circleLine.r = self.barHeight / 2
 	circleLine.mode = "line"
@@ -91,8 +91,8 @@ Slider.receive = function(self, event)
 		})
 	elseif event.name == "mousemoved" and self.pressed then
 		local mx = self.cs:x(event.args[1], true)
-		local value = map(mx, self.x + self.h / 2, self.x + self.w - self.h / 2, self.item.minValue, self.item.maxValue)
-		self.value = math.min(math.max(round(value, self.item.step), self.item.minValue), self.item.maxValue)
+		local value = map(mx, self.x + self.h / 2, self.x + self.w - self.h / 2, self.minValue, self.maxValue)
+		self.value = math.min(math.max(round(value, self.step), self.minValue), self.maxValue)
 		self:reload()
 		
 		self:send({
