@@ -1,3 +1,6 @@
+require("mime")
+require("ltn12")
+
 setmetatable(_G, {
 	__newindex = function(a, b, c)
 		print(a, b, c, debug.traceback())
