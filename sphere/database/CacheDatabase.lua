@@ -140,11 +140,11 @@ local selectChartSetRequest = [[
 ]]
 
 local deleteChartRequest = [[
-	DELETE FROM `charts` WHERE INSTR(`path`, ? || "/") == 1
+	DELETE FROM `charts` WHERE INSTR(`path`, ?) == 1
 ]]
 
 local deleteChartSetRequest = [[
-	DELETE FROM `chartSets` WHERE INSTR(`path`, ? || "/") == 1
+	DELETE FROM `chartSets` WHERE INSTR(`path`, ?) == 1
 ]]
 
 CacheDatabase.init = function(self)
