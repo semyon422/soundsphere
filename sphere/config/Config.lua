@@ -6,6 +6,7 @@ local Config = {}
 Config.path = "userdata/config.json"
 
 Config.init = function(self)
+	self.data = {}
 	self.observable = Observable:new()
 end
 
@@ -14,7 +15,6 @@ Config.send = function(self, event)
 end
 
 Config.read = function(self)
-	self.data = {}
 	if love.filesystem.exists(self.path) then
 		local file = io.open(self.path, "r")
 		self.data = json.decode(file:read("*all"))
