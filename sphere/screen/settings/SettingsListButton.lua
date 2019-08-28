@@ -30,6 +30,9 @@ SettingsListButton.construct = function(self)
 		self.slider = Slider:new()
 		self.slider.item = self.item
 		self.slider.observable:add(self)
+		self.slider.minValue = self.item.minValue
+		self.slider.maxValue = self.item.maxValue
+		self.slider.step = self.item.step
 	elseif self.item.type == "checkbox" then
 		self.checkbox = Checkbox:new()
 		self.checkbox.item = self.item
