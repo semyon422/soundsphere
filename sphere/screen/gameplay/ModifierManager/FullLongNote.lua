@@ -4,7 +4,8 @@ local NoteData = require("ncdk.NoteData")
 
 local FullLongNote = SequentialModifier:new()
 
-FullLongNote.name = "FLN"
+FullLongNote.name = "FullLongNote"
+FullLongNote.shortName = "FLN"
 
 FullLongNote.value = {
 	level = 0
@@ -16,6 +17,10 @@ end
 
 FullLongNote.setValue = function(self, value)
 	self.value = clone(value)
+end
+
+FullLongNote.tostring = function(self)
+	return self.shortName .. self.value.level
 end
 
 FullLongNote.apply = function(self)

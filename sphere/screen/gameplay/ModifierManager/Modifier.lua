@@ -5,7 +5,7 @@ local Modifier = Class:new()
 Modifier.name = ""
 
 Modifier.tostring = function(self)
-	return self.name
+	return self.shortName
 end
 
 Modifier.setValue = function(self, value)

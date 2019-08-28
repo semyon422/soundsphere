@@ -1,10 +1,11 @@
-local aquafonts		= require("aqua.assets.fonts")
-local TextFrame		= require("aqua.graphics.TextFrame")
-local map			= require("aqua.math").map
-local spherefonts	= require("sphere.assets.fonts")
-local CrossButton	= require("sphere.ui.CrossButton")
-local CustomList	= require("sphere.ui.CustomList")
-local Slider		= require("sphere.ui.Slider")
+local aquafonts			= require("aqua.assets.fonts")
+local TextFrame			= require("aqua.graphics.TextFrame")
+local map				= require("aqua.math").map
+local spherefonts		= require("sphere.assets.fonts")
+local ModifierDisplay	= require("sphere.screen.select.ModifierDisplay")
+local CrossButton		= require("sphere.ui.CrossButton")
+local CustomList		= require("sphere.ui.CustomList")
+local Slider			= require("sphere.ui.Slider")
 
 local SliderButton = CustomList.Button:new()
 
@@ -97,12 +98,16 @@ end
 
 SliderButton.receive = function(self, event)
 	if event.name == "pressed" then
+		ModifierDisplay:updateText()
 		return
 	elseif event.name == "released" then
+		ModifierDisplay:updateText()
 		return
 	elseif event.name == "valueChanged" then
+		ModifierDisplay:updateText()
 		self:updateValue(event.value)
 	elseif event.name == "ButtonPressed" and event.sender == "CrossButton" then
+		ModifierDisplay:updateText()
 		self:removeModifier()
 	end
 	
