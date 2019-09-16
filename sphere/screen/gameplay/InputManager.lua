@@ -71,7 +71,7 @@ end
 
 InputManager.receive = function(self, event)
 	if not self.inputConfig then
-		return self:send(event)
+		return
 	end
 	
 	local keyConfig
@@ -81,7 +81,7 @@ InputManager.receive = function(self, event)
 		keyConfig = self.inputConfig.release[event.args[1]]
 	end
 	if not keyConfig then
-		return self:send(event)
+		return
 	end
 	
 	local events = {}
