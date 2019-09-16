@@ -76,6 +76,7 @@ CloudburstEngine.receive = function(self, event)
 		for noteHandler in pairs(self.noteHandlers) do
 			local currentNote = noteHandler.currentNote
 			if
+				currentNote and
 				(
 					not nearestNote or
 					currentNote.startNoteData.timePoint.absoluteTime < nearestNote.startNoteData.timePoint.absoluteTime
@@ -85,7 +86,7 @@ CloudburstEngine.receive = function(self, event)
 				not currentNote.startNoteData.autoplay and
 				not currentNote.autoplay
 			then
-				nearestNote = noteHandler.currentNote
+				nearestNote = currentNote
 			end
 		end
 		if nearestNote then
