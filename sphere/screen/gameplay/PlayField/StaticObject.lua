@@ -29,4 +29,6 @@ StaticObject.unload = function(self)
 	self.container:remove(self.drawable)
 end
 
+StaticObject.receive = function(self, event) end
+
 return StaticObject
