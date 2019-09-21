@@ -11,6 +11,7 @@ local AutoPlay		= require("sphere.screen.gameplay.ModifierManager.AutoPlay")
 local ProMode		= require("sphere.screen.gameplay.ModifierManager.ProMode")
 local SetInput		= require("sphere.screen.gameplay.ModifierManager.SetInput")
 local Pitch			= require("sphere.screen.gameplay.ModifierManager.Pitch")
+local TimeRate		= require("sphere.screen.gameplay.ModifierManager.TimeRate")
 local Mirror		= require("sphere.screen.gameplay.ModifierManager.Mirror")
 local NoLongNote	= require("sphere.screen.gameplay.ModifierManager.NoLongNote")
 local NoMeasureLine	= require("sphere.screen.gameplay.ModifierManager.NoMeasureLine")
@@ -22,7 +23,7 @@ local ModifierList = CustomList:new()
 
 ModifierList.x = 0
 ModifierList.y = 0
-ModifierList.w = 5/17
+ModifierList.w = 0.5
 ModifierList.h = 1
 
 ModifierList.textAlign = {x = "center", y = "center"}
@@ -68,6 +69,9 @@ ModifierList.addItems = function(self)
 	}
 	items[#items + 1] = {
 		modifier = Pitch
+	}
+	items[#items + 1] = {
+		modifier = TimeRate
 	}
 	items[#items + 1] = {
 		modifier = Mirror

@@ -9,8 +9,8 @@ local AddModifierButton = CustomList.Button:new()
 
 AddModifierButton.nameTextAlign = {x = "left", y = "center"}
 
-AddModifierButton.columnX = {0, 4/5}
-AddModifierButton.columnWidth = {4/5, 1/5}
+AddModifierButton.columnX = {0, 0.9}
+AddModifierButton.columnWidth = {0.9, 0.1}
 
 AddModifierButton.construct = function(self)
 	self.font = aquafonts.getFont(spherefonts.NotoSansRegular, 20)

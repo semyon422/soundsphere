@@ -12,8 +12,8 @@ local SliderButton = CustomList.Button:new()
 SliderButton.nameTextAlign = {x = "left", y = "center"}
 SliderButton.valueTextAlign = {x = "left", y = "center"}
 
-SliderButton.columnX = {0, 4/11, 6/11, 10/11}
-SliderButton.columnWidth = {4/11, 2/11, 4/11, 1/11}
+SliderButton.columnX = {0, 0.45, 0.6, 0.9}
+SliderButton.columnWidth = {0.45, 0.15, 0.3, 0.1}
 
 SliderButton.sliderRectangleColor = {63, 63, 63, 255}
 SliderButton.sliderCircleColor = {255, 255, 255, 255}

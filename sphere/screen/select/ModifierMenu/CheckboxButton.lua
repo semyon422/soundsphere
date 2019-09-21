@@ -9,8 +9,8 @@ local CheckboxButton = CustomList.Button:new()
 
 CheckboxButton.nameTextAlign = {x = "left", y = "center"}
 
-CheckboxButton.columnX = {0, 4/5}
-CheckboxButton.columnWidth = {4/5, 1/5}
+CheckboxButton.columnX = {0, 0.9}
+CheckboxButton.columnWidth = {0.9, 0.1}
 
 CheckboxButton.construct = function(self)
 	self.font = aquafonts.getFont(spherefonts.NotoSansRegular, 20)

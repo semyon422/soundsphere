@@ -21,9 +21,9 @@ local ToOsu			= require("sphere.screen.gameplay.ModifierManager.ToOsu")
 
 local SequenceList = CustomList:new()
 
-SequenceList.x = 6/17
+SequenceList.x = 0.5
 SequenceList.y = 0
-SequenceList.w = 11/17
+SequenceList.w = 0.5
 SequenceList.h = 1
 
 SequenceList.textAlign = {x = "center", y = "center"}
