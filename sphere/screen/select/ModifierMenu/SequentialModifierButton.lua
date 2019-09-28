@@ -8,6 +8,7 @@ local CustomList	= require("sphere.ui.CustomList")
 local Slider		= require("sphere.ui.Slider")
 
 local AutoPlay		= require("sphere.screen.gameplay.ModifierManager.AutoPlay")
+local Automap		= require("sphere.screen.gameplay.ModifierManager.Automap")
 local ProMode		= require("sphere.screen.gameplay.ModifierManager.ProMode")
 local SetInput		= require("sphere.screen.gameplay.ModifierManager.SetInput")
 local Pitch			= require("sphere.screen.gameplay.ModifierManager.Pitch")
@@ -20,12 +21,15 @@ local ToOsu			= require("sphere.screen.gameplay.ModifierManager.ToOsu")
 
 local ModifierButton		= require("sphere.screen.select.ModifierMenu.ModifierButton")
 local FullLongNoteButton	= require("sphere.screen.select.ModifierMenu.FullLongNoteButton")
+local AutomapButton			= require("sphere.screen.select.ModifierMenu.AutomapButton")
 
 local SequentialModifierButton = ModifierButton:new()
 
 SequentialModifierButton.construct = function(self)
 	if getmetatable(self.item.modifier) == FullLongNote then
 		return FullLongNoteButton:new(self)
+	elseif getmetatable(self.item.modifier) == Automap then
+		return AutomapButton:new(self)
 	end
 	error()
 end

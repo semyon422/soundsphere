@@ -31,6 +31,15 @@ GameplayScreen.load = function(self)
 	NoteSkinManager:load()
 	
 	local noteChart, hash = NoteChartFactory:getNoteChart(self.cacheData.path)
+
+	self.engine = CloudburstEngine:new()
+	self.engine.score = CustomScore:new()
+	self.playField = PlayField:new()
+
+	ModifierManager.engine = self.engine
+	ModifierManager.noteChart = noteChart
+	ModifierManager:apply()
+
 	InputManager:setInputMode(noteChart.inputMode:getString())
 	
 	local noteSkinData = NoteSkinManager:getNoteSkin(noteChart.inputMode)
@@ -40,25 +49,16 @@ GameplayScreen.load = function(self)
 		noteSkinData = noteSkinData.noteSkin
 	})
 	
-	self.engine = CloudburstEngine:new()
 	self.engine.noteChart = noteChart
 	self.engine.noteSkin = noteSkin
 	self.engine.container = self.container
-	self.engine.score = CustomScore:new()
 	self.engine.aliases = NoteChartResourceLoader.aliases
 	
-	self.playField = PlayField:new()
 	self.playField.directoryPath = noteSkinData.directoryPath
 	self.playField.noteSkinData = noteSkinData.noteSkin
 	self.playField.playFieldData = noteSkinData.playField
 	self.playField.noteSkin = noteSkin
 	self.playField.container = self.container
-	
-	ModifierManager.engine = self.engine
-	ModifierManager.noteChart = noteChart
-	ModifierManager.noteSkin = noteSkin
-	ModifierManager.playField = self.playField
-	ModifierManager:apply()
 	
 	self.bga = BMSBGA:new()
 	self.bga.noteChart = noteChart

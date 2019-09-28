@@ -8,6 +8,7 @@ local CustomList					= require("sphere.ui.CustomList")
 local NotificationLine				= require("sphere.ui.NotificationLine")
 
 local AutoPlay		= require("sphere.screen.gameplay.ModifierManager.AutoPlay")
+local Automap		= require("sphere.screen.gameplay.ModifierManager.Automap")
 local ProMode		= require("sphere.screen.gameplay.ModifierManager.ProMode")
 local SetInput		= require("sphere.screen.gameplay.ModifierManager.SetInput")
 local Pitch			= require("sphere.screen.gameplay.ModifierManager.Pitch")
@@ -60,6 +61,9 @@ ModifierList.addItems = function(self)
 	
 	items[#items + 1] = {
 		modifier = AutoPlay
+	}
+	items[#items + 1] = {
+		modifier = Automap
 	}
 	items[#items + 1] = {
 		modifier = ProMode

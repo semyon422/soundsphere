@@ -8,17 +8,6 @@ local SequentialModifierButton	= require("sphere.screen.select.ModifierMenu.Sequ
 local CustomList				= require("sphere.ui.CustomList")
 local NotificationLine			= require("sphere.ui.NotificationLine")
 
-local AutoPlay		= require("sphere.screen.gameplay.ModifierManager.AutoPlay")
-local ProMode		= require("sphere.screen.gameplay.ModifierManager.ProMode")
-local SetInput		= require("sphere.screen.gameplay.ModifierManager.SetInput")
-local Pitch			= require("sphere.screen.gameplay.ModifierManager.Pitch")
-local Mirror		= require("sphere.screen.gameplay.ModifierManager.Mirror")
-local NoLongNote	= require("sphere.screen.gameplay.ModifierManager.NoLongNote")
-local NoMeasureLine	= require("sphere.screen.gameplay.ModifierManager.NoMeasureLine")
-local CMod			= require("sphere.screen.gameplay.ModifierManager.CMod")
-local FullLongNote	= require("sphere.screen.gameplay.ModifierManager.FullLongNote")
-local ToOsu			= require("sphere.screen.gameplay.ModifierManager.ToOsu")
-
 local SequenceList = CustomList:new()
 
 SequenceList.x = 0.5

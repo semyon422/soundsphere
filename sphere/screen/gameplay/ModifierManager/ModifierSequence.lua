@@ -1,6 +1,7 @@
 local Class			= require("aqua.util.Class")
 
 local AutoPlay		= require("sphere.screen.gameplay.ModifierManager.AutoPlay")
+local Automap		= require("sphere.screen.gameplay.ModifierManager.Automap")
 local ProMode		= require("sphere.screen.gameplay.ModifierManager.ProMode")
 local SetInput		= require("sphere.screen.gameplay.ModifierManager.SetInput")
 local Pitch			= require("sphere.screen.gameplay.ModifierManager.Pitch")
