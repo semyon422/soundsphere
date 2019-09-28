@@ -299,7 +299,6 @@ Automap.process = function(self)
 	bf:process()
 
 	local nbs = bf:getNoteBlocks()
-	print("blocks", #nbs)
 
 	NotePreprocessor:process(nbs)
 
@@ -311,14 +310,12 @@ Automap.process = function(self)
 	for i = 1, #notes do
 		local tNoteData = notes[i]
 		tNoteData.noteData.inputIndex = tNoteData.columnIndex
-		print(tNoteData.columnIndex)
 		if tNoteData.long then
 			tNoteData.noteData.endNoteData.inputIndex = tNoteData.columnIndex
 		end
 	end
 
 	self.noteChart.inputMode:setInputCount("key", targetMode)
-	print(self.noteChart.inputMode:getString())
 end
 
 return Automap
