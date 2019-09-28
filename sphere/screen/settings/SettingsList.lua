@@ -96,6 +96,17 @@ SettingsList.setGeneralItems = function(self)
 		format = "%d"
 	}
 	items[#items + 1] = {
+		name = "TPS limit",
+		configKey = "tps",
+		type = "slider",
+		minValue = 10,
+		maxValue = 1000,
+		minDisplayValue = 10,
+		maxDisplayValue = 1000,
+		step = 10,
+		format = "%d"
+	}
+	items[#items + 1] = {
 		name = "play speed",
 		configKey = "speed",
 		type = "slider",

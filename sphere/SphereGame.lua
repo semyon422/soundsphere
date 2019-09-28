@@ -54,6 +54,7 @@ SphereGame.load = function(self)
 	
 	Config.observable:add(self)
 	aquaevent.fpslimit = Config.data.fps
+	aquaevent.tpslimit = Config.data.tps
 	
 	DiscordPresence:load()
 	
@@ -99,6 +100,8 @@ SphereGame.receive = function(self, event)
 	elseif event.name == "Config.set" then
 		if event.key == "fps" then
 			aquaevent.fpslimit = event.value
+		elseif event.key == "tps" then
+			aquaevent.tpslimit = event.value
 		end
 	end
 	
