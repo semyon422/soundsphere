@@ -53,6 +53,8 @@ end
 Config.defaultValues = {
 	["cb"] = false,
 	["kb"] = "",
+
+	["audio.stream"] = false,
 	
 	["dim.select"] = 0.5,
 	["dim.gameplay"] = 0.75,

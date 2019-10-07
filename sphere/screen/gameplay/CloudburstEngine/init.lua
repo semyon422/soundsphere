@@ -16,7 +16,6 @@ CloudburstEngine.autoplay = false
 CloudburstEngine.paused = true
 CloudburstEngine.rate = 1
 CloudburstEngine.targetRate = 1
-CloudburstEngine.allowStream = true
 
 CloudburstEngine.load = function(self)
 	self.observable = Observable:new()
@@ -182,9 +181,9 @@ CloudburstEngine.playAudio = function(self, paths, layer, stream)
 	if not paths then return end
 	for i = 1, #paths do
 		local audio
-		if not stream then
+		if not stream or not Config:get("audio.stream") then
 			audio = AudioFactory:getSample(self.aliases[paths[i][1]])
-		elseif self.allowStream then
+		else
 			audio = AudioFactory:getStream(self.aliases[paths[i][1]])
 		end
 		if audio then

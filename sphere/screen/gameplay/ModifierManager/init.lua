@@ -6,7 +6,6 @@ ModifierManager.modifiers = {
 	require("sphere.screen.gameplay.ModifierManager.AutoPlay"),
 	require("sphere.screen.gameplay.ModifierManager.ProMode"),
 	require("sphere.screen.gameplay.ModifierManager.SetInput"),
-	require("sphere.screen.gameplay.ModifierManager.Pitch"),
 	require("sphere.screen.gameplay.ModifierManager.Mirror"),
 	require("sphere.screen.gameplay.ModifierManager.NoLongNote"),
 	require("sphere.screen.gameplay.ModifierManager.NoMeasureLine"),
@@ -18,7 +17,6 @@ ModifierManager.modifiers = {
 ModifierManager.AutoPlay = require("sphere.screen.gameplay.ModifierManager.AutoPlay")
 ModifierManager.ProMode = require("sphere.screen.gameplay.ModifierManager.ProMode")
 ModifierManager.SetInput = require("sphere.screen.gameplay.ModifierManager.SetInput")
-ModifierManager.Pitch = require("sphere.screen.gameplay.ModifierManager.Pitch")
 ModifierManager.Mirror = require("sphere.screen.gameplay.ModifierManager.Mirror")
 ModifierManager.NoLongNote = require("sphere.screen.gameplay.ModifierManager.NoLongNote")
 ModifierManager.NoMeasureLine = require("sphere.screen.gameplay.ModifierManager.NoMeasureLine")
@@ -33,7 +31,6 @@ ModifierManager.engineModifiers = {
 	ModifierManager.AutoPlay,
 	ModifierManager.ProMode,
 	ModifierManager.SetInput,
-	ModifierManager.Pitch
 }
 
 ModifierManager.noteChartModifiers = {

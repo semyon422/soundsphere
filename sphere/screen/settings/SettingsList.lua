@@ -154,7 +154,16 @@ SettingsList.setSoundItems = function(self)
 	local items = {}
 	
 	items[#items + 1] = {
-		name = "global",
+		name = "main audio mode",
+		configKey = "audio.stream",
+		type = "checkbox",
+		minValue = false,
+		maxValue = true,
+		minDisplayValue = "sample",
+		maxDisplayValue = "stream"
+	}
+	items[#items + 1] = {
+		name = "global volume",
 		configKey = "volume.global",
 		type = "slider",
 		minValue = 0,
@@ -165,7 +174,7 @@ SettingsList.setSoundItems = function(self)
 		format = "%d"
 	}
 	items[#items + 1] = {
-		name = "music",
+		name = "music volume",
 		configKey = "volume.music",
 		type = "slider",
 		minValue = 0,
@@ -176,7 +185,7 @@ SettingsList.setSoundItems = function(self)
 		format = "%d"
 	}
 	items[#items + 1] = {
-		name = "effects",
+		name = "effects volume",
 		configKey = "volume.effects",
 		type = "slider",
 		minValue = 0,
