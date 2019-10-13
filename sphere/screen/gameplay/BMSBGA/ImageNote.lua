@@ -34,7 +34,7 @@ ImageNote.pause = function(self) end
 ImageNote.play = function(self) end
 
 ImageNote.load = function(self)
-	local path = self.engine.aliases[self.images[1][1]]
+	local path = self.engine.localAliases[self.images[1][1]] or self.engine.globalAliases[self.images[1][1]]
 	self.image = image.getImage(path)
 	
 	if self.image then

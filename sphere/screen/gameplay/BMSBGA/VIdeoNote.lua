@@ -51,7 +51,7 @@ VideoNote.play = function(self)
 end
 
 VideoNote.load = function(self)
-	local path = self.engine.aliases[self.images[1][1]]
+	local path = self.engine.localAliases[self.images[1][1]] or self.engine.globalAliases[self.images[1][1]]
 	self.video = video.new(path)
 	
 	if self.video then

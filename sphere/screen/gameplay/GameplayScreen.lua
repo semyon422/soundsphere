@@ -52,7 +52,8 @@ GameplayScreen.load = function(self)
 	self.engine.noteChart = noteChart
 	self.engine.noteSkin = noteSkin
 	self.engine.container = self.container
-	self.engine.aliases = NoteChartResourceLoader.aliases
+	self.engine.localAliases = {}
+	self.engine.globalAliases = {}
 	
 	self.playField.directoryPath = noteSkinData.directoryPath
 	self.playField.noteSkinData = noteSkinData.noteSkin
@@ -90,6 +91,8 @@ GameplayScreen.load = function(self)
 	InputManager.observable:add(self.engine)
 	
 	NoteChartResourceLoader:load(self.cacheData.path, noteChart, function()
+		self.engine.localAliases = NoteChartResourceLoader.localAliases
+		self.engine.globalAliases = NoteChartResourceLoader.globalAliases
 		self.bga:load()
 		PauseOverlay:play()
 	end)

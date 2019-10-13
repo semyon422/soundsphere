@@ -20,7 +20,7 @@ Autoplay.processShortNote = function(self, note)
 		else
 			layer = "bga"
 		end
-		note.engine:playAudio(note.pressSounds, layer, note.startNoteData.stream)
+		note.engine:playAudio(note.pressSounds, layer, note.startNoteData.keysound, note.startNoteData.stream)
 		
 		note.keyState = true
 		
@@ -36,7 +36,7 @@ end
 Autoplay.processSoundNote = function(self, note)
 	if note.pressSounds and note.pressSounds[1] then
 		if note.startNoteData.timePoint.absoluteTime <= note.engine.currentTime then
-			note.engine:playAudio(note.pressSounds, "bga", note.startNoteData.stream)
+			note.engine:playAudio(note.pressSounds, "bga", note.startNoteData.keysound, note.startNoteData.stream)
 		else
 			return
 		end
@@ -59,7 +59,7 @@ Autoplay.processLongNote = function(self, note)
 		else
 			layer = "bga"
 		end
-		note.engine:playAudio(note.pressSounds, layer, note.startNoteData.stream)
+		note.engine:playAudio(note.pressSounds, layer, note.startNoteData.keysound, note.startNoteData.stream)
 		
 		note.keyState = true
 		
@@ -78,7 +78,7 @@ Autoplay.processLongNote = function(self, note)
 		else
 			layer = "bga"
 		end
-		note.engine:playAudio(note.releaseSounds, layer, note.startNoteData.stream)
+		note.engine:playAudio(note.releaseSounds, layer, note.startNoteData.keysound, note.startNoteData.stream)
 		
 		note.keyState = false
 		

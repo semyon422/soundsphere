@@ -177,14 +177,19 @@ CloudburstEngine.receive = function(self, event)
 	end
 end
 
-CloudburstEngine.playAudio = function(self, paths, layer, stream)
+CloudburstEngine.playAudio = function(self, paths, layer, keysound, stream)
 	if not paths then return end
 	for i = 1, #paths do
+		local path = paths[i][1]
 		local audio
+		local aliases = self.localAliases
+		if not keysound and not aliases[path] then
+			aliases = self.globalAliases
+		end
 		if not stream or not Config:get("audio.stream") then
-			audio = AudioFactory:getSample(self.aliases[paths[i][1]])
+			audio = AudioFactory:getSample(aliases[paths[i][1]])
 		else
-			audio = AudioFactory:getStream(self.aliases[paths[i][1]])
+			audio = AudioFactory:getStream(aliases[paths[i][1]])
 		end
 		if audio then
 			audio.offset = self.timeManager.currentTime

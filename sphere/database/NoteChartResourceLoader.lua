@@ -9,17 +9,20 @@ local FileManager	= require("sphere.filesystem.FileManager")
 local NoteChartResourceLoader = {}
 
 NoteChartResourceLoader.resourceNames = {}
-NoteChartResourceLoader.aliases = {}
 NoteChartResourceLoader.hitSoundsPath = "userdata/hitsounds"
 
 NoteChartResourceLoader.init = function(self)
 	self.observable = Observable:new()
+	self.localAliases = {}
+	self.globalAliases = {}
 end
 
 NoteChartResourceLoader.load = function(self, path, noteChart, callback)
 	local directoryPath = path:match("^(.+)/")
 	if self.directoryPath and self.directoryPath ~= directoryPath then
 		self:unload()
+		self.localAliases = {}
+		self.globalAliases = {}
 	end
 	self.directoryPath = directoryPath
 	self.path = path
@@ -37,7 +40,7 @@ NoteChartResourceLoader.loadOJM = function(self)
 	local path = self.path:match("(.+)n/%d$") .. "m"
 	JamLoader:load(path, function(samples)
 		for name in pairs(samples) do
-			self.aliases[name] = path .. "/" .. name
+			self.localAliases[name] = path .. "/" .. name
 		end
 		self.callback()
 	end)
@@ -60,7 +63,11 @@ NoteChartResourceLoader.loadBMS = function(self)
 					if not self.soundGroup.objects[soundFilePath] then
 						self.soundGroup:add(soundFilePath)
 						self.resourceCount = self.resourceCount + 1
-						self.aliases[name] = soundFilePath
+						if soundFilePath:find(self.directoryPath, 1, true) then
+							self.localAliases[name] = soundFilePath
+						else
+							self.globalAliases[name] = soundFilePath
+						end
 					end
 					break
 				end
@@ -73,14 +80,22 @@ NoteChartResourceLoader.loadBMS = function(self)
 					if not self.imageGroup.objects[imageFilePath] then
 						self.imageGroup:add(imageFilePath)
 						self.resourceCount = self.resourceCount + 1
-						self.aliases[name] = imageFilePath
+						if imageFilePath:find(self.directoryPath, 1, true) then
+							self.localAliases[name] = imageFilePath
+						else
+							self.globalAliases[name] = imageFilePath
+						end
 					end
 					break
 				elseif videoFilePath then
 					if not self.videoGroup.objects[videoFilePath] then
 						self.videoGroup:add(videoFilePath)
 						self.resourceCount = self.resourceCount + 1
-						self.aliases[name] = videoFilePath
+						if videoFilePath:find(self.directoryPath, 1, true) then
+							self.localAliases[name] = videoFilePath
+						else
+							self.globalAliases[name] = videoFilePath
+						end
 					end
 					break
 				end
