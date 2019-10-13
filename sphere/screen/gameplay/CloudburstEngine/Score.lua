@@ -74,7 +74,8 @@ Score.updateGrade = function(self)
 end
 
 Score.interval = 0.004
-Score.scale = 100/6
+Score.scale = 3.6
+Score.unit = 1/60
 Score.hit = function(self, deltaTime, time)
 	self.hits[#self.hits + 1] = {time, deltaTime}
 	
@@ -100,7 +101,7 @@ Score.hit = function(self, deltaTime, time)
 	-- self:updateGrade()
 	
 	self.score = self.score
-		+ math.exp(-(deltaTime * self.scale) ^ 2)
+		+ math.exp(-(deltaTime / self.unit / self.scale) ^ 2)
 		/ self.engine.noteCount
 		* 1000000
 	
@@ -117,7 +118,7 @@ Score.hit = function(self, deltaTime, time)
 end
 
 Score.updateAccuracy = function(self)
-	self.accuracy = 1000 * math.sqrt(math.abs(-math.log(self.score / 1000000 * self.engine.noteCount / self.count))) / self.scale
+	self.accuracy = 1000 * math.sqrt(math.abs(-math.log(self.score / 1000000 * self.engine.noteCount / self.count))) * self.unit * self.scale
 	self:updateGrade()
 end
 
