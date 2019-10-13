@@ -117,7 +117,7 @@ Score.hit = function(self, deltaTime, time)
 end
 
 Score.updateAccuracy = function(self)
-	self.accuracy = 1000 * math.sqrt(math.abs(-math.log(self.score / 1000000 * self.engine.noteCount / self.count) / self.scale ^ 2))
+	self.accuracy = 1000 * math.sqrt(math.abs(-math.log(self.score / 1000000 * self.engine.noteCount / self.count))) / self.scale
 	self:updateGrade()
 end
 
