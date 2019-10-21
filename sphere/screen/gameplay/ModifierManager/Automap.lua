@@ -1,3 +1,4 @@
+local aquamath				= require("aqua.math")
 local clone					= require("aqua.table").clone
 local Upscaler				= require("libchart.Upscaler")
 local NoteBlock				= require("libchart.NoteBlock")
@@ -262,9 +263,9 @@ Automap.apply = function(self)
 
 		tNoteData.noteData = noteData
 
-		tNoteData.startTime = noteData.timePoint.absoluteTime * 1000
+		tNoteData.startTime = aquamath.round(noteData.timePoint.absoluteTime * 1000)
 		if noteData.endNoteData then
-			tNoteData.endTime = noteData.endNoteData.timePoint.absoluteTime * 1000
+			tNoteData.endTime = aquamath.round(noteData.endNoteData.timePoint.absoluteTime * 1000)
 			tNoteData.long = true
 		else
 			tNoteData.endTime = tNoteData.startTime
