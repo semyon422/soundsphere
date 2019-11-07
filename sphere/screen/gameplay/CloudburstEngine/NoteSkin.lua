@@ -202,20 +202,6 @@ NoteSkin.getLongNoteBodyX = function(self, note)
 		+ dataHead.fx * self:getSpeed() * dt
 		+ dataBody.ox * self:getNoteWidth(note, "Head")
 end
-NoteSkin.getLineNoteX = function(self, note)
-	local data = self.data[note.id]["Head"]
-	local speedSign = sign(self.speed)
-	local dt
-	if data.fx * speedSign <= 0 then
-		dt = note.endNoteData.timePoint.currentVisualTime - note.engine.currentTime
-	else
-		dt = note.startNoteData.timePoint.currentVisualTime - note.engine.currentTime
-	end
-	
-	return
-		data.x
-		+ data.fx * self:getSpeed() * dt
-end
 
 NoteSkin.getShortNoteY = function(self, note)
 	local data = self.data[note.id]["Head"]
@@ -258,20 +244,6 @@ NoteSkin.getLongNoteBodyY = function(self, note)
 		+ dataHead.fy * self:getSpeed() * dt
 		+ dataBody.oy * self:getNoteHeight(note, "Head")
 end
-NoteSkin.getLineNoteY = function(self, note)
-	local data = self.data[note.id]["Head"]
-	local speedSign = sign(self.speed)
-	local dt
-	if data.fy * speedSign <= 0 then
-		dt = note.endNoteData.timePoint.currentVisualTime - note.engine.currentTime
-	else
-		dt = note.startNoteData.timePoint.currentVisualTime - note.engine.currentTime
-	end
-	
-	return
-		data.y
-		+ data.fy * self:getSpeed() * dt
-end
 
 --------------------------------
 -- get*Width get*Height
@@ -282,22 +254,6 @@ end
 
 NoteSkin.getNoteHeight = function(self, note, part)
 	return self.data[note.id][part].h
-end
-
---------------------------------
--- getLineNoteScaledWidth getLineNoteScaledHeight
---------------------------------
-
-NoteSkin.getLineNoteScaledWidth = function(self, note)
-	local data = self.data[note.id]["Head"]
-	local dt = note.startNoteData.timePoint.currentVisualTime - note.endNoteData.timePoint.currentVisualTime
-	return math.max(math.abs(data.fx * self:getSpeed() * dt + data.w), self:getCS(note):x(1))
-end
-
-NoteSkin.getLineNoteScaledHeight = function(self, note)
-	local data = self.data[note.id]["Head"]
-	local dt = note.startNoteData.timePoint.currentVisualTime - note.endNoteData.timePoint.currentVisualTime
-	return math.max(math.abs(data.fy * self:getSpeed() * dt + data.h), self:getCS(note):y(1))
 end
 
 --------------------------------
@@ -438,55 +394,6 @@ NoteSkin.willLongNoteDrawBeforeStart = function(self, note)
 end
 NoteSkin.willLongNoteDrawAfterEnd = function(self, note)
 	local x, y = self:whereWillLongNoteDraw(note)
-	local data = self.data[note.id]["Head"]
-	local speedSign = sign(self.speed)
-	return data.fx * x * speedSign > 0 or data.fy * y * speedSign > 0
-end
-
-
-NoteSkin.whereWillLineNoteDraw = function(self, note)
-	local notex = self:getLineNoteX(note)
-	local notey = self:getLineNoteY(note)
-	local width = self:getLineNoteScaledWidth(note)
-	local height = self:getLineNoteScaledHeight(note)
-	
-	local cs = self:getCS(note)
-	
-	local x, y
-	if
-		(self.allcs:x(cs:X(notex + width, true), true) > 0) and (self.allcs:x(cs:X(notex, true), true) < 1)
-	then
-		x = 0
-	elseif self.allcs:x(cs:X(notex, true), true) >= 1 then
-		x = 1
-	elseif self.allcs:x(cs:X(notex + width, true), true) <= 0 then
-		x = -1
-	end
-	
-	if
-		(self.allcs:y(cs:Y(notey + height, true), true) > 0) and (self.allcs:y(cs:Y(notey, true), true) < 1)
-	then
-		y = 0
-	elseif self.allcs:y(cs:Y(notey, true), true) >= 1 then
-		y = 1
-	elseif self.allcs:y(cs:Y(notey + height, true), true) <= 0 then
-		y = -1
-	end
-	
-	return x, y
-end
-NoteSkin.willLineNoteDraw = function(self, note)
-	local x, y = self:whereWillLineNoteDraw(note)
-	return x == 0 and y == 0
-end
-NoteSkin.willLineNoteDrawBeforeStart = function(self, note)
-	local x, y = self:whereWillLineNoteDraw(note)
-	local data = self.data[note.id]["Head"]
-	local speedSign = sign(self.speed)
-	return data.fx * x * speedSign < 0 or data.fy * y * speedSign < 0
-end
-NoteSkin.willLineNoteDrawAfterEnd = function(self, note)
-	local x, y = self:whereWillLineNoteDraw(note)
 	local data = self.data[note.id]["Head"]
 	local speedSign = sign(self.speed)
 	return data.fx * x * speedSign > 0 or data.fy * y * speedSign > 0
