@@ -46,7 +46,14 @@ ShortGraphicalNote.reload = function(self)
 end
 
 ShortGraphicalNote.getColor = function(self)
-	return self.noteSkin:getShortNoteColor(self)
+	local color = self.noteSkin.color
+	if self.logicalNote.state == "clear" or self.logicalNote.state == "skipped" then
+		return color.clear
+	elseif self.logicalNote.state == "missed" then
+		return color.missed
+	elseif self.logicalNote.state == "passed" then
+		return color.passed
+	end
 end
 
 ShortGraphicalNote.getLayer = function(self)
@@ -62,31 +69,79 @@ ShortGraphicalNote.getContainer = function(self)
 end
 
 ShortGraphicalNote.getX = function(self)
-	return self.noteSkin:getShortNoteX(self)
+	local data = self.noteSkin.data[self.id]["Head"]
+	return
+		data.x
+		+ data.fx * self.noteSkin:getVisualTimeRate()
+			* (self.startNoteData.timePoint.currentVisualTime - self.engine.currentTime)
+		+ data.ox * self.noteSkin:getNoteWidth(self, "Head")
 end
 
 ShortGraphicalNote.getY = function(self)
-	return self.noteSkin:getShortNoteY(self)
+	local data = self.noteSkin.data[self.id]["Head"]
+	return
+		data.y
+		+ data.fy * self.noteSkin:getVisualTimeRate()
+			* (self.startNoteData.timePoint.currentVisualTime - self.engine.currentTime)
+		+ data.oy * self.noteSkin:getNoteHeight(self, "Head")
 end
 
 ShortGraphicalNote.getScaleX = function(self)
-	return self.noteSkin:getNoteScaleX(self, "Head")
+	return
+		self.noteSkin:getNoteWidth(self, "Head") /
+		self.noteSkin:getCS(self):x(self.noteSkin:getNoteImage(self, "Head"):getWidth())
 end
 
 ShortGraphicalNote.getScaleY = function(self)
-	return self.noteSkin:getNoteScaleY(self, "Head")
+	return
+		self.noteSkin:getNoteHeight(self, "Head") /
+		self.noteSkin:getCS(self):y(self:getNoteImage(self, "Head"):getHeight())
 end
 
+ShortGraphicalNote.whereWillDraw = function(self)
+	local shortNoteY = self:getY()
+	local shortNoteHeight = self.noteSkin:getNoteHeight(self, "Head")
+	local shortNoteX = self:getX()
+	local shortNoteWidth = self.noteSkin:getNoteWidth(self, "Head")
+	
+	local cs = self.noteSkin:getCS(self)
+	
+	local allcs = self.noteSkin.allcs
+	local x, y
+	if (allcs:x(cs:X(shortNoteX + shortNoteWidth, true), true) > 0) and (allcs:x(cs:X(shortNoteX, true), true) < 1) then
+		x = 0
+	elseif allcs:x(cs:X(shortNoteX, true), true) >= 1 then
+		x = 1
+	elseif allcs:x(cs:X(shortNoteX + shortNoteWidth, true), true) <= 0 then
+		x = -1
+	end
+	if (allcs:y(cs:Y(shortNoteY + shortNoteHeight, true), true) > 0) and (allcs:y(cs:Y(shortNoteY, true), true) < 1) then
+		y = 0
+	elseif allcs:y(cs:Y(shortNoteY, true), true) >= 1 then
+		y = 1
+	elseif allcs:y(cs:Y(shortNoteY + shortNoteHeight, true), true) <= 0 then
+		y = -1
+	end
+	
+	return x, y
+end
 ShortGraphicalNote.willDraw = function(self)
-	return self.noteSkin:willShortNoteDraw(self)
+	local x, y = self:whereWillDraw(self)
+	return x == 0 and y == 0
 end
 
 ShortGraphicalNote.willDrawBeforeStart = function(self)
-	return self.noteSkin:willShortNoteDrawBeforeStart(self)
+	local x, y = self:whereWillDraw(self)
+	local data = self.noteSkin.data[self.id]["Head"]
+	local visualTimeRate = self.noteSkin.visualTimeRate
+	return data.fx * x * visualTimeRate < 0 or data.fy * y * visualTimeRate < 0
 end
 
 ShortGraphicalNote.willDrawAfterEnd = function(self)
-	return self.noteSkin:willShortNoteDrawAfterEnd(self)
+	local x, y = self:whereWillDraw(self)
+	local data = self.noteSkin.data[self.id]["Head"]
+	local visualTimeRate = self.noteSkin.visualTimeRate
+	return data.fx * x * visualTimeRate > 0 or data.fy * y * visualTimeRate > 0
 end
 
 return ShortGraphicalNote
