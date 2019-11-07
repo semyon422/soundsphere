@@ -16,9 +16,9 @@ end
 TimeRate.apply = function(self)
 	local engine = self.sequence.manager.engine
 	engine.score.timeRate = true
-	engine.rate = self.value
-	engine.targetRate = self.value
-	engine:setRate(self.value)
+	engine.timeRate = self.value
+	engine.targetTimeRate = self.value
+	engine:setTimeRate(self.value)
 end
 
 return TimeRate

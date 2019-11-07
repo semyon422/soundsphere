@@ -14,8 +14,8 @@ local CloudburstEngine = Class:new()
 
 CloudburstEngine.autoplay = false
 CloudburstEngine.paused = true
-CloudburstEngine.rate = 1
-CloudburstEngine.targetRate = 1
+CloudburstEngine.timeRate = 1
+CloudburstEngine.targetTimeRate = 1
 
 CloudburstEngine.load = function(self)
 	self.observable = Observable:new()
@@ -44,9 +44,9 @@ CloudburstEngine.update = function(self, dt)
 	self.bgaContainer:update()
 	self.fgaContainer:update()
 	
-	if self.rateTween then
-		self.rateTween:update(dt)
-		self:updateRate()
+	if self.timeRateTween then
+		self.timeRateTween:update(dt)
+		self:updateTimeRate()
 	end
 	
 	self:updateTimeManager(dt)
@@ -158,20 +158,20 @@ CloudburstEngine.receive = function(self, event)
 				text = "visualTimeRate: " .. NoteSkin.targetVisualTimeRate
 			})
 		elseif key == "f5" then
-			if self.targetRate - delta >= 0.1 then
-				self.targetRate = self.targetRate - delta
-				self:setRate(self.targetRate)
+			if self.targetTimeRate - delta >= 0.1 then
+				self.targetTimeRate = self.targetTimeRate - delta
+				self:setTimeRate(self.targetTimeRate)
 			end
 			return self.observable:send({
 				name = "notify",
-				text = "rate: " .. self.targetRate
+				text = "timeRate: " .. self.targetTimeRate
 			})
 		elseif key == "f6" then
-			self.targetRate = self.targetRate + delta
-			self:setRate(self.targetRate)
+			self.targetTimeRate = self.targetTimeRate + delta
+			self:setTimeRate(self.targetTimeRate)
 			return self.observable:send({
 				name = "notify",
-				text = "rate: " .. self.targetRate
+				text = "timeRate: " .. self.targetTimeRate
 			})
 		end
 	end
@@ -194,7 +194,7 @@ CloudburstEngine.playAudio = function(self, paths, layer, keysound, stream)
 		if audio then
 			audio.offset = self.timeManager.currentTime
 			audio:play()
-			audio:setRate(self.rate)
+			audio:setRate(self.timeRate)
 			audio:setBaseVolume(paths[i][2])
 			if layer == "bga" then
 				self.bgaContainer:add(audio)
@@ -225,21 +225,21 @@ CloudburstEngine.pause = function(self)
 	end
 end
 
-CloudburstEngine.setRate = function(self, rate)
-	self.rateTween = tween.new(0.25, self, {rate = rate}, "inOutQuad")
+CloudburstEngine.setTimeRate = function(self, timeRate)
+	self.timeRateTween = tween.new(0.25, self, {timeRate = timeRate}, "inOutQuad")
 end
 
-CloudburstEngine.updateRate = function(self)
-	self.score.rate = self.rate
-	self.noteSkin.rate = self.rate
-	self.timeManager:setRate(self.rate)
-	self.bga:setRate(self.rate)
+CloudburstEngine.updateTimeRate = function(self)
+	self.score.timeRate = self.timeRate
+	self.noteSkin.timeRate = self.timeRate
+	self.timeManager:setRate(self.timeRate)
+	self.bga:setTimeRate(self.timeRate)
 	
-	self.bgaContainer:setRate(self.rate)
-	self.fgaContainer:setRate(self.rate)
+	self.bgaContainer:setRate(self.timeRate)
+	self.fgaContainer:setRate(self.timeRate)
 	if self.pitch then
-		self.bgaContainer:setPitch(self.rate)
-		self.fgaContainer:setPitch(self.rate)
+		self.bgaContainer:setPitch(self.timeRate)
+		self.fgaContainer:setPitch(self.timeRate)
 	end
 end
 

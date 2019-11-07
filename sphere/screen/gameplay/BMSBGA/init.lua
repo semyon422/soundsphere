@@ -4,7 +4,7 @@ local NoteHandler		= require("sphere.screen.gameplay.BMSBGA.NoteHandler")
 
 local BMSBGA = Class:new()
 
-BMSBGA.rate = 1
+BMSBGA.timeRate = 1
 
 BMSBGA.construct = function(self)
 	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
@@ -77,11 +77,11 @@ BMSBGA.draw = function(self)
 	self:drawNoteHandlers()
 end
 
-BMSBGA.setRate = function(self, rate)
-	self.rate = rate
+BMSBGA.setTimeRate = function(self, timeRate)
+	self.timeRate = timeRate
 	if not self.noteHandlers then return end
 	for _, noteHandler in pairs(self.noteHandlers) do
-		noteHandler:setRate(rate)
+		noteHandler:setTimeRate(timeRate)
 	end
 end
 

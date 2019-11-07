@@ -32,9 +32,9 @@ VideoNote.update = function(self, dt)
 	end
 end
 
-VideoNote.setRate = function(self, rate)
+VideoNote.setTimeRate = function(self, timeRate)
 	if self.video then
-		self.video:setRate(rate)
+		self.video:setRate(timeRate)
 	end
 end
 
@@ -77,7 +77,7 @@ VideoNote.load = function(self)
 		self.video.getAdjustTime = function()
 			return self.engine.currentTime - deltaTime
 		end
-		self.video:setRate(self.bga.rate)
+		self.video:setRate(self.bga.timeRate)
 	end
 end
 

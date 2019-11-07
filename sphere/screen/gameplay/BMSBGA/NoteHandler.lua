@@ -76,12 +76,12 @@ NoteHandler.draw = function(self)
 	self.currentNote:draw()
 end
 
-NoteHandler.setRate = function(self, rate)
-	self.rate = rate
+NoteHandler.setTimeRate = function(self, timeRate)
+	self.timeRate = timeRate
 	
 	if not self.currentNote then return end
 	
-	self.currentNote:setRate(rate)
+	self.currentNote:setTimeRate(timeRate)
 end
 
 NoteHandler.pause = function(self)

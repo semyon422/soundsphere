@@ -29,7 +29,7 @@ ImageNote.update = function(self)
 	end
 end
 
-ImageNote.setRate = function(self) end
+ImageNote.setTimeRate = function(self) end
 ImageNote.pause = function(self) end
 ImageNote.play = function(self) end
 

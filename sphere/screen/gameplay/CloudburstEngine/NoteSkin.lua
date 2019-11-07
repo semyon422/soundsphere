@@ -25,7 +25,7 @@ NoteSkin.color = {
 
 NoteSkin.visualTimeRate = 1
 NoteSkin.targetVisualTimeRate = 1
-NoteSkin.rate = 1
+NoteSkin.timeRate = 1
 
 NoteSkin.construct = function(self)
 	self.allcs = CoordinateManager:getCS(0, 0, 0, 0, "all")
@@ -112,7 +112,7 @@ NoteSkin.setVisualTimeRate = function(self, visualTimeRate)
 end
 
 NoteSkin.getVisualTimeRate = function(self)
-	return self.visualTimeRate / self.rate
+	return self.visualTimeRate / self.timeRate
 end
 
 NoteSkin.getCS = function(self, note)
