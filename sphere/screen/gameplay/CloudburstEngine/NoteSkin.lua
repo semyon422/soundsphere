@@ -1,7 +1,6 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Container			= require("aqua.graphics.Container")
 local Image				= require("aqua.graphics.Image")
-local Rectangle			= require("aqua.graphics.Rectangle")
 local SpriteBatch		= require("aqua.graphics.SpriteBatch")
 local map				= require("aqua.math").map
 local sign				= require("aqua.math").sign
@@ -83,9 +82,6 @@ NoteSkin.loadContainers = function(self)
 		table.insert(self.containerList, container)
 	end
 	table.sort(self.containerList, sortContainers)
-	
-	self.rectangleContainer = Container:new()
-	table.insert(self.containerList, 1, self.rectangleContainer)
 end
 
 NoteSkin.update = function(self, dt)
@@ -145,21 +141,6 @@ NoteSkin.getNoteImage = function(self, note, part)
 	return self.images[self.data[note.id][part].image]
 end
 
-NoteSkin.getRectangleDrawable = function(self, note, part)
-	return Rectangle:new({
-		cs = self:getCS(note),
-		mode = "fill",
-		x = 0,
-		y = 0,
-		w = self:getLineNoteScaledWidth(note),
-		h = self:getLineNoteScaledHeight(note),
-		lineStyle = "rough",
-		lineWidth = 1,
-		layer = self:getNoteLayer(note, part),
-		color = self.color.clear
-	})
-end
-
 NoteSkin.getImageDrawable = function(self, note, part)
 	return Image:new({
 		cs = self:getCS(note),
@@ -175,10 +156,6 @@ end
 
 NoteSkin.getImageContainer = function(self, note, part)
 	return self.containers[self.data[note.id][part].image]
-end
-
-NoteSkin.getRectangleContainer = function(self, note, part)
-	return self.rectangleContainer
 end
 
 --------------------------------
@@ -550,6 +527,8 @@ NoteSkin.getLongNoteColor = function(self, note)
 	elseif logicalNote.state == "endMissedPassed" then
 		return color.endMissedPassed
 	end
+
+	return color.clear
 end
 
 return NoteSkin

@@ -1,7 +1,6 @@
 local Class					= require("aqua.util.Class")
 local ShortGraphicalNote	= require("sphere.screen.gameplay.CloudburstEngine.note.ShortGraphicalNote")
 local LongGraphicalNote		= require("sphere.screen.gameplay.CloudburstEngine.note.LongGraphicalNote")
-local LineGraphicalNote		= require("sphere.screen.gameplay.CloudburstEngine.note.LineGraphicalNote")
 
 local NoteDrawer = Class:new()
 
@@ -30,11 +29,11 @@ NoteDrawer.load = function(self)
 					noteType = "LongNote"
 				})
 			elseif noteData.noteType == "LineNoteStart" then
-				graphicalNote = LineGraphicalNote:new({
+				graphicalNote = LongGraphicalNote:new({
 					startNoteData = noteData,
 					endNoteData = noteData.endNoteData,
 					inputModeString = inputModeString,
-					noteType = "LineNote"
+					noteType = "LongNote"
 				})
 			elseif noteData.noteType == "SoundNote" then
 				graphicalNote = ShortGraphicalNote:new({
