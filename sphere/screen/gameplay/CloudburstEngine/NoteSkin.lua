@@ -23,8 +23,8 @@ NoteSkin.color = {
 	endMissedPassed = {127, 127, 127, 255}
 }
 
-NoteSkin.speed = 1
-NoteSkin.targetSpeed = 1
+NoteSkin.visualTimeRate = 1
+NoteSkin.targetVisualTimeRate = 1
 NoteSkin.rate = 1
 
 NoteSkin.construct = function(self)
@@ -85,8 +85,8 @@ NoteSkin.loadContainers = function(self)
 end
 
 NoteSkin.update = function(self, dt)
-	if self.speedTween and self.updateTween then
-		self.speedTween:update(dt)
+	if self.visualTimeRateTween and self.updateTween then
+		self.visualTimeRateTween:update(dt)
 	end
 	
 	for _, container in ipairs(self.containerList) do
@@ -100,19 +100,19 @@ NoteSkin.draw = function(self)
 	end
 end
 
-NoteSkin.setSpeed = function(self, speed)
-	if speed * self.speed < 0 then
-		self.speed = speed
+NoteSkin.setVisualTimeRate = function(self, visualTimeRate)
+	if visualTimeRate * self.visualTimeRate < 0 then
+		self.visualTimeRate = visualTimeRate
 		self.updateTween = false
 	else
 		self.updateTween = true
-		self.speedTween = tween.new(0.25, self, {speed = speed}, "inOutQuad")
+		self.visualTimeRateTween = tween.new(0.25, self, {visualTimeRate = visualTimeRate}, "inOutQuad")
 	end
-	Config.data.speed = speed
+	Config.data.speed = visualTimeRate
 end
 
-NoteSkin.getSpeed = function(self)
-	return self.speed / self.rate
+NoteSkin.getVisualTimeRate = function(self)
+	return self.visualTimeRate / self.rate
 end
 
 NoteSkin.getCS = function(self, note)
@@ -161,19 +161,11 @@ end
 --------------------------------
 -- get*X get*Y
 --------------------------------
-NoteSkin.getShortNoteX = function(self, note)
-	local data = self.data[note.id]["Head"]
-	return
-		data.x
-		+ data.fx * self:getSpeed()
-			* (note.startNoteData.timePoint.currentVisualTime - note.engine.currentTime)
-		+ data.ox * self:getNoteWidth(note, "Head")
-end
 NoteSkin.getLongNoteHeadX = function(self, note)
 	local data = self.data[note.id]["Head"]
 	return
 		data.x
-		+ data.fx * self:getSpeed()
+		+ data.fx * self:getVisualTimeRate()
 			* ((note:getFakeVisualStartTime() or note.startNoteData.timePoint.currentVisualTime) - note.engine.currentTime)
 		+ data.ox * self:getNoteWidth(note, "Head")
 end
@@ -182,16 +174,16 @@ NoteSkin.getLongNoteTailX = function(self, note)
 	local dataTail = self.data[note.id]["Tail"]
 	return
 		dataHead.x
-		+ dataHead.fx * self:getSpeed()
+		+ dataHead.fx * self:getVisualTimeRate()
 			* (note.endNoteData.timePoint.currentVisualTime - note.engine.currentTime)
 		+ dataTail.ox * self:getNoteWidth(note, "Tail")
 end
 NoteSkin.getLongNoteBodyX = function(self, note)
 	local dataHead = self.data[note.id]["Head"]
 	local dataBody = self.data[note.id]["Body"]
-	local speedSign = sign(self.speed)
+	local visualTimeRateSign = sign(self.visualTimeRate)
 	local dt
-	if dataHead.fx * speedSign <= 0 then
+	if dataHead.fx * visualTimeRateSign <= 0 then
 		dt = note.endNoteData.timePoint.currentVisualTime - note.engine.currentTime
 	else
 		dt = (note:getFakeVisualStartTime() or note.startNoteData.timePoint.currentVisualTime) - note.engine.currentTime
@@ -199,23 +191,15 @@ NoteSkin.getLongNoteBodyX = function(self, note)
 	
 	return
 		dataHead.x
-		+ dataHead.fx * self:getSpeed() * dt
+		+ dataHead.fx * self:getVisualTimeRate() * dt
 		+ dataBody.ox * self:getNoteWidth(note, "Head")
 end
 
-NoteSkin.getShortNoteY = function(self, note)
-	local data = self.data[note.id]["Head"]
-	return
-		data.y
-		+ data.fy * self:getSpeed()
-			* (note.startNoteData.timePoint.currentVisualTime - note.engine.currentTime)
-		+ data.oy * self:getNoteHeight(note, "Head")
-end
 NoteSkin.getLongNoteHeadY = function(self, note)
 	local data = self.data[note.id]["Head"]
 	return
 		data.y
-		+ data.fy * self:getSpeed()
+		+ data.fy * self:getVisualTimeRate()
 			* ((note:getFakeVisualStartTime() or note.startNoteData.timePoint.currentVisualTime) - note.engine.currentTime)
 		+ data.oy * self:getNoteHeight(note, "Head")
 end
@@ -224,16 +208,16 @@ NoteSkin.getLongNoteTailY = function(self, note)
 	local dataTail = self.data[note.id]["Tail"]
 	return
 		dataHead.y
-		+ dataHead.fy * self:getSpeed()
+		+ dataHead.fy * self:getVisualTimeRate()
 			* (note.endNoteData.timePoint.currentVisualTime - note.engine.currentTime)
 		+ dataTail.oy * self:getNoteHeight(note, "Tail")
 end
 NoteSkin.getLongNoteBodyY = function(self, note)
 	local dataHead = self.data[note.id]["Head"]
 	local dataBody = self.data[note.id]["Body"]
-	local speedSign = sign(self.speed)
+	local visualTimeRateSign = sign(self.visualTimeRate)
 	local dt
-	if dataHead.fy * speedSign <= 0 then
+	if dataHead.fy * visualTimeRateSign <= 0 then
 		dt = note.endNoteData.timePoint.currentVisualTime - note.engine.currentTime
 	else
 		dt = (note:getFakeVisualStartTime() or note.startNoteData.timePoint.currentVisualTime) - note.engine.currentTime
@@ -241,7 +225,7 @@ NoteSkin.getLongNoteBodyY = function(self, note)
 	
 	return
 		dataHead.y
-		+ dataHead.fy * self:getSpeed() * dt
+		+ dataHead.fy * self:getVisualTimeRate() * dt
 		+ dataBody.oy * self:getNoteHeight(note, "Head")
 end
 
@@ -262,13 +246,13 @@ end
 NoteSkin.getNoteScaleX = function(self, note, part)
 	local data = self.data[note.id][part]
 	if part == "Body" then
-		local speedSign = sign(self.speed)
+		local visualTimeRateSign = sign(self.visualTimeRate)
 		return
 			(
 				math.max(
 					self.data[note.id]["Head"].fx *
 					(self:getLongNoteTailX(note) - self:getLongNoteHeadX(note)) *
-					speedSign,
+					visualTimeRateSign,
 					0
 				)
 				+ data.w
@@ -281,13 +265,13 @@ end
 NoteSkin.getNoteScaleY = function(self, note, part)
 	local data = self.data[note.id][part]
 	if part == "Body" then
-		local speedSign = sign(self.speed)
+		local visualTimeRateSign = sign(self.visualTimeRate)
 		return
 			math.abs(
 				math.max(
 					self.data[note.id]["Head"].fy *
 					(self:getLongNoteTailY(note) - self:getLongNoteHeadY(note)) *
-					speedSign,
+					visualTimeRateSign,
 					0
 				)
 				+ data.h
@@ -300,49 +284,6 @@ end
 --------------------------------
 -- will*Draw
 --------------------------------
-NoteSkin.whereWillShortNoteDraw = function(self, note)
-	local shortNoteY = self:getShortNoteY(note)
-	local shortNoteHeight = self:getNoteHeight(note, "Head")
-	local shortNoteX = self:getShortNoteX(note)
-	local shortNoteWidth = self:getNoteWidth(note, "Head")
-	
-	local cs = self:getCS(note)
-	
-	local x, y
-	if (self.allcs:x(cs:X(shortNoteX + shortNoteWidth, true), true) > 0) and (self.allcs:x(cs:X(shortNoteX, true), true) < 1) then
-		x = 0
-	elseif self.allcs:x(cs:X(shortNoteX, true), true) >= 1 then
-		x = 1
-	elseif self.allcs:x(cs:X(shortNoteX + shortNoteWidth, true), true) <= 0 then
-		x = -1
-	end
-	if (self.allcs:y(cs:Y(shortNoteY + shortNoteHeight, true), true) > 0) and (self.allcs:y(cs:Y(shortNoteY, true), true) < 1) then
-		y = 0
-	elseif self.allcs:y(cs:Y(shortNoteY, true), true) >= 1 then
-		y = 1
-	elseif self.allcs:y(cs:Y(shortNoteY + shortNoteHeight, true), true) <= 0 then
-		y = -1
-	end
-	
-	return x, y
-end
-NoteSkin.willShortNoteDraw = function(self, note)
-	local x, y = self:whereWillShortNoteDraw(note)
-	return x == 0 and y == 0
-end
-NoteSkin.willShortNoteDrawBeforeStart = function(self, note)
-	local x, y = self:whereWillShortNoteDraw(note)
-	local data = self.data[note.id]["Head"]
-	local speedSign = sign(self.speed)
-	return data.fx * x * speedSign < 0 or data.fy * y * speedSign < 0
-end
-NoteSkin.willShortNoteDrawAfterEnd = function(self, note)
-	local x, y = self:whereWillShortNoteDraw(note)
-	local data = self.data[note.id]["Head"]
-	local speedSign = sign(self.speed)
-	return data.fx * x * speedSign > 0 or data.fy * y * speedSign > 0
-end
-
 NoteSkin.whereWillLongNoteDraw = function(self, note)
 	local longNoteHeadX = self:getLongNoteHeadX(note)
 	local longNoteHeadY = self:getLongNoteHeadY(note)
@@ -389,29 +330,19 @@ end
 NoteSkin.willLongNoteDrawBeforeStart = function(self, note)
 	local x, y = self:whereWillLongNoteDraw(note)
 	local data = self.data[note.id]["Head"]
-	local speedSign = sign(self.speed)
-	return data.fx * x * speedSign < 0 or data.fy * y * speedSign < 0
+	local visualTimeRateSign = sign(self.visualTimeRate)
+	return data.fx * x * visualTimeRateSign < 0 or data.fy * y * visualTimeRateSign < 0
 end
 NoteSkin.willLongNoteDrawAfterEnd = function(self, note)
 	local x, y = self:whereWillLongNoteDraw(note)
 	local data = self.data[note.id]["Head"]
-	local speedSign = sign(self.speed)
-	return data.fx * x * speedSign > 0 or data.fy * y * speedSign > 0
+	local visualTimeRateSign = sign(self.visualTimeRate)
+	return data.fx * x * visualTimeRateSign > 0 or data.fy * y * visualTimeRateSign > 0
 end
 
 --------------------------------
 -- get*Color
 --------------------------------
-NoteSkin.getShortNoteColor = function(self, note)
-	local color = self.color
-	if note.logicalNote.state == "clear" or note.logicalNote.state == "skipped" then
-		return color.clear
-	elseif note.logicalNote.state == "missed" then
-		return color.missed
-	elseif note.logicalNote.state == "passed" then
-		return color.passed
-	end
-end
 
 NoteSkin.getLongNoteColor = function(self, note)
 	local logicalNote = note.logicalNote

@@ -36,8 +36,8 @@ CloudburstEngine.load = function(self)
 	self:loadNoteDrawers()
 	self:loadTimeManager()
 	
-	NoteSkin.speed = Config.data.speed
-	NoteSkin.targetSpeed = Config.data.speed
+	NoteSkin.visualTimeRate = Config.data.speed
+	NoteSkin.targetVisualTimeRate = Config.data.speed
 end
 
 CloudburstEngine.update = function(self, dt)
@@ -127,35 +127,35 @@ CloudburstEngine.receive = function(self, event)
 			delta = 0.1
 		end
 		if key == "f2" then
-			NoteSkin.targetSpeed = -NoteSkin.targetSpeed
-			NoteSkin:setSpeed(NoteSkin.targetSpeed)
+			NoteSkin.targetVisualTimeRate = -NoteSkin.targetVisualTimeRate
+			NoteSkin:setVisualTimeRate(NoteSkin.targetVisualTimeRate)
 			return self.observable:send({
 				name = "notify",
-				text = "speed: " .. NoteSkin.targetSpeed
+				text = "visualTimeRate: " .. NoteSkin.targetVisualTimeRate
 			})
 		elseif key == "f3" then
-			if math.abs(NoteSkin.targetSpeed - delta) > 0.001 then
-				NoteSkin.targetSpeed = NoteSkin.targetSpeed - delta
-				NoteSkin:setSpeed(NoteSkin.targetSpeed)
+			if math.abs(NoteSkin.targetVisualTimeRate - delta) > 0.001 then
+				NoteSkin.targetVisualTimeRate = NoteSkin.targetVisualTimeRate - delta
+				NoteSkin:setVisualTimeRate(NoteSkin.targetVisualTimeRate)
 			else
-				NoteSkin.targetSpeed = 0
-				NoteSkin:setSpeed(NoteSkin.targetSpeed)
+				NoteSkin.targetVisualTimeRate = 0
+				NoteSkin:setVisualTimeRate(NoteSkin.targetVisualTimeRate)
 			end
 			return self.observable:send({
 				name = "notify",
-				text = "speed: " .. NoteSkin.targetSpeed
+				text = "visualTimeRate: " .. NoteSkin.targetVisualTimeRate
 			})
 		elseif key == "f4" then
-			if math.abs(NoteSkin.targetSpeed + delta) > 0.001 then
-				NoteSkin.targetSpeed = NoteSkin.targetSpeed + delta
-				NoteSkin:setSpeed(NoteSkin.targetSpeed)
+			if math.abs(NoteSkin.targetVisualTimeRate + delta) > 0.001 then
+				NoteSkin.targetVisualTimeRate = NoteSkin.targetVisualTimeRate + delta
+				NoteSkin:setVisualTimeRate(NoteSkin.targetVisualTimeRate)
 			else
-				NoteSkin.targetSpeed = 0
-				NoteSkin:setSpeed(NoteSkin.targetSpeed)
+				NoteSkin.targetVisualTimeRate = 0
+				NoteSkin:setVisualTimeRate(NoteSkin.targetVisualTimeRate)
 			end
 			return self.observable:send({
 				name = "notify",
-				text = "speed: " .. NoteSkin.targetSpeed
+				text = "visualTimeRate: " .. NoteSkin.targetVisualTimeRate
 			})
 		elseif key == "f5" then
 			if self.targetRate - delta >= 0.1 then
