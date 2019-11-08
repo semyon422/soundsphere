@@ -162,15 +162,4 @@ NoteSkin.getImageContainer = function(self, note, part)
 	return self.containers[self.data[note.id][part].image]
 end
 
---------------------------------
--- get*Width get*Height
---------------------------------
-NoteSkin.getNoteWidth = function(self, note, part)
-	return self.data[note.id][part].w
-end
-
-NoteSkin.getNoteHeight = function(self, note, part)
-	return self.data[note.id][part].h
-end
-
 return NoteSkin

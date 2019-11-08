@@ -181,13 +181,37 @@ LongGraphicalNote.getBodyContainer = function(self)
 	return self.noteSkin:getImageContainer(self, "Body")
 end
 
+LongGraphicalNote.getHeadWidth = function(self)
+	return self.noteSkin.data[self.id]["Head"].w
+end
+
+LongGraphicalNote.getTailHeight = function(self)
+	return self.noteSkin.data[self.id]["Tail"].h
+end
+
+LongGraphicalNote.getBodyWidth = function(self)
+	return self.noteSkin.data[self.id]["Body"].w
+end
+
+LongGraphicalNote.getHeadHeight = function(self)
+	return self.noteSkin.data[self.id]["Head"].h
+end
+
+LongGraphicalNote.getTailWidth = function(self)
+	return self.noteSkin.data[self.id]["Tail"].w
+end
+
+LongGraphicalNote.getBodyHeight = function(self)
+	return self.noteSkin.data[self.id]["Body"].h
+end
+
 LongGraphicalNote.getHeadX = function(self)
 	local data = self.noteSkin.data[self.id]["Head"]
 	return
 		data.x
 		+ data.fx * self.noteSkin:getVisualTimeRate()
 			* ((self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime) - self.engine.currentTime)
-		+ data.ox * self.noteSkin:getNoteWidth(self, "Head")
+		+ data.ox * self:getHeadWidth()
 end
 LongGraphicalNote.getTailX = function(self)
 	local dataHead = self.noteSkin.data[self.id]["Head"]
@@ -196,7 +220,7 @@ LongGraphicalNote.getTailX = function(self)
 		dataHead.x
 		+ dataHead.fx * self.noteSkin:getVisualTimeRate()
 			* (self.endNoteData.timePoint.currentVisualTime - self.engine.currentTime)
-		+ dataTail.ox * self.noteSkin:getNoteWidth(self, "Tail")
+		+ dataTail.ox * self:getTailWidth()
 end
 LongGraphicalNote.getBodyX = function(self)
 	local dataHead = self.noteSkin.data[self.id]["Head"]
@@ -212,7 +236,7 @@ LongGraphicalNote.getBodyX = function(self)
 	return
 		dataHead.x
 		+ dataHead.fx * self.noteSkin:getVisualTimeRate() * dt
-		+ dataBody.ox * self.noteSkin:getNoteWidth(self, "Head")
+		+ dataBody.ox * self:getHeadWidth()
 end
 
 LongGraphicalNote.getHeadY = function(self)
@@ -221,7 +245,7 @@ LongGraphicalNote.getHeadY = function(self)
 		data.y
 		+ data.fy * self.noteSkin:getVisualTimeRate()
 			* ((self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime) - self.engine.currentTime)
-		+ data.oy * self.noteSkin:getNoteHeight(self, "Head")
+		+ data.oy * self:getHeadHeight()
 end
 LongGraphicalNote.getTailY = function(self)
 	local dataHead = self.noteSkin.data[self.id]["Head"]
@@ -230,7 +254,7 @@ LongGraphicalNote.getTailY = function(self)
 		dataHead.y
 		+ dataHead.fy * self.noteSkin:getVisualTimeRate()
 			* (self.endNoteData.timePoint.currentVisualTime - self.engine.currentTime)
-		+ dataTail.oy * self.noteSkin:getNoteHeight(self, "Tail")
+		+ dataTail.oy * self:getTailHeight()
 end
 LongGraphicalNote.getBodyY = function(self)
 	local dataHead = self.noteSkin.data[self.id]["Head"]
@@ -246,14 +270,14 @@ LongGraphicalNote.getBodyY = function(self)
 	return
 		dataHead.y
 		+ dataHead.fy * self.noteSkin:getVisualTimeRate() * dt
-		+ dataBody.oy * self.noteSkin:getNoteHeight(self, "Head")
+		+ dataBody.oy * self:getHeadHeight()
 end
 
 LongGraphicalNote.getHeadScaleX = function(self)
-	return self.noteSkin:getNoteWidth(self, "Head") / self.noteSkin:getCS(self):x(self.noteSkin:getNoteImage(self, "Head"):getWidth())
+	return self:getHeadWidth() / self.noteSkin:getCS(self):x(self.noteSkin:getNoteImage(self, "Head"):getWidth())
 end
 LongGraphicalNote.getTailScaleX = function(self)
-	return self.noteSkin:getNoteWidth(self, "Tail") / self.noteSkin:getCS(self):x(self.noteSkin:getNoteImage(self, "Tail"):getWidth())
+	return self:getTailWidth() / self.noteSkin:getCS(self):x(self.noteSkin:getNoteImage(self, "Tail"):getWidth())
 end
 LongGraphicalNote.getBodyScaleX = function(self)
 	local data = self.noteSkin.data[self.id]["Body"]
@@ -271,10 +295,10 @@ LongGraphicalNote.getBodyScaleX = function(self)
 end
 
 LongGraphicalNote.getHeadScaleY = function(self)
-	return self.noteSkin:getNoteHeight(self, "Head") / self.noteSkin:getCS(self):y(self.noteSkin:getNoteImage(self, "Head"):getHeight())
+	return self:getHeadHeight() / self.noteSkin:getCS(self):y(self.noteSkin:getNoteImage(self, "Head"):getHeight())
 end
 LongGraphicalNote.getTailScaleY = function(self)
-	return self.noteSkin:getNoteHeight(self, "Tail") / self.noteSkin:getCS(self):y(self.noteSkin:getNoteImage(self, "Tail"):getHeight())
+	return self:getTailHeight() / self.noteSkin:getCS(self):y(self.noteSkin:getNoteImage(self, "Tail"):getHeight())
 end
 LongGraphicalNote.getBodyScaleY = function(self)
 	local data = self.noteSkin.data[self.id]["Body"]
@@ -296,10 +320,10 @@ LongGraphicalNote.whereWillDraw = function(self)
 	local longNoteHeadY = self:getHeadY()
 	local longNoteTailX = self:getTailX()
 	local longNoteTailY = self:getTailY()
-	local longNoteHeadWidth = self.noteSkin:getNoteWidth(self, "Head")
-	local longNoteHeadHeight = self.noteSkin:getNoteHeight(self, "Head")
-	local longNoteTailWidth = self.noteSkin:getNoteWidth(self, "Tail")
-	local longNoteTailHeight = self.noteSkin:getNoteHeight(self, "Tail")
+	local longNoteHeadWidth = self:getHeadWidth()
+	local longNoteHeadHeight = self:getHeadHeight()
+	local longNoteTailWidth = self:getTailWidth()
+	local longNoteTailHeight = self:getTailHeight()
 	
 	local cs = self.noteSkin:getCS(self)
 	

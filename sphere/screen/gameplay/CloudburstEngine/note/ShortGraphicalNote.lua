@@ -70,13 +70,21 @@ ShortGraphicalNote.getContainer = function(self)
 	return self.noteSkin:getImageContainer(self, "Head")
 end
 
+ShortGraphicalNote.getHeadWidth = function(self)
+	return self.noteSkin.data[self.id]["Head"].w
+end
+
+ShortGraphicalNote.getHeadHeight = function(self)
+	return self.noteSkin.data[self.id]["Head"].h
+end
+
 ShortGraphicalNote.getX = function(self)
 	local data = self.noteSkin.data[self.id]["Head"]
 	return
 		data.x
 		+ data.fx * self.noteSkin:getVisualTimeRate()
 			* (self.startNoteData.timePoint.currentVisualTime - self.engine.currentTime)
-		+ data.ox * self.noteSkin:getNoteWidth(self, "Head")
+		+ data.ox * self:getHeadWidth()
 end
 
 ShortGraphicalNote.getY = function(self)
@@ -85,26 +93,26 @@ ShortGraphicalNote.getY = function(self)
 		data.y
 		+ data.fy * self.noteSkin:getVisualTimeRate()
 			* (self.startNoteData.timePoint.currentVisualTime - self.engine.currentTime)
-		+ data.oy * self.noteSkin:getNoteHeight(self, "Head")
+		+ data.oy * self:getHeadHeight()
 end
 
 ShortGraphicalNote.getScaleX = function(self)
 	return
-		self.noteSkin:getNoteWidth(self, "Head") /
+		self:getHeadWidth() /
 		self.noteSkin:getCS(self):x(self.noteSkin:getNoteImage(self, "Head"):getWidth())
 end
 
 ShortGraphicalNote.getScaleY = function(self)
 	return
-		self.noteSkin:getNoteHeight(self, "Head") /
+		self:getHeadHeight() /
 		self.noteSkin:getCS(self):y(self.noteSkin:getNoteImage(self, "Head"):getHeight())
 end
 
 ShortGraphicalNote.whereWillDraw = function(self)
 	local shortNoteY = self:getY()
-	local shortNoteHeight = self.noteSkin:getNoteHeight(self, "Head")
+	local shortNoteHeight = self:getHeadHeight()
 	local shortNoteX = self:getX()
-	local shortNoteWidth = self.noteSkin:getNoteWidth(self, "Head")
+	local shortNoteWidth = self:getHeadWidth()
 	
 	local cs = self.noteSkin:getCS(self)
 	
