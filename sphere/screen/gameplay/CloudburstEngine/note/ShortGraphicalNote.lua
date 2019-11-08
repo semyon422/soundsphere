@@ -16,6 +16,8 @@ ShortGraphicalNote.update = function(self)
 	else
 		self.drawable.y = self:getY()
 		self.drawable.x = self:getX()
+		self.drawable.sx = self:getScaleX()
+		self.drawable.sy = self:getScaleY()
 		self.drawable:reload()
 		self.drawable.color = self:getColor()
 	end
@@ -95,7 +97,7 @@ end
 ShortGraphicalNote.getScaleY = function(self)
 	return
 		self.noteSkin:getNoteHeight(self, "Head") /
-		self.noteSkin:getCS(self):y(self:getNoteImage(self, "Head"):getHeight())
+		self.noteSkin:getCS(self):y(self.noteSkin:getNoteImage(self, "Head"):getHeight())
 end
 
 ShortGraphicalNote.whereWillDraw = function(self)

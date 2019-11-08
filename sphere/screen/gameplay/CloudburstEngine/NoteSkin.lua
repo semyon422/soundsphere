@@ -115,6 +115,10 @@ NoteSkin.getVisualTimeRate = function(self)
 	return self.visualTimeRate / self.timeRate
 end
 
+NoteSkin.getVisualTimeRateSign = function(self)
+	return sign(self.visualTimeRate)
+end
+
 NoteSkin.getCS = function(self, note)
 	return self.cses[self.data[note.id]["Head"].cs]
 end
@@ -146,8 +150,8 @@ NoteSkin.getImageDrawable = function(self, note, part)
 		cs = self:getCS(note),
 		x = 0,
 		y = 0,
-		sx = self:getNoteScaleX(note, part),
-		sy = self:getNoteScaleY(note, part),
+		sx = 0,
+		sy = 0,
 		image = self:getNoteImage(note, part),
 		layer = self:getNoteLayer(note, part),
 		color = self.color.clear
@@ -159,77 +163,6 @@ NoteSkin.getImageContainer = function(self, note, part)
 end
 
 --------------------------------
--- get*X get*Y
---------------------------------
-NoteSkin.getLongNoteHeadX = function(self, note)
-	local data = self.data[note.id]["Head"]
-	return
-		data.x
-		+ data.fx * self:getVisualTimeRate()
-			* ((note:getFakeVisualStartTime() or note.startNoteData.timePoint.currentVisualTime) - note.engine.currentTime)
-		+ data.ox * self:getNoteWidth(note, "Head")
-end
-NoteSkin.getLongNoteTailX = function(self, note)
-	local dataHead = self.data[note.id]["Head"]
-	local dataTail = self.data[note.id]["Tail"]
-	return
-		dataHead.x
-		+ dataHead.fx * self:getVisualTimeRate()
-			* (note.endNoteData.timePoint.currentVisualTime - note.engine.currentTime)
-		+ dataTail.ox * self:getNoteWidth(note, "Tail")
-end
-NoteSkin.getLongNoteBodyX = function(self, note)
-	local dataHead = self.data[note.id]["Head"]
-	local dataBody = self.data[note.id]["Body"]
-	local visualTimeRateSign = sign(self.visualTimeRate)
-	local dt
-	if dataHead.fx * visualTimeRateSign <= 0 then
-		dt = note.endNoteData.timePoint.currentVisualTime - note.engine.currentTime
-	else
-		dt = (note:getFakeVisualStartTime() or note.startNoteData.timePoint.currentVisualTime) - note.engine.currentTime
-	end
-	
-	return
-		dataHead.x
-		+ dataHead.fx * self:getVisualTimeRate() * dt
-		+ dataBody.ox * self:getNoteWidth(note, "Head")
-end
-
-NoteSkin.getLongNoteHeadY = function(self, note)
-	local data = self.data[note.id]["Head"]
-	return
-		data.y
-		+ data.fy * self:getVisualTimeRate()
-			* ((note:getFakeVisualStartTime() or note.startNoteData.timePoint.currentVisualTime) - note.engine.currentTime)
-		+ data.oy * self:getNoteHeight(note, "Head")
-end
-NoteSkin.getLongNoteTailY = function(self, note)
-	local dataHead = self.data[note.id]["Head"]
-	local dataTail = self.data[note.id]["Tail"]
-	return
-		dataHead.y
-		+ dataHead.fy * self:getVisualTimeRate()
-			* (note.endNoteData.timePoint.currentVisualTime - note.engine.currentTime)
-		+ dataTail.oy * self:getNoteHeight(note, "Tail")
-end
-NoteSkin.getLongNoteBodyY = function(self, note)
-	local dataHead = self.data[note.id]["Head"]
-	local dataBody = self.data[note.id]["Body"]
-	local visualTimeRateSign = sign(self.visualTimeRate)
-	local dt
-	if dataHead.fy * visualTimeRateSign <= 0 then
-		dt = note.endNoteData.timePoint.currentVisualTime - note.engine.currentTime
-	else
-		dt = (note:getFakeVisualStartTime() or note.startNoteData.timePoint.currentVisualTime) - note.engine.currentTime
-	end
-	
-	return
-		dataHead.y
-		+ dataHead.fy * self:getVisualTimeRate() * dt
-		+ dataBody.oy * self:getNoteHeight(note, "Head")
-end
-
---------------------------------
 -- get*Width get*Height
 --------------------------------
 NoteSkin.getNoteWidth = function(self, note, part)
@@ -238,135 +171,6 @@ end
 
 NoteSkin.getNoteHeight = function(self, note, part)
 	return self.data[note.id][part].h
-end
-
---------------------------------
--- get*ScaleX get*ScaleY
---------------------------------
-NoteSkin.getNoteScaleX = function(self, note, part)
-	local data = self.data[note.id][part]
-	if part == "Body" then
-		local visualTimeRateSign = sign(self.visualTimeRate)
-		return
-			(
-				math.max(
-					self.data[note.id]["Head"].fx *
-					(self:getLongNoteTailX(note) - self:getLongNoteHeadX(note)) *
-					visualTimeRateSign,
-					0
-				)
-				+ data.w
-			) / self:getCS(note):x(self:getNoteImage(note, part):getWidth())
-	end
-	
-	return self:getNoteWidth(note, part) / self:getCS(note):x(self:getNoteImage(note, part):getWidth())
-end
-
-NoteSkin.getNoteScaleY = function(self, note, part)
-	local data = self.data[note.id][part]
-	if part == "Body" then
-		local visualTimeRateSign = sign(self.visualTimeRate)
-		return
-			math.abs(
-				math.max(
-					self.data[note.id]["Head"].fy *
-					(self:getLongNoteTailY(note) - self:getLongNoteHeadY(note)) *
-					visualTimeRateSign,
-					0
-				)
-				+ data.h
-			) / self:getCS(note):y(self:getNoteImage(note, part):getHeight())
-	end
-	
-	return self:getNoteHeight(note, part) / self:getCS(note):y(self:getNoteImage(note, part):getHeight())
-end
-
---------------------------------
--- will*Draw
---------------------------------
-NoteSkin.whereWillLongNoteDraw = function(self, note)
-	local longNoteHeadX = self:getLongNoteHeadX(note)
-	local longNoteHeadY = self:getLongNoteHeadY(note)
-	local longNoteTailX = self:getLongNoteTailX(note)
-	local longNoteTailY = self:getLongNoteTailY(note)
-	local longNoteHeadWidth = self:getNoteWidth(note, "Head")
-	local longNoteHeadHeight = self:getNoteHeight(note, "Head")
-	local longNoteTailWidth = self:getNoteWidth(note, "Tail")
-	local longNoteTailHeight = self:getNoteHeight(note, "Tail")
-	
-	local cs = self:getCS(note)
-	
-	local x, y
-	if
-		(self.allcs:x(cs:X(longNoteHeadX + longNoteHeadWidth, true), true) > 0) and (self.allcs:x(cs:X(longNoteHeadX, true), true) < 1) or
-		(self.allcs:x(cs:X(longNoteTailX + longNoteTailWidth, true), true) > 0) and (self.allcs:x(cs:X(longNoteTailX, true), true) < 1) or
-		self.allcs:x(cs:X(longNoteTailX + longNoteTailWidth, true), true) * self.allcs:x(cs:X(longNoteHeadX, true), true) < 0
-	then
-		x = 0
-	elseif self.allcs:x(cs:X(longNoteTailX, true), true) >= 1 then
-		x = 1
-	elseif self.allcs:x(cs:X(longNoteHeadX + longNoteHeadWidth, true), true) <= 0 then
-		x = -1
-	end
-	
-	if
-		(self.allcs:y(cs:Y(longNoteHeadY + longNoteHeadHeight, true), true) > 0) and (self.allcs:y(cs:Y(longNoteHeadY, true), true) < 1) or
-		(self.allcs:y(cs:Y(longNoteTailY + longNoteTailHeight, true), true) > 0) and (self.allcs:y(cs:Y(longNoteTailY, true), true) < 1) or
-		self.allcs:y(cs:Y(longNoteTailY + longNoteTailHeight, true), true) * self.allcs:y(cs:Y(longNoteHeadY, true), true) < 0
-	then
-		y = 0
-	elseif self.allcs:y(cs:Y(longNoteTailY, true), true) >= 1 then
-		y = 1
-	elseif self.allcs:y(cs:Y(longNoteHeadY + longNoteHeadHeight, true), true) <= 0 then
-		y = -1
-	end
-	
-	return x, y
-end
-NoteSkin.willLongNoteDraw = function(self, note)
-	local x, y = self:whereWillLongNoteDraw(note)
-	return x == 0 and y == 0
-end
-NoteSkin.willLongNoteDrawBeforeStart = function(self, note)
-	local x, y = self:whereWillLongNoteDraw(note)
-	local data = self.data[note.id]["Head"]
-	local visualTimeRateSign = sign(self.visualTimeRate)
-	return data.fx * x * visualTimeRateSign < 0 or data.fy * y * visualTimeRateSign < 0
-end
-NoteSkin.willLongNoteDrawAfterEnd = function(self, note)
-	local x, y = self:whereWillLongNoteDraw(note)
-	local data = self.data[note.id]["Head"]
-	local visualTimeRateSign = sign(self.visualTimeRate)
-	return data.fx * x * visualTimeRateSign > 0 or data.fy * y * visualTimeRateSign > 0
-end
-
---------------------------------
--- get*Color
---------------------------------
-
-NoteSkin.getLongNoteColor = function(self, note)
-	local logicalNote = note.logicalNote
-	
-	local color = self.color
-	if note.fakeStartTime and note.fakeStartTime >= note.endNoteData.timePoint.absoluteTime then
-		return color.transparent
-	elseif logicalNote.state == "clear" then
-		return color.clear
-	elseif logicalNote.state == "startMissed" then
-		return color.startMissed
-	elseif logicalNote.state == "startMissedPressed" then
-		return color.startMissedPressed
-	elseif logicalNote.state == "startPassedPressed" then
-		return color.startPassedPressed
-	elseif logicalNote.state == "endPassed" then
-		return color.endPassed
-	elseif logicalNote.state == "endMissed" then
-		return color.endMissed
-	elseif logicalNote.state == "endMissedPassed" then
-		return color.endMissedPassed
-	end
-
-	return color.clear
 end
 
 return NoteSkin
