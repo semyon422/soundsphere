@@ -10,6 +10,7 @@ local CustomScore				= require("sphere.screen.gameplay.CustomScore")
 local InputManager				= require("sphere.screen.gameplay.InputManager")
 local ModifierManager			= require("sphere.screen.gameplay.ModifierManager")
 local NoteSkinManager			= require("sphere.screen.gameplay.NoteSkinManager")
+local NoteSkinLoader			= require("sphere.screen.gameplay.NoteSkinLoader")
 local PauseOverlay				= require("sphere.screen.gameplay.PauseOverlay")
 local PlayField					= require("sphere.screen.gameplay.PlayField")
 local ProgressBar				= require("sphere.screen.gameplay.ProgressBar")
@@ -42,12 +43,9 @@ GameplayScreen.load = function(self)
 
 	InputManager:setInputMode(noteChart.inputMode:getString())
 	
-	local noteSkinData = NoteSkinManager:getNoteSkin(noteChart.inputMode)
-	
-	local noteSkin = NoteSkin:new({
-		directoryPath = noteSkinData.directoryPath,
-		noteSkinData = noteSkinData.noteSkin
-	})
+	local noteSkinMetaData = NoteSkinManager:getNoteSkinList(noteChart.inputMode)[1]
+	local noteSkin = NoteSkinLoader:load(noteSkinMetaData)
+	noteSkinMetaData = noteSkinMetaData or {}
 	
 	self.engine.noteChart = noteChart
 	self.engine.noteSkin = noteSkin
@@ -55,9 +53,9 @@ GameplayScreen.load = function(self)
 	self.engine.localAliases = {}
 	self.engine.globalAliases = {}
 	
-	self.playField.directoryPath = noteSkinData.directoryPath
-	self.playField.noteSkinData = noteSkinData.noteSkin
-	self.playField.playFieldData = noteSkinData.playField
+	self.playField.directoryPath = noteSkinMetaData.directoryPath
+	self.playField.noteSkinData = noteSkin
+	self.playField.playFieldData = noteSkin.playField
 	self.playField.noteSkin = noteSkin
 	self.playField.container = self.container
 	

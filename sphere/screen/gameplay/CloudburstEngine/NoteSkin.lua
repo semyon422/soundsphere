@@ -27,7 +27,7 @@ NoteSkin.visualTimeRate = 1
 NoteSkin.targetVisualTimeRate = 1
 NoteSkin.timeRate = 1
 
-NoteSkin.construct = function(self)
+NoteSkin.load = function(self)
 	self.allcs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 	
 	self.cses = {}
@@ -52,7 +52,7 @@ end
 
 local newImage = love.graphics.newImage
 NoteSkin.loadImage = function(self, imageData)
-	self.images[imageData.name] = newImage(self.directoryPath .. "/" .. imageData.path)
+	self.images[imageData.name] = newImage(self.metaData.directoryPath .. "/" .. imageData.path)
 end
 
 NoteSkin.loadImages = function(self)
