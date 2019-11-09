@@ -43,7 +43,7 @@ GameplayScreen.load = function(self)
 
 	InputManager:setInputMode(noteChart.inputMode:getString())
 	
-	local noteSkinMetaData = NoteSkinManager:getNoteSkinList(noteChart.inputMode)[1]
+	local noteSkinMetaData = NoteSkinManager:getMetaData(noteChart.inputMode)
 	local noteSkin = NoteSkinLoader:load(noteSkinMetaData)
 	noteSkinMetaData = noteSkinMetaData or {}
 	

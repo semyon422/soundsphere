@@ -1,9 +1,5 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Rectangle			= require("aqua.graphics.Rectangle")
-local TextFrame			= require("aqua.graphics.TextFrame")
-local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
-local ModifierDisplay	= require("sphere.screen.select.ModifierDisplay")
-local ModifierButton	= require("sphere.screen.select.ModifierMenu.ModifierButton")
 local ModifierList		= require("sphere.screen.select.ModifierMenu.ModifierList")
 local SequenceList		= require("sphere.screen.select.ModifierMenu.SequenceList")
 

@@ -1,5 +1,6 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Config			= require("sphere.config.Config")
+local NoteSkinManager	= require("sphere.screen.gameplay.NoteSkinManager")
 local Screen			= require("sphere.screen.Screen")
 local ScreenManager		= require("sphere.screen.ScreenManager")
 local Footer			= require("sphere.screen.select.Footer")
@@ -9,6 +10,7 @@ local ModifierDisplay	= require("sphere.screen.select.ModifierDisplay")
 local ModifierMenu		= require("sphere.screen.select.ModifierMenu")
 local NoteChartList		= require("sphere.screen.select.NoteChartList")
 local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
+local NoteSkinMenu		= require("sphere.screen.select.NoteSkinMenu")
 local PreviewManager	= require("sphere.screen.select.PreviewManager")
 local SearchLine		= require("sphere.screen.select.SearchLine")
 local SelectFrame		= require("sphere.screen.select.SelectFrame")
@@ -22,6 +24,7 @@ SelectScreen.init = function(self)
 	MetaDataTable:init()
 	ModifierDisplay:init()
 	ModifierMenu:init()
+	NoteSkinMenu:init()
 	SearchLine:init()
 	NoteChartList:init()
 	NoteChartSetList:init()
@@ -36,6 +39,7 @@ SelectScreen.init = function(self)
 end
 
 SelectScreen.load = function(self)
+	NoteSkinManager:load()
 	MetaDataTable:reload()
 	
 	NoteChartList:load()
@@ -66,6 +70,7 @@ SelectScreen.update = function(self)
 	PreviewManager:update()
 	
 	ModifierMenu:update()
+	NoteSkinMenu:update()
 end
 
 SelectScreen.draw = function(self)
@@ -83,12 +88,15 @@ SelectScreen.draw = function(self)
 	ModifierDisplay:draw()
 	
 	ModifierMenu:draw()
+	NoteSkinMenu:draw()
 end
 
 SelectScreen.receive = function(self, event)
 	local modifierMenuHidden = ModifierMenu.hidden
+	local noteSkinMenuHidden = NoteSkinMenu.hidden
 	ModifierMenu:receive(event)
-	if not modifierMenuHidden and event.name ~= "resize" then
+	NoteSkinMenu:receive(event)
+	if (not modifierMenuHidden or not noteSkinMenuHidden) and event.name ~= "resize" then
 		return
 	end
 	
