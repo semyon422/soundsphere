@@ -359,33 +359,71 @@ LongGraphicalNote.whereWillDrawY = function(self)
 	return y
 end
 
+LongGraphicalNote.whereWillDrawW = function(self)
+	local head = self.noteSkin:whereWillBelongSegment(self, "Head", "w", self:getHeadWidth())
+	local tail = self.noteSkin:whereWillBelongSegment(self, "Head", "w", self:getHeadWidth())
+	local body = self.noteSkin:whereWillBelongSegment(self, "Head", "w", self:getHeadWidth())
+
+	if head == 0 or tail == 0 or body == 0 or head * tail < 0 then
+		return 0
+	elseif head < 0 then
+		return -1
+	elseif tail > 0 then
+		return 1
+	end
+end
+
+LongGraphicalNote.whereWillDrawH = function(self)
+	local head = self.noteSkin:whereWillBelongSegment(self, "Head", "h", self:getHeadWidth())
+	local tail = self.noteSkin:whereWillBelongSegment(self, "Head", "h", self:getHeadWidth())
+	local body = self.noteSkin:whereWillBelongSegment(self, "Head", "h", self:getHeadWidth())
+
+	if head == 0 or tail == 0 or body == 0 or head * tail < 0 then
+		return 0
+	elseif head < 0 then
+		return -1
+	elseif tail > 0 then
+		return 1
+	end
+end
+
 LongGraphicalNote.whereWillDraw = function(self)
 	local x = self:whereWillDrawX()
 	local y = self:whereWillDrawY()
-	return x, y
+	local w = self:whereWillDrawW()
+	local h = self:whereWillDrawH()
+	return x, y, w, h
 end
 
 LongGraphicalNote.willDraw = function(self)
-	local x, y = self:whereWillDraw()
-	return x == 0 and y == 0
+	local x, y, w, h = self:whereWillDraw()
+	return
+		x == 0 and
+		y == 0 and
+		w == 0 and
+		h == 0
 end
 
 LongGraphicalNote.willDrawBeforeStart = function(self)
-	local x, y = self:whereWillDraw()
+	local x, y, w, h = self:whereWillDraw()
 	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	local visualTimeRate = self.noteSkin.visualTimeRate
 	return
 		self.noteSkin:getG(1, dt, self, "Head", "x") * x * visualTimeRate > 0 or
-		self.noteSkin:getG(1, dt, self, "Head", "x") * y * visualTimeRate > 0
+		self.noteSkin:getG(1, dt, self, "Head", "x") * y * visualTimeRate > 0 or
+		w * visualTimeRate > 0 or
+		h * visualTimeRate > 0
 end
 
 LongGraphicalNote.willDrawAfterEnd = function(self)
-	local x, y = self:whereWillDraw()
+	local x, y, w, h = self:whereWillDraw()
 	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	local visualTimeRate = self.noteSkin.visualTimeRate
 	return
 		self.noteSkin:getG(1, dt, self, "Head", "x") * x * visualTimeRate < 0 or
-		self.noteSkin:getG(1, dt, self, "Head", "y") * y * visualTimeRate < 0
+		self.noteSkin:getG(1, dt, self, "Head", "y") * y * visualTimeRate < 0 or
+		w * visualTimeRate < 0 or
+		h * visualTimeRate < 0
 end
 
 return LongGraphicalNote
