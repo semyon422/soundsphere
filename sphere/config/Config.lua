@@ -42,6 +42,10 @@ Config.set = function(self, key, value)
 	})
 end
 
+Config.setNoEvent = function(self, key, value)
+	self.data[key] = value
+end
+
 Config.setDefaultValues = function(self)
 	local data = self.data
 	
