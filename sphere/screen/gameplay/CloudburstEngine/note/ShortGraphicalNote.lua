@@ -5,17 +5,9 @@ local ShortGraphicalNote = GraphicalNote:new()
 ShortGraphicalNote.update = function(self)
 	self:computeVisualTime()
 	
-	if self.index == self.noteDrawer.startNoteIndex and self:willDrawBeforeStart() then
-		self:deactivate()
-		self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
-		return self:updateNext(self.noteDrawer.startNoteIndex)
-	elseif self.index == self.noteDrawer.endNoteIndex and self:willDrawAfterEnd() then
-		self:deactivate()
-		self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
-		return self:updateNext(self.noteDrawer.endNoteIndex)
-	else
-		self.drawable.y = self:getY()
+	if not self:tryNext() then
 		self.drawable.x = self:getX()
+		self.drawable.y = self:getY()
 		self.drawable.sx = self:getScaleX()
 		self.drawable.sy = self:getScaleY()
 		self.drawable:reload()
@@ -71,29 +63,29 @@ ShortGraphicalNote.getContainer = function(self)
 end
 
 ShortGraphicalNote.getHeadWidth = function(self)
-	return self.noteSkin.data[self.id]["Head"].w
+	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	return self.noteSkin:getG(0, dt, self, "Head", "w")
 end
 
 ShortGraphicalNote.getHeadHeight = function(self)
-	return self.noteSkin.data[self.id]["Head"].h
+	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	return self.noteSkin:getG(0, dt, self, "Head", "h")
 end
 
 ShortGraphicalNote.getX = function(self)
-	local data = self.noteSkin.data[self.id]["Head"]
+	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	return
-		data.x
-		+ data.fx * self.noteSkin:getVisualTimeRate()
-			* (self.startNoteData.timePoint.currentVisualTime - self.engine.currentTime)
-		+ data.ox * self:getHeadWidth()
+		  self.noteSkin:getG(0, dt, self, "Head", "x")
+		+ self.noteSkin:getG(0, dt, self, "Head", "w")
+		* self.noteSkin:getG(0, dt, self, "Head", "ox")
 end
 
 ShortGraphicalNote.getY = function(self)
-	local data = self.noteSkin.data[self.id]["Head"]
+	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	return
-		data.y
-		+ data.fy * self.noteSkin:getVisualTimeRate()
-			* (self.startNoteData.timePoint.currentVisualTime - self.engine.currentTime)
-		+ data.oy * self:getHeadHeight()
+		  self.noteSkin:getG(0, dt, self, "Head", "y")
+		+ self.noteSkin:getG(0, dt, self, "Head", "h")
+		* self.noteSkin:getG(0, dt, self, "Head", "oy")
 end
 
 ShortGraphicalNote.getScaleX = function(self)
@@ -108,16 +100,13 @@ ShortGraphicalNote.getScaleY = function(self)
 		self.noteSkin:getCS(self):y(self.noteSkin:getNoteImage(self, "Head"):getHeight())
 end
 
-ShortGraphicalNote.whereWillDraw = function(self)
-	local shortNoteY = self:getY()
-	local shortNoteHeight = self:getHeadHeight()
+ShortGraphicalNote.whereWillDrawX = function(self)
 	local shortNoteX = self:getX()
 	local shortNoteWidth = self:getHeadWidth()
-	
+
 	local cs = self.noteSkin:getCS(self)
-	
 	local allcs = self.noteSkin.allcs
-	local x, y
+	local x
 	if (allcs:x(cs:X(shortNoteX + shortNoteWidth, true), true) > 0) and (allcs:x(cs:X(shortNoteX, true), true) < 1) then
 		x = 0
 	elseif allcs:x(cs:X(shortNoteX, true), true) >= 1 then
@@ -125,6 +114,17 @@ ShortGraphicalNote.whereWillDraw = function(self)
 	elseif allcs:x(cs:X(shortNoteX + shortNoteWidth, true), true) <= 0 then
 		x = -1
 	end
+
+	return x
+end
+
+ShortGraphicalNote.whereWillDrawY = function(self)
+	local shortNoteY = self:getY()
+	local shortNoteHeight = self:getHeadHeight()
+	
+	local cs = self.noteSkin:getCS(self)
+	local allcs = self.noteSkin.allcs
+	local y
 	if (allcs:y(cs:Y(shortNoteY + shortNoteHeight, true), true) > 0) and (allcs:y(cs:Y(shortNoteY, true), true) < 1) then
 		y = 0
 	elseif allcs:y(cs:Y(shortNoteY, true), true) >= 1 then
@@ -132,26 +132,55 @@ ShortGraphicalNote.whereWillDraw = function(self)
 	elseif allcs:y(cs:Y(shortNoteY + shortNoteHeight, true), true) <= 0 then
 		y = -1
 	end
-	
-	return x, y
+
+	return y
 end
+
+ShortGraphicalNote.whereWillDrawW = function(self)
+	return self.noteSkin:whereWillBelongSegment(self, "Head", "w", self:getHeadWidth())
+end
+
+ShortGraphicalNote.whereWillDrawH = function(self)
+	return self.noteSkin:whereWillBelongSegment(self, "Head", "h", self:getHeadHeight())
+end
+
+ShortGraphicalNote.whereWillDraw = function(self)
+	local x = self:whereWillDrawX()
+	local y = self:whereWillDrawY()
+	local w = self:whereWillDrawW()
+	local h = self:whereWillDrawH()
+	return x, y, w, h
+end
+
 ShortGraphicalNote.willDraw = function(self)
-	local x, y = self:whereWillDraw(self)
-	return x == 0 and y == 0
+	local x, y, w, h = self:whereWillDraw()
+	return
+		x == 0 and
+		y == 0 and
+		w == 0 and
+		h == 0
 end
 
 ShortGraphicalNote.willDrawBeforeStart = function(self)
-	local x, y = self:whereWillDraw(self)
-	local data = self.noteSkin.data[self.id]["Head"]
+	local x, y, w, h = self:whereWillDraw()
+	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	local visualTimeRate = self.noteSkin.visualTimeRate
-	return data.fx * x * visualTimeRate < 0 or data.fy * y * visualTimeRate < 0
+	return
+		self.noteSkin:getG(1, dt, self, "Head", "x") * x * visualTimeRate > 0 or
+		self.noteSkin:getG(1, dt, self, "Head", "y") * y * visualTimeRate > 0 or
+		self.noteSkin:getG(1, dt, self, "Head", "w") * w * visualTimeRate > 0 or
+		self.noteSkin:getG(1, dt, self, "Head", "h") * h * visualTimeRate > 0
 end
 
 ShortGraphicalNote.willDrawAfterEnd = function(self)
-	local x, y = self:whereWillDraw(self)
-	local data = self.noteSkin.data[self.id]["Head"]
+	local x, y, w, h = self:whereWillDraw()
+	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	local visualTimeRate = self.noteSkin.visualTimeRate
-	return data.fx * x * visualTimeRate > 0 or data.fy * y * visualTimeRate > 0
+	return
+		self.noteSkin:getG(1, dt, self, "Head", "x") * x * visualTimeRate < 0 or
+		self.noteSkin:getG(1, dt, self, "Head", "y") * y * visualTimeRate < 0 or
+		self.noteSkin:getG(1, dt, self, "Head", "w") * w * visualTimeRate < 0 or
+		self.noteSkin:getG(1, dt, self, "Head", "h") * h * visualTimeRate < 0
 end
 
 return ShortGraphicalNote

@@ -28,4 +28,18 @@ GraphicalNote.updateNext = function(self, index)
 	end
 end
 
+GraphicalNote.tryNext = function(self)
+	if self.index == self.noteDrawer.startNoteIndex and self:willDrawBeforeStart() then
+		self:deactivate()
+		self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
+		self:updateNext(self.noteDrawer.startNoteIndex)
+		return true
+	elseif self.index == self.noteDrawer.endNoteIndex and self:willDrawAfterEnd() then
+		self:deactivate()
+		self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
+		self:updateNext(self.noteDrawer.endNoteIndex)
+		return true
+	end
+end
+
 return GraphicalNote

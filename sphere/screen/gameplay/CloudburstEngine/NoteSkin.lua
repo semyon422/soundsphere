@@ -129,6 +129,47 @@ NoteSkin.checkNote = function(self, note)
 	end
 end
 
+NoteSkin.getG = function(self, order, dt, note, part, name)
+	local dt = dt * self:getVisualTimeRate()
+	local seq = self.data[note.id][part].gc[name]
+	if not seq then print(order, dt, note, part, name) end
+	local sum = 0
+	for i = order, #seq - 1 do
+		local delta = seq[i + 1] * dt ^ (i - order)
+		sum = sum + delta
+	end
+	return sum
+end
+
+NoteSkin.whereWillBelongSegment = function(self, note, part, name, value)
+	local seq = self.data[note.id][part].sb[name]
+
+	if not seq then
+		return 0
+	end
+	
+	local a, b = seq[1], seq[2]
+	if a < b then
+		if value < a then
+			return -1
+		elseif value > b then
+			return 1
+		else
+			return 0
+		end
+	elseif b < a then
+		if value < b then
+			return -1
+		elseif value > a then
+			return 1
+		else
+			return 0
+		end
+	end
+
+	return 0
+end
+
 NoteSkin.getNoteLayer = function(self, note, part)
 	return
 		self.data[note.id][part].layer
