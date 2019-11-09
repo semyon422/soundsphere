@@ -46,6 +46,10 @@ NoteSkin.load = function(self)
 	self.images = {}
 	self:loadImages()
 	
+	self.functions0 = {}
+	self.functions1 = {}
+	self:loadFunctions()
+	
 	self.containers = {}
 	self:loadContainers()
 end
@@ -62,6 +66,21 @@ NoteSkin.loadImages = function(self)
 	
 	for _, imageData in pairs(self.noteSkinData.images) do
 		self:loadImage(imageData)
+	end
+end
+
+NoteSkin.loadFunctions = function(self)
+	if not self.noteSkinData.functions then
+		return
+	end
+	
+	local functions0 = self.functions0
+	local functions1 = self.functions1
+	for _, fn in pairs(self.noteSkinData.functions) do
+		functions0[fn.name] = loadstring(fn.chunk0)()
+		if fn.chunk1 then
+			functions1[fn.name] = loadstring(fn.chunk1)()
+		end
 	end
 end
 
@@ -132,13 +151,23 @@ end
 NoteSkin.getG = function(self, order, dt, note, part, name)
 	local dt = dt * self:getVisualTimeRate()
 	local seq = self.data[note.id][part].gc[name]
-	if not seq then print(order, dt, note, part, name) end
-	local sum = 0
-	for i = order, #seq - 1 do
-		local delta = seq[i + 1] * dt ^ (i - order)
-		sum = sum + delta
+
+	if not seq then
+		print(order, dt, note, part, name)
+	elseif type(seq) == "table" then
+		local sum = 0
+		for i = order, #seq - 1 do
+			local delta = seq[i + 1] * dt ^ (i - order)
+			sum = sum + delta
+		end
+		return sum
+	elseif type(seq) == "string" then
+		if order == 0 then
+			return self.functions0[seq](dt)
+		elseif order == 1 then
+			return self.functions1[seq](dt)
+		end
 	end
-	return sum
 end
 
 NoteSkin.whereWillBelongSegment = function(self, note, part, name, value)
@@ -157,11 +186,11 @@ NoteSkin.whereWillBelongSegment = function(self, note, part, name, value)
 		else
 			return 0
 		end
-	elseif b < a then
+	elseif a > b then
 		if value < b then
-			return -1
-		elseif value > a then
 			return 1
+		elseif value > a then
+			return -1
 		else
 			return 0
 		end

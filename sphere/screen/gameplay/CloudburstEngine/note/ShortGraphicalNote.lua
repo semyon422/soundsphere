@@ -168,8 +168,8 @@ ShortGraphicalNote.willDrawBeforeStart = function(self)
 	return
 		self.noteSkin:getG(1, dt, self, "Head", "x") * x * visualTimeRate > 0 or
 		self.noteSkin:getG(1, dt, self, "Head", "y") * y * visualTimeRate > 0 or
-		self.noteSkin:getG(1, dt, self, "Head", "w") * w * visualTimeRate > 0 or
-		self.noteSkin:getG(1, dt, self, "Head", "h") * h * visualTimeRate > 0
+		w * visualTimeRate > 0 or
+		h * visualTimeRate > 0
 end
 
 ShortGraphicalNote.willDrawAfterEnd = function(self)
@@ -179,8 +179,8 @@ ShortGraphicalNote.willDrawAfterEnd = function(self)
 	return
 		self.noteSkin:getG(1, dt, self, "Head", "x") * x * visualTimeRate < 0 or
 		self.noteSkin:getG(1, dt, self, "Head", "y") * y * visualTimeRate < 0 or
-		self.noteSkin:getG(1, dt, self, "Head", "w") * w * visualTimeRate < 0 or
-		self.noteSkin:getG(1, dt, self, "Head", "h") * h * visualTimeRate < 0
+		w * visualTimeRate < 0 or
+		h * visualTimeRate < 0
 end
 
 return ShortGraphicalNote
