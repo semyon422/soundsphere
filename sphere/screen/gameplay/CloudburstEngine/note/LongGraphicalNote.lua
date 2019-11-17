@@ -410,7 +410,7 @@ LongGraphicalNote.willDrawBeforeStart = function(self)
 	local visualTimeRate = self.noteSkin.visualTimeRate
 	return
 		self.noteSkin:getG(1, dt, self, "Head", "x") * x * visualTimeRate > 0 or
-		self.noteSkin:getG(1, dt, self, "Head", "x") * y * visualTimeRate > 0 or
+		self.noteSkin:getG(1, dt, self, "Head", "y") * y * visualTimeRate > 0 or
 		w * visualTimeRate > 0 or
 		h * visualTimeRate > 0
 end
