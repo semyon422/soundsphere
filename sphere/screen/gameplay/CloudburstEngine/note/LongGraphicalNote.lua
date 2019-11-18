@@ -186,7 +186,7 @@ end
 
 LongGraphicalNote.getTailHeight = function(self)
 	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
-	return self.noteSkin:getG(0, dt, self, "Tail", "w")
+	return self.noteSkin:getG(0, dt, self, "Tail", "h")
 end
 
 LongGraphicalNote.getBodyWidth = function(self)
@@ -201,7 +201,7 @@ end
 
 LongGraphicalNote.getTailWidth = function(self)
 	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
-	return self.noteSkin:getG(0, dt, self, "Tail", "h")
+	return self.noteSkin:getG(0, dt, self, "Tail", "w")
 end
 
 LongGraphicalNote.getBodyHeight = function(self)
