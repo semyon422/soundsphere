@@ -32,17 +32,20 @@ end
 NoteSkinList.send = function(self, event)
 	if event.action == "buttonInteract" and event.button == 1 then
 		local metaData = self.items[event.itemIndex].metaData
-		NoteSkinManager:setDefaultNoteSkin(metaData.inputMode, metaData)
+		NoteSkinManager:setDefaultNoteSkin(self:getSelectedInputMode(), metaData)
 	end
 	
 	CustomList.send(self, event)
 end
 
+NoteSkinList.getSelectedInputMode = function(self)
+	return NoteChartList.items[NoteChartList.focusedItemIndex].cacheData.inputMode
+end
+
 NoteSkinList.addItems = function(self)
 	local items = {}
 	
-	local cacheData = NoteChartList.items[NoteChartList.focusedItemIndex].cacheData
-	local list = NoteSkinManager:getMetaDataList(cacheData.inputMode)
+	local list = NoteSkinManager:getMetaDataList(self:getSelectedInputMode())
 
 	for _, metaData in ipairs(list) do
 		items[#items + 1] = {
