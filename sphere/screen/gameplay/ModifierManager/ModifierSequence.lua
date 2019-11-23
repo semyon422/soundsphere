@@ -11,6 +11,7 @@ local NoMeasureLine	= require("sphere.screen.gameplay.ModifierManager.NoMeasureL
 local CMod			= require("sphere.screen.gameplay.ModifierManager.CMod")
 local FullLongNote	= require("sphere.screen.gameplay.ModifierManager.FullLongNote")
 local ToOsu			= require("sphere.screen.gameplay.ModifierManager.ToOsu")
+local AutoKeySound	= require("sphere.screen.gameplay.ModifierManager.AutoKeySound")
 
 local ModifierSequence = Class:new()
 
@@ -63,6 +64,11 @@ ModifierSequence.addInconsequential = function(self)
 	cMod.sequence = self
 	list[#list + 1] = cMod
 	self[CMod] = cMod
+	
+	local autoKeySound = AutoKeySound:new()
+	autoKeySound.sequence = self
+	list[#list + 1] = autoKeySound
+	self[AutoKeySound] = autoKeySound
 	
 	local toOsu = ToOsu:new()
 	toOsu.sequence = self

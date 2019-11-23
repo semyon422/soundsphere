@@ -1,4 +1,5 @@
 local AutoPlay		= require("sphere.screen.gameplay.ModifierManager.AutoPlay")
+local AutoKeySound	= require("sphere.screen.gameplay.ModifierManager.AutoKeySound")
 local Automap		= require("sphere.screen.gameplay.ModifierManager.Automap")
 local ProMode		= require("sphere.screen.gameplay.ModifierManager.ProMode")
 local SetInput		= require("sphere.screen.gameplay.ModifierManager.SetInput")
@@ -11,6 +12,7 @@ local FullLongNote	= require("sphere.screen.gameplay.ModifierManager.FullLongNot
 local ToOsu			= require("sphere.screen.gameplay.ModifierManager.ToOsu")
 
 local AutoPlayButton		= require("sphere.screen.select.ModifierMenu.AutoPlayButton")
+local AutoKeySoundButton	= require("sphere.screen.select.ModifierMenu.AutoKeySoundButton")
 local AutomapAddButton		= require("sphere.screen.select.ModifierMenu.AutomapAddButton")
 local ProModeButton			= require("sphere.screen.select.ModifierMenu.ProModeButton")
 local SetInputButton		= require("sphere.screen.select.ModifierMenu.SetInputButton")
@@ -24,6 +26,7 @@ local ToOsuButton			= require("sphere.screen.select.ModifierMenu.ToOsuButton")
 
 local class2button = {
 	[AutoPlay] = AutoPlayButton,
+	[AutoKeySound] = AutoKeySoundButton,
 	[Automap] = AutomapAddButton,
 	[ProMode] = ProModeButton,
 	[SetInput] = SetInputButton,
