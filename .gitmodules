@@ -34,3 +34,6 @@
 [submodule "libchart"]
 	path = libchart
 	url = https://github.com/semyon422/libchart
+[submodule "lua-toml"]
+	path = lua-toml
+	url = https://github.com/pocomane/lua-toml
