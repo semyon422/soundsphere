@@ -46,6 +46,9 @@ GameplayScreen.load = function(self)
 	local noteSkinMetaData = NoteSkinManager:getMetaData(noteChart.inputMode)
 	local noteSkin = NoteSkinLoader:load(noteSkinMetaData)
 	noteSkinMetaData = noteSkinMetaData or {}
+
+	noteSkin.container = self.container
+	noteSkin:joinContainer(self.container)
 	
 	self.engine.noteChart = noteChart
 	self.engine.noteSkin = noteSkin
@@ -102,6 +105,8 @@ GameplayScreen.load = function(self)
 end
 
 GameplayScreen.unload = function(self)
+	self.engine.noteSkin:leaveContainer(self.container)
+
 	self.engine:unload()
 	self.playField:unload()
 	self.bga:unload()
@@ -127,7 +132,6 @@ end
 GameplayScreen.draw = function(self)
 	self.bga:draw()
 	AccuracyGraph:draw()
-	self.engine:draw()
 	
 	Screen.draw(self)
 	

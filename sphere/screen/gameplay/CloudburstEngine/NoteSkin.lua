@@ -103,6 +103,18 @@ NoteSkin.loadContainers = function(self)
 	table.sort(self.containerList, sortContainers)
 end
 
+NoteSkin.joinContainer = function(self, container)
+	for _, container in ipairs(self.containerList) do
+		self.container:add(container)
+	end
+end
+
+NoteSkin.leaveContainer = function(self, container)
+	for _, container in ipairs(self.containerList) do
+		self.container:remove(container)
+	end
+end
+
 NoteSkin.update = function(self, dt)
 	if self.visualTimeRateTween and self.updateTween then
 		self.visualTimeRateTween:update(dt)
