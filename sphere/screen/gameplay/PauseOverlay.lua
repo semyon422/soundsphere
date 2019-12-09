@@ -167,10 +167,11 @@ PauseOverlay.play = function(self)
 	self.paused = false
 	self.engine:play()
 	
+	local length = math.min(self.cacheData.length, 3600 * 24)
 	DiscordPresence:setPresence({
 		state = "Playing",
 		details = ("%s - %s [%s]"):format(self.cacheData.artist, self.cacheData.title, self.cacheData.name),
-		endTimestamp = math.floor(os.time() + (self.cacheData.length - self.engine.currentTime) / self.engine.timeRate)
+		endTimestamp = math.floor(os.time() + (length - self.engine.currentTime) / self.engine.timeRate)
 	})
 end
 
