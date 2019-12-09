@@ -19,7 +19,7 @@ LongGraphicalNote.update = function(self)
 		self.headDrawable.sy = self:getHeadScaleY()
 		self.tailDrawable.sy = self:getTailScaleY()
 		self.bodyDrawable.sy = self:getBodyScaleY()
-		
+
 		self.headDrawable:reload()
 		self.tailDrawable:reload()
 		self.bodyDrawable:reload()
@@ -279,13 +279,9 @@ end
 
 LongGraphicalNote.getBodyScaleX = function(self)
 	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
-	local visualTimeRateSign = self.noteSkin:getVisualTimeRateSign()
 	return
 		(
-			math.max(
-				(self:getHeadX() - self:getTailX()) * visualTimeRateSign,
-				0
-			)
+			math.abs(self:getHeadX() - self:getTailX())
 			+ self.noteSkin:getG(0, dt, self, "Body", "w")
 		) / self.noteSkin:getCS(self):x(self.noteSkin:getNoteImage(self, "Body"):getWidth())
 end
@@ -300,13 +296,9 @@ end
 
 LongGraphicalNote.getBodyScaleY = function(self)
 	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
-	local visualTimeRateSign = self.noteSkin:getVisualTimeRateSign()
 	return
 		(
-			math.max(
-				(self:getHeadY() - self:getTailY()) * visualTimeRateSign,
-				0
-			)
+			math.abs(self:getHeadY() - self:getTailY())
 			+ self.noteSkin:getG(0, dt, self, "Body", "h")
 		) / self.noteSkin:getCS(self):y(self.noteSkin:getNoteImage(self, "Body"):getHeight())
 end
