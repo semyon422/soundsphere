@@ -5,6 +5,7 @@ local Automap		= require("sphere.screen.gameplay.ModifierManager.Automap")
 local ProMode		= require("sphere.screen.gameplay.ModifierManager.ProMode")
 local SetInput		= require("sphere.screen.gameplay.ModifierManager.SetInput")
 local TimeRate		= require("sphere.screen.gameplay.ModifierManager.TimeRate")
+local NoScratch		= require("sphere.screen.gameplay.ModifierManager.NoScratch")
 local Mirror		= require("sphere.screen.gameplay.ModifierManager.Mirror")
 local NoLongNote	= require("sphere.screen.gameplay.ModifierManager.NoLongNote")
 local NoMeasureLine	= require("sphere.screen.gameplay.ModifierManager.NoMeasureLine")
@@ -45,6 +46,11 @@ ModifierSequence.addInconsequential = function(self)
 	list[#list + 1] = timeRate
 	self[TimeRate] = timeRate
 	
+	local noScratch = NoScratch:new()
+	noScratch.sequence = self
+	list[#list + 1] = noScratch
+	self[NoScratch] = noScratch
+
 	local mirror = Mirror:new()
 	mirror.sequence = self
 	list[#list + 1] = mirror

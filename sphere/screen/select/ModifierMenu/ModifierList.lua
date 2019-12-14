@@ -13,6 +13,7 @@ local Automap		= require("sphere.screen.gameplay.ModifierManager.Automap")
 local ProMode		= require("sphere.screen.gameplay.ModifierManager.ProMode")
 local SetInput		= require("sphere.screen.gameplay.ModifierManager.SetInput")
 local TimeRate		= require("sphere.screen.gameplay.ModifierManager.TimeRate")
+local NoScratch		= require("sphere.screen.gameplay.ModifierManager.NoScratch")
 local Mirror		= require("sphere.screen.gameplay.ModifierManager.Mirror")
 local NoLongNote	= require("sphere.screen.gameplay.ModifierManager.NoLongNote")
 local NoMeasureLine	= require("sphere.screen.gameplay.ModifierManager.NoMeasureLine")
@@ -76,6 +77,9 @@ ModifierList.addItems = function(self)
 	}
 	items[#items + 1] = {
 		modifier = TimeRate
+	}
+	items[#items + 1] = {
+		modifier = NoScratch
 	}
 	items[#items + 1] = {
 		modifier = Mirror
