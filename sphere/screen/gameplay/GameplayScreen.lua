@@ -125,6 +125,7 @@ GameplayScreen.update = function(self, dt)
 	self.bga:update(dt)
 	PauseOverlay:update(dt)
 	ProgressBar:update(dt)
+	ModifierManager:update()
 	
 	Screen.update(self)
 end

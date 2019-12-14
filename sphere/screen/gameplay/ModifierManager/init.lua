@@ -9,6 +9,10 @@ ModifierManager.apply = function(self)
 	return self.sequence:apply()
 end
 
+ModifierManager.update = function(self)
+	return self.sequence:update()
+end
+
 ModifierManager.getSequence = function(self)
 	return self.sequence
 end

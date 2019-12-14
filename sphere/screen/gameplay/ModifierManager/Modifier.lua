@@ -4,6 +4,8 @@ local Modifier = Class:new()
 
 Modifier.name = ""
 
+Modifier.update = function(self) end
+
 Modifier.tostring = function(self)
 	return self.shortName
 end

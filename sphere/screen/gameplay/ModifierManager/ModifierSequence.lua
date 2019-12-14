@@ -4,6 +4,7 @@ local AutoPlay		= require("sphere.screen.gameplay.ModifierManager.AutoPlay")
 local Automap		= require("sphere.screen.gameplay.ModifierManager.Automap")
 local ProMode		= require("sphere.screen.gameplay.ModifierManager.ProMode")
 local SetInput		= require("sphere.screen.gameplay.ModifierManager.SetInput")
+local WindUp		= require("sphere.screen.gameplay.ModifierManager.WindUp")
 local TimeRate		= require("sphere.screen.gameplay.ModifierManager.TimeRate")
 local NoScratch		= require("sphere.screen.gameplay.ModifierManager.NoScratch")
 local Mirror		= require("sphere.screen.gameplay.ModifierManager.Mirror")
@@ -40,6 +41,11 @@ ModifierSequence.addInconsequential = function(self)
 	setInput.sequence = self
 	list[#list + 1] = setInput
 	self[SetInput] = setInput
+	
+	local windUp = WindUp:new()
+	windUp.sequence = self
+	list[#list + 1] = windUp
+	self[WindUp] = windUp
 	
 	local timeRate = TimeRate:new()
 	timeRate.sequence = self
@@ -114,6 +120,22 @@ ModifierSequence.apply = function(self)
 	for _, modifier in ipairs(self.inconsequential) do
 		if modifier.after and modifier:getValue() then
 			modifier:apply()
+		end
+	end
+end
+
+ModifierSequence.update = function(self)
+	for _, modifier in ipairs(self.inconsequential) do
+		if not modifier.after and modifier:getValue() then
+			modifier:update()
+		end
+	end
+	for _, modifier in ipairs(self.sequential) do
+		modifier:update()
+	end
+	for _, modifier in ipairs(self.inconsequential) do
+		if modifier.after and modifier:getValue() then
+			modifier:update()
 		end
 	end
 end
