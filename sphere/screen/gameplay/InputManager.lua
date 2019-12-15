@@ -53,6 +53,17 @@ InputManager.setKey = function(self, inputMode, virtualKey, key)
 	local inputConfig = data[inputMode]
 	inputConfig.press = inputConfig.press or {}
 	inputConfig.release = inputConfig.release or {}
+
+	for key, data in pairs(inputConfig.press) do
+		if data.press and data.press[1] == virtualKey then
+			inputConfig.press[key] = nil
+		end
+	end
+	for key, data in pairs(inputConfig.release) do
+		if data.release and data.release[1] == virtualKey then
+			inputConfig.release[key] = nil
+		end
+	end
 	
 	inputConfig.press[key] = {
 		press = {virtualKey},
@@ -62,6 +73,23 @@ InputManager.setKey = function(self, inputMode, virtualKey, key)
 		press = {},
 		release = {virtualKey}
 	}
+end
+
+InputManager.getKey = function(self, inputMode, virtualKey)
+	local data = self.data
+
+	local inputConfig = data[inputMode]
+	if not inputConfig or not inputConfig.press then
+		return "none"
+	end
+
+	for key, data in pairs(inputConfig.press) do
+		if data.press and data.press[1] == virtualKey then
+			return key
+		end
+	end
+
+	return "none"
 end
 
 InputManager.setInputMode = function(self, inputMode)

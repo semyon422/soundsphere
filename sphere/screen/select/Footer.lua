@@ -4,6 +4,7 @@ local Theme				= require("aqua.ui.Theme")
 local spherefonts		= require("sphere.assets.fonts")
 local ModifierMenu		= require("sphere.screen.select.ModifierMenu")
 local NoteSkinMenu		= require("sphere.screen.select.NoteSkinMenu")
+local KeyBindMenu		= require("sphere.screen.select.KeyBindMenu")
 
 local Footer = {}
 
@@ -52,24 +53,42 @@ Footer.init = function(self)
 		backgroundColor = {0, 0, 0, 127},
 		interact = function() NoteSkinMenu:show() end
 	})
+	
+	self.keyBindButton = Theme.Button:new({
+		text = "keybinds",
+		font = self.font,
+		x = 2/8,
+		y = 1 - 67/1080,
+		w = 1/8,
+		limit = 1/8,
+		h = 67/1080,
+		cs = self.csmin,
+		mode = "fill",
+		textAlign = {x = "center", y = "center"},
+		backgroundColor = {0, 0, 0, 127},
+		interact = function() KeyBindMenu:show() end
+	})
 end
 
 Footer.reload = function(self)
 	self.bottomButton:reload()
 	self.modsButton:reload()
 	self.skinButton:reload()
+	self.keyBindButton:reload()
 end
 
 Footer.draw = function(self)
 	self.bottomButton:draw()
 	self.modsButton:draw()
 	self.skinButton:draw()
+	self.keyBindButton:draw()
 end
 
 Footer.receive = function(self, event)
 	self.bottomButton:receive(event)
 	self.modsButton:receive(event)
 	self.skinButton:receive(event)
+	self.keyBindButton:receive(event)
 end
 
 return Footer

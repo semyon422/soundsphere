@@ -11,6 +11,7 @@ local ModifierMenu		= require("sphere.screen.select.ModifierMenu")
 local NoteChartList		= require("sphere.screen.select.NoteChartList")
 local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
 local NoteSkinMenu		= require("sphere.screen.select.NoteSkinMenu")
+local KeyBindMenu		= require("sphere.screen.select.KeyBindMenu")
 local PreviewManager	= require("sphere.screen.select.PreviewManager")
 local SearchLine		= require("sphere.screen.select.SearchLine")
 local SelectFrame		= require("sphere.screen.select.SelectFrame")
@@ -25,6 +26,7 @@ SelectScreen.init = function(self)
 	ModifierDisplay:init()
 	ModifierMenu:init()
 	NoteSkinMenu:init()
+	KeyBindMenu:init()
 	SearchLine:init()
 	NoteChartList:init()
 	NoteChartSetList:init()
@@ -71,6 +73,7 @@ SelectScreen.update = function(self)
 	
 	ModifierMenu:update()
 	NoteSkinMenu:update()
+	KeyBindMenu:update()
 end
 
 SelectScreen.draw = function(self)
@@ -89,14 +92,17 @@ SelectScreen.draw = function(self)
 	
 	ModifierMenu:draw()
 	NoteSkinMenu:draw()
+	KeyBindMenu:draw()
 end
 
 SelectScreen.receive = function(self, event)
 	local modifierMenuHidden = ModifierMenu.hidden
 	local noteSkinMenuHidden = NoteSkinMenu.hidden
+	local keyBindMenuMenuHidden = KeyBindMenu.hidden
 	ModifierMenu:receive(event)
 	NoteSkinMenu:receive(event)
-	if (not modifierMenuHidden or not noteSkinMenuHidden) and event.name ~= "resize" then
+	KeyBindMenu:receive(event)
+	if (not modifierMenuHidden or not noteSkinMenuHidden or not keyBindMenuMenuHidden) and event.name ~= "resize" then
 		return
 	end
 	
