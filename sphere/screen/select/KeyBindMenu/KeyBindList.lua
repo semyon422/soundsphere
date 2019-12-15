@@ -44,6 +44,16 @@ KeyBindList.receive = function(self, event)
 end
 
 KeyBindList.getSelectedInputMode = function(self)
+	if
+		not NoteChartList.items or
+		not NoteChartList.focusedItemIndex or
+		not NoteChartList.items[NoteChartList.focusedItemIndex] or
+		not NoteChartList.items[NoteChartList.focusedItemIndex].cacheData or
+		not NoteChartList.items[NoteChartList.focusedItemIndex].cacheData.inputMode
+	then
+		return ""
+	end
+	
 	return NoteChartList.items[NoteChartList.focusedItemIndex].cacheData.inputMode
 end
 
