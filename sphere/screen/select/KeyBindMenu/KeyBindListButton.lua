@@ -31,8 +31,6 @@ KeyBindListButton.construct = function(self)
 end
 
 KeyBindListButton.reload = function(self)
-	InputManager:read()
-
 	local keybindEditButton = self.keybindEditButton
 	
 	keybindEditButton.x = self.x + self.w * self.columnX[3]
@@ -109,9 +107,7 @@ KeyBindListButton.getSelectedInputMode = function(self)
 end
 
 KeyBindListButton.updateValue = function(self, value)
-	InputManager:read()
 	InputManager:setKey(self:getSelectedInputMode(), self.item.virtualKey, value)
-	InputManager:write()
 	self.valueTextFrame.text = self:getDisplayValue(value)
 	self.valueTextFrame:reload()
 end
