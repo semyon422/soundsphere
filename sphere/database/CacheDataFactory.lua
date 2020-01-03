@@ -55,7 +55,7 @@ CacheDataFactory.getCacheDatas = function(self, chartPaths)
 		for _, data in ipairs(formats) do
 			local pattern = data[1]
 			local getCacheDatas = data[2]
-			if path:find(pattern) then
+			if path:lower():find(pattern) then
 				for _, cacheData in ipairs(getCacheDatas(self, paths)) do
 					cacheDatas[#cacheDatas + 1] = cacheData
 				end
@@ -104,7 +104,7 @@ CacheDataFactory.processCacheDataNames = function(self, cacheDatas)
 			if char ~= cacheDatas[j].title:sub(byteOffset, byteNext - 1) then
 				continue = true
 				break
-			elseif j == #cacheDatas - 1 then
+			elseif j == #cacheDatas then
 				titleTable[#titleTable + 1] = char
 			end
 		end
@@ -222,7 +222,9 @@ CacheDataFactory.getBMS = function(self, chartPaths)
 			
 			cacheDatas[#cacheDatas + 1] = cacheData
 		end
+		io.write(".")
 	end
+	io.write("\n")
 	
 	if #cacheDatas > 0 then
 		for _, cacheData in ipairs(cacheDatas) do
@@ -270,7 +272,9 @@ CacheDataFactory.getOsu = function(self, chartPaths)
 			
 			cacheDatas[#cacheDatas + 1] = cacheData
 		end
+		io.write(".")
 	end
+	io.write("\n")
 	
 	return cacheDatas
 end
@@ -308,7 +312,9 @@ CacheDataFactory.getKSM = function(self, chartPaths)
 			
 			cacheDatas[#cacheDatas + 1] = cacheData
 		end
+		io.write(".")
 	end
+	io.write("\n")
 	
 	return cacheDatas
 end
@@ -343,7 +349,9 @@ CacheDataFactory.getQuaver = function(self, chartPaths)
 			
 			cacheDatas[#cacheDatas + 1] = cacheData
 		end
+		io.write(".")
 	end
+	io.write("\n")
 	
 	return cacheDatas
 end
@@ -380,7 +388,9 @@ CacheDataFactory.getO2Jam = function(self, chartPaths)
 			
 			cacheDatas[#cacheDatas + 1] = cacheData
 		end
+		io.write(".")
 	end
+	io.write("\n")
 	
 	return cacheDatas
 end
@@ -419,7 +429,9 @@ CacheDataFactory.getSphere = function(self, chartPaths)
 		self:fixCacheData(cacheData)
 		
 		cacheDatas[#cacheDatas + 1] = cacheData
+		io.write(".")
 	end
+	io.write("\n")
 	
 	return cacheDatas
 end
