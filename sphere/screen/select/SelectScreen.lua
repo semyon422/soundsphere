@@ -3,8 +3,7 @@ local Config			= require("sphere.config.Config")
 local NoteSkinManager	= require("sphere.screen.gameplay.NoteSkinManager")
 local Screen			= require("sphere.screen.Screen")
 local ScreenManager		= require("sphere.screen.ScreenManager")
-local Footer			= require("sphere.screen.select.Footer")
-local Header			= require("sphere.screen.select.Header")
+
 local MetaDataTable		= require("sphere.screen.select.MetaDataTable")
 local ModifierDisplay	= require("sphere.screen.select.ModifierDisplay")
 local ModifierMenu		= require("sphere.screen.select.ModifierMenu")
@@ -15,13 +14,17 @@ local KeyBindMenu		= require("sphere.screen.select.KeyBindMenu")
 local PreviewManager	= require("sphere.screen.select.PreviewManager")
 local SearchLine		= require("sphere.screen.select.SearchLine")
 local SelectFrame		= require("sphere.screen.select.SelectFrame")
+local SelectGUI			= require("sphere.screen.select.SelectGUI")
+
 local BackgroundManager	= require("sphere.ui.BackgroundManager")
 
 local SelectScreen = Screen:new()
 
 SelectScreen.init = function(self)
-	Footer:init()
-	Header:init()
+	self.gui = SelectGUI:new()
+	self.gui.container = self.container
+	self.gui:load("userdata/interface/select.json")
+
 	MetaDataTable:init()
 	ModifierDisplay:init()
 	ModifierMenu:init()
@@ -41,6 +44,8 @@ SelectScreen.init = function(self)
 end
 
 SelectScreen.load = function(self)
+	self.gui:reload()
+	
 	NoteSkinManager:load()
 	MetaDataTable:reload()
 	
@@ -51,8 +56,6 @@ SelectScreen.load = function(self)
 	
 	SearchLine:reload()
 	SelectFrame:reload()
-	Header:reload()
-	Footer:reload()
 	
 	NoteChartSetList:sendState()
 	
@@ -74,6 +77,7 @@ SelectScreen.update = function(self)
 	ModifierMenu:update()
 	NoteSkinMenu:update()
 	KeyBindMenu:update()
+	self.gui:update()
 end
 
 SelectScreen.draw = function(self)
@@ -82,9 +86,6 @@ SelectScreen.draw = function(self)
 	NoteChartSetList:draw()
 	NoteChartList:draw()
 	SelectFrame:draw()
-	
-	Header:draw()
-	Footer:draw()
 	
 	MetaDataTable:draw()
 	SearchLine:draw()
@@ -120,18 +121,16 @@ SelectScreen.receive = function(self, event)
 		SelectFrame:reload()
 		NoteChartSetList:reload()
 		NoteChartList:reload()
-		Header:reload()
-		Footer:reload()
 		SearchLine:reload()
+		self.gui:reload()
 		return
 	end
 	
 	NoteChartSetList:receive(event)
 	NoteChartList:receive(event)
 	ModifierDisplay:receive(event)
-	Header:receive(event)
-	Footer:receive(event)
 	SearchLine:receive(event)
+	self.gui:receive(event)
 end
 
 return SelectScreen

@@ -208,7 +208,7 @@ TomlNoteSkinLoader.addPlayFieldKey = function(self, input, i)
 		y = keys.padding
 	end
 	playField[#playField + 1] = {
-		type = "input",
+		class = "InputImage",
 		inputType = inputType,
 		inputIndex = inputIndex,
 		x = self:getNoteX(i) / unit,
@@ -218,7 +218,7 @@ TomlNoteSkinLoader.addPlayFieldKey = function(self, input, i)
 		layer = keys.layer,
 		released = keys.released[i],
 		pressed = keys.pressed[i],
-		cs = 1
+		cs = {0.5, 0, 0, 0, "h"}
 	}
 end
 
@@ -288,7 +288,7 @@ TomlNoteSkinLoader.processPlayFieldData = function(self)
 	local columns = self.noteSkin.tomlData.columns
 
 	playField[#playField + 1] = {
-		type = "score",
+		class = "ScoreDisplay",
 		field = "score",
 		format = tomlScore.score.format,
 		x = 0,
@@ -296,14 +296,14 @@ TomlNoteSkinLoader.processPlayFieldData = function(self)
 		w = 1,
 		h = 1,
 		layer = 20,
-		cs = 2,
+		cs = {0, 0, 0, 0, "all"},
 		align = {x = tomlScore.score.align[1], y = tomlScore.score.align[2]},
 		color = tomlScore.score.color,
 		font = tomlScore.score.font,
 		size = tomlScore.score.size
 	}
 	playField[#playField + 1] = {
-		type = "score",
+		class = "ScoreDisplay",
 		field = "accuracy",
 		format = tomlScore.accuracy.format,
 		x = 0,
@@ -311,14 +311,14 @@ TomlNoteSkinLoader.processPlayFieldData = function(self)
 		w = 1,
 		h = 1,
 		layer = 20,
-		cs = 2,
+		cs = {0, 0, 0, 0, "all"},
 		align = {x = tomlScore.accuracy.align[1], y = tomlScore.accuracy.align[2]},
 		color = tomlScore.accuracy.color,
 		font = tomlScore.accuracy.font,
 		size = tomlScore.accuracy.size
 	}
 	playField[#playField + 1] = {
-		type = "score",
+		class = "ScoreDisplay",
 		field = "combo",
 		format = tomlScore.combo.format,
 		x = -0.5 + columns.x / self.unit,
@@ -326,14 +326,14 @@ TomlNoteSkinLoader.processPlayFieldData = function(self)
 		w = 1,
 		h = 1,
 		layer = 20,
-		cs = 1,
+		cs = {0.5, 0, 0, 0, "h"},
 		align = {x = tomlScore.combo.align[1], y = tomlScore.combo.align[2]},
 		color = tomlScore.combo.color,
 		font = tomlScore.combo.font,
 		size = tomlScore.combo.size
 	}
 	playField[#playField + 1] = {
-		type = "score",
+		class = "ScoreDisplay",
 		field = "timegate",
 		format = tomlScore.timegate.format,
 		x = -0.5 + columns.x / self.unit,
@@ -341,11 +341,35 @@ TomlNoteSkinLoader.processPlayFieldData = function(self)
 		w = 1,
 		h = 1,
 		layer = 20,
-		cs = 1,
+		cs = {0.5, 0, 0, 0, "h"},
 		align = {x = tomlScore.timegate.align[1], y = tomlScore.timegate.align[2]},
 		color = tomlScore.timegate.color,
 		font = tomlScore.timegate.font,
 		size = tomlScore.timegate.size
+	}
+	playField[#playField + 1] = {
+		class = "AccuracyGraph",
+		x = 0.25,
+		y = 0.25,
+		w = 0.5,
+		h = 0.5,
+		r = 0.002,
+		layer = 0,
+		cs = {0, 0, 0, 0, "all"},
+		color = {127, 127, 127, 255},
+		lineColor = {127, 127, 127, 127}
+	}
+	playField[#playField + 1] = {
+		class = "ProgressBar",
+		x = 0,
+		y = 0.995,
+		w = 1,
+		h = 0.005,
+		layer = 20,
+		cs = {0, 0, 0, 0, "all"},
+		color = {255, 255, 255, 255},
+		direction = "left-right",
+		mode = "+"
 	}
 end
 

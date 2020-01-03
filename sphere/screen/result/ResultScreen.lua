@@ -2,7 +2,7 @@ local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local ScoreManager		= require("sphere.database.ScoreManager")
 local Screen			= require("sphere.screen.Screen")
 local ScreenManager		= require("sphere.screen.ScreenManager")
-local AccuracyGraph		= require("sphere.screen.result.AccuracyGraph")
+local ResultGUI			= require("sphere.screen.result.ResultGUI")
 local JudgeTable		= require("sphere.screen.result.JudgeTable")
 local MetaDataTable		= require("sphere.screen.select.MetaDataTable")
 
@@ -11,9 +11,8 @@ local ResultScreen = Screen:new()
 ResultScreen.init = function(self)
 	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 	
-	self.accuracyGraph = AccuracyGraph:new({
-		cs = self.cs
-	})
+	self.gui = ResultGUI:new()
+	self.gui.container = self.container
 	
 	self.judgeTable = JudgeTable:new({
 		cs = self.cs
@@ -34,14 +33,13 @@ ResultScreen.draw = function(self)
 	Screen.draw(self)
 	
 	MetaDataTable:draw()
-	self.accuracyGraph:draw()
 	self.judgeTable:draw()
 end
 
 ResultScreen.receive = function(self, event)
 	if event.name == "resize" then
 		MetaDataTable:reload()
-		self.accuracyGraph:reload()
+		self.gui:reload()
 		self.judgeTable:reload()
 	elseif event.name == "keypressed" and event.args[1] == "escape" then
 		ScreenManager:set(require("sphere.screen.select.SelectScreen"))
@@ -50,8 +48,8 @@ ResultScreen.receive = function(self, event)
 	if event.name == "score" then
 		local score = event.score
 		
-		self.accuracyGraph.score = score
-		self.accuracyGraph:load()
+		self.gui.score = score
+		self.gui:load("userdata/interface/result.json")
 		
 		self.judgeTable.score = score
 		self.judgeTable:load()

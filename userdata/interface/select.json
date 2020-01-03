@@ -1,0 +1,93 @@
+[
+	{
+		"name": "HeaderTop",
+		"class": "Button",
+		"cs": [0, 0, 0, 0, "all"],
+		"x": 0,
+		"y": 0,
+		"w": 1,
+		"h": 0.051851,
+		"layer": 1,
+		"backgroundColor": [0, 0, 0, 191]
+	},
+	{
+		"name": "HeaderBottom",
+		"class": "Button",
+		"cs": [0, 0, 0, 0, "all"],
+		"x": 0,
+		"y": 0.051851,
+		"w": 1,
+		"h": 0.124074,
+		"layer": 1,
+		"backgroundColor": [0, 0, 0, 127]
+	},
+	{
+		"name": "SettingsButton",
+		"class": "ImageButton",
+		"cs": [0, 0, 0, 0, "h"],
+		"x": 0,
+		"y": 0,
+		"w": 0.077777,
+		"h": 0.051851,
+		"scale": 0.66,
+		"layer": 2,
+		"image": "resources/icons/ic_settings_white_48dp.png",
+		"interact": ["ScreenManager:set(SettingsScreen)"]
+	},
+
+
+	{
+		"name": "Footer",
+		"class": "Button",
+		"cs": [0, 0, 0, 0, "all"],
+		"x": 0,
+		"y": 0.937963,
+		"w": 1,
+		"h": 0.062037,
+		"layer": 1,
+		"backgroundColor": [0, 0, 0, 127]
+	},
+	{
+		"name": "ModifierMenu",
+		"class": "Button",
+		"cs": [0.5, 1, 0.5, 1, "min"],
+		"x": 0,
+		"y": 0.937963,
+		"w": 0.125,
+		"h": 0.062037,
+		"layer": 2,
+		"backgroundColor": [0, 0, 0, 127],
+		"text": "mods",
+		"font": "resources/fonts/NotoSansCJK-Regular.ttc",
+		"fontSize": 14,
+		"interact": ["ModifierMenu:show()"]
+	},
+	{
+		"name": "NoteSkinMenu",
+		"class": "Button",
+		"cs": [0.5, 1, 0.5, 1, "min"],
+		"x": 0.125,
+		"y": 0.937963,
+		"w": 0.125,
+		"h": 0.062037,
+		"layer": 2,
+		"text": "skins",
+		"font": "resources/fonts/NotoSansCJK-Regular.ttc",
+		"fontSize": 14,
+		"interact": ["NoteSkinMenu:show()"]
+	},
+	{
+		"name": "KeyBindMenu",
+		"class": "Button",
+		"cs": [0.5, 1, 0.5, 1, "min"],
+		"x": 0.250,
+		"y": 0.937963,
+		"w": 0.125,
+		"h": 0.062037,
+		"layer": 2,
+		"text": "keybinds",
+		"font": "resources/fonts/NotoSansCJK-Regular.ttc",
+		"fontSize": 14,
+		"interact": ["KeyBindMenu:show()"]
+	}
+]

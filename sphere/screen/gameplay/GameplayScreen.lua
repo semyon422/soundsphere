@@ -12,9 +12,7 @@ local ModifierManager			= require("sphere.screen.gameplay.ModifierManager")
 local NoteSkinManager			= require("sphere.screen.gameplay.NoteSkinManager")
 local NoteSkinLoader			= require("sphere.screen.gameplay.NoteSkinLoader")
 local PauseOverlay				= require("sphere.screen.gameplay.PauseOverlay")
-local PlayField					= require("sphere.screen.gameplay.PlayField")
-local ProgressBar				= require("sphere.screen.gameplay.ProgressBar")
-local AccuracyGraph				= require("sphere.screen.result.AccuracyGraph")
+local GameplayGUI				= require("sphere.screen.gameplay.GameplayGUI")
 local Screen					= require("sphere.screen.Screen")
 local ScreenManager				= require("sphere.screen.ScreenManager")
 
@@ -22,9 +20,7 @@ local GameplayScreen = Screen:new()
 
 GameplayScreen.init = function(self)
 	InputManager:init()
-	ProgressBar:init()
 	PauseOverlay:init()
-	AccuracyGraph:init()
 end
 
 GameplayScreen.load = function(self)
@@ -35,7 +31,7 @@ GameplayScreen.load = function(self)
 
 	self.engine = CloudburstEngine:new()
 	self.engine.score = CustomScore:new()
-	self.playField = PlayField:new()
+	self.gui = GameplayGUI:new()
 
 	ModifierManager.engine = self.engine
 	ModifierManager.noteChart = noteChart
@@ -56,11 +52,11 @@ GameplayScreen.load = function(self)
 	self.engine.localAliases = {}
 	self.engine.globalAliases = {}
 	
-	self.playField.directoryPath = noteSkinMetaData.directoryPath
-	self.playField.noteSkinData = noteSkin
-	self.playField.playFieldData = noteSkin.playField
-	self.playField.noteSkin = noteSkin
-	self.playField.container = self.container
+	self.gui.root = noteSkinMetaData.directoryPath
+	self.gui.jsonData = noteSkin.playField
+	self.gui.noteSkin = noteSkin
+	self.gui.container = self.container
+	self.gui.engine = self.engine
 	
 	self.bga = BMSBGA:new()
 	self.bga.noteChart = noteChart
@@ -69,12 +65,12 @@ GameplayScreen.load = function(self)
 	self.engine.score.engine = self.engine
 	self.engine.score.noteChart = noteChart
 	self.engine.score.hash = hash
-	self.playField.score = self.engine.score
+	self.gui.score = self.engine.score
 	
 	self.engine:load()
-	self.playField:load()
+	self.gui:loadTable(noteSkin.playField)
 	
-	self.engine.observable:add(self.playField)
+	self.engine.observable:add(self.gui)
 	self.engine.observable:add(NotificationLine)
 	NoteChartResourceLoader.observable:add(NotificationLine)
 	
@@ -82,12 +78,6 @@ GameplayScreen.load = function(self)
 	PauseOverlay.noteChart = noteChart
 	PauseOverlay.cacheData = self.cacheData
 	PauseOverlay:load()
-	
-	ProgressBar.engine = self.engine
-	ProgressBar:load()
-	
-	AccuracyGraph.score = self.engine.score
-	AccuracyGraph:load()
 	
 	InputManager.observable:add(self.engine)
 	
@@ -108,7 +98,7 @@ GameplayScreen.unload = function(self)
 	self.engine.noteSkin:leaveContainer(self.container)
 
 	self.engine:unload()
-	self.playField:unload()
+	self.gui:unload()
 	self.bga:unload()
 	
 	if self.engine.score.setinput then
@@ -121,10 +111,9 @@ end
 
 GameplayScreen.update = function(self, dt)
 	self.engine:update(dt)
-	self.playField:update()
+	self.gui:update()
 	self.bga:update(dt)
 	PauseOverlay:update(dt)
-	ProgressBar:update(dt)
 	ModifierManager:update()
 	
 	Screen.update(self)
@@ -132,11 +121,9 @@ end
 
 GameplayScreen.draw = function(self)
 	self.bga:draw()
-	AccuracyGraph:draw()
 	
 	Screen.draw(self)
 	
-	ProgressBar:draw()
 	PauseOverlay:draw()
 end
 
@@ -144,9 +131,8 @@ GameplayScreen.receive = function(self, event)
 	if not PauseOverlay.paused then
 		self.engine:receive(event)
 		InputManager:receive(event)
-		self.playField:receive(event)
+		self.gui:receive(event)
 		self.bga:receive(event)
-		AccuracyGraph:receive(event)
 	end
 	PauseOverlay:receive(event)
 end

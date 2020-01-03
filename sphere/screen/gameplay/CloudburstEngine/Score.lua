@@ -4,13 +4,13 @@ local Autoplay		= require("sphere.screen.gameplay.CloudburstEngine.Autoplay")
 
 local Score = Class:new()
 
-Score.observable = Observable:new()
-
 Score.send = function(self, event)
 	return self.observable:send(event)
 end
 
 Score.construct = function(self)
+	self.observable = Observable:new()
+
 	self.combo = 0
 	self.maxcombo = 0
 	self.rate = 1

@@ -4,23 +4,36 @@ local Image				= require("aqua.graphics.Image")
 local Line				= require("aqua.graphics.Line")
 local map				= require("aqua.math").map
 local Class				= require("aqua.util.Class")
-local Score				= require("sphere.screen.gameplay.CloudburstEngine.Score")
 
 local AccuracyGraph = Class:new()
 
-AccuracyGraph.init = function(self)
-	Score.observable:add(AccuracyGraph)
-	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
+AccuracyGraph.loadGui = function(self)
+	self.cs = CoordinateManager:getCS(unpack(self.data.cs))
+	self.x = self.data.x
+	self.y = self.data.y
+	self.w = self.data.w
+	self.h = self.data.h
+	self.r = self.data.r
+	self.layer = self.data.layer
+	self.lineColor = self.data.lineColor
+	self.color = self.data.color
+
+	self.score = self.gui.score
+	self.container = self.gui.container
+	
+	self:load()
 end
 
 AccuracyGraph.load = function(self)
+	self.score.observable:add(self)
+
 	self.canvas = love.graphics.newCanvas()
 	
 	love.graphics.setCanvas(self.canvas)
 	local line = Line:new({
-		points = {0, 0.5, 1, 0.5},
+		points = {self.x, self.y + self.h / 2, self.x + self.w, self.y + self.h / 2},
 		cs = self.cs,
-		color = {255, 255, 255, 127},
+		color = self.lineColor,
 		lineStyle = "smooth",
 		lineWidth = 4
 	})
@@ -29,8 +42,8 @@ AccuracyGraph.load = function(self)
 	love.graphics.setCanvas()
 	
 	self.circle = Circle:new({
-		x = 0, y = 0, r = 1/360,
-		color = {0, 127, 63, 255},
+		x = 0, y = 0, r = self.r,
+		color = self.color,
 		mode = "fill",
 		cs = self.cs
 	})
@@ -44,17 +57,20 @@ AccuracyGraph.load = function(self)
 	self.image = Image:new({
 		x = 0, y = 0,
 		cs = self.cs,
+		layer = self.layer,
 		image = self.canvas
 	})
 	self.image:reload()
+	
+	self.container:add(self.image)
 end
 
 AccuracyGraph.addPoint = function(self, time, deltaTime)
 	love.graphics.setCanvas(self.canvas)
 	local circle = self.circle
 	
-	circle.x = map(time, self.minTime, self.maxTime, 0, 1)
-	circle.y = 0.5 + deltaTime * 3
+	circle.x = map(time, self.minTime, self.maxTime, self.x, self.x + self.w)
+	circle.y = map(0.5 + deltaTime * 3, 0, 1, self.y, self.y + self.h)
 	circle:reload()
 	circle:draw()
 	
@@ -64,6 +80,12 @@ end
 AccuracyGraph.reload = function(self)
 	self:load()
 end
+
+AccuracyGraph.unload = function(self)
+	self.container:remove(self.image)
+end
+
+AccuracyGraph.update = function(self) end
 
 AccuracyGraph.receive = function(self, event)
 	if event.name == "resize" then
