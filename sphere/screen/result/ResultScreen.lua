@@ -23,6 +23,7 @@ ResultScreen.load = function(self)
 end
 
 ResultScreen.unload = function(self)
+	self.gui:unload()
 end
 
 ResultScreen.update = function(self)
