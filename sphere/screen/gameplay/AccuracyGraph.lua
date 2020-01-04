@@ -78,6 +78,7 @@ AccuracyGraph.addPoint = function(self, time, deltaTime)
 end
 
 AccuracyGraph.reload = function(self)
+	self:unload()
 	self:load()
 end
 
