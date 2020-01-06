@@ -81,15 +81,17 @@ GameplayScreen.load = function(self)
 	
 	InputManager.observable:add(self.engine)
 	
+	local dim = 255 * (1 - Config:get("dim.gameplay"))
+	local color = {dim, dim, dim}
 	NoteChartResourceLoader:load(self.cacheData.path, noteChart, function()
 		self.engine.localAliases = NoteChartResourceLoader.localAliases
 		self.engine.globalAliases = NoteChartResourceLoader.globalAliases
 		self.bga:load()
 		PauseOverlay:play()
+		BackgroundManager:setColor(color)
+		self.bga:setColor(color)
 	end)
 	
-	local dim = 255 * (1 - Config:get("dim.gameplay"))
-	local color = {dim, dim, dim}
 	BackgroundManager:setColor(color)
 	self.bga:setColor(color)
 end
