@@ -2,7 +2,7 @@ local ncdk = require("ncdk")
 local json = require("json")
 local toml = require("lua-toml.toml")
 local NoteSkin = require("sphere.screen.gameplay.CloudburstEngine.NoteSkin")
-local TomlNoteSkinLoader = require("sphere.screen.gameplay.TomlNoteSkinLoader")
+local TomlNoteSkinLoader = require("sphere.noteskin.TomlNoteSkinLoader")
 
 local NoteSkinLoader = {}
 
@@ -13,6 +13,8 @@ NoteSkinLoader.load = function(self, metaData)
 	if not metaData then
 		return self:loadEmptySkin()
 	elseif metaData.type == "toml:simple-v1" then
+		return self:loadTomlSimpleV1(metaData)
+	elseif metaData.type == "toml:simple-v2" then
 		return self:loadTomlSimpleLatest(metaData)
 	elseif metaData.type == "json:full-v2" then
 		return self:loadJsonFullLatest(metaData)
@@ -30,6 +32,10 @@ NoteSkinLoader.loadEmptySkin = function(self)
 	noteSkin:load()
 
 	return noteSkin
+end
+
+NoteSkinLoader.loadTomlSimpleV1 = function(self, metaData)
+	return TomlNoteSkinLoader:new():load(metaData, 1)
 end
 
 NoteSkinLoader.loadTomlSimpleLatest = function(self, metaData)

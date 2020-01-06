@@ -1,15 +1,19 @@
 local Class = require("aqua.util.Class")
 local ncdk = require("ncdk")
-local toml = require("lua-toml.toml")
 local ajson = require("aqua.util.json")
 local NoteSkin = require("sphere.screen.gameplay.CloudburstEngine.NoteSkin")
+
+local toml = require("lua-toml.toml")
+toml.strict = false
 
 local TomlNoteSkinLoader = Class:new()
 
 TomlNoteSkinLoader.data = {}
 TomlNoteSkinLoader.path = "userdata/skins"
 
-TomlNoteSkinLoader.load = function(self, metaData)
+TomlNoteSkinLoader.load = function(self, metaData, version)
+	self.version = version or math.huge
+
 	local noteSkin = NoteSkin:new()
 	noteSkin.metaData = metaData
 	self.noteSkin = noteSkin
@@ -20,9 +24,14 @@ TomlNoteSkinLoader.load = function(self, metaData)
 
 	self.unit = noteSkin.tomlData.general.unit
 
-	self:processPlayFieldData()
+	self.noteSkin.playField = {}
+	self.noteSkin.noteSkinData = {}
+
+	self:addCS()
+
 	self:processNoteSkinData()
 	self:addMeasureLine()
+	self:processPlayFieldData()
 	noteSkin:load()
 
 	-- ajson.write("skin.json", noteSkin.playField)
@@ -32,13 +41,8 @@ end
 
 TomlNoteSkinLoader.processNoteSkinData = function(self)
 	local noteSkin = self.noteSkin
-	noteSkin.noteSkinData = {}
 	local noteSkinData = noteSkin.noteSkinData
 
-	noteSkinData.cses = {
-		{0.5, 0, 0, 0, "h"},
-		{0, 0, 0, 0, "all"}
-	}
 	noteSkinData.images = {}
 	self.imageNames = {}
 
@@ -47,6 +51,29 @@ TomlNoteSkinLoader.processNoteSkinData = function(self)
 	for i = 1, #input do
 		self:processInput(input[i], i)
 	end
+
+	if self.version > 1 then
+		self:addPlayFieldGuidelines()
+	end
+end
+
+TomlNoteSkinLoader.addCS = function(self)
+	local columns = self.noteSkin.tomlData.columns
+	local align = columns.align
+
+	local noteSkinData = self.noteSkin.noteSkinData
+	noteSkinData.cses = {}
+	local cses = noteSkinData.cses
+	self.cses = cses
+
+	if align == "left" then
+		cses[1] = {0, 0, 0, 0, "h"}
+	elseif align == "right" then
+		cses[1] = {1, 0, 1, 0, "h"}
+	else
+		cses[1] = {0.5, 0, 0.5, 0, "h"}
+	end
+	cses[2] = {0, 0, 0, 0, "all"}
 end
 
 TomlNoteSkinLoader.getImageName = function(self, path, layer)
@@ -71,8 +98,9 @@ TomlNoteSkinLoader.processInput = function(self, input, i)
 	self:addPlayFieldKey(input, i)
 end
 
-TomlNoteSkinLoader.getNoteX = function(self, i)
+TomlNoteSkinLoader.getFullWidth = function(self)
 	local columns = self.noteSkin.tomlData.columns
+	local align = columns.align
 	local sum = 0
 
 	for j = 1, #columns.width do
@@ -82,12 +110,27 @@ TomlNoteSkinLoader.getNoteX = function(self, i)
 		sum = sum + columns.space[j]
 	end
 
-	local x = columns.x - sum / 2
+	return sum
+end
+
+TomlNoteSkinLoader.getNoteX = function(self, i, leftSpace)
+	local columns = self.noteSkin.tomlData.columns
+	local align = columns.align
+	local sum = self:getFullWidth()
+
+	local x
+	if align == "left" then
+		x = columns.x
+	elseif align == "right" then
+		x = columns.x + self.unit - sum
+	else
+		x = columns.x + self.unit / 2 - sum / 2
+	end
 
 	for j = 1, i - 1 do
 		x = x + columns.width[j]
 	end
-	for j = 1, i do
+	for j = 1, leftSpace and (i - 1) or i do
 		x = x + columns.space[j]
 	end
 
@@ -218,8 +261,40 @@ TomlNoteSkinLoader.addPlayFieldKey = function(self, input, i)
 		layer = keys.layer,
 		released = keys.released[i],
 		pressed = keys.pressed[i],
-		cs = {0.5, 0, 0, 0, "h"}
+		cs = self.cses[1]
 	}
+end
+
+TomlNoteSkinLoader.addPlayFieldGuidelines = function(self)
+	local playField = self.noteSkin.playField
+	
+	local guidelines = self.noteSkin.tomlData.guidelines
+	local unit = self.unit
+
+	for i = 1, #guidelines.width do
+		local bw = guidelines.width[i]
+		local bh = guidelines.height[i]
+
+		if bw ~= 0 and bh ~= 0 then
+			local x
+			if bw >= 0 then
+				x = self:getNoteX(i, true)
+			elseif bw < 0 then
+				x = self:getNoteX(i) + bw
+			end
+
+			playField[#playField + 1] = {
+				class = "StaticObject",
+				x = x / unit,
+				y = guidelines.y / unit,
+				w = math.abs(bw) / unit,
+				h = bh / unit,
+				layer = guidelines.layer,
+				image = guidelines.images[i],
+				cs = self.cses[1]
+			}
+		end
+	end
 end
 
 TomlNoteSkinLoader.addMeasureLine = function(self)
@@ -282,94 +357,216 @@ TomlNoteSkinLoader.addMeasureLine = function(self)
 end
 
 TomlNoteSkinLoader.processPlayFieldData = function(self)
-	self.noteSkin.playField = {}
+	if self.version == 1 then
+		local tomlScore = self.noteSkin.tomlData.score
+		
+		tomlScore.score.layer = 5
+		tomlScore.accuracy.layer = 5
+		tomlScore.combo.layer = 5
+		tomlScore.timegate.layer = 5
+		self:addScoreDisplayScore(tomlScore.score)
+		self:addScoreDisplayAccuracy(tomlScore.accuracy)
+		self:addScoreDisplayCombo(tomlScore.combo)
+		self:addScoreDisplayTimegate(tomlScore.timegate)
+
+		self:addAccuracyGraph({
+			class = "AccuracyGraph",
+			r = 1,
+			lineColor = {255, 255, 255, 127},
+			color = {127, 127, 127, 255},
+			xywh = {0, self.unit * 0.25, self.unit, self.unit * 0.5},
+			origin = "lane",
+			layer = 0
+		})
+		self:addProgressBar({
+			class = "ProgressBar",
+			color = {255, 255, 255, 255},
+			direction = "left-right",
+			mode = "+",
+			xywh = {0, 0.995, 1, 0.005},
+			origin = "all",
+			layer = 0
+		})
+
+		return
+	end
+
+	local tomlPlayField = self.noteSkin.tomlData.playfield
+	for _, object in pairs(tomlPlayField) do
+		if object.class == "ScoreDisplay" and object.field == "score" then
+			self:addScoreDisplayScore(object)
+		elseif object.class == "ScoreDisplay" and object.field == "accuracy" then
+			self:addScoreDisplayAccuracy(object)
+		elseif object.class == "ScoreDisplay" and object.field == "combo" then
+			self:addScoreDisplayCombo(object)
+		elseif object.class == "ScoreDisplay" and object.field == "timegate" then
+			self:addScoreDisplayTimegate(object)
+		elseif object.class == "AccuracyGraph" then
+			self:addAccuracyGraph(object)
+		elseif object.class == "ProgressBar" then
+			self:addProgressBar(object)
+		elseif object.class == "StaticObject" then
+			self:addStaticObject(object)
+		end
+	end
+end
+
+TomlNoteSkinLoader.getPlayFielObjectXYWH = function(self, object)
+	if self.version == 1 and not object.xywh then
+		return 0, 0, 1, 1, self.cses[2]
+	end
+
+	local ox, oy, ow, oh = unpack(object.xywh)
+	if object.origin == "lane" then
+		local x0 = self:getNoteX(0)
+		local width = self:getFullWidth()
+		local xcenter = x0 + width / 2
+		local unit = self.unit
+
+		local x = (xcenter - unit / 2 + ox) / unit
+		local y = oy / unit
+		local w = ow / unit
+		local h = oh / unit
+		
+		return x, y, w, h, self.cses[1]
+	elseif object.origin == "all" then
+		return ox, oy, ow, oh, self.cses[2]
+	end
+end
+
+TomlNoteSkinLoader.addScoreDisplayScore = function(self, object)
 	local playField = self.noteSkin.playField
-	local tomlScore = self.noteSkin.tomlData.score
-	local columns = self.noteSkin.tomlData.columns
+	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
 
 	playField[#playField + 1] = {
 		class = "ScoreDisplay",
 		field = "score",
-		format = tomlScore.score.format,
-		x = 0,
-		y = 0,
-		w = 1,
-		h = 1,
-		layer = 20,
-		cs = {0, 0, 0, 0, "all"},
-		align = {x = tomlScore.score.align[1], y = tomlScore.score.align[2]},
-		color = tomlScore.score.color,
-		font = tomlScore.score.font,
-		size = tomlScore.score.size
+		format = object.format,
+		x = x,
+		y = y,
+		w = w,
+		h = h,
+		layer = object.layer,
+		cs = cs,
+		align = {x = object.align[1], y = object.align[2]},
+		color = object.color,
+		font = object.font,
+		size = object.size
 	}
+end
+
+TomlNoteSkinLoader.addScoreDisplayAccuracy = function(self, object)
+	local playField = self.noteSkin.playField
+	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
+
 	playField[#playField + 1] = {
 		class = "ScoreDisplay",
 		field = "accuracy",
-		format = tomlScore.accuracy.format,
-		x = 0,
-		y = 0,
-		w = 1,
-		h = 1,
-		layer = 20,
-		cs = {0, 0, 0, 0, "all"},
-		align = {x = tomlScore.accuracy.align[1], y = tomlScore.accuracy.align[2]},
-		color = tomlScore.accuracy.color,
-		font = tomlScore.accuracy.font,
-		size = tomlScore.accuracy.size
+		format = object.format,
+		x = x,
+		y = y,
+		w = w,
+		h = h,
+		layer = object.layer,
+		cs = cs,
+		align = {x = object.align[1], y = object.align[2]},
+		color = object.color,
+		font = object.font,
+		size = object.size
 	}
+end
+
+TomlNoteSkinLoader.addScoreDisplayCombo = function(self, object)
+	local playField = self.noteSkin.playField
+	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
+
 	playField[#playField + 1] = {
 		class = "ScoreDisplay",
 		field = "combo",
-		format = tomlScore.combo.format,
-		x = -0.5 + columns.x / self.unit,
-		y = 0,
-		w = 1,
-		h = 1,
-		layer = 20,
-		cs = {0.5, 0, 0, 0, "h"},
-		align = {x = tomlScore.combo.align[1], y = tomlScore.combo.align[2]},
-		color = tomlScore.combo.color,
-		font = tomlScore.combo.font,
-		size = tomlScore.combo.size
+		format = object.format,
+		x = x,
+		y = y,
+		w = w,
+		h = h,
+		layer = object.layer,
+		cs = cs,
+		align = {x = object.align[1], y = object.align[2]},
+		color = object.color,
+		font = object.font,
+		size = object.size
 	}
+end
+
+TomlNoteSkinLoader.addScoreDisplayTimegate = function(self, object)
+	local playField = self.noteSkin.playField
+	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
+
 	playField[#playField + 1] = {
 		class = "ScoreDisplay",
 		field = "timegate",
-		format = tomlScore.timegate.format,
-		x = -0.5 + columns.x / self.unit,
-		y = 0,
-		w = 1,
-		h = 1,
-		layer = 20,
-		cs = {0.5, 0, 0, 0, "h"},
-		align = {x = tomlScore.timegate.align[1], y = tomlScore.timegate.align[2]},
-		color = tomlScore.timegate.color,
-		font = tomlScore.timegate.font,
-		size = tomlScore.timegate.size
+		format = object.format,
+		x = x,
+		y = y,
+		w = w,
+		h = h,
+		layer = object.layer,
+		cs = cs,
+		align = {x = object.align[1], y = object.align[2]},
+		color = object.color,
+		font = object.font,
+		size = object.size
 	}
+end
+
+TomlNoteSkinLoader.addAccuracyGraph = function(self, object)
+	local playField = self.noteSkin.playField
+	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
+
 	playField[#playField + 1] = {
 		class = "AccuracyGraph",
-		x = 0.25,
-		y = 0.25,
-		w = 0.5,
-		h = 0.5,
-		r = 0.002,
-		layer = 0,
-		cs = {0, 0, 0, 0, "all"},
-		color = {127, 127, 127, 255},
-		lineColor = {127, 127, 127, 127}
+		x = x,
+		y = y,
+		w = w,
+		h = h,
+		r = object.r / self.unit,
+		layer = object.layer,
+		cs = cs,
+		color = object.color,
+		lineColor = object.lineColor
 	}
+end
+
+TomlNoteSkinLoader.addProgressBar = function(self, object)
+	local playField = self.noteSkin.playField
+	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
+
 	playField[#playField + 1] = {
 		class = "ProgressBar",
-		x = 0,
-		y = 0.995,
-		w = 1,
-		h = 0.005,
-		layer = 20,
-		cs = {0, 0, 0, 0, "all"},
-		color = {255, 255, 255, 255},
-		direction = "left-right",
-		mode = "+"
+		x = x,
+		y = y,
+		w = w,
+		h = h,
+		layer = object.layer,
+		cs = cs,
+		color = object.color,
+		direction = object.direction,
+		mode = object.mode
+	}
+end
+
+TomlNoteSkinLoader.addStaticObject = function(self, object)
+	local playField = self.noteSkin.playField
+	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
+
+	playField[#playField + 1] = {
+		class = "StaticObject",
+		x = x,
+		y = y,
+		w = w,
+		h = h,
+		layer = object.layer,
+		cs = cs,
+		image = object.image
 	}
 end
 

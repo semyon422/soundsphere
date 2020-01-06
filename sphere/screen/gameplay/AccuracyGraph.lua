@@ -25,6 +25,8 @@ AccuracyGraph.loadGui = function(self)
 end
 
 AccuracyGraph.load = function(self)
+	self.allcs = CoordinateManager:getCS(0, 0, 0, 0, "all")
+
 	self.score.observable:add(self)
 
 	self.canvas = love.graphics.newCanvas()
@@ -56,7 +58,7 @@ AccuracyGraph.load = function(self)
 	
 	self.image = Image:new({
 		x = 0, y = 0,
-		cs = self.cs,
+		cs = self.allcs,
 		layer = self.layer,
 		image = self.canvas
 	})

@@ -1,6 +1,6 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Config			= require("sphere.config.Config")
-local NoteSkinManager	= require("sphere.screen.gameplay.NoteSkinManager")
+local NoteSkinManager	= require("sphere.noteskin.NoteSkinManager")
 local Screen			= require("sphere.screen.Screen")
 local ScreenManager		= require("sphere.screen.ScreenManager")
 
