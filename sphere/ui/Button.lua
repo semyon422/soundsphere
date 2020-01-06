@@ -6,6 +6,7 @@ local aquafonts			= require("aqua.assets.fonts")
 local Button = Class:new()
 
 local transparent = {0, 0, 0, 0}
+local white = {255, 255, 255, 255}
 Button.loadGui = function(self)
 	self.cs = CoordinateManager:getCS(unpack(self.data.cs))
 	self.x = self.data.x
@@ -13,7 +14,9 @@ Button.loadGui = function(self)
 	self.w = self.data.w
 	self.h = self.data.h
 	self.layer = self.data.layer
+	self.textAlign = self.data.textAlign
 	self.text = self.data.text or ""
+	self.textColor = self.data.textColor or white
 	self.backgroundColor = self.data.backgroundColor or transparent
 
 	if self.data.font then
@@ -45,8 +48,10 @@ Button.load = function(self)
 		cs = self.cs,
 		layer = self.layer,
 		mode = "fill",
+		textolor = self.textolor,
 		backgroundColor = self.backgroundColor,
-		textAlign = {x = "center", y = "center"},
+		textAlign = self.textAlign,
+		font = self.font,
 		interact = self.interact
 	})
 	self.button:reload()
@@ -67,7 +72,8 @@ Button.unload = function(self)
 end
 
 Button.reload = function(self)
-	self.button:reload()
+	self:unload()
+	self:load()
 end
 
 return Button

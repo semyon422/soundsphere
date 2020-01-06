@@ -4,7 +4,6 @@ local Screen			= require("sphere.screen.Screen")
 local ScreenManager		= require("sphere.screen.ScreenManager")
 local ResultGUI			= require("sphere.screen.result.ResultGUI")
 local JudgeTable		= require("sphere.screen.result.JudgeTable")
-local MetaDataTable		= require("sphere.screen.select.MetaDataTable")
 
 local ResultScreen = Screen:new()
 
@@ -28,18 +27,18 @@ end
 
 ResultScreen.update = function(self)
 	Screen.update(self)
+
+	self.gui:update()
 end
 
 ResultScreen.draw = function(self)
 	Screen.draw(self)
 	
-	MetaDataTable:draw()
 	self.judgeTable:draw()
 end
 
 ResultScreen.receive = function(self, event)
 	if event.name == "resize" then
-		MetaDataTable:reload()
 		self.gui:reload()
 		self.judgeTable:reload()
 	elseif event.name == "keypressed" and event.args[1] == "escape" then
@@ -51,6 +50,10 @@ ResultScreen.receive = function(self, event)
 		
 		self.gui.score = score
 		self.gui:load("userdata/interface/result.json")
+		self.gui:receive({
+			action = "updateMetaData",
+			cacheData = event.cacheData
+		})
 		
 		self.judgeTable.score = score
 		self.judgeTable:load()
@@ -58,10 +61,6 @@ ResultScreen.receive = function(self, event)
 		if not score.autoplay and score.score > 0 then
 			ScoreManager:insertScore(score)
 		end
-	end
-	
-	if event.name == "metadata" then
-		MetaDataTable:setData(event.data)
 	end
 end
 

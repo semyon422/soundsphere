@@ -7,7 +7,7 @@ local JudgeTable = Class:new()
 
 JudgeTable.rowHeight = 0.06
 JudgeTable.x = 0.2
-JudgeTable.y = 0.3
+JudgeTable.y = 0.4
 JudgeTable.w = 0.25
 JudgeTable.load = function(self)
 	self.judgeNames = {}
@@ -15,9 +15,6 @@ JudgeTable.load = function(self)
 	self.judgeValues = {}
 	
 	self.row = 1
-	self:addCombo()
-	self:addScore()
-	self:addAccuracy()
 	self:addHeader()
 	for i = 1, #self.score.timegates do
 		self.judgeNames[self.row] = self:getJudgeNameText(self.score.timegates[i].name, self.row)
@@ -106,45 +103,6 @@ JudgeTable.addHeader = function(self)
 	self.judgeGates[self.row]:reload()
 	
 	self.judgeValues[self.row] = self:getJudgeValueText("count", self.row)
-	self.judgeValues[self.row]:reload()
-	
-	self.row = self.row + 1
-end
-
-JudgeTable.addCombo = function(self)
-	self.judgeNames[self.row] = self:getJudgeNameText("combo", self.row)
-	self.judgeNames[self.row]:reload()
-	
-	self.judgeGates[self.row] = self:getJudgeGateText("", self.row)
-	self.judgeGates[self.row]:reload()
-	
-	self.judgeValues[self.row] = self:getJudgeValueText(self.score.maxcombo, self.row)
-	self.judgeValues[self.row]:reload()
-	
-	self.row = self.row + 1
-end
-
-JudgeTable.addAccuracy = function(self)
-	self.judgeNames[self.row] = self:getJudgeNameText("accuracy", self.row)
-	self.judgeNames[self.row]:reload()
-	
-	self.judgeGates[self.row] = self:getJudgeGateText("", self.row)
-	self.judgeGates[self.row]:reload()
-	
-	self.judgeValues[self.row] = self:getJudgeValueText(("%.2f"):format(self.score.accuracy), self.row)
-	self.judgeValues[self.row]:reload()
-	
-	self.row = self.row + 1
-end
-
-JudgeTable.addScore = function(self)
-	self.judgeNames[self.row] = self:getJudgeNameText("score", self.row)
-	self.judgeNames[self.row]:reload()
-	
-	self.judgeGates[self.row] = self:getJudgeGateText("", self.row)
-	self.judgeGates[self.row]:reload()
-	
-	self.judgeValues[self.row] = self:getJudgeValueText(("%06d"):format(self.score.score), self.row)
 	self.judgeValues[self.row]:reload()
 	
 	self.row = self.row + 1

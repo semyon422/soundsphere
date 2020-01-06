@@ -3,7 +3,6 @@ local Observable				= require("aqua.util.Observable")
 local Cache						= require("sphere.database.Cache")
 local CollectionManager			= require("sphere.database.CollectionManager")
 local ModifierManager			= require("sphere.screen.gameplay.ModifierManager")
-local ModifierDisplay			= require("sphere.screen.select.ModifierDisplay")
 local SequentialModifierButton	= require("sphere.screen.select.ModifierMenu.SequentialModifierButton")
 local CustomList				= require("sphere.ui.CustomList")
 local NotificationLine			= require("sphere.ui.NotificationLine")
@@ -50,7 +49,7 @@ end
 
 SequenceList.send = function(self, event)
 	if event.action == "buttonInteract" and event.button == 1 then
-		ModifierDisplay:updateText()
+		-- ModifierDisplay:updateText()
 	end
 	
 	CustomList.send(self, event)

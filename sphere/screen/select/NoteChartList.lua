@@ -7,7 +7,6 @@ local GameplayScreen		= require("sphere.screen.gameplay.GameplayScreen")
 local CacheList				= require("sphere.screen.select.CacheList")
 local NoteChartListButton	= require("sphere.screen.select.NoteChartListButton")
 local PreviewManager		= require("sphere.screen.select.PreviewManager")
-local SearchLine			= require("sphere.screen.select.SearchLine")
 
 local NoteChartList = CacheList:new()
 
@@ -110,7 +109,7 @@ NoteChartList.selectCache = function(self)
 	if not list or not list[1] then
 		return
 	end
-	local foundList = SearchManager:search(list, SearchLine.searchTable)
+	local foundList = SearchManager:search(list, self.NoteChartSetList.searchLine.searchTable)
 	for i = 1, #foundList do
 		items[#items + 1] = self:getItem(foundList[i])
 	end

@@ -212,11 +212,8 @@ PauseOverlay.menu = function(self)
 		function()
 			ScreenManager:receive({
 				name = "score",
-				score = self.engine.score
-			})
-			ScreenManager:receive({
-				name = "metadata",
-				data = GameplayScreen.cacheData
+				score = self.engine.score,
+				cacheData = GameplayScreen.cacheData
 			})
 		end
 	)

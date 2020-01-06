@@ -51,9 +51,9 @@ ModifierList.load = function(self)
 end
 
 ModifierList.send = function(self, event)
-	if event.action == "buttonInteract" and event.button == 1 then
-		ModifierDisplay:updateText()
-	end
+	-- if event.action == "buttonInteract" and event.button == 1 then
+	-- 	ModifierDisplay:updateText()
+	-- end
 	
 	CustomList.send(self, event)
 end

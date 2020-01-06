@@ -11,6 +11,8 @@ local OverlayMenu		= require("sphere.ui.OverlayMenu")
 
 local NoteChartSetList = CacheList:new()
 
+NoteChartSetList.searchLine = SearchLine
+
 NoteChartSetList.x = 0.6
 NoteChartSetList.y = 0
 NoteChartSetList.w = 0.4
@@ -94,6 +96,7 @@ NoteChartSetList.receive = function(self, event)
 			self.keyControl = true
 		end
 	elseif event.name == "search" then
+		self.searchLine = event.sender
 		if event.text == "" then
 			self.needSearch = false
 		else
@@ -117,7 +120,7 @@ NoteChartSetList.checkCacheData = function(self, cacheData)
 	if not base then return false end
 	if not self.needSearch then return true end
 	
-	local searchTable = SearchLine.searchTable
+	local searchTable = self.searchLine.searchTable
 	
 	local list = Cache.chartsAtSet[cacheData.id]
 	if not list or not list[1] then

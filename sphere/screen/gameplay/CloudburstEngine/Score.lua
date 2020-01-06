@@ -21,7 +21,7 @@ Score.construct = function(self)
 	self.count = 0
 	self.accuracy = 0
 	self.timegate = ""
-	self.grade = ""
+	self.grade = "?"
 	
 	self.score = 0
 end

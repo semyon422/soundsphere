@@ -1,14 +1,19 @@
-local NoteSkinMenu = require("sphere.screen.select.NoteSkinMenu")
-local ModifierMenu = require("sphere.screen.select.ModifierMenu")
-local KeyBindMenu = require("sphere.screen.select.KeyBindMenu")
-local ScreenManager = require("sphere.screen.ScreenManager")
+local NoteSkinMenu		= require("sphere.screen.select.NoteSkinMenu")
+local ModifierMenu		= require("sphere.screen.select.ModifierMenu")
+local KeyBindMenu		= require("sphere.screen.select.KeyBindMenu")
+local CacheDataDisplay	= require("sphere.screen.select.CacheDataDisplay")
+local ModifierDisplay	= require("sphere.screen.select.ModifierDisplay")
+local SearchLine		= require("sphere.screen.select.SearchLine")
+local ScreenManager		= require("sphere.screen.ScreenManager")
 
 local GUI = require("sphere.ui.GUI")
 
 local SelectGUI = GUI:new()
 
 SelectGUI.classes = setmetatable({
-	--
+	CacheDataDisplay = CacheDataDisplay,
+	ModifierDisplay = ModifierDisplay,
+	SearchLine = SearchLine
 }, GUI.classes)
 
 SelectGUI.functions = setmetatable({
