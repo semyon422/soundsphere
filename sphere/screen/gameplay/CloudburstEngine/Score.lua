@@ -13,7 +13,7 @@ Score.construct = function(self)
 
 	self.combo = 0
 	self.maxcombo = 0
-	self.rate = 1
+	self.timeRate = 1
 	self.hits = {}
 	self.judges = {}
 	
@@ -155,7 +155,7 @@ Score.processNote = function(self, note)
 end
 
 Score.processShortNote = function(self, note)
-	local deltaTime = (note.engine.exactCurrentTime - note.startNoteData.timePoint.absoluteTime) / self.rate
+	local deltaTime = (note.engine.exactCurrentTime - note.startNoteData.timePoint.absoluteTime) / self.timeRate
 	local timeState = self:getTimeState(deltaTime)
 	
 	note:process(timeState)
@@ -167,8 +167,8 @@ Score.processShortNote = function(self, note)
 end
 
 Score.processLongNote = function(self, note)
-	local deltaStartTime = (note.engine.exactCurrentTime - note.startNoteData.timePoint.absoluteTime) / self.rate
-	local deltaEndTime = (note.engine.exactCurrentTime - note.endNoteData.timePoint.absoluteTime) / self.rate
+	local deltaStartTime = (note.engine.exactCurrentTime - note.startNoteData.timePoint.absoluteTime) / self.timeRate
+	local deltaEndTime = (note.engine.exactCurrentTime - note.endNoteData.timePoint.absoluteTime) / self.timeRate
 	local startTimeState = self:getTimeState(deltaStartTime)
 	local endTimeState = self:getTimeState(deltaEndTime)
 	
