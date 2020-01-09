@@ -56,11 +56,16 @@ NoteSkinList.addItems = function(self)
 	local items = {}
 	
 	local list = NoteSkinManager:getMetaDataList(self:getSelectedInputMode())
+	local selectedMetaData = NoteSkinManager:getMetaData(self:getSelectedInputMode())
 
 	for _, metaData in ipairs(list) do
+		local name = metaData.name
+		if name == selectedMetaData.name then
+			name = "★ " .. name
+		end
 		items[#items + 1] = {
 			metaData = metaData,
-			name = metaData.name
+			name = name
 		}
 	end
 	
