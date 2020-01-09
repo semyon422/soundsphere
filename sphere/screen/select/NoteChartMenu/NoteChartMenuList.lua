@@ -61,9 +61,16 @@ NoteChartMenuList.addItems = function(self)
 
 	local items = {
 		{
-			name = "open folder",
+			name = "open " .. cacheData.path,
 			onClick = function()
 				love.system.openURL("file://" .. love.filesystem.getSource() .. "/" .. cacheData.path)
+				NoteChartMenu:hide()
+			end
+		},
+		{
+			name = "open " .. cacheData.path:match("^(.+)/.-$"),
+			onClick = function()
+				love.system.openURL("file://" .. love.filesystem.getSource() .. "/" .. cacheData.path:match("^(.+)/.-$"))
 				NoteChartMenu:hide()
 			end
 		},
