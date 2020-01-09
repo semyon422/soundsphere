@@ -56,6 +56,8 @@ NoteChartStateManager.receive = function(self, event)
 	elseif action == "scrollTarget" then
 		if sender == NoteChartSetList then
 			local item = NoteChartSetList.items[event.itemIndex]
+			if not item then return end
+			
 			local list = Cache.chartsAtSet[item.cacheData.id]
 			if list and list[1] then
 				local focusedItem = NoteChartList.items[NoteChartList.focusedItemIndex]
