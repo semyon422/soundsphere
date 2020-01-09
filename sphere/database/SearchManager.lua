@@ -1,20 +1,21 @@
 local SearchManager = {}
 
-SearchManager.search = function(self, list, searchTable)
+SearchManager.search = function(self, list, searchString)
 	local foundList = {}
 	for i = 1, #list do
-		if self:check(list[i], searchTable) then
+		if self:check(list[i], searchString) then
 			foundList[#foundList + 1] = list[i]
 		end
 	end
 	return foundList
 end
 
-SearchManager.check = function(self, chart, searchTable)
+SearchManager.check = function(self, chart, searchString)
+	local searchTable = searchString:split(" ")
 	local found = true
-	for _, searchString in ipairs(searchTable) do
-		local key, operator, value = searchString:match("^(.-)([=><~!]+)(.+)$")
-		if key and self:checkFilter(chart, key, operator, value) or self:find(chart, searchString) then
+	for _, searchSubString in ipairs(searchTable) do
+		local key, operator, value = searchSubString:match("^(.-)([=><~!]+)(.+)$")
+		if key and self:checkFilter(chart, key, operator, value) or self:find(chart, searchSubString) then
 			-- skip
 		else
 			found = false
@@ -35,10 +36,10 @@ local fieldList = {
 	"inputMode"
 }
 
-SearchManager.find = function(self, chart, searchString)
+SearchManager.find = function(self, chart, searchSubString)
 	for i = 1, #fieldList do
 		local value = chart[fieldList[i]]
-		if value and value:lower():find(searchString, 1, true) then
+		if value and value:lower():find(searchSubString, 1, true) then
 			return true
 		end
 	end

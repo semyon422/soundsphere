@@ -5,14 +5,18 @@ local Screen			= require("sphere.screen.Screen")
 local ScreenManager		= require("sphere.screen.ScreenManager")
 
 local ModifierMenu		= require("sphere.screen.select.ModifierMenu")
-local NoteChartList		= require("sphere.screen.select.NoteChartList")
-local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
 local NoteSkinMenu		= require("sphere.screen.select.NoteSkinMenu")
 local KeyBindMenu		= require("sphere.screen.select.KeyBindMenu")
+local NoteChartMenu		= require("sphere.screen.select.NoteChartMenu")
+
+local NoteChartList		= require("sphere.screen.select.NoteChartList")
+local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
 local PreviewManager	= require("sphere.screen.select.PreviewManager")
 local SelectGUI			= require("sphere.screen.select.SelectGUI")
 
 local BackgroundManager	= require("sphere.ui.BackgroundManager")
+
+local NoteChartStateManager	= require("sphere.screen.select.NoteChartStateManager")
 
 local SelectScreen = Screen:new()
 
@@ -20,18 +24,18 @@ SelectScreen.init = function(self)
 	self.gui = SelectGUI:new()
 	self.gui.container = self.container
 	self.gui:load("userdata/interface/select.json")
+	
 	ModifierMenu:init()
 	NoteSkinMenu:init()
 	KeyBindMenu:init()
+	NoteChartMenu:init()
+
 	NoteChartList:init()
 	NoteChartSetList:init()
 	PreviewManager:init()
-	
-	NoteChartList.observable:add(self)
-	NoteChartSetList.observable:add(self)
-	
-	NoteChartList.NoteChartSetList = NoteChartSetList
-	NoteChartSetList.NoteChartList = NoteChartList
+
+	NoteChartStateManager:init()
+	NoteChartStateManager.observable:add(self)
 end
 
 SelectScreen.load = function(self)
@@ -62,6 +66,8 @@ SelectScreen.update = function(self)
 	ModifierMenu:update()
 	NoteSkinMenu:update()
 	KeyBindMenu:update()
+	NoteChartMenu:update()
+
 	self.gui:update()
 end
 
@@ -74,20 +80,32 @@ SelectScreen.draw = function(self)
 	ModifierMenu:draw()
 	NoteSkinMenu:draw()
 	KeyBindMenu:draw()
+	NoteChartMenu:draw()
 end
 
 SelectScreen.receive = function(self, event)
 	local modifierMenuHidden = ModifierMenu.hidden
 	local noteSkinMenuHidden = NoteSkinMenu.hidden
 	local keyBindMenuMenuHidden = KeyBindMenu.hidden
+	local noteChartMenuMenuHidden = NoteChartMenu.hidden
 	ModifierMenu:receive(event)
 	NoteSkinMenu:receive(event)
 	KeyBindMenu:receive(event)
-	if (not modifierMenuHidden or not noteSkinMenuHidden or not keyBindMenuMenuHidden) and event.name ~= "resize" then
+	NoteChartMenu:receive(event)
+	if (
+		not modifierMenuHidden or
+		not noteSkinMenuHidden or
+		not keyBindMenuMenuHidden or
+		not noteChartMenuMenuHidden
+		) and event.name ~= "resize" then
 		return
 	end
 	
-	if event.name == "keypressed" and event.args[1] == Config:get("screen.browser") then
+	if event.action == "playNoteChart" then
+		local GameplayScreen = require("sphere.screen.gameplay.GameplayScreen")
+		GameplayScreen.cacheData = event.cacheData
+		return ScreenManager:set(GameplayScreen)
+	elseif event.name == "keypressed" and event.args[1] == Config:get("screen.browser") then
 		return ScreenManager:set(require("sphere.screen.browser.BrowserScreen"))
 	elseif event.name == "keypressed" and event.args[1] == Config:get("screen.settings") then
 		return ScreenManager:set(require("sphere.screen.settings.SettingsScreen"))
@@ -103,6 +121,7 @@ SelectScreen.receive = function(self, event)
 	NoteChartSetList:receive(event)
 	NoteChartList:receive(event)
 	self.gui:receive(event)
+	NoteChartStateManager:receive(event)
 end
 
 return SelectScreen

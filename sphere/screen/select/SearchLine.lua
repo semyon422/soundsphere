@@ -1,14 +1,13 @@
-local Class				= require("aqua.util.Class")
-local aquafonts			= require("aqua.assets.fonts")
-local CoordinateManager	= require("aqua.graphics.CoordinateManager")
-local Theme				= require("aqua.ui.Theme")
-local Observable		= require("aqua.util.Observable")
-local spherefonts		= require("sphere.assets.fonts")
+local Class					= require("aqua.util.Class")
+local aquafonts				= require("aqua.assets.fonts")
+local CoordinateManager		= require("aqua.graphics.CoordinateManager")
+local Theme					= require("aqua.ui.Theme")
+local Observable			= require("aqua.util.Observable")
+local spherefonts			= require("sphere.assets.fonts")
 
 local SearchLine = Class:new()
 
 SearchLine.searchString = ""
-SearchLine.searchTable = {}
 
 local transparent = {0, 0, 0, 0}
 local white = {255, 255, 255, 255}
@@ -48,6 +47,9 @@ SearchLine.load = function(self)
 	self.observable = Observable:new()
 	self.observable:add(require("sphere.screen.select.SelectScreen"))
 
+	local NoteChartStateManager	= require("sphere.screen.select.NoteChartStateManager")
+	self.searchString = NoteChartStateManager.searchString
+
 	self.sender = self
 	
 	self.textInputFrame = Theme.TextInputFrame:new({
@@ -65,12 +67,12 @@ SearchLine.load = function(self)
 		limit = 1,
 		textAlign = {x = "left", y = "center"},
 		xpadding = 0.01,
-		text = "",
 		font = self.font,
 		enableStencil = true,
 		layer = self.layer
 	})
 	self.textInputFrame:reload()
+	self.textInputFrame.textInput.text = self.searchString
 
 	self.container:add(self.textInputFrame)
 end
@@ -100,7 +102,6 @@ SearchLine.receive = function(self, event)
 		
 		if oldText ~= newText or forceReload then
 			self.searchString = newText:lower()
-			self.searchTable = self.searchString:split(" ")
 			self.observable:send({
 				name = "search",
 				text = newText,

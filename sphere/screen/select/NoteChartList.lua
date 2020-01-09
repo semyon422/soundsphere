@@ -2,8 +2,6 @@ local CoordinateManager		= require("aqua.graphics.CoordinateManager")
 local Observable			= require("aqua.util.Observable")
 local Cache					= require("sphere.database.Cache")
 local SearchManager			= require("sphere.database.SearchManager")
-local ScreenManager			= require("sphere.screen.ScreenManager")
-local GameplayScreen		= require("sphere.screen.gameplay.GameplayScreen")
 local CacheList				= require("sphere.screen.select.CacheList")
 local NoteChartListButton	= require("sphere.screen.select.NoteChartListButton")
 local PreviewManager		= require("sphere.screen.select.PreviewManager")
@@ -15,7 +13,8 @@ NoteChartList.y = 4/17
 NoteChartList.w = 0.6
 NoteChartList.h = 9/17
 
-NoteChartList.sender = "NoteChartList"
+NoteChartList.sender = NoteChartList
+NoteChartList.searchString = ""
 
 NoteChartList.buttonCount = 9
 NoteChartList.middleOffset = 5
@@ -33,46 +32,11 @@ NoteChartList.init = function(self)
 end
 
 NoteChartList.send = function(self, event)
-	if event.action == "scrollStop" then
-		local item = self.items[event.itemIndex]
-		local cacheData = item and item.cacheData
-		if cacheData then
-			self:updateBackground()
-			self:updateAudio()
-		end
-	elseif event.action == "buttonInteract" and event.button == 1 or event.action == "return" then
-		local cacheData = self.items[event.itemIndex].cacheData
-		if cacheData then
-			GameplayScreen.cacheData = cacheData
-			ScreenManager:set(GameplayScreen)
-		end
-	elseif event.action == "scrollTarget" then
-		local item = self.items[event.itemIndex]
-		if item and item.cacheData then
-			self:send({
-				sender = self.sender,
-				action = "updateMetaData",
-				cacheData = item.cacheData
-			})
-		end
-	end
-	
 	return CacheList.send(self, event)
 end
 
 NoteChartList.receive = function(self, event)
-	if event.action == "scrollTarget" then
-		local item = event.list.items[event.itemIndex]
-		if item and item.cacheData and event.list.sender == "NoteChartSetList" then
-			local focusedItem = self.items[self.focusedItemIndex]
-			local cacheData = focusedItem and focusedItem.cacheData
-			
-			self.chartSetId = item.cacheData.id
-			self:selectCache()
-			
-			self:quickScrollToItemIndex(self:getItemIndex(cacheData))
-		end
-	elseif event.name == "keypressed" then
+	if event.name == "keypressed" then
 		local key = event.args[1]
 		if key == "lctrl" or key == "rctrl" then
 			self.keyControl = true
@@ -109,7 +73,7 @@ NoteChartList.selectCache = function(self)
 	if not list or not list[1] then
 		return
 	end
-	local foundList = SearchManager:search(list, self.NoteChartSetList.searchLine.searchTable)
+	local foundList = SearchManager:search(list, self.searchString)
 	for i = 1, #foundList do
 		items[#items + 1] = self:getItem(foundList[i])
 	end
