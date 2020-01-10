@@ -14,6 +14,7 @@ local CMod			= require("sphere.screen.gameplay.ModifierManager.CMod")
 local FullLongNote	= require("sphere.screen.gameplay.ModifierManager.FullLongNote")
 local ToOsu			= require("sphere.screen.gameplay.ModifierManager.ToOsu")
 local AutoKeySound	= require("sphere.screen.gameplay.ModifierManager.AutoKeySound")
+local DoublePlay	= require("sphere.screen.gameplay.ModifierManager.DoublePlay")
 
 local ModifierSequence = Class:new()
 
@@ -21,6 +22,7 @@ ModifierSequence.modifiers = {
 	AutoPlay,
 	AutoKeySound,
 	Automap,
+	DoublePlay,
 	ProMode,
 	SetInput,
 	WindUp,
@@ -53,6 +55,7 @@ ModifierSequence.inconsequentialClassList = {
 	NoMeasureLine,
 	CMod,
 	AutoKeySound,
+	DoublePlay,
 	ToOsu
 }
 
@@ -151,6 +154,8 @@ ModifierSequence.toJson = function(self)
 end
 
 ModifierSequence.fromJson = function(self, jsonObject)
+	self:construct()
+
 	for _, modifierData in ipairs(jsonObject) do
 		for _, Modifier in ipairs(self.modifiers) do
 			if modifierData.name == Modifier.name then
