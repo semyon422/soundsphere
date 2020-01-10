@@ -28,10 +28,15 @@ NoteChartStateManager.load = function(self)
 
 		local chartSetData = Cache.chartSetDict[self.selectedChart[1]]
 		local chartData = Cache.chartDict[self.selectedChart[2]]
-		print(self.selectedChart[1], self.selectedChart[2])
 
 		local itemIndex = NoteChartSetList:getItemIndex(chartSetData)
 		NoteChartSetList:quickScrollToItemIndex(itemIndex)
+		NoteChartSetList:send({
+			sender = NoteChartSetList,
+			action = "scrollTarget",
+			itemIndex = itemIndex,
+			list = NoteChartSetList
+		})
 		NoteChartSetList:calculateButtons()
 
 		local itemIndex = NoteChartList:getItemIndex(chartData)
