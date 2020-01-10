@@ -22,7 +22,7 @@ LogicalNote.isHere = function(self)
 end
 
 LogicalNote.isReachable = function(self)
-	local deltaTime = (self.engine.exactCurrentTime - self.startNoteData.timePoint.absoluteTime) / self.score.rate
+	local deltaTime = (self.engine.exactCurrentTime - self.startNoteData.timePoint.absoluteTime) / self.score.timeRate
 	local timeState = self.score:getTimeState(deltaTime)
 	return timeState ~= "none" and timeState ~= "late"
 end
