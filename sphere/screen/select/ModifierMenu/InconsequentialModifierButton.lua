@@ -27,6 +27,9 @@ InconsequentialModifierButton.construct = function(self)
 				
 				SliderButton.updateValue(self, value)
 			end
+			button.removeModifier = function(self)
+				modifier[modifier.variable] = Modifier[modifier.variable]
+			end
 		end
 	elseif Modifier.sequential then
 		if Modifier.type == "number" then
