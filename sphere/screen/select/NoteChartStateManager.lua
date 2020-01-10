@@ -4,16 +4,46 @@ local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
 local PreviewManager	= require("sphere.screen.select.PreviewManager")
 local SearchLine		= require("sphere.screen.select.SearchLine")
 local Cache				= require("sphere.database.Cache")
+local json				= require("json")
 
 local NoteChartStateManager = {}
 
 NoteChartStateManager.searchString = ""
+NoteChartStateManager.path = "userdata/selectedChart.json"
 
 NoteChartStateManager.init = function(self)
 	self.observable = Observable:new()
 
 	NoteChartList.observable:add(self)
 	NoteChartSetList.observable:add(self)
+
+	self.selectedChart = {1, 1}
+end
+
+NoteChartStateManager.load = function(self)
+	if love.filesystem.exists(self.path) then
+		local file = io.open(self.path, "r")
+		self.selectedChart = json.decode(file:read("*all"))
+		file:close()
+
+		local chartSetData = Cache.chartSetDict[self.selectedChart[1]]
+		local chartData = Cache.chartDict[self.selectedChart[2]]
+		print(self.selectedChart[1], self.selectedChart[2])
+
+		local itemIndex = NoteChartSetList:getItemIndex(chartSetData)
+		NoteChartSetList:quickScrollToItemIndex(itemIndex)
+		NoteChartSetList:calculateButtons()
+
+		local itemIndex = NoteChartList:getItemIndex(chartData)
+		NoteChartList:quickScrollToItemIndex(itemIndex)
+		NoteChartList:calculateButtons()
+	end
+end
+
+NoteChartStateManager.unload = function(self)
+	local file = io.open(self.path, "w")
+	file:write(json.encode(self.selectedChart))
+	return file:close()
 end
 
 NoteChartStateManager.send = function(self, event)
@@ -78,10 +108,12 @@ NoteChartStateManager.receive = function(self, event)
 			end
 
 			self.noteChartSetCacheData = item.cacheData
+			self.selectedChart[1] = item.cacheData.id
 		elseif sender == NoteChartList then
 			local item = NoteChartList.items[event.itemIndex]
 
 			NoteChartList.noteChartCacheData = item.cacheData
+			self.selectedChart[2] = item.cacheData.id
 
 			self:send({
 				sender = self,

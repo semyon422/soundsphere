@@ -51,6 +51,8 @@ SelectScreen.load = function(self)
 	NoteChartList:load()
 	NoteChartSetList:load()
 	
+	NoteChartStateManager:load()
+	
 	NoteChartSetList:sendState()
 	
 	local dim = 255 * (1 - Config:get("dim.select"))
@@ -60,6 +62,7 @@ end
 SelectScreen.unload = function(self)
 	PreviewManager:stop()
 	ModifierManager:unload()
+	NoteChartStateManager:unload()
 end
 
 SelectScreen.update = function(self)
