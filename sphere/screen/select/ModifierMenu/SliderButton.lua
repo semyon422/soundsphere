@@ -36,6 +36,8 @@ SliderButton.construct = function(self)
 end
 
 SliderButton.reload = function(self)
+	local modifier = self.item.modifier
+
 	local slider = self.slider
 	
 	slider.x = self.x + self.w * self.columnX[3]
@@ -46,11 +48,11 @@ SliderButton.reload = function(self)
 	slider.rectangleColor = self.sliderRectangleColor
 	slider.circleColor = self.sliderCircleColor
 	slider.cs = self.cs
-	slider.value = slider.value or self.item.minValue
+	slider.value = modifier[modifier.variable]
 	
-	slider.step = self.item.step
-	slider.minValue = self.item.minValue
-	slider.maxValue = self.item.maxValue
+	slider.step = modifier.range[2]
+	slider.minValue = modifier.range[1]
+	slider.maxValue = modifier.range[3]
 	
 	slider:reload()
 	
@@ -128,7 +130,9 @@ SliderButton.getValue = function(self)
 end
 
 SliderButton.getDisplayValue = function(self)
-	return self.item.format:format(map(self:getValue(), self.item.minValue, self.item.maxValue, self.item.minDisplayValue, self.item.maxDisplayValue))
+	local displayRange = self.item.modifier.displayRange or self.item.modifier.range
+	local format = self.item.modifier.format or "%s"
+	return format:format(map(self:getValue(), self.item.modifier.range[1], self.item.modifier.range[3], displayRange[1], displayRange[3]))
 end
 
 SliderButton.updateValue = function(self, value)

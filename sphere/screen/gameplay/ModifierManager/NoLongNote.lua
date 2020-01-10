@@ -5,6 +5,8 @@ local NoLongNote = InconsequentialModifier:new()
 NoLongNote.name = "NoLongNote"
 NoLongNote.shortName = "NLN"
 
+NoLongNote.type = "boolean"
+
 NoLongNote.apply = function(self)
 	local noteChart = self.sequence.manager.noteChart
 	

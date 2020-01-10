@@ -6,8 +6,10 @@ local WindUp = InconsequentialModifier:new()
 WindUp.name = "WindUp"
 WindUp.shortName = "WindUp"
 
+WindUp.type = "boolean"
+
 WindUp.apply = function(self)
-	self.sequence.manager.engine.score.windUp = self.value
+	self.sequence.manager.engine.score.windUp = true
 end
 
 WindUp.update = function(self)

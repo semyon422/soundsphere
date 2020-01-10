@@ -5,6 +5,8 @@ local CMod = InconsequentialModifier:new()
 CMod.name = "CMod"
 CMod.shortName = "CMod"
 
+CMod.type = "boolean"
+
 CMod.apply = function(self)
 	local noteChart = self.sequence.manager.noteChart
 	

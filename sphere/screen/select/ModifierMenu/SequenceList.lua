@@ -40,7 +40,9 @@ SequenceList.reloadItems = function(self)
 	local items = {}
 	for _, modifier in ipairs(sequential) do
 		items[#items + 1] = {
-			modifier = modifier
+			name = modifier.name,
+			modifier = modifier,
+			Modifier = modifier.Class
 		}
 	end
 	

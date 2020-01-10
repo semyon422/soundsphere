@@ -50,6 +50,11 @@ ModifierMenu.reload = function(self)
 	SequenceList:reload()
 end
 
+ModifierMenu.reloadItems = function(self)
+	ModifierList:addItems()
+	SequenceList:reloadItems()
+end
+
 ModifierMenu.receive = function(self, event)
 	if self.hidden then
 		return

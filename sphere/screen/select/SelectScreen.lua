@@ -3,6 +3,7 @@ local Config			= require("sphere.config.Config")
 local NoteSkinManager	= require("sphere.noteskin.NoteSkinManager")
 local Screen			= require("sphere.screen.Screen")
 local ScreenManager		= require("sphere.screen.ScreenManager")
+local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 
 local ModifierMenu		= require("sphere.screen.select.ModifierMenu")
 local NoteSkinMenu		= require("sphere.screen.select.NoteSkinMenu")
@@ -25,6 +26,8 @@ SelectScreen.init = function(self)
 	self.gui.container = self.container
 	self.gui:load("userdata/interface/select.json")
 	
+	ModifierManager:init()
+	
 	ModifierMenu:init()
 	NoteSkinMenu:init()
 	KeyBindMenu:init()
@@ -42,6 +45,8 @@ SelectScreen.load = function(self)
 	self.gui:reload()
 	
 	NoteSkinManager:load()
+	ModifierManager:load()
+	ModifierMenu:reloadItems()
 	
 	NoteChartList:load()
 	NoteChartSetList:load()
@@ -54,6 +59,7 @@ end
 
 SelectScreen.unload = function(self)
 	PreviewManager:stop()
+	ModifierManager:unload()
 end
 
 SelectScreen.update = function(self)

@@ -5,6 +5,8 @@ local Mirror = InconsequentialModifier:new()
 Mirror.name = "Mirror"
 Mirror.shortName = "Mirror"
 
+Mirror.type = "boolean"
+
 Mirror.apply = function(self)
 	local noteChart = self.sequence.manager.noteChart
 	local keyCount = noteChart.inputMode:getInputCount("key")

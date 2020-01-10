@@ -7,6 +7,8 @@ ToOsu.name = "ToOsu"
 ToOsu.shortName = "ToOsu"
 ToOsu.after = true
 
+ToOsu.type = "boolean"
+
 ToOsu.apply = function(self)
 	local GameplayScreen = require("sphere.screen.gameplay.GameplayScreen")
 	

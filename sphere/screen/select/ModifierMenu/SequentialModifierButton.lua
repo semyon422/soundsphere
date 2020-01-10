@@ -1,28 +1,31 @@
-local aquafonts		= require("aqua.assets.fonts")
-local TextFrame		= require("aqua.graphics.TextFrame")
-local map			= require("aqua.math").map
-local Class			= require("aqua.util.Class")
-local spherefonts	= require("sphere.assets.fonts")
-local Checkbox		= require("sphere.ui.Checkbox")
-local CustomList	= require("sphere.ui.CustomList")
-local Slider		= require("sphere.ui.Slider")
-
-local Automap		= require("sphere.screen.gameplay.ModifierManager.Automap")
-local FullLongNote	= require("sphere.screen.gameplay.ModifierManager.FullLongNote")
-
-local ModifierButton		= require("sphere.screen.select.ModifierMenu.ModifierButton")
-local FullLongNoteButton	= require("sphere.screen.select.ModifierMenu.FullLongNoteButton")
-local AutomapButton			= require("sphere.screen.select.ModifierMenu.AutomapButton")
+local ModifierButton	= require("sphere.screen.select.ModifierMenu.ModifierButton")
+local SliderButton		= require("sphere.screen.select.ModifierMenu.SliderButton")
+local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 
 local SequentialModifierButton = ModifierButton:new()
 
 SequentialModifierButton.construct = function(self)
-	if getmetatable(self.item.modifier) == FullLongNote then
-		return FullLongNoteButton:new(self)
-	elseif getmetatable(self.item.modifier) == Automap then
-		return AutomapButton:new(self)
+	local Modifier = self.item.Modifier
+	local modifier = self.item.modifier
+	
+	local button
+	if Modifier.type == "number" then
+		button = SliderButton:new(self)
+		button.item = self.item
+		button.updateValue = function(self, value)
+			modifier[modifier.variable] = value
+			
+			SliderButton.updateValue(self, value)
+		end
+		button.removeModifier = function(self)
+			ModifierManager.sequence:remove(modifier)
+			
+			local SequenceList = require("sphere.screen.select.ModifierMenu.SequenceList")
+			SequenceList:reloadItems()
+		end
 	end
-	error()
+
+	return button
 end
 
 return SequentialModifierButton

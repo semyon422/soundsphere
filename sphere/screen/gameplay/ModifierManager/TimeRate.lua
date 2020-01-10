@@ -5,12 +5,18 @@ local TimeRate = InconsequentialModifier:new()
 TimeRate.name = "TimeRate"
 TimeRate.shortName = "TimeRate"
 
-TimeRate.construct = function(self)
-	self.value = 1
-end
+TimeRate.type = "number"
+TimeRate.variable = "value"
+TimeRate.format = "%0.2f"
+TimeRate.range = {0.5, 0.05, 2}
+TimeRate.value = 1
 
 TimeRate.tostring = function(self)
 	return self.value .. "X"
+end
+
+TimeRate.tojson = function(self)
+	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
 end
 
 TimeRate.apply = function(self)

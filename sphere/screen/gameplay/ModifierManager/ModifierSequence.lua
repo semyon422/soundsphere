@@ -17,6 +17,23 @@ local AutoKeySound	= require("sphere.screen.gameplay.ModifierManager.AutoKeySoun
 
 local ModifierSequence = Class:new()
 
+ModifierSequence.modifiers = {
+	AutoPlay,
+	AutoKeySound,
+	Automap,
+	ProMode,
+	SetInput,
+	WindUp,
+	TimeRate,
+	NoScratch,
+	Mirror,
+	NoLongNote,
+	NoMeasureLine,
+	CMod,
+	FullLongNote,
+	ToOsu
+}
+
 ModifierSequence.construct = function(self)
 	self.sequential = {}
 	self.inconsequential = {}
@@ -24,78 +41,51 @@ ModifierSequence.construct = function(self)
 	self:addInconsequential()
 end
 
+ModifierSequence.inconsequentialClassList = {
+	AutoPlay,
+	ProMode,
+	SetInput,
+	WindUp,
+	TimeRate,
+	NoScratch,
+	Mirror,
+	NoLongNote,
+	NoMeasureLine,
+	CMod,
+	AutoKeySound,
+	ToOsu
+}
+
 ModifierSequence.addInconsequential = function(self)
 	local list = self.inconsequential
 	
-	local autoPlay = AutoPlay:new()
-	autoPlay.sequence = self
-	list[#list + 1] = autoPlay
-	self[AutoPlay] = autoPlay
-	
-	local proMode = ProMode:new()
-	proMode.sequence = self
-	list[#list + 1] = proMode
-	self[ProMode] = proMode
-	
-	local setInput = SetInput:new()
-	setInput.sequence = self
-	list[#list + 1] = setInput
-	self[SetInput] = setInput
-	
-	local windUp = WindUp:new()
-	windUp.sequence = self
-	list[#list + 1] = windUp
-	self[WindUp] = windUp
-	
-	local timeRate = TimeRate:new()
-	timeRate.sequence = self
-	list[#list + 1] = timeRate
-	self[TimeRate] = timeRate
-	
-	local noScratch = NoScratch:new()
-	noScratch.sequence = self
-	list[#list + 1] = noScratch
-	self[NoScratch] = noScratch
+	for _, Modifier in ipairs(self.inconsequentialClassList) do
+		local modifier = Modifier:new()
+		modifier.sequence = self
+		modifier.enabled = false
+		modifier.Class = Modifier
+		list[#list + 1] = modifier
+		-- self[Modifier] = modifier
+		if Modifier == TimeRate then
+			modifier.enabled = true
+		end
+	end
+end
 
-	local mirror = Mirror:new()
-	mirror.sequence = self
-	list[#list + 1] = mirror
-	self[Mirror] = mirror
-	
-	local noLongNote = NoLongNote:new()
-	noLongNote.sequence = self
-	list[#list + 1] = noLongNote
-	self[NoLongNote] = noLongNote
-	
-	local noMeasureLine = NoMeasureLine:new()
-	noMeasureLine.sequence = self
-	list[#list + 1] = noMeasureLine
-	self[NoMeasureLine] = noMeasureLine
-	
-	local cMod = CMod:new()
-	cMod.sequence = self
-	list[#list + 1] = cMod
-	self[CMod] = cMod
-	
-	local autoKeySound = AutoKeySound:new()
-	autoKeySound.sequence = self
-	list[#list + 1] = autoKeySound
-	self[AutoKeySound] = autoKeySound
-	
-	local toOsu = ToOsu:new()
-	toOsu.sequence = self
-	list[#list + 1] = toOsu
-	self[ToOsu] = toOsu
+ModifierSequence.get = function(self, Modifier)
+	for _, modifier in ipairs(self.inconsequential) do
+		if modifier.Class == Modifier then
+			return modifier
+		end
+	end
 end
 
 ModifierSequence.add = function(self, Modifier)
-	if Modifier.inconsequential then
-		self[Modifier]:setValue(Modifier:getValue())
-	elseif Modifier.sequential then
-		local modifier = Modifier:new()
-		modifier.sequence = self
-		self.sequential[#self.sequential + 1] = modifier
-	end
+	local modifier = Modifier:new()
+	modifier.sequence = self
+	modifier.Class = Modifier
+	self.sequential[#self.sequential + 1] = modifier
+	return modifier
 end
 
 ModifierSequence.remove = function(self, modifier)
@@ -108,56 +98,76 @@ ModifierSequence.remove = function(self, modifier)
 	end
 end
 
-ModifierSequence.apply = function(self)
+ModifierSequence.getEnabledModifiers = function(self)
+	local list = {}
+
 	for _, modifier in ipairs(self.inconsequential) do
-		if not modifier.after and modifier:getValue() then
-			modifier:apply()
+		if not modifier.after and modifier.enabled then
+			list[#list + 1] = modifier
 		end
 	end
 	for _, modifier in ipairs(self.sequential) do
-		modifier:apply()
+		list[#list + 1] = modifier
 	end
 	for _, modifier in ipairs(self.inconsequential) do
-		if modifier.after and modifier:getValue() then
-			modifier:apply()
+		if modifier.after and modifier.enabled then
+			list[#list + 1] = modifier
 		end
+	end
+
+	return list
+end
+
+ModifierSequence.apply = function(self)
+	for _, modifier in ipairs(self:getEnabledModifiers()) do
+		modifier:apply()
 	end
 end
 
 ModifierSequence.update = function(self)
-	for _, modifier in ipairs(self.inconsequential) do
-		if not modifier.after and modifier:getValue() then
-			modifier:update()
-		end
-	end
-	for _, modifier in ipairs(self.sequential) do
+	for _, modifier in ipairs(self:getEnabledModifiers()) do
 		modifier:update()
-	end
-	for _, modifier in ipairs(self.inconsequential) do
-		if modifier.after and modifier:getValue() then
-			modifier:update()
-		end
 	end
 end
 
 ModifierSequence.tostring = function(self)
 	local out = {}
 	
-	for _, modifier in ipairs(self.inconsequential) do
-		if not modifier.after and modifier:getValue() then
-			out[#out + 1] = modifier:tostring()
-		end
-	end
-	for _, modifier in ipairs(self.sequential) do
+	for _, modifier in ipairs(self:getEnabledModifiers()) do
 		out[#out + 1] = modifier:tostring()
-	end
-	for _, modifier in ipairs(self.inconsequential) do
-		if modifier.after and modifier:getValue() then
-			out[#out + 1] = modifier:tostring()
-		end
 	end
 	
 	return table.concat(out, ", ")
+end
+
+ModifierSequence.toJson = function(self)
+	local out = {}
+	
+	for _, modifier in ipairs(self:getEnabledModifiers()) do
+		out[#out + 1] = modifier:tojson()
+	end
+	
+	return ("[%s]"):format(table.concat(out, ","))
+end
+
+ModifierSequence.fromJson = function(self, jsonObject)
+	for _, modifierData in ipairs(jsonObject) do
+		for _, Modifier in ipairs(self.modifiers) do
+			if modifierData.name == Modifier.name then
+				local modifier
+				if Modifier.inconsequential then
+					modifier = self:get(Modifier)
+					modifier.enabled = true
+				elseif Modifier.sequential then
+					modifier = self:add(Modifier)
+				end
+				
+				if modifier.variable then
+					modifier[modifier.variable] = modifierData[modifier.variable]
+				end
+			end
+		end
+	end
 end
 
 return ModifierSequence

@@ -7,20 +7,22 @@ local FullLongNote = SequentialModifier:new()
 FullLongNote.name = "FullLongNote"
 FullLongNote.shortName = "FLN"
 
-FullLongNote.value = {
-	level = 0
-}
+FullLongNote.type = "number"
+FullLongNote.variable = "level"
+FullLongNote.range = {0, 1, 3}
+
+FullLongNote.level = 0
 
 FullLongNote.construct = function(self)
-	self:setValue(FullLongNote.value)
-end
-
-FullLongNote.setValue = function(self, value)
-	self.value = clone(value)
+	self.level = FullLongNote.level
 end
 
 FullLongNote.tostring = function(self)
-	return self.shortName .. self.value.level
+	return self.shortName .. self.level
+end
+
+FullLongNote.tojson = function(self)
+	return ([[{"name":"%s","level":%s}]]):format(self.name, self.level)
 end
 
 FullLongNote.apply = function(self)
@@ -87,7 +89,7 @@ FullLongNote.processNoteData = function(self, noteDataIndex, noteData)
 	end
 	
 	local endTimePoint
-	local level = self.value.level
+	local level = self.level
 	if level >= 3 and #timePointList >= 2 then
 		if not nNoteData then
 			endTimePoint = timePointList[#timePointList]

@@ -1,60 +1,45 @@
-local AutoPlay		= require("sphere.screen.gameplay.ModifierManager.AutoPlay")
-local AutoKeySound	= require("sphere.screen.gameplay.ModifierManager.AutoKeySound")
-local Automap		= require("sphere.screen.gameplay.ModifierManager.Automap")
-local ProMode		= require("sphere.screen.gameplay.ModifierManager.ProMode")
-local SetInput		= require("sphere.screen.gameplay.ModifierManager.SetInput")
-local WindUp		= require("sphere.screen.gameplay.ModifierManager.WindUp")
-local TimeRate		= require("sphere.screen.gameplay.ModifierManager.TimeRate")
-local NoScratch		= require("sphere.screen.gameplay.ModifierManager.NoScratch")
-local Mirror		= require("sphere.screen.gameplay.ModifierManager.Mirror")
-local NoLongNote	= require("sphere.screen.gameplay.ModifierManager.NoLongNote")
-local NoMeasureLine	= require("sphere.screen.gameplay.ModifierManager.NoMeasureLine")
-local CMod			= require("sphere.screen.gameplay.ModifierManager.CMod")
-local FullLongNote	= require("sphere.screen.gameplay.ModifierManager.FullLongNote")
-local ToOsu			= require("sphere.screen.gameplay.ModifierManager.ToOsu")
-
-local AutoPlayButton		= require("sphere.screen.select.ModifierMenu.AutoPlayButton")
-local AutoKeySoundButton	= require("sphere.screen.select.ModifierMenu.AutoKeySoundButton")
-local AutomapAddButton		= require("sphere.screen.select.ModifierMenu.AutomapAddButton")
-local ProModeButton			= require("sphere.screen.select.ModifierMenu.ProModeButton")
-local SetInputButton		= require("sphere.screen.select.ModifierMenu.SetInputButton")
-local WindUpButton			= require("sphere.screen.select.ModifierMenu.WindUpButton")
-local TimeRateButton		= require("sphere.screen.select.ModifierMenu.TimeRateButton")
-local NoScratchButton		= require("sphere.screen.select.ModifierMenu.NoScratchButton")
-local MirrorButton			= require("sphere.screen.select.ModifierMenu.MirrorButton")
-local NoLongNoteButton		= require("sphere.screen.select.ModifierMenu.NoLongNoteButton")
-local NoMeasureLineButton	= require("sphere.screen.select.ModifierMenu.NoMeasureLineButton")
-local CModButton			= require("sphere.screen.select.ModifierMenu.CModButton")
-local FullLongNoteAddButton	= require("sphere.screen.select.ModifierMenu.FullLongNoteAddButton")
-local ToOsuButton			= require("sphere.screen.select.ModifierMenu.ToOsuButton")
-
-local class2button = {
-	[AutoPlay] = AutoPlayButton,
-	[AutoKeySound] = AutoKeySoundButton,
-	[Automap] = AutomapAddButton,
-	[ProMode] = ProModeButton,
-	[SetInput] = SetInputButton,
-	[WindUp] = WindUpButton,
-	[TimeRate] = TimeRateButton,
-	[NoScratch] = NoScratchButton,
-	[Mirror] = MirrorButton,
-	[NoLongNote] = NoLongNoteButton,
-	[NoMeasureLine] = NoMeasureLineButton,
-	[CMod] = CModButton,
-	[FullLongNote] = FullLongNoteAddButton,
-	[ToOsu] = ToOsuButton,
-}
-
-local ModifierButton = require("sphere.screen.select.ModifierMenu.ModifierButton")
+local ModifierButton	= require("sphere.screen.select.ModifierMenu.ModifierButton")
+local CheckboxButton	= require("sphere.screen.select.ModifierMenu.CheckboxButton")
+local SliderButton		= require("sphere.screen.select.ModifierMenu.SliderButton")
+local AddModifierButton	= require("sphere.screen.select.ModifierMenu.AddModifierButton")
+local SequenceList		= require("sphere.screen.select.ModifierMenu.SequenceList")
+local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 
 local InconsequentialModifierButton = ModifierButton:new()
 
 InconsequentialModifierButton.construct = function(self)
-	local Button = class2button[self.item.modifier]
-	if Button then
-		return Button:new(self)
+	local Modifier = self.item.Modifier
+	local modifier = self.item.modifier
+	
+	local button
+	if Modifier.inconsequential then
+		if Modifier.type == "boolean" then
+			button = CheckboxButton:new(self)
+			button.item = self.item
+			button.updateValue = function(self, value)
+				modifier.enabled = value
+			end
+		elseif Modifier.type == "number" then
+			button = SliderButton:new(self)
+			button.item = self.item
+			button.updateValue = function(self, value)
+				modifier[modifier.variable] = value
+				
+				SliderButton.updateValue(self, value)
+			end
+		end
+	elseif Modifier.sequential then
+		if Modifier.type == "number" then
+			button = AddModifierButton:new(self)
+			button.item = self.item
+			button.add = function(self)
+				ModifierManager.sequence:add(Modifier)
+				SequenceList:reloadItems()
+			end
+		end
 	end
-	error()
+	
+	return button
 end
 
 return InconsequentialModifierButton

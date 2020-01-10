@@ -4,8 +4,10 @@ local InconsequentialModifier = Modifier:new()
 
 InconsequentialModifier.inconsequential = true
 
-InconsequentialModifier.construct = function(self)
-	self.value = false
+InconsequentialModifier.enabled = false
+
+InconsequentialModifier.tojson = function(self)
+	return ([[{"name":"%s"}]]):format(self.name)
 end
 
 return InconsequentialModifier

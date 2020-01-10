@@ -5,6 +5,8 @@ local SetInput = InconsequentialModifier:new()
 SetInput.name = "SetInput"
 SetInput.shortName = "SetInput"
 
+SetInput.type = "boolean"
+
 SetInput.apply = function(self)
 	self.sequence.manager.engine.score.setinput = true
 end

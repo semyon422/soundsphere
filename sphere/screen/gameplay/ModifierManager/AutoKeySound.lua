@@ -6,6 +6,8 @@ local AutoKeySound = InconsequentialModifier:new()
 AutoKeySound.name = "AutoKeySound"
 AutoKeySound.shortName = "AKS"
 
+AutoKeySound.type = "boolean"
+
 AutoKeySound.apply = function(self)
 	local noteChart = self.sequence.manager.noteChart
 	

@@ -6,6 +6,8 @@ local NoScratch = InconsequentialModifier:new()
 NoScratch.name = "NoScratch"
 NoScratch.shortName = "NoScratch"
 
+NoScratch.type = "boolean"
+
 NoScratch.apply = function(self)
 	local noteChart = self.sequence.manager.noteChart
 

@@ -32,7 +32,7 @@ CheckboxButton.reload = function(self)
 	checkbox.w = self.w * self.columnWidth[2]
 	checkbox.h = self.h
 	checkbox.cs = self.cs
-	checkbox.value = checkbox.value or self.item.minValue
+	checkbox.value = self.item.modifier.enabled
 	
 	checkbox:reload()
 	

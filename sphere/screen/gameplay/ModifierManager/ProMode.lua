@@ -5,6 +5,8 @@ local ProMode = InconsequentialModifier:new()
 ProMode.name = "ProMode"
 ProMode.shortName = "ProMode"
 
+ProMode.type = "boolean"
+
 ProMode.apply = function(self)
 	self.sequence.manager.engine.score.promode = true
 end

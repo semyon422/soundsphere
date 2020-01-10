@@ -208,27 +208,29 @@ local Automap = SequentialModifier:new()
 Automap.name = "Automap"
 Automap.shortName = "AM"
 
-Automap.value = {
-	level = 10
-}
+Automap.type = "number"
+Automap.variable = "keys"
+Automap.range = {4, 1, 10}
+
+Automap.keys = 10
 
 Automap.construct = function(self)
-	self:setValue(Automap.value)
-end
-
-Automap.setValue = function(self, value)
-	self.value = clone(value)
+	self.keys = Automap.keys
 end
 
 Automap.tostring = function(self)
-	return self.shortName .. self.value.level
+	return self.shortName .. self.keys
+end
+
+Automap.tojson = function(self)
+	return ([[{"name":"%s","keys":%s}]]):format(self.name, self.keys)
 end
 
 Automap.apply = function(self)
 	local noteChart = self.sequence.manager.noteChart
 	self.noteChart = noteChart
 
-	self.targetMode = self.value.level
+	self.targetMode = self.keys
 	self.columnCount = self.noteChart.inputMode:getInputCount("key")
 
 	if self.targetMode <= self.columnCount then
@@ -280,7 +282,7 @@ Automap.apply = function(self)
 
 	local inputExisting = noteChart.layerDataSequence.inputExisting
 	inputExisting["key"] = inputExisting["key"] or {}
-	for i = 1, self.value.level do
+	for i = 1, self.keys do
 		inputExisting["key"][i] = true
 	end
 	

@@ -5,6 +5,8 @@ local NoMeasureLine = InconsequentialModifier:new()
 NoMeasureLine.name = "NoMeasureLine"
 NoMeasureLine.shortName = "NML"
 
+NoMeasureLine.type = "boolean"
+
 NoMeasureLine.apply = function(self)
 	local noteChart = self.sequence.manager.noteChart
 	
