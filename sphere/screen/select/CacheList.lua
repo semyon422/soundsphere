@@ -64,10 +64,12 @@ CacheList.getBackgroundPath = function(self, itemIndex)
 	local stagePath
 	if cacheData.stagePath and cacheData.stagePath ~= "" then
 		stagePath = cacheData.stagePath
+	elseif cacheData.path:find("%.ojn/.$") then
+		return directoryPath
 	else
 		stagePath = "background.jpg"
 	end
-	
+
 	return directoryPath .. "/" .. stagePath
 end
 

@@ -2,6 +2,7 @@ local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local image				= require("aqua.image")
 local ImageBackground	= require("sphere.ui.ImageBackground")
 local tween				= require("tween")
+local ThreadPool		= require("aqua.thread.ThreadPool")
 
 local BackgroundManager = {}
 
@@ -16,7 +17,56 @@ end
 BackgroundManager.loadDrawableBackground = function(self, path)
 	if path ~= self.currentPath then
 		self.currentPath = path
-		return image.load(path, function(imageData)
+		if path:find("%.ojn$") then
+			return self:loadOJNBackground(path)
+		else
+			return self:loadImageBackground(path)
+		end
+	end
+end
+
+BackgroundManager.loadImageBackground = function(self, path)
+	return image.load(path, function(imageData)
+		if imageData then
+			return self:setBackground(
+				ImageBackground:new({
+					image = love.graphics.newImage(imageData),
+					cs = self.cs,
+					color = {255, 255, 255, 0},
+					globalColor = self.color,
+					path = path
+				})
+			)
+		end
+	end)
+end
+
+BackgroundManager.loadOJNBackground = function(self, path)
+	return ThreadPool:execute(
+		[[
+			require("love.filesystem")
+			require("love.image")
+
+			local OJN = require("o2jam.OJN")
+
+			local file = love.filesystem.newFile(...)
+			file:open("r")
+			local content = file:read()
+			file:close()
+
+			local ojn = OJN:new(content)
+			if ojn.cover == "" then
+				return
+			end
+
+			local fileData = love.filesystem.newFileData(ojn.cover, "cover")
+			local imageData = love.image.newImageData(fileData)
+
+			return imageData
+		]],
+		{path},
+		function(result)
+			local imageData = result[2]
 			if imageData then
 				return self:setBackground(
 					ImageBackground:new({
@@ -28,8 +78,8 @@ BackgroundManager.loadDrawableBackground = function(self, path)
 					})
 				)
 			end
-		end)
-	end
+		end
+	)
 end
 
 BackgroundManager.setColor = function(self, color)
