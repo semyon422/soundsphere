@@ -69,6 +69,11 @@ NoteChartStateManager.receive = function(self, event)
 				local NoteChartMenu	= require("sphere.screen.select.NoteChartMenu")
 				NoteChartMenu:show()
 			end
+		elseif sender == NoteChartList and event.button == 2 then
+			local cacheData = NoteChartList.items[event.itemIndex].cacheData
+			if cacheData and event.itemIndex == NoteChartList.focusedItemIndex then
+				love.system.setClipboardText(cacheData.path)
+			end
 		elseif sender == NoteChartList and event.button == 1 then
 			local cacheData = NoteChartList.items[event.itemIndex].cacheData
 			if cacheData and event.itemIndex == NoteChartList.focusedItemIndex then
