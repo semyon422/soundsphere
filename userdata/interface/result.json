@@ -9,7 +9,7 @@
 	},
 	
 	{
-		"name": "SongTitle",
+		"name": "SongArtist",
 		"class": "CacheDataDisplay",
 		"field": "artist",
 		"cs": [0, 0, 0, 0, "all"],
@@ -45,7 +45,7 @@
 		"interact": []
 	},
 	{
-		"name": "SongTitle",
+		"name": "ChartName",
 		"class": "CacheDataDisplay",
 		"field": "name",
 		"cs": [0, 0, 0, 0, "all"],
@@ -63,7 +63,7 @@
 		"interact": []
 	},
 	{
-		"name": "SongTitle",
+		"name": "ChartCreator",
 		"class": "CacheDataDisplay",
 		"field": "creator",
 		"cs": [0, 0, 0, 0, "all"],
@@ -99,6 +99,7 @@
 	},
 
 	{
+		"name": "ScoreDisplayScore",
 		"class": "ScoreDisplay", "field": "score",
 		"format": "%07d",
 		"x": 0,
@@ -113,6 +114,7 @@
 		"cs": [0, 0, 0, 0, "all"]
 	},
 	{
+		"name": "ScoreDisplayAccuracy",
 		"class": "ScoreDisplay", "field": "accuracy",
 		"format": "%0.2f",
 		"x": 0,
@@ -127,7 +129,8 @@
 		"cs": [0, 0, 0, 0, "all"]
 	},
 	{
-		"class": "ScoreDisplay", "field": "combo",
+		"name": "ScoreDisplayMaxCombo",
+		"class": "ScoreDisplay", "field": "maxcombo",
 		"format": "%d",
 		"x": 0,
 		"y": 0.32,
@@ -141,6 +144,7 @@
 		"cs": [0, 0, 0, 0, "all"]
 	},
 	{
+		"name": "ScoreDisplayGrade",
 		"class": "ScoreDisplay", "field": "grade",
 		"format": "%s",
 		"x": 0.5,
@@ -153,5 +157,5 @@
 		"font": "resources/fonts/SourceCodePro-Bold.ttf",
 		"size": 180,
 		"cs": [0, 0, 0, 0, "all"]
-	},
+	}
 ]
