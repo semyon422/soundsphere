@@ -193,7 +193,6 @@ CloudburstEngine.playAudio = function(self, paths, layer, keysound, stream)
 		end
 		if audio then
 			audio.offset = self.timeManager.currentTime
-			audio:play()
 			audio:setRate(self.timeRate)
 			audio:setBaseVolume(paths[i][2])
 			if layer == "bga" then
@@ -201,6 +200,7 @@ CloudburstEngine.playAudio = function(self, paths, layer, keysound, stream)
 			elseif layer == "fga" then
 				self.fgaContainer:add(audio)
 			end
+			audio:play()
 		end
 	end
 end
