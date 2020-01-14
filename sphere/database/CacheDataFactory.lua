@@ -441,13 +441,13 @@ CacheDataFactory.getSphere = function(self, chartPaths)
 end
 
 CacheDataFactory.formats = {
-	{"%.osu", CacheDataFactory.getOsu},
-	{"%.qua", CacheDataFactory.getQuaver},
+	{"%.osu$", CacheDataFactory.getOsu},
+	{"%.qua$", CacheDataFactory.getQuaver},
 	{"%.bm[sel]$", CacheDataFactory.getBMS},
-	{"%.pms", CacheDataFactory.getBMS},
-	{"%.ojn", CacheDataFactory.getO2Jam},
-	{"%.ksh", CacheDataFactory.getKSM},
-	{"%.sph", CacheDataFactory.getSphere}
+	{"%.pms$", CacheDataFactory.getBMS},
+	{"%.ojn$", CacheDataFactory.getO2Jam},
+	{"%.ksh$", CacheDataFactory.getKSM},
+	{"%.sph$", CacheDataFactory.getSphere}
 }
 
 return CacheDataFactory
