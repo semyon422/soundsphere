@@ -50,18 +50,13 @@ CacheDatabase.chartSetNumberColumns = {
 }
 
 local createTableRequest = [[
-	CREATE TABLE IF NOT EXISTS `charts` (
-		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		`chartSetId` INTEGER NOT NULL,
-		`hash` TEXT NOT NULL DEFAULT '',
-		`path` TEXT UNIQUE,
-		
+	CREATE TABLE IF NOT EXISTS `noteСharts` (
+		`hash` TEXT UNIQUE NOT NULL PRIMARY KEY,
 		`title` TEXT,
 		`artist` TEXT,
 		`source` TEXT,
 		`tags` TEXT,
 		`name` TEXT,
-		`level` REAL,
 		`creator` TEXT,
 		`audioPath` TEXT,
 		`stagePath` TEXT,
@@ -71,8 +66,21 @@ local createTableRequest = [[
 		`bpm` REAL,
 		`inputMode` TEXT
 	);
-	CREATE TABLE IF NOT EXISTS `chartSets` (
+	CREATE TABLE IF NOT EXISTS `noteChartSets` (
 		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		`path` TEXT UNIQUE
+	);
+	CREATE TABLE IF NOT EXISTS `paths` (
+		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		`chartSetId` INTEGER NOT NULL,
+		`hash` TEXT NOT NULL DEFAULT '',
+		`path` TEXT UNIQUE,
+		`lastModified` INTEGER,
+	);
+	CREATE TABLE IF NOT EXISTS `difficulty` (
+		`hash` TEXT UNIQUE NOT NULL PRIMARY KEY,
+		`chartSetId` INTEGER NOT NULL,
+		`hash` TEXT NOT NULL DEFAULT '',
 		`path` TEXT UNIQUE
 	);
 ]]
