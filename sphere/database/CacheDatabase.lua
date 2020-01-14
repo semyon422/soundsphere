@@ -306,50 +306,80 @@ CacheDatabase.processCacheDatas = function(self, cacheDatas, chartSetData)
 		local cacheData = cacheDatas[i]
 		cacheData.chartSetId = chartSetData[1]
 		self.log:write("chart", cacheData.path:match("^.+/(.-)$"))
-		self:setChartData(cacheData)
+		self:setNoteChartData(cacheData)
 	end
 end
 
-CacheDatabase.setChartData = function(self, cacheData)
-	self.insertChartStatement:reset():bind(
-		cacheData.chartSetId,
-		cacheData.hash,
-		cacheData.path,
-		cacheData.title,
-		cacheData.artist,
-		cacheData.source,
-		cacheData.tags,
-		cacheData.name,
-		cacheData.level,
-		cacheData.creator,
-		cacheData.audioPath,
-		cacheData.stagePath,
-		cacheData.previewTime,
-		cacheData.noteCount,
-		cacheData.length,
-		cacheData.bpm,
-		cacheData.inputMode
+CacheDatabase.setNoteChartData = function(self, data)
+	self:insertNoteChartData(data)
+	self:updateNoteChartData(data)
+end
+
+CacheDatabase.insertNoteChartData = function(self, data)
+	return self.insertChartStatement:reset():bind(
+		data.chartSetId,
+		data.hash,
+		data.path,
+		data.title,
+		data.artist,
+		data.source,
+		data.tags,
+		data.name,
+		data.level,
+		data.creator,
+		data.audioPath,
+		data.stagePath,
+		data.previewTime,
+		data.noteCount,
+		data.length,
+		data.bpm,
+		data.inputMode
 	):step()
-	self.updateChartStatement:reset():bind(
-		cacheData.chartSetId,
-		cacheData.hash,
-		cacheData.path,
-		cacheData.title,
-		cacheData.artist,
-		cacheData.source,
-		cacheData.tags,
-		cacheData.name,
-		cacheData.level,
-		cacheData.creator,
-		cacheData.audioPath,
-		cacheData.stagePath,
-		cacheData.previewTime,
-		cacheData.noteCount,
-		cacheData.length,
-		cacheData.bpm,
-		cacheData.inputMode,
-		cacheData.path
+end
+
+CacheDatabase.updateNoteChartData = function(self, data)
+	return self.updateChartStatement:reset():bind(
+		data.chartSetId,
+		data.hash,
+		data.path,
+		data.title,
+		data.artist,
+		data.source,
+		data.tags,
+		data.name,
+		data.level,
+		data.creator,
+		data.audioPath,
+		data.stagePath,
+		data.previewTime,
+		data.noteCount,
+		data.length,
+		data.bpm,
+		data.inputMode,
+		data.path
 	):step()
+end
+
+CacheDatabase.insertNoteChartData = function(self, path)
+	self:setChartData({
+		chartSetId	= 0,
+		path		= path,
+		hash		= "",
+		title		= "",
+		artist		= "",
+		source		= "",
+		tags		= "",
+		name		= "",
+		level		= 0,
+		creator		= "",
+		audioPath	= "",
+		stagePath	= "",
+		previewTime	= 0,
+		noteCount	= 0,
+		length		= 0,
+		bpm			= 0,
+		inputMode	= ""
+	})
 end
 
 return CacheDatabase

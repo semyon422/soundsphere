@@ -82,7 +82,8 @@ BrowserList.selectCache = function(self)
 		}
 		for _, name in ipairs(directoryItems) do
 			local path = "userdata/charts/" .. name
-			if love.filesystem.isDirectory(path) then
+			
+			if not love.filesystem.isFile(path) then
 				items[#items + 1] = {
 					name = name,
 					path = path

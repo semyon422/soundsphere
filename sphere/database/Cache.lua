@@ -59,25 +59,35 @@ Cache.select = function(self)
 		row = stmt:step()
 	end
 	
-	local chartDict = {}
-	local chartSetDict = {}
-	self.chartDict = chartDict
-	self.chartSetDict = chartSetDict
+	local chartsId = {}
+	local chartsPath = {}
+	local chartSetsId = {}
+	local chartSetsPath = {}
+	self.chartsId = chartsId
+	self.chartsPath = chartsPath
+	self.chartSetsId = chartSetsId
+	self.chartSetsPath = chartSetsPath
 	
-	for _, chartData in ipairs(chartList) do
-		chartDict[chartData.id] = chartData
+	for i = 1, #chartList do
+		local data = chartList[i]
+		chartsId[data.id] = data
+		chartsPath[data.path] = data
 	end
-	for _, chartSetData in ipairs(chartSetList) do
-		chartSetDict[chartSetData.id] = chartSetData
+	for i = 1, #chartSetList do
+		local data = chartSetList[i]
+		chartSetsId[chartSetsId.id] = data
+		chartSetsPath[chartSetsPath.id] = data
 	end
 	
 	local chartsAtSet = {}
 	self.chartsAtSet = chartsAtSet
 	
-	for _, chartData in ipairs(chartList) do
-		chartsAtSet[chartData.chartSetId] = chartsAtSet[chartData.chartSetId] or {}
-		local list = chartsAtSet[chartData.chartSetId]
-		list[#list + 1] = chartData
+	for i = 1, #chartList do
+		local data = chartList[i]
+		local chartSetId = data.chartSetId
+		chartsAtSet[data.chartSetId] = chartsAtSet[data.chartSetId] or {}
+		local list = chartsAtSet[data.chartSetId]
+		list[#list + 1] = data
 	end
 	
 	CacheDatabase:unload()
