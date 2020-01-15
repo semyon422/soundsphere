@@ -3,6 +3,7 @@ local NoteChartFactory			= require("sphere.database.NoteChartFactory")
 local NoteChartEntryFactory		= require("sphere.database.NoteChartEntryFactory")
 local NoteChartDataEntryFactory	= require("sphere.database.NoteChartDataEntryFactory")
 local CacheDatabase				= require("sphere.database.CacheDatabase")
+local Cache						= require("sphere.database.Cache")
 local Log						= require("aqua.util.Log")
 
 local NoteChartManager = {}
@@ -12,34 +13,6 @@ NoteChartManager.init = function(self)
 	self.log.console = true
 	self.log.path = "userdata/NoteChartManager.log"
 end
-
--- NoteChartManager.update = function(self, path, recursive, callback)
--- 	if not self.isUpdating then
--- 		self.isUpdating = true
--- 		return ThreadPool:execute(
--- 			[[
--- 				local path, recursive = ...
-				
--- 				local CacheDatabase = require("sphere.database.CacheDatabase")
--- 				local CacheDataFactory = require("sphere.database.CacheDataFactory")
--- 				local NoteChartFactory = require("sphere.database.NoteChartFactory")
--- 				CacheDatabase:init()
--- 				CacheDataFactory:init()
--- 				NoteChartFactory:init()
-				
--- 				CacheDatabase:load()
--- 				CacheDatabase:clear(path)
--- 				CacheDatabase:lookup(path, recursive)
--- 				CacheDatabase:unload()
--- 			]],
--- 			{path, recursive},
--- 			function(result)
--- 				callback()
--- 				self.isUpdating = false
--- 			end
--- 		)
--- 	end
--- end
 
 NoteChartManager.lookup = function(self, directoryPath, recursive)
 	self.log:write("lookup", directoryPath)
@@ -79,29 +52,59 @@ end
 
 NoteChartManager.processNoteChartEntries = function(self, noteChartPaths, noteChartSetPath)
 	self.log:write("ncs", noteChartSetPath:match("^.+/(.-)$"))
-	-- CacheDatabase:begin()
 	local noteChartEntries = NoteChartEntryFactory:getEntries(noteChartPaths)
-	local noteChartSetEntry = CacheDatabase:getNoteChartSetEntry(noteChartSetPath)
+	local noteChartSetEntry = Cache:getNoteChartSetEntry({
+		path = noteChartSetPath,
+		lastModified = love.filesystem.getLastModified(noteChartSetPath)
+	})
 
 	for i = 1, #noteChartEntries do
 		local noteChartEntry = noteChartEntries[i]
 
-		noteChartEntry.chartSetId = noteChartSetEntry[1]
-		CacheDatabase:setNoteChartEntry(noteChartEntry)
+		noteChartEntry.setId = noteChartSetEntry.id
+		noteChartEntry.lastModified = love.filesystem.getLastModified(noteChartEntry.path)
+		
+		Cache:setNoteChartEntry(noteChartEntry)
 
 		self.log:write("chart", noteChartEntry.path:match("^.+/(.-)$"))
 	end
-	-- CacheDatabase:commit()
 end
 
 NoteChartManager.generateCacheFull = function(self)
+	Cache:select()
 	CacheDatabase:load()
 	CacheDatabase:begin()
+
 	self:lookup("userdata/chartsTest", true)
+	self:generate()
+
 	CacheDatabase:commit()
 	CacheDatabase:unload()
 end
 
+NoteChartManager.generate = function(self)
+	local noteChartSets = Cache.noteChartSets
+	for i = 1, #noteChartSets do
+		self:processNoteChartDataEntries(Cache:getNoteChartsAtSet(noteChartSets[i].id))
+	end
+end
+
+NoteChartManager.processNoteChartDataEntries = function(self, noteChartEntries)
+	local paths = {}
+	for i = 1, #noteChartEntries do
+		paths[#paths + 1] = noteChartEntries[i].path
+	end
+
+	local entries = NoteChartDataEntryFactory:getEntries(paths)
+	for i = 1, #entries do
+		local noteChartDataEntry = entries[i]
+		Cache:setNoteChartDataEntry(noteChartDataEntry)
+
+		local noteChartEntry = Cache:getNoteChartEntryByPath(noteChartDataEntry.path)
+		noteChartEntry.hash = noteChartDataEntry.hash
+		Cache:setNoteChartEntry(noteChartEntry)
+	end
+end
 
 NoteChartManager.load = function(self)
 	

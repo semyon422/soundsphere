@@ -5,6 +5,7 @@ local SearchManager			= require("sphere.database.SearchManager")
 local CacheList				= require("sphere.screen.select.CacheList")
 local NoteChartListButton	= require("sphere.screen.select.NoteChartListButton")
 local PreviewManager		= require("sphere.screen.select.PreviewManager")
+local BackgroundManager		= require("sphere.ui.BackgroundManager")
 
 local NoteChartList = CacheList:new()
 
@@ -52,7 +53,7 @@ NoteChartList.receive = function(self, event)
 end
 
 NoteChartList.sortItemsFunction = function(a, b)
-	a, b = a.cacheData, b.cacheData
+	a, b = a.noteChartDataEntry, b.noteChartDataEntry
 	if
 		#a.inputMode < #b.inputMode or
 		#a.inputMode == #b.inputMode and a.inputMode < b.inputMode or
@@ -62,20 +63,30 @@ NoteChartList.sortItemsFunction = function(a, b)
 	end
 end
 
-NoteChartList.getItemName = function(self, cacheData)
-	return cacheData.name or "."
-end
-
 NoteChartList.selectCache = function(self)
 	local items = {}
 	
-	local list = Cache.chartsAtSet[self.chartSetId]
-	if not list or not list[1] then
+	local noteChartEntries = Cache:getNoteChartsAtSet(self.chartSetId)
+	if not noteChartEntries or not noteChartEntries[1] then
 		return
 	end
-	local foundList = SearchManager:search(list, self.searchString)
+
+	local map = {}
+	local noteChartDataEntries = {}
+	for i = 1, #noteChartEntries do
+		local noteChartDataEntry = Cache:getNoteChartDataEntry(noteChartEntries[i].hash)
+		noteChartDataEntries[i] = noteChartDataEntry
+		map[noteChartDataEntry] = noteChartEntries[i]
+	end
+
+	local foundList = SearchManager:search(noteChartDataEntries, self.searchString)
 	for i = 1, #foundList do
-		items[#items + 1] = self:getItem(foundList[i])
+		local noteChartDataEntry = foundList[i]
+		items[#items + 1] = {
+			noteChartDataEntry = noteChartDataEntry,
+			noteChartEntry = map[noteChartDataEntry],
+			name = noteChartDataEntry.name
+		}
 	end
 	
 	if self.needItemsSort then
@@ -83,6 +94,46 @@ NoteChartList.selectCache = function(self)
 	end
 	
 	return self:setItems(items)
+end
+
+NoteChartList.getBackgroundPath = function(self, itemIndex)
+	local item = self.items[itemIndex]
+	local noteChartDataEntry = item.noteChartDataEntry
+	local noteChartEntry = item.noteChartEntry
+	
+	local directoryPath = Cache:getNoteChartSetEntryById(noteChartEntry.setId).path
+	local stagePath = noteChartDataEntry.stagePath
+
+	if stagePath and stagePath ~= "" then
+		return directoryPath .. "/" .. stagePath
+	end
+	
+	return directoryPath
+end
+
+NoteChartList.getAudioPath = function(self, itemIndex)
+	local item = self.items[itemIndex]
+	local noteChartDataEntry = item.noteChartDataEntry
+	local noteChartEntry = item.noteChartEntry
+	
+	local directoryPath = Cache:getNoteChartSetEntryById(noteChartEntry.setId).path
+	local audioPath = noteChartDataEntry.audioPath
+
+	if audioPath and audioPath ~= "" then
+		return directoryPath .. "/" .. audioPath, noteChartDataEntry.previewTime
+	end
+
+	return directoryPath .. "/preview.ogg", 0
+end
+
+NoteChartList.updateBackground = function(self)
+	if not self.items[self.focusedItemIndex] then return end
+	return BackgroundManager:loadDrawableBackground(self:getBackgroundPath(self.focusedItemIndex))
+end
+
+NoteChartList.updateAudio = function(self)
+	if not self.items[self.focusedItemIndex] then return end
+	return PreviewManager:playAudio(self:getAudioPath(self.focusedItemIndex))
 end
 
 return NoteChartList

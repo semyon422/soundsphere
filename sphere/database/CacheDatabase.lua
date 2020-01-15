@@ -7,48 +7,79 @@ local CacheDatabase = {}
 CacheDatabase.dbpath = "userdata/charts.db"
 CacheDatabase.chartspath = "userdata/charts"
 
-CacheDatabase.chartColumns = {
-	"id",
-	"chartSetId",
+----------------------------------------------------------------
+
+CacheDatabase.noteChartDatasColumns = {
 	"hash",
-	"path",
 	"title",
 	"artist",
 	"source",
 	"tags",
 	"name",
-	"level",
 	"creator",
 	"audioPath",
 	"stagePath",
 	"previewTime",
+	"inputMode",
 	"noteCount",
 	"length",
 	"bpm",
-	"inputMode"
-}
-
-CacheDatabase.chartSetColumns = {
-	"id",
-	"path"
-}
-
-CacheDatabase.chartNumberColumns = {
-	"id",
-	"chartSetId",
 	"level",
+	"difficultyRate"
+}
+
+CacheDatabase.noteChartsColumns = {
+	"id",
+	"path",
+	"hash",
+	"setId",
+	"lastModified"
+}
+
+CacheDatabase.noteChartSetsColumns = {
+	"id",
+	"path",
+	"lastModified"
+}
+
+----------------------------------------------------------------
+
+CacheDatabase.noteChartDatasNumberColumns = {
 	"previewTime",
 	"noteCount",
 	"length",
-	"bpm"
+	"bpm",
+	"level",
+	"difficultyRate"
 }
 
-CacheDatabase.chartSetNumberColumns = {
-	"id"
+CacheDatabase.noteChartsNumberColumns = {
+	"id",
+	"setId",
+	"lastModified"
 }
+
+CacheDatabase.noteChartSetsNumberColumns = {
+	"id",
+	"lastModified"
+}
+
+----------------------------------------------------------------
 
 local createTableRequest = [[
-	CREATE TABLE IF NOT EXISTS `noteСhartDatas` (
+	CREATE TABLE IF NOT EXISTS `noteCharts` (
+		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		`path` TEXT NOT NULL UNIQUE,
+		`hash` TEXT,
+		`setId` INTEGER,
+		`lastModified` INTEGER
+	);
+	CREATE TABLE IF NOT EXISTS `noteChartSets` (
+		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		`path` TEXT NOT NULL UNIQUE,
+		`lastModified` INTEGER
+	);
+	CREATE TABLE IF NOT EXISTS `noteChartDatas` (
 		`hash` TEXT UNIQUE NOT NULL PRIMARY KEY,
 		`title` TEXT,
 		`artist` TEXT,
@@ -60,47 +91,37 @@ local createTableRequest = [[
 		`stagePath` TEXT,
 		`previewTime` REAL,
 		`inputMode` TEXT,
-
 		`noteCount` REAL,
 		`length` REAL,
 		`bpm` REAL,
 		`level` REAL,
 		`difficultyRate` REAL
 	);
-
-	CREATE TABLE IF NOT EXISTS `noteСharts` (
-		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		`path` TEXT NOT NULL UNIQUE,
-		`hash` TEXT,
-		`chartSetId` INTEGER,
-		`lastModified` INTEGER
-	);
-	CREATE TABLE IF NOT EXISTS `noteChartSets` (
-		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		`path` TEXT NOT NULL UNIQUE,
-		`lastModified` INTEGER
-	);
 ]]
 
 ----------------------------------------------------------------
 
 local insertNoteChartRequest = [[
-	INSERT OR IGNORE INTO `noteСharts` (
-		`path`, `hash`, `chartSetId`, `lastModified`
+	INSERT OR IGNORE INTO `noteCharts` (
+		`path`, `hash`, `setId`, `lastModified`
 	)
 	VALUES (?, ?, ?, ?);
 ]]
 
 local updateNoteChartRequest = [[
-	UPDATE `noteСharts` SET
+	UPDATE `noteCharts` SET
 		`hash` = ?,
-		`chartSetId` = ?,
+		`setId` = ?,
 		`lastModified` = ?
 	WHERE `path` = ?;
 ]]
 
 local selectNoteChartRequest = [[
-	SELECT * FROM `noteСharts` WHERE `path` = ?
+	SELECT * FROM `noteCharts` WHERE `path` = ?
+]]
+
+local selectAllNoteChartsRequest = [[
+	SELECT * FROM `noteCharts`;
 ]]
 
 ----------------------------------------------------------------
@@ -122,6 +143,62 @@ local selectNoteChartSetRequest = [[
 	SELECT * FROM `noteChartSets` WHERE `path` = ?
 ]]
 
+local selectAllNoteChartSetsRequest = [[
+	SELECT * FROM `noteChartSets`;
+]]
+
+----------------------------------------------------------------
+
+local insertNoteChartDataRequest = [[
+	INSERT OR IGNORE INTO `noteChartDatas` (
+		`hash`,
+		`title`,
+		`artist`,
+		`source`,
+		`tags`,
+		`name`,
+		`creator`,
+		`audioPath`,
+		`stagePath`,
+		`previewTime`,
+		`inputMode`,
+		`noteCount`,
+		`length`,
+		`bpm`,
+		`level`,
+		`difficultyRate`
+	)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+]]
+
+local updateNoteChartDataRequest = [[
+	UPDATE `noteChartDatas` SET
+		`title` = ?,
+		`artist` = ?,
+		`source` = ?,
+		`tags` = ?,
+		`name` = ?,
+		`creator` = ?,
+		`audioPath` = ?,
+		`stagePath` = ?,
+		`previewTime` = ?,
+		`inputMode` = ?,
+		`noteCount` = ?,
+		`length` = ?,
+		`bpm` = ?,
+		`level` = ?,
+		`difficultyRate` = ?
+	WHERE `hash` = ?;
+]]
+
+local selectNoteChartDataRequest = [[
+	SELECT * FROM `noteChartDatas` WHERE `hash` = ?;
+]]
+
+local selectAllNoteChartDatasRequest = [[
+	SELECT * FROM `noteChartDatas`;
+]]
+
 ----------------------------------------------------------------
 
 -- local deleteChartRequest = [[
@@ -140,19 +217,27 @@ end
 
 CacheDatabase.load = function(self)
 	self.db = sqlite.open(self.dbpath)
+	local db = self.db
 	
-	self.db:exec(createTableRequest)
+	db:exec(createTableRequest)
 	
-	self.insertNoteChartStatement = self.db:prepare(insertNoteChartRequest)
-	self.updateNoteChartStatement = self.db:prepare(updateNoteChartRequest)
-	self.selectNoteChartStatement = self.db:prepare(selectNoteChartRequest)
-
-	self.insertNoteChartSetStatement = self.db:prepare(insertNoteChartSetRequest)
-	self.updateNoteChartSetStatement = self.db:prepare(updateNoteChartSetRequest)
-	self.selectNoteChartSetStatement = self.db:prepare(selectNoteChartSetRequest)
-
+	self.insertNoteChartStatement = db:prepare(insertNoteChartRequest)
+	self.updateNoteChartStatement = db:prepare(updateNoteChartRequest)
+	self.selectNoteChartStatement = db:prepare(selectNoteChartRequest)
+	self.selectAllNoteChartsStatement = db:prepare(selectAllNoteChartsRequest)
 	-- self.deleteChartStatement = self.db:prepare(deleteChartRequest)
+
+	self.insertNoteChartSetStatement = db:prepare(insertNoteChartSetRequest)
+	self.updateNoteChartSetStatement = db:prepare(updateNoteChartSetRequest)
+	self.selectNoteChartSetStatement = db:prepare(selectNoteChartSetRequest)
+	self.selectAllNoteChartSetsStatement = db:prepare(selectAllNoteChartSetsRequest)
 	-- self.deleteChartSetStatement = self.db:prepare(deleteChartSetRequest)
+
+	self.insertNoteChartDataStatement = db:prepare(insertNoteChartDataRequest)
+	self.updateNoteChartDataStatement = db:prepare(updateNoteChartDataRequest)
+	self.selectNoteChartDataStatement = db:prepare(selectNoteChartDataRequest)
+	self.selectAllNoteChartDatasStatement = db:prepare(selectAllNoteChartDatasRequest)
+	-- self.deleteChartStatement = self.db:prepare(deleteChartRequest)
 end
 
 CacheDatabase.unload = function(self)
@@ -194,7 +279,7 @@ CacheDatabase.insertNoteChartEntry = function(self, entry)
 	return self.insertNoteChartStatement:reset():bind(
 		entry.path,
 		entry.hash,
-		entry.chartSetId,
+		entry.setId,
 		entry.lastModified
 	):step()
 end
@@ -202,14 +287,15 @@ end
 CacheDatabase.updateNoteChartEntry = function(self, entry)
 	return self.updateNoteChartStatement:reset():bind(
 		entry.hash,
-		entry.chartSetId,
+		entry.setId,
 		entry.lastModified,
 		entry.path
 	):step()
 end
 
 CacheDatabase.selectNoteChartEntry = function(self, path)
-	return self.selectNoteChartStatement:reset():bind(path):step()
+	local entry = self.selectNoteChartStatement:reset():bind(path):step()
+	return self:transformNoteChartEntry(entry)
 end
 
 CacheDatabase.setNoteChartEntry = function(self, entry)
@@ -234,17 +320,95 @@ CacheDatabase.updateNoteChartSetEntry = function(self, entry)
 end
 
 CacheDatabase.selectNoteChartSetEntry = function(self, path)
-	return self.selectNoteChartSetStatement:reset():bind(path):step()
+	local entry = self.selectNoteChartSetStatement:reset():bind(path):step()
+	return self:transformNoteChartSetEntry(entry)
 end
 
-CacheDatabase.getNoteChartSetEntry = function(self, path)
-	self.insertNoteChartSetStatement:reset():bind(path, nil):step()
-	return self.selectNoteChartSetStatement:reset():bind(path):step()
+CacheDatabase.getNoteChartSetEntry = function(self, entry)
+	self.insertNoteChartSetStatement:reset():bind(entry.path, entry.lastModified):step()
+	return self:selectNoteChartSetEntry(entry.path)
 end
 
 ----------------------------------------------------------------
 
+CacheDatabase.insertNoteChartDataEntry = function(self, entry)
+	return self.insertNoteChartDataStatement:reset():bind(
+		entry.hash,
+		entry.title,
+		entry.artist,
+		entry.source,
+		entry.tags,
+		entry.name,
+		entry.creator,
+		entry.audioPath,
+		entry.stagePath,
+		entry.previewTime,
+		entry.inputMode,
+		entry.noteCount,
+		entry.length,
+		entry.bpm,
+		entry.level,
+		entry.difficultyRate
+	):step()
+end
 
+CacheDatabase.updateNoteChartDataEntry = function(self, entry)
+	return self.updateNoteChartDataStatement:reset():bind(
+		entry.title,
+		entry.artist,
+		entry.source,
+		entry.tags,
+		entry.name,
+		entry.creator,
+		entry.audioPath,
+		entry.stagePath,
+		entry.previewTime,
+		entry.inputMode,
+		entry.noteCount,
+		entry.length,
+		entry.bpm,
+		entry.level,
+		entry.difficultyRate,
+		entry.hash
+	):step()
+end
+
+CacheDatabase.selectNoteCharDatatEntry = function(self, hash)
+	local entry = self.selectNoteChartDataStatement:reset():bind(hash):step()
+	return self:transformNoteChartDataEntry(entry)
+end
+
+CacheDatabase.setNoteChartDataEntry = function(self, entry)
+	self:insertNoteChartDataEntry(entry)
+	return self:updateNoteChartDataEntry(entry)
+end
+
+----------------------------------------------------------------
+
+CacheDatabase.transformEntry = function(self, row, columns, numberColumns)
+	local entry = {}
+
+	for i = 1, #columns do
+		entry[columns[i]] = row[i]
+	end
+	for i = 1, #numberColumns do
+		entry[numberColumns[i]] = tonumber(entry[numberColumns[i]])
+	end
+
+	return entry
+end
+
+CacheDatabase.transformNoteChartEntry = function(self, entry)
+	return self:transformEntry(entry, self.noteChartsColumns, self.noteChartsNumberColumns)
+end
+
+CacheDatabase.transformNoteChartSetEntry = function(self, entry)
+	return self:transformEntry(entry, self.noteChartSetsColumns, self.noteChartSetsNumberColumns)
+end
+
+CacheDatabase.transformNoteChartDataEntry = function(self, entry)
+	return self:transformEntry(entry, self.noteChartDatasColumns, self.noteChartDatasNumberColumns)
+end
 
 
 
@@ -255,7 +419,7 @@ end
 
 -- CacheDatabase.insertNoteChartData = function(self, data)
 -- 	return self.insertChartStatement:reset():bind(
--- 		data.chartSetId,
+-- 		data.setId,
 -- 		data.hash,
 -- 		data.path,
 -- 		data.title,
@@ -277,7 +441,7 @@ end
 
 -- CacheDatabase.updateNoteChartData = function(self, data)
 -- 	return self.updateChartStatement:reset():bind(
--- 		data.chartSetId,
+-- 		data.setId,
 -- 		data.hash,
 -- 		data.path,
 -- 		data.title,
@@ -300,7 +464,7 @@ end
 
 -- CacheDatabase.insertNoteChartData = function(self, path)
 -- 	self:setChartData({
--- 		chartSetId	= 0,
+-- 		setId	= 0,
 -- 		path		= path,
 -- 		hash		= "",
 -- 		title		= "",

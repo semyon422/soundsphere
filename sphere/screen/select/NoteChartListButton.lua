@@ -37,7 +37,7 @@ NoteChartListButton.reloadTextFrame = function(self)
 	textFrame.h = self.h
 	textFrame.limit = self.w * self.columnWidth[1]
 	textFrame.align = self.inputModeTextAlign
-	textFrame.text = self.item.cacheData.inputMode
+	textFrame.text = self.item.noteChartDataEntry.inputMode
 	textFrame.font = self.inputModeFont
 	textFrame.color = self.textColor
 	textFrame.cs = self.cs
@@ -46,7 +46,7 @@ NoteChartListButton.reloadTextFrame = function(self)
 	
 	local textFrame = self.scoreTextFrame
 	
-	local scores = ScoreManager.scoresByHash[self.item.cacheData.hash]
+	local scores = ScoreManager.scoresByHash[self.item.noteChartDataEntry.hash]
 	local score = scores and scores[1] and scores[1].score or 0
 	
 	textFrame.x = self.x + self.w * self.columnX[2]
@@ -70,7 +70,7 @@ NoteChartListButton.reloadTextFrame = function(self)
 	textFrame.h = self.h
 	textFrame.limit = self.w * self.columnWidth[3]
 	textFrame.align = self.difficultyTextAlign
-	textFrame.text = ("%.2f"):format(self.item.cacheData.noteCount / self.item.cacheData.length / 3)
+	textFrame.text = ("%.2f"):format(self.item.noteChartDataEntry.noteCount / self.item.noteChartDataEntry.length / 3)
 	textFrame.font = self.difficultyFont
 	textFrame.color = self.textColor
 	textFrame.cs = self.cs
@@ -85,7 +85,7 @@ NoteChartListButton.reloadTextFrame = function(self)
 	textFrame.h = self.h
 	textFrame.limit = self.w * self.columnWidth[4]
 	textFrame.align = self.nameTextAlign
-	textFrame.text = self.item.cacheData.name or ""
+	textFrame.text = self.item.noteChartDataEntry.name or ""
 	textFrame.font = self.nameFont
 	textFrame.color = self.textColor
 	textFrame.cs = self.cs
