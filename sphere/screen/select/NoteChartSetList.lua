@@ -71,7 +71,7 @@ NoteChartSetList.checkNoteChartSetEntry = function(self, entry)
 end
 
 NoteChartSetList.sortItemsFunction = function(a, b)
-	return a.entry.path < b.entry.path
+	return a.noteChartSetEntry.path < b.noteChartSetEntry.path
 end
 
 NoteChartSetList.getItemName = function(self, entry)
@@ -92,7 +92,10 @@ NoteChartSetList.selectCache = function(self)
 	for i = 1, #noteChartSetEntries do
 		local noteChartSetEntry = noteChartSetEntries[i]
 		if self:checkNoteChartSetEntry(noteChartSetEntry) then
-			items[#items + 1] = self:getItem(noteChartSetEntry)
+			items[#items + 1] = {
+				noteChartSetEntry = noteChartSetEntry,
+				name = self:getItemName(noteChartSetEntry)
+			}
 		end
 	end
 	
@@ -101,6 +104,21 @@ NoteChartSetList.selectCache = function(self)
 	end
 	
 	return self:setItems(items)
+end
+
+NoteChartSetList.getItemIndex = function(self, entry)
+	if not entry then
+		return 1
+	end
+	
+	local items = self.items
+	for i = 1, #items do
+		if items[i].noteChartSetEntry == entry then
+			return i
+		end
+	end
+	
+	return 1
 end
 
 return NoteChartSetList

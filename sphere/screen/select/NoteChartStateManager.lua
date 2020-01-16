@@ -26,10 +26,10 @@ NoteChartStateManager.load = function(self)
 		self.selectedChart = json.decode(file:read("*all"))
 		file:close()
 
-		local chartSetData = Cache:getNoteChartSetEntryById(self.selectedChart[1])
-		local chartData = Cache:getNoteChartEntryById(self.selectedChart[2])
+		local noteChartSetEntry = Cache:getNoteChartSetEntryById(self.selectedChart[1])
+		local noteChartEntry = Cache:getNoteChartEntryById(self.selectedChart[2])
 
-		local itemIndex = NoteChartSetList:getItemIndex(chartSetData)
+		local itemIndex = NoteChartSetList:getItemIndex(noteChartSetEntry)
 		NoteChartSetList:quickScrollToItemIndex(itemIndex)
 		NoteChartSetList:send({
 			sender = NoteChartSetList,
@@ -39,7 +39,7 @@ NoteChartStateManager.load = function(self)
 		})
 		NoteChartSetList:calculateButtons()
 
-		local itemIndex = NoteChartList:getItemIndex(chartData)
+		local itemIndex = NoteChartList:getItemIndex(noteChartEntry)
 		NoteChartList:quickScrollToItemIndex(itemIndex)
 		NoteChartList:calculateButtons()
 	end
@@ -64,7 +64,7 @@ NoteChartStateManager.receive = function(self, event)
 		NoteChartList:updateAudio()
 	elseif action == "buttonInteract" then
 		if sender == NoteChartSetList and event.button == 2 then
-			local entry = NoteChartSetList.items[event.itemIndex].entry
+			local entry = NoteChartSetList.items[event.itemIndex].noteChartSetEntry
 			if entry and event.itemIndex == NoteChartSetList.focusedItemIndex then
 				local NoteChartMenu	= require("sphere.screen.select.NoteChartMenu")
 				NoteChartMenu:show()
@@ -102,16 +102,16 @@ NoteChartStateManager.receive = function(self, event)
 		if sender == NoteChartSetList then
 			local item = NoteChartSetList.items[event.itemIndex]
 			if not item then return end
-			
-			local list = Cache:getNoteChartsAtSet(item.entry.id)
+
+			local list = Cache:getNoteChartsAtSet(item.noteChartSetEntry.id)
 			if list and list[1] then
 				local focusedItem = NoteChartList.items[NoteChartList.focusedItemIndex]
-				local entry = focusedItem and focusedItem.entry
+				local noteChartEntry = focusedItem and focusedItem.noteChartEntry
 				
-				NoteChartList.chartSetId = item.entry.id
+				NoteChartList.setId = item.noteChartSetEntry.id
 				NoteChartList:selectCache()
 				
-				local itemIndex = NoteChartList:getItemIndex(entry)
+				local itemIndex = NoteChartList:getItemIndex(noteChartEntry)
 				NoteChartList:quickScrollToItemIndex(itemIndex)
 
 				NoteChartList:send({
@@ -122,11 +122,12 @@ NoteChartStateManager.receive = function(self, event)
 				})
 			end
 
-			self.noteChartSetCacheData = item.entry
-			self.selectedChart[1] = item.entry.id
+			self.noteChartSetEntry = item.noteChartSetEntry
+			self.selectedChart[1] = item.noteChartSetEntry.id
 		elseif sender == NoteChartList then
 			local item = NoteChartList.items[event.itemIndex]
-
+			if not item then return end
+			
 			self.selectedChart[2] = item.noteChartEntry.id
 
 			self:send({
@@ -148,11 +149,11 @@ NoteChartStateManager.receive = function(self, event)
 		NoteChartList.searchString = event.text
 		
 		local focusedItem = NoteChartSetList.items[NoteChartSetList.focusedItemIndex]
-		local entry = focusedItem and focusedItem.entry
+		local noteChartSetEntry = focusedItem and focusedItem.noteChartSetEntry
 		
 		NoteChartSetList:selectCache()
 		
-		NoteChartSetList:quickScrollToItemIndex(NoteChartSetList:getItemIndex(entry))
+		NoteChartSetList:quickScrollToItemIndex(NoteChartSetList:getItemIndex(noteChartSetEntry))
 		NoteChartSetList:sendState()
 	end
 end

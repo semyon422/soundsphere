@@ -23,7 +23,7 @@ NoteChartList.startOffset = 5
 NoteChartList.endOffset = 5
 
 NoteChartList.basePath = "?"
-NoteChartList.chartSetId = 0
+NoteChartList.setId = 0
 NoteChartList.needItemsSort = true
 
 NoteChartList.Button = NoteChartListButton
@@ -66,7 +66,7 @@ end
 NoteChartList.selectCache = function(self)
 	local items = {}
 	
-	local noteChartEntries = Cache:getNoteChartsAtSet(self.chartSetId)
+	local noteChartEntries = Cache:getNoteChartsAtSet(self.setId)
 	if not noteChartEntries or not noteChartEntries[1] then
 		return
 	end
@@ -137,6 +137,21 @@ end
 NoteChartList.updateAudio = function(self)
 	if not self.items[self.focusedItemIndex] then return end
 	return PreviewManager:playAudio(self:getAudioPath(self.focusedItemIndex))
+end
+
+NoteChartList.getItemIndex = function(self, entry)
+	if not entry then
+		return 1
+	end
+	
+	local items = self.items
+	for i = 1, #items do
+		if items[i].noteChartEntry == entry then
+			return i
+		end
+	end
+	
+	return 1
 end
 
 return NoteChartList

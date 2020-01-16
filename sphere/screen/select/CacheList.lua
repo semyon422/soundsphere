@@ -32,19 +32,4 @@ CacheList.getItem = function(self, entry)
 	return item
 end
 
-CacheList.getItemIndex = function(self, entry)
-	if not entry then
-		return 1
-	end
-	
-	local items = self.items
-	for i = 1, #items do
-		if items[i].entry == entry then
-			return i
-		end
-	end
-	
-	return 1
-end
-
 return CacheList

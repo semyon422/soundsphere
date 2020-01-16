@@ -1,8 +1,8 @@
-local ScreenManager		= require("sphere.screen.ScreenManager")
-local AccuracyGraph		= require("sphere.screen.gameplay.AccuracyGraph")
-local CacheDataDisplay	= require("sphere.screen.select.CacheDataDisplay")
-local ModifierDisplay	= require("sphere.screen.select.ModifierDisplay")
-local ScoreDisplay		= require("sphere.screen.gameplay.ScoreDisplay")
+local ScreenManager			= require("sphere.screen.ScreenManager")
+local AccuracyGraph			= require("sphere.screen.gameplay.AccuracyGraph")
+local NoteChartDataDisplay	= require("sphere.screen.select.NoteChartDataDisplay")
+local ModifierDisplay		= require("sphere.screen.select.ModifierDisplay")
+local ScoreDisplay			= require("sphere.screen.gameplay.ScoreDisplay")
 
 local GUI = require("sphere.ui.GUI")
 
@@ -10,7 +10,7 @@ local ResultGUI = GUI:new()
 
 ResultGUI.classes = setmetatable({
 	AccuracyGraph = AccuracyGraph,
-	CacheDataDisplay = CacheDataDisplay,
+	NoteChartDataDisplay = NoteChartDataDisplay,
 	ModifierDisplay = ModifierDisplay,
 	ScoreDisplay = ScoreDisplay
 }, GUI.classes)
