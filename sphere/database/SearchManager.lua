@@ -10,12 +10,12 @@ SearchManager.search = function(self, list, searchString)
 	return foundList
 end
 
-SearchManager.check = function(self, chart, searchString)
+SearchManager.check = function(self, entry, searchString)
 	local searchTable = searchString:split(" ")
 	local found = true
 	for _, searchSubString in ipairs(searchTable) do
 		local key, operator, value = searchSubString:match("^(.-)([=><~!]+)(.+)$")
-		if key and self:checkFilter(chart, key, operator, value) or self:find(chart, searchSubString) then
+		if key and self:checkFilter(entry, key, operator, value) or self:find(entry, searchSubString) then
 			-- skip
 		else
 			found = false
@@ -25,7 +25,6 @@ SearchManager.check = function(self, chart, searchString)
 end
 
 local fieldList = {
-	"path",
 	"hash",
 	"artist",
 	"title",
@@ -36,17 +35,17 @@ local fieldList = {
 	"inputMode"
 }
 
-SearchManager.find = function(self, chart, searchSubString)
+SearchManager.find = function(self, entry, searchSubString)
 	for i = 1, #fieldList do
-		local value = chart[fieldList[i]]
+		local value = entry[fieldList[i]]
 		if value and value:lower():find(searchSubString, 1, true) then
 			return true
 		end
 	end
 end
 
-SearchManager.checkFilter = function(self, chart, key, operator, value)
-	local value1 = tonumber(chart[key])
+SearchManager.checkFilter = function(self, entry, key, operator, value)
+	local value1 = tonumber(entry[key])
 	local value2 = tonumber(value)
 	
 	if not value1 or not value2 then

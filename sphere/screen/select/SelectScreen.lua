@@ -112,7 +112,8 @@ SelectScreen.receive = function(self, event)
 	
 	if event.action == "playNoteChart" then
 		local GameplayScreen = require("sphere.screen.gameplay.GameplayScreen")
-		GameplayScreen.cacheData = event.cacheData
+		GameplayScreen.noteChartEntry = event.noteChartEntry
+		GameplayScreen.noteChartDataEntry = event.noteChartDataEntry
 		return ScreenManager:set(GameplayScreen)
 	elseif event.name == "keypressed" and event.args[1] == Config:get("screen.browser") then
 		return ScreenManager:set(require("sphere.screen.browser.BrowserScreen"))

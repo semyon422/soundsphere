@@ -157,9 +157,7 @@ NoteChartManager.generateCacheFull = function(self)
 	
 	print("Create cache")
 	Cache:select()
-	-- CacheDatabase:begin()
-	-- self:generate()
-	-- CacheDatabase:commit()
+	self:generate()
 	print("end")
 
 	CacheDatabase:unload()
@@ -168,10 +166,25 @@ end
 NoteChartManager.generate = function(self)
 	local noteChartSets = Cache.noteChartSets
 	local length = #tostring(#noteChartSets)
+
+	CacheDatabase:begin()
 	for i = 1, #noteChartSets do
-		self:processNoteChartDataEntries(Cache:getNoteChartsAtSet(noteChartSets[i].id), false)
+		local status, err = xpcall(function()
+			self:processNoteChartDataEntries(Cache:getNoteChartsAtSet(noteChartSets[i].id), false)
+		end, debug.traceback)
+		if not status then
+			self.log:write("error", noteChartSets[i].id)
+			self.log:write("error", noteChartSets[i].path)
+			self.log:write("error", err)
+		end
+
 		print(("%" .. length .. "d/%d"):format(i, #noteChartSets))
+		if i % 100 == 0 then
+			CacheDatabase:commit()
+			CacheDatabase:begin()
+		end
 	end
+	CacheDatabase:commit()
 end
 
 NoteChartManager.getRealPath = function(self, path)

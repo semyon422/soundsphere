@@ -44,40 +44,40 @@ NoteChartMenuList.getSelectedInputMode = function(self)
 		not NoteChartList.items or
 		not NoteChartList.focusedItemIndex or
 		not NoteChartList.items[NoteChartList.focusedItemIndex] or
-		not NoteChartList.items[NoteChartList.focusedItemIndex].cacheData or
-		not NoteChartList.items[NoteChartList.focusedItemIndex].cacheData.inputMode
+		not NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry or
+		not NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry.inputMode
 	then
 		return ""
 	end
 	
-	return NoteChartList.items[NoteChartList.focusedItemIndex].cacheData.inputMode
+	return NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry.inputMode
 end
 
 NoteChartMenuList.addItems = function(self)
 	local NoteChartMenu	= require("sphere.screen.select.NoteChartMenu")
 	local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
 
-	local cacheData = NoteChartSetList.items[NoteChartSetList.focusedItemIndex].cacheData
+	local entry = NoteChartSetList.items[NoteChartSetList.focusedItemIndex].entry
 
 	local items = {
 		{
-			name = "open " .. cacheData.path,
+			name = "open " .. entry.path,
 			onClick = function()
-				love.system.openURL("file://" .. love.filesystem.getSource() .. "/" .. cacheData.path)
+				love.system.openURL("file://" .. love.filesystem.getSource() .. "/" .. entry.path)
 				NoteChartMenu:hide()
 			end
 		},
 		{
-			name = "open " .. cacheData.path:match("^(.+)/.-$"),
+			name = "open " .. entry.path:match("^(.+)/.-$"),
 			onClick = function()
-				love.system.openURL("file://" .. love.filesystem.getSource() .. "/" .. cacheData.path:match("^(.+)/.-$"))
+				love.system.openURL("file://" .. love.filesystem.getSource() .. "/" .. entry.path:match("^(.+)/.-$"))
 				NoteChartMenu:hide()
 			end
 		},
 		{
 			name = "recache",
 			onClick = function()
-				Cache:update(cacheData.path)
+				Cache:update(entry.path)
 				NoteChartMenu:hide()
 			end
 		}

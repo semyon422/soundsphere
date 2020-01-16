@@ -27,7 +27,7 @@ GameplayScreen.load = function(self)
 	InputManager:read()
 	NoteSkinManager:load()
 	
-	local noteChart, hash = NoteChartFactory:getNoteChart(self.cacheData.path)
+	local noteChart, hash = NoteChartFactory:getNoteChart(self.noteChartEntry.path)
 
 	self.engine = CloudburstEngine:new()
 	self.engine.score = CustomScore:new()
@@ -76,14 +76,15 @@ GameplayScreen.load = function(self)
 	
 	PauseOverlay.engine = self.engine
 	PauseOverlay.noteChart = noteChart
-	PauseOverlay.cacheData = self.cacheData
+	PauseOverlay.noteChartEntry = self.noteChartEntry
+	PauseOverlay.noteChartDataEntry = self.noteChartDataEntry
 	PauseOverlay:load()
 	
 	InputManager.observable:add(self.engine)
 	
 	local dim = 255 * (1 - Config:get("dim.gameplay"))
 	local color = {dim, dim, dim}
-	NoteChartResourceLoader:load(self.cacheData.path, noteChart, function()
+	NoteChartResourceLoader:load(self.noteChartEntry.path, noteChart, function()
 		self.engine.localAliases = NoteChartResourceLoader.localAliases
 		self.engine.globalAliases = NoteChartResourceLoader.globalAliases
 		self.bga:load()

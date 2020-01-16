@@ -75,22 +75,27 @@ NoteChartStateManager.receive = function(self, event)
 				love.system.setClipboardText(entry.path)
 			end
 		elseif sender == NoteChartList and event.button == 1 then
-			local entry = NoteChartList.items[event.itemIndex].noteChartEntry
-			if entry and event.itemIndex == NoteChartList.focusedItemIndex then
+			local item = NoteChartList.items[event.itemIndex]
+			local noteChartEntry = item.noteChartEntry
+			local noteChartDataEntry = item.noteChartDataEntry
+			if noteChartEntry and event.itemIndex == NoteChartList.focusedItemIndex then
 				self:send({
 					sender = self,
 					action = "playNoteChart",
-					entry = entry
+					noteChartEntry = noteChartEntry,
+					noteChartDataEntry = noteChartDataEntry
 				})
 			end
 		end
 	elseif sender == NoteChartSetList and action == "return" then
-		local entry = NoteChartList.items[NoteChartList.focusedItemIndex].noteChartEntry
-		if entry then
+		local noteChartEntry = NoteChartList.items[NoteChartList.focusedItemIndex].noteChartEntry
+		local noteChartDataEntry = NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry
+		if noteChartEntry then
 			self:send({
 				sender = self,
 				action = "playNoteChart",
-				entry = entry
+				noteChartEntry = noteChartEntry,
+				noteChartDataEntry = noteChartDataEntry
 			})
 		end
 	elseif action == "scrollTarget" then
@@ -127,7 +132,7 @@ NoteChartStateManager.receive = function(self, event)
 			self:send({
 				sender = self,
 				action = "updateMetaData",
-				entry = item.noteChartDataEntry
+				noteChartDataEntry = item.noteChartDataEntry
 			})
 		end
 	elseif event.name == "search" then

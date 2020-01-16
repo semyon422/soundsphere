@@ -52,7 +52,8 @@ ResultScreen.receive = function(self, event)
 		self.gui:load("userdata/interface/result.json")
 		self.gui:receive({
 			action = "updateMetaData",
-			cacheData = event.cacheData
+			noteChartEntry = event.noteChartEntry,
+			noteChartDataEntry = event.noteChartDataEntry
 		})
 		
 		self.judgeTable.score = score

@@ -24,12 +24,6 @@ local SphereGame = {}
 
 SphereGame.run = function(self)
 	self:init()
-
-	local NoteChartManager = require("sphere.database.NoteChartManager")
-	NoteChartManager:init()
-	NoteChartManager:generateCacheFull()
-	print("complete")
-
 	self:load()
 end
 
@@ -53,6 +47,12 @@ end
 
 SphereGame.load = function(self)
 	MountManager:mount()
+
+	local NoteChartManager = require("sphere.database.NoteChartManager")
+	NoteChartManager:init()
+	-- NoteChartManager:generateCacheFull()
+	-- print("complete")
+
 	Cache:select()
 	ScoreManager:load()
 	Config:read()

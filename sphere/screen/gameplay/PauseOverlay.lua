@@ -167,10 +167,10 @@ PauseOverlay.play = function(self)
 	self.paused = false
 	self.engine:play()
 	
-	local length = math.min(self.cacheData.length, 3600 * 24)
+	local length = math.min(self.noteChartDataEntry.length, 3600 * 24)
 	DiscordPresence:setPresence({
 		state = "Playing",
-		details = ("%s - %s [%s]"):format(self.cacheData.artist, self.cacheData.title, self.cacheData.name),
+		details = ("%s - %s [%s]"):format(self.noteChartDataEntry.artist, self.noteChartDataEntry.title, self.noteChartDataEntry.name),
 		endTimestamp = math.floor(os.time() + (length - self.engine.currentTime) / self.engine.timeRate)
 	})
 end
@@ -195,7 +195,7 @@ PauseOverlay.pause = function(self)
 	
 	DiscordPresence:setPresence({
 		state = "Playing (paused)",
-		details = ("%s - %s [%s]"):format(self.cacheData.artist, self.cacheData.title, self.cacheData.name)
+		details = ("%s - %s [%s]"):format(self.noteChartDataEntry.artist, self.noteChartDataEntry.title, self.noteChartDataEntry.name)
 	})
 end
 
@@ -213,7 +213,8 @@ PauseOverlay.menu = function(self)
 			ScreenManager:receive({
 				name = "score",
 				score = self.engine.score,
-				cacheData = GameplayScreen.cacheData
+				noteChartEntry = GameplayScreen.noteChartEntry,
+				noteChartDataEntry = GameplayScreen.noteChartDataEntry
 			})
 		end
 	)
