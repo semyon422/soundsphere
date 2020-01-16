@@ -316,7 +316,7 @@ CacheDatabase.insertNoteChartSetEntry = function(self, entry)
 end
 
 CacheDatabase.updateNoteChartSetEntry = function(self, entry)
-	return self.insertNoteChartSetStatement:reset():bind(
+	return self.updateNoteChartSetStatement:reset():bind(
 		entry.lastModified,
 		entry.path
 	):step()
@@ -328,7 +328,8 @@ CacheDatabase.selectNoteChartSetEntry = function(self, path)
 end
 
 CacheDatabase.getNoteChartSetEntry = function(self, entry)
-	self.insertNoteChartSetStatement:reset():bind(entry.path, entry.lastModified):step()
+	self:insertNoteChartSetEntry(entry)
+	self:updateNoteChartSetEntry(entry)
 	return self:selectNoteChartSetEntry(entry.path)
 end
 

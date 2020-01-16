@@ -127,7 +127,7 @@ end
 Cache.getNoteChartSetEntry = function(self, entry)
 	local oldEntry = self:getNoteChartSetEntryByPath(entry.path)
 
-	if oldEntry then
+	if oldEntry and oldEntry.lastModified == entry.lastModified then
 		return oldEntry
 	end
 
