@@ -93,14 +93,14 @@ NoteChartFactory.deleteBOM = function(self, content)
 	return content
 end
 
-NoteChartFactory.getNoteChart = function(self, path)
-	local noteChart, hash, rawContent
+NoteChartFactory.getNoteChart = function(self, path, rawContent, hash)
+	local noteChart, hash
 	local status, err = xpcall(function()
 		local noteChartImporter = self:getNoteChartImporter(path)
 		local realPath = self:getRealPath(path)
 		
-		rawContent = self:readFile(realPath)
-		hash = md5.sumhexa(rawContent)
+		rawContent = rawContent or self:readFile(realPath)
+		hash = hash or md5.sumhexa(rawContent)
 		
 		local content
 		if self:isTextFile(realPath) then

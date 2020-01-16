@@ -162,18 +162,26 @@ NoteChartDataEntryFactory.fixEntry = function(self, entry)
 	end
 end
 
-NoteChartDataEntryFactory.getBMS = function(self, chartPaths)
+--[[
+	fileDatas = {
+		{
+			path = "path/to/chart.bms",
+			content = "...",
+			hash = "..."
+		}
+	}
+]]
+NoteChartDataEntryFactory.getBMS = function(self, fileDatas)
 	local entries = {}
 	
-	for i = 1, #chartPaths do
-		local path = chartPaths[i]
-		local noteChart, hash = NoteChartFactory:getNoteChart(path)
+	for i = 1, #fileDatas do
+		local fileData = fileDatas[i]
+		local noteChart, hash = NoteChartFactory:getNoteChart(fileData.path, fileData.content, fileData.hash)
 		
 		if noteChart then
 			local bms = noteChart.importer.bms
 			local header = bms.header
 			local entry = {
-				path			= path,
 				hash			= hash,
 				title			= header["TITLE"],
 				artist			= header["ARTIST"],
@@ -193,6 +201,7 @@ NoteChartDataEntryFactory.getBMS = function(self, chartPaths)
 			}
 			
 			entries[#entries + 1] = entry
+			fileData.noteChartDataEntry = entry
 		end
 		io.write(".")
 	end
@@ -212,18 +221,17 @@ NoteChartDataEntryFactory.getBMS = function(self, chartPaths)
 	return entries
 end
 
-NoteChartDataEntryFactory.getOsu = function(self, chartPaths)
+NoteChartDataEntryFactory.getOsu = function(self, fileDatas)
 	local entries = {}
 	
-	for i = 1, #chartPaths do
-		local path = chartPaths[i]
-		local noteChart, hash = NoteChartFactory:getNoteChart(path)
+	for i = 1, #fileDatas do
+		local fileData = fileDatas[i]
+		local noteChart, hash = NoteChartFactory:getNoteChart(fileData.path, fileData.content, fileData.hash)
 		
 		if noteChart then
 			local osu = noteChart.importer.osu
 			local metadata = osu.metadata
 			local entry = {
-				path			= path,
 				hash			= hash,
 				title			= metadata["Title"],
 				artist			= metadata["Artist"],
@@ -244,6 +252,7 @@ NoteChartDataEntryFactory.getOsu = function(self, chartPaths)
 			self:fixEntry(entry)
 			
 			entries[#entries + 1] = entry
+			fileData.noteChartDataEntry = entry
 		end
 		io.write(".")
 	end
@@ -252,19 +261,18 @@ NoteChartDataEntryFactory.getOsu = function(self, chartPaths)
 	return entries
 end
 
-NoteChartDataEntryFactory.getKSM = function(self, chartPaths)
+NoteChartDataEntryFactory.getKSM = function(self, fileDatas)
 	local entries = {}
 	
-	for i = 1, #chartPaths do
-		local path = chartPaths[i]
-		local noteChart, hash = NoteChartFactory:getNoteChart(path)
+	for i = 1, #fileDatas do
+		local fileData = fileDatas[i]
+		local noteChart, hash = NoteChartFactory:getNoteChart(fileData.path, fileData.content, fileData.hash)
 		
 		if noteChart then
 			local importer = noteChart.importer
 			local ksh = importer.ksh
 			local options = ksh.options
 			local entry = {
-				path			= path,
 				hash			= hash,
 				title			= options["title"],
 				artist			= options["artist"],
@@ -285,6 +293,7 @@ NoteChartDataEntryFactory.getKSM = function(self, chartPaths)
 			self:fixEntry(entry)
 			
 			entries[#entries + 1] = entry
+			fileData.noteChartDataEntry = entry
 		end
 		io.write(".")
 	end
@@ -293,17 +302,16 @@ NoteChartDataEntryFactory.getKSM = function(self, chartPaths)
 	return entries
 end
 
-NoteChartDataEntryFactory.getQuaver = function(self, chartPaths)
+NoteChartDataEntryFactory.getQuaver = function(self, fileDatas)
 	local entries = {}
 	
-	for i = 1, #chartPaths do
-		local path = chartPaths[i]
-		local noteChart, hash = NoteChartFactory:getNoteChart(path)
+	for i = 1, #fileDatas do
+		local fileData = fileDatas[i]
+		local noteChart, hash = NoteChartFactory:getNoteChart(fileData.path, fileData.content, fileData.hash)
 		
 		if noteChart then
 			local qua = noteChart.importer.qua
 			local entry = {
-				path			= path,
 				hash			= hash,
 				title			= qua["Title"],
 				artist			= qua["Artist"],
@@ -323,6 +331,7 @@ NoteChartDataEntryFactory.getQuaver = function(self, chartPaths)
 			}
 			
 			entries[#entries + 1] = entry
+			fileData.noteChartDataEntry = entry
 		end
 		io.write(".")
 	end
@@ -331,39 +340,57 @@ NoteChartDataEntryFactory.getQuaver = function(self, chartPaths)
 	return entries
 end
 
+--[[
+	fileDatas = {
+		{
+			path = "path/to/chart.ojn/1",
+			content = "...",
+			hash = "..."
+		},
+		{
+			path = "path/to/chart.ojn/2",
+			content = "...",
+			hash = "..."
+		},
+		{
+			path = "path/to/chart.ojn/3",
+			content = "...",
+			hash = "..."
+		}
+	}
+]]
 local o2jamDifficultyNames = {"Easy", "Normal", "Hard"}
-NoteChartDataEntryFactory.getO2Jam = function(self, chartPaths)
+NoteChartDataEntryFactory.getO2Jam = function(self, fileDatas)
 	local entries = {}
 	
-	for i = 1, #chartPaths do
-		local path = chartPaths[i]
-		local noteChart, hash = NoteChartFactory:getNoteChart(path)
+	for i = 1, #fileDatas do
+		local fileData = fileDatas[i]
+		local noteChart, hash = NoteChartFactory:getNoteChart(fileData.path, fileData.content, fileData.hash)
 		local ojn = noteChart.importer.ojn
 		
-		for i = 1, 3 do
-			local entry = {
-				path			= path .. "/" .. i,
-				hash			= hash,
-				title			= ojn.str_title,
-				artist			= ojn.str_artist,
-				source			= "o2jam",
-				tags			= "",
-				name			= o2jamDifficultyNames[i],
-				level			= ojn.charts[i].level,
-				creator			= ojn.str_noter,
-				audioPath		= "",
-				stagePath		= "",
-				previewTime		= 0,
-				noteCount		= ojn.charts[i].notes,
-				length			= ojn.charts[i].duration,
-				bpm				= ojn.bpm,
-				inputMode		= "7key",
-				difficultyRate	= 0
-			}
-			self:fixEntry(entry)
-			
-			entries[#entries + 1] = entry
-		end
+		local entry = {
+			hash			= hash,
+			title			= ojn.str_title,
+			artist			= ojn.str_artist,
+			source			= "o2jam",
+			tags			= "",
+			name			= o2jamDifficultyNames[i],
+			level			= ojn.charts[i].level,
+			creator			= ojn.str_noter,
+			audioPath		= "",
+			stagePath		= "",
+			previewTime		= 0,
+			noteCount		= ojn.charts[i].notes,
+			length			= ojn.charts[i].duration,
+			bpm				= ojn.bpm,
+			inputMode		= "7key",
+			difficultyRate	= 0
+		}
+		self:fixEntry(entry)
+		
+		entries[#entries + 1] = entry
+		fileData.noteChartDataEntry = entry
+
 		io.write(".")
 	end
 	io.write("\n")
@@ -371,13 +398,14 @@ NoteChartDataEntryFactory.getO2Jam = function(self, chartPaths)
 	return entries
 end
 
-NoteChartDataEntryFactory.getSphere = function(self, chartPaths)
+NoteChartDataEntryFactory.getSphere = function(self, fileDatas)
 	local entries = {}
 	
-	for i = 1, #chartPaths do
-		local path = chartPaths[i]
+	for i = 1, #fileDatas do
+		local fileData = fileDatas[i]
+		-- local noteChart, hash = NoteChartFactory:getNoteChart(fileData.path, fileData.content, fileData.hash)
 		
-		local file = love.filesystem.newFile(path)
+		local file = love.filesystem.newFile(fileData.path)
 		file:open("r")
 		local content = file:read(file:getSize())
 		local hash = md5.sumhexa(content)

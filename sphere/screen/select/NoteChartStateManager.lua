@@ -122,7 +122,6 @@ NoteChartStateManager.receive = function(self, event)
 		elseif sender == NoteChartList then
 			local item = NoteChartList.items[event.itemIndex]
 
-			-- NoteChartList.noteChartCacheData = item.noteChartEntry
 			self.selectedChart[2] = item.noteChartEntry.id
 
 			self:send({

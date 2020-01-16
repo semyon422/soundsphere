@@ -238,9 +238,12 @@ CacheDatabase.load = function(self)
 	self.selectNoteChartDataStatement = db:prepare(selectNoteChartDataRequest)
 	self.selectAllNoteChartDatasStatement = db:prepare(selectAllNoteChartDatasRequest)
 	-- self.deleteChartStatement = self.db:prepare(deleteChartRequest)
+
+	self.loaded = true
 end
 
 CacheDatabase.unload = function(self)
+	self.loaded = false
 	return self.db:close()
 end
 

@@ -3,37 +3,38 @@ local NoteChartEntryFactory = {}
 NoteChartEntryFactory.init = function(self)
 end
 
-NoteChartEntryFactory.splitList = function(self, paths)
+NoteChartEntryFactory.splitList = function(self, fileDatas)
 	local dict = {}
-	for _, path in ipairs(paths) do
+
+	for _, fileData in ipairs(fileDatas) do
 		for i = 1, #self.formats do
 			local pattern = self.formats[i][1]
-			if path:find(pattern) then
+			if fileData.path:find(pattern) then
 				dict[pattern] = dict[pattern] or {}
-				table.insert(dict[pattern], path)
+				table.insert(dict[pattern], fileData)
 			end
 		end
 	end
 	
 	local list = {}
-	for _, data in pairs(dict) do
-		list[#list + 1] = data
+	for _, fileData in pairs(dict) do
+		list[#list + 1] = fileData
 	end
 	
 	return list
 end
 
-NoteChartEntryFactory.getEntries = function(self, paths)
+NoteChartEntryFactory.getEntries = function(self, fileDatas)
 	local formats = self.formats
 	
 	local entries = {}
-	for _, subPaths in ipairs(self:splitList(paths)) do
-		local path = subPaths[1]
+	for _, subFileDatas in ipairs(self:splitList(fileDatas)) do
+		local path = subFileDatas[1].path
 		for _, data in ipairs(formats) do
 			local pattern = data[1]
 			local getEntries = data[2]
 			if path:lower():find(pattern) then
-				for _, entry in ipairs(getEntries(self, subPaths)) do
+				for _, entry in ipairs(getEntries(self, subFileDatas)) do
 					entries[#entries + 1] = entry
 				end
 			end
@@ -43,12 +44,19 @@ NoteChartEntryFactory.getEntries = function(self, paths)
 	return entries
 end
 
-NoteChartEntryFactory.getBMS = function(self, paths)
+--[[
+	fileDatas = {
+		{
+			path = "path/to/chart.bms"
+		}
+	}
+]]
+NoteChartEntryFactory.getBMS = function(self, fileDatas)
 	local entries = {}
 	
-	for i = 1, #paths do
+	for i = 1, #fileDatas do
 		entries[#entries + 1] = {
-			path			= paths[i],
+			path			= fileDatas[i].path,
 			hash			= nil,
 			chartSetId		= nil,
 			lastModified	= nil
@@ -58,11 +66,18 @@ NoteChartEntryFactory.getBMS = function(self, paths)
 	return entries
 end
 
-NoteChartEntryFactory.getO2Jam = function(self, paths)
+--[[
+	fileDatas = {
+		{
+			path = "path/to/chart.ojn"
+		}
+	}
+]]
+NoteChartEntryFactory.getO2Jam = function(self, fileDatas)
 	local entries = {}
 	
-	for i = 1, #paths do
-		local path = paths[i]
+	for i = 1, #fileDatas do
+		local path = fileDatas[i].path
 		for j = 1, 3 do
 			entries[#entries + 1] = {
 				path			= path .. "/" .. j,

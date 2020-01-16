@@ -7,7 +7,10 @@ Cache.select = function(self)
 		return
 	end
 	
-	CacheDatabase:load()
+	local loaded = CacheDatabase.loaded
+	if not loaded then
+		CacheDatabase:load()
+	end
 	
 	local db = CacheDatabase.db
 
@@ -94,7 +97,9 @@ Cache.select = function(self)
 		noteChartDatasHash[entry.hash] = entry
 	end
 	
-	CacheDatabase:unload()
+	if not loaded then
+		CacheDatabase:unload()
+	end
 end
 
 ----------------------------------------------------------------
@@ -110,10 +115,10 @@ end
 ----------------------------------------------------------------
 
 Cache.getNoteChartSetEntry = function(self, entry)
-	entry = self:getNoteChartSetEntryByPath(entry.path)
+	local oldEntry = self:getNoteChartSetEntryByPath(entry.path)
 
-	if entry then
-		return entry
+	if oldEntry then
+		return oldEntry
 	end
 
 	entry = CacheDatabase:getNoteChartSetEntry(entry)
