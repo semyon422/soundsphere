@@ -55,11 +55,12 @@ NoteChartEntryFactory.getBMS = function(self, fileDatas)
 	local entries = {}
 	
 	for i = 1, #fileDatas do
+		local fileData = fileDatas[i]
 		entries[#entries + 1] = {
-			path			= fileDatas[i].path,
-			hash			= nil,
-			chartSetId		= nil,
-			lastModified	= nil
+			path			= fileData.path,
+			hash			= fileData.hash,
+			setId			= fileData.setId,
+			lastModified	= fileData.lastModified
 		}
 	end
 	
@@ -77,13 +78,14 @@ NoteChartEntryFactory.getO2Jam = function(self, fileDatas)
 	local entries = {}
 	
 	for i = 1, #fileDatas do
-		local path = fileDatas[i].path
+		local fileData = fileDatas[i]
+		local path = fileData.path
 		for j = 1, 3 do
 			entries[#entries + 1] = {
 				path			= path .. "/" .. j,
-				hash			= nil,
-				chartSetId		= nil,
-				lastModified	= nil
+				hash			= fileData.hash,
+				setId			= fileData.setId,
+				lastModified	= fileData.lastModified
 			}
 		end
 	end

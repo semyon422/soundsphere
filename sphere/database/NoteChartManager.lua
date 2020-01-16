@@ -53,23 +53,47 @@ end
 
 NoteChartManager.processNoteChartEntries = function(self, noteChartPaths, noteChartSetPath)
 	self.log:write("ncs", noteChartSetPath:match("^.+/(.-)$"))
-	
-	local entries = {}
-	for i = 1, #noteChartPaths do
-		entries[i] = {path = noteChartPaths[i]}
-	end
-	local noteChartEntries = NoteChartEntryFactory:getEntries(entries)
 
 	local noteChartSetEntry = Cache:getNoteChartSetEntry({
 		path = noteChartSetPath,
 		lastModified = love.filesystem.getLastModified(noteChartSetPath)
 	})
+	
+	local entries = {}
+	for i = 1, #noteChartPaths do
+		local path = noteChartPaths[i]
+		local lastModified = love.filesystem.getLastModified(path)
+		local entry = Cache:getNoteChartEntryByPath(path)
+
+		self.log:write("entry", path)
+		if entry then
+			self.log:write("entry", "exists")
+			if entry.lastModified ~= lastModified then
+				entry.hash = nil
+				entry.lastModified = lastModified
+				entry.setId = noteChartSetEntry.id
+				self.log:write("entry", "modified, resetting hash")
+				Cache:setNoteChartEntry(entry)
+			elseif entry.setId ~= noteChartSetEntry.id then
+				entry.setId = noteChartSetEntry.id
+				self.log:write("entry", "wrong setId, updating")
+				Cache:setNoteChartEntry(entry)
+			end
+		else
+			self.log:write("entry", "not exists, adding to table")
+			entries[#entries + 1] = {
+				path = noteChartPaths[i],
+				lastModified = lastModified
+			}
+		end
+	end
+	local noteChartEntries = NoteChartEntryFactory:getEntries(entries)
 
 	for i = 1, #noteChartEntries do
 		local noteChartEntry = noteChartEntries[i]
+		self.log:write("entry", "adding " .. noteChartEntry.path)
 
 		noteChartEntry.setId = noteChartSetEntry.id
-		noteChartEntry.lastModified = love.filesystem.getLastModified(noteChartEntry.path)
 		
 		Cache:setNoteChartEntry(noteChartEntry)
 

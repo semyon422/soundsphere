@@ -60,12 +60,22 @@ Cache.select = function(self)
 		local entry = CacheDatabase:transformNoteChartEntry(row)
 		noteCharts[#noteCharts + 1] = entry
 
-		local setList = noteChartsAtSet[entry.setId]
-		setList[#setList + 1] = entry
+		if entry.setId then
+			local setList = noteChartsAtSet[entry.setId]
+			if setList then
+				setList[#setList + 1] = entry
+			else
+				entry.setId = nil
+			end
+		end
 
 		if entry.hash then
 			local hashList = noteChartsAtHash[entry.hash]
-			hashList[#hashList + 1] = entry
+			if hashList then
+				hashList[#hashList + 1] = entry
+			else
+				entry.hash = nil
+			end
 		end
 
 		row = stmt:step()
