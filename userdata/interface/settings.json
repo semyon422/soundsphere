@@ -1,0 +1,52 @@
+[
+	{
+		"name": "HeaderTop",
+		"class": "Button",
+		"cs": [0, 0, 0, 0, "all"],
+		"x": 0,
+		"y": 0,
+		"w": 1,
+		"h": 0.05,
+		"layer": 1,
+		"backgroundColor": [0, 0, 0, 191]
+	},
+	{
+		"name": "SettingsButton",
+		"class": "ImageButton",
+		"cs": [0, 0, 0, 0, "h"],
+		"x": 0,
+		"y": 0,
+		"w": 0.066,
+		"h": 0.05,
+		"scale": 0.66,
+		"layer": 2,
+		"image": "resources/icons/ic_settings_white_48dp.png",
+		"interact": ["ScreenManager:set(SettingsScreen)"]
+	},
+	{
+		"name": "BrowserButton",
+		"class": "ImageButton",
+		"cs": [0, 0, 0, 0, "h"],
+		"x": 0.066,
+		"y": 0,
+		"w": 0.066,
+		"h": 0.05,
+		"scale": 0.66,
+		"layer": 2,
+		"image": "resources/icons/ic_folder_open_white_48dp.png",
+		"interact": ["ScreenManager:set(BrowserScreen)"]
+	},
+	{
+		"name": "SelectButton",
+		"class": "ImageButton",
+		"cs": [0, 0, 0, 0, "h"],
+		"x": 0.132,
+		"y": 0,
+		"w": 0.066,
+		"h": 0.05,
+		"scale": 0.66,
+		"layer": 2,
+		"image": "resources/icons/ic_menu_white_48dp.png",
+		"interact": ["ScreenManager:set(SelectScreen)"]
+	}
+]

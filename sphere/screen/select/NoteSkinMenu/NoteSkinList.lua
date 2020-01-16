@@ -43,13 +43,13 @@ NoteSkinList.getSelectedInputMode = function(self)
 		not NoteChartList.items or
 		not NoteChartList.focusedItemIndex or
 		not NoteChartList.items[NoteChartList.focusedItemIndex] or
-		not NoteChartList.items[NoteChartList.focusedItemIndex].cacheData or
-		not NoteChartList.items[NoteChartList.focusedItemIndex].cacheData.inputMode
+		not NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry or
+		not NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry.inputMode
 	then
 		return ""
 	end
 	
-	return NoteChartList.items[NoteChartList.focusedItemIndex].cacheData.inputMode
+	return NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry.inputMode
 end
 
 NoteSkinList.addItems = function(self)

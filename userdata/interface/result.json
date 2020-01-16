@@ -10,7 +10,7 @@
 	
 	{
 		"name": "SongArtist",
-		"class": "CacheDataDisplay",
+		"class": "NoteChartDataDisplay",
 		"field": "artist",
 		"cs": [0, 0, 0, 0, "all"],
 		"x": 0,
@@ -28,7 +28,7 @@
 	},
 	{
 		"name": "SongTitle",
-		"class": "CacheDataDisplay",
+		"class": "NoteChartDataDisplay",
 		"field": "title",
 		"cs": [0, 0, 0, 0, "all"],
 		"x": 0,
@@ -46,7 +46,7 @@
 	},
 	{
 		"name": "ChartName",
-		"class": "CacheDataDisplay",
+		"class": "NoteChartDataDisplay",
 		"field": "name",
 		"cs": [0, 0, 0, 0, "all"],
 		"x": 0,
@@ -64,7 +64,7 @@
 	},
 	{
 		"name": "ChartCreator",
-		"class": "CacheDataDisplay",
+		"class": "NoteChartDataDisplay",
 		"field": "creator",
 		"cs": [0, 0, 0, 0, "all"],
 		"x": 0,

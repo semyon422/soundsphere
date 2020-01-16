@@ -4,7 +4,7 @@ local CollectionManager = {}
 
 CollectionManager.getPaths = function(self)
 	local packPathsDict = {}
-	for _, chartSetData in ipairs(Cache.chartSetList) do
+	for _, chartSetData in ipairs(Cache:getNoteChartSets()) do
 		packPathsDict[chartSetData.path:match("^(.+)/.-$")] = true
 	end
 	

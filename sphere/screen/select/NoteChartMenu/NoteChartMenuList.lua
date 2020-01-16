@@ -57,7 +57,7 @@ NoteChartMenuList.addItems = function(self)
 	local NoteChartMenu	= require("sphere.screen.select.NoteChartMenu")
 	local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
 
-	local entry = NoteChartSetList.items[NoteChartSetList.focusedItemIndex].entry
+	local entry = NoteChartSetList.items[NoteChartSetList.focusedItemIndex].noteChartSetEntry
 
 	local items = {
 		{

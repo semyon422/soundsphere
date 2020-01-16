@@ -20,7 +20,9 @@ SelectGUI.functions = setmetatable({
 	["NoteSkinMenu:show()"] = function() NoteSkinMenu:show() end,
 	["ModifierMenu:show()"] = function() ModifierMenu:show() end,
 	["KeyBindMenu:show()"] = function() KeyBindMenu:show() end,
-	["ScreenManager:set(SettingsScreen)"] = function() ScreenManager:set(require("sphere.screen.settings.SettingsScreen")) end
+	["ScreenManager:set(SettingsScreen)"] = function() ScreenManager:set(require("sphere.screen.settings.SettingsScreen")) end,
+	["ScreenManager:set(BrowserScreen)"] = function() ScreenManager:set(require("sphere.screen.browser.BrowserScreen")) end,
+	["ScreenManager:set(SelectScreen)"] = function() ScreenManager:set(require("sphere.screen.select.SelectScreen")) end
 }, GUI.functions)
 
 return SelectGUI

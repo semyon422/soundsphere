@@ -178,7 +178,7 @@ NoteChartManager.generate = function(self)
 			self.log:write("error", err)
 		end
 
-		print(("%" .. length .. "d/%d"):format(i, #noteChartSets))
+		-- print(("%" .. length .. "d/%d"):format(i, #noteChartSets))
 		if i % 100 == 0 then
 			CacheDatabase:commit()
 			CacheDatabase:begin()

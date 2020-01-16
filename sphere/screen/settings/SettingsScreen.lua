@@ -5,10 +5,15 @@ local SettingsList		= require("sphere.screen.Settings.SettingsList")
 local CategoriesList	= require("sphere.screen.Settings.CategoriesList")
 local SelectFrame		= require("sphere.screen.Settings.SelectFrame")
 local BackgroundManager	= require("sphere.ui.BackgroundManager")
+local SettingsGUI		= require("sphere.screen.settings.SettingsGUI")
 
 local SettingsScreen = Screen:new()
 
 SettingsScreen.init = function(self)
+	self.gui = SettingsGUI:new()
+	self.gui.container = self.container
+	self.gui:load("userdata/interface/settings.json")
+
 	SelectFrame:init()
 	SettingsList:init()
 	CategoriesList:init()
@@ -17,6 +22,8 @@ SettingsScreen.init = function(self)
 end
 
 SettingsScreen.load = function(self)
+	self.gui:reload()
+
 	SettingsList:load()
 	CategoriesList:load()
 	SelectFrame:reload()
@@ -33,6 +40,8 @@ SettingsScreen.update = function(self)
 	
 	SettingsList:update()
 	CategoriesList:update()
+
+	self.gui:update()
 end
 
 SettingsScreen.draw = function(self)
@@ -55,6 +64,7 @@ SettingsScreen.receive = function(self, event)
 	
 	SettingsList:receive(event)
 	CategoriesList:receive(event)
+	self.gui:receive(event)
 end
 
 return SettingsScreen

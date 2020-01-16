@@ -8,7 +8,7 @@ local NotificationLine	= require("sphere.ui.NotificationLine")
 
 local BrowserList = CustomList:new()
 
-BrowserList.x = 1/17
+BrowserList.x = 0.6
 BrowserList.y = 0
 BrowserList.w = 10
 BrowserList.h = 1
@@ -26,7 +26,7 @@ BrowserList.mode = "filesystem"
 BrowserList.basePath = "userdata/charts"
 
 BrowserList.init = function(self)
-	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "h")
+	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 end
 
 BrowserList.load = function(self)

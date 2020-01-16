@@ -27,12 +27,38 @@
 		"cs": [0, 0, 0, 0, "h"],
 		"x": 0,
 		"y": 0,
-		"w": 0.075,
+		"w": 0.066,
 		"h": 0.05,
 		"scale": 0.66,
 		"layer": 2,
 		"image": "resources/icons/ic_settings_white_48dp.png",
 		"interact": ["ScreenManager:set(SettingsScreen)"]
+	},
+	{
+		"name": "BrowserButton",
+		"class": "ImageButton",
+		"cs": [0, 0, 0, 0, "h"],
+		"x": 0.066,
+		"y": 0,
+		"w": 0.066,
+		"h": 0.05,
+		"scale": 0.66,
+		"layer": 2,
+		"image": "resources/icons/ic_folder_open_white_48dp.png",
+		"interact": ["ScreenManager:set(BrowserScreen)"]
+	},
+	{
+		"name": "SelectButton",
+		"class": "ImageButton",
+		"cs": [0, 0, 0, 0, "h"],
+		"x": 0.132,
+		"y": 0,
+		"w": 0.066,
+		"h": 0.05,
+		"scale": 0.66,
+		"layer": 2,
+		"image": "resources/icons/ic_menu_white_48dp.png",
+		"interact": ["ScreenManager:set(SelectScreen)"]
 	},
 
 
@@ -98,7 +124,7 @@
 	
 	{
 		"name": "SongTitle",
-		"class": "CacheDataDisplay",
+		"class": "NoteChartDataDisplay",
 		"field": "creator",
 		"cs": [0, 0, 0, 0, "all"],
 		"x": 0,
@@ -116,7 +142,7 @@
 	},
 	{
 		"name": "SongTitle",
-		"class": "CacheDataDisplay",
+		"class": "NoteChartDataDisplay",
 		"field": "artist",
 		"cs": [0, 0, 0, 0, "h"],
 		"x": 0.1,
@@ -134,7 +160,7 @@
 	},
 	{
 		"name": "SongTitle",
-		"class": "CacheDataDisplay",
+		"class": "NoteChartDataDisplay",
 		"field": "title",
 		"cs": [0, 0, 0, 0, "h"],
 		"x": 0.1,
@@ -152,7 +178,7 @@
 	},
 	{
 		"name": "SongTitle",
-		"class": "CacheDataDisplay",
+		"class": "NoteChartDataDisplay",
 		"field": "name",
 		"cs": [0, 0, 0, 0, "h"],
 		"x": 0.1,
