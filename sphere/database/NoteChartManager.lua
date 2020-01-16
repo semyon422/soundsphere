@@ -17,14 +17,39 @@ NoteChartManager.init = function(self)
 	NoteChartDataEntryFactory:init()
 end
 
+NoteChartManager.resetProgress = function(self)
+	self.noteChartSetCount = 0
+	self.noteChartCount = 0
+
+	self.noteChartSetCountDelta = 100
+	self.noteChartCountDelta = 100
+
+	self.noteChartSetCountNext = self.noteChartSetCountDelta
+	self.noteChartCountNext = self.noteChartCountDelta
+end
+
+NoteChartManager.checkProgress = function(self)
+	if self.noteChartSetCount >= self.noteChartSetCountNext then
+		self.log:write("progress", "notechart set ".. self.noteChartSetCount)
+		self.noteChartSetCountNext = self.noteChartSetCountNext + self.noteChartSetCountDelta
+		
+		CacheDatabase:commit()
+		CacheDatabase:begin()
+	end
+	if self.noteChartCount >= self.noteChartCountNext then
+		self.log:write("progress", "notechart ".. self.noteChartCount)
+		self.noteChartCountNext = self.noteChartCountNext + self.noteChartCountDelta
+	end
+end
+
 NoteChartManager.lookup = function(self, directoryPath, recursive)
-	self.log:write("lookup", directoryPath)
+	-- self.log:write("lookup", directoryPath)
 	local items = love.filesystem.getDirectoryItems(directoryPath)
 	
 	local containerPaths = {}
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
-		if love.filesystem.isFile(path) and NoteChartFactory:isNoteChartContainer(path) then
+		if love.filesystem.isFile(path) and NoteChartFactory:isNoteChartContainer(path) and self:checkNoteChartSetEntry(path) then
 			containerPaths[#containerPaths + 1] = path
 			self:processNoteChartEntries({path}, path)
 		end
@@ -47,19 +72,34 @@ NoteChartManager.lookup = function(self, directoryPath, recursive)
 	
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
-		if love.filesystem.isDirectory(path) and (recursive or not self:checkChartSetData(path)) then
+		if love.filesystem.isDirectory(path) and (recursive or self:checkNoteChartSetEntry(path)) then
 			self:lookup(path, recursive)
 		end
 	end
 end
 
+NoteChartManager.checkNoteChartSetEntry = function(self, path)
+	local entry = Cache:getNoteChartSetEntryByPath(path)
+	if not entry then
+		return true
+	end
+
+	local lastModified = love.filesystem.getLastModified(path)
+	if entry.lastModified ~= lastModified then
+		return true
+	end
+
+	return false
+end
+
 NoteChartManager.processNoteChartEntries = function(self, noteChartPaths, noteChartSetPath)
-	self.log:write("ncs", noteChartSetPath:match("^.+/(.-)$"))
+	-- self.log:write("ncs", noteChartSetPath:match("^.+/(.-)$"))
 
 	local noteChartSetEntry = Cache:getNoteChartSetEntry({
 		path = noteChartSetPath,
 		lastModified = love.filesystem.getLastModified(noteChartSetPath)
 	})
+	self.noteChartSetCount = self.noteChartSetCount + 1
 	
 	local entries = {}
 	for i = 1, #noteChartPaths do
@@ -67,22 +107,22 @@ NoteChartManager.processNoteChartEntries = function(self, noteChartPaths, noteCh
 		local lastModified = love.filesystem.getLastModified(path)
 		local entry = Cache:getNoteChartEntryByPath(path)
 
-		self.log:write("entry", path)
+		-- self.log:write("entry", path)
 		if entry then
-			self.log:write("entry", "exists")
+			-- self.log:write("entry", "exists")
 			if entry.lastModified ~= lastModified then
 				entry.hash = nil
 				entry.lastModified = lastModified
 				entry.setId = noteChartSetEntry.id
-				self.log:write("entry", "modified, resetting hash")
+				-- self.log:write("entry", "modified, resetting hash")
 				Cache:setNoteChartEntry(entry)
 			elseif entry.setId ~= noteChartSetEntry.id then
 				entry.setId = noteChartSetEntry.id
-				self.log:write("entry", "wrong setId, updating")
+				-- self.log:write("entry", "wrong setId, updating")
 				Cache:setNoteChartEntry(entry)
 			end
 		else
-			self.log:write("entry", "not exists, adding to table")
+			-- self.log:write("entry", "not exists, adding to table")
 			entries[#entries + 1] = {
 				path = noteChartPaths[i],
 				lastModified = lastModified
@@ -93,30 +133,33 @@ NoteChartManager.processNoteChartEntries = function(self, noteChartPaths, noteCh
 
 	for i = 1, #noteChartEntries do
 		local noteChartEntry = noteChartEntries[i]
-		self.log:write("entry", "adding " .. noteChartEntry.path)
+		-- self.log:write("entry", "adding " .. noteChartEntry.path)
 
 		noteChartEntry.setId = noteChartSetEntry.id
 		
 		Cache:setNoteChartEntry(noteChartEntry)
+		self.noteChartCount = self.noteChartCount + 1
 
-		self.log:write("chart", noteChartEntry.path:match("^.+/(.-)$"))
+		-- self.log:write("chart", noteChartEntry.path:match("^.+/(.-)$"))
 	end
+	self:checkProgress()
 end
 
 NoteChartManager.generateCacheFull = function(self)
 	CacheDatabase:load()
 
+	self:resetProgress()
 	print("Find all charts")
 	Cache:select()
 	CacheDatabase:begin()
-	self:lookup("userdata/chartsTest", true)
+	self:lookup("userdata/charts", false)
 	CacheDatabase:commit()
 	
 	print("Create cache")
 	Cache:select()
-	CacheDatabase:begin()
-	self:generate()
-	CacheDatabase:commit()
+	-- CacheDatabase:begin()
+	-- self:generate()
+	-- CacheDatabase:commit()
 	print("end")
 
 	CacheDatabase:unload()
@@ -124,8 +167,10 @@ end
 
 NoteChartManager.generate = function(self)
 	local noteChartSets = Cache.noteChartSets
+	local length = #tostring(#noteChartSets)
 	for i = 1, #noteChartSets do
-		self:processNoteChartDataEntries(Cache:getNoteChartsAtSet(noteChartSets[i].id), true)
+		self:processNoteChartDataEntries(Cache:getNoteChartsAtSet(noteChartSets[i].id), false)
+		print(("%" .. length .. "d/%d"):format(i, #noteChartSets))
 	end
 end
 

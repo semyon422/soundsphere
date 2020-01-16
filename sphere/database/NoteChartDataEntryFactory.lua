@@ -203,9 +203,7 @@ NoteChartDataEntryFactory.getBMS = function(self, fileDatas)
 			entries[#entries + 1] = entry
 			fileData.noteChartDataEntry = entry
 		end
-		io.write(".")
 	end
-	io.write("\n")
 	
 	if #entries > 0 then
 		for _, entry in ipairs(entries) do
@@ -254,9 +252,7 @@ NoteChartDataEntryFactory.getOsu = function(self, fileDatas)
 			entries[#entries + 1] = entry
 			fileData.noteChartDataEntry = entry
 		end
-		io.write(".")
 	end
-	io.write("\n")
 	
 	return entries
 end
@@ -295,9 +291,7 @@ NoteChartDataEntryFactory.getKSM = function(self, fileDatas)
 			entries[#entries + 1] = entry
 			fileData.noteChartDataEntry = entry
 		end
-		io.write(".")
 	end
-	io.write("\n")
 	
 	return entries
 end
@@ -333,9 +327,7 @@ NoteChartDataEntryFactory.getQuaver = function(self, fileDatas)
 			entries[#entries + 1] = entry
 			fileData.noteChartDataEntry = entry
 		end
-		io.write(".")
 	end
-	io.write("\n")
 	
 	return entries
 end
@@ -393,10 +385,7 @@ NoteChartDataEntryFactory.getO2Jam = function(self, fileDatas)
 		
 		entries[#entries + 1] = entry
 		fileData.noteChartDataEntry = entry
-
-		io.write(".")
 	end
-	io.write("\n")
 	
 	return entries
 end
@@ -437,9 +426,7 @@ NoteChartDataEntryFactory.getSphere = function(self, fileDatas)
 		self:fixEntry(entry)
 		
 		entries[#entries + 1] = entry
-		io.write(".")
 	end
-	io.write("\n")
 	
 	return entries
 end
