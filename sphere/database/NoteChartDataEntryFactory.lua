@@ -361,11 +361,14 @@ end
 ]]
 local o2jamDifficultyNames = {"Easy", "Normal", "Hard"}
 NoteChartDataEntryFactory.getO2Jam = function(self, fileDatas)
+	assert(#fileDatas == 3)
 	local entries = {}
 	
+	local firstFileData = fileDatas[1]
+	local noteChart, hash = NoteChartFactory:getNoteChart(firstFileData.path, firstFileData.content, firstFileData.hash)
 	for i = 1, #fileDatas do
 		local fileData = fileDatas[i]
-		local noteChart, hash = NoteChartFactory:getNoteChart(fileData.path, fileData.content, fileData.hash)
+
 		local ojn = noteChart.importer.ojn
 		
 		local entry = {
