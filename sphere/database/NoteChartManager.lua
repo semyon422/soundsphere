@@ -13,6 +13,8 @@ NoteChartManager.init = function(self)
 	self.log = Log:new()
 	self.log.console = true
 	self.log.path = "userdata/NoteChartManager.log"
+
+	NoteChartDataEntryFactory:init()
 end
 
 NoteChartManager.lookup = function(self, directoryPath, recursive)

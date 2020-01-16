@@ -446,7 +446,7 @@ NoteChartDataEntryFactory.formats = {
 	{"%.qua$", NoteChartDataEntryFactory.getQuaver},
 	{"%.bm[sel]$", NoteChartDataEntryFactory.getBMS},
 	{"%.pms$", NoteChartDataEntryFactory.getBMS},
-	{"%.ojn$", NoteChartDataEntryFactory.getO2Jam},
+	{"%.ojn/.$", NoteChartDataEntryFactory.getO2Jam},
 	{"%.ksh$", NoteChartDataEntryFactory.getKSM},
 	{"%.sph$", NoteChartDataEntryFactory.getSphere}
 }

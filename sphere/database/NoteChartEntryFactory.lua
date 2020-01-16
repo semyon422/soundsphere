@@ -17,8 +17,8 @@ NoteChartEntryFactory.splitList = function(self, fileDatas)
 	end
 	
 	local list = {}
-	for _, fileData in pairs(dict) do
-		list[#list + 1] = fileData
+	for _, data in pairs(dict) do
+		list[#list + 1] = data
 	end
 	
 	return list
