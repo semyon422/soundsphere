@@ -15,6 +15,9 @@ BackgroundManager.init = function(self)
 end
 
 BackgroundManager.loadDrawableBackground = function(self, path)
+	if not love.filesystem.isFile(path) then
+		return
+	end
 	if path ~= self.currentPath then
 		self.currentPath = path
 		if path:find("%.ojn$") then

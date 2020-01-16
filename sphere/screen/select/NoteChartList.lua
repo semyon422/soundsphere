@@ -75,6 +75,9 @@ NoteChartList.selectCache = function(self)
 	local noteChartDataEntries = {}
 	for i = 1, #noteChartEntries do
 		local noteChartDataEntry = Cache:getNoteChartDataEntry(noteChartEntries[i].hash)
+		if not noteChartDataEntry then
+			noteChartDataEntry = Cache:getEmptyNoteChartDataEntry(noteChartEntries[i].path)
+		end
 		noteChartDataEntries[i] = noteChartDataEntry
 		map[noteChartDataEntry] = noteChartEntries[i]
 	end

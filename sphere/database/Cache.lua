@@ -213,6 +213,27 @@ Cache.getNoteChartDataEntry = function(self, hash)
 	return self.noteChartDatasHash[hash]
 end
 
+Cache.getEmptyNoteChartDataEntry = function(self, path)
+	return {
+		hash = "",
+		title = path:match(".+/(.-)$"),
+		artist = "",
+		source = "",
+		tags = "",
+		name = path:match(".+/(.-)$"),
+		creator = "",
+		audioPath = "",
+		stagePath = "",
+		previewTime = 0,
+		inputMode = "",
+		noteCount = 0,
+		length = 0,
+		bpm = 0,
+		level = 0,
+		difficultyRat = 0
+	}
+end
+
 ----------------------------------------------------------------
 
 Cache.update = function(self, path, recursive)

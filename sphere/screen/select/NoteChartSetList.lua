@@ -74,9 +74,12 @@ end
 NoteChartSetList.getItemName = function(self, entry)
 	local list = Cache:getNoteChartsAtSet(entry.id)
 	if list and list[1] then
-		return Cache:getNoteChartDataEntry(list[1].hash).title
+		local noteChartDataEntry = Cache:getNoteChartDataEntry(list[1].hash)
+		if noteChartDataEntry then
+			return noteChartDataEntry.title
+		end
 	end
-	return entry.path
+	return entry.path:match(".+/(.-)$")
 end
 
 NoteChartSetList.selectCache = function(self)
