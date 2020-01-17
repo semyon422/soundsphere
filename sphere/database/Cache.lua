@@ -502,7 +502,7 @@ Cache.generate = function(self, path)
 end
 
 Cache.generateCacheFull = function(self, path)
-	local path = path or "userdata/chartsTest"
+	local path = path or "userdata/charts"
 	CacheDatabase:load()
 
 	self:select()
