@@ -2,7 +2,7 @@ local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local CustomList		= require("sphere.ui.CustomList")
 local NoteSkinManager	= require("sphere.noteskin.NoteSkinManager")
 local NoteChartList  	= require("sphere.screen.select.NoteChartList")
-local Cache				= require("sphere.database.Cache")
+local NoteChartManager	= require("sphere.database.NoteChartManager")
 
 local NoteChartMenuList = CustomList:new()
 
@@ -71,6 +71,13 @@ NoteChartMenuList.addItems = function(self)
 			name = "open " .. entry.path:match("^(.+)/.-$"),
 			onClick = function()
 				love.system.openURL("file://" .. love.filesystem.getSource() .. "/" .. entry.path:match("^(.+)/.-$"))
+				NoteChartMenu:hide()
+			end
+		},
+		{
+			name = "recache",
+			onClick = function()
+				NoteChartManager:updateCache(entry.path)
 				NoteChartMenu:hide()
 			end
 		}

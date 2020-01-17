@@ -464,11 +464,14 @@ Cache.processNoteChartEntries = function(self, noteChartPaths, noteChartSetPath)
 	self:checkProgress()
 end
 
-Cache.generate = function(self)
+Cache.generate = function(self, path)
 	local noteChartSets = self.noteChartSets
 	local entries = {}
 	for i = 1, #noteChartSets do
-		entries[i] = noteChartSets[i]
+		local entry = noteChartSets[i]
+		if entry.path:find(path, 1, true) then
+			entries[#entries + 1] = entry
+		end
 	end
 
 	CacheDatabase:begin()
@@ -498,7 +501,8 @@ Cache.generate = function(self)
 	CacheDatabase:commit()
 end
 
-Cache.generateCacheFull = function(self)
+Cache.generateCacheFull = function(self, path)
+	local path = path or "userdata/chartsTest"
 	CacheDatabase:load()
 
 	self:select()
@@ -508,14 +512,14 @@ Cache.generateCacheFull = function(self)
 	self:checkProgress()
 
 	CacheDatabase:begin()
-	self:lookup("userdata/chartsTest", false)
+	self:lookup(path, false)
 	CacheDatabase:commit()
 
 	self:select()
 	self.state = 2
 	self:checkProgress()
 
-	self:generate()
+	self:generate(path)
 
 	self.state = 3
 	self:checkProgress()

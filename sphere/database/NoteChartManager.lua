@@ -58,7 +58,7 @@ NoteChartManager.stopCache = function(self)
 	})
 end
 
-NoteChartManager.updateCache = function(self)
+NoteChartManager.updateCache = function(self, path)
 	self.lock = true
 	if not self.isUpdating then
 		self.isUpdating = true
@@ -73,11 +73,11 @@ NoteChartManager.updateCache = function(self)
 				NoteChartDataEntryFactory:init()
 				CacheDatabase:init()
 				NoteChartFactory:init()
-				
 				Cache:init()
-				Cache:generateCacheFull()
+
+				Cache:generateCacheFull(...)
 			]],
-			{}
+			{path}
 		)
 	end
 end
