@@ -1,9 +1,9 @@
-local Config			= require("sphere.config.Config")
-local Screen			= require("sphere.screen.Screen")
-local ScreenManager		= require("sphere.screen.ScreenManager")
-local BrowserList		= require("sphere.screen.browser.BrowserList")
-local BrowserGUI		= require("sphere.screen.browser.BrowserGUI")
-local BackgroundManager	= require("sphere.ui.BackgroundManager")
+local Config				= require("sphere.config.Config")
+local Screen				= require("sphere.screen.Screen")
+local ScreenManager			= require("sphere.screen.ScreenManager")
+local BrowserList			= require("sphere.screen.browser.BrowserList")
+local BrowserGUI			= require("sphere.screen.browser.BrowserGUI")
+local BackgroundManager		= require("sphere.ui.BackgroundManager")
 
 local BrowserScreen = Screen:new()
 
@@ -26,6 +26,8 @@ end
 
 BrowserScreen.unload = function(self)
 	BrowserList:unload()
+
+	self.gui:unload()
 end
 
 BrowserScreen.update = function(self)

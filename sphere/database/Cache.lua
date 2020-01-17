@@ -1,12 +1,34 @@
-local CacheDatabase = require("sphere.database.CacheDatabase")
+local CacheDatabase				= require("sphere.database.CacheDatabase")
+local NoteChartFactory			= require("sphere.database.NoteChartFactory")
+local NoteChartEntryFactory		= require("sphere.database.NoteChartEntryFactory")
+local NoteChartDataEntryFactory	= require("sphere.database.NoteChartDataEntryFactory")
+local Log						= require("aqua.util.Log")
+local md5						= require("md5")
 
 local Cache = {}
 
+Cache.init = function(self)
+	self.log = Log:new()
+	self.log.console = true
+	self.log.path = "userdata/cache.log"
+
+	self.state = 0
+end
+
+Cache.clear = function(self)
+	self.noteChartsAtSet = nil
+	self.noteChartsAtHash = nil
+	self.noteChartSets = nil
+	self.noteChartDatas = nil
+	self.noteCharts = nil
+	self.noteChartsId = nil
+	self.noteChartsPath = nil
+	self.noteChartSetsId = nil
+	self.noteChartSetsPath = nil
+	self.noteChartDatasHash = nil
+end
+
 Cache.select = function(self)
-	if self.lock then
-		return
-	end
-	
 	local loaded = CacheDatabase.loaded
 	if not loaded then
 		CacheDatabase:load()
@@ -236,32 +258,269 @@ end
 
 ----------------------------------------------------------------
 
-Cache.update = function(self, path, recursive)
-	self.lock = true
-	if not self.isUpdating then
-		self.isUpdating = true
-		return ThreadPool:execute(
-			[[
-				local path, recursive = ...
-				
-				local CacheDatabase = require("sphere.database.CacheDatabase")
-				local CacheDataFactory = require("sphere.database.CacheDataFactory")
-				local NoteChartFactory = require("sphere.database.NoteChartFactory")
-				CacheDatabase:init()
-				CacheDataFactory:init()
-				NoteChartFactory:init()
-				
-				CacheDatabase:load()
-				--CacheDatabase:lookup(path, recursive)
-				CacheDatabase:unload()
-			]],
-			{path, recursive},
-			function(result)
-				self.lock = false
-				self:select()
-				self.isUpdating = false
+Cache.checkThreadEvent = function(self)
+	if thread then
+		local event = thread:pop()
+		if event and event.name == "NoteChartManager" then
+			if event.action == "stop" then
+				self.needStop = true
 			end
-		)
+		end
+	end
+end
+
+Cache.sendThreadEvent = function(self)
+	if thread then
+		thread:push({
+			name = "CacheProgress",
+			noteChartSetCount = self.noteChartSetCount,
+			noteChartCount = self.noteChartCount,
+			cachePercent = self.cachePercent,
+			state = self.state
+		})
+	end
+end
+
+Cache.resetProgress = function(self)
+	self.noteChartSetCount = self.noteChartSets and #self.noteChartSets or 0
+	self.noteChartCount = self.noteCharts and #self.noteCharts or 0
+	self.cachePercent = 0
+
+	self.countDelta = 100
+	self.countNext = self.noteChartSetCount + self.countDelta
+
+	self.state = 0
+end
+
+Cache.checkProgress = function(self)
+	if self.noteChartSetCount >= self.countNext then
+		self.countNext = self.countNext + self.countDelta
+		
+		CacheDatabase:commit()
+		CacheDatabase:begin()
+	end
+
+	self:sendThreadEvent()
+	self:checkThreadEvent()
+end
+
+Cache.lookup = function(self, directoryPath, recursive)
+	if self.needStop then
+		return
+	end
+
+	local items = love.filesystem.getDirectoryItems(directoryPath)
+	
+	local containerPaths = {}
+	for _, itemName in ipairs(items) do
+		local path = directoryPath .. "/" .. itemName
+		if love.filesystem.isFile(path) and NoteChartFactory:isNoteChartContainer(path) and self:checkNoteChartSetEntry(path) then
+			containerPaths[#containerPaths + 1] = path
+			self:processNoteChartEntries({path}, path)
+		end
+	end
+	if #containerPaths > 0 then
+		return
+	end
+	
+	local chartPaths = {}
+	for _, itemName in ipairs(items) do
+		local path = directoryPath .. "/" .. itemName
+		if love.filesystem.isFile(path) and NoteChartFactory:isNoteChart(path) then
+			chartPaths[#chartPaths + 1] = path
+		end
+	end
+	if #chartPaths > 0 then
+		self:processNoteChartEntries(chartPaths, directoryPath)
+		return
+	end
+	
+	for _, itemName in ipairs(items) do
+		local path = directoryPath .. "/" .. itemName
+		if love.filesystem.isDirectory(path) and (recursive or self:checkNoteChartSetEntry(path)) then
+			self:lookup(path, recursive)
+		end
+	end
+end
+
+Cache.checkNoteChartSetEntry = function(self, path)
+	local entry = self:getNoteChartSetEntryByPath(path)
+	if not entry then
+		return true
+	end
+
+	local lastModified = love.filesystem.getLastModified(path)
+	if entry.lastModified ~= lastModified then
+		return true
+	end
+
+	return false
+end
+
+Cache.processNoteChartEntries = function(self, noteChartPaths, noteChartSetPath)
+	local noteChartSetEntry = self:getNoteChartSetEntry({
+		path = noteChartSetPath,
+		lastModified = love.filesystem.getLastModified(noteChartSetPath)
+	})
+	self.noteChartSetCount = self.noteChartSetCount + 1
+	
+	local entries = {}
+	for i = 1, #noteChartPaths do
+		local path = noteChartPaths[i]
+		local lastModified = love.filesystem.getLastModified(path)
+		local entry = self:getNoteChartEntryByPath(path)
+
+		if entry then
+			if entry.lastModified ~= lastModified then
+				entry.hash = nil
+				entry.lastModified = lastModified
+				entry.setId = noteChartSetEntry.id
+				self:setNoteChartEntry(entry)
+			elseif entry.setId ~= noteChartSetEntry.id then
+				entry.setId = noteChartSetEntry.id
+				self:setNoteChartEntry(entry)
+			end
+		else
+			entries[#entries + 1] = {
+				path = noteChartPaths[i],
+				lastModified = lastModified
+			}
+		end
+	end
+	local noteChartEntries = NoteChartEntryFactory:getEntries(entries)
+
+	for i = 1, #noteChartEntries do
+		local noteChartEntry = noteChartEntries[i]
+		noteChartEntry.setId = noteChartSetEntry.id
+		
+		self:setNoteChartEntry(noteChartEntry)
+		self.noteChartCount = self.noteChartCount + 1
+	end
+
+	self:checkProgress()
+end
+
+Cache.generate = function(self)
+	local noteChartSets = self.noteChartSets
+
+	CacheDatabase:begin()
+	for i = 1, #noteChartSets do
+		local status, err = xpcall(function()
+			self:processNoteChartDataEntries(self:getNoteChartsAtSet(noteChartSets[i].id), false)
+		end, debug.traceback)
+		if not status then
+			self.log:write("error", noteChartSets[i].id)
+			self.log:write("error", noteChartSets[i].path)
+			self.log:write("error", err)
+		end
+
+		if i % 100 == 0 then
+			CacheDatabase:commit()
+			CacheDatabase:begin()
+		end
+
+		self.cachePercent = (i - 1) / #noteChartSets * 100
+		self:checkProgress()
+
+		if self.needStop then
+			CacheDatabase:commit()
+			return
+		end
+	end
+	CacheDatabase:commit()
+end
+
+Cache.generateCacheFull = function(self)
+	CacheDatabase:load()
+
+	self:select()
+	self:resetProgress()
+	self.state = 1
+	self:checkProgress()
+
+	CacheDatabase:begin()
+	self:lookup("userdata/charts", false)
+	CacheDatabase:commit()
+
+	self:select()
+	self.state = 2
+	self:checkProgress()
+
+	self:generate()
+
+	self.state = 3
+	self:checkProgress()
+
+	CacheDatabase:unload()
+end
+
+Cache.getRealPath = function(self, path)
+	if path:find("%.ojn/.$") then
+		return path:match("^(.+)/.$")
+	end
+	return path
+end
+
+Cache.processNoteChartDataEntries = function(self, noteChartEntries, reHash)
+	if not reHash then
+		local newLoteChartEntries = {}
+		for i = 1, #noteChartEntries do
+			local noteChartEntry = noteChartEntries[i]
+			if not noteChartEntry.hash then
+				newLoteChartEntries[#newLoteChartEntries + 1] = noteChartEntry
+			end
+		end
+		noteChartEntries = newLoteChartEntries
+	end
+
+	local fileContent = {}
+	local fileHash = {}
+
+	for i = 1, #noteChartEntries do
+		local realPath = self:getRealPath(noteChartEntries[i].path)
+		if not fileContent[realPath] then
+			local file = love.filesystem.newFile(realPath)
+			file:open("r")
+			local content = file:read()
+			file:close()
+
+			fileContent[realPath] = content
+			fileHash[realPath] = md5.sumhexa(content)
+		end
+	end
+
+	local fileDatas = {}
+	for i = 1, #noteChartEntries do
+		local path = noteChartEntries[i].path
+		local realPath = self:getRealPath(path)
+
+		local noteChartEntry = noteChartEntries[i]
+		local content = fileContent[realPath]
+		local hash = fileHash[realPath]
+
+		if noteChartEntry.hash ~= hash then
+			local noteChartDataEntry = Cache:getNoteChartDataEntry(hash)
+			noteChartEntry.hash = hash
+
+			if noteChartDataEntry then
+				self:setNoteChartEntry(noteChartEntry)
+			else
+				fileDatas[#fileDatas + 1] = {
+					path = path,
+					content = content,
+					hash = hash,
+					noteChartEntry = noteChartEntry
+				}
+			end
+		end
+	end
+
+	local entries = NoteChartDataEntryFactory:getEntries(fileDatas)
+	for i = 1, #fileDatas do
+		local fileData = fileDatas[i]
+
+		self:setNoteChartDataEntry(fileData.noteChartDataEntry)
+		self:setNoteChartEntry(fileData.noteChartEntry)
 	end
 end
 

@@ -22,7 +22,6 @@ BrowserList.startOffset = 9
 BrowserList.endOffset = 9
 BrowserList.needItemsSort = true
 
-BrowserList.mode = "filesystem"
 BrowserList.basePath = "userdata/charts"
 
 BrowserList.init = function(self)
@@ -35,19 +34,12 @@ BrowserList.load = function(self)
 end
 
 BrowserList.send = function(self, event)
-	if event.action == "buttonInteract" then
+	if event.action == "scrollTarget" then
 		local item = self.items[event.itemIndex]
-		if event.button == 1 then
-			NoteChartSetList:setBasePath(item.path)
-		elseif event.button == 2 then
-			local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
-			local recursive = love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")
-			if shift then
-				Cache:update(item.path, recursive)
-			else
-				love.system.openURL("file://" .. love.filesystem.getSource() .. "/" .. item.path)
-			end
-		end
+		if not item then return end
+
+		self.basePath = item.path
+		NoteChartSetList:setBasePath(item.path)
 	end
 	
 	return CustomList.send(self, event)
@@ -59,12 +51,6 @@ BrowserList.receive = function(self, event)
 		if key == "f5" then
 			Cache:select()
 			NotificationLine:notify("Cache reloaded from database")
-		elseif key == "f1" then
-			self.mode = "filesystem"
-			self:selectCache()
-		elseif key == "f2" then
-			self.mode = "cache"
-			self:selectCache()
 		end
 	end
 	
@@ -73,29 +59,19 @@ end
 
 BrowserList.selectCache = function(self)
 	local items = {}
-	if self.mode == "filesystem" then
-		local directoryItems = love.filesystem.getDirectoryItems("userdata/charts")
+	
+	local directoryItems = love.filesystem.getDirectoryItems("userdata/charts")
+	
+	items[1] = {
+		name = "all",
+		path = "userdata/charts"
+	}
+	for _, name in ipairs(directoryItems) do
+		local path = "userdata/charts/" .. name
 		
-		items[1] = {
-			name = "all",
-			path = "userdata/charts"
-		}
-		for _, name in ipairs(directoryItems) do
-			local path = "userdata/charts/" .. name
-			
-			if not love.filesystem.isFile(path) then
-				items[#items + 1] = {
-					name = name,
-					path = path
-				}
-			end
-		end
-	elseif self.mode == "cache" then
-		local paths = CollectionManager:getPaths()
-		
-		for _, path in ipairs(paths) do
+		if not love.filesystem.isFile(path) then
 			items[#items + 1] = {
-				name = path,
+				name = name,
 				path = path
 			}
 		end

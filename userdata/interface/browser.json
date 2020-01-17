@@ -60,4 +60,32 @@
 		"layer": 6,
 		"image": "resources/ui/browserframe.png"
 	},
+
+	{
+		"name": "Footer",
+		"class": "Button",
+		"cs": [0, 0, 0, 0, "all"],
+		"x": 0,
+		"y": 0.925,
+		"w": 1,
+		"h": 0.075,
+		"layer": 1,
+		"backgroundColor": [0, 0, 0, 127]
+	},
+
+	{
+		"name": "CacheManagerDisplay",
+		"class": "CacheManagerDisplay",
+		"cs": [0, 0, 0, 0, "all"],
+		"x": 0,
+		"y": 0.925,
+		"w": 1,
+		"h": 0.075,
+		"layer": 3,
+		"textColor": [255, 255, 255, 255],
+		"backgroundColor": [0, 0, 0, 127],
+		"text": "refresh",
+		"font": "resources/fonts/NotoSansCJK-Regular.ttc",
+		"fontSize": 20
+	},
 ]

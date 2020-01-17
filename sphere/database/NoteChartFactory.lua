@@ -14,12 +14,19 @@ local zlib		= require("zlib")
 
 local NoteChartFactory = {}
 
-local chartPatterns = {
-	"%.osu$", "%.bm[sel]$", "%.pms$", "%.qua$", "%.ksh$", "%.sph$"
+local chartExtensions = {
+	[".osu"] = true,
+	[".bms"] = true,
+	[".bme"] = true,
+	[".bml"] = true,
+	[".pms"] = true,
+	[".qua"] = true,
+	[".ksh"] = true,
+	[".sph"] = true
 }
 
-local containerPatterns = {
-	"%.ojn$"
+local containerExtensions = {
+	[".ojn"] = true
 }
 
 NoteChartFactory.init = function(self)
@@ -31,20 +38,13 @@ NoteChartFactory.isTextFile = function(self, path)
 	return self:isNoteChart(path)
 end
 
+local sub = string.sub
 NoteChartFactory.isNoteChart = function(self, path)
-	for i = 1, #chartPatterns do
-		if path:find(chartPatterns[i]) then
-			return true
-		end
-	end
+	return chartExtensions[sub(path, -4, -1)]
 end
 
 NoteChartFactory.isNoteChartContainer = function(self, path)
-	for i = 1, #containerPatterns do
-		if path:find(containerPatterns[i]) then
-			return true
-		end
-	end
+	return containerExtensions[sub(path, -4, -1)]
 end
 
 NoteChartFactory.readFile = function(self, path)

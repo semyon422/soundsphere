@@ -123,7 +123,7 @@
 	},
 	
 	{
-		"name": "SongTitle",
+		"name": "ChartCreator",
 		"class": "NoteChartDataDisplay",
 		"field": "creator",
 		"cs": [0, 0, 0, 0, "all"],
@@ -141,7 +141,7 @@
 		"interact": []
 	},
 	{
-		"name": "SongTitle",
+		"name": "SongArtist",
 		"class": "NoteChartDataDisplay",
 		"field": "artist",
 		"cs": [0, 0, 0, 0, "h"],
@@ -177,7 +177,7 @@
 		"interact": []
 	},
 	{
-		"name": "SongTitle",
+		"name": "ChartName",
 		"class": "NoteChartDataDisplay",
 		"field": "name",
 		"cs": [0, 0, 0, 0, "h"],
