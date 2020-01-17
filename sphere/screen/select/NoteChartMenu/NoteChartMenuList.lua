@@ -73,13 +73,6 @@ NoteChartMenuList.addItems = function(self)
 				love.system.openURL("file://" .. love.filesystem.getSource() .. "/" .. entry.path:match("^(.+)/.-$"))
 				NoteChartMenu:hide()
 			end
-		},
-		{
-			name = "recache",
-			onClick = function()
-				Cache:update(entry.path)
-				NoteChartMenu:hide()
-			end
 		}
 	}
 	
