@@ -111,6 +111,10 @@ SelectScreen.receive = function(self, event)
 	end
 	
 	if event.action == "playNoteChart" then
+		if not love.filesystem.exists(event.noteChartEntry.path) then
+			return
+		end
+
 		local GameplayScreen = require("sphere.screen.gameplay.GameplayScreen")
 		GameplayScreen.noteChartEntry = event.noteChartEntry
 		GameplayScreen.noteChartDataEntry = event.noteChartDataEntry

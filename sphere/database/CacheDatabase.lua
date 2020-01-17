@@ -124,6 +124,10 @@ local selectAllNoteChartsRequest = [[
 	SELECT * FROM `noteCharts`;
 ]]
 
+local deleteNoteChartRequest = [[
+	DELETE FROM `noteCharts` WHERE `path` = ?
+]]
+
 ----------------------------------------------------------------
 
 local insertNoteChartSetRequest = [[
@@ -145,6 +149,10 @@ local selectNoteChartSetRequest = [[
 
 local selectAllNoteChartSetsRequest = [[
 	SELECT * FROM `noteChartSets`;
+]]
+
+local deleteNoteChartSetRequest = [[
+	DELETE FROM `noteChartSets` WHERE `path` = ?
 ]]
 
 ----------------------------------------------------------------
@@ -201,14 +209,6 @@ local selectAllNoteChartDatasRequest = [[
 
 ----------------------------------------------------------------
 
--- local deleteChartRequest = [[
--- 	DELETE FROM `charts` WHERE INSTR(`path`, ?) == 1
--- ]]
-
--- local deleteChartSetRequest = [[
--- 	DELETE FROM `chartSets` WHERE INSTR(`path`, ?) == 1
--- ]]
-
 CacheDatabase.init = function(self)
 	self.log = Log:new()
 	self.log.console = true
@@ -224,20 +224,19 @@ CacheDatabase.load = function(self)
 	self.insertNoteChartStatement = db:prepare(insertNoteChartRequest)
 	self.updateNoteChartStatement = db:prepare(updateNoteChartRequest)
 	self.selectNoteChartStatement = db:prepare(selectNoteChartRequest)
+	self.deleteNoteChartStatement = db:prepare(deleteNoteChartRequest)
 	self.selectAllNoteChartsStatement = db:prepare(selectAllNoteChartsRequest)
-	-- self.deleteChartStatement = self.db:prepare(deleteChartRequest)
 
 	self.insertNoteChartSetStatement = db:prepare(insertNoteChartSetRequest)
 	self.updateNoteChartSetStatement = db:prepare(updateNoteChartSetRequest)
 	self.selectNoteChartSetStatement = db:prepare(selectNoteChartSetRequest)
+	self.deleteNoteChartSetStatement = db:prepare(deleteNoteChartSetRequest)
 	self.selectAllNoteChartSetsStatement = db:prepare(selectAllNoteChartSetsRequest)
-	-- self.deleteChartSetStatement = self.db:prepare(deleteChartSetRequest)
 
 	self.insertNoteChartDataStatement = db:prepare(insertNoteChartDataRequest)
 	self.updateNoteChartDataStatement = db:prepare(updateNoteChartDataRequest)
 	self.selectNoteChartDataStatement = db:prepare(selectNoteChartDataRequest)
 	self.selectAllNoteChartDatasStatement = db:prepare(selectAllNoteChartDatasRequest)
-	-- self.deleteChartStatement = self.db:prepare(deleteChartRequest)
 
 	self.loaded = true
 end
@@ -254,27 +253,6 @@ end
 CacheDatabase.commit = function(self)
 	return self.db:exec("COMMIT;")
 end
-
-
-
--- CacheDatabase.checkChartSetData = function(self, path)
--- 	return self.selectChartSetStatement:reset():bind(path):step()
--- end
-
--- CacheDatabase.getChartSetData = function(self, path)
--- 	self.insertChartSetStatement:reset():bind(path):step()
--- 	return self:checkChartSetData(path)
--- end
-
--- CacheDatabase.deleteChartData = function(self, path)
--- 	return self.deleteChartStatement:reset():bind(path):step()
--- end
-
--- CacheDatabase.deleteChartSetData = function(self, path)
--- 	return self.deleteChartSetStatement:reset():bind(path):step()
--- end
-
-
 
 ----------------------------------------------------------------
 
@@ -301,6 +279,10 @@ CacheDatabase.selectNoteChartEntry = function(self, path)
 	return self:transformNoteChartEntry(entry)
 end
 
+CacheDatabase.deleteNoteChartEntry = function(self, path)
+	return self.deleteNoteChartStatement:reset():bind(path):step()
+end
+
 CacheDatabase.setNoteChartEntry = function(self, entry)
 	self:insertNoteChartEntry(entry)
 	return self:updateNoteChartEntry(entry)
@@ -325,6 +307,10 @@ end
 CacheDatabase.selectNoteChartSetEntry = function(self, path)
 	local entry = self.selectNoteChartSetStatement:reset():bind(path):step()
 	return self:transformNoteChartSetEntry(entry)
+end
+
+CacheDatabase.deleteNoteChartSetEntry = function(self, path)
+	return self.deleteNoteChartSetStatement:reset():bind(path):step()
 end
 
 CacheDatabase.getNoteChartSetEntry = function(self, entry)
