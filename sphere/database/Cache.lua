@@ -286,27 +286,6 @@ Cache.getNoteChartDataEntry = function(self, hash)
 	return self.noteChartDatasHash[hash]
 end
 
-Cache.getEmptyNoteChartDataEntry = function(self, path)
-	return {
-		hash = "",
-		title = path:match(".+/(.-)$"),
-		artist = "",
-		source = "",
-		tags = "",
-		name = path:match(".+/(.-)$"),
-		creator = "",
-		audioPath = "",
-		stagePath = "",
-		previewTime = 0,
-		inputMode = "",
-		noteCount = 0,
-		length = 0,
-		bpm = 0,
-		level = 0,
-		difficultyRat = 0
-	}
-end
-
 ----------------------------------------------------------------
 
 Cache.checkThreadEvent = function(self)
@@ -353,6 +332,32 @@ Cache.checkProgress = function(self)
 
 	self:sendThreadEvent()
 	self:checkThreadEvent()
+end
+
+Cache.generateCacheFull = function(self, path)
+	local path = path or "userdata/charts"
+	CacheDatabase:load()
+
+	self:select()
+
+	self:resetProgress()
+	self.state = 1
+	self:checkProgress()
+
+	CacheDatabase:begin()
+	self:lookup(path, false)
+	CacheDatabase:commit()
+
+	self:select()
+	self.state = 2
+	self:checkProgress()
+
+	self:generate(path)
+
+	self.state = 3
+	self:checkProgress()
+
+	CacheDatabase:unload()
 end
 
 local getDirectoryItems, isFile, isDirectory = love.filesystem.getDirectoryItems, love.filesystem.isFile, love.filesystem.isDirectory
@@ -477,7 +482,7 @@ Cache.generate = function(self, path)
 	CacheDatabase:begin()
 	for i = 1, #entries do
 		local status, err = xpcall(function()
-			self:processNoteChartDataEntries(entries[i], false)
+			self:processNoteChartDataEntries(entries[i])
 		end, debug.traceback)
 		if not status then
 			self.log:write("error", entries[i].id)
@@ -501,32 +506,6 @@ Cache.generate = function(self, path)
 	CacheDatabase:commit()
 end
 
-Cache.generateCacheFull = function(self, path)
-	local path = path or "userdata/charts"
-	CacheDatabase:load()
-
-	self:select()
-
-	self:resetProgress()
-	self.state = 1
-	self:checkProgress()
-
-	CacheDatabase:begin()
-	self:lookup(path, false)
-	CacheDatabase:commit()
-
-	self:select()
-	self.state = 2
-	self:checkProgress()
-
-	self:generate(path)
-
-	self.state = 3
-	self:checkProgress()
-
-	CacheDatabase:unload()
-end
-
 Cache.getRealPath = function(self, path)
 	if path:find("%.ojn/.$") then
 		return path:match("^(.+)/.$")
@@ -534,23 +513,26 @@ Cache.getRealPath = function(self, path)
 	return path
 end
 
-Cache.processNoteChartDataEntries = function(self, noteChartSetEntry, reHash)
+Cache.processNoteChartDataEntries = function(self, noteChartSetEntry)
 	if not exists(noteChartSetEntry.path) then
 		return self:deleteNoteChartSetEntry(noteChartSetEntry)
 	end
 
 	local noteChartEntries = self:getNoteChartsAtSet(noteChartSetEntry.id)
 
-	if not reHash then
-		local newLoteChartEntries = {}
-		for i = 1, #noteChartEntries do
-			local noteChartEntry = noteChartEntries[i]
-			if not noteChartEntry.hash then
-				newLoteChartEntries[#newLoteChartEntries + 1] = noteChartEntry
+	local newNoteChartEntries = {}
+	for i = 1, #noteChartEntries do
+		local noteChartEntry = noteChartEntries[i]
+		if not noteChartEntry.hash then
+			newNoteChartEntries[#newNoteChartEntries + 1] = noteChartEntry
+		else
+			local noteChartDataEntry = self:getNoteChartDataEntry(noteChartEntry.hash)
+			if noteChartDataEntry.version ~= NoteChartDataEntryFactory.versions[noteChartDataEntry.format] then
+				newNoteChartEntries[#newNoteChartEntries + 1] = noteChartEntry
 			end
 		end
-		noteChartEntries = newLoteChartEntries
 	end
+	noteChartEntries = newNoteChartEntries
 
 	local fileContent = {}
 	local fileHash = {}
@@ -577,20 +559,21 @@ Cache.processNoteChartDataEntries = function(self, noteChartSetEntry, reHash)
 		local content = fileContent[realPath]
 		local hash = fileHash[realPath]
 
-		if noteChartEntry.hash ~= hash then
-			local noteChartDataEntry = Cache:getNoteChartDataEntry(hash)
-			noteChartEntry.hash = hash
+		local noteChartDataEntry = Cache:getNoteChartDataEntry(hash)
+		noteChartEntry.hash = hash
 
-			if noteChartDataEntry then
-				self:setNoteChartEntry(noteChartEntry)
-			else
-				fileDatas[#fileDatas + 1] = {
-					path = path,
-					content = content,
-					hash = hash,
-					noteChartEntry = noteChartEntry
-				}
-			end
+		if
+			noteChartDataEntry and
+			noteChartDataEntry.version == NoteChartDataEntryFactory.versions[noteChartDataEntry.format]
+		then
+			self:setNoteChartEntry(noteChartEntry)
+		else
+			fileDatas[#fileDatas + 1] = {
+				path = path,
+				content = content,
+				hash = hash,
+				noteChartEntry = noteChartEntry
+			}
 		end
 	end
 

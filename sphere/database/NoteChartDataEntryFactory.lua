@@ -9,6 +9,15 @@ local iconv = require("aqua.iconv")
 
 local NoteChartDataEntryFactory = {}
 
+NoteChartDataEntryFactory.versions = {
+	bms = 0,
+	ksh = 0,
+	osu = 0,
+	qua = 0,
+	ojn = 0,
+	sph = 0
+}
+
 local charsets = {
 	{"UTF-8", "SHIFT-JIS"},
 	{"UTF-8", "CP932"},
@@ -122,16 +131,16 @@ local fix = function(line)
 end
 
 local numberFields = {
-	"level",
+	"version",
 	"previewTime",
 	"noteCount",
 	"length",
-	"bpm",
-	"difficultyRate"
+	"bpm"
 }
 
 local stringFields = {
 	"hash",
+	"format",
 	"title",
 	"artist",
 	"source",
@@ -183,12 +192,13 @@ NoteChartDataEntryFactory.getBMS = function(self, fileDatas)
 			local header = bms.header
 			local entry = {
 				hash			= hash,
+				format			= "bms",
+				version			= self.versions.bms,
 				title			= header["TITLE"],
 				artist			= header["ARTIST"],
 				source			= "BMS",
 				tags			= "",
 				name			= nil,
-				level			= header["PLAYLEVEL"],
 				creator			= "",
 				audioPath		= "",
 				stagePath		= header["STAGEFILE"],
@@ -196,8 +206,7 @@ NoteChartDataEntryFactory.getBMS = function(self, fileDatas)
 				noteCount		= noteChart:hashGet("noteCount"),
 				length			= noteChart:hashGet("totalLength"),
 				bpm				= bms.baseTempo or 0,
-				inputMode		= noteChart.inputMode:getString(),
-				difficultyRate	= 0
+				inputMode		= noteChart.inputMode:getString()
 			}
 			
 			entries[#entries + 1] = entry
@@ -231,12 +240,13 @@ NoteChartDataEntryFactory.getOsu = function(self, fileDatas)
 			local metadata = osu.metadata
 			local entry = {
 				hash			= hash,
+				format			= "osu",
+				version			= self.versions.osu,
 				title			= metadata["Title"],
 				artist			= metadata["Artist"],
 				source			= metadata["Source"],
 				tags			= metadata["Tags"],
 				name			= metadata["Version"],
-				level			= 0,
 				creator			= metadata["Creator"],
 				audioPath		= metadata["AudioFilename"],
 				stagePath		= osu.background,
@@ -244,8 +254,7 @@ NoteChartDataEntryFactory.getOsu = function(self, fileDatas)
 				noteCount		= noteChart:hashGet("noteCount"),
 				length			= noteChart:hashGet("totalLength"),
 				bpm				= noteChart.importer.primaryBPM,
-				inputMode		= noteChart.inputMode:getString(),
-				difficultyRate	= 0
+				inputMode		= noteChart.inputMode:getString()
 			}
 			self:fixEntry(entry)
 			
@@ -270,12 +279,13 @@ NoteChartDataEntryFactory.getKSM = function(self, fileDatas)
 			local options = ksh.options
 			local entry = {
 				hash			= hash,
+				format			= "ksh",
+				version			= self.versions.ksh,
 				title			= options["title"],
 				artist			= options["artist"],
 				source			= "KSM",
 				tags			= "",
 				name			= options["difficulty"],
-				level			= options["level"],
 				creator			= options["effect"],
 				audioPath		= importer.audioFileName,
 				stagePath		= options["jacket"],
@@ -283,8 +293,7 @@ NoteChartDataEntryFactory.getKSM = function(self, fileDatas)
 				noteCount		= noteChart:hashGet("noteCount"),
 				length			= noteChart:hashGet("totalLength"),
 				bpm				= 0,
-				inputMode		= noteChart.inputMode:getString(),
-				difficultyRate	= 0
+				inputMode		= noteChart.inputMode:getString()
 			}
 			self:fixEntry(entry)
 			
@@ -307,12 +316,13 @@ NoteChartDataEntryFactory.getQuaver = function(self, fileDatas)
 			local qua = noteChart.importer.qua
 			local entry = {
 				hash			= hash,
+				format			= "qua",
+				version			= self.versions.qua,
 				title			= qua["Title"],
 				artist			= qua["Artist"],
 				source			= qua["Source"],
 				tags			= qua["Tags"],
 				name			= qua["DifficultyName"],
-				level			= 0,
 				creator			= qua["Creator"],
 				audioPath		= qua["AudioFile"],
 				stagePath		= qua["BackgroundFile"],
@@ -320,8 +330,7 @@ NoteChartDataEntryFactory.getQuaver = function(self, fileDatas)
 				noteCount		= noteChart:hashGet("noteCount"),
 				length			= noteChart:hashGet("totalLength"),
 				bpm				= noteChart.importer.primaryBPM,
-				inputMode		= noteChart.inputMode:getString(),
-				difficultyRate	= 0
+				inputMode		= noteChart.inputMode:getString()
 			}
 			
 			entries[#entries + 1] = entry
@@ -365,12 +374,13 @@ NoteChartDataEntryFactory.getO2Jam = function(self, fileDatas)
 		
 		local entry = {
 			hash			= hash,
+			format			= "ojn",
+			version			= self.versions.ojn,
 			title			= ojn.str_title,
 			artist			= ojn.str_artist,
 			source			= "o2jam",
 			tags			= "",
 			name			= o2jamDifficultyNames[i],
-			level			= ojn.charts[i].level,
 			creator			= ojn.str_noter,
 			audioPath		= "",
 			stagePath		= "",
@@ -378,8 +388,7 @@ NoteChartDataEntryFactory.getO2Jam = function(self, fileDatas)
 			noteCount		= ojn.charts[i].notes,
 			length			= ojn.charts[i].duration,
 			bpm				= ojn.bpm,
-			inputMode		= "7key",
-			difficultyRate	= 0
+			inputMode		= "7key"
 		}
 		self:fixEntry(entry)
 		
@@ -405,14 +414,14 @@ NoteChartDataEntryFactory.getSphere = function(self, fileDatas)
 		file:close()
 		
 		local entry = {
-			path			= path,
 			hash			= hash,
+			format			= "sph",
+			version			= self.versions.sph,
 			title			= data.title,
 			artist			= data.artist,
 			source			= data.source,
 			tags			= data.tags,
 			name			= data.name,
-			level			= data.level,
 			creator			= data.creator,
 			audioPath		= data.audioPath,
 			stagePath		= data.stagePath,
@@ -420,8 +429,7 @@ NoteChartDataEntryFactory.getSphere = function(self, fileDatas)
 			noteCount		= data.noteCount,
 			length			= data.length,
 			bpm				= data.bpm,
-			inputMode		= data.inputMode,
-			difficultyRate	= 0
+			inputMode		= data.inputMode
 		}
 		self:fixEntry(entry)
 		

@@ -11,6 +11,8 @@ CacheDatabase.chartspath = "userdata/charts"
 
 CacheDatabase.noteChartDatasColumns = {
 	"hash",
+	"format",
+	"version",
 	"title",
 	"artist",
 	"source",
@@ -23,9 +25,7 @@ CacheDatabase.noteChartDatasColumns = {
 	"inputMode",
 	"noteCount",
 	"length",
-	"bpm",
-	"level",
-	"difficultyRate"
+	"bpm"
 }
 
 CacheDatabase.noteChartsColumns = {
@@ -45,12 +45,11 @@ CacheDatabase.noteChartSetsColumns = {
 ----------------------------------------------------------------
 
 CacheDatabase.noteChartDatasNumberColumns = {
+	"version",
 	"previewTime",
 	"noteCount",
 	"length",
-	"bpm",
-	"level",
-	"difficultyRate"
+	"bpm"
 }
 
 CacheDatabase.noteChartsNumberColumns = {
@@ -81,6 +80,8 @@ local createTableRequest = [[
 	);
 	CREATE TABLE IF NOT EXISTS `noteChartDatas` (
 		`hash` TEXT UNIQUE NOT NULL PRIMARY KEY,
+		`format` TEXT,
+		`version` REAL,
 		`title` TEXT,
 		`artist` TEXT,
 		`source` TEXT,
@@ -93,9 +94,7 @@ local createTableRequest = [[
 		`inputMode` TEXT,
 		`noteCount` REAL,
 		`length` REAL,
-		`bpm` REAL,
-		`level` REAL,
-		`difficultyRate` REAL
+		`bpm` REAL
 	);
 ]]
 
@@ -160,6 +159,8 @@ local deleteNoteChartSetRequest = [[
 local insertNoteChartDataRequest = [[
 	INSERT OR IGNORE INTO `noteChartDatas` (
 		`hash`,
+		`format`,
+		`version`,
 		`title`,
 		`artist`,
 		`source`,
@@ -172,15 +173,15 @@ local insertNoteChartDataRequest = [[
 		`inputMode`,
 		`noteCount`,
 		`length`,
-		`bpm`,
-		`level`,
-		`difficultyRate`
+		`bpm`
 	)
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 ]]
 
 local updateNoteChartDataRequest = [[
 	UPDATE `noteChartDatas` SET
+		`format` = ?,
+		`version` = ?,
 		`title` = ?,
 		`artist` = ?,
 		`source` = ?,
@@ -193,9 +194,7 @@ local updateNoteChartDataRequest = [[
 		`inputMode` = ?,
 		`noteCount` = ?,
 		`length` = ?,
-		`bpm` = ?,
-		`level` = ?,
-		`difficultyRate` = ?
+		`bpm` = ?
 	WHERE `hash` = ?;
 ]]
 
@@ -324,6 +323,8 @@ end
 CacheDatabase.insertNoteChartDataEntry = function(self, entry)
 	return self.insertNoteChartDataStatement:reset():bind(
 		entry.hash,
+		entry.format,
+		entry.version,
 		entry.title,
 		entry.artist,
 		entry.source,
@@ -336,14 +337,14 @@ CacheDatabase.insertNoteChartDataEntry = function(self, entry)
 		entry.inputMode,
 		entry.noteCount,
 		entry.length,
-		entry.bpm,
-		entry.level,
-		entry.difficultyRate
+		entry.bpm
 	):step()
 end
 
 CacheDatabase.updateNoteChartDataEntry = function(self, entry)
 	return self.updateNoteChartDataStatement:reset():bind(
+		entry.format,
+		entry.version,
 		entry.title,
 		entry.artist,
 		entry.source,
@@ -357,8 +358,6 @@ CacheDatabase.updateNoteChartDataEntry = function(self, entry)
 		entry.noteCount,
 		entry.length,
 		entry.bpm,
-		entry.level,
-		entry.difficultyRate,
 		entry.hash
 	):step()
 end
@@ -399,79 +398,5 @@ end
 CacheDatabase.transformNoteChartDataEntry = function(self, entry)
 	return self:transformEntry(entry, self.noteChartDatasColumns, self.noteChartDatasNumberColumns)
 end
-
-
-
--- CacheDatabase.setNoteChartData = function(self, data)
--- 	self:insertNoteChartData(data)
--- 	self:updateNoteChartData(data)
--- end
-
--- CacheDatabase.insertNoteChartData = function(self, data)
--- 	return self.insertChartStatement:reset():bind(
--- 		data.setId,
--- 		data.hash,
--- 		data.path,
--- 		data.title,
--- 		data.artist,
--- 		data.source,
--- 		data.tags,
--- 		data.name,
--- 		data.level,
--- 		data.creator,
--- 		data.audioPath,
--- 		data.stagePath,
--- 		data.previewTime,
--- 		data.noteCount,
--- 		data.length,
--- 		data.bpm,
--- 		data.inputMode
--- 	):step()
--- end
-
--- CacheDatabase.updateNoteChartData = function(self, data)
--- 	return self.updateChartStatement:reset():bind(
--- 		data.setId,
--- 		data.hash,
--- 		data.path,
--- 		data.title,
--- 		data.artist,
--- 		data.source,
--- 		data.tags,
--- 		data.name,
--- 		data.level,
--- 		data.creator,
--- 		data.audioPath,
--- 		data.stagePath,
--- 		data.previewTime,
--- 		data.noteCount,
--- 		data.length,
--- 		data.bpm,
--- 		data.inputMode,
--- 		data.path
--- 	):step()
--- end
-
--- CacheDatabase.insertNoteChartData = function(self, path)
--- 	self:setChartData({
--- 		setId	= 0,
--- 		path		= path,
--- 		hash		= "",
--- 		title		= "",
--- 		artist		= "",
--- 		source		= "",
--- 		tags		= "",
--- 		name		= "",
--- 		level		= 0,
--- 		creator		= "",
--- 		audioPath	= "",
--- 		stagePath	= "",
--- 		previewTime	= 0,
--- 		noteCount	= 0,
--- 		length		= 0,
--- 		bpm			= 0,
--- 		inputMode	= ""
--- 	})
--- end
 
 return CacheDatabase

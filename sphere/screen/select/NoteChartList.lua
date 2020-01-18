@@ -68,7 +68,7 @@ NoteChartList.selectCache = function(self)
 	
 	local noteChartEntries = Cache:getNoteChartsAtSet(self.setId)
 	if not noteChartEntries or not noteChartEntries[1] then
-		return
+		return self:setItems(items)
 	end
 
 	local map = {}
