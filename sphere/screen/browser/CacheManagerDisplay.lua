@@ -3,6 +3,7 @@ local Image				= require("aqua.graphics.Image")
 local Line				= require("aqua.graphics.Line")
 local map				= require("aqua.math").map
 local NoteChartManager	= require("sphere.database.NoteChartManager")
+local BrowserList		= require("sphere.screen.browser.BrowserList")
 local Button			= require("sphere.ui.Button")
 
 local CacheManagerDisplay = Button:new()
@@ -30,7 +31,7 @@ end
 
 CacheManagerDisplay.processCache = function(self)
 	if self.state == 0 or self.state == 3 then
-		NoteChartManager:updateCache()
+		NoteChartManager:updateCache(BrowserList.basePath)
 	else
 		NoteChartManager:stopCache()
 	end
