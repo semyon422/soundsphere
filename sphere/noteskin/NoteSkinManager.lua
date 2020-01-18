@@ -76,7 +76,9 @@ NoteSkinManager.getMetaData = function(self, inputMode)
 		end
 	end
 
-	self:setDefaultNoteSkin(inputMode, list[1])
+	if #list ~= 0 then
+		self:setDefaultNoteSkin(inputMode, list[1])
+	end
 
 	return list[1]
 end
