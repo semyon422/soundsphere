@@ -26,8 +26,6 @@ end
 
 BrowserScreen.unload = function(self)
 	BrowserList:unload()
-
-	self.gui:unload()
 end
 
 BrowserScreen.update = function(self)

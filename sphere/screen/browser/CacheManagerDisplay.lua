@@ -1,4 +1,3 @@
-local Circle			= require("aqua.graphics.Circle")
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Image				= require("aqua.graphics.Image")
 local Line				= require("aqua.graphics.Line")
@@ -54,9 +53,7 @@ CacheManagerDisplay.unload = function(self)
 end
 
 CacheManagerDisplay.receive = function(self, event)
-	if event.name == "resize" then
-		self.circle:reload()
-	elseif event.name == "NoteChartManagerState" then
+	if event.name == "NoteChartManagerState" then
 		if event.state == 1 then
 			self.button.text = ("searching for charts: %d"):format(event.noteChartCount)
 			self.button:reload()
