@@ -14,9 +14,10 @@ ToOsu.apply = function(self)
 	
 	local nce = NoteChartExporter:new()
 	nce.noteChart = self.sequence.manager.noteChart
-	nce.cacheData = GameplayScreen.cacheData
+	nce.noteChartEntry = GameplayScreen.noteChartEntry
+	nce.noteChartDataEntry = GameplayScreen.noteChartDataEntry
 	
-	local path = GameplayScreen.cacheData.path
+	local path = GameplayScreen.noteChartEntry.path
 	path = path:find("^.+/.$") and path:match("^(.+)/.$") or path
 	local fileName = path:match("^.+/(.-)$"):match("^(.+)%..-$")
 	
