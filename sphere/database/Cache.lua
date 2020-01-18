@@ -288,6 +288,29 @@ end
 
 ----------------------------------------------------------------
 
+Cache.getEmptyNoteChartDataEntry = function(self, path)
+	return {
+		hash = "",
+		title = path:match(".+/(.-)$"),
+		artist = "",
+		source = "",
+		tags = "",
+		name = path:match(".+/(.-)$"),
+		creator = "",
+		audioPath = "",
+		stagePath = "",
+		previewTime = 0,
+		inputMode = "",
+		noteCount = 0,
+		length = 0,
+		bpm = 0,
+		level = 0,
+		difficultyRat = 0
+	}
+end
+
+----------------------------------------------------------------
+
 Cache.checkThreadEvent = function(self)
 	if thread then
 		local event = thread:pop()
