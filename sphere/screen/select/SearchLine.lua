@@ -71,8 +71,8 @@ SearchLine.load = function(self)
 		enableStencil = true,
 		layer = self.layer
 	})
+	self.textInputFrame.textInput:setText(self.searchString)
 	self.textInputFrame:reload()
-	self.textInputFrame.textInput.text = self.searchString
 
 	self.container:add(self.textInputFrame)
 end
@@ -80,6 +80,7 @@ end
 SearchLine.update = function(self) end
 
 SearchLine.unload = function(self)
+	self.observable:remove(require("sphere.screen.select.SelectScreen"))
 	self.container:remove(self.textInputFrame)
 end
 

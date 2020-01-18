@@ -2,7 +2,6 @@ local Observable		= require("aqua.util.Observable")
 local NoteChartList  	= require("sphere.screen.select.NoteChartList")
 local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
 local PreviewManager	= require("sphere.screen.select.PreviewManager")
-local SearchLine		= require("sphere.screen.select.SearchLine")
 local Cache				= require("sphere.database.Cache")
 local json				= require("json")
 
