@@ -25,6 +25,7 @@ NoteSkinList.init = function(self)
 end
 
 NoteSkinList.load = function(self)
+	NoteSkinManager:load()
 	self:addItems()
 	self:reload()
 end
