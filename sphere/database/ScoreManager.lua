@@ -1,4 +1,5 @@
 local ScoreDatabase = require("sphere.database.ScoreDatabase")
+local OnlineScoreManager = require("sphere.online.OnlineScoreManager")
 
 local ScoreManager = {}
 
@@ -74,6 +75,8 @@ ScoreManager.insertScore = function(self, score)
 		mods = "None"
 	})
 	self:select()
+
+	OnlineScoreManager:submit(score)
 end
 
 return ScoreManager

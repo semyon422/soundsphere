@@ -1,5 +1,7 @@
 require("mime")
 require("ltn12")
+require("enet")
+require("socket")
 
 setmetatable(_G, {
 	__newindex = function(a, b, c)

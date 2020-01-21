@@ -5,6 +5,7 @@ local MainLog					= require("sphere.MainLog")
 local Config					= require("sphere.config.Config")
 local ScoreManager				= require("sphere.database.ScoreManager")
 local ScoreDatabase				= require("sphere.database.ScoreDatabase")
+local NoteChartManager			= require("sphere.database.NoteChartManager")
 local DiscordPresence			= require("sphere.discord.DiscordPresence")
 local MountManager				= require("sphere.filesystem.MountManager")
 local ScreenManager				= require("sphere.screen.ScreenManager")
@@ -15,7 +16,8 @@ local CLI						= require("sphere.ui.CLI")
 local NotificationLine			= require("sphere.ui.NotificationLine")
 local OverlayMenu				= require("sphere.ui.OverlayMenu")
 local WindowManager				= require("sphere.window.WindowManager")
-local NoteChartManager			= require("sphere.database.NoteChartManager")
+local OnlineClient				= require("sphere.online.OnlineClient")
+local OnlineScoreManager		= require("sphere.online.OnlineScoreManager")
 
 local SphereGame = {}
 
@@ -36,6 +38,9 @@ SphereGame.init = function(self)
 	NotificationLine:init()
 	CLI:init()
 	OverlayMenu:init()
+
+	OnlineClient:init()
+	OnlineScoreManager:init()
 	
 	aquaevent:add(self)
 end
@@ -59,12 +64,16 @@ SphereGame.load = function(self)
 	
 	ScreenManager:set(SelectScreen)
 	WindowManager:load()
+
+	OnlineClient:load()
+	OnlineClient.observable:add(self)
 end
 
 SphereGame.unload = function(self)
 	ScreenManager:unload()
 	DiscordPresence:unload()
 	Config:write()
+	OnlineClient:unload()
 end
 
 SphereGame.update = function(self, dt)
@@ -76,6 +85,7 @@ SphereGame.update = function(self, dt)
 	ScreenManager:update(dt)
 	CLI:update()
 	OverlayMenu:update()
+	OnlineClient:update()
 end
 
 SphereGame.draw = function(self)
@@ -113,6 +123,8 @@ SphereGame.receive = function(self, event)
 		WindowManager:receive(event)
 	end
 	CLI:receive(event)
+
+	OnlineClient:receive(event)
 end
 
 return SphereGame
