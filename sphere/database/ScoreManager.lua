@@ -64,8 +64,9 @@ ScoreManager.select = function(self)
 end
 
 ScoreManager.insertScore = function(self, score)
-	ScoreDatabase:insertScore({
+	local dbScore = {
 		chartHash = score.hash,
+		noteChartHash = score.hash,
 		playerName = "Player",
 		time = os.time(),
 		score = score.score,
@@ -73,10 +74,12 @@ ScoreManager.insertScore = function(self, score)
 		maxCombo = score.maxcombo,
 		scoreRating = 0,
 		mods = "None"
-	})
+	}
+
+	ScoreDatabase:insertScore(dbScore)
 	self:select()
 
-	OnlineScoreManager:submit(score)
+	OnlineScoreManager:submit(dbScore)
 end
 
 return ScoreManager

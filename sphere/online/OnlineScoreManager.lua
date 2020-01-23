@@ -21,18 +21,19 @@ end
 OnlineScoreManager.submit = function(self, playCase)
 	return ThreadPool:execute(
 		[[
-			local http			= require("aqua.http")
-			local OnlineClient	= require("sphere.online.OnlineClient")
+			local http = require("aqua.http")
 
-			OnlineClient:init()
-			OnlineClient:load()
-
-			local score = ...
+			local data = {...}
 
 			local status, body = http.post("http://s.touhou.one:8080/score/add", {
-				userId = OnlineClient:getUserId(),
-				sessionId = OnlineClient:getSessionId(),
-				score = score
+				userId			= data[1],
+				sessionId		= data[2],
+				noteChartHash	= data[3],
+				score			= data[4],
+				accuracy		= data[5],
+				mods			= data[6],
+				maxCombo		= data[7],
+				time			= data[8]
 			})
 
 			thread:push({
@@ -41,7 +42,16 @@ OnlineScoreManager.submit = function(self, playCase)
 				body = body
 			})
 		]],
-		{playCase.score}
+		{
+			OnlineClient:getUserId(),
+			OnlineClient:getSessionId(),
+			playCase.noteChartHash,
+			playCase.score,
+			playCase.accuracy,
+			playCase.mods,
+			playCase.maxCombo,
+			playCase.time
+		}
 	)
 end
 
