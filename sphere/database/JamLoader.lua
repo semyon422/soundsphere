@@ -6,6 +6,10 @@ local JamLoader = {}
 local ojms = {}
 local callbacks = {}
 
+JamLoader.init = function(self)
+	ThreadPool.observable:add(self)
+end
+
 JamLoader.load = function(self, path, callback)
 	if ojms[path] then
 		return callback(ojms[path])
@@ -22,7 +26,8 @@ JamLoader.load = function(self, path, callback)
 				local sound = require("aqua.sound")
 				local OJM = require("o2jam.OJM")
 				
-				local fileData = file.new(...)
+				local path = ...
+				local fileData = file.new(path)
 				local ojm = OJM:new(fileData:getString())
 				local soundDatas = {}
 				
@@ -30,27 +35,13 @@ JamLoader.load = function(self, path, callback)
 					soundDatas[sampleIndex] = sound.new(nil, file.new(sampleData.sampleData, sampleIndex))
 				end
 				
-				return soundDatas
+				thread:push({
+					name = "OJM_SoundDatas",
+					soundDatas = soundDatas,
+					path = path
+				})
 			]],
-			{path},
-			function(result)
-				local soundDatas
-				if result[1] then
-					soundDatas = result[2]
-				else
-					soundDatas = {}
-				end
-				ojms[path] = soundDatas
-				
-				for i, soundData in pairs(soundDatas) do
-					sound.add(path .. "/" .. i, soundData)
-				end
-				
-				for i = 1, #callbacks[path] do
-					callbacks[path][i](soundDatas)
-				end
-				callbacks[path] = nil
-			end
+			{path}
 		)
 	end
 	
@@ -77,6 +68,23 @@ JamLoader.unload = function(self, path, callback)
 		)
 	else
 		return callback()
+	end
+end
+
+JamLoader.receive = function(self, event)
+	if event.name == "OJM_SoundDatas" then
+		local soundDatas = event.soundDatas
+		local path = event.path
+		ojms[path] = soundDatas
+		
+		for i, soundData in pairs(soundDatas) do
+			sound.add(path .. "/" .. i, soundData)
+		end
+		
+		for i = 1, #callbacks[path] do
+			callbacks[path][i](soundDatas)
+		end
+		callbacks[path] = nil
 	end
 end
 

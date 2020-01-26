@@ -1,6 +1,7 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Config			= require("sphere.config.Config")
 local NoteSkinManager	= require("sphere.noteskin.NoteSkinManager")
+local NoteChartFactory	= require("sphere.database.NoteChartFactory")
 local Screen			= require("sphere.screen.Screen")
 local ScreenManager		= require("sphere.screen.ScreenManager")
 local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
@@ -111,7 +112,7 @@ SelectScreen.receive = function(self, event)
 	end
 	
 	if event.action == "playNoteChart" then
-		if not love.filesystem.exists(event.noteChartEntry.path) then
+		if not love.filesystem.exists(NoteChartFactory:getRealPath(event.noteChartEntry.path)) then
 			return
 		end
 

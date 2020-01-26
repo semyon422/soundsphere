@@ -21,6 +21,7 @@ local GameplayScreen = Screen:new()
 GameplayScreen.init = function(self)
 	InputManager:init()
 	PauseOverlay:init()
+	NoteChartResourceLoader:init()
 end
 
 GameplayScreen.load = function(self)
