@@ -12,6 +12,7 @@ BackgroundManager.init = function(self)
 	self.state = 0
 	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 	self.backgrounds = {}
+	ThreadPool.observable:add(self)
 end
 
 BackgroundManager.loadDrawableBackground = function(self, path)
@@ -52,7 +53,8 @@ BackgroundManager.loadOJNBackground = function(self, path)
 
 			local OJN = require("o2jam.OJN")
 
-			local file = love.filesystem.newFile(...)
+			local path = ...
+			local file = love.filesystem.newFile(path)
 			file:open("r")
 			local content = file:read()
 			file:close()
@@ -65,23 +67,13 @@ BackgroundManager.loadOJNBackground = function(self, path)
 			local fileData = love.filesystem.newFileData(ojn.cover, "cover")
 			local imageData = love.image.newImageData(fileData)
 
-			return imageData
+			thread:push({
+				name = "OJNBackground",
+				imageData = imageData,
+				path = path
+			})
 		]],
-		{path},
-		function(result)
-			local imageData = result[2]
-			if imageData then
-				return self:setBackground(
-					ImageBackground:new({
-						image = love.graphics.newImage(imageData),
-						cs = self.cs,
-						color = {255, 255, 255, 0},
-						globalColor = self.color,
-						path = path
-					})
-				)
-			end
-		end
+		{path}
 	)
 end
 
@@ -132,6 +124,17 @@ BackgroundManager.receive = function(self, event)
 	end
 	for i = 1, #self.backgrounds do
 		self.backgrounds[i]:receive(event)
+	end
+	if event.name == "OJNBackground" then
+		return self:setBackground(
+			ImageBackground:new({
+				image = love.graphics.newImage(event.imageData),
+				cs = self.cs,
+				color = {255, 255, 255, 0},
+				globalColor = self.color,
+				path = event.path
+			})
+		)
 	end
 end
 
