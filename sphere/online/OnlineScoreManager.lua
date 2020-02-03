@@ -18,17 +18,30 @@ OnlineScoreManager.receive = function(self, event)
 	end
 end
 
-OnlineScoreManager.submit = function(self, playCase)
+OnlineScoreManager.convertToOnlineScore = function(self, score)
+	return {
+		hash = score.hash,
+		time = os.time(),
+		score = score.score,
+		accuracy = score.accuracy,
+		maxCombo = score.maxcombo,
+		mods = "None"
+	}
+end
+
+OnlineScoreManager.submit = function(self, score)
+	local onlineScore = self:convertToOnlineScore(score)
+
 	return ThreadPool:execute(
 		[[
 			local http = require("aqua.http")
 
 			local data = {...}
 
-			local status, body = http.post("http://s.touhou.one:8080/score/add", {
+			local status, body = http.post("http://insecure.soundsphere.xyz/score", {
 				userId			= data[1],
 				sessionId		= data[2],
-				noteChartHash	= data[3],
+				hash			= data[3],
 				score			= data[4],
 				accuracy		= data[5],
 				mods			= data[6],
@@ -45,12 +58,12 @@ OnlineScoreManager.submit = function(self, playCase)
 		{
 			OnlineClient:getUserId(),
 			OnlineClient:getSessionId(),
-			playCase.noteChartHash,
-			playCase.score,
-			playCase.accuracy,
-			playCase.mods,
-			playCase.maxCombo,
-			playCase.time
+			onlineScore.hash,
+			onlineScore.score,
+			onlineScore.accuracy,
+			onlineScore.mods,
+			onlineScore.maxCombo,
+			onlineScore.time
 		}
 	)
 end

@@ -119,7 +119,7 @@ NoteChartFactory.getNoteChart = function(self, path, rawContent, hash)
 		return
 	end
 	
-	return noteChart, hash
+	return noteChart, hash, rawContent
 end
 
 return NoteChartFactory

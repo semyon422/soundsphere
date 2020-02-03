@@ -1,4 +1,5 @@
 local Config					= require("sphere.config.Config")
+local ScoreManager				= require("sphere.database.ScoreManager")
 local NoteChartFactory			= require("sphere.database.NoteChartFactory")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 local NoteSkinManager			= require("sphere.noteskin.NoteSkinManager")
@@ -28,7 +29,10 @@ GameplayScreen.load = function(self)
 	InputManager:read()
 	NoteSkinManager:load()
 	
-	local noteChart, hash = NoteChartFactory:getNoteChart(self.noteChartEntry.path)
+	local noteChart, hash, content = NoteChartFactory:getNoteChart(self.noteChartEntry.path)
+	self.noteChart = noteChart
+	self.hash = hash
+	self.noteChartContent = content
 
 	self.engine = CloudburstEngine:new()
 	self.engine.score = CustomScore:new()
@@ -111,6 +115,11 @@ GameplayScreen.unload = function(self)
 	end
 	
 	InputManager.observable:remove(self.engine)
+
+	local score = self.engine.score
+	if not score.autoplay and score.score > 0 then
+		ScoreManager:insertScore(score)
+	end
 end
 
 GameplayScreen.update = function(self, dt)
