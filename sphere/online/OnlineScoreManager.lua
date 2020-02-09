@@ -1,5 +1,6 @@
 local json			= require("json")
 local http			= require("aqua.http")
+local request		= require("luajit-request")
 local Observable	= require("aqua.util.Observable")
 local OnlineClient	= require("sphere.online.OnlineClient")
 local ThreadPool	= require("aqua.thread.ThreadPool")
@@ -35,24 +36,31 @@ OnlineScoreManager.submit = function(self, score)
 	return ThreadPool:execute(
 		[[
 			local http = require("aqua.http")
+			local request = require("luajit-request")
 
 			local data = {...}
+			for i, v in ipairs(data) do
+				data[i] = tostring(v)
+			end
 
-			local status, body = http.post("http://insecure.soundsphere.xyz/score", {
-				userId			= data[1],
-				sessionId		= data[2],
-				hash			= data[3],
-				score			= data[4],
-				accuracy		= data[5],
-				mods			= data[6],
-				maxCombo		= data[7],
-				time			= data[8]
+			local response = request.send("https://soundsphere.xyz/score", {
+				method = "POST",
+				data = {
+					userId			= data[1],
+					sessionId		= data[2],
+					hash			= data[3],
+					score			= data[4],
+					accuracy		= data[5],
+					mods			= data[6],
+					maxCombo		= data[7],
+					time			= data[8]
+				}
 			})
 
 			thread:push({
 				name = "ScoreSubmit",
-				status = status,
-				body = body
+				status = response.code == 200,
+				body = response.body
 			})
 		]],
 		{
