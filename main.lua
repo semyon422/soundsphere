@@ -16,6 +16,7 @@ aquapackage.add("ncdk")
 aquapackage.add("chartbase")
 aquapackage.add("libchart")
 aquapackage.add("md5")
+aquapackage.add("luajit-request")
 
 local MainLog = require("sphere.MainLog")
 MainLog:write("trace", "starting game")
