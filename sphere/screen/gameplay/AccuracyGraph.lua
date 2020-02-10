@@ -17,6 +17,8 @@ AccuracyGraph.loadGui = function(self)
 	self.layer = self.data.layer
 	self.lineColor = self.data.lineColor
 	self.color = self.data.color
+	self.blendMode = self.data.blendMode
+	self.blendAlphaMode = self.data.blendAlphaMode
 
 	self.score = self.gui.score
 	self.container = self.gui.container
@@ -60,6 +62,8 @@ AccuracyGraph.load = function(self)
 		x = 0, y = 0,
 		cs = self.allcs,
 		layer = self.layer,
+		blendMode = self.blendMode,
+		blendAlphaMode = self.blendAlphaMode,
 		image = self.canvas
 	})
 	self.image:reload()

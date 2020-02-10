@@ -15,6 +15,8 @@ InputImage.loadGui = function(self)
 	self.released = self.data.released
 	self.inputType = self.data.inputType
 	self.inputIndex = self.data.inputIndex
+	self.blendMode = self.data.blendMode
+	self.blendAlphaMode = self.data.blendAlphaMode
 
 	self.container = self.gui.container
 	self.engine = self.gui.engine
@@ -33,6 +35,8 @@ InputImage.load = function(self)
 		y = self.y,
 		sx = 1,
 		sy = 1,
+		blendMode = self.blendMode,
+		blendAlphaMode = self.blendAlphaMode,
 		color = {255, 255, 255, 255}
 	})
 	self.drawable:reload()

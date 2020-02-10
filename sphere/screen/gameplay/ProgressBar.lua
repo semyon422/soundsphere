@@ -18,6 +18,8 @@ ProgressBar.loadGui = function(self)
 	self.color = self.data.color
 	self.mode = self.data.mode
 	self.direction = self.data.direction
+	self.blendMode = self.data.blendMode
+	self.blendAlphaMode = self.data.blendAlphaMode
 
 	self.score = self.gui.score
 	self.container = self.gui.container
@@ -35,6 +37,8 @@ ProgressBar.load = function(self)
 		cs = self.cs,
 		color = self.color,
 		mode = "fill",
+		blendMode = self.blendMode,
+		blendAlphaMode = self.blendAlphaMode,
 		layer = self.layer
 	})
 	self.progressRectangle:reload()

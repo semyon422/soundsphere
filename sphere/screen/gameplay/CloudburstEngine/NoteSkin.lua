@@ -97,6 +97,9 @@ NoteSkin.loadContainers = function(self)
 	for _, imageData in pairs(self.noteSkinData.images) do
 		local container = SpriteBatch:new(nil, self.images[imageData.name], 1000)
 		container.layer = imageData.layer
+		container.blendMode = imageData.blendMode
+		container.blendAlphaMode = imageData.blendAlphaMode
+
 		self.containers[imageData.name] = container
 		table.insert(self.containerList, container)
 	end
