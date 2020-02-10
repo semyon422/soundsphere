@@ -37,3 +37,6 @@
 [submodule "lua-toml"]
 	path = lua-toml
 	url = https://github.com/pocomane/lua-toml
+[submodule "byte"]
+	path = byte
+	url = https://github.com/semyon422/luajit-byte
