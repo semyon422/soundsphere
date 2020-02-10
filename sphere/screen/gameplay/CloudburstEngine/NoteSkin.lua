@@ -69,6 +69,23 @@ NoteSkin.loadImages = function(self)
 	end
 end
 
+
+local env = {
+	math = math
+}
+
+local safeload = function(code)
+	if code:byte(1) == 27 then
+		error("bytecode is not allowed")
+	end
+	local f, message = loadstring(code)
+	if not f then
+		error(message)
+	end
+	setfenv(f, env)
+	return f
+end
+
 NoteSkin.loadFunctions = function(self)
 	if not self.noteSkinData.functions then
 		return
@@ -77,9 +94,9 @@ NoteSkin.loadFunctions = function(self)
 	local functions0 = self.functions0
 	local functions1 = self.functions1
 	for _, fn in pairs(self.noteSkinData.functions) do
-		functions0[fn.name] = loadstring(fn.chunk0)()
+		functions0[fn.name] = safeload(fn.chunk0)()
 		if fn.chunk1 then
-			functions1[fn.name] = loadstring(fn.chunk1)()
+			functions1[fn.name] = safeload(fn.chunk1)()
 		end
 	end
 end
@@ -97,6 +114,9 @@ NoteSkin.loadContainers = function(self)
 	for _, imageData in pairs(self.noteSkinData.images) do
 		local container = SpriteBatch:new(nil, self.images[imageData.name], 1000)
 		container.layer = imageData.layer
+		container.blendMode = imageData.blendMode
+		container.blendAlphaMode = imageData.blendAlphaMode
+
 		self.containers[imageData.name] = container
 		table.insert(self.containerList, container)
 	end

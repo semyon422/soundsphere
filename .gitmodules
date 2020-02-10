@@ -42,4 +42,4 @@
 	url = https://github.com/semyon422/luajit-byte
 [submodule "luajit-request"]
 	path = luajit-request
-	url = https://github.com/LPGhatguy/luajit-request.git
+	url = https://github.com/LPGhatguy/luajit-request

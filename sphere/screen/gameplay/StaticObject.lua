@@ -12,6 +12,8 @@ StaticObject.loadGui = function(self)
 	self.h = self.data.h
 	self.layer = self.data.layer
 	self.image = self.data.image
+	self.blendMode = self.data.blendMode
+	self.blendAlphaMode = self.data.blendAlphaMode
 
 	self.container = self.gui.container
 	
@@ -28,6 +30,8 @@ StaticObject.load = function(self)
 		y = self.y,
 		sx = 1,
 		sy = 1,
+		blendMode = self.blendMode,
+		blendAlphaMode = self.blendAlphaMode,
 		color = {255, 255, 255, 255}
 	})
 	self.drawable:reload()

@@ -19,6 +19,8 @@ TextDisplay.loadGui = function(self)
 	self.size = self.data.size
 	self.format = self.data.format
 	self.field = self.data.field
+	self.blendMode = self.data.blendMode
+	self.blendAlphaMode = self.data.blendAlphaMode
 
 	self.score = self.gui.score
 	self.container = self.gui.container
@@ -38,6 +40,8 @@ TextDisplay.load = function(self)
 		limit = self.w,
 		align = self.align,
 		color = self.color,
+		blendMode = self.blendMode,
+		blendAlphaMode = self.blendAlphaMode,
 		font = aquafonts.getFont(self.font, self.size)
 	})
 	self.textFrame:reload()
