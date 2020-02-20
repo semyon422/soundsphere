@@ -16,3 +16,4 @@ userdata/charts.db
 userdata/scores.db
 userdata/charts.db-journal
 *.log
+userdata/online.json

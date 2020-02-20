@@ -1,7 +1,6 @@
 local CacheDatabase				= require("sphere.database.CacheDatabase")
-local NoteChartFactory			= require("sphere.database.NoteChartFactory")
-local NoteChartEntryFactory		= require("sphere.database.NoteChartEntryFactory")
-local NoteChartDataEntryFactory	= require("sphere.database.NoteChartDataEntryFactory")
+local NoteChartFactory			= require("notechart.NoteChartFactory")
+local NoteChartDataEntryFactory	= require("notechart.NoteChartDataEntryFactory")
 local Log						= require("aqua.util.Log")
 local md5						= require("md5")
 
@@ -25,7 +24,7 @@ Cache.clear = function(self)
 	self.noteChartsPath = nil
 	self.noteChartSetsId = nil
 	self.noteChartSetsPath = nil
-	self.noteChartDatasHash = nil
+	self.noteChartDatasHashIndex = nil
 end
 
 Cache.select = function(self)
@@ -107,12 +106,12 @@ Cache.select = function(self)
 	local noteChartsPath = {}
 	local noteChartSetsId = {}
 	local noteChartSetsPath = {}
-	local noteChartDatasHash = {}
+	local noteChartDatasHashIndex = {}
 	self.noteChartsId = noteChartsId
 	self.noteChartsPath = noteChartsPath
 	self.noteChartSetsId = noteChartSetsId
 	self.noteChartSetsPath = noteChartSetsPath
-	self.noteChartDatasHash = noteChartDatasHash
+	self.noteChartDatasHashIndex = noteChartDatasHashIndex
 	
 	for i = 1, #noteCharts do
 		local entry = noteCharts[i]
@@ -126,7 +125,8 @@ Cache.select = function(self)
 	end
 	for i = 1, #noteChartDatas do
 		local entry = noteChartDatas[i]
-		noteChartDatasHash[entry.hash] = entry
+		noteChartDatasHashIndex[entry.hash] = noteChartDatasHashIndex[entry.hash] or {}
+		noteChartDatasHashIndex[entry.hash][entry.index] = entry
 	end
 	
 	if not loaded then
@@ -192,14 +192,15 @@ Cache.setNoteChartEntry = function(self, entry)
 end
 
 Cache.setNoteChartDataEntry = function(self, entry)
-	local oldEntry = self:getNoteChartDataEntry(entry.hash)
+	local oldEntry = self:getNoteChartDataEntry(entry.hash, entry.index)
 
 	CacheDatabase:setNoteChartDataEntry(entry)
 
 	if not oldEntry then
 		self.noteChartDatas[#self.noteChartDatas + 1] = entry
 		self.noteChartsAtHash[entry.hash] = {}
-		self.noteChartDatasHash[entry.hash] = entry
+		self.noteChartDatasHashIndex[entry.hash] = self.noteChartDatasHashIndex[entry.hash] or {}
+		self.noteChartDatasHashIndex[entry.hash][entry.index] = entry
 	else
 		for k, v in pairs(entry) do
 			oldEntry[k] = v
@@ -232,13 +233,7 @@ Cache.deleteNoteChartEntry = function(self, entry)
 		return
 	end
 
-	local noteChartDatasHash = self.noteChartDatasHash[entry.hash] or {}
-	for i = 1, #noteChartDatasHash do
-		if noteChartDatasHash[i].path == entry.path then
-			table.remove(noteChartDatasHash, i)
-			break
-		end
-	end
+	self.noteChartDatasHashIndex[entry.hash] = nil
 end
 
 Cache.deleteNoteChartSetEntry = function(self, entry)
@@ -282,8 +277,9 @@ Cache.getNoteChartsAtHash = function(self, hash)
 	return self.noteChartsAtHash[hash]
 end
 
-Cache.getNoteChartDataEntry = function(self, hash)
-	return self.noteChartDatasHash[hash]
+Cache.getNoteChartDataEntry = function(self, hash, index)
+	local t = self.noteChartDatasHashIndex
+	return t[hash] and t[hash][index]
 end
 
 ----------------------------------------------------------------
@@ -291,6 +287,7 @@ end
 Cache.getEmptyNoteChartDataEntry = function(self, path)
 	return {
 		hash = "",
+		index = "",
 		title = path:match(".+/(.-)$"),
 		artist = "",
 		source = "",
@@ -394,7 +391,7 @@ Cache.lookup = function(self, directoryPath, recursive)
 	local containerPaths = {}
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
-		if isFile(path) and NoteChartFactory:isNoteChartContainer(path) and self:checkNoteChartSetEntry(path) then
+		if isFile(path) and NoteChartFactory:isUnrelatedContainer(path) and self:checkNoteChartSetEntry(path) then
 			containerPaths[#containerPaths + 1] = path
 			self:processNoteChartEntries({path}, path)
 		end
@@ -406,7 +403,7 @@ Cache.lookup = function(self, directoryPath, recursive)
 	local chartPaths = {}
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
-		if isFile(path) and NoteChartFactory:isNoteChart(path) then
+		if isFile(path) and NoteChartFactory:isRelatedContainer(path) then
 			chartPaths[#chartPaths + 1] = path
 		end
 	end
@@ -456,7 +453,6 @@ Cache.processNoteChartEntries = function(self, noteChartPaths, noteChartSetPath)
 		end
 	end
 
-	local entries = {}
 	for i = 1, #noteChartPaths do
 		local path = noteChartPaths[i]
 		local lastModified = getLastModified(path)
@@ -473,20 +469,14 @@ Cache.processNoteChartEntries = function(self, noteChartPaths, noteChartSetPath)
 				self:setNoteChartEntry(entry)
 			end
 		else
-			entries[#entries + 1] = {
+			self:setNoteChartEntry({
+				hash = nil,
 				path = noteChartPaths[i],
-				lastModified = lastModified
-			}
+				lastModified = lastModified,
+				setId = noteChartSetEntry.id
+			})
+			self.noteChartCount = self.noteChartCount + 1
 		end
-	end
-	local noteChartEntries = NoteChartEntryFactory:getEntries(entries)
-
-	for i = 1, #noteChartEntries do
-		local noteChartEntry = noteChartEntries[i]
-		noteChartEntry.setId = noteChartSetEntry.id
-		
-		self:setNoteChartEntry(noteChartEntry)
-		self.noteChartCount = self.noteChartCount + 1
 	end
 
 	self:checkProgress()
@@ -504,9 +494,8 @@ Cache.generate = function(self, path)
 
 	CacheDatabase:begin()
 	for i = 1, #entries do
-		local status, err = xpcall(function()
-			self:processNoteChartDataEntries(entries[i])
-		end, debug.traceback)
+		local status, err = xpcall(function() return self:processNoteChartDataEntries(entries[i]) end, debug.traceback)
+
 		if not status then
 			self.log:write("error", entries[i].id)
 			self.log:write("error", entries[i].path)
@@ -529,13 +518,6 @@ Cache.generate = function(self, path)
 	CacheDatabase:commit()
 end
 
-Cache.getRealPath = function(self, path)
-	if path:find("%.ojn/.$") then
-		return path:match("^(.+)/.$")
-	end
-	return path
-end
-
 Cache.processNoteChartDataEntries = function(self, noteChartSetEntry)
 	if not exists(noteChartSetEntry.path) then
 		return self:deleteNoteChartSetEntry(noteChartSetEntry)
@@ -548,11 +530,6 @@ Cache.processNoteChartDataEntries = function(self, noteChartSetEntry)
 		local noteChartEntry = noteChartEntries[i]
 		if not noteChartEntry.hash then
 			newNoteChartEntries[#newNoteChartEntries + 1] = noteChartEntry
-		else
-			local noteChartDataEntry = self:getNoteChartDataEntry(noteChartEntry.hash)
-			if noteChartDataEntry.version ~= NoteChartDataEntryFactory.versions[noteChartDataEntry.format] then
-				newNoteChartEntries[#newNoteChartEntries + 1] = noteChartEntry
-			end
 		end
 	end
 	noteChartEntries = newNoteChartEntries
@@ -561,34 +538,28 @@ Cache.processNoteChartDataEntries = function(self, noteChartSetEntry)
 	local fileHash = {}
 
 	for i = 1, #noteChartEntries do
-		local realPath = self:getRealPath(noteChartEntries[i].path)
-		if not fileContent[realPath] then
-			local file = love.filesystem.newFile(realPath)
+		local path = noteChartEntries[i].path
+		if not fileContent[path] then
+			local file = love.filesystem.newFile(path)
 			file:open("r")
 			local content = file:read()
 			file:close()
 
-			fileContent[realPath] = content
-			fileHash[realPath] = md5.sumhexa(content)
+			fileContent[path] = content
+			fileHash[path] = md5.sumhexa(content)
 		end
 	end
 
 	local fileDatas = {}
 	for i = 1, #noteChartEntries do
 		local path = noteChartEntries[i].path
-		local realPath = self:getRealPath(path)
 
 		local noteChartEntry = noteChartEntries[i]
-		local content = fileContent[realPath]
-		local hash = fileHash[realPath]
-
-		local noteChartDataEntry = Cache:getNoteChartDataEntry(hash)
+		local content = fileContent[path]
+		local hash = fileHash[path]
 		noteChartEntry.hash = hash
 
-		if
-			noteChartDataEntry and
-			noteChartDataEntry.version == NoteChartDataEntryFactory.versions[noteChartDataEntry.format]
-		then
+		if Cache:getNoteChartDataEntry(hash, 1) then
 			self:setNoteChartEntry(noteChartEntry)
 		else
 			fileDatas[#fileDatas + 1] = {
@@ -601,11 +572,9 @@ Cache.processNoteChartDataEntries = function(self, noteChartSetEntry)
 	end
 
 	local entries = NoteChartDataEntryFactory:getEntries(fileDatas)
-	for i = 1, #fileDatas do
-		local fileData = fileDatas[i]
-
-		self:setNoteChartDataEntry(fileData.noteChartDataEntry)
-		self:setNoteChartEntry(fileData.noteChartEntry)
+	for _, entry in ipairs(entries) do
+		self:setNoteChartDataEntry(entry)
+		self:setNoteChartEntry(entry.noteChartEntry)
 	end
 end
 

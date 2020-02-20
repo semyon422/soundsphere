@@ -43,8 +43,8 @@ ProgressBar.load = function(self)
 	})
 	self.progressRectangle:reload()
 	
-	self.startTime = self.engine.noteChart:hashGet("minTime")
-	self.endTime = self.engine.noteChart:hashGet("maxTime")
+	self.startTime = self.engine.noteChart.metaData:get("minTime")
+	self.endTime = self.engine.noteChart.metaData:get("maxTime")
 
 	self.container:add(self.progressRectangle)
 end

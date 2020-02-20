@@ -1,5 +1,5 @@
 local Config					= require("sphere.config.Config")
-local NoteChartFactory			= require("sphere.database.NoteChartFactory")
+local NoteChartFactory			= require("notechart.NoteChartFactory")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 local NoteSkinManager			= require("sphere.noteskin.NoteSkinManager")
 local NoteSkinLoader			= require("sphere.noteskin.NoteSkinLoader")
@@ -28,7 +28,18 @@ GameplayScreen.load = function(self)
 	InputManager:read()
 	NoteSkinManager:load()
 	
-	local noteChart, hash = NoteChartFactory:getNoteChart(self.noteChartEntry.path)
+	local path = self.noteChartEntry.path
+	local file = love.filesystem.newFile(path)
+	file:open("r")
+	local content = file:read()
+	file:close()
+	
+	local status, noteCharts = NoteChartFactory:getNoteCharts(
+		path,
+		content,
+		self.noteChartDataEntry.index
+	)
+	local noteChart = noteCharts[1]
 
 	self.engine = CloudburstEngine:new()
 	self.engine.score = CustomScore:new()
