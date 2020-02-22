@@ -77,7 +77,7 @@ end
 NoteChartSetList.getItemName = function(self, entry)
 	local list = Cache:getNoteChartsAtSet(entry.id)
 	if list and list[1] then
-		local noteChartDataEntry = Cache:getNoteChartDataEntry(list[1].hash)
+		local noteChartDataEntry = Cache:getNoteChartDataEntry(list[1].hash, 1)
 		if noteChartDataEntry then
 			return noteChartDataEntry.title
 		end

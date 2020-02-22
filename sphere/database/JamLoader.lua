@@ -20,7 +20,7 @@ JamLoader.load = function(self, path, callback)
 		
 		ThreadPool:execute(
 			[[
-				local byte = require("aqua.byte")
+				local byte = require("byte")
 				
 				local file = require("aqua.file")
 				local sound = require("aqua.sound")

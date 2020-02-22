@@ -38,7 +38,7 @@ NoteChartResourceLoader.load = function(self, path, noteChart, callback)
 end
 
 NoteChartResourceLoader.loadOJM = function(self)
-	local path = self.path:match("(.+)n/%d$") .. "m"
+	local path = self.path:match("(.+)n$") .. "m"
 	JamLoader:load(path, function(samples)
 		for name in pairs(samples) do
 			self.localAliases[name] = path .. "/" .. name

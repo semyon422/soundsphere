@@ -74,12 +74,14 @@ NoteChartList.selectCache = function(self)
 	local map = {}
 	local noteChartDataEntries = {}
 	for i = 1, #noteChartEntries do
-		local noteChartDataEntry = Cache:getNoteChartDataEntry(noteChartEntries[i].hash)
-		if not noteChartDataEntry then
-			noteChartDataEntry = Cache:getEmptyNoteChartDataEntry(noteChartEntries[i].path)
+		local entries = Cache:getAllNoteChartDataEntries(noteChartEntries[i].hash)
+		if not entries then
+			entries = {Cache:getEmptyNoteChartDataEntry(noteChartEntries[i].path)}
 		end
-		noteChartDataEntries[i] = noteChartDataEntry
-		map[noteChartDataEntry] = noteChartEntries[i]
+		for _, entry in pairs(entries) do
+			noteChartDataEntries[#noteChartDataEntries + 1] = entry
+			map[entry] = noteChartEntries[i]
+		end
 	end
 
 	local foundList = SearchManager:search(noteChartDataEntries, self.searchString)

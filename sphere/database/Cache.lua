@@ -282,12 +282,27 @@ Cache.getNoteChartDataEntry = function(self, hash, index)
 	return t[hash] and t[hash][index]
 end
 
+Cache.getAllNoteChartDataEntries = function(self, hash)
+	local hashIndex = self.noteChartDatasHashIndex[hash]
+	if not hashIndex then
+		return
+	end
+
+	local t = {}
+
+	for k, v in pairs(hashIndex) do
+		t[k] = v
+	end
+
+	return t
+end
+
 ----------------------------------------------------------------
 
 Cache.getEmptyNoteChartDataEntry = function(self, path)
 	return {
 		hash = "",
-		index = "",
+		index = 1,
 		title = path:match(".+/(.-)$"),
 		artist = "",
 		source = "",

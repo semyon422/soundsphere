@@ -76,7 +76,8 @@ GameplayScreen.load = function(self)
 	self.engine.bga = self.bga
 	self.engine.score.engine = self.engine
 	self.engine.score.noteChart = noteChart
-	self.engine.score.hash = hash
+	self.engine.score.hash = self.noteChartDataEntry.hash
+	self.engine.score.index = self.noteChartDataEntry.index
 	self.gui.score = self.engine.score
 	
 	self.engine:load()
