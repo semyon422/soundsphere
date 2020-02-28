@@ -162,7 +162,7 @@ NoteChartResourceLoader.unloadBMS = function(self)
 end
 
 NoteChartResourceLoader.unloadOJM = function(self)
-	JamLoader:unload(self.path:match("(.+)n/%d$") .. "m", function() end)
+	JamLoader:unload(self.path:match("(.+)n$") .. "m", function() end)
 end
 
 return NoteChartResourceLoader
