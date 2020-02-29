@@ -1,6 +1,6 @@
 local Class			= require("aqua.util.Class")
 local Observable	= require("aqua.util.Observable")
-local Autoplay		= require("sphere.screen.gameplay.CloudburstEngine.Autoplay")
+local Autoplay		= require("sphere.screen.gameplay.LogicEngine.Autoplay")
 
 local Score = Class:new()
 
@@ -102,7 +102,7 @@ Score.hit = function(self, deltaTime, time)
 	
 	self.score = self.score
 		+ math.exp(-(deltaTime / self.unit / self.scale) ^ 2)
-		/ self.engine.noteCount
+		/ self.logicEngine.noteCount
 		* 1000000
 	
 	self:updateAccuracy()
@@ -118,7 +118,7 @@ Score.hit = function(self, deltaTime, time)
 end
 
 Score.updateAccuracy = function(self)
-	self.accuracy = 1000 * math.sqrt(math.abs(-math.log(self.score / 1000000 * self.engine.noteCount / self.count))) * self.unit * self.scale
+	self.accuracy = 1000 * math.sqrt(math.abs(-math.log(self.score / 1000000 * self.logicEngine.noteCount / self.count))) * self.unit * self.scale
 	self:updateGrade()
 end
 
@@ -155,7 +155,7 @@ Score.processNote = function(self, note)
 end
 
 Score.processShortNote = function(self, note)
-	local deltaTime = (note.engine.exactCurrentTime - note.startNoteData.timePoint.absoluteTime) / self.timeRate
+	local deltaTime = (note.logicEngine.exactCurrentTime - note.startNoteData.timePoint.absoluteTime) / self.timeRate
 	local timeState = self:getTimeState(deltaTime)
 	
 	note:process(timeState)
@@ -167,8 +167,8 @@ Score.processShortNote = function(self, note)
 end
 
 Score.processLongNote = function(self, note)
-	local deltaStartTime = (note.engine.exactCurrentTime - note.startNoteData.timePoint.absoluteTime) / self.timeRate
-	local deltaEndTime = (note.engine.exactCurrentTime - note.endNoteData.timePoint.absoluteTime) / self.timeRate
+	local deltaStartTime = (note.logicEngine.exactCurrentTime - note.startNoteData.timePoint.absoluteTime) / self.timeRate
+	local deltaEndTime = (note.logicEngine.exactCurrentTime - note.endNoteData.timePoint.absoluteTime) / self.timeRate
 	local startTimeState = self:getTimeState(deltaStartTime)
 	local endTimeState = self:getTimeState(deltaEndTime)
 	

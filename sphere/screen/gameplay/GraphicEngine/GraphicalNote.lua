@@ -13,12 +13,12 @@ GraphicalNote.init = function(self)
 		 = self.startNoteData.inputType
 		.. self.startNoteData.inputIndex
 		
-	self.logicalNote = self.engine.sharedLogicalNoteData[self.startNoteData]
+	self.logicalNote = self.graphicEngine.logicEngine.sharedLogicalNoteData[self.startNoteData]
 	self.logicalNote.graphicalNote = self
 end
 
 GraphicalNote.getCS = function(self)
-	return self.engine.noteSkin:getCS(self)
+	return self.graphicEngine.noteSkin:getCS(self)
 end
 
 GraphicalNote.updateNext = function(self, index)

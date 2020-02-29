@@ -145,11 +145,11 @@ NoteSkin.update = function(self, dt)
 	end
 end
 
-NoteSkin.draw = function(self)
-	for _, container in ipairs(self.containerList) do
-		container:draw()
-	end
-end
+-- NoteSkin.draw = function(self)
+-- 	for _, container in ipairs(self.containerList) do
+-- 		container:draw()
+-- 	end
+-- end
 
 NoteSkin.setVisualTimeRate = function(self, visualTimeRate)
 	if visualTimeRate * self.visualTimeRate < 0 then

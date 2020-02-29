@@ -8,7 +8,7 @@ AutoPlay.shortName = "AP"
 AutoPlay.type = "boolean"
 
 AutoPlay.apply = function(self)
-	self.sequence.manager.engine.score.autoplay = true
+	self.sequence.manager.logicEngine.score.autoplay = true
 end
 
 return AutoPlay

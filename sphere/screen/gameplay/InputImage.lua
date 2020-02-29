@@ -19,7 +19,6 @@ InputImage.loadGui = function(self)
 	self.blendAlphaMode = self.data.blendAlphaMode
 
 	self.container = self.gui.container
-	self.engine = self.gui.engine
 	
 	self:load()
 end

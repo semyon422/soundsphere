@@ -9,13 +9,13 @@ TimeManager.load = function(self)
 end
 
 TimeManager.getAdjustTime = function(self)
-	return self.engine.bgaContainer:getPosition()
+	return self.logicEngine.bgaContainer:getPosition()
 end
 
 TimeManager.loadTimePoints = function(self)
 	local absoluteTimes = {}
 
-	local noteChart = self.engine.noteChart
+	local noteChart = self.logicEngine.noteChart
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local timePointList = noteChart:requireLayerData(layerIndex).timeData.timePointList
 		for timePointIndex = 1, #timePointList do

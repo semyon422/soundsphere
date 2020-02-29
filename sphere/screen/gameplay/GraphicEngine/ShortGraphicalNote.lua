@@ -1,4 +1,4 @@
-local GraphicalNote = require("sphere.screen.gameplay.CloudburstEngine.note.GraphicalNote")
+local GraphicalNote = require("sphere.screen.gameplay.GraphicEngine.GraphicalNote")
 
 local ShortGraphicalNote = GraphicalNote:new()
 
@@ -63,17 +63,17 @@ ShortGraphicalNote.getContainer = function(self)
 end
 
 ShortGraphicalNote.getHeadWidth = function(self)
-	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	return self.noteSkin:getG(0, dt, self, "Head", "w")
 end
 
 ShortGraphicalNote.getHeadHeight = function(self)
-	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	return self.noteSkin:getG(0, dt, self, "Head", "h")
 end
 
 ShortGraphicalNote.getX = function(self)
-	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	return
 		  self.noteSkin:getG(0, dt, self, "Head", "x")
 		+ self.noteSkin:getG(0, dt, self, "Head", "w")
@@ -81,7 +81,7 @@ ShortGraphicalNote.getX = function(self)
 end
 
 ShortGraphicalNote.getY = function(self)
-	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	return
 		  self.noteSkin:getG(0, dt, self, "Head", "y")
 		+ self.noteSkin:getG(0, dt, self, "Head", "h")
@@ -163,7 +163,7 @@ end
 
 ShortGraphicalNote.willDrawBeforeStart = function(self)
 	local x, y, w, h = self:whereWillDraw()
-	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	local visualTimeRate = self.noteSkin.visualTimeRate
 	return
 		self.noteSkin:getG(1, dt, self, "Head", "x") * x * visualTimeRate > 0 or
@@ -174,7 +174,7 @@ end
 
 ShortGraphicalNote.willDrawAfterEnd = function(self)
 	local x, y, w, h = self:whereWillDraw()
-	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	local visualTimeRate = self.noteSkin.visualTimeRate
 	return
 		self.noteSkin:getG(1, dt, self, "Head", "x") * x * visualTimeRate < 0 or

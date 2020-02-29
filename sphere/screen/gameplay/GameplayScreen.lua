@@ -5,9 +5,8 @@ local NoteSkinManager			= require("sphere.noteskin.NoteSkinManager")
 local NoteSkinLoader			= require("sphere.noteskin.NoteSkinLoader")
 local NotificationLine			= require("sphere.ui.NotificationLine")
 local BackgroundManager			= require("sphere.ui.BackgroundManager")
-local BMSBGA					= require("sphere.screen.gameplay.BMSBGA")
-local CloudburstEngine			= require("sphere.screen.gameplay.CloudburstEngine")
-local NoteSkin					= require("sphere.screen.gameplay.CloudburstEngine.NoteSkin")
+local LogicEngine				= require("sphere.screen.gameplay.LogicEngine")
+local GraphicEngine				= require("sphere.screen.gameplay.GraphicEngine")
 local CustomScore				= require("sphere.screen.gameplay.CustomScore")
 local InputManager				= require("sphere.screen.gameplay.InputManager")
 local ModifierManager			= require("sphere.screen.gameplay.ModifierManager")
@@ -41,11 +40,15 @@ GameplayScreen.load = function(self)
 	)
 	local noteChart = noteCharts[1]
 
-	self.engine = CloudburstEngine:new()
-	self.engine.score = CustomScore:new()
+	self.logicEngine = LogicEngine:new()
+	self.logicEngine.score = CustomScore:new()
+
+	self.graphicEngine = GraphicEngine:new()
+	self.graphicEngine.logicEngine = self.logicEngine
+
 	self.gui = GameplayGUI:new()
 
-	ModifierManager.engine = self.engine
+	ModifierManager.logicEngine = self.logicEngine
 	ModifierManager.noteChart = noteChart
 	ModifierManager:apply()
 
@@ -58,77 +61,74 @@ GameplayScreen.load = function(self)
 	noteSkin.container = self.container
 	noteSkin:joinContainer(self.container)
 	
-	self.engine.noteChart = noteChart
-	self.engine.noteSkin = noteSkin
-	self.engine.container = self.container
-	self.engine.localAliases = {}
-	self.engine.globalAliases = {}
+	self.graphicEngine.noteChart = noteChart
+	self.graphicEngine.noteSkin = noteSkin
+	self.graphicEngine.container = self.container
+	
+	self.logicEngine.noteChart = noteChart
+	self.logicEngine.localAliases = {}
+	self.logicEngine.globalAliases = {}
 	
 	self.gui.root = noteSkinMetaData.directoryPath
 	self.gui.jsonData = noteSkin.playField
 	self.gui.noteSkin = noteSkin
 	self.gui.container = self.container
-	self.gui.engine = self.engine
+	self.gui.logicEngine = self.logicEngine
 	
-	self.bga = BMSBGA:new()
-	self.bga.noteChart = noteChart
-	self.bga.engine = self.engine
-	self.engine.bga = self.bga
-	self.engine.score.engine = self.engine
-	self.engine.score.noteChart = noteChart
-	self.engine.score.hash = self.noteChartDataEntry.hash
-	self.engine.score.index = self.noteChartDataEntry.index
-	self.gui.score = self.engine.score
+	self.logicEngine.score.logicEngine = self.logicEngine
+	self.logicEngine.score.noteChart = noteChart
+	self.logicEngine.score.hash = self.noteChartDataEntry.hash
+	self.logicEngine.score.index = self.noteChartDataEntry.index
+	self.gui.score = self.logicEngine.score
 	
-	self.engine:load()
+	self.logicEngine:load()
+	self.graphicEngine:load()
 	self.gui:loadTable(noteSkin.playField)
 	
-	self.engine.observable:add(self.gui)
-	self.engine.observable:add(NotificationLine)
+	self.logicEngine.observable:add(self.gui)
+	self.logicEngine.observable:add(NotificationLine)
+	self.graphicEngine.observable:add(NotificationLine)
 	NoteChartResourceLoader.observable:add(NotificationLine)
 	
-	PauseOverlay.engine = self.engine
+	PauseOverlay.logicEngine = self.logicEngine
 	PauseOverlay.noteChart = noteChart
 	PauseOverlay.noteChartEntry = self.noteChartEntry
 	PauseOverlay.noteChartDataEntry = self.noteChartDataEntry
 	PauseOverlay:load()
 	
-	InputManager.observable:add(self.engine)
+	InputManager.observable:add(self.logicEngine)
 	
 	local dim = 255 * (1 - Config:get("dim.gameplay"))
 	local color = {dim, dim, dim}
 	NoteChartResourceLoader:load(self.noteChartEntry.path, noteChart, function()
-		self.engine.localAliases = NoteChartResourceLoader.localAliases
-		self.engine.globalAliases = NoteChartResourceLoader.globalAliases
-		self.bga:load()
+		self.logicEngine.localAliases = NoteChartResourceLoader.localAliases
+		self.logicEngine.globalAliases = NoteChartResourceLoader.globalAliases
 		PauseOverlay:play()
 		BackgroundManager:setColor(color)
-		self.bga:setColor(color)
 	end)
 	
 	BackgroundManager:setColor(color)
-	self.bga:setColor(color)
 end
 
 GameplayScreen.unload = function(self)
-	self.engine.noteSkin:leaveContainer(self.container)
+	self.graphicEngine.noteSkin:leaveContainer(self.container)
 
-	self.engine:unload()
+	self.logicEngine:unload()
+	self.graphicEngine:unload()
 	self.gui:unload()
-	self.bga:unload()
 	
-	if self.engine.score.setinput then
-		InputManager:setKeysFromInputStats(self.engine.inputStats)
+	if self.logicEngine.score.setinput then
+		InputManager:setKeysFromInputStats(self.logicEngine.inputStats)
 		InputManager:write()
 	end
 	
-	InputManager.observable:remove(self.engine)
+	InputManager.observable:remove(self.logicEngine)
 end
 
 GameplayScreen.update = function(self, dt)
-	self.engine:update(dt)
+	self.logicEngine:update(dt)
+	self.graphicEngine:update(dt)
 	self.gui:update()
-	self.bga:update(dt)
 	PauseOverlay:update(dt)
 	ModifierManager:update()
 	
@@ -136,8 +136,6 @@ GameplayScreen.update = function(self, dt)
 end
 
 GameplayScreen.draw = function(self)
-	self.bga:draw()
-	
 	Screen.draw(self)
 	
 	PauseOverlay:draw()
@@ -145,10 +143,10 @@ end
 
 GameplayScreen.receive = function(self, event)
 	if not PauseOverlay.paused then
-		self.engine:receive(event)
+		self.logicEngine:receive(event)
+		self.graphicEngine:receive(event)
 		InputManager:receive(event)
 		self.gui:receive(event)
-		self.bga:receive(event)
 	end
 	PauseOverlay:receive(event)
 end

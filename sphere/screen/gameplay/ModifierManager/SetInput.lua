@@ -8,7 +8,7 @@ SetInput.shortName = "SetInput"
 SetInput.type = "boolean"
 
 SetInput.apply = function(self)
-	self.sequence.manager.engine.score.setinput = true
+	self.sequence.manager.logicEngine.score.setinput = true
 end
 
 return SetInput

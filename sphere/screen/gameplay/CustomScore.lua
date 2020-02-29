@@ -1,4 +1,4 @@
-local Score = require("sphere.screen.gameplay.CloudburstEngine.Score")
+local Score = require("sphere.screen.gameplay.LogicEngine.Score")
 
 local CustomScore = Score:new()
 

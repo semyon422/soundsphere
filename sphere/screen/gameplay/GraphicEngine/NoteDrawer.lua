@@ -1,13 +1,13 @@
 local Class					= require("aqua.util.Class")
-local ShortGraphicalNote	= require("sphere.screen.gameplay.CloudburstEngine.note.ShortGraphicalNote")
-local LongGraphicalNote		= require("sphere.screen.gameplay.CloudburstEngine.note.LongGraphicalNote")
+local ShortGraphicalNote	= require("sphere.screen.gameplay.GraphicEngine.ShortGraphicalNote")
+local LongGraphicalNote		= require("sphere.screen.gameplay.GraphicEngine.LongGraphicalNote")
 
 local NoteDrawer = Class:new()
 
 NoteDrawer.load = function(self)
 	self.noteData = {}
 	
-	self.layerData = self.engine.noteChart:requireLayerData(self.layerIndex)
+	self.layerData = self.graphicEngine.noteChart:requireLayerData(self.layerIndex)
 	local inputModeString = self.layerData.layerDataSequence.noteChart.inputMode:getString()
 	
 	for noteDataIndex = 1, self.layerData:getNoteDataCount() do
@@ -43,10 +43,10 @@ NoteDrawer.load = function(self)
 			end
 			if graphicalNote then
 				graphicalNote.noteDrawer = self
-				graphicalNote.engine = self.engine
-				graphicalNote.noteSkin = self.engine.noteSkin
+				graphicalNote.graphicEngine = self.graphicEngine
+				graphicalNote.noteSkin = self.graphicEngine.noteSkin
 				graphicalNote:init()
-				if self.engine.noteSkin:checkNote(graphicalNote) then
+				if self.graphicEngine.noteSkin:checkNote(graphicalNote) then
 					table.insert(self.noteData, graphicalNote)
 				end
 			end
@@ -70,7 +70,7 @@ NoteDrawer.load = function(self)
 end
 
 NoteDrawer.updateCurrentTime = function(self)
-	self.currentTimePoint.absoluteTime = self.engine.currentTime
+	self.currentTimePoint.absoluteTime = self.graphicEngine.currentTime
 	
 	self.currentVelocityData = self.layerData.spaceData:getVelocityData(self.currentVelocityDataIndex)
 	self.nextVelocityData = self.layerData.spaceData:getVelocityData(self.currentVelocityDataIndex + 1)

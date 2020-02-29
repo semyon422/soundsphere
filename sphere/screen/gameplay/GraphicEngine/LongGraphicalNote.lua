@@ -1,4 +1,4 @@
-local GraphicalNote = require("sphere.screen.gameplay.CloudburstEngine.note.GraphicalNote")
+local GraphicalNote = require("sphere.screen.gameplay.GraphicEngine.GraphicalNote")
 
 local LongGraphicalNote = GraphicalNote:new()
 
@@ -39,7 +39,7 @@ end
 LongGraphicalNote.updateFakeStartTime = function(self)
 	local startTime = self.startNoteData.timePoint.absoluteTime
 	local endTime = self.endNoteData.timePoint.absoluteTime
-	self.fakeStartTime = self.engine.currentTime > startTime and self.engine.currentTime or startTime
+	self.fakeStartTime = self.graphicEngine.currentTime > startTime and self.graphicEngine.currentTime or startTime
 	self.fakeStartTime = math.min(self.fakeStartTime, endTime)
 end
 
@@ -180,37 +180,37 @@ LongGraphicalNote.getBodyContainer = function(self)
 end
 
 LongGraphicalNote.getHeadWidth = function(self)
-	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	return self.noteSkin:getG(0, dt, self, "Head", "w")
 end
 
 LongGraphicalNote.getTailHeight = function(self)
-	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	return self.noteSkin:getG(0, dt, self, "Tail", "h")
 end
 
 LongGraphicalNote.getBodyWidth = function(self)
-	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	return self.noteSkin:getG(0, dt, self, "Body", "w")
 end
 
 LongGraphicalNote.getHeadHeight = function(self)
-	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	return self.noteSkin:getG(0, dt, self, "Head", "h")
 end
 
 LongGraphicalNote.getTailWidth = function(self)
-	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	return self.noteSkin:getG(0, dt, self, "Tail", "w")
 end
 
 LongGraphicalNote.getBodyHeight = function(self)
-	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	return self.noteSkin:getG(0, dt, self, "Body", "h")
 end
 
 LongGraphicalNote.getHeadX = function(self)
-	local dt = self.engine.currentTime - (self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime)
+	local dt = self.graphicEngine.currentTime - (self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime)
 	return
 		  self.noteSkin:getG(0, dt, self, "Head", "x")
 		+ self.noteSkin:getG(0, dt, self, "Head", "w")
@@ -218,7 +218,7 @@ LongGraphicalNote.getHeadX = function(self)
 end
 
 LongGraphicalNote.getTailX = function(self)
-	local dt = self.engine.currentTime - self.endNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.endNoteData.timePoint.currentVisualTime
 	return
 		  self.noteSkin:getG(0, dt, self, "Tail", "x")
 		+ self.noteSkin:getG(0, dt, self, "Tail", "w")
@@ -229,9 +229,9 @@ LongGraphicalNote.getBodyX = function(self)
 	local dg = self:getHeadX() - self:getTailX()
 	local dt
 	if dg >= 0 then
-		dt = self.engine.currentTime - self.endNoteData.timePoint.currentVisualTime
+		dt = self.graphicEngine.currentTime - self.endNoteData.timePoint.currentVisualTime
 	else
-		dt = self.engine.currentTime - (self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime)
+		dt = self.graphicEngine.currentTime - (self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime)
 	end
 	return
 		  self.noteSkin:getG(0, dt, self, "Body", "x")
@@ -240,7 +240,7 @@ LongGraphicalNote.getBodyX = function(self)
 end
 
 LongGraphicalNote.getHeadY = function(self)
-	local dt = self.engine.currentTime - (self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime)
+	local dt = self.graphicEngine.currentTime - (self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime)
 	return
 		  self.noteSkin:getG(0, dt, self, "Head", "y")
 		+ self.noteSkin:getG(0, dt, self, "Head", "h")
@@ -248,7 +248,7 @@ LongGraphicalNote.getHeadY = function(self)
 end
 
 LongGraphicalNote.getTailY = function(self)
-	local dt = self.engine.currentTime - self.endNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.endNoteData.timePoint.currentVisualTime
 	return
 		  self.noteSkin:getG(0, dt, self, "Tail", "y")
 		+ self.noteSkin:getG(0, dt, self, "Tail", "h")
@@ -259,9 +259,9 @@ LongGraphicalNote.getBodyY = function(self)
 	local dg = self:getHeadY() - self:getTailY()
 	local dt
 	if dg >= 0 then
-		dt = self.engine.currentTime - self.endNoteData.timePoint.currentVisualTime
+		dt = self.graphicEngine.currentTime - self.endNoteData.timePoint.currentVisualTime
 	else
-		dt = self.engine.currentTime - (self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime)
+		dt = self.graphicEngine.currentTime - (self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime)
 	end
 	return
 		  self.noteSkin:getG(0, dt, self, "Body", "y")
@@ -278,7 +278,7 @@ LongGraphicalNote.getTailScaleX = function(self)
 end
 
 LongGraphicalNote.getBodyScaleX = function(self)
-	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	return
 		(
 			math.abs(self:getHeadX() - self:getTailX())
@@ -295,7 +295,7 @@ LongGraphicalNote.getTailScaleY = function(self)
 end
 
 LongGraphicalNote.getBodyScaleY = function(self)
-	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	return
 		(
 			math.abs(self:getHeadY() - self:getTailY())
@@ -398,7 +398,7 @@ end
 
 LongGraphicalNote.willDrawBeforeStart = function(self)
 	local x, y, w, h = self:whereWillDraw()
-	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	local visualTimeRate = self.noteSkin.visualTimeRate
 	return
 		self.noteSkin:getG(1, dt, self, "Head", "x") * x * visualTimeRate > 0 or
@@ -409,7 +409,7 @@ end
 
 LongGraphicalNote.willDrawAfterEnd = function(self)
 	local x, y, w, h = self:whereWillDraw()
-	local dt = self.engine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	local visualTimeRate = self.noteSkin.visualTimeRate
 	return
 		self.noteSkin:getG(1, dt, self, "Head", "x") * x * visualTimeRate < 0 or

@@ -20,11 +20,11 @@ TimeRate.tojson = function(self)
 end
 
 TimeRate.apply = function(self)
-	local engine = self.sequence.manager.engine
-	engine.score.timeRate = true
-	engine.timeRate = self.value
-	engine.targetTimeRate = self.value
-	engine:setTimeRate(self.value)
+	local logicEngine = self.sequence.manager.logicEngine
+	logicEngine.score.timeRate = true
+	logicEngine.timeRate = self.value
+	logicEngine.targetTimeRate = self.value
+	logicEngine:setTimeRate(self.value)
 end
 
 return TimeRate

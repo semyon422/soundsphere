@@ -1,7 +1,7 @@
 local ncdk = require("ncdk")
 local json = require("json")
 local toml = require("lua-toml.toml")
-local NoteSkin = require("sphere.screen.gameplay.CloudburstEngine.NoteSkin")
+local NoteSkin = require("sphere.screen.gameplay.GraphicEngine.NoteSkin")
 local TomlNoteSkinLoader = require("sphere.noteskin.TomlNoteSkinLoader")
 
 local NoteSkinLoader = {}

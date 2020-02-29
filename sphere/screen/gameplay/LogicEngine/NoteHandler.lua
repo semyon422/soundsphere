@@ -1,6 +1,6 @@
 local Class				= require("aqua.util.Class")
-local ShortLogicalNote	= require("sphere.screen.gameplay.CloudburstEngine.note.ShortLogicalNote")
-local LongLogicalNote	= require("sphere.screen.gameplay.CloudburstEngine.note.LongLogicalNote")
+local ShortLogicalNote	= require("sphere.screen.gameplay.LogicEngine.ShortLogicalNote")
+local LongLogicalNote	= require("sphere.screen.gameplay.LogicEngine.LongLogicalNote")
 
 local NoteHandler = Class:new()
 
@@ -9,8 +9,9 @@ NoteHandler.autoplayDelay = 1/15
 NoteHandler.loadNoteData = function(self)
 	self.noteData = {}
 	
-	for layerDataIndex in self.engine.noteChart:getLayerDataIndexIterator() do
-		local layerData = self.engine.noteChart:requireLayerData(layerDataIndex)
+	local logicEngine = self.logicEngine
+	for layerDataIndex in logicEngine.noteChart:getLayerDataIndexIterator() do
+		local layerData = logicEngine.noteChart:requireLayerData(layerDataIndex)
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 			
@@ -23,7 +24,7 @@ NoteHandler.loadNoteData = function(self)
 						pressSounds = noteData.sounds,
 						noteType = "ShortNote"
 					})
-					self.engine.noteCount = self.engine.noteCount + 1
+					logicEngine.noteCount = logicEngine.noteCount + 1
 				elseif noteData.noteType == "LongNoteStart" then
 					logicalNote = LongLogicalNote:new({
 						startNoteData = noteData,
@@ -32,7 +33,7 @@ NoteHandler.loadNoteData = function(self)
 						releaseSounds = noteData.endNoteData.sounds,
 						noteType = "LongNote"
 					})
-					self.engine.noteCount = self.engine.noteCount + 1
+					logicEngine.noteCount = logicEngine.noteCount + 1
 				elseif noteData.noteType == "LineNoteStart" then
 					logicalNote = ShortLogicalNote:new({
 						startNoteData = noteData,
@@ -50,11 +51,11 @@ NoteHandler.loadNoteData = function(self)
 				
 				if logicalNote then
 					logicalNote.noteHandler = self
-					logicalNote.engine = self.engine
-					logicalNote.score = self.engine.score
+					logicalNote.logicEngine = logicEngine
+					logicalNote.score = logicEngine.score
 					table.insert(self.noteData, logicalNote)
 					
-					self.engine.sharedLogicalNoteData[noteData] = logicalNote
+					logicEngine.sharedLogicalNoteData[noteData] = logicalNote
 				end
 			end
 		end
@@ -97,12 +98,12 @@ NoteHandler.receive = function(self, event)
 	if self.keyBind and key == self.keyBind then
 		local currentNote = self.currentNote
 		if event.name == "keypressed" then
-			self.engine:playAudio(currentNote.pressSounds, "fga", currentNote.startNoteData.keysound)
+			self.logicEngine:playAudio(currentNote.pressSounds, "fga", currentNote.startNoteData.keysound)
 			
 			self.currentNote.keyState = true
 			return self:switchKey(true)
 		elseif event.name == "keyreleased" then
-			self.engine:playAudio(currentNote.releaseSounds, "fga", currentNote.startNoteData.keysound)
+			self.logicEngine:playAudio(currentNote.releaseSounds, "fga", currentNote.startNoteData.keysound)
 			
 			self.currentNote.keyState = false
 			return self:switchKey(false)
@@ -124,7 +125,7 @@ NoteHandler.clickKey = function(self)
 end
 
 NoteHandler.sendState = function(self)
-	return self.engine.observable:send({
+	return self.logicEngine.observable:send({
 		name = "noteHandlerUpdated",
 		noteHandler = self
 	})

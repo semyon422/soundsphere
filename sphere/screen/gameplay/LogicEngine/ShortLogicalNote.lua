@@ -1,4 +1,4 @@
-local LogicalNote = require("sphere.screen.gameplay.CloudburstEngine.note.LogicalNote")
+local LogicalNote = require("sphere.screen.gameplay.LogicEngine.LogicalNote")
 
 local ShortLogicalNote = LogicalNote:new()
 

@@ -1,7 +1,7 @@
 local Class = require("aqua.util.Class")
 local ncdk = require("ncdk")
 local ajson = require("aqua.util.json")
-local NoteSkin = require("sphere.screen.gameplay.CloudburstEngine.NoteSkin")
+local NoteSkin = require("sphere.screen.gameplay.GraphicEngine.NoteSkin")
 
 local toml = require("lua-toml.toml")
 toml.strict = false

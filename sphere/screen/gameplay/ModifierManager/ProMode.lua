@@ -8,7 +8,7 @@ ProMode.shortName = "ProMode"
 ProMode.type = "boolean"
 
 ProMode.apply = function(self)
-	self.sequence.manager.engine.score.promode = true
+	self.sequence.manager.logicEngine.score.promode = true
 end
 
 return ProMode

@@ -118,7 +118,7 @@ PauseOverlay.receive = function(self, event)
 		self:reload()
 	end
 	
-	if event.name == "focus" and not self.paused and not event.args[1] and not self.engine.score.autoplay then
+	if event.name == "focus" and not self.paused and not event.args[1] and not self.logicEngine.score.autoplay then
 		self:pause()
 	end
 	
@@ -137,7 +137,7 @@ PauseOverlay.receive = function(self, event)
 				self:resetProgress()
 				return
 			end
-			if self.engine.paused then
+			if self.logicEngine.paused then
 				self:beginPlay()
 			else
 				self:pause()
@@ -165,13 +165,13 @@ end
 
 PauseOverlay.play = function(self)
 	self.paused = false
-	self.engine:play()
+	self.logicEngine:play()
 	
 	local length = math.min(self.noteChartDataEntry.length, 3600 * 24)
 	DiscordPresence:setPresence({
 		state = "Playing",
 		details = ("%s - %s [%s]"):format(self.noteChartDataEntry.artist, self.noteChartDataEntry.title, self.noteChartDataEntry.name),
-		endTimestamp = math.floor(os.time() + (length - self.engine.currentTime) / self.engine.timeRate)
+		endTimestamp = math.floor(os.time() + (length - self.logicEngine.currentTime) / self.logicEngine.timeRate)
 	})
 end
 
@@ -190,7 +190,7 @@ PauseOverlay.beginRestart = function(self)
 end
 
 PauseOverlay.pause = function(self)
-	self.engine:pause()
+	self.logicEngine:pause()
 	self.paused = true
 	
 	DiscordPresence:setPresence({
@@ -203,7 +203,7 @@ PauseOverlay.restart = function(self)
 	local GameplayScreen = require("sphere.screen.gameplay.GameplayScreen")
 	GameplayScreen:unload()
 	GameplayScreen:load()
-	self.engine:play()
+	self.logicEngine:play()
 end
 
 PauseOverlay.menu = function(self)
@@ -212,7 +212,7 @@ PauseOverlay.menu = function(self)
 		function()
 			ScreenManager:receive({
 				name = "score",
-				score = self.engine.score,
+				score = self.logicEngine.score,
 				noteChartEntry = GameplayScreen.noteChartEntry,
 				noteChartDataEntry = GameplayScreen.noteChartDataEntry
 			})
