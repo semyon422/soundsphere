@@ -20,31 +20,19 @@ NoteHandler.loadNoteData = function(self)
 				
 				if noteData.noteType == "ShortNote" then
 					logicalNote = ShortLogicalNote:new({
-						startNoteData = noteData,
-						pressSounds = noteData.sounds,
+						noteData = noteData,
 						noteType = "ShortNote"
 					})
 					logicEngine.noteCount = logicEngine.noteCount + 1
 				elseif noteData.noteType == "LongNoteStart" then
 					logicalNote = LongLogicalNote:new({
-						startNoteData = noteData,
-						endNoteData = noteData.endNoteData,
-						pressSounds = noteData.sounds,
-						releaseSounds = noteData.endNoteData.sounds,
+						noteData = noteData,
 						noteType = "LongNote"
 					})
 					logicEngine.noteCount = logicEngine.noteCount + 1
-				elseif noteData.noteType == "LineNoteStart" then
+				else
 					logicalNote = ShortLogicalNote:new({
-						startNoteData = noteData,
-						endNoteData = noteData.endNoteData,
-						pressSounds = noteData.sounds,
-						noteType = "SoundNote"
-					})
-				elseif noteData.noteType == "SoundNote" then
-					logicalNote = ShortLogicalNote:new({
-						startNoteData = noteData,
-						pressSounds = noteData.sounds,
+						noteData = noteData,
 						noteType = "SoundNote"
 					})
 				end

@@ -88,24 +88,17 @@ GraphicEngine.receive = function(self, event)
 	end
 end
 
+GraphicEngine.getLogicalNote = function(self, noteData)
+	return self.logicEngine.sharedLogicalNoteData[noteData]
+end
+
 GraphicEngine.getNoteDrawer = function(self, layerIndex, inputType, inputIndex)
-	if
-		inputType == "key" or
-		inputType == "scratch" or
-		inputType == "measure" or
-		inputType == "bt" or
-		inputType == "fx" or
-		inputType == "laserleft" or
-		inputType == "laserright" or
-		inputType == "auto"
-	then
-		return NoteDrawer:new({
-			layerIndex = layerIndex,
-			inputType = inputType,
-			inputIndex = inputIndex,
-			graphicEngine = self
-		})
-	end
+	return NoteDrawer:new({
+		layerIndex = layerIndex,
+		inputType = inputType,
+		inputIndex = inputIndex,
+		graphicEngine = self
+	})
 end
 
 GraphicEngine.loadNoteDrawers = function(self)

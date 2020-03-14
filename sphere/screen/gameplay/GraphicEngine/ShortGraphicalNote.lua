@@ -50,10 +50,6 @@ ShortGraphicalNote.getColor = function(self)
 	end
 end
 
-ShortGraphicalNote.getLayer = function(self)
-	return self.noteSkin:getNoteLayer(self, "Head")
-end
-
 ShortGraphicalNote.getDrawable = function(self)
 	return self.noteSkin:getImageDrawable(self, "Head")
 end

@@ -96,9 +96,7 @@ LogicEngine.receive = function(self, event)
 		end
 	end
 	
-	if event.name == "resize" then
-		self:reloadNoteDrawers()
-	elseif event.name == "keypressed" then
+	if event.name == "keypressed" then
 		local key = event.args[1]
 		local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
 		local control = love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")
@@ -213,22 +211,11 @@ LogicEngine.unloadTimeManager = function(self)
 end
 
 LogicEngine.getNoteHandler = function(self, inputType, inputIndex)
-	if
-		inputType == "key" or
-		inputType == "scratch" or
-		inputType == "measure" or
-		inputType == "bt" or
-		inputType == "fx" or
-		inputType == "laserleft" or
-		inputType == "laserright" or
-		inputType == "auto"
-	then
-		return NoteHandler:new({
-			inputType = inputType,
-			inputIndex = inputIndex,
-			logicEngine = self
-		})
-	end
+	return NoteHandler:new({
+		inputType = inputType,
+		inputIndex = inputIndex,
+		logicEngine = self
+	})
 end
 
 LogicEngine.loadNoteHandlers = function(self)

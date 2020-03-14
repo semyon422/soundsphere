@@ -64,6 +64,8 @@ GameplayScreen.load = function(self)
 	self.graphicEngine.noteChart = noteChart
 	self.graphicEngine.noteSkin = noteSkin
 	self.graphicEngine.container = self.container
+	self.graphicEngine.localAliases = {}
+	self.graphicEngine.globalAliases = {}
 	
 	self.logicEngine.noteChart = noteChart
 	self.logicEngine.localAliases = {}
@@ -103,6 +105,8 @@ GameplayScreen.load = function(self)
 	NoteChartResourceLoader:load(self.noteChartEntry.path, noteChart, function()
 		self.logicEngine.localAliases = NoteChartResourceLoader.localAliases
 		self.logicEngine.globalAliases = NoteChartResourceLoader.globalAliases
+		self.graphicEngine.localAliases = NoteChartResourceLoader.localAliases
+		self.graphicEngine.globalAliases = NoteChartResourceLoader.globalAliases
 		PauseOverlay:play()
 		BackgroundManager:setColor(color)
 	end)

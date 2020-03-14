@@ -32,6 +32,9 @@ TomlNoteSkinLoader.load = function(self, metaData, version)
 	self:processNoteSkinData()
 	self:addMeasureLine()
 	self:processPlayFieldData()
+
+	self:addBmsBga()
+
 	noteSkin:load()
 
 	-- ajson.write("skin.json", noteSkin.playField)
@@ -568,6 +571,71 @@ TomlNoteSkinLoader.addStaticObject = function(self, object)
 		cs = cs,
 		image = object.image
 	}
+end
+
+TomlNoteSkinLoader.addImageNote = function(self, input, layer)
+	local noteSkin = self.noteSkin
+	local noteSkinData = noteSkin.noteSkinData
+
+	noteSkinData.notes[input .. ":ImageNote"] = {}
+	local imageNote = noteSkinData.notes[input .. ":ImageNote"]
+
+	imageNote.Head = {}
+	local head = imageNote.Head
+	head.cs = 1
+	head.layer = layer
+	head.sb = {}
+	head.gc = {
+		x = {0},
+		y = {0},
+		w = {1},
+		h = {1},
+		ox = {0},
+		oy = {0}
+	}
+end
+
+TomlNoteSkinLoader.addVideoNote = function(self, input, layer)
+	local noteSkin = self.noteSkin
+	local noteSkinData = noteSkin.noteSkinData
+
+	noteSkinData.notes[input .. ":VideoNote"] = {}
+	local videoNote = noteSkinData.notes[input .. ":VideoNote"]
+
+	videoNote.Head = {}
+	local head = videoNote.Head
+	head.cs = 1
+	head.layer = layer
+	head.sb = {}
+	head.gc = {
+		x = {0},
+		y = {0},
+		w = {1},
+		h = {1},
+		ox = {0},
+		oy = {0}
+	}
+end
+
+-- local drawOrder = {0x04, 0x07, 0x0A}
+TomlNoteSkinLoader.addBmsBga = function(self)
+	self:addImageNote("bmsbga" .. 0x04, 0.1)
+	-- self:addImageNote("bmsbga" .. 0x06)
+	self:addImageNote("bmsbga" .. 0x07, 0.2)
+	self:addImageNote("bmsbga" .. 0x0A, 0.3)
+	-- self:addImageNote("bmsbga" .. 0x0B)
+	-- self:addImageNote("bmsbga" .. 0x0C)
+	-- self:addImageNote("bmsbga" .. 0x0D)
+	-- self:addImageNote("bmsbga" .. 0x0E)
+
+	self:addVideoNote("bmsbga" .. 0x04, 0.1)
+	-- self:addVideoNote("bmsbga" .. 0x06)
+	self:addVideoNote("bmsbga" .. 0x07, 0.2)
+	self:addVideoNote("bmsbga" .. 0x0A, 0.3)
+	-- self:addVideoNote("bmsbga" .. 0x0B)
+	-- self:addVideoNote("bmsbga" .. 0x0C)
+	-- self:addVideoNote("bmsbga" .. 0x0D)
+	-- self:addVideoNote("bmsbga" .. 0x0E)
 end
 
 return TomlNoteSkinLoader

@@ -1,6 +1,9 @@
 local Class					= require("aqua.util.Class")
 local ShortGraphicalNote	= require("sphere.screen.gameplay.GraphicEngine.ShortGraphicalNote")
 local LongGraphicalNote		= require("sphere.screen.gameplay.GraphicEngine.LongGraphicalNote")
+local ImageNote				= require("sphere.screen.gameplay.GraphicEngine.ImageNote")
+local VideoNote				= require("sphere.screen.gameplay.GraphicEngine.VideoNote")
+local FileManager			= require("sphere.filesystem.FileManager")
 
 local NoteDrawer = Class:new()
 
@@ -40,6 +43,25 @@ NoteDrawer.load = function(self)
 					startNoteData = noteData,
 					noteType = "SoundNote"
 				})
+			elseif noteData.noteType == "ImageNote" then
+				local fileType
+				local images = noteData.images[1] and noteData.images[1][1]
+				if images then
+					fileType = FileManager:getType(images)
+				end
+				if fileType == "image" then
+					graphicalNote = ImageNote:new({
+						startNoteData = noteData,
+						images = noteData.images,
+						noteType = "ImageNote"
+					})
+				elseif fileType == "video" then
+					graphicalNote = VideoNote:new({
+						startNoteData = noteData,
+						images = noteData.images,
+						noteType = "VideoNote"
+					})
+				end
 			end
 			if graphicalNote then
 				graphicalNote.noteDrawer = self

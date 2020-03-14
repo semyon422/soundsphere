@@ -2,6 +2,15 @@ local LogicalNote = require("sphere.screen.gameplay.LogicEngine.LogicalNote")
 
 local LongLogicalNote = LogicalNote:new()
 
+LongLogicalNote.construct = function(self)
+	self.startNoteData = self.noteData
+	self.endNoteData = self.noteData.endNoteData
+	self.noteData = nil
+
+	self.pressSounds = self.startNoteData.sounds
+	self.releaseSounds = self.endNoteData.sounds
+end
+
 LongLogicalNote.process = function(self, startTimeState, endTimeState)
 	if self.keyState and startTimeState == "none" then
 		self.keyState = false
