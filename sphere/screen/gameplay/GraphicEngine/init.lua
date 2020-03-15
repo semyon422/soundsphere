@@ -39,6 +39,10 @@ GraphicEngine.draw = function(self)
 end
 
 GraphicEngine.receive = function(self, event)
+	for noteDrawer in pairs(self.noteDrawers) do
+		noteDrawer:receive(event)
+	end
+
 	if event.name == "TimeState" then
 		self.currentTime = event.currentTime
 		self.timeRate = event.timeRate

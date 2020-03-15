@@ -4,6 +4,8 @@ local video			= require("aqua.video")
 
 local VideoNote = GraphicalNote:new()
 
+VideoNote.timeRate = 0
+
 VideoNote.update = function(self)
 	if not self:tryNext() then
 		if self.video then
@@ -131,40 +133,27 @@ VideoNote.getScaleY = function(self)
 		self.noteSkin:getCS(self):y(self.image:getHeight())
 end
 
+VideoNote.receive = function(self, event)
+	if event.name == "TimeState" then
+		self:setTimeRate(event.timeRate)
+		self.timeRate = event.timeRate
+	end
+end
 
+VideoNote.setTimeRate = function(self, timeRate)
+	local video = self.video
+	if not video then
+		return
+	end
 
-
--- VideoNote.setTimeRate = function(self, timeRate)
--- 	if self.video then
--- 		self.video:setRate(timeRate)
--- 	end
--- end
-
--- VideoNote.pause = function(self)
--- 	if self.video then
--- 		self.video:pause()
--- 	end
--- end
-
--- VideoNote.play = function(self)
--- 	if self.video then
--- 		self.video:play()
--- 	end
--- end
-
--- VideoNote.draw = function(self)
--- 	if not self:isHere() then
--- 		return
--- 	end
--- 	if not self.started then
--- 		if self.video then
--- 			self.video:play()
--- 		end
--- 		self.started = true
--- 	end
--- 	if self.drawable then
--- 		self.drawable:draw()
--- 	end
--- end
+	if timeRate == 0 and self.timeRate ~= 0 then
+		video:pause()
+	elseif timeRate ~= 0 and self.timeRate == 0 then
+		video:setRate(timeRate)
+		video:play()
+	elseif timeRate ~= 0 and self.timeRate ~= 0 then
+		video:setRate(timeRate)
+	end
+end
 
 return VideoNote

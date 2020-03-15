@@ -39,4 +39,6 @@ GraphicalNote.tryNext = function(self)
 	end
 end
 
+GraphicalNote.receive = function(self, event) end
+
 return GraphicalNote

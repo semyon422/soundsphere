@@ -171,4 +171,14 @@ NoteDrawer.reload = function(self)
 	end
 end
 
+NoteDrawer.receive = function(self, event)
+	local note
+	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
+		note = self.noteData[currentNoteIndex]
+		if note.activated then
+			note:receive(event)
+		end
+	end
+end
+
 return NoteDrawer
