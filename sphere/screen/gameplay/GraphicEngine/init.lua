@@ -11,6 +11,8 @@ GraphicEngine.load = function(self)
 	self.observable = Observable:new()
 	
 	self.noteCount = 0
+	self.currentTime = 0
+	self.timeRate = 1
 	
 	self:loadNoteDrawers()
 	
@@ -19,9 +21,9 @@ GraphicEngine.load = function(self)
 end
 
 GraphicEngine.update = function(self, dt)
-	self.currentTime = self.logicEngine.currentTime
-	self.timeRate = self.logicEngine.timeRate
-	NoteSkin.timeRate = self.timeRate
+	-- self.currentTime = self.logicEngine.currentTime
+	-- self.timeRate = self.logicEngine.timeRate
+	-- NoteSkin.timeRate = self.timeRate
 
 	self:updateNoteDrawers()
 	
@@ -37,6 +39,13 @@ GraphicEngine.draw = function(self)
 end
 
 GraphicEngine.receive = function(self, event)
+	if event.name == "TimeState" then
+		self.currentTime = event.currentTime
+		self.timeRate = event.timeRate
+		NoteSkin.timeRate = event.timeRate
+		return
+	end
+
 	if event.name == "resize" then
 		self:reloadNoteDrawers()
 	elseif event.name == "keypressed" then

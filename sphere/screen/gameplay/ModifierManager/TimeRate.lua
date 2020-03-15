@@ -21,10 +21,11 @@ end
 
 TimeRate.apply = function(self)
 	local logicEngine = self.sequence.manager.logicEngine
+	local timeEngine = self.sequence.manager.timeEngine
 	logicEngine.score.timeRate = true
-	logicEngine.timeRate = self.value
-	logicEngine.targetTimeRate = self.value
-	logicEngine:setTimeRate(self.value)
+	-- timeEngine.timeRate = self.value
+	-- timeEngine.targetTimeRate = self.value
+	-- timeEngine:setTimeRate(self.value)
 end
 
 return TimeRate

@@ -4,7 +4,16 @@ local LongLogicalNote	= require("sphere.screen.gameplay.LogicEngine.LongLogicalN
 
 local NoteHandler = Class:new()
 
-NoteHandler.autoplayDelay = 1/15
+-- NoteHandler.autoplayDelay = 1/15
+
+NoteHandler.load = function(self)
+	self:loadNoteData()
+	
+	self.keyBind = self.inputType .. self.inputIndex
+	self.keyState = false
+end
+
+NoteHandler.unload = function(self) end
 
 NoteHandler.loadNoteData = function(self)
 	self.noteData = {}
@@ -61,69 +70,57 @@ NoteHandler.loadNoteData = function(self)
 	self.currentNote = self.noteData[1]
 end
 
-NoteHandler.setKeyState = function(self)
-	self.keyBind = self.inputType .. self.inputIndex
-	self.keyState = love.keyboard.isDown(self.keyBind)
-end
-
 NoteHandler.update = function(self)
 	if not self.currentNote then return end
 	
 	self.currentNote:update()
-	if self.click then
-		self.keyTimer = self.keyTimer + love.timer.getDelta()
-		if self.keyTimer > self.autoplayDelay then
-			self.click = false
-			self:switchKey(false)
-		end
-	end
+	-- if self.click then
+	-- 	self.keyTimer = self.keyTimer + love.timer.getDelta()
+	-- 	if self.keyTimer > self.autoplayDelay then
+	-- 		self.click = false
+	-- 		self:switchKey(false)
+	-- 	end
+	-- end
 end
 
 NoteHandler.receive = function(self, event)
 	if not self.currentNote then return end
 	
 	local key = event.args and event.args[1]
-	if self.keyBind and key == self.keyBind then
+	if key == self.keyBind then
 		local currentNote = self.currentNote
 		if event.name == "keypressed" then
-			self.logicEngine:playAudio(currentNote.pressSounds, "fga", currentNote.startNoteData.keysound)
-			
-			self.currentNote.keyState = true
-			return self:switchKey(true)
+			currentNote.keyState = true
+			self.keyState = true
+			return self:send({
+				name = "KeyState",
+				state = true,
+				note = currentNote,
+				layer = "foreground"
+			})
 		elseif event.name == "keyreleased" then
-			self.logicEngine:playAudio(currentNote.releaseSounds, "fga", currentNote.startNoteData.keysound)
-			
-			self.currentNote.keyState = false
-			return self:switchKey(false)
+			currentNote.keyState = false
+			self.keyState = false
+			return self:send({
+				name = "KeyState",
+				state = false,
+				note = currentNote,
+				layer = "foreground"
+			})
 		end
 	end
 end
 
-NoteHandler.switchKey = function(self, state)
-	self.keyState = state
-	return self:sendState()
-end
-
-NoteHandler.clickKey = function(self)
-	self.keyTimer = 0
-	self.click = true
-	self.keyState = true
+-- NoteHandler.clickKey = function(self)
+-- 	self.keyTimer = 0
+-- 	self.click = true
+-- 	self.keyState = true
 	
-	return self:sendState()
-end
+-- 	return self:sendState()
+-- end
 
-NoteHandler.sendState = function(self)
-	return self.logicEngine.observable:send({
-		name = "noteHandlerUpdated",
-		noteHandler = self
-	})
+NoteHandler.send = function(self, event)
+	return self.logicEngine.observable:send(event)
 end
-
-NoteHandler.load = function(self)
-	self:loadNoteData()
-	self:setKeyState()
-end
-
-NoteHandler.unload = function(self) end
 
 return NoteHandler

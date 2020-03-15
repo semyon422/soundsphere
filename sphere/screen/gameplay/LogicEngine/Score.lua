@@ -134,8 +134,8 @@ end
 
 Score.needAutoplay = function(self, note)
 	return
-		note.noteType == "SoundNote" or
 		self.autoplay or
+		note.noteType == "SoundNote" or
 		note.startNoteData.autoplay or
 		note.autoplay
 end
@@ -155,7 +155,7 @@ Score.processNote = function(self, note)
 end
 
 Score.processShortNote = function(self, note)
-	local deltaTime = (note.logicEngine.exactCurrentTime - note.startNoteData.timePoint.absoluteTime) / self.timeRate
+	local deltaTime = (self.logicEngine.currentTime - note.startNoteData.timePoint.absoluteTime) / self.timeRate
 	local timeState = self:getTimeState(deltaTime)
 	
 	note:process(timeState)
@@ -167,8 +167,8 @@ Score.processShortNote = function(self, note)
 end
 
 Score.processLongNote = function(self, note)
-	local deltaStartTime = (note.logicEngine.exactCurrentTime - note.startNoteData.timePoint.absoluteTime) / self.timeRate
-	local deltaEndTime = (note.logicEngine.exactCurrentTime - note.endNoteData.timePoint.absoluteTime) / self.timeRate
+	local deltaStartTime = (self.logicEngine.currentTime - note.startNoteData.timePoint.absoluteTime) / self.timeRate
+	local deltaEndTime = (self.logicEngine.currentTime - note.endNoteData.timePoint.absoluteTime) / self.timeRate
 	local startTimeState = self:getTimeState(deltaStartTime)
 	local endTimeState = self:getTimeState(deltaEndTime)
 	

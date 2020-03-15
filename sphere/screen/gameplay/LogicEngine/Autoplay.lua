@@ -15,12 +15,17 @@ Autoplay.processShortNote = function(self, note)
 	if deltaTime <= 0 then
 		local layer
 		if note.noteType ~= "SoundNote" then
-			note.noteHandler:clickKey()
-			layer = "fga"
+			-- note.noteHandler:clickKey()
+			layer = "foreground"
 		else
-			layer = "bga"
+			layer = "background"
 		end
-		note.logicEngine:playAudio(note.pressSounds, layer, note.startNoteData.keysound, note.startNoteData.stream)
+		note.noteHandler:send({
+			name = "KeyState",
+			state = true,
+			note = note,
+			layer = layer
+		})
 		
 		note.keyState = true
 		
@@ -36,7 +41,12 @@ end
 Autoplay.processSoundNote = function(self, note)
 	if note.pressSounds and note.pressSounds[1] then
 		if note.startNoteData.timePoint.absoluteTime <= note.logicEngine.currentTime then
-			note.logicEngine:playAudio(note.pressSounds, "bga", note.startNoteData.keysound, note.startNoteData.stream)
+			note.noteHandler:send({
+				name = "KeyState",
+				state = true,
+				note = note,
+				layer = "background"
+			})
 		else
 			return
 		end
@@ -54,12 +64,17 @@ Autoplay.processLongNote = function(self, note)
 	if deltaStartTime <= 0 and not note.keyState then
 		local layer
 		if note.noteType ~= "SoundNote" then
-			note.noteHandler:switchKey(true)
-			layer = "fga"
+			-- note.noteHandler:switchKey(true)
+			layer = "foreground"
 		else
-			layer = "bga"
+			layer = "background"
 		end
-		note.logicEngine:playAudio(note.pressSounds, layer, note.startNoteData.keysound, note.startNoteData.stream)
+		note.noteHandler:send({
+			name = "KeyState",
+			state = true,
+			note = note,
+			layer = layer
+		})
 		
 		note.keyState = true
 		
@@ -73,12 +88,17 @@ Autoplay.processLongNote = function(self, note)
 	elseif deltaEndTime <= 0 and note.keyState or nextNote and nextNote:isHere() then
 		local layer
 		if note.noteType ~= "SoundNote" then
-			note.noteHandler:switchKey(false)
-			layer = "fga"
+			-- note.noteHandler:switchKey(false)
+			layer = "foreground"
 		else
-			layer = "bga"
+			layer = "background"
 		end
-		note.logicEngine:playAudio(note.releaseSounds, layer, note.startNoteData.keysound, note.startNoteData.stream)
+		note.noteHandler:send({
+			name = "KeyState",
+			state = false,
+			note = note,
+			layer = layer
+		})
 		
 		note.keyState = false
 		
