@@ -163,7 +163,10 @@ NoteSkin.setVisualTimeRate = function(self, visualTimeRate)
 end
 
 NoteSkin.getVisualTimeRate = function(self)
-	return self.visualTimeRate / self.timeRate
+	if self.timeRate ~= 0 then
+		return self.visualTimeRate / self.timeRate
+	end
+	return self.visualTimeRate
 end
 
 NoteSkin.getVisualTimeRateSign = function(self)
