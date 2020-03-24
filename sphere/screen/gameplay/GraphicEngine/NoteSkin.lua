@@ -205,33 +205,16 @@ NoteSkin.getG = function(self, order, dt, note, part, name)
 	end
 end
 
-NoteSkin.whereWillBelongSegment = function(self, note, part, name, value)
-	local seq = self.data[note.id][part].sb[name]
-
-	if not seq then
+NoteSkin.whereWillDraw = function(self, note, value)
+	local a, b = -1, 1
+	
+	if value > b then
+		return -1
+	elseif value < a then
+		return 1
+	else
 		return 0
 	end
-	
-	local a, b = seq[1], seq[2]
-	if a < b then
-		if value < a then
-			return -1
-		elseif value > b then
-			return 1
-		else
-			return 0
-		end
-	elseif a > b then
-		if value < b then
-			return 1
-		elseif value > a then
-			return -1
-		else
-			return 0
-		end
-	end
-
-	return 0
 end
 
 NoteSkin.getNoteLayer = function(self, note, part)

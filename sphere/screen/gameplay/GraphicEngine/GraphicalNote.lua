@@ -41,4 +41,20 @@ end
 
 GraphicalNote.receive = function(self, event) end
 
+GraphicalNote.whereWillDraw = function(self)
+	return 0
+end
+
+GraphicalNote.willDraw = function(self)
+	return self:whereWillDraw() == 0
+end
+
+GraphicalNote.willDrawBeforeStart = function(self)
+	return self:whereWillDraw() == -1
+end
+
+GraphicalNote.willDrawAfterEnd = function(self)
+	return self:whereWillDraw() == 1
+end
+
 return GraphicalNote
