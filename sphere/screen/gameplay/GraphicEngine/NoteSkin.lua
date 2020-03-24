@@ -30,14 +30,15 @@ NoteSkin.timeRate = 1
 NoteSkin.load = function(self)
 	self.allcs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 	
+	local nsdCses = self.noteSkinData.cses
 	self.cses = {}
-	for i = 1, #self.noteSkinData.cses do
+	for i = 1, #nsdCses do
 		self.cses[i] = CoordinateManager:getCS(
-			tonumber(self.noteSkinData.cses[i][1]),
-			tonumber(self.noteSkinData.cses[i][2]),
-			tonumber(self.noteSkinData.cses[i][3]),
-			tonumber(self.noteSkinData.cses[i][4]),
-			self.noteSkinData.cses[i][5]
+			tonumber(nsdCses[i][1]),
+			tonumber(nsdCses[i][2]),
+			tonumber(nsdCses[i][3]),
+			tonumber(nsdCses[i][4]),
+			nsdCses[i][5]
 		)
 	end
 	
@@ -46,8 +47,7 @@ NoteSkin.load = function(self)
 	self.images = {}
 	self:loadImages()
 	
-	self.functions0 = {}
-	self.functions1 = {}
+	self.functions = {}
 	self:loadFunctions()
 	
 	self.containers = {}
@@ -69,16 +69,15 @@ NoteSkin.loadImages = function(self)
 	end
 end
 
-
 local env = {
 	math = math
 }
 
-local safeload = function(code)
-	if code:byte(1) == 27 then
+local safeload = function(chunk)
+	if chunk:byte(1) == 27 then
 		error("bytecode is not allowed")
 	end
-	local f, message = loadstring(code)
+	local f, message = loadstring(chunk)
 	if not f then
 		error(message)
 	end
@@ -91,13 +90,9 @@ NoteSkin.loadFunctions = function(self)
 		return
 	end
 	
-	local functions0 = self.functions0
-	local functions1 = self.functions1
+	local functions = self.functions
 	for _, fn in pairs(self.noteSkinData.functions) do
-		functions0[fn.name] = safeload(fn.chunk0)()
-		if fn.chunk1 then
-			functions1[fn.name] = safeload(fn.chunk1)()
-		end
+		functions[fn.name] = safeload(fn.chunk)()
 	end
 end
 
@@ -145,12 +140,6 @@ NoteSkin.update = function(self, dt)
 	end
 end
 
--- NoteSkin.draw = function(self)
--- 	for _, container in ipairs(self.containerList) do
--- 		container:draw()
--- 	end
--- end
-
 NoteSkin.setVisualTimeRate = function(self, visualTimeRate)
 	if visualTimeRate * self.visualTimeRate < 0 then
 		self.visualTimeRate = visualTimeRate
@@ -169,48 +158,30 @@ NoteSkin.getVisualTimeRate = function(self)
 	return self.visualTimeRate
 end
 
-NoteSkin.getVisualTimeRateSign = function(self)
-	return sign(self.visualTimeRate)
-end
+-- NoteSkin.getVisualTimeRateSign = function(self)
+-- 	return sign(self.visualTimeRate)
+-- end
 
 NoteSkin.getCS = function(self, note)
 	return self.cses[self.data[note.id]["Head"].cs]
 end
 
 NoteSkin.checkNote = function(self, note)
-	if self.data[note.id] then
-		return true
-	end
+	return self.data[note.id]
 end
 
-NoteSkin.getG = function(self, order, dt, note, part, name)
-	local dt = dt * self:getVisualTimeRate()
+NoteSkin.getG = function(self, note, part, name, timeState)
 	local seq = self.data[note.id][part].gc[name]
 
-	if not seq then
-		print(order, dt, note, part, name)
-	elseif type(seq) == "table" then
-		local sum = 0
-		for i = order, #seq - 1 do
-			local delta = seq[i + 1] * dt ^ (i - order)
-			sum = sum + delta
-		end
-		return sum
-	elseif type(seq) == "string" then
-		if order == 0 then
-			return self.functions0[seq](dt)
-		elseif order == 1 then
-			return self.functions1[seq](dt)
-		end
-	end
+	return self.functions[seq[1]](timeState, seq[2])
 end
 
-NoteSkin.whereWillDraw = function(self, note, value)
+NoteSkin.whereWillDraw = function(self, time)
 	local a, b = -1, 1
 	
-	if value > b then
+	if time > b then
 		return -1
-	elseif value < a then
+	elseif time < a then
 		return 1
 	else
 		return 0

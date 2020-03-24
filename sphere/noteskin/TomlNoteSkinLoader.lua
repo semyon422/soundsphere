@@ -28,6 +28,7 @@ TomlNoteSkinLoader.load = function(self, metaData, version)
 	self.noteSkin.noteSkinData = {}
 
 	self:addCS()
+	self:addFunctions()
 
 	self:processNoteSkinData()
 	self:addMeasureLine()
@@ -40,6 +41,22 @@ TomlNoteSkinLoader.load = function(self, metaData, version)
 	-- ajson.write("skin.json", noteSkin.playField)
 
 	return noteSkin
+end
+
+TomlNoteSkinLoader.addFunctions = function(self)
+	self.noteSkin.noteSkinData.functions = {}
+	self.noteSkin.noteSkinData.functions[1] = {
+		name = "number",
+		chunk = "return function(_, n) return n end"
+	}
+	self.noteSkin.noteSkinData.functions[2] = {
+		name = "linear",
+		chunk = [[
+			return function(timeState, data)
+				return data[1] + data[2] * (timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
+			end
+		]]
+	}
 end
 
 TomlNoteSkinLoader.processNoteSkinData = function(self)
@@ -168,14 +185,13 @@ TomlNoteSkinLoader.addShortNote = function(self, input, i)
 	head.cs = 1
 	head.layer = 10
 	head.image = self:getImageName(tomlNote.Head.images[i], tomlNote.Head.layer)
-	head.sb = {}
 	head.gc = {
-		x = {self:getNoteX(i) / unit},
-		y = {self:getNoteY(i) / unit, scroll},
-		w = {columns.width[i] / unit},
-		h = {columns.height[i] / unit},
-		ox = {0},
-		oy = {-1}
+		x = {"number", self:getNoteX(i) / unit},
+		y = {"linear", {self:getNoteY(i) / unit, scroll}},
+		w = {"number", columns.width[i] / unit},
+		h = {"number", columns.height[i] / unit},
+		ox = {"number", 0},
+		oy = {"number", -1}
 	}
 end
 
@@ -197,14 +213,13 @@ TomlNoteSkinLoader.addLongNote = function(self, input, i)
 	head.cs = 1
 	head.layer = 10
 	head.image = self:getImageName(tomlNote.Head.images[i], tomlNote.Head.layer)
-	head.sb = {}
 	head.gc = {
-		x = {self:getNoteX(i) / unit},
-		y = {self:getNoteY(i) / unit, scroll},
-		w = {columns.width[i] / unit},
-		h = {columns.height[i] / unit},
-		ox = {0},
-		oy = {-1}
+		x = {"number", self:getNoteX(i) / unit},
+		y = {"linear", {self:getNoteY(i) / unit, scroll}},
+		w = {"number", columns.width[i] / unit},
+		h = {"number", columns.height[i] / unit},
+		ox = {"number", 0},
+		oy = {"number", -1}
 	}
 
 	longNote.Body = {}
@@ -212,14 +227,13 @@ TomlNoteSkinLoader.addLongNote = function(self, input, i)
 	body.cs = 1
 	body.layer = 10
 	body.image = self:getImageName(tomlNote.Body.images[i], tomlNote.Body.layer)
-	body.sb = {}
 	body.gc = {
-		x = {self:getNoteX(i) / unit},
-		y = {self:getNoteY(i) / unit, scroll},
-		w = {columns.width[i] / unit},
-		h = {0},
-		ox = {0},
-		oy = {-0.5}
+		x = {"number", self:getNoteX(i) / unit},
+		y = {"linear", {self:getNoteY(i) / unit, scroll}},
+		w = {"number", columns.width[i] / unit},
+		h = {"number", 0},
+		ox = {"number", 0},
+		oy = {"number", -0.5}
 	}
 
 	longNote.Tail = {}
@@ -227,14 +241,13 @@ TomlNoteSkinLoader.addLongNote = function(self, input, i)
 	tail.cs = 1
 	tail.layer = 10
 	tail.image = self:getImageName(tomlNote.Tail.images[i], tomlNote.Tail.layer)
-	tail.sb = {}
 	tail.gc = {
-		x = {self:getNoteX(i) / unit},
-		y = {self:getNoteY(i) / unit, scroll},
-		w = {columns.width[i] / unit},
-		h = {columns.height[i] / unit},
-		ox = {0},
-		oy = {-1}
+		x = {"number", self:getNoteX(i) / unit},
+		y = {"linear", {self:getNoteY(i) / unit, scroll}},
+		w = {"number", columns.width[i] / unit},
+		h = {"number", columns.height[i] / unit},
+		ox = {"number", 0},
+		oy = {"number", -1}
 	}
 end
 
@@ -318,14 +331,13 @@ TomlNoteSkinLoader.addMeasureLine = function(self)
 	head.cs = 1
 	head.layer = 10
 	head.image = self:getImageName(tomlMeasureLine.image, tomlMeasureLine.layer)
-	head.sb = {}
 	head.gc = {
-		x = {self:getNoteX(0) / unit},
-		y = {columns.y / unit, scroll},
-		w = {0},
-		h = {0},
-		ox = {0},
-		oy = {0}
+		x = {"number", self:getNoteX(0) / unit},
+		y = {"linear", {columns.y / unit, scroll}},
+		w = {"number", 0},
+		h = {"number", 0},
+		ox = {"number", 0},
+		oy = {"number", 0}
 	}
 
 	longNote.Body = {}
@@ -333,14 +345,13 @@ TomlNoteSkinLoader.addMeasureLine = function(self)
 	body.cs = 1
 	body.layer = 10
 	body.image = self:getImageName(tomlMeasureLine.image, tomlMeasureLine.layer)
-	body.sb = {}
 	body.gc = {
-		x = {self:getNoteX(0) / unit},
-		y = {columns.y / unit, scroll},
-		w = {(self:getNoteX(#columns.width + 1) - self:getNoteX(0)) / unit},
-		h = {tomlMeasureLine.height / unit},
-		ox = {0},
-		oy = {0}
+		x = {"number", self:getNoteX(0) / unit},
+		y = {"linear", {columns.y / unit, scroll}},
+		w = {"number", (self:getNoteX(#columns.width + 1) - self:getNoteX(0)) / unit},
+		h = {"number", tomlMeasureLine.height / unit},
+		ox = {"number", 0},
+		oy = {"number", 0}
 	}
 
 	longNote.Tail = {}
@@ -348,14 +359,13 @@ TomlNoteSkinLoader.addMeasureLine = function(self)
 	tail.cs = 1
 	tail.layer = 10
 	tail.image = self:getImageName(tomlMeasureLine.image, tomlMeasureLine.layer)
-	tail.sb = {}
 	tail.gc = {
-		x = {self:getNoteX(0) / unit},
-		y = {columns.y / unit, scroll},
-		w = {0},
-		h = {0},
-		ox = {0},
-		oy = {0}
+		x = {"number", self:getNoteX(0) / unit},
+		y = {"linear", {columns.y / unit, scroll}},
+		w = {"number", 0},
+		h = {"number", 0},
+		ox = {"number", 0},
+		oy = {"number", 0}
 	}
 end
 
@@ -584,14 +594,13 @@ TomlNoteSkinLoader.addImageNote = function(self, input, layer)
 	local head = imageNote.Head
 	head.cs = 1
 	head.layer = layer
-	head.sb = {}
 	head.gc = {
-		x = {0},
-		y = {0},
-		w = {1},
-		h = {1},
-		ox = {0},
-		oy = {0}
+		x = {"number", 0},
+		y = {"number", 0},
+		w = {"number", 1},
+		h = {"number", 1},
+		ox = {"number", 0},
+		oy = {"number", 0}
 	}
 end
 
@@ -606,14 +615,13 @@ TomlNoteSkinLoader.addVideoNote = function(self, input, layer)
 	local head = videoNote.Head
 	head.cs = 2
 	head.layer = layer
-	head.sb = {}
 	head.gc = {
-		x = {0},
-		y = {0},
-		w = {1},
-		h = {1},
-		ox = {0},
-		oy = {0}
+		x = {"number", 0},
+		y = {"number", 0},
+		w = {"number", 1},
+		h = {"number", 1},
+		ox = {"number", 0},
+		oy = {"number", 0}
 	}
 end
 

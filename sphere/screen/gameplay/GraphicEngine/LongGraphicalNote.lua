@@ -4,6 +4,7 @@ local LongGraphicalNote = GraphicalNote:new()
 
 LongGraphicalNote.update = function(self)
 	self:computeVisualTime()
+	self:computeTimeState()
 	
 	if not self:tryNext() then
 		self.headDrawable.x = self:getHeadX()
@@ -35,9 +36,34 @@ LongGraphicalNote.computeVisualTime = function(self)
 	self.startNoteData.timePoint:computeVisualTime(self.noteDrawer.currentTimePoint)
 	self.endNoteData.timePoint:computeVisualTime(self.noteDrawer.currentTimePoint)
 	
-	self.sdt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
-	self.edt = self.graphicEngine.currentTime - self.endNoteData.timePoint.currentVisualTime
 	self.fsdt = self.graphicEngine.currentTime - (self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime)
+end
+
+LongGraphicalNote.computeTimeState = function(self)
+	self.startTimeState = self.startTimeState or {}
+	local startTimeState = self.startTimeState
+
+	startTimeState.currentTime = self.graphicEngine.currentTime
+
+	startTimeState.absoluteTime = self.startNoteData.timePoint.absoluteTime
+	startTimeState.currentVisualTime = self.startNoteData.timePoint.currentVisualTime
+	startTimeState.absoluteDeltaTime = self.graphicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
+	startTimeState.visualDeltaTime = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	startTimeState.scaledVisualDeltaTime = startTimeState.visualDeltaTime * self.noteSkin:getVisualTimeRate()
+	
+	startTimeState.fakeVisualDeltaTime = self.graphicEngine.currentTime - (self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime)
+	startTimeState.scaledFakeVisualDeltaTime = startTimeState.fakeVisualDeltaTime * self.noteSkin:getVisualTimeRate()
+
+	self.endTimeState = self.endTimeState or {}
+	local endTimeState = self.endTimeState
+
+	endTimeState.currentTime = self.graphicEngine.currentTime
+	
+	endTimeState.absoluteTime = self.endNoteData.timePoint.absoluteTime
+	endTimeState.currentVisualTime = self.endNoteData.timePoint.currentVisualTime
+	endTimeState.absoluteDeltaTime = self.graphicEngine.currentTime - self.endNoteData.timePoint.absoluteTime
+	endTimeState.visualDeltaTime = self.graphicEngine.currentTime - self.endNoteData.timePoint.currentVisualTime
+	endTimeState.scaledVisualDeltaTime = endTimeState.visualDeltaTime * self.noteSkin:getVisualTimeRate()
 end
 
 LongGraphicalNote.updateFakeStartTime = function(self)
@@ -184,87 +210,83 @@ LongGraphicalNote.getBodyContainer = function(self)
 end
 
 LongGraphicalNote.getHeadWidth = function(self)
-	return self.noteSkin:getG(0, self.sdt, self, "Head", "w")
+	return self.noteSkin:getG(self, "Head", "w", self.startTimeState)
 end
 
 LongGraphicalNote.getTailHeight = function(self)
-	return self.noteSkin:getG(0, self.sdt, self, "Tail", "h")
+	return self.noteSkin:getG(self, "Tail", "h", self.startTimeState)
 end
 
 LongGraphicalNote.getBodyWidth = function(self)
-	return self.noteSkin:getG(0, self.sdt, self, "Body", "w")
+	return self.noteSkin:getG(self, "Body", "w", self.startTimeState)
 end
 
 LongGraphicalNote.getHeadHeight = function(self)
-	return self.noteSkin:getG(0, self.sdt, self, "Head", "h")
+	return self.noteSkin:getG(self, "Head", "h", self.startTimeState)
 end
 
 LongGraphicalNote.getTailWidth = function(self)
-	return self.noteSkin:getG(0, self.sdt, self, "Tail", "w")
+	return self.noteSkin:getG(self, "Tail", "w", self.startTimeState)
 end
 
 LongGraphicalNote.getBodyHeight = function(self)
-	return self.noteSkin:getG(0, self.sdt, self, "Body", "h")
+	return self.noteSkin:getG(self, "Body", "h", self.startTimeState)
 end
 
 LongGraphicalNote.getHeadX = function(self)
-	local dt = self.fsdt
 	return
-		  self.noteSkin:getG(0, dt, self, "Head", "x")
-		+ self.noteSkin:getG(0, dt, self, "Head", "w")
-		* self.noteSkin:getG(0, dt, self, "Head", "ox")
+		  self.noteSkin:getG(self, "Head", "x", self.startTimeState)
+		+ self.noteSkin:getG(self, "Head", "w", self.startTimeState)
+		* self.noteSkin:getG(self, "Head", "ox", self.startTimeState)
 end
 
 LongGraphicalNote.getTailX = function(self)
-	local dt = self.edt
 	return
-		  self.noteSkin:getG(0, dt, self, "Tail", "x")
-		+ self.noteSkin:getG(0, dt, self, "Tail", "w")
-		* self.noteSkin:getG(0, dt, self, "Tail", "ox")
+		  self.noteSkin:getG(self, "Tail", "x", self.endTimeState)
+		+ self.noteSkin:getG(self, "Tail", "w", self.endTimeState)
+		* self.noteSkin:getG(self, "Tail", "ox", self.endTimeState)
 end
 
 LongGraphicalNote.getBodyX = function(self)
 	local dg = self:getHeadX() - self:getTailX()
-	local dt
+	local timeState
 	if dg >= 0 then
-		dt = self.edt
+		timeState = self.endTimeState
 	else
-		dt = self.fsdt
+		timeState = self.startTimeState
 	end
 	return
-		  self.noteSkin:getG(0, dt, self, "Body", "x")
-		+ self.noteSkin:getG(0, dt, self, "Head", "w")
-		* self.noteSkin:getG(0, dt, self, "Body", "ox")
+		  self.noteSkin:getG(self, "Body", "x", timeState)
+		+ self.noteSkin:getG(self, "Head", "w", timeState)
+		* self.noteSkin:getG(self, "Body", "ox", timeState)
 end
 
 LongGraphicalNote.getHeadY = function(self)
-	local dt = self.fsdt
 	return
-		  self.noteSkin:getG(0, dt, self, "Head", "y")
-		+ self.noteSkin:getG(0, dt, self, "Head", "h")
-		* self.noteSkin:getG(0, dt, self, "Head", "oy")
+		  self.noteSkin:getG(self, "Head", "y", self.startTimeState)
+		+ self.noteSkin:getG(self, "Head", "h", self.startTimeState)
+		* self.noteSkin:getG(self, "Head", "oy", self.startTimeState)
 end
 
 LongGraphicalNote.getTailY = function(self)
-	local dt = self.edt
 	return
-		  self.noteSkin:getG(0, dt, self, "Tail", "y")
-		+ self.noteSkin:getG(0, dt, self, "Tail", "h")
-		* self.noteSkin:getG(0, dt, self, "Tail", "oy")
+		  self.noteSkin:getG(self, "Tail", "y", self.endTimeState)
+		+ self.noteSkin:getG(self, "Tail", "h", self.endTimeState)
+		* self.noteSkin:getG(self, "Tail", "oy", self.endTimeState)
 end
 
 LongGraphicalNote.getBodyY = function(self)
 	local dg = self:getHeadY() - self:getTailY()
-	local dt
+	local timeState
 	if dg >= 0 then
-		dt = self.edt
+		timeState = self.endTimeState
 	else
-		dt = self.fsdt
+		timeState = self.startTimeState
 	end
 	return
-		  self.noteSkin:getG(0, dt, self, "Body", "y")
-		+ self.noteSkin:getG(0, dt, self, "Head", "h")
-		* self.noteSkin:getG(0, dt, self, "Body", "oy")
+		  self.noteSkin:getG(self, "Body", "y", timeState)
+		+ self.noteSkin:getG(self, "Head", "h", timeState)
+		* self.noteSkin:getG(self, "Body", "oy", timeState)
 end
 
 LongGraphicalNote.getHeadScaleX = function(self)
@@ -279,7 +301,7 @@ LongGraphicalNote.getBodyScaleX = function(self)
 	return
 		(
 			math.abs(self:getHeadX() - self:getTailX())
-			+ self.noteSkin:getG(0, self.sdt, self, "Body", "w")
+			+ self.noteSkin:getG(self, "Body", "w", self.startTimeState)
 		) / self.noteSkin:getCS(self):x(self.noteSkin:getNoteImage(self, "Body"):getWidth())
 end
 
@@ -295,13 +317,13 @@ LongGraphicalNote.getBodyScaleY = function(self)
 	return
 		(
 			math.abs(self:getHeadY() - self:getTailY())
-			+ self.noteSkin:getG(0, self.sdt, self, "Body", "h")
+			+ self.noteSkin:getG(self, "Body", "h", self.startTimeState)
 		) / self.noteSkin:getCS(self):y(self.noteSkin:getNoteImage(self, "Body"):getHeight())
 end
 
 LongGraphicalNote.whereWillDraw = function(self)
-	local wwdStart = self.noteSkin:whereWillDraw(self, self.fsdt)
-	local wwdEnd = self.noteSkin:whereWillDraw(self, self.edt)
+	local wwdStart = self.noteSkin:whereWillDraw(self.startTimeState.scaledVisualDeltaTime)
+	local wwdEnd = self.noteSkin:whereWillDraw(self.endTimeState.scaledVisualDeltaTime)
 
 	if wwdStart == wwdEnd then
 		return wwdStart

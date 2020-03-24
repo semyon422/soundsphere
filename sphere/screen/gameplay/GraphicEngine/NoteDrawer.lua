@@ -118,6 +118,7 @@ NoteDrawer.update = function(self)
 		note = self.noteData[currentNoteIndex - 1]
 		if note then
 			note:computeVisualTime()
+			note:computeTimeState()
 			if not note:willDrawBeforeStart() and note.index == self.startNoteIndex - 1 then
 				self.startNoteIndex = self.startNoteIndex - 1
 				note:activate()
@@ -132,6 +133,7 @@ NoteDrawer.update = function(self)
 		note = self.noteData[currentNoteIndex + 1]
 		if note then
 			note:computeVisualTime()
+			note:computeTimeState()
 			if not note:willDrawAfterEnd() and note.index == self.endNoteIndex + 1 then
 				self.endNoteIndex = self.endNoteIndex + 1
 				note:activate()

@@ -4,6 +4,7 @@ local ShortGraphicalNote = GraphicalNote:new()
 
 ShortGraphicalNote.update = function(self)
 	self:computeVisualTime()
+	self:computeTimeState()
 	
 	if not self:tryNext() then
 		self.drawable.x = self:getX()
@@ -16,9 +17,20 @@ ShortGraphicalNote.update = function(self)
 end
 
 ShortGraphicalNote.computeVisualTime = function(self)
-	self.startNoteData.timePoint:computeVisualTime(self.noteDrawer.currentTimePoint)
-	
-	self.dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	return self.startNoteData.timePoint:computeVisualTime(self.noteDrawer.currentTimePoint)
+end
+
+ShortGraphicalNote.computeTimeState = function(self)
+	self.timeState = self.timeState or {}
+	local timeState = self.timeState
+
+	timeState.currentTime = self.graphicEngine.currentTime
+	timeState.absoluteTime = self.startNoteData.timePoint.absoluteTime
+	timeState.currentVisualTime = self.startNoteData.timePoint.currentVisualTime
+
+	timeState.absoluteDeltaTime = self.graphicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
+	timeState.visualDeltaTime = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
+	timeState.scaledVisualDeltaTime = timeState.visualDeltaTime * self.noteSkin:getVisualTimeRate()
 end
 
 ShortGraphicalNote.activate = function(self)
@@ -61,27 +73,25 @@ ShortGraphicalNote.getContainer = function(self)
 end
 
 ShortGraphicalNote.getHeadWidth = function(self)
-	return self.noteSkin:getG(0, self.dt, self, "Head", "w")
+	return self.noteSkin:getG(self, "Head", "w", self.timeState)
 end
 
 ShortGraphicalNote.getHeadHeight = function(self)
-	return self.noteSkin:getG(0, self.dt, self, "Head", "h")
+	return self.noteSkin:getG(self, "Head", "h", self.timeState)
 end
 
 ShortGraphicalNote.getX = function(self)
-	local dt = self.dt
 	return
-		  self.noteSkin:getG(0, dt, self, "Head", "x")
-		+ self.noteSkin:getG(0, dt, self, "Head", "w")
-		* self.noteSkin:getG(0, dt, self, "Head", "ox")
+		  self.noteSkin:getG(self, "Head", "x", self.timeState)
+		+ self.noteSkin:getG(self, "Head", "w", self.timeState)
+		* self.noteSkin:getG(self, "Head", "ox", self.timeState)
 end
 
 ShortGraphicalNote.getY = function(self)
-	local dt = self.dt
 	return
-		  self.noteSkin:getG(0, dt, self, "Head", "y")
-		+ self.noteSkin:getG(0, dt, self, "Head", "h")
-		* self.noteSkin:getG(0, dt, self, "Head", "oy")
+		  self.noteSkin:getG(self, "Head", "y", self.timeState)
+		+ self.noteSkin:getG(self, "Head", "h", self.timeState)
+		* self.noteSkin:getG(self, "Head", "oy", self.timeState)
 end
 
 ShortGraphicalNote.getScaleX = function(self)
@@ -97,7 +107,7 @@ ShortGraphicalNote.getScaleY = function(self)
 end
 
 ShortGraphicalNote.whereWillDraw = function(self)
-	return self.noteSkin:whereWillDraw(self, self.dt)
+	return self.noteSkin:whereWillDraw(self.timeState.scaledVisualDeltaTime)
 end
 
 return ShortGraphicalNote
