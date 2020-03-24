@@ -604,7 +604,7 @@ TomlNoteSkinLoader.addVideoNote = function(self, input, layer)
 
 	videoNote.Head = {}
 	local head = videoNote.Head
-	head.cs = 1
+	head.cs = 2
 	head.layer = layer
 	head.sb = {}
 	head.gc = {
