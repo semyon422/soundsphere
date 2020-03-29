@@ -10,16 +10,12 @@ NoteSkinLoader.data = {}
 NoteSkinLoader.path = "userdata/skins"
 
 NoteSkinLoader.load = function(self, metaData)
-	if not metaData then
-		return self:loadEmptySkin()
-	elseif metaData.type == "toml:simple-v1" then
-		return self:loadTomlSimpleV1(metaData)
-	elseif metaData.type == "toml:simple-v2" then
+	if metaData.type == "toml:simple-v2" then
 		return self:loadTomlSimpleLatest(metaData)
-	elseif metaData.type == "json:full-v2" then
+	elseif metaData.type == "json:full-v3" then
 		return self:loadJsonFullLatest(metaData)
-	elseif metaData.type == "json:full-v1" or metaData.type == "json:full" then
-		return self:loadJsonFullV1(metaData)
+	else
+		return self:loadEmptySkin()
 	end
 end
 
@@ -28,6 +24,7 @@ NoteSkinLoader.loadEmptySkin = function(self)
 
 	noteSkin.noteSkinData = {cses = {}}
 	noteSkin.playField = {}
+	noteSkin.env = {}
 
 	noteSkin:load()
 
@@ -42,6 +39,18 @@ NoteSkinLoader.loadTomlSimpleLatest = function(self, metaData)
 	return TomlNoteSkinLoader:new():load(metaData)
 end
 
+local safeload = function(chunk, env)
+	if chunk:byte(1) == 27 then
+		error("bytecode is not allowed")
+	end
+	local f, message = loadstring(chunk)
+	if not f then
+		error(message)
+	end
+	setfenv(f, env)
+	return f
+end
+
 NoteSkinLoader.loadJsonFullLatest = function(self, metaData)
 	local noteSkin = NoteSkin:new()
 	noteSkin.metaData = metaData
@@ -54,34 +63,13 @@ NoteSkinLoader.loadJsonFullLatest = function(self, metaData)
 	noteSkin.playField = json.decode(file:read("*all"))
 	file:close()
 
+	local file = io.open(metaData.directoryPath .. "/" .. noteSkin.noteSkinData.env, "r")
+	noteSkin.env = {}
+	noteSkin.env.math = math
+	safeload(file:read("*all"), noteSkin.env)()
+	file:close()
+
 	noteSkin:load()
-
-	return noteSkin
-end
-
-NoteSkinLoader.loadJsonFullV1 = function(self, metaData)
-	local noteSkin = self:loadJsonFullLatest(metaData)
-	
-	for _, note in pairs(noteSkin.data) do
-		local head = note["Head"]
-		for _, part in pairs(note) do
-			part.cs = part.cs or head.cs
-			part.layer = part.layer or head.layer
-			part.image = part.image or head.image
-			
-			part.sb = {}
-
-			part.gc = {}
-			local gc = part.gc
-
-			gc.x = {part.x or head.x, -(part.fx or head.fx)}
-			gc.y = {part.y or head.y, -(part.fy or head.fy)}
-			gc.w = {part.w or head.w}
-			gc.h = {part.h or head.h}
-			gc.ox = {part.ox or head.ox}
-			gc.oy = {part.oy or head.oy}
-		end
-	end
 
 	return noteSkin
 end

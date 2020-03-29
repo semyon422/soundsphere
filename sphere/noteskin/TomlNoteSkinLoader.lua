@@ -28,7 +28,7 @@ TomlNoteSkinLoader.load = function(self, metaData, version)
 	self.noteSkin.noteSkinData = {}
 
 	self:addCS()
-	self:addFunctions()
+	self:addEnv()
 
 	self:processNoteSkinData()
 	self:addMeasureLine()
@@ -43,20 +43,14 @@ TomlNoteSkinLoader.load = function(self, metaData, version)
 	return noteSkin
 end
 
-TomlNoteSkinLoader.addFunctions = function(self)
-	self.noteSkin.noteSkinData.functions = {}
-	self.noteSkin.noteSkinData.functions[1] = {
-		name = "number",
-		chunk = "return function(_, n) return n end"
-	}
-	self.noteSkin.noteSkinData.functions[2] = {
-		name = "linear",
-		chunk = [[
-			return function(timeState, data)
-				return data[1] + data[2] * (timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
-			end
-		]]
-	}
+TomlNoteSkinLoader.addEnv = function(self)
+	self.noteSkin.env = {}
+	local env = self.noteSkin.env
+
+	env.number = function(_, n) return n end
+	env.linear = function(timeState, data)
+		return data[1] + data[2] * (timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
+	end
 end
 
 TomlNoteSkinLoader.processNoteSkinData = function(self)

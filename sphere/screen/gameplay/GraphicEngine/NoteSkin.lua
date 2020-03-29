@@ -47,9 +47,6 @@ NoteSkin.load = function(self)
 	self.images = {}
 	self:loadImages()
 	
-	self.functions = {}
-	self:loadFunctions()
-	
 	self.containers = {}
 	self:loadContainers()
 end
@@ -66,33 +63,6 @@ NoteSkin.loadImages = function(self)
 	
 	for _, imageData in pairs(self.noteSkinData.images) do
 		self:loadImage(imageData)
-	end
-end
-
-local env = {
-	math = math
-}
-
-local safeload = function(chunk)
-	if chunk:byte(1) == 27 then
-		error("bytecode is not allowed")
-	end
-	local f, message = loadstring(chunk)
-	if not f then
-		error(message)
-	end
-	setfenv(f, env)
-	return f
-end
-
-NoteSkin.loadFunctions = function(self)
-	if not self.noteSkinData.functions then
-		return
-	end
-	
-	local functions = self.functions
-	for _, fn in pairs(self.noteSkinData.functions) do
-		functions[fn.name] = safeload(fn.chunk)()
 	end
 end
 
@@ -169,7 +139,7 @@ end
 NoteSkin.getG = function(self, note, part, name, timeState)
 	local seq = self.data[note.id][part].gc[name]
 
-	return self.functions[seq[1]](timeState, seq[2])
+	return self.env[seq[1]](timeState, seq[2])
 end
 
 NoteSkin.whereWillDraw = function(self, note, part, time)
