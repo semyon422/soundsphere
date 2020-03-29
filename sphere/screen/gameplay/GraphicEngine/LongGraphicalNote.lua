@@ -322,8 +322,8 @@ LongGraphicalNote.getBodyScaleY = function(self)
 end
 
 LongGraphicalNote.whereWillDraw = function(self)
-	local wwdStart = self.noteSkin:whereWillDraw(self.startTimeState.scaledVisualDeltaTime)
-	local wwdEnd = self.noteSkin:whereWillDraw(self.endTimeState.scaledVisualDeltaTime)
+	local wwdStart = self.noteSkin:whereWillDraw(self, "Head", self.startTimeState.scaledVisualDeltaTime)
+	local wwdEnd = self.noteSkin:whereWillDraw(self, "Tail", self.endTimeState.scaledVisualDeltaTime)
 
 	if wwdStart == wwdEnd then
 		return wwdStart

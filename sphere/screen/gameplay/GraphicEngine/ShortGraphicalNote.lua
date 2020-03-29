@@ -107,7 +107,7 @@ ShortGraphicalNote.getScaleY = function(self)
 end
 
 ShortGraphicalNote.whereWillDraw = function(self)
-	return self.noteSkin:whereWillDraw(self.timeState.scaledVisualDeltaTime)
+	return self.noteSkin:whereWillDraw(self, "Head", self.timeState.scaledVisualDeltaTime)
 end
 
 return ShortGraphicalNote

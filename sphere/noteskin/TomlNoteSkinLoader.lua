@@ -193,6 +193,7 @@ TomlNoteSkinLoader.addShortNote = function(self, input, i)
 		ox = {"number", 0},
 		oy = {"number", -1}
 	}
+	head.drawInterval = {-1, 1}
 end
 
 TomlNoteSkinLoader.addLongNote = function(self, input, i)
@@ -221,6 +222,7 @@ TomlNoteSkinLoader.addLongNote = function(self, input, i)
 		ox = {"number", 0},
 		oy = {"number", -1}
 	}
+	head.drawInterval = {-1, 1}
 
 	longNote.Body = {}
 	local body = longNote.Body
@@ -249,6 +251,7 @@ TomlNoteSkinLoader.addLongNote = function(self, input, i)
 		ox = {"number", 0},
 		oy = {"number", -1}
 	}
+	tail.drawInterval = {-1, 1}
 end
 
 TomlNoteSkinLoader.addPlayFieldKey = function(self, input, i)
@@ -339,6 +342,7 @@ TomlNoteSkinLoader.addMeasureLine = function(self)
 		ox = {"number", 0},
 		oy = {"number", 0}
 	}
+	head.drawInterval = {-1, 1}
 
 	longNote.Body = {}
 	local body = longNote.Body
@@ -367,6 +371,7 @@ TomlNoteSkinLoader.addMeasureLine = function(self)
 		ox = {"number", 0},
 		oy = {"number", 0}
 	}
+	tail.drawInterval = {-1, 1}
 end
 
 TomlNoteSkinLoader.processPlayFieldData = function(self)

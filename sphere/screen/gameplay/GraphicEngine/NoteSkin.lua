@@ -158,10 +158,6 @@ NoteSkin.getVisualTimeRate = function(self)
 	return self.visualTimeRate
 end
 
--- NoteSkin.getVisualTimeRateSign = function(self)
--- 	return sign(self.visualTimeRate)
--- end
-
 NoteSkin.getCS = function(self, note)
 	return self.cses[self.data[note.id]["Head"].cs]
 end
@@ -176,13 +172,13 @@ NoteSkin.getG = function(self, note, part, name, timeState)
 	return self.functions[seq[1]](timeState, seq[2])
 end
 
-NoteSkin.whereWillDraw = function(self, time)
-	local a, b = -1, 1
+NoteSkin.whereWillDraw = function(self, note, part, time)
+	local drawInterval = self.data[note.id][part].drawInterval
 	
-	if time > b then
-		return -1
-	elseif time < a then
+	if -time > drawInterval[2] then
 		return 1
+	elseif -time < drawInterval[1] then
+		return -1
 	else
 		return 0
 	end
