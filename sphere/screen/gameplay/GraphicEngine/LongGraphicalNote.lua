@@ -64,6 +64,9 @@ LongGraphicalNote.computeTimeState = function(self)
 	endTimeState.absoluteDeltaTime = self.graphicEngine.currentTime - self.endNoteData.timePoint.absoluteTime
 	endTimeState.visualDeltaTime = self.graphicEngine.currentTime - self.endNoteData.timePoint.currentVisualTime
 	endTimeState.scaledVisualDeltaTime = endTimeState.visualDeltaTime * self.noteSkin:getVisualTimeRate()
+
+	endTimeState.startTimeState = startTimeState
+	startTimeState.endTimeState = endTimeState
 end
 
 LongGraphicalNote.updateFakeStartTime = function(self)
