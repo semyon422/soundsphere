@@ -143,6 +143,7 @@ GameplayScreen.unload = function(self)
 	self.logicEngine:unload()
 	self.graphicEngine:unload()
 	self.gui:unload()
+	self.audioEngine:unload()
 	
 	InputManager.observable:remove(self.logicEngine)
 end
