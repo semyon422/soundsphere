@@ -1,8 +1,5 @@
 local Class					= require("aqua.util.Class")
-local ShortGraphicalNote	= require("sphere.screen.gameplay.GraphicEngine.ShortGraphicalNote")
-local LongGraphicalNote		= require("sphere.screen.gameplay.GraphicEngine.LongGraphicalNote")
-local ImageNote				= require("sphere.screen.gameplay.GraphicEngine.ImageNote")
-local VideoNote				= require("sphere.screen.gameplay.GraphicEngine.VideoNote")
+local GraphicalNoteFactory	= require("sphere.screen.gameplay.GraphicEngine.GraphicalNoteFactory")
 local FileManager			= require("sphere.filesystem.FileManager")
 
 local NoteDrawer = Class:new()
@@ -11,58 +8,14 @@ NoteDrawer.load = function(self)
 	self.noteData = {}
 	
 	self.layerData = self.graphicEngine.noteChart:requireLayerData(self.layerIndex)
-	local inputModeString = self.layerData.layerDataSequence.noteChart.inputMode:getString()
+	-- local inputModeString = self.layerData.layerDataSequence.noteChart.inputMode:getString()
 	
 	for noteDataIndex = 1, self.layerData:getNoteDataCount() do
 		local noteData = self.layerData:getNoteData(noteDataIndex)
 		
 		if noteData.inputType == self.inputType and noteData.inputIndex == self.inputIndex then
-			local graphicalNote
-			if noteData.noteType == "ShortNote" then
-				graphicalNote = ShortGraphicalNote:new({
-					startNoteData = noteData,
-					inputModeString = inputModeString,
-					noteType = "ShortNote"
-				})
-			elseif noteData.noteType == "LongNoteStart" then
-				graphicalNote = LongGraphicalNote:new({
-					startNoteData = noteData,
-					endNoteData = noteData.endNoteData,
-					inputModeString = inputModeString,
-					noteType = "LongNote"
-				})
-			elseif noteData.noteType == "LineNoteStart" then
-				graphicalNote = LongGraphicalNote:new({
-					startNoteData = noteData,
-					endNoteData = noteData.endNoteData,
-					inputModeString = inputModeString,
-					noteType = "LongNote"
-				})
-			elseif noteData.noteType == "SoundNote" then
-				graphicalNote = ShortGraphicalNote:new({
-					startNoteData = noteData,
-					noteType = "SoundNote"
-				})
-			elseif noteData.noteType == "ImageNote" then
-				local fileType
-				local images = noteData.images[1] and noteData.images[1][1]
-				if images then
-					fileType = FileManager:getType(images)
-				end
-				if fileType == "image" then
-					graphicalNote = ImageNote:new({
-						startNoteData = noteData,
-						images = noteData.images,
-						noteType = "ImageNote"
-					})
-				elseif fileType == "video" then
-					graphicalNote = VideoNote:new({
-						startNoteData = noteData,
-						images = noteData.images,
-						noteType = "VideoNote"
-					})
-				end
-			end
+			local graphicalNote = GraphicalNoteFactory:getNote(noteData)
+			
 			if graphicalNote then
 				graphicalNote.noteDrawer = self
 				graphicalNote.graphicEngine = self.graphicEngine

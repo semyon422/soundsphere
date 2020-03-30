@@ -31,4 +31,6 @@ LogicalNote.update = function(self)
 	return self.score:processNote(self)
 end
 
+LogicalNote.receive = function(self, event) end
+
 return LogicalNote
