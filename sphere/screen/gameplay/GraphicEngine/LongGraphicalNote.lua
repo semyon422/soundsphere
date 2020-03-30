@@ -25,10 +25,9 @@ LongGraphicalNote.update = function(self)
 		self.tailDrawable:reload()
 		self.bodyDrawable:reload()
 		
-		local color = self:getColor()
-		self.headDrawable.color = color
-		self.tailDrawable.color = color
-		self.bodyDrawable.color = color
+		self.headDrawable.color = self:getHeadColor()
+		self.tailDrawable.color = self:getTailColor()
+		self.bodyDrawable.color = self:getBodyColor()
 	end
 end
 
@@ -154,26 +153,18 @@ end
 LongGraphicalNote.getColor = function(self)
 	local logicalNote = self.logicalNote
 	
-	local color = self.noteSkin.color
-	if self.fakeStartTime and self.fakeStartTime >= self.endNoteData.timePoint.absoluteTime then
-		return color.transparent
-	elseif logicalNote.state == "clear" then
-		return color.clear
-	elseif logicalNote.state == "startMissed" then
-		return color.startMissed
-	elseif logicalNote.state == "startMissedPressed" then
-		return color.startMissedPressed
-	elseif logicalNote.state == "startPassedPressed" then
-		return color.startPassedPressed
-	elseif logicalNote.state == "endPassed" then
-		return color.endPassed
-	elseif logicalNote.state == "endMissed" then
-		return color.endMissed
-	elseif logicalNote.state == "endMissedPassed" then
-		return color.endMissedPassed
-	end
+end
 
-	return color.clear
+LongGraphicalNote.getHeadColor = function(self)
+	return self.noteSkin:getG(self, "Head", "color", self.startTimeState)
+end
+
+LongGraphicalNote.getTailColor = function(self)
+	return self.noteSkin:getG(self, "Tail", "color", self.startTimeState)
+end
+
+LongGraphicalNote.getBodyColor = function(self)
+	return self.noteSkin:getG(self, "Body", "color", self.startTimeState)
 end
 
 LongGraphicalNote.getHeadLayer = function(self)

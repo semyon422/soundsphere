@@ -54,14 +54,7 @@ ShortGraphicalNote.reload = function(self)
 end
 
 ShortGraphicalNote.getColor = function(self)
-	local color = self.noteSkin.color
-	if self.logicalNote.state == "clear" or self.logicalNote.state == "skipped" then
-		return color.clear
-	elseif self.logicalNote.state == "missed" then
-		return color.missed
-	elseif self.logicalNote.state == "passed" then
-		return color.passed
-	end
+	return self.noteSkin:getG(self, "Head", "color", self.timeState)
 end
 
 ShortGraphicalNote.getDrawable = function(self)

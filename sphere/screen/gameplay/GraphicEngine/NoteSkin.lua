@@ -10,19 +10,6 @@ local tween				= require("tween")
 
 local NoteSkin = Class:new()
 
-NoteSkin.color = {
-	transparent = {255, 255, 255, 0},
-	clear = {255, 255, 255, 255},
-	missed = {127, 127, 127, 255},
-	passed = {255, 255, 255, 0},
-	startMissed = {127, 127, 127, 255},
-	startMissedPressed = {191, 191, 191, 255},
-	startPassedPressed = {255, 255, 255, 255},
-	endPassed = {255, 255, 255, 0},
-	endMissed = {127, 127, 127, 255},
-	endMissedPassed = {127, 127, 127, 255}
-}
-
 NoteSkin.visualTimeRate = 1
 NoteSkin.targetVisualTimeRate = 1
 NoteSkin.timeRate = 1
@@ -139,7 +126,7 @@ end
 NoteSkin.getG = function(self, note, part, name, timeState)
 	local seq = self.data[note.id][part].gc[name]
 
-	return self.env[seq[1]](timeState, seq[2])
+	return self.env[seq[1]](timeState, note.logicalNote.state, seq[2])
 end
 
 NoteSkin.whereWillDraw = function(self, note, part, time)
@@ -170,6 +157,7 @@ NoteSkin.getNoteImage = function(self, note, part)
 	return self.images[self.data[note.id][part].image]
 end
 
+local clear = {255, 255, 255, 255}
 NoteSkin.getImageDrawable = function(self, note, part)
 	return Image:new({
 		cs = self:getCS(note),
@@ -179,7 +167,7 @@ NoteSkin.getImageDrawable = function(self, note, part)
 		sy = 0,
 		image = self:getNoteImage(note, part),
 		layer = self:getNoteLayer(note, part),
-		color = self.color.clear
+		color = clear
 	})
 end
 
