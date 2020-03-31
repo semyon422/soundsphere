@@ -98,40 +98,25 @@ NoteDrawer.update = function(self)
 	end
 	
 	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
-		note = self.noteData[currentNoteIndex]
-		if note.activated then
-			note:update()
-		end
+		self.noteData[currentNoteIndex]:update()
 	end
 end
 
 NoteDrawer.unload = function(self)
-	local note
 	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
-		note = self.noteData[currentNoteIndex]
-		if note.activated then
-			note:deactivate()
-		end
+		self.noteData[currentNoteIndex]:deactivate()
 	end
 end
 
 NoteDrawer.reload = function(self)
-	local note
 	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
-		note = self.noteData[currentNoteIndex]
-		if note.activated then
-			note:reload()
-		end
+		self.noteData[currentNoteIndex]:reload()
 	end
 end
 
 NoteDrawer.receive = function(self, event)
-	local note
 	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
-		note = self.noteData[currentNoteIndex]
-		if note.activated then
-			note:receive(event)
-		end
+		self.noteData[currentNoteIndex]:receive(event)
 	end
 end
 
