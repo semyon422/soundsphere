@@ -17,7 +17,8 @@ LogicalNoteFactory.getNote = function(self, noteData)
 	else
 		return ShortLogicalNote:new({
 			noteData = noteData,
-			noteType = "SoundNote"
+			noteType = "ShortNote",
+			autoplay = true
 		})
 	end
 end

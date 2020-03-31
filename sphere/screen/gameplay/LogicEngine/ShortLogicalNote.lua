@@ -17,11 +17,11 @@ ShortLogicalNote.process = function(self)
 	local deltaTime = self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
 	local timeState = self.score:getTimeState(deltaTime)
 	
-	-- if not self.autoplay then
-	-- 	self:processTimeState(timeState)
-	-- else
+	if not self.autoplay then
+		self:processTimeState(timeState)
+	else
 		self:processAuto()
-	-- end
+	end
 	-- self:processShortNoteState(note.state)
 	
 	-- if note.ended then

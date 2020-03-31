@@ -18,11 +18,11 @@ LongLogicalNote.process = function(self)
 	local endTimeState = self.score:getTimeState(deltaEndTime)
 	
 	-- local oldState = note.state
-	-- if not self.autoplay then
-	-- 	self:processTimeState(startTimeState, endTimeState)
-	-- else
+	if not self.autoplay then
+		self:processTimeState(startTimeState, endTimeState)
+	else
 		self:processAuto()
-	-- end
+	end
 
 	-- self:processLongNoteState(note.state, oldState)
 	
