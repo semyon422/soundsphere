@@ -4,6 +4,13 @@ local video			= require("aqua.video")
 
 local VideoNote = GraphicalNote:new()
 
+VideoNote.construct = function(self)
+	self.startNoteData = self.noteData
+	self.noteData = nil
+	
+	self.images = self.startNoteData.images
+end
+
 VideoNote.timeRate = 0
 
 VideoNote.update = function(self)

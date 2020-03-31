@@ -2,6 +2,12 @@ local GraphicalNote = require("sphere.screen.gameplay.GraphicEngine.GraphicalNot
 
 local LongGraphicalNote = GraphicalNote:new()
 
+LongGraphicalNote.construct = function(self)
+	self.startNoteData = self.noteData
+	self.endNoteData = self.noteData.endNoteData
+	self.noteData = nil
+end
+
 LongGraphicalNote.update = function(self)
 	self:computeVisualTime()
 	self:computeTimeState()
@@ -50,7 +56,7 @@ LongGraphicalNote.computeTimeState = function(self)
 	startTimeState.visualDeltaTime = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	startTimeState.scaledVisualDeltaTime = startTimeState.visualDeltaTime * self.noteSkin:getVisualTimeRate()
 	
-	startTimeState.fakeVisualStartTime = self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime
+	startTimeState.fakeCurrentVisualTime = self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime
 	startTimeState.fakeVisualDeltaTime = self.graphicEngine.currentTime - (self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime)
 	startTimeState.scaledFakeVisualDeltaTime = startTimeState.fakeVisualDeltaTime * self.noteSkin:getVisualTimeRate()
 

@@ -4,22 +4,15 @@ local LongLogicalNote	= require("sphere.screen.gameplay.LogicEngine.LongLogicalN
 local LogicalNoteFactory = {}
 
 LogicalNoteFactory.getNote = function(self, noteData)
+	local logicalNote = {noteData = noteData}
+
 	if noteData.noteType == "ShortNote" then
-		return ShortLogicalNote:new({
-			noteData = noteData,
-			noteType = "ShortNote"
-		})
+		return ShortLogicalNote:new(logicalNote)
 	elseif noteData.noteType == "LongNoteStart" then
-		return LongLogicalNote:new({
-			noteData = noteData,
-			noteType = "LongNote"
-		})
+		return LongLogicalNote:new(logicalNote)
 	else
-		return ShortLogicalNote:new({
-			noteData = noteData,
-			noteType = "ShortNote",
-			autoplay = true
-		})
+		logicalNote.autoplay = true
+		return ShortLogicalNote:new(logicalNote)
 	end
 end
 

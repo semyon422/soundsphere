@@ -4,6 +4,13 @@ local GraphicalNote = require("sphere.screen.gameplay.GraphicEngine.GraphicalNot
 
 local ImageNote = GraphicalNote:new()
 
+ImageNote.construct = function(self)
+	self.startNoteData = self.noteData
+	self.noteData = nil
+	
+	self.images = self.startNoteData.images
+end
+
 ImageNote.update = function(self)
 	if not self:tryNext() then
 		self.drawable.x = self:getX()

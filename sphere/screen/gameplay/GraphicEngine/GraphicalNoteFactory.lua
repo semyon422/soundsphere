@@ -1,3 +1,4 @@
+local FileManager			= require("sphere.filesystem.FileManager")
 local ShortGraphicalNote	= require("sphere.screen.gameplay.GraphicEngine.ShortGraphicalNote")
 local LongGraphicalNote		= require("sphere.screen.gameplay.GraphicEngine.LongGraphicalNote")
 local ImageNote				= require("sphere.screen.gameplay.GraphicEngine.ImageNote")
@@ -6,31 +7,20 @@ local VideoNote				= require("sphere.screen.gameplay.GraphicEngine.VideoNote")
 local GraphicalNoteFactory = {}
 
 GraphicalNoteFactory.getNote = function(self, noteData)
+	local graphicalNote = {noteData = noteData}
+
 	if noteData.noteType == "ShortNote" then
-		return ShortGraphicalNote:new({
-			startNoteData = noteData,
-			-- inputModeString = inputModeString,
-			noteType = "ShortNote"
-		})
+		graphicalNote.noteType = "ShortNote"
+		return ShortGraphicalNote:new(graphicalNote)
 	elseif noteData.noteType == "LongNoteStart" then
-		return LongGraphicalNote:new({
-			startNoteData = noteData,
-			endNoteData = noteData.endNoteData,
-			-- inputModeString = inputModeString,
-			noteType = "LongNote"
-		})
+		graphicalNote.noteType = "LongNote"
+		return LongGraphicalNote:new(graphicalNote)
 	elseif noteData.noteType == "LineNoteStart" then
-		return LongGraphicalNote:new({
-			startNoteData = noteData,
-			endNoteData = noteData.endNoteData,
-			-- inputModeString = inputModeString,
-			noteType = "LongNote"
-		})
+		graphicalNote.noteType = "LongNote"
+		return LongGraphicalNote:new(graphicalNote)
 	elseif noteData.noteType == "SoundNote" then
-		return ShortGraphicalNote:new({
-			startNoteData = noteData,
-			noteType = "SoundNote"
-		})
+		graphicalNote.noteType = "SoundNote"
+		return ShortGraphicalNote:new(graphicalNote)
 	elseif noteData.noteType == "ImageNote" then
 		local fileType
 		local images = noteData.images[1] and noteData.images[1][1]
@@ -38,17 +28,11 @@ GraphicalNoteFactory.getNote = function(self, noteData)
 			fileType = FileManager:getType(images)
 		end
 		if fileType == "image" then
-			return ImageNote:new({
-				startNoteData = noteData,
-				images = noteData.images,
-				noteType = "ImageNote"
-			})
+			graphicalNote.noteType = "ImageNote"
+			return ImageNote:new(graphicalNote)
 		elseif fileType == "video" then
-			return VideoNote:new({
-				startNoteData = noteData,
-				images = noteData.images,
-				noteType = "VideoNote"
-			})
+			graphicalNote.noteType = "VideoNote"
+			return VideoNote:new(graphicalNote)
 		end
 	end
 end

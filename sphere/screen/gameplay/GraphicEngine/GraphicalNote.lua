@@ -7,7 +7,7 @@ GraphicalNote.init = function(self)
 	self.id = self.inputId .. ":" .. self.noteType
 		
 	self.logicalNote = self.graphicEngine:getLogicalNote(self.startNoteData)
-	self.logicalNote.graphicalNote = self
+	-- self.logicalNote.graphicalNote = self
 end
 
 GraphicalNote.getCS = function(self)

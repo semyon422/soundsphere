@@ -1,6 +1,5 @@
 local Class					= require("aqua.util.Class")
 local GraphicalNoteFactory	= require("sphere.screen.gameplay.GraphicEngine.GraphicalNoteFactory")
-local FileManager			= require("sphere.filesystem.FileManager")
 
 local NoteDrawer = Class:new()
 

@@ -2,6 +2,11 @@ local GraphicalNote = require("sphere.screen.gameplay.GraphicEngine.GraphicalNot
 
 local ShortGraphicalNote = GraphicalNote:new()
 
+ShortGraphicalNote.construct = function(self)
+	self.startNoteData = self.noteData
+	self.noteData = nil
+end
+
 ShortGraphicalNote.update = function(self)
 	self:computeVisualTime()
 	self:computeTimeState()
