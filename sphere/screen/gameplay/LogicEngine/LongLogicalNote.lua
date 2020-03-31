@@ -18,7 +18,12 @@ LongLogicalNote.process = function(self)
 	local endTimeState = self.score:getTimeState(deltaEndTime)
 	
 	-- local oldState = note.state
-	self:processTimeState(startTimeState, endTimeState)
+	-- if not self.autoplay then
+	-- 	self:processTimeState(startTimeState, endTimeState)
+	-- else
+		self:processAuto()
+	-- end
+
 	-- self:processLongNoteState(note.state, oldState)
 	
 	-- if note.started and not note.judged then
@@ -78,6 +83,55 @@ LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
 	local nextNote = self:getNext()
 	if nextNote and self.state == "startMissed" and nextNote:isReachable() then
 		return self:next()
+	end
+end
+
+LongLogicalNote.processAuto = function(self)
+	local deltaStartTime = self.startNoteData.timePoint.absoluteTime - self.logicEngine.currentTime
+	local deltaEndTime = self.endNoteData.timePoint.absoluteTime - self.logicEngine.currentTime
+	
+	local nextNote = self:getNext()
+	if deltaStartTime <= 0 and not self.keyState then
+		local layer
+		-- if note.noteType ~= "SoundNote" then
+			layer = "foreground"
+		-- else
+		-- 	layer = "background"
+		-- end
+		self.noteHandler:send({
+			name = "KeyState",
+			state = true,
+			note = self,
+			layer = layer
+		})
+		
+		self.keyState = true
+		
+		self:processTimeState("exactly", "none")
+		-- note.score:processLongNoteState("startPassedPressed", "clear")
+		
+		-- if note.started and not note.judged then
+		-- 	note.score:hit(0, note.startNoteData.timePoint.absoluteTime)
+		-- 	note.judged = true
+		-- end
+	elseif deltaEndTime <= 0 and self.keyState or nextNote and nextNote:isHere() then
+		local layer
+		-- if note.noteType ~= "SoundNote" then
+			layer = "foreground"
+		-- else
+		-- 	layer = "background"
+		-- end
+		self.noteHandler:send({
+			name = "KeyState",
+			state = false,
+			note = self,
+			layer = layer
+		})
+		
+		self.keyState = false
+		
+		self:processTimeState("none", "exactly")
+		-- note.score:processLongNoteState("endPassed", "startPassedPressed")
 	end
 end
 

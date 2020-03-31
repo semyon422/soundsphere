@@ -10,10 +10,18 @@ ShortLogicalNote.construct = function(self)
 end
 
 ShortLogicalNote.process = function(self)
+	if self.ended then
+		return
+	end
+
 	local deltaTime = self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
 	local timeState = self.score:getTimeState(deltaTime)
 	
-	self:processTimeState(timeState)
+	-- if not self.autoplay then
+	-- 	self:processTimeState(timeState)
+	-- else
+		self:processAuto()
+	-- end
 	-- self:processShortNoteState(note.state)
 	
 	-- if note.ended then
@@ -33,6 +41,33 @@ ShortLogicalNote.processTimeState = function(self, timeState)
 	elseif self.keyState and timeState == "exactly" then
 		self.state = "passed"
 		return self:next()
+	end
+end
+
+ShortLogicalNote.processAuto = function(self)
+	local deltaTime = self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
+	if deltaTime >= 0 then
+		local layer
+		-- if note.noteType ~= "SoundNote" then
+			layer = "foreground"
+		-- else
+		-- 	layer = "background"
+		-- -- end
+		self.noteHandler:send({
+			name = "KeyState",
+			state = true,
+			note = self,
+			layer = layer
+		})
+		
+		self.keyState = true
+		
+		self:processTimeState("exactly")
+		-- note.score:processShortNoteState(note.state)
+		
+		-- if note.ended then
+		-- 	note.score:hit(0, note.startNoteData.timePoint.absoluteTime)
+		-- end
 	end
 end
 

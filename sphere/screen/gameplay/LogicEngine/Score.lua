@@ -1,6 +1,5 @@
 local Class			= require("aqua.util.Class")
 local Observable	= require("aqua.util.Observable")
-local Autoplay		= require("sphere.screen.gameplay.LogicEngine.Autoplay")
 
 local Score = Class:new()
 
@@ -48,20 +47,6 @@ Score.needAutoplay = function(self, note)
 		note.noteType == "SoundNote" or
 		note.startNoteData.autoplay or
 		note.autoplay
-end
-
-Score.processNote = function(self, note)
-	if note.ended then
-		return
-	end
-	
-	if self:needAutoplay(note) then
-		return Autoplay:processNote(note)
-	elseif note.noteType == "ShortNote" then
-		return self:processShortNote(note)
-	elseif note.noteType == "LongNote" then
-		return self:processLongNote(note)
-	end
 end
 
 return Score
