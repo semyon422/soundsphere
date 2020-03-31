@@ -50,6 +50,7 @@ LongGraphicalNote.computeTimeState = function(self)
 	startTimeState.visualDeltaTime = self.graphicEngine.currentTime - self.startNoteData.timePoint.currentVisualTime
 	startTimeState.scaledVisualDeltaTime = startTimeState.visualDeltaTime * self.noteSkin:getVisualTimeRate()
 	
+	startTimeState.fakeVisualStartTime = self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime
 	startTimeState.fakeVisualDeltaTime = self.graphicEngine.currentTime - (self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime)
 	startTimeState.scaledFakeVisualDeltaTime = startTimeState.fakeVisualDeltaTime * self.noteSkin:getVisualTimeRate()
 

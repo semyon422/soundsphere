@@ -11,7 +11,23 @@ LongLogicalNote.construct = function(self)
 	self.releaseSounds = self.endNoteData.sounds
 end
 
-LongLogicalNote.process = function(self, startTimeState, endTimeState)
+LongLogicalNote.process = function(self)
+	local deltaStartTime = self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
+	local deltaEndTime = self.logicEngine.currentTime - self.endNoteData.timePoint.absoluteTime
+	local startTimeState = self.score:getTimeState(deltaStartTime)
+	local endTimeState = self.score:getTimeState(deltaEndTime)
+	
+	-- local oldState = note.state
+	self:processTimeState(startTimeState, endTimeState)
+	-- self:processLongNoteState(note.state, oldState)
+	
+	-- if note.started and not note.judged then
+	-- 	self:hit(deltaStartTime, note.startNoteData.timePoint.absoluteTime)
+	-- 	note.judged = true
+	-- end
+end
+
+LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
 	if self.keyState and startTimeState == "none" then
 		self.keyState = false
 	elseif self.state == "clear" then
@@ -56,6 +72,34 @@ LongLogicalNote.process = function(self, startTimeState, endTimeState)
 		elseif endTimeState == "late" then
 			self.state = "endMissed"
 			return self:next()
+		end
+	end
+	
+	local nextNote = self:getNext()
+	if nextNote and self.state == "startMissed" and nextNote:isReachable() then
+		return self:next()
+	end
+end
+
+LongLogicalNote.receive = function(self, event)
+	local key = event.args and event.args[1]
+	if key == self.noteHandler.keyBind then
+		if event.name == "keypressed" then
+			self.keyState = true
+			return self.noteHandler:send({
+				name = "KeyState",
+				state = true,
+				note = self,
+				layer = "foreground"
+			})
+		elseif event.name == "keyreleased" then
+			self.keyState = false
+			return self.noteHandler:send({
+				name = "KeyState",
+				state = false,
+				note = self,
+				layer = "foreground"
+			})
 		end
 	end
 end

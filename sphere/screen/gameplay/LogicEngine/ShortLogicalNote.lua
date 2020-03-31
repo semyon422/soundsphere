@@ -9,7 +9,19 @@ ShortLogicalNote.construct = function(self)
 	self.pressSounds = self.startNoteData.sounds
 end
 
-ShortLogicalNote.process = function(self, timeState)
+ShortLogicalNote.process = function(self)
+	local deltaTime = self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
+	local timeState = self.score:getTimeState(deltaTime)
+	
+	self:processTimeState(timeState)
+	-- self:processShortNoteState(note.state)
+	
+	-- if note.ended then
+	-- 	self:hit(deltaTime, note.startNoteData.timePoint.absoluteTime)
+	-- end
+end
+
+ShortLogicalNote.processTimeState = function(self, timeState)
 	if self.keyState and timeState == "none" then
 		self.keyState = false
 	elseif self.keyState and timeState == "early" then

@@ -28,7 +28,7 @@ LogicalNote.isReachable = function(self)
 end
 
 LogicalNote.update = function(self)
-	return self.score:processNote(self)
+	return self:process()
 end
 
 LogicalNote.receive = function(self, event) end
