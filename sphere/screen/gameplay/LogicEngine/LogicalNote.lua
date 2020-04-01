@@ -33,4 +33,12 @@ end
 
 LogicalNote.receive = function(self, event) end
 
+LogicalNote.sendState = function(self, key)
+	return self.logicEngine:send({
+		name = "LogicalNoteState",
+		note = self,
+		key = "keyState"
+	})
+end
+
 return LogicalNote

@@ -94,20 +94,8 @@ LongLogicalNote.processAuto = function(self)
 	
 	local nextNote = self:getNext()
 	if deltaStartTime <= 0 and not self.keyState then
-		local layer
-		-- if note.noteType ~= "SoundNote" then
-			layer = "foreground"
-		-- else
-		-- 	layer = "background"
-		-- end
-		self.logicEngine:send({
-			name = "KeyState",
-			state = true,
-			note = self,
-			layer = layer
-		})
-		
 		self.keyState = true
+		self:sendState("keyState")
 		
 		self:processTimeState("exactly", "none")
 		-- note.score:processLongNoteState("startPassedPressed", "clear")
@@ -117,20 +105,8 @@ LongLogicalNote.processAuto = function(self)
 		-- 	note.judged = true
 		-- end
 	elseif deltaEndTime <= 0 and self.keyState or nextNote and nextNote:isHere() then
-		local layer
-		-- if note.noteType ~= "SoundNote" then
-			layer = "foreground"
-		-- else
-		-- 	layer = "background"
-		-- end
-		self.logicEngine:send({
-			name = "KeyState",
-			state = false,
-			note = self,
-			layer = layer
-		})
-		
 		self.keyState = false
+		self:sendState("keyState")
 		
 		self:processTimeState("none", "exactly")
 		-- note.score:processLongNoteState("endPassed", "startPassedPressed")
@@ -142,20 +118,10 @@ LongLogicalNote.receive = function(self, event)
 	if key == self.keyBind then
 		if event.name == "keypressed" then
 			self.keyState = true
-			return self.logicEngine:send({
-				name = "KeyState",
-				state = true,
-				note = self,
-				layer = "foreground"
-			})
+			return self:sendState("keyState")
 		elseif event.name == "keyreleased" then
 			self.keyState = false
-			return self.logicEngine:send({
-				name = "KeyState",
-				state = false,
-				note = self,
-				layer = "foreground"
-			})
+			return self:sendState("keyState")
 		end
 	end
 end

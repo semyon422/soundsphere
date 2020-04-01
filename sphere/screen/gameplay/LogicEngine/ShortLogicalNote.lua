@@ -49,20 +49,8 @@ end
 ShortLogicalNote.processAuto = function(self)
 	local deltaTime = self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
 	if deltaTime >= 0 then
-		local layer
-		-- if note.noteType ~= "SoundNote" then
-			layer = "foreground"
-		-- else
-		-- 	layer = "background"
-		-- -- end
-		self.logicEngine:send({
-			name = "KeyState",
-			state = true,
-			note = self,
-			layer = layer
-		})
-		
 		self.keyState = true
+		self:sendState("keyState")
 		
 		self:processTimeState("exactly")
 		-- note.score:processShortNoteState(note.state)
@@ -78,20 +66,10 @@ ShortLogicalNote.receive = function(self, event)
 	if key == self.keyBind then
 		if event.name == "keypressed" then
 			self.keyState = true
-			return self.logicEngine:send({
-				name = "KeyState",
-				state = true,
-				note = self,
-				layer = "foreground"
-			})
+			return self:sendState("keyState")
 		elseif event.name == "keyreleased" then
 			self.keyState = false
-			return self.logicEngine:send({
-				name = "KeyState",
-				state = false,
-				note = self,
-				layer = "foreground"
-			})
+			return self:sendState("keyState")
 		end
 	end
 end

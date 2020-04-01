@@ -29,12 +29,12 @@ AudioEngine.unload = function(self)
 end
 
 AudioEngine.receive = function(self, event)
-	if event.name == "KeyState" then
+	if event.name == "LogicalNoteState" and event.key == "keyState" then
 		local note = event.note
-		if event.state then
-			self:playAudio(note.pressSounds, event.layer, note.startNoteData.keysound, note.startNoteData.stream)
+		if note[event.key] then
+			self:playAudio(note.pressSounds, "foreground", note.startNoteData.keysound, note.startNoteData.stream)
 		else
-			self:playAudio(note.releaseSounds, event.layer, note.startNoteData.keysound, note.startNoteData.stream)
+			self:playAudio(note.releaseSounds, "foreground", note.startNoteData.keysound, note.startNoteData.stream)
 		end
 	elseif event.name == "TimeState" then
 		self.currentTime = event.exactCurrentTime
