@@ -7,19 +7,18 @@ GraphicalNote.init = function(self)
 	self.id = self.inputId .. ":" .. self.noteType
 		
 	self.logicalNote = self.graphicEngine:getLogicalNote(self.startNoteData)
-	-- self.logicalNote.graphicalNote = self
 end
 
 GraphicalNote.getCS = function(self)
-	return self.graphicEngine.noteSkin:getCS(self)
+	return self.noteSkin:getCS(self)
 end
 
 GraphicalNote.getNext = function(self, offset)
-	return self.noteDrawer.noteData[self.index + 1]
+	return self.noteDrawer.noteData[self.index + offset]
 end
 
 GraphicalNote.updateNext = function(self, offset)
-	local nextNote = self.noteDrawer.noteData[self.index + offset]
+	local nextNote = self:getNext(offset)
 	if nextNote and nextNote.activated then
 		return nextNote:update()
 	end

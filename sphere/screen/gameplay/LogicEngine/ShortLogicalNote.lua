@@ -7,6 +7,8 @@ ShortLogicalNote.construct = function(self)
 	self.noteData = nil
 	
 	self.pressSounds = self.startNoteData.sounds
+
+	self.keyBind = self.startNoteData.inputType .. self.startNoteData.inputIndex
 end
 
 ShortLogicalNote.process = function(self)
@@ -53,7 +55,7 @@ ShortLogicalNote.processAuto = function(self)
 		-- else
 		-- 	layer = "background"
 		-- -- end
-		self.noteHandler:send({
+		self.logicEngine:send({
 			name = "KeyState",
 			state = true,
 			note = self,
@@ -73,10 +75,10 @@ end
 
 ShortLogicalNote.receive = function(self, event)
 	local key = event.args and event.args[1]
-	if key == self.noteHandler.keyBind then
+	if key == self.keyBind then
 		if event.name == "keypressed" then
 			self.keyState = true
-			return self.noteHandler:send({
+			return self.logicEngine:send({
 				name = "KeyState",
 				state = true,
 				note = self,
@@ -84,7 +86,7 @@ ShortLogicalNote.receive = function(self, event)
 			})
 		elseif event.name == "keyreleased" then
 			self.keyState = false
-			return self.noteHandler:send({
+			return self.logicEngine:send({
 				name = "KeyState",
 				state = false,
 				note = self,

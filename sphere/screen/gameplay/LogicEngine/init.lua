@@ -24,6 +24,10 @@ LogicEngine.unload = function(self)
 	self:unloadNoteHandlers()
 end
 
+LogicEngine.send = function(self, event)
+	return self.observable:send(event)
+end
+
 LogicEngine.receive = function(self, event)
 	if event.name == "TimeState" then
 		self.currentTime = event.exactCurrentTime

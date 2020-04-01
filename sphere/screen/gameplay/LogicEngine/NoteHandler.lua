@@ -5,8 +5,6 @@ local NoteHandler = Class:new()
 
 NoteHandler.load = function(self)
 	self:loadNoteData()
-	
-	self.keyBind = self.inputType .. self.inputIndex
 end
 
 NoteHandler.unload = function(self) end
@@ -57,10 +55,6 @@ NoteHandler.receive = function(self, event)
 	if not self.currentNote then return end
 	
 	return self.currentNote:receive(event)
-end
-
-NoteHandler.send = function(self, event)
-	return self.logicEngine.observable:send(event)
 end
 
 return NoteHandler
