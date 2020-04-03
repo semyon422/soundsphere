@@ -4,6 +4,7 @@ local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
 local sound				= require("aqua.sound")
 local Config			= require("sphere.config.Config")
+local SoundNoteFactory	= require("sphere.screen.gameplay.AudioEngine.SoundNoteFactory")
 
 local AudioEngine = Class:new()
 
@@ -29,13 +30,10 @@ AudioEngine.unload = function(self)
 end
 
 AudioEngine.receive = function(self, event)
-	if event.name == "LogicalNoteState" and event.key == "keyState" then
-		local note = event.note
-		if note[event.key] then
-			self:playAudio(note.pressSounds, "foreground", note.startNoteData.keysound, note.startNoteData.stream)
-		else
-			self:playAudio(note.releaseSounds, "foreground", note.startNoteData.keysound, note.startNoteData.stream)
-		end
+	if event.name == "LogicalNoteState" then
+		local soundNote = SoundNoteFactory:getNote(event.note)
+		soundNote.audioEngine = self
+		return soundNote:receive(event)
 	elseif event.name == "TimeState" then
 		self.currentTime = event.exactCurrentTime
 		self:setTimeRate(event.timeRate)

@@ -2,13 +2,12 @@ local LogicalNote = require("sphere.screen.gameplay.LogicEngine.LogicalNote")
 
 local LongLogicalNote = LogicalNote:new()
 
+LongLogicalNote.noteClass = "LongLogicalNote"
+
 LongLogicalNote.construct = function(self)
 	self.startNoteData = self.noteData
 	self.endNoteData = self.noteData.endNoteData
 	self.noteData = nil
-
-	self.pressSounds = self.startNoteData.sounds
-	self.releaseSounds = self.endNoteData.sounds
 
 	self.keyBind = self.startNoteData.inputType .. self.startNoteData.inputIndex
 end
