@@ -12,7 +12,7 @@ LongLogicalNote.construct = function(self)
 	self.keyBind = self.startNoteData.inputType .. self.startNoteData.inputIndex
 end
 
-LongLogicalNote.process = function(self)
+LongLogicalNote.update = function(self)
 	local deltaStartTime = self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
 	local deltaEndTime = self.logicEngine.currentTime - self.endNoteData.timePoint.absoluteTime
 	local startTimeState = self.score:getTimeState(deltaStartTime)

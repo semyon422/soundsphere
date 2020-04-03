@@ -11,13 +11,14 @@ ShortLogicalNote.construct = function(self)
 	self.keyBind = self.startNoteData.inputType .. self.startNoteData.inputIndex
 end
 
-ShortLogicalNote.process = function(self)
+ShortLogicalNote.update = function(self)
 	if self.ended then
 		return
 	end
 
 	local deltaTime = self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
 	local timeState = self.score:getTimeState(deltaTime)
+	-- self.scoreNote
 	
 	if not self.autoplay then
 		self:processTimeState(timeState)

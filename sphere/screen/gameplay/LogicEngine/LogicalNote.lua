@@ -22,14 +22,12 @@ LogicalNote.isHere = function(self)
 end
 
 LogicalNote.isReachable = function(self)
-	local deltaTime = (self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime) / self.score.timeRate
+	local deltaTime = self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
 	local timeState = self.score:getTimeState(deltaTime)
 	return timeState ~= "none" and timeState ~= "late"
 end
 
-LogicalNote.update = function(self)
-	return self:process()
-end
+LogicalNote.update = function(self) end
 
 LogicalNote.receive = function(self, event) end
 
