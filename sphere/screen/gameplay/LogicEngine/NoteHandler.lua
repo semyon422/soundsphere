@@ -46,9 +46,23 @@ NoteHandler.loadNoteData = function(self)
 end
 
 NoteHandler.update = function(self)
-	if not self.currentNote then return end
+	local currentNote = self.currentNote
+
+	if not currentNote then
+		return
+	end
 	
-	return self.currentNote:update()
+	currentNote:update()
+
+	if not currentNote.ended then
+		return
+	end
+	
+	local nextNote = currentNote:getNext()
+	if nextNote then
+		self.currentNote = nextNote
+		return self:update()
+	end
 end
 
 NoteHandler.receive = function(self, event)

@@ -10,11 +10,6 @@ end
 
 LogicalNote.next = function(self)
 	self.ended = true
-	local nextNote = self:getNext()
-	if nextNote then
-		self.noteHandler.currentNote = nextNote
-		return self.noteHandler.currentNote:update()
-	end
 end
 
 LogicalNote.isHere = function(self)
