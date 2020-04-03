@@ -109,12 +109,13 @@ GameplayScreen.load = function(self)
 	graphicEngine:load()
 	gui:loadTable(noteSkin.playField)
 
-	logicEngine.observable:add(self.gui)
+	logicEngine.observable:add(gui)
 	logicEngine.observable:add(audioEngine)
 	timeEngine.observable:add(logicEngine)
 	timeEngine.observable:add(graphicEngine)
 	NoteChartResourceLoader.observable:add(NotificationLine)
 	InputManager.observable:add(logicEngine)
+	InputManager.observable:add(gui)
 	
 	PauseOverlay.timeEngine = timeEngine
 	PauseOverlay.score = score
@@ -146,6 +147,7 @@ GameplayScreen.unload = function(self)
 	self.audioEngine:unload()
 	
 	InputManager.observable:remove(self.logicEngine)
+	InputManager.observable:remove(self.gui)
 end
 
 GameplayScreen.update = function(self, dt)

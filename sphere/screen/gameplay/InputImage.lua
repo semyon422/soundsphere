@@ -18,6 +18,8 @@ InputImage.loadGui = function(self)
 	self.blendMode = self.data.blendMode
 	self.blendAlphaMode = self.data.blendAlphaMode
 
+	self.keyBind = self.inputType .. self.inputIndex
+
 	self.container = self.gui.container
 	
 	self:load()
@@ -57,16 +59,12 @@ InputImage.reload = function(self)
 end
 
 InputImage.receive = function(self, event)
-	if event.name == "noteHandlerUpdated" then
-		if
-			event.noteHandler.inputType == self.inputType and
-			event.noteHandler.inputIndex == self.inputIndex
-		then
-			if event.noteHandler.keyState == true then
-				self.drawable.image = self.imagePressed
-			else
-				self.drawable.image = self.imageReleased
-			end
+	local key = event.args and event.args[1]
+	if key == self.keyBind then
+		if event.name == "keypressed" then
+			self.drawable.image = self.imagePressed
+		elseif event.name == "keyreleased" then
+			self.drawable.image = self.imageReleased
 		end
 	end
 end
