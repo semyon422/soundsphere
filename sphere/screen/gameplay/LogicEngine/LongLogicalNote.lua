@@ -10,15 +10,20 @@ LongLogicalNote.construct = function(self)
 	self.noteData = nil
 
 	self.keyBind = self.startNoteData.inputType .. self.startNoteData.inputIndex
+
+	LogicalNote.construct(self)
+
+	self:switchState("clear")
 end
 
 LongLogicalNote.update = function(self)
-	local deltaStartTime = self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
-	local deltaEndTime = self.logicEngine.currentTime - self.endNoteData.timePoint.absoluteTime
-	local startTimeState = self.score:getTimeState(deltaStartTime)
-	local endTimeState = self.score:getTimeState(deltaEndTime)
-	
-	-- local oldState = note.state
+	if self.ended then
+		return
+	end
+
+	local startTimeState = self.scoreNote:getStartTimeState()
+	local endTimeState = self.scoreNote:getEndTimeState()
+
 	if not self.autoplay then
 		self:processTimeState(startTimeState, endTimeState)
 	else
@@ -34,55 +39,57 @@ LongLogicalNote.update = function(self)
 end
 
 LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
+	local lastState = self:getLastState()
+
 	if self.keyState and startTimeState == "none" then
 		self.keyState = false
-	elseif self.state == "clear" then
+	elseif lastState == "clear" then
 		if startTimeState == "late" then
-			self.state = "startMissed"
+			self:switchState("startMissed")
 			self.started = true
 		elseif self.keyState then
 			if startTimeState == "early" then
-				self.state = "startMissedPressed"
+				self:switchState("startMissedPressed")
 			elseif startTimeState == "exactly" then
-				self.state = "startPassedPressed"
+				self:switchState("startPassedPressed")
 			end
 			self.started = true
 		end
-	elseif self.state == "startPassedPressed" then
+	elseif lastState == "startPassedPressed" then
 		if not self.keyState then
 			if endTimeState == "none" then
-				self.state = "startMissed"
+				self:switchState("startMissed")
 			elseif endTimeState == "exactly" then
-				self.state = "endPassed"
+				self:switchState("endPassed")
 				return self:next()
 			end
 		elseif endTimeState == "late" then
-			self.state = "endMissed"
+			self:switchState("endMissed")
 			return self:next()
 		end
-	elseif self.state == "startMissedPressed" then
+	elseif lastState == "startMissedPressed" then
 		if not self.keyState then
 			if endTimeState == "exactly" then
-				self.state = "endMissedPassed"
+				self:switchState("endMissedPassed")
 				return self:next()
 			else
-				self.state = "startMissed"
+				self:switchState("startMissed")
 			end
 		elseif endTimeState == "late" then
-			self.state = "endMissed"
+			self:switchState("endMissed")
 			return self:next()
 		end
-	elseif self.state == "startMissed" then
+	elseif lastState == "startMissed" then
 		if self.keyState then
-			self.state = "startMissedPressed"
+			self:switchState("startMissedPressed")
 		elseif endTimeState == "late" then
-			self.state = "endMissed"
+			self:switchState("endMissed")
 			return self:next()
 		end
 	end
 	
 	local nextNote = self:getNext()
-	if nextNote and self.state == "startMissed" and nextNote:isReachable() then
+	if nextNote and self:getLastState() == "startMissed" and nextNote:isReachable() then
 		return self:next()
 	end
 end

@@ -24,10 +24,11 @@ NoteHandler.loadNoteData = function(self)
 				if logicalNote then
 					logicalNote.noteHandler = self
 					logicalNote.logicEngine = logicEngine
-					logicalNote.score = logicEngine.score
+					-- logicalNote.score = logicEngine.score
+					logicalNote.scoreNote = self.logicEngine:getScoreNote(noteData)
 					table.insert(self.noteData, logicalNote)
 					
-					logicEngine.sharedLogicalNoteData[noteData] = logicalNote
+					logicEngine.sharedLogicalNotes[noteData] = logicalNote
 				end
 			end
 		end
@@ -43,6 +44,7 @@ NoteHandler.loadNoteData = function(self)
 	
 	self.startNoteIndex = 1
 	self.currentNote = self.noteData[1]
+	self.currentNote:load()
 end
 
 NoteHandler.update = function(self)
@@ -60,6 +62,8 @@ NoteHandler.update = function(self)
 	
 	local nextNote = currentNote:getNext()
 	if nextNote then
+		currentNote:unload()
+		nextNote:load()
 		self.currentNote = nextNote
 		return self:update()
 	end

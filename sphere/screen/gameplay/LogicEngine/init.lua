@@ -7,13 +7,10 @@ local LogicEngine = Class:new()
 LogicEngine.load = function(self)
 	self.observable = Observable:new()
 	
-	self.sharedLogicalNoteData = {}
-	self.noteCount = 0
+	self.sharedLogicalNotes = {}
 	self.currentTime = 0
 	
 	self:loadNoteHandlers()
-
-	self.score.noteCount = self.noteCount
 end
 
 LogicEngine.update = function(self, dt)
@@ -31,7 +28,6 @@ end
 LogicEngine.receive = function(self, event)
 	if event.name == "TimeState" then
 		self.currentTime = event.exactCurrentTime
-		self.score.timeRate = event.timeRate
 	end
 
 	if not event.virtual then
@@ -73,6 +69,10 @@ LogicEngine.unloadNoteHandlers = function(self)
 		noteHandler:unload()
 	end
 	self.noteHandlers = nil
+end
+
+LogicEngine.getScoreNote = function(self, noteData)
+	return self.scoreEngine.sharedScoreNotes[noteData]
 end
 
 return LogicEngine

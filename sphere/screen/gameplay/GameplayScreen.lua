@@ -5,11 +5,11 @@ local NoteSkinManager			= require("sphere.noteskin.NoteSkinManager")
 local NoteSkinLoader			= require("sphere.noteskin.NoteSkinLoader")
 local NotificationLine			= require("sphere.ui.NotificationLine")
 local BackgroundManager			= require("sphere.ui.BackgroundManager")
+local ScoreEngine				= require("sphere.screen.gameplay.ScoreEngine")
 local LogicEngine				= require("sphere.screen.gameplay.LogicEngine")
 local GraphicEngine				= require("sphere.screen.gameplay.GraphicEngine")
 local AudioEngine				= require("sphere.screen.gameplay.AudioEngine")
 local TimeEngine				= require("sphere.screen.gameplay.TimeEngine")
-local CustomScore				= require("sphere.screen.gameplay.CustomScore")
 local InputManager				= require("sphere.screen.gameplay.InputManager")
 local ModifierManager			= require("sphere.screen.gameplay.ModifierManager")
 local PauseOverlay				= require("sphere.screen.gameplay.PauseOverlay")
@@ -50,6 +50,12 @@ GameplayScreen.load = function(self)
 	timeEngine:load()
 	ModifierManager.timeEngine = timeEngine
 
+	local scoreEngine = ScoreEngine:new()
+	self.scoreEngine = scoreEngine
+	scoreEngine.noteChart = noteChart
+	scoreEngine:load()
+	timeEngine.observable:add(scoreEngine)
+
 	local audioEngine = AudioEngine:new()
 	self.audioEngine = audioEngine
 	audioEngine:load()
@@ -69,19 +75,19 @@ GameplayScreen.load = function(self)
 	noteSkin.container = self.container
 	noteSkin:joinContainer(self.container)
 
-	local score = CustomScore:new()
-	score.noteChart = noteChart
-	score.hash = self.noteChartDataEntry.hash
-	score.index = self.noteChartDataEntry.index
-	ModifierManager.score = score
+	-- local score = CustomScore:new()
+	-- score.noteChart = noteChart
+	-- score.hash = self.noteChartDataEntry.hash
+	-- score.index = self.noteChartDataEntry.index
+	-- ModifierManager.score = score
 
 	local logicEngine = LogicEngine:new()
 	self.logicEngine = logicEngine
-	logicEngine.score = score
+	logicEngine.scoreEngine = scoreEngine
 	logicEngine.noteChart = noteChart
 	logicEngine.localAliases = {}
 	logicEngine.globalAliases = {}
-	score.logicEngine = logicEngine
+	-- score.logicEngine = logicEngine
 	ModifierManager.logicEngine = logicEngine
 
 	local graphicEngine = GraphicEngine:new()
@@ -100,7 +106,7 @@ GameplayScreen.load = function(self)
 	gui.noteSkin = noteSkin
 	gui.container = self.container
 	gui.logicEngine = logicEngine
-	gui.score = score
+	gui.score = scoreEngine.score
 	timeEngine.observable:add(gui)
 
 	ModifierManager:apply()
@@ -118,7 +124,7 @@ GameplayScreen.load = function(self)
 	InputManager.observable:add(gui)
 	
 	PauseOverlay.timeEngine = timeEngine
-	PauseOverlay.score = score
+	-- PauseOverlay.score = score
 	PauseOverlay.noteChart = noteChart
 	PauseOverlay.noteChartEntry = self.noteChartEntry
 	PauseOverlay.noteChartDataEntry = self.noteChartDataEntry
@@ -142,6 +148,7 @@ GameplayScreen.unload = function(self)
 	self.noteSkin:leaveContainer(self.container)
 
 	self.logicEngine:unload()
+	self.scoreEngine:unload()
 	self.graphicEngine:unload()
 	self.gui:unload()
 	self.audioEngine:unload()
@@ -154,6 +161,7 @@ GameplayScreen.update = function(self, dt)
 	self.timeEngine:update(dt)
 	self.audioEngine:update()
 	self.logicEngine:update(dt)
+	self.scoreEngine:update()
 	self.graphicEngine:update(dt)
 	self.gui:update()
 	PauseOverlay:update(dt)
@@ -173,6 +181,7 @@ GameplayScreen.receive = function(self, event)
 		self.timeEngine:receive(event)
 		self.audioEngine:receive(event)
 		InputManager:receive(event)
+		self.scoreEngine:receive(event)
 		-- self.logicEngine:receive(event)
 		self.graphicEngine:receive(event)
 		self.gui:receive(event)

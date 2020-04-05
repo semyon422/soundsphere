@@ -2,7 +2,19 @@ local Class = require("aqua.util.Class")
 
 local LogicalNote = Class:new()
 
-LogicalNote.state = "clear"
+LogicalNote.construct = function(self)
+	self.states = {}
+end
+
+LogicalNote.switchState = function(self, state)
+	local states = self.states
+	states[#states + 1] = state
+end
+
+LogicalNote.getLastState = function(self)
+	local states = self.states
+	return states[#states]
+end
 
 LogicalNote.getNext = function(self)
 	return self.noteHandler.noteData[self.index + 1]
@@ -13,14 +25,19 @@ LogicalNote.next = function(self)
 end
 
 LogicalNote.isHere = function(self)
-	return self.startNoteData.timePoint.absoluteTime <= self.logicEngine.currentTime
+	return self.scoreNote:isHere()
 end
 
 LogicalNote.isReachable = function(self)
-	local deltaTime = self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
-	local timeState = self.score:getTimeState(deltaTime)
-	return timeState ~= "none" and timeState ~= "late"
+	return self.scoreNote:isReachable()
 end
+
+LogicalNote.load = function(self)
+	self.scoreNote.logicalNote = self
+	self.scoreNote:load()
+end
+
+LogicalNote.unload = function(self) end
 
 LogicalNote.update = function(self) end
 

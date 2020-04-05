@@ -126,7 +126,7 @@ end
 NoteSkin.getG = function(self, note, part, name, timeState)
 	local seq = self.data[note.id][part].gc[name]
 
-	return self.env[seq[1]](timeState, note.logicalNote.state, seq[2])
+	return self.env[seq[1]](timeState, note.logicalNote:getLastState(), seq[2])
 end
 
 NoteSkin.whereWillDraw = function(self, note, part, time)

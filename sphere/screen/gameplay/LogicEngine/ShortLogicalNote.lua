@@ -9,22 +9,26 @@ ShortLogicalNote.construct = function(self)
 	self.noteData = nil
 
 	self.keyBind = self.startNoteData.inputType .. self.startNoteData.inputIndex
+
+	LogicalNote.construct(self)
+
+	self:switchState("clear")
 end
 
 ShortLogicalNote.update = function(self)
 	if self.ended then
 		return
 	end
-
-	local deltaTime = self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
-	local timeState = self.score:getTimeState(deltaTime)
-	-- self.scoreNote
+	
+	local timeState = self.scoreNote:getTimeState()
 	
 	if not self.autoplay then
 		self:processTimeState(timeState)
 	else
 		self:processAuto()
 	end
+
+	-- self.scoreNote:update()
 	-- self:processShortNoteState(note.state)
 	
 	-- if note.ended then
@@ -36,13 +40,13 @@ ShortLogicalNote.processTimeState = function(self, timeState)
 	if self.keyState and timeState == "none" then
 		self.keyState = false
 	elseif self.keyState and timeState == "early" then
-		self.state = "missed"
+		self:switchState("missed")
 		return self:next()
 	elseif timeState == "late" then
-		self.state = "missed"
+		self:switchState("missed")
 		return self:next()
 	elseif self.keyState and timeState == "exactly" then
-		self.state = "passed"
+		self:switchState("passed")
 		return self:next()
 	end
 end
