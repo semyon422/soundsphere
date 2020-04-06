@@ -5,6 +5,8 @@ local ShortScoreNote = ScoreNote:new()
 ShortScoreNote.construct = function(self)
 	self.startNoteData = self.noteData
 	self.noteData = nil
+
+	ScoreNote.construct(self)
 end
 
 ShortScoreNote.getMaxScore = function(self)
@@ -42,19 +44,16 @@ end
 
 ShortScoreNote.update = function(self)
 	local states = self.logicalNote.states
-	local oldState, newState = states[#states - 1], states[#states]
+    local oldState, newState = states[self.currentStateIndex - 1], states[self.currentStateIndex]
 
 	if newState == "clear" then
-		return
-	end
-	
-	if newState == "passed" then
-		-- self.combo = self.combo + 1
+	elseif newState == "passed" then
+		return self:unload()
 	elseif newState == "missed" then
-		-- self.combo = 0
+		return self:unload()
 	end
-	
-	return self:unload()
+
+	self:nextStateIndex()
 end
 
 return ShortScoreNote

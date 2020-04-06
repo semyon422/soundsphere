@@ -33,7 +33,6 @@ LogicalNote.isReachable = function(self)
 end
 
 LogicalNote.load = function(self)
-	self.scoreNote.logicalNote = self
 	self.scoreNote:load()
 end
 

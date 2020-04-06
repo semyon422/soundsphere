@@ -6,6 +6,8 @@ LongScoreNote.construct = function(self)
 	self.startNoteData = self.noteData
 	self.endNoteData = self.noteData.endNoteData
 	self.noteData = nil
+
+	ScoreNote.construct(self)
 end
 
 LongScoreNote.getMaxScore = function(self)
@@ -57,21 +59,35 @@ end
 
 LongScoreNote.update = function(self)
     local states = self.logicalNote.states
-    local oldState, newState = states[#states - 1], states[#states]
-    
-	if oldState == "clear" and newState == "startPassedPressed" then
-		-- self.combo = self.combo + 1
-	elseif (
-		(oldState == "clear" or oldState == "startPassedPressed") and (
-			newState == "startMissed" or
-			newState == "startMissedPressed" or
-			newState == "endMissed"
-		)
-	) then
-		-- self.combo = 0
+	local oldState, newState = states[self.currentStateIndex - 1], states[self.currentStateIndex]
+	
+	if oldState == "clear" then
+		if newState == "startPassedPressed" then
+		elseif newState == "startMissed" then
+		elseif newState == "startMissedPressed" then
+		end
+	elseif oldState == "startPassedPressed" then
+		if newState == "startMissed" then
+		elseif newState == "endMissed" then
+			return self:unload()
+		elseif newState == "endPassed" then
+			return self:unload()
+		end
+	elseif oldState == "startMissedPressed" then
+		if newState == "endMissedPassed" then
+			return self:unload()
+		elseif newState == "startMissed" then
+		elseif newState == "endMissed" then
+			return self:unload()
+		end
+	elseif oldState == "startMissed" then
+		if newState == "startMissedPressed" then
+		elseif newState == "endMissed" then
+			return self:unload()
+		end
 	end
-    
-    -- return self:unload()
+
+	self:nextStateIndex()
 end
 
 return LongScoreNote

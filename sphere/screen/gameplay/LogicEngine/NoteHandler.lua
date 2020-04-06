@@ -26,6 +26,7 @@ NoteHandler.loadNoteData = function(self)
 					logicalNote.logicEngine = logicEngine
 					-- logicalNote.score = logicEngine.score
 					logicalNote.scoreNote = self.logicEngine:getScoreNote(noteData)
+					logicalNote.scoreNote.logicalNote = logicalNote
 					table.insert(self.noteData, logicalNote)
 					
 					logicEngine.sharedLogicalNotes[noteData] = logicalNote

@@ -10,7 +10,12 @@ LogicalNoteFactory.getNote = function(self, noteData)
 		return ShortLogicalNote:new(logicalNote)
 	elseif noteData.noteType == "LongNoteStart" then
 		return LongLogicalNote:new(logicalNote)
-	else
+	elseif noteData.noteType == "LineNoteStart" then
+		return ShortLogicalNote:new(logicalNote)
+	elseif noteData.noteType == "SoundNote" then
+		logicalNote.autoplay = true
+		return ShortLogicalNote:new(logicalNote)
+	elseif noteData.noteType == "ImageNote" then
 		logicalNote.autoplay = true
 		return ShortLogicalNote:new(logicalNote)
 	end
