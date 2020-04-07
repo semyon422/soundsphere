@@ -1,0 +1,64 @@
+{
+    "counters": [
+        "great",
+        "good", "late good", "early good",
+        "bad",
+        "miss",
+    ],
+    "notes": {
+        "ShortNote": {
+            "logicIntervals": [
+                {
+                    "time": -0.16,
+                    "name": "early"
+                },
+                {
+                    "time": -0.12,
+                    "name": "exactly"
+                },
+                {
+                    "time": 0.12,
+                    "name": "exactly"
+                },
+                {
+                    "time": -0.04,
+                    "name": "early"
+                },
+            ],
+            "counterIntervals": [
+                {
+                    "time": -0.16,
+                    "counters": ["miss"]
+                },
+                {
+                    "time": -0.12,
+                    "counters": ["bad"]
+                },
+                {
+                    "time": -0.04,
+                    "counters": ["good", "early good"]
+                },
+                {
+                    "time": -0.016,
+                    "counters": ["great"]
+                },
+                {
+                    "time": 0.016,
+                    "counters": ["great"]
+                },
+                {
+                    "time": 0.04,
+                    "counters": ["good", "late good"]
+                },
+                {
+                    "time": 0.12,
+                    "counters": ["bad"]
+                },
+                {
+                    "time": 0.16,
+                    "counters": ["miss"]
+                },
+            ]
+        }
+    }
+}

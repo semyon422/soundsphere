@@ -40,4 +40,12 @@ ScoreNote.isReachable = function(self)
 	return true
 end
 
+ScoreNote.increaseCombo = function(self)
+	return self.score:increaseCombo()
+end
+
+ScoreNote.breakCombo = function(self)
+	return self.score:breakCombo()
+end
+
 return ScoreNote

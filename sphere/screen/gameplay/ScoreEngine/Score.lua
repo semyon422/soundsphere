@@ -51,42 +51,42 @@ Score.timegates = {
 	}
 }
 
-Score.grades = {
-	{time = 0.001,	name = "auto"	},
-	{time = 0.002,	name = "cheater"},
-	{time = 0.004,	name = ">_<"	},
-	{time = 0.006,	name = "wtf?"	},
-	{time = 0.008,	name = "ET"		},
-	{time = 0.010,	name = "$$$"	},
-	{time = 0.012,	name = "SS"		},
-	{time = 0.016,	name = "S++"	},
-	{time = 0.020,	name = "S+"		},
-	{time = 0.024,	name = "S"		},
-	{time = 0.028,	name = "A+"		},
-	{time = 0.032,	name = "A"		},
-	{time = 0.048,	name = "B"		},
-	{time = 0.98,	name = "E"		},
-	{name = "F"},
-}
+-- Score.grades = {
+-- 	{time = 0.001,	name = "auto"	},
+-- 	{time = 0.002,	name = "cheater"},
+-- 	{time = 0.004,	name = ">_<"	},
+-- 	{time = 0.006,	name = "wtf?"	},
+-- 	{time = 0.008,	name = "ET"		},
+-- 	{time = 0.010,	name = "$$$"	},
+-- 	{time = 0.012,	name = "SS"		},
+-- 	{time = 0.016,	name = "S++"	},
+-- 	{time = 0.020,	name = "S+"		},
+-- 	{time = 0.024,	name = "S"		},
+-- 	{time = 0.028,	name = "A+"		},
+-- 	{time = 0.032,	name = "A"		},
+-- 	{time = 0.048,	name = "B"		},
+-- 	{time = 0.98,	name = "E"		},
+-- 	{name = "F"},
+-- }
 
 
 
-Score.updateGrade = function(self)
-	local accuracy = self.accuracy / 1000
-	local grades = self.grades
-	for i = 1, #grades - 1 do
-		if accuracy <= grades[i].time then
-			self.grade = grades[i].name
-			return
-		end
-	end
-	self.grade = grades[#grades].name
-end
+-- Score.updateGrade = function(self)
+-- 	local accuracy = self.accuracy / 1000
+-- 	local grades = self.grades
+-- 	for i = 1, #grades - 1 do
+-- 		if accuracy <= grades[i].time then
+-- 			self.grade = grades[i].name
+-- 			return
+-- 		end
+-- 	end
+-- 	self.grade = grades[#grades].name
+-- end
 
 Score.interval = 0.004
 Score.scale = 3.6
 Score.unit = 1/60
-Score.hit = function(self, deltaTime, time)
+Score.hit = function(self, score, deltaTime, time)
 	self.hits[#self.hits + 1] = {time, deltaTime}
 	
 	local judgeIndex = self:judge(deltaTime)
@@ -111,8 +111,9 @@ Score.hit = function(self, deltaTime, time)
 	-- self:updateGrade()
 	
 	self.score = self.score
-		+ math.exp(-(deltaTime / self.unit / self.scale) ^ 2)
-		/ self.logicEngine.noteCount
+		+ score
+		* math.exp(-(deltaTime / self.unit / self.scale) ^ 2)
+		/ self.scoreEngine.maxScore
 		* 1000000
 	
 	self:updateAccuracy()
@@ -128,8 +129,8 @@ Score.hit = function(self, deltaTime, time)
 end
 
 Score.updateAccuracy = function(self)
-	self.accuracy = 1000 * math.sqrt(math.abs(-math.log(self.score / 1000000 * self.logicEngine.noteCount / self.count))) * self.unit * self.scale
-	self:updateGrade()
+	self.accuracy = 1000 * math.sqrt(math.abs(-math.log(self.score / 1000000 * self.scoreEngine.maxScore / self.count))) * self.unit * self.scale
+	-- self:updateGrade()
 end
 
 Score.judge = function(self, deltaTime)
@@ -140,6 +141,14 @@ Score.judge = function(self, deltaTime)
 		end
 	end
 	return #self.timegates
+end
+
+Score.increaseCombo = function(self)
+	self.combo = self.combo + 1
+end
+
+Score.breakCombo = function(self)
+	self.combo = 0
 end
 
 return Score

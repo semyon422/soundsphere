@@ -11,11 +11,7 @@ LongScoreNote.construct = function(self)
 end
 
 LongScoreNote.getMaxScore = function(self)
-    if not self.logicalNote.autoplay then
-        return 1
-    end
-
-    return 0
+	return 1
 end
 
 LongScoreNote.passEdge = 0.120
@@ -58,17 +54,25 @@ LongScoreNote.isReachable = function(self)
 end
 
 LongScoreNote.update = function(self)
-    local states = self.logicalNote.states
+	local states = self.logicalNote.states
 	local oldState, newState = states[self.currentStateIndex - 1], states[self.currentStateIndex]
 	
 	if oldState == "clear" then
 		if newState == "startPassedPressed" then
+			self:increaseScore(self:getMaxScore())
+			self:increaseCombo()
 		elseif newState == "startMissed" then
+			self:increaseScore(0)
+			self:breakCombo()
 		elseif newState == "startMissedPressed" then
+			self:increaseScore(0)
+			self:breakCombo()
 		end
 	elseif oldState == "startPassedPressed" then
 		if newState == "startMissed" then
+			self:breakCombo()
 		elseif newState == "endMissed" then
+			self:breakCombo()
 			return self:unload()
 		elseif newState == "endPassed" then
 			return self:unload()
@@ -77,17 +81,25 @@ LongScoreNote.update = function(self)
 		if newState == "endMissedPassed" then
 			return self:unload()
 		elseif newState == "startMissed" then
+			self:breakCombo()
 		elseif newState == "endMissed" then
+			self:breakCombo()
 			return self:unload()
 		end
 	elseif oldState == "startMissed" then
 		if newState == "startMissedPressed" then
 		elseif newState == "endMissed" then
+			self:breakCombo()
 			return self:unload()
 		end
 	end
 
 	self:nextStateIndex()
+end
+
+LongScoreNote.increaseScore = function(self)
+	local deltaTime = (self.scoreEngine.currentTime - self.startNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
+	self.score:hit(self:getMaxScore(), deltaTime, self.scoreEngine.currentTime)
 end
 
 return LongScoreNote

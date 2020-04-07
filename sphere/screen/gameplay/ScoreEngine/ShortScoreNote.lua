@@ -10,11 +10,7 @@ ShortScoreNote.construct = function(self)
 end
 
 ShortScoreNote.getMaxScore = function(self)
-	if not self.logicalNote.autoplay then
-		return 1
-	end
-
-	return 0
+	return 1
 end
 
 ShortScoreNote.passEdge = 0.120
@@ -44,16 +40,25 @@ end
 
 ShortScoreNote.update = function(self)
 	local states = self.logicalNote.states
-    local oldState, newState = states[self.currentStateIndex - 1], states[self.currentStateIndex]
+	local oldState, newState = states[self.currentStateIndex - 1], states[self.currentStateIndex]
 
 	if newState == "clear" then
 	elseif newState == "passed" then
+		self:increaseScore(self:getMaxScore())
+		self:increaseCombo()
 		return self:unload()
 	elseif newState == "missed" then
+		self:increaseScore(0)
+		self:breakCombo()
 		return self:unload()
 	end
 
 	self:nextStateIndex()
+end
+
+ShortScoreNote.increaseScore = function(self, score)
+	local deltaTime = (self.scoreEngine.currentTime - self.startNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
+	self.score:hit(score, deltaTime, self.scoreEngine.currentTime)
 end
 
 return ShortScoreNote

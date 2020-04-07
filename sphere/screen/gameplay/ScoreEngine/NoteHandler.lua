@@ -23,6 +23,7 @@ NoteHandler.loadNoteData = function(self)
 			if scoreNote then
 				scoreNote.noteHandler = self
 				scoreNote.scoreEngine = scoreEngine
+				scoreNote.score = scoreEngine.score
 				table.insert(self.scoreNotes, scoreNote)
 				
 				scoreEngine.sharedScoreNotes[noteData] = scoreNote

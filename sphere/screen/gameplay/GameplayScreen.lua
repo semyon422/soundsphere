@@ -124,7 +124,7 @@ GameplayScreen.load = function(self)
 	InputManager.observable:add(gui)
 	
 	PauseOverlay.timeEngine = timeEngine
-	-- PauseOverlay.score = score
+	PauseOverlay.score = scoreEngine.score
 	PauseOverlay.noteChart = noteChart
 	PauseOverlay.noteChartEntry = self.noteChartEntry
 	PauseOverlay.noteChartDataEntry = self.noteChartDataEntry
