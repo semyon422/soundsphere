@@ -2,16 +2,14 @@ local ScoreNote = require("sphere.screen.gameplay.ScoreEngine.ScoreNote")
 
 local LongScoreNote = ScoreNote:new()
 
+LongScoreNote.noteType = "LongNote"
+
 LongScoreNote.construct = function(self)
 	self.startNoteData = self.noteData
 	self.endNoteData = self.noteData.endNoteData
 	self.noteData = nil
 
 	ScoreNote.construct(self)
-end
-
-LongScoreNote.getMaxScore = function(self)
-	return 1
 end
 
 LongScoreNote.passEdge = 0.120
@@ -57,49 +55,29 @@ LongScoreNote.update = function(self)
 	local states = self.logicalNote.states
 	local oldState, newState = states[self.currentStateIndex - 1], states[self.currentStateIndex]
 	
-	if oldState == "clear" then
-		if newState == "startPassedPressed" then
-			self:increaseScore(self:getMaxScore())
-			self:increaseCombo()
-		elseif newState == "startMissed" then
-			self:increaseScore(0)
-			self:breakCombo()
-		elseif newState == "startMissedPressed" then
-			self:increaseScore(0)
-			self:breakCombo()
-		end
-	elseif oldState == "startPassedPressed" then
-		if newState == "startMissed" then
-			self:breakCombo()
-		elseif newState == "endMissed" then
-			self:breakCombo()
-			return self:unload()
-		elseif newState == "endPassed" then
-			return self:unload()
-		end
-	elseif oldState == "startMissedPressed" then
-		if newState == "endMissedPassed" then
-			return self:unload()
-		elseif newState == "startMissed" then
-			self:breakCombo()
-		elseif newState == "endMissed" then
-			self:breakCombo()
-			return self:unload()
-		end
-	elseif oldState == "startMissed" then
-		if newState == "startMissedPressed" then
-		elseif newState == "endMissed" then
-			self:breakCombo()
-			return self:unload()
-		end
+	-- local startDeltaTime = (self.scoreEngine.currentTime - self.startNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
+	-- local endDeltaTime = (self.scoreEngine.currentTime - self.endNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
+
+	if newState then
+		self:send({
+			name = "ScoreNoteState",
+			noteType = self.noteType,
+			currentTime = self.scoreEngine.currentTime,
+			noteStartTime = self.startNoteData.timePoint.absoluteTime,
+			noteEndTime = self.endNoteData.timePoint.absoluteTime,
+			timeRate = self.scoreEngine.timeRate,
+			oldState = oldState,
+			newState = newState
+		})
 	end
 
 	self:nextStateIndex()
-end
 
-LongScoreNote.increaseScore = function(self)
-	local deltaTime = (self.scoreEngine.currentTime - self.startNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
-	self.score:hit(self:getMaxScore(), deltaTime, self.scoreEngine.currentTime)
+	if self:areNewStates() then
+		return self:update()
+	elseif self.logicalNote.ended then
+		return self:unload()
+	end
 end
 
 return LongScoreNote

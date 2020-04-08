@@ -24,18 +24,16 @@ LongLogicalNote.update = function(self)
 	local startTimeState = self.scoreNote:getStartTimeState()
 	local endTimeState = self.scoreNote:getEndTimeState()
 
+	local numStates = #self.states
 	if not self.autoplay then
 		self:processTimeState(startTimeState, endTimeState)
 	else
 		self:processAuto()
 	end
 
-	-- self:processLongNoteState(note.state, oldState)
-	
-	-- if note.started and not note.judged then
-	-- 	self:hit(deltaStartTime, note.startNoteData.timePoint.absoluteTime)
-	-- 	note.judged = true
-	-- end
+	if numStates ~= #self.states then
+		return self:update()
+	end
 end
 
 LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)

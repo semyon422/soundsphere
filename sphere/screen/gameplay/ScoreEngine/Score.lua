@@ -1,5 +1,6 @@
 local Class			= require("aqua.util.Class")
 local Observable	= require("aqua.util.Observable")
+local Counter		= require("sphere.screen.gameplay.ScoreEngine.Counter")
 
 local Score = Class:new()
 
@@ -10,46 +11,75 @@ end
 Score.construct = function(self)
 	self.observable = Observable:new()
 
-	self.combo = 0
-	self.maxcombo = 0
-	self.timeRate = 1
-	self.hits = {}
-	self.judges = {}
-	
-	self.sum = 0
-	self.count = 0
-	self.accuracy = 0
-	self.timegate = ""
-	self.grade = "?"
-	
-	self.score = 0
+	self.scoreTable = {
+		combo = 0,
+		maxcombo = 0,
+		timeRate = 1,
+		hits = {},
+		judges = {},
+		
+		sum = 0,
+		maxScore = 0,
+		accuracy = 0,
+		timegate = "",
+		grade = "?",
+		
+		score = 0
+	}
+
+	self:loadCounters()
 end
 
-Score.passEdge = 0.120
-Score.missEdge = 0.160
+Score.loadCounters = function(self)
+	self.counters = {}
+	local counters = self.counters
 
-Score.timegates = {
-	{
-		time = 0.016,
-		name = "great"
-	},
-	{
-		time = 0.040,
-		name = "good",
-		nameLate = "late good",
-		nameEarly = "early good"
-	},
-	{
-		time = 0.120,
-		name = "bad",
-		nameLate = "late bad",
-		nameEarly = "early bad"
-	},
-	{
-		time = 0.160,
-		name = "miss"
-	}
-}
+	for _, itemName in pairs(love.filesystem.getDirectoryItems("userdata/counters")) do
+		local counter = Counter:new()
+		counter:loadFile("userdata/counters/" .. itemName)
+		counter:load(self.scoreTable)
+		counters[#counters + 1] = counter
+	end
+end
+
+Score.receive = function(self, event)
+	local counters = self.counters
+	for i = 1, #counters do
+		counters[i]:receive(event)
+	end
+end
+
+-- Score.toTable = function(self)
+-- 	local score = {}
+
+
+-- end
+
+-- Score.passEdge = 0.120
+-- Score.missEdge = 0.160
+
+-- Score.timegates = {
+-- 	{
+-- 		time = 0.016,
+-- 		name = "great"
+-- 	},
+-- 	{
+-- 		time = 0.040,
+-- 		name = "good",
+-- 		nameLate = "late good",
+-- 		nameEarly = "early good"
+-- 	},
+-- 	{
+-- 		time = 0.120,
+-- 		name = "bad",
+-- 		nameLate = "late bad",
+-- 		nameEarly = "early bad"
+-- 	},
+-- 	{
+-- 		time = 0.160,
+-- 		name = "miss"
+-- 	}
+-- }
 
 -- Score.grades = {
 -- 	{time = 0.001,	name = "auto"	},
@@ -83,72 +113,72 @@ Score.timegates = {
 -- 	self.grade = grades[#grades].name
 -- end
 
-Score.interval = 0.004
-Score.scale = 3.6
-Score.unit = 1/60
-Score.hit = function(self, score, deltaTime, time)
-	self.hits[#self.hits + 1] = {time, deltaTime}
+-- Score.interval = 0.004
+-- Score.scale = 3.6
+-- Score.unit = 1/60
+-- Score.hit = function(self, score, maxScore, deltaTime, time)
+-- 	self.hits[#self.hits + 1] = {time, deltaTime}
 	
-	local judgeIndex = self:judge(deltaTime)
-	self.judges[judgeIndex] = (self.judges[judgeIndex] or 0) + 1
+-- 	local judgeIndex = self:judge(deltaTime)
+-- 	self.judges[judgeIndex] = (self.judges[judgeIndex] or 0) + 1
 	
-	self.count = self.count + 1
+-- 	self.maxScore = self.maxScore + maxScore
 	
-	self:send({
-		name = "hit",
-		time = time,
-		deltaTime = deltaTime
-	})
+-- 	self:send({
+-- 		name = "hit",
+-- 		time = time,
+-- 		deltaTime = deltaTime
+-- 	})
 	
-	if math.abs(deltaTime) >= self.timegates[#self.timegates - 1].time then
-		self:updateAccuracy()
-		return
-	end
+-- 	if math.abs(deltaTime) >= self.timegates[#self.timegates - 1].time then
+-- 		self:updateAccuracy()
+-- 		return
+-- 	end
 	
-	-- self.count = self.count + 1
-	-- self.sum = self.sum + (deltaTime * 1000) ^ 2
-	-- self.accuracy = math.sqrt(self.sum / self.count)
-	-- self:updateGrade()
+-- 	-- self.count = self.count + 1
+-- 	-- self.sum = self.sum + (deltaTime * 1000) ^ 2
+-- 	-- self.accuracy = math.sqrt(self.sum / self.count)
+-- 	-- self:updateGrade()
 	
-	self.score = self.score
-		+ score
-		* math.exp(-(deltaTime / self.unit / self.scale) ^ 2)
-		/ self.scoreEngine.maxScore
-		* 1000000
+-- 	self.score = self.score
+-- 		+ score
+-- 		* math.exp(-(deltaTime / self.unit / self.scale) ^ 2)
+-- 		/ self.scoreEngine.maxScore
+-- 		* 1000000
 	
-	self:updateAccuracy()
+-- 	self:updateAccuracy()
 	
-	-- local timegateData = self.timegates[judgeIndex]
-	-- if deltaTime < 0 and timegateData.nameEarly then
-	-- 	self.timegate = timegateData.nameEarly
-	-- elseif deltaTime > 0 and timegateData.nameLate then
-	-- 	self.timegate = timegateData.nameLate
-	-- else
-	-- 	self.timegate = timegateData.name
-	-- end
-end
+-- 	local timegateData = self.timegates[judgeIndex]
+-- 	if deltaTime < 0 and timegateData.nameEarly then
+-- 		self.timegate = timegateData.nameEarly
+-- 	elseif deltaTime > 0 and timegateData.nameLate then
+-- 		self.timegate = timegateData.nameLate
+-- 	else
+-- 		self.timegate = timegateData.name
+-- 	end
+-- end
 
-Score.updateAccuracy = function(self)
-	self.accuracy = 1000 * math.sqrt(math.abs(-math.log(self.score / 1000000 * self.scoreEngine.maxScore / self.count))) * self.unit * self.scale
-	-- self:updateGrade()
-end
+-- Score.updateAccuracy = function(self)
+-- 	self.accuracy = 1000 * math.sqrt(math.abs(-math.log(self.score / 1000000 * self.scoreEngine.maxScore / self.maxScore))) * self.unit * self.scale
+-- 	-- self:updateGrade()
+-- end
 
-Score.judge = function(self, deltaTime)
-	local deltaTime = math.abs(deltaTime)
-	for i = 1, #self.timegates do
-		if deltaTime <= self.timegates[i].time then
-			return i
-		end
-	end
-	return #self.timegates
-end
+-- Score.judge = function(self, deltaTime)
+-- 	local deltaTime = math.abs(deltaTime)
+-- 	for i = 1, #self.timegates do
+-- 		if deltaTime <= self.timegates[i].time then
+-- 			return i
+-- 		end
+-- 	end
+-- 	return #self.timegates
+-- end
 
-Score.increaseCombo = function(self)
-	self.combo = self.combo + 1
-end
+-- Score.increaseCombo = function(self)
+-- 	self.combo = self.combo + 1
+-- end
 
-Score.breakCombo = function(self)
-	self.combo = 0
-end
+-- Score.breakCombo = function(self)
+-- 	self.combo = 0
+-- end
 
 return Score

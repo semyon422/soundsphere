@@ -19,8 +19,6 @@ ScoreEngine.load = function(self)
 	self.noteHandler = NoteHandler:new()
 	self.noteHandler.scoreEngine = self
 	self.noteHandler:load()
-
-	self.maxScore = self:getMaxScore()
 end
 
 ScoreEngine.update = function(self, dt)
@@ -52,15 +50,6 @@ end
 
 ScoreEngine.getScoreNote = function(self, noteData)
 	return self.scoreEngine.sharedScoreNotes[noteData]
-end
-
-ScoreEngine.getMaxScore = function(self)
-	local score = 0
-	local scoreNotes = self.noteHandler.scoreNotes
-	for i = 1, #scoreNotes do
-		score = score + scoreNotes[i]:getMaxScore()
-	end
-	return score
 end
 
 return ScoreEngine

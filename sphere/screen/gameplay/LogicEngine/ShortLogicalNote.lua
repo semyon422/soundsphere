@@ -22,18 +22,16 @@ ShortLogicalNote.update = function(self)
 	
 	local timeState = self.scoreNote:getTimeState()
 	
+	local numStates = #self.states
 	if not self.autoplay then
 		self:processTimeState(timeState)
 	else
 		self:processAuto()
 	end
 
-	-- self.scoreNote:update()
-	-- self:processShortNoteState(note.state)
-	
-	-- if note.ended then
-	-- 	self:hit(deltaTime, note.startNoteData.timePoint.absoluteTime)
-	-- end
+	if numStates ~= #self.states then
+		return self:update()
+	end
 end
 
 ShortLogicalNote.processTimeState = function(self, timeState)

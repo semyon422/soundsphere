@@ -6,10 +6,6 @@ ScoreNote.construct = function(self)
 	self.currentStateIndex = 1
 end
 
-ScoreNote.getMaxScore = function(self)
-	return 0
-end
-
 ScoreNote.getTimeState = function(self)
 	return "none"
 end
@@ -40,12 +36,8 @@ ScoreNote.isReachable = function(self)
 	return true
 end
 
-ScoreNote.increaseCombo = function(self)
-	return self.score:increaseCombo()
-end
-
-ScoreNote.breakCombo = function(self)
-	return self.score:breakCombo()
+ScoreNote.send = function(self, event)
+	return self.score:receive(event)
 end
 
 return ScoreNote
