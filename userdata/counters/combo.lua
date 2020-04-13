@@ -12,14 +12,14 @@ receive = function(event)
 	end
 
 	local oldState, newState = event.oldState, event.newState
-	if event.noteType == "ShortNote" then
+	if event.noteType == "ShortScoreNote" then
 		if newState == "passed" then
 			score.combo = score.combo + 1
 			score.maxcombo = math.max(score.maxcombo, score.combo)
 		elseif newState == "missed" then
 			score.combo = 0
 		end
-	elseif event.noteType == "LongNote" then
+	elseif event.noteType == "LongScoreNote" then
 		if oldState == "clear" then
 			if newState == "startPassedPressed" then
 				score.combo = score.combo + 1

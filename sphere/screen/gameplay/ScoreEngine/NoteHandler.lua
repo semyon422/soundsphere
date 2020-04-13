@@ -11,6 +11,8 @@ NoteHandler.unload = function(self) end
 
 NoteHandler.loadNoteData = function(self)
 	self.scoreNotes = {}
+	self.scoreNotesCount = {}
+	local scoreNotesCount = self.scoreNotesCount
 	
 	local scoreEngine = self.scoreEngine
 	for layerDataIndex in scoreEngine.noteChart:getLayerDataIndexIterator() do
@@ -27,6 +29,9 @@ NoteHandler.loadNoteData = function(self)
 				table.insert(self.scoreNotes, scoreNote)
 				
 				scoreEngine.sharedScoreNotes[noteData] = scoreNote
+
+				local noteType = scoreNote.noteType
+				scoreNotesCount[noteType] = (scoreNotesCount[noteType] or 0) + 1
 			end
 		end
 	end

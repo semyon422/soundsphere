@@ -2,7 +2,7 @@ local ScoreNote = require("sphere.screen.gameplay.ScoreEngine.ScoreNote")
 
 local LongScoreNote = ScoreNote:new()
 
-LongScoreNote.noteType = "LongNote"
+LongScoreNote.noteType = "LongScoreNote"
 
 LongScoreNote.construct = function(self)
 	self.startNoteData = self.noteData
@@ -66,6 +66,7 @@ LongScoreNote.update = function(self)
 			noteStartTime = self.startNoteData.timePoint.absoluteTime,
 			noteEndTime = self.endNoteData.timePoint.absoluteTime,
 			timeRate = self.scoreEngine.timeRate,
+			scoreNotesCount = self.noteHandler.scoreNotesCount,
 			oldState = oldState,
 			newState = newState
 		})

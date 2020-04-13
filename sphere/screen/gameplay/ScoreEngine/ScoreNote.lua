@@ -2,6 +2,8 @@ local Class = require("aqua.util.Class")
 
 local ScoreNote = Class:new()
 
+ScoreNote.noteType = "ScoreNote"
+
 ScoreNote.construct = function(self)
 	self.currentStateIndex = 1
 end

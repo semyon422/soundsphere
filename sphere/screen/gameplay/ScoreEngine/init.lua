@@ -21,7 +21,7 @@ ScoreEngine.load = function(self)
 	self.noteHandler:load()
 end
 
-ScoreEngine.update = function(self, dt)
+ScoreEngine.update = function(self)
 	self.noteHandler:update()
 end
 
@@ -38,14 +38,6 @@ ScoreEngine.receive = function(self, event)
 		self.currentTime = event.exactCurrentTime
 		self.timeRate = event.timeRate
 	end
-
-	-- if not event.virtual then
-	-- 	return
-	-- end
-
-	-- for noteHandler in pairs(self.noteHandlers) do
-	-- 	noteHandler:receive(event)
-	-- end
 end
 
 ScoreEngine.getScoreNote = function(self, noteData)

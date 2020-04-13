@@ -1,25 +1,21 @@
 local score
 
+local count, sum
+
 load = function(...)
 	score = ...
-	score.score = 0
+	score.accuracy = 0
+
+	count, sum = 0, 0
 end
 
-local maxScore = 1000000
-local scale = 3.6
-local unit = 1/60
+local increase = function(deltaTime, sumMul, countMul)
+	sum = sum + sumMul * deltaTime ^ 2
+	count = count + countMul
+end
 
-local noteCount
-getNoteCount = function(event)
-	if noteCount then
-		return noteCount
-	end
-
-	noteCount = 0
-	noteCount = noteCount + (event.scoreNotesCount["ShortScoreNote"] or 0)
-	noteCount = noteCount + (event.scoreNotesCount["LongScoreNote"] or 0)
-
-	return noteCount
+local update = function()
+	score.accuracy = 1000 * math.sqrt(sum / count)
 end
 
 receive = function(event)
@@ -31,20 +27,14 @@ receive = function(event)
 	if event.noteType == "ShortScoreNote" then
 		local deltaTime = (event.currentTime - event.noteTime) / event.timeRate
 		if newState == "passed" then
-			score.score = score.score
-				+ math.exp(-(deltaTime / unit / scale) ^ 2)
-				/ getNoteCount(event)
-				* maxScore
+			increase(deltaTime, 1, 1)
 		elseif newState == "missed" then
 		end
 	elseif event.noteType == "LongScoreNote" then
 		local deltaTime = (event.currentTime - event.noteStartTime) / event.timeRate
 		if oldState == "clear" then
 			if newState == "startPassedPressed" then
-				score.score = score.score
-					+ math.exp(-(deltaTime / unit / scale) ^ 2)
-					/ getNoteCount(event)
-					* maxScore
+				increase(deltaTime, 1, 1)
 			elseif newState == "startMissed" then
 			elseif newState == "startMissedPressed" then
 			end
@@ -64,5 +54,6 @@ receive = function(event)
 			end
 		end
 	end
+	update()
 end
 

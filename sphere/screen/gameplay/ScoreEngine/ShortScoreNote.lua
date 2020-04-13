@@ -2,7 +2,7 @@ local ScoreNote = require("sphere.screen.gameplay.ScoreEngine.ScoreNote")
 
 local ShortScoreNote = ScoreNote:new()
 
-ShortScoreNote.noteType = "ShortNote"
+ShortScoreNote.noteType = "ShortScoreNote"
 
 ShortScoreNote.construct = function(self)
 	self.startNoteData = self.noteData
@@ -49,6 +49,7 @@ ShortScoreNote.update = function(self)
 			currentTime = self.scoreEngine.currentTime,
 			noteTime = self.startNoteData.timePoint.absoluteTime,
 			timeRate = self.scoreEngine.timeRate,
+			scoreNotesCount = self.noteHandler.scoreNotesCount,
 			oldState = oldState,
 			newState = newState
 		})
