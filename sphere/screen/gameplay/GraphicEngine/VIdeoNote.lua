@@ -56,6 +56,10 @@ end
 VideoNote.computeVisualTime = function(self)
 end
 
+VideoNote.computeTimeState = function(self)
+	self.timeState = self.timeState or {}
+end
+
 VideoNote.getContainer = function(self)
 	return self.graphicEngine.container
 end
@@ -113,19 +117,19 @@ VideoNote.willDrawAfterEnd = function(self)
 end
 
 VideoNote.getHeadWidth = function(self)
-	return self.noteSkin:getG(0, 0, self, "Head", "w")
+	return self.noteSkin:getG(self, "Head", "w", self.timeState)
 end
 
 VideoNote.getHeadHeight = function(self)
-	return self.noteSkin:getG(0, 0, self, "Head", "h")
+	return self.noteSkin:getG(self, "Head", "h", self.timeState)
 end
 
 VideoNote.getX = function(self)
-	return self.noteSkin:getG(0, 0, self, "Head", "x")
+	return self.noteSkin:getG(self, "Head", "x", self.timeState)
 end
 
 VideoNote.getY = function(self)
-	return self.noteSkin:getG(0, 0, self, "Head", "y")
+	return self.noteSkin:getG(self, "Head", "y", self.timeState)
 end
 
 VideoNote.getScaleX = function(self)

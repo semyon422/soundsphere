@@ -125,7 +125,7 @@ end
 
 NoteSkin.getG = function(self, note, part, name, timeState)
 	local seq = self.data[note.id][part].gc[name]
-
+	
 	return self.env[seq[1]](timeState, note.logicalNote:getLastState(), seq[2])
 end
 

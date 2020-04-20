@@ -45,6 +45,10 @@ end
 ImageNote.computeVisualTime = function(self)
 end
 
+ImageNote.computeTimeState = function(self)
+	self.timeState = self.timeState or {}
+end
+
 ImageNote.getContainer = function(self)
 	return self.graphicEngine.container
 end
@@ -92,19 +96,19 @@ ImageNote.willDrawAfterEnd = function(self)
 end
 
 ImageNote.getHeadWidth = function(self)
-	return self.noteSkin:getG(0, 0, self, "Head", "w")
+	return self.noteSkin:getG(self, "Head", "w", self.timeState)
 end
 
 ImageNote.getHeadHeight = function(self)
-	return self.noteSkin:getG(0, 0, self, "Head", "h")
+	return self.noteSkin:getG(self, "Head", "h", self.timeState)
 end
 
 ImageNote.getX = function(self)
-	return self.noteSkin:getG(0, 0, self, "Head", "x")
+	return self.noteSkin:getG(self, "Head", "x", self.timeState)
 end
 
 ImageNote.getY = function(self)
-	return self.noteSkin:getG(0, 0, self, "Head", "y")
+	return self.noteSkin:getG(self, "Head", "y", self.timeState)
 end
 
 ImageNote.getScaleX = function(self)

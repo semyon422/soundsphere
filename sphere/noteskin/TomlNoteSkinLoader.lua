@@ -43,14 +43,62 @@ TomlNoteSkinLoader.load = function(self, metaData, version)
 	return noteSkin
 end
 
+local colors = {
+	transparent = {255, 255, 255, 0},
+	clear = {255, 255, 255, 255},
+	missed = {127, 127, 127, 255},
+	passed = {255, 255, 255, 0},
+	startMissed = {127, 127, 127, 255},
+	startMissedPressed = {191, 191, 191, 255},
+	startPassedPressed = {255, 255, 255, 255},
+	endPassed = {255, 255, 255, 0},
+	endMissed = {127, 127, 127, 255},
+	endMissedPassed = {127, 127, 127, 255}
+}
+
+local envcolor = function(timeState, logicalState, data)
+    if logicalState == "clear" or logicalState == "skipped" then
+		return colors.clear
+	elseif logicalState == "missed" then
+		return colors.missed
+	elseif logicalState == "passed" then
+		return colors.passed
+    end
+	
+	local startTimeState = timeState.startTimeState or timeState
+	local endTimeState = timeState.endTimeState or timeState
+	local sdt = timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime
+
+	if startTimeState.fakeCurrentVisualTime >= endTimeState.absoluteTime then
+		return colors.transparent
+	elseif logicalState == "clear" then
+		return colors.clear
+	elseif logicalState == "startMissed" then
+		return colors.startMissed
+	elseif logicalState == "startMissedPressed" then
+		return colors.startMissedPressed
+	elseif logicalState == "startPassedPressed" then
+		return colors.startPassedPressed
+	elseif logicalState == "endPassed" then
+		return colors.endPassed
+	elseif logicalState == "endMissed" then
+		return colors.endMissed
+	elseif logicalState == "endMissedPassed" then
+		return colors.endMissedPassed
+	end
+
+    return colors.clear
+end
+
 TomlNoteSkinLoader.addEnv = function(self)
 	self.noteSkin.env = {}
 	local env = self.noteSkin.env
 
-	env.number = function(_, n) return n end
-	env.linear = function(timeState, data)
+	env.number = function(timeState, logicalState, n) return n end
+	env.linear = function(timeState, logicalState, data)
 		return data[1] + data[2] * (timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
 	end
+	env.color = envcolor
 end
 
 TomlNoteSkinLoader.processNoteSkinData = function(self)
@@ -185,7 +233,8 @@ TomlNoteSkinLoader.addShortNote = function(self, input, i)
 		w = {"number", columns.width[i] / unit},
 		h = {"number", columns.height[i] / unit},
 		ox = {"number", 0},
-		oy = {"number", -1}
+		oy = {"number", -1},
+		color = {"color", "white"}
 	}
 	head.drawInterval = {-1, 1}
 end
@@ -214,7 +263,8 @@ TomlNoteSkinLoader.addLongNote = function(self, input, i)
 		w = {"number", columns.width[i] / unit},
 		h = {"number", columns.height[i] / unit},
 		ox = {"number", 0},
-		oy = {"number", -1}
+		oy = {"number", -1},
+		color = {"color", "white"}
 	}
 	head.drawInterval = {-1, 1}
 
@@ -229,7 +279,8 @@ TomlNoteSkinLoader.addLongNote = function(self, input, i)
 		w = {"number", columns.width[i] / unit},
 		h = {"number", 0},
 		ox = {"number", 0},
-		oy = {"number", -0.5}
+		oy = {"number", -0.5},
+		color = {"color", "white"}
 	}
 
 	longNote.Tail = {}
@@ -243,7 +294,8 @@ TomlNoteSkinLoader.addLongNote = function(self, input, i)
 		w = {"number", columns.width[i] / unit},
 		h = {"number", columns.height[i] / unit},
 		ox = {"number", 0},
-		oy = {"number", -1}
+		oy = {"number", -1},
+		color = {"color", "white"}
 	}
 	tail.drawInterval = {-1, 1}
 end
@@ -334,7 +386,8 @@ TomlNoteSkinLoader.addMeasureLine = function(self)
 		w = {"number", 0},
 		h = {"number", 0},
 		ox = {"number", 0},
-		oy = {"number", 0}
+		oy = {"number", 0},
+		color = {"color", "white"}
 	}
 	head.drawInterval = {-1, 1}
 
@@ -349,7 +402,8 @@ TomlNoteSkinLoader.addMeasureLine = function(self)
 		w = {"number", (self:getNoteX(#columns.width + 1) - self:getNoteX(0)) / unit},
 		h = {"number", tomlMeasureLine.height / unit},
 		ox = {"number", 0},
-		oy = {"number", 0}
+		oy = {"number", 0},
+		color = {"color", "white"}
 	}
 
 	longNote.Tail = {}
@@ -363,7 +417,8 @@ TomlNoteSkinLoader.addMeasureLine = function(self)
 		w = {"number", 0},
 		h = {"number", 0},
 		ox = {"number", 0},
-		oy = {"number", 0}
+		oy = {"number", 0},
+		color = {"color", "white"}
 	}
 	tail.drawInterval = {-1, 1}
 end
@@ -599,7 +654,8 @@ TomlNoteSkinLoader.addImageNote = function(self, input, layer)
 		w = {"number", 1},
 		h = {"number", 1},
 		ox = {"number", 0},
-		oy = {"number", 0}
+		oy = {"number", 0},
+		color = {"color", "white"}
 	}
 end
 
@@ -620,7 +676,8 @@ TomlNoteSkinLoader.addVideoNote = function(self, input, layer)
 		w = {"number", 1},
 		h = {"number", 1},
 		ox = {"number", 0},
-		oy = {"number", 0}
+		oy = {"number", 0},
+		color = {"color", "white"}
 	}
 end
 
