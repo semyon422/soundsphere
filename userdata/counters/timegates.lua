@@ -1,5 +1,35 @@
+local timegatesLT0, timegatesMT0
+
+local sortTimegates = function(a, b)
+	return a.time < b.time
+end
+
 load = function()
-	scoreTable.hits = {}
+	scoreTable.timegates = {}
+	timegatesLT0, timegatesMT0 = {}, {}
+
+	for _, data in ipairs(config.timegates) do
+		if data.time < 0 then
+			timegatesLT0[#timegatesLT0 + 1] = data
+			data.time = - data.time
+		elseif data.time > 0 then
+			timegatesMT0[#timegatesMT0 + 1] = data
+		end
+	end
+
+	table.sort(timegatesLT0, sortTimegates)
+	table.sort(timegatesMT0, sortTimegates)
+end
+
+local increase = function(deltaTime)
+	local timegates = deltaTime < 0 and timegatesLT0 or timegatesMT0
+	deltaTime = math.abs(deltaTime)
+
+	for i, data in ipairs(timegates) do
+		if deltaTime <= data.time then
+			scoreTable.timegates[data.name] = (scoreTable.timegates[data.name] or 0) + 1
+		end
+	end
 end
 
 receive = function(event)
@@ -7,21 +37,23 @@ receive = function(event)
 		return
 	end
 
-	local hits = scoreTable.hits
 	local oldState, newState = event.oldState, event.newState
 	if event.noteType == "ShortScoreNote" then
 		local deltaTime = (event.currentTime - event.noteTime) / event.timeRate
 		if newState == "passed" then
-			hits[#hits + 1] = {event.currentTime, deltaTime}
+			increase(deltaTime)
 		elseif newState == "missed" then
+			increase(deltaTime)
 		end
 	elseif event.noteType == "LongScoreNote" then
 		local deltaTime = (event.currentTime - event.noteStartTime) / event.timeRate
 		if oldState == "clear" then
 			if newState == "startPassedPressed" then
-				hits[#hits + 1] = {event.currentTime, deltaTime}
+				increase(deltaTime)
 			elseif newState == "startMissed" then
+				increase(deltaTime)
 			elseif newState == "startMissedPressed" then
+				increase(deltaTime)
 			end
 		elseif oldState == "startPassedPressed" then
 			if newState == "startMissed" then

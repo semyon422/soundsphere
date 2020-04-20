@@ -39,6 +39,7 @@ ScoreNote.isReachable = function(self)
 end
 
 ScoreNote.send = function(self, event)
+	self.scoreEngine:send(event)
 	return self.scoreSystem:receive(event)
 end
 

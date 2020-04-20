@@ -109,6 +109,7 @@ GameplayScreen.load = function(self)
 	gui.scoreSystem = scoreEngine.scoreSystem
 	gui.noteChart = noteChart
 	timeEngine.observable:add(gui)
+	scoreEngine.observable:add(gui)
 
 	ModifierManager:apply()
 	

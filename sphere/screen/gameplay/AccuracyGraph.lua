@@ -99,8 +99,40 @@ AccuracyGraph.update = function(self) end
 AccuracyGraph.receive = function(self, event)
 	if event.name == "resize" then
 		self:reload()
-	elseif event.name == "hit" then
-		self:addPoint(event.time, event.deltaTime)
+	end
+
+	if event.name ~= "ScoreNoteState" then
+		return
+	end
+	
+	local oldState, newState = event.oldState, event.newState
+	if event.noteType == "ShortScoreNote" then
+		if newState == "passed" then
+			self:addPoint(event.currentTime, (event.currentTime - event.noteTime) / event.timeRate)
+		elseif newState == "missed" then
+		end
+	elseif event.noteType == "LongScoreNote" then
+		if oldState == "clear" then
+			if newState == "startPassedPressed" then
+				self:addPoint(event.currentTime, (event.currentTime - event.noteStartTime) / event.timeRate)
+			elseif newState == "startMissed" then
+			elseif newState == "startMissedPressed" then
+			end
+		elseif oldState == "startPassedPressed" then
+			if newState == "startMissed" then
+			elseif newState == "endMissed" then
+			elseif newState == "endPassed" then
+			end
+		elseif oldState == "startMissedPressed" then
+			if newState == "endMissedPassed" then
+			elseif newState == "startMissed" then
+			elseif newState == "endMissed" then
+			end
+		elseif oldState == "startMissed" then
+			if newState == "startMissedPressed" then
+			elseif newState == "endMissed" then
+			end
+		end
 	end
 end
 

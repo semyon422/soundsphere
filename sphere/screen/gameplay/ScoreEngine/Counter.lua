@@ -17,9 +17,19 @@ end
 local Counter = Class:new()
 
 Counter.construct = function(self)
+	self:createEnv()
+end
+
+Counter.createEnv = function(self)
 	self.env = {}
-	self.env.math = math
-	self.env.print = print
+
+	local env = self.env
+
+	env.math = math
+	env.print = print
+	env.pairs = pairs
+	env.ipairs = ipairs
+	env.table = table
 end
 
 Counter.loadFile = function(self, path)

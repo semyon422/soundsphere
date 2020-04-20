@@ -9,18 +9,58 @@
         },
         {
             "path": "combo.lua"
+        },
+        {
+            "path": "hits.lua"
+        },
+        {
+            "path": "timegates.lua",
+            "timegates": [
+                {
+                    "time": -0.16,
+                    "name": "miss"
+                },
+                {
+                    "time": -0.12,
+                    "name": "bad"
+                },
+                {
+                    "time": -0.04,
+                    "name": "good"
+                },
+                {
+                    "time": -0.016,
+                    "name": "great"
+                },
+                {
+                    "time": 0.016,
+                    "name": "great"
+                },
+                {
+                    "time": 0.04,
+                    "name": "good"
+                },
+                {
+                    "time": 0.12,
+                    "name": "bad"
+                },
+                {
+                    "time": 0.16,
+                    "name": "miss"
+                }
+            ]
         }
     ],
     "notes": {
         "ShortScoreNote": {
-            "pass": [-0.120, 0.120],
-            "miss": [-0.160]
+            "pass": [-0.12, 0.12],
+            "miss": [-0.16]
         },
         "LongScoreNote": {
-            "startPass": [-0.120, 0.120],
-            "startMiss": [-0.160],
-            "endPass": [-0.120, 0.120],
-            "endMiss": [-0.160]
+            "startPass": [-0.12, 0.12],
+            "startMiss": [-0.16],
+            "endPass": [-0.12, 0.12],
+            "endMiss": [-0.16]
         }
     }
 }
