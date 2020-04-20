@@ -106,7 +106,8 @@ GameplayScreen.load = function(self)
 	gui.noteSkin = noteSkin
 	gui.container = self.container
 	gui.logicEngine = logicEngine
-	gui.score = scoreEngine.score
+	gui.scoreSystem = scoreEngine.scoreSystem
+	gui.noteChart = noteChart
 	timeEngine.observable:add(gui)
 
 	ModifierManager:apply()
@@ -124,7 +125,7 @@ GameplayScreen.load = function(self)
 	InputManager.observable:add(gui)
 	
 	PauseOverlay.timeEngine = timeEngine
-	PauseOverlay.score = scoreEngine.score
+	PauseOverlay.scoreSystem = scoreEngine.scoreSystem
 	PauseOverlay.noteChart = noteChart
 	PauseOverlay.noteChartEntry = self.noteChartEntry
 	PauseOverlay.noteChartDataEntry = self.noteChartDataEntry

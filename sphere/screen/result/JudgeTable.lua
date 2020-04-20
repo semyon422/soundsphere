@@ -16,7 +16,7 @@ JudgeTable.load = function(self)
 	
 	self.row = 1
 	self:addHeader()
-	local timegates = self.score.timegates or {}
+	local timegates = self.scoreSystem.timegates or {}
 	for i = 1, #timegates do
 		self.judgeNames[self.row] = self:getJudgeNameText(self.score.timegates[i].name, self.row)
 		self.judgeNames[self.row]:reload()

@@ -1,48 +1,44 @@
+local json			= require("json")
 local Class			= require("aqua.util.Class")
 local Observable	= require("aqua.util.Observable")
 local Counter		= require("sphere.screen.gameplay.ScoreEngine.Counter")
 
-local Score = Class:new()
+local ScoreSystem = Class:new()
 
-Score.send = function(self, event)
+ScoreSystem.basePath = "userdata/counters"
+
+ScoreSystem.send = function(self, event)
 	return self.observable:send(event)
 end
 
-Score.construct = function(self)
+ScoreSystem.construct = function(self)
 	self.observable = Observable:new()
+	self.scoreTable = {}
+end
 
-	self.scoreTable = {
-		-- combo = 0,
-		-- maxcombo = 0,
-		-- timeRate = 1,
-		-- hits = {},
-		-- judges = {},
-		
-		-- sum = 0,
-		-- maxScore = 0,
-		-- accuracy = 0,
-		-- timegate = "",
-		-- grade = "?",
-		
-		-- score = 0
-	}
+ScoreSystem.loadConfig = function(self, path)
+	local file = io.open(self.basePath .. "/" .. path, "r")
+	self.scoreConfig = json.decode(file:read("*all"))
+	file:close()
 
 	self:loadCounters()
 end
 
-Score.loadCounters = function(self)
+ScoreSystem.loadCounters = function(self)
 	self.counters = {}
 	local counters = self.counters
 
-	for _, itemName in pairs(love.filesystem.getDirectoryItems("userdata/counters")) do
+	for _, counterConfig in ipairs(self.scoreConfig.counters) do
 		local counter = Counter:new()
-		counter:loadFile("userdata/counters/" .. itemName)
-		counter:load(self.scoreTable)
+		counter.config = counterConfig
+		counter.scoreTable = self.scoreTable
+		counter:loadFile(self.basePath .. "/" .. counterConfig.path)
+		counter:load()
 		counters[#counters + 1] = counter
 	end
 end
 
-Score.receive = function(self, event)
+ScoreSystem.receive = function(self, event)
 	local counters = self.counters
 	for i = 1, #counters do
 		counters[i]:receive(event)
@@ -181,4 +177,4 @@ end
 -- 	self.combo = 0
 -- end
 
-return Score
+return ScoreSystem

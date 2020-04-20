@@ -211,8 +211,9 @@ PauseOverlay.menu = function(self)
 	ScreenManager:set(require("sphere.screen.result.ResultScreen"),
 		function()
 			ScreenManager:receive({
-				name = "score",
-				score = self.score,
+				name = "scoreSystem",
+				scoreSystem = self.scoreSystem,
+				noteChart = self.noteChart,
 				noteChartEntry = GameplayScreen.noteChartEntry,
 				noteChartDataEntry = GameplayScreen.noteChartDataEntry
 			})

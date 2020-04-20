@@ -23,7 +23,7 @@ TextDisplay.loadGui = function(self)
 	self.blendMode = self.data.blendMode
 	self.blendAlphaMode = self.data.blendAlphaMode
 
-	self.score = self.gui.score
+	self.scoreSystem = self.gui.scoreSystem
 	self.container = self.gui.container
 	
 	self:load()

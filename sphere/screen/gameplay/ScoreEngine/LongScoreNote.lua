@@ -12,16 +12,17 @@ LongScoreNote.construct = function(self)
 	ScoreNote.construct(self)
 end
 
-LongScoreNote.passEdge = 0.120
-LongScoreNote.missEdge = 0.160
 LongScoreNote.getStartTimeState = function(self)
 	local deltaTime = (self.scoreEngine.currentTime - self.startNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
+	local config = self.scoreEngine.scoreSystem.scoreConfig.notes.LongScoreNote
+	local pass = config.startPass
+	local miss = config.startMiss
 
-	if math.abs(deltaTime) <= self.passEdge then
+	if deltaTime >= pass[1] and deltaTime <= pass[2] then
 		return "exactly"
-	elseif deltaTime > self.passEdge then
+	elseif deltaTime > pass[2] then
 		return "late"
-	elseif deltaTime >= -self.missEdge then
+	elseif deltaTime >= miss[1] then
 		return "early"
 	end
 	
@@ -30,12 +31,15 @@ end
 
 LongScoreNote.getEndTimeState = function(self)
 	local deltaTime = (self.scoreEngine.currentTime - self.endNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
+	local config = self.scoreEngine.scoreSystem.scoreConfig.notes.LongScoreNote
+	local pass = config.endPass
+	local miss = config.endMiss
 
-	if math.abs(deltaTime) <= self.passEdge then
+	if deltaTime >= pass[1] and deltaTime <= pass[2] then
 		return "exactly"
-	elseif deltaTime > self.passEdge then
+	elseif deltaTime > pass[2] then
 		return "late"
-	elseif deltaTime >= -self.missEdge then
+	elseif deltaTime >= miss[1] then
 		return "early"
 	end
 	

@@ -20,7 +20,8 @@ AccuracyGraph.loadGui = function(self)
 	self.blendMode = self.data.blendMode
 	self.blendAlphaMode = self.data.blendAlphaMode
 
-	self.score = self.gui.score
+	self.scoreSystem = self.gui.scoreSystem
+	self.noteChart = self.gui.noteChart
 	self.container = self.gui.container
 	
 	self:load()
@@ -29,7 +30,7 @@ end
 AccuracyGraph.load = function(self)
 	self.allcs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
-	self.score.observable:add(self)
+	self.scoreSystem.observable:add(self)
 
 	self.canvas = love.graphics.newCanvas()
 	
@@ -52,9 +53,9 @@ AccuracyGraph.load = function(self)
 		cs = self.cs
 	})
 	
-	self.minTime = self.score.noteChart.metaData:get("minTime")
-	self.maxTime = self.score.noteChart.metaData:get("maxTime")
-	local hits = self.score.scoreTable.hits or {}
+	self.minTime = self.noteChart.metaData:get("minTime")
+	self.maxTime = self.noteChart.metaData:get("maxTime")
+	local hits = self.scoreSystem.scoreTable.hits or {}
 	for _, point in ipairs(hits) do
 		self:addPoint(point[1], point[2])
 	end

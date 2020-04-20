@@ -11,16 +11,17 @@ ShortScoreNote.construct = function(self)
 	ScoreNote.construct(self)
 end
 
-ShortScoreNote.passEdge = 0.120
-ShortScoreNote.missEdge = 0.160
 ShortScoreNote.getTimeState = function(self)
 	local deltaTime = (self.scoreEngine.currentTime - self.startNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
+	local config = self.scoreEngine.scoreSystem.scoreConfig.notes.ShortScoreNote
+	local pass = config.pass
+	local miss = config.miss
 
-	if math.abs(deltaTime) <= self.passEdge then
+	if deltaTime >= pass[1] and deltaTime <= pass[2] then
 		return "exactly"
-	elseif deltaTime > self.passEdge then
+	elseif deltaTime > pass[2] then
 		return "late"
-	elseif deltaTime >= -self.missEdge then
+	elseif deltaTime >= miss[1] then
 		return "early"
 	end
 	

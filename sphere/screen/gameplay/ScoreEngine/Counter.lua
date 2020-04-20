@@ -28,8 +28,11 @@ Counter.loadFile = function(self, path)
 	file:close()
 end
 
-Counter.load = function(self, score)
-	self.env.load(score)
+Counter.load = function(self)
+	local env = self.env
+	env.scoreTable = self.scoreTable
+	env.config = self.config
+	env.load()
 end
 
 Counter.receive = function(self, event)

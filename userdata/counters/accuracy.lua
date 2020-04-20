@@ -1,10 +1,7 @@
-local score
-
 local count, sum
 
-load = function(...)
-	score = ...
-	score.accuracy = 0
+load = function()
+	scoreTable.accuracy = 0
 
 	count, sum = 0, 0
 end
@@ -15,7 +12,7 @@ local increase = function(deltaTime, sumMul, countMul)
 end
 
 local update = function()
-	score.accuracy = 1000 * math.sqrt(sum / count)
+	scoreTable.accuracy = 1000 * math.sqrt(sum / count)
 end
 
 receive = function(event)

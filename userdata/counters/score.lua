@@ -1,8 +1,5 @@
-local score
-
-load = function(...)
-	score = ...
-	score.score = 0
+load = function()
+	scoreTable.score = 0
 end
 
 local maxScore = 1000000
@@ -31,7 +28,7 @@ receive = function(event)
 	if event.noteType == "ShortScoreNote" then
 		local deltaTime = (event.currentTime - event.noteTime) / event.timeRate
 		if newState == "passed" then
-			score.score = score.score
+			scoreTable.score = scoreTable.score
 				+ math.exp(-(deltaTime / unit / scale) ^ 2)
 				/ getNoteCount(event)
 				* maxScore
@@ -41,7 +38,7 @@ receive = function(event)
 		local deltaTime = (event.currentTime - event.noteStartTime) / event.timeRate
 		if oldState == "clear" then
 			if newState == "startPassedPressed" then
-				score.score = score.score
+				scoreTable.score = scoreTable.score
 					+ math.exp(-(deltaTime / unit / scale) ^ 2)
 					/ getNoteCount(event)
 					* maxScore

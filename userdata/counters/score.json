@@ -1,0 +1,26 @@
+{
+    "name": "soundsphere score system",
+    "counters": [
+        {
+            "path": "score.lua"
+        },
+        {
+            "path": "accuracy.lua"
+        },
+        {
+            "path": "combo.lua"
+        }
+    ],
+    "notes": {
+        "ShortScoreNote": {
+            "pass": [-0.120, 0.120],
+            "miss": [-0.160]
+        },
+        "LongScoreNote": {
+            "startPass": [-0.120, 0.120],
+            "startMiss": [-0.160],
+            "endPass": [-0.120, 0.120],
+            "endMiss": [-0.160]
+        }
+    }
+}
