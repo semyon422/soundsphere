@@ -12,19 +12,19 @@ Score.construct = function(self)
 	self.observable = Observable:new()
 
 	self.scoreTable = {
-		combo = 0,
-		maxcombo = 0,
-		timeRate = 1,
-		hits = {},
-		judges = {},
+		-- combo = 0,
+		-- maxcombo = 0,
+		-- timeRate = 1,
+		-- hits = {},
+		-- judges = {},
 		
-		sum = 0,
-		maxScore = 0,
-		accuracy = 0,
-		timegate = "",
-		grade = "?",
+		-- sum = 0,
+		-- maxScore = 0,
+		-- accuracy = 0,
+		-- timegate = "",
+		-- grade = "?",
 		
-		score = 0
+		-- score = 0
 	}
 
 	self:loadCounters()

@@ -54,7 +54,8 @@ AccuracyGraph.load = function(self)
 	
 	self.minTime = self.score.noteChart.metaData:get("minTime")
 	self.maxTime = self.score.noteChart.metaData:get("maxTime")
-	for _, point in ipairs(self.score.scoreTable.hits) do
+	local hits = self.score.scoreTable.hits or {}
+	for _, point in ipairs(hits) do
 		self:addPoint(point[1], point[2])
 	end
 	
