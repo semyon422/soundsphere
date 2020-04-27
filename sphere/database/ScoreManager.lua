@@ -67,15 +67,15 @@ ScoreManager.select = function(self)
 	end
 end
 
-ScoreManager.insertScore = function(self, score)
+ScoreManager.insertScore = function(self, scoreTable, noteChartDataEntry)
 	ScoreDatabase:insertScore({
-		noteChartHash = score.hash,
-		noteChartIndex = score.index,
+		noteChartHash = noteChartDataEntry.hash,
+		noteChartIndex = noteChartDataEntry.index,
 		playerName = "Player",
 		time = os.time(),
-		score = score.score,
-		accuracy = score.accuracy,
-		maxCombo = score.maxcombo,
+		score = scoreTable.score,
+		accuracy = scoreTable.accuracy,
+		maxCombo = scoreTable.maxcombo,
 		scoreRating = 0,
 		mods = "None"
 	})

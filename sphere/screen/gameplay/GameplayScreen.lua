@@ -44,6 +44,8 @@ GameplayScreen.load = function(self)
 	local noteChart = self:loadNoteChart()
 	ModifierManager.noteChart = noteChart
 
+	ModifierManager:apply()
+
 	local timeEngine = TimeEngine:new()
 	self.timeEngine = timeEngine
 	timeEngine.noteChart = noteChart
@@ -89,6 +91,8 @@ GameplayScreen.load = function(self)
 	logicEngine.globalAliases = {}
 	-- score.logicEngine = logicEngine
 	ModifierManager.logicEngine = logicEngine
+	logicEngine.observable:add(ModifierManager)
+
 
 	local graphicEngine = GraphicEngine:new()
 	self.graphicEngine = graphicEngine
@@ -110,8 +114,6 @@ GameplayScreen.load = function(self)
 	gui.noteChart = noteChart
 	timeEngine.observable:add(gui)
 	scoreEngine.observable:add(gui)
-
-	ModifierManager:apply()
 	
 	logicEngine:load()
 	graphicEngine:load()

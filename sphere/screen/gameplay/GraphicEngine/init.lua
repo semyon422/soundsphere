@@ -7,9 +7,11 @@ local tween				= require("tween")
 
 local GraphicEngine = Class:new()
 
-GraphicEngine.load = function(self)
+GraphicEngine.construct = function(self)
 	self.observable = Observable:new()
-	
+end
+
+GraphicEngine.load = function(self)
 	self.noteCount = 0
 	self.currentTime = 0
 	self.timeRate = 1

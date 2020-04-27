@@ -1,13 +1,16 @@
-local Class			= require("aqua.util.Class")
-local Observable	= require("aqua.util.Observable")
-local NoteHandler	= require("sphere.screen.gameplay.ScoreEngine.NoteHandler")
-local ScoreSystem	= require("sphere.screen.gameplay.ScoreEngine.ScoreSystem")
+local Class				= require("aqua.util.Class")
+local Observable		= require("aqua.util.Observable")
+local NoteHandler		= require("sphere.screen.gameplay.ScoreEngine.NoteHandler")
+local ScoreSystem		= require("sphere.screen.gameplay.ScoreEngine.ScoreSystem")
+local ScoreNoteFactory	= require("sphere.screen.gameplay.ScoreEngine.ScoreNoteFactory")
 
 local ScoreEngine = Class:new()
 
-ScoreEngine.load = function(self)
+ScoreEngine.construct = function(self)
 	self.observable = Observable:new()
+end
 
+ScoreEngine.load = function(self)
 	self.scoreSystem = ScoreSystem:new()
 	self.scoreSystem:loadConfig("score.json")
 	
@@ -40,7 +43,7 @@ ScoreEngine.receive = function(self, event)
 end
 
 ScoreEngine.getScoreNote = function(self, noteData)
-	return self.scoreEngine.sharedScoreNotes[noteData]
+	return self.sharedScoreNotes[noteData]
 end
 
 return ScoreEngine

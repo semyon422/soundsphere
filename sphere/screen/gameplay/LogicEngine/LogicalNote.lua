@@ -34,9 +34,12 @@ end
 
 LogicalNote.load = function(self)
 	self.scoreNote:load()
+	self:sendState("load")
 end
 
-LogicalNote.unload = function(self) end
+LogicalNote.unload = function(self)
+	self:sendState("unload")
+end
 
 LogicalNote.update = function(self) end
 

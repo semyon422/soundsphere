@@ -133,6 +133,12 @@ ModifierSequence.update = function(self)
 	end
 end
 
+ModifierSequence.receive = function(self, event)
+	for _, modifier in ipairs(self:getEnabledModifiers()) do
+		modifier:receive(event)
+	end
+end
+
 ModifierSequence.tostring = function(self)
 	local out = {}
 	

@@ -34,6 +34,10 @@ ModifierManager.update = function(self)
 	return self.sequence:update()
 end
 
+ModifierManager.receive = function(self, event)
+	return self.sequence:receive(event)
+end
+
 ModifierManager.getSequence = function(self)
 	return self.sequence
 end

@@ -17,7 +17,7 @@ WindUp.update = function(self)
 	local startTime = logicEngine.noteChart:hashGet("minTime")
 	local endTime = logicEngine.noteChart:hashGet("maxTime")
 	local currentTime = logicEngine.exactCurrentTime
-	logicEngine:setTimeRate(map(currentTime, startTime, endTime, 0.75, 1.5))
+	-- logicEngine:setTimeRate(map(currentTime, startTime, endTime, 0.75, 1.5))
 end
 
 return WindUp

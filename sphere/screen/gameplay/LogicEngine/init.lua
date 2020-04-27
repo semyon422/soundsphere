@@ -4,9 +4,11 @@ local NoteHandler		= require("sphere.screen.gameplay.LogicEngine.NoteHandler")
 
 local LogicEngine = Class:new()
 
-LogicEngine.load = function(self)
+LogicEngine.construct = function(self)
 	self.observable = Observable:new()
-	
+end
+
+LogicEngine.load = function(self)
 	self.sharedLogicalNotes = {}
 	self.currentTime = 0
 	
@@ -72,7 +74,7 @@ LogicEngine.unloadNoteHandlers = function(self)
 end
 
 LogicEngine.getScoreNote = function(self, noteData)
-	return self.scoreEngine.sharedScoreNotes[noteData]
+	return self.scoreEngine:getScoreNote(noteData)
 end
 
 return LogicEngine

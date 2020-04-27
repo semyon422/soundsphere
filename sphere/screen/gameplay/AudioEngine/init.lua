@@ -8,10 +8,13 @@ local SoundNoteFactory	= require("sphere.screen.gameplay.AudioEngine.SoundNoteFa
 
 local AudioEngine = Class:new()
 
+AudioEngine.construct = function(self)
+	self.observable = Observable:new()
+end
+
 AudioEngine.timeRate = 1
 
 AudioEngine.load = function(self)
-	self.observable = Observable:new()
 	self.backgroundContainer = AudioContainer:new()
 	self.foregroundContainer = AudioContainer:new()
 	

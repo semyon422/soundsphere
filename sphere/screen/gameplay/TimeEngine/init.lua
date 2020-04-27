@@ -5,13 +5,16 @@ local TimeManager		= require("sphere.screen.gameplay.TimeEngine.TimeManager")
 
 local TimeEngine = Class:new()
 
+TimeEngine.construct = function(self)
+	self.observable = Observable:new()
+end
+
 TimeEngine.currentTime = 0
 TimeEngine.exactCurrentTime = 0
 TimeEngine.timeRate = 0
 TimeEngine.targetTimeRate = 0
 
 TimeEngine.load = function(self)
-	self.observable = Observable:new()
 	self:loadTimeManager()
 end
 

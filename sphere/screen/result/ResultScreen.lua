@@ -60,9 +60,9 @@ ResultScreen.receive = function(self, event)
 		self.judgeTable.scoreSystem = scoreSystem
 		self.judgeTable:load()
 		
-		-- if not score.autoplay and score.score > 0 then
-		-- 	ScoreManager:insertScore(score)
-		-- end
+		if scoreSystem.scoreTable.score > 0 then
+			ScoreManager:insertScore(scoreSystem.scoreTable, event.noteChartDataEntry)
+		end
 	end
 end
 
