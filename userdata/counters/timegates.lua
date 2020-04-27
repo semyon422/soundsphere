@@ -5,6 +5,7 @@ local sortTimegates = function(a, b)
 end
 
 load = function()
+	scoreTable.timegate = ""
 	scoreTable.timegates = {}
 	timegatesLT0, timegatesMT0 = {}, {}
 
@@ -28,6 +29,8 @@ local increase = function(deltaTime)
 	for i, data in ipairs(timegates) do
 		if deltaTime <= data.time then
 			scoreTable.timegates[data.name] = (scoreTable.timegates[data.name] or 0) + 1
+			scoreTable.timegate = data.name
+			break
 		end
 	end
 end
