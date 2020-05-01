@@ -1,13 +1,18 @@
-local InconsequentialModifier = require("sphere.screen.gameplay.ModifierManager.InconsequentialModifier")
+local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
 
-local AutoPlay = InconsequentialModifier:new()
+local AutoPlay = Modifier:new()
+
+AutoPlay.inconsequential = true
+AutoPlay.type = "LogicEngineModifier"
 
 AutoPlay.name = "AutoPlay"
 AutoPlay.shortName = "AP"
 
-AutoPlay.type = "boolean"
+AutoPlay.variableType = "boolean"
 
-AutoPlay.apply = function(self) end
+AutoPlay.apply = function(self)
+	self.sequence.manager.logicEngine.autoplay = true
+end
 
 AutoPlay.receive = function(self, event)
 	if event.name ~= "LogicalNoteState" then

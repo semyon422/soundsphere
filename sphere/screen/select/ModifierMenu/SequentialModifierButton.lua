@@ -9,11 +9,11 @@ SequentialModifierButton.construct = function(self)
 	local modifier = self.item.modifier
 	
 	local button
-	if Modifier.type == "number" then
+	if Modifier.variableType == "number" then
 		button = SliderButton:new(self)
 		button.item = self.item
 		button.updateValue = function(self, value)
-			modifier[modifier.variable] = value
+			modifier[modifier.variableName] = value
 			
 			SliderButton.updateValue(self, value)
 		end

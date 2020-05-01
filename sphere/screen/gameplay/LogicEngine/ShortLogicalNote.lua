@@ -55,6 +55,7 @@ ShortLogicalNote.processAuto = function(self)
 		self.keyState = true
 		self:sendState("keyState")
 		
+		self.autoplayStart = true
 		self:processTimeState("exactly")
 		-- note.score:processShortNoteState(note.state)
 		
@@ -65,6 +66,10 @@ ShortLogicalNote.processAuto = function(self)
 end
 
 ShortLogicalNote.receive = function(self, event)
+	if self.autoplay then
+		return
+	end
+
 	local key = event.args and event.args[1]
 	if key == self.keyBind then
 		if event.name == "keypressed" then

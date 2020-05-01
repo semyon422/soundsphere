@@ -56,17 +56,28 @@ LongScoreNote.isReachable = function(self)
 end
 
 LongScoreNote.update = function(self)
-	local states = self.logicalNote.states
+	local logicalNote = self.logicalNote
+	local states = logicalNote.states
 	local oldState, newState = states[self.currentStateIndex - 1], states[self.currentStateIndex]
 	
 	-- local startDeltaTime = (self.scoreEngine.currentTime - self.startNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
 	-- local endDeltaTime = (self.scoreEngine.currentTime - self.endNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
 
+	local currentTime = self.scoreEngine.currentTime
+	if logicalNote.autoplayStart then
+		currentTime = self.startNoteData.timePoint.absoluteTime
+		logicalNote.autoplayStart = false
+	end
+	if logicalNote.autoplayEnd then
+		currentTime = self.endNoteData.timePoint.absoluteTime
+		logicalNote.autoplayEnd = true
+	end
+
 	if newState then
 		self:send({
 			name = "ScoreNoteState",
 			noteType = self.noteType,
-			currentTime = self.scoreEngine.currentTime,
+			currentTime = currentTime,
 			noteStartTime = self.startNoteData.timePoint.absoluteTime,
 			noteEndTime = self.endNoteData.timePoint.absoluteTime,
 			timeRate = self.scoreEngine.timeRate,

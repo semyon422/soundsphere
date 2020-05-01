@@ -5,7 +5,7 @@ local NoteBlock				= require("libchart.NoteBlock")
 local BlockFinder			= require("libchart.BlockFinder")
 local NotePreprocessor		= require("libchart.NotePreprocessor")
 local NoteData				= require("ncdk.NoteData")
-local SequentialModifier	= require("sphere.screen.gameplay.ModifierManager.SequentialModifier")
+local Modifier				= require("sphere.screen.gameplay.ModifierManager.Modifier")
 
 local config = {}
 
@@ -203,14 +203,17 @@ config[10][9] = {
 	{0,0,0,0,0,0,0,0,1,1},
 }
 
-local Automap = SequentialModifier:new()
+local Automap = Modifier:new()
+
+Automap.sequential = true
+Automap.type = "NoteChartModifier"
 
 Automap.name = "Automap"
 Automap.shortName = "AM"
 
-Automap.type = "number"
-Automap.variable = "keys"
-Automap.range = {4, 1, 10}
+Automap.variableType = "number"
+Automap.variableName = "keys"
+Automap.variableRange = {4, 1, 10}
 
 Automap.keys = 10
 

@@ -42,9 +42,9 @@ end
 
 GameplayScreen.load = function(self)
 	local noteChart = self:loadNoteChart()
-	ModifierManager.noteChart = noteChart
 
-	ModifierManager:apply()
+	ModifierManager.noteChart = noteChart
+	ModifierManager:apply("NoteChartModifier")
 
 	local timeEngine = TimeEngine:new()
 	self.timeEngine = timeEngine
@@ -52,16 +52,25 @@ GameplayScreen.load = function(self)
 	timeEngine:load()
 	ModifierManager.timeEngine = timeEngine
 
+	ModifierManager.timeEngine = timeEngine
+	ModifierManager:apply("TimeEngineModifier")
+
 	local scoreEngine = ScoreEngine:new()
 	self.scoreEngine = scoreEngine
 	scoreEngine.noteChart = noteChart
 	scoreEngine:load()
 	timeEngine.observable:add(scoreEngine)
 
+	ModifierManager.scoreEngine = scoreEngine
+	ModifierManager:apply("ScoreEngineModifier")
+
 	local audioEngine = AudioEngine:new()
 	self.audioEngine = audioEngine
 	audioEngine:load()
 	timeEngine.observable:add(audioEngine)
+
+	ModifierManager.audioEngine = audioEngine
+	ModifierManager:apply("AudioEngineModifier")
 
 	timeEngine.audioEngine = audioEngine
 	audioEngine.timeEngine = timeEngine
@@ -93,6 +102,8 @@ GameplayScreen.load = function(self)
 	ModifierManager.logicEngine = logicEngine
 	logicEngine.observable:add(ModifierManager)
 
+	ModifierManager.logicEngine = logicEngine
+	ModifierManager:apply("LogicEngineModifier")
 
 	local graphicEngine = GraphicEngine:new()
 	self.graphicEngine = graphicEngine
@@ -102,6 +113,9 @@ GameplayScreen.load = function(self)
 	graphicEngine.container = self.container
 	graphicEngine.localAliases = {}
 	graphicEngine.globalAliases = {}
+
+	ModifierManager.graphicEngine = graphicEngine
+	ModifierManager:apply("GraphicEngineModifier")
 
 	local gui = GameplayGUI:new()
 	self.gui = gui
@@ -127,6 +141,7 @@ GameplayScreen.load = function(self)
 	InputManager.observable:add(logicEngine)
 	InputManager.observable:add(gui)
 	
+	PauseOverlay.logicEngine = logicEngine
 	PauseOverlay.timeEngine = timeEngine
 	PauseOverlay.scoreSystem = scoreEngine.scoreSystem
 	PauseOverlay.noteChart = noteChart
@@ -141,7 +156,7 @@ GameplayScreen.load = function(self)
 		audioEngine.globalAliases = NoteChartResourceLoader.globalAliases
 		graphicEngine.localAliases = NoteChartResourceLoader.localAliases
 		graphicEngine.globalAliases = NoteChartResourceLoader.globalAliases
-		timeEngine:setTimeRate(1)
+		timeEngine:setTimeRate(timeEngine.baseTimeRate)
 		BackgroundManager:setColor(color)
 	end)
 	
@@ -184,6 +199,7 @@ GameplayScreen.receive = function(self, event)
 	if not PauseOverlay.paused then
 		self.timeEngine:receive(event)
 		self.audioEngine:receive(event)
+		ModifierManager:receive(event)
 		InputManager:receive(event)
 		self.scoreEngine:receive(event)
 		-- self.logicEngine:receive(event)

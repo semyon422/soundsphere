@@ -4,8 +4,12 @@ local SoundNote = Class:new()
 
 SoundNote.receive = function(self, event) end
 
+SoundNote.getLayer = function(self)
+	return self.logicalNote.autoplay and "background" or "foreground"
+end
+
 SoundNote.playAudio = function(self, noteData, layer)
-	return self.audioEngine:playAudio(noteData.sounds, layer, noteData.keysound, noteData.stream)
+	return self.audioEngine:playAudio(noteData.sounds, self:getLayer(), noteData.keysound, noteData.stream)
 end
 
 return SoundNote

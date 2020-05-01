@@ -11,6 +11,7 @@ end
 
 TimeEngine.currentTime = 0
 TimeEngine.exactCurrentTime = 0
+TimeEngine.baseTimeRate = 1
 TimeEngine.timeRate = 0
 TimeEngine.targetTimeRate = 0
 

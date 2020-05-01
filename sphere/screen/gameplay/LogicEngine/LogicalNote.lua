@@ -3,7 +3,7 @@ local Class = require("aqua.util.Class")
 local LogicalNote = Class:new()
 
 LogicalNote.construct = function(self)
-	self.states = {}
+	self:clearStates()
 end
 
 LogicalNote.switchState = function(self, state)
@@ -14,6 +14,16 @@ end
 LogicalNote.getLastState = function(self)
 	local states = self.states
 	return states[#states]
+end
+
+LogicalNote.clearStates = function(self)
+	self.states = {}
+end
+
+LogicalNote.switchAutoplay = function(self, value)
+	self.autoplay = value
+	self:clearStates()
+	self:switchState("clear")
 end
 
 LogicalNote.getNext = function(self)

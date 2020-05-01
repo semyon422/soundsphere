@@ -118,7 +118,7 @@ PauseOverlay.receive = function(self, event)
 		self:reload()
 	end
 	
-	if event.name == "focus" and not self.paused and not event.args[1] and not self.score.autoplay then
+	if event.name == "focus" and not self.paused and not event.args[1] and not self.logicEngine.autoplay then
 		self:pause()
 	end
 	

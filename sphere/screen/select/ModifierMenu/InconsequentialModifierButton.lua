@@ -13,26 +13,26 @@ InconsequentialModifierButton.construct = function(self)
 	
 	local button
 	if Modifier.inconsequential then
-		if Modifier.type == "boolean" then
+		if Modifier.variableType == "boolean" then
 			button = CheckboxButton:new(self)
 			button.item = self.item
 			button.updateValue = function(self, value)
 				modifier.enabled = value
 			end
-		elseif Modifier.type == "number" then
+		elseif Modifier.variableType == "number" then
 			button = SliderButton:new(self)
 			button.item = self.item
 			button.updateValue = function(self, value)
-				modifier[modifier.variable] = value
+				modifier[modifier.variableName] = value
 				
 				SliderButton.updateValue(self, value)
 			end
 			button.removeModifier = function(self)
-				modifier[modifier.variable] = Modifier[modifier.variable]
+				modifier[modifier.variableName] = Modifier[modifier.variableName]
 			end
 		end
 	elseif Modifier.sequential then
-		if Modifier.type == "number" then
+		if Modifier.variableType == "number" then
 			button = AddModifierButton:new(self)
 			button.item = self.item
 			button.add = function(self)

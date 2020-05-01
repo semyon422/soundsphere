@@ -1,12 +1,15 @@
-local NoteData					= require("ncdk.NoteData")
-local InconsequentialModifier	= require("sphere.screen.gameplay.ModifierManager.InconsequentialModifier")
+local NoteData	= require("ncdk.NoteData")
+local Modifier	= require("sphere.screen.gameplay.ModifierManager.Modifier")
 
-local DoublePlay = InconsequentialModifier:new()
+local DoublePlay = Modifier:new()
+
+DoublePlay.inconsequential = true
+DoublePlay.type = "NoteChartModifier"
 
 DoublePlay.name = "DoublePlay"
 DoublePlay.shortName = "DP"
 
-DoublePlay.type = "boolean"
+DoublePlay.variableType = "boolean"
 
 DoublePlay.apply = function(self)
 	local noteChart = self.sequence.manager.noteChart

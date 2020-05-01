@@ -32,7 +32,7 @@ LogicEngine.receive = function(self, event)
 		self.currentTime = event.exactCurrentTime
 	end
 
-	if not event.virtual then
+	if not event.virtual or self.promode then
 		return
 	end
 

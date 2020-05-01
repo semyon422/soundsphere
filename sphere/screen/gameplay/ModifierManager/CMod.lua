@@ -1,11 +1,14 @@
-local InconsequentialModifier = require("sphere.screen.gameplay.ModifierManager.InconsequentialModifier")
+local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
 
-local CMod = InconsequentialModifier:new()
+local CMod = Modifier:new()
+
+CMod.inconsequential = true
+CMod.type = "NoteChartModifier"
 
 CMod.name = "CMod"
 CMod.shortName = "CMod"
 
-CMod.type = "boolean"
+CMod.variableType = "boolean"
 
 CMod.apply = function(self)
 	local noteChart = self.sequence.manager.noteChart

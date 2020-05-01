@@ -101,6 +101,7 @@ LongLogicalNote.processAuto = function(self)
 		self.keyState = true
 		self:sendState("keyState")
 		
+		self.autoplayStart = true
 		self:processTimeState("exactly", "none")
 		-- note.score:processLongNoteState("startPassedPressed", "clear")
 		
@@ -112,12 +113,17 @@ LongLogicalNote.processAuto = function(self)
 		self.keyState = false
 		self:sendState("keyState")
 		
+		self.autoplayEnd = true
 		self:processTimeState("none", "exactly")
 		-- note.score:processLongNoteState("endPassed", "startPassedPressed")
 	end
 end
 
 LongLogicalNote.receive = function(self, event)
+	if self.autoplay then
+		return
+	end
+
 	local key = event.args and event.args[1]
 	if key == self.keyBind then
 		if event.name == "keypressed" then

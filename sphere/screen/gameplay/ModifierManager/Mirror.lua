@@ -1,11 +1,14 @@
-local InconsequentialModifier = require("sphere.screen.gameplay.ModifierManager.InconsequentialModifier")
+local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
 
-local Mirror = InconsequentialModifier:new()
+local Mirror = Modifier:new()
+
+Mirror.inconsequential = true
+Mirror.type = "NoteChartModifier"
 
 Mirror.name = "Mirror"
 Mirror.shortName = "Mirror"
 
-Mirror.type = "boolean"
+Mirror.variableType = "boolean"
 
 Mirror.apply = function(self)
 	local noteChart = self.sequence.manager.noteChart
@@ -21,7 +24,7 @@ Mirror.apply = function(self)
 			if noteData.inputType == "key" then
 				noteData.inputIndex = keyCount - noteData.inputIndex + 1
 			elseif noteData.inputType == "scratch" then
-				noteData.noteType = scratchCount - noteData.inputIndex + 1
+				noteData.noteIndex = scratchCount - noteData.inputIndex + 1
 			end
 		end
 	end

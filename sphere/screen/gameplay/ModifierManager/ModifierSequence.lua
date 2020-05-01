@@ -3,7 +3,6 @@ local Class			= require("aqua.util.Class")
 local AutoPlay		= require("sphere.screen.gameplay.ModifierManager.AutoPlay")
 local Automap		= require("sphere.screen.gameplay.ModifierManager.Automap")
 local ProMode		= require("sphere.screen.gameplay.ModifierManager.ProMode")
-local SetInput		= require("sphere.screen.gameplay.ModifierManager.SetInput")
 local WindUp		= require("sphere.screen.gameplay.ModifierManager.WindUp")
 local TimeRate		= require("sphere.screen.gameplay.ModifierManager.TimeRate")
 local NoScratch		= require("sphere.screen.gameplay.ModifierManager.NoScratch")
@@ -24,7 +23,6 @@ ModifierSequence.modifiers = {
 	Automap,
 	DoublePlay,
 	ProMode,
-	SetInput,
 	WindUp,
 	TimeRate,
 	NoScratch,
@@ -46,7 +44,6 @@ end
 ModifierSequence.inconsequentialClassList = {
 	AutoPlay,
 	ProMode,
-	SetInput,
 	WindUp,
 	TimeRate,
 	NoScratch,
@@ -121,9 +118,11 @@ ModifierSequence.getEnabledModifiers = function(self)
 	return list
 end
 
-ModifierSequence.apply = function(self)
+ModifierSequence.apply = function(self, modifierType)
 	for _, modifier in ipairs(self:getEnabledModifiers()) do
-		modifier:apply()
+		if modifier.type == modifierType then
+			modifier:apply()
+		end
 	end
 end
 
@@ -173,8 +172,8 @@ ModifierSequence.fromJson = function(self, jsonObject)
 					modifier = self:add(Modifier)
 				end
 				
-				if modifier.variable then
-					modifier[modifier.variable] = modifierData[modifier.variable]
+				if modifier.variableName then
+					modifier[modifier.variableName] = modifierData[modifier.variableName]
 				end
 			end
 		end

@@ -1,14 +1,18 @@
-local InconsequentialModifier = require("sphere.screen.gameplay.ModifierManager.InconsequentialModifier")
+local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
 
-local TimeRate = InconsequentialModifier:new()
+local TimeRate = Modifier:new()
+
+TimeRate.inconsequential = true
+TimeRate.type = "TimeEngineModifier"
 
 TimeRate.name = "TimeRate"
 TimeRate.shortName = "TimeRate"
 
-TimeRate.type = "number"
-TimeRate.variable = "value"
-TimeRate.format = "%0.2f"
-TimeRate.range = {0.5, 0.05, 2}
+TimeRate.variableType = "number"
+TimeRate.variableName = "value"
+TimeRate.variableFormat = "%0.2f"
+TimeRate.variableRange = {0.5, 0.05, 2}
+
 TimeRate.value = 1
 
 TimeRate.tostring = function(self)
@@ -20,12 +24,8 @@ TimeRate.tojson = function(self)
 end
 
 TimeRate.apply = function(self)
-	local logicEngine = self.sequence.manager.logicEngine
 	local timeEngine = self.sequence.manager.timeEngine
-	-- logicEngine.score.timeRate = true
-	-- timeEngine.timeRate = self.value
-	-- timeEngine.targetTimeRate = self.value
-	-- timeEngine:setTimeRate(self.value)
+	timeEngine.baseTimeRate = self.value
 end
 
 return TimeRate
