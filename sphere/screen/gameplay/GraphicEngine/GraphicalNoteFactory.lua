@@ -15,6 +15,9 @@ GraphicalNoteFactory.getNote = function(self, noteData)
 	elseif noteData.noteType == "LongNoteStart" then
 		graphicalNote.noteType = "LongNote"
 		return LongGraphicalNote:new(graphicalNote)
+	elseif noteData.noteType == "LaserNoteStart" then
+		graphicalNote.noteType = "LongNote"
+		return LongGraphicalNote:new(graphicalNote)
 	elseif noteData.noteType == "LineNoteStart" then
 		graphicalNote.noteType = "LongNote"
 		return LongGraphicalNote:new(graphicalNote)

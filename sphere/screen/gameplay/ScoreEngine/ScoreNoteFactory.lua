@@ -11,6 +11,8 @@ ScoreNoteFactory.getNote = function(self, noteData)
 		return ShortScoreNote:new(scoreNote)
 	elseif noteData.noteType == "LongNoteStart" then
 		return LongScoreNote:new(scoreNote)
+	elseif noteData.noteType == "LaserNoteStart" then
+		return LongScoreNote:new(scoreNote)
 	else
 		return ScoreNote:new(scoreNote)
 	end

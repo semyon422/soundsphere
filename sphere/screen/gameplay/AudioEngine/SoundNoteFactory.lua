@@ -10,6 +10,8 @@ SoundNoteFactory.getNote = function(self, logicalNote)
         return ShortSoundNote:new(soundNote)
     elseif logicalNote.noteClass == "LongLogicalNote" then
         return LongSoundNote:new(soundNote)
+    elseif logicalNote.noteClass == "LaserLogicalNote" then
+        return LongSoundNote:new(soundNote)
     end
     return SoundNote:new(soundNote)
 end
