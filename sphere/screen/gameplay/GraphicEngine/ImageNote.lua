@@ -18,7 +18,7 @@ ImageNote.update = function(self)
 		self.drawable.sx = self:getScaleX()
 		self.drawable.sy = self:getScaleY()
 		self.drawable:reload()
-		self.drawable.color = {255, 255, 255}
+		self.drawable.color = self:getColor()
 	end
 end
 
@@ -121,6 +121,10 @@ ImageNote.getScaleY = function(self)
 	return
 		self:getHeadHeight() /
 		self.noteSkin:getCS(self):y(self.image:getHeight())
+end
+
+ImageNote.getColor = function(self)
+	return self.noteSkin:getG(self, "Head", "color", self.timeState)
 end
 
 return ImageNote

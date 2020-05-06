@@ -23,7 +23,7 @@ VideoNote.update = function(self)
 		self.drawable.sx = self:getScaleX()
 		self.drawable.sy = self:getScaleY()
 		self.drawable:reload()
-		self.drawable.color = {255, 255, 255}
+		self.drawable.color = self:getColor()
 	end
 end
 
@@ -165,6 +165,10 @@ VideoNote.setTimeRate = function(self, timeRate)
 	elseif timeRate ~= 0 and self.timeRate ~= 0 then
 		video:setRate(timeRate)
 	end
+end
+
+VideoNote.getColor = function(self)
+	return self.noteSkin:getG(self, "Head", "color", self.timeState)
 end
 
 return VideoNote

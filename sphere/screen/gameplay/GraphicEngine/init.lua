@@ -9,6 +9,9 @@ local GraphicEngine = Class:new()
 
 GraphicEngine.construct = function(self)
 	self.observable = Observable:new()
+
+	self.localAliases = {}
+	self.globalAliases = {}
 end
 
 GraphicEngine.load = function(self)

@@ -91,14 +91,22 @@ local envcolor = function(timeState, logicalState, data)
 end
 
 TomlNoteSkinLoader.addEnv = function(self)
-	self.noteSkin.env = {}
-	local env = self.noteSkin.env
+	local noteSkin = self.noteSkin
+	noteSkin.env = {}
+	local env = noteSkin.env
 
 	env.number = function(timeState, logicalState, n) return n end
 	env.linear = function(timeState, logicalState, data)
 		return data[1] + data[2] * (timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
 	end
 	env.color = envcolor
+	env.bgacolor = function()
+		local bga = noteSkin.tomlData.bga
+		if not bga then
+			return colors.clear
+		end
+		return bga.color
+	end
 end
 
 TomlNoteSkinLoader.processNoteSkinData = function(self)
@@ -646,7 +654,7 @@ TomlNoteSkinLoader.addImageNote = function(self, input, layer)
 
 	imageNote.Head = {}
 	local head = imageNote.Head
-	head.cs = 1
+	head.cs = 2
 	head.layer = layer
 	head.gc = {
 		x = {"number", 0},
@@ -655,7 +663,7 @@ TomlNoteSkinLoader.addImageNote = function(self, input, layer)
 		h = {"number", 1},
 		ox = {"number", 0},
 		oy = {"number", 0},
-		color = {"color", "white"}
+		color = {"bgacolor"}
 	}
 end
 
@@ -677,7 +685,7 @@ TomlNoteSkinLoader.addVideoNote = function(self, input, layer)
 		h = {"number", 1},
 		ox = {"number", 0},
 		oy = {"number", 0},
-		color = {"color", "white"}
+		color = {"bgacolor"}
 	}
 end
 
