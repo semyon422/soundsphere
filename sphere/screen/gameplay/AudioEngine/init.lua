@@ -10,6 +10,9 @@ local AudioEngine = Class:new()
 
 AudioEngine.construct = function(self)
 	self.observable = Observable:new()
+
+	self.localAliases = {}
+	self.globalAliases = {}
 end
 
 AudioEngine.timeRate = 1
