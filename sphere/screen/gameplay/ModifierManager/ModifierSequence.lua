@@ -4,12 +4,12 @@ local AutoPlay		= require("sphere.screen.gameplay.ModifierManager.AutoPlay")
 local Automap		= require("sphere.screen.gameplay.ModifierManager.Automap")
 local ProMode		= require("sphere.screen.gameplay.ModifierManager.ProMode")
 local WindUp		= require("sphere.screen.gameplay.ModifierManager.WindUp")
+local SpeedMode		= require("sphere.screen.gameplay.ModifierManager.SpeedMode")
 local TimeRate		= require("sphere.screen.gameplay.ModifierManager.TimeRate")
 local NoScratch		= require("sphere.screen.gameplay.ModifierManager.NoScratch")
 local Mirror		= require("sphere.screen.gameplay.ModifierManager.Mirror")
 local NoLongNote	= require("sphere.screen.gameplay.ModifierManager.NoLongNote")
 local NoMeasureLine	= require("sphere.screen.gameplay.ModifierManager.NoMeasureLine")
-local CMod			= require("sphere.screen.gameplay.ModifierManager.CMod")
 local FullLongNote	= require("sphere.screen.gameplay.ModifierManager.FullLongNote")
 local ToOsu			= require("sphere.screen.gameplay.ModifierManager.ToOsu")
 local AutoKeySound	= require("sphere.screen.gameplay.ModifierManager.AutoKeySound")
@@ -24,12 +24,12 @@ ModifierSequence.modifiers = {
 	DoublePlay,
 	ProMode,
 	WindUp,
+	SpeedMode,
 	TimeRate,
 	NoScratch,
 	Mirror,
 	NoLongNote,
 	NoMeasureLine,
-	CMod,
 	FullLongNote,
 	ToOsu
 }
@@ -45,12 +45,12 @@ ModifierSequence.inconsequentialClassList = {
 	AutoPlay,
 	ProMode,
 	WindUp,
+	SpeedMode,
 	TimeRate,
 	NoScratch,
 	Mirror,
 	NoLongNote,
 	NoMeasureLine,
-	CMod,
 	AutoKeySound,
 	DoublePlay,
 	ToOsu
@@ -66,7 +66,7 @@ ModifierSequence.addInconsequential = function(self)
 		modifier.Class = Modifier
 		list[#list + 1] = modifier
 		-- self[Modifier] = modifier
-		if Modifier == TimeRate then
+		if Modifier == TimeRate or Modifier == SpeedMode then
 			modifier.enabled = true
 		end
 	end

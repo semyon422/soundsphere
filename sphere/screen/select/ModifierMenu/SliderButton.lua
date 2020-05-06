@@ -1,4 +1,5 @@
 local aquafonts			= require("aqua.assets.fonts")
+local aquamath			= require("aqua.math")
 local TextFrame			= require("aqua.graphics.TextFrame")
 local map				= require("aqua.math").map
 local spherefonts		= require("sphere.assets.fonts")
@@ -130,9 +131,25 @@ SliderButton.getValue = function(self)
 end
 
 SliderButton.getDisplayValue = function(self)
-	local displayRange = self.item.modifier.variableDisplayRange or self.item.modifier.variableRange
 	local format = self.item.modifier.variableFormat or "%s"
-	return format:format(map(self:getValue(), self.item.modifier.variableRange[1], self.item.modifier.variableRange[3], displayRange[1], displayRange[3]))
+
+	local variableValues = self.item.modifier.variableValues
+	if variableValues then
+		local range = self.item.modifier.variableRange
+		local index = aquamath.round((self:getValue() - range[1]) / range[2] + range[1], 1)
+		return format:format(variableValues[index])
+	else
+		local displayRange = self.item.modifier.variableDisplayRange or self.item.modifier.variableRange
+		return format:format(
+			map(
+				self:getValue(),
+				self.item.modifier.variableRange[1],
+				self.item.modifier.variableRange[3],
+				displayRange[1],
+				displayRange[3]
+			)
+		)
+	end
 end
 
 SliderButton.updateValue = function(self, value)
