@@ -60,8 +60,8 @@ NoteChartSetList.checkNoteChartSetEntry = function(self, entry)
 	end
 	
 	for i = 1, #list do
-		local entry = Cache:getNoteChartDataEntry(list[i].hash)
-		if entry then
+		local entries = Cache:getAllNoteChartDataEntries(list[i].hash)
+		for _, entry in pairs(entries) do
 			local found = SearchManager:check(entry, self.searchString)
 			if found == true then
 				return true
