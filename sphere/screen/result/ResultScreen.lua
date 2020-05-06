@@ -3,7 +3,6 @@ local ScoreManager		= require("sphere.database.ScoreManager")
 local Screen			= require("sphere.screen.Screen")
 local ScreenManager		= require("sphere.screen.ScreenManager")
 local ResultGUI			= require("sphere.screen.result.ResultGUI")
-local JudgeTable		= require("sphere.screen.result.JudgeTable")
 
 local ResultScreen = Screen:new()
 
@@ -12,10 +11,6 @@ ResultScreen.init = function(self)
 	
 	self.gui = ResultGUI:new()
 	self.gui.container = self.container
-	
-	self.judgeTable = JudgeTable:new({
-		cs = self.cs
-	})
 end
 
 ResultScreen.load = function(self)
@@ -33,14 +28,11 @@ end
 
 ResultScreen.draw = function(self)
 	Screen.draw(self)
-	
-	self.judgeTable:draw()
 end
 
 ResultScreen.receive = function(self, event)
 	if event.name == "resize" then
 		self.gui:reload()
-		self.judgeTable:reload()
 	elseif event.name == "keypressed" and event.args[1] == "escape" then
 		ScreenManager:set(require("sphere.screen.select.SelectScreen"))
 	end
@@ -56,9 +48,6 @@ ResultScreen.receive = function(self, event)
 			noteChartEntry = event.noteChartEntry,
 			noteChartDataEntry = event.noteChartDataEntry
 		})
-		
-		self.judgeTable.scoreSystem = scoreSystem
-		self.judgeTable:load()
 		
 		if scoreSystem.scoreTable.score > 0 then
 			ScoreManager:insertScore(scoreSystem.scoreTable, event.noteChartDataEntry)

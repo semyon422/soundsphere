@@ -28,8 +28,10 @@ local increase = function(deltaTime)
 
 	for i, data in ipairs(timegates) do
 		if deltaTime <= data.time then
-			scoreTable.timegates[data.name] = (scoreTable.timegates[data.name] or 0) + 1
-			scoreTable.timegate = data.name
+			for _, name in ipairs(data.names) do
+				scoreTable.timegates[name] = (scoreTable.timegates[name] or 0) + 1
+			end
+			scoreTable.timegate = data.names[1]
 			break
 		end
 	end

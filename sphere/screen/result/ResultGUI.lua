@@ -3,6 +3,7 @@ local AccuracyGraph			= require("sphere.screen.gameplay.AccuracyGraph")
 local NoteChartDataDisplay	= require("sphere.screen.select.NoteChartDataDisplay")
 local ModifierDisplay		= require("sphere.screen.select.ModifierDisplay")
 local ScoreDisplay			= require("sphere.screen.gameplay.ScoreDisplay")
+local JudgeDisplay			= require("sphere.screen.result.JudgeDisplay")
 
 local GUI = require("sphere.ui.GUI")
 
@@ -12,7 +13,8 @@ ResultGUI.classes = setmetatable({
 	AccuracyGraph = AccuracyGraph,
 	NoteChartDataDisplay = NoteChartDataDisplay,
 	ModifierDisplay = ModifierDisplay,
-	ScoreDisplay = ScoreDisplay
+	ScoreDisplay = ScoreDisplay,
+	JudgeDisplay = JudgeDisplay
 }, GUI.classes)
 
 ResultGUI.functions = setmetatable({
