@@ -44,20 +44,22 @@ KeyBindList.receive = function(self, event)
 end
 
 KeyBindList.getSelectedInputMode = function(self)
-	if
-		not NoteChartList.items or
-		not NoteChartList.focusedItemIndex or
-		not NoteChartList.items[NoteChartList.focusedItemIndex] or
-		not NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry or
-		not NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry.inputMode
-	then
+	local noteChart = self.menu.noteChart
+
+	if not noteChart then
 		return ""
 	end
-	
-	return NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry.inputMode
+
+	return noteChart.inputMode:getString()
 end
 
 KeyBindList.addItems = function(self)
+	local noteChart = self.menu.noteChart
+
+	if not noteChart then
+		return
+	end
+
 	local items = {}
 	
 	for inputCount, inputType in self:getSelectedInputMode():gmatch("([0-9]+)([a-z]+)") do

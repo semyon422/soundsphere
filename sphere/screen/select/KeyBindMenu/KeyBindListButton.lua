@@ -103,7 +103,7 @@ KeyBindListButton.getDisplayValue = function(self)
 end
 
 KeyBindListButton.getSelectedInputMode = function(self)
-	return NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry.inputMode
+	return self.list:getSelectedInputMode()
 end
 
 KeyBindListButton.updateValue = function(self, value)
