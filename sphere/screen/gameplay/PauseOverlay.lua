@@ -165,7 +165,7 @@ end
 
 PauseOverlay.play = function(self)
 	self.paused = false
-	self.timeEngine:setTimeRate(1)
+	self.timeEngine:setTimeRate(self.timeEngine:getBaseTimeRate())
 	
 	local length = math.min(self.noteChartDataEntry.length, 3600 * 24)
 	DiscordPresence:setPresence({

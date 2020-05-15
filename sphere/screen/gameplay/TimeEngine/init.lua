@@ -7,6 +7,8 @@ local TimeEngine = Class:new()
 
 TimeEngine.construct = function(self)
 	self.observable = Observable:new()
+
+	self.baseTimeRates = {1}
 end
 
 TimeEngine.currentTime = 0
@@ -17,6 +19,20 @@ TimeEngine.targetTimeRate = 0
 
 TimeEngine.load = function(self)
 	self:loadTimeManager()
+end
+
+TimeEngine.addBaseTimeRate = function(self, timeRate)
+	local baseTimeRates = self.baseTimeRates
+	baseTimeRates[#baseTimeRates + 1] = timeRate
+end
+
+TimeEngine.getBaseTimeRate = function(self)
+	local timeRate = 1
+	local baseTimeRates = self.baseTimeRates
+	for i = 1, #baseTimeRates do
+		timeRate = timeRate * baseTimeRates[i]
+	end
+	return timeRate
 end
 
 TimeEngine.update = function(self, dt)	
@@ -44,18 +60,7 @@ end
 TimeEngine.receive = function(self, event)
 	if event.name == "keypressed" then
 		local key = event.args[1]
-		local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
-		local control = love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")
-		local delta
-		if shift and control then
-			delta = 5
-		elseif shift then
-			delta = 0.05
-		elseif control then
-			delta = 1
-		else
-			delta = 0.1
-		end
+		local delta = 0.05
 		
 		if key == "f5" then
 			if self.targetTimeRate - delta >= 0.1 then

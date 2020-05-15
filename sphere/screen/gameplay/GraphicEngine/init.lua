@@ -26,10 +26,6 @@ GraphicEngine.load = function(self)
 end
 
 GraphicEngine.update = function(self, dt)
-	-- self.currentTime = self.logicEngine.currentTime
-	-- self.timeRate = self.logicEngine.timeRate
-	-- NoteSkin.timeRate = self.timeRate
-
 	self:updateNoteDrawers()
 	
 	self.noteSkin:update(dt)
@@ -59,18 +55,8 @@ GraphicEngine.receive = function(self, event)
 		self:reloadNoteDrawers()
 	elseif event.name == "keypressed" then
 		local key = event.args[1]
-		local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
-		local control = love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")
-		local delta
-		if shift and control then
-			delta = 5
-		elseif shift then
-			delta = 0.05
-		elseif control then
-			delta = 1
-		else
-			delta = 0.1
-		end
+		local delta = 0.05
+		
 		if key == "f2" then
 			NoteSkin.targetVisualTimeRate = -NoteSkin.targetVisualTimeRate
 			NoteSkin:setVisualTimeRate(NoteSkin.targetVisualTimeRate)

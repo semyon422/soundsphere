@@ -156,7 +156,7 @@ GameplayScreen.load = function(self)
 		audioEngine.globalAliases = NoteChartResourceLoader.globalAliases
 		graphicEngine.localAliases = NoteChartResourceLoader.localAliases
 		graphicEngine.globalAliases = NoteChartResourceLoader.globalAliases
-		timeEngine:setTimeRate(timeEngine.baseTimeRate)
+		timeEngine:setTimeRate(timeEngine:getBaseTimeRate())
 		BackgroundManager:setColor(color)
 	end)
 	

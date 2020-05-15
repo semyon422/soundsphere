@@ -5,7 +5,8 @@ local Automap		= require("sphere.screen.gameplay.ModifierManager.Automap")
 local ProMode		= require("sphere.screen.gameplay.ModifierManager.ProMode")
 local WindUp		= require("sphere.screen.gameplay.ModifierManager.WindUp")
 local SpeedMode		= require("sphere.screen.gameplay.ModifierManager.SpeedMode")
-local TimeRate		= require("sphere.screen.gameplay.ModifierManager.TimeRate")
+local TimeRateQ		= require("sphere.screen.gameplay.ModifierManager.TimeRateQ")
+local TimeRateX		= require("sphere.screen.gameplay.ModifierManager.TimeRateX")
 local NoScratch		= require("sphere.screen.gameplay.ModifierManager.NoScratch")
 local Mirror		= require("sphere.screen.gameplay.ModifierManager.Mirror")
 local NoLongNote	= require("sphere.screen.gameplay.ModifierManager.NoLongNote")
@@ -25,7 +26,8 @@ ModifierSequence.modifiers = {
 	ProMode,
 	WindUp,
 	SpeedMode,
-	TimeRate,
+	TimeRateQ,
+	TimeRateX,
 	NoScratch,
 	Mirror,
 	NoLongNote,
@@ -46,7 +48,8 @@ ModifierSequence.inconsequentialClassList = {
 	ProMode,
 	WindUp,
 	SpeedMode,
-	TimeRate,
+	TimeRateQ,
+	TimeRateX,
 	NoScratch,
 	Mirror,
 	NoLongNote,
@@ -66,7 +69,7 @@ ModifierSequence.addInconsequential = function(self)
 		modifier.Class = Modifier
 		list[#list + 1] = modifier
 		-- self[Modifier] = modifier
-		if Modifier == TimeRate or Modifier == SpeedMode then
+		if Modifier == TimeRateX or Modifier == TimeRateQ or Modifier == SpeedMode then
 			modifier.enabled = true
 		end
 	end
