@@ -57,11 +57,6 @@ ShortLogicalNote.processAuto = function(self)
 		
 		self.autoplayStart = true
 		self:processTimeState("exactly")
-		-- note.score:processShortNoteState(note.state)
-		
-		-- if note.ended then
-		-- 	note.score:hit(0, note.startNoteData.timePoint.absoluteTime)
-		-- end
 	end
 end
 

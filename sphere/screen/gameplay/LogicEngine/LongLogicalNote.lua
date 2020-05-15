@@ -103,19 +103,12 @@ LongLogicalNote.processAuto = function(self)
 		
 		self.autoplayStart = true
 		self:processTimeState("exactly", "none")
-		-- note.score:processLongNoteState("startPassedPressed", "clear")
-		
-		-- if note.started and not note.judged then
-		-- 	note.score:hit(0, note.startNoteData.timePoint.absoluteTime)
-		-- 	note.judged = true
-		-- end
 	elseif deltaEndTime <= 0 and self.keyState or nextNote and nextNote:isHere() then
 		self.keyState = false
 		self:sendState("keyState")
 		
 		self.autoplayEnd = true
 		self:processTimeState("none", "exactly")
-		-- note.score:processLongNoteState("endPassed", "startPassedPressed")
 	end
 end
 
