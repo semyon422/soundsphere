@@ -1,4 +1,5 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
+local NoteChartFactory	= require("notechart.NoteChartFactory")
 local Config			= require("sphere.config.Config")
 local NoteSkinManager	= require("sphere.noteskin.NoteSkinManager")
 local Screen			= require("sphere.screen.Screen")
@@ -41,8 +42,30 @@ SelectScreen.init = function(self)
 	NoteChartStateManager.observable:add(self)
 end
 
+SelectScreen.getNoteChart = function(self)
+	local item = NoteChartList.items[NoteChartList.focusedItemIndex]
+	local noteChartDataEntry = item.noteChartDataEntry
+	local noteChartEntry = item.noteChartEntry
+	local path = noteChartEntry.path
+
+	local file = love.filesystem.newFile(path)
+	file:open("r")
+	local content = file:read()
+	file:close()
+	
+	local status, noteCharts = NoteChartFactory:getNoteCharts(
+		path,
+		content,
+		noteChartDataEntry.index
+	)
+	return noteCharts[1]
+end
+
 SelectScreen.load = function(self)
 	self.gui:reload()
+
+	ModifierMenu.SelectScreen = SelectScreen
+	NoteSkinMenu.SelectScreen = SelectScreen
 	
 	NoteSkinManager:load()
 	ModifierManager:load()

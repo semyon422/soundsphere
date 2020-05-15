@@ -40,17 +40,13 @@ NoteSkinList.send = function(self, event)
 end
 
 NoteSkinList.getSelectedInputMode = function(self)
-	if
-		not NoteChartList.items or
-		not NoteChartList.focusedItemIndex or
-		not NoteChartList.items[NoteChartList.focusedItemIndex] or
-		not NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry or
-		not NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry.inputMode
-	then
+	local noteChart = self.menu.noteChart
+
+	if not noteChart then
 		return ""
 	end
-	
-	return NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry.inputMode
+
+	return noteChart.inputMode:getString()
 end
 
 NoteSkinList.addItems = function(self)

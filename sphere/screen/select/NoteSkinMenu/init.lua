@@ -1,6 +1,7 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Rectangle			= require("aqua.graphics.Rectangle")
 local NoteSkinList		= require("sphere.screen.select.NoteSkinMenu.NoteSkinList")
+local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 
 local NoteSkinMenu = {}
 
@@ -21,6 +22,7 @@ NoteSkinMenu.init = function(self)
 	})
 	self.background:reload()
 	
+	NoteSkinList.menu = self
 	NoteSkinList:init()
 end
 
@@ -59,6 +61,12 @@ end
 
 NoteSkinMenu.show = function(self)
 	self.hidden = false
+
+	self.noteChart = self.SelectScreen:getNoteChart()
+
+	ModifierManager.noteChart = self.noteChart
+	ModifierManager:apply("NoteChartModifier")
+
 	self:reload()
 end
 

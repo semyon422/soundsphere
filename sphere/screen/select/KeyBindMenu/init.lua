@@ -5,7 +5,6 @@ local KeyBindList		= require("sphere.screen.select.KeyBindMenu.KeyBindList")
 local BackgroundManager	= require("sphere.ui.BackgroundManager")
 local NoteChartList  	= require("sphere.screen.select.NoteChartList")
 local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
-local NoteChartFactory	= require("notechart.NoteChartFactory")
 
 local KeyBindMenu = {}
 
@@ -74,31 +73,12 @@ KeyBindMenu.show = function(self)
 	self.hidden = false
 	InputManager:read()
 
-	self.noteChart = self:getNoteChart()
+	self.noteChart = self.SelectScreen:getNoteChart()
 
 	ModifierManager.noteChart = self.noteChart
 	ModifierManager:apply("NoteChartModifier")
 
 	self:reload()
-end
-
-KeyBindMenu.getNoteChart = function(self)
-	local item = NoteChartList.items[NoteChartList.focusedItemIndex]
-	local noteChartDataEntry = item.noteChartDataEntry
-	local noteChartEntry = item.noteChartEntry
-	local path = noteChartEntry.path
-
-	local file = love.filesystem.newFile(path)
-	file:open("r")
-	local content = file:read()
-	file:close()
-	
-	local status, noteCharts = NoteChartFactory:getNoteCharts(
-		path,
-		content,
-		noteChartDataEntry.index
-	)
-	return noteCharts[1]
 end
 
 return KeyBindMenu
