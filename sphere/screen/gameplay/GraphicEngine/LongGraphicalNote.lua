@@ -40,8 +40,6 @@ end
 LongGraphicalNote.computeVisualTime = function(self)
 	self.startNoteData.timePoint:computeVisualTime(self.noteDrawer.currentTimePoint)
 	self.endNoteData.timePoint:computeVisualTime(self.noteDrawer.currentTimePoint)
-	
-	self.fsdt = self.graphicEngine.currentTime - (self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime)
 end
 
 LongGraphicalNote.computeTimeState = function(self)
@@ -155,11 +153,6 @@ LongGraphicalNote.reload = function(self)
 	self.headDrawable:reload()
 	self.tailDrawable:reload()
 	self.bodyDrawable:reload()
-end
-
-LongGraphicalNote.getColor = function(self)
-	local logicalNote = self.logicalNote
-	
 end
 
 LongGraphicalNote.getHeadColor = function(self)
