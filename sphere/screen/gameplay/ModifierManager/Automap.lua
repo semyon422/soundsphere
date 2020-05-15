@@ -281,18 +281,16 @@ Automap.apply = function(self)
 		tNoteDatas[i] = tNoteData
 	end
 
-	self:process()
+	noteChart.layerDataSequence.inputCount["key"] = {}
 
-	local inputExisting = noteChart.layerDataSequence.inputExisting
-	inputExisting["key"] = inputExisting["key"] or {}
-	for i = 1, self.keys do
-		inputExisting["key"][i] = true
-	end
+	self:process()
 	
 	noteChart:compute()
 end
 
 Automap.process = function(self)
+	local layerDataSequence = self.noteChart.layerDataSequence
+
 	local targetMode = self.targetMode
 	local columnCount = self.columnCount
 	
@@ -316,6 +314,7 @@ Automap.process = function(self)
 	for i = 1, #notes do
 		local tNoteData = notes[i]
 		tNoteData.noteData.inputIndex = tNoteData.columnIndex
+		layerDataSequence:increaseInputCount(tNoteData.noteData.inputType, tNoteData.noteData.inputIndex, 1)
 		if tNoteData.long then
 			tNoteData.noteData.endNoteData.inputIndex = tNoteData.columnIndex
 		end
