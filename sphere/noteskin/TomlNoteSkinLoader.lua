@@ -166,6 +166,7 @@ end
 TomlNoteSkinLoader.processInput = function(self, input, i)
 	self:addShortNote(input, i)
 	self:addLongNote(input, i)
+	self:addSoundNote(input, i)
 	self:addPlayFieldKey(input, i)
 end
 
@@ -307,6 +308,36 @@ TomlNoteSkinLoader.addLongNote = function(self, input, i)
 		color = {"color", "white"}
 	}
 	tail.drawInterval = {-1, 1}
+end
+
+TomlNoteSkinLoader.addSoundNote = function(self, input, i)
+	local noteSkin = self.noteSkin
+	local noteSkinData = noteSkin.noteSkinData
+
+	noteSkinData.notes[input .. ":SoundNote"] = {}
+	local shortNote = noteSkinData.notes[input .. ":SoundNote"]
+	
+	local tomlNote = noteSkin.tomlData.notes.SoundNote
+	local unit = self.unit
+	local scroll = noteSkin.tomlData.general.scroll
+
+	local columns = noteSkin.tomlData.columns
+
+	shortNote.Head = {}
+	local head = shortNote.Head
+	head.cs = 1
+	head.layer = 10
+	head.image = self:getImageName(tomlNote.Head.images[i], tomlNote.Head.layer)
+	head.gc = {
+		x = {"number", self:getNoteX(i) / unit},
+		y = {"linear", {self:getNoteY(i) / unit, scroll}},
+		w = {"number", columns.width[i] / unit},
+		h = {"number", columns.height[i] / unit},
+		ox = {"number", 0},
+		oy = {"number", -1},
+		color = {"colorWhite"}
+	}
+	head.drawInterval = {-1, 1}
 end
 
 TomlNoteSkinLoader.addPlayFieldKey = function(self, input, i)
