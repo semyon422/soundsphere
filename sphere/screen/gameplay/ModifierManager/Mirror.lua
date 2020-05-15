@@ -12,19 +12,24 @@ Mirror.variableType = "boolean"
 
 Mirror.apply = function(self)
 	local noteChart = self.sequence.manager.noteChart
-	local keyCount = noteChart.inputMode:getInputCount("key")
-	local scratchCount = noteChart.inputMode:getInputCount("scratch")
+	local layerDataSequence = noteChart.layerDataSequence
+	
+	local inputCounts = {}
+	for inputType, inputIndex in noteChart:getInputIteraator() do
+		if not inputCounts[inputType] then
+			inputCounts[inputType] = noteChart.inputMode:getInputCount(inputType)
+		end
+	end
 	
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
 		
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
-			
-			if noteData.inputType == "key" then
-				noteData.inputIndex = keyCount - noteData.inputIndex + 1
-			elseif noteData.inputType == "scratch" then
-				noteData.noteIndex = scratchCount - noteData.inputIndex + 1
+			if inputCounts[noteData.inputType] > 0 then
+				layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, -1)
+				noteData.inputIndex = inputCounts[noteData.inputType] - noteData.inputIndex + 1
+				layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, 1)
 			end
 		end
 	end

@@ -9,6 +9,7 @@ local TimeRateQ		= require("sphere.screen.gameplay.ModifierManager.TimeRateQ")
 local TimeRateX		= require("sphere.screen.gameplay.ModifierManager.TimeRateX")
 local NoScratch		= require("sphere.screen.gameplay.ModifierManager.NoScratch")
 local Mirror		= require("sphere.screen.gameplay.ModifierManager.Mirror")
+local Random		= require("sphere.screen.gameplay.ModifierManager.Random")
 local NoLongNote	= require("sphere.screen.gameplay.ModifierManager.NoLongNote")
 local NoMeasureLine	= require("sphere.screen.gameplay.ModifierManager.NoMeasureLine")
 local FullLongNote	= require("sphere.screen.gameplay.ModifierManager.FullLongNote")
@@ -30,6 +31,7 @@ ModifierSequence.modifiers = {
 	TimeRateX,
 	NoScratch,
 	Mirror,
+	Random,
 	NoLongNote,
 	NoMeasureLine,
 	FullLongNote,
@@ -52,6 +54,7 @@ ModifierSequence.inconsequentialClassList = {
 	TimeRateX,
 	NoScratch,
 	Mirror,
+	Random,
 	NoLongNote,
 	NoMeasureLine,
 	AutoKeySound,
