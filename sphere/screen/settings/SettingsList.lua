@@ -193,9 +193,39 @@ SettingsList.setInputItems = function(self)
 		configKey = "screen.browser"
 	}
 	items[#items + 1] = {
+		name = "pause",
+		type = "keybind",
+		configKey = "gameplay.pause"
+	}
+	items[#items + 1] = {
 		name = "quick restart",
 		type = "keybind",
 		configKey = "gameplay.quickRestart"
+	}
+	items[#items + 1] = {
+		name = "invert play speed",
+		type = "keybind",
+		configKey = "gameplay.invertPlaySpeed"
+	}
+	items[#items + 1] = {
+		name = "decrease play speed",
+		type = "keybind",
+		configKey = "gameplay.decreasePlaySpeed"
+	}
+	items[#items + 1] = {
+		name = "increase play speed",
+		type = "keybind",
+		configKey = "gameplay.increasePlaySpeed"
+	}
+	items[#items + 1] = {
+		name = "decrease time rate",
+		type = "keybind",
+		configKey = "gameplay.decreaseTimeRate"
+	}
+	items[#items + 1] = {
+		name = "increase time rate",
+		type = "keybind",
+		configKey = "gameplay.increaseTimeRate"
 	}
 	
 	return self:setItems(items)

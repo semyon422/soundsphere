@@ -57,14 +57,14 @@ GraphicEngine.receive = function(self, event)
 		local key = event.args[1]
 		local delta = 0.05
 		
-		if key == "f2" then
+		if key == Config:get("gameplay.invertPlaySpeed") then
 			NoteSkin.targetVisualTimeRate = -NoteSkin.targetVisualTimeRate
 			NoteSkin:setVisualTimeRate(NoteSkin.targetVisualTimeRate)
 			return self.observable:send({
 				name = "notify",
 				text = "visualTimeRate: " .. NoteSkin.targetVisualTimeRate
 			})
-		elseif key == "f3" then
+		elseif key == Config:get("gameplay.decreasePlaySpeed") then
 			if math.abs(NoteSkin.targetVisualTimeRate - delta) > 0.001 then
 				NoteSkin.targetVisualTimeRate = NoteSkin.targetVisualTimeRate - delta
 				NoteSkin:setVisualTimeRate(NoteSkin.targetVisualTimeRate)
@@ -76,7 +76,7 @@ GraphicEngine.receive = function(self, event)
 				name = "notify",
 				text = "visualTimeRate: " .. NoteSkin.targetVisualTimeRate
 			})
-		elseif key == "f4" then
+		elseif key == Config:get("gameplay.increasePlaySpeed") then
 			if math.abs(NoteSkin.targetVisualTimeRate + delta) > 0.001 then
 				NoteSkin.targetVisualTimeRate = NoteSkin.targetVisualTimeRate + delta
 				NoteSkin:setVisualTimeRate(NoteSkin.targetVisualTimeRate)

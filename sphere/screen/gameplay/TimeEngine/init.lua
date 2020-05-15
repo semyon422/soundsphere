@@ -1,6 +1,7 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
 local tween				= require("tween")
+local Config			= require("sphere.config.Config")
 local TimeManager		= require("sphere.screen.gameplay.TimeEngine.TimeManager")
 
 local TimeEngine = Class:new()
@@ -62,7 +63,7 @@ TimeEngine.receive = function(self, event)
 		local key = event.args[1]
 		local delta = 0.05
 		
-		if key == "f5" then
+		if key == Config:get("gameplay.decreaseTimeRate") then
 			if self.targetTimeRate - delta >= 0.1 then
 				self.targetTimeRate = self.targetTimeRate - delta
 				self:setTimeRate(self.targetTimeRate)
@@ -71,7 +72,7 @@ TimeEngine.receive = function(self, event)
 				name = "notify",
 				text = "timeRate: " .. self.targetTimeRate
 			})
-		elseif key == "f6" then
+		elseif key == Config:get("gameplay.increaseTimeRate") then
 			self.targetTimeRate = self.targetTimeRate + delta
 			self:setTimeRate(self.targetTimeRate)
 			return self.observable:send({

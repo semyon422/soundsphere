@@ -73,7 +73,13 @@ Config.defaultValues = {
 	
 	["screen.settings"] = "f1",
 	["screen.browser"] = "tab",
+	["gameplay.pause"] = "escape",
 	["gameplay.quickRestart"] = "`",
+	["gameplay.invertPlaySpeed"] = "f2",
+	["gameplay.decreasePlaySpeed"] = "f3",
+	["gameplay.increasePlaySpeed"] = "f4",
+	["gameplay.decreaseTimeRate"] = "f5",
+	["gameplay.increaseTimeRate"] = "f6"
 }
 
 return Config
