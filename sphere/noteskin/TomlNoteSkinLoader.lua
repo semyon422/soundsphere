@@ -100,6 +100,7 @@ TomlNoteSkinLoader.addEnv = function(self)
 		return data[1] + data[2] * (timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
 	end
 	env.color = envcolor
+	env.colorWhite = function() return colors.clear end
 	env.bgacolor = function()
 		local bga = noteSkin.tomlData.bga
 		if not bga then
@@ -395,7 +396,7 @@ TomlNoteSkinLoader.addMeasureLine = function(self)
 		h = {"number", 0},
 		ox = {"number", 0},
 		oy = {"number", 0},
-		color = {"color", "white"}
+		color = {"colorWhite"}
 	}
 	head.drawInterval = {-1, 1}
 
@@ -411,7 +412,7 @@ TomlNoteSkinLoader.addMeasureLine = function(self)
 		h = {"number", tomlMeasureLine.height / unit},
 		ox = {"number", 0},
 		oy = {"number", 0},
-		color = {"color", "white"}
+		color = {"colorWhite"}
 	}
 
 	longNote.Tail = {}
@@ -426,7 +427,7 @@ TomlNoteSkinLoader.addMeasureLine = function(self)
 		h = {"number", 0},
 		ox = {"number", 0},
 		oy = {"number", 0},
-		color = {"color", "white"}
+		color = {"colorWhite"}
 	}
 	tail.drawInterval = {-1, 1}
 end
