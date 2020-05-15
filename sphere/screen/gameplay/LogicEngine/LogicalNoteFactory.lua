@@ -14,6 +14,7 @@ LogicalNoteFactory.getNote = function(self, noteData)
 	elseif noteData.noteType == "LaserNoteStart" then
 		return LaserLogicalNote:new(logicalNote)
 	elseif noteData.noteType == "LineNoteStart" then
+		logicalNote.autoplay = true
 		return ShortLogicalNote:new(logicalNote)
 	elseif noteData.noteType == "SoundNote" then
 		logicalNote.autoplay = true

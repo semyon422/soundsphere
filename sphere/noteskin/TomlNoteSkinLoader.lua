@@ -692,19 +692,21 @@ end
 
 -- local drawOrder = {0x04, 0x07, 0x0A}
 TomlNoteSkinLoader.addBmsBga = function(self)
-	self:addImageNote("bmsbga" .. 0x04, 0.1)
+	local layer = self.noteSkin.tomlData.bga.layer
+
+	self:addImageNote("bmsbga" .. 0x04, 0.1 + layer)
 	-- self:addImageNote("bmsbga" .. 0x06)
-	self:addImageNote("bmsbga" .. 0x07, 0.2)
-	self:addImageNote("bmsbga" .. 0x0A, 0.3)
+	self:addImageNote("bmsbga" .. 0x07, 0.2 + layer)
+	self:addImageNote("bmsbga" .. 0x0A, 0.3 + layer)
 	-- self:addImageNote("bmsbga" .. 0x0B)
 	-- self:addImageNote("bmsbga" .. 0x0C)
 	-- self:addImageNote("bmsbga" .. 0x0D)
 	-- self:addImageNote("bmsbga" .. 0x0E)
 
-	self:addVideoNote("bmsbga" .. 0x04, 0.1)
+	self:addVideoNote("bmsbga" .. 0x04, 0.1 + layer)
 	-- self:addVideoNote("bmsbga" .. 0x06)
-	self:addVideoNote("bmsbga" .. 0x07, 0.2)
-	self:addVideoNote("bmsbga" .. 0x0A, 0.3)
+	self:addVideoNote("bmsbga" .. 0x07, 0.2 + layer)
+	self:addVideoNote("bmsbga" .. 0x0A, 0.3 + layer)
 	-- self:addVideoNote("bmsbga" .. 0x0B)
 	-- self:addVideoNote("bmsbga" .. 0x0C)
 	-- self:addVideoNote("bmsbga" .. 0x0D)
