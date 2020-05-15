@@ -74,16 +74,7 @@ end
 
 SettingsList.setGeneralItems = function(self)
 	local items = {}
-	
-	items[#items + 1] = {
-		name = "test checkbox",
-		configKey = "cb",
-		type = "checkbox",
-		minValue = false,
-		maxValue = true,
-		minDisplayValue = "disabled",
-		maxDisplayValue = "enabled"
-	}
+
 	items[#items + 1] = {
 		name = "FPS limit",
 		configKey = "fps",
@@ -95,17 +86,6 @@ SettingsList.setGeneralItems = function(self)
 		step = 10,
 		format = "%d"
 	}
-	-- items[#items + 1] = {
-	-- 	name = "TPS limit",
-	-- 	configKey = "tps",
-	-- 	type = "slider",
-	-- 	minValue = 10,
-	-- 	maxValue = 1000,
-	-- 	minDisplayValue = 10,
-	-- 	maxDisplayValue = 1000,
-	-- 	step = 10,
-	-- 	format = "%d"
-	-- }
 	items[#items + 1] = {
 		name = "play speed",
 		configKey = "speed",
