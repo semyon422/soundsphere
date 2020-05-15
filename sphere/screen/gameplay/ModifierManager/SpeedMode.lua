@@ -109,7 +109,6 @@ SpeedMode.apply = function(self)
 			maximum = speed
 		end
 	end
-	print(average, minimum, maximum)
 
 	local mode = self.value
 	if mode == 1 then
