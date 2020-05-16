@@ -21,19 +21,19 @@ local ModifierSequence = Class:new()
 
 ModifierSequence.modifiers = {
 	AutoPlay,
-	AutoKeySound,
-	Automap,
-	DoublePlay,
 	ProMode,
-	WindUp,
+	AutoKeySound,
 	SpeedMode,
 	TimeRateQ,
 	TimeRateX,
+	WindUp,
 	NoScratch,
-	Mirror,
-	Random,
 	NoLongNote,
 	NoMeasureLine,
+	Automap,
+	DoublePlay,
+	Mirror,
+	Random,
 	FullLongNote,
 	ToOsu
 }
@@ -48,10 +48,10 @@ end
 ModifierSequence.inconsequentialClassList = {
 	AutoPlay,
 	ProMode,
-	WindUp,
 	SpeedMode,
 	TimeRateQ,
 	TimeRateX,
+	WindUp,
 	NoScratch,
 	NoLongNote,
 	NoMeasureLine,
