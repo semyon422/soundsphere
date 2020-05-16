@@ -283,12 +283,12 @@ Cache.getNoteChartDataEntry = function(self, hash, index)
 end
 
 Cache.getAllNoteChartDataEntries = function(self, hash)
+	local t = {}
+
 	local hashIndex = self.noteChartDatasHashIndex[hash]
 	if not hashIndex then
-		return
+		return t
 	end
-
-	local t = {}
 
 	for k, v in pairs(hashIndex) do
 		t[k] = v
