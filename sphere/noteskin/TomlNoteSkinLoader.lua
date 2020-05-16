@@ -12,8 +12,6 @@ TomlNoteSkinLoader.data = {}
 TomlNoteSkinLoader.path = "userdata/skins"
 
 TomlNoteSkinLoader.load = function(self, metaData, version)
-	self.version = version or math.huge
-
 	local noteSkin = NoteSkin:new()
 	noteSkin.metaData = metaData
 	self.noteSkin = noteSkin
@@ -123,9 +121,7 @@ TomlNoteSkinLoader.processNoteSkinData = function(self)
 		self:processInput(input[i], i)
 	end
 
-	if self.version > 1 then
-		self:addPlayFieldGuidelines()
-	end
+	self:addPlayFieldGuidelines()
 end
 
 TomlNoteSkinLoader.addCS = function(self)
@@ -464,40 +460,6 @@ TomlNoteSkinLoader.addMeasureLine = function(self)
 end
 
 TomlNoteSkinLoader.processPlayFieldData = function(self)
-	if self.version == 1 then
-		local tomlScore = self.noteSkin.tomlData.score
-		
-		tomlScore.score.layer = 5
-		tomlScore.accuracy.layer = 5
-		tomlScore.combo.layer = 5
-		tomlScore.timegate.layer = 5
-		self:addScoreDisplayScore(tomlScore.score)
-		self:addScoreDisplayAccuracy(tomlScore.accuracy)
-		self:addScoreDisplayCombo(tomlScore.combo)
-		self:addScoreDisplayTimegate(tomlScore.timegate)
-
-		self:addAccuracyGraph({
-			class = "AccuracyGraph",
-			r = 1,
-			lineColor = {255, 255, 255, 127},
-			color = {127, 127, 127, 255},
-			xywh = {0, self.unit * 0.25, self.unit, self.unit * 0.5},
-			origin = "lane",
-			layer = 0
-		})
-		self:addProgressBar({
-			class = "ProgressBar",
-			color = {255, 255, 255, 255},
-			direction = "left-right",
-			mode = "+",
-			xywh = {0, 0.995, 1, 0.005},
-			origin = "all",
-			layer = 0
-		})
-
-		return
-	end
-
 	local tomlPlayField = self.noteSkin.tomlData.playfield
 	for _, object in pairs(tomlPlayField) do
 		if object.class == "ScoreDisplay" and object.field == "score" then
@@ -508,8 +470,8 @@ TomlNoteSkinLoader.processPlayFieldData = function(self)
 			self:addScoreDisplayCombo(object)
 		elseif object.class == "ScoreDisplay" and object.field == "timegate" then
 			self:addScoreDisplayTimegate(object)
-		elseif object.class == "AccuracyGraph" then
-			self:addAccuracyGraph(object)
+		elseif object.class == "PointGraph" then
+			self:addPointGraph(object)
 		elseif object.class == "ProgressBar" then
 			self:addProgressBar(object)
 		elseif object.class == "StaticObject" then
@@ -519,10 +481,6 @@ TomlNoteSkinLoader.processPlayFieldData = function(self)
 end
 
 TomlNoteSkinLoader.getPlayFielObjectXYWH = function(self, object)
-	if self.version == 1 and not object.xywh then
-		return 0, 0, 1, 1, self.cses[2]
-	end
-
 	local ox, oy, ow, oh = unpack(object.xywh)
 	if object.origin == "lane" then
 		local x0 = self:getNoteX(0)
@@ -625,12 +583,12 @@ TomlNoteSkinLoader.addScoreDisplayTimegate = function(self, object)
 	}
 end
 
-TomlNoteSkinLoader.addAccuracyGraph = function(self, object)
+TomlNoteSkinLoader.addPointGraph = function(self, object)
 	local playField = self.noteSkin.playField
 	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
 
 	playField[#playField + 1] = {
-		class = "AccuracyGraph",
+		class = "PointGraph",
 		x = x,
 		y = y,
 		w = w,
@@ -639,7 +597,8 @@ TomlNoteSkinLoader.addAccuracyGraph = function(self, object)
 		layer = object.layer,
 		cs = cs,
 		color = object.color,
-		lineColor = object.lineColor
+		lineColor = object.lineColor,
+		counterPath = object.counterPath
 	}
 end
 

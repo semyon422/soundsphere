@@ -8,10 +8,13 @@
 			"path": "accuracy.lua"
 		},
 		{
-			"path": "combo.lua"
+			"path": "combo.lua",
+			"tableName": "comboHits"
 		},
 		{
-			"path": "hits.lua"
+			"path": "hits.lua",
+			"scale": 0.25,
+			"tableName": "hits"
 		},
 		{
 			"path": "grade.lua",

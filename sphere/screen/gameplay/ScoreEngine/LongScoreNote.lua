@@ -60,9 +60,6 @@ LongScoreNote.update = function(self)
 	local states = logicalNote.states
 	local oldState, newState = states[self.currentStateIndex - 1], states[self.currentStateIndex]
 	
-	-- local startDeltaTime = (self.scoreEngine.currentTime - self.startNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
-	-- local endDeltaTime = (self.scoreEngine.currentTime - self.endNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
-
 	local currentTime = self.scoreEngine.currentTime
 	if logicalNote.autoplayStart then
 		currentTime = self.startNoteData.timePoint.absoluteTime
@@ -83,7 +80,9 @@ LongScoreNote.update = function(self)
 			timeRate = self.scoreEngine.timeRate,
 			scoreNotesCount = self.noteHandler.scoreNotesCount,
 			oldState = oldState,
-			newState = newState
+			newState = newState,
+			minTime = self.scoreEngine.minTime,
+			maxTime = self.scoreEngine.maxTime
 		})
 	end
 

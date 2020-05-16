@@ -1,5 +1,5 @@
 local ScreenManager	= require("sphere.screen.ScreenManager")
-local AccuracyGraph	= require("sphere.screen.gameplay.AccuracyGraph")
+local PointGraph	= require("sphere.screen.gameplay.PointGraph")
 local ProgressBar	= require("sphere.screen.gameplay.ProgressBar")
 local InputImage	= require("sphere.screen.gameplay.InputImage")
 local ScoreDisplay	= require("sphere.screen.gameplay.ScoreDisplay")
@@ -10,7 +10,7 @@ local GUI = require("sphere.ui.GUI")
 local GameplayGUI = GUI:new()
 
 GameplayGUI.classes = setmetatable({
-	AccuracyGraph = AccuracyGraph,
+	PointGraph = PointGraph,
 	ProgressBar = ProgressBar,
 	InputImage = InputImage,
 	ScoreDisplay = ScoreDisplay,

@@ -58,7 +58,9 @@ ShortScoreNote.update = function(self)
 			timeRate = self.scoreEngine.timeRate,
 			scoreNotesCount = self.noteHandler.scoreNotesCount,
 			oldState = oldState,
-			newState = newState
+			newState = newState,
+			minTime = self.scoreEngine.minTime,
+			maxTime = self.scoreEngine.maxTime
 		})
 	end
 

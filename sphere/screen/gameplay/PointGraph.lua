@@ -5,9 +5,9 @@ local Line				= require("aqua.graphics.Line")
 local map				= require("aqua.math").map
 local Class				= require("aqua.util.Class")
 
-local AccuracyGraph = Class:new()
+local PointGraph = Class:new()
 
-AccuracyGraph.loadGui = function(self)
+PointGraph.loadGui = function(self)
 	self.cs = CoordinateManager:getCS(unpack(self.data.cs))
 	self.x = self.data.x
 	self.y = self.data.y
@@ -19,6 +19,7 @@ AccuracyGraph.loadGui = function(self)
 	self.color = self.data.color
 	self.blendMode = self.data.blendMode
 	self.blendAlphaMode = self.data.blendAlphaMode
+	self.counterPath = self.data.counterPath
 
 	self.scoreSystem = self.gui.scoreSystem
 	self.noteChart = self.gui.noteChart
@@ -27,7 +28,9 @@ AccuracyGraph.loadGui = function(self)
 	self:load()
 end
 
-AccuracyGraph.load = function(self)
+PointGraph.load = function(self)
+	self.counter = self.scoreSystem:getCounter(self.counterPath)
+
 	self.allcs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
 	self.scoreSystem.observable:add(self)
@@ -53,9 +56,7 @@ AccuracyGraph.load = function(self)
 		cs = self.cs
 	})
 	
-	self.minTime = self.noteChart.metaData:get("minTime")
-	self.maxTime = self.noteChart.metaData:get("maxTime")
-	local hits = self.scoreSystem.scoreTable.hits or {}
+	local hits = self.scoreSystem.scoreTable[self.counter.env.config.tableName] or {}
 	for _, point in ipairs(hits) do
 		self:addPoint(point[1], point[2])
 	end
@@ -73,30 +74,30 @@ AccuracyGraph.load = function(self)
 	self.container:add(self.image)
 end
 
-AccuracyGraph.addPoint = function(self, time, deltaTime)
+PointGraph.addPoint = function(self, x, y)
 	love.graphics.setCanvas(self.canvas)
 	local circle = self.circle
 	
-	circle.x = map(time, self.minTime, self.maxTime, self.x, self.x + self.w)
-	circle.y = map(0.5 + deltaTime * 3, 0, 1, self.y, self.y + self.h)
+	circle.x = map(x, 0, 1, self.x, self.x + self.w)
+	circle.y = map(y, 0, 1, self.y, self.y + self.h)
 	circle:reload()
 	circle:draw()
 	
 	love.graphics.setCanvas()
 end
 
-AccuracyGraph.reload = function(self)
+PointGraph.reload = function(self)
 	self:unload()
 	self:load()
 end
 
-AccuracyGraph.unload = function(self)
+PointGraph.unload = function(self)
 	self.container:remove(self.image)
 end
 
-AccuracyGraph.update = function(self) end
+PointGraph.update = function(self) end
 
-AccuracyGraph.receive = function(self, event)
+PointGraph.receive = function(self, event)
 	if event.name == "resize" then
 		self:reload()
 	end
@@ -104,40 +105,15 @@ AccuracyGraph.receive = function(self, event)
 	if event.name ~= "ScoreNoteState" then
 		return
 	end
-	
-	local oldState, newState = event.oldState, event.newState
-	if event.noteType == "ShortScoreNote" then
-		if newState == "passed" then
-			self:addPoint(event.currentTime, (event.currentTime - event.noteTime) / event.timeRate)
-		elseif newState == "missed" then
-		end
-	elseif event.noteType == "LongScoreNote" then
-		if oldState == "clear" then
-			if newState == "startPassedPressed" then
-				self:addPoint(event.currentTime, (event.currentTime - event.noteStartTime) / event.timeRate)
-			elseif newState == "startMissed" then
-			elseif newState == "startMissedPressed" then
-			end
-		elseif oldState == "startPassedPressed" then
-			if newState == "startMissed" then
-			elseif newState == "endMissed" then
-			elseif newState == "endPassed" then
-			end
-		elseif oldState == "startMissedPressed" then
-			if newState == "endMissedPassed" then
-			elseif newState == "startMissed" then
-			elseif newState == "endMissed" then
-			end
-		elseif oldState == "startMissed" then
-			if newState == "startMissedPressed" then
-			elseif newState == "endMissed" then
-			end
-		end
+
+	local point = self.counter.env.getPoint(event)
+	if point then
+		self:addPoint(unpack(point))
 	end
 end
 
-AccuracyGraph.draw = function(self)
+PointGraph.draw = function(self)
 	self.image:draw()
 end
 
-return AccuracyGraph
+return PointGraph
