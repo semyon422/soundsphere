@@ -32,14 +32,21 @@ InconsequentialModifierButton.construct = function(self)
 			end
 		end
 	elseif Modifier.sequential then
-		if Modifier.variableType == "number" then
+		-- if Modifier.variableType == "boolean" then
+		-- 	button = AddModifierButton:new(self)
+		-- 	button.item = self.item
+		-- 	button.add = function(self)
+		-- 		ModifierManager.sequence:add(Modifier)
+		-- 		SequenceList:reloadItems()
+		-- 	end
+		-- elseif Modifier.variableType == "number" then
 			button = AddModifierButton:new(self)
 			button.item = self.item
 			button.add = function(self)
 				ModifierManager.sequence:add(Modifier)
 				SequenceList:reloadItems()
 			end
-		end
+		-- end
 	end
 	
 	return button

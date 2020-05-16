@@ -2,7 +2,7 @@ local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
 
 local Random = Modifier:new()
 
-Random.inconsequential = true
+Random.sequential = true
 Random.type = "NoteChartModifier"
 
 Random.name = "Random"

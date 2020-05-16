@@ -3,7 +3,7 @@ local Modifier	= require("sphere.screen.gameplay.ModifierManager.Modifier")
 
 local DoublePlay = Modifier:new()
 
-DoublePlay.inconsequential = true
+DoublePlay.sequential = true
 DoublePlay.type = "NoteChartModifier"
 
 DoublePlay.name = "DoublePlay"

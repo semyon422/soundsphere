@@ -53,12 +53,9 @@ ModifierSequence.inconsequentialClassList = {
 	TimeRateQ,
 	TimeRateX,
 	NoScratch,
-	Mirror,
-	Random,
 	NoLongNote,
 	NoMeasureLine,
 	AutoKeySound,
-	DoublePlay,
 	ToOsu
 }
 

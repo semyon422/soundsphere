@@ -2,7 +2,7 @@ local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
 
 local Mirror = Modifier:new()
 
-Mirror.inconsequential = true
+Mirror.sequential = true
 Mirror.type = "NoteChartModifier"
 
 Mirror.name = "Mirror"
