@@ -24,7 +24,6 @@ NoteHandler.loadNoteData = function(self)
 				if logicalNote then
 					logicalNote.noteHandler = self
 					logicalNote.logicEngine = logicEngine
-					-- logicalNote.score = logicEngine.score
 					logicalNote.scoreNote = self.logicEngine:getScoreNote(noteData)
 					logicalNote.scoreNote.logicalNote = logicalNote
 					table.insert(self.noteData, logicalNote)
@@ -45,15 +44,14 @@ NoteHandler.loadNoteData = function(self)
 	
 	self.startNoteIndex = 1
 	self.currentNote = self.noteData[1]
+	if not self.currentNote then return end
 	self.currentNote:load()
 end
 
 NoteHandler.update = function(self)
 	local currentNote = self.currentNote
 
-	if not currentNote then
-		return
-	end
+	if not self.currentNote then return end
 	
 	currentNote:update()
 
@@ -72,7 +70,6 @@ end
 
 NoteHandler.receive = function(self, event)
 	if not self.currentNote then return end
-	
 	return self.currentNote:receive(event)
 end
 
