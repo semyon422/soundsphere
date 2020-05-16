@@ -64,7 +64,7 @@ end
 SelectScreen.load = function(self)
 	self.gui:reload()
 
-	ModifierMenu.SelectScreen = SelectScreen
+	KeyBindMenu.SelectScreen = SelectScreen
 	NoteSkinMenu.SelectScreen = SelectScreen
 	
 	NoteSkinManager:load()
