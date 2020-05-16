@@ -24,7 +24,7 @@ TimeRateX.tojson = function(self)
 end
 
 TimeRateX.apply = function(self)
-	self.sequence.manager.timeEngine:addBaseTimeRate(self.value)
+	self.sequence.manager.timeEngine:createTimeRateHandler().timeRate = self.value
 end
 
 return TimeRateX

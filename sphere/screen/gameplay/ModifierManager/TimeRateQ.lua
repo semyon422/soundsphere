@@ -25,7 +25,7 @@ end
 
 -- https://github.com/Quaver/Quaver/issues/666
 TimeRateQ.apply = function(self)
-	self.sequence.manager.timeEngine:addBaseTimeRate(2 ^ (0.1 * self.value))
+	self.sequence.manager.timeEngine:createTimeRateHandler().timeRate = 2 ^ (0.1 * self.value)
 end
 
 return TimeRateQ

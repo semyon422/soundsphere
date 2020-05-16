@@ -9,7 +9,7 @@ local TimeEngine = Class:new()
 TimeEngine.construct = function(self)
 	self.observable = Observable:new()
 
-	self.baseTimeRates = {1}
+	self.timeRateHandlers = {}
 end
 
 TimeEngine.currentTime = 0
@@ -22,16 +22,22 @@ TimeEngine.load = function(self)
 	self:loadTimeManager()
 end
 
-TimeEngine.addBaseTimeRate = function(self, timeRate)
-	local baseTimeRates = self.baseTimeRates
-	baseTimeRates[#baseTimeRates + 1] = timeRate
+TimeEngine.createTimeRateHandler = function(self)
+	local timeRateHandler = {
+		timeRate = 1
+	}
+
+	local timeRateHandlers = self.timeRateHandlers
+	timeRateHandlers[#timeRateHandlers + 1] = timeRateHandler
+
+	return timeRateHandler
 end
 
 TimeEngine.getBaseTimeRate = function(self)
 	local timeRate = 1
-	local baseTimeRates = self.baseTimeRates
-	for i = 1, #baseTimeRates do
-		timeRate = timeRate * baseTimeRates[i]
+	local timeRateHandlers = self.timeRateHandlers
+	for i = 1, #timeRateHandlers do
+		timeRate = timeRate * timeRateHandlers[i].timeRate
 	end
 	return timeRate
 end

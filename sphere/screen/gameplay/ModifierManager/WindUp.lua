@@ -12,7 +12,7 @@ WindUp.shortName = "WindUp"
 WindUp.variableType = "boolean"
 
 WindUp.apply = function(self)
-	-- self.sequence.manager.logicEngine.score.windUp = true
+	self.timeRateHandler = self.sequence.manager.timeEngine:createTimeRateHandler()
 end
 
 WindUp.update = function(self)
@@ -25,9 +25,11 @@ WindUp.update = function(self)
 		return
 	end
 
-	local targetTimeRate = map(currentTime, startTime, endTime, 0.75, 1.5)
-	timeEngine.baseTimeRate = targetTimeRate
-	timeEngine:setTimeRate(targetTimeRate, false)
+	local timeRate = map(currentTime, startTime, endTime, 0.75, 1.5)
+	self.timeRateHandler.timeRate = timeRate
+
+	local baseTimeRate = self.sequence.manager.timeEngine:getBaseTimeRate()
+	timeEngine:setTimeRate(baseTimeRate, false)
 end
 
 return WindUp
