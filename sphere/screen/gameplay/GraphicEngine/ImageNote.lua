@@ -1,4 +1,5 @@
 local ImageFrame	= require("aqua.graphics.ImageFrame")
+-- local Drawable		= require("aqua.graphics.Drawable")
 local image			= require("aqua.image")
 local GraphicalNote = require("sphere.screen.gameplay.GraphicEngine.GraphicalNote")
 
@@ -13,33 +14,48 @@ end
 
 ImageNote.update = function(self)
 	if not self:tryNext() then
-		self.drawable.x = self:getX()
-		self.drawable.y = self:getY()
-		self.drawable.sx = self:getScaleX()
-		self.drawable.sy = self:getScaleY()
-		self.drawable:reload()
-		self.drawable.color = self:getColor()
+		local drawable = self.drawable
+		if not drawable then
+			return
+		end
+
+		drawable.x = self:getX()
+		drawable.y = self:getY()
+		drawable.sx = self:getScaleX()
+		drawable.sy = self:getScaleY()
+		drawable:reload()
+		drawable.color = self:getColor()
 	end
 end
 
 ImageNote.activate = function(self)
-	self.drawable = self:getDrawable()
-	self.drawable:reload()
-	self.container = self:getContainer()
-	self.container:add(self.drawable)
+	local drawable = self:getDrawable()
+	if drawable then
+		drawable:reload()
+		self.drawable = drawable
+		self.container = self:getContainer()
+		self.container:add(drawable)
+	end
 	
 	self.activated = true
 end
 
 ImageNote.deactivate = function(self)
-	self.container:remove(self.drawable)
+	local drawable = self.drawable
+	if drawable then
+		self.container:remove(drawable)
+	end
 	self.activated = false
 end
 
 ImageNote.reload = function(self)
-	self.drawable.sx = self:getScaleX()
-	self.drawable.sy = self:getScaleY()
-	self.drawable:reload()
+	local drawable = self.drawable
+	if not drawable then
+		return
+	end
+	drawable.sx = self:getScaleX()
+	drawable.sy = self:getScaleY()
+	drawable:reload()
 end
 
 ImageNote.computeVisualTime = function(self)
@@ -112,15 +128,19 @@ ImageNote.getY = function(self)
 end
 
 ImageNote.getScaleX = function(self)
-	return
-		self:getHeadWidth() /
-		self.noteSkin:getCS(self):x(self.image:getWidth())
+	local image = self.image
+	if not image then
+		return
+	end
+	return self:getHeadWidth() / self.noteSkin:getCS(self):x(image:getWidth())
 end
 
 ImageNote.getScaleY = function(self)
-	return
-		self:getHeadHeight() /
-		self.noteSkin:getCS(self):y(self.image:getHeight())
+	local image = self.image
+	if not image then
+		return
+	end
+	return self:getHeadHeight() / self.noteSkin:getCS(self):y(image:getHeight())
 end
 
 ImageNote.getColor = function(self)

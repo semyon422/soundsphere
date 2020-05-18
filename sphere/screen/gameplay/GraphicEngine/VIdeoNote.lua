@@ -1,5 +1,6 @@
 local ImageFrame	= require("aqua.graphics.ImageFrame")
 local GraphicalNote = require("sphere.screen.gameplay.GraphicEngine.GraphicalNote")
+local ImageNote		= require("sphere.screen.gameplay.GraphicEngine.ImageNote")
 local video			= require("aqua.video")
 
 local VideoNote = GraphicalNote:new()
@@ -15,66 +16,67 @@ VideoNote.timeRate = 0
 
 VideoNote.update = function(self)
 	if not self:tryNext() then
-		if self.video then
-			self.video:update(dt)
+		local video = self.video
+		if video then
+			video:update(dt)
 		end
-		self.drawable.x = self:getX()
-		self.drawable.y = self:getY()
-		self.drawable.sx = self:getScaleX()
-		self.drawable.sy = self:getScaleY()
-		self.drawable:reload()
-		self.drawable.color = self:getColor()
+
+		local drawable = self.drawable
+		if not drawable then
+			return
+		end
+		drawable.x = self:getX()
+		drawable.y = self:getY()
+		drawable.sx = self:getScaleX()
+		drawable.sy = self:getScaleY()
+		drawable:reload()
+		drawable.color = self:getColor()
 	end
 end
 
 VideoNote.activate = function(self)
-	self.drawable = self:getDrawable()
-	self.drawable:reload()
-	self.container = self:getContainer()
-	self.container:add(self.drawable)
+	local drawable = self:getDrawable()
+	if drawable then
+		drawable:reload()
+		self.drawable = drawable
+		self.container = self:getContainer()
+		self.container:add(drawable)
+	end
+
+	local video = self.video
+	if video then
+		video:play()
+	end
 	
 	self.activated = true
-	if self.video then
-		self.video:play()
-	end
 end
 
 VideoNote.deactivate = function(self)
-	self.container:remove(self.drawable)
-	self.activated = false
-	if self.video then
-		self.video:pause()
+	local drawable = self.drawable
+	if drawable then
+		self.container:remove(drawable)
 	end
-end
 
-VideoNote.reload = function(self)
-	self.drawable.sx = self:getScaleX()
-	self.drawable.sy = self:getScaleY()
-	self.drawable:reload()
-end
-
-VideoNote.computeVisualTime = function(self)
-end
-
-VideoNote.computeTimeState = function(self)
-	self.timeState = self.timeState or {}
-end
-
-VideoNote.getContainer = function(self)
-	return self.graphicEngine.container
+	local video = self.video
+	if video then
+		video:pause()
+	end
+	
+	self.activated = false
 end
 
 VideoNote.getDrawable = function(self)
 	local path = self.graphicEngine.localAliases[self.startNoteData.images[1][1]] or self.graphicEngine.globalAliases[self.startNoteData.images[1][1]]
 
-	self.video = video.new(path)
-	
-	if self.video then
-		self.video:rewind()
-		self.image = self.video.image
+	local video = video.new(path)
+	local image
+
+	if video then
+		video:rewind()
+		image = video.image
 
 		local drawable = ImageFrame:new({
-			image = self.image,
+			image = image,
 			cs = self.noteSkin:getCS(self),
 			layer = self.noteSkin:getNoteLayer(self, "Head"),
 			x = 0,
@@ -89,60 +91,32 @@ VideoNote.getDrawable = function(self)
 		})
 		
 		local deltaTime = self.startNoteData.timePoint.absoluteTime
-		self.video.getAdjustTime = function()
+		video.getAdjustTime = function()
 			return self.graphicEngine.currentTime - deltaTime
 		end
-		self.video:setRate(self.graphicEngine.timeRate)
+		video:setRate(self.graphicEngine.timeRate)
+
+		self.video = video
+		self.image = image
 
 		return drawable
 	end
 end
 
-VideoNote.willDrawBeforeStart = function(self)
-	local nextNote = self:getNext(1)
 
-	if not nextNote then
-		return false
-	end
-
-	return not nextNote:willDrawAfterEnd()
-end
-
-VideoNote.willDrawAfterEnd = function(self)
-	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
-
-	if dt < 0 then
-		return true
-	end
-end
-
-VideoNote.getHeadWidth = function(self)
-	return self.noteSkin:getG(self, "Head", "w", self.timeState)
-end
-
-VideoNote.getHeadHeight = function(self)
-	return self.noteSkin:getG(self, "Head", "h", self.timeState)
-end
-
-VideoNote.getX = function(self)
-	return self.noteSkin:getG(self, "Head", "x", self.timeState)
-end
-
-VideoNote.getY = function(self)
-	return self.noteSkin:getG(self, "Head", "y", self.timeState)
-end
-
-VideoNote.getScaleX = function(self)
-	return
-		self:getHeadWidth() /
-		self.noteSkin:getCS(self):x(self.image:getWidth())
-end
-
-VideoNote.getScaleY = function(self)
-	return
-		self:getHeadHeight() /
-		self.noteSkin:getCS(self):y(self.image:getHeight())
-end
+VideoNote.reload = ImageNote.reload
+VideoNote.computeVisualTime = ImageNote.computeVisualTime
+VideoNote.computeTimeState = ImageNote.computeTimeState
+VideoNote.getContainer = ImageNote.getContainer
+VideoNote.willDrawBeforeStart = ImageNote.willDrawBeforeStart
+VideoNote.willDrawAfterEnd = ImageNote.willDrawAfterEnd
+VideoNote.getHeadWidth = ImageNote.getHeadWidth
+VideoNote.getHeadHeight = ImageNote.getHeadHeight
+VideoNote.getX = ImageNote.getX
+VideoNote.getY = ImageNote.getY
+VideoNote.getScaleX = ImageNote.getScaleX
+VideoNote.getScaleY = ImageNote.getScaleY
+VideoNote.getColor = ImageNote.getColor
 
 VideoNote.receive = function(self, event)
 	if event.name == "TimeState" then
@@ -165,10 +139,6 @@ VideoNote.setTimeRate = function(self, timeRate)
 	elseif timeRate ~= 0 and self.timeRate ~= 0 then
 		video:setRate(timeRate)
 	end
-end
-
-VideoNote.getColor = function(self)
-	return self.noteSkin:getG(self, "Head", "color", self.timeState)
 end
 
 return VideoNote
