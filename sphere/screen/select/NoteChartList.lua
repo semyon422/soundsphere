@@ -75,7 +75,7 @@ NoteChartList.selectCache = function(self)
 	local noteChartDataEntries = {}
 	for i = 1, #noteChartEntries do
 		local entries = Cache:getAllNoteChartDataEntries(noteChartEntries[i].hash)
-		if not entries then
+		if #entries == 0 then
 			entries = {Cache:getEmptyNoteChartDataEntry(noteChartEntries[i].path)}
 		end
 		for _, entry in pairs(entries) do
