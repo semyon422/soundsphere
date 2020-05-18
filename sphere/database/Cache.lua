@@ -369,7 +369,7 @@ Cache.checkProgress = function(self)
 	self:checkThreadEvent()
 end
 
-Cache.generateCacheFull = function(self, path)
+Cache.generateCacheFull = function(self, path, force)
 	local path = path or "userdata/charts"
 	CacheDatabase:load()
 
@@ -387,7 +387,7 @@ Cache.generateCacheFull = function(self, path)
 	self.state = 2
 	self:checkProgress()
 
-	self:generate(path)
+	self:generate(path, force)
 
 	self.state = 3
 	self:checkProgress()
@@ -497,7 +497,7 @@ Cache.processNoteChartEntries = function(self, noteChartPaths, noteChartSetPath)
 	self:checkProgress()
 end
 
-Cache.generate = function(self, path)
+Cache.generate = function(self, path, force)
 	local noteChartSets = self.noteChartSets
 	local entries = {}
 	for i = 1, #noteChartSets do
@@ -509,7 +509,7 @@ Cache.generate = function(self, path)
 
 	CacheDatabase:begin()
 	for i = 1, #entries do
-		local status, err = xpcall(function() return self:processNoteChartDataEntries(entries[i]) end, debug.traceback)
+		local status, err = xpcall(function() return self:processNoteChartDataEntries(entries[i], force) end, debug.traceback)
 
 		if not status then
 			self.log:write("error", entries[i].id)
@@ -533,7 +533,7 @@ Cache.generate = function(self, path)
 	CacheDatabase:commit()
 end
 
-Cache.processNoteChartDataEntries = function(self, noteChartSetEntry)
+Cache.processNoteChartDataEntries = function(self, noteChartSetEntry, force)
 	if not exists(noteChartSetEntry.path) then
 		return self:deleteNoteChartSetEntry(noteChartSetEntry)
 	end
@@ -543,7 +543,7 @@ Cache.processNoteChartDataEntries = function(self, noteChartSetEntry)
 	local newNoteChartEntries = {}
 	for i = 1, #noteChartEntries do
 		local noteChartEntry = noteChartEntries[i]
-		if not noteChartEntry.hash then
+		if not noteChartEntry.hash or force then
 			newNoteChartEntries[#newNoteChartEntries + 1] = noteChartEntry
 		end
 	end
@@ -574,7 +574,7 @@ Cache.processNoteChartDataEntries = function(self, noteChartSetEntry)
 		local hash = fileHash[path]
 		noteChartEntry.hash = hash
 
-		if Cache:getNoteChartDataEntry(hash, 1) then
+		if not force and Cache:getNoteChartDataEntry(hash, 1) then
 			self:setNoteChartEntry(noteChartEntry)
 		else
 			fileDatas[#fileDatas + 1] = {

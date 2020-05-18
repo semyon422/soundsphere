@@ -52,7 +52,7 @@ NoteChartManager.stopCache = function(self)
 	})
 end
 
-NoteChartManager.updateCache = function(self, path)
+NoteChartManager.updateCache = function(self, path, force)
 	self.lock = true
 	if not self.isUpdating then
 		self.isUpdating = true
@@ -66,7 +66,7 @@ NoteChartManager.updateCache = function(self, path)
 
 				Cache:generateCacheFull(...)
 			]],
-			{path}
+			{path, force}
 		)
 	end
 end
