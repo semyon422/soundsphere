@@ -39,6 +39,9 @@ GameplayScreen.loadNoteChart = function(self)
 		content,
 		self.noteChartDataEntry.index
 	)
+	if not status then
+		error(noteCharts)
+	end
 	return noteCharts[1]
 end
 
