@@ -60,7 +60,7 @@ LongScoreNote.update = function(self)
 	local states = logicalNote.states
 	local oldState, newState = states[self.currentStateIndex - 1], states[self.currentStateIndex]
 	
-	local currentTime = self.scoreEngine.currentTime
+	local currentTime = logicalNote.eventTime or self.scoreEngine.currentTime
 	if logicalNote.autoplayStart then
 		currentTime = self.startNoteData.timePoint.absoluteTime
 		logicalNote.autoplayStart = false

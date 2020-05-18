@@ -11,6 +11,7 @@ local GraphicEngine				= require("sphere.screen.gameplay.GraphicEngine")
 local AudioEngine				= require("sphere.screen.gameplay.AudioEngine")
 local TimeEngine				= require("sphere.screen.gameplay.TimeEngine")
 local InputManager				= require("sphere.screen.gameplay.InputManager")
+local ReplayManager				= require("sphere.screen.gameplay.ReplayManager")
 local ModifierManager			= require("sphere.screen.gameplay.ModifierManager")
 local PauseOverlay				= require("sphere.screen.gameplay.PauseOverlay")
 local GameplayGUI				= require("sphere.screen.gameplay.GameplayGUI")
@@ -21,6 +22,7 @@ local GameplayScreen = Screen:new()
 
 GameplayScreen.init = function(self)
 	InputManager:init()
+	ReplayManager:init()
 	PauseOverlay:init()
 	NoteChartResourceLoader:init()
 end
@@ -86,19 +88,12 @@ GameplayScreen.load = function(self)
 	noteSkin.container = self.container
 	noteSkin:joinContainer(self.container)
 
-	-- local score = CustomScore:new()
-	-- score.noteChart = noteChart
-	-- score.hash = self.noteChartDataEntry.hash
-	-- score.index = self.noteChartDataEntry.index
-	-- ModifierManager.score = score
-
 	local logicEngine = LogicEngine:new()
 	self.logicEngine = logicEngine
 	logicEngine.scoreEngine = scoreEngine
 	logicEngine.noteChart = noteChart
 	logicEngine.localAliases = {}
 	logicEngine.globalAliases = {}
-	-- score.logicEngine = logicEngine
 	ModifierManager.logicEngine = logicEngine
 	logicEngine.observable:add(ModifierManager)
 
@@ -138,9 +133,12 @@ GameplayScreen.load = function(self)
 	timeEngine.observable:add(logicEngine)
 	timeEngine.observable:add(graphicEngine)
 	timeEngine.observable:add(NotificationLine)
+	timeEngine.observable:add(ReplayManager)
 	graphicEngine.observable:add(NotificationLine)
 	InputManager.observable:add(logicEngine)
 	InputManager.observable:add(gui)
+	InputManager.observable:add(ReplayManager)
+	ReplayManager.observable:add(InputManager)
 	NoteChartResourceLoader.observable:add(NotificationLine)
 	
 	PauseOverlay.logicEngine = logicEngine
@@ -150,6 +148,10 @@ GameplayScreen.load = function(self)
 	PauseOverlay.noteChartEntry = self.noteChartEntry
 	PauseOverlay.noteChartDataEntry = self.noteChartDataEntry
 	PauseOverlay:load()
+
+	ReplayManager.timeEngine = timeEngine
+	ReplayManager.logicEngine = logicEngine
+	ReplayManager:load()
 	
 	local dim = 255 * (1 - Config:get("dim.gameplay"))
 	local color = {dim, dim, dim}
@@ -176,6 +178,7 @@ GameplayScreen.unload = function(self)
 	
 	InputManager.observable:remove(self.logicEngine)
 	InputManager.observable:remove(self.gui)
+	ReplayManager.observable:remove(InputManager)
 end
 
 GameplayScreen.update = function(self, dt)

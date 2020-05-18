@@ -6,6 +6,8 @@ local spherefonts		= require("sphere.assets.fonts")
 local Config			= require("sphere.config.Config")
 local DiscordPresence	= require("sphere.discord.DiscordPresence")
 local ScreenManager		= require("sphere.screen.ScreenManager")
+local ReplayManager		= require("sphere.screen.gameplay.ReplayManager")
+local InputManager		= require("sphere.screen.gameplay.InputManager")
 local tween				= require("tween")
 
 local PauseOverlay = {}
@@ -27,7 +29,7 @@ PauseOverlay.init = function(self)
 		interact = function() self:beginPlay() end,
 		
 		x = 0, y = 0,
-		w = 1, h = 1/3,
+		w = 1, h = 1/4,
 		cs = self.cs,
 		backgroundColor = {0, 0, 0, 127},
 		mode = "fill",
@@ -39,10 +41,33 @@ PauseOverlay.init = function(self)
 	
 	self.retryButton = Theme.Button:new({
 		text = "retry",
-		interact = function() self:restart() end,
+		interact = function()
+			InputManager:setMode("external")
+			ReplayManager:setMode("record")
+			self:restart()
+		end,
 		
-		x = 0, y = 1/3,
-		w = 1, h = 1/3,
+		x = 0, y = 1/4,
+		w = 1, h = 1/4,
+		cs = self.cs,
+		backgroundColor = {0, 0, 0, 127},
+		mode = "fill",
+		limit = 1,
+		textAlign = {x = "center", y = "center"},
+		textColor = {255, 255, 255, 255},
+		font = self.font,
+	})
+	
+	self.replayButton = Theme.Button:new({
+		text = "replay",
+		interact = function()
+			InputManager:setMode("internal")
+			ReplayManager:setMode("replay")
+			self:restart()
+		end,
+		
+		x = 0, y = 1/2,
+		w = 1, h = 1/4,
 		cs = self.cs,
 		backgroundColor = {0, 0, 0, 127},
 		mode = "fill",
@@ -56,8 +81,8 @@ PauseOverlay.init = function(self)
 		text = "menu",
 		interact = function() self:menu() end,
 		
-		x = 0, y = 2/3,
-		w = 1, h = 1/3,
+		x = 0, y = 3/4,
+		w = 1, h = 1/4,
 		cs = self.cs,
 		backgroundColor = {0, 0, 0, 127},
 		mode = "fill",
@@ -79,6 +104,7 @@ PauseOverlay.reload = function(self)
 	self.progressRectangle:reload()
 	self.continueButton:reload()
 	self.retryButton:reload()
+	self.replayButton:reload()
 	self.menuButton:reload()
 end
 
@@ -92,6 +118,7 @@ PauseOverlay.update = function(self, dt)
 	if self.paused then
 		self.continueButton:update()
 		self.retryButton:update()
+		self.replayButton:update()
 		self.menuButton:update()
 	end
 	
@@ -108,6 +135,7 @@ PauseOverlay.draw = function(self)
 	if self.paused then
 		self.continueButton:draw()
 		self.retryButton:draw()
+		self.replayButton:draw()
 		self.menuButton:draw()
 	end
 	self.progressRectangle:draw()
@@ -125,6 +153,7 @@ PauseOverlay.receive = function(self, event)
 	if self.paused then
 		self.continueButton:receive(event)
 		self.retryButton:receive(event)
+		self.replayButton:receive(event)
 		self.menuButton:receive(event)
 	end
 	

@@ -12,7 +12,8 @@ ShortScoreNote.construct = function(self)
 end
 
 ShortScoreNote.getTimeState = function(self)
-	local deltaTime = (self.scoreEngine.currentTime - self.startNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
+	local currentTime = self.logicalNote.eventTime or self.scoreEngine.currentTime
+	local deltaTime = (currentTime - self.startNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
 	local config = self.scoreEngine.scoreSystem.scoreConfig.notes.ShortScoreNote
 	local pass = config.pass
 	local miss = config.miss
@@ -42,10 +43,8 @@ ShortScoreNote.update = function(self)
 	local states = logicalNote.states
 	local oldState, newState = states[self.currentStateIndex - 1], states[self.currentStateIndex]
 
-	-- local deltaTime = (self.scoreEngine.currentTime - self.startNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
-
 	if newState then
-		local currentTime = self.scoreEngine.currentTime
+		local currentTime = logicalNote.eventTime or self.scoreEngine.currentTime
 		if logicalNote.autoplayStart then
 			currentTime = self.startNoteData.timePoint.absoluteTime
 			logicalNote.autoplayStart = false

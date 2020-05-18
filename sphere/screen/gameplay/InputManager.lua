@@ -6,8 +6,14 @@ local InputManager = Class:new()
 
 InputManager.path = "userdata/input.json"
 
+InputManager.mode = "external"
+
 InputManager.init = function(self)
 	self.observable = Observable:new()
+end
+
+InputManager.setMode = function(self, mode)
+	self.mode = mode
 end
 
 InputManager.send = function(self, event)
@@ -98,6 +104,16 @@ InputManager.setInputMode = function(self, inputMode)
 end
 
 InputManager.receive = function(self, event)
+	local mode = self.mode
+
+	if event.virtual and mode == "internal" then
+		return self:send(event)
+	end
+
+	if mode ~= "external" then
+		return
+	end
+
 	if not self.inputConfig then
 		return
 	end

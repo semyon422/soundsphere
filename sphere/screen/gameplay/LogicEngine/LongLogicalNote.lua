@@ -121,9 +121,21 @@ LongLogicalNote.receive = function(self, event)
 	if key == self.keyBind then
 		if event.name == "keypressed" then
 			self.keyState = true
+
+			self.eventTime = event.time
+			self:update()
+			self.scoreNote:update()
+			self.eventTime = nil
+
 			return self:sendState("keyState")
 		elseif event.name == "keyreleased" then
 			self.keyState = false
+
+			self.eventTime = event.time
+			self:update()
+			self.scoreNote:update()
+			self.eventTime = nil
+
 			return self:sendState("keyState")
 		end
 	end
