@@ -1,40 +1,13 @@
 local LogicalNote = require("sphere.screen.gameplay.LogicEngine.LogicalNote")
+local LongLogicalNote = require("sphere.screen.gameplay.LogicEngine.LongLogicalNote")
 
 local LaserLogicalNote = LogicalNote:new()
 
 LaserLogicalNote.noteClass = "LaserLogicalNote"
 
-LaserLogicalNote.construct = function(self)
-	self.startNoteData = self.noteData
-	self.endNoteData = self.noteData.endNoteData
-	self.noteData = nil
+LaserLogicalNote.construct = LongLogicalNote.construct
 
-	self.keyBind = self.startNoteData.inputType .. self.startNoteData.inputIndex
-
-	LogicalNote.construct(self)
-
-	self:switchState("clear")
-end
-
-LaserLogicalNote.update = function(self)
-	if self.ended then
-		return
-	end
-
-	local startTimeState = self.scoreNote:getStartTimeState()
-	local endTimeState = self.scoreNote:getEndTimeState()
-
-	local numStates = #self.states
-	if not self.autoplay then
-		self:processTimeState(startTimeState, endTimeState)
-	else
-		self:processAuto()
-	end
-
-	if numStates ~= #self.states then
-		return self:update()
-	end
-end
+LaserLogicalNote.update = LongLogicalNote.update
 
 LaserLogicalNote.next = function(self)
 	local nextNote = self:getNext()
@@ -99,60 +72,8 @@ LaserLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
 	end
 end
 
-LaserLogicalNote.processAuto = function(self)
-	local deltaStartTime = self.startNoteData.timePoint.absoluteTime - self.logicEngine.currentTime
-	local deltaEndTime = self.endNoteData.timePoint.absoluteTime - self.logicEngine.currentTime
-	
-	local nextNote = self:getNext()
-	if deltaStartTime <= 0 and not self.keyState then
-		self.keyState = true
-		self:sendState("keyState")
-		
-		self.autoplayStart = true
-		self:processTimeState("exactly", "none")
-		-- note.score:processLongNoteState("startPassedPressed", "clear")
-		
-		-- if note.started and not note.judged then
-		-- 	note.score:hit(0, note.startNoteData.timePoint.absoluteTime)
-		-- 	note.judged = true
-		-- end
-	elseif deltaEndTime <= 0 and self.keyState or nextNote and nextNote:isHere() then
-		self.keyState = false
-		self:sendState("keyState")
-		
-		self.autoplayEnd = true
-		self:processTimeState("none", "exactly")
-		-- note.score:processLongNoteState("endPassed", "startPassedPressed")
-	end
-end
+LaserLogicalNote.processAuto = LongLogicalNote.processAuto
 
-LaserLogicalNote.receive = function(self, event)
-	if self.autoplay then
-		return
-	end
-
-	local key = event.args and event.args[1]
-	if key == self.keyBind then
-		if event.name == "keypressed" then
-			self.keyState = true
-
-			self.eventTime = event.time
-			self:update()
-			self.scoreNote:update()
-			self.eventTime = nil
-
-			return self:sendState("keyState")
-		elseif event.name == "keyreleased" then
-			self.keyState = false
-
-			self.eventTime = event.time
-			self:update()
-			self.scoreNote:update()
-			self.eventTime = nil
-
-			return self:sendState("keyState")
-		end
-	end
-end
+LaserLogicalNote.receive = LongLogicalNote.receive
 
 return LaserLogicalNote

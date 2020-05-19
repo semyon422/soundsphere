@@ -1,4 +1,5 @@
 local LogicalNote = require("sphere.screen.gameplay.LogicEngine.LogicalNote")
+local ShortLogicalNote = require("sphere.screen.gameplay.LogicEngine.ShortLogicalNote")
 
 local LongLogicalNote = LogicalNote:new()
 
@@ -112,33 +113,6 @@ LongLogicalNote.processAuto = function(self)
 	end
 end
 
-LongLogicalNote.receive = function(self, event)
-	if self.autoplay then
-		return
-	end
-
-	local key = event.args and event.args[1]
-	if key == self.keyBind then
-		if event.name == "keypressed" then
-			self.keyState = true
-
-			self.eventTime = event.time
-			self:update()
-			self.scoreNote:update()
-			self.eventTime = nil
-
-			return self:sendState("keyState")
-		elseif event.name == "keyreleased" then
-			self.keyState = false
-
-			self.eventTime = event.time
-			self:update()
-			self.scoreNote:update()
-			self.eventTime = nil
-
-			return self:sendState("keyState")
-		end
-	end
-end
+LongLogicalNote.receive = ShortLogicalNote.receive
 
 return LongLogicalNote

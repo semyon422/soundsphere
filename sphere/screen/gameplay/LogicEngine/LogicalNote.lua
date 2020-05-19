@@ -59,7 +59,8 @@ LogicalNote.sendState = function(self, key)
 	return self.logicEngine:send({
 		name = "LogicalNoteState",
 		note = self,
-		key = key
+		key = key,
+		value = self[key]
 	})
 end
 
