@@ -381,10 +381,10 @@ CacheDatabase.transformEntry = function(self, row, columns, numberColumns)
 	local entry = {}
 
 	for i = 1, #columns do
-		entry[columns[i]] = row[i]
+		entry[columns[i]] = row[i] or ""
 	end
 	for i = 1, #numberColumns do
-		entry[numberColumns[i]] = tonumber(entry[numberColumns[i]])
+		entry[numberColumns[i]] = tonumber(entry[numberColumns[i]]) or 0
 	end
 
 	return entry
