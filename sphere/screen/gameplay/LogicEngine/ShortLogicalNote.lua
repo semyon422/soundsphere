@@ -39,17 +39,16 @@ ShortLogicalNote.update = function(self)
 end
 
 ShortLogicalNote.processTimeState = function(self, timeState)
-	local eventTime = self.eventTime
 	if self.keyState and timeState == "none" then
 		self.keyState = false
 	elseif self.keyState and timeState == "early" then
-		self:switchState("missed", eventTime)
+		self:switchState("missed")
 		return self:next()
 	elseif timeState == "late" then
-		self:switchState("missed", eventTime)
+		self:switchState("missed")
 		return self:next()
 	elseif self.keyState and timeState == "exactly" then
-		self:switchState("passed", eventTime)
+		self:switchState("passed")
 		return self:next()
 	end
 end

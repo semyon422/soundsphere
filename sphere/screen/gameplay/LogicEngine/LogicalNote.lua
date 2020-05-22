@@ -6,18 +6,17 @@ LogicalNote.construct = function(self)
 	self:clearStates()
 end
 
-LogicalNote.switchState = function(self, name, time)
+LogicalNote.switchState = function(self, name)
 	local states = self.states
 	states[#states + 1] = {
 		name = name,
-		time = time
+		time = self.eventTime
 	}
 end
 
 LogicalNote.getLastState = function(self)
 	local states = self.states
-	local state = states[#states]
-	return state.name, state.time
+	return states[#states].name
 end
 
 LogicalNote.clearStates = function(self)
