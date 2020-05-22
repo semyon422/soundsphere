@@ -79,7 +79,11 @@ PauseOverlay.init = function(self)
 	
 	self.menuButton = Theme.Button:new({
 		text = "menu",
-		interact = function() self:menu() end,
+		interact = function()
+			InputManager:setMode("external")
+			ReplayManager:setMode("record")
+			self:menu()
+		end,
 		
 		x = 0, y = 3/4,
 		w = 1, h = 1/4,
