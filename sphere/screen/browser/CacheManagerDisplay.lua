@@ -31,7 +31,7 @@ end
 
 CacheManagerDisplay.processCache = function(self)
 	if self.state == 0 or self.state == 3 then
-		NoteChartManager:updateCache(BrowserList.basePath)
+		NoteChartManager:updateCache(BrowserList.basePath, self.data.force)
 	else
 		NoteChartManager:stopCache()
 	end
@@ -65,7 +65,7 @@ CacheManagerDisplay.receive = function(self, event)
 			self.button.text = "complete"
 			self.button:reload()
 		elseif event.state == 0 then
-			self.button.text = "refresh"
+			self.button.text = self.data.text
 			self.button:reload()
 		end
 		self.state = event.state
