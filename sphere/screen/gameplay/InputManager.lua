@@ -104,6 +104,11 @@ InputManager.setInputMode = function(self, inputMode)
 end
 
 InputManager.receive = function(self, event)
+	if event.name == "TimeState" then
+		self.currentTime = event.exactCurrentTime
+		return
+	end
+
 	local mode = self.mode
 
 	if event.virtual and mode == "internal" then
@@ -133,14 +138,16 @@ InputManager.receive = function(self, event)
 		events[#events + 1] = {
 			name = "keypressed",
 			args = {key},
-			virtual = true
+			virtual = true,
+			time = self.currentTime
 		}
 	end
 	for _, key in ipairs(keyConfig.release) do
 		events[#events + 1] = {
 			name = "keyreleased",
 			args = {key},
-			virtual = true
+			virtual = true,
+			time = self.currentTime
 		}
 	end
 	for _, event in ipairs(events) do

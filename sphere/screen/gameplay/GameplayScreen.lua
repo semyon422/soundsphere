@@ -137,6 +137,7 @@ GameplayScreen.load = function(self)
 	timeEngine.observable:add(graphicEngine)
 	timeEngine.observable:add(NotificationLine)
 	timeEngine.observable:add(ReplayManager)
+	timeEngine.observable:add(InputManager)
 	graphicEngine.observable:add(NotificationLine)
 	InputManager.observable:add(logicEngine)
 	InputManager.observable:add(gui)
@@ -184,6 +185,25 @@ GameplayScreen.unload = function(self)
 	ReplayManager.observable:remove(InputManager)
 end
 
+GameplayScreen.receive = function(self, event)
+	PauseOverlay:receive(event)
+
+	if PauseOverlay.paused then
+		return
+	end
+
+	self.timeEngine:update(0)
+	self.timeEngine:receive(event)
+
+	self.audioEngine:receive(event)
+	ModifierManager:receive(event)
+	InputManager:receive(event)
+	self.scoreEngine:receive(event)
+	-- self.logicEngine:receive(event)
+	self.graphicEngine:receive(event)
+	self.gui:receive(event)
+end
+
 GameplayScreen.update = function(self, dt)
 	self.timeEngine:update(dt)
 	self.audioEngine:update()
@@ -201,20 +221,6 @@ GameplayScreen.draw = function(self)
 	Screen.draw(self)
 	
 	PauseOverlay:draw()
-end
-
-GameplayScreen.receive = function(self, event)
-	if not PauseOverlay.paused then
-		self.timeEngine:receive(event)
-		self.audioEngine:receive(event)
-		ModifierManager:receive(event)
-		InputManager:receive(event)
-		self.scoreEngine:receive(event)
-		-- self.logicEngine:receive(event)
-		self.graphicEngine:receive(event)
-		self.gui:receive(event)
-	end
-	PauseOverlay:receive(event)
 end
 
 return GameplayScreen
