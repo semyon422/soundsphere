@@ -6,14 +6,18 @@ LogicalNote.construct = function(self)
 	self:clearStates()
 end
 
-LogicalNote.switchState = function(self, state)
+LogicalNote.switchState = function(self, name, time)
 	local states = self.states
-	states[#states + 1] = state
+	states[#states + 1] = {
+		name = name,
+		time = time
+	}
 end
 
 LogicalNote.getLastState = function(self)
 	local states = self.states
-	return states[#states]
+	local state = states[#states]
+	return state.name, state.time
 end
 
 LogicalNote.clearStates = function(self)
@@ -28,6 +32,14 @@ end
 
 LogicalNote.getNext = function(self)
 	return self.noteHandler.noteData[self.index + 1]
+end
+
+LogicalNote.getNextPlayable = function(self)
+	local nextNote = self:getNext()
+	while nextNote and nextNote.startNoteData.noteType == "SoundNote" do
+		nextNote = nextNote:getNext()
+	end
+	return nextNote
 end
 
 LogicalNote.next = function(self)

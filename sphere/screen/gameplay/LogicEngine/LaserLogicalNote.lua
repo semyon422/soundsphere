@@ -18,18 +18,19 @@ LaserLogicalNote.next = function(self)
 end
 
 LaserLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
+	local eventTime = self.eventTime
 	local lastState = self:getLastState()
 
 	if self.keyState and startTimeState == "none" then
 	elseif lastState == "clear" then
 		if startTimeState == "late" then
-			self:switchState("startMissed")
+			self:switchState("startMissed", eventTime)
 			self.started = true
 		elseif self.keyState then
 			if startTimeState == "early" then
-				-- self:switchState("startMissedPressed")
+				-- self:switchState("startMissedPressed", eventTime)
 			elseif startTimeState == "exactly" then
-				self:switchState("startPassedPressed")
+				self:switchState("startPassedPressed", eventTime)
 				self.started = true
 			end
 		end
@@ -42,32 +43,35 @@ LaserLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
 				return self:next()
 			end
 		elseif endTimeState == "late" then
-			-- self:switchState("endMissed")
+			-- self:switchState("endMissed", eventTime)
 			return self:next()
 		end
 	elseif lastState == "startMissedPressed" then
 		if not self.keyState then
 			if endTimeState == "exactly" then
-				self:switchState("endMissedPassed")
+				self:switchState("endMissedPassed", eventTime)
 				return self:next()
 			else
-				self:switchState("startMissed")
+				self:switchState("startMissed", eventTime)
 			end
 		elseif endTimeState == "late" then
-			-- self:switchState("endMissed")
+			-- self:switchState("endMissed", eventTime)
 			return self:next()
 		end
 	elseif lastState == "startMissed" then
 		if self.keyState then
-			self:switchState("startMissedPressed")
+			self:switchState("startMissedPressed", eventTime)
 		elseif endTimeState == "late" then
-			-- self:switchState("endMissed")
+			-- self:switchState("endMissed", eventTime)
 			return self:next()
 		end
 	end
-	
-	local nextNote = self:getNext()
-	if nextNote and self:getLastState() == "startMissed" and nextNote:isReachable() then
+
+	local nextNote = self:getNextPlayable()
+	if not nextNote then
+		return
+	end
+	if self:getLastState().name == "startMissed" and nextNote:isReachable() then
 		return self:next()
 	end
 end

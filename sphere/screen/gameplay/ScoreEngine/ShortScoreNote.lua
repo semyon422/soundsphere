@@ -30,7 +30,8 @@ ShortScoreNote.getTimeState = function(self)
 end
 
 ShortScoreNote.isHere = function(self)
-	return self.startNoteData.timePoint.absoluteTime <= self.scoreEngine.currentTime
+	local currentTime = self.logicalNote.eventTime or self.scoreEngine.currentTime
+	return self.startNoteData.timePoint.absoluteTime <= currentTime
 end
 
 ShortScoreNote.isReachable = function(self)
@@ -44,11 +45,7 @@ ShortScoreNote.update = function(self)
 	local oldState, newState = states[self.currentStateIndex - 1], states[self.currentStateIndex]
 
 	if newState then
-		local currentTime = logicalNote.eventTime or self.scoreEngine.currentTime
-		if logicalNote.autoplayStart then
-			currentTime = self.startNoteData.timePoint.absoluteTime
-			logicalNote.autoplayStart = false
-		end
+		local currentTime = newState.time or self.scoreEngine.currentTime
 		self:send({
 			name = "ScoreNoteState",
 			noteType = self.noteType,
@@ -56,8 +53,8 @@ ShortScoreNote.update = function(self)
 			noteTime = self.startNoteData.timePoint.absoluteTime,
 			timeRate = self.scoreEngine.timeRate,
 			scoreNotesCount = self.noteHandler.scoreNotesCount,
-			oldState = oldState,
-			newState = newState,
+			oldState = oldState and oldState.name,
+			newState = newState.name,
 			minTime = self.scoreEngine.minTime,
 			maxTime = self.scoreEngine.maxTime
 		})

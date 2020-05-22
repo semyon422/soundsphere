@@ -13,7 +13,8 @@ LongScoreNote.construct = function(self)
 end
 
 LongScoreNote.getStartTimeState = function(self)
-	local deltaTime = (self.scoreEngine.currentTime - self.startNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
+	local currentTime = self.logicalNote.eventTime or self.scoreEngine.currentTime
+	local deltaTime = (currentTime - self.startNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
 	local config = self.scoreEngine.scoreSystem.scoreConfig.notes.LongScoreNote
 	local pass = config.startPass
 	local miss = config.startMiss
@@ -30,7 +31,8 @@ LongScoreNote.getStartTimeState = function(self)
 end
 
 LongScoreNote.getEndTimeState = function(self)
-	local deltaTime = (self.scoreEngine.currentTime - self.endNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
+	local currentTime = self.logicalNote.eventTime or self.scoreEngine.currentTime
+	local deltaTime = (currentTime - self.endNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
 	local config = self.scoreEngine.scoreSystem.scoreConfig.notes.LongScoreNote
 	local pass = config.endPass
 	local miss = config.endMiss
@@ -47,7 +49,8 @@ LongScoreNote.getEndTimeState = function(self)
 end
 
 LongScoreNote.isHere = function(self)
-	return self.startNoteData.timePoint.absoluteTime <= self.scoreEngine.currentTime
+	local currentTime = self.logicalNote.eventTime or self.scoreEngine.currentTime
+	return self.startNoteData.timePoint.absoluteTime <= currentTime
 end
 
 LongScoreNote.isReachable = function(self)
@@ -59,18 +62,9 @@ LongScoreNote.update = function(self)
 	local logicalNote = self.logicalNote
 	local states = logicalNote.states
 	local oldState, newState = states[self.currentStateIndex - 1], states[self.currentStateIndex]
-	
-	local currentTime = logicalNote.eventTime or self.scoreEngine.currentTime
-	if logicalNote.autoplayStart then
-		currentTime = self.startNoteData.timePoint.absoluteTime
-		logicalNote.autoplayStart = false
-	end
-	if logicalNote.autoplayEnd then
-		currentTime = self.endNoteData.timePoint.absoluteTime
-		logicalNote.autoplayEnd = true
-	end
 
 	if newState then
+		local currentTime = newState.time or self.scoreEngine.currentTime
 		self:send({
 			name = "ScoreNoteState",
 			noteType = self.noteType,
@@ -79,8 +73,8 @@ LongScoreNote.update = function(self)
 			noteEndTime = self.endNoteData.timePoint.absoluteTime,
 			timeRate = self.scoreEngine.timeRate,
 			scoreNotesCount = self.noteHandler.scoreNotesCount,
-			oldState = oldState,
-			newState = newState,
+			oldState = oldState and oldState.name,
+			newState = newState.name,
 			minTime = self.scoreEngine.minTime,
 			maxTime = self.scoreEngine.maxTime
 		})

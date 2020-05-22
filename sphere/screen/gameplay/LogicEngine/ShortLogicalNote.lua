@@ -19,6 +19,8 @@ ShortLogicalNote.update = function(self)
 	if self.ended then
 		return
 	end
+
+	self.eventTime = self.eventTime or self.logicEngine.currentTime
 	
 	local timeState = self.scoreNote:getTimeState()
 	
@@ -31,20 +33,23 @@ ShortLogicalNote.update = function(self)
 
 	if numStates ~= #self.states then
 		return self:update()
+	else
+		self.eventTime = nil
 	end
 end
 
 ShortLogicalNote.processTimeState = function(self, timeState)
+	local eventTime = self.eventTime
 	if self.keyState and timeState == "none" then
 		self.keyState = false
 	elseif self.keyState and timeState == "early" then
-		self:switchState("missed")
+		self:switchState("missed", eventTime)
 		return self:next()
 	elseif timeState == "late" then
-		self:switchState("missed")
+		self:switchState("missed", eventTime)
 		return self:next()
 	elseif self.keyState and timeState == "exactly" then
-		self:switchState("passed")
+		self:switchState("passed", eventTime)
 		return self:next()
 	end
 end
@@ -55,8 +60,9 @@ ShortLogicalNote.processAuto = function(self)
 		self.keyState = true
 		self:sendState("keyState")
 		
-		self.autoplayStart = true
+		self.eventTime = self.startNoteData.timePoint.absoluteTime
 		self:processTimeState("exactly")
+		self.eventTime = nil
 	end
 end
 
@@ -70,19 +76,11 @@ ShortLogicalNote.receive = function(self, event)
 		if event.name == "keypressed" then
 			self.keyState = true
 			self:sendState("keyState")
-
 			self.eventTime = event.time
-			self:update()
-			self.scoreNote:update()
-			self.eventTime = nil
 		elseif event.name == "keyreleased" then
 			self.keyState = false
 			self:sendState("keyState")
-
 			self.eventTime = event.time
-			self:update()
-			self.scoreNote:update()
-			self.eventTime = nil
 		end
 	end
 end
