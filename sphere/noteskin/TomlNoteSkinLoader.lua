@@ -217,12 +217,17 @@ end
 
 TomlNoteSkinLoader.addShortNote = function(self, input, i)
 	local noteSkin = self.noteSkin
+
+	local tomlNote = noteSkin.tomlData.notes.ShortNote
+	if not tomlNote then
+		return
+	end
+
 	local noteSkinData = noteSkin.noteSkinData
 
 	noteSkinData.notes[input .. ":ShortNote"] = {}
 	local shortNote = noteSkinData.notes[input .. ":ShortNote"]
 	
-	local tomlNote = noteSkin.tomlData.notes.ShortNote
 	local unit = self.unit
 	local scroll = noteSkin.tomlData.general.scroll
 
@@ -247,12 +252,17 @@ end
 
 TomlNoteSkinLoader.addLongNote = function(self, input, i)
 	local noteSkin = self.noteSkin
+
+	local tomlNote = noteSkin.tomlData.notes.LongNote
+	if not tomlNote then
+		return
+	end
+
 	local noteSkinData = noteSkin.noteSkinData
 
 	noteSkinData.notes[input .. ":LongNote"] = {}
 	local longNote = noteSkinData.notes[input .. ":LongNote"]
 
-	local tomlNote = noteSkin.tomlData.notes.LongNote
 	local unit = self.unit
 	local scroll = noteSkin.tomlData.general.scroll
 
@@ -308,12 +318,17 @@ end
 
 TomlNoteSkinLoader.addSoundNote = function(self, input, i)
 	local noteSkin = self.noteSkin
+
+	local tomlNote = noteSkin.tomlData.notes.SoundNote
+	if not tomlNote then
+		return
+	end
+
 	local noteSkinData = noteSkin.noteSkinData
 
 	noteSkinData.notes[input .. ":SoundNote"] = {}
 	local shortNote = noteSkinData.notes[input .. ":SoundNote"]
 	
-	local tomlNote = noteSkin.tomlData.notes.SoundNote
 	local unit = self.unit
 	local scroll = noteSkin.tomlData.general.scroll
 
