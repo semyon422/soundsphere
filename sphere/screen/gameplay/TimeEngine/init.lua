@@ -52,7 +52,11 @@ TimeEngine.update = function(self, dt)
 
 	self.currentTime = self.timeManager:getTime()
 	self.exactCurrentTime = self.timeManager:getExactTime()
-	self.observable:send({
+	self:sendState()
+end
+
+TimeEngine.sendState = function(self)
+	return self.observable:send({
 		name = "TimeState",
 		currentTime = self.currentTime,
 		exactCurrentTime = self.exactCurrentTime,

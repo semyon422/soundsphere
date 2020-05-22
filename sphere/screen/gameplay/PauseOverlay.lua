@@ -63,6 +63,15 @@ PauseOverlay.init = function(self)
 		interact = function()
 			InputManager:setMode("internal")
 			ReplayManager:setMode("replay")
+
+			-- local GameplayScreen = require("sphere.screen.gameplay.GameplayScreen")
+
+			-- local FastPlay = require("sphere.screen.gameplay.ReplayManager.FastPlay")
+			-- FastPlay.replay = ReplayManager.replay
+			-- FastPlay.noteChartEntry = GameplayScreen.noteChartEntry
+			-- FastPlay.noteChartDataEntry = GameplayScreen.noteChartDataEntry
+			-- FastPlay:play()
+
 			self:restart()
 		end,
 		
