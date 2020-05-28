@@ -14,7 +14,7 @@ end
 
 LongScoreNote.getStartTimeState = function(self)
 	local currentTime = self.logicalNote.eventTime or self.scoreEngine.currentTime
-	local deltaTime = (currentTime - self.startNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
+	local deltaTime = (currentTime - self.startNoteData.timePoint.absoluteTime) / math.abs(self.scoreEngine.timeRate)
 	local config = self.scoreEngine.scoreSystem.scoreConfig.notes.LongScoreNote
 	local pass = config.startPass
 	local miss = config.startMiss
@@ -32,7 +32,7 @@ end
 
 LongScoreNote.getEndTimeState = function(self)
 	local currentTime = self.logicalNote.eventTime or self.scoreEngine.currentTime
-	local deltaTime = (currentTime - self.endNoteData.timePoint.absoluteTime) / self.scoreEngine.timeRate
+	local deltaTime = (currentTime - self.endNoteData.timePoint.absoluteTime) / math.abs(self.scoreEngine.timeRate)
 	local config = self.scoreEngine.scoreSystem.scoreConfig.notes.LongScoreNote
 	local pass = config.endPass
 	local miss = config.endMiss

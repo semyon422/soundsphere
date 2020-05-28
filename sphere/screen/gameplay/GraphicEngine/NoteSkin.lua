@@ -110,7 +110,7 @@ end
 
 NoteSkin.getVisualTimeRate = function(self)
 	if self.timeRate ~= 0 then
-		return self.visualTimeRate / self.timeRate
+		return self.visualTimeRate / math.abs(self.timeRate)
 	end
 	return self.visualTimeRate
 end

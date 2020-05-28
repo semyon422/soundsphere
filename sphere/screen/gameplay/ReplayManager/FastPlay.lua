@@ -1,17 +1,10 @@
-local Config					= require("sphere.config.Config")
-local NoteChartFactory			= require("notechart.NoteChartFactory")
-local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
-local BackgroundManager			= require("sphere.ui.BackgroundManager")
-local ScoreEngine				= require("sphere.screen.gameplay.ScoreEngine")
-local LogicEngine				= require("sphere.screen.gameplay.LogicEngine")
-local TimeEngine				= require("sphere.screen.gameplay.TimeEngine")
-local InputManager				= require("sphere.screen.gameplay.InputManager")
-local ReplayManager				= require("sphere.screen.gameplay.ReplayManager")
-local ModifierManager			= require("sphere.screen.gameplay.ModifierManager")
-local PauseOverlay				= require("sphere.screen.gameplay.PauseOverlay")
-local Screen					= require("sphere.screen.Screen")
-local ScreenManager				= require("sphere.screen.ScreenManager")
-
+local NoteChartFactory		= require("notechart.NoteChartFactory")
+local ScoreEngine			= require("sphere.screen.gameplay.ScoreEngine")
+local LogicEngine			= require("sphere.screen.gameplay.LogicEngine")
+local TimeEngine			= require("sphere.screen.gameplay.TimeEngine")
+local InputManager			= require("sphere.screen.gameplay.InputManager")
+local ReplayManager			= require("sphere.screen.gameplay.ReplayManager")
+local ModifierManager		= require("sphere.screen.gameplay.ModifierManager")
 
 local FastPlay = {}
 

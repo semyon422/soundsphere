@@ -26,7 +26,7 @@ receive = function(event)
 
 	local oldState, newState = event.oldState, event.newState
 	if event.noteType == "ShortScoreNote" then
-		local deltaTime = (event.currentTime - event.noteTime) / event.timeRate
+		local deltaTime = (event.currentTime - event.noteTime) / math.abs(event.timeRate)
 		if newState == "passed" then
 			scoreTable.score = scoreTable.score
 				+ math.exp(-(deltaTime / unit / scale) ^ 2)
@@ -35,7 +35,7 @@ receive = function(event)
 		elseif newState == "missed" then
 		end
 	elseif event.noteType == "LongScoreNote" then
-		local deltaTime = (event.currentTime - event.noteStartTime) / event.timeRate
+		local deltaTime = (event.currentTime - event.noteStartTime) / math.abs(event.timeRate)
 		if oldState == "clear" then
 			if newState == "startPassedPressed" then
 				scoreTable.score = scoreTable.score

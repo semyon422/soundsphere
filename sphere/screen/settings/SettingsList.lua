@@ -218,6 +218,11 @@ SettingsList.setInputItems = function(self)
 		configKey = "gameplay.increasePlaySpeed"
 	}
 	items[#items + 1] = {
+		name = "invert time rate",
+		type = "keybind",
+		configKey = "gameplay.invertTimeRate"
+	}
+	items[#items + 1] = {
 		name = "decrease time rate",
 		type = "keybind",
 		configKey = "gameplay.decreaseTimeRate"

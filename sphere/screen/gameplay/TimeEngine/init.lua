@@ -17,6 +17,7 @@ TimeEngine.exactCurrentTime = 0
 TimeEngine.baseTimeRate = 1
 TimeEngine.timeRate = 0
 TimeEngine.targetTimeRate = 0
+TimeEngine.backwardCounter = 0
 
 TimeEngine.load = function(self)
 	self:loadTimeManager()
@@ -89,6 +90,8 @@ TimeEngine.receive = function(self, event)
 				name = "notify",
 				text = "timeRate: " .. self.targetTimeRate
 			})
+		elseif key == Config:get("gameplay.invertTimeRate") then
+			self:setTimeRate(-self.timeRate)
 		end
 	end
 end

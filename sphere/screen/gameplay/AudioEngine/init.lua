@@ -56,9 +56,9 @@ AudioEngine.playAudio = function(self, paths, layer, keysound, stream)
 			aliases = self.globalAliases
 		end
 		if not stream or not Config:get("audio.stream") then
-			audio = AudioFactory:getSample(aliases[paths[i][1]])
+			audio = AudioFactory:getStreamMemory(aliases[paths[i][1]])
 		else
-			audio = AudioFactory:getStream(aliases[paths[i][1]])
+			audio = AudioFactory:getStreamMemory(aliases[paths[i][1]])
 		end
 		if audio then
 			audio.offset = self.currentTime
@@ -92,6 +92,11 @@ end
 
 AudioEngine.getPosition = function(self)
 	return self.backgroundContainer:getPosition()
+end
+
+AudioEngine.setPosition = function(self, position)
+	self.backgroundContainer:setPosition(position)
+	self.foregroundContainer:setPosition(position)
 end
 
 return AudioEngine
