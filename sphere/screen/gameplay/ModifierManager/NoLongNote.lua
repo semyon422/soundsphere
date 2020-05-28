@@ -19,9 +19,9 @@ NoLongNote.apply = function(self)
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 			
-			if noteData.noteType == "LongNoteStart" then
+			if noteData.noteType == "LongNoteStart" or noteData.noteType == "LaserNoteStart" then
 				noteData.noteType = "ShortNote"
-			elseif noteData.noteType == "LongNoteEnd" then
+			elseif noteData.noteType == "LongNoteEnd" or noteData.noteType == "LaserNoteEnd" then
 				noteData.noteType = "Ignore"
 			end
 		end
