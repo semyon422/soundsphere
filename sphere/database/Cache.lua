@@ -309,6 +309,7 @@ Cache.getEmptyNoteChartDataEntry = function(self, path)
 		tags = "",
 		name = path:match(".+/(.-)$"),
 		creator = "",
+		level = 0,
 		audioPath = "",
 		stagePath = "",
 		previewTime = 0,

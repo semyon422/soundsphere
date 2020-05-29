@@ -20,6 +20,7 @@ CacheDatabase.noteChartDatasColumns = {
 	"tags",
 	"name",
 	"creator",
+	"level",
 	"audioPath",
 	"stagePath",
 	"previewTime",
@@ -48,6 +49,7 @@ CacheDatabase.noteChartSetsColumns = {
 CacheDatabase.noteChartDatasNumberColumns = {
 	"id",
 	"index",
+	"level",
 	"previewTime",
 	"noteCount",
 	"length",
@@ -91,6 +93,7 @@ local createTableRequest = [[
 		`tags` TEXT,
 		`name` TEXT,
 		`creator` TEXT,
+		`level` REAL,
 		`audioPath` TEXT,
 		`stagePath` TEXT,
 		`previewTime` REAL,
@@ -171,6 +174,7 @@ local insertNoteChartDataRequest = [[
 		`tags`,
 		`name`,
 		`creator`,
+		`level`,
 		`audioPath`,
 		`stagePath`,
 		`previewTime`,
@@ -179,7 +183,7 @@ local insertNoteChartDataRequest = [[
 		`length`,
 		`bpm`
 	)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 ]]
 
 local updateNoteChartDataRequest = [[
@@ -191,6 +195,7 @@ local updateNoteChartDataRequest = [[
 		`tags` = ?,
 		`name` = ?,
 		`creator` = ?,
+		`level` = ?,
 		`audioPath` = ?,
 		`stagePath` = ?,
 		`previewTime` = ?,
@@ -334,6 +339,7 @@ CacheDatabase.insertNoteChartDataEntry = function(self, entry)
 		entry.tags,
 		entry.name,
 		entry.creator,
+		entry.level,
 		entry.audioPath,
 		entry.stagePath,
 		entry.previewTime,
@@ -353,6 +359,7 @@ CacheDatabase.updateNoteChartDataEntry = function(self, entry)
 		entry.tags,
 		entry.name,
 		entry.creator,
+		entry.level,
 		entry.audioPath,
 		entry.stagePath,
 		entry.previewTime,
