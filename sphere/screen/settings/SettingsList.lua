@@ -203,6 +203,11 @@ SettingsList.setInputItems = function(self)
 		configKey = "gameplay.quickRestart"
 	}
 	items[#items + 1] = {
+		name = "select random song",
+		type = "keybind",
+		configKey = "select.selectRandomNoteChartSet"
+	}
+	items[#items + 1] = {
 		name = "invert play speed",
 		type = "keybind",
 		configKey = "gameplay.invertPlaySpeed"

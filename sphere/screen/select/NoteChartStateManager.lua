@@ -4,6 +4,7 @@ local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
 local PreviewManager	= require("sphere.screen.select.PreviewManager")
 local Cache				= require("sphere.database.Cache")
 local json				= require("json")
+local Config			= require("sphere.config.Config")
 
 local NoteChartStateManager = {}
 
@@ -153,6 +154,9 @@ NoteChartStateManager.receive = function(self, event)
 		NoteChartSetList:selectCache()
 		
 		NoteChartSetList:quickScrollToItemIndex(NoteChartSetList:getItemIndex(noteChartSetEntry))
+		NoteChartSetList:sendState()
+	elseif event.name == "keypressed" and event.args[1] == Config:get("select.selectRandomNoteChartSet") then
+		NoteChartSetList:quickScrollToItemIndex(math.random(1, #NoteChartSetList.items))
 		NoteChartSetList:sendState()
 	end
 end
