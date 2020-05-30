@@ -12,7 +12,7 @@ NoteSkinLoader.path = "userdata/skins"
 NoteSkinLoader.load = function(self, metaData)
 	if not metaData then
 		return self:loadEmptySkin()
-	elseif metaData.type == "toml:simple-v2" then
+	elseif metaData.type == "toml:simple-v3" then
 		return self:loadTomlSimpleLatest(metaData)
 	elseif metaData.type == "json:full-v3" then
 		return self:loadJsonFullLatest(metaData)
