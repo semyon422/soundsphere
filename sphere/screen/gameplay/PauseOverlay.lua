@@ -245,7 +245,7 @@ PauseOverlay.restart = function(self)
 	local GameplayScreen = require("sphere.screen.gameplay.GameplayScreen")
 	GameplayScreen:unload()
 	GameplayScreen:load()
-	self.timeEngine:setTimeRate(1)
+	self.timeEngine:setTimeRate(self.timeEngine:getBaseTimeRate())
 end
 
 PauseOverlay.menu = function(self)
