@@ -34,10 +34,19 @@ LogicalNote.getNext = function(self)
 end
 
 LogicalNote.getNextPlayable = function(self)
+	if self.nextPlayable then
+		return self.nextPlayable
+	end
+
 	local nextNote = self:getNext()
 	while nextNote and nextNote.startNoteData.noteType == "SoundNote" do
 		nextNote = nextNote:getNext()
 	end
+
+	if nextNote then
+		self.nextPlayable = nextNote
+	end
+	
 	return nextNote
 end
 

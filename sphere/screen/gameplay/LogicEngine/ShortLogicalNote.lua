@@ -67,6 +67,10 @@ end
 
 ShortLogicalNote.receive = function(self, event)
 	if self.autoplay then
+		local nextNote = self:getNextPlayable()
+		if nextNote then
+			return nextNote:receive(event)
+		end
 		return
 	end
 
