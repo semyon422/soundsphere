@@ -53,8 +53,8 @@ FileManager.removePath = function(self, path)
 end
 
 FileManager.findFile = function(self, fileName, fileType)
-	local originalFileName = fileName
-	local fileName = self:removeExtension(fileName, fileType)
+	local originalFileName = fileName:gsub("\\", "/")
+	local fileName = self:removeExtension(originalFileName, fileType)
 	
 	for _, path in ipairs(self.paths) do
 		local originalFilePath = path .. "/" .. originalFileName
