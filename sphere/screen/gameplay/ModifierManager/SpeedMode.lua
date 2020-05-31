@@ -11,11 +11,11 @@ SpeedMode.shortName = "SpeedMode"
 SpeedMode.variableType = "number"
 SpeedMode.variableName = "value"
 SpeedMode.variableFormat = "%s"
-SpeedMode.variableRange = {1, 1, 4}
-SpeedMode.variableValues = {"avg", "const", "min", "max"}
+SpeedMode.variableRange = {1, 1, 5}
+SpeedMode.variableValues = {"avg", "x", "const", "min", "max"}
 SpeedMode.value = 1
 
-SpeedMode.modeNames = {"AMod", "CMod", "MinMod", "MaxMod"}
+SpeedMode.modeNames = {"AMod", "XMod", "CMod", "MinMod", "MaxMod"}
 
 SpeedMode.tostring = function(self)
 	return self.modeNames[self.value]
@@ -114,10 +114,12 @@ SpeedMode.apply = function(self)
 	if mode == 1 then
 		self:applySpeed(average)
 	elseif mode == 2 then
-		self:applyConstant()
+		return
 	elseif mode == 3 then
-		self:applySpeed(minimum)
+		self:applyConstant()
 	elseif mode == 4 then
+		self:applySpeed(minimum)
+	elseif mode == 5 then
 		self:applySpeed(maximum)
 	end
 end
