@@ -134,13 +134,18 @@ SettingsList.setSoundItems = function(self)
 	local items = {}
 	
 	items[#items + 1] = {
-		name = "main audio mode",
-		configKey = "audio.stream",
-		type = "checkbox",
-		minValue = false,
-		maxValue = true,
-		minDisplayValue = "sample",
-		maxDisplayValue = "stream"
+		name = "primary audio mode",
+		configKey = "audio.primaryAudioMode",
+		type = "listSwitcher",
+		valueList = {"sample", "stream", "streamTempo", "streamMemoryTempo", "streamMemoryReversable"},
+		displayList = {"sample", "stream", "tempo", "memory", "reversable"}
+	}
+	items[#items + 1] = {
+		name = "secondary audio mode",
+		configKey = "audio.secondaryAudioMode",
+		type = "listSwitcher",
+		valueList = {"sample", "stream", "streamTempo", "streamMemoryTempo", "streamMemoryReversable"},
+		displayList = {"sample", "stream", "tempo", "memory", "reversable"}
 	}
 	items[#items + 1] = {
 		name = "global volume",

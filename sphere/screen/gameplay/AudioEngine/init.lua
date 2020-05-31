@@ -55,11 +55,27 @@ AudioEngine.playAudio = function(self, paths, layer, keysound, stream)
 		if not keysound and not aliases[path] then
 			aliases = self.globalAliases
 		end
-		if not stream or not Config:get("audio.stream") then
-			audio = AudioFactory:getStreamMemory(aliases[paths[i][1]])
+
+		local mode
+		if stream then
+			mode = Config:get("audio.primaryAudioMode")
 		else
-			audio = AudioFactory:getStreamMemory(aliases[paths[i][1]])
+			mode = Config:get("audio.secondaryAudioMode")
 		end
+
+		local apath = aliases[paths[i][1]]
+		if mode == "sample" then
+			audio = AudioFactory:getSample(apath)
+		elseif mode == "stream" then
+			audio = AudioFactory:getStream(apath)
+		elseif mode == "streamTempo" then
+			audio = AudioFactory:getStreamTempo(apath)
+		elseif mode == "streamMemoryTempo" then
+			audio = AudioFactory:getStreamMemoryTempo(apath)
+		elseif mode == "streamMemoryReversable" then
+			audio = AudioFactory:getStreamMemoryReversable(apath)
+		end
+
 		if audio then
 			audio.offset = self.currentTime
 			audio:setRate(self.timeRate)

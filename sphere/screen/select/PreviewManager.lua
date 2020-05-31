@@ -22,7 +22,7 @@ PreviewManager.playAudio = function(self, path, position)
 	
 	self.path = path
 	self.position = position
-	self.audio = AudioFactory:getStreamFile(path)
+	self.audio = AudioFactory:getStream(path)
 	self.audio:setPosition(position)
 	self.audio:setVolume(Config:get("volume.global") * Config:get("volume.music"))
 	self.audio:play()

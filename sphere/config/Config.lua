@@ -58,7 +58,8 @@ Config.defaultValues = {
 	["cb"] = false,
 	["kb"] = "",
 
-	["audio.stream"] = false,
+	["audio.primaryAudioMode"] = "streamMemoryReversable",
+	["audio.secondaryAudioMode"] = "sample",
 	
 	["dim.select"] = 0.5,
 	["dim.gameplay"] = 0.75,
