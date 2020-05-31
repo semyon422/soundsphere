@@ -10,6 +10,7 @@ local TimeRateX		= require("sphere.screen.gameplay.ModifierManager.TimeRateX")
 local NoScratch		= require("sphere.screen.gameplay.ModifierManager.NoScratch")
 local Mirror		= require("sphere.screen.gameplay.ModifierManager.Mirror")
 local Random		= require("sphere.screen.gameplay.ModifierManager.Random")
+local BracketSwap	= require("sphere.screen.gameplay.ModifierManager.BracketSwap")
 local NoLongNote	= require("sphere.screen.gameplay.ModifierManager.NoLongNote")
 local NoMeasureLine	= require("sphere.screen.gameplay.ModifierManager.NoMeasureLine")
 local FullLongNote	= require("sphere.screen.gameplay.ModifierManager.FullLongNote")
@@ -34,6 +35,7 @@ ModifierSequence.modifiers = {
 	DoublePlay,
 	Mirror,
 	Random,
+	BracketSwap,
 	FullLongNote,
 	ToOsu
 }
