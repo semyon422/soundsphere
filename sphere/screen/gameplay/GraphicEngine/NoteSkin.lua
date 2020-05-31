@@ -109,10 +109,7 @@ NoteSkin.setVisualTimeRate = function(self, visualTimeRate)
 end
 
 NoteSkin.getVisualTimeRate = function(self)
-	if self.timeRate ~= 0 then
-		return self.visualTimeRate / math.abs(self.timeRate)
-	end
-	return self.visualTimeRate
+	return self.visualTimeRate / math.abs(self.timeRate)
 end
 
 NoteSkin.getCS = function(self, note)

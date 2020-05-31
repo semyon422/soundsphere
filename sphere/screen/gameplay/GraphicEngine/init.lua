@@ -1,7 +1,6 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
 local NoteDrawer		= require("sphere.screen.gameplay.GraphicEngine.NoteDrawer")
-local NoteSkin			= require("sphere.screen.gameplay.GraphicEngine.NoteSkin")
 local Config			= require("sphere.config.Config")
 local tween				= require("tween")
 
@@ -21,8 +20,8 @@ GraphicEngine.load = function(self)
 	
 	self:loadNoteDrawers()
 	
-	NoteSkin.visualTimeRate = Config.data.speed
-	NoteSkin.targetVisualTimeRate = Config.data.speed
+	self.noteSkin.visualTimeRate = Config.data.speed
+	self.noteSkin.targetVisualTimeRate = Config.data.speed
 end
 
 GraphicEngine.update = function(self, dt)
@@ -47,7 +46,9 @@ GraphicEngine.receive = function(self, event)
 	if event.name == "TimeState" then
 		self.currentTime = event.currentTime
 		self.timeRate = event.timeRate
-		NoteSkin.timeRate = event.timeRate
+		if event.timeRate ~= 0 then
+			self.noteSkin.timeRate = event.timeRate
+		end
 		return
 	end
 
@@ -58,35 +59,35 @@ GraphicEngine.receive = function(self, event)
 		local delta = 0.05
 		
 		if key == Config:get("gameplay.invertPlaySpeed") then
-			NoteSkin.targetVisualTimeRate = -NoteSkin.targetVisualTimeRate
-			NoteSkin:setVisualTimeRate(NoteSkin.targetVisualTimeRate)
+			self.noteSkin.targetVisualTimeRate = -self.noteSkin.targetVisualTimeRate
+			self.noteSkin:setVisualTimeRate(self.noteSkin.targetVisualTimeRate)
 			return self.observable:send({
 				name = "notify",
-				text = "visualTimeRate: " .. NoteSkin.targetVisualTimeRate
+				text = "visualTimeRate: " .. self.noteSkin.targetVisualTimeRate
 			})
 		elseif key == Config:get("gameplay.decreasePlaySpeed") then
-			if math.abs(NoteSkin.targetVisualTimeRate - delta) > 0.001 then
-				NoteSkin.targetVisualTimeRate = NoteSkin.targetVisualTimeRate - delta
-				NoteSkin:setVisualTimeRate(NoteSkin.targetVisualTimeRate)
+			if math.abs(self.noteSkin.targetVisualTimeRate - delta) > 0.001 then
+				self.noteSkin.targetVisualTimeRate = self.noteSkin.targetVisualTimeRate - delta
+				self.noteSkin:setVisualTimeRate(self.noteSkin.targetVisualTimeRate)
 			else
-				NoteSkin.targetVisualTimeRate = 0
-				NoteSkin:setVisualTimeRate(NoteSkin.targetVisualTimeRate)
+				self.noteSkin.targetVisualTimeRate = 0
+				self.noteSkin:setVisualTimeRate(self.noteSkin.targetVisualTimeRate)
 			end
 			return self.observable:send({
 				name = "notify",
-				text = "visualTimeRate: " .. NoteSkin.targetVisualTimeRate
+				text = "visualTimeRate: " .. self.noteSkin.targetVisualTimeRate
 			})
 		elseif key == Config:get("gameplay.increasePlaySpeed") then
-			if math.abs(NoteSkin.targetVisualTimeRate + delta) > 0.001 then
-				NoteSkin.targetVisualTimeRate = NoteSkin.targetVisualTimeRate + delta
-				NoteSkin:setVisualTimeRate(NoteSkin.targetVisualTimeRate)
+			if math.abs(self.noteSkin.targetVisualTimeRate + delta) > 0.001 then
+				self.noteSkin.targetVisualTimeRate = self.noteSkin.targetVisualTimeRate + delta
+				self.noteSkin:setVisualTimeRate(self.noteSkin.targetVisualTimeRate)
 			else
-				NoteSkin.targetVisualTimeRate = 0
-				NoteSkin:setVisualTimeRate(NoteSkin.targetVisualTimeRate)
+				self.noteSkin.targetVisualTimeRate = 0
+				self.noteSkin:setVisualTimeRate(self.noteSkin.targetVisualTimeRate)
 			end
 			return self.observable:send({
 				name = "notify",
-				text = "visualTimeRate: " .. NoteSkin.targetVisualTimeRate
+				text = "visualTimeRate: " .. self.noteSkin.targetVisualTimeRate
 			})
 		end
 	end
