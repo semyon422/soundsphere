@@ -10,10 +10,19 @@ BracketSwap.shortName = "BS"
 
 BracketSwap.variableType = "boolean"
 
+BracketSwap.hardcodedMaps = {
+	[4] = {1, 3, 2, 4},
+	[5] = {2, 1, 3, 5, 4}
+}
+
 BracketSwap.getMap = function(self)
 	local noteChart = self.sequence.manager.noteChart
 
 	local keyCount = noteChart.inputMode:getInputCount("key")
+
+	if keyCount <= 5 then
+		return {key = self.hardcodedMaps[keyCount]}
+	end
 
 	local map = {
 		key = {}
