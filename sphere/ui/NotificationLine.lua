@@ -5,7 +5,8 @@ local spherefonts		= require("sphere.assets.fonts")
 
 local NotificationLine = {}
 
-NotificationLine.rectangleColor = {255, 255, 255, 31}
+NotificationLine.backgroundColor = {31, 31, 31, 255}
+NotificationLine.borderColor = {255, 255, 255, 255}
 NotificationLine.textColor = {255, 255, 255, 255}
 NotificationLine.maxlifetime = 1
 NotificationLine.lifetime = 0
@@ -17,27 +18,30 @@ NotificationLine.init = function(self)
 	
 	self.button = Theme.Button:new({
 		text = "",
-		x = 0,
+		x = -0.1,
 		y = 8 / 17,
-		w = 1,
+		w = 1.2,
 		h = 1 / 17,
 		cs = self.cs,
 		mode = "fill",
-		rectangleColor = {unpack(self.rectangleColor)},
+		backgroundColor = {unpack(self.backgroundColor)},
+		borderColor = {unpack(self.borderColor)},
 		textColor = {unpack(self.textColor)},
 		textAlign = {x = "center", y = "center"},
-		limit = 1,
+		limit = 1.2,
 		font = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
 	})
 	self.button:reload()
-	self.button.rectangleColor[4] = 0
+	self.button.backgroundColor[4] = 0
+	self.button.borderColor[4] = 0
 	self.button.textColor[4] = 0
 end
 
 NotificationLine.notify = function(self, text)
 	self.state = 1
 	self.lifetime = 0
-	self.button.rectangleColor[4] = self.rectangleColor[4]
+	self.button.backgroundColor[4] = self.backgroundColor[4]
+	self.button.borderColor[4] = self.borderColor[4]
 	self.button.textColor[4] = self.textColor[4]
 	self.button:setText(text)
 end
@@ -47,12 +51,14 @@ NotificationLine.update = function(self)
 		if self.lifetime < self.maxlifetime then
 			self.lifetime = self.lifetime + love.timer.getDelta()
 		else
-			self.button.rectangleColor[4] = math.max(self.button.rectangleColor[4] - love.timer.getDelta() * 125, 0)
+			self.button.backgroundColor[4] = math.max(self.button.backgroundColor[4] - love.timer.getDelta() * 1000, 0)
+			self.button.borderColor[4] = math.max(self.button.borderColor[4] - love.timer.getDelta() * 1000, 0)
 			self.button.textColor[4] = math.max(self.button.textColor[4] - love.timer.getDelta() * 1000, 0)
 			
 			if self.button.textColor[4] == 0 then
 				self.state = 0
-				self.button.rectangleColor[4] = 0
+				self.button.backgroundColor[4] = 0
+				self.button.borderColor[4] = 0
 				self.button.textColor[4] = 0
 				self.lifetime = 0
 			end
