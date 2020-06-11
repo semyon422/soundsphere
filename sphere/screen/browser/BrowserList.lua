@@ -60,18 +60,14 @@ end
 BrowserList.selectCache = function(self)
 	local items = {}
 	
-	local directoryItems = love.filesystem.getDirectoryItems("userdata/charts")
-	
 	items[1] = {
 		name = "all",
 		path = "userdata/charts"
 	}
-	for _, name in ipairs(directoryItems) do
-		local path = "userdata/charts/" .. name
-		
+	for _, path in ipairs(CollectionManager:getPaths()) do
 		if not love.filesystem.isFile(path) then
 			items[#items + 1] = {
-				name = name,
+				name = path:match("^.-/.-/(.+)$"),
 				path = path
 			}
 		end
