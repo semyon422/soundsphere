@@ -16,7 +16,7 @@ local NoMeasureLine	= require("sphere.screen.gameplay.ModifierManager.NoMeasureL
 local FullLongNote	= require("sphere.screen.gameplay.ModifierManager.FullLongNote")
 local ToOsu			= require("sphere.screen.gameplay.ModifierManager.ToOsu")
 local AutoKeySound	= require("sphere.screen.gameplay.ModifierManager.AutoKeySound")
-local DoublePlay	= require("sphere.screen.gameplay.ModifierManager.DoublePlay")
+local MultiplePlay	= require("sphere.screen.gameplay.ModifierManager.MultiplePlay")
 
 local ModifierSequence = Class:new()
 
@@ -32,7 +32,7 @@ ModifierSequence.modifiers = {
 	NoLongNote,
 	NoMeasureLine,
 	Automap,
-	DoublePlay,
+	MultiplePlay,
 	Mirror,
 	Random,
 	BracketSwap,

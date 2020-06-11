@@ -1,6 +1,6 @@
-local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
+local SwapModifier = require("sphere.screen.gameplay.ModifierManager.SwapModifier")
 
-local Random = Modifier:new()
+local Random = SwapModifier:new()
 
 Random.sequential = true
 Random.type = "NoteChartModifier"
@@ -8,63 +8,79 @@ Random.type = "NoteChartModifier"
 Random.name = "Random"
 Random.shortName = "RD"
 
-Random.variableType = "boolean"
+Random.variableType = "number"
+Random.variableName = "value"
+Random.variableFormat = "%s"
+Random.variableRange = {1, 1, 3}
+Random.variableValues = {"all", "left", "right"}
+Random.value = 1
+
+Random.modeNames = {"A", "L", "R"}
+
+Random.tostring = function(self)
+	return self.shortName .. self.modeNames[self.value]
+end
+
+Random.tojson = function(self)
+	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
+end
 
 Random.getMap = function(self)
 	local noteChart = self.sequence.manager.noteChart
+	local value = self.value
 
-	local maxInputs = {}
 	local inputs = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do
-		inputs[inputType] = inputs[inputType] or {}
-		inputs[inputType][#inputs[inputType] + 1] = inputIndex
-
-		maxInputs[inputType] = math.max(maxInputs[inputType] or 0, inputIndex)
+		if noteChart.inputMode:getInputCount(inputType) > 0 then
+			inputs[inputType] = inputs[inputType] or {}
+			inputs[inputType][#inputs[inputType] + 1] = inputIndex
+		end
 	end
+
+	local filteredInputs = {}
+	for inputType, subInputs in pairs(inputs) do
+		local inputCount = noteChart.inputMode:getInputCount(inputType)
+		filteredInputs[inputType] = {}
+		local filteredSubInputs = filteredInputs[inputType]
+
+		local halfFloor = math.floor(inputCount / 2)
+		local halfCeil = math.ceil(inputCount / 2)
+		for i = 1, #subInputs do
+			if value == 1 then
+				filteredSubInputs[#filteredSubInputs + 1] = subInputs[i]
+			elseif value == 2 then
+				if subInputs[i] <= halfFloor then
+					filteredSubInputs[#filteredSubInputs + 1] = subInputs[i]
+				end
+			elseif value == 3 then
+				if subInputs[i] > halfCeil then
+					filteredSubInputs[#filteredSubInputs + 1] = subInputs[i]
+				end
+			end
+		end
+	end
+
+	inputs = filteredInputs
 
 	local map = {}
 
 	for inputType, subInputs in pairs(inputs) do
-		if maxInputs[inputType] > 0 then
-			local availableIndices = {}
-			for i = 1, #inputs[inputType] do
-				availableIndices[i] = inputs[inputType][i]
-			end
+		local availableIndices = {}
+		for i = 1, #subInputs do
+			availableIndices[i] = subInputs[i]
+		end
 
-			map[inputType] = {}
+		map[inputType] = {}
 
-			local list = map[inputType]
-			for i = 1, #inputs[inputType] do
-				local index = math.random(1, #availableIndices)
-				list[inputs[inputType][i]] = availableIndices[index]
-				table.remove(availableIndices, index)
-			end
+		local submap = map[inputType]
+		for i = 1, #subInputs do
+			local index = math.random(1, #availableIndices)
+			submap[subInputs[i]] = availableIndices[index]
+			table.remove(availableIndices, index)
 		end
 	end
 
 	return map
-end
-
-Random.apply = function(self)
-	math.randomseed(os.time())
-
-	local map = self:getMap()
-
-	local noteChart = self.sequence.manager.noteChart
-	local layerDataSequence = noteChart.layerDataSequence
-	
-	for layerIndex in noteChart:getLayerDataIndexIterator() do
-		local layerData = noteChart:requireLayerData(layerIndex)
-		
-		for noteDataIndex = 1, layerData:getNoteDataCount() do
-			local noteData = layerData:getNoteData(noteDataIndex)
-			if map[noteData.inputType] then
-				layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, -1)
-				noteData.inputIndex = map[noteData.inputType][noteData.inputIndex]
-				layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, 1)
-			end
-		end
-	end
 end
 
 return Random
