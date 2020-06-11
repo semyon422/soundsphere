@@ -24,6 +24,9 @@ ScoreEngine.load = function(self)
 	self.noteHandler = NoteHandler:new()
 	self.noteHandler.scoreEngine = self
 	self.noteHandler:load()
+
+	self.scoreSystem.scoreTable.inputMode = self.noteChart.inputMode:getString()
+	self.scoreSystem.scoreTable.timeRate = self.timeEngine:getBaseTimeRate()
 end
 
 ScoreEngine.update = function(self)

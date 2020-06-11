@@ -13,7 +13,9 @@ end
 
 ScoreSystem.construct = function(self)
 	self.observable = Observable:new()
-	self.scoreTable = {}
+	self.scoreTable = {
+		timeRate = 1
+	}
 end
 
 ScoreSystem.loadConfig = function(self, path)
