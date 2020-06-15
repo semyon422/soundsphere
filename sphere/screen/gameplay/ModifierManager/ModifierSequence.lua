@@ -3,35 +3,39 @@ local Class			= require("aqua.util.Class")
 local AutoPlay		= require("sphere.screen.gameplay.ModifierManager.AutoPlay")
 local Automap		= require("sphere.screen.gameplay.ModifierManager.Automap")
 local ProMode		= require("sphere.screen.gameplay.ModifierManager.ProMode")
-local SetInput		= require("sphere.screen.gameplay.ModifierManager.SetInput")
 local WindUp		= require("sphere.screen.gameplay.ModifierManager.WindUp")
-local TimeRate		= require("sphere.screen.gameplay.ModifierManager.TimeRate")
+local SpeedMode		= require("sphere.screen.gameplay.ModifierManager.SpeedMode")
+local TimeRateQ		= require("sphere.screen.gameplay.ModifierManager.TimeRateQ")
+local TimeRateX		= require("sphere.screen.gameplay.ModifierManager.TimeRateX")
 local NoScratch		= require("sphere.screen.gameplay.ModifierManager.NoScratch")
 local Mirror		= require("sphere.screen.gameplay.ModifierManager.Mirror")
+local Random		= require("sphere.screen.gameplay.ModifierManager.Random")
+local BracketSwap	= require("sphere.screen.gameplay.ModifierManager.BracketSwap")
 local NoLongNote	= require("sphere.screen.gameplay.ModifierManager.NoLongNote")
 local NoMeasureLine	= require("sphere.screen.gameplay.ModifierManager.NoMeasureLine")
-local CMod			= require("sphere.screen.gameplay.ModifierManager.CMod")
 local FullLongNote	= require("sphere.screen.gameplay.ModifierManager.FullLongNote")
 local ToOsu			= require("sphere.screen.gameplay.ModifierManager.ToOsu")
 local AutoKeySound	= require("sphere.screen.gameplay.ModifierManager.AutoKeySound")
-local DoublePlay	= require("sphere.screen.gameplay.ModifierManager.DoublePlay")
+local MultiplePlay	= require("sphere.screen.gameplay.ModifierManager.MultiplePlay")
 
 local ModifierSequence = Class:new()
 
 ModifierSequence.modifiers = {
 	AutoPlay,
-	AutoKeySound,
-	Automap,
-	DoublePlay,
 	ProMode,
-	SetInput,
+	AutoKeySound,
+	SpeedMode,
+	TimeRateQ,
+	TimeRateX,
 	WindUp,
-	TimeRate,
 	NoScratch,
-	Mirror,
 	NoLongNote,
 	NoMeasureLine,
-	CMod,
+	Automap,
+	MultiplePlay,
+	Mirror,
+	Random,
+	BracketSwap,
 	FullLongNote,
 	ToOsu
 }
@@ -46,16 +50,14 @@ end
 ModifierSequence.inconsequentialClassList = {
 	AutoPlay,
 	ProMode,
-	SetInput,
+	SpeedMode,
+	TimeRateQ,
+	TimeRateX,
 	WindUp,
-	TimeRate,
 	NoScratch,
-	Mirror,
 	NoLongNote,
 	NoMeasureLine,
-	CMod,
 	AutoKeySound,
-	DoublePlay,
 	ToOsu
 }
 
@@ -69,7 +71,7 @@ ModifierSequence.addInconsequential = function(self)
 		modifier.Class = Modifier
 		list[#list + 1] = modifier
 		-- self[Modifier] = modifier
-		if Modifier == TimeRate then
+		if Modifier == TimeRateX or Modifier == TimeRateQ or Modifier == SpeedMode then
 			modifier.enabled = true
 		end
 	end
@@ -121,15 +123,23 @@ ModifierSequence.getEnabledModifiers = function(self)
 	return list
 end
 
-ModifierSequence.apply = function(self)
+ModifierSequence.apply = function(self, modifierType)
 	for _, modifier in ipairs(self:getEnabledModifiers()) do
-		modifier:apply()
+		if modifier.type == modifierType then
+			modifier:apply()
+		end
 	end
 end
 
 ModifierSequence.update = function(self)
 	for _, modifier in ipairs(self:getEnabledModifiers()) do
 		modifier:update()
+	end
+end
+
+ModifierSequence.receive = function(self, event)
+	for _, modifier in ipairs(self:getEnabledModifiers()) do
+		modifier:receive(event)
 	end
 end
 
@@ -167,8 +177,8 @@ ModifierSequence.fromJson = function(self, jsonObject)
 					modifier = self:add(Modifier)
 				end
 				
-				if modifier.variable then
-					modifier[modifier.variable] = modifierData[modifier.variable]
+				if modifier.variableName then
+					modifier[modifier.variableName] = modifierData[modifier.variableName]
 				end
 			end
 		end

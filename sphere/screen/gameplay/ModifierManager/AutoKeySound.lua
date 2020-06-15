@@ -1,12 +1,15 @@
-local InconsequentialModifier = require("sphere.screen.gameplay.ModifierManager.InconsequentialModifier")
+local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
 local NoteData = require("ncdk.NoteData")
 
-local AutoKeySound = InconsequentialModifier:new()
+local AutoKeySound = Modifier:new()
+
+AutoKeySound.inconsequential = true
+AutoKeySound.type = "NoteChartModifier"
 
 AutoKeySound.name = "AutoKeySound"
 AutoKeySound.shortName = "AKS"
 
-AutoKeySound.type = "boolean"
+AutoKeySound.variableType = "boolean"
 
 AutoKeySound.apply = function(self)
 	local noteChart = self.sequence.manager.noteChart

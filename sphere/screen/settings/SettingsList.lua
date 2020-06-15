@@ -74,16 +74,7 @@ end
 
 SettingsList.setGeneralItems = function(self)
 	local items = {}
-	
-	items[#items + 1] = {
-		name = "test checkbox",
-		configKey = "cb",
-		type = "checkbox",
-		minValue = false,
-		maxValue = true,
-		minDisplayValue = "disabled",
-		maxDisplayValue = "enabled"
-	}
+
 	items[#items + 1] = {
 		name = "FPS limit",
 		configKey = "fps",
@@ -95,17 +86,6 @@ SettingsList.setGeneralItems = function(self)
 		step = 10,
 		format = "%d"
 	}
-	-- items[#items + 1] = {
-	-- 	name = "TPS limit",
-	-- 	configKey = "tps",
-	-- 	type = "slider",
-	-- 	minValue = 10,
-	-- 	maxValue = 1000,
-	-- 	minDisplayValue = 10,
-	-- 	maxDisplayValue = 1000,
-	-- 	step = 10,
-	-- 	format = "%d"
-	-- }
 	items[#items + 1] = {
 		name = "play speed",
 		configKey = "speed",
@@ -154,13 +134,18 @@ SettingsList.setSoundItems = function(self)
 	local items = {}
 	
 	items[#items + 1] = {
-		name = "main audio mode",
-		configKey = "audio.stream",
-		type = "checkbox",
-		minValue = false,
-		maxValue = true,
-		minDisplayValue = "sample",
-		maxDisplayValue = "stream"
+		name = "primary audio mode",
+		configKey = "audio.primaryAudioMode",
+		type = "listSwitcher",
+		valueList = {"sample", "stream", "streamTempo", "streamMemoryTempo", "streamMemoryReversable"},
+		displayList = {"sample", "stream", "tempo", "memory", "reversable"}
+	}
+	items[#items + 1] = {
+		name = "secondary audio mode",
+		configKey = "audio.secondaryAudioMode",
+		type = "listSwitcher",
+		valueList = {"sample", "stream", "streamTempo", "streamMemoryTempo", "streamMemoryReversable"},
+		displayList = {"sample", "stream", "tempo", "memory", "reversable"}
 	}
 	items[#items + 1] = {
 		name = "global volume",
@@ -213,9 +198,49 @@ SettingsList.setInputItems = function(self)
 		configKey = "screen.browser"
 	}
 	items[#items + 1] = {
+		name = "pause",
+		type = "keybind",
+		configKey = "gameplay.pause"
+	}
+	items[#items + 1] = {
 		name = "quick restart",
 		type = "keybind",
 		configKey = "gameplay.quickRestart"
+	}
+	items[#items + 1] = {
+		name = "select random song",
+		type = "keybind",
+		configKey = "select.selectRandomNoteChartSet"
+	}
+	items[#items + 1] = {
+		name = "invert play speed",
+		type = "keybind",
+		configKey = "gameplay.invertPlaySpeed"
+	}
+	items[#items + 1] = {
+		name = "decrease play speed",
+		type = "keybind",
+		configKey = "gameplay.decreasePlaySpeed"
+	}
+	items[#items + 1] = {
+		name = "increase play speed",
+		type = "keybind",
+		configKey = "gameplay.increasePlaySpeed"
+	}
+	items[#items + 1] = {
+		name = "invert time rate",
+		type = "keybind",
+		configKey = "gameplay.invertTimeRate"
+	}
+	items[#items + 1] = {
+		name = "decrease time rate",
+		type = "keybind",
+		configKey = "gameplay.decreaseTimeRate"
+	}
+	items[#items + 1] = {
+		name = "increase time rate",
+		type = "keybind",
+		configKey = "gameplay.increaseTimeRate"
 	}
 	
 	return self:setItems(items)

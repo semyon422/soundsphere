@@ -21,9 +21,9 @@ ProgressBar.loadGui = function(self)
 	self.blendMode = self.data.blendMode
 	self.blendAlphaMode = self.data.blendAlphaMode
 
-	self.score = self.gui.score
+	self.noteChart = self.gui.noteChart
 	self.container = self.gui.container
-	self.engine = self.gui.engine
+	self.logicEngine = self.gui.logicEngine
 	
 	self:load()
 end
@@ -43,8 +43,8 @@ ProgressBar.load = function(self)
 	})
 	self.progressRectangle:reload()
 	
-	self.startTime = self.engine.noteChart:hashGet("minTime")
-	self.endTime = self.engine.noteChart:hashGet("maxTime")
+	self.startTime = self.noteChart.metaData:get("minTime")
+	self.endTime = self.noteChart.metaData:get("maxTime")
 
 	self.container:add(self.progressRectangle)
 end
@@ -54,7 +54,7 @@ ProgressBar.unload = function(self)
 end
 
 ProgressBar.update = function(self, dt)
-	local currentTime = self.engine.currentTime
+	local currentTime = self.logicEngine.currentTime
 	self.zeroTime = self.zeroTime or currentTime
 	
 	local x0, w0 = self.x, self.w

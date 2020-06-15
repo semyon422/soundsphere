@@ -6,8 +6,14 @@ local InputManager = Class:new()
 
 InputManager.path = "userdata/input.json"
 
+InputManager.mode = "external"
+
 InputManager.init = function(self)
 	self.observable = Observable:new()
+end
+
+InputManager.setMode = function(self, mode)
+	self.mode = mode
 end
 
 InputManager.send = function(self, event)
@@ -98,6 +104,21 @@ InputManager.setInputMode = function(self, inputMode)
 end
 
 InputManager.receive = function(self, event)
+	if event.name == "TimeState" then
+		self.currentTime = event.exactCurrentTime
+		return
+	end
+
+	local mode = self.mode
+
+	if event.virtual and mode == "internal" then
+		return self:send(event)
+	end
+
+	if mode ~= "external" then
+		return
+	end
+
 	if not self.inputConfig then
 		return
 	end
@@ -117,14 +138,16 @@ InputManager.receive = function(self, event)
 		events[#events + 1] = {
 			name = "keypressed",
 			args = {key},
-			virtual = true
+			virtual = true,
+			time = self.currentTime
 		}
 	end
 	for _, key in ipairs(keyConfig.release) do
 		events[#events + 1] = {
 			name = "keyreleased",
 			args = {key},
-			virtual = true
+			virtual = true,
+			time = self.currentTime
 		}
 	end
 	for _, event in ipairs(events) do

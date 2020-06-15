@@ -10,15 +10,17 @@ CacheDatabase.chartspath = "userdata/charts"
 ----------------------------------------------------------------
 
 CacheDatabase.noteChartDatasColumns = {
+	"id",
 	"hash",
+	"index",
 	"format",
-	"version",
 	"title",
 	"artist",
 	"source",
 	"tags",
 	"name",
 	"creator",
+	"level",
 	"audioPath",
 	"stagePath",
 	"previewTime",
@@ -45,7 +47,9 @@ CacheDatabase.noteChartSetsColumns = {
 ----------------------------------------------------------------
 
 CacheDatabase.noteChartDatasNumberColumns = {
-	"version",
+	"id",
+	"index",
+	"level",
 	"previewTime",
 	"noteCount",
 	"length",
@@ -79,22 +83,25 @@ local createTableRequest = [[
 		`lastModified` INTEGER
 	);
 	CREATE TABLE IF NOT EXISTS `noteChartDatas` (
-		`hash` TEXT UNIQUE NOT NULL PRIMARY KEY,
+		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		`hash` TEXT NOT NULL,
+		`index` REAL NOT NULL,
 		`format` TEXT,
-		`version` REAL,
 		`title` TEXT,
 		`artist` TEXT,
 		`source` TEXT,
 		`tags` TEXT,
 		`name` TEXT,
 		`creator` TEXT,
+		`level` REAL,
 		`audioPath` TEXT,
 		`stagePath` TEXT,
 		`previewTime` REAL,
 		`inputMode` TEXT,
 		`noteCount` REAL,
 		`length` REAL,
-		`bpm` REAL
+		`bpm` REAL,
+		UNIQUE(`hash`, `index`)
 	);
 ]]
 
@@ -159,14 +166,15 @@ local deleteNoteChartSetRequest = [[
 local insertNoteChartDataRequest = [[
 	INSERT OR IGNORE INTO `noteChartDatas` (
 		`hash`,
+		`index`,
 		`format`,
-		`version`,
 		`title`,
 		`artist`,
 		`source`,
 		`tags`,
 		`name`,
 		`creator`,
+		`level`,
 		`audioPath`,
 		`stagePath`,
 		`previewTime`,
@@ -175,19 +183,19 @@ local insertNoteChartDataRequest = [[
 		`length`,
 		`bpm`
 	)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 ]]
 
 local updateNoteChartDataRequest = [[
 	UPDATE `noteChartDatas` SET
 		`format` = ?,
-		`version` = ?,
 		`title` = ?,
 		`artist` = ?,
 		`source` = ?,
 		`tags` = ?,
 		`name` = ?,
 		`creator` = ?,
+		`level` = ?,
 		`audioPath` = ?,
 		`stagePath` = ?,
 		`previewTime` = ?,
@@ -195,11 +203,11 @@ local updateNoteChartDataRequest = [[
 		`noteCount` = ?,
 		`length` = ?,
 		`bpm` = ?
-	WHERE `hash` = ?;
+	WHERE `hash` = ? AND `index` = ?;
 ]]
 
 local selectNoteChartDataRequest = [[
-	SELECT * FROM `noteChartDatas` WHERE `hash` = ?;
+	SELECT * FROM `noteChartDatas` WHERE `hash` = ? AND `index` = ?;
 ]]
 
 local selectAllNoteChartDatasRequest = [[
@@ -323,14 +331,15 @@ end
 CacheDatabase.insertNoteChartDataEntry = function(self, entry)
 	return self.insertNoteChartDataStatement:reset():bind(
 		entry.hash,
+		entry.index,
 		entry.format,
-		entry.version,
 		entry.title,
 		entry.artist,
 		entry.source,
 		entry.tags,
 		entry.name,
 		entry.creator,
+		entry.level,
 		entry.audioPath,
 		entry.stagePath,
 		entry.previewTime,
@@ -344,13 +353,13 @@ end
 CacheDatabase.updateNoteChartDataEntry = function(self, entry)
 	return self.updateNoteChartDataStatement:reset():bind(
 		entry.format,
-		entry.version,
 		entry.title,
 		entry.artist,
 		entry.source,
 		entry.tags,
 		entry.name,
 		entry.creator,
+		entry.level,
 		entry.audioPath,
 		entry.stagePath,
 		entry.previewTime,
@@ -358,12 +367,13 @@ CacheDatabase.updateNoteChartDataEntry = function(self, entry)
 		entry.noteCount,
 		entry.length,
 		entry.bpm,
-		entry.hash
+		entry.hash,
+		entry.index
 	):step()
 end
 
-CacheDatabase.selectNoteCharDatatEntry = function(self, hash)
-	local entry = self.selectNoteChartDataStatement:reset():bind(hash):step()
+CacheDatabase.selectNoteCharDatatEntry = function(self, hash, index)
+	local entry = self.selectNoteChartDataStatement:reset():bind(hash, index):step()
 	return self:transformNoteChartDataEntry(entry)
 end
 
@@ -378,10 +388,10 @@ CacheDatabase.transformEntry = function(self, row, columns, numberColumns)
 	local entry = {}
 
 	for i = 1, #columns do
-		entry[columns[i]] = row[i]
+		entry[columns[i]] = row[i] or ""
 	end
 	for i = 1, #numberColumns do
-		entry[numberColumns[i]] = tonumber(entry[numberColumns[i]])
+		entry[numberColumns[i]] = tonumber(entry[numberColumns[i]]) or 0
 	end
 
 	return entry

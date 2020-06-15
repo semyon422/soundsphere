@@ -1,23 +1,35 @@
-local InconsequentialModifier = require("sphere.screen.gameplay.ModifierManager.InconsequentialModifier")
+local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
 local map = require("aqua.math").map
 
-local WindUp = InconsequentialModifier:new()
+local WindUp = Modifier:new()
+
+WindUp.inconsequential = true
+WindUp.type = "TimeEngineModifier"
 
 WindUp.name = "WindUp"
 WindUp.shortName = "WindUp"
 
-WindUp.type = "boolean"
+WindUp.variableType = "boolean"
 
 WindUp.apply = function(self)
-	self.sequence.manager.engine.score.windUp = true
+	self.timeRateHandler = self.sequence.manager.timeEngine:createTimeRateHandler()
 end
 
 WindUp.update = function(self)
-	local engine = self.sequence.manager.engine
-	local startTime = engine.noteChart:hashGet("minTime")
-	local endTime = engine.noteChart:hashGet("maxTime")
-	local currentTime = engine.exactCurrentTime
-	engine:setTimeRate(map(currentTime, startTime, endTime, 0.75, 1.5))
+	local timeEngine = self.sequence.manager.timeEngine
+	local startTime = timeEngine.noteChart.metaData:get("minTime")
+	local endTime = timeEngine.noteChart.metaData:get("maxTime")
+	local currentTime = timeEngine.exactCurrentTime
+
+	if timeEngine.timeRate == 0 then
+		return
+	end
+
+	local timeRate = map(currentTime, startTime, endTime, 0.75, 1.5)
+	self.timeRateHandler.timeRate = timeRate
+
+	local baseTimeRate = self.sequence.manager.timeEngine:getBaseTimeRate()
+	timeEngine:setTimeRate(baseTimeRate, false)
 end
 
 return WindUp

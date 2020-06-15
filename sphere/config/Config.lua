@@ -58,7 +58,8 @@ Config.defaultValues = {
 	["cb"] = false,
 	["kb"] = "",
 
-	["audio.stream"] = false,
+	["audio.primaryAudioMode"] = "streamMemoryReversable",
+	["audio.secondaryAudioMode"] = "sample",
 	
 	["dim.select"] = 0.5,
 	["dim.gameplay"] = 0.75,
@@ -73,7 +74,17 @@ Config.defaultValues = {
 	
 	["screen.settings"] = "f1",
 	["screen.browser"] = "tab",
+	["gameplay.pause"] = "escape",
 	["gameplay.quickRestart"] = "`",
+	["select.selectRandomNoteChartSet"] = "f2",
+
+	["gameplay.invertPlaySpeed"] = "f2",
+	["gameplay.decreasePlaySpeed"] = "f3",
+	["gameplay.increasePlaySpeed"] = "f4",
+
+	["gameplay.invertTimeRate"] = "f7",
+	["gameplay.decreaseTimeRate"] = "f5",
+	["gameplay.increaseTimeRate"] = "f6"
 }
 
 return Config

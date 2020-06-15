@@ -7,7 +7,8 @@ ScoreDatabase.dbpath = "userdata/scores.db"
 
 ScoreDatabase.scoreColumns = {
 	"id",
-	"chartHash",
+	"noteChartHash",
+	"noteChartIndex",
 	"playerName",
 	"time",
 	"score",
@@ -19,6 +20,7 @@ ScoreDatabase.scoreColumns = {
 
 ScoreDatabase.scoreNumberColumns = {
 	"id",
+	"noteChartIndex",
 	"time",
 	"maxCombo"
 }
@@ -26,7 +28,8 @@ ScoreDatabase.scoreNumberColumns = {
 local createTableRequest = [[
 	CREATE TABLE IF NOT EXISTS `scores` (
 		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		`chartHash` TEXT NOT NULL DEFAULT '',
+		`noteChartHash` TEXT NOT NULL,
+		`noteChartIndex` REAL NOT NULL,
 		`playerName` TEXT,
 		`time` INTEGER,
 		`score` REAL,
@@ -39,7 +42,8 @@ local createTableRequest = [[
 
 local insertScoreRequest = [[
 	INSERT OR IGNORE INTO `scores` (
-		chartHash,
+		noteChartHash,
+		noteChartIndex,
 		playerName,
 		time,
 		score,
@@ -48,11 +52,11 @@ local insertScoreRequest = [[
 		scoreRating,
 		mods
 	)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 ]]
 
 local selectScoreRequest = [[
-	SELECT * FROM `scores` WHERE chartHash = ?
+	SELECT * FROM `scores` WHERE noteChartHash = ? AND noteChartIndex = ?
 ]]
 
 ScoreDatabase.init = function(self)
@@ -75,9 +79,10 @@ ScoreDatabase.unload = function(self)
 end
 
 ScoreDatabase.insertScore = function(self, scoreData)
-	self.log:write("score", scoreData.chartHash, scoreData.score)
+	self.log:write("score", scoreData.noteChartHash, scoreData.noteChartIndex, scoreData.score)
 	self.insertScoreStatement:reset():bind(
-		scoreData.chartHash,
+		scoreData.noteChartHash,
+		scoreData.noteChartIndex,
 		scoreData.playerName,
 		scoreData.time,
 		scoreData.score,

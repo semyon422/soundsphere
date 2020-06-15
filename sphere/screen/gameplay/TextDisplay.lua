@@ -18,11 +18,12 @@ TextDisplay.loadGui = function(self)
 	self.font = self.data.font
 	self.size = self.data.size
 	self.format = self.data.format
+	self.defaultValue = self.data.defaultValue
 	self.field = self.data.field
 	self.blendMode = self.data.blendMode
 	self.blendAlphaMode = self.data.blendAlphaMode
 
-	self.score = self.gui.score
+	self.scoreSystem = self.gui.scoreSystem
 	self.container = self.gui.container
 	
 	self:load()

@@ -18,27 +18,46 @@ NoteChartResourceLoader.init = function(self)
 	JamLoader:init()
 end
 
+NoteChartResourceLoader.getNoteChartType = function(self, noteChart)
+	if noteChart.type == "bms" or noteChart.type == "osu" or noteChart.type == "quaver" or noteChart.type == "ksm" then
+		return "bms"
+	elseif noteChart.type == "o2jam" then
+		return "o2jam"
+	end
+end
+
 NoteChartResourceLoader.load = function(self, path, noteChart, callback)
 	local directoryPath = path:match("^(.+)/")
-	if self.directoryPath and self.directoryPath ~= directoryPath then
-		self:unload()
-		self.localAliases = {}
-		self.globalAliases = {}
+	local noteChartType = self:getNoteChartType(noteChart)
+
+	if noteChartType == "bms" then
+		if self.directoryPath and self.directoryPath ~= directoryPath then
+			self:unload()
+			self.localAliases = {}
+			self.globalAliases = {}
+		end
+	elseif noteChartType == "o2jam" then
+		if self.path and self.path ~= path then
+			self:unload()
+			self.localAliases = {}
+			self.globalAliases = {}
+		end
 	end
+
 	self.directoryPath = directoryPath
 	self.path = path
 	self.noteChart = noteChart
 	self.callback = callback
 	
-	if self.noteChart.type == "bms" or self.noteChart.type == "osu" or self.noteChart.type == "quaver" or self.noteChart.type == "ksm" then
+	if noteChartType == "bms" then
 		self:loadBMS()
-	elseif self.noteChart.type == "o2jam" then
+	elseif noteChartType == "o2jam" then
 		self:loadOJM()
 	end
 end
 
 NoteChartResourceLoader.loadOJM = function(self)
-	local path = self.path:match("(.+)n/%d$") .. "m"
+	local path = self.path:match("(.+)n$") .. "m"
 	JamLoader:load(path, function(samples)
 		for name in pairs(samples) do
 			self.localAliases[name] = path .. "/" .. name
@@ -162,7 +181,7 @@ NoteChartResourceLoader.unloadBMS = function(self)
 end
 
 NoteChartResourceLoader.unloadOJM = function(self)
-	JamLoader:unload(self.path:match("(.+)n/%d$") .. "m", function() end)
+	JamLoader:unload(self.path:match("(.+)n$") .. "m", function() end)
 end
 
 return NoteChartResourceLoader

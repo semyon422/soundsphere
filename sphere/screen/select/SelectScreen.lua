@@ -1,7 +1,7 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
+local NoteChartFactory	= require("notechart.NoteChartFactory")
 local Config			= require("sphere.config.Config")
 local NoteSkinManager	= require("sphere.noteskin.NoteSkinManager")
-local NoteChartFactory	= require("sphere.database.NoteChartFactory")
 local Screen			= require("sphere.screen.Screen")
 local ScreenManager		= require("sphere.screen.ScreenManager")
 local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
@@ -42,8 +42,30 @@ SelectScreen.init = function(self)
 	NoteChartStateManager.observable:add(self)
 end
 
+SelectScreen.getNoteChart = function(self)
+	local item = NoteChartList.items[NoteChartList.focusedItemIndex]
+	local noteChartDataEntry = item.noteChartDataEntry
+	local noteChartEntry = item.noteChartEntry
+	local path = noteChartEntry.path
+
+	local file = love.filesystem.newFile(path)
+	file:open("r")
+	local content = file:read()
+	file:close()
+	
+	local status, noteCharts = NoteChartFactory:getNoteCharts(
+		path,
+		content,
+		noteChartDataEntry.index
+	)
+	return noteCharts[1]
+end
+
 SelectScreen.load = function(self)
 	self.gui:reload()
+
+	KeyBindMenu.SelectScreen = SelectScreen
+	NoteSkinMenu.SelectScreen = SelectScreen
 	
 	NoteSkinManager:load()
 	ModifierManager:load()
@@ -112,7 +134,10 @@ SelectScreen.receive = function(self, event)
 	end
 	
 	if event.action == "playNoteChart" then
-		if not love.filesystem.exists(NoteChartFactory:getRealPath(event.noteChartEntry.path)) then
+		if not love.filesystem.exists(event.noteChartEntry.path) then
+			return
+		end
+		if event.noteChartDataEntry.hash == "" then
 			return
 		end
 

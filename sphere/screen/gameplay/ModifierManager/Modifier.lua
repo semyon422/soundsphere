@@ -7,6 +7,8 @@ Modifier.shortName = ""
 
 Modifier.update = function(self) end
 
+Modifier.receive = function(self, event) end
+
 Modifier.tostring = function(self)
 	return self.shortName
 end

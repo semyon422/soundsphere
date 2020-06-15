@@ -50,28 +50,33 @@ ScoreManager.select = function(self)
 		scoreDict[scoreData.id] = scoreData
 	end
 	
-	local scoresByHash = {}
-	self.scoresByHash = scoresByHash
+	local scoresByHashIndex = {}
+	self.scoresByHashIndex = scoresByHashIndex
 	
 	for _, scoreData in ipairs(scoreList) do
-		scoresByHash[scoreData.chartHash] = scoresByHash[scoreData.chartHash] or {}
-		local list = scoresByHash[scoreData.chartHash]
+		local hash = scoreData.noteChartHash
+		local index = scoreData.noteChartIndex
+		scoresByHashIndex[hash] = scoresByHashIndex[hash] or {}
+		scoresByHashIndex[hash][index] = scoresByHashIndex[hash][index] or {}
+		local list = scoresByHashIndex[hash][index]
 		list[#list + 1] = scoreData
 	end
-	for _, list in pairs(scoresByHash) do
-		table.sort(list, sortByScore)
+	for _, list in pairs(scoresByHashIndex) do
+		for _, sublist in pairs(list) do
+			table.sort(sublist, sortByScore)
+		end
 	end
 end
 
-ScoreManager.insertScore = function(self, score)
-	local localScore = {
-		chartHash = score.hash,
-		noteChartHash = score.hash,
+ScoreManager.insertScore = function(self, scoreTable, noteChartDataEntry)
+	ScoreDatabase:insertScore({
+		noteChartHash = noteChartDataEntry.hash,
+		noteChartIndex = noteChartDataEntry.index,
 		playerName = "Player",
 		time = os.time(),
-		score = score.score,
-		accuracy = score.accuracy,
-		maxCombo = score.maxcombo,
+		score = scoreTable.score,
+		accuracy = scoreTable.accuracy,
+		maxCombo = scoreTable.maxcombo,
 		scoreRating = 0,
 		mods = "None"
 	}

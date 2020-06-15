@@ -1,15 +1,18 @@
 local clone = require("aqua.table").clone
-local SequentialModifier = require("sphere.screen.gameplay.ModifierManager.SequentialModifier")
+local Modifier = require("sphere.screen.gameplay.ModifierManager.Modifier")
 local NoteData = require("ncdk.NoteData")
 
-local FullLongNote = SequentialModifier:new()
+local FullLongNote = Modifier:new()
+
+FullLongNote.sequential = true
+FullLongNote.type = "NoteChartModifier"
 
 FullLongNote.name = "FullLongNote"
 FullLongNote.shortName = "FLN"
 
-FullLongNote.type = "number"
-FullLongNote.variable = "level"
-FullLongNote.range = {0, 1, 3}
+FullLongNote.variableType = "number"
+FullLongNote.variableName = "level"
+FullLongNote.variableRange = {0, 1, 3}
 
 FullLongNote.level = 0
 

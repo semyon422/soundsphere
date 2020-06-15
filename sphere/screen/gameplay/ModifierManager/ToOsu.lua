@@ -1,13 +1,16 @@
-local InconsequentialModifier	= require("sphere.screen.gameplay.ModifierManager.InconsequentialModifier")
+local Modifier	= require("sphere.screen.gameplay.ModifierManager.Modifier")
 local NoteChartExporter			= require("osu.NoteChartExporter")
 
-local ToOsu = InconsequentialModifier:new()
+local ToOsu = Modifier:new()
+
+ToOsu.inconsequential = true
+ToOsu.type = "NoteChartModifier"
 
 ToOsu.name = "ToOsu"
 ToOsu.shortName = "ToOsu"
 ToOsu.after = true
 
-ToOsu.type = "boolean"
+ToOsu.variableType = "boolean"
 
 ToOsu.apply = function(self)
 	local GameplayScreen = require("sphere.screen.gameplay.GameplayScreen")

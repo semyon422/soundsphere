@@ -1,7 +1,7 @@
 local Class = require("aqua.util.Class")
 local ncdk = require("ncdk")
 local ajson = require("aqua.util.json")
-local NoteSkin = require("sphere.screen.gameplay.CloudburstEngine.NoteSkin")
+local NoteSkin = require("sphere.screen.gameplay.GraphicEngine.NoteSkin")
 
 local toml = require("lua-toml.toml")
 toml.strict = false
@@ -12,8 +12,6 @@ TomlNoteSkinLoader.data = {}
 TomlNoteSkinLoader.path = "userdata/skins"
 
 TomlNoteSkinLoader.load = function(self, metaData, version)
-	self.version = version or math.huge
-
 	local noteSkin = NoteSkin:new()
 	noteSkin.metaData = metaData
 	self.noteSkin = noteSkin
@@ -28,15 +26,86 @@ TomlNoteSkinLoader.load = function(self, metaData, version)
 	self.noteSkin.noteSkinData = {}
 
 	self:addCS()
+	self:addEnv()
 
 	self:processNoteSkinData()
 	self:addMeasureLine()
 	self:processPlayFieldData()
+
+	self:addBmsBga()
+
 	noteSkin:load()
 
 	-- ajson.write("skin.json", noteSkin.playField)
 
 	return noteSkin
+end
+
+local colors = {
+	transparent = {255, 255, 255, 0},
+	clear = {255, 255, 255, 255},
+	missed = {127, 127, 127, 255},
+	passed = {255, 255, 255, 0},
+	startMissed = {127, 127, 127, 255},
+	startMissedPressed = {191, 191, 191, 255},
+	startPassedPressed = {255, 255, 255, 255},
+	endPassed = {255, 255, 255, 0},
+	endMissed = {127, 127, 127, 255},
+	endMissedPassed = {127, 127, 127, 255}
+}
+
+local envcolor = function(timeState, logicalState, data)
+    if logicalState == "clear" or logicalState == "skipped" then
+		return colors.clear
+	elseif logicalState == "missed" then
+		return colors.missed
+	elseif logicalState == "passed" then
+		return colors.passed
+    end
+	
+	local startTimeState = timeState.startTimeState or timeState
+	local endTimeState = timeState.endTimeState or timeState
+	local sdt = timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime
+
+	if startTimeState.fakeCurrentVisualTime >= endTimeState.absoluteTime then
+		return colors.transparent
+	elseif logicalState == "clear" then
+		return colors.clear
+	elseif logicalState == "startMissed" then
+		return colors.startMissed
+	elseif logicalState == "startMissedPressed" then
+		return colors.startMissedPressed
+	elseif logicalState == "startPassedPressed" then
+		return colors.startPassedPressed
+	elseif logicalState == "endPassed" then
+		return colors.endPassed
+	elseif logicalState == "endMissed" then
+		return colors.endMissed
+	elseif logicalState == "endMissedPassed" then
+		return colors.endMissedPassed
+	end
+
+    return colors.clear
+end
+
+TomlNoteSkinLoader.addEnv = function(self)
+	local noteSkin = self.noteSkin
+	noteSkin.env = {}
+	local env = noteSkin.env
+
+	env.number = function(timeState, logicalState, n) return n end
+	env.linear = function(timeState, logicalState, data)
+		return data[1] + data[2] * (timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
+	end
+	env.color = envcolor
+	env.colorWhite = function() return colors.clear end
+	env.bgacolor = function()
+		local bga = noteSkin.tomlData.bga
+		if not bga then
+			return colors.clear
+		end
+		return bga.color
+	end
 end
 
 TomlNoteSkinLoader.processNoteSkinData = function(self)
@@ -52,9 +121,7 @@ TomlNoteSkinLoader.processNoteSkinData = function(self)
 		self:processInput(input[i], i)
 	end
 
-	if self.version > 1 then
-		self:addPlayFieldGuidelines()
-	end
+	self:addPlayFieldGuidelines()
 end
 
 TomlNoteSkinLoader.addCS = function(self)
@@ -95,6 +162,7 @@ end
 TomlNoteSkinLoader.processInput = function(self, input, i)
 	self:addShortNote(input, i)
 	self:addLongNote(input, i)
+	self:addSoundNote(input, i)
 	self:addPlayFieldKey(input, i)
 end
 
@@ -149,12 +217,17 @@ end
 
 TomlNoteSkinLoader.addShortNote = function(self, input, i)
 	local noteSkin = self.noteSkin
+
+	local tomlNote = noteSkin.tomlData.notes.ShortNote
+	if not tomlNote then
+		return
+	end
+
 	local noteSkinData = noteSkin.noteSkinData
 
 	noteSkinData.notes[input .. ":ShortNote"] = {}
 	local shortNote = noteSkinData.notes[input .. ":ShortNote"]
 	
-	local tomlNote = noteSkin.tomlData.notes.ShortNote
 	local unit = self.unit
 	local scroll = noteSkin.tomlData.general.scroll
 
@@ -165,25 +238,31 @@ TomlNoteSkinLoader.addShortNote = function(self, input, i)
 	head.cs = 1
 	head.layer = 10
 	head.image = self:getImageName(tomlNote.Head.images[i], tomlNote.Head.layer)
-	head.sb = {}
 	head.gc = {
-		x = {self:getNoteX(i) / unit},
-		y = {self:getNoteY(i) / unit, scroll},
-		w = {columns.width[i] / unit},
-		h = {columns.height[i] / unit},
-		ox = {0},
-		oy = {-1}
+		x = {"number", self:getNoteX(i) / unit},
+		y = {"linear", {self:getNoteY(i) / unit, scroll}},
+		w = {"number", columns.width[i] / unit},
+		h = {"number", columns.height[i] / unit},
+		ox = {"number", 0},
+		oy = {"number", -1},
+		color = {"color", "white"}
 	}
+	head.drawInterval = {-1, 1}
 end
 
 TomlNoteSkinLoader.addLongNote = function(self, input, i)
 	local noteSkin = self.noteSkin
+
+	local tomlNote = noteSkin.tomlData.notes.LongNote
+	if not tomlNote then
+		return
+	end
+
 	local noteSkinData = noteSkin.noteSkinData
 
 	noteSkinData.notes[input .. ":LongNote"] = {}
 	local longNote = noteSkinData.notes[input .. ":LongNote"]
 
-	local tomlNote = noteSkin.tomlData.notes.LongNote
 	local unit = self.unit
 	local scroll = noteSkin.tomlData.general.scroll
 
@@ -194,29 +273,30 @@ TomlNoteSkinLoader.addLongNote = function(self, input, i)
 	head.cs = 1
 	head.layer = 10
 	head.image = self:getImageName(tomlNote.Head.images[i], tomlNote.Head.layer)
-	head.sb = {}
 	head.gc = {
-		x = {self:getNoteX(i) / unit},
-		y = {self:getNoteY(i) / unit, scroll},
-		w = {columns.width[i] / unit},
-		h = {columns.height[i] / unit},
-		ox = {0},
-		oy = {-1}
+		x = {"number", self:getNoteX(i) / unit},
+		y = {"linear", {self:getNoteY(i) / unit, scroll}},
+		w = {"number", columns.width[i] / unit},
+		h = {"number", columns.height[i] / unit},
+		ox = {"number", 0},
+		oy = {"number", -1},
+		color = {"color", "white"}
 	}
+	head.drawInterval = {-1, 1}
 
 	longNote.Body = {}
 	local body = longNote.Body
 	body.cs = 1
 	body.layer = 10
 	body.image = self:getImageName(tomlNote.Body.images[i], tomlNote.Body.layer)
-	body.sb = {}
 	body.gc = {
-		x = {self:getNoteX(i) / unit},
-		y = {self:getNoteY(i) / unit, scroll},
-		w = {columns.width[i] / unit},
-		h = {0},
-		ox = {0},
-		oy = {-0.5}
+		x = {"number", self:getNoteX(i) / unit},
+		y = {"linear", {self:getNoteY(i) / unit, scroll}},
+		w = {"number", columns.width[i] / unit},
+		h = {"number", 0},
+		ox = {"number", 0},
+		oy = {"number", -0.5},
+		color = {"color", "white"}
 	}
 
 	longNote.Tail = {}
@@ -224,15 +304,51 @@ TomlNoteSkinLoader.addLongNote = function(self, input, i)
 	tail.cs = 1
 	tail.layer = 10
 	tail.image = self:getImageName(tomlNote.Tail.images[i], tomlNote.Tail.layer)
-	tail.sb = {}
 	tail.gc = {
-		x = {self:getNoteX(i) / unit},
-		y = {self:getNoteY(i) / unit, scroll},
-		w = {columns.width[i] / unit},
-		h = {columns.height[i] / unit},
-		ox = {0},
-		oy = {-1}
+		x = {"number", self:getNoteX(i) / unit},
+		y = {"linear", {self:getNoteY(i) / unit, scroll}},
+		w = {"number", columns.width[i] / unit},
+		h = {"number", columns.height[i] / unit},
+		ox = {"number", 0},
+		oy = {"number", -1},
+		color = {"color", "white"}
 	}
+	tail.drawInterval = {-1, 1}
+end
+
+TomlNoteSkinLoader.addSoundNote = function(self, input, i)
+	local noteSkin = self.noteSkin
+
+	local tomlNote = noteSkin.tomlData.notes.SoundNote
+	if not tomlNote then
+		return
+	end
+
+	local noteSkinData = noteSkin.noteSkinData
+
+	noteSkinData.notes[input .. ":SoundNote"] = {}
+	local shortNote = noteSkinData.notes[input .. ":SoundNote"]
+	
+	local unit = self.unit
+	local scroll = noteSkin.tomlData.general.scroll
+
+	local columns = noteSkin.tomlData.columns
+
+	shortNote.Head = {}
+	local head = shortNote.Head
+	head.cs = 1
+	head.layer = 10
+	head.image = self:getImageName(tomlNote.Head.images[i], tomlNote.Head.layer)
+	head.gc = {
+		x = {"number", self:getNoteX(i) / unit},
+		y = {"linear", {self:getNoteY(i) / unit, scroll}},
+		w = {"number", columns.width[i] / unit},
+		h = {"number", columns.height[i] / unit},
+		ox = {"number", 0},
+		oy = {"number", -1},
+		color = {"colorWhite"}
+	}
+	head.drawInterval = {-1, 1}
 end
 
 TomlNoteSkinLoader.addPlayFieldKey = function(self, input, i)
@@ -315,29 +431,30 @@ TomlNoteSkinLoader.addMeasureLine = function(self)
 	head.cs = 1
 	head.layer = 10
 	head.image = self:getImageName(tomlMeasureLine.image, tomlMeasureLine.layer)
-	head.sb = {}
 	head.gc = {
-		x = {self:getNoteX(0) / unit},
-		y = {columns.y / unit, scroll},
-		w = {0},
-		h = {0},
-		ox = {0},
-		oy = {0}
+		x = {"number", self:getNoteX(0) / unit},
+		y = {"linear", {columns.y / unit, scroll}},
+		w = {"number", 0},
+		h = {"number", 0},
+		ox = {"number", 0},
+		oy = {"number", 0},
+		color = {"colorWhite"}
 	}
+	head.drawInterval = {-1, 1}
 
 	longNote.Body = {}
 	local body = longNote.Body
 	body.cs = 1
 	body.layer = 10
 	body.image = self:getImageName(tomlMeasureLine.image, tomlMeasureLine.layer)
-	body.sb = {}
 	body.gc = {
-		x = {self:getNoteX(0) / unit},
-		y = {columns.y / unit, scroll},
-		w = {(self:getNoteX(#columns.width + 1) - self:getNoteX(0)) / unit},
-		h = {tomlMeasureLine.height / unit},
-		ox = {0},
-		oy = {0}
+		x = {"number", self:getNoteX(0) / unit},
+		y = {"linear", {columns.y / unit, scroll}},
+		w = {"number", (self:getNoteX(#columns.width + 1) - self:getNoteX(0)) / unit},
+		h = {"number", tomlMeasureLine.height / unit},
+		ox = {"number", 0},
+		oy = {"number", 0},
+		color = {"colorWhite"}
 	}
 
 	longNote.Tail = {}
@@ -345,52 +462,19 @@ TomlNoteSkinLoader.addMeasureLine = function(self)
 	tail.cs = 1
 	tail.layer = 10
 	tail.image = self:getImageName(tomlMeasureLine.image, tomlMeasureLine.layer)
-	tail.sb = {}
 	tail.gc = {
-		x = {self:getNoteX(0) / unit},
-		y = {columns.y / unit, scroll},
-		w = {0},
-		h = {0},
-		ox = {0},
-		oy = {0}
+		x = {"number", self:getNoteX(0) / unit},
+		y = {"linear", {columns.y / unit, scroll}},
+		w = {"number", 0},
+		h = {"number", 0},
+		ox = {"number", 0},
+		oy = {"number", 0},
+		color = {"colorWhite"}
 	}
+	tail.drawInterval = {-1, 1}
 end
 
 TomlNoteSkinLoader.processPlayFieldData = function(self)
-	if self.version == 1 then
-		local tomlScore = self.noteSkin.tomlData.score
-		
-		tomlScore.score.layer = 5
-		tomlScore.accuracy.layer = 5
-		tomlScore.combo.layer = 5
-		tomlScore.timegate.layer = 5
-		self:addScoreDisplayScore(tomlScore.score)
-		self:addScoreDisplayAccuracy(tomlScore.accuracy)
-		self:addScoreDisplayCombo(tomlScore.combo)
-		self:addScoreDisplayTimegate(tomlScore.timegate)
-
-		self:addAccuracyGraph({
-			class = "AccuracyGraph",
-			r = 1,
-			lineColor = {255, 255, 255, 127},
-			color = {127, 127, 127, 255},
-			xywh = {0, self.unit * 0.25, self.unit, self.unit * 0.5},
-			origin = "lane",
-			layer = 0
-		})
-		self:addProgressBar({
-			class = "ProgressBar",
-			color = {255, 255, 255, 255},
-			direction = "left-right",
-			mode = "+",
-			xywh = {0, 0.995, 1, 0.005},
-			origin = "all",
-			layer = 0
-		})
-
-		return
-	end
-
 	local tomlPlayField = self.noteSkin.tomlData.playfield
 	for _, object in pairs(tomlPlayField) do
 		if object.class == "ScoreDisplay" and object.field == "score" then
@@ -401,8 +485,8 @@ TomlNoteSkinLoader.processPlayFieldData = function(self)
 			self:addScoreDisplayCombo(object)
 		elseif object.class == "ScoreDisplay" and object.field == "timegate" then
 			self:addScoreDisplayTimegate(object)
-		elseif object.class == "AccuracyGraph" then
-			self:addAccuracyGraph(object)
+		elseif object.class == "PointGraph" then
+			self:addPointGraph(object)
 		elseif object.class == "ProgressBar" then
 			self:addProgressBar(object)
 		elseif object.class == "StaticObject" then
@@ -412,10 +496,6 @@ TomlNoteSkinLoader.processPlayFieldData = function(self)
 end
 
 TomlNoteSkinLoader.getPlayFielObjectXYWH = function(self, object)
-	if self.version == 1 and not object.xywh then
-		return 0, 0, 1, 1, self.cses[2]
-	end
-
 	local ox, oy, ow, oh = unpack(object.xywh)
 	if object.origin == "lane" then
 		local x0 = self:getNoteX(0)
@@ -518,12 +598,12 @@ TomlNoteSkinLoader.addScoreDisplayTimegate = function(self, object)
 	}
 end
 
-TomlNoteSkinLoader.addAccuracyGraph = function(self, object)
+TomlNoteSkinLoader.addPointGraph = function(self, object)
 	local playField = self.noteSkin.playField
 	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
 
 	playField[#playField + 1] = {
-		class = "AccuracyGraph",
+		class = "PointGraph",
 		x = x,
 		y = y,
 		w = w,
@@ -532,7 +612,8 @@ TomlNoteSkinLoader.addAccuracyGraph = function(self, object)
 		layer = object.layer,
 		cs = cs,
 		color = object.color,
-		lineColor = object.lineColor
+		lineColor = object.lineColor,
+		counterPath = object.counterPath
 	}
 end
 
@@ -568,6 +649,73 @@ TomlNoteSkinLoader.addStaticObject = function(self, object)
 		cs = cs,
 		image = object.image
 	}
+end
+
+TomlNoteSkinLoader.addImageNote = function(self, input, layer)
+	local noteSkin = self.noteSkin
+	local noteSkinData = noteSkin.noteSkinData
+
+	noteSkinData.notes[input .. ":ImageNote"] = {}
+	local imageNote = noteSkinData.notes[input .. ":ImageNote"]
+
+	imageNote.Head = {}
+	local head = imageNote.Head
+	head.cs = 2
+	head.layer = layer
+	head.gc = {
+		x = {"number", 0},
+		y = {"number", 0},
+		w = {"number", 1},
+		h = {"number", 1},
+		ox = {"number", 0},
+		oy = {"number", 0},
+		color = {"bgacolor"}
+	}
+end
+
+TomlNoteSkinLoader.addVideoNote = function(self, input, layer)
+	local noteSkin = self.noteSkin
+	local noteSkinData = noteSkin.noteSkinData
+
+	noteSkinData.notes[input .. ":VideoNote"] = {}
+	local videoNote = noteSkinData.notes[input .. ":VideoNote"]
+
+	videoNote.Head = {}
+	local head = videoNote.Head
+	head.cs = 2
+	head.layer = layer
+	head.gc = {
+		x = {"number", 0},
+		y = {"number", 0},
+		w = {"number", 1},
+		h = {"number", 1},
+		ox = {"number", 0},
+		oy = {"number", 0},
+		color = {"bgacolor"}
+	}
+end
+
+-- local drawOrder = {0x04, 0x07, 0x0A}
+TomlNoteSkinLoader.addBmsBga = function(self)
+	local layer = self.noteSkin.tomlData.bga.layer
+
+	self:addImageNote("bmsbga" .. 0x04, 0.1 + layer)
+	-- self:addImageNote("bmsbga" .. 0x06)
+	self:addImageNote("bmsbga" .. 0x07, 0.2 + layer)
+	self:addImageNote("bmsbga" .. 0x0A, 0.3 + layer)
+	-- self:addImageNote("bmsbga" .. 0x0B)
+	-- self:addImageNote("bmsbga" .. 0x0C)
+	-- self:addImageNote("bmsbga" .. 0x0D)
+	-- self:addImageNote("bmsbga" .. 0x0E)
+
+	self:addVideoNote("bmsbga" .. 0x04, 0.1 + layer)
+	-- self:addVideoNote("bmsbga" .. 0x06)
+	self:addVideoNote("bmsbga" .. 0x07, 0.2 + layer)
+	self:addVideoNote("bmsbga" .. 0x0A, 0.3 + layer)
+	-- self:addVideoNote("bmsbga" .. 0x0B)
+	-- self:addVideoNote("bmsbga" .. 0x0C)
+	-- self:addVideoNote("bmsbga" .. 0x0D)
+	-- self:addVideoNote("bmsbga" .. 0x0E)
 end
 
 return TomlNoteSkinLoader

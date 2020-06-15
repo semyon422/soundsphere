@@ -30,29 +30,6 @@ NoteChartMenuList.load = function(self)
 	self:reload()
 end
 
-NoteChartMenuList.send = function(self, event)
-	if event.action == "buttonInteract" and event.button == 1 then
-		local metaData = self.items[event.itemIndex].metaData
-		NoteSkinManager:setDefaultNoteSkin(self:getSelectedInputMode(), metaData)
-	end
-	
-	CustomList.send(self, event)
-end
-
-NoteChartMenuList.getSelectedInputMode = function(self)
-	if
-		not NoteChartList.items or
-		not NoteChartList.focusedItemIndex or
-		not NoteChartList.items[NoteChartList.focusedItemIndex] or
-		not NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry or
-		not NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry.inputMode
-	then
-		return ""
-	end
-	
-	return NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry.inputMode
-end
-
 NoteChartMenuList.addItems = function(self)
 	local NoteChartMenu	= require("sphere.screen.select.NoteChartMenu")
 	local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
@@ -75,9 +52,16 @@ NoteChartMenuList.addItems = function(self)
 			end
 		},
 		{
-			name = "recache",
+			name = "recache new",
 			onClick = function()
 				NoteChartManager:updateCache(entry.path)
+				NoteChartMenu:hide()
+			end
+		},
+		{
+			name = "recache all",
+			onClick = function()
+				NoteChartManager:updateCache(entry.path, true)
 				NoteChartMenu:hide()
 			end
 		}

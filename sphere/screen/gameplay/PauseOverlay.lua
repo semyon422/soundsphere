@@ -6,6 +6,8 @@ local spherefonts		= require("sphere.assets.fonts")
 local Config			= require("sphere.config.Config")
 local DiscordPresence	= require("sphere.discord.DiscordPresence")
 local ScreenManager		= require("sphere.screen.ScreenManager")
+local ReplayManager		= require("sphere.screen.gameplay.ReplayManager")
+local InputManager		= require("sphere.screen.gameplay.InputManager")
 local tween				= require("tween")
 
 local PauseOverlay = {}
@@ -27,7 +29,7 @@ PauseOverlay.init = function(self)
 		interact = function() self:beginPlay() end,
 		
 		x = 0, y = 0,
-		w = 1, h = 1/3,
+		w = 1, h = 1/4,
 		cs = self.cs,
 		backgroundColor = {0, 0, 0, 127},
 		mode = "fill",
@@ -39,10 +41,42 @@ PauseOverlay.init = function(self)
 	
 	self.retryButton = Theme.Button:new({
 		text = "retry",
-		interact = function() self:restart() end,
+		interact = function()
+			InputManager:setMode("external")
+			ReplayManager:setMode("record")
+			self:restart()
+		end,
 		
-		x = 0, y = 1/3,
-		w = 1, h = 1/3,
+		x = 0, y = 1/4,
+		w = 1, h = 1/4,
+		cs = self.cs,
+		backgroundColor = {0, 0, 0, 127},
+		mode = "fill",
+		limit = 1,
+		textAlign = {x = "center", y = "center"},
+		textColor = {255, 255, 255, 255},
+		font = self.font,
+	})
+	
+	self.replayButton = Theme.Button:new({
+		text = "replay",
+		interact = function()
+			InputManager:setMode("internal")
+			ReplayManager:setMode("replay")
+
+			-- local GameplayScreen = require("sphere.screen.gameplay.GameplayScreen")
+
+			-- local FastPlay = require("sphere.screen.gameplay.ReplayManager.FastPlay")
+			-- FastPlay.replay = ReplayManager.replay
+			-- FastPlay.noteChartEntry = GameplayScreen.noteChartEntry
+			-- FastPlay.noteChartDataEntry = GameplayScreen.noteChartDataEntry
+			-- FastPlay:play()
+
+			self:restart()
+		end,
+		
+		x = 0, y = 1/2,
+		w = 1, h = 1/4,
 		cs = self.cs,
 		backgroundColor = {0, 0, 0, 127},
 		mode = "fill",
@@ -54,10 +88,14 @@ PauseOverlay.init = function(self)
 	
 	self.menuButton = Theme.Button:new({
 		text = "menu",
-		interact = function() self:menu() end,
+		interact = function()
+			InputManager:setMode("external")
+			ReplayManager:setMode("record")
+			self:menu()
+		end,
 		
-		x = 0, y = 2/3,
-		w = 1, h = 1/3,
+		x = 0, y = 3/4,
+		w = 1, h = 1/4,
 		cs = self.cs,
 		backgroundColor = {0, 0, 0, 127},
 		mode = "fill",
@@ -79,6 +117,7 @@ PauseOverlay.reload = function(self)
 	self.progressRectangle:reload()
 	self.continueButton:reload()
 	self.retryButton:reload()
+	self.replayButton:reload()
 	self.menuButton:reload()
 end
 
@@ -92,6 +131,7 @@ PauseOverlay.update = function(self, dt)
 	if self.paused then
 		self.continueButton:update()
 		self.retryButton:update()
+		self.replayButton:update()
 		self.menuButton:update()
 	end
 	
@@ -108,6 +148,7 @@ PauseOverlay.draw = function(self)
 	if self.paused then
 		self.continueButton:draw()
 		self.retryButton:draw()
+		self.replayButton:draw()
 		self.menuButton:draw()
 	end
 	self.progressRectangle:draw()
@@ -118,13 +159,14 @@ PauseOverlay.receive = function(self, event)
 		self:reload()
 	end
 	
-	if event.name == "focus" and not self.paused and not event.args[1] and not self.engine.score.autoplay then
+	if event.name == "focus" and not self.paused and not event.args[1] and not self.logicEngine.autoplay then
 		self:pause()
 	end
 	
 	if self.paused then
 		self.continueButton:receive(event)
 		self.retryButton:receive(event)
+		self.replayButton:receive(event)
 		self.menuButton:receive(event)
 	end
 	
@@ -137,7 +179,7 @@ PauseOverlay.receive = function(self, event)
 				self:resetProgress()
 				return
 			end
-			if self.engine.paused then
+			if self.timeEngine.timeRate == 0 then
 				self:beginPlay()
 			else
 				self:pause()
@@ -165,13 +207,13 @@ end
 
 PauseOverlay.play = function(self)
 	self.paused = false
-	self.engine:play()
+	self.timeEngine:setTimeRate(self.timeEngine:getBaseTimeRate())
 	
 	local length = math.min(self.noteChartDataEntry.length, 3600 * 24)
 	DiscordPresence:setPresence({
 		state = "Playing",
 		details = ("%s - %s [%s]"):format(self.noteChartDataEntry.artist, self.noteChartDataEntry.title, self.noteChartDataEntry.name),
-		endTimestamp = math.floor(os.time() + (length - self.engine.currentTime) / self.engine.timeRate)
+		endTimestamp = math.floor(os.time() + (length - self.timeEngine.currentTime) / self.timeEngine.timeRate)
 	})
 end
 
@@ -190,7 +232,7 @@ PauseOverlay.beginRestart = function(self)
 end
 
 PauseOverlay.pause = function(self)
-	self.engine:pause()
+	self.timeEngine:setTimeRate(0)
 	self.paused = true
 	
 	DiscordPresence:setPresence({
@@ -203,7 +245,7 @@ PauseOverlay.restart = function(self)
 	local GameplayScreen = require("sphere.screen.gameplay.GameplayScreen")
 	GameplayScreen:unload()
 	GameplayScreen:load()
-	self.engine:play()
+	self.timeEngine:setTimeRate(self.timeEngine:getBaseTimeRate())
 end
 
 PauseOverlay.menu = function(self)
@@ -211,8 +253,9 @@ PauseOverlay.menu = function(self)
 	ScreenManager:set(require("sphere.screen.result.ResultScreen"),
 		function()
 			ScreenManager:receive({
-				name = "score",
-				score = self.engine.score,
+				name = "scoreSystem",
+				scoreSystem = self.scoreSystem,
+				noteChart = self.noteChart,
 				noteChartEntry = GameplayScreen.noteChartEntry,
 				noteChartDataEntry = GameplayScreen.noteChartDataEntry
 			})

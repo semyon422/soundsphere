@@ -26,12 +26,16 @@ ModifierManager.unload = function(self)
 	return file:close()
 end
 
-ModifierManager.apply = function(self)
-	return self.sequence:apply()
+ModifierManager.apply = function(self, modifierType)
+	return self.sequence:apply(modifierType)
 end
 
 ModifierManager.update = function(self)
 	return self.sequence:update()
+end
+
+ModifierManager.receive = function(self, event)
+	return self.sequence:receive(event)
 end
 
 ModifierManager.getSequence = function(self)
