@@ -9,9 +9,9 @@ local BackgroundManager		= require("sphere.ui.BackgroundManager")
 
 local NoteChartList = CacheList:new()
 
-NoteChartList.x = 0
+NoteChartList.x = 0.2
 NoteChartList.y = 4/17
-NoteChartList.w = 0.6
+NoteChartList.w = 0.4
 NoteChartList.h = 9/17
 
 NoteChartList.sender = NoteChartList

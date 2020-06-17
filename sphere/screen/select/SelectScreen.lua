@@ -11,6 +11,7 @@ local NoteSkinMenu		= require("sphere.screen.select.NoteSkinMenu")
 local KeyBindMenu		= require("sphere.screen.select.KeyBindMenu")
 local NoteChartMenu		= require("sphere.screen.select.NoteChartMenu")
 
+local ScoreList			= require("sphere.screen.select.ScoreList")
 local NoteChartList		= require("sphere.screen.select.NoteChartList")
 local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
 local PreviewManager	= require("sphere.screen.select.PreviewManager")
@@ -34,6 +35,7 @@ SelectScreen.init = function(self)
 	KeyBindMenu:init()
 	NoteChartMenu:init()
 
+	ScoreList:init()
 	NoteChartList:init()
 	NoteChartSetList:init()
 	PreviewManager:init()
@@ -71,6 +73,7 @@ SelectScreen.load = function(self)
 	ModifierManager:load()
 	ModifierMenu:reloadItems()
 	
+	ScoreList:load()
 	NoteChartList:load()
 	NoteChartSetList:load()
 	
@@ -91,6 +94,7 @@ end
 SelectScreen.update = function(self)
 	Screen.update(self)
 	
+	ScoreList:update()
 	NoteChartSetList:update()
 	NoteChartList:update()
 	PreviewManager:update()
@@ -106,6 +110,7 @@ end
 SelectScreen.draw = function(self)
 	NoteChartSetList:draw()
 	NoteChartList:draw()
+	ScoreList:draw()
 	
 	Screen.draw(self)
 
@@ -154,12 +159,14 @@ SelectScreen.receive = function(self, event)
 	elseif event.name == "resize" then
 		NoteChartSetList:reload()
 		NoteChartList:reload()
+		ScoreList:reload()
 		self.gui:reload()
 		return
 	end
 	
 	NoteChartSetList:receive(event)
 	NoteChartList:receive(event)
+	ScoreList:receive(event)
 	self.gui:receive(event)
 	NoteChartStateManager:receive(event)
 end

@@ -7,22 +7,19 @@ local CustomList		= require("sphere.ui.CustomList")
 local NoteChartListButton = CustomList.Button:new()
 
 NoteChartListButton.nameTextAlign = {x = "left", y = "center"}
-NoteChartListButton.difficultyTextAlign = {x = "right", y = "center"}
-NoteChartListButton.scoreTextAlign = {x = "right", y = "center"}
-NoteChartListButton.inputModeTextAlign = {x = "left", y = "center"}
+NoteChartListButton.difficultyTextAlign = {x = "right", y = "top"}
+NoteChartListButton.inputModeTextAlign = {x = "left", y = "bottom"}
 
-NoteChartListButton.columnX = {0.05, 0.3, 0.45, 0.6}
-NoteChartListButton.columnWidth = {0.25, 0.15, 0.14, 0.4}
+NoteChartListButton.columnX = {0, 0.4}
+NoteChartListButton.columnWidth = {0.38, 0.6}
 
 NoteChartListButton.construct = function(self)
 	self.nameFont = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
-	self.difficultyFont = aquafonts.getFont(spherefonts.SourceCodeProBold, 30)
-	self.scoreFont = aquafonts.getFont(spherefonts.SourceCodeProRegular, 26)
-	self.inputModeFont = aquafonts.getFont(spherefonts.SourceCodeProRegular, 24)
+	self.difficultyFont = aquafonts.getFont(spherefonts.SourceCodeProBold, 18)
+	self.inputModeFont = aquafonts.getFont(spherefonts.SourceCodeProRegular, 18)
 	
 	self.nameTextFrame = TextFrame:new()
 	self.difficultyTextFrame = TextFrame:new()
-	self.scoreTextFrame = TextFrame:new()
 	self.inputModeTextFrame = TextFrame:new()
 	
 	CustomList.Button.construct(self)
@@ -44,33 +41,13 @@ NoteChartListButton.reloadTextFrame = function(self)
 	
 	textFrame:reload()
 	
-	local textFrame = self.scoreTextFrame
-	
-	local hash = self.item.noteChartDataEntry.hash
-	local index = self.item.noteChartDataEntry.index
-	local scoreEntry = ScoreManager:getScoreEntries(hash, index)
-	local score = scoreEntry and scoreEntry[1] and scoreEntry[1].score or 0
-	
-	textFrame.x = self.x + self.w * self.columnX[2]
-	textFrame.y = self.y
-	textFrame.w = self.w * self.columnWidth[2]
-	textFrame.h = self.h
-	textFrame.limit = self.w * self.columnWidth[2]
-	textFrame.align = self.scoreTextAlign
-	textFrame.text = ("%7d"):format(score)
-	textFrame.font = self.scoreFont
-	textFrame.color = self.textColor
-	textFrame.cs = self.cs
-	
-	textFrame:reload()
-	
 	local textFrame = self.difficultyTextFrame
 	
-	textFrame.x = self.x + self.w * self.columnX[3]
+	textFrame.x = self.x + self.w * self.columnX[1]
 	textFrame.y = self.y
-	textFrame.w = self.w * self.columnWidth[3]
+	textFrame.w = self.w * self.columnWidth[1]
 	textFrame.h = self.h
-	textFrame.limit = self.w * self.columnWidth[3]
+	textFrame.limit = self.w * self.columnWidth[1]
 	textFrame.align = self.difficultyTextAlign
 	textFrame.text = ("%.2f"):format(self.item.noteChartDataEntry.noteCount / self.item.noteChartDataEntry.length / 3)
 	textFrame.font = self.difficultyFont
@@ -81,11 +58,11 @@ NoteChartListButton.reloadTextFrame = function(self)
 	
 	local textFrame = self.nameTextFrame
 	
-	textFrame.x = self.x + self.w * self.columnX[4]
+	textFrame.x = self.x + self.w * self.columnX[2]
 	textFrame.y = self.y
-	textFrame.w = self.w * self.columnWidth[4]
+	textFrame.w = self.w * self.columnWidth[2]
 	textFrame.h = self.h
-	textFrame.limit = self.w * self.columnWidth[4]
+	textFrame.limit = self.w * self.columnWidth[2]
 	textFrame.align = self.nameTextAlign
 	textFrame.text = self.item.noteChartDataEntry.name or ""
 	textFrame.font = self.nameFont
@@ -101,7 +78,6 @@ NoteChartListButton.draw = function(self)
 		self.stencil:set("greater", 0)
 	end
 	self.background:draw()
-	self.scoreTextFrame:draw()
 	self.difficultyTextFrame:draw()
 	self.nameTextFrame:draw()
 	self.inputModeTextFrame:draw()
