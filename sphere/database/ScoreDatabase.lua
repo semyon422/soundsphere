@@ -77,6 +77,7 @@ end
 
 ScoreDatabase.unload = function(self)
 	self.db:close()
+	self.loaded = false
 end
 
 ScoreDatabase.insertScore = function(self, scoreData)

@@ -573,7 +573,7 @@ CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, for
 		local hash = fileHash[path]
 		noteChartEntry.hash = hash
 
-		if not force and Cache:getNoteChartDataEntry(hash, 1) then
+		if not force and self:getNoteChartDataEntry(hash, 1) then
 			self:setNoteChartEntry(noteChartEntry)
 		else
 			fileDatas[#fileDatas + 1] = {

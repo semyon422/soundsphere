@@ -68,6 +68,7 @@ ScoreManager.select = function(self)
 end
 
 ScoreManager.insertScore = function(self, scoreTable, noteChartDataEntry)
+	ScoreDatabase:load()
 	ScoreDatabase:insertScore({
 		noteChartHash = noteChartDataEntry.hash,
 		noteChartIndex = noteChartDataEntry.index,
@@ -79,6 +80,7 @@ ScoreManager.insertScore = function(self, scoreTable, noteChartDataEntry)
 		scoreRating = 0,
 		mods = "None"
 	})
+	ScoreDatabase:unload()
 	self:select()
 end
 
