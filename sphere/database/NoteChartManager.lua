@@ -60,7 +60,6 @@ NoteChartManager.updateCache = function(self, path, force)
 				local CacheDatabase				= require("sphere.database.CacheDatabase")
 				local CacheManager				= require("sphere.database.CacheManager")
 
-				CacheDatabase:init()
 				CacheManager:init()
 
 				CacheManager:generateCacheFull(...)
