@@ -47,7 +47,7 @@ SphereGame.load = function(self)
 	-- print("complete")
 	NoteChartManager:load()
 
-	ScoreManager:load()
+	ScoreManager:select()
 	Config:read()
 	Config:write()
 	

@@ -1,20 +1,12 @@
-local ScoreDatabase = require("sphere.database.ScoreDatabase")
+local ScoreDatabase	= require("sphere.database.ScoreDatabase")
+local Log			= require("aqua.util.Log")
 
 local ScoreManager = {}
 
-ScoreManager.selectScoresRequest = [[
-	SELECT * FROM `scores`;
-]]
-
-ScoreManager.load = function(self)
-	ScoreDatabase:load()
-	self.db = ScoreDatabase.db
-	self.selectScoresRequest = self.db:prepare(self.selectScoresRequest)
-	self:select()
-end
-
-ScoreManager.unload = function(self)
-	ScoreDatabase:unload()
+ScoreDatabase.init = function(self)
+	self.log = Log:new()
+	self.log.console = true
+	self.log.path = "userdata/scores.log"
 end
 
 local sortByScore = function(a, b)
@@ -22,48 +14,56 @@ local sortByScore = function(a, b)
 end
 
 ScoreManager.select = function(self)
-	local scoreList = {}
-	self.scoreList = scoreList
+	local loaded = ScoreDatabase.loaded
+	if not loaded then
+		ScoreDatabase:load()
+	end
+
+	local scores = {}
+	self.scores = scores
 	
 	local scoreColumns = ScoreDatabase.scoreColumns
 	local scoreNumberColumns = ScoreDatabase.scoreNumberColumns
+
+	local selectScoresStatement = ScoreDatabase.selectScoresStatement
 	
-	local stmt = self.selectScoresRequest:reset()
+	local stmt = selectScoresStatement:reset()
 	local row = stmt:step()
 	while row do
-		local scoreData = {}
-		for i = 1, #scoreColumns do
-			scoreData[scoreColumns[i]] = row[i]
-		end
-		for i = 1, #scoreNumberColumns do
-			scoreData[scoreNumberColumns[i]] = tonumber(scoreData[scoreNumberColumns[i]])
-		end
-		scoreList[#scoreList + 1] = scoreData
+		local entry = ScoreDatabase:transformScoreEntry(row)
+		scores[#scores + 1] = entry
+
 		row = stmt:step()
 	end
 	
-	local scoreDict = {}
-	self.scoreDict = scoreDict
+	local scoresId = {}
+	self.scoresId = scoresId
 	
-	for _, scoreData in ipairs(scoreList) do
-		scoreDict[scoreData.id] = scoreData
+	for i = 1, #scores do
+		local entry = scores[i]
+		scoresId[entry.id] = entry
 	end
 	
-	local scoresByHashIndex = {}
-	self.scoresByHashIndex = scoresByHashIndex
+	local scoresHashIndex = {}
+	self.scoresHashIndex = scoresHashIndex
 	
-	for _, scoreData in ipairs(scoreList) do
-		local hash = scoreData.noteChartHash
-		local index = scoreData.noteChartIndex
-		scoresByHashIndex[hash] = scoresByHashIndex[hash] or {}
-		scoresByHashIndex[hash][index] = scoresByHashIndex[hash][index] or {}
-		local list = scoresByHashIndex[hash][index]
-		list[#list + 1] = scoreData
+	for i = 1, #scores do
+		local entry = scores[i]
+		local hash = entry.noteChartHash
+		local index = entry.noteChartIndex
+		scoresHashIndex[hash] = scoresHashIndex[hash] or {}
+		scoresHashIndex[hash][index] = scoresHashIndex[hash][index] or {}
+		local list = scoresHashIndex[hash][index]
+		list[#list + 1] = entry
 	end
-	for _, list in pairs(scoresByHashIndex) do
+	for _, list in pairs(scoresHashIndex) do
 		for _, sublist in pairs(list) do
 			table.sort(sublist, sortByScore)
 		end
+	end
+
+	if not loaded then
+		ScoreDatabase:unload()
 	end
 end
 
@@ -80,6 +80,23 @@ ScoreManager.insertScore = function(self, scoreTable, noteChartDataEntry)
 		mods = "None"
 	})
 	self:select()
+end
+
+ScoreManager.getScores = function(self)
+	return self.scores
+end
+
+ScoreManager.getScores = function(self)
+	return self.scores
+end
+
+ScoreManager.getScoreEntryById = function(self, id)
+	return self.scoresId[id]
+end
+
+ScoreManager.getScoreEntries = function(self, hash, index)
+	local t = self.scoresHashIndex
+	return t[hash] and t[hash][index]
 end
 
 return ScoreManager

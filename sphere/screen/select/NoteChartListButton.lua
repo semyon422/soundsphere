@@ -48,11 +48,8 @@ NoteChartListButton.reloadTextFrame = function(self)
 	
 	local hash = self.item.noteChartDataEntry.hash
 	local index = self.item.noteChartDataEntry.index
-	local scores = ScoreManager.scoresByHashIndex[hash]
-	if scores then
-		scores = scores[index]
-	end
-	local score = scores and scores[1] and scores[1].score or 0
+	local scoreEntry = ScoreManager:getScoreEntries(hash, index)
+	local score = scoreEntry and scoreEntry[1] and scoreEntry[1].score or 0
 	
 	textFrame.x = self.x + self.w * self.columnX[2]
 	textFrame.y = self.y

@@ -1,11 +1,10 @@
-local Log		= require("aqua.util.Log")
 local sqlite	= require("ljsqlite3")
 
 local ScoreDatabase = {}
 
 ScoreDatabase.dbpath = "userdata/scores.db"
 
-ScoreDatabase.scoreColumns = {
+ScoreDatabase.scoresColumns = {
 	"id",
 	"noteChartHash",
 	"noteChartIndex",
@@ -18,7 +17,7 @@ ScoreDatabase.scoreColumns = {
 	"mods"
 }
 
-ScoreDatabase.scoreNumberColumns = {
+ScoreDatabase.scoresNumberColumns = {
 	"id",
 	"noteChartIndex",
 	"time",
@@ -59,11 +58,9 @@ local selectScoreRequest = [[
 	SELECT * FROM `scores` WHERE noteChartHash = ? AND noteChartIndex = ?
 ]]
 
-ScoreDatabase.init = function(self)
-	self.log = Log:new()
-	self.log.console = true
-	self.log.path = "userdata/scores.log"
-end
+local selectScoresRequest = [[
+	SELECT * FROM `scores`;
+]]
 
 ScoreDatabase.load = function(self)
 	self.db = sqlite.open(self.dbpath)
@@ -72,6 +69,10 @@ ScoreDatabase.load = function(self)
 	
 	self.insertScoreStatement = self.db:prepare(insertScoreRequest)
 	self.selectScoreStatement = self.db:prepare(selectScoreRequest)
+
+	self.selectScoresStatement = self.db:prepare(selectScoresRequest)
+
+	self.loaded = true
 end
 
 ScoreDatabase.unload = function(self)
@@ -79,7 +80,7 @@ ScoreDatabase.unload = function(self)
 end
 
 ScoreDatabase.insertScore = function(self, scoreData)
-	self.log:write("score", scoreData.noteChartHash, scoreData.noteChartIndex, scoreData.score)
+	-- self.log:write("score", scoreData.noteChartHash, scoreData.noteChartIndex, scoreData.score)
 	self.insertScoreStatement:reset():bind(
 		scoreData.noteChartHash,
 		scoreData.noteChartIndex,
@@ -91,6 +92,23 @@ ScoreDatabase.insertScore = function(self, scoreData)
 		scoreData.scoreRating,
 		scoreData.mods
 	):step()
+end
+
+ScoreDatabase.transformEntry = function(self, row, columns, numberColumns)
+	local entry = {}
+
+	for i = 1, #columns do
+		entry[columns[i]] = row[i] or ""
+	end
+	for i = 1, #numberColumns do
+		entry[numberColumns[i]] = tonumber(entry[numberColumns[i]]) or 0
+	end
+
+	return entry
+end
+
+ScoreDatabase.transformScoreEntry = function(self, entry)
+	return self:transformEntry(entry, self.scoresColumns, self.scoresNumberColumns)
 end
 
 return ScoreDatabase
