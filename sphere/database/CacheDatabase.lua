@@ -216,12 +216,6 @@ local selectAllNoteChartDatasRequest = [[
 
 ----------------------------------------------------------------
 
-CacheDatabase.init = function(self)
-	self.log = Log:new()
-	self.log.console = true
-	self.log.path = "userdata/cache.log"
-end
-
 CacheDatabase.load = function(self)
 	self.db = sqlite.open(self.dbpath)
 	local db = self.db

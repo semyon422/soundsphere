@@ -32,8 +32,6 @@ CacheManager.select = function(self)
 	if not loaded then
 		CacheDatabase:load()
 	end
-	
-	local db = CacheDatabase.db
 
 	local selectAllNoteChartsStatement		= CacheDatabase.selectAllNoteChartsStatement
 	local selectAllNoteChartSetsStatement	= CacheDatabase.selectAllNoteChartSetsStatement

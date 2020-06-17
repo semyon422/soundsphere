@@ -16,7 +16,6 @@ NoteChartManager.init = function(self)
 
 	ThreadPool.observable:add(self)
 
-	CacheDatabase:init()
 	NoteChartResourceLoader:init()
 end
 
