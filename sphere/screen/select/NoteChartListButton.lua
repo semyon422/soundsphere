@@ -7,8 +7,8 @@ local CustomList		= require("sphere.ui.CustomList")
 local NoteChartListButton = CustomList.Button:new()
 
 NoteChartListButton.nameTextAlign = {x = "left", y = "center"}
-NoteChartListButton.difficultyTextAlign = {x = "right", y = "top"}
-NoteChartListButton.inputModeTextAlign = {x = "left", y = "bottom"}
+NoteChartListButton.difficultyTextAlign = {x = "right", y = "bottom"}
+NoteChartListButton.inputModeTextAlign = {x = "left", y = "top"}
 
 NoteChartListButton.columnX = {0, 0.4}
 NoteChartListButton.columnWidth = {0.38, 0.6}
