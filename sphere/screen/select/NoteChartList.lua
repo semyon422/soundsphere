@@ -1,6 +1,6 @@
 local CoordinateManager		= require("aqua.graphics.CoordinateManager")
 local Observable			= require("aqua.util.Observable")
-local Cache					= require("sphere.database.Cache")
+local CacheManager			= require("sphere.database.CacheManager")
 local SearchManager			= require("sphere.database.SearchManager")
 local CacheList				= require("sphere.screen.select.CacheList")
 local NoteChartListButton	= require("sphere.screen.select.NoteChartListButton")
@@ -66,7 +66,7 @@ end
 NoteChartList.selectCache = function(self)
 	local items = {}
 	
-	local noteChartEntries = Cache:getNoteChartsAtSet(self.setId)
+	local noteChartEntries = CacheManager:getNoteChartsAtSet(self.setId)
 	if not noteChartEntries or not noteChartEntries[1] then
 		return self:setItems(items)
 	end
@@ -74,9 +74,9 @@ NoteChartList.selectCache = function(self)
 	local map = {}
 	local noteChartDataEntries = {}
 	for i = 1, #noteChartEntries do
-		local entries = Cache:getAllNoteChartDataEntries(noteChartEntries[i].hash)
+		local entries = CacheManager:getAllNoteChartDataEntries(noteChartEntries[i].hash)
 		if #entries == 0 then
-			entries = {Cache:getEmptyNoteChartDataEntry(noteChartEntries[i].path)}
+			entries = {CacheManager:getEmptyNoteChartDataEntry(noteChartEntries[i].path)}
 		end
 		for _, entry in pairs(entries) do
 			noteChartDataEntries[#noteChartDataEntries + 1] = entry
@@ -106,7 +106,7 @@ NoteChartList.getBackgroundPath = function(self, itemIndex)
 	local noteChartDataEntry = item.noteChartDataEntry
 	local noteChartEntry = item.noteChartEntry
 	
-	local directoryPath = Cache:getNoteChartSetEntryById(noteChartEntry.setId).path
+	local directoryPath = CacheManager:getNoteChartSetEntryById(noteChartEntry.setId).path
 	local stagePath = noteChartDataEntry.stagePath
 
 	if stagePath and stagePath ~= "" then
@@ -121,7 +121,7 @@ NoteChartList.getAudioPath = function(self, itemIndex)
 	local noteChartDataEntry = item.noteChartDataEntry
 	local noteChartEntry = item.noteChartEntry
 	
-	local directoryPath = Cache:getNoteChartSetEntryById(noteChartEntry.setId).path
+	local directoryPath = CacheManager:getNoteChartSetEntryById(noteChartEntry.setId).path
 	local audioPath = noteChartDataEntry.audioPath
 
 	if audioPath and audioPath ~= "" then

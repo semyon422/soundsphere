@@ -1,6 +1,5 @@
 local CoordinateManager				= require("aqua.graphics.CoordinateManager")
 local Observable					= require("aqua.util.Observable")
-local Cache							= require("sphere.database.Cache")
 local CollectionManager				= require("sphere.database.CollectionManager")
 local ModifierDisplay				= require("sphere.screen.select.ModifierDisplay")
 local ModifierManager				= require("sphere.screen.gameplay.ModifierManager")

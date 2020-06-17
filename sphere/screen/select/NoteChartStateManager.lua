@@ -2,7 +2,7 @@ local Observable		= require("aqua.util.Observable")
 local NoteChartList  	= require("sphere.screen.select.NoteChartList")
 local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
 local PreviewManager	= require("sphere.screen.select.PreviewManager")
-local Cache				= require("sphere.database.Cache")
+local CacheManager		= require("sphere.database.CacheManager")
 local json				= require("json")
 local Config			= require("sphere.config.Config")
 
@@ -26,8 +26,8 @@ NoteChartStateManager.load = function(self)
 		self.selectedChart = json.decode(file:read("*all"))
 		file:close()
 
-		local noteChartSetEntry = Cache:getNoteChartSetEntryById(self.selectedChart[1])
-		local noteChartEntry = Cache:getNoteChartEntryById(self.selectedChart[2])
+		local noteChartSetEntry = CacheManager:getNoteChartSetEntryById(self.selectedChart[1])
+		local noteChartEntry = CacheManager:getNoteChartEntryById(self.selectedChart[2])
 
 		local itemIndex = NoteChartSetList:getItemIndex(noteChartSetEntry)
 		NoteChartSetList:quickScrollToItemIndex(itemIndex)
@@ -103,7 +103,7 @@ NoteChartStateManager.receive = function(self, event)
 			local item = NoteChartSetList.items[event.itemIndex]
 			if not item then return end
 
-			local list = Cache:getNoteChartsAtSet(item.noteChartSetEntry.id)
+			local list = CacheManager:getNoteChartsAtSet(item.noteChartSetEntry.id)
 			if list and list[1] then
 				local focusedItem = NoteChartList.items[NoteChartList.focusedItemIndex]
 				local noteChartEntry = focusedItem and focusedItem.noteChartEntry

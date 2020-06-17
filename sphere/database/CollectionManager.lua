@@ -1,10 +1,10 @@
-local Cache = require("sphere.database.Cache")
+local CacheManager = require("sphere.database.CacheManager")
 
 local CollectionManager = {}
 
 CollectionManager.getPaths = function(self)
 	local packPathsDict = {}
-	for _, chartSetData in ipairs(Cache:getNoteChartSets()) do
+	for _, chartSetData in ipairs(CacheManager:getNoteChartSets()) do
 		packPathsDict[chartSetData.path:match("^(.+)/.-$")] = true
 	end
 	

@@ -1,6 +1,6 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Observable		= require("aqua.util.Observable")
-local Cache				= require("sphere.database.Cache")
+local CacheManager				= require("sphere.database.CacheManager")
 local SearchManager		= require("sphere.database.SearchManager")
 local CacheList			= require("sphere.screen.select.CacheList")
 local PreviewManager	= require("sphere.screen.select.PreviewManager")
@@ -54,13 +54,13 @@ NoteChartSetList.checkNoteChartSetEntry = function(self, entry)
 	if not base then return false end
 	if not self.needSearch then return true end
 	
-	local list = Cache:getNoteChartsAtSet(entry.id)
+	local list = CacheManager:getNoteChartsAtSet(entry.id)
 	if not list or not list[1] then
 		return
 	end
 	
 	for i = 1, #list do
-		local entries = Cache:getAllNoteChartDataEntries(list[i].hash)
+		local entries = CacheManager:getAllNoteChartDataEntries(list[i].hash)
 		for _, entry in pairs(entries) do
 			local found = SearchManager:check(entry, self.searchString)
 			if found == true then
@@ -75,9 +75,9 @@ NoteChartSetList.sortItemsFunction = function(a, b)
 end
 
 NoteChartSetList.getItemName = function(self, entry)
-	local list = Cache:getNoteChartsAtSet(entry.id)
+	local list = CacheManager:getNoteChartsAtSet(entry.id)
 	if list and list[1] then
-		local noteChartDataEntry = Cache:getNoteChartDataEntry(list[1].hash, 1)
+		local noteChartDataEntry = CacheManager:getNoteChartDataEntry(list[1].hash, 1)
 		if noteChartDataEntry then
 			return noteChartDataEntry.title
 		end
@@ -88,7 +88,7 @@ end
 NoteChartSetList.selectCache = function(self)
 	local items = {}
 	
-	local noteChartSetEntries = Cache:getNoteChartSets()
+	local noteChartSetEntries = CacheManager:getNoteChartSets()
 	for i = 1, #noteChartSetEntries do
 		local noteChartSetEntry = noteChartSetEntries[i]
 		if self:checkNoteChartSetEntry(noteChartSetEntry) then

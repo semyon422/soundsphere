@@ -1,6 +1,6 @@
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 local CacheDatabase				= require("sphere.database.CacheDatabase")
-local Cache						= require("sphere.database.Cache")
+local CacheManager				= require("sphere.database.CacheManager")
 local ThreadPool				= require("aqua.thread.ThreadPool")
 local Log						= require("aqua.util.Log")
 local Observable				= require("aqua.util.Observable")
@@ -21,7 +21,7 @@ NoteChartManager.init = function(self)
 end
 
 NoteChartManager.load = function(self)
-	Cache:select()
+	CacheManager:select()
 end
 
 NoteChartManager.send = function(self, event)
@@ -32,7 +32,7 @@ NoteChartManager.receive = function(self, event)
 	if event.name == "CacheProgress" then
 		if event.state == 3 then
 			self.lock = false
-			Cache:select()
+			CacheManager:select()
 			self.isUpdating = false
 		end
 		self:send({
@@ -59,12 +59,12 @@ NoteChartManager.updateCache = function(self, path, force)
 		return ThreadPool:execute(
 			[[
 				local CacheDatabase				= require("sphere.database.CacheDatabase")
-				local Cache						= require("sphere.database.Cache")
+				local CacheManager				= require("sphere.database.CacheManager")
 
 				CacheDatabase:init()
-				Cache:init()
+				CacheManager:init()
 
-				Cache:generateCacheFull(...)
+				CacheManager:generateCacheFull(...)
 			]],
 			{path, force}
 		)

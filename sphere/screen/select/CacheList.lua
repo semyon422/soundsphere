@@ -1,5 +1,4 @@
 local Observable		= require("aqua.util.Observable")
-local Cache				= require("sphere.database.Cache")
 local CustomList		= require("sphere.ui.CustomList")
 local NotificationLine	= require("sphere.ui.NotificationLine")
 
