@@ -46,7 +46,7 @@ AudioEngine.receive = function(self, event)
 	end
 end
 
-AudioEngine.playAudio = function(self, paths, layer, keysound, stream)
+AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
 	if not paths then return end
 	for i = 1, #paths do
 		local path = paths[i][1]
@@ -77,13 +77,16 @@ AudioEngine.playAudio = function(self, paths, layer, keysound, stream)
 		end
 
 		if audio then
-			audio.offset = self.currentTime
+			audio.offset = offset or self.currentTime
 			audio:setRate(self.timeRate)
 			audio:setBaseVolume(paths[i][2])
 			if layer == "background" then
 				self.backgroundContainer:add(audio)
 			elseif layer == "foreground" then
 				self.foregroundContainer:add(audio)
+			end
+			if self.forcePosition then
+				audio:setPosition(self.currentTime)
 			end
 			audio:play()
 		end

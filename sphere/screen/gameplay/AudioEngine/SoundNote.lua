@@ -9,7 +9,7 @@ SoundNote.getLayer = function(self)
 end
 
 SoundNote.playAudio = function(self, noteData, layer)
-	return self.audioEngine:playAudio(noteData.sounds, self:getLayer(), noteData.keysound, noteData.stream)
+	return self.audioEngine:playAudio(noteData.sounds, self:getLayer(), noteData.keysound, noteData.stream, noteData.timePoint.absoluteTime)
 end
 
 return SoundNote

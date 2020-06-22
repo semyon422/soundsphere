@@ -202,6 +202,11 @@ SettingsList.setInputItems = function(self)
 		configKey = "gameplay.pause"
 	}
 	items[#items + 1] = {
+		name = "skip intro",
+		type = "keybind",
+		configKey = "gameplay.skipIntro"
+	}
+	items[#items + 1] = {
 		name = "quick restart",
 		type = "keybind",
 		configKey = "gameplay.quickRestart"

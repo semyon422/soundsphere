@@ -75,6 +75,7 @@ Config.defaultValues = {
 	["screen.settings"] = "f1",
 	["screen.browser"] = "tab",
 	["gameplay.pause"] = "escape",
+	["gameplay.skipIntro"] = "space",
 	["gameplay.quickRestart"] = "`",
 	["select.selectRandomNoteChartSet"] = "f2",
 

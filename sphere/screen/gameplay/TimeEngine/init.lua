@@ -92,8 +92,23 @@ TimeEngine.receive = function(self, event)
 			})
 		elseif key == Config:get("gameplay.invertTimeRate") then
 			self:setTimeRate(-self.timeRate)
+		elseif key == Config:get("gameplay.skipIntro") then
+			local skipTime = self.noteChart.metaData:get("minTime") - 2
+			if self.currentTime < skipTime then
+				self:setPosition(skipTime)
+			end
 		end
 	end
+end
+
+TimeEngine.setPosition = function(self, position)
+	self.timeManager:setPosition(position)
+	self:update(0)
+
+	self.audioEngine:setPosition(position)
+	self.audioEngine.forcePosition = true
+	self.logicEngine:update()
+	self.audioEngine.forcePosition = false
 end
 
 TimeEngine.setTimeRate = function(self, timeRate, needTween)

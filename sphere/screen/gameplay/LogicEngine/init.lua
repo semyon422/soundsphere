@@ -15,7 +15,7 @@ LogicEngine.load = function(self)
 	self:loadNoteHandlers()
 end
 
-LogicEngine.update = function(self, dt)
+LogicEngine.update = function(self)
 	self:updateNoteHandlers()
 end
 

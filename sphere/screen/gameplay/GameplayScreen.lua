@@ -100,6 +100,7 @@ GameplayScreen.load = function(self)
 	logicEngine.globalAliases = {}
 	ModifierManager.logicEngine = logicEngine
 	logicEngine.observable:add(ModifierManager)
+	timeEngine.logicEngine = logicEngine
 
 	ModifierManager.logicEngine = logicEngine
 	ModifierManager:apply("LogicEngineModifier")
