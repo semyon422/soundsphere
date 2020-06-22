@@ -5,6 +5,7 @@ local NoteSkinManager	= require("sphere.noteskin.NoteSkinManager")
 local Screen			= require("sphere.screen.Screen")
 local ScreenManager		= require("sphere.screen.ScreenManager")
 local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
+local AliasManager		= require("sphere.database.AliasManager")
 
 local ModifierMenu		= require("sphere.screen.select.ModifierMenu")
 local NoteSkinMenu		= require("sphere.screen.select.NoteSkinMenu")
@@ -69,6 +70,7 @@ SelectScreen.load = function(self)
 	KeyBindMenu.SelectScreen = SelectScreen
 	NoteSkinMenu.SelectScreen = SelectScreen
 	
+	AliasManager:load()
 	NoteSkinManager:load()
 	ModifierManager:load()
 	ModifierMenu:reloadItems()

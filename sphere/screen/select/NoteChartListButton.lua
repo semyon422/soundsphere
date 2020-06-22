@@ -3,6 +3,7 @@ local TextFrame			= require("aqua.graphics.TextFrame")
 local spherefonts		= require("sphere.assets.fonts")
 local ScoreManager		= require("sphere.database.ScoreManager")
 local CustomList		= require("sphere.ui.CustomList")
+local AliasManager		= require("sphere.database.AliasManager")
 
 local NoteChartListButton = CustomList.Button:new()
 
@@ -34,7 +35,7 @@ NoteChartListButton.reloadTextFrame = function(self)
 	textFrame.h = self.h
 	textFrame.limit = self.w * self.columnWidth[1]
 	textFrame.align = self.inputModeTextAlign
-	textFrame.text = self.item.noteChartDataEntry.inputMode
+	textFrame.text = AliasManager:getAlias("inputMode", self.item.noteChartDataEntry.inputMode)
 	textFrame.font = self.inputModeFont
 	textFrame.color = self.textColor
 	textFrame.cs = self.cs
