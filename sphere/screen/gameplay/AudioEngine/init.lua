@@ -81,7 +81,7 @@ AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
 			audio:setRate(self.timeRate)
 			audio:setBaseVolume(paths[i][2])
 			if self.forcePosition then
-				audio:setPosition(self.currentTime)
+				audio:setPosition(self.currentTime - audio.offset)
 			end
 			if layer == "background" then
 				self.backgroundContainer:add(audio)

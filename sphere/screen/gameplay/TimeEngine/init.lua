@@ -94,7 +94,7 @@ TimeEngine.receive = function(self, event)
 			self:setTimeRate(-self.timeRate)
 		elseif key == Config:get("gameplay.skipIntro") then
 			local skipTime = self.noteChart.metaData:get("minTime") - 2
-			if self.currentTime < skipTime and self:getBaseTimeRate() ~= 0 then
+			if self.currentTime < skipTime and self.timeRate ~= 0 then
 				self:setPosition(skipTime)
 			end
 		end
