@@ -248,8 +248,9 @@ Automap.apply = function(self)
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 			if
-				noteData.noteType == "ShortNote" or
-				noteData.noteType == "LongNoteStart"
+				(noteData.noteType == "ShortNote" or
+				noteData.noteType == "LongNoteStart") and
+				noteData.inputType == "key"
 			then
 				noteDatas[#noteDatas + 1] = noteData
 			end
