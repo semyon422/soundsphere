@@ -8,6 +8,11 @@ CollectionManager.getPaths = function(self)
 		packPathsDict[chartSetData.path:match("^(.+)/.-$")] = true
 	end
 	
+	local directoryItems = love.filesystem.getDirectoryItems("userdata/charts")
+	for _, name in ipairs(directoryItems) do
+		packPathsDict["userdata/charts/" .. name] = true
+	end
+	
 	local packPaths = {}
 	for path in pairs(packPathsDict) do
 		packPaths[#packPaths + 1] = path
