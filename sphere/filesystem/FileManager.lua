@@ -36,18 +36,21 @@ local sortPaths = function(a, b)
 end
 
 FileManager.addPath = function(self, path, priority)
-	if not self.priority[path] then
-		self.paths[#self.paths + 1] = path
+	local paths = self.paths
+	local spriority = self.priority
+	if not spriority[path] then
+		paths[#paths + 1] = path
 	end
-	self.priority[path] = priority or 0
-	table.sort(self.paths, sortPaths)
+	spriority[path] = priority or 0
+	table.sort(paths, sortPaths)
 end
 
 FileManager.removePath = function(self, path)
+	local paths = self.paths
 	self.priority[path] = nil
-	for i = 1, #self.paths do
-		if self.paths[i] == path then
-			table.remove(self.paths, i)
+	for i = 1, #paths do
+		if paths[i] == path then
+			table.remove(paths, i)
 		end
 	end
 end

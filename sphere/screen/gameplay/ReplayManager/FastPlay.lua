@@ -62,6 +62,7 @@ FastPlay.load = function(self)
 	local scoreEngine = ScoreEngine:new()
 	self.scoreEngine = scoreEngine
 	scoreEngine.noteChart = noteChart
+	scoreEngine.timeEngine = timeEngine
 	scoreEngine:load()
 	timeEngine.observable:add(scoreEngine)
 

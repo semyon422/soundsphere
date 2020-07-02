@@ -6,18 +6,21 @@ local CustomList		= require("sphere.ui.CustomList")
 
 local ScoreListButton = CustomList.Button:new()
 
-ScoreListButton.scoreTextAlign = {x = "right", y = "center"}
+ScoreListButton.scoreTextAlign = {x = "right", y = "top"}
 ScoreListButton.dateTextAlign = {x = "right", y = "center"}
+ScoreListButton.modifiersTextAlign = {x = "right", y = "bottom"}
 
 ScoreListButton.columnX = {0, 0.5}
 ScoreListButton.columnWidth = {0.5, 0.45}
 
 ScoreListButton.construct = function(self)
-	self.scoreFont = aquafonts.getFont(spherefonts.SourceCodeProRegular, 22)
+	self.scoreFont = aquafonts.getFont(spherefonts.SourceCodeProRegular, 18)
 	self.dateFont = aquafonts.getFont(spherefonts.SourceCodeProRegular, 14)
+	self.modifiersFont = aquafonts.getFont(spherefonts.SourceCodeProRegular, 12)
 	
 	self.scoreTextFrame = TextFrame:new()
 	self.dateTextFrame = TextFrame:new()
+	self.modifiersTextFrame = TextFrame:new()
 	
 	CustomList.Button.construct(self)
 end
@@ -52,6 +55,21 @@ ScoreListButton.reloadTextFrame = function(self)
 	textFrame.cs = self.cs
 	
 	textFrame:reload()
+	
+	local textFrame = self.modifiersTextFrame
+	
+	textFrame.x = self.x + self.w * self.columnX[2]
+	textFrame.y = self.y
+	textFrame.w = self.w * self.columnWidth[2]
+	textFrame.h = self.h
+	textFrame.limit = self.w * self.columnWidth[2]
+	textFrame.align = self.modifiersTextAlign
+	textFrame.text = self.item.scoreEntry.modifiers
+	textFrame.font = self.modifiersFont
+	textFrame.color = self.textColor
+	textFrame.cs = self.cs
+	
+	textFrame:reload()
 end
 
 ScoreListButton.draw = function(self)
@@ -62,6 +80,7 @@ ScoreListButton.draw = function(self)
 	self.background:draw()
 	self.dateTextFrame:draw()
 	self.scoreTextFrame:draw()
+	self.modifiersTextFrame:draw()
 	if self.enableStencil then
 		self.stencil:set()
 	end

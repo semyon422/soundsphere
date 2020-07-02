@@ -1,5 +1,6 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
+local json				= require("json")
 
 local Replay = Class:new()
 
@@ -28,6 +29,26 @@ end
 
 Replay.getNextEvent = function(self)
 	return self.events[self.eventOffset + 1]
+end
+
+Replay.toString = function(self)
+	return json.encode({
+		hash = self.noteChartDataEntry.hash,
+		index = self.noteChartDataEntry.index,
+		modifiers = self.modifierSequence:toTable(),
+		events = self.events
+	})
+end
+
+Replay.fromString = function(self, s)
+	local object = json.decode(s)
+
+	self.hash = object.hash
+	self.index = object.hash
+	self.modifiers = object.modifiers
+	self.events = object.events
+
+	return self
 end
 
 return Replay

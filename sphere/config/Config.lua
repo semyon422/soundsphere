@@ -66,7 +66,6 @@ Config.defaultValues = {
 	
 	["speed"] = 1,
 	["fps"] = 240,
-	-- ["tps"] = 240,
 	
 	["volume.global"] = 1,
 	["volume.music"] = 1,

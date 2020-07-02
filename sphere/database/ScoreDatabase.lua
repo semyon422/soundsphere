@@ -14,7 +14,8 @@ ScoreDatabase.scoresColumns = {
 	"accuracy",
 	"maxCombo",
 	"scoreRating",
-	"mods"
+	"modifiers",
+	"replayHash"
 }
 
 ScoreDatabase.scoresNumberColumns = {
@@ -35,7 +36,8 @@ local createTableRequest = [[
 		`accuracy` REAL,
 		`maxCombo` INTEGER,
 		`scoreRating` REAL,
-		`mods` TEXT
+		`modifiers` TEXT,
+		`replayHash` TEXT
 	);
 ]]
 
@@ -49,9 +51,10 @@ local insertScoreRequest = [[
 		accuracy,
 		maxCombo,
 		scoreRating,
-		mods
+		modifiers,
+		replayHash
 	)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 ]]
 
 local selectScoreRequest = [[
@@ -91,7 +94,8 @@ ScoreDatabase.insertScore = function(self, scoreData)
 		scoreData.accuracy,
 		scoreData.maxCombo,
 		scoreData.scoreRating,
-		scoreData.mods
+		scoreData.modifiers,
+		scoreData.replayHash
 	):step()
 end
 

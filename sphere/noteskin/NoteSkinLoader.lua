@@ -33,10 +33,6 @@ NoteSkinLoader.loadEmptySkin = function(self)
 	return noteSkin
 end
 
-NoteSkinLoader.loadTomlSimpleV1 = function(self, metaData)
-	return TomlNoteSkinLoader:new():load(metaData, 1)
-end
-
 NoteSkinLoader.loadTomlSimpleLatest = function(self, metaData)
 	return TomlNoteSkinLoader:new():load(metaData)
 end
