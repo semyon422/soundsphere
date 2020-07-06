@@ -21,7 +21,9 @@ ScoreDatabase.scoresNumberColumns = {
 	"id",
 	"noteChartIndex",
 	"time",
-	"maxCombo"
+	"score",
+	"maxCombo",
+	"scoreRating"
 }
 
 local createTableRequest = [[
