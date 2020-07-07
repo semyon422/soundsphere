@@ -1,11 +1,9 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
-local Container			= require("aqua.graphics.Container")
 local Image				= require("aqua.graphics.Image")
 local SpriteBatch		= require("aqua.graphics.SpriteBatch")
 local map				= require("aqua.math").map
-local sign				= require("aqua.math").sign
 local Class				= require("aqua.util.Class")
-local Config			= require("sphere.config.Config")
+local GameConfig		= require("sphere.config.GameConfig")
 local tween				= require("tween")
 
 local NoteSkin = Class:new()
@@ -105,7 +103,7 @@ NoteSkin.setVisualTimeRate = function(self, visualTimeRate)
 		self.updateTween = true
 		self.visualTimeRateTween = tween.new(0.25, self, {visualTimeRate = visualTimeRate}, "inOutQuad")
 	end
-	Config.data.speed = visualTimeRate
+	GameConfig:set("speed", visualTimeRate)
 end
 
 NoteSkin.getVisualTimeRate = function(self)

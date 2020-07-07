@@ -1,17 +1,20 @@
 local Observable	= require("aqua.util.Observable")
+local Class			= require("aqua.util.Class")
 local json			= require("json")
 
-local Config = {}
+local Config = Class:new()
 
-Config.path = "userdata/config.json"
+Config.path = "config.json"
+Config.defaultValues = {}
 
-Config.init = function(self)
+Config.construct = function(self)
 	self.data = {}
 	self.observable = Observable:new()
+	self:setDefaultValues()
 end
 
-Config.send = function(self, event)
-	return self.observable:send(event)
+Config.setPath = function(self, path)
+	self.path = path
 end
 
 Config.read = function(self)
@@ -35,57 +38,19 @@ end
 
 Config.set = function(self, key, value)
 	self.data[key] = value
-	return self:send({
+	return self.observable:send({
 		name = "Config.set",
 		key = key,
 		value = value
 	})
 end
 
-Config.setNoEvent = function(self, key, value)
-	self.data[key] = value
-end
-
 Config.setDefaultValues = function(self)
 	local data = self.data
-	
+
 	for key, value in pairs(self.defaultValues) do
 		data[key] = data[key] ~= nil and data[key] or value
 	end
 end
-
-Config.defaultValues = {
-	["cb"] = false,
-	["kb"] = "",
-
-	["audio.primaryAudioMode"] = "streamMemoryReversable",
-	["audio.secondaryAudioMode"] = "sample",
-	
-	["dim.select"] = 0.5,
-	["dim.gameplay"] = 0.75,
-	
-	["speed"] = 1,
-	["fps"] = 240,
-	-- ["tps"] = 240,
-	
-	["volume.global"] = 1,
-	["volume.music"] = 1,
-	["volume.effects"] = 1,
-	
-	["screen.settings"] = "f1",
-	["screen.browser"] = "tab",
-	["gameplay.pause"] = "escape",
-	["gameplay.skipIntro"] = "space",
-	["gameplay.quickRestart"] = "`",
-	["select.selectRandomNoteChartSet"] = "f2",
-
-	["gameplay.invertPlaySpeed"] = "f2",
-	["gameplay.decreasePlaySpeed"] = "f3",
-	["gameplay.increasePlaySpeed"] = "f4",
-
-	["gameplay.invertTimeRate"] = "f7",
-	["gameplay.decreaseTimeRate"] = "f5",
-	["gameplay.increaseTimeRate"] = "f6"
-}
 
 return Config

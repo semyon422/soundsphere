@@ -1,5 +1,4 @@
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
-local CacheDatabase				= require("sphere.database.CacheDatabase")
 local CacheManager				= require("sphere.database.CacheManager")
 local ThreadPool				= require("aqua.thread.ThreadPool")
 local Log						= require("aqua.util.Log")

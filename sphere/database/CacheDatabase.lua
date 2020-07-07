@@ -1,5 +1,3 @@
-local ThreadPool		= require("aqua.thread.ThreadPool")
-local Log				= require("aqua.util.Log")
 local sqlite			= require("ljsqlite3")
 
 local CacheDatabase = {}

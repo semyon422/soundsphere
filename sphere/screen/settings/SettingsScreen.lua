@@ -1,4 +1,4 @@
-local Config			= require("sphere.config.Config")
+local GameConfig		= require("sphere.config.GameConfig")
 local Screen			= require("sphere.screen.Screen")
 local ScreenManager		= require("sphere.screen.ScreenManager")
 local SettingsList		= require("sphere.screen.Settings.SettingsList")
@@ -32,7 +32,7 @@ SettingsScreen.load = function(self)
 end
 
 SettingsScreen.unload = function(self)
-	Config:write()
+	GameConfig:write()
 end
 
 SettingsScreen.update = function(self)
@@ -53,7 +53,7 @@ SettingsScreen.draw = function(self)
 end
 
 SettingsScreen.receive = function(self, event)
-	if event.name == "keypressed" and event.args[1] == Config:get("screen.settings") then
+	if event.name == "keypressed" and event.args[1] == GameConfig:get("screen.settings") then
 		return ScreenManager:set(require("sphere.screen.select.SelectScreen"))
 	elseif event.name == "resize" then
 		SettingsList:reload()

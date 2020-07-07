@@ -1,10 +1,9 @@
 local Observable		= require("aqua.util.Observable")
 local NoteChartList  	= require("sphere.screen.select.NoteChartList")
 local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
-local PreviewManager	= require("sphere.screen.select.PreviewManager")
 local CacheManager		= require("sphere.database.CacheManager")
 local json				= require("json")
-local Config			= require("sphere.config.Config")
+local GameConfig		= require("sphere.config.GameConfig")
 
 local NoteChartStateManager = {}
 
@@ -155,7 +154,7 @@ NoteChartStateManager.receive = function(self, event)
 		
 		NoteChartSetList:quickScrollToItemIndex(NoteChartSetList:getItemIndex(noteChartSetEntry))
 		NoteChartSetList:sendState()
-	elseif event.name == "keypressed" and event.args[1] == Config:get("select.selectRandomNoteChartSet") then
+	elseif event.name == "keypressed" and event.args[1] == GameConfig:get("select.selectRandomNoteChartSet") then
 		NoteChartSetList:quickScrollToItemIndex(math.random(1, #NoteChartSetList.items))
 		NoteChartSetList:sendState()
 	end

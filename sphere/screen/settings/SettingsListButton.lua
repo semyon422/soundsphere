@@ -2,7 +2,7 @@ local aquafonts			= require("aqua.assets.fonts")
 local TextFrame			= require("aqua.graphics.TextFrame")
 local map				= require("aqua.math").map
 local spherefonts		= require("sphere.assets.fonts")
-local Config			= require("sphere.config.Config")
+local GameConfig		= require("sphere.config.GameConfig")
 local KeybindEditButton	= require("sphere.screen.settings.KeybindEditButton")
 local Checkbox			= require("sphere.ui.Checkbox")
 local CustomList		= require("sphere.ui.CustomList")
@@ -64,7 +64,7 @@ SettingsListButton.reload = function(self)
 		slider.rectangleColor = self.sliderRectangleColor
 		slider.circleColor = self.sliderCircleColor
 		slider.cs = self.cs
-		slider.value = Config:get(self.item.configKey)
+		slider.value = GameConfig:get(self.item.configKey)
 		
 		slider:reload()
 	elseif self.item.type == "listSwitcher" then
@@ -76,7 +76,7 @@ SettingsListButton.reload = function(self)
 		listSwitcher.h = self.h
 		listSwitcher.cs = self.cs
 
-		local configValue = Config:get(self.item.configKey)
+		local configValue = GameConfig:get(self.item.configKey)
 		local valueList = self.item.valueList
 		for i = 1, #valueList do
 			if valueList[i] == configValue then
@@ -93,7 +93,7 @@ SettingsListButton.reload = function(self)
 		checkbox.w = self.w * self.columnWidth[3]
 		checkbox.h = self.h
 		checkbox.cs = self.cs
-		checkbox.value = Config:get(self.item.configKey)
+		checkbox.value = GameConfig:get(self.item.configKey)
 		
 		checkbox:reload()
 	elseif self.item.type == "keybind" then
@@ -104,7 +104,7 @@ SettingsListButton.reload = function(self)
 		keybindEditButton.w = self.w * self.columnWidth[3]
 		keybindEditButton.h = self.h
 		keybindEditButton.cs = self.cs
-		keybindEditButton.value = Config:get(self.item.configKey)
+		keybindEditButton.value = GameConfig:get(self.item.configKey)
 		
 		keybindEditButton:reload()
 	end
@@ -203,9 +203,9 @@ end
 
 SettingsListButton.updateValue = function(self, value)
 	if self.item.type == "listSwitcher" then
-		Config:set(self.item.configKey, self.item.valueList[value])
+		GameConfig:set(self.item.configKey, self.item.valueList[value])
 	else
-		Config:set(self.item.configKey, value)
+		GameConfig:set(self.item.configKey, value)
 	end
 
 	self.valueTextFrame.text = self:getDisplayValue(value)

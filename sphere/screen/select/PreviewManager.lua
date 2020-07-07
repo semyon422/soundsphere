@@ -1,10 +1,10 @@
 local AudioFactory	= require("aqua.audio.AudioFactory")
-local Config		= require("sphere.config.Config")
+local GameConfig	= require("sphere.config.GameConfig")
 
 local PreviewManager = {}
 
 PreviewManager.init = function(self)
-	Config.observable:add(self)
+	GameConfig.observable:add(self)
 end
 
 PreviewManager.playAudio = function(self, path, position)
@@ -24,7 +24,7 @@ PreviewManager.playAudio = function(self, path, position)
 	self.position = position
 	self.audio = AudioFactory:getStream(path)
 	self.audio:setPosition(position)
-	self.audio:setVolume(Config:get("volume.global") * Config:get("volume.music"))
+	self.audio:setVolume(GameConfig:get("volume.global") * GameConfig:get("volume.music"))
 	self.audio:play()
 end
 
@@ -47,7 +47,7 @@ end
 
 PreviewManager.receive = function(self, event)
 	if self.audio and event.name == "Config.set" and (event.key == "volume.global" or event.key == "volume.music") then
-		self.audio:setVolume(Config:get("volume.global") * Config:get("volume.music"))
+		self.audio:setVolume(GameConfig:get("volume.global") * GameConfig:get("volume.music"))
 	end
 end
 

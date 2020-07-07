@@ -1,7 +1,7 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
 local tween				= require("tween")
-local Config			= require("sphere.config.Config")
+local GameConfig		= require("sphere.config.GameConfig")
 local TimeManager		= require("sphere.screen.gameplay.TimeEngine.TimeManager")
 
 local TimeEngine = Class:new()
@@ -74,7 +74,7 @@ TimeEngine.receive = function(self, event)
 		local key = event.args[1]
 		local delta = 0.05
 		
-		if key == Config:get("gameplay.decreaseTimeRate") then
+		if key == GameConfig:get("gameplay.decreaseTimeRate") then
 			if self.targetTimeRate - delta >= 0.1 then
 				self.targetTimeRate = self.targetTimeRate - delta
 				self:setTimeRate(self.targetTimeRate)
@@ -83,16 +83,16 @@ TimeEngine.receive = function(self, event)
 				name = "notify",
 				text = "timeRate: " .. self.targetTimeRate
 			})
-		elseif key == Config:get("gameplay.increaseTimeRate") then
+		elseif key == GameConfig:get("gameplay.increaseTimeRate") then
 			self.targetTimeRate = self.targetTimeRate + delta
 			self:setTimeRate(self.targetTimeRate)
 			return self.observable:send({
 				name = "notify",
 				text = "timeRate: " .. self.targetTimeRate
 			})
-		elseif key == Config:get("gameplay.invertTimeRate") then
+		elseif key == GameConfig:get("gameplay.invertTimeRate") then
 			self:setTimeRate(-self.timeRate)
-		elseif key == Config:get("gameplay.skipIntro") then
+		elseif key == GameConfig:get("gameplay.skipIntro") then
 			local skipTime = self.noteChart.metaData:get("minTime") - 2
 			if self.currentTime < skipTime and self.timeRate ~= 0 then
 				self:setPosition(skipTime)

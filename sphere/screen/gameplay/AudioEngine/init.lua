@@ -2,8 +2,7 @@ local AudioFactory		= require("aqua.audio.AudioFactory")
 local AudioContainer	= require("aqua.audio.Container")
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
-local sound				= require("aqua.sound")
-local Config			= require("sphere.config.Config")
+local GameConfig		= require("sphere.config.GameConfig")
 local SoundNoteFactory	= require("sphere.screen.gameplay.AudioEngine.SoundNoteFactory")
 
 local AudioEngine = Class:new()
@@ -21,8 +20,8 @@ AudioEngine.load = function(self)
 	self.backgroundContainer = AudioContainer:new()
 	self.foregroundContainer = AudioContainer:new()
 	
-	self.backgroundContainer:setVolume(Config:get("volume.global") * Config:get("volume.music"))
-	self.foregroundContainer:setVolume(Config:get("volume.global") * Config:get("volume.effects"))
+	self.backgroundContainer:setVolume(GameConfig:get("volume.global") * GameConfig:get("volume.music"))
+	self.foregroundContainer:setVolume(GameConfig:get("volume.global") * GameConfig:get("volume.effects"))
 end
 
 AudioEngine.update = function(self)
@@ -58,9 +57,9 @@ AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
 
 		local mode
 		if stream then
-			mode = Config:get("audio.primaryAudioMode")
+			mode = GameConfig:get("audio.primaryAudioMode")
 		else
-			mode = Config:get("audio.secondaryAudioMode")
+			mode = GameConfig:get("audio.secondaryAudioMode")
 		end
 
 		local apath = aliases[paths[i][1]]

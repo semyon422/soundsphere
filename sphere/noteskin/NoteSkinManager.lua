@@ -1,6 +1,6 @@
-local Config	= require("sphere.config.Config")
-local json		= require("json")
-local ncdk		= require("ncdk")
+local GameConfig	= require("sphere.config.GameConfig")
+local json			= require("json")
+local ncdk			= require("ncdk")
 
 local NoteSkinManager = {}
 
@@ -57,7 +57,7 @@ NoteSkinManager.setDefaultNoteSkin = function(self, inputMode, metaData)
 		inputMode = inputMode:getString()
 	end
 
-	return Config:setNoEvent("noteskin." .. inputMode, metaData.directoryPath .. "/" .. metaData.path)
+	return GameConfig:set("noteskin." .. inputMode, metaData.directoryPath .. "/" .. metaData.path)
 end
 
 NoteSkinManager.getMetaData = function(self, inputMode)
@@ -66,7 +66,7 @@ NoteSkinManager.getMetaData = function(self, inputMode)
 	end
 
 	local list = self:getMetaDataList(inputMode)
-	local configValue = Config:get("noteskin." .. inputMode:getString())
+	local configValue = GameConfig:get("noteskin." .. inputMode:getString())
 	
 	if configValue then
 		for _, metaData in ipairs(list) do

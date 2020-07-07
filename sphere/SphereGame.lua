@@ -2,13 +2,12 @@ local aquaevent					= require("aqua.event")
 local CoordinateManager			= require("aqua.graphics.CoordinateManager")
 local ThreadPool				= require("aqua.thread.ThreadPool")
 local MainLog					= require("sphere.MainLog")
-local Config					= require("sphere.config.Config")
+local GameConfig				= require("sphere.config.GameConfig")
 local ScoreManager				= require("sphere.database.ScoreManager")
 local ScoreDatabase				= require("sphere.database.ScoreDatabase")
 local DiscordPresence			= require("sphere.discord.DiscordPresence")
 local MountManager				= require("sphere.filesystem.MountManager")
 local ScreenManager				= require("sphere.screen.ScreenManager")
-local TransitionManager			= require("sphere.screen.TransitionManager")
 local SelectScreen				= require("sphere.screen.select.SelectScreen")
 local BackgroundManager			= require("sphere.ui.BackgroundManager")
 local CLI						= require("sphere.ui.CLI")
@@ -25,38 +24,33 @@ SphereGame.run = function(self)
 end
 
 SphereGame.init = function(self)
-	Config:init()
 	MainLog:init()
-	
+
 	ScoreDatabase:init()
 	NoteChartManager:init()
-	
+
 	ScreenManager:init()
 	BackgroundManager:init()
 	NotificationLine:init()
 	CLI:init()
 	OverlayMenu:init()
-	
+
 	aquaevent:add(self)
 end
 
 SphereGame.load = function(self)
 	MountManager:mount()
 
-	-- NoteChartManager:generateCacheFull()
-	-- print("complete")
 	NoteChartManager:load()
 
 	ScoreManager:select()
-	Config:read()
-	Config:write()
-	
-	Config.observable:add(self)
-	aquaevent.fpslimit = Config.data.fps
-	aquaevent.tpslimit = Config.data.tps
-	
+	GameConfig:read()
+
+	GameConfig.observable:add(self)
+	aquaevent.fpslimit = GameConfig.data.fps
+
 	DiscordPresence:load()
-	
+
 	ScreenManager:set(SelectScreen)
 	WindowManager:load()
 end
@@ -64,12 +58,12 @@ end
 SphereGame.unload = function(self)
 	ScreenManager:unload()
 	DiscordPresence:unload()
-	Config:write()
+	GameConfig:write()
 end
 
 SphereGame.update = function(self, dt)
 	ThreadPool:update()
-	
+
 	DiscordPresence:update()
 	BackgroundManager:update(dt)
 	NotificationLine:update()
@@ -103,7 +97,7 @@ SphereGame.receive = function(self, event)
 			aquaevent.tpslimit = event.value
 		end
 	end
-	
+
 	local overlayHidden = OverlayMenu.hidden
 	OverlayMenu:receive(event)
 	if CLI.hidden and overlayHidden or event.name == "resize" then

@@ -1,4 +1,4 @@
-local Config					= require("sphere.config.Config")
+local GameConfig				= require("sphere.config.GameConfig")
 local NoteChartFactory			= require("notechart.NoteChartFactory")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 local NoteSkinManager			= require("sphere.noteskin.NoteSkinManager")
@@ -159,7 +159,7 @@ GameplayScreen.load = function(self)
 	ReplayManager.logicEngine = logicEngine
 	ReplayManager:load()
 	
-	local dim = 255 * (1 - Config:get("dim.gameplay"))
+	local dim = 255 * (1 - GameConfig:get("dim.gameplay"))
 	local color = {dim, dim, dim}
 	NoteChartResourceLoader:load(self.noteChartEntry.path, noteChart, function()
 		audioEngine.localAliases = NoteChartResourceLoader.localAliases

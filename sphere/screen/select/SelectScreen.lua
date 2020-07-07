@@ -1,6 +1,5 @@
-local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local NoteChartFactory	= require("notechart.NoteChartFactory")
-local Config			= require("sphere.config.Config")
+local GameConfig		= require("sphere.config.GameConfig")
 local NoteSkinManager	= require("sphere.noteskin.NoteSkinManager")
 local Screen			= require("sphere.screen.Screen")
 local ScreenManager		= require("sphere.screen.ScreenManager")
@@ -83,7 +82,7 @@ SelectScreen.load = function(self)
 	
 	NoteChartSetList:sendState()
 	
-	local dim = 255 * (1 - Config:get("dim.select"))
+	local dim = 255 * (1 - GameConfig:get("dim.select"))
 	BackgroundManager:setColor({dim, dim, dim})
 end
 
@@ -152,9 +151,9 @@ SelectScreen.receive = function(self, event)
 		GameplayScreen.noteChartEntry = event.noteChartEntry
 		GameplayScreen.noteChartDataEntry = event.noteChartDataEntry
 		return ScreenManager:set(GameplayScreen)
-	elseif event.name == "keypressed" and event.args[1] == Config:get("screen.browser") then
+	elseif event.name == "keypressed" and event.args[1] == GameConfig:get("screen.browser") then
 		return ScreenManager:set(require("sphere.screen.browser.BrowserScreen"))
-	elseif event.name == "keypressed" and event.args[1] == Config:get("screen.settings") then
+	elseif event.name == "keypressed" and event.args[1] == GameConfig:get("screen.settings") then
 		return ScreenManager:set(require("sphere.screen.settings.SettingsScreen"))
 	elseif event.backgroundPath then
 		return BackgroundManager:loadDrawableBackground(event.backgroundPath)

@@ -1,4 +1,4 @@
-local Config				= require("sphere.config.Config")
+local GameConfig			= require("sphere.config.GameConfig")
 local Screen				= require("sphere.screen.Screen")
 local ScreenManager			= require("sphere.screen.ScreenManager")
 local BrowserList			= require("sphere.screen.browser.BrowserList")
@@ -43,7 +43,7 @@ BrowserScreen.draw = function(self)
 end
 
 BrowserScreen.receive = function(self, event)
-	if event.name == "keypressed" and event.args[1] == Config:get("screen.browser") then
+	if event.name == "keypressed" and event.args[1] == GameConfig:get("screen.browser") then
 		ScreenManager:set(require("sphere.screen.select.SelectScreen"))
 	end
 	

@@ -1,7 +1,7 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
 local NoteDrawer		= require("sphere.screen.gameplay.GraphicEngine.NoteDrawer")
-local Config			= require("sphere.config.Config")
+local GameConfig		= require("sphere.config.GameConfig")
 local tween				= require("tween")
 
 local GraphicEngine = Class:new()
@@ -20,8 +20,8 @@ GraphicEngine.load = function(self)
 	
 	self:loadNoteDrawers()
 	
-	self.noteSkin.visualTimeRate = Config.data.speed
-	self.noteSkin.targetVisualTimeRate = Config.data.speed
+	self.noteSkin.visualTimeRate = GameConfig:get("speed")
+	self.noteSkin.targetVisualTimeRate = GameConfig:get("speed")
 end
 
 GraphicEngine.update = function(self, dt)
@@ -58,14 +58,14 @@ GraphicEngine.receive = function(self, event)
 		local key = event.args[1]
 		local delta = 0.05
 		
-		if key == Config:get("gameplay.invertPlaySpeed") then
+		if key == GameConfig:get("gameplay.invertPlaySpeed") then
 			self.noteSkin.targetVisualTimeRate = -self.noteSkin.targetVisualTimeRate
 			self.noteSkin:setVisualTimeRate(self.noteSkin.targetVisualTimeRate)
 			return self.observable:send({
 				name = "notify",
 				text = "visualTimeRate: " .. self.noteSkin.targetVisualTimeRate
 			})
-		elseif key == Config:get("gameplay.decreasePlaySpeed") then
+		elseif key == GameConfig:get("gameplay.decreasePlaySpeed") then
 			if math.abs(self.noteSkin.targetVisualTimeRate - delta) > 0.001 then
 				self.noteSkin.targetVisualTimeRate = self.noteSkin.targetVisualTimeRate - delta
 				self.noteSkin:setVisualTimeRate(self.noteSkin.targetVisualTimeRate)
@@ -77,7 +77,7 @@ GraphicEngine.receive = function(self, event)
 				name = "notify",
 				text = "visualTimeRate: " .. self.noteSkin.targetVisualTimeRate
 			})
-		elseif key == Config:get("gameplay.increasePlaySpeed") then
+		elseif key == GameConfig:get("gameplay.increasePlaySpeed") then
 			if math.abs(self.noteSkin.targetVisualTimeRate + delta) > 0.001 then
 				self.noteSkin.targetVisualTimeRate = self.noteSkin.targetVisualTimeRate + delta
 				self.noteSkin:setVisualTimeRate(self.noteSkin.targetVisualTimeRate)
