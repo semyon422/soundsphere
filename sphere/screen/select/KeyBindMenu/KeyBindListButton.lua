@@ -99,7 +99,7 @@ KeyBindListButton.getValue = function(self)
 end
 
 KeyBindListButton.getDisplayValue = function(self)
-	return self:getValue(value)
+	return self:getValue()
 end
 
 KeyBindListButton.getSelectedInputMode = function(self)

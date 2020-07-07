@@ -307,7 +307,6 @@ CacheManager.getEmptyNoteChartDataEntry = function(self, path)
 		tags = "",
 		name = path:match(".+/(.-)$"),
 		creator = "",
-		level = 0,
 		audioPath = "",
 		stagePath = "",
 		previewTime = 0,
@@ -316,7 +315,7 @@ CacheManager.getEmptyNoteChartDataEntry = function(self, path)
 		length = 0,
 		bpm = 0,
 		level = 0,
-		difficultyRat = 0
+		difficultyRate = 0
 	}
 end
 

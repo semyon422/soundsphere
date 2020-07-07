@@ -14,7 +14,7 @@ end
 
 VideoNote.timeRate = 0
 
-VideoNote.update = function(self)
+VideoNote.update = function(self, dt)
 	if not self:tryNext() then
 		local video = self.video
 		if video then
