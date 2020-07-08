@@ -54,4 +54,6 @@ end
 PreviewManager.reload = function(self, event)
 end
 
+PreviewManager:init()
+
 return PreviewManager

@@ -55,4 +55,6 @@ ResultScreen.receive = function(self, event)
 	end
 end
 
+ResultScreen:init()
+
 return ResultScreen

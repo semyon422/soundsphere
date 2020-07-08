@@ -42,4 +42,6 @@ ModifierManager.getSequence = function(self)
 	return self.sequence
 end
 
+ModifierManager:init()
+
 return ModifierManager

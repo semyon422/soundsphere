@@ -67,4 +67,6 @@ SettingsScreen.receive = function(self, event)
 	self.gui:receive(event)
 end
 
+SettingsScreen:init()
+
 return SettingsScreen

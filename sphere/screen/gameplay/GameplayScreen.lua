@@ -225,4 +225,6 @@ GameplayScreen.draw = function(self)
 	PauseOverlay:draw()
 end
 
+GameplayScreen:init()
+
 return GameplayScreen

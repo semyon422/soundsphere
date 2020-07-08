@@ -51,4 +51,6 @@ BrowserScreen.receive = function(self, event)
 	self.gui:receive(event)
 end
 
+BrowserScreen:init()
+
 return BrowserScreen

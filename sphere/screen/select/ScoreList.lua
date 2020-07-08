@@ -67,4 +67,6 @@ ScoreList.selectScores = function(self)
 	return self:setItems(items)
 end
 
+ScoreList:init()
+
 return ScoreList

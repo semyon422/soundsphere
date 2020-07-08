@@ -45,7 +45,7 @@ NoteChartSetList.receive = function(self, event)
 			self.keyControl = true
 		end
 	end
-	
+
 	return CacheList.receive(self, event)
 end
 
@@ -53,12 +53,12 @@ NoteChartSetList.checkNoteChartSetEntry = function(self, entry)
 	local base = entry.path:find(self.basePath, 1, true)
 	if not base then return false end
 	if not self.needSearch then return true end
-	
+
 	local list = CacheManager:getNoteChartsAtSet(entry.id)
 	if not list or not list[1] then
 		return
 	end
-	
+
 	for i = 1, #list do
 		local entries = CacheManager:getAllNoteChartDataEntries(list[i].hash)
 		for _, entry in pairs(entries) do
@@ -87,7 +87,7 @@ end
 
 NoteChartSetList.selectCache = function(self)
 	local items = {}
-	
+
 	local noteChartSetEntries = CacheManager:getNoteChartSets()
 	for i = 1, #noteChartSetEntries do
 		local noteChartSetEntry = noteChartSetEntries[i]
@@ -98,11 +98,11 @@ NoteChartSetList.selectCache = function(self)
 			}
 		end
 	end
-	
+
 	if self.needItemsSort then
 		table.sort(items, self.sortItemsFunction)
 	end
-	
+
 	return self:setItems(items)
 end
 
@@ -110,15 +110,17 @@ NoteChartSetList.getItemIndex = function(self, entry)
 	if not entry then
 		return 1
 	end
-	
+
 	local items = self.items
 	for i = 1, #items do
 		if items[i].noteChartSetEntry == entry then
 			return i
 		end
 	end
-	
+
 	return 1
 end
+
+NoteChartSetList:init()
 
 return NoteChartSetList

@@ -3,7 +3,7 @@ local Log			= require("aqua.util.Log")
 
 local ScoreManager = {}
 
-ScoreDatabase.init = function(self)
+ScoreManager.init = function(self)
 	self.log = Log:new()
 	self.log.console = true
 	self.log.path = "userdata/scores.log"
@@ -21,12 +21,9 @@ ScoreManager.select = function(self)
 
 	local scores = {}
 	self.scores = scores
-	
-	local scoreColumns = ScoreDatabase.scoreColumns
-	local scoreNumberColumns = ScoreDatabase.scoreNumberColumns
 
 	local selectScoresStatement = ScoreDatabase.selectScoresStatement
-	
+
 	local stmt = selectScoresStatement:reset()
 	local row = stmt:step()
 	while row do
@@ -35,18 +32,18 @@ ScoreManager.select = function(self)
 
 		row = stmt:step()
 	end
-	
+
 	local scoresId = {}
 	self.scoresId = scoresId
-	
+
 	for i = 1, #scores do
 		local entry = scores[i]
 		scoresId[entry.id] = entry
 	end
-	
+
 	local scoresHashIndex = {}
 	self.scoresHashIndex = scoresHashIndex
-	
+
 	for i = 1, #scores do
 		local entry = scores[i]
 		local hash = entry.noteChartHash
@@ -100,5 +97,7 @@ ScoreManager.getScoreEntries = function(self, hash, index)
 	local t = self.scoresHashIndex
 	return t[hash] and t[hash][index]
 end
+
+ScoreManager:init()
 
 return ScoreManager

@@ -3,7 +3,6 @@ local aquafonts				= require("aqua.assets.fonts")
 local CoordinateManager		= require("aqua.graphics.CoordinateManager")
 local Theme					= require("aqua.ui.Theme")
 local Observable			= require("aqua.util.Observable")
-local spherefonts			= require("sphere.assets.fonts")
 
 local SearchLine = Class:new()
 

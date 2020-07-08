@@ -62,4 +62,6 @@ NoteChartMenu.show = function(self)
 	self:reload()
 end
 
+NoteChartMenu:init()
+
 return NoteChartMenu

@@ -144,4 +144,6 @@ BackgroundManager.reload = function(self, event)
 	end
 end
 
+BackgroundManager:init()
+
 return BackgroundManager

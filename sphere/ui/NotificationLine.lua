@@ -78,4 +78,6 @@ NotificationLine.receive = function(self, event)
 	end
 end
 
+NotificationLine:init()
+
 return NotificationLine

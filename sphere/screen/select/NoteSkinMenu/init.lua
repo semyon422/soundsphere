@@ -21,7 +21,7 @@ NoteSkinMenu.init = function(self)
 		mode = "fill"
 	})
 	self.background:reload()
-	
+
 	NoteSkinList.menu = self
 	NoteSkinList:init()
 end
@@ -55,7 +55,7 @@ NoteSkinMenu.receive = function(self, event)
 	elseif event.name == "keypressed" and event.args[1] == "escape" then
 		self:hide()
 	end
-	
+
 	NoteSkinList:receive(event)
 end
 
@@ -69,5 +69,7 @@ NoteSkinMenu.show = function(self)
 
 	self:reload()
 end
+
+NoteSkinMenu:init()
 
 return NoteSkinMenu

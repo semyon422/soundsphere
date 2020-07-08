@@ -1,10 +1,9 @@
 local aquaevent					= require("aqua.event")
 local CoordinateManager			= require("aqua.graphics.CoordinateManager")
 local ThreadPool				= require("aqua.thread.ThreadPool")
-local MainLog					= require("sphere.MainLog")
 local GameConfig				= require("sphere.config.GameConfig")
 local ScoreManager				= require("sphere.database.ScoreManager")
-local ScoreDatabase				= require("sphere.database.ScoreDatabase")
+local CacheManager				= require("sphere.database.CacheManager")
 local DiscordPresence			= require("sphere.discord.DiscordPresence")
 local MountManager				= require("sphere.filesystem.MountManager")
 local ScreenManager				= require("sphere.screen.ScreenManager")
@@ -12,9 +11,7 @@ local SelectScreen				= require("sphere.screen.select.SelectScreen")
 local BackgroundManager			= require("sphere.ui.BackgroundManager")
 local CLI						= require("sphere.ui.CLI")
 local NotificationLine			= require("sphere.ui.NotificationLine")
-local OverlayMenu				= require("sphere.ui.OverlayMenu")
 local WindowManager				= require("sphere.window.WindowManager")
-local NoteChartManager			= require("sphere.database.NoteChartManager")
 
 local SphereGame = {}
 
@@ -24,16 +21,6 @@ SphereGame.run = function(self)
 end
 
 SphereGame.init = function(self)
-	MainLog:init()
-
-	ScoreDatabase:init()
-	NoteChartManager:init()
-
-	ScreenManager:init()
-	BackgroundManager:init()
-	NotificationLine:init()
-	CLI:init()
-	OverlayMenu:init()
 
 	aquaevent:add(self)
 end
@@ -41,8 +28,7 @@ end
 SphereGame.load = function(self)
 	MountManager:mount()
 
-	NoteChartManager:load()
-
+	CacheManager:select()
 	ScoreManager:select()
 	GameConfig:read()
 
@@ -69,7 +55,6 @@ SphereGame.update = function(self, dt)
 	NotificationLine:update()
 	ScreenManager:update(dt)
 	CLI:update()
-	OverlayMenu:update()
 end
 
 SphereGame.draw = function(self)
@@ -77,7 +62,6 @@ SphereGame.draw = function(self)
 	ScreenManager:draw()
 	NotificationLine:draw()
 	CLI:draw()
-	OverlayMenu:draw()
 end
 
 SphereGame.receive = function(self, event)
@@ -98,9 +82,7 @@ SphereGame.receive = function(self, event)
 		end
 	end
 
-	local overlayHidden = OverlayMenu.hidden
-	OverlayMenu:receive(event)
-	if CLI.hidden and overlayHidden or event.name == "resize" then
+	if CLI.hidden or event.name == "resize" then
 		ScreenManager:receive(event)
 		BackgroundManager:receive(event)
 		NotificationLine:receive(event)

@@ -7,18 +7,6 @@ ScreenManager.init = function(self)
 	self.currentScreen = Screen:new()
 
 	TransitionManager:init()
-	
-	local BrowserScreen		= require("sphere.screen.browser.BrowserScreen")
-	local GameplayScreen	= require("sphere.screen.gameplay.GameplayScreen")
-	local ResultScreen		= require("sphere.screen.result.ResultScreen")
-	local SelectScreen		= require("sphere.screen.select.SelectScreen")
-	local SettingsScreen	= require("sphere.screen.settings.SettingsScreen")
-	
-	BrowserScreen:init()
-	GameplayScreen:init()
-	ResultScreen:init()
-	SelectScreen:init()
-	SettingsScreen:init()
 end
 
 ScreenManager.set = function(self, screen, callback)
@@ -50,5 +38,7 @@ end
 ScreenManager.unload = function(self)
 	self.currentScreen:unload()
 end
+
+ScreenManager:init()
 
 return ScreenManager

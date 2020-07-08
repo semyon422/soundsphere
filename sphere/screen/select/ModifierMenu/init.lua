@@ -19,10 +19,10 @@ ModifierMenu.init = function(self)
 		mode = "fill"
 	})
 	self.background:reload()
-	
+
 	ModifierList:init()
 	ModifierList:load()
-	
+
 	SequenceList:init()
 	SequenceList:load()
 end
@@ -64,7 +64,7 @@ ModifierMenu.receive = function(self, event)
 	elseif event.name == "keypressed" and event.args[1] == "escape" then
 		self:hide()
 	end
-	
+
 	ModifierList:receive(event)
 	SequenceList:receive(event)
 end
@@ -73,5 +73,7 @@ ModifierMenu.show = function(self)
 	self.hidden = false
 	self:reload()
 end
+
+ModifierMenu:init()
 
 return ModifierMenu

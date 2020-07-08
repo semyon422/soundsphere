@@ -26,21 +26,7 @@ local SelectScreen = Screen:new()
 SelectScreen.init = function(self)
 	self.gui = SelectGUI:new()
 	self.gui.container = self.container
-	self.gui:load("userdata/interface/select.json")
-	
-	ModifierManager:init()
-	
-	ModifierMenu:init()
-	NoteSkinMenu:init()
-	KeyBindMenu:init()
-	NoteChartMenu:init()
 
-	ScoreList:init()
-	NoteChartList:init()
-	NoteChartSetList:init()
-	PreviewManager:init()
-
-	NoteChartStateManager:init()
 	NoteChartStateManager.observable:add(self)
 end
 
@@ -54,7 +40,7 @@ SelectScreen.getNoteChart = function(self)
 	file:open("r")
 	local content = file:read()
 	file:close()
-	
+
 	local status, noteCharts = NoteChartFactory:getNoteCharts(
 		path,
 		content,
@@ -64,29 +50,31 @@ SelectScreen.getNoteChart = function(self)
 end
 
 SelectScreen.load = function(self)
+	self.gui:load("userdata/interface/select.json")
 	self.gui:reload()
 
 	KeyBindMenu.SelectScreen = SelectScreen
 	NoteSkinMenu.SelectScreen = SelectScreen
-	
+
 	AliasManager:load()
 	NoteSkinManager:load()
 	ModifierManager:load()
 	ModifierMenu:reloadItems()
-	
+
 	ScoreList:load()
 	NoteChartList:load()
 	NoteChartSetList:load()
-	
+
 	NoteChartStateManager:load()
-	
+
 	NoteChartSetList:sendState()
-	
+
 	local dim = 255 * (1 - GameConfig:get("dim.select"))
 	BackgroundManager:setColor({dim, dim, dim})
 end
 
 SelectScreen.unload = function(self)
+	self.gui:unload()
 	PreviewManager:stop()
 	ModifierManager:unload()
 	NoteChartStateManager:unload()
@@ -94,12 +82,12 @@ end
 
 SelectScreen.update = function(self)
 	Screen.update(self)
-	
+
 	ScoreList:update()
 	NoteChartSetList:update()
 	NoteChartList:update()
 	PreviewManager:update()
-	
+
 	ModifierMenu:update()
 	NoteSkinMenu:update()
 	KeyBindMenu:update()
@@ -112,7 +100,7 @@ SelectScreen.draw = function(self)
 	NoteChartSetList:draw()
 	NoteChartList:draw()
 	ScoreList:draw()
-	
+
 	Screen.draw(self)
 
 	ModifierMenu:draw()
@@ -138,7 +126,7 @@ SelectScreen.receive = function(self, event)
 		) and event.name ~= "resize" then
 		return
 	end
-	
+
 	if event.action == "playNoteChart" then
 		if not love.filesystem.exists(event.noteChartEntry.path) then
 			return
@@ -164,12 +152,14 @@ SelectScreen.receive = function(self, event)
 		self.gui:reload()
 		return
 	end
-	
+
 	NoteChartSetList:receive(event)
 	NoteChartList:receive(event)
 	ScoreList:receive(event)
 	self.gui:receive(event)
 	NoteChartStateManager:receive(event)
 end
+
+SelectScreen:init()
 
 return SelectScreen

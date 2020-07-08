@@ -48,7 +48,7 @@ NoteChartList.receive = function(self, event)
 			self.keyControl = false
 		end
 	end
-	
+
 	return CacheList.receive(self, event)
 end
 
@@ -65,7 +65,7 @@ end
 
 NoteChartList.selectCache = function(self)
 	local items = {}
-	
+
 	local noteChartEntries = CacheManager:getNoteChartsAtSet(self.setId)
 	if not noteChartEntries or not noteChartEntries[1] then
 		return self:setItems(items)
@@ -93,11 +93,11 @@ NoteChartList.selectCache = function(self)
 			name = noteChartDataEntry.name
 		}
 	end
-	
+
 	if self.needItemsSort then
 		table.sort(items, self.sortItemsFunction)
 	end
-	
+
 	return self:setItems(items)
 end
 
@@ -105,14 +105,14 @@ NoteChartList.getBackgroundPath = function(self, itemIndex)
 	local item = self.items[itemIndex]
 	local noteChartDataEntry = item.noteChartDataEntry
 	local noteChartEntry = item.noteChartEntry
-	
+
 	local directoryPath = CacheManager:getNoteChartSetEntryById(noteChartEntry.setId).path
 	local stagePath = noteChartDataEntry.stagePath
 
 	if stagePath and stagePath ~= "" then
 		return directoryPath .. "/" .. stagePath
 	end
-	
+
 	return directoryPath
 end
 
@@ -120,7 +120,7 @@ NoteChartList.getAudioPath = function(self, itemIndex)
 	local item = self.items[itemIndex]
 	local noteChartDataEntry = item.noteChartDataEntry
 	local noteChartEntry = item.noteChartEntry
-	
+
 	local directoryPath = CacheManager:getNoteChartSetEntryById(noteChartEntry.setId).path
 	local audioPath = noteChartDataEntry.audioPath
 
@@ -145,15 +145,17 @@ NoteChartList.getItemIndex = function(self, entry)
 	if not entry then
 		return 1
 	end
-	
+
 	local items = self.items
 	for i = 1, #items do
 		if items[i].noteChartEntry == entry then
 			return i
 		end
 	end
-	
+
 	return 1
 end
+
+NoteChartList:init()
 
 return NoteChartList

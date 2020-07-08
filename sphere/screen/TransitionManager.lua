@@ -23,7 +23,7 @@ TransitionManager.update = function(self, dt)
 	if self.phase == 0 then
 		return
 	end
-	
+
 	if self.phase == 1 then
 		self.phase = 2
 		self.tween = tween.new(0.1, self, {alpha = 0}, "inOutQuad")
@@ -59,10 +59,10 @@ TransitionManager.transit = function(self, callbackMiddle, callbackEnd)
 	if self.needTransit then
 		return
 	end
-	
+
 	self.callbackMiddle = callbackMiddle
 	self.callbackEnd = callbackEnd
-	
+
 	self.needTransit = true
 	self.phase = 1
 end
@@ -72,7 +72,7 @@ TransitionManager.drawBefore = function(self)
 		return
 	end
 	self.isTransiting = true
-	
+
 	love.graphics.setShader(self.shader)
 	self.shader:send("alpha", self.alpha)
 end
@@ -81,7 +81,7 @@ TransitionManager.drawAfter = function(self)
 	if not self.isTransiting then
 		return
 	end
-	
+
 	love.graphics.setShader()
 	self.isTransiting = false
 end

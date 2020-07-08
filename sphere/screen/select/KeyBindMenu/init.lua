@@ -22,11 +22,11 @@ KeyBindMenu.init = function(self)
 		mode = "fill"
 	})
 	self.background:reload()
-	
+
 	KeyBindList.menu = self
 	KeyBindList:init()
 	KeyBindList.observable:add(self)
-	
+
 	BackgroundManager:setColor({63, 63, 63})
 end
 
@@ -60,12 +60,12 @@ KeyBindMenu.receive = function(self, event)
 	elseif event.name == "keypressed" and event.args[1] == "escape" then
 		self:hide()
 	end
-	
+
 	if event.name == "resize" then
 		KeyBindList:reload()
 		return
 	end
-	
+
 	KeyBindList:receive(event)
 end
 
@@ -80,5 +80,7 @@ KeyBindMenu.show = function(self)
 
 	self:reload()
 end
+
+KeyBindMenu:init()
 
 return KeyBindMenu

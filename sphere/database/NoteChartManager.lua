@@ -18,10 +18,6 @@ NoteChartManager.init = function(self)
 	NoteChartResourceLoader:init()
 end
 
-NoteChartManager.load = function(self)
-	CacheManager:select()
-end
-
 NoteChartManager.send = function(self, event)
 	return self.observable:send(event)
 end
@@ -67,5 +63,7 @@ NoteChartManager.updateCache = function(self, path, force)
 		)
 	end
 end
+
+NoteChartManager:init()
 
 return NoteChartManager

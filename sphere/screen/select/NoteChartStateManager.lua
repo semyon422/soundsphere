@@ -160,4 +160,6 @@ NoteChartStateManager.receive = function(self, event)
 	end
 end
 
+NoteChartStateManager:init()
+
 return NoteChartStateManager
