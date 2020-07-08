@@ -1,10 +1,9 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
-local Observable		= require("aqua.util.Observable")
 local CacheManager		= require("sphere.database.CacheManager")
 local CollectionManager	= require("sphere.database.CollectionManager")
 local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
 local CustomList		= require("sphere.ui.CustomList")
-local NotificationLine	= require("sphere.ui.NotificationLine")
+local NotificationModel	= require("sphere.models.NotificationModel")
 
 local BrowserList = CustomList:new()
 
@@ -50,7 +49,7 @@ BrowserList.receive = function(self, event)
 		local key = event.args[1]
 		if key == "f5" then
 			CacheManager:select()
-			NotificationLine:notify("Cache reloaded from database")
+			NotificationModel:notify("Cache reloaded from database")
 		end
 	end
 	

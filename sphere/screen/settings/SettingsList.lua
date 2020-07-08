@@ -1,9 +1,6 @@
 local CoordinateManager		= require("aqua.graphics.CoordinateManager")
-local Observable			= require("aqua.util.Observable")
-local CollectionManager		= require("sphere.database.CollectionManager")
 local SettingsListButton	= require("sphere.screen.settings.SettingsListButton")
 local CustomList			= require("sphere.ui.CustomList")
-local NotificationLine		= require("sphere.ui.NotificationLine")
 
 local SettingsList = CustomList:new()
 

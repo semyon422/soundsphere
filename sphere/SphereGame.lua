@@ -10,9 +10,10 @@ local ScreenManager				= require("sphere.screen.ScreenManager")
 local FadeTransition			= require("sphere.screen.FadeTransition")
 local SelectScreen				= require("sphere.screen.select.SelectScreen")
 local BackgroundManager			= require("sphere.ui.BackgroundManager")
-local NotificationLine			= require("sphere.ui.NotificationLine")
 local WindowManager				= require("sphere.window.WindowManager")
 local FpsLimiter				= require("sphere.window.FpsLimiter")
+local UserView					= require("sphere.views.UserView")
+local NotificationModel			= require("sphere.models.NotificationModel")
 
 local SphereGame = {}
 
@@ -22,6 +23,10 @@ SphereGame.run = function(self)
 end
 
 SphereGame.init = function(self)
+	self.globalView = UserView:new()
+	self.globalView:setPath("sphere/views/global.lua")
+	NotificationModel.observable:add(self.globalView)
+
 	aquaevent:add(self)
 end
 
@@ -37,11 +42,14 @@ SphereGame.load = function(self)
 
 	DiscordPresence:load()
 
+	self.globalView:load()
+
 	ScreenManager:setTransition(FadeTransition)
 	ScreenManager:set(SelectScreen)
 end
 
 SphereGame.unload = function(self)
+	self.globalView:unload()
 	ScreenManager:unload()
 	DiscordPresence:unload()
 	GameConfig:write()
@@ -52,14 +60,14 @@ SphereGame.update = function(self, dt)
 
 	DiscordPresence:update()
 	BackgroundManager:update(dt)
-	NotificationLine:update()
 	ScreenManager:update(dt)
+	self.globalView:update(dt)
 end
 
 SphereGame.draw = function(self)
 	BackgroundManager:draw()
 	ScreenManager:draw()
-	NotificationLine:draw()
+	self.globalView:draw()
 end
 
 SphereGame.receive = function(self, event)
@@ -76,8 +84,8 @@ SphereGame.receive = function(self, event)
 
 	ScreenManager:receive(event)
 	BackgroundManager:receive(event)
-	NotificationLine:receive(event)
 	WindowManager:receive(event)
+	self.globalView:receive(event)
 end
 
 return SphereGame
