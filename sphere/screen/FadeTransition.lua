@@ -1,8 +1,8 @@
 local tween = require("tween")
 
-local TransitionManager = {}
+local FadeTransition = {}
 
-TransitionManager.shaderText = [[
+FadeTransition.shaderText = [[
 	extern number alpha;
 	vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ){
 		vec4 pixel = Texel(texture, texture_coords);
@@ -10,16 +10,16 @@ TransitionManager.shaderText = [[
 	}
 ]]
 
-TransitionManager.isTransiting = false
-TransitionManager.needTransit = false
-TransitionManager.alpha = 1
-TransitionManager.phase = 0
+FadeTransition.isTransiting = false
+FadeTransition.needTransit = false
+FadeTransition.alpha = 1
+FadeTransition.phase = 0
 
-TransitionManager.init = function(self)
+FadeTransition.init = function(self)
 	self.shader = love.graphics.newShader(self.shaderText)
 end
 
-TransitionManager.update = function(self, dt)
+FadeTransition.update = function(self, dt)
 	if self.phase == 0 then
 		return
 	end
@@ -55,7 +55,7 @@ TransitionManager.update = function(self, dt)
 	end
 end
 
-TransitionManager.transit = function(self, callbackMiddle, callbackEnd)
+FadeTransition.transit = function(self, callbackMiddle, callbackEnd)
 	if self.needTransit then
 		return
 	end
@@ -67,7 +67,7 @@ TransitionManager.transit = function(self, callbackMiddle, callbackEnd)
 	self.phase = 1
 end
 
-TransitionManager.drawBefore = function(self)
+FadeTransition.drawBefore = function(self)
 	if not self.needTransit then
 		return
 	end
@@ -77,7 +77,7 @@ TransitionManager.drawBefore = function(self)
 	self.shader:send("alpha", self.alpha)
 end
 
-TransitionManager.drawAfter = function(self)
+FadeTransition.drawAfter = function(self)
 	if not self.isTransiting then
 		return
 	end
@@ -86,4 +86,6 @@ TransitionManager.drawAfter = function(self)
 	self.isTransiting = false
 end
 
-return TransitionManager
+FadeTransition:init()
+
+return FadeTransition

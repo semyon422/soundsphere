@@ -20,10 +20,9 @@ end
 Config.read = function(self)
 	if love.filesystem.exists(self.path) then
 		local file = io.open(self.path, "r")
-		self.data = json.decode(file:read("*all"))
+		self:setTable(json.decode(file:read("*all")))
 		file:close()
 	end
-	self:setDefaultValues()
 end
 
 Config.write = function(self)
@@ -36,13 +35,22 @@ Config.get = function(self, key)
 	return self.data[key]
 end
 
+Config.setTable = function(self, t)
+	for key, value in pairs(t) do
+		self:set(key, value)
+	end
+end
+
 Config.set = function(self, key, value)
-	self.data[key] = value
-	return self.observable:send({
-		name = "Config.set",
-		key = key,
-		value = value
-	})
+	local oldValue = self.data[key]
+	if oldValue ~= value then
+		self.data[key] = value
+		return self.observable:send({
+			name = "Config.set",
+			key = key,
+			value = value
+		})
+	end
 end
 
 Config.setDefaultValues = function(self)
