@@ -4,6 +4,7 @@ local ProgressBar	= require("sphere.screen.gameplay.ProgressBar")
 local InputImage	= require("sphere.screen.gameplay.InputImage")
 local ScoreDisplay	= require("sphere.screen.gameplay.ScoreDisplay")
 local StaticObject	= require("sphere.screen.gameplay.StaticObject")
+local Animation		= require("sphere.screen.gameplay.Animation")
 
 local GUI = require("sphere.ui.GUI")
 
@@ -14,7 +15,8 @@ GameplayGUI.classes = setmetatable({
 	ProgressBar = ProgressBar,
 	InputImage = InputImage,
 	ScoreDisplay = ScoreDisplay,
-	StaticObject = StaticObject
+	StaticObject = StaticObject,
+	Animation = Animation
 }, GUI.classes)
 
 GameplayGUI.functions = setmetatable({

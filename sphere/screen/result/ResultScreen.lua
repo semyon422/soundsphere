@@ -20,10 +20,10 @@ ResultScreen.unload = function(self)
 	self.gui:unload()
 end
 
-ResultScreen.update = function(self)
+ResultScreen.update = function(self, dt)
 	Screen.update(self)
 
-	self.gui:update()
+	self.gui:update(dt)
 end
 
 ResultScreen.draw = function(self)

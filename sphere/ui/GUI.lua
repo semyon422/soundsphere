@@ -43,9 +43,9 @@ GUI.loadTable = function(self, t)
 	end
 end
 
-GUI.update = function(self)
+GUI.update = function(self, dt)
 	for _, object in ipairs(self.objects) do
-		object:update()
+		object:update(dt)
 	end
 end
 
