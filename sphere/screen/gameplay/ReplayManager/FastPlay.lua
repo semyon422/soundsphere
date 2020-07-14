@@ -55,8 +55,6 @@ FastPlay.load = function(self)
 	timeEngine.noteChart = noteChart
 	timeEngine:load()
 	ModifierManager.timeEngine = timeEngine
-
-	ModifierManager.timeEngine = timeEngine
 	ModifierManager:apply("TimeEngineModifier")
 
 	local scoreEngine = ScoreEngine:new()
