@@ -35,27 +35,10 @@ InputManager.write = function(self)
 	return file:close()
 end
 
-InputManager.setKeysFromInputStats = function(self, inputStats)
-	local inputMode = self.inputMode
-	for virtualKey, data in pairs(inputStats) do
-		print(virtualKey)
-		local topKey
-		local topKeyCount
-		for key, count in pairs(data) do
-			print(key, count)
-			if not topKey or count > topKeyCount then
-				topKey = key
-				topKeyCount = count
-			end
-		end
-		self:setKey(inputMode, virtualKey, topKey)
-	end
-end
-
 InputManager.setKey = function(self, inputMode, virtualKey, key)
 	local data = self.data
 	data[inputMode] = data[inputMode] or {}
-	
+
 	local inputConfig = data[inputMode]
 	inputConfig.press = inputConfig.press or {}
 	inputConfig.release = inputConfig.release or {}
@@ -70,7 +53,7 @@ InputManager.setKey = function(self, inputMode, virtualKey, key)
 			inputConfig.release[key] = nil
 		end
 	end
-	
+
 	inputConfig.press[key] = {
 		press = {virtualKey},
 		release = {}
@@ -122,7 +105,7 @@ InputManager.receive = function(self, event)
 	if not self.inputConfig then
 		return
 	end
-	
+
 	local keyConfig
 	if event.name == "keypressed" then
 		keyConfig = self.inputConfig.press[event.args[1]]
@@ -132,7 +115,7 @@ InputManager.receive = function(self, event)
 	if not keyConfig then
 		return
 	end
-	
+
 	local events = {}
 	for _, key in ipairs(keyConfig.press) do
 		events[#events + 1] = {
