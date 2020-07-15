@@ -10,6 +10,7 @@ InputManager.mode = "external"
 
 InputManager.types = {
 	"keyboard",
+	"gamepad",
 	"joystick"
 }
 
@@ -128,6 +129,10 @@ InputManager.receive = function(self, event)
 		keyConfig = self.inputConfig.press.keyboard[event.args[1]]
 	elseif event.name == "keyreleased" then
 		keyConfig = self.inputConfig.release.keyboard[event.args[1]]
+	elseif event.name == "gamepadpressed" then
+		keyConfig = self.inputConfig.press.gamepad[tostring(event.args[2])]
+	elseif event.name == "gamepadreleased" then
+		keyConfig = self.inputConfig.release.gamepad[tostring(event.args[2])]
 	elseif event.name == "joystickpressed" then
 		keyConfig = self.inputConfig.press.joystick[tostring(event.args[2])]
 	elseif event.name == "joystickreleased" then
