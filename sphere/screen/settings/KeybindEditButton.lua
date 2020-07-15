@@ -70,7 +70,17 @@ KeybindEditButton.receive = function(self, event)
 		
 		self:send({
 			name = "valueChanged",
-			value = self.value
+			value = self.value,
+			type = "keyboard"
+		})
+	elseif event.name == "joystickpressed" and self.active then
+		self.active = false
+		self.value = tostring(event.args[2])
+		
+		self:send({
+			name = "valueChanged",
+			value = self.value,
+			type = "joystick"
 		})
 	end
 end
