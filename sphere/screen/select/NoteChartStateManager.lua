@@ -100,7 +100,9 @@ NoteChartStateManager.receive = function(self, event)
 			local noteChartDataEntry = noteChartListItem.noteChartDataEntry
 			if noteChartEntry and event.itemIndex == ScoreList.focusedItemIndex then
 				local replay = ReplayManager:loadReplay(item.scoreEntry.replayHash)
-				ModifierManager:getSequence():fromJson(replay.modifiers)
+				if replay.modifiers then
+					ModifierManager:getSequence():fromJson(replay.modifiers)
+				end
 				if event.button == 1 then
 					ReplayManager.replay = replay
 					InputManager:setMode("internal")

@@ -69,7 +69,13 @@ ReplayManager.saveReplay = function(self, noteChartDataEntry, modifierSequence)
 end
 
 ReplayManager.loadReplay = function(self, replayHash)
-	local file = io.open(self.path .. "/" .. replayHash, "r")
+	local path = self.path .. "/" .. replayHash
+
+	if not love.filesystem.exists(path) or love.filesystem.isDirectory(path) then
+		return Replay:new()
+	end
+
+	local file = io.open(path, "r")
 	local replayString = file:read("*all")
 	file:close()
 
