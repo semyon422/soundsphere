@@ -8,6 +8,12 @@ InputManager.path = "userdata/input.json"
 
 InputManager.mode = "external"
 
+InputManager.types = {
+	"keyboard",
+	"gamepad",
+	"joystick"
+}
+
 InputManager.init = function(self)
 	self.observable = Observable:new()
 end
@@ -35,47 +41,40 @@ InputManager.write = function(self)
 	return file:close()
 end
 
-InputManager.setKeysFromInputStats = function(self, inputStats)
-	local inputMode = self.inputMode
-	for virtualKey, data in pairs(inputStats) do
-		print(virtualKey)
-		local topKey
-		local topKeyCount
-		for key, count in pairs(data) do
-			print(key, count)
-			if not topKey or count > topKeyCount then
-				topKey = key
-				topKeyCount = count
+InputManager.setKey = function(self, inputMode, virtualKey, key, type)
+	local data = self.data
+
+	data[inputMode] = data[inputMode] or {}
+	local inputConfig = data[inputMode]
+
+	inputConfig.press = inputConfig.press or {}
+	local press = inputConfig.press
+	press[type] = press[type] or {}
+
+	inputConfig.release = inputConfig.release or {}
+	local release = inputConfig.release
+	release[type] = release[type] or {}
+
+	for type, keys in pairs(press) do
+		for key, data in pairs(keys) do
+			if data.press and data.press[1] == virtualKey then
+				press[type][key] = nil
 			end
 		end
-		self:setKey(inputMode, virtualKey, topKey)
 	end
-end
-
-InputManager.setKey = function(self, inputMode, virtualKey, key)
-	local data = self.data
-	data[inputMode] = data[inputMode] or {}
-	
-	local inputConfig = data[inputMode]
-	inputConfig.press = inputConfig.press or {}
-	inputConfig.release = inputConfig.release or {}
-
-	for key, data in pairs(inputConfig.press) do
-		if data.press and data.press[1] == virtualKey then
-			inputConfig.press[key] = nil
+	for type, keys in pairs(release) do
+		for key, data in pairs(keys) do
+			if data.release and data.release[1] == virtualKey then
+				release[type][key] = nil
+			end
 		end
 	end
-	for key, data in pairs(inputConfig.release) do
-		if data.release and data.release[1] == virtualKey then
-			inputConfig.release[key] = nil
-		end
-	end
-	
-	inputConfig.press[key] = {
+
+	press[type][key] = {
 		press = {virtualKey},
 		release = {}
 	}
-	inputConfig.release[key] = {
+	release[type][key] = {
 		press = {},
 		release = {virtualKey}
 	}
@@ -89,9 +88,11 @@ InputManager.getKey = function(self, inputMode, virtualKey)
 		return "none"
 	end
 
-	for key, data in pairs(inputConfig.press) do
-		if data.press and data.press[1] == virtualKey then
-			return key
+	for type, keys in pairs(inputConfig.press) do
+		for key, data in pairs(keys) do
+			if data.press and data.press[1] == virtualKey then
+				return key
+			end
 		end
 	end
 
@@ -122,17 +123,25 @@ InputManager.receive = function(self, event)
 	if not self.inputConfig then
 		return
 	end
-	
+
 	local keyConfig
 	if event.name == "keypressed" then
-		keyConfig = self.inputConfig.press[event.args[1]]
+		keyConfig = self.inputConfig.press.keyboard[event.args[1]]
 	elseif event.name == "keyreleased" then
-		keyConfig = self.inputConfig.release[event.args[1]]
+		keyConfig = self.inputConfig.release.keyboard[event.args[1]]
+	elseif event.name == "gamepadpressed" then
+		keyConfig = self.inputConfig.press.gamepad[tostring(event.args[2])]
+	elseif event.name == "gamepadreleased" then
+		keyConfig = self.inputConfig.release.gamepad[tostring(event.args[2])]
+	elseif event.name == "joystickpressed" then
+		keyConfig = self.inputConfig.press.joystick[tostring(event.args[2])]
+	elseif event.name == "joystickreleased" then
+		keyConfig = self.inputConfig.release.joystick[tostring(event.args[2])]
 	end
 	if not keyConfig then
 		return
 	end
-	
+
 	local events = {}
 	for _, key in ipairs(keyConfig.press) do
 		events[#events + 1] = {

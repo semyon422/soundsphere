@@ -79,7 +79,7 @@ KeyBindListButton.receive = function(self, event)
 	elseif event.name == "released" then
 		return
 	elseif event.name == "valueChanged" then
-		self:updateValue(event.value)
+		self:updateValue(event.value, event.type)
 	end
 	
 	self.keybindEditButton:receive(event)
@@ -99,15 +99,15 @@ KeyBindListButton.getValue = function(self)
 end
 
 KeyBindListButton.getDisplayValue = function(self)
-	return self:getValue(value)
+	return self:getValue()
 end
 
 KeyBindListButton.getSelectedInputMode = function(self)
 	return self.list:getSelectedInputMode()
 end
 
-KeyBindListButton.updateValue = function(self, value)
-	InputManager:setKey(self:getSelectedInputMode(), self.item.virtualKey, value)
+KeyBindListButton.updateValue = function(self, value, type)
+	InputManager:setKey(self:getSelectedInputMode(), self.item.virtualKey, value, type)
 	self.valueTextFrame.text = self:getDisplayValue(value)
 	self.valueTextFrame:reload()
 end

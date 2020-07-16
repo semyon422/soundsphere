@@ -1,0 +1,34 @@
+{
+    "Lua.diagnostics.globals": [
+        "love",
+        "thread",
+        "newproxy"
+    ],
+    "Lua.runtime.version": "LuaJIT",
+    "Lua.runtime.path": [
+        "?.lua",
+        "?/init.lua",
+        "?/?.lua",
+        "aqua/?.lua",
+        "ncdk/?.lua",
+        "chartbase/?.lua",
+        "libchart/?.lua",
+        "md5/?.lua",
+        "aqua/?/init.lua",
+        "ncdk/?/init.lua",
+        "chartbase/?/init.lua",
+        "libchart/?/init.lua",
+        "md5/?/init.lua"
+    ],
+    "Lua.workspace.ignoreSubmodules": false,
+    "Lua.workspace.maxPreload": 1000,
+    "Lua.workspace.ignoreDir": [
+        ".vscode",
+        "*/bench",
+        "*/spec",
+        "*/test",
+        "*/tests",
+        "userdata",
+        "discordrpc/main.lua"
+    ]
+}
