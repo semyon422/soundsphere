@@ -84,7 +84,7 @@ local updateInfoRequest = [[
 ]]
 
 local defaultInfo = {
-	version = 1
+	version = 2
 }
 
 ScoreDatabase.load = function(self)
@@ -179,7 +179,7 @@ end
 
 local updates = {}
 
-updates[1] = [[
+updates[2] = [[
 	ALTER TABLE scores RENAME TO temp;
 	CREATE TABLE IF NOT EXISTS `scores` (
 		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -191,10 +191,11 @@ updates[1] = [[
 		`accuracy` REAL,
 		`maxCombo` INTEGER,
 		`scoreRating` REAL,
-		`mods` TEXT
+		`modifiers` TEXT,
+		`replayHash` TEXT
 	);
-	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, mods)
-	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, mods FROM temp;
+	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash)
+	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, mods, "" FROM temp;
 	DROP TABLE temp;
 ]]
 
