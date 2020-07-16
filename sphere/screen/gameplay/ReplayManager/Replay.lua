@@ -1,6 +1,8 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
 local json				= require("json")
+local zlib				= require("zlib")
+local mime				= require("mime")
 
 local Replay = Class:new()
 
@@ -32,11 +34,15 @@ Replay.getNextEvent = function(self)
 end
 
 Replay.toString = function(self)
+	local jsonData = json.encode(self.events)
+	local compressedEvents = zlib.compress(jsonData)
+	local b64Events = mime.b64(compressedEvents)
 	return json.encode({
 		hash = self.noteChartDataEntry.hash,
 		index = self.noteChartDataEntry.index,
 		modifiers = self.modifierSequence:toTable(),
-		events = self.events
+		events = b64Events,
+		size = #jsonData
 	})
 end
 
@@ -46,7 +52,8 @@ Replay.fromString = function(self, s)
 	self.hash = object.hash
 	self.index = object.hash
 	self.modifiers = object.modifiers
-	self.events = object.events
+
+	self.events = json.decode(zlib.uncompress(mime.unb64(object.events), nil, object.size))
 
 	return self
 end
