@@ -62,6 +62,10 @@ LogicalNote.isReachable = function(self)
 	return self.scoreNote:isReachable()
 end
 
+LogicalNote.getEventTime = function(self)
+	return self.eventTime or self.logicEngine.currentTime
+end
+
 LogicalNote.load = function(self)
 	self.scoreNote:load()
 	self:sendState("load")

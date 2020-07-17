@@ -101,21 +101,21 @@ LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
 end
 
 LongLogicalNote.processAuto = function(self)
-	local deltaStartTime = self.startNoteData.timePoint.absoluteTime - self.logicEngine.currentTime
-	local deltaEndTime = self.endNoteData.timePoint.absoluteTime - self.logicEngine.currentTime
-	
+	local deltaStartTime = self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
+	local deltaEndTime = self.logicEngine.currentTime - self.endNoteData.timePoint.absoluteTim
+
 	local nextNote = self:getNextPlayable()
-	if deltaStartTime <= 0 and not self.keyState then
+	if deltaStartTime >= 0 and not self.keyState then
 		self.keyState = true
 		self:sendState("keyState")
-		
+
 		self.eventTime = self.startNoteData.timePoint.absoluteTime
 		self:processTimeState("exactly", "none")
 		self.eventTime = nil
-	elseif deltaEndTime <= 0 and self.keyState or nextNote and nextNote:isHere() then
+	elseif deltaEndTime >= 0 and self.keyState or nextNote and nextNote:isHere() then
 		self.keyState = false
 		self:sendState("keyState")
-		
+
 		self.eventTime = self.endNoteData.timePoint.absoluteTime
 		self:processTimeState("none", "exactly")
 		self.eventTime = nil

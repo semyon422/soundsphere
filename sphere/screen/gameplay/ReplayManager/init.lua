@@ -29,26 +29,28 @@ ReplayManager.send = function(self, event)
 end
 
 ReplayManager.receive = function(self, event)
-	local timeEngine = self.timeEngine
-	if timeEngine.timeRate == 0 then
+	if event.name == "TimeState" then
+		self.currentTime = event.exactCurrentTime
 		return
 	end
-	local currentTime = timeEngine.exactCurrentTime
 
-	local replay = self.replay
-	local mode = self.mode
-	if mode == "record" and event.virtual then
-		event.time = currentTime
-		replay:receive(event)
-	elseif mode == "replay" and event.name == "TimeState" then
+	if self.mode == "record" and event.virtual then
+		self.replay:receive(event)
+	end
+end
+
+ReplayManager.update = function(self)
+	if self.mode == "replay" then
+		local replay = self.replay
 		local nextEvent = replay:getNextEvent()
 		if not nextEvent then
 			return
 		end
 
-		if currentTime >= nextEvent.time then
+		if self.currentTime >= nextEvent.time then
 			self:send(nextEvent)
 			replay:step()
+			return self:update()
 		end
 	end
 end
