@@ -1,4 +1,4 @@
-local discordrpc = require("discordrpc.discordrpc")
+local discordrpc = require("discordrpc.discordRPC")
 
 local DiscordPresence = {}
 

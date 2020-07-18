@@ -1,9 +1,9 @@
 local Config			= require("sphere.config.Config")
 local Screen			= require("sphere.screen.Screen")
 local ScreenManager		= require("sphere.screen.ScreenManager")
-local SettingsList		= require("sphere.screen.Settings.SettingsList")
-local CategoriesList	= require("sphere.screen.Settings.CategoriesList")
-local SelectFrame		= require("sphere.screen.Settings.SelectFrame")
+local SettingsList		= require("sphere.screen.settings.SettingsList")
+local CategoriesList	= require("sphere.screen.settings.CategoriesList")
+local SelectFrame		= require("sphere.screen.settings.SelectFrame")
 local BackgroundManager	= require("sphere.ui.BackgroundManager")
 local SettingsGUI		= require("sphere.screen.settings.SettingsGUI")
 
