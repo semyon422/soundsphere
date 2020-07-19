@@ -3,6 +3,8 @@ local ScoreManager		= require("sphere.database.ScoreManager")
 local Screen			= require("sphere.screen.Screen")
 local ScreenManager		= require("sphere.screen.ScreenManager")
 local ResultGUI			= require("sphere.screen.result.ResultGUI")
+local ReplayManager		= require("sphere.screen.gameplay.ReplayManager")
+local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 
 local ResultScreen = Screen:new()
 
@@ -49,8 +51,10 @@ ResultScreen.receive = function(self, event)
 			noteChartDataEntry = event.noteChartDataEntry
 		})
 		
-		if scoreSystem.scoreTable.score > 0 then
-			ScoreManager:insertScore(scoreSystem.scoreTable, event.noteChartDataEntry)
+		if scoreSystem.scoreTable.score > 0 and ReplayManager.mode ~= "replay" and not event.autoplay then
+			local modifierSequence = ModifierManager:getSequence()
+			local replayHash = ReplayManager:saveReplay(event.noteChartDataEntry, modifierSequence)
+			ScoreManager:insertScore(scoreSystem.scoreTable, event.noteChartDataEntry, replayHash, modifierSequence)
 		end
 	end
 end

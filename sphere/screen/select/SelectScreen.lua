@@ -135,11 +135,32 @@ SelectScreen.receive = function(self, event)
 			return
 		end
 
-		local GameplayScreen = require("sphere.screen.gameplay.GameplayScreen")
-		GameplayScreen.noteChartEntry = event.noteChartEntry
-		GameplayScreen.noteChartDataEntry = event.noteChartDataEntry
-		return ScreenManager:set(GameplayScreen)
-	elseif event.name == "keypressed" and event.args[1] == GameConfig:get("screen.browser") then
+		if not event.fastPlay then
+			local GameplayScreen = require("sphere.screen.gameplay.GameplayScreen")
+			GameplayScreen.noteChartEntry = event.noteChartEntry
+			GameplayScreen.noteChartDataEntry = event.noteChartDataEntry
+			return ScreenManager:set(GameplayScreen)
+		else
+			local FastPlay = require("sphere.screen.gameplay.ReplayManager.FastPlay")
+			FastPlay.replay = event.replay
+			FastPlay.noteChartEntry = event.noteChartEntry
+			FastPlay.noteChartDataEntry = event.noteChartDataEntry
+			FastPlay:play()
+
+			return ScreenManager:set(require("sphere.screen.result.ResultScreen"),
+				function()
+					ScreenManager:receive({
+						name = "scoreSystem",
+						scoreSystem = FastPlay.scoreEngine.scoreSystem,
+						noteChart = FastPlay.noteChart,
+						noteChartEntry = FastPlay.noteChartEntry,
+						noteChartDataEntry = FastPlay.noteChartDataEntry,
+						autoplay = FastPlay.logicEngine.autoplay
+					})
+				end
+			)
+		end
+	elseif event.name == "keypressed" and event.args[1] == Config:get("screen.browser") then
 		return ScreenManager:set(require("sphere.screen.browser.BrowserScreen"))
 	elseif event.name == "keypressed" and event.args[1] == GameConfig:get("screen.settings") then
 		return ScreenManager:set(require("sphere.screen.settings.SettingsScreen"))

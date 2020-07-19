@@ -1,6 +1,11 @@
 local Observable		= require("aqua.util.Observable")
+local ScoreList		  	= require("sphere.screen.select.ScoreList")
 local NoteChartList  	= require("sphere.screen.select.NoteChartList")
 local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
+local PreviewManager	= require("sphere.screen.select.PreviewManager")
+local InputManager		= require("sphere.screen.gameplay.InputManager")
+local ReplayManager		= require("sphere.screen.gameplay.ReplayManager")
+local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 local CacheManager		= require("sphere.database.CacheManager")
 local json				= require("json")
 local GameConfig		= require("sphere.config.GameConfig")
@@ -13,6 +18,7 @@ NoteChartStateManager.path = "userdata/selectedChart.json"
 NoteChartStateManager.init = function(self)
 	self.observable = Observable:new()
 
+	ScoreList.observable:add(self)
 	NoteChartList.observable:add(self)
 	NoteChartSetList.observable:add(self)
 
@@ -78,11 +84,40 @@ NoteChartStateManager.receive = function(self, event)
 			local noteChartEntry = item.noteChartEntry
 			local noteChartDataEntry = item.noteChartDataEntry
 			if noteChartEntry and event.itemIndex == NoteChartList.focusedItemIndex then
+				InputManager:setMode("external")
+				ReplayManager:setMode("record")
 				self:send({
 					sender = self,
 					action = "playNoteChart",
 					noteChartEntry = noteChartEntry,
 					noteChartDataEntry = noteChartDataEntry
+				})
+			end
+		elseif sender == ScoreList and (event.button == 1 or event.button == 2) then
+			local item = ScoreList.items[event.itemIndex]
+			local noteChartListItem = NoteChartList.items[NoteChartList.focusedItemIndex]
+			local noteChartEntry = noteChartListItem.noteChartEntry
+			local noteChartDataEntry = noteChartListItem.noteChartDataEntry
+			if noteChartEntry and event.itemIndex == ScoreList.focusedItemIndex then
+				local replay = ReplayManager:loadReplay(item.scoreEntry.replayHash)
+				if replay.modifiers then
+					ModifierManager:getSequence():fromJson(replay.modifiers)
+				end
+				if event.button == 1 then
+					ReplayManager.replay = replay
+					InputManager:setMode("internal")
+					ReplayManager:setMode("replay")
+				else
+					InputManager:setMode("external")
+					ReplayManager:setMode("record")
+				end
+				self:send({
+					sender = self,
+					action = "playNoteChart",
+					noteChartEntry = noteChartEntry,
+					noteChartDataEntry = noteChartDataEntry,
+					replay = replay,
+					fastPlay = event.button == 1 and love.keyboard.isDown("lshift")
 				})
 			end
 		end

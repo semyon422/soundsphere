@@ -59,6 +59,7 @@ end
 TimeEngine.sendState = function(self)
 	return self.observable:send({
 		name = "TimeState",
+		time = self.exactCurrentTime,
 		currentTime = self.currentTime,
 		exactCurrentTime = self.exactCurrentTime,
 		timeRate = self.timeRate

@@ -11,12 +11,26 @@ end
 LogicEngine.load = function(self)
 	self.sharedLogicalNotes = {}
 	self.currentTime = 0
-	
+	self.events = {}
+
 	self:loadNoteHandlers()
 end
 
+local sortEvents = function(a, b)
+	return a.time < b.time
+end
 LogicEngine.update = function(self)
-	self:updateNoteHandlers()
+	local events = self.events
+	table.sort(events, sortEvents)
+
+	for _, event in ipairs(events) do
+		self.currentTime = event.time
+		self:updateNoteHandlers()
+		self:_receive(event)
+		self:updateNoteHandlers()
+	end
+
+	self.events = {}
 end
 
 LogicEngine.unload = function(self)
@@ -28,8 +42,13 @@ LogicEngine.send = function(self, event)
 end
 
 LogicEngine.receive = function(self, event)
+	self.events[#self.events + 1] = event
+end
+
+LogicEngine._receive = function(self, event)
 	if event.name == "TimeState" then
 		self.currentTime = event.exactCurrentTime
+		return
 	end
 
 	if not event.virtual or self.promode then

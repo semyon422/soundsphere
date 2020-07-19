@@ -1,4 +1,5 @@
 local Class			= require("aqua.util.Class")
+local json			= require("json")
 
 local AutoPlay		= require("sphere.screen.gameplay.ModifierManager.AutoPlay")
 local Automap		= require("sphere.screen.gameplay.ModifierManager.Automap")
@@ -161,6 +162,10 @@ ModifierSequence.toJson = function(self)
 	end
 	
 	return ("[%s]"):format(table.concat(out, ","))
+end
+
+ModifierSequence.toTable = function(self)
+	return json.decode(self:toJson())
 end
 
 ModifierSequence.fromJson = function(self, jsonObject)

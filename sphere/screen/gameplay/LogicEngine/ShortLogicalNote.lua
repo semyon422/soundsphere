@@ -21,9 +21,9 @@ ShortLogicalNote.update = function(self)
 	end
 
 	self.eventTime = self.eventTime or self.logicEngine.currentTime
-	
+
 	local timeState = self.scoreNote:getTimeState()
-	
+
 	local numStates = #self.states
 	if not self.autoplay then
 		self:processTimeState(timeState)
@@ -58,7 +58,7 @@ ShortLogicalNote.processAuto = function(self)
 	if deltaTime >= 0 then
 		self.keyState = true
 		self:sendState("keyState")
-		
+
 		self.eventTime = self.startNoteData.timePoint.absoluteTime
 		self:processTimeState("exactly")
 		self.eventTime = nil

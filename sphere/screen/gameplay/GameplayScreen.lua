@@ -200,15 +200,16 @@ GameplayScreen.receive = function(self, event)
 	ModifierManager:receive(event)
 	InputManager:receive(event)
 	self.scoreEngine:receive(event)
-	-- self.logicEngine:receive(event)
 	self.graphicEngine:receive(event)
 	self.gui:receive(event)
 end
 
 GameplayScreen.update = function(self, dt)
+	ReplayManager:update()
+	self.logicEngine:update()
+
 	self.timeEngine:update(dt)
 	self.audioEngine:update()
-	self.logicEngine:update(dt)
 	self.scoreEngine:update()
 	self.graphicEngine:update(dt)
 	self.gui:update()
