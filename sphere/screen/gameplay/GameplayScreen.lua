@@ -136,15 +136,15 @@ GameplayScreen.load = function(self)
 	logicEngine.observable:add(audioEngine)
 	timeEngine.observable:add(logicEngine)
 	timeEngine.observable:add(graphicEngine)
-	timeEngine.observable:add(NotificationLine)
+	-- timeEngine.observable:add(NotificationLine)
 	timeEngine.observable:add(ReplayManager)
 	timeEngine.observable:add(InputManager)
-	graphicEngine.observable:add(NotificationLine)
+	-- graphicEngine.observable:add(NotificationLine)
 	InputManager.observable:add(logicEngine)
 	InputManager.observable:add(gui)
 	InputManager.observable:add(ReplayManager)
 	ReplayManager.observable:add(InputManager)
-	NoteChartResourceLoader.observable:add(NotificationLine)
+	-- NoteChartResourceLoader.observable:add(NotificationLine)
 	
 	PauseOverlay.logicEngine = logicEngine
 	PauseOverlay.timeEngine = timeEngine
