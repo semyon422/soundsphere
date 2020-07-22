@@ -102,7 +102,7 @@ end
 
 LongLogicalNote.processAuto = function(self)
 	local deltaStartTime = self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
-	local deltaEndTime = self.logicEngine.currentTime - self.endNoteData.timePoint.absoluteTim
+	local deltaEndTime = self.logicEngine.currentTime - self.endNoteData.timePoint.absoluteTime
 
 	local nextNote = self:getNextPlayable()
 	if deltaStartTime >= 0 and not self.keyState then
