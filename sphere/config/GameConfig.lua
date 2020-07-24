@@ -34,4 +34,6 @@ GameConfig.defaultValues = {
 	["gameplay.increaseTimeRate"] = "f6"
 }
 
+GameConfig:setDefaultValues()
+
 return GameConfig
