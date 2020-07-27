@@ -1,6 +1,6 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Rectangle			= require("aqua.graphics.Rectangle")
-local NoteChartMenuList	= require("sphere.screen.select.NoteChartMenu.NoteChartMenuList")
+local NoteChartMenuList	= require("sphere.ui.NoteChartMenu.NoteChartMenuList")
 
 local NoteChartMenu = {}
 

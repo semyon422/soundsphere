@@ -1,9 +1,9 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Rectangle			= require("aqua.graphics.Rectangle")
 -- local InputManager		= require("sphere.screen.gameplay.InputManager")
-local KeyBindList		= require("sphere.screen.select.KeyBindMenu.KeyBindList")
+local KeyBindList		= require("sphere.ui.KeyBindMenu.KeyBindList")
 local BackgroundManager	= require("sphere.ui.BackgroundManager")
-local NoteChartList  	= require("sphere.screen.select.NoteChartList")
+local NoteChartList  	= require("sphere.ui.NoteChartList")
 -- local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 
 local KeyBindMenu = {}

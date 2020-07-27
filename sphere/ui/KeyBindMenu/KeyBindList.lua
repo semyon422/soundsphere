@@ -1,8 +1,8 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Observable		= require("aqua.util.Observable")
 local CustomList		= require("sphere.ui.CustomList")
-local KeyBindListButton	= require("sphere.screen.select.KeyBindMenu.KeyBindListButton")
-local NoteChartList  	= require("sphere.screen.select.NoteChartList")
+local KeyBindListButton	= require("sphere.ui.KeyBindMenu.KeyBindListButton")
+local NoteChartList  	= require("sphere.ui.NoteChartList")
 
 local KeyBindList = CustomList:new()
 

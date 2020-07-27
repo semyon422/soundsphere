@@ -1,4 +1,4 @@
-local TextDisplay = require("sphere.screen.gameplay.TextDisplay")
+local TextDisplay = require("sphere.ui.TextDisplay")
 
 local ScoreDisplay = TextDisplay:new()
 

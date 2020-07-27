@@ -4,7 +4,7 @@ local NoteChartModel			= require("sphere.models.NoteChartModel")
 local NoteSkinModel				= require("sphere.models.NoteSkinModel")
 local InputModel				= require("sphere.models.InputModel")
 local GameplayController		= require("sphere.controllers.GameplayController")
-local GameplayView				= require("sphere.screen.gameplay.GameplayView")
+local GameplayView				= require("sphere.views.GameplayView")
 local NoteSkinManager			= require("sphere.models.NoteSkinModel.NoteSkinManager")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 

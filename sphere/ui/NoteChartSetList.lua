@@ -2,8 +2,8 @@ local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Observable		= require("aqua.util.Observable")
 local CacheManager				= require("sphere.database.CacheManager")
 local SearchManager		= require("sphere.database.SearchManager")
-local CacheList			= require("sphere.screen.select.CacheList")
-local PreviewManager	= require("sphere.screen.select.PreviewManager")
+local CacheList			= require("sphere.ui.CacheList")
+local PreviewManager	= require("sphere.ui.PreviewManager")
 
 local NoteChartSetList = CacheList:new()
 

@@ -1,6 +1,6 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Rectangle			= require("aqua.graphics.Rectangle")
-local NoteSkinList		= require("sphere.screen.select.NoteSkinMenu.NoteSkinList")
+local NoteSkinList		= require("sphere.ui.NoteSkinMenu.NoteSkinList")
 -- local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 
 local NoteSkinMenu = {}

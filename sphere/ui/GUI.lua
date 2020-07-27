@@ -3,18 +3,43 @@ local Class			= require("aqua.util.Class")
 local StaticImage	= require("sphere.ui.StaticImage")
 local Button		= require("sphere.ui.Button")
 local ImageButton	= require("sphere.ui.ImageButton")
+local PointGraph	= require("sphere.ui.PointGraph")
+local ProgressBar	= require("sphere.ui.ProgressBar")
+local InputImage	= require("sphere.ui.InputImage")
+local ScoreDisplay	= require("sphere.ui.ScoreDisplay")
+local StaticObject	= require("sphere.ui.StaticObject")
+local Animation		= require("sphere.ui.Animation")
+local NoteSkinMenu			= require("sphere.ui.NoteSkinMenu")
+local ModifierMenu			= require("sphere.ui.ModifierMenu")
+local KeyBindMenu			= require("sphere.ui.KeyBindMenu")
+local NoteChartDataDisplay	= require("sphere.ui.NoteChartDataDisplay")
+local ModifierDisplay		= require("sphere.ui.ModifierDisplay")
+local SearchLine			= require("sphere.ui.SearchLine")
+local ScreenManager			= require("sphere.screen.ScreenManager")
 
 local GUI = Class:new()
 
 GUI.classes = {
 	StaticImage = StaticImage,
 	Button = Button,
-	ImageButton = ImageButton
+	ImageButton = ImageButton,
+	PointGraph = PointGraph,
+	ProgressBar = ProgressBar,
+	InputImage = InputImage,
+	ScoreDisplay = ScoreDisplay,
+	StaticObject = StaticObject,
+	Animation = Animation
 }
 GUI.classes.__index = GUI.classes
 
 GUI.functions = {
-	["print"] = function(...) print(...) end
+	["print"] = function(...) print(...) end,
+	["NoteSkinMenu:show()"] = function() NoteSkinMenu:show() end,
+	["ModifierMenu:show()"] = function() ModifierMenu:show() end,
+	["KeyBindMenu:show()"] = function() KeyBindMenu:show() end,
+	["ScreenManager:set(SettingsScreen)"] = function() ScreenManager:set(require("sphere.screen.settings.SettingsScreen")) end,
+	["ScreenManager:set(BrowserScreen)"] = function() ScreenManager:set(require("sphere.screen.browser.BrowserScreen")) end,
+	["ScreenManager:set(SelectScreen)"] = function() ScreenManager:set(require("sphere.ui.SelectScreen")) end
 }
 GUI.functions.__index = GUI.functions
 
@@ -30,7 +55,7 @@ GUI.loadTable = function(self, t)
 	self.jsonData = t
 
 	self.objects = {}
-	
+
 	for _, objectData in ipairs(self.jsonData) do
 		local Object = self.classes[objectData.class]
 		if Object then

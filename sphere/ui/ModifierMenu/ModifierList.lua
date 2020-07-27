@@ -1,6 +1,6 @@
 local CoordinateManager				= require("aqua.graphics.CoordinateManager")
 -- local ModifierManager				= require("sphere.screen.gameplay.ModifierManager")
-local InconsequentialModifierButton	= require("sphere.screen.select.ModifierMenu.InconsequentialModifierButton")
+local InconsequentialModifierButton	= require("sphere.ui.ModifierMenu.InconsequentialModifierButton")
 local CustomList					= require("sphere.ui.CustomList")
 
 local ModifierList = CustomList:new()

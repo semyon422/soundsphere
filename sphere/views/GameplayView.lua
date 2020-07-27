@@ -1,7 +1,7 @@
 local Class = require("aqua.util.Class")
 local Container = require("aqua.graphics.Container")
 local RhythmView = require("sphere.views.RhythmView")
-local GameplayGUI = require("sphere.screen.gameplay.GameplayGUI")
+local GUI = require("sphere.ui.GUI")
 
 local GameplayView = Class:new()
 
@@ -16,7 +16,7 @@ GameplayView.load = function(self)
 	rhythmView:load()
 	self.rhythmView = rhythmView
 
-	local gui = GameplayGUI:new()
+	local gui = GUI:new()
 	self.gui = gui
 	gui.container = self.container
 	gui.root = rhythmModel.noteSkinMetaData.directoryPath

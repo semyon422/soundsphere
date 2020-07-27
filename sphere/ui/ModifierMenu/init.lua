@@ -1,7 +1,7 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Rectangle			= require("aqua.graphics.Rectangle")
-local ModifierList		= require("sphere.screen.select.ModifierMenu.ModifierList")
-local SequenceList		= require("sphere.screen.select.ModifierMenu.SequenceList")
+local ModifierList		= require("sphere.ui.ModifierMenu.ModifierList")
+local SequenceList		= require("sphere.ui.ModifierMenu.SequenceList")
 
 local ModifierMenu = {}
 

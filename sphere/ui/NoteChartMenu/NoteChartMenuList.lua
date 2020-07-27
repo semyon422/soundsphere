@@ -1,6 +1,6 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local CustomList		= require("sphere.ui.CustomList")
-local NoteChartList  	= require("sphere.screen.select.NoteChartList")
+local NoteChartList  	= require("sphere.ui.NoteChartList")
 local NoteChartManager	= require("sphere.database.NoteChartManager")
 
 local NoteChartMenuList = CustomList:new()
@@ -30,8 +30,8 @@ NoteChartMenuList.load = function(self)
 end
 
 NoteChartMenuList.addItems = function(self)
-	local NoteChartMenu	= require("sphere.screen.select.NoteChartMenu")
-	local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
+	local NoteChartMenu	= require("sphere.ui.NoteChartMenu")
+	local NoteChartSetList	= require("sphere.ui.NoteChartSetList")
 
 	local entry = NoteChartSetList.items[NoteChartSetList.focusedItemIndex].noteChartSetEntry
 

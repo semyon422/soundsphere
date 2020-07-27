@@ -1,8 +1,8 @@
-local ModifierButton	= require("sphere.screen.select.ModifierMenu.ModifierButton")
-local CheckboxButton	= require("sphere.screen.select.ModifierMenu.CheckboxButton")
-local SliderButton		= require("sphere.screen.select.ModifierMenu.SliderButton")
-local AddModifierButton	= require("sphere.screen.select.ModifierMenu.AddModifierButton")
-local SequenceList		= require("sphere.screen.select.ModifierMenu.SequenceList")
+local ModifierButton	= require("sphere.ui.ModifierMenu.ModifierButton")
+local CheckboxButton	= require("sphere.ui.ModifierMenu.CheckboxButton")
+local SliderButton		= require("sphere.ui.ModifierMenu.SliderButton")
+local AddModifierButton	= require("sphere.ui.ModifierMenu.AddModifierButton")
+local SequenceList		= require("sphere.ui.ModifierMenu.SequenceList")
 -- local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 
 local InconsequentialModifierButton = ModifierButton:new()

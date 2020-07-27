@@ -1,8 +1,8 @@
 local CoordinateManager		= require("aqua.graphics.CoordinateManager")
 local Observable			= require("aqua.util.Observable")
 local CustomList			= require("sphere.ui.CustomList")
-local ScoreListButton		= require("sphere.screen.select.ScoreListButton")
-local NoteChartList			= require("sphere.screen.select.NoteChartList")
+local ScoreListButton		= require("sphere.ui.ScoreListButton")
+local NoteChartList			= require("sphere.ui.NoteChartList")
 local ScoreManager			= require("sphere.database.ScoreManager")
 
 local ScoreList = CustomList:new()

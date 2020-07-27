@@ -1,8 +1,8 @@
 local Observable		= require("aqua.util.Observable")
-local ScoreList		  	= require("sphere.screen.select.ScoreList")
-local NoteChartList  	= require("sphere.screen.select.NoteChartList")
-local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
-local PreviewManager	= require("sphere.screen.select.PreviewManager")
+local ScoreList		  	= require("sphere.ui.ScoreList")
+local NoteChartList  	= require("sphere.ui.NoteChartList")
+local NoteChartSetList	= require("sphere.ui.NoteChartSetList")
+local PreviewManager	= require("sphere.ui.PreviewManager")
 -- local InputManager		= require("sphere.screen.gameplay.InputManager")
 -- local ReplayManager		= require("sphere.screen.gameplay.ReplayManager")
 -- local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
@@ -71,7 +71,7 @@ NoteChartStateManager.receive = function(self, event)
 		if sender == NoteChartSetList and event.button == 2 then
 			local entry = NoteChartSetList.items[event.itemIndex].noteChartSetEntry
 			if entry and event.itemIndex == NoteChartSetList.focusedItemIndex then
-				local NoteChartMenu	= require("sphere.screen.select.NoteChartMenu")
+				local NoteChartMenu	= require("sphere.ui.NoteChartMenu")
 				NoteChartMenu:show()
 			end
 		elseif sender == NoteChartList and event.button == 2 then
