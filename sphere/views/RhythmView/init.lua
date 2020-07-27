@@ -1,5 +1,4 @@
 local Class = require("aqua.util.Class")
-local Container = require("aqua.graphics.Container")
 local GraphicalNoteFactory = require("sphere.views.RhythmView.GraphicalNoteFactory")
 
 local RhythmView = Class:new()
@@ -8,12 +7,11 @@ RhythmView.load = function(self)
 	self.rhythmModel.graphicEngine.observable:add(self)
 	self.notes = {}
 
-	self.container = Container:new()
-
 	self.rhythmModel.graphicEngine.noteSkin:joinContainer(self.container)
 end
 
 RhythmView.unload = function(self)
+	self.rhythmModel.graphicEngine.observable:remove(self)
 	self.rhythmModel.graphicEngine.noteSkin:leaveContainer(self.container)
 end
 
@@ -47,11 +45,6 @@ RhythmView.update = function(self, dt)
 	for _, note in pairs(self.notes) do
 		note:update()
 	end
-	self.container:update()
-end
-
-RhythmView.draw = function(self)
-	self.container:draw()
 end
 
 return RhythmView

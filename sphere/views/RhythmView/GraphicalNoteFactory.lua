@@ -9,26 +9,23 @@ local GraphicalNoteFactory = {}
 GraphicalNoteFactory.getNote = function(self, graphicalNoteModel)
 	local graphicalNote = {graphicalNoteModel = graphicalNoteModel}
 	local noteData = graphicalNoteModel.startNoteData
-	graphicalNote.startNoteData = noteData
+	graphicalNote.startNoteData = graphicalNoteModel.startNoteData
+	graphicalNote.endNoteData = graphicalNoteModel.endNoteData
 
 	if noteData.noteType == "ShortNote" then
 		graphicalNote.noteType = "ShortNote"
 		return ShortGraphicalNote:new(graphicalNote)
 	elseif noteData.noteType == "LongNoteStart" then
-		-- graphicalNote.noteType = "LongNote"
-		-- return LongGraphicalNote:new(graphicalNote)
-		graphicalNote.noteType = "ShortNote"
-		return ShortGraphicalNote:new(graphicalNote)
+		graphicalNote.noteType = "LongNote"
+		return LongGraphicalNote:new(graphicalNote)
 	elseif noteData.noteType == "LaserNoteStart" then
 		graphicalNote.noteType = "LongNote"
 		return LongGraphicalNote:new(graphicalNote)
 	elseif noteData.noteType == "LineNoteStart" then
 		graphicalNote.noteType = "LongNote"
 	elseif noteData.noteType == "LineNoteStart" then
-		-- graphicalNote.noteType = "LongNote"
-		-- return LongGraphicalNote:new(graphicalNote)
-		graphicalNote.noteType = "ShortNote"
-		return ShortGraphicalNote:new(graphicalNote)
+		graphicalNote.noteType = "LongNote"
+		return LongGraphicalNote:new(graphicalNote)
 	elseif noteData.noteType == "SoundNote" then
 		graphicalNote.noteType = "SoundNote"
 		return ShortGraphicalNote:new(graphicalNote)

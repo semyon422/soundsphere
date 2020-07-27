@@ -6,32 +6,42 @@ local GameplayGUI = require("sphere.screen.gameplay.GameplayGUI")
 local GameplayView = Class:new()
 
 GameplayView.load = function(self)
-	local rhythmView = RhythmView:new()
-	rhythmView.rhythmModel = self.rhythmModel
-	rhythmView:load()
-	self.rhythmView = rhythmView
+	local rhythmModel = self.rhythmModel
 
 	self.container = Container:new()
 
+	local rhythmView = RhythmView:new()
+	rhythmView.rhythmModel = rhythmModel
+	rhythmView.container = self.container
+	rhythmView:load()
+	self.rhythmView = rhythmView
+
 	local gui = GameplayGUI:new()
 	self.gui = gui
-	gui.root = self.rhythmModel.noteSkinMetaData.directoryPath
-	gui.jsonData = self.rhythmModel.graphicEngine.noteSkin.playField
-	gui.noteSkin = self.rhythmModel.graphicEngine.noteSkin
 	gui.container = self.container
-	gui.logicEngine = self.rhythmModel.logicEngine
-	gui.scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
-	gui.noteChart = self.rhythmModel.noteChart
-	self.rhythmModel.timeEngine.observable:add(gui)
-	self.rhythmModel.scoreEngine.observable:add(gui)
-	gui:loadTable(self.rhythmModel.graphicEngine.noteSkin.playField)
+	gui.root = rhythmModel.noteSkinMetaData.directoryPath
+	gui.jsonData = rhythmModel.graphicEngine.noteSkin.playField
+	gui.noteSkin = rhythmModel.graphicEngine.noteSkin
+	gui.logicEngine = rhythmModel.logicEngine
+	gui.scoreSystem = rhythmModel.scoreEngine.scoreSystem
+	gui.noteChart = rhythmModel.noteChart
+	gui:loadTable(rhythmModel.graphicEngine.noteSkin.playField)
 
-	self.rhythmModel.logicEngine.observable:add(gui)
-	self.rhythmModel.inputManager.observable:add(gui)
+	rhythmModel.timeEngine.observable:add(gui)
+	rhythmModel.scoreEngine.observable:add(gui)
+	rhythmModel.logicEngine.observable:add(gui)
+	rhythmModel.inputManager.observable:add(gui)
 end
 
 GameplayView.unload = function(self)
 	self.rhythmView:unload()
+
+	local gui = self.gui
+	local rhythmModel = self.rhythmModel
+	rhythmModel.timeEngine.observable:add(gui)
+	rhythmModel.scoreEngine.observable:add(gui)
+	rhythmModel.logicEngine.observable:add(gui)
+	rhythmModel.inputManager.observable:add(gui)
 end
 
 GameplayView.receive = function(self, event)
@@ -40,13 +50,12 @@ GameplayView.receive = function(self, event)
 end
 
 GameplayView.update = function(self, dt)
-	self.rhythmView:update(dt)
 	self.container:update()
+	self.rhythmView:update(dt)
 	self.gui:update()
 end
 
 GameplayView.draw = function(self)
-	self.rhythmView:draw()
 	self.container:draw()
 end
 

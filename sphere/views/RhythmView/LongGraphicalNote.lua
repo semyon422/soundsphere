@@ -3,7 +3,8 @@ local GraphicalNote = require("sphere.views.RhythmView.GraphicalNote")
 local LongGraphicalNote = GraphicalNote:new()
 
 LongGraphicalNote.update = function(self)
-	self.timeState = self.graphicalNoteModel.timeState
+	self.startTimeState = self.graphicalNoteModel.startTimeState
+	self.endTimeState = self.graphicalNoteModel.endTimeState
 
 	self.headDrawable.x = self:getHeadX()
 	self.tailDrawable.x = self:getTailX()
