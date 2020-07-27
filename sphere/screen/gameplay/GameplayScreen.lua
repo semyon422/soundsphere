@@ -2,7 +2,7 @@ local Screen					= require("sphere.screen.Screen")
 local RhythmModel				= require("sphere.models.RhythmModel")
 local NoteChartModel			= require("sphere.models.NoteChartModel")
 local NoteSkinModel				= require("sphere.models.NoteSkinModel")
--- local InputModel				= require("sphere.models.InputModel")
+local InputModel				= require("sphere.models.InputModel")
 local GameplayController		= require("sphere.controllers.GameplayController")
 local GameplayView				= require("sphere.screen.gameplay.GameplayView")
 local NoteSkinManager			= require("sphere.models.NoteSkinModel.NoteSkinManager")
@@ -19,10 +19,12 @@ GameplayScreen.load = function(self)
 	local rhythmModel = RhythmModel:new()
 	local view = GameplayView:new()
 	local gameplayController = GameplayController:new()
+	local inputModel = InputModel:new()
 
 	self.rhythmModel = rhythmModel
 	self.view = view
 	self.gameplayController = gameplayController
+	self.inputModel = inputModel
 
 	view.rhythmModel = rhythmModel
 	gameplayController.rhythmModel = rhythmModel
@@ -30,7 +32,11 @@ GameplayScreen.load = function(self)
 	local noteChart = noteChartModel:getNoteChart()
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel:setNoteSkin(NoteSkinModel:getNoteSkin(noteChart))
-	-- rhythmModel:setInputBindings(InputModel:getInputBindings(noteChart)))
+
+	inputModel:read()
+	rhythmModel:setInputBindings(inputModel:getInputBindings())
+	rhythmModel.inputManager:setInputMode(noteChart.inputMode:getString())
+
 	rhythmModel:load()
 
 	view:load()
