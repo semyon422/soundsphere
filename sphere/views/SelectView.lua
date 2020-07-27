@@ -31,6 +31,7 @@ SelectView.load = function(self)
 	self.gui = GUI:new()
 	self.gui.container = self.container
 
+	NoteChartStateManager.observable:add(self.gui)
 	NoteChartStateManager.observable:add(self.controller)
 	NoteChartStateManager.noteChartModel = self.noteChartModel
 

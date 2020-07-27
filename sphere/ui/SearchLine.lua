@@ -44,9 +44,9 @@ end
 
 SearchLine.load = function(self)
 	self.observable = Observable:new()
-	self.observable:add(require("sphere.screen.select.SelectScreen"))
+	self.observable:add(require("sphere.screen.SelectScreen"))
 
-	local NoteChartStateManager	= require("sphere.screen.select.NoteChartStateManager")
+	local NoteChartStateManager	= require("sphere.ui.NoteChartStateManager")
 	self.searchString = NoteChartStateManager.searchString
 
 	self.sender = self
@@ -79,7 +79,7 @@ end
 SearchLine.update = function(self) end
 
 SearchLine.unload = function(self)
-	self.observable:remove(require("sphere.screen.select.SelectScreen"))
+	self.observable:remove(require("sphere.screen.SelectScreen"))
 	self.container:remove(self.textInputFrame)
 end
 

@@ -28,7 +28,10 @@ GUI.classes = {
 	InputImage = InputImage,
 	ScoreDisplay = ScoreDisplay,
 	StaticObject = StaticObject,
-	Animation = Animation
+	Animation = Animation,
+	NoteChartDataDisplay = NoteChartDataDisplay,
+	ModifierDisplay = ModifierDisplay,
+	SearchLine = SearchLine
 }
 GUI.classes.__index = GUI.classes
 
