@@ -28,6 +28,7 @@ GameplayScreen.load = function(self)
 
 	view.rhythmModel = rhythmModel
 	gameplayController.rhythmModel = rhythmModel
+	gameplayController.noteChartModel = noteChartModel
 
 	local noteChart = noteChartModel:getNoteChart()
 	rhythmModel:setNoteChart(noteChart)

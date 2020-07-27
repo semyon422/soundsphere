@@ -38,10 +38,10 @@ GameplayView.unload = function(self)
 
 	local gui = self.gui
 	local rhythmModel = self.rhythmModel
-	rhythmModel.timeEngine.observable:add(gui)
-	rhythmModel.scoreEngine.observable:add(gui)
-	rhythmModel.logicEngine.observable:add(gui)
-	rhythmModel.inputManager.observable:add(gui)
+	rhythmModel.timeEngine.observable:remove(gui)
+	rhythmModel.scoreEngine.observable:remove(gui)
+	rhythmModel.logicEngine.observable:remove(gui)
+	rhythmModel.inputManager.observable:remove(gui)
 end
 
 GameplayView.receive = function(self, event)

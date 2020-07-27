@@ -19,6 +19,7 @@ NoteChartModel.load = function(self)
 
 		self.noteChartSetEntry = CacheManager:getNoteChartSetEntryById(self.selected[1])
 		self.noteChartEntry = CacheManager:getNoteChartEntryById(self.selected[2])
+		self.noteChartDataEntry = CacheManager:getNoteChartDataEntry(self.noteChartEntry.hash, 1)
 	end
 end
 

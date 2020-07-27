@@ -15,6 +15,7 @@ local KeyBindMenu			= require("sphere.ui.KeyBindMenu")
 local NoteChartDataDisplay	= require("sphere.ui.NoteChartDataDisplay")
 local ModifierDisplay		= require("sphere.ui.ModifierDisplay")
 local SearchLine			= require("sphere.ui.SearchLine")
+local JudgeDisplay			= require("sphere.ui.JudgeDisplay")
 local ScreenManager			= require("sphere.screen.ScreenManager")
 
 local GUI = Class:new()
@@ -31,7 +32,8 @@ GUI.classes = {
 	Animation = Animation,
 	NoteChartDataDisplay = NoteChartDataDisplay,
 	ModifierDisplay = ModifierDisplay,
-	SearchLine = SearchLine
+	SearchLine = SearchLine,
+	JudgeDisplay = JudgeDisplay
 }
 GUI.classes.__index = GUI.classes
 
