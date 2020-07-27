@@ -3,6 +3,7 @@ local RhythmModel				= require("sphere.models.RhythmModel")
 local NoteChartModel			= require("sphere.models.NoteChartModel")
 local NoteSkinModel				= require("sphere.models.NoteSkinModel")
 -- local InputModel				= require("sphere.models.InputModel")
+local GameplayController		= require("sphere.controllers.GameplayController")
 local GameplayView				= require("sphere.screen.gameplay.GameplayView")
 local NoteSkinManager			= require("sphere.models.NoteSkinModel.NoteSkinManager")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
@@ -17,14 +18,14 @@ GameplayScreen.load = function(self)
 
 	local rhythmModel = RhythmModel:new()
 	local view = GameplayView:new()
-	-- local rhythmController = RhythmController:new()
-	
+	local gameplayController = GameplayController:new()
+
 	self.rhythmModel = rhythmModel
 	self.view = view
-	-- self.rhythmController = rhythmController
+	self.gameplayController = gameplayController
 
 	view.rhythmModel = rhythmModel
-	-- rhythmController.rhythmModel = rhythmController
+	gameplayController.rhythmModel = rhythmModel
 
 	local noteChart = noteChartModel:getNoteChart()
 	rhythmModel:setNoteChart(noteChart)
@@ -33,7 +34,7 @@ GameplayScreen.load = function(self)
 	rhythmModel:load()
 
 	view:load()
-	-- rhythmController:load()
+	-- gameplayController:load()
 
 	
 	NoteChartResourceLoader:load(self.noteChartEntry.path, noteChart, function()
@@ -48,19 +49,19 @@ end
 GameplayScreen.unload = function(self)
 	self.rhythmModel:unload()
 	self.view:unload()
-	-- self.rhythmController:unload()
+	-- self.gameplayController:unload()
 end
 
 GameplayScreen.receive = function(self, event)
 	self.rhythmModel:receive(event)
 	self.view:receive(event)
-	-- self.rhythmController:receive(event)
+	self.gameplayController:receive(event)
 end
 
 GameplayScreen.update = function(self, dt)
 	self.rhythmModel:update(dt)
 	self.view:update(dt)
-	-- self.rhythmController:update(dt)
+	-- self.gameplayController:update(dt)
 
 	Screen.update(self)
 end
