@@ -12,37 +12,38 @@ UserView.load = function(self)
 	self.env = env
 
 	local file = io.open(self.path, "r")
-	safeload(file:read("*all"), env)()
+	local view = safeload(file:read("*all"), env)()
 	file:close()
 
-	env.load()
+	view:load()
+	self.view = view
 end
 
 UserView.unload = function(self)
-	local env = self.env
-	if env then
-		env.unload()
+	local view = self.view
+	if view then
+		view:unload()
 	end
 end
 
 UserView.receive = function(self, event)
-	local env = self.env
-	if env then
-		env.receive(event)
+	local view = self.view
+	if view then
+		view:receive(event)
 	end
 end
 
 UserView.update = function(self, dt)
-	local env = self.env
-	if env then
-		env.update(dt)
+	local view = self.view
+	if view then
+		view:update(dt)
 	end
 end
 
 UserView.draw = function(self)
-	local env = self.env
-	if env then
-		env.draw()
+	local view = self.view
+	if view then
+		view:draw()
 	end
 end
 

@@ -1,5 +1,5 @@
 local CoordinateManager				= require("aqua.graphics.CoordinateManager")
-local ModifierManager				= require("sphere.screen.gameplay.ModifierManager")
+-- local ModifierManager				= require("sphere.screen.gameplay.ModifierManager")
 local InconsequentialModifierButton	= require("sphere.screen.select.ModifierMenu.InconsequentialModifierButton")
 local CustomList					= require("sphere.ui.CustomList")
 
@@ -42,13 +42,13 @@ end
 ModifierList.addItems = function(self)
 	local items = {}
 	
-	for _, Modifier in ipairs(ModifierManager.sequence.modifiers) do
-		items[#items + 1] = {
-			name = Modifier.name,
-			Modifier = Modifier,
-			modifier = ModifierManager.sequence:get(Modifier)
-		}
-	end
+	-- for _, Modifier in ipairs(ModifierManager.sequence.modifiers) do
+	-- 	items[#items + 1] = {
+	-- 		name = Modifier.name,
+	-- 		Modifier = Modifier,
+	-- 		modifier = ModifierManager.sequence:get(Modifier)
+	-- 	}
+	-- end
 	
 	return self:setItems(items)
 end

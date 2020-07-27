@@ -3,7 +3,7 @@ local CheckboxButton	= require("sphere.screen.select.ModifierMenu.CheckboxButton
 local SliderButton		= require("sphere.screen.select.ModifierMenu.SliderButton")
 local AddModifierButton	= require("sphere.screen.select.ModifierMenu.AddModifierButton")
 local SequenceList		= require("sphere.screen.select.ModifierMenu.SequenceList")
-local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
+-- local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 
 local InconsequentialModifierButton = ModifierButton:new()
 
@@ -43,7 +43,7 @@ InconsequentialModifierButton.construct = function(self)
 			button = AddModifierButton:new(self)
 			button.item = self.item
 			button.add = function(self)
-				ModifierManager.sequence:add(Modifier)
+				-- ModifierManager.sequence:add(Modifier)
 				SequenceList:reloadItems()
 			end
 		-- end

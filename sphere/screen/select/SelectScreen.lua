@@ -1,9 +1,9 @@
 local NoteChartFactory	= require("notechart.NoteChartFactory")
 local GameConfig		= require("sphere.config.GameConfig")
-local NoteSkinManager	= require("sphere.noteskin.NoteSkinManager")
+-- local NoteSkinManager	= require("sphere.noteskin.NoteSkinManager")
 local Screen			= require("sphere.screen.Screen")
 local ScreenManager		= require("sphere.screen.ScreenManager")
-local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
+-- local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 local AliasManager		= require("sphere.database.AliasManager")
 
 local ModifierMenu		= require("sphere.screen.select.ModifierMenu")
@@ -57,8 +57,8 @@ SelectScreen.load = function(self)
 	NoteSkinMenu.SelectScreen = SelectScreen
 
 	AliasManager:load()
-	NoteSkinManager:load()
-	ModifierManager:load()
+	-- NoteSkinManager:load()
+	-- ModifierManager:load()
 	ModifierMenu:reloadItems()
 
 	ScoreList:load()
@@ -76,7 +76,7 @@ end
 SelectScreen.unload = function(self)
 	self.gui:unload()
 	PreviewManager:stop()
-	ModifierManager:unload()
+	-- ModifierManager:unload()
 	NoteChartStateManager:unload()
 end
 

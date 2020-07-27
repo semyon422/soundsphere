@@ -1,10 +1,10 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Rectangle			= require("aqua.graphics.Rectangle")
-local InputManager		= require("sphere.screen.gameplay.InputManager")
+-- local InputManager		= require("sphere.screen.gameplay.InputManager")
 local KeyBindList		= require("sphere.screen.select.KeyBindMenu.KeyBindList")
 local BackgroundManager	= require("sphere.ui.BackgroundManager")
 local NoteChartList  	= require("sphere.screen.select.NoteChartList")
-local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
+-- local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 
 local KeyBindMenu = {}
 
@@ -32,7 +32,7 @@ end
 
 KeyBindMenu.hide = function(self)
 	self.hidden = true
-	InputManager:write()
+	-- InputManager:write()
 end
 
 KeyBindMenu.update = function(self)
@@ -71,12 +71,12 @@ end
 
 KeyBindMenu.show = function(self)
 	self.hidden = false
-	InputManager:read()
+	-- InputManager:read()
 
 	self.noteChart = self.SelectScreen:getNoteChart()
 
-	ModifierManager.noteChart = self.noteChart
-	ModifierManager:apply("NoteChartModifier")
+	-- ModifierManager.noteChart = self.noteChart
+	-- ModifierManager:apply("NoteChartModifier")
 
 	self:reload()
 end

@@ -3,9 +3,9 @@ local ScoreList		  	= require("sphere.screen.select.ScoreList")
 local NoteChartList  	= require("sphere.screen.select.NoteChartList")
 local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
 local PreviewManager	= require("sphere.screen.select.PreviewManager")
-local InputManager		= require("sphere.screen.gameplay.InputManager")
-local ReplayManager		= require("sphere.screen.gameplay.ReplayManager")
-local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
+-- local InputManager		= require("sphere.screen.gameplay.InputManager")
+-- local ReplayManager		= require("sphere.screen.gameplay.ReplayManager")
+-- local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 local CacheManager		= require("sphere.database.CacheManager")
 local json				= require("json")
 local GameConfig		= require("sphere.config.GameConfig")
@@ -84,8 +84,8 @@ NoteChartStateManager.receive = function(self, event)
 			local noteChartEntry = item.noteChartEntry
 			local noteChartDataEntry = item.noteChartDataEntry
 			if noteChartEntry and event.itemIndex == NoteChartList.focusedItemIndex then
-				InputManager:setMode("external")
-				ReplayManager:setMode("record")
+				-- InputManager:setMode("external")
+				-- ReplayManager:setMode("record")
 				self:send({
 					sender = self,
 					action = "playNoteChart",
@@ -99,17 +99,17 @@ NoteChartStateManager.receive = function(self, event)
 			local noteChartEntry = noteChartListItem.noteChartEntry
 			local noteChartDataEntry = noteChartListItem.noteChartDataEntry
 			if noteChartEntry and event.itemIndex == ScoreList.focusedItemIndex then
-				local replay = ReplayManager:loadReplay(item.scoreEntry.replayHash)
+				-- local replay = ReplayManager:loadReplay(item.scoreEntry.replayHash)
 				if replay.modifiers then
 					ModifierManager:getSequence():fromJson(replay.modifiers)
 				end
 				if event.button == 1 then
-					ReplayManager.replay = replay
-					InputManager:setMode("internal")
-					ReplayManager:setMode("replay")
+					-- ReplayManager.replay = replay
+					-- InputManager:setMode("internal")
+					-- ReplayManager:setMode("replay")
 				else
-					InputManager:setMode("external")
-					ReplayManager:setMode("record")
+					-- InputManager:setMode("external")
+					-- ReplayManager:setMode("record")
 				end
 				self:send({
 					sender = self,

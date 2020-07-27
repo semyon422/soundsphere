@@ -1,7 +1,7 @@
 local ModifierButton	= require("sphere.screen.select.ModifierMenu.ModifierButton")
 local TextButton		= require("sphere.screen.select.ModifierMenu.TextButton")
 local SliderButton		= require("sphere.screen.select.ModifierMenu.SliderButton")
-local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
+-- local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 
 local SequentialModifierButton = ModifierButton:new()
 
@@ -15,7 +15,7 @@ SequentialModifierButton.construct = function(self)
 		button.item = self.item
 		button.updateValue = function(self, value) end
 		button.removeModifier = function(self)
-			ModifierManager.sequence:remove(modifier)
+			-- ModifierManager.sequence:remove(modifier)
 			
 			local SequenceList = require("sphere.screen.select.ModifierMenu.SequenceList")
 			SequenceList:reloadItems()
@@ -29,7 +29,7 @@ SequentialModifierButton.construct = function(self)
 			SliderButton.updateValue(self, value)
 		end
 		button.removeModifier = function(self)
-			ModifierManager.sequence:remove(modifier)
+			-- ModifierManager.sequence:remove(modifier)
 			
 			local SequenceList = require("sphere.screen.select.ModifierMenu.SequenceList")
 			SequenceList:reloadItems()

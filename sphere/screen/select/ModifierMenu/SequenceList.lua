@@ -1,5 +1,5 @@
 local CoordinateManager			= require("aqua.graphics.CoordinateManager")
-local ModifierManager			= require("sphere.screen.gameplay.ModifierManager")
+-- local ModifierManager			= require("sphere.screen.gameplay.ModifierManager")
 local SequentialModifierButton	= require("sphere.screen.select.ModifierMenu.SequentialModifierButton")
 local CustomList				= require("sphere.ui.CustomList")
 
@@ -31,16 +31,16 @@ SequenceList.load = function(self)
 end
 
 SequenceList.reloadItems = function(self)
-	local sequential = ModifierManager.sequence.sequential
+	-- local sequential = ModifierManager.sequence.sequential
 	
 	local items = {}
-	for _, modifier in ipairs(sequential) do
-		items[#items + 1] = {
-			name = modifier.name,
-			modifier = modifier,
-			Modifier = modifier.Class
-		}
-	end
+	-- for _, modifier in ipairs(sequential) do
+	-- 	items[#items + 1] = {
+	-- 		name = modifier.name,
+	-- 		modifier = modifier,
+	-- 		Modifier = modifier.Class
+	-- 	}
+	-- end
 	
 	return self:setItems(items)
 end

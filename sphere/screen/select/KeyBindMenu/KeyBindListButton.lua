@@ -2,7 +2,7 @@ local aquafonts			= require("aqua.assets.fonts")
 local TextFrame			= require("aqua.graphics.TextFrame")
 local map				= require("aqua.math").map
 local spherefonts		= require("sphere.assets.fonts")
-local InputManager		= require("sphere.screen.gameplay.InputManager")
+-- local InputManager		= require("sphere.screen.gameplay.InputManager")
 local NoteChartList  	= require("sphere.screen.select.NoteChartList")
 local KeybindEditButton	= require("sphere.screen.settings.KeybindEditButton")
 local Checkbox			= require("sphere.ui.Checkbox")
@@ -38,7 +38,7 @@ KeyBindListButton.reload = function(self)
 	keybindEditButton.w = self.w * self.columnWidth[3]
 	keybindEditButton.h = self.h
 	keybindEditButton.cs = self.cs
-	keybindEditButton.value = InputManager:getKey(self:getSelectedInputMode(), self.item.virtualKey)
+	-- keybindEditButton.value = InputManager:getKey(self:getSelectedInputMode(), self.item.virtualKey)
 	
 	keybindEditButton:reload()
 	
@@ -107,7 +107,7 @@ KeyBindListButton.getSelectedInputMode = function(self)
 end
 
 KeyBindListButton.updateValue = function(self, value, type)
-	InputManager:setKey(self:getSelectedInputMode(), self.item.virtualKey, value, type)
+	-- InputManager:setKey(self:getSelectedInputMode(), self.item.virtualKey, value, type)
 	self.valueTextFrame.text = self:getDisplayValue(value)
 	self.valueTextFrame:reload()
 end
