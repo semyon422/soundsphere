@@ -31,7 +31,11 @@ GameplayScreen.load = function(self)
 
 	local noteChart = noteChartModel:getNoteChart()
 	rhythmModel:setNoteChart(noteChart)
-	rhythmModel:setNoteSkin(NoteSkinModel:getNoteSkin(noteChart))
+	rhythmModel.noteChart = noteChart
+
+	rhythmModel.noteSkinMetaData = NoteSkinModel:getNoteSkinMetaData(noteChart)
+	rhythmModel:setNoteSkin(NoteSkinModel:getNoteSkin(rhythmModel.noteSkinMetaData))
+
 
 	inputModel:read()
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
