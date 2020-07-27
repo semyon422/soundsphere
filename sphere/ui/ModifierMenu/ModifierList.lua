@@ -35,21 +35,25 @@ ModifierList.send = function(self, event)
 	-- if event.action == "buttonInteract" and event.button == 1 then
 	-- 	ModifierDisplay:updateText()
 	-- end
-	
+
 	CustomList.send(self, event)
 end
 
 ModifierList.addItems = function(self)
 	local items = {}
-	
-	-- for _, Modifier in ipairs(ModifierManager.sequence.modifiers) do
-	-- 	items[#items + 1] = {
-	-- 		name = Modifier.name,
-	-- 		Modifier = Modifier,
-	-- 		modifier = ModifierManager.sequence:get(Modifier)
-	-- 	}
-	-- end
-	
+
+	if not self.modifierModel then
+		return self:setItems(items)
+	end
+
+	for _, Modifier in ipairs(self.modifierModel.modifiers) do
+		items[#items + 1] = {
+			name = Modifier.name,
+			Modifier = Modifier,
+			modifier = self.modifierModel:get(Modifier)
+		}
+	end
+
 	return self:setItems(items)
 end
 

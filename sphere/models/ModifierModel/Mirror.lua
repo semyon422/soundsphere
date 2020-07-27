@@ -1,4 +1,4 @@
-local SwapModifier = require("sphere.models.RhythmModel.ModifierManager.SwapModifier")
+local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 
 local Mirror = SwapModifier:new()
 
@@ -26,7 +26,7 @@ Mirror.tojson = function(self)
 end
 
 Mirror.getMap = function(self)
-	local noteChart = self.sequence.manager.noteChart
+	local noteChart = self.model.noteChart
 
 	local inputCounts = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do

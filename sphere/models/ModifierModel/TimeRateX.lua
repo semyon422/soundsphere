@@ -1,4 +1,4 @@
-local Modifier = require("sphere.models.RhythmModel.ModifierManager.Modifier")
+local Modifier = require("sphere.models.ModifierModel.Modifier")
 
 local TimeRateX = Modifier:new()
 
@@ -24,7 +24,7 @@ TimeRateX.tojson = function(self)
 end
 
 TimeRateX.apply = function(self)
-	self.sequence.manager.timeEngine:createTimeRateHandler().timeRate = self.value
+	self.model.timeEngine:createTimeRateHandler().timeRate = self.value
 end
 
 return TimeRateX

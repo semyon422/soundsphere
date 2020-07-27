@@ -33,20 +33,40 @@ GameplayScreen.load = function(self)
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
 
-	rhythmModel.noteSkinMetaData = NoteSkinModel:getNoteSkinMetaData(noteChart)
-	rhythmModel:setNoteSkin(NoteSkinModel:getNoteSkin(rhythmModel.noteSkinMetaData))
-
-
 	inputModel:read()
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
 	rhythmModel.inputManager:setInputMode(noteChart.inputMode:getString())
 
-	rhythmModel:load()
-
-	view:load()
+	-- rhythmModel:load()
 	-- gameplayController:load()
 
-	
+	local modifierModel = rhythmModel.modifierModel
+
+	modifierModel:load()
+
+	modifierModel:apply("NoteChartModifier")
+
+	rhythmModel.noteSkinMetaData = NoteSkinModel:getNoteSkinMetaData(noteChart)
+	rhythmModel:setNoteSkin(NoteSkinModel:getNoteSkin(rhythmModel.noteSkinMetaData))
+
+	rhythmModel.timeEngine:load()
+	modifierModel:apply("TimeEngineModifier")
+
+	rhythmModel.scoreEngine:load()
+	modifierModel:apply("ScoreEngineModifier")
+
+	rhythmModel.audioEngine:load()
+	modifierModel:apply("AudioEngineModifier")
+
+	modifierModel:apply("LogicEngineModifier")
+	modifierModel:apply("GraphicEngineModifier")
+
+	rhythmModel.logicEngine:load()
+	rhythmModel.graphicEngine:load()
+	rhythmModel.replayManager:load()
+
+	view:load()
+
 	NoteChartResourceLoader:load(self.noteChartEntry.path, noteChart, function()
 		self.rhythmModel.audioEngine.localAliases = NoteChartResourceLoader.localAliases
 		self.rhythmModel.audioEngine.globalAliases = NoteChartResourceLoader.globalAliases

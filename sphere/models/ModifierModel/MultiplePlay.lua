@@ -1,5 +1,5 @@
 local NoteData	= require("ncdk.NoteData")
-local Modifier	= require("sphere.models.RhythmModel.ModifierManager.Modifier")
+local Modifier	= require("sphere.models.ModifierModel.Modifier")
 
 local MultiplePlay = Modifier:new()
 
@@ -27,7 +27,7 @@ MultiplePlay.tojson = function(self)
 end
 
 MultiplePlay.apply = function(self)
-	local noteChart = self.sequence.manager.noteChart
+	local noteChart = self.model.noteChart
 	local value = self.value
 
 	local inputCounts = {}

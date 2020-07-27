@@ -1,5 +1,5 @@
 local clone = require("aqua.table").clone
-local Modifier = require("sphere.models.RhythmModel.ModifierManager.Modifier")
+local Modifier = require("sphere.models.ModifierModel.Modifier")
 local NoteData = require("ncdk.NoteData")
 
 local FullLongNote = Modifier:new()
@@ -29,7 +29,7 @@ FullLongNote.tojson = function(self)
 end
 
 FullLongNote.apply = function(self)
-	local noteChart = self.sequence.manager.noteChart
+	local noteChart = self.model.noteChart
 	self.noteDatas = {}
 	self.noteDataLayers = {}
 	

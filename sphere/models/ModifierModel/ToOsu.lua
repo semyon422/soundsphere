@@ -1,4 +1,4 @@
-local Modifier	= require("sphere.models.RhythmModel.ModifierManager.Modifier")
+local Modifier	= require("sphere.models.ModifierModel.Modifier")
 local NoteChartExporter			= require("osu.NoteChartExporter")
 
 local ToOsu = Modifier:new()
@@ -16,7 +16,7 @@ ToOsu.apply = function(self)
 	local GameplayScreen = require("sphere.models.RhythmModel.GameplayScreen")
 	
 	local nce = NoteChartExporter:new()
-	nce.noteChart = self.sequence.manager.noteChart
+	nce.noteChart = self.model.noteChart
 	nce.noteChartEntry = GameplayScreen.noteChartEntry
 	nce.noteChartDataEntry = GameplayScreen.noteChartDataEntry
 	

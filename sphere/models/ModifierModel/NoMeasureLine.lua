@@ -1,4 +1,4 @@
-local Modifier = require("sphere.models.RhythmModel.ModifierManager.Modifier")
+local Modifier = require("sphere.models.ModifierModel.Modifier")
 
 local NoMeasureLine = Modifier:new()
 
@@ -11,7 +11,7 @@ NoMeasureLine.shortName = "NML"
 NoMeasureLine.variableType = "boolean"
 
 NoMeasureLine.apply = function(self)
-	local noteChart = self.sequence.manager.noteChart
+	local noteChart = self.model.noteChart
 	
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)

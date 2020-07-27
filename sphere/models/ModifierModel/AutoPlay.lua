@@ -1,4 +1,4 @@
-local Modifier = require("sphere.models.RhythmModel.ModifierManager.Modifier")
+local Modifier = require("sphere.models.ModifierModel.Modifier")
 
 local AutoPlay = Modifier:new()
 
@@ -11,7 +11,7 @@ AutoPlay.shortName = "AP"
 AutoPlay.variableType = "boolean"
 
 AutoPlay.apply = function(self)
-	self.sequence.manager.logicEngine.autoplay = true
+	self.model.logicEngine.autoplay = true
 end
 
 AutoPlay.receive = function(self, event)

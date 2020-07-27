@@ -73,10 +73,10 @@ KeyBindMenu.show = function(self)
 	self.hidden = false
 	-- InputManager:read()
 
-	self.noteChart = self.SelectScreen:getNoteChart()
+	self.noteChart = self.noteChartModel:getNoteChart()
 
-	-- ModifierManager.noteChart = self.noteChart
-	-- ModifierManager:apply("NoteChartModifier")
+	self.modifierModel.noteChart = self.noteChart
+	self.modifierModel:apply("NoteChartModifier")
 
 	self:reload()
 end

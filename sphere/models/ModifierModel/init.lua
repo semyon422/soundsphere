@@ -1,27 +1,27 @@
 local Class			= require("aqua.util.Class")
 local json			= require("json")
 
-local AutoPlay		= require("sphere.models.RhythmModel.ModifierManager.AutoPlay")
-local Automap		= require("sphere.models.RhythmModel.ModifierManager.Automap")
-local ProMode		= require("sphere.models.RhythmModel.ModifierManager.ProMode")
-local WindUp		= require("sphere.models.RhythmModel.ModifierManager.WindUp")
-local SpeedMode		= require("sphere.models.RhythmModel.ModifierManager.SpeedMode")
-local TimeRateQ		= require("sphere.models.RhythmModel.ModifierManager.TimeRateQ")
-local TimeRateX		= require("sphere.models.RhythmModel.ModifierManager.TimeRateX")
-local NoScratch		= require("sphere.models.RhythmModel.ModifierManager.NoScratch")
-local Mirror		= require("sphere.models.RhythmModel.ModifierManager.Mirror")
-local Random		= require("sphere.models.RhythmModel.ModifierManager.Random")
-local BracketSwap	= require("sphere.models.RhythmModel.ModifierManager.BracketSwap")
-local NoLongNote	= require("sphere.models.RhythmModel.ModifierManager.NoLongNote")
-local NoMeasureLine	= require("sphere.models.RhythmModel.ModifierManager.NoMeasureLine")
-local FullLongNote	= require("sphere.models.RhythmModel.ModifierManager.FullLongNote")
-local ToOsu			= require("sphere.models.RhythmModel.ModifierManager.ToOsu")
-local AutoKeySound	= require("sphere.models.RhythmModel.ModifierManager.AutoKeySound")
-local MultiplePlay	= require("sphere.models.RhythmModel.ModifierManager.MultiplePlay")
+local AutoPlay		= require("sphere.models.ModifierModel.AutoPlay")
+local Automap		= require("sphere.models.ModifierModel.Automap")
+local ProMode		= require("sphere.models.ModifierModel.ProMode")
+local WindUp		= require("sphere.models.ModifierModel.WindUp")
+local SpeedMode		= require("sphere.models.ModifierModel.SpeedMode")
+local TimeRateQ		= require("sphere.models.ModifierModel.TimeRateQ")
+local TimeRateX		= require("sphere.models.ModifierModel.TimeRateX")
+local NoScratch		= require("sphere.models.ModifierModel.NoScratch")
+local Mirror		= require("sphere.models.ModifierModel.Mirror")
+local Random		= require("sphere.models.ModifierModel.Random")
+local BracketSwap	= require("sphere.models.ModifierModel.BracketSwap")
+local NoLongNote	= require("sphere.models.ModifierModel.NoLongNote")
+local NoMeasureLine	= require("sphere.models.ModifierModel.NoMeasureLine")
+local FullLongNote	= require("sphere.models.ModifierModel.FullLongNote")
+local ToOsu			= require("sphere.models.ModifierModel.ToOsu")
+local AutoKeySound	= require("sphere.models.ModifierModel.AutoKeySound")
+local MultiplePlay	= require("sphere.models.ModifierModel.MultiplePlay")
 
-local ModifierSequence = Class:new()
+local ModifierModel = Class:new()
 
-ModifierSequence.modifiers = {
+ModifierModel.modifiers = {
 	AutoPlay,
 	ProMode,
 	AutoKeySound,
@@ -41,14 +41,14 @@ ModifierSequence.modifiers = {
 	ToOsu
 }
 
-ModifierSequence.construct = function(self)
+ModifierModel.construct = function(self)
 	self.sequential = {}
 	self.inconsequential = {}
-	
+
 	self:addInconsequential()
 end
 
-ModifierSequence.inconsequentialClassList = {
+ModifierModel.inconsequentialClassList = {
 	AutoPlay,
 	ProMode,
 	SpeedMode,
@@ -62,30 +62,30 @@ ModifierSequence.inconsequentialClassList = {
 	ToOsu
 }
 
-ModifierSequence.path = "userdata/modifiers.json"
+ModifierModel.path = "userdata/modifiers.json"
 
-ModifierSequence.load = function(self)
+ModifierModel.load = function(self)
 	if love.filesystem.exists(self.path) then
 		local file = io.open(self.path, "r")
 		local jsonObject = json.decode(file:read("*all"))
 		file:close()
-		
-		self.sequence:fromJson(jsonObject)
+
+        self:fromTable(jsonObject)
 	end
 end
 
-ModifierSequence.unload = function(self)
+ModifierModel.unload = function(self)
 	local file = io.open(self.path, "w")
-	file:write(self.sequence:toJson())
+	file:write(self:toJson())
 	return file:close()
 end
 
-ModifierSequence.addInconsequential = function(self)
+ModifierModel.addInconsequential = function(self)
 	local list = self.inconsequential
-	
+
 	for _, Modifier in ipairs(self.inconsequentialClassList) do
 		local modifier = Modifier:new()
-		modifier.sequence = self
+		modifier.model = self
 		modifier.enabled = false
 		modifier.Class = Modifier
 		list[#list + 1] = modifier
@@ -96,7 +96,7 @@ ModifierSequence.addInconsequential = function(self)
 	end
 end
 
-ModifierSequence.get = function(self, Modifier)
+ModifierModel.get = function(self, Modifier)
 	for _, modifier in ipairs(self.inconsequential) do
 		if modifier.Class == Modifier then
 			return modifier
@@ -104,15 +104,15 @@ ModifierSequence.get = function(self, Modifier)
 	end
 end
 
-ModifierSequence.add = function(self, Modifier)
+ModifierModel.add = function(self, Modifier)
 	local modifier = Modifier:new()
-	modifier.sequence = self
+	modifier.model = self
 	modifier.Class = Modifier
 	self.sequential[#self.sequential + 1] = modifier
 	return modifier
 end
 
-ModifierSequence.remove = function(self, modifier)
+ModifierModel.remove = function(self, modifier)
 	local list = self.sequential
 	for i, listModifier in ipairs(list) do
 		if listModifier == modifier then
@@ -122,7 +122,7 @@ ModifierSequence.remove = function(self, modifier)
 	end
 end
 
-ModifierSequence.getEnabledModifiers = function(self)
+ModifierModel.getEnabledModifiers = function(self)
 	local list = {}
 
 	for _, modifier in ipairs(self.inconsequential) do
@@ -142,54 +142,55 @@ ModifierSequence.getEnabledModifiers = function(self)
 	return list
 end
 
-ModifierSequence.apply = function(self, modifierType)
+ModifierModel.apply = function(self, modifierType)
 	for _, modifier in ipairs(self:getEnabledModifiers()) do
 		if modifier.type == modifierType then
-			-- modifier:apply()
+			modifier:apply()
 		end
 	end
 end
 
-ModifierSequence.update = function(self)
+ModifierModel.update = function(self)
 	for _, modifier in ipairs(self:getEnabledModifiers()) do
-		-- modifier:update()
+		modifier:update()
 	end
 end
 
-ModifierSequence.receive = function(self, event)
+ModifierModel.receive = function(self, event)
 	for _, modifier in ipairs(self:getEnabledModifiers()) do
-		-- modifier:receive(event)
+		modifier:receive(event)
 	end
 end
 
-ModifierSequence.tostring = function(self)
+ModifierModel.tostring = function(self)
 	local out = {}
-	
+
 	for _, modifier in ipairs(self:getEnabledModifiers()) do
 		out[#out + 1] = modifier:tostring()
 	end
-	
+
 	return table.concat(out, ", ")
 end
 
-ModifierSequence.toJson = function(self)
+-- TODO: rework this awful approach
+ModifierModel.toJson = function(self)
 	local out = {}
-	
+
 	for _, modifier in ipairs(self:getEnabledModifiers()) do
 		out[#out + 1] = modifier:tojson()
 	end
-	
+
 	return ("[%s]"):format(table.concat(out, ","))
 end
 
-ModifierSequence.toTable = function(self)
+ModifierModel.toTable = function(self)
 	return json.decode(self:toJson())
 end
 
-ModifierSequence.fromJson = function(self, jsonObject)
+ModifierModel.fromTable = function(self, modifiersTable)
 	self:construct()
 
-	for _, modifierData in ipairs(jsonObject) do
+	for _, modifierData in ipairs(modifiersTable) do
 		for _, Modifier in ipairs(self.modifiers) do
 			if modifierData.name == Modifier.name then
 				local modifier
@@ -199,7 +200,7 @@ ModifierSequence.fromJson = function(self, jsonObject)
 				elseif Modifier.sequential then
 					modifier = self:add(Modifier)
 				end
-				
+
 				if modifier.variableName then
 					modifier[modifier.variableName] = modifierData[modifier.variableName]
 				end
@@ -208,4 +209,4 @@ ModifierSequence.fromJson = function(self, jsonObject)
 	end
 end
 
-return ModifierSequence
+return ModifierModel

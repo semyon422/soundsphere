@@ -13,7 +13,6 @@ local GameConfig		= require("sphere.config.GameConfig")
 local NoteChartStateManager = {}
 
 NoteChartStateManager.searchString = ""
-NoteChartStateManager.path = "userdata/selectedChart.json"
 
 NoteChartStateManager.init = function(self)
 	self.observable = Observable:new()
@@ -21,39 +20,28 @@ NoteChartStateManager.init = function(self)
 	ScoreList.observable:add(self)
 	NoteChartList.observable:add(self)
 	NoteChartSetList.observable:add(self)
-
-	self.selectedChart = {1, 1}
 end
 
 NoteChartStateManager.load = function(self)
-	if love.filesystem.exists(self.path) then
-		local file = io.open(self.path, "r")
-		self.selectedChart = json.decode(file:read("*all"))
-		file:close()
+	local noteChartSetEntry = self.noteChartModel.noteChartSetEntry
+	local noteChartEntry = self.noteChartModel.noteChartEntry
 
-		local noteChartSetEntry = CacheManager:getNoteChartSetEntryById(self.selectedChart[1])
-		local noteChartEntry = CacheManager:getNoteChartEntryById(self.selectedChart[2])
+	local itemIndex = NoteChartSetList:getItemIndex(noteChartSetEntry)
+	NoteChartSetList:quickScrollToItemIndex(itemIndex)
+	NoteChartSetList:send({
+		sender = NoteChartSetList,
+		action = "scrollTarget",
+		itemIndex = itemIndex,
+		list = NoteChartSetList
+	})
+	NoteChartSetList:calculateButtons()
 
-		local itemIndex = NoteChartSetList:getItemIndex(noteChartSetEntry)
-		NoteChartSetList:quickScrollToItemIndex(itemIndex)
-		NoteChartSetList:send({
-			sender = NoteChartSetList,
-			action = "scrollTarget",
-			itemIndex = itemIndex,
-			list = NoteChartSetList
-		})
-		NoteChartSetList:calculateButtons()
-
-		local itemIndex = NoteChartList:getItemIndex(noteChartEntry)
-		NoteChartList:quickScrollToItemIndex(itemIndex)
-		NoteChartList:calculateButtons()
-	end
+	local itemIndex = NoteChartList:getItemIndex(noteChartEntry)
+	NoteChartList:quickScrollToItemIndex(itemIndex)
+	NoteChartList:calculateButtons()
 end
 
 NoteChartStateManager.unload = function(self)
-	local file = io.open(self.path, "w")
-	file:write(json.encode(self.selectedChart))
-	return file:close()
 end
 
 NoteChartStateManager.send = function(self, event)
@@ -141,10 +129,10 @@ NoteChartStateManager.receive = function(self, event)
 			if list and list[1] then
 				local focusedItem = NoteChartList.items[NoteChartList.focusedItemIndex]
 				local noteChartEntry = focusedItem and focusedItem.noteChartEntry
-				
+
 				NoteChartList.setId = item.noteChartSetEntry.id
 				NoteChartList:selectCache()
-				
+
 				local itemIndex = NoteChartList:getItemIndex(noteChartEntry)
 				NoteChartList:quickScrollToItemIndex(itemIndex)
 
@@ -157,12 +145,21 @@ NoteChartStateManager.receive = function(self, event)
 			end
 
 			self.noteChartSetEntry = item.noteChartSetEntry
-			self.selectedChart[1] = item.noteChartSetEntry.id
+
+			self.observable:send({
+				name = "selectNoteChart",
+				type = "noteChartSetEntry",
+				id = item.noteChartSetEntry.id
+			})
 		elseif sender == NoteChartList then
 			local item = NoteChartList.items[event.itemIndex]
 			if not item then return end
-			
-			self.selectedChart[2] = item.noteChartEntry.id
+
+			self.observable:send({
+				name = "selectNoteChart",
+				type = "noteChartEntry",
+				id = item.noteChartEntry.id
+			})
 
 			self:send({
 				sender = self,
@@ -177,16 +174,16 @@ NoteChartStateManager.receive = function(self, event)
 		else
 			NoteChartSetList.needSearch = true
 		end
-		
+
 		self.searchString = event.text
 		NoteChartSetList.searchString = event.text
 		NoteChartList.searchString = event.text
-		
+
 		local focusedItem = NoteChartSetList.items[NoteChartSetList.focusedItemIndex]
 		local noteChartSetEntry = focusedItem and focusedItem.noteChartSetEntry
-		
+
 		NoteChartSetList:selectCache()
-		
+
 		NoteChartSetList:quickScrollToItemIndex(NoteChartSetList:getItemIndex(noteChartSetEntry))
 		NoteChartSetList:sendState()
 	elseif event.name == "keypressed" and event.args[1] == GameConfig:get("select.selectRandomNoteChartSet") then

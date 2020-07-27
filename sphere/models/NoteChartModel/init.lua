@@ -3,24 +3,38 @@ local json = require("json")
 local CacheManager		= require("sphere.database.CacheManager")
 local NoteChartFactory			= require("notechart.NoteChartFactory")
 
-
 local NoteChartModel = Class:new()
 
-NoteChartModel.path = "userdata/selectedChart.json"
+NoteChartModel.path = "userdata/selected.json"
 
 NoteChartModel.construct = function(self)
-	self.selectedChart = {1, 1}
+	self.selected = {1, 1}
 end
 
 NoteChartModel.load = function(self)
 	if love.filesystem.exists(self.path) then
 		local file = io.open(self.path, "r")
-		self.selectedChart = json.decode(file:read("*all"))
+		self.selected = json.decode(file:read("*all"))
 		file:close()
 
-		self.noteChartSetEntry = CacheManager:getNoteChartSetEntryById(self.selectedChart[1])
-		self.noteChartEntry = CacheManager:getNoteChartEntryById(self.selectedChart[2])
+		self.noteChartSetEntry = CacheManager:getNoteChartSetEntryById(self.selected[1])
+		self.noteChartEntry = CacheManager:getNoteChartEntryById(self.selected[2])
 	end
+end
+
+NoteChartModel.unload = function(self)
+	local file = io.open(self.path, "w")
+	file:write(json.encode(self.selected))
+	return file:close()
+end
+
+NoteChartModel.selectNoteChartSet = function(self, id)
+	self.selected[1] = id
+end
+
+
+NoteChartModel.selectNoteChart = function(self, id)
+	self.selected[2] = id
 end
 
 NoteChartModel.getNoteChart = function(self)

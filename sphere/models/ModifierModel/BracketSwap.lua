@@ -1,4 +1,4 @@
-local SwapModifier = require("sphere.models.RhythmModel.ModifierManager.SwapModifier")
+local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 
 local BracketSwap = SwapModifier:new()
 
@@ -16,7 +16,7 @@ BracketSwap.hardcodedMaps = {
 }
 
 BracketSwap.getMap = function(self)
-	local noteChart = self.sequence.manager.noteChart
+	local noteChart = self.model.noteChart
 
 	local keyCount = noteChart.inputMode:getInputCount("key")
 

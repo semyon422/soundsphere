@@ -43,7 +43,7 @@ InconsequentialModifierButton.construct = function(self)
 			button = AddModifierButton:new(self)
 			button.item = self.item
 			button.add = function(self)
-				-- ModifierManager.sequence:add(Modifier)
+				self.list.modifierModel:add(Modifier)
 				SequenceList:reloadItems()
 			end
 		-- end

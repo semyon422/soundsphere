@@ -36,8 +36,12 @@ SelectController.receive = function(self, event)
 	-- end
 
 	
-	if event.action == "selectNoteChart" then
-
+	if event.name == "selectNoteChart" then
+		if event.type == "noteChartEntry" then
+			self.noteChartModel:selectNoteChart(event.id)
+		elseif event.type == "noteChartSetEntry" then
+			self.noteChartModel:selectNoteChartSet(event.id)
+		end
 	elseif event.action == "playNoteChart" then
 		if not love.filesystem.exists(event.noteChartEntry.path) then
 			return

@@ -1,4 +1,4 @@
-local Modifier = require("sphere.models.RhythmModel.ModifierManager.Modifier")
+local Modifier = require("sphere.models.ModifierModel.Modifier")
 local NoteData = require("ncdk.NoteData")
 
 local NoScratch = Modifier:new()
@@ -12,7 +12,7 @@ NoScratch.shortName = "NoScratch"
 NoScratch.variableType = "boolean"
 
 NoScratch.apply = function(self)
-	local noteChart = self.sequence.manager.noteChart
+	local noteChart = self.model.noteChart
 	local layerDataSequence = noteChart.layerDataSequence
 
 	noteChart.inputMode:setInputCount("scratch", nil)

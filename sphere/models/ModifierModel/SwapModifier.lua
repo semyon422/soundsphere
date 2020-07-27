@@ -1,4 +1,4 @@
-local Modifier = require("sphere.models.RhythmModel.ModifierManager.Modifier")
+local Modifier = require("sphere.models.ModifierModel.Modifier")
 
 local SwapModifier = Modifier:new()
 
@@ -11,7 +11,7 @@ SwapModifier.shortName = "SwapModifier"
 SwapModifier.apply = function(self)
 	local map = self:getMap()
 
-	local noteChart = self.sequence.manager.noteChart
+	local noteChart = self.model.noteChart
 	local layerDataSequence = noteChart.layerDataSequence
 	
 	for layerIndex in noteChart:getLayerDataIndexIterator() do

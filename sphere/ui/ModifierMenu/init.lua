@@ -51,6 +51,8 @@ ModifierMenu.reload = function(self)
 end
 
 ModifierMenu.reloadItems = function(self)
+	ModifierList.modifierModel = self.modifierModel
+	SequenceList.modifierModel = self.modifierModel
 	ModifierList:addItems()
 	SequenceList:reloadItems()
 end

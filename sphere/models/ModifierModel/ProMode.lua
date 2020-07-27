@@ -1,4 +1,4 @@
-local Modifier = require("sphere.models.RhythmModel.ModifierManager.Modifier")
+local Modifier = require("sphere.models.ModifierModel.Modifier")
 
 local ProMode = Modifier:new()
 
@@ -11,7 +11,7 @@ ProMode.shortName = "ProMode"
 ProMode.variableType = "boolean"
 
 ProMode.apply = function(self)
-	self.sequence.manager.logicEngine.promode = true
+	self.model.logicEngine.promode = true
 end
 
 ProMode.receive = function(self, event)
@@ -19,7 +19,7 @@ ProMode.receive = function(self, event)
 		return
 	end
 
-	local logicEngine = self.sequence.manager.logicEngine
+	local logicEngine = self.model.logicEngine
 
 	local nearestNote
 	for noteHandler in pairs(logicEngine.noteHandlers) do

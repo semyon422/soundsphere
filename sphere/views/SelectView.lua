@@ -31,13 +31,18 @@ SelectView.load = function(self)
 	self.gui = GUI:new()
 	self.gui.container = self.container
 
-    NoteChartStateManager.observable:add(self.controller)
+	NoteChartStateManager.observable:add(self.controller)
+	NoteChartStateManager.noteChartModel = self.noteChartModel
 
 	self.gui:load("userdata/interface/select.json")
 	self.gui:reload()
 
-	-- KeyBindMenu.SelectScreen = SelectScreen
-	-- NoteSkinMenu.SelectScreen = SelectScreen
+	KeyBindMenu.noteChartModel = self.noteChartModel
+	NoteSkinMenu.noteChartModel = self.noteChartModel
+
+	KeyBindMenu.modifierModel = self.modifierModel
+	NoteSkinMenu.modifierModel = self.modifierModel
+	ModifierMenu.modifierModel = self.modifierModel
 
 	AliasManager:load()
 	ModifierMenu:reloadItems()

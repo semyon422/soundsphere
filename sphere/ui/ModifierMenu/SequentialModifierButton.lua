@@ -15,7 +15,7 @@ SequentialModifierButton.construct = function(self)
 		button.item = self.item
 		button.updateValue = function(self, value) end
 		button.removeModifier = function(self)
-			-- ModifierManager.sequence:remove(modifier)
+			self.list.modifierModel:remove(modifier)
 			
 			local SequenceList = require("sphere.ui.ModifierMenu.SequenceList")
 			SequenceList:reloadItems()
@@ -29,7 +29,7 @@ SequentialModifierButton.construct = function(self)
 			SliderButton.updateValue(self, value)
 		end
 		button.removeModifier = function(self)
-			-- ModifierManager.sequence:remove(modifier)
+			self.list.modifierModel.sequence:remove(modifier)
 			
 			local SequenceList = require("sphere.ui.ModifierMenu.SequenceList")
 			SequenceList:reloadItems()

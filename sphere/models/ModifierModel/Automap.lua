@@ -5,7 +5,7 @@ local NoteBlock				= require("libchart.NoteBlock")
 local BlockFinder			= require("libchart.BlockFinder")
 local NotePreprocessor		= require("libchart.NotePreprocessor")
 local NoteData				= require("ncdk.NoteData")
-local Modifier				= require("sphere.models.RhythmModel.ModifierManager.Modifier")
+local Modifier				= require("sphere.models.ModifierModel.Modifier")
 
 local config = {}
 
@@ -230,7 +230,7 @@ Automap.tojson = function(self)
 end
 
 Automap.apply = function(self)
-	local noteChart = self.sequence.manager.noteChart
+	local noteChart = self.model.noteChart
 	self.noteChart = noteChart
 
 	self.targetMode = self.keys

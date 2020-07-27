@@ -12,7 +12,7 @@ userdata/input.json
 userdata/config.json
 userdata/mount.json
 userdata/modifiers.json
-userdata/selectedChart.json
+userdata/selected.json
 userdata/charts.db
 userdata/scores.db
 userdata/charts.db-journal

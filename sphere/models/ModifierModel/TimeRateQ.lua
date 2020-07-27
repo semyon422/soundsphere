@@ -1,4 +1,4 @@
-local Modifier = require("sphere.models.RhythmModel.ModifierManager.Modifier")
+local Modifier = require("sphere.models.ModifierModel.Modifier")
 
 local TimeRateQ = Modifier:new()
 
@@ -25,7 +25,7 @@ end
 
 -- https://github.com/Quaver/Quaver/issues/666
 TimeRateQ.apply = function(self)
-	self.sequence.manager.timeEngine:createTimeRateHandler().timeRate = 2 ^ (0.1 * self.value)
+	self.model.timeEngine:createTimeRateHandler().timeRate = 2 ^ (0.1 * self.value)
 end
 
 return TimeRateQ

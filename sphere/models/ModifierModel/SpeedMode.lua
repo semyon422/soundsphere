@@ -1,4 +1,4 @@
-local Modifier = require("sphere.models.RhythmModel.ModifierManager.Modifier")
+local Modifier = require("sphere.models.ModifierModel.Modifier")
 
 local SpeedMode = Modifier:new()
 
@@ -26,7 +26,7 @@ SpeedMode.tojson = function(self)
 end
 
 SpeedMode.applySpeed = function(self, speed)
-	local noteChart = self.sequence.manager.noteChart
+	local noteChart = self.model.noteChart
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
@@ -43,7 +43,7 @@ SpeedMode.applySpeed = function(self, speed)
 end
 
 SpeedMode.applyConstant = function(self)
-	local noteChart = self.sequence.manager.noteChart
+	local noteChart = self.model.noteChart
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
@@ -62,7 +62,7 @@ SpeedMode.applyConstant = function(self)
 end
 
 SpeedMode.apply = function(self)
-	local noteChart = self.sequence.manager.noteChart
+	local noteChart = self.model.noteChart
 	
 	local minTime = noteChart.metaData:get("minTime")
 	local maxTime = noteChart.metaData:get("maxTime")

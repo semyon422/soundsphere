@@ -1,4 +1,4 @@
-local Modifier = require("sphere.models.RhythmModel.ModifierManager.Modifier")
+local Modifier = require("sphere.models.ModifierModel.Modifier")
 local map = require("aqua.math").map
 
 local WindUp = Modifier:new()
@@ -12,11 +12,11 @@ WindUp.shortName = "WindUp"
 WindUp.variableType = "boolean"
 
 WindUp.apply = function(self)
-	self.timeRateHandler = self.sequence.manager.timeEngine:createTimeRateHandler()
+	self.timeRateHandler = self.model.timeEngine:createTimeRateHandler()
 end
 
 WindUp.update = function(self)
-	local timeEngine = self.sequence.manager.timeEngine
+	local timeEngine = self.model.timeEngine
 	local startTime = timeEngine.noteChart.metaData:get("minTime")
 	local endTime = timeEngine.noteChart.metaData:get("maxTime")
 	local currentTime = timeEngine.exactCurrentTime
@@ -28,7 +28,7 @@ WindUp.update = function(self)
 	local timeRate = map(currentTime, startTime, endTime, 0.75, 1.5)
 	self.timeRateHandler.timeRate = timeRate
 
-	local baseTimeRate = self.sequence.manager.timeEngine:getBaseTimeRate()
+	local baseTimeRate = self.model.timeEngine:getBaseTimeRate()
 	timeEngine:setTimeRate(baseTimeRate, false)
 end
 

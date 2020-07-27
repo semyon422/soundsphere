@@ -31,17 +31,17 @@ SequenceList.load = function(self)
 end
 
 SequenceList.reloadItems = function(self)
-	-- local sequential = ModifierManager.sequence.sequential
-	
+	local sequential = self.modifierModel.sequential
+
 	local items = {}
-	-- for _, modifier in ipairs(sequential) do
-	-- 	items[#items + 1] = {
-	-- 		name = modifier.name,
-	-- 		modifier = modifier,
-	-- 		Modifier = modifier.Class
-	-- 	}
-	-- end
-	
+	for _, modifier in ipairs(sequential) do
+		items[#items + 1] = {
+			name = modifier.name,
+			modifier = modifier,
+			Modifier = modifier.Class
+		}
+	end
+
 	return self:setItems(items)
 end
 
@@ -49,7 +49,7 @@ SequenceList.send = function(self, event)
 	if event.action == "buttonInteract" and event.button == 1 then
 		-- ModifierDisplay:updateText()
 	end
-	
+
 	CustomList.send(self, event)
 end
 

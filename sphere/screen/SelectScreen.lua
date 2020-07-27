@@ -1,21 +1,39 @@
 local Screen			= require("sphere.screen.Screen")
-local SelectView	= require("sphere.views.SelectView")
+local SelectView		= require("sphere.views.SelectView")
 local SelectController	= require("sphere.controllers.SelectController")
+local NoteChartModel	= require("sphere.models.NoteChartModel")
+local ModifierModel		= require("sphere.models.ModifierModel")
 
 local SelectScreen = Screen:new()
 
 SelectScreen.load = function(self)
-	self.view = SelectView:new()
-	self.controller = SelectController:new()
+	local modifierModel = ModifierModel:new()
+	local noteChartModel = NoteChartModel:new()
+	local view = SelectView:new()
+	local controller = SelectController:new()
 
-	self.view.controller = self.controller
-	self.controller.view = self.view
+	self.modifierModel = modifierModel
+	self.noteChartModel = noteChartModel
+	self.view = view
+	self.controller = controller
 
-	self.view:load()
-	self.controller:load()
+	view.controller = controller
+	view.noteChartModel = noteChartModel
+	view.modifierModel = modifierModel
+
+	controller.view = view
+	controller.noteChartModel = noteChartModel
+
+	modifierModel:load()
+	noteChartModel:load()
+
+	view:load()
+	controller:load()
 end
 
 SelectScreen.unload = function(self)
+	self.modifierModel:unload()
+	self.noteChartModel:unload()
 	self.view:unload()
 end
 

@@ -1,4 +1,4 @@
-local SwapModifier = require("sphere.models.RhythmModel.ModifierManager.SwapModifier")
+local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 
 local Random = SwapModifier:new()
 
@@ -26,7 +26,7 @@ Random.tojson = function(self)
 end
 
 Random.getMap = function(self)
-	local noteChart = self.sequence.manager.noteChart
+	local noteChart = self.model.noteChart
 	local value = self.value
 
 	local inputs = {}
