@@ -33,9 +33,9 @@ end
 SelectController.receive = function(self, event)
 	if event.name == "setNoteSkin" then
 		self.noteSkinModel:setDefaultNoteSkin(event.inputMode, event.metaData)
-	end
-
-	if event.name == "selectNoteChart" then
+	elseif event.name == "setInputBinding" then
+		self.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
+	elseif event.name == "selectNoteChart" then
 		if event.type == "noteChartEntry" then
 			self.noteChartModel:selectNoteChart(event.id)
 		elseif event.type == "noteChartSetEntry" then

@@ -34,8 +34,9 @@ GameplayScreen.load = function(self)
 	local noteChart = noteChartModel:getNoteChart()
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
+	view.noteChart = noteChart
 
-	inputModel:read()
+	inputModel:load()
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
 	rhythmModel.inputManager:setInputMode(noteChart.inputMode:getString())
 
@@ -67,6 +68,8 @@ GameplayScreen.load = function(self)
 	rhythmModel.logicEngine:load()
 	rhythmModel.graphicEngine:load()
 	rhythmModel.replayManager:load()
+
+	view.scoreSystem = rhythmModel.scoreEngine.scoreSystem
 
 	view:load()
 

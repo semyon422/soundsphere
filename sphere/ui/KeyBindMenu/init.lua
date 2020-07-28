@@ -1,10 +1,8 @@
+local Observable		= require("aqua.util.Observable")
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Rectangle			= require("aqua.graphics.Rectangle")
--- local InputManager		= require("sphere.screen.gameplay.InputManager")
 local KeyBindList		= require("sphere.ui.KeyBindMenu.KeyBindList")
 local BackgroundManager	= require("sphere.ui.BackgroundManager")
-local NoteChartList  	= require("sphere.ui.NoteChartList")
--- local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 
 local KeyBindMenu = {}
 
@@ -12,6 +10,8 @@ KeyBindMenu.hidden = true
 KeyBindMenu.csall = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
 KeyBindMenu.init = function(self)
+	self.observable = Observable:new()
+
 	self.background = Rectangle:new({
 		x = 0,
 		y = 0,
@@ -32,7 +32,6 @@ end
 
 KeyBindMenu.hide = function(self)
 	self.hidden = true
-	-- InputManager:write()
 end
 
 KeyBindMenu.update = function(self)
@@ -71,7 +70,6 @@ end
 
 KeyBindMenu.show = function(self)
 	self.hidden = false
-	-- InputManager:read()
 
 	self.noteChart = self.noteChartModel:getNoteChart()
 

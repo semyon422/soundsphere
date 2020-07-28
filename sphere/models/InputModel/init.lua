@@ -14,7 +14,7 @@ InputModel.types = {
 	"joystick"
 }
 
-InputModel.read = function(self)
+InputModel.load = function(self)
 	self.inputBindings = {}
 	if love.filesystem.exists(self.path) then
 		local file = io.open(self.path, "r")
@@ -23,7 +23,7 @@ InputModel.read = function(self)
 	end
 end
 
-InputModel.write = function(self)
+InputModel.unload = function(self)
 	local file = io.open(self.path, "w")
 	file:write(json.encode(self.inputBindings))
 	return file:close()

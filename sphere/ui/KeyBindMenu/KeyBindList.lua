@@ -1,8 +1,6 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
-local Observable		= require("aqua.util.Observable")
 local CustomList		= require("sphere.ui.CustomList")
 local KeyBindListButton	= require("sphere.ui.KeyBindMenu.KeyBindListButton")
-local NoteChartList  	= require("sphere.ui.NoteChartList")
 
 local KeyBindList = CustomList:new()
 
@@ -33,16 +31,6 @@ KeyBindList.load = function(self)
 	self:reload()
 end
 
-KeyBindList.receive = function(self, event)
-	if event.name == "keypressed" then
-		local key = event.args[1]
-		if key == "f5" then
-		end
-	end
-	
-	return CustomList.receive(self, event)
-end
-
 KeyBindList.getSelectedInputMode = function(self)
 	local noteChart = self.menu.noteChart
 
@@ -61,7 +49,7 @@ KeyBindList.addItems = function(self)
 	end
 
 	local items = {}
-	
+
 	for inputCount, inputType in self:getSelectedInputMode():gmatch("([0-9]+)([a-z]+)") do
 		for i = 1, inputCount do
 			items[#items + 1] = {
@@ -71,7 +59,7 @@ KeyBindList.addItems = function(self)
 			}
 		end
 	end
-	
+
 	return self:setItems(items)
 end
 

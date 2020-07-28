@@ -7,8 +7,6 @@ local GUI = require("sphere.ui.GUI")
 local GameplayView = Class:new()
 
 GameplayView.load = function(self)
-	local rhythmModel = self.rhythmModel
-
 	self.container = Container:new()
 
 	local noteSkinView = NoteSkinView:new()
@@ -26,8 +24,8 @@ GameplayView.load = function(self)
 	self.gui = gui
 	gui.container = self.container
 	gui.root = self.noteSkin.directoryPath
-	gui.scoreSystem = rhythmModel.scoreEngine.scoreSystem
-	gui.noteChart = rhythmModel.noteChart
+	gui.scoreSystem = self.scoreSystem
+	gui.noteChart = self.noteChart
 	gui:loadTable(self.noteSkin.playField)
 end
 

@@ -44,6 +44,9 @@ SelectView.load = function(self)
 
 	NoteSkinMenu.noteSkinModel = self.noteSkinModel
 	NoteSkinMenu.observable:add(self.controller)
+	KeyBindMenu.observable:add(self.controller)
+
+	KeyBindMenu.inputModel = self.inputModel
 
 	KeyBindMenu.modifierModel = self.modifierModel
 	NoteSkinMenu.modifierModel = self.modifierModel
