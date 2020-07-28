@@ -12,9 +12,7 @@ GameplayView.load = function(self)
 	self.container = Container:new()
 
 	local noteSkinView = NoteSkinView:new()
-	noteSkinView.noteSkinData = rhythmModel.graphicEngine.noteSkin.noteSkinData
-	noteSkinView.metaData = rhythmModel.graphicEngine.noteSkin.metaData
-	noteSkinView.env = rhythmModel.graphicEngine.noteSkin.env
+	noteSkinView.noteSkin = self.noteSkin
 	noteSkinView:load()
 	self.noteSkinView = noteSkinView
 
@@ -27,10 +25,10 @@ GameplayView.load = function(self)
 	local gui = GUI:new()
 	self.gui = gui
 	gui.container = self.container
-	gui.root = rhythmModel.noteSkinMetaData.directoryPath
+	gui.root = self.noteSkin.directoryPath
 	gui.scoreSystem = rhythmModel.scoreEngine.scoreSystem
 	gui.noteChart = rhythmModel.noteChart
-	gui:loadTable(rhythmModel.graphicEngine.noteSkin.playField)
+	gui:loadTable(self.noteSkin.playField)
 end
 
 GameplayView.unload = function(self)

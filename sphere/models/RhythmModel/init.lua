@@ -99,7 +99,6 @@ RhythmModel.setNoteChart = function(self, noteChart)
 end
 
 RhythmModel.setNoteSkin = function(self, noteSkin)
-	assert(noteSkin)
 	self.graphicEngine.noteSkin = noteSkin
 end
 

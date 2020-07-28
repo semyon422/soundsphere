@@ -5,21 +5,21 @@ local NoteSkinModel				= require("sphere.models.NoteSkinModel")
 local InputModel				= require("sphere.models.InputModel")
 local GameplayController		= require("sphere.controllers.GameplayController")
 local GameplayView				= require("sphere.views.GameplayView")
-local NoteSkinManager			= require("sphere.models.NoteSkinModel.NoteSkinManager")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 
 local GameplayScreen = Screen:new()
 
 GameplayScreen.load = function(self)
-	NoteSkinManager:load()
-
 	local noteChartModel = NoteChartModel:new()
-	noteChartModel:load()
-
+	local noteSkinModel = NoteSkinModel:new()
 	local rhythmModel = RhythmModel:new()
+	local inputModel = InputModel:new()
+
+	noteChartModel:load()
+	noteSkinModel:load()
+
 	local view = GameplayView:new()
 	local gameplayController = GameplayController:new()
-	local inputModel = InputModel:new()
 
 	self.rhythmModel = rhythmModel
 	self.view = view
@@ -47,8 +47,10 @@ GameplayScreen.load = function(self)
 
 	modifierModel:apply("NoteChartModifier")
 
-	rhythmModel.noteSkinMetaData = NoteSkinModel:getNoteSkinMetaData(noteChart)
-	rhythmModel:setNoteSkin(NoteSkinModel:getNoteSkin(rhythmModel.noteSkinMetaData))
+	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
+	noteSkin:load()
+	rhythmModel:setNoteSkin(noteSkin)
+	view.noteSkin = noteSkin
 
 	rhythmModel.timeEngine:load()
 	modifierModel:apply("TimeEngineModifier")

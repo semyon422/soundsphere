@@ -1,5 +1,4 @@
 local Class = require("aqua.util.Class")
-local NoteSkin = require("sphere.models.NoteSkinModel.NoteSkin")
 
 local toml = require("lua-toml.toml")
 toml.strict = false
@@ -9,12 +8,10 @@ local TomlNoteSkinLoader = Class:new()
 TomlNoteSkinLoader.data = {}
 TomlNoteSkinLoader.path = "userdata/skins"
 
-TomlNoteSkinLoader.load = function(self, metaData, version)
-	local noteSkin = NoteSkin:new()
-	noteSkin.metaData = metaData
+TomlNoteSkinLoader.load = function(self, noteSkin)
 	self.noteSkin = noteSkin
 
-	local file = io.open(metaData.directoryPath .. "/" .. metaData.path, "r")
+	local file = io.open(noteSkin.directoryPath .. "/" .. noteSkin.path, "r")
 	noteSkin.tomlData = toml.parse(file:read("*all"))
 	file:close()
 
@@ -32,13 +29,7 @@ TomlNoteSkinLoader.load = function(self, metaData, version)
 
 	self:addBmsBga()
 
-	noteSkin.data = noteSkin.noteSkinData.notes or {}
-
-	noteSkin:load()
-
-	-- ajson.write("skin.json", noteSkin.playField)
-
-	return noteSkin
+	noteSkin.notes = noteSkin.data.notes or {}
 end
 
 local colors = {
@@ -62,7 +53,7 @@ local envcolor = function(timeState, logicalState, data)
 	elseif logicalState == "passed" then
 		return colors.passed
     end
-	
+
 	local startTimeState = timeState.startTimeState or timeState
 	local endTimeState = timeState.endTimeState or timeState
 	local sdt = timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime
@@ -110,12 +101,12 @@ end
 
 TomlNoteSkinLoader.processNoteSkinData = function(self)
 	local noteSkin = self.noteSkin
-	local noteSkinData = noteSkin.noteSkinData
+	local data = noteSkin.data
 
-	noteSkinData.images = {}
+	data.images = {}
 	self.imageNames = {}
 
-	noteSkinData.notes = {}
+	data.notes = {}
 	local input = noteSkin.tomlData.general.input
 	for i = 1, #input do
 		self:processInput(input[i], i)
@@ -128,9 +119,9 @@ TomlNoteSkinLoader.addCS = function(self)
 	local columns = self.noteSkin.tomlData.columns
 	local align = columns.align
 
-	local noteSkinData = self.noteSkin.noteSkinData
-	noteSkinData.cses = {}
-	local cses = noteSkinData.cses
+	local data = self.noteSkin.data
+	data.cses = {}
+	local cses = data.cses
 	self.cses = cses
 
 	if align == "left" then
@@ -145,9 +136,9 @@ end
 
 TomlNoteSkinLoader.getImageName = function(self, path, layer)
 	local noteSkin = self.noteSkin
-	local noteSkinData = noteSkin.noteSkinData
+	local data = noteSkin.data
 
-	local images = noteSkinData.images
+	local images = data.images
 	local imageNames = self.imageNames
 
 	local name = path .. ":" .. layer
@@ -223,11 +214,11 @@ TomlNoteSkinLoader.addShortNote = function(self, input, i)
 		return
 	end
 
-	local noteSkinData = noteSkin.noteSkinData
+	local data = noteSkin.data
 
-	noteSkinData.notes[input .. ":ShortNote"] = {}
-	local shortNote = noteSkinData.notes[input .. ":ShortNote"]
-	
+	data.notes[input .. ":ShortNote"] = {}
+	local shortNote = data.notes[input .. ":ShortNote"]
+
 	local unit = self.unit
 	local scroll = noteSkin.tomlData.general.scroll
 
@@ -258,10 +249,10 @@ TomlNoteSkinLoader.addLongNote = function(self, input, i)
 		return
 	end
 
-	local noteSkinData = noteSkin.noteSkinData
+	local data = noteSkin.data
 
-	noteSkinData.notes[input .. ":LongNote"] = {}
-	local longNote = noteSkinData.notes[input .. ":LongNote"]
+	data.notes[input .. ":LongNote"] = {}
+	local longNote = data.notes[input .. ":LongNote"]
 
 	local unit = self.unit
 	local scroll = noteSkin.tomlData.general.scroll
@@ -324,11 +315,11 @@ TomlNoteSkinLoader.addSoundNote = function(self, input, i)
 		return
 	end
 
-	local noteSkinData = noteSkin.noteSkinData
+	local data = noteSkin.data
 
-	noteSkinData.notes[input .. ":SoundNote"] = {}
-	local shortNote = noteSkinData.notes[input .. ":SoundNote"]
-	
+	data.notes[input .. ":SoundNote"] = {}
+	local shortNote = data.notes[input .. ":SoundNote"]
+
 	local unit = self.unit
 	local scroll = noteSkin.tomlData.general.scroll
 
@@ -383,7 +374,7 @@ end
 
 TomlNoteSkinLoader.addPlayFieldGuidelines = function(self)
 	local playField = self.noteSkin.playField
-	
+
 	local guidelines = self.noteSkin.tomlData.guidelines
 	local unit = self.unit
 
@@ -415,10 +406,10 @@ end
 
 TomlNoteSkinLoader.addMeasureLine = function(self)
 	local noteSkin = self.noteSkin
-	local noteSkinData = noteSkin.noteSkinData
+	local data = noteSkin.data
 
-	noteSkinData.notes["measure1:LongNote"] = {}
-	local longNote = noteSkinData.notes["measure1:LongNote"]
+	data.notes["measure1:LongNote"] = {}
+	local longNote = data.notes["measure1:LongNote"]
 
 	local tomlMeasureLine = noteSkin.tomlData.measureline
 	local unit = self.unit
@@ -507,7 +498,7 @@ TomlNoteSkinLoader.getPlayFielObjectXYWH = function(self, object)
 		local y = oy / unit
 		local w = ow / unit
 		local h = oh / unit
-		
+
 		return x, y, w, h, self.cses[1]
 	elseif object.origin == "all" then
 		return ox, oy, ow, oh, self.cses[2]
@@ -653,10 +644,10 @@ end
 
 TomlNoteSkinLoader.addImageNote = function(self, input, layer)
 	local noteSkin = self.noteSkin
-	local noteSkinData = noteSkin.noteSkinData
+	local data = noteSkin.data
 
-	noteSkinData.notes[input .. ":ImageNote"] = {}
-	local imageNote = noteSkinData.notes[input .. ":ImageNote"]
+	data.notes[input .. ":ImageNote"] = {}
+	local imageNote = data.notes[input .. ":ImageNote"]
 
 	imageNote.Head = {}
 	local head = imageNote.Head
@@ -675,10 +666,10 @@ end
 
 TomlNoteSkinLoader.addVideoNote = function(self, input, layer)
 	local noteSkin = self.noteSkin
-	local noteSkinData = noteSkin.noteSkinData
+	local data = noteSkin.data
 
-	noteSkinData.notes[input .. ":VideoNote"] = {}
-	local videoNote = noteSkinData.notes[input .. ":VideoNote"]
+	data.notes[input .. ":VideoNote"] = {}
+	local videoNote = data.notes[input .. ":VideoNote"]
 
 	videoNote.Head = {}
 	local head = videoNote.Head

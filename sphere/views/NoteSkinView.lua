@@ -15,7 +15,7 @@ NoteSkinView.timeRate = 1
 NoteSkinView.load = function(self)
 	self.allcs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
-	local nsdCses = self.noteSkinData.cses
+    local nsdCses = self.noteSkin.data.cses
 	self.cses = {}
 	for i = 1, #nsdCses do
 		self.cses[i] = CoordinateManager:getCS(
@@ -26,8 +26,6 @@ NoteSkinView.load = function(self)
 			nsdCses[i][5]
 		)
 	end
-
-	self.data = self.noteSkinData.notes or {}
 
 	self.images = {}
 	self:loadImages()
@@ -47,15 +45,15 @@ end
 
 local newImage = love.graphics.newImage
 NoteSkinView.loadImage = function(self, imageData)
-	self.images[imageData.name] = newImage(self.metaData.directoryPath .. "/" .. imageData.path)
+	self.images[imageData.name] = newImage(self.noteSkin.directoryPath .. "/" .. imageData.path)
 end
 
 NoteSkinView.loadImages = function(self)
-	if not self.noteSkinData.images then
+	if not self.noteSkin.data.images then
 		return
 	end
 
-	for _, imageData in pairs(self.noteSkinData.images) do
+	for _, imageData in pairs(self.noteSkin.data.images) do
 		self:loadImage(imageData)
 	end
 end
@@ -66,11 +64,11 @@ end
 NoteSkinView.loadContainers = function(self)
 	self.containerList = {}
 
-	if not self.noteSkinData.images then
+	if not self.noteSkin.data.images then
 		return
 	end
 
-	for _, imageData in pairs(self.noteSkinData.images) do
+	for _, imageData in pairs(self.noteSkin.data.images) do
 		local container = SpriteBatch:new(nil, self.images[imageData.name], 1000)
 		container.layer = imageData.layer
 		container.blendMode = imageData.blendMode
@@ -104,38 +102,25 @@ NoteSkinView.update = function(self, dt)
 	end
 end
 
-NoteSkinView.setVisualTimeRate = function(self, visualTimeRate)
-	if visualTimeRate * self.visualTimeRate < 0 then
-		self.visualTimeRate = visualTimeRate
-		self.updateTween = false
-	else
-		self.updateTween = true
-		self.visualTimeRateTween = tween.new(0.25, self, {visualTimeRate = visualTimeRate}, "inOutQuad")
-	end
-	GameConfig.data.speed = visualTimeRate
-end
-
 NoteSkinView.getVisualTimeRate = function(self)
-	return self.visualTimeRate / math.abs(self.timeRate)
+	return self.noteSkin:getVisualTimeRate()
 end
 
 NoteSkinView.getCS = function(self, note)
-	return self.cses[self.data[note.id]["Head"].cs]
+	return self.cses[self.noteSkin.notes[note.id]["Head"].cs]
 end
 
 NoteSkinView.checkNote = function(self, note)
-	return self.data[note.id]
+	return self.noteSkin:checkNote(note)
 end
 
 NoteSkinView.getG = function(self, note, part, name, timeState)
-	local seq = self.data[note.id][part].gc[name]
-
-	return self.env[seq[1]](timeState, note.logicalState, seq[2])
+	return self.noteSkin:getG(note, part, name, timeState)
 end
 
 NoteSkinView.getNoteLayer = function(self, note, part)
 	return
-		self.data[note.id][part].layer
+		self.noteSkin.notes[note.id][part].layer
 		+ map(
 			note.startNoteData.timePoint.absoluteTime,
 			note.startNoteData.timePoint.firstTimePoint.absoluteTime,
@@ -146,7 +131,7 @@ NoteSkinView.getNoteLayer = function(self, note, part)
 end
 
 NoteSkinView.getNoteImage = function(self, note, part)
-	return self.images[self.data[note.id][part].image]
+	return self.images[self.noteSkin.notes[note.id][part].image]
 end
 
 local clear = {255, 255, 255, 255}
@@ -164,7 +149,7 @@ NoteSkinView.getImageDrawable = function(self, note, part)
 end
 
 NoteSkinView.getImageContainer = function(self, note, part)
-	return self.containers[self.data[note.id][part].image]
+	return self.containers[self.noteSkin.notes[note.id][part].image]
 end
 
 return NoteSkinView
