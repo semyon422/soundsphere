@@ -30,6 +30,7 @@ SelectView.load = function(self)
 
 	self.gui = GUI:new()
 	self.gui.container = self.container
+	self.gui.modifierModel = self.modifierModel
 
 	NoteChartStateManager.observable:add(self.gui)
 	NoteChartStateManager.observable:add(self.controller)
@@ -92,6 +93,16 @@ SelectView.receive = function(self, event)
 		return
 	elseif event.backgroundPath then
 		return BackgroundManager:loadDrawableBackground(event.backgroundPath)
+	elseif event.name == "keypressed" and event.args[1] == GameConfig:get("screen.browser") then
+		return self.controller:receive({
+			name = "setScreen",
+			screenName = "BrowserScreen"
+		})
+	elseif event.name == "keypressed" and event.args[1] == GameConfig:get("screen.settings") then
+		return self.controller:receive({
+			name = "setScreen",
+			screenName = "SettingsScreen"
+		})
 	end
 
 	NoteChartSetList:receive(event)

@@ -31,14 +31,6 @@ ModifierList.load = function(self)
 	self:reload()
 end
 
-ModifierList.send = function(self, event)
-	-- if event.action == "buttonInteract" and event.button == 1 then
-	-- 	ModifierDisplay:updateText()
-	-- end
-
-	CustomList.send(self, event)
-end
-
 ModifierList.addItems = function(self)
 	local items = {}
 

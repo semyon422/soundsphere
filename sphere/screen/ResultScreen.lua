@@ -1,10 +1,12 @@
 local Screen			= require("sphere.screen.Screen")
 local ResultView		= require("sphere.views.ResultView")
 local ResultController	= require("sphere.controllers.ResultController")
+local ModifierModel		= require("sphere.models.ModifierModel")
 
 local ResultScreen = Screen:new()
 
 ResultScreen.load = function(self)
+	local modifierModel = ModifierModel:new()
 	local view = ResultView:new()
 	local controller = ResultController:new()
 
@@ -13,6 +15,9 @@ ResultScreen.load = function(self)
 
 	controller.view = view
 
+	view.modifierModel = modifierModel
+
+	modifierModel:load()
 	view:load()
 end
 

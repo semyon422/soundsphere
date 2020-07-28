@@ -46,7 +46,8 @@ SelectScreen.draw = function(self)
 end
 
 SelectScreen.receive = function(self, event)
-	self.controller:receive(event)
+	self.view:receive(event)
+	-- self.controller:receive(event)
 end
 
 return SelectScreen

@@ -162,7 +162,7 @@ ModifierModel.receive = function(self, event)
 	end
 end
 
-ModifierModel.tostring = function(self)
+ModifierModel.getString = function(self)
 	local out = {}
 
 	for _, modifier in ipairs(self:getEnabledModifiers()) do

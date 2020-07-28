@@ -35,7 +35,6 @@ SelectController.receive = function(self, event)
 	-- 	self:setNoteSkin(event.noteSkin)
 	-- end
 
-	
 	if event.name == "selectNoteChart" then
 		if event.type == "noteChartEntry" then
 			self.noteChartModel:selectNoteChart(event.id)
@@ -54,13 +53,13 @@ SelectController.receive = function(self, event)
 		GameplayScreen.noteChartEntry = event.noteChartEntry
 		GameplayScreen.noteChartDataEntry = event.noteChartDataEntry
 		return ScreenManager:set(require("sphere.screen.GameplayScreen"))
-	elseif event.name == "keypressed" and event.args[1] == GameConfig:get("screen.browser") then
-		return ScreenManager:set(require("sphere.screen.browser.BrowserScreen"))
-	elseif event.name == "keypressed" and event.args[1] == GameConfig:get("screen.settings") then
-		return ScreenManager:set(require("sphere.screen.settings.SettingsScreen"))
+	elseif event.name == "setScreen" then
+		if event.screenName == "BrowserScreen" then
+			return ScreenManager:set(require("sphere.screen.browser.BrowserScreen"))
+		elseif event.screenName == "SettingsScreen" then
+			return ScreenManager:set(require("sphere.screen.settings.SettingsScreen"))
+		end
 	end
-
-	self.view:receive(event)
 end
 
 SelectController.setNoteSkin = function(self, noteSkin)

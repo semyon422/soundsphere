@@ -11,6 +11,7 @@ ResultView.load = function(self)
     self.gui = gui
 
 	gui.container = self.container
+	gui.modifierModel = self.modifierModel
 end
 
 ResultView.unload = function(self)
