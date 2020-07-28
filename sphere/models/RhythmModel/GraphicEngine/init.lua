@@ -16,17 +16,17 @@ GraphicEngine.load = function(self)
 	self.noteCount = 0
 	self.currentTime = 0
 	self.timeRate = 1
-	
+
 	self:loadNoteDrawers()
-	
+
 	self.noteSkin.visualTimeRate = GameConfig:get("speed")
 	self.noteSkin.targetVisualTimeRate = GameConfig:get("speed")
 end
 
 GraphicEngine.update = function(self, dt)
 	self:updateNoteDrawers()
-	
-	self.noteSkin:update(dt)
+
+	-- self.noteSkin:update(dt)
 end
 
 GraphicEngine.unload = function(self)
@@ -52,7 +52,7 @@ GraphicEngine.receive = function(self, event)
 	-- elseif event.name == "keypressed" then
 	-- 	local key = event.args[1]
 	-- 	local delta = 0.05
-		
+
 	-- 	if key == GameConfig:get("gameplay.invertPlaySpeed") then
 	-- 		self.noteSkin.targetVisualTimeRate = -self.noteSkin.targetVisualTimeRate
 	-- 		self.noteSkin:setVisualTimeRate(self.noteSkin.targetVisualTimeRate)

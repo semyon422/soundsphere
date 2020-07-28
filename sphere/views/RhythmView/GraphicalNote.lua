@@ -5,8 +5,6 @@ local GraphicalNote = Class:new()
 GraphicalNote.init = function(self)
 	self.inputId = self.startNoteData.inputType .. self.startNoteData.inputIndex
 	self.id = self.inputId .. ":" .. self.noteType
-
-	self.logicalNote = self.graphicEngine:getLogicalNote(self.startNoteData)
 end
 
 GraphicalNote.getCS = function(self)

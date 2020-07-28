@@ -4,15 +4,13 @@ local GraphicalNoteFactory = require("sphere.views.RhythmView.GraphicalNoteFacto
 local RhythmView = Class:new()
 
 RhythmView.load = function(self)
-	self.rhythmModel.graphicEngine.observable:add(self)
 	self.notes = {}
 
-	self.rhythmModel.graphicEngine.noteSkin:joinContainer(self.container)
+	self.noteSkinView:joinContainer(self.container)
 end
 
 RhythmView.unload = function(self)
-	self.rhythmModel.graphicEngine.observable:remove(self)
-	self.rhythmModel.graphicEngine.noteSkin:leaveContainer(self.container)
+	self.noteSkinView:leaveContainer(self.container)
 end
 
 RhythmView.receive = function(self, event)
@@ -24,8 +22,9 @@ RhythmView.receive = function(self, event)
 			if not graphicalNote then
 				return
 			end
-			graphicalNote.noteSkin = self.rhythmModel.graphicEngine.noteSkin
-			graphicalNote.graphicEngine = self.rhythmModel.graphicEngine
+			-- graphicalNote.noteSkin = self.rhythmModel.graphicEngine.noteSkin
+			-- graphicalNote.graphicEngine = self.rhythmModel.graphicEngine
+			graphicalNote.noteSkinView = self.noteSkinView
 			graphicalNote:init()
 			graphicalNote:activate()
 			notes[note] = graphicalNote
@@ -41,9 +40,8 @@ RhythmView.receive = function(self, event)
 end
 
 RhythmView.update = function(self, dt)
-	self.rhythmModel.graphicEngine.noteSkin:update()
 	for _, note in pairs(self.notes) do
-		note:update()
+		note:update(dt)
 	end
 end
 

@@ -76,8 +76,8 @@ ImageNote.getDrawable = function(self)
 	
 	return ImageFrame:new({
 		image = self.image,
-		cs = self.noteSkin:getCS(self),
-		layer = self.noteSkin:getNoteLayer(self, "Head"),
+		cs = self.noteSkinView:getCS(self),
+		layer = self.noteSkinView:getNoteLayer(self, "Head"),
 		x = 0,
 		y = 0,
 		h = 1,
@@ -109,19 +109,19 @@ ImageNote.willDrawAfterEnd = function(self)
 end
 
 ImageNote.getHeadWidth = function(self)
-	return self.noteSkin:getG(self, "Head", "w", self.timeState)
+	return self.noteSkinView:getG(self, "Head", "w", self.timeState)
 end
 
 ImageNote.getHeadHeight = function(self)
-	return self.noteSkin:getG(self, "Head", "h", self.timeState)
+	return self.noteSkinView:getG(self, "Head", "h", self.timeState)
 end
 
 ImageNote.getX = function(self)
-	return self.noteSkin:getG(self, "Head", "x", self.timeState)
+	return self.noteSkinView:getG(self, "Head", "x", self.timeState)
 end
 
 ImageNote.getY = function(self)
-	return self.noteSkin:getG(self, "Head", "y", self.timeState)
+	return self.noteSkinView:getG(self, "Head", "y", self.timeState)
 end
 
 ImageNote.getScaleX = function(self)
@@ -129,7 +129,7 @@ ImageNote.getScaleX = function(self)
 	if not image then
 		return
 	end
-	return self:getHeadWidth() / self.noteSkin:getCS(self):x(image:getWidth())
+	return self:getHeadWidth() / self.noteSkinView:getCS(self):x(image:getWidth())
 end
 
 ImageNote.getScaleY = function(self)
@@ -137,11 +137,11 @@ ImageNote.getScaleY = function(self)
 	if not image then
 		return
 	end
-	return self:getHeadHeight() / self.noteSkin:getCS(self):y(image:getHeight())
+	return self:getHeadHeight() / self.noteSkinView:getCS(self):y(image:getHeight())
 end
 
 ImageNote.getColor = function(self)
-	return self.noteSkin:getG(self, "Head", "color", self.timeState)
+	return self.noteSkinView:getG(self, "Head", "color", self.timeState)
 end
 
 return ImageNote

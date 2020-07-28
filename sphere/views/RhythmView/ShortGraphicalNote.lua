@@ -4,6 +4,7 @@ local ShortGraphicalNote = GraphicalNote:new()
 
 ShortGraphicalNote.update = function(self)
 	self.timeState = self.graphicalNoteModel.timeState
+	self.logicalState = self.graphicalNoteModel.logicalNote:getLastState()
 
 	local drawable = self.drawable
 	drawable.x = self:getX()
@@ -35,53 +36,53 @@ ShortGraphicalNote.reload = function(self)
 end
 
 ShortGraphicalNote.getColor = function(self)
-	return self.noteSkin:getG(self, "Head", "color", self.timeState)
+	return self.noteSkinView:getG(self, "Head", "color", self.timeState)
 end
 
 ShortGraphicalNote.getDrawable = function(self)
-	return self.noteSkin:getImageDrawable(self, "Head")
+	return self.noteSkinView:getImageDrawable(self, "Head")
 end
 
 ShortGraphicalNote.getContainer = function(self)
-	return self.noteSkin:getImageContainer(self, "Head")
+	return self.noteSkinView:getImageContainer(self, "Head")
 end
 
 ShortGraphicalNote.getHeadWidth = function(self)
-	return self.noteSkin:getG(self, "Head", "w", self.timeState)
+	return self.noteSkinView:getG(self, "Head", "w", self.timeState)
 end
 
 ShortGraphicalNote.getHeadHeight = function(self)
-	return self.noteSkin:getG(self, "Head", "h", self.timeState)
+	return self.noteSkinView:getG(self, "Head", "h", self.timeState)
 end
 
 ShortGraphicalNote.getX = function(self)
 	return
-		  self.noteSkin:getG(self, "Head", "x", self.timeState)
-		+ self.noteSkin:getG(self, "Head", "w", self.timeState)
-		* self.noteSkin:getG(self, "Head", "ox", self.timeState)
+		  self.noteSkinView:getG(self, "Head", "x", self.timeState)
+		+ self.noteSkinView:getG(self, "Head", "w", self.timeState)
+		* self.noteSkinView:getG(self, "Head", "ox", self.timeState)
 end
 
 ShortGraphicalNote.getY = function(self)
 	return
-		  self.noteSkin:getG(self, "Head", "y", self.timeState)
-		+ self.noteSkin:getG(self, "Head", "h", self.timeState)
-		* self.noteSkin:getG(self, "Head", "oy", self.timeState)
+		  self.noteSkinView:getG(self, "Head", "y", self.timeState)
+		+ self.noteSkinView:getG(self, "Head", "h", self.timeState)
+		* self.noteSkinView:getG(self, "Head", "oy", self.timeState)
 end
 
 ShortGraphicalNote.getScaleX = function(self)
 	return
 		self:getHeadWidth() /
-		self.noteSkin:getCS(self):x(self.noteSkin:getNoteImage(self, "Head"):getWidth())
+		self.noteSkinView:getCS(self):x(self.noteSkinView:getNoteImage(self, "Head"):getWidth())
 end
 
 ShortGraphicalNote.getScaleY = function(self)
 	return
 		self:getHeadHeight() /
-		self.noteSkin:getCS(self):y(self.noteSkin:getNoteImage(self, "Head"):getHeight())
+		self.noteSkinView:getCS(self):y(self.noteSkinView:getNoteImage(self, "Head"):getHeight())
 end
 
 ShortGraphicalNote.whereWillDraw = function(self)
-	return self.noteSkin:whereWillDraw(self, "Head", self.timeState.scaledVisualDeltaTime)
+	return self.noteSkinView:whereWillDraw(self, "Head", self.timeState.scaledVisualDeltaTime)
 end
 
 return ShortGraphicalNote

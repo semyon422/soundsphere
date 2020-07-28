@@ -15,87 +15,87 @@ NoteSkin.targetVisualTimeRate = 1
 NoteSkin.timeRate = 1
 
 NoteSkin.load = function(self)
-	self.allcs = CoordinateManager:getCS(0, 0, 0, 0, "all")
+	-- self.allcs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
-	local nsdCses = self.noteSkinData.cses
-	self.cses = {}
-	for i = 1, #nsdCses do
-		self.cses[i] = CoordinateManager:getCS(
-			tonumber(nsdCses[i][1]),
-			tonumber(nsdCses[i][2]),
-			tonumber(nsdCses[i][3]),
-			tonumber(nsdCses[i][4]),
-			nsdCses[i][5]
-		)
-	end
+	-- local nsdCses = self.noteSkinData.cses
+	-- self.cses = {}
+	-- for i = 1, #nsdCses do
+	-- 	self.cses[i] = CoordinateManager:getCS(
+	-- 		tonumber(nsdCses[i][1]),
+	-- 		tonumber(nsdCses[i][2]),
+	-- 		tonumber(nsdCses[i][3]),
+	-- 		tonumber(nsdCses[i][4]),
+	-- 		nsdCses[i][5]
+	-- 	)
+	-- end
 
 	self.data = self.noteSkinData.notes or {}
 
-	self.images = {}
-	self:loadImages()
+	-- self.images = {}
+	-- self:loadImages()
 
-	self.containers = {}
-	self:loadContainers()
+	-- self.containers = {}
+	-- self:loadContainers()
 end
 
-local newImage = love.graphics.newImage
-NoteSkin.loadImage = function(self, imageData)
-	self.images[imageData.name] = newImage(self.metaData.directoryPath .. "/" .. imageData.path)
-end
+-- local newImage = love.graphics.newImage
+-- NoteSkin.loadImage = function(self, imageData)
+-- 	self.images[imageData.name] = newImage(self.metaData.directoryPath .. "/" .. imageData.path)
+-- end
 
-NoteSkin.loadImages = function(self)
-	if not self.noteSkinData.images then
-		return
-	end
+-- NoteSkin.loadImages = function(self)
+-- 	if not self.noteSkinData.images then
+-- 		return
+-- 	end
 
-	for _, imageData in pairs(self.noteSkinData.images) do
-		self:loadImage(imageData)
-	end
-end
+-- 	for _, imageData in pairs(self.noteSkinData.images) do
+-- 		self:loadImage(imageData)
+-- 	end
+-- end
 
-local sortContainers = function(a, b)
-	return a.layer < b.layer
-end
-NoteSkin.loadContainers = function(self)
-	self.containerList = {}
+-- local sortContainers = function(a, b)
+-- 	return a.layer < b.layer
+-- end
+-- NoteSkin.loadContainers = function(self)
+-- 	self.containerList = {}
 
-	if not self.noteSkinData.images then
-		return
-	end
+-- 	if not self.noteSkinData.images then
+-- 		return
+-- 	end
 
-	for _, imageData in pairs(self.noteSkinData.images) do
-		local container = SpriteBatch:new(nil, self.images[imageData.name], 1000)
-		container.layer = imageData.layer
-		container.blendMode = imageData.blendMode
-		container.blendAlphaMode = imageData.blendAlphaMode
+-- 	for _, imageData in pairs(self.noteSkinData.images) do
+-- 		local container = SpriteBatch:new(nil, self.images[imageData.name], 1000)
+-- 		container.layer = imageData.layer
+-- 		container.blendMode = imageData.blendMode
+-- 		container.blendAlphaMode = imageData.blendAlphaMode
 
-		self.containers[imageData.name] = container
-		table.insert(self.containerList, container)
-	end
-	table.sort(self.containerList, sortContainers)
-end
+-- 		self.containers[imageData.name] = container
+-- 		table.insert(self.containerList, container)
+-- 	end
+-- 	table.sort(self.containerList, sortContainers)
+-- end
 
-NoteSkin.joinContainer = function(self, container)
-	for _, subcontainer in ipairs(self.containerList) do
-		container:add(subcontainer)
-	end
-end
+-- NoteSkin.joinContainer = function(self, container)
+-- 	for _, subcontainer in ipairs(self.containerList) do
+-- 		container:add(subcontainer)
+-- 	end
+-- end
 
-NoteSkin.leaveContainer = function(self, container)
-	for _, subcontainer in ipairs(self.containerList) do
-		container:remove(subcontainer)
-	end
-end
+-- NoteSkin.leaveContainer = function(self, container)
+-- 	for _, subcontainer in ipairs(self.containerList) do
+-- 		container:remove(subcontainer)
+-- 	end
+-- end
 
-NoteSkin.update = function(self, dt)
-	if self.visualTimeRateTween and self.updateTween then
-		self.visualTimeRateTween:update(dt)
-	end
+-- NoteSkin.update = function(self, dt)
+-- 	if self.visualTimeRateTween and self.updateTween then
+-- 		self.visualTimeRateTween:update(dt)
+-- 	end
 
-	for _, container in ipairs(self.containerList) do
-		container:update()
-	end
-end
+-- 	for _, container in ipairs(self.containerList) do
+-- 		container:update()
+-- 	end
+-- end
 
 NoteSkin.setVisualTimeRate = function(self, visualTimeRate)
 	if visualTimeRate * self.visualTimeRate < 0 then
@@ -112,9 +112,9 @@ NoteSkin.getVisualTimeRate = function(self)
 	return self.visualTimeRate / math.abs(self.timeRate)
 end
 
-NoteSkin.getCS = function(self, note)
-	return self.cses[self.data[note.id]["Head"].cs]
-end
+-- NoteSkin.getCS = function(self, note)
+-- 	return self.cses[self.data[note.id]["Head"].cs]
+-- end
 
 NoteSkin.checkNote = function(self, note)
 	return self.data[note.id]
@@ -123,7 +123,8 @@ end
 NoteSkin.getG = function(self, note, part, name, timeState)
 	local seq = self.data[note.id][part].gc[name]
 
-	return self.env[seq[1]](timeState, note.logicalNote:getLastState(), seq[2])
+	-- return self.env[seq[1]](timeState, note.logicalNote:getLastState(), seq[2])
+	return self.env[seq[1]](timeState, note.logicalState, seq[2])
 end
 
 NoteSkin.whereWillDraw = function(self, note, part, time)
@@ -138,38 +139,38 @@ NoteSkin.whereWillDraw = function(self, note, part, time)
 	end
 end
 
-NoteSkin.getNoteLayer = function(self, note, part)
-	return
-		self.data[note.id][part].layer
-		+ map(
-			note.startNoteData.timePoint.absoluteTime,
-			note.startNoteData.timePoint.firstTimePoint.absoluteTime,
-			note.startNoteData.timePoint.lastTimePoint.absoluteTime,
-			0,
-			1
-		)
-end
+-- NoteSkin.getNoteLayer = function(self, note, part)
+-- 	return
+-- 		self.data[note.id][part].layer
+-- 		+ map(
+-- 			note.startNoteData.timePoint.absoluteTime,
+-- 			note.startNoteData.timePoint.firstTimePoint.absoluteTime,
+-- 			note.startNoteData.timePoint.lastTimePoint.absoluteTime,
+-- 			0,
+-- 			1
+-- 		)
+-- end
 
-NoteSkin.getNoteImage = function(self, note, part)
-	return self.images[self.data[note.id][part].image]
-end
+-- NoteSkin.getNoteImage = function(self, note, part)
+-- 	return self.images[self.data[note.id][part].image]
+-- end
 
-local clear = {255, 255, 255, 255}
-NoteSkin.getImageDrawable = function(self, note, part)
-	return Image:new({
-		cs = self:getCS(note),
-		x = 0,
-		y = 0,
-		sx = 0,
-		sy = 0,
-		image = self:getNoteImage(note, part),
-		layer = self:getNoteLayer(note, part),
-		color = clear
-	})
-end
+-- local clear = {255, 255, 255, 255}
+-- NoteSkin.getImageDrawable = function(self, note, part)
+-- 	return Image:new({
+-- 		cs = self:getCS(note),
+-- 		x = 0,
+-- 		y = 0,
+-- 		sx = 0,
+-- 		sy = 0,
+-- 		image = self:getNoteImage(note, part),
+-- 		layer = self:getNoteLayer(note, part),
+-- 		color = clear
+-- 	})
+-- end
 
-NoteSkin.getImageContainer = function(self, note, part)
-	return self.containers[self.data[note.id][part].image]
-end
+-- NoteSkin.getImageContainer = function(self, note, part)
+-- 	return self.containers[self.data[note.id][part].image]
+-- end
 
 return NoteSkin

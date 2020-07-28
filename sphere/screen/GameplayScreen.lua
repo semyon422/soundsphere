@@ -27,6 +27,7 @@ GameplayScreen.load = function(self)
 	self.inputModel = inputModel
 
 	view.rhythmModel = rhythmModel
+	gameplayController.view = view
 	gameplayController.rhythmModel = rhythmModel
 	gameplayController.noteChartModel = noteChartModel
 
@@ -39,7 +40,6 @@ GameplayScreen.load = function(self)
 	rhythmModel.inputManager:setInputMode(noteChart.inputMode:getString())
 
 	-- rhythmModel:load()
-	-- gameplayController:load()
 
 	local modifierModel = rhythmModel.modifierModel
 
@@ -67,6 +67,8 @@ GameplayScreen.load = function(self)
 	rhythmModel.replayManager:load()
 
 	view:load()
+
+	gameplayController:load()
 
 	NoteChartResourceLoader:load(self.noteChartEntry.path, noteChart, function()
 		self.rhythmModel.audioEngine.localAliases = NoteChartResourceLoader.localAliases

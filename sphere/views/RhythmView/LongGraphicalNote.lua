@@ -5,6 +5,7 @@ local LongGraphicalNote = GraphicalNote:new()
 LongGraphicalNote.update = function(self)
 	self.startTimeState = self.graphicalNoteModel.startTimeState
 	self.endTimeState = self.graphicalNoteModel.endTimeState
+	self.logicalState = self.graphicalNoteModel.logicalNote:getLastState()
 
 	self.headDrawable.x = self:getHeadX()
 	self.tailDrawable.x = self:getTailX()
@@ -66,89 +67,89 @@ LongGraphicalNote.reload = function(self)
 end
 
 LongGraphicalNote.getHeadColor = function(self)
-	return self.noteSkin:getG(self, "Head", "color", self.startTimeState)
+	return self.noteSkinView:getG(self, "Head", "color", self.startTimeState)
 end
 
 LongGraphicalNote.getTailColor = function(self)
-	return self.noteSkin:getG(self, "Tail", "color", self.startTimeState)
+	return self.noteSkinView:getG(self, "Tail", "color", self.startTimeState)
 end
 
 LongGraphicalNote.getBodyColor = function(self)
-	return self.noteSkin:getG(self, "Body", "color", self.startTimeState)
+	return self.noteSkinView:getG(self, "Body", "color", self.startTimeState)
 end
 
 LongGraphicalNote.getHeadLayer = function(self)
-	return self.noteSkin:getNoteLayer(self, "Head")
+	return self.noteSkinView:getNoteLayer(self, "Head")
 end
 
 LongGraphicalNote.getTailLayer = function(self)
-	return self.noteSkin:getNoteLayer(self, "Tail")
+	return self.noteSkinView:getNoteLayer(self, "Tail")
 end
 
 LongGraphicalNote.getBodyLayer = function(self)
-	return self.noteSkin:getNoteLayer(self, "Body")
+	return self.noteSkinView:getNoteLayer(self, "Body")
 end
 
 LongGraphicalNote.getHeadDrawable = function(self)
-	return self.noteSkin:getImageDrawable(self, "Head")
+	return self.noteSkinView:getImageDrawable(self, "Head")
 end
 
 LongGraphicalNote.getTailDrawable = function(self)
-	return self.noteSkin:getImageDrawable(self, "Tail")
+	return self.noteSkinView:getImageDrawable(self, "Tail")
 end
 
 LongGraphicalNote.getBodyDrawable = function(self)
-	return self.noteSkin:getImageDrawable(self, "Body")
+	return self.noteSkinView:getImageDrawable(self, "Body")
 end
 
 LongGraphicalNote.getHeadContainer = function(self)
-	return self.noteSkin:getImageContainer(self, "Head")
+	return self.noteSkinView:getImageContainer(self, "Head")
 end
 
 LongGraphicalNote.getTailContainer = function(self)
-	return self.noteSkin:getImageContainer(self, "Tail")
+	return self.noteSkinView:getImageContainer(self, "Tail")
 end
 
 LongGraphicalNote.getBodyContainer = function(self)
-	return self.noteSkin:getImageContainer(self, "Body")
+	return self.noteSkinView:getImageContainer(self, "Body")
 end
 
 LongGraphicalNote.getHeadWidth = function(self)
-	return self.noteSkin:getG(self, "Head", "w", self.startTimeState)
+	return self.noteSkinView:getG(self, "Head", "w", self.startTimeState)
 end
 
 LongGraphicalNote.getTailHeight = function(self)
-	return self.noteSkin:getG(self, "Tail", "h", self.startTimeState)
+	return self.noteSkinView:getG(self, "Tail", "h", self.startTimeState)
 end
 
 LongGraphicalNote.getBodyWidth = function(self)
-	return self.noteSkin:getG(self, "Body", "w", self.startTimeState)
+	return self.noteSkinView:getG(self, "Body", "w", self.startTimeState)
 end
 
 LongGraphicalNote.getHeadHeight = function(self)
-	return self.noteSkin:getG(self, "Head", "h", self.startTimeState)
+	return self.noteSkinView:getG(self, "Head", "h", self.startTimeState)
 end
 
 LongGraphicalNote.getTailWidth = function(self)
-	return self.noteSkin:getG(self, "Tail", "w", self.startTimeState)
+	return self.noteSkinView:getG(self, "Tail", "w", self.startTimeState)
 end
 
 LongGraphicalNote.getBodyHeight = function(self)
-	return self.noteSkin:getG(self, "Body", "h", self.startTimeState)
+	return self.noteSkinView:getG(self, "Body", "h", self.startTimeState)
 end
 
 LongGraphicalNote.getHeadX = function(self)
 	return
-		  self.noteSkin:getG(self, "Head", "x", self.startTimeState)
-		+ self.noteSkin:getG(self, "Head", "w", self.startTimeState)
-		* self.noteSkin:getG(self, "Head", "ox", self.startTimeState)
+		  self.noteSkinView:getG(self, "Head", "x", self.startTimeState)
+		+ self.noteSkinView:getG(self, "Head", "w", self.startTimeState)
+		* self.noteSkinView:getG(self, "Head", "ox", self.startTimeState)
 end
 
 LongGraphicalNote.getTailX = function(self)
 	return
-		  self.noteSkin:getG(self, "Tail", "x", self.endTimeState)
-		+ self.noteSkin:getG(self, "Tail", "w", self.endTimeState)
-		* self.noteSkin:getG(self, "Tail", "ox", self.endTimeState)
+		  self.noteSkinView:getG(self, "Tail", "x", self.endTimeState)
+		+ self.noteSkinView:getG(self, "Tail", "w", self.endTimeState)
+		* self.noteSkinView:getG(self, "Tail", "ox", self.endTimeState)
 end
 
 LongGraphicalNote.getBodyX = function(self)
@@ -160,23 +161,23 @@ LongGraphicalNote.getBodyX = function(self)
 		timeState = self.startTimeState
 	end
 	return
-		  self.noteSkin:getG(self, "Body", "x", timeState)
-		+ self.noteSkin:getG(self, "Head", "w", timeState)
-		* self.noteSkin:getG(self, "Body", "ox", timeState)
+		  self.noteSkinView:getG(self, "Body", "x", timeState)
+		+ self.noteSkinView:getG(self, "Head", "w", timeState)
+		* self.noteSkinView:getG(self, "Body", "ox", timeState)
 end
 
 LongGraphicalNote.getHeadY = function(self)
 	return
-		  self.noteSkin:getG(self, "Head", "y", self.startTimeState)
-		+ self.noteSkin:getG(self, "Head", "h", self.startTimeState)
-		* self.noteSkin:getG(self, "Head", "oy", self.startTimeState)
+		  self.noteSkinView:getG(self, "Head", "y", self.startTimeState)
+		+ self.noteSkinView:getG(self, "Head", "h", self.startTimeState)
+		* self.noteSkinView:getG(self, "Head", "oy", self.startTimeState)
 end
 
 LongGraphicalNote.getTailY = function(self)
 	return
-		  self.noteSkin:getG(self, "Tail", "y", self.endTimeState)
-		+ self.noteSkin:getG(self, "Tail", "h", self.endTimeState)
-		* self.noteSkin:getG(self, "Tail", "oy", self.endTimeState)
+		  self.noteSkinView:getG(self, "Tail", "y", self.endTimeState)
+		+ self.noteSkinView:getG(self, "Tail", "h", self.endTimeState)
+		* self.noteSkinView:getG(self, "Tail", "oy", self.endTimeState)
 end
 
 LongGraphicalNote.getBodyY = function(self)
@@ -188,41 +189,41 @@ LongGraphicalNote.getBodyY = function(self)
 		timeState = self.startTimeState
 	end
 	return
-		  self.noteSkin:getG(self, "Body", "y", timeState)
-		+ self.noteSkin:getG(self, "Head", "h", timeState)
-		* self.noteSkin:getG(self, "Body", "oy", timeState)
+		  self.noteSkinView:getG(self, "Body", "y", timeState)
+		+ self.noteSkinView:getG(self, "Head", "h", timeState)
+		* self.noteSkinView:getG(self, "Body", "oy", timeState)
 end
 
 LongGraphicalNote.getHeadScaleX = function(self)
-	return self:getHeadWidth() / self.noteSkin:getCS(self):x(self.noteSkin:getNoteImage(self, "Head"):getWidth())
+	return self:getHeadWidth() / self.noteSkinView:getCS(self):x(self.noteSkinView:getNoteImage(self, "Head"):getWidth())
 end
 
 LongGraphicalNote.getTailScaleX = function(self)
-	return self:getTailWidth() / self.noteSkin:getCS(self):x(self.noteSkin:getNoteImage(self, "Tail"):getWidth())
+	return self:getTailWidth() / self.noteSkinView:getCS(self):x(self.noteSkinView:getNoteImage(self, "Tail"):getWidth())
 end
 
 LongGraphicalNote.getBodyScaleX = function(self)
 	return
 		(
 			math.abs(self:getHeadX() - self:getTailX())
-			+ self.noteSkin:getG(self, "Body", "w", self.startTimeState)
-		) / self.noteSkin:getCS(self):x(self.noteSkin:getNoteImage(self, "Body"):getWidth())
+			+ self.noteSkinView:getG(self, "Body", "w", self.startTimeState)
+		) / self.noteSkinView:getCS(self):x(self.noteSkinView:getNoteImage(self, "Body"):getWidth())
 end
 
 LongGraphicalNote.getHeadScaleY = function(self)
-	return self:getHeadHeight() / self.noteSkin:getCS(self):y(self.noteSkin:getNoteImage(self, "Head"):getHeight())
+	return self:getHeadHeight() / self.noteSkinView:getCS(self):y(self.noteSkinView:getNoteImage(self, "Head"):getHeight())
 end
 
 LongGraphicalNote.getTailScaleY = function(self)
-	return self:getTailHeight() / self.noteSkin:getCS(self):y(self.noteSkin:getNoteImage(self, "Tail"):getHeight())
+	return self:getTailHeight() / self.noteSkinView:getCS(self):y(self.noteSkinView:getNoteImage(self, "Tail"):getHeight())
 end
 
 LongGraphicalNote.getBodyScaleY = function(self)
 	return
 		(
 			math.abs(self:getHeadY() - self:getTailY())
-			+ self.noteSkin:getG(self, "Body", "h", self.startTimeState)
-		) / self.noteSkin:getCS(self):y(self.noteSkin:getNoteImage(self, "Body"):getHeight())
+			+ self.noteSkinView:getG(self, "Body", "h", self.startTimeState)
+		) / self.noteSkinView:getCS(self):y(self.noteSkinView:getNoteImage(self, "Body"):getHeight())
 end
 
 return LongGraphicalNote

@@ -23,7 +23,6 @@ ProgressBar.loadGui = function(self)
 
 	self.noteChart = self.gui.noteChart
 	self.container = self.gui.container
-	self.logicEngine = self.gui.logicEngine
 	
 	self:load()
 end
@@ -54,7 +53,7 @@ ProgressBar.unload = function(self)
 end
 
 ProgressBar.update = function(self, dt)
-	local currentTime = self.logicEngine.currentTime
+	local currentTime = self.currentTime or 0
 	self.zeroTime = self.zeroTime or currentTime
 	
 	local x0, w0 = self.x, self.w
@@ -133,7 +132,12 @@ ProgressBar.draw = function(self)
 	self.progressRectangle:draw()
 end
 
-ProgressBar.receive = function(self, event) end
+ProgressBar.receive = function(self, event)
+	if event.name == "TimeState" then
+		self.currentTime = event.exactCurrentTime
+		return
+	end
+end
 
 ProgressBar.reload = function(self)
 	self.progressRectangle:reload()
