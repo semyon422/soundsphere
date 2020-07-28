@@ -1,11 +1,6 @@
 local Class = require("aqua.util.Class")
 local Container = require("aqua.graphics.Container")
-local NoteChartFactory	= require("notechart.NoteChartFactory")
 local GameConfig		= require("sphere.config.GameConfig")
--- local NoteSkinManager	= require("sphere.noteskin.NoteSkinManager")
-local Screen			= require("sphere.screen.Screen")
-local ScreenManager		= require("sphere.screen.ScreenManager")
--- local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 local AliasManager		= require("sphere.database.AliasManager")
 
 local ModifierMenu		= require("sphere.ui.ModifierMenu")
@@ -37,6 +32,7 @@ SelectView.load = function(self)
 	NoteChartStateManager.noteChartModel = self.noteChartModel
 
 	self.gui:load("userdata/interface/select.json")
+	self.gui.observable:add(self)
 	self.gui:reload()
 
 	KeyBindMenu.noteChartModel = self.noteChartModel
@@ -69,6 +65,7 @@ SelectView.load = function(self)
 end
 
 SelectView.unload = function(self)
+	self.gui.observable:remove(self)
 	NoteSkinMenu.observable:remove(self.controller)
 	self.gui:unload()
 	PreviewManager:stop()

@@ -1,36 +1,58 @@
-local Class = require("aqua.util.Class")
-local Class = require("aqua.util.Class")
-local Container = require("aqua.graphics.Container")
-local NoteChartFactory	= require("notechart.NoteChartFactory")
-local GameConfig		= require("sphere.config.GameConfig")
--- local NoteSkinManager	= require("sphere.noteskin.NoteSkinManager")
-local Screen			= require("sphere.screen.Screen")
+local Class				= require("aqua.util.Class")
 local ScreenManager		= require("sphere.screen.ScreenManager")
--- local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
-local AliasManager		= require("sphere.database.AliasManager")
-
-local ModifierMenu		= require("sphere.ui.ModifierMenu")
-local NoteSkinMenu		= require("sphere.ui.NoteSkinMenu")
-local KeyBindMenu		= require("sphere.ui.KeyBindMenu")
-local NoteChartMenu		= require("sphere.ui.NoteChartMenu")
-
-local ScoreList			= require("sphere.ui.ScoreList")
-local NoteChartList		= require("sphere.ui.NoteChartList")
-local NoteChartSetList	= require("sphere.ui.NoteChartSetList")
-local PreviewManager	= require("sphere.ui.PreviewManager")
-
-local BackgroundManager	= require("sphere.ui.BackgroundManager")
-
-local NoteChartStateManager	= require("sphere.ui.NoteChartStateManager")
-local GUI = require("sphere.ui.GUI")
-
+local SelectView		= require("sphere.views.SelectView")
+local NoteChartModel	= require("sphere.models.NoteChartModel")
+local ModifierModel		= require("sphere.models.ModifierModel")
+local NoteSkinModel		= require("sphere.models.NoteSkinModel")
+local InputModel		= require("sphere.models.InputModel")
 
 local SelectController = Class:new()
 
 SelectController.load = function(self)
+	local modifierModel = ModifierModel:new()
+	local noteSkinModel = NoteSkinModel:new()
+	local noteChartModel = NoteChartModel:new()
+	local inputModel = InputModel:new()
+	local view = SelectView:new()
+
+	self.modifierModel = modifierModel
+	self.noteSkinModel = noteSkinModel
+	self.noteChartModel = noteChartModel
+	self.inputModel = inputModel
+	self.view = view
+
+	view.controller = self
+	view.noteChartModel = noteChartModel
+	view.modifierModel = modifierModel
+	view.noteSkinModel = noteSkinModel
+	view.inputModel = inputModel
+
+	inputModel:load()
+	modifierModel:load()
+	noteSkinModel:load()
+	noteChartModel:load()
+
+	view:load()
+end
+
+SelectController.unload = function(self)
+	self.modifierModel:unload()
+	self.noteChartModel:unload()
+	self.view:unload()
+	self.inputModel:unload()
+end
+
+SelectController.update = function(self, dt)
+	self.view:update(dt)
+end
+
+SelectController.draw = function(self)
+	self.view:draw()
 end
 
 SelectController.receive = function(self, event)
+	self.view:receive(event)
+
 	if event.name == "setNoteSkin" then
 		self.noteSkinModel:setDefaultNoteSkin(event.inputMode, event.metaData)
 	elseif event.name == "setInputBinding" then
@@ -53,10 +75,11 @@ SelectController.receive = function(self, event)
 			return
 		end
 
-		local GameplayScreen = require("sphere.screen.GameplayScreen")
-		GameplayScreen.noteChartEntry = event.noteChartEntry
-		GameplayScreen.noteChartDataEntry = event.noteChartDataEntry
-		return ScreenManager:set(require("sphere.screen.GameplayScreen"))
+		local GameplayController = require("sphere.controllers.GameplayController")
+		local gameplayController = GameplayController:new()
+		gameplayController.noteChartEntry = event.noteChartEntry
+		gameplayController.noteChartDataEntry = event.noteChartDataEntry
+		return ScreenManager:set(gameplayController)
 	elseif event.name == "setScreen" then
 		if event.screenName == "BrowserScreen" then
 			return ScreenManager:set(require("sphere.screen.browser.BrowserScreen"))

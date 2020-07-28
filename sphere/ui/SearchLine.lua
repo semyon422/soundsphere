@@ -43,14 +43,14 @@ SearchLine.loadGui = function(self)
 end
 
 SearchLine.load = function(self)
-	self.observable = Observable:new()
-	self.observable:add(require("sphere.screen.SelectScreen"))
+	-- self.observable = Observable:new()
+	-- self.observable:add(require("sphere.screen.SelectScreen"))
 
 	local NoteChartStateManager	= require("sphere.ui.NoteChartStateManager")
 	self.searchString = NoteChartStateManager.searchString
 
 	self.sender = self
-	
+
 	self.textInputFrame = Theme.TextInputFrame:new({
 		x = self.x,
 		y = self.y,
@@ -79,7 +79,7 @@ end
 SearchLine.update = function(self) end
 
 SearchLine.unload = function(self)
-	self.observable:remove(require("sphere.screen.SelectScreen"))
+	-- self.observable:remove(require("sphere.screen.SelectScreen"))
 	self.container:remove(self.textInputFrame)
 end
 
@@ -94,15 +94,15 @@ SearchLine.receive = function(self, event)
 		self.textInputFrame.textInput:reset()
 		forceReload = true
 	end
-	
+
 	if self.textInputFrame then
 		local oldText = self:getText()
 		self.textInputFrame:receive(event)
 		local newText = self:getText()
-		
+
 		if oldText ~= newText or forceReload then
 			self.searchString = newText:lower()
-			self.observable:send({
+			self.gui.observable:send({
 				name = "search",
 				text = newText,
 				sender = self

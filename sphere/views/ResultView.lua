@@ -8,10 +8,22 @@ ResultView.load = function(self)
 	self.container = Container:new()
 
 	local gui = GUI:new()
-    self.gui = gui
+	self.gui = gui
 
 	gui.container = self.container
 	gui.modifierModel = self.modifierModel
+
+	gui.scoreSystem = self.scoreSystem
+	gui.noteChart = self.noteChart
+	gui.noteChartEntry = self.noteChartEntry
+	gui.noteChartDataEntry = self.noteChartDataEntry
+
+	gui:load("userdata/interface/result.json")
+	gui:receive({
+		action = "updateMetaData",
+		noteChartEntry = self.noteChartEntry,
+		noteChartDataEntry = self.noteChartDataEntry
+	})
 end
 
 ResultView.unload = function(self)

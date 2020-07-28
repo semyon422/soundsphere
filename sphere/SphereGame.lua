@@ -8,7 +8,7 @@ local DiscordPresence			= require("sphere.discord.DiscordPresence")
 local MountManager				= require("sphere.filesystem.MountManager")
 local ScreenManager				= require("sphere.screen.ScreenManager")
 local FadeTransition			= require("sphere.screen.FadeTransition")
-local SelectScreen				= require("sphere.screen.SelectScreen")
+local SelectController			= require("sphere.controllers.SelectController")
 local BackgroundManager			= require("sphere.ui.BackgroundManager")
 local WindowManager				= require("sphere.window.WindowManager")
 local FpsLimiter				= require("sphere.window.FpsLimiter")
@@ -45,7 +45,9 @@ SphereGame.load = function(self)
 	self.globalView:load()
 
 	ScreenManager:setTransition(FadeTransition)
-	ScreenManager:set(SelectScreen)
+
+	local selectController = SelectController:new()
+	ScreenManager:set(selectController)
 end
 
 SphereGame.unload = function(self)

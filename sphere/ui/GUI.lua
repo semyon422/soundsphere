@@ -1,14 +1,15 @@
-local json			= require("json")
-local Class			= require("aqua.util.Class")
-local StaticImage	= require("sphere.ui.StaticImage")
-local Button		= require("sphere.ui.Button")
-local ImageButton	= require("sphere.ui.ImageButton")
-local PointGraph	= require("sphere.ui.PointGraph")
-local ProgressBar	= require("sphere.ui.ProgressBar")
-local InputImage	= require("sphere.ui.InputImage")
-local ScoreDisplay	= require("sphere.ui.ScoreDisplay")
-local StaticObject	= require("sphere.ui.StaticObject")
-local Animation		= require("sphere.ui.Animation")
+local json					= require("json")
+local Class					= require("aqua.util.Class")
+local Observable			= require("aqua.util.Observable")
+local StaticImage			= require("sphere.ui.StaticImage")
+local Button				= require("sphere.ui.Button")
+local ImageButton			= require("sphere.ui.ImageButton")
+local PointGraph			= require("sphere.ui.PointGraph")
+local ProgressBar			= require("sphere.ui.ProgressBar")
+local InputImage			= require("sphere.ui.InputImage")
+local ScoreDisplay			= require("sphere.ui.ScoreDisplay")
+local StaticObject			= require("sphere.ui.StaticObject")
+local Animation				= require("sphere.ui.Animation")
 local NoteSkinMenu			= require("sphere.ui.NoteSkinMenu")
 local ModifierMenu			= require("sphere.ui.ModifierMenu")
 local KeyBindMenu			= require("sphere.ui.KeyBindMenu")
@@ -19,6 +20,10 @@ local JudgeDisplay			= require("sphere.ui.JudgeDisplay")
 local ScreenManager			= require("sphere.screen.ScreenManager")
 
 local GUI = Class:new()
+
+GUI.construct = function(self)
+	self.observable = Observable:new()
+end
 
 GUI.classes = {
 	StaticImage = StaticImage,
@@ -43,8 +48,7 @@ GUI.functions = {
 	["ModifierMenu:show()"] = function() ModifierMenu:show() end,
 	["KeyBindMenu:show()"] = function() KeyBindMenu:show() end,
 	["ScreenManager:set(SettingsScreen)"] = function() ScreenManager:set(require("sphere.screen.settings.SettingsScreen")) end,
-	["ScreenManager:set(BrowserScreen)"] = function() ScreenManager:set(require("sphere.screen.browser.BrowserScreen")) end,
-	["ScreenManager:set(SelectScreen)"] = function() ScreenManager:set(require("sphere.ui.SelectScreen")) end
+	["ScreenManager:set(BrowserScreen)"] = function() ScreenManager:set(require("sphere.screen.browser.BrowserScreen")) end
 }
 GUI.functions.__index = GUI.functions
 
