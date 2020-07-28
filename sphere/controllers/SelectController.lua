@@ -35,6 +35,10 @@ SelectController.receive = function(self, event)
 		self.noteSkinModel:setDefaultNoteSkin(event.inputMode, event.metaData)
 	elseif event.name == "setInputBinding" then
 		self.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
+	elseif event.name == "addModifier" then
+		self.modifierModel:add(event.Modifier)
+	elseif event.name == "removeModifier" then
+		self.modifierModel:remove(event.modifier)
 	elseif event.name == "selectNoteChart" then
 		if event.type == "noteChartEntry" then
 			self.noteChartModel:selectNoteChart(event.id)

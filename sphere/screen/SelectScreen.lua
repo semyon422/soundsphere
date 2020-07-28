@@ -33,6 +33,7 @@ SelectScreen.load = function(self)
 	controller.noteChartModel = noteChartModel
 	controller.noteSkinModel = noteSkinModel
 	controller.inputModel = inputModel
+	controller.modifierModel = modifierModel
 
 	inputModel:load()
 	modifierModel:load()

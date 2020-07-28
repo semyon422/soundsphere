@@ -1,5 +1,4 @@
 local CoordinateManager			= require("aqua.graphics.CoordinateManager")
--- local ModifierManager			= require("sphere.screen.gameplay.ModifierManager")
 local SequentialModifierButton	= require("sphere.ui.ModifierMenu.SequentialModifierButton")
 local CustomList				= require("sphere.ui.CustomList")
 
@@ -43,14 +42,6 @@ SequenceList.reloadItems = function(self)
 	end
 
 	return self:setItems(items)
-end
-
-SequenceList.send = function(self, event)
-	if event.action == "buttonInteract" and event.button == 1 then
-		-- ModifierDisplay:updateText()
-	end
-
-	CustomList.send(self, event)
 end
 
 return SequenceList

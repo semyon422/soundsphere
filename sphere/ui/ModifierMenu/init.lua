@@ -1,3 +1,4 @@
+local Observable		= require("aqua.util.Observable")
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Rectangle			= require("aqua.graphics.Rectangle")
 local ModifierList		= require("sphere.ui.ModifierMenu.ModifierList")
@@ -9,6 +10,8 @@ ModifierMenu.hidden = true
 ModifierMenu.csall = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
 ModifierMenu.init = function(self)
+	self.observable = Observable:new()
+
 	self.background = Rectangle:new({
 		x = 0,
 		y = 0,
@@ -19,6 +22,9 @@ ModifierMenu.init = function(self)
 		mode = "fill"
 	})
 	self.background:reload()
+
+	ModifierList.menu = self
+	SequenceList.menu = self
 
 	ModifierList:init()
 	ModifierList:load()

@@ -1,7 +1,6 @@
 local ModifierButton	= require("sphere.ui.ModifierMenu.ModifierButton")
 local TextButton		= require("sphere.ui.ModifierMenu.TextButton")
 local SliderButton		= require("sphere.ui.ModifierMenu.SliderButton")
--- local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
 
 local SequentialModifierButton = ModifierButton:new()
 
@@ -15,7 +14,10 @@ SequentialModifierButton.construct = function(self)
 		button.item = self.item
 		button.updateValue = function(self, value) end
 		button.removeModifier = function(self)
-			self.list.modifierModel:remove(modifier)
+			self.list.menu.observable:send({
+				name = "removeModifier",
+				modifier = modifier
+			})
 
 			local SequenceList = require("sphere.ui.ModifierMenu.SequenceList")
 			SequenceList:reloadItems()
@@ -29,7 +31,10 @@ SequentialModifierButton.construct = function(self)
 			SliderButton.updateValue(self, value)
 		end
 		button.removeModifier = function(self)
-			self.list.modifierModel:remove(modifier)
+			self.list.menu.observable:send({
+				name = "removeModifier",
+				modifier = modifier
+			})
 
 			local SequenceList = require("sphere.ui.ModifierMenu.SequenceList")
 			SequenceList:reloadItems()
