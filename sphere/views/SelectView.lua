@@ -42,6 +42,9 @@ SelectView.load = function(self)
 	KeyBindMenu.noteChartModel = self.noteChartModel
 	NoteSkinMenu.noteChartModel = self.noteChartModel
 
+	NoteSkinMenu.noteSkinModel = self.noteSkinModel
+	NoteSkinMenu.observable:add(self.controller)
+
 	KeyBindMenu.modifierModel = self.modifierModel
 	NoteSkinMenu.modifierModel = self.modifierModel
 	ModifierMenu.modifierModel = self.modifierModel
@@ -62,6 +65,7 @@ SelectView.load = function(self)
 end
 
 SelectView.unload = function(self)
+	NoteSkinMenu.observable:remove(self.controller)
 	self.gui:unload()
 	PreviewManager:stop()
 	NoteChartStateManager:unload()

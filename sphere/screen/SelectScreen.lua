@@ -3,16 +3,19 @@ local SelectView		= require("sphere.views.SelectView")
 local SelectController	= require("sphere.controllers.SelectController")
 local NoteChartModel	= require("sphere.models.NoteChartModel")
 local ModifierModel		= require("sphere.models.ModifierModel")
+local NoteSkinModel		= require("sphere.models.NoteSkinModel")
 
 local SelectScreen = Screen:new()
 
 SelectScreen.load = function(self)
 	local modifierModel = ModifierModel:new()
+	local noteSkinModel = NoteSkinModel:new()
 	local noteChartModel = NoteChartModel:new()
 	local view = SelectView:new()
 	local controller = SelectController:new()
 
 	self.modifierModel = modifierModel
+	self.noteSkinModel = noteSkinModel
 	self.noteChartModel = noteChartModel
 	self.view = view
 	self.controller = controller
@@ -20,11 +23,14 @@ SelectScreen.load = function(self)
 	view.controller = controller
 	view.noteChartModel = noteChartModel
 	view.modifierModel = modifierModel
+	view.noteSkinModel = noteSkinModel
 
 	controller.view = view
 	controller.noteChartModel = noteChartModel
+	controller.noteSkinModel = noteSkinModel
 
 	modifierModel:load()
+	noteSkinModel:load()
 	noteChartModel:load()
 
 	view:load()

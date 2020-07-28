@@ -33,9 +33,14 @@ end
 NoteSkinList.send = function(self, event)
 	if event.action == "buttonInteract" and event.button == 1 then
 		local metaData = self.items[event.itemIndex].metaData
-		-- NoteSkinManager:setDefaultNoteSkin(self:getSelectedInputMode(), metaData)
+		self.menu.observable:send({
+			name = "setNoteSkin",
+			inputMode = self:getSelectedInputMode(),
+			metaData = metaData
+		})
+		self:addItems()
 	end
-	
+
 	CustomList.send(self, event)
 end
 
@@ -51,21 +56,27 @@ end
 
 NoteSkinList.addItems = function(self)
 	local items = {}
-	
-	-- local list = NoteSkinManager:getMetaDataList(self:getSelectedInputMode())
-	-- local selectedMetaData = NoteSkinManager:getMetaData(self:getSelectedInputMode())
 
-	-- for _, metaData in ipairs(list) do
-	-- 	local name = metaData.name
-	-- 	if name == selectedMetaData.name then
-	-- 		name = "★ " .. name
-	-- 	end
-	-- 	items[#items + 1] = {
-	-- 		metaData = metaData,
-	-- 		name = name
-	-- 	}
-	-- end
-	
+	if not self.menu.noteChart then
+		return self:setItems(items)
+	end
+
+	local noteSkinModel = self.menu.noteSkinModel
+
+	local list = noteSkinModel:getMetaDataList(self.menu.noteChart)
+	local selectedMetaData = noteSkinModel:getNoteSkinMetaData(self.menu.noteChart)
+
+	for _, metaData in ipairs(list) do
+		local name = metaData.name
+		if name == selectedMetaData.name then
+			name = "★ " .. name
+		end
+		items[#items + 1] = {
+			metaData = metaData,
+			name = name
+		}
+	end
+
 	return self:setItems(items)
 end
 

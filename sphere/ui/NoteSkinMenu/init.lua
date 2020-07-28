@@ -1,6 +1,7 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Rectangle			= require("aqua.graphics.Rectangle")
 local NoteSkinList		= require("sphere.ui.NoteSkinMenu.NoteSkinList")
+local Observable		= require("aqua.util.Observable")
 
 local NoteSkinMenu = {}
 
@@ -10,6 +11,7 @@ NoteSkinMenu.hidden = true
 NoteSkinMenu.csall = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
 NoteSkinMenu.init = function(self)
+	self.observable = Observable:new()
 	self.background = Rectangle:new({
 		x = 0,
 		y = 0,

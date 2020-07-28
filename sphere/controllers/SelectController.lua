@@ -31,9 +31,9 @@ SelectController.load = function(self)
 end
 
 SelectController.receive = function(self, event)
-	-- if event.name == "SetNoteSkin" then
-	-- 	self:setNoteSkin(event.noteSkin)
-	-- end
+	if event.name == "setNoteSkin" then
+		self.noteSkinModel:setDefaultNoteSkin(event.inputMode, event.metaData)
+	end
 
 	if event.name == "selectNoteChart" then
 		if event.type == "noteChartEntry" then
@@ -60,10 +60,6 @@ SelectController.receive = function(self, event)
 			return ScreenManager:set(require("sphere.screen.settings.SettingsScreen"))
 		end
 	end
-end
-
-SelectController.setNoteSkin = function(self, noteSkin)
-	-- NoteSkinModel:setSkin(noteSkin)
 end
 
 return SelectController

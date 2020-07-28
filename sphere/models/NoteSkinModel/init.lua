@@ -8,6 +8,14 @@ NoteSkinModel.load = function(self)
     NoteSkinManager:load()
 end
 
+NoteSkinModel.getMetaDataList = function(self, noteChart)
+    return NoteSkinManager:getMetaDataList(noteChart.inputMode)
+end
+
+NoteSkinModel.setDefaultNoteSkin = function(self, inputMode, metaData)
+    return NoteSkinManager:setDefaultNoteSkin(inputMode, metaData)
+end
+
 NoteSkinModel.getNoteSkinMetaData = function(self, noteChart)
     return NoteSkinManager:getMetaData(noteChart.inputMode)
 end
