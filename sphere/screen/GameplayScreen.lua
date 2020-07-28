@@ -73,21 +73,20 @@ GameplayScreen.load = function(self)
 
 	view:load()
 
-	gameplayController:load()
-
 	NoteChartResourceLoader:load(self.noteChartEntry.path, noteChart, function()
-		self.rhythmModel.audioEngine.localAliases = NoteChartResourceLoader.localAliases
-		self.rhythmModel.audioEngine.globalAliases = NoteChartResourceLoader.globalAliases
-		self.rhythmModel.graphicEngine.localAliases = NoteChartResourceLoader.localAliases
-		self.rhythmModel.graphicEngine.globalAliases = NoteChartResourceLoader.globalAliases
-		self.rhythmModel.timeEngine:setTimeRate(self.rhythmModel.timeEngine:getBaseTimeRate())
+		rhythmModel:setResourceAliases(NoteChartResourceLoader.localAliases, NoteChartResourceLoader.globalAliases)
+		gameplayController:receive({
+			name = "play"
+		})
 	end)
+
+	rhythmModel.observable:add(view)
 end
 
 GameplayScreen.unload = function(self)
 	self.rhythmModel:unload()
 	self.view:unload()
-	-- self.gameplayController:unload()
+	self.rhythmModel.observable:remove(self.view)
 end
 
 GameplayScreen.receive = function(self, event)
@@ -99,7 +98,6 @@ end
 GameplayScreen.update = function(self, dt)
 	self.rhythmModel:update(dt)
 	self.view:update(dt)
-	-- self.gameplayController:update(dt)
 
 	Screen.update(self)
 end

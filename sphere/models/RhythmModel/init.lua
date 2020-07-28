@@ -1,4 +1,5 @@
 local Class				= require("aqua.util.Class")
+local Observable		= require("aqua.util.Observable")
 local ScoreEngine		= require("sphere.models.RhythmModel.ScoreEngine")
 local LogicEngine		= require("sphere.models.RhythmModel.LogicEngine")
 local GraphicEngine		= require("sphere.models.RhythmModel.GraphicEngine")
@@ -60,6 +61,15 @@ RhythmModel.construct = function(self)
 	replayManager.observable:add(inputManager)
 	replayManager.timeEngine = timeEngine
 	replayManager.logicEngine = logicEngine
+
+	local observable = Observable:new()
+	self.observable = observable
+
+	timeEngine.observable:add(observable)
+	scoreEngine.observable:add(observable)
+	logicEngine.observable:add(observable)
+	inputManager.observable:add(observable)
+	graphicEngine.observable:add(observable)
 end
 
 RhythmModel.load = function(self)
@@ -105,6 +115,13 @@ end
 RhythmModel.setInputBindings = function(self, inputBindings)
 	assert(inputBindings)
 	self.inputManager:setBindings(inputBindings)
+end
+
+RhythmModel.setResourceAliases = function(self, localAliases, globalAliases)
+	self.audioEngine.localAliases = localAliases
+	self.audioEngine.globalAliases = globalAliases
+	self.graphicEngine.localAliases = localAliases
+	self.graphicEngine.globalAliases = globalAliases
 end
 
 return RhythmModel
