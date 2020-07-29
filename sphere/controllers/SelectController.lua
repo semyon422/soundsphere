@@ -1,10 +1,11 @@
-local Class				= require("aqua.util.Class")
-local ScreenManager		= require("sphere.screen.ScreenManager")
-local SelectView		= require("sphere.views.SelectView")
-local NoteChartModel	= require("sphere.models.NoteChartModel")
-local ModifierModel		= require("sphere.models.ModifierModel")
-local NoteSkinModel		= require("sphere.models.NoteSkinModel")
-local InputModel		= require("sphere.models.InputModel")
+local Class					= require("aqua.util.Class")
+local ScreenManager			= require("sphere.screen.ScreenManager")
+local SelectView			= require("sphere.views.SelectView")
+local NoteChartModel		= require("sphere.models.NoteChartModel")
+local ModifierModel			= require("sphere.models.ModifierModel")
+local NoteSkinModel			= require("sphere.models.NoteSkinModel")
+local InputModel			= require("sphere.models.InputModel")
+local ModifierController	= require("sphere.controllers.ModifierController")
 
 local SelectController = Class:new()
 
@@ -14,18 +15,22 @@ SelectController.load = function(self)
 	local noteChartModel = NoteChartModel:new()
 	local inputModel = InputModel:new()
 	local view = SelectView:new()
+	local modifierController = ModifierController:new()
 
 	self.modifierModel = modifierModel
 	self.noteSkinModel = noteSkinModel
 	self.noteChartModel = noteChartModel
 	self.inputModel = inputModel
 	self.view = view
+	self.modifierController = modifierController
 
 	view.controller = self
 	view.noteChartModel = noteChartModel
 	view.modifierModel = modifierModel
 	view.noteSkinModel = noteSkinModel
 	view.inputModel = inputModel
+
+	modifierController.modifierModel = modifierModel
 
 	inputModel:load()
 	modifierModel:load()
@@ -52,15 +57,12 @@ end
 
 SelectController.receive = function(self, event)
 	self.view:receive(event)
+	self.modifierController:receive(event)
 
-	if event.name == "setNoteSkin" then
+    if event.name == "setNoteSkin" then
 		self.noteSkinModel:setDefaultNoteSkin(event.inputMode, event.metaData)
 	elseif event.name == "setInputBinding" then
 		self.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
-	elseif event.name == "addModifier" then
-		self.modifierModel:add(event.Modifier)
-	elseif event.name == "removeModifier" then
-		self.modifierModel:remove(event.modifier)
 	elseif event.name == "selectNoteChart" then
 		if event.type == "noteChartEntry" then
 			self.noteChartModel:selectNoteChart(event.id)

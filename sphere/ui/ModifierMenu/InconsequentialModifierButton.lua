@@ -16,18 +16,30 @@ InconsequentialModifierButton.construct = function(self)
 			button = CheckboxButton:new(self)
 			button.item = self.item
 			button.updateValue = function(self, value)
-				modifier.enabled = value
+				self.list.menu.observable:send({
+					name = "enableBooleanModifier",
+					modifier = modifier,
+					value = value
+				})
 			end
 		elseif Modifier.variableType == "number" then
 			button = SliderButton:new(self)
 			button.item = self.item
 			button.updateValue = function(self, value)
-				modifier[modifier.variableName] = value
+				self.list.menu.observable:send({
+					name = "enableNumberModifier",
+					modifier = modifier,
+					value = value
+				})
 
 				SliderButton.updateValue(self, value)
 			end
 			button.removeModifier = function(self)
-				modifier[modifier.variableName] = Modifier[modifier.variableName]
+				self.list.menu.observable:send({
+					name = "disableNumberModifier",
+					modifier = modifier,
+					Modifier = Modifier
+				})
 			end
 		end
 	elseif Modifier.sequential then

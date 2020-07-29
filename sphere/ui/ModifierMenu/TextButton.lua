@@ -26,8 +26,6 @@ TextButton.construct = function(self)
 end
 
 TextButton.reload = function(self)
-	local modifier = self.item.modifier
-
 	local crossButton = self.crossButton
 
 	crossButton.x = self.x + self.w * self.columnX[2]
