@@ -6,23 +6,27 @@ local GUI = require("sphere.ui.GUI")
 
 local GameplayView = Class:new()
 
-GameplayView.load = function(self)
+GameplayView.construct = function(self)
 	self.container = Container:new()
+	self.noteSkinView = NoteSkinView:new()
+	self.rhythmView = RhythmView:new()
+	self.gui = GUI:new()
+end
 
-	local noteSkinView = NoteSkinView:new()
+GameplayView.load = function(self)
+	local container = self.container
+	local noteSkinView = self.noteSkinView
+	local rhythmView = self.rhythmView
+	local gui = self.gui
+
 	noteSkinView.noteSkin = self.noteSkin
 	noteSkinView:load()
-	self.noteSkinView = noteSkinView
 
-	local rhythmView = RhythmView:new()
 	rhythmView.noteSkinView = noteSkinView
-	rhythmView.container = self.container
+	rhythmView.container = container
 	rhythmView:load()
-	self.rhythmView = rhythmView
 
-	local gui = GUI:new()
-	self.gui = gui
-	gui.container = self.container
+	gui.container = container
 	gui.root = self.noteSkin.directoryPath
 	gui.scoreSystem = self.scoreSystem
 	gui.noteChart = self.noteChart

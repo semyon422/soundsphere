@@ -5,11 +5,14 @@ local ModifierModel		= require("sphere.models.ModifierModel")
 
 local ResultController = Class:new()
 
-ResultController.load = function(self)
-	local modifierModel = ModifierModel:new()
-	local view = ResultView:new()
+ResultController.construct = function(self)
+	self.modifierModel = ModifierModel:new()
+	self.view = ResultView:new()
+end
 
-	self.view = view
+ResultController.load = function(self)
+	local modifierModel = self.modifierModel
+	local view = self.view
 
 	view.modifierModel = modifierModel
 

@@ -9,22 +9,23 @@ local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader
 
 local GameplayController = Class:new()
 
+GameplayController.construct = function(self)
+	self.noteChartModel = NoteChartModel:new()
+	self.noteSkinModel = NoteSkinModel:new()
+	self.rhythmModel = RhythmModel:new()
+	self.inputModel = InputModel:new()
+	self.view = GameplayView:new()
+end
+
 GameplayController.load = function(self)
-	local noteChartModel = NoteChartModel:new()
-	local noteSkinModel = NoteSkinModel:new()
-	local rhythmModel = RhythmModel:new()
-	local inputModel = InputModel:new()
+	local noteChartModel = self.noteChartModel
+	local noteSkinModel = self.noteSkinModel
+	local rhythmModel = self.rhythmModel
+	local inputModel = self.inputModel
+	local view = self.view
 
 	noteChartModel:load()
 	noteSkinModel:load()
-
-	local view = GameplayView:new()
-
-	self.noteChartModel = noteChartModel
-	self.noteSkinModel = noteSkinModel
-	self.rhythmModel = rhythmModel
-	self.inputModel = inputModel
-	self.view = view
 
 	view.rhythmModel = rhythmModel
 
@@ -64,7 +65,7 @@ GameplayController.load = function(self)
 
 	rhythmModel.logicEngine:load()
 	rhythmModel.graphicEngine:load()
-	rhythmModel.replayManager:load()
+	rhythmModel.replayModel:load()
 
 	view.scoreSystem = rhythmModel.scoreEngine.scoreSystem
 

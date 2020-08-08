@@ -20,20 +20,25 @@ local GUI = require("sphere.ui.GUI")
 
 local SelectView = Class:new()
 
-SelectView.load = function(self)
+SelectView.construct = function(self)
     self.container = Container:new()
-
 	self.gui = GUI:new()
-	self.gui.container = self.container
-	self.gui.modifierModel = self.modifierModel
+end
 
-	NoteChartStateManager.observable:add(self.gui)
+SelectView.load = function(self)
+    local container = self.container
+	local gui = self.gui
+
+	gui.container = container
+	gui.modifierModel = self.modifierModel
+
+	NoteChartStateManager.observable:add(gui)
 	NoteChartStateManager.observable:add(self.controller)
 	NoteChartStateManager.noteChartModel = self.noteChartModel
 
-	self.gui:load("userdata/interface/select.json")
-	self.gui.observable:add(self)
-	self.gui:reload()
+	gui:load("userdata/interface/select.json")
+	gui.observable:add(self)
+	gui:reload()
 
 	KeyBindMenu.noteChartModel = self.noteChartModel
 	NoteSkinMenu.noteChartModel = self.noteChartModel

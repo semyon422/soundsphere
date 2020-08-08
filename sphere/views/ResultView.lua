@@ -4,13 +4,16 @@ local GUI = require("sphere.ui.GUI")
 
 local ResultView = Class:new()
 
-ResultView.load = function(self)
+ResultView.construct = function(self)
 	self.container = Container:new()
+	self.gui = GUI:new()
+end
 
-	local gui = GUI:new()
-	self.gui = gui
+ResultView.load = function(self)
+	local container = self.container
+	local gui = self.gui
 
-	gui.container = self.container
+	gui.container = container
 	gui.modifierModel = self.modifierModel
 
 	gui.scoreSystem = self.scoreSystem

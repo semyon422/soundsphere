@@ -1,18 +1,18 @@
 local Class			= require("aqua.util.Class")
 local Observable	= require("aqua.util.Observable")
-local Replay		= require("sphere.models.RhythmModel.ReplayManager.Replay")
+local Replay		= require("sphere.models.ReplayModel.Replay")
 local md5			= require("md5")
 
-local ReplayManager = Class:new()
+local ReplayModel = Class:new()
 
-ReplayManager.path = "userdata/replays"
+ReplayModel.path = "userdata/replays"
 
-ReplayManager.construct = function(self)
+ReplayModel.construct = function(self)
 	self.observable = Observable:new()
 	self.mode = "record"
 end
 
-ReplayManager.load = function(self)
+ReplayModel.load = function(self)
 	if self.mode == "record" then
 		self.replay = Replay:new()
 	elseif self.mode == "replay" then
@@ -20,15 +20,15 @@ ReplayManager.load = function(self)
 	end
 end
 
-ReplayManager.setMode = function(self, mode)
+ReplayModel.setMode = function(self, mode)
 	self.mode = mode
 end
 
-ReplayManager.send = function(self, event)
+ReplayModel.send = function(self, event)
 	return self.observable:send(event)
 end
 
-ReplayManager.receive = function(self, event)
+ReplayModel.receive = function(self, event)
 	if event.name == "TimeState" then
 		self.currentTime = event.exactCurrentTime
 		return
@@ -39,7 +39,7 @@ ReplayManager.receive = function(self, event)
 	end
 end
 
-ReplayManager.update = function(self)
+ReplayModel.update = function(self)
 	if self.mode == "replay" then
 		local replay = self.replay
 		local nextEvent = replay:getNextEvent()
@@ -55,7 +55,7 @@ ReplayManager.update = function(self)
 	end
 end
 
-ReplayManager.saveReplay = function(self, noteChartDataEntry, modifierSequence)
+ReplayModel.saveReplay = function(self, noteChartDataEntry, modifierSequence)
 	local replay = self.replay
 	replay.noteChartDataEntry = noteChartDataEntry
 	replay.modifierSequence = modifierSequence
@@ -70,7 +70,7 @@ ReplayManager.saveReplay = function(self, noteChartDataEntry, modifierSequence)
 	return replayHash
 end
 
-ReplayManager.loadReplay = function(self, replayHash)
+ReplayModel.loadReplay = function(self, replayHash)
 	local path = self.path .. "/" .. replayHash
 
 	if not love.filesystem.exists(path) or love.filesystem.isDirectory(path) then
@@ -84,4 +84,4 @@ ReplayManager.loadReplay = function(self, replayHash)
 	return Replay:new():fromString(replayString)
 end
 
-return ReplayManager
+return ReplayModel

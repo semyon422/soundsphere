@@ -87,25 +87,23 @@ NoteChartStateManager.receive = function(self, event)
 			local noteChartEntry = noteChartListItem.noteChartEntry
 			local noteChartDataEntry = noteChartListItem.noteChartDataEntry
 			if noteChartEntry and event.itemIndex == ScoreList.focusedItemIndex then
-				-- local replay = ReplayManager:loadReplay(item.scoreEntry.replayHash)
-				if replay.modifiers then
-					ModifierManager:getSequence():fromJson(replay.modifiers)
-				end
+				local mode
 				if event.button == 1 then
-					-- ReplayManager.replay = replay
-					-- InputManager:setMode("internal")
-					-- ReplayManager:setMode("replay")
-				else
-					-- InputManager:setMode("external")
-					-- ReplayManager:setMode("record")
+					if love.keyboard.isDown("lshift") then
+						mode = "result"
+					else
+						mode = "replay"
+					end
+				elseif event.button == 2 then
+					mode = "retry"
 				end
 				self:send({
 					sender = self,
-					action = "playNoteChart",
+					action = "replayNoteChart",
 					noteChartEntry = noteChartEntry,
 					noteChartDataEntry = noteChartDataEntry,
-					replay = replay,
-					fastPlay = event.button == 1 and love.keyboard.isDown("lshift")
+					mode = mode,
+					scoreEntry = item.scoreEntry
 				})
 			end
 		end

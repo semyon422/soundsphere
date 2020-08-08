@@ -9,20 +9,22 @@ local ModifierController	= require("sphere.controllers.ModifierController")
 
 local SelectController = Class:new()
 
-SelectController.load = function(self)
-	local modifierModel = ModifierModel:new()
-	local noteSkinModel = NoteSkinModel:new()
-	local noteChartModel = NoteChartModel:new()
-	local inputModel = InputModel:new()
-	local view = SelectView:new()
-	local modifierController = ModifierController:new()
+SelectController.construct = function(self)
+	self.modifierModel = ModifierModel:new()
+	self.noteSkinModel = NoteSkinModel:new()
+	self.noteChartModel = NoteChartModel:new()
+	self.inputModel = InputModel:new()
+	self.view = SelectView:new()
+	self.modifierController = ModifierController:new()
+end
 
-	self.modifierModel = modifierModel
-	self.noteSkinModel = noteSkinModel
-	self.noteChartModel = noteChartModel
-	self.inputModel = inputModel
-	self.view = view
-	self.modifierController = modifierController
+SelectController.load = function(self)
+	local modifierModel = self.modifierModel
+	local noteSkinModel = self.noteSkinModel
+	local noteChartModel = self.noteChartModel
+	local inputModel = self.inputModel
+	local view = self.view
+	local modifierController = self.modifierController
 
 	view.controller = self
 	view.noteChartModel = noteChartModel
@@ -79,6 +81,34 @@ SelectController.receive = function(self, event)
 
 		local GameplayController = require("sphere.controllers.GameplayController")
 		local gameplayController = GameplayController:new()
+		gameplayController.noteChartEntry = event.noteChartEntry
+		gameplayController.noteChartDataEntry = event.noteChartDataEntry
+		return ScreenManager:set(gameplayController)
+	elseif event.action == "replayNoteChart" then
+		if not love.filesystem.exists(event.noteChartEntry.path) then
+			return
+		end
+		if event.noteChartDataEntry.hash == "" then
+			return
+		end
+
+		local GameplayController = require("sphere.controllers.GameplayController")
+		local gameplayController = GameplayController:new()
+
+		local replay = gameplayController.rhythmModel.replayModel:loadReplay(event.scoreEntry.replayHash)
+
+		if replay.modifiers then
+			gameplayController.modifierModel:fromTable(replay.modifiers)
+		end
+		if event.mode == "replay" or event.mode == "result" then
+			gameplayController.rhythmModel.replayModel.replay = replay
+			gameplayController.rhythmModel.inputManager:setMode("internal")
+			gameplayController.rhythmModel.replayModel:setMode("replay")
+		elseif event.mode == "retry" then
+			gameplayController.rhythmModel.inputManager:setMode("external")
+			gameplayController.rhythmModel.replayModel:setMode("record")
+		end
+
 		gameplayController.noteChartEntry = event.noteChartEntry
 		gameplayController.noteChartDataEntry = event.noteChartDataEntry
 		return ScreenManager:set(gameplayController)

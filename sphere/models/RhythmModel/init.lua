@@ -6,7 +6,7 @@ local GraphicEngine		= require("sphere.models.RhythmModel.GraphicEngine")
 local AudioEngine		= require("sphere.models.RhythmModel.AudioEngine")
 local TimeEngine		= require("sphere.models.RhythmModel.TimeEngine")
 local InputManager		= require("sphere.models.RhythmModel.InputManager")
-local ReplayManager		= require("sphere.models.RhythmModel.ReplayManager")
+local ReplayModel		= require("sphere.models.ReplayModel")
 local ModifierModel		= require("sphere.models.ModifierModel")
 
 local RhythmModel = Class:new()
@@ -14,7 +14,7 @@ local RhythmModel = Class:new()
 RhythmModel.construct = function(self)
 	local modifierModel = ModifierModel:new()
 	local inputManager = InputManager:new()
-	local replayManager = ReplayManager:new()
+	local replayModel = ReplayModel:new()
 	local timeEngine = TimeEngine:new()
 	local scoreEngine = ScoreEngine:new()
 	local audioEngine = AudioEngine:new()
@@ -23,7 +23,7 @@ RhythmModel.construct = function(self)
 
 	self.modifierModel = modifierModel
 	self.inputManager = inputManager
-	self.replayManager = replayManager
+	self.replayModel = replayModel
 	self.timeEngine = timeEngine
 	self.scoreEngine = scoreEngine
 	self.audioEngine = audioEngine
@@ -34,7 +34,7 @@ RhythmModel.construct = function(self)
 	timeEngine.observable:add(scoreEngine)
 	timeEngine.observable:add(logicEngine)
 	timeEngine.observable:add(graphicEngine)
-	timeEngine.observable:add(replayManager)
+	timeEngine.observable:add(replayModel)
 	timeEngine.observable:add(inputManager)
 	timeEngine.logicEngine = logicEngine
 	timeEngine.audioEngine = audioEngine
@@ -56,11 +56,11 @@ RhythmModel.construct = function(self)
 	graphicEngine.logicEngine = logicEngine
 
 	inputManager.observable:add(logicEngine)
-	inputManager.observable:add(replayManager)
+	inputManager.observable:add(replayModel)
 
-	replayManager.observable:add(inputManager)
-	replayManager.timeEngine = timeEngine
-	replayManager.logicEngine = logicEngine
+	replayModel.observable:add(inputManager)
+	replayModel.timeEngine = timeEngine
+	replayModel.logicEngine = logicEngine
 
 	local observable = Observable:new()
 	self.observable = observable
@@ -90,7 +90,7 @@ RhythmModel.receive = function(self, event)
 end
 
 RhythmModel.update = function(self, dt)
-	self.replayManager:update()
+	self.replayModel:update()
 	self.logicEngine:update()
 	self.timeEngine:update(dt)
 	self.audioEngine:update()
