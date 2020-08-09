@@ -1,7 +1,5 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local CustomList		= require("sphere.ui.CustomList")
-local NoteChartList  	= require("sphere.ui.NoteChartList")
-local NoteChartManager	= require("sphere.database.NoteChartManager")
 
 local NoteChartMenuList = CustomList:new()
 
@@ -53,14 +51,14 @@ NoteChartMenuList.addItems = function(self)
 		{
 			name = "recache new",
 			onClick = function()
-				NoteChartManager:updateCache(entry.path)
+				self.menu.cacheModel:startUpdate(entry.path)
 				NoteChartMenu:hide()
 			end
 		},
 		{
 			name = "recache all",
 			onClick = function()
-				NoteChartManager:updateCache(entry.path, true)
+				self.menu.cacheModel:startUpdate(entry.path, true)
 				NoteChartMenu:hide()
 			end
 		}

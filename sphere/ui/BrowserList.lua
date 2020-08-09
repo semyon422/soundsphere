@@ -1,6 +1,4 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
-local CacheManager		= require("sphere.database.CacheManager")
-local CollectionManager	= require("sphere.database.CollectionManager")
 local NoteChartSetList	= require("sphere.ui.NoteChartSetList")
 local CustomList		= require("sphere.ui.CustomList")
 local NotificationModel	= require("sphere.models.NotificationModel")
@@ -48,7 +46,7 @@ BrowserList.receive = function(self, event)
 	if event.name == "keypressed" then
 		local key = event.args[1]
 		if key == "f5" then
-			CacheManager:select()
+			self.cacheModel.cacheManager:select()
 			NotificationModel:notify("Cache reloaded from database")
 		end
 	end
@@ -63,7 +61,7 @@ BrowserList.selectCache = function(self)
 		name = "all",
 		path = "userdata/charts"
 	}
-	for _, path in ipairs(CollectionManager:getPaths()) do
+	for _, path in ipairs(self.collectionModel:getPaths()) do
 		if not love.filesystem.isFile(path) then
 			items[#items + 1] = {
 				name = path:match("^.-/.-/(.+)$"),

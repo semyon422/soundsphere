@@ -2,12 +2,6 @@ local Observable		= require("aqua.util.Observable")
 local ScoreList		  	= require("sphere.ui.ScoreList")
 local NoteChartList  	= require("sphere.ui.NoteChartList")
 local NoteChartSetList	= require("sphere.ui.NoteChartSetList")
-local PreviewManager	= require("sphere.ui.PreviewManager")
--- local InputManager		= require("sphere.screen.gameplay.InputManager")
--- local ReplayManager		= require("sphere.screen.gameplay.ReplayManager")
--- local ModifierManager	= require("sphere.screen.gameplay.ModifierManager")
-local CacheManager		= require("sphere.database.CacheManager")
-local json				= require("json")
 local GameConfig		= require("sphere.config.GameConfig")
 
 local NoteChartStateManager = {}
@@ -112,7 +106,7 @@ NoteChartStateManager.receive = function(self, event)
 			local item = NoteChartSetList.items[event.itemIndex]
 			if not item then return end
 
-			local list = CacheManager:getNoteChartsAtSet(item.noteChartSetEntry.id)
+			local list = self.cacheModel.cacheManager:getNoteChartsAtSet(item.noteChartSetEntry.id)
 			if list and list[1] then
 				local focusedItem = NoteChartList.items[NoteChartList.focusedItemIndex]
 				local noteChartEntry = focusedItem and focusedItem.noteChartEntry

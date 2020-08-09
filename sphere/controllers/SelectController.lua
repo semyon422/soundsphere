@@ -5,6 +5,7 @@ local NoteChartModel		= require("sphere.models.NoteChartModel")
 local ModifierModel			= require("sphere.models.ModifierModel")
 local NoteSkinModel			= require("sphere.models.NoteSkinModel")
 local InputModel			= require("sphere.models.InputModel")
+local CacheModel			= require("sphere.models.CacheModel")
 local ModifierController	= require("sphere.controllers.ModifierController")
 
 local SelectController = Class:new()
@@ -14,6 +15,7 @@ SelectController.construct = function(self)
 	self.noteSkinModel = NoteSkinModel:new()
 	self.noteChartModel = NoteChartModel:new()
 	self.inputModel = InputModel:new()
+	self.cacheModel = CacheModel:new()
 	self.view = SelectView:new()
 	self.modifierController = ModifierController:new()
 end
@@ -23,20 +25,25 @@ SelectController.load = function(self)
 	local noteSkinModel = self.noteSkinModel
 	local noteChartModel = self.noteChartModel
 	local inputModel = self.inputModel
+	local cacheModel = self.cacheModel
 	local view = self.view
 	local modifierController = self.modifierController
+
+	noteChartModel.cacheModel = cacheModel
 
 	view.controller = self
 	view.noteChartModel = noteChartModel
 	view.modifierModel = modifierModel
 	view.noteSkinModel = noteSkinModel
 	view.inputModel = inputModel
+	view.cacheModel = cacheModel
 
 	modifierController.modifierModel = modifierModel
 
 	inputModel:load()
 	modifierModel:load()
 	noteSkinModel:load()
+	cacheModel:load()
 	noteChartModel:load()
 
 	view:load()
@@ -84,6 +91,7 @@ SelectController.receive = function(self, event)
 		if event.screenName == "BrowserScreen" then
 			local BrowserController = require("sphere.controllers.BrowserController")
 			local browserController = BrowserController:new()
+			browserController.cacheModel = self.cacheModel
 			return ScreenManager:set(browserController)
 		elseif event.screenName == "SettingsScreen" then
 			local SettingsController = require("sphere.controllers.SettingsController")

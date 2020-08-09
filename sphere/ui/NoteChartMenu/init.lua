@@ -4,8 +4,6 @@ local NoteChartMenuList	= require("sphere.ui.NoteChartMenu.NoteChartMenuList")
 
 local NoteChartMenu = {}
 
-local NoteChartMenu = {}
-
 NoteChartMenu.hidden = true
 NoteChartMenu.csall = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
@@ -21,6 +19,7 @@ NoteChartMenu.init = function(self)
 	})
 	self.background:reload()
 	
+	NoteChartMenuList.menu = self
 	NoteChartMenuList:init()
 end
 

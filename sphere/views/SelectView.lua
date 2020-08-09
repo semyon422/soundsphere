@@ -33,6 +33,7 @@ SelectView.load = function(self)
 	gui.container = container
 	gui.modifierModel = self.modifierModel
 	gui.noteChartModel = self.noteChartModel
+	gui.cacheModel = self.cacheModel
 
 	NoteChartStateManager.observable:add(gui)
 	NoteChartStateManager.observable:add(self.controller)
@@ -55,9 +56,15 @@ SelectView.load = function(self)
 	KeyBindMenu.modifierModel = self.modifierModel
 	NoteSkinMenu.modifierModel = self.modifierModel
 	ModifierMenu.modifierModel = self.modifierModel
+	ModifierMenu.modifierModel = self.modifierModel
 
 	AliasManager:load()
 	ModifierMenu:reloadItems()
+
+	NoteChartList.cacheModel = self.cacheModel
+	NoteChartSetList.cacheModel = self.cacheModel
+	NoteChartStateManager.cacheModel = self.cacheModel
+	NoteChartMenu.cacheModel = self.cacheModel
 
 	ScoreList:load()
 	NoteChartList:load()

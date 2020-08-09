@@ -1,6 +1,5 @@
 local Class = require("aqua.util.Class")
 local json = require("json")
-local CacheManager		= require("sphere.database.CacheManager")
 local NoteChartFactory			= require("notechart.NoteChartFactory")
 
 local NoteChartModel = Class:new()
@@ -17,9 +16,9 @@ NoteChartModel.load = function(self)
 		self.selected = json.decode(file:read("*all"))
 		file:close()
 
-		self.noteChartSetEntry = CacheManager:getNoteChartSetEntryById(self.selected[1])
-		self.noteChartEntry = CacheManager:getNoteChartEntryById(self.selected[2])
-		self.noteChartDataEntry = CacheManager:getNoteChartDataEntry(self.noteChartEntry.hash, 1)
+		self.noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(self.selected[1])
+		self.noteChartEntry = self.cacheModel.cacheManager:getNoteChartEntryById(self.selected[2])
+		self.noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntry(self.noteChartEntry.hash, 1)
 	end
 end
 
@@ -31,16 +30,16 @@ end
 
 NoteChartModel.selectNoteChartSet = function(self, id)
 	self.selected[1] = id
-	self.noteChartSetEntry = CacheManager:getNoteChartSetEntryById(id)
-	self.noteChartEntry = CacheManager:getNoteChartsAtSet(id)[1]
-	self.noteChartDataEntry = CacheManager:getNoteChartDataEntry(self.noteChartEntry.hash, 1)
+	self.noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(id)
+	self.noteChartEntry = self.cacheModel.cacheManager:getNoteChartsAtSet(id)[1]
+	self.noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntry(self.noteChartEntry.hash, 1)
 end
 
 NoteChartModel.selectNoteChart = function(self, id)
 	self.selected[2] = id
-	self.noteChartEntry = CacheManager:getNoteChartEntryById(id)
-	self.noteChartDataEntry = CacheManager:getNoteChartDataEntry(self.noteChartEntry.hash, 1)
-	self.noteChartSetEntry = CacheManager:getNoteChartSetEntryById(self.noteChartEntry.setId)
+	self.noteChartEntry = self.cacheModel.cacheManager:getNoteChartEntryById(id)
+	self.noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntry(self.noteChartEntry.hash, 1)
+	self.noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(self.noteChartEntry.setId)
 end
 
 NoteChartModel.loadNoteChart = function(self)

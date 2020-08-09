@@ -1,20 +1,21 @@
-local NoteChartManager	= require("sphere.database.NoteChartManager")
 local BrowserList		= require("sphere.ui.BrowserList")
 local Button			= require("sphere.ui.Button")
 
 local CacheManagerDisplay = Button:new()
 
 CacheManagerDisplay.loadGui = function(self)
+	self.cacheModel = self.gui.cacheModel
+
 	Button.loadGui(self)
+end
+
+CacheManagerDisplay.load = function(self)
+	self.cacheModel.observable:add(self)
+	self.state = 0
 
 	self.interact = function()
 		self:processCache()
 	end
-end
-
-CacheManagerDisplay.load = function(self)
-	NoteChartManager.observable:add(self)
-	self.state = 0
 
 	Button.load(self)
 
@@ -27,30 +28,20 @@ end
 
 CacheManagerDisplay.processCache = function(self)
 	if self.state == 0 or self.state == 3 then
-		NoteChartManager:updateCache(BrowserList.basePath, self.data.force)
+		self.cacheModel:startUpdate(BrowserList.basePath, self.data.force)
 	else
-		NoteChartManager:stopCache()
+		self.cacheModel:stopUpdate()
 	end
 end
 
-CacheManagerDisplay.update = function(self)
-
-	Button.update(self)
-end
-
-CacheManagerDisplay.draw = function(self)
-
-	Button.draw(self)
-end
-
 CacheManagerDisplay.unload = function(self)
-	NoteChartManager.observable:remove(self)
+	self.cacheModel.observable:remove(self)
 
 	Button.unload(self)
 end
 
 CacheManagerDisplay.receive = function(self, event)
-	if event.name == "NoteChartManagerState" then
+	if event.name == "CacheProgress" then
 		if event.state == 1 then
 			self.button.text = ("searching for charts: %d"):format(event.noteChartCount)
 			self.button:reload()

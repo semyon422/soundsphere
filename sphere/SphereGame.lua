@@ -3,7 +3,6 @@ local CoordinateManager			= require("aqua.graphics.CoordinateManager")
 local ThreadPool				= require("aqua.thread.ThreadPool")
 local GameConfig				= require("sphere.config.GameConfig")
 local ScoreManager				= require("sphere.database.ScoreManager")
-local CacheManager				= require("sphere.database.CacheManager")
 local DiscordPresence			= require("sphere.discord.DiscordPresence")
 local MountManager				= require("sphere.filesystem.MountManager")
 local ScreenManager				= require("sphere.screen.ScreenManager")
@@ -36,7 +35,6 @@ SphereGame.load = function(self)
 
 	MountManager:mount()
 
-	CacheManager:select()
 	ScoreManager:select()
 	GameConfig:read()
 

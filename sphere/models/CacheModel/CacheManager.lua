@@ -1,12 +1,13 @@
-local CacheDatabase				= require("sphere.database.CacheDatabase")
+local CacheDatabase				= require("sphere.models.CacheModel.CacheDatabase")
 local NoteChartFactory			= require("notechart.NoteChartFactory")
 local NoteChartDataEntryFactory	= require("notechart.NoteChartDataEntryFactory")
 local Log						= require("aqua.util.Log")
+local Class						= require("aqua.util.Class")
 local md5						= require("md5")
 
-local CacheManager = {}
+local CacheManager = Class:new()
 
-CacheManager.init = function(self)
+CacheManager.construct = function(self)
 	self.log = Log:new()
 	self.log.console = true
 	self.log.path = "userdata/cache.log"
@@ -324,7 +325,7 @@ end
 CacheManager.checkThreadEvent = function(self)
 	if thread then
 		local event = thread:pop()
-		if event and event.name == "NoteChartManager" then
+		if event and event.name == "CacheUpdater" then
 			if event.action == "stop" then
 				self.needStop = true
 			end

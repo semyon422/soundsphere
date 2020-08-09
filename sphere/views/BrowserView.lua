@@ -5,10 +5,6 @@ local BackgroundManager	= require("sphere.ui.BackgroundManager")
 
 local GUI = require("sphere.ui.GUI")
 
-local SettingsList		= require("sphere.ui.SettingsList")
-local CategoriesList	= require("sphere.ui.CategoriesList")
-local SelectFrame		= require("sphere.ui.SelectFrame")
-
 local BrowserList		= require("sphere.ui.BrowserList")
 
 local BrowserView = Class:new()
@@ -22,9 +18,14 @@ BrowserView.load = function(self)
     local container = self.container
 	local gui = self.gui
 
-	gui.container = container
+    gui.cacheModel = self.cacheModel
+    gui.collectionModel = self.collectionModel
+    gui.container = container
+
 	gui:load("userdata/interface/browser.json")
-	gui.observable:add(self)
+    gui.observable:add(self)
+
+    BrowserList.collectionModel = self.collectionModel
 
 	BrowserList:init()
 	BrowserList.observable:add(self)
@@ -38,13 +39,6 @@ BrowserView.unload = function(self)
 end
 
 BrowserView.receive = function(self, event)
-    if event.name == "resize" then
-		SettingsList:reload()
-		CategoriesList:reload()
-		SelectFrame:reload()
-		return
-	end
-
 	BrowserList:receive(event)
 	self.gui:receive(event)
 end

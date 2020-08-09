@@ -1,11 +1,13 @@
 local GameConfig			= require("sphere.config.GameConfig")
 local Class					= require("aqua.util.Class")
 local ScreenManager			= require("sphere.screen.ScreenManager")
+local CollectionModel		= require("sphere.models.CollectionModel")
 local BrowserView			= require("sphere.views.BrowserView")
 
 local BrowserController = Class:new()
 
 BrowserController.construct = function(self)
+	self.collectionModel = CollectionModel:new()
 	self.view = BrowserView:new()
 end
 
@@ -13,6 +15,10 @@ BrowserController.load = function(self)
 	local view = self.view
 
 	view.controller = self
+	view.cacheModel = self.cacheModel
+	view.collectionModel = self.collectionModel
+
+	self.collectionModel.cacheModel = self.cacheModel
 
 	view:load()
 end

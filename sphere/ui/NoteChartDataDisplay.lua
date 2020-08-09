@@ -13,6 +13,9 @@ end
 
 NoteChartDataDisplay.receive = function(self, event)
 	if event.action == "updateMetaData" then
+		if not self.noteChartModel.noteChartDataEntry then
+			return
+		end
 		self.text = self.format:format(self.noteChartModel.noteChartDataEntry[self.field] or "")
 		self:reload()
 	end
