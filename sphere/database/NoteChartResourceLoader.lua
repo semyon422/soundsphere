@@ -48,7 +48,7 @@ NoteChartResourceLoader.load = function(self, path, noteChart, callback)
 	self.path = path
 	self.noteChart = noteChart
 	self.callback = callback
-	
+
 	if noteChartType == "bms" then
 		self:loadBMS()
 	elseif noteChartType == "o2jam" then
@@ -69,7 +69,7 @@ end
 NoteChartResourceLoader.loadBMS = function(self)
 	FileManager:addPath(self.directoryPath, 1)
 	FileManager:addPath(self.hitSoundsPath, 0)
-	
+
 	self.resourceCount = 0
 	self.resourceCountLoaded = 0
 	self.soundGroup = Group:new()
@@ -122,19 +122,19 @@ NoteChartResourceLoader.loadBMS = function(self)
 			end
 		end
 	end
-	
+
 	local resourceLoadedCallback = function()
 		self.resourceCountLoaded = self.resourceCountLoaded + 1
 		if self.resourceCountLoaded == self.resourceCount then
 			self.callback()
 		end
-		
+
 		return self.observable:send({
 			name = "notify",
 			text = self.resourceCountLoaded .. "/" .. self.resourceCount
 		})
 	end
-	
+
 	local directoryPath = self.directoryPath
 	self.soundGroup:call(function(soundFilePath)
 		if self.directoryPath == directoryPath then
@@ -151,10 +151,10 @@ NoteChartResourceLoader.loadBMS = function(self)
 			return video.load(videoFilePath, resourceLoadedCallback)
 		end
 	end)
-	
-	if self.resourceCountLoaded == self.resourceCount then
-		self.callback()
-	end
+
+	-- if self.resourceCountLoaded == self.resourceCount then
+	-- 	self.callback()
+	-- end
 end
 
 NoteChartResourceLoader.unload = function(self)
@@ -168,7 +168,7 @@ end
 NoteChartResourceLoader.unloadBMS = function(self)
 	FileManager:removePath(self.directoryPath)
 	FileManager:removePath(self.hitSoundsPath)
-	
+
 	self.soundGroup:call(function(soundFilePath)
 		return sound.unload(soundFilePath, function() end)
 	end)

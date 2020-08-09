@@ -29,6 +29,7 @@ GameplayController.load = function(self)
 	noteSkinModel:load()
 
 	view.rhythmModel = rhythmModel
+	view.controller = self
 
 	local noteChart = noteChartModel:getNoteChart()
 	rhythmModel:setNoteChart(noteChart)
@@ -102,27 +103,26 @@ GameplayController.receive = function(self, event)
 	self.view:receive(event)
 
 	if event.name == "play" then
-		self:play()
+		self.rhythmModel.timeEngine:setTimeRate(self.rhythmModel.timeEngine:getBaseTimeRate())
 	elseif event.name == "pause" then
-		self:pause()
-	elseif event.name == "keypressed" then
-		if event.args[1] == "1" then
-			self:pause()
-		elseif event.args[1] == "2" then
-			self:play()
-		elseif event.args[1] == "escape" then
-			self:saveScore()
-			local ResultController = require("sphere.controllers.ResultController")
-			local resultController = ResultController:new()
+		self.rhythmModel.timeEngine:setTimeRate(0)
+	elseif event.name == "restart" then
+		self.rhythmModel.inputManager:setMode("external")
+		self.rhythmModel.replayModel:setMode("record")
+		self:unload()
+		self:load()
+	elseif event.name == "quit" then
+		self:saveScore()
+		local ResultController = require("sphere.controllers.ResultController")
+		local resultController = ResultController:new()
 
-			resultController.scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
-			resultController.noteChart = self.noteChart
-			resultController.noteChartEntry = self.noteChartModel.noteChartEntry
-			resultController.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
-			resultController.autoplay = self.rhythmModel.logicEngine.autoplay
+		resultController.scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
+		resultController.noteChart = self.noteChart
+		resultController.noteChartEntry = self.noteChartModel.noteChartEntry
+		resultController.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
+		resultController.autoplay = self.rhythmModel.logicEngine.autoplay
 
-			ScreenManager:set(resultController)
-		end
+		ScreenManager:set(resultController)
 	end
 end
 
@@ -135,14 +135,6 @@ GameplayController.saveScore = function(self)
 		local replayHash = rhythmModel.replayModel:saveReplay(noteChartModel.noteChartDataEntry, modifierModel)
 		ScoreManager:insertScore(scoreSystem.scoreTable, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
 	end
-end
-
-GameplayController.pause = function(self)
-	self.rhythmModel.timeEngine:setTimeRate(0)
-end
-
-GameplayController.play = function(self)
-	self.rhythmModel.timeEngine:setTimeRate(self.rhythmModel.timeEngine:getBaseTimeRate())
 end
 
 return GameplayController

@@ -1,3 +1,5 @@
+local Class				= require("aqua.util.Class")
+local Observable		= require("aqua.util.Observable")
 local aquafonts			= require("aqua.assets.fonts")
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Rectangle			= require("aqua.graphics.Rectangle")
@@ -6,16 +8,15 @@ local spherefonts		= require("sphere.assets.fonts")
 local GameConfig		= require("sphere.config.GameConfig")
 local DiscordPresence	= require("sphere.discord.DiscordPresence")
 local ScreenManager		= require("sphere.screen.ScreenManager")
-local ReplayManager		= require("sphere.screen.gameplay.ReplayManager")
-local InputManager		= require("sphere.screen.gameplay.InputManager")
 local tween				= require("tween")
 
-local PauseOverlay = {}
+local PauseOverlay = Class:new()
 
-PauseOverlay.init = function(self)
+PauseOverlay.load = function(self)
+	self.observable = Observable:new()
 	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 	self.font = aquafonts.getFont(spherefonts.NotoSansRegular, 48)
-	
+
 	self.progressRectangle = Rectangle:new({
 		x = 0, y = 0.99,
 		w = 1, h = 0.01,
@@ -23,11 +24,11 @@ PauseOverlay.init = function(self)
 		color = {255, 255, 255, 255},
 		mode = "fill"
 	})
-	
+
 	self.continueButton = Theme.Button:new({
 		text = "continue",
 		interact = function() self:beginPlay() end,
-		
+
 		x = 0, y = 0,
 		w = 1, h = 1/3,
 		cs = self.cs,
@@ -38,15 +39,11 @@ PauseOverlay.init = function(self)
 		textColor = {255, 255, 255, 255},
 		font = self.font,
 	})
-	
+
 	self.retryButton = Theme.Button:new({
 		text = "retry",
-		interact = function()
-			InputManager:setMode("external")
-			ReplayManager:setMode("record")
-			self:restart()
-		end,
-		
+		interact = function() self:restart() end,
+
 		x = 0, y = 1/3,
 		w = 1, h = 1/3,
 		cs = self.cs,
@@ -57,13 +54,11 @@ PauseOverlay.init = function(self)
 		textColor = {255, 255, 255, 255},
 		font = self.font,
 	})
-	
+
 	self.menuButton = Theme.Button:new({
 		text = "menu",
-		interact = function()
-			self:menu()
-		end,
-		
+		interact = function() self:menu() end,
+
 		x = 0, y = 2/3,
 		w = 1, h = 1/3,
 		cs = self.cs,
@@ -74,11 +69,9 @@ PauseOverlay.init = function(self)
 		textColor = {255, 255, 255, 255},
 		font = self.font,
 	})
-end
-
-PauseOverlay.load = function(self)
-	self:reload()
 	
+	self:reload()
+
 	self:resetProgress()
 	self.paused = false
 end
@@ -96,13 +89,13 @@ PauseOverlay.update = function(self, dt)
 		self.progressRectangle.w = self.delay / self.baseDelay
 		self.progressRectangle:reload()
 	end
-	
+
 	if self.paused then
 		self.continueButton:update()
 		self.retryButton:update()
 		self.menuButton:update()
 	end
-	
+
 	if self.action == "play" and self.delay / self.baseDelay == 0 then
 		self:resetProgress()
 		self:play()
@@ -125,17 +118,17 @@ PauseOverlay.receive = function(self, event)
 	if event.name == "resize" then
 		self:reload()
 	end
-	
-	if event.name == "focus" and not self.paused and not event.args[1] and not self.logicEngine.autoplay then
+
+	if event.name == "focus" and not self.paused and not event.args[1] and not self.autoplay then
 		self:pause()
 	end
-	
+
 	if self.paused then
 		self.continueButton:receive(event)
 		self.retryButton:receive(event)
 		self.menuButton:receive(event)
 	end
-	
+
 	local quickRestartKey = GameConfig:get("gameplay.quickRestart")
 	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
 	if event.name == "keypressed" then
@@ -145,7 +138,7 @@ PauseOverlay.receive = function(self, event)
 				self:resetProgress()
 				return
 			end
-			if self.timeEngine.timeRate == 0 then
+			if self.rhythmModel.timeEngine.timeRate == 0 then
 				self:beginPlay()
 			else
 				self:pause()
@@ -173,14 +166,16 @@ end
 
 PauseOverlay.play = function(self)
 	self.paused = false
-	self.timeEngine:setTimeRate(self.timeEngine:getBaseTimeRate())
-	
-	local length = math.min(self.noteChartDataEntry.length, 3600 * 24)
-	DiscordPresence:setPresence({
-		state = "Playing",
-		details = ("%s - %s [%s]"):format(self.noteChartDataEntry.artist, self.noteChartDataEntry.title, self.noteChartDataEntry.name),
-		endTimestamp = math.floor(os.time() + (length - self.timeEngine.currentTime) / self.timeEngine.timeRate)
+	self.observable:send({
+		name = "play"
 	})
+
+	-- local length = math.min(self.noteChartDataEntry.length, 3600 * 24)
+	-- DiscordPresence:setPresence({
+	-- 	state = "Playing",
+	-- 	details = ("%s - %s [%s]"):format(self.noteChartDataEntry.artist, self.noteChartDataEntry.title, self.noteChartDataEntry.name),
+	-- 	endTimestamp = math.floor(os.time() + (length - self.timeEngine.currentTime) / self.timeEngine.timeRate)
+	-- })
 end
 
 PauseOverlay.beginPlay = function(self)
@@ -198,38 +193,29 @@ PauseOverlay.beginRestart = function(self)
 end
 
 PauseOverlay.pause = function(self)
-	self.timeEngine:setTimeRate(0)
-	self.paused = true
-	
-	DiscordPresence:setPresence({
-		state = "Playing (paused)",
-		details = ("%s - %s [%s]"):format(self.noteChartDataEntry.artist, self.noteChartDataEntry.title, self.noteChartDataEntry.name)
+	self.observable:send({
+		name = "pause"
 	})
+	self.paused = true
+
+	-- DiscordPresence:setPresence({
+	-- 	state = "Playing (paused)",
+	-- 	details = ("%s - %s [%s]"):format(self.noteChartDataEntry.artist, self.noteChartDataEntry.title, self.noteChartDataEntry.name)
+	-- })
 end
 
 PauseOverlay.restart = function(self)
-	local GameplayScreen = require("sphere.screen.gameplay.GameplayScreen")
-	GameplayScreen:unload()
-	GameplayScreen:load()
-	self.timeEngine:setTimeRate(self.timeEngine:getBaseTimeRate())
+	self.observable:send({
+		name = "restart"
+	})
 end
 
 PauseOverlay.menu = function(self)
-	local GameplayScreen = require("sphere.screen.gameplay.GameplayScreen")
-	ScreenManager:set(require("sphere.screen.result.ResultScreen"),
-		function()
-			ScreenManager:receive({
-				name = "scoreSystem",
-				scoreSystem = self.scoreSystem,
-				noteChart = self.noteChart,
-				noteChartEntry = GameplayScreen.noteChartEntry,
-				noteChartDataEntry = GameplayScreen.noteChartDataEntry,
-				autoplay = self.logicEngine.autoplay
-			})
-		end
-	)
-	
-	DiscordPresence:setPresence({})
+	self.observable:send({
+		name = "quit"
+	})
+
+	-- DiscordPresence:setPresence({})
 end
 
 return PauseOverlay

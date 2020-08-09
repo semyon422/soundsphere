@@ -23,7 +23,15 @@ TimeEngine.targetTimeRate = 0
 TimeEngine.backwardCounter = 0
 
 TimeEngine.load = function(self)
+	self.currentTime = TimeEngine.currentTime
+	self.exactCurrentTime = TimeEngine.exactCurrentTime
+	self.baseTimeRate = TimeEngine.baseTimeRate
+	self.timeRate = TimeEngine.timeRate
+	self.targetTimeRate = TimeEngine.targetTimeRate
+	self.backwardCounter = TimeEngine.backwardCounter
+
 	self:loadTimeManager()
+	self.timeRateHandlers = {}
 end
 
 TimeEngine.createTimeRateHandler = function(self)
