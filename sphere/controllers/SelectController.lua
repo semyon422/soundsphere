@@ -115,8 +115,8 @@ SelectController.receive = function(self, event)
 			gameplayController.rhythmModel.replayModel:setMode("record")
 		end
 
-		gameplayController.noteChartEntry = event.noteChartEntry
-		gameplayController.noteChartDataEntry = event.noteChartDataEntry
+		-- gameplayController.noteChartEntry = event.noteChartEntry
+		-- gameplayController.noteChartDataEntry = event.noteChartDataEntry
 
 		if event.mode == "result" then
 			gameplayController:play()

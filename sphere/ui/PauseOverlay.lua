@@ -169,13 +169,6 @@ PauseOverlay.play = function(self)
 	self.observable:send({
 		name = "play"
 	})
-
-	-- local length = math.min(self.noteChartDataEntry.length, 3600 * 24)
-	-- DiscordPresence:setPresence({
-	-- 	state = "Playing",
-	-- 	details = ("%s - %s [%s]"):format(self.noteChartDataEntry.artist, self.noteChartDataEntry.title, self.noteChartDataEntry.name),
-	-- 	endTimestamp = math.floor(os.time() + (length - self.timeEngine.currentTime) / self.timeEngine.timeRate)
-	-- })
 end
 
 PauseOverlay.beginPlay = function(self)
@@ -197,11 +190,6 @@ PauseOverlay.pause = function(self)
 		name = "pause"
 	})
 	self.paused = true
-
-	-- DiscordPresence:setPresence({
-	-- 	state = "Playing (paused)",
-	-- 	details = ("%s - %s [%s]"):format(self.noteChartDataEntry.artist, self.noteChartDataEntry.title, self.noteChartDataEntry.name)
-	-- })
 end
 
 PauseOverlay.restart = function(self)
@@ -214,8 +202,6 @@ PauseOverlay.menu = function(self)
 	self.observable:send({
 		name = "quit"
 	})
-
-	-- DiscordPresence:setPresence({})
 end
 
 return PauseOverlay

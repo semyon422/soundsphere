@@ -29,6 +29,7 @@ GameplayController.load = function(self)
 	noteSkinModel:load()
 
 	view.rhythmModel = rhythmModel
+	view.noteChartModel = noteChartModel
 	view.controller = self
 
 	local noteChart = noteChartModel:getNoteChart()

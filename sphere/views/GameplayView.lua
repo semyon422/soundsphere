@@ -2,6 +2,7 @@ local Class = require("aqua.util.Class")
 local Container = require("aqua.graphics.Container")
 local RhythmView = require("sphere.views.RhythmView")
 local NoteSkinView = require("sphere.views.NoteSkinView")
+local DiscordGameplayView = require("sphere.views.DiscordGameplayView")
 local PauseOverlay = require("sphere.ui.PauseOverlay")
 local GUI = require("sphere.ui.GUI")
 
@@ -11,6 +12,7 @@ GameplayView.construct = function(self)
 	self.container = Container:new()
 	self.noteSkinView = NoteSkinView:new()
 	self.rhythmView = RhythmView:new()
+	self.discordGameplayView = DiscordGameplayView:new()
 	self.gui = GUI:new()
 	self.pauseOverlay = PauseOverlay:new()
 end
@@ -19,6 +21,7 @@ GameplayView.load = function(self)
 	local container = self.container
 	local noteSkinView = self.noteSkinView
 	local rhythmView = self.rhythmView
+	local discordGameplayView = self.discordGameplayView
 	local gui = self.gui
 	local pauseOverlay = self.pauseOverlay
 
@@ -38,6 +41,9 @@ GameplayView.load = function(self)
 	pauseOverlay:load()
 	pauseOverlay.rhythmModel = self.rhythmModel
 	pauseOverlay.observable:add(self.controller)
+
+	discordGameplayView.rhythmModel = self.rhythmModel
+	discordGameplayView.noteChartModel = self.noteChartModel
 end
 
 GameplayView.unload = function(self)
@@ -52,6 +58,7 @@ GameplayView.receive = function(self, event)
 	self.rhythmView:receive(event)
 	self.gui:receive(event)
 	self.pauseOverlay:receive(event)
+	self.discordGameplayView:receive(event)
 end
 
 GameplayView.update = function(self, dt)
