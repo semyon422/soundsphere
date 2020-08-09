@@ -31,14 +31,19 @@ end
 
 NoteChartModel.selectNoteChartSet = function(self, id)
 	self.selected[1] = id
+	self.noteChartSetEntry = CacheManager:getNoteChartSetEntryById(id)
+	self.noteChartEntry = CacheManager:getNoteChartsAtSet(id)[1]
+	self.noteChartDataEntry = CacheManager:getNoteChartDataEntry(self.noteChartEntry.hash, 1)
 end
-
 
 NoteChartModel.selectNoteChart = function(self, id)
 	self.selected[2] = id
+	self.noteChartEntry = CacheManager:getNoteChartEntryById(id)
+	self.noteChartDataEntry = CacheManager:getNoteChartDataEntry(self.noteChartEntry.hash, 1)
+	self.noteChartSetEntry = CacheManager:getNoteChartSetEntryById(self.noteChartEntry.setId)
 end
 
-NoteChartModel.getNoteChart = function(self)
+NoteChartModel.loadNoteChart = function(self)
 	local noteChartEntry = self.noteChartEntry
 
 	local file = love.filesystem.newFile(noteChartEntry.path)
@@ -54,7 +59,10 @@ NoteChartModel.getNoteChart = function(self)
 	if not status then
 		error(noteCharts)
 	end
-	return noteCharts[1]
+
+	self.noteChart = noteCharts[1]
+
+	return self.noteChart
 end
 
 return NoteChartModel

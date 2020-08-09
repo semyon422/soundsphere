@@ -17,9 +17,7 @@ ResultController.load = function(self)
 	view.modifierModel = modifierModel
 
 	view.scoreSystem = self.scoreSystem
-	view.noteChart = self.noteChart
-	view.noteChartEntry = self.noteChartEntry
-	view.noteChartDataEntry = self.noteChartDataEntry
+	view.noteChartModel = self.noteChartModel
 
 	modifierModel:load()
 	view:load()

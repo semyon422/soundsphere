@@ -35,7 +35,7 @@ GameplayView.load = function(self)
 	gui.container = container
 	gui.root = self.noteSkin.directoryPath
 	gui.scoreSystem = self.scoreSystem
-	gui.noteChart = self.noteChart
+	gui.noteChartModel = self.noteChartModel
 	gui:loadTable(self.noteSkin.playField)
 
 	pauseOverlay:load()

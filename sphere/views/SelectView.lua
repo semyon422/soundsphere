@@ -28,20 +28,22 @@ end
 SelectView.load = function(self)
     local container = self.container
 	local gui = self.gui
+	local noteChartModel = self.noteChartModel
 
 	gui.container = container
 	gui.modifierModel = self.modifierModel
+	gui.noteChartModel = self.noteChartModel
 
 	NoteChartStateManager.observable:add(gui)
 	NoteChartStateManager.observable:add(self.controller)
-	NoteChartStateManager.noteChartModel = self.noteChartModel
+	NoteChartStateManager.noteChartModel = noteChartModel
 
 	gui:load("userdata/interface/select.json")
 	gui.observable:add(self)
 	gui:reload()
 
-	KeyBindMenu.noteChartModel = self.noteChartModel
-	NoteSkinMenu.noteChartModel = self.noteChartModel
+	KeyBindMenu.noteChartModel = noteChartModel
+	NoteSkinMenu.noteChartModel = noteChartModel
 
 	NoteSkinMenu.noteSkinModel = self.noteSkinModel
 	NoteSkinMenu.observable:add(self.controller)

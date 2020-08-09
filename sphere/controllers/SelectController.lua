@@ -72,74 +72,80 @@ SelectController.receive = function(self, event)
 			self.noteChartModel:selectNoteChartSet(event.id)
 		end
 	elseif event.action == "playNoteChart" then
-		if not love.filesystem.exists(event.noteChartEntry.path) then
-			return
-		end
-		if event.noteChartDataEntry.hash == "" then
-			return
-		end
-
-		local GameplayController = require("sphere.controllers.GameplayController")
-		local gameplayController = GameplayController:new()
-		gameplayController.noteChartEntry = event.noteChartEntry
-		gameplayController.noteChartDataEntry = event.noteChartDataEntry
-		return ScreenManager:set(gameplayController)
+		self:playNoteChart(event)
 	elseif event.action == "replayNoteChart" then
-		if not love.filesystem.exists(event.noteChartEntry.path) then
-			return
-		end
-		if event.noteChartDataEntry.hash == "" then
-			return
-		end
-
-		local gameplayController
-		if event.mode == "result" then
-			local FastplayController = require("sphere.controllers.FastplayController")
-			gameplayController = FastplayController:new()
-		else
-			local GameplayController = require("sphere.controllers.GameplayController")
-			gameplayController = GameplayController:new()
-		end
-
-		local replay = gameplayController.rhythmModel.replayModel:loadReplay(event.scoreEntry.replayHash)
-
-		if replay.modifiers then
-			gameplayController.rhythmModel.modifierModel:fromTable(replay.modifiers)
-		end
-		if event.mode == "replay" or event.mode == "result" then
-			gameplayController.rhythmModel.replayModel.replay = replay
-			gameplayController.rhythmModel.inputManager:setMode("internal")
-			gameplayController.rhythmModel.replayModel:setMode("replay")
-		elseif event.mode == "retry" then
-			gameplayController.rhythmModel.inputManager:setMode("external")
-			gameplayController.rhythmModel.replayModel:setMode("record")
-		end
-
-		-- gameplayController.noteChartEntry = event.noteChartEntry
-		-- gameplayController.noteChartDataEntry = event.noteChartDataEntry
-
-		if event.mode == "result" then
-			gameplayController:play()
-
-			local ResultController = require("sphere.controllers.ResultController")
-			local resultController = ResultController:new()
-
-			resultController.scoreSystem = gameplayController.rhythmModel.scoreEngine.scoreSystem
-			resultController.noteChart = gameplayController.noteChart
-			resultController.noteChartEntry = gameplayController.noteChartEntry
-			resultController.noteChartDataEntry = gameplayController.noteChartDataEntry
-			resultController.autoplay = gameplayController.rhythmModel.logicEngine.autoplay
-
-			ScreenManager:set(resultController)
-		else
-			return ScreenManager:set(gameplayController)
-		end
+		self:replayNoteChart(event)
 	elseif event.name == "setScreen" then
 		if event.screenName == "BrowserScreen" then
 			return ScreenManager:set(require("sphere.screen.browser.BrowserScreen"))
 		elseif event.screenName == "SettingsScreen" then
 			return ScreenManager:set(require("sphere.screen.settings.SettingsScreen"))
 		end
+	end
+end
+
+SelectController.playNoteChart = function(self)
+	local noteChartModel = self.noteChartModel
+	if not love.filesystem.exists(noteChartModel.noteChartEntry.path) then
+		return
+	end
+	if noteChartModel.noteChartDataEntry.hash == "" then
+		return
+	end
+
+	local GameplayController = require("sphere.controllers.GameplayController")
+	local gameplayController = GameplayController:new()
+	gameplayController.noteChartModel = noteChartModel
+	return ScreenManager:set(gameplayController)
+end
+
+SelectController.replayNoteChart = function(self, event)
+	local noteChartModel = self.noteChartModel
+	if not love.filesystem.exists(noteChartModel.noteChartEntry.path) then
+		return
+	end
+	if noteChartModel.noteChartDataEntry.hash == "" then
+		return
+	end
+
+	local gameplayController
+	if event.mode == "result" then
+		local FastplayController = require("sphere.controllers.FastplayController")
+		gameplayController = FastplayController:new()
+	else
+		local GameplayController = require("sphere.controllers.GameplayController")
+		gameplayController = GameplayController:new()
+	end
+
+	local replay = gameplayController.rhythmModel.replayModel:loadReplay(event.scoreEntry.replayHash)
+
+	if replay.modifiers then
+		gameplayController.rhythmModel.modifierModel:fromTable(replay.modifiers)
+	end
+	if event.mode == "replay" or event.mode == "result" then
+		gameplayController.rhythmModel.replayModel.replay = replay
+		gameplayController.rhythmModel.inputManager:setMode("internal")
+		gameplayController.rhythmModel.replayModel:setMode("replay")
+	elseif event.mode == "retry" then
+		gameplayController.rhythmModel.inputManager:setMode("external")
+		gameplayController.rhythmModel.replayModel:setMode("record")
+	end
+
+	gameplayController.noteChartModel = noteChartModel
+
+	if event.mode == "result" then
+		gameplayController:play()
+
+		local ResultController = require("sphere.controllers.ResultController")
+		local resultController = ResultController:new()
+
+		resultController.scoreSystem = gameplayController.rhythmModel.scoreEngine.scoreSystem
+		resultController.noteChartModel = noteChartModel
+		resultController.autoplay = gameplayController.rhythmModel.logicEngine.autoplay
+
+		ScreenManager:set(resultController)
+	else
+		return ScreenManager:set(gameplayController)
 	end
 end
 

@@ -12,20 +12,17 @@ end
 ResultView.load = function(self)
 	local container = self.container
 	local gui = self.gui
+	local noteChartModel = self.noteChartModel
 
 	gui.container = container
 	gui.modifierModel = self.modifierModel
 
 	gui.scoreSystem = self.scoreSystem
-	gui.noteChart = self.noteChart
-	gui.noteChartEntry = self.noteChartEntry
-	gui.noteChartDataEntry = self.noteChartDataEntry
+	gui.noteChartModel = noteChartModel
 
 	gui:load("userdata/interface/result.json")
 	gui:receive({
-		action = "updateMetaData",
-		noteChartEntry = self.noteChartEntry,
-		noteChartDataEntry = self.noteChartDataEntry
+		action = "updateMetaData"
 	})
 end
 

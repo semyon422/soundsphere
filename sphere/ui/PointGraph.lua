@@ -22,7 +22,6 @@ PointGraph.loadGui = function(self)
 	self.counterPath = self.data.counterPath
 
 	self.scoreSystem = self.gui.scoreSystem
-	self.noteChart = self.gui.noteChart
 	self.container = self.gui.container
 	
 	self:load()

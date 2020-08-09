@@ -70,22 +70,16 @@ NoteChartStateManager.receive = function(self, event)
 		elseif sender == NoteChartList and event.button == 1 then
 			local item = NoteChartList.items[event.itemIndex]
 			local noteChartEntry = item.noteChartEntry
-			local noteChartDataEntry = item.noteChartDataEntry
 			if noteChartEntry and event.itemIndex == NoteChartList.focusedItemIndex then
-				-- InputManager:setMode("external")
-				-- ReplayManager:setMode("record")
 				self:send({
 					sender = self,
-					action = "playNoteChart",
-					noteChartEntry = noteChartEntry,
-					noteChartDataEntry = noteChartDataEntry
+					action = "playNoteChart"
 				})
 			end
 		elseif sender == ScoreList and (event.button == 1 or event.button == 2) then
 			local item = ScoreList.items[event.itemIndex]
 			local noteChartListItem = NoteChartList.items[NoteChartList.focusedItemIndex]
 			local noteChartEntry = noteChartListItem.noteChartEntry
-			local noteChartDataEntry = noteChartListItem.noteChartDataEntry
 			if noteChartEntry and event.itemIndex == ScoreList.focusedItemIndex then
 				local mode
 				if event.button == 1 then
@@ -100,8 +94,6 @@ NoteChartStateManager.receive = function(self, event)
 				self:send({
 					sender = self,
 					action = "replayNoteChart",
-					noteChartEntry = noteChartEntry,
-					noteChartDataEntry = noteChartDataEntry,
 					mode = mode,
 					scoreEntry = item.scoreEntry
 				})
@@ -109,13 +101,10 @@ NoteChartStateManager.receive = function(self, event)
 		end
 	elseif sender == NoteChartSetList and action == "return" then
 		local noteChartEntry = NoteChartList.items[NoteChartList.focusedItemIndex].noteChartEntry
-		local noteChartDataEntry = NoteChartList.items[NoteChartList.focusedItemIndex].noteChartDataEntry
 		if noteChartEntry then
 			self:send({
 				sender = self,
 				action = "playNoteChart",
-				noteChartEntry = noteChartEntry,
-				noteChartDataEntry = noteChartDataEntry
 			})
 		end
 	elseif action == "scrollTarget" then
@@ -161,8 +150,7 @@ NoteChartStateManager.receive = function(self, event)
 
 			self:send({
 				sender = self,
-				action = "updateMetaData",
-				noteChartDataEntry = item.noteChartDataEntry
+				action = "updateMetaData"
 			})
 		end
 	elseif event.name == "search" then

@@ -32,10 +32,9 @@ GameplayController.load = function(self)
 	view.noteChartModel = noteChartModel
 	view.controller = self
 
-	local noteChart = noteChartModel:getNoteChart()
+	local noteChart = noteChartModel:loadNoteChart()
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
-	view.noteChart = noteChart
 
 	inputModel:load()
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
@@ -74,7 +73,7 @@ GameplayController.load = function(self)
 
 	view:load()
 
-	NoteChartResourceLoader:load(self.noteChartEntry.path, noteChart, function()
+	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChart, function()
 		rhythmModel:setResourceAliases(NoteChartResourceLoader.localAliases, NoteChartResourceLoader.globalAliases)
 		self:receive({
 			name = "play"
@@ -118,9 +117,7 @@ GameplayController.receive = function(self, event)
 		local resultController = ResultController:new()
 
 		resultController.scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
-		resultController.noteChart = self.noteChart
-		resultController.noteChartEntry = self.noteChartModel.noteChartEntry
-		resultController.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
+		resultController.noteChartModel = self.noteChartModel
 		resultController.autoplay = self.rhythmModel.logicEngine.autoplay
 
 		ScreenManager:set(resultController)
