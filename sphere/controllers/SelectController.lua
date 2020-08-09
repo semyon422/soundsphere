@@ -82,7 +82,9 @@ SelectController.receive = function(self, event)
 		self:replayNoteChart(event)
 	elseif event.name == "setScreen" then
 		if event.screenName == "BrowserScreen" then
-			return ScreenManager:set(require("sphere.screen.browser.BrowserScreen"))
+			local BrowserController = require("sphere.controllers.BrowserController")
+			local browserController = BrowserController:new()
+			return ScreenManager:set(browserController)
 		elseif event.screenName == "SettingsScreen" then
 			local SettingsController = require("sphere.controllers.SettingsController")
 			local settingsController = SettingsController:new()

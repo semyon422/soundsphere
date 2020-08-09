@@ -1,9 +1,5 @@
-local CoordinateManager	= require("aqua.graphics.CoordinateManager")
-local Image				= require("aqua.graphics.Image")
-local Line				= require("aqua.graphics.Line")
-local map				= require("aqua.math").map
 local NoteChartManager	= require("sphere.database.NoteChartManager")
-local BrowserList		= require("sphere.screen.browser.BrowserList")
+local BrowserList		= require("sphere.ui.BrowserList")
 local Button			= require("sphere.ui.Button")
 
 local CacheManagerDisplay = Button:new()

@@ -1,7 +1,7 @@
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local CacheManager		= require("sphere.database.CacheManager")
 local CollectionManager	= require("sphere.database.CollectionManager")
-local NoteChartSetList	= require("sphere.screen.select.NoteChartSetList")
+local NoteChartSetList	= require("sphere.ui.NoteChartSetList")
 local CustomList		= require("sphere.ui.CustomList")
 local NotificationModel	= require("sphere.models.NotificationModel")
 

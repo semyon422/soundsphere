@@ -17,7 +17,7 @@ local NoteChartDataDisplay	= require("sphere.ui.NoteChartDataDisplay")
 local ModifierDisplay		= require("sphere.ui.ModifierDisplay")
 local SearchLine			= require("sphere.ui.SearchLine")
 local JudgeDisplay			= require("sphere.ui.JudgeDisplay")
-local ScreenManager			= require("sphere.screen.ScreenManager")
+local CacheManagerDisplay	= require("sphere.ui.CacheManagerDisplay")
 
 local GUI = Class:new()
 
@@ -38,7 +38,8 @@ GUI.classes = {
 	NoteChartDataDisplay = NoteChartDataDisplay,
 	ModifierDisplay = ModifierDisplay,
 	SearchLine = SearchLine,
-	JudgeDisplay = JudgeDisplay
+	JudgeDisplay = JudgeDisplay,
+	CacheManagerDisplay = CacheManagerDisplay
 }
 GUI.classes.__index = GUI.classes
 

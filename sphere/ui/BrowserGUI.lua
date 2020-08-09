@@ -1,5 +1,4 @@
 local ScreenManager			= require("sphere.screen.ScreenManager")
-local CacheManagerDisplay	= require("sphere.screen.browser.CacheManagerDisplay")
 
 local GUI = require("sphere.ui.GUI")
 
