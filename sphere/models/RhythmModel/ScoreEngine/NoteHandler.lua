@@ -13,21 +13,21 @@ NoteHandler.loadNoteData = function(self)
 	self.scoreNotes = {}
 	self.scoreNotesCount = {}
 	local scoreNotesCount = self.scoreNotesCount
-	
+
 	local scoreEngine = self.scoreEngine
 	for layerDataIndex in scoreEngine.noteChart:getLayerDataIndexIterator() do
 		local layerData = scoreEngine.noteChart:requireLayerData(layerDataIndex)
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
-			
+
 			local scoreNote = ScoreNoteFactory:getNote(noteData)
-			
+
 			if scoreNote then
 				scoreNote.noteHandler = self
 				scoreNote.scoreEngine = scoreEngine
 				scoreNote.scoreSystem = scoreEngine.scoreSystem
 				table.insert(self.scoreNotes, scoreNote)
-				
+
 				scoreEngine.sharedScoreNotes[noteData] = scoreNote
 
 				local noteType = scoreNote.noteType
@@ -53,7 +53,7 @@ end
 
 NoteHandler.receive = function(self, event)
 	if not self.currentNote then return end
-	
+
 	return self.currentNote:receive(event)
 end
 

@@ -9,6 +9,9 @@ local TimeEngine = Class:new()
 TimeEngine.construct = function(self)
 	self.observable = Observable:new()
 
+	self.timeManager = TimeManager:new()
+	self.timeManager.timeEngine = self
+
 	self.timeRateHandlers = {}
 end
 
@@ -43,12 +46,12 @@ TimeEngine.getBaseTimeRate = function(self)
 	return timeRate
 end
 
-TimeEngine.update = function(self, dt)	
+TimeEngine.update = function(self, dt)
 	if self.timeRateTween then
 		self.timeRateTween:update(dt)
 		self.timeManager:setRate(self.timeRate)
 	end
-	
+
 	self:updateTimeManager(dt)
 
 	self.currentTime = self.timeManager:getTime()
@@ -74,7 +77,7 @@ TimeEngine.receive = function(self, event)
 	-- if event.name == "keypressed" then
 	-- 	local key = event.args[1]
 	-- 	local delta = 0.05
-		
+
 	-- 	if key == GameConfig:get("gameplay.decreaseTimeRate") then
 	-- 		if self.targetTimeRate - delta >= 0.1 then
 	-- 			self.targetTimeRate = self.targetTimeRate - delta
@@ -132,8 +135,6 @@ TimeEngine.setTimeRate = function(self, timeRate, needTween)
 end
 
 TimeEngine.loadTimeManager = function(self)
-	self.timeManager = TimeManager:new()
-	self.timeManager.timeEngine = self
 	self.timeManager:load()
 end
 

@@ -12,14 +12,14 @@ AudioEngine.construct = function(self)
 
 	self.localAliases = {}
 	self.globalAliases = {}
+
+	self.backgroundContainer = AudioContainer:new()
+	self.foregroundContainer = AudioContainer:new()
 end
 
 AudioEngine.timeRate = 1
 
 AudioEngine.load = function(self)
-	self.backgroundContainer = AudioContainer:new()
-	self.foregroundContainer = AudioContainer:new()
-	
 	self.backgroundContainer:setVolume(GameConfig:get("volume.global") * GameConfig:get("volume.music"))
 	self.foregroundContainer:setVolume(GameConfig:get("volume.global") * GameConfig:get("volume.effects"))
 end

@@ -46,7 +46,7 @@ LogicalNote.getNextPlayable = function(self)
 	if nextNote then
 		self.nextPlayable = nextNote
 	end
-	
+
 	return nextNote
 end
 

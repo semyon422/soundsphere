@@ -92,13 +92,19 @@ SelectController.receive = function(self, event)
 			return
 		end
 
-		local GameplayController = require("sphere.controllers.GameplayController")
-		local gameplayController = GameplayController:new()
+		local gameplayController
+		if event.mode == "result" then
+			local FastplayController = require("sphere.controllers.FastplayController")
+			gameplayController = FastplayController:new()
+		else
+			local GameplayController = require("sphere.controllers.GameplayController")
+			gameplayController = GameplayController:new()
+		end
 
 		local replay = gameplayController.rhythmModel.replayModel:loadReplay(event.scoreEntry.replayHash)
 
 		if replay.modifiers then
-			gameplayController.modifierModel:fromTable(replay.modifiers)
+			gameplayController.rhythmModel.modifierModel:fromTable(replay.modifiers)
 		end
 		if event.mode == "replay" or event.mode == "result" then
 			gameplayController.rhythmModel.replayModel.replay = replay
@@ -111,7 +117,23 @@ SelectController.receive = function(self, event)
 
 		gameplayController.noteChartEntry = event.noteChartEntry
 		gameplayController.noteChartDataEntry = event.noteChartDataEntry
-		return ScreenManager:set(gameplayController)
+
+		if event.mode == "result" then
+			gameplayController:play()
+
+			local ResultController = require("sphere.controllers.ResultController")
+			local resultController = ResultController:new()
+
+			resultController.scoreSystem = gameplayController.rhythmModel.scoreEngine.scoreSystem
+			resultController.noteChart = gameplayController.noteChart
+			resultController.noteChartEntry = gameplayController.noteChartEntry
+			resultController.noteChartDataEntry = gameplayController.noteChartDataEntry
+			resultController.autoplay = gameplayController.rhythmModel.logicEngine.autoplay
+
+			ScreenManager:set(resultController)
+		else
+			return ScreenManager:set(gameplayController)
+		end
 	elseif event.name == "setScreen" then
 		if event.screenName == "BrowserScreen" then
 			return ScreenManager:set(require("sphere.screen.browser.BrowserScreen"))

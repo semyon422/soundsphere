@@ -2,7 +2,6 @@ local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
 local NoteHandler		= require("sphere.models.RhythmModel.ScoreEngine.NoteHandler")
 local ScoreSystem		= require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
-local ScoreNoteFactory	= require("sphere.models.RhythmModel.ScoreEngine.ScoreNoteFactory")
 
 local ScoreEngine = Class:new()
 
@@ -13,14 +12,14 @@ end
 ScoreEngine.load = function(self)
 	self.scoreSystem = ScoreSystem:new()
 	self.scoreSystem:loadConfig("score.json")
-	
+
 	self.sharedScoreNotes = {}
 	self.currentTime = 0
 	self.timeRate = 1
 
 	self.minTime = self.noteChart.metaData:get("minTime")
 	self.maxTime = self.noteChart.metaData:get("maxTime")
-	
+
 	self.noteHandler = NoteHandler:new()
 	self.noteHandler.scoreEngine = self
 	self.noteHandler:load()

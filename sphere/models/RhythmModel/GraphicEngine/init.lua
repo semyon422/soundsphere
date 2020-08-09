@@ -10,6 +10,8 @@ GraphicEngine.construct = function(self)
 
 	self.localAliases = {}
 	self.globalAliases = {}
+
+	self.noteDrawers = {}
 end
 
 GraphicEngine.load = function(self)
@@ -41,7 +43,7 @@ GraphicEngine.receive = function(self, event)
 	if event.name == "TimeState" then
 		self.currentTime = event.currentTime
 		self.timeRate = event.timeRate
-		if event.timeRate ~= 0 then
+		if self.noteSkin and event.timeRate ~= 0 then
 			self.noteSkin.timeRate = event.timeRate
 		end
 		return
@@ -102,7 +104,6 @@ GraphicEngine.getNoteDrawer = function(self, layerIndex, inputType, inputIndex)
 end
 
 GraphicEngine.loadNoteDrawers = function(self)
-	self.noteDrawers = {}
 	for layerIndex in self.noteChart:getLayerDataIndexIterator() do
 		local layerData = self.noteChart:requireLayerData(layerIndex)
 		if not layerData.invisible then
@@ -127,7 +128,7 @@ GraphicEngine.unloadNoteDrawers = function(self)
 	for noteDrawer in pairs(self.noteDrawers) do
 		noteDrawer:unload()
 	end
-	self.noteDrawers = nil
+	self.noteDrawers = {}
 end
 
 GraphicEngine.reloadNoteDrawers = function(self)

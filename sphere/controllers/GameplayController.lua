@@ -6,6 +6,7 @@ local NoteSkinModel				= require("sphere.models.NoteSkinModel")
 local InputModel				= require("sphere.models.InputModel")
 local GameplayView				= require("sphere.views.GameplayView")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
+local ScoreManager				= require("sphere.database.ScoreManager")
 
 local GameplayController = Class:new()
 
@@ -126,11 +127,14 @@ GameplayController.receive = function(self, event)
 end
 
 GameplayController.saveScore = function(self)
-	-- if scoreSystem.scoreTable.score > 0 and ReplayManager.mode ~= "replay" and not event.autoplay then
-	-- 	local modifierSequence = ModifierManager:getSequence()
-	-- 	local replayHash = ReplayManager:saveReplay(event.noteChartDataEntry, modifierSequence)
-	-- 	ScoreManager:insertScore(scoreSystem.scoreTable, event.noteChartDataEntry, replayHash, modifierSequence)
-	-- end
+	local scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
+	local noteChartModel = self.noteChartModel
+	local rhythmModel = self.rhythmModel
+	local modifierModel = rhythmModel.modifierModel
+	if scoreSystem.scoreTable.score > 0 and rhythmModel.replayModel.mode ~= "replay" and not rhythmModel.logicEngine.autoplay then
+		local replayHash = rhythmModel.replayModel:saveReplay(noteChartModel.noteChartDataEntry, modifierModel)
+		ScoreManager:insertScore(scoreSystem.scoreTable, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
+	end
 end
 
 GameplayController.pause = function(self)
