@@ -35,6 +35,10 @@ end
 
 ModifierMenu.hide = function(self)
 	self.hidden = true
+
+	self.observable:send({
+		name = "resetModifiedNoteChart"
+	})
 end
 
 ModifierMenu.update = function(self)

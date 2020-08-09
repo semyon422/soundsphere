@@ -73,6 +73,11 @@ SelectController.receive = function(self, event)
 		end
 	elseif event.action == "playNoteChart" then
 		self:playNoteChart(event)
+	elseif event.name == "loadModifiedNoteChart" then
+		print(123)
+		self:loadModifiedNoteChart()
+	elseif event.name == "resetModifiedNoteChart" then
+		self:resetModifiedNoteChart()
 	elseif event.action == "replayNoteChart" then
 		self:replayNoteChart(event)
 	elseif event.name == "setScreen" then
@@ -81,6 +86,22 @@ SelectController.receive = function(self, event)
 		elseif event.screenName == "SettingsScreen" then
 			return ScreenManager:set(require("sphere.screen.settings.SettingsScreen"))
 		end
+	end
+end
+
+SelectController.resetModifiedNoteChart = function(self)
+	local noteChartModel = self.noteChartModel
+	local modifierModel = self.modifierModel
+
+	local noteChart = noteChartModel:loadNoteChart()
+
+	modifierModel.noteChart = noteChart
+	modifierModel:apply("NoteChartModifier")
+end
+
+SelectController.loadModifiedNoteChart = function(self)
+	if not self.noteChartModel.noteChart then
+		self:resetModifiedNoteChart()
 	end
 end
 

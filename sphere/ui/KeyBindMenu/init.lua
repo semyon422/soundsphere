@@ -71,10 +71,11 @@ end
 KeyBindMenu.show = function(self)
 	self.hidden = false
 
-	self.noteChart = self.noteChartModel:getNoteChart()
+	self.observable:send({
+		name = "loadModifiedNoteChart"
+	})
 
-	self.modifierModel.noteChart = self.noteChart
-	self.modifierModel:apply("NoteChartModifier")
+	self.noteChart = self.noteChartModel.noteChart
 
 	self:reload()
 end

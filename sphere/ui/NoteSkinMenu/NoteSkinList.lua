@@ -63,16 +63,16 @@ NoteSkinList.addItems = function(self)
 
 	local noteSkinModel = self.menu.noteSkinModel
 
-	local list = noteSkinModel:getMetaDataList(self.menu.noteChart)
-	local selectedMetaData = noteSkinModel:getNoteSkinMetaData(self.menu.noteChart)
+	local list = noteSkinModel:getNoteSkins(self.menu.noteChart.inputMode)
+	local selectedNoteSkin = noteSkinModel:getNoteSkin(self.menu.noteChart.inputMode)
 
-	for _, metaData in ipairs(list) do
-		local name = metaData.name
-		if name == selectedMetaData.name then
+	for _, noteSkin in ipairs(list) do
+		local name = noteSkin.name
+		if name == selectedNoteSkin.name then
 			name = "★ " .. name
 		end
 		items[#items + 1] = {
-			metaData = metaData,
+			metaData = noteSkin,
 			name = name
 		}
 	end

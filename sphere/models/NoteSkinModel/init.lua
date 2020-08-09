@@ -43,7 +43,7 @@ NoteSkinModel.loadMetaData = function(self, path, fileName)
 	end
 end
 
-NoteSkinModel.getNoteSkinModels = function(self, inputMode)
+NoteSkinModel.getNoteSkins = function(self, inputMode)
 	if type(inputMode) == "string" then
 		inputMode = ncdk.InputMode:new():setString(inputMode)
 	end
@@ -59,7 +59,7 @@ NoteSkinModel.getNoteSkinModels = function(self, inputMode)
 	return list
 end
 
-NoteSkinModel.setDefault = function(self, inputMode, noteSkin)
+NoteSkinModel.setDefaultNoteSkin = function(self, inputMode, noteSkin)
 	if type(inputMode) == "table" then
 		inputMode = inputMode:getString()
 	end
@@ -72,7 +72,7 @@ NoteSkinModel.getNoteSkin = function(self, inputMode)
 		inputMode = ncdk.InputMode:new():setString(inputMode)
 	end
 
-	local list = self:getNoteSkinModels(inputMode)
+	local list = self:getNoteSkins(inputMode)
 	local configValue = GameConfig:get("noteskin." .. inputMode:getString())
 
 	if configValue then

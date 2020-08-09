@@ -65,4 +65,8 @@ NoteChartModel.loadNoteChart = function(self)
 	return self.noteChart
 end
 
+NoteChartModel.unloadNoteChart = function(self)
+	self.noteChart = nil
+end
+
 return NoteChartModel
