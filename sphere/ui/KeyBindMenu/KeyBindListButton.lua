@@ -1,7 +1,7 @@
 local aquafonts			= require("aqua.assets.fonts")
 local TextFrame			= require("aqua.graphics.TextFrame")
 local spherefonts		= require("sphere.assets.fonts")
-local KeybindEditButton	= require("sphere.screen.settings.KeybindEditButton")
+local KeybindEditButton	= require("sphere.ui.KeybindEditButton")
 local CustomList		= require("sphere.ui.CustomList")
 
 local KeyBindListButton = CustomList.Button:new()

@@ -1,5 +1,5 @@
 local CoordinateManager		= require("aqua.graphics.CoordinateManager")
-local SettingsListButton	= require("sphere.screen.settings.SettingsListButton")
+local SettingsListButton	= require("sphere.ui.SettingsListButton")
 local CustomList			= require("sphere.ui.CustomList")
 
 local SettingsList = CustomList:new()

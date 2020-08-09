@@ -84,7 +84,9 @@ SelectController.receive = function(self, event)
 		if event.screenName == "BrowserScreen" then
 			return ScreenManager:set(require("sphere.screen.browser.BrowserScreen"))
 		elseif event.screenName == "SettingsScreen" then
-			return ScreenManager:set(require("sphere.screen.settings.SettingsScreen"))
+			local SettingsController = require("sphere.controllers.SettingsController")
+			local settingsController = SettingsController:new()
+			return ScreenManager:set(settingsController)
 		end
 	end
 end
