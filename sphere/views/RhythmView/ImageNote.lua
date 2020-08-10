@@ -1,7 +1,6 @@
 local ImageFrame	= require("aqua.graphics.ImageFrame")
--- local Drawable		= require("aqua.graphics.Drawable")
 local image			= require("aqua.image")
-local GraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.GraphicalNote")
+local GraphicalNote = require("sphere.views.RhythmView.GraphicalNote")
 
 local ImageNote = GraphicalNote:new()
 
@@ -10,19 +9,17 @@ ImageNote.construct = function(self)
 end
 
 ImageNote.update = function(self)
-	if not self:tryNext() then
-		local drawable = self.drawable
-		if not drawable then
-			return
-		end
-
-		drawable.x = self:getX()
-		drawable.y = self:getY()
-		drawable.sx = self:getScaleX()
-		drawable.sy = self:getScaleY()
-		drawable:reload()
-		drawable.color = self:getColor()
+	local drawable = self.drawable
+	if not drawable then
+		return
 	end
+
+	drawable.x = self:getX()
+	drawable.y = self:getY()
+	drawable.sx = self:getScaleX()
+	drawable.sy = self:getScaleY()
+	drawable:reload()
+	drawable.color = self:getColor()
 end
 
 ImageNote.activate = function(self)
@@ -33,7 +30,7 @@ ImageNote.activate = function(self)
 		self.container = self:getContainer()
 		self.container:add(drawable)
 	end
-	
+
 	self.activated = true
 end
 
@@ -69,11 +66,11 @@ end
 ImageNote.getDrawable = function(self)
 	local path = self.graphicEngine.localAliases[self.startNoteData.images[1][1]] or self.graphicEngine.globalAliases[self.startNoteData.images[1][1]]
 	self.image = image.getImage(path)
-	
+
 	if not self.image then
 		return
 	end
-	
+
 	return ImageFrame:new({
 		image = self.image,
 		cs = self.noteSkinView:getCS(self),

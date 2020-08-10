@@ -9,6 +9,13 @@ VideoNote.construct = function(self)
 	self.images = self.startNoteData.images
 end
 
+VideoNote.computeVisualTime = function(self)
+end
+
+VideoNote.computeTimeState = function(self)
+	self.timeState = self.timeState or {}
+end
+
 VideoNote.timeRate = 0
 
 VideoNote.update = function(self, dt)

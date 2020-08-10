@@ -184,4 +184,6 @@ NoteChartResourceLoader.unloadOJM = function(self)
 	JamLoader:unload(self.path:match("(.+)n$") .. "m", function() end)
 end
 
+NoteChartResourceLoader:init()
+
 return NoteChartResourceLoader

@@ -18,6 +18,7 @@ NoteDrawer.load = function(self)
 			if graphicalNote then
 				graphicalNote.noteDrawer = self
 				graphicalNote.graphicEngine = self.graphicEngine -- !!!!!!!!!!!!!!!!!!!!!
+				assert(graphicalNote.graphicEngine)
 				graphicalNote.noteSkin = self.graphicEngine.noteSkin
 				graphicalNote:init()
 				if self.graphicEngine.noteSkin:checkNote(graphicalNote) then

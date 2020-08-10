@@ -23,7 +23,7 @@ RhythmView.receive = function(self, event)
 				return
 			end
 			-- graphicalNote.noteSkin = self.rhythmModel.graphicEngine.noteSkin
-			-- graphicalNote.graphicEngine = self.rhythmModel.graphicEngine
+			graphicalNote.graphicEngine = self.rhythmModel.graphicEngine
 			graphicalNote.noteSkinView = self.noteSkinView
 			graphicalNote:init()
 			graphicalNote:activate()

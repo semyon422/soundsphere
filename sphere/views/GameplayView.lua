@@ -28,6 +28,7 @@ GameplayView.load = function(self)
 	noteSkinView.noteSkin = self.noteSkin
 	noteSkinView:load()
 
+	rhythmView.rhythmModel = self.rhythmModel
 	rhythmView.noteSkinView = noteSkinView
 	rhythmView.container = container
 	rhythmView:load()

@@ -1,6 +1,6 @@
 local ImageFrame	= require("aqua.graphics.ImageFrame")
-local GraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.GraphicalNote")
-local ImageNote		= require("sphere.models.RhythmModel.GraphicEngine.ImageNote")
+local GraphicalNote = require("sphere.views.RhythmView.GraphicalNote")
+local ImageNote		= require("sphere.views.RhythmView.ImageNote")
 local video			= require("aqua.video")
 
 local VideoNote = GraphicalNote:new()
@@ -12,23 +12,21 @@ end
 VideoNote.timeRate = 0
 
 VideoNote.update = function(self, dt)
-	if not self:tryNext() then
-		local video = self.video
-		if video then
-			video:update(dt)
-		end
-
-		local drawable = self.drawable
-		if not drawable then
-			return
-		end
-		drawable.x = self:getX()
-		drawable.y = self:getY()
-		drawable.sx = self:getScaleX()
-		drawable.sy = self:getScaleY()
-		drawable:reload()
-		drawable.color = self:getColor()
+	local video = self.video
+	if video then
+		video:update(dt)
 	end
+
+	local drawable = self.drawable
+	if not drawable then
+		return
+	end
+	drawable.x = self:getX()
+	drawable.y = self:getY()
+	drawable.sx = self:getScaleX()
+	drawable.sy = self:getScaleY()
+	drawable:reload()
+	drawable.color = self:getColor()
 end
 
 VideoNote.activate = function(self)
@@ -44,7 +42,7 @@ VideoNote.activate = function(self)
 	if video then
 		video:play()
 	end
-	
+
 	self.activated = true
 end
 
@@ -58,7 +56,7 @@ VideoNote.deactivate = function(self)
 	if video then
 		video:pause()
 	end
-	
+
 	self.activated = false
 end
 
@@ -86,7 +84,7 @@ VideoNote.getDrawable = function(self)
 				y = "center"
 			}
 		})
-		
+
 		local deltaTime = self.startNoteData.timePoint.absoluteTime
 		video.getAdjustTime = function()
 			return self.graphicEngine.currentTime - deltaTime
