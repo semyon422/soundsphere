@@ -30,7 +30,7 @@ TimeEngine.load = function(self)
 	self.targetTimeRate = TimeEngine.targetTimeRate
 	self.backwardCounter = TimeEngine.backwardCounter
 
-	self:loadTimeManager()
+	self.timeManager:load()
 	self.timeRateHandlers = {}
 end
 
@@ -54,19 +54,22 @@ TimeEngine.getBaseTimeRate = function(self)
 	return timeRate
 end
 
-TimeEngine.updateAndSend = function(self)
-	self.currentTime = self.timeManager:getTime()
-	self.exactCurrentTime = self.timeManager:getExactTime()
-	self:sendState()
-end
+TimeEngine.sync = function(self, time, dt)
+	local timeManager = self.timeManager
 
-TimeEngine.updateAndAdjust = function(self, dt)
+	timeManager.eventTime = time
+	timeManager.eventDelta = dt
+
 	if self.timeRateTween then
 		self.timeRateTween:update(dt)
-		self.timeManager:setRate(self.timeRate)
+		timeManager:setRate(self.timeRate)
 	end
 
-	self:updateTimeManager(dt)
+	timeManager:update()
+
+	self.currentTime = timeManager:getTime()
+	self.exactCurrentTime = timeManager:getExactTime()
+	self:sendState()
 end
 
 TimeEngine.sendState = function(self)
@@ -80,10 +83,13 @@ TimeEngine.sendState = function(self)
 end
 
 TimeEngine.unload = function(self)
-	self:unloadTimeManager()
+	self.timeManager:unload()
 end
 
 TimeEngine.receive = function(self, event)
+	if event.name == "framestarted" then
+		self:sync(event.time, event.dt)
+	end
 	-- if event.name == "keypressed" then
 	-- 	local key = event.args[1]
 	-- 	local delta = 0.05
@@ -142,18 +148,6 @@ TimeEngine.setTimeRate = function(self, timeRate, needTween)
 	else
 		self.timeRateTween = tween.new(0.25, self, {timeRate = timeRate}, "inOutQuad")
 	end
-end
-
-TimeEngine.loadTimeManager = function(self)
-	self.timeManager:load()
-end
-
-TimeEngine.updateTimeManager = function(self, dt)
-	self.timeManager:update(dt)
-end
-
-TimeEngine.unloadTimeManager = function(self)
-	self.timeManager:unload()
 end
 
 return TimeEngine

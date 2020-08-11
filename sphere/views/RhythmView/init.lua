@@ -22,7 +22,6 @@ RhythmView.receive = function(self, event)
 			if not graphicalNote then
 				return
 			end
-			-- graphicalNote.noteSkin = self.rhythmModel.graphicEngine.noteSkin
 			graphicalNote.graphicEngine = self.rhythmModel.graphicEngine
 			graphicalNote.noteSkinView = self.noteSkinView
 			graphicalNote.container = self.container

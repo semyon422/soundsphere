@@ -84,7 +84,7 @@ RhythmModel.unload = function(self)
 end
 
 RhythmModel.receive = function(self, event)
-	self.timeEngine:updateAndSend()
+	self.timeEngine:receive(event)
 	self.modifierModel:receive(event)
 	self.inputManager:receive(event)
 end
@@ -96,7 +96,6 @@ RhythmModel.update = function(self, dt)
 	self.scoreEngine:update()
 	self.graphicEngine:update(dt)
 	self.modifierModel:update()
-	self.timeEngine:updateAndAdjust(dt)
 end
 
 RhythmModel.setNoteChart = function(self, noteChart)

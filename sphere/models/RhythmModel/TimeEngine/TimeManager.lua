@@ -4,6 +4,14 @@ local TimeManager = Timer:new()
 
 TimeManager.currentTime = -1
 
+TimeManager.getAbsoluteTime = function(self)
+	return self.eventTime or Timer.getAbsoluteTime(self)
+end
+
+TimeManager.getAbsoluteDelta = function(self)
+	return self.eventDelta or Timer.getAbsoluteDelta(self)
+end
+
 TimeManager.load = function(self)
 	self.rate = Timer.rate
 	self.offset = Timer.offset
@@ -77,8 +85,8 @@ TimeManager.getNearestTime = function(self)
 	end
 end
 
-TimeManager.update = function(self, dt)
-	Timer.update(self, dt)
+TimeManager.update = function(self)
+	Timer.update(self)
 
 	self:updateNextTimeIndex()
 end
