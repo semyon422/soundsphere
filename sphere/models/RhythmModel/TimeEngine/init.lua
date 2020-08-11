@@ -54,17 +54,19 @@ TimeEngine.getBaseTimeRate = function(self)
 	return timeRate
 end
 
-TimeEngine.update = function(self, dt)
+TimeEngine.updateAndSend = function(self)
+	self.currentTime = self.timeManager:getTime()
+	self.exactCurrentTime = self.timeManager:getExactTime()
+	self:sendState()
+end
+
+TimeEngine.updateAndAdjust = function(self, dt)
 	if self.timeRateTween then
 		self.timeRateTween:update(dt)
 		self.timeManager:setRate(self.timeRate)
 	end
 
 	self:updateTimeManager(dt)
-
-	self.currentTime = self.timeManager:getTime()
-	self.exactCurrentTime = self.timeManager:getExactTime()
-	self:sendState()
 end
 
 TimeEngine.sendState = function(self)
