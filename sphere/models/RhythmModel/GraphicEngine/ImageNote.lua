@@ -5,19 +5,13 @@ local ImageNote = GraphicalNote:new()
 ImageNote.construct = function(self)
 	self.startNoteData = self.noteData
 	self.noteData = nil
-
-	self.images = self.startNoteData.images
 end
 
 ImageNote.update = function(self)
 	return self:tryNext()
 end
 
-ImageNote.reload = function(self)
-end
-
-ImageNote.computeVisualTime = function(self)
-end
+ImageNote.computeVisualTime = function(self) end
 
 ImageNote.computeTimeState = function(self)
 	self.timeState = self.timeState or {}

@@ -30,8 +30,6 @@ ImageNote.activate = function(self)
 		self.container = self:getContainer()
 		self.container:add(drawable)
 	end
-
-	self.activated = true
 end
 
 ImageNote.deactivate = function(self)
@@ -39,7 +37,6 @@ ImageNote.deactivate = function(self)
 	if drawable then
 		self.container:remove(drawable)
 	end
-	self.activated = false
 end
 
 ImageNote.reload = function(self)
@@ -52,15 +49,8 @@ ImageNote.reload = function(self)
 	drawable:reload()
 end
 
-ImageNote.computeVisualTime = function(self)
-end
-
-ImageNote.computeTimeState = function(self)
-	self.timeState = self.timeState or {}
-end
-
 ImageNote.getContainer = function(self)
-	return self.graphicEngine.container
+	return self.container
 end
 
 ImageNote.getDrawable = function(self)
@@ -85,24 +75,6 @@ ImageNote.getDrawable = function(self)
 			y = "center"
 		}
 	})
-end
-
-ImageNote.willDrawBeforeStart = function(self)
-	local nextNote = self:getNext(1)
-
-	if not nextNote then
-		return false
-	end
-
-	return not nextNote:willDrawAfterEnd()
-end
-
-ImageNote.willDrawAfterEnd = function(self)
-	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
-
-	if dt < 0 then
-		return true
-	end
 end
 
 ImageNote.getHeadWidth = function(self)

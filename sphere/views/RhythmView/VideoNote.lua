@@ -42,8 +42,6 @@ VideoNote.activate = function(self)
 	if video then
 		video:play()
 	end
-
-	self.activated = true
 end
 
 VideoNote.deactivate = function(self)
@@ -56,8 +54,6 @@ VideoNote.deactivate = function(self)
 	if video then
 		video:pause()
 	end
-
-	self.activated = false
 end
 
 VideoNote.getDrawable = function(self)
@@ -100,11 +96,7 @@ end
 
 
 VideoNote.reload = ImageNote.reload
-VideoNote.computeVisualTime = ImageNote.computeVisualTime
-VideoNote.computeTimeState = ImageNote.computeTimeState
 VideoNote.getContainer = ImageNote.getContainer
-VideoNote.willDrawBeforeStart = ImageNote.willDrawBeforeStart
-VideoNote.willDrawAfterEnd = ImageNote.willDrawAfterEnd
 VideoNote.getHeadWidth = ImageNote.getHeadWidth
 VideoNote.getHeadHeight = ImageNote.getHeadHeight
 VideoNote.getX = ImageNote.getX

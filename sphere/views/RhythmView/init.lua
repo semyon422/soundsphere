@@ -25,6 +25,7 @@ RhythmView.receive = function(self, event)
 			-- graphicalNote.noteSkin = self.rhythmModel.graphicEngine.noteSkin
 			graphicalNote.graphicEngine = self.rhythmModel.graphicEngine
 			graphicalNote.noteSkinView = self.noteSkinView
+			graphicalNote.container = self.container
 			graphicalNote:init()
 			graphicalNote:activate()
 			notes[note] = graphicalNote
@@ -35,6 +36,10 @@ RhythmView.receive = function(self, event)
 			end
 			graphicalNote:deactivate()
 			notes[note] = nil
+		end
+	elseif event.name == "TimeState" then
+		for _, note in pairs(self.notes) do
+			note:receive(event)
 		end
 	end
 end
