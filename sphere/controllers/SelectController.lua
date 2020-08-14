@@ -122,9 +122,6 @@ SelectController.playNoteChart = function(self)
 	if not love.filesystem.exists(noteChartModel.noteChartEntry.path) then
 		return
 	end
-	if noteChartModel.noteChartDataEntry.hash == "" then
-		return
-	end
 
 	local GameplayController = require("sphere.controllers.GameplayController")
 	local gameplayController = GameplayController:new()

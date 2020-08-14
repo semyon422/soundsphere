@@ -45,7 +45,7 @@ CacheManager.select = function(self)
 
 	local noteChartSets = {}
 	self.noteChartSets = noteChartSets
-	
+
 	local stmt = selectAllNoteChartSetsStatement:reset()
 	local row = stmt:step()
 	while row do
@@ -56,7 +56,7 @@ CacheManager.select = function(self)
 
 		row = stmt:step()
 	end
-	
+
 	local noteChartDatas = {}
 	self.noteChartDatas = noteChartDatas
 
@@ -70,7 +70,7 @@ CacheManager.select = function(self)
 
 		row = stmt:step()
 	end
-	
+
 	local noteCharts = {}
 	self.noteCharts = noteCharts
 
@@ -100,7 +100,7 @@ CacheManager.select = function(self)
 
 		row = stmt:step()
 	end
-	
+
 	local noteChartsId = {}
 	local noteChartsPath = {}
 	local noteChartSetsId = {}
@@ -111,7 +111,7 @@ CacheManager.select = function(self)
 	self.noteChartSetsId = noteChartSetsId
 	self.noteChartSetsPath = noteChartSetsPath
 	self.noteChartDatasHashIndex = noteChartDatasHashIndex
-	
+
 	for i = 1, #noteCharts do
 		local entry = noteCharts[i]
 		noteChartsId[entry.id] = entry
@@ -127,7 +127,7 @@ CacheManager.select = function(self)
 		noteChartDatasHashIndex[entry.hash] = noteChartDatasHashIndex[entry.hash] or {}
 		noteChartDatasHashIndex[entry.hash][entry.index] = entry
 	end
-	
+
 	if not loaded then
 		CacheDatabase:unload()
 	end
@@ -237,7 +237,7 @@ end
 
 CacheManager.deleteNoteChartSetEntry = function(self, entry)
 	CacheDatabase:deleteNoteChartSetEntry(entry.path)
-	
+
 	local noteChartsAtSet = self:getNoteChartsAtSet(entry.id) or {}
 	local cachedEntries = {}
 	for i = 1, #noteChartsAtSet do
@@ -359,7 +359,7 @@ end
 CacheManager.checkProgress = function(self)
 	if self.noteChartSetCount >= self.countNext then
 		self.countNext = self.countNext + self.countDelta
-		
+
 		CacheDatabase:commit()
 		CacheDatabase:begin()
 	end
@@ -401,7 +401,7 @@ CacheManager.lookup = function(self, directoryPath, recursive)
 	end
 
 	local items = getDirectoryItems(directoryPath)
-	
+
 	local containerPaths = {}
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
@@ -413,7 +413,7 @@ CacheManager.lookup = function(self, directoryPath, recursive)
 	if #containerPaths > 0 then
 		return
 	end
-	
+
 	local chartPaths = {}
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
@@ -425,7 +425,7 @@ CacheManager.lookup = function(self, directoryPath, recursive)
 		self:processNoteChartEntries(chartPaths, directoryPath)
 		return
 	end
-	
+
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
 		if isDirectory(path) and (recursive or self:checkNoteChartSetEntry(path)) then
@@ -455,7 +455,7 @@ CacheManager.processNoteChartEntries = function(self, noteChartPaths, noteChartS
 		lastModified = getLastModified(noteChartSetPath)
 	})
 	self.noteChartSetCount = self.noteChartSetCount + 1
-	
+
 	local noteChartsAtSet = self:getNoteChartsAtSet(noteChartSetEntry.id) or {}
 	local cachedEntries = {}
 	for i = 1, #noteChartsAtSet do

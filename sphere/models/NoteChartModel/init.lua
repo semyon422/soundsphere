@@ -19,6 +19,7 @@ NoteChartModel.load = function(self)
 		self.noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(self.selected[1])
 		self.noteChartEntry = self.cacheModel.cacheManager:getNoteChartEntryById(self.selected[2])
 		self.noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntry(self.noteChartEntry.hash, 1)
+			or self.cacheModel.cacheManager:getEmptyNoteChartDataEntry(self.noteChartEntry.path)
 	end
 end
 
@@ -33,6 +34,7 @@ NoteChartModel.selectNoteChartSet = function(self, id)
 	self.noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(id)
 	self.noteChartEntry = self.cacheModel.cacheManager:getNoteChartsAtSet(id)[1]
 	self.noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntry(self.noteChartEntry.hash, 1)
+		or self.cacheModel.cacheManager:getEmptyNoteChartDataEntry(self.noteChartEntry.path)
 end
 
 NoteChartModel.selectNoteChart = function(self, id)
@@ -40,6 +42,7 @@ NoteChartModel.selectNoteChart = function(self, id)
 	self.noteChartEntry = self.cacheModel.cacheManager:getNoteChartEntryById(id)
 	self.noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntry(self.noteChartEntry.hash, 1)
 	self.noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(self.noteChartEntry.setId)
+		or self.cacheModel.cacheManager:getEmptyNoteChartDataEntry(self.noteChartEntry.path)
 end
 
 NoteChartModel.loadNoteChart = function(self)
