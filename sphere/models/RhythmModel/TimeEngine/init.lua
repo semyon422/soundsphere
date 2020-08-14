@@ -90,41 +90,27 @@ TimeEngine.receive = function(self, event)
 	if event.name == "framestarted" then
 		self:sync(event.time, event.dt)
 	end
-	-- if event.name == "keypressed" then
-	-- 	local key = event.args[1]
-	-- 	local delta = 0.05
+end
 
-	-- 	if key == GameConfig:get("gameplay.decreaseTimeRate") then
-	-- 		if self.targetTimeRate - delta >= 0.1 then
-	-- 			self.targetTimeRate = self.targetTimeRate - delta
-	-- 			self:setTimeRate(self.targetTimeRate)
-	-- 		end
-	-- 		return self.observable:send({
-	-- 			name = "notify",
-	-- 			text = "timeRate: " .. self.targetTimeRate
-	-- 		})
-	-- 	elseif key == GameConfig:get("gameplay.increaseTimeRate") then
-	-- 		self.targetTimeRate = self.targetTimeRate + delta
-	-- 		self:setTimeRate(self.targetTimeRate)
-	-- 		return self.observable:send({
-	-- 			name = "notify",
-	-- 			text = "timeRate: " .. self.targetTimeRate
-	-- 		})
-	-- 	elseif key == GameConfig:get("gameplay.invertTimeRate") then
-	-- 		self:setTimeRate(-self.timeRate)
-	-- 	elseif key == GameConfig:get("gameplay.skipIntro") then
-	-- 		local skipTime = self.noteChart.metaData:get("minTime") - 2
-	-- 		if self.currentTime < skipTime and self.timeRate ~= 0 then
-	-- 			self:setPosition(skipTime)
-	-- 		end
-	-- 	end
-	-- end
+TimeEngine.skipIntro = function(self)
+	local skipTime = self.noteChart.metaData:get("minTime") - 2
+	if self.currentTime < skipTime and self.timeRate ~= 0 then
+		self:setPosition(skipTime)
+	end
+end
+
+TimeEngine.increaseTimeRate = function(self, delta)
+	if self.targetTimeRate + delta >= 0.1 then
+		self.targetTimeRate = self.targetTimeRate + delta
+		self:setTimeRate(self.targetTimeRate)
+	end
 end
 
 TimeEngine.setPosition = function(self, position)
 	self.audioEngine:setPosition(position)
 	self.timeManager:setPosition(position)
-	self:update(0)
+	self:sync()
+	self.timeManager:adjustTime(true)
 
 	self.audioEngine.forcePosition = true
 	self.logicEngine:update()

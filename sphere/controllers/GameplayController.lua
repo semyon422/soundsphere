@@ -5,8 +5,10 @@ local NoteChartModel			= require("sphere.models.NoteChartModel")
 local NoteSkinModel				= require("sphere.models.NoteSkinModel")
 local InputModel				= require("sphere.models.InputModel")
 local GameplayView				= require("sphere.views.GameplayView")
+local TimeController			= require("sphere.controllers.TimeController")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 local ScoreManager				= require("sphere.database.ScoreManager")
+local GameConfig				= require("sphere.config.GameConfig")
 
 local GameplayController = Class:new()
 
@@ -16,6 +18,7 @@ GameplayController.construct = function(self)
 	self.rhythmModel = RhythmModel:new()
 	self.inputModel = InputModel:new()
 	self.view = GameplayView:new()
+	self.timeController = TimeController:new()
 end
 
 GameplayController.load = function(self)
@@ -24,6 +27,7 @@ GameplayController.load = function(self)
 	local rhythmModel = self.rhythmModel
 	local inputModel = self.inputModel
 	local view = self.view
+	local timeController = self.timeController
 
 	noteChartModel:load()
 	noteSkinModel:load()
@@ -32,6 +36,9 @@ GameplayController.load = function(self)
 	view.rhythmModel = rhythmModel
 	view.noteChartModel = noteChartModel
 	view.controller = self
+
+	timeController.rhythmModel = rhythmModel
+	timeController.config = GameConfig
 
 	local noteChart = noteChartModel:loadNoteChart()
 	rhythmModel:setNoteChart(noteChart)
@@ -100,6 +107,7 @@ GameplayController.draw = function(self)
 end
 
 GameplayController.receive = function(self, event)
+	self.timeController:receive(event)
 	self.rhythmModel:receive(event)
 	self.view:receive(event)
 
