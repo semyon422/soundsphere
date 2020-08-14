@@ -27,6 +27,7 @@ GameplayController.load = function(self)
 
 	noteChartModel:load()
 	noteSkinModel:load()
+	inputModel:load()
 
 	view.rhythmModel = rhythmModel
 	view.noteChartModel = noteChartModel
@@ -36,9 +37,7 @@ GameplayController.load = function(self)
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
 
-	inputModel:load()
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
-	rhythmModel.inputManager:setInputMode(noteChart.inputMode:getString())
 
 	-- rhythmModel:load()
 
@@ -47,6 +46,8 @@ GameplayController.load = function(self)
 	modifierModel:load()
 
 	modifierModel:apply("NoteChartModifier")
+
+	rhythmModel.inputManager:setInputMode(noteChart.inputMode:getString())
 
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
 	noteSkin:load()
