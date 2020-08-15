@@ -66,6 +66,10 @@ ShortLogicalNote.processAuto = function(self)
 end
 
 ShortLogicalNote.receive = function(self, event)
+	if self.logicEngine.autoplay then
+		return
+	end
+
 	if self.autoplay then
 		local nextNote = self:getNextPlayable()
 		if nextNote then
