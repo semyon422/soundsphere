@@ -1,8 +1,9 @@
+local Class = require("aqua.util.Class")
 local Observable = require("aqua.util.Observable")
 
-local NotificationModel = {}
+local NotificationModel = Class:new()
 
-NotificationModel.init = function(self)
+NotificationModel.construct = function(self)
     self.observable = Observable:new()
     self.messages = {}
 end
@@ -15,7 +16,5 @@ NotificationModel.notify = function(self, message)
         message = message
     })
 end
-
-NotificationModel:init()
 
 return NotificationModel

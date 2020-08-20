@@ -5,9 +5,6 @@ local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Rectangle			= require("aqua.graphics.Rectangle")
 local Theme				= require("aqua.ui.Theme")
 local spherefonts		= require("sphere.assets.fonts")
-local GameConfig		= require("sphere.config.GameConfig")
-local DiscordPresence	= require("sphere.discord.DiscordPresence")
-local ScreenManager		= require("sphere.screen.ScreenManager")
 local tween				= require("tween")
 
 local PauseOverlay = Class:new()
@@ -129,7 +126,7 @@ PauseOverlay.receive = function(self, event)
 		self.menuButton:receive(event)
 	end
 
-	local quickRestartKey = GameConfig:get("gameplay.quickRestart")
+	local quickRestartKey = self.configModel:get("gameplay.quickRestart")
 	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
 	if event.name == "keypressed" then
 		local key = event.args[1]

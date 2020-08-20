@@ -1,4 +1,3 @@
-local GameConfig			= require("sphere.config.GameConfig")
 local Class					= require("aqua.util.Class")
 local ScreenManager			= require("sphere.screen.ScreenManager")
 local CollectionModel		= require("sphere.models.CollectionModel")
@@ -38,9 +37,10 @@ end
 BrowserController.receive = function(self, event)
 	self.view:receive(event)
 
-	if event.name == "keypressed" and event.args[1] == GameConfig:get("screen.browser") then
+	if event.name == "keypressed" and event.args[1] == self.configModel:get("screen.browser") then
 		local SelectController = require("sphere.controllers.SelectController")
 		local selectController = SelectController:new()
+		selectController.configModel = self.configModel
 		ScreenManager:set(selectController)
 	end
 end

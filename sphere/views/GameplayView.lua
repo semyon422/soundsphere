@@ -26,6 +26,7 @@ GameplayView.load = function(self)
 	local pauseOverlay = self.pauseOverlay
 
 	noteSkinView.noteSkin = self.noteSkin
+	noteSkinView.configModel = self.configModel
 	noteSkinView:load()
 
 	rhythmView.rhythmModel = self.rhythmModel
@@ -41,6 +42,7 @@ GameplayView.load = function(self)
 
 	pauseOverlay:load()
 	pauseOverlay.rhythmModel = self.rhythmModel
+	pauseOverlay.configModel = self.configModel
 	pauseOverlay.observable:add(self.controller)
 
 	discordGameplayView.rhythmModel = self.rhythmModel

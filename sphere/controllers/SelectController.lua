@@ -30,6 +30,7 @@ SelectController.load = function(self)
 	local modifierController = self.modifierController
 
 	noteChartModel.cacheModel = cacheModel
+	noteSkinModel.configModel = self.configModel
 
 	view.controller = self
 	view.noteChartModel = noteChartModel
@@ -37,6 +38,7 @@ SelectController.load = function(self)
 	view.noteSkinModel = noteSkinModel
 	view.inputModel = inputModel
 	view.cacheModel = cacheModel
+	view.configModel = self.configModel
 
 	modifierController.modifierModel = modifierModel
 
@@ -91,11 +93,13 @@ SelectController.receive = function(self, event)
 		if event.screenName == "BrowserScreen" then
 			local BrowserController = require("sphere.controllers.BrowserController")
 			local browserController = BrowserController:new()
+			browserController.configModel = self.configModel
 			browserController.cacheModel = self.cacheModel
 			return ScreenManager:set(browserController)
 		elseif event.screenName == "SettingsScreen" then
 			local SettingsController = require("sphere.controllers.SettingsController")
 			local settingsController = SettingsController:new()
+			settingsController.configModel = self.configModel
 			return ScreenManager:set(settingsController)
 		end
 	end
@@ -126,6 +130,7 @@ SelectController.playNoteChart = function(self)
 	local GameplayController = require("sphere.controllers.GameplayController")
 	local gameplayController = GameplayController:new()
 	gameplayController.noteChartModel = noteChartModel
+	gameplayController.configModel = self.configModel
 	return ScreenManager:set(gameplayController)
 end
 

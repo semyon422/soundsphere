@@ -1,7 +1,8 @@
-local aquaevent					= require("aqua.event")
+
+local Class						= require("aqua.util.Class")
 local CoordinateManager			= require("aqua.graphics.CoordinateManager")
 local ThreadPool				= require("aqua.thread.ThreadPool")
-local GameConfig				= require("sphere.config.GameConfig")
+local ConfigModel				= require("sphere.models.ConfigModel")
 local ScoreManager				= require("sphere.database.ScoreManager")
 local DiscordPresence			= require("sphere.discord.DiscordPresence")
 local MountManager				= require("sphere.filesystem.MountManager")
@@ -14,48 +15,57 @@ local FpsLimiter				= require("sphere.window.FpsLimiter")
 local UserView					= require("sphere.views.UserView")
 local NotificationModel			= require("sphere.models.NotificationModel")
 
-local SphereGame = {}
+local GameController = Class:new()
 
-SphereGame.run = function(self)
-	self:init()
-	self:load()
-end
-
-SphereGame.init = function(self)
+GameController.construct = function(self)
 	self.globalView = UserView:new()
-	self.globalView:setPath("sphere/views/global.lua")
-	NotificationModel.observable:add(self.globalView)
-
-	aquaevent:add(self)
+	self.configModel = ConfigModel:new()
+	self.notificationModel = NotificationModel:new()
+	self.windowManager = WindowManager:new()
+	self.mountManager = MountManager:new()
 end
 
-SphereGame.load = function(self)
-	WindowManager:load()
-	GameConfig.observable:add(FpsLimiter)
+GameController.load = function(self)
+	local notificationModel = self.notificationModel
+	local configModel = self.configModel
+	local globalView = self.globalView
+	local windowManager = self.windowManager
+	local mountManager = self.mountManager
 
-	MountManager:mount()
+	globalView:setPath("sphere/views/global.lua")
+	notificationModel.observable:add(globalView)
+
+	configModel:setPath("userdata/config.json")
+
+	windowManager:load()
+	configModel.observable:add(FpsLimiter)
+
+	mountManager:mount()
 
 	ScoreManager:select()
-	GameConfig:read()
+	configModel:read()
 
 	DiscordPresence:load()
 
-	self.globalView:load()
+	globalView:load()
 
 	ScreenManager:setTransition(FadeTransition)
 
 	local selectController = SelectController:new()
+	selectController.notificationModel = notificationModel
+	selectController.configModel = configModel
+
 	ScreenManager:set(selectController)
 end
 
-SphereGame.unload = function(self)
+GameController.unload = function(self)
 	self.globalView:unload()
 	ScreenManager:unload()
 	DiscordPresence:unload()
-	GameConfig:write()
+	self.configModel:write()
 end
 
-SphereGame.update = function(self, dt)
+GameController.update = function(self, dt)
 	ThreadPool:update()
 
 	DiscordPresence:update()
@@ -64,13 +74,13 @@ SphereGame.update = function(self, dt)
 	self.globalView:update(dt)
 end
 
-SphereGame.draw = function(self)
+GameController.draw = function(self)
 	BackgroundManager:draw()
 	ScreenManager:draw()
 	self.globalView:draw()
 end
 
-SphereGame.receive = function(self, event)
+GameController.receive = function(self, event)
 	if event.name == "update" then
 		self:update(event.args[1])
 	elseif event.name == "draw" then
@@ -84,8 +94,8 @@ SphereGame.receive = function(self, event)
 
 	ScreenManager:receive(event)
 	BackgroundManager:receive(event)
-	WindowManager:receive(event)
+	self.windowManager:receive(event)
 	self.globalView:receive(event)
 end
 
-return SphereGame
+return GameController

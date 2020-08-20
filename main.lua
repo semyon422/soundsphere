@@ -23,5 +23,12 @@ local MainLog = require("sphere.MainLog")
 MainLog:write("trace", "starting game")
 
 require("aqua")
-require("aqua.event"):init()
-require("sphere.SphereGame"):run()
+
+local aquaevent = require("aqua.event")
+aquaevent:init()
+
+local GameController = require("sphere.controllers.GameController")
+local gameController = GameController:new()
+
+aquaevent:add(gameController)
+gameController:load()

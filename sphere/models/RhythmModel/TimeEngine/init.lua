@@ -1,7 +1,6 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
 local tween				= require("tween")
-local GameConfig		= require("sphere.config.GameConfig")
 local TimeManager		= require("sphere.models.RhythmModel.TimeEngine.TimeManager")
 
 local TimeEngine = Class:new()

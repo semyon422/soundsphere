@@ -11,11 +11,11 @@ MountManager.mount = function(self)
 		self.jsonData = {}
 		return
 	end
-	
+
 	local file = io.open(self.filePath, "r")
 	self.jsonData = json.decode(file:read("*all"))
 	file:close()
-	
+
 	for _, entry in pairs(self.jsonData) do
 		aquafs.mount(entry[1], entry[2], 1)
 	end

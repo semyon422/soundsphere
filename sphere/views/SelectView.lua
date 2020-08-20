@@ -1,6 +1,5 @@
 local Class = require("aqua.util.Class")
 local Container = require("aqua.graphics.Container")
-local GameConfig		= require("sphere.config.GameConfig")
 local AliasManager		= require("sphere.database.AliasManager")
 
 local ModifierMenu		= require("sphere.ui.ModifierMenu")
@@ -29,6 +28,10 @@ SelectView.load = function(self)
     local container = self.container
 	local gui = self.gui
 	local noteChartModel = self.noteChartModel
+	local configModel = self.configModel
+
+	PreviewManager.configModel = configModel
+	configModel.observable:add(PreviewManager)
 
 	gui.container = container
 	gui.modifierModel = self.modifierModel
@@ -38,6 +41,7 @@ SelectView.load = function(self)
 	NoteChartStateManager.observable:add(gui)
 	NoteChartStateManager.observable:add(self.controller)
 	NoteChartStateManager.noteChartModel = noteChartModel
+	NoteChartStateManager.configModel = configModel
 
 	gui:load("userdata/interface/select.json")
 	gui.observable:add(self)
@@ -74,7 +78,7 @@ SelectView.load = function(self)
 
 	NoteChartSetList:sendState()
 
-	local dim = 255 * (1 - GameConfig:get("dim.select"))
+	local dim = 255 * (1 - (configModel:get("dim.select") or 0))
 	BackgroundManager:setColor({dim, dim, dim})
 end
 
@@ -84,6 +88,8 @@ SelectView.unload = function(self)
 	self.gui:unload()
 	PreviewManager:stop()
 	NoteChartStateManager:unload()
+
+	self.configModel.observable:remove(PreviewManager)
 end
 
 SelectView.receive = function(self, event)
@@ -112,16 +118,19 @@ SelectView.receive = function(self, event)
 		return
 	elseif event.backgroundPath then
 		return BackgroundManager:loadDrawableBackground(event.backgroundPath)
-	elseif event.name == "keypressed" and event.args[1] == GameConfig:get("screen.browser") then
-		return self.controller:receive({
-			name = "setScreen",
-			screenName = "BrowserScreen"
-		})
-	elseif event.name == "keypressed" and event.args[1] == GameConfig:get("screen.settings") then
-		return self.controller:receive({
-			name = "setScreen",
-			screenName = "SettingsScreen"
-		})
+	elseif event.name == "keypressed" then
+		local key = event.args[1]
+		if key == (self.configModel:get("screen.browser") or "tab") then
+			return self.controller:receive({
+				name = "setScreen",
+				screenName = "BrowserScreen"
+			})
+		elseif key == (self.configModel:get("screen.settings") or "f1") then
+			return self.controller:receive({
+				name = "setScreen",
+				screenName = "SettingsScreen"
+			})
+		end
 	end
 
 	NoteChartSetList:receive(event)

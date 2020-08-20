@@ -1,7 +1,6 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
 local NoteDrawer		= require("sphere.models.RhythmModel.GraphicEngine.NoteDrawer")
-local GameConfig		= require("sphere.config.GameConfig")
 
 local GraphicEngine = Class:new()
 
@@ -21,8 +20,8 @@ GraphicEngine.load = function(self)
 
 	self:loadNoteDrawers()
 
-	self.noteSkin.visualTimeRate = GameConfig:get("speed")
-	self.noteSkin.targetVisualTimeRate = GameConfig:get("speed")
+	self.noteSkin.visualTimeRate = self.configModel:get("speed")
+	self.noteSkin.targetVisualTimeRate = self.configModel:get("speed")
 end
 
 GraphicEngine.update = function(self, dt)

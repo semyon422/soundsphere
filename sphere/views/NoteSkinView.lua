@@ -3,8 +3,6 @@ local Image				= require("aqua.graphics.Image")
 local SpriteBatch		= require("aqua.graphics.SpriteBatch")
 local map				= require("aqua.math").map
 local Class				= require("aqua.util.Class")
-local GameConfig		= require("sphere.config.GameConfig")
-local tween				= require("tween")
 
 local NoteSkinView = Class:new()
 

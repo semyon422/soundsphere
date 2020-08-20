@@ -1,5 +1,4 @@
 local Class			= require("aqua.util.Class")
-local GameConfig	= require("sphere.config.GameConfig")
 local json			= require("json")
 local ncdk			= require("ncdk")
 local NoteSkin		= require("sphere.models.NoteSkinModel.NoteSkin")
@@ -64,7 +63,7 @@ NoteSkinModel.setDefaultNoteSkin = function(self, inputMode, noteSkin)
 		inputMode = inputMode:getString()
 	end
 
-	return GameConfig:set("noteskin." .. inputMode, noteSkin.directoryPath .. "/" .. noteSkin.path)
+	return self.configModel:set("noteskin." .. inputMode, noteSkin.directoryPath .. "/" .. noteSkin.path)
 end
 
 NoteSkinModel.getNoteSkin = function(self, inputMode)
@@ -73,7 +72,7 @@ NoteSkinModel.getNoteSkin = function(self, inputMode)
 	end
 
 	local list = self:getNoteSkins(inputMode)
-	local configValue = GameConfig:get("noteskin." .. inputMode:getString())
+	local configValue = self.configModel:get("noteskin." .. inputMode:getString())
 
 	if configValue then
 		for _, noteSkin in ipairs(list) do
