@@ -22,7 +22,9 @@ aquapackage.add("md5")
 local MainLog = require("sphere.MainLog")
 MainLog:write("trace", "starting game")
 
-require("aqua")
+local aqua = require("aqua")
+
+aqua.filesystem.setWriteDir(love.filesystem.getSource())
 
 local aquaevent = require("aqua.event")
 aquaevent:init()

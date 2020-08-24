@@ -23,6 +23,7 @@ ConfigModel.read = function(self)
 		self:setTable(json.decode(file:read("*all")))
 		file:close()
 	end
+	self:setDefaultValues()
 end
 
 ConfigModel.write = function(self)
@@ -42,22 +43,20 @@ ConfigModel.setTable = function(self, t)
 end
 
 ConfigModel.set = function(self, key, value)
-	local oldValue = self.data[key]
-	if oldValue ~= value then
-		self.data[key] = value
-		return self.observable:send({
-			name = "ConfigModel.set",
-			key = key,
-			value = value
-		})
-	end
+	self.data[key] = value
+	return self.observable:send({
+		name = "ConfigModel.set",
+		key = key,
+		value = value
+	})
 end
 
 ConfigModel.setDefaultValues = function(self)
 	local data = self.data
 
 	for key, value in pairs(self.defaultValues) do
-		data[key] = data[key] ~= nil and data[key] or value
+		-- print(key)
+		self:set(key, data[key] ~= nil and data[key] or value)
 	end
 end
 
@@ -88,7 +87,10 @@ ConfigModel.defaultValues = {
 
 	["gameplay.invertTimeRate"] = "f7",
 	["gameplay.decreaseTimeRate"] = "f5",
-	["gameplay.increaseTimeRate"] = "f6"
+	["gameplay.increaseTimeRate"] = "f6",
+
+	["screenshot.capture"] = "f12",
+	["screenshot.open"] = "lshift"
 }
 
 return ConfigModel

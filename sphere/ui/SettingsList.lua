@@ -243,7 +243,17 @@ SettingsList.setInputItems = function(self)
 		type = "keybind",
 		configKey = "gameplay.increaseTimeRate"
 	}
-	
+	items[#items + 1] = {
+		name = "capture screenshot",
+		type = "keybind",
+		configKey = "screenshot.capture"
+	}
+	items[#items + 1] = {
+		name = "open screenshot",
+		type = "keybind",
+		configKey = "screenshot.open"
+	}
+
 	return self:setItems(items)
 end
 

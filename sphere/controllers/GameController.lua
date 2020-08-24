@@ -12,6 +12,7 @@ local SelectController			= require("sphere.controllers.SelectController")
 local BackgroundManager			= require("sphere.ui.BackgroundManager")
 local WindowManager				= require("sphere.window.WindowManager")
 local FpsLimiter				= require("sphere.window.FpsLimiter")
+local Screenshot				= require("sphere.window.Screenshot")
 local UserView					= require("sphere.views.UserView")
 local NotificationModel			= require("sphere.models.NotificationModel")
 
@@ -23,6 +24,7 @@ GameController.construct = function(self)
 	self.notificationModel = NotificationModel:new()
 	self.windowManager = WindowManager:new()
 	self.mountManager = MountManager:new()
+	self.screenshot = Screenshot:new()
 end
 
 GameController.load = function(self)
@@ -31,6 +33,7 @@ GameController.load = function(self)
 	local globalView = self.globalView
 	local windowManager = self.windowManager
 	local mountManager = self.mountManager
+	local screenshot = self.screenshot
 
 	globalView:setPath("sphere/views/global.lua")
 	notificationModel.observable:add(globalView)
@@ -39,10 +42,12 @@ GameController.load = function(self)
 
 	windowManager:load()
 	configModel.observable:add(FpsLimiter)
+	configModel.observable:add(screenshot)
 
 	mountManager:mount()
 
 	ScoreManager:select()
+	print("READ")
 	configModel:read()
 
 	DiscordPresence:load()
@@ -96,6 +101,7 @@ GameController.receive = function(self, event)
 	BackgroundManager:receive(event)
 	self.windowManager:receive(event)
 	self.globalView:receive(event)
+	self.screenshot:receive(event)
 end
 
 return GameController
