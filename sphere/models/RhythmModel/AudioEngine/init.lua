@@ -75,6 +75,10 @@ AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
 			audio = AudioFactory:getStream(apath)
 		elseif mode == "streamTempo" then
 			audio = AudioFactory:getStreamTempo(apath)
+		elseif mode == "streamUser" then
+			audio = AudioFactory:getStreamUser(apath)
+		elseif mode == "streamUserTempo" then
+			audio = AudioFactory:getStreamUserTempo(apath)
 		elseif mode == "streamMemoryTempo" then
 			audio = AudioFactory:getStreamMemoryTempo(apath)
 		elseif mode == "streamMemoryReversable" then

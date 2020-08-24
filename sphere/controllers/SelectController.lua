@@ -122,7 +122,8 @@ end
 
 SelectController.playNoteChart = function(self)
 	local noteChartModel = self.noteChartModel
-	if not love.filesystem.exists(noteChartModel.noteChartEntry.path) then
+	local info = love.filesystem.getInfo(noteChartModel.noteChartEntry.path)
+	if not info then
 		return
 	end
 
@@ -136,7 +137,8 @@ end
 
 SelectController.replayNoteChart = function(self, event)
 	local noteChartModel = self.noteChartModel
-	if not love.filesystem.exists(noteChartModel.noteChartEntry.path) then
+	local info = love.filesystem.getInfo(noteChartModel.noteChartEntry.path)
+	if not info then
 		return
 	end
 	if noteChartModel.noteChartDataEntry.hash == "" then

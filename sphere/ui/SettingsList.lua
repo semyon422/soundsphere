@@ -133,15 +133,22 @@ SettingsList.setSoundItems = function(self)
 		name = "primary audio mode",
 		configKey = "audio.primaryAudioMode",
 		type = "listSwitcher",
-		valueList = {"sample", "stream", "streamTempo", "streamMemoryTempo", "streamMemoryReversable"},
-		displayList = {"sample", "stream", "tempo", "memory", "reversable"}
+		valueList = {"sample", "stream", "streamTempo", "streamUser", "streamUserTempo", "streamMemoryTempo", "streamMemoryReversable"},
+		displayList = {"sample", "stream", "tempo", "stream*", "tempo*", "memory", "reversable"}
 	}
 	items[#items + 1] = {
 		name = "secondary audio mode",
 		configKey = "audio.secondaryAudioMode",
 		type = "listSwitcher",
-		valueList = {"sample", "stream", "streamTempo", "streamMemoryTempo", "streamMemoryReversable"},
-		displayList = {"sample", "stream", "tempo", "memory", "reversable"}
+		valueList = {"sample", "stream", "streamTempo", "streamUser", "streamUserTempo", "streamMemoryTempo", "streamMemoryReversable"},
+		displayList = {"sample", "stream", "tempo", "stream*", "tempo*", "memory", "reversable"}
+	}
+	items[#items + 1] = {
+		name = "preview audio mode",
+		configKey = "audio.previewAudioMode",
+		type = "listSwitcher",
+		valueList = {"sample", "stream", "streamTempo", "streamUser", "streamUserTempo", "streamMemoryTempo", "streamMemoryReversable"},
+		displayList = {"sample", "stream", "tempo", "stream*", "tempo*", "memory", "reversable"}
 	}
 	items[#items + 1] = {
 		name = "global volume",

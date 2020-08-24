@@ -64,6 +64,7 @@ end
 ConfigModel.defaultValues = {
 	["audio.primaryAudioMode"] = "streamMemoryReversable",
 	["audio.secondaryAudioMode"] = "sample",
+	["audio.previewAudioMode"] = "streamUser",
 
 	["dim.select"] = 0.5,
 	["dim.gameplay"] = 0.75,
