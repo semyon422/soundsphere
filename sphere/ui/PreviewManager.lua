@@ -34,6 +34,10 @@ PreviewManager.playAudio = function(self, path, position)
 		audio = AudioFactory:getStreamMemoryReversable(path)
 	end
 
+	if not audio then
+		return
+	end
+
 	self.path = path
 	self.position = position
 	self.audio = audio

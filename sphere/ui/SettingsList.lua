@@ -147,8 +147,8 @@ SettingsList.setSoundItems = function(self)
 		name = "preview audio mode",
 		configKey = "audio.previewAudioMode",
 		type = "listSwitcher",
-		valueList = {"sample", "stream", "streamTempo", "streamUser", "streamUserTempo", "streamMemoryTempo", "streamMemoryReversable"},
-		displayList = {"sample", "stream", "tempo", "stream*", "tempo*", "memory", "reversable"}
+		valueList = {"stream", "streamTempo", "streamUser", "streamUserTempo"},
+		displayList = {"stream", "tempo", "stream*", "tempo*"}
 	}
 	items[#items + 1] = {
 		name = "global volume",
