@@ -16,7 +16,8 @@ BackgroundManager.init = function(self)
 end
 
 BackgroundManager.loadDrawableBackground = function(self, path)
-	if not love.filesystem.isFile(path) then
+	local info = love.filesystem.getInfo(path)
+	if not info then
 		return
 	end
 	if path ~= self.currentPath then

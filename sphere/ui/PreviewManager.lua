@@ -3,7 +3,8 @@ local AudioFactory	= require("aqua.audio.AudioFactory")
 local PreviewManager = {}
 
 PreviewManager.playAudio = function(self, path, position)
-	if not love.filesystem.exists(path) then
+	local info = love.filesystem.getInfo(path)
+	if not info then
 		self:stop()
 		return
 	end

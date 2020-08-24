@@ -18,7 +18,8 @@ ConfigModel.setPath = function(self, path)
 end
 
 ConfigModel.read = function(self)
-	if love.filesystem.exists(self.path) then
+	local info = love.filesystem.getInfo(self.path)
+	if info then
 		local file = io.open(self.path, "r")
 		self:setTable(json.decode(file:read("*all")))
 		file:close()

@@ -8,10 +8,6 @@ setmetatable(_G, {
 	end
 })
 
-if love.setDeprecationOutput then
-	love.setDeprecationOutput(false)
-end
-
 local aquapackage = require("aqua.aqua.package")
 aquapackage.add("aqua")
 aquapackage.add("ncdk")

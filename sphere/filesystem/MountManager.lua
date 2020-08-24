@@ -7,7 +7,8 @@ local MountManager = Class:new()
 MountManager.filePath = "userdata/mount.json"
 
 MountManager.mount = function(self)
-	if not love.filesystem.exists(self.filePath) then
+	local info = love.filesystem.getInfo(self.filePath)
+	if not info then
 		self.jsonData = {}
 		return
 	end

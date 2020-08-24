@@ -16,7 +16,8 @@ InputModel.types = {
 
 InputModel.load = function(self)
 	self.inputBindings = {}
-	if love.filesystem.exists(self.path) then
+	local info = love.filesystem.getInfo(self.path)
+	if info then
 		local file = io.open(self.path, "r")
 		self.inputBindings = json.decode(file:read("*all"))
 		file:close()

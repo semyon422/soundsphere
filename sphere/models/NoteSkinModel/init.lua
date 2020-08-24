@@ -15,8 +15,10 @@ end
 NoteSkinModel.lookup = function(self, directoryPath)
 	for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
 		local path = directoryPath .. "/" .. itemName
-		if love.filesystem.isDirectory(path) then
-			if love.filesystem.exists(path .. "/metadata.json") then
+		local info = love.filesystem.getInfo(path)
+		if info.type == "directory" or info.type == "symlink" then
+			local info = love.filesystem.getInfo(path .. "/metadata.json")
+			if info then
 				self:loadMetaData(path, "metadata.json")
 			end
 		end

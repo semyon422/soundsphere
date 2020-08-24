@@ -394,18 +394,18 @@ CacheManager.generateCacheFull = function(self, path, force)
 	CacheDatabase:unload()
 end
 
-local getDirectoryItems, isFile, isDirectory = love.filesystem.getDirectoryItems, love.filesystem.isFile, love.filesystem.isDirectory
 CacheManager.lookup = function(self, directoryPath, recursive)
 	if self.needStop then
 		return
 	end
 
-	local items = getDirectoryItems(directoryPath)
+	local items = love.filesystem.getDirectoryItems(directoryPath)
 
 	local containerPaths = {}
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
-		if isFile(path) and NoteChartFactory:isUnrelatedContainer(path) and self:checkNoteChartSetEntry(path) then
+		local info = love.filesystem.getInfo(path)
+		if info.type == "file" and NoteChartFactory:isUnrelatedContainer(path) and self:checkNoteChartSetEntry(path) then
 			containerPaths[#containerPaths + 1] = path
 			self:processNoteChartEntries({path}, path)
 		end
@@ -417,7 +417,8 @@ CacheManager.lookup = function(self, directoryPath, recursive)
 	local chartPaths = {}
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
-		if isFile(path) and NoteChartFactory:isRelatedContainer(path) then
+		local info = love.filesystem.getInfo(path)
+		if info.type == "file" and NoteChartFactory:isRelatedContainer(path) then
 			chartPaths[#chartPaths + 1] = path
 		end
 	end
@@ -428,21 +429,21 @@ CacheManager.lookup = function(self, directoryPath, recursive)
 
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
-		if isDirectory(path) and (recursive or self:checkNoteChartSetEntry(path)) then
+		local info = love.filesystem.getInfo(path)
+		if (info.type == "directory" or info.type == "symlink") and (recursive or self:checkNoteChartSetEntry(path)) then
 			self:lookup(path, recursive)
 		end
 	end
 end
 
-local getLastModified, exists = love.filesystem.getLastModified, love.filesystem.exists
 CacheManager.checkNoteChartSetEntry = function(self, path)
 	local entry = self:getNoteChartSetEntryByPath(path)
 	if not entry then
 		return true
 	end
 
-	local lastModified = getLastModified(path)
-	if entry.lastModified ~= lastModified then
+	local info = love.filesystem.getInfo(path)
+	if entry.lastModified ~= info.modtime then
 		return true
 	end
 
@@ -450,9 +451,10 @@ CacheManager.checkNoteChartSetEntry = function(self, path)
 end
 
 CacheManager.processNoteChartEntries = function(self, noteChartPaths, noteChartSetPath)
+	local info = love.filesystem.getInfo(noteChartSetPath)
 	local noteChartSetEntry = self:getNoteChartSetEntry({
 		path = noteChartSetPath,
-		lastModified = getLastModified(noteChartSetPath)
+		lastModified = info.modtime
 	})
 	self.noteChartSetCount = self.noteChartSetCount + 1
 
@@ -462,14 +464,16 @@ CacheManager.processNoteChartEntries = function(self, noteChartPaths, noteChartS
 		cachedEntries[i] = noteChartsAtSet[i]
 	end
 	for i = 1, #cachedEntries do
-		if not exists(cachedEntries[i].path) then
+		local info = love.filesystem.getInfo(cachedEntries[i].path)
+		if not info then
 			self:deleteNoteChartEntry(cachedEntries[i])
 		end
 	end
 
 	for i = 1, #noteChartPaths do
 		local path = noteChartPaths[i]
-		local lastModified = getLastModified(path)
+		local info = love.filesystem.getInfo(path)
+		local lastModified = info.modtime
 		local entry = self:getNoteChartEntryByPath(path)
 
 		if entry then
@@ -533,7 +537,8 @@ CacheManager.generate = function(self, path, force)
 end
 
 CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, force)
-	if not exists(noteChartSetEntry.path) then
+	local info = love.filesystem.getInfo(noteChartSetEntry.path)
+	if not info then
 		return self:deleteNoteChartSetEntry(noteChartSetEntry)
 	end
 

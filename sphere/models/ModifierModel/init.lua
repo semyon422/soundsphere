@@ -65,7 +65,8 @@ ModifierModel.inconsequentialClassList = {
 ModifierModel.path = "userdata/modifiers.json"
 
 ModifierModel.load = function(self)
-	if love.filesystem.exists(self.path) then
+	local info = love.filesystem.getInfo(self.path)
+	if info then
 		local file = io.open(self.path, "r")
 		local jsonObject = json.decode(file:read("*all"))
 		file:close()

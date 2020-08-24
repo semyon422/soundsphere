@@ -35,6 +35,8 @@ GameController.load = function(self)
 	local mountManager = self.mountManager
 	local screenshot = self.screenshot
 
+	MountManager:mount()
+
 	globalView:setPath("sphere/views/global.lua")
 	notificationModel.observable:add(globalView)
 

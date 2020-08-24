@@ -73,7 +73,8 @@ end
 ReplayModel.loadReplay = function(self, replayHash)
 	local path = self.path .. "/" .. replayHash
 
-	if not love.filesystem.exists(path) or love.filesystem.isDirectory(path) then
+	local info = love.filesystem.getInfo(path)
+	if not info or info.type == "directory" then
 		return Replay:new()
 	end
 

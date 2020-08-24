@@ -11,7 +11,8 @@ NoteChartModel.construct = function(self)
 end
 
 NoteChartModel.load = function(self)
-	if love.filesystem.exists(self.path) then
+	local info = love.filesystem.getInfo(self.path)
+	if info then
 		local file = io.open(self.path, "r")
 		self.selected = json.decode(file:read("*all"))
 		file:close()
