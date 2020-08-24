@@ -59,8 +59,6 @@ GameplayController.load = function(self)
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
 	rhythmModel:load()
 
-	modifierModel:load()
-
 	modifierModel:apply("NoteChartModifier")
 
 	rhythmModel.inputManager:setInputMode(noteChart.inputMode:getString())
@@ -132,6 +130,7 @@ GameplayController.receive = function(self, event)
 		self:unload()
 		self:load()
 	elseif event.name == "quit" then
+		self:skip()
 		self:saveScore()
 		local ResultController = require("sphere.controllers.ResultController")
 		local resultController = ResultController:new()
@@ -154,6 +153,18 @@ GameplayController.saveScore = function(self)
 		local replayHash = rhythmModel.replayModel:saveReplay(noteChartModel.noteChartDataEntry, modifierModel)
 		ScoreManager:insertScore(scoreSystem.scoreTable, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
 	end
+end
+
+GameplayController.skip = function(self)
+	local rhythmModel = self.rhythmModel
+	local timeEngine = rhythmModel.timeEngine
+	local time = math.huge
+	timeEngine.currentTime = time
+	timeEngine.exactCurrentTime = time
+	timeEngine:sendState()
+	self:update()
+	self.rhythmModel.replayModel:update()
+	self:update()
 end
 
 return GameplayController

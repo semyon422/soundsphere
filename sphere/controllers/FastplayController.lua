@@ -43,8 +43,6 @@ FastplayController.load = function(self)
 
 	rhythmModel:load()
 
-	modifierModel:load()
-
 	modifierModel:apply("NoteChartModifier")
 
 	rhythmModel.timeEngine:load()
