@@ -3,10 +3,12 @@ userdata/charts/*
 userdata/hitsounds/*
 userdata/export/*
 userdata/replays/*
+userdata/screenshots/*
 !userdata/charts/.keep
 !userdata/hitsounds/.keep
 !userdata/export/.keep
 !userdata/replays/.keep
+!userdata/screenshots/.keep
 userdata/cache.sqlite
 userdata/input.json
 userdata/config.json
