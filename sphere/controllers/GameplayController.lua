@@ -70,21 +70,7 @@ GameplayController.load = function(self)
 	rhythmModel:setNoteSkin(noteSkin)
 	view.noteSkin = noteSkin
 
-	rhythmModel.timeEngine:load()
-	modifierModel:apply("TimeEngineModifier")
-
-	rhythmModel.scoreEngine:load()
-	modifierModel:apply("ScoreEngineModifier")
-
-	rhythmModel.audioEngine:load()
-	modifierModel:apply("AudioEngineModifier")
-
-	modifierModel:apply("LogicEngineModifier")
-	modifierModel:apply("GraphicEngineModifier")
-
-	rhythmModel.logicEngine:load()
-	rhythmModel.graphicEngine:load()
-	rhythmModel.replayModel:load()
+	rhythmModel:loadAllEngines()
 
 	view.scoreSystem = rhythmModel.scoreEngine.scoreSystem
 
@@ -101,6 +87,7 @@ GameplayController.load = function(self)
 end
 
 GameplayController.unload = function(self)
+	self.rhythmModel:loadAllEngines()
 	self.rhythmModel:unload()
 	self.view:unload()
 	self.rhythmModel.observable:remove(self.view)

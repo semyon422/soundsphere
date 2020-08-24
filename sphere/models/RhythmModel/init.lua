@@ -104,12 +104,67 @@ RhythmModel.unload = function(self)
 	logicEngine.observable:remove(observable)
 	inputManager.observable:remove(observable)
 	graphicEngine.observable:remove(observable)
+end
 
-	timeEngine:unload()
-	logicEngine:unload()
-	scoreEngine:unload()
-	graphicEngine:unload()
-	audioEngine:unload()
+RhythmModel.loadAllEngines = function(self)
+	local modifierModel = self.modifierModel
+	local replayModel = self.replayModel
+	local timeEngine = self.timeEngine
+	local scoreEngine = self.scoreEngine
+	local audioEngine = self.audioEngine
+	local logicEngine = self.logicEngine
+	local graphicEngine = self.graphicEngine
+
+	timeEngine:load()
+	modifierModel:apply("TimeEngineModifier")
+
+	scoreEngine:load()
+	modifierModel:apply("ScoreEngineModifier")
+
+	audioEngine:load()
+	modifierModel:apply("AudioEngineModifier")
+
+	modifierModel:apply("LogicEngineModifier")
+	modifierModel:apply("GraphicEngineModifier")
+
+	logicEngine:load()
+	graphicEngine:load()
+	replayModel:load()
+end
+
+RhythmModel.loadLogicEngines = function(self)
+	local modifierModel = self.modifierModel
+	local replayModel = self.replayModel
+	local timeEngine = self.timeEngine
+	local scoreEngine = self.scoreEngine
+	local logicEngine = self.logicEngine
+
+	modifierModel:apply("NoteChartModifier")
+
+	timeEngine:load()
+	modifierModel:apply("TimeEngineModifier")
+
+	scoreEngine:load()
+	modifierModel:apply("ScoreEngineModifier")
+
+	modifierModel:apply("LogicEngineModifier")
+
+	logicEngine:load()
+	replayModel:load()
+end
+
+RhythmModel.unloadAllEngines = function(self)
+	self.timeEngine:unload()
+	self.scoreEngine:unload()
+	self.audioEngine:unload()
+	self.logicEngine:unload()
+	self.graphicEngine:unload()
+end
+
+RhythmModel.unloadLogicEngines = function(self)
+	self.timeEngine:unload()
+	self.scoreEngine:unload()
+	self.logicEngine:unload()
 end
 
 RhythmModel.receive = function(self, event)

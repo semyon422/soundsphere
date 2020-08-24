@@ -42,24 +42,13 @@ FastplayController.load = function(self)
 	rhythmModel.noteChart = noteChart
 
 	rhythmModel:load()
-
-	modifierModel:apply("NoteChartModifier")
-
-	rhythmModel.timeEngine:load()
-	modifierModel:apply("TimeEngineModifier")
-
-	rhythmModel.scoreEngine:load()
-	modifierModel:apply("ScoreEngineModifier")
-
-	modifierModel:apply("LogicEngineModifier")
-
-	rhythmModel.logicEngine:load()
-	rhythmModel.replayModel:load()
+	rhythmModel:loadLogicEngines()
 
 	self.rhythmModel.timeEngine:setTimeRate(self.rhythmModel.timeEngine:getBaseTimeRate())
 end
 
 FastplayController.unload = function(self)
+	self.rhythmModel:unloadLogicEngines()
 	self.rhythmModel:unload()
 end
 
@@ -90,6 +79,7 @@ FastplayController.loadTimePoints = function(self)
 		absoluteTimeList[#absoluteTimeList + 1] = time
 	end
 	table.sort(absoluteTimeList)
+	absoluteTimeList[#absoluteTimeList + 1] = math.huge
 
 	self.absoluteTimeList = absoluteTimeList
 	self.nextTimeIndex = 1
