@@ -12,23 +12,27 @@ local ModifierModel		= require("sphere.models.ModifierModel")
 local RhythmModel = Class:new()
 
 RhythmModel.construct = function(self)
-	local modifierModel = ModifierModel:new()
-	local inputManager = InputManager:new()
-	local replayModel = ReplayModel:new()
-	local timeEngine = TimeEngine:new()
-	local scoreEngine = ScoreEngine:new()
-	local audioEngine = AudioEngine:new()
-	local logicEngine = LogicEngine:new()
-	local graphicEngine = GraphicEngine:new()
+	self.modifierModel = ModifierModel:new()
+	self.inputManager = InputManager:new()
+	self.replayModel = ReplayModel:new()
+	self.timeEngine = TimeEngine:new()
+	self.scoreEngine = ScoreEngine:new()
+	self.audioEngine = AudioEngine:new()
+	self.logicEngine = LogicEngine:new()
+	self.graphicEngine = GraphicEngine:new()
+	self.observable = Observable:new()
+end
 
-	self.modifierModel = modifierModel
-	self.inputManager = inputManager
-	self.replayModel = replayModel
-	self.timeEngine = timeEngine
-	self.scoreEngine = scoreEngine
-	self.audioEngine = audioEngine
-	self.logicEngine = logicEngine
-	self.graphicEngine = graphicEngine
+RhythmModel.load = function(self)
+	local modifierModel = self.modifierModel
+	local inputManager = self.inputManager
+	local replayModel = self.replayModel
+	local timeEngine = self.timeEngine
+	local scoreEngine = self.scoreEngine
+	local audioEngine = self.audioEngine
+	local logicEngine = self.logicEngine
+	local graphicEngine = self.graphicEngine
+	local observable = self.observable
 
 	timeEngine.observable:add(audioEngine)
 	timeEngine.observable:add(scoreEngine)
@@ -62,9 +66,6 @@ RhythmModel.construct = function(self)
 	replayModel.timeEngine = timeEngine
 	replayModel.logicEngine = logicEngine
 
-	local observable = Observable:new()
-	self.observable = observable
-
 	timeEngine.observable:add(observable)
 	scoreEngine.observable:add(observable)
 	logicEngine.observable:add(observable)
@@ -72,15 +73,43 @@ RhythmModel.construct = function(self)
 	graphicEngine.observable:add(observable)
 end
 
-RhythmModel.load = function(self)
-end
-
 RhythmModel.unload = function(self)
-	self.timeEngine:unload()
-	self.logicEngine:unload()
-	self.scoreEngine:unload()
-	self.graphicEngine:unload()
-	self.audioEngine:unload()
+	local modifierModel = self.modifierModel
+	local inputManager = self.inputManager
+	local replayModel = self.replayModel
+	local timeEngine = self.timeEngine
+	local scoreEngine = self.scoreEngine
+	local audioEngine = self.audioEngine
+	local logicEngine = self.logicEngine
+	local graphicEngine = self.graphicEngine
+	local observable = self.observable
+
+	timeEngine.observable:remove(audioEngine)
+	timeEngine.observable:remove(scoreEngine)
+	timeEngine.observable:remove(logicEngine)
+	timeEngine.observable:remove(graphicEngine)
+	timeEngine.observable:remove(replayModel)
+	timeEngine.observable:remove(inputManager)
+
+	logicEngine.observable:remove(modifierModel)
+	logicEngine.observable:remove(audioEngine)
+
+	inputManager.observable:remove(logicEngine)
+	inputManager.observable:remove(replayModel)
+
+	replayModel.observable:remove(inputManager)
+
+	timeEngine.observable:remove(observable)
+	scoreEngine.observable:remove(observable)
+	logicEngine.observable:remove(observable)
+	inputManager.observable:remove(observable)
+	graphicEngine.observable:remove(observable)
+
+	timeEngine:unload()
+	logicEngine:unload()
+	scoreEngine:unload()
+	graphicEngine:unload()
+	audioEngine:unload()
 end
 
 RhythmModel.receive = function(self, event)

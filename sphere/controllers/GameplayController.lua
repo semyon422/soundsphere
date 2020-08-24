@@ -28,6 +28,7 @@ GameplayController.load = function(self)
 	local configModel = self.configModel
 	local view = self.view
 	local timeController = self.timeController
+	local modifierModel = self.modifierModel
 
 	noteSkinModel.configModel = configModel
 
@@ -43,6 +44,8 @@ GameplayController.load = function(self)
 	timeController.rhythmModel = rhythmModel
 	timeController.configModel = configModel
 
+	rhythmModel.modifierModel = modifierModel
+
 	local noteChart = noteChartModel:loadNoteChart()
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
@@ -54,10 +57,7 @@ GameplayController.load = function(self)
 	rhythmModel:setAudioMode("secondary", configModel:get("audio.secondaryAudioMode"))
 
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
-
-	-- rhythmModel:load()
-
-	local modifierModel = rhythmModel.modifierModel
+	rhythmModel:load()
 
 	modifierModel:load()
 

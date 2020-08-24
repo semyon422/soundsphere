@@ -31,6 +31,9 @@ end
 FastplayController.load = function(self)
 	local noteChartModel = self.noteChartModel
 	local rhythmModel = self.rhythmModel
+	local modifierModel = self.modifierModel
+
+	rhythmModel.modifierModel = modifierModel
 
 	noteChartModel:load()
 
@@ -38,7 +41,7 @@ FastplayController.load = function(self)
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
 
-	local modifierModel = rhythmModel.modifierModel
+	rhythmModel:load()
 
 	modifierModel:load()
 

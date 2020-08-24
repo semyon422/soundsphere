@@ -130,6 +130,7 @@ SelectController.playNoteChart = function(self)
 	local GameplayController = require("sphere.controllers.GameplayController")
 	local gameplayController = GameplayController:new()
 	gameplayController.noteChartModel = noteChartModel
+	gameplayController.modifierModel = self.modifierModel
 	gameplayController.configModel = self.configModel
 	return ScreenManager:set(gameplayController)
 end
@@ -155,7 +156,7 @@ SelectController.replayNoteChart = function(self, event)
 	local replay = gameplayController.rhythmModel.replayModel:loadReplay(event.scoreEntry.replayHash)
 
 	if replay.modifiers then
-		gameplayController.rhythmModel.modifierModel:fromTable(replay.modifiers)
+		self.modifierModel:fromTable(replay.modifiers)
 	end
 	if event.mode == "replay" or event.mode == "result" then
 		gameplayController.rhythmModel.replayModel.replay = replay
@@ -166,8 +167,9 @@ SelectController.replayNoteChart = function(self, event)
 		gameplayController.rhythmModel.replayModel:setMode("record")
 	end
 
-	gameplayController.configModel = self.configModel
 	gameplayController.noteChartModel = noteChartModel
+	gameplayController.modifierModel = self.modifierModel
+	gameplayController.configModel = self.configModel
 
 	if event.mode == "result" then
 		gameplayController:play()
