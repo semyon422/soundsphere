@@ -166,6 +166,7 @@ SelectController.replayNoteChart = function(self, event)
 		gameplayController.rhythmModel.replayModel:setMode("record")
 	end
 
+	gameplayController.configModel = self.configModel
 	gameplayController.noteChartModel = noteChartModel
 
 	if event.mode == "result" then
@@ -176,6 +177,7 @@ SelectController.replayNoteChart = function(self, event)
 
 		resultController.scoreSystem = gameplayController.rhythmModel.scoreEngine.scoreSystem
 		resultController.noteChartModel = noteChartModel
+		resultController.configModel = self.configModel
 		resultController.autoplay = gameplayController.rhythmModel.logicEngine.autoplay
 
 		ScreenManager:set(resultController)

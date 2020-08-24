@@ -25,10 +25,11 @@ GameplayController.load = function(self)
 	local noteSkinModel = self.noteSkinModel
 	local rhythmModel = self.rhythmModel
 	local inputModel = self.inputModel
+	local configModel = self.configModel
 	local view = self.view
 	local timeController = self.timeController
 
-	NoteSkinModel.configModel = self.configModel
+	noteSkinModel.configModel = configModel
 
 	noteChartModel:load()
 	noteSkinModel:load()
@@ -36,17 +37,21 @@ GameplayController.load = function(self)
 
 	view.rhythmModel = rhythmModel
 	view.noteChartModel = noteChartModel
-	view.configModel = self.configModel
+	view.configModel = configModel
 	view.controller = self
 
 	timeController.rhythmModel = rhythmModel
-	timeController.config = self.configModel
+	timeController.configModel = configModel
 
 	local noteChart = noteChartModel:loadNoteChart()
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
-	rhythmModel.graphicEngine.configModel = self.configModel
-	rhythmModel.audioEngine.configModel = self.configModel
+
+	rhythmModel:setVolume("global", configModel:get("volume.global"))
+	rhythmModel:setVolume("music", configModel:get("volume.music"))
+	rhythmModel:setVolume("effects", configModel:get("volume.effects"))
+	rhythmModel:setAudioMode("primary", configModel:get("audio.primaryAudioMode"))
+	rhythmModel:setAudioMode("secondary", configModel:get("audio.secondaryAudioMode"))
 
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
 
@@ -61,6 +66,8 @@ GameplayController.load = function(self)
 	rhythmModel.inputManager:setInputMode(noteChart.inputMode:getString())
 
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
+	noteSkin.visualTimeRate = configModel:get("speed")
+	noteSkin.targetVisualTimeRate = configModel:get("speed")
 	noteSkin:load()
 	rhythmModel:setNoteSkin(noteSkin)
 	view.noteSkin = noteSkin

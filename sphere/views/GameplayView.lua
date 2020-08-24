@@ -26,7 +26,6 @@ GameplayView.load = function(self)
 	local pauseOverlay = self.pauseOverlay
 
 	noteSkinView.noteSkin = self.noteSkin
-	noteSkinView.configModel = self.configModel
 	noteSkinView:load()
 
 	rhythmView.rhythmModel = self.rhythmModel

@@ -123,4 +123,23 @@ RhythmModel.setResourceAliases = function(self, localAliases, globalAliases)
 	self.graphicEngine.globalAliases = globalAliases
 end
 
+RhythmModel.setVolume = function(self, layer, value)
+	if layer == "global" then
+		self.audioEngine.globalVolume = value
+	elseif layer == "music" then
+		self.audioEngine.musicVolume = value
+	elseif layer == "effects" then
+		self.audioEngine.effectsVolume = value
+	end
+	self.audioEngine:updateVolume()
+end
+
+RhythmModel.setAudioMode = function(self, layer, value)
+	if layer == "primary" then
+		self.audioEngine.primaryAudioMode = value
+	elseif layer == "secondary" then
+		self.audioEngine.secondaryAudioMode = value
+	end
+end
+
 return RhythmModel

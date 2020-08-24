@@ -6,6 +6,13 @@ local SoundNoteFactory	= require("sphere.models.RhythmModel.AudioEngine.SoundNot
 
 local AudioEngine = Class:new()
 
+AudioEngine.timeRate = 1
+AudioEngine.globalVolume = 1
+AudioEngine.musicVolume = 1
+AudioEngine.effectsVolume = 1
+AudioEngine.primaryAudioMode = "sample"
+AudioEngine.secondaryAudioMode = "sample"
+
 AudioEngine.construct = function(self)
 	self.observable = Observable:new()
 
@@ -16,12 +23,12 @@ AudioEngine.construct = function(self)
 	self.foregroundContainer = AudioContainer:new()
 end
 
-AudioEngine.timeRate = 1
-
-AudioEngine.load = function(self)
-	self.backgroundContainer:setVolume(self.configModel:get("volume.global") * self.configModel:get("volume.music"))
-	self.foregroundContainer:setVolume(self.configModel:get("volume.global") * self.configModel:get("volume.effects"))
+AudioEngine.updateVolume = function(self)
+	self.backgroundContainer:setVolume(self.globalVolume * self.musicVolume)
+	self.foregroundContainer:setVolume(self.globalVolume * self.effectsVolume)
 end
+
+AudioEngine.load = function(self) end
 
 AudioEngine.update = function(self)
 	self.backgroundContainer:update()
@@ -56,9 +63,9 @@ AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
 
 		local mode
 		if stream then
-			mode = self.configModel:get("audio.primaryAudioMode")
+			mode = self.primaryAudioMode
 		else
-			mode = self.configModel:get("audio.secondaryAudioMode")
+			mode = self.secondaryAudioMode
 		end
 
 		local apath = aliases[paths[i][1]]

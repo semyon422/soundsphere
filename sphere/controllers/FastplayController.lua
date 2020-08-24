@@ -1,5 +1,4 @@
 local Class						= require("aqua.util.Class")
-local ScreenManager				= require("sphere.screen.ScreenManager")
 local RhythmModel				= require("sphere.models.RhythmModel")
 local NoteChartModel			= require("sphere.models.NoteChartModel")
 
@@ -35,7 +34,7 @@ FastplayController.load = function(self)
 
 	noteChartModel:load()
 
-	local noteChart = noteChartModel:getNoteChart()
+	local noteChart = noteChartModel:loadNoteChart()
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
 

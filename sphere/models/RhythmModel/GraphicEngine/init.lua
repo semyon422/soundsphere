@@ -19,9 +19,6 @@ GraphicEngine.load = function(self)
 	self.timeRate = 1
 
 	self:loadNoteDrawers()
-
-	self.noteSkin.visualTimeRate = self.configModel:get("speed")
-	self.noteSkin.targetVisualTimeRate = self.configModel:get("speed")
 end
 
 GraphicEngine.update = function(self, dt)
