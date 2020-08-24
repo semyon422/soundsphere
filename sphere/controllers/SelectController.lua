@@ -83,7 +83,6 @@ SelectController.receive = function(self, event)
 	elseif event.action == "playNoteChart" then
 		self:playNoteChart(event)
 	elseif event.name == "loadModifiedNoteChart" then
-		print(123)
 		self:loadModifiedNoteChart()
 	elseif event.name == "resetModifiedNoteChart" then
 		self:resetModifiedNoteChart()
@@ -172,6 +171,7 @@ SelectController.replayNoteChart = function(self, event)
 	gameplayController.configModel = self.configModel
 
 	if event.mode == "result" then
+		noteChartModel:unload()
 		gameplayController:play()
 
 		local ResultController = require("sphere.controllers.ResultController")
