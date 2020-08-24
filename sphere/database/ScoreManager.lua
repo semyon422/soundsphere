@@ -10,7 +10,7 @@ ScoreManager.init = function(self)
 end
 
 local sortByScore = function(a, b)
-	return a.score > b.score
+	return a.score < b.score
 end
 
 ScoreManager.select = function(self)
