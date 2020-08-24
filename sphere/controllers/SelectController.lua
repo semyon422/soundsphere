@@ -179,6 +179,7 @@ SelectController.replayNoteChart = function(self, event)
 
 		resultController.scoreSystem = gameplayController.rhythmModel.scoreEngine.scoreSystem
 		resultController.noteChartModel = noteChartModel
+		resultController.modifierModel = self.modifierModel
 		resultController.configModel = self.configModel
 		resultController.autoplay = gameplayController.rhythmModel.logicEngine.autoplay
 

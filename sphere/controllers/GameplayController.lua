@@ -87,7 +87,7 @@ GameplayController.load = function(self)
 end
 
 GameplayController.unload = function(self)
-	self.rhythmModel:loadAllEngines()
+	self.rhythmModel:unloadAllEngines()
 	self.rhythmModel:unload()
 	self.view:unload()
 	self.rhythmModel.observable:remove(self.view)
@@ -124,6 +124,7 @@ GameplayController.receive = function(self, event)
 
 		resultController.scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
 		resultController.noteChartModel = self.noteChartModel
+		resultController.modifierModel = self.modifierModel
 		resultController.autoplay = self.rhythmModel.logicEngine.autoplay
 		resultController.configModel = self.configModel
 

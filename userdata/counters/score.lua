@@ -25,7 +25,7 @@ receive = function(event)
 	end
 
 	-- scoreTable.score = scoreTable.accuracy * 1000 * (getNoteCount(event) - scoreTable.hitcount) / getNoteCount(event)
-	scoreTable.score = scoreTable.accuracy * 1000 * (scoreTable.hitcount + scoreTable.misscount) / scoreTable.hitcount
+	scoreTable.score = scoreTable.accuracy * 1000 * (scoreTable.hitcount + scoreTable.misscount) / scoreTable.hitcount / math.abs(event.timeRate)
 	-- local oldState, newState = event.oldState, event.newState
 	-- if event.noteType == "ShortScoreNote" then
 	-- 	if not event.currentTime then

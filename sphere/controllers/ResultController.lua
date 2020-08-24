@@ -1,12 +1,10 @@
 local Class				= require("aqua.util.Class")
 local ScreenManager		= require("sphere.screen.ScreenManager")
 local ResultView		= require("sphere.views.ResultView")
-local ModifierModel		= require("sphere.models.ModifierModel")
 
 local ResultController = Class:new()
 
 ResultController.construct = function(self)
-	self.modifierModel = ModifierModel:new()
 	self.view = ResultView:new()
 end
 
@@ -19,7 +17,6 @@ ResultController.load = function(self)
 	view.scoreSystem = self.scoreSystem
 	view.noteChartModel = self.noteChartModel
 
-	modifierModel:load()
 	view:load()
 end
 
@@ -44,6 +41,7 @@ ResultController.receive = function(self, event)
 		local SelectController = require("sphere.controllers.SelectController")
 		local selectController = SelectController:new()
 		selectController.configModel = self.configModel
+		selectController.modifierModel = self.modifierModel
 		return ScreenManager:set(selectController)
 	end
 end
