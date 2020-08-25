@@ -62,7 +62,8 @@ BrowserList.selectCache = function(self)
 		path = "userdata/charts"
 	}
 	for _, path in ipairs(self.collectionModel:getPaths()) do
-		if not love.filesystem.isFile(path) then
+		local info = love.filesystem.getInfo(path)
+		if info.type ~= "file" then
 			items[#items + 1] = {
 				name = path:match("^.-/.-/(.+)$"),
 				path = path
