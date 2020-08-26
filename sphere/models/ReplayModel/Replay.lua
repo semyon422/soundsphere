@@ -40,7 +40,9 @@ Replay.toString = function(self)
 	return json.encode({
 		hash = self.noteChartDataEntry.hash,
 		index = self.noteChartDataEntry.index,
-		modifiers = self.modifierSequence:toTable(),
+		modifiers = self.modifierTable,
+		player = "Player",
+		time = os.time(),
 		events = b64Events,
 		size = #jsonData
 	})
@@ -52,6 +54,8 @@ Replay.fromString = function(self, s)
 	self.hash = object.hash
 	self.index = object.hash
 	self.modifiers = object.modifiers
+	self.player = object.player
+	self.time = object.time
 
 	self.events = json.decode(zlib.uncompress(mime.unb64(object.events), nil, object.size))
 

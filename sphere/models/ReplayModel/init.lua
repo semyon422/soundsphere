@@ -55,10 +55,10 @@ ReplayModel.update = function(self)
 	end
 end
 
-ReplayModel.saveReplay = function(self, noteChartDataEntry, modifierSequence)
+ReplayModel.saveReplay = function(self)
 	local replay = self.replay
-	replay.noteChartDataEntry = noteChartDataEntry
-	replay.modifierSequence = modifierSequence
+	replay.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
+	replay.modifierTable = self.modifierModel:toTable()
 
 	local replayString = replay:toString()
 	local replayHash = md5.sumhexa(replayString)
