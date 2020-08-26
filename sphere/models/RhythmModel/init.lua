@@ -170,7 +170,9 @@ end
 RhythmModel.receive = function(self, event)
 	self.timeEngine:receive(event)
 	self.modifierModel:receive(event)
-	self.inputManager:receive(event)
+	if self.timeEngine.timeRate ~= 0 then
+		self.inputManager:receive(event)
+	end
 end
 
 RhythmModel.update = function(self, dt)
