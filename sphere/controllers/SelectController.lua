@@ -154,6 +154,7 @@ SelectController.replayNoteChart = function(self, event)
 		gameplayController = GameplayController:new()
 	end
 
+	local replayModel = gameplayController.rhythmModel.replayModel
 	local replay = gameplayController.rhythmModel.replayModel:loadReplay(event.scoreEntry.replayHash)
 
 	if replay.modifiers then

@@ -1,12 +1,17 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
 local json				= require("json")
-local zlib				= require("zlib")
-local mime				= require("mime")
+local ReplayNanoChart	= require("sphere.models.ReplayModel.ReplayNanoChart")
+local ReplayJson		= require("sphere.models.ReplayModel.ReplayJson")
+local InputMode			= require("ncdk.InputMode")
 
 local Replay = Class:new()
 
+Replay.type = "NanoChart"
+
 Replay.construct = function(self)
+	self.replayNanoChart = ReplayNanoChart:new()
+	self.replayJson = ReplayJson:new()
 	self.observable = Observable:new()
 	self.events = {}
 	self.eventOffset = 0
@@ -34,17 +39,22 @@ Replay.getNextEvent = function(self)
 end
 
 Replay.toString = function(self)
-	local jsonData = json.encode(self.events)
-	local compressedEvents = zlib.compress(jsonData)
-	local b64Events = mime.b64(compressedEvents)
+	local content, size
+	if self.type == "NanoChart" then
+		content, size = self.replayNanoChart:encode(self.events, self.inputMode)
+	elseif self.type == "Json" then
+		content, size = self.replayJson:encode(self.events)
+	end
 	return json.encode({
 		hash = self.noteChartDataEntry.hash,
 		index = self.noteChartDataEntry.index,
+		inputMode = self.inputMode:getString(),
 		modifiers = self.modifierTable,
 		player = "Player",
 		time = os.time(),
-		events = b64Events,
-		size = #jsonData
+		events = content,
+		size = size,
+		type = self.type
 	})
 end
 
@@ -56,8 +66,13 @@ Replay.fromString = function(self, s)
 	self.modifiers = object.modifiers
 	self.player = object.player
 	self.time = object.time
+	self.inputMode = InputMode:new():setString(object.inputMode)
 
-	self.events = json.decode(zlib.uncompress(mime.unb64(object.events), nil, object.size))
+	if object.type == "NanoChart" then
+		self.events = self.replayNanoChart:decode(object.events, object.size, self.inputMode)
+	elseif object.type == "Json" or not object.type then
+		self.events = self.replayJson:decode(object.events, object.size)
+	end
 
 	return self
 end

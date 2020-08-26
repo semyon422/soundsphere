@@ -141,7 +141,8 @@ GameplayController.saveScore = function(self)
 	if scoreSystem.scoreTable.score > 0 and rhythmModel.replayModel.mode ~= "replay" and not rhythmModel.logicEngine.autoplay then
 		replayModel.noteChartModel = noteChartModel
 		replayModel.modifierModel = modifierModel
-		local replayHash = rhythmModel.replayModel:saveReplay()
+		replayModel.replayType = self.configModel:get("replay.type")
+		local replayHash = replayModel:saveReplay()
 		ScoreManager:insertScore(scoreSystem.scoreTable, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
 	end
 end

@@ -93,6 +93,13 @@ SettingsList.setGeneralItems = function(self)
 		step = 0.05,
 		format = "%0.2f"
 	}
+	items[#items + 1] = {
+		name = "replay type",
+		configKey = "replay.type",
+		type = "listSwitcher",
+		valueList = {"NanoChart", "Json"},
+		displayList = {"NanoChart", "Json"}
+	}
 	
 	return self:setItems(items)
 end

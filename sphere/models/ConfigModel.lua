@@ -92,7 +92,9 @@ ConfigModel.defaultValues = {
 	["gameplay.increaseTimeRate"] = "f6",
 
 	["screenshot.capture"] = "f12",
-	["screenshot.open"] = "lshift"
+	["screenshot.open"] = "lshift",
+
+	["replay.type"] = "NanoChart"
 }
 
 return ConfigModel
