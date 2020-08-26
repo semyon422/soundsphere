@@ -5,6 +5,7 @@ local NoteSkinView = require("sphere.views.NoteSkinView")
 local DiscordGameplayView = require("sphere.views.DiscordGameplayView")
 local PauseOverlay = require("sphere.ui.PauseOverlay")
 local GUI = require("sphere.ui.GUI")
+local BackgroundManager	= require("sphere.ui.BackgroundManager")
 
 local GameplayView = Class:new()
 
@@ -24,6 +25,7 @@ GameplayView.load = function(self)
 	local discordGameplayView = self.discordGameplayView
 	local gui = self.gui
 	local pauseOverlay = self.pauseOverlay
+	local configModel = self.configModel
 
 	noteSkinView.noteSkin = self.noteSkin
 	noteSkinView:load()
@@ -41,11 +43,14 @@ GameplayView.load = function(self)
 
 	pauseOverlay:load()
 	pauseOverlay.rhythmModel = self.rhythmModel
-	pauseOverlay.configModel = self.configModel
+	pauseOverlay.configModel = configModel
 	pauseOverlay.observable:add(self.controller)
 
 	discordGameplayView.rhythmModel = self.rhythmModel
 	discordGameplayView.noteChartModel = self.noteChartModel
+
+	local dim = 255 * (1 - (configModel:get("dim.gameplay") or 0))
+	BackgroundManager:setColor({dim, dim, dim})
 end
 
 GameplayView.unload = function(self)
