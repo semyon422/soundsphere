@@ -83,13 +83,17 @@ SelectView.load = function(self)
 end
 
 SelectView.unload = function(self)
+	self.configModel.observable:remove(PreviewManager)
+	NoteChartStateManager.observable:remove(self.gui)
+	NoteChartStateManager.observable:remove(self.controller)
 	self.gui.observable:remove(self)
 	NoteSkinMenu.observable:remove(self.controller)
+	KeyBindMenu.observable:remove(self.controller)
+	ModifierMenu.observable:remove(self.controller)
+
 	self.gui:unload()
 	PreviewManager:stop()
 	NoteChartStateManager:unload()
-
-	self.configModel.observable:remove(PreviewManager)
 end
 
 SelectView.receive = function(self, event)
