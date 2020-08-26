@@ -146,6 +146,10 @@ end
 GameplayController.skip = function(self)
 	local rhythmModel = self.rhythmModel
 	local timeEngine = rhythmModel.timeEngine
+
+	rhythmModel.audioEngine:unload()
+	rhythmModel.logicEngine.observable:remove(rhythmModel.audioEngine)
+
 	local time = math.huge
 	timeEngine.currentTime = time
 	timeEngine.exactCurrentTime = time

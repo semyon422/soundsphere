@@ -39,14 +39,20 @@ NoteHandler.loadNoteData = function(self)
 	self.currentNotes = {}
 end
 
+local sortNotes = function(a, b)
+	return a.logicalNote.startNoteData.timePoint < b.logicalNote.startNoteData.timePoint
+end
+
 NoteHandler.update = function(self)
 	local currentNotes = {}
 
 	for currentNote in pairs(self.currentNotes) do
-		currentNotes[currentNote] = true
+		currentNotes[#currentNotes + 1] = currentNote
 	end
 
-	for currentNote in pairs(currentNotes) do
+	table.sort(currentNotes, sortNotes)
+
+	for _, currentNote in ipairs(currentNotes) do
 		currentNote:update()
 	end
 end
