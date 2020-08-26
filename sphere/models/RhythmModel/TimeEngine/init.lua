@@ -108,8 +108,8 @@ end
 TimeEngine.setPosition = function(self, position)
 	self.audioEngine:setPosition(position)
 	self.timeManager:setPosition(position)
-	self:sync()
 	self.timeManager:adjustTime(true)
+	self:sync()
 
 	self.audioEngine.forcePosition = true
 	self.logicEngine:update()
