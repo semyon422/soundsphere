@@ -90,6 +90,7 @@ ConfigModel.defaultValues = {
 	["gameplay.invertTimeRate"] = "f7",
 	["gameplay.decreaseTimeRate"] = "f5",
 	["gameplay.increaseTimeRate"] = "f6",
+	["gameplay.needTimeRound"] = true,
 
 	["screenshot.capture"] = "f12",
 	["screenshot.open"] = "lshift",

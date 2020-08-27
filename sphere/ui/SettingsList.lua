@@ -100,6 +100,15 @@ SettingsList.setGeneralItems = function(self)
 		valueList = {"NanoChart", "Json"},
 		displayList = {"NanoChart", "Json"}
 	}
+	items[#items + 1] = {
+		name = "round off time?",
+		configKey = "gameplay.needTimeRound",
+		type = "checkbox",
+		minValue = false,
+		maxValue = true,
+		minDisplayValue = "no",
+		maxDisplayValue = "yes"
+	}
 	
 	return self:setItems(items)
 end

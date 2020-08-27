@@ -228,4 +228,8 @@ RhythmModel.setAudioMode = function(self, layer, value)
 	end
 end
 
+RhythmModel.setTimeRound = function(self, needRound)
+	self.inputManager.needRound = needRound
+end
+
 return RhythmModel

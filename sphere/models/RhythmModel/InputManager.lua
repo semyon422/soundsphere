@@ -7,6 +7,7 @@ local InputManager = Class:new()
 InputManager.path = "userdata/input.json"
 
 InputManager.mode = "external"
+InputManager.needRound = true
 
 InputManager.types = {
 	"keyboard",
@@ -73,13 +74,18 @@ InputManager.receive = function(self, event)
 		return
 	end
 
+	local eventTime = self.currentTime
+	if self.needRound then
+		eventTime =  math.floor(self.currentTime * 1024) / 1024
+	end
+
 	local events = {}
 	for _, key in ipairs(keyConfig.press) do
 		events[#events + 1] = {
 			name = "keypressed",
 			args = {key},
 			virtual = true,
-			time = self.currentTime
+			time = eventTime
 		}
 	end
 	for _, key in ipairs(keyConfig.release) do
@@ -87,7 +93,7 @@ InputManager.receive = function(self, event)
 			name = "keyreleased",
 			args = {key},
 			virtual = true,
-			time = self.currentTime
+			time = eventTime
 		}
 	end
 	for _, event in ipairs(events) do
