@@ -29,6 +29,8 @@ SettingsView.load = function(self)
 	CategoriesList:init()
 	SettingsList.observable:add(self)
     CategoriesList.observable:add(self)
+	SettingsList.observable:add(self.controller)
+    CategoriesList.observable:add(self.controller)
 
 	gui:reload()
 
@@ -40,7 +42,10 @@ SettingsView.load = function(self)
 end
 
 SettingsView.unload = function(self)
-	self.configModel:write()
+	SettingsList.observable:remove(self)
+    CategoriesList.observable:remove(self)
+	SettingsList.observable:remove(self.controller)
+    CategoriesList.observable:remove(self.controller)
 end
 
 SettingsView.receive = function(self, event)

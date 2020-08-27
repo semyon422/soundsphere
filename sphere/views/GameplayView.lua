@@ -33,6 +33,8 @@ GameplayView.load = function(self)
 	rhythmView.rhythmModel = self.rhythmModel
 	rhythmView.noteSkinView = noteSkinView
 	rhythmView.container = container
+	rhythmView:setBgaEnabled("video", configModel:get("gameplay.videobga"))
+	rhythmView:setBgaEnabled("image", configModel:get("gameplay.imagebga"))
 	rhythmView:load()
 
 	gui.container = container

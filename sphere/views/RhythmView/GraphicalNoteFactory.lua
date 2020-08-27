@@ -1,10 +1,11 @@
+local Class					= require("aqua.util.Class")
 local FileManager			= require("sphere.filesystem.FileManager")
 local ShortGraphicalNote	= require("sphere.views.RhythmView.ShortGraphicalNote")
 local LongGraphicalNote		= require("sphere.views.RhythmView.LongGraphicalNote")
 local ImageNote				= require("sphere.views.RhythmView.ImageNote")
 local VideoNote				= require("sphere.views.RhythmView.VideoNote")
 
-local GraphicalNoteFactory = {}
+local GraphicalNoteFactory = Class:new()
 
 GraphicalNoteFactory.getNote = function(self, graphicalNoteModel)
 	local graphicalNote = {graphicalNoteModel = graphicalNoteModel}
@@ -35,10 +36,10 @@ GraphicalNoteFactory.getNote = function(self, graphicalNoteModel)
 		if images then
 			fileType = FileManager:getType(images)
 		end
-		if fileType == "image" then
+		if fileType == "image" and self.imageBgaEnabled then
 			graphicalNote.noteType = "ImageNote"
 			return ImageNote:new(graphicalNote)
-		elseif fileType == "video" then
+		elseif fileType == "video" and self.videoBgaEnabled then
 			graphicalNote.noteType = "VideoNote"
 			return VideoNote:new(graphicalNote)
 		end

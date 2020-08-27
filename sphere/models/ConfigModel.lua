@@ -56,8 +56,11 @@ ConfigModel.setDefaultValues = function(self)
 	local data = self.data
 
 	for key, value in pairs(self.defaultValues) do
-		-- print(key)
-		self:set(key, data[key] ~= nil and data[key] or value)
+		if data[key] ~= nil then
+			self:set(key, data[key])
+		else
+			self:set(key, value)
+		end
 	end
 end
 
@@ -91,6 +94,8 @@ ConfigModel.defaultValues = {
 	["gameplay.decreaseTimeRate"] = "f5",
 	["gameplay.increaseTimeRate"] = "f6",
 	["gameplay.needTimeRound"] = true,
+	["gameplay.videobga"] = false,
+	["gameplay.imagebga"] = true,
 
 	["screenshot.capture"] = "f12",
 	["screenshot.open"] = "lshift",

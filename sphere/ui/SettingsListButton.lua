@@ -202,9 +202,17 @@ end
 
 SettingsListButton.updateValue = function(self, value)
 	if self.item.type == "listSwitcher" then
-		self.list.configModel:set(self.item.configKey, self.item.valueList[value])
+		self.list.observable:send({
+			name = "ConfigModel.setValue",
+			key = self.item.configKey,
+			value = self.item.valueList[value]
+		})
 	else
-		self.list.configModel:set(self.item.configKey, value)
+		self.list.observable:send({
+			name = "ConfigModel.setValue",
+			key = self.item.configKey,
+			value = value
+		})
 	end
 
 	self.valueTextFrame.text = self:getDisplayValue(value)

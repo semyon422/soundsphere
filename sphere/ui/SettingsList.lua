@@ -109,6 +109,24 @@ SettingsList.setGeneralItems = function(self)
 		minDisplayValue = "no",
 		maxDisplayValue = "yes"
 	}
+	items[#items + 1] = {
+		name = "video BGA",
+		configKey = "gameplay.videobga",
+		type = "checkbox",
+		minValue = false,
+		maxValue = true,
+		minDisplayValue = "disabled",
+		maxDisplayValue = "enabled"
+	}
+	items[#items + 1] = {
+		name = "image BGA",
+		configKey = "gameplay.imagebga",
+		type = "checkbox",
+		minValue = false,
+		maxValue = true,
+		minDisplayValue = "disabled",
+		maxDisplayValue = "enabled"
+	}
 	
 	return self:setItems(items)
 end
