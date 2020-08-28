@@ -45,6 +45,14 @@ MountModel.getMountPoint = function(self, path)
 	return self.chartsPath .. "/" .. path:gsub("\\", "/"):match("^.+/(.-)$")
 end
 
+MountModel.getRealPath = function(self, path)
+	for _, entry in ipairs(self.mountInfo) do
+		if path:find(entry[2]) == 1 then
+			return path:gsub(entry[2], entry[1])
+		end
+	end
+end
+
 MountModel.isAdded = function(self, path)
 	for _, entry in ipairs(self.mountInfo) do
 		if entry[1] == path then

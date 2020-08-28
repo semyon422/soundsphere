@@ -69,6 +69,7 @@ SelectView.load = function(self)
 	NoteChartSetList.cacheModel = self.cacheModel
 	NoteChartStateManager.cacheModel = self.cacheModel
 	NoteChartMenu.cacheModel = self.cacheModel
+	NoteChartMenu.mountModel = self.mountModel
 
 	ScoreList:load()
 	NoteChartList:load()

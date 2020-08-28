@@ -51,7 +51,6 @@ GameController.load = function(self)
 	configModel.observable:add(screenshot)
 
 	ScoreManager:select()
-	print("READ")
 	configModel:read()
 
 	DiscordPresence:load()
@@ -63,6 +62,7 @@ GameController.load = function(self)
 	local selectController = SelectController:new()
 	selectController.notificationModel = notificationModel
 	selectController.configModel = configModel
+	selectController.mountModel = mountModel
 
 	ScreenManager:set(selectController)
 end

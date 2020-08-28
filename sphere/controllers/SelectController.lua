@@ -28,9 +28,11 @@ SelectController.load = function(self)
 	local cacheModel = self.cacheModel
 	local view = self.view
 	local modifierController = self.modifierController
+	local configModel = self.configModel
+	local mountModel = self.mountModel
 
 	noteChartModel.cacheModel = cacheModel
-	noteSkinModel.configModel = self.configModel
+	noteSkinModel.configModel = configModel
 
 	view.controller = self
 	view.noteChartModel = noteChartModel
@@ -38,7 +40,8 @@ SelectController.load = function(self)
 	view.noteSkinModel = noteSkinModel
 	view.inputModel = inputModel
 	view.cacheModel = cacheModel
-	view.configModel = self.configModel
+	view.configModel = configModel
+	view.mountModel = mountModel
 
 	modifierController.modifierModel = modifierModel
 
@@ -94,11 +97,13 @@ SelectController.receive = function(self, event)
 			local browserController = BrowserController:new()
 			browserController.configModel = self.configModel
 			browserController.cacheModel = self.cacheModel
+			browserController.selectController = self
 			return ScreenManager:set(browserController)
 		elseif event.screenName == "SettingsScreen" then
 			local SettingsController = require("sphere.controllers.SettingsController")
 			local settingsController = SettingsController:new()
 			settingsController.configModel = self.configModel
+			settingsController.selectController = self
 			return ScreenManager:set(settingsController)
 		end
 	end
@@ -132,6 +137,7 @@ SelectController.playNoteChart = function(self)
 	gameplayController.noteChartModel = noteChartModel
 	gameplayController.modifierModel = self.modifierModel
 	gameplayController.configModel = self.configModel
+	gameplayController.selectController = self
 	return ScreenManager:set(gameplayController)
 end
 
@@ -154,7 +160,6 @@ SelectController.replayNoteChart = function(self, event)
 		gameplayController = GameplayController:new()
 	end
 
-	local replayModel = gameplayController.rhythmModel.replayModel
 	local replay = gameplayController.rhythmModel.replayModel:loadReplay(event.scoreEntry.replayHash)
 
 	if replay.modifiers then
@@ -172,6 +177,7 @@ SelectController.replayNoteChart = function(self, event)
 	gameplayController.noteChartModel = noteChartModel
 	gameplayController.modifierModel = self.modifierModel
 	gameplayController.configModel = self.configModel
+	gameplayController.selectController = self
 
 	if event.mode == "result" then
 		noteChartModel:unload()
@@ -185,6 +191,7 @@ SelectController.replayNoteChart = function(self, event)
 		resultController.modifierModel = self.modifierModel
 		resultController.configModel = self.configModel
 		resultController.autoplay = gameplayController.rhythmModel.logicEngine.autoplay
+		resultController.selectController = self
 
 		ScreenManager:set(resultController)
 	else

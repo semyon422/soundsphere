@@ -128,6 +128,7 @@ GameplayController.receive = function(self, event)
 		resultController.modifierModel = self.modifierModel
 		resultController.autoplay = self.rhythmModel.logicEngine.autoplay
 		resultController.configModel = self.configModel
+		resultController.selectController = self.selectController
 
 		ScreenManager:set(resultController)
 	end

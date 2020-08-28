@@ -41,10 +41,7 @@ SettingsController.receive = function(self, event)
 	self.configController:receive(event)
 
 	if event.name == "keypressed" and event.args[1] == self.configModel:get("screen.settings") then
-		local SelectController = require("sphere.controllers.SelectController")
-		local selectController = SelectController:new()
-		selectController.configModel = self.configModel
-		return ScreenManager:set(selectController)
+		return ScreenManager:set(self.selectController)
 	end
 end
 

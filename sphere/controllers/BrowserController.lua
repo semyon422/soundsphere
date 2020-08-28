@@ -38,10 +38,7 @@ BrowserController.receive = function(self, event)
 	self.view:receive(event)
 
 	if event.name == "keypressed" and event.args[1] == self.configModel:get("screen.browser") then
-		local SelectController = require("sphere.controllers.SelectController")
-		local selectController = SelectController:new()
-		selectController.configModel = self.configModel
-		ScreenManager:set(selectController)
+		ScreenManager:set(self.selectController)
 	end
 end
 

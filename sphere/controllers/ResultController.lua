@@ -38,11 +38,7 @@ end
 
 ResultController.receive = function(self, event)
 	if event.name == "keypressed" and event.args[1] == "escape" then
-		local SelectController = require("sphere.controllers.SelectController")
-		local selectController = SelectController:new()
-		selectController.configModel = self.configModel
-		selectController.modifierModel = self.modifierModel
-		return ScreenManager:set(selectController)
+		return ScreenManager:set(self.selectController)
 	end
 end
 
