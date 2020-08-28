@@ -65,7 +65,7 @@ ConfigModel.setDefaultValues = function(self)
 end
 
 ConfigModel.defaultValues = {
-	["audio.primaryAudioMode"] = "streamMemoryReversable",
+	["audio.primaryAudioMode"] = "streamMemoryTempo",
 	["audio.secondaryAudioMode"] = "sample",
 	["audio.previewAudioMode"] = "streamOpenAL",
 
