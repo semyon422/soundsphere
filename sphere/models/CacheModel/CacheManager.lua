@@ -405,7 +405,7 @@ CacheManager.lookup = function(self, directoryPath, recursive)
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
 		local info = love.filesystem.getInfo(path)
-		if info.type == "file" and NoteChartFactory:isUnrelatedContainer(path) and self:checkNoteChartSetEntry(path) then
+		if info and info.type == "file" and NoteChartFactory:isUnrelatedContainer(path) and self:checkNoteChartSetEntry(path) then
 			containerPaths[#containerPaths + 1] = path
 			self:processNoteChartEntries({path}, path)
 		end
@@ -418,7 +418,7 @@ CacheManager.lookup = function(self, directoryPath, recursive)
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
 		local info = love.filesystem.getInfo(path)
-		if info.type == "file" and NoteChartFactory:isRelatedContainer(path) then
+		if info and info.type == "file" and NoteChartFactory:isRelatedContainer(path) then
 			chartPaths[#chartPaths + 1] = path
 		end
 	end
@@ -430,7 +430,7 @@ CacheManager.lookup = function(self, directoryPath, recursive)
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
 		local info = love.filesystem.getInfo(path)
-		if (info.type == "directory" or info.type == "symlink") and (recursive or self:checkNoteChartSetEntry(path)) then
+		if info and (info.type == "directory" or info.type == "symlink") and (recursive or self:checkNoteChartSetEntry(path)) then
 			self:lookup(path, recursive)
 		end
 	end
@@ -443,7 +443,7 @@ CacheManager.checkNoteChartSetEntry = function(self, path)
 	end
 
 	local info = love.filesystem.getInfo(path)
-	if entry.lastModified ~= info.modtime then
+	if info and entry.lastModified ~= info.modtime then
 		return true
 	end
 
