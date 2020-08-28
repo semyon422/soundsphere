@@ -28,7 +28,11 @@ ScoreNote.unload = function(self)
 	self.noteHandler.currentNotes[self] = nil
 end
 
-ScoreNote.update = function(self) end
+ScoreNote.update = function(self)
+	if self.logicalNote.ended then
+		return self:unload()
+	end
+end
 
 ScoreNote.isHere = function(self)
 	return true
