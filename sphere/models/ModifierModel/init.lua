@@ -66,7 +66,7 @@ ModifierModel.path = "userdata/modifiers.json"
 
 ModifierModel.load = function(self)
 	local info = love.filesystem.getInfo(self.path)
-	if info then
+	if info and info.size ~= 0 then
 		local file = io.open(self.path, "r")
 		local jsonObject = json.decode(file:read("*all"))
 		file:close()

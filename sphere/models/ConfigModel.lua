@@ -19,7 +19,7 @@ end
 
 ConfigModel.read = function(self)
 	local info = love.filesystem.getInfo(self.path)
-	if info then
+	if info and info.size ~= 0 then
 		local file = io.open(self.path, "r")
 		self:setTable(json.decode(file:read("*all")))
 		file:close()
