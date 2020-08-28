@@ -5,7 +5,8 @@ local ThreadPool				= require("aqua.thread.ThreadPool")
 local ConfigModel				= require("sphere.models.ConfigModel")
 local ScoreManager				= require("sphere.database.ScoreManager")
 local DiscordPresence			= require("sphere.discord.DiscordPresence")
-local MountManager				= require("sphere.filesystem.MountManager")
+local MountModel				= require("sphere.models.MountModel")
+local MountController				= require("sphere.controllers.MountController")
 local ScreenManager				= require("sphere.screen.ScreenManager")
 local FadeTransition			= require("sphere.screen.FadeTransition")
 local SelectController			= require("sphere.controllers.SelectController")
@@ -23,7 +24,8 @@ GameController.construct = function(self)
 	self.configModel = ConfigModel:new()
 	self.notificationModel = NotificationModel:new()
 	self.windowManager = WindowManager:new()
-	self.mountManager = MountManager:new()
+	self.mountModel = MountModel:new()
+	self.mountController = MountController:new()
 	self.screenshot = Screenshot:new()
 end
 
@@ -32,10 +34,12 @@ GameController.load = function(self)
 	local configModel = self.configModel
 	local globalView = self.globalView
 	local windowManager = self.windowManager
-	local mountManager = self.mountManager
+	local mountModel = self.mountModel
+	local mountController = self.mountController
 	local screenshot = self.screenshot
 
-	MountManager:mount()
+	mountController.mountModel = mountModel
+	mountModel:load()
 
 	globalView:setPath("sphere/views/global.lua")
 	notificationModel.observable:add(globalView)
@@ -45,8 +49,6 @@ GameController.load = function(self)
 	windowManager:load()
 	configModel.observable:add(FpsLimiter)
 	configModel.observable:add(screenshot)
-
-	mountManager:mount()
 
 	ScoreManager:select()
 	print("READ")
@@ -70,6 +72,7 @@ GameController.unload = function(self)
 	ScreenManager:unload()
 	DiscordPresence:unload()
 	self.configModel:write()
+	self.mountModel:unload()
 end
 
 GameController.update = function(self, dt)
@@ -104,6 +107,7 @@ GameController.receive = function(self, event)
 	self.windowManager:receive(event)
 	self.globalView:receive(event)
 	self.screenshot:receive(event)
+	self.mountController:receive(event)
 end
 
 return GameController
