@@ -55,7 +55,6 @@ AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
 	if not paths then return end
 	for i = 1, #paths do
 		local path = paths[i][1]
-		local audio
 		local aliases = self.localAliases
 		if not keysound and not aliases[path] then
 			aliases = self.globalAliases
@@ -69,21 +68,7 @@ AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
 		end
 
 		local apath = aliases[paths[i][1]]
-		if mode == "sample" then
-			audio = AudioFactory:getSample(apath)
-		elseif mode == "stream" then
-			audio = AudioFactory:getStream(apath)
-		elseif mode == "streamTempo" then
-			audio = AudioFactory:getStreamTempo(apath)
-		elseif mode == "streamUser" then
-			audio = AudioFactory:getStreamUser(apath)
-		elseif mode == "streamUserTempo" then
-			audio = AudioFactory:getStreamUserTempo(apath)
-		elseif mode == "streamMemoryTempo" then
-			audio = AudioFactory:getStreamMemoryTempo(apath)
-		elseif mode == "streamMemoryReversable" then
-			audio = AudioFactory:getStreamMemoryReversable(apath)
-		end
+		local audio = AudioFactory:getAudio(apath, mode)
 
 		if audio then
 			audio.offset = offset or self.currentTime
@@ -111,7 +96,7 @@ AudioEngine.setTimeRate = function(self, timeRate)
 		self.foregroundContainer:setRate(timeRate)
 		self.backgroundContainer:play()
 		self.foregroundContainer:play()
-	else
+	elseif timeRate ~= 0 and self.timeRate ~= 0 then
 		self.backgroundContainer:setRate(timeRate)
 		self.foregroundContainer:setRate(timeRate)
 	end

@@ -16,23 +16,8 @@ PreviewManager.playAudio = function(self, path, position)
 		end
 	end
 
-	local audio
 	local mode = self.configModel:get("audio.previewAudioMode")
-	if mode == "sample" then
-		audio = AudioFactory:getSample(path)
-	elseif mode == "stream" then
-		audio = AudioFactory:getStream(path)
-	elseif mode == "streamTempo" then
-		audio = AudioFactory:getStreamTempo(path)
-	elseif mode == "streamUser" then
-		audio = AudioFactory:getStreamUser(path)
-	elseif mode == "streamUserTempo" then
-		audio = AudioFactory:getStreamUserTempo(path)
-	elseif mode == "streamMemoryTempo" then
-		audio = AudioFactory:getStreamMemoryTempo(path)
-	elseif mode == "streamMemoryReversable" then
-		audio = AudioFactory:getStreamMemoryReversable(path)
-	end
+	local audio = AudioFactory:getAudio(path, mode)
 
 	if not audio then
 		return
