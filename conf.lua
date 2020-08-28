@@ -3,9 +3,9 @@ function love.conf(t)
 	t.console = true
 	t.accelerometerjoystick = true
 	t.gammacorrect = false
-	
+
 	t.window.title = "soundsphere"
-	t.window.icon = nil
+	t.window.icon = "resources/icon.png"
 	t.window.width = 1024
 	t.window.height = 576
 	t.window.borderless = false
