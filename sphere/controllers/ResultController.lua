@@ -16,6 +16,7 @@ ResultController.load = function(self)
 
 	view.scoreSystem = self.scoreSystem
 	view.noteChartModel = self.noteChartModel
+	view.configModel = self.configModel
 
 	view:load()
 end

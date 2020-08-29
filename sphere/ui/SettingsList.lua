@@ -156,6 +156,17 @@ SettingsList.setGraphicsItems = function(self)
 		step = 0.01,
 		format = "%d"
 	}
+	items[#items + 1] = {
+		name = "dim result",
+		configKey = "dim.result",
+		type = "slider",
+		minValue = 0,
+		maxValue = 1,
+		minDisplayValue = 0,
+		maxDisplayValue = 100,
+		step = 0.01,
+		format = "%d"
+	}
 	
 	return self:setItems(items)
 end

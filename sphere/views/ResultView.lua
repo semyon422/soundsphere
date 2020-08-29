@@ -1,6 +1,7 @@
 local Class = require("aqua.util.Class")
 local Container = require("aqua.graphics.Container")
 local GUI = require("sphere.ui.GUI")
+local BackgroundManager	= require("sphere.ui.BackgroundManager")
 
 local ResultView = Class:new()
 
@@ -13,6 +14,7 @@ ResultView.load = function(self)
 	local container = self.container
 	local gui = self.gui
 	local noteChartModel = self.noteChartModel
+	local configModel = self.configModel
 
 	gui.container = container
 	gui.modifierModel = self.modifierModel
@@ -24,6 +26,9 @@ ResultView.load = function(self)
 	gui:receive({
 		action = "updateMetaData"
 	})
+
+	local dim = 255 * (1 - (configModel:get("dim.result") or 0))
+	BackgroundManager:setColor({dim, dim, dim})
 end
 
 ResultView.unload = function(self)

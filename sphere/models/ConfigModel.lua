@@ -71,6 +71,7 @@ ConfigModel.defaultValues = {
 
 	["dim.select"] = 0.5,
 	["dim.gameplay"] = 0.75,
+	["dim.result"] = 0.75,
 
 	["speed"] = 1,
 	["fps"] = 240,
