@@ -9,7 +9,7 @@ local NoteChartList = CacheList:new()
 
 NoteChartList.x = 0.2
 NoteChartList.y = 4/17
-NoteChartList.w = 0.4
+NoteChartList.w = 0.385
 NoteChartList.h = 9/17
 
 NoteChartList.sender = NoteChartList
