@@ -5,7 +5,7 @@ local TimeManager		= require("sphere.models.RhythmModel.TimeEngine.TimeManager")
 
 local TimeEngine = Class:new()
 
-TimeEngine.skipDeltaTime = -2
+TimeEngine.timeToPrepare = 2
 
 TimeEngine.construct = function(self)
 	self.observable = Observable:new()
@@ -24,21 +24,21 @@ TimeEngine.targetTimeRate = 0
 TimeEngine.backwardCounter = 0
 
 TimeEngine.load = function(self)
-	self.currentTime = TimeEngine.currentTime
-	self.exactCurrentTime = TimeEngine.exactCurrentTime
+	self.currentTime = -self.timeToPrepare
+	self.exactCurrentTime = -self.timeToPrepare
 	self.baseTimeRate = TimeEngine.baseTimeRate
 	self.timeRate = TimeEngine.timeRate
 	self.targetTimeRate = TimeEngine.targetTimeRate
 	self.backwardCounter = TimeEngine.backwardCounter
 
-	self.timeManager.currentTime = self.skipDeltaTime
-
 	self.timeManager:load()
 	self.timeRateHandlers = {}
+
+	self.timeManager.offset = -self.timeToPrepare
 end
 
-TimeEngine.resetCurrentTime = function(self)
-	self.timeManager.currentTime = self.skipDeltaTime * self:getBaseTimeRate()
+TimeEngine.updateTimeToPrepare = function(self)
+	self.timeManager.offset = -self.timeToPrepare * self:getBaseTimeRate()
 end
 
 TimeEngine.createTimeRateHandler = function(self)
@@ -74,6 +74,7 @@ TimeEngine.sync = function(self, time, dt)
 
 	timeManager:update()
 
+	print(timeManager:getTime(), timeManager.currentTime, timeManager.offset)
 	self.currentTime = timeManager:getTime()
 	self.exactCurrentTime = timeManager:getExactTime()
 	self:sendState()
@@ -99,12 +100,8 @@ TimeEngine.receive = function(self, event)
 	end
 end
 
-TimeEngine.getSkipTime = function(self)
-	return self.noteChart.metaData:get("minTime") + self.skipDeltaTime * math.abs(self.timeRate)
-end
-
 TimeEngine.skipIntro = function(self)
-	local skipTime = self.noteChart.metaData:get("minTime") + self.skipDeltaTime * math.abs(self.timeRate)
+	local skipTime = self.noteChart.metaData:get("minTime") + self.timeToPrepare * math.abs(self.timeRate)
 	if self.currentTime < skipTime and self.timeRate ~= 0 then
 		self:setPosition(skipTime)
 	end

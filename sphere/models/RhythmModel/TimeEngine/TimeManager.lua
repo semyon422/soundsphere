@@ -2,8 +2,6 @@ local Timer = require("aqua.util.Timer")
 
 local TimeManager = Timer:new()
 
-TimeManager.currentTime = -1
-
 TimeManager.getAbsoluteTime = function(self)
 	return self.eventTime or Timer.getAbsoluteTime(self)
 end
@@ -13,15 +11,8 @@ TimeManager.getAbsoluteDelta = function(self)
 end
 
 TimeManager.load = function(self)
-	self.rate = Timer.rate
-	self.offset = Timer.offset
-	self.pauseTime = Timer.pauseTime
-	self.adjustDelta = Timer.adjustDelta
-	self.rateDelta = Timer.rateDelta
-	self.positionDelta = Timer.positionDelta
-	self.state = Timer.state
-
 	self:loadTimePoints()
+	self:reset()
 end
 
 TimeManager.getAdjustTime = function(self)
@@ -96,14 +87,14 @@ end
 TimeManager.getTime = function(self)
 	local nearestTime = self:getNearestTime()
 	if math.abs(self.currentTime - nearestTime) < 0.001 then
-		return nearestTime
+		return nearestTime + self.offset
 	else
-		return self.currentTime
+		return self.currentTime + self.offset
 	end
 end
 
 TimeManager.getExactTime = function(self)
-	return self.currentTime
+	return self.currentTime + self.offset
 end
 
 return TimeManager

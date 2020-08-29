@@ -59,6 +59,7 @@ GameplayController.load = function(self)
 	rhythmModel:setAudioMode("primary", configModel:get("audio.primaryAudioMode"))
 	rhythmModel:setAudioMode("secondary", configModel:get("audio.secondaryAudioMode"))
 	rhythmModel:setTimeRound(configModel:get("gameplay.needTimeRound"))
+	rhythmModel:setTimeToPrepare(configModel:get("gameplay.timeToPrepare"))
 
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
 	rhythmModel:load()

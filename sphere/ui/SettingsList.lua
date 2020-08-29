@@ -127,7 +127,18 @@ SettingsList.setGeneralItems = function(self)
 		minDisplayValue = "disabled",
 		maxDisplayValue = "enabled"
 	}
-	
+	items[#items + 1] = {
+		name = "time to prepare",
+		configKey = "gameplay.timeToPrepare",
+		type = "slider",
+		minValue = 0.5,
+		maxValue = 3,
+		minDisplayValue = 0.5,
+		maxDisplayValue = 3,
+		step = 0.5,
+		format = "%0.1f"
+	}
+
 	return self:setItems(items)
 end
 

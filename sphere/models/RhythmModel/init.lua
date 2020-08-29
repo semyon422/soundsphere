@@ -111,7 +111,7 @@ RhythmModel.loadAllEngines = function(self)
 
 	timeEngine:load()
 	modifierModel:apply("TimeEngineModifier")
-	timeEngine:resetCurrentTime()
+	timeEngine:updateTimeToPrepare()
 
 	scoreEngine:load()
 	modifierModel:apply("ScoreEngineModifier")
@@ -225,6 +225,10 @@ end
 
 RhythmModel.setTimeRound = function(self, needRound)
 	self.inputManager.needRound = needRound
+end
+
+RhythmModel.setTimeToPrepare = function(self, timeToPrepare)
+	self.timeEngine.timeToPrepare = timeToPrepare
 end
 
 return RhythmModel
