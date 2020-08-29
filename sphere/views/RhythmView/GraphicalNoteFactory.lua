@@ -24,8 +24,6 @@ GraphicalNoteFactory.getNote = function(self, graphicalNoteModel)
 		return LongGraphicalNote:new(graphicalNote)
 	elseif noteData.noteType == "LineNoteStart" then
 		graphicalNote.noteType = "LongNote"
-	elseif noteData.noteType == "LineNoteStart" then
-		graphicalNote.noteType = "LongNote"
 		return LongGraphicalNote:new(graphicalNote)
 	elseif noteData.noteType == "SoundNote" then
 		graphicalNote.noteType = "SoundNote"
