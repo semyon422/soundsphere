@@ -5,6 +5,10 @@ local NoteSkin		= require("sphere.models.NoteSkinModel.NoteSkin")
 
 local NoteSkinModel = Class:new()
 
+NoteSkinModel.construct = function(self)
+	self.emptyNoteSkin = NoteSkin:new()
+end
+
 NoteSkinModel.path = "userdata/skins"
 
 NoteSkinModel.load = function(self)
@@ -88,7 +92,7 @@ NoteSkinModel.getNoteSkin = function(self, inputMode)
 		self:setDefaultNoteSkin(inputMode, list[1])
 	end
 
-	return list[1]
+	return list[1] or self.emptyNoteSkin
 end
 
 return NoteSkinModel

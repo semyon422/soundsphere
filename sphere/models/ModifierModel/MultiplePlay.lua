@@ -27,7 +27,7 @@ MultiplePlay.tojson = function(self)
 end
 
 MultiplePlay.apply = function(self)
-	local noteChart = self.model.noteChart
+	local noteChart = self.noteChartModel.noteChart
 	local value = self.value
 
 	local inputCounts = {}

@@ -26,7 +26,7 @@ Random.tojson = function(self)
 end
 
 Random.getMap = function(self)
-	local noteChart = self.model.noteChart
+	local noteChart = self.noteChartModel.noteChart
 	local value = self.value
 
 	local inputs = {}

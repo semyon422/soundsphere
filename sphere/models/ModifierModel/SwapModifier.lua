@@ -11,7 +11,7 @@ SwapModifier.shortName = "SwapModifier"
 SwapModifier.apply = function(self)
 	local map = self:getMap()
 
-	local noteChart = self.model.noteChart
+	local noteChart = self.noteChartModel.noteChart
 	local layerDataSequence = noteChart.layerDataSequence
 	
 	for layerIndex in noteChart:getLayerDataIndexIterator() do

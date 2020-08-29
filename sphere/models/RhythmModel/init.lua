@@ -47,12 +47,6 @@ RhythmModel.load = function(self)
 	logicEngine.observable:add(audioEngine)
 	logicEngine.scoreEngine = scoreEngine
 
-	modifierModel.timeEngine = timeEngine
-	modifierModel.scoreEngine = scoreEngine
-	modifierModel.audioEngine = audioEngine
-	modifierModel.graphicEngine = graphicEngine
-	modifierModel.logicEngine = logicEngine
-
 	scoreEngine.timeEngine = timeEngine
 
 	audioEngine.timeEngine = timeEngine

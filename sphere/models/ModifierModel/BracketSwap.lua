@@ -16,7 +16,7 @@ BracketSwap.hardcodedMaps = {
 }
 
 BracketSwap.getMap = function(self)
-	local noteChart = self.model.noteChart
+	local noteChart = self.noteChartModel.noteChart
 
 	local keyCount = noteChart.inputMode:getInputCount("key")
 

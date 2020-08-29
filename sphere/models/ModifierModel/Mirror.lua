@@ -26,7 +26,7 @@ Mirror.tojson = function(self)
 end
 
 Mirror.getMap = function(self)
-	local noteChart = self.model.noteChart
+	local noteChart = self.noteChartModel.noteChart
 
 	local inputCounts = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do

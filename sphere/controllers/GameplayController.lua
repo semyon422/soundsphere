@@ -44,6 +44,9 @@ GameplayController.load = function(self)
 	timeController.rhythmModel = rhythmModel
 	timeController.configModel = configModel
 
+	modifierModel.rhythmModel = rhythmModel
+	modifierModel.noteChartModel = noteChartModel
+
 	rhythmModel.modifierModel = modifierModel
 
 	local noteChart = noteChartModel:loadNoteChart()

@@ -12,7 +12,7 @@ NoScratch.shortName = "NoScratch"
 NoScratch.variableType = "boolean"
 
 NoScratch.apply = function(self)
-	local noteChart = self.model.noteChart
+	local noteChart = self.noteChartModel.noteChart
 	local layerDataSequence = noteChart.layerDataSequence
 
 	noteChart.inputMode:setInputCount("scratch", nil)

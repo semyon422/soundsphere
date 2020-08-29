@@ -230,7 +230,7 @@ Automap.tojson = function(self)
 end
 
 Automap.apply = function(self)
-	local noteChart = self.model.noteChart
+	local noteChart = self.noteChartModel.noteChart
 	self.noteChart = noteChart
 
 	self.targetMode = self.keys

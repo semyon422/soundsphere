@@ -11,7 +11,7 @@ ProMode.shortName = "ProMode"
 ProMode.variableType = "boolean"
 
 ProMode.apply = function(self)
-	self.model.logicEngine.promode = true
+	self.rhythmModel.logicEngine.promode = true
 end
 
 ProMode.receive = function(self, event)
@@ -19,7 +19,7 @@ ProMode.receive = function(self, event)
 		return
 	end
 
-	local logicEngine = self.model.logicEngine
+	local logicEngine = self.rhythmModel.logicEngine
 
 	local nearestNote
 	for noteHandler in pairs(logicEngine.noteHandlers) do

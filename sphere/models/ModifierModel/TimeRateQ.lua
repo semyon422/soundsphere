@@ -25,7 +25,7 @@ end
 
 -- https://github.com/Quaver/Quaver/issues/666
 TimeRateQ.apply = function(self)
-	self.model.timeEngine:createTimeRateHandler().timeRate = 2 ^ (0.1 * self.value)
+	self.rhythmModel.timeEngine:createTimeRateHandler().timeRate = 2 ^ (0.1 * self.value)
 end
 
 return TimeRateQ

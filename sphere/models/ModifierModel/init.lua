@@ -86,11 +86,10 @@ ModifierModel.addInconsequential = function(self)
 
 	for _, Modifier in ipairs(self.inconsequentialClassList) do
 		local modifier = Modifier:new()
-		modifier.model = self
+		modifier.modifierModel = self
 		modifier.enabled = false
 		modifier.Class = Modifier
 		list[#list + 1] = modifier
-		-- self[Modifier] = modifier
 		if Modifier == TimeRateX or Modifier == TimeRateQ or Modifier == SpeedMode then
 			modifier.enabled = true
 		end
@@ -107,7 +106,7 @@ end
 
 ModifierModel.add = function(self, Modifier)
 	local modifier = Modifier:new()
-	modifier.model = self
+	modifier.modifierModel = self
 	modifier.Class = Modifier
 	self.sequential[#self.sequential + 1] = modifier
 	return modifier
@@ -146,6 +145,8 @@ end
 ModifierModel.apply = function(self, modifierType)
 	for _, modifier in ipairs(self:getEnabledModifiers()) do
 		if modifier.type == modifierType then
+			modifier.noteChartModel = self.noteChartModel
+			modifier.rhythmModel = self.rhythmModel
 			modifier:apply()
 		end
 	end

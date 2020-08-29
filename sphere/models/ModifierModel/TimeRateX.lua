@@ -24,7 +24,7 @@ TimeRateX.tojson = function(self)
 end
 
 TimeRateX.apply = function(self)
-	self.model.timeEngine:createTimeRateHandler().timeRate = self.value
+	self.rhythmModel.timeEngine:createTimeRateHandler().timeRate = self.value
 end
 
 return TimeRateX

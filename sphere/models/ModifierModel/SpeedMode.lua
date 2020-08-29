@@ -26,7 +26,7 @@ SpeedMode.tojson = function(self)
 end
 
 SpeedMode.applySpeed = function(self, speed)
-	local noteChart = self.model.noteChart
+	local noteChart = self.noteChartModel.noteChart
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
@@ -43,7 +43,7 @@ SpeedMode.applySpeed = function(self, speed)
 end
 
 SpeedMode.applyConstant = function(self)
-	local noteChart = self.model.noteChart
+	local noteChart = self.noteChartModel.noteChart
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
@@ -62,7 +62,7 @@ SpeedMode.applyConstant = function(self)
 end
 
 SpeedMode.apply = function(self)
-	local noteChart = self.model.noteChart
+	local noteChart = self.noteChartModel.noteChart
 	
 	local minTime = noteChart.metaData:get("minTime")
 	local maxTime = noteChart.metaData:get("maxTime")

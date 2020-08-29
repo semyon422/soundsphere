@@ -11,7 +11,7 @@ AutoPlay.shortName = "AP"
 AutoPlay.variableType = "boolean"
 
 AutoPlay.apply = function(self)
-	self.model.logicEngine.autoplay = true
+	self.rhythmModel.logicEngine.autoplay = true
 end
 
 AutoPlay.receive = function(self, event)

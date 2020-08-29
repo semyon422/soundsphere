@@ -33,6 +33,7 @@ SelectController.load = function(self)
 
 	noteChartModel.cacheModel = cacheModel
 	noteSkinModel.configModel = configModel
+	modifierModel.noteChartModel = noteChartModel
 
 	view.controller = self
 	view.noteChartModel = noteChartModel

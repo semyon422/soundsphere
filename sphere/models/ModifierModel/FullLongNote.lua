@@ -29,7 +29,7 @@ FullLongNote.tojson = function(self)
 end
 
 FullLongNote.apply = function(self)
-	local noteChart = self.model.noteChart
+	local noteChart = self.noteChartModel.noteChart
 	self.noteDatas = {}
 	self.noteDataLayers = {}
 	

@@ -15,14 +15,16 @@ NoteSkinView.load = function(self)
 
     local nsdCses = self.noteSkin.data.cses
 	self.cses = {}
-	for i = 1, #nsdCses do
-		self.cses[i] = CoordinateManager:getCS(
-			tonumber(nsdCses[i][1]),
-			tonumber(nsdCses[i][2]),
-			tonumber(nsdCses[i][3]),
-			tonumber(nsdCses[i][4]),
-			nsdCses[i][5]
-		)
+	if nsdCses then
+		for i = 1, #nsdCses do
+			self.cses[i] = CoordinateManager:getCS(
+				tonumber(nsdCses[i][1]),
+				tonumber(nsdCses[i][2]),
+				tonumber(nsdCses[i][3]),
+				tonumber(nsdCses[i][4]),
+				nsdCses[i][5]
+			)
+		end
 	end
 
 	self.images = {}

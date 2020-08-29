@@ -12,11 +12,11 @@ WindUp.shortName = "WindUp"
 WindUp.variableType = "boolean"
 
 WindUp.apply = function(self)
-	self.timeRateHandler = self.model.timeEngine:createTimeRateHandler()
+	self.timeRateHandler = self.rhythmModel.timeEngine:createTimeRateHandler()
 end
 
 WindUp.update = function(self)
-	local timeEngine = self.model.timeEngine
+	local timeEngine = self.rhythmModel.timeEngine
 	local startTime = timeEngine.noteChart.metaData:get("minTime")
 	local endTime = timeEngine.noteChart.metaData:get("maxTime")
 	local currentTime = timeEngine.exactCurrentTime
@@ -28,7 +28,7 @@ WindUp.update = function(self)
 	local timeRate = map(currentTime, startTime, endTime, 0.75, 1.5)
 	self.timeRateHandler.timeRate = timeRate
 
-	local baseTimeRate = self.model.timeEngine:getBaseTimeRate()
+	local baseTimeRate = self.rhythmModel.timeEngine:getBaseTimeRate()
 	timeEngine:setTimeRate(baseTimeRate, false)
 end
 

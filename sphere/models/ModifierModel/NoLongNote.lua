@@ -11,7 +11,7 @@ NoLongNote.shortName = "NLN"
 NoLongNote.variableType = "boolean"
 
 NoLongNote.apply = function(self)
-	local noteChart = self.model.noteChart
+	local noteChart = self.noteChartModel.noteChart
 	
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
