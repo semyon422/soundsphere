@@ -21,8 +21,6 @@ TimeManager.load = function(self)
 	self.positionDelta = Timer.positionDelta
 	self.state = Timer.state
 
-	self.currentTime = TimeManager.currentTime
-
 	self:loadTimePoints()
 end
 

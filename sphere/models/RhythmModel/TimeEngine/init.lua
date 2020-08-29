@@ -5,6 +5,8 @@ local TimeManager		= require("sphere.models.RhythmModel.TimeEngine.TimeManager")
 
 local TimeEngine = Class:new()
 
+TimeEngine.skipDeltaTime = -2
+
 TimeEngine.construct = function(self)
 	self.observable = Observable:new()
 
@@ -29,8 +31,14 @@ TimeEngine.load = function(self)
 	self.targetTimeRate = TimeEngine.targetTimeRate
 	self.backwardCounter = TimeEngine.backwardCounter
 
+	self.timeManager.currentTime = self.skipDeltaTime
+
 	self.timeManager:load()
 	self.timeRateHandlers = {}
+end
+
+TimeEngine.resetCurrentTime = function(self)
+	self.timeManager.currentTime = self.skipDeltaTime * self:getBaseTimeRate()
 end
 
 TimeEngine.createTimeRateHandler = function(self)
@@ -91,8 +99,12 @@ TimeEngine.receive = function(self, event)
 	end
 end
 
+TimeEngine.getSkipTime = function(self)
+	return self.noteChart.metaData:get("minTime") + self.skipDeltaTime * math.abs(self.timeRate)
+end
+
 TimeEngine.skipIntro = function(self)
-	local skipTime = self.noteChart.metaData:get("minTime") - 2
+	local skipTime = self.noteChart.metaData:get("minTime") + self.skipDeltaTime * math.abs(self.timeRate)
 	if self.currentTime < skipTime and self.timeRate ~= 0 then
 		self:setPosition(skipTime)
 	end

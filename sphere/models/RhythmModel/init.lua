@@ -111,6 +111,7 @@ RhythmModel.loadAllEngines = function(self)
 
 	timeEngine:load()
 	modifierModel:apply("TimeEngineModifier")
+	timeEngine:resetCurrentTime()
 
 	scoreEngine:load()
 	modifierModel:apply("ScoreEngineModifier")
