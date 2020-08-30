@@ -9,7 +9,7 @@ MountModel.chartsPath = "userdata/charts"
 
 MountModel.readConfig = function(self)
 	local info = love.filesystem.getInfo(self.configPath)
-	if not info then
+	if not info or info.size == 0 then
 		self.mountInfo = {}
 		return
 	end

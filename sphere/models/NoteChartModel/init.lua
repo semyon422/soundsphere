@@ -12,7 +12,7 @@ end
 
 NoteChartModel.load = function(self)
 	local info = love.filesystem.getInfo(self.path)
-	if info then
+	if info and info.size ~= 0 then
 		local file = io.open(self.path, "r")
 		self.selected = json.decode(file:read("*all"))
 		file:close()
