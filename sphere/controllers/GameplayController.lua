@@ -29,6 +29,7 @@ GameplayController.load = function(self)
 	local view = self.view
 	local timeController = self.timeController
 	local modifierModel = self.modifierModel
+	local notificationModel = self.notificationModel
 
 	noteSkinModel.configModel = configModel
 
@@ -43,6 +44,7 @@ GameplayController.load = function(self)
 
 	timeController.rhythmModel = rhythmModel
 	timeController.configModel = configModel
+	timeController.notificationModel = notificationModel
 
 	modifierModel.rhythmModel = rhythmModel
 	modifierModel.noteChartModel = noteChartModel

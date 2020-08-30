@@ -142,6 +142,7 @@ SelectController.playNoteChart = function(self)
 	gameplayController.noteChartModel = noteChartModel
 	gameplayController.modifierModel = self.modifierModel
 	gameplayController.configModel = self.configModel
+	gameplayController.notificationModel = self.notificationModel
 	gameplayController.selectController = self
 	return ScreenManager:set(gameplayController)
 end
@@ -182,6 +183,7 @@ SelectController.replayNoteChart = function(self, event)
 	gameplayController.noteChartModel = noteChartModel
 	gameplayController.modifierModel = self.modifierModel
 	gameplayController.configModel = self.configModel
+	gameplayController.notificationModel = self.notificationModel
 	gameplayController.selectController = self
 
 	if event.mode == "result" then

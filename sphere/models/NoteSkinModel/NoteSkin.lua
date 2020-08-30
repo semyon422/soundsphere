@@ -32,6 +32,16 @@ NoteSkin.update = function(self, dt)
 	end
 end
 
+NoteSkin.increaseVisualTimeRate = function(self, delta)
+	if math.abs(self.targetVisualTimeRate + delta) > 0.001 then
+		self.targetVisualTimeRate = self.targetVisualTimeRate + delta
+		self:setVisualTimeRate(self.targetVisualTimeRate)
+	else
+		self.targetVisualTimeRate = 0
+		self:setVisualTimeRate(self.targetVisualTimeRate)
+	end
+end
+
 NoteSkin.setVisualTimeRate = function(self, visualTimeRate)
 	if visualTimeRate * self.visualTimeRate < 0 then
 		self.visualTimeRate = visualTimeRate
