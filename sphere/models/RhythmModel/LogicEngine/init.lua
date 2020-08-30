@@ -6,6 +6,7 @@ local LogicEngine = Class:new()
 
 LogicEngine.construct = function(self)
 	self.observable = Observable:new()
+	self.noteHandlers = {}
 end
 
 LogicEngine.load = function(self)
@@ -89,7 +90,7 @@ LogicEngine.unloadNoteHandlers = function(self)
 	for noteHandler in pairs(self.noteHandlers) do
 		noteHandler:unload()
 	end
-	self.noteHandlers = nil
+	self.noteHandlers = {}
 end
 
 LogicEngine.getScoreNote = function(self, noteData)
