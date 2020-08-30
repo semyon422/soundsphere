@@ -24,6 +24,7 @@ BrowserView.load = function(self)
 
 	gui:load("userdata/interface/browser.json")
     gui.observable:add(self)
+	gui.observable:add(self.controller)
 
     BrowserList.collectionModel = self.collectionModel
 
@@ -36,6 +37,8 @@ end
 
 BrowserView.unload = function(self)
 	BrowserList:unload()
+    self.gui.observable:remove(self)
+    self.gui.observable:remove(self.controller)
 end
 
 BrowserView.receive = function(self, event)

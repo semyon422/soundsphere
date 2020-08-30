@@ -40,6 +40,18 @@ BrowserController.receive = function(self, event)
 	if event.name == "keypressed" and event.args[1] == self.configModel:get("screen.browser") then
 		ScreenManager:set(self.selectController)
 	end
+
+	if event.name == "setScreen" then
+		if event.screenName == "SelectScreen" then
+			ScreenManager:set(self.selectController)
+		elseif event.screenName == "SettingsScreen" then
+			local SettingsController = require("sphere.controllers.SettingsController")
+			local settingsController = SettingsController:new()
+			settingsController.configModel = self.configModel
+			settingsController.selectController = self.selectController
+			return ScreenManager:set(settingsController)
+		end
+	end
 end
 
 return BrowserController

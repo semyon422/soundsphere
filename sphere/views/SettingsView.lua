@@ -22,6 +22,7 @@ SettingsView.load = function(self)
 	gui.container = container
 	gui:load("userdata/interface/settings.json")
 	gui.observable:add(self)
+	gui.observable:add(self.controller)
 
 	SettingsList.configModel = self.configModel
 
@@ -46,6 +47,8 @@ SettingsView.unload = function(self)
     CategoriesList.observable:remove(self)
 	SettingsList.observable:remove(self.controller)
     CategoriesList.observable:remove(self.controller)
+	self.gui.observable:remove(self)
+	self.gui.observable:remove(self.controller)
 end
 
 SettingsView.receive = function(self, event)

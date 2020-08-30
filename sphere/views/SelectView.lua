@@ -45,6 +45,7 @@ SelectView.load = function(self)
 
 	gui:load("userdata/interface/select.json")
 	gui.observable:add(self)
+	gui.observable:add(self.controller)
 	gui:reload()
 
 	KeyBindMenu.noteChartModel = noteChartModel
@@ -88,6 +89,7 @@ SelectView.unload = function(self)
 	NoteChartStateManager.observable:remove(self.gui)
 	NoteChartStateManager.observable:remove(self.controller)
 	self.gui.observable:remove(self)
+	self.gui.observable:remove(self.controller)
 	NoteSkinMenu.observable:remove(self.controller)
 	KeyBindMenu.observable:remove(self.controller)
 	ModifierMenu.observable:remove(self.controller)
