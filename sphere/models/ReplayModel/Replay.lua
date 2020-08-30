@@ -66,7 +66,9 @@ Replay.fromString = function(self, s)
 	self.modifiers = object.modifiers
 	self.player = object.player
 	self.time = object.time
-	self.inputMode = InputMode:new():setString(object.inputMode)
+	if object.inputMode then
+		self.inputMode = InputMode:new():setString(object.inputMode)
+	end
 
 	if object.type == "NanoChart" then
 		self.events = self.replayNanoChart:decode(object.events, object.size, self.inputMode)
