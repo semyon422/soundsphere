@@ -1,4 +1,4 @@
-
+local aquaevent					= require("aqua.event")
 local Class						= require("aqua.util.Class")
 local CoordinateManager			= require("aqua.graphics.CoordinateManager")
 local ThreadPool				= require("aqua.thread.ThreadPool")
@@ -105,7 +105,7 @@ GameController.receive = function(self, event)
 		self:draw()
 	elseif event.name == "quit" then
 		self:unload()
-		return os.exit()
+		aquaevent.quit()
 	elseif event.name == "resize" then
 		CoordinateManager:reload()
 	end
