@@ -165,9 +165,9 @@ GameplayController.skip = function(self)
 	timeEngine.currentTime = time
 	timeEngine.exactCurrentTime = time
 	timeEngine:sendState()
-	self:update()
+	self:update(0)
 	self.rhythmModel.replayModel:update()
-	self:update()
+	self:update(0)
 end
 
 return GameplayController

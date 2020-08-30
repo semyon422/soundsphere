@@ -1,6 +1,6 @@
+local tween = require("tween")
 local Class = require("aqua.util.Class")
 local InputMode	= require("ncdk.InputMode")
--- local NoteSkinManager = require("sphere.models.NoteSkinModel.NoteSkinManager")
 local NoteSkinLoader = require("sphere.models.NoteSkinModel.NoteSkinLoader")
 
 local NoteSkin = Class:new()
@@ -26,15 +26,20 @@ NoteSkin.load = function(self)
 	return NoteSkinLoader:load(self)
 end
 
+NoteSkin.update = function(self, dt)
+	if self.visualTimeRateTween and self.updateTween then
+		self.visualTimeRateTween:update(dt)
+	end
+end
+
 NoteSkin.setVisualTimeRate = function(self, visualTimeRate)
 	if visualTimeRate * self.visualTimeRate < 0 then
 		self.visualTimeRate = visualTimeRate
 		self.updateTween = false
 	else
 		self.updateTween = true
-		-- self.visualTimeRateTween = tween.new(0.25, self, {visualTimeRate = visualTimeRate}, "inOutQuad")
+		self.visualTimeRateTween = tween.new(0.25, self, {visualTimeRate = visualTimeRate}, "inOutQuad")
 	end
-	-- GameConfig.data.speed = visualTimeRate
 end
 
 NoteSkin.getVisualTimeRate = function(self)

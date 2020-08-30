@@ -24,7 +24,7 @@ end
 GraphicEngine.update = function(self, dt)
 	self:updateNoteDrawers()
 
-	-- self.noteSkin:update(dt)
+	self.noteSkin:update(dt)
 end
 
 GraphicEngine.unload = function(self)
@@ -44,46 +44,6 @@ GraphicEngine.receive = function(self, event)
 		end
 		return
 	end
-
-	-- if event.name == "resize" then
-	-- 	self:reloadNoteDrawers()
-	-- elseif event.name == "keypressed" then
-	-- 	local key = event.args[1]
-	-- 	local delta = 0.05
-
-	-- 	if key == GameConfig:get("gameplay.invertPlaySpeed") then
-	-- 		self.noteSkin.targetVisualTimeRate = -self.noteSkin.targetVisualTimeRate
-	-- 		self.noteSkin:setVisualTimeRate(self.noteSkin.targetVisualTimeRate)
-	-- 		return self.observable:send({
-	-- 			name = "notify",
-	-- 			text = "visualTimeRate: " .. self.noteSkin.targetVisualTimeRate
-	-- 		})
-	-- 	elseif key == GameConfig:get("gameplay.decreasePlaySpeed") then
-	-- 		if math.abs(self.noteSkin.targetVisualTimeRate - delta) > 0.001 then
-	-- 			self.noteSkin.targetVisualTimeRate = self.noteSkin.targetVisualTimeRate - delta
-	-- 			self.noteSkin:setVisualTimeRate(self.noteSkin.targetVisualTimeRate)
-	-- 		else
-	-- 			self.noteSkin.targetVisualTimeRate = 0
-	-- 			self.noteSkin:setVisualTimeRate(self.noteSkin.targetVisualTimeRate)
-	-- 		end
-	-- 		return self.observable:send({
-	-- 			name = "notify",
-	-- 			text = "visualTimeRate: " .. self.noteSkin.targetVisualTimeRate
-	-- 		})
-	-- 	elseif key == GameConfig:get("gameplay.increasePlaySpeed") then
-	-- 		if math.abs(self.noteSkin.targetVisualTimeRate + delta) > 0.001 then
-	-- 			self.noteSkin.targetVisualTimeRate = self.noteSkin.targetVisualTimeRate + delta
-	-- 			self.noteSkin:setVisualTimeRate(self.noteSkin.targetVisualTimeRate)
-	-- 		else
-	-- 			self.noteSkin.targetVisualTimeRate = 0
-	-- 			self.noteSkin:setVisualTimeRate(self.noteSkin.targetVisualTimeRate)
-	-- 		end
-	-- 		return self.observable:send({
-	-- 			name = "notify",
-	-- 			text = "visualTimeRate: " .. self.noteSkin.targetVisualTimeRate
-	-- 		})
-	-- 	end
-	-- end
 end
 
 GraphicEngine.getLogicalNote = function(self, noteData)

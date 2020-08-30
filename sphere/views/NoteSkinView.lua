@@ -37,9 +37,6 @@ end
 NoteSkinView.receive = function(self, event)
 end
 
-NoteSkinView.update = function(self, dt)
-end
-
 NoteSkinView.unload = function(self)
 end
 
@@ -93,10 +90,6 @@ NoteSkinView.leaveContainer = function(self, container)
 end
 
 NoteSkinView.update = function(self, dt)
-	if self.visualTimeRateTween and self.updateTween then
-		self.visualTimeRateTween:update(dt)
-	end
-
 	for _, container in ipairs(self.containerList) do
 		container:update()
 	end
