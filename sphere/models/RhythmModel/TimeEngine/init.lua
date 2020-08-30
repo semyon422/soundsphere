@@ -74,7 +74,6 @@ TimeEngine.sync = function(self, time, dt)
 
 	timeManager:update()
 
-	print(timeManager:getTime(), timeManager.currentTime, timeManager.offset)
 	self.currentTime = timeManager:getTime()
 	self.exactCurrentTime = timeManager:getExactTime()
 	self:sendState()
@@ -101,7 +100,7 @@ TimeEngine.receive = function(self, event)
 end
 
 TimeEngine.skipIntro = function(self)
-	local skipTime = self.noteChart.metaData:get("minTime") + self.timeToPrepare * math.abs(self.timeRate)
+	local skipTime = self.noteChart.metaData:get("minTime") - self.timeToPrepare * math.abs(self.timeRate)
 	if self.currentTime < skipTime and self.timeRate ~= 0 then
 		self:setPosition(skipTime)
 	end
