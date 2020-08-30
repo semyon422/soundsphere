@@ -93,8 +93,8 @@ NoteChartStateManager.receive = function(self, event)
 			end
 		end
 	elseif sender == NoteChartSetList and action == "return" then
-		local noteChartEntry = NoteChartList.items[NoteChartList.focusedItemIndex].noteChartEntry
-		if noteChartEntry then
+		local item = NoteChartList.items[NoteChartList.focusedItemIndex]
+		if item and item.noteChartEntry then
 			self:send({
 				sender = self,
 				action = "playNoteChart",

@@ -116,6 +116,10 @@ SelectController.resetModifiedNoteChart = function(self)
 
 	local noteChart = noteChartModel:loadNoteChart()
 
+	if not noteChart then
+		return
+	end
+
 	modifierModel.noteChart = noteChart
 	modifierModel:apply("NoteChartModifier")
 end

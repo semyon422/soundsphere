@@ -19,6 +19,9 @@ NoteChartModel.load = function(self)
 
 		self.noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(self.selected[1])
 		self.noteChartEntry = self.cacheModel.cacheManager:getNoteChartEntryById(self.selected[2])
+		if not self.noteChartEntry then
+			return
+		end
 		self.noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntry(self.noteChartEntry.hash, 1)
 			or self.cacheModel.cacheManager:getEmptyNoteChartDataEntry(self.noteChartEntry.path)
 	end
@@ -48,6 +51,10 @@ end
 
 NoteChartModel.loadNoteChart = function(self)
 	local noteChartEntry = self.noteChartEntry
+
+	if not noteChartEntry then
+		return
+	end
 
 	local file = love.filesystem.newFile(noteChartEntry.path)
 	file:open("r")
