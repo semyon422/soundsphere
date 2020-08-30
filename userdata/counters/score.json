@@ -2,14 +2,14 @@
 	"name": "soundsphere score system",
 	"counters": [
 		{
-			"path": "score.lua"
-		},
-		{
 			"path": "accuracy.lua"
 		},
 		{
 			"path": "combo.lua",
 			"tableName": "comboHits"
+		},
+		{
+			"path": "score.lua"
 		},
 		{
 			"path": "hits.lua",

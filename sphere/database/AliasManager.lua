@@ -5,7 +5,8 @@ local AliasManager = {}
 AliasManager.path = "userdata/aliases.json"
 
 AliasManager.load = function(self)
-	if love.filesystem.exists(self.path) then
+	local info = love.filesystem.getInfo(self.path)
+	if info then
 		local file = io.open(self.path, "r")
 		self.data = json.decode(file:read("*all"))
         file:close()

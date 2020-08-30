@@ -17,9 +17,9 @@ CLI.init = function(self)
 	self.currentLineOffset = #self.currentLine
 	self.historyOffset = 0
 	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
-	
+
 	self.font = aquafonts.getFont(spherefonts.NotoMonoRegular, 16)
-	
+
 	self.rectangleObject = Rectangle:new({
 		x = 0,
 		y = 0,
@@ -30,7 +30,7 @@ CLI.init = function(self)
 		mode = "fill"
 	})
 	self.rectangleObject:reload()
-	
+
 	self.textObject = Text:new({
 		x = 0,
 		y = 0.5,
@@ -44,7 +44,7 @@ CLI.init = function(self)
 		cs = self.cs,
 		baseScale = 1
 	})
-	
+
 	self.cursorObject = Text:new({
 		x = 0,
 		y = 0.5,
@@ -58,7 +58,7 @@ CLI.init = function(self)
 		cs = self.cs,
 		baseScale = 1
 	})
-	
+
 	self:addDefaultCommands()
 	self:reload()
 end
@@ -104,11 +104,11 @@ CLI.receive = function(self, event)
 	if event.name == "keypressed" and event.args[1] == "`" and love.keyboard.isDown("lctrl") then
 		self:switch()
 	end
-	
+
 	if self.hidden then
 		return
 	end
-	
+
 	if event.name == "resize" then
 		self:reload()
 	elseif event.name == "textinput" and event.args[1] ~= "`" then
@@ -215,17 +215,17 @@ CLI.processCurrentLine = function(self)
 	local args = table.concat(self.currentLine):split(" ")
 	local command = args[1]
 	table.remove(args, 1)
-	
+
 	table.insert(self.history, self.currentLine)
 	self.historyOffset = #self.history + 1
-	
+
 	self.currentLine = {}
 	self.currentLineOffset = 0
 	self:runCommand(command, args)
 end
 
 CLI.unload = function(self)
-	
+
 end
 
 CLI.show = function(self)
@@ -300,7 +300,7 @@ CLI.addDefaultCommands = function(self)
 			love.window.setFullscreen(not love.window.getFullscreen())
 		end
 	)
-	
+
 	local helpFunction = function()
 		local cell = 0
 		local commandSet = {}
@@ -311,9 +311,11 @@ CLI.addDefaultCommands = function(self)
 		self:print("Available commands: ")
 		self:print(table.concat(commandSet, ", "))
 	end
-	
+
 	self:addCommand("help", helpFunction)
 	self:addCommand("?", helpFunction)
 end
+
+CLI:init()
 
 return CLI

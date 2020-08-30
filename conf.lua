@@ -3,9 +3,9 @@ function love.conf(t)
 	t.console = true
 	t.accelerometerjoystick = true
 	t.gammacorrect = false
-	
+
 	t.window.title = "soundsphere"
-	t.window.icon = nil
+	t.window.icon = "resources/icon.png"
 	t.window.width = 1024
 	t.window.height = 576
 	t.window.borderless = false
@@ -21,7 +21,7 @@ function love.conf(t)
 	t.window.x = nil
 	t.window.y = nil
 
-	t.modules.audio = false
+	t.modules.audio = true
 	t.modules.event = true
 	t.modules.graphics = true
 	t.modules.image = true
@@ -30,7 +30,7 @@ function love.conf(t)
 	t.modules.math = true
 	t.modules.mouse = true
 	t.modules.physics = false
-	t.modules.sound = false
+	t.modules.sound = true
 	t.modules.system = true
 	t.modules.timer = true
 	t.modules.touch = true
