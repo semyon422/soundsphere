@@ -37,8 +37,9 @@ NoteChartMenuList.addItems = function(self)
 		{
 			name = "open " .. entry.path,
 			onClick = function()
+				local mountPath = self.menu.mountModel:getRealPath(entry.path)
 				local realPath =
-					self.menu.mountModel:getRealPath(entry.path) or
+					mountPath or
 					love.filesystem.getSource() .. "/" .. entry.path
 				love.system.openURL("file://" .. realPath)
 				NoteChartMenu:hide()
@@ -47,8 +48,9 @@ NoteChartMenuList.addItems = function(self)
 		{
 			name = "open " .. entry.path:match("^(.+)/.-$"),
 			onClick = function()
+				local mountPath = self.menu.mountModel:getRealPath(entry.path)
 				local realPath =
-					self.menu.mountModel:getRealPath(entry.path):match("^(.+)/.-$") or
+					(mountPath and mountPath:match("^(.+)/.-$")) or
 					love.filesystem.getSource() .. "/" .. entry.path:match("^(.+)/.-$")
 				love.system.openURL("file://" .. realPath)
 				NoteChartMenu:hide()
