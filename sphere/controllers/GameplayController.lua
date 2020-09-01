@@ -62,6 +62,8 @@ GameplayController.load = function(self)
 	rhythmModel:setAudioMode("secondary", configModel:get("audio.secondaryAudioMode"))
 	rhythmModel:setTimeRound(configModel:get("gameplay.needTimeRound"))
 	rhythmModel:setTimeToPrepare(configModel:get("gameplay.timeToPrepare"))
+	rhythmModel:setInputOffset(configModel:get("gameplay.inputOffset"))
+	rhythmModel:setVisualOffset(configModel:get("gameplay.visualOffset"))
 
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
 	rhythmModel:load()

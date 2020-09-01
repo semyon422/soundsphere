@@ -8,6 +8,7 @@ InputManager.path = "userdata/input.json"
 
 InputManager.mode = "external"
 InputManager.needRound = true
+InputManager.offset = 0
 
 InputManager.types = {
 	"keyboard",
@@ -21,6 +22,10 @@ end
 
 InputManager.setMode = function(self, mode)
 	self.mode = mode
+end
+
+InputManager.setInputOffset = function(self, offset)
+	self.offset = offset
 end
 
 InputManager.setBindings = function(self, inputBindings)
@@ -85,7 +90,7 @@ InputManager.receive = function(self, event)
 			name = "keypressed",
 			args = {key},
 			virtual = true,
-			time = eventTime
+			time = eventTime + self.offset
 		}
 	end
 	for _, key in ipairs(keyConfig.release) do
@@ -93,7 +98,7 @@ InputManager.receive = function(self, event)
 			name = "keyreleased",
 			args = {key},
 			virtual = true,
-			time = eventTime
+			time = eventTime + self.offset
 		}
 	end
 	for _, event in ipairs(events) do

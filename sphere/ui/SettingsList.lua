@@ -138,6 +138,28 @@ SettingsList.setGeneralItems = function(self)
 		step = 0.5,
 		format = "%0.1f"
 	}
+	items[#items + 1] = {
+		name = "input offset",
+		configKey = "gameplay.inputOffset",
+		type = "slider",
+		minValue = -0.1,
+		maxValue = 0.1,
+		minDisplayValue = -100,
+		maxDisplayValue = 100,
+		step = 0.001,
+		format = "%d"
+	}
+	items[#items + 1] = {
+		name = "visual offset",
+		configKey = "gameplay.visualOffset",
+		type = "slider",
+		minValue = -0.1,
+		maxValue = 0.1,
+		minDisplayValue = -100,
+		maxDisplayValue = 100,
+		step = 0.001,
+		format = "%d"
+	}
 
 	return self:setItems(items)
 end

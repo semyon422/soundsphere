@@ -86,6 +86,7 @@ ConfigModel.defaultValues = {
 	["gameplay.skipIntro"] = "space",
 	["gameplay.quickRestart"] = "`",
 	["gameplay.timeToPrepare"] = 2,
+	["gameplay.inputOffset"] = 0,
 	["select.selectRandomNoteChartSet"] = "f2",
 
 	["gameplay.invertPlaySpeed"] = "f2",

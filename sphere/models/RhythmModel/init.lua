@@ -231,4 +231,12 @@ RhythmModel.setTimeToPrepare = function(self, timeToPrepare)
 	self.timeEngine.timeToPrepare = timeToPrepare
 end
 
+RhythmModel.setInputOffset = function(self, offset)
+	self.inputManager:setInputOffset(offset)
+end
+
+RhythmModel.setVisualOffset = function(self, offset)
+	self.graphicEngine:setVisualOffset(offset)
+end
+
 return RhythmModel
