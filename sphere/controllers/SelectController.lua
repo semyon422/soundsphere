@@ -98,7 +98,7 @@ SelectController.receive = function(self, event)
 	elseif event.name == "resetModifiedNoteChart" then
 		self:resetModifiedNoteChart()
 	elseif event.action == "replayNoteChart" then
-		self:replayNoteChart(event.mode)
+		self:replayNoteChart(event.mode, event.scoreEntry.replayHash)
 	elseif event.name == "setScreen" then
 		if event.screenName == "BrowserScreen" then
 			local BrowserController = require("sphere.controllers.BrowserController")
@@ -157,7 +157,7 @@ SelectController.playNoteChart = function(self)
 	return ScreenManager:set(gameplayController)
 end
 
-SelectController.replayNoteChart = function(self, mode)
+SelectController.replayNoteChart = function(self, mode, hash)
 	local noteChartModel = self.noteChartModel
 	local info = love.filesystem.getInfo(noteChartModel.noteChartEntry.path)
 	if not info then
@@ -176,7 +176,7 @@ SelectController.replayNoteChart = function(self, mode)
 		gameplayController = GameplayController:new()
 	end
 
-	local replay = gameplayController.rhythmModel.replayModel:loadReplay(event.scoreEntry.replayHash)
+	local replay = gameplayController.rhythmModel.replayModel:loadReplay(hash)
 
 	if replay.modifiers then
 		self.modifierModel:fromTable(replay.modifiers)
