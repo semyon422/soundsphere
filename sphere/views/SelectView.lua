@@ -6,6 +6,7 @@ local ModifierMenu		= require("sphere.ui.ModifierMenu")
 local NoteSkinMenu		= require("sphere.ui.NoteSkinMenu")
 local KeyBindMenu		= require("sphere.ui.KeyBindMenu")
 local NoteChartMenu		= require("sphere.ui.NoteChartMenu")
+local ThemeMenu			= require("sphere.ui.ThemeMenu")
 
 local ScoreList			= require("sphere.ui.ScoreList")
 local NoteChartList		= require("sphere.ui.NoteChartList")
@@ -50,11 +51,13 @@ SelectView.load = function(self)
 
 	KeyBindMenu.noteChartModel = noteChartModel
 	NoteSkinMenu.noteChartModel = noteChartModel
-
 	NoteSkinMenu.noteSkinModel = self.noteSkinModel
+	ThemeMenu.themeModel = self.themeModel
+
 	NoteSkinMenu.observable:add(self.controller)
 	KeyBindMenu.observable:add(self.controller)
 	ModifierMenu.observable:add(self.controller)
+	ThemeMenu.observable:add(self.controller)
 
 	KeyBindMenu.inputModel = self.inputModel
 
@@ -93,6 +96,7 @@ SelectView.unload = function(self)
 	NoteSkinMenu.observable:remove(self.controller)
 	KeyBindMenu.observable:remove(self.controller)
 	ModifierMenu.observable:remove(self.controller)
+	ThemeMenu.observable:remove(self.controller)
 
 	self.gui:unload()
 	PreviewManager:stop()
@@ -104,14 +108,17 @@ SelectView.receive = function(self, event)
 	local noteSkinMenuHidden = NoteSkinMenu.hidden
 	local keyBindMenuMenuHidden = KeyBindMenu.hidden
 	local noteChartMenuMenuHidden = NoteChartMenu.hidden
+	local themeMenuHidden = ThemeMenu.hidden
 	ModifierMenu:receive(event)
 	NoteSkinMenu:receive(event)
 	KeyBindMenu:receive(event)
 	NoteChartMenu:receive(event)
+	ThemeMenu:receive(event)
 	if (
 		not modifierMenuHidden or
 		not noteSkinMenuHidden or
 		not keyBindMenuMenuHidden or
+		not themeMenuHidden or
 		not noteChartMenuMenuHidden
 		) and event.name ~= "resize" then
 		return
@@ -159,6 +166,7 @@ SelectView.update = function(self, dt)
 	NoteSkinMenu:update()
 	KeyBindMenu:update()
 	NoteChartMenu:update()
+	ThemeMenu:update()
 
 	self.gui:update()
 end
@@ -174,6 +182,7 @@ SelectView.draw = function(self)
 	NoteSkinMenu:draw()
 	KeyBindMenu:draw()
 	NoteChartMenu:draw()
+	ThemeMenu:draw()
 end
 
 return SelectView

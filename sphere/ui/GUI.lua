@@ -11,6 +11,7 @@ local ScoreDisplay			= require("sphere.ui.ScoreDisplay")
 local StaticObject			= require("sphere.ui.StaticObject")
 local Animation				= require("sphere.ui.Animation")
 local NoteSkinMenu			= require("sphere.ui.NoteSkinMenu")
+local ThemeMenu				= require("sphere.ui.ThemeMenu")
 local ModifierMenu			= require("sphere.ui.ModifierMenu")
 local KeyBindMenu			= require("sphere.ui.KeyBindMenu")
 local NoteChartDataDisplay	= require("sphere.ui.NoteChartDataDisplay")
@@ -47,7 +48,8 @@ GUI.functions = {
 	["print"] = function(...) print(...) end,
 	["NoteSkinMenu:show()"] = function() NoteSkinMenu:show() end,
 	["ModifierMenu:show()"] = function() ModifierMenu:show() end,
-	["KeyBindMenu:show()"] = function() KeyBindMenu:show() end
+	["KeyBindMenu:show()"] = function() KeyBindMenu:show() end,
+	["ThemeMenu:show()"] = function() ThemeMenu:show() end
 }
 GUI.functions.__index = GUI.functions
 

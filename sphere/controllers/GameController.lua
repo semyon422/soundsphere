@@ -17,6 +17,7 @@ local Screenshot				= require("sphere.window.Screenshot")
 local UserView					= require("sphere.views.UserView")
 local NotificationView			= require("sphere.views.NotificationView")
 local NotificationModel			= require("sphere.models.NotificationModel")
+local ThemeModel				= require("sphere.models.ThemeModel")
 
 local GameController = Class:new()
 
@@ -29,6 +30,7 @@ GameController.construct = function(self)
 	self.mountModel = MountModel:new()
 	self.mountController = MountController:new()
 	self.screenshot = Screenshot:new()
+	self.themeModel = ThemeModel:new()
 end
 
 GameController.load = function(self)
@@ -40,6 +42,10 @@ GameController.load = function(self)
 	local mountModel = self.mountModel
 	local mountController = self.mountController
 	local screenshot = self.screenshot
+	local themeModel = self.themeModel
+
+	themeModel.configModel = configModel
+	themeModel:load()
 
 	mountController.mountModel = mountModel
 	mountModel:load()
@@ -69,6 +75,7 @@ GameController.load = function(self)
 	selectController.notificationModel = notificationModel
 	selectController.configModel = configModel
 	selectController.mountModel = mountModel
+	selectController.themeModel = themeModel
 
 	ScreenManager:set(selectController)
 end

@@ -1,17 +1,20 @@
 local Class				= require("aqua.util.Class")
 local ScreenManager		= require("sphere.screen.ScreenManager")
-local ViewFactory		= require("sphere.views.ViewFactory")
 
 local ResultController = Class:new()
 
 ResultController.construct = function(self)
-	local viewFactory = ViewFactory:new()
-	self.view = viewFactory:newView("ResultView")
 end
 
 ResultController.load = function(self)
 	local modifierModel = self.modifierModel
-	local view = self.view
+	local themeModel = self.themeModel
+
+	local theme = themeModel:getTheme()
+	self.theme = theme
+
+	local view = theme:newView("ResultView")
+	self.view = view
 
 	view.modifierModel = modifierModel
 

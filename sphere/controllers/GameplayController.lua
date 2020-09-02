@@ -7,7 +7,6 @@ local InputModel				= require("sphere.models.InputModel")
 local TimeController			= require("sphere.controllers.TimeController")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 local ScoreManager				= require("sphere.database.ScoreManager")
-local ViewFactory				= require("sphere.views.ViewFactory")
 
 local GameplayController = Class:new()
 
@@ -17,9 +16,6 @@ GameplayController.construct = function(self)
 	self.rhythmModel = RhythmModel:new()
 	self.inputModel = InputModel:new()
 	self.timeController = TimeController:new()
-
-	local viewFactory = ViewFactory:new()
-	self.view = viewFactory:newView("GameplayView")
 end
 
 GameplayController.load = function(self)
@@ -28,10 +24,16 @@ GameplayController.load = function(self)
 	local rhythmModel = self.rhythmModel
 	local inputModel = self.inputModel
 	local configModel = self.configModel
-	local view = self.view
 	local timeController = self.timeController
 	local modifierModel = self.modifierModel
 	local notificationModel = self.notificationModel
+	local themeModel = self.themeModel
+
+	local theme = themeModel:getTheme()
+	self.theme = theme
+
+	local view = theme:newView("GameplayView")
+	self.view = view
 
 	noteSkinModel.configModel = configModel
 
@@ -134,6 +136,7 @@ GameplayController.receive = function(self, event)
 		local resultController = ResultController:new()
 
 		resultController.scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
+		resultController.themeModel = self.themeModel
 		resultController.noteChartModel = self.noteChartModel
 		resultController.modifierModel = self.modifierModel
 		resultController.autoplay = self.rhythmModel.logicEngine.autoplay

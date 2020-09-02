@@ -121,6 +121,22 @@
 		"fontSize": 14,
 		"interact": ["KeyBindMenu:show()"]
 	},
+	{
+		"name": "ThemeMenu",
+		"class": "Button",
+		"cs": [0.5, 1, 0.5, 1, "min"],
+		"x": 0.375,
+		"y": 0.925,
+		"w": 0.125,
+		"h": 0.075,
+		"layer": 2,
+		"textColor": [255, 255, 255, 255],
+		"backgroundColor": [0, 0, 0, 127],
+		"text": "themes",
+		"font": "resources/fonts/NotoSansCJK-Regular.ttc",
+		"fontSize": 14,
+		"interact": ["ThemeMenu:show()"]
+	},
 	
 	{
 		"name": "ChartCreator",

@@ -1,20 +1,21 @@
 local Class					= require("aqua.util.Class")
 local ScreenManager			= require("sphere.screen.ScreenManager")
 local CollectionModel		= require("sphere.models.CollectionModel")
-local ViewFactory			= require("sphere.views.ViewFactory")
-
 
 local BrowserController = Class:new()
 
 BrowserController.construct = function(self)
 	self.collectionModel = CollectionModel:new()
-
-	local viewFactory = ViewFactory:new()
-	self.view = viewFactory:newView("BrowserView")
 end
 
 BrowserController.load = function(self)
-	local view = self.view
+	local themeModel = self.themeModel
+
+	local theme = themeModel:getTheme()
+	self.theme = theme
+
+	local view = theme:newView("BrowserView")
+	self.view = view
 
 	view.controller = self
 	view.cacheModel = self.cacheModel
@@ -51,6 +52,7 @@ BrowserController.receive = function(self, event)
 			local SettingsController = require("sphere.controllers.SettingsController")
 			local settingsController = SettingsController:new()
 			settingsController.configModel = self.configModel
+			settingsController.themeModel = self.themeModel
 			settingsController.selectController = self.selectController
 			return ScreenManager:set(settingsController)
 		end

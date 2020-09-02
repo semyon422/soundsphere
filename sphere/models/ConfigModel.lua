@@ -75,6 +75,7 @@ ConfigModel.defaultValues = {
 
 	["speed"] = 1,
 	["fps"] = 240,
+	["theme"] = "",
 
 	["volume.global"] = 1,
 	["volume.music"] = 1,

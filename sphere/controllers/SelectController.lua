@@ -1,6 +1,5 @@
 local Class					= require("aqua.util.Class")
 local ScreenManager			= require("sphere.screen.ScreenManager")
-local ViewFactory			= require("sphere.views.ViewFactory")
 local NoteChartModel		= require("sphere.models.NoteChartModel")
 local ModifierModel			= require("sphere.models.ModifierModel")
 local NoteSkinModel			= require("sphere.models.NoteSkinModel")
@@ -17,9 +16,6 @@ SelectController.construct = function(self)
 	self.inputModel = InputModel:new()
 	self.cacheModel = CacheModel:new()
 	self.modifierController = ModifierController:new()
-
-	local viewFactory = ViewFactory:new()
-	self.view = viewFactory:newView("SelectView")
 end
 
 SelectController.load = function(self)
@@ -28,16 +24,23 @@ SelectController.load = function(self)
 	local noteChartModel = self.noteChartModel
 	local inputModel = self.inputModel
 	local cacheModel = self.cacheModel
-	local view = self.view
+	local themeModel = self.themeModel
 	local modifierController = self.modifierController
 	local configModel = self.configModel
 	local mountModel = self.mountModel
+
+	local theme = themeModel:getTheme()
+	self.theme = theme
+
+	local view = theme:newView("SelectView")
+	self.view = view
 
 	noteChartModel.cacheModel = cacheModel
 	noteSkinModel.configModel = configModel
 	modifierModel.noteChartModel = noteChartModel
 
 	view.controller = self
+	view.themeModel = themeModel
 	view.noteChartModel = noteChartModel
 	view.modifierModel = modifierModel
 	view.noteSkinModel = noteSkinModel
@@ -78,6 +81,8 @@ SelectController.receive = function(self, event)
 
     if event.name == "setNoteSkin" then
 		self.noteSkinModel:setDefaultNoteSkin(event.inputMode, event.metaData)
+	elseif event.name == "setTheme" then
+		self.themeModel:setDefaultTheme(event.theme)
 	elseif event.name == "setInputBinding" then
 		self.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
 	elseif event.name == "selectNoteChart" then
@@ -87,25 +92,27 @@ SelectController.receive = function(self, event)
 			self.noteChartModel:selectNoteChartSet(event.id)
 		end
 	elseif event.action == "playNoteChart" then
-		self:playNoteChart(event)
+		self:playNoteChart()
 	elseif event.name == "loadModifiedNoteChart" then
 		self:loadModifiedNoteChart()
 	elseif event.name == "resetModifiedNoteChart" then
 		self:resetModifiedNoteChart()
 	elseif event.action == "replayNoteChart" then
-		self:replayNoteChart(event)
+		self:replayNoteChart(event.mode)
 	elseif event.name == "setScreen" then
 		if event.screenName == "BrowserScreen" then
 			local BrowserController = require("sphere.controllers.BrowserController")
 			local browserController = BrowserController:new()
 			browserController.configModel = self.configModel
 			browserController.cacheModel = self.cacheModel
+			browserController.themeModel = self.themeModel
 			browserController.selectController = self
 			return ScreenManager:set(browserController)
 		elseif event.screenName == "SettingsScreen" then
 			local SettingsController = require("sphere.controllers.SettingsController")
 			local settingsController = SettingsController:new()
 			settingsController.configModel = self.configModel
+			settingsController.themeModel = self.themeModel
 			settingsController.selectController = self
 			return ScreenManager:set(settingsController)
 		end
@@ -142,6 +149,7 @@ SelectController.playNoteChart = function(self)
 	local GameplayController = require("sphere.controllers.GameplayController")
 	local gameplayController = GameplayController:new()
 	gameplayController.noteChartModel = noteChartModel
+	gameplayController.themeModel = self.themeModel
 	gameplayController.modifierModel = self.modifierModel
 	gameplayController.configModel = self.configModel
 	gameplayController.notificationModel = self.notificationModel
@@ -149,7 +157,7 @@ SelectController.playNoteChart = function(self)
 	return ScreenManager:set(gameplayController)
 end
 
-SelectController.replayNoteChart = function(self, event)
+SelectController.replayNoteChart = function(self, mode)
 	local noteChartModel = self.noteChartModel
 	local info = love.filesystem.getInfo(noteChartModel.noteChartEntry.path)
 	if not info then
@@ -160,7 +168,7 @@ SelectController.replayNoteChart = function(self, event)
 	end
 
 	local gameplayController
-	if event.mode == "result" then
+	if mode == "result" then
 		local FastplayController = require("sphere.controllers.FastplayController")
 		gameplayController = FastplayController:new()
 	else
@@ -173,11 +181,11 @@ SelectController.replayNoteChart = function(self, event)
 	if replay.modifiers then
 		self.modifierModel:fromTable(replay.modifiers)
 	end
-	if event.mode == "replay" or event.mode == "result" then
+	if mode == "replay" or mode == "result" then
 		gameplayController.rhythmModel.replayModel.replay = replay
 		gameplayController.rhythmModel.inputManager:setMode("internal")
 		gameplayController.rhythmModel.replayModel:setMode("replay")
-	elseif event.mode == "retry" then
+	elseif mode == "retry" then
 		gameplayController.rhythmModel.inputManager:setMode("external")
 		gameplayController.rhythmModel.replayModel:setMode("record")
 	end
@@ -186,9 +194,10 @@ SelectController.replayNoteChart = function(self, event)
 	gameplayController.modifierModel = self.modifierModel
 	gameplayController.configModel = self.configModel
 	gameplayController.notificationModel = self.notificationModel
+	gameplayController.themeModel = self.themeModel
 	gameplayController.selectController = self
 
-	if event.mode == "result" then
+	if mode == "result" then
 		noteChartModel:unload()
 		gameplayController:play()
 
@@ -197,6 +206,7 @@ SelectController.replayNoteChart = function(self, event)
 
 		resultController.scoreSystem = gameplayController.rhythmModel.scoreEngine.scoreSystem
 		resultController.noteChartModel = noteChartModel
+		resultController.themeModel = self.themeModel
 		resultController.modifierModel = self.modifierModel
 		resultController.configModel = self.configModel
 		resultController.autoplay = gameplayController.rhythmModel.logicEngine.autoplay
