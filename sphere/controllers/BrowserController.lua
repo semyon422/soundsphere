@@ -19,6 +19,7 @@ BrowserController.load = function(self)
 
 	view.controller = self
 	view.cacheModel = self.cacheModel
+	view.configModel = self.configModel
 	view.collectionModel = self.collectionModel
 
 	self.collectionModel.cacheModel = self.cacheModel
@@ -40,10 +41,6 @@ end
 
 BrowserController.receive = function(self, event)
 	self.view:receive(event)
-
-	if event.name == "keypressed" and event.args[1] == self.configModel:get("screen.browser") then
-		ScreenManager:set(self.selectController)
-	end
 
 	if event.name == "setScreen" then
 		if event.screenName == "SelectScreen" then

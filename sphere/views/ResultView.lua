@@ -36,6 +36,13 @@ end
 
 ResultView.receive = function(self, event)
 	self.gui:receive(event)
+
+	if event.name == "keypressed" and event.args[1] == "escape" then
+		self.controller:receive({
+			name = "setScreen",
+			screenName = "SelectScreen"
+		})
+	end
 end
 
 ResultView.update = function(self, dt)

@@ -62,6 +62,13 @@ SettingsView.receive = function(self, event)
 	SettingsList:receive(event)
 	CategoriesList:receive(event)
 	self.gui:receive(event)
+
+	if event.name == "keypressed" and event.args[1] == self.configModel:get("screen.settings") then
+		self.controller:receive({
+			name = "setScreen",
+			screenName = "SelectScreen"
+		})
+	end
 end
 
 SettingsView.update = function(self, dt)

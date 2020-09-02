@@ -44,6 +44,13 @@ end
 BrowserView.receive = function(self, event)
 	BrowserList:receive(event)
 	self.gui:receive(event)
+
+	if event.name == "keypressed" and event.args[1] == self.configModel:get("screen.browser") then
+		self.controller:receive({
+			name = "setScreen",
+			screenName = "SelectScreen"
+		})
+	end
 end
 
 BrowserView.update = function(self, dt)

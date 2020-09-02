@@ -17,6 +17,7 @@ ResultController.load = function(self)
 	self.view = view
 
 	view.modifierModel = modifierModel
+	view.controller = self
 
 	view.scoreSystem = self.scoreSystem
 	view.noteChartModel = self.noteChartModel
@@ -38,12 +39,12 @@ ResultController.draw = function(self)
 end
 
 ResultController.receive = function(self, event)
-	self.controller:receive(event)
-end
+	self.view:receive(event)
 
-ResultController.receive = function(self, event)
-	if event.name == "keypressed" and event.args[1] == "escape" then
-		return ScreenManager:set(self.selectController)
+	if event.name == "setScreen" then
+		if event.screenName == "SelectScreen" then
+			ScreenManager:set(self.selectController)
+		end
 	end
 end
 
