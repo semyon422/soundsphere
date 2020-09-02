@@ -1,13 +1,15 @@
 local Class				= require("aqua.util.Class")
 local ScreenManager		= require("sphere.screen.ScreenManager")
 local ConfigController	= require("sphere.controllers.ConfigController")
-local SettingsView		= require("sphere.views.SettingsView")
+local ViewFactory		= require("sphere.views.ViewFactory")
 
 local SettingsController = Class:new()
 
 SettingsController.construct = function(self)
-	self.view = SettingsView:new()
 	self.configController = ConfigController:new()
+
+	local viewFactory = ViewFactory:new()
+	self.view = viewFactory:newView("SettingsView")
 end
 
 SettingsController.load = function(self)

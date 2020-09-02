@@ -1,13 +1,16 @@
 local Class					= require("aqua.util.Class")
 local ScreenManager			= require("sphere.screen.ScreenManager")
 local CollectionModel		= require("sphere.models.CollectionModel")
-local BrowserView			= require("sphere.views.BrowserView")
+local ViewFactory			= require("sphere.views.ViewFactory")
+
 
 local BrowserController = Class:new()
 
 BrowserController.construct = function(self)
 	self.collectionModel = CollectionModel:new()
-	self.view = BrowserView:new()
+
+	local viewFactory = ViewFactory:new()
+	self.view = viewFactory:newView("BrowserView")
 end
 
 BrowserController.load = function(self)

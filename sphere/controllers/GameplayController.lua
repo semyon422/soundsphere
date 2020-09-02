@@ -4,10 +4,10 @@ local RhythmModel				= require("sphere.models.RhythmModel")
 local NoteChartModel			= require("sphere.models.NoteChartModel")
 local NoteSkinModel				= require("sphere.models.NoteSkinModel")
 local InputModel				= require("sphere.models.InputModel")
-local GameplayView				= require("sphere.views.GameplayView")
 local TimeController			= require("sphere.controllers.TimeController")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 local ScoreManager				= require("sphere.database.ScoreManager")
+local ViewFactory				= require("sphere.views.ViewFactory")
 
 local GameplayController = Class:new()
 
@@ -16,8 +16,10 @@ GameplayController.construct = function(self)
 	self.noteSkinModel = NoteSkinModel:new()
 	self.rhythmModel = RhythmModel:new()
 	self.inputModel = InputModel:new()
-	self.view = GameplayView:new()
 	self.timeController = TimeController:new()
+
+	local viewFactory = ViewFactory:new()
+	self.view = viewFactory:newView("GameplayView")
 end
 
 GameplayController.load = function(self)

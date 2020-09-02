@@ -1,11 +1,12 @@
 local Class				= require("aqua.util.Class")
 local ScreenManager		= require("sphere.screen.ScreenManager")
-local ResultView		= require("sphere.views.ResultView")
+local ViewFactory		= require("sphere.views.ViewFactory")
 
 local ResultController = Class:new()
 
 ResultController.construct = function(self)
-	self.view = ResultView:new()
+	local viewFactory = ViewFactory:new()
+	self.view = viewFactory:newView("ResultView")
 end
 
 ResultController.load = function(self)

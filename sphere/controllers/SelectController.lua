@@ -1,6 +1,6 @@
 local Class					= require("aqua.util.Class")
 local ScreenManager			= require("sphere.screen.ScreenManager")
-local SelectView			= require("sphere.views.SelectView")
+local ViewFactory			= require("sphere.views.ViewFactory")
 local NoteChartModel		= require("sphere.models.NoteChartModel")
 local ModifierModel			= require("sphere.models.ModifierModel")
 local NoteSkinModel			= require("sphere.models.NoteSkinModel")
@@ -16,8 +16,10 @@ SelectController.construct = function(self)
 	self.noteChartModel = NoteChartModel:new()
 	self.inputModel = InputModel:new()
 	self.cacheModel = CacheModel:new()
-	self.view = SelectView:new()
 	self.modifierController = ModifierController:new()
+
+	local viewFactory = ViewFactory:new()
+	self.view = viewFactory:newView("SelectView")
 end
 
 SelectController.load = function(self)
