@@ -10,12 +10,16 @@ OnlineClient.path = "userdata/online.json"
 
 OnlineClient.init = function(self)
 	self.observable = Observable:new()
+	self.data = {}
 end
 
 OnlineClient.load = function(self)
-	local file = io.open(self.path, "r")
-	self.data = json.decode(file:read("*all"))
-	file:close()
+	local info = love.filesystem.getInfo(self.path)
+	if info and info.size ~= 0 then
+		local file = io.open(self.path, "r")
+		self.data = json.decode(file:read("*all"))
+		file:close()
+	end
 
 	-- self.host = enet.host_create()
 	-- self.server = self.host:connect(self.data.host)
@@ -48,13 +52,11 @@ OnlineClient.send = function(self, event)
 end
 
 OnlineClient.getUserId = function(self)
-	-- return self.data.userId
-	return 0
+	return self.data.userId or 1
 end
 
 OnlineClient.getSessionId = function(self)
-	-- return self.data.sessionId
-	return 0
+	return self.data.sessionId or 0
 end
 
 -- OnlineClient.login = function(self)

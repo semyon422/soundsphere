@@ -17,11 +17,13 @@ OnlineModel.load = function(self)
 
     onlineScoreManager.onlineClient = onlineClient
 
+    onlineClient:load()
     onlineScoreManager:load()
 end
 
 OnlineModel.unload = function(self)
     self.onlineScoreManager:unload()
+    self.onlineClient:unload()
 end
 
 OnlineModel.submit = function(self, score)
