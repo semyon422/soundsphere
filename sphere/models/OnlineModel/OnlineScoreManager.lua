@@ -1,13 +1,19 @@
 local Observable	= require("aqua.util.Observable")
-local OnlineClient	= require("sphere.online.OnlineClient")
+local Class			= require("aqua.util.Class")
 local ThreadPool	= require("aqua.thread.ThreadPool")
 
-local OnlineScoreManager = {}
+local OnlineScoreManager = Class:new()
 
-OnlineScoreManager.init = function(self)
+OnlineScoreManager.construct = function(self)
 	self.observable = Observable:new()
+end
 
+OnlineScoreManager.load = function(self)
 	ThreadPool.observable:add(self)
+end
+
+OnlineScoreManager.unload = function(self)
+	ThreadPool.observable:remove(self)
 end
 
 OnlineScoreManager.receive = function(self, event)
@@ -61,8 +67,8 @@ OnlineScoreManager.submit = function(self, score)
 			})
 		]],
 		{
-			OnlineClient:getUserId(),
-			OnlineClient:getSessionId(),
+			self.onlineClient:getUserId(),
+			self.onlineClient:getSessionId(),
 			onlineScore.hash,
 			onlineScore.score,
 			onlineScore.accuracy,

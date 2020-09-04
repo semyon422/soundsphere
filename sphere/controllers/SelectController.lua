@@ -29,6 +29,7 @@ SelectController.load = function(self)
 	local configModel = self.configModel
 	local mountModel = self.mountModel
 	local scoreModel = self.scoreModel
+	local onlineModel = self.onlineModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -50,6 +51,7 @@ SelectController.load = function(self)
 	view.configModel = configModel
 	view.mountModel = mountModel
 	view.scoreModel = scoreModel
+	view.onlineModel = onlineModel
 
 	modifierController.modifierModel = modifierModel
 
@@ -156,6 +158,7 @@ SelectController.playNoteChart = function(self)
 	gameplayController.configModel = self.configModel
 	gameplayController.notificationModel = self.notificationModel
 	gameplayController.scoreModel = self.scoreModel
+	gameplayController.onlineModel = self.onlineModel
 	gameplayController.selectController = self
 	return ScreenManager:set(gameplayController)
 end
@@ -199,6 +202,7 @@ SelectController.replayNoteChart = function(self, mode, hash)
 	gameplayController.notificationModel = self.notificationModel
 	gameplayController.themeModel = self.themeModel
 	gameplayController.scoreModel = self.scoreModel
+	gameplayController.onlineModel = self.onlineModel
 	gameplayController.selectController = self
 
 	if mode == "result" then
@@ -214,6 +218,7 @@ SelectController.replayNoteChart = function(self, mode, hash)
 		resultController.modifierModel = self.modifierModel
 		resultController.configModel = self.configModel
 		resultController.scoreModel = self.scoreModel
+		resultController.onlineModel = self.onlineModel
 		resultController.autoplay = gameplayController.rhythmModel.logicEngine.autoplay
 		resultController.selectController = self
 

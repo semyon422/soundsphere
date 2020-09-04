@@ -18,6 +18,7 @@ local UserView					= require("sphere.views.UserView")
 local NotificationView			= require("sphere.views.NotificationView")
 local NotificationModel			= require("sphere.models.NotificationModel")
 local ThemeModel				= require("sphere.models.ThemeModel")
+local OnlineModel				= require("sphere.models.OnlineModel")
 
 local GameController = Class:new()
 
@@ -32,6 +33,7 @@ GameController.construct = function(self)
 	self.screenshot = Screenshot:new()
 	self.themeModel = ThemeModel:new()
 	self.scoreModel = ScoreModel:new()
+	self.onlineModel = OnlineModel:new()
 end
 
 GameController.load = function(self)
@@ -45,6 +47,9 @@ GameController.load = function(self)
 	local screenshot = self.screenshot
 	local themeModel = self.themeModel
 	local scoreModel = self.scoreModel
+	local onlineModel = self.onlineModel
+
+	onlineModel:load()
 
 	themeModel.configModel = configModel
 	themeModel:load()
@@ -79,6 +84,7 @@ GameController.load = function(self)
 	selectController.mountModel = mountModel
 	selectController.themeModel = themeModel
 	selectController.scoreModel = scoreModel
+	selectController.onlineModel = onlineModel
 
 	ScreenManager:set(selectController)
 end
@@ -89,6 +95,7 @@ GameController.unload = function(self)
 	DiscordPresence:unload()
 	self.configModel:write()
 	self.mountModel:unload()
+	self.onlineModel:unload()
 end
 
 GameController.update = function(self, dt)

@@ -2,8 +2,9 @@ local enet = require("enet")
 local json = require("json")
 local http = require("aqua.http")
 local Observable = require("aqua.util.Observable")
+local Class = require("aqua.util.Class")
 
-local OnlineClient = {}
+local OnlineClient = Class:new()
 
 OnlineClient.path = "userdata/online.json"
 
