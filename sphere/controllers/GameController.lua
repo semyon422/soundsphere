@@ -3,7 +3,7 @@ local Class						= require("aqua.util.Class")
 local CoordinateManager			= require("aqua.graphics.CoordinateManager")
 local ThreadPool				= require("aqua.thread.ThreadPool")
 local ConfigModel				= require("sphere.models.ConfigModel")
-local ScoreManager				= require("sphere.database.ScoreManager")
+local ScoreModel				= require("sphere.models.ScoreModel")
 local DiscordPresence			= require("sphere.discord.DiscordPresence")
 local MountModel				= require("sphere.models.MountModel")
 local MountController			= require("sphere.controllers.MountController")
@@ -31,6 +31,7 @@ GameController.construct = function(self)
 	self.mountController = MountController:new()
 	self.screenshot = Screenshot:new()
 	self.themeModel = ThemeModel:new()
+	self.scoreModel = ScoreModel:new()
 end
 
 GameController.load = function(self)
@@ -43,6 +44,7 @@ GameController.load = function(self)
 	local mountController = self.mountController
 	local screenshot = self.screenshot
 	local themeModel = self.themeModel
+	local scoreModel = self.scoreModel
 
 	themeModel.configModel = configModel
 	themeModel:load()
@@ -62,7 +64,7 @@ GameController.load = function(self)
 	configModel.observable:add(FpsLimiter)
 	configModel.observable:add(screenshot)
 
-	ScoreManager:select()
+	scoreModel:select()
 	configModel:read()
 
 	DiscordPresence:load()
@@ -76,6 +78,7 @@ GameController.load = function(self)
 	selectController.configModel = configModel
 	selectController.mountModel = mountModel
 	selectController.themeModel = themeModel
+	selectController.scoreModel = scoreModel
 
 	ScreenManager:set(selectController)
 end

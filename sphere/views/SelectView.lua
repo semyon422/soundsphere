@@ -12,6 +12,7 @@ local ScoreList			= require("sphere.ui.ScoreList")
 local NoteChartList		= require("sphere.ui.NoteChartList")
 local NoteChartSetList	= require("sphere.ui.NoteChartSetList")
 local PreviewManager	= require("sphere.ui.PreviewManager")
+local SearchManager		= require("sphere.database.SearchManager")
 
 local BackgroundManager	= require("sphere.ui.BackgroundManager")
 
@@ -30,6 +31,8 @@ SelectView.load = function(self)
 	local gui = self.gui
 	local noteChartModel = self.noteChartModel
 	local configModel = self.configModel
+
+	SearchManager.scoreModel = self.scoreModel
 
 	PreviewManager.configModel = configModel
 	configModel.observable:add(PreviewManager)
@@ -74,6 +77,7 @@ SelectView.load = function(self)
 	NoteChartStateManager.cacheModel = self.cacheModel
 	NoteChartMenu.cacheModel = self.cacheModel
 	NoteChartMenu.mountModel = self.mountModel
+	ScoreList.scoreModel = self.scoreModel
 
 	ScoreList:load()
 	NoteChartList:load()

@@ -1,9 +1,7 @@
 local CoordinateManager		= require("aqua.graphics.CoordinateManager")
-local Observable			= require("aqua.util.Observable")
 local CustomList			= require("sphere.ui.CustomList")
 local ScoreListButton		= require("sphere.ui.ScoreListButton")
 local NoteChartList			= require("sphere.ui.NoteChartList")
-local ScoreManager			= require("sphere.database.ScoreManager")
 
 local ScoreList = CustomList:new()
 
@@ -52,7 +50,7 @@ ScoreList.selectScores = function(self)
 
 	local hash = selectedItem.noteChartDataEntry.hash
 	local index = selectedItem.noteChartDataEntry.index
-	local scoreEntries = ScoreManager:getScoreEntries(hash, index)
+	local scoreEntries = self.scoreModel:getScoreEntries(hash, index)
 	
 	if not scoreEntries then
 		return self:setItems(items)

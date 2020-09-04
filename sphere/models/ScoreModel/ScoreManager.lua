@@ -1,7 +1,8 @@
-local ScoreDatabase	= require("sphere.database.ScoreDatabase")
+local ScoreDatabase	= require("sphere.models.ScoreModel.ScoreDatabase")
 local Log			= require("aqua.util.Log")
+local Class			= require("aqua.util.Class")
 
-local ScoreManager = {}
+local ScoreManager = Class:new()
 
 ScoreManager.init = function(self)
 	self.log = Log:new()

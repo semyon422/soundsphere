@@ -1,7 +1,6 @@
 local aquafonts			= require("aqua.assets.fonts")
 local TextFrame			= require("aqua.graphics.TextFrame")
 local spherefonts		= require("sphere.assets.fonts")
-local ScoreManager		= require("sphere.database.ScoreManager")
 local CustomList		= require("sphere.ui.CustomList")
 local AliasManager		= require("sphere.database.AliasManager")
 
