@@ -47,11 +47,13 @@ OnlineClient.send = function(self, event)
 end
 
 OnlineClient.getUserId = function(self)
-	return self.data.userId
+	-- return self.data.userId
+	return 0
 end
 
 OnlineClient.getSessionId = function(self)
-	return self.data.sessionId
+	-- return self.data.sessionId
+	return 0
 end
 
 -- OnlineClient.login = function(self)

@@ -7,6 +7,7 @@ local InputModel				= require("sphere.models.InputModel")
 local TimeController			= require("sphere.controllers.TimeController")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 local ScoreManager				= require("sphere.database.ScoreManager")
+local OnlineScoreManager		= require("sphere.online.OnlineScoreManager")
 
 local GameplayController = Class:new()
 
@@ -159,6 +160,7 @@ GameplayController.saveScore = function(self)
 		replayModel.replayType = self.configModel:get("replay.type")
 		local replayHash = replayModel:saveReplay()
 		ScoreManager:insertScore(scoreSystem.scoreTable, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
+		OnlineScoreManager:submit(scoreSystem.scoreTable)
 	end
 end
 
