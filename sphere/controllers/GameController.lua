@@ -14,7 +14,6 @@ local BackgroundManager			= require("sphere.ui.BackgroundManager")
 local WindowManager				= require("sphere.window.WindowManager")
 local FpsLimiter				= require("sphere.window.FpsLimiter")
 local Screenshot				= require("sphere.window.Screenshot")
-local UserView					= require("sphere.views.UserView")
 local NotificationView			= require("sphere.views.NotificationView")
 local NotificationModel			= require("sphere.models.NotificationModel")
 local ThemeModel				= require("sphere.models.ThemeModel")
@@ -23,7 +22,6 @@ local OnlineModel				= require("sphere.models.OnlineModel")
 local GameController = Class:new()
 
 GameController.construct = function(self)
-	self.globalView = UserView:new()
 	self.configModel = ConfigModel:new()
 	self.notificationModel = NotificationModel:new()
 	self.notificationView = NotificationView:new()
@@ -40,7 +38,6 @@ GameController.load = function(self)
 	local notificationModel = self.notificationModel
 	local notificationView = self.notificationView
 	local configModel = self.configModel
-	local globalView = self.globalView
 	local windowManager = self.windowManager
 	local mountModel = self.mountModel
 	local mountController = self.mountController
@@ -57,9 +54,6 @@ GameController.load = function(self)
 	mountController.mountModel = mountModel
 	mountModel:load()
 
-	globalView:setPath("sphere/views/global.lua")
-	notificationModel.observable:add(globalView)
-
 	notificationModel.observable:add(notificationView)
 	notificationView:load()
 
@@ -73,8 +67,6 @@ GameController.load = function(self)
 	configModel:read()
 
 	DiscordPresence:load()
-
-	globalView:load()
 
 	ScreenManager:setTransition(FadeTransition)
 
@@ -90,7 +82,6 @@ GameController.load = function(self)
 end
 
 GameController.unload = function(self)
-	self.globalView:unload()
 	ScreenManager:unload()
 	DiscordPresence:unload()
 	self.configModel:write()
@@ -104,14 +95,12 @@ GameController.update = function(self, dt)
 	DiscordPresence:update()
 	BackgroundManager:update(dt)
 	ScreenManager:update(dt)
-	self.globalView:update(dt)
 	self.notificationView:update(dt)
 end
 
 GameController.draw = function(self)
 	BackgroundManager:draw()
 	ScreenManager:draw()
-	self.globalView:draw()
 	self.notificationView:draw()
 end
 
@@ -130,7 +119,6 @@ GameController.receive = function(self, event)
 	ScreenManager:receive(event)
 	BackgroundManager:receive(event)
 	self.windowManager:receive(event)
-	self.globalView:receive(event)
 	self.screenshot:receive(event)
 	self.mountController:receive(event)
 	self.notificationView:receive(event)
