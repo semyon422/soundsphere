@@ -29,7 +29,7 @@ OnlineScoreManager.convertToOnlineScore = function(self, score)
 		score = score.score,
 		accuracy = score.accuracy,
 		maxCombo = score.maxcombo,
-		mods = "None"
+		modifiers = "None"
 	}
 end
 
@@ -54,7 +54,7 @@ OnlineScoreManager.submit = function(self, score)
 					hash			= tostring(data[3]),
 					score			= tostring(data[4]),
 					accuracy		= tostring(data[5]),
-					mods			= tostring(data[6]),
+					modifiers			= tostring(data[6]),
 					maxCombo		= tostring(data[7]),
 					time			= tostring(data[8])
 				}
@@ -72,7 +72,7 @@ OnlineScoreManager.submit = function(self, score)
 			onlineScore.hash,
 			onlineScore.score,
 			onlineScore.accuracy,
-			onlineScore.mods,
+			onlineScore.modifiers,
 			onlineScore.maxCombo,
 			onlineScore.time
 		}
