@@ -148,13 +148,9 @@ NoteChartResourceLoader.loadBMS = function(self)
 	end)
 	self.videoGroup:call(function(videoFilePath)
 		if self.directoryPath == directoryPath then
-			return video.load(videoFilePath, resourceLoadedCallback)
+			resourceLoadedCallback()
 		end
 	end)
-
-	-- if self.resourceCountLoaded == self.resourceCount then
-	-- 	self.callback()
-	-- end
 end
 
 NoteChartResourceLoader.unload = function(self)
