@@ -44,6 +44,9 @@ receive = function(event)
 
 	local oldState, newState = event.oldState, event.newState
 	if event.noteType == "ShortScoreNote" then
+		if not event.currentTime then
+			return
+		end
 		local deltaTime = (event.currentTime - event.noteTime) / math.abs(event.timeRate)
 		if newState == "passed" then
 			increase(deltaTime)
@@ -51,6 +54,9 @@ receive = function(event)
 			increase(deltaTime)
 		end
 	elseif event.noteType == "LongScoreNote" then
+		if not event.currentTime then
+			return
+		end
 		local deltaTime = (event.currentTime - event.noteStartTime) / math.abs(event.timeRate)
 		if oldState == "clear" then
 			if newState == "startPassedPressed" then

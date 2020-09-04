@@ -1,4 +1,6 @@
 load = function()
+	scoreTable.misscount = 0
+	scoreTable.hitcount = 0
 	scoreTable.combo = 0
 	scoreTable.maxcombo = 0
 	scoreTable[config.tableName] = {}
@@ -38,10 +40,12 @@ receive = function(event)
 	local oldState, newState = event.oldState, event.newState
 	if event.noteType == "ShortScoreNote" then
 		if newState == "passed" then
+			scoreTable.hitcount = scoreTable.hitcount + 1
 			scoreTable.combo = scoreTable.combo + 1
 			scoreTable.maxcombo = math.max(scoreTable.maxcombo, scoreTable.combo)
 		elseif newState == "missed" then
 			scoreTable.combo = 0
+			scoreTable.misscount = scoreTable.misscount + 1
 		end
 	elseif event.noteType == "LongScoreNote" then
 		if oldState == "clear" then
@@ -50,8 +54,10 @@ receive = function(event)
 				scoreTable.maxcombo = math.max(scoreTable.maxcombo, scoreTable.combo)
 			elseif newState == "startMissed" then
 				scoreTable.combo = 0
+				scoreTable.misscount = scoreTable.misscount + 1
 			elseif newState == "startMissedPressed" then
 				scoreTable.combo = 0
+				scoreTable.misscount = scoreTable.misscount + 1
 			end
 		elseif oldState == "startPassedPressed" then
 			if newState == "startMissed" then
@@ -59,6 +65,7 @@ receive = function(event)
 			elseif newState == "endMissed" then
 				scoreTable.combo = 0
 			elseif newState == "endPassed" then
+				scoreTable.hitcount = scoreTable.hitcount + 1
 			end
 		elseif oldState == "startMissedPressed" then
 			if newState == "endMissedPassed" then

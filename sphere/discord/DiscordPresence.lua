@@ -1,4 +1,4 @@
-local discordrpc = require("discordrpc.discordrpc")
+local discordrpc = require("discordrpc.discordRPC")
 
 local DiscordPresence = {}
 
@@ -30,9 +30,9 @@ DiscordPresence.appId = "594443609668059149"
 
 DiscordPresence.load = function(self)
 	discordrpc.initialize(self.appId, true)
-	
+
 	self.presence = {}
-	
+
 	self.nextUpdate = 0
 end
 

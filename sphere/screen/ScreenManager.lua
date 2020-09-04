@@ -1,28 +1,13 @@
 local Screen			= require("sphere.screen.Screen")
-local TransitionManager	= require("sphere.screen.TransitionManager")
 
 local ScreenManager = {}
 
 ScreenManager.init = function(self)
 	self.currentScreen = Screen:new()
-
-	TransitionManager:init()
-	
-	local BrowserScreen		= require("sphere.screen.browser.BrowserScreen")
-	local GameplayScreen	= require("sphere.screen.gameplay.GameplayScreen")
-	local ResultScreen		= require("sphere.screen.result.ResultScreen")
-	local SelectScreen		= require("sphere.screen.select.SelectScreen")
-	local SettingsScreen	= require("sphere.screen.settings.SettingsScreen")
-	
-	BrowserScreen:init()
-	GameplayScreen:init()
-	ResultScreen:init()
-	SelectScreen:init()
-	SettingsScreen:init()
 end
 
 ScreenManager.set = function(self, screen, callback)
-	TransitionManager:transit(function()
+	self.transition:transit(function()
 		self.currentScreen:unload()
 		self.currentScreen = screen
 		screen:load()
@@ -32,15 +17,19 @@ ScreenManager.set = function(self, screen, callback)
 	end)
 end
 
+ScreenManager.setTransition = function(self, transition)
+	self.transition = transition
+end
+
 ScreenManager.update = function(self, dt)
 	self.currentScreen:update(dt)
-	TransitionManager:update(dt)
+	self.transition:update(dt)
 end
 
 ScreenManager.draw = function(self)
-	TransitionManager:drawBefore()
+	self.transition:drawBefore()
 	self.currentScreen:draw()
-	TransitionManager:drawAfter()
+	self.transition:drawAfter()
 end
 
 ScreenManager.receive = function(self, event)
@@ -50,5 +39,7 @@ end
 ScreenManager.unload = function(self)
 	self.currentScreen:unload()
 end
+
+ScreenManager:init()
 
 return ScreenManager

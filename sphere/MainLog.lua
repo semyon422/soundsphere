@@ -16,4 +16,6 @@ MainLog.receive = function(self, event)
 	end
 end
 
+MainLog:init()
+
 return MainLog

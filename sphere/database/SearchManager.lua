@@ -1,3 +1,5 @@
+local ScoreManager = require("sphere.database.ScoreManager")
+
 local SearchManager = {}
 
 SearchManager.search = function(self, list, searchString)
@@ -42,12 +44,27 @@ SearchManager.find = function(self, entry, searchSubString)
 	end
 end
 
+SearchManager.checkTag = function(self, entry, value)
+	if value == "played" then
+		local scores = ScoreManager:getScoreEntries(entry.hash, entry.index)
+		if scores then
+			return value
+		end
+	end
+end
+
 SearchManager.checkFilter = function(self, entry, key, operator, value)
 	local value1 = tonumber(entry[key])
 	local value2 = tonumber(value)
 
 	if not value1 or not value2 then
-		return self:checkFilterString(tostring(entry[key]), tostring(value), operator)
+		local entryKey
+		if key ~= "tag" then
+			entryKey = tostring(entry[key])
+		else
+			entryKey = self:checkTag(entry, value)
+		end
+		return self:checkFilterString(entryKey, tostring(value), operator)
 	end
 	
 	return self:checkFilterNumber(value1, value2, operator)

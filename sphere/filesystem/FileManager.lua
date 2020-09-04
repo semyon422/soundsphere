@@ -36,18 +36,21 @@ local sortPaths = function(a, b)
 end
 
 FileManager.addPath = function(self, path, priority)
-	if not self.priority[path] then
-		self.paths[#self.paths + 1] = path
+	local paths = self.paths
+	local spriority = self.priority
+	if not spriority[path] then
+		paths[#paths + 1] = path
 	end
-	self.priority[path] = priority or 0
-	table.sort(self.paths, sortPaths)
+	spriority[path] = priority or 0
+	table.sort(paths, sortPaths)
 end
 
 FileManager.removePath = function(self, path)
+	local paths = self.paths
 	self.priority[path] = nil
-	for i = 1, #self.paths do
-		if self.paths[i] == path then
-			table.remove(self.paths, i)
+	for i = 1, #paths do
+		if paths[i] == path then
+			table.remove(paths, i)
 		end
 	end
 end
@@ -55,18 +58,17 @@ end
 FileManager.findFile = function(self, fileName, fileType)
 	local originalFileName = fileName:gsub("\\", "/")
 	local fileName = self:removeExtension(originalFileName, fileType)
-	
+
 	for _, path in ipairs(self.paths) do
 		local originalFilePath = path .. "/" .. originalFileName
-		if
-			love.filesystem.exists(originalFilePath) and
-			self:getType(originalFileName) == fileType
-		then
+		local info = love.filesystem.getInfo(originalFilePath)
+		if info and self:getType(originalFileName) == fileType then
 			return originalFilePath
 		end
 		for _, format in ipairs(self.Formats[fileType]) do
 			local filePath = path .. "/" .. fileName .. "." .. format
-			if love.filesystem.exists(filePath) then
+			local info = love.filesystem.getInfo(filePath)
+			if info then
 				return filePath
 			end
 		end
@@ -80,7 +82,7 @@ FileManager.removeExtension = function(self, fileName, fileType)
 			return fileName:sub(1, position - 1)
 		end
 	end
-	
+
 	return fileName
 end
 
