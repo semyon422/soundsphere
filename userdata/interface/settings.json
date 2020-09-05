@@ -21,7 +21,7 @@
 		"scale": 0.66,
 		"layer": 2,
 		"image": "resources/icons/ic_settings_white_48dp.png",
-		"interact": ["ScreenManager:set(SettingsScreen)"]
+		"events": [{"name": "setScreen", "screenName": "SettingsScreen"}]
 	},
 	{
 		"name": "BrowserButton",
@@ -34,7 +34,7 @@
 		"scale": 0.66,
 		"layer": 2,
 		"image": "resources/icons/ic_folder_open_white_48dp.png",
-		"interact": ["ScreenManager:set(BrowserScreen)"]
+		"events": [{"name": "setScreen", "screenName": "BrowserScreen"}]
 	},
 	{
 		"name": "SelectButton",
@@ -47,6 +47,6 @@
 		"scale": 0.66,
 		"layer": 2,
 		"image": "resources/icons/ic_menu_white_48dp.png",
-		"interact": ["ScreenManager:set(SelectScreen)"]
+		"events": [{"name": "setScreen", "screenName": "SelectScreen"}]
 	}
 ]

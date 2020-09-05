@@ -15,11 +15,10 @@ ImageButton.loadGui = function(self)
 	self.layer = self.data.layer
 
 	self.interact = function()
-		local sequence = self.data.interact
-		if not sequence then return end
-		for i = 1, #sequence do
-			local f = self.gui.functions[sequence[i]]
-			if f then f() end
+		local events = self.data.events
+		if not events then return end
+		for i = 1, #events do
+			self.gui.observable:send(events[i])
 		end
 	end
 

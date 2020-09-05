@@ -16,7 +16,8 @@ BackgroundManager.init = function(self)
 end
 
 BackgroundManager.loadDrawableBackground = function(self, path)
-	if not love.filesystem.isFile(path) then
+	local info = love.filesystem.getInfo(path)
+	if not info or info.type == "directory" then
 		return
 	end
 	if path ~= self.currentPath then
@@ -143,5 +144,7 @@ BackgroundManager.reload = function(self, event)
 		self.backgrounds[i]:reload()
 	end
 end
+
+BackgroundManager:init()
 
 return BackgroundManager

@@ -1,0 +1,1 @@
+return function(self) end
