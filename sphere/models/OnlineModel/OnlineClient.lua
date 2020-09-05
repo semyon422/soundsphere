@@ -8,7 +8,7 @@ local OnlineClient = Class:new()
 
 OnlineClient.path = "userdata/online.json"
 
-OnlineClient.init = function(self)
+OnlineClient.construct = function(self)
 	self.observable = Observable:new()
 	self.data = {}
 end
