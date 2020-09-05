@@ -26,8 +26,8 @@ OnlineModel.unload = function(self)
     self.onlineClient:unload()
 end
 
-OnlineModel.submit = function(self, score)
-    self.onlineScoreManager:submit(score)
+OnlineModel.submit = function(self, scoreTable, noteChartDataEntry, replayHash, modifierModel)
+    self.onlineScoreManager:submit(scoreTable, noteChartDataEntry, replayHash, modifierModel)
 end
 
 OnlineModel.receive = function(self, event)

@@ -22,19 +22,21 @@ OnlineScoreManager.receive = function(self, event)
 	end
 end
 
-OnlineScoreManager.convertToOnlineScore = function(self, score)
+OnlineScoreManager.convertToOnlineScore = function(self, scoreTable, noteChartDataEntry, replayHash, modifierModel)
 	return {
-		hash = score.hash,
+		hash = noteChartDataEntry.hash,
+		index = noteChartDataEntry.index,
 		time = os.time(),
-		score = score.score,
-		accuracy = score.accuracy,
-		maxCombo = score.maxcombo,
-		modifiers = "None"
+		score = scoreTable.score,
+		accuracy = scoreTable.accuracy,
+		maxCombo = scoreTable.maxcombo,
+		modifiers = modifierModel:getString(),
+		replayHash = replayHash
 	}
 end
 
-OnlineScoreManager.submit = function(self, score)
-	local onlineScore = self:convertToOnlineScore(score)
+OnlineScoreManager.submit = function(self, scoreTable, noteChartDataEntry, replayHash, modifierModel)
+	local onlineScore = self:convertToOnlineScore(scoreTable, noteChartDataEntry, replayHash, modifierModel)
 
 	return ThreadPool:execute(
 		[[
@@ -52,11 +54,13 @@ OnlineScoreManager.submit = function(self, score)
 					userId			= tostring(data[1]),
 					sessionId		= tostring(data[2]),
 					hash			= tostring(data[3]),
-					score			= tostring(data[4]),
-					accuracy		= tostring(data[5]),
-					modifiers			= tostring(data[6]),
+					index			= tostring(data[4]),
+					score			= tostring(data[5]),
+					accuracy		= tostring(data[6]),
 					maxCombo		= tostring(data[7]),
-					time			= tostring(data[8])
+					replayHash		= tostring(data[8]),
+					modifiers		= tostring(data[9]),
+					time			= tostring(data[10])
 				}
 			})
 
@@ -70,10 +74,12 @@ OnlineScoreManager.submit = function(self, score)
 			self.onlineClient:getUserId(),
 			self.onlineClient:getSessionId(),
 			onlineScore.hash,
+			onlineScore.index,
 			onlineScore.score,
 			onlineScore.accuracy,
-			onlineScore.modifiers,
 			onlineScore.maxCombo,
+			onlineScore.replayHash,
+			onlineScore.modifiers,
 			onlineScore.time
 		}
 	)
