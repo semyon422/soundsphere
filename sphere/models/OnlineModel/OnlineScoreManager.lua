@@ -17,8 +17,8 @@ OnlineScoreManager.unload = function(self)
 end
 
 OnlineScoreManager.receive = function(self, event)
-	if event.name == "ScoreSubmit" then
-		print(event.body)
+	if event.name == "ScoreSubmitResponse" then
+		self.onlineModel:receive(event)
 	end
 end
 
@@ -65,7 +65,7 @@ OnlineScoreManager.submit = function(self, scoreTable, noteChartDataEntry, repla
 			})
 
 			thread:push({
-				name = "ScoreSubmit",
+				name = "ScoreSubmitResponse",
 				status = response.code == 200,
 				body = response.body
 			})

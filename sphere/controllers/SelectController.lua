@@ -14,7 +14,6 @@ SelectController.construct = function(self)
 	self.noteSkinModel = NoteSkinModel:new()
 	self.noteChartModel = NoteChartModel:new()
 	self.inputModel = InputModel:new()
-	self.cacheModel = CacheModel:new()
 	self.modifierController = ModifierController:new()
 end
 

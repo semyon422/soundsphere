@@ -7,6 +7,7 @@ local ScoreModel				= require("sphere.models.ScoreModel")
 local DiscordPresence			= require("sphere.discord.DiscordPresence")
 local MountModel				= require("sphere.models.MountModel")
 local MountController			= require("sphere.controllers.MountController")
+local OnlineController			= require("sphere.controllers.OnlineController")
 local ScreenManager				= require("sphere.screen.ScreenManager")
 local FadeTransition			= require("sphere.screen.FadeTransition")
 local SelectController			= require("sphere.controllers.SelectController")
@@ -18,6 +19,7 @@ local NotificationView			= require("sphere.views.NotificationView")
 local NotificationModel			= require("sphere.models.NotificationModel")
 local ThemeModel				= require("sphere.models.ThemeModel")
 local OnlineModel				= require("sphere.models.OnlineModel")
+local CacheModel				= require("sphere.models.CacheModel")
 
 local GameController = Class:new()
 
@@ -28,10 +30,12 @@ GameController.construct = function(self)
 	self.windowManager = WindowManager:new()
 	self.mountModel = MountModel:new()
 	self.mountController = MountController:new()
+	self.onlineController = OnlineController:new()
 	self.screenshot = Screenshot:new()
 	self.themeModel = ThemeModel:new()
 	self.scoreModel = ScoreModel:new()
 	self.onlineModel = OnlineModel:new()
+	self.cacheModel = CacheModel:new()
 end
 
 GameController.load = function(self)
@@ -41,11 +45,16 @@ GameController.load = function(self)
 	local windowManager = self.windowManager
 	local mountModel = self.mountModel
 	local mountController = self.mountController
+	local onlineController = self.onlineController
 	local screenshot = self.screenshot
 	local themeModel = self.themeModel
 	local scoreModel = self.scoreModel
 	local onlineModel = self.onlineModel
+	local cacheModel = self.cacheModel
 
+	onlineController.onlineModel = onlineModel
+	onlineController.cacheModel = cacheModel
+	onlineModel.observable:add(onlineController)
 	onlineModel:load()
 
 	themeModel.configModel = configModel
@@ -77,6 +86,7 @@ GameController.load = function(self)
 	selectController.themeModel = themeModel
 	selectController.scoreModel = scoreModel
 	selectController.onlineModel = onlineModel
+	selectController.cacheModel = cacheModel
 
 	ScreenManager:set(selectController)
 end
