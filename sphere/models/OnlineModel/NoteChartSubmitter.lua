@@ -34,7 +34,8 @@ NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry)
 
             local noteChartFile = love.filesystem.newFile(path, "r")
             local content = noteChartFile:read()
-            local tempFile = io.open("temp", "wb")
+            local tempName = os.tmpname()
+            local tempFile = io.open(tempName, "wb")
             tempFile:write(content)
             tempFile:close()
 
@@ -58,13 +59,13 @@ NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry)
             thread:push({
 				name = "NoteChartSubmitResponse",
 				body = result.body
-			})
+            })
 
             print("request 2")
             local result, err, message = request.send("https://soundsphere.xyz/noteChart", {
                 method = "POST",
                 files = {
-                    noteChart = "temp"
+                    noteChart = tempName
                 }
             })
 
@@ -77,7 +78,9 @@ NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry)
             thread:push({
 				name = "NoteChartSubmitResponse",
 				body = result.body
-			})
+            })
+            
+            os.remove(tempName)
 		]],
 		{noteChartEntry.path, noteChartEntry.hash}
 	)

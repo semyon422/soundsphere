@@ -32,7 +32,8 @@ ReplaySubmitter.submitReplay = function(self, replayHash)
 
             local replayFile = love.filesystem.newFile("userdata/replays/" .. hash, "r")
             local content = replayFile:read()
-            local tempFile = io.open("temp", "wb")
+            local tempName = os.tmpname()
+            local tempFile = io.open(tempName, "wb")
             tempFile:write(content)
             tempFile:close()
 
@@ -41,7 +42,7 @@ ReplaySubmitter.submitReplay = function(self, replayHash)
             local result, err, message = request.send("https://soundsphere.xyz/replay", {
                 method = "POST",
                 files = {
-                    replay = "temp"
+                    replay = tempName
                 }
             })
 
@@ -54,7 +55,9 @@ ReplaySubmitter.submitReplay = function(self, replayHash)
             thread:push({
 				name = "ReplaySubmitResponse",
 				body = result.body
-			})
+            })
+
+            os.remove(tempName)
 		]],
 		{replayHash}
 	)
