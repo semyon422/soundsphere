@@ -12,7 +12,8 @@ OnlineController.receive = function(self, event)
 		end
 		if event.response.needReplaySubmit then
 			print("Server requested to upload the replay")
-			print("Not implemented")
+			print("Uploading...")
+			self:submitReplay(event.response.score.replayHash)
 		end
 	elseif event.name == "NoteChartSubmitResponse" then
 		print(event.response.message)
@@ -25,6 +26,10 @@ OnlineController.submitNoteChart = function(self, noteChartHash)
 	if noteChartsAtHash then
 		self.onlineModel:submitNoteChart(noteChartsAtHash[1])
 	end
+end
+
+OnlineController.submitReplay = function(self, replayHash)
+	self.onlineModel:submitReplay(replayHash)
 end
 
 return OnlineController
