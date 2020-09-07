@@ -28,9 +28,9 @@ NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry)
 
 	return ThreadPool:execute(
 		[[
-            local arg = {...}
-            local path = arg[1]
-            local hash = arg[2]
+			local data = ({...})[1]
+            local path = data.path
+            local hash = data.hash
 
             local noteChartFile = love.filesystem.newFile(path, "r")
             local content = noteChartFile:read()
@@ -42,7 +42,7 @@ NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry)
             local request = require("luajit-request")
 
             print("request 1")
-            local result, err, message = request.send("https://soundsphere.xyz/noteChart", {
+            local result, err, message = request.send(data.host .. "/noteChart", {
                 method = "POST",
                 data = {
                     fileName = path:match("^.+/(.-)$"),
@@ -82,7 +82,13 @@ NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry)
             
             os.remove(tempName)
 		]],
-		{noteChartEntry.path, noteChartEntry.hash}
+        {
+            {
+                host = self.host,
+                hash = noteChartEntry.hash,
+                path = noteChartEntry.path
+            }
+        }
 	)
 end
 

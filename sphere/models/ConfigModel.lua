@@ -104,7 +104,11 @@ ConfigModel.defaultValues = {
 	["screenshot.capture"] = "f12",
 	["screenshot.open"] = "lshift",
 
-	["replay.type"] = "NanoChart"
+	["replay.type"] = "NanoChart",
+
+	["online.host"] = "https://soundsphere.xyz",
+	["online.sessionId"] = 0,
+	["online.userId"] = 1
 }
 
 return ConfigModel

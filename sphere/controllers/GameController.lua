@@ -54,8 +54,7 @@ GameController.load = function(self)
 
 	onlineController.onlineModel = onlineModel
 	onlineController.cacheModel = cacheModel
-	onlineModel.observable:add(onlineController)
-	onlineModel:load()
+	onlineController.configModel = configModel
 
 	themeModel.configModel = configModel
 	themeModel:load()
@@ -74,6 +73,12 @@ GameController.load = function(self)
 
 	scoreModel:select()
 	configModel:read()
+
+	onlineModel.observable:add(onlineController)
+	onlineModel:setHost(configModel:get("online.host"))
+	onlineModel:setSessionId(configModel:get("online.sessionId"))
+	onlineModel:setUserId(configModel:get("online.userId"))
+	onlineModel:load()
 
 	DiscordPresence:load()
 

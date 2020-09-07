@@ -22,45 +22,30 @@ OnlineScoreManager.receive = function(self, event)
 	end
 end
 
-OnlineScoreManager.convertToOnlineScore = function(self, scoreTable, noteChartDataEntry, replayHash, modifierModel)
-	return {
-		hash = noteChartDataEntry.hash,
-		index = noteChartDataEntry.index,
-		time = os.time(),
-		score = scoreTable.score,
-		accuracy = scoreTable.accuracy,
-		maxCombo = scoreTable.maxcombo,
-		modifiers = modifierModel:getString(),
-		replayHash = replayHash
-	}
-end
-
 OnlineScoreManager.submit = function(self, scoreTable, noteChartDataEntry, replayHash, modifierModel)
-	local onlineScore = self:convertToOnlineScore(scoreTable, noteChartDataEntry, replayHash, modifierModel)
-
 	return ThreadPool:execute(
 		[[
 			local http = require("aqua.http")
 			local request = require("luajit-request")
 
-			local data = {...}
-			for i, v in ipairs(data) do
-				data[i] = tostring(v)
+			local data = ({...})[1]
+			for k, v in pairs(data) do
+				data[k] = tostring(v)
 			end
 
-			local response = request.send("https://soundsphere.xyz/score", {
+			local response = request.send(data.host .. "/score", {
 				method = "POST",
 				data = {
-					userId			= tostring(data[1]),
-					sessionId		= tostring(data[2]),
-					hash			= tostring(data[3]),
-					index			= tostring(data[4]),
-					score			= tostring(data[5]),
-					accuracy		= tostring(data[6]),
-					maxCombo		= tostring(data[7]),
-					replayHash		= tostring(data[8]),
-					modifiers		= tostring(data[9]),
-					time			= tostring(data[10])
+					userId = data.userId,
+					sessionId = data.sessionId,
+					hash = data.hash,
+					index = data.index,
+					score = data.score,
+					accuracy = data.accuracy,
+					maxCombo = data.maxCombo,
+					replayHash = data.replayHash,
+					modifiers = data.modifiers,
+					time = data.time
 				}
 			})
 
@@ -71,16 +56,19 @@ OnlineScoreManager.submit = function(self, scoreTable, noteChartDataEntry, repla
 			})
 		]],
 		{
-			self.onlineClient:getUserId(),
-			self.onlineClient:getSessionId(),
-			onlineScore.hash,
-			onlineScore.index,
-			onlineScore.score,
-			onlineScore.accuracy,
-			onlineScore.maxCombo,
-			onlineScore.replayHash,
-			onlineScore.modifiers,
-			onlineScore.time
+			{
+				host = self.host,
+				userId = self.userId,
+				sessionId = self.sessionId,
+				hash = noteChartDataEntry.hash,
+				index = noteChartDataEntry.index,
+				time = os.time(),
+				score = scoreTable.score,
+				accuracy = scoreTable.accuracy,
+				maxCombo = scoreTable.maxcombo,
+				modifiers = modifierModel:getString(),
+				replayHash = replayHash
+			}
 		}
 	)
 end

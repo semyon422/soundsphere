@@ -27,10 +27,9 @@ ReplaySubmitter.submitReplay = function(self, replayHash)
 
 	return ThreadPool:execute(
 		[[
-            local arg = {...}
-            local hash = arg[1]
+			local data = ({...})[1]
 
-            local replayFile = love.filesystem.newFile("userdata/replays/" .. hash, "r")
+            local replayFile = love.filesystem.newFile("userdata/replays/" .. data.hash, "r")
             local content = replayFile:read()
             local tempName = os.tmpname()
             local tempFile = io.open(tempName, "wb")
@@ -39,7 +38,7 @@ ReplaySubmitter.submitReplay = function(self, replayHash)
 
             local request = require("luajit-request")
 
-            local result, err, message = request.send("https://soundsphere.xyz/replay", {
+            local result, err, message = request.send(data.host .. "/replay", {
                 method = "POST",
                 files = {
                     replay = tempName
@@ -59,7 +58,12 @@ ReplaySubmitter.submitReplay = function(self, replayHash)
 
             os.remove(tempName)
 		]],
-		{replayHash}
+		{
+            {
+                host = self.host,
+                hash = replayHash
+            }
+        }
 	)
 end
 
