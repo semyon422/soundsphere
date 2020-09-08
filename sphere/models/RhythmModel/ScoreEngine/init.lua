@@ -51,4 +51,8 @@ ScoreEngine.getScoreNote = function(self, noteData)
 	return self.sharedScoreNotes[noteData]
 end
 
+ScoreEngine.setBasePath = function(self, path)
+	return self.scoreSystem:setBasePath(path)
+end
+
 return ScoreEngine
