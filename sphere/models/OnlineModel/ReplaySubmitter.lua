@@ -22,7 +22,7 @@ ReplaySubmitter.receive = function(self, event)
 	end
 end
 
-ReplaySubmitter.submitReplay = function(self, replayHash)
+ReplaySubmitter.submitReplay = function(self, replayHash, url)
     print(replayHash)
 
 	return ThreadPool:execute(
@@ -38,7 +38,7 @@ ReplaySubmitter.submitReplay = function(self, replayHash)
 
             local request = require("luajit-request")
 
-            local result, err, message = request.send(data.host .. "/replay", {
+            local result, err, message = request.send(data.host .. "/" .. data.url, {
                 method = "POST",
                 files = {
                     replay = tempName
@@ -61,6 +61,7 @@ ReplaySubmitter.submitReplay = function(self, replayHash)
 		{
             {
                 host = self.host,
+                url = url,
                 hash = replayHash
             }
         }

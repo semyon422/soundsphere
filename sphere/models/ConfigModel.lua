@@ -107,7 +107,8 @@ ConfigModel.defaultValues = {
 	["replay.type"] = "NanoChart",
 
 	["online.host"] = "https://soundsphere.xyz",
-	["online.sessionId"] = 0,
+	["online.session"] = "",
+	["online.token"] = "",
 	["online.userId"] = 1
 }
 

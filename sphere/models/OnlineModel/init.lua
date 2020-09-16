@@ -43,12 +43,12 @@ OnlineModel.submit = function(self, scoreTable, noteChartDataEntry, replayHash, 
 	self.onlineScoreManager:submit(scoreTable, noteChartDataEntry, replayHash, modifierModel)
 end
 
-OnlineModel.submitNoteChart = function(self, noteChartEntry)
-	self.noteChartSubmitter:submitNoteChart(noteChartEntry)
+OnlineModel.submitNoteChart = function(self, noteChartEntry, url)
+	self.noteChartSubmitter:submitNoteChart(noteChartEntry, url)
 end
 
-OnlineModel.submitReplay = function(self, replayHash)
-	self.replaySubmitter:submitReplay(replayHash)
+OnlineModel.submitReplay = function(self, replayHash, url)
+	self.replaySubmitter:submitReplay(replayHash, url)
 end
 
 OnlineModel.setHost = function(self, host)
@@ -57,10 +57,10 @@ OnlineModel.setHost = function(self, host)
 	self.noteChartSubmitter.host = host
 end
 
-OnlineModel.setSessionId = function(self, sessionId)
-	self.replaySubmitter.sessionId = sessionId
-	self.onlineScoreManager.sessionId = sessionId
-	self.noteChartSubmitter.sessionId = sessionId
+OnlineModel.setSession = function(self, session)
+	self.replaySubmitter.session = session
+	self.onlineScoreManager.session = session
+	self.noteChartSubmitter.session = session
 end
 
 OnlineModel.setUserId = function(self, userId)

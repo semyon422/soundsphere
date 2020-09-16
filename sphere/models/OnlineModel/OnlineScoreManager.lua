@@ -36,16 +36,11 @@ OnlineScoreManager.submit = function(self, scoreTable, noteChartDataEntry, repla
 			local response = request.send(data.host .. "/score", {
 				method = "POST",
 				data = {
-					userId = data.userId,
-					sessionId = data.sessionId,
-					hash = data.hash,
-					index = data.index,
-					score = data.score,
-					accuracy = data.accuracy,
-					maxCombo = data.maxCombo,
-					replayHash = data.replayHash,
-					modifiers = data.modifiers,
-					time = data.time
+					session = data.session,
+					replay_hash = data.replayHash,
+					notechart_hash = data.hash,
+					notechart_index = data.index,
+					notechart_filename = data.fileName
 				}
 			})
 
@@ -58,16 +53,11 @@ OnlineScoreManager.submit = function(self, scoreTable, noteChartDataEntry, repla
 		{
 			{
 				host = self.host,
-				userId = self.userId,
-				sessionId = self.sessionId,
+				session = self.session,
+				replayHash = replayHash,
 				hash = noteChartDataEntry.hash,
 				index = noteChartDataEntry.index,
-				time = os.time(),
-				score = scoreTable.score,
-				accuracy = scoreTable.accuracy,
-				maxCombo = scoreTable.maxcombo,
-				modifiers = modifierModel:getString(),
-				replayHash = replayHash
+				fileName = "123.bms"
 			}
 		}
 	)

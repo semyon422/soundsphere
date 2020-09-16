@@ -2,7 +2,6 @@ local ThreadPool	= require("aqua.thread.ThreadPool")
 local Observable	= require("aqua.util.Observable")
 local Class			= require("aqua.util.Class")
 
-
 local NoteChartSubmitter = Class:new()
 
 NoteChartSubmitter.construct = function(self)
@@ -23,14 +22,13 @@ NoteChartSubmitter.receive = function(self, event)
 	end
 end
 
-NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry)
+NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry, url)
     print(noteChartEntry.path)
 
 	return ThreadPool:execute(
 		[[
 			local data = ({...})[1]
             local path = data.path
-            local hash = data.hash
 
             local noteChartFile = love.filesystem.newFile(path, "r")
             local content = noteChartFile:read()
@@ -41,35 +39,14 @@ NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry)
 
             local request = require("luajit-request")
 
-            print("request 1")
-            local result, err, message = request.send(data.host .. "/noteChart", {
-                method = "POST",
-                data = {
-                    fileName = path:match("^.+/(.-)$"),
-                    hash = hash
-                }
-            })
-
-            if (not result) then
-                print(err, message)
-            end
-
-            print(result.body)
-            
-            thread:push({
-				name = "NoteChartSubmitResponse",
-				body = result.body
-            })
-
-            print("request 2")
-            local result, err, message = request.send("https://soundsphere.xyz/noteChart", {
+            local result, err, message = request.send(data.host .. "/" .. data.url, {
                 method = "POST",
                 files = {
-                    noteChart = tempName
+                    notechart = tempName
                 }
             })
 
-            if (not result) then
+            if not result then
                 print(err, message)
             end
 
@@ -85,7 +62,7 @@ NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry)
         {
             {
                 host = self.host,
-                hash = noteChartEntry.hash,
+                url = url,
                 path = noteChartEntry.path
             }
         }
