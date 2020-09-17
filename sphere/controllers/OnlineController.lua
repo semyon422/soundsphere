@@ -5,6 +5,7 @@ local OnlineController = Class:new()
 OnlineController.receive = function(self, event)
 	if event.name == "ScoreSubmitResponse" then
 		print(event.response.message)
+		print("Server received the score")
 		local noteChartUploadUrl = event.response.notechart
 		local replayUploadUrl = event.response.replay
 		if noteChartUploadUrl then
@@ -20,6 +21,9 @@ OnlineController.receive = function(self, event)
 	elseif event.name == "NoteChartSubmitResponse" then
 		print(event.response.message)
 		print("Server received the notechart")
+	elseif event.name == "ReplaySubmitResponse" then
+		print(event.response.message)
+		print("Server received the replay")
 	end
 end
 

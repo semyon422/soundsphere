@@ -70,8 +70,6 @@ OnlineModel.setUserId = function(self, userId)
 end
 
 OnlineModel.receive = function(self, event)
-	-- self.observable:send(event)
-
 	if event.name == "ScoreSubmitResponse" then
 		local status, response = pcall(json.decode, event.body)
 		if status then
@@ -87,6 +85,16 @@ OnlineModel.receive = function(self, event)
 		if status then
 			self.observable:send({
 				name = "NoteChartSubmitResponse",
+				response = response
+			})
+		else
+			print(event.body)
+		end
+	elseif event.name == "ReplaySubmitResponse" then
+		local status, response = pcall(json.decode, event.body)
+		if status then
+			self.observable:send({
+				name = "ReplaySubmitResponse",
 				response = response
 			})
 		else
