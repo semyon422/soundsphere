@@ -22,7 +22,7 @@ OnlineScoreManager.receive = function(self, event)
 	end
 end
 
-OnlineScoreManager.submit = function(self, scoreTable, noteChartDataEntry, replayHash, modifierModel)
+OnlineScoreManager.submit = function(self, noteChartEntry, noteChartDataEntry, replayHash)
 	return ThreadPool:execute(
 		[[
 			local http = require("aqua.http")
@@ -57,7 +57,7 @@ OnlineScoreManager.submit = function(self, scoreTable, noteChartDataEntry, repla
 				replayHash = replayHash,
 				hash = noteChartDataEntry.hash,
 				index = noteChartDataEntry.index,
-				fileName = "123.bms"
+				fileName = noteChartEntry.path:match("^.+/(.-)$")
 			}
 		}
 	)
