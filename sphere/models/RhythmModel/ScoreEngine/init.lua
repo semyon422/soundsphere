@@ -7,10 +7,10 @@ local ScoreEngine = Class:new()
 
 ScoreEngine.construct = function(self)
 	self.observable = Observable:new()
+	self.scoreSystem = ScoreSystem:new()
 end
 
 ScoreEngine.load = function(self)
-	self.scoreSystem = ScoreSystem:new()
 	self.scoreSystem:loadConfig("score.json")
 
 	self.sharedScoreNotes = {}
@@ -49,6 +49,10 @@ end
 
 ScoreEngine.getScoreNote = function(self, noteData)
 	return self.sharedScoreNotes[noteData]
+end
+
+ScoreEngine.setBasePath = function(self, path)
+	return self.scoreSystem:setBasePath(path)
 end
 
 return ScoreEngine

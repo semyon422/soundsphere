@@ -2,36 +2,35 @@ local ThreadPool	= require("aqua.thread.ThreadPool")
 local Observable	= require("aqua.util.Observable")
 local Class			= require("aqua.util.Class")
 
-local NoteChartSubmitter = Class:new()
+local ReplaySubmitter = Class:new()
 
-NoteChartSubmitter.construct = function(self)
+ReplaySubmitter.construct = function(self)
 	self.observable = Observable:new()
 end
 
-NoteChartSubmitter.load = function(self)
+ReplaySubmitter.load = function(self)
 	ThreadPool.observable:add(self)
 end
 
-NoteChartSubmitter.unload = function(self)
+ReplaySubmitter.unload = function(self)
 	ThreadPool.observable:remove(self)
 end
 
-NoteChartSubmitter.receive = function(self, event)
-	if event.name == "NoteChartSubmitResponse" then
+ReplaySubmitter.receive = function(self, event)
+	if event.name == "ReplaySubmitResponse" then
 		self.onlineModel:receive(event)
 	end
 end
 
-NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry, url)
-    print(noteChartEntry.path)
+ReplaySubmitter.submitReplay = function(self, replayHash, url)
+    print(replayHash)
 
 	return ThreadPool:execute(
 		[[
 			local data = ({...})[1]
-            local path = data.path
 
-            local noteChartFile = love.filesystem.newFile(path, "r")
-            local content = noteChartFile:read()
+            local replayFile = love.filesystem.newFile("userdata/replays/" .. data.hash, "r")
+            local content = replayFile:read()
             local tempName = os.tmpname()
             local tempFile = io.open(tempName, "wb")
             tempFile:write(content)
@@ -42,31 +41,31 @@ NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry, url)
             local result, err, message = request.send(data.host .. "/" .. data.url, {
                 method = "POST",
                 files = {
-                    notechart = tempName
+                    replay = tempName
                 }
             })
 
-            if not result then
+            if (not result) then
                 print(err, message)
             end
 
             print(result.body)
             
             thread:push({
-				name = "NoteChartSubmitResponse",
+				name = "ReplaySubmitResponse",
 				body = result.body
             })
-            
+
             os.remove(tempName)
 		]],
-        {
+		{
             {
                 host = self.host,
                 url = url,
-                path = noteChartEntry.path
+                hash = replayHash
             }
         }
 	)
 end
 
-return NoteChartSubmitter
+return ReplaySubmitter

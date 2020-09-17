@@ -239,4 +239,8 @@ RhythmModel.setVisualOffset = function(self, offset)
 	self.graphicEngine:setVisualOffset(offset)
 end
 
+RhythmModel.setScoreBasePath = function(self, path)
+	self.scoreEngine:setBasePath(path)
+end
+
 return RhythmModel

@@ -13,15 +13,20 @@ end
 
 ScoreSystem.construct = function(self)
 	self.observable = Observable:new()
-	self.scoreTable = {
-		timeRate = 1
-	}
+end
+
+ScoreSystem.setBasePath = function(self, path)
+	self.basePath = path
 end
 
 ScoreSystem.loadConfig = function(self, path)
 	local file = io.open(self.basePath .. "/" .. path, "r")
 	self.scoreConfig = json.decode(file:read("*all"))
 	file:close()
+
+	self.scoreTable = {
+		timeRate = 1
+	}
 
 	self:loadCounters()
 end
