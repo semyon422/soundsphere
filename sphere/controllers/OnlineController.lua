@@ -75,7 +75,7 @@ OnlineController.receive = function(self, event)
 			self.onlineModel:createSession(self.configModel:get("online.token"))
 		end
 	elseif event.name == "SessionUpdateResponse" then
-		print("Session updated")
+		print(event.response.message)
 	end
 end
 
