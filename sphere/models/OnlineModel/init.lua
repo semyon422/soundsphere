@@ -48,6 +48,10 @@ OnlineModel.submitNoteChart = function(self, noteChartEntry, url)
 	self.noteChartSubmitter:submitNoteChart(noteChartEntry, url)
 end
 
+OnlineModel.submitReplay = function(self, replayHash, url)
+	self.replaySubmitter:submitReplay(replayHash, url)
+end
+
 OnlineModel.createToken = function(self, ...)
 	self.authManager:createToken(...)
 end
