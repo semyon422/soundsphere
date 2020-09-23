@@ -32,7 +32,7 @@ NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry, url)
 
             local noteChartFile = love.filesystem.newFile(path, "r")
             local content = noteChartFile:read()
-            local tempName = os.tmpname()
+            local tempName = "nc" .. os.time()
             local tempFile = io.open(tempName, "wb")
             tempFile:write(content)
             tempFile:close()

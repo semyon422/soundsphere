@@ -31,7 +31,7 @@ ReplaySubmitter.submitReplay = function(self, replayHash, url)
 
             local replayFile = love.filesystem.newFile("userdata/replays/" .. data.hash, "r")
             local content = replayFile:read()
-            local tempName = os.tmpname()
+            local tempName = "rp" .. os.time()
             local tempFile = io.open(tempName, "wb")
             tempFile:write(content)
             tempFile:close()
