@@ -109,7 +109,9 @@ ConfigModel.defaultValues = {
 	["online.host"] = "https://soundsphere.xyz",
 	["online.session"] = "",
 	["online.token"] = "",
-	["online.userId"] = 1
+	["online.userId"] = 1,
+	["online.email"] = "",
+	["online.password"] = ""
 }
 
 return ConfigModel
