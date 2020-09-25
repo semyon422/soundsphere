@@ -49,7 +49,7 @@ NoteChartModel.selectNoteChart = function(self, id)
 		or self.cacheModel.cacheManager:getEmptyNoteChartDataEntry(self.noteChartEntry.path)
 end
 
-NoteChartModel.loadNoteChart = function(self)
+NoteChartModel.loadNoteChart = function(self, settings)
 	local noteChartEntry = self.noteChartEntry
 
 	if not noteChartEntry then
@@ -64,7 +64,8 @@ NoteChartModel.loadNoteChart = function(self)
 	local status, noteCharts = NoteChartFactory:getNoteCharts(
 		noteChartEntry.path,
 		content,
-		noteChartEntry.index
+		noteChartEntry.index,
+		settings
 	)
 	if not status then
 		error(noteCharts)

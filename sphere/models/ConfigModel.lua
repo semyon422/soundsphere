@@ -111,7 +111,8 @@ ConfigModel.defaultValues = {
 	["online.token"] = "",
 	["online.userId"] = 1,
 	["online.email"] = "",
-	["online.password"] = ""
+
+	["parser.setting1"] = "value"
 }
 
 return ConfigModel

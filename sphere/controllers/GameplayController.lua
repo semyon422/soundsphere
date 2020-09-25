@@ -54,7 +54,7 @@ GameplayController.load = function(self)
 
 	rhythmModel.modifierModel = modifierModel
 
-	local noteChart = noteChartModel:loadNoteChart()
+	local noteChart = noteChartModel:loadNoteChart(self:getImporterSettings())
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
 
@@ -96,6 +96,13 @@ GameplayController.load = function(self)
 	end)
 
 	rhythmModel.observable:add(view)
+end
+
+GameplayController.getImporterSettings = function(self)
+	local configModel = self.configModel
+	return {
+		setting1 = configModel:get("parser.setting1")
+	}
 end
 
 GameplayController.unload = function(self)
