@@ -76,6 +76,22 @@ OnlineController.receive = function(self, event)
 		end
 	elseif event.name == "SessionUpdateResponse" then
 		print(event.response.message)
+	elseif event.name == "QuickLoginGetResponse" then
+		if event.response.status then
+			print(event.response.key)
+			self.configModel:set("online.quick_login_key", event.response.key)
+			love.system.openURL(self.onlineModel.host .. "/quick_login?key=" .. event.response.key)
+		else
+			print(event.response.message)
+		end
+	elseif event.name == "QuickLoginPostResponse" then
+		if event.response.status then
+			event.name = "TokenResponse"
+			self:receive(event)
+			self.configModel:set("online.quick_login_key", "")
+		else
+			print(event.response.message)
+		end
 	end
 end
 

@@ -68,7 +68,14 @@ OnlineModel.updateSession = function(self, ...)
 	self.authManager:updateSession(...)
 end
 
+OnlineModel.quickLogin = function(self, ...)
+	if not self.session or self.session == "" then
+		self.authManager:quickLogin(...)
+	end
+end
+
 OnlineModel.setHost = function(self, host)
+	self.host = host
 	self.replaySubmitter.host = host
 	self.onlineScoreManager.host = host
 	self.noteChartSubmitter.host = host
@@ -76,6 +83,7 @@ OnlineModel.setHost = function(self, host)
 end
 
 OnlineModel.setSession = function(self, session)
+	self.session = session
 	self.replaySubmitter.session = session
 	self.onlineScoreManager.session = session
 	self.noteChartSubmitter.session = session
@@ -97,7 +105,9 @@ OnlineModel.receive = function(self, event)
 		name == "TokenResponse" or
 		name == "SessionResponse" or
 		name == "SessionCheckResponse" or
-		name == "SessionUpdateResponse"
+		name == "SessionUpdateResponse" or
+		name == "QuickLoginGetResponse" or
+		name == "QuickLoginPostResponse"
 	then
 		local status, response = pcall(json.decode, event.body)
 		if status then

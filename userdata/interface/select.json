@@ -60,6 +60,19 @@
 		"image": "resources/icons/ic_menu_white_48dp.png",
 		"events": [{"name": "setScreen", "screenName": "SelectScreen"}]
 	},
+	{
+		"name": "LoginButton",
+		"class": "ImageButton",
+		"cs": [1, 0, 0, 0, "h"],
+		"x": -0.066,
+		"y": 0,
+		"w": 0.066,
+		"h": 0.05,
+		"scale": 0.66,
+		"layer": 2,
+		"image": "resources/icons/ic_star_border_white_48dp.png",
+		"events": [{"name": "quickLogin"}]
+	},
 
 
 	{

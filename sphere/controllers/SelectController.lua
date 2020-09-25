@@ -102,6 +102,8 @@ SelectController.receive = function(self, event)
 		self:resetModifiedNoteChart()
 	elseif event.action == "replayNoteChart" then
 		self:replayNoteChart(event.mode, event.scoreEntry.replayHash)
+	elseif event.name == "quickLogin" then
+		self.onlineModel:quickLogin(self.configModel:get("online.quick_login_key"))
 	elseif event.name == "setScreen" then
 		if event.screenName == "BrowserScreen" then
 			local BrowserController = require("sphere.controllers.BrowserController")

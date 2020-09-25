@@ -25,6 +25,10 @@ AuthManager.receive = function(self, event)
 		self.onlineModel:receive(event)
 	elseif event.name == "SessionUpdateResponse" then
 		self.onlineModel:receive(event)
+	elseif event.name == "QuickLoginGetResponse" then
+		self.onlineModel:receive(event)
+	elseif event.name == "QuickLoginPostResponse" then
+		self.onlineModel:receive(event)
 	end
 end
 
@@ -157,6 +161,51 @@ AuthManager.updateSession = function(self)
 			{
 				host = self.host,
 				session = self.session,
+			}
+		}
+	)
+end
+
+AuthManager.quickLogin = function(self, key)
+	return ThreadPool:execute(
+		[[
+			local http = require("aqua.http")
+			local request = require("luajit-request")
+
+			local data = ({...})[1]
+			for k, v in pairs(data) do
+				data[k] = tostring(v)
+			end
+
+			if data.key and #data.key ~= 0 then
+				local response = request.send(data.host .. "/auth/quick", {
+					method = "POST",
+					data = {
+						key = data.key
+					}
+				})
+
+				thread:push({
+					name = "QuickLoginPostResponse",
+					status = response.code == 200,
+					body = response.body
+				})
+			else
+				local response = request.send(data.host .. "/auth/quick", {
+					method = "GET"
+				})
+
+				thread:push({
+					name = "QuickLoginGetResponse",
+					status = response.code == 200,
+					body = response.body
+				})
+			end
+		]],
+		{
+			{
+				host = self.host,
+				key = key
 			}
 		}
 	)
