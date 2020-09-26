@@ -131,6 +131,9 @@ NoteChartStateManager.receive = function(self, event)
 				type = "noteChartSetEntry",
 				id = item.noteChartSetEntry.id
 			})
+			self.observable:send({
+				name = "unloadModifiedNoteChart"
+			})
 		elseif sender == NoteChartList then
 			local item = NoteChartList.items[event.itemIndex]
 			if not item then return end
@@ -144,6 +147,9 @@ NoteChartStateManager.receive = function(self, event)
 			self:send({
 				sender = self,
 				action = "updateMetaData"
+			})
+			self.observable:send({
+				name = "unloadModifiedNoteChart"
 			})
 		end
 	elseif event.name == "search" then

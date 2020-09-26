@@ -98,6 +98,8 @@ SelectController.receive = function(self, event)
 		self:playNoteChart()
 	elseif event.name == "loadModifiedNoteChart" then
 		self:loadModifiedNoteChart()
+	elseif event.name == "unloadModifiedNoteChart" then
+		self:unloadModifiedNoteChart()
 	elseif event.name == "resetModifiedNoteChart" then
 		self:resetModifiedNoteChart()
 	elseif event.action == "replayNoteChart" then
@@ -142,6 +144,10 @@ SelectController.loadModifiedNoteChart = function(self)
 	if not self.noteChartModel.noteChart then
 		self:resetModifiedNoteChart()
 	end
+end
+
+SelectController.unloadModifiedNoteChart = function(self)
+	self.noteChartModel:unloadNoteChart()
 end
 
 SelectController.playNoteChart = function(self)
