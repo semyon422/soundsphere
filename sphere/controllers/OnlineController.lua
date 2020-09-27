@@ -91,6 +91,8 @@ OnlineController.receive = function(self, event)
 			self.configModel:set("online.quick_login_key", "")
 		else
 			print(event.response.message)
+			print("Quick login key was deleted")
+			self.configModel:set("online.quick_login_key", "")
 		end
 	end
 end
