@@ -147,6 +147,8 @@ ModifierModel.apply = function(self, modifierType)
 		if modifier.type == modifierType then
 			modifier.noteChartModel = self.noteChartModel
 			modifier.rhythmModel = self.rhythmModel
+			modifier.difficultyModel = self.difficultyModel
+			modifier.scoreModel = self.scoreModel
 			modifier:apply()
 		end
 	end

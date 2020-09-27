@@ -26,7 +26,11 @@ SequentialModifierButton.construct = function(self)
 		button = SliderButton:new(self)
 		button.item = self.item
 		button.updateValue = function(self, value)
-			modifier[modifier.variableName] = value
+			self.list.menu.observable:send({
+				name = "updateNumberModifier",
+				modifier = modifier,
+				value = value
+			})
 
 			SliderButton.updateValue(self, value)
 		end

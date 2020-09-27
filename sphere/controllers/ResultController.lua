@@ -1,12 +1,7 @@
 local Class				= require("aqua.util.Class")
 local ScreenManager		= require("sphere.screen.ScreenManager")
-local DifficultyModel	= require("sphere.models.DifficultyModel")
 
 local ResultController = Class:new()
-
-ResultController.construct = function(self)
-	self.difficultyModel = DifficultyModel:new()
-end
 
 ResultController.load = function(self)
 	local modifierModel = self.modifierModel

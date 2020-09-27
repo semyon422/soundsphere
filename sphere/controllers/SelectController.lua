@@ -6,6 +6,7 @@ local NoteSkinModel			= require("sphere.models.NoteSkinModel")
 local InputModel			= require("sphere.models.InputModel")
 local CacheModel			= require("sphere.models.CacheModel")
 local ModifierController	= require("sphere.controllers.ModifierController")
+local DifficultyModel		= require("sphere.models.DifficultyModel")
 
 local SelectController = Class:new()
 
@@ -15,6 +16,7 @@ SelectController.construct = function(self)
 	self.noteChartModel = NoteChartModel:new()
 	self.inputModel = InputModel:new()
 	self.modifierController = ModifierController:new()
+	self.difficultyModel = DifficultyModel:new()
 end
 
 SelectController.load = function(self)
@@ -29,6 +31,7 @@ SelectController.load = function(self)
 	local mountModel = self.mountModel
 	local scoreModel = self.scoreModel
 	local onlineModel = self.onlineModel
+	local difficultyModel = self.difficultyModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -39,6 +42,8 @@ SelectController.load = function(self)
 	noteChartModel.cacheModel = cacheModel
 	noteSkinModel.configModel = configModel
 	modifierModel.noteChartModel = noteChartModel
+	modifierModel.difficultyModel = difficultyModel
+	modifierModel.scoreModel = scoreModel
 
 	view.controller = self
 	view.themeModel = themeModel
@@ -53,6 +58,9 @@ SelectController.load = function(self)
 	view.onlineModel = onlineModel
 
 	modifierController.modifierModel = modifierModel
+	modifierController.noteChartModel = noteChartModel
+	modifierController.difficultyModel = difficultyModel
+	modifierController.scoreModel = scoreModel
 
 	inputModel:load()
 	modifierModel:load()
@@ -166,6 +174,7 @@ SelectController.playNoteChart = function(self)
 	gameplayController.notificationModel = self.notificationModel
 	gameplayController.scoreModel = self.scoreModel
 	gameplayController.onlineModel = self.onlineModel
+	gameplayController.difficultyModel = self.difficultyModel
 	gameplayController.selectController = self
 	return ScreenManager:set(gameplayController)
 end
@@ -210,6 +219,7 @@ SelectController.replayNoteChart = function(self, mode, hash)
 	gameplayController.themeModel = self.themeModel
 	gameplayController.scoreModel = self.scoreModel
 	gameplayController.onlineModel = self.onlineModel
+	gameplayController.difficultyModel = self.difficultyModel
 	gameplayController.selectController = self
 
 	if mode == "result" then
@@ -226,6 +236,7 @@ SelectController.replayNoteChart = function(self, mode, hash)
 		resultController.configModel = self.configModel
 		resultController.scoreModel = self.scoreModel
 		resultController.onlineModel = self.onlineModel
+		resultController.difficultyModel = self.difficultyModel
 		resultController.autoplay = gameplayController.rhythmModel.logicEngine.autoplay
 		resultController.selectController = self
 
