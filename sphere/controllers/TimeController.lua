@@ -18,12 +18,15 @@ TimeController.receive = function(self, event)
 		if key == configModel:get("gameplay.decreaseTimeRate") then
 			timeEngine:increaseTimeRate(-delta)
 			notificationModel:notify("timeRate: " .. timeEngine.timeRate)
+			rhythmModel.prohibitSavingScore = true
 		elseif key == configModel:get("gameplay.increaseTimeRate") then
 			timeEngine:increaseTimeRate(delta)
 			notificationModel:notify("timeRate: " .. timeEngine.timeRate)
+			rhythmModel.prohibitSavingScore = true
 		elseif key == configModel:get("gameplay.invertTimeRate") then
 			timeEngine:setTimeRate(-timeEngine.timeRate)
 			notificationModel:notify("timeRate: " .. timeEngine.timeRate)
+			rhythmModel.prohibitSavingScore = true
 		elseif key == configModel:get("gameplay.skipIntro") then
 			timeEngine:skipIntro()
 		elseif key == configModel:get("gameplay.invertPlaySpeed") then

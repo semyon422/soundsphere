@@ -154,9 +154,13 @@ GameplayController.receive = function(self, event)
 end
 
 GameplayController.saveScore = function(self)
-	local scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
-	local noteChartModel = self.noteChartModel
 	local rhythmModel = self.rhythmModel
+	if rhythmModel.prohibitSavingScore then
+		return
+	end
+
+	local scoreSystem = rhythmModel.scoreEngine.scoreSystem
+	local noteChartModel = self.noteChartModel
 	local modifierModel = rhythmModel.modifierModel
 	local replayModel = rhythmModel.replayModel
 	if scoreSystem.scoreTable.score > 0 and rhythmModel.replayModel.mode ~= "replay" and not rhythmModel.logicEngine.autoplay then
