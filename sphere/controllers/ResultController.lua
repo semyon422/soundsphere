@@ -3,12 +3,15 @@ local ScreenManager		= require("sphere.screen.ScreenManager")
 
 local ResultController = Class:new()
 
-ResultController.construct = function(self)
-end
-
 ResultController.load = function(self)
 	local modifierModel = self.modifierModel
 	local themeModel = self.themeModel
+	local noteChartModel = self.noteChartModel
+	local difficultyModel = self.difficultyModel
+
+	local difficulty = difficultyModel:getDifficulty(noteChartModel.noteChart)
+	print("difficulty", difficulty)
+	print("skill", difficulty / (self.scoreSystem.scoreTable.score / 1e6))
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -20,7 +23,7 @@ ResultController.load = function(self)
 	view.controller = self
 
 	view.scoreSystem = self.scoreSystem
-	view.noteChartModel = self.noteChartModel
+	view.noteChartModel = noteChartModel
 	view.configModel = self.configModel
 
 	view:load()

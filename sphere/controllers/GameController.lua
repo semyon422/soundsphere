@@ -80,6 +80,8 @@ GameController.load = function(self)
 	onlineModel:setUserId(configModel:get("online.userId"))
 	onlineModel:load()
 
+	onlineController:load()
+
 	DiscordPresence:load()
 
 	ScreenManager:setTransition(FadeTransition)
@@ -111,6 +113,7 @@ GameController.update = function(self, dt)
 	BackgroundManager:update(dt)
 	ScreenManager:update(dt)
 	self.notificationView:update(dt)
+	self.onlineController:update()
 end
 
 GameController.draw = function(self)

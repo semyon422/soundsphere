@@ -54,7 +54,7 @@ GameplayController.load = function(self)
 
 	rhythmModel.modifierModel = modifierModel
 
-	local noteChart = noteChartModel:loadNoteChart()
+	local noteChart = noteChartModel:loadNoteChart(self:getImporterSettings())
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
 
@@ -96,6 +96,13 @@ GameplayController.load = function(self)
 	end)
 
 	rhythmModel.observable:add(view)
+end
+
+GameplayController.getImporterSettings = function(self)
+	local configModel = self.configModel
+	return {
+		setting1 = configModel:get("parser.setting1")
+	}
 end
 
 GameplayController.unload = function(self)
@@ -140,6 +147,7 @@ GameplayController.receive = function(self, event)
 		resultController.modifierModel = self.modifierModel
 		resultController.autoplay = self.rhythmModel.logicEngine.autoplay
 		resultController.configModel = self.configModel
+		resultController.difficultyModel = self.difficultyModel
 		resultController.selectController = self.selectController
 
 		ScreenManager:set(resultController)
@@ -147,9 +155,13 @@ GameplayController.receive = function(self, event)
 end
 
 GameplayController.saveScore = function(self)
-	local scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
-	local noteChartModel = self.noteChartModel
 	local rhythmModel = self.rhythmModel
+	if rhythmModel.prohibitSavingScore then
+		return
+	end
+
+	local scoreSystem = rhythmModel.scoreEngine.scoreSystem
+	local noteChartModel = self.noteChartModel
 	local modifierModel = rhythmModel.modifierModel
 	local replayModel = rhythmModel.replayModel
 	if scoreSystem.scoreTable.score > 0 and rhythmModel.replayModel.mode ~= "replay" and not rhythmModel.logicEngine.autoplay then
