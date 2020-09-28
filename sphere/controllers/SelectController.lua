@@ -101,8 +101,6 @@ SelectController.receive = function(self, event)
 	elseif event.name == "selectNoteChart" then
 		if event.type == "noteChartEntry" then
 			self.noteChartModel:selectNoteChart(event.id)
-		elseif event.type == "noteChartSetEntry" then
-			self.noteChartModel:selectNoteChartSet(event.id)
 		end
 	elseif event.action == "playNoteChart" then
 		self:playNoteChart()

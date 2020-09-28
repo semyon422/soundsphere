@@ -127,11 +127,6 @@ NoteChartStateManager.receive = function(self, event)
 			self.noteChartSetEntry = item.noteChartSetEntry
 
 			self.observable:send({
-				name = "selectNoteChart",
-				type = "noteChartSetEntry",
-				id = item.noteChartSetEntry.id
-			})
-			self.observable:send({
 				name = "unloadModifiedNoteChart"
 			})
 		elseif sender == NoteChartList then
