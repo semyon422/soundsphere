@@ -89,6 +89,9 @@ ConfigModel.defaultValues = {
 	["gameplay.timeToPrepare"] = 2,
 	["gameplay.inputOffset"] = 0,
 	["select.selectRandomNoteChartSet"] = "f2",
+	["select.adjustDifficultyAccuracy"] = 26,
+	["select.adjustDifficultyPerformance"] = 300,
+	["select.adjustDifficulty"] = "f3",
 
 	["gameplay.invertPlaySpeed"] = "f2",
 	["gameplay.decreasePlaySpeed"] = "f3",

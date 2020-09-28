@@ -160,6 +160,28 @@ SettingsList.setGeneralItems = function(self)
 		step = 0.001,
 		format = "%d"
 	}
+	items[#items + 1] = {
+		name = "adjust accuracy",
+		configKey = "select.adjustDifficultyAccuracy",
+		type = "slider",
+		minValue = 10,
+		maxValue = 40,
+		minDisplayValue = 10,
+		maxDisplayValue = 40,
+		step = 1,
+		format = "%d"
+	}
+	items[#items + 1] = {
+		name = "adjust performance",
+		configKey = "adjustDifficultyPerformance",
+		type = "slider",
+		minValue = 50,
+		maxValue = 1000,
+		minDisplayValue = 50,
+		maxDisplayValue = 1000,
+		step = 50,
+		format = "%d"
+	}
 
 	return self:setItems(items)
 end
@@ -357,6 +379,11 @@ SettingsList.setInputItems = function(self)
 		name = "open screenshot",
 		type = "keybind",
 		configKey = "screenshot.open"
+	}
+	items[#items + 1] = {
+		name = "adjust difficulty",
+		type = "keybind",
+		configKey = "select.adjustDifficulty"
 	}
 
 	return self:setItems(items)
