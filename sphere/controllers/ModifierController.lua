@@ -37,8 +37,10 @@ ModifierController.adjustDifficulty = function(self)
 		selectController:loadModifiedNoteChart()
 		local performance = configModel:get("select.adjustDifficultyPerformance")
 		local difficulty = difficultyModel:getDifficulty(noteChartModel.noteChart)
+		if difficulty == 0 or difficulty ~= difficulty then
+			return
+		end
 		score = difficulty / performance * 1000000
-		print(score, performance, difficulty)
 	else
 		score = scores[1].score
 	end
