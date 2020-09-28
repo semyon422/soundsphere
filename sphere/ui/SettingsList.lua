@@ -175,11 +175,11 @@ SettingsList.setGeneralItems = function(self)
 		name = "adjust performance",
 		configKey = "adjustDifficultyPerformance",
 		type = "slider",
-		minValue = 50,
+		minValue = 25,
 		maxValue = 2000,
-		minDisplayValue = 50,
+		minDisplayValue = 25,
 		maxDisplayValue = 2000,
-		step = 50,
+		step = 25,
 		format = "%d"
 	}
 
