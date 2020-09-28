@@ -176,9 +176,9 @@ SettingsList.setGeneralItems = function(self)
 		configKey = "adjustDifficultyPerformance",
 		type = "slider",
 		minValue = 50,
-		maxValue = 1000,
+		maxValue = 2000,
 		minDisplayValue = 50,
-		maxDisplayValue = 1000,
+		maxDisplayValue = 2000,
 		step = 50,
 		format = "%d"
 	}
