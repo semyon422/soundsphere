@@ -49,7 +49,8 @@ ModifierController.adjustDifficulty = function(self)
 		return
 	end
 
-	local timeRate = math.floor(28 / score * 1000 * 100) / 100
+	local accuracy = configModel:get("select.adjustDifficultyAccuracy")
+	local timeRate = math.floor(accuracy / score * 1000 * 100) / 100
 
 	local TimeRateX = require("sphere.models.ModifierModel.TimeRateX")
 	for _, modifier in ipairs(modifierModel.inconsequential) do
