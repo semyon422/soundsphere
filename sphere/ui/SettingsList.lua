@@ -173,7 +173,7 @@ SettingsList.setGeneralItems = function(self)
 	}
 	items[#items + 1] = {
 		name = "adjust performance",
-		configKey = "adjustDifficultyPerformance",
+		configKey = "select.adjustDifficultyPerformance",
 		type = "slider",
 		minValue = 25,
 		maxValue = 2000,
