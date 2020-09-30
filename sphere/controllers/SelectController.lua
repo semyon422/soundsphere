@@ -61,6 +61,8 @@ SelectController.load = function(self)
 	modifierController.noteChartModel = noteChartModel
 	modifierController.difficultyModel = difficultyModel
 	modifierController.scoreModel = scoreModel
+	modifierController.configModel = configModel
+	modifierController.selectController = self
 
 	inputModel:load()
 	modifierModel:load()

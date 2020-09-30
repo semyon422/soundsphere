@@ -148,6 +148,10 @@ SelectView.receive = function(self, event)
 				name = "setScreen",
 				screenName = "SettingsScreen"
 			})
+		elseif key == (self.configModel:get("select.adjustDifficulty") or "f3") then
+			return self.controller:receive({
+				name = "adjustDifficulty"
+			})
 		end
 	end
 

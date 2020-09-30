@@ -95,7 +95,7 @@ SpeedMode.apply = function(self)
 	end
 	
 	local longestDuration = 0
-	local average, minimum, maximum
+	local average, minimum, maximum = 1, 1, 1
 	
 	for speed, duration in pairs(durations) do
 		if duration > longestDuration then

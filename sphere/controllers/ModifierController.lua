@@ -15,11 +15,9 @@ ModifierController.receive = function(self, event)
 		self.modifierModel:remove(event.modifier)
 	elseif event.name == "updateNumberModifier" then
 		event.modifier[event.modifier.variableName] = event.value
-	elseif event.name == "keypressed" then
-		if event.args[1] == "f3" then
-			self:adjustDifficulty()
-		end
-    end
+	elseif event.name == "adjustDifficulty" then
+		self:adjustDifficulty()
+	end
 end
 
 ModifierController.adjustDifficulty = function(self)
@@ -27,24 +25,32 @@ ModifierController.adjustDifficulty = function(self)
 	local difficultyModel = self.difficultyModel
 	local scoreModel = self.scoreModel
 	local modifierModel = self.modifierModel
+	local configModel = self.configModel
+	local selectController = self.selectController
 
-	-- local difficulty = difficultyModel:getDifficulty(noteChartModel.noteChart)
-    -- print("difficulty", difficulty)
+	local score
+	local scores = scoreModel:getScoreEntries(
+		noteChartModel.noteChartDataEntry.hash,
+		noteChartModel.noteChartDataEntry.index
+	)
+	if not scores or not scores[1] then
+		selectController:loadModifiedNoteChart()
+		local performance = configModel:get("select.adjustDifficultyPerformance")
+		local difficulty = difficultyModel:getDifficulty(noteChartModel.noteChart)
+		if difficulty == 0 or difficulty ~= difficulty then
+			return
+		end
+		score = difficulty / performance * 1000000
+	else
+		score = scores[1].score
+	end
 
-    local scores = scoreModel:getScoreEntries(
-        noteChartModel.noteChartDataEntry.hash,
-        noteChartModel.noteChartDataEntry.index
-    )
-    if not scores or not scores[1] then
-        return
-    end
+	if score == 0 or score > 100000 then
+		return
+	end
 
-    local score = scores[1].score
-    if score == 0 or score > 50000 then
-        return
-    end
-
-    local timeRate = math.floor(28 / score * 1000 * 100) / 100
+	local accuracy = configModel:get("select.adjustDifficultyAccuracy")
+	local timeRate = math.floor(accuracy / score * 1000 * 100) / 100
 
 	local TimeRateX = require("sphere.models.ModifierModel.TimeRateX")
 	for _, modifier in ipairs(modifierModel.inconsequential) do
