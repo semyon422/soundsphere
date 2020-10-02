@@ -14,6 +14,8 @@ BrowserController.load = function(self)
 	local theme = themeModel:getTheme()
 	self.theme = theme
 
+	self.selectController.inputModel:load()
+
 	local view = theme:newView("BrowserView")
 	self.view = view
 
@@ -28,6 +30,7 @@ BrowserController.load = function(self)
 end
 
 BrowserController.unload = function(self)
+	self.selectController.inputModel:unload()
 	self.view:unload()
 end
 

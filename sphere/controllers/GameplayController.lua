@@ -101,7 +101,7 @@ end
 GameplayController.getImporterSettings = function(self)
 	local configModel = self.configModel
 	return {
-		setting1 = configModel:get("parser.setting1")
+		midiConstantVolume = configModel:get("parser.midiConstantVolume")
 	}
 end
 

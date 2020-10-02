@@ -91,6 +91,15 @@ KeybindEditButton.receive = function(self, event)
 			value = self.value,
 			type = "joystick"
 		})
+	elseif event.name == "midipressed" and self.active then
+		self.active = false
+		self.value = tostring(event.args[1])
+		
+		self:send({
+			name = "valueChanged",
+			value = self.value,
+			type = "midi"
+		})
 	end
 end
 

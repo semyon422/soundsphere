@@ -18,6 +18,7 @@ local FullLongNote	= require("sphere.models.ModifierModel.FullLongNote")
 local ToOsu			= require("sphere.models.ModifierModel.ToOsu")
 local AutoKeySound	= require("sphere.models.ModifierModel.AutoKeySound")
 local MultiplePlay	= require("sphere.models.ModifierModel.MultiplePlay")
+local MinLnLength	= require("sphere.models.ModifierModel.MinLnLength")
 
 local ModifierModel = Class:new()
 
@@ -38,6 +39,7 @@ ModifierModel.modifiers = {
 	Random,
 	BracketSwap,
 	FullLongNote,
+	MinLnLength,
 	ToOsu
 }
 
