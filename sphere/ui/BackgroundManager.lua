@@ -24,6 +24,8 @@ BackgroundManager.loadDrawableBackground = function(self, path)
 		self.currentPath = path
 		if path:find("%.ojn$") then
 			return self:loadOJNBackground(path)
+		elseif path:find("%.mid$") then
+			return self:loadImageBackground("resources/midi/background.jpg")
 		else
 			return self:loadImageBackground(path)
 		end

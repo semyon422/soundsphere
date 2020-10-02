@@ -13,7 +13,8 @@ InputManager.offset = 0
 InputManager.types = {
 	"keyboard",
 	"gamepad",
-	"joystick"
+	"joystick",
+	"midi"
 }
 
 InputManager.construct = function(self)
@@ -62,18 +63,22 @@ InputManager.receive = function(self, event)
 	end
 
 	local keyConfig
-	if event.name == "keypressed" then
+	if event.name == "keypressed" and self.inputConfig.press.keyboard then
 		keyConfig = self.inputConfig.press.keyboard[event.args[1]]
-	elseif event.name == "keyreleased" then
+	elseif event.name == "keyreleased" and self.inputConfig.release.keyboard then
 		keyConfig = self.inputConfig.release.keyboard[event.args[1]]
 	elseif event.name == "gamepadpressed" then
 		keyConfig = self.inputConfig.press.gamepad[tostring(event.args[2])]
 	elseif event.name == "gamepadreleased" then
 		keyConfig = self.inputConfig.release.gamepad[tostring(event.args[2])]
-	elseif event.name == "joystickpressed" then
+	elseif event.name == "joystickpressed" and self.inputConfig.press.joystick then
 		keyConfig = self.inputConfig.press.joystick[tostring(event.args[2])]
-	elseif event.name == "joystickreleased" then
+	elseif event.name == "joystickreleased" and self.inputConfig.release.joystick then
 		keyConfig = self.inputConfig.release.joystick[tostring(event.args[2])]
+	elseif event.name == "midipressed" then
+		keyConfig = self.inputConfig.press.midi[tostring(event.args[1])]
+	elseif event.name == "midireleased" then
+		keyConfig = self.inputConfig.release.midi[tostring(event.args[1])]
 	end
 	if not keyConfig then
 		return

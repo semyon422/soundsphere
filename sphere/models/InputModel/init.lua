@@ -11,7 +11,8 @@ InputModel.mode = "external"
 InputModel.types = {
 	"keyboard",
 	"gamepad",
-	"joystick"
+	"joystick",
+	"midi"
 }
 
 InputModel.load = function(self)

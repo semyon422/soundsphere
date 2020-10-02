@@ -18,6 +18,7 @@ BrowserView.load = function(self)
     local container = self.container
 	local gui = self.gui
 
+	gui.view = self
     gui.cacheModel = self.cacheModel
     gui.collectionModel = self.collectionModel
     gui.container = container

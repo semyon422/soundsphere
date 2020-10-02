@@ -23,6 +23,8 @@ NoteChartResourceLoader.getNoteChartType = function(self, noteChart)
 		return "bms"
 	elseif noteChart.type == "o2jam" then
 		return "o2jam"
+	elseif noteChart.type == "midi" then
+		return "midi"
 	end
 end
 
@@ -53,6 +55,9 @@ NoteChartResourceLoader.load = function(self, path, noteChart, callback)
 		self:loadBMS()
 	elseif noteChartType == "o2jam" then
 		self:loadOJM()
+	elseif noteChartType == "midi" then
+		self.hitSoundsPath = self.hitSoundsPath .. "/midi"
+		self:loadBMS()
 	end
 end
 
@@ -154,7 +159,7 @@ NoteChartResourceLoader.loadBMS = function(self)
 end
 
 NoteChartResourceLoader.unload = function(self)
-	if self.noteChart.type == "bms" or self.noteChart.type == "osu" or self.noteChart.type == "quaver" or self.noteChart.type == "ksm"  then
+	if self.noteChart.type == "bms" or self.noteChart.type == "osu" or self.noteChart.type == "quaver" or self.noteChart.type == "ksm" or self.noteChart.type == "midi" then
 		self:unloadBMS()
 	elseif self.noteChart.type == "o2jam" then
 		self:unloadOJM()

@@ -4,6 +4,7 @@ userdata/hitsounds/*
 userdata/export/*
 userdata/replays/*
 userdata/screenshots/*
+!userdata/hitsounds/midi
 !userdata/charts/.keep
 !userdata/hitsounds/.keep
 !userdata/export/.keep

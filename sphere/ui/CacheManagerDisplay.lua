@@ -27,10 +27,38 @@ CacheManagerDisplay.updateState = function(self)
 end
 
 CacheManagerDisplay.processCache = function(self)
+	local noteChartSetsPath = self.gui.cacheModel.cacheManager.noteChartSetsPath
+	for path in pairs(noteChartSetsPath) do
+		if path:find("%.mid$") then
+			self:createMidiKeybinds()
+			break
+		end
+	end
+
 	if self.state == 0 or self.state == 3 then
 		self.cacheModel:startUpdate(BrowserList.basePath, self.data.force)
 	else
 		self.cacheModel:stopUpdate()
+	end
+end
+
+CacheManagerDisplay.createMidiKeybinds = function(self)
+	local inputBindings = self.gui.view.controller.selectController.inputModel.inputBindings
+
+	if inputBindings["88key"] and inputBindings["88key"].press and inputBindings["88key"].press.midi then return end
+
+	inputBindings["88key"] = {}
+	inputBindings["88key"]["press"] = {}
+	inputBindings["88key"]["press"]["midi"] = {}
+	inputBindings["88key"]["release"] = {}
+	inputBindings["88key"]["release"]["midi"] = {}
+	for i = 1, 88 do
+		inputBindings["88key"]["press"]["midi"][tostring(i + 20)] = {}
+		inputBindings["88key"]["press"]["midi"][tostring(i + 20)]["press"] = {"key" .. tostring(i)}
+		inputBindings["88key"]["press"]["midi"][tostring(i + 20)]["release"] = {}
+		inputBindings["88key"]["release"]["midi"][tostring(i + 20)] = {}
+		inputBindings["88key"]["release"]["midi"][tostring(i + 20)]["press"] = {}
+		inputBindings["88key"]["release"]["midi"][tostring(i + 20)]["release"] = {"key" .. tostring(i)}
 	end
 end
 

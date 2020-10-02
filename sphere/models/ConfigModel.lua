@@ -116,7 +116,7 @@ ConfigModel.defaultValues = {
 	["online.email"] = "",
 	["online.quick_login_key"] = "",
 
-	["parser.setting1"] = "value"
+	["parser.midiConstantVolume"] = false
 }
 
 return ConfigModel
