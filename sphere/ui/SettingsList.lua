@@ -303,6 +303,15 @@ SettingsList.setSoundItems = function(self)
 		step = 0.01,
 		format = "%d"
 	}
+	items[#items + 1] = {
+		name = "midi constant volume",
+		configKey = "parser.midiConstantVolume",
+		type = "checkbox",
+		minValue = false,
+		maxValue = true,
+		minDisplayValue = "no",
+		maxDisplayValue = "yes"
+	}
 	
 	return self:setItems(items)
 end
