@@ -13,7 +13,7 @@ aquapackage.add("luajit-request")
 
 aquapackage.add("aqua/linux64")
 aquapackage.add("aqua/win64")
-aquapackage.add("aqua/win64")
+aquapackage.add("aqua/win32")
 
 require("luamidi")
 
