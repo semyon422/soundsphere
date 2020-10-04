@@ -27,14 +27,6 @@ CacheManagerDisplay.updateState = function(self)
 end
 
 CacheManagerDisplay.processCache = function(self)
-	local noteChartSetsPath = self.gui.cacheModel.cacheManager.noteChartSetsPath
-	for path in pairs(noteChartSetsPath) do
-		if path:find("%.mid$") then
-			self:createMidiKeybinds()
-			break
-		end
-	end
-
 	if self.state == 0 or self.state == 3 then
 		self.cacheModel:startUpdate(BrowserList.basePath, self.data.force)
 	else
@@ -43,22 +35,36 @@ CacheManagerDisplay.processCache = function(self)
 end
 
 CacheManagerDisplay.createMidiKeybinds = function(self)
-	local inputBindings = self.gui.view.controller.selectController.inputModel.inputBindings
+	local noteChartSetsPath = self.cacheModel.cacheManager.noteChartSetsPath
 
-	if inputBindings["88key"] and inputBindings["88key"].press and inputBindings["88key"].press.midi then return end
+	for path in pairs(noteChartSetsPath) do
+		if path:find("%.mid$") then
+			local inputBindings = self.gui.view.controller.selectController.inputModel.inputBindings
 
-	inputBindings["88key"] = {}
-	inputBindings["88key"]["press"] = {}
-	inputBindings["88key"]["press"]["midi"] = {}
-	inputBindings["88key"]["release"] = {}
-	inputBindings["88key"]["release"]["midi"] = {}
-	for i = 1, 88 do
-		inputBindings["88key"]["press"]["midi"][tostring(i + 20)] = {}
-		inputBindings["88key"]["press"]["midi"][tostring(i + 20)]["press"] = {"key" .. tostring(i)}
-		inputBindings["88key"]["press"]["midi"][tostring(i + 20)]["release"] = {}
-		inputBindings["88key"]["release"]["midi"][tostring(i + 20)] = {}
-		inputBindings["88key"]["release"]["midi"][tostring(i + 20)]["press"] = {}
-		inputBindings["88key"]["release"]["midi"][tostring(i + 20)]["release"] = {"key" .. tostring(i)}
+			if inputBindings["88key"] == nil then
+				inputBindings["88key"] = {}
+				inputBindings["88key"]["press"] = {}
+				inputBindings["88key"]["press"]["midi"] = {}
+				inputBindings["88key"]["release"] = {}
+				inputBindings["88key"]["release"]["midi"] = {}
+
+				local key
+				local virtualKey
+				for i = 1, 88 do
+					key = tostring(i + 20)
+					virtualKey = "key" .. i
+
+					inputBindings["88key"]["press"]["midi"][key] = {}
+					inputBindings["88key"]["press"]["midi"][key]["press"] = {virtualKey}
+					inputBindings["88key"]["press"]["midi"][key]["release"] = {}
+					inputBindings["88key"]["release"]["midi"][key] = {}
+					inputBindings["88key"]["release"]["midi"][key]["press"] = {}
+					inputBindings["88key"]["release"]["midi"][key]["release"] = {virtualKey}
+				end
+			end
+
+			break
+		end
 	end
 end
 
@@ -77,6 +83,7 @@ CacheManagerDisplay.receive = function(self, event)
 			self.button.text = ("creating cache: %0.2f%%"):format(event.cachePercent)
 			self.button:reload()
 		elseif event.state == 3 then
+			self:createMidiKeybinds()
 			self.button.text = "complete"
 			self.button:reload()
 		elseif event.state == 0 then
