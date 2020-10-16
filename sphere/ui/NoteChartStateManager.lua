@@ -141,7 +141,8 @@ NoteChartStateManager.receive = function(self, event)
 			self.observable:send({
 				name = "selectNoteChart",
 				type = "noteChartEntry",
-				id = item.noteChartEntry.id
+				noteChartEntryId = item.noteChartEntry.id,
+				noteChartDataEntryId = item.noteChartDataEntry.id
 			})
 
 			self:send({
