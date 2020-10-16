@@ -63,6 +63,12 @@ NoteChartModel.loadNoteChart = function(self, settings)
 		return
 	end
 
+	local info = love.filesystem.getInfo(noteChartEntry.path)
+	if not info then
+		self.noteChart = nil
+		return
+	end
+
 	local file = love.filesystem.newFile(noteChartEntry.path)
 	file:open("r")
 	local content = file:read()
