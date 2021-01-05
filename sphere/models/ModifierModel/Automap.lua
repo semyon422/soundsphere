@@ -1,10 +1,8 @@
 local aquamath				= require("aqua.math")
-local clone					= require("aqua.table").clone
 local Upscaler				= require("libchart.Upscaler")
-local NoteBlock				= require("libchart.NoteBlock")
+local Reductor				= require("libchart.Reductor")
 local BlockFinder			= require("libchart.BlockFinder")
 local NotePreprocessor		= require("libchart.NotePreprocessor")
-local NoteData				= require("ncdk.NoteData")
 local Modifier				= require("sphere.models.ModifierModel.Modifier")
 
 local config = {}
@@ -236,13 +234,31 @@ Automap.apply = function(self)
 	self.targetMode = self.keys
 	self.columnCount = self.noteChart.inputMode:getInputCount("key")
 
-	if self.targetMode <= self.columnCount or self.columnCount == 0 then
+	print(self.targetMode == self.columnCount or self.columnCount == 0)
+	if self.targetMode == self.columnCount or self.columnCount == 0 then
 		return
 	end
 
+	self:applyAutomap()
+	if self.targetMode < self.columnCount then
+		self:processReductor()
+	elseif self.targetMode > self.columnCount then
+		self:processUpscaler()
+	end
+
+	noteChart:compute()
+end
+
+Automap.applyAutomap = function(self)
+	local noteChart = self.noteChartModel.noteChart
+	self.noteChart = noteChart
+
+	self.targetMode = self.keys
+	self.columnCount = self.noteChart.inputMode:getInputCount("key")
+
 	local noteDatas = {}
 	self.noteDatas = noteDatas
-	
+
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
@@ -256,11 +272,11 @@ Automap.apply = function(self)
 			end
 		end
 	end
-	
+
 	table.sort(noteDatas, function(noteData1, noteData2)
 		return noteData1.timePoint < noteData2.timePoint
 	end)
-	
+
 	local tNoteDatas = {}
 	self.tNoteDatas = tNoteDatas
 	for i = 1, #noteDatas do
@@ -276,6 +292,7 @@ Automap.apply = function(self)
 		else
 			tNoteData.endTime = tNoteData.startTime
 		end
+		tNoteData.baseEndTime = tNoteData.endTime
 		tNoteData.columnIndex = noteData.inputIndex
 		tNoteData.baseColumnIndex = noteData.inputIndex
 
@@ -283,18 +300,14 @@ Automap.apply = function(self)
 	end
 
 	noteChart.layerDataSequence.inputCount["key"] = {}
-
-	self:process()
-	
-	noteChart:compute()
 end
 
-Automap.process = function(self)
+Automap.processUpscaler = function(self)
 	local layerDataSequence = self.noteChart.layerDataSequence
 
 	local targetMode = self.targetMode
 	local columnCount = self.columnCount
-	
+
 	NotePreprocessor.columnCount = columnCount
 	NotePreprocessor:process(self.tNoteDatas)
 
@@ -318,6 +331,58 @@ Automap.process = function(self)
 		layerDataSequence:increaseInputCount(tNoteData.noteData.inputType, tNoteData.noteData.inputIndex, 1)
 		if tNoteData.long then
 			tNoteData.noteData.endNoteData.inputIndex = tNoteData.columnIndex
+		end
+	end
+
+	self.noteChart.inputMode:setInputCount("key", targetMode)
+end
+
+Automap.processReductor = function(self)
+	local layerDataSequence = self.noteChart.layerDataSequence
+
+	local targetMode = self.targetMode
+	local columnCount = self.columnCount
+
+	local tNoteDatasMap = {}
+	for _, tNoteData in ipairs(self.tNoteDatas) do
+		tNoteData.endTime = tNoteData.startTime
+		tNoteDatasMap[tNoteData] = true
+	end
+
+	NotePreprocessor.columnCount = columnCount
+	NotePreprocessor:process(self.tNoteDatas)
+
+	local reductor = Reductor:new()
+	local notes = reductor:process(self.tNoteDatas, columnCount, targetMode)
+
+	for i = 1, #notes do
+		local tNoteData = notes[i]
+		tNoteDatasMap[tNoteData] = nil
+		tNoteData.noteData.inputIndex = tNoteData.columnIndex
+		layerDataSequence:increaseInputCount(tNoteData.noteData.inputType, tNoteData.noteData.inputIndex, 1)
+		if tNoteData.long and tNoteData.startTime == tNoteData.endTime then
+			tNoteData.noteData.noteType = "ShortNote"
+			tNoteData.noteData.endNoteData.noteType = "Ignore"
+		end
+		if tNoteData.long and tNoteData.startTime ~= tNoteData.endTime then
+			tNoteData.noteData.endNoteData.inputIndex = tNoteData.columnIndex
+			local timePoint = self.noteChart:requireLayerData(1):getTimePoint(
+				tNoteData.endTime / 1000,
+				tNoteData.noteData.endNoteData.timePoint.side
+			)
+			tNoteData.noteData.endNoteData.timePoint = timePoint
+		end
+	end
+
+	for tNoteData in pairs(tNoteDatasMap) do
+		local noteData = tNoteData.noteData
+
+		noteData.noteType = "SoundNote"
+		noteData.inputType = "auto"
+		noteData.inputIndex = 0
+
+		if tNoteData.long then
+			tNoteData.noteData.endNoteData.noteType = "Ignore"
 		end
 	end
 
