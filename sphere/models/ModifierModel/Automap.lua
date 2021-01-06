@@ -286,7 +286,7 @@ Automap.applyAutomap = function(self)
 		tNoteData.noteData = noteData
 
 		tNoteData.startTime = aquamath.round(noteData.timePoint.absoluteTime * 1000)
-		if noteData.endNoteData then
+		if noteData.noteType == "LongNoteStart" and noteData.endNoteData then
 			tNoteData.endTime = aquamath.round(noteData.endNoteData.timePoint.absoluteTime * 1000)
 			tNoteData.long = true
 		else
@@ -354,6 +354,12 @@ Automap.processReductor = function(self)
 
 	local reductor = Reductor:new()
 	local notes = reductor:process(self.tNoteDatas, columnCount, targetMode)
+
+	if self.noteChart:requireLayerData(1).timeData.mode == "measure" then
+		for _, tNoteData in ipairs(self.tNoteDatas) do
+			tNoteData.endTime = tNoteData.startTime
+		end
+	end
 
 	for i = 1, #notes do
 		local tNoteData = notes[i]
