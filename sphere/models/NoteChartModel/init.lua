@@ -7,7 +7,7 @@ local NoteChartModel = Class:new()
 NoteChartModel.path = "userdata/selected.json"
 
 NoteChartModel.construct = function(self)
-	self.selected = {1, 1}
+	self.selected = {1, 1, 1}
 end
 
 NoteChartModel.load = function(self)
@@ -22,7 +22,7 @@ NoteChartModel.load = function(self)
 		if not self.noteChartEntry then
 			return
 		end
-		self.noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntry(self.noteChartEntry.hash, 1)
+		self.noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntryById(self.selected[3])
 			or self.cacheModel.cacheManager:getEmptyNoteChartDataEntry(self.noteChartEntry.path)
 	end
 end
@@ -46,18 +46,26 @@ NoteChartModel.selectNoteChartSet = function(self, id)
 		or self.cacheModel.cacheManager:getEmptyNoteChartDataEntry(self.noteChartEntry.path)
 end
 
-NoteChartModel.selectNoteChart = function(self, id)
-	self.selected[2] = id
-	self.noteChartEntry = self.cacheModel.cacheManager:getNoteChartEntryById(id)
-	self.noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntry(self.noteChartEntry.hash, 1)
+NoteChartModel.selectNoteChart = function(self, noteChartEntryId, noteChartDataEntryId)
+	self.selected[2] = noteChartEntryId
+	self.selected[3] = noteChartDataEntryId
+	self.noteChartEntry = self.cacheModel.cacheManager:getNoteChartEntryById(noteChartEntryId)
+	self.noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntryById(noteChartDataEntryId)
 	self.noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(self.noteChartEntry.setId)
 		or self.cacheModel.cacheManager:getEmptyNoteChartDataEntry(self.noteChartEntry.path)
 end
 
 NoteChartModel.loadNoteChart = function(self, settings)
 	local noteChartEntry = self.noteChartEntry
+	local noteChartDataEntry = self.noteChartDataEntry
 
 	if not noteChartEntry then
+		return
+	end
+
+	local info = love.filesystem.getInfo(noteChartEntry.path)
+	if not info then
+		self.noteChart = nil
 		return
 	end
 
@@ -69,7 +77,7 @@ NoteChartModel.loadNoteChart = function(self, settings)
 	local status, noteCharts = NoteChartFactory:getNoteCharts(
 		noteChartEntry.path,
 		content,
-		noteChartEntry.index,
+		noteChartDataEntry.index,
 		settings
 	)
 	if not status then

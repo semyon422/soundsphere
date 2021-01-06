@@ -42,18 +42,6 @@ BrowserList.send = function(self, event)
 	return CustomList.send(self, event)
 end
 
-BrowserList.receive = function(self, event)
-	if event.name == "keypressed" then
-		local key = event.args[1]
-		if key == "f5" then
-			self.cacheModel.cacheManager:select()
-			NotificationModel:notify("Cache reloaded from database")
-		end
-	end
-	
-	return CustomList.receive(self, event)
-end
-
 BrowserList.selectCache = function(self)
 	local items = {}
 	

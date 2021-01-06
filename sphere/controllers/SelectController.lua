@@ -100,7 +100,7 @@ SelectController.receive = function(self, event)
 		self.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
 	elseif event.name == "selectNoteChart" then
 		if event.type == "noteChartEntry" then
-			self.noteChartModel:selectNoteChart(event.id)
+			self.noteChartModel:selectNoteChart(event.noteChartEntryId, event.noteChartDataEntryId)
 		elseif event.type == "noteChartSetEntry" then
 			self.noteChartModel:selectNoteChartSet(event.id)
 		end

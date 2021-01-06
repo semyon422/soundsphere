@@ -105,11 +105,13 @@ CacheManager.select = function(self)
 	local noteChartsPath = {}
 	local noteChartSetsId = {}
 	local noteChartSetsPath = {}
+	local noteChartDatasId = {}
 	local noteChartDatasHashIndex = {}
 	self.noteChartsId = noteChartsId
 	self.noteChartsPath = noteChartsPath
 	self.noteChartSetsId = noteChartSetsId
 	self.noteChartSetsPath = noteChartSetsPath
+	self.noteChartDatasId = noteChartDatasId
 	self.noteChartDatasHashIndex = noteChartDatasHashIndex
 
 	for i = 1, #noteCharts do
@@ -126,6 +128,7 @@ CacheManager.select = function(self)
 		local entry = noteChartDatas[i]
 		noteChartDatasHashIndex[entry.hash] = noteChartDatasHashIndex[entry.hash] or {}
 		noteChartDatasHashIndex[entry.hash][entry.index] = entry
+		noteChartDatasId[entry.id] = entry
 	end
 
 	if not loaded then
@@ -279,6 +282,10 @@ end
 CacheManager.getNoteChartDataEntry = function(self, hash, index)
 	local t = self.noteChartDatasHashIndex
 	return t[hash] and t[hash][index]
+end
+
+CacheManager.getNoteChartDataEntryById = function(self, id)
+	return self.noteChartDatasId[id]
 end
 
 CacheManager.getAllNoteChartDataEntries = function(self, hash)

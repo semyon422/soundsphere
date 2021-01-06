@@ -32,12 +32,19 @@ ReplaySubmitter.submitReplay = function(self, replayHash, url)
             local replayFile = love.filesystem.newFile("userdata/replays/" .. data.hash, "r")
             local content = replayFile:read()
             local tempName = "rp" .. os.time()
-            local tempFile = io.open(tempName, "wb")
+            local tempFile, err = io.open(tempName, "wb")
+            if not tempFile then
+                print("Can't create temporary file " .. tempName)
+                print(err)
+            else
+                print("Created temporary file " .. tempName)
+            end
             tempFile:write(content)
             tempFile:close()
 
             local request = require("luajit-request")
 
+            print("POST " .. data.host .. "/" .. data.url)
             local result, err, message = request.send(data.host .. "/" .. data.url, {
                 method = "POST",
                 files = {
@@ -45,16 +52,16 @@ ReplaySubmitter.submitReplay = function(self, replayHash, url)
                 }
             })
 
-            if (not result) then
+            if not result then
                 print(err, message)
+            else
+                print(result.body)
+                
+                thread:push({
+                    name = "ReplaySubmitResponse",
+                    body = result.body
+                })
             end
-
-            print(result.body)
-            
-            thread:push({
-				name = "ReplaySubmitResponse",
-				body = result.body
-            })
 
             os.remove(tempName)
 		]],
