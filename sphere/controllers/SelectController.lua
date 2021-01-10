@@ -7,6 +7,8 @@ local InputModel			= require("sphere.models.InputModel")
 local CacheModel			= require("sphere.models.CacheModel")
 local ModifierController	= require("sphere.controllers.ModifierController")
 local DifficultyModel		= require("sphere.models.DifficultyModel")
+local NoteChartSetLibraryModel		= require("sphere.models.NoteChartSetLibraryModel")
+local NoteChartLibraryModel		= require("sphere.models.NoteChartLibraryModel")
 
 local SelectController = Class:new()
 
@@ -17,6 +19,8 @@ SelectController.construct = function(self)
 	self.inputModel = InputModel:new()
 	self.modifierController = ModifierController:new()
 	self.difficultyModel = DifficultyModel:new()
+	self.noteChartSetLibraryModel = NoteChartSetLibraryModel:new()
+	self.noteChartLibraryModel = NoteChartLibraryModel:new()
 end
 
 SelectController.load = function(self)
@@ -32,6 +36,8 @@ SelectController.load = function(self)
 	local scoreModel = self.scoreModel
 	local onlineModel = self.onlineModel
 	local difficultyModel = self.difficultyModel
+	local noteChartSetLibraryModel = self.noteChartSetLibraryModel
+	local noteChartLibraryModel = self.noteChartLibraryModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -44,6 +50,8 @@ SelectController.load = function(self)
 	modifierModel.noteChartModel = noteChartModel
 	modifierModel.difficultyModel = difficultyModel
 	modifierModel.scoreModel = scoreModel
+	noteChartSetLibraryModel.cacheModel = cacheModel
+	noteChartLibraryModel.cacheModel = cacheModel
 
 	view.controller = self
 	view.themeModel = themeModel
@@ -56,6 +64,8 @@ SelectController.load = function(self)
 	view.mountModel = mountModel
 	view.scoreModel = scoreModel
 	view.onlineModel = onlineModel
+	view.noteChartSetLibraryModel = noteChartSetLibraryModel
+	view.noteChartLibraryModel = noteChartLibraryModel
 
 	modifierController.modifierModel = modifierModel
 	modifierController.noteChartModel = noteChartModel
