@@ -23,11 +23,17 @@ SelectView.load = function(self)
 	local noteChartListView = NoteChartListView:new({__path = self.__path, view = self})
 	noteChartListView.selectNavigator = selectNavigator
 
+	local ScoreListView = dofile(self.__path .. "/views/ScoreListView.lua")
+	local scoreListView = ScoreListView:new({__path = self.__path, view = self})
+	scoreListView.selectNavigator = selectNavigator
+
 	noteChartListView.noteChartSetListView = noteChartSetListView
 	noteChartSetListView.noteChartListView = noteChartListView
+	scoreListView.noteChartListView = noteChartListView
 
 	node:node(noteChartSetListView)
 	node:node(noteChartListView)
+	node:node(scoreListView)
 
 	self.selectedNode = node
 

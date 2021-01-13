@@ -17,6 +17,10 @@ SelectNavigator.construct = function(self)
 	local noteChartList = Node:new()
 	self.noteChartList = noteChartList
 	noteChartList.selected = 1
+
+	local scoreList = Node:new()
+	self.scoreList = scoreList
+	scoreList.selected = 1
 end
 
 SelectNavigator.scrollNoteChartSet = function(self, direction)
@@ -68,10 +72,33 @@ SelectNavigator.scrollNoteChart = function(self, direction)
 	})
 end
 
+SelectNavigator.scrollScore = function(self, direction)
+	local scoreList = self.scoreList
+	local noteChartSetList = self.noteChartSetList
+	local noteChartList = self.noteChartList
+
+	local noteChartSetItems = self.view.noteChartSetLibraryModel:getItems("")
+	local setId = noteChartSetItems[noteChartSetList.selected].noteChartSetEntry.id
+	local noteChartItems = self.view.noteChartLibraryModel:getItems(setId, "")
+	local noteChartDataEntry = noteChartItems[noteChartList.selected].noteChartDataEntry
+
+	local scoreItems = self.view.scoreModel:getScoreEntries(
+		noteChartDataEntry.hash,
+		noteChartDataEntry.index
+	)
+
+	if not scoreItems or not scoreItems[scoreList.selected + direction] then
+		return
+	end
+
+	scoreList.selected = scoreList.selected + direction
+end
+
 SelectNavigator.load = function(self)
 	local observable = self.observable
 	local noteChartSetList = self.noteChartSetList
 	local noteChartList = self.noteChartList
+	local scoreList = self.scoreList
 
 	observable:add(self.view.controller)
 
@@ -95,10 +122,23 @@ SelectNavigator.load = function(self)
 	noteChartList:on("right", function()
 		self.node = noteChartSetList
 	end)
+	noteChartList:on("left", function()
+		self.node = scoreList
+	end)
 	noteChartList:on("return", function()
 		self:send({
 			action = "playNoteChart",
 		})
+	end)
+
+	scoreList:on("up", function()
+		self:scrollScore(-1)
+	end)
+	scoreList:on("down", function()
+		self:scrollScore(1)
+	end)
+	scoreList:on("right", function()
+		self.node = noteChartList
 	end)
 end
 
