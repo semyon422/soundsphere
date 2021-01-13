@@ -9,6 +9,7 @@ NoteChartSetListView.init = function(self)
 	local listView = ListView:new()
 	self.listView = listView
 
+	listView.ListItemView = dofile(self.__path .. "/views/NoteChartSetListItemView.lua")
 	listView.__path = self.__path
 	listView.view = self.view
 	listView.cs = CoordinateManager:getCS(0.5, 0, 0, 0, "h")
@@ -16,7 +17,7 @@ NoteChartSetListView.init = function(self)
 	listView.y = 0
 	listView.w = 16 / 9 / 3
 	listView.h = 1
-	listView.itemCount = 17
+	listView.itemCount = 15
 	listView.selectedItem = 1
 
 	self:reloadItems()

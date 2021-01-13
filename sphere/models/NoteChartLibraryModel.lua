@@ -52,8 +52,7 @@ NoteChartLibraryModel.updateItems = function(self)
 		local noteChartDataEntry = foundList[i]
 		items[#items + 1] = {
 			noteChartDataEntry = noteChartDataEntry,
-			noteChartEntry = map[noteChartDataEntry],
-			name = noteChartDataEntry.name
+			noteChartEntry = map[noteChartDataEntry]
 		}
 	end
 

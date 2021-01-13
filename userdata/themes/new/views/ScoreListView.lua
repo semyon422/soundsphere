@@ -17,7 +17,7 @@ ScoreListView.init = function(self)
 	listView.y = 0
 	listView.w = 16 / 9 / 3
 	listView.h = 1
-	listView.itemCount = 17
+	listView.itemCount = 15
 	listView.selectedItem = 1
 
 	self:reloadItems()

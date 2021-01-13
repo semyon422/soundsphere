@@ -26,9 +26,12 @@ NoteChartSetLibraryModel.updateItems = function(self)
 	for i = 1, #noteChartSetEntries do
 		local noteChartSetEntry = noteChartSetEntries[i]
 		if self:checkNoteChartSetEntry(noteChartSetEntry) then
+			local noteChartEntries = self.cacheModel.cacheManager:getNoteChartsAtSet(noteChartSetEntry.id)
+			local noteChartDataEntries = self.cacheModel.cacheManager:getAllNoteChartDataEntries(noteChartEntries[1].hash)
 			items[#items + 1] = {
 				noteChartSetEntry = noteChartSetEntry,
-				name = noteChartSetEntry.path:match(".+/(.-)$")
+				noteChartEntries = noteChartEntries,
+				noteChartDataEntries = noteChartDataEntries
 			}
 		end
 	end
