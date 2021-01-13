@@ -4,23 +4,32 @@ local SearchManager			= require("sphere.database.SearchManager")
 local NoteChartLibraryModel = Class:new()
 
 NoteChartLibraryModel.construct = function(self)
-
+	self:setNoteChartSetId(1)
+	self:setSearchString("")
 end
 
-NoteChartLibraryModel.getItems = function(self, setId, searchString)
-	if not self.items or self.setId ~= setId or self.searchString ~= searchString then
-		self:updateItems(setId, searchString)
-		self.setId = setId
-		self.searchString = searchString
+NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
+	self.setId = setId
+	self.items = nil
+end
+
+NoteChartLibraryModel.setSearchString = function(self, searchString)
+	self.searchString = searchString
+	self.items = nil
+end
+
+NoteChartLibraryModel.getItems = function(self)
+	if not self.items then
+		self:updateItems()
 	end
 	return self.items
 end
 
-NoteChartLibraryModel.updateItems = function(self, setId, searchString)
+NoteChartLibraryModel.updateItems = function(self)
 	local items = {}
 	self.items = items
 
-	local noteChartEntries = self.cacheModel.cacheManager:getNoteChartsAtSet(setId)
+	local noteChartEntries = self.cacheModel.cacheManager:getNoteChartsAtSet(self.setId)
 	if not noteChartEntries or not noteChartEntries[1] then
 		return items
 	end
@@ -38,7 +47,7 @@ NoteChartLibraryModel.updateItems = function(self, setId, searchString)
 		end
 	end
 
-	local foundList = SearchManager:search(noteChartDataEntries, searchString)
+	local foundList = SearchManager:search(noteChartDataEntries, self.searchString)
 	for i = 1, #foundList do
 		local noteChartDataEntry = foundList[i]
 		items[#items + 1] = {

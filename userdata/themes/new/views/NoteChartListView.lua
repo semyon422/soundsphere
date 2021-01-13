@@ -19,21 +19,11 @@ NoteChartListView.init = function(self)
 	listView.itemCount = 17
 	listView.selectedItem = 1
 
-	self.selectedSet = 1
-	self.setId = 1
-
 	self:reloadItems()
 
 	self:on("update", function()
 		listView.selectedItem = self.selectNavigator.noteChartList.selected
-
-		local oldSelected = self.selectedSet
-		local newSelected = self.selectNavigator.noteChartSetList.selected
-		if oldSelected ~= newSelected then
-			self.setId = self.noteChartSetListView.listView.items[newSelected].noteChartSetEntry.id
-			self:reloadItems()
-		end
-		self.selectedSet = newSelected
+		self:reloadItems()
 	end)
 	listView:on("select", function()
 		self.selectNavigator:setNode("noteChartList")
@@ -45,7 +35,7 @@ NoteChartListView.init = function(self)
 end
 
 NoteChartListView.reloadItems = function(self)
-	self.listView.items = self.view.noteChartLibraryModel:getItems(self.setId, "")
+	self.listView.items = self.view.noteChartLibraryModel:getItems()
 end
 
 return NoteChartListView

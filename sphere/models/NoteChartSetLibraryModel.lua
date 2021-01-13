@@ -3,18 +3,22 @@ local Class = require("aqua.util.Class")
 local NoteChartSetLibraryModel = Class:new()
 
 NoteChartSetLibraryModel.construct = function(self)
-
+	self:setSearchString("")
 end
 
-NoteChartSetLibraryModel.getItems = function(self, searchString)
-	if not self.items or self.searchString ~= searchString then
-		self:updateItems(searchString)
-		self.searchString = searchString
+NoteChartSetLibraryModel.setSearchString = function(self, searchString)
+	self.searchString = searchString
+	self.items = nil
+end
+
+NoteChartSetLibraryModel.getItems = function(self)
+	if not self.items then
+		self:updateItems()
 	end
 	return self.items
 end
 
-NoteChartSetLibraryModel.updateItems = function(self, searchString)
+NoteChartSetLibraryModel.updateItems = function(self)
 	local items = {}
 	self.items = items
 

@@ -23,6 +23,7 @@ NoteChartSetListView.init = function(self)
 
 	self:on("update", function()
 		listView.selectedItem = self.selectNavigator.noteChartSetList.selected
+		self:reloadItems()
 	end)
 	listView:on("select", function()
 		self.selectNavigator:setNode("noteChartSetList")
@@ -34,7 +35,7 @@ NoteChartSetListView.init = function(self)
 end
 
 NoteChartSetListView.reloadItems = function(self)
-	self.listView.items = self.view.noteChartSetLibraryModel:getItems("")
+	self.listView.items = self.view.noteChartSetLibraryModel:getItems()
 end
 
 return NoteChartSetListView

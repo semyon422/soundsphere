@@ -26,8 +26,9 @@ end
 SelectNavigator.scrollNoteChartSet = function(self, direction)
 	local noteChartSetList = self.noteChartSetList
 	local noteChartList = self.noteChartList
+	local scoreList = self.scoreList
 
-	local noteChartSetItems = self.view.noteChartSetLibraryModel:getItems("")
+	local noteChartSetItems = self.view.noteChartSetLibraryModel:getItems()
 
 	if not noteChartSetItems[noteChartSetList.selected + direction] then
 		return
@@ -35,11 +36,17 @@ SelectNavigator.scrollNoteChartSet = function(self, direction)
 
 	noteChartSetList.selected = noteChartSetList.selected + direction
 	noteChartList.selected = 1
+	scoreList.selected = 1
+
+	local noteChartSetId = noteChartSetItems[noteChartSetList.selected].noteChartSetEntry.id
+	self.view.noteChartLibraryModel:setNoteChartSetId(noteChartSetId)
+
+	self:updateScore()
 
 	self:send({
 		name = "selectNoteChart",
 		type = "noteChartSetEntry",
-		id = noteChartSetItems[noteChartSetList.selected].noteChartSetEntry.id
+		id = noteChartSetId
 	})
 	self:send({
 		name = "unloadModifiedNoteChart"
@@ -47,50 +54,42 @@ SelectNavigator.scrollNoteChartSet = function(self, direction)
 end
 
 SelectNavigator.scrollNoteChart = function(self, direction)
-	local noteChartSetList = self.noteChartSetList
 	local noteChartList = self.noteChartList
-
-	local noteChartSetItems = self.view.noteChartSetLibraryModel:getItems("")
-
-	local setId = noteChartSetItems[noteChartSetList.selected].noteChartSetEntry.id
-	local noteChartItems = self.view.noteChartLibraryModel:getItems(setId, "")
+	local noteChartItems = self.view.noteChartLibraryModel:getItems()
 
 	if not noteChartItems[noteChartList.selected + direction] then
 		return
 	end
 
 	noteChartList.selected = noteChartList.selected + direction
+	self:updateScore()
+	local noteChartItem = noteChartItems[noteChartList.selected]
 
 	self:send({
 		name = "selectNoteChart",
 		type = "noteChartEntry",
-		noteChartEntryId = noteChartItems[noteChartList.selected].noteChartEntry.id,
-		noteChartDataEntryId = noteChartItems[noteChartList.selected].noteChartDataEntry.id
+		noteChartEntryId = noteChartItem.noteChartEntry.id,
+		noteChartDataEntryId = noteChartItem.noteChartDataEntry.id
 	})
 	self:send({
 		name = "unloadModifiedNoteChart"
 	})
 end
 
+SelectNavigator.updateScore = function(self)
+	local noteChartList = self.noteChartList
+	local noteChartItems = self.view.noteChartLibraryModel:getItems()
+	local noteChartItem = noteChartItems[noteChartList.selected]
+	self.view.scoreLibraryModel:setHash(noteChartItem.noteChartDataEntry.hash)
+	self.view.scoreLibraryModel:setIndex(noteChartItem.noteChartDataEntry.index)
+end
+
 SelectNavigator.scrollScore = function(self, direction)
 	local scoreList = self.scoreList
-	local noteChartSetList = self.noteChartSetList
-	local noteChartList = self.noteChartList
-
-	local noteChartSetItems = self.view.noteChartSetLibraryModel:getItems("")
-	local setId = noteChartSetItems[noteChartSetList.selected].noteChartSetEntry.id
-	local noteChartItems = self.view.noteChartLibraryModel:getItems(setId, "")
-	local noteChartDataEntry = noteChartItems[noteChartList.selected].noteChartDataEntry
-
-	local scoreItems = self.view.scoreModel:getScoreEntries(
-		noteChartDataEntry.hash,
-		noteChartDataEntry.index
-	)
-
-	if not scoreItems or not scoreItems[scoreList.selected + direction] then
+	local scoreItems = self.view.scoreLibraryModel:getItems()
+	if not scoreItems[scoreList.selected + direction] then
 		return
 	end
-
 	scoreList.selected = scoreList.selected + direction
 end
 

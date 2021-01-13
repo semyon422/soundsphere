@@ -27,10 +27,6 @@ SelectView.load = function(self)
 	local scoreListView = ScoreListView:new({__path = self.__path, view = self})
 	scoreListView.selectNavigator = selectNavigator
 
-	noteChartListView.noteChartSetListView = noteChartSetListView
-	noteChartSetListView.noteChartListView = noteChartListView
-	scoreListView.noteChartListView = noteChartListView
-
 	node:node(noteChartSetListView)
 	node:node(noteChartListView)
 	node:node(scoreListView)
