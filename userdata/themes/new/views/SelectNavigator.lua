@@ -19,9 +19,19 @@ SelectNavigator.construct = function(self)
 	noteChartList.selected = 1
 end
 
-SelectNavigator.selectNoteChartSet = function(self)
+SelectNavigator.scrollNoteChartSet = function(self, direction)
 	local noteChartSetList = self.noteChartSetList
+	local noteChartList = self.noteChartList
+
 	local noteChartSetItems = self.view.noteChartSetLibraryModel:getItems("")
+
+	if not noteChartSetItems[noteChartSetList.selected + direction] then
+		return
+	end
+
+	noteChartSetList.selected = noteChartSetList.selected + direction
+	noteChartList.selected = 1
+
 	self:send({
 		name = "selectNoteChart",
 		type = "noteChartSetEntry",
@@ -32,12 +42,21 @@ SelectNavigator.selectNoteChartSet = function(self)
 	})
 end
 
-SelectNavigator.selectNoteChart = function(self)
+SelectNavigator.scrollNoteChart = function(self, direction)
 	local noteChartSetList = self.noteChartSetList
 	local noteChartList = self.noteChartList
+
 	local noteChartSetItems = self.view.noteChartSetLibraryModel:getItems("")
+
 	local setId = noteChartSetItems[noteChartSetList.selected].noteChartSetEntry.id
 	local noteChartItems = self.view.noteChartLibraryModel:getItems(setId, "")
+
+	if not noteChartItems[noteChartList.selected + direction] then
+		return
+	end
+
+	noteChartList.selected = noteChartList.selected + direction
+
 	self:send({
 		name = "selectNoteChart",
 		type = "noteChartEntry",
@@ -58,26 +77,20 @@ SelectNavigator.load = function(self)
 
 	self.node = noteChartSetList
 	noteChartSetList:on("up", function()
-		noteChartSetList.selected = noteChartSetList.selected - 1
-		noteChartList.selected = 1
-		self:selectNoteChartSet()
+		self:scrollNoteChartSet(-1)
 	end)
 	noteChartSetList:on("down", function()
-		noteChartSetList.selected = noteChartSetList.selected + 1
-		noteChartList.selected = 1
-		self:selectNoteChartSet()
+		self:scrollNoteChartSet(1)
 	end)
 	noteChartSetList:on("left", function()
 		self.node = noteChartList
 	end)
 
 	noteChartList:on("up", function()
-		noteChartList.selected = noteChartList.selected - 1
-		self:selectNoteChart()
+		self:scrollNoteChart(-1)
 	end)
 	noteChartList:on("down", function()
-		noteChartList.selected = noteChartList.selected + 1
-		self:selectNoteChart()
+		self:scrollNoteChart(1)
 	end)
 	noteChartList:on("right", function()
 		self.node = noteChartSetList
