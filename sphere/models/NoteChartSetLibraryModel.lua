@@ -1,4 +1,5 @@
 local Class = require("aqua.util.Class")
+local SearchManager			= require("sphere.database.SearchManager")
 
 local NoteChartSetLibraryModel = Class:new()
 
@@ -7,6 +8,9 @@ NoteChartSetLibraryModel.construct = function(self)
 end
 
 NoteChartSetLibraryModel.setSearchString = function(self, searchString)
+	if searchString == self.searchString then
+		return
+	end
 	self.searchString = searchString
 	self.items = nil
 end
@@ -39,58 +43,44 @@ end
 
 
 NoteChartSetLibraryModel.checkNoteChartSetEntry = function(self, entry)
-	return true
 	-- local base = entry.path:find(self.basePath, 1, true)
 	-- if not base then return false end
 	-- if not self.needSearch then return true end
 
-	-- local list = self.cacheModel.cacheManager:getNoteChartsAtSet(entry.id)
-	-- if not list or not list[1] then
-	-- 	return
-	-- end
+	local list = self.cacheModel.cacheManager:getNoteChartsAtSet(entry.id)
+	if not list or not list[1] then
+		return
+	end
 
-	-- for i = 1, #list do
-	-- 	local entries = self.cacheModel.cacheManager:getAllNoteChartDataEntries(list[i].hash)
-	-- 	for _, entry in pairs(entries) do
-	-- 		local found = SearchManager:check(entry, self.searchString)
-	-- 		if found == true then
-	-- 			return true
-	-- 		end
-	-- 	end
-	-- end
+	for i = 1, #list do
+		local entries = self.cacheModel.cacheManager:getAllNoteChartDataEntries(list[i].hash)
+		for _, entry in pairs(entries) do
+			local found = SearchManager:check(entry, self.searchString)
+			if found == true then
+				return true
+			end
+		end
+	end
 end
 
--- NoteChartSetList.sortItemsFunction = function(a, b)
--- 	return a.noteChartSetEntry.path < b.noteChartSetEntry.path
--- end
+NoteChartSetLibraryModel.sortItemsFunction = function(a, b)
+	return a.noteChartSetEntry.path < b.noteChartSetEntry.path
+end
 
--- NoteChartSetList.getItemName = function(self, entry)
--- 	local list = self.cacheModel.cacheManager:getNoteChartsAtSet(entry.id)
--- 	if list and list[1] then
--- 		local noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntry(list[1].hash, 1)
--- 		if noteChartDataEntry then
--- 			return noteChartDataEntry.title
--- 		end
--- 	end
--- 	return entry.path:match(".+/(.-)$")
--- end
+NoteChartSetLibraryModel.getItemIndex = function(self, item)
+	local items = self.items
 
--- NoteChartSetList.selectCache = function(self)
--- end
+	if not item or not items then
+		return 1
+	end
 
--- NoteChartSetList.getItemIndex = function(self, entry)
--- 	if not entry then
--- 		return 1
--- 	end
+	for i = 1, #items do
+		if items[i].noteChartSetEntry == item.noteChartSetEntry then
+			return i
+		end
+	end
 
--- 	local items = self.items
--- 	for i = 1, #items do
--- 		if items[i].noteChartSetEntry == entry then
--- 			return i
--- 		end
--- 	end
-
--- 	return 1
--- end
+	return 1
+end
 
 return NoteChartSetLibraryModel

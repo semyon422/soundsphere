@@ -9,11 +9,17 @@ NoteChartLibraryModel.construct = function(self)
 end
 
 NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
+	if setId == self.setId then
+		return
+	end
 	self.setId = setId
 	self.items = nil
 end
 
 NoteChartLibraryModel.setSearchString = function(self, searchString)
+	if searchString == self.searchString then
+		return
+	end
 	self.searchString = searchString
 	self.items = nil
 end
@@ -70,6 +76,22 @@ NoteChartLibraryModel.sortItemsFunction = function(a, b)
 	end
 end
 
+NoteChartLibraryModel.getItemIndex = function(self, item)
+	local items = self.items
+
+	if not item or not items then
+		return 1
+	end
+
+	for i = 1, #items do
+		if items[i].noteChartDataEntry == item.noteChartDataEntry then
+			return i
+		end
+	end
+
+	return 1
+end
+
 -- NoteChartLibraryModel.getBackgroundPath = function(self, itemIndex)
 -- 	local item = self.items[itemIndex]
 -- 	local noteChartDataEntry = item.noteChartDataEntry
@@ -98,21 +120,6 @@ end
 -- 	end
 
 -- 	return directoryPath .. "/preview.ogg", 0
--- end
-
--- NoteChartList.getItemIndex = function(self, entry)
--- 	if not entry then
--- 		return 1
--- 	end
-
--- 	local items = self.items
--- 	for i = 1, #items do
--- 		if items[i].noteChartEntry == entry then
--- 			return i
--- 		end
--- 	end
-
--- 	return 1
 -- end
 
 return NoteChartLibraryModel

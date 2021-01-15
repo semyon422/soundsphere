@@ -30,7 +30,10 @@ NoteChartSetListItemView.draw = function(self)
 	local index = self.index
 	local noteChartDataEntry = listView.items[itemIndex].noteChartDataEntries[1]
 
-	love.graphics.setColor(1, 1, 1, 1)
+	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
+	love.graphics.setColor(1, 1, 1,
+		math.cos(deltaItemIndex / math.ceil(listView.itemCount / 2) * math.pi / 2)
+	)
 
 	love.graphics.setFont(self.fontArtist)
 	love.graphics.printf(

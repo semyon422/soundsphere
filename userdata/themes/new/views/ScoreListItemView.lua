@@ -32,10 +32,12 @@ ScoreListItemView.draw = function(self)
 	local h = cs:Y(listView.h)
 
 	local index = self.index
-
-	love.graphics.setColor(1, 1, 1, 1)
-
 	local scoreEntry = listView.items[itemIndex].scoreEntry
+
+	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
+	love.graphics.setColor(1, 1, 1,
+		math.cos(deltaItemIndex / math.ceil(listView.itemCount / 2) * math.pi / 2)
+	)
 
 	if itemIndex == listView.selectedItem then
 		love.graphics.setFont(self.header)

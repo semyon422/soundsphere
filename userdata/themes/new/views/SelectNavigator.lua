@@ -23,12 +23,14 @@ SelectNavigator.construct = function(self)
 	scoreList.selected = 1
 end
 
-SelectNavigator.scrollNoteChartSet = function(self, direction)
+SelectNavigator.scrollNoteChartSet = function(self, direction, destination)
 	local noteChartSetList = self.noteChartSetList
 	local noteChartList = self.noteChartList
 	local scoreList = self.scoreList
 
 	local noteChartSetItems = self.view.noteChartSetLibraryModel:getItems()
+
+	direction = direction or destination - noteChartSetList.selected
 
 	if not noteChartSetItems[noteChartSetList.selected + direction] then
 		return
@@ -53,9 +55,11 @@ SelectNavigator.scrollNoteChartSet = function(self, direction)
 	})
 end
 
-SelectNavigator.scrollNoteChart = function(self, direction)
+SelectNavigator.scrollNoteChart = function(self, direction, destination)
 	local noteChartList = self.noteChartList
 	local noteChartItems = self.view.noteChartLibraryModel:getItems()
+
+	direction = direction or destination - noteChartList.selected
 
 	if not noteChartItems[noteChartList.selected + direction] then
 		return
@@ -91,6 +95,35 @@ SelectNavigator.scrollScore = function(self, direction)
 		return
 	end
 	scoreList.selected = scoreList.selected + direction
+end
+
+SelectNavigator.updateSearch = function(self)
+	local newSearchString = self.searchLineModel:getSearchString()
+	if self.searchString == newSearchString then
+		return
+	end
+	self.searchString = newSearchString
+
+	local noteChartLibraryModel = self.view.noteChartLibraryModel
+	local noteChartSetLibraryModel = self.view.noteChartSetLibraryModel
+
+	local noteChartSetList = self.noteChartSetList
+	local noteChartList = self.noteChartList
+
+	local noteChartSetItems = self.view.noteChartSetLibraryModel:getItems()
+	local noteChartItems = self.view.noteChartLibraryModel:getItems()
+
+	local noteChartSetItem = noteChartSetItems[noteChartSetList.selected]
+	local noteChartItem = noteChartItems[noteChartList.selected]
+
+	noteChartLibraryModel:setSearchString(newSearchString)
+	noteChartSetLibraryModel:setSearchString(newSearchString)
+
+	noteChartLibraryModel:updateItems()
+	noteChartSetLibraryModel:updateItems()
+
+	self:scrollNoteChartSet(nil, noteChartSetLibraryModel:getItemIndex(noteChartSetItem))
+	self:scrollNoteChart(nil, noteChartLibraryModel:getItemIndex(noteChartItem))
 end
 
 SelectNavigator.load = function(self)
@@ -139,10 +172,16 @@ SelectNavigator.load = function(self)
 	scoreList:on("right", function()
 		self.node = noteChartList
 	end)
+
+	self.searchString = self.searchLineModel:getSearchString()
 end
 
 SelectNavigator.unload = function(self)
 	self.observable:remove(self.view.controller)
+end
+
+SelectNavigator.update = function(self)
+	self:updateSearch()
 end
 
 SelectNavigator.setNode = function(self, nodeName)

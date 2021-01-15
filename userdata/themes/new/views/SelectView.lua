@@ -14,6 +14,7 @@ SelectView.load = function(self)
 	local SelectNavigator = dofile(self.__path .. "/views/SelectNavigator.lua")
 	local selectNavigator = SelectNavigator:new({view = self})
 	self.selectNavigator = selectNavigator
+	selectNavigator.searchLineModel = self.searchLineModel
 
 	local NoteChartSetListView = dofile(self.__path .. "/views/NoteChartSetListView.lua")
 	local noteChartSetListView = NoteChartSetListView:new({__path = self.__path, view = self})
@@ -27,9 +28,15 @@ SelectView.load = function(self)
 	local scoreListView = ScoreListView:new({__path = self.__path, view = self})
 	scoreListView.selectNavigator = selectNavigator
 
+	local SearchLineView = dofile(self.__path .. "/views/SearchLineView.lua")
+	local searchLineView = SearchLineView:new({__path = self.__path, view = self})
+	searchLineView.selectNavigator = selectNavigator
+	searchLineView.searchLineModel = self.searchLineModel
+
 	node:node(noteChartSetListView)
 	node:node(noteChartListView)
 	node:node(scoreListView)
+	node:node(searchLineView)
 
 	self.selectedNode = node
 
@@ -61,10 +68,12 @@ SelectView.receive = function(self, event)
 	-- 	selectedNode:call("keypressed", event.args[1])
 	-- end
 	self.selectNavigator:receive(event)
+	self.searchLineModel:receive(event)
 end
 
 SelectView.update = function(self, dt)
 	self.node:callnext("update")
+	self.selectNavigator:update()
 end
 
 SelectView.draw = function(self)
