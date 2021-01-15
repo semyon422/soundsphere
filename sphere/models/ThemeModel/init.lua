@@ -53,6 +53,10 @@ ThemeModel.setDefaultTheme = function(self, theme)
 end
 
 ThemeModel.getTheme = function(self)
+	if love.keyboard.isDown("lshift") then
+		return self.themes[1]
+	end
+
 	local configValue = self.configModel:get("theme")
 
 	if configValue then
