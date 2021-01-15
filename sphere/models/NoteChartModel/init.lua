@@ -44,6 +44,9 @@ NoteChartModel.selectNoteChartSet = function(self, id)
 	self.noteChartEntry = self.cacheModel.cacheManager:getNoteChartsAtSet(id)[1]
 	self.noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntry(self.noteChartEntry.hash, 1)
 		or self.cacheModel.cacheManager:getEmptyNoteChartDataEntry(self.noteChartEntry.path)
+
+	self.selected[2] = self.noteChartEntry.id
+	self.selected[3] = self.noteChartDataEntry.id
 end
 
 NoteChartModel.selectNoteChart = function(self, noteChartEntryId, noteChartDataEntryId)
