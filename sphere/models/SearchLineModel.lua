@@ -20,4 +20,9 @@ SearchLineModel.getSearchString = function(self)
 	return self.searchString
 end
 
+SearchLineModel.setSearchString = function(self, text)
+	self.searchString = text
+	return self.textInput:setText(text)
+end
+
 return SearchLineModel

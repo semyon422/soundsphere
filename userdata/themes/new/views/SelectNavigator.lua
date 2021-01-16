@@ -23,6 +23,15 @@ SelectNavigator.construct = function(self)
 	scoreList.selected = 1
 end
 
+SelectNavigator.updateSearch = function(self)
+	local newSearchString = self.searchLineModel:getSearchString()
+	if self.searchString ~= newSearchString then
+		self:pushSearch()
+		self:pullSearch()
+		self.searchString = newSearchString
+	end
+end
+
 SelectNavigator.scrollNoteChartSet = function(self, direction, destination)
 	local noteChartSetList = self.noteChartSetList
 	local noteChartList = self.noteChartList
@@ -81,12 +90,17 @@ SelectNavigator.pushSearch = function(self)
 		name = "selectSearchString",
 		searchString = searchString
 	})
-
-	self:pullNoteChartSet()
 end
 
 SelectNavigator.pullSearch = function(self)
-	return self:pullNoteChart()
+	local searchString = self.config.searchString
+
+	self.searchLineModel:setSearchString(searchString)
+
+	self.view.noteChartLibraryModel:setSearchString(searchString)
+	self.view.noteChartSetLibraryModel:setSearchString(searchString)
+
+	self:pullNoteChartSet()
 end
 
 SelectNavigator.pushNoteChartSet = function(self)
@@ -222,14 +236,6 @@ SelectNavigator.pullScore = function(self)
 	end
 end
 
-SelectNavigator.updateSearch = function(self)
-	local newSearchString = self.searchLineModel:getSearchString()
-	if self.searchString ~= newSearchString then
-		self:pushSearch()
-		self.searchString = newSearchString
-	end
-end
-
 SelectNavigator.load = function(self)
 	local observable = self.observable
 	local noteChartSetList = self.noteChartSetList
@@ -277,7 +283,8 @@ SelectNavigator.load = function(self)
 		self.node = noteChartList
 	end)
 
-	self.searchString = self.searchLineModel:getSearchString()
+	self.searchString = self.config.searchString
+	self:pullSearch()
 end
 
 SelectNavigator.unload = function(self)

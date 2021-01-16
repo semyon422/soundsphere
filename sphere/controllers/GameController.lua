@@ -107,6 +107,7 @@ GameController.unload = function(self)
 	ScreenManager:unload()
 	DiscordPresence:unload()
 	self.configModel:writeConfig("settings")
+	self.configModel:writeConfig("select")
 	self.mountModel:unload()
 	self.onlineModel:unload()
 end
