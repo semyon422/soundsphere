@@ -69,7 +69,7 @@ NoteSkinModel.setDefaultNoteSkin = function(self, inputMode, noteSkin)
 	if type(inputMode) == "table" then
 		inputMode = inputMode:getString()
 	end
-	self.config.general["noteskin." .. inputMode] = noteSkin.directoryPath .. "/" .. noteSkin.path
+	self.config.general["noteskin" .. inputMode] = noteSkin.directoryPath .. "/" .. noteSkin.path
 end
 
 NoteSkinModel.getNoteSkin = function(self, inputMode)
@@ -78,7 +78,7 @@ NoteSkinModel.getNoteSkin = function(self, inputMode)
 	end
 
 	local list = self:getNoteSkins(inputMode)
-	local configValue = self.config.general["noteskin." .. inputMode:getString()]
+	local configValue = self.config.general["noteskin" .. inputMode:getString()]
 
 	if configValue then
 		for _, noteSkin in ipairs(list) do
