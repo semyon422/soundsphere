@@ -52,6 +52,12 @@ GameController.load = function(self)
 	local onlineModel = self.onlineModel
 	local cacheModel = self.cacheModel
 
+	configModel:addConfig("settings", "userdata/settings.toml", "sphere/models/ConfigModel/settings.toml")
+	configModel:addConfig("select", "userdata/select.toml", "sphere/models/ConfigModel/select.toml")
+
+	configModel:readConfig("settings")
+	configModel:readConfig("select")
+
 	onlineController.onlineModel = onlineModel
 	onlineController.cacheModel = cacheModel
 	onlineController.configModel = configModel
@@ -65,19 +71,18 @@ GameController.load = function(self)
 	notificationModel.observable:add(notificationView)
 	notificationView:load()
 
-	configModel:setPath("userdata/config.json")
-
 	windowManager:load()
-	configModel.observable:add(FpsLimiter)
-	configModel.observable:add(screenshot)
+	-- configModel.observable:add(FpsLimiter)
+	-- configModel.observable:add(screenshot)
 
 	scoreModel:select()
-	configModel:read()
+	-- configModel:read()
 
-	onlineModel.observable:add(onlineController)
-	onlineModel:setHost(configModel:get("online.host"))
-	onlineModel:setSession(configModel:get("online.session"))
-	onlineModel:setUserId(configModel:get("online.userId"))
+	onlineModel.configModel = configModel
+	-- onlineModel.observable:add(onlineController)
+	-- onlineModel:setHost(configModel:get("online.host"))
+	-- onlineModel:setSession(configModel:get("online.session"))
+	-- onlineModel:setUserId(configModel:get("online.userId"))
 	onlineModel:load()
 
 	onlineController:load()
@@ -101,7 +106,7 @@ end
 GameController.unload = function(self)
 	ScreenManager:unload()
 	DiscordPresence:unload()
-	self.configModel:write()
+	self.configModel:writeConfig("settings")
 	self.mountModel:unload()
 	self.onlineModel:unload()
 end

@@ -12,6 +12,7 @@ ThemeModel.path = "userdata/themes"
 
 ThemeModel.load = function(self)
 	self.themes = {}
+	self.config = self.configModel:getConfig("settings")
 	return self:lookup(self.path)
 end
 
@@ -49,7 +50,7 @@ end
 
 ThemeModel.setDefaultTheme = function(self, theme)
 	self.theme = theme
-	return self.configModel:set("theme", theme.path)
+	self.config.general.theme = theme.path
 end
 
 ThemeModel.getTheme = function(self)
@@ -57,7 +58,7 @@ ThemeModel.getTheme = function(self)
 		return self.themes[1]
 	end
 
-	local configValue = self.configModel:get("theme")
+	local configValue = self.config.general.theme
 
 	if configValue then
 		for _, theme in ipairs(self.themes) do

@@ -1,0 +1,63 @@
+[audio]
+primaryAudioMode = "streamMemoryTempo"
+secondaryAudioMode = "sample"
+previewAudioMode = "streamOpenAL"
+
+[dim]
+select = 0.5
+gameplay = 0.75
+result = 0.75
+
+[general]
+speed = 1
+fps = 240
+theme = "userdata/themes/new"
+
+[volume]
+global = 1
+music = 1
+effects = 1
+
+[screen]
+settings = "f1"
+browser = "tab"
+
+[gameplay]
+pause = "escape"
+skipIntro = "space"
+quickRestart = "`"
+timeToPrepare = 2
+inputOffset = 0
+invertPlaySpeed = "f2"
+decreasePlaySpeed = "f3"
+increasePlaySpeed = "f4"
+invertTimeRate = "f7"
+decreaseTimeRate = "f5"
+increaseTimeRate = "f6"
+needTimeRound = true
+videobga = false
+imagebga = true
+
+[select]
+selectRandomNoteChartSet = "f2"
+adjustDifficultyAccuracy = 26
+adjustDifficultyPerformance = 300
+adjustDifficulty = "f3"
+
+[screenshot]
+capture = "f12"
+open = "lshift"
+
+[replay]
+type = "NanoChart"
+
+[online]
+host = "https://soundsphere.xyz"
+session = ""
+token = ""
+userId = 1
+email = ""
+quick_login_key = ""
+
+[parser]
+midiConstantVolume = false

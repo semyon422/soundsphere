@@ -22,3 +22,4 @@ userdata/charts.db-journal
 *.log
 userdata/online.json
 temp
+userdata/settings.toml

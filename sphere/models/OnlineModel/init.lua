@@ -27,6 +27,11 @@ OnlineModel.load = function(self)
 	onlineScoreManager.onlineModel = self
 	authManager.onlineModel = self
 
+	local config = self.configModel:getConfig("settings")
+	self:setHost(config.online.host)
+	self:setSession(config.online.session)
+	self:setUserId(config.online.userId)
+
 	authManager:load()
 	onlineScoreManager:load()
 	noteChartSubmitter:load()
