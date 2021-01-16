@@ -76,15 +76,16 @@ NoteChartLibraryModel.sortItemsFunction = function(a, b)
 	end
 end
 
-NoteChartLibraryModel.getItemIndex = function(self, item)
+NoteChartLibraryModel.getItemIndex = function(self, noteChartEntryId, noteChartDataEntryId)
 	local items = self.items
 
-	if not item or not items then
+	if not items then
 		return 1
 	end
 
 	for i = 1, #items do
-		if items[i].noteChartDataEntry == item.noteChartDataEntry then
+		local item = items[i]
+		if item.noteChartEntry.id == noteChartEntryId and item.noteChartDataEntry.id == noteChartDataEntryId then
 			return i
 		end
 	end

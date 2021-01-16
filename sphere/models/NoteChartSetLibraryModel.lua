@@ -67,15 +67,15 @@ NoteChartSetLibraryModel.sortItemsFunction = function(a, b)
 	return a.noteChartSetEntry.path < b.noteChartSetEntry.path
 end
 
-NoteChartSetLibraryModel.getItemIndex = function(self, item)
+NoteChartSetLibraryModel.getItemIndex = function(self, noteChartSetEntryId)
 	local items = self.items
 
-	if not item or not items then
+	if not items then
 		return 1
 	end
 
 	for i = 1, #items do
-		if items[i].noteChartSetEntry == item.noteChartSetEntry then
+		if items[i].noteChartSetEntry.id == noteChartSetEntryId then
 			return i
 		end
 	end

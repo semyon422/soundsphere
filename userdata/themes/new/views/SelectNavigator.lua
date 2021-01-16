@@ -31,7 +31,6 @@ SelectNavigator.scrollNoteChartSet = function(self, direction, destination)
 	local noteChartSetItems = self.view.noteChartSetLibraryModel:getItems()
 
 	direction = direction or destination - noteChartSetList.selected
-
 	if not noteChartSetItems[noteChartSetList.selected + direction] then
 		return
 	end
@@ -40,19 +39,8 @@ SelectNavigator.scrollNoteChartSet = function(self, direction, destination)
 	noteChartList.selected = 1
 	scoreList.selected = 1
 
-	local noteChartSetId = noteChartSetItems[noteChartSetList.selected].noteChartSetEntry.id
-	self.view.noteChartLibraryModel:setNoteChartSetId(noteChartSetId)
-
-	self:updateScore()
-
-	self:send({
-		name = "selectNoteChart",
-		type = "noteChartSetEntry",
-		id = noteChartSetId
-	})
-	self:send({
-		name = "unloadModifiedNoteChart"
-	})
+	self:pushNoteChartSet()
+	self:pullSearch()
 end
 
 SelectNavigator.scrollNoteChart = function(self, direction, destination)
@@ -66,26 +54,9 @@ SelectNavigator.scrollNoteChart = function(self, direction, destination)
 	end
 
 	noteChartList.selected = noteChartList.selected + direction
-	self:updateScore()
-	local noteChartItem = noteChartItems[noteChartList.selected]
 
-	self:send({
-		name = "selectNoteChart",
-		type = "noteChartEntry",
-		noteChartEntryId = noteChartItem.noteChartEntry.id,
-		noteChartDataEntryId = noteChartItem.noteChartDataEntry.id
-	})
-	self:send({
-		name = "unloadModifiedNoteChart"
-	})
-end
-
-SelectNavigator.updateScore = function(self)
-	local noteChartList = self.noteChartList
-	local noteChartItems = self.view.noteChartLibraryModel:getItems()
-	local noteChartItem = noteChartItems[noteChartList.selected]
-	self.view.scoreLibraryModel:setHash(noteChartItem.noteChartDataEntry.hash)
-	self.view.scoreLibraryModel:setIndex(noteChartItem.noteChartDataEntry.index)
+	self:pushNoteChart()
+	self:pullSearch()
 end
 
 SelectNavigator.scrollScore = function(self, direction)
@@ -95,35 +66,172 @@ SelectNavigator.scrollScore = function(self, direction)
 		return
 	end
 	scoreList.selected = scoreList.selected + direction
+
+	self:pushScore()
+	self:pullSearch()
+end
+
+SelectNavigator.pushSearch = function(self)
+	local searchString = self.searchLineModel:getSearchString()
+
+	self.view.noteChartLibraryModel:setSearchString(searchString)
+	self.view.noteChartSetLibraryModel:setSearchString(searchString)
+
+	self:send({
+		name = "selectSearchString",
+		searchString = searchString
+	})
+
+	self:pullNoteChartSet()
+end
+
+SelectNavigator.pullSearch = function(self)
+	return self:pullNoteChart()
+end
+
+SelectNavigator.pushNoteChartSet = function(self)
+	local noteChartSetItems = self.view.noteChartSetLibraryModel:getItems()
+	local noteChartSetItem = noteChartSetItems[self.noteChartSetList.selected]
+	if not noteChartSetItem then
+		return
+	end
+
+	self:send({
+		name = "selectNoteChartSetEntry",
+		noteChartSetEntryId = noteChartSetItem.noteChartSetEntry.id
+	})
+
+	-- self:pushNoteChart()
+end
+
+SelectNavigator.pullNoteChartSet = function(self)
+	local config = self.config
+	local noteChartSetLibraryModel = self.view.noteChartSetLibraryModel
+	local noteChartSetList = self.noteChartSetList
+
+	local noteChartSetItems = noteChartSetLibraryModel:getItems()
+	local noteChartSetItem = noteChartSetItems[noteChartSetList.selected]
+
+	if noteChartSetItem and noteChartSetItem.noteChartSetEntry.id == config.noteChartSetEntryId then
+		self:pullNoteChart()
+		return
+	end
+
+	local noteChartSetItemIndex = noteChartSetLibraryModel:getItemIndex(config.noteChartSetEntryId)
+	noteChartSetList.selected = noteChartSetItemIndex
+
+	noteChartSetItem = noteChartSetItems[noteChartSetList.selected]
+	if noteChartSetItem then
+		config.noteChartSetEntryId = noteChartSetItem.noteChartSetEntry.id
+		self:pullNoteChart()
+	end
+end
+
+SelectNavigator.pushNoteChart = function(self)
+	local noteChartSetItems = self.view.noteChartSetLibraryModel:getItems()
+	local noteChartSetItem = noteChartSetItems[self.noteChartSetList.selected]
+	self.view.noteChartLibraryModel:setNoteChartSetId(noteChartSetItem.noteChartSetEntry.id)
+
+	local noteChartItems = self.view.noteChartLibraryModel:getItems()
+	local noteChartItem = noteChartItems[self.noteChartList.selected]
+	if not noteChartItem then
+		return
+	end
+
+	self:send({
+		name = "selectNoteChartEntry",
+		noteChartEntryId = noteChartItem.noteChartEntry.id
+	})
+	self:send({
+		name = "selectNoteChartDataEntry",
+		noteChartDataEntryId = noteChartItem.noteChartDataEntry.id
+	})
+
+	-- self:pushScore()
+end
+
+SelectNavigator.pullNoteChart = function(self)
+	local config = self.config
+	local noteChartList = self.noteChartList
+	local noteChartSetLibraryModel = self.view.noteChartSetLibraryModel
+	local noteChartLibraryModel = self.view.noteChartLibraryModel
+
+	local noteChartSetItems = noteChartSetLibraryModel:getItems()
+	local noteChartSetItem = noteChartSetItems[self.noteChartSetList.selected]
+	noteChartLibraryModel:setNoteChartSetId(noteChartSetItem.noteChartSetEntry.id)
+
+	local noteChartItems = self.view.noteChartLibraryModel:getItems()
+	local noteChartItem = noteChartItems[noteChartList.selected]
+
+	if
+		noteChartItem and
+		noteChartItem.noteChartEntry.id == config.noteChartEntryId and
+		noteChartItem.noteChartDataEntry.id == config.noteChartDataEntryId
+	then
+		self:pullScore()
+		return
+	end
+
+	local noteChartItemIndex = noteChartLibraryModel:getItemIndex(config.noteChartEntryId, config.noteChartDataEntryId)
+	noteChartList.selected = noteChartItemIndex
+
+	noteChartItem = noteChartItems[noteChartList.selected]
+	if noteChartItem then
+		config.noteChartEntryId = noteChartItem.noteChartEntry.id
+		config.noteChartDataEntryId = noteChartItem.noteChartDataEntry.id
+		self:pullScore()
+	end
+end
+
+SelectNavigator.pushScore = function(self)
+	local noteChartItems = self.view.noteChartLibraryModel:getItems()
+	local noteChartItem = noteChartItems[self.noteChartList.selected]
+	self.view.scoreLibraryModel:setHash(noteChartItem.noteChartDataEntry.hash)
+	self.view.scoreLibraryModel:setIndex(noteChartItem.noteChartDataEntry.index)
+
+	local scoreItems = self.view.scoreLibraryModel:getItems()
+	local scoreItem = scoreItems[self.scoreList.selected]
+	if not scoreItem then
+		return
+	end
+
+	self:send({
+		name = "selectScoreEntry",
+		scoreEntryId = scoreItem.scoreEntry.id
+	})
+end
+
+SelectNavigator.pullScore = function(self)
+	local config = self.config
+	local scoreList = self.scoreList
+	local scoreLibraryModel = self.view.scoreLibraryModel
+
+	local noteChartItems = self.view.noteChartLibraryModel:getItems()
+	local noteChartItem = noteChartItems[self.noteChartList.selected]
+	scoreLibraryModel:setHash(noteChartItem.noteChartDataEntry.hash)
+	scoreLibraryModel:setIndex(noteChartItem.noteChartDataEntry.index)
+
+	local scoreItems = self.view.scoreLibraryModel:getItems()
+	local scoreItem = scoreItems[scoreList.selected]
+	if scoreItem and scoreItem.scoreEntry.id == config.scoreEntryId then
+		return
+	end
+
+	local scoreItemIndex = scoreLibraryModel:getItemIndex(config.scoreEntryId)
+	scoreList.selected = scoreItemIndex
+
+	scoreItem = scoreItems[scoreList.selected]
+	if scoreItem then
+		config.scoreEntryId = scoreItem.scoreEntry.id
+	end
 end
 
 SelectNavigator.updateSearch = function(self)
 	local newSearchString = self.searchLineModel:getSearchString()
-	if self.searchString == newSearchString then
-		return
+	if self.searchString ~= newSearchString then
+		self:pushSearch()
+		self.searchString = newSearchString
 	end
-	self.searchString = newSearchString
-
-	local noteChartLibraryModel = self.view.noteChartLibraryModel
-	local noteChartSetLibraryModel = self.view.noteChartSetLibraryModel
-
-	local noteChartSetList = self.noteChartSetList
-	local noteChartList = self.noteChartList
-
-	local noteChartSetItems = self.view.noteChartSetLibraryModel:getItems()
-	local noteChartItems = self.view.noteChartLibraryModel:getItems()
-
-	local noteChartSetItem = noteChartSetItems[noteChartSetList.selected]
-	local noteChartItem = noteChartItems[noteChartList.selected]
-
-	noteChartLibraryModel:setSearchString(newSearchString)
-	noteChartSetLibraryModel:setSearchString(newSearchString)
-
-	noteChartLibraryModel:updateItems()
-	noteChartSetLibraryModel:updateItems()
-
-	self:scrollNoteChartSet(nil, noteChartSetLibraryModel:getItemIndex(noteChartSetItem))
-	self:scrollNoteChart(nil, noteChartLibraryModel:getItemIndex(noteChartItem))
 end
 
 SelectNavigator.load = function(self)

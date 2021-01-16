@@ -10,28 +10,34 @@ end
 
 SelectView.load = function(self)
 	local node = self.node
+	local config = self.configModel:getConfig("select")
 
 	local SelectNavigator = dofile(self.__path .. "/views/SelectNavigator.lua")
 	local selectNavigator = SelectNavigator:new({view = self})
 	self.selectNavigator = selectNavigator
 	selectNavigator.searchLineModel = self.searchLineModel
+	selectNavigator.config = config
 
 	local NoteChartSetListView = dofile(self.__path .. "/views/NoteChartSetListView.lua")
 	local noteChartSetListView = NoteChartSetListView:new({__path = self.__path, view = self})
 	noteChartSetListView.selectNavigator = selectNavigator
+	noteChartSetListView.config = config
 
 	local NoteChartListView = dofile(self.__path .. "/views/NoteChartListView.lua")
 	local noteChartListView = NoteChartListView:new({__path = self.__path, view = self})
 	noteChartListView.selectNavigator = selectNavigator
+	noteChartListView.config = config
 
 	local ScoreListView = dofile(self.__path .. "/views/ScoreListView.lua")
 	local scoreListView = ScoreListView:new({__path = self.__path, view = self})
 	scoreListView.selectNavigator = selectNavigator
+	scoreListView.config = config
 
 	local SearchLineView = dofile(self.__path .. "/views/SearchLineView.lua")
 	local searchLineView = SearchLineView:new({__path = self.__path, view = self})
 	searchLineView.selectNavigator = selectNavigator
 	searchLineView.searchLineModel = self.searchLineModel
+	searchLineView.config = self.config
 
 	node:node(noteChartSetListView)
 	node:node(noteChartListView)

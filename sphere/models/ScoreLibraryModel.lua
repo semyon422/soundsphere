@@ -46,4 +46,21 @@ ScoreLibraryModel.updateItems = function(self)
 	return items
 end
 
+ScoreLibraryModel.getItemIndex = function(self, scoreEntryId)
+	local items = self.items
+
+	if not items then
+		return 1
+	end
+
+	for i = 1, #items do
+		local item = items[i]
+		if item.scoreEntry.id == scoreEntryId then
+			return i
+		end
+	end
+
+	return 1
+end
+
 return ScoreLibraryModel
