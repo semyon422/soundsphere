@@ -52,6 +52,8 @@ SelectController.load = function(self)
 	self.view = view
 
 	noteChartModel.cacheModel = cacheModel
+	noteChartModel.configModel = configModel
+	noteChartModel.scoreModel = scoreModel
 	noteSkinModel.configModel = configModel
 	modifierModel.noteChartModel = noteChartModel
 	modifierModel.difficultyModel = difficultyModel
@@ -87,14 +89,13 @@ SelectController.load = function(self)
 	modifierModel:load()
 	noteSkinModel:load()
 	cacheModel:load()
-	noteChartModel:load()
+	noteChartModel:select()
 
 	view:load()
 end
 
 SelectController.unload = function(self)
 	self.modifierModel:unload()
-	self.noteChartModel:unload()
 	self.view:unload()
 	self.inputModel:unload()
 end
@@ -119,22 +120,20 @@ SelectController.receive = function(self, event)
 		self.themeModel:setDefaultTheme(event.theme)
 	elseif event.name == "setInputBinding" then
 		self.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
-	-- elseif event.name == "selectNoteChart" then
-	-- 	if event.type == "noteChartEntry" then
-	-- 		self.noteChartModel:selectNoteChart(event.noteChartEntryId, event.noteChartDataEntryId)
-	-- 	elseif event.type == "noteChartSetEntry" then
-	-- 		self.noteChartModel:selectNoteChartSet(event.id)
-	-- 	end
 	elseif event.name == "selectSearchString" then
 		config.searchString = event.searchString
 	elseif event.name == "selectNoteChartSetEntry" then
 		config.noteChartSetEntryId = event.noteChartSetEntryId
+		self.noteChartModel:select()
 	elseif event.name == "selectNoteChartEntry" then
 		config.noteChartEntryId = event.noteChartEntryId
+		self.noteChartModel:select()
 	elseif event.name == "selectNoteChartDataEntry" then
 		config.noteChartDataEntryId = event.noteChartDataEntryId
+		self.noteChartModel:select()
 	elseif event.name == "selectScoreEntry" then
 		config.scoreEntryId = event.scoreEntryId
+		self.noteChartModel:select()
 	elseif event.action == "playNoteChart" then
 		self:playNoteChart()
 	elseif event.name == "loadModifiedNoteChart" then
@@ -144,7 +143,7 @@ SelectController.receive = function(self, event)
 	elseif event.name == "resetModifiedNoteChart" then
 		self:resetModifiedNoteChart()
 	elseif event.action == "replayNoteChart" then
-		self:replayNoteChart(event.mode, event.scoreEntry.replayHash)
+		-- self:replayNoteChart(event.mode, event.scoreEntry.replayHash)
 	elseif event.name == "quickLogin" then
 		self.onlineModel:quickLogin(self.configModel:getConfig("settings").online.quick_login_key)
 	elseif event.name == "setScreen" then
