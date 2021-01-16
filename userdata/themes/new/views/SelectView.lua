@@ -39,6 +39,10 @@ SelectView.load = function(self)
 	searchLineView.searchLineModel = self.searchLineModel
 	searchLineView.config = self.config
 
+	local BackgroundView = dofile(self.__path .. "/views/BackgroundView.lua")
+	local backgroundView = BackgroundView:new({__path = self.__path, view = self})
+
+	node:node(backgroundView)
 	node:node(noteChartSetListView)
 	node:node(noteChartListView)
 	node:node(scoreListView)

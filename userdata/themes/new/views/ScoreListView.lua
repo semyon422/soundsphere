@@ -30,6 +30,7 @@ ScoreListView.init = function(self)
 		self.selectNavigator:setNode("scoreList")
 		self.view.selectedNode = self
 	end)
+	self:on("draw", self.drawFrame)
 
 	self:node(listView)
 	self.pass = true
@@ -37,6 +38,15 @@ end
 
 ScoreListView.reloadItems = function(self)
 	self.listView.items = self.view.scoreLibraryModel:getItems()
+end
+
+ScoreListView.drawFrame = function(self)
+	local listView = self.listView
+	if self.selectNavigator:checkNode("scoreList") then
+		listView.isSelected = true
+	else
+		listView.isSelected = false
+	end
 end
 
 return ScoreListView

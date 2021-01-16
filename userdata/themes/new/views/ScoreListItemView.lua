@@ -35,9 +35,15 @@ ScoreListItemView.draw = function(self)
 	local scoreEntry = listView.items[itemIndex].scoreEntry
 
 	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
-	love.graphics.setColor(1, 1, 1,
-		math.cos(deltaItemIndex / math.ceil(listView.itemCount / 2) * math.pi / 2)
-	)
+	if listView.isSelected then
+		love.graphics.setColor(1, 1, 1,
+			deltaItemIndex == 0 and 1 or 0.66
+		)
+	else
+		love.graphics.setColor(1, 1, 1,
+			deltaItemIndex == 0 and 1 or 0.33
+		)
+	end
 
 	if itemIndex == listView.selectedItem then
 		love.graphics.setFont(self.header)

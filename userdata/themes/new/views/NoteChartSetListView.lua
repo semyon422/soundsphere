@@ -30,6 +30,7 @@ NoteChartSetListView.init = function(self)
 		self.selectNavigator:setNode("noteChartSetList")
 		self.view.selectedNode = self
 	end)
+	self:on("draw", self.drawFrame)
 
 	self:node(listView)
 	self.pass = true
@@ -37,6 +38,15 @@ end
 
 NoteChartSetListView.reloadItems = function(self)
 	self.listView.items = self.view.noteChartSetLibraryModel:getItems()
+end
+
+NoteChartSetListView.drawFrame = function(self)
+	local listView = self.listView
+	if self.selectNavigator:checkNode("noteChartSetList") then
+		listView.isSelected = true
+	else
+		listView.isSelected = false
+	end
 end
 
 return NoteChartSetListView

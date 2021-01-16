@@ -299,6 +299,10 @@ SelectNavigator.setNode = function(self, nodeName)
 	self.node = assert(self[nodeName])
 end
 
+SelectNavigator.checkNode = function(self, nodeName)
+	return self.node == self[nodeName]
+end
+
 SelectNavigator.call = function(self, ...)
 	self.node:call(...)
 end
