@@ -27,7 +27,8 @@ ResultView.load = function(self)
 		action = "updateMetaData"
 	})
 
-	local dim = 255 * (1 - (configModel:get("dim.result") or 0))
+	local config = configModel:getConfig("settings")
+	local dim = 255 * (1 - (config.dim.result or 0))
 	BackgroundManager:setColor({dim, dim, dim})
 end
 

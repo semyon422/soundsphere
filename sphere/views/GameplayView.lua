@@ -30,11 +30,13 @@ GameplayView.load = function(self)
 	noteSkinView.noteSkin = self.noteSkin
 	noteSkinView:load()
 
+	local config = configModel:getConfig("settings")
+
 	rhythmView.rhythmModel = self.rhythmModel
 	rhythmView.noteSkinView = noteSkinView
 	rhythmView.container = container
-	rhythmView:setBgaEnabled("video", configModel:get("gameplay.videobga"))
-	rhythmView:setBgaEnabled("image", configModel:get("gameplay.imagebga"))
+	rhythmView:setBgaEnabled("video", config.gameplay.videobga)
+	rhythmView:setBgaEnabled("image", config.gameplay.imagebga)
 	rhythmView:load()
 
 	gui.container = container
@@ -51,7 +53,7 @@ GameplayView.load = function(self)
 	discordGameplayView.rhythmModel = self.rhythmModel
 	discordGameplayView.noteChartModel = self.noteChartModel
 
-	local dim = 255 * (1 - (configModel:get("dim.gameplay") or 0))
+	local dim = 255 * (1 - (config.dim.gameplay or 0))
 	BackgroundManager:setColor({dim, dim, dim})
 end
 

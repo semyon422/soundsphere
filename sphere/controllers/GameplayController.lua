@@ -36,7 +36,7 @@ GameplayController.load = function(self)
 
 	noteSkinModel.configModel = configModel
 
-	noteChartModel:load()
+	noteChartModel:select()
 	noteSkinModel:load()
 	inputModel:load()
 
@@ -58,15 +58,17 @@ GameplayController.load = function(self)
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
 
-	rhythmModel:setVolume("global", configModel:get("volume.global"))
-	rhythmModel:setVolume("music", configModel:get("volume.music"))
-	rhythmModel:setVolume("effects", configModel:get("volume.effects"))
-	rhythmModel:setAudioMode("primary", configModel:get("audio.primaryAudioMode"))
-	rhythmModel:setAudioMode("secondary", configModel:get("audio.secondaryAudioMode"))
-	rhythmModel:setTimeRound(configModel:get("gameplay.needTimeRound"))
-	rhythmModel:setTimeToPrepare(configModel:get("gameplay.timeToPrepare"))
-	rhythmModel:setInputOffset(configModel:get("gameplay.inputOffset"))
-	rhythmModel:setVisualOffset(configModel:get("gameplay.visualOffset"))
+	local config = configModel:getConfig("settings")
+
+	rhythmModel:setVolume("global", config.volume.global)
+	rhythmModel:setVolume("music", config.volume.music)
+	rhythmModel:setVolume("effects", config.volume.effects)
+	rhythmModel:setAudioMode("primary", config.audio.primaryAudioMode)
+	rhythmModel:setAudioMode("secondary", config.audio.secondaryAudioMode)
+	rhythmModel:setTimeRound(config.gameplay.needTimeRound)
+	rhythmModel:setTimeToPrepare(config.gameplay.timeToPrepare)
+	rhythmModel:setInputOffset(config.gameplay.inputOffset)
+	rhythmModel:setVisualOffset(config.gameplay.visualOffset)
 
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
 	rhythmModel:load()
@@ -76,8 +78,8 @@ GameplayController.load = function(self)
 	rhythmModel.inputManager:setInputMode(noteChart.inputMode:getString())
 
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
-	noteSkin.visualTimeRate = configModel:get("speed")
-	noteSkin.targetVisualTimeRate = configModel:get("speed")
+	noteSkin.visualTimeRate = config.general.speed
+	noteSkin.targetVisualTimeRate = config.general.speed
 	noteSkin:load()
 	rhythmModel:setNoteSkin(noteSkin)
 	view.noteSkin = noteSkin
@@ -99,9 +101,9 @@ GameplayController.load = function(self)
 end
 
 GameplayController.getImporterSettings = function(self)
-	local configModel = self.configModel
+	local config = self.configModel:getConfig("settings")
 	return {
-		midiConstantVolume = configModel:get("parser.midiConstantVolume")
+		midiConstantVolume = config.parser.midiConstantVolume
 	}
 end
 
@@ -167,7 +169,7 @@ GameplayController.saveScore = function(self)
 	if scoreSystem.scoreTable.score > 0 and rhythmModel.replayModel.mode ~= "replay" and not rhythmModel.logicEngine.autoplay then
 		replayModel.noteChartModel = noteChartModel
 		replayModel.modifierModel = modifierModel
-		replayModel.replayType = self.configModel:get("replay.type")
+		replayModel.replayType = self.configModel:getConfig("settings").replay.type
 		local replayHash = replayModel:saveReplay()
 		self.scoreModel:insertScore(scoreSystem.scoreTable, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
 		self.onlineModel:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
