@@ -100,8 +100,6 @@ SelectNavigator.pushNoteChartSet = function(self)
 		name = "selectNoteChartSetEntry",
 		noteChartSetEntryId = noteChartSetItem.noteChartSetEntry.id
 	})
-
-	-- self:pushNoteChart()
 end
 
 SelectNavigator.pullNoteChartSet = function(self)
@@ -146,8 +144,6 @@ SelectNavigator.pushNoteChart = function(self)
 		name = "selectNoteChartDataEntry",
 		noteChartDataEntryId = noteChartItem.noteChartDataEntry.id
 	})
-
-	-- self:pushScore()
 end
 
 SelectNavigator.pullNoteChart = function(self)
