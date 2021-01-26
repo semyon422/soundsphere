@@ -2,13 +2,10 @@ local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 
 local BracketSwap = SwapModifier:new()
 
-BracketSwap.sequential = true
 BracketSwap.type = "NoteChartModifier"
 
 BracketSwap.name = "BracketSwap"
 BracketSwap.shortName = "BS"
-
-BracketSwap.variableType = "boolean"
 
 BracketSwap.hardcodedMaps = {
 	[4] = {1, 3, 2, 4},

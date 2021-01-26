@@ -1,6 +1,70 @@
 local Class = require("aqua.util.Class")
+local ScreenManager			= require("sphere.screen.ScreenManager")
 
 local ModifierController = Class:new()
+
+
+ModifierController.construct = function(self)
+end
+
+ModifierController.load = function(self)
+	local modifierModel = self.modifierModel
+	local noteSkinModel = self.noteSkinModel
+	local noteChartModel = self.noteChartModel
+	local inputModel = self.inputModel
+	local cacheModel = self.cacheModel
+	local themeModel = self.themeModel
+	local modifierController = self.modifierController
+	local configModel = self.configModel
+	local mountModel = self.mountModel
+	local scoreModel = self.scoreModel
+	local onlineModel = self.onlineModel
+	local difficultyModel = self.difficultyModel
+	local noteChartSetLibraryModel = self.noteChartSetLibraryModel
+	local noteChartLibraryModel = self.noteChartLibraryModel
+	local scoreLibraryModel = self.scoreLibraryModel
+	local searchLineModel = self.searchLineModel
+
+	local theme = themeModel:getTheme()
+	self.theme = theme
+
+	local view = theme:newView("ModifierView")
+	self.view = view
+
+	view.controller = self
+	view.themeModel = themeModel
+	view.noteChartModel = noteChartModel
+	view.modifierModel = modifierModel
+	view.noteSkinModel = noteSkinModel
+	view.inputModel = inputModel
+	view.cacheModel = cacheModel
+	view.configModel = configModel
+	view.mountModel = mountModel
+	view.scoreModel = scoreModel
+	view.onlineModel = onlineModel
+	view.noteChartSetLibraryModel = noteChartSetLibraryModel
+	view.noteChartLibraryModel = noteChartLibraryModel
+	view.scoreLibraryModel = scoreLibraryModel
+	view.searchLineModel = searchLineModel
+
+	modifierModel:load()
+	noteChartModel:select()
+
+	view:load()
+end
+
+ModifierController.unload = function(self)
+	self.modifierModel:unload()
+	self.view:unload()
+end
+
+ModifierController.update = function(self, dt)
+	self.view:update(dt)
+end
+
+ModifierController.draw = function(self)
+	self.view:draw()
+end
 
 ModifierController.receive = function(self, event)
 	if event.name == "enableBooleanModifier" then
@@ -18,6 +82,27 @@ ModifierController.receive = function(self, event)
 	elseif event.name == "adjustDifficulty" then
 		self:adjustDifficulty()
 	end
+end
+
+ModifierController.playNoteChart = function(self)
+	local noteChartModel = self.noteChartModel
+	local info = love.filesystem.getInfo(noteChartModel.noteChartEntry.path)
+	if not info then
+		return
+	end
+
+	local GameplayController = require("sphere.controllers.GameplayController")
+	local gameplayController = GameplayController:new()
+	gameplayController.noteChartModel = noteChartModel
+	gameplayController.themeModel = self.themeModel
+	gameplayController.modifierModel = self.modifierModel
+	gameplayController.configModel = self.configModel
+	gameplayController.notificationModel = self.notificationModel
+	gameplayController.scoreModel = self.scoreModel
+	gameplayController.onlineModel = self.onlineModel
+	gameplayController.difficultyModel = self.difficultyModel
+	gameplayController.selectController = self
+	return ScreenManager:set(gameplayController)
 end
 
 ModifierController.adjustDifficulty = function(self)

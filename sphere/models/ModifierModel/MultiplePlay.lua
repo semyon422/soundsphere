@@ -3,32 +3,23 @@ local Modifier	= require("sphere.models.ModifierModel.Modifier")
 
 local MultiplePlay = Modifier:new()
 
-MultiplePlay.sequential = true
 MultiplePlay.type = "NoteChartModifier"
 
 MultiplePlay.name = "MultiplePlay"
 MultiplePlay.shortName = "MP"
 
-MultiplePlay.variableType = "number"
-MultiplePlay.variableName = "value"
-MultiplePlay.variableFormat = "%s"
-MultiplePlay.variableRange = {1, 1, 3}
-MultiplePlay.variableValues = {"DP", "TP", "QP"}
-MultiplePlay.value = 1
+MultiplePlay.defaultValue = 1
+MultiplePlay.format = "%s"
+MultiplePlay.range = {1, 1, 3}
+MultiplePlay.values = {"DP", "TP", "QP"}
 
-MultiplePlay.modeNames = {"DP", "TP", "QP"}
-
-MultiplePlay.tostring = function(self)
-	return self.modeNames[self.value]
-end
-
-MultiplePlay.tojson = function(self)
-	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
+MultiplePlay.getString = function(self)
+	return self.values[self.config.value]
 end
 
 MultiplePlay.apply = function(self)
 	local noteChart = self.noteChartModel.noteChart
-	local value = self.value
+	local value = self.config.value
 
 	local inputCounts = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do
@@ -41,10 +32,10 @@ MultiplePlay.apply = function(self)
 	end
 
 	local layerDataSequence = noteChart.layerDataSequence
-	
+
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
-		
+
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 			local inputCount = inputCounts[noteData.inputType]
@@ -66,7 +57,7 @@ MultiplePlay.apply = function(self)
 			end
 		end
 	end
-	
+
 	for inputType, inputCount in pairs(inputCounts) do
 		noteChart.inputMode:setInputCount(inputType, inputCount * (value + 1))
 	end

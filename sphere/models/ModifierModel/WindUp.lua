@@ -3,19 +3,25 @@ local map = require("aqua.math").map
 
 local WindUp = Modifier:new()
 
-WindUp.inconsequential = true
 WindUp.type = "TimeEngineModifier"
 
 WindUp.name = "WindUp"
-WindUp.shortName = "WindUp"
-
-WindUp.variableType = "boolean"
+WindUp.shortName = "WU"
 
 WindUp.apply = function(self)
+	local config = self.config
+	if not config.value then
+		return
+	end
 	self.timeRateHandler = self.rhythmModel.timeEngine:createTimeRateHandler()
 end
 
 WindUp.update = function(self)
+	local config = self.config
+	if not config.value then
+		return
+	end
+
 	local timeEngine = self.rhythmModel.timeEngine
 	local startTime = timeEngine.noteChart.metaData:get("minTime")
 	local endTime = timeEngine.noteChart.metaData:get("maxTime")

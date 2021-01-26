@@ -2,19 +2,25 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 
 local ProMode = Modifier:new()
 
-ProMode.inconsequential = true
 ProMode.type = "LogicEngineModifier"
 
 ProMode.name = "ProMode"
 ProMode.shortName = "ProMode"
 
-ProMode.variableType = "boolean"
-
 ProMode.apply = function(self)
+	local config = self.config
+	if not config.value then
+		return
+	end
 	self.rhythmModel.logicEngine.promode = true
 end
 
 ProMode.receive = function(self, event)
+	local config = self.config
+	if not config.value then
+		return
+	end
+
 	if event.name ~= "keypressed" then
 		return
 	end

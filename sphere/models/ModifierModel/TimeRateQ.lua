@@ -2,25 +2,17 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 
 local TimeRateQ = Modifier:new()
 
-TimeRateQ.inconsequential = true
 TimeRateQ.type = "TimeEngineModifier"
 
 TimeRateQ.name = "TimeRateQ"
-TimeRateQ.shortName = "TimeRateQ"
+TimeRateQ.shortName = "Q"
 
-TimeRateQ.variableType = "number"
-TimeRateQ.variableName = "value"
-TimeRateQ.variableFormat = "%3s"
-TimeRateQ.variableRange = {-10, 1, 10}
-
-TimeRateQ.value = 0
+TimeRateQ.defaultValue = 0
+TimeRateQ.format = "%3s"
+TimeRateQ.range = {-10, 1, 10}
 
 TimeRateQ.tostring = function(self)
-	return self.value .. "Q"
-end
-
-TimeRateQ.tojson = function(self)
-	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
+	return self.value .. self.shortName
 end
 
 -- https://github.com/Quaver/Quaver/issues/666

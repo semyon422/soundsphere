@@ -2,27 +2,19 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 
 local SpeedMode = Modifier:new()
 
-SpeedMode.inconsequential = true
 SpeedMode.type = "NoteChartModifier"
 
 SpeedMode.name = "SpeedMode"
-SpeedMode.shortName = "SpeedMode"
 
-SpeedMode.variableType = "number"
-SpeedMode.variableName = "value"
-SpeedMode.variableFormat = "%s"
-SpeedMode.variableRange = {1, 1, 5}
-SpeedMode.variableValues = {"avg", "x", "const", "min", "max"}
-SpeedMode.value = 1
+SpeedMode.defaultValue = 1
+SpeedMode.format = "%s"
+SpeedMode.range = {1, 1, 5}
+SpeedMode.values = {"avg", "x", "const", "min", "max"}
 
 SpeedMode.modeNames = {"AMod", "XMod", "CMod", "MinMod", "MaxMod"}
 
-SpeedMode.tostring = function(self)
-	return self.modeNames[self.value]
-end
-
-SpeedMode.tojson = function(self)
-	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
+SpeedMode.getString = function(self)
+	return self.modeNames[self.config.value]
 end
 
 SpeedMode.applySpeed = function(self, speed)
@@ -30,15 +22,15 @@ SpeedMode.applySpeed = function(self, speed)
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
-		
+
 		local velocityDataSequence = layerData.spaceData.velocityDataSequence
 		for velocityDataIndex = 1, velocityDataSequence:getVelocityDataCount() do
 			local velocityData = velocityDataSequence:getVelocityData(velocityDataIndex)
-			
+
 			velocityData.currentSpeed = velocityData.currentSpeed / speed
 		end
 	end
-	
+
 	noteChart:compute()
 end
 
@@ -47,23 +39,23 @@ SpeedMode.applyConstant = function(self)
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
-		
+
 		local velocityDataSequence = layerData.spaceData.velocityDataSequence
 		for velocityDataIndex = 1, velocityDataSequence:getVelocityDataCount() do
 			local velocityData = velocityDataSequence:getVelocityData(velocityDataIndex)
-			
+
 			velocityData.currentSpeed = 1
 			velocityData.localSpeed = 1
 			velocityData.globalSpeed = 1
 		end
 	end
-	
+
 	noteChart:compute()
 end
 
 SpeedMode.apply = function(self)
 	local noteChart = self.noteChartModel.noteChart
-	
+
 	local minTime = noteChart.metaData:get("minTime")
 	local maxTime = noteChart.metaData:get("maxTime")
 
@@ -72,7 +64,7 @@ SpeedMode.apply = function(self)
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
-		
+
 		local velocityDataSequence = layerData.spaceData.velocityDataSequence
 		for velocityDataIndex = 1, velocityDataSequence:getVelocityDataCount() do
 			local velocityData = velocityDataSequence:getVelocityData(velocityDataIndex)
@@ -93,10 +85,10 @@ SpeedMode.apply = function(self)
 			end
 		end
 	end
-	
+
 	local longestDuration = 0
 	local average, minimum, maximum = 1, 1, 1
-	
+
 	for speed, duration in pairs(durations) do
 		if duration > longestDuration then
 			longestDuration = duration
@@ -110,7 +102,7 @@ SpeedMode.apply = function(self)
 		end
 	end
 
-	local mode = self.value
+	local mode = self.config.value
 	if mode == 1 then
 		self:applySpeed(average)
 	elseif mode == 2 then

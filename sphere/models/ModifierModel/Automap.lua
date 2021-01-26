@@ -203,35 +203,23 @@ config[10][9] = {
 
 local Automap = Modifier:new()
 
-Automap.sequential = true
 Automap.type = "NoteChartModifier"
 
 Automap.name = "Automap"
 Automap.shortName = "AM"
 
-Automap.variableType = "number"
-Automap.variableName = "keys"
-Automap.variableRange = {4, 1, 10}
-
-Automap.keys = 10
-
-Automap.construct = function(self)
-	self.keys = Automap.keys
-end
+Automap.defaultValue = 10
+Automap.range = {4, 1, 10}
 
 Automap.tostring = function(self)
-	return self.shortName .. self.keys
-end
-
-Automap.tojson = function(self)
-	return ([[{"name":"%s","keys":%s}]]):format(self.name, self.keys)
+	return self.shortName .. self.config.value
 end
 
 Automap.apply = function(self)
 	local noteChart = self.noteChartModel.noteChart
 	self.noteChart = noteChart
 
-	self.targetMode = self.keys
+	self.targetMode = self.config.value
 	self.columnCount = self.noteChart.inputMode:getInputCount("key")
 
 	print(self.targetMode == self.columnCount or self.columnCount == 0)
@@ -252,9 +240,6 @@ end
 Automap.applyAutomap = function(self)
 	local noteChart = self.noteChartModel.noteChart
 	self.noteChart = noteChart
-
-	self.targetMode = self.keys
-	self.columnCount = self.noteChart.inputMode:getInputCount("key")
 
 	local noteDatas = {}
 	self.noteDatas = noteDatas

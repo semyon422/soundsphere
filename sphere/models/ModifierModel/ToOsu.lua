@@ -3,16 +3,17 @@ local NoteChartExporter			= require("osu.NoteChartExporter")
 
 local ToOsu = Modifier:new()
 
-ToOsu.inconsequential = true
 ToOsu.type = "NoteChartModifier"
 
 ToOsu.name = "ToOsu"
 ToOsu.shortName = "ToOsu"
-ToOsu.after = true
-
-ToOsu.variableType = "boolean"
 
 ToOsu.apply = function(self)
+	local config = self.config
+	if not config.value then
+		return
+	end
+
 	local nce = NoteChartExporter:new()
 	nce.noteChart = self.noteChartModel.noteChart
 	nce.noteChartEntry = self.noteChartModel.noteChartEntry

@@ -197,18 +197,31 @@ SelectController.playNoteChart = function(self)
 		return
 	end
 
-	local GameplayController = require("sphere.controllers.GameplayController")
-	local gameplayController = GameplayController:new()
-	gameplayController.noteChartModel = noteChartModel
-	gameplayController.themeModel = self.themeModel
-	gameplayController.modifierModel = self.modifierModel
-	gameplayController.configModel = self.configModel
-	gameplayController.notificationModel = self.notificationModel
-	gameplayController.scoreModel = self.scoreModel
-	gameplayController.onlineModel = self.onlineModel
-	gameplayController.difficultyModel = self.difficultyModel
-	gameplayController.selectController = self
-	return ScreenManager:set(gameplayController)
+	local ModifierController = require("sphere.controllers.ModifierController")
+	local modifierController = ModifierController:new()
+	modifierController.noteChartModel = noteChartModel
+	modifierController.themeModel = self.themeModel
+	modifierController.modifierModel = self.modifierModel
+	modifierController.configModel = self.configModel
+	modifierController.notificationModel = self.notificationModel
+	modifierController.scoreModel = self.scoreModel
+	modifierController.onlineModel = self.onlineModel
+	modifierController.difficultyModel = self.difficultyModel
+	modifierController.selectController = self
+	return ScreenManager:set(modifierController)
+
+	-- local GameplayController = require("sphere.controllers.GameplayController")
+	-- local gameplayController = GameplayController:new()
+	-- gameplayController.noteChartModel = noteChartModel
+	-- gameplayController.themeModel = self.themeModel
+	-- gameplayController.modifierModel = self.modifierModel
+	-- gameplayController.configModel = self.configModel
+	-- gameplayController.notificationModel = self.notificationModel
+	-- gameplayController.scoreModel = self.scoreModel
+	-- gameplayController.onlineModel = self.onlineModel
+	-- gameplayController.difficultyModel = self.difficultyModel
+	-- gameplayController.selectController = self
+	-- return ScreenManager:set(gameplayController)
 end
 
 SelectController.replayNoteChart = function(self, mode, hash)

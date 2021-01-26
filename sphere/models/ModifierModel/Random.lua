@@ -2,32 +2,25 @@ local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 
 local Random = SwapModifier:new()
 
-Random.sequential = true
 Random.type = "NoteChartModifier"
 
 Random.name = "Random"
 Random.shortName = "RD"
 
-Random.variableType = "number"
-Random.variableName = "value"
-Random.variableFormat = "%s"
-Random.variableRange = {1, 1, 3}
-Random.variableValues = {"all", "left", "right"}
-Random.value = 1
+Random.defaultValue = 1
+Random.format = "%s"
+Random.range = {1, 1, 3}
+Random.values = {"all", "left", "right"}
 
 Random.modeNames = {"A", "L", "R"}
 
-Random.tostring = function(self)
-	return self.shortName .. self.modeNames[self.value]
-end
-
-Random.tojson = function(self)
-	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
+Random.getString = function(self)
+	return self.shortName .. self.modeNames[self.config.value]
 end
 
 Random.getMap = function(self)
 	local noteChart = self.noteChartModel.noteChart
-	local value = self.value
+	local value = self.config.value
 
 	local inputs = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do
