@@ -52,11 +52,13 @@ GameController.load = function(self)
 	local onlineModel = self.onlineModel
 	local cacheModel = self.cacheModel
 
-	configModel:addConfig("settings", "userdata/settings.toml", "sphere/models/ConfigModel/settings.toml")
-	configModel:addConfig("select", "userdata/select.toml", "sphere/models/ConfigModel/select.toml")
+	configModel:addConfig("settings", "userdata/settings.toml", "sphere/models/ConfigModel/settings.toml", "toml")
+	configModel:addConfig("select", "userdata/select.toml", "sphere/models/ConfigModel/select.toml", "toml")
+	configModel:addConfig("modifier", "userdata/modifier.json", "sphere/models/ConfigModel/modifier.json", "json")
 
 	configModel:readConfig("settings")
 	configModel:readConfig("select")
+	configModel:readConfig("modifier")
 
 	onlineController.onlineModel = onlineModel
 	onlineController.cacheModel = cacheModel
@@ -108,6 +110,7 @@ GameController.unload = function(self)
 	DiscordPresence:unload()
 	self.configModel:writeConfig("settings")
 	self.configModel:writeConfig("select")
+	self.configModel:writeConfig("modifier")
 	self.mountModel:unload()
 	self.onlineModel:unload()
 end

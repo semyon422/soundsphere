@@ -1,5 +1,6 @@
 local Class = require("aqua.util.Class")
 local toml = require("lua-toml.toml")
+local json = require("json")
 toml.strict = false
 
 local ConfigModel = Class:new()
@@ -8,17 +9,24 @@ ConfigModel.construct = function(self)
 	self.configs = {}
 	self.paths = {}
 	self.defaultPaths = {}
+	self.formats = {}
 end
 
-ConfigModel.addConfig = function(self, name, path, defaultPath)
+ConfigModel.getConfig = function(self, name)
+	return assert(self.configs[name])
+end
+
+ConfigModel.addConfig = function(self, name, path, defaultPath, format)
 	local configs = self.configs
 	local paths = self.paths
 	local defaultPaths = self.defaultPaths
+	local formats = self.formats
 	assert(not configs[name])
 
 	configs[name] = {}
 	paths[name] = path
 	defaultPaths[name] = defaultPath
+	formats[name] = format
 end
 
 ConfigModel.readConfig = function(self, name)
@@ -26,14 +34,18 @@ ConfigModel.readConfig = function(self, name)
 
 	local path = self.paths[name]
 	local defaultPath = self.defaultPaths[name]
+	local format = self.formats[name]
 	if defaultPath then
-		self:copyTable(self:readTomlFile(defaultPath), config)
+		self:copyTable(self:readConfigFile(defaultPath, format), config)
 	end
-	self:copyTable(self:readTomlFile(path), config)
+	self:copyTable(self:readConfigFile(path, format), config)
 end
 
 ConfigModel.writeConfig = function(self, name)
-	return self:writeTomlFile(self.paths[name], assert(self.configs[name]))
+	local config = assert(self.configs[name])
+	local format = self.formats[name]
+	local path = self.paths[name]
+	return self:writeConfigFile(path, format, config)
 end
 
 ConfigModel.copyTable = function(self, from, to)
@@ -47,15 +59,39 @@ ConfigModel.copyTable = function(self, from, to)
 	end
 end
 
-ConfigModel.readTomlFile = function(self, path)
+ConfigModel.readConfigFile = function(self, path, format)
 	local info = love.filesystem.getInfo(path)
-	if info and info.size ~= 0 then
-		local file = io.open(path, "r")
-		local data = assert(toml.parse(file:read("*all")))
-		file:close()
-		return data
+	if not info or info.size == 0 then
+		return {}
 	end
-	return {}
+
+	if format == "toml" then
+		return self:readTomlFile(path)
+	elseif format == "json" then
+		return self:readJsonFile(path)
+	end
+end
+
+ConfigModel.readTomlFile = function(self, path)
+	local file = io.open(path, "r")
+	local data = assert(toml.parse(file:read("*all")))
+	file:close()
+	return data
+end
+
+ConfigModel.readJsonFile = function(self, path)
+	local file = io.open(path, "r")
+	local data = assert(json.decode(file:read("*all")))
+	file:close()
+	return data
+end
+
+ConfigModel.writeConfigFile = function(self, path, format, config)
+	if format == "toml" then
+		return self:writeTomlFile(path, config)
+	elseif format == "json" then
+		return self:writeJsonFile(path, config)
+	end
 end
 
 ConfigModel.writeTomlFile = function(self, path, config)
@@ -64,8 +100,10 @@ ConfigModel.writeTomlFile = function(self, path, config)
 	return file:close()
 end
 
-ConfigModel.getConfig = function(self, name)
-	return assert(self.configs[name])
+ConfigModel.writeJsonFile = function(self, path, config)
+	local file = io.open(path, "w")
+	file:write(json.encode(config))
+	return file:close()
 end
 
 return ConfigModel
