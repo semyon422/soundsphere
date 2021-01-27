@@ -1,10 +1,12 @@
+local viewspackage = (...):match("^(.-%.views%.)")
 
 local Node = require("aqua.util.Node")
+local ListItemView = require(viewspackage .. "ListItemView")
 
 local ListView = Node:new()
 
 ListView.init = function(self)
-	local ListItemView = self.ListItemView or dofile(self.__path .. "/views/ListItemView.lua")
+	local ListItemView = self.ListItemView or ListItemView
 	for i = 1, self.itemCount do
 		local item = ListItemView:new()
 		item.__path = self.__path

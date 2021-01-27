@@ -1,19 +1,21 @@
 
+local viewspackage = (...):match("^(.-%.views%.)")
+
 local Node = require("aqua.util.Node")
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
+local ListView = require(viewspackage .. "ListView")
+local ScoreListItemView = require(viewspackage .. "select.ScoreListItemView")
 
-local NoteChartSetListView = Node:new()
+local ScoreListView = Node:new()
 
-NoteChartSetListView.init = function(self)
-	local ListView = dofile(self.__path .. "/views/ListView.lua")
+ScoreListView.init = function(self)
 	local listView = ListView:new()
 	self.listView = listView
 
-	listView.ListItemView = dofile(self.__path .. "/views/NoteChartSetListItemView.lua")
-	listView.__path = self.__path
+	listView.ListItemView = ScoreListItemView
 	listView.view = self.view
 	listView.cs = CoordinateManager:getCS(0.5, 0, 0, 0, "h")
-	listView.x = 16 / 9 / 3 / 2
+	listView.x = -16 / 9 / 2
 	listView.y = 0
 	listView.w = 16 / 9 / 3
 	listView.h = 1
@@ -23,11 +25,11 @@ NoteChartSetListView.init = function(self)
 	self:reloadItems()
 
 	self:on("update", function()
-		listView.selectedItem = self.selectNavigator.noteChartSetList.selected
+		listView.selectedItem = self.selectNavigator.scoreList.selected
 		self:reloadItems()
 	end)
 	listView:on("select", function()
-		self.selectNavigator:setNode("noteChartSetList")
+		self.selectNavigator:setNode("scoreList")
 		self.view.selectedNode = self
 	end)
 	self:on("draw", self.drawFrame)
@@ -36,17 +38,17 @@ NoteChartSetListView.init = function(self)
 	self.pass = true
 end
 
-NoteChartSetListView.reloadItems = function(self)
-	self.listView.items = self.view.noteChartSetLibraryModel:getItems()
+ScoreListView.reloadItems = function(self)
+	self.listView.items = self.view.scoreLibraryModel:getItems()
 end
 
-NoteChartSetListView.drawFrame = function(self)
+ScoreListView.drawFrame = function(self)
 	local listView = self.listView
-	if self.selectNavigator:checkNode("noteChartSetList") then
+	if self.selectNavigator:checkNode("scoreList") then
 		listView.isSelected = true
 	else
 		listView.isSelected = false
 	end
 end
 
-return NoteChartSetListView
+return ScoreListView

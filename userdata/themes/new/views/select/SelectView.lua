@@ -1,5 +1,14 @@
+local viewspackage = (...):match("^(.-%.views%.)")
+
 local Class = require("aqua.util.Class")
 local Node = require("aqua.util.Node")
+
+local SelectNavigator = require(viewspackage .. "select.SelectNavigator")
+local NoteChartSetListView = require(viewspackage .. "select.NoteChartSetListView")
+local NoteChartListView = require(viewspackage .. "select.NoteChartListView")
+local ScoreListView = require(viewspackage .. "select.ScoreListView")
+local SearchLineView = require(viewspackage .. "select.SearchLineView")
+local BackgroundView = require(viewspackage .. "BackgroundView")
 
 local SelectView = Class:new()
 
@@ -12,35 +21,35 @@ SelectView.load = function(self)
 	local node = self.node
 	local config = self.configModel:getConfig("select")
 
-	local SelectNavigator = dofile(self.__path .. "/views/SelectNavigator.lua")
-	local selectNavigator = SelectNavigator:new({view = self})
+	local selectNavigator = SelectNavigator:new()
 	self.selectNavigator = selectNavigator
 	selectNavigator.searchLineModel = self.searchLineModel
 	selectNavigator.config = config
+	selectNavigator.view = self
 
-	local NoteChartSetListView = dofile(self.__path .. "/views/NoteChartSetListView.lua")
-	local noteChartSetListView = NoteChartSetListView:new({__path = self.__path, view = self})
+	local noteChartSetListView = NoteChartSetListView:new()
 	noteChartSetListView.selectNavigator = selectNavigator
 	noteChartSetListView.config = config
+	noteChartSetListView.view = self
 
-	local NoteChartListView = dofile(self.__path .. "/views/NoteChartListView.lua")
-	local noteChartListView = NoteChartListView:new({__path = self.__path, view = self})
+	local noteChartListView = NoteChartListView:new()
 	noteChartListView.selectNavigator = selectNavigator
 	noteChartListView.config = config
+	noteChartListView.view = self
 
-	local ScoreListView = dofile(self.__path .. "/views/ScoreListView.lua")
-	local scoreListView = ScoreListView:new({__path = self.__path, view = self})
+	local scoreListView = ScoreListView:new()
 	scoreListView.selectNavigator = selectNavigator
 	scoreListView.config = config
+	scoreListView.view = self
 
-	local SearchLineView = dofile(self.__path .. "/views/SearchLineView.lua")
-	local searchLineView = SearchLineView:new({__path = self.__path, view = self})
+	local searchLineView = SearchLineView:new()
 	searchLineView.selectNavigator = selectNavigator
 	searchLineView.searchLineModel = self.searchLineModel
 	searchLineView.config = self.config
+	searchLineView.view = self
 
-	local BackgroundView = dofile(self.__path .. "/views/BackgroundView.lua")
-	local backgroundView = BackgroundView:new({__path = self.__path, view = self})
+	local backgroundView = BackgroundView:new()
+	backgroundView.view = self
 
 	node:node(backgroundView)
 	node:node(noteChartSetListView)

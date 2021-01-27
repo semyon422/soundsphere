@@ -1,14 +1,12 @@
+local viewspackage = (...):match("^(.-%.views%.)")
 
-local Class = require("aqua.util.Class")
+local Navigator = require(viewspackage .. "Navigator")
 local Node = require("aqua.util.Node")
-local Observable = require("aqua.util.Observable")
 
-local SelectNavigator = Class:new()
+local SelectNavigator = Navigator:new()
 
 SelectNavigator.construct = function(self)
-	local observable = Observable:new()
-	self.observable = observable
-	observable:add(self.view.controller)
+	Navigator.construct(self)
 
 	local noteChartSetList = Node:new()
 	self.noteChartSetList = noteChartSetList
@@ -237,12 +235,11 @@ SelectNavigator.pullScore = function(self)
 end
 
 SelectNavigator.load = function(self)
-	local observable = self.observable
+	Navigator.load(self)
+
 	local noteChartSetList = self.noteChartSetList
 	local noteChartList = self.noteChartList
 	local scoreList = self.scoreList
-
-	observable:add(self.view.controller)
 
 	self.node = noteChartSetList
 	noteChartSetList:on("up", function()
@@ -287,28 +284,8 @@ SelectNavigator.load = function(self)
 	self:pullSearch()
 end
 
-SelectNavigator.unload = function(self)
-	self.observable:remove(self.view.controller)
-end
-
 SelectNavigator.update = function(self)
 	self:updateSearch()
-end
-
-SelectNavigator.setNode = function(self, nodeName)
-	self.node = assert(self[nodeName])
-end
-
-SelectNavigator.checkNode = function(self, nodeName)
-	return self.node == self[nodeName]
-end
-
-SelectNavigator.call = function(self, ...)
-	self.node:call(...)
-end
-
-SelectNavigator.send = function(self, event)
-	return self.observable:send(event)
 end
 
 SelectNavigator.receive = function(self, event)

@@ -86,7 +86,7 @@ SelectController.load = function(self)
 	modifierController.selectController = self
 
 	inputModel:load()
-	modifierModel:load()
+	-- modifierModel:load()
 	noteSkinModel:load()
 	cacheModel:load()
 	noteChartModel:select()
@@ -95,7 +95,7 @@ SelectController.load = function(self)
 end
 
 SelectController.unload = function(self)
-	self.modifierModel:unload()
+	-- self.modifierModel:unload()
 	self.view:unload()
 	self.inputModel:unload()
 end

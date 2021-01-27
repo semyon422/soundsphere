@@ -34,14 +34,13 @@ ThemeModel.loadMetaData = function(self, path, fileName)
 	local jsonObject = json.decode(file:read("*all"))
 	file:close()
 
-	local theme = Theme:new()
-
-	theme.name = jsonObject.name
-	theme.path = path
-	theme:load()
+	local UserTheme = require(path:gsub("/", "."))
+	local userTheme = UserTheme:new()
+	userTheme.path = path
+	userTheme:load()
 
 	local themes = self.themes
-	themes[#themes + 1] = theme
+	themes[#themes + 1] = userTheme
 end
 
 ThemeModel.getThemes = function(self)

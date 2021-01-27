@@ -1,1 +1,1 @@
-return function(self) end
+return require("sphere.models.ThemeModel.Theme")

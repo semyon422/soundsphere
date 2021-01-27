@@ -1,20 +1,18 @@
-local theme = {}
+local themepackage = (...) .. "."
 
-theme.newView = function(self, name)
+local Theme = require("sphere.models.ThemeModel.Theme")
+local SelectView = require(themepackage .. "views.select.SelectView")
+local ModifierView = require(themepackage .. "views.modifier.ModifierView")
+
+local UserTheme = Theme:new()
+
+UserTheme.newView = function(self, name)
 	if name == "SelectView" then
-		local SelectView = dofile(self.path .. "/views/SelectView.lua")
-		local selectView = SelectView:new()
-		selectView.__path = self.path
-		return selectView
+		return SelectView:new()
 	elseif name == "ModifierView" then
-		local ModifierView = dofile(self.path .. "/views/ModifierView.lua")
-		local modifierView = ModifierView:new()
-		modifierView.__path = self.path
-		return modifierView
+		return ModifierView:new()
 	end
 	return self.viewFactory:newView(name)
 end
 
-return function(self)
-	self.newView = theme.newView
-end
+return UserTheme

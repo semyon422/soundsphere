@@ -1,19 +1,20 @@
+local viewspackage = (...):match("^(.-%.views%.)")
 
 local Node = require("aqua.util.Node")
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
+local ListView = require(viewspackage .. "ListView")
+local NoteChartListItemView = require(viewspackage .. "select.NoteChartListItemView")
 
-local ScoreListView = Node:new()
+local NoteChartListView = Node:new()
 
-ScoreListView.init = function(self)
-	local ListView = dofile(self.__path .. "/views/ListView.lua")
+NoteChartListView.init = function(self)
 	local listView = ListView:new()
 	self.listView = listView
 
-	listView.ListItemView = dofile(self.__path .. "/views/ScoreListItemView.lua")
-	listView.__path = self.__path
+	listView.ListItemView = NoteChartListItemView
 	listView.view = self.view
 	listView.cs = CoordinateManager:getCS(0.5, 0, 0, 0, "h")
-	listView.x = -16 / 9 / 2
+	listView.x = -16 / 9 / 3 / 2
 	listView.y = 0
 	listView.w = 16 / 9 / 3
 	listView.h = 1
@@ -23,11 +24,11 @@ ScoreListView.init = function(self)
 	self:reloadItems()
 
 	self:on("update", function()
-		listView.selectedItem = self.selectNavigator.scoreList.selected
+		listView.selectedItem = self.selectNavigator.noteChartList.selected
 		self:reloadItems()
 	end)
 	listView:on("select", function()
-		self.selectNavigator:setNode("scoreList")
+		self.selectNavigator:setNode("noteChartList")
 		self.view.selectedNode = self
 	end)
 	self:on("draw", self.drawFrame)
@@ -36,17 +37,17 @@ ScoreListView.init = function(self)
 	self.pass = true
 end
 
-ScoreListView.reloadItems = function(self)
-	self.listView.items = self.view.scoreLibraryModel:getItems()
+NoteChartListView.reloadItems = function(self)
+	self.listView.items = self.view.noteChartLibraryModel:getItems()
 end
 
-ScoreListView.drawFrame = function(self)
+NoteChartListView.drawFrame = function(self)
 	local listView = self.listView
-	if self.selectNavigator:checkNode("scoreList") then
+	if self.selectNavigator:checkNode("noteChartList") then
 		listView.isSelected = true
 	else
 		listView.isSelected = false
 	end
 end
 
-return ScoreListView
+return NoteChartListView

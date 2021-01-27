@@ -47,14 +47,14 @@ ModifierController.load = function(self)
 	view.scoreLibraryModel = scoreLibraryModel
 	view.searchLineModel = searchLineModel
 
-	modifierModel:load()
+	-- modifierModel:load()
 	noteChartModel:select()
 
 	view:load()
 end
 
 ModifierController.unload = function(self)
-	self.modifierModel:unload()
+	-- self.modifierModel:unload()
 	self.view:unload()
 end
 

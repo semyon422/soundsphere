@@ -8,8 +8,6 @@ Theme.construct = function(self)
 end
 
 Theme.load = function(self)
-    local init = dofile(self.path .. "/init.lua")
-    init(self)
 end
 
 Theme.newView = function(self, name)
