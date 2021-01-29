@@ -3,18 +3,18 @@ local viewspackage = (...):match("^(.-%.views%.)")
 local Node = require("aqua.util.Node")
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local ListView = require(viewspackage .. "ListView")
-local NoteChartSetListItemView = require(viewspackage .. "select.NoteChartSetListItemView")
+local AvailableModifierListItemView = require(viewspackage .. "modifier.AvailableModifierListItemView")
 
-local NoteChartSetListView = Node:new()
+local AvailableModifierListView = Node:new()
 
-NoteChartSetListView.init = function(self)
+AvailableModifierListView.init = function(self)
 	local listView = ListView:new()
 	self.listView = listView
 
-	listView.ListItemView = NoteChartSetListItemView
+	listView.ListItemView = AvailableModifierListItemView
 	listView.view = self.view
 	listView.cs = CoordinateManager:getCS(0.5, 0, 0, 0, "h")
-	listView.x = 16 / 9 / 3 / 2
+	listView.x = -16 / 9 / 3
 	listView.y = 0
 	listView.w = 16 / 9 / 3
 	listView.h = 1
@@ -24,11 +24,11 @@ NoteChartSetListView.init = function(self)
 	self:reloadItems()
 
 	self:on("update", function()
-		listView.selectedItem = self.navigator.noteChartSetList.selected
+		listView.selectedItem = self.navigator.availableModifierList.selected
 		self:reloadItems()
 	end)
 	listView:on("select", function()
-		self.navigator:setNode("noteChartSetList")
+		self.navigator:setNode("availableModifierList")
 		self.view.selectedNode = self
 	end)
 	self:on("draw", self.drawFrame)
@@ -37,17 +37,17 @@ NoteChartSetListView.init = function(self)
 	self.pass = true
 end
 
-NoteChartSetListView.reloadItems = function(self)
-	self.listView.items = self.view.noteChartSetLibraryModel:getItems()
+AvailableModifierListView.reloadItems = function(self)
+	self.listView.items = self.view.modifierModel.modifiers
 end
 
-NoteChartSetListView.drawFrame = function(self)
+AvailableModifierListView.drawFrame = function(self)
 	local listView = self.listView
-	if self.navigator:checkNode("noteChartSetList") then
+	if self.navigator:checkNode("availableModifierList") then
 		listView.isSelected = true
 	else
 		listView.isSelected = false
 	end
 end
 
-return NoteChartSetListView
+return AvailableModifierListView

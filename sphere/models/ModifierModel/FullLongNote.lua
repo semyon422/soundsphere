@@ -11,7 +11,7 @@ FullLongNote.shortName = "FLN"
 FullLongNote.defaultValue = 0
 FullLongNote.range = {0, 1, 3}
 
-FullLongNote.tostring = function(self)
+FullLongNote.getString = function(self)
 	return self.shortName .. self.config.value
 end
 

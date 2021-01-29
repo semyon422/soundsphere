@@ -3,18 +3,18 @@ local viewspackage = (...):match("^(.-%.views%.)")
 local Node = require("aqua.util.Node")
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local ListView = require(viewspackage .. "ListView")
-local NoteChartSetListItemView = require(viewspackage .. "select.NoteChartSetListItemView")
+local ModifierListItemView = require(viewspackage .. "modifier.ModifierListItemView")
 
-local NoteChartSetListView = Node:new()
+local ModifierListView = Node:new()
 
-NoteChartSetListView.init = function(self)
+ModifierListView.init = function(self)
 	local listView = ListView:new()
 	self.listView = listView
 
-	listView.ListItemView = NoteChartSetListItemView
+	listView.ListItemView = ModifierListItemView
 	listView.view = self.view
 	listView.cs = CoordinateManager:getCS(0.5, 0, 0, 0, "h")
-	listView.x = 16 / 9 / 3 / 2
+	listView.x = 0
 	listView.y = 0
 	listView.w = 16 / 9 / 3
 	listView.h = 1
@@ -24,11 +24,11 @@ NoteChartSetListView.init = function(self)
 	self:reloadItems()
 
 	self:on("update", function()
-		listView.selectedItem = self.navigator.noteChartSetList.selected
+		listView.selectedItem = self.navigator.modifierList.selected
 		self:reloadItems()
 	end)
 	listView:on("select", function()
-		self.navigator:setNode("noteChartSetList")
+		self.navigator:setNode("modifierList")
 		self.view.selectedNode = self
 	end)
 	self:on("draw", self.drawFrame)
@@ -37,17 +37,17 @@ NoteChartSetListView.init = function(self)
 	self.pass = true
 end
 
-NoteChartSetListView.reloadItems = function(self)
-	self.listView.items = self.view.noteChartSetLibraryModel:getItems()
+ModifierListView.reloadItems = function(self)
+	self.listView.items = self.view.configModel:getConfig("modifier")
 end
 
-NoteChartSetListView.drawFrame = function(self)
+ModifierListView.drawFrame = function(self)
 	local listView = self.listView
-	if self.navigator:checkNode("noteChartSetList") then
+	if self.navigator:checkNode("modifierList") then
 		listView.isSelected = true
 	else
 		listView.isSelected = false
 	end
 end
 
-return NoteChartSetListView
+return ModifierListView

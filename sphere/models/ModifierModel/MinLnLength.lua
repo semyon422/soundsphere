@@ -18,7 +18,7 @@ MinLnLength.shortName = "MLL"
 MinLnLength.defaultValue = 0
 MinLnLength.range = {0, 25, 1000}
 
-MinLnLength.tostring = function(self)
+MinLnLength.getString = function(self)
 	return self.shortName .. self.config.value
 end
 

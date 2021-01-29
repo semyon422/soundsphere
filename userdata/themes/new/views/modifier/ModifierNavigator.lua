@@ -17,6 +17,32 @@ ModifierNavigator.construct = function(self)
 	modifierList.selected = 1
 end
 
+ModifierNavigator.scrollAvailableModifier = function(self, direction, destination)
+	local availableModifierList = self.availableModifierList
+
+	local availableModifiers = self.view.modifierModel.modifiers
+
+	direction = direction or destination - availableModifierList.selected
+	if not availableModifiers[availableModifierList.selected + direction] then
+		return
+	end
+
+	availableModifierList.selected = availableModifierList.selected + direction
+end
+
+ModifierNavigator.scrollModifier = function(self, direction, destination)
+	local modifierList = self.modifierList
+
+	local modifiers = self.config
+
+	direction = direction or destination - modifierList.selected
+	if not modifiers[modifierList.selected + direction] then
+		return
+	end
+
+	modifierList.selected = modifierList.selected + direction
+end
+
 ModifierNavigator.load = function(self)
     Navigator.load(self)
 
@@ -35,7 +61,13 @@ ModifierNavigator.load = function(self)
 	end)
 	modifierList:on("return", function()
 		self:send({
-			action = "playNoteChart",
+			name = "playNoteChart",
+		})
+	end)
+	modifierList:on("backspace", function()
+		self:send({
+			name = "removeModifier",
+			modifierConfig = self.config[modifierList.selected]
 		})
 	end)
 
@@ -47,6 +79,13 @@ ModifierNavigator.load = function(self)
 	end)
 	availableModifierList:on("right", function()
 		self.node = modifierList
+	end)
+	availableModifierList:on("return", function()
+		local Modifier = self.view.modifierModel.modifiers[availableModifierList.selected]
+		self:send({
+			name = "addModifier",
+			modifierConfig = Modifier:getDefaultConfig()
+		})
 	end)
 end
 

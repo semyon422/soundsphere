@@ -19,7 +19,6 @@ SelectController.construct = function(self)
 	self.noteSkinModel = NoteSkinModel:new()
 	self.noteChartModel = NoteChartModel:new()
 	self.inputModel = InputModel:new()
-	self.modifierController = ModifierController:new()
 	self.difficultyModel = DifficultyModel:new()
 	self.noteChartSetLibraryModel = NoteChartSetLibraryModel:new()
 	self.noteChartLibraryModel = NoteChartLibraryModel:new()
@@ -34,7 +33,6 @@ SelectController.load = function(self)
 	local inputModel = self.inputModel
 	local cacheModel = self.cacheModel
 	local themeModel = self.themeModel
-	local modifierController = self.modifierController
 	local configModel = self.configModel
 	local mountModel = self.mountModel
 	local scoreModel = self.scoreModel
@@ -78,12 +76,7 @@ SelectController.load = function(self)
 	view.scoreLibraryModel = scoreLibraryModel
 	view.searchLineModel = searchLineModel
 
-	modifierController.modifierModel = modifierModel
-	modifierController.noteChartModel = noteChartModel
-	modifierController.difficultyModel = difficultyModel
-	modifierController.scoreModel = scoreModel
-	modifierController.configModel = configModel
-	modifierController.selectController = self
+	modifierModel.config = configModel:getConfig("modifier")
 
 	inputModel:load()
 	-- modifierModel:load()
@@ -112,7 +105,6 @@ SelectController.receive = function(self, event)
 	local config = self.configModel:getConfig("select")
 
 	self.view:receive(event)
-	self.modifierController:receive(event)
 
     if event.name == "setNoteSkin" then
 		self.noteSkinModel:setDefaultNoteSkin(event.inputMode, event.metaData)

@@ -14,7 +14,6 @@ ModifierController.load = function(self)
 	local inputModel = self.inputModel
 	local cacheModel = self.cacheModel
 	local themeModel = self.themeModel
-	local modifierController = self.modifierController
 	local configModel = self.configModel
 	local mountModel = self.mountModel
 	local scoreModel = self.scoreModel
@@ -67,6 +66,8 @@ ModifierController.draw = function(self)
 end
 
 ModifierController.receive = function(self, event)
+	self.view:receive(event)
+
 	if event.name == "enableBooleanModifier" then
 		event.modifier.enabled = event.value
 	elseif event.name == "enableNumberModifier" then
@@ -74,13 +75,16 @@ ModifierController.receive = function(self, event)
 	elseif event.name == "disableNumberModifier" then
 		event.modifier[event.modifier.variableName] = event.Modifier[event.modifier.variableName]
 	elseif event.name == "addModifier" then
-		self.modifierModel:add(event.Modifier)
+		print(123456)
+		self.modifierModel:add(event.modifierConfig)
 	elseif event.name == "removeModifier" then
-		self.modifierModel:remove(event.modifier)
-	elseif event.name == "updateNumberModifier" then
-		event.modifier[event.modifier.variableName] = event.value
+		self.modifierModel:remove(event.modifierConfig)
+	-- elseif event.name == "updateNumberModifier" then
+	-- 	event.modifier[event.modifier.variableName] = event.value
 	elseif event.name == "adjustDifficulty" then
 		self:adjustDifficulty()
+	elseif event.name == "playNoteChart" then
+		self:playNoteChart()
 	end
 end
 

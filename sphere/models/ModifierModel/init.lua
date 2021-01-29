@@ -52,7 +52,7 @@ ModifierModel.createModifiers = function(self)
 	for _, Modifier in ipairs(self.modifiers) do
 		local modifier = Modifier:new()
 		modifier.modifierModel = self
-		modifierByName[modifier.name] = modifierByName
+		modifierByName[modifier.name] = modifier
 	end
 end
 

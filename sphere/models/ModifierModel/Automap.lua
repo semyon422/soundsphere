@@ -211,7 +211,7 @@ Automap.shortName = "AM"
 Automap.defaultValue = 10
 Automap.range = {4, 1, 10}
 
-Automap.tostring = function(self)
+Automap.getString = function(self)
 	return self.shortName .. self.config.value
 end
 

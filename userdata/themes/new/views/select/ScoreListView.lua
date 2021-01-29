@@ -1,4 +1,3 @@
-
 local viewspackage = (...):match("^(.-%.views%.)")
 
 local Node = require("aqua.util.Node")
@@ -25,11 +24,11 @@ ScoreListView.init = function(self)
 	self:reloadItems()
 
 	self:on("update", function()
-		listView.selectedItem = self.selectNavigator.scoreList.selected
+		listView.selectedItem = self.navigator.scoreList.selected
 		self:reloadItems()
 	end)
 	listView:on("select", function()
-		self.selectNavigator:setNode("scoreList")
+		self.navigator:setNode("scoreList")
 		self.view.selectedNode = self
 	end)
 	self:on("draw", self.drawFrame)
@@ -44,7 +43,7 @@ end
 
 ScoreListView.drawFrame = function(self)
 	local listView = self.listView
-	if self.selectNavigator:checkNode("scoreList") then
+	if self.navigator:checkNode("scoreList") then
 		listView.isSelected = true
 	else
 		listView.isSelected = false

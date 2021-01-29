@@ -21,29 +21,29 @@ SelectView.load = function(self)
 	local node = self.node
 	local config = self.configModel:getConfig("select")
 
-	local selectNavigator = SelectNavigator:new()
-	self.selectNavigator = selectNavigator
-	selectNavigator.searchLineModel = self.searchLineModel
-	selectNavigator.config = config
-	selectNavigator.view = self
+	local navigator = SelectNavigator:new()
+	self.navigator = navigator
+	navigator.searchLineModel = self.searchLineModel
+	navigator.config = config
+	navigator.view = self
 
 	local noteChartSetListView = NoteChartSetListView:new()
-	noteChartSetListView.selectNavigator = selectNavigator
+	noteChartSetListView.navigator = navigator
 	noteChartSetListView.config = config
 	noteChartSetListView.view = self
 
 	local noteChartListView = NoteChartListView:new()
-	noteChartListView.selectNavigator = selectNavigator
+	noteChartListView.navigator = navigator
 	noteChartListView.config = config
 	noteChartListView.view = self
 
 	local scoreListView = ScoreListView:new()
-	scoreListView.selectNavigator = selectNavigator
+	scoreListView.navigator = navigator
 	scoreListView.config = config
 	scoreListView.view = self
 
 	local searchLineView = SearchLineView:new()
-	searchLineView.selectNavigator = selectNavigator
+	searchLineView.navigator = navigator
 	searchLineView.searchLineModel = self.searchLineModel
 	searchLineView.config = self.config
 	searchLineView.view = self
@@ -59,11 +59,11 @@ SelectView.load = function(self)
 
 	self.selectedNode = node
 
-	selectNavigator:load()
+	navigator:load()
 end
 
 SelectView.unload = function(self)
-	self.selectNavigator:unload()
+	self.navigator:unload()
 end
 
 SelectView.receive = function(self, event)
@@ -86,13 +86,13 @@ SelectView.receive = function(self, event)
 	-- if event.name == "keypressed" then
 	-- 	selectedNode:call("keypressed", event.args[1])
 	-- end
-	self.selectNavigator:receive(event)
+	self.navigator:receive(event)
 	self.searchLineModel:receive(event)
 end
 
 SelectView.update = function(self, dt)
 	self.node:callnext("update")
-	self.selectNavigator:update()
+	self.navigator:update()
 end
 
 SelectView.draw = function(self)

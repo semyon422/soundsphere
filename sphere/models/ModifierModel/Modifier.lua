@@ -3,7 +3,11 @@ local Class = require("aqua.util.Class")
 local Modifier = Class:new()
 
 Modifier.construct = function(self)
-	self.config = {
+	self.config = self:getDefaultConfig()
+end
+
+Modifier.getDefaultConfig = function(self)
+	return {
 		name = self.name,
 		value = self.defaultValue
 	}
