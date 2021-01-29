@@ -27,7 +27,9 @@ ModifierListItemView.draw = function(self)
 	local h = cs:Y(listView.h)
 
 	local index = self.index
-	local modifierConfig = listView.items[itemIndex]
+    local modifierConfig = listView.items[itemIndex]
+    local modifier = self.listView.view.modifierModel:getModifier(modifierConfig)
+    local realValue = modifier:getRealValue(modifierConfig)
 
 	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
 	if listView.isSelected then
@@ -42,7 +44,7 @@ ModifierListItemView.draw = function(self)
 
 	love.graphics.setFont(self.fontName)
 	love.graphics.printf(
-		modifierConfig.name .. tostring(modifierConfig.value),
+		modifierConfig.name .. realValue,
 		x,
 		y + (index - 1) * h / listView.itemCount,
 		w / cs.one * 1080,

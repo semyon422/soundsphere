@@ -17,8 +17,15 @@ Modifier.name = ""
 Modifier.shortName = ""
 Modifier.format = "%d"
 Modifier.defaultValue = 0
-Modifier.range = {0, 1, 1}
+Modifier.range = {0, 1}
+Modifier.step = 1
+Modifier.offset = 0
 Modifier.display = {"false", "true"}
+
+Modifier.getRealValue = function(self, config)
+	config = config or self.config
+	return self.offset + config.value * self.step
+end
 
 Modifier.update = function(self) end
 
@@ -26,12 +33,12 @@ Modifier.receive = function(self, event) end
 
 Modifier.checkValue = function(self, value)
 	local range = self.range
-	if value >= range[1] and value <= range[3] and (value - range[1]) % range[2] == 0 then
+	if value >= range[1] and value <= range[2] and value % 1 == 0 then
 		return true
 	end
 end
 
-Modifier.getString = function(self)
+Modifier.getString = function(self, config)
 	return self.shortName
 end
 

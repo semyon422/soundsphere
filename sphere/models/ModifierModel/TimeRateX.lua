@@ -7,16 +7,19 @@ TimeRateX.type = "TimeEngineModifier"
 TimeRateX.name = "TimeRateX"
 TimeRateX.shortName = "X"
 
-TimeRateX.defaultValue = 1
+TimeRateX.defaultValue = 10
 TimeRateX.format = "%0.2f"
-TimeRateX.range = {0.5, 0.05, 2}
+TimeRateX.step = 0.05
+TimeRateX.offset = 0.5
+TimeRateX.range = {0, 30}
 
-TimeRateX.tostring = function(self)
-	return self.value .. self.shortName
+TimeRateX.getString = function(self, config)
+	config = config or self.config
+	return self:getRealValue(config) .. self.shortName
 end
 
 TimeRateX.apply = function(self)
-	self.rhythmModel.timeEngine:createTimeRateHandler().timeRate = self.value
+	self.rhythmModel.timeEngine:createTimeRateHandler().timeRate = self:getRealValue()
 end
 
 return TimeRateX

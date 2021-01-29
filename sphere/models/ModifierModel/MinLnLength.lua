@@ -16,14 +16,16 @@ MinLnLength.name = "MinLnLength"
 MinLnLength.shortName = "MLL"
 
 MinLnLength.defaultValue = 0
-MinLnLength.range = {0, 25, 1000}
+MinLnLength.range = {0, 40}
+MinLnLength.step = 0.025
 
-MinLnLength.getString = function(self)
-	return self.shortName .. self.config.value
+MinLnLength.getString = function(self, config)
+	config = config or self.config
+	return self.shortName .. self:getRealValue(config) * 1000
 end
 
 MinLnLength.apply = function(self)
-	local duration = self.config.value / 1000
+	local duration = self:getRealValue()
 	local noteChart = self.noteChartModel.noteChart
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do

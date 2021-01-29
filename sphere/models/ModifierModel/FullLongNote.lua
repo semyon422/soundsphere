@@ -9,10 +9,11 @@ FullLongNote.name = "FullLongNote"
 FullLongNote.shortName = "FLN"
 
 FullLongNote.defaultValue = 0
-FullLongNote.range = {0, 1, 3}
+FullLongNote.range = {0, 3}
 
-FullLongNote.getString = function(self)
-	return self.shortName .. self.config.value
+FullLongNote.getString = function(self, config)
+	config = config or self.config
+	return self.shortName .. config.value
 end
 
 FullLongNote.apply = function(self)

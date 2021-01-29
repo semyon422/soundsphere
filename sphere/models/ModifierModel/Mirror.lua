@@ -9,13 +9,14 @@ Mirror.shortName = "MR"
 
 Mirror.defaultValue = 1
 Mirror.format = "%s"
-Mirror.range = {1, 1, 3}
+Mirror.range = {1, 3}
 Mirror.values = {"all", "left", "right"}
 
 Mirror.modeNames = {"A", "L", "R"}
 
-Mirror.getString = function(self)
-	return self.shortName .. self.modeNames[self.config.value]
+Mirror.getString = function(self, config)
+	config = config or self.config
+	return self.shortName .. self.modeNames[config.value]
 end
 
 Mirror.getMap = function(self)

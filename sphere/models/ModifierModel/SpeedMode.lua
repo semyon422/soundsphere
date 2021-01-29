@@ -8,13 +8,14 @@ SpeedMode.name = "SpeedMode"
 
 SpeedMode.defaultValue = 1
 SpeedMode.format = "%s"
-SpeedMode.range = {1, 1, 5}
+SpeedMode.range = {1, 5}
 SpeedMode.values = {"avg", "x", "const", "min", "max"}
 
 SpeedMode.modeNames = {"AMod", "XMod", "CMod", "MinMod", "MaxMod"}
 
-SpeedMode.getString = function(self)
-	return self.modeNames[self.config.value]
+SpeedMode.getString = function(self, config)
+	config = config or self.config
+	return self.modeNames[config.value]
 end
 
 SpeedMode.applySpeed = function(self, speed)

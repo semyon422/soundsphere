@@ -10,11 +10,12 @@ MultiplePlay.shortName = "MP"
 
 MultiplePlay.defaultValue = 1
 MultiplePlay.format = "%s"
-MultiplePlay.range = {1, 1, 3}
+MultiplePlay.range = {1, 3}
 MultiplePlay.values = {"DP", "TP", "QP"}
 
-MultiplePlay.getString = function(self)
-	return self.values[self.config.value]
+MultiplePlay.getString = function(self, config)
+	config = config or self.config
+	return self.values[config.value]
 end
 
 MultiplePlay.apply = function(self)

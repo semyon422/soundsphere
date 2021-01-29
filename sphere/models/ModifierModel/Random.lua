@@ -9,13 +9,14 @@ Random.shortName = "RD"
 
 Random.defaultValue = 1
 Random.format = "%s"
-Random.range = {1, 1, 3}
+Random.range = {1, 3}
 Random.values = {"all", "left", "right"}
 
 Random.modeNames = {"A", "L", "R"}
 
-Random.getString = function(self)
-	return self.shortName .. self.modeNames[self.config.value]
+Random.getString = function(self, config)
+	config = config or self.config
+	return self.shortName .. self.modeNames[config.value]
 end
 
 Random.getMap = function(self)

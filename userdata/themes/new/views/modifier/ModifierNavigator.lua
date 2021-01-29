@@ -73,7 +73,7 @@ ModifierNavigator.load = function(self)
 	modifierList:on("right", function()
 		local modifierConfig = self.config[modifierList.selected]
 		self:send({
-			name = "changeModifier",
+			name = "setModifierValue",
 			modifierConfig = modifierConfig,
 			value = modifierConfig.value + 1
 		})
@@ -81,7 +81,7 @@ ModifierNavigator.load = function(self)
 	modifierList:on("left", function()
 		local modifierConfig = self.config[modifierList.selected]
 		self:send({
-			name = "changeModifier",
+			name = "setModifierValue",
 			modifierConfig = modifierConfig,
 			value = modifierConfig.value - 1
 		})

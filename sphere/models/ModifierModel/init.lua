@@ -69,17 +69,20 @@ ModifierModel.remove = function(self, modifierConfig)
 	end
 end
 
-ModifierModel.change = function(self, modifierConfig, value)
-	local modifier = self.modifierByName[modifierConfig.name]
+ModifierModel.setModifierValue = function(self, modifierConfig, value)
+	local modifier = self:getModifier(modifierConfig)
 	if modifier:checkValue(value) then
 		modifierConfig.value = value
 	end
 end
 
+ModifierModel.getModifier = function(self, modifierConfig)
+	return self.modifierByName[modifierConfig.name]
+end
+
 ModifierModel.apply = function(self, modifierType)
-	local modifierByName = self.modifierByName
 	for _, modifierConfig in ipairs(self.config) do
-		local modifier = modifierByName[modifierConfig.name]
+		local modifier = self:getModifier(modifierConfig)
 		if modifier.type == modifierType then
 			modifier.config = modifierConfig
 			modifier.noteChartModel = self.noteChartModel
@@ -92,18 +95,16 @@ ModifierModel.apply = function(self, modifierType)
 end
 
 ModifierModel.update = function(self)
-	local modifierByName = self.modifierByName
 	for _, modifierConfig in ipairs(self.config) do
-		local modifier = modifierByName[modifierConfig.name]
+		local modifier = self:getModifier(modifierConfig)
 		modifier.config = modifierConfig
 		modifier:update()
 	end
 end
 
 ModifierModel.receive = function(self, event)
-	local modifierByName = self.modifierByName
 	for _, modifierConfig in ipairs(self.config) do
-		local modifier = modifierByName[modifierConfig.name]
+		local modifier = self:getModifier(modifierConfig)
 		modifier.config = modifierConfig
 		modifier:receive(event)
 	end

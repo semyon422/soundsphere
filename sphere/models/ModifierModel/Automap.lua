@@ -209,10 +209,11 @@ Automap.name = "Automap"
 Automap.shortName = "AM"
 
 Automap.defaultValue = 10
-Automap.range = {4, 1, 10}
+Automap.range = {4, 10}
 
-Automap.getString = function(self)
-	return self.shortName .. self.config.value
+Automap.getString = function(self, config)
+	config = config or self.config
+	return self.shortName .. config.value
 end
 
 Automap.apply = function(self)

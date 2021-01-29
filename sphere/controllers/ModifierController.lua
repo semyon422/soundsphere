@@ -78,8 +78,8 @@ ModifierController.receive = function(self, event)
 		self.modifierModel:add(event.modifierConfig)
 	elseif event.name == "removeModifier" then
 		self.modifierModel:remove(event.modifierConfig)
-	elseif event.name == "changeModifier" then
-		self.modifierModel:change(event.modifierConfig, event.value)
+	elseif event.name == "setModifierValue" then
+		self.modifierModel:setModifierValue(event.modifierConfig, event.value)
 	elseif event.name == "adjustDifficulty" then
 		self:adjustDifficulty()
 	elseif event.name == "playNoteChart" then
