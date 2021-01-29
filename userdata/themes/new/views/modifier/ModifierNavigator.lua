@@ -56,7 +56,7 @@ ModifierNavigator.load = function(self)
 	modifierList:on("down", function()
 		self:scrollModifier(1)
 	end)
-	modifierList:on("left", function()
+	modifierList:on("tab", function()
 		self.node = availableModifierList
 	end)
 	modifierList:on("return", function()
@@ -70,6 +70,22 @@ ModifierNavigator.load = function(self)
 			modifierConfig = self.config[modifierList.selected]
 		})
 	end)
+	modifierList:on("right", function()
+		local modifierConfig = self.config[modifierList.selected]
+		self:send({
+			name = "changeModifier",
+			modifierConfig = modifierConfig,
+			value = modifierConfig.value + 1
+		})
+	end)
+	modifierList:on("left", function()
+		local modifierConfig = self.config[modifierList.selected]
+		self:send({
+			name = "changeModifier",
+			modifierConfig = modifierConfig,
+			value = modifierConfig.value - 1
+		})
+	end)
 
 	availableModifierList:on("up", function()
 		self:scrollAvailableModifier(-1)
@@ -77,7 +93,7 @@ ModifierNavigator.load = function(self)
 	availableModifierList:on("down", function()
 		self:scrollAvailableModifier(1)
 	end)
-	availableModifierList:on("right", function()
+	availableModifierList:on("tab", function()
 		self.node = modifierList
 	end)
 	availableModifierList:on("return", function()

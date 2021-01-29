@@ -24,6 +24,13 @@ Modifier.update = function(self) end
 
 Modifier.receive = function(self, event) end
 
+Modifier.checkValue = function(self, value)
+	local range = self.range
+	if value >= range[1] and value <= range[3] and (value - range[1]) % range[2] == 0 then
+		return true
+	end
+end
+
 Modifier.getString = function(self)
 	return self.shortName
 end

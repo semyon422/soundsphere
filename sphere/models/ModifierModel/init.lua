@@ -69,6 +69,13 @@ ModifierModel.remove = function(self, modifierConfig)
 	end
 end
 
+ModifierModel.change = function(self, modifierConfig, value)
+	local modifier = self.modifierByName[modifierConfig.name]
+	if modifier:checkValue(value) then
+		modifierConfig.value = value
+	end
+end
+
 ModifierModel.apply = function(self, modifierType)
 	local modifierByName = self.modifierByName
 	for _, modifierConfig in ipairs(self.config) do
