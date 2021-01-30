@@ -56,37 +56,6 @@ ModifierListItemView.draw = function(self)
 	)
 end
 
-ModifierListItemView.receive = function(self, event)
-	if event.name == "wheelmoved" then
-		local listView = self.listView
-
-		local cs = listView.cs
-
-		local index = self.index
-		local x = cs:X(listView.x, true)
-		local y = cs:Y(listView.y, true) + (index - 1) * cs:Y(listView.h) / listView.itemCount
-		local w = cs:X(listView.w)
-		local h = cs:Y(listView.h) / listView.itemCount
-
-		local mx, my = love.mouse.getPosition()
-		if mx >= x and mx <= x + w and my >= y and my <= y + h then
-			if mx >= x + w / 2 and mx <= x + w then
-				local wy = event.args[2]
-				if wy == 1 then
-					self.listView.navigator:call("right")
-				elseif wy == -1 then
-					self.listView.navigator:call("left")
-				end
-			elseif mx >= x and mx < x + w / 2 then
-				local wy = event.args[2]
-				if wy == 1 then
-					self.listView.navigator:call("up")
-				elseif wy == -1 then
-					self.listView.navigator:call("down")
-				end
-			end
-		end
-	end
-end
+ModifierListItemView.receive = function(self, event) end
 
 return ModifierListItemView

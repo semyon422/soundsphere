@@ -1,6 +1,5 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
-local Node = require("aqua.util.Node")
 local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
 
@@ -56,6 +55,39 @@ ModifierListItemSliderView.draw = function(self)
 		-cs:X(120 / cs.one),
 		-cs:Y(18 / cs.one)
 	)
+end
+
+ModifierListItemSliderView.receive = function(self, event)
+	local listView = self.listView
+
+	local cs = listView.cs
+
+	local index = self.index
+	local x = cs:X(listView.x, true)
+	local y = cs:Y(listView.y, true) + (index - 1) * cs:Y(listView.h) / listView.itemCount
+	local w = cs:X(listView.w)
+	local h = cs:Y(listView.h) / listView.itemCount
+
+	local mx, my = love.mouse.getPosition()
+	if event.name == "wheelmoved" then
+		if mx >= x and mx <= x + w and my >= y and my <= y + h then
+			if mx >= x + w * 0.5 and mx <= x + w then
+				local wy = event.args[2]
+				if wy == 1 then
+					self.listView.navigator:call("right")
+				elseif wy == -1 then
+					self.listView.navigator:call("left")
+				end
+			else
+				local wy = event.args[2]
+				if wy == 1 then
+					self.listView.navigator:call("up")
+				elseif wy == -1 then
+					self.listView.navigator:call("down")
+				end
+			end
+		end
+	end
 end
 
 return ModifierListItemSliderView
