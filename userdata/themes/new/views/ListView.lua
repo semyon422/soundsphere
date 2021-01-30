@@ -6,10 +6,7 @@ local ListItemView = require(viewspackage .. "ListItemView")
 local ListView = Node:new()
 
 ListView.init = function(self)
-	local ListItemView = self.ListItemView or ListItemView
-	self.listItemView = ListItemView:new()
-	self.listItemView.listView = self
-	self.listItemView:init()
+	self:createListItemViews()
 
 	self:on("draw", function() return self:draw() end)
 
@@ -23,6 +20,14 @@ ListView.init = function(self)
 			self:call("select")
 		end
 	end)
+end
+
+ListView.createListItemViews = function(self)
+	local ListItemView = self.ListItemView or ListItemView
+	local listItemView = ListItemView:new()
+	listItemView.listView = self
+	listItemView:init()
+	self.listItemView = listItemView
 end
 
 ListView.getListItemView = function(self, item)

@@ -15,9 +15,7 @@ ModifierListItemSliderView.draw = function(self)
 	local listView = self.listView
 
 	local itemIndex = self.index + listView.selectedItem - math.ceil(listView.itemCount / 2)
-	if not listView.items[itemIndex] then
-		return
-	end
+	local item = self.item
 
 	local cs = listView.cs
 
@@ -27,8 +25,8 @@ ModifierListItemSliderView.draw = function(self)
 	local h = cs:Y(listView.h)
 
 	local index = self.index
-    local modifierConfig = listView.items[itemIndex]
-    local modifier = self.listView.view.modifierModel:getModifier(modifierConfig)
+    local modifierConfig = item
+    local modifier = listView.view.modifierModel:getModifier(modifierConfig)
     local realValue = modifier:getRealValue(modifierConfig)
 
 	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
@@ -44,7 +42,7 @@ ModifierListItemSliderView.draw = function(self)
 
 	love.graphics.setFont(self.fontName)
 	love.graphics.printf(
-		modifierConfig.name .. realValue,
+		modifierConfig.name .. realValue .. "slider",
 		x,
 		y + (index - 1) * h / listView.itemCount,
 		w / cs.one * 1080,

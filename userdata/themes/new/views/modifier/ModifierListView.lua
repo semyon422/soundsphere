@@ -3,6 +3,8 @@ local viewspackage = (...):match("^(.-%.views%.)")
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local ListView = require(viewspackage .. "ListView")
 local ModifierListItemView = require(viewspackage .. "modifier.ModifierListItemView")
+local ModifierListItemSwitchView = require(viewspackage .. "modifier.ModifierListItemSwitchView")
+local ModifierListItemSliderView = require(viewspackage .. "modifier.ModifierListItemSliderView")
 
 local ModifierListView = ListView:new()
 
@@ -30,6 +32,27 @@ ModifierListView.init = function(self)
 	self:on("draw", self.drawFrame)
 
 	ListView.init(self)
+end
+
+ModifierListView.createListItemViews = function(self)
+	local switchView = ModifierListItemSwitchView:new()
+	switchView.listView = self
+	switchView:init()
+	self.listItemSwitchView = switchView
+
+	local sliderView = ModifierListItemSliderView:new()
+	sliderView.listView = self
+	sliderView:init()
+	self.listItemSliderView = sliderView
+end
+
+ModifierListView.getListItemView = function(self, modifierConfig)
+	local modifier = self.view.modifierModel:getModifier(modifierConfig)
+	if modifier.range[1] == 0 and modifier.range[2] == 1 then
+		return self.listItemSwitchView
+	else
+		return self.listItemSliderView
+	end
 end
 
 ModifierListView.reloadItems = function(self)
