@@ -1,9 +1,12 @@
+local viewspackage = (...):match("^(.-%.views%.)")
 
 local Node = require("aqua.util.Node")
 local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
 
-local ModifierListItemSliderView = Node:new()
+local ModifierListItemView = require(viewspackage .. "modifier.ModifierListItemView")
+
+local ModifierListItemSliderView = ModifierListItemView:new()
 
 ModifierListItemSliderView.init = function(self)
 	self:on("draw", self.draw)

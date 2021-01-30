@@ -2,14 +2,12 @@ local viewspackage = (...):match("^(.-%.views%.)")
 
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local ListView = require(viewspackage .. "ListView")
-local ModifierListItemView = require(viewspackage .. "modifier.ModifierListItemView")
 local ModifierListItemSwitchView = require(viewspackage .. "modifier.ModifierListItemSwitchView")
 local ModifierListItemSliderView = require(viewspackage .. "modifier.ModifierListItemSliderView")
 
 local ModifierListView = ListView:new()
 
 ModifierListView.init = function(self)
-	self.ListItemView = ModifierListItemView
 	self.view = self.view
 	self.cs = CoordinateManager:getCS(0.5, 0, 0, 0, "h")
 	self.x = 0
@@ -30,6 +28,8 @@ ModifierListView.init = function(self)
 		self.view.selectedNode = self
 	end)
 	self:on("draw", self.drawFrame)
+	self:on("wheelmoved", self.receive)
+	self:on("mousepressed", self.receive)
 
 	ListView.init(self)
 end
@@ -64,6 +64,19 @@ ModifierListView.drawFrame = function(self)
 		self.isSelected = true
 	else
 		self.isSelected = false
+	end
+end
+
+ListView.receive = function(self, event)
+	for i = 1, self.itemCount do
+		local itemIndex = i + self.selectedItem - math.ceil(self.itemCount / 2)
+		local item = self.items[itemIndex]
+		if item then
+			local listItemView = self:getListItemView(item)
+			listItemView.index = i
+			listItemView.item = item
+			listItemView:receive(event)
+		end
 	end
 end
 

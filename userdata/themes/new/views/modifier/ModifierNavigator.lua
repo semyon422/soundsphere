@@ -106,16 +106,17 @@ ModifierNavigator.load = function(self)
 end
 
 ModifierNavigator.receive = function(self, event)
-	if event.name == "wheelmoved" then
-		local y = event.args[2]
-		if y == 1 then
-			self:call("up")
-		elseif y == -1 then
-			self:call("down")
-		end
-	elseif event.name == "mousepressed" then
-		self:call("return")
-	elseif event.name == "keypressed" then
+	-- if event.name == "wheelmoved" then
+	-- 	local y = event.args[2]
+	-- 	if y == 1 then
+	-- 		self:call("up")
+	-- 	elseif y == -1 then
+	-- 		self:call("down")
+	-- 	end
+	-- elseif event.name == "mousepressed" then
+	-- 	self:call("return")
+	-- elseif event.name == "keypressed" then
+	if event.name == "keypressed" then
 		self:call(event.args[1])
 	end
 end

@@ -1,9 +1,12 @@
+local viewspackage = (...):match("^(.-%.views%.)")
 
 local Node = require("aqua.util.Node")
 local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
 
-local ModifierListItemSwitchView = Node:new()
+local ModifierListItemView = require(viewspackage .. "modifier.ModifierListItemView")
+
+local ModifierListItemSwitchView = ModifierListItemView:new()
 
 ModifierListItemSwitchView.init = function(self)
 	self:on("draw", self.draw)

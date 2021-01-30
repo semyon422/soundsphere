@@ -28,6 +28,17 @@ AvailableModifierListView.init = function(self)
 		self.view.selectedNode = self
 	end)
 	self:on("draw", self.drawFrame)
+	self:on("wheelmoved", function(self, event)
+		local y = event.args[2]
+		if y == 1 then
+			self.navigator:call("up")
+		elseif y == -1 then
+			self.navigator:call("down")
+		end
+	end)
+	self:on("mousepressed", function(self)
+		self.navigator:call("return")
+	end)
 
 	ListView.init(self)
 end
