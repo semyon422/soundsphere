@@ -10,10 +10,7 @@ end
 ListItemView.draw = function(self)
 	local listView = self.listView
 
-	local itemIndex = self.index + listView.selectedItem - math.ceil(listView.itemCount / 2)
-	if not listView.items[itemIndex] then
-		return
-	end
+	local item = self.item
 
 	local cs = listView.cs
 
@@ -26,7 +23,7 @@ ListItemView.draw = function(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.printf(
-		listView.items[itemIndex].name,
+		item.name,
 		x,
 		y + (index - 1) * h / listView.itemCount,
 		w

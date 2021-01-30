@@ -7,13 +7,11 @@ local ListView = Node:new()
 
 ListView.init = function(self)
 	local ListItemView = self.ListItemView or ListItemView
-	for i = 1, self.itemCount do
-		local item = ListItemView:new()
-		item.__path = self.__path
-		item.listView = self
-		item.index = i
-		self:node(item)
-	end
+	self.listItemView = ListItemView:new()
+	self.listItemView.listView = self
+	self.listItemView:init()
+
+	self:on("draw", function() return self:draw() end)
 
 	local cs = self.cs
 	self:on("mousemoved", function(self, event)
@@ -25,6 +23,23 @@ ListView.init = function(self)
 			self:call("select")
 		end
 	end)
+end
+
+ListView.getListItemView = function(self, item)
+	return self.listItemView
+end
+
+ListView.draw = function(self)
+	for i = 1, self.itemCount do
+		local itemIndex = i + self.selectedItem - math.ceil(self.itemCount / 2)
+		local item = self.items[itemIndex]
+		if item then
+			local listItemView = self:getListItemView(item)
+			listItemView.index = i
+			listItemView.item = item
+			listItemView:draw()
+		end
+	end
 end
 
 return ListView

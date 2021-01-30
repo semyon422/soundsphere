@@ -15,9 +15,7 @@ AvailableModifierListItemView.draw = function(self)
 	local listView = self.listView
 
 	local itemIndex = self.index + listView.selectedItem - math.ceil(listView.itemCount / 2)
-	if not listView.items[itemIndex] then
-		return
-	end
+	local item = self.item
 
 	local cs = listView.cs
 
@@ -27,7 +25,7 @@ AvailableModifierListItemView.draw = function(self)
 	local h = cs:Y(listView.h)
 
 	local index = self.index
-	local Modifier = listView.items[itemIndex]
+	local Modifier = item
 
 	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
 	if listView.isSelected then

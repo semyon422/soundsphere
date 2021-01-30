@@ -1,7 +1,10 @@
+local viewspackage = (...):match("^(.-%.views%.)")
 
 local Node = require("aqua.util.Node")
 local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
+-- local ModifierListItemSwitchView = require(viewspackage .. "modifier.ModifierListItemSwitchView")
+-- local ModifierListItemSliderView = require(viewspackage .. "modifier.ModifierListItemSliderView")
 
 local ModifierListItemView = Node:new()
 
@@ -15,9 +18,7 @@ ModifierListItemView.draw = function(self)
 	local listView = self.listView
 
 	local itemIndex = self.index + listView.selectedItem - math.ceil(listView.itemCount / 2)
-	if not listView.items[itemIndex] then
-		return
-	end
+	local item = self.item
 
 	local cs = listView.cs
 
@@ -27,7 +28,7 @@ ModifierListItemView.draw = function(self)
 	local h = cs:Y(listView.h)
 
 	local index = self.index
-    local modifierConfig = listView.items[itemIndex]
+    local modifierConfig = item
     local modifier = self.listView.view.modifierModel:getModifier(modifierConfig)
     local realValue = modifier:getRealValue(modifierConfig)
 
