@@ -19,7 +19,8 @@ local ToOsu			= require("sphere.models.ModifierModel.ToOsu")
 local AutoKeySound	= require("sphere.models.ModifierModel.AutoKeySound")
 local MultiplePlay	= require("sphere.models.ModifierModel.MultiplePlay")
 local MinLnLength	= require("sphere.models.ModifierModel.MinLnLength")
-local Alternate	= require("sphere.models.ModifierModel.Alternate")
+local Alternate		= require("sphere.models.ModifierModel.Alternate")
+local MultiOverPlay	= require("sphere.models.ModifierModel.MultiOverPlay")
 
 local ModifierModel = Class:new()
 
@@ -36,6 +37,7 @@ ModifierModel.modifiers = {
 	NoMeasureLine,
 	Automap,
 	MultiplePlay,
+	MultiOverPlay,
 	Alternate,
 	Mirror,
 	Random,
