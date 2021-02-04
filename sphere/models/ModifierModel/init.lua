@@ -21,6 +21,7 @@ local MultiplePlay	= require("sphere.models.ModifierModel.MultiplePlay")
 local MinLnLength	= require("sphere.models.ModifierModel.MinLnLength")
 local Alternate		= require("sphere.models.ModifierModel.Alternate")
 local MultiOverPlay	= require("sphere.models.ModifierModel.MultiOverPlay")
+local Shift			= require("sphere.models.ModifierModel.Shift")
 
 local ModifierModel = Class:new()
 
@@ -39,6 +40,7 @@ ModifierModel.modifiers = {
 	MultiplePlay,
 	MultiOverPlay,
 	Alternate,
+	Shift,
 	Mirror,
 	Random,
 	BracketSwap,
