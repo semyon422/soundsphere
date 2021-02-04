@@ -19,6 +19,7 @@ local ToOsu			= require("sphere.models.ModifierModel.ToOsu")
 local AutoKeySound	= require("sphere.models.ModifierModel.AutoKeySound")
 local MultiplePlay	= require("sphere.models.ModifierModel.MultiplePlay")
 local MinLnLength	= require("sphere.models.ModifierModel.MinLnLength")
+local Alternate	= require("sphere.models.ModifierModel.Alternate")
 
 local ModifierModel = Class:new()
 
@@ -35,6 +36,7 @@ ModifierModel.modifiers = {
 	NoMeasureLine,
 	Automap,
 	MultiplePlay,
+	Alternate,
 	Mirror,
 	Random,
 	BracketSwap,
