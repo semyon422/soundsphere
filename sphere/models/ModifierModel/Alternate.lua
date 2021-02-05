@@ -50,7 +50,7 @@ Alternate.apply = function(self)
 			local noteData = layerData:getNoteData(noteDataIndex)
 			local inputCount = inputCounts[noteData.inputType]
 			local inputIndex = noteData.inputIndex
-			if inputCount and noteData.inputType == inputType then
+			if inputCount and noteData.inputType == inputType and (noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart") then
 				inputAlternate[inputIndex] = inputAlternate[inputIndex] or 0
 
 				local newInputIndex
