@@ -5,6 +5,7 @@ local ListView = require(viewspackage .. "ListView")
 local ModifierListItemSwitchView = require(viewspackage .. "modifier.ModifierListItemSwitchView")
 local ModifierListItemSliderView = require(viewspackage .. "modifier.ModifierListItemSliderView")
 local Slider = require(viewspackage .. "Slider")
+local Switch = require(viewspackage .. "Switch")
 
 local ModifierListView = ListView:new()
 
@@ -21,6 +22,7 @@ ModifierListView.init = function(self)
 	self:reloadItems()
 
 	self.slider = Slider:new()
+	self.switch = Switch:new()
 
 	self:on("update", function()
 		self.selectedItem = self.navigator.modifierList.selected
@@ -35,6 +37,21 @@ ModifierListView.init = function(self)
 	self:on("mousepressed", self.receive)
 	self:on("mousereleased", self.receive)
 	self:on("mousemoved", self.receive)
+
+	self:on("wheelmoved", function(self, event)
+		local mx, my = love.mouse.getPosition()
+		local cs = self.cs
+		local x = cs:X(self.x, true)
+		local w = cs:X(self.w)
+		if mx >= x and mx < x + w / 2 then
+			local wy = event.args[2]
+			if wy == 1 then
+				self.navigator:call("up")
+			elseif wy == -1 then
+				self.navigator:call("down")
+			end
+		end
+	end)
 
 	ListView.init(self)
 end

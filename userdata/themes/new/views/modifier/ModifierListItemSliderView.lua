@@ -63,27 +63,30 @@ end
 
 ModifierListItemSliderView.receive = function(self, event)
 	local listView = self.listView
+
+	local itemIndex = self.index + listView.selectedItem - math.ceil(listView.itemCount / 2)
+	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
+	if deltaItemIndex ~= 0 then
+		return
+	end
+
 	local x, y, w, h = self:getPosition()
 
 	local slider = listView.slider
 
-	local itemIndex = self.index + listView.selectedItem - math.ceil(listView.itemCount / 2)
-	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
-	if deltaItemIndex == 0 then
-		local modifierConfig = self.item
-		local modifier = listView.view.modifierModel:getModifier(modifierConfig)
-		slider:setPosition(x + w / 2, y, w / 2, h)
-		slider:setValue(modifier:getNormalizedValue(modifierConfig))
-		slider:receive(event)
+	local modifierConfig = self.item
+	local modifier = listView.view.modifierModel:getModifier(modifierConfig)
+	slider:setPosition(x + w / 2, y, w / 2, h)
+	slider:setValue(modifier:getNormalizedValue(modifierConfig))
+	slider:receive(event)
 
-		if slider.valueUpdated then
-			self.listView.navigator:send({
-				name = "setModifierValue",
-				modifierConfig = modifierConfig,
-				value = modifier:fromNormalizedValue(slider.value)
-			})
-			slider.valueUpdated = false
-		end
+	if slider.valueUpdated then
+		self.listView.navigator:send({
+			name = "setModifierValue",
+			modifierConfig = modifierConfig,
+			value = modifier:fromNormalizedValue(slider.value)
+		})
+		slider.valueUpdated = false
 	end
 
 	local mx, my = love.mouse.getPosition()
@@ -95,13 +98,6 @@ ModifierListItemSliderView.receive = function(self, event)
 					self.listView.navigator:call("right")
 				elseif wy == -1 then
 					self.listView.navigator:call("left")
-				end
-			else
-				local wy = event.args[2]
-				if wy == 1 then
-					self.listView.navigator:call("up")
-				elseif wy == -1 then
-					self.listView.navigator:call("down")
 				end
 			end
 		end

@@ -4,7 +4,7 @@ local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
 
 local ModifierListItemView = require(viewspackage .. "modifier.ModifierListItemView")
-local icons			= require("sphere.assets.icons")
+local SwitchView = require(viewspackage .. "SwitchView")
 
 local ModifierListItemSwitchView = ModifierListItemView:new()
 
@@ -12,8 +12,8 @@ ModifierListItemSwitchView.init = function(self)
 	self:on("draw", self.draw)
 
 	self.fontName = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
-	self.checkboxOffImage = love.graphics.newImage(icons.ic_check_box_outline_blank_white_24dp)
-	self.checkboxOnImage = love.graphics.newImage(icons.ic_check_box_white_24dp)
+
+	self.switchView = SwitchView:new()
 end
 
 ModifierListItemSwitchView.draw = function(self)
@@ -55,55 +55,37 @@ ModifierListItemSwitchView.draw = function(self)
 		-cs:Y(18 / cs.one)
 	)
 
-	local drawable = self.checkboxOnImage
-	if realValue == 0 then
-		drawable = self.checkboxOffImage
-	end
-
-	love.graphics.setColor(1, 1, 1)
-	love.graphics.draw(
-		drawable,
-		x + w - h / 2,
-		y + h / 2,
-		0,
-		h / drawable:getWidth() * 0.5,
-		h / drawable:getHeight() * 0.5,
-		drawable:getWidth() / 2,
-		drawable:getHeight() / 2
-	)
+	local switchView = self.switchView
+	switchView:setPosition(x + w / 2, y, h, h)
+	switchView:setValue(modifier:getNormalizedValue(modifierConfig))
+	switchView:draw()
 end
 
 ModifierListItemSwitchView.receive = function(self, event)
 	local listView = self.listView
 
+	local itemIndex = self.index + listView.selectedItem - math.ceil(listView.itemCount / 2)
+	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
+	if deltaItemIndex ~= 0 then
+		return
+	end
+
 	local x, y, w, h = self:getPosition()
 
-	local mx, my = love.mouse.getPosition()
-	if mx >= x and mx <= x + w and my >= y and my <= y + h then
-		if event.name == "wheelmoved" then
-			if mx >= 0 and mx < x + w - h then
-				local wy = event.args[2]
-				if wy == 1 then
-					self.listView.navigator:call("up")
-				elseif wy == -1 then
-					self.listView.navigator:call("down")
-				end
-			end
-		elseif event.name == "mousepressed" then
-			if mx >= x + w - h and mx <= x + w then
-				local button = event.args[3]
-				if button == 1 then
-					local modifierConfig = self.item
-					local modifier = listView.view.modifierModel:getModifier(modifierConfig)
-					local realValue = modifier:getRealValue(modifierConfig)
-					if realValue == 1 then
-						self.listView.navigator:call("left")
-					else
-						self.listView.navigator:call("right")
-					end
-				end
-			end
+	local switch = listView.switch
+	local modifierConfig = self.item
+	local modifier = listView.view.modifierModel:getModifier(modifierConfig)
+	switch:setPosition(x + w / 2, y, h, h)
+	switch:setValue(modifier:getRealValue(modifierConfig))
+	switch:receive(event)
+
+	if switch.valueUpdated then
+		if switch.value == 0 then
+			self.listView.navigator:call("left")
+		else
+			self.listView.navigator:call("right")
 		end
+		switch.valueUpdated = false
 	end
 end
 
