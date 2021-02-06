@@ -12,7 +12,7 @@ local ModifierListView = ListView:new()
 ModifierListView.init = function(self)
 	self.view = self.view
 	self.cs = CoordinateManager:getCS(0.5, 0, 0, 0, "h")
-	self.x = 0
+	self.x = -16 / 9 / 3 / 4
 	self.y = 0
 	self.w = 16 / 9 / 3
 	self.h = 1
@@ -53,8 +53,17 @@ ModifierListView.init = function(self)
 		end
 	end)
 	self:on("mousepressed", function(self, event)
+		local mx = event.args[1]
+		local my = event.args[2]
+		local cs = self.cs
+		local x = cs:X(self.x, true)
+		local w = cs:X(self.w)
 		local button = event.args[3]
-		if button == 2 then
+		if button == 1 then
+			if mx >= x + w then
+				self.navigator:call("return")
+			end
+		elseif button == 2 then
 			self.navigator:call("backspace")
 		end
 	end)

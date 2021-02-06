@@ -51,7 +51,7 @@ ModifierListItemSliderView.draw = function(self)
 		0,
 		cs.one / 1080,
 		cs.one / 1080,
-		-cs:X(120 / cs.one),
+		-cs:X(0 / cs.one),
 		-cs:Y(18 / cs.one)
 	)
 

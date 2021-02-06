@@ -5,6 +5,7 @@ local Node = require("aqua.util.Node")
 local ModifierNavigator = require(viewspackage .. "modifier.ModifierNavigator")
 local AvailableModifierListView = require(viewspackage .. "modifier.AvailableModifierListView")
 local ModifierListView = require(viewspackage .. "modifier.ModifierListView")
+local PlayButtonView = require(viewspackage .. "modifier.PlayButtonView")
 local BackgroundView = require(viewspackage .. "BackgroundView")
 
 local ModifierView = Class:new()
@@ -36,9 +37,13 @@ ModifierView.load = function(self)
 	local backgroundView = BackgroundView:new()
 	backgroundView.view = self
 
+	local playButtonView = PlayButtonView:new()
+	playButtonView.view = self
+
 	node:node(backgroundView)
 	node:node(availableModifierListView)
 	node:node(modifierListView)
+	node:node(playButtonView)
 
 	self.selectedNode = node
 
