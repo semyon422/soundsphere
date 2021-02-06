@@ -43,7 +43,7 @@ ModifierListItemSliderView.draw = function(self)
 
 	love.graphics.setFont(self.fontName)
 	love.graphics.printf(
-		modifierConfig.name .. realValue .. "slider",
+		modifierConfig.name .. " " .. realValue,
 		x,
 		y,
 		w / cs.one * 1080,

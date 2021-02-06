@@ -43,6 +43,16 @@ ModifierNavigator.scrollModifier = function(self, direction, destination)
 	modifierList.selected = modifierList.selected + direction
 end
 
+ModifierNavigator.fixScrollModifier = function(self)
+	local modifierList = self.modifierList
+
+	local modifiers = self.config
+
+	if not modifiers[modifierList.selected] then
+		modifierList.selected = #modifiers
+	end
+end
+
 ModifierNavigator.load = function(self)
     Navigator.load(self)
 
@@ -69,6 +79,7 @@ ModifierNavigator.load = function(self)
 			name = "removeModifier",
 			modifierConfig = self.config[modifierList.selected]
 		})
+		self:fixScrollModifier()
 	end)
 	modifierList:on("right", function()
 		local modifierConfig = self.config[modifierList.selected]
@@ -86,6 +97,11 @@ ModifierNavigator.load = function(self)
 			value = modifierConfig.value - 1
 		})
 	end)
+	modifierList:on("escape", function()
+		self:send({
+			name = "goSselectScreen"
+		})
+	end)
 
 	availableModifierList:on("up", function()
 		self:scrollAvailableModifier(-1)
@@ -94,6 +110,9 @@ ModifierNavigator.load = function(self)
 		self:scrollAvailableModifier(1)
 	end)
 	availableModifierList:on("tab", function()
+		self.node = modifierList
+	end)
+	modifierList:on("escape", function()
 		self.node = modifierList
 	end)
 	availableModifierList:on("return", function()

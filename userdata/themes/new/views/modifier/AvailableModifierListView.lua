@@ -36,8 +36,11 @@ AvailableModifierListView.init = function(self)
 			self.navigator:call("down")
 		end
 	end)
-	self:on("mousepressed", function(self)
-		self.navigator:call("return")
+	self:on("mousepressed", function(self, event)
+		local button = event.args[3]
+		if button == 1 then
+			self.navigator:call("return")
+		end
 	end)
 
 	ListView.init(self)

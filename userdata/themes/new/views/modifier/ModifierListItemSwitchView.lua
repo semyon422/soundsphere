@@ -43,7 +43,7 @@ ModifierListItemSwitchView.draw = function(self)
 
 	love.graphics.setFont(self.fontName)
 	love.graphics.printf(
-		modifierConfig.name .. realValue .. "switch",
+		modifierConfig.name,
 		x,
 		y,
 		w / cs.one * 1080,
