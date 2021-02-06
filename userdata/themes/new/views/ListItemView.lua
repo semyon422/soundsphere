@@ -8,9 +8,29 @@ ListItemView.init = function(self)
 end
 
 ListItemView.draw = function(self)
-	local listView = self.listView
-
 	local item = self.item
+
+	local x, y, w, h = self:getPosition()
+
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.printf(
+		item.name,
+		x,
+		y,
+		w
+	)
+	love.graphics.setColor(1, 1, 1, 0.25)
+	love.graphics.rectangle(
+		"fill",
+		x,
+		y,
+		w,
+		h
+	)
+end
+
+ListItemView.getPosition = function(self)
+	local listView = self.listView
 
 	local cs = listView.cs
 
@@ -19,23 +39,7 @@ ListItemView.draw = function(self)
 	local w = cs:X(listView.w)
 	local h = cs:Y(listView.h)
 
-	local index = self.index
-
-	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.printf(
-		item.name,
-		x,
-		y + (index - 1) * h / listView.itemCount,
-		w
-	)
-	love.graphics.setColor(1, 1, 1, 0.25)
-	love.graphics.rectangle(
-		"fill",
-		x,
-		y + (index - 1) * h / listView.itemCount,
-		w,
-		h / listView.itemCount
-	)
+	return x, y + (self.index - 1) * h / listView.itemCount, w, h / listView.itemCount
 end
 
 return ListItemView

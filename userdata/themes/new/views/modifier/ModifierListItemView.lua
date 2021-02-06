@@ -4,7 +4,9 @@ local Node = require("aqua.util.Node")
 local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
 
-local ModifierListItemView = Node:new()
+local ListItemView = require(viewspackage .. "ListItemView")
+
+local ModifierListItemView = ListItemView:new()
 
 ModifierListItemView.init = function(self)
 	self:on("draw", self.draw)
@@ -20,12 +22,8 @@ ModifierListItemView.draw = function(self)
 
 	local cs = listView.cs
 
-	local x = cs:X(listView.x, true)
-	local y = cs:Y(listView.y, true)
-	local w = cs:X(listView.w)
-	local h = cs:Y(listView.h)
+	local x, y, w, h = self:getPosition()
 
-	local index = self.index
     local modifierConfig = item
     local modifier = listView.view.modifierModel:getModifier(modifierConfig)
     local realValue = modifier:getRealValue(modifierConfig)
@@ -45,7 +43,7 @@ ModifierListItemView.draw = function(self)
 	love.graphics.printf(
 		modifierConfig.name .. realValue,
 		x,
-		y + (index - 1) * h / listView.itemCount,
+		y,
 		w / cs.one * 1080,
 		"left",
 		0,

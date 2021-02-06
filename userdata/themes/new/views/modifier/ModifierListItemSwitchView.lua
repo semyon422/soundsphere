@@ -24,14 +24,8 @@ ModifierListItemSwitchView.draw = function(self)
 
 	local cs = listView.cs
 
-	local x = cs:X(listView.x, true)
-	local y = cs:Y(listView.y, true)
-	local w = cs:X(listView.w)
-	local h = cs:Y(listView.h)
+	local x, y, w, h = self:getPosition()
 
-	local ih = h / listView.itemCount
-
-	local index = self.index
     local modifierConfig = item
     local modifier = listView.view.modifierModel:getModifier(modifierConfig)
     local realValue = modifier:getRealValue(modifierConfig)
@@ -51,7 +45,7 @@ ModifierListItemSwitchView.draw = function(self)
 	love.graphics.printf(
 		modifierConfig.name .. realValue .. "switch",
 		x,
-		y + (index - 1) * ih,
+		y,
 		w / cs.one * 1080,
 		"left",
 		0,
@@ -69,11 +63,11 @@ ModifierListItemSwitchView.draw = function(self)
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.draw(
 		drawable,
-		x + w - ih / 2,
-		y + (index - 1) * ih + ih / 2,
+		x + w - h / 2,
+		y + h / 2,
 		0,
-		ih / drawable:getWidth() * 0.5,
-		ih / drawable:getHeight() * 0.5,
+		h / drawable:getWidth() * 0.5,
+		h / drawable:getHeight() * 0.5,
 		drawable:getWidth() / 2,
 		drawable:getHeight() / 2
 	)
@@ -82,13 +76,7 @@ end
 ModifierListItemSwitchView.receive = function(self, event)
 	local listView = self.listView
 
-	local cs = listView.cs
-
-	local index = self.index
-	local x = cs:X(listView.x, true)
-	local y = cs:Y(listView.y, true) + (index - 1) * cs:Y(listView.h) / listView.itemCount
-	local w = cs:X(listView.w)
-	local h = cs:Y(listView.h) / listView.itemCount
+	local x, y, w, h = self:getPosition()
 
 	local mx, my = love.mouse.getPosition()
 	if mx >= x and mx <= x + w and my >= y and my <= y + h then

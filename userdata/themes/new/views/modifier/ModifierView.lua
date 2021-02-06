@@ -66,6 +66,9 @@ ModifierView.receive = function(self, event)
 	if event.name == "mousepressed" then
 		self.selectedNode:call("mousepressed", event)
 	end
+	if event.name == "mousereleased" then
+		self.selectedNode:call("mousereleased", event)
+	end
 	-- if event.name == "mousepressed" then
 	-- 	selectedNode:call("mousepressed", event)
 	-- end

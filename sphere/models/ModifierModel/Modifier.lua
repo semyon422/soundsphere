@@ -1,4 +1,5 @@
 local Class = require("aqua.util.Class")
+local round = require("aqua.math").round
 
 local Modifier = Class:new()
 
@@ -25,6 +26,15 @@ Modifier.display = {"false", "true"}
 Modifier.getRealValue = function(self, config)
 	config = config or self.config
 	return self.offset + config.value * self.step
+end
+
+Modifier.getNormalizedValue = function(self, config)
+	config = config or self.config
+	return (config.value - self.range[1]) / (self.range[2] - self.range[1])
+end
+
+Modifier.fromNormalizedValue = function(self, value)
+	return round(self.range[1] + value * (self.range[2] - self.range[1]))
 end
 
 Modifier.update = function(self) end

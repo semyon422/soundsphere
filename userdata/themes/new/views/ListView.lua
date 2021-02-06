@@ -47,4 +47,18 @@ ListView.draw = function(self)
 	end
 end
 
+ListView.receive = function(self, event)
+	for i = 1, self.itemCount do
+		local itemIndex = i + self.selectedItem - math.ceil(self.itemCount / 2)
+		local item = self.items[itemIndex]
+		if item then
+			local listItemView = self:getListItemView(item)
+			listItemView.index = i
+			listItemView.item = item
+			listItemView:receive(event)
+		end
+	end
+end
+
+
 return ListView

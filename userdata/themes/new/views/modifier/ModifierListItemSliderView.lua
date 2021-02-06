@@ -4,6 +4,7 @@ local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
 
 local ModifierListItemView = require(viewspackage .. "modifier.ModifierListItemView")
+local SliderView = require(viewspackage .. "SliderView")
 
 local ModifierListItemSliderView = ModifierListItemView:new()
 
@@ -11,6 +12,8 @@ ModifierListItemSliderView.init = function(self)
 	self:on("draw", self.draw)
 
 	self.fontName = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
+
+	self.sliderView = SliderView:new()
 end
 
 ModifierListItemSliderView.draw = function(self)
@@ -21,12 +24,8 @@ ModifierListItemSliderView.draw = function(self)
 
 	local cs = listView.cs
 
-	local x = cs:X(listView.x, true)
-	local y = cs:Y(listView.y, true)
-	local w = cs:X(listView.w)
-	local h = cs:Y(listView.h)
+	local x, y, w, h = self:getPosition()
 
-	local index = self.index
     local modifierConfig = item
     local modifier = listView.view.modifierModel:getModifier(modifierConfig)
     local realValue = modifier:getRealValue(modifierConfig)
@@ -46,7 +45,7 @@ ModifierListItemSliderView.draw = function(self)
 	love.graphics.printf(
 		modifierConfig.name .. realValue .. "slider",
 		x,
-		y + (index - 1) * h / listView.itemCount,
+		y,
 		w / cs.one * 1080,
 		"left",
 		0,
@@ -55,18 +54,37 @@ ModifierListItemSliderView.draw = function(self)
 		-cs:X(120 / cs.one),
 		-cs:Y(18 / cs.one)
 	)
+
+	local sliderView = self.sliderView
+	sliderView:setPosition(x + w / 2, y, w / 2, h)
+	sliderView:setValue(modifier:getNormalizedValue(modifierConfig))
+	sliderView:draw()
 end
 
 ModifierListItemSliderView.receive = function(self, event)
 	local listView = self.listView
+	local x, y, w, h = self:getPosition()
 
-	local cs = listView.cs
+	local slider = listView.slider
 
-	local index = self.index
-	local x = cs:X(listView.x, true)
-	local y = cs:Y(listView.y, true) + (index - 1) * cs:Y(listView.h) / listView.itemCount
-	local w = cs:X(listView.w)
-	local h = cs:Y(listView.h) / listView.itemCount
+	local itemIndex = self.index + listView.selectedItem - math.ceil(listView.itemCount / 2)
+	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
+	if deltaItemIndex == 0 then
+		local modifierConfig = self.item
+		local modifier = listView.view.modifierModel:getModifier(modifierConfig)
+		slider:setPosition(x + w / 2, y, w / 2, h)
+		slider:setValue(modifier:getNormalizedValue(modifierConfig))
+		slider:receive(event)
+
+		if slider.valueUpdated then
+			self.listView.navigator:send({
+				name = "setModifierValue",
+				modifierConfig = modifierConfig,
+				value = modifier:fromNormalizedValue(slider.value)
+			})
+			slider.valueUpdated = false
+		end
+	end
 
 	local mx, my = love.mouse.getPosition()
 	if event.name == "wheelmoved" then
