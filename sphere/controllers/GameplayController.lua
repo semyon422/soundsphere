@@ -27,6 +27,7 @@ GameplayController.load = function(self)
 	local modifierModel = self.modifierModel
 	local notificationModel = self.notificationModel
 	local themeModel = self.themeModel
+	local difficultyModel = self.difficultyModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -85,6 +86,11 @@ GameplayController.load = function(self)
 	rhythmModel:loadAllEngines()
 
 	view.scoreSystem = rhythmModel.scoreEngine.scoreSystem
+
+	local enps, averageStrain, generalizedKeymode = difficultyModel:getDifficulty(noteChart)
+	view.scoreSystem:set("baseEnps", enps)
+	view.scoreSystem:set("baseAverageStrain", averageStrain)
+	view.scoreSystem:set("generalizedKeymode", generalizedKeymode)
 
 	view:load()
 

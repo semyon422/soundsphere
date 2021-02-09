@@ -62,4 +62,12 @@ ScoreSystem.receive = function(self, event)
 	end
 end
 
+ScoreSystem.set = function(self, key, value)
+	self.scoreTable[key] = value
+end
+
+ScoreSystem.get = function(self, key)
+	return self.scoreTable[key]
+end
+
 return ScoreSystem
