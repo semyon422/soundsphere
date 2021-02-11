@@ -11,7 +11,7 @@ receive = function(event)
 		return
 	end
 
-	scoreTable.performance = scoreTable.enps / scoreTable.score * 1e6
+	scoreTable.performance = scoreTable.baseEnps / scoreTable.score * 1e6
 	scoreTable.logperformance = math.log(scoreTable.performance / 100) / math.log(2 ^ 0.1)
 end
 
