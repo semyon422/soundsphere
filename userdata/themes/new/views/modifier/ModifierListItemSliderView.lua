@@ -19,7 +19,7 @@ end
 ModifierListItemSliderView.draw = function(self)
 	local listView = self.listView
 
-	local itemIndex = self.index + listView.selectedItem - math.ceil(listView.itemCount / 2)
+	local itemIndex = self.itemIndex
 	local item = self.item
 
 	local cs = listView.cs
@@ -62,13 +62,12 @@ end
 ModifierListItemSliderView.receive = function(self, event)
 	local listView = self.listView
 
-	local itemIndex = self.index + listView.selectedItem - math.ceil(listView.itemCount / 2)
-	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
-	if deltaItemIndex ~= 0 then
+	local x, y, w, h = self:getPosition()
+
+	local mx, my = love.mouse.getPosition()
+	if event.name == "wheelmoved" and not (mx >= x and mx <= x + w and my >= y and my <= y + h) then
 		return
 	end
-
-	local x, y, w, h = self:getPosition()
 
 	local slider = listView.slider
 
@@ -87,16 +86,13 @@ ModifierListItemSliderView.receive = function(self, event)
 		slider.valueUpdated = false
 	end
 
-	local mx, my = love.mouse.getPosition()
-	if event.name == "wheelmoved" then
-		if mx >= x and mx <= x + w and my >= y and my <= y + h then
-			if mx >= x + w * 0.5 and mx <= x + w then
-				local wy = event.args[2]
-				if wy == 1 then
-					self.listView.navigator:call("right")
-				elseif wy == -1 then
-					self.listView.navigator:call("left")
-				end
+	if mx >= x and mx <= x + w and my >= y and my <= y + h then
+		if mx >= x + w * 0.5 and mx <= x + w then
+			local wy = event.args[2]
+			if wy == 1 then
+				self.listView.navigator:call("right", self.itemIndex)
+			elseif wy == -1 then
+				self.listView.navigator:call("left", self.itemIndex)
 			end
 		end
 	end

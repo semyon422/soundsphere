@@ -17,7 +17,7 @@ end
 ModifierListItemView.draw = function(self)
 	local listView = self.listView
 
-	local itemIndex = self.index + listView.selectedItem - math.ceil(listView.itemCount / 2)
+	local itemIndex = self.itemIndex
 	local item = self.item
 
 	local cs = listView.cs
@@ -52,6 +52,13 @@ ModifierListItemView.draw = function(self)
 	)
 end
 
-ModifierListItemView.receive = function(self, event) end
+ModifierListItemView.receive = function(self, event)
+	if event.name == "mousepressed" then
+		local button = event.args[3]
+		if button == 2 then
+			self.listView.navigator:call("backspace", self.itemIndex)
+		end
+	end
+end
 
 return ModifierListItemView

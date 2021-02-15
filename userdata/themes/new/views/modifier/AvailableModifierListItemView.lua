@@ -14,7 +14,7 @@ end
 AvailableModifierListItemView.draw = function(self)
 	local listView = self.listView
 
-	local itemIndex = self.index + listView.selectedItem - math.ceil(listView.itemCount / 2)
+	local itemIndex = self.itemIndex
 	local item = self.item
 
 	local cs = listView.cs

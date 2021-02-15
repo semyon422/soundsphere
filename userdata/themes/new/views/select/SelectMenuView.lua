@@ -60,7 +60,7 @@ SelectMenuView.draw = function(self)
 		local item = self.items[i]
 		if item then
 			local listItemView = self:getListItemView(item)
-			listItemView.index = i
+			listItemView.itemIndex = i
 			listItemView.item = item
 			listItemView:draw()
 		end
@@ -72,7 +72,7 @@ SelectMenuView.receive = function(self, event)
 		local item = self.items[i]
 		if item then
 			local listItemView = self:getListItemView(item)
-			listItemView.index = i
+			listItemView.itemIndex = i
 			listItemView.item = item
 			listItemView:receive(event)
 		end

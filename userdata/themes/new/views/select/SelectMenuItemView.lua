@@ -24,9 +24,9 @@ SelectMenuItemView.draw = function(self)
 	local w = cs:X(listView.w)
 	local h = cs:Y(listView.h)
 
-	local index = self.index
+	local itemIndex = self.itemIndex
 
-	local deltaItemIndex = math.abs(index - listView.selectedItem)
+	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
 	if listView.isSelected then
 		love.graphics.setColor(1, 1, 1,
 			deltaItemIndex == 0 and 1 or 0.66
@@ -38,7 +38,7 @@ SelectMenuItemView.draw = function(self)
 	love.graphics.setFont(self.fontName)
 	love.graphics.printf(
 		item.name,
-		x + (index - 1) * w / listView.itemCount,
+		x + (itemIndex - 1) * w / listView.itemCount,
 		y,
 		w / cs.one * 1080 / listView.itemCount,
 		"center",
@@ -55,7 +55,7 @@ SelectMenuItemView.receive = function(self, event)
 
 	local cs = listView.cs
 
-	local x = cs:X(listView.x, true) + (self.index - 1) * cs:X(listView.w) / listView.itemCount
+	local x = cs:X(listView.x, true) + (self.itemIndex - 1) * cs:X(listView.w) / listView.itemCount
 	local y = cs:Y(listView.y, true)
 	local w = cs:X(listView.w) / listView.itemCount
 	local h = cs:Y(listView.h)
@@ -64,7 +64,7 @@ SelectMenuItemView.receive = function(self, event)
 		local mx = event.args[1]
 		local my = event.args[2]
 		if belong(mx, x, x + w) and belong(my, y, y + h) then
-			listView.navigator.selectMenu.selected = self.index
+			listView.navigator.selectMenu.selected = self.itemIndex
 		end
 	end
 end

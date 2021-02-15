@@ -41,6 +41,7 @@ ListView.draw = function(self)
 		if item then
 			local listItemView = self:getListItemView(item)
 			listItemView.index = i
+			listItemView.itemIndex = itemIndex
 			listItemView.item = item
 			listItemView:draw()
 		end
@@ -54,6 +55,7 @@ ListView.receive = function(self, event)
 		if item then
 			local listItemView = self:getListItemView(item)
 			listItemView.index = i
+			listItemView.itemIndex = itemIndex
 			listItemView.item = item
 			listItemView:receive(event)
 		end

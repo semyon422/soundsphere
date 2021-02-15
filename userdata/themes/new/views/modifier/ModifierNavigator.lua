@@ -74,23 +74,23 @@ ModifierNavigator.load = function(self)
 			name = "playNoteChart",
 		})
 	end)
-	modifierList:on("backspace", function()
+	modifierList:on("backspace", function(_, itemIndex)
 		self:send({
 			name = "removeModifier",
-			modifierConfig = self.config[modifierList.selected]
+			modifierConfig = self.config[itemIndex or modifierList.selected]
 		})
 		self:fixScrollModifier()
 	end)
-	modifierList:on("right", function()
-		local modifierConfig = self.config[modifierList.selected]
+	modifierList:on("right", function(_, itemIndex)
+		local modifierConfig = self.config[itemIndex or modifierList.selected]
 		self:send({
 			name = "setModifierValue",
 			modifierConfig = modifierConfig,
 			value = modifierConfig.value + 1
 		})
 	end)
-	modifierList:on("left", function()
-		local modifierConfig = self.config[modifierList.selected]
+	modifierList:on("left", function(_, itemIndex)
+		local modifierConfig = self.config[itemIndex or modifierList.selected]
 		self:send({
 			name = "setModifierValue",
 			modifierConfig = modifierConfig,
