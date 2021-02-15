@@ -60,5 +60,4 @@ ListView.receive = function(self, event)
 	end
 end
 
-
 return ListView

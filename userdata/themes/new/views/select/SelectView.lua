@@ -8,6 +8,7 @@ local NoteChartSetListView = require(viewspackage .. "select.NoteChartSetListVie
 local NoteChartListView = require(viewspackage .. "select.NoteChartListView")
 local ScoreListView = require(viewspackage .. "select.ScoreListView")
 local SearchLineView = require(viewspackage .. "select.SearchLineView")
+local SelectMenuView = require(viewspackage .. "select.SelectMenuView")
 local BackgroundView = require(viewspackage .. "BackgroundView")
 
 local SelectView = Class:new()
@@ -48,6 +49,12 @@ SelectView.load = function(self)
 	searchLineView.config = self.config
 	searchLineView.view = self
 
+	local selectMenuView = SelectMenuView:new()
+	selectMenuView.navigator = navigator
+	selectMenuView.config = self.config
+	selectMenuView.view = self
+	self.selectMenuView = selectMenuView
+
 	local backgroundView = BackgroundView:new()
 	backgroundView.view = self
 
@@ -56,6 +63,7 @@ SelectView.load = function(self)
 	node:node(noteChartListView)
 	node:node(scoreListView)
 	node:node(searchLineView)
+	node:node(selectMenuView)
 
 	self.selectedNode = node
 

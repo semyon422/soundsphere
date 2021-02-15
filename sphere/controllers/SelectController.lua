@@ -126,6 +126,10 @@ SelectController.receive = function(self, event)
 	elseif event.name == "selectScoreEntry" then
 		config.scoreEntryId = event.scoreEntryId
 		self.noteChartModel:select()
+	elseif event.action == "clickSelectMenu" then
+		if event.item.controllerName == "ModifierController" then
+			self:switchModifierController()
+		end
 	elseif event.action == "playNoteChart" then
 		self:playNoteChart()
 	elseif event.name == "loadModifiedNoteChart" then
@@ -182,7 +186,7 @@ SelectController.unloadModifiedNoteChart = function(self)
 	self.noteChartModel:unloadNoteChart()
 end
 
-SelectController.playNoteChart = function(self)
+SelectController.switchModifierController = function(self)
 	local noteChartModel = self.noteChartModel
 	local info = love.filesystem.getInfo(noteChartModel.noteChartEntry.path)
 	if not info then
@@ -201,19 +205,27 @@ SelectController.playNoteChart = function(self)
 	modifierController.difficultyModel = self.difficultyModel
 	modifierController.selectController = self
 	return ScreenManager:set(modifierController)
+end
 
-	-- local GameplayController = require("sphere.controllers.GameplayController")
-	-- local gameplayController = GameplayController:new()
-	-- gameplayController.noteChartModel = noteChartModel
-	-- gameplayController.themeModel = self.themeModel
-	-- gameplayController.modifierModel = self.modifierModel
-	-- gameplayController.configModel = self.configModel
-	-- gameplayController.notificationModel = self.notificationModel
-	-- gameplayController.scoreModel = self.scoreModel
-	-- gameplayController.onlineModel = self.onlineModel
-	-- gameplayController.difficultyModel = self.difficultyModel
-	-- gameplayController.selectController = self
-	-- return ScreenManager:set(gameplayController)
+SelectController.playNoteChart = function(self)
+	local noteChartModel = self.noteChartModel
+	local info = love.filesystem.getInfo(noteChartModel.noteChartEntry.path)
+	if not info then
+		return
+	end
+
+	local GameplayController = require("sphere.controllers.GameplayController")
+	local gameplayController = GameplayController:new()
+	gameplayController.noteChartModel = noteChartModel
+	gameplayController.themeModel = self.themeModel
+	gameplayController.modifierModel = self.modifierModel
+	gameplayController.configModel = self.configModel
+	gameplayController.notificationModel = self.notificationModel
+	gameplayController.scoreModel = self.scoreModel
+	gameplayController.onlineModel = self.onlineModel
+	gameplayController.difficultyModel = self.difficultyModel
+	gameplayController.selectController = self
+	return ScreenManager:set(gameplayController)
 end
 
 SelectController.replayNoteChart = function(self, mode, hash)

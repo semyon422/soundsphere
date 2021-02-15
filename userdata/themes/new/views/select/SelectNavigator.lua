@@ -19,6 +19,10 @@ SelectNavigator.construct = function(self)
 	local scoreList = Node:new()
 	self.scoreList = scoreList
 	scoreList.selected = 1
+
+	local selectMenu = Node:new()
+	self.selectMenu = selectMenu
+	selectMenu.selected = 1
 end
 
 SelectNavigator.updateSearch = function(self)
@@ -76,6 +80,15 @@ SelectNavigator.scrollScore = function(self, direction)
 
 	self:pushScore()
 	self:pullSearch()
+end
+
+SelectNavigator.scrollSelectMenu = function(self, direction)
+	local selectMenu = self.selectMenu
+	local selectMenuItems = self.view.selectMenuView.items
+	if not selectMenuItems[selectMenu.selected + direction] then
+		return
+	end
+	selectMenu.selected = selectMenu.selected + direction
 end
 
 SelectNavigator.pushSearch = function(self)
@@ -240,6 +253,7 @@ SelectNavigator.load = function(self)
 	local noteChartSetList = self.noteChartSetList
 	local noteChartList = self.noteChartList
 	local scoreList = self.scoreList
+	local selectMenu = self.selectMenu
 
 	self.node = noteChartSetList
 	noteChartSetList:on("up", function()
@@ -264,9 +278,12 @@ SelectNavigator.load = function(self)
 	noteChartList:on("left", function()
 		self.node = scoreList
 	end)
+	noteChartList:on("tab", function()
+		self.node = selectMenu
+	end)
 	noteChartList:on("return", function()
 		self:send({
-			action = "playNoteChart",
+			action = "playNoteChart"
 		})
 	end)
 
@@ -278,6 +295,22 @@ SelectNavigator.load = function(self)
 	end)
 	scoreList:on("right", function()
 		self.node = noteChartList
+	end)
+
+	selectMenu:on("left", function()
+		self:scrollSelectMenu(-1)
+	end)
+	selectMenu:on("right", function()
+		self:scrollSelectMenu(1)
+	end)
+	selectMenu:on("tab", function()
+		self.node = noteChartList
+	end)
+	selectMenu:on("return", function()
+		self:send({
+			action = "clickSelectMenu",
+			item = self.view.selectMenuView.items[selectMenu.selected]
+		})
 	end)
 
 	self.searchString = self.config.searchString
