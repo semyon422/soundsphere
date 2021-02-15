@@ -46,7 +46,7 @@ SelectMenuItemView.draw = function(self)
 		cs.one / 1080,
 		cs.one / 1080,
 		cs:X(0 / cs.one),
-		-cs:Y(23 / cs.one)
+		-cs:Y(18 / cs.one)
 	)
 end
 

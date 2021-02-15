@@ -36,9 +36,7 @@ ModifierListItemSwitchView.draw = function(self)
 			deltaItemIndex == 0 and 1 or 0.66
 		)
 	else
-		love.graphics.setColor(1, 1, 1,
-			deltaItemIndex == 0 and 1 or 0.33
-		)
+		love.graphics.setColor(1, 1, 1, 0.33)
 	end
 
 	love.graphics.setFont(self.fontName)
