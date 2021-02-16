@@ -60,14 +60,13 @@ ModifierListItemSwitchView.draw = function(self)
 end
 
 ModifierListItemSwitchView.receive = function(self, event)
+	if event.name ~= "mousepressed" then
+		return
+	end
+
 	local listView = self.listView
 
 	local x, y, w, h = self:getPosition()
-
-	local mx, my = love.mouse.getPosition()
-	if event.name == "wheelmoved" and not (mx >= x and mx <= x + w and my >= y and my <= y + h) then
-		return
-	end
 
 	local switch = listView.switch
 	local modifierConfig = self.item

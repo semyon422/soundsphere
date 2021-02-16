@@ -62,10 +62,21 @@ end
 ModifierListItemSliderView.receive = function(self, event)
 	local listView = self.listView
 
-	local x, y, w, h = self:getPosition()
+	if event.name == "wheelmoved" then
+		return self:wheelmoved(event)
+	end
 
+	local x, y, w, h = self:getPosition()
 	local mx, my = love.mouse.getPosition()
-	if event.name == "wheelmoved" and not (mx >= x and mx <= x + w and my >= y and my <= y + h) then
+
+	if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then
+		listView.activeItem = self.itemIndex
+	end
+	if event.name == "mousereleased" then
+		listView.activeItem = listView.selectedItem
+	end
+
+	if listView.activeItem ~= self.itemIndex then
 		return
 	end
 
@@ -84,6 +95,15 @@ ModifierListItemSliderView.receive = function(self, event)
 			value = modifier:fromNormalizedValue(slider.value)
 		})
 		slider.valueUpdated = false
+	end
+end
+
+ModifierListItemSliderView.wheelmoved = function(self, event)
+	local x, y, w, h = self:getPosition()
+	local mx, my = love.mouse.getPosition()
+
+	if event.name == "wheelmoved" and not (mx >= x and mx <= x + w and my >= y and my <= y + h) then
+		return
 	end
 
 	if mx >= x and mx <= x + w and my >= y and my <= y + h then
