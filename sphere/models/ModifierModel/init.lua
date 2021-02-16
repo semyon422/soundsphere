@@ -56,8 +56,12 @@ ModifierModel.createModifiers = function(self)
 	end
 end
 
-ModifierModel.add = function(self, modifierConfig)
-	table.insert(self.config, modifierConfig)
+ModifierModel.add = function(self, modifierConfig, index)
+	if not index then
+		table.insert(self.config, modifierConfig)
+	else
+		table.insert(self.config, index, modifierConfig)
+	end
 end
 
 ModifierModel.remove = function(self, modifierConfig)

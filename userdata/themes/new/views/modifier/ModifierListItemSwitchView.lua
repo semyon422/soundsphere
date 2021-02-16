@@ -60,6 +60,8 @@ ModifierListItemSwitchView.draw = function(self)
 end
 
 ModifierListItemSwitchView.receive = function(self, event)
+	ModifierListItemView.receive(self, event)
+
 	if event.name ~= "mousepressed" then
 		return
 	end

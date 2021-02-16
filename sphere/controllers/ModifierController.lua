@@ -75,7 +75,7 @@ ModifierController.receive = function(self, event)
 	elseif event.name == "disableNumberModifier" then
 		event.modifier[event.modifier.variableName] = event.Modifier[event.modifier.variableName]
 	elseif event.name == "addModifier" then
-		self.modifierModel:add(event.modifierConfig)
+		self.modifierModel:add(event.modifierConfig, event.index)
 	elseif event.name == "removeModifier" then
 		self.modifierModel:remove(event.modifierConfig)
 	elseif event.name == "setModifierValue" then

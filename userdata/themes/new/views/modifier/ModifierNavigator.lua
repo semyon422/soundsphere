@@ -115,12 +115,14 @@ ModifierNavigator.load = function(self)
 	modifierList:on("escape", function()
 		self.node = modifierList
 	end)
-	availableModifierList:on("return", function()
-		local Modifier = self.view.modifierModel.modifiers[availableModifierList.selected]
+	availableModifierList:on("return", function(_, itemIndex)
+		local Modifier = self.view.modifierModel.modifiers[itemIndex or availableModifierList.selected]
 		self:send({
 			name = "addModifier",
-			modifierConfig = Modifier:getDefaultConfig()
+			modifierConfig = Modifier:getDefaultConfig(),
+			index = modifierList.selected + 1
 		})
+		modifierList.selected = modifierList.selected + 1
 	end)
 end
 

@@ -53,12 +53,6 @@ ModifierListView.init = function(self)
 			end
 		end
 	end)
-	self:on("mousepressed", function(self, event)
-		local button = event.args[3]
-		if button == 2 then
-			self.navigator:call("backspace")
-		end
-	end)
 
 	ListView.init(self)
 end

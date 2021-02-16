@@ -60,21 +60,14 @@ ModifierListItemSliderView.draw = function(self)
 end
 
 ModifierListItemSliderView.receive = function(self, event)
-	local listView = self.listView
+	ModifierListItemView.receive(self, event)
 
 	if event.name == "wheelmoved" then
 		return self:wheelmoved(event)
 	end
 
+	local listView = self.listView
 	local x, y, w, h = self:getPosition()
-	local mx, my = love.mouse.getPosition()
-
-	if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then
-		listView.activeItem = self.itemIndex
-	end
-	if event.name == "mousereleased" then
-		listView.activeItem = listView.selectedItem
-	end
 
 	if listView.activeItem ~= self.itemIndex then
 		return

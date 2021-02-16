@@ -1,9 +1,11 @@
+local viewspackage = (...):match("^(.-%.views%.)")
 
-local Node = require("aqua.util.Node")
 local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
 
-local AvailableModifierListItemView = Node:new()
+local ListItemView = require(viewspackage .. "ListItemView")
+
+local AvailableModifierListItemView = ListItemView:new()
 
 AvailableModifierListItemView.init = function(self)
 	self:on("draw", self.draw)
@@ -49,6 +51,18 @@ AvailableModifierListItemView.draw = function(self)
 		-cs:X(0 / cs.one),
 		-cs:Y(18 / cs.one)
 	)
+end
+
+AvailableModifierListItemView.receive = function(self, event)
+	local x, y, w, h = self:getPosition()
+	local mx, my = love.mouse.getPosition()
+
+	if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then
+		local button = event.args[3]
+		if button == 1 then
+			self.listView.navigator:call("return", self.itemIndex)
+		end
+	end
 end
 
 return AvailableModifierListItemView
