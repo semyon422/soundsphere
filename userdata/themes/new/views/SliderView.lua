@@ -20,7 +20,7 @@ end
 SliderView.draw = function(self)
     local x, y, w, h = self.x, self.y, self.w, self.h
 
-    local barHeight = h / 4
+    local barHeight = h / 3
 
     love.graphics.setColor(0.5, 0.5, 0.5)
     love.graphics.rectangle(

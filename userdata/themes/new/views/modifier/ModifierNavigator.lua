@@ -69,11 +69,7 @@ ModifierNavigator.load = function(self)
 	modifierList:on("tab", function()
 		self.node = availableModifierList
 	end)
-	modifierList:on("return", function()
-		self:send({
-			name = "playNoteChart",
-		})
-	end)
+	modifierList:on("return", function() end)
 	modifierList:on("backspace", function(_, itemIndex)
 		self:send({
 			name = "removeModifier",
@@ -112,9 +108,6 @@ ModifierNavigator.load = function(self)
 	availableModifierList:on("tab", function()
 		self.node = modifierList
 	end)
-	modifierList:on("escape", function()
-		self.node = modifierList
-	end)
 	availableModifierList:on("return", function(_, itemIndex)
 		local Modifier = self.view.modifierModel.modifiers[itemIndex or availableModifierList.selected]
 		self:send({
@@ -123,6 +116,11 @@ ModifierNavigator.load = function(self)
 			index = modifierList.selected + 1
 		})
 		modifierList.selected = modifierList.selected + 1
+	end)
+	availableModifierList:on("escape", function()
+		self:send({
+			name = "goSselectScreen"
+		})
 	end)
 end
 

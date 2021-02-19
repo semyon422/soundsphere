@@ -21,20 +21,25 @@ Slider.setValue = function(self, value)
 	self.value = value
 end
 
+Slider.updateValueMouse = function(self, mx)
+	local value = map(mx, self.x + self.h / 2, self.x + self.w - self.h / 2, 0, 1)
+	self.value = math.min(math.max(value, 0), 1)
+	self.valueUpdated = true
+end
+
 Slider.receive = function(self, event)
 	if event.name == "mousepressed" then
 		local mx = event.args[1]
 		local my = event.args[2]
 		if belong(mx, self.x, self.x + self.w) and belong(my, self.y, self.y + self.h) then
 			self.pressed = true
+			self:updateValueMouse(mx)
 		end
 	elseif event.name == "mousereleased" and self.pressed then
 		self.pressed = false
 	elseif event.name == "mousemoved" and self.pressed then
 		local mx = event.args[1]
-		local value = map(mx, self.x + self.h / 2, self.x + self.w - self.h / 2, 0, 1)
-		self.value = math.min(math.max(value, 0), 1)
-		self.valueUpdated = true
+		self:updateValueMouse(mx)
 	end
 end
 

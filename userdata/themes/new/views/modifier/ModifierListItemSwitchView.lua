@@ -54,7 +54,7 @@ ModifierListItemSwitchView.draw = function(self)
 	)
 
 	local switchView = self.switchView
-	switchView:setPosition(x + w / 2, y, h, h)
+	switchView:setPosition(x + 3 * w / 4 - h / 2, y, h, h)
 	switchView:setValue(modifier:getNormalizedValue(modifierConfig))
 	switchView:draw()
 end
@@ -73,7 +73,7 @@ ModifierListItemSwitchView.receive = function(self, event)
 	local switch = listView.switch
 	local modifierConfig = self.item
 	local modifier = listView.view.modifierModel:getModifier(modifierConfig)
-	switch:setPosition(x + w / 2, y, h, h)
+	switch:setPosition(x + 3 * w / 4 - h / 2, y, h, h)
 	switch:setValue(modifier:getRealValue(modifierConfig))
 	switch:receive(event)
 
