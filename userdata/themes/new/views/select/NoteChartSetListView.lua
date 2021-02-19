@@ -24,7 +24,6 @@ NoteChartSetListView.init = function(self)
 	end)
 	self:on("select", function()
 		self.navigator:setNode("noteChartSetList")
-		self.view.selectedNode = self
 	end)
 	self:on("draw", self.drawFrame)
 

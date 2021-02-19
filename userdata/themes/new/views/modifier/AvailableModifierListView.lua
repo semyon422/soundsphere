@@ -25,15 +25,20 @@ AvailableModifierListView.init = function(self)
 	end)
 	self:on("select", function()
 		self.navigator:setNode("availableModifierList")
-		self.view.selectedNode = self
 	end)
 	self:on("draw", self.drawFrame)
 	self:on("wheelmoved", function(self, event)
-		local y = event.args[2]
-		if y == 1 then
-			self.navigator:call("up")
-		elseif y == -1 then
-			self.navigator:call("down")
+		local mx, my = love.mouse.getPosition()
+		local cs = self.cs
+		local x = cs:X(self.x, true)
+		local w = cs:X(self.w)
+		if mx >= x and mx < x + w then
+			local wy = event.args[2]
+			if wy == 1 then
+				self.navigator:call("up")
+			elseif wy == -1 then
+				self.navigator:call("down")
+			end
 		end
 	end)
 	self:on("mousepressed", self.receive)

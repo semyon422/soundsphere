@@ -15,7 +15,6 @@ local SelectView = Class:new()
 
 SelectView.construct = function(self)
 	self.node = Node:new()
-	self.selectedNode = Node:new()
 end
 
 SelectView.load = function(self)
@@ -65,8 +64,6 @@ SelectView.load = function(self)
 	node:node(searchLineView)
 	node:node(selectMenuView)
 
-	self.selectedNode = node
-
 	navigator:load()
 end
 
@@ -75,7 +72,6 @@ SelectView.unload = function(self)
 end
 
 SelectView.receive = function(self, event)
-	local selectedNode = self.selectedNode
 	-- if event.name == "keypressed" and event.args[1] == "escape" then
 	-- 	self.controller:receive({
 	-- 		name = "setScreen",

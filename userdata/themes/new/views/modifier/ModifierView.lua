@@ -11,7 +11,6 @@ local ModifierView = Class:new()
 
 ModifierView.construct = function(self)
 	self.node = Node:new()
-	self.selectedNode = Node:new()
 end
 
 ModifierView.load = function(self)
@@ -40,8 +39,6 @@ ModifierView.load = function(self)
 	node:node(availableModifierListView)
 	node:node(modifierListView)
 
-	self.selectedNode = node
-
 	navigator:load()
 end
 
@@ -50,34 +47,7 @@ ModifierView.unload = function(self)
 end
 
 ModifierView.receive = function(self, event)
-	local selectedNode = self.selectedNode
-	-- if event.name == "keypressed" and event.args[1] == "escape" then
-	-- 	self.controller:receive({
-	-- 		name = "setScreen",
-	-- 		screenName = "SelectScreen"
-	-- 	})
-	-- end
-	if event.name == "mousemoved" then
-		self.node:callnext("mousemoved", event)
-	end
-	if event.name == "wheelmoved" then
-		self.selectedNode:call("wheelmoved", event)
-	end
-	if event.name == "mousepressed" then
-		self.selectedNode:call("mousepressed", event)
-	end
-	if event.name == "mousereleased" then
-		self.selectedNode:call("mousereleased", event)
-	end
-	-- if event.name == "mousepressed" then
-	-- 	selectedNode:call("mousepressed", event)
-	-- end
-	-- if event.name == "wheelmoved" then
-	-- 	selectedNode:call("wheelmoved", event.args[2])
-	-- end
-	-- if event.name == "keypressed" then
-	-- 	selectedNode:call("keypressed", event.args[1])
-	-- end
+	self.node:callnext(event.name, event)
 	self.navigator:receive(event)
 end
 

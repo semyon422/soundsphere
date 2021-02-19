@@ -31,7 +31,6 @@ ModifierListView.init = function(self)
 	end)
 	self:on("select", function()
 		self.navigator:setNode("modifierList")
-		self.view.selectedNode = self
 	end)
 	self:on("draw", self.drawFrame)
 	self:on("wheelmoved", self.receive)

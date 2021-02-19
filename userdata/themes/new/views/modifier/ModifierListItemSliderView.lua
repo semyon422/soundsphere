@@ -99,14 +99,12 @@ ModifierListItemSliderView.wheelmoved = function(self, event)
 		return
 	end
 
-	if mx >= x and mx <= x + w and my >= y and my <= y + h then
-		if mx >= x + w * 0.5 and mx <= x + w then
-			local wy = event.args[2]
-			if wy == 1 then
-				self.listView.navigator:call("right", self.itemIndex)
-			elseif wy == -1 then
-				self.listView.navigator:call("left", self.itemIndex)
-			end
+	if mx >= x + w * 0.5 and mx <= x + w then
+		local wy = event.args[2]
+		if wy == 1 then
+			self.listView.navigator:call("right", self.itemIndex)
+		elseif wy == -1 then
+			self.listView.navigator:call("left", self.itemIndex)
 		end
 	end
 end

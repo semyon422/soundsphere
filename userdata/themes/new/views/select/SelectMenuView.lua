@@ -24,7 +24,6 @@ SelectMenuView.init = function(self)
 	end)
 	self:on("select", function()
 		self.navigator:setNode("selectMenu")
-		self.view.selectedNode = self
 	end)
 	self:on("draw", self.drawFrame)
 	self:on("mousemoved", self.receive)
