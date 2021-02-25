@@ -78,9 +78,10 @@ OnlineController.receive = function(self, event)
 		print(event.response.message)
 	elseif event.name == "QuickLoginGetResponse" then
 		if event.response.status then
-			print(event.response.key)
 			self.configModel:set("online.quick_login_key", event.response.key)
-			love.system.openURL(self.onlineModel.host .. "/quick_login?key=" .. event.response.key)
+			local url = self.onlineModel.host .. "/quick_login?key=" .. event.response.key
+			print(url)
+			love.system.openURL(url)
 		else
 			print(event.response.message)
 		end
