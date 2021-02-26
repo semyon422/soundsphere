@@ -1,2 +1,2 @@
 @echo off
-start /high aqua\win64\love.exe .
+start /high bin\win64\love.exe .
