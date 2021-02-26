@@ -43,3 +43,6 @@
 [submodule "luajit-request"]
 	path = luajit-request
 	url = https://github.com/LPGhatguy/luajit-request
+[submodule "luajit-iconv"]
+	path = luajit-iconv
+	url = https://github.com/semyon422/luajit-iconv

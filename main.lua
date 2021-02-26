@@ -24,6 +24,8 @@ setmetatable(_G, {
 	end
 })
 
+require("preloaders.preloadall")
+
 local MainLog = require("sphere.MainLog")
 MainLog:write("trace", "starting game")
 
