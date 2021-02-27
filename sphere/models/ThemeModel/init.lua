@@ -21,26 +21,15 @@ ThemeModel.lookup = function(self, directoryPath)
 		local path = directoryPath .. "/" .. itemName
 		local info = love.filesystem.getInfo(path)
 		if info.type == "directory" or info.type == "symlink" then
-			local info = love.filesystem.getInfo(path .. "/metadata.json")
-			if info then
-				self:loadMetaData(path, "metadata.json")
-			end
+			local UserTheme = require(path:gsub("/", "."))
+			local userTheme = UserTheme:new()
+			userTheme.path = path
+			userTheme:load()
+
+			local themes = self.themes
+			themes[#themes + 1] = userTheme
 		end
 	end
-end
-
-ThemeModel.loadMetaData = function(self, path, fileName)
-	local file = io.open(path .. "/" .. fileName, "r")
-	local jsonObject = json.decode(file:read("*all"))
-	file:close()
-
-	local UserTheme = require(path:gsub("/", "."))
-	local userTheme = UserTheme:new()
-	userTheme.path = path
-	userTheme:load()
-
-	local themes = self.themes
-	themes[#themes + 1] = userTheme
 end
 
 ThemeModel.getThemes = function(self)
