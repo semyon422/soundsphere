@@ -95,7 +95,7 @@ ModifierNavigator.load = function(self)
 	end)
 	modifierList:on("escape", function()
 		self:send({
-			name = "goSselectScreen"
+			name = "goSelectScreen"
 		})
 	end)
 
@@ -119,7 +119,7 @@ ModifierNavigator.load = function(self)
 	end)
 	availableModifierList:on("escape", function()
 		self:send({
-			name = "goSselectScreen"
+			name = "goSelectScreen"
 		})
 	end)
 end

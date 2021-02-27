@@ -38,10 +38,11 @@ SelectMenuView.reloadItems = function(self)
 			controllerName = "ModifierController"
 		},
 		{
-			name = "noteskins"
+			name = "noteskins",
+			controllerName = "NoteSkinController"
 		},
 		{
-			name = "keybinds"
+			name = "keybinds",
 		},
 	}
 end

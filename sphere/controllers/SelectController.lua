@@ -106,9 +106,7 @@ SelectController.receive = function(self, event)
 
 	self.view:receive(event)
 
-    if event.name == "setNoteSkin" then
-		self.noteSkinModel:setDefaultNoteSkin(event.inputMode, event.metaData)
-	elseif event.name == "setTheme" then
+	if event.name == "setTheme" then
 		self.themeModel:setDefaultTheme(event.theme)
 	elseif event.name == "setInputBinding" then
 		self.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
@@ -129,6 +127,8 @@ SelectController.receive = function(self, event)
 	elseif event.action == "clickSelectMenu" then
 		if event.item.controllerName == "ModifierController" then
 			self:switchModifierController()
+		elseif event.item.controllerName == "NoteSkinController" then
+			self:switchNoteSkinController()
 		end
 	elseif event.action == "playNoteChart" then
 		self:playNoteChart()
@@ -205,6 +205,30 @@ SelectController.switchModifierController = function(self)
 	modifierController.difficultyModel = self.difficultyModel
 	modifierController.selectController = self
 	return ScreenManager:set(modifierController)
+end
+
+SelectController.switchNoteSkinController = function(self)
+	local noteChartModel = self.noteChartModel
+	local info = love.filesystem.getInfo(noteChartModel.noteChartEntry.path)
+	if not info then
+		return
+	end
+
+	self:resetModifiedNoteChart()
+
+	local NoteSkinController = require("sphere.controllers.NoteSkinController")
+	local noteSkinController = NoteSkinController:new()
+	noteSkinController.noteChartModel = noteChartModel
+	noteSkinController.noteSkinModel = self.noteSkinModel
+	noteSkinController.themeModel = self.themeModel
+	noteSkinController.modifierModel = self.modifierModel
+	noteSkinController.configModel = self.configModel
+	noteSkinController.notificationModel = self.notificationModel
+	noteSkinController.scoreModel = self.scoreModel
+	noteSkinController.onlineModel = self.onlineModel
+	noteSkinController.difficultyModel = self.difficultyModel
+	noteSkinController.selectController = self
+	return ScreenManager:set(noteSkinController)
 end
 
 SelectController.playNoteChart = function(self)

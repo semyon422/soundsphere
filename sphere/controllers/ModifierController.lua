@@ -84,7 +84,7 @@ ModifierController.receive = function(self, event)
 		self:adjustDifficulty()
 	elseif event.name == "playNoteChart" then
 		self:playNoteChart()
-	elseif event.name == "goSselectScreen" then
+	elseif event.name == "goSelectScreen" then
 		return ScreenManager:set(self.selectController)
 	end
 end
