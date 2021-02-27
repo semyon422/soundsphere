@@ -11,9 +11,9 @@ aquapackage.add("libchart")
 aquapackage.add("md5")
 aquapackage.add("luajit-request")
 
-aquapackage.add("aqua/linux64")
-aquapackage.add("aqua/win64")
-aquapackage.add("aqua/win32")
+aquapackage.add("bin/linux64")
+aquapackage.add("bin/win64")
+aquapackage.add("bin/win32")
 
 require("luamidi")
 
