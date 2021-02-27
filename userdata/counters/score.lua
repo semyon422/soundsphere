@@ -1,10 +1,8 @@
 load = function()
 	scoreTable.score = 0
+	scoreTable.logscore = 0
+	scoreTable.missFactor = 0
 end
-
-local maxScore = 1000000
-local scale = 3.6
-local unit = 1/60
 
 local noteCount
 getNoteCount = function(event)
@@ -28,6 +26,9 @@ receive = function(event)
 		return
 	end
 
-	scoreTable.score = scoreTable.accuracy * 1000 * (scoreTable.hitcount + scoreTable.misscount) / scoreTable.hitcount / math.abs(event.timeRate)
+	scoreTable.missFactor = (scoreTable.hitcount + scoreTable.misscount) / scoreTable.hitcount
+
+	scoreTable.score = scoreTable.accuracy * 1000 * scoreTable.missFactor / math.abs(event.timeRate)
+	scoreTable.logscore = math.log(scoreTable.score / 1000) / math.log(2 ^ 0.1)
 end
 

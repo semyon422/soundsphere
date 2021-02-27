@@ -12,6 +12,12 @@
 			"path": "score.lua"
 		},
 		{
+			"path": "difficulty.lua"
+		},
+		{
+			"path": "performance.lua"
+		},
+		{
 			"path": "hits.lua",
 			"scale": 0.25,
 			"tableName": "hits"

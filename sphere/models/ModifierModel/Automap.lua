@@ -221,7 +221,7 @@ Automap.apply = function(self)
 	self.noteChart = noteChart
 
 	self.targetMode = self.config.value
-	self.columnCount = self.noteChart.inputMode:getInputCount("key")
+	self.columnCount = math.floor(self.noteChart.inputMode:getInputCount("key"))
 
 	print(self.targetMode == self.columnCount or self.columnCount == 0)
 	if self.targetMode == self.columnCount or self.columnCount == 0 then
