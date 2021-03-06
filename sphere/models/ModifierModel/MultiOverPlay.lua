@@ -9,21 +9,19 @@ MultiOverPlay.type = "NoteChartModifier"
 MultiOverPlay.name = "MultiOverPlay"
 MultiOverPlay.shortName = "MOP"
 
-MultiOverPlay.variableType = "number"
-MultiOverPlay.variableName = "value"
-MultiOverPlay.variableFormat = "%s"
-MultiOverPlay.variableRange = {1, 1, 3}
 MultiOverPlay.variableValues = {"DO", "TO", "QO"}
-MultiOverPlay.value = 1
-
 MultiOverPlay.modeNames = {"DO", "TO", "QO"}
 
-MultiOverPlay.tostring = function(self)
+MultiOverPlay.defaultValue = 1
+MultiOverPlay.range = {1, 3}
+
+MultiOverPlay.getString = function(self)
 	return self.modeNames[self.value]
 end
 
-MultiOverPlay.tojson = function(self)
-	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
+MultiOverPlay.getRealValue = function(self, config)
+	config = config or self.config
+	return self.modeNames[config.value]
 end
 
 MultiOverPlay.apply = function(self)

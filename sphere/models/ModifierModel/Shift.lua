@@ -8,26 +8,22 @@ Shift.type = "NoteChartModifier"
 Shift.name = "Shift"
 Shift.shortName = "Shift"
 
-Shift.variableType = "number"
-Shift.variableName = "value"
+Shift.defaultValue = 0
+Shift.range = {-5, 5}
 
-Shift.variableFormat = "%3s"
-Shift.variableRange = {-5, 1, 5}
-
-Shift.value = 0
-
-Shift.tostring = function(self)
-    if self.value > 0 then
-        return self.shortName .. "+" .. self.value
-    elseif self.value < 0 then
-        return self.shortName .. "-" .. -self.value
-    else
-        return self.shortName .. self.value
-    end
+Shift.getString = function(self)
+    return self.shortName .. self:getRealValue()
 end
 
-Shift.tojson = function(self)
-	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
+Shift.getRealValue = function(self, config)
+	config = config or self.config
+    if config.value > 0 then
+        return "+" .. config.value
+    elseif config.value < 0 then
+        return "-" .. -config.value
+    else
+        return config.value
+    end
 end
 
 Shift.getMap = function(self)

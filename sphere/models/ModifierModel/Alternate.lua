@@ -1,29 +1,25 @@
-local NoteData	= require("ncdk.NoteData")
 local Modifier	= require("sphere.models.ModifierModel.Modifier")
 
 local Alternate = Modifier:new()
 
-Alternate.sequential = true
 Alternate.type = "NoteChartModifier"
 
 Alternate.name = "Alternate"
 Alternate.shortName = "Alt"
 
-Alternate.variableType = "number"
-Alternate.variableName = "value"
-Alternate.variableFormat = "%s"
-Alternate.variableRange = {1, 1, 2}
 Alternate.variableValues = {"key", "scratch"}
-Alternate.value = 1
-
 Alternate.modeNames = {"K", "S"}
 
-Alternate.tostring = function(self)
+Alternate.defaultValue = 1
+Alternate.range = {1, 2}
+
+Alternate.getString = function(self)
 	return self.shortName .. self.modeNames[self.value]
 end
 
-Alternate.tojson = function(self)
-	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
+Alternate.getRealValue = function(self, config)
+	config = config or self.config
+	return self.variableValues[config.value]
 end
 
 Alternate.apply = function(self)
