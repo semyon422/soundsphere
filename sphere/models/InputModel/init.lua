@@ -16,20 +16,10 @@ InputModel.types = {
 }
 
 InputModel.load = function(self)
-	self.inputBindings = {}
-	local info = love.filesystem.getInfo(self.path)
-	if info and info.size ~= 0 then
-		local file = io.open(self.path, "r")
-		self.inputBindings = json.decode(file:read("*all"))
-		file:close()
-	end
+	self.inputBindings = self.configModel:getConfig("input")
 end
 
-InputModel.unload = function(self)
-	local file = io.open(self.path, "w")
-	file:write(json.encode(self.inputBindings))
-	return file:close()
-end
+InputModel.unload = function(self) end
 
 InputModel.getInputBindings = function(self)
 	return self.inputBindings
@@ -91,6 +81,20 @@ InputModel.getKey = function(self, inputMode, virtualKey)
 	end
 
 	return "none"
+end
+
+InputModel.getInputs = function(self, inputModeString)
+	local inputs = {}
+
+	for inputCount, inputType in inputModeString:gmatch("([0-9]+)([a-z]+)") do
+		for i = 1, inputCount do
+			inputs[#inputs + 1] = {
+				virtualKey = inputType .. i
+			}
+		end
+	end
+
+	return inputs
 end
 
 return InputModel

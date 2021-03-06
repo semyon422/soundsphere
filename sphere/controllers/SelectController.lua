@@ -59,6 +59,7 @@ SelectController.load = function(self)
 	noteChartSetLibraryModel.cacheModel = cacheModel
 	noteChartLibraryModel.cacheModel = cacheModel
 	scoreLibraryModel.scoreModel = scoreModel
+	inputModel.configModel = configModel
 
 	view.controller = self
 	view.themeModel = themeModel
@@ -108,8 +109,6 @@ SelectController.receive = function(self, event)
 
 	if event.name == "setTheme" then
 		self.themeModel:setDefaultTheme(event.theme)
-	elseif event.name == "setInputBinding" then
-		self.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
 	elseif event.name == "selectSearchString" then
 		config.searchString = event.searchString
 	elseif event.name == "selectNoteChartSetEntry" then
@@ -129,6 +128,8 @@ SelectController.receive = function(self, event)
 			self:switchModifierController()
 		elseif event.item.controllerName == "NoteSkinController" then
 			self:switchNoteSkinController()
+		elseif event.item.controllerName == "InputController" then
+			self:switchInputController()
 		end
 	elseif event.action == "playNoteChart" then
 		self:playNoteChart()
@@ -231,6 +232,31 @@ SelectController.switchNoteSkinController = function(self)
 	return ScreenManager:set(noteSkinController)
 end
 
+SelectController.switchInputController = function(self)
+	local noteChartModel = self.noteChartModel
+	local info = love.filesystem.getInfo(noteChartModel.noteChartEntry.path)
+	if not info then
+		return
+	end
+
+	self:resetModifiedNoteChart()
+
+	local InputController = require("sphere.controllers.InputController")
+	local inputController = InputController:new()
+	inputController.noteChartModel = noteChartModel
+	inputController.noteSkinModel = self.noteSkinModel
+	inputController.themeModel = self.themeModel
+	inputController.modifierModel = self.modifierModel
+	inputController.configModel = self.configModel
+	inputController.notificationModel = self.notificationModel
+	inputController.scoreModel = self.scoreModel
+	inputController.onlineModel = self.onlineModel
+	inputController.difficultyModel = self.difficultyModel
+	inputController.inputModel = self.inputModel
+	inputController.selectController = self
+	return ScreenManager:set(inputController)
+end
+
 SelectController.playNoteChart = function(self)
 	local noteChartModel = self.noteChartModel
 	local info = love.filesystem.getInfo(noteChartModel.noteChartEntry.path)
@@ -241,6 +267,7 @@ SelectController.playNoteChart = function(self)
 	local GameplayController = require("sphere.controllers.GameplayController")
 	local gameplayController = GameplayController:new()
 	gameplayController.noteChartModel = noteChartModel
+	gameplayController.inputModel = self.inputModel
 	gameplayController.themeModel = self.themeModel
 	gameplayController.modifierModel = self.modifierModel
 	gameplayController.configModel = self.configModel

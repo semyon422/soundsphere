@@ -13,7 +13,6 @@ GameplayController.construct = function(self)
 	self.noteChartModel = NoteChartModel:new()
 	self.noteSkinModel = NoteSkinModel:new()
 	self.rhythmModel = RhythmModel:new()
-	self.inputModel = InputModel:new()
 	self.timeController = TimeController:new()
 end
 
@@ -39,7 +38,6 @@ GameplayController.load = function(self)
 
 	noteChartModel:select()
 	noteSkinModel:load()
-	inputModel:load()
 
 	view.rhythmModel = rhythmModel
 	view.noteChartModel = noteChartModel

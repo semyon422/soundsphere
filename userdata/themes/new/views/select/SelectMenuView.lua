@@ -42,7 +42,8 @@ SelectMenuView.reloadItems = function(self)
 			controllerName = "NoteSkinController"
 		},
 		{
-			name = "keybinds",
+			name = "input",
+			controllerName = "InputController"
 		},
 	}
 end
