@@ -10,7 +10,7 @@ NoteChartListItemView.init = function(self)
 
 	self.fontName = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
 	self.fontCreator = aquafonts.getFont(spherefonts.NotoSansRegular, 16)
-	self.fontInputMode = aquafonts.getFont(spherefonts.NotoSansRegular, 16)
+	self.fontInputMode = aquafonts.getFont(spherefonts.NotoSansRegular, 18)
 	self.fontDifficulty = aquafonts.getFont(spherefonts.NotoMonoRegular, 24)
 end
 
@@ -19,6 +19,8 @@ NoteChartListItemView.draw = function(self)
 
 	local itemIndex = self.itemIndex
 	local item = self.item
+	local prevItem = self.prevItem
+	local nextItem = self.nextItem
 
 	local cs = listView.cs
 
@@ -41,6 +43,16 @@ NoteChartListItemView.draw = function(self)
 		)
 	end
 
+	if deltaItemIndex == 0 then
+		love.graphics.rectangle(
+			"fill",
+			x,
+			y + (index - 1) * h / listView.itemCount,
+			cs:X(4 / cs.one),
+			h / listView.itemCount
+		)
+	end
+
 	love.graphics.setFont(self.fontName)
 	love.graphics.printf(
 		noteChartDataEntry.name,
@@ -55,33 +67,37 @@ NoteChartListItemView.draw = function(self)
 		-cs:Y(18 / cs.one)
 	)
 
-	love.graphics.setFont(self.fontCreator)
-	love.graphics.printf(
-		noteChartDataEntry.creator,
-		x,
-		y + (index - 1) * h / listView.itemCount,
-		w / cs.one * 1080,
-		"left",
-		0,
-		cs.one / 1080,
-		cs.one / 1080,
-		-cs:X(120 / cs.one),
-		-cs:Y(4 / cs.one)
-	)
+	if not prevItem or prevItem.noteChartDataEntry.creator ~= item.noteChartDataEntry.creator then
+		love.graphics.setFont(self.fontCreator)
+		love.graphics.printf(
+			noteChartDataEntry.creator,
+			x,
+			y + (index - 1) * h / listView.itemCount,
+			w / cs.one * 1080,
+			"left",
+			0,
+			cs.one / 1080,
+			cs.one / 1080,
+			-cs:X(120 / cs.one),
+			-cs:Y(4 / cs.one)
+		)
+	end
 
-	love.graphics.setFont(self.fontInputMode)
-	love.graphics.printf(
-		noteChartDataEntry.inputMode,
-		x,
-		y + (index - 1) * h / listView.itemCount,
-		w / cs.one * 1080,
-		"left",
-		0,
-		cs.one / 1080,
-		cs.one / 1080,
-		-cs:X(15 / cs.one),
-		-cs:Y(4 / cs.one)
-	)
+	if not prevItem or prevItem.noteChartDataEntry.inputMode ~= item.noteChartDataEntry.inputMode then
+		love.graphics.setFont(self.fontInputMode)
+		love.graphics.printf(
+			noteChartDataEntry.inputMode,
+			x,
+			y + (index - 1) * h / listView.itemCount,
+			w / cs.one * 1080,
+			"left",
+			0,
+			cs.one / 1080,
+			cs.one / 1080,
+			-cs:X(15 / cs.one),
+			cs:Y(4 / cs.one)
+		)
+	end
 
 	love.graphics.setFont(self.fontDifficulty)
 	love.graphics.printf(
@@ -96,6 +112,16 @@ NoteChartListItemView.draw = function(self)
 		-cs:X(15 / cs.one),
 		-cs:Y(23 / cs.one)
 	)
+
+	if nextItem and nextItem.noteChartDataEntry.inputMode ~= item.noteChartDataEntry.inputMode then
+		love.graphics.setColor(1, 1, 1, 0.25)
+		love.graphics.line(
+			x,
+			y + index * h / listView.itemCount,
+			x + w / 3,
+			y + index * h / listView.itemCount
+		)
+	end
 end
 
 return NoteChartListItemView

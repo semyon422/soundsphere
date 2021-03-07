@@ -10,10 +10,12 @@ SearchLineView.init = function(self)
 	self:on("draw", self.draw)
 
 	self.cs = CoordinateManager:getCS(0.5, 0, 0, 0, "h")
-	self.x = 16 / 9 / 3 / 2 - 16 / 9 / 3 / 6
-	self.w = 16 / 9 / 3
+	self.x = 16 / 9 * 0.61803 - 16 / 9 / 2 + 16 / 9 * 0.61803 * (1 - 0.61803)
+	self.w = 16 / 9 * (0.61803 ^ 2 - 0.61803 * (1 - 0.61803))
 	self.h = 40 / 1080
-	self.y = 1 / 15 - self.h / 2
+	self.y = 1.5 / 15 - self.h / 2
+
+	self.x = self.x - (1 / 15 - self.h)
 
 	self.font = aquafonts.getFont(spherefonts.NotoSansRegular, 20)
 end

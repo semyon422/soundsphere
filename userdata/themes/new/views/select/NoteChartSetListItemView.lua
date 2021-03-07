@@ -39,6 +39,16 @@ NoteChartSetListItemView.draw = function(self)
 		)
 	end
 
+	if deltaItemIndex == 0 then
+		love.graphics.rectangle(
+			"fill",
+			x,
+			y + (index - 1) * h / listView.itemCount,
+			cs:X(4 / cs.one),
+			h / listView.itemCount
+		)
+	end
+
 	love.graphics.setFont(self.fontArtist)
 	love.graphics.printf(
 		noteChartDataEntry.artist,

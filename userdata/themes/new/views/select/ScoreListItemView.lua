@@ -46,7 +46,7 @@ ScoreListItemView.draw = function(self)
 	if itemIndex == listView.selectedItem then
 		love.graphics.setFont(self.header)
 		love.graphics.printf(
-			"score",
+			"accuracy",
 			x,
 			y + (index - 1) * h / listView.itemCount,
 			w / cs.one * 1080 / 3,
@@ -60,36 +60,36 @@ ScoreListItemView.draw = function(self)
 
 		love.graphics.setFont(self.header)
 		love.graphics.printf(
-			"accuracy",
+			"score",
 			x + w / 3,
 			y + (index - 1) * h / listView.itemCount,
 			w / cs.one * 1080 / 3,
-			"center",
+			"right",
 			0,
 			cs.one / 1080,
 			cs.one / 1080,
-			0,
+			cs:X(22 / cs.one),
 			-cs:Y(4 / cs.one)
 		)
 
 		love.graphics.setFont(self.header)
 		love.graphics.printf(
-			"combo",
+			"pp",
 			x + 2 * w / 3,
 			y + (index - 1) * h / listView.itemCount,
 			w / cs.one * 1080 / 3,
-			"left",
+			"right",
 			0,
 			cs.one / 1080,
 			cs.one / 1080,
-			-cs:X(22 / cs.one),
+			cs:X(22 / cs.one),
 			-cs:Y(4 / cs.one)
 		)
 	end
 
 	love.graphics.setFont(self.fontScore)
 	love.graphics.printf(
-		math.floor(scoreEntry.score),
+		("%0.2f"):format(scoreEntry.accuracy),
 		x,
 		y + (index - 1) * h / listView.itemCount,
 		w / cs.one * 1080 / 3,
@@ -103,35 +103,37 @@ ScoreListItemView.draw = function(self)
 
 	love.graphics.setFont(self.fontAccuracy)
 	love.graphics.printf(
-		("%0.2f"):format(scoreEntry.accuracy),
+		math.floor(scoreEntry.score),
 		x + w / 3,
 		y + (index - 1) * h / listView.itemCount,
 		w / cs.one * 1080 / 3,
-		"center",
+		"right",
 		0,
 		cs.one / 1080,
 		cs.one / 1080,
-		0,
+		cs:X(22 / cs.one),
 		-cs:Y(23 / cs.one)
 	)
 
 	love.graphics.setFont(self.fontCombo)
 	love.graphics.printf(
-		("%d"):format(scoreEntry.maxCombo),
+		"999",
+		-- ("%d"):format(scoreEntry.maxCombo),
 		x + 2 * w / 3,
 		y + (index - 1) * h / listView.itemCount,
 		w / cs.one * 1080 / 3,
-		"left",
+		"right",
 		0,
 		cs.one / 1080,
 		cs.one / 1080,
-		-cs:X(22 / cs.one),
+		cs:X(22 / cs.one),
 		-cs:Y(23 / cs.one)
 	)
 
 	love.graphics.setFont(self.fontDate)
 	love.graphics.printf(
-		os.date("%H:%M:%S %d.%m.%y", scoreEntry.time),
+		"10 seconds ago",
+		-- os.date("%H:%M:%S %d.%m.%y", scoreEntry.time),
 		x,
 		y + (index - 1) * h / listView.itemCount,
 		w / cs.one * 1080 / 2,

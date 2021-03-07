@@ -43,6 +43,8 @@ ListView.draw = function(self)
 			listItemView.index = i
 			listItemView.itemIndex = itemIndex
 			listItemView.item = item
+			listItemView.prevItem = self.items[itemIndex - 1]
+			listItemView.nextItem = self.items[itemIndex + 1]
 			listItemView:draw()
 		end
 	end
@@ -57,6 +59,8 @@ ListView.receive = function(self, event)
 			listItemView.index = i
 			listItemView.itemIndex = itemIndex
 			listItemView.item = item
+			listItemView.prevItem = self.items[itemIndex - 1]
+			listItemView.nextItem = self.items[itemIndex + 1]
 			listItemView:receive(event)
 		end
 	end
