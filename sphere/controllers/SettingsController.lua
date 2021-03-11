@@ -28,7 +28,7 @@ SettingsController.load = function(self)
 end
 
 SettingsController.unload = function(self)
-	self.configModel:write()
+	-- self.configModel:write()
 	self.view:unload()
 end
 
@@ -44,18 +44,8 @@ SettingsController.receive = function(self, event)
 	self.view:receive(event)
 	self.configController:receive(event)
 
-	if event.name == "setScreen" then
-		if event.screenName == "BrowserScreen" then
-			local BrowserController = require("sphere.controllers.BrowserController")
-			local browserController = BrowserController:new()
-			browserController.configModel = self.configModel
-			browserController.themeModel = self.themeModel
-			browserController.cacheModel = self.selectController.cacheModel
-			browserController.selectController = self.selectController
-			return ScreenManager:set(browserController)
-		elseif event.screenName == "SelectScreen" then
-			return ScreenManager:set(self.selectController)
-		end
+	if event.name == "goSelectScreen" then
+		return ScreenManager:set(self.selectController)
 	end
 end
 

@@ -45,6 +45,10 @@ SelectMenuView.reloadItems = function(self)
 			name = "input",
 			controllerName = "InputController"
 		},
+		{
+			name = "settings",
+			controllerName = "SettingsController"
+		},
 	}
 end
 

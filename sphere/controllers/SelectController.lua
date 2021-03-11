@@ -130,6 +130,8 @@ SelectController.receive = function(self, event)
 			self:switchNoteSkinController()
 		elseif event.item.controllerName == "InputController" then
 			self:switchInputController()
+		elseif event.item.controllerName == "SettingsController" then
+			self:switchSettingsController()
 		end
 	elseif event.action == "playNoteChart" then
 		self:playNoteChart()
@@ -255,6 +257,23 @@ SelectController.switchInputController = function(self)
 	inputController.inputModel = self.inputModel
 	inputController.selectController = self
 	return ScreenManager:set(inputController)
+end
+
+SelectController.switchSettingsController = function(self)
+	local SettingsController = require("sphere.controllers.SettingsController")
+	local settingsController = SettingsController:new()
+	settingsController.noteChartModel = self.noteChartModel
+	settingsController.noteSkinModel = self.noteSkinModel
+	settingsController.themeModel = self.themeModel
+	settingsController.modifierModel = self.modifierModel
+	settingsController.configModel = self.configModel
+	settingsController.notificationModel = self.notificationModel
+	settingsController.scoreModel = self.scoreModel
+	settingsController.onlineModel = self.onlineModel
+	settingsController.difficultyModel = self.difficultyModel
+	settingsController.inputModel = self.inputModel
+	settingsController.selectController = self
+	return ScreenManager:set(settingsController)
 end
 
 SelectController.playNoteChart = function(self)

@@ -52,12 +52,14 @@ GameController.load = function(self)
 	local onlineModel = self.onlineModel
 	local cacheModel = self.cacheModel
 
+	configModel:addConfig("settings_model", "userdata/settings_model.json", "sphere/models/ConfigModel/settings_model.json", "json")
 	configModel:addConfig("settings", "userdata/settings.toml", "sphere/models/ConfigModel/settings.toml", "toml")
 	configModel:addConfig("select", "userdata/select.toml", "sphere/models/ConfigModel/select.toml", "toml")
 	configModel:addConfig("modifier", "userdata/modifier.json", "sphere/models/ConfigModel/modifier.json", "json")
 	configModel:addConfig("noteskin", "userdata/noteskin.toml", "sphere/models/ConfigModel/noteskin.toml", "toml")
 	configModel:addConfig("input", "userdata/input.json", "sphere/models/ConfigModel/input.json", "json")
 
+	configModel:readConfig("settings_model")
 	configModel:readConfig("settings")
 	configModel:readConfig("select")
 	configModel:readConfig("modifier")
@@ -115,6 +117,7 @@ GameController.unload = function(self)
 	self.configModel:writeConfig("settings")
 	self.configModel:writeConfig("select")
 	self.configModel:writeConfig("modifier")
+	self.configModel:writeConfig("noteskin")
 	self.configModel:writeConfig("input")
 	self.mountModel:unload()
 	self.onlineModel:unload()

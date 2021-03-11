@@ -1,0 +1,324 @@
+[
+	{
+		"name": "general",
+		"items": [
+			{
+				"name": "FPS limit",
+				"key": "fps",
+				"type": "slider",
+				"minValue": 10,
+				"maxValue": 1000,
+				"minDisplayValue": 10,
+				"maxDisplayValue": 1000,
+				"step": 10,
+				"format": "%d"
+			},
+			{
+				"name": "play speed",
+				"key": "speed",
+				"type": "slider",
+				"minValue": 0,
+				"maxValue": 3,
+				"minDisplayValue": 0,
+				"maxDisplayValue": 3,
+				"step": 0.05,
+				"format": "%0.2f"
+			},
+			{
+				"name": "replay type",
+				"key": "replay.type",
+				"type": "listSwitcher",
+				"valueList": ["NanoChart", "Json"],
+				"displayList": ["NanoChart", "Json"]
+			},
+			{
+				"name": "round off time?",
+				"key": "gameplay.needTimeRound",
+				"type": "checkbox",
+				"minValue": false,
+				"maxValue": true,
+				"minDisplayValue": "no",
+				"maxDisplayValue": "yes"
+			},
+			{
+				"name": "video BGA",
+				"key": "gameplay.videobga",
+				"type": "checkbox",
+				"minValue": false,
+				"maxValue": true,
+				"minDisplayValue": "disabled",
+				"maxDisplayValue": "enabled"
+			},
+			{
+				"name": "image BGA",
+				"key": "gameplay.imagebga",
+				"type": "checkbox",
+				"minValue": false,
+				"maxValue": true,
+				"minDisplayValue": "disabled",
+				"maxDisplayValue": "enabled"
+			},
+			{
+				"name": "time to prepare",
+				"key": "gameplay.timeToPrepare",
+				"type": "slider",
+				"minValue": 0.5,
+				"maxValue": 3,
+				"minDisplayValue": 0.5,
+				"maxDisplayValue": 3,
+				"step": 0.5,
+				"format": "%0.1f"
+			},
+			{
+				"name": "input offset",
+				"key": "gameplay.inputOffset",
+				"type": "slider",
+				"minValue": -0.1,
+				"maxValue": 0.1,
+				"minDisplayValue": -100,
+				"maxDisplayValue": 100,
+				"step": 0.001,
+				"format": "%d"
+			},
+			{
+				"name": "visual offset",
+				"key": "gameplay.visualOffset",
+				"type": "slider",
+				"minValue": -0.1,
+				"maxValue": 0.1,
+				"minDisplayValue": -100,
+				"maxDisplayValue": 100,
+				"step": 0.001,
+				"format": "%d"
+			},
+			{
+				"name": "adjust accuracy",
+				"key": "select.adjustDifficultyAccuracy",
+				"type": "slider",
+				"minValue": 10,
+				"maxValue": 40,
+				"minDisplayValue": 10,
+				"maxDisplayValue": 40,
+				"step": 1,
+				"format": "%d"
+			},
+			{
+				"name": "adjust performance",
+				"key": "select.adjustDifficultyPerformance",
+				"type": "slider",
+				"minValue": 25,
+				"maxValue": 2000,
+				"minDisplayValue": 25,
+				"maxDisplayValue": 2000,
+				"step": 25,
+				"format": "%d"
+			}
+		]
+	},
+	{
+		"name": "graphics",
+		"items": [
+			{
+				"name": "dim select",
+				"key": "dim.select",
+				"type": "slider",
+				"minValue": 0,
+				"maxValue": 1,
+				"minDisplayValue": 0,
+				"maxDisplayValue": 100,
+				"step": 0.01,
+				"format": "%d"
+			},
+			{
+				"name": "dim gameplay",
+				"key": "dim.gameplay",
+				"type": "slider",
+				"minValue": 0,
+				"maxValue": 1,
+				"minDisplayValue": 0,
+				"maxDisplayValue": 100,
+				"step": 0.01,
+				"format": "%d"
+			},
+			{
+				"name": "dim result",
+				"key": "dim.result",
+				"type": "slider",
+				"minValue": 0,
+				"maxValue": 1,
+				"minDisplayValue": 0,
+				"maxDisplayValue": 100,
+				"step": 0.01,
+				"format": "%d"
+			}
+		]
+	},
+	{
+		"name": "sound",
+		"items": [
+			{
+				"name": "primary audio mode",
+				"key": "audio.primaryAudioMode",
+				"type": "listSwitcher",
+				"valueList": [
+					"sample", "stream", "streamTempo",
+					"streamUser", "streamUserTempo",
+					"streamMemoryTempo", "streamMemoryReversable",
+					"streamOpenAL", "sampleOpenAL"
+				],
+				"displayList": [
+					"sample", "stream", "tempo",
+					"stream*", "tempo*",
+					"memory", "reversable",
+					"streamOAL", "sampleOAL"
+				]
+			},
+			{
+				"name": "secondary audio mode",
+				"key": "audio.secondaryAudioMode",
+				"type": "listSwitcher",
+				"valueList": [
+					"sample", "stream", "streamTempo",
+					"streamUser", "streamUserTempo",
+					"streamMemoryTempo", "streamMemoryReversable",
+					"streamOpenAL", "sampleOpenAL"
+				],
+				"displayList": [
+					"sample", "stream", "tempo",
+					"stream*", "tempo*",
+					"memory", "reversable",
+					"streamOAL", "sampleOAL"
+				]
+			},
+			{
+				"name": "preview audio mode",
+				"key": "audio.previewAudioMode",
+				"type": "listSwitcher",
+				"valueList": ["stream", "streamTempo", "streamUser", "streamUserTempo", "streamOpenAL"],
+				"displayList": ["stream", "tempo", "stream*", "tempo*", "streamOAL"]
+			},
+			{
+				"name": "global volume",
+				"key": "volume.global",
+				"type": "slider",
+				"minValue": 0,
+				"maxValue": 1,
+				"minDisplayValue": 0,
+				"maxDisplayValue": 100,
+				"step": 0.01,
+				"format": "%d"
+			},
+			{
+				"name": "music volume",
+				"key": "volume.music",
+				"type": "slider",
+				"minValue": 0,
+				"maxValue": 1,
+				"minDisplayValue": 0,
+				"maxDisplayValue": 100,
+				"step": 0.01,
+				"format": "%d"
+			},
+			{
+				"name": "effects volume",
+				"key": "volume.effects",
+				"type": "slider",
+				"minValue": 0,
+				"maxValue": 1,
+				"minDisplayValue": 0,
+				"maxDisplayValue": 100,
+				"step": 0.01,
+				"format": "%d"
+			},
+			{
+				"name": "midi constant volume",
+				"key": "parser.midiConstantVolume",
+				"type": "checkbox",
+				"minValue": false,
+				"maxValue": true,
+				"minDisplayValue": "no",
+				"maxDisplayValue": "yes"
+			}
+		]
+	},
+	{
+		"name": "input",
+		"items": [
+			{
+				"name": "settings",
+				"type": "keybind",
+				"key": "screen.settings"
+			},
+			{
+				"name": "browser",
+				"type": "keybind",
+				"key": "screen.browser"
+			},
+			{
+				"name": "pause",
+				"type": "keybind",
+				"key": "gameplay.pause"
+			},
+			{
+				"name": "skip intro",
+				"type": "keybind",
+				"key": "gameplay.skipIntro"
+			},
+			{
+				"name": "quick restart",
+				"type": "keybind",
+				"key": "gameplay.quickRestart"
+			},
+			{
+				"name": "select random song",
+				"type": "keybind",
+				"key": "select.selectRandomNoteChartSet"
+			},
+			{
+				"name": "invert play speed",
+				"type": "keybind",
+				"key": "gameplay.invertPlaySpeed"
+			},
+			{
+				"name": "decrease play speed",
+				"type": "keybind",
+				"key": "gameplay.decreasePlaySpeed"
+			},
+			{
+				"name": "increase play speed",
+				"type": "keybind",
+				"key": "gameplay.increasePlaySpeed"
+			},
+			{
+				"name": "invert time rate",
+				"type": "keybind",
+				"key": "gameplay.invertTimeRate"
+			},
+			{
+				"name": "decrease time rate",
+				"type": "keybind",
+				"key": "gameplay.decreaseTimeRate"
+			},
+			{
+				"name": "increase time rate",
+				"type": "keybind",
+				"key": "gameplay.increaseTimeRate"
+			},
+			{
+				"name": "capture screenshot",
+				"type": "keybind",
+				"key": "screenshot.capture"
+			},
+			{
+				"name": "open screenshot",
+				"type": "keybind",
+				"key": "screenshot.open"
+			},
+			{
+				"name": "adjust difficulty",
+				"type": "keybind",
+				"key": "select.adjustDifficulty"
+			}
+		]
+	}
+]

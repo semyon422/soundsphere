@@ -5,6 +5,7 @@ local SelectView = require(themepackage .. "views.select.SelectView")
 local ModifierView = require(themepackage .. "views.modifier.ModifierView")
 local NoteSkinView = require(themepackage .. "views.noteskin.NoteSkinView")
 local InputView = require(themepackage .. "views.input.InputView")
+local SettingsView = require(themepackage .. "views.settings.SettingsView")
 
 local UserTheme = Theme:new()
 
@@ -17,6 +18,8 @@ UserTheme.newView = function(self, name)
 		return NoteSkinView:new()
 	elseif name == "InputView" then
 		return InputView:new()
+	elseif name == "SettingsView" then
+		return SettingsView:new()
 	end
 	return self.viewFactory:newView(name)
 end
