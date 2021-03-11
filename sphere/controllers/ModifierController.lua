@@ -68,13 +68,7 @@ end
 ModifierController.receive = function(self, event)
 	self.view:receive(event)
 
-	if event.name == "enableBooleanModifier" then
-		event.modifier.enabled = event.value
-	elseif event.name == "enableNumberModifier" then
-		event.modifier[event.modifier.variableName] = event.value
-	elseif event.name == "disableNumberModifier" then
-		event.modifier[event.modifier.variableName] = event.Modifier[event.modifier.variableName]
-	elseif event.name == "addModifier" then
+	if event.name == "addModifier" then
 		self.modifierModel:add(event.modifierConfig, event.index)
 	elseif event.name == "removeModifier" then
 		self.modifierModel:remove(event.modifierConfig)

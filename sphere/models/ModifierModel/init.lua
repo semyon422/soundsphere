@@ -63,10 +63,13 @@ ModifierModel.createModifiers = function(self)
 end
 
 ModifierModel.add = function(self, modifierConfig, index)
+	local config = self.config
 	if not index then
-		table.insert(self.config, modifierConfig)
+		table.insert(config, modifierConfig)
 	else
-		table.insert(self.config, index, modifierConfig)
+		local maxIndex = math.max(#config, 1)
+		index = math.min(math.max(index, 1), maxIndex)
+		table.insert(config, index, modifierConfig)
 	end
 end
 
