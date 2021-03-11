@@ -39,10 +39,8 @@ end
 ResultController.receive = function(self, event)
 	self.view:receive(event)
 
-	if event.name == "setScreen" then
-		if event.screenName == "SelectScreen" then
-			ScreenManager:set(self.selectController)
-		end
+	if event.name == "goSelectScreen" then
+		return ScreenManager:set(self.selectController)
 	end
 end
 
