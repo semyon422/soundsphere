@@ -73,17 +73,13 @@ ConfigModel.readConfigFile = function(self, path, format)
 end
 
 ConfigModel.readTomlFile = function(self, path)
-	local file = io.open(path, "r")
-	local data = assert(toml.parse(file:read("*all")))
-	file:close()
-	return data
+	local contents = love.filesystem.read(path)
+	return assert(toml.parse(contents))
 end
 
 ConfigModel.readJsonFile = function(self, path)
-	local file = io.open(path, "r")
-	local data = assert(json.decode(file:read("*all")))
-	file:close()
-	return data
+	local contents = love.filesystem.read(path)
+	return assert(json.decode(contents))
 end
 
 ConfigModel.writeConfigFile = function(self, path, format, config)
@@ -95,15 +91,11 @@ ConfigModel.writeConfigFile = function(self, path, format, config)
 end
 
 ConfigModel.writeTomlFile = function(self, path, config)
-	local file = io.open(path, "w")
-	file:write(toml.encode(config))
-	return file:close()
+	return assert(love.filesystem.write(path, toml.encode(config)))
 end
 
 ConfigModel.writeJsonFile = function(self, path, config)
-	local file = io.open(path, "w")
-	file:write(json.encode(config))
-	return file:close()
+	return assert(love.filesystem.write(path, json.encode(config)))
 end
 
 return ConfigModel

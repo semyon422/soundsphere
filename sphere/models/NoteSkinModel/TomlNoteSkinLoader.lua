@@ -11,9 +11,8 @@ TomlNoteSkinLoader.path = "userdata/skins"
 TomlNoteSkinLoader.load = function(self, noteSkin)
 	self.noteSkin = noteSkin
 
-	local file = io.open(noteSkin.directoryPath .. "/" .. noteSkin.path, "r")
-	noteSkin.tomlData = toml.parse(file:read("*all"))
-	file:close()
+	local contents = love.filesystem.read(noteSkin.directoryPath .. "/" .. noteSkin.path)
+	noteSkin.tomlData = toml.parse(contents)
 
 	self.unit = noteSkin.tomlData.general.unit
 

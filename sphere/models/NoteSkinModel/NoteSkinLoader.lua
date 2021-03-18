@@ -20,19 +20,16 @@ NoteSkinLoader.loadTomlSimpleLatest = function(self, noteSkin)
 end
 
 NoteSkinLoader.loadJsonFullLatest = function(self, noteSkin)
-	local file = io.open(noteSkin.directoryPath .. "/" .. noteSkin.path, "r")
-	noteSkin.data = json.decode(file:read("*all"))
-	file:close()
+	local contents = love.filesystem.read(noteSkin.directoryPath .. "/" .. noteSkin.path)
+	noteSkin.data = json.decode(contents)
 
-	local file = io.open(noteSkin.directoryPath .. "/" .. noteSkin.data.playfield, "r")
-	noteSkin.playField = json.decode(file:read("*all"))
-	file:close()
+	contents = love.filesystem.read(noteSkin.directoryPath .. "/" .. noteSkin.data.playfield)
+	noteSkin.playField = json.decode(contents)
 
-	local file = io.open(noteSkin.directoryPath .. "/" .. noteSkin.data.env, "r")
+	contents = love.filesystem.read(noteSkin.directoryPath .. "/" .. noteSkin.data.env)
 	noteSkin.env = {}
 	noteSkin.env.math = math
-	safeload(file:read("*all"), noteSkin.env)()
-	file:close()
+	safeload(contents, noteSkin.env)()
 
 	noteSkin.notes = noteSkin.data.notes or {}
 end

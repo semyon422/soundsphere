@@ -14,15 +14,12 @@ MountModel.readConfig = function(self)
 		return
 	end
 
-	local file = io.open(self.configPath, "r")
-	self.mountInfo = json.decode(file:read("*all"))
-	file:close()
+	local contents = love.filesystem.read(self.configPath)
+	self.mountInfo = json.decode(contents)
 end
 
 MountModel.writeConfig = function(self)
-	local file = io.open(self.configPath, "w")
-	file:write(json.encode(self.mountInfo))
-	return file:close()
+	return assert(love.filesystem.write(self.configPath, json.encode(self.mountInfo)))
 end
 
 MountModel.load = function(self)

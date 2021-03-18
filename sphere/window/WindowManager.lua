@@ -6,9 +6,8 @@ local WindowManager = Class:new()
 WindowManager.path = "userdata/window.json"
 
 WindowManager.load = function(self)
-	local file = io.open(self.path, "r")
-	self.modes = json.decode(file:read("*all"))
-	file:close()
+	local contents = love.filesystem.read(self.path)
+	self.modes = json.decode(contents)
 
 	self.currentMode = 1
 	self:setMode()

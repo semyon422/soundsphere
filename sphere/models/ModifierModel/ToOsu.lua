@@ -23,9 +23,7 @@ ToOsu.apply = function(self)
 	path = path:find("^.+/.$") and path:match("^(.+)/.$") or path
 	local fileName = path:match("^.+/(.-)$"):match("^(.+)%..-$")
 
-	local out = io.open(("userdata/export/%s.osu"):format(fileName), "w")
-	out:write(nce:export())
-	out:close()
+	return assert(love.filesystem.write(("userdata/export/%s.osu"):format(fileName), nce:export()))
 end
 
 return ToOsu
