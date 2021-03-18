@@ -26,6 +26,19 @@ elseif os == "Linux" then
 	aquapackage.add("bin/linux64")
 end
 
+local aquafs = require("aqua.filesystem")
+
+local git_dir_info = love.filesystem.getInfo(".git")
+if not git_dir_info then
+	print("launcher filesystem mode")
+	aquafs.mount(love.filesystem.getSourceBaseDirectory(), "/", true)
+	aquafs.mount(love.filesystem.getSourceBaseDirectory() .. "/moddedgame", "/", false)
+	aquafs.setWriteDir(love.filesystem.getSourceBaseDirectory())
+else
+	print("repository filesystem mode")
+	aquafs.setWriteDir(love.filesystem.getSource())
+end
+
 require("luamidi")
 
 setmetatable(_G, {
@@ -41,8 +54,6 @@ local MainLog = require("sphere.MainLog")
 MainLog:write("trace", "starting game")
 
 local aqua = require("aqua")
-
-aqua.filesystem.setWriteDir(love.filesystem.getSource())
 
 local aquaevent = require("aqua.event")
 aquaevent:init()
