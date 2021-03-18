@@ -10,10 +10,21 @@ aquapackage.add("chartbase")
 aquapackage.add("libchart")
 aquapackage.add("md5")
 aquapackage.add("luajit-request")
+aquapackage.add("json")
+aquapackage.add("tinyyaml")
+aquapackage.add("tween")
 
-aquapackage.add("bin/linux64")
-aquapackage.add("bin/win64")
-aquapackage.add("bin/win32")
+local os = jit.os
+local arch = jit.arch
+if os == "Windows" then
+	if arch == "x64" then
+		aquapackage.add("bin/win64")
+	elseif arch == "x86" then
+		aquapackage.add("bin/win32")
+	end
+elseif os == "Linux" then
+	aquapackage.add("bin/linux64")
+end
 
 require("luamidi")
 
