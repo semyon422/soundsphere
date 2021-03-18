@@ -2,7 +2,7 @@ local viewspackage = (...):match("^(.-%.views%.)")
 
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local ListView = require(viewspackage .. "ListView")
-local InputListItemView = require(viewspackage .. "input.InputListItemView")
+local InputListItemView = require(viewspackage .. "InputView.InputListItemView")
 
 local InputListView = ListView:new()
 
