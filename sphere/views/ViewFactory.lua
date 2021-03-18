@@ -3,7 +3,6 @@ local SelectView = require("sphere.views.SelectView")
 local SettingsView = require("sphere.views.SettingsView")
 local ResultView = require("sphere.views.ResultView")
 local GameplayView = require("sphere.views.GameplayView")
-local BrowserView = require("sphere.views.BrowserView")
 
 local ViewFactory = Class:new()
 
@@ -16,8 +15,6 @@ ViewFactory.newView = function(self, name)
 		return ResultView:new()
 	elseif name == "GameplayView" then
 		return GameplayView:new()
-	elseif name == "BrowserView" then
-		return BrowserView:new()
 	end
 end
 

@@ -68,8 +68,8 @@ VideoNote.getDrawable = function(self)
 
 		local drawable = ImageFrame:new({
 			image = image,
-			cs = self.noteSkinView:getCS(self),
-			layer = self.noteSkinView:getNoteLayer(self, "Head"),
+			cs = self.noteSkinImageView:getCS(self),
+			layer = self.noteSkinImageView:getNoteLayer(self, "Head"),
 			x = 0,
 			y = 0,
 			h = 1,

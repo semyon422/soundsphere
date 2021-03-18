@@ -46,11 +46,8 @@ music = 1
 global = 1
 effects = 1
 [general]
+speed = 1
 noteskin10key2scratch = "userdata/skins/soundsphere circle/10key2scratch.toml"
 fps = 240
-theme = "userdata/themes/new"
-noteskin5key = "userdata/skins/soundsphere circle/5key.toml"
-noteskin4key = "userdata/skins/soundsphere arrow/noteskin4key_test.json"
-speed = 1
 [parser]
 midiConstantVolume = false
