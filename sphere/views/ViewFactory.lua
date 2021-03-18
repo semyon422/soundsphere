@@ -1,20 +1,29 @@
+local viewspackage = (...):match("^(.-%.views%.)")
+
 local Class = require("aqua.util.Class")
-local SelectView = require("sphere.views.SelectView")
-local SettingsView = require("sphere.views.SettingsView")
-local ResultView = require("sphere.views.ResultView")
-local GameplayView = require("sphere.views.GameplayView")
+
+local SelectView = require(viewspackage .. "SelectView")
+local ModifierView = require(viewspackage .. "ModifierView")
+local NoteSkinView = require(viewspackage .. "NoteSkinView")
+local InputView = require(viewspackage .. "InputView")
+local SettingsView = require(viewspackage .. "SettingsView")
+local ResultView = require(viewspackage .. "ResultView")
 
 local ViewFactory = Class:new()
 
 ViewFactory.newView = function(self, name)
 	if name == "SelectView" then
 		return SelectView:new()
+	elseif name == "ModifierView" then
+		return ModifierView:new()
+	elseif name == "NoteSkinView" then
+		return NoteSkinView:new()
+	elseif name == "InputView" then
+		return InputView:new()
 	elseif name == "SettingsView" then
 		return SettingsView:new()
 	elseif name == "ResultView" then
 		return ResultView:new()
-	elseif name == "GameplayView" then
-		return GameplayView:new()
 	end
 end
 
