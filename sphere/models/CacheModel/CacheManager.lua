@@ -566,10 +566,7 @@ CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, for
 	for i = 1, #noteChartEntries do
 		local path = noteChartEntries[i].path
 		if not fileContent[path] then
-			local file = love.filesystem.newFile(path)
-			file:open("r")
-			local content = file:read()
-			file:close()
+			local content = love.filesystem.read(path)
 
 			fileContent[path] = content
 			fileHash[path] = md5.sumhexa(content)
