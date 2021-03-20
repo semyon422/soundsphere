@@ -58,7 +58,7 @@ GameController.load = function(self)
 	configModel:addConfig("modifier", "userdata/modifier.json", "sphere/models/ConfigModel/modifier.json", "json")
 	configModel:addConfig("noteskin", "userdata/noteskin.toml", "sphere/models/ConfigModel/noteskin.toml", "toml")
 	configModel:addConfig("input", "userdata/input.json", "sphere/models/ConfigModel/input.json", "json")
-	configModel:addConfig("mount", "userdata/mount.toml", "sphere/models/ConfigModel/mount.toml", "toml")
+	configModel:addConfig("mount", "userdata/mount.json", "sphere/models/ConfigModel/mount.json", "json")
 
 	configModel:readConfig("settings_model")
 	configModel:readConfig("settings")
