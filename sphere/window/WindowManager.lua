@@ -11,6 +11,7 @@ WindowManager.load = function(self)
 
 	self.currentMode = 1
 	self:setMode()
+	self:setIcon()
 end
 
 WindowManager.receive = function(self, event)
@@ -24,6 +25,15 @@ WindowManager.setMode = function(self)
 	local mode = self.modes[self.currentMode]
 	love.window.setMode(mode.width, mode.height, mode.flags)
 	love.resize(mode.width, mode.height)
+end
+
+local icon_path = "resources/icon.png"
+WindowManager.setIcon = function(self)
+	local info = love.filesystem.getInfo(icon_path)
+	if info then
+		local imageData = love.image.newImageData(icon_path)
+		love.window.setIcon(imageData)
+	end
 end
 
 return WindowManager

@@ -5,7 +5,7 @@ function love.conf(t)
 	t.gammacorrect = false
 
 	t.window.title = "soundsphere"
-	t.window.icon = "resources/icon.png"
+	t.window.icon = nil
 	t.window.width = 1024
 	t.window.height = 576
 	t.window.borderless = false
