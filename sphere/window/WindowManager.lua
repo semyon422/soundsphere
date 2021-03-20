@@ -6,8 +6,7 @@ local WindowManager = Class:new()
 WindowManager.path = "userdata/window.json"
 
 WindowManager.load = function(self)
-	local contents = love.filesystem.read(self.path)
-	self.modes = json.decode(contents)
+	self.modes = self.configModel:getConfig("window")
 
 	self.currentMode = 1
 	self:setMode()

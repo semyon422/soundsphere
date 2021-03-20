@@ -59,6 +59,7 @@ GameController.load = function(self)
 	configModel:addConfig("noteskin", "userdata/noteskin.toml", "sphere/models/ConfigModel/noteskin.toml", "toml")
 	configModel:addConfig("input", "userdata/input.json", "sphere/models/ConfigModel/input.json", "json")
 	configModel:addConfig("mount", "userdata/mount.json", "sphere/models/ConfigModel/mount.json", "json")
+	configModel:addConfig("window", "userdata/window.json", "sphere/models/ConfigModel/window.json", "json")
 
 	configModel:readConfig("settings_model")
 	configModel:readConfig("settings")
@@ -67,6 +68,7 @@ GameController.load = function(self)
 	configModel:readConfig("noteskin")
 	configModel:readConfig("input")
 	configModel:readConfig("mount")
+	configModel:readConfig("window")
 
 	onlineController.onlineModel = onlineModel
 	onlineController.cacheModel = cacheModel
@@ -83,6 +85,7 @@ GameController.load = function(self)
 	notificationModel.observable:add(notificationView)
 	notificationView:load()
 
+	windowManager.configModel = configModel
 	windowManager:load()
 	-- configModel.observable:add(FpsLimiter)
 	-- configModel.observable:add(screenshot)
@@ -124,6 +127,7 @@ GameController.unload = function(self)
 	self.configModel:writeConfig("noteskin")
 	self.configModel:writeConfig("input")
 	self.configModel:writeConfig("mount")
+	self.configModel:writeConfig("window")
 	self.mountModel:unload()
 	self.onlineModel:unload()
 end

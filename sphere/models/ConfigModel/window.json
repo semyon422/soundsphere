@@ -1,0 +1,22 @@
+[
+	{
+		"width": 1280,
+		"height": 720,
+		"flags": {
+			"fullscreen": false,
+			"fullscreentype": "desktop",
+			"vsync": false,
+			"resizable": true
+		}
+	},
+	{
+		"width": 1920,
+		"height": 1080,
+		"flags": {
+			"fullscreen": true,
+			"fullscreentype": "exclusive",
+			"vsync": false,
+			"resizable": false
+		}
+	}
+]
