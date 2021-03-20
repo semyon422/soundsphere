@@ -8,6 +8,7 @@ local NoteSkinView = require(viewspackage .. "NoteSkinView")
 local InputView = require(viewspackage .. "InputView")
 local SettingsView = require(viewspackage .. "SettingsView")
 local ResultView = require(viewspackage .. "ResultView")
+local GameplayView = require(viewspackage .. "GameplayView")
 
 local ViewFactory = Class:new()
 
@@ -24,6 +25,8 @@ ViewFactory.newView = function(self, name)
 		return SettingsView:new()
 	elseif name == "ResultView" then
 		return ResultView:new()
+	elseif name == "GameplayView" then
+		return GameplayView:new()
 	end
 end
 
