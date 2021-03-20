@@ -6,10 +6,20 @@ local NoteChartModel = Class:new()
 NoteChartModel.select = function(self)
 	local config = self.configModel:getConfig("select")
 
-	self.noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(config.noteChartSetEntryId)
-	self.noteChartEntry = self.cacheModel.cacheManager:getNoteChartEntryById(config.noteChartEntryId)
-	self.noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntryById(config.noteChartDataEntryId)
-		or self.cacheModel.cacheManager:getEmptyNoteChartDataEntry(self.noteChartEntry.path)
+	local cacheManager = self.cacheModel.cacheManager
+
+	self.noteChartSetEntry = cacheManager:getNoteChartSetEntryById(config.noteChartSetEntryId)
+	if not self.noteChartSetEntry then
+		return
+	end
+
+	self.noteChartEntry = cacheManager:getNoteChartEntryById(config.noteChartEntryId)
+	if not self.noteChartEntry then
+		return
+	end
+
+	self.noteChartDataEntry = cacheManager:getNoteChartDataEntryById(config.noteChartDataEntryId)
+		or cacheManager:getEmptyNoteChartDataEntry(self.noteChartEntry.path)
 	self.scoreEntry = self.scoreModel.scoreManager:getScoreEntryById(config.scoreEntryId)
 end
 
