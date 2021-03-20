@@ -7,23 +7,8 @@ local MountModel = Class:new()
 MountModel.configPath = "userdata/mount.json"
 MountModel.chartsPath = "userdata/charts"
 
-MountModel.readConfig = function(self)
-	local info = love.filesystem.getInfo(self.configPath)
-	if not info or info.size == 0 then
-		self.mountInfo = {}
-		return
-	end
-
-	local contents = love.filesystem.read(self.configPath)
-	self.mountInfo = json.decode(contents)
-end
-
-MountModel.writeConfig = function(self)
-	return assert(love.filesystem.write(self.configPath, json.encode(self.mountInfo)))
-end
-
 MountModel.load = function(self)
-	self:readConfig()
+	self.mountInfo = self.configModel:getConfig("mount")
 
 	for _, entry in ipairs(self.mountInfo) do
 		aquafs.mount(entry[1], entry[2], 1)
@@ -31,8 +16,6 @@ MountModel.load = function(self)
 end
 
 MountModel.unload = function(self)
-	self:writeConfig()
-
 	for _, entry in ipairs(self.mountInfo) do
 		aquafs.unmount(entry[1])
 	end

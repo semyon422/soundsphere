@@ -13,7 +13,6 @@ MountController.receive = function(self, event)
 		self.mountModel:addPath(path)
 	end
 	self.mountModel:mount(path)
-	self.mountModel:writeConfig()
 end
 
 return MountController
