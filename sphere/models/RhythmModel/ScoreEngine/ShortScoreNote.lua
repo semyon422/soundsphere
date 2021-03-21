@@ -14,7 +14,7 @@ end
 ShortScoreNote.getTimeState = function(self)
 	local currentTime = self.logicalNote:getEventTime()
 	local deltaTime = (currentTime - self.startNoteData.timePoint.absoluteTime) / math.abs(self.scoreEngine.timeRate)
-	local config = self.scoreEngine.scoreSystem.scoreConfig.notes.ShortScoreNote
+	local config = self.scoreEngine.scoreSystem.missWindows.ShortScoreNote
 	local pass = config.pass
 	local miss = config.miss
 

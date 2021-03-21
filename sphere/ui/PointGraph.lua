@@ -28,11 +28,11 @@ PointGraph.loadGui = function(self)
 end
 
 PointGraph.load = function(self)
-	self.counter = self.scoreSystem:getCounter(self.counterPath)
+	-- self.counter = self.scoreSystem:getCounter(self.counterPath)
 
 	self.allcs = CoordinateManager:getCS(0, 0, 0, 0, "all")
 
-	self.scoreSystem.observable:add(self)
+	-- self.scoreSystem.observable:add(self)
 
 	self.canvas = love.graphics.newCanvas()
 	
@@ -55,7 +55,8 @@ PointGraph.load = function(self)
 		cs = self.cs
 	})
 	
-	local hits = self.scoreSystem.scoreTable[self.counter.env.config.tableName] or {}
+	-- local hits = self.scoreSystem.accuracySequence or {}
+	local hits = {}
 	for _, point in ipairs(hits) do
 		self:addPoint(point[1], point[2])
 	end
@@ -105,7 +106,8 @@ PointGraph.receive = function(self, event)
 		return
 	end
 
-	local point = self.counter.env.getPoint(event)
+	-- local point = self.counter.env.getPoint(event)
+	local point
 	if point then
 		self:addPoint(unpack(point))
 	end

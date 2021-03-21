@@ -1,17 +1,21 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
 local NoteHandler		= require("sphere.models.RhythmModel.ScoreEngine.NoteHandler")
-local ScoreSystem		= require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
+local ScoreSystemLoader	= require("sphere.models.RhythmModel.ScoreEngine.ScoreSystemLoader")
 
 local ScoreEngine = Class:new()
 
 ScoreEngine.construct = function(self)
 	self.observable = Observable:new()
-	self.scoreSystem = ScoreSystem:new()
+	self.scoreSystemLoader = ScoreSystemLoader:new()
 end
 
 ScoreEngine.load = function(self)
-	self.scoreSystem:loadConfig("score.json")
+	local scoreSystem = self.scoreSystemLoader:loadScoreSystem()
+	self.scoreSystem = scoreSystem
+
+	scoreSystem.inputMode = self.noteChart.inputMode:getString()
+	scoreSystem.timeRate = self.timeEngine:getBaseTimeRate()
 
 	self.sharedScoreNotes = {}
 	self.currentTime = 0
@@ -23,9 +27,6 @@ ScoreEngine.load = function(self)
 	self.noteHandler = NoteHandler:new()
 	self.noteHandler.scoreEngine = self
 	self.noteHandler:load()
-
-	self.scoreSystem.scoreTable.inputMode = self.noteChart.inputMode:getString()
-	self.scoreSystem.scoreTable.timeRate = self.timeEngine:getBaseTimeRate()
 end
 
 ScoreEngine.update = function(self)
@@ -49,10 +50,6 @@ end
 
 ScoreEngine.getScoreNote = function(self, noteData)
 	return self.sharedScoreNotes[noteData]
-end
-
-ScoreEngine.setBasePath = function(self, path)
-	return self.scoreSystem:setBasePath(path)
 end
 
 return ScoreEngine
