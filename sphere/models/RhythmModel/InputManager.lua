@@ -64,9 +64,9 @@ InputManager.receive = function(self, event)
 
 	local keyConfig
 	if event.name == "keypressed" and self.inputConfig.press.keyboard then
-		keyConfig = self.inputConfig.press.keyboard[event.args[1]]
+		keyConfig = self.inputConfig.press.keyboard[event.args[2]]
 	elseif event.name == "keyreleased" and self.inputConfig.release.keyboard then
-		keyConfig = self.inputConfig.release.keyboard[event.args[1]]
+		keyConfig = self.inputConfig.release.keyboard[event.args[2]]
 	elseif event.name == "gamepadpressed" then
 		keyConfig = self.inputConfig.press.gamepad[tostring(event.args[2])]
 	elseif event.name == "gamepadreleased" then
