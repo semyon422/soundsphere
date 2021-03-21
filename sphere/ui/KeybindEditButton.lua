@@ -66,7 +66,7 @@ KeybindEditButton.receive = function(self, event)
 		end
 	elseif event.name == "keypressed" and self.active then
 		self.active = false
-		self.value = event.args[1]
+		self.value = event.args[2]
 		
 		self:send({
 			name = "valueChanged",
