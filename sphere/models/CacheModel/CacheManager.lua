@@ -408,19 +408,6 @@ CacheManager.lookup = function(self, directoryPath, recursive)
 
 	local items = love.filesystem.getDirectoryItems(directoryPath)
 
-	local containerPaths = {}
-	for _, itemName in ipairs(items) do
-		local path = directoryPath .. "/" .. itemName
-		local info = love.filesystem.getInfo(path)
-		if info and info.type == "file" and NoteChartFactory:isUnrelatedContainer(path) and self:checkNoteChartSetEntry(path) then
-			containerPaths[#containerPaths + 1] = path
-			self:processNoteChartEntries({path}, path)
-		end
-	end
-	if #containerPaths > 0 then
-		return
-	end
-
 	local chartPaths = {}
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
@@ -431,6 +418,19 @@ CacheManager.lookup = function(self, directoryPath, recursive)
 	end
 	if #chartPaths > 0 then
 		self:processNoteChartEntries(chartPaths, directoryPath)
+		return
+	end
+
+	local containerPaths = {}
+	for _, itemName in ipairs(items) do
+		local path = directoryPath .. "/" .. itemName
+		local info = love.filesystem.getInfo(path)
+		if info and info.type == "file" and NoteChartFactory:isUnrelatedContainer(path) and self:checkNoteChartSetEntry(path) then
+			containerPaths[#containerPaths + 1] = path
+			self:processNoteChartEntries({path}, path)
+		end
+	end
+	if #containerPaths > 0 then
 		return
 	end
 
