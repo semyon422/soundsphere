@@ -123,4 +123,14 @@ ModifierModel.receive = function(self, event)
 	end
 end
 
+ModifierModel.getString = function(self, event)
+	local t = {}
+	for _, modifierConfig in ipairs(self.config) do
+		local modifier = self:getModifier(modifierConfig)
+		modifier.config = modifierConfig
+		table.insert(t, modifier:getString())
+	end
+	return table.concat(t, ",")
+end
+
 return ModifierModel

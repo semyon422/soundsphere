@@ -59,7 +59,7 @@ ReplayModel.saveReplay = function(self)
 	local replay = self.replay
 	replay.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
 	replay.inputMode = self.noteChartModel.noteChart.inputMode
-	replay.modifierTable = self.modifierModel:toTable()
+	replay.modifierTable = self.modifierModel.config
 	replay.type = self.replayType
 
 	local replayString = replay:toString()
