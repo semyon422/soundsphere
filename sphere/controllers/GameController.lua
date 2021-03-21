@@ -15,11 +15,13 @@ local BackgroundManager			= require("sphere.ui.BackgroundManager")
 local WindowManager				= require("sphere.window.WindowManager")
 local FpsLimiter				= require("sphere.window.FpsLimiter")
 local Screenshot				= require("sphere.window.Screenshot")
+local DirectoryManager			= require("sphere.filesystem.DirectoryManager")
 local NotificationView			= require("sphere.views.NotificationView")
 local NotificationModel			= require("sphere.models.NotificationModel")
 local ThemeModel				= require("sphere.models.ThemeModel")
 local OnlineModel				= require("sphere.models.OnlineModel")
 local CacheModel				= require("sphere.models.CacheModel")
+local MainLog					= require("sphere.MainLog")
 
 local GameController = Class:new()
 
@@ -32,6 +34,7 @@ GameController.construct = function(self)
 	self.mountController = MountController:new()
 	self.onlineController = OnlineController:new()
 	self.screenshot = Screenshot:new()
+	self.directoryManager = DirectoryManager:new()
 	self.themeModel = ThemeModel:new()
 	self.scoreModel = ScoreModel:new()
 	self.onlineModel = OnlineModel:new()
@@ -47,10 +50,15 @@ GameController.load = function(self)
 	local mountController = self.mountController
 	local onlineController = self.onlineController
 	local screenshot = self.screenshot
+	local directoryManager = self.directoryManager
 	local themeModel = self.themeModel
 	local scoreModel = self.scoreModel
 	local onlineModel = self.onlineModel
 	local cacheModel = self.cacheModel
+
+	directoryManager:createDirectories()
+
+	MainLog:write("trace", "starting game")
 
 	configModel:addConfig("settings_model", "userdata/settings_model.json", "sphere/models/ConfigModel/settings_model.json", "json")
 	configModel:addConfig("settings", "userdata/settings.toml", "sphere/models/ConfigModel/settings.toml", "toml")

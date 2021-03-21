@@ -50,9 +50,6 @@ setmetatable(_G, {
 
 require("preloaders.preloadall")
 
-local MainLog = require("sphere.MainLog")
-MainLog:write("trace", "starting game")
-
 local aqua = require("aqua")
 
 local aquaevent = require("aqua.event")
