@@ -1,4 +1,5 @@
 local Class			= require("aqua.util.Class")
+local aquafs		= require("aqua.filesystem")
 local json			= require("json")
 local ncdk			= require("ncdk")
 local NoteSkin		= require("sphere.models.NoteSkinModel.NoteSkin")
@@ -25,6 +26,13 @@ NoteSkinModel.lookup = function(self, directoryPath)
 			local info = love.filesystem.getInfo(path .. "/metadata.json")
 			if info then
 				self:loadMetaData(path, "metadata.json")
+			end
+		elseif info.type == "file" and itemName:sub(-3, -1) == "zip" then
+			local directoryPath = path:sub(1, -5)
+			aquafs.mount(path, directoryPath, false)
+			local info = love.filesystem.getInfo(directoryPath .. "/metadata.json")
+			if info then
+				self:loadMetaData(directoryPath, "metadata.json")
 			end
 		end
 	end
