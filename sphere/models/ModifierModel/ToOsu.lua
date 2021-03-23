@@ -18,6 +18,10 @@ ToOsu.apply = function(self)
 	nce.noteChartEntry = self.noteChartModel.noteChartEntry
 	nce.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
 
+	if not self.noteChartModel.noteChartEntry then
+		return
+	end
+
 	local path = self.noteChartModel.noteChartEntry.path
 	path = path:find("^.+/.$") and path:match("^(.+)/.$") or path
 	local fileName = path:match("^.+/(.-)$"):match("^(.+)%..-$")
