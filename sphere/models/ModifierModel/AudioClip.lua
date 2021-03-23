@@ -10,21 +10,17 @@ AudioClip.type = "TimeEngineModifier"
 AudioClip.name = "AudioClip"
 AudioClip.shortName = "Clip"
 
-AudioClip.variableType = "number"
-AudioClip.variableName = "value"
-AudioClip.variableFormat = "%3s"
-AudioClip.variableRange = {0, 10, 100}
+AudioClip.defaultValue = 0
+AudioClip.step = 10
+AudioClip.offset = 0
+AudioClip.range = {0, 10}
 
-AudioClip.value = 0
-
-AudioClip.tostring = function(self)
-    if self.value > 0 then
+AudioClip.getString = function(self, config)
+	config = config or self.config
+	local realValue = self:getRealValue(config)
+    if realValue > 0 then
 	    return "+" .. self.value .. "dB"
-    end
-end
-
-AudioClip.tojson = function(self)
-	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
+	end
 end
 
 AudioClip.apply = function(self)
