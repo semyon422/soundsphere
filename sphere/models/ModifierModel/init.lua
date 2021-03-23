@@ -7,6 +7,7 @@ local WindUp		= require("sphere.models.ModifierModel.WindUp")
 local SpeedMode		= require("sphere.models.ModifierModel.SpeedMode")
 local TimeRateQ		= require("sphere.models.ModifierModel.TimeRateQ")
 local TimeRateX		= require("sphere.models.ModifierModel.TimeRateX")
+local AudioClip		= require("sphere.models.ModifierModel.AudioClip")
 local NoScratch		= require("sphere.models.ModifierModel.NoScratch")
 local Mirror		= require("sphere.models.ModifierModel.Mirror")
 local Random		= require("sphere.models.ModifierModel.Random")
@@ -31,6 +32,7 @@ ModifierModel.modifiers = {
 	SpeedMode,
 	TimeRateQ,
 	TimeRateX,
+	AudioClip,
 	WindUp,
 	NoScratch,
 	NoLongNote,

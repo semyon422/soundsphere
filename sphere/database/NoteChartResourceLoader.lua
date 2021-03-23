@@ -10,6 +10,7 @@ local NoteChartResourceLoader = {}
 
 NoteChartResourceLoader.resourceNames = {}
 NoteChartResourceLoader.hitSoundsPath = "userdata/hitsounds"
+NoteChartResourceLoader.sample_gain = 0
 
 NoteChartResourceLoader.init = function(self)
 	self.observable = Observable:new()
@@ -32,17 +33,18 @@ NoteChartResourceLoader.load = function(self, path, noteChart, callback)
 	local directoryPath = path:match("^(.+)/")
 	local noteChartType = self:getNoteChartType(noteChart)
 
+	if self.noteChart and self.sample_gain ~= sound.sample_gain then
+		self:unloadAll()
+		self.sample_gain = sound.sample_gain
+	end
+
 	if noteChartType == "bms" then
 		if self.directoryPath and self.directoryPath ~= directoryPath then
-			self:unload()
-			self.localAliases = {}
-			self.globalAliases = {}
+			self:unloadAll()
 		end
 	elseif noteChartType == "o2jam" then
 		if self.path and self.path ~= path then
-			self:unload()
-			self.localAliases = {}
-			self.globalAliases = {}
+			self:unloadAll()
 		end
 	end
 
@@ -156,6 +158,12 @@ NoteChartResourceLoader.loadBMS = function(self)
 			resourceLoadedCallback()
 		end
 	end)
+end
+
+NoteChartResourceLoader.unloadAll = function(self)
+	self:unload()
+	self.localAliases = {}
+	self.globalAliases = {}
 end
 
 NoteChartResourceLoader.unload = function(self)

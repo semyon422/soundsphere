@@ -15,7 +15,10 @@ TimeRateX.range = {0, 30}
 
 TimeRateX.getString = function(self, config)
 	config = config or self.config
-	return self:getRealValue(config) .. self.shortName
+	local realValue = self:getRealValue(config)
+    if realValue ~= 1 then
+		return realValue .. self.shortName
+	end
 end
 
 TimeRateX.apply = function(self)

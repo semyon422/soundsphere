@@ -13,7 +13,9 @@ TimeRateQ.range = {-10, 10}
 
 TimeRateQ.getString = function(self, config)
 	config = config or self.config
-	return config.value .. self.shortName
+    if config.value ~= 0 then
+		return config.value .. self.shortName
+    end
 end
 
 -- https://github.com/Quaver/Quaver/issues/666
