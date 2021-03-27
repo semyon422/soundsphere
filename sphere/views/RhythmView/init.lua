@@ -1,10 +1,12 @@
 local Class = require("aqua.util.Class")
 local GraphicalNoteFactory = require("sphere.views.RhythmView.GraphicalNoteFactory")
 local NoteSkinImageView = require("sphere.views.RhythmView.NoteSkinImageView")
+local Container = require("aqua.graphics.Container")
 
 local RhythmView = Class:new()
 
 RhythmView.construct = function(self)
+	self.container = Container:new()
 	self.graphicalNoteFactory = GraphicalNoteFactory:new()
 	self.noteSkinImageView = NoteSkinImageView:new()
 end
@@ -63,10 +65,15 @@ end
 
 RhythmView.update = function(self, dt)
 	self.noteSkinImageView:update(dt)
+	self.container:update()
 
 	for _, note in pairs(self.notes) do
 		note:update(dt)
 	end
+end
+
+RhythmView.draw = function(self)
+	return self.container:draw()
 end
 
 RhythmView.setBgaEnabled = function(self, type, enabled)

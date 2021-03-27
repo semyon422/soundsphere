@@ -5,22 +5,24 @@ local DiscordGameplayView = require("sphere.views.DiscordGameplayView")
 local PauseOverlay = require("sphere.ui.PauseOverlay")
 local GUI = require("sphere.ui.GUI")
 local BackgroundManager	= require("sphere.ui.BackgroundManager")
+local ScoreView	= require("sphere.views.GameplayView.ScoreView")
+local SequenceView	= require("sphere.views.SequenceView")
 
 local GameplayView = Class:new()
 
 GameplayView.construct = function(self)
-	self.container = Container:new()
 	self.rhythmView = RhythmView:new()
+	self.scoreView = ScoreView:new()
 	self.discordGameplayView = DiscordGameplayView:new()
-	self.gui = GUI:new()
+	self.sequenceView = SequenceView:new()
 	self.pauseOverlay = PauseOverlay:new()
 end
 
 GameplayView.load = function(self)
-	local container = self.container
 	local rhythmView = self.rhythmView
+	local scoreView = self.scoreView
 	local discordGameplayView = self.discordGameplayView
-	local gui = self.gui
+	local sequenceView = self.sequenceView
 	local pauseOverlay = self.pauseOverlay
 	local configModel = self.configModel
 
@@ -28,16 +30,23 @@ GameplayView.load = function(self)
 
 	rhythmView.noteSkin = self.noteSkin
 	rhythmView.rhythmModel = self.rhythmModel
-	rhythmView.container = container
+	-- rhythmView.container = container
 	rhythmView:setBgaEnabled("video", config.gameplay.videobga)
 	rhythmView:setBgaEnabled("image", config.gameplay.imagebga)
 	rhythmView:load()
 
-	gui.container = container
-	gui.root = self.noteSkin.directoryPath
-	gui.scoreSystem = self.scoreSystem
-	gui.noteChartModel = self.noteChartModel
-	gui:loadTable(self.noteSkin.playField)
+	scoreView.scoreSystem = self.scoreSystem
+	scoreView.noteChartModel = self.noteChartModel
+	scoreView:load()
+
+	-- gui.container = container
+	-- gui.root = self.noteSkin.directoryPath
+	-- gui.scoreSystem = self.scoreSystem
+	-- gui.noteChartModel = self.noteChartModel
+	-- gui:loadTable(self.noteSkin.playField)
+	sequenceView:setView("RhythmView", rhythmView)
+	sequenceView:setView("ScoreView", scoreView)
+	sequenceView:setSequenceConfig(self.noteSkin.playField)
 
 	pauseOverlay:load()
 	pauseOverlay.rhythmModel = self.rhythmModel
@@ -53,26 +62,22 @@ end
 
 GameplayView.unload = function(self)
 	self.rhythmView:unload()
-	self.gui:unload()
 	self.pauseOverlay.observable:remove(self.controller)
 end
 
 GameplayView.receive = function(self, event)
 	self.rhythmView:receive(event)
-	self.gui:receive(event)
 	self.pauseOverlay:receive(event)
 	self.discordGameplayView:receive(event)
 end
 
 GameplayView.update = function(self, dt)
-	self.container:update()
 	self.rhythmView:update(dt)
-	self.gui:update()
 	self.pauseOverlay:update(dt)
 end
 
 GameplayView.draw = function(self)
-	self.container:draw()
+	self.sequenceView:draw()
 	self.pauseOverlay:draw()
 end
 
