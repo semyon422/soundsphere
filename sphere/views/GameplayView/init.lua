@@ -33,11 +33,9 @@ GameplayView.load = function(self)
 	-- rhythmView.container = container
 	rhythmView:setBgaEnabled("video", config.gameplay.videobga)
 	rhythmView:setBgaEnabled("image", config.gameplay.imagebga)
-	rhythmView:load()
 
 	scoreView.scoreSystem = self.scoreSystem
 	scoreView.noteChartModel = self.noteChartModel
-	scoreView:load()
 
 	-- gui.container = container
 	-- gui.root = self.noteSkin.directoryPath
@@ -47,6 +45,7 @@ GameplayView.load = function(self)
 	sequenceView:setView("RhythmView", rhythmView)
 	sequenceView:setView("ScoreView", scoreView)
 	sequenceView:setSequenceConfig(self.noteSkin.playField)
+	sequenceView:load()
 
 	pauseOverlay:load()
 	pauseOverlay.rhythmModel = self.rhythmModel
