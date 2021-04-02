@@ -33,4 +33,8 @@ ScoreView.draw = function(self)
 	)
 end
 
+ScoreView.update = function(self, dt) end
+ScoreView.receive = function(self, event) end
+ScoreView.unload = function(self) end
+
 return ScoreView
