@@ -68,6 +68,7 @@ GameController.load = function(self)
 	configModel:addConfig("input", "userdata/input.json", "sphere/models/ConfigModel/input.json", "json")
 	configModel:addConfig("mount", "userdata/mount.json", "sphere/models/ConfigModel/mount.json", "json")
 	configModel:addConfig("window", "userdata/window.json", "sphere/models/ConfigModel/window.json", "json")
+	configModel:addConfig("result", "userdata/result.json", "sphere/models/ConfigModel/result.json", "json")
 
 	configModel:readConfig("settings_model")
 	configModel:readConfig("settings")
@@ -77,6 +78,7 @@ GameController.load = function(self)
 	configModel:readConfig("input")
 	configModel:readConfig("mount")
 	configModel:readConfig("window")
+	configModel:readConfig("result")
 
 	onlineController.onlineModel = onlineModel
 	onlineController.cacheModel = cacheModel
@@ -158,12 +160,13 @@ end
 
 GameController.receive = function(self, event)
 	if event.name == "update" then
-		self:update(event.args[1])
+		return self:update(event.args[1])
 	elseif event.name == "draw" then
-		self:draw()
+		return self:draw()
 	elseif event.name == "quit" then
 		self:unload()
 		aquaevent.quit()
+		return
 	elseif event.name == "resize" then
 		CoordinateManager:reload()
 	end
