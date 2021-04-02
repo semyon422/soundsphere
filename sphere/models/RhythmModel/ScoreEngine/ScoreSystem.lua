@@ -70,7 +70,7 @@ ScoreSystem.processAccuracy = function(self, event)
 	self.accuracyCount = self.accuracyCount + 1
 	self.accuracy = 1000 * math.sqrt(self.accuracySum / self.accuracyCount)
 
-	table.insert(self.scoreSequence, {
+	table.insert(self.hitSequence, {
 		currentTime = event.currentTime,
 		deltaTime = deltaTime
 	})
