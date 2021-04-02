@@ -26,12 +26,7 @@ PointGraphView.draw = function(self)
 	love.graphics.setColor(config.lineColor)
 	self:drawLine()
 
-	love.graphics.setColor(config.color)
-	local points = self.scoreSystem[config.field]
-	for i = state.drawnPoints + 1, #points do
-		self:drawPoint(points[i])
-	end
-	state.drawnPoints = #points
+	self:drawPoints()
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.draw(state.canvas, 0, 0)
@@ -57,7 +52,8 @@ PointGraphView.drawLine = function(self)
 
 	local cs = state.cs
 
-	love.graphics.setLineWidth(4)
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.setLineWidth(2)
 	love.graphics.setLineStyle("smooth")
 	love.graphics.line(
 		cs:X(config.x, true),
@@ -65,6 +61,28 @@ PointGraphView.drawLine = function(self)
 		cs:X(config.x + config.w, true),
 		cs:Y(config.y + config.h / 2, true)
 	)
+end
+
+PointGraphView.drawPoints = function(self)
+	local config = self.config
+	local state = self.state
+
+	local shader = love.graphics.getShader()
+	love.graphics.setShader()
+	love.graphics.setCanvas(state.canvas)
+
+	love.graphics.setColor(config.color)
+	love.graphics.setLineWidth(1)
+	love.graphics.setLineStyle("smooth")
+
+	local points = self.scoreSystem[config.field]
+	for i = state.drawnPoints + 1, #points do
+		self:drawPoint(points[i])
+	end
+	state.drawnPoints = #points
+
+	love.graphics.setCanvas()
+	love.graphics.setShader(shader)
 end
 
 PointGraphView.drawPoint = function(self, point)
@@ -76,16 +94,12 @@ PointGraphView.drawPoint = function(self, point)
 
 	local cs = state.cs
 
-	love.graphics.setCanvas(state.canvas)
-	love.graphics.setLineWidth(4)
-	love.graphics.setLineStyle("smooth")
 	love.graphics.circle(
 		"fill",
 		cs:X(map(x, 0, 1, config.x, config.x + config.w), true),
 		cs:Y(map(y, 0, 1, config.y, config.y + config.h), true),
 		cs:X(config.r)
 	)
-	love.graphics.setCanvas()
 end
 
 return PointGraphView
