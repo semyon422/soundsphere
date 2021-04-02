@@ -1,0 +1,18 @@
+[
+	{
+		"class": "PointGraphView", "field": "hitSequence",
+		"x": 0.333, "y": 0.75, "w": 0.333, "h": 0.25, "r": 0.002,
+		"time": "currentTime", "value": "deltaTime", "unit": 0.400, "offset": 0.2,
+		"lineColor": [1, 1, 1, 1],
+		"cs": [0, 0, 0, 0, "all"],
+		"color": [1, 1, 1, 1]
+	},
+	{
+		"class": "PointGraphView", "field": "scoreSequence",
+		"x": 0.333, "y": 0.75, "w": 0.333, "h": 0.25, "r": 0.002,
+		"time": "currentTime", "value": "normCombo", "unit": -1, "offset": -1,
+		"lineColor": [1, 1, 1, 0],
+		"cs": [0, 0, 0, 0, "all"],
+		"color": [0.25, 1, 0.5, 1]
+	}
+]
