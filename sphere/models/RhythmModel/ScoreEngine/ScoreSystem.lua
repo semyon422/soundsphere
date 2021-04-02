@@ -18,6 +18,8 @@ ScoreSystem.missWindows = {
 ScoreSystem.construct = function(self)
 	self.score = 0
 
+	self.noteCount = 0
+
 	self.accuracySum = 0
 	self.accuracyCount = 0
 	self.accuracy = 0
@@ -33,7 +35,21 @@ ScoreSystem.construct = function(self)
 	self.scoreSequence = {}
 end
 
-ScoreSystem.before = function(self, event) end
+ScoreSystem.updateNoteCount = function(self, event)
+	if self.noteCount ~= 0 then
+		return
+	end
+
+	local noteCount = 0
+	noteCount = noteCount + (event.scoreNotesCount["ShortScoreNote"] or 0)
+	noteCount = noteCount + (event.scoreNotesCount["LongScoreNote"] or 0)
+
+	self.noteCount = noteCount
+end
+
+ScoreSystem.before = function(self, event)
+	self:updateNoteCount(event)
+end
 
 ScoreSystem.after = function(self, event)
 	if math.abs(event.timeRate) == 0 then
@@ -59,6 +75,7 @@ ScoreSystem.after = function(self, event)
 		performance = self.performance,
 		logperformance = self.logperformance,
 		combo = self.combo,
+		normCombo = self.combo / self.noteCount,
 		maxcombo = self.maxcombo
 	})
 end
