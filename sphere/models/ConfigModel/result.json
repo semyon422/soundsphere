@@ -14,5 +14,61 @@
 		"lineColor": [1, 1, 1, 0],
 		"cs": [0, 0, 0, 0, "all"],
 		"color": [0.25, 1, 0.5, 1]
-	}
+	},
+	{
+		"class": "MetaDataView",
+		"field": "artist",
+		"cs": [0, 0, 0, 0, "all"],
+		"x": 0,
+		"y": 0.01,
+		"w": 1,
+		"h": 0.05,
+		"color": [1, 1, 1, 1],
+		"format": "%s",
+		"font": "resources/fonts/NotoSansCJK-Regular.ttc",
+		"size": 20,
+		"ax": "center", "ay": "center"
+	},
+	{
+		"class": "MetaDataView",
+		"field": "title",
+		"cs": [0, 0, 0, 0, "all"],
+		"x": 0,
+		"y": 0.05,
+		"w": 1,
+		"h": 0.05,
+		"color": [1, 1, 1, 1],
+		"format": "%s",
+		"font": "resources/fonts/NotoSansCJK-Regular.ttc",
+		"size": 32,
+		"ax": "center", "ay": "center"
+	},
+	{
+		"class": "MetaDataView",
+		"field": "name",
+		"cs": [0, 0, 0, 0, "all"],
+		"x": 0,
+		"y": 0.1,
+		"w": 1,
+		"h": 0.05,
+		"color": [1, 1, 1, 1],
+		"format": "%s",
+		"font": "resources/fonts/NotoSansCJK-Regular.ttc",
+		"size": 20,
+		"ax": "center", "ay": "center"
+	},
+	{
+		"class": "MetaDataView",
+		"field": "creator",
+		"cs": [0, 0, 0, 0, "all"],
+		"x": 0,
+		"y": 0.15,
+		"w": 1,
+		"h": 0.05,
+		"color": [1, 1, 1, 1],
+		"format": "%s",
+		"font": "resources/fonts/NotoSansCJK-Regular.ttc",
+		"size": 20,
+		"ax": "center", "ay": "center"
+	},
 ]

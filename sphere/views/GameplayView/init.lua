@@ -9,6 +9,7 @@ local ScoreView	= require("sphere.views.GameplayView.ScoreView")
 local ProgressView	= require("sphere.views.GameplayView.ProgressView")
 local PointGraphView	= require("sphere.views.GameplayView.PointGraphView")
 local ImageView	= require("sphere.views.GameplayView.ImageView")
+local MetaDataView	= require("sphere.views.GameplayView.MetaDataView")
 local SequenceView	= require("sphere.views.SequenceView")
 
 local GameplayView = Class:new()
@@ -19,6 +20,7 @@ GameplayView.construct = function(self)
 	self.progressView = ProgressView:new()
 	self.pointGraphView = PointGraphView:new()
 	self.imageView = ImageView:new()
+	self.metaDataView = MetaDataView:new()
 	self.discordGameplayView = DiscordGameplayView:new()
 	self.sequenceView = SequenceView:new()
 	self.pauseOverlay = PauseOverlay:new()
@@ -30,6 +32,7 @@ GameplayView.load = function(self)
 	local progressView = self.progressView
 	local pointGraphView = self.pointGraphView
 	local imageView = self.imageView
+	local metaDataView = self.metaDataView
 	local discordGameplayView = self.discordGameplayView
 	local sequenceView = self.sequenceView
 	local pauseOverlay = self.pauseOverlay
@@ -51,6 +54,8 @@ GameplayView.load = function(self)
 	pointGraphView.scoreSystem = self.scoreSystem
 	pointGraphView.noteChartModel = self.noteChartModel
 
+	metaDataView.noteChartModel = self.noteChartModel
+
 	imageView.root = self.noteSkin.directoryPath
 
 	sequenceView:setView("RhythmView", rhythmView)
@@ -58,6 +63,7 @@ GameplayView.load = function(self)
 	sequenceView:setView("ProgressView", progressView)
 	sequenceView:setView("PointGraphView", pointGraphView)
 	sequenceView:setView("ImageView", imageView)
+	sequenceView:setView("MetaDataView", metaDataView)
 	sequenceView:setSequenceConfig(self.noteSkin.playField)
 	sequenceView:load()
 

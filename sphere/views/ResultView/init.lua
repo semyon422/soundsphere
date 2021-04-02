@@ -8,6 +8,7 @@ local Class = require("aqua.util.Class")
 local ScoreView	= require("sphere.views.GameplayView.ScoreView")
 local PointGraphView	= require("sphere.views.GameplayView.PointGraphView")
 local ImageView	= require("sphere.views.GameplayView.ImageView")
+local MetaDataView	= require("sphere.views.GameplayView.MetaDataView")
 local SequenceView	= require("sphere.views.SequenceView")
 
 local ResultView = Class:new()
@@ -17,6 +18,7 @@ ResultView.construct = function(self)
 	self.scoreView = ScoreView:new()
 	self.pointGraphView = PointGraphView:new()
 	self.imageView = ImageView:new()
+	self.metaDataView = MetaDataView:new()
 	self.sequenceView = SequenceView:new()
 end
 
@@ -24,6 +26,7 @@ ResultView.load = function(self)
 	local scoreView = self.scoreView
 	local pointGraphView = self.pointGraphView
 	local imageView = self.imageView
+	local metaDataView = self.metaDataView
 	local sequenceView = self.sequenceView
 	local configModel = self.configModel
 
@@ -44,15 +47,18 @@ ResultView.load = function(self)
 	pointGraphView.scoreSystem = self.scoreSystem
 	pointGraphView.noteChartModel = self.noteChartModel
 
+	metaDataView.noteChartModel = self.noteChartModel
+
 	imageView.root = "."
 
 	sequenceView:setView("ScoreView", scoreView)
 	sequenceView:setView("PointGraphView", pointGraphView)
 	sequenceView:setView("ImageView", imageView)
+	sequenceView:setView("MetaDataView", metaDataView)
 	sequenceView:setSequenceConfig(config)
 	sequenceView:load()
 
-	-- node:node(backgroundView)
+	node:node(backgroundView)
 
 	navigator:load()
 end
