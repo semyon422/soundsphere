@@ -32,6 +32,7 @@ GameplayView.load = function(self)
 	local sequenceView = self.sequenceView
 	local pauseOverlay = self.pauseOverlay
 	local configModel = self.configModel
+	local modifierModel = self.modifierModel
 
 	local config = configModel:getConfig("settings")
 
@@ -42,6 +43,7 @@ GameplayView.load = function(self)
 
 	valueView.scoreSystem = self.scoreSystem
 	valueView.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
+	valueView.modifierString = modifierModel:getString()
 
 	progressView.scoreSystem = self.scoreSystem
 	progressView.noteChartModel = self.noteChartModel

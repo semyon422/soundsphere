@@ -42,6 +42,7 @@ GameplayController.load = function(self)
 	view.rhythmModel = rhythmModel
 	view.noteChartModel = noteChartModel
 	view.configModel = configModel
+	view.modifierModel = modifierModel
 	view.controller = self
 
 	timeController.rhythmModel = rhythmModel

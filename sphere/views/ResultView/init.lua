@@ -40,6 +40,7 @@ ResultView.load = function(self)
 
 	valueView.scoreSystem = self.scoreSystem
 	valueView.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
+	valueView.modifierString = self.modifierModel:getString()
 
 	pointGraphView.scoreSystem = self.scoreSystem
 	pointGraphView.noteChartModel = self.noteChartModel

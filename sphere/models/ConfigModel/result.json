@@ -72,20 +72,17 @@
 		"ax": "center", "ay": "center"
 	},
 	{
-		"name": "ModifierDisplay",
-		"class": "ModifierDisplay",
+		"class": "ValueView", "field": "modifierString",
 		"cs": [0, 0, 0, 0, "h"],
 		"x": 0.05,
 		"y": 0.9,
 		"w": 1,
 		"h": 0.1,
 		"color": [1, 1, 1, 1],
-		"backgroundColor": [0, 0, 0, 0],
-		"text": "",
+		"format": "%s",
 		"font": "resources/fonts/NotoSansCJK-Regular.ttc",
 		"size": 20,
-		"textAlign": {"x": "left", "y": "bottom"},
-		"interact": []
+		"ax": "left", "ay": "bottom"
 	},
 
 	{

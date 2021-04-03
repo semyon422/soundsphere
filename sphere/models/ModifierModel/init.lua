@@ -125,7 +125,7 @@ ModifierModel.receive = function(self, event)
 	end
 end
 
-ModifierModel.getString = function(self, event)
+ModifierModel.getString = function(self)
 	local t = {}
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
