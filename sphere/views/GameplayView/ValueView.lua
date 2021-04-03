@@ -30,10 +30,12 @@ ValueView.draw = function(self)
 
 	local cs = state.cs
 
+	local value = self:getValue()
+
 	love.graphics.setFont(state.font)
 	love.graphics.setColor(config.color)
 	frame_print(
-		(config.format):format(self:getValue() or ""),
+		(config.format):format(self:getValue()),
 		cs:X(config.x, true),
 		cs:Y(config.y, true),
 		cs:X(config.w),

@@ -255,9 +255,7 @@
 		"cs": [0, 0, 0, 0, "all"]
 	},
 	{
-		"name": "JudgeDisplay",
-		"class": "JudgeDisplay",
-		"timegateNames": ["great"],
+		"class": "ValueView", "field": "scoreSystem.noteScoreCounters.great",
 		"format": "great %d",
 		"x": 0.1,
 		"y": 0.4,
@@ -270,10 +268,8 @@
 		"cs": [0, 0, 0, 0, "all"]
 	},
 	{
-		"name": "JudgeDisplay",
-		"class": "JudgeDisplay",
-		"timegateNames": ["good", "early good", "late good"],
-		"format": "good %d, early %d, late %d",
+		"class": "ValueView", "field": "scoreSystem.noteScoreCounters.good",
+		"format": "good %d",
 		"x": 0.1,
 		"y": 0.45,
 		"w": 0.5,
@@ -285,9 +281,33 @@
 		"cs": [0, 0, 0, 0, "all"]
 	},
 	{
-		"name": "JudgeDisplay",
-		"class": "JudgeDisplay",
-		"timegateNames": ["bad"],
+		"class": "ValueView", "field": "scoreSystem.noteScoreCounters.early good",
+		"format": "early %d",
+		"x": 0.2,
+		"y": 0.45,
+		"w": 0.5,
+		"h": 0.05,
+		"ax": "left", "ay": "center",
+		"color": [1, 1, 1, 1],
+		"font": "resources/fonts/SourceCodePro-Regular.ttf",
+		"size": 24,
+		"cs": [0, 0, 0, 0, "all"]
+	},
+	{
+		"class": "ValueView", "field": "scoreSystem.noteScoreCounters.late good",
+		"format": "late %d",
+		"x": 0.3,
+		"y": 0.45,
+		"w": 0.5,
+		"h": 0.05,
+		"ax": "left", "ay": "center",
+		"color": [1, 1, 1, 1],
+		"font": "resources/fonts/SourceCodePro-Regular.ttf",
+		"size": 24,
+		"cs": [0, 0, 0, 0, "all"]
+	},
+	{
+		"class": "ValueView", "field": "scoreSystem.noteScoreCounters.bad",
 		"format": "bad %d",
 		"x": 0.1,
 		"y": 0.5,
@@ -300,9 +320,7 @@
 		"cs": [0, 0, 0, 0, "all"]
 	},
 	{
-		"name": "JudgeDisplay",
-		"class": "JudgeDisplay",
-		"timegateNames": ["miss"],
+		"class": "ValueView", "field": "scoreSystem.noteScoreCounters.miss",
 		"format": "miss %d",
 		"x": 0.1,
 		"y": 0.55,

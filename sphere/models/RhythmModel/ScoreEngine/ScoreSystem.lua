@@ -15,6 +15,45 @@ ScoreSystem.missWindows = {
 	}
 }
 
+ScoreSystem.noteScores = {
+	{
+		time = -0.16,
+		names = {"miss"}
+	},
+	{
+		time = -0.12,
+		names = {"bad"}
+	},
+	{
+		time = -0.04,
+		names = {"early good", "good"}
+	},
+	{
+		time = -0.016,
+		names = {"great"}
+	},
+	{
+		time = 0.016,
+		names = {"great"}
+	},
+	{
+		time = 0.04,
+		names = {"late good", "good"}
+	},
+	{
+		time = 0.12,
+		names = {"bad"}
+	},
+	{
+		time = 0.16,
+		names = {"miss"}
+	}
+}
+
+local sortNoteScores = function(a, b)
+	return a.time < b.time
+end
+
 ScoreSystem.construct = function(self)
 	self.score = 0
 
@@ -33,6 +72,26 @@ ScoreSystem.construct = function(self)
 
 	self.hitSequence = {}
 	self.scoreSequence = {}
+
+	self.noteScoreName = ""
+	self.noteScoreCounters = {}
+	self.noteScoresLT0 = {}
+	self.noteScoresMT0 = {}
+
+	for _, noteScore in ipairs(self.noteScores) do
+		for _, name in ipairs(noteScore.names) do
+			self.noteScoreCounters[name] = 0
+		end
+		if noteScore.time < 0 then
+			table.insert(self.noteScoresLT0, noteScore)
+			noteScore.time = -noteScore.time
+		elseif noteScore.time > 0 then
+			table.insert(self.noteScoresMT0, noteScore)
+		end
+	end
+
+	table.sort(self.noteScoresLT0, sortNoteScores)
+	table.sort(self.noteScoresMT0, sortNoteScores)
 end
 
 ScoreSystem.updateNoteCount = function(self, event)
@@ -93,6 +152,22 @@ ScoreSystem.processAccuracy = function(self, event)
 	})
 end
 
+ScoreSystem.processNoteScore = function(self, event)
+	local deltaTime = (event.currentTime - event.noteTime) / math.abs(event.timeRate)
+	local noteScores = deltaTime < 0 and self.noteScoresLT0 or self.noteScoresMT0
+	deltaTime = math.abs(deltaTime)
+
+	for _, noteScore in ipairs(noteScores) do
+		if deltaTime <= noteScore.time then
+			for _, name in ipairs(noteScore.names) do
+				self.noteScoreCounters[name] = (self.noteScoreCounters[name] or 0) + 1
+			end
+			self.noteScoreName = noteScore.names[1]
+			break
+		end
+	end
+end
+
 ScoreSystem.processSuccessfulHit = function(self)
 	self.hitcount = self.hitcount + 1
 	self.combo = self.combo + 1
@@ -105,6 +180,7 @@ end
 
 ScoreSystem.short_passed = function(self, event)
 	self:processAccuracy(event)
+	self:processNoteScore(event)
 	self:processSuccessfulHit()
 end
 ScoreSystem.short_missed = function(self, event)
