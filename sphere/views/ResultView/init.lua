@@ -5,28 +5,25 @@ local ResultNavigator = require(viewspackage .. "ResultView.ResultNavigator")
 local BackgroundView = require(viewspackage .. "BackgroundView")
 
 local Class = require("aqua.util.Class")
-local ScoreView	= require("sphere.views.GameplayView.ScoreView")
+local ValueView	= require("sphere.views.GameplayView.ValueView")
 local PointGraphView	= require("sphere.views.GameplayView.PointGraphView")
 local ImageView	= require("sphere.views.GameplayView.ImageView")
-local MetaDataView	= require("sphere.views.GameplayView.MetaDataView")
 local SequenceView	= require("sphere.views.SequenceView")
 
 local ResultView = Class:new()
 
 ResultView.construct = function(self)
 	self.node = Node:new()
-	self.scoreView = ScoreView:new()
+	self.valueView = ValueView:new()
 	self.pointGraphView = PointGraphView:new()
 	self.imageView = ImageView:new()
-	self.metaDataView = MetaDataView:new()
 	self.sequenceView = SequenceView:new()
 end
 
 ResultView.load = function(self)
-	local scoreView = self.scoreView
+	local valueView = self.valueView
 	local pointGraphView = self.pointGraphView
 	local imageView = self.imageView
-	local metaDataView = self.metaDataView
 	local sequenceView = self.sequenceView
 	local configModel = self.configModel
 
@@ -41,20 +38,17 @@ ResultView.load = function(self)
 	local backgroundView = BackgroundView:new()
 	backgroundView.view = self
 
-	scoreView.scoreSystem = self.scoreSystem
-	scoreView.noteChartModel = self.noteChartModel
+	valueView.scoreSystem = self.scoreSystem
+	valueView.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
 
 	pointGraphView.scoreSystem = self.scoreSystem
 	pointGraphView.noteChartModel = self.noteChartModel
 
-	metaDataView.noteChartModel = self.noteChartModel
-
 	imageView.root = "."
 
-	sequenceView:setView("ScoreView", scoreView)
+	sequenceView:setView("ValueView", valueView)
 	sequenceView:setView("PointGraphView", pointGraphView)
 	sequenceView:setView("ImageView", imageView)
-	sequenceView:setView("MetaDataView", metaDataView)
 	sequenceView:setSequenceConfig(config)
 	sequenceView:load()
 

@@ -1,26 +1,22 @@
 local Class = require("aqua.util.Class")
-local Container = require("aqua.graphics.Container")
 local RhythmView = require("sphere.views.RhythmView")
 local DiscordGameplayView = require("sphere.views.DiscordGameplayView")
 local PauseOverlay = require("sphere.ui.PauseOverlay")
-local GUI = require("sphere.ui.GUI")
 local BackgroundManager	= require("sphere.ui.BackgroundManager")
-local ScoreView	= require("sphere.views.GameplayView.ScoreView")
+local ValueView	= require("sphere.views.GameplayView.ValueView")
 local ProgressView	= require("sphere.views.GameplayView.ProgressView")
 local PointGraphView	= require("sphere.views.GameplayView.PointGraphView")
 local ImageView	= require("sphere.views.GameplayView.ImageView")
-local MetaDataView	= require("sphere.views.GameplayView.MetaDataView")
 local SequenceView	= require("sphere.views.SequenceView")
 
 local GameplayView = Class:new()
 
 GameplayView.construct = function(self)
 	self.rhythmView = RhythmView:new()
-	self.scoreView = ScoreView:new()
+	self.valueView = ValueView:new()
 	self.progressView = ProgressView:new()
 	self.pointGraphView = PointGraphView:new()
 	self.imageView = ImageView:new()
-	self.metaDataView = MetaDataView:new()
 	self.discordGameplayView = DiscordGameplayView:new()
 	self.sequenceView = SequenceView:new()
 	self.pauseOverlay = PauseOverlay:new()
@@ -28,11 +24,10 @@ end
 
 GameplayView.load = function(self)
 	local rhythmView = self.rhythmView
-	local scoreView = self.scoreView
+	local valueView = self.valueView
 	local progressView = self.progressView
 	local pointGraphView = self.pointGraphView
 	local imageView = self.imageView
-	local metaDataView = self.metaDataView
 	local discordGameplayView = self.discordGameplayView
 	local sequenceView = self.sequenceView
 	local pauseOverlay = self.pauseOverlay
@@ -45,8 +40,8 @@ GameplayView.load = function(self)
 	rhythmView:setBgaEnabled("video", config.gameplay.videobga)
 	rhythmView:setBgaEnabled("image", config.gameplay.imagebga)
 
-	scoreView.scoreSystem = self.scoreSystem
-	scoreView.noteChartModel = self.noteChartModel
+	valueView.scoreSystem = self.scoreSystem
+	valueView.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
 
 	progressView.scoreSystem = self.scoreSystem
 	progressView.noteChartModel = self.noteChartModel
@@ -54,16 +49,13 @@ GameplayView.load = function(self)
 	pointGraphView.scoreSystem = self.scoreSystem
 	pointGraphView.noteChartModel = self.noteChartModel
 
-	metaDataView.noteChartModel = self.noteChartModel
-
 	imageView.root = self.noteSkin.directoryPath
 
 	sequenceView:setView("RhythmView", rhythmView)
-	sequenceView:setView("ScoreView", scoreView)
+	sequenceView:setView("ValueView", valueView)
 	sequenceView:setView("ProgressView", progressView)
 	sequenceView:setView("PointGraphView", pointGraphView)
 	sequenceView:setView("ImageView", imageView)
-	sequenceView:setView("MetaDataView", metaDataView)
 	sequenceView:setSequenceConfig(self.noteSkin.playField)
 	sequenceView:load()
 

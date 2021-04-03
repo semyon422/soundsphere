@@ -3,9 +3,9 @@ local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local frame_print		= require("aqua.graphics.frame_print")
 local Class = require("aqua.util.Class")
 
-local ScoreView = Class:new()
+local ValueView = Class:new()
 
-ScoreView.load = function(self)
+ValueView.load = function(self)
 	local config = self.config
 	local state = self.state
 
@@ -13,7 +13,18 @@ ScoreView.load = function(self)
 	state.font = aquafonts.getFont(config.font, config.size)
 end
 
-ScoreView.draw = function(self)
+ValueView.getValue = function(self)
+	local config = self.config
+	local state = self.state
+
+	local value = self
+	for key in config.field:gmatch("[^.]+") do
+		value = value[key]
+	end
+	return value
+end
+
+ValueView.draw = function(self)
 	local config = self.config
 	local state = self.state
 
@@ -22,7 +33,7 @@ ScoreView.draw = function(self)
 	love.graphics.setFont(state.font)
 	love.graphics.setColor(config.color)
 	frame_print(
-		(config.format):format(self.scoreSystem[config.field] or 0),
+		(config.format):format(self:getValue() or ""),
 		cs:X(config.x, true),
 		cs:Y(config.y, true),
 		cs:X(config.w),
@@ -33,8 +44,8 @@ ScoreView.draw = function(self)
 	)
 end
 
-ScoreView.update = function(self, dt) end
-ScoreView.receive = function(self, event) end
-ScoreView.unload = function(self) end
+ValueView.update = function(self, dt) end
+ValueView.receive = function(self, event) end
+ValueView.unload = function(self) end
 
-return ScoreView
+return ValueView
