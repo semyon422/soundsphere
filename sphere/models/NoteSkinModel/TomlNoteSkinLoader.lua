@@ -638,7 +638,8 @@ TomlNoteSkinLoader.addStaticObject = function(self, object)
 		h = h,
 		layer = object.layer,
 		cs = cs,
-		image = object.image
+		image = object.image,
+		color = object.color
 	}
 end
 
