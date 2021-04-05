@@ -1,11 +1,15 @@
 local Class = require("aqua.util.Class")
+local Profiler = require("aqua.util.Profiler")
 local aquafonts = require("aqua.assets.fonts")
 local spherefonts = require("sphere.assets.fonts")
 
 local FrameTimeView = Class:new()
 
 FrameTimeView.visible = false
+FrameTimeView.profiler = false
 FrameTimeView.scale = 1
+FrameTimeView.updateFrameTime = 0.001
+FrameTimeView.updateDrawTime = 0.001
 
 FrameTimeView.load = function(self)
 	self.canvas1 = love.graphics.newCanvas()
@@ -18,16 +22,37 @@ FrameTimeView.load = function(self)
 	self.largeFont = aquafonts.getFont(spherefonts.NotoMonoRegular, 40)
 end
 
+local colors = {
+	white = {1, 1, 1, 1},
+	blue = {0.25, 0.25, 1, 1},
+	gray = {0.25, 0.25, 0.25, 1},
+	yellow = {1, 1, 0.25, 1}
+}
+
 FrameTimeView.draw = function(self)
 	if not self.visible then
 		return
 	end
 
 	love.graphics.setCanvas(self.canvas1)
-	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setLineStyle("rough")
 	love.graphics.setLineWidth(1)
-	love.graphics.line(0.5, self.height - 0.5, 0.5, self.height - 0.5 - love.timer.getDelta() * 1000 * self.scale)
+
+	local y = self.height - 0.5
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.line(0.5, y, 0.5, y - love.timer.getDelta() * 1000 * self.scale)
+
+	love.graphics.setColor(colors.blue)
+	love.graphics.line(0.5, y, 0.5, y - self.receiveFrameTime * 1000 * self.scale)
+
+	y = y - self.receiveFrameTime * 1000 * self.scale
+	love.graphics.setColor(colors.gray, 1)
+	love.graphics.line(0.5, y, 0.5, y - self.updateFrameTime * 1000 * self.scale)
+
+	y = y - self.updateFrameTime * 1000 * self.scale
+	love.graphics.setColor(colors.yellow)
+	love.graphics.line(0.5, y, 0.5, y - self.drawFrameTime * 1000 * self.scale)
+
 	love.graphics.setCanvas()
 
 	love.graphics.setColor(1, 1, 1, 1)
@@ -77,15 +102,32 @@ FrameTimeView.drawMouse = function(self)
 	love.graphics.printf(("%3.2fms (%dfps)"):format(frameTime * 1000, fpsValue), x - 250, y, self.width, "left")
 end
 
+local colorText = {
+	colors.white, "dt ",
+	colors.blue, "receive ",
+	colors.gray, "update ",
+	colors.yellow, "draw "
+}
+
 FrameTimeView.drawFPS = function(self)
 	local frameTime = love.timer.getDelta()
 
 	love.graphics.setColor(0, 0, 0, 0.75)
-	love.graphics.rectangle("fill", 0, 0, 350, 60)
+	love.graphics.rectangle("fill", 0, 0, self.width, 60)
 
 	love.graphics.setColor(0.25, 1, 0.75, 1)
 	love.graphics.setFont(self.largeFont)
 	love.graphics.printf(("%3.2fms (%dfps)"):format(frameTime * 1000, 1 / frameTime), 0, 0, self.width, "left")
+
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.setFont(self.font)
+	love.graphics.printf(colorText, 0, 0, self.width, "right")
+
+	if self.profiler then
+		love.graphics.setColor(1, 1, 1, 1)
+		love.graphics.setFont(self.largeFont)
+		love.graphics.printf("Profiler enabled", 0, 0, self.width, "center")
+	end
 end
 
 FrameTimeView.receive = function(self, event)
@@ -110,6 +152,13 @@ FrameTimeView.keypressed = function(self, key)
 		self.scale = self.scale * 2
 	elseif key == "down" then
 		self.scale = self.scale / 2
+	elseif key == "lshift" then
+		if self.profiler then
+			Profiler:stop()
+		else
+			Profiler:start()
+		end
+		self.profiler = not self.profiler
 	end
 end
 

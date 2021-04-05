@@ -110,6 +110,8 @@ GameController.unload = function(self)
 end
 
 GameController.update = function(self, dt)
+	local startTime = love.timer.getTime()
+
 	ThreadPool:update()
 
 	DiscordPresence:update()
@@ -117,16 +119,24 @@ GameController.update = function(self, dt)
 	ScreenManager:update(dt)
 	self.notificationView:update(dt)
 	self.onlineController:update()
+
+	self.frameTimeView.updateFrameTime = love.timer.getTime() - startTime
 end
 
 GameController.draw = function(self)
+	local startTime = love.timer.getTime()
+
 	BackgroundManager:draw()
 	ScreenManager:draw()
 	self.notificationView:draw()
 	self.frameTimeView:draw()
+
+	self.frameTimeView.drawFrameTime = love.timer.getTime() - startTime
 end
 
 GameController.receive = function(self, event)
+	local startTime = love.timer.getTime()
+
 	if event.name == "update" then
 		self:update(event.args[1])
 	elseif event.name == "draw" then
@@ -145,6 +155,8 @@ GameController.receive = function(self, event)
 	self.mountController:receive(event)
 	self.notificationView:receive(event)
 	self.frameTimeView:receive(event)
+
+	self.frameTimeView.receiveFrameTime = love.timer.getTime() - startTime
 end
 
 return GameController
