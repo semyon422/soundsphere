@@ -20,6 +20,7 @@ local NotificationModel			= require("sphere.models.NotificationModel")
 local ThemeModel				= require("sphere.models.ThemeModel")
 local OnlineModel				= require("sphere.models.OnlineModel")
 local CacheModel				= require("sphere.models.CacheModel")
+local FrameTimeView				= require("sphere.views.FrameTimeView")
 
 local GameController = Class:new()
 
@@ -36,6 +37,7 @@ GameController.construct = function(self)
 	self.scoreModel = ScoreModel:new()
 	self.onlineModel = OnlineModel:new()
 	self.cacheModel = CacheModel:new()
+	self.frameTimeView = FrameTimeView:new()
 end
 
 GameController.load = function(self)
@@ -83,6 +85,7 @@ GameController.load = function(self)
 	onlineController:load()
 
 	DiscordPresence:load()
+	self.frameTimeView:load()
 
 	ScreenManager:setTransition(FadeTransition)
 
@@ -120,6 +123,7 @@ GameController.draw = function(self)
 	BackgroundManager:draw()
 	ScreenManager:draw()
 	self.notificationView:draw()
+	self.frameTimeView:draw()
 end
 
 GameController.receive = function(self, event)
@@ -140,6 +144,7 @@ GameController.receive = function(self, event)
 	self.screenshot:receive(event)
 	self.mountController:receive(event)
 	self.notificationView:receive(event)
+	self.frameTimeView:receive(event)
 end
 
 return GameController
