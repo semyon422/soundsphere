@@ -9,7 +9,8 @@ FrameTimeView.visible = false
 FrameTimeView.profiler = false
 FrameTimeView.scale = 1
 FrameTimeView.updateFrameTime = 0.001
-FrameTimeView.updateDrawTime = 0.001
+FrameTimeView.drawFrameTime = 0.001
+FrameTimeView.receiveFrameTime = 0.001
 
 FrameTimeView.load = function(self)
 	self.canvas1 = love.graphics.newCanvas()
