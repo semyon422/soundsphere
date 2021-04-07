@@ -166,6 +166,7 @@ PauseOverlay.play = function(self)
 	self.observable:send({
 		name = "play"
 	})
+	love.mouse.setVisible(false)
 end
 
 PauseOverlay.beginPlay = function(self)
@@ -187,6 +188,7 @@ PauseOverlay.pause = function(self)
 		name = "pause"
 	})
 	self.paused = true
+	love.mouse.setVisible(true)
 end
 
 PauseOverlay.restart = function(self)

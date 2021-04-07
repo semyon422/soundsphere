@@ -53,6 +53,8 @@ GameplayView.load = function(self)
 
 	local dim = 255 * (1 - (configModel:get("dim.gameplay") or 0))
 	BackgroundManager:setColor({dim, dim, dim})
+
+	love.mouse.setVisible(false)
 end
 
 GameplayView.unload = function(self)
@@ -60,6 +62,8 @@ GameplayView.unload = function(self)
 	self.noteSkinView:unload()
 	self.gui:unload()
 	self.pauseOverlay.observable:remove(self.controller)
+
+	love.mouse.setVisible(true)
 end
 
 GameplayView.receive = function(self, event)
