@@ -2,11 +2,13 @@ local count, sum
 
 load = function()
 	scoreTable.accuracy = 0
+	scoreTable.lastHitDeltaTime = 0
 
 	count, sum = 0, 0
 end
 
 local increase = function(deltaTime, sumMul, countMul)
+	scoreTable.lastHitDeltaTime = deltaTime
 	sum = sum + sumMul * deltaTime ^ 2
 	count = count + countMul
 end

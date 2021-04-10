@@ -22,6 +22,9 @@ TextDisplay.loadGui = function(self)
 	self.field = self.data.field
 	self.blendMode = self.data.blendMode
 	self.blendAlphaMode = self.data.blendAlphaMode
+	self.type = self.data.type
+	self.trueValue = self.data.trueValue
+	self.falseValue = self.data.falseValue
 
 	self.scoreSystem = self.gui.scoreSystem
 	self.container = self.gui.container

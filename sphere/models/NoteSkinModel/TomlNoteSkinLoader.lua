@@ -480,6 +480,8 @@ TomlNoteSkinLoader.processPlayFieldData = function(self)
 			self:addPointGraph(object)
 		elseif object.class == "ProgressBar" then
 			self:addProgressBar(object)
+		elseif object.class == "HpBar" then
+			self:addHpBar(object)
 		elseif object.class == "StaticObject" then
 			self:addStaticObject(object)
 		end
@@ -614,6 +616,24 @@ TomlNoteSkinLoader.addProgressBar = function(self, object)
 
 	playField[#playField + 1] = {
 		class = "ProgressBar",
+		x = x,
+		y = y,
+		w = w,
+		h = h,
+		layer = object.layer,
+		cs = cs,
+		color = object.color,
+		direction = object.direction,
+		mode = object.mode
+	}
+end
+
+TomlNoteSkinLoader.addHpBar = function(self, object)
+	local playField = self.noteSkin.playField
+	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
+
+	playField[#playField + 1] = {
+		class = "HpBar",
 		x = x,
 		y = y,
 		w = w,

@@ -78,6 +78,9 @@
 					"names": ["miss"]
 				}
 			]
+		},
+		{
+			"path": "hp.lua"
 		}
 	],
 	"notes": {
