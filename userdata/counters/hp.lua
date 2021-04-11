@@ -25,16 +25,16 @@ receive = function(event)
 	end
 
 	-- combo based hp increase
-	-- if scoreTable.hitcount ~= prevHitcount then
-	-- 	scoreTable.hp = math.min(scoreTable.hp + 0.001, 1)
-	-- 	prevHitcount = scoreTable.hitcount
-	-- end
+	if scoreTable.hitcount ~= prevHitcount then
+		scoreTable.hp = math.min(scoreTable.hp + 0.001, 1)
+		prevHitcount = scoreTable.hitcount
+	end
 
 	-- accuracy based hp increase
-	if scoreTable.lastHitDeltaTime ~= prevHitDeltaTime then
-		local dhp = 2 ^ (-math.abs(scoreTable.lastHitDeltaTime) / 0.01) / 100
-		scoreTable.hp = math.min(scoreTable.hp + dhp, 1)
-		prevHitDeltaTime = scoreTable.lastHitDeltaTime
-	end
+	-- if scoreTable.lastHitDeltaTime ~= prevHitDeltaTime then
+	-- 	local dhp = 2 ^ (-math.abs(scoreTable.lastHitDeltaTime) / 0.01) / 100
+	-- 	scoreTable.hp = math.min(scoreTable.hp + dhp, 1)
+	-- 	prevHitDeltaTime = scoreTable.lastHitDeltaTime
+	-- end
 end
 
