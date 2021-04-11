@@ -468,14 +468,8 @@ end
 TomlNoteSkinLoader.processPlayFieldData = function(self)
 	local tomlPlayField = self.noteSkin.tomlData.playfield
 	for _, object in pairs(tomlPlayField) do
-		if object.class == "ScoreDisplay" and object.field == "score" then
-			self:addScoreDisplayScore(object)
-		elseif object.class == "ScoreDisplay" and object.field == "accuracy" then
-			self:addScoreDisplayAccuracy(object)
-		elseif object.class == "ScoreDisplay" and object.field == "combo" then
-			self:addScoreDisplayCombo(object)
-		elseif object.class == "ScoreDisplay" and object.field == "timegate" then
-			self:addScoreDisplayTimegate(object)
+		if object.class == "ScoreDisplay" then
+			self:addScoreDisplay(object)
 		elseif object.class == "PointGraph" then
 			self:addPointGraph(object)
 		elseif object.class == "ProgressBar" then
@@ -507,76 +501,13 @@ TomlNoteSkinLoader.getPlayFielObjectXYWH = function(self, object)
 	end
 end
 
-TomlNoteSkinLoader.addScoreDisplayScore = function(self, object)
+TomlNoteSkinLoader.addScoreDisplay = function(self, object)
 	local playField = self.noteSkin.playField
 	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
 
 	playField[#playField + 1] = {
 		class = "ScoreDisplay",
-		field = "score",
-		format = object.format,
-		x = x,
-		y = y,
-		w = w,
-		h = h,
-		layer = object.layer,
-		cs = cs,
-		align = {x = object.align[1], y = object.align[2]},
-		color = object.color,
-		font = object.font,
-		size = object.size
-	}
-end
-
-TomlNoteSkinLoader.addScoreDisplayAccuracy = function(self, object)
-	local playField = self.noteSkin.playField
-	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
-
-	playField[#playField + 1] = {
-		class = "ScoreDisplay",
-		field = "accuracy",
-		format = object.format,
-		x = x,
-		y = y,
-		w = w,
-		h = h,
-		layer = object.layer,
-		cs = cs,
-		align = {x = object.align[1], y = object.align[2]},
-		color = object.color,
-		font = object.font,
-		size = object.size
-	}
-end
-
-TomlNoteSkinLoader.addScoreDisplayCombo = function(self, object)
-	local playField = self.noteSkin.playField
-	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
-
-	playField[#playField + 1] = {
-		class = "ScoreDisplay",
-		field = "combo",
-		format = object.format,
-		x = x,
-		y = y,
-		w = w,
-		h = h,
-		layer = object.layer,
-		cs = cs,
-		align = {x = object.align[1], y = object.align[2]},
-		color = object.color,
-		font = object.font,
-		size = object.size
-	}
-end
-
-TomlNoteSkinLoader.addScoreDisplayTimegate = function(self, object)
-	local playField = self.noteSkin.playField
-	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
-
-	playField[#playField + 1] = {
-		class = "ScoreDisplay",
-		field = "timegate",
+		field = object.field,
 		format = object.format,
 		x = x,
 		y = y,
