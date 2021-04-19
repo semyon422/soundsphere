@@ -4,25 +4,17 @@ local SearchManager			= require("sphere.database.SearchManager")
 local ScoreLibraryModel = Class:new()
 
 ScoreLibraryModel.construct = function(self)
-	self:setHash("")
-	self:setIndex(1)
+	self.hash = ""
+	self.index = 1
+	self.items = {}
 end
 
 ScoreLibraryModel.setHash = function(self, hash)
 	self.hash = hash
-	self.items = nil
 end
 
 ScoreLibraryModel.setIndex = function(self, index)
 	self.index = index
-	self.items = nil
-end
-
-ScoreLibraryModel.getItems = function(self)
-	if not self.items then
-		self:updateItems()
-	end
-	return self.items
 end
 
 ScoreLibraryModel.updateItems = function(self)

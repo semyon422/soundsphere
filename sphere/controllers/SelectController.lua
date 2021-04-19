@@ -11,6 +11,7 @@ local NoteChartSetLibraryModel		= require("sphere.models.NoteChartSetLibraryMode
 local NoteChartLibraryModel		= require("sphere.models.NoteChartLibraryModel")
 local ScoreLibraryModel		= require("sphere.models.ScoreLibraryModel")
 local SearchLineModel		= require("sphere.models.SearchLineModel")
+local SelectModel		= require("sphere.models.SelectModel")
 
 local SelectController = Class:new()
 
@@ -24,6 +25,7 @@ SelectController.construct = function(self)
 	self.noteChartLibraryModel = NoteChartLibraryModel:new()
 	self.scoreLibraryModel = ScoreLibraryModel:new()
 	self.searchLineModel = SearchLineModel:new()
+	self.selectModel = SelectModel:new()
 end
 
 SelectController.load = function(self)
@@ -43,6 +45,7 @@ SelectController.load = function(self)
 	local scoreLibraryModel = self.scoreLibraryModel
 	local searchLineModel = self.searchLineModel
 	local backgroundModel = self.backgroundModel
+	local selectModel = self.selectModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -63,6 +66,13 @@ SelectController.load = function(self)
 	inputModel.configModel = configModel
 	backgroundModel.configModel = configModel
 
+	selectModel.noteChartModel = noteChartModel
+	selectModel.configModel = configModel
+	selectModel.searchLineModel = searchLineModel
+	selectModel.noteChartSetLibraryModel = noteChartSetLibraryModel
+	selectModel.noteChartLibraryModel = noteChartLibraryModel
+	selectModel.scoreLibraryModel = scoreLibraryModel
+
 	view.controller = self
 	view.themeModel = themeModel
 	view.noteChartModel = noteChartModel
@@ -79,6 +89,7 @@ SelectController.load = function(self)
 	view.scoreLibraryModel = scoreLibraryModel
 	view.searchLineModel = searchLineModel
 	view.backgroundModel = backgroundModel
+	view.selectModel = selectModel
 
 	modifierModel.config = configModel:getConfig("modifier")
 
@@ -86,6 +97,9 @@ SelectController.load = function(self)
 	-- modifierModel:load()
 	noteSkinModel:load()
 	cacheModel:load()
+
+	selectModel:load()
+
 	noteChartModel:select()
 
 	view:load()
@@ -112,20 +126,6 @@ SelectController.receive = function(self, event)
 
 	if event.name == "setTheme" then
 		self.themeModel:setDefaultTheme(event.theme)
-	elseif event.name == "selectSearchString" then
-		config.searchString = event.searchString
-	elseif event.name == "selectNoteChartSetEntry" then
-		config.noteChartSetEntryId = event.noteChartSetEntryId
-		self.noteChartModel:select()
-	elseif event.name == "selectNoteChartEntry" then
-		config.noteChartEntryId = event.noteChartEntryId
-		self.noteChartModel:select()
-	elseif event.name == "selectNoteChartDataEntry" then
-		config.noteChartDataEntryId = event.noteChartDataEntryId
-		self.noteChartModel:select()
-	elseif event.name == "selectScoreEntry" then
-		config.scoreEntryId = event.scoreEntryId
-		self.noteChartModel:select()
 	elseif event.action == "clickSelectMenu" then
 		if event.item.controllerName == "ModifierController" then
 			self:switchModifierController()

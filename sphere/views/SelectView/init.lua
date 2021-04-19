@@ -24,6 +24,7 @@ SelectView.load = function(self)
 	local navigator = SelectNavigator:new()
 	self.navigator = navigator
 	navigator.searchLineModel = self.searchLineModel
+	navigator.selectModel = self.selectModel
 	navigator.config = config
 	navigator.view = self
 

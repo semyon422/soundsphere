@@ -4,7 +4,8 @@ local SearchManager			= require("sphere.database.SearchManager")
 local NoteChartSetLibraryModel = Class:new()
 
 NoteChartSetLibraryModel.construct = function(self)
-	self:setSearchString("")
+	self.searchString = ""
+	self.items = {}
 end
 
 NoteChartSetLibraryModel.setSearchString = function(self, searchString)
@@ -12,14 +13,6 @@ NoteChartSetLibraryModel.setSearchString = function(self, searchString)
 		return
 	end
 	self.searchString = searchString
-	self.items = nil
-end
-
-NoteChartSetLibraryModel.getItems = function(self)
-	if not self.items then
-		self:updateItems()
-	end
-	return self.items
 end
 
 NoteChartSetLibraryModel.updateItems = function(self)

@@ -28,7 +28,7 @@ SearchLineView.draw = function(self)
 	local w = cs:X(self.w)
 	local h = cs:Y(self.h)
 
-	local searchString = self.searchLineModel:getSearchString()
+	local searchString = self.searchLineModel.searchString
 	if searchString == "" then
 		love.graphics.setColor(1, 1, 1, 0.5)
 		searchString = "Search..."

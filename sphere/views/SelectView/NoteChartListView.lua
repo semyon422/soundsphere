@@ -31,7 +31,7 @@ NoteChartListView.init = function(self)
 end
 
 NoteChartListView.reloadItems = function(self)
-	self.items = self.view.noteChartLibraryModel:getItems()
+	self.items = self.view.noteChartLibraryModel.items
 end
 
 NoteChartListView.drawFrame = function(self)

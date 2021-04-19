@@ -32,7 +32,7 @@ ScoreListView.init = function(self)
 end
 
 ScoreListView.reloadItems = function(self)
-	self.items = self.view.scoreLibraryModel:getItems()
+	self.items = self.view.scoreLibraryModel.items
 end
 
 ScoreListView.drawFrame = function(self)

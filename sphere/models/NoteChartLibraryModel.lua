@@ -4,8 +4,9 @@ local SearchManager			= require("sphere.database.SearchManager")
 local NoteChartLibraryModel = Class:new()
 
 NoteChartLibraryModel.construct = function(self)
-	self:setNoteChartSetId(1)
-	self:setSearchString("")
+	self.setId = 1
+	self.searchString = ""
+	self.items = {}
 end
 
 NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
@@ -13,7 +14,6 @@ NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
 		return
 	end
 	self.setId = setId
-	self.items = nil
 end
 
 NoteChartLibraryModel.setSearchString = function(self, searchString)
@@ -21,14 +21,6 @@ NoteChartLibraryModel.setSearchString = function(self, searchString)
 		return
 	end
 	self.searchString = searchString
-	self.items = nil
-end
-
-NoteChartLibraryModel.getItems = function(self)
-	if not self.items then
-		self:updateItems()
-	end
-	return self.items
 end
 
 NoteChartLibraryModel.updateItems = function(self)
@@ -91,6 +83,10 @@ NoteChartLibraryModel.getItemIndex = function(self, noteChartEntryId, noteChartD
 	end
 
 	return 1
+end
+
+NoteChartLibraryModel.getItem = function(self, noteChartEntryId, noteChartDataEntryId)
+	return self.items[self:getItemIndex(noteChartEntryId, noteChartDataEntryId)]
 end
 
 -- NoteChartLibraryModel.getBackgroundPath = function(self, itemIndex)
