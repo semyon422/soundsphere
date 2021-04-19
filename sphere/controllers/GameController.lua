@@ -21,6 +21,7 @@ local NotificationModel			= require("sphere.models.NotificationModel")
 local ThemeModel				= require("sphere.models.ThemeModel")
 local OnlineModel				= require("sphere.models.OnlineModel")
 local CacheModel				= require("sphere.models.CacheModel")
+local BackgroundModel			= require("sphere.models.BackgroundModel")
 local MainLog					= require("sphere.MainLog")
 
 local GameController = Class:new()
@@ -39,6 +40,7 @@ GameController.construct = function(self)
 	self.scoreModel = ScoreModel:new()
 	self.onlineModel = OnlineModel:new()
 	self.cacheModel = CacheModel:new()
+	self.backgroundModel = BackgroundModel:new()
 end
 
 GameController.load = function(self)
@@ -55,6 +57,7 @@ GameController.load = function(self)
 	local scoreModel = self.scoreModel
 	local onlineModel = self.onlineModel
 	local cacheModel = self.cacheModel
+	local backgroundModel = self.backgroundModel
 
 	directoryManager:createDirectories()
 
@@ -110,6 +113,8 @@ GameController.load = function(self)
 	-- onlineModel:setUserId(configModel:get("online.userId"))
 	onlineModel:load()
 
+	backgroundModel:load()
+
 	onlineController:load()
 
 	DiscordPresence:load()
@@ -124,6 +129,7 @@ GameController.load = function(self)
 	selectController.scoreModel = scoreModel
 	selectController.onlineModel = onlineModel
 	selectController.cacheModel = cacheModel
+	selectController.backgroundModel = backgroundModel
 
 	ScreenManager:set(selectController)
 end
@@ -140,6 +146,7 @@ GameController.unload = function(self)
 	self.configModel:writeConfig("window")
 	self.mountModel:unload()
 	self.onlineModel:unload()
+	self.backgroundModel:unload()
 end
 
 GameController.update = function(self, dt)

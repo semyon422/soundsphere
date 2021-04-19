@@ -22,7 +22,19 @@ BackgroundView.draw = function(self)
 	local w = cs:X(self.w)
 	local h = cs:Y(self.h)
 
-	local index = self.index
+	local backgroundModel = self.view.backgroundModel
+	local image = backgroundModel and backgroundModel:getImage()
+
+	if image then
+		love.graphics.setColor(0, 0, 0, 1)
+		love.graphics.rectangle(
+			"fill",
+			x,
+			y,
+			w,
+			h
+		)
+	end
 
 	love.graphics.setColor(0.125, 0.125, 0.125, 1)
 	love.graphics.rectangle(

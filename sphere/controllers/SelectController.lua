@@ -42,6 +42,7 @@ SelectController.load = function(self)
 	local noteChartLibraryModel = self.noteChartLibraryModel
 	local scoreLibraryModel = self.scoreLibraryModel
 	local searchLineModel = self.searchLineModel
+	local backgroundModel = self.backgroundModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -60,6 +61,7 @@ SelectController.load = function(self)
 	noteChartLibraryModel.cacheModel = cacheModel
 	scoreLibraryModel.scoreModel = scoreModel
 	inputModel.configModel = configModel
+	backgroundModel.configModel = configModel
 
 	view.controller = self
 	view.themeModel = themeModel
@@ -76,6 +78,7 @@ SelectController.load = function(self)
 	view.noteChartLibraryModel = noteChartLibraryModel
 	view.scoreLibraryModel = scoreLibraryModel
 	view.searchLineModel = searchLineModel
+	view.backgroundModel = backgroundModel
 
 	modifierModel.config = configModel:getConfig("modifier")
 
