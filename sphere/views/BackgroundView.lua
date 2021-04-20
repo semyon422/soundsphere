@@ -1,5 +1,6 @@
 
 local Node = require("aqua.util.Node")
+local frame_draw = require("aqua.graphics.frame_draw")
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
 
 local BackgroundView = Node:new()
@@ -27,13 +28,8 @@ BackgroundView.draw = function(self)
 
 	if image then
 		love.graphics.setColor(0, 0, 0, 1)
-		love.graphics.rectangle(
-			"fill",
-			x,
-			y,
-			w,
-			h
-		)
+		frame_draw(image, x, y, w, h, "out")
+		return
 	end
 
 	love.graphics.setColor(0.125, 0.125, 0.125, 1)

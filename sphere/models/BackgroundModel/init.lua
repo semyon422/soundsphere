@@ -8,6 +8,10 @@ local BackgroundModel = Class:new()
 BackgroundModel.construct = function(self)
 	self.observable = Observable:new()
 	self.currentPath = ""
+
+	self.emptyImageData = love.image.newImageData(1, 1)
+	self.emptyImage = love.graphics.newImage(self.emptyImageData)
+	self.image = self.emptyImage
 end
 
 BackgroundModel.load = function(self)
