@@ -126,6 +126,14 @@ SelectController.receive = function(self, event)
 
 	if event.name == "setTheme" then
 		self.themeModel:setDefaultTheme(event.theme)
+	elseif event.name == "updateSearch" then
+		self.selectModel:updateSearch()
+	elseif event.name == "scrollNoteChartSet" then 
+		self.selectModel:scrollNoteChartSet(event.direction)
+	elseif event.name == "scrollNoteChart" then 
+		self.selectModel:scrollNoteChart(event.direction)
+	elseif event.name == "scrollScore" then 
+		self.selectModel:scrollScore(event.direction)
 	elseif event.action == "clickSelectMenu" then
 		if event.item.controllerName == "ModifierController" then
 			self:switchModifierController()

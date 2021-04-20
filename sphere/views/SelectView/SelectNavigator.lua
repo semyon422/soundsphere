@@ -25,26 +25,10 @@ SelectNavigator.construct = function(self)
 	selectMenu.selected = 1
 end
 
-SelectNavigator.updateSearch = function(self)
-	self.selectModel:updateSearch()
-end
-
 SelectNavigator.updateSelected = function(self)
 	self.noteChartSetList.selected = self.selectModel.noteChartSetItemIndex
 	self.noteChartList.selected = self.selectModel.noteChartItemIndex
 	self.scoreList.selected = self.selectModel.scoreItemIndex
-end
-
-SelectNavigator.scrollNoteChartSet = function(self, direction, destination)
-	self.selectModel:scrollNoteChartSet(direction, destination)
-end
-
-SelectNavigator.scrollNoteChart = function(self, direction, destination)
-	self.selectModel:scrollNoteChart(direction, destination)
-end
-
-SelectNavigator.scrollScore = function(self, direction, destination)
-	self.selectModel:scrollScore(direction, destination)
 end
 
 SelectNavigator.scrollSelectMenu = function(self, direction)
@@ -66,20 +50,32 @@ SelectNavigator.load = function(self)
 
 	self.node = noteChartSetList
 	noteChartSetList:on("up", function()
-		self:scrollNoteChartSet(-1)
+		self:send({
+			name = "scrollNoteChartSet",
+			direction = -1
+		})
 	end)
 	noteChartSetList:on("down", function()
-		self:scrollNoteChartSet(1)
+		self:send({
+			name = "scrollNoteChartSet",
+			direction = 1
+		})
 	end)
 	noteChartSetList:on("left", function()
 		self.node = noteChartList
 	end)
 
 	noteChartList:on("up", function()
-		self:scrollNoteChart(-1)
+		self:send({
+			name = "scrollNoteChart",
+			direction = -1
+		})
 	end)
 	noteChartList:on("down", function()
-		self:scrollNoteChart(1)
+		self:send({
+			name = "scrollNoteChart",
+			direction = 1
+		})
 	end)
 	noteChartList:on("right", function()
 		self.node = noteChartSetList
@@ -97,10 +93,16 @@ SelectNavigator.load = function(self)
 	end)
 
 	scoreList:on("up", function()
-		self:scrollScore(-1)
+		self:send({
+			name = "scrollScore",
+			direction = -1
+		})
 	end)
 	scoreList:on("down", function()
-		self:scrollScore(1)
+		self:send({
+			name = "scrollScore",
+			direction = 1
+		})
 	end)
 	scoreList:on("right", function()
 		self.node = noteChartList
@@ -122,11 +124,15 @@ SelectNavigator.load = function(self)
 		})
 	end)
 
-	self:updateSelected()
+	self:send({
+		name = "updateSearch"
+	})
 end
 
 SelectNavigator.update = function(self)
-	self:updateSearch()
+	self:send({
+		name = "updateSearch"
+	})
 	self:updateSelected()
 end
 
