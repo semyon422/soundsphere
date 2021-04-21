@@ -45,6 +45,7 @@ NoteSkinController.load = function(self)
 	view.noteChartLibraryModel = noteChartLibraryModel
 	view.scoreLibraryModel = scoreLibraryModel
 	view.searchLineModel = searchLineModel
+	view.backgroundModel = self.backgroundModel
 
 	-- modifierModel:load()
 	noteChartModel:select()

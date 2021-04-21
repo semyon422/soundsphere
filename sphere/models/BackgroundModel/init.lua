@@ -16,19 +16,52 @@ end
 
 BackgroundModel.load = function(self)
 	ThreadPool.observable:add(self)
+
+	self.config = self.configModel:getConfig("select")
+	self.noteChartDataEntryId = 0
+	self.backgroundPath = ""
 end
 
 BackgroundModel.unload = function(self)
 	ThreadPool.observable:remove(self)
 end
 
+BackgroundModel.update = function(self)
+	if self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
+		self.noteChartDataEntryId = self.config.noteChartDataEntryId
+		local backgroundPath = self:getBackgroundPath()
+		if self.backgroundPath ~= backgroundPath then
+			self.backgroundPath = backgroundPath
+			self:loadBackground(backgroundPath)
+		end
+	end
+end
+
 BackgroundModel.getImage = function(self)
 	return self.image
+end
+
+BackgroundModel.getBackgroundPath = function(self)
+	local config = self.config
+
+	local noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(config.noteChartSetEntryId)
+	local noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntryById(config.noteChartDataEntryId)
+
+	local directoryPath = noteChartSetEntry.path
+	local stagePath = noteChartDataEntry.stagePath
+
+	if stagePath and stagePath ~= "" then
+		return directoryPath .. "/" .. stagePath
+	end
+
+	return directoryPath
 end
 
 BackgroundModel.loadBackground = function(self, path)
 	local info = love.filesystem.getInfo(path)
 	if not info or info.type == "directory" then
+		self.image = self.emptyImage
+		self.currentPath = path
 		return
 	end
 	if path ~= self.currentPath then

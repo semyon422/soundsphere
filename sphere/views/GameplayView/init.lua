@@ -68,9 +68,6 @@ GameplayView.load = function(self)
 
 	discordGameplayView.rhythmModel = self.rhythmModel
 	discordGameplayView.noteChartModel = self.noteChartModel
-
-	local dim = 255 * (1 - (config.dim.gameplay or 0))
-	BackgroundManager:setColor({dim, dim, dim})
 end
 
 GameplayView.unload = function(self)

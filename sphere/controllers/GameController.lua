@@ -113,8 +113,6 @@ GameController.load = function(self)
 	-- onlineModel:setUserId(configModel:get("online.userId"))
 	onlineModel:load()
 
-	backgroundModel:load()
-
 	onlineController:load()
 
 	DiscordPresence:load()
@@ -146,7 +144,6 @@ GameController.unload = function(self)
 	self.configModel:writeConfig("window")
 	self.mountModel:unload()
 	self.onlineModel:unload()
-	self.backgroundModel:unload()
 end
 
 GameController.update = function(self, dt)

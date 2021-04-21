@@ -64,7 +64,6 @@ SelectController.load = function(self)
 	noteChartLibraryModel.cacheModel = cacheModel
 	scoreLibraryModel.scoreModel = scoreModel
 	inputModel.configModel = configModel
-	backgroundModel.configModel = configModel
 
 	selectModel.noteChartModel = noteChartModel
 	selectModel.configModel = configModel
@@ -102,6 +101,10 @@ SelectController.load = function(self)
 
 	noteChartModel:select()
 
+	backgroundModel.configModel = configModel
+	backgroundModel.cacheModel = cacheModel
+	backgroundModel:load()
+
 	view:load()
 end
 
@@ -109,9 +112,11 @@ SelectController.unload = function(self)
 	-- self.modifierModel:unload()
 	self.view:unload()
 	self.inputModel:unload()
+	self.backgroundModel:load()
 end
 
 SelectController.update = function(self, dt)
+	self.backgroundModel:update()
 	self.view:update(dt)
 end
 
@@ -217,6 +222,7 @@ SelectController.switchModifierController = function(self)
 	modifierController.scoreModel = self.scoreModel
 	modifierController.onlineModel = self.onlineModel
 	modifierController.difficultyModel = self.difficultyModel
+	modifierController.backgroundModel = self.backgroundModel
 	modifierController.selectController = self
 	return ScreenManager:set(modifierController)
 end
@@ -241,6 +247,7 @@ SelectController.switchNoteSkinController = function(self)
 	noteSkinController.scoreModel = self.scoreModel
 	noteSkinController.onlineModel = self.onlineModel
 	noteSkinController.difficultyModel = self.difficultyModel
+	noteSkinController.backgroundModel = self.backgroundModel
 	noteSkinController.selectController = self
 	return ScreenManager:set(noteSkinController)
 end
@@ -266,6 +273,7 @@ SelectController.switchInputController = function(self)
 	inputController.onlineModel = self.onlineModel
 	inputController.difficultyModel = self.difficultyModel
 	inputController.inputModel = self.inputModel
+	inputController.backgroundModel = self.backgroundModel
 	inputController.selectController = self
 	return ScreenManager:set(inputController)
 end
@@ -283,6 +291,7 @@ SelectController.switchSettingsController = function(self)
 	settingsController.onlineModel = self.onlineModel
 	settingsController.difficultyModel = self.difficultyModel
 	settingsController.inputModel = self.inputModel
+	settingsController.backgroundModel = self.backgroundModel
 	settingsController.selectController = self
 	return ScreenManager:set(settingsController)
 end
@@ -305,6 +314,7 @@ SelectController.playNoteChart = function(self)
 	gameplayController.scoreModel = self.scoreModel
 	gameplayController.onlineModel = self.onlineModel
 	gameplayController.difficultyModel = self.difficultyModel
+	gameplayController.backgroundModel = self.backgroundModel
 	gameplayController.selectController = self
 	return ScreenManager:set(gameplayController)
 end

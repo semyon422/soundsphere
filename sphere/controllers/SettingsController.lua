@@ -21,6 +21,7 @@ SettingsController.load = function(self)
 
 	view.controller = self
 	view.configModel = configModel
+	view.backgroundModel = self.backgroundModel
 
 	configController.configModel = configModel
 

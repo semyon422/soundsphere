@@ -27,6 +27,7 @@ GameplayController.load = function(self)
 	local notificationModel = self.notificationModel
 	local themeModel = self.themeModel
 	local difficultyModel = self.difficultyModel
+	local backgroundModel = self.backgroundModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -43,6 +44,7 @@ GameplayController.load = function(self)
 	view.noteChartModel = noteChartModel
 	view.configModel = configModel
 	view.modifierModel = modifierModel
+	view.backgroundModel = backgroundModel
 	view.controller = self
 
 	timeController.rhythmModel = rhythmModel
@@ -155,6 +157,7 @@ GameplayController.receive = function(self, event)
 		resultController.autoplay = self.rhythmModel.logicEngine.autoplay
 		resultController.configModel = self.configModel
 		resultController.difficultyModel = self.difficultyModel
+		resultController.backgroundModel = self.backgroundModel
 		resultController.selectController = self.selectController
 
 		ScreenManager:set(resultController)
