@@ -11,7 +11,6 @@ local OnlineController			= require("sphere.controllers.OnlineController")
 local ScreenManager				= require("sphere.screen.ScreenManager")
 local FadeTransition			= require("sphere.screen.FadeTransition")
 local SelectController			= require("sphere.controllers.SelectController")
-local BackgroundManager			= require("sphere.ui.BackgroundManager")
 local WindowManager				= require("sphere.window.WindowManager")
 local FpsLimiter				= require("sphere.window.FpsLimiter")
 local Screenshot				= require("sphere.window.Screenshot")
@@ -150,14 +149,12 @@ GameController.update = function(self, dt)
 	ThreadPool:update()
 
 	DiscordPresence:update()
-	BackgroundManager:update(dt)
 	ScreenManager:update(dt)
 	self.notificationView:update(dt)
 	self.onlineController:update()
 end
 
 GameController.draw = function(self)
-	BackgroundManager:draw()
 	ScreenManager:draw()
 	self.notificationView:draw()
 end
@@ -176,7 +173,6 @@ GameController.receive = function(self, event)
 	end
 
 	ScreenManager:receive(event)
-	BackgroundManager:receive(event)
 	self.windowManager:receive(event)
 	self.screenshot:receive(event)
 	self.mountController:receive(event)
