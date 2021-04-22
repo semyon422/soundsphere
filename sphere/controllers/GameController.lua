@@ -40,6 +40,7 @@ GameController.construct = function(self)
 	self.onlineModel = OnlineModel:new()
 	self.cacheModel = CacheModel:new()
 	self.backgroundModel = BackgroundModel:new()
+	self.fadeTransition = FadeTransition:new()
 end
 
 GameController.load = function(self)
@@ -116,7 +117,7 @@ GameController.load = function(self)
 
 	DiscordPresence:load()
 
-	ScreenManager:setTransition(FadeTransition)
+	ScreenManager:setTransition(self.fadeTransition)
 
 	local selectController = SelectController:new()
 	selectController.notificationModel = notificationModel

@@ -6,15 +6,15 @@ ScreenManager.init = function(self)
 	self.currentScreen = Screen:new()
 end
 
-ScreenManager.set = function(self, screen, callback)
-	self.transition:transit(function()
+ScreenManager.set = function(self, screen)
+	self.coroutine = coroutine.create(function()
+		self.transition:fadeIn()
 		self.currentScreen:unload()
 		self.currentScreen = screen
 		screen:load()
-		if callback then
-			callback()
-		end
+		self.transition:fadeOut()
 	end)
+	coroutine.resume(self.coroutine)
 end
 
 ScreenManager.setTransition = function(self, transition)
@@ -23,7 +23,12 @@ end
 
 ScreenManager.update = function(self, dt)
 	self.currentScreen:update(dt)
-	self.transition:update(dt)
+
+	local transition = self.transition
+	transition:update(dt)
+	if transition.transiting and transition.complete then
+		coroutine.resume(self.coroutine)
+	end
 end
 
 ScreenManager.draw = function(self)
