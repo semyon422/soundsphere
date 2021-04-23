@@ -17,6 +17,23 @@ ModifierController.receive = function(self, event)
 		event.modifier[event.modifier.variableName] = event.value
 	elseif event.name == "adjustDifficulty" then
 		self:adjustDifficulty()
+	elseif event.name == "decreaseTimeRate" then
+		self:changeTimeRate(-0.05)
+	elseif event.name == "increaseTimeRate" then
+		self:changeTimeRate(0.05)
+	end
+end
+
+ModifierController.changeTimeRate = function(self, delta)
+	local modifierModel = self.modifierModel
+
+	local TimeRateX = require("sphere.models.ModifierModel.TimeRateX")
+	for _, modifier in ipairs(modifierModel.inconsequential) do
+		if modifier.Class == TimeRateX then
+			local timeRate = math.min(math.max(modifier[modifier.variableName] + delta, 0.5), 2)
+			modifier[modifier.variableName] = timeRate
+			break
+		end
 	end
 end
 

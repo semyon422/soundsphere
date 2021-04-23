@@ -152,6 +152,14 @@ SelectView.receive = function(self, event)
 			return self.controller:receive({
 				name = "adjustDifficulty"
 			})
+		elseif key == self.configModel:get("gameplay.decreaseTimeRate") then
+			return self.controller:receive({
+				name = "decreaseTimeRate"
+			})
+		elseif key == self.configModel:get("gameplay.increaseTimeRate") then
+			return self.controller:receive({
+				name = "increaseTimeRate"
+			})
 		end
 	end
 
