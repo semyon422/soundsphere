@@ -1,5 +1,4 @@
 local Class				= require("aqua.util.Class")
-local ScreenManager		= require("sphere.screen.ScreenManager")
 
 local ResultController = Class:new()
 
@@ -41,7 +40,7 @@ ResultController.receive = function(self, event)
 	self.view:receive(event)
 
 	if event.name == "goSelectScreen" then
-		return ScreenManager:set(self.selectController)
+		return self.gameController.screenManager:set(self.selectController)
 	end
 end
 

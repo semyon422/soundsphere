@@ -1,8 +1,9 @@
+local Class = require("aqua.util.Class")
 local Screen			= require("sphere.screen.Screen")
 
-local ScreenManager = {}
+local ScreenManager = Class:new()
 
-ScreenManager.init = function(self)
+ScreenManager.construct = function(self)
 	self.currentScreen = Screen:new()
 end
 
@@ -44,7 +45,5 @@ end
 ScreenManager.unload = function(self)
 	self.currentScreen:unload()
 end
-
-ScreenManager:init()
 
 return ScreenManager

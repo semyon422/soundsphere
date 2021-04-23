@@ -1,5 +1,4 @@
 local Class = require("aqua.util.Class")
-local ScreenManager			= require("sphere.screen.ScreenManager")
 
 local InputController = Class:new()
 
@@ -70,7 +69,7 @@ InputController.receive = function(self, event)
 	if event.name == "setInputBinding" then
 		self.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
 	elseif event.name == "goSelectScreen" then
-		return ScreenManager:set(self.selectController)
+		return self.gameController.screenManager:set(self.selectController)
 	end
 end
 

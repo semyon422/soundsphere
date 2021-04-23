@@ -1,5 +1,4 @@
 local Class					= require("aqua.util.Class")
-local ScreenManager			= require("sphere.screen.ScreenManager")
 local NoteChartModel		= require("sphere.models.NoteChartModel")
 local ModifierModel			= require("sphere.models.ModifierModel")
 local NoteSkinModel			= require("sphere.models.NoteSkinModel")
@@ -169,14 +168,16 @@ SelectController.receive = function(self, event)
 			browserController.cacheModel = self.cacheModel
 			browserController.themeModel = self.themeModel
 			browserController.selectController = self
-			return ScreenManager:set(browserController)
+			browserController.gameController = self.gameController
+			return self.gameController.screenManager:set(browserController)
 		elseif event.screenName == "SettingsScreen" then
 			local SettingsController = require("sphere.controllers.SettingsController")
 			local settingsController = SettingsController:new()
 			settingsController.configModel = self.configModel
 			settingsController.themeModel = self.themeModel
 			settingsController.selectController = self
-			return ScreenManager:set(settingsController)
+			settingsController.gameController = self.gameController
+			return self.gameController.screenManager:set(settingsController)
 		end
 	end
 end
@@ -224,7 +225,8 @@ SelectController.switchModifierController = function(self)
 	modifierController.difficultyModel = self.difficultyModel
 	modifierController.backgroundModel = self.backgroundModel
 	modifierController.selectController = self
-	return ScreenManager:set(modifierController)
+	modifierController.gameController = self.gameController
+	return self.gameController.screenManager:set(modifierController)
 end
 
 SelectController.switchNoteSkinController = function(self)
@@ -249,7 +251,8 @@ SelectController.switchNoteSkinController = function(self)
 	noteSkinController.difficultyModel = self.difficultyModel
 	noteSkinController.backgroundModel = self.backgroundModel
 	noteSkinController.selectController = self
-	return ScreenManager:set(noteSkinController)
+	noteSkinController.gameController = self.gameController
+	return self.gameController.screenManager:set(noteSkinController)
 end
 
 SelectController.switchInputController = function(self)
@@ -275,7 +278,8 @@ SelectController.switchInputController = function(self)
 	inputController.inputModel = self.inputModel
 	inputController.backgroundModel = self.backgroundModel
 	inputController.selectController = self
-	return ScreenManager:set(inputController)
+	inputController.gameController = self.gameController
+	return self.gameController.screenManager:set(inputController)
 end
 
 SelectController.switchSettingsController = function(self)
@@ -293,7 +297,8 @@ SelectController.switchSettingsController = function(self)
 	settingsController.inputModel = self.inputModel
 	settingsController.backgroundModel = self.backgroundModel
 	settingsController.selectController = self
-	return ScreenManager:set(settingsController)
+	settingsController.gameController = self.gameController
+	return self.gameController.screenManager:set(settingsController)
 end
 
 SelectController.playNoteChart = function(self)
@@ -316,7 +321,8 @@ SelectController.playNoteChart = function(self)
 	gameplayController.difficultyModel = self.difficultyModel
 	gameplayController.backgroundModel = self.backgroundModel
 	gameplayController.selectController = self
-	return ScreenManager:set(gameplayController)
+	gameplayController.gameController = self.gameController
+	return self.gameController.screenManager:set(gameplayController)
 end
 
 SelectController.replayNoteChart = function(self, mode, hash)
@@ -361,6 +367,7 @@ SelectController.replayNoteChart = function(self, mode, hash)
 	gameplayController.onlineModel = self.onlineModel
 	gameplayController.difficultyModel = self.difficultyModel
 	gameplayController.selectController = self
+	gameplayController.gameController = self.gameController
 
 	if mode == "result" then
 		noteChartModel:unload()
@@ -379,10 +386,11 @@ SelectController.replayNoteChart = function(self, mode, hash)
 		resultController.difficultyModel = self.difficultyModel
 		resultController.autoplay = gameplayController.rhythmModel.logicEngine.autoplay
 		resultController.selectController = self
+		resultController.gameController = self.gameController
 
-		ScreenManager:set(resultController)
+		self.gameController.screenManager:set(resultController)
 	else
-		return ScreenManager:set(gameplayController)
+		return self.gameController.screenManager:set(gameplayController)
 	end
 end
 

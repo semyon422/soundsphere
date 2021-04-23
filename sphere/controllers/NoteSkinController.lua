@@ -1,5 +1,4 @@
 local Class = require("aqua.util.Class")
-local ScreenManager			= require("sphere.screen.ScreenManager")
 
 local NoteSkinController = Class:new()
 
@@ -72,7 +71,7 @@ NoteSkinController.receive = function(self, event)
     if event.name == "setNoteSkin" then
 		self.noteSkinModel:setDefaultNoteSkin(event.noteSkin)
 	elseif event.name == "goSelectScreen" then
-		return ScreenManager:set(self.selectController)
+		return self.gameController.screenManager:set(self.selectController)
 	end
 end
 

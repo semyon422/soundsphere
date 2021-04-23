@@ -1,5 +1,4 @@
 local Class = require("aqua.util.Class")
-local ScreenManager			= require("sphere.screen.ScreenManager")
 
 local ModifierController = Class:new()
 
@@ -80,7 +79,7 @@ ModifierController.receive = function(self, event)
 	elseif event.name == "playNoteChart" then
 		self:playNoteChart()
 	elseif event.name == "goSelectScreen" then
-		return ScreenManager:set(self.selectController)
+		return self.gameController.screenManager:set(self.selectController)
 	end
 end
 
@@ -102,7 +101,8 @@ ModifierController.playNoteChart = function(self)
 	gameplayController.onlineModel = self.onlineModel
 	gameplayController.difficultyModel = self.difficultyModel
 	gameplayController.selectController = self
-	return ScreenManager:set(gameplayController)
+	gameplayController.gameController = self.gameController
+	return self.gameController.screenManager:set(gameplayController)
 end
 
 ModifierController.adjustDifficulty = function(self)

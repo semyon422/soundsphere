@@ -41,6 +41,7 @@ GameController.construct = function(self)
 	self.cacheModel = CacheModel:new()
 	self.backgroundModel = BackgroundModel:new()
 	self.fadeTransition = FadeTransition:new()
+	self.screenManager = ScreenManager:new()
 end
 
 GameController.load = function(self)
@@ -117,9 +118,11 @@ GameController.load = function(self)
 
 	DiscordPresence:load()
 
-	ScreenManager:setTransition(self.fadeTransition)
+	self.screenManager:setTransition(self.fadeTransition)
 
 	local selectController = SelectController:new()
+	self.selectController = selectController
+
 	selectController.notificationModel = notificationModel
 	selectController.configModel = configModel
 	selectController.mountModel = mountModel
@@ -128,12 +131,13 @@ GameController.load = function(self)
 	selectController.onlineModel = onlineModel
 	selectController.cacheModel = cacheModel
 	selectController.backgroundModel = backgroundModel
+	selectController.gameController = self
 
-	ScreenManager:set(selectController)
+	self.screenManager:set(selectController)
 end
 
 GameController.unload = function(self)
-	ScreenManager:unload()
+	self.screenManager:unload()
 	DiscordPresence:unload()
 	self.configModel:writeConfig("settings")
 	self.configModel:writeConfig("select")
@@ -150,13 +154,13 @@ GameController.update = function(self, dt)
 	ThreadPool:update()
 
 	DiscordPresence:update()
-	ScreenManager:update(dt)
+	self.screenManager:update(dt)
 	self.notificationView:update(dt)
 	self.onlineController:update()
 end
 
 GameController.draw = function(self)
-	ScreenManager:draw()
+	self.screenManager:draw()
 	self.notificationView:draw()
 end
 
@@ -173,7 +177,7 @@ GameController.receive = function(self, event)
 		CoordinateManager:reload()
 	end
 
-	ScreenManager:receive(event)
+	self.screenManager:receive(event)
 	self.windowManager:receive(event)
 	self.screenshot:receive(event)
 	self.mountController:receive(event)

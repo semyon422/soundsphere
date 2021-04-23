@@ -1,5 +1,4 @@
 local Class					= require("aqua.util.Class")
-local ScreenManager			= require("sphere.screen.ScreenManager")
 local CollectionModel		= require("sphere.models.CollectionModel")
 
 local BrowserController = Class:new()
@@ -47,14 +46,14 @@ BrowserController.receive = function(self, event)
 
 	if event.name == "setScreen" then
 		if event.screenName == "SelectScreen" then
-			ScreenManager:set(self.selectController)
+			self.gameController.screenManager:set(self.selectController)
 		elseif event.screenName == "SettingsScreen" then
 			local SettingsController = require("sphere.controllers.SettingsController")
 			local settingsController = SettingsController:new()
 			settingsController.configModel = self.configModel
 			settingsController.themeModel = self.themeModel
 			settingsController.selectController = self.selectController
-			return ScreenManager:set(settingsController)
+			return self.gameController.screenManager:set(settingsController)
 		end
 	end
 end

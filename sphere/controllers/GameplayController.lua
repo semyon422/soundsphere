@@ -1,5 +1,4 @@
 local Class						= require("aqua.util.Class")
-local ScreenManager				= require("sphere.screen.ScreenManager")
 local RhythmModel				= require("sphere.models.RhythmModel")
 local NoteChartModel			= require("sphere.models.NoteChartModel")
 local NoteSkinModel				= require("sphere.models.NoteSkinModel")
@@ -159,8 +158,9 @@ GameplayController.receive = function(self, event)
 		resultController.difficultyModel = self.difficultyModel
 		resultController.backgroundModel = self.backgroundModel
 		resultController.selectController = self.selectController
+		resultController.gameController = self.gameController
 
-		ScreenManager:set(resultController)
+		self.gameController.screenManager:set(resultController)
 	end
 end
 
