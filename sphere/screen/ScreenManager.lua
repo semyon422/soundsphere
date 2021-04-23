@@ -1,21 +1,27 @@
 local Class = require("aqua.util.Class")
-local Screen			= require("sphere.screen.Screen")
+local Screen = require("sphere.screen.Screen")
 
 local ScreenManager = Class:new()
 
 ScreenManager.construct = function(self)
 	self.currentScreen = Screen:new()
+	self.coroutine = coroutine.create(function()
+		while true do
+			local screen = coroutine.yield()
+			self.transition:fadeIn()
+			coroutine.yield()
+			self.currentScreen:unload()
+			self.currentScreen = screen
+			screen:load()
+			self.transition:fadeOut()
+			coroutine.yield()
+		end
+	end)
+	coroutine.resume(self.coroutine)
 end
 
 ScreenManager.set = function(self, screen)
-	self.coroutine = coroutine.create(function()
-		self.transition:fadeIn()
-		self.currentScreen:unload()
-		self.currentScreen = screen
-		screen:load()
-		self.transition:fadeOut()
-	end)
-	coroutine.resume(self.coroutine)
+	coroutine.resume(self.coroutine, screen)
 end
 
 ScreenManager.setTransition = function(self, transition)
@@ -27,8 +33,9 @@ ScreenManager.update = function(self, dt)
 
 	local transition = self.transition
 	transition:update(dt)
-	if transition.transiting and transition.complete then
+	if transition.needResume then
 		coroutine.resume(self.coroutine)
+		transition.needResume = false
 	end
 end
 

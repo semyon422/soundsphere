@@ -12,7 +12,7 @@ FadeTransition.shaderText = [[
 ]]
 
 FadeTransition.transiting = false
-FadeTransition.complete = false
+FadeTransition.needResume = false
 FadeTransition.alpha = 1
 FadeTransition.phase = 0
 
@@ -23,16 +23,14 @@ end
 FadeTransition.fadeIn = function(self)
 	self.transiting = true
 	self.phase = 1
-	self.complete = false
+	self.needResume = false
 	self.tween = tween.new(0.1, self, {alpha = 0}, "inOutQuad")
-	coroutine.yield()
 end
 
 FadeTransition.fadeOut = function(self)
 	self.phase = 2
-	self.complete = false
+	self.needResume = false
 	self.tween = tween.new(0.1, self, {alpha = 1}, "inOutQuad")
-	coroutine.yield()
 end
 
 FadeTransition.update = function(self, dt)
@@ -44,12 +42,12 @@ FadeTransition.update = function(self, dt)
 
 	if self.phase == 1 then
 		if self.alpha == 0 then
-			self.complete = true
+			self.needResume = true
 		end
 	elseif self.phase == 2 then
 		if self.alpha == 1 then
 			self.transiting = false
-			self.complete = true
+			self.needResume = true
 		end
 	end
 end
