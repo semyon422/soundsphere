@@ -1,16 +1,11 @@
-local Class				= require("aqua.util.Class")
-local ConfigController	= require("sphere.controllers.ConfigController")
+local Class = require("aqua.util.Class")
 
 local SettingsController = Class:new()
 
-SettingsController.construct = function(self)
-	self.configController = ConfigController:new()
-end
+SettingsController.construct = function(self) end
 
 SettingsController.load = function(self)
-	local configModel = self.configModel
-	local configController = self.configController
-	local themeModel = self.themeModel
+	local themeModel = self.gameController.themeModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -19,16 +14,13 @@ SettingsController.load = function(self)
 	self.view = view
 
 	view.controller = self
-	view.configModel = configModel
-	view.backgroundModel = self.backgroundModel
-
-	configController.configModel = configModel
+	view.configModel = self.gameController.configModel
+	view.backgroundModel = self.gameController.backgroundModel
 
 	view:load()
 end
 
 SettingsController.unload = function(self)
-	-- self.configModel:write()
 	self.view:unload()
 end
 
@@ -42,7 +34,6 @@ end
 
 SettingsController.receive = function(self, event)
 	self.view:receive(event)
-	self.configController:receive(event)
 
 	if event.name == "goSelectScreen" then
 		return self.gameController.screenManager:set(self.selectController)

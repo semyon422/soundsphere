@@ -2,26 +2,11 @@ local Class = require("aqua.util.Class")
 
 local NoteSkinController = Class:new()
 
-
-NoteSkinController.construct = function(self)
-end
+NoteSkinController.construct = function(self) end
 
 NoteSkinController.load = function(self)
-	local modifierModel = self.modifierModel
-	local noteSkinModel = self.noteSkinModel
-	local noteChartModel = self.noteChartModel
-	local inputModel = self.inputModel
-	local cacheModel = self.cacheModel
-	local themeModel = self.themeModel
-	local configModel = self.configModel
-	local mountModel = self.mountModel
-	local scoreModel = self.scoreModel
-	local onlineModel = self.onlineModel
-	local difficultyModel = self.difficultyModel
-	local noteChartSetLibraryModel = self.noteChartSetLibraryModel
-	local noteChartLibraryModel = self.noteChartLibraryModel
-	local scoreLibraryModel = self.scoreLibraryModel
-	local searchLineModel = self.searchLineModel
+	local noteChartModel = self.gameController.noteChartModel
+	local themeModel = self.gameController.themeModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -31,29 +16,27 @@ NoteSkinController.load = function(self)
 
 	view.controller = self
 	view.themeModel = themeModel
-	view.noteChartModel = noteChartModel
-	view.modifierModel = modifierModel
-	view.noteSkinModel = noteSkinModel
-	view.inputModel = inputModel
-	view.cacheModel = cacheModel
-	view.configModel = configModel
-	view.mountModel = mountModel
-	view.scoreModel = scoreModel
-	view.onlineModel = onlineModel
-	view.noteChartSetLibraryModel = noteChartSetLibraryModel
-	view.noteChartLibraryModel = noteChartLibraryModel
-	view.scoreLibraryModel = scoreLibraryModel
-	view.searchLineModel = searchLineModel
-	view.backgroundModel = self.backgroundModel
+	view.noteChartModel = self.gameController.noteChartModel
+	view.modifierModel = self.gameController.modifierModel
+	view.noteSkinModel = self.gameController.noteSkinModel
+	view.inputModel = self.gameController.inputModel
+	view.cacheModel = self.gameController.cacheModel
+	view.configModel = self.gameController.configModel
+	view.mountModel = self.gameController.mountModel
+	view.scoreModel = self.gameController.scoreModel
+	view.onlineModel = self.gameController.onlineModel
+	view.noteChartSetLibraryModel = self.gameController.noteChartSetLibraryModel
+	view.noteChartLibraryModel = self.gameController.noteChartLibraryModel
+	view.scoreLibraryModel = self.gameController.scoreLibraryModel
+	view.searchLineModel = self.gameController.searchLineModel
+	view.backgroundModel = self.gameController.backgroundModel
 
-	-- modifierModel:load()
 	noteChartModel:select()
 
 	view:load()
 end
 
 NoteSkinController.unload = function(self)
-	-- self.modifierModel:unload()
 	self.view:unload()
 end
 

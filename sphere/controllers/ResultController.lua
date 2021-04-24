@@ -3,9 +3,9 @@ local Class				= require("aqua.util.Class")
 local ResultController = Class:new()
 
 ResultController.load = function(self)
-	local modifierModel = self.modifierModel
-	local themeModel = self.themeModel
-	local noteChartModel = self.noteChartModel
+	local modifierModel = self.gameController.modifierModel
+	local themeModel = self.gameController.themeModel
+	local noteChartModel = self.gameController.noteChartModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -18,8 +18,8 @@ ResultController.load = function(self)
 
 	view.scoreSystem = self.scoreSystem
 	view.noteChartModel = noteChartModel
-	view.configModel = self.configModel
-	view.backgroundModel = self.backgroundModel
+	view.configModel = self.gameController.configModel
+	view.backgroundModel = self.gameController.backgroundModel
 
 	view:load()
 end

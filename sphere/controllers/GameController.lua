@@ -21,6 +21,12 @@ local ThemeModel				= require("sphere.models.ThemeModel")
 local OnlineModel				= require("sphere.models.OnlineModel")
 local CacheModel				= require("sphere.models.CacheModel")
 local BackgroundModel			= require("sphere.models.BackgroundModel")
+local NoteChartModel		= require("sphere.models.NoteChartModel")
+local ModifierModel			= require("sphere.models.ModifierModel")
+local NoteSkinModel			= require("sphere.models.NoteSkinModel")
+local InputModel			= require("sphere.models.InputModel")
+local CacheModel			= require("sphere.models.CacheModel")
+local DifficultyModel		= require("sphere.models.DifficultyModel")
 local MainLog					= require("sphere.MainLog")
 
 local GameController = Class:new()
@@ -42,6 +48,11 @@ GameController.construct = function(self)
 	self.backgroundModel = BackgroundModel:new()
 	self.fadeTransition = FadeTransition:new()
 	self.screenManager = ScreenManager:new()
+	self.modifierModel = ModifierModel:new()
+	self.noteSkinModel = NoteSkinModel:new()
+	self.noteChartModel = NoteChartModel:new()
+	self.inputModel = InputModel:new()
+	self.difficultyModel = DifficultyModel:new()
 end
 
 GameController.load = function(self)
@@ -59,6 +70,11 @@ GameController.load = function(self)
 	local onlineModel = self.onlineModel
 	local cacheModel = self.cacheModel
 	local backgroundModel = self.backgroundModel
+	local modifierModel = self.modifierModel
+	local noteSkinModel = self.noteSkinModel
+	local noteChartModel = self.noteChartModel
+	local inputModel = self.inputModel
+	local difficultyModel = self.difficultyModel
 
 	directoryManager:createDirectories()
 
@@ -88,6 +104,16 @@ GameController.load = function(self)
 	onlineController.cacheModel = cacheModel
 	onlineController.configModel = configModel
 
+	noteChartModel.cacheModel = cacheModel
+	noteChartModel.configModel = configModel
+	noteChartModel.scoreModel = scoreModel
+	noteSkinModel.configModel = configModel
+	modifierModel.noteChartModel = noteChartModel
+	modifierModel.difficultyModel = difficultyModel
+	modifierModel.scoreModel = scoreModel
+	inputModel.configModel = configModel
+	modifierModel.config = configModel:getConfig("modifier")
+
 	themeModel.configModel = configModel
 	themeModel:load()
 
@@ -114,23 +140,24 @@ GameController.load = function(self)
 	-- onlineModel:setUserId(configModel:get("online.userId"))
 	onlineModel:load()
 
+	inputModel:load()
+	noteSkinModel:load()
+	cacheModel:load()
+	noteChartModel:select()
+
 	onlineController:load()
 
 	DiscordPresence:load()
+
+	backgroundModel.configModel = configModel
+	backgroundModel.cacheModel = cacheModel
+	backgroundModel:load()
 
 	self.screenManager:setTransition(self.fadeTransition)
 
 	local selectController = SelectController:new()
 	self.selectController = selectController
 
-	selectController.notificationModel = notificationModel
-	selectController.configModel = configModel
-	selectController.mountModel = mountModel
-	selectController.themeModel = themeModel
-	selectController.scoreModel = scoreModel
-	selectController.onlineModel = onlineModel
-	selectController.cacheModel = cacheModel
-	selectController.backgroundModel = backgroundModel
 	selectController.gameController = self
 
 	self.screenManager:set(selectController)
@@ -139,6 +166,7 @@ end
 GameController.unload = function(self)
 	self.screenManager:unload()
 	DiscordPresence:unload()
+	self.backgroundModel:unload()
 	self.configModel:writeConfig("settings")
 	self.configModel:writeConfig("select")
 	self.configModel:writeConfig("modifier")
@@ -154,6 +182,7 @@ GameController.update = function(self, dt)
 	ThreadPool:update()
 
 	DiscordPresence:update()
+	self.backgroundModel:update()
 	self.screenManager:update(dt)
 	self.notificationView:update(dt)
 	self.onlineController:update()

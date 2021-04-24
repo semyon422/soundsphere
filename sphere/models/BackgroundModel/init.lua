@@ -57,6 +57,10 @@ BackgroundModel.getBackgroundPath = function(self)
 	return directoryPath
 end
 
+BackgroundModel.reloadBackground = function(self)
+	self:loadBackground(self.backgroundPath)
+end
+
 BackgroundModel.loadBackground = function(self, path)
 	local info = love.filesystem.getInfo(path)
 	if not info or info.type == "directory" then

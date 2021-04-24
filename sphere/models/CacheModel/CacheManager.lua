@@ -13,19 +13,21 @@ CacheManager.construct = function(self)
 	self.log.path = "userdata/cache.log"
 
 	self.state = 0
+
+	self:clear()
 end
 
 CacheManager.clear = function(self)
-	self.noteChartsAtSet = nil
-	self.noteChartsAtHash = nil
-	self.noteChartSets = nil
-	self.noteChartDatas = nil
-	self.noteCharts = nil
-	self.noteChartsId = nil
-	self.noteChartsPath = nil
-	self.noteChartSetsId = nil
-	self.noteChartSetsPath = nil
-	self.noteChartDatasHashIndex = nil
+	self.noteChartsAtSet = {}
+	self.noteChartsAtHash = {}
+	self.noteChartSets = {}
+	self.noteChartDatas = {}
+	self.noteCharts = {}
+	self.noteChartsId = {}
+	self.noteChartsPath = {}
+	self.noteChartSetsId = {}
+	self.noteChartSetsPath = {}
+	self.noteChartDatasHashIndex = {}
 end
 
 CacheManager.select = function(self)

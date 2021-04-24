@@ -21,7 +21,7 @@ ScreenManager.construct = function(self)
 end
 
 ScreenManager.set = function(self, screen)
-	coroutine.resume(self.coroutine, screen)
+	assert(coroutine.resume(self.coroutine, screen))
 end
 
 ScreenManager.setTransition = function(self, transition)
@@ -34,7 +34,7 @@ ScreenManager.update = function(self, dt)
 	local transition = self.transition
 	transition:update(dt)
 	if transition.needResume then
-		coroutine.resume(self.coroutine)
+		assert(coroutine.resume(self.coroutine))
 		transition.needResume = false
 	end
 end

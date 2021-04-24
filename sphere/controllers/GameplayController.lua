@@ -1,32 +1,28 @@
 local Class						= require("aqua.util.Class")
 local RhythmModel				= require("sphere.models.RhythmModel")
-local NoteChartModel			= require("sphere.models.NoteChartModel")
-local NoteSkinModel				= require("sphere.models.NoteSkinModel")
-local InputModel				= require("sphere.models.InputModel")
 local TimeController			= require("sphere.controllers.TimeController")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 
 local GameplayController = Class:new()
 
 GameplayController.construct = function(self)
-	self.noteChartModel = NoteChartModel:new()
-	self.noteSkinModel = NoteSkinModel:new()
 	self.rhythmModel = RhythmModel:new()
 	self.timeController = TimeController:new()
 end
 
 GameplayController.load = function(self)
-	local noteChartModel = self.noteChartModel
-	local noteSkinModel = self.noteSkinModel
 	local rhythmModel = self.rhythmModel
-	local inputModel = self.inputModel
-	local configModel = self.configModel
 	local timeController = self.timeController
-	local modifierModel = self.modifierModel
-	local notificationModel = self.notificationModel
-	local themeModel = self.themeModel
-	local difficultyModel = self.difficultyModel
-	local backgroundModel = self.backgroundModel
+
+	local noteChartModel = self.gameController.noteChartModel
+	local noteSkinModel = self.gameController.noteSkinModel
+	local inputModel = self.gameController.inputModel
+	local configModel = self.gameController.configModel
+	local modifierModel = self.gameController.modifierModel
+	local notificationModel = self.gameController.notificationModel
+	local themeModel = self.gameController.themeModel
+	local difficultyModel = self.gameController.difficultyModel
+	local backgroundModel = self.gameController.backgroundModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -87,12 +83,14 @@ GameplayController.load = function(self)
 
 	rhythmModel:loadAllEngines()
 
-	view.scoreSystem = rhythmModel.scoreEngine.scoreSystem
+	local scoreSystem = rhythmModel.scoreEngine.scoreSystem
 
 	local enps, averageStrain, generalizedKeymode = difficultyModel:getDifficulty(noteChart)
-	view.scoreSystem.baseEnps = enps
-	view.scoreSystem.baseAverageStrain = averageStrain
-	view.scoreSystem.generalizedKeymode = generalizedKeymode
+	scoreSystem.baseEnps = enps
+	scoreSystem.baseAverageStrain = averageStrain
+	scoreSystem.generalizedKeymode = generalizedKeymode
+
+	view.scoreSystem = scoreSystem
 
 	view:load()
 
@@ -107,7 +105,7 @@ GameplayController.load = function(self)
 end
 
 GameplayController.getImporterSettings = function(self)
-	local config = self.configModel:getConfig("settings")
+	local config = self.gameController.configModel:getConfig("settings")
 	return {
 		midiConstantVolume = config.parser.midiConstantVolume
 	}
@@ -150,13 +148,7 @@ GameplayController.receive = function(self, event)
 		local resultController = ResultController:new()
 
 		resultController.scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
-		resultController.themeModel = self.themeModel
-		resultController.noteChartModel = self.noteChartModel
-		resultController.modifierModel = self.modifierModel
 		resultController.autoplay = self.rhythmModel.logicEngine.autoplay
-		resultController.configModel = self.configModel
-		resultController.difficultyModel = self.difficultyModel
-		resultController.backgroundModel = self.backgroundModel
 		resultController.selectController = self.selectController
 		resultController.gameController = self.gameController
 
@@ -171,16 +163,16 @@ GameplayController.saveScore = function(self)
 	end
 
 	local scoreSystem = rhythmModel.scoreEngine.scoreSystem
-	local noteChartModel = self.noteChartModel
+	local noteChartModel = self.gameController.noteChartModel
 	local modifierModel = rhythmModel.modifierModel
 	local replayModel = rhythmModel.replayModel
 	if scoreSystem.score > 0 and rhythmModel.replayModel.mode ~= "replay" and not rhythmModel.logicEngine.autoplay then
 		replayModel.noteChartModel = noteChartModel
 		replayModel.modifierModel = modifierModel
-		replayModel.replayType = self.configModel:getConfig("settings").replay.type
+		replayModel.replayType = self.gameController.configModel:getConfig("settings").replay.type
 		local replayHash = replayModel:saveReplay()
-		self.scoreModel:insertScore(scoreSystem, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
-		self.onlineModel:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
+		self.gameController.scoreModel:insertScore(scoreSystem, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
+		self.gameController.onlineModel:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
 	end
 end
 
