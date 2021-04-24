@@ -182,7 +182,7 @@ GameController.update = function(self, dt)
 	ThreadPool:update()
 
 	DiscordPresence:update()
-	self.backgroundModel:update()
+	self.backgroundModel:update(dt)
 	self.screenManager:update(dt)
 	self.notificationView:update(dt)
 	self.onlineController:update()

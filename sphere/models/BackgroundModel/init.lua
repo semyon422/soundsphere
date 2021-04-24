@@ -1,7 +1,8 @@
 local Class = require("aqua.util.Class")
 local Observable = require("aqua.util.Observable")
 local ThreadPool	= require("aqua.thread.ThreadPool")
-local image			= require("aqua.image")
+local aquaimage			= require("aqua.image")
+local tween				= require("tween")
 
 local BackgroundModel = Class:new()
 
@@ -11,7 +12,11 @@ BackgroundModel.construct = function(self)
 
 	self.emptyImageData = love.image.newImageData(1, 1)
 	self.emptyImage = love.graphics.newImage(self.emptyImageData)
-	self.image = self.emptyImage
+	self.images = {
+		self.emptyImage
+	}
+	self.alpha = 0
+	self.loadable = 0
 end
 
 BackgroundModel.load = function(self)
@@ -26,19 +31,47 @@ BackgroundModel.unload = function(self)
 	ThreadPool.observable:remove(self)
 end
 
-BackgroundModel.update = function(self)
+BackgroundModel.update = function(self, dt)
+	if self.loadTween then
+		self.loadTween:update(dt)
+	end
+
 	if self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
 		self.noteChartDataEntryId = self.config.noteChartDataEntryId
 		local backgroundPath = self:getBackgroundPath()
 		if self.backgroundPath ~= backgroundPath then
 			self.backgroundPath = backgroundPath
-			self:loadBackground(backgroundPath)
+			self.loadable = 0
+			self.loadTween = tween.new(0.1, self, {loadable = 1}, "inOutQuad")
+		end
+	end
+
+	if self.loadable == 1 then
+		self:loadBackground(self.backgroundPath)
+		self.loadable = 0
+	end
+
+	if self.alphaTween then
+		self.alphaTween:update(dt)
+	end
+
+	if #self.images > 1 then
+		if self.alpha == 1 then
+			table.remove(self.images, 1)
+			self.alpha = 0
+			self.alphaTween = nil
+		elseif self.alpha == 0 then
+			self.alphaTween = tween.new(0.25, self, {alpha = 1}, "inOutQuad")
 		end
 	end
 end
 
-BackgroundModel.getImage = function(self)
-	return self.image
+BackgroundModel.setBackground = function(self, image)
+	local layer = math.min(#self.images + 1, 3)
+	self.images[layer] = image
+	if layer == 2 then
+		self.alpha = 0
+	end
 end
 
 BackgroundModel.getBackgroundPath = function(self)
@@ -81,9 +114,10 @@ BackgroundModel.loadBackground = function(self, path)
 end
 
 BackgroundModel.loadImage = function(self, path)
-	image.load(path, function(imageData)
+	aquaimage.load(path, function(imageData)
 		if imageData then
-			self.image = love.graphics.newImage(imageData)
+			local image = love.graphics.newImage(imageData)
+			self:setBackground(image)
 		end
 	end)
 end
@@ -122,7 +156,8 @@ end
 
 BackgroundModel.receive = function(self, event)
 	if event.name == "OJNBackground" then
-		self.image = love.graphics.newImage(event.imageData)
+		local image = love.graphics.newImage(event.imageData)
+		self:setBackground(image)
 	end
 end
 

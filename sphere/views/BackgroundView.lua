@@ -17,24 +17,35 @@ end
 BackgroundView.draw = function(self)
 	local cs = self.cs
 
-	local image = self.view.backgroundModel:getImage()
+	local images = self.view.backgroundModel.images
+	local alpha = self.view.backgroundModel.alpha
 
-	if not image then
-		return
+	local r, g, b = 0.4, 0.4, 0.4
+
+	for i = 1, 3 do
+		if not images[i] then
+			return
+		end
+
+		if i == 1 then
+			love.graphics.setColor(r, g, b, 1)
+		elseif i == 2 then
+			love.graphics.setColor(r, g, b, alpha)
+		elseif i == 3 then
+			love.graphics.setColor(r, g, b, 0)
+		end
+
+		local mx = self.cs:x(love.mouse.getX(), true)
+		local my = self.cs:y(love.mouse.getY(), true)
+		frame_draw(
+			images[i],
+			cs:X(0 - map(mx, 0, 1, self.parallax, 0), true),
+			cs:Y(0 - map(my, 0, 1, self.parallax, 0), true),
+			cs:X(1 + 2 * self.parallax),
+			cs:Y(1 + 2 * self.parallax),
+			"out"
+		)
 	end
-
-	love.graphics.setColor(0.4, 0.4, 0.4, 1)
-
-	local mx = self.cs:x(love.mouse.getX(), true)
-	local my = self.cs:y(love.mouse.getY(), true)
-	frame_draw(
-		image,
-		cs:X(0 - map(mx, 0, 1, self.parallax, 0), true),
-		cs:Y(0 - map(my, 0, 1, self.parallax, 0), true),
-		cs:X(1 + 2 * self.parallax),
-		cs:Y(1 + 2 * self.parallax),
-		"out"
-	)
 end
 
 return BackgroundView
