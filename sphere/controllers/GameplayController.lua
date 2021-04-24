@@ -147,8 +147,7 @@ GameplayController.receive = function(self, event)
 		local ResultController = require("sphere.controllers.ResultController")
 		local resultController = ResultController:new()
 
-		resultController.scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
-		resultController.autoplay = self.rhythmModel.logicEngine.autoplay
+		resultController.rhythmModel = self.rhythmModel
 		resultController.selectController = self.selectController
 		resultController.gameController = self.gameController
 

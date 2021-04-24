@@ -16,7 +16,7 @@ ResultController.load = function(self)
 	view.modifierModel = modifierModel
 	view.controller = self
 
-	view.scoreSystem = self.scoreSystem
+	view.rhythmModel = self.rhythmModel
 	view.noteChartModel = noteChartModel
 	view.configModel = self.gameController.configModel
 	view.backgroundModel = self.gameController.backgroundModel

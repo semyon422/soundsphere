@@ -38,11 +38,13 @@ ResultView.load = function(self)
 	local backgroundView = BackgroundView:new()
 	backgroundView.view = self
 
-	valueView.scoreSystem = self.scoreSystem
+	local scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
+
+	valueView.scoreSystem = scoreSystem
 	valueView.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
 	valueView.modifierString = self.modifierModel:getString()
 
-	pointGraphView.scoreSystem = self.scoreSystem
+	pointGraphView.scoreSystem = scoreSystem
 	pointGraphView.noteChartModel = self.noteChartModel
 
 	imageView.root = "."
