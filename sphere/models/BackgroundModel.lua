@@ -11,6 +11,7 @@ BackgroundModel.construct = function(self)
 	self.currentPath = ""
 
 	self.emptyImageData = love.image.newImageData(1, 1)
+	self.emptyImageData:setPixel(0, 0, 0.25, 0.25, 0.25, 1)
 	self.emptyImage = love.graphics.newImage(self.emptyImageData)
 	self.images = {
 		self.emptyImage
@@ -97,7 +98,7 @@ end
 BackgroundModel.loadBackground = function(self, path)
 	local info = love.filesystem.getInfo(path)
 	if not info or info.type == "directory" then
-		self.image = self.emptyImage
+		self:setBackground(self.emptyImage)
 		self.currentPath = path
 		return
 	end
