@@ -23,6 +23,11 @@
 			"tableName": "hits"
 		},
 		{
+			"path": "average.lua",
+			"count": 50,
+			"key": "average_ms"
+		},
+		{
 			"path": "grade.lua",
 			"grades": [
 				{"time": 0.001, "name": "auto"},
