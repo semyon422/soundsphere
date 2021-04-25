@@ -4,6 +4,7 @@ local NoteChartLibraryModel		= require("sphere.models.NoteChartLibraryModel")
 local ScoreLibraryModel		= require("sphere.models.ScoreLibraryModel")
 local SearchLineModel		= require("sphere.models.SearchLineModel")
 local SelectModel		= require("sphere.models.SelectModel")
+local PreviewModel		= require("sphere.models.PreviewModel")
 
 local SelectController = Class:new()
 
@@ -13,6 +14,7 @@ SelectController.construct = function(self)
 	self.scoreLibraryModel = ScoreLibraryModel:new()
 	self.searchLineModel = SearchLineModel:new()
 	self.selectModel = SelectModel:new()
+	self.previewModel = PreviewModel:new()
 end
 
 SelectController.load = function(self)
@@ -21,6 +23,7 @@ SelectController.load = function(self)
 	local scoreLibraryModel = self.scoreLibraryModel
 	local searchLineModel = self.searchLineModel
 	local selectModel = self.selectModel
+	local previewModel = self.previewModel
 
 	local modifierModel = self.gameController.modifierModel
 	local noteSkinModel = self.gameController.noteSkinModel
@@ -50,6 +53,8 @@ SelectController.load = function(self)
 	selectModel.noteChartSetLibraryModel = noteChartSetLibraryModel
 	selectModel.noteChartLibraryModel = noteChartLibraryModel
 	selectModel.scoreLibraryModel = scoreLibraryModel
+	previewModel.configModel = configModel
+	previewModel.cacheModel = cacheModel
 
 	view.themeModel = themeModel
 	view.noteChartModel = noteChartModel
@@ -71,15 +76,18 @@ SelectController.load = function(self)
 	view.selectModel = selectModel
 
 	selectModel:load()
+	previewModel:load()
 
 	view:load()
 end
 
 SelectController.unload = function(self)
+	self.previewModel:unload()
 	self.view:unload()
 end
 
 SelectController.update = function(self, dt)
+	self.previewModel:update(dt)
 	self.view:update(dt)
 end
 
