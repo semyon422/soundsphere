@@ -28,6 +28,7 @@ local InputModel			= require("sphere.models.InputModel")
 local CacheModel			= require("sphere.models.CacheModel")
 local DifficultyModel		= require("sphere.models.DifficultyModel")
 local CollectionModel		= require("sphere.models.CollectionModel")
+local SettingsModel		= require("sphere.models.SettingsModel")
 local MainLog					= require("sphere.MainLog")
 
 local GameController = Class:new()
@@ -55,6 +56,7 @@ GameController.construct = function(self)
 	self.inputModel = InputModel:new()
 	self.difficultyModel = DifficultyModel:new()
 	self.collectionModel = CollectionModel:new()
+	self.settingsModel = SettingsModel:new()
 end
 
 GameController.load = function(self)
@@ -78,6 +80,7 @@ GameController.load = function(self)
 	local inputModel = self.inputModel
 	local difficultyModel = self.difficultyModel
 	local collectionModel = self.collectionModel
+	local settingsModel = self.settingsModel
 
 	directoryManager:createDirectories()
 
@@ -92,6 +95,7 @@ GameController.load = function(self)
 	configModel:addConfig("mount", "userdata/mount.json", "sphere/models/ConfigModel/mount.json", "json")
 	configModel:addConfig("window", "userdata/window.json", "sphere/models/ConfigModel/window.json", "json")
 	configModel:addConfig("result", "userdata/result.json", "sphere/models/ConfigModel/result.json", "json")
+	configModel:addConfig("online", "userdata/online.toml", "sphere/models/ConfigModel/online.toml", "toml")
 
 	configModel:readConfig("settings_model")
 	configModel:readConfig("settings")
@@ -102,6 +106,7 @@ GameController.load = function(self)
 	configModel:readConfig("mount")
 	configModel:readConfig("window")
 	configModel:readConfig("result")
+	configModel:readConfig("online")
 
 	onlineController.onlineModel = onlineModel
 	onlineController.cacheModel = cacheModel
@@ -116,6 +121,9 @@ GameController.load = function(self)
 	modifierModel.scoreModel = scoreModel
 	inputModel.configModel = configModel
 	modifierModel.config = configModel:getConfig("modifier")
+
+	settingsModel.configModel = configModel
+	settingsModel:load()
 
 	themeModel.configModel = configModel
 	themeModel:load()
@@ -181,6 +189,7 @@ GameController.unload = function(self)
 	self.configModel:writeConfig("input")
 	self.configModel:writeConfig("mount")
 	self.configModel:writeConfig("window")
+	self.configModel:writeConfig("online")
 	self.mountModel:unload()
 	self.onlineModel:unload()
 end

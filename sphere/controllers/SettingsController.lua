@@ -15,6 +15,7 @@ SettingsController.load = function(self)
 
 	view.controller = self
 	view.configModel = self.gameController.configModel
+	view.settingsModel = self.gameController.settingsModel
 	view.backgroundModel = self.gameController.backgroundModel
 
 	view:load()

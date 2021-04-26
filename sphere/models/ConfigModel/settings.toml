@@ -1,63 +1,42 @@
-[audio]
-primaryAudioMode = "streamMemoryTempo"
-secondaryAudioMode = "sample"
-previewAudioMode = "streamOpenAL"
-
-[dim]
-select = 0.5
-gameplay = 0.75
-result = 0.75
-
 [general]
 speed = 1
 fps = 240
 theme = "userdata/themes/new"
+replayType = "NanoChart"
+adjustDifficultyAccuracy = 26
+adjustDifficultyPerformance = 300
+timeToPrepare = 2
+inputOffset = 0
+visualOffset = 0
+needTimeRound = 1
+videobga = 0
+imagebga = 1
 
-[volume]
-global = 1
-music = 1
-effects = 1
+[graphics]
+dimSelect = 0.5
+dimGameplay = 0.75
+dimResult = 0.75
 
-[screen]
-settings = "f1"
-browser = "tab"
+[audio]
+primaryAudioMode = "streamMemoryTempo"
+secondaryAudioMode = "sample"
+previewAudioMode = "streamOpenAL"
+volumeGlobal = 1
+volumeMusic = 1
+volumeEffects = 1
+midiConstantVolume = 0
 
-[gameplay]
+[input]
 pause = "escape"
 skipIntro = "space"
 quickRestart = "`"
-timeToPrepare = 2
-inputOffset = 0
 invertPlaySpeed = "f2"
 decreasePlaySpeed = "f3"
 increasePlaySpeed = "f4"
 invertTimeRate = "f7"
 decreaseTimeRate = "f5"
 increaseTimeRate = "f6"
-needTimeRound = true
-videobga = false
-imagebga = true
-
-[select]
 selectRandomNoteChartSet = "f2"
-adjustDifficultyAccuracy = 26
-adjustDifficultyPerformance = 300
 adjustDifficulty = "f3"
-
-[screenshot]
-capture = "f12"
-open = "lshift"
-
-[replay]
-type = "NanoChart"
-
-[online]
-host = "https://soundsphere.xyz"
-session = ""
-token = ""
-userId = 1
-email = ""
-quick_login_key = ""
-
-[parser]
-midiConstantVolume = false
+screenshotCapture = "f12"
+screenshotOpen = "lshift"
