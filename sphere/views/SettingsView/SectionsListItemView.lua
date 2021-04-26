@@ -5,15 +5,15 @@ local spherefonts		= require("sphere.assets.fonts")
 
 local ListItemView = require(viewspackage .. "ListItemView")
 
-local CategoriesListItemView = ListItemView:new()
+local SectionsListItemView = ListItemView:new()
 
-CategoriesListItemView.init = function(self)
+SectionsListItemView.init = function(self)
 	self:on("draw", self.draw)
 
 	self.fontName = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
 end
 
-CategoriesListItemView.draw = function(self)
+SectionsListItemView.draw = function(self)
 	local listView = self.listView
 
 	local itemIndex = self.itemIndex
@@ -27,7 +27,7 @@ CategoriesListItemView.draw = function(self)
 	local h = cs:Y(listView.h)
 
 	local index = self.index
-	local categoryItem = item
+	local sectionItem = item
 
 	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
 	if listView.isSelected then
@@ -40,7 +40,7 @@ CategoriesListItemView.draw = function(self)
 
 	love.graphics.setFont(self.fontName)
 	love.graphics.printf(
-		categoryItem.name,
+		sectionItem[1].section,
 		x,
 		y + (index - 1) * h / listView.itemCount,
 		w / cs.one * 1080,
@@ -53,7 +53,7 @@ CategoriesListItemView.draw = function(self)
 	)
 end
 
-CategoriesListItemView.receive = function(self, event)
+SectionsListItemView.receive = function(self, event)
 	local x, y, w, h = self:getPosition()
 	local mx, my = love.mouse.getPosition()
 
@@ -65,4 +65,4 @@ CategoriesListItemView.receive = function(self, event)
 	end
 end
 
-return CategoriesListItemView
+return SectionsListItemView

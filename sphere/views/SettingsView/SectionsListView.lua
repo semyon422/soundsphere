@@ -2,12 +2,12 @@ local viewspackage = (...):match("^(.-%.views%.)")
 
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local ListView = require(viewspackage .. "ListView")
-local CategoriesListItemView = require(viewspackage .. "SettingsView.CategoriesListItemView")
+local SectionsListItemView = require(viewspackage .. "SettingsView.SectionsListItemView")
 
-local CategoriesListView = ListView:new()
+local SectionsListView = ListView:new()
 
-CategoriesListView.init = function(self)
-	self.ListItemView = CategoriesListItemView
+SectionsListView.init = function(self)
+	self.ListItemView = SectionsListItemView
 	self.view = self.view
 	self.cs = CoordinateManager:getCS(0.5, 0, 0, 0, "h")
 	self.x = -16 / 9 / 3 + 16 / 9 / 3 / 4
@@ -20,11 +20,11 @@ CategoriesListView.init = function(self)
 	self:reloadItems()
 
 	self:on("update", function()
-		self.selectedItem = self.navigator.categoriesList.selected
+		self.selectedItem = self.navigator.sectionsList.selected
 	end)
 	self:on("select", function()
         if not self.navigator:checkNode("inputHandler") then
-		    self.navigator:setNode("categoriesList")
+		    self.navigator:setNode("sectionsList")
         end
 	end)
 	self:on("draw", self.drawFrame)
@@ -47,16 +47,16 @@ CategoriesListView.init = function(self)
 	ListView.init(self)
 end
 
-CategoriesListView.reloadItems = function(self)
-	self.items = self.config_settings_model
+SectionsListView.reloadItems = function(self)
+	self.items = self.view.settingsModel.sections
 end
 
-CategoriesListView.drawFrame = function(self)
-	if self.navigator:checkNode("categoriesList") then
+SectionsListView.drawFrame = function(self)
+	if self.navigator:checkNode("sectionsList") then
 		self.isSelected = true
 	else
 		self.isSelected = false
 	end
 end
 
-return CategoriesListView
+return SectionsListView

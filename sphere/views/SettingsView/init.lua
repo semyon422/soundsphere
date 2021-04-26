@@ -4,7 +4,7 @@ local Class = require("aqua.util.Class")
 local Node = require("aqua.util.Node")
 local SettingsNavigator = require(viewspackage .. "SettingsView.SettingsNavigator")
 local SettingsListView = require(viewspackage .. "SettingsView.SettingsListView")
-local CategoriesListView = require(viewspackage .. "SettingsView.CategoriesListView")
+local SectionsListView = require(viewspackage .. "SettingsView.SectionsListView")
 local BackgroundView = require(viewspackage .. "BackgroundView")
 
 local SettingsView = Class:new()
@@ -15,32 +15,28 @@ end
 
 SettingsView.load = function(self)
 	local node = self.node
-	local config_settings = self.configModel:getConfig("settings")
-	local config_settings_model = self.configModel:getConfig("settings_model")
+	local config = self.configModel:getConfig("settings")
 
 	local navigator = SettingsNavigator:new()
 	self.navigator = navigator
-	navigator.config_settings = config_settings
-	navigator.config_settings_model = config_settings_model
+	navigator.config = config
 	navigator.view = self
 
-	local categoriesListView = CategoriesListView:new()
-	categoriesListView.navigator = navigator
-	categoriesListView.config_settings = config_settings
-	categoriesListView.config_settings_model = config_settings_model
-	categoriesListView.view = self
+	local sectionsListView = SectionsListView:new()
+	sectionsListView.navigator = navigator
+	sectionsListView.config = config
+	sectionsListView.view = self
 
 	local settingsListView = SettingsListView:new()
 	settingsListView.navigator = navigator
-	settingsListView.config_settings = config_settings
-	settingsListView.config_settings_model = config_settings_model
+	settingsListView.config = config
 	settingsListView.view = self
 
 	local backgroundView = BackgroundView:new()
 	backgroundView.view = self
 
 	node:node(backgroundView)
-	node:node(categoriesListView)
+	node:node(sectionsListView)
 	node:node(settingsListView)
 
 	navigator:load()

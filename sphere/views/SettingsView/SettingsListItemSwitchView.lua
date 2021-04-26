@@ -53,8 +53,7 @@ SettingsListItemSwitchView.draw = function(self)
 
 	local switchView = self.switchView
 	switchView:setPosition(x + 3 * w / 4 - h / 2, y, h, h)
-	-- switchView:setValue(modifier:getNormalizedValue(modifierConfig))
-	switchView:setValue(1)
+	switchView:setValue(listView.view.settingsModel:getValue(settingConfig))
 	switchView:draw()
 end
 
@@ -70,11 +69,10 @@ SettingsListItemSwitchView.receive = function(self, event)
 	local x, y, w, h = self:getPosition()
 
 	local switch = listView.switch
-	-- local modifierConfig = self.item
+	local settingConfig = self.item
 	-- local modifier = listView.view.modifierModel:getSettings(modifierConfig)
 	switch:setPosition(x + 3 * w / 4 - h / 2, y, h, h)
-	-- switch:setValue(modifier:getRealValue(modifierConfig))
-	switch:setValue(1)
+	switch:setValue(listView.view.settingsModel:getValue(settingConfig))
 	switch:receive(event)
 
 	if switch.valueUpdated then

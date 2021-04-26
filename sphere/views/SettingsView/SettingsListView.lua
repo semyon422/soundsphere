@@ -80,7 +80,7 @@ end
 SettingsListView.getListItemView = function(self, settingConfig)
 	if settingConfig.type == "slider" or settingConfig.type == "listSwitcher" then
 		return self.listItemSliderView
-	elseif settingConfig.type == "checkbox" then
+	elseif settingConfig.type == "switch" then
 		return self.listItemSwitchView
 	elseif settingConfig.type == "keybind" then
 		return self.listItemInputView
@@ -88,8 +88,8 @@ SettingsListView.getListItemView = function(self, settingConfig)
 end
 
 SettingsListView.reloadItems = function(self)
-	self.items = self.config_settings_model[self.navigator.categoriesList.selected].items
-    self.categoryName = self.config_settings_model[self.navigator.categoriesList.selected].name
+	self.items = self.view.settingsModel.sections[self.navigator.sectionsList.selected]
+    self.sectionName = self.view.settingsModel.sections[self.navigator.sectionsList.selected][1].section
 end
 
 SettingsListView.drawFrame = function(self)

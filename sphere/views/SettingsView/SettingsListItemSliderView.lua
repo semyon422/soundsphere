@@ -41,7 +41,7 @@ SettingsListItemSliderView.draw = function(self)
 
 	love.graphics.setFont(self.fontName)
 	love.graphics.printf(
-		settingConfig.name .. " " .. 1,
+		settingConfig.name .. " " .. listView.view.settingsModel:getDisplayValue(settingConfig),
 		x,
 		y,
 		w / cs.one * 1080,
@@ -55,8 +55,7 @@ SettingsListItemSliderView.draw = function(self)
 
 	local sliderView = self.sliderView
 	sliderView:setPosition(x + w / 2, y, w / 2, h)
-	-- sliderView:setValue(modifier:getNormalizedValue(modifierConfig))
-	sliderView:setValue(1)
+	sliderView:setValue(listView.view.settingsModel:getNormalizedValue(settingConfig))
 	sliderView:draw()
 end
 
@@ -76,11 +75,10 @@ SettingsListItemSliderView.receive = function(self, event)
 
 	local slider = listView.slider
 
-	-- local modifierConfig = self.item
+	local settingConfig = self.item
 	-- local modifier = listView.view.modifierModel:getSettings(modifierConfig)
 	slider:setPosition(x + w / 2, y, w / 2, h)
-	-- slider:setValue(modifier:getNormalizedValue(modifierConfig))
-	slider:setValue(1)
+	slider:setValue(listView.view.settingsModel:getNormalizedValue(settingConfig))
 	slider:receive(event)
 
 	if slider.valueUpdated then

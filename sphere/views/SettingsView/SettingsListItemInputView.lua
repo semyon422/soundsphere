@@ -65,7 +65,7 @@ SettingsListItemInputView.receive = function(self, event)
 		not navigator:checkNode("inputHandler") and
 		event.name == "keypressed" and event.args[1] == "return"
 	then
-		navigator.inputHandler.categoryName = ""
+		navigator.inputHandler.sectionName = ""
 		navigator.inputHandler.settingName = ""
 		navigator:setNode("inputHandler")
 		return

@@ -12,9 +12,9 @@ SettingsNavigator.construct = function(self)
 	self.settingsList = settingsList
 	settingsList.selected = 1
 
-	local categoriesList = Node:new()
-	self.categoriesList = categoriesList
-	categoriesList.selected = 1
+	local sectionsList = Node:new()
+	self.sectionsList = sectionsList
+	sectionsList.selected = 1
 
 	local inputHandler = Node:new()
 	self.inputHandler = inputHandler
@@ -22,23 +22,23 @@ SettingsNavigator.construct = function(self)
 end
 
 SettingsNavigator.scrollCategories = function(self, direction, destination)
-	local categoriesList = self.categoriesList
+	local sectionsList = self.sectionsList
 
-	local categories = self.config_settings_model
+	local sections = self.view.settingsModel.sections
 
-	direction = direction or destination - categoriesList.selected
-	if not categories[categoriesList.selected + direction] then
+	direction = direction or destination - sectionsList.selected
+	if not sections[sectionsList.selected + direction] then
 		return
 	end
 
-	categoriesList.selected = categoriesList.selected + direction
+	sectionsList.selected = sectionsList.selected + direction
 end
 
 SettingsNavigator.scrollSettings = function(self, direction, destination)
 	local settingsList = self.settingsList
-	local categoriesList = self.categoriesList
+	local sectionsList = self.sectionsList
 
-	local settings = self.config_settings_model[categoriesList.selected].items
+	local settings = self.view.settingsModel.sections[sectionsList.selected]
 
 	direction = direction or destination - settingsList.selected
 	if not settings[settingsList.selected + direction] then
@@ -51,21 +51,21 @@ end
 SettingsNavigator.load = function(self)
 	Navigator.load(self)
 
-	local categoriesList = self.categoriesList
+	local sectionsList = self.sectionsList
 	local settingsList = self.settingsList
 	local inputHandler = self.inputHandler
 
-	self.node = categoriesList
-	categoriesList:on("up", function()
+	self.node = sectionsList
+	sectionsList:on("up", function()
 		self:scrollCategories(-1)
 	end)
-	categoriesList:on("down", function()
+	sectionsList:on("down", function()
 		self:scrollCategories(1)
 	end)
-	categoriesList:on("tab", function()
+	sectionsList:on("tab", function()
 		self.node = settingsList
 	end)
-	categoriesList:on("escape", function()
+	sectionsList:on("escape", function()
 		self:send({
 			name = "goSelectScreen"
 		})
@@ -78,12 +78,12 @@ SettingsNavigator.load = function(self)
 		self:scrollSettings(1)
 	end)
 	settingsList:on("tab", function()
-		self.node = categoriesList
+		self.node = sectionsList
 	end)
 	settingsList:on("backspace", function(_, itemIndex)
 		self:send({
 			name = "resetSettingsItem",
-			categoryIndex = categoriesList.selected,
+			sectionIndex = sectionsList.selected,
 			settingIndex = itemIndex or settingsList.selected
 		})
 	end)
@@ -96,7 +96,7 @@ SettingsNavigator.load = function(self)
 	inputHandler:on("keypressed", function(_, key, type)
 		self:send({
 			name = "setInputBinding",
-			categoryName = inputHandler.categoryName,
+			sectionName = inputHandler.sectionName,
 			settingName = inputHandler.settingName,
 			value = key,
 			type = type
