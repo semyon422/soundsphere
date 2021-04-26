@@ -27,7 +27,7 @@ PreviewModel.update = function(self, dt)
 	if self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
 		self.noteChartDataEntryId = self.config.noteChartDataEntryId
 		local audioPath, previewTime = self:getAudioPathPreview()
-		if self.audioPath ~= audioPath then
+		if audioPath and self.audioPath ~= audioPath then
 			self.audioPath = audioPath
 			self.previewTime = previewTime
 			self.loadable = 0
@@ -53,6 +53,10 @@ PreviewModel.getAudioPathPreview = function(self)
 
 	local noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(config.noteChartSetEntryId)
 	local noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntryById(config.noteChartDataEntryId)
+
+	if not noteChartSetEntry then
+		return
+	end
 
 	local directoryPath = noteChartSetEntry.path
 	local audioPath = noteChartDataEntry.audioPath

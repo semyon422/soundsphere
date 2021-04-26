@@ -40,7 +40,7 @@ BackgroundModel.update = function(self, dt)
 	if self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
 		self.noteChartDataEntryId = self.config.noteChartDataEntryId
 		local backgroundPath = self:getBackgroundPath()
-		if self.backgroundPath ~= backgroundPath then
+		if backgroundPath and self.backgroundPath ~= backgroundPath then
 			self.backgroundPath = backgroundPath
 			self.loadable = 0
 			self.loadTween = tween.new(0.1, self, {loadable = 1}, "inOutQuad")
@@ -80,6 +80,10 @@ BackgroundModel.getBackgroundPath = function(self)
 
 	local noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(config.noteChartSetEntryId)
 	local noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntryById(config.noteChartDataEntryId)
+
+	if not noteChartSetEntry then
+		return
+	end
 
 	local directoryPath = noteChartSetEntry.path
 	local stagePath = noteChartDataEntry.stagePath
