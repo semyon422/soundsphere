@@ -7,12 +7,12 @@ OnlineController.construct = function(self)
 end
 
 OnlineController.load = function(self)
-	local config = self.configModel:getConfig("settings")
-	local token = config.online.token
+	local config = self.configModel:getConfig("online")
+	local token = config.token
 	if #token == 0 then
 		print("creating new token")
-		local email = config.online.email
-		local password = config.online.password
+		local email = config.email
+		local password = config.password
 		self.onlineModel:createToken(email, password)
 		return
 	end
@@ -21,7 +21,7 @@ OnlineController.load = function(self)
 end
 
 OnlineController.receive = function(self, event)
-	local config = self.configModel:getConfig("settings")
+	local config = self.configModel:getConfig("online")
 	if event.name == "ScoreSubmitResponse" then
 		print(event.response.message)
 		print("Server received the score")
@@ -45,18 +45,18 @@ OnlineController.receive = function(self, event)
 		print("Server received the replay")
 	elseif event.name == "TokenResponse" then
 		if event.response.status then
-			config.online.token = event.response.token
+			config.token = event.response.token
 			print("New token: " .. event.response.token)
 			print("check session")
 			self.onlineModel:checkSession()
-			config.online.email = ""
-			config.online.password = ""
+			config.email = ""
+			config.password = ""
 		else
 			print(event.response.message)
 		end
 	elseif event.name == "SessionResponse" then
 		if event.response.status then
-			config.online.session = event.response.session
+			config.session = event.response.session
 			print("New session: " .. event.response.session)
 			self.onlineModel:setSession(event.response.session)
 		else
@@ -72,13 +72,13 @@ OnlineController.receive = function(self, event)
 		else
 			print("Current session is not valid")
 			print("create session")
-			self.onlineModel:createSession(config.online.token)
+			self.onlineModel:createSession(config.token)
 		end
 	elseif event.name == "SessionUpdateResponse" then
 		print(event.response.message)
 	elseif event.name == "QuickLoginGetResponse" then
 		if event.response.status then
-			config.online.quick_login_key = event.response.key
+			config.quick_login_key = event.response.key
 			local url = self.onlineModel.host .. "/quick_login?key=" .. event.response.key
 			print(url)
 			love.system.openURL(url)
@@ -89,11 +89,11 @@ OnlineController.receive = function(self, event)
 		if event.response.status then
 			event.name = "TokenResponse"
 			self:receive(event)
-			config.online.quick_login_key = ""
+			config.quick_login_key = ""
 		else
 			print(event.response.message)
 			print("Quick login key was deleted")
-			config.online.quick_login_key = ""
+			config.quick_login_key = ""
 		end
 	end
 end
@@ -110,8 +110,8 @@ OnlineController.submitReplay = function(self, replayHash, url)
 end
 
 OnlineController.update = function(self, dt)
-	local config = self.configModel:getConfig("settings")
-	local token = config.online.token
+	local config = self.configModel:getConfig("online")
+	local token = config.token
 	if #token == 0 then
 		return
 	end
