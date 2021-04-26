@@ -31,7 +31,7 @@ NoteSkinController.load = function(self)
 	view.searchLineModel = self.gameController.searchLineModel
 	view.backgroundModel = self.gameController.backgroundModel
 
-	noteChartModel:select()
+	noteChartModel:load()
 
 	view:load()
 end

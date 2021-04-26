@@ -23,7 +23,7 @@ InputController.load = function(self)
 	view.configModel = self.gameController.configModel
 	view.backgroundModel = self.gameController.backgroundModel
 
-	noteChartModel:select()
+	noteChartModel:load()
 
 	view:load()
 end

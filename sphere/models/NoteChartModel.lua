@@ -3,7 +3,7 @@ local NoteChartFactory			= require("notechart.NoteChartFactory")
 
 local NoteChartModel = Class:new()
 
-NoteChartModel.select = function(self)
+NoteChartModel.load = function(self)
 	local config = self.configModel:getConfig("select")
 
 	local cacheManager = self.cacheModel.cacheManager
@@ -21,6 +21,12 @@ NoteChartModel.select = function(self)
 	self.noteChartDataEntry = cacheManager:getNoteChartDataEntryById(config.noteChartDataEntryId)
 		or cacheManager:getEmptyNoteChartDataEntry(self.noteChartEntry.path)
 	self.scoreEntry = self.scoreModel.scoreManager:getScoreEntryById(config.scoreEntryId)
+end
+
+NoteChartModel.getFileInfo = function(self)
+	if self.noteChartEntry then
+		return love.filesystem.getInfo(self.noteChartEntry.path)
+	end
 end
 
 NoteChartModel.loadNoteChart = function(self, settings)

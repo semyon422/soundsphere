@@ -146,7 +146,7 @@ GameController.load = function(self)
 	inputModel:load()
 	noteSkinModel:load()
 	cacheModel:load()
-	noteChartModel:select()
+	noteChartModel:load()
 
 	onlineController:load()
 
