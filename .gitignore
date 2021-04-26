@@ -20,6 +20,7 @@ userdata/scores.db
 userdata/select.toml
 userdata/settings.toml
 userdata/window.json
+userdata/online.toml
 
 userdata/charts.db-journal
 userdata/scores.db-journal
