@@ -78,6 +78,7 @@ end
 SelectModel.pullNoteChartSet = function(self)
 	self.noteChartLibraryModel:setSearchString(self.config.searchString)
 	self.noteChartSetLibraryModel:setSearchString(self.config.searchString)
+	self.noteChartSetLibraryModel:setCollection(self.config.collection)
 	self.noteChartLibraryModel:updateItems()
 	self.noteChartSetLibraryModel:updateItems()
 

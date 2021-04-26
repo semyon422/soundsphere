@@ -4,6 +4,10 @@ local Class			= require("aqua.util.Class")
 
 local CacheUpdater = Class:new()
 
+CacheUpdater.state = 0
+CacheUpdater.noteChartCount = 0
+CacheUpdater.cachePercent = 0
+
 CacheUpdater.construct = function(self)
 	self.observable = Observable:new()
 end
@@ -21,13 +25,21 @@ CacheUpdater.send = function(self, event)
 end
 
 CacheUpdater.receive = function(self, event)
-	if event.name == "CacheProgress" then
-		if event.state == 3 then
-			self.cacheManager:select()
-			self.isUpdating = false
-		end
-		self:send(event)
+	if event.name ~= "CacheProgress" then
+		return
 	end
+
+	if event.state == 1 then
+		self.noteChartCount = event.noteChartCount
+	elseif event.state == 2 then
+		self.cachePercent = event.cachePercent
+	elseif event.state == 3 then
+		self.cacheManager:select()
+		self.isUpdating = false
+	end
+	self.state = event.state
+
+	self:send(event)
 end
 
 CacheUpdater.stop = function(self)

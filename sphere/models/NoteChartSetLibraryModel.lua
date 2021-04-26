@@ -5,14 +5,16 @@ local NoteChartSetLibraryModel = Class:new()
 
 NoteChartSetLibraryModel.construct = function(self)
 	self.searchString = ""
+	self.collection = ""
 	self.items = {}
 end
 
 NoteChartSetLibraryModel.setSearchString = function(self, searchString)
-	if searchString == self.searchString then
-		return
-	end
 	self.searchString = searchString
+end
+
+NoteChartSetLibraryModel.setCollection = function(self, collection)
+	self.collection = collection
 end
 
 NoteChartSetLibraryModel.updateItems = function(self)
@@ -36,9 +38,9 @@ end
 
 
 NoteChartSetLibraryModel.checkNoteChartSetEntry = function(self, entry)
-	-- local base = entry.path:find(self.basePath, 1, true)
-	-- if not base then return false end
-	-- if not self.needSearch then return true end
+	if not entry.path:find(self.collection, 1, true) then
+		return false
+	end
 
 	local list = self.cacheModel.cacheManager:getNoteChartsAtSet(entry.id)
 	if not list or not list[1] then

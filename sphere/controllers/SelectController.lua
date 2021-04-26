@@ -37,6 +37,7 @@ SelectController.load = function(self)
 	local onlineModel = self.gameController.onlineModel
 	local difficultyModel = self.gameController.difficultyModel
 	local backgroundModel = self.gameController.backgroundModel
+	local collectionModel = self.gameController.collectionModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -45,9 +46,10 @@ SelectController.load = function(self)
 	self.view = view
 
 	noteChartSetLibraryModel.cacheModel = cacheModel
+	noteChartSetLibraryModel.collectionModel = collectionModel
 	noteChartLibraryModel.cacheModel = cacheModel
 	scoreLibraryModel.scoreModel = scoreModel
-	selectModel.noteChartModel = noteChartModel
+	selectModel.collectionModel = collectionModel
 	selectModel.configModel = configModel
 	selectModel.searchLineModel = searchLineModel
 	selectModel.noteChartSetLibraryModel = noteChartSetLibraryModel
@@ -117,7 +119,15 @@ SelectController.receive = function(self, event)
 			self:switchInputController()
 		elseif event.item.controllerName == "SettingsController" then
 			self:switchSettingsController()
+		elseif event.item.controllerName == "CollectionController" then
+			self:switchCollectionController()
 		end
+	elseif event.name == "startCacheUpdate" then
+		self.gameController.cacheModel:startUpdate()
+		print("start update")
+	elseif event.name == "stopCacheUpdate" then
+		self.gameController.cacheModel:stopUpdate()
+		print("stop update")
 	elseif event.action == "playNoteChart" then
 		self:playNoteChart()
 	elseif event.name == "loadModifiedNoteChart" then
@@ -206,6 +216,14 @@ SelectController.switchSettingsController = function(self)
 	settingsController.selectController = self
 	settingsController.gameController = self.gameController
 	return self.gameController.screenManager:set(settingsController)
+end
+
+SelectController.switchCollectionController = function(self)
+	local CollectionController = require("sphere.controllers.CollectionController")
+	local collectionController = CollectionController:new()
+	collectionController.selectController = self
+	collectionController.gameController = self.gameController
+	return self.gameController.screenManager:set(collectionController)
 end
 
 SelectController.playNoteChart = function(self)

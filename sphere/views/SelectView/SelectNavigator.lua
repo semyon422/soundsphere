@@ -64,6 +64,18 @@ SelectNavigator.load = function(self)
 	noteChartSetList:on("left", function()
 		self.node = noteChartList
 	end)
+	noteChartSetList:on("f5", function()
+		local cacheUpdater = self.view.cacheModel.cacheUpdater
+		if cacheUpdater.state == 0 or cacheUpdater.state == 3 then
+			self:send({
+				name = "startCacheUpdate"
+			})
+		else
+			self:send({
+				name = "stopCacheUpdate"
+			})
+		end
+	end)
 
 	noteChartList:on("up", function()
 		self:send({

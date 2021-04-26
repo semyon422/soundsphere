@@ -10,9 +10,9 @@ SelectMenuView.init = function(self)
 	self.ListItemView = SelectMenuItemView
 	self.view = self.view
 	self.cs = CoordinateManager:getCS(0.5, 0, 0, 0, "h")
-	self.x = -16 / 9 / 3 / 2
+	self.x = -0.5
 	self.y = 14 / 15
-	self.w = 16 / 9 / 3
+	self.w = 1
 	self.h = 1 / 15
 	self.selectedItem = 1
 
@@ -48,6 +48,10 @@ SelectMenuView.reloadItems = function(self)
 		{
 			name = "settings",
 			controllerName = "SettingsController"
+		},
+		{
+			name = "collection",
+			controllerName = "CollectionController"
 		},
 	}
 end

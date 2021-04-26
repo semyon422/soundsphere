@@ -27,6 +27,7 @@ local NoteSkinModel			= require("sphere.models.NoteSkinModel")
 local InputModel			= require("sphere.models.InputModel")
 local CacheModel			= require("sphere.models.CacheModel")
 local DifficultyModel		= require("sphere.models.DifficultyModel")
+local CollectionModel		= require("sphere.models.CollectionModel")
 local MainLog					= require("sphere.MainLog")
 
 local GameController = Class:new()
@@ -53,6 +54,7 @@ GameController.construct = function(self)
 	self.noteChartModel = NoteChartModel:new()
 	self.inputModel = InputModel:new()
 	self.difficultyModel = DifficultyModel:new()
+	self.collectionModel = CollectionModel:new()
 end
 
 GameController.load = function(self)
@@ -75,6 +77,7 @@ GameController.load = function(self)
 	local noteChartModel = self.noteChartModel
 	local inputModel = self.inputModel
 	local difficultyModel = self.difficultyModel
+	local collectionModel = self.collectionModel
 
 	directoryManager:createDirectories()
 
@@ -152,6 +155,10 @@ GameController.load = function(self)
 	backgroundModel.configModel = configModel
 	backgroundModel.cacheModel = cacheModel
 	backgroundModel:load()
+
+	collectionModel.configModel = configModel
+	collectionModel.cacheModel = self.cacheModel
+	collectionModel:load()
 
 	self.screenManager:setTransition(self.fadeTransition)
 
