@@ -77,6 +77,7 @@ SelectController.load = function(self)
 	view.searchLineModel = searchLineModel
 	view.selectModel = selectModel
 
+	noteChartModel:load()
 	selectModel:load()
 	previewModel:load()
 
@@ -168,8 +169,7 @@ SelectController.unloadModifiedNoteChart = function(self)
 end
 
 SelectController.switchModifierController = function(self)
-	local info = love.filesystem.getInfo(self.gameController.noteChartModel.noteChartEntry.path)
-	if not info then
+	if not self.gameController.noteChartModel:getFileInfo() then
 		return
 	end
 
@@ -181,8 +181,7 @@ SelectController.switchModifierController = function(self)
 end
 
 SelectController.switchNoteSkinController = function(self)
-	local info = love.filesystem.getInfo(self.gameController.noteChartModel.noteChartEntry.path)
-	if not info then
+	if not self.gameController.noteChartModel:getFileInfo() then
 		return
 	end
 
@@ -196,8 +195,7 @@ SelectController.switchNoteSkinController = function(self)
 end
 
 SelectController.switchInputController = function(self)
-	local info = love.filesystem.getInfo(self.gameController.noteChartModel.noteChartEntry.path)
-	if not info then
+	if not self.gameController.noteChartModel:getFileInfo() then
 		return
 	end
 
@@ -227,8 +225,7 @@ SelectController.switchCollectionController = function(self)
 end
 
 SelectController.playNoteChart = function(self)
-	local info = love.filesystem.getInfo(self.gameController.noteChartModel.noteChartEntry.path)
-	if not info then
+	if not self.gameController.noteChartModel:getFileInfo() then
 		return
 	end
 
@@ -241,8 +238,7 @@ end
 
 SelectController.replayNoteChart = function(self, mode, hash)
 	local noteChartModel = self.noteChartModel
-	local info = love.filesystem.getInfo(noteChartModel.noteChartEntry.path)
-	if not info then
+	if not noteChartModel:getFileInfo() then
 		return
 	end
 	if noteChartModel.noteChartDataEntry.hash == "" then
