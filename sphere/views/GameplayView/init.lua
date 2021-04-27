@@ -7,6 +7,7 @@ local ProgressView	= require("sphere.views.GameplayView.ProgressView")
 local PointGraphView	= require("sphere.views.GameplayView.PointGraphView")
 local ImageView	= require("sphere.views.GameplayView.ImageView")
 local SequenceView	= require("sphere.views.SequenceView")
+local BackgroundView = require("sphere.views.BackgroundView")
 
 local GameplayView = Class:new()
 
@@ -19,6 +20,7 @@ GameplayView.construct = function(self)
 	self.discordGameplayView = DiscordGameplayView:new()
 	self.sequenceView = SequenceView:new()
 	self.pauseOverlay = PauseOverlay:new()
+	self.backgroundView = BackgroundView:new()
 end
 
 GameplayView.load = function(self)
@@ -32,6 +34,7 @@ GameplayView.load = function(self)
 	local pauseOverlay = self.pauseOverlay
 	local configModel = self.configModel
 	local modifierModel = self.modifierModel
+	local backgroundView = self.backgroundView
 
 	local config = configModel:getConfig("settings")
 
@@ -67,6 +70,9 @@ GameplayView.load = function(self)
 
 	discordGameplayView.rhythmModel = self.rhythmModel
 	discordGameplayView.noteChartModel = self.noteChartModel
+
+	backgroundView.view = self
+	backgroundView:init()
 end
 
 GameplayView.unload = function(self)
@@ -86,6 +92,7 @@ GameplayView.update = function(self, dt)
 end
 
 GameplayView.draw = function(self)
+	self.backgroundView:draw()
 	self.sequenceView:draw()
 	self.pauseOverlay:draw()
 end
