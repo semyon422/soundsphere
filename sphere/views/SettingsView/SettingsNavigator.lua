@@ -18,7 +18,6 @@ SettingsNavigator.construct = function(self)
 
 	local inputHandler = Node:new()
 	self.inputHandler = inputHandler
-	inputHandler.key = ""
 end
 
 SettingsNavigator.scrollCategories = function(self, direction, destination)
@@ -110,10 +109,11 @@ SettingsNavigator.load = function(self)
 	end)
 
 	inputHandler:on("keypressed", function(_, key, type)
+		local settings = self.view.settingsModel.sections[sectionsList.selected]
+		local settingConfig = inputHandler.settingConfig or settings[settingsList.selected]
 		self:send({
 			name = "setInputBinding",
-			sectionName = inputHandler.sectionName,
-			settingName = inputHandler.settingName,
+			settingConfig = settingConfig,
 			value = key,
 			type = type
 		})

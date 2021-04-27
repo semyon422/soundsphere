@@ -53,6 +53,18 @@ SettingsListItemInputView.draw = function(self)
 		-cs:X(0 / cs.one),
 		-cs:Y(18 / cs.one)
 	)
+	love.graphics.printf(
+		listView.view.settingsModel:getValue(settingConfig),
+		x + w / 2,
+		y,
+		w / 2 / cs.one * 1080,
+		"center",
+		0,
+		cs.one / 1080,
+		cs.one / 1080,
+		-cs:X(0 / cs.one),
+		-cs:Y(18 / cs.one)
+	)
 end
 
 SettingsListItemInputView.receive = function(self, event)
@@ -65,8 +77,7 @@ SettingsListItemInputView.receive = function(self, event)
 		not navigator:checkNode("inputHandler") and
 		event.name == "keypressed" and event.args[1] == "return"
 	then
-		navigator.inputHandler.sectionName = ""
-		navigator.inputHandler.settingName = ""
+		navigator.inputHandler.settingConfig = nil
 		navigator:setNode("inputHandler")
 		return
 	end
@@ -83,19 +94,10 @@ SettingsListItemInputView.receive = function(self, event)
 		listView.activeItem = self.itemIndex
 		local button = event.args[3]
 		if button == 1 then
+			navigator.inputHandler.settingConfig = self.item
 			self.listView.navigator:setNode("inputHandler")
-			-- self.listView.navigator:call("return", self.itemIndex)
 		end
 	end
-
-	-- if switch.valueUpdated then
-	-- 	if switch.value == 0 then
-	-- 		self.listView.navigator:call("left", self.itemIndex)
-	-- 	else
-	-- 		self.listView.navigator:call("right", self.itemIndex)
-	-- 	end
-	-- 	switch.valueUpdated = false
-	-- end
 end
 
 return SettingsListItemInputView

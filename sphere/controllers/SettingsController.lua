@@ -44,6 +44,8 @@ SettingsController.receive = function(self, event)
 		self.gameController.settingsModel:increaseValue(event.settingConfig, 1)
 	elseif event.name == "decreaseSettingValue" then
 		self.gameController.settingsModel:increaseValue(event.settingConfig, -1)
+	elseif event.name == "setInputBinding" then
+		self.gameController.settingsModel:setValue(event.settingConfig, event.value)
 	end
 end
 

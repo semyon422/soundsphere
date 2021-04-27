@@ -210,79 +210,79 @@
 	},
 	{
 		"name": "pause",
-		"type": "keybind",
+		"type": "binding",
 		"section": "input",
 		"key": "pause"
 	},
 	{
 		"name": "skip intro",
-		"type": "keybind",
+		"type": "binding",
 		"section": "input",
 		"key": "skipIntro"
 	},
 	{
 		"name": "quick restart",
-		"type": "keybind",
+		"type": "binding",
 		"section": "input",
 		"key": "quickRestart"
 	},
 	{
 		"name": "select random song",
-		"type": "keybind",
+		"type": "binding",
 		"section": "input",
 		"key": "selectRandomNoteChartSet"
 	},
 	{
 		"name": "invert play speed",
-		"type": "keybind",
+		"type": "binding",
 		"section": "input",
 		"key": "invertPlaySpeed"
 	},
 	{
 		"name": "decrease play speed",
-		"type": "keybind",
+		"type": "binding",
 		"section": "input",
 		"key": "decreasePlaySpeed"
 	},
 	{
 		"name": "increase play speed",
-		"type": "keybind",
+		"type": "binding",
 		"section": "input",
 		"key": "increasePlaySpeed"
 	},
 	{
 		"name": "invert time rate",
-		"type": "keybind",
+		"type": "binding",
 		"section": "input",
 		"key": "invertTimeRate"
 	},
 	{
 		"name": "decrease time rate",
-		"type": "keybind",
+		"type": "binding",
 		"section": "input",
 		"key": "decreaseTimeRate"
 	},
 	{
 		"name": "increase time rate",
-		"type": "keybind",
+		"type": "binding",
 		"section": "input",
 		"key": "increaseTimeRate"
 	},
 	{
 		"name": "capture screenshot",
-		"type": "keybind",
+		"type": "binding",
 		"section": "input",
 		"key": "screenshotCapture"
 	},
 	{
 		"name": "open screenshot",
-		"type": "keybind",
+		"type": "binding",
 		"section": "input",
 		"key": "screenshotOpen"
 	},
 	{
 		"name": "adjust difficulty",
-		"type": "keybind",
+		"type": "binding",
 		"section": "input",
 		"key": "adjustDifficulty"
 	}

@@ -90,7 +90,7 @@ SettingsListView.getListItemView = function(self, settingConfig)
 		return self.listItemSliderView
 	elseif settingConfig.type == "switch" then
 		return self.listItemSwitchView
-	elseif settingConfig.type == "keybind" then
+	elseif settingConfig.type == "binding" then
 		return self.listItemInputView
 	elseif settingConfig.type == "stepper" then
 		return self.listItemStepperView
