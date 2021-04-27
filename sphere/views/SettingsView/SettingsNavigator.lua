@@ -77,6 +77,22 @@ SettingsNavigator.load = function(self)
 	settingsList:on("down", function()
 		self:scrollSettings(1)
 	end)
+	settingsList:on("right", function(_, itemIndex)
+		local settings = self.view.settingsModel.sections[sectionsList.selected]
+		local settingConfig = settings[itemIndex or settingsList.selected]
+		self:send({
+			name = "increaseSettingValue",
+			settingConfig = settingConfig
+		})
+	end)
+	settingsList:on("left", function(_, itemIndex)
+		local settings = self.view.settingsModel.sections[sectionsList.selected]
+		local settingConfig = settings[itemIndex or settingsList.selected]
+		self:send({
+			name = "decreaseSettingValue",
+			settingConfig = settingConfig
+		})
+	end)
 	settingsList:on("tab", function()
 		self.node = sectionsList
 	end)

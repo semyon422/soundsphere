@@ -35,13 +35,38 @@ SettingsModel.loadStructure = function(self)
 	end
 end
 
-SettingsModel.getValue = function(self, settingConfig)
-	return self.config[settingConfig.section][settingConfig.key]
+SettingsModel.setValue = function(self, settingConfig, value)
+	self.config[settingConfig.section][settingConfig.key] = value
 end
 
-SettingsModel.setNormalizedValue = function(self, settingConfig, value)
+SettingsModel.increaseValue = function(self, settingConfig, delta)
+	local section = settingConfig.section
+	local key = settingConfig.key
+	local value = self.config[section][key]
 	if settingConfig.type == "slider" then
-		self.config[settingConfig.section][settingConfig.key] = round(settingConfig.range[1] + value * (settingConfig.range[2] - settingConfig.range[1]), settingConfig.step)
+		self.config[section][key] = math.min(math.max(value + settingConfig.step * delta, settingConfig.range[1]), settingConfig.range[2])
+	elseif settingConfig.type == "stepper" then
+		self.config[section][key] = settingConfig.values[math.min(math.max(self:getValue(settingConfig) + delta, 1), #settingConfig.values)]
+	elseif settingConfig.type == "switch" then
+		self.config[section][key] = math.min(math.max(value + delta, 0), 1)
+	end
+end
+
+SettingsModel.getValue = function(self, settingConfig)
+	local value = self.config[settingConfig.section][settingConfig.key]
+	if settingConfig.type == "stepper" then
+		for i, listValue in ipairs(settingConfig.values) do
+			if value == listValue then
+				return i
+			end
+		end
+	end
+	return value
+end
+
+SettingsModel.fromNormalizedValue = function(self, settingConfig, value)
+	if settingConfig.type == "slider" then
+		return round(settingConfig.range[1] + value * (settingConfig.range[2] - settingConfig.range[1]), settingConfig.step)
 	end
 end
 
@@ -50,8 +75,6 @@ SettingsModel.getNormalizedValue = function(self, settingConfig)
 	local range = settingConfig.range
 	if settingConfig.type == "slider" then
 		return map(value, range[1], range[2], 0, 1)
-	elseif settingConfig.type == "switch" then
-		return value
 	end
 end
 

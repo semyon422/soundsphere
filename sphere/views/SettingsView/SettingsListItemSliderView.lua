@@ -76,17 +76,16 @@ SettingsListItemSliderView.receive = function(self, event)
 	local slider = listView.slider
 
 	local settingConfig = self.item
-	-- local modifier = listView.view.modifierModel:getSettings(modifierConfig)
 	slider:setPosition(x + w / 2, y, w / 2, h)
 	slider:setValue(listView.view.settingsModel:getNormalizedValue(settingConfig))
 	slider:receive(event)
 
 	if slider.valueUpdated then
-		-- self.listView.navigator:send({
-		-- 	name = "setSettingsValue",
-		-- 	modifierConfig = modifierConfig,
-		-- 	value = modifier:fromNormalizedValue(slider.value)
-		-- })
+		self.listView.navigator:send({
+			name = "setSettingValue",
+			settingConfig = settingConfig,
+			value = listView.view.settingsModel:fromNormalizedValue(settingConfig, slider.value)
+		})
 		slider.valueUpdated = false
 	end
 end
@@ -95,7 +94,7 @@ SettingsListItemSliderView.wheelmoved = function(self, event)
 	local x, y, w, h = self:getPosition()
 	local mx, my = love.mouse.getPosition()
 
-	if event.name == "wheelmoved" and not (mx >= x and mx <= x + w and my >= y and my <= y + h) then
+	if not (mx >= x and mx <= x + w and my >= y and my <= y + h) then
 		return
 	end
 

@@ -38,6 +38,12 @@ SettingsController.receive = function(self, event)
 
 	if event.name == "goSelectScreen" then
 		return self.gameController.screenManager:set(self.selectController)
+	elseif event.name == "setSettingValue" then
+		self.gameController.settingsModel:setValue(event.settingConfig, event.value)
+	elseif event.name == "increaseSettingValue" then
+		self.gameController.settingsModel:increaseValue(event.settingConfig, 1)
+	elseif event.name == "decreaseSettingValue" then
+		self.gameController.settingsModel:increaseValue(event.settingConfig, -1)
 	end
 end
 

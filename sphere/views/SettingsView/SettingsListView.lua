@@ -5,8 +5,10 @@ local ListView = require(viewspackage .. "ListView")
 local SettingsListItemSwitchView = require(viewspackage .. "SettingsView.SettingsListItemSwitchView")
 local SettingsListItemSliderView = require(viewspackage .. "SettingsView.SettingsListItemSliderView")
 local SettingsListItemInputView = require(viewspackage .. "SettingsView.SettingsListItemInputView")
+local SettingsListItemStepperView = require(viewspackage .. "SettingsView.SettingsListItemStepperView")
 local Slider = require(viewspackage .. "Slider")
 local Switch = require(viewspackage .. "Switch")
+local Stepper = require(viewspackage .. "Stepper")
 
 local SettingsListView = ListView:new()
 
@@ -25,6 +27,7 @@ SettingsListView.init = function(self)
 
 	self.slider = Slider:new()
 	self.switch = Switch:new()
+	self.stepper = Stepper:new()
 
 	self:on("update", function()
 		self.selectedItem = self.navigator.settingsList.selected
@@ -75,6 +78,11 @@ SettingsListView.createListItemViews = function(self)
 	inputView.listView = self
 	inputView:init()
 	self.listItemInputView = inputView
+
+	local stepperView = SettingsListItemStepperView:new()
+	stepperView.listView = self
+	stepperView:init()
+	self.listItemStepperView = stepperView
 end
 
 SettingsListView.getListItemView = function(self, settingConfig)
@@ -84,6 +92,8 @@ SettingsListView.getListItemView = function(self, settingConfig)
 		return self.listItemSwitchView
 	elseif settingConfig.type == "keybind" then
 		return self.listItemInputView
+	elseif settingConfig.type == "stepper" then
+		return self.listItemStepperView
 	end
 end
 

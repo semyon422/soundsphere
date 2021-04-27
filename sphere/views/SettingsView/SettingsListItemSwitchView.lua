@@ -70,7 +70,6 @@ SettingsListItemSwitchView.receive = function(self, event)
 
 	local switch = listView.switch
 	local settingConfig = self.item
-	-- local modifier = listView.view.modifierModel:getSettings(modifierConfig)
 	switch:setPosition(x + 3 * w / 4 - h / 2, y, h, h)
 	switch:setValue(listView.view.settingsModel:getValue(settingConfig))
 	switch:receive(event)

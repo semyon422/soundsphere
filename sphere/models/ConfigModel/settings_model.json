@@ -21,9 +21,9 @@
 		"name": "replay type",
 		"section": "general",
 		"key": "replayType",
-		"type": "listSwitcher",
-		"valueList": ["NanoChart", "Json"],
-		"displayList": ["NanoChart", "Json"]
+		"type": "stepper",
+		"values": ["NanoChart", "Json"],
+		"displayValues": ["NanoChart", "Json"]
 	},
 	{
 		"name": "round off time?",
@@ -130,14 +130,14 @@
 		"name": "primary audio mode",
 		"section": "audio",
 		"key": "primaryAudioMode",
-		"type": "listSwitcher",
-		"valueList": [
+		"type": "stepper",
+		"values": [
 			"sample", "stream", "streamTempo",
 			"streamUser", "streamUserTempo",
 			"streamMemoryTempo", "streamMemoryReversable",
 			"streamOpenAL", "sampleOpenAL"
 		],
-		"displayList": [
+		"displayValues": [
 			"sample", "stream", "tempo",
 			"stream*", "tempo*",
 			"memory", "reversable",
@@ -148,14 +148,14 @@
 		"name": "secondary audio mode",
 		"section": "audio",
 		"key": "secondaryAudioMode",
-		"type": "listSwitcher",
-		"valueList": [
+		"type": "stepper",
+		"values": [
 			"sample", "stream", "streamTempo",
 			"streamUser", "streamUserTempo",
 			"streamMemoryTempo", "streamMemoryReversable",
 			"streamOpenAL", "sampleOpenAL"
 		],
-		"displayList": [
+		"displayValues": [
 			"sample", "stream", "tempo",
 			"stream*", "tempo*",
 			"memory", "reversable",
@@ -166,9 +166,9 @@
 		"name": "preview audio mode",
 		"section": "audio",
 		"key": "previewAudioMode",
-		"type": "listSwitcher",
-		"valueList": ["stream", "streamTempo", "streamUser", "streamUserTempo", "streamOpenAL"],
-		"displayList": ["stream", "tempo", "stream*", "tempo*", "streamOAL"]
+		"type": "stepper",
+		"values": ["stream", "streamTempo", "streamUser", "streamUserTempo", "streamOpenAL"],
+		"displayValues": ["stream", "tempo", "stream*", "tempo*", "streamOAL"]
 	},
 	{
 		"name": "global volume",
