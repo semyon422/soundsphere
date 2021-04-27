@@ -93,7 +93,7 @@ PreviewModel.play = function(self, path, position)
 	self.position = position
 	self.audio = audio
 	self.audio:setPosition(position)
-	self.audio:setVolume(config.volume.global * config.volume.music)
+	self.audio:setVolume(config.audio.volumeGlobal * config.audio.volumeMusic)
 	self.audio:play()
 end
 

@@ -126,7 +126,7 @@ PauseOverlay.receive = function(self, event)
 		self.menuButton:receive(event)
 	end
 
-	local quickRestartKey = self.configModel:getConfig("settings").gameplay.quickRestart
+	local quickRestartKey = self.configModel:getConfig("settings").general.quickRestart
 	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
 	if event.name == "keypressed" then
 		local key = event.args[1]

@@ -32,7 +32,7 @@ GameplayController.load = function(self)
 
 	noteSkinModel.configModel = configModel
 
-	noteChartModel:select()
+	noteChartModel:load()
 	noteSkinModel:load()
 
 	view.rhythmModel = rhythmModel
@@ -57,15 +57,15 @@ GameplayController.load = function(self)
 
 	local config = configModel:getConfig("settings")
 
-	rhythmModel:setVolume("global", config.volume.global)
-	rhythmModel:setVolume("music", config.volume.music)
-	rhythmModel:setVolume("effects", config.volume.effects)
+	rhythmModel:setVolume("global", config.audio.volumeGlobal)
+	rhythmModel:setVolume("music", config.audio.volumeMusic)
+	rhythmModel:setVolume("effects", config.audio.volumeEffects)
 	rhythmModel:setAudioMode("primary", config.audio.primaryAudioMode)
 	rhythmModel:setAudioMode("secondary", config.audio.secondaryAudioMode)
-	rhythmModel:setTimeRound(config.gameplay.needTimeRound)
-	rhythmModel:setTimeToPrepare(config.gameplay.timeToPrepare)
-	rhythmModel:setInputOffset(config.gameplay.inputOffset)
-	rhythmModel:setVisualOffset(config.gameplay.visualOffset)
+	rhythmModel:setTimeRound(config.general.needTimeRound)
+	rhythmModel:setTimeToPrepare(config.general.timeToPrepare)
+	rhythmModel:setInputOffset(config.general.inputOffset)
+	rhythmModel:setVisualOffset(config.general.visualOffset)
 
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
 	rhythmModel:load()
@@ -107,7 +107,7 @@ end
 GameplayController.getImporterSettings = function(self)
 	local config = self.gameController.configModel:getConfig("settings")
 	return {
-		midiConstantVolume = config.parser.midiConstantVolume
+		midiConstantVolume = config.audio.midiConstantVolume
 	}
 end
 
@@ -168,7 +168,7 @@ GameplayController.saveScore = function(self)
 	if scoreSystem.score > 0 and rhythmModel.replayModel.mode ~= "replay" and not rhythmModel.logicEngine.autoplay then
 		replayModel.noteChartModel = noteChartModel
 		replayModel.modifierModel = modifierModel
-		replayModel.replayType = self.gameController.configModel:getConfig("settings").replay.type
+		replayModel.replayType = self.gameController.configModel:getConfig("settings").general.replayType
 		local replayHash = replayModel:saveReplay()
 		self.gameController.scoreModel:insertScore(scoreSystem, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
 		self.gameController.onlineModel:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
