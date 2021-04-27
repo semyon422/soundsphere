@@ -4,21 +4,20 @@ local map = require("aqua.math").map
 local WindUp = Modifier:new()
 
 WindUp.type = "TimeEngineModifier"
+WindUp.interfaceType = "toggle"
 
 WindUp.name = "WindUp"
 WindUp.shortName = "WU"
 
-WindUp.apply = function(self)
-	local config = self.config
-	if not config.value then
+WindUp.apply = function(self, config)
+	if config.value == 0 then
 		return
 	end
 	self.timeRateHandler = self.rhythmModel.timeEngine:createTimeRateHandler()
 end
 
-WindUp.update = function(self)
-	local config = self.config
-	if not config.value then
+WindUp.update = function(self, config)
+	if config.value == 0 then
 		return
 	end
 

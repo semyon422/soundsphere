@@ -1,16 +1,15 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
-local NoteData = require("ncdk.NoteData")
 
 local NoScratch = Modifier:new()
 
 NoScratch.type = "NoteChartModifier"
+NoScratch.interfaceType = "toggle"
 
 NoScratch.name = "NoScratch"
 NoScratch.shortName = "NoScratch"
 
-NoScratch.apply = function(self)
-	local config = self.config
-	if not config.value then
+NoScratch.apply = function(self, config)
+	if config.value == 0 then
 		return
 	end
 

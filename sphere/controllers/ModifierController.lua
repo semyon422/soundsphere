@@ -48,6 +48,8 @@ ModifierController.receive = function(self, event)
 		self.gameController.modifierModel:remove(event.modifierConfig)
 	elseif event.name == "setModifierValue" then
 		self.gameController.modifierModel:setModifierValue(event.modifierConfig, event.value)
+	elseif event.name == "increaseModifierValue" then
+		self.gameController.modifierModel:increaseModifierValue(event.modifierConfig, event.delta)
 	elseif event.name == "adjustDifficulty" then
 		self:adjustDifficulty()
 	elseif event.name == "goSelectScreen" then

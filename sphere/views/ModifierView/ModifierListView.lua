@@ -4,8 +4,10 @@ local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local ListView = require(viewspackage .. "ListView")
 local ModifierListItemSwitchView = require(viewspackage .. "ModifierView.ModifierListItemSwitchView")
 local ModifierListItemSliderView = require(viewspackage .. "ModifierView.ModifierListItemSliderView")
+local ModifierListItemStepperView = require(viewspackage .. "ModifierView.ModifierListItemStepperView")
 local Slider = require(viewspackage .. "Slider")
 local Switch = require(viewspackage .. "Switch")
+local Stepper = require(viewspackage .. "Stepper")
 
 local ModifierListView = ListView:new()
 
@@ -24,6 +26,7 @@ ModifierListView.init = function(self)
 
 	self.slider = Slider:new()
 	self.switch = Switch:new()
+	self.stepper = Stepper:new()
 
 	self:on("update", function()
 		self.selectedItem = self.navigator.modifierList.selected
@@ -66,14 +69,21 @@ ModifierListView.createListItemViews = function(self)
 	sliderView.listView = self
 	sliderView:init()
 	self.listItemSliderView = sliderView
+
+	local stepperView = ModifierListItemStepperView:new()
+	stepperView.listView = self
+	stepperView:init()
+	self.listItemStepperView = stepperView
 end
 
 ModifierListView.getListItemView = function(self, modifierConfig)
 	local modifier = self.view.modifierModel:getModifier(modifierConfig)
-	if modifier.range[1] == 0 and modifier.range[2] == 1 then
+	if modifier.interfaceType == "toggle" then
 		return self.listItemSwitchView
-	else
+	elseif modifier.interfaceType == "slider" then
 		return self.listItemSliderView
+	elseif modifier.interfaceType == "stepper" then
+		return self.listItemStepperView
 	end
 end
 

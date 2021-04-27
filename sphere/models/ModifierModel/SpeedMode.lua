@@ -3,19 +3,19 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 local SpeedMode = Modifier:new()
 
 SpeedMode.type = "NoteChartModifier"
+SpeedMode.interfaceType = "stepper"
 
 SpeedMode.name = "SpeedMode"
 
-SpeedMode.defaultValue = 1
-SpeedMode.format = "%s"
+SpeedMode.defaultValue = "average"
 SpeedMode.range = {1, 5}
-SpeedMode.values = {"avg", "x", "const", "min", "max"}
+SpeedMode.values = {"average", "x", "constant", "minimum", "maximum"}
 
 SpeedMode.modeNames = {"AMod", "XMod", "CMod", "MinMod", "MaxMod"}
 
 SpeedMode.getString = function(self, config)
-	config = config or self.config
-	return self.modeNames[config.value]
+	local indexValue = self:toIndexValue(config)
+	return self.modeNames[indexValue]
 end
 
 SpeedMode.applySpeed = function(self, speed)
@@ -54,7 +54,7 @@ SpeedMode.applyConstant = function(self)
 	noteChart:compute()
 end
 
-SpeedMode.apply = function(self)
+SpeedMode.apply = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
 
 	local minTime = noteChart.metaData:get("minTime")
@@ -103,16 +103,16 @@ SpeedMode.apply = function(self)
 		end
 	end
 
-	local mode = self.config.value
-	if mode == 1 then
+	local mode = config.value
+	if mode == "average" then
 		self:applySpeed(average)
-	elseif mode == 2 then
+	elseif mode == "x" then
 		return
-	elseif mode == 3 then
+	elseif mode == "constatn" then
 		self:applyConstant()
-	elseif mode == 4 then
+	elseif mode == "minimum" then
 		self:applySpeed(minimum)
-	elseif mode == 5 then
+	elseif mode == "maximum" then
 		self:applySpeed(maximum)
 	end
 end

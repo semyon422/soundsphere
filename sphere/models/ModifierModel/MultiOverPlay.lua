@@ -3,30 +3,21 @@ local Modifier	= require("sphere.models.ModifierModel.Modifier")
 
 local MultiOverPlay = Modifier:new()
 
-MultiOverPlay.sequential = true
 MultiOverPlay.type = "NoteChartModifier"
+MultiOverPlay.interfaceType = "stepper"
 
 MultiOverPlay.name = "MultiOverPlay"
-MultiOverPlay.shortName = "MOP"
 
-MultiOverPlay.variableValues = {"DO", "TO", "QO"}
-MultiOverPlay.modeNames = {"DO", "TO", "QO"}
+MultiOverPlay.defaultValue = 2
+MultiOverPlay.range = {2, 4}
 
-MultiOverPlay.defaultValue = 1
-MultiOverPlay.range = {1, 3}
-
-MultiOverPlay.getString = function(self)
-	return self.modeNames[self.value]
+MultiOverPlay.getString = function(self, config)
+	return config.value .. "OP"
 end
 
-MultiOverPlay.getRealValue = function(self, config)
-	config = config or self.config
-	return self.modeNames[config.value]
-end
-
-MultiOverPlay.apply = function(self)
+MultiOverPlay.apply = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
-	local value = self.value
+	local value = config.value
 
 	local inputCounts = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do
@@ -48,11 +39,11 @@ MultiOverPlay.apply = function(self)
 			local inputCount = inputCounts[noteData.inputType]
             if inputCount then
                 local inputIndex = noteData.inputIndex
-                local newInputIndex = (inputIndex - 1) * (value + 1) + 1
+                local newInputIndex = (inputIndex - 1) * value + 1
 				layerDataSequence:increaseInputCount(noteData.inputType, inputIndex, -1)
 				layerDataSequence:increaseInputCount(noteData.inputType, newInputIndex, 1)
 				noteData.inputIndex = newInputIndex
-				for i = 1, value do
+				for i = 1, value - 1 do
 					newInputIndex = newInputIndex + i
 
 					local newNoteData = NoteData:new(noteData.timePoint)
@@ -71,7 +62,7 @@ MultiOverPlay.apply = function(self)
 	end
 
 	for inputType, inputCount in pairs(inputCounts) do
-		noteChart.inputMode:setInputCount(inputType, inputCount * (value + 1))
+		noteChart.inputMode:setInputCount(inputType, inputCount * value)
 	end
 
 	noteChart:compute()

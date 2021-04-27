@@ -2,30 +2,21 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 
 local MinLnLength = Modifier:new()
 
-MinLnLength.construct = function(self)
-	self.config = {
-		name = self.name,
-		value = 400
-	}
-end
-
-MinLnLength.sequential = true
 MinLnLength.type = "NoteChartModifier"
+MinLnLength.interfaceType = "slider"
 
 MinLnLength.name = "MinLnLength"
-MinLnLength.shortName = "MLL"
 
-MinLnLength.defaultValue = 0
+MinLnLength.defaultValue = 0.4
 MinLnLength.range = {0, 40}
 MinLnLength.step = 0.025
 
 MinLnLength.getString = function(self, config)
-	config = config or self.config
-	return self.shortName .. self:getRealValue(config) * 1000
+	return "MLL" .. config.value * 1000
 end
 
-MinLnLength.apply = function(self)
-	local duration = self:getRealValue()
+MinLnLength.apply = function(self, config)
+	local duration = config.value
 	local noteChart = self.noteChartModel.noteChart
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do

@@ -3,13 +3,13 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 local NoLongNote = Modifier:new()
 
 NoLongNote.type = "NoteChartModifier"
+NoLongNote.interfaceType = "toggle"
 
 NoLongNote.name = "NoLongNote"
 NoLongNote.shortName = "NLN"
 
-NoLongNote.apply = function(self)
-	local config = self.config
-	if not config.value then
+NoLongNote.apply = function(self, config)
+	if config.value == 0 then
 		return
 	end
 

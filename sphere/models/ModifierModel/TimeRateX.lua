@@ -3,26 +3,24 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 local TimeRateX = Modifier:new()
 
 TimeRateX.type = "TimeEngineModifier"
+TimeRateX.interfaceType = "slider"
 
 TimeRateX.name = "TimeRateX"
-TimeRateX.shortName = "X"
 
-TimeRateX.defaultValue = 10
+TimeRateX.defaultValue = 1
 TimeRateX.format = "%0.2f"
+TimeRateX.range = {0.5, 2}
 TimeRateX.step = 0.05
-TimeRateX.offset = 0.5
-TimeRateX.range = {0, 30}
 
 TimeRateX.getString = function(self, config)
-	config = config or self.config
-	local realValue = self:getRealValue(config)
-    if realValue ~= 1 then
-		return realValue .. self.shortName
+	local value = config.value
+    if value ~= 1 then
+		return value .. "X"
 	end
 end
 
-TimeRateX.apply = function(self)
-	self.rhythmModel.timeEngine:createTimeRateHandler().timeRate = self:getRealValue()
+TimeRateX.apply = function(self, config)
+	self.rhythmModel.timeEngine:createTimeRateHandler().timeRate = config.value
 end
 
 return TimeRateX

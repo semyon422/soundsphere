@@ -71,6 +71,7 @@ ModifierModel.add = function(self, modifierConfig, index)
 	else
 		local maxIndex = math.max(#config, 1)
 		index = math.min(math.max(index, 1), maxIndex)
+		print(#config, index)
 		table.insert(config, index, modifierConfig)
 	end
 end
@@ -86,9 +87,17 @@ end
 
 ModifierModel.setModifierValue = function(self, modifierConfig, value)
 	local modifier = self:getModifier(modifierConfig)
-	if modifier:checkValue(value) then
-		modifierConfig.value = value
+	modifier:setValue(modifierConfig, value)
+end
+
+ModifierModel.increaseModifierValue = function(self, modifierConfig, delta)
+	local modifier = self:getModifier(modifierConfig)
+	if type(modifier.defaultValue) == "number" then
+		modifier:setValue(modifierConfig, modifierConfig.value + delta * modifier.step)
+		return
 	end
+	local indexValue = modifier:toIndexValue(modifierConfig.value)
+	modifier:setValue(modifierConfig, modifier:fromIndexValue(indexValue + delta * modifier.step))
 end
 
 ModifierModel.getModifier = function(self, modifierConfig)
@@ -99,12 +108,11 @@ ModifierModel.apply = function(self, modifierType)
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
 		if modifier.type == modifierType then
-			modifier.config = modifierConfig
 			modifier.noteChartModel = self.noteChartModel
 			modifier.rhythmModel = self.rhythmModel
 			modifier.difficultyModel = self.difficultyModel
 			modifier.scoreModel = self.scoreModel
-			modifier:apply()
+			modifier:apply(modifierConfig)
 		end
 	end
 end
@@ -112,16 +120,14 @@ end
 ModifierModel.update = function(self)
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
-		modifier.config = modifierConfig
-		modifier:update()
+		modifier:update(modifierConfig)
 	end
 end
 
 ModifierModel.receive = function(self, event)
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
-		modifier.config = modifierConfig
-		modifier:receive(event)
+		modifier:receive(modifierConfig, event)
 	end
 end
 
@@ -129,8 +135,7 @@ ModifierModel.getString = function(self)
 	local t = {}
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
-		modifier.config = modifierConfig
-		table.insert(t, modifier:getString())
+		table.insert(t, modifier:getString(modifierConfig))
 	end
 	return table.concat(t, ",")
 end

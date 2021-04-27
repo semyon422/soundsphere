@@ -4,16 +4,12 @@ local NoteChartExporter			= require("osu.NoteChartExporter")
 local ToOsu = Modifier:new()
 
 ToOsu.type = "NoteChartModifier"
+ToOsu.interfaceType = "toggle"
 
 ToOsu.name = "ToOsu"
 ToOsu.shortName = "ToOsu"
 
-ToOsu.apply = function(self)
-	local config = self.config
-	if not config.value then
-		return
-	end
-
+ToOsu.apply = function(self, config)
 	local nce = NoteChartExporter:new()
 	nce.noteChart = self.noteChartModel.noteChart
 	nce.noteChartEntry = self.noteChartModel.noteChartEntry

@@ -4,19 +4,19 @@ local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
 
 local ModifierListItemView = require(viewspackage .. "ModifierView.ModifierListItemView")
-local SliderView = require(viewspackage .. "SliderView")
+local StepperView = require(viewspackage .. "StepperView")
 
-local ModifierListItemSliderView = ModifierListItemView:new()
+local ModifierListItemStepperView = ModifierListItemView:new()
 
-ModifierListItemSliderView.init = function(self)
+ModifierListItemStepperView.init = function(self)
 	self:on("draw", self.draw)
 
 	self.fontName = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
 
-	self.sliderView = SliderView:new()
+	self.stepperView = StepperView:new()
 end
 
-ModifierListItemSliderView.draw = function(self)
+ModifierListItemStepperView.draw = function(self)
 	local listView = self.listView
 
 	local itemIndex = self.itemIndex
@@ -53,10 +53,10 @@ ModifierListItemSliderView.draw = function(self)
 	)
 	love.graphics.printf(
 		modifierConfig.value,
-		x,
+		x + w / 2,
 		y,
 		w / 2 / cs.one * 1080,
-		"right",
+		"center",
 		0,
 		cs.one / 1080,
 		cs.one / 1080,
@@ -64,13 +64,14 @@ ModifierListItemSliderView.draw = function(self)
 		-cs:Y(18 / cs.one)
 	)
 
-	local sliderView = self.sliderView
-	sliderView:setPosition(x + w / 2, y, w / 2, h)
-	sliderView:setValue(modifier:toNormValue(modifierConfig.value))
-	sliderView:draw()
+	local stepperView = self.stepperView
+	stepperView:setPosition(x + w / 2, y, w / 2, h)
+	stepperView:setValue(modifier:toIndexValue(modifierConfig.value))
+	stepperView:setCount(modifier:getCount())
+	stepperView:draw()
 end
 
-ModifierListItemSliderView.receive = function(self, event)
+ModifierListItemStepperView.receive = function(self, event)
 	ModifierListItemView.receive(self, event)
 
 	if event.name == "wheelmoved" then
@@ -84,25 +85,26 @@ ModifierListItemSliderView.receive = function(self, event)
 		return
 	end
 
-	local slider = listView.slider
+	local stepper = listView.stepper
 
 	local modifierConfig = self.item
 	local modifier = listView.view.modifierModel:getModifier(modifierConfig)
-	slider:setPosition(x + w / 2, y, w / 2, h)
-	slider:setValue(modifier:toNormValue(modifierConfig.value))
-	slider:receive(event)
+	stepper:setPosition(x + w / 2, y, w / 2, h)
+	stepper:setValue(modifier:toIndexValue(modifierConfig.value))
+	stepper:setCount(modifier:getCount())
+	stepper:receive(event)
 
-	if slider.valueUpdated then
+	if stepper.valueUpdated then
 		self.listView.navigator:send({
 			name = "setModifierValue",
 			modifierConfig = modifierConfig,
-			value = modifier:fromNormValue(slider.value)
+			value = modifier:fromIndexValue(stepper.value)
 		})
-		slider.valueUpdated = false
+		stepper.valueUpdated = false
 	end
 end
 
-ModifierListItemSliderView.wheelmoved = function(self, event)
+ModifierListItemStepperView.wheelmoved = function(self, event)
 	local x, y, w, h = self:getPosition()
 	local mx, my = love.mouse.getPosition()
 
@@ -120,4 +122,4 @@ ModifierListItemSliderView.wheelmoved = function(self, event)
 	end
 end
 
-return ModifierListItemSliderView
+return ModifierListItemStepperView

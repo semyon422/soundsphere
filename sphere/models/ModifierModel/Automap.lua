@@ -5,27 +5,27 @@ local BlockFinder			= require("libchart.BlockFinder")
 local NotePreprocessor		= require("libchart.NotePreprocessor")
 local Modifier				= require("sphere.models.ModifierModel.Modifier")
 
-local config = {}
+local amConfig = {}
 
-config[5] = {}
+amConfig[5] = {}
 
-config[5][4] = {
+amConfig[5][4] = {
 	{1,1,0,0,0},
 	{0,1,1,0,0},
 	{0,0,1,1,0},
 	{0,0,0,1,1},
 }
 
-config[6] = {}
+amConfig[6] = {}
 
-config[6][4] = {
+amConfig[6][4] = {
 	{1,1,0,0,0,0},
 	{0,1,1,0,0,0},
 	{0,0,0,1,1,0},
 	{0,0,0,0,1,1},
 }
 
-config[6][5] = {
+amConfig[6][5] = {
 	{1,1,0,0,0,0},
 	{0,1,1,0,0,0},
 	{0,0,1,1,0,0},
@@ -33,16 +33,16 @@ config[6][5] = {
 	{0,0,0,0,1,1},
 }
 
-config[7] = {}
+amConfig[7] = {}
 
-config[7][4] = {
+amConfig[7][4] = {
 	{1,1,0,0,0,0,0},
 	{0,1,1,1,0,0,0},
 	{0,0,0,1,1,1,0},
 	{0,0,0,0,0,1,1},
 }
 
-config[7][5] = {
+amConfig[7][5] = {
 	{1,1,0,0,0,0,0},
 	{0,1,1,0,0,0,0},
 	{0,0,1,1,1,0,0},
@@ -50,7 +50,7 @@ config[7][5] = {
 	{0,0,0,0,0,1,1},
 }
 
-config[7][6] = {
+amConfig[7][6] = {
 	{1,1,0,0,0,0,0},
 	{0,1,1,0,0,0,0},
 	{0,0,1,1,0,0,0},
@@ -59,16 +59,16 @@ config[7][6] = {
 	{0,0,0,0,0,1,1},
 }
 
-config[8] = {}
+amConfig[8] = {}
 
-config[8][4] = {
+amConfig[8][4] = {
 	{1,1,0,0,0,0,0,0},
 	{0,0,1,1,0,0,0,0},
 	{0,0,0,0,1,1,0,0},
 	{0,0,0,0,0,0,1,1},
 }
 
-config[8][5] = {
+amConfig[8][5] = {
 	{1,1,0,0,0,0,0,0},
 	{0,1,1,1,0,0,0,0},
 	{0,0,0,1,1,0,0,0},
@@ -76,7 +76,7 @@ config[8][5] = {
 	{0,0,0,0,0,0,1,1},
 }
 
-config[8][6] = {
+amConfig[8][6] = {
 	{1,1,0,0,0,0,0,0},
 	{0,1,1,0,0,0,0,0},
 	{0,0,1,1,0,0,0,0},
@@ -85,7 +85,7 @@ config[8][6] = {
 	{0,0,0,0,0,0,1,1},
 }
 
-config[8][7] = {
+amConfig[8][7] = {
 	{1,1,0,0,0,0,0,0},
 	{0,1,1,0,0,0,0,0},
 	{0,0,1,1,0,0,0,0},
@@ -95,16 +95,16 @@ config[8][7] = {
 	{0,0,0,0,0,0,1,1},
 }
 
-config[9] = {}
+amConfig[9] = {}
 
-config[9][4] = {
+amConfig[9][4] = {
 	{1,1,1,0,0,0,0,0,0},
 	{0,0,1,1,1,0,0,0,0},
 	{0,0,0,0,1,1,1,0,0},
 	{0,0,0,0,0,0,1,1,1},
 }
 
-config[9][5] = {
+amConfig[9][5] = {
 	{1,1,0,0,0,0,0,0,0},
 	{0,1,1,1,0,0,0,0,0},
 	{0,0,0,1,1,1,0,0,0},
@@ -112,7 +112,7 @@ config[9][5] = {
 	{0,0,0,0,0,0,0,1,1},
 }
 
-config[9][6] = {
+amConfig[9][6] = {
 	{1,1,0,0,0,0,0,0,0},
 	{0,1,1,1,0,0,0,0,0},
 	{0,0,0,1,1,0,0,0,0},
@@ -121,7 +121,7 @@ config[9][6] = {
 	{0,0,0,0,0,0,0,1,1},
 }
 
-config[9][7] = {
+amConfig[9][7] = {
 	{1,1,0,0,0,0,0,0,0},
 	{0,1,1,0,0,0,0,0,0},
 	{0,0,1,1,0,0,0,0,0},
@@ -131,7 +131,7 @@ config[9][7] = {
 	{0,0,0,0,0,0,0,1,1},
 }
 
-config[9][8] = {
+amConfig[9][8] = {
 	{1,1,0,0,0,0,0,0,0},
 	{0,1,1,0,0,0,0,0,0},
 	{0,0,1,1,0,0,0,0,0},
@@ -142,16 +142,16 @@ config[9][8] = {
 	{0,0,0,0,0,0,0,1,1},
 }
 
-config[10] = {}
+amConfig[10] = {}
 
-config[10][4] = {
+amConfig[10][4] = {
 	{1,1,1,0,0,0,0,0,0,0},
 	{0,0,1,1,1,0,0,0,0,0},
 	{0,0,0,0,0,1,1,1,0,0},
 	{0,0,0,0,0,0,0,1,1,1},
 }
 
-config[10][5] = {
+amConfig[10][5] = {
 	{1,1,0,0,0,0,0,0,0,0},
 	{0,0,1,1,0,0,0,0,0,0},
 	{0,0,0,0,1,1,0,0,0,0},
@@ -159,7 +159,7 @@ config[10][5] = {
 	{0,0,0,0,0,0,0,0,1,1},
 }
 
-config[10][6] = {
+amConfig[10][6] = {
 	{1,1,0,0,0,0,0,0,0,0},
 	{0,1,1,1,0,0,0,0,0,0},
 	{0,0,0,1,1,0,0,0,0,0},
@@ -168,7 +168,7 @@ config[10][6] = {
 	{0,0,0,0,0,0,0,0,1,1},
 }
 
-config[10][7] = {
+amConfig[10][7] = {
 	{1,1,0,0,0,0,0,0,0,0},
 	{0,1,1,1,0,0,0,0,0,0},
 	{0,0,1,1,1,0,0,0,0,0},
@@ -178,7 +178,7 @@ config[10][7] = {
 	{0,0,0,0,0,0,0,0,1,1},
 }
 
-config[10][8] = {
+amConfig[10][8] = {
 	{1,1,0,0,0,0,0,0,0,0},
 	{0,1,1,0,0,0,0,0,0,0},
 	{0,0,1,1,0,0,0,0,0,0},
@@ -189,7 +189,7 @@ config[10][8] = {
 	{0,0,0,0,0,0,0,0,1,1},
 }
 
-config[10][9] = {
+amConfig[10][9] = {
 	{1,1,0,0,0,0,0,0,0,0},
 	{0,1,1,0,0,0,0,0,0,0},
 	{0,0,1,1,0,0,0,0,0,0},
@@ -204,23 +204,22 @@ config[10][9] = {
 local Automap = Modifier:new()
 
 Automap.type = "NoteChartModifier"
+Automap.interfaceType = "slider"
 
 Automap.name = "Automap"
-Automap.shortName = "AM"
 
 Automap.defaultValue = 10
 Automap.range = {4, 10}
 
 Automap.getString = function(self, config)
-	config = config or self.config
-	return self.shortName .. config.value
+	return "AM" .. config.value
 end
 
-Automap.apply = function(self)
+Automap.apply = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
 	self.noteChart = noteChart
 
-	self.targetMode = self.config.value
+	self.targetMode = config.value
 	self.columnCount = math.floor(self.noteChart.inputMode:getInputCount("key"))
 
 	print(self.targetMode == self.columnCount or self.columnCount == 0)
@@ -307,7 +306,7 @@ Automap.processUpscaler = function(self)
 	NotePreprocessor:process(nbs)
 
 	local am = Upscaler:new()
-	am.columns = config[targetMode][columnCount]
+	am.columns = amConfig[targetMode][columnCount]
 	am:load(targetMode)
 	local notes, blocks = am:process(nbs)
 

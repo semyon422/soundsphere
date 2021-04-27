@@ -80,17 +80,17 @@ ModifierNavigator.load = function(self)
 	modifierList:on("right", function(_, itemIndex)
 		local modifierConfig = self.config[itemIndex or modifierList.selected]
 		self:send({
-			name = "setModifierValue",
+			name = "increaseModifierValue",
 			modifierConfig = modifierConfig,
-			value = modifierConfig.value + 1
+			delta = 1
 		})
 	end)
 	modifierList:on("left", function(_, itemIndex)
 		local modifierConfig = self.config[itemIndex or modifierList.selected]
 		self:send({
-			name = "setModifierValue",
+			name = "increaseModifierValue",
 			modifierConfig = modifierConfig,
-			value = modifierConfig.value - 1
+			delta = -1
 		})
 	end)
 	modifierList:on("escape", function()
@@ -112,10 +112,8 @@ ModifierNavigator.load = function(self)
 		local Modifier = self.view.modifierModel.modifiers[itemIndex or availableModifierList.selected]
 		self:send({
 			name = "addModifier",
-			modifierConfig = Modifier:getDefaultConfig(),
-			index = modifierList.selected + 1
+			modifierConfig = Modifier:getDefaultConfig()
 		})
-		modifierList.selected = modifierList.selected + 1
 	end)
 	availableModifierList:on("escape", function()
 		self:send({
@@ -125,16 +123,6 @@ ModifierNavigator.load = function(self)
 end
 
 ModifierNavigator.receive = function(self, event)
-	-- if event.name == "wheelmoved" then
-	-- 	local y = event.args[2]
-	-- 	if y == 1 then
-	-- 		self:call("up")
-	-- 	elseif y == -1 then
-	-- 		self:call("down")
-	-- 	end
-	-- elseif event.name == "mousepressed" then
-	-- 	self:call("return")
-	-- elseif event.name == "keypressed" then
 	if event.name == "keypressed" then
 		self:call(event.args[1])
 	end

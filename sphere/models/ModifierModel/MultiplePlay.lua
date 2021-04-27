@@ -6,21 +6,18 @@ local MultiplePlay = Modifier:new()
 MultiplePlay.type = "NoteChartModifier"
 
 MultiplePlay.name = "MultiplePlay"
-MultiplePlay.shortName = "MP"
+MultiplePlay.interfaceType = "stepper"
 
-MultiplePlay.defaultValue = 1
-MultiplePlay.format = "%s"
-MultiplePlay.range = {1, 3}
-MultiplePlay.values = {"DP", "TP", "QP"}
+MultiplePlay.defaultValue = 2
+MultiplePlay.range = {2, 4}
 
 MultiplePlay.getString = function(self, config)
-	config = config or self.config
-	return self.values[config.value]
+	return config.value .. "P"
 end
 
-MultiplePlay.apply = function(self)
+MultiplePlay.apply = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
-	local value = self.config.value
+	local value = config.value
 
 	local inputCounts = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do
@@ -41,7 +38,7 @@ MultiplePlay.apply = function(self)
 			local noteData = layerData:getNoteData(noteDataIndex)
 			local inputCount = inputCounts[noteData.inputType]
 			if inputCount then
-				for i = 1, value do
+				for i = 1, value - 1 do
 					local newInputIndex = noteData.inputIndex + inputCount * i
 
 					local newNoteData = NoteData:new(noteData.timePoint)
@@ -60,7 +57,7 @@ MultiplePlay.apply = function(self)
 	end
 
 	for inputType, inputCount in pairs(inputCounts) do
-		noteChart.inputMode:setInputCount(inputType, inputCount * (value + 1))
+		noteChart.inputMode:setInputCount(inputType, inputCount * value)
 	end
 
 	noteChart:compute()

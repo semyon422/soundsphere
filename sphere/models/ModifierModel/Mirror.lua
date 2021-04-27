@@ -3,23 +3,19 @@ local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 local Mirror = SwapModifier:new()
 
 Mirror.type = "NoteChartModifier"
+Mirror.interfaceType = "stepper"
 
 Mirror.name = "Mirror"
-Mirror.shortName = "MR"
 
-Mirror.defaultValue = 1
-Mirror.format = "%s"
+Mirror.defaultValue = "all"
 Mirror.range = {1, 3}
 Mirror.values = {"all", "left", "right"}
 
-Mirror.modeNames = {"A", "L", "R"}
-
 Mirror.getString = function(self, config)
-	config = config or self.config
-	return self.shortName .. self.modeNames[config.value]
+	return "MR" .. config.value:sub(1, 1):upper()
 end
 
-Mirror.getMap = function(self)
+Mirror.getMap = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
 
 	local inputCounts = {}
@@ -34,7 +30,7 @@ Mirror.getMap = function(self)
 
 	local map = {}
 
-	local value = self.config.value
+	local value = config.value
 	for inputType, inputCount in pairs(inputCounts) do
 		map[inputType] = {}
 		local submap = map[inputType]

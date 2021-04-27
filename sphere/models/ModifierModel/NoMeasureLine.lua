@@ -3,13 +3,13 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 local NoMeasureLine = Modifier:new()
 
 NoMeasureLine.type = "NoteChartModifier"
+NoMeasureLine.interfaceType = "toggle"
 
 NoMeasureLine.name = "NoMeasureLine"
 NoMeasureLine.shortName = "NML"
 
-NoMeasureLine.apply = function(self)
-	local config = self.config
-	if not config.value then
+NoMeasureLine.apply = function(self, config)
+	if config.value == 0 then
 		return
 	end
 

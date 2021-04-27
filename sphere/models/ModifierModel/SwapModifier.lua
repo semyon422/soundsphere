@@ -3,16 +3,16 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 local SwapModifier = Modifier:new()
 
 SwapModifier.type = "NoteChartModifier"
+SwapModifier.interfaceType = "toggle"
 
 SwapModifier.name = "SwapModifier"
 
-SwapModifier.apply = function(self)
-	local config = self.config
-	if not config.value then
-		return
-	end
+SwapModifier.apply = function(self, config)
+	-- if not config.value then
+	-- 	return
+	-- end
 
-	local map = self:getMap()
+	local map = self:getMap(config)
 
 	local noteChart = self.noteChartModel.noteChart
 	local layerDataSequence = noteChart.layerDataSequence

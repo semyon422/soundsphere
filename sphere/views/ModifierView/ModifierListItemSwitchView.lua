@@ -27,8 +27,6 @@ ModifierListItemSwitchView.draw = function(self)
 	local x, y, w, h = self:getPosition()
 
     local modifierConfig = item
-    local modifier = listView.view.modifierModel:getModifier(modifierConfig)
-    local realValue = modifier:getRealValue(modifierConfig)
 
 	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
 	if listView.isSelected then
@@ -55,7 +53,7 @@ ModifierListItemSwitchView.draw = function(self)
 
 	local switchView = self.switchView
 	switchView:setPosition(x + 3 * w / 4 - h / 2, y, h, h)
-	switchView:setValue(modifier:getNormalizedValue(modifierConfig))
+	switchView:setValue(modifierConfig.value)
 	switchView:draw()
 end
 
@@ -72,9 +70,8 @@ ModifierListItemSwitchView.receive = function(self, event)
 
 	local switch = listView.switch
 	local modifierConfig = self.item
-	local modifier = listView.view.modifierModel:getModifier(modifierConfig)
 	switch:setPosition(x + 3 * w / 4 - h / 2, y, h, h)
-	switch:setValue(modifier:getRealValue(modifierConfig))
+	switch:setValue(modifierConfig.value)
 	switch:receive(event)
 
 	if switch.valueUpdated then

@@ -3,10 +3,6 @@ local round = require("aqua.math").round
 
 local Modifier = Class:new()
 
-Modifier.construct = function(self)
-	self.config = self:getDefaultConfig()
-end
-
 Modifier.getDefaultConfig = function(self)
 	return {
 		name = self.name,
@@ -15,26 +11,58 @@ Modifier.getDefaultConfig = function(self)
 end
 
 Modifier.name = ""
-Modifier.shortName = ""
 Modifier.format = "%d"
 Modifier.defaultValue = 0
 Modifier.range = {0, 1}
 Modifier.step = 1
-Modifier.offset = 0
-Modifier.display = {"false", "true"}
 
-Modifier.getRealValue = function(self, config)
-	config = config or self.config
-	return self.offset + config.value * self.step
+Modifier.getValue = function(self, config)
+	return config.value
 end
 
-Modifier.getNormalizedValue = function(self, config)
-	config = config or self.config
-	return (config.value - self.range[1]) / (self.range[2] - self.range[1])
+Modifier.toNormValue = function(self, value)
+	return (value - self.range[1]) / (self.range[2] - self.range[1])
 end
 
-Modifier.fromNormalizedValue = function(self, value)
-	return round(self.range[1] + value * (self.range[2] - self.range[1]))
+Modifier.fromNormValue = function(self, normValue)
+	normValue = math.min(math.max(normValue, 0), 1)
+	return self.range[1] + round(normValue * (self.range[2] - self.range[1]), self.step)
+end
+
+Modifier.toIndexValue = function(self, value)
+	if not self.values then
+		return round((value - self.range[1]) / self.step) + 1
+	end
+	for i, currentValue in ipairs(self.values) do
+		if value == currentValue then
+			return i
+		end
+	end
+	return 1
+end
+
+Modifier.fromIndexValue = function(self, indexValue)
+	if not self.values then
+		return self.range[1] + (indexValue - 1) * self.step
+	end
+	indexValue = math.min(math.max(indexValue, 1), #self.values)
+	return self.values[indexValue] or ""
+end
+
+Modifier.getCount = function(self, indexValue)
+	if not self.values then
+		return round((self.range[2] - self.range[1]) / self.step) + 1
+	end
+	return #self.values
+end
+
+Modifier.setValue = function(self, config, value)
+	local range = self.range
+	if type(self.defaultValue) == "number" then
+		config.value = math.min(math.max(round(value, self.step), range[1]), range[2])
+		return
+	end
+	config.value = value
 end
 
 Modifier.update = function(self) end
@@ -42,14 +70,14 @@ Modifier.update = function(self) end
 Modifier.receive = function(self, event) end
 
 Modifier.checkValue = function(self, value)
-	local range = self.range
-	if value >= range[1] and value <= range[2] and value % 1 == 0 then
-		return true
-	end
+	-- local range = self.range
+	-- if value >= range[1] and value <= range[2] and value % 1 == 0 then
+	-- 	return true
+	-- end
 end
 
 Modifier.getString = function(self, config)
-	return self.shortName
+	return self.shortName or self.name
 end
 
 return Modifier

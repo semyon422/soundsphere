@@ -4,13 +4,13 @@ local NoteData = require("ncdk.NoteData")
 local AutoKeySound = Modifier:new()
 
 AutoKeySound.type = "NoteChartModifier"
+AutoKeySound.interfaceType = "toggle"
 
 AutoKeySound.name = "AutoKeySound"
 AutoKeySound.shortName = "AKS"
 
-AutoKeySound.apply = function(self)
-	local config = self.config
-	if not config.value then
+AutoKeySound.apply = function(self, config)
+	if config.value == 0 then
 		return
 	end
 

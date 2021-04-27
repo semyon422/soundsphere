@@ -4,19 +4,18 @@ local NoteData = require("ncdk.NoteData")
 local FullLongNote = Modifier:new()
 
 FullLongNote.type = "NoteChartModifier"
+FullLongNote.interfaceType = "slider"
 
 FullLongNote.name = "FullLongNote"
-FullLongNote.shortName = "FLN"
 
 FullLongNote.defaultValue = 0
 FullLongNote.range = {0, 3}
 
 FullLongNote.getString = function(self, config)
-	config = config or self.config
-	return self.shortName .. config.value
+	return "FLN" .. config.value
 end
 
-FullLongNote.apply = function(self)
+FullLongNote.apply = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
 	self.noteDatas = {}
 	self.noteDataLayers = {}
@@ -39,6 +38,8 @@ FullLongNote.apply = function(self)
 	table.sort(self.noteDatas, function(noteData1, noteData2)
 		return noteData1.timePoint < noteData2.timePoint
 	end)
+
+	self.level = config.value
 
 	local noteDatas = self.noteDatas
 	for i = 1, #noteDatas do
@@ -80,7 +81,7 @@ FullLongNote.processNoteData = function(self, noteDataIndex, noteData)
 	end
 
 	local endTimePoint
-	local level = self.config.value
+	local level = self.level
 	if level >= 3 and #timePointList >= 2 then
 		if not nNoteData then
 			endTimePoint = timePointList[#timePointList]

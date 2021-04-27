@@ -3,26 +3,19 @@ local Modifier	= require("sphere.models.ModifierModel.Modifier")
 local Alternate = Modifier:new()
 
 Alternate.type = "NoteChartModifier"
+Alternate.interfaceType = "stepper"
 
 Alternate.name = "Alternate"
-Alternate.shortName = "Alt"
 
-Alternate.variableValues = {"key", "scratch"}
-Alternate.modeNames = {"K", "S"}
-
-Alternate.defaultValue = 1
+Alternate.defaultValue = "key"
 Alternate.range = {1, 2}
+Alternate.values = {"key", "scratch"}
 
-Alternate.getString = function(self)
-	return self.shortName .. self.modeNames[self.value]
+Alternate.getString = function(self, config)
+	return "Alt" .. self.value:sub(1, 1):upper()
 end
 
-Alternate.getRealValue = function(self, config)
-	config = config or self.config
-	return self.variableValues[config.value]
-end
-
-Alternate.apply = function(self)
+Alternate.apply = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
 
 	local inputCounts = {}
@@ -36,7 +29,7 @@ Alternate.apply = function(self)
 	end
 
 	local layerDataSequence = noteChart.layerDataSequence
-	local inputType = self.variableValues[self.value]
+	local inputType = config.value
 	local inputAlternate = {}
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do

@@ -3,21 +3,20 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 local ProMode = Modifier:new()
 
 ProMode.type = "LogicEngineModifier"
+ProMode.interfaceType = "toggle"
 
 ProMode.name = "ProMode"
 ProMode.shortName = "ProMode"
 
-ProMode.apply = function(self)
-	local config = self.config
-	if not config.value then
+ProMode.apply = function(self, config)
+	if config.value == 0 then
 		return
 	end
 	self.rhythmModel.logicEngine.promode = true
 end
 
-ProMode.receive = function(self, event)
-	local config = self.config
-	if not config.value then
+ProMode.receive = function(self, config, event)
+	if config.value == 0 then
 		return
 	end
 

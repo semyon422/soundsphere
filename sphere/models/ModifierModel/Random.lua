@@ -3,25 +3,21 @@ local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 local Random = SwapModifier:new()
 
 Random.type = "NoteChartModifier"
+Random.interfaceType = "stepper"
 
 Random.name = "Random"
-Random.shortName = "RD"
 
-Random.defaultValue = 1
-Random.format = "%s"
+Random.defaultValue = "all"
 Random.range = {1, 3}
 Random.values = {"all", "left", "right"}
 
-Random.modeNames = {"A", "L", "R"}
-
 Random.getString = function(self, config)
-	config = config or self.config
-	return self.shortName .. self.modeNames[config.value]
+	return "RD" .. config.value:sub(1, 1):upper()
 end
 
-Random.getMap = function(self)
+Random.getMap = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
-	local value = self.config.value
+	local value = config.value
 
 	local inputs = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do
