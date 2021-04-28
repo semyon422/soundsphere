@@ -140,7 +140,8 @@ ScoreSystem.after = function(self, event)
 end
 
 ScoreSystem.processAccuracy = function(self, event)
-	local deltaTime = (event.currentTime - event.noteTime) / math.abs(event.timeRate)
+	local noteStartTime = event.noteStartTime or event.noteTime
+	local deltaTime = (event.currentTime - noteStartTime) / math.abs(event.timeRate)
 
 	self.accuracySum = self.accuracySum + deltaTime ^ 2
 	self.accuracyCount = self.accuracyCount + 1
@@ -153,7 +154,8 @@ ScoreSystem.processAccuracy = function(self, event)
 end
 
 ScoreSystem.processNoteScore = function(self, event)
-	local deltaTime = (event.currentTime - event.noteTime) / math.abs(event.timeRate)
+	local noteStartTime = event.noteStartTime or event.noteTime
+	local deltaTime = (event.currentTime - noteStartTime) / math.abs(event.timeRate)
 	local noteScores = deltaTime < 0 and self.noteScoresLT0 or self.noteScoresMT0
 	deltaTime = math.abs(deltaTime)
 
@@ -188,7 +190,10 @@ ScoreSystem.short_missed = function(self, event)
 	self.misscount = self.misscount + 1
 end
 
-ScoreSystem.long_clear_startPassedPressed = ScoreSystem.processAccuracy
+ScoreSystem.long_clear_startPassedPressed = function(self, event)
+	self:processAccuracy(event)
+	self:processNoteScore(event)
+end
 ScoreSystem.long_clear_startMissed = ScoreSystem.short_missed
 ScoreSystem.long_clear_startMissedPressed = ScoreSystem.short_missed  -- ??? does it appear anywhere?
 
