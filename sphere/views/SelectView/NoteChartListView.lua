@@ -33,9 +33,9 @@ NoteChartListView.receive = function(self, event)
 		if mx >= x and mx < x + w and my >= y and my < y + h then
 			local wy = event.args[2]
 			if wy == 1 then
-				self.navigator:call("left")
+				self.navigator:scrollNoteChartUp()
 			elseif wy == -1 then
-				self.navigator:call("right")
+				self.navigator:scrollNoteChartDown()
 			end
 		end
 	end

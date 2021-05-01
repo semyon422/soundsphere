@@ -33,9 +33,9 @@ NoteChartSetListView.receive = function(self, event)
 		if mx >= x and mx < x + w and my >= y and my < y + h then
 			local wy = event.args[2]
 			if wy == 1 then
-				self.navigator:call("up")
+				self.navigator:scrollNoteChartSetUp()
 			elseif wy == -1 then
-				self.navigator:call("down")
+				self.navigator:scrollNoteChartSetDown()
 			end
 		end
 	end
