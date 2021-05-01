@@ -54,16 +54,16 @@ SortStepperView.draw = function(self)
 
 	love.graphics.polygon(
 		"fill",
-		cs:X((config.x + rx1) / screen.h, true), cs:X((config.y + ty) / screen.h, true),
-		cs:X((config.x + lx1) / screen.h, true), cs:X((config.y + my) / screen.h, true),
-		cs:X((config.x + rx1) / screen.h, true), cs:X((config.y + by) / screen.h, true)
+		cs:X((config.x + rx1) / screen.h, true), cs:Y((config.y + ty) / screen.h, true),
+		cs:X((config.x + lx1) / screen.h, true), cs:Y((config.y + my) / screen.h, true),
+		cs:X((config.x + rx1) / screen.h, true), cs:Y((config.y + by) / screen.h, true)
 	)
 
 	love.graphics.polygon(
 		"fill",
-		cs:X((config.x + lx2) / screen.h, true), cs:X((config.y + ty) / screen.h, true),
-		cs:X((config.x + rx2) / screen.h, true), cs:X((config.y + my) / screen.h, true),
-		cs:X((config.x + lx2) / screen.h, true), cs:X((config.y + by) / screen.h, true)
+		cs:X((config.x + lx2) / screen.h, true), cs:Y((config.y + ty) / screen.h, true),
+		cs:X((config.x + rx2) / screen.h, true), cs:Y((config.y + my) / screen.h, true),
+		cs:X((config.x + lx2) / screen.h, true), cs:Y((config.y + by) / screen.h, true)
 	)
 end
 
