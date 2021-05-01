@@ -193,8 +193,9 @@ local NoteChartSetScrollBar = {
 	screen = screen,
 	x = 1641,
 	y = 144,
-	w = 17, -- ????????
-	h = 792
+	w = 16, -- ????????
+	h = 792,
+	rows = 11
 }
 
 local StageInfoScrollBar = {
@@ -202,7 +203,7 @@ local StageInfoScrollBar = {
 	screen = screen,
 	x = 270,
 	y = 279,
-	w = 9, -- ????????
+	w = 8, -- ????????
 	h = 522
 }
 

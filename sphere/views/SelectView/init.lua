@@ -13,6 +13,7 @@ local SortStepperView = require(viewspackage .. "SelectView.SortStepperView")
 local ScreenMenuView = require(viewspackage .. "SelectView.ScreenMenuView")
 local UserInfoView = require(viewspackage .. "SelectView.UserInfoView")
 local LogoView = require(viewspackage .. "SelectView.LogoView")
+local NoteChartSetScrollBarView = require(viewspackage .. "SelectView.NoteChartSetScrollBarView")
 local BackgroundView = require(viewspackage .. "BackgroundView")
 
 local SelectView = Class:new()
@@ -28,6 +29,7 @@ SelectView.construct = function(self)
 	self.screenMenuView = ScreenMenuView:new()
 	self.userInfoView = UserInfoView:new()
 	self.logoView = LogoView:new()
+	self.noteChartSetScrollBarView = NoteChartSetScrollBarView:new()
 end
 
 SelectView.load = function(self)
@@ -38,6 +40,7 @@ SelectView.load = function(self)
 	local screenMenuView = self.screenMenuView
 	local userInfoView = self.userInfoView
 	local logoView = self.logoView
+	local noteChartSetScrollBarView = self.noteChartSetScrollBarView
 
 	local selectConfig = self.configModel:getConfig("select")
 	self.selectConfig = selectConfig
@@ -61,6 +64,9 @@ SelectView.load = function(self)
 
 	searchFieldView.searchLineModel = self.searchLineModel
 
+	noteChartSetScrollBarView.selectModel = self.selectModel
+	noteChartSetScrollBarView.noteChartSetLibraryModel = self.noteChartSetLibraryModel
+
 	screenMenuView.navigator = self.navigator
 
 	local backgroundView = BackgroundView:new()
@@ -77,6 +83,7 @@ SelectView.load = function(self)
 	sequenceView:setView("ScreenMenuView", screenMenuView)
 	sequenceView:setView("UserInfoView", userInfoView)
 	sequenceView:setView("LogoView", logoView)
+	sequenceView:setView("NoteChartSetScrollBarView", noteChartSetScrollBarView)
 
 	self.sequenceView:load()
 
