@@ -305,13 +305,36 @@ local ModifierIconGrid = {
 	row = 2
 }
 
-local BottomMenu = {
-	class = "BottomMenuView",
+local ScreenMenu = {
+	class = "ScreenMenuView",
 	screen = screen,
 	x = 392,
 	y = 991,
 	w = 681,
-	h = 89
+	h = 89,
+	columns = 3,
+	text = {
+		x = 0,
+		y = 26,
+		w = 228,
+		h = 36,
+		fontSize = 24,
+		align = "center"
+	},
+	screens = {
+		{
+			name = "Modifier",
+			displayName = "modifiers"
+		},
+		{
+			name = "NoteSkin",
+			displayName = "noteskins"
+		},
+		{
+			name = "Input",
+			displayName = "input"
+		}
+	}
 }
 
 local SelectViewConfig = {
@@ -329,7 +352,7 @@ local SelectViewConfig = {
 	SortStepper,
 
 	ModifierIconGrid,
-	BottomMenu
+	ScreenMenu
 }
 
 return SelectViewConfig

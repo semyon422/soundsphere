@@ -10,7 +10,7 @@ local NoteChartListView = require(viewspackage .. "SelectView.NoteChartListView"
 local ScoreListView = require(viewspackage .. "SelectView.ScoreListView")
 local SearchFieldView = require(viewspackage .. "SelectView.SearchFieldView")
 local SortStepperView = require(viewspackage .. "SelectView.SortStepperView")
-local SelectMenuView = require(viewspackage .. "SelectView.SelectMenuView")
+local ScreenMenuView = require(viewspackage .. "SelectView.ScreenMenuView")
 local BackgroundView = require(viewspackage .. "BackgroundView")
 
 local SelectView = Class:new()
@@ -23,6 +23,7 @@ SelectView.construct = function(self)
 	self.noteChartSetListView = NoteChartSetListView:new()
 	self.searchFieldView = SearchFieldView:new()
 	self.sortStepperView = SortStepperView:new()
+	self.screenMenuView = ScreenMenuView:new()
 end
 
 SelectView.load = function(self)
@@ -30,6 +31,7 @@ SelectView.load = function(self)
 	local noteChartListView = self.noteChartListView
 	local searchFieldView = self.searchFieldView
 	local sortStepperView = self.sortStepperView
+	local screenMenuView = self.screenMenuView
 
 	local selectConfig = self.configModel:getConfig("select")
 	self.selectConfig = selectConfig
@@ -53,11 +55,7 @@ SelectView.load = function(self)
 
 	searchFieldView.searchLineModel = self.searchLineModel
 
-	-- local selectMenuView = SelectMenuView:new()
-	-- selectMenuView.navigator = navigator
-	-- selectMenuView.config = self.config
-	-- selectMenuView.view = self
-	-- self.selectMenuView = selectMenuView
+	screenMenuView.navigator = self.navigator
 
 	local backgroundView = BackgroundView:new()
 	self.backgroundView = backgroundView
@@ -70,6 +68,7 @@ SelectView.load = function(self)
 	sequenceView:setView("BackgroundView", backgroundView)
 	sequenceView:setView("SearchFieldView", searchFieldView)
 	sequenceView:setView("SortStepperView", sortStepperView)
+	sequenceView:setView("ScreenMenuView", screenMenuView)
 
 	self.sequenceView:load()
 

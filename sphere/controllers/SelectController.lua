@@ -111,16 +111,16 @@ SelectController.receive = function(self, event)
 		self.selectModel:scrollNoteChart(event.direction)
 	elseif event.name == "scrollScore" then 
 		self.selectModel:scrollScore(event.direction)
-	elseif event.action == "clickSelectMenu" then
-		if event.item.controllerName == "ModifierController" then
+	elseif event.name == "changeScreen" then
+		if event.screenName == "Modifier" then
 			self:switchModifierController()
-		elseif event.item.controllerName == "NoteSkinController" then
+		elseif event.screenName == "NoteSkin" then
 			self:switchNoteSkinController()
-		elseif event.item.controllerName == "InputController" then
+		elseif event.screenName == "Input" then
 			self:switchInputController()
-		elseif event.item.controllerName == "SettingsController" then
+		elseif event.screenName == "Settings" then
 			self:switchSettingsController()
-		elseif event.item.controllerName == "CollectionController" then
+		elseif event.screenName == "Collection" then
 			self:switchCollectionController()
 		end
 	elseif event.name == "startCacheUpdate" then
