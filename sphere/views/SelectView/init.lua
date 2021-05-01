@@ -15,6 +15,7 @@ local UserInfoView = require(viewspackage .. "SelectView.UserInfoView")
 local LogoView = require(viewspackage .. "SelectView.LogoView")
 local NoteChartSetScrollBarView = require(viewspackage .. "SelectView.NoteChartSetScrollBarView")
 local StageInfoScrollBarView = require(viewspackage .. "SelectView.StageInfoScrollBarView")
+local StageInfoView = require(viewspackage .. "SelectView.StageInfoView")
 local BackgroundView = require(viewspackage .. "BackgroundView")
 
 local SelectView = Class:new()
@@ -32,6 +33,7 @@ SelectView.construct = function(self)
 	self.logoView = LogoView:new()
 	self.noteChartSetScrollBarView = NoteChartSetScrollBarView:new()
 	self.stageInfoScrollBarView = StageInfoScrollBarView:new()
+	self.stageInfoView = StageInfoView:new()
 end
 
 SelectView.load = function(self)
@@ -44,6 +46,7 @@ SelectView.load = function(self)
 	local logoView = self.logoView
 	local noteChartSetScrollBarView = self.noteChartSetScrollBarView
 	local stageInfoScrollBarView = self.stageInfoScrollBarView
+	local stageInfoView = self.stageInfoView
 
 	local selectConfig = self.configModel:getConfig("select")
 	self.selectConfig = selectConfig
@@ -88,6 +91,7 @@ SelectView.load = function(self)
 	sequenceView:setView("LogoView", logoView)
 	sequenceView:setView("NoteChartSetScrollBarView", noteChartSetScrollBarView)
 	sequenceView:setView("StageInfoScrollBarView", stageInfoScrollBarView)
+	sequenceView:setView("StageInfoView", stageInfoView)
 
 	self.sequenceView:load()
 

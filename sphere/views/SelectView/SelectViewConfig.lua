@@ -91,8 +91,7 @@ local StageInfo = {
 	h = 522,
 	smallCell = {
 		x = {0, 113, 227, 340},
-		yt = {0, 50, 101, 152},
-		yb = {319, 370, 421, 472},
+		y = {0, 50, 101, 152, 319, 370, 421, 472},
 		name = {
 			x = 22,
 			y = -4,
@@ -111,21 +110,21 @@ local StageInfo = {
 		},
 	},
 	largeCell = {
-		x = {279, 506},
-		y = {504},
+		x = {0, 227},
+		y = {225},
 		name = {
 			x = 22,
-			y = 7,
-			w = 161,
-			h = 54,
+			y = -6,
+			w = 160,
+			h = 27,
 			align = "right",
 			fontSize = 18
 		},
 		value = {
 			x = 22,
-			y = -6,
-			w = 160,
-			h = 27,
+			y = 7,
+			w = 161,
+			h = 54,
 			align = "right",
 			fontSize = 36
 		}
@@ -134,40 +133,68 @@ local StageInfo = {
 
 StageInfo.cells = {
 	{
-		cell = StageInfo.smallCell,
+		type = StageInfo.smallCell,
 		x = 2,
 		y = 3,
 		name = "duration",
 		key = "length"
 	},
 	{
-		cell = StageInfo.smallCell,
-		x = 3,
+		type = StageInfo.smallCell,
+		x = 2,
 		y = 4,
 		name = "notes",
 		key = "noteCount"
 	},
 	{
-		cell = StageInfo.smallCell,
+		type = StageInfo.smallCell,
 		x = 1,
 		y = 4,
 		name = "level",
 		key = "level"
 	},
 	{
-		cell = StageInfo.largeCell,
+		type = StageInfo.largeCell,
 		x = 1,
 		y = 1,
 		name = "accuracy",
 		key = "accuracy"
 	},
 	{
-		cell = StageInfo.largeCell,
+		type = StageInfo.largeCell,
 		x = 2,
 		y = 1,
 		name = "score",
 		key = "score"
-	}
+	},
+	{
+		type = StageInfo.smallCell,
+		x = {3, 4},
+		y = 5,
+		name = "played",
+		key = "played"
+	},
+	{
+		type = StageInfo.smallCell,
+		x = 3,
+		y = 6,
+		name = "pp",
+		key = "pp"
+	},
+	{
+		type = StageInfo.smallCell,
+		x = 4,
+		y = 6,
+		name = "rank",
+		key = "rank"
+	},
+	{
+		type = StageInfo.smallCell,
+		x = {1, 2},
+		y = 8,
+		name = "predicted accuracy",
+		key = "accuracy"
+	},
 }
 
 local Background = {
