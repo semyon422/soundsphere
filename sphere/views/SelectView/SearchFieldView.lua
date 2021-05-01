@@ -37,6 +37,8 @@ SearchFieldView.draw = function(self)
 	)
 
 	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.setLineWidth(cs:X(config.frame.lineWidth / screen.h))
+	love.graphics.setLineStyle(config.frame.lineStyle)
 	love.graphics.rectangle(
 		"line",
 		cs:X((config.x + config.frame.x) / screen.h, true),

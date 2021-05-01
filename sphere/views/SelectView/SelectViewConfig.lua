@@ -255,7 +255,9 @@ local SearchField = {
 		x = 6,
 		y = 6,
 		w = 269,
-		h = 43
+		h = 43,
+		lineStyle = "smooth",
+		lineWidth = 1.5
 	},
 	text = {
 		x = 27,
