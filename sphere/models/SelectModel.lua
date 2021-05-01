@@ -15,6 +15,10 @@ SelectModel.load = function(self)
 	self:pullNoteChartSet()
 end
 
+SelectModel.update = function(self)
+	self:updateSearch()
+end
+
 SelectModel.updateSearch = function(self)
 	local newSearchString = self.searchLineModel.searchString
 	if self.config.searchString ~= newSearchString then

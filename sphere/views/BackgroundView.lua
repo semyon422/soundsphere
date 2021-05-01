@@ -8,7 +8,7 @@ local BackgroundView = Node:new()
 
 BackgroundView.parallax = 0.0125
 
-BackgroundView.init = function(self)
+BackgroundView.load = function(self)
 	self:on("draw", self.draw)
 
 	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")

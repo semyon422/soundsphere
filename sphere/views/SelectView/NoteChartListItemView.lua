@@ -1,127 +1,88 @@
 
-local Node = require("aqua.util.Node")
+local Class = require("aqua.util.Class")
 local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
 
-local NoteChartListItemView = Node:new()
-
-NoteChartListItemView.init = function(self)
-	self:on("draw", self.draw)
-
-	self.fontName = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
-	self.fontCreator = aquafonts.getFont(spherefonts.NotoSansRegular, 16)
-	self.fontInputMode = aquafonts.getFont(spherefonts.NotoSansRegular, 18)
-	self.fontDifficulty = aquafonts.getFont(spherefonts.NotoMonoRegular, 24)
-end
+local NoteChartListItemView = Class:new()
 
 NoteChartListItemView.draw = function(self)
-	local listView = self.listView
-
-	local itemIndex = self.itemIndex
+	local config = self.listView.config
+	local cs = self.listView.cs
+	local screen = config.screen
+	local y = config.y + (self.index - 1) * config.h / config.rows
 	local item = self.item
+	local noteChartDataEntry = item.noteChartDataEntry
+
 	local prevItem = self.prevItem
 	local nextItem = self.nextItem
 
-	local cs = listView.cs
+	local scale = cs.one / screen.h
 
-	local x = cs:X(listView.x, true)
-	local y = cs:Y(listView.y, true)
-	local w = cs:X(listView.w)
-	local h = cs:Y(listView.h)
-
-	local index = self.index
-	local noteChartDataEntry = item.noteChartDataEntry
-
-	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
-	if listView.isSelected then
-		love.graphics.setColor(1, 1, 1,
-			deltaItemIndex == 0 and 1 or 0.66
-		)
-	else
-		love.graphics.setColor(1, 1, 1,
-			deltaItemIndex == 0 and 1 or 0.33
-		)
-	end
-
-	if deltaItemIndex == 0 then
-		love.graphics.rectangle(
-			"fill",
-			x,
-			y + (index - 1) * h / listView.itemCount,
-			cs:X(4 / cs.one),
-			h / listView.itemCount
-		)
-	end
-
-	love.graphics.setFont(self.fontName)
+	local fontName = aquafonts.getFont(spherefonts.NotoSansRegular, config.name.fontSize)
+	love.graphics.setFont(fontName)
 	love.graphics.printf(
 		noteChartDataEntry.name,
-		x,
-		y + (index - 1) * h / listView.itemCount,
-		w / cs.one * 1080,
-		"left",
+		cs:X((config.x + config.name.x) / screen.h, true),
+		cs:Y((y + config.name.y) / screen.h, true),
+		config.name.w,
+		config.name.align,
 		0,
-		cs.one / 1080,
-		cs.one / 1080,
-		-cs:X(120 / cs.one),
-		-cs:Y(18 / cs.one)
+		scale,
+		scale
 	)
 
 	if not prevItem or prevItem.noteChartDataEntry.creator ~= item.noteChartDataEntry.creator then
-		love.graphics.setFont(self.fontCreator)
+		local fontCreator = aquafonts.getFont(spherefonts.NotoSansRegular, config.creator.fontSize)
+		love.graphics.setFont(fontCreator)
 		love.graphics.printf(
 			noteChartDataEntry.creator,
-			x,
-			y + (index - 1) * h / listView.itemCount,
-			w / cs.one * 1080,
-			"left",
+			cs:X((config.x + config.creator.x) / screen.h, true),
+			cs:Y((y + config.creator.y) / screen.h, true),
+			config.creator.w,
+			config.creator.align,
 			0,
-			cs.one / 1080,
-			cs.one / 1080,
-			-cs:X(120 / cs.one),
-			-cs:Y(4 / cs.one)
+			scale,
+			scale
 		)
 	end
 
 	if not prevItem or prevItem.noteChartDataEntry.inputMode ~= item.noteChartDataEntry.inputMode then
-		love.graphics.setFont(self.fontInputMode)
+		local fontInputMode = aquafonts.getFont(spherefonts.NotoSansRegular, config.inputMode.fontSize)
+		love.graphics.setFont(fontInputMode)
 		love.graphics.printf(
 			noteChartDataEntry.inputMode,
-			x,
-			y + (index - 1) * h / listView.itemCount,
-			w / cs.one * 1080,
-			"left",
+			cs:X((config.x + config.inputMode.x) / screen.h, true),
+			cs:Y((y + config.inputMode.y) / screen.h, true),
+			config.inputMode.w,
+			config.inputMode.align,
 			0,
-			cs.one / 1080,
-			cs.one / 1080,
-			-cs:X(15 / cs.one),
-			cs:Y(4 / cs.one)
+			scale,
+			scale
 		)
 	end
 
-	love.graphics.setFont(self.fontDifficulty)
+	local difficulty = noteChartDataEntry.noteCount / noteChartDataEntry.length / 3
+	local format = "%.2f"
+	if difficulty >= 10 then
+		format = "%.1f"
+	elseif difficulty >= 100 then
+		format = "%d"
+	elseif difficulty >= 1000 then
+		format = "%s"
+		difficulty = "???"
+	end
+	local fontDifficulty = aquafonts.getFont(spherefonts.NotoMonoRegular, config.difficulty.fontSize)
+	love.graphics.setFont(fontDifficulty)
 	love.graphics.printf(
-		("%.2f"):format(noteChartDataEntry.noteCount / noteChartDataEntry.length / 3),
-		x,
-		y + (index - 1) * h / listView.itemCount,
-		w / cs.one * 1080,
-		"left",
+		format:format(difficulty),
+		cs:X((config.x + config.difficulty.x) / screen.h, true),
+		cs:Y((y + config.difficulty.y) / screen.h, true),
+		config.difficulty.w,
+		config.difficulty.align,
 		0,
-		cs.one / 1080,
-		cs.one / 1080,
-		-cs:X(15 / cs.one),
-		-cs:Y(23 / cs.one)
+		scale,
+		scale
 	)
-
-	if nextItem and nextItem.noteChartDataEntry.inputMode ~= item.noteChartDataEntry.inputMode then
-		love.graphics.setColor(1, 1, 1, 0.25)
-		love.graphics.line(
-			x,
-			y + index * h / listView.itemCount,
-			x + w / 3,
-			y + index * h / listView.itemCount
-		)
-	end
 end
 
 return NoteChartListItemView

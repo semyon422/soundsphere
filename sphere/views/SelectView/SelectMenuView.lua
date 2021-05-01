@@ -20,12 +20,11 @@ SelectMenuView.init = function(self)
 	self.itemCount = #self.items
 
 	self:on("update", function()
-		self.selectedItem = self.navigator.selectMenu.selected
+		self.selectedItem = 1
 	end)
 	self:on("select", function()
-		self.navigator:setNode("selectMenu")
+		-- self.navigator:setNode("selectMenu")
 	end)
-	self:on("draw", self.drawFrame)
 	self:on("mousemoved", self.receive)
 
 	ListView.init(self)
@@ -54,14 +53,6 @@ SelectMenuView.reloadItems = function(self)
 			controllerName = "CollectionController"
 		},
 	}
-end
-
-SelectMenuView.drawFrame = function(self)
-	if self.navigator:checkNode("selectMenu") then
-		self.isSelected = true
-	else
-		self.isSelected = false
-	end
 end
 
 SelectMenuView.draw = function(self)

@@ -64,7 +64,7 @@ SelectMenuItemView.receive = function(self, event)
 		local mx = event.args[1]
 		local my = event.args[2]
 		if belong(mx, x, x + w) and belong(my, y, y + h) then
-			listView.navigator.selectMenu.selected = self.itemIndex
+			-- listView.navigator.selectMenu.selected = self.itemIndex
 		end
 	end
 end

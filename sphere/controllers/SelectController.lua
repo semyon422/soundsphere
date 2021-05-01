@@ -91,6 +91,7 @@ end
 
 SelectController.update = function(self, dt)
 	self.previewModel:update(dt)
+	self.selectModel:update()
 	self.view:update(dt)
 end
 
@@ -99,12 +100,11 @@ SelectController.draw = function(self)
 end
 
 SelectController.receive = function(self, event)
+	self.searchLineModel:receive(event)
 	self.view:receive(event)
 
 	if event.name == "setTheme" then
 		self.themeModel:setDefaultTheme(event.theme)
-	elseif event.name == "updateSearch" then
-		self.selectModel:updateSearch()
 	elseif event.name == "scrollNoteChartSet" then 
 		self.selectModel:scrollNoteChartSet(event.direction)
 	elseif event.name == "scrollNoteChart" then 

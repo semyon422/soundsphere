@@ -1,8 +1,9 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
 local Class = require("aqua.util.Class")
-local Node = require("aqua.util.Node")
 
+local SequenceView = require(viewspackage .. "SequenceView")
+local SelectViewConfig = require(viewspackage .. "SelectView.SelectViewConfig")
 local SelectNavigator = require(viewspackage .. "SelectView.SelectNavigator")
 local NoteChartSetListView = require(viewspackage .. "SelectView.NoteChartSetListView")
 local NoteChartListView = require(viewspackage .. "SelectView.NoteChartListView")
@@ -14,94 +15,78 @@ local BackgroundView = require(viewspackage .. "BackgroundView")
 local SelectView = Class:new()
 
 SelectView.construct = function(self)
-	self.node = Node:new()
+	self.selectViewConfig = SelectViewConfig
+	self.sequenceView = SequenceView:new()
+	self.noteChartListView = NoteChartListView:new()
+	self.noteChartSetListView = NoteChartSetListView:new()
+	self.searchLineView = SearchLineView:new()
 end
 
 SelectView.load = function(self)
-	local node = self.node
-	local config = self.configModel:getConfig("select")
+	local noteChartSetListView = self.noteChartSetListView
+	local noteChartListView = self.noteChartListView
+	local searchLineView = self.searchLineView
+
+	local selectConfig = self.configModel:getConfig("select")
+	self.selectConfig = selectConfig
 
 	local navigator = SelectNavigator:new()
 	self.navigator = navigator
-	navigator.searchLineModel = self.searchLineModel
 	navigator.selectModel = self.selectModel
-	navigator.config = config
 	navigator.view = self
 
-	local noteChartSetListView = NoteChartSetListView:new()
-	noteChartSetListView.navigator = navigator
-	noteChartSetListView.config = config
-	noteChartSetListView.view = self
+	noteChartSetListView.noteChartSetLibraryModel = self.noteChartSetLibraryModel
+	noteChartSetListView.selectModel = self.selectModel
 
-	local noteChartListView = NoteChartListView:new()
-	noteChartListView.navigator = navigator
-	noteChartListView.config = config
-	noteChartListView.view = self
+	noteChartListView.noteChartLibraryModel = self.noteChartLibraryModel
+	noteChartListView.selectModel = self.selectModel
 
-	local scoreListView = ScoreListView:new()
-	scoreListView.navigator = navigator
-	scoreListView.config = config
-	scoreListView.view = self
+	-- local scoreListView = ScoreListView:new()
+	-- scoreListView.navigator = navigator
+	-- scoreListView.config = config
+	-- scoreListView.view = self
 
-	local searchLineView = SearchLineView:new()
-	searchLineView.navigator = navigator
-	searchLineView.searchLineModel = self.searchLineModel
-	searchLineView.config = self.config
-	searchLineView.view = self
+	-- searchLineView.searchLineModel = self.searchLineModel
 
-	local selectMenuView = SelectMenuView:new()
-	selectMenuView.navigator = navigator
-	selectMenuView.config = self.config
-	selectMenuView.view = self
-	self.selectMenuView = selectMenuView
+	-- local selectMenuView = SelectMenuView:new()
+	-- selectMenuView.navigator = navigator
+	-- selectMenuView.config = self.config
+	-- selectMenuView.view = self
+	-- self.selectMenuView = selectMenuView
 
 	local backgroundView = BackgroundView:new()
+	self.backgroundView = backgroundView
 	backgroundView.view = self
 
-	node:node(backgroundView)
-	node:node(noteChartSetListView)
-	node:node(noteChartListView)
-	node:node(scoreListView)
-	node:node(searchLineView)
-	node:node(selectMenuView)
+	local sequenceView = self.sequenceView
+	sequenceView:setSequenceConfig(self.selectViewConfig)
+	sequenceView:setView("NoteChartSetListView", noteChartSetListView)
+	sequenceView:setView("NoteChartListView", noteChartListView)
+	sequenceView:setView("BackgroundView", backgroundView)
+	-- sequenceView:setView("SearchLineView", searchLineView)
+
+	self.sequenceView:load()
 
 	navigator:load()
 end
 
 SelectView.unload = function(self)
 	self.navigator:unload()
+	self.sequenceView:unload()
 end
 
 SelectView.receive = function(self, event)
-	-- if event.name == "keypressed" and event.args[1] == "escape" then
-	-- 	self.controller:receive({
-	-- 		name = "setScreen",
-	-- 		screenName = "SelectScreen"
-	-- 	})
-	-- end
-	if event.name == "mousemoved" then
-		self.node:callnext("mousemoved", event)
-	end
-	-- if event.name == "mousepressed" then
-	-- 	selectedNode:call("mousepressed", event)
-	-- end
-	-- if event.name == "wheelmoved" then
-	-- 	selectedNode:call("wheelmoved", event.args[2])
-	-- end
-	-- if event.name == "keypressed" then
-	-- 	selectedNode:call("keypressed", event.args[1])
-	-- end
 	self.navigator:receive(event)
-	self.searchLineModel:receive(event)
+	self.sequenceView:receive(event)
 end
 
 SelectView.update = function(self, dt)
-	self.node:callnext("update")
 	self.navigator:update()
+	self.sequenceView:update(dt)
 end
 
 SelectView.draw = function(self)
-	self.node:callnext("draw")
+	self.sequenceView:draw()
 end
 
 return SelectView

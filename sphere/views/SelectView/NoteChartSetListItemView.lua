@@ -1,80 +1,44 @@
 
-local Node = require("aqua.util.Node")
+local Class = require("aqua.util.Class")
 local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
 
-local NoteChartSetListItemView = Node:new()
-
-NoteChartSetListItemView.init = function(self)
-	self:on("draw", self.draw)
-
-	self.fontArtist = aquafonts.getFont(spherefonts.NotoSansRegular, 16)
-	self.fontTitle = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
-end
+local NoteChartSetListItemView = Class:new()
 
 NoteChartSetListItemView.draw = function(self)
-	local listView = self.listView
+	local config = self.listView.config
+	local cs = self.listView.cs
+	local screen = config.screen
+	local y = config.y + (self.index - 1) * config.h / config.rows
+	local noteChartDataEntry = self.item.noteChartDataEntries[1]
 
-	local itemIndex = self.itemIndex
-	local item = self.item
+	love.graphics.setColor(1, 1, 1, 1)
 
-	local cs = listView.cs
-
-	local x = cs:X(listView.x, true)
-	local y = cs:Y(listView.y, true)
-	local w = cs:X(listView.w)
-	local h = cs:Y(listView.h)
-
-	local index = self.index
-	local noteChartDataEntry = item.noteChartDataEntries[1]
-
-	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
-	if listView.isSelected then
-		love.graphics.setColor(1, 1, 1,
-			deltaItemIndex == 0 and 1 or 0.66
-		)
-	else
-		love.graphics.setColor(1, 1, 1,
-			deltaItemIndex == 0 and 1 or 0.33
-		)
-	end
-
-	if deltaItemIndex == 0 then
-		love.graphics.rectangle(
-			"fill",
-			x,
-			y + (index - 1) * h / listView.itemCount,
-			cs:X(4 / cs.one),
-			h / listView.itemCount
-		)
-	end
-
-	love.graphics.setFont(self.fontArtist)
+	local fontArtist = aquafonts.getFont(spherefonts.NotoSansRegular, config.artist.fontSize)
+	love.graphics.setFont(fontArtist)
 	love.graphics.printf(
 		noteChartDataEntry.artist,
-		x,
-		y + (index - 1) * h / listView.itemCount,
-		math.huge,
-		"left",
+		cs:X((config.x + config.artist.x) / screen.h, true),
+		cs:Y((y + config.artist.y) / screen.h, true),
+		cs:X(config.artist.w / screen.h),
+		config.artist.align,
 		0,
-		cs.one / 1080,
-		cs.one / 1080,
-		-cs:X(15 / cs.one),
-		-cs:Y(4 / cs.one)
+		cs.one / screen.h,
+		cs.one / screen.h
 	)
 
-	love.graphics.setFont(self.fontTitle)
+	local fontTitle = aquafonts.getFont(spherefonts.NotoSansRegular, config.title.fontSize)
+	love.graphics.setFont(fontTitle)
 	love.graphics.printf(
 		noteChartDataEntry.title,
-		x,
-		y + (index - 1) * h / listView.itemCount,
+		cs:X((config.x + config.title.x) / screen.h, true),
+		cs:Y((y + config.title.y) / screen.h, true),
+		-- cs:X(config.title.w / screen.w),
 		math.huge,
-		"left",
+		config.title.align,
 		0,
-		cs.one / 1080,
-		cs.one / 1080,
-		-cs:X(15 / cs.one),
-		-cs:Y(18 / cs.one)
+		cs.one / screen.h,
+		cs.one / screen.h
 	)
 end
 

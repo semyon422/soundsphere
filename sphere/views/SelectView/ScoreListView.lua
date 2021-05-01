@@ -20,11 +20,11 @@ ScoreListView.init = function(self)
 	self:reloadItems()
 
 	self:on("update", function()
-		self.selectedItem = self.navigator.scoreList.selected
+		self.selectedItem = self.navigator.scoreItemIndex
 		self:reloadItems()
 	end)
 	self:on("select", function()
-		self.navigator:setNode("scoreList")
+		-- self.navigator:setNode("scoreList")
 	end)
 	self:on("draw", self.drawFrame)
 

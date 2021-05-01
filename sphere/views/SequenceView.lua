@@ -10,13 +10,9 @@ end
 
 SequenceView.setSequenceConfig = function(self, config)
 	self.config = config
-	self:initStates()
-end
-
-SequenceView.initStates = function(self)
 	local states = self.states
-	for _, config in ipairs(self.config) do
-		states[config] = {}
+	for _, subConfig in ipairs(config) do
+		states[subConfig] = {}
 	end
 end
 
@@ -48,31 +44,31 @@ end
 
 SequenceView.load = function(self)
 	for view in self:getViewIterator() do
-		view:load()
+		if view.load then view:load() end
 	end
 end
 
 SequenceView.unload = function(self)
 	for view in self:getViewIterator() do
-		view:unload()
+		if view.unload then view:unload() end
 	end
 end
 
 SequenceView.receive = function(self, event)
 	for view in self:getViewIterator() do
-		view:receive(event)
+		if view.receive then view:receive(event) end
 	end
 end
 
 SequenceView.update = function(self, dt)
 	for view in self:getViewIterator() do
-		view:update(dt)
+		if view.update then view:update(dt) end
 	end
 end
 
 SequenceView.draw = function(self)
 	for view in self:getViewIterator() do
-		view:draw()
+		if view.draw then view:draw() end
 	end
 end
 
