@@ -23,14 +23,20 @@ end
 
 NoteChartSetListView.receive = function(self, event)
 	local config = self.config
-	if event.name == "mousemoved" then
+	if event.name == "wheelmoved" then
+		local mx, my = love.mouse.getPosition()
 		local cs = self.cs
-		local x = cs:X(config.x, true)
-		local y = cs:Y(config.y, true)
-		local w = cs:X(config.w)
-		local h = cs:Y(config.h)
-		if event.args[1] >= x and event.args[1] < x + w and event.args[2] >= y and event.args[2] < y + h then
-			-- self:call("select")
+		local x = cs:X(config.x / config.screen.h, true)
+		local y = cs:Y(config.y / config.screen.h, true)
+		local w = cs:X(config.w / config.screen.h)
+		local h = cs:Y(config.h / config.screen.h)
+		if mx >= x and mx < x + w and my >= y and my < y + h then
+			local wy = event.args[2]
+			if wy == 1 then
+				self.navigator:call("up")
+			elseif wy == -1 then
+				self.navigator:call("down")
+			end
 		end
 	end
 end

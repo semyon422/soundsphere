@@ -17,6 +17,7 @@ local SelectView = Class:new()
 
 SelectView.construct = function(self)
 	self.selectViewConfig = SelectViewConfig
+	self.navigator = SelectNavigator:new()
 	self.sequenceView = SequenceView:new()
 	self.noteChartListView = NoteChartListView:new()
 	self.noteChartSetListView = NoteChartSetListView:new()
@@ -33,14 +34,15 @@ SelectView.load = function(self)
 	local selectConfig = self.configModel:getConfig("select")
 	self.selectConfig = selectConfig
 
-	local navigator = SelectNavigator:new()
-	self.navigator = navigator
+	local navigator = self.navigator
 	navigator.selectModel = self.selectModel
 	navigator.view = self
 
+	noteChartSetListView.navigator = self.navigator
 	noteChartSetListView.noteChartSetLibraryModel = self.noteChartSetLibraryModel
 	noteChartSetListView.selectModel = self.selectModel
 
+	noteChartListView.navigator = self.navigator
 	noteChartListView.noteChartLibraryModel = self.noteChartLibraryModel
 	noteChartListView.selectModel = self.selectModel
 
