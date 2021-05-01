@@ -354,8 +354,19 @@ local ModifierIconGrid = {
 	y = 855,
 	w = 410,
 	h = 136,
-	cols = 6,
+	columns = 6,
 	row = 2
+}
+
+local StageInfoModifierIconGrid = {
+	class = "ModifierIconGridView",
+	screen = screen,
+	x = 301,
+	y = 598,
+	w = 183,
+	h = 138,
+	columns = 4,
+	row = 3
 }
 
 local ScreenMenu = {
@@ -405,6 +416,7 @@ local SelectViewConfig = {
 	SortStepper,
 
 	ModifierIconGrid,
+	StageInfoModifierIconGrid,
 	ScreenMenu
 }
 
