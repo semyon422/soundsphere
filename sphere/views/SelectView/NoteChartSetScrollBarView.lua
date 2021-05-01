@@ -1,6 +1,5 @@
 local Class = require("aqua.util.Class")
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
-local map = require("aqua.math").map
 
 local NoteChartSetScrollBarView = Class:new()
 
