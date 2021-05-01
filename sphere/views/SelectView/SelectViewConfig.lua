@@ -101,13 +101,21 @@ local StageInfo = {
 			fontSize = 16
 		},
 		value = {
-			x = 22,
-			y = 16,
-			w = 70,
-			h = 36,
-			align = "right",
-			fontSize = 24
-		},
+			text = {
+				x = 22,
+				y = 16,
+				w = 70,
+				h = 36,
+				align = "right",
+				fontSize = 24
+			},
+			bar = {
+				x = 22,
+				y = 26,
+				w = 70,
+				h = 19
+			}
+		}
 	},
 	largeCell = {
 		x = {0, 227},
@@ -121,12 +129,14 @@ local StageInfo = {
 			fontSize = 18
 		},
 		value = {
-			x = 22,
-			y = 7,
-			w = 161,
-			h = 54,
-			align = "right",
-			fontSize = 36
+			text = {
+				x = 22,
+				y = 7,
+				w = 161,
+				h = 54,
+				align = "right",
+				fontSize = 36
+			}
 		}
 	}
 }
@@ -134,64 +144,71 @@ local StageInfo = {
 StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
-		x = 2,
-		y = 3,
+		valueType = "text",
+		x = 2, y = 3,
 		name = "duration",
 		key = "length"
 	},
 	{
 		type = StageInfo.smallCell,
-		x = 2,
-		y = 4,
+		valueType = "text",
+		x = 2, y = 4,
 		name = "notes",
 		key = "noteCount"
 	},
 	{
 		type = StageInfo.smallCell,
-		x = 1,
-		y = 4,
+		valueType = "bar",
+		x = {3, 4}, y = 4,
+		name = "long notes",
+		key = "longNoteCount"
+	},
+	{
+		type = StageInfo.smallCell,
+		valueType = "text",
+		x = 1, y = 4,
 		name = "level",
 		key = "level"
 	},
 	{
 		type = StageInfo.largeCell,
-		x = 1,
-		y = 1,
+		valueType = "text",
+		x = 1, y = 1,
 		name = "accuracy",
 		key = "accuracy"
 	},
 	{
 		type = StageInfo.largeCell,
-		x = 2,
-		y = 1,
+		valueType = "text",
+		x = 2, y = 1,
 		name = "score",
 		key = "score"
 	},
 	{
 		type = StageInfo.smallCell,
-		x = {3, 4},
-		y = 5,
+		valueType = "text",
+		x = {3, 4}, y = 5,
 		name = "played",
 		key = "played"
 	},
 	{
 		type = StageInfo.smallCell,
-		x = 3,
-		y = 6,
+		valueType = "text",
+		x = 3, y = 6,
 		name = "pp",
 		key = "pp"
 	},
 	{
 		type = StageInfo.smallCell,
-		x = 4,
-		y = 6,
+		valueType = "text",
+		x = 4, y = 6,
 		name = "rank",
 		key = "rank"
 	},
 	{
 		type = StageInfo.smallCell,
-		x = {1, 2},
-		y = 8,
+		valueType = "text",
+		x = {1, 2}, y = 8,
 		name = "predicted accuracy",
 		key = "accuracy"
 	},

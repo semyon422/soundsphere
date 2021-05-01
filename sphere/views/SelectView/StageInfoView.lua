@@ -10,26 +10,31 @@ StageInfoView.construct = function(self)
 end
 
 StageInfoView.draw = function(self)
-    for _, cell in ipairs(self.config.cells) do
-        self:drawCell(cell)
-    end
+	for _, cell in ipairs(self.config.cells) do
+		self:drawCellName(cell)
+		if cell.valueType == "text" then
+			self:drawTextCell(cell)
+		elseif cell.valueType == "bar" then
+			self:drawBarCell(cell)
+		end
+	end
 end
 
-StageInfoView.drawCell = function(self, cell)
+StageInfoView.drawCellName = function(self, cell)
 	local cs = self.cs
 	local config = self.config
 	local screen = self.config.screen
 
-    love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.setColor(1, 1, 1, 1)
 
-    local cx, dcw
-    if type(cell.x) == "table" then
-        cx = cell.type.x[cell.x[1]]
-        dcw = cell.type.x[cell.x[2]] - cell.type.x[cell.x[1]]
-    else
-        cx = cell.type.x[cell.x]
-        dcw = 0
-    end
+	local cx, dcw
+	if type(cell.x) == "table" then
+		cx = cell.type.x[cell.x[1]]
+		dcw = cell.type.x[cell.x[2]] - cell.type.x[cell.x[1]]
+	else
+		cx = cell.type.x[cell.x]
+		dcw = 0
+	end
 
 	local fontName = aquafonts.getFont(spherefonts.NotoSansRegular, cell.type.name.fontSize)
 	love.graphics.setFont(fontName)
@@ -43,18 +48,74 @@ StageInfoView.drawCell = function(self, cell)
 		cs.one / screen.h,
 		cs.one / screen.h
 	)
+end
 
-	local fontValue = aquafonts.getFont(spherefonts.NotoSansRegular, cell.type.value.fontSize)
+StageInfoView.drawTextCell = function(self, cell)
+	local cs = self.cs
+	local config = self.config
+	local screen = self.config.screen
+
+	love.graphics.setColor(1, 1, 1, 1)
+
+	local cx, dcw
+	if type(cell.x) == "table" then
+		cx = cell.type.x[cell.x[1]]
+		dcw = cell.type.x[cell.x[2]] - cell.type.x[cell.x[1]]
+	else
+		cx = cell.type.x[cell.x]
+		dcw = 0
+	end
+
+	local fontValue = aquafonts.getFont(spherefonts.NotoSansRegular, cell.type.value.text.fontSize)
 	love.graphics.setFont(fontValue)
 	love.graphics.printf(
 		"0",
-		cs:X((config.x + cx + cell.type.value.x) / screen.h, true),
-		cs:Y((config.y + cell.type.y[cell.y] + cell.type.value.y) / screen.h, true),
-		cell.type.value.w + dcw,
-		cell.type.value.align,
+		cs:X((config.x + cx + cell.type.value.text.x) / screen.h, true),
+		cs:Y((config.y + cell.type.y[cell.y] + cell.type.value.text.y) / screen.h, true),
+		cell.type.value.text.w + dcw,
+		cell.type.value.text.align,
 		0,
 		cs.one / screen.h,
 		cs.one / screen.h
+	)
+end
+
+StageInfoView.drawBarCell = function(self, cell)
+	local cs = self.cs
+	local config = self.config
+	local screen = self.config.screen
+
+	love.graphics.setColor(1, 1, 1, 1)
+
+	local cx, dcw
+	if type(cell.x) == "table" then
+		cx = cell.type.x[cell.x[1]]
+		dcw = cell.type.x[cell.x[2]] - cell.type.x[cell.x[1]]
+	else
+		cx = cell.type.x[cell.x]
+		dcw = 0
+	end
+
+	love.graphics.setColor(1, 1, 1, 0.25)
+	love.graphics.rectangle(
+		"fill",
+		cs:X((config.x + cx + cell.type.value.bar.x) / screen.h, true),
+		cs:Y((config.y + cell.type.y[cell.y] + cell.type.value.bar.y) / screen.h, true),
+		cs:X((cell.type.value.bar.w + dcw) / screen.h),
+		cs:Y(cell.type.value.bar.h / screen.h),
+		cs:X(cell.type.value.bar.h / 2 / screen.h),
+		cs:Y(cell.type.value.bar.h / 2 / screen.h)
+	)
+
+	love.graphics.setColor(1, 1, 1, 0.75)
+	love.graphics.rectangle(
+		"fill",
+		cs:X((config.x + cx + cell.type.value.bar.x) / screen.h, true),
+		cs:Y((config.y + cell.type.y[cell.y] + cell.type.value.bar.y) / screen.h, true),
+		cs:X((cell.type.value.bar.w + dcw) / 3 / screen.h),
+		cs:Y(cell.type.value.bar.h / screen.h),
+		cs:X(cell.type.value.bar.h / 2 / screen.h),
+		cs:Y(cell.type.value.bar.h / 2 / screen.h)
 	)
 end
 
