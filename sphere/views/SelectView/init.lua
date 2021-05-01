@@ -11,6 +11,8 @@ local ScoreListView = require(viewspackage .. "SelectView.ScoreListView")
 local SearchFieldView = require(viewspackage .. "SelectView.SearchFieldView")
 local SortStepperView = require(viewspackage .. "SelectView.SortStepperView")
 local ScreenMenuView = require(viewspackage .. "SelectView.ScreenMenuView")
+local UserInfoView = require(viewspackage .. "SelectView.UserInfoView")
+local LogoView = require(viewspackage .. "SelectView.LogoView")
 local BackgroundView = require(viewspackage .. "BackgroundView")
 
 local SelectView = Class:new()
@@ -24,6 +26,8 @@ SelectView.construct = function(self)
 	self.searchFieldView = SearchFieldView:new()
 	self.sortStepperView = SortStepperView:new()
 	self.screenMenuView = ScreenMenuView:new()
+	self.userInfoView = UserInfoView:new()
+	self.logoView = LogoView:new()
 end
 
 SelectView.load = function(self)
@@ -32,6 +36,8 @@ SelectView.load = function(self)
 	local searchFieldView = self.searchFieldView
 	local sortStepperView = self.sortStepperView
 	local screenMenuView = self.screenMenuView
+	local userInfoView = self.userInfoView
+	local logoView = self.logoView
 
 	local selectConfig = self.configModel:getConfig("select")
 	self.selectConfig = selectConfig
@@ -69,6 +75,8 @@ SelectView.load = function(self)
 	sequenceView:setView("SearchFieldView", searchFieldView)
 	sequenceView:setView("SortStepperView", sortStepperView)
 	sequenceView:setView("ScreenMenuView", screenMenuView)
+	sequenceView:setView("UserInfoView", userInfoView)
+	sequenceView:setView("LogoView", logoView)
 
 	self.sequenceView:load()
 
