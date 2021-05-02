@@ -20,7 +20,7 @@ NoteChartResourceLoader.init = function(self)
 end
 
 NoteChartResourceLoader.getNoteChartType = function(self, noteChart)
-	if noteChart.type == "bms" or noteChart.type == "osu" or noteChart.type == "quaver" or noteChart.type == "ksm" then
+	if noteChart.type == "bms" or noteChart.type == "osu" or noteChart.type == "quaver" or noteChart.type == "ksm" or noteChart.type == "sm" then
 		return "bms"
 	elseif noteChart.type == "o2jam" then
 		return "o2jam"
