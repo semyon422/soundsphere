@@ -12,7 +12,7 @@ Alternate.range = {1, 2}
 Alternate.values = {"key", "scratch"}
 
 Alternate.getString = function(self, config)
-	return "Alt" .. self.value:sub(1, 1):upper()
+	return "Alt" .. config.value:sub(1, 1):upper()
 end
 
 Alternate.apply = function(self, config)
