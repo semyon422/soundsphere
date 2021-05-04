@@ -12,7 +12,11 @@ MinLnLength.range = {0, 40}
 MinLnLength.step = 0.025
 
 MinLnLength.getString = function(self, config)
-	return "MLL" .. config.value * 1000
+	return "MLL"
+end
+
+MinLnLength.getSubString = function(self, config)
+	return config.value * 1000
 end
 
 MinLnLength.apply = function(self, config)

@@ -12,7 +12,11 @@ Random.range = {1, 3}
 Random.values = {"all", "left", "right"}
 
 Random.getString = function(self, config)
-	return "RD" .. config.value:sub(1, 1):upper()
+	return "RD"
+end
+
+Random.getSubString = function(self, config)
+	return config.value:sub(1, 1):upper()
 end
 
 Random.getMap = function(self, config)

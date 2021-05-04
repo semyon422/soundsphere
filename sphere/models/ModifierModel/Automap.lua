@@ -212,7 +212,11 @@ Automap.defaultValue = 10
 Automap.range = {4, 10}
 
 Automap.getString = function(self, config)
-	return "AM" .. config.value
+	return "AM"
+end
+
+Automap.getSubString = function(self, config)
+	return config.value
 end
 
 Automap.apply = function(self, config)

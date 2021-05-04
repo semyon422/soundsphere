@@ -80,4 +80,8 @@ Modifier.getString = function(self, config)
 	return self.shortName or self.name
 end
 
+Modifier.getSubString = function(self, config)
+	return nil
+end
+
 return Modifier

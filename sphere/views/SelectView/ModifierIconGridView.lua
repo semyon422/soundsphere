@@ -16,6 +16,10 @@ ModifierIconGridView.draw = function(self)
 	local config = self.config
 	local screen = self.config.screen
 	local modifierIconView = self.modifierIconView
+	local configModifier = self.configModifier
+	local modifierModel = self.modifierModel
+
+	local i = 1
 
 	love.graphics.setColor(1, 1, 1, 1)
 
@@ -24,6 +28,15 @@ ModifierIconGridView.draw = function(self)
 	iconConfig.size = config.w / config.columns
 	for column = 1, config.columns do
 		for row = 1, config.rows do
+			local modifierConfig = configModifier[i]
+			if modifierConfig then
+				local modifier = modifierModel:getModifier(modifierConfig)
+				iconConfig.modifierString = modifier:getString(modifierConfig)
+				iconConfig.modifierSubString = modifier:getSubString(modifierConfig)
+				i = i + 1
+			else
+				return
+			end
 			iconConfig.x = config.x + iconConfig.size * (column - 1)
 			iconConfig.y = config.y + iconConfig.size * (row - 1)
 			modifierIconView:draw()

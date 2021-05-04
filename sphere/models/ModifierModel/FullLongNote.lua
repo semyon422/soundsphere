@@ -12,7 +12,11 @@ FullLongNote.defaultValue = 0
 FullLongNote.range = {0, 3}
 
 FullLongNote.getString = function(self, config)
-	return "FLN" .. config.value
+	return "FLN"
+end
+
+FullLongNote.getSubString = function(self, config)
+	return config.value
 end
 
 FullLongNote.apply = function(self, config)

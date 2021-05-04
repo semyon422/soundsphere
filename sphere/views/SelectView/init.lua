@@ -51,8 +51,10 @@ SelectView.load = function(self)
 	local stageInfoView = self.stageInfoView
 	local modifierIconGridView = self.modifierIconGridView
 
-	local selectConfig = self.configModel:getConfig("select")
-	self.selectConfig = selectConfig
+	local configSelect = self.configModel:getConfig("select")
+	local configModifier = self.configModel:getConfig("modifier")
+	self.configSelect = configSelect
+	self.configModifier = configModifier
 
 	local navigator = self.navigator
 	navigator.selectModel = self.selectModel
@@ -72,6 +74,9 @@ SelectView.load = function(self)
 	-- scoreListView.view = self
 
 	searchFieldView.searchLineModel = self.searchLineModel
+
+	modifierIconGridView.modifierModel = self.modifierModel
+	modifierIconGridView.configModifier = configModifier
 
 	noteChartSetScrollBarView.selectModel = self.selectModel
 	noteChartSetScrollBarView.noteChartSetLibraryModel = self.noteChartSetLibraryModel

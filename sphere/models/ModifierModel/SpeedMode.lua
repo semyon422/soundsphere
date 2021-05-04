@@ -11,11 +11,15 @@ SpeedMode.defaultValue = "average"
 SpeedMode.range = {1, 5}
 SpeedMode.values = {"average", "x", "constant", "minimum", "maximum"}
 
-SpeedMode.modeNames = {"AMod", "XMod", "CMod", "MinMod", "MaxMod"}
+SpeedMode.modeNames = {"A", "X", "C", "MIN", "MAX"}
 
 SpeedMode.getString = function(self, config)
 	local indexValue = self:toIndexValue(config)
 	return self.modeNames[indexValue]
+end
+
+SpeedMode.getSubString = function(self, config)
+	return "MOD"
 end
 
 SpeedMode.applySpeed = function(self, speed)

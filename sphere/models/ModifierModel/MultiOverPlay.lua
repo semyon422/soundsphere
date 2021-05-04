@@ -12,7 +12,11 @@ MultiOverPlay.defaultValue = 2
 MultiOverPlay.range = {2, 4}
 
 MultiOverPlay.getString = function(self, config)
-	return config.value .. "OP"
+	return config.value
+end
+
+MultiOverPlay.getSubString = function(self, config)
+	return "OP"
 end
 
 MultiOverPlay.apply = function(self, config)

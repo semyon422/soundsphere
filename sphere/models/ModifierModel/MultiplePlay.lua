@@ -12,7 +12,11 @@ MultiplePlay.defaultValue = 2
 MultiplePlay.range = {2, 4}
 
 MultiplePlay.getString = function(self, config)
-	return config.value .. "P"
+	return config.value
+end
+
+MultiplePlay.getSubString = function(self, config)
+	return "P"
 end
 
 MultiplePlay.apply = function(self, config)

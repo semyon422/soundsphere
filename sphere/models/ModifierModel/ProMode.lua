@@ -6,7 +6,7 @@ ProMode.type = "LogicEngineModifier"
 ProMode.interfaceType = "toggle"
 
 ProMode.name = "ProMode"
-ProMode.shortName = "ProMode"
+ProMode.shortName = "PRO"
 
 ProMode.apply = function(self, config)
 	if config.value == 0 then

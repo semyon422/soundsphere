@@ -12,7 +12,11 @@ Mirror.range = {1, 3}
 Mirror.values = {"all", "left", "right"}
 
 Mirror.getString = function(self, config)
-	return "MR" .. config.value:sub(1, 1):upper()
+	return "MR"
+end
+
+Mirror.getSubString = function(self, config)
+	return config.value:sub(1, 1):upper()
 end
 
 Mirror.getMap = function(self, config)

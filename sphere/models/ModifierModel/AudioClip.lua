@@ -16,7 +16,14 @@ AudioClip.range = {0, 100}
 AudioClip.getString = function(self, config)
 	local value = config.value
     if value > 0 then
-	    return "+" .. value .. "dB"
+	    return value
+	end
+end
+
+AudioClip.getSubString = function(self, config)
+	local value = config.value
+    if value > 0 then
+	    return "dB"
 	end
 end
 

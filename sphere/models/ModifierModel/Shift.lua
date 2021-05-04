@@ -11,17 +11,17 @@ Shift.defaultValue = 0
 Shift.range = {-5, 5}
 
 Shift.getString = function(self, config)
-    return "Shift" .. self:getDisplayValue(config)
+    if config.value > 0 then
+        return "S+"
+    elseif config.value < 0 then
+        return "S-"
+    else
+        return "S"
+    end
 end
 
-Shift.getDisplayValue = function(self, config)
-    if config.value > 0 then
-        return "+" .. config.value
-    elseif config.value < 0 then
-        return "-" .. -config.value
-    else
-        return config.value
-    end
+Shift.getSubString = function(self, config)
+    return math.abs(config.value)
 end
 
 Shift.getMap = function(self, config)

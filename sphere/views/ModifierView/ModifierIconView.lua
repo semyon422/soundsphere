@@ -32,8 +32,12 @@ ModifierIconView.draw = function(self)
 	love.graphics.setLineStyle("smooth")
 	love.graphics.setLineWidth(cs:X(config.size / 32 / screen.h))
 
-	self:drawSquareBorder(self.shapes.topBottom)
-	self:drawText(self.lines.two, "MOD", "00")
+	self:drawSquareBorder(self.shapes.full)
+	if config.modifierSubString then
+		self:drawText(self.lines.two, config.modifierString, config.modifierSubString)
+	else
+		self:drawText(self.lines.one, config.modifierString)
+	end
 end
 
 ModifierIconView.drawText = function(self, lines, topText, bottomText)
@@ -134,7 +138,8 @@ ModifierIconView.drawSquareBorder = function(self, shape)
 			cs:Y((fy + fr1) / screen.h, true),
 			cs:X(fr1 / screen.h),
 			-math.pi,
-			-math.pi / 2
+			-math.pi / 2,
+			8
 		)
 	end
 	if shape[6] then
@@ -145,7 +150,8 @@ ModifierIconView.drawSquareBorder = function(self, shape)
 			cs:Y((fy + fr2) / screen.h, true),
 			cs:X(fr2 / screen.h),
 			-math.pi / 2,
-			0
+			0,
+			8
 		)
 	end
 	if shape[7] then
@@ -156,7 +162,8 @@ ModifierIconView.drawSquareBorder = function(self, shape)
 			cs:Y((fy + fs - fr3) / screen.h, true),
 			cs:X(fr3 / screen.h),
 			math.pi,
-			math.pi / 2
+			math.pi / 2,
+			8
 		)
 	end
 	if shape[8] then
@@ -167,7 +174,8 @@ ModifierIconView.drawSquareBorder = function(self, shape)
 			cs:Y((fy + fs - fr4) / screen.h, true),
 			cs:X(fr4 / screen.h),
 			math.pi / 2,
-			0
+			0,
+			8
 		)
 	end
 end

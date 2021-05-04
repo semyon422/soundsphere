@@ -6,7 +6,7 @@ NoScratch.type = "NoteChartModifier"
 NoScratch.interfaceType = "toggle"
 
 NoScratch.name = "NoScratch"
-NoScratch.shortName = "NoScratch"
+NoScratch.shortName = "NSC"
 
 NoScratch.apply = function(self, config)
 	if config.value == 0 then

@@ -7,7 +7,7 @@ ToOsu.type = "NoteChartModifier"
 ToOsu.interfaceType = "toggle"
 
 ToOsu.name = "ToOsu"
-ToOsu.shortName = "ToOsu"
+ToOsu.shortName = "OSU"
 
 ToOsu.apply = function(self, config)
 	local nce = NoteChartExporter:new()

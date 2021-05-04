@@ -135,7 +135,7 @@ ModifierModel.getString = function(self)
 	local t = {}
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
-		table.insert(t, modifier:getString(modifierConfig))
+		table.insert(t, modifier:getString(modifierConfig) .. modifier:getSubString(modifierConfig))
 	end
 	return table.concat(t, ",")
 end
