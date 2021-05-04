@@ -15,8 +15,8 @@ ModifierIconView.shapes = {
 }
 
 ModifierIconView.lines = {
-	one = {10 / 52},
-	two = {-2 / 52, 22 / 52},
+	one = {10 / 64},
+	two = {-6 / 64, 24 / 64},
 }
 
 ModifierIconView.construct = function(self)
@@ -30,9 +30,9 @@ ModifierIconView.draw = function(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setLineStyle("smooth")
-	love.graphics.setLineWidth(cs:X(config.size / 40 / screen.h))
+	love.graphics.setLineWidth(cs:X(config.size / 32 / screen.h))
 
-	self:drawSquareBorder(self.shapes.circleTopRight)
+	self:drawSquareBorder(self.shapes.topBottom)
 	self:drawText(self.lines.two, "MOD", "00")
 end
 
@@ -53,11 +53,11 @@ ModifierIconView.drawText = function(self, lines, topText, bottomText)
 			topText,
 			cs:X(fx / screen.h, true),
 			cs:Y((fy + lines[1] * fs) / screen.h, true),
-			52,
+			64,
 			"center",
 			0,
-			cs.one / screen.h * fs / 52,
-			cs.one / screen.h * fs / 52
+			cs.one / screen.h * fs / 64,
+			cs.one / screen.h * fs / 64
 		)
 	end
 	if bottomText then
@@ -65,11 +65,11 @@ ModifierIconView.drawText = function(self, lines, topText, bottomText)
 			bottomText,
 			cs:X(fx / screen.h, true),
 			cs:Y((fy + lines[2] * fs) / screen.h, true),
-			52,
+			64,
 			"center",
 			0,
-			cs.one / screen.h * fs / 52,
-			cs.one / screen.h * fs / 52
+			cs.one / screen.h * fs / 64,
+			cs.one / screen.h * fs / 64
 		)
 	end
 end
