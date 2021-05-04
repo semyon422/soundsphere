@@ -12,6 +12,7 @@ ModifierIconView.shapes = {
 	fillCircle = {false, false, false, false, 0.5, 0.5, 0.5, 0.5},
 	circleBottomRight = {false, true, false, true, 0.5, 0.5, 0.5, 0.15},
 	circleTopRight = {false, false, true, true, 0.5, 0.15, 0.5, 0.5},
+	allArcs = {false, false, false, false, 0.15, 0.15, 0.15, 0.15},
 }
 
 ModifierIconView.lines = {
@@ -32,7 +33,7 @@ ModifierIconView.draw = function(self)
 	love.graphics.setLineStyle("smooth")
 	love.graphics.setLineWidth(cs:X(config.size / 32 / screen.h))
 
-	self:drawSquareBorder(self.shapes.full)
+	self:drawSquareBorder(self.shapes.allArcs)
 	if config.modifierSubString then
 		self:drawText(self.lines.two, config.modifierString, config.modifierSubString)
 	else
