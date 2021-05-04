@@ -1,6 +1,5 @@
 
 local Class = require("aqua.util.Class")
-local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
 
 local NoteChartListItemView = Class:new()
@@ -18,7 +17,7 @@ NoteChartListItemView.draw = function(self)
 
 	local scale = cs.one / screen.h
 
-	local fontName = aquafonts.getFont(spherefonts.NotoSansRegular, config.name.fontSize)
+	local fontName = spherefonts.get(config.name.fontFamily, config.name.fontSize)
 	love.graphics.setFont(fontName)
 	love.graphics.printf(
 		noteChartDataEntry.name,
@@ -32,7 +31,7 @@ NoteChartListItemView.draw = function(self)
 	)
 
 	if not prevItem or prevItem.noteChartDataEntry.creator ~= item.noteChartDataEntry.creator then
-		local fontCreator = aquafonts.getFont(spherefonts.NotoSansRegular, config.creator.fontSize)
+		local fontCreator = spherefonts.get(config.creator.fontFamily, config.creator.fontSize)
 		love.graphics.setFont(fontCreator)
 		love.graphics.printf(
 			noteChartDataEntry.creator,
@@ -47,7 +46,7 @@ NoteChartListItemView.draw = function(self)
 	end
 
 	if not prevItem or prevItem.noteChartDataEntry.inputMode ~= item.noteChartDataEntry.inputMode then
-		local fontInputMode = aquafonts.getFont(spherefonts.NotoSansRegular, config.inputMode.fontSize)
+		local fontInputMode = spherefonts.get(config.inputMode.fontFamily, config.inputMode.fontSize)
 		love.graphics.setFont(fontInputMode)
 		love.graphics.printf(
 			noteChartDataEntry.inputMode,
@@ -71,7 +70,7 @@ NoteChartListItemView.draw = function(self)
 		format = "%s"
 		difficulty = "???"
 	end
-	local fontDifficulty = aquafonts.getFont(spherefonts.NotoMonoRegular, config.difficulty.fontSize)
+	local fontDifficulty = spherefonts.get(config.difficulty.fontFamily, config.difficulty.fontSize)
 	love.graphics.setFont(fontDifficulty)
 	love.graphics.printf(
 		format:format(difficulty),

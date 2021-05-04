@@ -1,6 +1,5 @@
 local Class = require("aqua.util.Class")
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
-local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
 
 local ModifierIconView = Class:new()
@@ -47,7 +46,7 @@ ModifierIconView.drawText = function(self, lines, topText, bottomText)
 	local fs = config.size * 3 / 4
 	local fr = fs / 4
 
-	local font = aquafonts.getFont(spherefonts.NotoMonoRegular, 28)
+	local font = spherefonts.get("Noto Sans Mono", 32)
 	love.graphics.setFont(font)
 	if topText then
 		love.graphics.printf(

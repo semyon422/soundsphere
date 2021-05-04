@@ -1,21 +1,34 @@
 local fonts = {}
 
-fonts.NotoSansRegular = "resources/fonts/NotoSansCJK-Regular.ttc"
-fonts.NotoMonoRegular = "resources/fonts/NotoMono-Regular.ttf"
+local instances = {}
 
-fonts.SourceCodeProBlack = "resources/fonts/SourceCodePro-Black.ttf"
-fonts.SourceCodeProBlackIt = "resources/fonts/SourceCodePro-BlackIt.ttf"
-fonts.SourceCodeProBold = "resources/fonts/SourceCodePro-Bold.ttf"
-fonts.SourceCodeProBoldIt = "resources/fonts/SourceCodePro-BoldIt.ttf"
-fonts.SourceCodeProExtraLight = "resources/fonts/SourceCodePro-ExtraLight.ttf"
-fonts.SourceCodeProExtraLightIt = "resources/fonts/SourceCodePro-ExtraLightIt.ttf"
-fonts.SourceCodeProIt = "resources/fonts/SourceCodePro-It.ttf"
-fonts.SourceCodeProLight = "resources/fonts/SourceCodePro-Light.ttf"
-fonts.SourceCodeProLightIt = "resources/fonts/SourceCodePro-LightIt.ttf"
-fonts.SourceCodeProMedium = "resources/fonts/SourceCodePro-Medium.ttf"
-fonts.SourceCodeProMediumIt = "resources/fonts/SourceCodePro-MediumIt.ttf"
-fonts.SourceCodeProRegular = "resources/fonts/SourceCodePro-Regular.ttf"
-fonts.SourceCodeProSemibold = "resources/fonts/SourceCodePro-Semibold.ttf"
-fonts.SourceCodeProSemiboldIt = "resources/fonts/SourceCodePro-SemiboldIt.ttf"
+local fontFamilyList = {
+	["Noto Sans"] = {
+		-- path = "resources/fonts/NotoSans-Minimal.ttf",
+		path = "resources/fonts/NotoSansCJK-Regular.ttc",
+		-- fallbackPath = "resources/fonts/NotoSansCJK-Regular.ttc"
+	},
+	["Noto Sans Mono"] = {
+		-- path = "resources/fonts/NotoSansMono-Minimal.ttf"
+		path = "resources/fonts/NotoSansMono-Regular.ttf"
+	}
+}
+
+fonts.get = function(family, size)
+	if not (instances[family] and instances[family][size]) then
+		local data = fontFamilyList[family]
+		local path = data.path
+		local font = love.graphics.newFont(path, size)
+		if data.fallbackPath then
+			local fallbackFont = love.graphics.newFont(data.fallbackPath, size)
+			data.fallbackFont = fallbackFont
+			font:setFallbacks(fallbackFont)
+		end
+		instances[family] = instances[family] or {}
+		instances[family][size] = font
+		return font
+	end
+	return instances[family][size]
+end
 
 return fonts

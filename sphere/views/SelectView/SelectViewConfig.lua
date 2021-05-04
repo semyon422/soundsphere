@@ -18,7 +18,8 @@ local NoteChartSetList = {
 		w = 410,
 		h = 36,
 		align = "left",
-		fontSize = 24
+		fontSize = 24,
+		fontFamily = "Noto Sans"
 	},
 	artist = {
 		x = 45,
@@ -26,7 +27,8 @@ local NoteChartSetList = {
 		w = 409,
 		h = 25,
 		align = "left",
-		fontSize = 16
+		fontSize = 16,
+		fontFamily = "Noto Sans"
 	},
 	point = {
 		x = 22,
@@ -49,7 +51,8 @@ local NoteChartList = {
 		w = 338,
 		h = 36,
 		align = "left",
-		fontSize = 24
+		fontSize = 24,
+		fontFamily = "Noto Sans"
 	},
 	creator = {
 		x = 117,
@@ -57,7 +60,8 @@ local NoteChartList = {
 		w = 337,
 		h = 25,
 		align = "left",
-		fontSize = 16
+		fontSize = 16,
+		fontFamily = "Noto Sans"
 	},
 	inputMode = {
 		x = 17,
@@ -65,15 +69,17 @@ local NoteChartList = {
 		w = 47,
 		h = 25,
 		align = "left",
-		fontSize = 16
+		fontSize = 16,
+		fontFamily = "Noto Sans"
 	},
 	difficulty = {
 		x = 0,
-		y = 22,
+		y = 19,
 		w = 72,
 		h = 36,
 		align = "right",
-		fontSize = 24
+		fontSize = 24,
+		fontFamily = "Noto Sans Mono"
 	},
 	point = {
 		x = 94,
@@ -98,7 +104,8 @@ local StageInfo = {
 			w = 69,
 			h = 27,
 			align = "right",
-			fontSize = 16
+			fontSize = 16,
+			fontFamily = "Noto Sans"
 		},
 		value = {
 			text = {
@@ -107,7 +114,8 @@ local StageInfo = {
 				w = 70,
 				h = 36,
 				align = "right",
-				fontSize = 24
+				fontSize = 24,
+				fontFamily = "Noto Sans"
 			},
 			bar = {
 				x = 22,
@@ -126,7 +134,8 @@ local StageInfo = {
 			w = 160,
 			h = 27,
 			align = "right",
-			fontSize = 18
+			fontSize = 18,
+			fontFamily = "Noto Sans"
 		},
 		value = {
 			text = {
@@ -135,7 +144,8 @@ local StageInfo = {
 				w = 161,
 				h = 54,
 				align = "right",
-				fontSize = 36
+				fontSize = 36,
+				fontFamily = "Noto Sans"
 			}
 		}
 	}
@@ -269,8 +279,9 @@ local Logo = {
 		y = 18,
 		w = 365,
 		h = 50,
+		align = "left",
 		fontSize = 32,
-		align = "left"
+		fontFamily = "Noto Sans"
 	}
 }
 
@@ -292,8 +303,9 @@ local UserInfo = {
 		y = 23,
 		w = 365,
 		h = 40,
+		align = "right",
 		fontSize = 26,
-		align = "right"
+		fontFamily = "Noto Sans"
 	}
 }
 
@@ -318,7 +330,8 @@ local SearchField = {
 		w = 227,
 		h = 31,
 		align = "left",
-		fontSize = 20
+		fontSize = 20,
+		fontFamily = "Noto Sans"
 	}
 }
 
@@ -343,7 +356,8 @@ local SortStepper = {
 		w = 119,
 		h = 31,
 		align = "center",
-		fontSize = 20
+		fontSize = 20,
+		fontFamily = "Noto Sans"
 	}
 }
 
@@ -382,8 +396,9 @@ local ScreenMenu = {
 		y = 26,
 		w = 228,
 		h = 36,
+		align = "center",
 		fontSize = 24,
-		align = "center"
+		fontFamily = "Noto Sans"
 	},
 	screens = {
 		{

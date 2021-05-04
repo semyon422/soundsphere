@@ -1,6 +1,5 @@
 
 local Class = require("aqua.util.Class")
-local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
 
 local NoteChartSetListItemView = Class:new()
@@ -14,7 +13,7 @@ NoteChartSetListItemView.draw = function(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local fontArtist = aquafonts.getFont(spherefonts.NotoSansRegular, config.artist.fontSize)
+	local fontArtist = spherefonts.get(config.artist.fontFamily, config.artist.fontSize)
 	love.graphics.setFont(fontArtist)
 	love.graphics.printf(
 		noteChartDataEntry.artist,
@@ -27,7 +26,7 @@ NoteChartSetListItemView.draw = function(self)
 		cs.one / screen.h
 	)
 
-	local fontTitle = aquafonts.getFont(spherefonts.NotoSansRegular, config.title.fontSize)
+	local fontTitle = spherefonts.get(config.title.fontFamily, config.title.fontSize)
 	love.graphics.setFont(fontTitle)
 	love.graphics.printf(
 		noteChartDataEntry.title,

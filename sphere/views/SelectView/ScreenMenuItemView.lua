@@ -1,7 +1,5 @@
 local Class = require("aqua.util.Class")
-local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
-local belong		= require("aqua.math").belong
 
 local HorizontalScreenMenuItemView = Class:new()
 
@@ -14,7 +12,7 @@ HorizontalScreenMenuItemView.draw = function(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local font = aquafonts.getFont(spherefonts.NotoSansRegular, config.text.fontSize)
+	local font = spherefonts.get(config.text.fontFamily, config.text.fontSize)
 	love.graphics.setFont(font)
 	love.graphics.printf(
 		item.displayName,

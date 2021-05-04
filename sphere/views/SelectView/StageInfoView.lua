@@ -1,6 +1,5 @@
 local Class = require("aqua.util.Class")
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
-local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
 
 local StageInfoView = Class:new()
@@ -36,7 +35,7 @@ StageInfoView.drawCellName = function(self, cell)
 		dcw = 0
 	end
 
-	local fontName = aquafonts.getFont(spherefonts.NotoSansRegular, cell.type.name.fontSize)
+	local fontName = spherefonts.get(cell.type.name.fontFamily, cell.type.name.fontSize)
 	love.graphics.setFont(fontName)
 	love.graphics.printf(
 		cell.name,
@@ -66,7 +65,7 @@ StageInfoView.drawTextCell = function(self, cell)
 		dcw = 0
 	end
 
-	local fontValue = aquafonts.getFont(spherefonts.NotoSansRegular, cell.type.value.text.fontSize)
+	local fontValue = spherefonts.get(cell.type.value.text.fontFamily, cell.type.value.text.fontSize)
 	love.graphics.setFont(fontValue)
 	love.graphics.printf(
 		"0",
