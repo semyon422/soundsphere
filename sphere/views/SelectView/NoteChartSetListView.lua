@@ -17,9 +17,13 @@ NoteChartSetListView.construct = function(self)
 end
 
 NoteChartSetListView.load = function(self)
+	self:forceScroll()
+	self:reloadItems()
+end
+
+NoteChartSetListView.forceScroll = function(self)
 	self.state.selectedItem = self.selectModel.noteChartSetItemIndex
 	self.state.selectedVisualItem = self.selectModel.noteChartSetItemIndex
-	self:reloadItems()
 end
 
 NoteChartSetListView.reloadItems = function(self)
@@ -56,13 +60,17 @@ NoteChartSetListView.update = function(self, dt)
 		)
 		self.state.selectedItem = self.selectModel.noteChartSetItemIndex
 	end
-	if self.state.scrollTween then
-		self.state.scrollTween:update(dt)
-	end
 	if self.state.selectedVisualItem == self.state.selectedItem then
 		self.state.scrollTween = nil
 	end
+	if self.state.scrollTween then
+		self.state.scrollTween:update(dt)
+	end
+	local items = self.state.items
 	self:reloadItems()
+	if items ~= self.state.items then
+		self:forceScroll()
+	end
 end
 
 NoteChartSetListView.drawStencil = function(self)

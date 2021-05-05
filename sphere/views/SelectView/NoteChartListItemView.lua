@@ -8,7 +8,7 @@ NoteChartListItemView.draw = function(self)
 	local config = self.listView.config
 	local cs = self.listView.cs
 	local screen = config.screen
-	local y = config.y + (self.index - 1) * config.h / config.rows
+	local y = config.y + (self.visualIndex - 1) * config.h / config.rows
 	local item = self.item
 	local noteChartDataEntry = item.noteChartDataEntry
 
