@@ -416,6 +416,36 @@ local ScreenMenu = {
 	}
 }
 
+local SelectFrame = {
+	class = "SelectFrameView",
+	screen = screen,
+	rectangles = {
+		{
+			mode = "fill",
+			lineStyle = "smooth",
+			lineWidth = 1,
+			x = 733,
+			y = 504,
+			w = 4,
+			h = 72,
+			rx = 0,
+			ry = 0
+		},
+		{
+			mode = "fill",
+			lineStyle = "smooth",
+			lineWidth = 1,
+			x = 1183,
+			y = 504,
+			w = 4,
+			h = 72,
+			rx = 0,
+			ry = 0
+		}
+	},
+	lines = {}
+}
+
 local SelectViewConfig = {
 	Background,
 	Preview,
@@ -432,7 +462,8 @@ local SelectViewConfig = {
 
 	ModifierIconGrid,
 	StageInfoModifierIconGrid,
-	ScreenMenu
+	ScreenMenu,
+	SelectFrame
 }
 
 return SelectViewConfig

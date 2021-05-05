@@ -17,6 +17,7 @@ local NoteChartSetScrollBarView = require(viewspackage .. "SelectView.NoteChartS
 local StageInfoScrollBarView = require(viewspackage .. "SelectView.StageInfoScrollBarView")
 local StageInfoView = require(viewspackage .. "SelectView.StageInfoView")
 local ModifierIconGridView = require(viewspackage .. "SelectView.ModifierIconGridView")
+local SelectFrameView = require(viewspackage .. "SelectView.SelectFrameView")
 local BackgroundView = require(viewspackage .. "BackgroundView")
 
 local SelectView = Class:new()
@@ -36,6 +37,7 @@ SelectView.construct = function(self)
 	self.stageInfoScrollBarView = StageInfoScrollBarView:new()
 	self.stageInfoView = StageInfoView:new()
 	self.modifierIconGridView = ModifierIconGridView:new()
+	self.selectFrameView = SelectFrameView:new()
 end
 
 SelectView.load = function(self)
@@ -50,6 +52,7 @@ SelectView.load = function(self)
 	local stageInfoScrollBarView = self.stageInfoScrollBarView
 	local stageInfoView = self.stageInfoView
 	local modifierIconGridView = self.modifierIconGridView
+	local selectFrameView = self.selectFrameView
 
 	local configSelect = self.configModel:getConfig("select")
 	local configModifier = self.configModel:getConfig("modifier")
@@ -101,6 +104,7 @@ SelectView.load = function(self)
 	sequenceView:setView("StageInfoScrollBarView", stageInfoScrollBarView)
 	sequenceView:setView("StageInfoView", stageInfoView)
 	sequenceView:setView("ModifierIconGridView", modifierIconGridView)
+	sequenceView:setView("SelectFrameView", selectFrameView)
 
 	self.sequenceView:load()
 
