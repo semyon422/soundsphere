@@ -14,29 +14,36 @@ end
 
 ScreenMenuView.load = function(self)
 	self.state.selectedItem = 1
-	self.items = self.config.screens
 end
 
 ScreenMenuView.draw = function(self)
-	for i = 1, self.config.columns do
-		local item = self.items[i]
-		if item then
-			local itemView = self.itemView
-			itemView.index = i
-			itemView.item = item
-			itemView:draw()
+	local items = self.config.screens
+	for i = 1, self.config.rows do
+		for j = 1, self.config.columns do
+			local item = items[i] and items[i][j]
+			if item then
+				local itemView = self.itemView
+				itemView.row = i
+				itemView.column = j
+				itemView.item = item
+				itemView:draw()
+			end
 		end
 	end
 end
 
 ScreenMenuView.receive = function(self, event)
-	for i = 1, self.config.columns do
-		local item = self.items[i]
-		if item then
-			local itemView = self.itemView
-			itemView.index = i
-			itemView.item = item
-			itemView:receive(event)
+	local items = self.config.screens
+	for i = 1, self.config.rows do
+		for j = 1, self.config.columns do
+			local item = items[i] and items[i][j]
+			if item then
+				local itemView = self.itemView
+				itemView.row = i
+				itemView.column = j
+				itemView.item = item
+				itemView:receive(event)
+			end
 		end
 	end
 end

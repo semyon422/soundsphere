@@ -383,13 +383,14 @@ local StageInfoModifierIconGrid = {
 	rows = 3
 }
 
-local ScreenMenu = {
+local BottomScreenMenu = {
 	class = "ScreenMenuView",
 	screen = screen,
 	x = 392,
 	y = 991,
 	w = 681,
 	h = 89,
+	rows = 1,
 	columns = 3,
 	text = {
 		x = 0,
@@ -402,16 +403,46 @@ local ScreenMenu = {
 	},
 	screens = {
 		{
-			name = "Modifier",
-			displayName = "modifiers"
-		},
+			{
+				name = "Modifier",
+				displayName = "modifiers"
+			},
+			{
+				name = "NoteSkin",
+				displayName = "noteskins"
+			},
+			{
+				name = "Input",
+				displayName = "input"
+			}
+		}
+	}
+}
+
+local LeftScreenMenu = {
+	class = "ScreenMenuView",
+	screen = screen,
+	x = 89,
+	y = 279,
+	w = 190,
+	h = 261,
+	rows = 4,
+	columns = 1,
+	text = {
+		x = 0,
+		y = 16,
+		w = 190,
+		h = 31,
+		align = "left",
+		fontSize = 24,
+		fontFamily = "Noto Sans"
+	},
+	screens = {
 		{
-			name = "NoteSkin",
-			displayName = "noteskins"
-		},
-		{
-			name = "Input",
-			displayName = "input"
+			{
+				name = "Collection",
+				displayName = "collection"
+			}
 		}
 	}
 }
@@ -462,7 +493,8 @@ local SelectViewConfig = {
 
 	ModifierIconGrid,
 	StageInfoModifierIconGrid,
-	ScreenMenu,
+	BottomScreenMenu,
+	LeftScreenMenu,
 	SelectFrame
 }
 
