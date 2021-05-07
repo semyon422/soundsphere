@@ -1,4 +1,3 @@
-
 local Class = require("aqua.util.Class")
 local spherefonts		= require("sphere.assets.fonts")
 

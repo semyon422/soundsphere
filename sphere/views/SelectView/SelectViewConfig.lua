@@ -231,7 +231,8 @@ local Background = {
 	y = 0,
 	w = 1920,
 	h = 1080,
-	parallax = 20
+	parallax = 0.01,
+	dim = 0.5
 }
 
 local Preview = {

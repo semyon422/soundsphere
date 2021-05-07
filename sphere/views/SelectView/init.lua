@@ -38,6 +38,7 @@ SelectView.construct = function(self)
 	self.stageInfoView = StageInfoView:new()
 	self.modifierIconGridView = ModifierIconGridView:new()
 	self.selectFrameView = SelectFrameView:new()
+	self.backgroundView = BackgroundView:new()
 end
 
 SelectView.load = function(self)
@@ -53,13 +54,15 @@ SelectView.load = function(self)
 	local stageInfoView = self.stageInfoView
 	local modifierIconGridView = self.modifierIconGridView
 	local selectFrameView = self.selectFrameView
+	local navigator = self.navigator
+	local sequenceView = self.sequenceView
+	local backgroundView = self.backgroundView
 
 	local configSelect = self.configModel:getConfig("select")
 	local configModifier = self.configModel:getConfig("modifier")
 	self.configSelect = configSelect
 	self.configModifier = configModifier
 
-	local navigator = self.navigator
 	navigator.selectModel = self.selectModel
 	navigator.view = self
 
@@ -86,11 +89,8 @@ SelectView.load = function(self)
 
 	screenMenuView.navigator = self.navigator
 
-	local backgroundView = BackgroundView:new()
-	self.backgroundView = backgroundView
-	backgroundView.view = self
+	backgroundView.backgroundModel = self.backgroundModel
 
-	local sequenceView = self.sequenceView
 	sequenceView:setSequenceConfig(self.selectViewConfig)
 	sequenceView:setView("NoteChartSetListView", noteChartSetListView)
 	sequenceView:setView("NoteChartListView", noteChartListView)
@@ -105,8 +105,7 @@ SelectView.load = function(self)
 	sequenceView:setView("StageInfoView", stageInfoView)
 	sequenceView:setView("ModifierIconGridView", modifierIconGridView)
 	sequenceView:setView("SelectFrameView", selectFrameView)
-
-	self.sequenceView:load()
+	sequenceView:load()
 
 	navigator:load()
 end

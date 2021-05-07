@@ -5,18 +5,20 @@ local Navigator = require(viewspackage .. "Navigator")
 local SelectNavigator = Navigator:new()
 
 SelectNavigator.receive = function(self, event)
-	if event.name == "keypressed" then
-		local scancode = event.args[2]
-		if scancode == "up" then self:scrollNoteChart("up")
-		elseif scancode == "down" then self:scrollNoteChart("down")
-		elseif scancode == "left" then self:scrollNoteChartSet("up")
-		elseif scancode == "right" then self:scrollNoteChartSet("down")
-		elseif scancode == "f5" then self:updateCache()
-		elseif scancode == "return" then self:play()
-		elseif scancode == "f1" then self:changeScreen("Modifier")
-		elseif scancode == "f2" then self:changeScreen("NoteSkin")
-		elseif scancode == "f3" then self:changeScreen("Input")
-		end
+	if event.name ~= "keypressed" then
+		return
+	end
+
+	local scancode = event.args[2]
+	if scancode == "up" then self:scrollNoteChart("up")
+	elseif scancode == "down" then self:scrollNoteChart("down")
+	elseif scancode == "left" then self:scrollNoteChartSet("up")
+	elseif scancode == "right" then self:scrollNoteChartSet("down")
+	elseif scancode == "f5" then self:updateCache()
+	elseif scancode == "return" then self:play()
+	elseif scancode == "f1" then self:changeScreen("Modifier")
+	elseif scancode == "f2" then self:changeScreen("NoteSkin")
+	elseif scancode == "f3" then self:changeScreen("Input")
 	end
 end
 
