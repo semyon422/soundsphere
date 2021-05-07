@@ -119,8 +119,8 @@ GameController.load = function(self)
 	modifierModel.noteChartModel = noteChartModel
 	modifierModel.difficultyModel = difficultyModel
 	modifierModel.scoreModel = scoreModel
+	modifierModel.configModel = configModel
 	inputModel.configModel = configModel
-	modifierModel.config = configModel:getConfig("modifier")
 
 	settingsModel.configModel = configModel
 	settingsModel:load()

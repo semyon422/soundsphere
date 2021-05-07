@@ -1,20 +1,46 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
 local Navigator = require(viewspackage .. "Navigator")
-local Node = require("aqua.util.Node")
 
 local ModifierNavigator = Navigator:new()
 
 ModifierNavigator.construct = function(self)
-	Navigator.construct(self)
+	self.modifierItemIndex = 1
+	self.availableModifierItemIndex = 1
+	self.activeList = "modifierList"
+end
 
-	local availableModifierList = Node:new()
-	self.availableModifierList = availableModifierList
-	availableModifierList.selected = 1
+ModifierNavigator.receive = function(self, event)
+	if event.name ~= "keypressed" then
+		return
+	end
 
-	local modifierList = Node:new()
-	self.modifierList = modifierList
-	modifierList.selected = 1
+	local scancode = event.args[2]
+	if self.activeList == "modifierList" then
+		if scancode == "up" then self:scrollModifier(-1)
+		elseif scancode == "down" then self:scrollModifier(1)
+		elseif scancode == "tab" then self.activeList = "availableModifierList"
+		elseif scancode == "return" then
+		elseif scancode == "backspace" then self:removeModifier()
+		elseif scancode == "right" then self:increaseModifierValue(1)
+		elseif scancode == "left" then self:increaseModifierValue(-1)
+		elseif scancode == "escape" then self:changeScreen("Input")
+		end
+	elseif self.activeList == "availableModifierList" then
+		if scancode == "up" then self:scrollAvailableModifier(-1)
+		elseif scancode == "down" then self:scrollAvailableModifier(1)
+		elseif scancode == "tab" then self.activeList = "modifierList"
+		elseif scancode == "return" then self:addModifier()
+		elseif scancode == "escape" then self:changeScreen("Input")
+		end
+	end
+end
+
+ModifierNavigator.changeScreen = function(self, screenName)
+	self:send({
+		name = "changeScreen",
+		screenName = screenName
+	})
 end
 
 ModifierNavigator.scrollAvailableModifier = function(self, direction, destination)
@@ -53,7 +79,7 @@ ModifierNavigator.fixScrollModifier = function(self)
 	end
 end
 
-ModifierNavigator.load = function(self)
+ModifierNavigator.load1 = function(self)
     Navigator.load(self)
 
 	local availableModifierList = self.availableModifierList
@@ -120,12 +146,6 @@ ModifierNavigator.load = function(self)
 			name = "goSelectScreen"
 		})
 	end)
-end
-
-ModifierNavigator.receive = function(self, event)
-	if event.name == "keypressed" then
-		self:call(event.args[1])
-	end
 end
 
 return ModifierNavigator

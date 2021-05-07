@@ -1,7 +1,9 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
 local Class = require("aqua.util.Class")
-local Node = require("aqua.util.Node")
+
+local SequenceView = require(viewspackage .. "SequenceView")
+local ModifierViewConfig = require(viewspackage .. "ModifierView.ModifierViewConfig")
 local ModifierNavigator = require(viewspackage .. "ModifierView.ModifierNavigator")
 local AvailableModifierListView = require(viewspackage .. "ModifierView.AvailableModifierListView")
 local ModifierListView = require(viewspackage .. "ModifierView.ModifierListView")
@@ -10,54 +12,63 @@ local BackgroundView = require(viewspackage .. "BackgroundView")
 local ModifierView = Class:new()
 
 ModifierView.construct = function(self)
-	self.node = Node:new()
+	self.modifierViewConfig = ModifierViewConfig
+	self.sequenceView = SequenceView:new()
+	self.navigator = ModifierNavigator:new()
+	self.availableModifierListView = AvailableModifierListView:new()
+	self.modifierListView = ModifierListView:new()
+	self.backgroundView = BackgroundView:new()
 end
 
 ModifierView.load = function(self)
-	local node = self.node
-	local config = self.configModel:getConfig("modifier")
+	local navigator = self.navigator
+	local availableModifierListView = self.availableModifierListView
+	local modifierListView = self.modifierListView
+	local backgroundView = self.backgroundView
 
-	local navigator = ModifierNavigator:new()
-	self.navigator = navigator
+	local config = self.configModel:getConfig("modifier")
+	self.config = config
+
 	navigator.config = config
 	navigator.view = self
 
-	local availableModifierListView = AvailableModifierListView:new()
 	availableModifierListView.navigator = navigator
 	availableModifierListView.config = config
+	availableModifierListView.modifierModel = self
 	availableModifierListView.view = self
 
-	local modifierListView = ModifierListView:new()
 	modifierListView.navigator = navigator
 	modifierListView.config = config
+	modifierListView.modifierModel = self
 	modifierListView.view = self
 
-	local backgroundView = BackgroundView:new()
 	backgroundView.view = self
 
-	node:node(backgroundView)
-	node:node(availableModifierListView)
-	node:node(modifierListView)
+	local sequenceView = self.sequenceView
+	sequenceView:setSequenceConfig(self.modifierViewConfig)
+	sequenceView:setView("AvailableModifierListView", availableModifierListView)
+	sequenceView:setView("ModifierListView", modifierListView)
 
 	navigator:load()
 end
 
 ModifierView.unload = function(self)
 	self.navigator:unload()
+	self.sequenceView:unload()
 end
 
 ModifierView.receive = function(self, event)
-	self.node:callnext(event.name, event)
 	self.navigator:receive(event)
+	self.sequenceView:receive(event)
 end
 
 ModifierView.update = function(self, dt)
-	self.node:callnext("update")
 	self.navigator:update()
+	self.sequenceView:update(dt)
 end
 
 ModifierView.draw = function(self)
-	self.node:callnext("draw")
+	self.sequenceView:draw()
 end
 
 return ModifierView

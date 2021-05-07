@@ -55,6 +55,30 @@ ModifierModel.construct = function(self)
 	self:createModifiers()
 end
 
+ModifierModel.load = function(self)
+	local config = self.configModel:getConfig("modifier")
+	self.config = config
+
+	self.availableModifierItemIndex = 1
+	self.modifierItemIndex = #config
+end
+
+ModifierModel.scrollAvailableModifier = function(self, direction, destination)
+	direction = direction or destination - self.availableModifierItemIndex
+	if not self.modifiers[self.availableModifierItemIndex + direction] then
+		return
+	end
+	self.availableModifierItemIndex = self.availableModifierItemIndex + direction
+end
+
+ModifierModel.scrollModifier = function(self, direction, destination)
+	direction = direction or destination - self.modifierItemIndex
+	if not self.config[self.modifierItemIndex + direction] then
+		return
+	end
+	self.modifierItemIndex = self.modifierItemIndex + direction
+end
+
 ModifierModel.createModifiers = function(self)
 	local modifierByName = self.modifierByName
 	for _, Modifier in ipairs(self.modifiers) do

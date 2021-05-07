@@ -1,67 +1,37 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
-local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local ListView = require(viewspackage .. "ListView")
+local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local AvailableModifierListItemView = require(viewspackage .. "ModifierView.AvailableModifierListItemView")
 
 local AvailableModifierListView = ListView:new()
 
-AvailableModifierListView.init = function(self)
-	self.ListItemView = AvailableModifierListItemView
-	self.view = self.view
-	self.cs = CoordinateManager:getCS(0.5, 0, 0, 0, "h")
-	self.x = -16 / 9 / 3 + 16 / 9 / 3 / 4
-	self.y = 0
-	self.w = 16 / 9 / 3 / 2
-	self.h = 1
-	self.itemCount = 15
-	self.selectedItem = 1
+AvailableModifierListView.construct = function(self)
+	ListView.construct(self)
+	self.itemView = AvailableModifierListItemView:new()
+	self.itemView.listView = self
+	self.cs = CoordinateManager:getCS(0.5, 0, 16 / 9 / 2, 0, "h")
+end
 
-	self:reloadItems()
-
-	self:on("update", function()
-		self.selectedItem = self.navigator.availableModifierList.selected
-		self:reloadItems()
-	end)
-	self:on("select", function()
-		self.navigator:setNode("availableModifierList")
-	end)
-	self:on("draw", self.drawFrame)
-	self:on("wheelmoved", function(self, event)
-		local mx, my = love.mouse.getPosition()
-		local cs = self.cs
-		local x = cs:X(self.x, true)
-		local w = cs:X(self.w)
-		if mx >= x and mx < x + w then
-			local wy = event.args[2]
-			if wy == 1 then
-				self.navigator:call("up")
-			elseif wy == -1 then
-				self.navigator:call("down")
-			end
-		end
-	end)
-	self:on("mousepressed", self.receive)
-	-- self:on("mousepressed", function(self, event)
-	-- 	local button = event.args[3]
-	-- 	if button == 1 then
-	-- 		self.navigator:call("return")
-	-- 	end
-	-- end)
-
-	ListView.init(self)
+AvailableModifierListView.forceScroll = function(self)
+	self.state.selectedItem = self.modifierModel.availableModifierItemIndex
+	self.state.selectedVisualItem = self.modifierModel.availableModifierItemIndex
 end
 
 AvailableModifierListView.reloadItems = function(self)
-	self.items = self.view.modifierModel.modifiers
+	self.items = self.modifierModel.modifiers
 end
 
-AvailableModifierListView.drawFrame = function(self)
-	if self.navigator:checkNode("availableModifierList") then
-		self.isSelected = true
-	else
-		self.isSelected = false
-	end
+AvailableModifierListView.getItemIndex = function(self)
+	return self.selectModel.noteChartItemIndex
+end
+
+AvailableModifierListView.scrollUp = function(self)
+	self.navigator:scrollAvailableModifier("up")
+end
+
+AvailableModifierListView.scrollDown = function(self)
+	self.navigator:scrollAvailableModifier("down")
 end
 
 return AvailableModifierListView

@@ -82,6 +82,10 @@ ListView.getItemIndex = function(self)
 	return 1
 end
 
+ListView.getItemView = function(self, item)
+	return self.itemView
+end
+
 ListView.drawStencil = function(self)
 	local config = self.config
 	local cs = self.cs
@@ -115,7 +119,7 @@ ListView.draw = function(self)
 		local visualIndex = i + deltaItemIndex
 		local item = state.items[itemIndex]
 		if item then
-			local itemView = self.itemView
+			local itemView = self:getItemView(item)
 			itemView.visualIndex = visualIndex
 			itemView.item = item
 			itemView.listView = self

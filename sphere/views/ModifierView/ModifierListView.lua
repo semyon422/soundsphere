@@ -11,79 +11,35 @@ local Stepper = require(viewspackage .. "Stepper")
 
 local ModifierListView = ListView:new()
 
-ModifierListView.init = function(self)
-	self.view = self.view
-	self.cs = CoordinateManager:getCS(0.5, 0, 0, 0, "h")
-	self.x = -16 / 9 / 3 / 4
-	self.y = 0
-	self.w = 16 / 9 / 3
-	self.h = 1
-	self.itemCount = 15
-	self.selectedItem = 1
-	self.activeItem = self.selectedItem
+ModifierListView.construct = function(self)
+	ListView.construct(self)
+	self.cs = CoordinateManager:getCS(0.5, 0, 16 / 9 / 2, 0, "h")
 
-	self:reloadItems()
+	self.itemSwitchView = ModifierListItemSwitchView:new()
+	self.itemSliderView = ModifierListItemSliderView:new()
+	self.itemStepperView = ModifierListItemStepperView:new()
+	self.itemSwitchView.listView = self
+	self.itemSliderView.listView = self
+	self.itemStepperView.listView = self
 
 	self.slider = Slider:new()
 	self.switch = Switch:new()
 	self.stepper = Stepper:new()
-
-	self:on("update", function()
-		self.selectedItem = self.navigator.modifierList.selected
-		self:reloadItems()
-	end)
-	self:on("select", function()
-		self.navigator:setNode("modifierList")
-	end)
-	self:on("draw", self.drawFrame)
-	self:on("wheelmoved", self.receive)
-	self:on("mousepressed", self.receive)
-	self:on("mousereleased", self.receive)
-	self:on("mousemoved", self.receive)
-
-	self:on("wheelmoved", function(self, event)
-		local mx, my = love.mouse.getPosition()
-		local cs = self.cs
-		local x = cs:X(self.x, true)
-		local w = cs:X(self.w)
-		if mx >= x and mx < x + w / 2 then
-			local wy = event.args[2]
-			if wy == 1 then
-				self.navigator:call("up")
-			elseif wy == -1 then
-				self.navigator:call("down")
-			end
-		end
-	end)
-
-	ListView.init(self)
 end
 
-ModifierListView.createListItemViews = function(self)
-	local switchView = ModifierListItemSwitchView:new()
-	switchView.listView = self
-	switchView:init()
-	self.listItemSwitchView = switchView
-
-	local sliderView = ModifierListItemSliderView:new()
-	sliderView.listView = self
-	sliderView:init()
-	self.listItemSliderView = sliderView
-
-	local stepperView = ModifierListItemStepperView:new()
-	stepperView.listView = self
-	stepperView:init()
-	self.listItemStepperView = stepperView
+ModifierListView.load = function(self)
+	ListView.load(self)
+	self.state.activeItem = self.state.selectedItem
 end
 
-ModifierListView.getListItemView = function(self, modifierConfig)
+ModifierListView.getItemView = function(self, modifierConfig)
 	local modifier = self.view.modifierModel:getModifier(modifierConfig)
 	if modifier.interfaceType == "toggle" then
-		return self.listItemSwitchView
+		return self.itemSwitchView
 	elseif modifier.interfaceType == "slider" then
-		return self.listItemSliderView
+		return self.itemSliderView
 	elseif modifier.interfaceType == "stepper" then
-		return self.listItemStepperView
+		return self.itemStepperView
 	end
 end
 
@@ -91,12 +47,21 @@ ModifierListView.reloadItems = function(self)
 	self.items = self.view.configModel:getConfig("modifier")
 end
 
-ModifierListView.drawFrame = function(self)
-	if self.navigator:checkNode("modifierList") then
-		self.isSelected = true
-	else
-		self.isSelected = false
-	end
+ModifierListView.forceScroll = function(self)
+	self.state.selectedItem = self.modifierModel.modifierItemIndex
+	self.state.selectedVisualItem = self.modifierModel.modifierItemIndex
+end
+
+ModifierListView.getItemIndex = function(self)
+	return self.modifierModel.modifierItemIndex
+end
+
+ModifierListView.scrollUp = function(self)
+	self.navigator:scrollModifier("up")
+end
+
+ModifierListView.scrollDown = function(self)
+	self.navigator:scrollModifier("down")
 end
 
 return ModifierListView
