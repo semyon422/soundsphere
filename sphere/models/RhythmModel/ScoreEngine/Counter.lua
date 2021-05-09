@@ -29,6 +29,7 @@ Counter.createEnv = function(self)
 	env.print = print
 	env.pairs = pairs
 	env.ipairs = ipairs
+	env.require = require
 	env.table = table
 end
 
