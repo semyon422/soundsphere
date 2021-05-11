@@ -3,14 +3,43 @@ local Class = require("aqua.util.Class")
 local frame_draw = require("aqua.graphics.frame_draw")
 local map = require("aqua.math").map
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
+local GaussianBlurView = require("sphere.views.GaussianBlurView")
 
 local BackgroundView = Class:new()
 
+BackgroundView.blurSigma = 16
+
 BackgroundView.construct = function(self)
 	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
+	self.gaussianBlurView = GaussianBlurView:new()
 end
 
 BackgroundView.draw = function(self)
+	local config = self.config
+
+	if config.dim == 1 then
+		return
+	end
+
+	if config.blur then
+		return self:drawBlurBackground()
+	end
+
+	self:drawBackground()
+end
+
+BackgroundView.drawBlurBackground = function(self)
+	local config = self.config
+	if config.sigma and self.gaussianBlurView.sigma ~= config.sigma then
+		self.gaussianBlurView:setSigma(config.sigma)
+	end
+
+	self.gaussianBlurView:enable()
+	self:drawBackground()
+	self.gaussianBlurView:disable()
+end
+
+BackgroundView.drawBackground = function(self)
 	local cs = self.cs
 	local config = self.config
 
