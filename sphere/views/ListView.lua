@@ -22,8 +22,9 @@ ListView.load = function(self)
 end
 
 ListView.forceScroll = function(self)
-	self.state.selectedItem = 1
-	self.state.selectedVisualItem = 1
+	local itemIndex = assert(self:getItemIndex())
+	self.state.selectedItem = itemIndex
+	self.state.selectedVisualItem = itemIndex
 end
 
 ListView.reloadItems = function(self)
@@ -55,15 +56,15 @@ ListView.scrollUp = function(self) end
 ListView.scrollDown = function(self) end
 
 ListView.update = function(self, dt)
-	local ItemIndex = self:getItemIndex()
-	if self.state.selectedItem ~= ItemIndex then
+	local itemIndex = assert(self:getItemIndex())
+	if self.state.selectedItem ~= itemIndex then
 		self.state.scrollTween = tween.new(
 			0.1,
 			self.state,
-			{selectedVisualItem = ItemIndex},
+			{selectedVisualItem = itemIndex},
 			"linear"
 		)
-		self.state.selectedItem = ItemIndex
+		self.state.selectedItem = itemIndex
 	end
 	if self.state.selectedVisualItem == self.state.selectedItem then
 		self.state.scrollTween = nil

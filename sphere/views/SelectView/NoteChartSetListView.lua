@@ -13,11 +13,6 @@ NoteChartSetListView.construct = function(self)
 	self.cs = CoordinateManager:getCS(0.5, 0, 16 / 9 / 2, 0, "h")
 end
 
-NoteChartSetListView.forceScroll = function(self)
-	self.state.selectedItem = self.selectModel.noteChartSetItemIndex
-	self.state.selectedVisualItem = self.selectModel.noteChartSetItemIndex
-end
-
 NoteChartSetListView.reloadItems = function(self)
 	self.state.items = self.noteChartSetLibraryModel.items
 end
