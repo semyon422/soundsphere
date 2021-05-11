@@ -31,23 +31,27 @@ ModifierView.load = function(self)
 
 	navigator.config = config
 	navigator.view = self
+	navigator.modifierModel = self.modifierModel
 
 	availableModifierListView.navigator = navigator
 	availableModifierListView.config = config
-	availableModifierListView.modifierModel = self
+	availableModifierListView.modifierModel = self.modifierModel
 	availableModifierListView.view = self
 
 	modifierListView.navigator = navigator
 	modifierListView.config = config
-	modifierListView.modifierModel = self
+	modifierListView.modifierModel = self.modifierModel
 	modifierListView.view = self
 
 	backgroundView.view = self
+	backgroundView.backgroundModel = self.backgroundModel
 
 	local sequenceView = self.sequenceView
 	sequenceView:setSequenceConfig(self.modifierViewConfig)
 	sequenceView:setView("AvailableModifierListView", availableModifierListView)
 	sequenceView:setView("ModifierListView", modifierListView)
+	sequenceView:setView("BackgroundView", backgroundView)
+	sequenceView:load()
 
 	navigator:load()
 end

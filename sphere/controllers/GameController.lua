@@ -128,6 +128,8 @@ GameController.load = function(self)
 	themeModel.configModel = configModel
 	themeModel:load()
 
+	modifierModel:load()
+
 	mountModel.configModel = configModel
 
 	mountController.mountModel = mountModel

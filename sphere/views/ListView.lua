@@ -122,6 +122,7 @@ ListView.draw = function(self)
 		if item then
 			local itemView = self:getItemView(item)
 			itemView.visualIndex = visualIndex
+			itemView.itemIndex = itemIndex
 			itemView.item = item
 			itemView.listView = self
 			itemView.prevItem = state.items[itemIndex - 1]
@@ -131,6 +132,38 @@ ListView.draw = function(self)
 	end
 
 	love.graphics.setStencilTest()
+end
+
+ListView.getItemPosition = function(self, itemIndex)
+	local config = self.config
+	local state = self.state
+	local cs = self.cs
+	local screen = config.screen
+	local visualIndex = math.ceil(config.rows / 2) + itemIndex - state.selectedVisualItem
+	local h = config.h / config.rows
+	local y = config.y + (visualIndex - 1) * h
+
+	return
+		cs:X(config.x / screen.h, true),
+		cs:Y(y / screen.h, true),
+		cs:X(config.w / screen.h),
+		cs:Y(h / screen.h)
+end
+
+ListView.getItemElementPosition = function(self, itemIndex, element)
+	local config = self.config
+	local state = self.state
+	local cs = self.cs
+	local screen = config.screen
+	local visualIndex = math.ceil(config.rows / 2) + itemIndex - state.selectedVisualItem
+	local h = config.h / config.rows
+	local y = config.y + (visualIndex - 1) * h
+
+	return
+		cs:X((config.x + element.x) / screen.h, true),
+		cs:Y((y + element.y) / screen.h, true),
+		cs:X(element.w / screen.h),
+		cs:Y(element.h / screen.h)
 end
 
 return ListView

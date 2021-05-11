@@ -13,14 +13,14 @@ AvailableModifierListItemView.draw = function(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local font = spherefonts.get(config.text.fontFamily, config.text.fontSize)
+	local font = spherefonts.get(config.name.fontFamily, config.name.fontSize)
 	love.graphics.setFont(font)
 	love.graphics.printf(
 		item.name,
-		cs:X((config.x + config.text.x) / screen.h, true),
-		cs:Y((y + config.text.y) / screen.h, true),
-		config.text.w,
-		config.text.align,
+		cs:X((config.x + config.name.x) / screen.h, true),
+		cs:Y((y + config.name.y) / screen.h, true),
+		config.name.w,
+		config.name.align,
 		0,
 		cs.one / screen.h,
 		cs.one / screen.h
@@ -28,15 +28,15 @@ AvailableModifierListItemView.draw = function(self)
 end
 
 AvailableModifierListItemView.receive = function(self, event)
-	-- local x, y, w, h = self:getPosition()
-	-- local mx, my = love.mouse.getPosition()
+	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
+	local mx, my = love.mouse.getPosition()
 
-	-- if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then
-	-- 	local button = event.args[3]
-	-- 	if button == 1 then
-	-- 		self.listView.navigator:call("return", self.itemIndex)
-	-- 	end
-	-- end
+	if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then
+		local button = event.args[3]
+		if button == 1 then
+			self.listView.navigator:addModifier(self.itemIndex)
+		end
+	end
 end
 
 return AvailableModifierListItemView

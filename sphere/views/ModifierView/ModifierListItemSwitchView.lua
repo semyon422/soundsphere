@@ -1,58 +1,22 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
-local aquafonts			= require("aqua.assets.fonts")
-local spherefonts		= require("sphere.assets.fonts")
-
 local ModifierListItemView = require(viewspackage .. "ModifierView.ModifierListItemView")
 local SwitchView = require(viewspackage .. "SwitchView")
 
 local ModifierListItemSwitchView = ModifierListItemView:new()
 
-ModifierListItemSwitchView.init = function(self)
-	self:on("draw", self.draw)
-
-	self.fontName = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
-
+ModifierListItemSwitchView.construct = function(self)
 	self.switchView = SwitchView:new()
 end
 
 ModifierListItemSwitchView.draw = function(self)
-	local listView = self.listView
+	local modifierConfig = self.item
 
-	local itemIndex = self.index + listView.selectedItem - math.ceil(listView.itemCount / 2)
-	local item = self.item
+	ModifierListItemView.draw(self)
 
-	local cs = listView.cs
-
-	local x, y, w, h = self:getPosition()
-
-    local modifierConfig = item
-
-	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
-	if listView.isSelected then
-		love.graphics.setColor(1, 1, 1,
-			deltaItemIndex == 0 and 1 or 0.66
-		)
-	else
-		love.graphics.setColor(1, 1, 1, 0.33)
-	end
-
-	love.graphics.setFont(self.fontName)
-	love.graphics.printf(
-		modifierConfig.name,
-		x,
-		y,
-		w / cs.one * 1080,
-		"left",
-		0,
-		cs.one / 1080,
-		cs.one / 1080,
-		-cs:X(0 / cs.one),
-		-cs:Y(18 / cs.one)
-	)
-
+	local config = self.listView.config
 	local switchView = self.switchView
-	switchView:setPosition(x + 3 * w / 4 - h / 2, y, h, h)
+	switchView:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.switch))
 	switchView:setValue(modifierConfig.value)
 	switchView:draw()
 end
@@ -66,19 +30,18 @@ ModifierListItemSwitchView.receive = function(self, event)
 
 	local listView = self.listView
 
-	local x, y, w, h = self:getPosition()
-
+	local config = listView.config
 	local switch = listView.switch
 	local modifierConfig = self.item
-	switch:setPosition(x + 3 * w / 4 - h / 2, y, h, h)
+	switch:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.slider))
 	switch:setValue(modifierConfig.value)
 	switch:receive(event)
 
 	if switch.valueUpdated then
 		if switch.value == 0 then
-			self.listView.navigator:call("left", self.itemIndex)
+			self.listView.navigator:increaseModifierValue(self.itemIndex, -1)
 		else
-			self.listView.navigator:call("right", self.itemIndex)
+			self.listView.navigator:increaseModifierValue(self.itemIndex, 1)
 		end
 		switch.valueUpdated = false
 	end
