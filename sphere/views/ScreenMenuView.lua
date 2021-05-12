@@ -2,7 +2,7 @@ local viewspackage = (...):match("^(.-%.views%.)")
 
 local Class = require("aqua.util.Class")
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
-local ScreenMenuItemView = require(viewspackage .. "SelectView.ScreenMenuItemView")
+local ScreenMenuItemView = require(viewspackage .. "ScreenMenuItemView")
 
 local ScreenMenuView = Class:new()
 
