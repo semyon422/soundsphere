@@ -1,12 +1,6 @@
 local Class			= require("aqua.util.Class")
-local icons			= require("sphere.assets.icons")
 
 local StepperView = Class:new()
-
-StepperView.construct = function(self)
-	self.leftImage = love.graphics.newImage(icons.ic_keyboard_arrow_left_white_48dp)
-	self.rightImage = love.graphics.newImage(icons.ic_keyboard_arrow_right_white_48dp)
-end
 
 StepperView.x = 0
 StepperView.y = 0
@@ -30,30 +24,33 @@ end
 StepperView.draw = function(self)
 	local x, y, w, h = self.x, self.y, self.w, self.h
 
-	local leftImage = self.leftImage
-	local rightImage = self.rightImage
+	love.graphics.setColor(1, 1, 1, 1)
 
-	love.graphics.setColor(1, 1, 1)
+	local ty = y + h / 3
+	local by = y + 2 * h / 3
+	local my = y + h / 2
+
+	local rx1 = x + h / 2
+	local lx1 = rx1 - h / 6
+
+	local lx2 = rx1 + w - h
+	local rx2 = lx2 + h / 6
 
     if self.value > 1 then
-        love.graphics.draw(
-            leftImage,
-            x,
-            y,
-            0,
-            h / leftImage:getWidth(),
-            h / leftImage:getHeight()
-        )
+		love.graphics.polygon(
+			"fill",
+			rx1, ty,
+			lx1, my,
+			rx1, by
+		)
     end
     if self.value < self.count then
-        love.graphics.draw(
-            rightImage,
-            x + w - h,
-            y,
-            0,
-            h / rightImage:getWidth(),
-            h / rightImage:getHeight()
-        )
+		love.graphics.polygon(
+			"fill",
+			lx2, ty,
+			rx2, my,
+			lx2, by
+		)
     end
 end
 

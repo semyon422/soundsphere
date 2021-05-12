@@ -2,7 +2,6 @@
 local Class			= require("aqua.util.Class")
 local belong		= require("aqua.math").belong
 local map			= require("aqua.math").map
-local round			= require("aqua.math").round
 
 local Slider = Class:new()
 

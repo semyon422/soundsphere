@@ -18,28 +18,33 @@ SliderView.setValue = function(self, value)
 end
 
 SliderView.draw = function(self)
-    local x, y, w, h = self.x, self.y, self.w, self.h
+	local x, y, w, h = self.x, self.y, self.w, self.h
 
-    local barHeight = h / 3
+	local barHeight = h / 3
 
-    love.graphics.setColor(0.5, 0.5, 0.5)
-    love.graphics.rectangle(
-        "fill",
-        x + (h - barHeight) / 2,
-        y + (h - barHeight) / 2,
-        w - (h - barHeight),
-        barHeight,
-        barHeight / 2,
-        barHeight / 2
-    )
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.rectangle(
+		"line",
+		x + (h - barHeight) / 2,
+		y + (h - barHeight) / 2,
+		w - (h - barHeight),
+		barHeight,
+		barHeight / 2,
+		barHeight / 2
+	)
 
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.circle(
-        "fill",
-        map(self.value, 0, 1, x + h / 2, x + w - h / 2),
-        y + h / 2,
-        barHeight / 1.5
-    )
+	love.graphics.circle(
+		"fill",
+		map(self.value, 0, 1, x + h / 2, x + w - h / 2),
+		y + h / 2,
+		h / 4
+	)
+	love.graphics.circle(
+		"line",
+		map(self.value, 0, 1, x + h / 2, x + w - h / 2),
+		y + h / 2,
+		h / 4
+	)
 end
 
 return SliderView
