@@ -25,6 +25,7 @@ ListView.forceScroll = function(self)
 	local itemIndex = assert(self:getItemIndex())
 	self.state.selectedItem = itemIndex
 	self.state.selectedVisualItem = itemIndex
+	self.state.numberItems = #self.state.items
 end
 
 ListView.reloadItems = function(self)
@@ -72,9 +73,11 @@ ListView.update = function(self, dt)
 	if self.state.scrollTween then
 		self.state.scrollTween:update(dt)
 	end
+
 	local items = self.state.items
+	local numberItems = self.state.numberItems
 	self:reloadItems()
-	if items ~= self.state.items then
+	if items ~= self.state.items or numberItems ~= #items then
 		self:forceScroll()
 	end
 end
