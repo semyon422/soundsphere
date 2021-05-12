@@ -3,6 +3,10 @@ local viewspackage = (...):match("^(.-%.views%.)")
 local Class = require("aqua.util.Class")
 
 local SequenceView = require(viewspackage .. "SequenceView")
+local ScrollBarView = require(viewspackage .. "ScrollBarView")
+local RectangleView = require(viewspackage .. "RectangleView")
+local LineView = require(viewspackage .. "LineView")
+local ScreenMenuView = require(viewspackage .. "ScreenMenuView")
 local ModifierViewConfig = require(viewspackage .. "ModifierView.ModifierViewConfig")
 local ModifierNavigator = require(viewspackage .. "ModifierView.ModifierNavigator")
 local AvailableModifierListView = require(viewspackage .. "ModifierView.AvailableModifierListView")
@@ -18,6 +22,10 @@ ModifierView.construct = function(self)
 	self.availableModifierListView = AvailableModifierListView:new()
 	self.modifierListView = ModifierListView:new()
 	self.backgroundView = BackgroundView:new()
+	self.scrollBarView = ScrollBarView:new()
+	self.rectangleView = RectangleView:new()
+	self.lineView = LineView:new()
+	self.screenMenuView = ScreenMenuView:new()
 end
 
 ModifierView.load = function(self)
@@ -25,6 +33,7 @@ ModifierView.load = function(self)
 	local availableModifierListView = self.availableModifierListView
 	local modifierListView = self.modifierListView
 	local backgroundView = self.backgroundView
+	local screenMenuView = self.screenMenuView
 
 	local config = self.configModel:getConfig("modifier")
 	self.config = config
@@ -32,6 +41,8 @@ ModifierView.load = function(self)
 	navigator.config = config
 	navigator.view = self
 	navigator.modifierModel = self.modifierModel
+
+	screenMenuView.navigator = self.navigator
 
 	availableModifierListView.navigator = navigator
 	availableModifierListView.config = config
@@ -51,6 +62,10 @@ ModifierView.load = function(self)
 	sequenceView:setView("AvailableModifierListView", availableModifierListView)
 	sequenceView:setView("ModifierListView", modifierListView)
 	sequenceView:setView("BackgroundView", backgroundView)
+	sequenceView:setView("ScrollBarView", self.scrollBarView)
+	sequenceView:setView("RectangleView", self.rectangleView)
+	sequenceView:setView("LineView", self.lineView)
+	sequenceView:setView("ScreenMenuView", self.screenMenuView)
 	sequenceView:load()
 
 	navigator:load()
