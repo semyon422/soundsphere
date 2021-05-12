@@ -24,6 +24,10 @@ SequenceView.getView = function(self, viewClass)
 	return self.views[viewClass]
 end
 
+SequenceView.getState = function(self, config)
+	return self.states[config]
+end
+
 SequenceView.getViewIterator = function(self)
 	local configs = self.config
 	local index = 1
@@ -34,7 +38,8 @@ SequenceView.getViewIterator = function(self)
 			local view = self:getView(config.class)
 			if view then
 				view.config = config
-				view.state = self.states[config]
+				view.state = self:getState(config)
+				view.sequenceView = self
 				index = i + 1
 				return view
 			end

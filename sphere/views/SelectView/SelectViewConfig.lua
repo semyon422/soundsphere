@@ -244,22 +244,16 @@ local Preview = {
 }
 
 local NoteChartSetScrollBar = {
-	class = "NoteChartSetScrollBarView",
+	class = "ScrollBarView",
 	screen = screen,
+	list = NoteChartSetList,
 	x = 1641,
 	y = 144,
 	w = 16,
 	h = 792,
-	rows = 11
-}
-
-local StageInfoScrollBar = {
-	class = "StageInfoScrollBarView",
-	screen = screen,
-	x = 270,
-	y = 279,
-	w = 8,
-	h = 522
+	rows = 11,
+	backgroundColor = {1, 1, 1, 0.33},
+	color = {1, 1, 1, 0.66}
 }
 
 local Logo = {
@@ -448,11 +442,12 @@ local LeftScreenMenu = {
 	}
 }
 
-local SelectFrame = {
-	class = "SelectFrameView",
+local Rectangle = {
+	class = "RectangleView",
 	screen = screen,
 	rectangles = {
 		{
+			color = {1, 1, 1, 1},
 			mode = "fill",
 			lineStyle = "smooth",
 			lineWidth = 1,
@@ -464,6 +459,7 @@ local SelectFrame = {
 			ry = 0
 		},
 		{
+			color = {1, 1, 1, 1},
 			mode = "fill",
 			lineStyle = "smooth",
 			lineWidth = 1,
@@ -473,8 +469,25 @@ local SelectFrame = {
 			h = 72,
 			rx = 0,
 			ry = 0
+		},
+		{
+			color = {1, 1, 1, 0.25},
+			mode = "fill",
+			lineStyle = "smooth",
+			lineWidth = 1,
+			x = 270,
+			y = 279,
+			w = 8,
+			h = 522,
+			rx = 4,
+			ry = 4
 		}
-	},
+	}
+}
+
+local Line = {
+	class = "LineView",
+	screen = screen,
 	lines = {}
 }
 
@@ -485,7 +498,6 @@ local SelectViewConfig = {
 	NoteChartList,
 	StageInfo,
 	NoteChartSetScrollBar,
-	StageInfoScrollBar,
 
 	Logo,
 	UserInfo,
@@ -496,7 +508,9 @@ local SelectViewConfig = {
 	StageInfoModifierIconGrid,
 	BottomScreenMenu,
 	LeftScreenMenu,
-	SelectFrame
+
+	Rectangle,
+	Line
 }
 
 return SelectViewConfig

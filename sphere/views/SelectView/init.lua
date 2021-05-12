@@ -3,21 +3,20 @@ local viewspackage = (...):match("^(.-%.views%.)")
 local Class = require("aqua.util.Class")
 
 local SequenceView = require(viewspackage .. "SequenceView")
+local ScrollBarView = require(viewspackage .. "ScrollBarView")
+local RectangleView = require(viewspackage .. "RectangleView")
+local LineView = require(viewspackage .. "LineView")
+local UserInfoView = require(viewspackage .. "UserInfoView")
+local LogoView = require(viewspackage .. "LogoView")
 local SelectViewConfig = require(viewspackage .. "SelectView.SelectViewConfig")
 local SelectNavigator = require(viewspackage .. "SelectView.SelectNavigator")
 local NoteChartSetListView = require(viewspackage .. "SelectView.NoteChartSetListView")
 local NoteChartListView = require(viewspackage .. "SelectView.NoteChartListView")
-local ScoreListView = require(viewspackage .. "SelectView.ScoreListView")
 local SearchFieldView = require(viewspackage .. "SelectView.SearchFieldView")
 local SortStepperView = require(viewspackage .. "SelectView.SortStepperView")
 local ScreenMenuView = require(viewspackage .. "SelectView.ScreenMenuView")
-local UserInfoView = require(viewspackage .. "SelectView.UserInfoView")
-local LogoView = require(viewspackage .. "SelectView.LogoView")
-local NoteChartSetScrollBarView = require(viewspackage .. "SelectView.NoteChartSetScrollBarView")
-local StageInfoScrollBarView = require(viewspackage .. "SelectView.StageInfoScrollBarView")
 local StageInfoView = require(viewspackage .. "SelectView.StageInfoView")
 local ModifierIconGridView = require(viewspackage .. "SelectView.ModifierIconGridView")
-local SelectFrameView = require(viewspackage .. "SelectView.SelectFrameView")
 local BackgroundView = require(viewspackage .. "BackgroundView")
 
 local SelectView = Class:new()
@@ -33,27 +32,20 @@ SelectView.construct = function(self)
 	self.screenMenuView = ScreenMenuView:new()
 	self.userInfoView = UserInfoView:new()
 	self.logoView = LogoView:new()
-	self.noteChartSetScrollBarView = NoteChartSetScrollBarView:new()
-	self.stageInfoScrollBarView = StageInfoScrollBarView:new()
+	self.scrollBarView = ScrollBarView:new()
 	self.stageInfoView = StageInfoView:new()
 	self.modifierIconGridView = ModifierIconGridView:new()
-	self.selectFrameView = SelectFrameView:new()
 	self.backgroundView = BackgroundView:new()
+	self.rectangleView = RectangleView:new()
+	self.lineView = LineView:new()
 end
 
 SelectView.load = function(self)
 	local noteChartSetListView = self.noteChartSetListView
 	local noteChartListView = self.noteChartListView
 	local searchFieldView = self.searchFieldView
-	local sortStepperView = self.sortStepperView
 	local screenMenuView = self.screenMenuView
-	local userInfoView = self.userInfoView
-	local logoView = self.logoView
-	local noteChartSetScrollBarView = self.noteChartSetScrollBarView
-	local stageInfoScrollBarView = self.stageInfoScrollBarView
-	local stageInfoView = self.stageInfoView
 	local modifierIconGridView = self.modifierIconGridView
-	local selectFrameView = self.selectFrameView
 	local navigator = self.navigator
 	local sequenceView = self.sequenceView
 	local backgroundView = self.backgroundView
@@ -74,18 +66,10 @@ SelectView.load = function(self)
 	noteChartListView.noteChartLibraryModel = self.noteChartLibraryModel
 	noteChartListView.selectModel = self.selectModel
 
-	-- local scoreListView = ScoreListView:new()
-	-- scoreListView.navigator = navigator
-	-- scoreListView.config = config
-	-- scoreListView.view = self
-
 	searchFieldView.searchLineModel = self.searchLineModel
 
 	modifierIconGridView.modifierModel = self.modifierModel
 	modifierIconGridView.configModifier = configModifier
-
-	noteChartSetScrollBarView.selectModel = self.selectModel
-	noteChartSetScrollBarView.noteChartSetLibraryModel = self.noteChartSetLibraryModel
 
 	screenMenuView.navigator = self.navigator
 
@@ -96,15 +80,15 @@ SelectView.load = function(self)
 	sequenceView:setView("NoteChartListView", noteChartListView)
 	sequenceView:setView("BackgroundView", backgroundView)
 	sequenceView:setView("SearchFieldView", searchFieldView)
-	sequenceView:setView("SortStepperView", sortStepperView)
+	sequenceView:setView("SortStepperView", self.sortStepperView)
 	sequenceView:setView("ScreenMenuView", screenMenuView)
-	sequenceView:setView("UserInfoView", userInfoView)
-	sequenceView:setView("LogoView", logoView)
-	sequenceView:setView("NoteChartSetScrollBarView", noteChartSetScrollBarView)
-	sequenceView:setView("StageInfoScrollBarView", stageInfoScrollBarView)
-	sequenceView:setView("StageInfoView", stageInfoView)
+	sequenceView:setView("UserInfoView", self.userInfoView)
+	sequenceView:setView("LogoView", self.logoView)
+	sequenceView:setView("ScrollBarView", self.scrollBarView)
+	sequenceView:setView("StageInfoView", self.stageInfoView)
 	sequenceView:setView("ModifierIconGridView", modifierIconGridView)
-	sequenceView:setView("SelectFrameView", selectFrameView)
+	sequenceView:setView("RectangleView", self.rectangleView)
+	sequenceView:setView("LineView", self.lineView)
 	sequenceView:load()
 
 	navigator:load()

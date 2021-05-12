@@ -1,18 +1,18 @@
 local Class = require("aqua.util.Class")
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
 
-local NoteChartSetScrollBarView = Class:new()
+local ScrollBarView = Class:new()
 
-NoteChartSetScrollBarView.construct = function(self)
+ScrollBarView.construct = function(self)
 	self.cs = CoordinateManager:getCS(0.5, 0, 16 / 9 / 2, 0, "h")
 end
 
-NoteChartSetScrollBarView.draw = function(self)
+ScrollBarView.draw = function(self)
 	local cs = self.cs
 	local config = self.config
-	local screen = self.config.screen
+	local screen = config.screen
 
-	love.graphics.setColor(1, 1, 1, 0.25)
+	love.graphics.setColor(config.backgroundColor)
 	love.graphics.rectangle(
 		"fill",
 		cs:X(config.x / screen.h, true),
@@ -23,13 +23,15 @@ NoteChartSetScrollBarView.draw = function(self)
 		cs:Y(config.w / 2 / screen.h)
 	)
 
-	local itemCount = #self.noteChartSetLibraryModel.items
-	local rows = config.rows
-	local noteChartSetItemIndex = self.selectModel.noteChartSetItemIndex
-	local h = config.w + (config.h - config.w) * rows / (itemCount + rows)
-	local y = config.y + (config.h - h) * (noteChartSetItemIndex - 1) / (itemCount - 1)
+	local listViewConfig = config.list
+	local listViewState = self.sequenceView:getState(listViewConfig)
 
-	love.graphics.setColor(1, 1, 1, 0.75)
+	local itemCount = #listViewState.items
+	local rows = listViewConfig.rows
+	local h = config.w + (config.h - config.w) * rows / (itemCount + rows)
+	local y = config.y + (config.h - h) * (listViewState.selectedVisualItem - 1) / (itemCount - 1)
+
+	love.graphics.setColor(config.color)
 	love.graphics.rectangle(
 		"fill",
 		cs:X(config.x / screen.h, true),
@@ -41,4 +43,4 @@ NoteChartSetScrollBarView.draw = function(self)
 	)
 end
 
-return NoteChartSetScrollBarView
+return ScrollBarView
