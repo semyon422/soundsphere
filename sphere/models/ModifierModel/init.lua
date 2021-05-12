@@ -102,8 +102,11 @@ ModifierModel.remove = function(self, modifierConfig)
 	for i, foundModifierConfig in ipairs(self.config) do
 		if foundModifierConfig == modifierConfig then
 			table.remove(self.config, i)
-			return
+			break
 		end
+	end
+	if self.modifierItemIndex > 1 and not self.config[self.modifierItemIndex] then
+		self.modifierItemIndex = self.modifierItemIndex - 1
 	end
 end
 
