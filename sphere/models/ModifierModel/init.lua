@@ -71,10 +71,11 @@ ModifierModel.scrollAvailableModifier = function(self, direction)
 end
 
 ModifierModel.scrollModifier = function(self, direction)
-	if not self.config[self.modifierItemIndex + direction] then
+	local newModifierItemIndex = self.modifierItemIndex + direction
+	if not self.config[newModifierItemIndex] and not self.config[newModifierItemIndex - 1] then
 		return
 	end
-	self.modifierItemIndex = self.modifierItemIndex + direction
+	self.modifierItemIndex = newModifierItemIndex
 end
 
 ModifierModel.createModifiers = function(self)
@@ -86,16 +87,12 @@ ModifierModel.createModifiers = function(self)
 	end
 end
 
-ModifierModel.add = function(self, Modifier, index)
+ModifierModel.add = function(self, Modifier)
 	local modifierConfig = Modifier:getDefaultConfig()
 	local config = self.config
-	if not index then
-		table.insert(config, modifierConfig)
-	else
-		local maxIndex = math.max(#config, 1)
-		index = math.min(math.max(index, 1), maxIndex)
-		table.insert(config, index, modifierConfig)
-	end
+	local index = math.max(self.modifierItemIndex, 1)
+	table.insert(config, index, modifierConfig)
+	self.modifierItemIndex = index + 1
 end
 
 ModifierModel.remove = function(self, modifierConfig)
@@ -105,8 +102,8 @@ ModifierModel.remove = function(self, modifierConfig)
 			break
 		end
 	end
-	if self.modifierItemIndex > 1 and not self.config[self.modifierItemIndex] then
-		self.modifierItemIndex = self.modifierItemIndex - 1
+	if not self.config[self.modifierItemIndex] then
+		self.modifierItemIndex = math.max(self.modifierItemIndex - 1, 0)
 	end
 end
 

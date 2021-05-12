@@ -129,6 +129,18 @@ local Rectangle = {
 			mode = "fill",
 			lineStyle = "smooth",
 			lineWidth = 1,
+			x = 733,
+			y = 504,
+			w = 22,
+			h = 4,
+			rx = 0,
+			ry = 0
+		},
+		{
+			color = {1, 1, 1, 1},
+			mode = "fill",
+			lineStyle = "smooth",
+			lineWidth = 1,
 			x = 279,
 			y = 504,
 			w = 4,
