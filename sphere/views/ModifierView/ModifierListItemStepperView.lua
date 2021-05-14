@@ -12,7 +12,7 @@ end
 ModifierListItemStepperView.draw = function(self)
 	local modifierConfig = self.item
 
-	local modifier = self.listView.view.modifierModel:getModifier(modifierConfig)
+	local modifier = self.listView.modifierModel:getModifier(modifierConfig)
 
 	ModifierListItemView.draw(self)
 
@@ -42,7 +42,7 @@ ModifierListItemStepperView.receive = function(self, event)
 	local config = listView.config
 	local stepper = listView.stepper
 	local modifierConfig = self.item
-	local modifier = listView.view.modifierModel:getModifier(modifierConfig)
+	local modifier = listView.modifierModel:getModifier(modifierConfig)
 	stepper:setPosition(listView:getItemElementPosition(self.itemIndex, config.stepper))
 	stepper:setValue(modifier:toIndexValue(modifierConfig.value))
 	stepper:setCount(modifier:getCount())

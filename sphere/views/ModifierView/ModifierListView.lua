@@ -33,7 +33,7 @@ ModifierListView.load = function(self)
 end
 
 ModifierListView.getItemView = function(self, modifierConfig)
-	local modifier = self.view.modifierModel:getModifier(modifierConfig)
+	local modifier = self.modifierModel:getModifier(modifierConfig)
 	if modifier.interfaceType == "toggle" then
 		return self.itemSwitchView
 	elseif modifier.interfaceType == "slider" then
@@ -44,7 +44,7 @@ ModifierListView.getItemView = function(self, modifierConfig)
 end
 
 ModifierListView.reloadItems = function(self)
-	self.state.items = self.view.configModel:getConfig("modifier")
+	self.state.items = self.configModifier
 end
 
 ModifierListView.getItemIndex = function(self)

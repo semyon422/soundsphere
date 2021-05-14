@@ -21,21 +21,17 @@ ModifierView.load = function(self)
 	local availableModifierListView = self.availableModifierListView
 	local modifierListView = self.modifierListView
 
-	local config = self.configModel:getConfig("modifier")
-	self.config = config
+	local configModifier = self.configModel:getConfig("modifier")
 
-	navigator.config = config
+	navigator.config = configModifier
 	navigator.modifierModel = self.modifierModel
 
 	availableModifierListView.navigator = navigator
-	availableModifierListView.config = config
 	availableModifierListView.modifierModel = self.modifierModel
-	availableModifierListView.view = self
 
 	modifierListView.navigator = navigator
-	modifierListView.config = config
+	modifierListView.configModifier = configModifier
 	modifierListView.modifierModel = self.modifierModel
-	modifierListView.view = self
 
 	local sequenceView = self.sequenceView
 	sequenceView:setView("AvailableModifierListView", availableModifierListView)

@@ -14,7 +14,6 @@ local ModifierIconGridView = require(viewspackage .. "SelectView.ModifierIconGri
 local SelectView = ScreenView:new()
 
 SelectView.construct = function(self)
-	ScreenView.construct(self)
 	self.viewConfig = SelectViewConfig
 	self.navigator = SelectNavigator:new()
 	self.noteChartListView = NoteChartListView:new()
@@ -32,10 +31,7 @@ SelectView.load = function(self)
 	local modifierIconGridView = self.modifierIconGridView
 	local navigator = self.navigator
 
-	local configSelect = self.configModel:getConfig("select")
 	local configModifier = self.configModel:getConfig("modifier")
-	self.configSelect = configSelect
-	self.configModifier = configModifier
 
 	navigator.selectModel = self.selectModel
 

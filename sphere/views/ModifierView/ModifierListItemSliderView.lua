@@ -12,7 +12,7 @@ end
 ModifierListItemSliderView.draw = function(self)
 	local modifierConfig = self.item
 
-	local modifier = self.listView.view.modifierModel:getModifier(modifierConfig)
+	local modifier = self.listView.modifierModel:getModifier(modifierConfig)
 
 	ModifierListItemView.draw(self)
 
@@ -40,7 +40,7 @@ ModifierListItemSliderView.receive = function(self, event)
 	local config = listView.config
 	local slider = listView.slider
 	local modifierConfig = self.item
-	local modifier = listView.view.modifierModel:getModifier(modifierConfig)
+	local modifier = listView.modifierModel:getModifier(modifierConfig)
 	slider:setPosition(listView:getItemElementPosition(self.itemIndex, config.slider))
 	slider:setValue(modifier:toNormValue(modifierConfig.value))
 	slider:receive(event)
