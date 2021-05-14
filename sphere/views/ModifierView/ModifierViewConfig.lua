@@ -19,6 +19,16 @@ local AvailableModifierList = {
 		h = 31,
 		align = "left",
 		fontSize = 24,
+		fontFamily = "Noto Sans",
+		addedColor = {1, 1, 1, 0.5}
+	},
+	section = {
+		x = 0,
+		y = 0,
+		w = 409,
+		h = 25,
+		align = "right",
+		fontSize = 16,
 		fontFamily = "Noto Sans"
 	}
 }
@@ -129,18 +139,6 @@ local Rectangle = {
 			mode = "fill",
 			lineStyle = "smooth",
 			lineWidth = 1,
-			x = 733,
-			y = 504,
-			w = 22,
-			h = 4,
-			rx = 0,
-			ry = 0
-		},
-		{
-			color = {1, 1, 1, 1},
-			mode = "fill",
-			lineStyle = "smooth",
-			lineWidth = 1,
 			x = 279,
 			y = 504,
 			w = 4,
@@ -148,6 +146,31 @@ local Rectangle = {
 			rx = 0,
 			ry = 0
 		}
+	}
+}
+
+local Circle = {
+	class = "CircleView",
+	screen = screen,
+	circles = {
+		{
+			color = {1, 1, 1, 1},
+			mode = "fill",
+			lineStyle = "smooth",
+			lineWidth = 1,
+			x = 755,
+			y = 504,
+			r = 4
+		},
+		{
+			color = {1, 1, 1, 1},
+			mode = "line",
+			lineStyle = "smooth",
+			lineWidth = 1,
+			x = 755,
+			y = 504,
+			r = 4
+		},
 	}
 }
 
@@ -185,7 +208,8 @@ local ModifierViewConfig = {
 	AvailableModifierList,
 	ModifierList,
 	AvailableModifierScrollBar,
-	Rectangle
+	Rectangle,
+	Circle
 }
 
 return ModifierViewConfig

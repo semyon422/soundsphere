@@ -11,7 +11,12 @@ AvailableModifierListItemView.draw = function(self)
 	local y = config.y + (self.visualIndex - 1) * config.h / config.rows
 	local item = self.item
 
+	local prevItem = self.prevItem
+
 	love.graphics.setColor(1, 1, 1, 1)
+	if item.oneUse and item.added then
+		love.graphics.setColor(config.name.addedColor)
+	end
 
 	local font = spherefonts.get(config.name.fontFamily, config.name.fontSize)
 	love.graphics.setFont(font)
@@ -25,6 +30,26 @@ AvailableModifierListItemView.draw = function(self)
 		cs.one / screen.h,
 		cs.one / screen.h
 	)
+
+	love.graphics.setColor(1, 1, 1, 1)
+	if not prevItem or prevItem.oneUse ~= item.oneUse then
+		local fontSection = spherefonts.get(config.section.fontFamily, config.section.fontSize)
+		local text = "One use modifiers"
+		if not item.oneUse then
+			text = "Sequential modifiers"
+		end
+		love.graphics.setFont(fontSection)
+		love.graphics.printf(
+			text,
+			cs:X((config.x + config.section.x) / screen.h, true),
+			cs:Y((y + config.section.y) / screen.h, true),
+			config.section.w,
+			config.section.align,
+			0,
+			cs.one / screen.h,
+			cs.one / screen.h
+		)
+	end
 end
 
 AvailableModifierListItemView.receive = function(self, event)
