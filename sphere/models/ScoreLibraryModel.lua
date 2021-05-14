@@ -1,5 +1,4 @@
 local Class = require("aqua.util.Class")
-local SearchManager			= require("sphere.database.SearchManager")
 
 local ScoreLibraryModel = Class:new()
 

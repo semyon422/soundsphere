@@ -1,11 +1,9 @@
 local Class = require("aqua.util.Class")
-local SearchManager			= require("sphere.database.SearchManager")
 
 local NoteChartLibraryModel = Class:new()
 
 NoteChartLibraryModel.construct = function(self)
 	self.setId = 1
-	self.searchString = ""
 	self.items = {}
 end
 
@@ -14,13 +12,6 @@ NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
 		return
 	end
 	self.setId = setId
-end
-
-NoteChartLibraryModel.setSearchString = function(self, searchString)
-	if searchString == self.searchString then
-		return
-	end
-	self.searchString = searchString
 end
 
 NoteChartLibraryModel.updateItems = function(self)
@@ -45,7 +36,7 @@ NoteChartLibraryModel.updateItems = function(self)
 		end
 	end
 
-	local foundList = SearchManager:search(noteChartDataEntries, self.searchString)
+	local foundList = self.searchModel:search(noteChartDataEntries)
 	for i = 1, #foundList do
 		local noteChartDataEntry = foundList[i]
 		items[#items + 1] = {

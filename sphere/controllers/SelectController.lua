@@ -2,7 +2,7 @@ local Class					= require("aqua.util.Class")
 local NoteChartSetLibraryModel		= require("sphere.models.NoteChartSetLibraryModel")
 local NoteChartLibraryModel		= require("sphere.models.NoteChartLibraryModel")
 local ScoreLibraryModel		= require("sphere.models.ScoreLibraryModel")
-local SearchLineModel		= require("sphere.models.SearchLineModel")
+local SearchModel		= require("sphere.models.SearchModel")
 local SelectModel		= require("sphere.models.SelectModel")
 local PreviewModel		= require("sphere.models.PreviewModel")
 
@@ -12,7 +12,7 @@ SelectController.construct = function(self)
 	self.noteChartSetLibraryModel = NoteChartSetLibraryModel:new()
 	self.noteChartLibraryModel = NoteChartLibraryModel:new()
 	self.scoreLibraryModel = ScoreLibraryModel:new()
-	self.searchLineModel = SearchLineModel:new()
+	self.searchModel = SearchModel:new()
 	self.selectModel = SelectModel:new()
 	self.previewModel = PreviewModel:new()
 end
@@ -21,7 +21,7 @@ SelectController.load = function(self)
 	local noteChartSetLibraryModel = self.noteChartSetLibraryModel
 	local noteChartLibraryModel = self.noteChartLibraryModel
 	local scoreLibraryModel = self.scoreLibraryModel
-	local searchLineModel = self.searchLineModel
+	local searchModel = self.searchModel
 	local selectModel = self.selectModel
 	local previewModel = self.previewModel
 
@@ -47,16 +47,19 @@ SelectController.load = function(self)
 
 	noteChartSetLibraryModel.cacheModel = cacheModel
 	noteChartSetLibraryModel.collectionModel = collectionModel
+	noteChartSetLibraryModel.searchModel = searchModel
 	noteChartLibraryModel.cacheModel = cacheModel
+	noteChartLibraryModel.searchModel = searchModel
 	scoreLibraryModel.scoreModel = scoreModel
 	selectModel.collectionModel = collectionModel
 	selectModel.configModel = configModel
-	selectModel.searchLineModel = searchLineModel
+	selectModel.searchModel = searchModel
 	selectModel.noteChartSetLibraryModel = noteChartSetLibraryModel
 	selectModel.noteChartLibraryModel = noteChartLibraryModel
 	selectModel.scoreLibraryModel = scoreLibraryModel
 	previewModel.configModel = configModel
 	previewModel.cacheModel = cacheModel
+	searchModel.scoreModel = scoreModel
 
 	view.themeModel = themeModel
 	view.noteChartModel = noteChartModel
@@ -74,7 +77,7 @@ SelectController.load = function(self)
 	view.noteChartSetLibraryModel = noteChartSetLibraryModel
 	view.noteChartLibraryModel = noteChartLibraryModel
 	view.scoreLibraryModel = scoreLibraryModel
-	view.searchLineModel = searchLineModel
+	view.searchModel = searchModel
 	view.selectModel = selectModel
 
 	noteChartModel:load()
@@ -100,16 +103,16 @@ SelectController.draw = function(self)
 end
 
 SelectController.receive = function(self, event)
-	self.searchLineModel:receive(event)
+	self.searchModel:receive(event)
 	self.view:receive(event)
 
 	if event.name == "setTheme" then
 		self.themeModel:setDefaultTheme(event.theme)
-	elseif event.name == "scrollNoteChartSet" then 
+	elseif event.name == "scrollNoteChartSet" then
 		self.selectModel:scrollNoteChartSet(event.direction)
-	elseif event.name == "scrollNoteChart" then 
+	elseif event.name == "scrollNoteChart" then
 		self.selectModel:scrollNoteChart(event.direction)
-	elseif event.name == "scrollScore" then 
+	elseif event.name == "scrollScore" then
 		self.selectModel:scrollScore(event.direction)
 	elseif event.name == "changeScreen" then
 		if event.screenName == "Modifier" then

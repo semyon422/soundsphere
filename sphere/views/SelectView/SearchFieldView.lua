@@ -14,7 +14,7 @@ SearchFieldView.draw = function(self)
 	local config = self.config
 	local screen = self.config.screen
 
-	local searchString = self.searchLineModel.searchString
+	local searchString = self.searchModel.searchString
 	if searchString == "" then
 		love.graphics.setColor(1, 1, 1, 0.5)
 		searchString = "Search..."

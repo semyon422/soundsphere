@@ -6,7 +6,7 @@ SelectModel.load = function(self)
 	local config = self.configModel:getConfig("select")
 	self.config = config
 
-	self.searchLineModel:setSearchString(config.searchString)
+	self.searchModel:setSearchString(config.searchString)
 
 	self.noteChartSetItemIndex = self.noteChartSetLibraryModel:getItemIndex(config.noteChartSetEntryId)
 	self.noteChartItemIndex = self.noteChartLibraryModel:getItemIndex(config.noteChartEntryId, config.noteChartDataEntryId)
@@ -20,7 +20,7 @@ SelectModel.update = function(self)
 end
 
 SelectModel.updateSearch = function(self)
-	local newSearchString = self.searchLineModel.searchString
+	local newSearchString = self.searchModel.searchString
 	if self.config.searchString ~= newSearchString then
 		self.config.searchString = newSearchString
 		self:pullNoteChartSet()
@@ -80,8 +80,6 @@ SelectModel.scrollScore = function(self, direction)
 end
 
 SelectModel.pullNoteChartSet = function(self)
-	self.noteChartLibraryModel:setSearchString(self.config.searchString)
-	self.noteChartSetLibraryModel:setSearchString(self.config.searchString)
 	self.noteChartSetLibraryModel:setCollection(self.config.collection)
 	self.noteChartLibraryModel:updateItems()
 	self.noteChartSetLibraryModel:updateItems()
