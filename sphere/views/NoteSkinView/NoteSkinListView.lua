@@ -6,72 +6,37 @@ local NoteSkinListItemView = require(viewspackage .. "NoteSkinView.NoteSkinListI
 
 local NoteSkinListView = ListView:new()
 
-NoteSkinListView.init = function(self)
-	self.view = self.view
-	self.cs = CoordinateManager:getCS(0.5, 0, 0, 0, "h")
-	self.x = -16 / 9 / 3 / 2
-	self.y = 0
-	self.w = 16 / 9 / 3
-	self.h = 1
-	self.itemCount = 15
-	self.selectedItem = 1
-	self.activeItem = self.selectedItem
-
-	self:reloadItems()
-
-	self:on("update", function()
-		self.selectedItem = self.navigator.noteSkinList.selected
-		-- self:reloadItems()
-	end)
-	self:on("select", function()
-		self.navigator:setNode("noteSkinList")
-	end)
-	self:on("draw", self.drawFrame)
-	self:on("wheelmoved", self.receive)
-	self:on("mousepressed", self.receive)
-	self:on("mousereleased", self.receive)
-	self:on("mousemoved", self.receive)
-
-	self:on("wheelmoved", function(self, event)
-		local mx, my = love.mouse.getPosition()
-		local cs = self.cs
-		local x = cs:X(self.x, true)
-		local w = cs:X(self.w)
-		if mx >= x and mx < x + w then
-			local wy = event.args[2]
-			if wy == 1 then
-				self.navigator:call("up")
-			elseif wy == -1 then
-				self.navigator:call("down")
-			end
-		end
-	end)
-
-	ListView.init(self)
-end
-
-NoteSkinListView.createListItemViews = function(self)
-	local itemView = NoteSkinListItemView:new()
-	itemView.listView = self
-	itemView:init()
-	self.itemView = itemView
-end
-
-NoteSkinListView.getListItemView = function(self)
-	return self.itemView
+NoteSkinListView.construct = function(self)
+	ListView.construct(self)
+	self.itemView = NoteSkinListItemView:new()
+	self.itemView.listView = self
+	self.cs = CoordinateManager:getCS(0.5, 0, 16 / 9 / 2, 0, "h")
 end
 
 NoteSkinListView.reloadItems = function(self)
-    local noteChart = self.view.noteChartModel.noteChart
-	self.items = self.view.noteSkinModel:getNoteSkins(noteChart.inputMode)
-    self.selectedNoteSkin = self.view.noteSkinModel:getNoteSkin(noteChart.inputMode)
+    local noteChart = self.noteChartModel.noteChart
+	self.state.items = self.noteSkinModel:getNoteSkins(noteChart.inputMode)
+    self.state.selectedNoteSkin = self.noteSkinModel:getNoteSkin(noteChart.inputMode)
 end
 
-NoteSkinListView.drawFrame = function(self)
-	if self.navigator:checkNode("noteSkinList") then
-		self.isSelected = true
-	else
-		self.isSelected = false
+NoteSkinListView.getItemIndex = function(self)
+	return self.navigator.noteSkinItemIndex
+end
+
+NoteSkinListView.scrollUp = function(self)
+	self.navigator:scrollNoteSkin("up")
+end
+
+NoteSkinListView.scrollDown = function(self)
+	self.navigator:scrollNoteSkin("down")
+end
+
+NoteSkinListView.receive = function(self, event)
+	if event.name == "wheelmoved" then
+		return self:wheelmoved(event)
+	end
+	if event.name == "mousepressed" or event.name == "mousereleased" or event.name == "mousemoved" then
+		self:receiveItems(event)
 	end
 end
 

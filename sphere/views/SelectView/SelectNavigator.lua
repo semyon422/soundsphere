@@ -23,12 +23,6 @@ SelectNavigator.receive = function(self, event)
 	end
 end
 
-SelectNavigator.changeSearchMode = function(self)
-	self:send({
-		name = "changeSearchMode"
-	})
-end
-
 SelectNavigator.updateCache = function(self)
 	local cacheUpdater = self.view.cacheModel.cacheUpdater
 	if cacheUpdater.state == 0 or cacheUpdater.state == 3 then

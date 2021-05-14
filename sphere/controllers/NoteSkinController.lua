@@ -53,8 +53,8 @@ NoteSkinController.receive = function(self, event)
 
     if event.name == "setNoteSkin" then
 		self.gameController.noteSkinModel:setDefaultNoteSkin(event.noteSkin)
-	elseif event.name == "goSelectScreen" then
-		return self.gameController.screenManager:set(self.selectController)
+	elseif event.name == "changeScreen" then
+		self.gameController.screenManager:set(self.selectController)
 	end
 end
 

@@ -5,8 +5,6 @@ local Navigator = require(viewspackage .. "Navigator")
 local ModifierNavigator = Navigator:new()
 
 ModifierNavigator.construct = function(self)
-	self.modifierItemIndex = 1
-	self.availableModifierItemIndex = 1
 	self.activeList = "modifierList"
 end
 
@@ -24,23 +22,16 @@ ModifierNavigator.receive = function(self, event)
 		elseif scancode == "backspace" then self:removeModifier()
 		elseif scancode == "right" then self:increaseModifierValue(nil, 1)
 		elseif scancode == "left" then self:increaseModifierValue(nil, -1)
-		elseif scancode == "escape" then self:changeScreen("Input")
+		elseif scancode == "escape" then self:changeScreen("Select")
 		end
 	elseif self.activeList == "availableModifierList" then
 		if scancode == "up" then self:scrollAvailableModifier("up")
 		elseif scancode == "down" then self:scrollAvailableModifier("down")
 		elseif scancode == "tab" then self.activeList = "modifierList"
 		elseif scancode == "return" then self:addModifier()
-		elseif scancode == "escape" then self:changeScreen("Input")
+		elseif scancode == "escape" then self:changeScreen("Select")
 		end
 	end
-end
-
-ModifierNavigator.changeScreen = function(self, screenName)
-	self:send({
-		name = "changeScreen",
-		screenName = screenName
-	})
 end
 
 ModifierNavigator.scrollModifier = function(self, direction)

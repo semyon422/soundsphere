@@ -8,9 +8,11 @@ local NoteSkinModel = Class:new()
 
 NoteSkinModel.construct = function(self)
 	self.emptyNoteSkin = NoteSkin:new()
+	self.items = {}
 end
 
 NoteSkinModel.path = "userdata/skins"
+NoteSkinModel.inputMode = ""
 
 NoteSkinModel.load = function(self)
 	self.noteSkins = {}
@@ -57,19 +59,27 @@ NoteSkinModel.loadMetaData = function(self, path, fileName)
 end
 
 NoteSkinModel.getNoteSkins = function(self, inputMode)
+	local stringInputMode = inputMode
 	if type(inputMode) == "string" then
 		inputMode = ncdk.InputMode:new():setString(inputMode)
+	else
+		stringInputMode = inputMode:getString()
 	end
+	if self.inputMode == stringInputMode then
+		return self.items
+	end
+	self.inputMode = stringInputMode
 
-	local list = {}
+	local items = {}
+	self.items = items
 
 	for _, noteSkin in ipairs(self.noteSkins) do
 		if noteSkin.inputMode >= inputMode then
-			list[#list + 1] = noteSkin
+			items[#items + 1] = noteSkin
 		end
 	end
 
-	return list
+	return items
 end
 
 NoteSkinModel.setDefaultNoteSkin = function(self, noteSkin)

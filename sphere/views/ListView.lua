@@ -33,21 +33,47 @@ ListView.reloadItems = function(self)
 end
 
 ListView.receive = function(self, event)
-	local config = self.config
 	if event.name == "wheelmoved" then
-		local mx, my = love.mouse.getPosition()
-		local cs = self.cs
-		local x = cs:X(config.x / config.screen.h, true)
-		local y = cs:Y(config.y / config.screen.h, true)
-		local w = cs:X(config.w / config.screen.h)
-		local h = cs:Y(config.h / config.screen.h)
-		if mx >= x and mx < x + w and my >= y and my < y + h then
-			local wy = event.args[2]
-			if wy == 1 then
-				self:scrollUp()
-			elseif wy == -1 then
-				self:scrollDown()
-			end
+		return self:wheelmoved(event)
+	end
+end
+
+ListView.wheelmoved = function(self, event)
+	local config = self.config
+	local mx, my = love.mouse.getPosition()
+	local cs = self.cs
+	local x = cs:X(config.x / config.screen.h, true)
+	local y = cs:Y(config.y / config.screen.h, true)
+	local w = cs:X(config.w / config.screen.h)
+	local h = cs:Y(config.h / config.screen.h)
+	if mx >= x and mx < x + w and my >= y and my < y + h then
+		local wy = event.args[2]
+		if wy == 1 then
+			self:scrollUp()
+		elseif wy == -1 then
+			self:scrollDown()
+		end
+	end
+end
+
+ListView.receiveItems = function(self, event)
+	local state = self.state
+	local config = self.config
+
+	local deltaItemIndex = state.selectedItem - state.selectedVisualItem
+	for i = 0 - math.floor(deltaItemIndex), config.rows - math.floor(deltaItemIndex) do
+		local itemIndex = i + state.selectedItem - math.ceil(config.rows / 2)
+		local visualIndex = i + deltaItemIndex
+		local item = state.items[itemIndex]
+		if item then
+			local itemView = self:getItemView(item)
+			itemView.visualIndex = visualIndex
+			itemView.itemIndex = itemIndex
+			itemView.item = item
+			itemView.listView = self
+			itemView.prevItem = state.items[itemIndex - 1]
+			itemView.nextItem = state.items[itemIndex + 1]
+			itemView:receive(event)
 		end
 	end
 end

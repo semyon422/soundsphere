@@ -1,71 +1,59 @@
-local viewspackage = (...):match("^(.-%.views%.)")
-
-local Node = require("aqua.util.Node")
-local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
 
-local ListItemView = require(viewspackage .. "ListItemView")
+local Class = require("aqua.util.Class")
 
-local NoteSkinListItemView = ListItemView:new()
-
-NoteSkinListItemView.init = function(self)
-	self:on("draw", self.draw)
-
-	self.fontName = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
-end
+local NoteSkinListItemView = Class:new()
 
 NoteSkinListItemView.draw = function(self)
-	local listView = self.listView
-
-	local itemIndex = self.itemIndex
+	local config = self.listView.config
+	local cs = self.listView.cs
+	local screen = config.screen
+	local y = config.y + (self.visualIndex - 1) * config.h / config.rows
 	local item = self.item
 
-	local cs = listView.cs
+	love.graphics.setColor(1, 1, 1, 1)
 
-	local x, y, w, h = self:getPosition()
-
-    local noteSkin = item
-
-	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
-	if listView.isSelected then
-		love.graphics.setColor(1, 1, 1,
-			deltaItemIndex == 0 and 1 or 0.66
-		)
-	else
-		love.graphics.setColor(1, 1, 1, 0.33)
-	end
-
-    local prefix = ""
-    if noteSkin == listView.selectedNoteSkin then
-        prefix = "★ "
-    end
-
-	love.graphics.setFont(self.fontName)
+	local font = spherefonts.get(config.name.fontFamily, config.name.fontSize)
+	love.graphics.setFont(font)
 	love.graphics.printf(
-		prefix .. noteSkin.name,
-		x,
-		y,
-		w / cs.one * 1080,
-		"left",
+		item.name,
+		cs:X((config.x + config.name.x) / screen.h, true),
+		cs:Y((y + config.name.y) / screen.h, true),
+		config.name.w,
+		config.name.align,
 		0,
-		cs.one / 1080,
-		cs.one / 1080,
-		-cs:X(120 / cs.one),
-		-cs:Y(18 / cs.one)
+		cs.one / screen.h,
+		cs.one / screen.h
 	)
+
+	if item == self.listView.state.selectedNoteSkin then
+		love.graphics.circle(
+			"line",
+			cs:X((config.x + config.point.x) / screen.h, true),
+			cs:Y((y + config.point.y) / screen.h, true),
+			cs:X(config.point.r / screen.h)
+		)
+		love.graphics.circle(
+			"fill",
+			cs:X((config.x + config.point.x) / screen.h, true),
+			cs:Y((y + config.point.y) / screen.h, true),
+			cs:X(config.point.r / screen.h)
+		)
+	end
 end
 
 NoteSkinListItemView.receive = function(self, event)
-	local listView = self.listView
+	if event.name ~= "mousepressed" then
+		return
+	end
 
-	local x, y, w, h = self:getPosition()
 	local mx, my = love.mouse.getPosition()
+	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
 
-	if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then
-		listView.activeItem = self.itemIndex
+	if (mx >= x and mx <= x + w and my >= y and my <= y + h) then
 		local button = event.args[3]
 		if button == 1 then
-			self.listView.navigator:call("return", self.itemIndex)
+			self.listView.navigator:setNoteSkin(self.itemIndex)
 		end
 	end
 end

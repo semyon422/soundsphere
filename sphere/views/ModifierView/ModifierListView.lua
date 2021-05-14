@@ -13,6 +13,7 @@ local ModifierListView = ListView:new()
 
 ModifierListView.construct = function(self)
 	ListView.construct(self)
+
 	self.cs = CoordinateManager:getCS(0.5, 0, 16 / 9 / 2, 0, "h")
 
 	self.itemSwitchView = ModifierListItemSwitchView:new()
@@ -57,28 +58,6 @@ end
 
 ModifierListView.scrollDown = function(self)
 	self.navigator:scrollModifier("down")
-end
-
-ModifierListView.receiveItems = function(self, event)
-	local state = self.state
-	local config = self.config
-
-	local deltaItemIndex = state.selectedItem - state.selectedVisualItem
-	for i = 0 - math.floor(deltaItemIndex), config.rows - math.floor(deltaItemIndex) do
-		local itemIndex = i + state.selectedItem - math.ceil(config.rows / 2)
-		local visualIndex = i + deltaItemIndex
-		local item = state.items[itemIndex]
-		if item then
-			local itemView = self:getItemView(item)
-			itemView.visualIndex = visualIndex
-			itemView.itemIndex = itemIndex
-			itemView.item = item
-			itemView.listView = self
-			itemView.prevItem = state.items[itemIndex - 1]
-			itemView.nextItem = state.items[itemIndex + 1]
-			itemView:receive(event)
-		end
-	end
 end
 
 ModifierListView.receive = function(self, event)
