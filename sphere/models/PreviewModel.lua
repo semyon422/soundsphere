@@ -54,7 +54,7 @@ PreviewModel.getAudioPathPreview = function(self)
 	local noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(config.noteChartSetEntryId)
 	local noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntryById(config.noteChartDataEntryId)
 
-	if not noteChartSetEntry then
+	if not noteChartSetEntry or not noteChartDataEntry then
 		return
 	end
 
