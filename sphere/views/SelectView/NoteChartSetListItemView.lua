@@ -46,13 +46,13 @@ NoteChartSetListItemView.draw = function(self)
 			"line",
 			cs:X((config.x + config.point.x) / screen.h, true),
 			cs:Y((y + config.point.y) / screen.h, true),
-			cs:X(config.point.r / screen.h, true)
+			cs:X(config.point.r / screen.h)
 		)
 		love.graphics.circle(
 			"fill",
 			cs:X((config.x + config.point.x) / screen.h, true),
 			cs:Y((y + config.point.y) / screen.h, true),
-			cs:X(config.point.r / screen.h, true)
+			cs:X(config.point.r / screen.h)
 		)
 	end
 end

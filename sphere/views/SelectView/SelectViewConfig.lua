@@ -327,6 +327,9 @@ local SearchField = {
 		align = "left",
 		fontSize = 20,
 		fontFamily = "Noto Sans"
+	},
+	point = {
+		r = 7
 	}
 }
 

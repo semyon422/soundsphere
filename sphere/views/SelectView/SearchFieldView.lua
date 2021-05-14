@@ -47,6 +47,21 @@ SearchFieldView.draw = function(self)
 		cs:X(config.frame.h / 2 / screen.h),
 		cs:X(config.frame.h / 2 / screen.h)
 	)
+
+	if self.searchModel.searchMode == "show" then
+		love.graphics.circle(
+			"line",
+			cs:X((config.x + config.frame.x + config.frame.w - config.frame.h / 2) / screen.h, true),
+			cs:Y((config.y + config.frame.y + config.frame.h / 2) / screen.h, true),
+			cs:X(config.point.r / screen.h)
+		)
+		love.graphics.circle(
+			"fill",
+			cs:X((config.x + config.frame.x + config.frame.w - config.frame.h / 2) / screen.h, true),
+			cs:Y((config.y + config.frame.y + config.frame.h / 2) / screen.h, true),
+			cs:X(config.point.r / screen.h)
+		)
+	end
 end
 
 return SearchFieldView

@@ -22,6 +22,7 @@ SelectModel.setSearchMode = function(self, searchMode)
 	end
 	self.noteChartSetLibraryModel.searchMode = searchMode
 	self.noteChartLibraryModel.searchMode = searchMode
+	self.searchModel.searchMode = searchMode
 end
 
 SelectModel.changeSearchMode = function(self)

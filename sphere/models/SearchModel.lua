@@ -4,6 +4,7 @@ local TextInput = require("aqua.util.TextInput")
 local SearchModel = Class:new()
 
 SearchModel.searchString = ""
+SearchModel.searchMode = "hide"
 
 SearchModel.construct = function(self)
 	self.textInput = TextInput:new()
@@ -22,11 +23,10 @@ SearchModel.setSearchString = function(self, text)
 end
 
 SearchModel.search = function(self, list)
-	local searchString = self.searchString
 	local foundList = {}
 	local foundMap = {}
 	for i = 1, #list do
-		if self:check(list[i], searchString) then
+		if self:check(list[i]) then
 			foundList[#foundList + 1] = list[i]
 			foundMap[list[i]] = true
 		end
