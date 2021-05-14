@@ -1,27 +1,27 @@
 local Class			= require("aqua.util.Class")
 
 local AutoPlay		= require("sphere.models.ModifierModel.AutoPlay")
-local Automap		= require("sphere.models.ModifierModel.Automap")
 local ProMode		= require("sphere.models.ModifierModel.ProMode")
-local WindUp		= require("sphere.models.ModifierModel.WindUp")
+local AutoKeySound	= require("sphere.models.ModifierModel.AutoKeySound")
 local SpeedMode		= require("sphere.models.ModifierModel.SpeedMode")
 local TimeRateQ		= require("sphere.models.ModifierModel.TimeRateQ")
 local TimeRateX		= require("sphere.models.ModifierModel.TimeRateX")
+local WindUp		= require("sphere.models.ModifierModel.WindUp")
 local AudioClip		= require("sphere.models.ModifierModel.AudioClip")
 local NoScratch		= require("sphere.models.ModifierModel.NoScratch")
+local NoLongNote	= require("sphere.models.ModifierModel.NoLongNote")
+local NoMeasureLine	= require("sphere.models.ModifierModel.NoMeasureLine")
+local Automap		= require("sphere.models.ModifierModel.Automap")
+local MultiplePlay	= require("sphere.models.ModifierModel.MultiplePlay")
+local MultiOverPlay	= require("sphere.models.ModifierModel.MultiOverPlay")
+local Alternate		= require("sphere.models.ModifierModel.Alternate")
+local Shift			= require("sphere.models.ModifierModel.Shift")
 local Mirror		= require("sphere.models.ModifierModel.Mirror")
 local Random		= require("sphere.models.ModifierModel.Random")
 local BracketSwap	= require("sphere.models.ModifierModel.BracketSwap")
-local NoLongNote	= require("sphere.models.ModifierModel.NoLongNote")
-local NoMeasureLine	= require("sphere.models.ModifierModel.NoMeasureLine")
 local FullLongNote	= require("sphere.models.ModifierModel.FullLongNote")
-local ToOsu			= require("sphere.models.ModifierModel.ToOsu")
-local AutoKeySound	= require("sphere.models.ModifierModel.AutoKeySound")
-local MultiplePlay	= require("sphere.models.ModifierModel.MultiplePlay")
 local MinLnLength	= require("sphere.models.ModifierModel.MinLnLength")
-local Alternate		= require("sphere.models.ModifierModel.Alternate")
-local MultiOverPlay	= require("sphere.models.ModifierModel.MultiOverPlay")
-local Shift			= require("sphere.models.ModifierModel.Shift")
+local ToOsu			= require("sphere.models.ModifierModel.ToOsu")
 
 local ModifierModel = Class:new()
 
@@ -32,8 +32,8 @@ ModifierModel.modifiers = {
 	SpeedMode,
 	TimeRateQ,
 	TimeRateX,
-	AudioClip,
 	WindUp,
+	AudioClip,
 	NoScratch,
 	NoLongNote,
 	NoMeasureLine,
@@ -48,6 +48,20 @@ ModifierModel.modifiers = {
 	FullLongNote,
 	MinLnLength,
 	ToOsu
+}
+
+ModifierModel.oneUseModifiers = {
+	AutoPlay,
+	ProMode,
+	AutoKeySound,
+	SpeedMode,
+	TimeRateQ,
+	TimeRateX,
+	WindUp,
+	AudioClip,
+	NoScratch,
+	NoLongNote,
+	NoMeasureLine
 }
 
 ModifierModel.construct = function(self)
@@ -87,10 +101,44 @@ ModifierModel.createModifiers = function(self)
 	end
 end
 
+ModifierModel.isOneUseModifier = function(self, Modifier)
+	for _, OneUseModifier in ipairs(self.oneUseModifiers) do
+		if Modifier == OneUseModifier then
+			return true
+		end
+	end
+end
+
+ModifierModel.isOneUseModifierAdded = function(self, Modifier)
+	for _, modifierConfig in ipairs(self.config) do
+		if Modifier.name == modifierConfig.name then
+			return true
+		end
+	end
+end
+
+ModifierModel.getOneUseModifierIndex = function(self, Modifier)
+	local index = 1
+	for _, OneUseModifier in ipairs(self.oneUseModifiers) do
+		if self:isOneUseModifierAdded(OneUseModifier) then
+			index = index + 1
+		end
+		if Modifier == OneUseModifier then
+			return index
+		end
+	end
+end
+
 ModifierModel.add = function(self, Modifier)
 	local modifierConfig = Modifier:getDefaultConfig()
 	local config = self.config
-	local index = math.max(self.modifierItemIndex, 1)
+	local index = math.max(self.modifierItemIndex, self:getOneUseModifierIndex(self.oneUseModifiers[#self.oneUseModifiers]))
+	if self:isOneUseModifier(Modifier) then
+		if self:isOneUseModifierAdded(Modifier) then
+			return
+		end
+		index = self:getOneUseModifierIndex(Modifier)
+	end
 	table.insert(config, index, modifierConfig)
 	self.modifierItemIndex = index + 1
 end
