@@ -13,9 +13,8 @@ end
 NoteChartModel.load = function(self)
 	local info = love.filesystem.getInfo(self.path)
 	if info and info.size ~= 0 then
-		local file = io.open(self.path, "r")
-		self.selected = json.decode(file:read("*all"))
-		file:close()
+		local contents = love.filesystem.read(self.path)
+		self.selected = json.decode(contents)
 
 		self.noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(self.selected[1])
 		self.noteChartEntry = self.cacheModel.cacheManager:getNoteChartEntryById(self.selected[2])
@@ -28,9 +27,7 @@ NoteChartModel.load = function(self)
 end
 
 NoteChartModel.unload = function(self)
-	local file = io.open(self.path, "w")
-	file:write(json.encode(self.selected))
-	return file:close()
+	love.filesystem.write(self.path, json.encode(self.selected))
 end
 
 NoteChartModel.selectNoteChartSet = function(self, id)

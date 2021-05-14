@@ -78,18 +78,15 @@ ModifierModel.path = "userdata/modifiers.json"
 ModifierModel.load = function(self)
 	local info = love.filesystem.getInfo(self.path)
 	if info and info.size ~= 0 then
-		local file = io.open(self.path, "r")
-		local jsonObject = json.decode(file:read("*all"))
-		file:close()
+		local contents = love.filesystem.read(self.path)
+		local jsonObject = json.decode(contents)
 
         self:fromTable(jsonObject)
 	end
 end
 
 ModifierModel.unload = function(self)
-	local file = io.open(self.path, "w")
-	file:write(self:toJson())
-	return file:close()
+	love.filesystem.write(self.path, self:toJson())
 end
 
 ModifierModel.addInconsequential = function(self)

@@ -56,9 +56,8 @@ GUI.functions = {
 GUI.functions.__index = GUI.functions
 
 GUI.load = function(self, path)
-	local file = io.open(path, "r")
-	local t = json.decode(file:read("*all"))
-	file:close()
+	local contents = love.filesystem.read(path)
+	local t = json.decode(contents)
 
 	self:loadTable(t)
 end

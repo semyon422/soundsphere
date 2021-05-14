@@ -65,9 +65,7 @@ ReplayModel.saveReplay = function(self)
 	local replayString = replay:toString()
 	local replayHash = md5.sumhexa(replayString)
 
-	local file = io.open(self.path .. "/" .. replayHash, "w")
-	file:write(replayString)
-	file:close()
+	love.filesystem.write(self.path .. "/" .. replayHash, replayString)
 
 	return replayHash
 end
@@ -80,9 +78,7 @@ ReplayModel.loadReplay = function(self, replayHash)
 		return Replay:new()
 	end
 
-	local file = io.open(path, "r")
-	local replayString = file:read("*all")
-	file:close()
+	local replayString = love.filesystem.read(path)
 
 	return Replay:new():fromString(replayString)
 end

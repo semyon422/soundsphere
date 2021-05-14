@@ -29,9 +29,8 @@ ThemeModel.lookup = function(self, directoryPath)
 end
 
 ThemeModel.loadMetaData = function(self, path, fileName)
-	local file = io.open(path .. "/" .. fileName, "r")
-	local jsonObject = json.decode(file:read("*all"))
-	file:close()
+	local contents = love.filesystem.read(path .. "/" .. fileName)
+	local jsonObject = json.decode(contents)
 
 	local theme = Theme:new()
 

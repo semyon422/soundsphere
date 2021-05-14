@@ -19,16 +19,13 @@ InputModel.load = function(self)
 	self.inputBindings = {}
 	local info = love.filesystem.getInfo(self.path)
 	if info and info.size ~= 0 then
-		local file = io.open(self.path, "r")
-		self.inputBindings = json.decode(file:read("*all"))
-		file:close()
+		local contents = love.filesystem.read(self.path)
+		self.inputBindings = json.decode(contents)
 	end
 end
 
 InputModel.unload = function(self)
-	local file = io.open(self.path, "w")
-	file:write(json.encode(self.inputBindings))
-	return file:close()
+	love.filesystem.write(self.path, json.encode(self.inputBindings))
 end
 
 InputModel.getInputBindings = function(self)

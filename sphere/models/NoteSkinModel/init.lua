@@ -30,9 +30,8 @@ NoteSkinModel.lookup = function(self, directoryPath)
 end
 
 NoteSkinModel.loadMetaData = function(self, path, fileName)
-	local file = io.open(path .. "/" .. fileName, "r")
-	local jsonObject = json.decode(file:read("*all"))
-	file:close()
+	local contents = love.filesystem.read(path .. "/" .. fileName)
+	local jsonObject = json.decode(contents)
 
 	local noteSkins = self.noteSkins
 	for _, metaData in ipairs(jsonObject) do

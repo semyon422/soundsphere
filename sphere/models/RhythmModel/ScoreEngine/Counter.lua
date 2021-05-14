@@ -34,9 +34,8 @@ Counter.createEnv = function(self)
 end
 
 Counter.loadFile = function(self, path)
-	local file = io.open(path, "r")
-	safeload(file:read("*all"), self.env)()
-	file:close()
+	local contents = love.filesystem.read(path)
+	safeload(contents, self.env)()
 end
 
 Counter.load = function(self)
