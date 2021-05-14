@@ -25,7 +25,7 @@ local ToOsu			= require("sphere.models.ModifierModel.ToOsu")
 
 local ModifierModel = Class:new()
 
-ModifierModel.modifiers = {
+local Modifiers = {
 	AutoPlay,
 	ProMode,
 	AutoKeySound,
@@ -50,7 +50,7 @@ ModifierModel.modifiers = {
 	ToOsu
 }
 
-ModifierModel.oneUseModifiers = {
+local OneUseModifiers = {
 	AutoPlay,
 	ProMode,
 	AutoKeySound,
@@ -65,6 +65,8 @@ ModifierModel.oneUseModifiers = {
 }
 
 ModifierModel.construct = function(self)
+	self.modifiers = {}
+	self.oneUseModifiers = {}
 	self.modifierByName = {}
 	self:createModifiers()
 end
@@ -75,6 +77,10 @@ ModifierModel.load = function(self)
 
 	self.availableModifierItemIndex = 1
 	self.modifierItemIndex = #config
+
+	for _, modifierConfig in ipairs(self.config) do
+		self:getModifier(modifierConfig).added = true
+	end
 end
 
 ModifierModel.scrollAvailableModifier = function(self, direction)
@@ -94,53 +100,57 @@ end
 
 ModifierModel.createModifiers = function(self)
 	local modifierByName = self.modifierByName
-	for _, Modifier in ipairs(self.modifiers) do
+	for _, Modifier in ipairs(Modifiers) do
 		local modifier = Modifier:new()
 		modifier.modifierModel = self
 		modifierByName[modifier.name] = modifier
+		table.insert(self.modifiers, modifier)
+		if self:isOneUseModifier(Modifier) then
+			modifier.oneUse = true
+			table.insert(self.oneUseModifiers, modifier)
+		end
 	end
+end
+
+ModifierModel.getModifier = function(self, modifierConfig)
+	return self.modifierByName[modifierConfig.name]
 end
 
 ModifierModel.isOneUseModifier = function(self, Modifier)
-	for _, OneUseModifier in ipairs(self.oneUseModifiers) do
+	for _, OneUseModifier in ipairs(OneUseModifiers) do
 		if Modifier == OneUseModifier then
 			return true
 		end
 	end
 end
 
-ModifierModel.isOneUseModifierAdded = function(self, Modifier)
-	for _, modifierConfig in ipairs(self.config) do
-		if Modifier.name == modifierConfig.name then
-			return true
-		end
-	end
-end
-
-ModifierModel.getOneUseModifierIndex = function(self, Modifier)
+ModifierModel.getMinimalModifierIndex = function(self, modifier)
 	local index = 1
-	for _, OneUseModifier in ipairs(self.oneUseModifiers) do
-		if self:isOneUseModifierAdded(OneUseModifier) then
+	for _, oneUseModifier in ipairs(self.oneUseModifiers) do
+		if oneUseModifier.added then
 			index = index + 1
 		end
-		if Modifier == OneUseModifier then
+		if modifier == oneUseModifier then
 			return index
 		end
 	end
+	return index
 end
 
-ModifierModel.add = function(self, Modifier)
-	local modifierConfig = Modifier:getDefaultConfig()
+ModifierModel.add = function(self, modifier)
+	local modifierConfig = modifier:getDefaultConfig()
 	local config = self.config
-	local index = math.max(self.modifierItemIndex, self:getOneUseModifierIndex(self.oneUseModifiers[#self.oneUseModifiers]))
-	if self:isOneUseModifier(Modifier) then
-		if self:isOneUseModifierAdded(Modifier) then
+	local minimalModifierIndex = self:getMinimalModifierIndex(modifier)
+	local index = math.max(self.modifierItemIndex, minimalModifierIndex)
+	if modifier.oneUse then
+		if modifier.added then
 			return
 		end
-		index = self:getOneUseModifierIndex(Modifier)
+		index = minimalModifierIndex
 	end
 	table.insert(config, index, modifierConfig)
 	self.modifierItemIndex = index + 1
+	modifier.added = true
 end
 
 ModifierModel.remove = function(self, modifierConfig)
@@ -153,6 +163,13 @@ ModifierModel.remove = function(self, modifierConfig)
 	if not self.config[self.modifierItemIndex] then
 		self.modifierItemIndex = math.max(self.modifierItemIndex - 1, 0)
 	end
+	local modifier = self:getModifier(modifierConfig)
+	for i, foundModifierConfig in ipairs(self.config) do
+		if foundModifierConfig.name == modifierConfig.name then
+			return
+		end
+	end
+	modifier.added = false
 end
 
 ModifierModel.setModifierValue = function(self, modifierConfig, value)
@@ -168,10 +185,6 @@ ModifierModel.increaseModifierValue = function(self, modifierConfig, delta)
 	end
 	local indexValue = modifier:toIndexValue(modifierConfig.value)
 	modifier:setValue(modifierConfig, modifier:fromIndexValue(indexValue + delta * modifier.step))
-end
-
-ModifierModel.getModifier = function(self, modifierConfig)
-	return self.modifierByName[modifierConfig.name]
 end
 
 ModifierModel.apply = function(self, modifierType)
@@ -205,7 +218,7 @@ ModifierModel.getString = function(self)
 	local t = {}
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
-		table.insert(t, modifier:getString(modifierConfig) .. modifier:getSubString(modifierConfig))
+		table.insert(t, modifier:getString(modifierConfig) .. (modifier:getSubString(modifierConfig) or ""))
 	end
 	return table.concat(t, ",")
 end

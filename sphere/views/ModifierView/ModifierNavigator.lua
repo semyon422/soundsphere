@@ -76,10 +76,10 @@ ModifierNavigator.increaseModifierValue = function(self, itemIndex, delta)
 end
 
 ModifierNavigator.addModifier = function(self, itemIndex)
-	local Modifier = self.modifierModel.modifiers[itemIndex or self.modifierModel.availableModifierItemIndex]
+	local modifier = self.modifierModel.modifiers[itemIndex or self.modifierModel.availableModifierItemIndex]
 	self:send({
 		name = "addModifier",
-		Modifier = Modifier
+		modifier = modifier
 	})
 end
 

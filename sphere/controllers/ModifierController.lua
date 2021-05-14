@@ -43,7 +43,7 @@ ModifierController.receive = function(self, event)
 	self.view:receive(event)
 
 	if event.name == "addModifier" then
-		self.gameController.modifierModel:add(event.Modifier)
+		self.gameController.modifierModel:add(event.modifier)
 	elseif event.name == "removeModifier" then
 		self.gameController.modifierModel:remove(event.modifierConfig)
 	elseif event.name == "setModifierValue" then
