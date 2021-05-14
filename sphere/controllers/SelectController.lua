@@ -126,6 +126,8 @@ SelectController.receive = function(self, event)
 		elseif event.screenName == "Collection" then
 			self:switchCollectionController()
 		end
+	elseif event.name == "changeSearchMode" then
+		self.selectModel:changeSearchMode()
 	elseif event.name == "startCacheUpdate" then
 		self.gameController.cacheModel:startUpdate()
 		print("start update")

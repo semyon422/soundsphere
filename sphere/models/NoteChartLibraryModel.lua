@@ -2,8 +2,10 @@ local Class = require("aqua.util.Class")
 
 local NoteChartLibraryModel = Class:new()
 
+NoteChartLibraryModel.searchMode = "hide"
+NoteChartLibraryModel.setId = 1
+
 NoteChartLibraryModel.construct = function(self)
-	self.setId = 1
 	self.items = {}
 end
 
@@ -36,13 +38,17 @@ NoteChartLibraryModel.updateItems = function(self)
 		end
 	end
 
-	local foundList = self.searchModel:search(noteChartDataEntries)
-	for i = 1, #foundList do
-		local noteChartDataEntry = foundList[i]
-		items[#items + 1] = {
-			noteChartDataEntry = noteChartDataEntry,
-			noteChartEntry = map[noteChartDataEntry]
-		}
+	local foundList, foundMap = self.searchModel:search(noteChartDataEntries)
+	for i = 1, #noteChartDataEntries do
+		local noteChartDataEntry = noteChartDataEntries[i]
+		local check = foundMap[noteChartDataEntry]
+		if check or self.searchMode == "show" then
+			items[#items + 1] = {
+				noteChartDataEntry = noteChartDataEntry,
+				noteChartEntry = map[noteChartDataEntry],
+				tagged = self.searchMode == "show" and check
+			}
+		end
 	end
 
 	table.sort(items, self.sortItemsFunction)

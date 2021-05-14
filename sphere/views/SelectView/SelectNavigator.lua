@@ -16,10 +16,17 @@ SelectNavigator.receive = function(self, event)
 	elseif scancode == "right" then self:scrollNoteChartSet("down")
 	elseif scancode == "f5" then self:updateCache()
 	elseif scancode == "return" then self:play()
+	elseif scancode == "lctrl" then self:changeSearchMode()
 	elseif scancode == "f1" then self:changeScreen("Modifier")
 	elseif scancode == "f2" then self:changeScreen("NoteSkin")
 	elseif scancode == "f3" then self:changeScreen("Input")
 	end
+end
+
+SelectNavigator.changeSearchMode = function(self)
+	self:send({
+		name = "changeSearchMode"
+	})
 end
 
 SelectNavigator.updateCache = function(self)

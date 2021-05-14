@@ -81,6 +81,21 @@ NoteChartListItemView.draw = function(self)
 		scale,
 		scale
 	)
+
+	if item.tagged then
+		love.graphics.circle(
+			"line",
+			cs:X((config.x + config.point.x) / screen.h, true),
+			cs:Y((y + config.point.y) / screen.h, true),
+			cs:X(config.point.r / screen.h, true)
+		)
+		love.graphics.circle(
+			"fill",
+			cs:X((config.x + config.point.x) / screen.h, true),
+			cs:Y((y + config.point.y) / screen.h, true),
+			cs:X(config.point.r / screen.h, true)
+		)
+	end
 end
 
 return NoteChartListItemView

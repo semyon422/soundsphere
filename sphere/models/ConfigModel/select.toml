@@ -1,4 +1,5 @@
 searchString = ""
+searchMode = "hide"
 noteChartSetEntryId = 1
 noteChartEntryId = 1
 noteChartDataEntryId = 1

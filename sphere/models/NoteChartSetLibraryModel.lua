@@ -2,8 +2,10 @@ local Class = require("aqua.util.Class")
 
 local NoteChartSetLibraryModel = Class:new()
 
+NoteChartSetLibraryModel.searchMode = "hide"
+NoteChartSetLibraryModel.collection = ""
+
 NoteChartSetLibraryModel.construct = function(self)
-	self.collection = ""
 	self.items = {}
 end
 
@@ -18,13 +20,15 @@ NoteChartSetLibraryModel.updateItems = function(self)
 	local noteChartSetEntries = self.cacheModel.cacheManager:getNoteChartSets()
 	for i = 1, #noteChartSetEntries do
 		local noteChartSetEntry = noteChartSetEntries[i]
-		if self:checkNoteChartSetEntry(noteChartSetEntry) then
+		local check = self:checkNoteChartSetEntry(noteChartSetEntry)
+		if check or self.searchMode == "show" then
 			local noteChartEntries = self.cacheModel.cacheManager:getNoteChartsAtSet(noteChartSetEntry.id)
 			local noteChartDataEntries = self.cacheModel.cacheManager:getAllNoteChartDataEntries(noteChartEntries[1].hash)
 			items[#items + 1] = {
 				noteChartSetEntry = noteChartSetEntry,
 				noteChartEntries = noteChartEntries,
-				noteChartDataEntries = noteChartDataEntries
+				noteChartDataEntries = noteChartDataEntries,
+				tagged = self.searchMode == "show" and check
 			}
 		end
 	end

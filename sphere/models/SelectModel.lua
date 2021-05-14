@@ -7,11 +7,31 @@ SelectModel.load = function(self)
 	self.config = config
 
 	self.searchModel:setSearchString(config.searchString)
+	self:setSearchMode(config.searchMode)
 
 	self.noteChartSetItemIndex = self.noteChartSetLibraryModel:getItemIndex(config.noteChartSetEntryId)
 	self.noteChartItemIndex = self.noteChartLibraryModel:getItemIndex(config.noteChartEntryId, config.noteChartDataEntryId)
 	self.scoreItemIndex = self.scoreLibraryModel:getItemIndex(config.scoreEntryId)
 
+	self:pullNoteChartSet()
+end
+
+SelectModel.setSearchMode = function(self, searchMode)
+	if searchMode ~= "show" and searchMode ~= "hide" then
+		return
+	end
+	self.noteChartSetLibraryModel.searchMode = searchMode
+	self.noteChartLibraryModel.searchMode = searchMode
+end
+
+SelectModel.changeSearchMode = function(self)
+	local config = self.config
+	if config.searchMode == "hide" then
+		config.searchMode = "show"
+	else
+		config.searchMode = "hide"
+	end
+	self:setSearchMode(config.searchMode)
 	self:pullNoteChartSet()
 end
 
