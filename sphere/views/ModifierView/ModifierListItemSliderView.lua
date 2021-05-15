@@ -1,75 +1,43 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
-local ModifierListItemView = require(viewspackage .. "ModifierView.ModifierListItemView")
+local ListItemSliderView = require(viewspackage .. "ListItemSliderView")
 local SliderView = require(viewspackage .. "SliderView")
 
-local ModifierListItemSliderView = ModifierListItemView:new()
+local ModifierListItemSliderView = ListItemSliderView:new()
 
 ModifierListItemSliderView.construct = function(self)
 	self.sliderView = SliderView:new()
 end
 
-ModifierListItemSliderView.draw = function(self)
-	local modifierConfig = self.item
-
-	local modifier = self.listView.modifierModel:getModifier(modifierConfig)
-
-	ModifierListItemView.draw(self)
-
-	local config = self.listView.config
-	self:drawValue(config.slider.value)
-
-	local sliderView = self.sliderView
-	sliderView:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.slider))
-	sliderView:setValue(modifier:toNormValue(modifierConfig.value))
-	sliderView:draw()
+ModifierListItemSliderView.getName = function(self)
+	return self.item.name
 end
 
-ModifierListItemSliderView.receive = function(self, event)
-	ModifierListItemView.receive(self, event)
-
-	if event.name == "wheelmoved" then
-		return self:wheelmoved(event)
-	end
-
-	local listView = self.listView
-	if listView.activeItem ~= self.itemIndex then
-		return
-	end
-
-	local config = listView.config
-	local slider = listView.slider
-	local modifierConfig = self.item
-	local modifier = listView.modifierModel:getModifier(modifierConfig)
-	slider:setPosition(listView:getItemElementPosition(self.itemIndex, config.slider))
-	slider:setValue(modifier:toNormValue(modifierConfig.value))
-	slider:receive(event)
-
-	if slider.valueUpdated then
-		self.listView.navigator:setModifierValue(
-			modifierConfig,
-			modifier:fromNormValue(slider.value)
-		)
-		slider.valueUpdated = false
-	end
+ModifierListItemSliderView.getValue = function(self)
+	return self.item.value
 end
 
-ModifierListItemSliderView.wheelmoved = function(self, event)
-	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
-	local mx, my = love.mouse.getPosition()
+ModifierListItemSliderView.getNormValue = function(self)
+	local modifier = self.listView.modifierModel:getModifier(self.item)
+	return modifier:toNormValue(self.item.value)
+end
 
-	if not (mx >= x and mx <= x + w and my >= y and my <= y + h) then
-		return
-	end
+ModifierListItemSliderView.updateNormValue = function(self, normValue)
+	local modifier = self.listView.modifierModel:getModifier(self.item)
+	self.listView.navigator:setModifierValue(
+		self.item,
+		modifier:fromNormValue(normValue)
+	)
+end
 
-	x, y, w, h = self.listView:getItemElementPosition(self.itemIndex, self.listView.config.slider)
-	if mx >= x and mx <= x + w then
-		local wy = event.args[2]
-		if wy == 1 then
-			self.listView.navigator:increaseModifierValue(self.itemIndex, 1)
-		elseif wy == -1 then
-			self.listView.navigator:increaseModifierValue(self.itemIndex, -1)
-		end
+ModifierListItemSliderView.increaseValue = function(self, delta)
+	self.listView.navigator:increaseModifierValue(self.itemIndex, delta)
+end
+
+ModifierListItemSliderView.mousepressed = function(self, event)
+	local button = event.args[3]
+	if button == 2 then
+		self.listView.navigator:removeModifier(self.itemIndex)
 	end
 end
 

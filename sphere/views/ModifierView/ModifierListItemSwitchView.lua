@@ -1,49 +1,30 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
-local ModifierListItemView = require(viewspackage .. "ModifierView.ModifierListItemView")
+local ListItemSwitchView = require(viewspackage .. "ListItemSwitchView")
 local SwitchView = require(viewspackage .. "SwitchView")
 
-local ModifierListItemSwitchView = ModifierListItemView:new()
+local ModifierListItemSwitchView = ListItemSwitchView:new()
 
 ModifierListItemSwitchView.construct = function(self)
 	self.switchView = SwitchView:new()
 end
 
-ModifierListItemSwitchView.draw = function(self)
-	local modifierConfig = self.item
-
-	ModifierListItemView.draw(self)
-
-	local config = self.listView.config
-	local switchView = self.switchView
-	switchView:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.switch))
-	switchView:setValue(modifierConfig.value)
-	switchView:draw()
+ModifierListItemSwitchView.getName = function(self)
+	return self.item.name
 end
 
-ModifierListItemSwitchView.receive = function(self, event)
-	ModifierListItemView.receive(self, event)
+ModifierListItemSwitchView.getValue = function(self)
+	return self.item.value
+end
 
-	if event.name ~= "mousepressed" then
-		return
-	end
+ModifierListItemSwitchView.increaseValue = function(self, delta)
+	self.listView.navigator:increaseModifierValue(self.itemIndex, delta)
+end
 
-	local listView = self.listView
-
-	local config = listView.config
-	local switch = listView.switch
-	local modifierConfig = self.item
-	switch:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.slider))
-	switch:setValue(modifierConfig.value)
-	switch:receive(event)
-
-	if switch.valueUpdated then
-		if switch.value == 0 then
-			self.listView.navigator:increaseModifierValue(self.itemIndex, -1)
-		else
-			self.listView.navigator:increaseModifierValue(self.itemIndex, 1)
-		end
-		switch.valueUpdated = false
+ModifierListItemSwitchView.mousepressed = function(self, event)
+	local button = event.args[3]
+	if button == 2 then
+		self.listView.navigator:removeModifier(self.itemIndex)
 	end
 end
 

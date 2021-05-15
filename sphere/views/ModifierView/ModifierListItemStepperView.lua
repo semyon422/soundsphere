@@ -1,78 +1,47 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
-local ModifierListItemView = require(viewspackage .. "ModifierView.ModifierListItemView")
+local ListItemStepperView = require(viewspackage .. "ListItemStepperView")
 local StepperView = require(viewspackage .. "StepperView")
 
-local ModifierListItemStepperView = ModifierListItemView:new()
+local ModifierListItemStepperView = ListItemStepperView:new()
 
 ModifierListItemStepperView.construct = function(self)
 	self.stepperView = StepperView:new()
 end
 
-ModifierListItemStepperView.draw = function(self)
-	local modifierConfig = self.item
-
-	local modifier = self.listView.modifierModel:getModifier(modifierConfig)
-
-	ModifierListItemView.draw(self)
-
-	local config = self.listView.config
-	self:drawValue(config.stepper.value)
-
-	local stepperView = self.stepperView
-	stepperView:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.stepper))
-	stepperView:setValue(modifier:toIndexValue(modifierConfig.value))
-	stepperView:setCount(modifier:getCount())
-	stepperView:draw()
+ModifierListItemStepperView.getName = function(self)
+	return self.item.name
 end
 
-ModifierListItemStepperView.receive = function(self, event)
-	ModifierListItemView.receive(self, event)
-
-	if event.name == "wheelmoved" then
-		return self:wheelmoved(event)
-	end
-
-	local listView = self.listView
-
-	if listView.activeItem ~= self.itemIndex then
-		return
-	end
-
-	local config = listView.config
-	local stepper = listView.stepper
-	local modifierConfig = self.item
-	local modifier = listView.modifierModel:getModifier(modifierConfig)
-	stepper:setPosition(listView:getItemElementPosition(self.itemIndex, config.stepper))
-	stepper:setValue(modifier:toIndexValue(modifierConfig.value))
-	stepper:setCount(modifier:getCount())
-	stepper:receive(event)
-
-	if stepper.valueUpdated then
-		self.listView.navigator:setModifierValue(
-			modifierConfig,
-			modifier:fromIndexValue(stepper.value)
-		)
-		stepper.valueUpdated = false
-	end
+ModifierListItemStepperView.getValue = function(self)
+	return self.item.value
 end
 
-ModifierListItemStepperView.wheelmoved = function(self, event)
-	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
-	local mx, my = love.mouse.getPosition()
+ModifierListItemStepperView.getIndexValue = function(self)
+	local modifier = self.listView.modifierModel:getModifier(self.item)
+	return modifier:toIndexValue(self.item.value)
+end
 
-	if not (mx >= x and mx <= x + w and my >= y and my <= y + h) then
-		return
-	end
+ModifierListItemStepperView.getCount = function(self)
+	local modifier = self.listView.modifierModel:getModifier(self.item)
+	return modifier:getCount()end
 
-	x, y, w, h = self.listView:getItemElementPosition(self.itemIndex, self.listView.config.slider)
-	if mx >= x and mx <= x + w then
-		local wy = event.args[2]
-		if wy == 1 then
-			self.listView.navigator:increaseModifierValue(self.itemIndex, 1)
-		elseif wy == -1 then
-			self.listView.navigator:increaseModifierValue(self.itemIndex, -1)
-		end
+ModifierListItemStepperView.updateIndexValue = function(self, indexValue)
+	local modifier = self.listView.modifierModel:getModifier(self.item)
+	self.listView.navigator:setModifierValue(
+		self.item,
+		modifier:fromIndexValue(indexValue)
+	)
+end
+
+ModifierListItemStepperView.increaseValue = function(self, delta)
+	self.listView.navigator:increaseModifierValue(self.itemIndex, delta)
+end
+
+ModifierListItemStepperView.mousepressed = function(self, event)
+	local button = event.args[3]
+	if button == 2 then
+		self.listView.navigator:removeModifier(self.itemIndex)
 	end
 end
 
