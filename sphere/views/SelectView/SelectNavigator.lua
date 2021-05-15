@@ -23,6 +23,12 @@ SelectNavigator.receive = function(self, event)
 	end
 end
 
+SelectNavigator.changeSearchMode = function(self)
+	self:send({
+		name = "changeSearchMode"
+	})
+end
+
 SelectNavigator.updateCache = function(self)
 	local cacheUpdater = self.view.cacheModel.cacheUpdater
 	if cacheUpdater.state == 0 or cacheUpdater.state == 3 then
@@ -34,13 +40,6 @@ SelectNavigator.updateCache = function(self)
 			name = "stopCacheUpdate"
 		})
 	end
-end
-
-SelectNavigator.changeScreen = function(self, screenName)
-	self:send({
-		name = "changeScreen",
-		screenName = screenName
-	})
 end
 
 SelectNavigator.scrollNoteChartSet = function(self, direction)
