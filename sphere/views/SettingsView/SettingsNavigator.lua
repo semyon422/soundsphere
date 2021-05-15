@@ -1,23 +1,39 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
 local Navigator = require(viewspackage .. "Navigator")
-local Node = require("aqua.util.Node")
 
 local SettingsNavigator = Navigator:new()
 
 SettingsNavigator.construct = function(self)
 	Navigator.construct(self)
 
-	local settingsList = Node:new()
-	self.settingsList = settingsList
-	settingsList.selected = 1
+	self.activeElement = "categories"
+	self.sectionItemIndex = 1
+	self.settingItemIndex = 1
+end
 
-	local sectionsList = Node:new()
-	self.sectionsList = sectionsList
-	sectionsList.selected = 1
+SettingsNavigator.receive = function(self, event)
+	if event.name ~= "keypressed" then
+		return
+	end
 
-	local inputHandler = Node:new()
-	self.inputHandler = inputHandler
+	local scancode = event.args[2]
+	if self.activeElement == "settings" then
+		if scancode == "up" then self:scrollSettings("up")
+		elseif scancode == "down" then self:scrollSettings("down")
+		elseif scancode == "return" then
+		elseif scancode == "backspace" then self:resetSetting()
+		elseif scancode == "right" then self:increaseSettingValue(nil, 1)
+		elseif scancode == "left" then self:increaseSettingValue(nil, -1)
+		elseif scancode == "escape" then self.activeElement = "categories"
+		end
+	elseif self.activeElement == "categories" then
+		if scancode == "up" then self:scrollCategories("up")
+		elseif scancode == "down" then self:scrollCategories("down")
+		elseif scancode == "return" then self.activeElement = "settings"
+		elseif scancode == "escape" then self:changeScreen("Select")
+		end
+	end
 end
 
 SettingsNavigator.scrollCategories = function(self, direction, destination)
@@ -47,95 +63,34 @@ SettingsNavigator.scrollSettings = function(self, direction, destination)
 	settingsList.selected = settingsList.selected + direction
 end
 
-SettingsNavigator.load = function(self)
-	Navigator.load(self)
-
-	local sectionsList = self.sectionsList
-	local settingsList = self.settingsList
-	local inputHandler = self.inputHandler
-
-	self.node = sectionsList
-	sectionsList:on("up", function()
-		self:scrollCategories(-1)
-	end)
-	sectionsList:on("down", function()
-		self:scrollCategories(1)
-	end)
-	sectionsList:on("tab", function()
-		self.node = settingsList
-	end)
-	sectionsList:on("escape", function()
-		self:send({
-			name = "goSelectScreen"
-		})
-	end)
-
-	settingsList:on("up", function()
-		self:scrollSettings(-1)
-	end)
-	settingsList:on("down", function()
-		self:scrollSettings(1)
-	end)
-	settingsList:on("right", function(_, itemIndex)
-		local settings = self.view.settingsModel.sections[sectionsList.selected]
-		local settingConfig = settings[itemIndex or settingsList.selected]
-		self:send({
-			name = "increaseSettingValue",
-			settingConfig = settingConfig
-		})
-	end)
-	settingsList:on("left", function(_, itemIndex)
-		local settings = self.view.settingsModel.sections[sectionsList.selected]
-		local settingConfig = settings[itemIndex or settingsList.selected]
-		self:send({
-			name = "decreaseSettingValue",
-			settingConfig = settingConfig
-		})
-	end)
-	settingsList:on("tab", function()
-		self.node = sectionsList
-	end)
-	settingsList:on("backspace", function(_, itemIndex)
-		self:send({
-			name = "resetSettingsItem",
-			sectionIndex = sectionsList.selected,
-			settingIndex = itemIndex or settingsList.selected
-		})
-	end)
-	settingsList:on("escape", function()
-		self:send({
-			name = "goSelectScreen"
-		})
-	end)
-
-	inputHandler:on("keypressed", function(_, key, type)
-		local settings = self.view.settingsModel.sections[sectionsList.selected]
-		local settingConfig = inputHandler.settingConfig or settings[settingsList.selected]
-		self:send({
-			name = "setInputBinding",
-			settingConfig = settingConfig,
-			value = key,
-			type = type
-		})
-		self.node = settingsList
-	end)
+SettingsNavigator.increaseSettingValue = function(self, direction, destination)
+	local settings = self.view.settingsModel.sections[sectionsList.selected]
+	local settingConfig = settings[itemIndex or settingsList.selected]
+	self:send({
+		name = "increaseSettingValue",
+		settingConfig = settingConfig
+	})
 end
 
-SettingsNavigator.receive = function(self, event)
-	if event.name == "keypressed" and self.node ~= self.inputHandler then
-		self:call(event.args[1])
-		return
-	end
+SettingsNavigator.resetSetting = function(self, direction, destination)
+	self:send({
+		name = "resetSettingsItem",
+		sectionIndex = sectionsList.selected,
+		settingIndex = itemIndex or settingsList.selected
+	})
+end
 
-	if event.name == "keypressed" then
-		self:call("keypressed", event.args[1], "keyboard")
-	elseif event.name == "gamepadpressed" then
-		self:call("keypressed", tostring(event.args[2]), "gamepad")
-	elseif event.name == "joystickpressed" then
-		self:call("keypressed", tostring(event.args[2]), "joystick")
-	elseif event.name == "midipressed" then
-		self:call("keypressed", tostring(event.args[1]), "midi")
-	end
+SettingsNavigator.setInputBinding = function(self, direction, destination)
+
+	local settings = self.view.settingsModel.sections[sectionsList.selected]
+	local settingConfig = inputHandler.settingConfig or settings[settingsList.selected]
+	self:send({
+		name = "setInputBinding",
+		settingConfig = settingConfig,
+		value = key,
+		type = type
+	})
+	self.node = settingsList
 end
 
 return SettingsNavigator

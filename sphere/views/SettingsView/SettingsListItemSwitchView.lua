@@ -3,7 +3,7 @@ local viewspackage = (...):match("^(.-%.views%.)")
 local aquafonts			= require("aqua.assets.fonts")
 local spherefonts		= require("sphere.assets.fonts")
 
-local SettingsListItemView = require(viewspackage .. "SettingsView.SettingsListItemView")
+local SettingsListItemView = require(viewspackage .. "ListItemView")
 local SwitchView = require(viewspackage .. "SwitchView")
 
 local SettingsListItemSwitchView = SettingsListItemView:new()

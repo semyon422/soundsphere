@@ -4,109 +4,103 @@ local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local ListView = require(viewspackage .. "ListView")
 local SettingsListItemSwitchView = require(viewspackage .. "SettingsView.SettingsListItemSwitchView")
 local SettingsListItemSliderView = require(viewspackage .. "SettingsView.SettingsListItemSliderView")
-local SettingsListItemInputView = require(viewspackage .. "SettingsView.SettingsListItemInputView")
 local SettingsListItemStepperView = require(viewspackage .. "SettingsView.SettingsListItemStepperView")
+local SettingsListItemInputView = require(viewspackage .. "SettingsView.SettingsListItemInputView")
 local Slider = require(viewspackage .. "Slider")
 local Switch = require(viewspackage .. "Switch")
 local Stepper = require(viewspackage .. "Stepper")
 
 local SettingsListView = ListView:new()
 
-SettingsListView.init = function(self)
-	self.view = self.view
-	self.cs = CoordinateManager:getCS(0.5, 0, 0, 0, "h")
-	self.x = -16 / 9 / 3 / 4
-	self.y = 0
-	self.w = 16 / 9 / 3
-	self.h = 1
-	self.itemCount = 15
-	self.selectedItem = 1
-	self.activeItem = self.selectedItem
+SettingsListView.construct = function(self)
+	ListView.construct(self)
 
-	self:reloadItems()
+	self.cs = CoordinateManager:getCS(0.5, 0, 16 / 9 / 2, 0, "h")
+
+	self.itemSwitchView = SettingsListItemSwitchView:new()
+	self.itemSliderView = SettingsListItemSliderView:new()
+	self.itemStepperView = SettingsListItemStepperView:new()
+	self.itemInputView = SettingsListItemInputView:new()
+	self.itemSwitchView.listView = self
+	self.itemSliderView.listView = self
+	self.itemStepperView.listView = self
+	self.itemInputView.listView = self
 
 	self.slider = Slider:new()
 	self.switch = Switch:new()
 	self.stepper = Stepper:new()
-
-	self:on("update", function()
-		self.selectedItem = self.navigator.settingsList.selected
-		self:reloadItems()
-	end)
-	self:on("select", function()
-        if not self.navigator:checkNode("inputHandler") then
-	    	self.navigator:setNode("settingsList")
-        end
-	end)
-	self:on("draw", self.drawFrame)
-	self:on("wheelmoved", self.receive)
-	self:on("mousepressed", self.receive)
-	self:on("mousereleased", self.receive)
-	self:on("mousemoved", self.receive)
-	self:on("keypressed", self.receive)
-
-	self:on("wheelmoved", function(self, event)
-		local mx, my = love.mouse.getPosition()
-		local cs = self.cs
-		local x = cs:X(self.x, true)
-		local w = cs:X(self.w)
-		if mx >= x and mx < x + w / 2 then
-			local wy = event.args[2]
-			if wy == 1 then
-				self.navigator:call("up")
-			elseif wy == -1 then
-				self.navigator:call("down")
-			end
-		end
-	end)
-
-	ListView.init(self)
 end
 
-SettingsListView.createListItemViews = function(self)
-	local switchView = SettingsListItemSwitchView:new()
-	switchView.listView = self
-	switchView:init()
-	self.listItemSwitchView = switchView
-
-	local sliderView = SettingsListItemSliderView:new()
-	sliderView.listView = self
-	sliderView:init()
-	self.listItemSliderView = sliderView
-
-	local inputView = SettingsListItemInputView:new()
-	inputView.listView = self
-	inputView:init()
-	self.listItemInputView = inputView
-
-	local stepperView = SettingsListItemStepperView:new()
-	stepperView.listView = self
-	stepperView:init()
-	self.listItemStepperView = stepperView
+SettingsListView.load = function(self)
+	ListView.load(self)
+	self.state.activeItem = self.state.selectedItem
 end
 
-SettingsListView.getListItemView = function(self, settingConfig)
+SettingsListView.getItemView = function(self, settingConfig)
 	if settingConfig.type == "slider" or settingConfig.type == "listSwitcher" then
-		return self.listItemSliderView
+		return self.itemSliderView
 	elseif settingConfig.type == "switch" then
-		return self.listItemSwitchView
+		return self.itemSwitchView
 	elseif settingConfig.type == "binding" then
-		return self.listItemInputView
+		return self.itemInputView
 	elseif settingConfig.type == "stepper" then
-		return self.listItemStepperView
+		return self.itemStepperView
 	end
 end
 
 SettingsListView.reloadItems = function(self)
-	self.items = self.view.settingsModel.sections[self.navigator.sectionsList.selected]
-    self.sectionName = self.view.settingsModel.sections[self.navigator.sectionsList.selected][1].section
+	self.state.items = self.settingsModel.sections[self.navigator.sectionItemIndex]
+    self.state.sectionName = self.settingsModel.sections[self.navigator.sectionItemIndex][1].section
 end
 
-SettingsListView.drawFrame = function(self)
-	if self.navigator:checkNode("settingsList") then
-		self.isSelected = true
-	else
-		self.isSelected = false
+SettingsListView.getItemIndex = function(self)
+	return self.navigator.settingItemIndex
+end
+
+SettingsListView.scrollUp = function(self)
+	self.navigator:scrollSettings("up")
+end
+
+SettingsListView.scrollDown = function(self)
+	self.navigator:scrollSettings("down")
+end
+
+SettingsListView.receive = function(self, event)
+	if event.name == "wheelmoved" then
+		return self:wheelmoved(event)
+	end
+	if event.name == "mousepressed" or event.name == "mousereleased" or event.name == "mousemoved" then
+		self:receiveItems(event)
+	end
+end
+
+SettingsListView.wheelmoved = function(self, event)
+	local config = self.config
+	local cs = self.cs
+
+	local mx, my = love.mouse.getPosition()
+	local sx = cs:X((config.x + config.scroll.x) / config.screen.h, true)
+	local sy = cs:Y((config.y + config.scroll.y) / config.screen.h, true)
+	local sw = cs:X(config.scroll.w / config.screen.h)
+	local sh = cs:Y(config.scroll.h / config.screen.h)
+
+	if mx >= sx and mx < sx + sw and my >= sy and my < sy + sh then
+		local wy = event.args[2]
+		if wy == 1 then
+			self:scrollUp()
+		elseif wy == -1 then
+			self:scrollDown()
+		end
+		return
+	end
+
+	local x = cs:X(config.x / config.screen.h, true)
+	local y = cs:Y(config.y / config.screen.h, true)
+	local w = cs:X(config.w / config.screen.h)
+	local h = cs:Y(config.h / config.screen.h)
+
+	if mx >= x and mx < x + w and my >= y and my < y + h then
+		self:receiveItems(event)
 	end
 end
 

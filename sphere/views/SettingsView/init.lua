@@ -1,63 +1,41 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
-local Class = require("aqua.util.Class")
-local Node = require("aqua.util.Node")
+local ScreenView = require(viewspackage .. "ScreenView")
+
+local SettingsViewConfig = require(viewspackage .. "SettingsView.SettingsViewConfig")
 local SettingsNavigator = require(viewspackage .. "SettingsView.SettingsNavigator")
 local SettingsListView = require(viewspackage .. "SettingsView.SettingsListView")
 local SectionsListView = require(viewspackage .. "SettingsView.SectionsListView")
-local BackgroundView = require(viewspackage .. "BackgroundView")
 
-local SettingsView = Class:new()
+local SettingsView = ScreenView:new()
 
 SettingsView.construct = function(self)
-	self.node = Node:new()
+	self.viewConfig = SettingsViewConfig
+	self.navigator = SettingsNavigator:new()
+	self.settingsListView = SettingsListView:new()
+	self.sectionsListView = SectionsListView:new()
 end
 
 SettingsView.load = function(self)
-	local node = self.node
-	local config = self.configModel:getConfig("settings")
+	local navigator = self.navigator
+	local sectionsListView = self.sectionsListView
+	local settingsListView = self.settingsListView
+	local configSettings = self.configModel:getConfig("settings")
 
-	local navigator = SettingsNavigator:new()
-	self.navigator = navigator
-	navigator.config = config
+	navigator.config = configSettings
 	navigator.view = self
 
-	local sectionsListView = SectionsListView:new()
 	sectionsListView.navigator = navigator
-	sectionsListView.config = config
-	sectionsListView.view = self
+	sectionsListView.configSettings = configSettings
 
-	local settingsListView = SettingsListView:new()
 	settingsListView.navigator = navigator
-	settingsListView.config = config
-	settingsListView.view = self
+	settingsListView.configSettings = configSettings
 
-	local backgroundView = BackgroundView:new()
-	backgroundView.view = self
+	local sequenceView = self.sequenceView
+	sequenceView:setView("SectionsListView", sectionsListView)
+	sequenceView:setView("SettingsListView", settingsListView)
 
-	node:node(backgroundView)
-	node:node(sectionsListView)
-	node:node(settingsListView)
-
-	navigator:load()
-end
-
-SettingsView.unload = function(self)
-	self.navigator:unload()
-end
-
-SettingsView.receive = function(self, event)
-	self.navigator:receive(event)
-	self.node:callnext(event.name, event)
-end
-
-SettingsView.update = function(self, dt)
-	self.node:callnext("update")
-	self.navigator:update()
-end
-
-SettingsView.draw = function(self)
-	self.node:callnext("draw")
+	ScreenView.load(self)
 end
 
 return SettingsView
