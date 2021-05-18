@@ -25,8 +25,8 @@ SettingsController.unload = function(self)
 	self.view:unload()
 end
 
-SettingsController.update = function(self)
-	self.view:update()
+SettingsController.update = function(self, dt)
+	self.view:update(dt)
 end
 
 SettingsController.draw = function(self)
@@ -36,16 +36,15 @@ end
 SettingsController.receive = function(self, event)
 	self.view:receive(event)
 
-	if event.name == "goSelectScreen" then
-		return self.gameController.screenManager:set(self.selectController)
-	elseif event.name == "setSettingValue" then
+	if event.name == "setSettingValue" then
 		self.gameController.settingsModel:setValue(event.settingConfig, event.value)
 	elseif event.name == "increaseSettingValue" then
-		self.gameController.settingsModel:increaseValue(event.settingConfig, 1)
+		self.gameController.settingsModel:increaseValue(event.settingConfig, event.delta)
 	elseif event.name == "decreaseSettingValue" then
-		self.gameController.settingsModel:increaseValue(event.settingConfig, -1)
 	elseif event.name == "setInputBinding" then
 		self.gameController.settingsModel:setValue(event.settingConfig, event.value)
+	elseif event.name == "changeScreen" then
+		self.gameController.screenManager:set(self.selectController)
 	end
 end
 

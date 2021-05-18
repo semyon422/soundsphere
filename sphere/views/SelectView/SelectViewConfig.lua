@@ -441,7 +441,13 @@ local LeftScreenMenu = {
 				name = "Collection",
 				displayName = "collection"
 			}
-		}
+		},
+		{
+			{
+				name = "Settings",
+				displayName = "settings"
+			}
+		},
 	}
 }
 

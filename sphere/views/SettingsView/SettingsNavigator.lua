@@ -7,9 +7,10 @@ local SettingsNavigator = Navigator:new()
 SettingsNavigator.construct = function(self)
 	Navigator.construct(self)
 
-	self.activeElement = "categories"
+	self.activeElement = "sections"
 	self.sectionItemIndex = 1
 	self.settingItemIndex = 1
+	self.inputItemIndex = 1
 end
 
 SettingsNavigator.receive = function(self, event)
@@ -21,76 +22,83 @@ SettingsNavigator.receive = function(self, event)
 	if self.activeElement == "settings" then
 		if scancode == "up" then self:scrollSettings("up")
 		elseif scancode == "down" then self:scrollSettings("down")
-		elseif scancode == "return" then
+		elseif scancode == "return" then self:setInputHandler()
 		elseif scancode == "backspace" then self:resetSetting()
 		elseif scancode == "right" then self:increaseSettingValue(nil, 1)
 		elseif scancode == "left" then self:increaseSettingValue(nil, -1)
-		elseif scancode == "escape" then self.activeElement = "categories"
+		elseif scancode == "escape" then self.activeElement = "sections"
 		end
-	elseif self.activeElement == "categories" then
-		if scancode == "up" then self:scrollCategories("up")
-		elseif scancode == "down" then self:scrollCategories("down")
+	elseif self.activeElement == "sections" then
+		if scancode == "up" then self:scrollSections("up")
+		elseif scancode == "down" then self:scrollSections("down")
 		elseif scancode == "return" then self.activeElement = "settings"
 		elseif scancode == "escape" then self:changeScreen("Select")
 		end
+	elseif self.activeElement == "inputHandler" then
+		self:setInputBinding(scancode)
 	end
 end
 
-SettingsNavigator.scrollCategories = function(self, direction, destination)
-	local sectionsList = self.sectionsList
-
+SettingsNavigator.scrollSections = function(self, direction)
+	direction = direction == "up" and -1 or 1
 	local sections = self.view.settingsModel.sections
 
-	direction = direction or destination - sectionsList.selected
-	if not sections[sectionsList.selected + direction] then
+	if not sections[self.sectionItemIndex + direction] then
 		return
 	end
 
-	sectionsList.selected = sectionsList.selected + direction
+	self.sectionItemIndex = self.sectionItemIndex + direction
+	self.settingItemIndex = 1
 end
 
-SettingsNavigator.scrollSettings = function(self, direction, destination)
-	local settingsList = self.settingsList
-	local sectionsList = self.sectionsList
+SettingsNavigator.scrollSettings = function(self, direction)
+	direction = direction == "up" and -1 or 1
+	local settings = self.view.settingsModel.sections[self.sectionItemIndex]
 
-	local settings = self.view.settingsModel.sections[sectionsList.selected]
-
-	direction = direction or destination - settingsList.selected
-	if not settings[settingsList.selected + direction] then
+	if not settings[self.settingItemIndex + direction] then
 		return
 	end
 
-	settingsList.selected = settingsList.selected + direction
+	self.settingItemIndex = self.settingItemIndex + direction
 end
 
-SettingsNavigator.increaseSettingValue = function(self, direction, destination)
-	local settings = self.view.settingsModel.sections[sectionsList.selected]
-	local settingConfig = settings[itemIndex or settingsList.selected]
+SettingsNavigator.increaseSettingValue = function(self, itemIndex, delta)
+	local settings = self.view.settingsModel.sections[self.sectionItemIndex]
+	local settingConfig = settings[itemIndex or self.settingItemIndex]
 	self:send({
 		name = "increaseSettingValue",
-		settingConfig = settingConfig
+		settingConfig = settingConfig,
+		delta = delta
 	})
 end
 
-SettingsNavigator.resetSetting = function(self, direction, destination)
+SettingsNavigator.resetSetting = function(self, itemIndex)
 	self:send({
 		name = "resetSettingsItem",
-		sectionIndex = sectionsList.selected,
-		settingIndex = itemIndex or settingsList.selected
+		sectionIndex = self.sectionItemIndex,
+		settingIndex = itemIndex or self.settingItemIndex
 	})
 end
 
-SettingsNavigator.setInputBinding = function(self, direction, destination)
+SettingsNavigator.setInputHandler = function(self, itemIndex)
+	local settings = self.view.settingsModel.sections[self.sectionItemIndex]
+	local settingConfig = settings[itemIndex or self.settingItemIndex]
+	if settingConfig.type ~= "binding" then
+		return
+	end
+	self.inputItemIndex = itemIndex or self.settingItemIndex
+	self.activeElement = "inputHandler"
+end
 
-	local settings = self.view.settingsModel.sections[sectionsList.selected]
-	local settingConfig = inputHandler.settingConfig or settings[settingsList.selected]
+SettingsNavigator.setInputBinding = function(self, scancode)
+	local settings = self.view.settingsModel.sections[self.sectionItemIndex]
+	local settingConfig = settings[self.inputItemIndex]
 	self:send({
 		name = "setInputBinding",
 		settingConfig = settingConfig,
-		value = key,
-		type = type
+		value = scancode
 	})
-	self.node = settingsList
+	self.activeElement = "settings"
 end
 
 return SettingsNavigator

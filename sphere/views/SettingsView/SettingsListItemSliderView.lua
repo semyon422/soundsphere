@@ -18,14 +18,14 @@ SettingsListItemSliderView.getValue = function(self)
 end
 
 SettingsListItemSliderView.getNormValue = function(self)
-	return self.listView.settingsModel:getNormalizedValue(self.item)
+	return self.listView.settingsModel:getNormValue(self.item)
 end
 
 SettingsListItemSliderView.updateNormValue = function(self, normValue)
 	self.listView.navigator:send({
 		name = "setSettingValue",
 		settingConfig = self.item,
-		value = self.listView.settingsModel:fromNormalizedValue(self.item, normValue)
+		value = self.listView.settingsModel:fromNormValue(self.item, normValue)
 	})
 end
 

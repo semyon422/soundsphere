@@ -1,86 +1,30 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
-local aquafonts			= require("aqua.assets.fonts")
-local spherefonts		= require("sphere.assets.fonts")
-
-local SettingsListItemView = require(viewspackage .. "ListItemView")
+local ListItemSwitchView = require(viewspackage .. "ListItemSwitchView")
 local SwitchView = require(viewspackage .. "SwitchView")
 
-local SettingsListItemSwitchView = SettingsListItemView:new()
+local SettingsListItemSwitchView = ListItemSwitchView:new()
 
-SettingsListItemSwitchView.init = function(self)
-	self:on("draw", self.draw)
-
-	self.fontName = aquafonts.getFont(spherefonts.NotoSansRegular, 24)
-
+SettingsListItemSwitchView.construct = function(self)
 	self.switchView = SwitchView:new()
 end
 
-SettingsListItemSwitchView.draw = function(self)
-	local listView = self.listView
-
-	local itemIndex = self.index + listView.selectedItem - math.ceil(listView.itemCount / 2)
-	local item = self.item
-
-	local cs = listView.cs
-
-	local x, y, w, h = self:getPosition()
-
-    local settingConfig = item
-
-	local deltaItemIndex = math.abs(itemIndex - listView.selectedItem)
-	if listView.isSelected then
-		love.graphics.setColor(1, 1, 1,
-			deltaItemIndex == 0 and 1 or 0.66
-		)
-	else
-		love.graphics.setColor(1, 1, 1, 0.33)
-	end
-
-	love.graphics.setFont(self.fontName)
-	love.graphics.printf(
-		settingConfig.name,
-		x,
-		y,
-		w / cs.one * 1080,
-		"left",
-		0,
-		cs.one / 1080,
-		cs.one / 1080,
-		-cs:X(0 / cs.one),
-		-cs:Y(18 / cs.one)
-	)
-
-	local switchView = self.switchView
-	switchView:setPosition(x + 3 * w / 4 - h / 2, y, h, h)
-	switchView:setValue(listView.view.settingsModel:getValue(settingConfig))
-	switchView:draw()
+SettingsListItemSwitchView.getName = function(self)
+	return self.item.name
 end
 
-SettingsListItemSwitchView.receive = function(self, event)
-	SettingsListItemView.receive(self, event)
+SettingsListItemSwitchView.getValue = function(self)
+	return self.listView.settingsModel:getValue(self.item)
+end
 
-	if event.name ~= "mousepressed" then
-		return
-	end
+SettingsListItemSwitchView.increaseValue = function(self, delta)
+	self.listView.navigator:increaseSettingValue(self.itemIndex, delta)
+end
 
-	local listView = self.listView
-
-	local x, y, w, h = self:getPosition()
-
-	local switch = listView.switch
-	local settingConfig = self.item
-	switch:setPosition(x + 3 * w / 4 - h / 2, y, h, h)
-	switch:setValue(listView.view.settingsModel:getValue(settingConfig))
-	switch:receive(event)
-
-	if switch.valueUpdated then
-		if switch.value == 0 then
-			self.listView.navigator:call("left", self.itemIndex)
-		else
-			self.listView.navigator:call("right", self.itemIndex)
-		end
-		switch.valueUpdated = false
+SettingsListItemSwitchView.mousepressed = function(self, event)
+	local button = event.args[3]
+	if button == 2 then
+		self.listView.navigator:resetSetting(self.itemIndex)
 	end
 end
 

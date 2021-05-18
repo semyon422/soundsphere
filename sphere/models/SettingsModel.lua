@@ -64,13 +64,13 @@ SettingsModel.getValue = function(self, settingConfig)
 	return value
 end
 
-SettingsModel.fromNormalizedValue = function(self, settingConfig, value)
+SettingsModel.fromNormValue = function(self, settingConfig, value)
 	if settingConfig.type == "slider" then
 		return round(settingConfig.range[1] + value * (settingConfig.range[2] - settingConfig.range[1]), settingConfig.step)
 	end
 end
 
-SettingsModel.getNormalizedValue = function(self, settingConfig)
+SettingsModel.getNormValue = function(self, settingConfig)
 	local value = self.config[settingConfig.section][settingConfig.key]
 	local range = settingConfig.range
 	if settingConfig.type == "slider" then

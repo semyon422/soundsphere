@@ -27,9 +27,11 @@ SettingsView.load = function(self)
 
 	sectionsListView.navigator = navigator
 	sectionsListView.configSettings = configSettings
+	sectionsListView.settingsModel = self.settingsModel
 
 	settingsListView.navigator = navigator
 	settingsListView.configSettings = configSettings
+	settingsListView.settingsModel = self.settingsModel
 
 	local sequenceView = self.sequenceView
 	sequenceView:setView("SectionsListView", sectionsListView)

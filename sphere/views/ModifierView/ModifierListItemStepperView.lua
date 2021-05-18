@@ -24,7 +24,8 @@ end
 
 ModifierListItemStepperView.getCount = function(self)
 	local modifier = self.listView.modifierModel:getModifier(self.item)
-	return modifier:getCount()end
+	return modifier:getCount()
+end
 
 ModifierListItemStepperView.updateIndexValue = function(self, indexValue)
 	local modifier = self.listView.modifierModel:getModifier(self.item)
