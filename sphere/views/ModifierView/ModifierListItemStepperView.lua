@@ -17,6 +17,10 @@ ModifierListItemStepperView.getValue = function(self)
 	return self.item.value
 end
 
+ModifierListItemStepperView.getDisplayValue = function(self)
+	return self.item.value
+end
+
 ModifierListItemStepperView.getIndexValue = function(self)
 	local modifier = self.listView.modifierModel:getModifier(self.item)
 	return modifier:toIndexValue(self.item.value)

@@ -68,11 +68,40 @@ SettingsModel.fromNormValue = function(self, settingConfig, value)
 	end
 end
 
-SettingsModel.getNormValue = function(self, settingConfig)
+SettingsModel.toNormValue = function(self, settingConfig)
 	local value = self.config[settingConfig.section][settingConfig.key]
 	local range = settingConfig.range
 	if settingConfig.type == "slider" then
 		return map(value, range[1], range[2], 0, 1)
+	end
+end
+
+SettingsModel.toIndexValue = function(self, settingConfig)
+	local value = self.config[settingConfig.section][settingConfig.key]
+	if not settingConfig.values then
+		return round((value - settingConfig.range[1]) / settingConfig.step) + 1
+	end
+	for i, currentValue in ipairs(settingConfig.values) do
+		if value == currentValue then
+			return i
+		end
+	end
+	return 1
+end
+
+SettingsModel.fromIndexValue = function(self, settingConfig, indexValue)
+	if not settingConfig.values then
+		return settingConfig.range[1] + (indexValue - 1) * settingConfig.step
+	end
+	indexValue = math.min(math.max(indexValue, 1), #settingConfig.values)
+	return settingConfig.values[indexValue]
+end
+
+SettingsModel.getCount = function(self, settingConfig)
+	if settingConfig.range then
+		return round((settingConfig.range[2] - settingConfig.range[1]) / settingConfig.step) + 1
+	elseif settingConfig.values then
+		return #settingConfig.values
 	end
 end
 
@@ -84,8 +113,10 @@ SettingsModel.getDisplayValue = function(self, settingConfig)
 		return settingConfig.format:format(map(value, range[1], range[2], displayRange[1], displayRange[2]))
 	elseif settingConfig.type == "switch" then
 		return value and displayRange[2] or displayRange[1]
+	elseif settingConfig.type == "stepper" then
+		local indexValue = self:toIndexValue(settingConfig)
+		return settingConfig.displayValues[indexValue]
 	end
-	return ""
 end
 
 return SettingsModel

@@ -12,6 +12,7 @@ end
 
 ListItemStepperView.getName = function(self) end
 ListItemStepperView.getValue = function(self) end
+ListItemStepperView.getDisplayValue = function(self) end
 ListItemStepperView.getIndexValue = function(self) end
 ListItemStepperView.getCount = function(self) end
 ListItemStepperView.updateIndexValue = function(self, indexValue) end
@@ -20,7 +21,7 @@ ListItemStepperView.increaseValue = function(self, delta) end
 ListItemStepperView.draw = function(self)
 	local config = self.listView.config
 	self:drawValue(config.name, self:getName())
-	self:drawValue(config.stepper.value, self:getValue())
+	self:drawValue(config.stepper.value, self:getDisplayValue())
 
 	local stepperView = self.stepperView
 	stepperView:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.stepper))

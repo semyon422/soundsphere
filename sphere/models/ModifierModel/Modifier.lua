@@ -49,7 +49,7 @@ Modifier.fromIndexValue = function(self, indexValue)
 	return self.values[indexValue] or ""
 end
 
-Modifier.getCount = function(self, indexValue)
+Modifier.getCount = function(self)
 	if not self.values then
 		return round((self.range[2] - self.range[1]) / self.step) + 1
 	end

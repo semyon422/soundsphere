@@ -17,6 +17,10 @@ ModifierListItemSliderView.getValue = function(self)
 	return self.item.value
 end
 
+ModifierListItemSliderView.getDisplayValue = function(self)
+	return self.item.value
+end
+
 ModifierListItemSliderView.getNormValue = function(self)
 	local modifier = self.listView.modifierModel:getModifier(self.item)
 	return modifier:toNormValue(self.item.value)

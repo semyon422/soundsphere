@@ -14,11 +14,15 @@ SettingsListItemSliderView.getName = function(self)
 end
 
 SettingsListItemSliderView.getValue = function(self)
+	return self.listView.settingsModel:getValue(self.item)
+end
+
+SettingsListItemSliderView.getDisplayValue = function(self)
 	return self.listView.settingsModel:getDisplayValue(self.item)
 end
 
 SettingsListItemSliderView.getNormValue = function(self)
-	return self.listView.settingsModel:getNormValue(self.item)
+	return self.listView.settingsModel:toNormValue(self.item)
 end
 
 SettingsListItemSliderView.updateNormValue = function(self, normValue)

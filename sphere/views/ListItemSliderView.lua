@@ -11,6 +11,7 @@ end
 
 ListItemSliderView.getName = function(self) end
 ListItemSliderView.getValue = function(self) end
+ListItemSliderView.getDisplayValue = function(self) end
 ListItemSliderView.getNormValue = function(self) end
 ListItemSliderView.updateNormValue = function(self, normValue) end
 ListItemSliderView.increaseValue = function(self, delta) end
@@ -18,7 +19,7 @@ ListItemSliderView.increaseValue = function(self, delta) end
 ListItemSliderView.draw = function(self)
 	local config = self.listView.config
 	self:drawValue(config.name, self:getName())
-	self:drawValue(config.slider.value, self:getValue())
+	self:drawValue(config.slider.value, self:getDisplayValue())
 
 	local sliderView = self.sliderView
 	sliderView:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.slider))
