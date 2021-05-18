@@ -30,11 +30,8 @@ SettingsListItemStepperView.getCount = function(self)
 end
 
 SettingsListItemStepperView.updateIndexValue = function(self, indexValue)
-	-- local modifier = self.listView.modifierModel:getModifier(self.item)
-	-- self.listView.navigator:setModifierValue(
-	-- 	self.item,
-	-- 	modifier:fromIndexValue(indexValue)
-	-- )
+	local value = self.listView.settingsModel:fromIndexValue(self.item, indexValue)
+	self.listView.navigator:setSettingValue(self.itemIndex, value)
 end
 
 SettingsListItemStepperView.increaseValue = function(self, delta)
