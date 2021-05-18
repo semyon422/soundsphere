@@ -7,6 +7,7 @@ local InputModel = Class:new()
 InputModel.path = "userdata/input.json"
 
 InputModel.mode = "external"
+InputModel.inputModeString = ""
 
 InputModel.types = {
 	"keyboard",
@@ -68,6 +69,7 @@ InputModel.getKey = function(self, inputMode, virtualKey)
 	local inputBindings = self.inputBindings
 
 	local inputConfig = inputBindings[inputMode]
+
 	if not inputConfig or not inputConfig.press then
 		return "none"
 	end
@@ -84,7 +86,13 @@ InputModel.getKey = function(self, inputMode, virtualKey)
 end
 
 InputModel.getInputs = function(self, inputModeString)
+	if inputModeString == self.inputModeString then
+		return self.inputs
+	end
+	self.inputModeString = inputModeString
+
 	local inputs = {}
+	self.inputs = inputs
 
 	for inputCount, inputType in inputModeString:gmatch("([0-9]+)([a-z]+)") do
 		for i = 1, inputCount do

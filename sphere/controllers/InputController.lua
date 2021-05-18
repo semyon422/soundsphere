@@ -45,8 +45,8 @@ InputController.receive = function(self, event)
 
 	if event.name == "setInputBinding" then
 		self.gameController.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
-	elseif event.name == "goSelectScreen" then
-		return self.gameController.screenManager:set(self.selectController)
+	elseif event.name == "changeScreen" then
+		self.gameController.screenManager:set(self.selectController)
 	end
 end
 

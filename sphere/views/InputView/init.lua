@@ -1,56 +1,36 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
-local Class = require("aqua.util.Class")
-local Node = require("aqua.util.Node")
+local ScreenView = require(viewspackage .. "ScreenView")
+
+local InputViewConfig = require(viewspackage .. "InputView.InputViewConfig")
 local InputNavigator = require(viewspackage .. "InputView.InputNavigator")
 local InputListView = require(viewspackage .. "InputView.InputListView")
-local BackgroundView = require(viewspackage .. "BackgroundView")
 
-local InputView = Class:new()
+local InputView = ScreenView:new()
 
 InputView.construct = function(self)
-	self.node = Node:new()
+	self.viewConfig = InputViewConfig
+	self.navigator = InputNavigator:new()
+	self.noteSkinListView = InputListView:new()
 end
 
 InputView.load = function(self)
-	local node = self.node
+	local navigator = self.navigator
+	local noteSkinListView = self.noteSkinListView
 	local config = self.configModel:getConfig("input")
 
-	local navigator = InputNavigator:new()
-	self.navigator = navigator
-	navigator.config = config
-	navigator.view = self
+	navigator.noteChartModel = self.noteChartModel
+	navigator.inputModel = self.inputModel
 
-	local inputListView = InputListView:new()
-	inputListView.navigator = navigator
-	inputListView.config = config
-	inputListView.view = self
+	noteSkinListView.navigator = navigator
+	noteSkinListView.noteChartModel = self.noteChartModel
+	noteSkinListView.inputModel = self.inputModel
+	noteSkinListView.configInput = config
 
-	local backgroundView = BackgroundView:new()
-	backgroundView.view = self
+	local sequenceView = self.sequenceView
+	sequenceView:setView("InputListView", noteSkinListView)
 
-	node:node(backgroundView)
-	node:node(inputListView)
-
-	navigator:load()
-end
-
-InputView.unload = function(self)
-	self.navigator:unload()
-end
-
-InputView.receive = function(self, event)
-	self.node:callnext(event.name, event)
-	self.navigator:receive(event)
-end
-
-InputView.update = function(self, dt)
-	self.node:callnext("update")
-	self.navigator:update()
-end
-
-InputView.draw = function(self)
-	self.node:callnext("draw")
+	ScreenView.load(self)
 end
 
 return InputView
