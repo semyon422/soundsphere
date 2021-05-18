@@ -8,7 +8,7 @@ Switch.x = 0
 Switch.y = 0
 Switch.w = 0
 Switch.h = 0
-Switch.value = 0
+Switch.value = false
 Switch.pressed = false
 
 Switch.setPosition = function(self, x, y, w, h)
@@ -27,7 +27,7 @@ Switch.receive = function(self, event)
 		if belong(mx, x, x + w) and belong(my, y, y + h) then
 			local button = event.args[3]
 			if button == 1 then
-				self.value = self.value == 0 and 1 or 0
+				self.value = not self.value
 				self.valueUpdated = true
 			end
 		end

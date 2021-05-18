@@ -181,10 +181,16 @@ ModifierModel.increaseModifierValue = function(self, modifierConfig, delta)
 	local modifier = self:getModifier(modifierConfig)
 	if type(modifier.defaultValue) == "number" then
 		modifier:setValue(modifierConfig, modifierConfig.value + delta * modifier.step)
-		return
+	elseif type(modifier.defaultValue) == "boolean" then
+		local value = false
+		if delta == 1 then
+			value = true
+		end
+		modifier:setValue(modifierConfig, value)
+	elseif type(modifier.defaultValue) == "string" then
+		local indexValue = modifier:toIndexValue(modifierConfig.value)
+		modifier:setValue(modifierConfig, modifier:fromIndexValue(indexValue + delta * modifier.step))
 	end
-	local indexValue = modifier:toIndexValue(modifierConfig.value)
-	modifier:setValue(modifierConfig, modifier:fromIndexValue(indexValue + delta * modifier.step))
 end
 
 ModifierModel.apply = function(self, modifierType)

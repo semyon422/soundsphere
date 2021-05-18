@@ -47,8 +47,6 @@ SettingsModel.increaseValue = function(self, settingConfig, delta)
 		self.config[section][key] = math.min(math.max(value + settingConfig.step * delta, settingConfig.range[1]), settingConfig.range[2])
 	elseif settingConfig.type == "stepper" then
 		self.config[section][key] = settingConfig.values[math.min(math.max(self:getValue(settingConfig) + delta, 1), #settingConfig.values)]
-	elseif settingConfig.type == "switch" then
-		self.config[section][key] = math.min(math.max(value + delta, 0), 1)
 	end
 end
 
@@ -85,7 +83,7 @@ SettingsModel.getDisplayValue = function(self, settingConfig)
 	if settingConfig.type == "slider" then
 		return settingConfig.format:format(map(value, range[1], range[2], displayRange[1], displayRange[2]))
 	elseif settingConfig.type == "switch" then
-		return value == 0 and displayRange[1] or displayRange[2]
+		return value and displayRange[2] or displayRange[1]
 	end
 	return ""
 end

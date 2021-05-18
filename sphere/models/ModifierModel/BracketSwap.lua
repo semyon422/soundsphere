@@ -5,6 +5,7 @@ local BracketSwap = SwapModifier:new()
 BracketSwap.type = "NoteChartModifier"
 BracketSwap.interfaceType = "toggle"
 
+BracketSwap.defaultValue = true
 BracketSwap.name = "BracketSwap"
 BracketSwap.shortName = "BS"
 

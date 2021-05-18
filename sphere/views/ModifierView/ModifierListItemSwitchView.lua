@@ -17,8 +17,8 @@ ModifierListItemSwitchView.getValue = function(self)
 	return self.item.value
 end
 
-ModifierListItemSwitchView.increaseValue = function(self, delta)
-	self.listView.navigator:increaseModifierValue(self.itemIndex, delta)
+ModifierListItemSwitchView.setValue = function(self, value)
+	self.listView.navigator:setModifierValue(self.item, value)
 end
 
 ModifierListItemSwitchView.mousepressed = function(self, event)

@@ -6,11 +6,12 @@ local AutoKeySound = Modifier:new()
 AutoKeySound.type = "NoteChartModifier"
 AutoKeySound.interfaceType = "toggle"
 
+AutoKeySound.defaultValue = true
 AutoKeySound.name = "AutoKeySound"
 AutoKeySound.shortName = "AKS"
 
 AutoKeySound.apply = function(self, config)
-	if config.value == 0 then
+	if not config.value then
 		return
 	end
 

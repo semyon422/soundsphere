@@ -53,7 +53,7 @@ end
 
 SettingsNavigator.scrollSettings = function(self, direction)
 	direction = direction == "up" and -1 or 1
-	local settings = self.view.settingsModel.sections[self.sectionItemIndex]
+	local settings = self.settingsModel.sections[self.sectionItemIndex]
 
 	if not settings[self.settingItemIndex + direction] then
 		return
@@ -63,12 +63,22 @@ SettingsNavigator.scrollSettings = function(self, direction)
 end
 
 SettingsNavigator.increaseSettingValue = function(self, itemIndex, delta)
-	local settings = self.view.settingsModel.sections[self.sectionItemIndex]
+	local settings = self.settingsModel.sections[self.sectionItemIndex]
 	local settingConfig = settings[itemIndex or self.settingItemIndex]
 	self:send({
 		name = "increaseSettingValue",
 		settingConfig = settingConfig,
 		delta = delta
+	})
+end
+
+SettingsNavigator.setSettingValue = function(self, itemIndex, value)
+	local settings = self.settingsModel.sections[self.sectionItemIndex]
+	local settingConfig = settings[itemIndex or self.settingItemIndex]
+	self:send({
+		name = "setSettingValue",
+		settingConfig = settingConfig,
+		value = value
 	})
 end
 

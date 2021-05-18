@@ -6,7 +6,7 @@ SwitchView.x = 0
 SwitchView.y = 0
 SwitchView.w = 0
 SwitchView.h = 0
-SwitchView.value = 0
+SwitchView.value = false
 
 SwitchView.setPosition = function(self, x, y, w, h)
 	self.x, self.y, self.w, self.h = x, y, w, h
@@ -23,7 +23,7 @@ SwitchView.draw = function(self)
 	love.graphics.setLineStyle("smooth")
 	love.graphics.setLineWidth(1)
 
-	if self.value == 1 then
+	if self.value then
 		love.graphics.circle(
 			"fill",
 			x + w - h / 2,

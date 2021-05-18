@@ -5,11 +5,12 @@ local ProMode = Modifier:new()
 ProMode.type = "LogicEngineModifier"
 ProMode.interfaceType = "toggle"
 
+ProMode.defaultValue = true
 ProMode.name = "ProMode"
 ProMode.shortName = "PRO"
 
 ProMode.apply = function(self, config)
-	if config.value == 0 then
+	if not config.value then
 		return
 	end
 	self.rhythmModel.logicEngine.promode = true

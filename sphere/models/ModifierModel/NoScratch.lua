@@ -5,11 +5,12 @@ local NoScratch = Modifier:new()
 NoScratch.type = "NoteChartModifier"
 NoScratch.interfaceType = "toggle"
 
+NoScratch.defaultValue = true
 NoScratch.name = "NoScratch"
 NoScratch.shortName = "NSC"
 
 NoScratch.apply = function(self, config)
-	if config.value == 0 then
+	if not config.value then
 		return
 	end
 

@@ -9,8 +9,8 @@ timeToPrepare = 2
 inputOffset = 0
 visualOffset = 0
 needTimeRound = 1
-videobga = 0
-imagebga = 1
+videobga = false
+imagebga = true
 
 [graphics]
 dimSelect = 0.5
@@ -24,7 +24,7 @@ previewAudioMode = "streamOpenAL"
 volumeGlobal = 1
 volumeMusic = 1
 volumeEffects = 1
-midiConstantVolume = 0
+midiConstantVolume = false
 
 [input]
 pause = "escape"

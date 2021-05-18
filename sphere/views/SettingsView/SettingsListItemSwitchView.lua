@@ -17,8 +17,8 @@ SettingsListItemSwitchView.getValue = function(self)
 	return self.listView.settingsModel:getValue(self.item)
 end
 
-SettingsListItemSwitchView.increaseValue = function(self, delta)
-	self.listView.navigator:increaseSettingValue(self.itemIndex, delta)
+SettingsListItemSwitchView.setValue = function(self, value)
+	self.listView.navigator:setSettingValue(self.itemIndex, value)
 end
 
 SettingsListItemSwitchView.mousepressed = function(self, event)

@@ -6,6 +6,7 @@ local WindUp = Modifier:new()
 WindUp.type = "TimeEngineModifier"
 WindUp.interfaceType = "toggle"
 
+WindUp.defaultValue = true
 WindUp.name = "WindUp"
 WindUp.shortName = "WU"
 
@@ -17,7 +18,7 @@ WindUp.apply = function(self, config)
 end
 
 WindUp.update = function(self, config)
-	if config.value == 0 then
+	if not config.value then
 		return
 	end
 

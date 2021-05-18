@@ -6,6 +6,7 @@ local ToOsu = Modifier:new()
 ToOsu.type = "NoteChartModifier"
 ToOsu.interfaceType = "toggle"
 
+ToOsu.defaultValue = true
 ToOsu.name = "ToOsu"
 ToOsu.shortName = "OSU"
 

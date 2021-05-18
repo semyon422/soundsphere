@@ -12,7 +12,7 @@ end
 
 ListItemSwitchView.getName = function(self) end
 ListItemSwitchView.getValue = function(self) end
-ListItemSwitchView.increaseValue = function(self, delta) end
+ListItemSwitchView.setValue = function(self, delta) end
 
 ListItemSwitchView.draw = function(self)
 	local config = self.listView.config
@@ -43,12 +43,16 @@ ListItemSwitchView.receive = function(self, event)
 	switch:receive(event)
 
 	if switch.valueUpdated then
-		if switch.value == 0 then
-			self:increaseValue(-1)
-		else
-			self:increaseValue(1)
-		end
+		self:setValue(switch.value)
 		switch.valueUpdated = false
+	end
+end
+
+ListItemSwitchView.increaseValue = function(self, delta)
+	if delta == 1 then
+		self:setValue(true)
+	elseif delta == -1 then
+		self:setValue(false)
 	end
 end
 

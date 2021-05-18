@@ -5,6 +5,7 @@ local AutoPlay = Modifier:new()
 AutoPlay.type = "LogicEngineModifier"
 AutoPlay.interfaceType = "toggle"
 
+AutoPlay.defaultValue = true
 AutoPlay.name = "AutoPlay"
 AutoPlay.shortName = "AP"
 
