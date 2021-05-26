@@ -182,6 +182,15 @@ SettingsList.setGeneralItems = function(self)
 		step = 25,
 		format = "%d"
 	}
+	items[#items + 1] = {
+		name = "scale scroll speed",
+		configKey = "gameplay.scaleScroll",
+		type = "checkbox",
+		minValue = false,
+		maxValue = true,
+		minDisplayValue = "disabled",
+		maxDisplayValue = "enabled"
+	}
 
 	return self:setItems(items)
 end

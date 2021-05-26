@@ -20,6 +20,7 @@ end
 
 NoteSkin.visualTimeRate = 1
 NoteSkin.targetVisualTimeRate = 1
+NoteSkin.scaleScroll = false
 NoteSkin.timeRate = 1
 
 NoteSkin.load = function(self)
@@ -53,7 +54,10 @@ NoteSkin.setVisualTimeRate = function(self, visualTimeRate)
 end
 
 NoteSkin.getVisualTimeRate = function(self)
-	return self.visualTimeRate / math.abs(self.timeRate)
+	if not self.scaleScroll then
+		return self.visualTimeRate / math.abs(self.timeRate)
+	end
+	return self.visualTimeRate
 end
 
 NoteSkin.checkNote = function(self, note)

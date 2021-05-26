@@ -79,6 +79,7 @@ GameplayController.load = function(self)
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
 	noteSkin.visualTimeRate = configModel:get("speed")
 	noteSkin.targetVisualTimeRate = configModel:get("speed")
+	noteSkin.scaleScroll = configModel:get("gameplay.scaleScroll")
 	noteSkin:load()
 	rhythmModel:setNoteSkin(noteSkin)
 	view.noteSkin = noteSkin

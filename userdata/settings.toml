@@ -15,6 +15,7 @@ increaseTimeRate = "f6"
 quickRestart = "`"
 timeToPrepare = 2
 decreasePlaySpeed = "f3"
+scaleScroll = false
 [screenshot]
 capture = "f12"
 open = "lshift"
