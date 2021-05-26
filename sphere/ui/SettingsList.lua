@@ -191,6 +191,15 @@ SettingsList.setGeneralItems = function(self)
 		minDisplayValue = "disabled",
 		maxDisplayValue = "enabled"
 	}
+	items[#items + 1] = {
+		name = "scale input offset",
+		configKey = "gameplay.scaleInputOffset",
+		type = "checkbox",
+		minValue = false,
+		maxValue = true,
+		minDisplayValue = "disabled",
+		maxDisplayValue = "enabled"
+	}
 
 	return self:setItems(items)
 end

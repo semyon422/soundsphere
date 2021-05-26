@@ -55,6 +55,7 @@ RhythmModel.load = function(self)
 
 	inputManager.observable:add(logicEngine)
 	inputManager.observable:add(replayModel)
+	inputManager.timeEngine = timeEngine
 
 	replayModel.observable:add(inputManager)
 	replayModel.timeEngine = timeEngine
@@ -241,6 +242,10 @@ end
 
 RhythmModel.setScoreBasePath = function(self, path)
 	self.scoreEngine:setBasePath(path)
+end
+
+RhythmModel.setScaleInputOffset = function(self, scaleInputOffset)
+	self.inputManager:setScaleInputOffset(scaleInputOffset)
 end
 
 return RhythmModel

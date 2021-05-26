@@ -68,6 +68,7 @@ GameplayController.load = function(self)
 	rhythmModel:setTimeToPrepare(configModel:get("gameplay.timeToPrepare"))
 	rhythmModel:setInputOffset(configModel:get("gameplay.inputOffset"))
 	rhythmModel:setVisualOffset(configModel:get("gameplay.visualOffset"))
+	rhythmModel:setScaleInputOffset(configModel:get("gameplay.scaleInputOffset"))
 
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
 	rhythmModel:load()
