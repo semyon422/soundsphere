@@ -51,6 +51,7 @@ RhythmModel.load = function(self)
 
 	audioEngine.timeEngine = timeEngine
 
+	graphicEngine.timeEngine = timeEngine
 	graphicEngine.logicEngine = logicEngine
 
 	inputManager.observable:add(logicEngine)
@@ -246,6 +247,10 @@ end
 
 RhythmModel.setScaleInputOffset = function(self, scaleInputOffset)
 	self.inputManager:setScaleInputOffset(scaleInputOffset)
+end
+
+RhythmModel.setScaleVisualOffset = function(self, scaleVisualOffset)
+	self.graphicEngine:setScaleVisualOffset(scaleVisualOffset)
 end
 
 return RhythmModel

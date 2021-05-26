@@ -24,7 +24,7 @@ LongGraphicalNote.computeTimeState = function(self)
 	self.startTimeState = self.startTimeState or {}
 	local startTimeState = self.startTimeState
 
-	local currentTime = self.graphicEngine.currentTime + self.graphicEngine.offset
+	local currentTime = self.graphicEngine.currentTime + self.graphicEngine:getVisualOffset()
 
 	startTimeState.currentTime = currentTime
 
@@ -54,7 +54,7 @@ LongGraphicalNote.computeTimeState = function(self)
 end
 
 LongGraphicalNote.updateFakeStartTime = function(self)
-	local currentTime = self.graphicEngine.currentTime + self.graphicEngine.offset
+	local currentTime = self.graphicEngine.currentTime + self.graphicEngine:getVisualOffset()
 	local startTime = self.startNoteData.timePoint.absoluteTime
 	local endTime = self.endNoteData.timePoint.absoluteTime
 	self.fakeStartTime = currentTime > startTime and currentTime or startTime
