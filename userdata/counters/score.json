@@ -28,6 +28,10 @@
 			"key": "average_ms"
 		},
 		{
+			"path": "average.lua",
+			"key": "mean"
+		},
+		{
 			"path": "normalscore.lua",
 			"hitTimingWindow": 0.16
 		},

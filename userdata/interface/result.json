@@ -237,6 +237,21 @@
 	},
 	{
 		"name": "ScoreDisplayPerformance",
+		"class": "ScoreDisplay", "field": "mean",
+		"format": "%0.1f   ms",
+		"x": 0,
+		"y": 0.20,
+		"w": 1,
+		"h": 1,
+		"layer": 20,
+		"align": {"x": "right", "y": "top"},
+		"color": [255, 255, 255, 255],
+		"font": "resources/fonts/SourceCodePro-Regular.ttf",
+		"size": 26,
+		"cs": [0, 0, 0, 0, "all"]
+	},
+	{
+		"name": "ScoreDisplayPerformance",
 		"class": "ScoreDisplay", "field": "enps",
 		"format": "%0.2f enps",
 		"x": 0,

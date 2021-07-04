@@ -3,7 +3,8 @@ local values
 load = function()
 	scoreTable[config.key] = 0
 	values = {}
-	for i = 1, config.count do
+	local count = config.count or #values
+	for i = 1, count do
 		values[i] = 0
 	end
 end
@@ -13,10 +14,11 @@ add = function(dt)
 	table.insert(values, dt)
 
 	local sum = 0
-	for i = 1, config.count do
+	local count = config.count or #values
+	for i = 1, count do
 		sum = sum + values[i]
 	end
-	scoreTable[config.key] = sum / config.count * 1000
+	scoreTable[config.key] = sum / count * 1000
 end
 
 receive = function(event)
