@@ -10,7 +10,9 @@ load = function()
 end
 
 add = function(dt)
-	table.remove(values, 1)
+	if config.count then
+		table.remove(values, 1)
+	end
 	table.insert(values, dt)
 
 	local sum = 0
