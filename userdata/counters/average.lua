@@ -1,20 +1,26 @@
-local count, sum
+local values
 
 load = function()
-	scoreTable.accuracy = 0
-	scoreTable.lastHitDeltaTime = 0
-
-	count, sum = 0, 0
+	scoreTable[config.key] = 0
+	values = {}
+	local count = config.count or #values
+	for i = 1, count do
+		values[i] = 0
+	end
 end
 
-local increase = function(deltaTime, sumMul, countMul)
-	scoreTable.lastHitDeltaTime = deltaTime
-	sum = sum + sumMul * deltaTime ^ 2
-	count = count + countMul
-end
+add = function(dt)
+	if config.count then
+		table.remove(values, 1)
+	end
+	table.insert(values, dt)
 
-local update = function()
-	scoreTable.accuracy = 1000 * math.sqrt(sum / count)
+	local sum = 0
+	local count = config.count or #values
+	for i = 1, count do
+		sum = sum + values[i]
+	end
+	scoreTable[config.key] = sum / count * 1000
 end
 
 receive = function(event)
@@ -29,7 +35,7 @@ receive = function(event)
 		end
 		local deltaTime = (event.currentTime - event.noteTime) / math.abs(event.timeRate)
 		if newState == "passed" then
-			increase(deltaTime, 1, 1)
+			add(deltaTime)
 		elseif newState == "missed" then
 		end
 	elseif event.noteType == "LongScoreNote" then
@@ -39,7 +45,7 @@ receive = function(event)
 		local deltaTime = (event.currentTime - event.noteStartTime) / math.abs(event.timeRate)
 		if oldState == "clear" then
 			if newState == "startPassedPressed" then
-				increase(deltaTime, 1, 1)
+				add(deltaTime)
 			elseif newState == "startMissed" then
 			elseif newState == "startMissedPressed" then
 			end
@@ -59,6 +65,4 @@ receive = function(event)
 			end
 		end
 	end
-	update()
 end
-

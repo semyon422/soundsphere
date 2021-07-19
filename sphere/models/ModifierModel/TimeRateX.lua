@@ -16,7 +16,9 @@ TimeRateX.variableRange = {0.5, 0.05, 2}
 TimeRateX.value = 1
 
 TimeRateX.tostring = function(self)
-	return self.value .. "X"
+    if self.value ~= 1 then
+		return self.value .. "X"
+    end
 end
 
 TimeRateX.tojson = function(self)

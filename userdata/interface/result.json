@@ -114,6 +114,23 @@
 	},
 
 	{
+		"name": "ScoreDisplayFailed",
+		"class": "ScoreDisplay", "field": "failed",
+		"type": "boolean",
+		"trueValue": "Failed",
+		"falseValue": "Passed",
+		"x": 0.025,
+		"y": 0.9,
+		"w": 1,
+		"h": 0.05,
+		"layer": 20,
+		"align": {"x": "left", "y": "center"},
+		"color": [255, 255, 255, 255],
+		"font": "resources/fonts/SourceCodePro-Semibold.ttf",
+		"size": 26,
+		"cs": [0, 0, 0, 0, "all"]
+	},
+	{
 		"name": "ScoreDisplayScore",
 		"class": "ScoreDisplay", "field": "score",
 		"format": "%07d",
@@ -220,6 +237,21 @@
 	},
 	{
 		"name": "ScoreDisplayPerformance",
+		"class": "ScoreDisplay", "field": "mean",
+		"format": "%0.1f   ms",
+		"x": 0,
+		"y": 0.20,
+		"w": 1,
+		"h": 1,
+		"layer": 20,
+		"align": {"x": "right", "y": "top"},
+		"color": [255, 255, 255, 255],
+		"font": "resources/fonts/SourceCodePro-Regular.ttf",
+		"size": 26,
+		"cs": [0, 0, 0, 0, "all"]
+	},
+	{
+		"name": "ScoreDisplayPerformance",
 		"class": "ScoreDisplay", "field": "enps",
 		"format": "%0.2f enps",
 		"x": 0,
@@ -306,6 +338,21 @@
 		"color": [255, 255, 255, 255],
 		"font": "resources/fonts/SourceCodePro-Bold.ttf",
 		"size": 28,
+		"cs": [0, 0, 0, 0, "all"]
+	},
+	{
+		"name": "ScoreDisplayNormalScore",
+		"class": "ScoreDisplay", "field": "normalscore_score",
+		"format": "%07d",
+		"x": 0,
+		"y": 0.15,
+		"w": 1,
+		"h": 1,
+		"layer": 20,
+		"align": {"x": "right", "y": "top"},
+		"color": [255, 255, 255, 255],
+		"font": "resources/fonts/SourceCodePro-Regular.ttf",
+		"size": 26,
 		"cs": [0, 0, 0, 0, "all"]
 	},
 	{

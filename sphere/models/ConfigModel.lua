@@ -20,17 +20,14 @@ end
 ConfigModel.read = function(self)
 	local info = love.filesystem.getInfo(self.path)
 	if info and info.size ~= 0 then
-		local file = io.open(self.path, "r")
-		self:setTable(json.decode(file:read("*all")))
-		file:close()
+		local contents = love.filesystem.read(self.path)
+		self:setTable(json.decode(contents))
 	end
 	self:setDefaultValues()
 end
 
 ConfigModel.write = function(self)
-	local file = io.open(self.path, "w")
-	file:write(json.encode(self.data))
-	return file:close()
+	love.filesystem.write(self.path, json.encode(self.data))
 end
 
 ConfigModel.get = function(self, key)

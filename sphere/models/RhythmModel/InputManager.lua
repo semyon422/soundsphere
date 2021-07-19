@@ -8,6 +8,7 @@ InputManager.path = "userdata/input.json"
 
 InputManager.mode = "external"
 InputManager.needRound = true
+InputManager.scaleInputOffset = false
 InputManager.offset = 0
 
 InputManager.types = {
@@ -27,6 +28,10 @@ end
 
 InputManager.setInputOffset = function(self, offset)
 	self.offset = offset
+end
+
+InputManager.setScaleInputOffset = function(self, scaleInputOffset)
+	self.scaleInputOffset = scaleInputOffset
 end
 
 InputManager.setBindings = function(self, inputBindings)
@@ -64,9 +69,9 @@ InputManager.receive = function(self, event)
 
 	local keyConfig
 	if event.name == "keypressed" and self.inputConfig.press.keyboard then
-		keyConfig = self.inputConfig.press.keyboard[event.args[1]]
+		keyConfig = self.inputConfig.press.keyboard[event.args[2]]
 	elseif event.name == "keyreleased" and self.inputConfig.release.keyboard then
-		keyConfig = self.inputConfig.release.keyboard[event.args[1]]
+		keyConfig = self.inputConfig.release.keyboard[event.args[2]]
 	elseif event.name == "gamepadpressed" then
 		keyConfig = self.inputConfig.press.gamepad[tostring(event.args[2])]
 	elseif event.name == "gamepadreleased" then
@@ -89,13 +94,18 @@ InputManager.receive = function(self, event)
 		eventTime =  math.floor(self.currentTime * 1024) / 1024
 	end
 
+	local offset = self.offset
+	if self.scaleInputOffset then
+		offset = offset * self.timeEngine.timeRate
+	end
+
 	local events = {}
 	for _, key in ipairs(keyConfig.press) do
 		events[#events + 1] = {
 			name = "keypressed",
 			args = {key},
 			virtual = true,
-			time = eventTime + self.offset
+			time = eventTime + offset
 		}
 	end
 	for _, key in ipairs(keyConfig.release) do
@@ -103,7 +113,7 @@ InputManager.receive = function(self, event)
 			name = "keyreleased",
 			args = {key},
 			virtual = true,
-			time = eventTime + self.offset
+			time = eventTime + offset
 		}
 	end
 	for _, event in ipairs(events) do

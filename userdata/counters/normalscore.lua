@@ -1,20 +1,23 @@
-local count, sum
+local normalscore = require("libchart.normalscore")
+
+local ns
 
 load = function()
-	scoreTable.accuracy = 0
-	scoreTable.lastHitDeltaTime = 0
-
-	count, sum = 0, 0
+	scoreTable.normalscore_accuracy = 0
+	scoreTable.normalscore_score = 0
+	scoreTable.normalscore_hit_count = 0
+	scoreTable.normalscore_miss_count = 0
+	scoreTable.normalscore_accuracy_sum = 0
+	ns = normalscore:new()
 end
 
-local increase = function(deltaTime, sumMul, countMul)
-	scoreTable.lastHitDeltaTime = deltaTime
-	sum = sum + sumMul * deltaTime ^ 2
-	count = count + countMul
-end
-
-local update = function()
-	scoreTable.accuracy = 1000 * math.sqrt(sum / count)
+local increase = function(deltaTime, timeRate)
+	ns:hit(deltaTime, config.hitTimingWindow)
+	scoreTable.normalscore_accuracy = ns.score * 1e3
+	scoreTable.normalscore_score = ns.score * 1e6 / math.abs(timeRate)
+	scoreTable.normalscore_hit_count = ns.hit_count
+	scoreTable.normalscore_miss_count = ns.miss_count
+	scoreTable.normalscore_accuracy_sum = ns.accuracy_sum
 end
 
 receive = function(event)
@@ -28,8 +31,8 @@ receive = function(event)
 			return
 		end
 		local deltaTime = (event.currentTime - event.noteTime) / math.abs(event.timeRate)
+		increase(deltaTime, event.timeRate)
 		if newState == "passed" then
-			increase(deltaTime, 1, 1)
 		elseif newState == "missed" then
 		end
 	elseif event.noteType == "LongScoreNote" then
@@ -38,8 +41,8 @@ receive = function(event)
 		end
 		local deltaTime = (event.currentTime - event.noteStartTime) / math.abs(event.timeRate)
 		if oldState == "clear" then
+			increase(deltaTime, event.timeRate)
 			if newState == "startPassedPressed" then
-				increase(deltaTime, 1, 1)
 			elseif newState == "startMissed" then
 			elseif newState == "startMissedPressed" then
 			end
@@ -59,6 +62,5 @@ receive = function(event)
 			end
 		end
 	end
-	update()
 end
 

@@ -18,6 +18,7 @@ ResultView.load = function(self)
 
 	gui.container = container
 	gui.modifierModel = self.modifierModel
+	gui.root = ""
 
 	gui.scoreSystem = self.scoreSystem
 	gui.noteChartModel = noteChartModel

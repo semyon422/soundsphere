@@ -5,6 +5,7 @@ local NoteDrawer		= require("sphere.models.RhythmModel.GraphicEngine.NoteDrawer"
 local GraphicEngine = Class:new()
 
 GraphicEngine.offset = 0
+GraphicEngine.scaleVisualOffset = false
 
 GraphicEngine.construct = function(self)
 	self.observable = Observable:new()
@@ -50,6 +51,17 @@ end
 
 GraphicEngine.setVisualOffset = function(self, offset)
 	self.offset = offset
+end
+
+GraphicEngine.getVisualOffset = function(self)
+	if not self.scaleVisualOffset then
+		return self.offset
+	end
+	return self.offset * self.timeEngine.timeRate
+end
+
+GraphicEngine.setScaleVisualOffset = function(self, scaleVisualOffset)
+	self.scaleVisualOffset = scaleVisualOffset
 end
 
 GraphicEngine.getLogicalNote = function(self, noteData)

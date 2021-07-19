@@ -8,6 +8,7 @@ local WindUp		= require("sphere.models.ModifierModel.WindUp")
 local SpeedMode		= require("sphere.models.ModifierModel.SpeedMode")
 local TimeRateQ		= require("sphere.models.ModifierModel.TimeRateQ")
 local TimeRateX		= require("sphere.models.ModifierModel.TimeRateX")
+local AudioClip		= require("sphere.models.ModifierModel.AudioClip")
 local NoScratch		= require("sphere.models.ModifierModel.NoScratch")
 local Mirror		= require("sphere.models.ModifierModel.Mirror")
 local Random		= require("sphere.models.ModifierModel.Random")
@@ -32,6 +33,7 @@ ModifierModel.modifiers = {
 	SpeedMode,
 	TimeRateQ,
 	TimeRateX,
+	AudioClip,
 	WindUp,
 	NoScratch,
 	NoLongNote,
@@ -62,6 +64,7 @@ ModifierModel.inconsequentialClassList = {
 	SpeedMode,
 	TimeRateQ,
 	TimeRateX,
+	AudioClip,
 	WindUp,
 	NoScratch,
 	NoLongNote,
@@ -75,18 +78,15 @@ ModifierModel.path = "userdata/modifiers.json"
 ModifierModel.load = function(self)
 	local info = love.filesystem.getInfo(self.path)
 	if info and info.size ~= 0 then
-		local file = io.open(self.path, "r")
-		local jsonObject = json.decode(file:read("*all"))
-		file:close()
+		local contents = love.filesystem.read(self.path)
+		local jsonObject = json.decode(contents)
 
         self:fromTable(jsonObject)
 	end
 end
 
 ModifierModel.unload = function(self)
-	local file = io.open(self.path, "w")
-	file:write(self:toJson())
-	return file:close()
+	love.filesystem.write(self.path, self:toJson())
 end
 
 ModifierModel.addInconsequential = function(self)
@@ -98,7 +98,12 @@ ModifierModel.addInconsequential = function(self)
 		modifier.enabled = false
 		modifier.Class = Modifier
 		list[#list + 1] = modifier
-		if Modifier == TimeRateX or Modifier == TimeRateQ or Modifier == SpeedMode then
+		if
+			Modifier == TimeRateX or
+			Modifier == TimeRateQ or
+			Modifier == SpeedMode or
+			Modifier == AudioClip
+		then
 			modifier.enabled = true
 		end
 	end
@@ -178,7 +183,10 @@ ModifierModel.getString = function(self)
 	local out = {}
 
 	for _, modifier in ipairs(self:getEnabledModifiers()) do
-		out[#out + 1] = modifier:tostring()
+		local s = modifier:tostring()
+		if s then
+			out[#out + 1] = s
+		end
 	end
 
 	return table.concat(out, ", ")

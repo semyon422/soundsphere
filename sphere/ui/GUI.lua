@@ -6,6 +6,7 @@ local Button				= require("sphere.ui.Button")
 local ImageButton			= require("sphere.ui.ImageButton")
 local PointGraph			= require("sphere.ui.PointGraph")
 local ProgressBar			= require("sphere.ui.ProgressBar")
+local HpBar			= require("sphere.ui.HpBar")
 local InputImage			= require("sphere.ui.InputImage")
 local ScoreDisplay			= require("sphere.ui.ScoreDisplay")
 local StaticObject			= require("sphere.ui.StaticObject")
@@ -32,6 +33,7 @@ GUI.classes = {
 	ImageButton = ImageButton,
 	PointGraph = PointGraph,
 	ProgressBar = ProgressBar,
+	HpBar = HpBar,
 	InputImage = InputImage,
 	ScoreDisplay = ScoreDisplay,
 	StaticObject = StaticObject,
@@ -54,9 +56,8 @@ GUI.functions = {
 GUI.functions.__index = GUI.functions
 
 GUI.load = function(self, path)
-	local file = io.open(path, "r")
-	local t = json.decode(file:read("*all"))
-	file:close()
+	local contents = love.filesystem.read(path)
+	local t = json.decode(contents)
 
 	self:loadTable(t)
 end

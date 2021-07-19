@@ -20,9 +20,8 @@ ScoreSystem.setBasePath = function(self, path)
 end
 
 ScoreSystem.loadConfig = function(self, path)
-	local file = io.open(self.basePath .. "/" .. path, "r")
-	self.scoreConfig = json.decode(file:read("*all"))
-	file:close()
+	local contents = love.filesystem.read(self.basePath .. "/" .. path)
+	self.scoreConfig = json.decode(contents)
 
 	self.scoreTable = {
 		timeRate = 1

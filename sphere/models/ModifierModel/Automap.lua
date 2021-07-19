@@ -328,6 +328,7 @@ Automap.processUpscaler = function(self)
 		layerDataSequence:increaseInputCount(tNoteData.noteData.inputType, tNoteData.noteData.inputIndex, 1)
 		if tNoteData.long then
 			tNoteData.noteData.endNoteData.inputIndex = tNoteData.columnIndex
+			layerDataSequence:increaseInputCount(tNoteData.noteData.inputType, tNoteData.noteData.endNoteData.inputIndex, 1)
 		end
 	end
 
@@ -369,6 +370,7 @@ Automap.processReductor = function(self)
 		end
 		if tNoteData.long and tNoteData.startTime ~= tNoteData.endTime then
 			tNoteData.noteData.endNoteData.inputIndex = tNoteData.columnIndex
+			layerDataSequence:increaseInputCount(tNoteData.noteData.inputType, tNoteData.noteData.endNoteData.inputIndex, 1)
 			local timePoint = self.noteChart:requireLayerData(1):getTimePoint(
 				tNoteData.endTime / 1000,
 				tNoteData.noteData.endNoteData.timePoint.side
@@ -383,6 +385,7 @@ Automap.processReductor = function(self)
 		noteData.noteType = "SoundNote"
 		noteData.inputType = "auto"
 		noteData.inputIndex = 0
+		layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, 1)
 
 		if tNoteData.long then
 			tNoteData.noteData.endNoteData.noteType = "Ignore"

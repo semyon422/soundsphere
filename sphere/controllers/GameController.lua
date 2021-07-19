@@ -20,6 +20,7 @@ local NotificationModel			= require("sphere.models.NotificationModel")
 local ThemeModel				= require("sphere.models.ThemeModel")
 local OnlineModel				= require("sphere.models.OnlineModel")
 local CacheModel				= require("sphere.models.CacheModel")
+local FrameTimeView				= require("sphere.views.FrameTimeView")
 
 local GameController = Class:new()
 
@@ -36,6 +37,7 @@ GameController.construct = function(self)
 	self.scoreModel = ScoreModel:new()
 	self.onlineModel = OnlineModel:new()
 	self.cacheModel = CacheModel:new()
+	self.frameTimeView = FrameTimeView:new()
 end
 
 GameController.load = function(self)
@@ -83,6 +85,7 @@ GameController.load = function(self)
 	onlineController:load()
 
 	DiscordPresence:load()
+	self.frameTimeView:load()
 
 	ScreenManager:setTransition(FadeTransition)
 
@@ -107,6 +110,8 @@ GameController.unload = function(self)
 end
 
 GameController.update = function(self, dt)
+	local startTime = love.timer.getTime()
+
 	ThreadPool:update()
 
 	DiscordPresence:update()
@@ -114,15 +119,24 @@ GameController.update = function(self, dt)
 	ScreenManager:update(dt)
 	self.notificationView:update(dt)
 	self.onlineController:update()
+
+	self.frameTimeView.updateFrameTime = love.timer.getTime() - startTime
 end
 
 GameController.draw = function(self)
+	local startTime = love.timer.getTime()
+
 	BackgroundManager:draw()
 	ScreenManager:draw()
 	self.notificationView:draw()
+	self.frameTimeView:draw()
+
+	self.frameTimeView.drawFrameTime = love.timer.getTime() - startTime
 end
 
 GameController.receive = function(self, event)
+	local startTime = love.timer.getTime()
+
 	if event.name == "update" then
 		self:update(event.args[1])
 	elseif event.name == "draw" then
@@ -140,6 +154,9 @@ GameController.receive = function(self, event)
 	self.screenshot:receive(event)
 	self.mountController:receive(event)
 	self.notificationView:receive(event)
+	self.frameTimeView:receive(event)
+
+	self.frameTimeView.receiveFrameTime = love.timer.getTime() - startTime
 end
 
 return GameController

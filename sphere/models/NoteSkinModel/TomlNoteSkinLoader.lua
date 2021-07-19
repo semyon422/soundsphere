@@ -11,9 +11,8 @@ TomlNoteSkinLoader.path = "userdata/skins"
 TomlNoteSkinLoader.load = function(self, noteSkin)
 	self.noteSkin = noteSkin
 
-	local file = io.open(noteSkin.directoryPath .. "/" .. noteSkin.path, "r")
-	noteSkin.tomlData = toml.parse(file:read("*all"))
-	file:close()
+	local contents = love.filesystem.read(noteSkin.directoryPath .. "/" .. noteSkin.path)
+	noteSkin.tomlData = toml.parse(contents)
 
 	self.unit = noteSkin.tomlData.general.unit
 
@@ -468,18 +467,14 @@ end
 TomlNoteSkinLoader.processPlayFieldData = function(self)
 	local tomlPlayField = self.noteSkin.tomlData.playfield
 	for _, object in pairs(tomlPlayField) do
-		if object.class == "ScoreDisplay" and object.field == "score" then
-			self:addScoreDisplayScore(object)
-		elseif object.class == "ScoreDisplay" and object.field == "accuracy" then
-			self:addScoreDisplayAccuracy(object)
-		elseif object.class == "ScoreDisplay" and object.field == "combo" then
-			self:addScoreDisplayCombo(object)
-		elseif object.class == "ScoreDisplay" and object.field == "timegate" then
-			self:addScoreDisplayTimegate(object)
+		if object.class == "ScoreDisplay" then
+			self:addScoreDisplay(object)
 		elseif object.class == "PointGraph" then
 			self:addPointGraph(object)
 		elseif object.class == "ProgressBar" then
 			self:addProgressBar(object)
+		elseif object.class == "HpBar" then
+			self:addHpBar(object)
 		elseif object.class == "StaticObject" then
 			self:addStaticObject(object)
 		end
@@ -505,76 +500,13 @@ TomlNoteSkinLoader.getPlayFielObjectXYWH = function(self, object)
 	end
 end
 
-TomlNoteSkinLoader.addScoreDisplayScore = function(self, object)
+TomlNoteSkinLoader.addScoreDisplay = function(self, object)
 	local playField = self.noteSkin.playField
 	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
 
 	playField[#playField + 1] = {
 		class = "ScoreDisplay",
-		field = "score",
-		format = object.format,
-		x = x,
-		y = y,
-		w = w,
-		h = h,
-		layer = object.layer,
-		cs = cs,
-		align = {x = object.align[1], y = object.align[2]},
-		color = object.color,
-		font = object.font,
-		size = object.size
-	}
-end
-
-TomlNoteSkinLoader.addScoreDisplayAccuracy = function(self, object)
-	local playField = self.noteSkin.playField
-	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
-
-	playField[#playField + 1] = {
-		class = "ScoreDisplay",
-		field = "accuracy",
-		format = object.format,
-		x = x,
-		y = y,
-		w = w,
-		h = h,
-		layer = object.layer,
-		cs = cs,
-		align = {x = object.align[1], y = object.align[2]},
-		color = object.color,
-		font = object.font,
-		size = object.size
-	}
-end
-
-TomlNoteSkinLoader.addScoreDisplayCombo = function(self, object)
-	local playField = self.noteSkin.playField
-	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
-
-	playField[#playField + 1] = {
-		class = "ScoreDisplay",
-		field = "combo",
-		format = object.format,
-		x = x,
-		y = y,
-		w = w,
-		h = h,
-		layer = object.layer,
-		cs = cs,
-		align = {x = object.align[1], y = object.align[2]},
-		color = object.color,
-		font = object.font,
-		size = object.size
-	}
-end
-
-TomlNoteSkinLoader.addScoreDisplayTimegate = function(self, object)
-	local playField = self.noteSkin.playField
-	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
-
-	playField[#playField + 1] = {
-		class = "ScoreDisplay",
-		field = "timegate",
+		field = object.field,
 		format = object.format,
 		x = x,
 		y = y,
@@ -626,6 +558,24 @@ TomlNoteSkinLoader.addProgressBar = function(self, object)
 	}
 end
 
+TomlNoteSkinLoader.addHpBar = function(self, object)
+	local playField = self.noteSkin.playField
+	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
+
+	playField[#playField + 1] = {
+		class = "HpBar",
+		x = x,
+		y = y,
+		w = w,
+		h = h,
+		layer = object.layer,
+		cs = cs,
+		color = object.color,
+		direction = object.direction,
+		mode = object.mode
+	}
+end
+
 TomlNoteSkinLoader.addStaticObject = function(self, object)
 	local playField = self.noteSkin.playField
 	local x, y, w, h, cs = self:getPlayFielObjectXYWH(object)
@@ -638,7 +588,8 @@ TomlNoteSkinLoader.addStaticObject = function(self, object)
 		h = h,
 		layer = object.layer,
 		cs = cs,
-		image = object.image
+		image = object.image,
+		color = object.color
 	}
 end
 

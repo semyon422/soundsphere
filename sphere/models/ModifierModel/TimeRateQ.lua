@@ -16,7 +16,9 @@ TimeRateQ.variableRange = {-10, 1, 10}
 TimeRateQ.value = 0
 
 TimeRateQ.tostring = function(self)
-	return self.value .. "Q"
+    if self.value ~= 0 then
+		return self.value .. "Q"
+    end
 end
 
 TimeRateQ.tojson = function(self)
