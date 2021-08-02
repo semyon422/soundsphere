@@ -21,6 +21,7 @@ local AutoKeySound	= require("sphere.models.ModifierModel.AutoKeySound")
 local MultiplePlay	= require("sphere.models.ModifierModel.MultiplePlay")
 local MinLnLength	= require("sphere.models.ModifierModel.MinLnLength")
 local Alternate		= require("sphere.models.ModifierModel.Alternate")
+local Alternate2		= require("sphere.models.ModifierModel.Alternate2")
 local MultiOverPlay	= require("sphere.models.ModifierModel.MultiOverPlay")
 local Shift			= require("sphere.models.ModifierModel.Shift")
 
@@ -42,6 +43,7 @@ ModifierModel.modifiers = {
 	MultiplePlay,
 	MultiOverPlay,
 	Alternate,
+	Alternate2,
 	Shift,
 	Mirror,
 	Random,
