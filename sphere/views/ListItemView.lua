@@ -1,4 +1,5 @@
 local spherefonts		= require("sphere.assets.fonts")
+local baseline_print = require("aqua.graphics.baseline_print")
 
 local Class = require("aqua.util.Class")
 
@@ -13,15 +14,13 @@ ListItemView.drawValue = function(self, valueConfig, value)
 	local font = spherefonts.get(valueConfig.fontFamily, valueConfig.fontSize)
 	love.graphics.setFont(font)
 	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.printf(
+	baseline_print(
 		value,
 		cs:X((config.x + valueConfig.x) / screen.h, true),
-		cs:Y((y + valueConfig.y) / screen.h, true),
-		valueConfig.w,
-		valueConfig.align,
-		0,
+		cs:Y((y + valueConfig.baseline) / screen.h, true),
+		valueConfig.limit,
 		cs.one / screen.h,
-		cs.one / screen.h
+		valueConfig.align
 	)
 end
 

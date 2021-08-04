@@ -1,4 +1,5 @@
 local spherefonts		= require("sphere.assets.fonts")
+local baseline_print = require("aqua.graphics.baseline_print")
 
 local Class = require("aqua.util.Class")
 
@@ -15,15 +16,13 @@ NoteSkinListItemView.draw = function(self)
 
 	local font = spherefonts.get(config.name.fontFamily, config.name.fontSize)
 	love.graphics.setFont(font)
-	love.graphics.printf(
+	baseline_print(
 		item.name,
 		cs:X((config.x + config.name.x) / screen.h, true),
-		cs:Y((y + config.name.y) / screen.h, true),
-		config.name.w,
-		config.name.align,
-		0,
+		cs:Y((y + config.name.baseline) / screen.h, true),
+		config.name.limit,
 		cs.one / screen.h,
-		cs.one / screen.h
+		config.name.align
 	)
 
 	if item == self.listView.state.selectedNoteSkin then

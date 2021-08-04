@@ -1,6 +1,7 @@
 local Class = require("aqua.util.Class")
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local spherefonts		= require("sphere.assets.fonts")
+local baseline_print = require("aqua.graphics.baseline_print")
 
 local StageInfoView = Class:new()
 
@@ -37,15 +38,13 @@ StageInfoView.drawCellName = function(self, cell)
 
 	local fontName = spherefonts.get(cell.type.name.fontFamily, cell.type.name.fontSize)
 	love.graphics.setFont(fontName)
-	love.graphics.printf(
+	baseline_print(
 		cell.name,
 		cs:X((config.x + cx + cell.type.name.x) / screen.h, true),
-		cs:Y((config.y + cell.type.y[cell.y] + cell.type.name.y) / screen.h, true),
-		cell.type.name.w + dcw,
-		cell.type.name.align,
-		0,
+		cs:Y((config.y + cell.type.y[cell.y] + cell.type.name.baseline) / screen.h, true),
+		cell.type.name.limit + dcw,
 		cs.one / screen.h,
-		cs.one / screen.h
+		cell.type.name.align
 	)
 end
 
@@ -67,15 +66,13 @@ StageInfoView.drawTextCell = function(self, cell)
 
 	local fontValue = spherefonts.get(cell.type.value.text.fontFamily, cell.type.value.text.fontSize)
 	love.graphics.setFont(fontValue)
-	love.graphics.printf(
+	baseline_print(
 		"0",
 		cs:X((config.x + cx + cell.type.value.text.x) / screen.h, true),
-		cs:Y((config.y + cell.type.y[cell.y] + cell.type.value.text.y) / screen.h, true),
-		cell.type.value.text.w + dcw,
-		cell.type.value.text.align,
-		0,
+		cs:Y((config.y + cell.type.y[cell.y] + cell.type.value.text.baseline) / screen.h, true),
+		cell.type.value.text.limit + dcw,
 		cs.one / screen.h,
-		cs.one / screen.h
+		cell.type.value.text.align
 	)
 end
 

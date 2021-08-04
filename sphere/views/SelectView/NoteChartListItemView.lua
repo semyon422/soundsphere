@@ -1,5 +1,6 @@
 local Class = require("aqua.util.Class")
 local spherefonts		= require("sphere.assets.fonts")
+local baseline_print = require("aqua.graphics.baseline_print")
 
 local NoteChartListItemView = Class:new()
 
@@ -18,44 +19,38 @@ NoteChartListItemView.draw = function(self)
 
 	local fontName = spherefonts.get(config.name.fontFamily, config.name.fontSize)
 	love.graphics.setFont(fontName)
-	love.graphics.printf(
+	baseline_print(
 		noteChartDataEntry.name,
 		cs:X((config.x + config.name.x) / screen.h, true),
-		cs:Y((y + config.name.y) / screen.h, true),
-		config.name.w,
-		config.name.align,
-		0,
+		cs:Y((y + config.name.baseline) / screen.h, true),
+		config.name.limit,
 		scale,
-		scale
+		config.name.align
 	)
 
 	if not prevItem or prevItem.noteChartDataEntry.creator ~= item.noteChartDataEntry.creator then
 		local fontCreator = spherefonts.get(config.creator.fontFamily, config.creator.fontSize)
 		love.graphics.setFont(fontCreator)
-		love.graphics.printf(
+		baseline_print(
 			noteChartDataEntry.creator,
 			cs:X((config.x + config.creator.x) / screen.h, true),
-			cs:Y((y + config.creator.y) / screen.h, true),
-			config.creator.w,
-			config.creator.align,
-			0,
+			cs:Y((y + config.creator.baseline) / screen.h, true),
+			config.creator.limit,
 			scale,
-			scale
+			config.creator.align
 		)
 	end
 
 	if not prevItem or prevItem.noteChartDataEntry.inputMode ~= item.noteChartDataEntry.inputMode then
 		local fontInputMode = spherefonts.get(config.inputMode.fontFamily, config.inputMode.fontSize)
 		love.graphics.setFont(fontInputMode)
-		love.graphics.printf(
+		baseline_print(
 			noteChartDataEntry.inputMode,
 			cs:X((config.x + config.inputMode.x) / screen.h, true),
-			cs:Y((y + config.inputMode.y) / screen.h, true),
-			config.inputMode.w,
-			config.inputMode.align,
-			0,
+			cs:Y((y + config.inputMode.baseline) / screen.h, true),
+			config.inputMode.limit,
 			scale,
-			scale
+			config.inputMode.align
 		)
 	end
 
@@ -71,15 +66,13 @@ NoteChartListItemView.draw = function(self)
 	end
 	local fontDifficulty = spherefonts.get(config.difficulty.fontFamily, config.difficulty.fontSize)
 	love.graphics.setFont(fontDifficulty)
-	love.graphics.printf(
+	baseline_print(
 		format:format(difficulty),
 		cs:X((config.x + config.difficulty.x) / screen.h, true),
-		cs:Y((y + config.difficulty.y) / screen.h, true),
-		config.difficulty.w,
-		config.difficulty.align,
-		0,
+		cs:Y((y + config.difficulty.baseline) / screen.h, true),
+		config.difficulty.limit,
 		scale,
-		scale
+		config.difficulty.align
 	)
 
 	if item.tagged then

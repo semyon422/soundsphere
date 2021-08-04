@@ -1,5 +1,6 @@
 local Class = require("aqua.util.Class")
 local spherefonts		= require("sphere.assets.fonts")
+local baseline_print = require("aqua.graphics.baseline_print")
 
 local ScreenMenuItemView = Class:new()
 
@@ -15,15 +16,13 @@ ScreenMenuItemView.draw = function(self)
 
 	local font = spherefonts.get(config.text.fontFamily, config.text.fontSize)
 	love.graphics.setFont(font)
-	love.graphics.printf(
+	baseline_print(
 		item.displayName,
 		cs:X((x + config.text.x) / screen.h, true),
-		cs:Y((y + config.text.y) / screen.h, true),
-		config.text.w,
-		config.text.align,
-		0,
+		cs:Y((y + config.text.baseline) / screen.h, true),
+		config.text.limit,
 		cs.one / screen.h,
-		cs.one / screen.h
+		config.text.align
 	)
 end
 

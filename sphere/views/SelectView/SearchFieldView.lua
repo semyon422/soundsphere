@@ -1,6 +1,7 @@
 
 local Class = require("aqua.util.Class")
 local CoordinateManager = require("aqua.graphics.CoordinateManager")
+local baseline_print = require("aqua.graphics.baseline_print")
 local spherefonts		= require("sphere.assets.fonts")
 
 local SearchFieldView = Class:new()
@@ -24,15 +25,13 @@ SearchFieldView.draw = function(self)
 
 	local font = spherefonts.get(config.text.fontFamily, config.text.fontSize)
 	love.graphics.setFont(font)
-	love.graphics.printf(
+	baseline_print(
 		searchString,
 		cs:X((config.x + config.text.x) / screen.h, true),
-		cs:Y((config.y + config.text.y) / screen.h, true),
-		config.text.w,
-		config.text.align,
-		0,
+		cs:Y((config.y + config.text.baseline) / screen.h, true),
+		config.text.limit,
 		cs.one / screen.h,
-		cs.one / screen.h
+		config.text.align
 	)
 
 	love.graphics.setColor(1, 1, 1, 1)
