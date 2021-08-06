@@ -39,8 +39,8 @@ end
 ResultController.receive = function(self, event)
 	self.view:receive(event)
 
-	if event.name == "goSelectScreen" then
-		return self.gameController.screenManager:set(self.selectController)
+	if event.name == "changeScreen" then
+		self.gameController.screenManager:set(self.selectController)
 	end
 end
 
