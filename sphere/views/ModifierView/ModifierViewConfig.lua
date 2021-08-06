@@ -1,19 +1,4 @@
--- local transform = {{1 / 2, -16 / 9 / 2}, 0, math.pi, {0, 1 / 1080}, {0, 1 / 1080}, 1920, 1080, 0, 0}
--- local transform = {{1 / 2, -16 / 9 / 2}, {0, 1}, 0, {0, 1 / 1080}, {0, -1 / 1080}, 0, 0, 0, 0}
--- local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
-local transform = {
-	{1 / 2, 0},
-	{0, 1 / 2},
-	function()
-		return math.sin(love.timer.getTime() / 10) * math.pi * 2
-	end,
-	{0, 1 / 1080},
-	{0, 1 / 1080},
-	1920 / 2,
-	1080 / 2,
-	0,
-	0
-}
+local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local AvailableModifierList = {
 	class = "AvailableModifierListView",
