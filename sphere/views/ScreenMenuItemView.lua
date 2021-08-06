@@ -18,10 +18,10 @@ ScreenMenuItemView.draw = function(self)
 	love.graphics.setFont(font)
 	baseline_print(
 		item.displayName,
-		cs:X((x + config.text.x) / screen.h, true),
-		cs:Y((y + config.text.baseline) / screen.h, true),
+		cs:X((x + config.text.x) / screen.unit, true),
+		cs:Y((y + config.text.baseline) / screen.unit, true),
 		config.text.limit,
-		cs.one / screen.h,
+		cs.one / screen.unit,
 		config.text.align
 	)
 end
@@ -36,13 +36,13 @@ ScreenMenuItemView.receive = function(self, event)
 
 		local x = config.x + (self.column - 1) * config.w / config.columns
 		local y = config.y + (self.row - 1) * config.h / config.rows
-		x = cs:X(x / config.screen.h, true)
-		y = cs:Y(y / config.screen.h, true)
+		x = cs:X(x / config.screen.unit, true)
+		y = cs:Y(y / config.screen.unit, true)
 
 		local w = config.w / config.columns
 		local h = config.h / config.rows
-		w = cs:X(w / config.screen.h)
-		h = cs:Y(h / config.screen.h)
+		w = cs:X(w / config.screen.unit)
+		h = cs:Y(h / config.screen.unit)
 
 		if mx >= x and mx < x + w and my >= y and my < y + h and button == 1 then
 			listView.navigator:changeScreen(self.item.name)

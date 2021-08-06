@@ -1,7 +1,7 @@
 
 local screen = {
-	w = 1920,
-	h = 1080
+	unit = 1080,
+	cs = {0.5, 0, 0.5 * 16 / 9, 0, "h"}
 }
 
 local SectionsList = {

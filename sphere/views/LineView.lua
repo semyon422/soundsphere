@@ -21,13 +21,13 @@ LineView.drawLine = function(self, line)
 	local screen = self.config.screen
 
 	love.graphics.setColor(line.color)
-	love.graphics.setLineWidth(cs:X(line.lineWidth / screen.h))
+	love.graphics.setLineWidth(cs:X(line.lineWidth / screen.unit))
 	love.graphics.setLineStyle(line.lineStyle)
 	love.graphics.line(
-		cs:X(line.x1 / screen.h, true),
-		cs:Y(line.y1 / screen.h, true),
-		cs:X(line.x2 / screen.h, true),
-		cs:Y(line.y2 / screen.h, true)
+		cs:X(line.x1 / screen.unit, true),
+		cs:Y(line.y1 / screen.unit, true),
+		cs:X(line.x2 / screen.unit, true),
+		cs:Y(line.y2 / screen.unit, true)
 	)
 end
 

@@ -74,10 +74,10 @@ ModifierListView.wheelmoved = function(self, event)
 	local cs = self.cs
 
 	local mx, my = love.mouse.getPosition()
-	local sx = cs:X((config.x + config.scroll.x) / config.screen.h, true)
-	local sy = cs:Y((config.y + config.scroll.y) / config.screen.h, true)
-	local sw = cs:X(config.scroll.w / config.screen.h)
-	local sh = cs:Y(config.scroll.h / config.screen.h)
+	local sx = cs:X((config.x + config.scroll.x) / config.screen.unit, true)
+	local sy = cs:Y((config.y + config.scroll.y) / config.screen.unit, true)
+	local sw = cs:X(config.scroll.w / config.screen.unit)
+	local sh = cs:Y(config.scroll.h / config.screen.unit)
 
 	if mx >= sx and mx < sx + sw and my >= sy and my < sy + sh then
 		local wy = event.args[2]
@@ -89,10 +89,10 @@ ModifierListView.wheelmoved = function(self, event)
 		return
 	end
 
-	local x = cs:X(config.x / config.screen.h, true)
-	local y = cs:Y(config.y / config.screen.h, true)
-	local w = cs:X(config.w / config.screen.h)
-	local h = cs:Y(config.h / config.screen.h)
+	local x = cs:X(config.x / config.screen.unit, true)
+	local y = cs:Y(config.y / config.screen.unit, true)
+	local w = cs:X(config.w / config.screen.unit)
+	local h = cs:Y(config.h / config.screen.unit)
 
 	if mx >= x and mx < x + w and my >= y and my < y + h then
 		self:receiveItems(event)

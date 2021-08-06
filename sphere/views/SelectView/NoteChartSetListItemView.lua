@@ -19,10 +19,10 @@ NoteChartSetListItemView.draw = function(self)
 	love.graphics.setFont(fontArtist)
 	baseline_print(
 		noteChartDataEntry.artist,
-		cs:X((config.x + config.artist.x) / screen.h, true),
-		cs:Y((y + config.artist.baseline) / screen.h, true),
+		cs:X((config.x + config.artist.x) / screen.unit, true),
+		cs:Y((y + config.artist.baseline) / screen.unit, true),
 		config.artist.limit,
-		cs.one / screen.h,
+		cs.one / screen.unit,
 		config.artist.align
 	)
 
@@ -30,25 +30,25 @@ NoteChartSetListItemView.draw = function(self)
 	love.graphics.setFont(fontTitle)
 	baseline_print(
 		noteChartDataEntry.title,
-		cs:X((config.x + config.title.x) / screen.h, true),
-		cs:Y((y + config.title.baseline) / screen.h, true),
+		cs:X((config.x + config.title.x) / screen.unit, true),
+		cs:Y((y + config.title.baseline) / screen.unit, true),
 		config.title.limit,
-		cs.one / screen.h,
+		cs.one / screen.unit,
 		config.title.align
 	)
 
 	if item.tagged then
 		love.graphics.circle(
 			"line",
-			cs:X((config.x + config.point.x) / screen.h, true),
-			cs:Y((y + config.point.y) / screen.h, true),
-			cs:X(config.point.r / screen.h)
+			cs:X((config.x + config.point.x) / screen.unit, true),
+			cs:Y((y + config.point.y) / screen.unit, true),
+			cs:X(config.point.r / screen.unit)
 		)
 		love.graphics.circle(
 			"fill",
-			cs:X((config.x + config.point.x) / screen.h, true),
-			cs:Y((y + config.point.y) / screen.h, true),
-			cs:X(config.point.r / screen.h)
+			cs:X((config.x + config.point.x) / screen.unit, true),
+			cs:Y((y + config.point.y) / screen.unit, true),
+			cs:X(config.point.r / screen.unit)
 		)
 	end
 end

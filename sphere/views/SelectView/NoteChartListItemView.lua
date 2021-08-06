@@ -15,14 +15,14 @@ NoteChartListItemView.draw = function(self)
 	local prevItem = self.prevItem
 	local nextItem = self.nextItem
 
-	local scale = cs.one / screen.h
+	local scale = cs.one / screen.unit
 
 	local fontName = spherefonts.get(config.name.fontFamily, config.name.fontSize)
 	love.graphics.setFont(fontName)
 	baseline_print(
 		noteChartDataEntry.name,
-		cs:X((config.x + config.name.x) / screen.h, true),
-		cs:Y((y + config.name.baseline) / screen.h, true),
+		cs:X((config.x + config.name.x) / screen.unit, true),
+		cs:Y((y + config.name.baseline) / screen.unit, true),
 		config.name.limit,
 		scale,
 		config.name.align
@@ -33,8 +33,8 @@ NoteChartListItemView.draw = function(self)
 		love.graphics.setFont(fontCreator)
 		baseline_print(
 			noteChartDataEntry.creator,
-			cs:X((config.x + config.creator.x) / screen.h, true),
-			cs:Y((y + config.creator.baseline) / screen.h, true),
+			cs:X((config.x + config.creator.x) / screen.unit, true),
+			cs:Y((y + config.creator.baseline) / screen.unit, true),
 			config.creator.limit,
 			scale,
 			config.creator.align
@@ -46,8 +46,8 @@ NoteChartListItemView.draw = function(self)
 		love.graphics.setFont(fontInputMode)
 		baseline_print(
 			noteChartDataEntry.inputMode,
-			cs:X((config.x + config.inputMode.x) / screen.h, true),
-			cs:Y((y + config.inputMode.baseline) / screen.h, true),
+			cs:X((config.x + config.inputMode.x) / screen.unit, true),
+			cs:Y((y + config.inputMode.baseline) / screen.unit, true),
 			config.inputMode.limit,
 			scale,
 			config.inputMode.align
@@ -68,8 +68,8 @@ NoteChartListItemView.draw = function(self)
 	love.graphics.setFont(fontDifficulty)
 	baseline_print(
 		format:format(difficulty),
-		cs:X((config.x + config.difficulty.x) / screen.h, true),
-		cs:Y((y + config.difficulty.baseline) / screen.h, true),
+		cs:X((config.x + config.difficulty.x) / screen.unit, true),
+		cs:Y((y + config.difficulty.baseline) / screen.unit, true),
 		config.difficulty.limit,
 		scale,
 		config.difficulty.align
@@ -78,15 +78,15 @@ NoteChartListItemView.draw = function(self)
 	if item.tagged then
 		love.graphics.circle(
 			"line",
-			cs:X((config.x + config.point.x) / screen.h, true),
-			cs:Y((y + config.point.y) / screen.h, true),
-			cs:X(config.point.r / screen.h)
+			cs:X((config.x + config.point.x) / screen.unit, true),
+			cs:Y((y + config.point.y) / screen.unit, true),
+			cs:X(config.point.r / screen.unit)
 		)
 		love.graphics.circle(
 			"fill",
-			cs:X((config.x + config.point.x) / screen.h, true),
-			cs:Y((y + config.point.y) / screen.h, true),
-			cs:X(config.point.r / screen.h)
+			cs:X((config.x + config.point.x) / screen.unit, true),
+			cs:Y((y + config.point.y) / screen.unit, true),
+			cs:X(config.point.r / screen.unit)
 		)
 	end
 end

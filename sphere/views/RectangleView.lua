@@ -21,16 +21,16 @@ RectangleView.drawRectangle = function(self, rectangle)
 	local screen = self.config.screen
 
 	love.graphics.setColor(rectangle.color)
-	love.graphics.setLineWidth(cs:X(rectangle.lineWidth / screen.h))
+	love.graphics.setLineWidth(cs:X(rectangle.lineWidth / screen.unit))
 	love.graphics.setLineStyle(rectangle.lineStyle)
 	love.graphics.rectangle(
 		rectangle.mode,
-		cs:X(rectangle.x / screen.h, true),
-		cs:Y(rectangle.y / screen.h, true),
-		cs:X(rectangle.w / screen.h),
-		cs:Y(rectangle.h / screen.h),
-		cs:X(rectangle.rx / screen.h),
-		cs:X(rectangle.ry / screen.h)
+		cs:X(rectangle.x / screen.unit, true),
+		cs:Y(rectangle.y / screen.unit, true),
+		cs:X(rectangle.w / screen.unit),
+		cs:Y(rectangle.h / screen.unit),
+		cs:X(rectangle.rx / screen.unit),
+		cs:X(rectangle.ry / screen.unit)
 	)
 end
 

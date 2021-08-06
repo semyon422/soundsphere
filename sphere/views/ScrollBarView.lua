@@ -15,12 +15,12 @@ ScrollBarView.draw = function(self)
 	love.graphics.setColor(config.backgroundColor)
 	love.graphics.rectangle(
 		"fill",
-		cs:X(config.x / screen.h, true),
-		cs:Y(config.y / screen.h, true),
-		cs:X(config.w / screen.h),
-		cs:Y(config.h / screen.h),
-		cs:X(config.w / 2 / screen.h),
-		cs:Y(config.w / 2 / screen.h)
+		cs:X(config.x / screen.unit, true),
+		cs:Y(config.y / screen.unit, true),
+		cs:X(config.w / screen.unit),
+		cs:Y(config.h / screen.unit),
+		cs:X(config.w / 2 / screen.unit),
+		cs:Y(config.w / 2 / screen.unit)
 	)
 
 	local listViewConfig = config.list
@@ -34,12 +34,12 @@ ScrollBarView.draw = function(self)
 	love.graphics.setColor(config.color)
 	love.graphics.rectangle(
 		"fill",
-		cs:X(config.x / screen.h, true),
-		cs:Y(y / screen.h, true),
-		cs:X(config.w / screen.h),
-		cs:Y(h / screen.h),
-		cs:X(config.w / 2 / screen.h),
-		cs:Y(config.w / 2 / screen.h)
+		cs:X(config.x / screen.unit, true),
+		cs:Y(y / screen.unit, true),
+		cs:X(config.w / screen.unit),
+		cs:Y(h / screen.unit),
+		cs:X(config.w / 2 / screen.unit),
+		cs:Y(config.w / 2 / screen.unit)
 	)
 end
 

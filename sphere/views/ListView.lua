@@ -42,10 +42,10 @@ ListView.wheelmoved = function(self, event)
 	local config = self.config
 	local mx, my = love.mouse.getPosition()
 	local cs = self.cs
-	local x = cs:X(config.x / config.screen.h, true)
-	local y = cs:Y(config.y / config.screen.h, true)
-	local w = cs:X(config.w / config.screen.h)
-	local h = cs:Y(config.h / config.screen.h)
+	local x = cs:X(config.x / config.screen.unit, true)
+	local y = cs:Y(config.y / config.screen.unit, true)
+	local w = cs:X(config.w / config.screen.unit)
+	local h = cs:Y(config.h / config.screen.unit)
 	if mx >= x and mx < x + w and my >= y and my < y + h then
 		local wy = event.args[2]
 		if wy == 1 then
@@ -124,10 +124,10 @@ ListView.drawStencil = function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.rectangle(
 		"fill",
-		cs:X(config.x / screen.h, true),
-		cs:Y(config.y / screen.h, true),
-		cs:X(config.w / screen.h),
-		cs:Y(config.h / screen.h)
+		cs:X(config.x / screen.unit, true),
+		cs:Y(config.y / screen.unit, true),
+		cs:X(config.w / screen.unit),
+		cs:Y(config.h / screen.unit)
 	)
 end
 
@@ -173,10 +173,10 @@ ListView.getItemPosition = function(self, itemIndex)
 	local y = config.y + (visualIndex - 1) * h
 
 	return
-		cs:X(config.x / screen.h, true),
-		cs:Y(y / screen.h, true),
-		cs:X(config.w / screen.h),
-		cs:Y(h / screen.h)
+		cs:X(config.x / screen.unit, true),
+		cs:Y(y / screen.unit, true),
+		cs:X(config.w / screen.unit),
+		cs:Y(h / screen.unit)
 end
 
 ListView.getItemElementPosition = function(self, itemIndex, element)
@@ -189,10 +189,10 @@ ListView.getItemElementPosition = function(self, itemIndex, element)
 	local y = config.y + (visualIndex - 1) * h
 
 	return
-		cs:X((config.x + element.x) / screen.h, true),
-		cs:Y((y + element.y) / screen.h, true),
-		cs:X(element.w / screen.h),
-		cs:Y(element.h / screen.h)
+		cs:X((config.x + element.x) / screen.unit, true),
+		cs:Y((y + element.y) / screen.unit, true),
+		cs:X(element.w / screen.unit),
+		cs:Y(element.h / screen.unit)
 end
 
 return ListView

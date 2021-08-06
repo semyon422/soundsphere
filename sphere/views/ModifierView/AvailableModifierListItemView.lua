@@ -23,10 +23,10 @@ AvailableModifierListItemView.draw = function(self)
 	love.graphics.setFont(font)
 	baseline_print(
 		item.name,
-		cs:X((config.x + config.name.x) / screen.h, true),
-		cs:Y((y + config.name.baseline) / screen.h, true),
+		cs:X((config.x + config.name.x) / screen.unit, true),
+		cs:Y((y + config.name.baseline) / screen.unit, true),
 		config.name.limit,
-		cs.one / screen.h,
+		cs.one / screen.unit,
 		config.name.align
 	)
 
@@ -40,10 +40,10 @@ AvailableModifierListItemView.draw = function(self)
 		love.graphics.setFont(fontSection)
 		baseline_print(
 			text,
-			cs:X((config.x + config.section.x) / screen.h, true),
-			cs:Y((y + config.section.baseline) / screen.h, true),
+			cs:X((config.x + config.section.x) / screen.unit, true),
+			cs:Y((y + config.section.baseline) / screen.unit, true),
 			config.section.limit,
-			cs.one / screen.h,
+			cs.one / screen.unit,
 			config.section.align
 		)
 	end

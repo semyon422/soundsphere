@@ -18,25 +18,25 @@ NoteSkinListItemView.draw = function(self)
 	love.graphics.setFont(font)
 	baseline_print(
 		item.name,
-		cs:X((config.x + config.name.x) / screen.h, true),
-		cs:Y((y + config.name.baseline) / screen.h, true),
+		cs:X((config.x + config.name.x) / screen.unit, true),
+		cs:Y((y + config.name.baseline) / screen.unit, true),
 		config.name.limit,
-		cs.one / screen.h,
+		cs.one / screen.unit,
 		config.name.align
 	)
 
 	if item == self.listView.state.selectedNoteSkin then
 		love.graphics.circle(
 			"line",
-			cs:X((config.x + config.point.x) / screen.h, true),
-			cs:Y((y + config.point.y) / screen.h, true),
-			cs:X(config.point.r / screen.h)
+			cs:X((config.x + config.point.x) / screen.unit, true),
+			cs:Y((y + config.point.y) / screen.unit, true),
+			cs:X(config.point.r / screen.unit)
 		)
 		love.graphics.circle(
 			"fill",
-			cs:X((config.x + config.point.x) / screen.h, true),
-			cs:Y((y + config.point.y) / screen.h, true),
-			cs:X(config.point.r / screen.h)
+			cs:X((config.x + config.point.x) / screen.unit, true),
+			cs:Y((y + config.point.y) / screen.unit, true),
+			cs:X(config.point.r / screen.unit)
 		)
 	end
 end

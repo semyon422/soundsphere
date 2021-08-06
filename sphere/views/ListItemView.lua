@@ -16,10 +16,10 @@ ListItemView.drawValue = function(self, valueConfig, value)
 	love.graphics.setColor(1, 1, 1, 1)
 	baseline_print(
 		value,
-		cs:X((config.x + valueConfig.x) / screen.h, true),
-		cs:Y((y + valueConfig.baseline) / screen.h, true),
+		cs:X((config.x + valueConfig.x) / screen.unit, true),
+		cs:Y((y + valueConfig.baseline) / screen.unit, true),
 		valueConfig.limit,
-		cs.one / screen.h,
+		cs.one / screen.unit,
 		valueConfig.align
 	)
 end

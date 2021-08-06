@@ -27,38 +27,38 @@ SearchFieldView.draw = function(self)
 	love.graphics.setFont(font)
 	baseline_print(
 		searchString,
-		cs:X((config.x + config.text.x) / screen.h, true),
-		cs:Y((config.y + config.text.baseline) / screen.h, true),
+		cs:X((config.x + config.text.x) / screen.unit, true),
+		cs:Y((config.y + config.text.baseline) / screen.unit, true),
 		config.text.limit,
-		cs.one / screen.h,
+		cs.one / screen.unit,
 		config.text.align
 	)
 
 	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.setLineWidth(cs:X(config.frame.lineWidth / screen.h))
+	love.graphics.setLineWidth(cs:X(config.frame.lineWidth / screen.unit))
 	love.graphics.setLineStyle(config.frame.lineStyle)
 	love.graphics.rectangle(
 		"line",
-		cs:X((config.x + config.frame.x) / screen.h, true),
-		cs:Y((config.y + config.frame.y) / screen.h, true),
-		cs:X(config.frame.w / screen.h),
-		cs:Y(config.frame.h / screen.h),
-		cs:X(config.frame.h / 2 / screen.h),
-		cs:X(config.frame.h / 2 / screen.h)
+		cs:X((config.x + config.frame.x) / screen.unit, true),
+		cs:Y((config.y + config.frame.y) / screen.unit, true),
+		cs:X(config.frame.w / screen.unit),
+		cs:Y(config.frame.h / screen.unit),
+		cs:X(config.frame.h / 2 / screen.unit),
+		cs:X(config.frame.h / 2 / screen.unit)
 	)
 
 	if self.searchModel.searchMode == "show" then
 		love.graphics.circle(
 			"line",
-			cs:X((config.x + config.frame.x + config.frame.w - config.frame.h / 2) / screen.h, true),
-			cs:Y((config.y + config.frame.y + config.frame.h / 2) / screen.h, true),
-			cs:X(config.point.r / screen.h)
+			cs:X((config.x + config.frame.x + config.frame.w - config.frame.h / 2) / screen.unit, true),
+			cs:Y((config.y + config.frame.y + config.frame.h / 2) / screen.unit, true),
+			cs:X(config.point.r / screen.unit)
 		)
 		love.graphics.circle(
 			"fill",
-			cs:X((config.x + config.frame.x + config.frame.w - config.frame.h / 2) / screen.h, true),
-			cs:Y((config.y + config.frame.y + config.frame.h / 2) / screen.h, true),
-			cs:X(config.point.r / screen.h)
+			cs:X((config.x + config.frame.x + config.frame.w - config.frame.h / 2) / screen.unit, true),
+			cs:Y((config.y + config.frame.y + config.frame.h / 2) / screen.unit, true),
+			cs:X(config.point.r / screen.unit)
 		)
 	end
 end

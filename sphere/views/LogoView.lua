@@ -22,26 +22,26 @@ LogoView.draw = function(self)
 	love.graphics.setFont(font)
 	baseline_print(
 		"soundsphere",
-		cs:X((config.x + config.text.x) / screen.h, true),
-		cs:Y((config.y + config.text.baseline) / screen.h, true),
+		cs:X((config.x + config.text.x) / screen.unit, true),
+		cs:Y((config.y + config.text.baseline) / screen.unit, true),
 		config.text.limit,
-		cs.one / screen.h,
+		cs.one / screen.unit,
 		config.text.align
 	)
 
 	love.graphics.setLineStyle("smooth")
-	love.graphics.setLineWidth(cs:X(1 / screen.h))
+	love.graphics.setLineWidth(cs:X(1 / screen.unit))
     logo.draw(
         "line",
-		cs:X((config.x + config.image.x) / screen.h, true),
-		cs:Y((config.y + config.image.y) / screen.h, true),
-		cs:X(config.image.h / screen.h)
+		cs:X((config.x + config.image.x) / screen.unit, true),
+		cs:Y((config.y + config.image.y) / screen.unit, true),
+		cs:X(config.image.h / screen.unit)
     )
     logo.draw(
         "fill",
-		cs:X((config.x + config.image.x) / screen.h, true),
-		cs:Y((config.y + config.image.y) / screen.h, true),
-		cs:X(config.image.h / screen.h)
+		cs:X((config.x + config.image.x) / screen.unit, true),
+		cs:Y((config.y + config.image.y) / screen.unit, true),
+		cs:X(config.image.h / screen.unit)
     )
 end
 

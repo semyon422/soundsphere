@@ -21,23 +21,23 @@ SortStepperView.draw = function(self)
 	love.graphics.setFont(font)
 	baseline_print(
 		"path",
-		cs:X((config.x + config.text.x) / screen.h, true),
-		cs:Y((config.y + config.text.baseline) / screen.h, true),
+		cs:X((config.x + config.text.x) / screen.unit, true),
+		cs:Y((config.y + config.text.baseline) / screen.unit, true),
 		config.text.limit,
-		cs.one / screen.h,
+		cs.one / screen.unit,
 		config.text.align
 	)
 
-	love.graphics.setLineWidth(cs:X(config.frame.lineWidth / screen.h))
+	love.graphics.setLineWidth(cs:X(config.frame.lineWidth / screen.unit))
 	love.graphics.setLineStyle(config.frame.lineStyle)
 	love.graphics.rectangle(
 		"line",
-		cs:X((config.x + config.frame.x) / screen.h, true),
-		cs:Y((config.y + config.frame.y) / screen.h, true),
-		cs:X(config.frame.w / screen.h),
-		cs:Y(config.frame.h / screen.h),
-		cs:X(config.frame.h / 2 / screen.h),
-		cs:X(config.frame.h / 2 / screen.h)
+		cs:X((config.x + config.frame.x) / screen.unit, true),
+		cs:Y((config.y + config.frame.y) / screen.unit, true),
+		cs:X(config.frame.w / screen.unit),
+		cs:Y(config.frame.h / screen.unit),
+		cs:X(config.frame.h / 2 / screen.unit),
+		cs:X(config.frame.h / 2 / screen.unit)
 	)
 
 	local ty = config.frame.y + config.frame.h / 3
@@ -52,16 +52,16 @@ SortStepperView.draw = function(self)
 
 	love.graphics.polygon(
 		"fill",
-		cs:X((config.x + rx1) / screen.h, true), cs:Y((config.y + ty) / screen.h, true),
-		cs:X((config.x + lx1) / screen.h, true), cs:Y((config.y + my) / screen.h, true),
-		cs:X((config.x + rx1) / screen.h, true), cs:Y((config.y + by) / screen.h, true)
+		cs:X((config.x + rx1) / screen.unit, true), cs:Y((config.y + ty) / screen.unit, true),
+		cs:X((config.x + lx1) / screen.unit, true), cs:Y((config.y + my) / screen.unit, true),
+		cs:X((config.x + rx1) / screen.unit, true), cs:Y((config.y + by) / screen.unit, true)
 	)
 
 	love.graphics.polygon(
 		"fill",
-		cs:X((config.x + lx2) / screen.h, true), cs:Y((config.y + ty) / screen.h, true),
-		cs:X((config.x + rx2) / screen.h, true), cs:Y((config.y + my) / screen.h, true),
-		cs:X((config.x + lx2) / screen.h, true), cs:Y((config.y + by) / screen.h, true)
+		cs:X((config.x + lx2) / screen.unit, true), cs:Y((config.y + ty) / screen.unit, true),
+		cs:X((config.x + rx2) / screen.unit, true), cs:Y((config.y + my) / screen.unit, true),
+		cs:X((config.x + lx2) / screen.unit, true), cs:Y((config.y + by) / screen.unit, true)
 	)
 end
 

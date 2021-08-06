@@ -19,10 +19,10 @@ SectionsListItemView.draw = function(self)
 	love.graphics.setFont(font)
 	baseline_print(
 		self.item[1].section,
-		cs:X((config.x + config.name.x) / screen.h, true),
-		cs:Y((y + config.name.baseline) / screen.h, true),
+		cs:X((config.x + config.name.x) / screen.unit, true),
+		cs:Y((y + config.name.baseline) / screen.unit, true),
 		config.name.limit,
-		cs.one / screen.h,
+		cs.one / screen.unit,
 		config.name.align
 	)
 end

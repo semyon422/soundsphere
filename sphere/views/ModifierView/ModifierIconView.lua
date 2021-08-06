@@ -31,7 +31,7 @@ ModifierIconView.draw = function(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setLineStyle("smooth")
-	love.graphics.setLineWidth(cs:X(config.size / 32 / screen.h))
+	love.graphics.setLineWidth(cs:X(config.size / 32 / screen.unit))
 
 	self:drawSquareBorder(self.shapes.allArcs)
 	if config.modifierSubString then
@@ -56,25 +56,25 @@ ModifierIconView.drawText = function(self, lines, topText, bottomText)
 	if topText then
 		love.graphics.printf(
 			topText,
-			cs:X(fx / screen.h, true),
-			cs:Y((fy + lines[1] * fs) / screen.h, true),
+			cs:X(fx / screen.unit, true),
+			cs:Y((fy + lines[1] * fs) / screen.unit, true),
 			64,
 			"center",
 			0,
-			cs.one / screen.h * fs / 64,
-			cs.one / screen.h * fs / 64
+			cs.one / screen.unit * fs / 64,
+			cs.one / screen.unit * fs / 64
 		)
 	end
 	if bottomText then
 		love.graphics.printf(
 			bottomText,
-			cs:X(fx / screen.h, true),
-			cs:Y((fy + lines[2] * fs) / screen.h, true),
+			cs:X(fx / screen.unit, true),
+			cs:Y((fy + lines[2] * fs) / screen.unit, true),
 			64,
 			"center",
 			0,
-			cs.one / screen.h * fs / 64,
-			cs.one / screen.h * fs / 64
+			cs.one / screen.unit * fs / 64,
+			cs.one / screen.unit * fs / 64
 		)
 	end
 end
@@ -86,7 +86,7 @@ ModifierIconView.drawSquareBorder = function(self, shape)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setLineStyle("smooth")
-	love.graphics.setLineWidth(cs:X(config.size / 40 / screen.h))
+	love.graphics.setLineWidth(cs:X(config.size / 40 / screen.unit))
 
 	local fx = config.x + config.size / 8
 	local fy = config.y + config.size / 8
@@ -100,34 +100,34 @@ ModifierIconView.drawSquareBorder = function(self, shape)
 
 	if shape[1] then
 		love.graphics.line(
-			cs:X(fx / screen.h, true),
-			cs:Y((fy + fr1) / screen.h, true),
-			cs:X(fx / screen.h, true),
-			cs:Y((fy + fs - fr3) / screen.h, true)
+			cs:X(fx / screen.unit, true),
+			cs:Y((fy + fr1) / screen.unit, true),
+			cs:X(fx / screen.unit, true),
+			cs:Y((fy + fs - fr3) / screen.unit, true)
 		)
 	end
 	if shape[2] then
 		love.graphics.line(
-			cs:X((fx + fr3) / screen.h, true),
-			cs:Y((fy + fs) / screen.h, true),
-			cs:X((fx + fs - fr4) / screen.h, true),
-			cs:Y((fy + fs) / screen.h, true)
+			cs:X((fx + fr3) / screen.unit, true),
+			cs:Y((fy + fs) / screen.unit, true),
+			cs:X((fx + fs - fr4) / screen.unit, true),
+			cs:Y((fy + fs) / screen.unit, true)
 		)
 	end
 	if shape[3] then
 		love.graphics.line(
-			cs:X((fx + fr1) / screen.h, true),
-			cs:Y(fy / screen.h, true),
-			cs:X((fx + fs - fr2) / screen.h, true),
-			cs:Y(fy / screen.h, true)
+			cs:X((fx + fr1) / screen.unit, true),
+			cs:Y(fy / screen.unit, true),
+			cs:X((fx + fs - fr2) / screen.unit, true),
+			cs:Y(fy / screen.unit, true)
 		)
 	end
 	if shape[4] then
 		love.graphics.line(
-			cs:X((fx + fs) / screen.h, true),
-			cs:Y((fy + fr2) / screen.h, true),
-			cs:X((fx + fs) / screen.h, true),
-			cs:Y((fy + fs - fr4) / screen.h, true)
+			cs:X((fx + fs) / screen.unit, true),
+			cs:Y((fy + fr2) / screen.unit, true),
+			cs:X((fx + fs) / screen.unit, true),
+			cs:Y((fy + fs - fr4) / screen.unit, true)
 		)
 	end
 
@@ -135,9 +135,9 @@ ModifierIconView.drawSquareBorder = function(self, shape)
 		love.graphics.arc(
 			"line",
 			"open",
-			cs:X((fx + fr1) / screen.h, true),
-			cs:Y((fy + fr1) / screen.h, true),
-			cs:X(fr1 / screen.h),
+			cs:X((fx + fr1) / screen.unit, true),
+			cs:Y((fy + fr1) / screen.unit, true),
+			cs:X(fr1 / screen.unit),
 			-math.pi,
 			-math.pi / 2,
 			8
@@ -147,9 +147,9 @@ ModifierIconView.drawSquareBorder = function(self, shape)
 		love.graphics.arc(
 			"line",
 			"open",
-			cs:X((fx + fs - fr2) / screen.h, true),
-			cs:Y((fy + fr2) / screen.h, true),
-			cs:X(fr2 / screen.h),
+			cs:X((fx + fs - fr2) / screen.unit, true),
+			cs:Y((fy + fr2) / screen.unit, true),
+			cs:X(fr2 / screen.unit),
 			-math.pi / 2,
 			0,
 			8
@@ -159,9 +159,9 @@ ModifierIconView.drawSquareBorder = function(self, shape)
 		love.graphics.arc(
 			"line",
 			"open",
-			cs:X((fx + fr3) / screen.h, true),
-			cs:Y((fy + fs - fr3) / screen.h, true),
-			cs:X(fr3 / screen.h),
+			cs:X((fx + fr3) / screen.unit, true),
+			cs:Y((fy + fs - fr3) / screen.unit, true),
+			cs:X(fr3 / screen.unit),
 			math.pi,
 			math.pi / 2,
 			8
@@ -171,9 +171,9 @@ ModifierIconView.drawSquareBorder = function(self, shape)
 		love.graphics.arc(
 			"line",
 			"open",
-			cs:X((fx + fs - fr4) / screen.h, true),
-			cs:Y((fy + fs - fr4) / screen.h, true),
-			cs:X(fr4 / screen.h),
+			cs:X((fx + fs - fr4) / screen.unit, true),
+			cs:Y((fy + fs - fr4) / screen.unit, true),
+			cs:X(fr4 / screen.unit),
 			math.pi / 2,
 			0,
 			8

@@ -40,10 +40,10 @@ StageInfoView.drawCellName = function(self, cell)
 	love.graphics.setFont(fontName)
 	baseline_print(
 		cell.name,
-		cs:X((config.x + cx + cell.type.name.x) / screen.h, true),
-		cs:Y((config.y + cell.type.y[cell.y] + cell.type.name.baseline) / screen.h, true),
+		cs:X((config.x + cx + cell.type.name.x) / screen.unit, true),
+		cs:Y((config.y + cell.type.y[cell.y] + cell.type.name.baseline) / screen.unit, true),
 		cell.type.name.limit + dcw,
-		cs.one / screen.h,
+		cs.one / screen.unit,
 		cell.type.name.align
 	)
 end
@@ -68,10 +68,10 @@ StageInfoView.drawTextCell = function(self, cell)
 	love.graphics.setFont(fontValue)
 	baseline_print(
 		"0",
-		cs:X((config.x + cx + cell.type.value.text.x) / screen.h, true),
-		cs:Y((config.y + cell.type.y[cell.y] + cell.type.value.text.baseline) / screen.h, true),
+		cs:X((config.x + cx + cell.type.value.text.x) / screen.unit, true),
+		cs:Y((config.y + cell.type.y[cell.y] + cell.type.value.text.baseline) / screen.unit, true),
 		cell.type.value.text.limit + dcw,
-		cs.one / screen.h,
+		cs.one / screen.unit,
 		cell.type.value.text.align
 	)
 end
@@ -95,23 +95,23 @@ StageInfoView.drawBarCell = function(self, cell)
 	love.graphics.setColor(1, 1, 1, 0.25)
 	love.graphics.rectangle(
 		"fill",
-		cs:X((config.x + cx + cell.type.value.bar.x) / screen.h, true),
-		cs:Y((config.y + cell.type.y[cell.y] + cell.type.value.bar.y) / screen.h, true),
-		cs:X((cell.type.value.bar.w + dcw) / screen.h),
-		cs:Y(cell.type.value.bar.h / screen.h),
-		cs:X(cell.type.value.bar.h / 2 / screen.h),
-		cs:Y(cell.type.value.bar.h / 2 / screen.h)
+		cs:X((config.x + cx + cell.type.value.bar.x) / screen.unit, true),
+		cs:Y((config.y + cell.type.y[cell.y] + cell.type.value.bar.y) / screen.unit, true),
+		cs:X((cell.type.value.bar.w + dcw) / screen.unit),
+		cs:Y(cell.type.value.bar.h / screen.unit),
+		cs:X(cell.type.value.bar.h / 2 / screen.unit),
+		cs:Y(cell.type.value.bar.h / 2 / screen.unit)
 	)
 
 	love.graphics.setColor(1, 1, 1, 0.75)
 	love.graphics.rectangle(
 		"fill",
-		cs:X((config.x + cx + cell.type.value.bar.x) / screen.h, true),
-		cs:Y((config.y + cell.type.y[cell.y] + cell.type.value.bar.y) / screen.h, true),
-		cs:X((cell.type.value.bar.w + dcw) / 3 / screen.h),
-		cs:Y(cell.type.value.bar.h / screen.h),
-		cs:X(cell.type.value.bar.h / 2 / screen.h),
-		cs:Y(cell.type.value.bar.h / 2 / screen.h)
+		cs:X((config.x + cx + cell.type.value.bar.x) / screen.unit, true),
+		cs:Y((config.y + cell.type.y[cell.y] + cell.type.value.bar.y) / screen.unit, true),
+		cs:X((cell.type.value.bar.w + dcw) / 3 / screen.unit),
+		cs:Y(cell.type.value.bar.h / screen.unit),
+		cs:X(cell.type.value.bar.h / 2 / screen.unit),
+		cs:Y(cell.type.value.bar.h / 2 / screen.unit)
 	)
 end
 

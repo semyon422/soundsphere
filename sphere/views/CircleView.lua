@@ -21,13 +21,13 @@ CircleView.drawCircle = function(self, circle)
 	local screen = self.config.screen
 
 	love.graphics.setColor(circle.color)
-	love.graphics.setLineWidth(cs:X(circle.lineWidth / screen.h))
+	love.graphics.setLineWidth(cs:X(circle.lineWidth / screen.unit))
 	love.graphics.setLineStyle(circle.lineStyle)
 	love.graphics.circle(
 		circle.mode,
-		cs:X(circle.x / screen.h, true),
-		cs:Y(circle.y / screen.h, true),
-		cs:X(circle.r / screen.h)
+		cs:X(circle.x / screen.unit, true),
+		cs:Y(circle.y / screen.unit, true),
+		cs:X(circle.r / screen.unit)
 	)
 end
 

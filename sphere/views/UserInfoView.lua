@@ -21,18 +21,18 @@ UserInfoView.draw = function(self)
 	love.graphics.setFont(font)
 	baseline_print(
 		"username",
-		cs:X((config.x + config.text.x) / screen.h, true),
-		cs:Y((config.y + config.text.baseline) / screen.h, true),
+		cs:X((config.x + config.text.x) / screen.unit, true),
+		cs:Y((config.y + config.text.baseline) / screen.unit, true),
 		config.text.limit,
-		cs.one / screen.h,
+		cs.one / screen.unit,
 		config.text.align
 	)
 
 	love.graphics.circle(
 		"fill",
-		cs:X((config.x + config.image.x + config.image.w / 2) / screen.h, true),
-		cs:Y((config.y + config.image.y + config.image.h / 2) / screen.h, true),
-		cs:X(config.image.h / 2 / screen.h)
+		cs:X((config.x + config.image.x + config.image.w / 2) / screen.unit, true),
+		cs:Y((config.y + config.image.y + config.image.h / 2) / screen.unit, true),
+		cs:X(config.image.h / 2 / screen.unit)
 	)
 end
 
