@@ -2,14 +2,18 @@
 local Class = require("aqua.util.Class")
 local spherefonts		= require("sphere.assets.fonts")
 local baseline_print = require("aqua.graphics.baseline_print")
+local transform = require("aqua.graphics.transform")
 
 local NoteChartSetListItemView = Class:new()
 
 NoteChartSetListItemView.draw = function(self)
 	local config = self.listView.config
-	local cs = self.listView.cs
-	local screen = config.screen
-	local y = config.y + (self.visualIndex - 1) * config.h / config.rows
+
+	love.graphics.replaceTransform(transform(config.transform))
+	love.graphics.translate(config.x, config.y)
+	love.graphics.setColor(1, 1, 1, 1)
+
+	local y = (self.visualIndex - 1) * config.h / config.rows
 	local item = self.item
 	local noteChartDataEntry = item.noteChartDataEntries[1]
 
@@ -19,10 +23,10 @@ NoteChartSetListItemView.draw = function(self)
 	love.graphics.setFont(fontArtist)
 	baseline_print(
 		noteChartDataEntry.artist,
-		cs:X((config.x + config.artist.x) / screen.unit, true),
-		cs:Y((y + config.artist.baseline) / screen.unit, true),
+		config.artist.x,
+		y + config.artist.baseline,
 		config.artist.limit,
-		cs.one / screen.unit,
+		1,
 		config.artist.align
 	)
 
@@ -30,25 +34,25 @@ NoteChartSetListItemView.draw = function(self)
 	love.graphics.setFont(fontTitle)
 	baseline_print(
 		noteChartDataEntry.title,
-		cs:X((config.x + config.title.x) / screen.unit, true),
-		cs:Y((y + config.title.baseline) / screen.unit, true),
+		config.title.x,
+		y + config.title.baseline,
 		config.title.limit,
-		cs.one / screen.unit,
+		1,
 		config.title.align
 	)
 
 	if item.tagged then
 		love.graphics.circle(
 			"line",
-			cs:X((config.x + config.point.x) / screen.unit, true),
-			cs:Y((y + config.point.y) / screen.unit, true),
-			cs:X(config.point.r / screen.unit)
+			config.point.x,
+			y + config.point.y,
+			config.point.r
 		)
 		love.graphics.circle(
 			"fill",
-			cs:X((config.x + config.point.x) / screen.unit, true),
-			cs:Y((y + config.point.y) / screen.unit, true),
-			cs:X(config.point.r / screen.unit)
+			config.point.x,
+			y + config.point.y,
+			config.point.r
 		)
 	end
 end

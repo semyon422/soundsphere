@@ -1,12 +1,8 @@
 
 local Class = require("aqua.util.Class")
-local CoordinateManager = require("aqua.graphics.CoordinateManager")
+local transform = require("aqua.graphics.transform")
 
 local CircleView = Class:new()
-
-CircleView.construct = function(self)
-	self.cs = CoordinateManager:getCS(0.5, 0, 16 / 9 / 2, 0, "h")
-end
 
 CircleView.draw = function(self)
 	local config = self.config
@@ -17,18 +13,14 @@ CircleView.draw = function(self)
 end
 
 CircleView.drawCircle = function(self, circle)
-	local cs = self.cs
-	local screen = self.config.screen
+	local config = self.config
+
+	love.graphics.replaceTransform(transform(config.transform))
 
 	love.graphics.setColor(circle.color)
-	love.graphics.setLineWidth(cs:X(circle.lineWidth / screen.unit))
+	love.graphics.setLineWidth(circle.lineWidth)
 	love.graphics.setLineStyle(circle.lineStyle)
-	love.graphics.circle(
-		circle.mode,
-		cs:X(circle.x / screen.unit, true),
-		cs:Y(circle.y / screen.unit, true),
-		cs:X(circle.r / screen.unit)
-	)
+	love.graphics.circle(circle.mode, circle.x, circle.y, circle.r)
 end
 
 return CircleView

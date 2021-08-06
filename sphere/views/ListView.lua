@@ -2,7 +2,7 @@ local viewspackage = (...):match("^(.-%.views%.)")
 
 local tween = require("tween")
 local Class = require("aqua.util.Class")
-local CoordinateManager = require("aqua.graphics.CoordinateManager")
+local transform = require("aqua.graphics.transform")
 local ListItemView = require(viewspackage .. "ListItemView")
 
 local ListView = Class:new()
@@ -10,7 +10,6 @@ local ListView = Class:new()
 ListView.construct = function(self)
 	self.itemView = ListItemView:new()
 	self.itemView.listView = self
-	self.cs = CoordinateManager:getCS(0.5, 0, 16 / 9 / 2, 0, "h")
 	self.stencilfunction = function()
 		self:drawStencil()
 	end
@@ -40,12 +39,14 @@ end
 
 ListView.wheelmoved = function(self, event)
 	local config = self.config
-	local mx, my = love.mouse.getPosition()
-	local cs = self.cs
-	local x = cs:X(config.x / config.screen.unit, true)
-	local y = cs:Y(config.y / config.screen.unit, true)
-	local w = cs:X(config.w / config.screen.unit)
-	local h = cs:Y(config.h / config.screen.unit)
+
+	local tf = transform(config.transform)
+	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
+
+	local x = config.x
+	local y = config.y
+	local w = config.w
+	local h = config.h
 	if mx >= x and mx < x + w and my >= y and my < y + h then
 		local wy = event.args[2]
 		if wy == 1 then
@@ -118,16 +119,16 @@ end
 
 ListView.drawStencil = function(self)
 	local config = self.config
-	local cs = self.cs
-	local screen = config.screen
 
+	love.graphics.replaceTransform(transform(config.transform))
 	love.graphics.setColor(1, 1, 1, 1)
+
 	love.graphics.rectangle(
 		"fill",
-		cs:X(config.x / screen.unit, true),
-		cs:Y(config.y / screen.unit, true),
-		cs:X(config.w / screen.unit),
-		cs:Y(config.h / screen.unit)
+		config.x,
+		config.y,
+		config.w,
+		config.h
 	)
 end
 
@@ -165,34 +166,20 @@ end
 
 ListView.getItemPosition = function(self, itemIndex)
 	local config = self.config
-	local state = self.state
-	local cs = self.cs
-	local screen = config.screen
-	local visualIndex = math.ceil(config.rows / 2) + itemIndex - state.selectedVisualItem
-	local h = config.h / config.rows
-	local y = config.y + (visualIndex - 1) * h
 
-	return
-		cs:X(config.x / screen.unit, true),
-		cs:Y(y / screen.unit, true),
-		cs:X(config.w / screen.unit),
-		cs:Y(h / screen.unit)
+	local visualIndex = math.ceil(config.rows / 2) + itemIndex - self.state.selectedVisualItem
+	local h = config.h / config.rows
+
+	return config.x, config.y + (visualIndex - 1) * h, config.w, h
 end
 
-ListView.getItemElementPosition = function(self, itemIndex, element)
+ListView.getItemElementPosition = function(self, itemIndex, el)
 	local config = self.config
 	local state = self.state
-	local cs = self.cs
-	local screen = config.screen
 	local visualIndex = math.ceil(config.rows / 2) + itemIndex - state.selectedVisualItem
 	local h = config.h / config.rows
-	local y = config.y + (visualIndex - 1) * h
 
-	return
-		cs:X((config.x + element.x) / screen.unit, true),
-		cs:Y((y + element.y) / screen.unit, true),
-		cs:X(element.w / screen.unit),
-		cs:Y(element.h / screen.unit)
+	return config.x + el.x, config.y + (visualIndex - 1) * h + el.y, el.w, el.h
 end
 
 return ListView

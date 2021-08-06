@@ -1,12 +1,8 @@
-
-local screen = {
-	unit = 1080,
-	cs = {0.5, 0, 0.5 * 16 / 9, 0, "h"}
-}
+local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local InputList = {
 	class = "InputListView",
-	screen = screen,
+	transform = transform,
 	x = 733,
 	y = 144,
 	w = 454,
@@ -40,7 +36,7 @@ local InputList = {
 
 local InputScrollBar = {
 	class = "ScrollBarView",
-	screen = screen,
+	transform = transform,
 	list = InputList,
 	x = 1187,
 	y = 144,
@@ -53,7 +49,7 @@ local InputScrollBar = {
 
 local Background = {
 	class = "BackgroundView",
-	screen = screen,
+	transform = transform,
 	x = 0,
 	y = 0,
 	w = 1920,
@@ -64,7 +60,7 @@ local Background = {
 
 local Rectangle = {
 	class = "RectangleView",
-	screen = screen,
+	transform = transform,
 	rectangles = {
 		{
 			color = {1, 1, 1, 1},
@@ -83,7 +79,7 @@ local Rectangle = {
 
 local BottomScreenMenu = {
 	class = "ScreenMenuView",
-	screen = screen,
+	transform = transform,
 	x = 279,
 	y = 991,
 	w = 227,

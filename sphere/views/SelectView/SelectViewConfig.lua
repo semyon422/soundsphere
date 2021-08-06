@@ -1,12 +1,8 @@
-
-local screen = {
-	unit = 1080,
-	cs = {0.5, 0, 0.5 * 16 / 9, 0, "h"}
-}
+local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local NoteChartSetList = {
 	class = "NoteChartSetListView",
-	screen = screen,
+	transform = transform,
 	x = 1187,
 	y = 144,
 	w = 454,
@@ -37,7 +33,7 @@ local NoteChartSetList = {
 
 local NoteChartList = {
 	class = "NoteChartListView",
-	screen = screen,
+	transform = transform,
 	x = 733,
 	y = 216,
 	w = 454,
@@ -84,7 +80,7 @@ local NoteChartList = {
 
 local StageInfo = {
 	class = "StageInfoView",
-	screen = screen,
+	transform = transform,
 	x = 279,
 	y = 279,
 	w = 454,
@@ -216,7 +212,7 @@ StageInfo.cells = {
 
 local Background = {
 	class = "BackgroundView",
-	screen = screen,
+	transform = transform,
 	x = 0,
 	y = 0,
 	w = 1920,
@@ -226,7 +222,7 @@ local Background = {
 }
 
 local Preview = {
-	screen = screen,
+	transform = transform,
 	x = 0,
 	y = 0,
 	w = 1920,
@@ -235,7 +231,7 @@ local Preview = {
 
 local NoteChartSetScrollBar = {
 	class = "ScrollBarView",
-	screen = screen,
+	transform = transform,
 	list = NoteChartSetList,
 	x = 1641,
 	y = 144,
@@ -248,7 +244,7 @@ local NoteChartSetScrollBar = {
 
 local Logo = {
 	class = "LogoView",
-	screen = screen,
+	transform = transform,
 	x = 279,
 	y = 0,
 	w = 454,
@@ -271,7 +267,7 @@ local Logo = {
 
 local UserInfo = {
 	class = "UserInfoView",
-	screen = screen,
+	transform = transform,
 	x = 1187,
 	y = 0,
 	w = 454,
@@ -294,7 +290,7 @@ local UserInfo = {
 
 local SearchField = {
 	class = "SearchFieldView",
-	screen = screen,
+	transform = transform,
 	x = 733,
 	y = 89,
 	w = 281,
@@ -322,7 +318,7 @@ local SearchField = {
 
 local SortStepper = {
 	class = "SortStepperView",
-	screen = screen,
+	transform = transform,
 	x = 1014,
 	y = 89,
 	w = 173,
@@ -347,7 +343,7 @@ local SortStepper = {
 
 local ModifierIconGrid = {
 	class = "ModifierIconGridView",
-	screen = screen,
+	transform = transform,
 	x = 301,
 	y = 855,
 	w = 410,
@@ -358,7 +354,7 @@ local ModifierIconGrid = {
 
 local StageInfoModifierIconGrid = {
 	class = "ModifierIconGridView",
-	screen = screen,
+	transform = transform,
 	x = 301,
 	y = 598,
 	w = 183,
@@ -369,7 +365,7 @@ local StageInfoModifierIconGrid = {
 
 local BottomScreenMenu = {
 	class = "ScreenMenuView",
-	screen = screen,
+	transform = transform,
 	x = 392,
 	y = 991,
 	w = 681,
@@ -404,7 +400,7 @@ local BottomScreenMenu = {
 
 local LeftScreenMenu = {
 	class = "ScreenMenuView",
-	screen = screen,
+	transform = transform,
 	x = 89,
 	y = 279,
 	w = 190,
@@ -437,7 +433,7 @@ local LeftScreenMenu = {
 
 local Rectangle = {
 	class = "RectangleView",
-	screen = screen,
+	transform = transform,
 	rectangles = {
 		{
 			color = {1, 1, 1, 1},
@@ -480,7 +476,7 @@ local Rectangle = {
 
 local Line = {
 	class = "LineView",
-	screen = screen,
+	transform = transform,
 	lines = {}
 }
 

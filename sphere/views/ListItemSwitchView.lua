@@ -3,6 +3,7 @@ local viewspackage = (...):match("^(.-%.views%.)")
 local ListItemView = require(viewspackage .. "ListItemView")
 local ListItemSliderView = require(viewspackage .. "ListItemSliderView")
 local SwitchView = require(viewspackage .. "SwitchView")
+local transform = require("aqua.graphics.transform")
 
 local ListItemSwitchView = ListItemView:new()
 
@@ -17,6 +18,8 @@ ListItemSwitchView.setValue = function(self, delta) end
 ListItemSwitchView.draw = function(self)
 	local config = self.listView.config
 	self:drawValue(config.name, self:getName())
+
+	love.graphics.replaceTransform(transform(config.transform))
 
 	local switchView = self.switchView
 	switchView:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.switch))
@@ -38,6 +41,7 @@ ListItemSwitchView.receive = function(self, event)
 
 	local config = listView.config
 	local switch = listView.switch
+	switch:setTransform(transform(config.transform))
 	switch:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.switch))
 	switch:setValue(self:getValue())
 	switch:receive(event)

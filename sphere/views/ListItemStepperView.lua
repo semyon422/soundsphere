@@ -3,6 +3,7 @@ local viewspackage = (...):match("^(.-%.views%.)")
 local ListItemView = require(viewspackage .. "ListItemView")
 local ListItemSliderView = require(viewspackage .. "ListItemSliderView")
 local StepperView = require(viewspackage .. "StepperView")
+local transform = require("aqua.graphics.transform")
 
 local ListItemStepperView = ListItemView:new()
 
@@ -22,6 +23,8 @@ ListItemStepperView.draw = function(self)
 	local config = self.listView.config
 	self:drawValue(config.name, self:getName())
 	self:drawValue(config.stepper.value, self:getDisplayValue())
+
+	love.graphics.replaceTransform(transform(config.transform))
 
 	local stepperView = self.stepperView
 	stepperView:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.stepper))
@@ -44,6 +47,7 @@ ListItemStepperView.receive = function(self, event)
 
 	local config = listView.config
 	local stepper = listView.stepper
+	stepper:setTransform(transform(config.transform))
 	stepper:setPosition(listView:getItemElementPosition(self.itemIndex, config.stepper))
 	stepper:setValue(self:getIndexValue())
 	stepper:setCount(self:getCount())

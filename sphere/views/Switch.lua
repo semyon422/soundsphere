@@ -15,14 +15,17 @@ Switch.setPosition = function(self, x, y, w, h)
 	self.x, self.y, self.w, self.h = x, y, w, h
 end
 
+Switch.setTransform = function(self, transform)
+	self.transform = transform
+end
+
 Switch.setValue = function(self, value)
 	self.value = value
 end
 
 Switch.receive = function(self, event)
 	if event.name == "mousepressed" then
-		local mx = event.args[1]
-		local my = event.args[2]
+		local mx, my = self.transform:inverseTransformPoint(event.args[1], event.args[2])
 		local x, y, w, h = self.x, self.y, self.w, self.h
 		if belong(mx, x, x + w) and belong(my, y, y + h) then
 			local button = event.args[3]

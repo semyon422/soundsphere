@@ -1,6 +1,5 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
-local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local ListView = require(viewspackage .. "ListView")
 local NoteSkinListItemView = require(viewspackage .. "NoteSkinView.NoteSkinListItemView")
 
@@ -10,7 +9,6 @@ NoteSkinListView.construct = function(self)
 	ListView.construct(self)
 	self.itemView = NoteSkinListItemView:new()
 	self.itemView.listView = self
-	self.cs = CoordinateManager:getCS(0.5, 0, 16 / 9 / 2, 0, "h")
 end
 
 NoteSkinListView.reloadItems = function(self)

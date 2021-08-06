@@ -2,6 +2,7 @@ local viewspackage = (...):match("^(.-%.views%.)")
 
 local ListItemView = require(viewspackage .. "ListItemView")
 local SliderView = require(viewspackage .. "SliderView")
+local transform = require("aqua.graphics.transform")
 
 local ListItemSliderView = ListItemView:new()
 
@@ -20,6 +21,8 @@ ListItemSliderView.draw = function(self)
 	local config = self.listView.config
 	self:drawValue(config.name, self:getName())
 	self:drawValue(config.slider.value, self:getDisplayValue())
+
+	love.graphics.replaceTransform(transform(config.transform))
 
 	local sliderView = self.sliderView
 	sliderView:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.slider))
@@ -41,6 +44,7 @@ ListItemSliderView.receive = function(self, event)
 
 	local config = listView.config
 	local slider = listView.slider
+	slider:setTransform(transform(config.transform))
 	slider:setPosition(listView:getItemElementPosition(self.itemIndex, config.slider))
 	slider:setValue(self:getNormValue())
 	slider:receive(event)
@@ -52,14 +56,17 @@ ListItemSliderView.receive = function(self, event)
 end
 
 ListItemSliderView.wheelmoved = function(self, event)
+	local config = self.listView.config
+
 	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
-	local mx, my = love.mouse.getPosition()
+	local tf = transform(config.transform)
+	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
 
 	if not (mx >= x and mx <= x + w and my >= y and my <= y + h) then
 		return
 	end
 
-	x, y, w, h = self.listView:getItemElementPosition(self.itemIndex, self.listView.config.slider)
+	x, y, w, h = self.listView:getItemElementPosition(self.itemIndex, config.slider)
 	if mx >= x and mx <= x + w then
 		local wy = event.args[2]
 		if wy == 1 then

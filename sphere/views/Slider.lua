@@ -16,6 +16,10 @@ Slider.setPosition = function(self, x, y, w, h)
 	self.x, self.y, self.w, self.h = x, y, w, h
 end
 
+Slider.setTransform = function(self, transform)
+	self.transform = transform
+end
+
 Slider.setValue = function(self, value)
 	self.value = value
 end
@@ -28,8 +32,7 @@ end
 
 Slider.receive = function(self, event)
 	if event.name == "mousepressed" then
-		local mx = event.args[1]
-		local my = event.args[2]
+		local mx, my = self.transform:inverseTransformPoint(event.args[1], event.args[2])
 		if belong(mx, self.x, self.x + self.w) and belong(my, self.y, self.y + self.h) then
 			self.pressed = true
 			self:updateValueMouse(mx)
@@ -37,7 +40,7 @@ Slider.receive = function(self, event)
 	elseif event.name == "mousereleased" and self.pressed then
 		self.pressed = false
 	elseif event.name == "mousemoved" and self.pressed then
-		local mx = event.args[1]
+		local mx, my = self.transform:inverseTransformPoint(event.args[1], event.args[2])
 		self:updateValueMouse(mx)
 	end
 end

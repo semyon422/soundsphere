@@ -1,5 +1,6 @@
 local spherefonts		= require("sphere.assets.fonts")
 local baseline_print = require("aqua.graphics.baseline_print")
+local transform = require("aqua.graphics.transform")
 
 local Class = require("aqua.util.Class")
 
@@ -7,14 +8,16 @@ local AvailableModifierListItemView = Class:new()
 
 AvailableModifierListItemView.draw = function(self)
 	local config = self.listView.config
-	local cs = self.listView.cs
-	local screen = config.screen
-	local y = config.y + (self.visualIndex - 1) * config.h / config.rows
+
+	love.graphics.replaceTransform(transform(config.transform))
+	love.graphics.translate(config.x, config.y)
+	love.graphics.setColor(1, 1, 1, 1)
+
+	local y = (self.visualIndex - 1) * config.h / config.rows
 	local item = self.item
 
 	local prevItem = self.prevItem
 
-	love.graphics.setColor(1, 1, 1, 1)
 	if item.oneUse and item.added then
 		love.graphics.setColor(config.name.addedColor)
 	end
@@ -23,10 +26,10 @@ AvailableModifierListItemView.draw = function(self)
 	love.graphics.setFont(font)
 	baseline_print(
 		item.name,
-		cs:X((config.x + config.name.x) / screen.unit, true),
-		cs:Y((y + config.name.baseline) / screen.unit, true),
+		config.name.x,
+		y + config.name.baseline,
 		config.name.limit,
-		cs.one / screen.unit,
+		1,
 		config.name.align
 	)
 
@@ -40,10 +43,10 @@ AvailableModifierListItemView.draw = function(self)
 		love.graphics.setFont(fontSection)
 		baseline_print(
 			text,
-			cs:X((config.x + config.section.x) / screen.unit, true),
-			cs:Y((y + config.section.baseline) / screen.unit, true),
+			config.section.x,
+			y + config.section.baseline,
 			config.section.limit,
-			cs.one / screen.unit,
+			1,
 			config.section.align
 		)
 	end

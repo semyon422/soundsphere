@@ -1,7 +1,6 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
 local ListView = require(viewspackage .. "ListView")
-local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local InputListItemView = require(viewspackage .. "InputView.InputListItemView")
 
 local InputListView = ListView:new()
@@ -10,7 +9,6 @@ InputListView.construct = function(self)
 	ListView.construct(self)
 	self.itemView = InputListItemView:new()
 	self.itemView.listView = self
-	self.cs = CoordinateManager:getCS(0.5, 0, 16 / 9 / 2, 0, "h")
 end
 
 InputListView.reloadItems = function(self)

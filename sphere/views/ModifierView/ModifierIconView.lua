@@ -1,5 +1,5 @@
 local Class = require("aqua.util.Class")
-local CoordinateManager = require("aqua.graphics.CoordinateManager")
+local transform = require("aqua.graphics.transform")
 local spherefonts		= require("sphere.assets.fonts")
 
 local ModifierIconView = Class:new()
@@ -20,18 +20,15 @@ ModifierIconView.lines = {
 	two = {-6 / 64, 24 / 64},
 }
 
-ModifierIconView.construct = function(self)
-	self.cs = CoordinateManager:getCS(0.5, 0, 16 / 9 / 2, 0, "h")
-end
-
 ModifierIconView.draw = function(self)
 	local config = self.config
-	local screen = config.screen
-	local cs = self.cs
 
+	love.graphics.replaceTransform(transform(config.transform))
+	love.graphics.translate(config.x, config.y)
 	love.graphics.setColor(1, 1, 1, 1)
+
 	love.graphics.setLineStyle("smooth")
-	love.graphics.setLineWidth(cs:X(config.size / 32 / screen.unit))
+	love.graphics.setLineWidth(config.size / 32)
 
 	self:drawSquareBorder(self.shapes.allArcs)
 	if config.modifierSubString then
@@ -43,53 +40,37 @@ end
 
 ModifierIconView.drawText = function(self, lines, topText, bottomText)
 	local config = self.config
-	local screen = config.screen
-	local cs = self.cs
 
-	local fx = config.x + config.size / 8
-	local fy = config.y + config.size / 8
+	love.graphics.replaceTransform(transform(config.transform))
+	love.graphics.translate(config.x, config.y)
+
+	local fx = config.size / 8
+	local fy = config.size / 8
 	local fs = config.size * 3 / 4
 	local fr = fs / 4
 
 	local font = spherefonts.get("Noto Sans Mono", 32)
 	love.graphics.setFont(font)
 	if topText then
-		love.graphics.printf(
-			topText,
-			cs:X(fx / screen.unit, true),
-			cs:Y((fy + lines[1] * fs) / screen.unit, true),
-			64,
-			"center",
-			0,
-			cs.one / screen.unit * fs / 64,
-			cs.one / screen.unit * fs / 64
-		)
+		love.graphics.printf(topText, fx, fy + lines[1] * fs, 64, "center", 0, fs / 64, fs / 64)
 	end
 	if bottomText then
-		love.graphics.printf(
-			bottomText,
-			cs:X(fx / screen.unit, true),
-			cs:Y((fy + lines[2] * fs) / screen.unit, true),
-			64,
-			"center",
-			0,
-			cs.one / screen.unit * fs / 64,
-			cs.one / screen.unit * fs / 64
-		)
+		love.graphics.printf(bottomText, fx, fy + lines[2] * fs, 64, "center", 0, fs / 64, fs / 64)
 	end
 end
 
 ModifierIconView.drawSquareBorder = function(self, shape)
 	local config = self.config
-	local screen = config.screen
-	local cs = self.cs
 
+	love.graphics.replaceTransform(transform(config.transform))
+	love.graphics.translate(config.x, config.y)
 	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.setLineStyle("smooth")
-	love.graphics.setLineWidth(cs:X(config.size / 40 / screen.unit))
 
-	local fx = config.x + config.size / 8
-	local fy = config.y + config.size / 8
+	love.graphics.setLineStyle("smooth")
+	love.graphics.setLineWidth(config.size / 40)
+
+	local fx = config.size / 8
+	local fy = config.size / 8
 	local fs = config.size * 3 / 4
 	local fr = fs / 4
 
@@ -99,85 +80,29 @@ ModifierIconView.drawSquareBorder = function(self, shape)
 	local fr4 = shape[8] and fs * shape[8] or fr
 
 	if shape[1] then
-		love.graphics.line(
-			cs:X(fx / screen.unit, true),
-			cs:Y((fy + fr1) / screen.unit, true),
-			cs:X(fx / screen.unit, true),
-			cs:Y((fy + fs - fr3) / screen.unit, true)
-		)
+		love.graphics.line(fx, fy + fr1, fx, fy + fs - fr3)
 	end
 	if shape[2] then
-		love.graphics.line(
-			cs:X((fx + fr3) / screen.unit, true),
-			cs:Y((fy + fs) / screen.unit, true),
-			cs:X((fx + fs - fr4) / screen.unit, true),
-			cs:Y((fy + fs) / screen.unit, true)
-		)
+		love.graphics.line(fx + fr3, fy + fs, fx + fs - fr4, fy + fs)
 	end
 	if shape[3] then
-		love.graphics.line(
-			cs:X((fx + fr1) / screen.unit, true),
-			cs:Y(fy / screen.unit, true),
-			cs:X((fx + fs - fr2) / screen.unit, true),
-			cs:Y(fy / screen.unit, true)
-		)
+		love.graphics.line(fx + fr1, fy, fx + fs - fr2, fy)
 	end
 	if shape[4] then
-		love.graphics.line(
-			cs:X((fx + fs) / screen.unit, true),
-			cs:Y((fy + fr2) / screen.unit, true),
-			cs:X((fx + fs) / screen.unit, true),
-			cs:Y((fy + fs - fr4) / screen.unit, true)
-		)
+		love.graphics.line(fx + fs, fy + fr2, fx + fs, fy + fs - fr4)
 	end
 
 	if shape[5] then
-		love.graphics.arc(
-			"line",
-			"open",
-			cs:X((fx + fr1) / screen.unit, true),
-			cs:Y((fy + fr1) / screen.unit, true),
-			cs:X(fr1 / screen.unit),
-			-math.pi,
-			-math.pi / 2,
-			8
-		)
+		love.graphics.arc("line", "open", fx + fr1, fy + fr1, fr1, -math.pi, -math.pi / 2, 8)
 	end
 	if shape[6] then
-		love.graphics.arc(
-			"line",
-			"open",
-			cs:X((fx + fs - fr2) / screen.unit, true),
-			cs:Y((fy + fr2) / screen.unit, true),
-			cs:X(fr2 / screen.unit),
-			-math.pi / 2,
-			0,
-			8
-		)
+		love.graphics.arc("line", "open", fx + fs - fr2, fy + fr2, fr2, -math.pi / 2, 0, 8)
 	end
 	if shape[7] then
-		love.graphics.arc(
-			"line",
-			"open",
-			cs:X((fx + fr3) / screen.unit, true),
-			cs:Y((fy + fs - fr3) / screen.unit, true),
-			cs:X(fr3 / screen.unit),
-			math.pi,
-			math.pi / 2,
-			8
-		)
+		love.graphics.arc("line", "open", fx + fr3, fy + fs - fr3, fr3, math.pi, math.pi / 2, 8)
 	end
 	if shape[8] then
-		love.graphics.arc(
-			"line",
-			"open",
-			cs:X((fx + fs - fr4) / screen.unit, true),
-			cs:Y((fy + fs - fr4) / screen.unit, true),
-			cs:X(fr4 / screen.unit),
-			math.pi / 2,
-			0,
-			8
-		)
+		love.graphics.arc("line", "open", fx + fs - fr4, fy + fs - fr4, fr4 , math.pi / 2, 0, 8)
 	end
 end
 

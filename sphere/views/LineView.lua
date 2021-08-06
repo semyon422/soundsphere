@@ -1,12 +1,8 @@
 
 local Class = require("aqua.util.Class")
-local CoordinateManager = require("aqua.graphics.CoordinateManager")
+local transform = require("aqua.graphics.transform")
 
 local LineView = Class:new()
-
-LineView.construct = function(self)
-	self.cs = CoordinateManager:getCS(0.5, 0, 16 / 9 / 2, 0, "h")
-end
 
 LineView.draw = function(self)
 	local config = self.config
@@ -17,18 +13,14 @@ LineView.draw = function(self)
 end
 
 LineView.drawLine = function(self, line)
-	local cs = self.cs
-	local screen = self.config.screen
+	local config = self.config
+
+	love.graphics.replaceTransform(transform(config.transform))
 
 	love.graphics.setColor(line.color)
-	love.graphics.setLineWidth(cs:X(line.lineWidth / screen.unit))
+	love.graphics.setLineWidth(line.lineWidth)
 	love.graphics.setLineStyle(line.lineStyle)
-	love.graphics.line(
-		cs:X(line.x1 / screen.unit, true),
-		cs:Y(line.y1 / screen.unit, true),
-		cs:X(line.x2 / screen.unit, true),
-		cs:Y(line.y2 / screen.unit, true)
-	)
+	love.graphics.line(line.x1, line.y1, line.x2, line.y2)
 end
 
 return LineView

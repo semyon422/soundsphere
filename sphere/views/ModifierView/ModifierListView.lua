@@ -1,6 +1,6 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
-local CoordinateManager = require("aqua.graphics.CoordinateManager")
+local transform = require("aqua.graphics.transform")
 local ListView = require(viewspackage .. "ListView")
 local ModifierListItemSwitchView = require(viewspackage .. "ModifierView.ModifierListItemSwitchView")
 local ModifierListItemSliderView = require(viewspackage .. "ModifierView.ModifierListItemSliderView")
@@ -13,8 +13,6 @@ local ModifierListView = ListView:new()
 
 ModifierListView.construct = function(self)
 	ListView.construct(self)
-
-	self.cs = CoordinateManager:getCS(0.5, 0, 16 / 9 / 2, 0, "h")
 
 	self.itemSwitchView = ModifierListItemSwitchView:new()
 	self.itemSliderView = ModifierListItemSliderView:new()
@@ -71,13 +69,13 @@ end
 
 ModifierListView.wheelmoved = function(self, event)
 	local config = self.config
-	local cs = self.cs
 
-	local mx, my = love.mouse.getPosition()
-	local sx = cs:X((config.x + config.scroll.x) / config.screen.unit, true)
-	local sy = cs:Y((config.y + config.scroll.y) / config.screen.unit, true)
-	local sw = cs:X(config.scroll.w / config.screen.unit)
-	local sh = cs:Y(config.scroll.h / config.screen.unit)
+	local tf = transform(config.transform)
+	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
+	local sx = config.x + config.scroll.x
+	local sy = config.y + config.scroll.y
+	local sw = config.scroll.w
+	local sh = config.scroll.h
 
 	if mx >= sx and mx < sx + sw and my >= sy and my < sy + sh then
 		local wy = event.args[2]
@@ -89,10 +87,10 @@ ModifierListView.wheelmoved = function(self, event)
 		return
 	end
 
-	local x = cs:X(config.x / config.screen.unit, true)
-	local y = cs:Y(config.y / config.screen.unit, true)
-	local w = cs:X(config.w / config.screen.unit)
-	local h = cs:Y(config.h / config.screen.unit)
+	local x = config.x
+	local y = config.y
+	local w = config.w
+	local h = config.h
 
 	if mx >= x and mx < x + w and my >= y and my < y + h then
 		self:receiveItems(event)

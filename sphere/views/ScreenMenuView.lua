@@ -1,7 +1,6 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
 local Class = require("aqua.util.Class")
-local CoordinateManager = require("aqua.graphics.CoordinateManager")
 local ScreenMenuItemView = require(viewspackage .. "ScreenMenuItemView")
 
 local ScreenMenuView = Class:new()
@@ -9,7 +8,6 @@ local ScreenMenuView = Class:new()
 ScreenMenuView.construct = function(self)
 	self.itemView = ScreenMenuItemView:new()
 	self.itemView.listView = self
-	self.cs = CoordinateManager:getCS(0.5, 0, 16 / 9 / 2, 0, "h")
 end
 
 ScreenMenuView.load = function(self)

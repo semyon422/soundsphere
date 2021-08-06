@@ -1,30 +1,32 @@
 local Class = require("aqua.util.Class")
 local spherefonts		= require("sphere.assets.fonts")
 local baseline_print = require("aqua.graphics.baseline_print")
+local transform = require("aqua.graphics.transform")
 
 local NoteChartListItemView = Class:new()
 
 NoteChartListItemView.draw = function(self)
 	local config = self.listView.config
-	local cs = self.listView.cs
-	local screen = config.screen
-	local y = config.y + (self.visualIndex - 1) * config.h / config.rows
+
+	love.graphics.replaceTransform(transform(config.transform))
+	love.graphics.translate(config.x, config.y)
+	love.graphics.setColor(1, 1, 1, 1)
+
+	local y = (self.visualIndex - 1) * config.h / config.rows
 	local item = self.item
 	local noteChartDataEntry = item.noteChartDataEntry
 
 	local prevItem = self.prevItem
 	local nextItem = self.nextItem
 
-	local scale = cs.one / screen.unit
-
 	local fontName = spherefonts.get(config.name.fontFamily, config.name.fontSize)
 	love.graphics.setFont(fontName)
 	baseline_print(
 		noteChartDataEntry.name,
-		cs:X((config.x + config.name.x) / screen.unit, true),
-		cs:Y((y + config.name.baseline) / screen.unit, true),
+		config.name.x,
+		y + config.name.baseline,
 		config.name.limit,
-		scale,
+		1,
 		config.name.align
 	)
 
@@ -33,10 +35,10 @@ NoteChartListItemView.draw = function(self)
 		love.graphics.setFont(fontCreator)
 		baseline_print(
 			noteChartDataEntry.creator,
-			cs:X((config.x + config.creator.x) / screen.unit, true),
-			cs:Y((y + config.creator.baseline) / screen.unit, true),
+			config.creator.x,
+			y + config.creator.baseline,
 			config.creator.limit,
-			scale,
+			1,
 			config.creator.align
 		)
 	end
@@ -46,10 +48,10 @@ NoteChartListItemView.draw = function(self)
 		love.graphics.setFont(fontInputMode)
 		baseline_print(
 			noteChartDataEntry.inputMode,
-			cs:X((config.x + config.inputMode.x) / screen.unit, true),
-			cs:Y((y + config.inputMode.baseline) / screen.unit, true),
+			config.inputMode.x,
+			y + config.inputMode.baseline,
 			config.inputMode.limit,
-			scale,
+			1,
 			config.inputMode.align
 		)
 	end
@@ -68,25 +70,25 @@ NoteChartListItemView.draw = function(self)
 	love.graphics.setFont(fontDifficulty)
 	baseline_print(
 		format:format(difficulty),
-		cs:X((config.x + config.difficulty.x) / screen.unit, true),
-		cs:Y((y + config.difficulty.baseline) / screen.unit, true),
+		config.difficulty.x,
+		y + config.difficulty.baseline,
 		config.difficulty.limit,
-		scale,
+		1,
 		config.difficulty.align
 	)
 
 	if item.tagged then
 		love.graphics.circle(
 			"line",
-			cs:X((config.x + config.point.x) / screen.unit, true),
-			cs:Y((y + config.point.y) / screen.unit, true),
-			cs:X(config.point.r / screen.unit)
+			config.point.x,
+			y + config.point.y,
+			config.point.r
 		)
 		love.graphics.circle(
 			"fill",
-			cs:X((config.x + config.point.x) / screen.unit, true),
-			cs:Y((y + config.point.y) / screen.unit, true),
-			cs:X(config.point.r / screen.unit)
+			config.point.x,
+			y + config.point.y,
+			config.point.r
 		)
 	end
 end
