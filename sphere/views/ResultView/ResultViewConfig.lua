@@ -4,6 +4,52 @@ local screen = {
 	h = 1080
 }
 
+local Logo = {
+	class = "LogoView",
+	screen = screen,
+	x = 279,
+	y = 0,
+	w = 454,
+	h = 89,
+	image = {
+		x = 21,
+		y = 20,
+		w = 48,
+		h = 48
+	},
+	text = {
+		x = 89,
+		baseline = 56,
+		limit = 365,
+		align = "left",
+		fontSize = 32,
+		fontFamily = "Noto Sans"
+	}
+}
+
+local UserInfo = {
+	class = "UserInfoView",
+	screen = screen,
+	x = 1187,
+	y = 0,
+	w = 454,
+	h = 89,
+	image = {
+		x = 386,
+		y = 20,
+		w = 48,
+		h = 48
+	},
+	text = {
+		x = 0,
+		baseline = 54,
+		limit = 365,
+		align = "right",
+		fontSize = 26,
+		fontFamily = "Noto Sans"
+	}
+}
+
 local Background = {
 	class = "BackgroundView",
 	screen = screen,
@@ -51,7 +97,9 @@ local BottomScreenMenu = {
 local NoteSkinViewConfig = {
 	Background,
 	BottomScreenMenu,
-	Rectangle
+	Rectangle,
+	Logo,
+	UserInfo,
 }
 
 return NoteSkinViewConfig

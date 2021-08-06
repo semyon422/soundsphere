@@ -8,6 +8,7 @@ local ResultViewConfig = require(viewspackage .. "ResultView.ResultViewConfig")
 local ValueView	= require("sphere.views.GameplayView.ValueView")
 local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
 local ImageView	= require("sphere.views.GameplayView.ImageView")
+local ModifierIconGridView = require(viewspackage .. "SelectView.ModifierIconGridView")
 
 local ResultView = ScreenView:new()
 
@@ -17,13 +18,16 @@ ResultView.construct = function(self)
 	self.valueView = ValueView:new()
 	self.pointGraphView = PointGraphView:new()
 	self.imageView = ImageView:new()
+	self.modifierIconGridView = ModifierIconGridView:new()
 end
 
 ResultView.load = function(self)
 	local valueView = self.valueView
 	local pointGraphView = self.pointGraphView
 	local imageView = self.imageView
-	local sequenceView = self.sequenceView
+	local modifierIconGridView = self.modifierIconGridView
+
+	local configModifier = self.configModel:getConfig("modifier")
 
 	local scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
 
@@ -34,11 +38,16 @@ ResultView.load = function(self)
 	pointGraphView.scoreSystem = scoreSystem
 	pointGraphView.noteChartModel = self.noteChartModel
 
+	modifierIconGridView.modifierModel = self.modifierModel
+	modifierIconGridView.configModifier = configModifier
+
 	imageView.root = "."
 
+	local sequenceView = self.sequenceView
 	sequenceView:setView("ValueView", valueView)
 	sequenceView:setView("PointGraphView", pointGraphView)
 	sequenceView:setView("ImageView", imageView)
+	sequenceView:setView("ModifierIconGridView", modifierIconGridView)
 
 	ScreenView.load(self)
 end
