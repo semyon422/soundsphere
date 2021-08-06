@@ -12,7 +12,10 @@ ScreenManager.construct = function(self)
 			coroutine.yield()
 			self.currentScreen:unload()
 			self.currentScreen = screen
-			screen:load()
+			local ok, err = xpcall(screen.load, debug.traceback, screen)
+			if not ok then
+				error(err)
+			end
 			self.transition:fadeOut()
 			coroutine.yield()
 		end
