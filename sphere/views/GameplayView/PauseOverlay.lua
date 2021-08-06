@@ -1,6 +1,5 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
-local aquafonts			= require("aqua.assets.fonts")
 local CoordinateManager	= require("aqua.graphics.CoordinateManager")
 local Rectangle			= require("aqua.graphics.Rectangle")
 local Theme				= require("aqua.ui.Theme")
@@ -12,7 +11,7 @@ local PauseOverlay = Class:new()
 PauseOverlay.load = function(self)
 	self.observable = Observable:new()
 	self.cs = CoordinateManager:getCS(0, 0, 0, 0, "all")
-	self.font = aquafonts.getFont(spherefonts.NotoSansRegular, 48)
+	self.font = spherefonts.get("Noto Sans", 48)
 
 	self.progressRectangle = Rectangle:new({
 		x = 0, y = 0.99,
@@ -66,7 +65,7 @@ PauseOverlay.load = function(self)
 		textColor = {255, 255, 255, 255},
 		font = self.font,
 	})
-	
+
 	self:reload()
 
 	self:resetProgress()

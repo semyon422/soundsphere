@@ -6,6 +6,7 @@ local GraphicEngine		= require("sphere.models.RhythmModel.GraphicEngine")
 local AudioEngine		= require("sphere.models.RhythmModel.AudioEngine")
 local TimeEngine		= require("sphere.models.RhythmModel.TimeEngine")
 local InputManager		= require("sphere.models.RhythmModel.InputManager")
+local PauseManager		= require("sphere.models.RhythmModel.PauseManager")
 local ReplayModel		= require("sphere.models.ReplayModel")
 local ModifierModel		= require("sphere.models.ModifierModel")
 
@@ -14,6 +15,7 @@ local RhythmModel = Class:new()
 RhythmModel.construct = function(self)
 	self.modifierModel = ModifierModel:new()
 	self.inputManager = InputManager:new()
+	self.pauseManager = PauseManager:new()
 	self.replayModel = ReplayModel:new()
 	self.timeEngine = TimeEngine:new()
 	self.scoreEngine = ScoreEngine:new()
@@ -26,6 +28,7 @@ end
 RhythmModel.load = function(self)
 	local modifierModel = self.modifierModel
 	local inputManager = self.inputManager
+	local pauseManager = self.pauseManager
 	local replayModel = self.replayModel
 	local timeEngine = self.timeEngine
 	local scoreEngine = self.scoreEngine
@@ -48,8 +51,8 @@ RhythmModel.load = function(self)
 	logicEngine.scoreEngine = scoreEngine
 
 	scoreEngine.timeEngine = timeEngine
-
 	audioEngine.timeEngine = timeEngine
+	pauseManager.timeEngine = timeEngine
 
 	graphicEngine.logicEngine = logicEngine
 
@@ -168,6 +171,7 @@ RhythmModel.receive = function(self, event)
 	if self.timeEngine.timeRate ~= 0 then
 		self.inputManager:receive(event)
 	end
+	self.pauseManager:receive(event)
 end
 
 RhythmModel.update = function(self, dt)
@@ -177,6 +181,7 @@ RhythmModel.update = function(self, dt)
 	self.scoreEngine:update()
 	self.graphicEngine:update(dt)
 	self.modifierModel:update()
+	self.pauseManager:update(dt)
 end
 
 RhythmModel.setNoteChart = function(self, noteChart)
