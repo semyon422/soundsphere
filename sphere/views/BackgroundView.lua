@@ -49,9 +49,7 @@ BackgroundView.drawBackground = function(self)
 	local r, g, b = config.dim, config.dim, config.dim
 
 	local mx, my = love.mouse.getPosition()
-	local w0, h0 = love.graphics.inverseTransformPoint(0, 0)
-	local w1, h1 = love.graphics.inverseTransformPoint(love.graphics.getDimensions())
-	local w, h = math.abs(w1 - w0), math.abs(h1 - h0)
+	local w, h = config.w, config.h
 	for i = 1, 3 do
 		if not images[i] then
 			return
@@ -65,14 +63,6 @@ BackgroundView.drawBackground = function(self)
 			love.graphics.setColor(r, g, b, 0)
 		end
 
-		-- frame_draw(
-		-- 	images[i],
-		-- 	w0,
-		-- 	h0,
-		-- 	w,
-		-- 	h,
-		-- 	"out"
-		-- )
 		frame_draw(
 			images[i],
 			-map(mx, 0, w, config.parallax, 0) * w,
