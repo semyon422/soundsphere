@@ -1,14 +1,13 @@
-local CoordinateManager	= require("aqua.graphics.CoordinateManager")
+
+local transform = require("aqua.graphics.transform")
 local map				= require("aqua.math").map
 local Class				= require("aqua.util.Class")
 
 local PointGraphView = Class:new()
 
 PointGraphView.load = function(self)
-	local config = self.config
 	local state = self.state
 
-	state.cs = CoordinateManager:getCS(unpack(config.cs))
 	state.drawnPoints = 0
 
 	state.startTime = self.noteChartModel.noteChart.metaData:get("minTime")
@@ -48,19 +47,14 @@ end
 
 PointGraphView.drawLine = function(self)
 	local config = self.config
-	local state = self.state
 
-	local cs = state.cs
+	love.graphics.replaceTransform(transform(config.transform))
+	love.graphics.translate(config.x, config.y)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setLineWidth(2)
 	love.graphics.setLineStyle("smooth")
-	love.graphics.line(
-		cs:X(config.x, true),
-		cs:Y(config.y + config.h / 2, true),
-		cs:X(config.x + config.w, true),
-		cs:Y(config.y + config.h / 2, true)
-	)
+	love.graphics.line(0, config.h / 2, config.w, config.h / 2)
 end
 
 PointGraphView.drawPoints = function(self)
@@ -89,16 +83,17 @@ PointGraphView.drawPoint = function(self, point)
 	local config = self.config
 	local state = self.state
 
+	love.graphics.replaceTransform(transform(config.transform))
+	love.graphics.translate(config.x, config.y)
+
 	local x = point[config.time] / (state.endTime - state.startTime)
 	local y = (point[config.value] + (config.offset or 0)) / (config.unit or 1)
 
-	local cs = state.cs
-
 	love.graphics.circle(
 		"fill",
-		cs:X(map(x, 0, 1, config.x, config.x + config.w), true),
-		cs:Y(map(y, 0, 1, config.y, config.y + config.h), true),
-		cs:X(config.r)
+		map(x, 0, 1, 0, config.w),
+		map(y, 0, 1, 0, config.h),
+		config.r
 	)
 end
 

@@ -1,4 +1,5 @@
-local CoordinateManager	= require("aqua.graphics.CoordinateManager")
+
+local transform = require("aqua.graphics.transform")
 local Class = require("aqua.util.Class")
 
 local ImageView = Class:new()
@@ -7,7 +8,6 @@ ImageView.load = function(self)
 	local config = self.config
 	local state = self.state
 
-	state.cs = CoordinateManager:getCS(unpack(config.cs))
 	state.image = love.graphics.newImage(self.root .. "/" .. config.image)
 	state.imageWidth = state.image:getWidth()
 	state.imageHeight = state.image:getHeight()
@@ -17,16 +17,16 @@ ImageView.draw = function(self)
 	local config = self.config
 	local state = self.state
 
-	local cs = state.cs
+	love.graphics.replaceTransform(transform(config.transform))
 
 	love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(
         state.image,
-		cs:X(config.x, true),
-		cs:Y(config.y, true),
+		config.x,
+		config.y,
         0,
-        cs:X(1) / state.imageWidth * config.w,
-	    cs:Y(1) / state.imageHeight * config.h
+        config.w / state.imageWidth,
+	    config.h / state.imageHeight
     )
 end
 

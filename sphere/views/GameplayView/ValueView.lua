@@ -1,6 +1,6 @@
-local aquafonts			= require("aqua.assets.fonts")
-local CoordinateManager	= require("aqua.graphics.CoordinateManager")
-local frame_print		= require("aqua.graphics.frame_print")
+local spherefonts = require("sphere.assets.fonts")
+local transform = require("aqua.graphics.transform")
+local baseline_print = require("aqua.graphics.baseline_print")
 local Class = require("aqua.util.Class")
 
 local ValueView = Class:new()
@@ -9,13 +9,11 @@ ValueView.load = function(self)
 	local config = self.config
 	local state = self.state
 
-	state.cs = CoordinateManager:getCS(unpack(config.cs))
-	state.font = aquafonts.getFont(config.font, config.size)
+	state.font = spherefonts.get(config.fontFamily, config.fontSize)
 end
 
 ValueView.getValue = function(self)
 	local config = self.config
-	local state = self.state
 
 	local value = self
 	for key in config.field:gmatch("[^.]+") do
@@ -26,23 +24,19 @@ end
 
 ValueView.draw = function(self)
 	local config = self.config
-	local state = self.state
 
-	local cs = state.cs
+	love.graphics.replaceTransform(transform(config.transform))
 
-	local value = self:getValue()
-
-	love.graphics.setFont(state.font)
+	love.graphics.setFont(self.state.font)
 	love.graphics.setColor(config.color)
-	frame_print(
+
+	baseline_print(
 		(config.format):format(self:getValue()),
-		cs:X(config.x, true),
-		cs:Y(config.y, true),
-		cs:X(config.w),
-		cs:Y(config.h),
-		cs.one / cs.baseOne,
-		config.ax,
-		config.ay
+		config.x,
+		config.baseline,
+		config.limit,
+		1,
+		config.align
 	)
 end
 

@@ -1,14 +1,11 @@
 local Class				= require("aqua.util.Class")
-local CoordinateManager	= require("aqua.graphics.CoordinateManager")
+local transform = require("aqua.graphics.transform")
 local map				= require("aqua.math").map
 
 local ProgressView = Class:new()
 
 ProgressView.load = function(self)
-	local config = self.config
 	local state = self.state
-
-	state.cs = CoordinateManager:getCS(unpack(config.cs))
 
 	state.startTime = self.noteChartModel.noteChart.metaData:get("minTime")
 	state.endTime = self.noteChartModel.noteChart.metaData:get("maxTime")
@@ -19,19 +16,13 @@ ProgressView.unload = function(self) end
 
 ProgressView.draw = function(self)
 	local config = self.config
-	local state = self.state
 
-	local cs = state.cs
+	love.graphics.replaceTransform(transform(config.transform))
+
     local x, y, w, h = self:getRectangle()
 
 	love.graphics.setColor(config.color)
-	love.graphics.rectangle(
-		"fill",
-		cs:X(x, true),
-		cs:Y(y, true),
-		cs:X(w),
-		cs:Y(h)
-	)
+	love.graphics.rectangle("fill", x, y, w, h)
 end
 
 ProgressView.receive = function(self, event)

@@ -1,8 +1,6 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
-local CoordinateManager	= require("aqua.graphics.CoordinateManager")
-local Rectangle			= require("aqua.graphics.Rectangle")
-local Theme				= require("aqua.ui.Theme")
+local transform = require("aqua.graphics.transform")
 local spherefonts		= require("sphere.assets.fonts")
 local tween				= require("tween")
 

@@ -23,8 +23,15 @@ NoteSkinLoader.loadJsonFullLatest = function(self, noteSkin)
 	local contents = love.filesystem.read(noteSkin.directoryPath .. "/" .. noteSkin.path)
 	noteSkin.data = json.decode(contents)
 
-	contents = love.filesystem.read(noteSkin.directoryPath .. "/" .. noteSkin.data.playfield)
-	noteSkin.playField = json.decode(contents)
+	local playfieldPath = noteSkin.data.playfield
+	contents = love.filesystem.read(noteSkin.directoryPath .. "/" .. playfieldPath)
+	if playfieldPath:sub(-4, -1) == "json" then
+		noteSkin.playField = json.decode(contents)
+	elseif playfieldPath:sub(-3, -1) == "lua" then
+		noteSkin.playField = assert(loadstring(contents))()
+	else
+		noteSkin.playField = {}
+	end
 
 	contents = love.filesystem.read(noteSkin.directoryPath .. "/" .. noteSkin.data.env)
 	noteSkin.env = {}

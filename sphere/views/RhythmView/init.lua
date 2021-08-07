@@ -73,6 +73,7 @@ RhythmView.update = function(self, dt)
 end
 
 RhythmView.draw = function(self)
+	love.graphics.origin()
 	return self.container:draw()
 end
 

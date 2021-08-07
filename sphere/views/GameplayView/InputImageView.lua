@@ -1,13 +1,13 @@
-local CoordinateManager	= require("aqua.graphics.CoordinateManager")
+
+local transform = require("aqua.graphics.transform")
 local Class = require("aqua.util.Class")
 
-local ImageView = Class:new()
+local InputImageView = Class:new()
 
-ImageView.load = function(self)
+InputImageView.load = function(self)
 	local config = self.config
 	local state = self.state
 
-	state.cs = CoordinateManager:getCS(unpack(config.cs))
 	state.imageReleased = love.graphics.newImage(self.root .. "/" .. config.released)
 	state.imagePressed = love.graphics.newImage(self.root .. "/" .. (config.pressed or config.released))
 	state.imageWidth = state.imageReleased:getWidth()
@@ -16,24 +16,24 @@ ImageView.load = function(self)
     state.image = state.imageReleased
 end
 
-ImageView.draw = function(self)
+InputImageView.draw = function(self)
 	local config = self.config
 	local state = self.state
 
-	local cs = state.cs
+	love.graphics.replaceTransform(transform(config.transform))
 
 	love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(
         state.image,
-		cs:X(config.x, true),
-		cs:Y(config.y, true),
+		config.x,
+		config.y,
         0,
-        cs:X(1) / state.imageWidth * config.w,
-	    cs:Y(1) / state.imageHeight * config.h
+        config.w / state.imageWidth,
+	    config.h / state.imageHeight
     )
 end
 
-ImageView.receive = function(self, event)
+InputImageView.receive = function(self, event)
 	local state = self.state
 
 	local key = event.args and event.args[1]
@@ -46,7 +46,7 @@ ImageView.receive = function(self, event)
 	end
 end
 
-ImageView.update = function(self, dt) end
-ImageView.unload = function(self) end
+InputImageView.update = function(self, dt) end
+InputImageView.unload = function(self) end
 
-return ImageView
+return InputImageView
