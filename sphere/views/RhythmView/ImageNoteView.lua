@@ -1,14 +1,14 @@
 local ImageFrame	= require("aqua.graphics.ImageFrame")
 local image			= require("aqua.image")
-local GraphicalNote = require("sphere.views.RhythmView.GraphicalNote")
+local NoteView = require("sphere.views.RhythmView.NoteView")
 
-local ImageNote = GraphicalNote:new()
+local ImageNoteView = NoteView:new()
 
-ImageNote.construct = function(self)
+ImageNoteView.construct = function(self)
 	self.images = self.startNoteData.images
 end
 
-ImageNote.update = function(self)
+ImageNoteView.update = function(self)
 	local drawable = self.drawable
 	if not drawable then
 		return
@@ -22,7 +22,7 @@ ImageNote.update = function(self)
 	drawable.color = self:getColor()
 end
 
-ImageNote.activate = function(self)
+ImageNoteView.activate = function(self)
 	local drawable = self:getDrawable()
 	if drawable then
 		drawable:reload()
@@ -32,14 +32,14 @@ ImageNote.activate = function(self)
 	end
 end
 
-ImageNote.deactivate = function(self)
+ImageNoteView.deactivate = function(self)
 	local drawable = self.drawable
 	if drawable then
 		self.container:remove(drawable)
 	end
 end
 
-ImageNote.reload = function(self)
+ImageNoteView.reload = function(self)
 	local drawable = self.drawable
 	if not drawable then
 		return
@@ -49,11 +49,11 @@ ImageNote.reload = function(self)
 	drawable:reload()
 end
 
-ImageNote.getContainer = function(self)
+ImageNoteView.getContainer = function(self)
 	return self.container
 end
 
-ImageNote.getDrawable = function(self)
+ImageNoteView.getDrawable = function(self)
 	local path = self.graphicEngine.localAliases[self.startNoteData.images[1][1]] or self.graphicEngine.globalAliases[self.startNoteData.images[1][1]]
 	self.image = image.getImage(path)
 
@@ -77,23 +77,23 @@ ImageNote.getDrawable = function(self)
 	})
 end
 
-ImageNote.getHeadWidth = function(self)
+ImageNoteView.getHeadWidth = function(self)
 	return self.noteSkinImageView:getG(self, "Head", "w", self.timeState)
 end
 
-ImageNote.getHeadHeight = function(self)
+ImageNoteView.getHeadHeight = function(self)
 	return self.noteSkinImageView:getG(self, "Head", "h", self.timeState)
 end
 
-ImageNote.getX = function(self)
+ImageNoteView.getX = function(self)
 	return self.noteSkinImageView:getG(self, "Head", "x", self.timeState)
 end
 
-ImageNote.getY = function(self)
+ImageNoteView.getY = function(self)
 	return self.noteSkinImageView:getG(self, "Head", "y", self.timeState)
 end
 
-ImageNote.getScaleX = function(self)
+ImageNoteView.getScaleX = function(self)
 	local image = self.image
 	if not image then
 		return
@@ -101,7 +101,7 @@ ImageNote.getScaleX = function(self)
 	return self:getHeadWidth() / self.noteSkinImageView:getCS(self):x(image:getWidth())
 end
 
-ImageNote.getScaleY = function(self)
+ImageNoteView.getScaleY = function(self)
 	local image = self.image
 	if not image then
 		return
@@ -109,8 +109,8 @@ ImageNote.getScaleY = function(self)
 	return self:getHeadHeight() / self.noteSkinImageView:getCS(self):y(image:getHeight())
 end
 
-ImageNote.getColor = function(self)
+ImageNoteView.getColor = function(self)
 	return self.noteSkinImageView:getG(self, "Head", "color", self.timeState)
 end
 
-return ImageNote
+return ImageNoteView

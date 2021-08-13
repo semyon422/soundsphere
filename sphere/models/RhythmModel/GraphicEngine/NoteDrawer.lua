@@ -21,7 +21,7 @@ NoteDrawer.load = function(self)
 				assert(graphicalNote.graphicEngine)
 				graphicalNote.noteSkin = self.graphicEngine.noteSkin
 				graphicalNote:init()
-				if self.graphicEngine.noteSkin:checkNote(graphicalNote) then
+				if self.graphicEngine.noteSkin:check(graphicalNote) then
 					table.insert(self.noteData, graphicalNote)
 				end
 			end

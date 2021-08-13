@@ -1,80 +1,105 @@
 local Class = require("aqua.util.Class")
-local GraphicalNoteFactory = require("sphere.views.RhythmView.GraphicalNoteFactory")
-local NoteSkinImageView = require("sphere.views.RhythmView.NoteSkinImageView")
-local Container = require("aqua.graphics.Container")
+local NoteViewFactory = require("sphere.views.RhythmView.NoteViewFactory")
+local transform = require("aqua.graphics.transform")
 
 local RhythmView = Class:new()
 
 RhythmView.construct = function(self)
-	self.container = Container:new()
-	self.graphicalNoteFactory = GraphicalNoteFactory:new()
-	self.noteSkinImageView = NoteSkinImageView:new()
+	self.noteViewFactory = NoteViewFactory:new()
 end
 
 RhythmView.load = function(self)
-	local noteSkinImageView = self.noteSkinImageView
+	self.noteViews = {}
 
-	noteSkinImageView.noteSkin = self.noteSkin
-	noteSkinImageView:load()
+	local noteViewFactory = self.noteViewFactory
+	noteViewFactory.videoBgaEnabled = self.videoBgaEnabled
+	noteViewFactory.imageBgaEnabled = self.imageBgaEnabled
 
-	self.notes = {}
-
-	self.noteSkinImageView:joinContainer(self.container)
-
-	local graphicalNoteFactory = self.graphicalNoteFactory
-	graphicalNoteFactory.videoBgaEnabled = self.videoBgaEnabled
-	graphicalNoteFactory.imageBgaEnabled = self.imageBgaEnabled
+	self.textures = {}
+	self.images = {}
+	self.spriteBatches = {}
+	self:loadImages()
 end
 
-RhythmView.unload = function(self)
-	self.noteSkinImageView:leaveContainer(self.container)
-	self.noteSkinImageView:unload()
-end
+RhythmView.unload = function(self) end
 
 RhythmView.receive = function(self, event)
-	self.noteSkinImageView:receive(event)
-
 	if event.name == "GraphicalNoteState" then
-		local notes = self.notes
+		local noteViews = self.noteViews
 		local note = event.note
 		if note.activated then
-			local graphicalNote = self.graphicalNoteFactory:getNote(note)
-			if not graphicalNote then
+			local noteView = self.noteViewFactory:getNoteView(note)
+			if not noteView then
 				return
 			end
-			graphicalNote.graphicEngine = self.rhythmModel.graphicEngine
-			graphicalNote.noteSkinImageView = self.noteSkinImageView
-			graphicalNote.container = self.container
-			graphicalNote:init()
-			graphicalNote:activate()
-			notes[note] = graphicalNote
+			noteView.graphicEngine = self.rhythmModel.graphicEngine
+			noteView.noteSkin = self.noteSkin
+			noteView.rhythmView = self
+			noteViews[note] = noteView
 		else
-			local graphicalNote = notes[note]
+			local graphicalNote = noteViews[note]
 			if not graphicalNote then
 				return
 			end
-			graphicalNote:deactivate()
-			notes[note] = nil
+			noteViews[note] = nil
 		end
 	elseif event.name == "TimeState" then
-		for _, note in pairs(self.notes) do
+		for _, note in pairs(self.noteViews) do
 			note:receive(event)
 		end
 	end
 end
 
 RhythmView.update = function(self, dt)
-	self.noteSkinImageView:update(dt)
-	self.container:update()
-
-	for _, note in pairs(self.notes) do
-		note:update(dt)
+	for _, noteView in pairs(self.noteViews) do
+		noteView:update(dt)
 	end
 end
 
 RhythmView.draw = function(self)
 	love.graphics.origin()
-	return self.container:draw()
+	love.graphics.print(love.timer.getFPS())
+	local noteViews = {}
+	for _, noteView in pairs(self.noteViews) do
+		table.insert(noteViews, noteView)
+	end
+	table.sort(noteViews, function(a, b)
+		return a.startNoteData.timePoint > b.startNoteData.timePoint
+	end)
+	for _, noteView in ipairs(noteViews) do
+		noteView:draw()
+	end
+
+	love.graphics.origin()
+	love.graphics.replaceTransform(transform(self.noteSkin.transform))
+	for _, spriteBatch in ipairs(self.spriteBatches) do
+		love.graphics.draw(spriteBatch)
+		spriteBatch:clear()
+	end
+end
+
+RhythmView.loadImages = function(self)
+	for _, path in ipairs(self.noteSkin.textures) do
+		local texture = love.graphics.newImage(self.noteSkin.directoryPath .. "/" .. path)
+		local spriteBatch = love.graphics.newSpriteBatch(texture, 1000)
+
+		self.textures[path] = texture
+		self.spriteBatches[path] = spriteBatch
+		table.insert(self.spriteBatches, spriteBatch)
+	end
+
+	for _, data in pairs(self.noteSkin.images) do
+		local texture = self.textures[data[1]]
+		local quad, transform
+		if data[2] then
+			quad = love.graphics.newQuad(unpack(data[2]))
+		end
+		if data[3] then
+			transform = love.math.newTransform(unpack(data[3]))
+		end
+
+		self.images[data[1]] = {texture, quad, transform}
+	end
 end
 
 RhythmView.setBgaEnabled = function(self, type, enabled)
@@ -83,6 +108,32 @@ RhythmView.setBgaEnabled = function(self, type, enabled)
 	elseif type == "image" then
 		self.imageBgaEnabled = enabled
 	end
+end
+
+RhythmView.getNoteImageWidth = function(self, note, part)
+	local image = self.noteSkin:get(note, part, "image")
+	if image[2] then
+		return image[2][3]
+	end
+	return self.images[image[1]][1]:getWidth()
+end
+
+RhythmView.getNoteImageHeight = function(self, note, part)
+	local image = self.noteSkin:get(note, part, "image")
+	if image[2] then
+		return image[2][4]
+	end
+	return self.images[image[1]][1]:getHeight()
+end
+
+RhythmView.getSpriteBatch = function(self, note, part)
+	local image = self.noteSkin:get(note, part, "image")
+	return self.spriteBatches[image[1]]
+end
+
+RhythmView.getQuad = function(self, note, part)
+	local image = self.noteSkin:get(note, part, "image")
+	return self.images[image[1]][2]
 end
 
 return RhythmView

@@ -1,4 +1,3 @@
-local tween = require("tween")
 local Class = require("aqua.util.Class")
 local InputMode	= require("ncdk.InputMode")
 local NoteSkinLoader = require("sphere.models.NoteSkinModel.NoteSkinLoader")
@@ -18,64 +17,39 @@ NoteSkin.construct = function(self)
 	self.directoryPath = ""
 end
 
-NoteSkin.visualTimeRate = 1
-NoteSkin.targetVisualTimeRate = 1
-NoteSkin.timeRate = 1
-
 NoteSkin.load = function(self)
 	return NoteSkinLoader:load(self)
 end
 
-NoteSkin.update = function(self, dt)
-	if self.visualTimeRateTween and self.updateTween then
-		self.visualTimeRateTween:update(dt)
-	end
+-- NoteSkin.checkNote = function(self, noteView)
+	-- local noteData = noteView.startNoteData
+	-- return
+	-- 	self.notes[noteData.inputType] and
+	-- 	self.notes[noteData.inputType][noteData.inputIndex] and
+	-- 	self.notes[noteData.inputType][noteData.inputIndex][noteView.noteType]
+-- end
+
+NoteSkin.check = function(self, note)
 end
 
-NoteSkin.increaseVisualTimeRate = function(self, delta)
-	if math.abs(self.targetVisualTimeRate + delta) > 0.001 then
-		self.targetVisualTimeRate = self.targetVisualTimeRate + delta
-		self:setVisualTimeRate(self.targetVisualTimeRate)
-	else
-		self.targetVisualTimeRate = 0
-		self:setVisualTimeRate(self.targetVisualTimeRate)
-	end
+NoteSkin.get = function(self, noteView, part, name, timeState)
+	-- local noteData = noteView.startNoteData
+	-- local seq = self.notes[noteData.inputType][noteData.inputIndex][noteView.noteType][part].gc[name]
+
+	-- return seq[1](timeState, noteView.logicalState, seq[2])
 end
 
-NoteSkin.setVisualTimeRate = function(self, visualTimeRate)
-	if visualTimeRate * self.visualTimeRate < 0 then
-		self.visualTimeRate = visualTimeRate
-		self.updateTween = false
-	else
-		self.updateTween = true
-		self.visualTimeRateTween = tween.new(0.25, self, {visualTimeRate = visualTimeRate}, "inOutQuad")
-	end
-end
+NoteSkin.where = function(self, note, time)
+	-- local noteData = note.startNoteData
+	-- local drawInterval = self.notes[noteData.inputType][noteData.inputIndex][note.noteType][part].drawInterval
 
-NoteSkin.getVisualTimeRate = function(self)
-	return self.visualTimeRate / math.abs(self.timeRate)
-end
-
-NoteSkin.checkNote = function(self, note)
-	return self.notes[note.id]
-end
-
-NoteSkin.getG = function(self, note, part, name, timeState)
-	local seq = self.notes[note.id][part].gc[name]
-
-	return self.env[seq[1]](timeState, note.logicalState, seq[2])
-end
-
-NoteSkin.whereWillDraw = function(self, note, part, time)
-	local drawInterval = self.notes[note.id][part].drawInterval
-
-	if -time > drawInterval[2] then
-		return 1
-	elseif -time < drawInterval[1] then
-		return -1
-	else
-		return 0
-	end
+	-- if -time > drawInterval[2] then
+	-- 	return 1
+	-- elseif -time < drawInterval[1] then
+	-- 	return -1
+	-- else
+	-- 	return 0
+	-- end
 end
 
 return NoteSkin

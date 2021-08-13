@@ -1,28 +1,23 @@
 local Class = require("aqua.util.Class")
 
-local GraphicalNote = Class:new()
+local NoteView = Class:new()
 
-GraphicalNote.init = function(self)
-	self.inputId = self.startNoteData.inputType .. self.startNoteData.inputIndex
-	self.id = self.inputId .. ":" .. self.noteType
-end
-
-GraphicalNote.getCS = function(self)
+NoteView.getCS = function(self)
 	return self.noteSkin:getCS(self)
 end
 
-GraphicalNote.getNext = function(self, offset)
+NoteView.getNext = function(self, offset)
 	return self.noteDrawer.noteData[self.index + offset]
 end
 
-GraphicalNote.updateNext = function(self, offset)
+NoteView.updateNext = function(self, offset)
 	local nextNote = self:getNext(offset)
 	if nextNote and nextNote.activated then
 		return nextNote:update()
 	end
 end
 
-GraphicalNote.tryNext = function(self)
+NoteView.tryNext = function(self)
 	if self.index == self.noteDrawer.startNoteIndex and self:willDrawBeforeStart() then
 		self:deactivate()
 		self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
@@ -36,22 +31,30 @@ GraphicalNote.tryNext = function(self)
 	end
 end
 
-GraphicalNote.receive = function(self, event) end
+NoteView.activate = function(self)
+	self.activated = true
+end
 
-GraphicalNote.whereWillDraw = function(self)
+NoteView.deactivate = function(self)
+	self.activated = false
+end
+
+NoteView.receive = function(self, event) end
+
+NoteView.whereWillDraw = function(self)
 	return 0
 end
 
-GraphicalNote.willDraw = function(self)
+NoteView.willDraw = function(self)
 	return self:whereWillDraw() == 0
 end
 
-GraphicalNote.willDrawBeforeStart = function(self)
+NoteView.willDrawBeforeStart = function(self)
 	return self:whereWillDraw() == -1
 end
 
-GraphicalNote.willDrawAfterEnd = function(self)
+NoteView.willDrawAfterEnd = function(self)
 	return self:whereWillDraw() == 1
 end
 
-return GraphicalNote
+return NoteView

@@ -30,14 +30,14 @@ ShortGraphicalNote.computeTimeState = function(self)
 
 	timeState.absoluteDeltaTime = currentTime - self.startNoteData.timePoint.absoluteTime
 	timeState.visualDeltaTime = currentTime - self.startNoteData.timePoint.currentVisualTime
-	timeState.scaledVisualDeltaTime = timeState.visualDeltaTime * self.noteSkin:getVisualTimeRate()
+	timeState.scaledVisualDeltaTime = timeState.visualDeltaTime * self.graphicEngine:getVisualTimeRate()
 end
 
 ShortGraphicalNote.reload = function(self)
 end
 
 ShortGraphicalNote.whereWillDraw = function(self)
-	return self.noteSkin:whereWillDraw(self, "Head", self.timeState.scaledVisualDeltaTime)
+	return self.noteSkin:where(self, self.timeState.scaledVisualDeltaTime)
 end
 
 return ShortGraphicalNote

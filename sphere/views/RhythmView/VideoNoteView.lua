@@ -1,17 +1,17 @@
 local ImageFrame	= require("aqua.graphics.ImageFrame")
-local GraphicalNote = require("sphere.views.RhythmView.GraphicalNote")
-local ImageNote		= require("sphere.views.RhythmView.ImageNote")
+local NoteView = require("sphere.views.RhythmView.NoteView")
+local ImageNoteView		= require("sphere.views.RhythmView.ImageNoteView")
 local video			= require("aqua.video")
 
-local VideoNote = GraphicalNote:new()
+local VideoNoteView = NoteView:new()
 
-VideoNote.construct = function(self)
+VideoNoteView.construct = function(self)
 	self.images = self.startNoteData.images
 end
 
-VideoNote.timeRate = 0
+VideoNoteView.timeRate = 0
 
-VideoNote.update = function(self, dt)
+VideoNoteView.update = function(self, dt)
 	local video = self.video
 	if video then
 		video:update(dt)
@@ -29,7 +29,7 @@ VideoNote.update = function(self, dt)
 	drawable.color = self:getColor()
 end
 
-VideoNote.activate = function(self)
+VideoNoteView.activate = function(self)
 	local drawable = self:getDrawable()
 	if drawable then
 		drawable:reload()
@@ -44,7 +44,7 @@ VideoNote.activate = function(self)
 	end
 end
 
-VideoNote.deactivate = function(self)
+VideoNoteView.deactivate = function(self)
 	local drawable = self.drawable
 	if drawable then
 		self.container:remove(drawable)
@@ -56,7 +56,7 @@ VideoNote.deactivate = function(self)
 	end
 end
 
-VideoNote.getDrawable = function(self)
+VideoNoteView.getDrawable = function(self)
 	local path = self.graphicEngine.localAliases[self.startNoteData.images[1][1]] or self.graphicEngine.globalAliases[self.startNoteData.images[1][1]]
 
 	local video = video.new(path)
@@ -95,24 +95,24 @@ VideoNote.getDrawable = function(self)
 end
 
 
-VideoNote.reload = ImageNote.reload
-VideoNote.getContainer = ImageNote.getContainer
-VideoNote.getHeadWidth = ImageNote.getHeadWidth
-VideoNote.getHeadHeight = ImageNote.getHeadHeight
-VideoNote.getX = ImageNote.getX
-VideoNote.getY = ImageNote.getY
-VideoNote.getScaleX = ImageNote.getScaleX
-VideoNote.getScaleY = ImageNote.getScaleY
-VideoNote.getColor = ImageNote.getColor
+VideoNoteView.reload = ImageNoteView.reload
+VideoNoteView.getContainer = ImageNoteView.getContainer
+VideoNoteView.getHeadWidth = ImageNoteView.getHeadWidth
+VideoNoteView.getHeadHeight = ImageNoteView.getHeadHeight
+VideoNoteView.getX = ImageNoteView.getX
+VideoNoteView.getY = ImageNoteView.getY
+VideoNoteView.getScaleX = ImageNoteView.getScaleX
+VideoNoteView.getScaleY = ImageNoteView.getScaleY
+VideoNoteView.getColor = ImageNoteView.getColor
 
-VideoNote.receive = function(self, event)
+VideoNoteView.receive = function(self, event)
 	if event.name == "TimeState" then
 		self:setTimeRate(event.timeRate)
 		self.timeRate = event.timeRate
 	end
 end
 
-VideoNote.setTimeRate = function(self, timeRate)
+VideoNoteView.setTimeRate = function(self, timeRate)
 	local video = self.video
 	if not video then
 		return
@@ -128,4 +128,4 @@ VideoNote.setTimeRate = function(self, timeRate)
 	end
 end
 
-return VideoNote
+return VideoNoteView

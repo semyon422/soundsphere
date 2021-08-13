@@ -32,11 +32,11 @@ LongGraphicalNote.computeTimeState = function(self)
 	startTimeState.currentVisualTime = self.startNoteData.timePoint.currentVisualTime
 	startTimeState.absoluteDeltaTime = currentTime - self.startNoteData.timePoint.absoluteTime
 	startTimeState.visualDeltaTime = currentTime - self.startNoteData.timePoint.currentVisualTime
-	startTimeState.scaledVisualDeltaTime = startTimeState.visualDeltaTime * self.noteSkin:getVisualTimeRate()
+	startTimeState.scaledVisualDeltaTime = startTimeState.visualDeltaTime * self.graphicEngine:getVisualTimeRate()
 
 	startTimeState.fakeCurrentVisualTime = self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime
 	startTimeState.fakeVisualDeltaTime = startTimeState.currentTime - (self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime)
-	startTimeState.scaledFakeVisualDeltaTime = startTimeState.fakeVisualDeltaTime * self.noteSkin:getVisualTimeRate()
+	startTimeState.scaledFakeVisualDeltaTime = startTimeState.fakeVisualDeltaTime * self.graphicEngine:getVisualTimeRate()
 
 	self.endTimeState = self.endTimeState or {}
 	local endTimeState = self.endTimeState
@@ -47,7 +47,7 @@ LongGraphicalNote.computeTimeState = function(self)
 	endTimeState.currentVisualTime = self.endNoteData.timePoint.currentVisualTime
 	endTimeState.absoluteDeltaTime = currentTime - self.endNoteData.timePoint.absoluteTime
 	endTimeState.visualDeltaTime = currentTime - self.endNoteData.timePoint.currentVisualTime
-	endTimeState.scaledVisualDeltaTime = endTimeState.visualDeltaTime * self.noteSkin:getVisualTimeRate()
+	endTimeState.scaledVisualDeltaTime = endTimeState.visualDeltaTime * self.graphicEngine:getVisualTimeRate()
 
 	endTimeState.startTimeState = startTimeState
 	startTimeState.endTimeState = endTimeState
@@ -104,8 +104,8 @@ LongGraphicalNote.reload = function(self)
 end
 
 LongGraphicalNote.whereWillDraw = function(self)
-	local wwdStart = self.noteSkin:whereWillDraw(self, "Head", self.startTimeState.scaledVisualDeltaTime)
-	local wwdEnd = self.noteSkin:whereWillDraw(self, "Tail", self.endTimeState.scaledVisualDeltaTime)
+	local wwdStart = self.noteSkin:where(self, self.startTimeState.scaledVisualDeltaTime)
+	local wwdEnd = self.noteSkin:where(self, self.endTimeState.scaledVisualDeltaTime)
 
 	if wwdStart == wwdEnd then
 		return wwdStart
