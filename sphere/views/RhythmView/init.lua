@@ -90,15 +90,16 @@ RhythmView.loadImages = function(self)
 
 	for _, data in pairs(self.noteSkin.images) do
 		local texture = self.textures[data[1]]
-		local quad, transform
-		if data[2] then
-			quad = love.graphics.newQuad(unpack(data[2]))
-		end
-		if data[3] then
-			transform = love.math.newTransform(unpack(data[3]))
+		local w, h = texture:getDimensions()
+		data[3] = {w, h}
+
+		local quad
+		local q = data[2]
+		if q then
+			quad = love.graphics.newQuad(q[1], q[2], q[3], q[4], w, h)
 		end
 
-		self.images[data[1]] = {texture, quad, transform}
+		self.images[data[1]] = {texture, quad}
 	end
 end
 
@@ -110,20 +111,13 @@ RhythmView.setBgaEnabled = function(self, type, enabled)
 	end
 end
 
-RhythmView.getNoteImageWidth = function(self, note, part)
+RhythmView.getDimensions = function(self, note, part)
 	local image = self.noteSkin:get(note, part, "image")
 	if image[2] then
-		return image[2][3]
+		return image[2][3], image[2][4]
+	elseif image[3] then
+		return image[3][1], image[3][2]
 	end
-	return self.images[image[1]][1]:getWidth()
-end
-
-RhythmView.getNoteImageHeight = function(self, note, part)
-	local image = self.noteSkin:get(note, part, "image")
-	if image[2] then
-		return image[2][4]
-	end
-	return self.images[image[1]][1]:getHeight()
 end
 
 RhythmView.getSpriteBatch = function(self, note, part)

@@ -4,10 +4,7 @@ local NotePartView = require("sphere.views.RhythmView.NotePartView")
 local ShortNoteView = NoteView:new()
 
 ShortNoteView.construct = function(self)
-	local headView = NotePartView:new()
-	headView.noteView = self
-	headView.name = "Head"
-	self.headView = headView
+	self.headView = NotePartView:new({}, self, "Head")
 end
 
 ShortNoteView.update = function(self)
@@ -30,12 +27,15 @@ end
 ShortNoteView.getTransformParams = function(self)
 	-- x, y, r, sx, sy, ox, oy, kx, ky
 	local hw = self.headView
+	local w, h = hw:getDimensions()
 	return
-		hw:get("x") + hw:get("w") * hw:get("ox"),
-		hw:get("y") + hw:get("h") * hw:get("oy"),
-		0,
-		hw:get("w") / hw:getWidth(),
-		hw:get("h") / hw:getHeight()
+		hw:get("x"),
+		hw:get("y"),
+		hw:get("r"),
+		hw:get("w") / w,
+		hw:get("h") / h,
+		hw:get("ox") * w,
+		hw:get("oy") * h
 end
 
 return ShortNoteView
