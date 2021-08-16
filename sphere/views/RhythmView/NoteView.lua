@@ -31,13 +31,9 @@ NoteView.tryNext = function(self)
 	end
 end
 
-NoteView.activate = function(self)
-	self.activated = true
-end
+NoteView.draw = function(self) end
 
-NoteView.deactivate = function(self)
-	self.activated = false
-end
+NoteView.update = function(self) end
 
 NoteView.receive = function(self, event) end
 

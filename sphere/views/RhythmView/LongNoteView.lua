@@ -1,4 +1,5 @@
 local NoteView = require("sphere.views.RhythmView.NoteView")
+local ShortNoteView = require("sphere.views.RhythmView.ShortNoteView")
 local NotePartView = require("sphere.views.RhythmView.NotePartView")
 
 local LongNoteView = NoteView:new()
@@ -55,18 +56,7 @@ LongNoteView.draw = function(self)
 	end
 end
 
-LongNoteView.getHeadTransformParams = function(self)
-	local hw = self.headView
-	local w, h = hw:getDimensions()
-	return
-		hw:get("x"),
-		hw:get("y"),
-		hw:get("r"),
-		hw:get("w") / w,
-		hw:get("h") / h,
-		hw:get("ox") * w,
-		hw:get("oy") * h
-end
+LongNoteView.getHeadTransformParams = ShortNoteView.getTransformParams
 
 LongNoteView.getTailTransformParams = function(self)
 	local tw = self.tailView
