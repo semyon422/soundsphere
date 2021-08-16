@@ -31,6 +31,13 @@ NoteView.tryNext = function(self)
 	end
 end
 
+NoteView.getDraw = function(self, quad, ...)
+	if quad then
+		return quad, ...
+	end
+	return ...
+end
+
 NoteView.draw = function(self) end
 
 NoteView.update = function(self) end

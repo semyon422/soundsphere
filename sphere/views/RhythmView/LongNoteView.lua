@@ -34,25 +34,13 @@ LongNoteView.draw = function(self)
 	local tailQuad = tailView:getQuad()
 
 	headSpriteBatch:setColor(headView:get("color"))
-	if headQuad then
-		headSpriteBatch:add(headQuad, self:getHeadTransformParams())
-	else
-		headSpriteBatch:add(self:getHeadTransformParams())
-	end
+	headSpriteBatch:add(self:getDraw(headQuad, self:getHeadTransformParams()))
 
 	bodySpriteBatch:setColor(bodyView:get("color"))
-	if bodyQuad then
-		bodySpriteBatch:add(bodyQuad, self:getBodyTransformParams())
-	else
-		bodySpriteBatch:add(self:getBodyTransformParams())
-	end
+	bodySpriteBatch:add(self:getDraw(bodyQuad, self:getBodyTransformParams()))
 
 	tailSpriteBatch:setColor(tailView:get("color"))
-	if tailQuad then
-		tailSpriteBatch:add(tailQuad, self:getTailTransformParams())
-	else
-		tailSpriteBatch:add(self:getTailTransformParams())
-	end
+	tailSpriteBatch:add(self:getDraw(tailQuad, self:getTailTransformParams()))
 end
 
 LongNoteView.getHeadTransformParams = ShortNoteView.getTransformParams

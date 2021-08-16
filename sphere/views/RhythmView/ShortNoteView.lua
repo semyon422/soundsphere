@@ -16,12 +16,7 @@ end
 ShortNoteView.draw = function(self)
 	local spriteBatch = self.headView:getSpriteBatch()
 	spriteBatch:setColor(self.headView:get("color"))
-	local quad = self.headView:getQuad()
-	if quad then
-		spriteBatch:add(quad, self:getTransformParams())
-	else
-		spriteBatch:add(self:getTransformParams())
-	end
+	spriteBatch:add(self:getDraw(self.headView:getQuad(), self:getTransformParams()))
 end
 
 ShortNoteView.getTransformParams = function(self)
