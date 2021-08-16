@@ -58,6 +58,7 @@ end
 
 RhythmView.draw = function(self)
 	love.graphics.origin()
+	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.print(love.timer.getFPS())
 	local noteViews = {}
 	for _, noteView in pairs(self.noteViews) do

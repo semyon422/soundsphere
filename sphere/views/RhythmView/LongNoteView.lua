@@ -29,26 +29,25 @@ LongNoteView.draw = function(self)
 	local bodySpriteBatch = bodyView:getSpriteBatch()
 	local tailSpriteBatch = tailView:getSpriteBatch()
 
-	headSpriteBatch:setColor(headView:get("color"))
-	bodySpriteBatch:setColor(bodyView:get("color"))
-	tailSpriteBatch:setColor(tailView:get("color"))
-
 	local headQuad = headView:getQuad()
 	local bodyQuad = bodyView:getQuad()
 	local tailQuad = tailView:getQuad()
 
+	headSpriteBatch:setColor(headView:get("color"))
 	if headQuad then
 		headSpriteBatch:add(headQuad, self:getHeadTransformParams())
 	else
 		headSpriteBatch:add(self:getHeadTransformParams())
 	end
 
+	bodySpriteBatch:setColor(bodyView:get("color"))
 	if bodyQuad then
 		bodySpriteBatch:add(bodyQuad, self:getBodyTransformParams())
 	else
 		bodySpriteBatch:add(self:getBodyTransformParams())
 	end
 
+	tailSpriteBatch:setColor(tailView:get("color"))
 	if tailQuad then
 		tailSpriteBatch:add(tailQuad, self:getTailTransformParams())
 	else
