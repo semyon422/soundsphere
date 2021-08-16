@@ -99,7 +99,7 @@ RhythmView.loadImages = function(self)
 			quad = love.graphics.newQuad(q[1], q[2], q[3], q[4], w, h)
 		end
 
-		self.images[data[1]] = {texture, quad}
+		self.images[data] = {texture, quad}
 	end
 end
 
@@ -127,7 +127,7 @@ end
 
 RhythmView.getQuad = function(self, note, part)
 	local image = self.noteSkin:get(note, part, "image")
-	return self.images[image[1]][2]
+	return self.images[image][2]
 end
 
 return RhythmView
