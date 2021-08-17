@@ -13,6 +13,7 @@ aquapackage.add("luajit-request")
 aquapackage.add("json")
 aquapackage.add("tinyyaml")
 aquapackage.add("tween")
+aquapackage.add("s3dc")
 
 local os = jit.os
 local arch = jit.arch
