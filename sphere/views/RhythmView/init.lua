@@ -1,12 +1,16 @@
 local Class = require("aqua.util.Class")
 local NoteViewFactory = require("sphere.views.RhythmView.NoteViewFactory")
 local transform = require("aqua.graphics.transform")
+local s3dc = require("s3dc")
 
 local RhythmView = Class:new()
 
 RhythmView.construct = function(self)
 	self.noteViewFactory = NoteViewFactory:new()
 end
+
+RhythmView.sensitivity = 0.5
+RhythmView.speed = 500
 
 RhythmView.load = function(self)
 	self.noteViews = {}
@@ -19,6 +23,9 @@ RhythmView.load = function(self)
 	self.images = {}
 	self.spriteBatches = {}
 	self:loadImages()
+
+	s3dc.load()
+	s3dc.show()
 end
 
 RhythmView.unload = function(self) end
@@ -47,6 +54,22 @@ RhythmView.receive = function(self, event)
 		for _, note in pairs(self.noteViews) do
 			note:receive(event)
 		end
+	elseif event.name == "mousepressed" then
+		local button = event.args[3]
+		if button == 1 then
+			self.dragging = true
+			love.mouse.setRelativeMode(true)
+		end
+	elseif event.name == "mousereleased" then
+		local button = event.args[3]
+		if button == 1 then
+			self.dragging = false
+			love.mouse.setRelativeMode(false)
+		end
+	elseif event.name == "mousemoved" and self.dragging then
+		local dx, dy = event.args[3], event.args[4]
+		local angle = self.sensitivity
+		s3dc.rotate(dx * angle, dy * angle)
 	end
 end
 
@@ -54,12 +77,28 @@ RhythmView.update = function(self, dt)
 	for _, noteView in pairs(self.noteViews) do
 		noteView:update(dt)
 	end
+
+	local dx = self.speed * dt
+	if love.keyboard.isDown("a") then
+		s3dc.left(dx)
+	elseif love.keyboard.isDown("d") then
+		s3dc.right(dx)
+	end
+	if love.keyboard.isDown("w") then
+		s3dc.forward(dx)
+	elseif love.keyboard.isDown("s") then
+		s3dc.back(dx)
+	end
+	if love.keyboard.isDown("lshift") then
+		s3dc.down(dx)
+	elseif love.keyboard.isDown("space") then
+		s3dc.up(dx)
+	end
 end
 
 RhythmView.draw = function(self)
 	love.graphics.origin()
 	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.print(love.timer.getFPS())
 	local noteViews = {}
 	for _, noteView in pairs(self.noteViews) do
 		table.insert(noteViews, noteView)
@@ -71,12 +110,13 @@ RhythmView.draw = function(self)
 		noteView:draw()
 	end
 
-	love.graphics.origin()
-	love.graphics.replaceTransform(transform(self.noteSkin.transform))
+	s3dc.draw_start()
+	love.graphics.applyTransform(transform(self.noteSkin.transform))
 	for _, spriteBatch in ipairs(self.spriteBatches) do
 		love.graphics.draw(spriteBatch)
 		spriteBatch:clear()
 	end
+	s3dc.draw_end()
 end
 
 RhythmView.loadImages = function(self)

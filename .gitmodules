@@ -46,3 +46,6 @@
 [submodule "luajit-iconv"]
 	path = luajit-iconv
 	url = https://github.com/semyon422/luajit-iconv
+[submodule "s3dc"]
+	path = s3dc
+	url = https://github.com/semyon422/s3dc
