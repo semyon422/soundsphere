@@ -25,7 +25,7 @@ RhythmView.load = function(self)
 	self:loadImages()
 
 	s3dc.load()
-	s3dc.show()
+	s3dc.show(0, 0, love.graphics.getDimensions())
 end
 
 RhythmView.unload = function(self) end
@@ -69,7 +69,7 @@ RhythmView.receive = function(self, event)
 	elseif event.name == "mousemoved" and self.dragging then
 		local dx, dy = event.args[3], event.args[4]
 		local angle = self.sensitivity
-		s3dc.rotate(dx * angle, dy * angle)
+		s3dc.rotate(math.rad(-dx) * angle, math.rad(-dy) * angle)
 	end
 end
 
@@ -87,7 +87,7 @@ RhythmView.update = function(self, dt)
 	if love.keyboard.isDown("w") then
 		s3dc.forward(dx)
 	elseif love.keyboard.isDown("s") then
-		s3dc.back(dx)
+		s3dc.backward(dx)
 	end
 	if love.keyboard.isDown("lshift") then
 		s3dc.down(dx)
