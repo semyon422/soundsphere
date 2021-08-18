@@ -69,7 +69,7 @@ RhythmView.receive = function(self, event)
 	elseif event.name == "mousemoved" and self.dragging then
 		local dx, dy = event.args[3], event.args[4]
 		local angle = self.sensitivity
-		s3dc.rotate(math.rad(-dx) * angle, math.rad(-dy) * angle)
+		s3dc.rotate(math.rad(dx) * angle, math.rad(-dy) * angle)
 	end
 end
 
