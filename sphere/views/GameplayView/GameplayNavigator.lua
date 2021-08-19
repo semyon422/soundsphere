@@ -20,12 +20,22 @@ GameplayNavigator.receive = function(self, event)
 	end
 end
 
+GameplayNavigator.update = function(self)
+	local needRetry = self.rhythmModel.pauseManager.needRetry
+
+	if needRetry then
+		self:forceRetry()
+	end
+end
+
 GameplayNavigator.keypressed = function(self, event)
 	local state = self.rhythmModel.pauseManager.state
 
 	local scancode = event.args[2]
-	if state == "play" and scancode == "escape" then
-		self:pause()
+	if state == "play" then
+		if scancode == "escape" then self:pause()
+		elseif scancode == "`" then self:retry()
+		end
 	elseif state == "pause" then
 		if scancode == "up" then self:scrollMenu("up")
 		elseif scancode == "down" then self:scrollMenu("down")
@@ -74,6 +84,12 @@ GameplayNavigator.retry = function(self)
 	self:send({
 		name = "playStateChange",
 		state = "retry"
+	})
+end
+
+GameplayNavigator.forceRetry = function(self)
+	self:send({
+		name = "retry"
 	})
 end
 

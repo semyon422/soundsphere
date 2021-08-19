@@ -22,6 +22,7 @@ GameplayView.construct = function(self)
 	self.rhythmView = RhythmView:new()
 	self.valueView = ValueView:new()
 	self.progressView = ProgressView:new()
+	self.menuProgressView = ProgressView:new()
 	self.pointGraphView = PointGraphView:new()
 	self.imageView = ImageView:new()
 	self.inputImageView = InputImageView:new()
@@ -34,6 +35,7 @@ GameplayView.load = function(self)
 	local rhythmView = self.rhythmView
 	local valueView = self.valueView
 	local progressView = self.progressView
+	local menuProgressView = self.menuProgressView
 	local pointGraphView = self.pointGraphView
 	local imageView = self.imageView
 	local inputImageView = self.inputImageView
@@ -60,6 +62,8 @@ GameplayView.load = function(self)
 	progressView.rhythmModel = self.rhythmModel
 	progressView.noteChartModel = self.noteChartModel
 
+	menuProgressView.rhythmModel = self.rhythmModel
+
 	pointGraphView.scoreSystem = self.scoreSystem
 	pointGraphView.noteChartModel = self.noteChartModel
 
@@ -76,6 +80,7 @@ GameplayView.load = function(self)
 	playfieldView:load()
 
 	sequenceView:setView("PlayfieldView", playfieldView)
+	sequenceView:setView("ProgressView", menuProgressView)
 
 	discordGameplayView.rhythmModel = self.rhythmModel
 	discordGameplayView.noteChartModel = self.noteChartModel

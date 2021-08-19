@@ -136,7 +136,7 @@ GameplayController.receive = function(self, event)
 		self.rhythmModel.timeEngine:setTimeRate(self.rhythmModel.timeEngine:getBaseTimeRate())
 	elseif event.name == "pause" then
 		self.rhythmModel.timeEngine:setTimeRate(0)
-	elseif event.name == "restart" then
+	elseif event.name == "retry" then
 		self.rhythmModel.inputManager:setMode("external")
 		self.rhythmModel.replayModel:setMode("record")
 		self:unload()

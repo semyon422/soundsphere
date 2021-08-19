@@ -128,6 +128,8 @@ RhythmModel.loadAllEngines = function(self)
 	logicEngine:load()
 	graphicEngine:load()
 	replayModel:load()
+
+	self.pauseManager:load()
 end
 
 RhythmModel.loadLogicEngines = function(self)

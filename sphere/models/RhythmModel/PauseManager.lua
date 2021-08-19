@@ -3,21 +3,24 @@ local tween = require("tween")
 
 local PauseManager = Class:new()
 
-PauseManager.construct = function(self)
-	self.state = "play"
-	self.progress = 0
-end
-
 PauseManager.progressTime = {
-	["play-pause"] = 0.25,
-	["pause-play"] = 0.25,
+	["play-pause"] = 0.20,
+	["pause-play"] = 0.5,
 	["play-retry"] = 0.5,
 	["pause-retry"] = 0.5,
 }
 
+PauseManager.load = function(self)
+	self.state = "play"
+	self.progress = 0
+	self.needRetry = false
+end
+
 PauseManager.update = function(self, dt)
 	if self.progressTween then
 		self.progressTween:update(dt)
+	else
+		self.progress = 0
 	end
 
 	local state = self.state
@@ -38,6 +41,10 @@ PauseManager.update = function(self, dt)
 			self.state = "play"
 		end
 	end
+
+	if progress == 1 then
+		self.progress = 0
+	end
 end
 
 PauseManager.receive = function(self, event)
@@ -49,10 +56,6 @@ PauseManager.receive = function(self, event)
 	local progressTime = self.progressTime
 	if event.name == "playStateChange" then
 		local progressState = state .. "-" .. event.state
-		print("progressState", progressState)
-		print("state", state)
-		print("event.state", event.state)
-		print("state:sub(1, #event.state) == event.state", state:sub(1, #event.state) == event.state)
 		if not progressTime[state] and progressTime[progressState] then
 			state = progressState
 			self:startProgress(progressTime[progressState])
@@ -60,25 +63,6 @@ PauseManager.receive = function(self, event)
 			state = event.state
 			self:startProgress()
 		end
-		-- if state == "play" and event.state == "pause" then
-		-- 	state = "play-pause"
-		-- 	self:startProgress(self.pausingTime)
-		-- elseif state == "play-pause" and event.state == "play" then
-		-- 	state = event.state
-		-- 	self:startProgress()
-		-- elseif state == "pause" and event.state == "play" then
-		-- 	state = "pause-play"
-		-- 	self:startProgress(self.resumingTime)
-		-- elseif state == "pause-play" and event.state == "pause" then
-		-- 	state = event.state
-		-- 	self:startProgress()
-		-- elseif (state == "play" or state == "pause") and event.state == "retry" then
-		-- 	state = "*-retry"
-		-- 	self:startProgress(self.retryingTime)
-		-- elseif state == "*-retry" and (event.state == "play" or event.state == "pause") then
-		-- 	state = event.state
-		-- 	self:startProgress()
-		-- end
 		self.state = state
 	end
 end
@@ -101,11 +85,7 @@ PauseManager.pause = function(self)
 end
 
 PauseManager.retry = function(self)
-	self.timeEngine:setTimeRate(self.timeEngine:getBaseTimeRate())
-	-- self.rhythmModel.inputManager:setMode("external")
-	-- self.rhythmModel.replayModel:setMode("record")
-	-- self:unload()
-	-- self:load()
+	self.needRetry = true
 end
 
 return PauseManager

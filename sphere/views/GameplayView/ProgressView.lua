@@ -27,10 +27,10 @@ ProgressView.getRectangle = function(self)
 	local config = self.config
 
 	local direction = config.direction
-	local minTime = self:getValue(config.minField)
-	local maxTime = self:getValue(config.maxField)
-	local startTime = self:getValue(config.startField)
-	local currentTime = self:getValue(config.currentField)
+	local minTime = self:getValue(config.minField) or 0
+	local maxTime = self:getValue(config.maxField) or 1
+	local startTime = self:getValue(config.startField) or 0
+	local currentTime = self:getValue(config.currentField) or 0
 
 	local normTime = 1
 	if currentTime < minTime then

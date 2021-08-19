@@ -13,8 +13,16 @@ ValueView.load = function(self)
 end
 
 ValueView.getValue = function(self, field)
+	if not field then
+		return
+	elseif type(field) == "number" then
+		return field
+	end
 	local value = self
 	for key in field:gmatch("[^.]+") do
+		if type(value) ~= "table" then
+			return
+		end
 		value = value[key]
 	end
 	return value

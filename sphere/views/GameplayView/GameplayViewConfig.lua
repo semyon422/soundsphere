@@ -1,4 +1,5 @@
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
+local transformFull = {0, 0, 0, {1 / 1920, 0}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local PlayfieldView = {
 	class = "PlayfieldView"
@@ -42,10 +43,21 @@ local BottomScreenMenu = {
 	}
 }
 
+local PauseProgressBar = {
+	class = "ProgressView",
+	currentField = "rhythmModel.pauseManager.progress",
+	x = 0, y = 0, w = 1920, h = 20,
+	color = {1, 1, 1, 1},
+	transform = transformFull,
+	direction = "left-right",
+	mode = "+"
+}
+
 local GameplayViewConfig = {
 	Background,
 	PlayfieldView,
 	BottomScreenMenu,
+	PauseProgressBar,
 }
 
 return GameplayViewConfig
