@@ -31,8 +31,6 @@ GraphicEngine.update = function(self, dt)
 		self.visualTimeRateTween:update(dt)
 	end
 	self:updateNoteDrawers()
-
-	-- self.noteSkin:update(dt)
 end
 
 GraphicEngine.increaseVisualTimeRate = function(self, delta)
@@ -70,9 +68,8 @@ GraphicEngine.receive = function(self, event)
 
 	if event.name == "TimeState" then
 		self.currentTime = event.currentTime
-		self.timeRate = event.timeRate
-		if self.noteSkin and event.timeRate ~= 0 then
-			self.noteSkin.timeRate = event.timeRate
+		if event.timeRate ~= 0 then
+			self.timeRate = event.timeRate
 		end
 		return
 	end
