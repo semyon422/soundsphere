@@ -4,12 +4,12 @@ local SequenceView = Class:new()
 
 SequenceView.construct = function(self)
 	self.views = {}
-	self.config = {}
+	self.sequenceConfig = {}
 	self.states = {}
 end
 
 SequenceView.setSequenceConfig = function(self, config)
-	self.config = config
+	self.sequenceConfig = config
 	local states = self.states
 	for _, subConfig in ipairs(config) do
 		states[subConfig] = {}
@@ -29,12 +29,12 @@ SequenceView.getState = function(self, config)
 end
 
 SequenceView.getViewIterator = function(self)
-	local configs = self.config
+	local sequenceConfig = self.sequenceConfig
 	local index = 1
 
 	return function()
-		for i = index, #configs do
-			local config = configs[i]
+		for i = index, #sequenceConfig do
+			local config = sequenceConfig[i]
 			local view = self:getView(config.class)
 			if view then
 				view.config = config

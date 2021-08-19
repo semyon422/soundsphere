@@ -1,6 +1,7 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
 local RhythmView = require("sphere.views.RhythmView")
+local GameplayViewConfig = require("sphere.views.GameplayView.GameplayViewConfig")
 local DiscordGameplayView = require("sphere.views.DiscordGameplayView")
 local PauseOverlay = require("sphere.views.GameplayView.PauseOverlay")
 local ValueView	= require("sphere.views.GameplayView.ValueView")
@@ -9,11 +10,14 @@ local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
 local ImageView	= require("sphere.views.GameplayView.ImageView")
 local InputImageView	= require("sphere.views.GameplayView.InputImageView")
 local GameplayNavigator	= require("sphere.views.GameplayView.GameplayNavigator")
+local SequenceView = require(viewspackage .. "SequenceView")
 local ScreenView = require(viewspackage .. "ScreenView")
 
 local GameplayView = ScreenView:new()
 
 GameplayView.construct = function(self)
+	self.viewConfig = GameplayViewConfig
+	self.playfieldView = SequenceView:new()
 	self.navigator = GameplayNavigator:new()
 	self.rhythmView = RhythmView:new()
 	self.valueView = ValueView:new()
@@ -26,6 +30,7 @@ GameplayView.construct = function(self)
 end
 
 GameplayView.load = function(self)
+	local playfieldView = self.playfieldView
 	local rhythmView = self.rhythmView
 	local valueView = self.valueView
 	local progressView = self.progressView
@@ -60,20 +65,16 @@ GameplayView.load = function(self)
 	imageView.root = self.noteSkin.directoryPath
 	inputImageView.root = self.noteSkin.directoryPath
 
-	self.viewConfig = self.noteSkin.playField
-	sequenceView:setView("RhythmView", rhythmView)
-	sequenceView:setView("ValueView", valueView)
-	sequenceView:setView("ProgressView", progressView)
-	sequenceView:setView("PointGraphView", pointGraphView)
-	sequenceView:setView("ImageView", imageView)
-	sequenceView:setView("InputImageView", inputImageView)
-	-- sequenceView:setSequenceConfig(self.noteSkin.playField)
-	-- sequenceView:load()
+	playfieldView:setSequenceConfig(self.noteSkin.playField)
+	playfieldView:setView("RhythmView", rhythmView)
+	playfieldView:setView("ValueView", valueView)
+	playfieldView:setView("ProgressView", progressView)
+	playfieldView:setView("PointGraphView", pointGraphView)
+	playfieldView:setView("ImageView", imageView)
+	playfieldView:setView("InputImageView", inputImageView)
+	playfieldView:load()
 
-	-- pauseOverlay:load()
-	-- pauseOverlay.rhythmModel = self.rhythmModel
-	-- pauseOverlay.configModel = configModel
-	-- pauseOverlay.observable:add(self.controller)
+	sequenceView:setView("PlayfieldView", playfieldView)
 
 	discordGameplayView.rhythmModel = self.rhythmModel
 	discordGameplayView.noteChartModel = self.noteChartModel
