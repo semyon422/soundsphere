@@ -1,18 +1,16 @@
 local Class				= require("aqua.util.Class")
 local transform = require("aqua.graphics.transform")
 local map				= require("aqua.math").map
+local ValueView = require("sphere.views.GameplayView.ValueView")
 
 local ProgressView = Class:new()
 
-ProgressView.load = function(self)
-	local state = self.state
-
-	state.startTime = self.noteChartModel.noteChart.metaData:get("minTime")
-	state.endTime = self.noteChartModel.noteChart.metaData:get("maxTime")
-end
-
+ProgressView.load = function(self) end
 ProgressView.update = function(self, dt) end
 ProgressView.unload = function(self) end
+ProgressView.receive = function(self, event) end
+
+ProgressView.getValue = ValueView.getValue
 
 ProgressView.draw = function(self)
 	local config = self.config
@@ -25,84 +23,83 @@ ProgressView.draw = function(self)
 	love.graphics.rectangle("fill", x, y, w, h)
 end
 
-ProgressView.receive = function(self, event)
-	if event.name == "TimeState" then
-		self.state.currentTime = event.exactCurrentTime
-	end
-end
-
 ProgressView.getRectangle = function(self)
 	local config = self.config
-	local state = self.state
-
-	local currentTime = state.currentTime or 0
-	state.zeroTime = state.zeroTime or currentTime
 
 	local direction = config.direction
-	local startTime = state.startTime
-	local endTime = state.endTime
-	local zeroTime = state.zeroTime
+	local minTime = self:getValue(config.minField)
+	local maxTime = self:getValue(config.maxField)
+	local startTime = self:getValue(config.startField)
+	local currentTime = self:getValue(config.currentField)
+
+	local normTime = 1
+	if currentTime < minTime then
+		normTime = map(currentTime, startTime, minTime, 0, 1)
+	elseif currentTime < maxTime then
+		normTime = map(currentTime, minTime, maxTime, 0, 1)
+	end
+	local rNormTime = 1 - normTime
 
 	local x0, y0, w0, h0 = config.x, config.y, config.w, config.h
 	local x, y, w, h = x0, y0, w0, h0
 	if config.mode == "+" then
 		if direction == "left-right" then
-			if currentTime < startTime then
-				w = w0 - map(currentTime, zeroTime, startTime, 0, w0)
+			if currentTime < minTime then
+				w = w0 * rNormTime
 				x = x0 + w0 - w
-			elseif currentTime < endTime then
-				w = map(currentTime, startTime, endTime, 0, w0)
+			elseif currentTime < maxTime then
+				w = w0 * normTime
 			end
 		elseif direction == "right-left" then
-			if currentTime < startTime then
-				w = w0 - map(currentTime, zeroTime, startTime, 0, w0)
-			elseif currentTime < endTime then
-				w = map(currentTime, startTime, endTime, 0, w0)
+			if currentTime < minTime then
+				w = w0 * rNormTime
+			elseif currentTime < maxTime then
+				w = w0 * normTime
 				x = x0 + w0 - w
 			end
 		elseif direction == "up-down" then
-			if currentTime < startTime then
-				h = h0 - map(currentTime, zeroTime, startTime, 0, h0)
+			if currentTime < minTime then
+				h = h0 * rNormTime
 				y = y0 + h0 - h
-			elseif currentTime < endTime then
-				h = map(currentTime, startTime, endTime, 0, h0)
+			elseif currentTime < maxTime then
+				h = h0 * normTime
 			end
 		elseif direction == "down-up" then
-			if currentTime < startTime then
-				h = h0 - map(currentTime, zeroTime, startTime, 0, h0)
-			elseif currentTime < endTime then
-				h = map(currentTime, startTime, endTime, 0, h0)
+			if currentTime < minTime then
+				h = h0 * rNormTime
+			elseif currentTime < maxTime then
+				h = h0 * normTime
 				y = y0 + h0 - h
 			end
 		end
 	elseif config.mode == "-" then
 		if direction == "left-right" then
-			if currentTime < startTime then
-				w = map(currentTime, zeroTime, startTime, 0, w0)
-			elseif currentTime < endTime then
-				w = w0 - map(currentTime, startTime, endTime, 0, w0)
+			if currentTime < minTime then
+				w = w0 * normTime
+			elseif currentTime < maxTime then
+				w = w0 * rNormTime
 				x = x0 + w0 - w
 			end
 		elseif direction == "right-left" then
-			if currentTime < startTime then
-				w = map(currentTime, zeroTime, startTime, 0, w0)
+			if currentTime < minTime then
+				w = w0 * normTime
 				x = x0 + w0 - w
-			elseif currentTime < endTime then
-				w = w0 - map(currentTime, startTime, endTime, 0, w0)
+			elseif currentTime < maxTime then
+				w = w0 * rNormTime
 			end
 		elseif direction == "up-down" then
-			if currentTime < startTime then
-				h = map(currentTime, zeroTime, startTime, 0, h0)
-			elseif currentTime < endTime then
-				h = h0 - map(currentTime, startTime, endTime, 0, h0)
+			if currentTime < minTime then
+				h = h0 * normTime
+			elseif currentTime < maxTime then
+				h = h0 * rNormTime
 				y = y0 + h0 - h
 			end
 		elseif direction == "down-up" then
-			if currentTime < startTime then
-				h = map(currentTime, zeroTime, startTime, 0, h0)
+			if currentTime < minTime then
+				h = h0 * normTime
 				y = y0 + h0 - h
-			elseif currentTime < endTime then
-				h = h0 - map(currentTime, startTime, endTime, 0, h0)
+			elseif currentTime < maxTime then
+				h = h0 * rNormTime
 			end
 		end
 	end

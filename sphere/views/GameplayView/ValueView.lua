@@ -12,11 +12,9 @@ ValueView.load = function(self)
 	state.font = spherefonts.get(config.fontFamily, config.fontSize)
 end
 
-ValueView.getValue = function(self)
-	local config = self.config
-
+ValueView.getValue = function(self, field)
 	local value = self
-	for key in config.field:gmatch("[^.]+") do
+	for key in field:gmatch("[^.]+") do
 		value = value[key]
 	end
 	return value
@@ -31,7 +29,7 @@ ValueView.draw = function(self)
 	love.graphics.setColor(config.color)
 
 	baseline_print(
-		(config.format):format(self:getValue()),
+		(config.format):format(self:getValue(config.field)),
 		config.x,
 		config.baseline,
 		config.limit,

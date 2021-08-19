@@ -24,8 +24,9 @@ TimeEngine.targetTimeRate = 0
 TimeEngine.backwardCounter = 0
 
 TimeEngine.load = function(self)
-	self.currentTime = -self.timeToPrepare
-	self.exactCurrentTime = -self.timeToPrepare
+	self.startTime = -self.timeToPrepare
+	self.currentTime = self.startTime
+	self.exactCurrentTime = self.startTime
 	self.baseTimeRate = TimeEngine.baseTimeRate
 	self.timeRate = TimeEngine.timeRate
 	self.targetTimeRate = TimeEngine.targetTimeRate
@@ -34,7 +35,10 @@ TimeEngine.load = function(self)
 	self.timeManager:load()
 	self.timeRateHandlers = {}
 
-	self.timeManager.offset = -self.timeToPrepare
+	self.timeManager.offset = self.startTime
+
+	self.minTime = self.noteChart.metaData:get("minTime")
+	self.maxTime = self.noteChart.metaData:get("maxTime")
 end
 
 TimeEngine.updateTimeToPrepare = function(self)
@@ -100,7 +104,7 @@ TimeEngine.receive = function(self, event)
 end
 
 TimeEngine.skipIntro = function(self)
-	local skipTime = self.noteChart.metaData:get("minTime") - self.timeToPrepare * math.abs(self.timeRate)
+	local skipTime = self.minTime - self.timeToPrepare * math.abs(self.timeRate)
 	if self.currentTime < skipTime and self.timeRate ~= 0 then
 		self:setPosition(skipTime)
 	end

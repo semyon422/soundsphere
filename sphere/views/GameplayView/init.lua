@@ -57,6 +57,7 @@ GameplayView.load = function(self)
 	valueView.modifierString = modifierModel:getString()
 
 	progressView.scoreSystem = self.scoreSystem
+	progressView.rhythmModel = self.rhythmModel
 	progressView.noteChartModel = self.noteChartModel
 
 	pointGraphView.scoreSystem = self.scoreSystem
