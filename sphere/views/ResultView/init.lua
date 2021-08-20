@@ -9,6 +9,7 @@ local ValueView	= require("sphere.views.GameplayView.ValueView")
 local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
 local ImageView	= require("sphere.views.GameplayView.ImageView")
 local ModifierIconGridView = require(viewspackage .. "SelectView.ModifierIconGridView")
+local StageInfoView = require(viewspackage .. "SelectView.StageInfoView")
 
 local ResultView = ScreenView:new()
 
@@ -19,6 +20,7 @@ ResultView.construct = function(self)
 	self.pointGraphView = PointGraphView:new()
 	self.imageView = ImageView:new()
 	self.modifierIconGridView = ModifierIconGridView:new()
+	self.stageInfoView = StageInfoView:new()
 end
 
 ResultView.load = function(self)
@@ -26,6 +28,7 @@ ResultView.load = function(self)
 	local pointGraphView = self.pointGraphView
 	local imageView = self.imageView
 	local modifierIconGridView = self.modifierIconGridView
+	local stageInfoView = self.stageInfoView
 
 	local configModifier = self.configModel:getConfig("modifier")
 
@@ -48,6 +51,7 @@ ResultView.load = function(self)
 	sequenceView:setView("PointGraphView", pointGraphView)
 	sequenceView:setView("ImageView", imageView)
 	sequenceView:setView("ModifierIconGridView", modifierIconGridView)
+	sequenceView:setView("StageInfoView", stageInfoView)
 
 	ScreenView.load(self)
 end
