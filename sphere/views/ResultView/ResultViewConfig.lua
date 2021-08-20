@@ -76,6 +76,53 @@ local Rectangle = {
 	}
 }
 
+local ScoreList = {
+	class = "ScoreListView",
+	transform = transform,
+	x = 1187,
+	y = 288,
+	w = 454,
+	h = 504,
+	rows = 7,
+	playedName = {
+		x = 116,
+		baseline = 45,
+		limit = 338,
+		align = "left",
+		fontSize = 24,
+		fontFamily = "Noto Sans"
+	},
+	playedValue = {
+		x = 117,
+		baseline = 19,
+		limit = 337,
+		align = "left",
+		fontSize = 16,
+		fontFamily = "Noto Sans"
+	},
+	performanceName = {
+		x = 71,
+		baseline = 19,
+		limit = 72,
+		align = "right",
+		fontSize = 16,
+		fontFamily = "Noto Sans"
+	},
+	performanceValue = {
+		x = 71,
+		baseline = 45,
+		limit = 72,
+		align = "right",
+		fontSize = 24,
+		fontFamily = "Noto Sans Mono"
+	},
+	point = {
+		x = 23,
+		y = 36,
+		r = 7
+	}
+}
+
 local SongTitleView = {
 	class = "ValueView",
 	field = "noteChartDataEntry.title",
@@ -407,6 +454,7 @@ local NoteSkinViewConfig = {
 	ChartDifficultyView,
 	StageInfo,
 	ModifierIconGrid,
+	ScoreList,
 }
 
 return NoteSkinViewConfig

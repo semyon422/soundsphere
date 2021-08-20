@@ -15,4 +15,11 @@ ResultNavigator.receive = function(self, event)
 	end
 end
 
+ResultNavigator.scrollScore = function(self, direction)
+	self:send({
+		name = "scrollScore",
+		direction = direction == "down" and 1 or -1
+	})
+end
+
 return ResultNavigator
