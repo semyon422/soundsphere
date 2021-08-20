@@ -5,7 +5,6 @@ local ResultController = Class:new()
 ResultController.load = function(self)
 	local modifierModel = self.gameController.modifierModel
 	local themeModel = self.gameController.themeModel
-	local noteChartModel = self.gameController.noteChartModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -17,7 +16,9 @@ ResultController.load = function(self)
 	view.controller = self
 
 	view.rhythmModel = self.rhythmModel
-	view.noteChartModel = noteChartModel
+	view.noteChartModel = self.gameController.noteChartModel
+	view.selectModel = self.gameController.selectModel
+	view.scoreLibraryModel = self.gameController.scoreLibraryModel
 	view.configModel = self.gameController.configModel
 	view.backgroundModel = self.gameController.backgroundModel
 

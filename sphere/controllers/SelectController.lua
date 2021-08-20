@@ -1,30 +1,8 @@
 local Class					= require("aqua.util.Class")
-local NoteChartSetLibraryModel		= require("sphere.models.NoteChartSetLibraryModel")
-local NoteChartLibraryModel		= require("sphere.models.NoteChartLibraryModel")
-local ScoreLibraryModel		= require("sphere.models.ScoreLibraryModel")
-local SearchModel		= require("sphere.models.SearchModel")
-local SelectModel		= require("sphere.models.SelectModel")
-local PreviewModel		= require("sphere.models.PreviewModel")
 
 local SelectController = Class:new()
 
-SelectController.construct = function(self)
-	self.noteChartSetLibraryModel = NoteChartSetLibraryModel:new()
-	self.noteChartLibraryModel = NoteChartLibraryModel:new()
-	self.scoreLibraryModel = ScoreLibraryModel:new()
-	self.searchModel = SearchModel:new()
-	self.selectModel = SelectModel:new()
-	self.previewModel = PreviewModel:new()
-end
-
 SelectController.load = function(self)
-	local noteChartSetLibraryModel = self.noteChartSetLibraryModel
-	local noteChartLibraryModel = self.noteChartLibraryModel
-	local scoreLibraryModel = self.scoreLibraryModel
-	local searchModel = self.searchModel
-	local selectModel = self.selectModel
-	local previewModel = self.previewModel
-
 	local modifierModel = self.gameController.modifierModel
 	local noteSkinModel = self.gameController.noteSkinModel
 	local noteChartModel = self.gameController.noteChartModel
@@ -38,6 +16,12 @@ SelectController.load = function(self)
 	local difficultyModel = self.gameController.difficultyModel
 	local backgroundModel = self.gameController.backgroundModel
 	local collectionModel = self.gameController.collectionModel
+	local noteChartSetLibraryModel = self.gameController.noteChartSetLibraryModel
+	local noteChartLibraryModel = self.gameController.noteChartLibraryModel
+	local scoreLibraryModel = self.gameController.scoreLibraryModel
+	local searchModel = self.gameController.searchModel
+	local selectModel = self.gameController.selectModel
+	local previewModel = self.gameController.previewModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -88,13 +72,13 @@ SelectController.load = function(self)
 end
 
 SelectController.unload = function(self)
-	self.previewModel:unload()
+	self.gameController.previewModel:unload()
 	self.view:unload()
 end
 
 SelectController.update = function(self, dt)
-	self.previewModel:update(dt)
-	self.selectModel:update()
+	self.gameController.previewModel:update(dt)
+	self.gameController.selectModel:update()
 	self.view:update(dt)
 end
 
@@ -103,17 +87,17 @@ SelectController.draw = function(self)
 end
 
 SelectController.receive = function(self, event)
-	self.searchModel:receive(event)
+	self.gameController.searchModel:receive(event)
 	self.view:receive(event)
 
 	if event.name == "setTheme" then
 		self.themeModel:setDefaultTheme(event.theme)
 	elseif event.name == "scrollNoteChartSet" then
-		self.selectModel:scrollNoteChartSet(event.direction)
+		self.gameController.selectModel:scrollNoteChartSet(event.direction)
 	elseif event.name == "scrollNoteChart" then
-		self.selectModel:scrollNoteChart(event.direction)
+		self.gameController.selectModel:scrollNoteChart(event.direction)
 	elseif event.name == "scrollScore" then
-		self.selectModel:scrollScore(event.direction)
+		self.gameController.selectModel:scrollScore(event.direction)
 	elseif event.name == "changeScreen" then
 		if event.screenName == "Modifier" then
 			self:switchModifierController()
@@ -127,7 +111,7 @@ SelectController.receive = function(self, event)
 			self:switchCollectionController()
 		end
 	elseif event.name == "changeSearchMode" then
-		self.selectModel:changeSearchMode()
+		self.gameController.selectModel:changeSearchMode()
 	elseif event.name == "startCacheUpdate" then
 		self.gameController.cacheModel:startUpdate()
 		print("start update")
