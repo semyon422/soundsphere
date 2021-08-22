@@ -356,6 +356,21 @@
 		"cs": [0, 0, 0, 0, "all"]
 	},
 	{
+		"name": "ScoreDisplayNormalScoreAdjusted",
+		"class": "ScoreDisplay", "field": "normalscore_score_adjusted",
+		"format": "%07d",
+		"x": 0,
+		"y": 0.25,
+		"w": 1,
+		"h": 1,
+		"layer": 20,
+		"align": {"x": "right", "y": "top"},
+		"color": [255, 255, 255, 255],
+		"font": "resources/fonts/SourceCodePro-Regular.ttf",
+		"size": 26,
+		"cs": [0, 0, 0, 0, "all"]
+	},
+	{
 		"name": "JudgeDisplay",
 		"class": "JudgeDisplay",
 		"timegateNames": ["great"],
