@@ -84,24 +84,24 @@ local ScoreList = {
 	w = 454,
 	h = 504,
 	rows = 7,
-	playedName = {
-		x = 116,
-		baseline = 45,
-		limit = 338,
-		align = "left",
-		fontSize = 24,
-		fontFamily = "Noto Sans"
-	},
-	playedValue = {
-		x = 117,
+	rankName = {
+		x = 22,
 		baseline = 19,
-		limit = 337,
-		align = "left",
+		limit = 72,
+		align = "right",
 		fontSize = 16,
 		fontFamily = "Noto Sans"
 	},
+	rankValue = {
+		x = 22,
+		baseline = 45,
+		limit = 72,
+		align = "right",
+		fontSize = 24,
+		fontFamily = "Noto Sans Mono"
+	},
 	performanceName = {
-		x = 71,
+		x = 116,
 		baseline = 19,
 		limit = 72,
 		align = "right",
@@ -109,9 +109,25 @@ local ScoreList = {
 		fontFamily = "Noto Sans"
 	},
 	performanceValue = {
-		x = 71,
+		x = 116,
 		baseline = 45,
 		limit = 72,
+		align = "right",
+		fontSize = 24,
+		fontFamily = "Noto Sans Mono"
+	},
+	playedName = {
+		x = 162,
+		baseline = 19,
+		limit = 270,
+		align = "right",
+		fontSize = 16,
+		fontFamily = "Noto Sans"
+	},
+	playedValue = {
+		x = 162,
+		baseline = 45,
+		limit = 270,
 		align = "right",
 		fontSize = 24,
 		fontFamily = "Noto Sans Mono"
@@ -121,6 +137,19 @@ local ScoreList = {
 		y = 36,
 		r = 7
 	}
+}
+
+local ScoreScrollBar = {
+	class = "ScrollBarView",
+	transform = transform,
+	list = ScoreList,
+	x = 1641,
+	y = 288,
+	w = 16,
+	h = 504,
+	rows = 11,
+	backgroundColor = {1, 1, 1, 0.33},
+	color = {1, 1, 1, 0.66}
 }
 
 local SongTitleView = {
@@ -309,52 +338,39 @@ StageInfo.cells = {
 		name = "score",
 		key = "score"
 	},
+
 	{
 		type = StageInfo.smallCell,
-		valueType = "text",
-		x = 1, y = 5,
-		name = "start",
-		key = "played"
-	},
-	{
-		type = StageInfo.smallCell,
-		valueType = "text",
-		x = 1, y = 6,
-		name = "max",
-		key = "played"
-	},
-	{
-		type = StageInfo.smallCell,
-		valueType = "text",
-		x = 1, y = 7,
-		name = "min",
-		key = "played"
-	},
-	{
-		type = StageInfo.smallCell,
-		valueType = "text",
-		x = 2, y = 6,
-		name = "increase",
-		key = "played"
-	},
-	{
-		type = StageInfo.smallCell,
-		valueType = "text",
-		x = 2, y = 7,
-		name = "decrease",
-		key = "played"
+		valueType = "bar",
+		x = {1, 2}, y = 5,
+		name = "perfect/hits",
+		key = "longNoteCount"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 3, y = 5,
-		name = "HTW",
-		key = "score"
+		name = "perfect",
+		key = "played"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = {2, 3}, y = 7,
+		x = {2, 3}, y = 6,
+		name = "not perfect",
+		key = "played"
+	},
+	{
+		type = StageInfo.smallCell,
+		valueType = "text",
+		x = 3, y = 7,
+		name = "miss",
+		key = "played"
+	},
+	{
+		type = StageInfo.smallCell,
+		valueType = "text",
+		x = {3, 4}, y = 6,
 		name = "early/late",
 		key = "played"
 	},
@@ -362,20 +378,6 @@ StageInfo.cells = {
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 4, y = 5,
-		name = "hits",
-		key = "score"
-	},
-	{
-		type = StageInfo.smallCell,
-		valueType = "text",
-		x = 4, y = 6,
-		name = "misses",
-		key = "played"
-	},
-	{
-		type = StageInfo.smallCell,
-		valueType = "text",
-		x = 4, y = 7,
 		name = "mean",
 		key = "played"
 	},
@@ -455,6 +457,7 @@ local NoteSkinViewConfig = {
 	StageInfo,
 	ModifierIconGrid,
 	ScoreList,
+	ScoreScrollBar,
 }
 
 return NoteSkinViewConfig
