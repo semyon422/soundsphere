@@ -1,6 +1,7 @@
 local spherefonts = require("sphere.assets.fonts")
 local transform = require("aqua.graphics.transform")
 local baseline_print = require("aqua.graphics.baseline_print")
+local inside = require("aqua.util.inside")
 local Class = require("aqua.util.Class")
 
 local ValueView = Class:new()
@@ -13,19 +14,10 @@ ValueView.load = function(self)
 end
 
 ValueView.getValue = function(self, field)
-	if not field then
-		return
-	elseif type(field) == "number" then
+	if type(field) == "number" then
 		return field
 	end
-	local value = self
-	for key in field:gmatch("[^.]+") do
-		if type(value) ~= "table" then
-			return
-		end
-		value = value[key]
-	end
-	return value
+	return inside(self, field)
 end
 
 ValueView.draw = function(self)
