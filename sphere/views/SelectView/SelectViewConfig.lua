@@ -8,27 +8,38 @@ local NoteChartSetList = {
 	w = 454,
 	h = 792,
 	rows = 11,
-	title = {
-		x = 44,
-		baseline = 45,
-		limit = 410,
-		align = "left",
-		fontSize = 24,
-		fontFamily = "Noto Sans"
+	elements = {
+		{
+			type = "text",
+			field = "noteChartDataEntry.title",
+			onNew = false,
+			x = 44,
+			baseline = 45,
+			limit = 410,
+			align = "left",
+			fontSize = 24,
+			fontFamily = "Noto Sans"
+		},
+		{
+			type = "text",
+			field = "noteChartDataEntry.artist",
+			onNew = false,
+			x = 45,
+			baseline = 19,
+			limit = 409,
+			align = "left",
+			fontSize = 16,
+			fontFamily = "Noto Sans"
+		},
+		{
+			type = "circle",
+			field = "tagged",
+			onNew = false,
+			x = 22,
+			y = 36,
+			r = 7
+		},
 	},
-	artist = {
-		x = 45,
-		baseline = 19,
-		limit = 409,
-		align = "left",
-		fontSize = 16,
-		fontFamily = "Noto Sans"
-	},
-	point = {
-		x = 22,
-		y = 36,
-		r = 7
-	}
 }
 
 local NoteChartList = {
@@ -39,43 +50,60 @@ local NoteChartList = {
 	w = 454,
 	h = 648,
 	rows = 9,
-	name = {
-		x = 116,
-		baseline = 45,
-		limit = 338,
-		align = "left",
-		fontSize = 24,
-		fontFamily = "Noto Sans"
+	elements = {
+		{
+			type = "text",
+			field = "noteChartDataEntry.name",
+			onNew = false,
+			x = 116,
+			baseline = 45,
+			limit = 338,
+			align = "left",
+			fontSize = 24,
+			fontFamily = "Noto Sans"
+		},
+		{
+			type = "text",
+			field = "noteChartDataEntry.creator",
+			onNew = true,
+			x = 117,
+			baseline = 19,
+			limit = 337,
+			align = "left",
+			fontSize = 16,
+			fontFamily = "Noto Sans"
+		},
+		{
+			type = "text",
+			field = "noteChartDataEntry.inputMode",
+			onNew = true,
+			x = 17,
+			baseline = 19,
+			limit = 47,
+			align = "left",
+			fontSize = 16,
+			fontFamily = "Noto Sans"
+		},
+		{
+			type = "text",
+			field = "difficulty",
+			onNew = false,
+			x = 0,
+			baseline = 45,
+			limit = 72,
+			align = "right",
+			fontSize = 24,
+			fontFamily = "Noto Sans Mono"
+		},
+		{
+			type = "circle",
+			field = "tagged",
+			onNew = false,
+			x = 94,
+			y = 36,
+			r = 7
+		},
 	},
-	creator = {
-		x = 117,
-		baseline = 19,
-		limit = 337,
-		align = "left",
-		fontSize = 16,
-		fontFamily = "Noto Sans"
-	},
-	inputMode = {
-		x = 17,
-		baseline = 19,
-		limit = 47,
-		align = "left",
-		fontSize = 16,
-		fontFamily = "Noto Sans"
-	},
-	difficulty = {
-		x = 0,
-		baseline = 45,
-		limit = 72,
-		align = "right",
-		fontSize = 24,
-		fontFamily = "Noto Sans Mono"
-	},
-	point = {
-		x = 94,
-		y = 36,
-		r = 7
-	}
 }
 
 local StageInfo = {

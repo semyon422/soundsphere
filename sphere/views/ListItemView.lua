@@ -1,13 +1,49 @@
 local spherefonts		= require("sphere.assets.fonts")
 local baseline_print = require("aqua.graphics.baseline_print")
 local transform = require("aqua.graphics.transform")
+local inside = require("aqua.util.inside")
 
 local Class = require("aqua.util.Class")
 
 local ListItemView = Class:new()
 
+ListItemView.draw = function(self)
+	local config = self.listView.config
+
+	love.graphics.replaceTransform(transform(config.transform))
+	love.graphics.translate(config.x, config.y)
+	love.graphics.setColor(1, 1, 1, 1)
+
+	self:drawElements()
+end
+
+ListItemView.drawElements = function(self)
+	local config = self.listView.config
+
+	local item = self.item
+
+	local prevItem = self.prevItem
+	local nextItem = self.nextItem
+
+	for _, element in ipairs(config.elements) do
+		local value = inside(item, element.field)
+		if not element.onNew or not prevItem or inside(prevItem, element.field) ~= value then
+			if element.type == "text" then
+				self:drawValue(element, value)
+			elseif element.type == "circle" then
+				self:drawCircle(element, value)
+			end
+		end
+	end
+end
+
 ListItemView.drawValue = function(self, valueConfig, value)
 	local config = self.listView.config
+
+	local format = valueConfig.format
+	if type(format) == "string" then
+		value = format:format(value)
+	end
 
 	local font = spherefonts.get(valueConfig.fontFamily, valueConfig.fontSize)
 	love.graphics.setFont(font)
@@ -21,7 +57,9 @@ ListItemView.drawValue = function(self, valueConfig, value)
 	)
 end
 
-ListItemView.drawTaggedCircle = function(self, valueConfig)
+ListItemView.drawCircle = function(self, valueConfig, value)
+	if not value then return end
+
 	local config = self.listView.config
 
 	local y = (self.visualIndex - 1) * config.h / config.rows
