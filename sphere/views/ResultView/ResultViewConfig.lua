@@ -84,59 +84,82 @@ local ScoreList = {
 	w = 454,
 	h = 504,
 	rows = 7,
-	rankName = {
-		x = 22,
-		baseline = 19,
-		limit = 72,
-		align = "right",
-		fontSize = 16,
-		fontFamily = "Noto Sans"
+	elements = {
+		{
+			type = "text",
+			value = "rank",
+			onNew = true,
+			x = 22,
+			baseline = 19,
+			limit = 72,
+			align = "right",
+			fontSize = 16,
+			fontFamily = "Noto Sans"
+		},
+		{
+			type = "text",
+			value = "0",
+			onNew = false,
+			x = 22,
+			baseline = 45,
+			limit = 72,
+			align = "right",
+			fontSize = 24,
+			fontFamily = "Noto Sans Mono"
+		},
+		{
+			type = "text",
+			value = "pp",
+			onNew = true,
+			x = 116,
+			baseline = 19,
+			limit = 72,
+			align = "right",
+			fontSize = 16,
+			fontFamily = "Noto Sans"
+		},
+		{
+			type = "text",
+			value = "0",
+			onNew = false,
+			x = 116,
+			baseline = 45,
+			limit = 72,
+			align = "right",
+			fontSize = 24,
+			fontFamily = "Noto Sans Mono"
+		},
+		{
+			type = "text",
+			value = "played",
+			onNew = true,
+			x = 162,
+			baseline = 19,
+			limit = 270,
+			align = "right",
+			fontSize = 16,
+			fontFamily = "Noto Sans"
+		},
+		{
+			type = "text",
+			value = "0 seconds ago",
+			onNew = false,
+			x = 162,
+			baseline = 45,
+			limit = 270,
+			align = "right",
+			fontSize = 24,
+			fontFamily = "Noto Sans Mono"
+		},
+		{
+			type = "circle",
+			value = true,
+			onNew = true,
+			x = 23,
+			y = 36,
+			r = 7
+		},
 	},
-	rankValue = {
-		x = 22,
-		baseline = 45,
-		limit = 72,
-		align = "right",
-		fontSize = 24,
-		fontFamily = "Noto Sans Mono"
-	},
-	performanceName = {
-		x = 116,
-		baseline = 19,
-		limit = 72,
-		align = "right",
-		fontSize = 16,
-		fontFamily = "Noto Sans"
-	},
-	performanceValue = {
-		x = 116,
-		baseline = 45,
-		limit = 72,
-		align = "right",
-		fontSize = 24,
-		fontFamily = "Noto Sans Mono"
-	},
-	playedName = {
-		x = 162,
-		baseline = 19,
-		limit = 270,
-		align = "right",
-		fontSize = 16,
-		fontFamily = "Noto Sans"
-	},
-	playedValue = {
-		x = 162,
-		baseline = 45,
-		limit = 270,
-		align = "right",
-		fontSize = 24,
-		fontFamily = "Noto Sans Mono"
-	},
-	point = {
-		x = 23,
-		y = 36,
-		r = 7
-	}
 }
 
 local ScoreScrollBar = {

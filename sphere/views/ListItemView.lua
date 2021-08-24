@@ -26,8 +26,8 @@ ListItemView.drawElements = function(self, elements)
 	local nextItem = self.nextItem
 
 	for _, element in ipairs(elements) do
-		local value = inside(item, element.field)
-		if not element.onNew or not prevItem or inside(prevItem, element.field) ~= value then
+		local value = element.value or inside(item, element.field)
+		if not element.onNew or not prevItem or (element.value or inside(prevItem, element.field)) ~= value then
 			if element.type == "text" then
 				self:drawValue(element, value)
 			elseif element.type == "circle" then
