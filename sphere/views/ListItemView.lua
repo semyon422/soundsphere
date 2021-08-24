@@ -9,10 +9,6 @@ local ListItemView = Class:new()
 ListItemView.drawValue = function(self, valueConfig, value)
 	local config = self.listView.config
 
-	love.graphics.replaceTransform(transform(config.transform))
-	love.graphics.translate(config.x, config.y)
-	love.graphics.setColor(1, 1, 1, 1)
-
 	local font = spherefonts.get(valueConfig.fontFamily, valueConfig.fontSize)
 	love.graphics.setFont(font)
 	baseline_print(
@@ -22,6 +18,24 @@ ListItemView.drawValue = function(self, valueConfig, value)
 		valueConfig.limit,
 		1,
 		valueConfig.align
+	)
+end
+
+ListItemView.drawTaggedCircle = function(self, valueConfig)
+	local config = self.listView.config
+
+	local y = (self.visualIndex - 1) * config.h / config.rows
+	love.graphics.circle(
+		"line",
+		valueConfig.x,
+		y + valueConfig.y,
+		valueConfig.r
+	)
+	love.graphics.circle(
+		"fill",
+		valueConfig.x,
+		y + valueConfig.y,
+		valueConfig.r
 	)
 end
 
