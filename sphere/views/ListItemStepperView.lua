@@ -20,11 +20,11 @@ ListItemStepperView.updateIndexValue = function(self, indexValue) end
 ListItemStepperView.increaseValue = function(self, delta) end
 
 ListItemStepperView.draw = function(self)
+	ListItemView.draw(self)
+
 	local config = self.listView.config
 	self:drawValue(config.name, self:getName())
 	self:drawValue(config.stepper.value, self:getDisplayValue())
-
-	love.graphics.replaceTransform(transform(config.transform))
 
 	local stepperView = self.stepperView
 	stepperView:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.stepper))
@@ -47,7 +47,7 @@ ListItemStepperView.receive = function(self, event)
 
 	local config = listView.config
 	local stepper = listView.stepper
-	stepper:setTransform(transform(config.transform))
+	stepper:setTransform(transform(config.transform):clone():translate(config.x, config.y))
 	stepper:setPosition(listView:getItemElementPosition(self.itemIndex, config.stepper))
 	stepper:setValue(self:getIndexValue())
 	stepper:setCount(self:getCount())

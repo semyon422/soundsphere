@@ -2,9 +2,9 @@ local spherefonts		= require("sphere.assets.fonts")
 local baseline_print = require("aqua.graphics.baseline_print")
 local transform = require("aqua.graphics.transform")
 
-local Class = require("aqua.util.Class")
+local ListItemView = require("sphere.views.ListItemView")
 
-local AvailableModifierListItemView = Class:new()
+local AvailableModifierListItemView = ListItemView:new()
 
 AvailableModifierListItemView.draw = function(self)
 	local config = self.listView.config
@@ -22,16 +22,7 @@ AvailableModifierListItemView.draw = function(self)
 		love.graphics.setColor(config.name.addedColor)
 	end
 
-	local font = spherefonts.get(config.name.fontFamily, config.name.fontSize)
-	love.graphics.setFont(font)
-	baseline_print(
-		item.name,
-		config.name.x,
-		y + config.name.baseline,
-		config.name.limit,
-		1,
-		config.name.align
-	)
+	self:drawValue(config.name, item.name)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	if not prevItem or prevItem.oneUse ~= item.oneUse then
@@ -40,21 +31,16 @@ AvailableModifierListItemView.draw = function(self)
 		if not item.oneUse then
 			text = "Sequential modifiers"
 		end
-		love.graphics.setFont(fontSection)
-		baseline_print(
-			text,
-			config.section.x,
-			y + config.section.baseline,
-			config.section.limit,
-			1,
-			config.section.align
-		)
+		self:drawValue(config.section, text)
 	end
 end
 
 AvailableModifierListItemView.receive = function(self, event)
+	local config = self.listView.config
+
 	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
-	local mx, my = love.mouse.getPosition()
+	local tf = transform(config.transform):clone():translate(config.x, config.y)
+	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
 
 	if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then
 		local button = event.args[3]

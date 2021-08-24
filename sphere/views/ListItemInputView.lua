@@ -9,6 +9,8 @@ ListItemInputView.getValue = function(self) end
 ListItemInputView.isActive = function(self) end
 
 ListItemInputView.draw = function(self)
+	ListItemView.draw(self)
+
 	local config = self.listView.config
 	self:drawValue(config.name, self:getName())
 	if self:isActive() then
@@ -23,7 +25,6 @@ ListItemInputView.receive = function(self, event)
 	if event.name ~= "mousepressed" then
 		return
 	end
-
 end
 
 return ListItemInputView

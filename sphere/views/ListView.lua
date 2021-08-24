@@ -170,7 +170,7 @@ ListView.getItemPosition = function(self, itemIndex)
 	local visualIndex = math.ceil(config.rows / 2) + itemIndex - self.state.selectedVisualItem
 	local h = config.h / config.rows
 
-	return config.x, config.y + (visualIndex - 1) * h, config.w, h
+	return 0, (visualIndex - 1) * h, config.w, h
 end
 
 ListView.getItemElementPosition = function(self, itemIndex, el)
@@ -179,7 +179,7 @@ ListView.getItemElementPosition = function(self, itemIndex, el)
 	local visualIndex = math.ceil(config.rows / 2) + itemIndex - state.selectedVisualItem
 	local h = config.h / config.rows
 
-	return config.x + el.x, config.y + (visualIndex - 1) * h + el.y, el.w, el.h
+	return el.x, (visualIndex - 1) * h + el.y, el.w, el.h
 end
 
 return ListView

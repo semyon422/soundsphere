@@ -8,23 +8,19 @@ local SectionsList = {
 	w = 454,
 	h = 792,
 	rows = 11,
-	name = {
-		x = 44,
-		baseline = 45,
-		limit = 410,
-		align = "left",
-		fontSize = 24,
-		fontFamily = "Noto Sans",
-		addedColor = {1, 1, 1, 0.5}
+	elements = {
+		{
+			type = "text",
+			field = "section",
+			onNew = false,
+			x = 44,
+			baseline = 45,
+			limit = 410,
+			align = "left",
+			fontSize = 24,
+			fontFamily = "Noto Sans",
+		}
 	},
-	section = {
-		x = 0,
-		baseline = 19,
-		limit = 409,
-		align = "right",
-		fontSize = 16,
-		fontFamily = "Noto Sans"
-	}
 }
 
 local SettingsList = {

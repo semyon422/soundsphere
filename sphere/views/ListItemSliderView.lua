@@ -18,11 +18,11 @@ ListItemSliderView.updateNormValue = function(self, normValue) end
 ListItemSliderView.increaseValue = function(self, delta) end
 
 ListItemSliderView.draw = function(self)
+	ListItemView.draw(self)
+
 	local config = self.listView.config
 	self:drawValue(config.name, self:getName())
 	self:drawValue(config.slider.value, self:getDisplayValue())
-
-	love.graphics.replaceTransform(transform(config.transform))
 
 	local sliderView = self.sliderView
 	sliderView:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.slider))
@@ -44,7 +44,7 @@ ListItemSliderView.receive = function(self, event)
 
 	local config = listView.config
 	local slider = listView.slider
-	slider:setTransform(transform(config.transform))
+	slider:setTransform(transform(config.transform):clone():translate(config.x, config.y))
 	slider:setPosition(listView:getItemElementPosition(self.itemIndex, config.slider))
 	slider:setValue(self:getNormValue())
 	slider:receive(event)
@@ -59,7 +59,7 @@ ListItemSliderView.wheelmoved = function(self, event)
 	local config = self.listView.config
 
 	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
-	local tf = transform(config.transform)
+	local tf = transform(config.transform):clone():translate(config.x, config.y)
 	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
 
 	if not (mx >= x and mx <= x + w and my >= y and my <= y + h) then

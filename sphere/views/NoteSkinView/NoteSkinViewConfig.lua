@@ -8,20 +8,27 @@ local NoteSkinList = {
 	w = 454,
 	h = 792,
 	rows = 11,
-	name = {
-		x = 44,
-		baseline = 45,
-		limit = 1920,
-		align = "left",
-		fontSize = 24,
-		fontFamily = "Noto Sans",
-		addedColor = {1, 1, 1, 0.5}
+	elements = {
+		{
+			type = "text",
+			field = "name",
+			onNew = false,
+			x = 44,
+			baseline = 45,
+			limit = 1920,
+			align = "left",
+			fontSize = 24,
+			fontFamily = "Noto Sans",
+		},
+		{
+			type = "circle",
+			field = "tagged",
+			onNew = false,
+			x = 22,
+			y = 36,
+			r = 7
+		},
 	},
-	point = {
-		x = 22,
-		y = 36,
-		r = 7
-	}
 }
 
 local NoteSkinScrollBar = {

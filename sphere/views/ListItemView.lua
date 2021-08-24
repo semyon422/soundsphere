@@ -14,18 +14,18 @@ ListItemView.draw = function(self)
 	love.graphics.translate(config.x, config.y)
 	love.graphics.setColor(1, 1, 1, 1)
 
-	self:drawElements()
+	if config.elements then
+		self:drawElements(config.elements)
+	end
 end
 
-ListItemView.drawElements = function(self)
-	local config = self.listView.config
-
+ListItemView.drawElements = function(self, elements)
 	local item = self.item
 
 	local prevItem = self.prevItem
 	local nextItem = self.nextItem
 
-	for _, element in ipairs(config.elements) do
+	for _, element in ipairs(elements) do
 		local value = inside(item, element.field)
 		if not element.onNew or not prevItem or inside(prevItem, element.field) ~= value then
 			if element.type == "text" then
@@ -83,7 +83,7 @@ ListItemView.receive = function(self, event)
 
 	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
 
-	local tf = transform(config.transform)
+	local tf = transform(config.transform):clone():translate(config.x, config.y)
 	local mx, my = tf:inverseTransformPoint(event.args[1], event.args[2])
 
 	if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then

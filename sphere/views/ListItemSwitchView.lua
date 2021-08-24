@@ -16,10 +16,10 @@ ListItemSwitchView.getValue = function(self) end
 ListItemSwitchView.setValue = function(self, delta) end
 
 ListItemSwitchView.draw = function(self)
+	ListItemView.draw(self)
+
 	local config = self.listView.config
 	self:drawValue(config.name, self:getName())
-
-	love.graphics.replaceTransform(transform(config.transform))
 
 	local switchView = self.switchView
 	switchView:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.switch))
@@ -41,7 +41,7 @@ ListItemSwitchView.receive = function(self, event)
 
 	local config = listView.config
 	local switch = listView.switch
-	switch:setTransform(transform(config.transform))
+	switch:setTransform(transform(config.transform):clone():translate(config.x, config.y))
 	switch:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.switch))
 	switch:setValue(self:getValue())
 	switch:receive(event)
