@@ -2,6 +2,7 @@ local Class = require("aqua.util.Class")
 local transform = require("aqua.graphics.transform")
 local spherefonts		= require("sphere.assets.fonts")
 local baseline_print = require("aqua.graphics.baseline_print")
+local inside = require("aqua.util.inside")
 
 local StageInfoView = Class:new()
 
@@ -60,10 +61,15 @@ StageInfoView.drawTextCell = function(self, cell)
 		dcw = 0
 	end
 
+	local value = cell.value or inside(self, cell.key) or "0"
+	if cell.format then
+		value = cell.format:format(value)
+	end
+
 	local fontValue = spherefonts.get(cell.type.value.text.fontFamily, cell.type.value.text.fontSize)
 	love.graphics.setFont(fontValue)
 	baseline_print(
-		"0",
+		value,
 		cx + cell.type.value.text.x,
 		cell.type.y[cell.y] + cell.type.value.text.baseline,
 		cell.type.value.text.limit + dcw,

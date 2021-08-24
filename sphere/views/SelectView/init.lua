@@ -29,6 +29,7 @@ SelectView.load = function(self)
 	local noteChartListView = self.noteChartListView
 	local searchFieldView = self.searchFieldView
 	local modifierIconGridView = self.modifierIconGridView
+	local stageInfoView = self.stageInfoView
 	local navigator = self.navigator
 
 	local configModifier = self.configModel:getConfig("modifier")
@@ -47,6 +48,8 @@ SelectView.load = function(self)
 
 	modifierIconGridView.modifierModel = self.modifierModel
 	modifierIconGridView.configModifier = configModifier
+
+	stageInfoView.selectModel = self.selectModel
 
 	local sequenceView = self.sequenceView
 	sequenceView:setView("NoteChartSetListView", noteChartSetListView)

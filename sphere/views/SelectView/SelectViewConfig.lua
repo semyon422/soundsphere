@@ -171,14 +171,14 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 2, y = 3,
 		name = "duration",
-		key = "length"
+		key = "selectModel.noteChartItem.noteChartDataEntry.length"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 2, y = 4,
 		name = "notes",
-		key = "noteCount"
+		key = "selectModel.noteChartItem.noteChartDataEntry.noteCount"
 	},
 	{
 		type = StageInfo.smallCell,
@@ -192,21 +192,23 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 1, y = 4,
 		name = "level",
-		key = "level"
+		key = "selectModel.noteChartItem.noteChartDataEntry.level"
 	},
 	{
 		type = StageInfo.largeCell,
 		valueType = "text",
 		x = 1, y = 1,
 		name = "accuracy",
-		key = "accuracy"
+		format = "%2.2f",
+		key = "selectModel.scoreItem.scoreEntry.accuracy"
 	},
 	{
 		type = StageInfo.largeCell,
 		valueType = "text",
 		x = 2, y = 1,
 		name = "score",
-		key = "score"
+		format = "%2.2f",
+		key = "selectModel.scoreItem.scoreEntry.score"
 	},
 	{
 		type = StageInfo.smallCell,

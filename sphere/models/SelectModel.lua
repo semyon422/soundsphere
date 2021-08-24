@@ -13,6 +13,10 @@ SelectModel.load = function(self)
 	self.noteChartItemIndex = self.noteChartLibraryModel:getItemIndex(config.noteChartEntryId, config.noteChartDataEntryId)
 	self.scoreItemIndex = self.scoreLibraryModel:getItemIndex(config.scoreEntryId)
 
+	self.noteChartSetItem = self.noteChartSetLibraryModel.items[self.noteChartSetItemIndex]
+	self.noteChartItem = self.noteChartLibraryModel.items[self.noteChartItemIndex]
+	self.scoreItem = self.scoreLibraryModel.items[self.scoreItemIndex]
+
 	self:pullNoteChartSet()
 end
 
@@ -61,6 +65,7 @@ SelectModel.scrollNoteChartSet = function(self, direction, destination)
 	self.scoreItemIndex = 1
 
 	local noteChartSetItem = noteChartSetItems[self.noteChartSetItemIndex]
+	self.noteChartSetItem = noteChartSetItem
 	self.config.noteChartSetEntryId = noteChartSetItem.noteChartSetEntry.id
 
 	self:pullNoteChart()
@@ -79,6 +84,7 @@ SelectModel.scrollNoteChart = function(self, direction, destination)
 	self.scoreItemIndex = 1
 
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
+	self.noteChartItem = noteChartItem
 
 	self.config.noteChartEntryId = noteChartItem.noteChartEntry.id
 	self.config.noteChartDataEntryId = noteChartItem.noteChartDataEntry.id
@@ -96,6 +102,7 @@ SelectModel.scrollScore = function(self, direction)
 	self.scoreItemIndex = self.scoreItemIndex + direction
 
 	local scoreItem = scoreItems[self.scoreItemIndex]
+	self.scoreItem = scoreItem
 
 	self.config.scoreEntryId = scoreItem.scoreEntry.id
 end
@@ -112,6 +119,7 @@ SelectModel.pullNoteChartSet = function(self)
 
 	noteChartSetItem = noteChartSetItems[self.noteChartSetItemIndex]
 	if noteChartSetItem then
+		self.noteChartSetItem = noteChartSetItem
 		self.config.noteChartSetEntryId = noteChartSetItem.noteChartSetEntry.id
 		self:pullNoteChart()
 	end
@@ -131,6 +139,7 @@ SelectModel.pullNoteChart = function(self)
 		return
 	end
 
+	self.noteChartItem = noteChartItem
 	self.config.noteChartEntryId = noteChartItem.noteChartEntry.id
 	self.config.noteChartDataEntryId = noteChartItem.noteChartDataEntry.id
 	self:pullScore()
@@ -154,6 +163,7 @@ SelectModel.pullScore = function(self)
 
 	scoreItem = scoreItems[self.scoreItemIndex]
 	if scoreItem then
+		self.scoreItem = scoreItem
 		self.config.scoreEntryId = scoreItem.scoreEntry.id
 	end
 end
