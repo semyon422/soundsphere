@@ -215,8 +215,10 @@ StageInfo.cells = {
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = {3, 4}, y = 5,
-		name = "played",
-		key = "played"
+		name = "played time ago",
+		key = "selectModel.scoreItem.scoreEntry.time",
+		ago = true,
+		suffix = ""
 	},
 	{
 		type = StageInfo.smallCell,

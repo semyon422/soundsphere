@@ -4,6 +4,7 @@ local spherefonts		= require("sphere.assets.fonts")
 local baseline_print = require("aqua.graphics.baseline_print")
 local inside = require("aqua.util.inside")
 local rtime = require("aqua.util.rtime")
+local time_ago_in_words = require("aqua.util").time_ago_in_words
 
 local StageInfoView = Class:new()
 
@@ -67,6 +68,8 @@ StageInfoView.drawTextCell = function(self, cell)
 		value = cell.format:format(value)
 	elseif cell.time then
 		value = rtime(value)
+	elseif cell.ago then
+		value = time_ago_in_words(value, cell.parts, cell.suffix)
 	end
 
 	local fontValue = spherefonts.get(cell.type.value.text.fontFamily, cell.type.value.text.fontSize)
