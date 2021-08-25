@@ -26,8 +26,8 @@ ModifierIconGridView.draw = function(self)
 	local iconConfig = self.iconConfig
 	iconConfig.transform = config.transform
 	iconConfig.size = config.w / config.columns
-	for column = 1, config.columns do
-		for row = 1, config.rows do
+	for row = 1, config.rows do
+		for column = 1, config.columns do
 			local modifierConfig = configModifier[i]
 			if modifierConfig then
 				local modifier = modifierModel:getModifier(modifierConfig)
