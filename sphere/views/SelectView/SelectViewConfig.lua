@@ -171,7 +171,8 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 2, y = 3,
 		name = "duration",
-		key = "selectModel.noteChartItem.noteChartDataEntry.length"
+		key = "selectModel.noteChartItem.noteChartDataEntry.length",
+		time = true
 	},
 	{
 		type = StageInfo.smallCell,

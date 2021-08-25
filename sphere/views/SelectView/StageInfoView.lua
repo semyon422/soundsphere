@@ -3,6 +3,7 @@ local transform = require("aqua.graphics.transform")
 local spherefonts		= require("sphere.assets.fonts")
 local baseline_print = require("aqua.graphics.baseline_print")
 local inside = require("aqua.util.inside")
+local rtime = require("aqua.util.rtime")
 
 local StageInfoView = Class:new()
 
@@ -64,6 +65,8 @@ StageInfoView.drawTextCell = function(self, cell)
 	local value = cell.value or inside(self, cell.key) or "0"
 	if cell.format then
 		value = cell.format:format(value)
+	elseif cell.time then
+		value = rtime(value)
 	end
 
 	local fontValue = spherefonts.get(cell.type.value.text.fontFamily, cell.type.value.text.fontSize)
