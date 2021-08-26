@@ -67,9 +67,9 @@ StageInfoView.drawTextCell = function(self, cell)
 	if cell.format then
 		value = cell.format:format(value)
 	elseif cell.time then
-		value = rtime(value)
+		value = rtime(tonumber(value) or 0)
 	elseif cell.ago then
-		value = time_ago_in_words(value, cell.parts, cell.suffix)
+		value = time_ago_in_words(tonumber(value) or 0, cell.parts, cell.suffix)
 	end
 
 	local fontValue = spherefonts.get(cell.type.value.text.fontFamily, cell.type.value.text.fontSize)
