@@ -1,4 +1,5 @@
 local Class = require("aqua.util.Class")
+local inside = require("aqua.util.inside")
 local transform = require("aqua.graphics.transform")
 local ModifierIconView = require("sphere.views.ModifierView.ModifierIconView")
 
@@ -18,8 +19,12 @@ ModifierIconGridView.draw = function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local modifierIconView = self.modifierIconView
-	local configModifier = self.configModifier
+	local configModifier = inside(self, config.config)
 	local modifierModel = self.modifierModel
+	if type(configModifier) == "string" then
+		configModifier = modifierModel:decode(configModifier)
+	end
+	configModifier = configModifier or {}
 
 	local i = 1
 

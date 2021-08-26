@@ -46,6 +46,7 @@ SelectView.load = function(self)
 
 	searchFieldView.searchModel = self.searchModel
 
+	modifierIconGridView.selectModel = self.selectModel
 	modifierIconGridView.modifierModel = self.modifierModel
 	modifierIconGridView.configModifier = configModifier
 

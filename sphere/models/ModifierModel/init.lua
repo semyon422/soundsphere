@@ -50,6 +50,31 @@ local Modifiers = {
 	ToOsu
 }
 
+local ModifierId = {
+	[AutoPlay] = 0,
+	[ProMode] = 1,
+	[AutoKeySound] = 2,
+	[SpeedMode] = 3,
+	[TimeRateQ] = 4,
+	[TimeRateX] = 5,
+	[WindUp] = 6,
+	[AudioClip] = 7,
+	[NoScratch] = 8,
+	[NoLongNote] = 9,
+	[NoMeasureLine] = 10,
+	[Automap] = 11,
+	[MultiplePlay] = 12,
+	[MultiOverPlay] = 13,
+	[Alternate] = 14,
+	[Shift] = 15,
+	[Mirror] = 16,
+	[Random] = 17,
+	[BracketSwap] = 18,
+	[FullLongNote] = 19,
+	[MinLnLength] = 20,
+	[ToOsu] = 21
+}
+
 local OneUseModifiers = {
 	AutoPlay,
 	ProMode,
@@ -68,6 +93,7 @@ ModifierModel.construct = function(self)
 	self.modifiers = {}
 	self.oneUseModifiers = {}
 	self.modifierByName = {}
+	self.modifierById = {}
 	self:createModifiers()
 end
 
@@ -100,10 +126,13 @@ end
 
 ModifierModel.createModifiers = function(self)
 	local modifierByName = self.modifierByName
+	local modifierById = self.modifierById
 	for _, Modifier in ipairs(Modifiers) do
 		local modifier = Modifier:new()
 		modifier.modifierModel = self
+		modifier.id = ModifierId[Modifier]
 		modifierByName[modifier.name] = modifier
+		modifierById[modifier.id] = modifier
 		table.insert(self.modifiers, modifier)
 		if self:isOneUseModifier(Modifier) then
 			modifier.oneUse = true
@@ -113,6 +142,9 @@ ModifierModel.createModifiers = function(self)
 end
 
 ModifierModel.getModifier = function(self, modifierConfig)
+	if type(modifierConfig) == "number" then
+		return self.modifierById[modifierConfig]
+	end
 	return self.modifierByName[modifierConfig.name]
 end
 
@@ -227,6 +259,25 @@ ModifierModel.getString = function(self)
 		table.insert(t, modifier:getString(modifierConfig) .. (modifier:getSubString(modifierConfig) or ""))
 	end
 	return table.concat(t, ",")
+end
+
+ModifierModel.encode = function(self, config)
+	config = config or self.config
+	local t = {}
+	for _, modifierConfig in ipairs(config) do
+		local modifier = self:getModifier(modifierConfig)
+		table.insert(t, ("%d:%s"):format(modifier.id, modifier:encode(modifierConfig)))
+	end
+	return table.concat(t, ";")
+end
+
+ModifierModel.decode = function(self, encodedConfig)
+	local config = {}
+	for modifierId, modifierData in encodedConfig:gmatch("(%d+):([^;]+)") do
+		local modifier = self:getModifier(tonumber(modifierId))
+		table.insert(config, modifier:decode(modifierData))
+	end
+	return config
 end
 
 return ModifierModel

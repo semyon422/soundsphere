@@ -76,7 +76,7 @@ ScoreManager.insertScore = function(self, scoreSystem, noteChartDataEntry, repla
 		accuracy = scoreSystem.accuracy,
 		maxCombo = scoreSystem.maxcombo,
 		scoreRating = 0,
-		modifiers = modifierModel:getString(),
+		modifiers = modifierModel:encode(),
 		replayHash = replayHash
 	})
 	ScoreDatabase:unload()

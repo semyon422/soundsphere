@@ -6,15 +6,38 @@ local Modifier = Class:new()
 Modifier.getDefaultConfig = function(self)
 	return {
 		name = self.name,
+		version = self.version,
 		value = self.defaultValue
 	}
 end
 
+Modifier.version = 0
 Modifier.name = ""
 Modifier.format = "%d"
 Modifier.defaultValue = 0
 Modifier.range = {0, 1}
 Modifier.step = 1
+
+Modifier.encode = function(self, config)
+	return ("%d,%s"):format(config.version, config.value)
+end
+
+Modifier.decode = function(self, configData)
+	local config = self:getDefaultConfig()
+	local version, value = configData:match("^(%d+),(.+)$")
+	config.version = tonumber(version)
+	config.value = self:decodeValue(value)
+	return config
+end
+
+Modifier.decodeValue = function(self, s)
+	if type(self.defaultValue) == "boolean" then
+		return s == "true"
+	elseif type(self.defaultValue) == "number" then
+		return tonumber(s)
+	end
+	return s
+end
 
 Modifier.getValue = function(self, config)
 	return config.value

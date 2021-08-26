@@ -382,7 +382,8 @@ local ModifierIconGrid = {
 	w = 410,
 	h = 136,
 	columns = 6,
-	rows = 2
+	rows = 2,
+	config = "configModifier"
 }
 
 local StageInfoModifierIconGrid = {
@@ -393,7 +394,8 @@ local StageInfoModifierIconGrid = {
 	w = 183,
 	h = 138,
 	columns = 4,
-	rows = 3
+	rows = 3,
+	config = "selectModel.scoreItem.scoreEntry.modifiers"
 }
 
 local BottomScreenMenu = {
