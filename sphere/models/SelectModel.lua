@@ -118,8 +118,8 @@ SelectModel.pullNoteChartSet = function(self)
 	self.noteChartSetItemIndex = self.noteChartSetLibraryModel:getItemIndex(self.config.noteChartSetEntryId)
 
 	noteChartSetItem = noteChartSetItems[self.noteChartSetItemIndex]
+	self.noteChartSetItem = noteChartSetItem
 	if noteChartSetItem then
-		self.noteChartSetItem = noteChartSetItem
 		self.config.noteChartSetEntryId = noteChartSetItem.noteChartSetEntry.id
 		self:pullNoteChart()
 	end
@@ -135,11 +135,11 @@ SelectModel.pullNoteChart = function(self)
 	self.noteChartItemIndex = self.noteChartLibraryModel:getItemIndex(self.config.noteChartEntryId, self.config.noteChartDataEntryId)
 
 	noteChartItem = noteChartItems[self.noteChartItemIndex]
+	self.noteChartItem = noteChartItem
 	if not noteChartItem then
 		return
 	end
 
-	self.noteChartItem = noteChartItem
 	self.config.noteChartEntryId = noteChartItem.noteChartEntry.id
 	self.config.noteChartDataEntryId = noteChartItem.noteChartDataEntry.id
 	self:pullScore()
@@ -162,8 +162,8 @@ SelectModel.pullScore = function(self)
 	self.scoreItemIndex = self.scoreLibraryModel:getItemIndex(self.config.scoreEntryId)
 
 	scoreItem = scoreItems[self.scoreItemIndex]
+	self.scoreItem = scoreItem
 	if scoreItem then
-		self.scoreItem = scoreItem
 		self.config.scoreEntryId = scoreItem.scoreEntry.id
 	end
 end
