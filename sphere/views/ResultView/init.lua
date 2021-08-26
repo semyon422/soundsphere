@@ -51,6 +51,8 @@ ResultView.load = function(self)
 	scoreListView.selectModel = self.selectModel
 	scoreListView.navigator = self.navigator
 
+	stageInfoView.selectModel = self.selectModel
+
 	imageView.root = "."
 
 	local sequenceView = self.sequenceView

@@ -169,6 +169,14 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
+		x = 1, y = 3,
+		name = "bpm",
+		format = "%d",
+		key = "selectModel.noteChartItem.noteChartDataEntry.bpm"
+	},
+	{
+		type = StageInfo.smallCell,
+		valueType = "text",
 		x = 2, y = 3,
 		name = "duration",
 		key = "selectModel.noteChartItem.noteChartDataEntry.length",
@@ -186,7 +194,7 @@ StageInfo.cells = {
 		valueType = "bar",
 		x = {3, 4}, y = 4,
 		name = "long notes",
-		key = "longNoteCount"
+		key = "selectModel.noteChartItem.noteChartDataEntry.longNoteRatio"
 	},
 	{
 		type = StageInfo.smallCell,
@@ -224,8 +232,8 @@ StageInfo.cells = {
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 3, y = 6,
-		name = "pp",
-		key = "pp"
+		name = "rating",
+		key = "selectModel.scoreItem.scoreEntry.rating"
 	},
 	{
 		type = StageInfo.smallCell,
@@ -233,13 +241,6 @@ StageInfo.cells = {
 		x = 4, y = 6,
 		name = "rank",
 		key = "rank"
-	},
-	{
-		type = StageInfo.smallCell,
-		valueType = "text",
-		x = {1, 2}, y = 8,
-		name = "predicted accuracy",
-		key = "accuracy"
 	},
 }
 
