@@ -40,6 +40,13 @@ CollectionController.receive = function(self, event)
 
 	if event.name == "setCollection" then
 		self.gameController.collectionModel:setCollection(event.collection)
+	elseif event.name == "updateCache" then
+		local state = self.gameController.cacheModel.cacheUpdater.state
+		if state == 0 or state == 3 then
+			self.gameController.cacheModel:startUpdate(event.collection.path, event.force)
+		else
+			self.gameController.cacheModel:stopUpdate()
+		end
 	elseif event.name == "changeScreen" then
 		self.gameController.screenManager:set(self.selectController)
 	end

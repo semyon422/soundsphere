@@ -1,5 +1,23 @@
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
+local CacheView = {
+	class = "CacheView",
+	transform = transform,
+	x = 279,
+	y = 504,
+	w = 454,
+	h = 792,
+	text = {
+		type = "text",
+		x = 44,
+		baseline = 45,
+		limit = 1920,
+		align = "left",
+		fontSize = 24,
+		fontFamily = "Noto Sans",
+	},
+}
+
 local CollectionList = {
 	class = "CollectionListView",
 	transform = transform,
@@ -106,6 +124,7 @@ local CollectionViewConfig = {
 	BottomScreenMenu,
 	CollectionList,
 	CollectionScrollBar,
+	CacheView,
 	Rectangle
 }
 

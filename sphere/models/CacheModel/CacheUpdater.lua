@@ -20,10 +20,6 @@ CacheUpdater.unload = function(self)
 	ThreadPool.observable:remove(self)
 end
 
-CacheUpdater.send = function(self, event)
-	return self.observable:send(event)
-end
-
 CacheUpdater.receive = function(self, event)
 	if event.name ~= "CacheProgress" then
 		return
@@ -38,8 +34,6 @@ CacheUpdater.receive = function(self, event)
 		self.isUpdating = false
 	end
 	self.state = event.state
-
-	self:send(event)
 end
 
 CacheUpdater.stop = function(self)

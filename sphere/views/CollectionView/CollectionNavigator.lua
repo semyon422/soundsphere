@@ -39,4 +39,13 @@ CollectionNavigator.setCollection = function(self, itemIndex)
 	self:changeScreen("Select")
 end
 
+CollectionNavigator.updateCache = function(self)
+	local collections = self.collectionModel.items
+	self:send({
+		name = "updateCache",
+		collection = collections[self.collectionItemIndex],
+		force = love.keyboard.isDown("lshift")
+	})
+end
+
 return CollectionNavigator
