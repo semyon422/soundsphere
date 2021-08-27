@@ -601,9 +601,9 @@ CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, for
 	local entries, noteCharts = NoteChartDataEntryFactory:getEntries(fileDatas)
 	for i, entry in ipairs(entries) do
 		local noteChart = noteCharts[i]
-		local difficulty, longNoteRate = DifficultyModel:getDifficulty(noteChart)
+		local difficulty, longNoteRatio = DifficultyModel:getDifficulty(noteChart)
 		entry.difficulty = difficulty
-		entry.longNoteRate = longNoteRate
+		entry.longNoteRatio = longNoteRatio
 		self:setNoteChartDataEntry(entry)
 		self:setNoteChartEntry(entry.noteChartEntry)
 	end
