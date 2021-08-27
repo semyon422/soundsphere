@@ -59,7 +59,7 @@ NoteChartLibraryModel.sortItemsFunction = function(a, b)
 	if
 		#a.inputMode < #b.inputMode or
 		#a.inputMode == #b.inputMode and a.inputMode < b.inputMode or
-		a.inputMode == b.inputMode and a.noteCount / a.length < b.noteCount / b.length
+		a.inputMode == b.inputMode and a.noteCount < b.noteCount
 	then
 		return true
 	end
