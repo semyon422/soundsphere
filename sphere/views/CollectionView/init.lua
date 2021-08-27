@@ -1,56 +1,33 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
-local Class = require("aqua.util.Class")
-local Node = require("aqua.util.Node")
+local ScreenView = require(viewspackage .. "ScreenView")
+
+local CollectionViewConfig = require(viewspackage .. "CollectionView.CollectionViewConfig")
 local CollectionNavigator = require(viewspackage .. "CollectionView.CollectionNavigator")
 local CollectionListView = require(viewspackage .. "CollectionView.CollectionListView")
-local BackgroundView = require(viewspackage .. "BackgroundView")
 
-local CollectionView = Class:new()
+local CollectionView = ScreenView:new()
 
 CollectionView.construct = function(self)
-	self.node = Node:new()
+	self.viewConfig = CollectionViewConfig
+	self.navigator = CollectionNavigator:new()
+	self.collectionListView = CollectionListView:new()
 end
 
 CollectionView.load = function(self)
-	local node = self.node
-	local config = self.configModel:getConfig("select")
+	local navigator = self.navigator
+	local collectionListView = self.collectionListView
 
-	local navigator = CollectionNavigator:new()
-	self.navigator = navigator
-	navigator.config = config
-	navigator.view = self
+	navigator.collectionModel = self.collectionModel
 
-	local inputListView = CollectionListView:new()
-	inputListView.navigator = navigator
-	inputListView.config = config
-	inputListView.view = self
+	collectionListView.collectionModel = self.collectionModel
+	collectionListView.navigator = navigator
+	collectionListView.view = self
 
-	local backgroundView = BackgroundView:new()
-	backgroundView.view = self
+	local sequenceView = self.sequenceView
+	sequenceView:setView("CollectionListView", collectionListView)
 
-	node:node(backgroundView)
-	node:node(inputListView)
-
-	navigator:load()
-end
-
-CollectionView.unload = function(self)
-	self.navigator:unload()
-end
-
-CollectionView.receive = function(self, event)
-	self.node:callnext(event.name, event)
-	self.navigator:receive(event)
-end
-
-CollectionView.update = function(self, dt)
-	self.node:callnext("update")
-	self.navigator:update()
-end
-
-CollectionView.draw = function(self)
-	self.node:callnext("draw")
+	ScreenView.load(self)
 end
 
 return CollectionView

@@ -3,7 +3,7 @@ local Class = require("aqua.util.Class")
 local NoteChartSetLibraryModel = Class:new()
 
 NoteChartSetLibraryModel.searchMode = "hide"
-NoteChartSetLibraryModel.collection = ""
+NoteChartSetLibraryModel.collection = {path = ""}
 
 NoteChartSetLibraryModel.construct = function(self)
 	self.items = {}
@@ -36,7 +36,7 @@ end
 
 
 NoteChartSetLibraryModel.checkNoteChartSetEntry = function(self, entry)
-	if not entry.path:find(self.collection, 1, true) then
+	if not entry.path:find(self.collection.path, 1, true) then
 		return false
 	end
 

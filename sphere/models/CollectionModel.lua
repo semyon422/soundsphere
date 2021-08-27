@@ -2,11 +2,9 @@ local Class = require("aqua.util.Class")
 
 local CollectionModel = Class:new()
 
-CollectionModel.collection = ""
-
 CollectionModel.load = function(self)
 	self.config = self.configModel:getConfig("select")
-	self.collection = self.config.collection
+	local collectionPath = self.config.collection
 
 	local dict = {}
 	for _, chartSetData in ipairs(self.cacheModel.cacheManager:getNoteChartSets()) do
@@ -18,18 +16,23 @@ CollectionModel.load = function(self)
 		dict["userdata/charts/" .. name] = true
 	end
 
-	local paths = {"userdata/charts"}
+	local items = {{path = "userdata/charts"}}
 	for path in pairs(dict) do
-		paths[#paths + 1] = path
+		local collection = {path = path}
+		items[#items + 1] = collection
+		if path == collectionPath then
+			self.collection = collection
+		end
 	end
-	table.sort(paths)
+	table.sort(items, function(a, b) return a.path < b.path end)
+	self.collection = self.collection or items[1]
 
-	self.items = paths
+	self.items = items
 end
 
 CollectionModel.setCollection = function(self, collection)
 	self.collection = collection
-	self.config.collection = collection
+	self.config.collection = collection.path
 end
 
 return CollectionModel

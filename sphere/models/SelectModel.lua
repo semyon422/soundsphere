@@ -108,7 +108,7 @@ SelectModel.scrollScore = function(self, direction)
 end
 
 SelectModel.pullNoteChartSet = function(self)
-	self.noteChartSetLibraryModel:setCollection(self.config.collection)
+	self.noteChartSetLibraryModel:setCollection(self.collectionModel.collection)
 	self.noteChartLibraryModel:updateItems()
 	self.noteChartSetLibraryModel:updateItems()
 

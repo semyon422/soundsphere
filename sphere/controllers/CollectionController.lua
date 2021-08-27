@@ -27,8 +27,8 @@ CollectionController.unload = function(self)
 	self.view:unload()
 end
 
-CollectionController.update = function(self)
-	self.view:update()
+CollectionController.update = function(self, dt)
+	self.view:update(dt)
 end
 
 CollectionController.draw = function(self)
@@ -40,8 +40,8 @@ CollectionController.receive = function(self, event)
 
 	if event.name == "setCollection" then
 		self.gameController.collectionModel:setCollection(event.collection)
-	elseif event.name == "goSelectScreen" then
-		return self.gameController.screenManager:set(self.selectController)
+	elseif event.name == "changeScreen" then
+		self.gameController.screenManager:set(self.selectController)
 	end
 end
 

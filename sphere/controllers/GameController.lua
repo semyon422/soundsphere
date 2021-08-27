@@ -93,6 +93,7 @@ GameController.load = function(self)
 	local difficultyModel = self.difficultyModel
 	local collectionModel = self.collectionModel
 	local settingsModel = self.settingsModel
+	local selectModel = self.selectModel
 
 	directoryManager:createDirectories()
 
@@ -139,6 +140,8 @@ GameController.load = function(self)
 
 	themeModel.configModel = configModel
 	themeModel:load()
+
+	selectModel.collectionModel = collectionModel
 
 	modifierModel:load()
 
