@@ -6,7 +6,8 @@ NoteChartListItemView.draw = function(self)
 	local item = self.item
 	local noteChartDataEntry = item.noteChartDataEntry
 
-	local difficulty = noteChartDataEntry.noteCount / noteChartDataEntry.length / 3
+	-- local difficulty = noteChartDataEntry.noteCount / noteChartDataEntry.length / 3
+	local difficulty = noteChartDataEntry.difficulty
 	local format = "%.2f"
 	if difficulty >= 10 then
 		format = "%.1f"

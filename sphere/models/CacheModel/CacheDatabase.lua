@@ -25,7 +25,9 @@ CacheDatabase.noteChartDatasColumns = {
 	"inputMode",
 	"noteCount",
 	"length",
-	"bpm"
+	"bpm",
+	"difficulty",
+	"longNoteRatio",
 }
 
 CacheDatabase.noteChartsColumns = {
@@ -51,7 +53,9 @@ CacheDatabase.noteChartDatasNumberColumns = {
 	"previewTime",
 	"noteCount",
 	"length",
-	"bpm"
+	"bpm",
+	"difficulty",
+	"longNoteRatio",
 }
 
 CacheDatabase.noteChartsNumberColumns = {
@@ -99,6 +103,8 @@ local createTableRequest = [[
 		`noteCount` REAL,
 		`length` REAL,
 		`bpm` REAL,
+		`difficulty` REAL,
+		`longNoteRatio` REAL,
 		UNIQUE(`hash`, `index`)
 	);
 ]]
@@ -179,9 +185,11 @@ local insertNoteChartDataRequest = [[
 		`inputMode`,
 		`noteCount`,
 		`length`,
-		`bpm`
+		`bpm`,
+		`difficulty`,
+		`longNoteRatio`
 	)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 ]]
 
 local updateNoteChartDataRequest = [[
@@ -200,7 +208,9 @@ local updateNoteChartDataRequest = [[
 		`inputMode` = ?,
 		`noteCount` = ?,
 		`length` = ?,
-		`bpm` = ?
+		`bpm` = ?,
+		`difficulty` = ?,
+		`longNoteRatio` = ?
 	WHERE `hash` = ? AND `index` = ?;
 ]]
 
@@ -217,9 +227,9 @@ local selectAllNoteChartDatasRequest = [[
 CacheDatabase.load = function(self)
 	self.db = sqlite.open(self.dbpath)
 	local db = self.db
-	
+
 	db:exec(createTableRequest)
-	
+
 	self.insertNoteChartStatement = db:prepare(insertNoteChartRequest)
 	self.updateNoteChartStatement = db:prepare(updateNoteChartRequest)
 	self.selectNoteChartStatement = db:prepare(selectNoteChartRequest)
@@ -338,7 +348,9 @@ CacheDatabase.insertNoteChartDataEntry = function(self, entry)
 		entry.inputMode,
 		entry.noteCount,
 		entry.length,
-		entry.bpm
+		entry.bpm,
+		entry.difficulty,
+		entry.longNoteRatio
 	):step()
 end
 
@@ -360,6 +372,8 @@ CacheDatabase.updateNoteChartDataEntry = function(self, entry)
 		entry.length,
 		entry.bpm,
 		entry.hash,
+		entry.difficulty,
+		entry.longNoteRatio,
 		entry.index
 	):step()
 end

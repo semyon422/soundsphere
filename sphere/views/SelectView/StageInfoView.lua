@@ -111,12 +111,17 @@ StageInfoView.drawBarCell = function(self, cell)
 		cell.type.value.bar.h / 2
 	)
 
+	local value = cell.value or inside(self, cell.key) or 0
+	if value == 0 then
+		return
+	end
+
 	love.graphics.setColor(1, 1, 1, 0.75)
 	love.graphics.rectangle(
 		"fill",
 		cx + cell.type.value.bar.x,
 		cell.type.y[cell.y] + cell.type.value.bar.y,
-		(cell.type.value.bar.w + dcw) / 3,
+		(cell.type.value.bar.w + dcw - cell.type.value.bar.h) * value + cell.type.value.bar.h,
 		cell.type.value.bar.h,
 		cell.type.value.bar.h / 2,
 		cell.type.value.bar.h / 2

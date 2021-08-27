@@ -6,6 +6,7 @@ local DifficultyModel = Class:new()
 DifficultyModel.getDifficulty = function(self, noteChart)
 	local notes = {}
 
+	local longNoteCount = 0
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
 
@@ -22,10 +23,14 @@ DifficultyModel.getDifficulty = function(self, noteChart)
 					input = noteData.inputType .. noteData.inputIndex
 				}
 			end
+
+			if noteData.noteType == "LongNoteStart" then
+				longNoteCount = longNoteCount + 1
+			end
 		end
 	end
 
-	return enps.getEnps(notes)
+	return enps.getEnps(notes), longNoteCount / #notes
 end
 
 return DifficultyModel

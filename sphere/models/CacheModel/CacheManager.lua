@@ -1,4 +1,5 @@
 local CacheDatabase				= require("sphere.models.CacheModel.CacheDatabase")
+local DifficultyModel			= require("sphere.models.DifficultyModel")
 local NoteChartFactory			= require("notechart.NoteChartFactory")
 local NoteChartDataEntryFactory	= require("notechart.NoteChartDataEntryFactory")
 local Log						= require("aqua.util.Log")
@@ -325,7 +326,8 @@ CacheManager.getEmptyNoteChartDataEntry = function(self, path)
 		length = 0,
 		bpm = 0,
 		level = 0,
-		difficultyRate = 0
+		difficulty = 0,
+		longNoteRatio = 0,
 	}
 end
 
@@ -596,8 +598,12 @@ CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, for
 		end
 	end
 
-	local entries = NoteChartDataEntryFactory:getEntries(fileDatas)
-	for _, entry in ipairs(entries) do
+	local entries, noteCharts = NoteChartDataEntryFactory:getEntries(fileDatas)
+	for i, entry in ipairs(entries) do
+		local noteChart = noteCharts[i]
+		local difficulty, longNoteRate = DifficultyModel:getDifficult(noteChart)
+		entry.difficulty = difficulty
+		entry.longNoteRate = longNoteRate
 		self:setNoteChartDataEntry(entry)
 		self:setNoteChartEntry(entry.noteChartEntry)
 	end
