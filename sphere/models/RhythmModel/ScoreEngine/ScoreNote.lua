@@ -34,6 +34,20 @@ ScoreNote.update = function(self)
 	end
 end
 
+ScoreNote.getTimeStateFromConfig = function(self, hit, miss, deltaTime)
+	if deltaTime >= hit[1] and deltaTime <= hit[2] then
+		return "exactly"
+	elseif deltaTime >= miss[1] and deltaTime < hit[1] then
+		return "early"
+	elseif deltaTime > hit[2] and deltaTime <= miss[2] then
+		return "late"
+	elseif deltaTime < miss[1] then
+		return "too early"
+	elseif deltaTime > miss[2] then
+		return "too late"
+	end
+end
+
 ScoreNote.isHere = function(self)
 	return true
 end

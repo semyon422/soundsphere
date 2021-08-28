@@ -16,36 +16,14 @@ LongScoreNote.getStartTimeState = function(self)
 	local currentTime = self.logicalNote:getEventTime()
 	local deltaTime = (currentTime - self.startNoteData.timePoint.absoluteTime) / math.abs(self.scoreEngine.timeRate)
 	local config = self.scoreEngine.scoreSystem.missWindows.LongScoreNote
-	local pass = config.startPass
-	local miss = config.startMiss
-
-	if deltaTime >= pass[1] and deltaTime <= pass[2] then
-		return "exactly"
-	elseif deltaTime > pass[2] then
-		return "late"
-	elseif deltaTime >= miss[1] then
-		return "early"
-	end
-	
-	return "none"
+	return self:getTimeStateFromConfig(config.startHit, config.startMiss, deltaTime)
 end
 
 LongScoreNote.getEndTimeState = function(self)
 	local currentTime = self.logicalNote:getEventTime()
 	local deltaTime = (currentTime - self.endNoteData.timePoint.absoluteTime) / math.abs(self.scoreEngine.timeRate)
 	local config = self.scoreEngine.scoreSystem.missWindows.LongScoreNote
-	local pass = config.endPass
-	local miss = config.endMiss
-
-	if deltaTime >= pass[1] and deltaTime <= pass[2] then
-		return "exactly"
-	elseif deltaTime > pass[2] then
-		return "late"
-	elseif deltaTime >= miss[1] then
-		return "early"
-	end
-	
-	return "none"
+	return self:getTimeStateFromConfig(config.endHit, config.endMiss, deltaTime)
 end
 
 LongScoreNote.isHere = function(self)
@@ -54,8 +32,7 @@ LongScoreNote.isHere = function(self)
 end
 
 LongScoreNote.isReachable = function(self)
-	local timeState = self:getStartTimeState()
-	return timeState ~= "none" and timeState ~= "late"
+	return self:getStartTimeState() ~= "too early"
 end
 
 LongScoreNote.update = function(self)

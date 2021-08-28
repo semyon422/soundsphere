@@ -15,18 +15,7 @@ ShortScoreNote.getTimeState = function(self)
 	local currentTime = self.logicalNote:getEventTime()
 	local deltaTime = (currentTime - self.startNoteData.timePoint.absoluteTime) / math.abs(self.scoreEngine.timeRate)
 	local config = self.scoreEngine.scoreSystem.missWindows.ShortScoreNote
-	local pass = config.pass
-	local miss = config.miss
-
-	if deltaTime >= pass[1] and deltaTime <= pass[2] then
-		return "exactly"
-	elseif deltaTime > pass[2] then
-		return "late"
-	elseif deltaTime >= miss[1] then
-		return "early"
-	end
-
-	return "none"
+	return self:getTimeStateFromConfig(config.hit, config.miss, deltaTime)
 end
 
 ShortScoreNote.isHere = function(self)
@@ -35,8 +24,7 @@ ShortScoreNote.isHere = function(self)
 end
 
 ShortScoreNote.isReachable = function(self)
-	local timeState = self:getTimeState()
-	return timeState ~= "none" and timeState ~= "late"
+	return self:getTimeState() ~= "too early"
 end
 
 ShortScoreNote.update = function(self)
