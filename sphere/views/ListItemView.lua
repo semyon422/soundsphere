@@ -43,6 +43,8 @@ ListItemView.drawValue = function(self, valueConfig, value)
 	local format = valueConfig.format
 	if type(format) == "string" then
 		value = format:format(value)
+	elseif type(format) == "function" then
+		value = format(value)
 	end
 
 	local font = spherefonts.get(valueConfig.fontFamily, valueConfig.fontSize)

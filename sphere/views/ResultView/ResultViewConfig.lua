@@ -248,7 +248,7 @@ local ChartInputModeView = {
 local ChartDifficultyView = {
 	class = "ValueView",
 	field = "noteChartDataEntry.difficulty",
-	format = "0.00", defaultValue = 0,
+	defaultValue = 0,
 	color = {1, 1, 1, 1},
 	x = 279 + 29,
 	baseline = 216 + 45,
@@ -256,7 +256,17 @@ local ChartDifficultyView = {
 	align = "right",
 	fontSize = 24,
 	fontFamily = "Noto Sans Mono",
-	transform = transform
+	transform = transform,
+	format = function(difficulty)
+		local format = "%.2f"
+		if difficulty >= 10 then
+			format = "%.1f"
+		elseif difficulty >= 100 then
+			format = "%s"
+			difficulty = "100+"
+		end
+		return format:format(difficulty)
+	end
 }
 
 local StageInfo = {

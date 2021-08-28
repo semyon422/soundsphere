@@ -63,9 +63,14 @@ StageInfoView.drawTextCell = function(self, cell)
 		dcw = 0
 	end
 
-	local value = cell.value or inside(self, cell.key) or "0"
+	local value = cell.value or inside(self, cell.key) or 0
 	if cell.format then
-		value = cell.format:format(value)
+		local format = cell.format
+		if type(format) == "string" then
+			value = format:format(value)
+		elseif type(format) == "function" then
+			value = format(value)
+		end
 	elseif cell.time then
 		value = rtime(tonumber(value) or 0)
 	elseif cell.ago then

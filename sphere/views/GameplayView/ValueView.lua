@@ -28,8 +28,16 @@ ValueView.draw = function(self)
 	love.graphics.setFont(self.state.font)
 	love.graphics.setColor(config.color)
 
+	local format = config.format
+	local value = self:getValue(config.field)
+	if type(format) == "string" then
+		value = format:format(value)
+	elseif type(format) == "function" then
+		value = format(value)
+	end
+
 	baseline_print(
-		(config.format):format(self:getValue(config.field)),
+		value,
 		config.x,
 		config.baseline,
 		config.limit,

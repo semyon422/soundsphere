@@ -86,14 +86,24 @@ local NoteChartList = {
 		},
 		{
 			type = "text",
-			field = "difficulty",
+			field = "noteChartDataEntry.difficulty",
 			onNew = false,
 			x = 0,
 			baseline = 45,
 			limit = 72,
 			align = "right",
 			fontSize = 24,
-			fontFamily = "Noto Sans Mono"
+			fontFamily = "Noto Sans Mono",
+			format = function(difficulty)
+				local format = "%.2f"
+				if difficulty >= 10 then
+					format = "%.1f"
+				elseif difficulty >= 100 then
+					format = "%s"
+					difficulty = "100+"
+				end
+				return format:format(difficulty)
+			end
 		},
 		{
 			type = "circle",
@@ -216,8 +226,14 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 2, y = 1,
 		name = "score",
-		format = "%2.2f",
-		key = "selectModel.scoreItem.scoreEntry.score"
+		-- format = "%2.2f",
+		key = "selectModel.scoreItem.scoreEntry.score",
+		format = function(score)
+			if score >= 100000 then
+				return "100000+"
+			end
+			return ("%d"):format(score)
+		end
 	},
 	{
 		type = StageInfo.smallCell,
