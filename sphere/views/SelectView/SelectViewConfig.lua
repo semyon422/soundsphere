@@ -233,6 +233,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 3, y = 6,
 		name = "rating",
+		format = "%d",
 		key = "selectModel.scoreItem.scoreEntry.rating"
 	},
 	{

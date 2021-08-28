@@ -15,7 +15,8 @@ ScoreDatabase.scoresColumns = {
 	"maxCombo",
 	"scoreRating",
 	"modifiers",
-	"replayHash"
+	"replayHash",
+	"rating"
 }
 
 ScoreDatabase.scoresNumberColumns = {
@@ -24,7 +25,8 @@ ScoreDatabase.scoresNumberColumns = {
 	"time",
 	"score",
 	"maxCombo",
-	"scoreRating"
+	"scoreRating",
+	"rating"
 }
 
 local createTableRequest = [[
@@ -44,6 +46,7 @@ local createTableRequest = [[
 		`scoreRating` REAL,
 		`modifiers` TEXT,
 		`replayHash` TEXT
+		`rating` REAL
 	);
 ]]
 
@@ -58,9 +61,10 @@ local insertScoreRequest = [[
 		maxCombo,
 		scoreRating,
 		modifiers,
-		replayHash
+		replayHash,
+		rating
 	)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 ]]
 
 local selectScoreRequest = [[
@@ -84,7 +88,7 @@ local updateInfoRequest = [[
 ]]
 
 local defaultInfo = {
-	version = 2
+	version = 3
 }
 
 ScoreDatabase.load = function(self)
@@ -156,7 +160,8 @@ ScoreDatabase.insertScore = function(self, scoreData)
 		scoreData.maxCombo,
 		scoreData.scoreRating,
 		scoreData.modifiers,
-		scoreData.replayHash
+		scoreData.replayHash,
+		scoreData.rating
 	):step()
 end
 
@@ -196,6 +201,27 @@ updates[2] = [[
 	);
 	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash)
 	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, mods, "" FROM temp;
+	DROP TABLE temp;
+]]
+
+updates[3] = [[
+	ALTER TABLE scores RENAME TO temp;
+	CREATE TABLE IF NOT EXISTS `scores` (
+		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		`noteChartHash` TEXT NOT NULL,
+		`noteChartIndex` REAL NOT NULL,
+		`playerName` TEXT,
+		`time` INTEGER,
+		`score` REAL,
+		`accuracy` REAL,
+		`maxCombo` INTEGER,
+		`scoreRating` REAL,
+		`modifiers` TEXT,
+		`replayHash` TEXT,
+		`rating` REAL
+	);
+	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating)
+	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, 0 FROM temp;
 	DROP TABLE temp;
 ]]
 
