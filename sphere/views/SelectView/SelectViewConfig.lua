@@ -226,7 +226,6 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 2, y = 1,
 		name = "score",
-		-- format = "%2.2f",
 		key = "selectModel.scoreItem.scoreEntry.score",
 		format = function(score)
 			if score >= 100000 then

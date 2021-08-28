@@ -28,8 +28,9 @@ ScoreLibraryModel.updateItems = function(self)
 		return items
 	end
 
-	for _, scoreEntry in ipairs(scoreEntries) do
+	for itemIndex, scoreEntry in ipairs(scoreEntries) do
 		items[#items + 1] = {
+			itemIndex = itemIndex,
 			scoreEntry = scoreEntry
 		}
 	end

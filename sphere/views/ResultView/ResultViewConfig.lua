@@ -98,7 +98,7 @@ local ScoreList = {
 		},
 		{
 			type = "text",
-			value = "0",
+			field = "itemIndex",
 			onNew = false,
 			x = 22,
 			baseline = 45,
@@ -120,8 +120,9 @@ local ScoreList = {
 		},
 		{
 			type = "text",
-			value = "0",
+			field = "scoreEntry.rating",
 			onNew = false,
+			format = "%d",
 			x = 116,
 			baseline = 45,
 			limit = 72,
@@ -142,14 +143,15 @@ local ScoreList = {
 		},
 		{
 			type = "text",
-			value = "0 seconds ago",
+			field = "scoreEntry.time",
+			ago = true,
 			onNew = false,
 			x = 162,
 			baseline = 45,
 			limit = 270,
 			align = "right",
 			fontSize = 24,
-			fontFamily = "Noto Sans Mono"
+			fontFamily = "Noto Sans"
 		},
 		{
 			type = "circle",
@@ -371,8 +373,13 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 2, y = 1,
 		name = "score",
-		format = "%2.2f",
-		key = "selectModel.scoreItem.scoreEntry.score"
+		key = "selectModel.scoreItem.scoreEntry.score",
+		format = function(score)
+			if score >= 100000 then
+				return "100000+"
+			end
+			return ("%d"):format(score)
+		end
 	},
 
 	{
@@ -415,27 +422,6 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 4, y = 5,
 		name = "mean",
-		key = "played"
-	},
-	{
-		type = StageInfo.smallCell,
-		valueType = "text",
-		x = 6, y = 3,
-		name = "rank",
-		key = "score"
-	},
-	{
-		type = StageInfo.smallCell,
-		valueType = "text",
-		x = {5, 6}, y = 4,
-		name = "difficulty",
-		key = "played"
-	},
-	{
-		type = StageInfo.smallCell,
-		valueType = "text",
-		x = 8, y = 4,
-		name = "pp",
 		key = "played"
 	},
 }

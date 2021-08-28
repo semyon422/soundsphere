@@ -2,6 +2,8 @@ local spherefonts		= require("sphere.assets.fonts")
 local baseline_print = require("aqua.graphics.baseline_print")
 local transform = require("aqua.graphics.transform")
 local inside = require("aqua.util.inside")
+local rtime = require("aqua.util.rtime")
+local time_ago_in_words = require("aqua.util").time_ago_in_words
 
 local Class = require("aqua.util.Class")
 
@@ -40,11 +42,17 @@ end
 ListItemView.drawValue = function(self, valueConfig, value)
 	local config = self.listView.config
 
-	local format = valueConfig.format
-	if type(format) == "string" then
-		value = format:format(value)
-	elseif type(format) == "function" then
-		value = format(value)
+	if valueConfig.format then
+		local format = valueConfig.format
+		if type(format) == "string" then
+			value = format:format(value)
+		elseif type(format) == "function" then
+			value = format(value)
+		end
+	elseif valueConfig.time then
+		value = rtime(tonumber(value) or 0)
+	elseif valueConfig.ago then
+		value = time_ago_in_words(tonumber(value) or 0, valueConfig.parts, valueConfig.suffix)
 	end
 
 	local font = spherefonts.get(valueConfig.fontFamily, valueConfig.fontSize)
