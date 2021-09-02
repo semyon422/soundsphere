@@ -65,20 +65,20 @@ ScoreManager.select = function(self)
 	end
 end
 
-ScoreManager.insertScore = function(self, scoreSystem, noteChartDataEntry, replayHash, modifierModel)
+ScoreManager.insertScore = function(self, scoreSystemEntry, noteChartDataEntry, replayHash, modifierModel)
 	ScoreDatabase:load()
 	ScoreDatabase:insertScore({
 		noteChartHash = noteChartDataEntry.hash,
 		noteChartIndex = noteChartDataEntry.index,
 		playerName = "Player",
 		time = os.time(),
-		score = scoreSystem.score,
-		accuracy = scoreSystem.accuracy,
-		maxCombo = scoreSystem.maxcombo,
+		score = scoreSystemEntry.score,
+		accuracy = scoreSystemEntry.accuracy,
+		maxCombo = scoreSystemEntry.maxCombo,
 		scoreRating = 0,
 		modifiers = modifierModel:encode(),
 		replayHash = replayHash,
-		rating = scoreSystem.performance
+		rating = scoreSystemEntry.performance
 	})
 	ScoreDatabase:unload()
 	self:select()

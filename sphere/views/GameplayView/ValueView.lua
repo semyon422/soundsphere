@@ -30,14 +30,19 @@ ValueView.draw = function(self)
 
 	local format = config.format
 	local value = self:getValue(config.field)
-	if type(format) == "string" then
-		value = format:format(value)
-	elseif type(format) == "function" then
-		value = format(value)
+	if value then
+		if config.multiplier and tonumber(value) then
+			value = value * config.multiplier
+		end
+		if type(format) == "string" then
+			value = format:format(value)
+		elseif type(format) == "function" then
+			value = format(value)
+		end
 	end
 
 	baseline_print(
-		value,
+		tostring(value),
 		config.x,
 		config.baseline,
 		config.limit,

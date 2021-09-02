@@ -44,14 +44,15 @@ end
 LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
 	local lastState = self:getLastState()
 
-	if self.keyState and startTimeState == "none" then
+	local keyState = self.keyState
+	if keyState and startTimeState == "too early" then
 		self.keyState = false
 	elseif lastState == "clear" then
-		if startTimeState == "late" then
+		if startTimeState == "too late" then
 			self:switchState("startMissed")
 			self.started = true
-		elseif self.keyState then
-			if startTimeState == "early" then
+		elseif keyState then
+			if startTimeState == "early" or startTimeState == "late" then
 				self:switchState("startMissedPressed")
 			elseif startTimeState == "exactly" then
 				self:switchState("startPassedPressed")
@@ -59,33 +60,39 @@ LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
 			self.started = true
 		end
 	elseif lastState == "startPassedPressed" then
-		if not self.keyState then
-			if endTimeState == "none" then
+		if endTimeState == "too late" then
+			self:switchState("endMissed")
+			return self:next()
+		elseif not keyState then
+			if endTimeState == "too early" then
 				self:switchState("startMissed")
+			elseif endTimeState == "early" or endTimeState == "late" then
+				self:switchState("endMissed")
+				return self:next()
 			elseif endTimeState == "exactly" then
 				self:switchState("endPassed")
 				return self:next()
 			end
-		elseif endTimeState == "late" then
-			self:switchState("endMissed")
-			return self:next()
 		end
 	elseif lastState == "startMissedPressed" then
-		if not self.keyState then
-			if endTimeState == "exactly" then
+		if not keyState then
+			if endTimeState == "too early" then
+				self:switchState("startMissed")
+			elseif endTimeState == "early" or endTimeState == "late" then
+				self:switchState("endMissed")
+				return self:next()
+			elseif endTimeState == "exactly" then
 				self:switchState("endMissedPassed")
 				return self:next()
-			else
-				self:switchState("startMissed")
 			end
-		elseif endTimeState == "late" then
+		elseif endTimeState == "too late" then
 			self:switchState("endMissed")
 			return self:next()
 		end
 	elseif lastState == "startMissed" then
-		if self.keyState then
+		if keyState then
 			self:switchState("startMissedPressed")
-		elseif endTimeState == "late" then
+		elseif endTimeState == "too late" then
 			self:switchState("endMissed")
 			return self:next()
 		end
@@ -110,14 +117,14 @@ LongLogicalNote.processAuto = function(self)
 		self:sendState("keyState")
 
 		self.eventTime = self.startNoteData.timePoint.absoluteTime
-		self:processTimeState("exactly", "none")
+		self:processTimeState("exactly", "too early")
 		self.eventTime = nil
 	elseif deltaEndTime >= 0 and self.keyState or nextNote and nextNote:isHere() then
 		self.keyState = false
 		self:sendState("keyState")
 
 		self.eventTime = self.endNoteData.timePoint.absoluteTime
-		self:processTimeState("none", "exactly")
+		self:processTimeState("too late", "exactly")
 		self.eventTime = nil
 	end
 end

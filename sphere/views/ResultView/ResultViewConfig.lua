@@ -366,7 +366,8 @@ StageInfo.cells = {
 		x = 1, y = 1,
 		name = "accuracy",
 		format = "%2.2f",
-		key = "selectModel.scoreItem.scoreEntry.accuracy"
+		key = "selectModel.scoreItem.scoreEntry.accuracy",
+		multiplier = 1000
 	},
 	{
 		type = StageInfo.largeCell,
@@ -375,10 +376,10 @@ StageInfo.cells = {
 		name = "score",
 		key = "selectModel.scoreItem.scoreEntry.score",
 		format = function(score)
-			if score >= 100000 then
-				return "100000+"
+			if score >= 0.1 then
+				return "100+"
 			end
-			return ("%d"):format(score)
+			return ("%2.2f"):format(score * 1000)
 		end
 	},
 

@@ -83,14 +83,14 @@ GameplayController.load = function(self)
 
 	rhythmModel:loadAllEngines()
 
-	local scoreSystem = rhythmModel.scoreEngine.scoreSystem
+	local scoreEngine = rhythmModel.scoreEngine
 
 	local enps, averageStrain, generalizedKeymode = difficultyModel:getDifficulty(noteChart)
-	scoreSystem.baseEnps = enps
-	scoreSystem.baseAverageStrain = averageStrain
-	scoreSystem.generalizedKeymode = generalizedKeymode
+	scoreEngine.baseEnps = enps
+	scoreEngine.baseAverageStrain = averageStrain
+	scoreEngine.generalizedKeymode = generalizedKeymode
 
-	view.scoreSystem = scoreSystem
+	view.scoreSystem = scoreEngine.scoreSystem
 
 	view:load()
 
@@ -161,16 +161,16 @@ GameplayController.saveScore = function(self)
 		return
 	end
 
-	local scoreSystem = rhythmModel.scoreEngine.scoreSystem
+	local scoreSystemEntry = rhythmModel.scoreEngine.scoreSystem.entry
 	local noteChartModel = self.gameController.noteChartModel
 	local modifierModel = rhythmModel.modifierModel
 	local replayModel = rhythmModel.replayModel
-	if scoreSystem.score > 0 and rhythmModel.replayModel.mode ~= "replay" and not rhythmModel.logicEngine.autoplay then
+	if scoreSystemEntry.score > 0 and rhythmModel.replayModel.mode ~= "replay" and not rhythmModel.logicEngine.autoplay then
 		replayModel.noteChartModel = noteChartModel
 		replayModel.modifierModel = modifierModel
 		replayModel.replayType = self.gameController.configModel:getConfig("settings").general.replayType
 		local replayHash = replayModel:saveReplay()
-		self.gameController.scoreModel:insertScore(scoreSystem, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
+		self.gameController.scoreModel:insertScore(scoreSystemEntry, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
 		self.gameController.onlineModel:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
 	end
 end

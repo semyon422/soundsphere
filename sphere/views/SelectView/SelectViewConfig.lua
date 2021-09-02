@@ -216,28 +216,20 @@ StageInfo.cells = {
 	{
 		type = StageInfo.largeCell,
 		valueType = "text",
-		x = 1, y = 1,
-		name = "accuracy",
-		format = "%2.2f",
-		key = "selectModel.scoreItem.scoreEntry.accuracy"
-	},
-	{
-		type = StageInfo.largeCell,
-		valueType = "text",
 		x = 2, y = 1,
 		name = "score",
 		key = "selectModel.scoreItem.scoreEntry.score",
 		format = function(score)
-			if score >= 100000 then
-				return "100000+"
+			if score >= 0.1 then
+				return "100+"
 			end
-			return ("%d"):format(score)
+			return ("%2.2f"):format(score * 1000)
 		end
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = {3, 4}, y = 5,
+		x = {3, 4}, y = 8,
 		name = "played time ago",
 		key = "selectModel.scoreItem.scoreEntry.time",
 		ago = true,
@@ -246,7 +238,7 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = 3, y = 6,
+		x = 3, y = 5,
 		name = "rating",
 		format = "%d",
 		key = "selectModel.scoreItem.scoreEntry.rating"
@@ -254,9 +246,19 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
+		x = 4, y = 5,
+		name = "accuracy",
+		format = "%0.2f",
+		multiplier = 1000,
+		key = "selectModel.scoreItem.scoreEntry.accuracy"
+	},
+	{
+		type = StageInfo.smallCell,
+		valueType = "text",
 		x = 4, y = 6,
-		name = "rank",
-		key = "rank"
+		name = "density",
+		format = "%0.2f",
+		key = "selectModel.scoreItem.scoreEntry.density"
 	},
 }
 
@@ -412,7 +414,8 @@ local StageInfoModifierIconGrid = {
 	h = 138,
 	columns = 4,
 	rows = 3,
-	config = "selectModel.scoreItem.scoreEntry.modifiers"
+	config = "selectModel.scoreItem.scoreEntry.modifiers",
+	noModifier = true
 }
 
 local BottomScreenMenu = {
