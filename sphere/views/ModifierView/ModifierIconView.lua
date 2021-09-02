@@ -30,7 +30,7 @@ ModifierIconView.draw = function(self)
 	love.graphics.setLineStyle("smooth")
 	love.graphics.setLineWidth(config.size / 32)
 
-	self:drawSquareBorder(self.shapes.allArcs)
+	self:drawSquareBorder(self.shapes[config.shape] or self.shapes.allArcs)
 	if config.modifierSubString then
 		self:drawText(self.lines.two, config.modifierString, config.modifierSubString)
 	else
