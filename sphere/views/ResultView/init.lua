@@ -49,6 +49,7 @@ ResultView.load = function(self)
 
 	scoreListView.scoreLibraryModel = self.scoreLibraryModel
 	scoreListView.selectModel = self.selectModel
+	scoreListView.rhythmModel = self.rhythmModel
 	scoreListView.navigator = self.navigator
 
 	stageInfoView.selectModel = self.selectModel

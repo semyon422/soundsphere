@@ -176,8 +176,8 @@ local ScoreList = {
 		},
 		{
 			type = "circle",
-			value = true,
-			onNew = true,
+			field = "loaded",
+			onNew = false,
 			x = 23,
 			y = 36,
 			r = 7

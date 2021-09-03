@@ -42,6 +42,8 @@ ResultController.receive = function(self, event)
 
 	if event.name == "changeScreen" then
 		self.gameController.screenManager:set(self.selectController)
+	elseif event.name == "scrollScore" then
+		self.gameController.selectModel:scrollScore(event.direction)
 	end
 end
 

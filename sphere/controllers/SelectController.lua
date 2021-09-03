@@ -128,6 +128,7 @@ SelectController.receive = function(self, event)
 		self:resetModifiedNoteChart()
 	elseif event.action == "replayNoteChart" then
 		-- self:replayNoteChart(event.mode, event.scoreEntry.replayHash)
+		-- self:replayNoteChart(event.mode, event.scoreEntry)
 	elseif event.name == "quickLogin" then
 		self.onlineModel:quickLogin(self.configModel:getConfig("settings").online.quick_login_key)
 	end
@@ -225,7 +226,7 @@ SelectController.playNoteChart = function(self)
 	return self.gameController.screenManager:set(gameplayController)
 end
 
-SelectController.replayNoteChart = function(self, mode, hash)
+SelectController.replayNoteChart = function(self, mode, scoreEntry)
 	local noteChartModel = self.noteChartModel
 	if not noteChartModel:getFileInfo() then
 		return
@@ -243,12 +244,14 @@ SelectController.replayNoteChart = function(self, mode, hash)
 		gameplayController = GameplayController:new()
 	end
 
+	local hash = scoreEntry.replayHash
 	local replay = gameplayController.rhythmModel.replayModel:loadReplay(hash)
 
 	if replay.modifiers then
 		self.modifierModel:fromTable(replay.modifiers)
 	end
 	if mode == "replay" or mode == "result" then
+		gameplayController.rhythmModel.scoreEngine.scoreEntry = scoreEntry
 		gameplayController.rhythmModel.replayModel.replay = replay
 		gameplayController.rhythmModel.inputManager:setMode("internal")
 		gameplayController.rhythmModel.replayModel:setMode("replay")
