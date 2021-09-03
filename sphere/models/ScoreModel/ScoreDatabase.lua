@@ -16,7 +16,14 @@ ScoreDatabase.scoresColumns = {
 	"scoreRating",
 	"modifiers",
 	"replayHash",
-	"rating"
+	"rating",
+	"pauses",
+	"ratio",
+	"perfect",
+	"notPerfect",
+	"missCount",
+	"mean",
+	"earlylate"
 }
 
 ScoreDatabase.scoresNumberColumns = {
@@ -26,7 +33,14 @@ ScoreDatabase.scoresNumberColumns = {
 	"score",
 	"maxCombo",
 	"scoreRating",
-	"rating"
+	"rating",
+	"pauses",
+	"ratio",
+	"perfect",
+	"notPerfect",
+	"missCount",
+	"mean",
+	"earlylate"
 }
 
 local createTableRequest = [[
@@ -45,8 +59,15 @@ local createTableRequest = [[
 		`maxCombo` INTEGER,
 		`scoreRating` REAL,
 		`modifiers` TEXT,
-		`replayHash` TEXT
-		`rating` REAL
+		`replayHash` TEXT,
+		`rating` REAL,
+		`pauses` REAL,
+		`ratio` REAL,
+		`perfect` REAL,
+		`notPerfect` REAL,
+		`missCount` REAL,
+		`mean` REAL,
+		`earlylate` REAL
 	);
 ]]
 
@@ -62,9 +83,16 @@ local insertScoreRequest = [[
 		scoreRating,
 		modifiers,
 		replayHash,
-		rating
+		rating,
+		pauses,
+		ratio,
+		perfect,
+		notPerfect,
+		missCount,
+		mean,
+		earlylate
 	)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 ]]
 
 local selectScoreRequest = [[
@@ -88,7 +116,7 @@ local updateInfoRequest = [[
 ]]
 
 local defaultInfo = {
-	version = 3
+	version = 4
 }
 
 ScoreDatabase.load = function(self)
@@ -161,7 +189,14 @@ ScoreDatabase.insertScore = function(self, scoreData)
 		scoreData.scoreRating,
 		scoreData.modifiers,
 		scoreData.replayHash,
-		scoreData.rating
+		scoreData.rating,
+		scoreData.pauses,
+		scoreData.ratio,
+		scoreData.perfect,
+		scoreData.notPerfect,
+		scoreData.missCount,
+		scoreData.mean,
+		scoreData.earlylate
 	):step()
 end
 
@@ -222,6 +257,34 @@ updates[3] = [[
 	);
 	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating)
 	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, 0 FROM temp;
+	DROP TABLE temp;
+]]
+
+updates[4] = [[
+	ALTER TABLE scores RENAME TO temp;
+	CREATE TABLE IF NOT EXISTS `scores` (
+		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		`noteChartHash` TEXT NOT NULL,
+		`noteChartIndex` REAL NOT NULL,
+		`playerName` TEXT,
+		`time` INTEGER,
+		`score` REAL,
+		`accuracy` REAL,
+		`maxCombo` INTEGER,
+		`scoreRating` REAL,
+		`modifiers` TEXT,
+		`replayHash` TEXT,
+		`rating` REAL,
+		`pauses` REAL,
+		`ratio` REAL,
+		`perfect` REAL,
+		`notPerfect` REAL,
+		`missCount` REAL,
+		`mean` REAL,
+		`earlylate` REAL
+	);
+	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating, pauses, ratio, perfect, notPerfect, missCount, mean, earlylate)
+	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating, 0, 0, 0, 0, 0, 0, 0 FROM temp;
 	DROP TABLE temp;
 ]]
 

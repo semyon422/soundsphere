@@ -15,6 +15,13 @@ EntryScoreSystem.after = function(self, event)
 	self.accuracy = container.normalscore.accuracyAdjusted
 	self.rating = container.normalscore.performance
 	self.maxCombo = container.base.maxCombo
+	self.pauses = container.base.pauses
+	self.ratio = container.judgement.ratio
+	self.perfect = container.judgement.counters.perfect
+	self.notPerfect = container.judgement.counters["not perfect"]
+	self.missCount = container.base.missCount
+	self.mean = container.normalscore.normalscore.mean
+	self.earlylate = container.judgement.earlylate
 end
 
 return EntryScoreSystem

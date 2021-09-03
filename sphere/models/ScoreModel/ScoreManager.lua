@@ -42,6 +42,14 @@ ScoreManager.select = function(self)
 		scoresId[entry.id] = entry
 	end
 
+	local scoresReplayHash = {}
+	self.scoresReplayHash = scoresReplayHash
+
+	for i = 1, #scores do
+		local entry = scores[i]
+		scoresReplayHash[entry.replayHash] = entry
+	end
+
 	local scoresHashIndex = {}
 	self.scoresHashIndex = scoresHashIndex
 
@@ -76,13 +84,19 @@ ScoreManager.insertScore = function(self, scoreSystemEntry, noteChartDataEntry, 
 		maxCombo = scoreSystemEntry.maxCombo,
 		modifiers = modifierModel:encode(),
 		replayHash = replayHash,
-		rating = scoreSystemEntry.performance
+		rating = scoreSystemEntry.performance,
+		ratio = scoreSystemEntry.ratio,
+		perfect = scoreSystemEntry.perfect,
+		notPerfect = scoreSystemEntry.notPerfect,
+		missCount = scoreSystemEntry.missCount,
+		mean = scoreSystemEntry.mean,
+		earlylate = scoreSystemEntry.earlylate
 	}
 	ScoreDatabase:load()
 	ScoreDatabase:insertScore(scoreEntry)
 	ScoreDatabase:unload()
 	self:select()
-	return scoreEntry
+	return self:getScoreEntryByReplayHash(replayHash)
 end
 
 ScoreManager.getScores = function(self)
@@ -91,6 +105,10 @@ end
 
 ScoreManager.getScoreEntryById = function(self, id)
 	return self.scoresId[id]
+end
+
+ScoreManager.getScoreEntryByReplayHash = function(self, replayHash)
+	return self.scoresReplayHash[replayHash]
 end
 
 ScoreManager.getScoreEntries = function(self, hash, index)

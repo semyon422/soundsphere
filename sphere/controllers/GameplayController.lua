@@ -174,7 +174,9 @@ GameplayController.saveScore = function(self)
 		self.gameController.onlineModel:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
 
 		rhythmModel.scoreEngine.scoreEntry = scoreEntry
-		self.gameController.scoreLibraryModel:updateItems()
+		local config = self.gameController.configModel:getConfig("select")
+		config.scoreEntryId = scoreEntry.id
+		self.gameController.selectModel:pullScore()
 	end
 end
 

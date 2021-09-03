@@ -420,35 +420,35 @@ StageInfo.cells = {
 		valueType = "bar",
 		x = {1, 2}, y = 5,
 		name = "perfect/hits",
-		key = "scoreSystem.judgement.ratio"
+		key = "selectModel.scoreItem.scoreEntry.ratio"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 3, y = 5,
 		name = "perfect",
-		key = "scoreSystem.judgement.counters.perfect"
+		key = "selectModel.scoreItem.scoreEntry.counters.perfect"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = {2, 3}, y = 6,
 		name = "not perfect",
-		key = "scoreSystem.judgement.counters.not perfect"
+		key = "selectModel.scoreItem.scoreEntry.counters.not perfect"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 3, y = 7,
 		name = "miss",
-		key = "scoreSystem.base.missCount"
+		key = "selectModel.scoreItem.scoreEntry.missCount"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = {3, 4}, y = 6,
 		name = "early/late",
-		key = "scoreSystem.judgement.earlylate",
+		key = "selectModel.scoreItem.scoreEntry.earlylate",
 		format = function(earlylate)
 			if earlylate > 1 then
 				return ("-%d%%"):format((earlylate - 1) * 100)
@@ -465,7 +465,7 @@ StageInfo.cells = {
 		name = "mean",
 		multiplier = 1000,
 		format = "%0.1f",
-		key = "scoreSystem.normalscore.normalscore.mean"
+		key = "selectModel.scoreItem.scoreEntry.mean"
 	},
 }
 
