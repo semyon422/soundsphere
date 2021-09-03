@@ -30,4 +30,18 @@ ScoreSystem.receive = function(self, event)
 	self:after(event)
 end
 
+ScoreSystem.getSlice = function(self)
+	local slice = {}
+	for k, v in pairs(self) do
+		local t = type(v)
+		if t == "number" or t == "string" or t == "boolean" then
+			if v == math.huge then
+				v = "inf"
+			end
+			slice[k] = v
+		end
+	end
+	return slice
+end
+
 return ScoreSystem

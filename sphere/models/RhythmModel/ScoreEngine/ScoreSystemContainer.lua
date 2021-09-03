@@ -30,17 +30,7 @@ end
 ScoreSystemContainer.getSlice = function(self)
 	local slice = {}
 	for _, scoreSystem in ipairs(self.scoreSystems) do
-		slice[scoreSystem.name] = {}
-		local sliceScoreSystem = slice[scoreSystem.name]
-		for k, v in pairs(scoreSystem) do
-			local t = type(v)
-			if t == "number" or t == "string" or t == "boolean" then
-				if v == math.huge then
-					v = "inf"
-				end
-				sliceScoreSystem[k] = v
-			end
-		end
+		slice[scoreSystem.name] = scoreSystem:getSlice()
 	end
 	return slice
 end
