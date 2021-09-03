@@ -2,6 +2,7 @@
 local transform = require("aqua.graphics.transform")
 local map				= require("aqua.math").map
 local Class				= require("aqua.util.Class")
+local inside = require("aqua.util.inside")
 
 local PointGraphView = Class:new()
 
@@ -19,14 +20,12 @@ PointGraphView.load = function(self)
 end
 
 PointGraphView.draw = function(self)
-	local config = self.config
 	local state = self.state
 
-	love.graphics.setColor(config.lineColor)
 	self:drawLine()
-
 	self:drawPoints()
 
+	love.graphics.origin()
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.draw(state.canvas, 0, 0)
 end
@@ -51,7 +50,7 @@ PointGraphView.drawLine = function(self)
 	love.graphics.replaceTransform(transform(config.transform))
 	love.graphics.translate(config.x, config.y)
 
-	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.setColor(config.lineColor)
 	love.graphics.setLineWidth(2)
 	love.graphics.setLineStyle("smooth")
 	love.graphics.line(0, config.h / 2, config.w, config.h / 2)
@@ -69,7 +68,10 @@ PointGraphView.drawPoints = function(self)
 	love.graphics.setLineWidth(1)
 	love.graphics.setLineStyle("smooth")
 
-	local points = self.scoreSystem[config.field]
+	love.graphics.replaceTransform(transform(config.transform))
+	love.graphics.translate(config.x, config.y)
+
+	local points = inside(self, config.field)
 	for i = state.drawnPoints + 1, #points do
 		self:drawPoint(points[i])
 	end
@@ -83,11 +85,11 @@ PointGraphView.drawPoint = function(self, point)
 	local config = self.config
 	local state = self.state
 
-	love.graphics.replaceTransform(transform(config.transform))
-	love.graphics.translate(config.x, config.y)
+	local time = inside(point, config.time)
+	local value = inside(point, config.value)
+	local unit = inside(point, config.unit)
 
-	local x = point[config.time] / (state.endTime - state.startTime)
-	local y = (point[config.value] + (config.offset or 0)) / (config.unit or 1)
+	local x, y = config.point(time, state.startTime, state.endTime, value, unit)
 
 	love.graphics.circle(
 		"fill",

@@ -24,11 +24,14 @@ BaseScoreSystem.construct = function(self)
 	self.noteCount = 0
 	self.combo = 0
 	self.maxCombo = 0
+	self.currentTime = 0
 
 	self.counters = {}
 end
 
 BaseScoreSystem.before = function(self, event)
+	self.currentTime = event.currentTime
+
 	if self.noteCount ~= 0 then
 		return
 	end

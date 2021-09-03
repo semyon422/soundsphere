@@ -24,6 +24,7 @@ ScoreSystemContainer.construct = function(self)
 		end
 	end
 	self.scoreSystems = scoreSystems
+	self.sequence = {}
 end
 
 ScoreSystemContainer.receive = function(self, event)
@@ -34,6 +35,19 @@ ScoreSystemContainer.receive = function(self, event)
 	for _, scoreSystem in ipairs(self.scoreSystems) do
 		scoreSystem.scoreEngine = self.scoreEngine
 		scoreSystem:receive(event)
+	end
+
+	local sequence = self.sequence
+	local slice = {}
+	table.insert(sequence, slice)
+	for _, scoreSystem in ipairs(self.scoreSystems) do
+		slice[scoreSystem.name] = {}
+		local sliceScoreSystem = slice[scoreSystem.name]
+		for k, v in pairs(scoreSystem) do
+			if type(v) == "number" then
+				sliceScoreSystem[k] = v
+			end
+		end
 	end
 end
 

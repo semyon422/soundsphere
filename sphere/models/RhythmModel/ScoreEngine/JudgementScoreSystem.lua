@@ -5,19 +5,20 @@ local JudgementScoreSystem = ScoreSystem:new()
 JudgementScoreSystem.name = "judgement"
 
 JudgementScoreSystem.judgements = {
-	{-1, "early not perfect", "not perfect"},
-	{-0.016, "perfect"},
-	{0.016, "perfect"},
-	{1, "late not perfect", "not perfect"},
+	{-1, "early not perfect", "not perfect", "all", "early"},
+	{-0.016, "perfect", "all", "early"},
+	{0.016, "perfect", "all", "late"},
+	{1, "late not perfect", "not perfect", "all", "late"},
 }
 
 JudgementScoreSystem.construct = function(self)
+	self.ratio = 0
 	self.judgementName = ""
 	self.counters = {}
 	table.sort(self.judgements, function(a, b) return math.abs(a[1]) < math.abs(b[1]) end)
 end
 
-ScoreSystem.processJudgement = function(self, event)
+JudgementScoreSystem.processJudgement = function(self, event)
 	local noteStartTime = event.noteStartTime or event.noteTime
 	local deltaTime = (event.currentTime - noteStartTime) / math.abs(event.timeRate)
 
@@ -32,6 +33,9 @@ ScoreSystem.processJudgement = function(self, event)
 			break
 		end
 	end
+
+	self.ratio = (self.counters.perfect or 0) / (self.counters.all or 1)
+	self.earlylate = (self.counters.early or 0) / (self.counters.late or 1)
 end
 
 JudgementScoreSystem.notes = {

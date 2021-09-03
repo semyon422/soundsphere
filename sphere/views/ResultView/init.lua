@@ -52,6 +52,7 @@ ResultView.load = function(self)
 	scoreListView.navigator = self.navigator
 
 	stageInfoView.selectModel = self.selectModel
+	stageInfoView.scoreSystem = scoreSystem
 
 	imageView.root = "."
 
