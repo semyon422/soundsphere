@@ -41,8 +41,9 @@ ResultView.load = function(self)
 	valueView.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
 	valueView.modifierString = self.modifierModel:getString()
 
-	pointGraphView.scoreSystem = scoreSystem
+	pointGraphView.scoreEngine = self.rhythmModel.scoreEngine
 	pointGraphView.noteChartModel = self.noteChartModel
+	pointGraphView.selectModel = self.selectModel
 
 	modifierIconGridView.modifierModel = self.modifierModel
 	modifierIconGridView.configModifier = configModifier
@@ -53,7 +54,7 @@ ResultView.load = function(self)
 	scoreListView.navigator = self.navigator
 
 	stageInfoView.selectModel = self.selectModel
-	stageInfoView.scoreSystem = scoreSystem
+	stageInfoView.scoreEngine = self.rhythmModel.scoreEngine
 
 	imageView.root = "."
 

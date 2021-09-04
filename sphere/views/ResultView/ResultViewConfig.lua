@@ -1,5 +1,12 @@
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
+local showLoadedScore = function(self)
+	if not self.scoreEngine.scoreEntry then
+		return
+	end
+	return self.selectModel.scoreItem.scoreEntry.id == self.scoreEngine.scoreEntry.id
+end
+
 local Logo = {
 	class = "LogoView",
 	transform = transform,
@@ -83,10 +90,12 @@ local PointGraph = {
 	y = 801,
 	w = 1362,
 	h = 190,
-	r = 3,
+	r = 1,
+	lineWidth = 1,
+	pointLineWidth = 1,
 	color = {1, 1, 1, 1},
 	lineColor = {1, 1, 1, 0.5},
-	field = "scoreSystem.sequence",
+	field = "scoreEngine.scoreSystem.sequence",
 	time = "base.currentTime",
 	value = "base.combo",
 	unit = "base.noteCount",
@@ -94,7 +103,8 @@ local PointGraph = {
 		local x = time / (endTime - startTime)
 		local y = -value / unit + 1
 		return x, y
-	end
+	end,
+	show = showLoadedScore
 }
 
 local ScoreList = {
@@ -427,14 +437,14 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 3, y = 5,
 		name = "perfect",
-		key = "selectModel.scoreItem.scoreEntry.counters.perfect"
+		key = "selectModel.scoreItem.scoreEntry.perfect"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = {2, 3}, y = 6,
 		name = "not perfect",
-		key = "selectModel.scoreItem.scoreEntry.counters.not perfect"
+		key = "selectModel.scoreItem.scoreEntry.notPerfect"
 	},
 	{
 		type = StageInfo.smallCell,
@@ -466,6 +476,20 @@ StageInfo.cells = {
 		multiplier = 1000,
 		format = "%0.1f",
 		key = "selectModel.scoreItem.scoreEntry.mean"
+	},
+	{
+		type = StageInfo.smallCell,
+		valueType = "text",
+		x = 1, y = 7,
+		name = "",
+		key = "scoreEngine.scoreSystem.hp.failed",
+		format = function(failed)
+			if failed then
+				return "failed"
+			end
+			return "passed"
+		end,
+		show = showLoadedScore
 	},
 }
 

@@ -14,13 +14,16 @@ PointGraphView.load = function(self)
 	state.startTime = self.noteChartModel.noteChart.metaData:get("minTime")
 	state.endTime = self.noteChartModel.noteChart.metaData:get("maxTime")
 
-	-- self.scoreSystem.observable:add(self)
-
 	state.canvas = love.graphics.newCanvas()
 end
 
 PointGraphView.draw = function(self)
 	local state = self.state
+	local config = self.config
+
+	if config.show and not config.show(self) then
+		return
+	end
 
 	self:drawLine()
 	self:drawPoints()
@@ -51,7 +54,7 @@ PointGraphView.drawLine = function(self)
 	love.graphics.translate(config.x, config.y)
 
 	love.graphics.setColor(config.lineColor)
-	love.graphics.setLineWidth(2)
+	love.graphics.setLineWidth(config.lineWidth)
 	love.graphics.setLineStyle("smooth")
 	love.graphics.line(0, config.h / 2, config.w, config.h / 2)
 end
@@ -65,7 +68,7 @@ PointGraphView.drawPoints = function(self)
 	love.graphics.setCanvas(state.canvas)
 
 	love.graphics.setColor(config.color)
-	love.graphics.setLineWidth(1)
+	love.graphics.setLineWidth(config.pointLineWidth)
 	love.graphics.setLineStyle("smooth")
 
 	love.graphics.replaceTransform(transform(config.transform))
@@ -91,12 +94,9 @@ PointGraphView.drawPoint = function(self, point)
 
 	local x, y = config.point(time, state.startTime, state.endTime, value, unit)
 
-	love.graphics.circle(
-		"fill",
-		map(x, 0, 1, 0, config.w),
-		map(y, 0, 1, 0, config.h),
-		config.r
-	)
+	local _x, _y = map(x, 0, 1, 0, config.w), map(y, 0, 1, 0, config.h)
+	love.graphics.circle("fill", _x, _y, config.r)
+	love.graphics.circle("line", _x, _y, config.r)
 end
 
 return PointGraphView

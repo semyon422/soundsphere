@@ -10,11 +10,13 @@ local StageInfoView = Class:new()
 
 StageInfoView.draw = function(self)
 	for _, cell in ipairs(self.config.cells) do
-		self:drawCellName(cell)
-		if cell.valueType == "text" then
-			self:drawTextCell(cell)
-		elseif cell.valueType == "bar" then
-			self:drawBarCell(cell)
+		if not cell.show or cell.show(self) then
+			self:drawCellName(cell)
+			if cell.valueType == "text" then
+				self:drawTextCell(cell)
+			elseif cell.valueType == "bar" then
+				self:drawBarCell(cell)
+			end
 		end
 	end
 end
