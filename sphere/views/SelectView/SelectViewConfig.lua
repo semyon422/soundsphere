@@ -435,18 +435,21 @@ local BottomScreenMenu = {
 		fontSize = 24,
 		fontFamily = "Noto Sans"
 	},
-	screens = {
+	items = {
 		{
 			{
-				name = "Modifier",
+				method = "changeScreen",
+				value = "Modifier",
 				displayName = "modifiers"
 			},
 			{
-				name = "NoteSkin",
+				method = "changeScreen",
+				value = "NoteSkin",
 				displayName = "noteskins"
 			},
 			{
-				name = "Input",
+				method = "changeScreen",
+				value = "Input",
 				displayName = "input"
 			}
 		}
@@ -470,16 +473,18 @@ local LeftScreenMenu = {
 		fontSize = 24,
 		fontFamily = "Noto Sans"
 	},
-	screens = {
+	items = {
 		{
 			{
-				name = "Collection",
+				method = "changeScreen",
+				value = "Collection",
 				displayName = "collection"
 			}
 		},
 		{
 			{
-				name = "Settings",
+				method = "changeScreen",
+				value = "Settings",
 				displayName = "settings"
 			}
 		},

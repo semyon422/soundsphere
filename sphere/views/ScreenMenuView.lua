@@ -15,7 +15,7 @@ ScreenMenuView.load = function(self)
 end
 
 ScreenMenuView.draw = function(self)
-	local items = self.config.screens
+	local items = self.config.items
 	for i = 1, self.config.rows do
 		for j = 1, self.config.columns do
 			local item = items[i] and items[i][j]
@@ -31,7 +31,7 @@ ScreenMenuView.draw = function(self)
 end
 
 ScreenMenuView.receive = function(self, event)
-	local items = self.config.screens
+	local items = self.config.items
 	for i = 1, self.config.rows do
 		for j = 1, self.config.columns do
 			local item = items[i] and items[i][j]

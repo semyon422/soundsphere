@@ -42,7 +42,7 @@ ScreenMenuItemView.receive = function(self, event)
 		local h = config.h / config.rows
 
 		if mx >= x and mx < x + w and my >= y and my < y + h and button == 1 then
-			listView.navigator:changeScreen(self.item.name)
+			listView.navigator[self.item.method](listView.navigator, self.item.value)
 		end
 	end
 end

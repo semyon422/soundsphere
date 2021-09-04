@@ -33,10 +33,11 @@ local BottomScreenMenu = {
 		fontSize = 24,
 		fontFamily = "Noto Sans"
 	},
-	screens = {
+	items = {
 		{
 			{
-				name = "Select",
+				method = "changeScreen",
+				value = "Select",
 				displayName = "back"
 			}
 		}

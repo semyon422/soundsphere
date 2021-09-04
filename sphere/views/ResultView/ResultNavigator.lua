@@ -37,4 +37,13 @@ ResultNavigator.loadScore = function(self, itemIndex)
 	})
 end
 
+ResultNavigator.play = function(self, mode)
+	local scoreEntry = self.selectModel.scoreItem.scoreEntry
+	self:send({
+		name = "loadScore",
+		mode = mode,
+		scoreEntry = scoreEntry
+	})
+end
+
 return ResultNavigator

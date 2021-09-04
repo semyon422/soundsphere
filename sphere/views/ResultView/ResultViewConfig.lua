@@ -522,12 +522,46 @@ local BottomScreenMenu = {
 		fontSize = 24,
 		fontFamily = "Noto Sans"
 	},
-	screens = {
+	items = {
 		{
 			{
-				name = "Select",
+				method = "changeScreen",
+				value = "Select",
 				displayName = "back"
 			}
+		}
+	}
+}
+
+local BottomRightScreenMenu = {
+	class = "ScreenMenuView",
+	transform = transform,
+	x = 1187,
+	y = 991,
+	w = 454,
+	h = 89,
+	rows = 1,
+	columns = 2,
+	text = {
+		x = 0,
+		baseline = 54,
+		limit = 227,
+		align = "center",
+		fontSize = 24,
+		fontFamily = "Noto Sans"
+	},
+	items = {
+		{
+			{
+				method = "play",
+				value = "replay",
+				displayName = "replay"
+			},
+			{
+				method = "play",
+				value = "retry",
+				displayName = "retry"
+			},
 		}
 	}
 }
@@ -535,6 +569,7 @@ local BottomScreenMenu = {
 local NoteSkinViewConfig = {
 	Background,
 	BottomScreenMenu,
+	BottomRightScreenMenu,
 	Rectangle,
 	Logo,
 	UserInfo,
