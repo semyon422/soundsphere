@@ -98,7 +98,7 @@ ListView.update = function(self, dt)
 		self.state.scrollTween = nil
 	end
 	if self.state.scrollTween then
-		self.state.scrollTween:update(dt)
+		self.state.scrollTween:update(math.min(dt, 1 / 60))
 	end
 
 	local items = self.state.items

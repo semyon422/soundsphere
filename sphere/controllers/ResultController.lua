@@ -42,8 +42,66 @@ ResultController.receive = function(self, event)
 
 	if event.name == "changeScreen" then
 		self.gameController.screenManager:set(self.selectController)
+	elseif event.name == "loadScore" then
+		self:replayNoteChart(event.mode, event.scoreEntry, event.itemIndex)
 	elseif event.name == "scrollScore" then
 		self.gameController.selectModel:scrollScore(event.direction)
+	end
+end
+
+ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
+	local noteChartModel = self.gameController.noteChartModel
+	if not noteChartModel:getFileInfo() then
+		return
+	end
+	if noteChartModel.noteChartDataEntry.hash == "" then
+		return
+	end
+
+	local gameplayController
+	if mode == "result" then
+		local FastplayController = require("sphere.controllers.FastplayController")
+		gameplayController = FastplayController:new()
+	else
+		local GameplayController = require("sphere.controllers.GameplayController")
+		gameplayController = GameplayController:new()
+	end
+
+	local hash = scoreEntry.replayHash
+	local replay = gameplayController.rhythmModel.replayModel:loadReplay(hash)
+
+	if replay.modifiers then
+		-- self.modifierModel:fromTable(replay.modifiers)
+	end
+	if mode == "replay" or mode == "result" then
+		gameplayController.rhythmModel.scoreEngine.scoreEntry = scoreEntry
+		gameplayController.rhythmModel.replayModel.replay = replay
+		gameplayController.rhythmModel.inputManager:setMode("internal")
+		gameplayController.rhythmModel.replayModel:setMode("replay")
+	elseif mode == "retry" then
+		gameplayController.rhythmModel.inputManager:setMode("external")
+		gameplayController.rhythmModel.replayModel:setMode("record")
+	end
+
+	gameplayController.selectController = self
+	gameplayController.gameController = self.gameController
+
+	if mode == "result" then
+		gameplayController:play()
+
+		self.rhythmModel = gameplayController.rhythmModel
+		self.view.rhythmModel = self.rhythmModel
+		self.view:unload()
+		self.view:load()
+
+		gameplayController.rhythmModel.scoreEngine.scoreEntry = scoreEntry
+		local config = self.gameController.configModel:getConfig("select")
+		config.scoreEntryId = scoreEntry.id
+		if itemIndex then
+			self.gameController.selectModel:scrollScore(nil, itemIndex)
+		end
+	else
+		return self.gameController.screenManager:set(gameplayController)
 	end
 end
 

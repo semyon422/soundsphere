@@ -92,8 +92,10 @@ SelectModel.scrollNoteChart = function(self, direction, destination)
 	self:pullScore()
 end
 
-SelectModel.scrollScore = function(self, direction)
+SelectModel.scrollScore = function(self, direction, destination)
 	local scoreItems = self.scoreLibraryModel.items
+
+	direction = direction or destination - self.scoreItemIndex
 
 	if not scoreItems[self.scoreItemIndex + direction] then
 		return

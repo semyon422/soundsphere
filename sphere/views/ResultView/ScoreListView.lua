@@ -27,4 +27,13 @@ ScoreListView.scrollDown = function(self)
 	self.navigator:scrollScore("down")
 end
 
+ScoreListView.receive = function(self, event)
+	if event.name == "wheelmoved" then
+		return self:wheelmoved(event)
+	end
+	if event.name == "mousepressed" then
+		self:receiveItems(event)
+	end
+end
+
 return ScoreListView

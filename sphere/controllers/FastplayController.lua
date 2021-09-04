@@ -1,11 +1,9 @@
 local Class						= require("aqua.util.Class")
 local RhythmModel				= require("sphere.models.RhythmModel")
-local NoteChartModel			= require("sphere.models.NoteChartModel")
 
 local FastplayController = Class:new()
 
 FastplayController.construct = function(self)
-	self.noteChartModel = NoteChartModel:new()
 	self.rhythmModel = RhythmModel:new()
 end
 
@@ -29,10 +27,10 @@ FastplayController.play = function(self)
 end
 
 FastplayController.load = function(self)
-	local noteChartModel = self.noteChartModel
+	local noteChartModel = self.gameController.noteChartModel
+	local modifierModel = self.gameController.modifierModel
+	local difficultyModel = self.gameController.difficultyModel
 	local rhythmModel = self.rhythmModel
-	local modifierModel = self.modifierModel
-	local difficultyModel = self.difficultyModel
 
 	rhythmModel.modifierModel = modifierModel
 

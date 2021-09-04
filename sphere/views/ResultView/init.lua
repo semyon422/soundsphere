@@ -32,6 +32,7 @@ ResultView.load = function(self)
 	local modifierIconGridView = self.modifierIconGridView
 	local stageInfoView = self.stageInfoView
 	local scoreListView = self.scoreListView
+	local navigator = self.navigator
 
 	local configModifier = self.configModel:getConfig("modifier")
 
@@ -51,10 +52,13 @@ ResultView.load = function(self)
 	scoreListView.scoreLibraryModel = self.scoreLibraryModel
 	scoreListView.selectModel = self.selectModel
 	scoreListView.rhythmModel = self.rhythmModel
-	scoreListView.navigator = self.navigator
+	scoreListView.navigator = navigator
 
 	stageInfoView.selectModel = self.selectModel
 	stageInfoView.scoreEngine = self.rhythmModel.scoreEngine
+
+	navigator.selectModel = self.selectModel
+	navigator.scoreLibraryModel = self.scoreLibraryModel
 
 	imageView.root = "."
 
