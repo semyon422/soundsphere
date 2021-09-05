@@ -11,6 +11,7 @@ local UserInfoView = require(viewspackage .. "UserInfoView")
 local LogoView = require(viewspackage .. "LogoView")
 local ScreenMenuView = require(viewspackage .. "ScreenMenuView")
 local BackgroundView = require(viewspackage .. "BackgroundView")
+local InspectView = require(viewspackage .. "InspectView")
 
 local ScreenView = Class:new()
 
@@ -24,6 +25,7 @@ ScreenView.construct = function(self)
 	self.rectangleView = RectangleView:new()
 	self.circleView = CircleView:new()
 	self.lineView = LineView:new()
+	self.inspectView = InspectView:new()
 end
 
 ScreenView.load = function(self)
@@ -45,6 +47,7 @@ ScreenView.load = function(self)
 	sequenceView:setView("RectangleView", self.rectangleView)
 	sequenceView:setView("CircleView", self.circleView)
 	sequenceView:setView("LineView", self.lineView)
+	sequenceView:setView("InspectView", self.inspectView)
 	sequenceView:load()
 
 	navigator:load()

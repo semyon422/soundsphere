@@ -32,11 +32,14 @@ ResultView.load = function(self)
 	local modifierIconGridView = self.modifierIconGridView
 	local stageInfoView = self.stageInfoView
 	local scoreListView = self.scoreListView
+	local inspectView = self.inspectView
 	local navigator = self.navigator
 
 	local configModifier = self.configModel:getConfig("modifier")
 
-	local scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
+	local scoreSystem = self.rhythmModel.scoreEngine.scoreSystem:getSlice()
+
+	inspectView.scoreSystem = scoreSystem
 
 	valueView.scoreSystem = scoreSystem
 	valueView.noteChartDataEntry = self.noteChartModel.noteChartDataEntry

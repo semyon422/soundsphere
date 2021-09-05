@@ -580,6 +580,18 @@ local BottomRightScreenMenu = {
 	}
 }
 
+local InspectScoreSystem = {
+	class = "InspectView",
+	transform = transform,
+	key = "scoreSystem",
+	x = 0,
+	y = 0,
+	limit = 1920,
+	fontSize = 14,
+	fontFamily = "Noto Sans Mono",
+	align = "left",
+}
+
 local NoteSkinViewConfig = {
 	Background,
 	BottomScreenMenu,
@@ -598,6 +610,7 @@ local NoteSkinViewConfig = {
 	ScoreList,
 	ScoreScrollBar,
 	PointGraph,
+	InspectScoreSystem,
 }
 
 return NoteSkinViewConfig
