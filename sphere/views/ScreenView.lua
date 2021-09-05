@@ -35,6 +35,7 @@ ScreenView.load = function(self)
 	local backgroundView = self.backgroundView
 
 	navigator.view = self
+	navigator.viewConfig = self.viewConfig
 	screenMenuView.navigator = navigator
 	backgroundView.backgroundModel = self.backgroundModel
 

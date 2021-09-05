@@ -6,6 +6,7 @@ local Navigator = Class:new()
 
 Navigator.construct = function(self)
 	self.observable = Observable:new()
+	self.debugHidden = true
 end
 
 Navigator.load = function(self)
@@ -29,6 +30,15 @@ Navigator.changeScreen = function(self, screenName)
 		name = "changeScreen",
 		screenName = screenName
 	})
+end
+
+Navigator.showDebug = function(self)
+	self.debugHidden = not self.debugHidden
+	for _, config in ipairs(self.viewConfig) do
+		if config.debug then
+			config.hidden = self.debugHidden
+		end
+	end
 end
 
 return Navigator

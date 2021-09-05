@@ -14,6 +14,7 @@ ResultNavigator.receive = function(self, event)
 	elseif scancode == "down" then self:scrollScore("down")
 	elseif scancode == "escape" then self:changeScreen("Select")
 	elseif scancode == "return" then self:loadScore()
+	elseif scancode == "f1" then self:showDebug()
 	end
 end
 
