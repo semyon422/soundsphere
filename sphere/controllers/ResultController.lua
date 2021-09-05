@@ -83,7 +83,7 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 		gameplayController.rhythmModel.replayModel:setMode("record")
 	end
 
-	gameplayController.selectController = self
+	gameplayController.selectController = self.gameController.selectController
 	gameplayController.gameController = self.gameController
 
 	if mode == "result" then
