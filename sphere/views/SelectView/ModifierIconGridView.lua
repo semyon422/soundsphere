@@ -30,30 +30,37 @@ ModifierIconGridView.draw = function(self)
 		return self:drawNoModifier()
 	end
 
-	local i = 1
+	local modifierIndex = 1
+	local drawIndex = 1
 
 	local iconConfig = self.iconConfig
 	iconConfig.transform = config.transform
 	iconConfig.size = config.w / config.columns
 	local maxIndex = config.rows * config.columns
-	for row = 1, config.rows do
-		for column = 1, config.columns do
-			local modifierConfig = configModifier[i]
-			if modifierConfig then
-				if i == maxIndex and #configModifier > maxIndex then
-					return self:drawMoreModifier()
-				end
-				local modifier = modifierModel:getModifier(modifierConfig)
-				iconConfig.modifierString = modifier:getString(modifierConfig)
-				iconConfig.modifierSubString = modifier:getSubString(modifierConfig)
-				i = i + 1
-			else
-				return
+
+	while true do
+		local row = math.floor((drawIndex - 1) / config.columns) + 1
+		local column = (drawIndex - 1) % config.columns + 1
+		local modifierConfig = configModifier[modifierIndex]
+		if modifierConfig then
+			if drawIndex == maxIndex and #configModifier + drawIndex - modifierIndex > maxIndex then
+				return self:drawMoreModifier()
 			end
-			iconConfig.x = config.x + iconConfig.size * (column - 1)
-			iconConfig.y = config.y + iconConfig.size * (row - 1)
-			modifierIconView:draw()
+			local modifier = modifierModel:getModifier(modifierConfig)
+
+			local modifierString = modifier:getString(modifierConfig)
+			if modifierString then
+				iconConfig.modifierString = modifierString
+				iconConfig.modifierSubString = modifier:getSubString(modifierConfig)
+				iconConfig.x = config.x + iconConfig.size * (column - 1)
+				iconConfig.y = config.y + iconConfig.size * (row - 1)
+				modifierIconView:draw()
+				drawIndex = drawIndex + 1
+			end
+		else
+			return
 		end
+		modifierIndex = modifierIndex + 1
 	end
 end
 

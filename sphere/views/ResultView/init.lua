@@ -35,8 +35,6 @@ ResultView.load = function(self)
 	local inspectView = self.inspectView
 	local navigator = self.navigator
 
-	local configModifier = self.configModel:getConfig("modifier")
-
 	local scoreSystem = self.rhythmModel.scoreEngine.scoreSystem:getSlice()
 
 	inspectView.scoreSystem = scoreSystem
@@ -50,7 +48,7 @@ ResultView.load = function(self)
 	pointGraphView.selectModel = self.selectModel
 
 	modifierIconGridView.modifierModel = self.modifierModel
-	modifierIconGridView.configModifier = configModifier
+	modifierIconGridView.selectModel = self.selectModel
 
 	scoreListView.scoreLibraryModel = self.scoreLibraryModel
 	scoreListView.selectModel = self.selectModel

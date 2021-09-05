@@ -32,8 +32,6 @@ SelectView.load = function(self)
 	local stageInfoView = self.stageInfoView
 	local navigator = self.navigator
 
-	local configModifier = self.configModel:getConfig("modifier")
-
 	navigator.selectModel = self.selectModel
 
 	noteChartSetListView.navigator = self.navigator
@@ -48,7 +46,6 @@ SelectView.load = function(self)
 
 	modifierIconGridView.selectModel = self.selectModel
 	modifierIconGridView.modifierModel = self.modifierModel
-	modifierIconGridView.configModifier = configModifier
 	modifierIconGridView.scoreLibraryModel = self.scoreLibraryModel
 
 	stageInfoView.selectModel = self.selectModel

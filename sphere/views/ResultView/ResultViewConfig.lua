@@ -554,7 +554,8 @@ local ModifierIconGrid = {
 	h = 136,
 	columns = 6,
 	rows = 2,
-	noModifier = true
+	noModifier = true,
+	config = "selectModel.scoreItem.scoreEntry.modifiers",
 }
 
 local BottomScreenMenu = {

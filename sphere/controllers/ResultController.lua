@@ -70,9 +70,9 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 	local hash = scoreEntry.replayHash
 	local replay = gameplayController.rhythmModel.replayModel:loadReplay(hash)
 
-	if replay.modifiers then
-		-- self.modifierModel:fromTable(replay.modifiers)
-	end
+	local modifierModel = self.gameController.modifierModel
+	modifierModel.config = modifierModel:decode(scoreEntry.modifiers)
+
 	if mode == "replay" or mode == "result" then
 		gameplayController.rhythmModel.scoreEngine.scoreEntry = scoreEntry
 		gameplayController.rhythmModel.replayModel.replay = replay

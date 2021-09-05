@@ -402,7 +402,7 @@ local ModifierIconGrid = {
 	h = 136,
 	columns = 6,
 	rows = 2,
-	config = "configModifier"
+	config = "modifierModel.config"
 }
 
 local StageInfoModifierIconGrid = {
