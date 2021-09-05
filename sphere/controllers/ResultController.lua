@@ -90,9 +90,12 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 		gameplayController:play()
 
 		self.rhythmModel = gameplayController.rhythmModel
-		self.view.rhythmModel = self.rhythmModel
-		self.view:unload()
-		self.view:load()
+		local view = self.view
+		if view then
+			view.rhythmModel = self.rhythmModel
+			view:unload()
+			view:load()
+		end
 
 		gameplayController.rhythmModel.scoreEngine.scoreEntry = scoreEntry
 		local config = self.gameController.configModel:getConfig("select")

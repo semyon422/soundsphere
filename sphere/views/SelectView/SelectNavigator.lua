@@ -21,6 +21,7 @@ SelectNavigator.receive = function(self, event)
 	elseif scancode == "f2" then self:changeScreen("NoteSkin")
 	elseif scancode == "f3" then self:changeScreen("Input")
 	elseif scancode == "f4" then self:changeScreen("Settings")
+	elseif scancode == "tab" then self:changeScreen("Result")
 	end
 end
 
