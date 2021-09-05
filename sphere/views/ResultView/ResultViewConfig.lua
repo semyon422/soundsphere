@@ -140,7 +140,7 @@ local ScoreList = {
 		},
 		{
 			type = "text",
-			value = "pp",
+			value = "rating",
 			onNew = true,
 			x = 116,
 			baseline = 19,
@@ -420,9 +420,23 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = 8, y = 4,
+		x = 8, y = 3,
 		name = "pauses",
 		key = "selectModel.scoreItem.scoreEntry.pauses"
+	},
+	{
+		type = StageInfo.smallCell,
+		valueType = "text",
+		x = {7, 8}, y = 4,
+		name = "adjust",
+		key = "scoreEngine.scoreSystem.normalscore.adjustRatio",
+		format = function(adjustRatio)
+			if adjustRatio ~= adjustRatio then
+				adjustRatio = 1
+			end
+			return ("%d%%"):format((1 - adjustRatio) * 100)
+		end,
+		show = showLoadedScore
 	},
 
 	{

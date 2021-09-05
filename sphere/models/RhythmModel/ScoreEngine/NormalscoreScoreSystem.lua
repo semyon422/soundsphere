@@ -7,7 +7,7 @@ NormalscoreScoreSystem.name = "normalscore"
 
 NormalscoreScoreSystem.construct = function(self)
 	self.normalscore = normalscore:new()
-	self.hitTimingWindow = 0.016
+	self.hitTimingWindow = 0.12
 end
 
 NormalscoreScoreSystem.after = function(self, event)
@@ -25,6 +25,7 @@ NormalscoreScoreSystem.after = function(self, event)
 	self.averageStrain = self.scoreEngine.baseAverageStrain * event.timeRate
 
 	self.performance = self.enps / self.accuracyAdjusted
+	self.adjustRatio = ns.score_adjusted / ns.score
 end
 
 NormalscoreScoreSystem.hit = function(self, event)
