@@ -9,6 +9,13 @@ AutoPlay.defaultValue = true
 AutoPlay.name = "AutoPlay"
 AutoPlay.shortName = "AP"
 
+AutoPlay.getString = function(self, config)
+	if not config.value then
+		return
+	end
+	return Modifier.getString(self)
+end
+
 AutoPlay.apply = function(self, config)
 	if not config.value then
 		return

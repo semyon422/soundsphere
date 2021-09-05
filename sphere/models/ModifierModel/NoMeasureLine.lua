@@ -5,8 +5,16 @@ local NoMeasureLine = Modifier:new()
 NoMeasureLine.type = "NoteChartModifier"
 NoMeasureLine.interfaceType = "toggle"
 
+NoMeasureLine.defaultValue = true
 NoMeasureLine.name = "NoMeasureLine"
 NoMeasureLine.shortName = "NML"
+
+NoMeasureLine.getString = function(self, config)
+	if not config.value then
+		return
+	end
+	return Modifier.getString(self)
+end
 
 NoMeasureLine.apply = function(self, config)
 	if config.value == 0 then

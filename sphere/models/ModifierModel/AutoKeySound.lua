@@ -10,6 +10,13 @@ AutoKeySound.defaultValue = true
 AutoKeySound.name = "AutoKeySound"
 AutoKeySound.shortName = "AKS"
 
+AutoKeySound.getString = function(self, config)
+	if not config.value then
+		return
+	end
+	return Modifier.getString(self)
+end
+
 AutoKeySound.apply = function(self, config)
 	if not config.value then
 		return

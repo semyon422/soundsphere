@@ -8,9 +8,9 @@ SwapModifier.interfaceType = "toggle"
 SwapModifier.name = "SwapModifier"
 
 SwapModifier.apply = function(self, config)
-	-- if not config.value then
-	-- 	return
-	-- end
+	if not config.value then
+		return
+	end
 
 	local map = self:getMap(config)
 

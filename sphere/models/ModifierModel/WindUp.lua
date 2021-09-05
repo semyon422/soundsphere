@@ -10,6 +10,13 @@ WindUp.defaultValue = true
 WindUp.name = "WindUp"
 WindUp.shortName = "WU"
 
+WindUp.getString = function(self, config)
+	if not config.value then
+		return
+	end
+	return Modifier.getString(self)
+end
+
 WindUp.apply = function(self, config)
 	if config.value == 0 then
 		return

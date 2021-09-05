@@ -9,6 +9,13 @@ NoScratch.defaultValue = true
 NoScratch.name = "NoScratch"
 NoScratch.shortName = "NSC"
 
+NoScratch.getString = function(self, config)
+	if not config.value then
+		return
+	end
+	return Modifier.getString(self)
+end
+
 NoScratch.apply = function(self, config)
 	if not config.value then
 		return

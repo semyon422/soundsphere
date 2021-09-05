@@ -5,8 +5,16 @@ local NoLongNote = Modifier:new()
 NoLongNote.type = "NoteChartModifier"
 NoLongNote.interfaceType = "toggle"
 
+NoLongNote.defaultValue = true
 NoLongNote.name = "NoLongNote"
 NoLongNote.shortName = "NLN"
+
+NoLongNote.getString = function(self, config)
+	if not config.value then
+		return
+	end
+	return Modifier.getString(self)
+end
 
 NoLongNote.apply = function(self, config)
 	if config.value == 0 then

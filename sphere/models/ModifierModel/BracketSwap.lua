@@ -9,6 +9,13 @@ BracketSwap.defaultValue = true
 BracketSwap.name = "BracketSwap"
 BracketSwap.shortName = "BS"
 
+BracketSwap.getString = function(self, config)
+	if not config.value then
+		return
+	end
+	return SwapModifier.getString(self)
+end
+
 BracketSwap.hardcodedMaps = {
 	[4] = {1, 3, 2, 4},
 	[5] = {2, 1, 3, 5, 4}

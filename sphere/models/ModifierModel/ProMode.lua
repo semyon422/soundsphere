@@ -9,6 +9,13 @@ ProMode.defaultValue = true
 ProMode.name = "ProMode"
 ProMode.shortName = "PRO"
 
+ProMode.getString = function(self, config)
+	if not config.value then
+		return
+	end
+	return Modifier.getString(self)
+end
+
 ProMode.apply = function(self, config)
 	if not config.value then
 		return

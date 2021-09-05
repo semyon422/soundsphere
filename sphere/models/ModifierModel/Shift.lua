@@ -15,8 +15,6 @@ Shift.getString = function(self, config)
         return "S+"
     elseif config.value < 0 then
         return "S-"
-    else
-        return "S"
     end
 end
 
