@@ -218,7 +218,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 2, y = 1,
 		name = "score",
-		key = "selectModel.scoreItem.scoreEntry.score",
+		key = "scoreLibraryModel.firstScoreItem.scoreEntry.score",
 		format = function(score)
 			if score >= 0.1 then
 				return "100+"
@@ -231,7 +231,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = {3, 4}, y = 8,
 		name = "played time ago",
-		key = "selectModel.scoreItem.scoreEntry.time",
+		key = "scoreLibraryModel.firstScoreItem.scoreEntry.time",
 		ago = true,
 		suffix = ""
 	},
@@ -241,7 +241,7 @@ StageInfo.cells = {
 		x = 3, y = 5,
 		name = "rating",
 		format = "%d",
-		key = "selectModel.scoreItem.scoreEntry.rating"
+		key = "scoreLibraryModel.firstScoreItem.scoreEntry.rating"
 	},
 	{
 		type = StageInfo.smallCell,
@@ -250,7 +250,7 @@ StageInfo.cells = {
 		name = "accuracy",
 		format = "%0.2f",
 		multiplier = 1000,
-		key = "selectModel.scoreItem.scoreEntry.accuracy"
+		key = "scoreLibraryModel.firstScoreItem.scoreEntry.accuracy"
 	},
 	{
 		type = StageInfo.smallCell,
@@ -258,7 +258,7 @@ StageInfo.cells = {
 		x = 4, y = 6,
 		name = "density",
 		format = "%0.2f",
-		key = "selectModel.scoreItem.scoreEntry.density"
+		key = "scoreLibraryModel.firstScoreItem.scoreEntry.density"
 	},
 }
 
@@ -414,7 +414,7 @@ local StageInfoModifierIconGrid = {
 	h = 138,
 	columns = 4,
 	rows = 3,
-	config = "selectModel.scoreItem.scoreEntry.modifiers",
+	config = "scoreLibraryModel.firstScoreItem.scoreEntry.modifiers",
 	noModifier = true
 }
 

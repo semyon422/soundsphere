@@ -35,6 +35,8 @@ ScoreLibraryModel.updateItems = function(self)
 		}
 	end
 
+	self.firstScoreItem = items[1]
+
 	return items
 end
 

@@ -49,8 +49,10 @@ SelectView.load = function(self)
 	modifierIconGridView.selectModel = self.selectModel
 	modifierIconGridView.modifierModel = self.modifierModel
 	modifierIconGridView.configModifier = configModifier
+	modifierIconGridView.scoreLibraryModel = self.scoreLibraryModel
 
 	stageInfoView.selectModel = self.selectModel
+	stageInfoView.scoreLibraryModel = self.scoreLibraryModel
 
 	local sequenceView = self.sequenceView
 	sequenceView:setView("NoteChartSetListView", noteChartSetListView)
