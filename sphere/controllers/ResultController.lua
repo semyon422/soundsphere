@@ -41,6 +41,7 @@ ResultController.receive = function(self, event)
 	self.view:receive(event)
 
 	if event.name == "changeScreen" then
+		self.gameController.modifierModel.config = self.gameController.configModel:getConfig("modifier")
 		self.gameController.screenManager:set(self.selectController)
 	elseif event.name == "loadScore" then
 		self:replayNoteChart(event.mode, event.scoreEntry, event.itemIndex)
