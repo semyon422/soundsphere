@@ -14,7 +14,6 @@ JudgementScoreSystem.judgements = {
 JudgementScoreSystem.construct = function(self)
 	self.ratio = 0
 	self.judgementName = ""
-	self.counters = {}
 	table.sort(self.judgements, function(a, b) return math.abs(a[1]) < math.abs(b[1]) end)
 end
 
@@ -27,15 +26,15 @@ JudgementScoreSystem.processJudgement = function(self, event)
 		if deltaTime * time > 0 and math.abs(deltaTime) <= math.abs(time) then
 			for i = 2, #judgement do
 				local name = judgement[i]
-				self.counters[name] = (self.counters[name] or 0) + 1
+				self[name] = (self[name] or 0) + 1
 			end
 			self.judgementName = judgement[2]
 			break
 		end
 	end
 
-	self.ratio = (self.counters.perfect or 0) / (self.counters.all or 1)
-	self.earlylate = (self.counters.early or 0) / (self.counters.late or 1)
+	self.ratio = (self.perfect or 0) / (self.all or 1)
+	self.earlylate = (self.early or 0) / (self.late or 1)
 end
 
 JudgementScoreSystem.notes = {
