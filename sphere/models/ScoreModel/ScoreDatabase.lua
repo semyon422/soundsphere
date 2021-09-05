@@ -23,7 +23,9 @@ ScoreDatabase.scoresColumns = {
 	"notPerfect",
 	"missCount",
 	"mean",
-	"earlylate"
+	"earlylate",
+	"inputMode",
+	"timeRate",
 }
 
 ScoreDatabase.scoresNumberColumns = {
@@ -40,7 +42,8 @@ ScoreDatabase.scoresNumberColumns = {
 	"notPerfect",
 	"missCount",
 	"mean",
-	"earlylate"
+	"earlylate",
+	"timeRate",
 }
 
 local createTableRequest = [[
@@ -67,7 +70,9 @@ local createTableRequest = [[
 		`notPerfect` REAL,
 		`missCount` REAL,
 		`mean` REAL,
-		`earlylate` REAL
+		`earlylate` REAL,
+		`inputMode` TEXT,
+		`timeRate` REAL
 	);
 ]]
 
@@ -90,9 +95,11 @@ local insertScoreRequest = [[
 		notPerfect,
 		missCount,
 		mean,
-		earlylate
+		earlylate,
+		inputMode,
+		timeRate
 	)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 ]]
 
 local selectScoreRequest = [[
@@ -116,7 +123,7 @@ local updateInfoRequest = [[
 ]]
 
 local defaultInfo = {
-	version = 4
+	version = 5
 }
 
 ScoreDatabase.load = function(self)
@@ -196,7 +203,9 @@ ScoreDatabase.insertScore = function(self, scoreData)
 		scoreData.notPerfect,
 		scoreData.missCount,
 		scoreData.mean,
-		scoreData.earlylate
+		scoreData.earlylate,
+		scoreData.inputMode,
+		scoreData.timeRate
 	):step()
 end
 
@@ -285,6 +294,36 @@ updates[4] = [[
 	);
 	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating, pauses, ratio, perfect, notPerfect, missCount, mean, earlylate)
 	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating, 0, 0, 0, 0, 0, 0, 0 FROM temp;
+	DROP TABLE temp;
+]]
+
+updates[5] = [[
+	ALTER TABLE scores RENAME TO temp;
+	CREATE TABLE IF NOT EXISTS `scores` (
+		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		`noteChartHash` TEXT NOT NULL,
+		`noteChartIndex` REAL NOT NULL,
+		`playerName` TEXT,
+		`time` INTEGER,
+		`score` REAL,
+		`accuracy` REAL,
+		`maxCombo` INTEGER,
+		`scoreRating` REAL,
+		`modifiers` TEXT,
+		`replayHash` TEXT,
+		`rating` REAL,
+		`pauses` REAL,
+		`ratio` REAL,
+		`perfect` REAL,
+		`notPerfect` REAL,
+		`missCount` REAL,
+		`mean` REAL,
+		`earlylate` REAL,
+		`inputMode` TEXT,
+		`timeRate` REAL
+	);
+	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating, pauses, ratio, perfect, notPerfect, missCount, mean, earlylate, inputMode, timeRate)
+	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating, pauses, ratio, perfect, notPerfect, missCount, mean, earlylate, "", 1 FROM temp;
 	DROP TABLE temp;
 ]]
 

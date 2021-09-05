@@ -142,7 +142,7 @@ local ScoreList = {
 			type = "text",
 			value = "rating",
 			onNew = true,
-			x = 116,
+			x = 94,
 			baseline = 19,
 			limit = 72,
 			align = "right",
@@ -154,7 +154,7 @@ local ScoreList = {
 			field = "scoreEntry.rating",
 			onNew = false,
 			format = "%d",
-			x = 116,
+			x = 94,
 			baseline = 45,
 			limit = 72,
 			align = "right",
@@ -163,7 +163,35 @@ local ScoreList = {
 		},
 		{
 			type = "text",
-			value = "played",
+			value = "time rate",
+			onNew = true,
+			x = 166,
+			baseline = 19,
+			limit = 94,
+			align = "right",
+			fontSize = 16,
+			fontFamily = "Noto Sans"
+		},
+		{
+			type = "text",
+			field = "scoreEntry.timeRate",
+			onNew = false,
+			x = 166,
+			baseline = 45,
+			limit = 94,
+			align = "right",
+			fontSize = 24,
+			fontFamily = "Noto Sans Mono",
+			format = function(timeRate)
+				if math.abs(timeRate % 0.05) < 1e-6 then
+					return ("%0.2f"):format(timeRate)
+				end
+				return ("%dQ"):format(10 * math.log(timeRate) / math.log(2))
+			end
+		},
+		{
+			type = "text",
+			value = "",
 			onNew = true,
 			x = 162,
 			baseline = 19,
@@ -177,6 +205,16 @@ local ScoreList = {
 			field = "scoreEntry.time",
 			ago = true,
 			onNew = false,
+			x = 162,
+			baseline = 19,
+			limit = 270,
+			align = "right",
+			fontSize = 16,
+			fontFamily = "Noto Sans"
+		},
+		{
+			type = "text",
+			field = "scoreEntry.inputMode",
 			x = 162,
 			baseline = 45,
 			limit = 270,

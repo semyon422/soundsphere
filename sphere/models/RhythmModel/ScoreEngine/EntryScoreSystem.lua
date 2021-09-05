@@ -22,6 +22,8 @@ EntryScoreSystem.after = function(self, event)
 	self.missCount = container.base.missCount
 	self.mean = container.normalscore.normalscore.mean
 	self.earlylate = container.judgement.earlylate
+	self.inputMode = self.scoreEngine.inputMode
+	self.timeRate = self.scoreEngine.baseTimeRate
 end
 
 return EntryScoreSystem
