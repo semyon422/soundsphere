@@ -53,12 +53,12 @@ end
 ModifierNavigator.removeModifier = function(self, itemIndex)
 	self:send({
 		name = "removeModifier",
-		modifierConfig = self.config[itemIndex or self.modifierModel.modifierItemIndex]
+		modifierConfig = self.modifierModel.config[itemIndex or self.modifierModel.modifierItemIndex]
 	})
 end
 
 ModifierNavigator.increaseModifierValue = function(self, itemIndex, delta)
-	local modifierConfig = self.config[itemIndex or self.modifierModel.modifierItemIndex]
+	local modifierConfig = self.modifierModel.config[itemIndex or self.modifierModel.modifierItemIndex]
 	self:send({
 		name = "increaseModifierValue",
 		modifierConfig = modifierConfig,

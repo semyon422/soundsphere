@@ -43,7 +43,7 @@ ModifierListView.getItemView = function(self, modifierConfig)
 end
 
 ModifierListView.reloadItems = function(self)
-	self.state.items = self.configModifier
+	self.state.items = self.modifierModel.config
 end
 
 ModifierListView.getItemIndex = function(self)
