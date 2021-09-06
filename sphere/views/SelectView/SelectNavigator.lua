@@ -17,6 +17,7 @@ SelectNavigator.receive = function(self, event)
 	elseif scancode == "f5" then self:updateCache()
 	elseif scancode == "return" then self:play()
 	elseif scancode == "lctrl" then self:changeSearchMode()
+	elseif scancode == "lshift" then self:changeCollapse()
 	elseif scancode == "f1" then self:changeScreen("Modifier")
 	elseif scancode == "f2" then self:changeScreen("NoteSkin")
 	elseif scancode == "f3" then self:changeScreen("Input")
@@ -28,6 +29,12 @@ end
 SelectNavigator.changeSearchMode = function(self)
 	self:send({
 		name = "changeSearchMode"
+	})
+end
+
+SelectNavigator.changeCollapse = function(self)
+	self:send({
+		name = "changeCollapse"
 	})
 end
 
@@ -61,6 +68,20 @@ end
 SelectNavigator.play = function(self)
 	self:send({
 		action = "playNoteChart"
+	})
+end
+
+SelectNavigator.setSortFunction = function(self, sortFunction)
+	self:send({
+		name = "setSortFunction",
+		sortFunction = sortFunction
+	})
+end
+
+SelectNavigator.scrollSortFunction = function(self, delta)
+	self:send({
+		name = "scrollSortFunction",
+		delta = delta
 	})
 end
 

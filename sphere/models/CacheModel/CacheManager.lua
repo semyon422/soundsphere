@@ -149,6 +149,10 @@ CacheManager.getNoteChartSets = function(self)
 	return self.noteChartSets
 end
 
+CacheManager.getNoteChartDatas = function(self)
+	return self.noteChartDatas
+end
+
 ----------------------------------------------------------------
 
 CacheManager.getNoteChartSetEntry = function(self, entry)

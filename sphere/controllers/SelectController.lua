@@ -19,6 +19,7 @@ SelectController.load = function(self)
 	local noteChartSetLibraryModel = self.gameController.noteChartSetLibraryModel
 	local noteChartLibraryModel = self.gameController.noteChartLibraryModel
 	local scoreLibraryModel = self.gameController.scoreLibraryModel
+	local sortModel = self.gameController.sortModel
 	local searchModel = self.gameController.searchModel
 	local selectModel = self.gameController.selectModel
 	local previewModel = self.gameController.previewModel
@@ -40,6 +41,7 @@ SelectController.load = function(self)
 	selectModel.searchModel = searchModel
 	selectModel.noteChartSetLibraryModel = noteChartSetLibraryModel
 	selectModel.noteChartLibraryModel = noteChartLibraryModel
+	selectModel.sortModel = sortModel
 	selectModel.scoreLibraryModel = scoreLibraryModel
 	previewModel.configModel = configModel
 	previewModel.cacheModel = cacheModel
@@ -61,6 +63,7 @@ SelectController.load = function(self)
 	view.noteChartSetLibraryModel = noteChartSetLibraryModel
 	view.noteChartLibraryModel = noteChartLibraryModel
 	view.scoreLibraryModel = scoreLibraryModel
+	view.sortModel = sortModel
 	view.searchModel = searchModel
 	view.selectModel = selectModel
 
@@ -98,6 +101,10 @@ SelectController.receive = function(self, event)
 		self.gameController.selectModel:scrollNoteChart(event.direction)
 	elseif event.name == "scrollScore" then
 		self.gameController.selectModel:scrollScore(event.direction)
+	elseif event.name == "setSortFunction" then
+		self.gameController.selectModel:setSortFunction(event.sortFunction)
+	elseif event.name == "scrollSortFunction" then
+		self.gameController.selectModel:scrollSortFunction(event.delta)
 	elseif event.name == "changeScreen" then
 		if event.screenName == "Modifier" then
 			self:switchModifierController()
@@ -114,6 +121,8 @@ SelectController.receive = function(self, event)
 		end
 	elseif event.name == "changeSearchMode" then
 		self.gameController.selectModel:changeSearchMode()
+	elseif event.name == "changeCollapse" then
+		self.gameController.selectModel:changeCollapse()
 	elseif event.name == "startCacheUpdate" then
 		self.gameController.cacheModel:startUpdate()
 		print("start update")

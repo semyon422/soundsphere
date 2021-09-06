@@ -58,6 +58,15 @@ SearchFieldView.draw = function(self)
 			config.point.r
 		)
 	end
+
+	if self.noteChartSetLibraryModel.collapse then
+		love.graphics.circle(
+			"line",
+			config.frame.x + config.frame.w - config.frame.h,
+			config.frame.y + config.frame.h / 2,
+			config.point.r
+		)
+	end
 end
 
 return SearchFieldView

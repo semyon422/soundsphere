@@ -30,6 +30,7 @@ SelectView.load = function(self)
 	local searchFieldView = self.searchFieldView
 	local modifierIconGridView = self.modifierIconGridView
 	local stageInfoView = self.stageInfoView
+	local sortStepperView = self.sortStepperView
 	local navigator = self.navigator
 
 	navigator.selectModel = self.selectModel
@@ -42,6 +43,7 @@ SelectView.load = function(self)
 	noteChartListView.noteChartLibraryModel = self.noteChartLibraryModel
 	noteChartListView.selectModel = self.selectModel
 
+	searchFieldView.noteChartSetLibraryModel = self.noteChartSetLibraryModel
 	searchFieldView.searchModel = self.searchModel
 
 	modifierIconGridView.selectModel = self.selectModel
@@ -50,6 +52,9 @@ SelectView.load = function(self)
 
 	stageInfoView.selectModel = self.selectModel
 	stageInfoView.scoreLibraryModel = self.scoreLibraryModel
+
+	sortStepperView.sortModel = self.sortModel
+	sortStepperView.navigator = navigator
 
 	local sequenceView = self.sequenceView
 	sequenceView:setView("NoteChartSetListView", noteChartSetListView)

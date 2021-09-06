@@ -38,12 +38,14 @@ NoteChartLibraryModel.updateItems = function(self)
 		end
 	end
 
+	local noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(self.setId)
 	local foundList, foundMap = self.searchModel:search(noteChartDataEntries)
 	for i = 1, #noteChartDataEntries do
 		local noteChartDataEntry = noteChartDataEntries[i]
 		local check = foundMap[noteChartDataEntry]
 		if check or self.searchMode == "show" then
 			items[#items + 1] = {
+				noteChartSetEntry = noteChartSetEntry,
 				noteChartDataEntry = noteChartDataEntry,
 				noteChartEntry = map[noteChartDataEntry],
 				tagged = self.searchMode == "show" and check
@@ -59,7 +61,7 @@ NoteChartLibraryModel.sortItemsFunction = function(a, b)
 	if
 		#a.inputMode < #b.inputMode or
 		#a.inputMode == #b.inputMode and a.inputMode < b.inputMode or
-		a.inputMode == b.inputMode and a.noteCount < b.noteCount
+		a.inputMode == b.inputMode and a.difficulty < b.difficulty
 	then
 		return true
 	end
@@ -83,37 +85,10 @@ NoteChartLibraryModel.getItemIndex = function(self, noteChartEntryId, noteChartD
 end
 
 NoteChartLibraryModel.getItem = function(self, noteChartEntryId, noteChartDataEntryId)
-	return self.items[self:getItemIndex(noteChartEntryId, noteChartDataEntryId)]
+	local itemIndex = self:getItemIndex(noteChartEntryId, noteChartDataEntryId)
+	if itemIndex then
+		return self.items[itemIndex]
+	end
 end
-
--- NoteChartLibraryModel.getBackgroundPath = function(self, itemIndex)
--- 	local item = self.items[itemIndex]
--- 	local noteChartDataEntry = item.noteChartDataEntry
--- 	local noteChartEntry = item.noteChartEntry
-
--- 	local directoryPath = self.cacheModel.cacheManager:getNoteChartSetEntryById(noteChartEntry.setId).path
--- 	local stagePath = noteChartDataEntry.stagePath
-
--- 	if stagePath and stagePath ~= "" then
--- 		return directoryPath .. "/" .. stagePath
--- 	end
-
--- 	return directoryPath
--- end
-
--- NoteChartList.getAudioPath = function(self, itemIndex)
--- 	local item = self.items[itemIndex]
--- 	local noteChartDataEntry = item.noteChartDataEntry
--- 	local noteChartEntry = item.noteChartEntry
-
--- 	local directoryPath = self.cacheModel.cacheManager:getNoteChartSetEntryById(noteChartEntry.setId).path
--- 	local audioPath = noteChartDataEntry.audioPath
-
--- 	if audioPath and audioPath ~= "" then
--- 		return directoryPath .. "/" .. audioPath, noteChartDataEntry.previewTime
--- 	end
-
--- 	return directoryPath .. "/preview.ogg", 0
--- end
 
 return NoteChartLibraryModel
