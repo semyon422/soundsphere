@@ -3,7 +3,6 @@ local viewspackage = (...):match("^(.-%.views%.)")
 local RhythmView = require("sphere.views.RhythmView")
 local GameplayViewConfig = require("sphere.views.GameplayView.GameplayViewConfig")
 local DiscordGameplayView = require("sphere.views.DiscordGameplayView")
-local PauseOverlay = require("sphere.views.GameplayView.PauseOverlay")
 local ValueView	= require("sphere.views.GameplayView.ValueView")
 local ProgressView	= require("sphere.views.GameplayView.ProgressView")
 local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
@@ -27,7 +26,6 @@ GameplayView.construct = function(self)
 	self.imageView = ImageView:new()
 	self.inputImageView = InputImageView:new()
 	self.discordGameplayView = DiscordGameplayView:new()
-	self.pauseOverlay = PauseOverlay:new()
 end
 
 GameplayView.load = function(self)
@@ -41,7 +39,6 @@ GameplayView.load = function(self)
 	local inputImageView = self.inputImageView
 	local discordGameplayView = self.discordGameplayView
 	local sequenceView = self.sequenceView
-	local pauseOverlay = self.pauseOverlay
 	local configModel = self.configModel
 	local modifierModel = self.modifierModel
 
