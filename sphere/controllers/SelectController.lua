@@ -23,6 +23,7 @@ SelectController.load = function(self)
 	local searchModel = self.gameController.searchModel
 	local selectModel = self.gameController.selectModel
 	local previewModel = self.gameController.previewModel
+	local updateModel = self.gameController.updateModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -58,6 +59,7 @@ SelectController.load = function(self)
 	view.scoreModel = scoreModel
 	view.onlineModel = onlineModel
 	view.backgroundModel = backgroundModel
+	view.updateModel = updateModel
 
 	view.controller = self
 	view.noteChartSetLibraryModel = noteChartSetLibraryModel

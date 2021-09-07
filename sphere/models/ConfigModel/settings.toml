@@ -11,6 +11,7 @@ visualOffset = 0
 needTimeRound = 1
 videobga = false
 imagebga = true
+autoUpdate = false
 
 [graphics]
 dimSelect = 0.5

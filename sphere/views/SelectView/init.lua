@@ -10,6 +10,7 @@ local SearchFieldView = require(viewspackage .. "SelectView.SearchFieldView")
 local SortStepperView = require(viewspackage .. "SelectView.SortStepperView")
 local StageInfoView = require(viewspackage .. "SelectView.StageInfoView")
 local ModifierIconGridView = require(viewspackage .. "SelectView.ModifierIconGridView")
+local ValueView = require(viewspackage .. "GameplayView.ValueView")
 
 local SelectView = ScreenView:new()
 
@@ -22,6 +23,7 @@ SelectView.construct = function(self)
 	self.sortStepperView = SortStepperView:new()
 	self.stageInfoView = StageInfoView:new()
 	self.modifierIconGridView = ModifierIconGridView:new()
+	self.valueView = ValueView:new()
 end
 
 SelectView.load = function(self)
@@ -31,9 +33,12 @@ SelectView.load = function(self)
 	local modifierIconGridView = self.modifierIconGridView
 	local stageInfoView = self.stageInfoView
 	local sortStepperView = self.sortStepperView
+	local valueView = self.valueView
 	local navigator = self.navigator
 
 	navigator.selectModel = self.selectModel
+
+	valueView.updateModel = self.updateModel
 
 	noteChartSetListView.navigator = self.navigator
 	noteChartSetListView.noteChartSetLibraryModel = self.noteChartSetLibraryModel
@@ -63,6 +68,7 @@ SelectView.load = function(self)
 	sequenceView:setView("SortStepperView", self.sortStepperView)
 	sequenceView:setView("StageInfoView", self.stageInfoView)
 	sequenceView:setView("ModifierIconGridView", modifierIconGridView)
+	sequenceView:setView("ValueView", valueView)
 
 	ScreenView.load(self)
 end

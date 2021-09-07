@@ -418,6 +418,19 @@ local StageInfoModifierIconGrid = {
 	noModifier = true
 }
 
+local UpdateStatus = {
+	class = "ValueView",
+	transform = transform,
+	field = "updateModel.status",
+	x = 0,
+	baseline = 1070,
+	limit = 1920,
+	color = {1, 1, 1, 1},
+	fontSize = 24,
+	fontFamily = "Noto Sans Mono",
+	align = "left",
+}
+
 local BottomScreenMenu = {
 	class = "ScreenMenuView",
 	transform = transform,
@@ -557,6 +570,7 @@ local SelectViewConfig = {
 	StageInfoModifierIconGrid,
 	BottomScreenMenu,
 	LeftScreenMenu,
+	UpdateStatus,
 
 	Rectangle,
 	Line

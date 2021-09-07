@@ -94,6 +94,13 @@
 		"format": "%d"
 	},
 	{
+		"name": "auto update on game start",
+		"section": "general",
+		"key": "autoUpdate",
+		"type": "switch",
+		"displayRange": ["disabled", "enabled"]
+	},
+	{
 		"name": "dim select",
 		"section": "graphics",
 		"key": "dimSelect",

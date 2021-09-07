@@ -36,6 +36,7 @@ local SortModel		= require("sphere.models.SortModel")
 local SearchModel		= require("sphere.models.SearchModel")
 local SelectModel		= require("sphere.models.SelectModel")
 local PreviewModel		= require("sphere.models.PreviewModel")
+local UpdateModel		= require("sphere.models.UpdateModel")
 local MainLog					= require("sphere.MainLog")
 
 local GameController = Class:new()
@@ -71,6 +72,7 @@ GameController.construct = function(self)
 	self.searchModel = SearchModel:new()
 	self.selectModel = SelectModel:new()
 	self.previewModel = PreviewModel:new()
+	self.updateModel = UpdateModel:new()
 end
 
 GameController.load = function(self)
@@ -96,6 +98,7 @@ GameController.load = function(self)
 	local collectionModel = self.collectionModel
 	local settingsModel = self.settingsModel
 	local selectModel = self.selectModel
+	local updateModel = self.updateModel
 
 	directoryManager:createDirectories()
 
@@ -154,6 +157,9 @@ GameController.load = function(self)
 
 	notificationModel.observable:add(notificationView)
 	notificationView:load()
+
+	updateModel.configModel = configModel
+	updateModel:load()
 
 	windowManager.configModel = configModel
 	windowManager:load()

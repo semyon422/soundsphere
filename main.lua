@@ -15,6 +15,7 @@ aquapackage.add("tinyyaml")
 aquapackage.add("tween")
 aquapackage.add("s3dc")
 aquapackage.add("inspect")
+aquapackage.add("lua-crc32")
 
 local ffi = require("ffi")
 

@@ -52,3 +52,6 @@
 [submodule "inspect"]
 	path = inspect
 	url = https://github.com/kikito/inspect.lua
+[submodule "lua-crc32"]
+	path = lua-crc32
+	url = https://github.com/semyon422/lua-crc32
