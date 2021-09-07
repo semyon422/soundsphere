@@ -16,15 +16,18 @@ aquapackage.add("tween")
 aquapackage.add("s3dc")
 aquapackage.add("inspect")
 
-local os = jit.os
+local ffi = require("ffi")
+
+local jit_os = jit.os
 local arch = jit.arch
-if os == "Windows" then
-	if arch == "x64" then
-		aquapackage.add("bin/win64")
-	elseif arch == "x86" then
-		aquapackage.add("bin/win32")
-	end
-elseif os == "Linux" then
+if jit_os == "Windows" then
+	local bin = arch == "x64" and "bin/win64" or "bin/win32"
+	ffi.cdef("int _putenv_s(const char *varname, const char *value_string);")
+	ffi.C._putenv_s("PATH", os.getenv("PATH") .. ";" .. bin)
+	aquapackage.add(bin)
+elseif jit_os == "Linux" then
+	ffi.cdef("int setenv(const char *name, const char *value, int overwrite);")
+	ffi.C.setenv("LD_LIBRARY_PATH", os.getenv("LD_LIBRARY_PATH") .. ":bin/linux64")
 	aquapackage.add("bin/linux64")
 end
 
