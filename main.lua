@@ -37,11 +37,20 @@ local git_dir_info = love.filesystem.getInfo(".git")
 if not git_dir_info then
 	print("launcher filesystem mode")
 	aquafs.mount(love.filesystem.getSourceBaseDirectory(), "/", true)
-	aquafs.mount(love.filesystem.getSourceBaseDirectory() .. "/moddedgame", "/", false)
 	aquafs.setWriteDir(love.filesystem.getSourceBaseDirectory())
+
+	local moddedgame = love.filesystem.getInfo("moddedgame")
+	if moddedgame and moddedgame.type == "directory" then
+		aquafs.mount(love.filesystem.getSourceBaseDirectory() .. "/moddedgame", "/", false)
+	end
 else
 	print("repository filesystem mode")
 	aquafs.setWriteDir(love.filesystem.getSource())
+
+	local moddedgame = love.filesystem.getInfo("moddedgame")
+	if moddedgame and moddedgame.type == "directory" then
+		aquafs.mount("moddedgame", "/", false)
+	end
 end
 
 require("luamidi")
