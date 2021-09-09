@@ -1,5 +1,12 @@
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
+local formatScore = function(score)
+	if score >= 0.1 then
+		return "100+"
+	end
+	return ("%2.2f"):format(score * 1000)
+end
+
 local NoteChartSetList = {
 	class = "NoteChartSetListView",
 	transform = transform,
@@ -219,12 +226,7 @@ StageInfo.cells = {
 		x = 2, y = 1,
 		name = "score",
 		key = "scoreLibraryModel.firstScoreItem.scoreEntry.score",
-		format = function(score)
-			if score >= 0.1 then
-				return "100+"
-			end
-			return ("%2.2f"):format(score * 1000)
-		end
+		format = formatScore
 	},
 	{
 		type = StageInfo.smallCell,
@@ -248,9 +250,8 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 4, y = 5,
 		name = "accuracy",
-		format = "%0.2f",
-		multiplier = 1000,
-		key = "scoreLibraryModel.firstScoreItem.scoreEntry.accuracy"
+		key = "scoreLibraryModel.firstScoreItem.scoreEntry.accuracy",
+		format = formatScore
 	},
 	{
 		type = StageInfo.smallCell,
