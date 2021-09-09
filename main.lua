@@ -27,10 +27,17 @@ if jit_os == "Windows" then
 	ffi.C._putenv_s("PATH", os.getenv("PATH") .. ";" .. bin)
 	aquapackage.add(bin)
 elseif jit_os == "Linux" then
-	ffi.cdef("int setenv(const char *name, const char *value, int overwrite);")
-	ffi.C.setenv("LD_LIBRARY_PATH", os.getenv("LD_LIBRARY_PATH") .. ":bin/linux64")
+	local ldlp = os.getenv("LD_LIBRARY_PATH")
+	if not ldlp or not ldlp:find("bin/linux64") then
+		ffi.cdef("int setenv(const char *name, const char *value, int overwrite);")
+		ffi.C.setenv("LD_LIBRARY_PATH", (ldlp or "") .. ":bin/linux64", true)
+		os.execute(arg[-2] .. " " .. arg[1] .. " &")
+		return os.exit()
+	end
 	aquapackage.add("bin/linux64")
 end
+love.window.setMode(1, 1)
+love.window.setTitle("soundsphere")
 
 local aquafs = require("aqua.filesystem")
 
