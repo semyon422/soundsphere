@@ -34,6 +34,7 @@ ResultView.load = function(self)
 	local stageInfoView = self.stageInfoView
 	local scoreListView = self.scoreListView
 	local inspectView = self.inspectView
+	local userInfoView = self.userInfoView
 	local navigator = self.navigator
 
 	local scoreSystem = self.rhythmModel.scoreEngine.scoreSystem:getSlice()
@@ -58,6 +59,8 @@ ResultView.load = function(self)
 
 	stageInfoView.selectModel = self.selectModel
 	stageInfoView.scoreEngine = self.rhythmModel.scoreEngine
+
+	userInfoView.onlineConfig = self.configModel:getConfig("online")
 
 	navigator.selectModel = self.selectModel
 	navigator.scoreLibraryModel = self.scoreLibraryModel

@@ -35,6 +35,7 @@ SelectView.load = function(self)
 	local stageInfoView = self.stageInfoView
 	local sortStepperView = self.sortStepperView
 	local valueView = self.valueView
+	local userInfoView = self.userInfoView
 	local navigator = self.navigator
 
 	navigator.selectModel = self.selectModel
@@ -58,6 +59,8 @@ SelectView.load = function(self)
 
 	stageInfoView.selectModel = self.selectModel
 	stageInfoView.scoreLibraryModel = self.scoreLibraryModel
+
+	userInfoView.onlineConfig = self.configModel:getConfig("online")
 
 	sortStepperView.sortModel = self.sortModel
 	sortStepperView.navigator = navigator

@@ -22,6 +22,7 @@ userdata/settings.toml
 userdata/window.json
 userdata/online.toml
 userdata/files.json
+userdata/avatar.png
 
 userdata/charts.db-journal
 userdata/scores.db-journal
