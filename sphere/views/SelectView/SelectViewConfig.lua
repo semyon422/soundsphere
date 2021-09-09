@@ -103,11 +103,11 @@ local NoteChartList = {
 			fontFamily = "Noto Sans Mono",
 			format = function(difficulty)
 				local format = "%.2f"
-				if difficulty >= 10 then
-					format = "%.1f"
-				elseif difficulty >= 100 then
+				if difficulty >= 100 then
 					format = "%s"
 					difficulty = "100+"
+				elseif difficulty >= 10 then
+					format = "%.1f"
 				end
 				return format:format(difficulty)
 			end
