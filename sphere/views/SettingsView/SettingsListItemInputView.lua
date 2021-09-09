@@ -3,9 +3,10 @@ local viewspackage = (...):match("^(.-%.views%.)")
 local ListItemInputView = require(viewspackage .. "ListItemInputView")
 local SwitchView = require(viewspackage .. "SwitchView")
 
-local SettingsListItemInputView = ListItemInputView:new()
+local SettingsListItemInputView = ListItemInputView:new({construct = false})
 
 SettingsListItemInputView.construct = function(self)
+	ListItemInputView.construct(self)
 	self.switchView = SwitchView:new()
 end
 

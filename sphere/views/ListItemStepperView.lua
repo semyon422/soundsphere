@@ -5,9 +5,10 @@ local ListItemSliderView = require(viewspackage .. "ListItemSliderView")
 local StepperView = require(viewspackage .. "StepperView")
 local transform = require("aqua.graphics.transform")
 
-local ListItemStepperView = ListItemView:new()
+local ListItemStepperView = ListItemView:new({construct = false})
 
 ListItemStepperView.construct = function(self)
+	ListItemView.construct(self)
 	self.stepperView = StepperView:new()
 end
 

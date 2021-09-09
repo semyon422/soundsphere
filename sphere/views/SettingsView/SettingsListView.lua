@@ -10,7 +10,7 @@ local Switch = require(viewspackage .. "Switch")
 local Stepper = require(viewspackage .. "Stepper")
 local transform = require("aqua.graphics.transform")
 
-local SettingsListView = ListView:new()
+local SettingsListView = ListView:new({construct = false})
 
 SettingsListView.construct = function(self)
 	ListView.construct(self)

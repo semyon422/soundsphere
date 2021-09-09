@@ -3,9 +3,10 @@ local viewspackage = (...):match("^(.-%.views%.)")
 local ListItemStepperView = require(viewspackage .. "ListItemStepperView")
 local StepperView = require(viewspackage .. "StepperView")
 
-local SettingsListItemStepperView = ListItemStepperView:new()
+local SettingsListItemStepperView = ListItemStepperView:new({construct = false})
 
 SettingsListItemStepperView.construct = function(self)
+	ListItemStepperView.construct(self)
 	self.stepperView = StepperView:new()
 end
 

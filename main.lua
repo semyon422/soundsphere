@@ -37,7 +37,6 @@ elseif jit_os == "Linux" then
 	aquapackage.add("bin/linux64")
 end
 love.window.setMode(1, 1)
-love.window.setTitle("soundsphere")
 
 local aquafs = require("aqua.filesystem")
 
@@ -72,8 +71,6 @@ setmetatable(_G, {
 
 require("preloaders.preloadall")
 
-local aqua = require("aqua")
-
 local aquaevent = require("aqua.event")
 aquaevent:init()
 
@@ -82,3 +79,5 @@ local gameController = GameController:new()
 
 aquaevent:add(gameController)
 gameController:load()
+
+love.window.setTitle("soundsphere")

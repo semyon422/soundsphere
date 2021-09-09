@@ -3,7 +3,7 @@ local viewspackage = (...):match("^(.-%.views%.)")
 local ListView = require(viewspackage .. "ListView")
 local AvailableModifierListItemView = require(viewspackage .. "ModifierView.AvailableModifierListItemView")
 
-local AvailableModifierListView = ListView:new()
+local AvailableModifierListView = ListView:new({construct = false})
 
 AvailableModifierListView.construct = function(self)
 	ListView.construct(self)

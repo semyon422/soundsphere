@@ -2,9 +2,10 @@ local viewspackage = (...):match("^(.-%.views%.)")
 
 local Navigator = require(viewspackage .. "Navigator")
 
-local InputNavigator = Navigator:new()
+local InputNavigator = Navigator:new({construct = false})
 
 InputNavigator.construct = function(self)
+	Navigator.construct(self)
 	self.itemIndex = 1
 	self.inputItemIndex = 1
 	self.virtualKey = ""

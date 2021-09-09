@@ -9,7 +9,7 @@ local Slider = require(viewspackage .. "Slider")
 local Switch = require(viewspackage .. "Switch")
 local Stepper = require(viewspackage .. "Stepper")
 
-local ModifierListView = ListView:new()
+local ModifierListView = ListView:new({construct = false})
 
 ModifierListView.construct = function(self)
 	ListView.construct(self)

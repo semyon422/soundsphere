@@ -1,7 +1,7 @@
 local ListItemView = require("sphere.views.ListItemView")
 local transform = require("aqua.graphics.transform")
 
-local ScoreListItemView = ListItemView:new()
+local ScoreListItemView = ListItemView:new({construct = false})
 
 ScoreListItemView.draw = function(self)
 	local scoreEntry = self.listView.rhythmModel.scoreEngine.scoreEntry

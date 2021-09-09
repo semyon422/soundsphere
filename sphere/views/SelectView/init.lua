@@ -12,9 +12,10 @@ local StageInfoView = require(viewspackage .. "SelectView.StageInfoView")
 local ModifierIconGridView = require(viewspackage .. "SelectView.ModifierIconGridView")
 local ValueView = require(viewspackage .. "GameplayView.ValueView")
 
-local SelectView = ScreenView:new()
+local SelectView = ScreenView:new({construct = false})
 
 SelectView.construct = function(self)
+	ScreenView.construct(self)
 	self.viewConfig = SelectViewConfig
 	self.navigator = SelectNavigator:new()
 	self.noteChartListView = NoteChartListView:new()

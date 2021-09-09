@@ -12,9 +12,10 @@ local GameplayNavigator	= require("sphere.views.GameplayView.GameplayNavigator")
 local SequenceView = require(viewspackage .. "SequenceView")
 local ScreenView = require(viewspackage .. "ScreenView")
 
-local GameplayView = ScreenView:new()
+local GameplayView = ScreenView:new({construct = false})
 
 GameplayView.construct = function(self)
+	ScreenView.construct(self)
 	self.viewConfig = GameplayViewConfig
 	self.playfieldView = SequenceView:new()
 	self.navigator = GameplayNavigator:new()

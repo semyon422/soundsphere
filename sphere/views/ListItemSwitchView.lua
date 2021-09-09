@@ -5,9 +5,10 @@ local ListItemSliderView = require(viewspackage .. "ListItemSliderView")
 local SwitchView = require(viewspackage .. "SwitchView")
 local transform = require("aqua.graphics.transform")
 
-local ListItemSwitchView = ListItemView:new()
+local ListItemSwitchView = ListItemView:new({construct = false})
 
 ListItemSwitchView.construct = function(self)
+	ListItemView.construct(self)
 	self.switchView = SwitchView:new()
 end
 

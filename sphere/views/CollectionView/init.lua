@@ -7,9 +7,10 @@ local CollectionNavigator = require(viewspackage .. "CollectionView.CollectionNa
 local CollectionListView = require(viewspackage .. "CollectionView.CollectionListView")
 local CacheView = require(viewspackage .. "CollectionView.CacheView")
 
-local CollectionView = ScreenView:new()
+local CollectionView = ScreenView:new({construct = false})
 
 CollectionView.construct = function(self)
+	ScreenView.construct(self)
 	self.viewConfig = CollectionViewConfig
 	self.navigator = CollectionNavigator:new()
 	self.collectionListView = CollectionListView:new()

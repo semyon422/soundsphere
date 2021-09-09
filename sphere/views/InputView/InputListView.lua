@@ -3,7 +3,7 @@ local viewspackage = (...):match("^(.-%.views%.)")
 local ListView = require(viewspackage .. "ListView")
 local InputListItemView = require(viewspackage .. "InputView.InputListItemView")
 
-local InputListView = ListView:new()
+local InputListView = ListView:new({construct = false})
 
 InputListView.construct = function(self)
 	ListView.construct(self)

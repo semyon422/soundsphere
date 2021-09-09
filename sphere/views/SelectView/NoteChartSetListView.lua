@@ -3,7 +3,7 @@ local viewspackage = (...):match("^(.-%.views%.)")
 local ListView = require(viewspackage .. "ListView")
 local NoteChartSetListItemView = require(viewspackage .. "SelectView.NoteChartSetListItemView")
 
-local NoteChartSetListView = ListView:new()
+local NoteChartSetListView = ListView:new({construct = false})
 
 NoteChartSetListView.construct = function(self)
 	ListView.construct(self)

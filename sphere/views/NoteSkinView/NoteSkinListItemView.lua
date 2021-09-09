@@ -1,7 +1,7 @@
 local transform = require("aqua.graphics.transform")
 local ListItemView = require("sphere.views.ListItemView")
 
-local NoteSkinListItemView = ListItemView:new()
+local NoteSkinListItemView = ListItemView:new({construct = false})
 
 NoteSkinListItemView.draw = function(self)
 	self.item.tagged = self.item == self.listView.state.selectedNoteSkin

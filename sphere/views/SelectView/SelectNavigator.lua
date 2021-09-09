@@ -2,7 +2,7 @@ local viewspackage = (...):match("^(.-%.views%.)")
 
 local Navigator = require(viewspackage .. "Navigator")
 
-local SelectNavigator = Navigator:new()
+local SelectNavigator = Navigator:new({construct = false})
 
 SelectNavigator.receive = function(self, event)
 	if event.name ~= "keypressed" then

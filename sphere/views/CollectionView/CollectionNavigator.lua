@@ -2,9 +2,10 @@ local viewspackage = (...):match("^(.-%.views%.)")
 
 local Navigator = require(viewspackage .. "Navigator")
 
-local CollectionNavigator = Navigator:new()
+local CollectionNavigator = Navigator:new({construct = false})
 
 CollectionNavigator.construct = function(self)
+	Navigator.construct(self)
 	self.collectionItemIndex = 1
 end
 

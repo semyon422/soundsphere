@@ -6,9 +6,10 @@ local InputViewConfig = require(viewspackage .. "InputView.InputViewConfig")
 local InputNavigator = require(viewspackage .. "InputView.InputNavigator")
 local InputListView = require(viewspackage .. "InputView.InputListView")
 
-local InputView = ScreenView:new()
+local InputView = ScreenView:new({construct = false})
 
 InputView.construct = function(self)
+	ScreenView.construct(self)
 	self.viewConfig = InputViewConfig
 	self.navigator = InputNavigator:new()
 	self.noteSkinListView = InputListView:new()

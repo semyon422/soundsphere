@@ -2,9 +2,10 @@ local viewspackage = (...):match("^(.-%.views%.)")
 
 local Navigator = require(viewspackage .. "Navigator")
 
-local ModifierNavigator = Navigator:new()
+local ModifierNavigator = Navigator:new({construct = false})
 
 ModifierNavigator.construct = function(self)
+	Navigator.construct(self)
 	self.activeList = "modifierList"
 end
 

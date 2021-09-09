@@ -7,9 +7,10 @@ local SettingsNavigator = require(viewspackage .. "SettingsView.SettingsNavigato
 local SettingsListView = require(viewspackage .. "SettingsView.SettingsListView")
 local SectionsListView = require(viewspackage .. "SettingsView.SectionsListView")
 
-local SettingsView = ScreenView:new()
+local SettingsView = ScreenView:new({construct = false})
 
 SettingsView.construct = function(self)
+	ScreenView.construct(self)
 	self.viewConfig = SettingsViewConfig
 	self.navigator = SettingsNavigator:new()
 	self.settingsListView = SettingsListView:new()

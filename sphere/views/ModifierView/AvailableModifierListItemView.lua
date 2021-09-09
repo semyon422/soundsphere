@@ -4,7 +4,7 @@ local transform = require("aqua.graphics.transform")
 
 local ListItemView = require("sphere.views.ListItemView")
 
-local AvailableModifierListItemView = ListItemView:new()
+local AvailableModifierListItemView = ListItemView:new({construct = false})
 
 AvailableModifierListItemView.draw = function(self)
 	local config = self.listView.config

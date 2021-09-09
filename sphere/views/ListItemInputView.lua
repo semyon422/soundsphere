@@ -2,7 +2,7 @@ local viewspackage = (...):match("^(.-%.views%.)")
 
 local ListItemView = require(viewspackage .. "ListItemView")
 
-local ListItemInputView = ListItemView:new()
+local ListItemInputView = ListItemView:new({construct = false})
 
 ListItemInputView.getName = function(self) end
 ListItemInputView.getValue = function(self) end

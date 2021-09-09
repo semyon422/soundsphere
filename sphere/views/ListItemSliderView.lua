@@ -4,9 +4,10 @@ local ListItemView = require(viewspackage .. "ListItemView")
 local SliderView = require(viewspackage .. "SliderView")
 local transform = require("aqua.graphics.transform")
 
-local ListItemSliderView = ListItemView:new()
+local ListItemSliderView = ListItemView:new({construct = false})
 
 ListItemSliderView.construct = function(self)
+	ListItemView.construct(self)
 	self.sliderView = SliderView:new()
 end
 

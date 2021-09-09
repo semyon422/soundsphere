@@ -2,7 +2,7 @@ local viewspackage = (...):match("^(.-%.views%.)")
 
 local Navigator = require(viewspackage .. "Navigator")
 
-local SettingsNavigator = Navigator:new()
+local SettingsNavigator = Navigator:new({construct = false})
 
 SettingsNavigator.construct = function(self)
 	Navigator.construct(self)

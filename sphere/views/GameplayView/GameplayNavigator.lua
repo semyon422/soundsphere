@@ -2,9 +2,10 @@ local viewspackage = (...):match("^(.-%.views%.)")
 
 local Navigator = require(viewspackage .. "Navigator")
 
-local GameplayNavigator = Navigator:new()
+local GameplayNavigator = Navigator:new({construct = false})
 
 GameplayNavigator.construct = function(self)
+	Navigator.construct(self)
 	-- self.itemIndex = 1
 	-- self.inputItemIndex = 1
 	-- self.virtualKey = ""

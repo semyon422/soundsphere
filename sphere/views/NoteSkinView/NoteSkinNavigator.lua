@@ -2,9 +2,10 @@ local viewspackage = (...):match("^(.-%.views%.)")
 
 local Navigator = require(viewspackage .. "Navigator")
 
-local NoteSkinNavigator = Navigator:new()
+local NoteSkinNavigator = Navigator:new({construct = false})
 
 NoteSkinNavigator.construct = function(self)
+	Navigator.construct(self)
 	self.noteSkinItemIndex = 1
 end
 

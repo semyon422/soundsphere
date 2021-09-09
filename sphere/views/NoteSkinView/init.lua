@@ -6,9 +6,10 @@ local NoteSkinViewConfig = require(viewspackage .. "NoteSkinView.NoteSkinViewCon
 local NoteSkinNavigator = require(viewspackage .. "NoteSkinView.NoteSkinNavigator")
 local NoteSkinListView = require(viewspackage .. "NoteSkinView.NoteSkinListView")
 
-local NoteSkinView = ScreenView:new()
+local NoteSkinView = ScreenView:new({construct = false})
 
 NoteSkinView.construct = function(self)
+	ScreenView.construct(self)
 	self.viewConfig = NoteSkinViewConfig
 	self.navigator = NoteSkinNavigator:new()
 	self.noteSkinListView = NoteSkinListView:new()

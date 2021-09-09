@@ -7,9 +7,10 @@ local ModifierNavigator = require(viewspackage .. "ModifierView.ModifierNavigato
 local AvailableModifierListView = require(viewspackage .. "ModifierView.AvailableModifierListView")
 local ModifierListView = require(viewspackage .. "ModifierView.ModifierListView")
 
-local ModifierView = ScreenView:new()
+local ModifierView = ScreenView:new({construct = false})
 
 ModifierView.construct = function(self)
+	ScreenView.construct(self)
 	self.viewConfig = ModifierViewConfig
 	self.navigator = ModifierNavigator:new()
 	self.availableModifierListView = AvailableModifierListView:new()

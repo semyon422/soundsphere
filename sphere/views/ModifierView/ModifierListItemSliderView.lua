@@ -3,9 +3,10 @@ local viewspackage = (...):match("^(.-%.views%.)")
 local ListItemSliderView = require(viewspackage .. "ListItemSliderView")
 local SliderView = require(viewspackage .. "SliderView")
 
-local ModifierListItemSliderView = ListItemSliderView:new()
+local ModifierListItemSliderView = ListItemSliderView:new({construct = false})
 
 ModifierListItemSliderView.construct = function(self)
+	ListItemSliderView.construct(self)
 	self.sliderView = SliderView:new()
 end
 

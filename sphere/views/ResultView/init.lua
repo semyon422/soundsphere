@@ -12,9 +12,10 @@ local ScoreListView	= require("sphere.views.ResultView.ScoreListView")
 local ModifierIconGridView = require(viewspackage .. "SelectView.ModifierIconGridView")
 local StageInfoView = require(viewspackage .. "SelectView.StageInfoView")
 
-local ResultView = ScreenView:new()
+local ResultView = ScreenView:new({construct = false})
 
 ResultView.construct = function(self)
+	ScreenView.construct(self)
 	self.viewConfig = ResultViewConfig
 	self.navigator = ResultNavigator:new()
 	self.valueView = ValueView:new()

@@ -2,7 +2,7 @@
 local transform = require("aqua.graphics.transform")
 local ListItemView = require("sphere.views.ListItemView")
 
-local CollectionListItemView = ListItemView:new()
+local CollectionListItemView = ListItemView:new({construct = false})
 
 CollectionListItemView.draw = function(self)
 	self.item.tagged = self.item == self.listView.state.selectedCollection
