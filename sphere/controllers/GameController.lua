@@ -164,7 +164,7 @@ GameController.load = function(self)
 	windowManager.configModel = configModel
 	windowManager:load()
 	-- configModel.observable:add(FpsLimiter)
-	-- configModel.observable:add(screenshot)
+	screenshot.configModel = configModel
 
 	scoreModel:select()
 	-- configModel:read()
