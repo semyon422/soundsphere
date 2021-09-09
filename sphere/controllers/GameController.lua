@@ -173,10 +173,7 @@ GameController.load = function(self)
 	-- configModel:read()
 
 	onlineModel.configModel = configModel
-	-- onlineModel.observable:add(onlineController)
-	-- onlineModel:setHost(configModel:get("online.host"))
-	-- onlineModel:setSession(configModel:get("online.session"))
-	-- onlineModel:setUserId(configModel:get("online.userId"))
+	onlineModel.observable:add(onlineController)
 	onlineModel:load()
 
 	inputModel:load()
