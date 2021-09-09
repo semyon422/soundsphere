@@ -11,7 +11,7 @@ local NoteChartSetList = {
 	elements = {
 		{
 			type = "text",
-			field = "noteChartDataEntry.title",
+			key = "noteChartDataEntry.title",
 			onNew = false,
 			x = 44,
 			baseline = 45,
@@ -22,7 +22,7 @@ local NoteChartSetList = {
 		},
 		{
 			type = "text",
-			field = "noteChartDataEntry.artist",
+			key = "noteChartDataEntry.artist",
 			onNew = false,
 			x = 45,
 			baseline = 19,
@@ -33,7 +33,7 @@ local NoteChartSetList = {
 		},
 		{
 			type = "circle",
-			field = "tagged",
+			key = "tagged",
 			onNew = false,
 			x = 22,
 			y = 36,
@@ -53,7 +53,7 @@ local NoteChartList = {
 	elements = {
 		{
 			type = "text",
-			field = "noteChartDataEntry.name",
+			key = "noteChartDataEntry.name",
 			onNew = false,
 			x = 116,
 			baseline = 45,
@@ -64,7 +64,7 @@ local NoteChartList = {
 		},
 		{
 			type = "text",
-			field = "noteChartDataEntry.creator",
+			key = "noteChartDataEntry.creator",
 			onNew = true,
 			x = 117,
 			baseline = 19,
@@ -75,7 +75,7 @@ local NoteChartList = {
 		},
 		{
 			type = "text",
-			field = "noteChartDataEntry.inputMode",
+			key = "noteChartDataEntry.inputMode",
 			onNew = true,
 			x = 17,
 			baseline = 19,
@@ -86,7 +86,7 @@ local NoteChartList = {
 		},
 		{
 			type = "text",
-			field = "noteChartDataEntry.difficulty",
+			key = "noteChartDataEntry.difficulty",
 			onNew = false,
 			x = 0,
 			baseline = 45,
@@ -107,7 +107,7 @@ local NoteChartList = {
 		},
 		{
 			type = "circle",
-			field = "tagged",
+			key = "tagged",
 			onNew = false,
 			x = 94,
 			y = 36,
@@ -423,7 +423,7 @@ local StageInfoModifierIconGrid = {
 local UpdateStatus = {
 	class = "ValueView",
 	transform = transform,
-	field = "updateModel.status",
+	key = "updateModel.status",
 	x = 0,
 	baseline = 1070,
 	limit = 1920,

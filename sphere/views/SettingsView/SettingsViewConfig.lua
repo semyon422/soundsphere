@@ -11,7 +11,7 @@ local SectionsList = {
 	elements = {
 		{
 			type = "text",
-			field = "section",
+			key = "section",
 			onNew = false,
 			x = 44,
 			baseline = 45,

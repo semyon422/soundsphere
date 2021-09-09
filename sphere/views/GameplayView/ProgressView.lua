@@ -1,7 +1,7 @@
 local Class				= require("aqua.util.Class")
 local transform = require("aqua.graphics.transform")
 local map				= require("aqua.math").map
-local ValueView = require("sphere.views.ValueView")
+local inside = require("aqua.util.inside")
 
 local ProgressView = Class:new()
 
@@ -9,8 +9,6 @@ ProgressView.load = function(self) end
 ProgressView.update = function(self, dt) end
 ProgressView.unload = function(self) end
 ProgressView.receive = function(self, event) end
-
-ProgressView.getValue = ValueView.getValue
 
 ProgressView.draw = function(self)
 	local config = self.config
@@ -27,10 +25,10 @@ ProgressView.getRectangle = function(self)
 	local config = self.config
 
 	local direction = config.direction
-	local minTime = self:getValue(config.minField) or 0
-	local maxTime = self:getValue(config.maxField) or 1
-	local startTime = self:getValue(config.startField) or 0
-	local currentTime = self:getValue(config.currentField) or 0
+	local minTime = config.min and (config.min.value or inside(self, config.min.key)) or 0
+	local maxTime = config.max and (config.max.value or inside(self, config.max.key)) or 1
+	local startTime = config.start and (config.start.value or inside(self, config.start.key)) or 0
+	local currentTime = config.current and (config.current.value or inside(self, config.current.key)) or 0
 
 	local normTime = 1
 	if currentTime < minTime then

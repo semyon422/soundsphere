@@ -11,7 +11,7 @@ local NoteSkinList = {
 	elements = {
 		{
 			type = "text",
-			field = "name",
+			key = "name",
 			onNew = false,
 			x = 44,
 			baseline = 45,
@@ -22,7 +22,7 @@ local NoteSkinList = {
 		},
 		{
 			type = "circle",
-			field = "tagged",
+			key = "tagged",
 			onNew = false,
 			x = 22,
 			y = 36,

@@ -13,13 +13,6 @@ ValueView.load = function(self)
 	state.font = spherefonts.get(config.fontFamily, config.fontSize)
 end
 
-ValueView.getValue = function(self, field)
-	if type(field) == "number" then
-		return field
-	end
-	return inside(self, field)
-end
-
 ValueView.draw = function(self)
 	local config = self.config
 
@@ -29,7 +22,7 @@ ValueView.draw = function(self)
 	love.graphics.setColor(config.color)
 
 	local format = config.format
-	local value = self:getValue(config.field)
+	local value = config.value or inside(self, config.key)
 	if value then
 		if config.multiplier and tonumber(value) then
 			value = value * config.multiplier

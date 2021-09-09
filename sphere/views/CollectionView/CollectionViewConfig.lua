@@ -29,7 +29,7 @@ local CollectionList = {
 	elements = {
 		{
 			type = "text",
-			field = "path",
+			key = "path",
 			onNew = false,
 			x = 44,
 			baseline = 45,
@@ -40,7 +40,7 @@ local CollectionList = {
 		},
 		{
 			type = "circle",
-			field = "tagged",
+			key = "tagged",
 			onNew = false,
 			x = 22,
 			y = 36,

@@ -74,7 +74,7 @@ PointGraphView.drawPoints = function(self)
 	love.graphics.replaceTransform(transform(config.transform))
 	love.graphics.translate(config.x, config.y)
 
-	local points = inside(self, config.field)
+	local points = inside(self, config.key)
 	for i = state.drawnPoints + 1, #points do
 		self:drawPoint(points[i])
 	end

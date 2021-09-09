@@ -97,7 +97,7 @@ local PointGraph = {
 	pointLineWidth = 1,
 	color = {1, 1, 1, 1},
 	lineColor = {1, 1, 1, 0.5},
-	field = "scoreEngine.scoreSystem.sequence",
+	key = "scoreEngine.scoreSystem.sequence",
 	time = "base.currentTime",
 	value = "base.combo",
 	unit = "base.noteCount",
@@ -131,7 +131,7 @@ local ScoreList = {
 		},
 		{
 			type = "text",
-			field = "itemIndex",
+			key = "itemIndex",
 			onNew = false,
 			x = 22,
 			baseline = 45,
@@ -153,7 +153,7 @@ local ScoreList = {
 		},
 		{
 			type = "text",
-			field = "scoreEntry.rating",
+			key = "scoreEntry.rating",
 			onNew = false,
 			format = "%d",
 			x = 94,
@@ -176,7 +176,7 @@ local ScoreList = {
 		},
 		{
 			type = "text",
-			field = "scoreEntry.timeRate",
+			key = "scoreEntry.timeRate",
 			onNew = false,
 			x = 166,
 			baseline = 45,
@@ -204,7 +204,7 @@ local ScoreList = {
 		},
 		{
 			type = "text",
-			field = "scoreEntry.time",
+			key = "scoreEntry.time",
 			ago = true,
 			onNew = false,
 			x = 162,
@@ -216,7 +216,7 @@ local ScoreList = {
 		},
 		{
 			type = "text",
-			field = "scoreEntry.inputMode",
+			key = "scoreEntry.inputMode",
 			x = 162,
 			baseline = 45,
 			limit = 270,
@@ -226,7 +226,7 @@ local ScoreList = {
 		},
 		{
 			type = "circle",
-			field = "loaded",
+			key = "loaded",
 			onNew = false,
 			x = 23,
 			y = 36,
@@ -250,7 +250,7 @@ local ScoreScrollBar = {
 
 local SongTitleView = {
 	class = "ValueView",
-	field = "noteChartDataEntry.title",
+	key = "noteChartDataEntry.title",
 	format = "%s", defaultValue = "",
 	color = {1, 1, 1, 1},
 	x = 279 + 44,
@@ -264,7 +264,7 @@ local SongTitleView = {
 
 local SongArtistView = {
 	class = "ValueView",
-	field = "noteChartDataEntry.artist",
+	key = "noteChartDataEntry.artist",
 	format = "%s", defaultValue = "",
 	color = {1, 1, 1, 1},
 	x = 279 + 45,
@@ -278,7 +278,7 @@ local SongArtistView = {
 
 local ChartNameView = {
 	class = "ValueView",
-	field = "noteChartDataEntry.name",
+	key = "noteChartDataEntry.name",
 	format = "%s", defaultValue = "",
 	color = {1, 1, 1, 1},
 	x = 279 + 116,
@@ -292,7 +292,7 @@ local ChartNameView = {
 
 local ChartCreatorView = {
 	class = "ValueView",
-	field = "noteChartDataEntry.creator",
+	key = "noteChartDataEntry.creator",
 	format = "%s", defaultValue = "",
 	color = {1, 1, 1, 1},
 	x = 279 + 117,
@@ -306,7 +306,7 @@ local ChartCreatorView = {
 
 local ChartInputModeView = {
 	class = "ValueView",
-	field = "noteChartDataEntry.inputMode",
+	key = "noteChartDataEntry.inputMode",
 	format = "%s", defaultValue = "",
 	color = {1, 1, 1, 1},
 	x = 279 + 29 + 17,
@@ -320,7 +320,7 @@ local ChartInputModeView = {
 
 local ChartDifficultyView = {
 	class = "ValueView",
-	field = "noteChartDataEntry.difficulty",
+	key = "noteChartDataEntry.difficulty",
 	defaultValue = 0,
 	color = {1, 1, 1, 1},
 	x = 279 + 29,
