@@ -6,7 +6,7 @@ local SliderView = require(viewspackage .. "SliderView")
 local SettingsListItemSliderView = ListItemSliderView:new({construct = false})
 
 SettingsListItemSliderView.construct = function(self)
-	SettingsListItemSliderView.construct(self)
+	ListItemSliderView.construct(self)
 	self.sliderView = SliderView:new()
 end
 
