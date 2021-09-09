@@ -252,15 +252,6 @@ ModifierModel.receive = function(self, event)
 	end
 end
 
-ModifierModel.getString = function(self)
-	local t = {}
-	for _, modifierConfig in ipairs(self.config) do
-		local modifier = self:getModifier(modifierConfig)
-		table.insert(t, modifier:getString(modifierConfig) .. (modifier:getSubString(modifierConfig) or ""))
-	end
-	return table.concat(t, ",")
-end
-
 ModifierModel.encode = function(self, config)
 	config = config or self.config
 	local t = {}

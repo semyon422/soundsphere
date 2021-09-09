@@ -38,7 +38,6 @@ ResultView.load = function(self)
 
 	valueView.scoreSystem = scoreSystem
 	valueView.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
-	valueView.modifierString = self.modifierModel:getString()
 
 	pointGraphView.scoreEngine = self.rhythmModel.scoreEngine
 	pointGraphView.noteChartModel = self.noteChartModel
