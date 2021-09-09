@@ -30,8 +30,8 @@ NoteChartSetLibraryModel.updateItems = function(self)
 		local check = self:checkNoteChartDataEntry(noteChartDataEntry)
 		if check or self.searchMode == "show" then
 			local noteChartEntries = self.cacheModel.cacheManager:getNoteChartsAtHash(noteChartDataEntry.hash)
-			local setId = noteChartEntries[1].setId
-			if not self.collapse or setId ~= prevSetId then
+			local setId = noteChartEntries[1] and noteChartEntries[1].setId
+			if setId and (not self.collapse or setId ~= prevSetId) then
 				items[#items + 1] = {
 					noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(setId),
 					noteChartEntry = noteChartEntries[1],
