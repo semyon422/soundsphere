@@ -4,6 +4,8 @@ local Class = require("aqua.util.Class")
 
 local ImageView = Class:new()
 
+ImageView.root = "."
+
 ImageView.load = function(self)
 	local config = self.config
 	local state = self.state

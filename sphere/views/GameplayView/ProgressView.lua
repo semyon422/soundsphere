@@ -1,7 +1,7 @@
 local Class				= require("aqua.util.Class")
 local transform = require("aqua.graphics.transform")
 local map				= require("aqua.math").map
-local ValueView = require("sphere.views.GameplayView.ValueView")
+local ValueView = require("sphere.views.ValueView")
 
 local ProgressView = Class:new()
 

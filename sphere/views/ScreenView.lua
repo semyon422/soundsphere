@@ -12,6 +12,8 @@ local LogoView = require(viewspackage .. "LogoView")
 local ScreenMenuView = require(viewspackage .. "ScreenMenuView")
 local BackgroundView = require(viewspackage .. "BackgroundView")
 local InspectView = require(viewspackage .. "InspectView")
+local ValueView = require(viewspackage .. "ValueView")
+local ImageView = require(viewspackage .. "ImageView")
 
 local ScreenView = Class:new()
 
@@ -26,6 +28,8 @@ ScreenView.construct = function(self)
 	self.circleView = CircleView:new()
 	self.lineView = LineView:new()
 	self.inspectView = InspectView:new()
+	self.valueView = ValueView:new()
+	self.imageView = ImageView:new()
 end
 
 ScreenView.load = function(self)
@@ -49,6 +53,8 @@ ScreenView.load = function(self)
 	sequenceView:setView("CircleView", self.circleView)
 	sequenceView:setView("LineView", self.lineView)
 	sequenceView:setView("InspectView", self.inspectView)
+	sequenceView:setView("ValueView", self.valueView)
+	sequenceView:setView("ImageView", self.imageView)
 	sequenceView:load()
 
 	navigator:load()
