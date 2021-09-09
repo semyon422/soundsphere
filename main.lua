@@ -40,9 +40,9 @@ love.window.setMode(1, 1)
 
 local aquafs = require("aqua.filesystem")
 
-local git_dir_info = love.filesystem.getInfo(".git")
-if not git_dir_info then
-	print("launcher filesystem mode")
+local source = love.filesystem.getSource()
+if source:find("^.+%.love$") then
+	print("starting from .love file directly")
 	aquafs.mount(love.filesystem.getSourceBaseDirectory(), "/", true)
 	aquafs.setWriteDir(love.filesystem.getSourceBaseDirectory())
 
@@ -51,7 +51,7 @@ if not git_dir_info then
 		aquafs.mount(love.filesystem.getSourceBaseDirectory() .. "/moddedgame", "/", false)
 	end
 else
-	print("repository filesystem mode")
+	print("starting from current directory")
 	aquafs.setWriteDir(love.filesystem.getSource())
 
 	local moddedgame = love.filesystem.getInfo("moddedgame")
