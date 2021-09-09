@@ -73,6 +73,7 @@ GameController.construct = function(self)
 	self.selectModel = SelectModel:new()
 	self.previewModel = PreviewModel:new()
 	self.updateModel = UpdateModel:new()
+	self.fpsLimiter = FpsLimiter:new()
 end
 
 GameController.load = function(self)
@@ -99,6 +100,7 @@ GameController.load = function(self)
 	local settingsModel = self.settingsModel
 	local selectModel = self.selectModel
 	local updateModel = self.updateModel
+	local fpsLimiter = self.fpsLimiter
 
 	directoryManager:createDirectories()
 
@@ -163,8 +165,9 @@ GameController.load = function(self)
 
 	windowManager.configModel = configModel
 	windowManager:load()
-	-- configModel.observable:add(FpsLimiter)
+
 	screenshot.configModel = configModel
+	fpsLimiter.configModel = configModel
 
 	scoreModel:select()
 	-- configModel:read()
@@ -227,6 +230,7 @@ GameController.update = function(self, dt)
 	self.screenManager:update(dt)
 	self.notificationView:update(dt)
 	self.onlineController:update()
+	self.fpsLimiter:update()
 end
 
 GameController.draw = function(self)
