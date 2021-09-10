@@ -73,6 +73,9 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 
 	local modifierModel = self.gameController.modifierModel
 	modifierModel.config = modifierModel:decode(scoreEntry.modifiers)
+	if #modifierModel.config == 0 then
+		modifierModel.config = replay.modifiers
+	end
 
 	if mode == "replay" or mode == "result" then
 		gameplayController.rhythmModel.scoreEngine.scoreEntry = scoreEntry
