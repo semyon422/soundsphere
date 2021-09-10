@@ -75,6 +75,7 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 	modifierModel.config = modifierModel:decode(scoreEntry.modifiers)
 	if #modifierModel.config == 0 then
 		modifierModel.config = replay.modifiers
+		modifierModel:fixOldFormat(replay.modifiers)
 	end
 
 	if mode == "replay" or mode == "result" then

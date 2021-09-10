@@ -105,7 +105,10 @@ ModifierModel.load = function(self)
 	self.modifierItemIndex = #config
 
 	for _, modifierConfig in ipairs(self.config) do
-		self:getModifier(modifierConfig).added = true
+		local modifier = self:getModifier(modifierConfig)
+		if modifier then
+			modifier.added = true
+		end
 	end
 end
 
@@ -228,7 +231,7 @@ end
 ModifierModel.apply = function(self, modifierType)
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
-		if modifier.type == modifierType then
+		if modifier and modifier.type == modifierType then
 			modifier.noteChartModel = self.noteChartModel
 			modifier.rhythmModel = self.rhythmModel
 			modifier.difficultyModel = self.difficultyModel
@@ -241,14 +244,18 @@ end
 ModifierModel.update = function(self)
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
-		modifier:update(modifierConfig)
+		if modifier then
+			modifier:update(modifierConfig)
+		end
 	end
 end
 
 ModifierModel.receive = function(self, event)
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
-		modifier:receive(modifierConfig, event)
+		if modifier then
+			modifier:receive(modifierConfig, event)
+		end
 	end
 end
 
@@ -257,7 +264,9 @@ ModifierModel.encode = function(self, config)
 	local t = {}
 	for _, modifierConfig in ipairs(config) do
 		local modifier = self:getModifier(modifierConfig)
-		table.insert(t, ("%d:%s"):format(modifier.id, modifier:encode(modifierConfig)))
+		if modifier then
+			table.insert(t, ("%d:%s"):format(modifier.id, modifier:encode(modifierConfig)))
+		end
 	end
 	return table.concat(t, ";")
 end
@@ -266,9 +275,29 @@ ModifierModel.decode = function(self, encodedConfig)
 	local config = {}
 	for modifierId, modifierData in encodedConfig:gmatch("(%d+):([^;]+)") do
 		local modifier = self:getModifier(tonumber(modifierId))
-		table.insert(config, modifier:decode(modifierData))
+		if modifier then
+			table.insert(config, modifier:decode(modifierData))
+		end
 	end
 	return config
+end
+
+ModifierModel.fixOldFormat = function(self, oldConfig)
+	for _, modifierConfig in ipairs(oldConfig) do
+		local modifier = self:getModifier(modifierConfig)
+		if modifier then
+			if not modifierConfig.value then
+				for k, v in pairs(modifierConfig) do
+					if k ~= "name" then
+						modifierConfig.value = v
+					end
+				end
+			end
+			if type(modifierConfig.value) == "number" and type(modifier.defaultValue) == "string" then
+				modifierConfig.value = modifier:fromIndexValue(modifierConfig.value)
+			end
+		end
+	end
 end
 
 return ModifierModel
