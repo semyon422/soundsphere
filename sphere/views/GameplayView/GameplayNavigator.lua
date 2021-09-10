@@ -32,16 +32,19 @@ end
 GameplayNavigator.keypressed = function(self, event)
 	local state = self.rhythmModel.pauseManager.state
 
+	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
 	local scancode = event.args[2]
 	if state == "play" then
-		if scancode == "escape" then self:pause()
+		if scancode == "escape" and not shift then self:pause()
+		elseif scancode == "escape" and shift then self:quit()
 		elseif scancode == "`" then self:retry()
 		end
 	elseif state == "pause" then
 		if scancode == "up" then self:scrollMenu("up")
 		elseif scancode == "down" then self:scrollMenu("down")
 		elseif scancode == "return" then
-		elseif scancode == "escape" then self:play()
+		elseif scancode == "escape" and not shift then self:play()
+		elseif scancode == "escape" and shift then self:quit()
 		elseif scancode == "`" then self:retry()
 		end
 	elseif state == "pause-play" and scancode == "escape" then
@@ -52,12 +55,7 @@ end
 GameplayNavigator.keyreleased = function(self, event)
 	local state = self.rhythmModel.pauseManager.state
 
-	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
 	local scancode = event.args[2]
-	if shift and scancode == "escape" then
-		return self:quit()
-	end
-
 	if state == "play-pause" and scancode == "escape" then
 		self:play()
 	elseif state == "pause-retry" and scancode == "`" then
