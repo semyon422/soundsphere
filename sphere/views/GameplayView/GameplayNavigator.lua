@@ -67,6 +67,17 @@ GameplayNavigator.keyreleased = function(self, event)
 	end
 end
 
+GameplayNavigator.saveCamera = function(self, x, y, z, pitch, yaw)
+	self:send({
+		name = "saveCamera",
+		x = x,
+		y = y,
+		z = z,
+		pitch = pitch,
+		yaw = yaw,
+	})
+end
+
 GameplayNavigator.play = function(self)
 	self:send({
 		name = "playStateChange",

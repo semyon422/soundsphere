@@ -27,6 +27,16 @@ volumeMusic = 1
 volumeEffects = 1
 midiConstantVolume = false
 
+[perspective]
+camera = false
+allowRotateX = false
+allowRotateY = true
+x = 0
+y = 0
+z = 0
+pitch = 0
+yaw = 0
+
 [input]
 pause = "escape"
 skipIntro = "space"

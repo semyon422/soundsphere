@@ -61,18 +61,18 @@ ScreenView.load = function(self)
 end
 
 ScreenView.unload = function(self)
-	self.navigator:unload()
 	self.sequenceView:unload()
+	self.navigator:unload()
 end
 
 ScreenView.receive = function(self, event)
-	self.navigator:receive(event)
 	self.sequenceView:receive(event)
+	self.navigator:receive(event)
 end
 
 ScreenView.update = function(self, dt)
-	self.navigator:update()
 	self.sequenceView:update(dt)
+	self.navigator:update()
 end
 
 ScreenView.draw = function(self)

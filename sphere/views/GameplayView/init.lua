@@ -43,6 +43,8 @@ GameplayView.load = function(self)
 
 	self.navigator.rhythmModel = self.rhythmModel
 
+	rhythmView.navigator = self.navigator
+	rhythmView.configModel = self.configModel
 	rhythmView.noteSkin = self.noteSkin
 	rhythmView.rhythmModel = self.rhythmModel
 	rhythmView:setBgaEnabled("video", config.general.videobga)

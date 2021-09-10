@@ -212,6 +212,27 @@
 		"displayRange": ["no", "yes"]
 	},
 	{
+		"name": "enable camera",
+		"section": "perspective",
+		"key": "camera",
+		"type": "switch",
+		"displayRange": ["disabled", "enabled"]
+	},
+	{
+		"name": "allow rotate x",
+		"section": "perspective",
+		"key": "allowRotateX",
+		"type": "switch",
+		"displayRange": ["disabled", "enabled"]
+	},
+	{
+		"name": "allow rotate y",
+		"section": "perspective",
+		"key": "allowRotateY",
+		"type": "switch",
+		"displayRange": ["disabled", "enabled"]
+	},
+	{
 		"name": "pause",
 		"type": "binding",
 		"section": "input",

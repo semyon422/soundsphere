@@ -141,6 +141,13 @@ GameplayController.receive = function(self, event)
 		self.rhythmModel.replayModel:setMode("record")
 		self:unload()
 		self:load()
+	elseif event.name == "saveCamera" then
+		local perspective = self.gameController.configModel:getConfig("settings").perspective
+		perspective.x = event.x
+		perspective.y = event.y
+		perspective.z = event.z
+		perspective.pitch = event.pitch
+		perspective.yaw = event.yaw
 	elseif event.name == "quit" then
 		self:skip()
 		self:saveScore()
