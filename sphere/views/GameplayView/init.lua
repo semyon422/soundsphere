@@ -37,11 +37,13 @@ GameplayView.load = function(self)
 	local discordGameplayView = self.discordGameplayView
 	local sequenceView = self.sequenceView
 	local configModel = self.configModel
-	local modifierModel = self.modifierModel
+	local cameraView = self.cameraView
 
 	local config = configModel:getConfig("settings")
 
 	self.navigator.rhythmModel = self.rhythmModel
+
+	cameraView.configModel = self.configModel
 
 	rhythmView.navigator = self.navigator
 	rhythmView.configModel = self.configModel
@@ -71,6 +73,7 @@ GameplayView.load = function(self)
 	playfieldView:setView("ProgressView", progressView)
 	playfieldView:setView("PointGraphView", pointGraphView)
 	playfieldView:setView("InputImageView", inputImageView)
+	playfieldView:setView("CameraView", self.cameraView)
 	playfieldView:load()
 
 	sequenceView:setView("PlayfieldView", playfieldView)

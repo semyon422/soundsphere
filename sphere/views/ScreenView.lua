@@ -14,6 +14,7 @@ local BackgroundView = require(viewspackage .. "BackgroundView")
 local InspectView = require(viewspackage .. "InspectView")
 local ValueView = require(viewspackage .. "ValueView")
 local ImageView = require(viewspackage .. "ImageView")
+local CameraView = require(viewspackage .. "CameraView")
 
 local ScreenView = Class:new()
 
@@ -30,6 +31,7 @@ ScreenView.construct = function(self)
 	self.inspectView = InspectView:new()
 	self.valueView = ValueView:new()
 	self.imageView = ImageView:new()
+	self.cameraView = CameraView:new()
 end
 
 ScreenView.load = function(self)
@@ -42,6 +44,7 @@ ScreenView.load = function(self)
 	navigator.viewConfig = self.viewConfig
 	screenMenuView.navigator = navigator
 	backgroundView.backgroundModel = self.backgroundModel
+	self.cameraView.navigator = self.navigator
 
 	sequenceView:setSequenceConfig(self.viewConfig)
 	sequenceView:setView("BackgroundView", backgroundView)
@@ -55,6 +58,7 @@ ScreenView.load = function(self)
 	sequenceView:setView("InspectView", self.inspectView)
 	sequenceView:setView("ValueView", self.valueView)
 	sequenceView:setView("ImageView", self.imageView)
+	sequenceView:setView("CameraView", self.cameraView)
 	sequenceView:load()
 
 	navigator:load()
