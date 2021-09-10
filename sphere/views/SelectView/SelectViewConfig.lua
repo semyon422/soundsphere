@@ -493,15 +493,15 @@ local LeftScreenMenu = {
 		{
 			{
 				method = "changeScreen",
-				value = "Collection",
-				displayName = "collection"
+				value = "Settings",
+				displayName = "settings"
 			}
 		},
 		{
 			{
 				method = "changeScreen",
-				value = "Settings",
-				displayName = "settings"
+				value = "Collection",
+				displayName = "collection"
 			}
 		},
 	}
