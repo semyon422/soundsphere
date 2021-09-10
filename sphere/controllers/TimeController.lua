@@ -9,40 +9,41 @@ TimeController.receive = function(self, event)
 
 	local timeEngine = rhythmModel.timeEngine
 	local graphicEngine = rhythmModel.graphicEngine
-	local noteSkin = graphicEngine.noteSkin
 
 	local config = configModel:getConfig("settings")
+	local input = config.input
+	local general = config.general
 
 	if event.name == "keypressed" then
 		local key = event.args[1]
 		local delta = 0.05
 
-		if key == config.general.decreaseTimeRate then
+		if key == input.decreaseTimeRate then
 			timeEngine:increaseTimeRate(-delta)
 			notificationModel:notify("timeRate: " .. timeEngine.timeRate)
 			rhythmModel.prohibitSavingScore = true
-		elseif key == config.general.increaseTimeRate then
+		elseif key == input.increaseTimeRate then
 			timeEngine:increaseTimeRate(delta)
 			notificationModel:notify("timeRate: " .. timeEngine.timeRate)
 			rhythmModel.prohibitSavingScore = true
-		elseif key == config.general.invertTimeRate then
+		elseif key == input.invertTimeRate then
 			timeEngine:setTimeRate(-timeEngine.timeRate)
 			notificationModel:notify("timeRate: " .. timeEngine.timeRate)
 			rhythmModel.prohibitSavingScore = true
-		elseif key == config.general.skipIntro then
+		elseif key == input.skipIntro then
 			timeEngine:skipIntro()
-		elseif key == config.general.invertPlaySpeed then
-			noteSkin.targetVisualTimeRate = -noteSkin.targetVisualTimeRate
-			noteSkin:setVisualTimeRate(noteSkin.targetVisualTimeRate)
-			notificationModel:notify("visualTimeRate: " .. noteSkin.targetVisualTimeRate)
-		elseif key == config.general.decreasePlaySpeed then
-			noteSkin:increaseVisualTimeRate(-delta)
-			config.general.speed = noteSkin.targetVisualTimeRate
-			notificationModel:notify("visualTimeRate: " .. noteSkin.targetVisualTimeRate)
-		elseif key == config.general.increasePlaySpeed then
-			noteSkin:increaseVisualTimeRate(delta)
-			config.general.speed = noteSkin.targetVisualTimeRate
-			notificationModel:notify("visualTimeRate: " .. noteSkin.targetVisualTimeRate)
+		elseif key == input.invertPlaySpeed then
+			graphicEngine.targetVisualTimeRate = -graphicEngine.targetVisualTimeRate
+			graphicEngine:setVisualTimeRate(graphicEngine.targetVisualTimeRate)
+			notificationModel:notify("visualTimeRate: " .. graphicEngine.targetVisualTimeRate)
+		elseif key == input.decreasePlaySpeed then
+			graphicEngine:increaseVisualTimeRate(-delta)
+			general.speed = graphicEngine.targetVisualTimeRate
+			notificationModel:notify("visualTimeRate: " .. graphicEngine.targetVisualTimeRate)
+		elseif key == input.increasePlaySpeed then
+			graphicEngine:increaseVisualTimeRate(delta)
+			general.speed = graphicEngine.targetVisualTimeRate
+			notificationModel:notify("visualTimeRate: " .. graphicEngine.targetVisualTimeRate)
 		end
 	end
 end
