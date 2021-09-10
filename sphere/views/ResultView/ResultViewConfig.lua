@@ -414,7 +414,8 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 4, y = 2,
 		name = "bpm",
-		key = "selectModel.noteChartItem.noteChartDataEntry.bpm"
+		key = "selectModel.noteChartItem.noteChartDataEntry.bpm",
+		format = "%d"
 	},
 	{
 		type = StageInfo.smallCell,
