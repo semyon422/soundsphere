@@ -4,6 +4,7 @@ local transform = require("aqua.graphics.transform")
 local spherefonts		= require("sphere.assets.fonts")
 local baseline_print = require("aqua.graphics.baseline_print")
 local inside = require("aqua.util.inside")
+local belong		= require("aqua.math").belong
 
 local UserInfoView = Class:new()
 
@@ -16,6 +17,22 @@ UserInfoView.load = function(self)
 	end
 
 	state.image = love.graphics.newImage(config.file)
+end
+
+UserInfoView.receive = function(self, event)
+	if event.name ~= "mousepressed" then
+		return
+	end
+
+	local config = self.config
+	local mx, my = transform(config.transform):inverseTransformPoint(event.args[1], event.args[2])
+	local x, y, w, h = config.x, config.y, config.w, config.h
+	if belong(mx, x, x + w) and belong(my, y, y + h) then
+		local button = event.args[3]
+		if button == 1 then
+			self.navigator:quickLogin()
+		end
+	end
 end
 
 UserInfoView.draw = function(self)

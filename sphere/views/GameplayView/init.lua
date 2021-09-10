@@ -50,7 +50,6 @@ GameplayView.load = function(self)
 
 	valueView.scoreSystem = self.scoreSystem
 	valueView.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
-	valueView.modifierString = modifierModel:getString()
 
 	progressView.scoreSystem = self.scoreSystem
 	progressView.rhythmModel = self.rhythmModel

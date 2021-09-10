@@ -59,6 +59,7 @@ SelectView.load = function(self)
 	stageInfoView.selectModel = self.selectModel
 	stageInfoView.scoreLibraryModel = self.scoreLibraryModel
 
+	userInfoView.navigator = navigator
 	userInfoView.onlineConfig = self.configModel:getConfig("online")
 
 	sortStepperView.sortModel = self.sortModel

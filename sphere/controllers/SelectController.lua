@@ -126,12 +126,6 @@ SelectController.receive = function(self, event)
 		self.gameController.selectModel:changeSearchMode()
 	elseif event.name == "changeCollapse" then
 		self.gameController.selectModel:changeCollapse()
-	elseif event.name == "startCacheUpdate" then
-		self.gameController.cacheModel:startUpdate()
-		print("start update")
-	elseif event.name == "stopCacheUpdate" then
-		self.gameController.cacheModel:stopUpdate()
-		print("stop update")
 	elseif event.action == "playNoteChart" then
 		self:playNoteChart()
 	elseif event.name == "loadModifiedNoteChart" then
@@ -140,11 +134,8 @@ SelectController.receive = function(self, event)
 		self:unloadModifiedNoteChart()
 	elseif event.name == "resetModifiedNoteChart" then
 		self:resetModifiedNoteChart()
-	elseif event.action == "replayNoteChart" then
-		-- self:replayNoteChart(event.mode, event.scoreEntry.replayHash)
-		-- self:replayNoteChart(event.mode, event.scoreEntry)
 	elseif event.name == "quickLogin" then
-		self.onlineModel:quickLogin(self.configModel:getConfig("settings").online.quick_login_key)
+		self.gameController.onlineModel:quickLogin(self.gameController.configModel:getConfig("online").quick_login_key)
 	end
 end
 

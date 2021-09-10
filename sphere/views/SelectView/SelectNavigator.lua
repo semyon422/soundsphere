@@ -79,4 +79,10 @@ SelectNavigator.setSearchString = function(self, text)
 	})
 end
 
+SelectNavigator.quickLogin = function(self)
+	self:send({
+		name = "quickLogin"
+	})
+end
+
 return SelectNavigator

@@ -54,6 +54,7 @@ ResultView.load = function(self)
 	stageInfoView.selectModel = self.selectModel
 	stageInfoView.scoreEngine = self.rhythmModel.scoreEngine
 
+	userInfoView.navigator = navigator
 	userInfoView.onlineConfig = self.configModel:getConfig("online")
 
 	navigator.selectModel = self.selectModel
