@@ -50,6 +50,7 @@ SelectView.load = function(self)
 
 	searchFieldView.noteChartSetLibraryModel = self.noteChartSetLibraryModel
 	searchFieldView.searchModel = self.searchModel
+	searchFieldView.navigator = self.navigator
 
 	modifierIconGridView.selectModel = self.selectModel
 	modifierIconGridView.modifierModel = self.modifierModel

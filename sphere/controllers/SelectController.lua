@@ -92,7 +92,6 @@ SelectController.draw = function(self)
 end
 
 SelectController.receive = function(self, event)
-	self.gameController.searchModel:receive(event)
 	self.view:receive(event)
 
 	if event.name == "setTheme" then
@@ -107,6 +106,8 @@ SelectController.receive = function(self, event)
 		self.gameController.selectModel:setSortFunction(event.sortFunction)
 	elseif event.name == "scrollSortFunction" then
 		self.gameController.selectModel:scrollSortFunction(event.delta)
+	elseif event.name == "setSearchString" then
+		self.gameController.searchModel:setSearchString(event.text)
 	elseif event.name == "changeScreen" then
 		if event.screenName == "Modifier" then
 			self:switchModifierController()

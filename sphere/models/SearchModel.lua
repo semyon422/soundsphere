@@ -1,25 +1,12 @@
 local Class = require("aqua.util.Class")
-local TextInput = require("aqua.util.TextInput")
 
 local SearchModel = Class:new()
 
 SearchModel.searchString = ""
 SearchModel.searchMode = "hide"
 
-SearchModel.construct = function(self)
-	self.textInput = TextInput:new()
-end
-
-SearchModel.receive = function(self, event)
-	if event.name == "textinput" or event.name == "keypressed" and event.args[1] == "backspace" then
-		self.textInput:receive(event)
-		self.searchString = self.textInput.text:lower()
-	end
-end
-
 SearchModel.setSearchString = function(self, text)
 	self.searchString = text
-	return self.textInput:setText(text)
 end
 
 SearchModel.search = function(self, list)

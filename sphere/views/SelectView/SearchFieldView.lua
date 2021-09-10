@@ -3,8 +3,26 @@ local Class = require("aqua.util.Class")
 local transform = require("aqua.graphics.transform")
 local baseline_print = require("aqua.graphics.baseline_print")
 local spherefonts		= require("sphere.assets.fonts")
+local TextInput = require("aqua.util.TextInput")
 
 local SearchFieldView = Class:new()
+
+SearchFieldView.load = function(self)
+	local state = self.state
+	state.textInput = TextInput:new()
+	state.textInput:setText(self.searchModel.searchString)
+end
+
+SearchFieldView.receive = function(self, event)
+	if not (event.name == "textinput" or event.name == "keypressed" and event.args[1] == "backspace") then
+		return
+	end
+
+	local state = self.state
+	state.textInput:receive(event)
+	self.navigator:setSearchString(state.textInput.text)
+	state.textInput:setText(self.searchModel.searchString)
+end
 
 SearchFieldView.draw = function(self)
 	local config = self.config

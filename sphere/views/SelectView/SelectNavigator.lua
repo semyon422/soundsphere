@@ -38,19 +38,6 @@ SelectNavigator.changeCollapse = function(self)
 	})
 end
 
-SelectNavigator.updateCache = function(self)
-	local cacheUpdater = self.view.cacheModel.cacheUpdater
-	if cacheUpdater.state == 0 or cacheUpdater.state == 3 then
-		self:send({
-			name = "startCacheUpdate"
-		})
-	else
-		self:send({
-			name = "stopCacheUpdate"
-		})
-	end
-end
-
 SelectNavigator.scrollNoteChartSet = function(self, direction)
 	self:send({
 		name = "scrollNoteChartSet",
@@ -82,6 +69,13 @@ SelectNavigator.scrollSortFunction = function(self, delta)
 	self:send({
 		name = "scrollSortFunction",
 		delta = delta
+	})
+end
+
+SelectNavigator.setSearchString = function(self, text)
+	self:send({
+		name = "setSearchString",
+		text = text
 	})
 end
 
