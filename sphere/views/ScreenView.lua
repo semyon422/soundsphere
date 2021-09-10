@@ -39,12 +39,14 @@ ScreenView.load = function(self)
 	local navigator = self.navigator
 	local sequenceView = self.sequenceView
 	local backgroundView = self.backgroundView
+	local cameraView = self.cameraView
 
 	navigator.view = self
 	navigator.viewConfig = self.viewConfig
+	navigator.sequenceView = sequenceView
 	screenMenuView.navigator = navigator
 	backgroundView.backgroundModel = self.backgroundModel
-	self.cameraView.navigator = self.navigator
+	cameraView.navigator = navigator
 
 	sequenceView:setSequenceConfig(self.viewConfig)
 	sequenceView:setView("BackgroundView", backgroundView)
@@ -58,7 +60,7 @@ ScreenView.load = function(self)
 	sequenceView:setView("InspectView", self.inspectView)
 	sequenceView:setView("ValueView", self.valueView)
 	sequenceView:setView("ImageView", self.imageView)
-	sequenceView:setView("CameraView", self.cameraView)
+	sequenceView:setView("CameraView", cameraView)
 	sequenceView:load()
 
 	navigator:load()

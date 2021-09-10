@@ -56,11 +56,26 @@ local PauseProgressBar = {
 	mode = "+"
 }
 
+local PauseText = {
+	class = "ValueView",
+	subscreen = "pause",
+	transform = transformFull,
+	value = "pause",
+	color = {1, 1, 1, 1},
+	x = 64,
+	baseline = 64,
+	limit = 1920,
+	align = "left",
+	fontSize = 40,
+	fontFamily = "Noto Sans",
+}
+
 local GameplayViewConfig = {
 	Background,
 	PlayfieldView,
 	BottomScreenMenu,
 	PauseProgressBar,
+	PauseText,
 }
 
 return GameplayViewConfig

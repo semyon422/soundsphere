@@ -27,6 +27,13 @@ GameplayNavigator.update = function(self)
 	if needRetry then
 		self:forceRetry()
 	end
+
+	local state = self.rhythmModel.pauseManager.state
+	if state == "play" then
+		self:removeSubscreen("pause")
+	elseif state == "pause" then
+		self:addSubscreen("pause")
+	end
 end
 
 GameplayNavigator.keypressed = function(self, event)

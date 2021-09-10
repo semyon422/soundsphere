@@ -7,10 +7,12 @@ local Navigator = Class:new()
 Navigator.construct = function(self)
 	self.observable = Observable:new()
 	self.debugHidden = true
+	self.subscreens = {}
 end
 
 Navigator.load = function(self)
 	self.observable:add(self.view.controller)
+	self:setHidden(nil, true, true)
 end
 
 Navigator.unload = function(self)
@@ -32,11 +34,48 @@ Navigator.changeScreen = function(self, screenName)
 	})
 end
 
-Navigator.showDebug = function(self)
-	self.debugHidden = not self.debugHidden
+Navigator.addSubscreen = function(self, subscreen)
+	local subscreens = self.subscreens
+	if subscreens[subscreen] then
+		return
+	end
+	table.insert(subscreens, subscreen)
+	subscreens[subscreen] = #subscreens
+	self:setHidden(subscreen, false)
+end
+
+Navigator.removeSubscreen = function(self, subscreen)
+	local subscreens = self.subscreens
+	if not subscreens[subscreen] then
+		return
+	end
+	local i = subscreens[subscreen]
+	local n = #subscreens
+	subscreens[subscreen] = nil
+	subscreens[i] = nil
+	if n ~= 1 then
+		local last = subscreens[n]
+		subscreens[i] = last
+		subscreens[last] = i
+		subscreens[n] = nil
+	end
+	self:setHidden(subscreen, true)
+end
+
+Navigator.switchSubscreen = function(self, subscreen)
+	local subscreens = self.subscreens
+	if subscreens[subscreen] then
+		return self:removeSubscreen(subscreen)
+	end
+	self:addSubscreen(subscreen)
+end
+
+Navigator.setHidden = function(self, subscreen, value, other)
+	local sequenceView = self.sequenceView
 	for _, config in ipairs(self.viewConfig) do
-		if config.debug then
-			config.hidden = self.debugHidden
+		if not other and config.subscreen == subscreen or other and config.subscreen ~= subscreen then
+			local state = sequenceView:getState(config)
+			state.hidden = value
 		end
 	end
 end

@@ -621,7 +621,7 @@ local BottomRightScreenMenu = {
 
 local InspectScoreSystem = {
 	class = "InspectView",
-	debug = true,
+	subscreen = "debug",
 	hidden = true,
 	transform = transform,
 	key = "scoreSystem",
