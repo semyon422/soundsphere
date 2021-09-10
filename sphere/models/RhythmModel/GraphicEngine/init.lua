@@ -20,8 +20,6 @@ GraphicEngine.load = function(self)
 	self.noteCount = 0
 	self.currentTime = 0
 	self.timeRate = 1
-	self.visualTimeRate = 1
-	self.targetVisualTimeRate = 1
 
 	self:loadNoteDrawers()
 end

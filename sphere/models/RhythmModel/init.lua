@@ -230,6 +230,11 @@ RhythmModel.setAudioMode = function(self, layer, value)
 	end
 end
 
+RhythmModel.setVisualTimeRate = function(self, visualTimeRate)
+	self.graphicEngine.visualTimeRate = visualTimeRate
+	self.graphicEngine.targetVisualTimeRate = visualTimeRate
+end
+
 RhythmModel.setTimeRound = function(self, needRound)
 	self.inputManager.needRound = needRound
 end

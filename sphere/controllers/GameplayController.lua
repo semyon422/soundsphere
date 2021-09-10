@@ -66,6 +66,7 @@ GameplayController.load = function(self)
 	rhythmModel:setTimeToPrepare(config.general.timeToPrepare)
 	rhythmModel:setInputOffset(config.general.inputOffset)
 	rhythmModel:setVisualOffset(config.general.visualOffset)
+	rhythmModel:setVisualTimeRate(config.general.speed)
 
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
 	rhythmModel:load()
@@ -75,8 +76,6 @@ GameplayController.load = function(self)
 	rhythmModel.inputManager:setInputMode(noteChart.inputMode:getString())
 
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
-	noteSkin.visualTimeRate = config.general.speed
-	noteSkin.targetVisualTimeRate = config.general.speed
 	noteSkin:load()
 	rhythmModel:setNoteSkin(noteSkin)
 	view.noteSkin = noteSkin
