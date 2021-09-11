@@ -107,7 +107,7 @@ local ComboGraph = {
 	w = 1362,
 	h = 190,
 	radius = 1.5,
-	color = {0.25, 1, 0.5, 1},
+	color = {1, 1, 0.25, 1},
 	background = true,
 	backgroundColor = {0, 0, 0, 0.2},
 	backgroundRadius = 4,
@@ -124,7 +124,7 @@ local ComboGraph = {
 }
 
 local perfectColor = {1, 1, 1, 1}
-local notPerfectColor = {1, 0.5, 0.5, 1}
+local notPerfectColor = {1, 0.6, 0.4, 1}
 local HitGraph = {
 	class = "PointGraphView",
 	transform = transform,
@@ -145,11 +145,67 @@ local HitGraph = {
 	key = "scoreEngine.scoreSystem.sequence",
 	time = "base.currentTime",
 	value = "judgement.deltaTime",
-	unit = 0.12,
+	unit = 0.16,
 	point = function(time, startTime, endTime, value, unit)
+		if math.abs(value) > 0.12 then
+			return
+		end
 		local x = (time - startTime) / (endTime - startTime)
 		local y = value / unit / 2 + 0.5
 		return x, y
+	end,
+	show = showLoadedScore
+}
+
+local EarlyLateMissGraph = {
+	class = "PointGraphView",
+	transform = transform,
+	x = 279,
+	y = 801,
+	w = 1362,
+	h = 190,
+	radius = 3,
+	color = {1, 0.2, 0.2, 1},
+	background = true,
+	backgroundColor = {1, 1, 1, 1},
+	backgroundRadius = 4,
+	key = "scoreEngine.scoreSystem.sequence",
+	time = "base.currentTime",
+	value = "judgement.deltaTime",
+	unit = 0.16,
+	point = function(time, startTime, endTime, value, unit)
+		if math.abs(value) <= 0.12 or math.abs(value) > 0.16 then
+			return
+		end
+		local x = (time - startTime) / (endTime - startTime)
+		local y = math.min(math.max(value, -0.16), 0.16) / unit / 2 + 0.5
+		return x, y
+	end,
+	show = showLoadedScore
+}
+
+local MissGraph = {
+	class = "PointGraphView",
+	transform = transform,
+	x = 279,
+	y = 801,
+	w = 1362,
+	h = 190,
+	radius = 1,
+	color = {1, 0.6, 0.6, 1},
+	background = true,
+	backgroundColor = {1, 1, 1, 0},
+	backgroundRadius = 3,
+	key = "scoreEngine.scoreSystem.sequence",
+	time = "base.currentTime",
+	value = "base.isMiss",
+	unit = 0.16,
+	line = function(time, startTime, endTime, value, unit)
+		if not value then
+			return
+		end
+		local x = (time - startTime) / (endTime - startTime)
+		return x
 	end,
 	show = showLoadedScore
 }
@@ -162,7 +218,7 @@ local HpGraph = {
 	w = 1362,
 	h = 190,
 	radius = 1.5,
-	color = {1, 1, 0.25, 1},
+	color = {0.25, 1, 0.5, 1},
 	background = true,
 	backgroundColor = {0, 0, 0, 0.2},
 	backgroundRadius = 4,
@@ -758,9 +814,11 @@ local NoteSkinViewConfig = {
 	ModifierIconGrid,
 	ScoreList,
 	ScoreScrollBar,
+	MissGraph,
 	HitGraph,
 	ComboGraph,
 	HpGraph,
+	EarlyLateMissGraph,
 	InspectScoreSystem,
 }
 

@@ -42,18 +42,24 @@ JudgementScoreSystem.processJudgement = function(self, event)
 	self.earlylate = (self.early or 0) / (self.late or 1)
 end
 
+JudgementScoreSystem.processMiss = function(self, event)
+	local noteStartTime = event.noteStartTime or event.noteTime
+	local deltaTime = (event.currentTime - noteStartTime) / math.abs(event.timeRate)
+	self.deltaTime = deltaTime
+end
+
 JudgementScoreSystem.notes = {
 	ShortScoreNote = {
 		clear = {
 			passed = JudgementScoreSystem.processJudgement,
-			missed = nil,
+			missed = JudgementScoreSystem.processMiss,
 		},
 	},
 	LongScoreNote = {
 		clear = {
 			startPassedPressed = JudgementScoreSystem.processJudgement,
-			startMissed = nil,
-			startMissedPressed = nil,
+			startMissed = JudgementScoreSystem.processMiss,
+			startMissedPressed = JudgementScoreSystem.processMiss,
 		},
 		startPassedPressed = {
 			startMissed = nil,

@@ -26,11 +26,16 @@ BaseScoreSystem.construct = function(self)
 	self.maxCombo = 0
 	self.currentTime = 0
 
+	self.isMiss = false
+	self.isLongNoteComboBreak = false
+
 	self.counters = {}
 end
 
 BaseScoreSystem.before = function(self, event)
 	self.currentTime = event.currentTime
+	self.isMiss = false
+	self.isLongNoteComboBreak = false
 
 	if self.noteCount ~= 0 then
 		return
@@ -53,8 +58,14 @@ BaseScoreSystem.breakCombo = function(self)
 	self.combo = 0
 end
 
+BaseScoreSystem.breakComboLongNote = function(self)
+	self.combo = 0
+	self.isLongNoteComboBreak = true
+end
+
 BaseScoreSystem.miss = function(self)
 	self.missCount = self.missCount + 1
+	self.isMiss = true
 end
 
 BaseScoreSystem.notes = {
@@ -67,22 +78,22 @@ BaseScoreSystem.notes = {
 	LongScoreNote = {
 		clear = {
 			startPassedPressed = nil,
-			startMissed = {BaseScoreSystem.breakCombo, BaseScoreSystem.miss},
-			startMissedPressed = {BaseScoreSystem.breakCombo, BaseScoreSystem.miss},
+			startMissed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
+			startMissedPressed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
 		},
 		startPassedPressed = {
-			startMissed = {BaseScoreSystem.breakCombo, BaseScoreSystem.miss},
-			endMissed = {BaseScoreSystem.breakCombo, BaseScoreSystem.miss},
+			startMissed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
+			endMissed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
 			endPassed = BaseScoreSystem.success,
 		},
 		startMissedPressed = {
 			endMissedPassed = nil,
-			startMissed = BaseScoreSystem.breakCombo,
-			endMissed = BaseScoreSystem.breakCombo,
+			startMissed = BaseScoreSystem.breakComboLongNote,
+			endMissed = BaseScoreSystem.breakComboLongNote,
 		},
 		startMissed = {
 			startMissedPressed = nil,
-			endMissed = BaseScoreSystem.breakCombo,
+			endMissed = BaseScoreSystem.breakComboLongNote,
 		},
 	},
 }

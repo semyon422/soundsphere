@@ -77,19 +77,39 @@ PointGraphView.drawPoint = function(self, point, color, radius)
 	local config = self.config
 	local state = self.state
 
-	local time = inside(point, config.time) or tonumber(config.time) or 0
-	local value = inside(point, config.value) or tonumber(config.value) or 0
-	local unit = inside(point, config.unit) or tonumber(config.unit) or 1
+	local time = inside(point, config.time)
+	local value = inside(point, config.value)
+	local unit = inside(point, config.unit)
+	if type(time) == "nil" then
+		time = tonumber(config.time) or 0
+	end
+	if type(value) == "nil" then
+		value = tonumber(config.value) or 0
+	end
+	if type(unit) == "nil" then
+		unit = tonumber(config.unit) or 1
+	end
 
 	if type(color) == "function" then
 		color = color(time, state.startTime, state.endTime, value, unit)
 	end
 	love.graphics.setColor(color)
 
-	local x, y = config.point(time, state.startTime, state.endTime, value, unit)
-
-	local _x, _y = map(x, 0, 1, 0, config.w), map(y, 0, 1, 0, config.h)
-	love.graphics.rectangle("fill", _x - radius, _y - radius, radius * 2, radius * 2)
+	if config.point then
+		local x, y = config.point(time, state.startTime, state.endTime, value, unit)
+		if not x then
+			return
+		end
+		local _x, _y = map(x, 0, 1, 0, config.w), map(y, 0, 1, 0, config.h)
+		love.graphics.rectangle("fill", _x - radius, _y - radius, radius * 2, radius * 2)
+	elseif config.line then
+		local x = config.line(time, state.startTime, state.endTime, value, unit)
+		if not x then
+			return
+		end
+		local _x = map(x, 0, 1, 0, config.w)
+		love.graphics.rectangle("fill", _x - radius, 0, radius * 2, config.h)
+	end
 end
 
 return PointGraphView
