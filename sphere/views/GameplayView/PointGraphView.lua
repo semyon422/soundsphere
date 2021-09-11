@@ -89,9 +89,9 @@ PointGraphView.drawPoint = function(self, point)
 	local config = self.config
 	local state = self.state
 
-	local time = inside(point, config.time) or config.time
-	local value = inside(point, config.value) or config.value
-	local unit = inside(point, config.unit) or config.unit
+	local time = inside(point, config.time) or tonumber(config.time) or 0
+	local value = inside(point, config.value) or tonumber(config.value) or 0
+	local unit = inside(point, config.unit) or tonumber(config.unit) or 1
 
 	local x, y = config.point(time, state.startTime, state.endTime, value, unit)
 
