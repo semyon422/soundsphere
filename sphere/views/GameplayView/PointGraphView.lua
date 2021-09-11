@@ -10,11 +10,13 @@ PointGraphView.load = function(self)
 	local state = self.state
 
 	state.drawnPoints = 0
+	state.drawnBackgroundPoints = 0
 
 	state.startTime = self.noteChartModel.noteChart.metaData:get("minTime")
 	state.endTime = self.noteChartModel.noteChart.metaData:get("maxTime")
 
 	state.canvas = love.graphics.newCanvas()
+	state.backgroundCanvas = love.graphics.newCanvas()
 end
 
 PointGraphView.draw = function(self)
@@ -25,10 +27,14 @@ PointGraphView.draw = function(self)
 		return
 	end
 
-	self:drawPoints()
+	if config.background then
+		self:drawPoints("drawnBackgroundPoints", state.backgroundCanvas, config.backgroundColor, config.backgroundRadius)
+	end
+	self:drawPoints("drawnPoints", state.canvas, config.color, config.radius)
 
 	love.graphics.origin()
 	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.draw(state.backgroundCanvas, 0, 0)
 	love.graphics.draw(state.canvas, 0, 0)
 
 	self:drawLine()
@@ -60,32 +66,30 @@ PointGraphView.drawLine = function(self)
 	love.graphics.line(0, config.h / 2, config.w, config.h / 2)
 end
 
-PointGraphView.drawPoints = function(self)
+PointGraphView.drawPoints = function(self, counter, canvas, color, radius)
 	local config = self.config
 	local state = self.state
 
 	local shader = love.graphics.getShader()
 	love.graphics.setShader()
-	love.graphics.setCanvas(state.canvas)
+	love.graphics.setCanvas(canvas)
 
-	love.graphics.setColor(config.color)
-	love.graphics.setLineWidth(config.pointLineWidth)
-	love.graphics.setLineStyle("smooth")
+	love.graphics.setColor(color)
 
 	love.graphics.replaceTransform(transform(config.transform))
 	love.graphics.translate(config.x, config.y)
 
 	local points = inside(self, config.key)
-	for i = state.drawnPoints + 1, #points do
-		self:drawPoint(points[i])
+	for i = state[counter] + 1, #points do
+		self:drawPoint(points[i], radius)
 	end
-	state.drawnPoints = #points
+	state[counter] = #points
 
 	love.graphics.setCanvas()
 	love.graphics.setShader(shader)
 end
 
-PointGraphView.drawPoint = function(self, point)
+PointGraphView.drawPoint = function(self, point, radius)
 	local config = self.config
 	local state = self.state
 
@@ -96,8 +100,7 @@ PointGraphView.drawPoint = function(self, point)
 	local x, y = config.point(time, state.startTime, state.endTime, value, unit)
 
 	local _x, _y = map(x, 0, 1, 0, config.w), map(y, 0, 1, 0, config.h)
-	love.graphics.circle("fill", _x, _y, config.r)
-	love.graphics.circle("line", _x, _y, config.r)
+	love.graphics.rectangle("fill", _x - radius, _y - radius, radius * 2, radius * 2)
 end
 
 return PointGraphView
