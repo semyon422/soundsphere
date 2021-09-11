@@ -444,7 +444,10 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 1, y = 1,
 		name = "accuracy",
-		key = "selectModel.scoreItem.scoreEntry.accuracy",
+		key = {
+			{"scoreEngine.scoreSystem.normalscore.accuracyAdjusted", showLoadedScore},
+			"selectModel.scoreItem.scoreEntry.accuracy"
+		},
 		format = formatScore
 	},
 	{
@@ -452,7 +455,10 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 2, y = 1,
 		name = "score",
-		key = "selectModel.scoreItem.scoreEntry.score",
+		key = {
+			{"scoreEngine.scoreSystem.normalscore.scoreAdjusted", showLoadedScore},
+			"selectModel.scoreItem.scoreEntry.score"
+		},
 		format = formatScore
 	},
 	{
@@ -482,35 +488,50 @@ StageInfo.cells = {
 		valueType = "bar",
 		x = {1, 2}, y = 5,
 		name = "perfect/hits",
-		key = "selectModel.scoreItem.scoreEntry.ratio"
+		key = {
+			{"scoreEngine.scoreSystem.judgement.ratio", showLoadedScore},
+			"selectModel.scoreItem.scoreEntry.ratio"
+		},
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 3, y = 5,
 		name = "perfect",
-		key = "selectModel.scoreItem.scoreEntry.perfect"
+		key = {
+			{"scoreEngine.scoreSystem.judgement.perfect", showLoadedScore},
+			"selectModel.scoreItem.scoreEntry.perfect"
+		},
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = {2, 3}, y = 6,
 		name = "not perfect",
-		key = "selectModel.scoreItem.scoreEntry.notPerfect"
+		key = {
+			{"scoreEngine.scoreSystem.judgement.not perfect", showLoadedScore},
+			"selectModel.scoreItem.scoreEntry.notPerfect"
+		},
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 3, y = 7,
 		name = "miss",
-		key = "selectModel.scoreItem.scoreEntry.missCount"
+		key = {
+			{"scoreEngine.scoreSystem.base.missCount", showLoadedScore},
+			"selectModel.scoreItem.scoreEntry.missCount"
+		},
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = {3, 4}, y = 6,
 		name = "early/late",
-		key = "selectModel.scoreItem.scoreEntry.earlylate",
+		key = {
+			{"scoreEngine.scoreSystem.judgement.earlylate", showLoadedScore},
+			"selectModel.scoreItem.scoreEntry.earlylate"
+		},
 		format = function(earlylate)
 			if earlylate > 1 then
 				return ("-%d%%"):format((earlylate - 1) * 100)
@@ -527,7 +548,10 @@ StageInfo.cells = {
 		name = "mean",
 		multiplier = 1000,
 		format = "%0.1f",
-		key = "selectModel.scoreItem.scoreEntry.mean"
+		key = {
+			{"scoreEngine.scoreSystem.normalscore.normalscore.mean", showLoadedScore},
+			"selectModel.scoreItem.scoreEntry.mean"
+		},
 	},
 	{
 		type = StageInfo.smallCell,
@@ -537,9 +561,9 @@ StageInfo.cells = {
 		key = "scoreEngine.scoreSystem.hp.failed",
 		format = function(failed)
 			if failed then
-				return "failed"
+				return "fail"
 			end
-			return "passed"
+			return "pass"
 		end,
 		show = showLoadedScore
 	},
@@ -555,7 +579,10 @@ local ModifierIconGrid = {
 	columns = 6,
 	rows = 2,
 	noModifier = true,
-	config = "selectModel.scoreItem.scoreEntry.modifiers",
+	config = {
+		{"modifierModel.config", showLoadedScore},
+		"selectModel.scoreItem.scoreEntry.modifiers"
+	},
 }
 
 local BottomScreenMenu = {

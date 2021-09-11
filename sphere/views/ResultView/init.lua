@@ -45,6 +45,7 @@ ResultView.load = function(self)
 
 	modifierIconGridView.modifierModel = self.modifierModel
 	modifierIconGridView.selectModel = self.selectModel
+	modifierIconGridView.scoreEngine = self.rhythmModel.scoreEngine
 
 	scoreListView.scoreLibraryModel = self.scoreLibraryModel
 	scoreListView.selectModel = self.selectModel
