@@ -27,7 +27,7 @@ HpScoreSystem.notes = {
 	ShortScoreNote = {
 		clear = {
 			passed = HpScoreSystem.increaseHp,
-			missed = nil,
+			missed = HpScoreSystem.decreaseHp,
 		},
 	},
 	LongScoreNote = {
