@@ -47,15 +47,16 @@ ModifierIconGridView.draw = function(self)
 				return self:drawMoreModifier()
 			end
 			local modifier = modifierModel:getModifier(modifierConfig)
-
-			local modifierString = modifier:getString(modifierConfig)
-			if modifierString then
-				iconConfig.modifierString = modifierString
-				iconConfig.modifierSubString = modifier:getSubString(modifierConfig)
-				iconConfig.x = config.x + iconConfig.size * (column - 1)
-				iconConfig.y = config.y + iconConfig.size * (row - 1)
-				modifierIconView:draw()
-				drawIndex = drawIndex + 1
+			if modifier then
+				local modifierString = modifier:getString(modifierConfig)
+				if modifierString then
+					iconConfig.modifierString = modifierString
+					iconConfig.modifierSubString = modifier:getSubString(modifierConfig)
+					iconConfig.x = config.x + iconConfig.size * (column - 1)
+					iconConfig.y = config.y + iconConfig.size * (row - 1)
+					modifierIconView:draw()
+					drawIndex = drawIndex + 1
+				end
 			end
 		else
 			return
