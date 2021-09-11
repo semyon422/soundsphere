@@ -36,8 +36,6 @@ PointGraphView.draw = function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.draw(state.backgroundCanvas, 0, 0)
 	love.graphics.draw(state.canvas, 0, 0)
-
-	self:drawLine()
 end
 
 PointGraphView.update = function(self, dt) end
@@ -54,18 +52,6 @@ PointGraphView.reload = function(self)
 	self:load()
 end
 
-PointGraphView.drawLine = function(self)
-	local config = self.config
-
-	love.graphics.replaceTransform(transform(config.transform))
-	love.graphics.translate(config.x, config.y)
-
-	love.graphics.setColor(config.lineColor)
-	love.graphics.setLineWidth(config.lineWidth)
-	love.graphics.setLineStyle("smooth")
-	love.graphics.line(0, config.h / 2, config.w, config.h / 2)
-end
-
 PointGraphView.drawPoints = function(self, counter, canvas, color, radius)
 	local config = self.config
 	local state = self.state
@@ -74,14 +60,12 @@ PointGraphView.drawPoints = function(self, counter, canvas, color, radius)
 	love.graphics.setShader()
 	love.graphics.setCanvas(canvas)
 
-	love.graphics.setColor(color)
-
 	love.graphics.replaceTransform(transform(config.transform))
 	love.graphics.translate(config.x, config.y)
 
 	local points = inside(self, config.key)
 	for i = state[counter] + 1, #points do
-		self:drawPoint(points[i], radius)
+		self:drawPoint(points[i], color, radius)
 	end
 	state[counter] = #points
 
@@ -89,13 +73,18 @@ PointGraphView.drawPoints = function(self, counter, canvas, color, radius)
 	love.graphics.setShader(shader)
 end
 
-PointGraphView.drawPoint = function(self, point, radius)
+PointGraphView.drawPoint = function(self, point, color, radius)
 	local config = self.config
 	local state = self.state
 
 	local time = inside(point, config.time) or tonumber(config.time) or 0
 	local value = inside(point, config.value) or tonumber(config.value) or 0
 	local unit = inside(point, config.unit) or tonumber(config.unit) or 1
+
+	if type(color) == "function" then
+		color = color(time, state.startTime, state.endTime, value, unit)
+	end
+	love.graphics.setColor(color)
 
 	local x, y = config.point(time, state.startTime, state.endTime, value, unit)
 

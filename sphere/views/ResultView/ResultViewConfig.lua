@@ -96,18 +96,6 @@ local Rectangle = {
 			rx = 0,
 			ry = 0
 		},
-		-- {
-		-- 	color = {0, 0, 0, 0.25},
-		-- 	mode = "fill",
-		-- 	lineStyle = "smooth",
-		-- 	lineWidth = 1,
-		-- 	x = 279,
-		-- 	y = 801,
-		-- 	w = 1362,
-		-- 	h = 190,
-		-- 	rx = 0,
-		-- 	ry = 0
-		-- },
 	}
 }
 
@@ -119,9 +107,7 @@ local ComboGraph = {
 	w = 1362,
 	h = 190,
 	radius = 1.5,
-	lineWidth = 1,
 	color = {0.25, 1, 0.5, 1},
-	lineColor = {1, 1, 1, 0},
 	background = true,
 	backgroundColor = {0, 0, 0, 0.2},
 	backgroundRadius = 4,
@@ -137,6 +123,8 @@ local ComboGraph = {
 	show = showLoadedScore
 }
 
+local perfectColor = {1, 1, 1, 1}
+local notPerfectColor = {1, 0.5, 0.5, 1}
 local HitGraph = {
 	class = "PointGraphView",
 	transform = transform,
@@ -145,9 +133,12 @@ local HitGraph = {
 	w = 1362,
 	h = 190,
 	radius = 1.5,
-	lineWidth = 3,
-	color = {1, 1, 1, 1},
-	lineColor = {0.25, 1, 0.25, 1},
+	color = function(time, startTime, endTime, value, unit)
+		if math.abs(value) <= 0.016 then
+			return perfectColor
+		end
+		return notPerfectColor
+	end,
 	background = true,
 	backgroundColor = {0, 0, 0, 0.2},
 	backgroundRadius = 4,
@@ -171,9 +162,7 @@ local HpGraph = {
 	w = 1362,
 	h = 190,
 	radius = 1.5,
-	lineWidth = 1,
 	color = {1, 1, 0.25, 1},
-	lineColor = {1, 1, 1, 0},
 	background = true,
 	backgroundColor = {0, 0, 0, 0.2},
 	backgroundRadius = 4,
