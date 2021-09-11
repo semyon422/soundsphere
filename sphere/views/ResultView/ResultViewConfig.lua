@@ -614,6 +614,16 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
+		x = {3, 4}, y = 7,
+		name = "max delta",
+		multiplier = 1000,
+		format = "%d",
+		key = "scoreEngine.scoreSystem.judgement.maxDeltaTime",
+		show = showLoadedScore
+	},
+	{
+		type = StageInfo.smallCell,
+		valueType = "text",
 		x = 1, y = 7,
 		name = "",
 		key = "scoreEngine.scoreSystem.hp.failed",

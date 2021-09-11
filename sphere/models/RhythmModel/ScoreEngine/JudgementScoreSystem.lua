@@ -14,6 +14,7 @@ JudgementScoreSystem.judgements = {
 JudgementScoreSystem.construct = function(self)
 	self.ratio = 0
 	self.judgementName = ""
+	self.maxDeltaTime = 0
 	table.sort(self.judgements, function(a, b) return math.abs(a[1]) < math.abs(b[1]) end)
 end
 
@@ -21,6 +22,9 @@ JudgementScoreSystem.processJudgement = function(self, event)
 	local noteStartTime = event.noteStartTime or event.noteTime
 	local deltaTime = (event.currentTime - noteStartTime) / math.abs(event.timeRate)
 	self.deltaTime = deltaTime
+	if math.abs(deltaTime) > math.abs(self.maxDeltaTime) then
+		self.maxDeltaTime = deltaTime
+	end
 
 	for _, judgement in ipairs(self.judgements) do
 		local time = judgement[1]
