@@ -99,7 +99,7 @@ local Rectangle = {
 	}
 }
 
-local PointGraph = {
+local ComboGraph = {
 	class = "PointGraphView",
 	transform = transform,
 	x = 279,
@@ -109,12 +109,60 @@ local PointGraph = {
 	r = 1,
 	lineWidth = 1,
 	pointLineWidth = 1,
-	color = {1, 1, 1, 1},
-	lineColor = {1, 1, 1, 0.5},
+	color = {0.25, 1, 0.5, 1},
+	lineColor = {1, 1, 1, 0},
 	key = "scoreEngine.scoreSystem.sequence",
 	time = "base.currentTime",
 	value = "base.combo",
 	unit = "base.noteCount",
+	point = function(time, startTime, endTime, value, unit)
+		local x = time / (endTime - startTime)
+		local y = -value / unit + 1
+		return x, y
+	end,
+	show = showLoadedScore
+}
+
+local HitGraph = {
+	class = "PointGraphView",
+	transform = transform,
+	x = 279,
+	y = 801,
+	w = 1362,
+	h = 190,
+	r = 1,
+	lineWidth = 3,
+	pointLineWidth = 1,
+	color = {1, 1, 1, 1},
+	lineColor = {0.25, 1, 0.25, 1},
+	key = "scoreEngine.scoreSystem.sequence",
+	time = "base.currentTime",
+	value = "judgement.deltaTime",
+	unit = 0.12,
+	point = function(time, startTime, endTime, value, unit)
+		local x = time / (endTime - startTime)
+		local y = value / unit / 2 + 0.5
+		return x, y
+	end,
+	show = showLoadedScore
+}
+
+local HpGraph = {
+	class = "PointGraphView",
+	transform = transform,
+	x = 279,
+	y = 801,
+	w = 1362,
+	h = 190,
+	r = 1,
+	lineWidth = 1,
+	pointLineWidth = 1,
+	color = {1, 1, 0.25, 1},
+	lineColor = {1, 1, 1, 0},
+	key = "scoreEngine.scoreSystem.sequence",
+	time = "base.currentTime",
+	value = "hp.hp",
+	unit = 1,
 	point = function(time, startTime, endTime, value, unit)
 		local x = time / (endTime - startTime)
 		local y = -value / unit + 1
@@ -687,7 +735,9 @@ local NoteSkinViewConfig = {
 	ModifierIconGrid,
 	ScoreList,
 	ScoreScrollBar,
-	PointGraph,
+	ComboGraph,
+	HpGraph,
+	HitGraph,
 	InspectScoreSystem,
 }
 

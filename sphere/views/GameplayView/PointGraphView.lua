@@ -25,12 +25,13 @@ PointGraphView.draw = function(self)
 		return
 	end
 
-	self:drawLine()
 	self:drawPoints()
 
 	love.graphics.origin()
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.draw(state.canvas, 0, 0)
+
+	self:drawLine()
 end
 
 PointGraphView.update = function(self, dt) end
@@ -88,9 +89,9 @@ PointGraphView.drawPoint = function(self, point)
 	local config = self.config
 	local state = self.state
 
-	local time = inside(point, config.time)
-	local value = inside(point, config.value)
-	local unit = inside(point, config.unit)
+	local time = inside(point, config.time) or config.time
+	local value = inside(point, config.value) or config.value
+	local unit = inside(point, config.unit) or config.unit
 
 	local x, y = config.point(time, state.startTime, state.endTime, value, unit)
 

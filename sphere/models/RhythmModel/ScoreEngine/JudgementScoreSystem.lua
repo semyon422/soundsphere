@@ -20,6 +20,7 @@ end
 JudgementScoreSystem.processJudgement = function(self, event)
 	local noteStartTime = event.noteStartTime or event.noteTime
 	local deltaTime = (event.currentTime - noteStartTime) / math.abs(event.timeRate)
+	self.deltaTime = deltaTime
 
 	for _, judgement in ipairs(self.judgements) do
 		local time = judgement[1]
