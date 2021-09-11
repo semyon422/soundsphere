@@ -116,7 +116,7 @@ local ComboGraph = {
 	value = "base.combo",
 	unit = "base.noteCount",
 	point = function(time, startTime, endTime, value, unit)
-		local x = time / (endTime - startTime)
+		local x = (time - startTime) / (endTime - startTime)
 		local y = -value / unit + 1
 		return x, y
 	end,
@@ -130,7 +130,7 @@ local HitGraph = {
 	y = 801,
 	w = 1362,
 	h = 190,
-	r = 1,
+	r = 1.2,
 	lineWidth = 3,
 	pointLineWidth = 1,
 	color = {1, 1, 1, 1},
@@ -140,7 +140,7 @@ local HitGraph = {
 	value = "judgement.deltaTime",
 	unit = 0.12,
 	point = function(time, startTime, endTime, value, unit)
-		local x = time / (endTime - startTime)
+		local x = (time - startTime) / (endTime - startTime)
 		local y = value / unit / 2 + 0.5
 		return x, y
 	end,
@@ -164,7 +164,7 @@ local HpGraph = {
 	value = "hp.hp",
 	unit = 1,
 	point = function(time, startTime, endTime, value, unit)
-		local x = time / (endTime - startTime)
+		local x = (time - startTime) / (endTime - startTime)
 		local y = -value / unit + 1
 		return x, y
 	end,
