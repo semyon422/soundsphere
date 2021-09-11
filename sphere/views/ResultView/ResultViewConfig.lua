@@ -14,6 +14,13 @@ local showLoadedScore = function(self)
 	return self.selectModel.scoreItem.scoreEntry.id == self.scoreEngine.scoreEntry.id
 end
 
+local showLoadedListScore = function(self)
+	if not self.scoreEntry then
+		return
+	end
+	return self.scoreEngine.scoreEntry.id == self.scoreEntry.id
+end
+
 local Logo = {
 	class = "LogoView",
 	transform = transform,
@@ -160,7 +167,10 @@ local ScoreList = {
 		},
 		{
 			type = "text",
-			key = "scoreEntry.rating",
+			key = {
+				{"scoreEngine.scoreSystem.normalscore.performance", showLoadedListScore},
+				"scoreEntry.rating"
+			},
 			onNew = false,
 			format = "%d",
 			x = 94,

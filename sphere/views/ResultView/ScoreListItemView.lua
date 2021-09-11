@@ -4,8 +4,11 @@ local transform = require("aqua.graphics.transform")
 local ScoreListItemView = ListItemView:new({construct = false})
 
 ScoreListItemView.draw = function(self)
-	local scoreEntry = self.listView.rhythmModel.scoreEngine.scoreEntry
+	local scoreEngine = self.listView.rhythmModel.scoreEngine
+	local scoreEntry = scoreEngine.scoreEntry
 	local item = self.item
+	item.selectModel = self.listView.selectModel
+	item.scoreEngine = scoreEngine
 
 	if scoreEntry then
 		item.loaded = scoreEntry.replayHash == item.scoreEntry.replayHash

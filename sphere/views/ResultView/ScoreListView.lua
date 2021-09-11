@@ -9,6 +9,7 @@ ScoreListView.construct = function(self)
 	ListView.construct(self)
 	self.itemView = ScoreListItemView:new()
 	self.itemView.listView = self
+	self.itemView.selectModel = self.selectModel
 end
 
 ScoreListView.reloadItems = function(self)
