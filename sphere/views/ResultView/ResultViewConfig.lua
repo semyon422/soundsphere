@@ -248,7 +248,10 @@ local ScoreList = {
 		},
 		{
 			type = "text",
-			key = "scoreEntry.timeRate",
+			key = {
+				{"scoreEngine.timeRate", showLoadedListScore},
+				"scoreEntry.timeRate"
+			},
 			onNew = false,
 			x = 166,
 			baseline = 45,
@@ -288,7 +291,10 @@ local ScoreList = {
 		},
 		{
 			type = "text",
-			key = "scoreEntry.inputMode",
+			key = {
+				{"scoreEngine.inputMode", showLoadedListScore},
+				"scoreEntry.inputMode"
+			},
 			x = 162,
 			baseline = 45,
 			limit = 270,
