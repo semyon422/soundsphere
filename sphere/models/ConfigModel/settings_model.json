@@ -171,7 +171,7 @@
 		"section": "graphics",
 		"key": "blurSelect",
 		"type": "slider",
-		"range": [0, 20],
+		"range": [0, 50],
 		"displayRange": [0, 50],
 		"step": 1,
 		"format": "%d"
@@ -181,7 +181,7 @@
 		"section": "graphics",
 		"key": "blurGameplay",
 		"type": "slider",
-		"range": [0, 20],
+		"range": [0, 50],
 		"displayRange": [0, 50],
 		"step": 1,
 		"format": "%d"
@@ -191,7 +191,7 @@
 		"section": "graphics",
 		"key": "blurResult",
 		"type": "slider",
-		"range": [0, 20],
+		"range": [0, 50],
 		"displayRange": [0, 50],
 		"step": 1,
 		"format": "%d"
