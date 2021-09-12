@@ -13,6 +13,7 @@ end
 ScoreEngine.load = function(self)
 	local scoreSystem = self.scoreSystem
 	scoreSystem.scoreEngine = self
+	scoreSystem:load()
 
 	self.inputMode = self.noteChart.inputMode:getString()
 	self.baseTimeRate = self.timeEngine:getBaseTimeRate()

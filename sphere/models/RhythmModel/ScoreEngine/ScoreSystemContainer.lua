@@ -10,8 +10,11 @@ local ScoreSystems = {
 
 local ScoreSystemContainer = Class:new()
 
-ScoreSystemContainer.construct = function(self)
-	local scoreSystems = {}
+ScoreSystemContainer.load = function(self)
+	self.scoreSystems = {}
+	self.sequence = {}
+
+	local scoreSystems = self.scoreSystems
 	for _, ScoreSystem in ipairs(ScoreSystems) do
 		local scoreSystem = ScoreSystem:new()
 		scoreSystem.container = self
@@ -23,8 +26,6 @@ ScoreSystemContainer.construct = function(self)
 			self.timingWindows = scoreSystem.timingWindows
 		end
 	end
-	self.scoreSystems = scoreSystems
-	self.sequence = {}
 end
 
 ScoreSystemContainer.getSlice = function(self)
