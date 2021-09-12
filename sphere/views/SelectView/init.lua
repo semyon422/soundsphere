@@ -65,6 +65,8 @@ SelectView.load = function(self)
 	sortStepperView.sortModel = self.sortModel
 	sortStepperView.navigator = navigator
 
+	self.backgroundView.settings = self.configModel:getConfig("settings")
+
 	local sequenceView = self.sequenceView
 	sequenceView:setView("NoteChartSetListView", noteChartSetListView)
 	sequenceView:setView("NoteChartListView", noteChartListView)

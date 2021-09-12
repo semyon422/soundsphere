@@ -28,6 +28,8 @@ InputView.load = function(self)
 	noteSkinListView.inputModel = self.inputModel
 	noteSkinListView.configInput = config
 
+	self.backgroundView.settings = self.configModel:getConfig("settings")
+
 	local sequenceView = self.sequenceView
 	sequenceView:setView("InputListView", noteSkinListView)
 

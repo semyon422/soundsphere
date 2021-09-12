@@ -13,7 +13,8 @@ local Background = {
 	w = 1920,
 	h = 1080,
 	parallax = 0.01,
-	dim = 0.5
+	dim = {key = "settings.graphics.dimGameplay"},
+	blur = {key = "settings.graphics.blurGameplay"}
 }
 
 local BottomScreenMenu = {

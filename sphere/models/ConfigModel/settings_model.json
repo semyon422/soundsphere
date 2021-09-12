@@ -167,6 +167,36 @@
 		"format": "%d"
 	},
 	{
+		"name": "blur select",
+		"section": "graphics",
+		"key": "blurSelect",
+		"type": "slider",
+		"range": [0, 20],
+		"displayRange": [0, 50],
+		"step": 1,
+		"format": "%d"
+	},
+	{
+		"name": "blur gameplay",
+		"section": "graphics",
+		"key": "blurGameplay",
+		"type": "slider",
+		"range": [0, 20],
+		"displayRange": [0, 50],
+		"step": 1,
+		"format": "%d"
+	},
+	{
+		"name": "blur result",
+		"section": "graphics",
+		"key": "blurResult",
+		"type": "slider",
+		"range": [0, 20],
+		"displayRange": [0, 50],
+		"step": 1,
+		"format": "%d"
+	},
+	{
 		"name": "primary audio mode",
 		"section": "audio",
 		"key": "primaryAudioMode",

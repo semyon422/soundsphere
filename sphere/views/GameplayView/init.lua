@@ -67,6 +67,8 @@ GameplayView.load = function(self)
 	imageView.root = self.noteSkin.directoryPath
 	inputImageView.root = self.noteSkin.directoryPath
 
+	self.backgroundView.settings = self.configModel:getConfig("settings")
+
 	playfieldView:setSequenceConfig(self.noteSkin.playField)
 	playfieldView:setView("RhythmView", rhythmView)
 	playfieldView:setView("ValueView", valueView)

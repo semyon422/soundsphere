@@ -72,6 +72,7 @@ GaussianBlurView.disable = function(self)
 	local oldCanvas = self.oldCanvas
 	local width, height = love.graphics.getDimensions()
 
+	love.graphics.origin()
 	love.graphics.setCanvas(shaderCanvas)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setShader(shader)

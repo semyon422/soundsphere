@@ -4,10 +4,9 @@ local frame_draw = require("aqua.graphics.frame_draw")
 local map = require("aqua.math").map
 local transform = require("aqua.graphics.transform")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
+local inside = require("aqua.util.inside")
 
 local BackgroundView = Class:new()
-
-BackgroundView.blurSigma = 16
 
 BackgroundView.construct = function(self)
 	self.gaussianBlurView = GaussianBlurView:new()
@@ -16,11 +15,13 @@ end
 BackgroundView.draw = function(self)
 	local config = self.config
 
-	if config.dim == 1 then
+	local dim = config.dim.value or inside(self, config.dim.key)
+	if dim == 1 then
 		return
 	end
 
-	if config.blur then
+	local blur = config.blur.value or inside(self, config.blur.key)
+	if blur > 0 then
 		return self:drawBlurBackground()
 	end
 
@@ -29,8 +30,10 @@ end
 
 BackgroundView.drawBlurBackground = function(self)
 	local config = self.config
-	if config.sigma and self.gaussianBlurView.sigma ~= config.sigma then
-		self.gaussianBlurView:setSigma(config.sigma)
+
+	local sigma = config.blur.value or inside(self, config.blur.key)
+	if self.gaussianBlurView.sigma ~= sigma then
+		self.gaussianBlurView:setSigma(sigma)
 	end
 
 	self.gaussianBlurView:enable()
@@ -46,7 +49,8 @@ BackgroundView.drawBackground = function(self)
 	local images = self.backgroundModel.images
 	local alpha = self.backgroundModel.alpha
 
-	local r, g, b = config.dim, config.dim, config.dim
+	local dim = config.dim.value or inside(self, config.dim.key)
+	local r, g, b = dim, dim, dim
 
 	local mx, my = love.mouse.getPosition()
 	local w, h = config.w, config.h

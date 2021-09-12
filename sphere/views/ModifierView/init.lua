@@ -30,6 +30,8 @@ ModifierView.load = function(self)
 	modifierListView.navigator = navigator
 	modifierListView.modifierModel = self.modifierModel
 
+	self.backgroundView.settings = self.configModel:getConfig("settings")
+
 	local sequenceView = self.sequenceView
 	sequenceView:setView("AvailableModifierListView", availableModifierListView)
 	sequenceView:setView("ModifierListView", modifierListView)

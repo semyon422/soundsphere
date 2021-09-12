@@ -21,6 +21,9 @@ autoUpdate = false
 dimSelect = 0.5
 dimGameplay = 0.75
 dimResult = 0.75
+blurSelect = 0
+blurGameplay = 0
+blurResult = 0
 
 [audio]
 primaryAudioMode = "streamMemoryTempo"

@@ -27,6 +27,8 @@ NoteSkinView.load = function(self)
 	noteSkinListView.noteSkinModel = self.noteSkinModel
 	noteSkinListView.view = self
 
+	self.backgroundView.settings = self.configModel:getConfig("settings")
+
 	local sequenceView = self.sequenceView
 	sequenceView:setView("NoteSkinListView", noteSkinListView)
 

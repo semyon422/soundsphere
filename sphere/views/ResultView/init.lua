@@ -61,6 +61,8 @@ ResultView.load = function(self)
 	navigator.selectModel = self.selectModel
 	navigator.scoreLibraryModel = self.scoreLibraryModel
 
+	self.backgroundView.settings = self.configModel:getConfig("settings")
+
 	local sequenceView = self.sequenceView
 	sequenceView:setView("PointGraphView", pointGraphView)
 	sequenceView:setView("ModifierIconGridView", modifierIconGridView)
