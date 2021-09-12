@@ -39,26 +39,19 @@ PauseManager.updateState = function(self)
 	if state == "play-pause" then
 		if progress == 1 then
 			self:pause()
-			self.state = "pause"
 		end
 	elseif state == "pause-play" then
 		if progress == 1 then
 			self:play()
-			self.state = "play"
 		end
 	elseif state:find("retry") then
 		if progress == 1 then
 			self:retry()
-			self.state = "play"
 		end
 	end
 end
 
 PauseManager.receive = function(self, event)
-	if event.name == "focus" and self.state ~= "pause" and not event.args[1] and not self.logicEngine.autoplay then
-		self:pause()
-	end
-
 	local state = self.state
 	local progressTime = self.progressTime
 	if event.name == "playStateChange" then
@@ -89,14 +82,17 @@ end
 
 PauseManager.play = function(self)
 	self.timeEngine:setTimeRate(self.timeEngine:getBaseTimeRate())
+	self.state = "play"
 end
 
 PauseManager.pause = function(self)
 	self.timeEngine:setTimeRate(0)
+	self.state = "pause"
 end
 
 PauseManager.retry = function(self)
 	self.needRetry = true
+	self.state = "play"
 end
 
 return PauseManager

@@ -19,6 +19,16 @@ GameplayNavigator.receive = function(self, event)
 	elseif event.name == "keyreleased" then
 		return self:keyreleased(event)
 	end
+
+	if
+		event.name == "focus" and
+		not event.args[1] and
+		self.state ~= "pause" and
+		not self.rhythmModel.logicEngine.autoplay and
+		self.rhythmModel.inputManager.mode ~= "internal"
+	then
+		self:forcePause()
+	end
 end
 
 GameplayNavigator.update = function(self)
@@ -94,6 +104,12 @@ GameplayNavigator.pause = function(self)
 	self:send({
 		name = "playStateChange",
 		state = "pause"
+	})
+end
+
+GameplayNavigator.forcePause = function(self)
+	self:send({
+		name = "pause"
 	})
 end
 

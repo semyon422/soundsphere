@@ -138,9 +138,9 @@ GameplayController.receive = function(self, event)
 	self.view:receive(event)
 
 	if event.name == "play" then
-		self.rhythmModel.timeEngine:setTimeRate(self.rhythmModel.timeEngine:getBaseTimeRate())
+		self.rhythmModel.pauseManager:play()
 	elseif event.name == "pause" then
-		self.rhythmModel.timeEngine:setTimeRate(0)
+		self.rhythmModel.pauseManager:pause()
 	elseif event.name == "retry" then
 		self.rhythmModel.inputManager:setMode("external")
 		self.rhythmModel.replayModel:setMode("record")
@@ -155,15 +155,19 @@ GameplayController.receive = function(self, event)
 		perspective.yaw = event.yaw
 	elseif event.name == "quit" then
 		self:skip()
-		self:saveScore()
-		local ResultController = require("sphere.controllers.ResultController")
-		local resultController = ResultController:new()
+		local scoreEntry = self:saveScore()
+		if scoreEntry then
+			local ResultController = require("sphere.controllers.ResultController")
+			local resultController = ResultController:new()
 
-		resultController.rhythmModel = self.rhythmModel
-		resultController.selectController = self.selectController
-		resultController.gameController = self.gameController
+			resultController.rhythmModel = self.rhythmModel
+			resultController.selectController = self.selectController
+			resultController.gameController = self.gameController
 
-		self.gameController.screenManager:set(resultController)
+			self.gameController.screenManager:set(resultController)
+		else
+			self.gameController.screenManager:set(self.selectController)
+		end
 	end
 end
 
@@ -189,6 +193,8 @@ GameplayController.saveScore = function(self)
 		local config = self.gameController.configModel:getConfig("select")
 		config.scoreEntryId = scoreEntry.id
 		self.gameController.selectModel:pullScore()
+
+		return scoreEntry
 	end
 end
 
