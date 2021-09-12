@@ -49,7 +49,7 @@ BackgroundView.drawBackground = function(self)
 	local images = self.backgroundModel.images
 	local alpha = self.backgroundModel.alpha
 
-	local dim = config.dim.value or inside(self, config.dim.key)
+	local dim = 1 - (config.dim.value or inside(self, config.dim.key))
 	local r, g, b = dim, dim, dim
 
 	local mx, my = love.mouse.getPosition()
