@@ -53,6 +53,7 @@ RhythmModel.load = function(self)
 	scoreEngine.timeEngine = timeEngine
 	audioEngine.timeEngine = timeEngine
 	pauseManager.timeEngine = timeEngine
+	pauseManager.logicEngine = logicEngine
 
 	graphicEngine.logicEngine = logicEngine
 
@@ -253,6 +254,10 @@ end
 
 RhythmModel.setScoreBasePath = function(self, path)
 	self.scoreEngine:setBasePath(path)
+end
+
+RhythmModel.setPauseTimes = function(self, ...)
+	self.pauseManager:setPauseTimes(...)
 end
 
 return RhythmModel

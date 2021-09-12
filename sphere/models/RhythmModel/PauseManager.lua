@@ -3,17 +3,19 @@ local tween = require("tween")
 
 local PauseManager = Class:new()
 
-PauseManager.progressTime = {
-	["play-pause"] = 0.20,
-	["pause-play"] = 0.5,
-	["play-retry"] = 0.5,
-	["pause-retry"] = 0.5,
-}
-
 PauseManager.load = function(self)
 	self.state = "play"
 	self.progress = 0
 	self.needRetry = false
+end
+
+PauseManager.setPauseTimes = function(self, timePlayPause, timePausePlay, timePlayRetry, timePauseRetry)
+	self.progressTime = {
+		["play-pause"] = timePlayPause,
+		["pause-play"] = timePausePlay,
+		["play-retry"] = timePlayRetry,
+		["pause-retry"] = timePauseRetry,
+	}
 end
 
 PauseManager.update = function(self, dt)
@@ -23,8 +25,17 @@ PauseManager.update = function(self, dt)
 		self.progress = 0
 	end
 
+	self:updateState()
+
+	if self.progress == 1 then
+		self.progress = 0
+	end
+end
+
+PauseManager.updateState = function(self)
 	local state = self.state
 	local progress = self.progress
+
 	if state == "play-pause" then
 		if progress == 1 then
 			self:pause()
@@ -41,29 +52,26 @@ PauseManager.update = function(self, dt)
 			self.state = "play"
 		end
 	end
-
-	if progress == 1 then
-		self.progress = 0
-	end
 end
 
 PauseManager.receive = function(self, event)
-	-- if event.name == "focus" and not self.paused and not event.args[1] and not self.rhythmModel.logicEngine.autoplay then
-	-- 	self:pause()
-	-- end
+	if event.name == "focus" and self.state ~= "pause" and not event.args[1] and not self.logicEngine.autoplay then
+		self:pause()
+	end
 
 	local state = self.state
 	local progressTime = self.progressTime
 	if event.name == "playStateChange" then
 		local progressState = state .. "-" .. event.state
+		local time
 		if not progressTime[state] and progressTime[progressState] then
 			state = progressState
-			self:startProgress(progressTime[progressState])
+			time = progressTime[progressState]
 		elseif progressTime[state] and state:sub(1, #event.state) == event.state then
 			state = event.state
-			self:startProgress()
 		end
 		self.state = state
+		self:startProgress(time)
 	end
 end
 
@@ -72,6 +80,9 @@ PauseManager.startProgress = function(self, time)
 	if not time then
 		self.progressTween = nil
 		return
+	elseif time == 0 then
+		self.progress = 1
+		return self:updateState()
 	end
 	self.progressTween = tween.new(time, self, {progress = 1}, "linear")
 end

@@ -67,6 +67,12 @@ GameplayController.load = function(self)
 	rhythmModel:setInputOffset(config.general.inputOffset)
 	rhythmModel:setVisualOffset(config.general.visualOffset)
 	rhythmModel:setVisualTimeRate(config.general.speed)
+	rhythmModel:setPauseTimes(
+		config.general.timePlayPause,
+		config.general.timePausePlay,
+		config.general.timePlayRetry,
+		config.general.timePauseRetry
+	)
 
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
 	rhythmModel:load()

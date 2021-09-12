@@ -56,6 +56,42 @@
 		"format": "%0.1f"
 	},
 	{
+		"name": "time to play-pause",
+		"section": "general",
+		"key": "timePlayPause",
+		"type": "slider",
+		"range": [0, 2],
+		"step": 0.1,
+		"format": "%0.1f"
+	},
+	{
+		"name": "time to pause-play",
+		"section": "general",
+		"key": "timePausePlay",
+		"type": "slider",
+		"range": [0, 2],
+		"step": 0.1,
+		"format": "%0.1f"
+	},
+	{
+		"name": "time to play-retry",
+		"section": "general",
+		"key": "timePlayRetry",
+		"type": "slider",
+		"range": [0, 2],
+		"step": 0.1,
+		"format": "%0.1f"
+	},
+	{
+		"name": "time to pause-retry",
+		"section": "general",
+		"key": "timePauseRetry",
+		"type": "slider",
+		"range": [0, 2],
+		"step": 0.1,
+		"format": "%0.1f"
+	},
+	{
 		"name": "input offset",
 		"section": "general",
 		"key": "inputOffset",
