@@ -1,6 +1,5 @@
 local aquaevent					= require("aqua.event")
 local Class						= require("aqua.util.Class")
-local CoordinateManager			= require("aqua.graphics.CoordinateManager")
 local ThreadPool				= require("aqua.thread.ThreadPool")
 local ConfigModel				= require("sphere.models.ConfigModel")
 local ScoreModel				= require("sphere.models.ScoreModel")
@@ -244,8 +243,6 @@ GameController.receive = function(self, event)
 		self:unload()
 		aquaevent.quit()
 		return
-	elseif event.name == "resize" then
-		CoordinateManager:reload()
 	end
 
 	self.screenManager:receive(event)

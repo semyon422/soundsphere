@@ -203,13 +203,11 @@
 		"type": "stepper",
 		"values": [
 			"sample", "stream", "streamTempo",
-			"streamUser", "streamUserTempo",
 			"streamMemoryTempo", "streamMemoryReversable",
 			"streamOpenAL", "sampleOpenAL"
 		],
 		"displayValues": [
 			"sample", "stream", "tempo",
-			"stream*", "tempo*",
 			"memory", "reversable",
 			"streamOAL", "sampleOAL"
 		]
@@ -221,13 +219,11 @@
 		"type": "stepper",
 		"values": [
 			"sample", "stream", "streamTempo",
-			"streamUser", "streamUserTempo",
 			"streamMemoryTempo", "streamMemoryReversable",
 			"streamOpenAL", "sampleOpenAL"
 		],
 		"displayValues": [
 			"sample", "stream", "tempo",
-			"stream*", "tempo*",
 			"memory", "reversable",
 			"streamOAL", "sampleOAL"
 		]
@@ -237,8 +233,8 @@
 		"section": "audio",
 		"key": "previewAudioMode",
 		"type": "stepper",
-		"values": ["stream", "streamTempo", "streamUser", "streamUserTempo", "streamOpenAL"],
-		"displayValues": ["stream", "tempo", "stream*", "tempo*", "streamOAL"]
+		"values": ["stream", "streamTempo", "streamOpenAL"],
+		"displayValues": ["stream", "tempo", "streamOAL"]
 	},
 	{
 		"name": "global volume",
