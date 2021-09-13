@@ -70,7 +70,7 @@ ConfigModel.readConfigFile = function(self, path, format)
 	elseif format == "json" then
 		return self:readJsonFile(path)
 	elseif format == "lua" then
-		return dofile(path)
+		return love.filesystem.load(path)()
 	end
 end
 
