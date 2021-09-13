@@ -23,8 +23,10 @@ ModifierIconView.lines = {
 ModifierIconView.draw = function(self)
 	local config = self.config
 
-	love.graphics.replaceTransform(transform(config.transform))
-	love.graphics.translate(config.x, config.y)
+	local tf = transform(config.transform):translate(config.x, config.y)
+	love.graphics.replaceTransform(tf)
+	tf:release()
+
 	love.graphics.setColor(1, 1, 1, 1)
 
 	love.graphics.setLineStyle("smooth")
@@ -41,8 +43,9 @@ end
 ModifierIconView.drawText = function(self, lines, topText, bottomText)
 	local config = self.config
 
-	love.graphics.replaceTransform(transform(config.transform))
-	love.graphics.translate(config.x, config.y)
+	local tf = transform(config.transform):translate(config.x, config.y)
+	love.graphics.replaceTransform(tf)
+	tf:release()
 
 	local fx = config.size / 8
 	local fy = config.size / 8

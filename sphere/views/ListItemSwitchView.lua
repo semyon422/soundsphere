@@ -42,10 +42,12 @@ ListItemSwitchView.receive = function(self, event)
 
 	local config = listView.config
 	local switch = listView.switch
-	switch:setTransform(transform(config.transform):clone():translate(config.x, config.y))
+	local tf = transform(config.transform):translate(config.x, config.y)
+	switch:setTransform(tf)
 	switch:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.switch))
 	switch:setValue(self:getValue())
 	switch:receive(event)
+	tf:release()
 
 	if switch.valueUpdated then
 		self:setValue(switch.value)

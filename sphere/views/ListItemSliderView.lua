@@ -45,10 +45,12 @@ ListItemSliderView.receive = function(self, event)
 
 	local config = listView.config
 	local slider = listView.slider
-	slider:setTransform(transform(config.transform):clone():translate(config.x, config.y))
+	local tf = transform(config.transform):translate(config.x, config.y)
+	slider:setTransform(tf)
 	slider:setPosition(listView:getItemElementPosition(self.itemIndex, config.slider))
 	slider:setValue(self:getNormValue())
 	slider:receive(event)
+	tf:release()
 
 	if slider.valueUpdated then
 		self:updateNormValue(slider.value)
@@ -60,8 +62,9 @@ ListItemSliderView.wheelmoved = function(self, event)
 	local config = self.listView.config
 
 	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
-	local tf = transform(config.transform):clone():translate(config.x, config.y)
+	local tf = transform(config.transform):translate(config.x, config.y)
 	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
+	tf:release()
 
 	if not (mx >= x and mx <= x + w and my >= y and my <= y + h) then
 		return

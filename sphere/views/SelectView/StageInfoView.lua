@@ -24,8 +24,10 @@ end
 StageInfoView.drawCellName = function(self, cell)
 	local config = self.config
 
-	love.graphics.replaceTransform(transform(config.transform))
-	love.graphics.translate(config.x, config.y)
+	local tf = transform(config.transform):translate(config.x, config.y)
+	love.graphics.replaceTransform(tf)
+	tf:release()
+
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local cx, dcw
@@ -52,8 +54,10 @@ end
 StageInfoView.drawTextCell = function(self, cell)
 	local config = self.config
 
-	love.graphics.replaceTransform(transform(config.transform))
-	love.graphics.translate(config.x, config.y)
+	local tf = transform(config.transform):translate(config.x, config.y)
+	love.graphics.replaceTransform(tf)
+	tf:release()
+
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local cx, dcw
@@ -100,8 +104,10 @@ end
 StageInfoView.drawBarCell = function(self, cell)
 	local config = self.config
 
-	love.graphics.replaceTransform(transform(config.transform))
-	love.graphics.translate(config.x, config.y)
+	local tf = transform(config.transform):translate(config.x, config.y)
+	love.graphics.replaceTransform(tf)
+	tf:release()
+
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local cx, dcw

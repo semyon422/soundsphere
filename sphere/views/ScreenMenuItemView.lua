@@ -8,8 +8,10 @@ local ScreenMenuItemView = Class:new()
 ScreenMenuItemView.draw = function(self)
 	local config = self.listView.config
 
-	love.graphics.replaceTransform(transform(config.transform))
-	love.graphics.translate(config.x, config.y)
+	local tf = transform(config.transform):translate(config.x, config.y)
+	love.graphics.replaceTransform(tf)
+	tf:release()
+
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local item = self.item
@@ -33,6 +35,8 @@ ScreenMenuItemView.receive = function(self, event)
 	if event.name == "mousepressed" then
 		local tf = transform(config.transform)
 		local mx, my = tf:inverseTransformPoint(event.args[1], event.args[2])
+		tf:release()
+
 		local button = event.args[3]
 
 		local x = config.x + (self.column - 1) * config.w / config.columns

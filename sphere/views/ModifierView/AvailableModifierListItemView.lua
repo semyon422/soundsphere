@@ -9,8 +9,10 @@ local AvailableModifierListItemView = ListItemView:new({construct = false})
 AvailableModifierListItemView.draw = function(self)
 	local config = self.listView.config
 
-	love.graphics.replaceTransform(transform(config.transform))
-	love.graphics.translate(config.x, config.y)
+	local tf = transform(config.transform):translate(config.x, config.y)
+	love.graphics.replaceTransform(tf)
+	tf:release()
+
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local y = (self.visualIndex - 1) * config.h / config.rows
@@ -26,7 +28,6 @@ AvailableModifierListItemView.draw = function(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	if not prevItem or prevItem.oneUse ~= item.oneUse then
-		local fontSection = spherefonts.get(config.section.fontFamily, config.section.fontSize)
 		local text = "One use modifiers"
 		if not item.oneUse then
 			text = "Sequential modifiers"
@@ -39,8 +40,9 @@ AvailableModifierListItemView.receive = function(self, event)
 	local config = self.listView.config
 
 	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
-	local tf = transform(config.transform):clone():translate(config.x, config.y)
+	local tf = transform(config.transform):translate(config.x, config.y)
 	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
+	tf:release()
 
 	if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then
 		local button = event.args[3]

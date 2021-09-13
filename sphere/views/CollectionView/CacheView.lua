@@ -9,8 +9,10 @@ local CacheView = Class:new()
 CacheView.draw = function(self)
 	local config = self.config
 
-	love.graphics.replaceTransform(transform(config.transform))
-	love.graphics.translate(config.x, config.y)
+	local tf = transform(config.transform):translate(config.x, config.y)
+	love.graphics.replaceTransform(tf)
+	tf:release()
+
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local font = spherefonts.get(config.text.fontFamily, config.text.fontSize)
@@ -45,6 +47,8 @@ CacheView.receive = function(self, event)
 	if event.name == "mousepressed" then
 		local tf = transform(config.transform)
 		local mx, my = tf:inverseTransformPoint(event.args[1], event.args[2])
+		tf:release()
+
 		local button = event.args[3]
 
 		local x = config.x

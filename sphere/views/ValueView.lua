@@ -16,7 +16,9 @@ end
 ValueView.draw = function(self)
 	local config = self.config
 
-	love.graphics.replaceTransform(transform(config.transform))
+	local tf = transform(config.transform)
+	love.graphics.replaceTransform(tf)
+	tf:release()
 
 	love.graphics.setFont(self.state.font)
 	love.graphics.setColor(config.color)

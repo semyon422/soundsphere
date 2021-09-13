@@ -42,6 +42,7 @@ ListView.wheelmoved = function(self, event)
 
 	local tf = transform(config.transform)
 	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
+	tf:release()
 
 	local x = config.x
 	local y = config.y
@@ -120,7 +121,10 @@ end
 ListView.drawStencil = function(self)
 	local config = self.config
 
-	love.graphics.replaceTransform(transform(config.transform))
+	local tf = transform(config.transform)
+	love.graphics.replaceTransform(tf)
+	tf:release()
+
 	love.graphics.setColor(1, 1, 1, 1)
 
 	love.graphics.rectangle(

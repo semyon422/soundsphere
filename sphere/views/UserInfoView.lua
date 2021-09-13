@@ -25,7 +25,10 @@ UserInfoView.receive = function(self, event)
 	end
 
 	local config = self.config
-	local mx, my = transform(config.transform):inverseTransformPoint(event.args[1], event.args[2])
+	local tf = transform(config.transform)
+	local mx, my = tf:inverseTransformPoint(event.args[1], event.args[2])
+	tf:release()
+
 	local x, y, w, h = config.x, config.y, config.w, config.h
 	if belong(mx, x, x + w) and belong(my, y, y + h) then
 		local button = event.args[3]
@@ -39,8 +42,9 @@ UserInfoView.draw = function(self)
 	local config = self.config
 	local state = self.state
 
-	love.graphics.replaceTransform(transform(config.transform))
-	love.graphics.translate(config.x, config.y)
+	local tf = transform(config.transform):translate(config.x, config.y)
+	love.graphics.replaceTransform(tf)
+	tf:release()
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local font = spherefonts.get(config.text.fontFamily, config.text.fontSize)

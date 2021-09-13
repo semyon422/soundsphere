@@ -20,7 +20,9 @@ InputImageView.draw = function(self)
 	local config = self.config
 	local state = self.state
 
-	love.graphics.replaceTransform(transform(config.transform))
+	local tf = transform(config.transform)
+	love.graphics.replaceTransform(tf)
+	tf:release()
 
 	love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(

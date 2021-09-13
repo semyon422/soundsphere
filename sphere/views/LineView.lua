@@ -15,7 +15,9 @@ end
 LineView.drawLine = function(self, line)
 	local config = self.config
 
-	love.graphics.replaceTransform(transform(config.transform))
+	local tf = transform(config.transform)
+	love.graphics.replaceTransform(tf)
+	tf:release()
 
 	love.graphics.setColor(line.color)
 	love.graphics.setLineWidth(line.lineWidth)

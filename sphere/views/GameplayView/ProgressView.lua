@@ -13,7 +13,9 @@ ProgressView.receive = function(self, event) end
 ProgressView.draw = function(self)
 	local config = self.config
 
-	love.graphics.replaceTransform(transform(config.transform))
+	local tf = transform(config.transform)
+	love.graphics.replaceTransform(tf)
+	tf:release()
 
     local x, y, w, h = self:getRectangle()
 

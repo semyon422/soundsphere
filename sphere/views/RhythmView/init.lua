@@ -68,7 +68,10 @@ RhythmView.draw = function(self)
 		noteView:draw()
 	end
 
-	love.graphics.applyTransform(transform(self.noteSkin.transform))
+	local tf = transform(self.noteSkin.transform)
+	love.graphics.replaceTransform(tf)
+	tf:release()
+
 	for _, spriteBatch in ipairs(self.spriteBatches) do
 		love.graphics.draw(spriteBatch)
 		spriteBatch:clear()

@@ -32,8 +32,10 @@ end
 SortStepperView.draw = function(self)
 	local config = self.config
 
-	love.graphics.replaceTransform(transform(config.transform))
-	love.graphics.translate(config.x, config.y)
+	local tf = transform(config.transform):translate(config.x, config.y)
+	love.graphics.replaceTransform(tf)
+	tf:release()
+
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local font = spherefonts.get(config.text.fontFamily, config.text.fontSize)
@@ -78,11 +80,13 @@ SortStepperView.receive = function(self, event)
 
 	local config = self.config
 	local stepper = self.stepper
-	stepper:setTransform(transform(config.transform))
+	local tf = transform(config.transform)
+	stepper:setTransform(tf)
 	stepper:setPosition(config.x, config.y, config.w, config.h)
 	stepper:setValue(self:getIndexValue())
 	stepper:setCount(self:getCount())
 	stepper:receive(event)
+	tf:release()
 
 	if stepper.valueUpdated then
 		self:updateIndexValue(stepper.value)
