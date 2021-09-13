@@ -1,4 +1,10 @@
 local modes = love.window.getFullscreenModes()
+table.sort(modes, function(a, b)
+	if a.width ~= b.width then
+		return a.width > b.width
+	end
+	return a.height > b.height
+end)
 
 local settings = {
 	{
@@ -134,6 +140,16 @@ local settings = {
 		type = "stepper",
 		values = {1, 0, -1},
 		displayValues = {"enabled", "disabled", "adaptive"}
+	},
+	{
+		name = "start window resolution",
+		section = "graphics",
+		key = "graphics.mode.window",
+		type = "stepper",
+		values = modes,
+		format = function(mode)
+			return ("%dx%d"):format(mode.width, mode.height)
+		end
 	},
 	{
 		name = "dim select",

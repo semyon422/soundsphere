@@ -84,7 +84,17 @@ SettingsModel.toIndexValue = function(self, settingConfig)
 		return round((value - settingConfig.range[1]) / settingConfig.step) + 1
 	end
 	for i, currentValue in ipairs(settingConfig.values) do
-		if value == currentValue then
+		if type(currentValue) == "table" then
+			local different = false
+			for k, v in pairs(currentValue) do
+				if v ~= value[k] then
+					different = true
+				end
+			end
+			if not different then
+				return i
+			end
+		elseif value == currentValue then
 			return i
 		end
 	end
@@ -112,13 +122,22 @@ SettingsModel.getDisplayValue = function(self, settingConfig)
 	local range = settingConfig.range
 	local displayRange = settingConfig.displayRange or range
 	if settingConfig.type == "slider" then
-		return settingConfig.format:format(map(value, range[1], range[2], displayRange[1], displayRange[2]))
+		value = settingConfig.format:format(map(value, range[1], range[2], displayRange[1], displayRange[2]))
 	elseif settingConfig.type == "switch" then
-		return value and displayRange[2] or displayRange[1]
+		value = value and displayRange[2] or displayRange[1]
 	elseif settingConfig.type == "stepper" then
 		local indexValue = self:toIndexValue(settingConfig)
-		return (settingConfig.displayValues or settingConfig.values)[indexValue]
+		value = (settingConfig.displayValues or settingConfig.values)[indexValue]
 	end
+	if settingConfig.format then
+		local format = settingConfig.format
+		if type(format) == "string" then
+			value = format:format(value)
+		elseif type(format) == "function" then
+			value = format(value)
+		end
+	end
+	return value
 end
 
 return SettingsModel
