@@ -69,6 +69,8 @@ ConfigModel.readConfigFile = function(self, path, format)
 		return self:readTomlFile(path)
 	elseif format == "json" then
 		return self:readJsonFile(path)
+	elseif format == "lua" then
+		return dofile(path)
 	end
 end
 

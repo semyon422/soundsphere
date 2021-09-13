@@ -79,5 +79,3 @@ local gameController = GameController:new()
 
 aquaevent:add(gameController)
 gameController:load()
-
-love.window.setTitle("soundsphere")

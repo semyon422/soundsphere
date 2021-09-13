@@ -43,7 +43,7 @@ GameplayView.load = function(self)
 
 	self.navigator.rhythmModel = self.rhythmModel
 
-	cameraView.configModel = self.configModel
+	cameraView.perspective = config.graphics.perspective
 
 	rhythmView.navigator = self.navigator
 	rhythmView.configModel = self.configModel
@@ -67,7 +67,7 @@ GameplayView.load = function(self)
 	imageView.root = self.noteSkin.directoryPath
 	inputImageView.root = self.noteSkin.directoryPath
 
-	self.backgroundView.settings = self.configModel:getConfig("settings")
+	self.backgroundView.settings = config
 
 	playfieldView:setSequenceConfig(self.noteSkin.playField)
 	playfieldView:setView("RhythmView", rhythmView)

@@ -1,6 +1,8 @@
 local Class = require("aqua.util.Class")
 local round = require("aqua.math").round
 local map = require("aqua.math").map
+local inside = require("aqua.util.inside")
+local outside = require("aqua.util.outside")
 
 local SettingsModel = Class:new()
 
@@ -36,22 +38,22 @@ SettingsModel.loadStructure = function(self)
 end
 
 SettingsModel.setValue = function(self, settingConfig, value)
-	self.config[settingConfig.section][settingConfig.key] = value
+	outside(self.config, settingConfig.key, value)
 end
 
 SettingsModel.increaseValue = function(self, settingConfig, delta)
-	local section = settingConfig.section
 	local key = settingConfig.key
-	local value = self.config[section][key]
+	local value = inside(self.config, key)
 	if settingConfig.type == "slider" then
-		self.config[section][key] = math.min(math.max(value + settingConfig.step * delta, settingConfig.range[1]), settingConfig.range[2])
+		value = math.min(math.max(value + settingConfig.step * delta, settingConfig.range[1]), settingConfig.range[2])
 	elseif settingConfig.type == "stepper" then
-		self.config[section][key] = settingConfig.values[math.min(math.max(self:getValue(settingConfig) + delta, 1), #settingConfig.values)]
+		value = settingConfig.values[math.min(math.max(self:getValue(settingConfig) + delta, 1), #settingConfig.values)]
 	end
+	outside(self.config, key, value)
 end
 
 SettingsModel.getValue = function(self, settingConfig)
-	local value = self.config[settingConfig.section][settingConfig.key]
+	local value = inside(self.config, settingConfig.key)
 	if settingConfig.type == "stepper" then
 		for i, listValue in ipairs(settingConfig.values) do
 			if value == listValue then
@@ -69,7 +71,7 @@ SettingsModel.fromNormValue = function(self, settingConfig, value)
 end
 
 SettingsModel.toNormValue = function(self, settingConfig)
-	local value = self.config[settingConfig.section][settingConfig.key]
+	local value = inside(self.config, settingConfig.key)
 	local range = settingConfig.range
 	if settingConfig.type == "slider" then
 		return map(value, range[1], range[2], 0, 1)
@@ -77,7 +79,7 @@ SettingsModel.toNormValue = function(self, settingConfig)
 end
 
 SettingsModel.toIndexValue = function(self, settingConfig)
-	local value = self.config[settingConfig.section][settingConfig.key]
+	local value = inside(self.config, settingConfig.key)
 	if not settingConfig.values then
 		return round((value - settingConfig.range[1]) / settingConfig.step) + 1
 	end
@@ -106,7 +108,7 @@ SettingsModel.getCount = function(self, settingConfig)
 end
 
 SettingsModel.getDisplayValue = function(self, settingConfig)
-	local value = self.config[settingConfig.section][settingConfig.key]
+	local value = inside(self.config, settingConfig.key)
 	local range = settingConfig.range
 	local displayRange = settingConfig.displayRange or range
 	if settingConfig.type == "slider" then
@@ -115,7 +117,7 @@ SettingsModel.getDisplayValue = function(self, settingConfig)
 		return value and displayRange[2] or displayRange[1]
 	elseif settingConfig.type == "stepper" then
 		local indexValue = self:toIndexValue(settingConfig)
-		return settingConfig.displayValues[indexValue]
+		return (settingConfig.displayValues or settingConfig.values)[indexValue]
 	end
 end
 

@@ -17,7 +17,7 @@ UpdateModel.load = function(self)
 	local online = self.configModel:getConfig("online")
 
 	self.filesUrl = online.update
-	if not settings.general.autoUpdate or online.update == "" or self.thread then
+	if not settings.miscellaneous.autoUpdate or online.update == "" or self.thread then
 		return
 	end
 

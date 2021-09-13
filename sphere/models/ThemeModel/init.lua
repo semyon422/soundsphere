@@ -13,7 +13,7 @@ ThemeModel.path = "userdata/themes"
 ThemeModel.load = function(self)
 	self.themes = {}
 	self.config = self.configModel:getConfig("settings")
-	return self:lookup(self.path)
+	-- return self:lookup(self.path)
 end
 
 ThemeModel.lookup = function(self, directoryPath)
@@ -37,27 +37,27 @@ ThemeModel.getThemes = function(self)
 end
 
 ThemeModel.setDefaultTheme = function(self, theme)
-	self.theme = theme
-	self.config.general.theme = theme.path
+	-- self.theme = theme
+	-- self.config.general.theme = theme.path
 end
 
 ThemeModel.getTheme = function(self)
-	if love.keyboard.isDown("lshift") then
-		return self.themes[1] or self.theme
-	end
+	-- if love.keyboard.isDown("lshift") then
+	-- 	return self.themes[1] or self.theme
+	-- end
 
-	local configValue = self.config.general.theme
+	-- local configValue = self.config.general.theme
 
-	if configValue then
-		for _, theme in ipairs(self.themes) do
-			if theme.path == configValue then
-				self.theme = theme
-				return theme
-			end
-		end
-	end
+	-- if configValue then
+	-- 	for _, theme in ipairs(self.themes) do
+	-- 		if theme.path == configValue then
+	-- 			self.theme = theme
+	-- 			return theme
+	-- 		end
+	-- 	end
+	-- end
 
-	self:setDefaultTheme(self.themes[1] or self.theme)
+	-- self:setDefaultTheme(self.themes[1] or self.theme)
 
 	return self.theme
 end

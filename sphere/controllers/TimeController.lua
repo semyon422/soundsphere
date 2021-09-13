@@ -12,37 +12,37 @@ TimeController.receive = function(self, event)
 
 	local config = configModel:getConfig("settings")
 	local input = config.input
-	local general = config.general
+	local gameplay = config.general
 
 	if event.name == "keypressed" then
 		local key = event.args[1]
 		local delta = 0.05
 
-		if key == input.decreaseTimeRate then
+		if key == input.timeRate.decrease then
 			timeEngine:increaseTimeRate(-delta)
 			notificationModel:notify("timeRate: " .. timeEngine.timeRate)
 			rhythmModel.prohibitSavingScore = true
-		elseif key == input.increaseTimeRate then
+		elseif key == input.timeRate.increase then
 			timeEngine:increaseTimeRate(delta)
 			notificationModel:notify("timeRate: " .. timeEngine.timeRate)
 			rhythmModel.prohibitSavingScore = true
-		elseif key == input.invertTimeRate then
+		elseif key == input.timeRate.invert then
 			timeEngine:setTimeRate(-timeEngine.timeRate)
 			notificationModel:notify("timeRate: " .. timeEngine.timeRate)
 			rhythmModel.prohibitSavingScore = true
 		elseif key == input.skipIntro then
 			timeEngine:skipIntro()
-		elseif key == input.invertPlaySpeed then
+		elseif key == input.playSpeed.invert then
 			graphicEngine.targetVisualTimeRate = -graphicEngine.targetVisualTimeRate
 			graphicEngine:setVisualTimeRate(graphicEngine.targetVisualTimeRate)
 			notificationModel:notify("visualTimeRate: " .. graphicEngine.targetVisualTimeRate)
-		elseif key == input.decreasePlaySpeed then
+		elseif key == input.playSpeed.decrease then
 			graphicEngine:increaseVisualTimeRate(-delta)
-			general.speed = graphicEngine.targetVisualTimeRate
+			gameplay.speed = graphicEngine.targetVisualTimeRate
 			notificationModel:notify("visualTimeRate: " .. graphicEngine.targetVisualTimeRate)
-		elseif key == input.increasePlaySpeed then
+		elseif key == input.playSpeed.increase then
 			graphicEngine:increaseVisualTimeRate(delta)
-			general.speed = graphicEngine.targetVisualTimeRate
+			gameplay.speed = graphicEngine.targetVisualTimeRate
 			notificationModel:notify("visualTimeRate: " .. graphicEngine.targetVisualTimeRate)
 		end
 	end

@@ -1,60 +1,76 @@
-[general]
-speed = 1
-fps = 240
-theme = "userdata/themes/new"
-replayType = "NanoChart"
-adjustDifficultyAccuracy = 26
-adjustDifficultyPerformance = 300
-timeToPrepare = 2
-timePlayPause = 0.20
-timePausePlay = 0.5
-timePlayRetry = 0.5
-timePauseRetry = 0.5
-inputOffset = 0
-visualOffset = 0
-needTimeRound = 1
-videobga = false
-imagebga = true
+[miscellaneous]
 autoUpdate = false
 
+[gameplay]
+speed = 1
+replayType = "NanoChart"
+needTimeRound = true
+[gameplay.offset]
+note = 0
+judgement = 0
+[gameplay.bga]
+video = false
+image = true
+[gameplay.time]
+prepare = 2
+playPause = 0.2
+pausePlay = 0.5
+playRetry = 0.5
+pauseRetry = 0.5
+
 [graphics]
-dimSelect = 0.5
-dimGameplay = 0.75
-dimResult = 0.75
-blurSelect = 0
-blurGameplay = 0
-blurResult = 0
-
-[audio]
-primaryAudioMode = "streamMemoryTempo"
-secondaryAudioMode = "sample"
-previewAudioMode = "streamOpenAL"
-volumeGlobal = 1
-volumeMusic = 1
-volumeEffects = 1
-midiConstantVolume = false
-
-[perspective]
+fps = 240
+[graphics.dim]
+select = 0.5
+gameplay = 0.8
+result = 0.6
+[graphics.blur]
+select = 0
+gameplay = 0
+result = 0
+[graphics.perspective]
 camera = false
-allowRotateX = false
-allowRotateY = true
+rx = false
+ry = true
 x = 0
 y = 0
 z = 0
 pitch = 0
 yaw = 0
+[graphics.mode]
+[graphics.mode.window]
+width = 1280
+height = 720
+[graphics.mode.flags]
+fullscreen = false
+fullscreentype = "desktop"
+vsync = 1
+
+[audio]
+[audio.volume]
+master = 1
+music = 1
+effects = 1
+[audio.mode]
+primary = "streamMemoryTempo"
+secondary = "sample"
+preview = "streamOpenAL"
+[audio.midi]
+constantVolume = false
 
 [input]
 pause = "escape"
 skipIntro = "space"
 quickRestart = "`"
-invertPlaySpeed = "f2"
-decreasePlaySpeed = "f3"
-increasePlaySpeed = "f4"
-invertTimeRate = "f7"
-decreaseTimeRate = "f5"
-increaseTimeRate = "f6"
-selectRandomNoteChartSet = "f2"
-adjustDifficulty = "f3"
-screenshotCapture = "f12"
-screenshotOpen = "lshift"
+selectRandom = "f2"
+[input.playSpeed]
+decrease = "f3"
+increase = "f4"
+invert = "f2"
+[input.timeRate]
+decrease = "f5"
+increase = "f6"
+invert = "f7"
+[input.screenshot]
+capture = "f12"
+open = "lshift"

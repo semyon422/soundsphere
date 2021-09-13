@@ -9,7 +9,7 @@ CameraView.speed = 500
 CameraView.load = function(self)
 	local state = self.state
 
-	local perspective = self.configModel:getConfig("settings").perspective
+	local perspective = self.perspective
 	state.camera = perspective.camera
 	if not state.camera then
 		return
@@ -20,7 +20,7 @@ end
 CameraView.loadCamera = function(self)
 	s3dc.load()
 	local w, h = love.graphics.getDimensions()
-	local perspective = self.configModel:getConfig("settings").perspective
+	local perspective = self.perspective
 	s3dc.translate(perspective.x * w, perspective.y * h, perspective.z * h)
 	s3dc.rotate(perspective.pitch, perspective.yaw)
 end
@@ -66,7 +66,7 @@ CameraView.receive = function(self, event)
 		local dx, dy = event.args[3], event.args[4]
 		local angle = self.sensitivity
 
-		local perspective = self.configModel:getConfig("settings").perspective
+		local perspective = self.perspective
 		if not perspective.allowRotateY then
 			dy = 0
 		end

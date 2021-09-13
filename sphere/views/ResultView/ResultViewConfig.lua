@@ -77,8 +77,8 @@ local Background = {
 	w = 1920,
 	h = 1080,
 	parallax = 0.01,
-	dim = {key = "settings.graphics.dimResult"},
-	blur = {key = "settings.graphics.blurResult"}
+	dim = {key = "settings.graphics.dim.result"},
+	blur = {key = "settings.graphics.blur.result"}
 }
 
 local Rectangle = {

@@ -57,21 +57,21 @@ GameplayController.load = function(self)
 
 	local config = configModel:getConfig("settings")
 
-	rhythmModel:setVolume("global", config.audio.volumeGlobal)
-	rhythmModel:setVolume("music", config.audio.volumeMusic)
-	rhythmModel:setVolume("effects", config.audio.volumeEffects)
-	rhythmModel:setAudioMode("primary", config.audio.primaryAudioMode)
-	rhythmModel:setAudioMode("secondary", config.audio.secondaryAudioMode)
-	rhythmModel:setTimeRound(config.general.needTimeRound)
-	rhythmModel:setTimeToPrepare(config.general.timeToPrepare)
-	rhythmModel:setInputOffset(config.general.inputOffset)
-	rhythmModel:setVisualOffset(config.general.visualOffset)
-	rhythmModel:setVisualTimeRate(config.general.speed)
+	rhythmModel:setVolume("global", config.audio.volume.master)
+	rhythmModel:setVolume("music", config.audio.volume.music)
+	rhythmModel:setVolume("effects", config.audio.volume.effects)
+	rhythmModel:setAudioMode("primary", config.audio.mode.primary)
+	rhythmModel:setAudioMode("secondary", config.audio.mode.secondary)
+	rhythmModel:setTimeRound(config.gameplay.needTimeRound)
+	rhythmModel:setTimeToPrepare(config.gameplay.time.prepare)
+	-- rhythmModel:setInputOffset(config.gameplay.inputOffset)
+	-- rhythmModel:setVisualOffset(config.gameplay.visualOffset)
+	rhythmModel:setVisualTimeRate(config.gameplay.speed)
 	rhythmModel:setPauseTimes(
-		config.general.timePlayPause,
-		config.general.timePausePlay,
-		config.general.timePlayRetry,
-		config.general.timePauseRetry
+		config.gameplay.time.playPause,
+		config.gameplay.time.pausePlay,
+		config.gameplay.time.playRetry,
+		config.gameplay.time.pauseRetry
 	)
 
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
@@ -112,7 +112,7 @@ end
 GameplayController.getImporterSettings = function(self)
 	local config = self.gameController.configModel:getConfig("settings")
 	return {
-		midiConstantVolume = config.audio.midiConstantVolume
+		midiConstantVolume = config.audio.midi.constantVolume
 	}
 end
 
@@ -147,7 +147,7 @@ GameplayController.receive = function(self, event)
 		self:unload()
 		self:load()
 	elseif event.name == "saveCamera" then
-		local perspective = self.gameController.configModel:getConfig("settings").perspective
+		local perspective = self.gameController.configModel:getConfig("settings").graphics.perspective
 		perspective.x = event.x
 		perspective.y = event.y
 		perspective.z = event.z
@@ -184,7 +184,7 @@ GameplayController.saveScore = function(self)
 	if scoreSystemEntry.score > 0 and rhythmModel.replayModel.mode ~= "replay" and not rhythmModel.logicEngine.autoplay then
 		replayModel.noteChartModel = noteChartModel
 		replayModel.modifierModel = modifierModel
-		replayModel.replayType = self.gameController.configModel:getConfig("settings").general.replayType
+		replayModel.replayType = self.gameController.configModel:getConfig("settings").gameplay.replayType
 		local replayHash = replayModel:saveReplay()
 		local scoreEntry = self.gameController.scoreModel:insertScore(scoreSystemEntry, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
 		self.gameController.onlineModel:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)

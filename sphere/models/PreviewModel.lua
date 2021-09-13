@@ -83,7 +83,7 @@ PreviewModel.play = function(self, path, position)
 	end
 
 	local config = self.configModel:getConfig("settings")
-	local audio = AudioFactory:getAudio(path, config.audio.previewAudioMode)
+	local audio = AudioFactory:getAudio(path, config.audio.mode.preview)
 
 	if not audio then
 		return
@@ -93,7 +93,7 @@ PreviewModel.play = function(self, path, position)
 	self.position = position
 	self.audio = audio
 	self.audio:setPosition(position)
-	self.audio:setVolume(config.audio.volumeGlobal * config.audio.volumeMusic)
+	self.audio:setVolume(config.audio.volume.master * config.audio.volume.music)
 	self.audio:play()
 end
 
