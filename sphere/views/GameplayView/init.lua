@@ -49,8 +49,8 @@ GameplayView.load = function(self)
 	rhythmView.configModel = self.configModel
 	rhythmView.noteSkin = self.noteSkin
 	rhythmView.rhythmModel = self.rhythmModel
-	rhythmView:setBgaEnabled("video", config.general.videobga)
-	rhythmView:setBgaEnabled("image", config.general.imagebga)
+	rhythmView:setBgaEnabled("video", config.gameplay.bga.video)
+	rhythmView:setBgaEnabled("image", config.gameplay.bga.image)
 
 	valueView.scoreSystem = self.scoreSystem
 	valueView.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
