@@ -577,7 +577,7 @@ local SelectViewConfig = {
 	UpdateStatus,
 
 	Rectangle,
-	Line
+	Line,
 }
 
 return SelectViewConfig

@@ -1,4 +1,5 @@
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
+local transformLeft = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local SectionsList = {
 	class = "SectionsListView",
@@ -179,13 +180,30 @@ local BottomScreenMenu = {
 	}
 }
 
+local FpsView = {
+	class = "ValueView",
+	transform = transformLeft,
+	value = "",
+	x = 0,
+	baseline = 20,
+	limit = 1920,
+	color = {1, 1, 1, 1},
+	fontSize = 24,
+	fontFamily = "Noto Sans Mono",
+	align = "left",
+	format = function()
+		return ("FPS:  %d\n1/dt: %0.2f"):format(love.timer.getFPS(), 1 / love.timer.getDelta())
+	end,
+}
+
 local SettingsViewConfig = {
 	Background,
 	BottomScreenMenu,
 	SectionsList,
 	SettingsList,
 	SectionsScrollBar,
-	Rectangle
+	Rectangle,
+	FpsView,
 }
 
 return SettingsViewConfig
