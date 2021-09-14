@@ -28,6 +28,7 @@ CacheDatabase.noteChartDatasColumns = {
 	"bpm",
 	"difficulty",
 	"longNoteRatio",
+	"localOffset",
 }
 
 CacheDatabase.noteChartsColumns = {
@@ -56,6 +57,7 @@ CacheDatabase.noteChartDatasNumberColumns = {
 	"bpm",
 	"difficulty",
 	"longNoteRatio",
+	"localOffset",
 }
 
 CacheDatabase.noteChartsNumberColumns = {
@@ -105,6 +107,7 @@ local createTableRequest = [[
 		`bpm` REAL,
 		`difficulty` REAL,
 		`longNoteRatio` REAL,
+		`localOffset` REAL,
 		UNIQUE(`hash`, `index`)
 	);
 ]]
@@ -187,9 +190,10 @@ local insertNoteChartDataRequest = [[
 		`length`,
 		`bpm`,
 		`difficulty`,
-		`longNoteRatio`
+		`longNoteRatio`,
+		`localOffset`
 	)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 ]]
 
 local updateNoteChartDataRequest = [[
@@ -210,7 +214,8 @@ local updateNoteChartDataRequest = [[
 		`length` = ?,
 		`bpm` = ?,
 		`difficulty` = ?,
-		`longNoteRatio` = ?
+		`longNoteRatio` = ?,
+		`localOffset` = ?
 	WHERE `hash` = ? AND `index` = ?;
 ]]
 
@@ -350,7 +355,8 @@ CacheDatabase.insertNoteChartDataEntry = function(self, entry)
 		entry.length,
 		entry.bpm,
 		entry.difficulty,
-		entry.longNoteRatio
+		entry.longNoteRatio,
+		entry.localOffset
 	):step()
 end
 
@@ -371,9 +377,10 @@ CacheDatabase.updateNoteChartDataEntry = function(self, entry)
 		entry.noteCount,
 		entry.length,
 		entry.bpm,
-		entry.hash,
 		entry.difficulty,
 		entry.longNoteRatio,
+		entry.localOffset,
+		entry.hash,
 		entry.index
 	):step()
 end

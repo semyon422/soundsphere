@@ -2,6 +2,7 @@ local Class						= require("aqua.util.Class")
 local RhythmModel				= require("sphere.models.RhythmModel")
 local TimeController			= require("sphere.controllers.TimeController")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
+local CacheDatabase				= require("sphere.models.CacheModel.CacheDatabase")
 
 local GameplayController = Class:new()
 
@@ -55,6 +56,8 @@ GameplayController.load = function(self)
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
 
+	local localOffset = noteChartModel.noteChartDataEntry.localOffset
+
 	local config = configModel:getConfig("settings")
 
 	rhythmModel:setVolume("global", config.audio.volume.master)
@@ -64,7 +67,7 @@ GameplayController.load = function(self)
 	rhythmModel:setAudioMode("secondary", config.audio.mode.secondary)
 	rhythmModel:setTimeRound(config.gameplay.needTimeRound)
 	rhythmModel:setTimeToPrepare(config.gameplay.time.prepare)
-	rhythmModel:setNoteOffset(config.gameplay.offset.note)
+	rhythmModel:setNoteOffset(config.gameplay.offset.note + localOffset)
 	rhythmModel:setInputOffset(config.gameplay.offset.input)
 	rhythmModel:setVisualTimeRate(config.gameplay.speed)
 	rhythmModel:setPauseTimes(
@@ -153,6 +156,13 @@ GameplayController.receive = function(self, event)
 		perspective.z = event.z
 		perspective.pitch = event.pitch
 		perspective.yaw = event.yaw
+	elseif event.name == "increaseLocalOffset" then
+		CacheDatabase:load()
+		local noteChartDataEntry = self.gameController.noteChartModel.noteChartDataEntry
+		noteChartDataEntry.localOffset = noteChartDataEntry.localOffset + event.delta
+		CacheDatabase:setNoteChartDataEntry(noteChartDataEntry)
+		print("local offset", noteChartDataEntry.localOffset)
+		CacheDatabase:unload()
 	elseif event.name == "quit" then
 		self:skip()
 		local scoreEntry = self:saveScore()

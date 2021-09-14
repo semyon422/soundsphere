@@ -332,6 +332,7 @@ CacheManager.getEmptyNoteChartDataEntry = function(self, path)
 		level = 0,
 		difficulty = 0,
 		longNoteRatio = 0,
+		localOffset = 0,
 	}
 end
 

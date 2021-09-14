@@ -51,6 +51,11 @@ GameplayNavigator.keypressed = function(self, event)
 
 	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
 	local scancode = event.args[2]
+
+	if scancode == "-" then self:increaseLocalOffset(-0.001)
+	elseif scancode == "=" or scancode == "+" then self:increaseLocalOffset(0.001)
+	end
+
 	if state == "play" then
 		if scancode == "escape" and not shift then self:pause()
 		elseif scancode == "escape" and shift then self:quit()
@@ -90,6 +95,13 @@ GameplayNavigator.saveCamera = function(self, x, y, z, pitch, yaw)
 		z = z,
 		pitch = pitch,
 		yaw = yaw,
+	})
+end
+
+GameplayNavigator.increaseLocalOffset = function(self, delta)
+	self:send({
+		name = "increaseLocalOffset",
+		delta = delta
 	})
 end
 

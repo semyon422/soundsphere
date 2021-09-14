@@ -216,6 +216,15 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
+		x = {3, 4}, y = 3,
+		name = "local offset",
+		format = "%d",
+		multiplier = 1000,
+		key = "selectModel.noteChartItem.noteChartDataEntry.localOffset"
+	},
+	{
+		type = StageInfo.smallCell,
+		valueType = "text",
 		x = 1, y = 4,
 		name = "level",
 		key = "selectModel.noteChartItem.noteChartDataEntry.level"
