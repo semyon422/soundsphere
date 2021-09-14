@@ -265,10 +265,10 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = 4, y = 6,
-		name = "density",
-		format = "%0.2f",
-		key = "scoreLibraryModel.firstScoreItem.scoreEntry.density"
+		x = {3, 4}, y = 6,
+		name = "miss count",
+		format = "%d",
+		key = "scoreLibraryModel.firstScoreItem.scoreEntry.missCount"
 	},
 }
 
