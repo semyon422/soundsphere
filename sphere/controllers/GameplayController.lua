@@ -165,8 +165,8 @@ GameplayController.receive = function(self, event)
 		CacheDatabase:unload()
 	elseif event.name == "quit" then
 		self:skip()
-		local scoreEntry = self:saveScore()
-		if scoreEntry then
+		self:saveScore()
+		if not self.rhythmModel.logicEngine.autoplay then
 			local ResultController = require("sphere.controllers.ResultController")
 			local resultController = ResultController:new()
 
