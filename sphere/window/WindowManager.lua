@@ -1,11 +1,13 @@
 local Class	= require("aqua.util.Class")
+local cursor = require("sphere.cursor")
 
 local WindowManager = Class:new()
 
 WindowManager.path = "userdata/window.json"
 
 WindowManager.load = function(self)
-	self.mode = self.configModel:getConfig("settings").graphics.mode
+	self.graphics = self.configModel:getConfig("settings").graphics
+	self.mode = self.graphics.mode
 	local mode = self.mode
 	local flags = mode.flags
 
@@ -24,10 +26,14 @@ WindowManager.load = function(self)
 	self.fullscreen = flags.fullscreen
 	self.fullscreentype = flags.fullscreentype
 	self.vsync = flags.vsync
+	self.cursor = self.graphics.cursor
+
+	self:setCursor()
 end
 
 WindowManager.update = function(self)
 	local flags = self.mode.flags
+	local graphics = self.graphics
 	if self.vsync ~= flags.vsync then
 		self.vsync = flags.vsync
 		love.window.setVSync(self.vsync)
@@ -37,6 +43,10 @@ WindowManager.update = function(self)
 		self.fullscreentype = flags.fullscreentype
 		self:setFullscreen(self.fullscreen, self.fullscreentype)
 	end
+	if self.cursor ~= graphics.cursor then
+		self.cursor = graphics.cursor
+		self:setCursor()
+	end
 end
 
 WindowManager.receive = function(self, event)
@@ -45,6 +55,16 @@ WindowManager.receive = function(self, event)
 		self.fullscreen = not self.fullscreen
 		mode.flags.fullscreen = self.fullscreen
 		self:setFullscreen(self.fullscreen, mode.flags.fullscreentype)
+	end
+end
+
+WindowManager.setCursor = function(self)
+	if self.cursor == "circle" then
+		cursor:setCircleCursor()
+	elseif self.cursor == "arrow" then
+		cursor:setArrowCursor()
+	elseif self.cursor == "system" then
+		cursor:setSystemCursor()
 	end
 end
 

@@ -162,6 +162,13 @@ local settings = {
 		format = "%d"
 	},
 	{
+		name = "cursor",
+		section = "graphics",
+		key = "graphics.cursor",
+		type = "stepper",
+		values = {"circle", "arrow", "system"}
+	},
+	{
 		name = "dim gameplay",
 		section = "graphics",
 		key = "graphics.dim.gameplay",

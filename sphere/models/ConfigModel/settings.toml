@@ -20,6 +20,7 @@ pauseRetry = 0.5
 
 [graphics]
 fps = 240
+cursor = "circle"
 [graphics.dim]
 select = 0.5
 gameplay = 0.8
