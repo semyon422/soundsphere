@@ -5,8 +5,6 @@ local tween = require("tween")
 
 local GraphicEngine = Class:new()
 
-GraphicEngine.offset = 0
-
 GraphicEngine.construct = function(self)
 	self.observable = Observable:new()
 
@@ -71,10 +69,6 @@ GraphicEngine.receive = function(self, event)
 		end
 		return
 	end
-end
-
-GraphicEngine.setVisualOffset = function(self, offset)
-	self.offset = offset
 end
 
 GraphicEngine.getLogicalNote = function(self, noteData)

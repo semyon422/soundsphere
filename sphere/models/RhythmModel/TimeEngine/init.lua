@@ -22,6 +22,7 @@ TimeEngine.baseTimeRate = 1
 TimeEngine.timeRate = 0
 TimeEngine.targetTimeRate = 0
 TimeEngine.backwardCounter = 0
+TimeEngine.offset = 0
 
 TimeEngine.load = function(self)
 	self.startTime = -self.timeToPrepare
@@ -43,6 +44,10 @@ end
 
 TimeEngine.updateTimeToPrepare = function(self)
 	self.timeManager.offset = -self.timeToPrepare * self:getBaseTimeRate()
+end
+
+TimeEngine.setOffset = function(self, offset)
+	self.offset = offset
 end
 
 TimeEngine.createTimeRateHandler = function(self)
@@ -78,8 +83,10 @@ TimeEngine.sync = function(self, time, dt)
 
 	timeManager:update()
 
-	self.currentTime = timeManager:getTime()
-	self.exactCurrentTime = timeManager:getExactTime()
+	-- print("time manager time", timeManager:getTime())
+	-- print("time manager time + offset", timeManager:getTime() + self.offset)
+	self.currentTime = timeManager:getTime() + self.offset
+	self.exactCurrentTime = timeManager:getExactTime() + self.offset
 	self:sendState()
 end
 
@@ -89,6 +96,7 @@ TimeEngine.sendState = function(self)
 		time = self.exactCurrentTime,
 		currentTime = self.currentTime,
 		exactCurrentTime = self.exactCurrentTime,
+		exactCurrentTimeNoOffset = self.exactCurrentTime - self.offset,
 		timeRate = self.timeRate
 	})
 end

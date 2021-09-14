@@ -46,7 +46,7 @@ AudioEngine.receive = function(self, event)
 		soundNote.audioEngine = self
 		return soundNote:receive(event)
 	elseif event.name == "TimeState" then
-		self.currentTime = event.exactCurrentTime
+		self.currentTime = event.exactCurrentTimeNoOffset
 		self:setTimeRate(event.timeRate)
 	end
 end

@@ -248,8 +248,8 @@ RhythmModel.setInputOffset = function(self, offset)
 	self.inputManager:setInputOffset(offset)
 end
 
-RhythmModel.setVisualOffset = function(self, offset)
-	self.graphicEngine:setVisualOffset(offset)
+RhythmModel.setNoteOffset = function(self, offset)
+	self.timeEngine:setOffset(offset)
 end
 
 RhythmModel.setScoreBasePath = function(self, path)

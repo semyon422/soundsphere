@@ -7,7 +7,7 @@ replayType = "NanoChart"
 needTimeRound = true
 [gameplay.offset]
 note = 0
-judgement = 0
+input = 0
 [gameplay.bga]
 video = false
 image = true

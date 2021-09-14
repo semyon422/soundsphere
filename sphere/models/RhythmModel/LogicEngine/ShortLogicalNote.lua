@@ -52,7 +52,12 @@ ShortLogicalNote.processTimeState = function(self, timeState)
 end
 
 ShortLogicalNote.processAuto = function(self)
-	local deltaTime = self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
+	local currentTime = self.logicEngine.exactCurrentTimeNoOffset
+	if self.logicEngine.autoplay then
+		currentTime = self.logicEngine.currentTime
+	end
+
+	local deltaTime = currentTime - self.startNoteData.timePoint.absoluteTime
 	if deltaTime >= 0 then
 		self.keyState = true
 		self:sendState("keyState")

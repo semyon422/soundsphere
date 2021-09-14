@@ -12,6 +12,7 @@ end
 LogicEngine.load = function(self)
 	self.sharedLogicalNotes = {}
 	self.currentTime = 0
+	self.exactCurrentTimeNoOffset = -math.huge
 	self.events = {}
 
 	self:loadNoteHandlers()
@@ -49,6 +50,7 @@ end
 LogicEngine._receive = function(self, event)
 	if event.name == "TimeState" then
 		self.currentTime = event.exactCurrentTime
+		self.exactCurrentTimeNoOffset = event.exactCurrentTimeNoOffset
 		return
 	end
 
