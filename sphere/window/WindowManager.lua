@@ -38,7 +38,7 @@ WindowManager.update = function(self)
 		self.vsync = flags.vsync
 		love.window.setVSync(self.vsync)
 	end
-	if self.fullscreen ~= flags.fullscreen or self.fullscreentype ~= flags.fullscreentype then
+	if self.fullscreen ~= flags.fullscreen or (self.fullscreen and self.fullscreentype ~= flags.fullscreentype) then
 		self.fullscreen = flags.fullscreen
 		self.fullscreentype = flags.fullscreentype
 		self:setFullscreen(self.fullscreen, self.fullscreentype)
