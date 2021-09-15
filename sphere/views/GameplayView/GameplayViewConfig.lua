@@ -5,6 +5,11 @@ local PlayfieldView = {
 	class = "PlayfieldView"
 }
 
+local BackgroundBlurSwitch = {
+	class = "GaussianBlurView",
+	blur = {key = "settings.graphics.blur.gameplay"}
+}
+
 local Background = {
 	class = "BackgroundView",
 	transform = transform,
@@ -14,7 +19,6 @@ local Background = {
 	h = 1080,
 	parallax = 0.01,
 	dim = {key = "settings.graphics.dim.gameplay"},
-	blur = {key = "settings.graphics.blur.gameplay"}
 }
 
 local BottomScreenMenu = {
@@ -72,7 +76,9 @@ local PauseText = {
 }
 
 local GameplayViewConfig = {
+	BackgroundBlurSwitch,
 	Background,
+	BackgroundBlurSwitch,
 	PlayfieldView,
 	BottomScreenMenu,
 	PauseProgressBar,

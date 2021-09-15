@@ -62,6 +62,7 @@ ResultView.load = function(self)
 	navigator.scoreLibraryModel = self.scoreLibraryModel
 
 	self.backgroundView.settings = self.configModel:getConfig("settings")
+	self.gaussianBlurView.settings = self.configModel:getConfig("settings")
 
 	local sequenceView = self.sequenceView
 	sequenceView:setView("PointGraphView", pointGraphView)

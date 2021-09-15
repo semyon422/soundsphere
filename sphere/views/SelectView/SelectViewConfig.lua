@@ -272,6 +272,11 @@ StageInfo.cells = {
 	},
 }
 
+local BackgroundBlurSwitch = {
+	class = "GaussianBlurView",
+	blur = {key = "settings.graphics.blur.select"}
+}
+
 local Background = {
 	class = "BackgroundView",
 	transform = transform,
@@ -281,7 +286,6 @@ local Background = {
 	h = 1080,
 	parallax = 0.01,
 	dim = {key = "settings.graphics.dim.select"},
-	blur = {key = "settings.graphics.blur.select"}
 }
 
 local Preview = {
@@ -482,6 +486,33 @@ local BottomScreenMenu = {
 	}
 }
 
+local BottomRightScreenMenu = {
+	class = "ScreenMenuView",
+	transform = transform,
+	x = 1300,
+	y = 991,
+	w = 227,
+	h = 89,
+	rows = 1,
+	columns = 1,
+	text = {
+		x = 0,
+		baseline = 54,
+		limit = 228,
+		align = "center",
+		fontSize = 24,
+		fontFamily = "Noto Sans"
+	},
+	items = {
+		{
+			{
+				method = "openOptions",
+				displayName = "options"
+			}
+		}
+	}
+}
+
 local LeftScreenMenu = {
 	class = "ScreenMenuView",
 	transform = transform,
@@ -567,7 +598,9 @@ local Line = {
 }
 
 local SelectViewConfig = {
+	BackgroundBlurSwitch,
 	Background,
+	BackgroundBlurSwitch,
 	Preview,
 	NoteChartSetList,
 	NoteChartList,
@@ -582,6 +615,7 @@ local SelectViewConfig = {
 	ModifierIconGrid,
 	StageInfoModifierIconGrid,
 	BottomScreenMenu,
+	BottomRightScreenMenu,
 	LeftScreenMenu,
 	UpdateStatus,
 

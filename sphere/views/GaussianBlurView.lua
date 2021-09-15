@@ -1,19 +1,46 @@
 
 local Class = require("aqua.util.Class")
+local inside = require("aqua.util.inside")
 
 local GaussianBlurView = Class:new()
 
 GaussianBlurView.sigma = 16
 
-GaussianBlurView.construct = function(self)
-	self:createBlurShader()
-	self.drawCanvas = love.graphics.newCanvas()
-	self.shaderCanvas = love.graphics.newCanvas()
+GaussianBlurView.load = function(self)
+	local state = self.state
+
+	self:setSigma(self.sigma)
+	state.drawCanvas = love.graphics.newCanvas()
+	state.shaderCanvas = love.graphics.newCanvas()
+end
+
+GaussianBlurView.draw = function(self)
+	local config = self.config
+	local state = self.state
+
+	local blur = config.blur.value or inside(self, config.blur.key)
+	if blur == 0 then
+		return
+	end
+
+	if state.sigma ~= blur then
+		self:setSigma(blur)
+	end
+
+	if not state.enabled then
+		self:enable()
+		state.enabled = true
+	else
+		self:disable()
+		state.enabled = false
+	end
 end
 
 -- https://github.com/vrld/moonshine/blob/master/gaussianblur.lua
 GaussianBlurView.createBlurShader = function(self)
-	local sigma = self.sigma
+	local state = self.state
+
+	local sigma = state.sigma
 	sigma = sigma > 0 and sigma or 1
 	local range = math.max(1, math.floor(3 * sigma + 0.5))
 	local norm = 0
@@ -33,47 +60,54 @@ GaussianBlurView.createBlurShader = function(self)
 
 	table.insert(code, ("return c * vec4(%f) * color;}"):format(1 / norm))
 
-	self.shader = love.graphics.newShader(table.concat(code))
-	self.direction = {1, 1}
+	state.shader = love.graphics.newShader(table.concat(code))
+	state.direction = {1, 1}
 end
 
 GaussianBlurView.setSigma = function(self, sigma)
-	if sigma and self.sigma ~= sigma then
-		self.sigma = sigma
+	local state = self.state
+	if sigma and state.sigma ~= sigma then
+		state.sigma = sigma
 		self:createBlurShader()
 	end
 end
 
 GaussianBlurView.enable = function(self)
+	local state = self.state
 	local width, height = love.graphics.getDimensions()
 
-	local drawCanvas = self.drawCanvas
-	local shaderCanvas = self.shaderCanvas
+	local drawCanvas = state.drawCanvas
+	local shaderCanvas = state.shaderCanvas
 	local cw, ch = shaderCanvas:getDimensions()
 	if cw ~= width or ch ~= height then
-		self.drawCanvas = love.graphics.newCanvas(width, height)
-		self.shaderCanvas = love.graphics.newCanvas(width, height)
-		drawCanvas = self.drawCanvas
-		shaderCanvas = self.shaderCanvas
+		state.drawCanvas = love.graphics.newCanvas(width, height)
+		state.shaderCanvas = love.graphics.newCanvas(width, height)
+		drawCanvas = state.drawCanvas
+		shaderCanvas = state.shaderCanvas
 	end
 
-	self.oldShader = love.graphics.getShader()
-	self.oldCanvas = love.graphics.getCanvas()
+	state.oldShader = love.graphics.getShader()
+	state.oldCanvas = love.graphics.getCanvas()
 
-	love.graphics.setCanvas(drawCanvas)
+	love.graphics.setCanvas({drawCanvas, stencil=true})
+	love.graphics.clear()
+	love.graphics.clear(0, 0, 0, 0)
 end
 
 GaussianBlurView.disable = function(self)
-	local shader = self.shader
-	local direction = self.direction
-	local drawCanvas = self.drawCanvas
-	local shaderCanvas = self.shaderCanvas
-	local oldShader = self.oldShader
-	local oldCanvas = self.oldCanvas
+	local state = self.state
+
+	local shader = state.shader
+	local direction = state.direction
+	local drawCanvas = state.drawCanvas
+	local shaderCanvas = state.shaderCanvas
+	local oldShader = state.oldShader
+	local oldCanvas = state.oldCanvas
 	local width, height = love.graphics.getDimensions()
 
 	love.graphics.origin()
 	love.graphics.setCanvas(shaderCanvas)
+	love.graphics.clear(0, 0, 0, 0)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setShader(shader)
 

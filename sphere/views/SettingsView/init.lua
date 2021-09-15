@@ -36,6 +36,7 @@ SettingsView.load = function(self)
 	settingsListView.settingsModel = self.settingsModel
 
 	self.backgroundView.settings = configSettings
+	self.gaussianBlurView.settings = configSettings
 
 	local sequenceView = self.sequenceView
 	sequenceView:setView("SectionsListView", sectionsListView)

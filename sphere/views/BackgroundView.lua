@@ -3,14 +3,9 @@ local Class = require("aqua.util.Class")
 local frame_draw = require("aqua.graphics.frame_draw")
 local map = require("aqua.math").map
 local transform = require("aqua.graphics.transform")
-local GaussianBlurView = require("sphere.views.GaussianBlurView")
 local inside = require("aqua.util.inside")
 
 local BackgroundView = Class:new()
-
-BackgroundView.construct = function(self)
-	self.gaussianBlurView = GaussianBlurView:new()
-end
 
 BackgroundView.draw = function(self)
 	local config = self.config
@@ -20,25 +15,7 @@ BackgroundView.draw = function(self)
 		return
 	end
 
-	local blur = config.blur.value or inside(self, config.blur.key)
-	if blur > 0 then
-		return self:drawBlurBackground()
-	end
-
 	self:drawBackground()
-end
-
-BackgroundView.drawBlurBackground = function(self)
-	local config = self.config
-
-	local sigma = config.blur.value or inside(self, config.blur.key)
-	if self.gaussianBlurView.sigma ~= sigma then
-		self.gaussianBlurView:setSigma(sigma)
-	end
-
-	self.gaussianBlurView:enable()
-	self:drawBackground()
-	self.gaussianBlurView:disable()
 end
 
 BackgroundView.drawBackground = function(self)

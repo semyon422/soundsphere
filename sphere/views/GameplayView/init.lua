@@ -68,6 +68,7 @@ GameplayView.load = function(self)
 	inputImageView.root = self.noteSkin.directoryPath
 
 	self.backgroundView.settings = config
+	self.gaussianBlurView.settings = config
 
 	playfieldView:setSequenceConfig(self.noteSkin.playField)
 	playfieldView:setView("RhythmView", rhythmView)

@@ -98,6 +98,11 @@ local AvailableModifierScrollBar = {
 	color = {1, 1, 1, 0.66}
 }
 
+local BackgroundBlurSwitch = {
+	class = "GaussianBlurView",
+	blur = {key = "settings.graphics.blur.select"}
+}
+
 local Background = {
 	class = "BackgroundView",
 	transform = transform,
@@ -107,7 +112,6 @@ local Background = {
 	h = 1080,
 	parallax = 0.01,
 	dim = {key = "settings.graphics.dim.select"},
-	blur = {key = "settings.graphics.blur.select"}
 }
 
 local Rectangle = {
@@ -195,7 +199,9 @@ local BottomScreenMenu = {
 }
 
 local ModifierViewConfig = {
+	BackgroundBlurSwitch,
 	Background,
+	BackgroundBlurSwitch,
 	BottomScreenMenu,
 	AvailableModifierList,
 	ModifierList,

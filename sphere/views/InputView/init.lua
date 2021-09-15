@@ -29,6 +29,7 @@ InputView.load = function(self)
 	noteSkinListView.configInput = config
 
 	self.backgroundView.settings = self.configModel:getConfig("settings")
+	self.gaussianBlurView.settings = self.configModel:getConfig("settings")
 
 	local sequenceView = self.sequenceView
 	sequenceView:setView("InputListView", noteSkinListView)

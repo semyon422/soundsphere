@@ -69,6 +69,11 @@ local UserInfo = {
 	}
 }
 
+local BackgroundBlurSwitch = {
+	class = "GaussianBlurView",
+	blur = {key = "settings.graphics.blur.result"}
+}
+
 local Background = {
 	class = "BackgroundView",
 	transform = transform,
@@ -78,7 +83,6 @@ local Background = {
 	h = 1080,
 	parallax = 0.01,
 	dim = {key = "settings.graphics.dim.result"},
-	blur = {key = "settings.graphics.blur.result"}
 }
 
 local Rectangle = {
@@ -799,7 +803,9 @@ local InspectScoreSystem = {
 }
 
 local NoteSkinViewConfig = {
+	BackgroundBlurSwitch,
 	Background,
+	BackgroundBlurSwitch,
 	BottomScreenMenu,
 	BottomRightScreenMenu,
 	Rectangle,
