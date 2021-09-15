@@ -125,6 +125,7 @@ local NoteChartList = {
 
 local StageInfo = {
 	class = "StageInfoView",
+	subscreen = "score",
 	transform = transform,
 	x = 279,
 	y = 279,
@@ -424,6 +425,7 @@ local ModifierIconGrid = {
 
 local StageInfoModifierIconGrid = {
 	class = "ModifierIconGridView",
+	subscreen = "score",
 	transform = transform,
 	x = 301,
 	y = 598,
@@ -504,12 +506,104 @@ local BottomRightScreenMenu = {
 		fontFamily = "Noto Sans"
 	},
 	items = {
+		--[[
 		{
 			{
 				method = "openOptions",
 				displayName = "options"
 			}
 		}
+		]]
+	}
+}
+
+local NoteChartSubScreenMenu = {
+	class = "ScreenMenuView",
+	transform = transform,
+	x = 279,
+	y = 224,
+	w = 454,
+	h = 55,
+	rows = 1,
+	columns = 4,
+	text = {
+		x = 0,
+		baseline = 35,
+		limit = 454 / 4,
+		align = "center",
+		fontSize = 20,
+		fontFamily = "Noto Sans"
+	},
+	items = {
+		{
+			{},
+			{},
+			{
+				method = "setSubscreen",
+				value = "score",
+				displayName = "score"
+			},
+			{
+				method = "setSubscreen",
+				value = "options",
+				displayName = "options"
+			},
+		}
+	}
+}
+
+local NoteChartOptionsScreenMenu = {
+	class = "ScreenMenuView",
+	subscreen = "options",
+	transform = transform,
+	x = 506,
+	y = 279,
+	w = 454,
+	h = 522,
+	rows = 10,
+	columns = 1,
+	text = {
+		x = 0,
+		baseline = 36,
+		limit = 228,
+		align = "left",
+		fontSize = 20,
+		fontFamily = "Noto Sans"
+	},
+	items = {
+		{
+			{
+				method = "openDirectory",
+				displayName = "open directory"
+			}
+		},
+		{
+			{
+				method = "updateCache",
+				displayName = "update cache"
+			}
+		},
+		{
+			{
+				method = "updateCache",
+				value = true,
+				displayName = "update cache (force)"
+			}
+		},
+		--[[
+		{
+			{
+				method = "deleteNoteChart",
+				displayName = "delete notechart"
+			}
+		},
+		{
+			{
+				method = "deleteNoteChartSet",
+				displayName = "delete notechart set"
+			}
+		},
+		]]
 	}
 }
 
@@ -616,6 +710,8 @@ local SelectViewConfig = {
 	StageInfoModifierIconGrid,
 	BottomScreenMenu,
 	BottomRightScreenMenu,
+	NoteChartSubScreenMenu,
+	NoteChartOptionsScreenMenu,
 	LeftScreenMenu,
 	UpdateStatus,
 

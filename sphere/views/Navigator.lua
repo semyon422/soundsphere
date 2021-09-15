@@ -6,7 +6,6 @@ local Navigator = Class:new()
 
 Navigator.construct = function(self)
 	self.observable = Observable:new()
-	self.debugHidden = true
 	self.subscreens = {}
 end
 
@@ -32,6 +31,16 @@ Navigator.changeScreen = function(self, screenName)
 		name = "changeScreen",
 		screenName = screenName
 	})
+end
+
+Navigator.resetSubscreens = function(self)
+	self.subscreens = {}
+	self:setHidden(nil, true, true)
+end
+
+Navigator.setSubscreen = function(self, subscreen)
+	self:resetSubscreens()
+	self:addSubscreen(subscreen)
 end
 
 Navigator.addSubscreen = function(self, subscreen)

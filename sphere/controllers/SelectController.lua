@@ -126,7 +126,7 @@ SelectController.receive = function(self, event)
 		self.gameController.selectModel:changeSearchMode()
 	elseif event.name == "changeCollapse" then
 		self.gameController.selectModel:changeCollapse()
-	elseif event.action == "playNoteChart" then
+	elseif event.name == "playNoteChart" then
 		self:playNoteChart()
 	elseif event.name == "loadModifiedNoteChart" then
 		self:loadModifiedNoteChart()
@@ -136,6 +136,20 @@ SelectController.receive = function(self, event)
 		self:resetModifiedNoteChart()
 	elseif event.name == "quickLogin" then
 		self.gameController.onlineModel:quickLogin(self.gameController.configModel:getConfig("online").quick_login_key)
+	elseif event.name == "openDirectory" then
+		local selectModel = self.gameController.selectModel
+		local path = selectModel.noteChartItem.noteChartEntry.path:match("^(.+)/.-$")
+		local mountPath = self.gameController.mountModel:getRealPath(path)
+		local realPath =
+			mountPath or
+			love.filesystem.getSource() .. "/" .. path
+		love.system.openURL("file://" .. realPath)
+	elseif event.name == "updateCache" then
+		local selectModel = self.gameController.selectModel
+		local path = selectModel.noteChartItem.noteChartEntry.path:match("^(.+)/.-$")
+		self.gameController.cacheModel:startUpdate(path, event.force)
+	elseif event.name == "deleteNoteChart" then
+	elseif event.name == "deleteNoteChartSet" then
 	end
 end
 

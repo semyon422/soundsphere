@@ -19,7 +19,7 @@ ScreenMenuView.draw = function(self)
 	for i = 1, self.config.rows do
 		for j = 1, self.config.columns do
 			local item = items[i] and items[i][j]
-			if item then
+			if item and item.displayName then
 				local itemView = self.itemView
 				itemView.row = i
 				itemView.column = j

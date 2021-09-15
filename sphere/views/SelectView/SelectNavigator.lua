@@ -4,6 +4,11 @@ local Navigator = require(viewspackage .. "Navigator")
 
 local SelectNavigator = Navigator:new({construct = false})
 
+SelectNavigator.load = function(self)
+	Navigator.load(self)
+	self:setSubscreen("score")
+end
+
 SelectNavigator.receive = function(self, event)
 	if event.name ~= "keypressed" then
 		return
@@ -26,16 +31,31 @@ SelectNavigator.receive = function(self, event)
 	end
 end
 
-SelectNavigator.changeSearchMode = function(self)
+SelectNavigator.openDirectory = function(self)
+	self:send({name = "openDirectory"})
+end
+
+SelectNavigator.updateCache = function(self, force)
 	self:send({
-		name = "changeSearchMode"
+		name = "updateCache",
+		force = force
 	})
 end
 
+SelectNavigator.deleteNoteChart = function(self)
+	self:send({name = "deleteNoteChart"})
+end
+
+SelectNavigator.deleteNoteChartSet = function(self)
+	self:send({name = "deleteNoteChartSet"})
+end
+
+SelectNavigator.changeSearchMode = function(self)
+	self:send({name = "changeSearchMode"})
+end
+
 SelectNavigator.changeCollapse = function(self)
-	self:send({
-		name = "changeCollapse"
-	})
+	self:send({name = "changeCollapse"})
 end
 
 SelectNavigator.scrollNoteChartSet = function(self, direction)
@@ -53,9 +73,7 @@ SelectNavigator.scrollNoteChart = function(self, direction)
 end
 
 SelectNavigator.play = function(self)
-	self:send({
-		action = "playNoteChart"
-	})
+	self:send({name = "playNoteChart"})
 end
 
 SelectNavigator.setSortFunction = function(self, sortFunction)
@@ -80,9 +98,7 @@ SelectNavigator.setSearchString = function(self, text)
 end
 
 SelectNavigator.quickLogin = function(self)
-	self:send({
-		name = "quickLogin"
-	})
+	self:send({name = "quickLogin"})
 end
 
 return SelectNavigator
