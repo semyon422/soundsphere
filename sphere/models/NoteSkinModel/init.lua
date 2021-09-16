@@ -1,8 +1,7 @@
 local Class			= require("aqua.util.Class")
-local aquafs		= require("aqua.filesystem")
-local json			= require("json")
 local ncdk			= require("ncdk")
 local NoteSkin		= require("sphere.models.NoteSkinModel.NoteSkin")
+local TomlNoteSkinLoader = require("sphere.models.NoteSkinModel.TomlNoteSkinLoader")
 
 local NoteSkinModel = Class:new()
 
@@ -21,41 +20,40 @@ NoteSkinModel.load = function(self)
 end
 
 NoteSkinModel.lookup = function(self, directoryPath)
-	for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
+	local items = love.filesystem.getDirectoryItems(directoryPath)
+
+	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
 		local info = love.filesystem.getInfo(path)
-		if info.type == "directory" or info.type == "symlink" then
-			local info = love.filesystem.getInfo(path .. "/metadata.json")
-			if info then
-				self:loadMetaData(path, "metadata.json")
-			end
-		elseif info.type == "file" and itemName:sub(-3, -1) == "zip" then
-			local directoryPath = path:sub(1, -5)
-			aquafs.mount(path, directoryPath, false)
-			local info = love.filesystem.getInfo(directoryPath .. "/metadata.json")
-			if info then
-				self:loadMetaData(directoryPath, "metadata.json")
-			end
+		if info and info.type == "file" and itemName:find("^.+%.skin%.%a-$") then
+			self:loadNoteSKin(path, directoryPath, itemName)
+		elseif info and info.type == "directory" then
+			self:lookup(path)
 		end
 	end
 end
 
-NoteSkinModel.loadMetaData = function(self, path, fileName)
-	local contents = love.filesystem.read(path .. "/" .. fileName)
-	local jsonObject = json.decode(contents)
-
-	local noteSkins = self.noteSkins
-	for _, metaData in ipairs(jsonObject) do
-		local noteSkin = NoteSkin:new()
-
-		noteSkin.name = metaData.name
-		noteSkin.inputMode = ncdk.InputMode:new():setString(metaData.inputMode)
-		noteSkin.type =  metaData.type
-		noteSkin.path = metaData.path
-		noteSkin.directoryPath = path
-
-		noteSkins[#noteSkins + 1] = noteSkin
+NoteSkinModel.loadNoteSKin = function(self, path, directoryPath, itemName)
+	local noteSkin
+	if path:find("^.+%.toml$") then
+		noteSkin = TomlNoteSkinLoader:new():load(path, directoryPath, itemName)
+	elseif path:find("^.+%.lua$") then
+		noteSkin = self:loadLuaFullLatest(path, directoryPath, itemName)
 	end
+	table.insert(self.noteSkins, noteSkin)
+end
+
+NoteSkinModel.loadLuaFullLatest = function(self, path, directoryPath, fileName)
+	local object = assert(love.filesystem.load(path))(path)
+
+	local noteSkin = NoteSkin:new(object)
+	noteSkin.path = path
+	noteSkin.directoryPath = directoryPath
+	noteSkin.fileName = fileName
+	noteSkin.inputMode = ncdk.InputMode:new():setString(noteSkin.inputMode)
+	noteSkin.playField = love.filesystem.load(directoryPath .. "/" .. noteSkin.playField)()
+
+	return noteSkin
 end
 
 NoteSkinModel.getNoteSkins = function(self, inputMode)
@@ -84,7 +82,7 @@ end
 
 NoteSkinModel.setDefaultNoteSkin = function(self, noteSkin)
 	local inputMode = noteSkin.inputMode:getString()
-	self.config.gameplay["noteskin" .. inputMode] = noteSkin.directoryPath .. "/" .. noteSkin.path
+	self.config.gameplay["noteskin" .. inputMode] = noteSkin.path
 end
 
 NoteSkinModel.getNoteSkin = function(self, inputMode)
@@ -97,7 +95,7 @@ NoteSkinModel.getNoteSkin = function(self, inputMode)
 
 	if configValue then
 		for _, noteSkin in ipairs(list) do
-			if noteSkin.directoryPath .. "/" .. noteSkin.path == configValue then
+			if noteSkin.path == configValue then
 				return noteSkin
 			end
 		end

@@ -85,7 +85,6 @@ GameplayController.load = function(self)
 	rhythmModel.inputManager:setInputMode(noteChart.inputMode:getString())
 
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
-	noteSkin:load()
 	rhythmModel:setNoteSkin(noteSkin)
 	view.noteSkin = noteSkin
 
