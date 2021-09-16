@@ -67,10 +67,10 @@ CameraView.receive = function(self, event)
 		local angle = self.sensitivity
 
 		local perspective = self.perspective
-		if not perspective.allowRotateY then
+		if not perspective.ry then
 			dy = 0
 		end
-		if not perspective.allowRotateX then
+		if not perspective.rx then
 			dx = 0
 		end
 		s3dc.rotate(math.rad(-dy) * angle, math.rad(dx) * angle)
