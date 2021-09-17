@@ -16,12 +16,27 @@ SequenceView.setSequenceConfig = function(self, config)
 	end
 end
 
+SequenceView.clone = function(self)
+	local sequenceView = SequenceView:new()
+	for viewClass, view in pairs(self.views) do
+		sequenceView:setView(viewClass, view)
+	end
+	return sequenceView
+end
+
 SequenceView.setView = function(self, viewClass, view)
 	self.views[viewClass] = view
 end
 
-SequenceView.getView = function(self, viewClass)
-	return self.views[viewClass]
+SequenceView.getView = function(self, config)
+	local state = self.states[config]
+	local view = self.views[config.class]
+	if view then
+		view.config = config
+		view.state = state
+		view.sequenceView = self
+		return view
+	end
 end
 
 SequenceView.getState = function(self, config)
@@ -37,7 +52,7 @@ SequenceView.getViewIterator = function(self)
 		for i = index, #sequenceConfig do
 			local config = sequenceConfig[i]
 			local state = states[config]
-			local view = self:getView(config.class)
+			local view = self:getView(config)
 			if view and not state.hidden then
 				view.config = config
 				view.state = state

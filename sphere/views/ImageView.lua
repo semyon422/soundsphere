@@ -34,8 +34,4 @@ ImageView.draw = function(self)
     )
 end
 
-ImageView.update = function(self, dt) end
-ImageView.receive = function(self, event) end
-ImageView.unload = function(self) end
-
 return ImageView

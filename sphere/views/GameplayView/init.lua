@@ -5,7 +5,7 @@ local GameplayViewConfig = require("sphere.views.GameplayView.GameplayViewConfig
 local DiscordGameplayView = require("sphere.views.DiscordGameplayView")
 local ProgressView	= require("sphere.views.GameplayView.ProgressView")
 local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
-local InputImageView	= require("sphere.views.GameplayView.InputImageView")
+local InputView	= require("sphere.views.GameplayView.InputView")
 local GameplayNavigator	= require("sphere.views.GameplayView.GameplayNavigator")
 local SequenceView = require(viewspackage .. "SequenceView")
 local ScreenView = require(viewspackage .. "ScreenView")
@@ -21,7 +21,7 @@ GameplayView.construct = function(self)
 	self.progressView = ProgressView:new()
 	self.menuProgressView = ProgressView:new()
 	self.pointGraphView = PointGraphView:new()
-	self.inputImageView = InputImageView:new()
+	self.inputView = InputView:new()
 	self.discordGameplayView = DiscordGameplayView:new()
 end
 
@@ -32,8 +32,6 @@ GameplayView.load = function(self)
 	local progressView = self.progressView
 	local menuProgressView = self.menuProgressView
 	local pointGraphView = self.pointGraphView
-	local imageView = self.imageView
-	local inputImageView = self.inputImageView
 	local discordGameplayView = self.discordGameplayView
 	local sequenceView = self.sequenceView
 	local configModel = self.configModel
@@ -64,8 +62,8 @@ GameplayView.load = function(self)
 	pointGraphView.scoreSystem = self.scoreSystem
 	pointGraphView.noteChartModel = self.noteChartModel
 
-	imageView.root = self.noteSkin.directoryPath
-	inputImageView.root = self.noteSkin.directoryPath
+	self.imageView.root = self.noteSkin.directoryPath
+	self.imageAnimationView.root = self.noteSkin.directoryPath
 
 	self.backgroundView.settings = config
 	self.gaussianBlurView.settings = config
@@ -75,8 +73,10 @@ GameplayView.load = function(self)
 	playfieldView:setView("ValueView", valueView)
 	playfieldView:setView("ProgressView", progressView)
 	playfieldView:setView("PointGraphView", pointGraphView)
-	playfieldView:setView("InputImageView", inputImageView)
+	playfieldView:setView("InputView", self.inputView)
 	playfieldView:setView("CameraView", self.cameraView)
+	playfieldView:setView("ImageView", self.imageView)
+	playfieldView:setView("ImageAnimationView", self.imageAnimationView)
 	playfieldView:load()
 
 	sequenceView:setView("PlayfieldView", playfieldView)

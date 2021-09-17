@@ -16,6 +16,7 @@ local ValueView = require(viewspackage .. "ValueView")
 local ImageView = require(viewspackage .. "ImageView")
 local CameraView = require(viewspackage .. "CameraView")
 local GaussianBlurView = require(viewspackage .. "GaussianBlurView")
+local ImageAnimationView = require(viewspackage .. "ImageAnimationView")
 
 local ScreenView = Class:new()
 
@@ -34,6 +35,7 @@ ScreenView.construct = function(self)
 	self.imageView = ImageView:new()
 	self.cameraView = CameraView:new()
 	self.gaussianBlurView = GaussianBlurView:new()
+	self.imageAnimationView = ImageAnimationView:new()
 end
 
 ScreenView.load = function(self)
@@ -64,6 +66,7 @@ ScreenView.load = function(self)
 	sequenceView:setView("ImageView", self.imageView)
 	sequenceView:setView("CameraView", cameraView)
 	sequenceView:setView("GaussianBlurView", self.gaussianBlurView)
+	sequenceView:setView("ImageAnimationView", self.imageAnimationView)
 	sequenceView:load()
 
 	navigator:load()
