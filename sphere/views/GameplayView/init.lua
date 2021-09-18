@@ -7,6 +7,7 @@ local ProgressView	= require("sphere.views.GameplayView.ProgressView")
 local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
 local InputView	= require("sphere.views.GameplayView.InputView")
 local GameplayNavigator	= require("sphere.views.GameplayView.GameplayNavigator")
+local LightingView = require("sphere.views.GameplayView.LightingView")
 local SequenceView = require(viewspackage .. "SequenceView")
 local ScreenView = require(viewspackage .. "ScreenView")
 
@@ -23,6 +24,7 @@ GameplayView.construct = function(self)
 	self.pointGraphView = PointGraphView:new()
 	self.inputView = InputView:new()
 	self.discordGameplayView = DiscordGameplayView:new()
+	self.lightingView = LightingView:new()
 end
 
 GameplayView.load = function(self)
@@ -64,6 +66,7 @@ GameplayView.load = function(self)
 
 	self.imageView.root = self.noteSkin.directoryPath
 	self.imageAnimationView.root = self.noteSkin.directoryPath
+	self.lightingView.root = self.noteSkin.directoryPath
 
 	self.backgroundView.settings = config
 	self.gaussianBlurView.settings = config
@@ -77,6 +80,7 @@ GameplayView.load = function(self)
 	playfieldView:setView("CameraView", self.cameraView)
 	playfieldView:setView("ImageView", self.imageView)
 	playfieldView:setView("ImageAnimationView", self.imageAnimationView)
+	playfieldView:setView("LightingView", self.lightingView)
 	playfieldView:load()
 
 	sequenceView:setView("PlayfieldView", playfieldView)
