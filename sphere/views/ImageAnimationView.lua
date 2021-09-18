@@ -1,4 +1,3 @@
-
 local transform = require("aqua.graphics.transform")
 local Class = require("aqua.util.Class")
 local Animation = require("aqua.util.Animation")
@@ -19,7 +18,8 @@ ImageAnimationView.load = function(self)
 	state.animation = animation
 
 	local images = {}
-	for i = config.range[1], config.range[2] do
+	local range = config.range
+	for i = range[1], range[2], range[1] < range[2] and 1 or -1 do
 		images[i] = love.graphics.newImage(self.root .. "/" .. config.image:format(i))
 	end
 	state.images = images
