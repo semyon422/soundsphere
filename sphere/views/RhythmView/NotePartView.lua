@@ -13,16 +13,16 @@ NotePartView.get = function(self, key, timeState)
 	return self.noteView.noteSkin:get(self.noteView, self.name, key, timeState or self.timeState)
 end
 
-NotePartView.getSpriteBatch = function(self)
-	return self.noteView.rhythmView:getSpriteBatch(self.noteView, self.name)
+NotePartView.getSpriteBatch = function(self, key, timeState)
+	return self.noteView.rhythmView:getSpriteBatch(self.noteView, self.name, key or "image", timeState or self.timeState)
 end
 
-NotePartView.getQuad = function(self)
-	return self.noteView.rhythmView:getQuad(self.noteView, self.name)
+NotePartView.getQuad = function(self, key, timeState)
+	return self.noteView.rhythmView:getQuad(self.noteView, self.name, key or "image", timeState or self.timeState)
 end
 
-NotePartView.getDimensions = function(self)
-	return self.noteView.rhythmView:getDimensions(self.noteView, self.name)
+NotePartView.getDimensions = function(self, key, timeState)
+	return self.noteView.rhythmView:getDimensions(self.noteView, self.name, key or "image", timeState or self.timeState)
 end
 
 return NotePartView

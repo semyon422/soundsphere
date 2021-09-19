@@ -11,7 +11,7 @@ ImageAnimationView.load = function(self)
 	local state = self.state
 
 	local animation = Animation:new()
-	animation.cycles = config.cycles
+	animation.cycles = 1
 	animation.range = config.range
 	animation.rate = config.rate
 	animation.time = math.huge
@@ -26,7 +26,7 @@ ImageAnimationView.load = function(self)
 end
 
 ImageAnimationView.reset = function(self)
-	self.state.animation.time = self.config.time
+	self.state.animation.time = 0
 end
 
 ImageAnimationView.draw = function(self)
