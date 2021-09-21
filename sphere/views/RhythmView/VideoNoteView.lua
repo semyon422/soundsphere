@@ -1,5 +1,4 @@
 local NoteView = require("sphere.views.RhythmView.NoteView")
-local NotePartView = require("sphere.views.RhythmView.NotePartView")
 local ImageNoteView		= require("sphere.views.RhythmView.ImageNoteView")
 local video			= require("aqua.video")
 
@@ -10,7 +9,7 @@ VideoNoteView.timeRate = 0
 VideoNoteView.construct = function(self)
 	NoteView.construct(self)
 	self.images = self.startNoteData.images
-	self.headView = NotePartView:new({}, self, "Head")
+	self.headView = self:newNotePartView("Head")
 	self.timeState = self.graphicalNote.timeState
 	self.logicalState = self.graphicalNote.logicalNote:getLastState()
 	self.headView.timeState = self.timeState

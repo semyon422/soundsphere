@@ -1,11 +1,10 @@
 local NoteView = require("sphere.views.RhythmView.NoteView")
-local NotePartView = require("sphere.views.RhythmView.NotePartView")
 
 local ShortNoteView = NoteView:new({construct = false})
 
 ShortNoteView.construct = function(self)
 	NoteView.construct(self)
-	self.headView = NotePartView:new({}, self, "Head")
+	self.headView = self:newNotePartView("Head")
 end
 
 ShortNoteView.update = function(self)

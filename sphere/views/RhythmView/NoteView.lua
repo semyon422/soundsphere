@@ -1,9 +1,10 @@
 local Class = require("aqua.util.Class")
+local NotePartView = require("sphere.views.RhythmView.NotePartView")
 
 local NoteView = Class:new()
 
-NoteView.getCS = function(self)
-	return self.noteSkin:getCS(self)
+NoteView.newNotePartView = function(self, part)
+	return NotePartView:new({}, self, part)
 end
 
 NoteView.getNext = function(self, offset)
