@@ -25,8 +25,12 @@ ImageAnimationView.load = function(self)
 	state.images = images
 end
 
-ImageAnimationView.reset = function(self)
-	self.state.animation.time = 0
+ImageAnimationView.setTime = function(self, time)
+	self.state.animation.time = time
+end
+
+ImageAnimationView.setCycles = function(self, cycles)
+	self.state.animation.cycles = cycles
 end
 
 ImageAnimationView.draw = function(self)

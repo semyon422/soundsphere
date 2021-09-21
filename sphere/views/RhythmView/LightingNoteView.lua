@@ -1,12 +1,11 @@
-local transform = require("aqua.graphics.transform")
 local NoteView = require("sphere.views.RhythmView.NoteView")
-local NotePartView = require("sphere.views.RhythmView.NotePartView")
+local ShortNoteView = require("sphere.views.RhythmView.ShortNoteView")
 
 local LightingNoteView = NoteView:new()
 
 LightingNoteView.construct = function(self)
 	NoteView.construct(self)
-	self.headView = NotePartView:new({}, self, "Head")
+	self.headView = self:newNotePartView("Head")
 end
 
 LightingNoteView.draw = function(self)
@@ -18,21 +17,29 @@ LightingNoteView.draw = function(self)
 	spriteBatch:add(self:getDraw(self.headView:getQuad(), self:getTransformParams()))
 end
 
-LightingNoteView.getTransformParams = function(self)
-	local hw = self.headView
-	local w, h = hw:getDimensions()
-	return
-		hw:get("x"),
-		hw:get("y"),
-		hw:get("r"),
-		hw:get("w") / w,
-		hw:get("h") / h,
-		hw:get("ox") * w,
-		hw:get("oy") * h
-end
+LightingNoteView.getTransformParams = ShortNoteView.getTransformParams
 
 LightingNoteView.update = function(self)
-	self.headView.timeState = self.graphicalNote.startTimeState or self.graphicalNote.timeState
+	local timeState = self.graphicalNote.startTimeState or self.graphicalNote.timeState
+	self.headView.timeState = timeState
+	local logicalState = self.graphicalNote.logicalNote:getLastState()
+	if
+		not self.startTime and (
+			logicalState == "passed" or
+			logicalState == "startPassedPressed" or
+			logicalState == "startMissedPressed"
+		)
+	then
+		self.startTime = timeState.currentTime
+	end
+	if
+		self.startTime and
+		logicalState ~= "passed" and
+		logicalState ~= "startPassedPressed" and
+		logicalState ~= "startMissedPressed"
+	then
+		self.startTime = nil
+	end
 end
 
 return LightingNoteView

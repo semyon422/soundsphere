@@ -8,33 +8,22 @@ InputView.load = function(self)
 
 	if config.pressed then
 		state.pressed = self.sequenceView:getView(config.pressed).state
+		state.pressed.hidden = true
 	end
 	if config.released then
 		state.released = self.sequenceView:getView(config.released).state
-	end
-	if config.mode == "switch" and state.pressed then
-		state.pressed.hidden = true
 	end
 end
 
 InputView.receive = function(self, event)
 	local config = self.config
-	local state = self.state
 
 	local key = event.args and event.args[1]
 	if key == config.inputType .. config.inputIndex then
 		if event.name == "keypressed" then
-			if config.mode == "switch" then
-				self:switchPressed(true)
-			elseif config.mode == "reset" and config.pressed then
-				self.sequenceView:getView(config.pressed):reset()
-			end
+			self:switchPressed(true)
 		elseif event.name == "keyreleased" then
-			if config.mode == "switch" then
-				self:switchPressed(false)
-			elseif config.mode == "reset" and config.released then
-				self.sequenceView:getView(config.released):reset()
-			end
+			self:switchPressed(false)
 		end
 	end
 end
