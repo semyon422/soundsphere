@@ -84,8 +84,8 @@ ImageAnimationView.draw = function(self)
 			config.x,
 			config.y,
 			0,
-			config.w / image:getWidth(),
-			config.h / image:getHeight()
+			config.w / config.quad[3],
+			config.h / config.quad[4]
 		)
 		return
 	end
