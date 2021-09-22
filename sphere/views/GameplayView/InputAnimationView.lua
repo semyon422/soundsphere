@@ -32,7 +32,8 @@ InputAnimationView.receive = function(self, event)
 			if config.hold then
 				local time = 0
 				if config.pressed then
-					time = config.pressed.frames / config.pressed.rate
+					local range = config.pressed.range
+					time = (math.abs(range[2] - range[1]) + 1) / config.pressed.rate
 				end
 				self.sequenceView:getView(config.hold):setCycles(math.huge)
 				self.sequenceView:getView(config.hold):setTime(-time)
