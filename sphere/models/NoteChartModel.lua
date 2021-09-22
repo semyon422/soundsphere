@@ -4,7 +4,7 @@ local NoteChartFactory			= require("notechart.NoteChartFactory")
 local NoteChartModel = Class:new()
 
 NoteChartModel.load = function(self)
-	local config = self.configModel:getConfig("select")
+	local config = self.configModel.configs.select
 
 	local cacheManager = self.cacheModel.cacheManager
 

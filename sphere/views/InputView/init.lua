@@ -18,7 +18,7 @@ end
 InputView.load = function(self)
 	local navigator = self.navigator
 	local noteSkinListView = self.noteSkinListView
-	local config = self.configModel:getConfig("input")
+	local config = self.configModel.configs.input
 
 	navigator.noteChartModel = self.noteChartModel
 	navigator.inputModel = self.inputModel
@@ -28,8 +28,8 @@ InputView.load = function(self)
 	noteSkinListView.inputModel = self.inputModel
 	noteSkinListView.configInput = config
 
-	self.backgroundView.settings = self.configModel:getConfig("settings")
-	self.gaussianBlurView.settings = self.configModel:getConfig("settings")
+	self.backgroundView.settings = self.configModel.configs.settings
+	self.gaussianBlurView.settings = self.configModel.configs.settings
 
 	local sequenceView = self.sequenceView
 	sequenceView:setView("InputListView", noteSkinListView)

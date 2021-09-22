@@ -41,7 +41,7 @@ GameplayView.load = function(self)
 	local configModel = self.configModel
 	local cameraView = self.cameraView
 
-	local config = configModel:getConfig("settings")
+	local config = configModel.configs.settings
 
 	self.navigator.rhythmModel = self.rhythmModel
 

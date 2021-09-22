@@ -17,7 +17,7 @@ InputModel.types = {
 }
 
 InputModel.load = function(self)
-	self.inputBindings = self.configModel:getConfig("input")
+	self.inputBindings = self.configModel.configs.input
 end
 
 InputModel.unload = function(self) end

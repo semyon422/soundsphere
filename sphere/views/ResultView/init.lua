@@ -56,13 +56,13 @@ ResultView.load = function(self)
 	stageInfoView.scoreEngine = self.rhythmModel.scoreEngine
 
 	userInfoView.navigator = navigator
-	userInfoView.onlineConfig = self.configModel:getConfig("online")
+	userInfoView.onlineConfig = self.configModel.configs.online
 
 	navigator.selectModel = self.selectModel
 	navigator.scoreLibraryModel = self.scoreLibraryModel
 
-	self.backgroundView.settings = self.configModel:getConfig("settings")
-	self.gaussianBlurView.settings = self.configModel:getConfig("settings")
+	self.backgroundView.settings = self.configModel.configs.settings
+	self.gaussianBlurView.settings = self.configModel.configs.settings
 
 	local sequenceView = self.sequenceView
 	sequenceView:setView("PointGraphView", pointGraphView)

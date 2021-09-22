@@ -7,7 +7,7 @@ OnlineController.construct = function(self)
 end
 
 OnlineController.load = function(self)
-	local config = self.configModel:getConfig("online")
+	local config = self.configModel.configs.online
 	local token = config.token
 	if #token == 0 then
 		print("creating new token")
@@ -21,7 +21,7 @@ OnlineController.load = function(self)
 end
 
 OnlineController.receive = function(self, event)
-	local config = self.configModel:getConfig("online")
+	local config = self.configModel.configs.online
 	if event.name == "ScoreSubmitResponse" then
 		print(event.response.message)
 		print("Server received the score")
@@ -110,7 +110,7 @@ OnlineController.submitReplay = function(self, replayHash, url)
 end
 
 OnlineController.update = function(self, dt)
-	local config = self.configModel:getConfig("online")
+	local config = self.configModel.configs.online
 	local token = config.token
 	if #token == 0 then
 		return

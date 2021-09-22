@@ -8,7 +8,7 @@ MountModel.configPath = "userdata/mount.json"
 MountModel.chartsPath = "userdata/charts"
 
 MountModel.load = function(self)
-	self.mountInfo = self.configModel:getConfig("mount")
+	self.mountInfo = self.configModel.configs.mount
 
 	for _, entry in ipairs(self.mountInfo) do
 		aquafs.mount(entry[1], entry[2], 1)

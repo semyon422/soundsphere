@@ -58,7 +58,7 @@ GameplayController.load = function(self)
 
 	local localOffset = noteChartModel.noteChartDataEntry.localOffset
 
-	local config = configModel:getConfig("settings")
+	local config = configModel.configs.settings
 
 	rhythmModel:setVolume("global", config.audio.volume.master)
 	rhythmModel:setVolume("music", config.audio.volume.music)
@@ -112,7 +112,7 @@ GameplayController.load = function(self)
 end
 
 GameplayController.getImporterSettings = function(self)
-	local config = self.gameController.configModel:getConfig("settings")
+	local config = self.gameController.configModel.configs.settings
 	return {
 		midiConstantVolume = config.audio.midi.constantVolume
 	}
@@ -149,7 +149,7 @@ GameplayController.receive = function(self, event)
 		self:unload()
 		self:load()
 	elseif event.name == "saveCamera" then
-		local perspective = self.gameController.configModel:getConfig("settings").graphics.perspective
+		local perspective = self.gameController.configModel.configs.settings.graphics.perspective
 		perspective.x = event.x
 		perspective.y = event.y
 		perspective.z = event.z
@@ -193,13 +193,13 @@ GameplayController.saveScore = function(self)
 	if scoreSystemEntry.score > 0 and rhythmModel.replayModel.mode ~= "replay" and not rhythmModel.logicEngine.autoplay then
 		replayModel.noteChartModel = noteChartModel
 		replayModel.modifierModel = modifierModel
-		replayModel.replayType = self.gameController.configModel:getConfig("settings").gameplay.replayType
+		replayModel.replayType = self.gameController.configModel.configs.settings.gameplay.replayType
 		local replayHash = replayModel:saveReplay()
 		local scoreEntry = self.gameController.scoreModel:insertScore(scoreSystemEntry, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
 		self.gameController.onlineModel:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
 
 		rhythmModel.scoreEngine.scoreEntry = scoreEntry
-		local config = self.gameController.configModel:getConfig("select")
+		local config = self.gameController.configModel.configs.select
 		config.scoreEntryId = scoreEntry.id
 		self.gameController.selectModel:pullScore()
 

@@ -60,13 +60,13 @@ SelectView.load = function(self)
 	stageInfoView.scoreLibraryModel = self.scoreLibraryModel
 
 	userInfoView.navigator = navigator
-	userInfoView.onlineConfig = self.configModel:getConfig("online")
+	userInfoView.onlineConfig = self.configModel.configs.online
 
 	sortStepperView.sortModel = self.sortModel
 	sortStepperView.navigator = navigator
 
-	self.backgroundView.settings = self.configModel:getConfig("settings")
-	self.gaussianBlurView.settings = self.configModel:getConfig("settings")
+	self.backgroundView.settings = self.configModel.configs.settings
+	self.gaussianBlurView.settings = self.configModel.configs.settings
 
 	local sequenceView = self.sequenceView
 	sequenceView:setView("NoteChartSetListView", noteChartSetListView)

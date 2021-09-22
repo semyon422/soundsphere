@@ -10,7 +10,7 @@ TimeController.receive = function(self, event)
 	local timeEngine = rhythmModel.timeEngine
 	local graphicEngine = rhythmModel.graphicEngine
 
-	local config = configModel:getConfig("settings")
+	local config = configModel.configs.settings
 	local input = config.input
 	local gameplay = config.general
 

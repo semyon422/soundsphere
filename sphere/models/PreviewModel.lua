@@ -9,7 +9,7 @@ PreviewModel.construct = function(self)
 end
 
 PreviewModel.load = function(self)
-	self.config = self.configModel:getConfig("select")
+	self.config = self.configModel.configs.select
 	self.noteChartDataEntryId = 0
 	self.audioPath = ""
 	self.previewTime = 0
@@ -82,7 +82,7 @@ PreviewModel.play = function(self, path, position)
 		end
 	end
 
-	local config = self.configModel:getConfig("settings")
+	local config = self.configModel.configs.settings
 	local audio = AudioFactory:getAudio(path, config.audio.mode.preview)
 
 	if not audio then

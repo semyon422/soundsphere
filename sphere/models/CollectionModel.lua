@@ -3,7 +3,7 @@ local Class = require("aqua.util.Class")
 local CollectionModel = Class:new()
 
 CollectionModel.load = function(self)
-	self.config = self.configModel:getConfig("select")
+	self.config = self.configModel.configs.select
 	local collectionPath = self.config.collection
 
 	local dict = {}

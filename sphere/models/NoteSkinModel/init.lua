@@ -15,7 +15,7 @@ NoteSkinModel.inputMode = ""
 
 NoteSkinModel.load = function(self)
 	self.noteSkins = {}
-	self.config = self.configModel:getConfig("settings")
+	self.config = self.configModel.configs.settings
 	return self:lookup(self.path)
 end
 

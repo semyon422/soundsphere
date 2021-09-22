@@ -31,8 +31,8 @@ CollectionView.load = function(self)
 	collectionListView.navigator = navigator
 	collectionListView.view = self
 
-	self.backgroundView.settings = self.configModel:getConfig("settings")
-	self.gaussianBlurView.settings = self.configModel:getConfig("settings")
+	self.backgroundView.settings = self.configModel.configs.settings
+	self.gaussianBlurView.settings = self.configModel.configs.settings
 
 	local sequenceView = self.sequenceView
 	sequenceView:setView("CollectionListView", collectionListView)

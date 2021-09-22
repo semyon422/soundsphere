@@ -30,8 +30,8 @@ ModifierView.load = function(self)
 	modifierListView.navigator = navigator
 	modifierListView.modifierModel = self.modifierModel
 
-	self.backgroundView.settings = self.configModel:getConfig("settings")
-	self.gaussianBlurView.settings = self.configModel:getConfig("settings")
+	self.backgroundView.settings = self.configModel.configs.settings
+	self.gaussianBlurView.settings = self.configModel.configs.settings
 
 	local sequenceView = self.sequenceView
 	sequenceView:setView("AvailableModifierListView", availableModifierListView)

@@ -13,8 +13,8 @@ UpdateModel.filesUrl = ""
 UpdateModel.construct = function(self) end
 
 UpdateModel.load = function(self)
-	local settings = self.configModel:getConfig("settings")
-	local online = self.configModel:getConfig("online")
+	local settings = self.configModel.configs.settings
+	local online = self.configModel.configs.online
 
 	self.filesUrl = online.update
 	if not settings.miscellaneous.autoUpdate or online.update == "" or self.thread then

@@ -12,10 +12,6 @@ ConfigModel.construct = function(self)
 	self.formats = {}
 end
 
-ConfigModel.getConfig = function(self, name)
-	return assert(self.configs[name])
-end
-
 ConfigModel.addConfig = function(self, name, path, defaultPath, format)
 	local configs = self.configs
 	local paths = self.paths

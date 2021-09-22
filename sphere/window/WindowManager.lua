@@ -6,7 +6,7 @@ local WindowManager = Class:new()
 WindowManager.path = "userdata/window.json"
 
 WindowManager.load = function(self)
-	self.graphics = self.configModel:getConfig("settings").graphics
+	self.graphics = self.configModel.configs.settings.graphics
 	self.mode = self.graphics.mode
 	local mode = self.mode
 	local flags = mode.flags

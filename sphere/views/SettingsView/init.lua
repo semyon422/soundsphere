@@ -21,7 +21,7 @@ SettingsView.load = function(self)
 	local navigator = self.navigator
 	local sectionsListView = self.sectionsListView
 	local settingsListView = self.settingsListView
-	local configSettings = self.configModel:getConfig("settings")
+	local configSettings = self.configModel.configs.settings
 
 	navigator.config = configSettings
 	navigator.settingsModel = self.settingsModel

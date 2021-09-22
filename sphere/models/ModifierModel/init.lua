@@ -98,7 +98,7 @@ ModifierModel.construct = function(self)
 end
 
 ModifierModel.load = function(self)
-	local config = self.configModel:getConfig("modifier")
+	local config = self.configModel.configs.modifier
 	self.config = config
 
 	self.availableModifierItemIndex = 1

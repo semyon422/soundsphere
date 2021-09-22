@@ -27,7 +27,7 @@ OnlineModel.load = function(self)
 	onlineScoreManager.onlineModel = self
 	authManager.onlineModel = self
 
-	local config = self.configModel:getConfig("online")
+	local config = self.configModel.configs.online
 	self:setHost(config.host)
 	self:setSession(config.session)
 	self:setUserId(config.userId)

@@ -23,7 +23,7 @@ end
 BackgroundModel.load = function(self)
 	ThreadPool.observable:add(self)
 
-	self.config = self.configModel:getConfig("select")
+	self.config = self.configModel.configs.select
 	self.noteChartDataEntryId = 0
 	self.backgroundPath = ""
 end

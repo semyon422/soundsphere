@@ -13,8 +13,8 @@ SettingsModel.construct = function(self)
 end
 
 SettingsModel.load = function(self)
-	self.config = self.configModel:getConfig("settings")
-	self.config_model = self.configModel:getConfig("settings_model")
+	self.config = self.configModel.configs.settings
+	self.config_model = self.configModel.configs.settings_model
 
 	self:loadStructure()
 end

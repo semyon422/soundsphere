@@ -3,7 +3,7 @@ local Class = require("aqua.util.Class")
 local SelectModel = Class:new()
 
 SelectModel.load = function(self)
-	local config = self.configModel:getConfig("select")
+	local config = self.configModel.configs.select
 	self.config = config
 
 	self.searchModel:setSearchString(config.searchString)
