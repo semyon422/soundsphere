@@ -41,11 +41,6 @@ GameplayController.load = function(self)
 	timeController.configModel = configModel
 	timeController.notificationModel = notificationModel
 
-	modifierModel.rhythmModel = rhythmModel
-	modifierModel.noteChartModel = noteChartModel
-
-	rhythmModel.modifierModel = modifierModel
-
 	local noteChart = noteChartModel:loadNoteChart(self:getImporterSettings())
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart

@@ -24,15 +24,8 @@ end
 
 FastplayController.load = function(self)
 	local noteChartModel = self.gameController.noteChartModel
-	local modifierModel = self.gameController.modifierModel
 	local difficultyModel = self.gameController.difficultyModel
 	local rhythmModel = self.gameController.rhythmModel
-
-	rhythmModel.modifierModel = modifierModel
-
-	modifierModel.rhythmModel = rhythmModel
-	modifierModel.noteChartModel = noteChartModel
-
 	noteChartModel:load()
 
 	local noteChart = noteChartModel:loadNoteChart()

@@ -3,7 +3,6 @@ local Class				= require("aqua.util.Class")
 local ResultController = Class:new()
 
 ResultController.load = function(self)
-	local modifierModel = self.gameController.modifierModel
 	local themeModel = self.gameController.themeModel
 
 	local theme = themeModel:getTheme()

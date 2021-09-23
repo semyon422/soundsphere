@@ -101,6 +101,59 @@ GameController.load = function(self)
 	local selectModel = self.selectModel
 	local updateModel = self.updateModel
 	local fpsLimiter = self.fpsLimiter
+	local rhythmModel = self.rhythmModel
+	local noteChartSetLibraryModel = self.noteChartSetLibraryModel
+	local noteChartLibraryModel = self.noteChartLibraryModel
+	local searchModel = self.searchModel
+	local scoreLibraryModel = self.scoreLibraryModel
+	local sortModel = self.sortModel
+	local previewModel = self.previewModel
+
+	onlineController.onlineModel = onlineModel
+	onlineController.cacheModel = cacheModel
+	onlineController.configModel = configModel
+
+	noteChartModel.cacheModel = cacheModel
+	noteChartModel.configModel = configModel
+	noteChartModel.scoreModel = scoreModel
+	noteSkinModel.configModel = configModel
+	modifierModel.noteChartModel = noteChartModel
+	modifierModel.difficultyModel = difficultyModel
+	modifierModel.scoreModel = scoreModel
+	modifierModel.configModel = configModel
+	modifierModel.rhythmModel = rhythmModel
+	inputModel.configModel = configModel
+	rhythmModel.modifierModel = modifierModel
+	noteChartSetLibraryModel.cacheModel = cacheModel
+	noteChartSetLibraryModel.collectionModel = collectionModel
+	noteChartSetLibraryModel.searchModel = searchModel
+	noteChartLibraryModel.cacheModel = cacheModel
+	noteChartLibraryModel.searchModel = searchModel
+	scoreLibraryModel.scoreModel = scoreModel
+	selectModel.collectionModel = collectionModel
+	selectModel.configModel = configModel
+	selectModel.searchModel = searchModel
+	selectModel.noteChartSetLibraryModel = noteChartSetLibraryModel
+	selectModel.noteChartLibraryModel = noteChartLibraryModel
+	selectModel.sortModel = sortModel
+	selectModel.scoreLibraryModel = scoreLibraryModel
+	selectModel.collectionModel = collectionModel
+	previewModel.configModel = configModel
+	previewModel.cacheModel = cacheModel
+	searchModel.scoreModel = scoreModel
+	settingsModel.configModel = configModel
+	themeModel.configModel = configModel
+	mountModel.configModel = configModel
+	mountController.mountModel = mountModel
+	updateModel.configModel = configModel
+	windowManager.configModel = configModel
+	screenshot.configModel = configModel
+	fpsLimiter.configModel = configModel
+	onlineModel.configModel = configModel
+	backgroundModel.configModel = configModel
+	backgroundModel.cacheModel = cacheModel
+	collectionModel.configModel = configModel
+	collectionModel.cacheModel = cacheModel
 
 	directoryManager:createDirectories()
 
@@ -126,70 +179,27 @@ GameController.load = function(self)
 	configModel:readConfig("result")
 	configModel:readConfig("online")
 
-	onlineController.onlineModel = onlineModel
-	onlineController.cacheModel = cacheModel
-	onlineController.configModel = configModel
-
-	noteChartModel.cacheModel = cacheModel
-	noteChartModel.configModel = configModel
-	noteChartModel.scoreModel = scoreModel
-	noteSkinModel.configModel = configModel
-	modifierModel.noteChartModel = noteChartModel
-	modifierModel.difficultyModel = difficultyModel
-	modifierModel.scoreModel = scoreModel
-	modifierModel.configModel = configModel
-	inputModel.configModel = configModel
-
-	settingsModel.configModel = configModel
 	settingsModel:load()
-
-	themeModel.configModel = configModel
 	themeModel:load()
-
-	selectModel.collectionModel = collectionModel
-
 	modifierModel:load()
-
-	mountModel.configModel = configModel
-
-	mountController.mountModel = mountModel
 	mountModel:load()
-
 	notificationModel.observable:add(notificationView)
 	notificationView:load()
-
-	updateModel.configModel = configModel
 	updateModel:load()
-
-	windowManager.configModel = configModel
 	windowManager:load()
-
-	screenshot.configModel = configModel
-	fpsLimiter.configModel = configModel
-
 	scoreModel:select()
-	-- configModel:read()
-
-	onlineModel.configModel = configModel
 	onlineModel.observable:add(onlineController)
 	onlineModel:load()
-
 	inputModel:load()
 	noteSkinModel:load()
 	cacheModel:load()
 	noteChartModel:load()
-
 	onlineController:load()
-
 	DiscordPresence:load()
-
-	backgroundModel.configModel = configModel
-	backgroundModel.cacheModel = cacheModel
 	backgroundModel:load()
-
-	collectionModel.configModel = configModel
-	collectionModel.cacheModel = self.cacheModel
 	collectionModel:load()
+	selectModel:load()
+	previewModel:load()
 
 	self.screenManager:setTransition(self.fadeTransition)
 

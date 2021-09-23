@@ -3,50 +3,16 @@ local Class					= require("aqua.util.Class")
 local SelectController = Class:new()
 
 SelectController.load = function(self)
-	local modifierModel = self.gameController.modifierModel
-	local noteSkinModel = self.gameController.noteSkinModel
 	local noteChartModel = self.gameController.noteChartModel
-	local inputModel = self.gameController.inputModel
-	local cacheModel = self.gameController.cacheModel
 	local themeModel = self.gameController.themeModel
-	local configModel = self.gameController.configModel
-	local mountModel = self.gameController.mountModel
-	local scoreModel = self.gameController.scoreModel
-	local onlineModel = self.gameController.onlineModel
-	local difficultyModel = self.gameController.difficultyModel
-	local backgroundModel = self.gameController.backgroundModel
-	local collectionModel = self.gameController.collectionModel
-	local noteChartSetLibraryModel = self.gameController.noteChartSetLibraryModel
-	local noteChartLibraryModel = self.gameController.noteChartLibraryModel
-	local scoreLibraryModel = self.gameController.scoreLibraryModel
-	local sortModel = self.gameController.sortModel
-	local searchModel = self.gameController.searchModel
 	local selectModel = self.gameController.selectModel
 	local previewModel = self.gameController.previewModel
-	local updateModel = self.gameController.updateModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
 
 	local view = theme:newView("SelectView")
 	self.view = view
-
-	noteChartSetLibraryModel.cacheModel = cacheModel
-	noteChartSetLibraryModel.collectionModel = collectionModel
-	noteChartSetLibraryModel.searchModel = searchModel
-	noteChartLibraryModel.cacheModel = cacheModel
-	noteChartLibraryModel.searchModel = searchModel
-	scoreLibraryModel.scoreModel = scoreModel
-	selectModel.collectionModel = collectionModel
-	selectModel.configModel = configModel
-	selectModel.searchModel = searchModel
-	selectModel.noteChartSetLibraryModel = noteChartSetLibraryModel
-	selectModel.noteChartLibraryModel = noteChartLibraryModel
-	selectModel.sortModel = sortModel
-	selectModel.scoreLibraryModel = scoreLibraryModel
-	previewModel.configModel = configModel
-	previewModel.cacheModel = cacheModel
-	searchModel.scoreModel = scoreModel
 
 	view.controller = self
 	view.gameController = self.gameController
