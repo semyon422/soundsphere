@@ -19,14 +19,15 @@ BackgroundView.draw = function(self)
 end
 
 BackgroundView.drawBackground = function(self)
+	local backgroundModel = self.gameController.backgroundModel
 	local config = self.config
 
 	local tf = transform(config.transform)
 	love.graphics.replaceTransform(tf)
 	tf:release()
 
-	local images = self.backgroundModel.images
-	local alpha = self.backgroundModel.alpha
+	local images = backgroundModel.images
+	local alpha = backgroundModel.alpha
 
 	local dim = 1 - (config.dim.value or inside(self, config.dim.key))
 	local r, g, b = dim, dim, dim

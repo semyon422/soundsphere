@@ -2,8 +2,6 @@ local Class = require("aqua.util.Class")
 
 local SettingsController = Class:new()
 
-SettingsController.construct = function(self) end
-
 SettingsController.load = function(self)
 	local themeModel = self.gameController.themeModel
 
@@ -14,9 +12,7 @@ SettingsController.load = function(self)
 	self.view = view
 
 	view.controller = self
-	view.configModel = self.gameController.configModel
-	view.settingsModel = self.gameController.settingsModel
-	view.backgroundModel = self.gameController.backgroundModel
+	view.gameController = self.gameController
 
 	view:load()
 end

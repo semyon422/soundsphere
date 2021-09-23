@@ -31,6 +31,9 @@ end
 SequenceView.getView = function(self, config)
 	local state = self.states[config]
 	local view = self.views[config.class]
+	if not view and self.sequenceView then
+		view = self.sequenceView.views[config.class]
+	end
 	if view then
 		view.config = config
 		view.state = state

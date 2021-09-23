@@ -13,6 +13,8 @@ end
 TimeManager.load = function(self)
 	self:loadTimePoints()
 	self:reset()
+	self.eventTime = nil
+	self.eventDelta = nil
 end
 
 TimeManager.getAdjustTime = function(self)

@@ -28,7 +28,9 @@ AudioEngine.updateVolume = function(self)
 	self.foregroundContainer:setVolume(self.globalVolume * self.effectsVolume)
 end
 
-AudioEngine.load = function(self) end
+AudioEngine.load = function(self)
+	self.loaded = true
+end
 
 AudioEngine.update = function(self)
 	self.backgroundContainer:update()
@@ -38,9 +40,13 @@ end
 AudioEngine.unload = function(self)
 	self.backgroundContainer:stop()
 	self.foregroundContainer:stop()
+	self.loaded = false
 end
 
 AudioEngine.receive = function(self, event)
+	if not self.loaded then
+		return
+	end
 	if event.name == "LogicalNoteState" then
 		local soundNote = SoundNoteFactory:getNote(event.note)
 		soundNote.audioEngine = self

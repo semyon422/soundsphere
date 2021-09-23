@@ -12,11 +12,11 @@ NoteChartSetListView.construct = function(self)
 end
 
 NoteChartSetListView.reloadItems = function(self)
-	self.state.items = self.noteChartSetLibraryModel.items
+	self.state.items = self.gameController.noteChartSetLibraryModel.items
 end
 
 NoteChartSetListView.getItemIndex = function(self)
-	return self.selectModel.noteChartSetItemIndex
+	return self.gameController.selectModel.noteChartSetItemIndex
 end
 
 NoteChartSetListView.scrollUp = function(self)

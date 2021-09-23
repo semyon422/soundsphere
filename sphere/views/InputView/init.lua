@@ -8,32 +8,21 @@ local InputListView = require(viewspackage .. "InputView.InputListView")
 
 local InputView = ScreenView:new({construct = false})
 
+InputView.views = {
+	{"inputListView", InputListView, "InputListView"},
+}
+
 InputView.construct = function(self)
 	ScreenView.construct(self)
 	self.viewConfig = InputViewConfig
 	self.navigator = InputNavigator:new()
-	self.noteSkinListView = InputListView:new()
+	self:createViews(ScreenView.views)
+	self:createViews(self.views)
 end
 
 InputView.load = function(self)
-	local navigator = self.navigator
-	local noteSkinListView = self.noteSkinListView
-	local config = self.configModel.configs.input
-
-	navigator.noteChartModel = self.noteChartModel
-	navigator.inputModel = self.inputModel
-
-	noteSkinListView.navigator = navigator
-	noteSkinListView.noteChartModel = self.noteChartModel
-	noteSkinListView.inputModel = self.inputModel
-	noteSkinListView.configInput = config
-
-	self.backgroundView.settings = self.configModel.configs.settings
-	self.gaussianBlurView.settings = self.configModel.configs.settings
-
-	local sequenceView = self.sequenceView
-	sequenceView:setView("InputListView", noteSkinListView)
-
+	self:loadViews(ScreenView.views)
+	self:loadViews(self.views)
 	ScreenView.load(self)
 end
 

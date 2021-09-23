@@ -1,17 +1,13 @@
 local Class						= require("aqua.util.Class")
-local RhythmModel				= require("sphere.models.RhythmModel")
 
 local FastplayController = Class:new()
-
-FastplayController.construct = function(self)
-	self.rhythmModel = RhythmModel:new()
-end
 
 FastplayController.play = function(self)
 	self:loadTimePoints()
 	self:load()
 
-	local timeEngine = self.rhythmModel.timeEngine
+	local rhythmModel = self.gameController.rhythmModel
+	local timeEngine = rhythmModel.timeEngine
 	local absoluteTimeList = self.absoluteTimeList
 	for i = 1, #absoluteTimeList do
 		local time = absoluteTimeList[i]
@@ -19,7 +15,7 @@ FastplayController.play = function(self)
 		timeEngine.exactCurrentTime = time
 		timeEngine:sendState()
 		self:update()
-		self.rhythmModel.replayModel:update()
+		rhythmModel.replayModel:update()
 		self:update()
 	end
 
@@ -30,7 +26,7 @@ FastplayController.load = function(self)
 	local noteChartModel = self.gameController.noteChartModel
 	local modifierModel = self.gameController.modifierModel
 	local difficultyModel = self.gameController.difficultyModel
-	local rhythmModel = self.rhythmModel
+	local rhythmModel = self.gameController.rhythmModel
 
 	rhythmModel.modifierModel = modifierModel
 
@@ -53,16 +49,17 @@ FastplayController.load = function(self)
 	scoreEngine.baseAverageStrain = averageStrain
 	scoreEngine.generalizedKeymode = generalizedKeymode
 
-	self.rhythmModel.timeEngine:setTimeRate(self.rhythmModel.timeEngine:getBaseTimeRate())
+	self.gameController.rhythmModel.timeEngine:setTimeRate(rhythmModel.timeEngine:getBaseTimeRate())
 end
 
 FastplayController.unload = function(self)
-	self.rhythmModel:unloadLogicEngines()
-	self.rhythmModel:unload()
+	local rhythmModel = self.gameController.rhythmModel
+	rhythmModel:unloadAllEngines()
+	rhythmModel:unload()
 end
 
 FastplayController.update = function(self, dt)
-	local rhythmModel = self.rhythmModel
+	local rhythmModel = self.gameController.rhythmModel
 	rhythmModel.logicEngine:update()
 	rhythmModel.scoreEngine:update()
 	rhythmModel.modifierModel:update()
@@ -72,13 +69,13 @@ FastplayController.draw = function(self)
 end
 
 FastplayController.receive = function(self, event)
-	self.rhythmModel:receive(event)
+	self.gameController.rhythmModel:receive(event)
 end
 
 FastplayController.loadTimePoints = function(self)
 	local absoluteTimes = {}
 
-	local events = self.rhythmModel.replayModel.replay.events
+	local events = self.gameController.rhythmModel.replayModel.replay.events
 	for i = 1, #events do
 		absoluteTimes[events[i].time] = true
 	end

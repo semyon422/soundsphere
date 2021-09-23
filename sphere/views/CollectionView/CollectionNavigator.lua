@@ -24,7 +24,7 @@ end
 
 CollectionNavigator.scrollCollection = function(self, direction)
 	direction = direction == "up" and -1 or 1
-	local collections = self.collectionModel.items
+	local collections = self.gameController.collectionModel.items
 	if not collections[self.collectionItemIndex + direction] then
 		return
 	end
@@ -32,7 +32,7 @@ CollectionNavigator.scrollCollection = function(self, direction)
 end
 
 CollectionNavigator.setCollection = function(self, itemIndex)
-	local collections = self.collectionModel.items
+	local collections = self.gameController.collectionModel.items
 	self:send({
 		name = "setCollection",
 		collection = collections[itemIndex or self.collectionItemIndex]
@@ -41,7 +41,7 @@ CollectionNavigator.setCollection = function(self, itemIndex)
 end
 
 CollectionNavigator.updateCache = function(self)
-	local collections = self.collectionModel.items
+	local collections = self.gameController.collectionModel.items
 	self:send({
 		name = "updateCache",
 		collection = collections[self.collectionItemIndex],

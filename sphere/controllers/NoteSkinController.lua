@@ -2,8 +2,6 @@ local Class = require("aqua.util.Class")
 
 local NoteSkinController = Class:new()
 
-NoteSkinController.construct = function(self) end
-
 NoteSkinController.load = function(self)
 	local noteChartModel = self.gameController.noteChartModel
 	local themeModel = self.gameController.themeModel
@@ -15,21 +13,7 @@ NoteSkinController.load = function(self)
 	self.view = view
 
 	view.controller = self
-	view.themeModel = themeModel
-	view.noteChartModel = self.gameController.noteChartModel
-	view.modifierModel = self.gameController.modifierModel
-	view.noteSkinModel = self.gameController.noteSkinModel
-	view.inputModel = self.gameController.inputModel
-	view.cacheModel = self.gameController.cacheModel
-	view.configModel = self.gameController.configModel
-	view.mountModel = self.gameController.mountModel
-	view.scoreModel = self.gameController.scoreModel
-	view.onlineModel = self.gameController.onlineModel
-	view.noteChartSetLibraryModel = self.gameController.noteChartSetLibraryModel
-	view.noteChartLibraryModel = self.gameController.noteChartLibraryModel
-	view.scoreLibraryModel = self.gameController.scoreLibraryModel
-	view.searchLineModel = self.gameController.searchLineModel
-	view.backgroundModel = self.gameController.backgroundModel
+	view.gameController = self.gameController
 
 	noteChartModel:load()
 

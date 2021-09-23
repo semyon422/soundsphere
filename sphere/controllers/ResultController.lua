@@ -12,15 +12,8 @@ ResultController.load = function(self)
 	local view = theme:newView("ResultView")
 	self.view = view
 
-	view.modifierModel = modifierModel
 	view.controller = self
-
-	view.rhythmModel = self.rhythmModel
-	view.noteChartModel = self.gameController.noteChartModel
-	view.selectModel = self.gameController.selectModel
-	view.scoreLibraryModel = self.gameController.scoreLibraryModel
-	view.configModel = self.gameController.configModel
-	view.backgroundModel = self.gameController.backgroundModel
+	view.gameController = self.gameController
 
 	view:load()
 end
@@ -41,7 +34,7 @@ ResultController.receive = function(self, event)
 	self.view:receive(event)
 
 	if event.name == "changeScreen" then
-		self.gameController.modifierModel.config = self.gameController.configModel:getConfig("modifier")
+		self.gameController.modifierModel.config = self.gameController.configModel.configs.modifier
 		self.gameController.screenManager:set(self.selectController)
 	elseif event.name == "loadScore" then
 		self:replayNoteChart(event.mode, event.scoreEntry, event.itemIndex)
@@ -69,7 +62,8 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 	end
 
 	local hash = scoreEntry.replayHash
-	local replay = gameplayController.rhythmModel.replayModel:loadReplay(hash)
+	local rhythmModel = self.gameController.rhythmModel
+	local replay = rhythmModel.replayModel:loadReplay(hash)
 
 	local modifierModel = self.gameController.modifierModel
 	modifierModel.config = modifierModel:decode(scoreEntry.modifiers)
@@ -79,13 +73,13 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 	end
 
 	if mode == "replay" or mode == "result" then
-		gameplayController.rhythmModel.scoreEngine.scoreEntry = scoreEntry
-		gameplayController.rhythmModel.replayModel.replay = replay
-		gameplayController.rhythmModel.inputManager:setMode("internal")
-		gameplayController.rhythmModel.replayModel:setMode("replay")
+		rhythmModel.scoreEngine.scoreEntry = scoreEntry
+		rhythmModel.replayModel.replay = replay
+		rhythmModel.inputManager:setMode("internal")
+		rhythmModel.replayModel:setMode("replay")
 	elseif mode == "retry" then
-		gameplayController.rhythmModel.inputManager:setMode("external")
-		gameplayController.rhythmModel.replayModel:setMode("record")
+		rhythmModel.inputManager:setMode("external")
+		rhythmModel.replayModel:setMode("record")
 	end
 
 	gameplayController.selectController = self.gameController.selectController
@@ -94,16 +88,14 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 	if mode == "result" then
 		gameplayController:play()
 
-		self.rhythmModel = gameplayController.rhythmModel
 		local view = self.view
 		if view then
-			view.rhythmModel = self.rhythmModel
 			view:unload()
 			view:load()
 		end
 
-		gameplayController.rhythmModel.scoreEngine.scoreEntry = scoreEntry
-		local config = self.gameController.configModel:getConfig("select")
+		rhythmModel.scoreEngine.scoreEntry = scoreEntry
+		local config = self.gameController.configModel.configs.select
 		config.scoreEntryId = scoreEntry.id
 		if itemIndex then
 			self.gameController.selectModel:scrollScore(nil, itemIndex)

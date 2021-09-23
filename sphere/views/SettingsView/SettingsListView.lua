@@ -47,8 +47,8 @@ SettingsListView.getItemView = function(self, settingConfig)
 end
 
 SettingsListView.reloadItems = function(self)
-	self.state.items = self.settingsModel.sections[self.navigator.sectionItemIndex]
-    self.state.sectionName = self.settingsModel.sections[self.navigator.sectionItemIndex][1].section
+	self.state.items = self.gameController.settingsModel.sections[self.navigator.sectionItemIndex]
+    self.state.sectionName = self.gameController.settingsModel.sections[self.navigator.sectionItemIndex][1].section
 end
 
 SettingsListView.getItemIndex = function(self)

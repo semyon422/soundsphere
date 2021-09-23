@@ -12,9 +12,9 @@ InputListView.construct = function(self)
 end
 
 InputListView.reloadItems = function(self)
-    local noteChart = self.noteChartModel.noteChart
+    local noteChart = self.gameController.noteChartModel.noteChart
     local inputModeString = noteChart.inputMode:getString()
-    self.state.items = self.inputModel:getInputs(inputModeString)
+    self.state.items = self.gameController.inputModel:getInputs(inputModeString)
 	self.inputModeString = inputModeString
 end
 

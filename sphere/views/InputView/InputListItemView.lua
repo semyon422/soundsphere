@@ -15,7 +15,7 @@ InputListItemView.getName = function(self)
 end
 
 InputListItemView.getValue = function(self)
-	return self.listView.inputModel:getKey(self.listView.inputModeString, self.item.virtualKey)
+	return self.listView.gameController.inputModel:getKey(self.listView.inputModeString, self.item.virtualKey)
 end
 
 InputListItemView.isActive = function(self)

@@ -49,7 +49,7 @@ local InputScrollBar = {
 
 local BackgroundBlurSwitch = {
 	class = "GaussianBlurView",
-	blur = {key = "settings.graphics.blur.select"}
+	blur = {key = "gameController.configModel.configs.settings.graphics.blur.select"}
 }
 
 local Background = {
@@ -60,7 +60,7 @@ local Background = {
 	w = 1920,
 	h = 1080,
 	parallax = 0.01,
-	dim = {key = "settings.graphics.dim.select"},
+	dim = {key = "gameController.configModel.configs.settings.graphics.dim.select"},
 }
 
 local Rectangle = {

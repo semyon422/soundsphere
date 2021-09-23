@@ -26,9 +26,9 @@ ResultNavigator.scrollScore = function(self, direction)
 end
 
 ResultNavigator.loadScore = function(self, itemIndex)
-	local scoreEntry = self.selectModel.scoreItem.scoreEntry
+	local scoreEntry = self.gameController.selectModel.scoreItem.scoreEntry
 	if itemIndex then
-		scoreEntry = self.scoreLibraryModel.items[itemIndex].scoreEntry
+		scoreEntry = self.gameController.scoreLibraryModel.items[itemIndex].scoreEntry
 	end
 	self:send({
 		name = "loadScore",
@@ -39,7 +39,7 @@ ResultNavigator.loadScore = function(self, itemIndex)
 end
 
 ResultNavigator.play = function(self, mode)
-	local scoreEntry = self.selectModel.scoreItem.scoreEntry
+	local scoreEntry = self.gameController.selectModel.scoreItem.scoreEntry
 	self:send({
 		name = "loadScore",
 		mode = mode,

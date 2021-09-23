@@ -12,11 +12,11 @@ AvailableModifierListView.construct = function(self)
 end
 
 AvailableModifierListView.reloadItems = function(self)
-	self.state.items = self.modifierModel.modifiers
+	self.state.items = self.gameController.modifierModel.modifiers
 end
 
 AvailableModifierListView.getItemIndex = function(self)
-	return self.modifierModel.availableModifierItemIndex
+	return self.gameController.modifierModel.availableModifierItemIndex
 end
 
 AvailableModifierListView.scrollUp = function(self)

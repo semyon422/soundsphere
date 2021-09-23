@@ -2,10 +2,6 @@ local Class = require("aqua.util.Class")
 
 local ModifierController = Class:new()
 
-
-ModifierController.construct = function(self)
-end
-
 ModifierController.load = function(self)
 	local noteChartModel = self.gameController.noteChartModel
 	local themeModel = self.gameController.themeModel
@@ -17,10 +13,7 @@ ModifierController.load = function(self)
 	self.view = view
 
 	view.controller = self
-	view.noteChartModel = noteChartModel
-	view.modifierModel = self.gameController.modifierModel
-	view.configModel = self.gameController.configModel
-	view.backgroundModel = self.gameController.backgroundModel
+	view.gameController = self.gameController
 
 	noteChartModel:load()
 

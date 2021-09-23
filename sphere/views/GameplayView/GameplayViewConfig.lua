@@ -7,7 +7,7 @@ local PlayfieldView = {
 
 local BackgroundBlurSwitch = {
 	class = "GaussianBlurView",
-	blur = {key = "settings.graphics.blur.gameplay"}
+	blur = {key = "gameController.configModel.configs.settings.graphics.blur.gameplay"}
 }
 
 local Background = {
@@ -18,7 +18,7 @@ local Background = {
 	w = 1920,
 	h = 1080,
 	parallax = 0.01,
-	dim = {key = "settings.graphics.dim.gameplay"},
+	dim = {key = "gameController.configModel.configs.settings.graphics.dim.gameplay"},
 }
 
 local BottomScreenMenu = {
@@ -52,7 +52,7 @@ local BottomScreenMenu = {
 local PauseProgressBar = {
 	class = "ProgressView",
 	current = {
-		key = "rhythmModel.pauseManager.progress",
+		key = "gameController.configModel.configs.rhythmModel.pauseManager.progress",
 	},
 	x = 0, y = 0, w = 1920, h = 20,
 	color = {1, 1, 1, 1},

@@ -48,26 +48,8 @@ SelectController.load = function(self)
 	previewModel.cacheModel = cacheModel
 	searchModel.scoreModel = scoreModel
 
-	view.themeModel = themeModel
-	view.noteChartModel = noteChartModel
-	view.modifierModel = modifierModel
-	view.noteSkinModel = noteSkinModel
-	view.inputModel = inputModel
-	view.cacheModel = cacheModel
-	view.configModel = configModel
-	view.mountModel = mountModel
-	view.scoreModel = scoreModel
-	view.onlineModel = onlineModel
-	view.backgroundModel = backgroundModel
-	view.updateModel = updateModel
-
 	view.controller = self
-	view.noteChartSetLibraryModel = noteChartSetLibraryModel
-	view.noteChartLibraryModel = noteChartLibraryModel
-	view.scoreLibraryModel = scoreLibraryModel
-	view.sortModel = sortModel
-	view.searchModel = searchModel
-	view.selectModel = selectModel
+	view.gameController = self.gameController
 
 	noteChartModel:load()
 	selectModel:load()

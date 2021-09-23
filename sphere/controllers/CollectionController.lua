@@ -13,10 +13,7 @@ CollectionController.load = function(self)
 	self.view = view
 
 	view.controller = self
-	view.cacheModel = self.gameController.cacheModel
-	view.configModel = self.gameController.configModel
-	view.backgroundModel = self.gameController.backgroundModel
-	view.collectionModel = collectionModel
+	view.gameController = self.gameController
 
 	collectionModel:load()
 

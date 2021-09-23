@@ -2,10 +2,6 @@ local Class = require("aqua.util.Class")
 
 local InputController = Class:new()
 
-
-InputController.construct = function(self)
-end
-
 InputController.load = function(self)
 	local noteChartModel = self.gameController.noteChartModel
 	local themeModel = self.gameController.themeModel
@@ -17,11 +13,7 @@ InputController.load = function(self)
 	self.view = view
 
 	view.controller = self
-	view.themeModel = themeModel
-	view.noteChartModel = self.gameController.noteChartModel
-	view.inputModel = self.gameController.inputModel
-	view.configModel = self.gameController.configModel
-	view.backgroundModel = self.gameController.backgroundModel
+	view.gameController = self.gameController
 
 	noteChartModel:load()
 

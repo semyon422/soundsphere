@@ -12,6 +12,7 @@ ModifierIconGridView.construct = function(self)
 end
 
 ModifierIconGridView.draw = function(self)
+	local modifierModel = self.gameController.modifierModel
 	local config = self.config
 
 	local tf = transform(config.transform):translate(config.x, config.y)
@@ -22,7 +23,6 @@ ModifierIconGridView.draw = function(self)
 
 	local modifierIconView = self.modifierIconView
 	local configModifier = inside(self, config.config)
-	local modifierModel = self.modifierModel
 	if type(configModifier) == "string" then
 		configModifier = modifierModel:decode(configModifier)
 	end

@@ -15,7 +15,7 @@ SettingsListItemSwitchView.getName = function(self)
 end
 
 SettingsListItemSwitchView.getValue = function(self)
-	return self.listView.settingsModel:getValue(self.item)
+	return self.listView.gameController.settingsModel:getValue(self.item)
 end
 
 SettingsListItemSwitchView.setValue = function(self, value)

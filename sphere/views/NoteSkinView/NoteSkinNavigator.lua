@@ -24,8 +24,8 @@ end
 
 NoteSkinNavigator.scrollNoteSkin = function(self, direction)
 	direction = direction == "up" and -1 or 1
-	local noteChart = self.noteChartModel.noteChart
-	local noteSkins = self.noteSkinModel:getNoteSkins(noteChart.inputMode)
+	local noteChart = self.gameController.noteChartModel.noteChart
+	local noteSkins = self.gameController.noteSkinModel:getNoteSkins(noteChart.inputMode)
 	if not noteSkins[self.noteSkinItemIndex + direction] then
 		return
 	end
@@ -33,8 +33,8 @@ NoteSkinNavigator.scrollNoteSkin = function(self, direction)
 end
 
 NoteSkinNavigator.setNoteSkin = function(self, itemIndex)
-	local noteChart = self.noteChartModel.noteChart
-	local noteSkins = self.noteSkinModel:getNoteSkins(noteChart.inputMode)
+	local noteChart = self.gameController.noteChartModel.noteChart
+	local noteSkins = self.gameController.noteSkinModel:getNoteSkins(noteChart.inputMode)
 	self:send({
 		name = "setNoteSkin",
 		noteSkin = noteSkins[itemIndex or self.noteSkinItemIndex]

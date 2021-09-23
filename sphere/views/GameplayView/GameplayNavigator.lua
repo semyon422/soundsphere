@@ -24,21 +24,21 @@ GameplayNavigator.receive = function(self, event)
 		event.name == "focus" and
 		not event.args[1] and
 		self.state ~= "pause" and
-		not self.rhythmModel.logicEngine.autoplay and
-		self.rhythmModel.inputManager.mode ~= "internal"
+		not self.gameController.rhythmModel.logicEngine.autoplay and
+		self.gameController.rhythmModel.inputManager.mode ~= "internal"
 	then
 		self:forcePause()
 	end
 end
 
 GameplayNavigator.update = function(self)
-	local needRetry = self.rhythmModel.pauseManager.needRetry
+	local needRetry = self.gameController.rhythmModel.pauseManager.needRetry
 
 	if needRetry then
 		self:forceRetry()
 	end
 
-	local state = self.rhythmModel.pauseManager.state
+	local state = self.gameController.rhythmModel.pauseManager.state
 	if state == "play" then
 		self:removeSubscreen("pause")
 	elseif state == "pause" then
@@ -47,7 +47,7 @@ GameplayNavigator.update = function(self)
 end
 
 GameplayNavigator.keypressed = function(self, event)
-	local state = self.rhythmModel.pauseManager.state
+	local state = self.gameController.rhythmModel.pauseManager.state
 
 	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
 	local scancode = event.args[2]
@@ -75,7 +75,7 @@ GameplayNavigator.keypressed = function(self, event)
 end
 
 GameplayNavigator.keyreleased = function(self, event)
-	local state = self.rhythmModel.pauseManager.state
+	local state = self.gameController.rhythmModel.pauseManager.state
 
 	local scancode = event.args[2]
 	if state == "play-pause" and scancode == "escape" then

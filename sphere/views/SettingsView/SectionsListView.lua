@@ -12,7 +12,7 @@ SectionsListView.construct = function(self)
 end
 
 SectionsListView.reloadItems = function(self)
-	self.state.items = self.settingsModel.sections
+	self.state.items = self.gameController.settingsModel.sections
 end
 
 SectionsListView.getItemIndex = function(self)

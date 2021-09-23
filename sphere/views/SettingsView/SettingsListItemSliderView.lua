@@ -15,22 +15,22 @@ SettingsListItemSliderView.getName = function(self)
 end
 
 SettingsListItemSliderView.getValue = function(self)
-	return self.listView.settingsModel:getValue(self.item)
+	return self.listView.gameController.settingsModel:getValue(self.item)
 end
 
 SettingsListItemSliderView.getDisplayValue = function(self)
-	return self.listView.settingsModel:getDisplayValue(self.item)
+	return self.listView.gameController.settingsModel:getDisplayValue(self.item)
 end
 
 SettingsListItemSliderView.getNormValue = function(self)
-	return self.listView.settingsModel:toNormValue(self.item)
+	return self.listView.gameController.settingsModel:toNormValue(self.item)
 end
 
 SettingsListItemSliderView.updateNormValue = function(self, normValue)
 	self.listView.navigator:send({
 		name = "setSettingValue",
 		settingConfig = self.item,
-		value = self.listView.settingsModel:fromNormValue(self.item, normValue)
+		value = self.listView.gameController.settingsModel:fromNormValue(self.item, normValue)
 	})
 end
 

@@ -83,8 +83,6 @@ TimeEngine.sync = function(self, time, dt)
 
 	timeManager:update()
 
-	-- print("time manager time", timeManager:getTime())
-	-- print("time manager time + offset", timeManager:getTime() + self.offset)
 	self.currentTime = timeManager:getTime() + self.offset
 	self.exactCurrentTime = timeManager:getExactTime() + self.offset
 	self:sendState()

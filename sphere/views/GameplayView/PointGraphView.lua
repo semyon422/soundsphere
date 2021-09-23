@@ -12,8 +12,8 @@ PointGraphView.load = function(self)
 	state.drawnPoints = 0
 	state.drawnBackgroundPoints = 0
 
-	state.startTime = self.noteChartModel.noteChart.metaData:get("minTime")
-	state.endTime = self.noteChartModel.noteChart.metaData:get("maxTime")
+	state.startTime = self.gameController.noteChartModel.noteChart.metaData:get("minTime")
+	state.endTime = self.gameController.noteChartModel.noteChart.metaData:get("maxTime")
 
 	state.canvas = love.graphics.newCanvas()
 	state.backgroundCanvas = love.graphics.newCanvas()

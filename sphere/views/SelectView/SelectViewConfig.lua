@@ -190,14 +190,14 @@ StageInfo.cells = {
 		x = 1, y = 3,
 		name = "bpm",
 		format = "%d",
-		key = "selectModel.noteChartItem.noteChartDataEntry.bpm"
+		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.bpm"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 2, y = 3,
 		name = "duration",
-		key = "selectModel.noteChartItem.noteChartDataEntry.length",
+		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.length",
 		time = true
 	},
 	{
@@ -205,14 +205,14 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 2, y = 4,
 		name = "notes",
-		key = "selectModel.noteChartItem.noteChartDataEntry.noteCount"
+		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.noteCount"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "bar",
 		x = {3, 4}, y = 4,
 		name = "long notes",
-		key = "selectModel.noteChartItem.noteChartDataEntry.longNoteRatio"
+		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.longNoteRatio"
 	},
 	{
 		type = StageInfo.smallCell,
@@ -221,21 +221,21 @@ StageInfo.cells = {
 		name = "local offset",
 		format = "%d",
 		multiplier = 1000,
-		key = "selectModel.noteChartItem.noteChartDataEntry.localOffset"
+		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.localOffset"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 1, y = 4,
 		name = "level",
-		key = "selectModel.noteChartItem.noteChartDataEntry.level"
+		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.level"
 	},
 	{
 		type = StageInfo.largeCell,
 		valueType = "text",
 		x = 2, y = 1,
 		name = "score",
-		key = "scoreLibraryModel.firstScoreItem.scoreEntry.score",
+		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.score",
 		format = formatScore
 	},
 	{
@@ -243,7 +243,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = {3, 4}, y = 8,
 		name = "played time ago",
-		key = "scoreLibraryModel.firstScoreItem.scoreEntry.time",
+		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.time",
 		ago = true,
 		suffix = ""
 	},
@@ -253,14 +253,14 @@ StageInfo.cells = {
 		x = 3, y = 5,
 		name = "rating",
 		format = "%d",
-		key = "scoreLibraryModel.firstScoreItem.scoreEntry.rating"
+		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.rating"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 4, y = 5,
 		name = "accuracy",
-		key = "scoreLibraryModel.firstScoreItem.scoreEntry.accuracy",
+		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.accuracy",
 		format = formatScore
 	},
 	{
@@ -269,13 +269,13 @@ StageInfo.cells = {
 		x = {3, 4}, y = 6,
 		name = "miss count",
 		format = "%d",
-		key = "scoreLibraryModel.firstScoreItem.scoreEntry.missCount"
+		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.missCount"
 	},
 }
 
 local BackgroundBlurSwitch = {
 	class = "GaussianBlurView",
-	blur = {key = "settings.graphics.blur.select"}
+	blur = {key = "gameController.configModel.configs.settings.graphics.blur.select"}
 }
 
 local Background = {
@@ -286,7 +286,7 @@ local Background = {
 	w = 1920,
 	h = 1080,
 	parallax = 0.01,
-	dim = {key = "settings.graphics.dim.select"},
+	dim = {key = "gameController.configModel.configs.settings.graphics.dim.select"},
 }
 
 local Preview = {
@@ -336,7 +336,7 @@ local Logo = {
 local UserInfo = {
 	class = "UserInfoView",
 	transform = transform,
-	key = "onlineConfig.username",
+	key = "gameController.configModel.configs.online.username",
 	file = "userdata/avatar.png",
 	x = 1187,
 	y = 0,
@@ -420,7 +420,7 @@ local ModifierIconGrid = {
 	h = 136,
 	columns = 6,
 	rows = 2,
-	config = "modifierModel.config"
+	config = "gameController.modifierModel.config"
 }
 
 local StageInfoModifierIconGrid = {
@@ -433,14 +433,14 @@ local StageInfoModifierIconGrid = {
 	h = 138,
 	columns = 4,
 	rows = 3,
-	config = "scoreLibraryModel.firstScoreItem.scoreEntry.modifiers",
+	config = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.modifiers",
 	noModifier = true
 }
 
 local UpdateStatus = {
 	class = "ValueView",
 	transform = transform,
-	key = "updateModel.status",
+	key = "gameController.updateModel.status",
 	x = 0,
 	baseline = 1070,
 	limit = 1920,

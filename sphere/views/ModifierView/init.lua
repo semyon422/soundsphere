@@ -9,34 +9,22 @@ local ModifierListView = require(viewspackage .. "ModifierView.ModifierListView"
 
 local ModifierView = ScreenView:new({construct = false})
 
+ModifierView.views = {
+	{"availableModifierListView", AvailableModifierListView, "AvailableModifierListView"},
+	{"modifierListView", ModifierListView, "ModifierListView"},
+}
+
 ModifierView.construct = function(self)
 	ScreenView.construct(self)
 	self.viewConfig = ModifierViewConfig
 	self.navigator = ModifierNavigator:new()
-	self.availableModifierListView = AvailableModifierListView:new()
-	self.modifierListView = ModifierListView:new()
+	self:createViews(ScreenView.views)
+	self:createViews(self.views)
 end
 
 ModifierView.load = function(self)
-	local navigator = self.navigator
-	local availableModifierListView = self.availableModifierListView
-	local modifierListView = self.modifierListView
-
-	navigator.modifierModel = self.modifierModel
-
-	availableModifierListView.navigator = navigator
-	availableModifierListView.modifierModel = self.modifierModel
-
-	modifierListView.navigator = navigator
-	modifierListView.modifierModel = self.modifierModel
-
-	self.backgroundView.settings = self.configModel.configs.settings
-	self.gaussianBlurView.settings = self.configModel.configs.settings
-
-	local sequenceView = self.sequenceView
-	sequenceView:setView("AvailableModifierListView", availableModifierListView)
-	sequenceView:setView("ModifierListView", modifierListView)
-
+	self:loadViews(ScreenView.views)
+	self:loadViews(self.views)
 	ScreenView.load(self)
 end
 

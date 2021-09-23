@@ -32,7 +32,7 @@ ModifierListView.load = function(self)
 end
 
 ModifierListView.getItemView = function(self, modifierConfig)
-	local modifier = self.modifierModel:getModifier(modifierConfig)
+	local modifier = self.gameController.modifierModel:getModifier(modifierConfig)
 	if modifier.interfaceType == "toggle" then
 		return self.itemSwitchView
 	elseif modifier.interfaceType == "slider" then
@@ -43,11 +43,11 @@ ModifierListView.getItemView = function(self, modifierConfig)
 end
 
 ModifierListView.reloadItems = function(self)
-	self.state.items = self.modifierModel.config
+	self.state.items = self.gameController.modifierModel.config
 end
 
 ModifierListView.getItemIndex = function(self)
-	return self.modifierModel.modifierItemIndex
+	return self.gameController.modifierModel.modifierItemIndex
 end
 
 ModifierListView.scrollUp = function(self)

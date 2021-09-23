@@ -13,69 +13,26 @@ local ModifierIconGridView = require(viewspackage .. "SelectView.ModifierIconGri
 
 local SelectView = ScreenView:new({construct = false})
 
+SelectView.views = {
+	{"noteChartListView", NoteChartListView, "NoteChartListView"},
+	{"noteChartSetListView", NoteChartSetListView, "NoteChartSetListView"},
+	{"searchFieldView", SearchFieldView, "SearchFieldView"},
+	{"sortStepperView", SortStepperView, "SortStepperView"},
+	{"stageInfoView", StageInfoView, "StageInfoView"},
+	{"modifierIconGridView", ModifierIconGridView, "ModifierIconGridView"},
+}
+
 SelectView.construct = function(self)
 	ScreenView.construct(self)
 	self.viewConfig = SelectViewConfig
 	self.navigator = SelectNavigator:new()
-	self.noteChartListView = NoteChartListView:new()
-	self.noteChartSetListView = NoteChartSetListView:new()
-	self.searchFieldView = SearchFieldView:new()
-	self.sortStepperView = SortStepperView:new()
-	self.stageInfoView = StageInfoView:new()
-	self.modifierIconGridView = ModifierIconGridView:new()
+	self:createViews(ScreenView.views)
+	self:createViews(self.views)
 end
 
 SelectView.load = function(self)
-	local noteChartSetListView = self.noteChartSetListView
-	local noteChartListView = self.noteChartListView
-	local searchFieldView = self.searchFieldView
-	local modifierIconGridView = self.modifierIconGridView
-	local stageInfoView = self.stageInfoView
-	local sortStepperView = self.sortStepperView
-	local valueView = self.valueView
-	local userInfoView = self.userInfoView
-	local navigator = self.navigator
-
-	navigator.selectModel = self.selectModel
-
-	valueView.updateModel = self.updateModel
-
-	noteChartSetListView.navigator = self.navigator
-	noteChartSetListView.noteChartSetLibraryModel = self.noteChartSetLibraryModel
-	noteChartSetListView.selectModel = self.selectModel
-
-	noteChartListView.navigator = self.navigator
-	noteChartListView.noteChartLibraryModel = self.noteChartLibraryModel
-	noteChartListView.selectModel = self.selectModel
-
-	searchFieldView.noteChartSetLibraryModel = self.noteChartSetLibraryModel
-	searchFieldView.searchModel = self.searchModel
-	searchFieldView.navigator = self.navigator
-
-	modifierIconGridView.selectModel = self.selectModel
-	modifierIconGridView.modifierModel = self.modifierModel
-	modifierIconGridView.scoreLibraryModel = self.scoreLibraryModel
-
-	stageInfoView.selectModel = self.selectModel
-	stageInfoView.scoreLibraryModel = self.scoreLibraryModel
-
-	userInfoView.navigator = navigator
-	userInfoView.onlineConfig = self.configModel.configs.online
-
-	sortStepperView.sortModel = self.sortModel
-	sortStepperView.navigator = navigator
-
-	self.backgroundView.settings = self.configModel.configs.settings
-	self.gaussianBlurView.settings = self.configModel.configs.settings
-
-	local sequenceView = self.sequenceView
-	sequenceView:setView("NoteChartSetListView", noteChartSetListView)
-	sequenceView:setView("NoteChartListView", noteChartListView)
-	sequenceView:setView("SearchFieldView", searchFieldView)
-	sequenceView:setView("SortStepperView", self.sortStepperView)
-	sequenceView:setView("StageInfoView", self.stageInfoView)
-	sequenceView:setView("ModifierIconGridView", modifierIconGridView)
-
+	self:loadViews(ScreenView.views)
+	self:loadViews(self.views)
 	ScreenView.load(self)
 end
 

@@ -12,8 +12,8 @@ CollectionListView.construct = function(self)
 end
 
 CollectionListView.reloadItems = function(self)
-	self.state.items = self.collectionModel.items
-    self.state.selectedCollection = self.collectionModel.collection
+	self.state.items = self.gameController.collectionModel.items
+    self.state.selectedCollection = self.gameController.collectionModel.collection
 end
 
 CollectionListView.getItemIndex = function(self)

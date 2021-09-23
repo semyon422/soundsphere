@@ -12,9 +12,9 @@ NoteSkinListView.construct = function(self)
 end
 
 NoteSkinListView.reloadItems = function(self)
-    local noteChart = self.noteChartModel.noteChart
-	self.state.items = self.noteSkinModel:getNoteSkins(noteChart.inputMode)
-    self.state.selectedNoteSkin = self.noteSkinModel:getNoteSkin(noteChart.inputMode)
+    local noteChart = self.gameController.noteChartModel.noteChart
+	self.state.items = self.gameController.noteSkinModel:getNoteSkins(noteChart.inputMode)
+    self.state.selectedNoteSkin = self.gameController.noteSkinModel:getNoteSkin(noteChart.inputMode)
 end
 
 NoteSkinListView.getItemIndex = function(self)

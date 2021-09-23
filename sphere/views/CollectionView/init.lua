@@ -9,35 +9,22 @@ local CacheView = require(viewspackage .. "CollectionView.CacheView")
 
 local CollectionView = ScreenView:new({construct = false})
 
+CollectionView.views = {
+	{"collectionListView", CollectionListView, "CollectionListView"},
+	{"cacheView", CacheView, "CacheView"},
+}
+
 CollectionView.construct = function(self)
 	ScreenView.construct(self)
 	self.viewConfig = CollectionViewConfig
 	self.navigator = CollectionNavigator:new()
-	self.collectionListView = CollectionListView:new()
-	self.cacheView = CacheView:new()
+	self:createViews(ScreenView.views)
+	self:createViews(self.views)
 end
 
 CollectionView.load = function(self)
-	local navigator = self.navigator
-	local collectionListView = self.collectionListView
-	local cacheView = self.cacheView
-
-	navigator.collectionModel = self.collectionModel
-
-	cacheView.navigator = navigator
-	cacheView.cacheModel = self.cacheModel
-
-	collectionListView.collectionModel = self.collectionModel
-	collectionListView.navigator = navigator
-	collectionListView.view = self
-
-	self.backgroundView.settings = self.configModel.configs.settings
-	self.gaussianBlurView.settings = self.configModel.configs.settings
-
-	local sequenceView = self.sequenceView
-	sequenceView:setView("CollectionListView", collectionListView)
-	sequenceView:setView("CacheView", cacheView)
-
+	self:loadViews(ScreenView.views)
+	self:loadViews(self.views)
 	ScreenView.load(self)
 end
 

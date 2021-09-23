@@ -41,7 +41,7 @@ end
 
 SettingsNavigator.scrollSections = function(self, direction)
 	direction = direction == "up" and -1 or 1
-	local sections = self.view.settingsModel.sections
+	local sections = self.gameController.settingsModel.sections
 
 	if not sections[self.sectionItemIndex + direction] then
 		return
@@ -53,7 +53,7 @@ end
 
 SettingsNavigator.scrollSettings = function(self, direction)
 	direction = direction == "up" and -1 or 1
-	local settings = self.settingsModel.sections[self.sectionItemIndex]
+	local settings = self.gameController.settingsModel.sections[self.sectionItemIndex]
 
 	if not settings[self.settingItemIndex + direction] then
 		return
@@ -63,7 +63,7 @@ SettingsNavigator.scrollSettings = function(self, direction)
 end
 
 SettingsNavigator.increaseSettingValue = function(self, itemIndex, delta)
-	local settings = self.settingsModel.sections[self.sectionItemIndex]
+	local settings = self.gameController.settingsModel.sections[self.sectionItemIndex]
 	local settingConfig = settings[itemIndex or self.settingItemIndex]
 	self:send({
 		name = "increaseSettingValue",
@@ -73,7 +73,7 @@ SettingsNavigator.increaseSettingValue = function(self, itemIndex, delta)
 end
 
 SettingsNavigator.setSettingValue = function(self, itemIndex, value)
-	local settings = self.settingsModel.sections[self.sectionItemIndex]
+	local settings = self.gameController.settingsModel.sections[self.sectionItemIndex]
 	local settingConfig = settings[itemIndex or self.settingItemIndex]
 	self:send({
 		name = "setSettingValue",
@@ -91,7 +91,7 @@ SettingsNavigator.resetSetting = function(self, itemIndex)
 end
 
 SettingsNavigator.setInputHandler = function(self, itemIndex)
-	local settings = self.view.settingsModel.sections[self.sectionItemIndex]
+	local settings = self.gameController.settingsModel.sections[self.sectionItemIndex]
 	local settingConfig = settings[itemIndex or self.settingItemIndex]
 	if settingConfig.type ~= "binding" then
 		return
@@ -101,7 +101,7 @@ SettingsNavigator.setInputHandler = function(self, itemIndex)
 end
 
 SettingsNavigator.setInputBinding = function(self, scancode)
-	local settings = self.view.settingsModel.sections[self.sectionItemIndex]
+	local settings = self.gameController.settingsModel.sections[self.sectionItemIndex]
 	local settingConfig = settings[self.inputItemIndex]
 	self:send({
 		name = "setInputBinding",

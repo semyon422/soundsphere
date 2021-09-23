@@ -9,7 +9,7 @@ CameraView.speed = 500
 CameraView.load = function(self)
 	local state = self.state
 
-	local perspective = self.perspective
+	local perspective = self.gameController.configModel.configs.settings.graphics.perspective
 	state.camera = perspective.camera
 	if not state.camera then
 		return
@@ -20,7 +20,7 @@ end
 CameraView.loadCamera = function(self)
 	s3dc.load()
 	local w, h = love.graphics.getDimensions()
-	local perspective = self.perspective
+	local perspective = self.gameController.configModel.configs.settings.graphics.perspective
 	s3dc.translate(perspective.x * w, perspective.y * h, perspective.z * h)
 	s3dc.rotate(perspective.pitch, perspective.yaw)
 end

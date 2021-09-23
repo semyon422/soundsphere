@@ -7,14 +7,13 @@ local CacheDatabase				= require("sphere.models.CacheModel.CacheDatabase")
 local GameplayController = Class:new()
 
 GameplayController.construct = function(self)
-	self.rhythmModel = RhythmModel:new()
 	self.timeController = TimeController:new()
 end
 
 GameplayController.load = function(self)
-	local rhythmModel = self.rhythmModel
 	local timeController = self.timeController
 
+	local rhythmModel = self.gameController.rhythmModel
 	local noteChartModel = self.gameController.noteChartModel
 	local noteSkinModel = self.gameController.noteSkinModel
 	local inputModel = self.gameController.inputModel
@@ -23,7 +22,6 @@ GameplayController.load = function(self)
 	local notificationModel = self.gameController.notificationModel
 	local themeModel = self.gameController.themeModel
 	local difficultyModel = self.gameController.difficultyModel
-	local backgroundModel = self.gameController.backgroundModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -36,12 +34,8 @@ GameplayController.load = function(self)
 	noteChartModel:load()
 	noteSkinModel:load()
 
-	view.rhythmModel = rhythmModel
-	view.noteChartModel = noteChartModel
-	view.configModel = configModel
-	view.modifierModel = modifierModel
-	view.backgroundModel = backgroundModel
 	view.controller = self
+	view.gameController = self.gameController
 
 	timeController.rhythmModel = rhythmModel
 	timeController.configModel = configModel
@@ -86,7 +80,6 @@ GameplayController.load = function(self)
 
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
 	rhythmModel:setNoteSkin(noteSkin)
-	view.noteSkin = noteSkin
 
 	rhythmModel:loadAllEngines()
 
@@ -96,8 +89,6 @@ GameplayController.load = function(self)
 	scoreEngine.baseEnps = enps
 	scoreEngine.baseAverageStrain = averageStrain
 	scoreEngine.generalizedKeymode = generalizedKeymode
-
-	view.scoreSystem = scoreEngine.scoreSystem
 
 	view:load()
 
@@ -119,14 +110,14 @@ GameplayController.getImporterSettings = function(self)
 end
 
 GameplayController.unload = function(self)
-	self.rhythmModel:unloadAllEngines()
-	self.rhythmModel:unload()
+	self.gameController.rhythmModel:unloadAllEngines()
+	self.gameController.rhythmModel:unload()
 	self.view:unload()
-	self.rhythmModel.observable:remove(self.view)
+	self.gameController.rhythmModel.observable:remove(self.view)
 end
 
 GameplayController.update = function(self, dt)
-	self.rhythmModel:update(dt)
+	self.gameController.rhythmModel:update(dt)
 	self.view:update(dt)
 end
 
@@ -136,16 +127,17 @@ end
 
 GameplayController.receive = function(self, event)
 	self.timeController:receive(event)
-	self.rhythmModel:receive(event)
+	local rhythmModel = self.gameController.rhythmModel
+	rhythmModel:receive(event)
 	self.view:receive(event)
 
 	if event.name == "play" then
-		self.rhythmModel.pauseManager:play()
+		rhythmModel.pauseManager:play()
 	elseif event.name == "pause" then
-		self.rhythmModel.pauseManager:pause()
+		rhythmModel.pauseManager:pause()
 	elseif event.name == "retry" then
-		self.rhythmModel.inputManager:setMode("external")
-		self.rhythmModel.replayModel:setMode("record")
+		rhythmModel.inputManager:setMode("external")
+		rhythmModel.replayModel:setMode("record")
 		self:unload()
 		self:load()
 	elseif event.name == "saveCamera" then
@@ -165,11 +157,10 @@ GameplayController.receive = function(self, event)
 	elseif event.name == "quit" then
 		self:skip()
 		self:saveScore()
-		if not self.rhythmModel.logicEngine.autoplay then
+		if not rhythmModel.logicEngine.autoplay then
 			local ResultController = require("sphere.controllers.ResultController")
 			local resultController = ResultController:new()
 
-			resultController.rhythmModel = self.rhythmModel
 			resultController.selectController = self.selectController
 			resultController.gameController = self.gameController
 
@@ -181,7 +172,7 @@ GameplayController.receive = function(self, event)
 end
 
 GameplayController.saveScore = function(self)
-	local rhythmModel = self.rhythmModel
+	local rhythmModel = self.gameController.rhythmModel
 	if rhythmModel.prohibitSavingScore then
 		return
 	end
@@ -208,7 +199,7 @@ GameplayController.saveScore = function(self)
 end
 
 GameplayController.skip = function(self)
-	local rhythmModel = self.rhythmModel
+	local rhythmModel = self.gameController.rhythmModel
 	local timeEngine = rhythmModel.timeEngine
 
 	rhythmModel.audioEngine:unload()
@@ -220,7 +211,7 @@ GameplayController.skip = function(self)
 	timeEngine.exactCurrentTime = time
 	timeEngine:sendState()
 	self:update(0)
-	self.rhythmModel.replayModel:update()
+	rhythmModel.replayModel:update()
 	self:update(0)
 end
 

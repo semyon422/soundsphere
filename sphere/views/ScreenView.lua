@@ -20,53 +20,55 @@ local ImageAnimationView = require(viewspackage .. "ImageAnimationView")
 
 local ScreenView = Class:new()
 
+ScreenView.views = {
+	{"screenMenuView", ScreenMenuView, "ScreenMenuView"},
+	{"userInfoView", UserInfoView, "UserInfoView"},
+	{"logoView", LogoView, "LogoView"},
+	{"scrollBarView", ScrollBarView, "ScrollBarView"},
+	{"backgroundView", BackgroundView, "BackgroundView"},
+	{"rectangleView", RectangleView, "RectangleView"},
+	{"circleView", CircleView, "CircleView"},
+	{"lineView", LineView, "LineView"},
+	{"inspectView", InspectView, "InspectView"},
+	{"valueView", ValueView, "ValueView"},
+	{"imageView", ImageView, "ImageView"},
+	{"cameraView", CameraView, "CameraView"},
+	{"gaussianBlurView", GaussianBlurView, "GaussianBlurView"},
+	{"imageAnimationView", ImageAnimationView, "ImageAnimationView"},
+}
+
 ScreenView.construct = function(self)
 	self.sequenceView = SequenceView:new()
-	self.screenMenuView = ScreenMenuView:new()
-	self.userInfoView = UserInfoView:new()
-	self.logoView = LogoView:new()
-	self.scrollBarView = ScrollBarView:new()
-	self.backgroundView = BackgroundView:new()
-	self.rectangleView = RectangleView:new()
-	self.circleView = CircleView:new()
-	self.lineView = LineView:new()
-	self.inspectView = InspectView:new()
-	self.valueView = ValueView:new()
-	self.imageView = ImageView:new()
-	self.cameraView = CameraView:new()
-	self.gaussianBlurView = GaussianBlurView:new()
-	self.imageAnimationView = ImageAnimationView:new()
+end
+
+ScreenView.createViews = function(self, views)
+	for _, a in ipairs(views) do
+		self[a[1]] = a[2]:new()
+	end
+end
+
+ScreenView.loadViews = function(self, views)
+	local navigator = assert(self.navigator)
+	local gameController = assert(self.gameController)
+	local sequenceView = assert(self.sequenceView)
+	for _, a in ipairs(views) do
+		local view = self[a[1]]
+		view.gameController = gameController
+		view.navigator = navigator
+		sequenceView:setView(a[3], view)
+	end
 end
 
 ScreenView.load = function(self)
-	local screenMenuView = self.screenMenuView
 	local navigator = self.navigator
 	local sequenceView = self.sequenceView
-	local backgroundView = self.backgroundView
-	local cameraView = self.cameraView
 
 	navigator.view = self
-	navigator.viewConfig = self.viewConfig
+	navigator.gameController = self.gameController
+	navigator.viewConfig = assert(self.viewConfig)
 	navigator.sequenceView = sequenceView
-	screenMenuView.navigator = navigator
-	backgroundView.backgroundModel = self.backgroundModel
-	cameraView.navigator = navigator
 
 	sequenceView:setSequenceConfig(self.viewConfig)
-	sequenceView:setView("BackgroundView", backgroundView)
-	sequenceView:setView("ScreenMenuView", screenMenuView)
-	sequenceView:setView("UserInfoView", self.userInfoView)
-	sequenceView:setView("LogoView", self.logoView)
-	sequenceView:setView("ScrollBarView", self.scrollBarView)
-	sequenceView:setView("RectangleView", self.rectangleView)
-	sequenceView:setView("CircleView", self.circleView)
-	sequenceView:setView("LineView", self.lineView)
-	sequenceView:setView("InspectView", self.inspectView)
-	sequenceView:setView("ValueView", self.valueView)
-	sequenceView:setView("ImageView", self.imageView)
-	sequenceView:setView("CameraView", cameraView)
-	sequenceView:setView("GaussianBlurView", self.gaussianBlurView)
-	sequenceView:setView("ImageAnimationView", self.imageAnimationView)
 	sequenceView:load()
 
 	navigator:load()

@@ -15,7 +15,7 @@ SettingsListItemInputView.getName = function(self)
 end
 
 SettingsListItemInputView.getValue = function(self)
-	return self.listView.settingsModel:getValue(self.item)
+	return self.listView.gameController.settingsModel:getValue(self.item)
 end
 
 SettingsListItemInputView.isActive = function(self)

@@ -30,9 +30,9 @@ InputNavigator.receive = function(self, event)
 end
 
 InputNavigator.scrollInput = function(self, direction)
-	local noteChart = self.noteChartModel.noteChart
+	local noteChart = self.gameController.noteChartModel.noteChart
 	local inputModeString = noteChart.inputMode:getString()
-	local inputs = self.inputModel:getInputs(inputModeString)
+	local inputs = self.gameController.inputModel:getInputs(inputModeString)
 
 	direction = direction == "up" and -1 or 1
 	if not inputs[self.itemIndex + direction] then
@@ -42,9 +42,9 @@ InputNavigator.scrollInput = function(self, direction)
 end
 
 InputNavigator.setInputHandler = function(self, itemIndex)
-	local noteChart = self.noteChartModel.noteChart
+	local noteChart = self.gameController.noteChartModel.noteChart
 	local inputModeString = noteChart.inputMode:getString()
-	local inputs = self.inputModel:getInputs(inputModeString)
+	local inputs = self.gameController.inputModel:getInputs(inputModeString)
 	self.virtualKey = inputs[itemIndex or self.itemIndex].virtualKey
 	self.inputModeString = inputModeString
 

@@ -8,31 +8,21 @@ local NoteSkinListView = require(viewspackage .. "NoteSkinView.NoteSkinListView"
 
 local NoteSkinView = ScreenView:new({construct = false})
 
+NoteSkinView.views = {
+	{"noteSkinListView", NoteSkinListView, "NoteSkinListView"},
+}
+
 NoteSkinView.construct = function(self)
 	ScreenView.construct(self)
 	self.viewConfig = NoteSkinViewConfig
 	self.navigator = NoteSkinNavigator:new()
-	self.noteSkinListView = NoteSkinListView:new()
+	self:createViews(ScreenView.views)
+	self:createViews(self.views)
 end
 
 NoteSkinView.load = function(self)
-	local navigator = self.navigator
-	local noteSkinListView = self.noteSkinListView
-
-	navigator.noteChartModel = self.noteChartModel
-	navigator.noteSkinModel = self.noteSkinModel
-
-	noteSkinListView.navigator = navigator
-	noteSkinListView.noteChartModel = self.noteChartModel
-	noteSkinListView.noteSkinModel = self.noteSkinModel
-	noteSkinListView.view = self
-
-	self.backgroundView.settings = self.configModel.configs.settings
-	self.gaussianBlurView.settings = self.configModel.configs.settings
-
-	local sequenceView = self.sequenceView
-	sequenceView:setView("NoteSkinListView", noteSkinListView)
-
+	self:loadViews(ScreenView.views)
+	self:loadViews(self.views)
 	ScreenView.load(self)
 end
 

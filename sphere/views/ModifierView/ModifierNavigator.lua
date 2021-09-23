@@ -54,12 +54,12 @@ end
 ModifierNavigator.removeModifier = function(self, itemIndex)
 	self:send({
 		name = "removeModifier",
-		modifierConfig = self.modifierModel.config[itemIndex or self.modifierModel.modifierItemIndex]
+		modifierConfig = self.gameController.modifierModel.config[itemIndex or self.gameController.modifierModel.modifierItemIndex]
 	})
 end
 
 ModifierNavigator.increaseModifierValue = function(self, itemIndex, delta)
-	local modifierConfig = self.modifierModel.config[itemIndex or self.modifierModel.modifierItemIndex]
+	local modifierConfig = self.gameController.modifierModel.config[itemIndex or self.gameController.modifierModel.modifierItemIndex]
 	self:send({
 		name = "increaseModifierValue",
 		modifierConfig = modifierConfig,
@@ -68,7 +68,7 @@ ModifierNavigator.increaseModifierValue = function(self, itemIndex, delta)
 end
 
 ModifierNavigator.addModifier = function(self, itemIndex)
-	local modifier = self.modifierModel.modifiers[itemIndex or self.modifierModel.availableModifierItemIndex]
+	local modifier = self.gameController.modifierModel.modifiers[itemIndex or self.gameController.modifierModel.availableModifierItemIndex]
 	self:send({
 		name = "addModifier",
 		modifier = modifier

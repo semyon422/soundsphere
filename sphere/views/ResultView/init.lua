@@ -12,64 +12,24 @@ local StageInfoView = require(viewspackage .. "SelectView.StageInfoView")
 
 local ResultView = ScreenView:new({construct = false})
 
+ResultView.views = {
+	{"pointGraphView", PointGraphView, "PointGraphView"},
+	{"modifierIconGridView", ModifierIconGridView, "ModifierIconGridView"},
+	{"stageInfoView", StageInfoView, "StageInfoView"},
+	{"scoreListView", ScoreListView, "ScoreListView"},
+}
+
 ResultView.construct = function(self)
 	ScreenView.construct(self)
 	self.viewConfig = ResultViewConfig
 	self.navigator = ResultNavigator:new()
-	self.pointGraphView = PointGraphView:new()
-	self.scoreListView = ScoreListView:new()
-	self.modifierIconGridView = ModifierIconGridView:new()
-	self.stageInfoView = StageInfoView:new()
+	self:createViews(ScreenView.views)
+	self:createViews(self.views)
 end
 
 ResultView.load = function(self)
-	local valueView = self.valueView
-	local pointGraphView = self.pointGraphView
-	local modifierIconGridView = self.modifierIconGridView
-	local stageInfoView = self.stageInfoView
-	local scoreListView = self.scoreListView
-	local inspectView = self.inspectView
-	local userInfoView = self.userInfoView
-	local navigator = self.navigator
-
-	local scoreSystem = self.rhythmModel.scoreEngine.scoreSystem:getSlice()
-
-	inspectView.scoreSystem = scoreSystem
-
-	valueView.scoreSystem = scoreSystem
-	valueView.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
-
-	pointGraphView.scoreEngine = self.rhythmModel.scoreEngine
-	pointGraphView.noteChartModel = self.noteChartModel
-	pointGraphView.selectModel = self.selectModel
-
-	modifierIconGridView.modifierModel = self.modifierModel
-	modifierIconGridView.selectModel = self.selectModel
-	modifierIconGridView.scoreEngine = self.rhythmModel.scoreEngine
-
-	scoreListView.scoreLibraryModel = self.scoreLibraryModel
-	scoreListView.selectModel = self.selectModel
-	scoreListView.rhythmModel = self.rhythmModel
-	scoreListView.navigator = navigator
-
-	stageInfoView.selectModel = self.selectModel
-	stageInfoView.scoreEngine = self.rhythmModel.scoreEngine
-
-	userInfoView.navigator = navigator
-	userInfoView.onlineConfig = self.configModel.configs.online
-
-	navigator.selectModel = self.selectModel
-	navigator.scoreLibraryModel = self.scoreLibraryModel
-
-	self.backgroundView.settings = self.configModel.configs.settings
-	self.gaussianBlurView.settings = self.configModel.configs.settings
-
-	local sequenceView = self.sequenceView
-	sequenceView:setView("PointGraphView", pointGraphView)
-	sequenceView:setView("ModifierIconGridView", modifierIconGridView)
-	sequenceView:setView("StageInfoView", stageInfoView)
-	sequenceView:setView("ScoreListView", scoreListView)
-
+	self:loadViews(ScreenView.views)
+	self:loadViews(self.views)
 	ScreenView.load(self)
 end
 

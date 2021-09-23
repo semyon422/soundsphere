@@ -14,11 +14,11 @@ SortStepperView.construct = function(self)
 end
 
 SortStepperView.getIndexValue = function(self)
-	return self.sortModel:toIndexValue(self.sortModel.name)
+	return self.gameController.sortModel:toIndexValue(self.gameController.sortModel.name)
 end
 
 SortStepperView.getCount = function(self)
-	return #self.sortModel.names
+	return #self.gameController.sortModel.names
 end
 
 SortStepperView.updateIndexValue = function(self, indexValue)
@@ -30,6 +30,7 @@ SortStepperView.increaseValue = function(self, delta)
 end
 
 SortStepperView.draw = function(self)
+	local sortModel = self.gameController.sortModel
 	local config = self.config
 
 	local tf = transform(config.transform):translate(config.x, config.y)
@@ -41,7 +42,7 @@ SortStepperView.draw = function(self)
 	local font = spherefonts.get(config.text.fontFamily, config.text.fontSize)
 	love.graphics.setFont(font)
 	baseline_print(
-		self.sortModel.name,
+		sortModel.name,
 		config.text.x,
 		config.text.baseline,
 		config.text.limit,

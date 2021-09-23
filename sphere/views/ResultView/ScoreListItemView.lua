@@ -4,10 +4,10 @@ local transform = require("aqua.graphics.transform")
 local ScoreListItemView = ListItemView:new({construct = false})
 
 ScoreListItemView.draw = function(self)
-	local scoreEngine = self.listView.rhythmModel.scoreEngine
+	local scoreEngine = self.listView.gameController.rhythmModel.scoreEngine
 	local scoreEntry = scoreEngine.scoreEntry
 	local item = self.item
-	item.selectModel = self.listView.selectModel
+	item.selectModel = self.listView.gameController.selectModel
 	item.scoreEngine = scoreEngine
 
 	if scoreEntry then

@@ -15,23 +15,23 @@ SettingsListItemStepperView.getName = function(self)
 end
 
 SettingsListItemStepperView.getValue = function(self)
-	return self.listView.settingsModel:getValue(self.item)
+	return self.listView.gameController.settingsModel:getValue(self.item)
 end
 
 SettingsListItemStepperView.getDisplayValue = function(self)
-	return self.listView.settingsModel:getDisplayValue(self.item)
+	return self.listView.gameController.settingsModel:getDisplayValue(self.item)
 end
 
 SettingsListItemStepperView.getIndexValue = function(self)
-	return self.listView.settingsModel:toIndexValue(self.item)
+	return self.listView.gameController.settingsModel:toIndexValue(self.item)
 end
 
 SettingsListItemStepperView.getCount = function(self)
-	return self.listView.settingsModel:getCount(self.item)
+	return self.listView.gameController.settingsModel:getCount(self.item)
 end
 
 SettingsListItemStepperView.updateIndexValue = function(self, indexValue)
-	local value = self.listView.settingsModel:fromIndexValue(self.item, indexValue)
+	local value = self.listView.gameController.settingsModel:fromIndexValue(self.item, indexValue)
 	self.listView.navigator:setSettingValue(self.itemIndex, value)
 end
 

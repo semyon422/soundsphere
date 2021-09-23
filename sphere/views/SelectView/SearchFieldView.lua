@@ -10,7 +10,7 @@ local SearchFieldView = Class:new()
 SearchFieldView.load = function(self)
 	local state = self.state
 	state.textInput = TextInput:new()
-	state.textInput:setText(self.searchModel.searchString)
+	state.textInput:setText(self.gameController.searchModel.searchString)
 end
 
 SearchFieldView.receive = function(self, event)
@@ -21,17 +21,19 @@ SearchFieldView.receive = function(self, event)
 	local state = self.state
 	state.textInput:receive(event)
 	self.navigator:setSearchString(state.textInput.text)
-	state.textInput:setText(self.searchModel.searchString)
+	state.textInput:setText(self.gameController.searchModel.searchString)
 end
 
 SearchFieldView.draw = function(self)
+	local searchModel = self.gameController.searchModel
+	local noteChartSetLibraryModel = self.gameController.noteChartSetLibraryModel
 	local config = self.config
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
 	tf:release()
 
-	local searchString = self.searchModel.searchString
+	local searchString = searchModel.searchString
 	if searchString == "" then
 		love.graphics.setColor(1, 1, 1, 0.5)
 		searchString = "Search..."
@@ -63,7 +65,7 @@ SearchFieldView.draw = function(self)
 		config.frame.h / 2
 	)
 
-	if self.searchModel.searchMode == "show" then
+	if searchModel.searchMode == "show" then
 		love.graphics.circle(
 			"line",
 			config.frame.x + config.frame.w - config.frame.h / 2,
@@ -78,7 +80,7 @@ SearchFieldView.draw = function(self)
 		)
 	end
 
-	if self.noteChartSetLibraryModel.collapse then
+	if noteChartSetLibraryModel.collapse then
 		love.graphics.circle(
 			"line",
 			config.frame.x + config.frame.w - config.frame.h,
