@@ -10,17 +10,19 @@ end
 ShortNoteView.update = function(self)
 	self.timeState = self.graphicalNote.timeState
 	self.logicalState = self.graphicalNote.logicalNote:getLastState()
-	self.headView.timeState = self.timeState
+	self.headView.timeState = self.graphicalNote.startTimeState or self.graphicalNote.timeState
 end
 
 ShortNoteView.draw = function(self)
 	local spriteBatch = self.headView:getSpriteBatch()
+	if not spriteBatch then
+		return
+	end
 	spriteBatch:setColor(self.headView:get("color"))
 	spriteBatch:add(self:getDraw(self.headView:getQuad(), self:getTransformParams()))
 end
 
 ShortNoteView.getTransformParams = function(self)
-	-- x, y, r, sx, sy, ox, oy, kx, ky
 	local hw = self.headView
 	local w, h = hw:getDimensions()
 	return

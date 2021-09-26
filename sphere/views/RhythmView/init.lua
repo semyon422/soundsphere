@@ -1,7 +1,5 @@
 local Class = require("aqua.util.Class")
 local NoteViewFactory = require("sphere.views.RhythmView.NoteViewFactory")
-local AnimationNoteViewFactory = require("sphere.views.RhythmView.AnimationNoteViewFactory")
-local LightingNoteViewFactory = require("sphere.views.RhythmView.LightingNoteViewFactory")
 local transform = require("aqua.graphics.transform")
 
 local RhythmView = Class:new()
@@ -12,15 +10,11 @@ RhythmView.load = function(self)
 
 	state.noteViews = {}
 
-	local noteViewFactory
-	if not config.mode then
-		noteViewFactory = NoteViewFactory:new()
-		noteViewFactory.videoBgaEnabled = self.videoBgaEnabled
-		noteViewFactory.imageBgaEnabled = self.imageBgaEnabled
-	elseif config.mode == "animation" then
-		noteViewFactory = AnimationNoteViewFactory:new()
-	elseif config.mode == "lighting" then
-		noteViewFactory = LightingNoteViewFactory:new()
+	local noteViewFactory = NoteViewFactory:new()
+	noteViewFactory.videoBgaEnabled = self.videoBgaEnabled
+	noteViewFactory.imageBgaEnabled = self.imageBgaEnabled
+	if config.mode then
+		noteViewFactory.mode = config.mode
 	end
 	state.noteViewFactory = noteViewFactory
 

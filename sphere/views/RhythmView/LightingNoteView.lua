@@ -1,23 +1,6 @@
-local NoteView = require("sphere.views.RhythmView.NoteView")
 local ShortNoteView = require("sphere.views.RhythmView.ShortNoteView")
 
-local LightingNoteView = NoteView:new()
-
-LightingNoteView.construct = function(self)
-	NoteView.construct(self)
-	self.headView = self:newNotePartView("Head")
-end
-
-LightingNoteView.draw = function(self)
-	local spriteBatch = self.headView:getSpriteBatch()
-	if not spriteBatch then
-		return
-	end
-	spriteBatch:setColor(self.headView:get("color"))
-	spriteBatch:add(self:getDraw(self.headView:getQuad(), self:getTransformParams()))
-end
-
-LightingNoteView.getTransformParams = ShortNoteView.getTransformParams
+local LightingNoteView = ShortNoteView:new()
 
 LightingNoteView.update = function(self)
 	local timeState = self.graphicalNote.startTimeState or self.graphicalNote.timeState
