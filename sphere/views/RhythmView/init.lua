@@ -106,7 +106,8 @@ RhythmView.loadImages = function(self)
 		if type(path) == "string" then
 			self:loadTexture(path)
 		elseif type(path) == "table" then
-			for i = path[2], path[3], path[4] do
+			local range = path[2]
+			for i = range[1], range[2], range[3] do
 				self:loadTexture(path[1]:format(i))
 			end
 		end
@@ -136,7 +137,7 @@ RhythmView.loadImages = function(self)
 			end
 			state.quads[image] = quad
 		elseif type(path) == "table" then
-			local texture = state.textures[path[1]:format(path[2])]
+			local texture = state.textures[path[1]:format(path[2][1])]
 			local w, h = texture:getDimensions()
 			image[3] = {w, h}
 		end
