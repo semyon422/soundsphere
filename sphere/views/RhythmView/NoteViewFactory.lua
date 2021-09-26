@@ -11,6 +11,7 @@ local NoteViewFactory = Class:new()
 NoteViewFactory.notes = {
 	default = {
 		ShortNote = {"ShortNote", ShortNoteView},
+		SoundNote = {"SoundNote", ShortNoteView},
 		LongNoteStart = {"LongNote", LongNoteView},
 		LaserNoteStart = {"LongNote", LongNoteView},
 		LineNoteStart = {"LongNote", LongNoteView},
