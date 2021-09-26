@@ -22,6 +22,10 @@ local difficulty = function(a, b)
 	return a.difficulty < b.difficulty
 end
 
+local name = function(a, b)
+	return a.name < b.name
+end
+
 SortModel.sortItemsFunctions = {
 	title = function(a, b)
 		if a.title ~= b.title then
@@ -43,7 +47,12 @@ SortModel.sortItemsFunctions = {
 		end
 		return difficulty(a, b)
 	end,
-	difficulty = difficulty,
+	difficulty = function(a, b)
+		if a.difficulty ~= b.difficulty then
+			return difficulty(a, b)
+		end
+		return name(a, b)
+	end,
 }
 
 SortModel.name = "title"
