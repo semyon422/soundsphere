@@ -107,13 +107,13 @@ RhythmView.loadImages = function(self)
 			self:loadTexture(path)
 		elseif type(path) == "table" then
 			local range = path[2]
-			for i = range[1], range[2], range[3] do
+			for i = range[1], range[2] do
 				self:loadTexture(path[1]:format(i))
 			end
 		end
 	end
 
-	for _, image in pairs(self.gameController.rhythmModel.graphicEngine.noteSkin.images) do
+	for imageName, image in pairs(self.gameController.rhythmModel.graphicEngine.noteSkin.images) do
 		local path = image[1]
 		if type(path) == "string" then
 			local texture = state.textures[path]
@@ -129,13 +129,13 @@ RhythmView.loadImages = function(self)
 				else
 					quad = {}
 					local offset = 0
-					for i = range[1], range[2], range[3] do
+					for i = range[1], range[2] do
 						quad[i] = love.graphics.newQuad(q[1] + offset * q[3], q[2], q[3], q[4], w, h)
 						offset = offset + 1
 					end
 				end
 			end
-			state.quads[image] = quad
+			state.quads[imageName] = quad
 		elseif type(path) == "table" then
 			local texture = state.textures[path[1]:format(path[2][1])]
 			local w, h = texture:getDimensions()
@@ -153,7 +153,8 @@ RhythmView.setBgaEnabled = function(self, type, enabled)
 end
 
 RhythmView.getDimensions = function(self, note, part, key, timeState)
-	local image = self.gameController.rhythmModel.graphicEngine.noteSkin:get(note, part, key, timeState)
+	local noteSkin = self.gameController.rhythmModel.graphicEngine.noteSkin
+	local image = noteSkin.images[noteSkin:get(note, part, key, timeState)]
 	if image[2] then
 		return image[2][3], image[2][4]
 	elseif image[3] then
@@ -163,7 +164,9 @@ end
 
 RhythmView.getSpriteBatch = function(self, note, part, key, timeState)
 	local state = self.state
-	local image, frame = self.gameController.rhythmModel.graphicEngine.noteSkin:get(note, part, key, timeState)
+	local noteSkin = self.gameController.rhythmModel.graphicEngine.noteSkin
+	local imageName, frame = noteSkin:get(note, part, key, timeState)
+	local image = noteSkin.images[imageName]
 	if not image then
 		return
 	end
@@ -177,8 +180,9 @@ end
 
 RhythmView.getQuad = function(self, note, part, key, timeState)
 	local state = self.state
-	local image, frame = self.gameController.rhythmModel.graphicEngine.noteSkin:get(note, part, key, timeState)
-	local quad = state.quads[image]
+	local noteSkin = self.gameController.rhythmModel.graphicEngine.noteSkin
+	local imageName, frame = noteSkin:get(note, part, key, timeState)
+	local quad = state.quads[imageName]
 	if type(quad) == "table" then
 		return quad[frame]
 	end

@@ -2,10 +2,45 @@ local Class = require("aqua.util.Class")
 
 local NoteSkin = Class:new()
 
-NoteSkin.construct = function(self) end
-NoteSkin.load = function(self) end
-NoteSkin.check = function(self, note) end
-NoteSkin.get = function(self, noteView, part, name, timeState) end
-NoteSkin.where = function(self, note, time) end
+NoteSkin.check = function(self, note)
+	local noteData = note.startNoteData
+	return self.columns[noteData.inputType .. noteData.inputIndex] and self.notes[note.noteType]
+end
+
+NoteSkin.get = function(self, noteView, part, key, timeState)
+	local noteData = noteView.startNoteData
+	local noteType = noteView.noteType
+	local column = self.columns[noteData.inputType .. noteData.inputIndex]
+
+	local value =
+		self.notes[noteType] and
+		self.notes[noteType][part] and
+		self.notes[noteType][part][key]
+
+	if type(value) == "table" then
+		value = value[column]
+	end
+	if type(value) == "function" then
+		return value(timeState, noteView, column)
+	end
+
+	return value
+end
+
+NoteSkin.setTextures = function(self, textures)
+	for i, texture in ipairs(textures) do
+		local k, v = next(texture)
+		textures[k] = v
+		textures[i] = v
+	end
+	self.textures = textures
+end
+
+NoteSkin.setImages = function(self, images)
+	for _, image in pairs(images) do
+		image[1] = self.textures[image[1]]
+	end
+	self.images = images
+end
 
 return NoteSkin

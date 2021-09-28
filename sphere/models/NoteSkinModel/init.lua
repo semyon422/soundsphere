@@ -44,9 +44,8 @@ NoteSkinModel.loadNoteSKin = function(self, path, directoryPath, itemName)
 end
 
 NoteSkinModel.loadLuaFullLatest = function(self, path, directoryPath, fileName)
-	local object = assert(love.filesystem.load(path))(path)
+	local noteSkin = assert(love.filesystem.load(path))(path)
 
-	local noteSkin = NoteSkin:new(object)
 	noteSkin.path = path
 	noteSkin.directoryPath = directoryPath
 	noteSkin.fileName = fileName

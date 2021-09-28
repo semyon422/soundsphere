@@ -25,14 +25,19 @@ end
 ShortNoteView.getTransformParams = function(self)
 	local hw = self.headView
 	local w, h = hw:getDimensions()
+	local nw, nh = hw:get("w"), hw:get("h")
+	local sx = nw and nw / w or hw:get("sx") or 1
+	local sy = nh and nh / h or hw:get("sy") or 1
+	local ox = (hw:get("ox") or 0) * w
+	local oy = (hw:get("oy") or 0) * h
 	return
 		hw:get("x"),
 		hw:get("y"),
-		hw:get("r"),
-		hw:get("w") / w,
-		hw:get("h") / h,
-		hw:get("ox") * w,
-		hw:get("oy") * h
+		hw:get("r") or 0,
+		sx,
+		sy,
+		ox,
+		oy
 end
 
 return ShortNoteView

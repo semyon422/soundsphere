@@ -62,7 +62,6 @@ LongGraphicalNote.updateFakeStartTime = function(self)
 end
 
 LongGraphicalNote.getFakeStartTime = function(self)
-	local startTime = self.startNoteData.timePoint.absoluteTime
 	if self.logicalNote:getLastState() == "startPassedPressed" then
 		self:updateFakeStartTime()
 		return self.fakeStartTime
@@ -100,12 +99,9 @@ LongGraphicalNote.getFakeVisualStartTime = function(self)
 	return fakeVisualStartTime
 end
 
-LongGraphicalNote.reload = function(self)
-end
-
 LongGraphicalNote.whereWillDraw = function(self)
-	local wwdStart = self.noteSkin:where(self, self.startTimeState.scaledVisualDeltaTime)
-	local wwdEnd = self.noteSkin:where(self, self.endTimeState.scaledVisualDeltaTime)
+	local wwdStart = self:where(self.startTimeState.scaledVisualDeltaTime)
+	local wwdEnd = self:where(self.endTimeState.scaledVisualDeltaTime)
 
 	if wwdStart == wwdEnd then
 		return wwdStart

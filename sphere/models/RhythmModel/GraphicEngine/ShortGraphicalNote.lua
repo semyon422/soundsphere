@@ -33,11 +33,8 @@ ShortGraphicalNote.computeTimeState = function(self)
 	timeState.scaledVisualDeltaTime = timeState.visualDeltaTime * self.graphicEngine:getVisualTimeRate()
 end
 
-ShortGraphicalNote.reload = function(self)
-end
-
 ShortGraphicalNote.whereWillDraw = function(self)
-	return self.noteSkin:where(self, self.timeState.scaledVisualDeltaTime)
+	return self:where(self.timeState.scaledVisualDeltaTime)
 end
 
 return ShortGraphicalNote

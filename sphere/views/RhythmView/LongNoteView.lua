@@ -29,18 +29,18 @@ LongNoteView.draw = function(self)
 	local bodySpriteBatch = bodyView:getSpriteBatch()
 	local tailSpriteBatch = tailView:getSpriteBatch()
 
-	local headQuad = headView:getQuad()
-	local bodyQuad = bodyView:getQuad()
-	local tailQuad = tailView:getQuad()
-
-	headSpriteBatch:setColor(headView:get("color"))
-	headSpriteBatch:add(self:getDraw(headQuad, self:getHeadTransformParams()))
-
-	bodySpriteBatch:setColor(bodyView:get("color"))
-	bodySpriteBatch:add(self:getDraw(bodyQuad, self:getBodyTransformParams()))
-
-	tailSpriteBatch:setColor(tailView:get("color"))
-	tailSpriteBatch:add(self:getDraw(tailQuad, self:getTailTransformParams()))
+	if bodySpriteBatch then
+		bodySpriteBatch:setColor(bodyView:get("color"))
+		bodySpriteBatch:add(self:getDraw(bodyView:getQuad(), self:getBodyTransformParams()))
+	end
+	if tailSpriteBatch then
+		tailSpriteBatch:setColor(tailView:get("color"))
+		tailSpriteBatch:add(self:getDraw(tailView:getQuad(), self:getTailTransformParams()))
+	end
+	if headSpriteBatch then
+		headSpriteBatch:setColor(headView:get("color"))
+		headSpriteBatch:add(self:getDraw(headView:getQuad(), self:getHeadTransformParams()))
+	end
 end
 
 LongNoteView.getHeadTransformParams = ShortNoteView.getTransformParams
@@ -49,14 +49,19 @@ LongNoteView.getTailTransformParams = function(self)
 	local tw = self.tailView
 	local ets = self.endTimeState
 	local w, h = tw:getDimensions()
+	local nw, nh = tw:get("w", ets), tw:get("h", ets)
+	local sx = nw and nw / w or tw:get("sx", ets) or 1
+	local sy = nh and nh / h or tw:get("sy", ets) or 1
+	local ox = (tw:get("ox", ets) or 0) * w
+	local oy = (tw:get("oy", ets) or 0) * h
 	return
 		tw:get("x", ets),
 		tw:get("y", ets),
-		tw:get("r", ets),
-		tw:get("w", ets) / w,
-		tw:get("h", ets) / h,
-		tw:get("ox", ets) * w,
-		tw:get("oy", ets) * h
+		tw:get("r", ets) or 0,
+		sx,
+		sy,
+		ox,
+		oy
 end
 
 LongNoteView.getBodyTransformParams = function(self)
@@ -79,14 +84,19 @@ LongNoteView.getBodyTransformParams = function(self)
 	end
 
 	local w, h = bw:getDimensions()
+	local nw, nh = bw:get("w", btsx), bw:get("h", btsy)
+	local sx = nw and (math.abs(dx) + nw) / w or bw:get("sx", btsx) or 1
+	local sy = nh and (math.abs(dy) + nh) / h or bw:get("sy", btsy) or 1
+	local ox = (bw:get("ox", btsx) or 0) * w
+	local oy = (bw:get("oy", btsy) or 0) * h
 	return
 		bw:get("x", btsx),
 		bw:get("y", btsy),
 		0,
-		(math.abs(dx) + bw:get("w", btsx)) / w,
-		(math.abs(dy) + bw:get("h", btsy)) / h,
-		bw:get("ox", btsx) * w,
-		bw:get("oy", btsy) * h
+		sx,
+		sy,
+		ox,
+		oy
 end
 
 return LongNoteView

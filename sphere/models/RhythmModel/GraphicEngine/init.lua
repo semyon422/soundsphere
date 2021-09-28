@@ -112,10 +112,4 @@ GraphicEngine.unloadNoteDrawers = function(self)
 	self.noteDrawers = {}
 end
 
-GraphicEngine.reloadNoteDrawers = function(self)
-	for noteDrawer in pairs(self.noteDrawers) do
-		noteDrawer:reload()
-	end
-end
-
 return GraphicEngine

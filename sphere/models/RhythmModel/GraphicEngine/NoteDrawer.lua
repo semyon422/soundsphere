@@ -109,12 +109,6 @@ NoteDrawer.unload = function(self)
 	end
 end
 
-NoteDrawer.reload = function(self)
-	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
-		self.noteData[currentNoteIndex]:reload()
-	end
-end
-
 NoteDrawer.receive = function(self, event)
 	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
 		self.noteData[currentNoteIndex]:receive(event)

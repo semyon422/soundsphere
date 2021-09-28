@@ -3,9 +3,6 @@ local Class = require("aqua.util.Class")
 local GraphicalNote = Class:new()
 
 GraphicalNote.init = function(self)
-	self.inputId = self.startNoteData.inputType .. self.startNoteData.inputIndex
-	self.id = self.inputId .. ":" .. self.noteType
-
 	self.logicalNote = self.graphicEngine:getLogicalNote(self.startNoteData)
 end
 
@@ -35,6 +32,17 @@ GraphicalNote.tryNext = function(self)
 end
 
 GraphicalNote.receive = function(self, event) end
+
+GraphicalNote.where = function(self, time)
+	local range = self.noteSkin.range
+	if -time > range[2] then
+		return 1
+	elseif -time < range[1] then
+		return -1
+	else
+		return 0
+	end
+end
 
 GraphicalNote.whereWillDraw = function(self)
 	return 0
