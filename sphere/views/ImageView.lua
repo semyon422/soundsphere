@@ -19,6 +19,14 @@ ImageView.draw = function(self)
 	local config = self.config
 	local state = self.state
 
+	local w, h = state.imageWidth, state.imageHeight
+
+	local cw, ch = config.w, config.h
+	local sx = cw and cw / w or config.sx or 1
+	local sy = ch and ch / h or config.sy or 1
+	local ox = (config.ox or 0) * w
+	local oy = (config.oy or 0) * h
+
 	local tf = transform(config.transform)
 	love.graphics.replaceTransform(tf)
 	tf:release()
@@ -29,8 +37,7 @@ ImageView.draw = function(self)
 		config.x,
 		config.y,
         0,
-        config.w / state.imageWidth,
-	    config.h / state.imageHeight
+		sx, sy, ox, oy
     )
 end
 

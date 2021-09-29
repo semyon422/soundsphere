@@ -29,7 +29,7 @@ ImageAnimationView.loadImages = function(self)
 
 	local images = {}
 	local range = config.range
-	for i = range[1], range[2], range[3] do
+	for i = range[1], range[2], range[1] < range[2] and 1 or -1 do
 		images[i] = love.graphics.newImage(self.root .. "/" .. config.image:format(i))
 	end
 	state.images = images
@@ -46,10 +46,8 @@ ImageAnimationView.loadQuads = function(self)
 	local q = config.quad
 	local quads = {}
 	local range = config.range
-	local offset = 0
-	for i = range[1], range[2], range[3] do
-		quads[i] = love.graphics.newQuad(q[1] + offset * q[3], q[2], q[3], q[4], w, h)
-		offset = offset + 1
+	for i = range[1], range[2], range[1] < range[2] and 1 or -1 do
+		quads[i] = love.graphics.newQuad(q[1] + i * q[3], q[2], q[3], q[4], w, h)
 	end
 	state.quads = quads
 end
@@ -71,32 +69,42 @@ ImageAnimationView.draw = function(self)
 		return
 	end
 
+	local w, h
+	if config.quad then
+		w, h = config.quad[3], config.quad[4]
+	else
+		local image = state.images[animation.frame]
+		w, h = image:getWidth(), image:getHeight()
+	end
+
+	local cw, ch = config.w, config.h
+	local sx = cw and cw / w or config.sx or 1
+	local sy = ch and ch / h or config.sy or 1
+	local ox = (config.ox or 0) * w
+	local oy = (config.oy or 0) * h
+
 	local tf = transform(config.transform)
 	love.graphics.replaceTransform(tf)
 	tf:release()
 
 	love.graphics.setColor(1, 1, 1, 1)
 	if config.quad then
-		local image = state.image
 		love.graphics.draw(
-			image,
+			state.image,
 			state.quads[animation.frame],
 			config.x,
 			config.y,
 			0,
-			config.w / config.quad[3],
-			config.h / config.quad[4]
+			sx, sy, ox, oy
 		)
 		return
 	end
-	local image = state.images[animation.frame]
 	love.graphics.draw(
-		image,
+		state.images[animation.frame],
 		config.x,
 		config.y,
 		0,
-		config.w / image:getWidth(),
-		config.h / image:getHeight()
+		sx, sy, ox, oy
 	)
 end
 

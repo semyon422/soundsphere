@@ -4,13 +4,13 @@ local NoteSkin = Class:new()
 
 NoteSkin.check = function(self, note)
 	local noteData = note.startNoteData
-	return self.columns[noteData.inputType .. noteData.inputIndex] and self.notes[note.noteType]
+	return self.inputs[noteData.inputType .. noteData.inputIndex] and self.notes[note.noteType]
 end
 
 NoteSkin.get = function(self, noteView, part, key, timeState)
 	local noteData = noteView.startNoteData
 	local noteType = noteView.noteType
-	local column = self.columns[noteData.inputType .. noteData.inputIndex]
+	local column = self.inputs[noteData.inputType .. noteData.inputIndex]
 
 	local value =
 		self.notes[noteType] and

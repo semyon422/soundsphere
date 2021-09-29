@@ -37,14 +37,14 @@ NoteSkinVsrg.setColumns = function(self, columns)
 		x[i] = offset
 		offset = offset + columns.width[i]
 	end
-	self.x = x
+	self.columns = x
 end
 
 NoteSkinVsrg.setInput = function(self, columns)
 	for i, input in ipairs(columns) do
 		columns[input] = i
 	end
-	self.columns = columns
+	self.inputs = columns
 end
 
 local colors = {
@@ -119,7 +119,7 @@ NoteSkinVsrg.setShortNote = function(self, params)
 	end
 
 	self.notes.ShortNote = {Head = {
-		x = self.x,
+		x = self.columns,
 		y = function(...) return self:getPosition(...) end,
 		w = self.width,
 		h = height,
@@ -174,7 +174,7 @@ NoteSkinVsrg.setLongNote = function(self, params)
 	end
 
 	local Head = {
-		x = self.x,
+		x = self.columns,
 		y = function(...) return self:getPosition(...) end,
 		w = self.width,
 		h = height,
@@ -186,7 +186,7 @@ NoteSkinVsrg.setLongNote = function(self, params)
 	}
 
 	local Tail = {
-		x = self.x,
+		x = self.columns,
 		y = function(...) return self:getPosition(...) end,
 		w = self.width,
 		h = height,
@@ -198,7 +198,7 @@ NoteSkinVsrg.setLongNote = function(self, params)
 	}
 
 	local Body = {
-		x = self.x,
+		x = self.columns,
 		y = function(...) return self:getPosition(...) - params.h / 2 end,
 		w = self.width,
 		h = bh,
@@ -217,10 +217,10 @@ end
 
 NoteSkinVsrg.addMeasureLine = function(self, params)
 	local Head = self.notes.LongNote.Head
-	local i = #self.columns + 1
+	local i = #self.inputs + 1
 
-	self.columns[i] = "measure1"
-	self.columns.measure1 = i
+	self.inputs[i] = "measure1"
+	self.inputs.measure1 = i
 
 	Head.x[i] = self.baseOffset
 	Head.w[i] = self.fullWidth
@@ -235,7 +235,7 @@ end
 NoteSkinVsrg.setLighting = function(self, params)
 	params.frames = math.abs(params.range[2] - params.range[1]) + 1
 	local note = {Head = {
-		x = function(_, _, column) return self.x[column] + self.width[column] / 2 end,
+		x = function(_, _, column) return self.columns[column] + self.width[column] / 2 end,
 		y = self.hitposition + params.offset,
 		sx = params.scale,
 		sy = params.scale,
@@ -341,7 +341,7 @@ end
 NoteSkinVsrg.setAnimation = function(self, params)
 	params.frames = math.abs(params.range[2] - params.range[1]) + 1
 	local note = {Head = {
-		x = function(timeState, _, column) return self.x[column] + getAnimation(params.animations, timeState).x end,
+		x = function(timeState, _, column) return self.columns[column] + getAnimation(params.animations, timeState).x end,
 		y = function(timeState) return self.hitposition + getAnimation(timeState).y end,
 		w = function(timeState) return getAnimation(timeState).w end,
 		h = function(timeState) return getAnimation(timeState).h end,

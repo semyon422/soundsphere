@@ -50,7 +50,9 @@ NoteSkinModel.loadLuaFullLatest = function(self, path, directoryPath, fileName)
 	noteSkin.directoryPath = directoryPath
 	noteSkin.fileName = fileName
 	noteSkin.inputMode = ncdk.InputMode:new():setString(noteSkin.inputMode)
-	noteSkin.playField = love.filesystem.load(directoryPath .. "/" .. noteSkin.playField)()
+	if type(noteSkin.playField) == "string" then
+		noteSkin.playField = love.filesystem.load(directoryPath .. "/" .. noteSkin.playField)()
+	end
 
 	return noteSkin
 end

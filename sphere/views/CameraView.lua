@@ -66,7 +66,7 @@ CameraView.receive = function(self, event)
 		local dx, dy = event.args[3], event.args[4]
 		local angle = self.sensitivity
 
-		local perspective = self.perspective
+		local perspective = self.gameController.configModel.configs.settings.graphics.perspective
 		if not perspective.ry then
 			dy = 0
 		end
