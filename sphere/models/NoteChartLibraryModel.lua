@@ -62,7 +62,7 @@ NoteChartLibraryModel.sortItemsFunction = function(a, b)
 		#a.inputMode < #b.inputMode or
 		#a.inputMode == #b.inputMode and a.inputMode < b.inputMode or
 		a.inputMode == b.inputMode and a.difficulty < b.difficulty or
-		a.difficulty == b.difficulty and a.name == b.name
+		a.difficulty == b.difficulty and a.name < b.name
 	then
 		return true
 	end
