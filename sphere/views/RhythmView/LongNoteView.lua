@@ -75,23 +75,15 @@ LongNoteView.getBodyTransformParams = function(self)
 	local dx = hw:get("x", sts) - tw:get("x", ets)
 	local dy = hw:get("y", sts) - tw:get("y", ets)
 
-	local btsx, btsy
-	if dx >= 0 then btsx = ets
-	else btsx = sts
-	end
-	if dy >= 0 then btsy = ets
-	else btsy = sts
-	end
-
 	local w, h = bw:getDimensions()
-	local nw, nh = bw:get("w", btsx), bw:get("h", btsy)
-	local sx = nw and (math.abs(dx) + nw) / w or bw:get("sx", btsx) or 1
-	local sy = nh and (math.abs(dy) + nh) / h or bw:get("sy", btsy) or 1
-	local ox = (bw:get("ox", btsx) or 0) * w
-	local oy = (bw:get("oy", btsy) or 0) * h
+	local nw, nh = bw:get("w"), bw:get("h")
+	local sx = nw and (dx + nw) / w or bw:get("sx") or 1
+	local sy = nh and (dy + nh) / h or bw:get("sy") or 1
+	local ox = (bw:get("ox") or 0) * w
+	local oy = (bw:get("oy") or 0) * h
 	return
-		bw:get("x", btsx),
-		bw:get("y", btsy),
+		bw:get("x", ets),
+		bw:get("y", ets),
 		0,
 		sx,
 		sy,
