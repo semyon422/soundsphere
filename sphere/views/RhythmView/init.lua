@@ -154,12 +154,7 @@ end
 
 RhythmView.getDimensions = function(self, note, part, key, timeState)
 	local noteSkin = self.gameController.rhythmModel.graphicEngine.noteSkin
-	local image = noteSkin.images[noteSkin:get(note, part, key, timeState)]
-	if image[2] then
-		return image[2][3], image[2][4]
-	elseif image[3] then
-		return image[3][1], image[3][2]
-	end
+	return noteSkin:getDimensions(noteSkin:get(note, part, key, timeState))
 end
 
 RhythmView.getSpriteBatch = function(self, note, part, key, timeState)

@@ -2,10 +2,6 @@ local NoteSkin = require("sphere.models.NoteSkinModel.NoteSkin")
 
 local NoteSkinVsrg = NoteSkin:new()
 
-NoteSkinVsrg.construct = function(self)
-	self.notes = {}
-end
-
 NoteSkinVsrg.setColumns = function(self, columns)
 	self.offset = columns.offset
 	self.align = columns.align
@@ -95,9 +91,10 @@ NoteSkinVsrg.getPosition = function(self, timeState)
 end
 
 NoteSkinVsrg.setShortNote = function(self, params)
+	local h = params.h or 0
 	local height = {}
 	for i = 1, #self.width do
-		height[i] = params.h
+		height[i] = h
 	end
 
 	local image = params.image
@@ -123,6 +120,10 @@ NoteSkinVsrg.setShortNote = function(self, params)
 		y = function(...) return self:getPosition(...) end,
 		w = self.width,
 		h = height,
+		rw = {},
+		rh = {},
+		sx = {},
+		sy = {},
 		ox = {},
 		oy = oy,
 		r = {},
@@ -132,9 +133,10 @@ NoteSkinVsrg.setShortNote = function(self, params)
 end
 
 NoteSkinVsrg.setLongNote = function(self, params)
+	local h = params.h or 0
 	local height = {}
 	for i = 1, #self.width do
-		height[i] = params.h
+		height[i] = h
 	end
 
 	local tail = params.tail
@@ -178,6 +180,10 @@ NoteSkinVsrg.setLongNote = function(self, params)
 		y = function(...) return self:getPosition(...) end,
 		w = self.width,
 		h = height,
+		rw = {},
+		rh = {},
+		sx = {},
+		sy = {},
 		ox = {},
 		oy = oy,
 		r = {},
@@ -190,6 +196,10 @@ NoteSkinVsrg.setLongNote = function(self, params)
 		y = function(...) return self:getPosition(...) end,
 		w = self.width,
 		h = height,
+		rw = {},
+		rh = {},
+		sx = {},
+		sy = {},
 		ox = {},
 		oy = oy,
 		r = {},
@@ -199,9 +209,13 @@ NoteSkinVsrg.setLongNote = function(self, params)
 
 	local Body = {
 		x = self.columns,
-		y = function(...) return self:getPosition(...) - params.h / 2 end,
+		y = function(...) return self:getPosition(...) - h / 2 end,
 		w = self.width,
 		h = bh,
+		rw = {},
+		rh = {},
+		sx = {},
+		sy = {},
 		ox = {},
 		oy = {},
 		color = color,

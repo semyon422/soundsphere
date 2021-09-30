@@ -2,6 +2,13 @@ local Class = require("aqua.util.Class")
 
 local NoteSkin = Class:new()
 
+NoteSkin.construct = function(self)
+	self.notes = {}
+	self.inputs = {}
+	self.textures = {}
+	self.images = {}
+end
+
 NoteSkin.check = function(self, note)
 	local noteData = note.startNoteData
 	return self.inputs[noteData.inputType .. noteData.inputIndex] and self.notes[note.noteType]
@@ -41,6 +48,15 @@ NoteSkin.setImages = function(self, images)
 		image[1] = self.textures[image[1]]
 	end
 	self.images = images
+end
+
+NoteSkin.getDimensions = function(self, imageName)
+	local image = self.images[imageName]
+	if image[2] then
+		return image[2][3], image[2][4]
+	elseif image[3] then
+		return image[3][1], image[3][2]
+	end
 end
 
 return NoteSkin

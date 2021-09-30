@@ -1,6 +1,7 @@
 local Class			= require("aqua.util.Class")
 local ncdk			= require("ncdk")
 local NoteSkin		= require("sphere.models.NoteSkinModel.NoteSkin")
+local OsuNoteSkin		= require("sphere.models.NoteSkinModel.OsuNoteSkin")
 local TomlNoteSkinLoader = require("sphere.models.NoteSkinModel.TomlNoteSkinLoader")
 
 local NoteSkinModel = Class:new()
@@ -25,20 +26,28 @@ NoteSkinModel.lookup = function(self, directoryPath)
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
 		local info = love.filesystem.getInfo(path)
-		if info and info.type == "file" and itemName:find("^.+%.skin%.%a-$") then
-			self:loadNoteSKin(path, directoryPath, itemName)
+		if info and info.type == "file" and itemName:find("^.-skin%.%a-$") then
+			self:loadNoteSkin(path, directoryPath, itemName)
 		elseif info and info.type == "directory" then
 			self:lookup(path)
 		end
 	end
 end
 
-NoteSkinModel.loadNoteSKin = function(self, path, directoryPath, itemName)
+NoteSkinModel.addNoteSkins = function(self, noteSkins)
+	for _, noteSkin in ipairs(noteSkins) do
+		table.insert(self.noteSkins, noteSkin)
+	end
+end
+
+NoteSkinModel.loadNoteSkin = function(self, path, directoryPath, itemName)
 	local noteSkin
 	if path:find("^.+%.toml$") then
 		noteSkin = TomlNoteSkinLoader:new():load(path, directoryPath, itemName)
 	elseif path:find("^.+%.lua$") then
 		noteSkin = self:loadLuaFullLatest(path, directoryPath, itemName)
+	elseif path:find("^.+%.ini$") then
+		return self:addNoteSkins(self:loadOsuLatest(path, directoryPath, itemName))
 	end
 	table.insert(self.noteSkins, noteSkin)
 end
@@ -55,6 +64,30 @@ NoteSkinModel.loadLuaFullLatest = function(self, path, directoryPath, fileName)
 	end
 
 	return noteSkin
+end
+
+NoteSkinModel.loadOsuLatest = function(self, path, directoryPath, fileName)
+	local noteSkins = {}
+
+	local skinini = OsuNoteSkin:parseSkinIni(love.filesystem.read(path))
+
+	for i, mania in ipairs(skinini.Mania) do
+		local noteSkin = OsuNoteSkin:new()
+		noteSkin.path = path
+		noteSkin.directoryPath = directoryPath
+		noteSkin.fileName = fileName
+		noteSkin.skinini = skinini
+		noteSkin:setKeys(tonumber(mania.Keys))
+		noteSkin.inputMode = ncdk.InputMode:new():setString(tonumber(mania.Keys) .. "key")
+		local status, err = xpcall(noteSkin.load, debug.traceback, noteSkin)
+		if status then
+			table.insert(noteSkins, noteSkin)
+		else
+			print(err)
+		end
+	end
+
+	return noteSkins
 end
 
 NoteSkinModel.getNoteSkins = function(self, inputMode)
