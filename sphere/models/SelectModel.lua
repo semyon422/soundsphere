@@ -137,7 +137,7 @@ end
 
 SelectModel.pullNoteChartSet = function(self, noUpdate)
 	if not noUpdate then
-		self.noteChartSetLibraryModel:setCollection(self.collectionModel.collection)
+		self.searchModel:setCollection(self.collectionModel.collection)
 		self.noteChartLibraryModel:updateItems()
 		self.noteChartSetLibraryModel:updateItems()
 	end

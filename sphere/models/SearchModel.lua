@@ -4,9 +4,14 @@ local SearchModel = Class:new()
 
 SearchModel.searchString = ""
 SearchModel.searchMode = "hide"
+SearchModel.collection = {path = ""}
 
 SearchModel.setSearchString = function(self, text)
 	self.searchString = text
+end
+
+SearchModel.setCollection = function(self, collection)
+	self.collection = collection
 end
 
 SearchModel.search = function(self, list)
@@ -21,11 +26,15 @@ SearchModel.search = function(self, list)
 	return foundList, foundMap
 end
 
-SearchModel.check = function(self, entry)
+SearchModel.check = function(self, noteChartDataEntry, noteChartEntry, noteChartSetEntry)
+	if noteChartSetEntry and not noteChartSetEntry.path:find(self.collection.path, 1, true) then
+		return false
+	end
+
 	local searchString = self.searchString
 	for _, searchSubString in ipairs(searchString:split(" ")) do
 		local key, operator, value = searchSubString:match("^(.-)([=><~!]+)(.+)$")
-		if key and self:checkFilter(entry, key, operator, value) or self:find(entry, searchSubString) then
+		if key and self:checkFilter(noteChartDataEntry, key, operator, value) or self:find(noteChartDataEntry, searchSubString) then
 			-- skip
 		else
 			return false

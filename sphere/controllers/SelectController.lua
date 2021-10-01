@@ -190,6 +190,9 @@ SelectController.switchResultController = function(self)
 	local selectModel = self.gameController.selectModel
 	local scoreItemIndex = selectModel.scoreItemIndex
 	local scoreItem = selectModel.scoreItem
+	if not scoreItem then
+		return
+	end
 	resultController:replayNoteChart("result", scoreItem.scoreEntry, scoreItemIndex)
 
 	return self.gameController.screenManager:set(resultController)

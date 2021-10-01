@@ -4,14 +4,9 @@ local NoteChartSetLibraryModel = Class:new()
 
 NoteChartSetLibraryModel.searchMode = "hide"
 NoteChartSetLibraryModel.collapse = false
-NoteChartSetLibraryModel.collection = {path = ""}
 
 NoteChartSetLibraryModel.construct = function(self)
 	self.items = {}
-end
-
-NoteChartSetLibraryModel.setCollection = function(self, collection)
-	self.collection = collection
 end
 
 NoteChartSetLibraryModel.updateItems = function(self)
@@ -27,10 +22,12 @@ NoteChartSetLibraryModel.updateItems = function(self)
 	local prevSetId = 0
 	for i = 1, #noteChartDataEntries do
 		local noteChartDataEntry = noteChartDataEntries[i]
-		local check = self:checkNoteChartDataEntry(noteChartDataEntry)
+		local noteChartEntries = self.cacheModel.cacheManager:getNoteChartsAtHash(noteChartDataEntry.hash)
+		local noteChartEntry = noteChartEntries[1]
+		local setId = noteChartEntry and noteChartEntry.setId
+		local noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(setId)
+		local check = self:checkNoteChartDataEntry(noteChartDataEntry, noteChartEntry, noteChartSetEntry)
 		if check or self.searchMode == "show" then
-			local noteChartEntries = self.cacheModel.cacheManager:getNoteChartsAtHash(noteChartDataEntry.hash)
-			local setId = noteChartEntries[1] and noteChartEntries[1].setId
 			if setId and (not self.collapse or setId ~= prevSetId) then
 				items[#items + 1] = {
 					noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(setId),
@@ -44,29 +41,11 @@ NoteChartSetLibraryModel.updateItems = function(self)
 	end
 end
 
-NoteChartSetLibraryModel.checkNoteChartSetEntry = function(self, entry)
-	if not entry.path:find(self.collection.path, 1, true) then
-		return false
-	end
-
-	local list = self.cacheModel.cacheManager:getNoteChartsAtSet(entry.id)
-	if not list or not list[1] then
+NoteChartSetLibraryModel.checkNoteChartDataEntry = function(self, noteChartDataEntry, noteChartEntry, noteChartSetEntry)
+	if not noteChartEntry or not noteChartSetEntry then
 		return
 	end
-
-	for i = 1, #list do
-		local entries = self.cacheModel.cacheManager:getAllNoteChartDataEntries(list[i].hash)
-		for _, e in pairs(entries) do
-			local found = self:checkNoteChartDataEntry(e)
-			if found == true then
-				return true
-			end
-		end
-	end
-end
-
-NoteChartSetLibraryModel.checkNoteChartDataEntry = function(self, entry)
-	return self.searchModel:check(entry)
+	return self.searchModel:check(noteChartDataEntry, noteChartEntry, noteChartSetEntry)
 end
 
 NoteChartSetLibraryModel.getItemIndex = function(self, noteChartSetEntryId, noteChartEntryId, noteChartDataEntryId)
