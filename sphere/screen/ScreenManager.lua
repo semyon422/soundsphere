@@ -7,14 +7,22 @@ ScreenManager.construct = function(self)
 	self.currentScreen = Screen:new()
 	self.coroutine = coroutine.create(function()
 		while true do
+			self.waitForScreen = true
 			local screen = coroutine.yield()
+			self.waitForScreen = false
 			self.transition:fadeIn()
 			coroutine.yield()
 			self.currentScreen:unload()
 			self.currentScreen = screen
 			local ok, err = xpcall(screen.load, debug.traceback, screen)
 			if not ok then
-				error(err)
+				screen = self.fallback
+				if not screen then
+					error(err)
+				end
+				self.currentScreen = screen
+				assert(xpcall(screen.load, debug.traceback, screen))
+				screen.error = err
 			end
 			self.transition:fadeOut()
 			coroutine.yield()
@@ -23,7 +31,14 @@ ScreenManager.construct = function(self)
 	coroutine.resume(self.coroutine)
 end
 
+ScreenManager.setFallback = function(self, screen)
+	self.fallback = screen
+end
+
 ScreenManager.set = function(self, screen)
+	if not self.waitForScreen then
+		return
+	end
 	assert(coroutine.resume(self.coroutine, screen))
 end
 

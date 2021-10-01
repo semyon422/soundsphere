@@ -10,6 +10,7 @@ local OnlineController			= require("sphere.controllers.OnlineController")
 local ScreenManager				= require("sphere.screen.ScreenManager")
 local FadeTransition			= require("sphere.screen.FadeTransition")
 local SelectController			= require("sphere.controllers.SelectController")
+local ErrorController			= require("sphere.controllers.ErrorController")
 local WindowManager				= require("sphere.window.WindowManager")
 local FpsLimiter				= require("sphere.window.FpsLimiter")
 local Screenshot				= require("sphere.window.Screenshot")
@@ -203,11 +204,14 @@ GameController.load = function(self)
 
 	self.screenManager:setTransition(self.fadeTransition)
 
+	local errorController = ErrorController:new()
+	self.errorController = errorController
+	errorController.gameController = self
+	self.screenManager:setFallback(errorController)
+
 	local selectController = SelectController:new()
 	self.selectController = selectController
-
 	selectController.gameController = self
-
 	self.screenManager:set(selectController)
 end
 
