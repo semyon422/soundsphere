@@ -18,7 +18,6 @@ WindowManager.load = function(self)
 		width, height = mode.window.width, mode.window.height
 	end
 	love.window.setMode(width, height, mode.flags)
-	love.resize(width, height)
 
 	self:setIcon()
 	love.window.setTitle("soundsphere")
