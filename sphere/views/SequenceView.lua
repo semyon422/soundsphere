@@ -57,9 +57,6 @@ SequenceView.getViewIterator = function(self)
 			local state = states[config]
 			local view = self:getView(config)
 			if view and not state.hidden then
-				view.config = config
-				view.state = state
-				view.sequenceView = self
 				index = i + 1
 				return view
 			end

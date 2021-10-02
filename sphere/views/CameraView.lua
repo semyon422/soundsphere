@@ -8,18 +8,21 @@ CameraView.speed = 500
 
 CameraView.load = function(self)
 	local state = self.state
+	local config = self.config
 
 	local perspective = self.gameController.configModel.configs.settings.graphics.perspective
 	state.camera = perspective.camera
-	if not state.camera then
+	if not state.camera or not config.draw_start then
 		return
 	end
 	self:loadCamera()
 end
 
 CameraView.loadCamera = function(self)
+	local state = self.state
 	s3dc.load()
 	local w, h = love.graphics.getDimensions()
+	state.w, state.h = w, h
 	local perspective = self.gameController.configModel.configs.settings.graphics.perspective
 	s3dc.translate(perspective.x * w, perspective.y * h, perspective.z * h)
 	s3dc.rotate(perspective.pitch, perspective.yaw)
@@ -27,21 +30,31 @@ end
 
 CameraView.unload = function(self)
 	local state = self.state
+	local config = self.config
 
-	if not state.camera then
+	if not state.camera or not config.draw_start then
 		return
 	end
 
-	local w, h = love.graphics.getDimensions()
+	local w, h = state.w, state.h
 	local x, y, z = unpack(s3dc.pos)
 	x = x / w
 	y = y / h
 	z = z / h
 	self.navigator:saveCamera(x, y, z, s3dc.angle.pitch, s3dc.angle.yaw)
+	self.state = state  -- bug fix when calling from receive
+	--[[
+		saveCamera sends state, calls receive of playfield and changes self.state because there are 2 cameras
+	]]
 end
 
 CameraView.receive = function(self, event)
 	local state = self.state
+	local config = self.config
+
+	if not config.draw_start then
+		return
+	end
 
 	if event.name == "keypressed" and state.camera then
 		local key = event.args[2]
@@ -74,13 +87,22 @@ CameraView.receive = function(self, event)
 			dx = 0
 		end
 		s3dc.rotate(math.rad(-dy) * angle, math.rad(dx) * angle)
-	elseif event.name == "resize" and state.camera then
-		self:loadCamera()
 	end
 end
 
 CameraView.update = function(self, dt)
 	local state = self.state
+	local config = self.config
+
+	if not config.draw_start then
+		return
+	end
+
+	local w, h = love.graphics.getDimensions()
+	if state.w ~= w or state.h ~= h then
+		self:unload()
+		self:loadCamera()
+	end
 
 	if not state.camera or not state.moveCamera then
 		return
