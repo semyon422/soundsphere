@@ -25,6 +25,7 @@ ScoreLibraryModel.updateItems = function(self)
 		self.index
 	)
 	if not scoreEntries or not scoreEntries[1] then
+		self.firstScoreItem = nil
 		return items
 	end
 
