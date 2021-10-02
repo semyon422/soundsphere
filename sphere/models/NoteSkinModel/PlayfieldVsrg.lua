@@ -256,4 +256,44 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 	end
 end
 
+PlayfieldVsrg.addGuidelines = function(self, object)
+	local noteskin = self.noteskin
+	if not object.transform then
+		object.transform = self:newNoteskinTransform()
+	end
+	local inputs = noteskin.inputsCount
+	for i = 1, #object.w do
+		local bw = object.w[i]
+		local bh = object.h[i]
+
+		if bw ~= 0 and bh ~= 0 then
+			local x
+			if bw > 0 then
+				if i <= inputs then
+					x = noteskin.columns[i] - noteskin.space[i]
+				else
+					x = noteskin.columns[inputs] + noteskin.width[inputs]
+				end
+			elseif bw < 0 then
+				if i <= inputs then
+					x = noteskin.columns[i]
+				else
+					x = noteskin.columns[inputs] + noteskin.width[inputs] + noteskin.space[i]
+				end
+			end
+
+			local view = {
+				class = "ImageView",
+				x = x,
+				y = object.y[i],
+				w = object.w[i],
+				h = object.h[i],
+				transform = object.transform,
+				image = object.image[i],
+			}
+			self:add(view)
+		end
+	end
+end
+
 return PlayfieldVsrg

@@ -41,6 +41,7 @@ NoteSkinVsrg.setInput = function(self, columns)
 		columns[input] = i
 	end
 	self.inputs = columns
+	self.inputsCount = #columns
 end
 
 local colors = {
