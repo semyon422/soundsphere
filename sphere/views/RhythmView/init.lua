@@ -8,11 +8,13 @@ RhythmView.load = function(self)
 	local config = self.config
 	local state = self.state
 
+	local bga = self.gameController.configModel.configs.settings.gameplay.bga
+
 	state.noteViews = {}
 
 	local noteViewFactory = NoteViewFactory:new()
-	noteViewFactory.videoBgaEnabled = self.videoBgaEnabled
-	noteViewFactory.imageBgaEnabled = self.imageBgaEnabled
+	noteViewFactory.videoBgaEnabled = bga.video
+	noteViewFactory.imageBgaEnabled = bga.image
 	if config.mode then
 		noteViewFactory.mode = config.mode
 	end
@@ -141,14 +143,6 @@ RhythmView.loadImages = function(self)
 			local w, h = texture:getDimensions()
 			image[3] = {w, h}
 		end
-	end
-end
-
-RhythmView.setBgaEnabled = function(self, type, enabled)
-	if type == "video" then
-		self.videoBgaEnabled = enabled
-	elseif type == "image" then
-		self.imageBgaEnabled = enabled
 	end
 end
 

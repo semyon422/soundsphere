@@ -1,21 +1,22 @@
 local image			= require("aqua.image")
+local transform = require("aqua.graphics.transform")
 local NoteView = require("sphere.views.RhythmView.NoteView")
-local ShortNoteView = require("sphere.views.RhythmView.ShortNoteView")
-local NotePartView = require("sphere.views.RhythmView.NotePartView")
 
 local ImageNoteView = NoteView:new({construct = false})
 
 ImageNoteView.construct = function(self)
 	NoteView.construct(self)
+	self.headView = self:newNotePartView("Head")
 
-	self.images = self.startNoteData.images
-	self.headView = NotePartView:new({}, self, "Head")
+	local images = self.startNoteData.images
+	local path = self.graphicalNote.graphicEngine.localAliases[images[1][1]] or self.graphicalNote.graphicEngine.globalAliases[images[1][1]]
+	self.drawable = image.getImage(path)
+end
+
+ImageNoteView.update = function(self)
 	self.timeState = self.graphicalNote.timeState
 	self.logicalState = self.graphicalNote.logicalNote:getLastState()
-	self.headView.timeState = self.timeState
-
-	local path = self.graphicEngine.localAliases[self.startNoteData.images[1][1]] or self.graphicEngine.globalAliases[self.startNoteData.images[1][1]]
-	self.drawable = image.getImage(path)
+	self.headView.timeState = self.graphicalNote.startTimeState or self.graphicalNote.timeState
 end
 
 ImageNoteView.draw = function(self)
@@ -24,10 +25,30 @@ ImageNoteView.draw = function(self)
 		return
 	end
 
+	local tf = transform(self.rhythmView.config.transform)
+	love.graphics.replaceTransform(tf)
+	tf:release()
+
 	love.graphics.setColor(self.headView:get("color"))
 	love.graphics.draw(drawable, self:getTransformParams())
 end
 
-ImageNoteView.getTransformParams = ShortNoteView.getTransformParams
+ImageNoteView.getTransformParams = function(self)
+	local hw = self.headView
+	local w, h = self.drawable:getDimensions()
+	local nw, nh = hw:get("w"), hw:get("h")
+	local sx = nw and nw / w or hw:get("sx") or 1
+	local sy = nh and nh / h or hw:get("sy") or 1
+	local ox = (hw:get("ox") or 0) * w
+	local oy = (hw:get("oy") or 0) * h
+	return
+		hw:get("x"),
+		hw:get("y"),
+		hw:get("r") or 0,
+		sx,
+		sy,
+		ox,
+		oy
+end
 
 return ImageNoteView

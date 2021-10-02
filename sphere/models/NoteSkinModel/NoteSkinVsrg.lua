@@ -121,8 +121,6 @@ NoteSkinVsrg.setShortNote = function(self, params)
 		y = function(...) return self:getPosition(...) end,
 		w = self.width,
 		h = height,
-		rw = {},
-		rh = {},
 		sx = {},
 		sy = {},
 		ox = {},
@@ -181,8 +179,6 @@ NoteSkinVsrg.setLongNote = function(self, params)
 		y = function(...) return self:getPosition(...) end,
 		w = self.width,
 		h = height,
-		rw = {},
-		rh = {},
 		sx = {},
 		sy = {},
 		ox = {},
@@ -197,8 +193,6 @@ NoteSkinVsrg.setLongNote = function(self, params)
 		y = function(...) return self:getPosition(...) end,
 		w = self.width,
 		h = height,
-		rw = {},
-		rh = {},
 		sx = {},
 		sy = {},
 		ox = {},
@@ -213,8 +207,6 @@ NoteSkinVsrg.setLongNote = function(self, params)
 		y = function(...) return self:getPosition(...) - h / 2 end,
 		w = self.width,
 		h = bh,
-		rw = {},
-		rh = {},
 		sx = {},
 		sy = {},
 		ox = {},
@@ -230,12 +222,66 @@ NoteSkinVsrg.setLongNote = function(self, params)
 	}
 end
 
+local bmsLayers = {
+	0x04,
+	-- 0x06,
+	0x07,
+	0x0A,
+	-- 0x0B,
+	-- 0x0C,
+	-- 0x0D,
+	-- 0x0E,
+}
+NoteSkinVsrg.addBga = function(self, params)
+	local imageHead = {
+		x = {},
+		y = {},
+		w = {},
+		h = {},
+		color = {}
+	}
+	local videoHead = {
+		x = {},
+		y = {},
+		w = {},
+		h = {},
+		color = {}
+	}
+	self.notes.ImageNote = {Head = imageHead}
+	self.notes.VideoNote = {Head = videoHead}
+
+	for _, head in ipairs({imageHead, videoHead}) do
+		for _, inputIndex in ipairs(bmsLayers) do
+			self:addImageNote(head, "bmsbga" .. inputIndex, params)
+		end
+	end
+end
+
+NoteSkinVsrg.addImageNote = function(self, head, input, params)
+	local i = self.inputs[input]
+	if not i then
+		i = #self.inputs + 1
+		self.inputs[i] = input
+		self.inputs[input] = i
+	end
+
+	head.x[i] = params.x or 0
+	head.y[i] = params.y or 0
+	head.w[i] = params.w or 1
+	head.h[i] = params.h or 1
+	head.color[i] = params.color or colors.clear
+end
+
 NoteSkinVsrg.addMeasureLine = function(self, params)
 	local Head = self.notes.LongNote.Head
-	local i = #self.inputs + 1
 
-	self.inputs[i] = "measure1"
-	self.inputs.measure1 = i
+	local input = "measure1"
+	local i = self.inputs[input]
+	if not i then
+		i = #self.inputs + 1
+		self.inputs[i] = input
+		self.inputs[input] = i
+	end
 
 	Head.x[i] = self.baseOffset
 	Head.w[i] = self.fullWidth

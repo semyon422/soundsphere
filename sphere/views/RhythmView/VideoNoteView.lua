@@ -8,13 +8,11 @@ VideoNoteView.timeRate = 0
 
 VideoNoteView.construct = function(self)
 	NoteView.construct(self)
-	self.images = self.startNoteData.images
 	self.headView = self:newNotePartView("Head")
-	self.timeState = self.graphicalNote.timeState
-	self.logicalState = self.graphicalNote.logicalNote:getLastState()
-	self.headView.timeState = self.timeState
 
-	local path = self.graphicEngine.localAliases[self.startNoteData.images[1][1]] or self.graphicEngine.globalAliases[self.startNoteData.images[1][1]]
+	local images = self.startNoteData.images
+	local graphicEngine = self.graphicalNote.graphicEngine
+	local path = graphicEngine.localAliases[images[1][1]] or graphicEngine.globalAliases[images[1][1]]
 
 	local vid = video.new(path)
 	local image
@@ -25,9 +23,9 @@ VideoNoteView.construct = function(self)
 
 		local deltaTime = self.startNoteData.timePoint.absoluteTime
 		vid.getAdjustTime = function()
-			return self.graphicEngine.currentTime - deltaTime
+			return graphicEngine.currentTime - deltaTime
 		end
-		vid:setRate(self.graphicEngine.timeRate)
+		vid:setRate(graphicEngine.timeRate)
 
 		self.video = vid
 		self.drawable = image
@@ -38,6 +36,10 @@ VideoNoteView.draw = ImageNoteView.draw
 VideoNoteView.getTransformParams = ImageNoteView.getTransformParams
 
 VideoNoteView.update = function(self, dt)
+	self.timeState = self.graphicalNote.timeState
+	self.logicalState = self.graphicalNote.logicalNote:getLastState()
+	self.headView.timeState = self.graphicalNote.startTimeState or self.graphicalNote.timeState
+
 	local vid = self.video
 	if vid then
 		vid:update(dt)

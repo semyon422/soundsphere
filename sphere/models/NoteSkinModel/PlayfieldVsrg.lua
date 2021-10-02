@@ -77,9 +77,15 @@ PlayfieldVsrg.addNotes = function(self, object)
 end
 
 PlayfieldVsrg.addLightings = function(self, object)
-	self:addRhythmView(object or {
-		mode = "lighting"
-	})
+	object = object or {}
+	object.mode = "lighting"
+	self:addRhythmView(object)
+end
+
+PlayfieldVsrg.addBga = function(self, object)
+	object = object or {}
+	object.mode = "bga"
+	self:addRhythmView(object)
 end
 
 PlayfieldVsrg.addProgressBar = function(self, object)

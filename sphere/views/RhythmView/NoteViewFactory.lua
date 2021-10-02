@@ -15,7 +15,6 @@ NoteViewFactory.notes = {
 		LongNoteStart = {"LongNote", LongNoteView},
 		LaserNoteStart = {"LongNote", LongNoteView},
 		LineNoteStart = {"LongNote", LongNoteView},
-		ImageNoteView = true,
 	},
 	animation = {
 		ShortNote = {"ShortNoteAnimation", ShortNoteView},
@@ -26,6 +25,9 @@ NoteViewFactory.notes = {
 		ShortNote = {"ShortNoteLighting", LightingNoteView},
 		LongNoteStart = {"LongNoteLighting", LightingNoteView},
 		LaserNoteStart = {"LongNoteLighting", LightingNoteView},
+	},
+	bga = {
+		ImageNote = true,
 	},
 }
 
