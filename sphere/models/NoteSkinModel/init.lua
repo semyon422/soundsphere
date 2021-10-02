@@ -2,7 +2,7 @@ local Class			= require("aqua.util.Class")
 local ncdk			= require("ncdk")
 local NoteSkin		= require("sphere.models.NoteSkinModel.NoteSkin")
 local OsuNoteSkin		= require("sphere.models.NoteSkinModel.OsuNoteSkin")
-local TomlNoteSkinLoader = require("sphere.models.NoteSkinModel.TomlNoteSkinLoader")
+local TomlNoteSkin = require("sphere.models.NoteSkinModel.TomlNoteSkin")
 
 local NoteSkinModel = Class:new()
 
@@ -43,16 +43,16 @@ end
 NoteSkinModel.loadNoteSkin = function(self, path, directoryPath, itemName)
 	local noteSkin
 	if path:find("^.+%.toml$") then
-		noteSkin = TomlNoteSkinLoader:new():load(path, directoryPath, itemName)
+		noteSkin = self:loadToml(path, directoryPath, itemName)
 	elseif path:find("^.+%.lua$") then
-		noteSkin = self:loadLuaFullLatest(path, directoryPath, itemName)
+		noteSkin = self:loadLua(path, directoryPath, itemName)
 	elseif path:find("^.+%.ini$") then
-		return self:addNoteSkins(self:loadOsuLatest(path, directoryPath, itemName))
+		return self:addNoteSkins(self:loadOsu(path, directoryPath, itemName))
 	end
 	table.insert(self.noteSkins, noteSkin)
 end
 
-NoteSkinModel.loadLuaFullLatest = function(self, path, directoryPath, fileName)
+NoteSkinModel.loadLua = function(self, path, directoryPath, fileName)
 	local noteSkin = assert(love.filesystem.load(path))(path)
 
 	noteSkin.path = path
@@ -66,7 +66,22 @@ NoteSkinModel.loadLuaFullLatest = function(self, path, directoryPath, fileName)
 	return noteSkin
 end
 
-NoteSkinModel.loadOsuLatest = function(self, path, directoryPath, fileName)
+NoteSkinModel.loadToml = function(self, path, directoryPath, fileName)
+	local noteSkin = TomlNoteSkin:new()
+
+	noteSkin:load(love.filesystem.read(path))
+	noteSkin.path = path
+	noteSkin.directoryPath = directoryPath
+	noteSkin.fileName = fileName
+	noteSkin.inputMode = ncdk.InputMode:new():setString(noteSkin.inputMode)
+	if type(noteSkin.playField) == "string" then
+		noteSkin.playField = love.filesystem.load(directoryPath .. "/" .. noteSkin.playField)()
+	end
+
+	return noteSkin
+end
+
+NoteSkinModel.loadOsu = function(self, path, directoryPath, fileName)
 	local noteSkins = {}
 
 	local skinini = OsuNoteSkin:parseSkinIni(love.filesystem.read(path))
