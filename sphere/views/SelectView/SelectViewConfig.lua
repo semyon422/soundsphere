@@ -450,6 +450,24 @@ local UpdateStatus = {
 	align = "left",
 }
 
+local SessionTime = {
+	class = "ValueView",
+	transform = transform,
+	value = "",
+	format = function()
+		local event = require("aqua.event")
+		local rtime = require("aqua.util.rtime")
+		return rtime(event.time - event.startTime)
+	end,
+	x = 301,
+	baseline = 818,
+	limit = 1920,
+	color = {1, 1, 1, 1},
+	fontSize = 20,
+	fontFamily = "Noto Sans",
+	align = "left",
+}
+
 local BottomScreenMenu = {
 	class = "ScreenMenuView",
 	transform = transform,
@@ -714,6 +732,7 @@ local SelectViewConfig = {
 	NoteChartOptionsScreenMenu,
 	LeftScreenMenu,
 	UpdateStatus,
+	SessionTime,
 
 	Rectangle,
 	Line,
