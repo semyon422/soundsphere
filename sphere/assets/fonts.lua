@@ -4,31 +4,36 @@ local instances = {}
 
 local fontFamilyList = {
 	["Noto Sans"] = {
-		-- path = "resources/fonts/NotoSans-Minimal.ttf",
-		path = "resources/fonts/NotoSansCJK-Regular.ttc",
-		-- fallbackPath = "resources/fonts/NotoSansCJK-Regular.ttc"
+		"resources/fonts/NotoSansCJK-Regular.ttc",
+		"resources/fonts/NotoSans-Minimal.ttf",
 	},
 	["Noto Sans Mono"] = {
-		-- path = "resources/fonts/NotoSansMono-Minimal.ttf"
-		path = "resources/fonts/NotoSansMono-Regular.ttf"
+		"resources/fonts/NotoSansMono-Regular.ttf",
+		"resources/fonts/NotoSansMono-Minimal.ttf",
 	}
 }
 
-fonts.get = function(family, size)
-	if not (instances[family] and instances[family][size]) then
-		local data = fontFamilyList[family]
-		local path = data.path
-		local font = love.graphics.newFont(path, size)
-		if data.fallbackPath then
-			local fallbackFont = love.graphics.newFont(data.fallbackPath, size)
-			data.fallbackFont = fallbackFont
-			font:setFallbacks(fallbackFont)
-		end
-		instances[family] = instances[family] or {}
-		instances[family][size] = font
-		return font
+local getFirstFile = function(list)
+	if not list then
+		return
 	end
-	return instances[family][size]
+	for _, path in ipairs(list) do
+		if love.filesystem.getInfo(path) then
+			return path
+		end
+	end
+end
+
+fonts.get = function(t)
+	local filename = t.filename
+	local size = t.size
+	if instances[filename] and instances[filename][size] then
+		return instances[filename][size]
+	end
+	local font = love.graphics.newFont(getFirstFile(fontFamilyList[filename]) or filename, size)
+	instances[filename] = instances[filename] or {}
+	instances[filename][size] = font
+	return font
 end
 
 return fonts

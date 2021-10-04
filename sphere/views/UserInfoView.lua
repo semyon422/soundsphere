@@ -47,7 +47,7 @@ UserInfoView.draw = function(self)
 	tf:release()
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local font = spherefonts.get(config.text.fontFamily, config.text.fontSize)
+	local font = spherefonts.get(config.text.font)
 	love.graphics.setFont(font)
 
 	local value = config.value or inside(self, config.key)

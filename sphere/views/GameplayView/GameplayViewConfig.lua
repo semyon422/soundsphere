@@ -35,8 +35,10 @@ local BottomScreenMenu = {
 		baseline = 54,
 		limit = 227,
 		align = "center",
-		fontSize = 24,
-		fontFamily = "Noto Sans"
+		font = {
+			filename = "Noto Sans",
+			size = 24,
+		},
 	},
 	items = {
 		{
@@ -71,8 +73,10 @@ local PauseText = {
 	baseline = 64,
 	limit = 1920,
 	align = "left",
-	fontSize = 40,
-	fontFamily = "Noto Sans",
+	font = {
+		filename = "Noto Sans",
+		size = 40,
+	},
 }
 
 local GameplayViewConfig = {

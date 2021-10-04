@@ -10,8 +10,10 @@ local ErrorText = {
 	baseline = 144,
 	limit = math.huge,
 	align = "left",
-	fontSize = 20,
-	fontFamily = "Noto Sans",
+	font = {
+		filename = "Noto Sans",
+		size = 20,
+	},
 	transform = transform
 }
 
@@ -29,8 +31,10 @@ local BottomScreenMenu = {
 		baseline = 54,
 		limit = 227,
 		align = "center",
-		fontSize = 24,
-		fontFamily = "Noto Sans"
+		font = {
+			filename = "Noto Sans",
+			size = 24,
+		},
 	},
 	items = {
 		{
@@ -52,8 +56,10 @@ local Title = {
 	baseline = 64,
 	limit = 1920,
 	align = "left",
-	fontSize = 36,
-	fontFamily = "Noto Sans",
+	font = {
+		filename = "Noto Sans",
+		size = 36,
+	},
 }
 
 local Rectangle = {

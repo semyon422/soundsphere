@@ -41,7 +41,7 @@ SearchFieldView.draw = function(self)
 		love.graphics.setColor(1, 1, 1, 1)
 	end
 
-	local font = spherefonts.get(config.text.fontFamily, config.text.fontSize)
+	local font = spherefonts.get(config.text.font)
 	love.graphics.setFont(font)
 	baseline_print(
 		searchString,

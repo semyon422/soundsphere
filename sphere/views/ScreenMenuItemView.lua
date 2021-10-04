@@ -16,7 +16,7 @@ ScreenMenuItemView.draw = function(self)
 
 	local item = self.item
 
-	local font = spherefonts.get(config.text.fontFamily, config.text.fontSize)
+	local font = spherefonts.get(config.text.font)
 	love.graphics.setFont(font)
 	baseline_print(
 		item.displayName,

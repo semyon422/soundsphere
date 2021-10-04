@@ -1,5 +1,3 @@
-local spherefonts		= require("sphere.assets.fonts")
-local baseline_print = require("aqua.graphics.baseline_print")
 local transform = require("aqua.graphics.transform")
 
 local ListItemView = require("sphere.views.ListItemView")

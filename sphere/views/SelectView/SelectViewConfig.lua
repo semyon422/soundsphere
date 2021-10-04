@@ -24,8 +24,10 @@ local NoteChartSetList = {
 			baseline = 45,
 			limit = math.huge,
 			align = "left",
-			fontSize = 24,
-			fontFamily = "Noto Sans"
+			font = {
+				filename = "Noto Sans",
+				size = 24,
+			},
 		},
 		{
 			type = "text",
@@ -35,8 +37,10 @@ local NoteChartSetList = {
 			baseline = 19,
 			limit = math.huge,
 			align = "left",
-			fontSize = 16,
-			fontFamily = "Noto Sans"
+			font = {
+				filename = "Noto Sans",
+				size = 16,
+			},
 		},
 		{
 			type = "circle",
@@ -66,8 +70,10 @@ local NoteChartList = {
 			baseline = 45,
 			limit = math.huge,
 			align = "left",
-			fontSize = 24,
-			fontFamily = "Noto Sans"
+			font = {
+				filename = "Noto Sans",
+				size = 24,
+			},
 		},
 		{
 			type = "text",
@@ -77,8 +83,10 @@ local NoteChartList = {
 			baseline = 19,
 			limit = math.huge,
 			align = "left",
-			fontSize = 16,
-			fontFamily = "Noto Sans"
+			font = {
+				filename = "Noto Sans",
+				size = 16,
+			},
 		},
 		{
 			type = "text",
@@ -88,8 +96,10 @@ local NoteChartList = {
 			baseline = 19,
 			limit = 500,
 			align = "left",
-			fontSize = 16,
-			fontFamily = "Noto Sans"
+			font = {
+				filename = "Noto Sans",
+				size = 16,
+			},
 		},
 		{
 			type = "text",
@@ -99,8 +109,10 @@ local NoteChartList = {
 			baseline = 45,
 			limit = 72,
 			align = "right",
-			fontSize = 24,
-			fontFamily = "Noto Sans Mono",
+			font = {
+				filename = "Noto Sans Mono",
+				size = 24,
+			},
 			format = function(difficulty)
 				local format = "%.2f"
 				if difficulty >= 100 then
@@ -139,8 +151,10 @@ local StageInfo = {
 			baseline = 18,
 			limit = 69,
 			align = "right",
-			fontSize = 16,
-			fontFamily = "Noto Sans"
+			font = {
+				filename = "Noto Sans",
+				size = 16,
+			},
 		},
 		value = {
 			text = {
@@ -148,8 +162,10 @@ local StageInfo = {
 				baseline = 44,
 				limit = 70,
 				align = "right",
-				fontSize = 24,
-				fontFamily = "Noto Sans"
+				font = {
+					filename = "Noto Sans",
+					size = 24,
+				},
 			},
 			bar = {
 				x = 22,
@@ -167,8 +183,10 @@ local StageInfo = {
 			baseline = 15,
 			limit = 160,
 			align = "right",
-			fontSize = 18,
-			fontFamily = "Noto Sans"
+			font = {
+				filename = "Noto Sans",
+				size = 18,
+			},
 		},
 		value = {
 			text = {
@@ -176,8 +194,10 @@ local StageInfo = {
 				baseline = 49,
 				limit = 161,
 				align = "right",
-				fontSize = 36,
-				fontFamily = "Noto Sans"
+				font = {
+					filename = "Noto Sans",
+					size = 36,
+				},
 			}
 		}
 	}
@@ -328,8 +348,10 @@ local Logo = {
 		baseline = 56,
 		limit = 365,
 		align = "left",
-		fontSize = 32,
-		fontFamily = "Noto Sans"
+		font = {
+			filename = "Noto Sans",
+			size = 32,
+		},
 	}
 }
 
@@ -353,8 +375,10 @@ local UserInfo = {
 		baseline = 54,
 		limit = 365,
 		align = "right",
-		fontSize = 26,
-		fontFamily = "Noto Sans"
+		font = {
+			filename = "Noto Sans",
+			size = 26,
+		},
 	}
 }
 
@@ -378,8 +402,10 @@ local SearchField = {
 		baseline = 35,
 		limit = 227,
 		align = "left",
-		fontSize = 20,
-		fontFamily = "Noto Sans"
+		font = {
+			filename = "Noto Sans",
+			size = 20,
+		},
 	},
 	point = {
 		r = 7
@@ -406,8 +432,10 @@ local SortStepper = {
 		baseline = 35,
 		limit = 119,
 		align = "center",
-		fontSize = 20,
-		fontFamily = "Noto Sans"
+		font = {
+			filename = "Noto Sans",
+			size = 20,
+		},
 	}
 }
 
@@ -445,8 +473,10 @@ local UpdateStatus = {
 	baseline = 1070,
 	limit = 1920,
 	color = {1, 1, 1, 1},
-	fontSize = 24,
-	fontFamily = "Noto Sans Mono",
+	font = {
+		filename = "Noto Sans Mono",
+		size = 24,
+	},
 	align = "left",
 }
 
@@ -463,8 +493,10 @@ local SessionTime = {
 	baseline = 818,
 	limit = 1920,
 	color = {1, 1, 1, 1},
-	fontSize = 20,
-	fontFamily = "Noto Sans",
+	font = {
+		filename = "Noto Sans",
+		size = 20,
+	},
 	align = "left",
 }
 
@@ -482,8 +514,10 @@ local BottomScreenMenu = {
 		baseline = 54,
 		limit = 228,
 		align = "center",
-		fontSize = 24,
-		fontFamily = "Noto Sans"
+		font = {
+			filename = "Noto Sans",
+			size = 24,
+		},
 	},
 	items = {
 		{
@@ -520,8 +554,10 @@ local BottomRightScreenMenu = {
 		baseline = 54,
 		limit = 228,
 		align = "center",
-		fontSize = 24,
-		fontFamily = "Noto Sans"
+		font = {
+			filename = "Noto Sans",
+			size = 24,
+		},
 	},
 	items = {
 		--[[
@@ -549,8 +585,10 @@ local NoteChartSubScreenMenu = {
 		baseline = 35,
 		limit = 454 / 4,
 		align = "center",
-		fontSize = 20,
-		fontFamily = "Noto Sans"
+		font = {
+			filename = "Noto Sans",
+			size = 20,
+		},
 	},
 	items = {
 		{
@@ -585,8 +623,10 @@ local NoteChartOptionsScreenMenu = {
 		baseline = 36,
 		limit = 228,
 		align = "left",
-		fontSize = 20,
-		fontFamily = "Noto Sans"
+		font = {
+			filename = "Noto Sans",
+			size = 20,
+		},
 	},
 	items = {
 		{
@@ -639,8 +679,10 @@ local LeftScreenMenu = {
 		baseline = 41,
 		limit = 190,
 		align = "left",
-		fontSize = 24,
-		fontFamily = "Noto Sans"
+		font = {
+			filename = "Noto Sans",
+			size = 24,
+		},
 	},
 	items = {
 		{

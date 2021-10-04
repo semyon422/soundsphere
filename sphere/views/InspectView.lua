@@ -17,7 +17,7 @@ InspectView.draw = function(self)
 
 	local value = config.value or inside(self, config.key) or 0
 
-	local fontName = spherefonts.get(config.fontFamily, config.fontSize)
+	local fontName = spherefonts.get(config.font)
 	love.graphics.setFont(fontName)
 	love.graphics.printf(
 		inspect(value),

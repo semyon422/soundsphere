@@ -18,8 +18,10 @@ local SectionsList = {
 			baseline = 45,
 			limit = 410,
 			align = "left",
-			fontSize = 24,
-			fontFamily = "Noto Sans",
+			font = {
+				filename = "Noto Sans",
+				size = 24,
+			},
 		}
 	},
 }
@@ -43,8 +45,10 @@ local SettingsList = {
 		baseline = 45,
 		limit = 410,
 		align = "left",
-		fontSize = 24,
-		fontFamily = "Noto Sans"
+		font = {
+			filename = "Noto Sans",
+			size = 24,
+		},
 	},
 	slider = {
 		x = 454,
@@ -56,8 +60,10 @@ local SettingsList = {
 			baseline = 45,
 			limit = 454,
 			align = "right",
-			fontSize = 24,
-			fontFamily = "Noto Sans"
+			font = {
+				filename = "Noto Sans",
+				size = 24,
+			},
 		}
 	},
 	stepper = {
@@ -70,8 +76,10 @@ local SettingsList = {
 			baseline = 45,
 			limit = 227,
 			align = "center",
-			fontSize = 24,
-			fontFamily = "Noto Sans"
+			font = {
+				filename = "Noto Sans",
+				size = 24,
+			},
 		}
 	},
 	switch = {
@@ -90,8 +98,10 @@ local SettingsList = {
 			baseline = 45,
 			limit = 227,
 			align = "center",
-			fontSize = 24,
-			fontFamily = "Noto Sans"
+			font = {
+				filename = "Noto Sans",
+				size = 24,
+			},
 		}
 	},
 }
@@ -170,8 +180,10 @@ local BottomScreenMenu = {
 		baseline = 54,
 		limit = 227,
 		align = "center",
-		fontSize = 24,
-		fontFamily = "Noto Sans"
+		font = {
+			filename = "Noto Sans",
+			size = 24,
+		},
 	},
 	items = {
 		{
@@ -192,8 +204,10 @@ local FpsView = {
 	baseline = 20,
 	limit = 1920,
 	color = {1, 1, 1, 1},
-	fontSize = 24,
-	fontFamily = "Noto Sans Mono",
+	font = {
+		filename = "Noto Sans Mono",
+		size = 24,
+	},
 	align = "left",
 	format = function()
 		return ("FPS:  %d\n1/dt: %0.2f"):format(love.timer.getFPS(), 1 / love.timer.getDelta())

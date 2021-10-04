@@ -39,7 +39,7 @@ StageInfoView.drawCellName = function(self, cell)
 		dcw = 0
 	end
 
-	local fontName = spherefonts.get(cell.type.name.fontFamily, cell.type.name.fontSize)
+	local fontName = spherefonts.get(cell.type.name.font)
 	love.graphics.setFont(fontName)
 	baseline_print(
 		cell.name,
@@ -89,7 +89,7 @@ StageInfoView.drawTextCell = function(self, cell)
 		value = time_ago_in_words(tonumber(value) or 0, cell.parts, cell.suffix)
 	end
 
-	local fontValue = spherefonts.get(cell.type.value.text.fontFamily, cell.type.value.text.fontSize)
+	local fontValue = spherefonts.get(cell.type.value.text.font)
 	love.graphics.setFont(fontValue)
 	baseline_print(
 		value,

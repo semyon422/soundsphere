@@ -15,7 +15,7 @@ CacheView.draw = function(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local font = spherefonts.get(config.text.fontFamily, config.text.fontSize)
+	local font = spherefonts.get(config.text.font)
 	love.graphics.setFont(font)
 
 	local cacheUpdater = self.gameController.cacheModel.cacheUpdater

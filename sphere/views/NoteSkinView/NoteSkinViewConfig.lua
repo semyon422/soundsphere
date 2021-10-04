@@ -17,8 +17,10 @@ local NoteSkinList = {
 			baseline = 45,
 			limit = 1920,
 			align = "left",
-			fontSize = 24,
-			fontFamily = "Noto Sans",
+			font = {
+				filename = "Noto Sans",
+				size = 24,
+			},
 		},
 		{
 			type = "circle",
@@ -93,8 +95,10 @@ local BottomScreenMenu = {
 		baseline = 54,
 		limit = 227,
 		align = "center",
-		fontSize = 24,
-		fontFamily = "Noto Sans"
+		font = {
+			filename = "Noto Sans",
+			size = 24,
+		},
 	},
 	items = {
 		{

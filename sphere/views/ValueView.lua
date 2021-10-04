@@ -10,7 +10,7 @@ ValueView.load = function(self)
 	local config = self.config
 	local state = self.state
 
-	state.font = spherefonts.get(config.fontFamily, config.fontSize)
+	state.font = spherefonts.get(config.font)
 end
 
 ValueView.draw = function(self)
