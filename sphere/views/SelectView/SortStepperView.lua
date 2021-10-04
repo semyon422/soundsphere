@@ -22,7 +22,7 @@ SortStepperView.getCount = function(self)
 end
 
 SortStepperView.updateIndexValue = function(self, indexValue)
-	self.navigator:setSortFunction(self.sortModel:fromIndexValue(indexValue))
+	self.navigator:setSortFunction(self.gameController.sortModel:fromIndexValue(indexValue))
 end
 
 SortStepperView.increaseValue = function(self, delta)

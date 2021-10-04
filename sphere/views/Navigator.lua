@@ -44,6 +44,30 @@ Navigator.setSubscreen = function(self, subscreen)
 	self:addSubscreen(subscreen)
 end
 
+Navigator.removeLessSubscreens = function(self, ...)
+	local subscreens = self.subscreens
+	local t = {...}
+
+	local maxIndex = 0
+	local maxSubscreen
+	for _, subscreen in ipairs(t) do
+		local index = subscreens[subscreen]
+		if index and index > maxIndex then
+			maxIndex = index
+			maxSubscreen = subscreen
+		end
+	end
+	for _, subscreen in ipairs(t) do
+		if subscreen ~= maxSubscreen then
+			self:removeSubscreen(subscreen)
+		end
+	end
+end
+
+Navigator.getSubscreen = function(self, subscreen)
+	return self.subscreens[subscreen]
+end
+
 Navigator.addSubscreen = function(self, subscreen)
 	local subscreens = self.subscreens
 	if subscreens[subscreen] then

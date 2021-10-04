@@ -44,6 +44,8 @@ SelectController.receive = function(self, event)
 
 	if event.name == "setTheme" then
 		self.themeModel:setDefaultTheme(event.theme)
+	elseif event.name == "scrollCollection" then
+		self.gameController.selectModel:scrollCollection(event.direction)
 	elseif event.name == "scrollNoteChartSet" then
 		self.gameController.selectModel:scrollNoteChartSet(event.direction)
 	elseif event.name == "scrollNoteChart" then
@@ -65,8 +67,6 @@ SelectController.receive = function(self, event)
 			self:switchInputController()
 		elseif event.screenName == "Settings" then
 			self:switchSettingsController()
-		elseif event.screenName == "Collection" then
-			self:switchCollectionController()
 		elseif event.screenName == "Result" then
 			self:switchResultController()
 		end
@@ -96,6 +96,13 @@ SelectController.receive = function(self, event)
 		local selectModel = self.gameController.selectModel
 		local path = selectModel.noteChartItem.noteChartEntry.path:match("^(.+)/.-$")
 		self.gameController.cacheModel:startUpdate(path, event.force)
+	elseif event.name == "updateCacheCollection" then
+		local state = self.gameController.cacheModel.cacheUpdater.state
+		if state == 0 or state == 3 then
+			self.gameController.cacheModel:startUpdate(event.collection.path, event.force)
+		else
+			self.gameController.cacheModel:stopUpdate()
+		end
 	elseif event.name == "deleteNoteChart" then
 	elseif event.name == "deleteNoteChartSet" then
 	end
@@ -171,14 +178,6 @@ SelectController.switchSettingsController = function(self)
 	settingsController.selectController = self
 	settingsController.gameController = self.gameController
 	return self.gameController.screenManager:set(settingsController)
-end
-
-SelectController.switchCollectionController = function(self)
-	local CollectionController = require("sphere.controllers.CollectionController")
-	local collectionController = CollectionController:new()
-	collectionController.selectController = self
-	collectionController.gameController = self.gameController
-	return self.gameController.screenManager:set(collectionController)
 end
 
 SelectController.switchResultController = function(self)

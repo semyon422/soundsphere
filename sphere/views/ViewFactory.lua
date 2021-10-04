@@ -9,7 +9,6 @@ local InputView = require(viewspackage .. "InputView")
 local SettingsView = require(viewspackage .. "SettingsView")
 local ResultView = require(viewspackage .. "ResultView")
 local GameplayView = require(viewspackage .. "GameplayView")
-local CollectionView = require(viewspackage .. "CollectionView")
 local ErrorView = require(viewspackage .. "ErrorView")
 
 local ViewFactory = Class:new()
@@ -29,8 +28,6 @@ ViewFactory.newView = function(self, name)
 		return ResultView:new()
 	elseif name == "GameplayView" then
 		return GameplayView:new()
-	elseif name == "CollectionView" then
-		return CollectionView:new()
 	elseif name == "ErrorView" then
 		return ErrorView:new()
 	end

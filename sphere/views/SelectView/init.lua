@@ -10,6 +10,8 @@ local SearchFieldView = require(viewspackage .. "SelectView.SearchFieldView")
 local SortStepperView = require(viewspackage .. "SelectView.SortStepperView")
 local StageInfoView = require(viewspackage .. "SelectView.StageInfoView")
 local ModifierIconGridView = require(viewspackage .. "SelectView.ModifierIconGridView")
+local CollectionListView = require(viewspackage .. "SelectView.CollectionListView")
+local CacheView = require(viewspackage .. "SelectView.CacheView")
 
 local SelectView = ScreenView:new({construct = false})
 
@@ -20,6 +22,8 @@ SelectView.views = {
 	{"sortStepperView", SortStepperView, "SortStepperView"},
 	{"stageInfoView", StageInfoView, "StageInfoView"},
 	{"modifierIconGridView", ModifierIconGridView, "ModifierIconGridView"},
+	{"collectionListView", CollectionListView, "CollectionListView"},
+	{"cacheView", CacheView, "CacheView"},
 }
 
 SelectView.construct = function(self)

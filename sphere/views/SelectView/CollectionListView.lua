@@ -1,7 +1,7 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
 local ListView = require(viewspackage .. "ListView")
-local CollectionListItemView = require(viewspackage .. "CollectionView.CollectionListItemView")
+local CollectionListItemView = require(viewspackage .. "SelectView.CollectionListItemView")
 
 local CollectionListView = ListView:new({construct = false})
 
@@ -13,11 +13,11 @@ end
 
 CollectionListView.reloadItems = function(self)
 	self.state.items = self.gameController.collectionModel.items
-    self.state.selectedCollection = self.gameController.collectionModel.collection
+    self.state.selectedCollection = self.gameController.selectModel.collectionItem
 end
 
 CollectionListView.getItemIndex = function(self)
-	return self.navigator.collectionItemIndex
+	return self.gameController.selectModel.collectionItemIndex
 end
 
 CollectionListView.scrollUp = function(self)
@@ -26,15 +26,6 @@ end
 
 CollectionListView.scrollDown = function(self)
 	self.navigator:scrollCollection("down")
-end
-
-CollectionListView.receive = function(self, event)
-	if event.name == "wheelmoved" then
-		return self:wheelmoved(event)
-	end
-	if event.name == "mousepressed" or event.name == "mousereleased" or event.name == "mousemoved" then
-		self:receiveItems(event)
-	end
 end
 
 return CollectionListView

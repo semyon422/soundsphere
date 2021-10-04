@@ -7,8 +7,99 @@ local formatScore = function(score)
 	return ("%2.2f"):format(score * 1000)
 end
 
+local CacheView = {
+	class = "CacheView",
+	subscreen = "collections",
+	transform = transform,
+	x = 733,
+	y = 504,
+	w = 454,
+	h = 792,
+	text = {
+		type = "text",
+		x = 44,
+		baseline = 45,
+		limit = 1920,
+		align = "left",
+		font = {
+			filename = "Noto Sans",
+			size = 24,
+		},
+	},
+}
+
+local CollectionList = {
+	class = "CollectionListView",
+	subscreen = "collections",
+	transform = transform,
+	x = 1187,
+	y = 144,
+	w = 454,
+	h = 792,
+	rows = 11,
+	elements = {
+		{
+			type = "text",
+			key = "name",
+			onNew = false,
+			x = 116,
+			baseline = 45,
+			limit = math.huge,
+			align = "left",
+			font = {
+				filename = "Noto Sans",
+				size = 24,
+			},
+		},
+		{
+			type = "text",
+			key = "shortPath",
+			onNew = false,
+			x = 117,
+			baseline = 19,
+			limit = math.huge,
+			align = "left",
+			font = {
+				filename = "Noto Sans",
+				size = 16,
+			},
+		},
+		{
+			type = "text",
+			key = "count",
+			onNew = false,
+			format = function(value)
+				return value ~= 0 and value or ""
+			end,
+			x = 0,
+			baseline = 45,
+			limit = 72,
+			align = "right",
+			font = {
+				filename = "Noto Sans Mono",
+				size = 24,
+			},
+		},
+	},
+}
+
+local CollectionScrollBar = {
+	class = "ScrollBarView",
+	subscreen = "collections",
+	transform = transform,
+	list = CollectionList,
+	x = 1641,
+	y = 144,
+	w = 16,
+	h = 792,
+	rows = 11,
+	backgroundColor = {1, 1, 1, 0.33},
+	color = {1, 1, 1, 0.66}
+}
+
 local NoteChartSetList = {
 	class = "NoteChartSetListView",
+	subscreen = "notecharts",
 	transform = transform,
 	x = 1187,
 	y = 144,
@@ -55,6 +146,7 @@ local NoteChartSetList = {
 
 local NoteChartList = {
 	class = "NoteChartListView",
+	subscreen = "notecharts",
 	transform = transform,
 	x = 733,
 	y = 216,
@@ -319,6 +411,7 @@ local Preview = {
 
 local NoteChartSetScrollBar = {
 	class = "ScrollBarView",
+	subscreen = "notecharts",
 	transform = transform,
 	list = NoteChartSetList,
 	x = 1641,
@@ -487,8 +580,9 @@ local BottomScreenMenu = {
 	}
 }
 
-local BottomRightScreenMenu = {
+local BottomRightNotechartsScreenMenu = {
 	class = "ScreenMenuView",
+	subscreen = "notecharts",
 	transform = transform,
 	x = 1300,
 	y = 991,
@@ -506,16 +600,42 @@ local BottomRightScreenMenu = {
 			size = 24,
 		},
 	},
-	items = {
-		--[[
+	items = {{
 		{
-			{
-				method = "openOptions",
-				displayName = "options"
-			}
-		}
-		]]
-	}
+			method = "addSubscreen",
+			value = "collections",
+			displayName = "collections"
+		},
+	}}
+}
+
+local BottomRightCollectionsScreenMenu = {
+	class = "ScreenMenuView",
+	subscreen = "collections",
+	transform = transform,
+	x = 1300,
+	y = 991,
+	w = 227,
+	h = 89,
+	rows = 1,
+	columns = 1,
+	text = {
+		x = 0,
+		baseline = 54,
+		limit = 228,
+		align = "center",
+		font = {
+			filename = "Noto Sans",
+			size = 24,
+		},
+	},
+	items = {{
+		{
+			method = "addSubscreen",
+			value = "notecharts",
+			displayName = "notecharts"
+		},
+	}}
 }
 
 local NoteChartSubScreenMenu = {
@@ -523,6 +643,7 @@ local NoteChartSubScreenMenu = {
 	transform = transform,
 	x = 279,
 	y = 224,
+	-- y = 89,
 	w = 454,
 	h = 55,
 	rows = 1,
@@ -542,12 +663,12 @@ local NoteChartSubScreenMenu = {
 			{},
 			{},
 			{
-				method = "setSubscreen",
+				method = "addSubscreen",
 				value = "score",
 				displayName = "score"
 			},
 			{
-				method = "setSubscreen",
+				method = "addSubscreen",
 				value = "options",
 				displayName = "options"
 			},
@@ -639,13 +760,6 @@ local LeftScreenMenu = {
 				displayName = "settings"
 			}
 		},
-		{
-			{
-				method = "changeScreen",
-				value = "Collection",
-				displayName = "collection"
-			}
-		},
 	}
 }
 
@@ -707,13 +821,17 @@ local SelectViewConfig = {
 	NoteChartList,
 	StageInfo,
 	NoteChartSetScrollBar,
+	CacheView,
+	CollectionList,
+	CollectionScrollBar,
 	require("sphere.views.HeaderViewConfig"),
 	SearchField,
 	SortStepper,
 	ModifierIconGrid,
 	StageInfoModifierIconGrid,
 	BottomScreenMenu,
-	BottomRightScreenMenu,
+	BottomRightNotechartsScreenMenu,
+	BottomRightCollectionsScreenMenu,
 	NoteChartSubScreenMenu,
 	NoteChartOptionsScreenMenu,
 	LeftScreenMenu,

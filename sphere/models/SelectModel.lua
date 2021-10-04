@@ -12,10 +12,12 @@ SelectModel.load = function(self)
 	self.noteChartSetLibraryModel.sortFunction = self.sortModel:getSortFunction()
 	self.noteChartSetLibraryModel.collapse = config.collapse
 
+	self.collectionItemIndex = self.collectionModel:getItemIndex(config.collection)
 	self.noteChartSetItemIndex = self.noteChartSetLibraryModel:getItemIndex(config.noteChartSetEntryId)
 	self.noteChartItemIndex = self.noteChartLibraryModel:getItemIndex(config.noteChartEntryId, config.noteChartDataEntryId)
 	self.scoreItemIndex = self.scoreLibraryModel:getItemIndex(config.scoreEntryId)
 
+	self.collectionItem = self.collectionModel.items[self.collectionItemIndex]
 	self.noteChartSetItem = self.noteChartSetLibraryModel.items[self.noteChartSetItemIndex]
 	self.noteChartItem = self.noteChartLibraryModel.items[self.noteChartItemIndex]
 	self.scoreItem = self.scoreLibraryModel.items[self.scoreItemIndex]
@@ -75,15 +77,32 @@ SelectModel.updateSearch = function(self)
 	end
 end
 
+SelectModel.scrollCollection = function(self, direction, destination)
+	local collectionItems = self.collectionModel.items
+
+	destination = math.min(math.max(destination or self.collectionItemIndex + direction, 1), #collectionItems)
+	if not collectionItems[destination] or self.collectionItemIndex == destination then
+		return
+	end
+	self.collectionItemIndex = destination
+
+	local oldCollectionItem = self.collectionItem
+
+	local collectionItem = collectionItems[self.collectionItemIndex]
+	self.collectionItem = collectionItem
+	self.config.collection = collectionItem.path
+
+	self:pullNoteChartSet(oldCollectionItem.path == collectionItem.path)
+end
+
 SelectModel.scrollNoteChartSet = function(self, direction, destination)
 	local noteChartSetItems = self.noteChartSetLibraryModel.items
 
-	direction = direction or destination - self.noteChartSetItemIndex
-	if not noteChartSetItems[self.noteChartSetItemIndex + direction] then
+	destination = math.min(math.max(destination or self.noteChartSetItemIndex + direction, 1), #noteChartSetItems)
+	if not noteChartSetItems[destination] or self.noteChartSetItemIndex == destination then
 		return
 	end
-
-	self.noteChartSetItemIndex = self.noteChartSetItemIndex + direction
+	self.noteChartSetItemIndex = destination
 
 	local oldNoteChartSetItem = self.noteChartSetItem
 
@@ -101,11 +120,11 @@ SelectModel.scrollNoteChart = function(self, direction, destination)
 
 	direction = direction or destination - self.noteChartItemIndex
 
-	if not noteChartItems[self.noteChartItemIndex + direction] then
+	destination = math.min(math.max(destination or self.noteChartItemIndex + direction, 1), #noteChartItems)
+	if not noteChartItems[destination] or self.noteChartItemIndex == destination then
 		return
 	end
-
-	self.noteChartItemIndex = self.noteChartItemIndex + direction
+	self.noteChartItemIndex = destination
 
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
 	self.noteChartItem = noteChartItem
@@ -121,13 +140,11 @@ end
 SelectModel.scrollScore = function(self, direction, destination)
 	local scoreItems = self.scoreLibraryModel.items
 
-	direction = direction or destination - self.scoreItemIndex
-
-	if not scoreItems[self.scoreItemIndex + direction] then
+	destination = math.min(math.max(destination or self.scoreItemIndex + direction, 1), #scoreItems)
+	if not scoreItems[destination] or self.scoreItemIndex == destination then
 		return
 	end
-
-	self.scoreItemIndex = self.scoreItemIndex + direction
+	self.scoreItemIndex = destination
 
 	local scoreItem = scoreItems[self.scoreItemIndex]
 	self.scoreItem = scoreItem
@@ -137,7 +154,7 @@ end
 
 SelectModel.pullNoteChartSet = function(self, noUpdate)
 	if not noUpdate then
-		self.searchModel:setCollection(self.collectionModel.collection)
+		self.searchModel:setCollection(self.collectionItem)
 		self.noteChartLibraryModel:updateItems()
 		self.noteChartSetLibraryModel:updateItems()
 	end

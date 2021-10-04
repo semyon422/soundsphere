@@ -57,7 +57,7 @@ CacheView.receive = function(self, event)
 		local h = config.h
 
 		if mx >= x and mx < x + w and my >= y and my < y + h and button == 1 then
-			self.navigator:updateCache()
+			self.navigator:updateCacheCollection()
 		end
 	end
 end
