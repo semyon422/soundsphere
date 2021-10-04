@@ -15,7 +15,6 @@ local ScreenView = require(viewspackage .. "ScreenView")
 local GameplayView = ScreenView:new({construct = false})
 
 GameplayView.views = {
-	{"playfieldView", SequenceView, "PlayfieldView"},
 	{"menuProgressView", ProgressView, "ProgressView"},
 	{"rhythmView", RhythmView, "RhythmView"},
 	{"progressView", ProgressView, "ProgressView"},
@@ -39,8 +38,11 @@ GameplayView.load = function(self)
 	self.imageView.root = noteSkin.directoryPath
 	self:loadViews(ScreenView.views)
 	self:loadViews(self.views)
-	self.playfieldView:setSequenceConfig(noteSkin.playField)
-	self.playfieldView:load()
+	for i, config in ipairs(self.viewConfig) do
+		if config.class == "PlayfieldView" then
+			self.viewConfig[i] = noteSkin.playField
+		end
+	end
 	ScreenView.load(self)
 end
 

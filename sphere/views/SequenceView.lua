@@ -2,17 +2,43 @@ local Class = require("aqua.util.Class")
 
 local SequenceView = Class:new()
 
+local function getConfigs(configs)
+	for _, config in ipairs(configs) do
+		if #config == 0 then
+			coroutine.yield(config)
+		else
+			getConfigs(config)
+		end
+	end
+end
+
+local noViews = function() end
+
 SequenceView.construct = function(self)
 	self.views = {}
 	self.sequenceConfig = {}
 	self.states = {}
+	self.co = coroutine.create(function()
+		while true do
+			getConfigs(self.sequenceConfig)
+			coroutine.yield()
+		end
+	end)
 end
 
 SequenceView.setSequenceConfig = function(self, config)
 	self.sequenceConfig = config
+	self:createStates(config)
+end
+
+SequenceView.createStates = function(self, config)
 	local states = self.states
 	for _, subConfig in ipairs(config) do
-		states[subConfig] = {}
+		if #subConfig == 0 then
+			states[subConfig] = {}
+		else
+			self:createStates(subConfig)
+		end
 	end
 end
 
@@ -47,17 +73,21 @@ SequenceView.getState = function(self, config)
 end
 
 SequenceView.getViewIterator = function(self)
-	local sequenceConfig = self.sequenceConfig
-	local states = self.states
-	local index = 1
+	if self.iterating then
+		return noViews
+	end
 
+	self.iterating = true
 	return function()
-		for i = index, #sequenceConfig do
-			local config = sequenceConfig[i]
-			local state = states[config]
+		while true do
+			local status, config = coroutine.resume(self.co)
+			if not config then
+				self.iterating = false
+				return
+			end
+			local state = self.states[config]
 			local view = self:getView(config)
 			if view and not state.hidden then
-				index = i + 1
 				return view
 			end
 		end
