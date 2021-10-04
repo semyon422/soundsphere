@@ -19,7 +19,6 @@ SelectNavigator.receive = function(self, event)
 	local collections = self:getSubscreen("collections")
 
 	local scancode = event.args[2]
-	print(scancode)
 	if notecharts then
 		if scancode == "up" then self:scrollNoteChart("up")
 		elseif scancode == "down" then self:scrollNoteChart("down")
