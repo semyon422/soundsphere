@@ -118,7 +118,8 @@ local NoteSkinViewConfig = {
 	BottomScreenMenu,
 	NoteSkinList,
 	NoteSkinScrollBar,
-	Rectangle
+	Rectangle,
+	require("sphere.views.DebugInfoViewConfig"),
 }
 
 return NoteSkinViewConfig

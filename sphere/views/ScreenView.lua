@@ -11,7 +11,6 @@ local UserInfoView = require(viewspackage .. "UserInfoView")
 local LogoView = require(viewspackage .. "LogoView")
 local ScreenMenuView = require(viewspackage .. "ScreenMenuView")
 local BackgroundView = require(viewspackage .. "BackgroundView")
-local InspectView = require(viewspackage .. "InspectView")
 local ValueView = require(viewspackage .. "ValueView")
 local ImageView = require(viewspackage .. "ImageView")
 local CameraView = require(viewspackage .. "CameraView")
@@ -29,7 +28,6 @@ ScreenView.views = {
 	{"rectangleView", RectangleView, "RectangleView"},
 	{"circleView", CircleView, "CircleView"},
 	{"lineView", LineView, "LineView"},
-	{"inspectView", InspectView, "InspectView"},
 	{"valueView", ValueView, "ValueView"},
 	{"imageView", ImageView, "ImageView"},
 	{"cameraView", CameraView, "CameraView"},

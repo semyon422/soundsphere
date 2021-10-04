@@ -56,6 +56,7 @@ GameplayNavigator.keypressed = function(self, event)
 	elseif scancode == "=" or scancode == "+" then self:increaseLocalOffset(0.001)
 	end
 
+	if scancode == "f1" then self:switchSubscreen("debug") end
 	if state == "play" then
 		if scancode == "escape" and not shift then self:pause()
 		elseif scancode == "escape" and shift then self:quit()

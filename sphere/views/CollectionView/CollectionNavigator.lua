@@ -19,6 +19,7 @@ CollectionNavigator.receive = function(self, event)
 	elseif scancode == "down" then self:scrollCollection("down")
 	elseif scancode == "return" then self:setCollection()
 	elseif scancode == "escape" then self:changeScreen("Select")
+	elseif scancode == "f1" then self:switchSubscreen("debug")
 	end
 end
 

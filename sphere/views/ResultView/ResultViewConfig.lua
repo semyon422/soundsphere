@@ -1,3 +1,4 @@
+local inspect = require("inspect")
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local formatScore = function(score)
@@ -782,19 +783,22 @@ local BottomRightScreenMenu = {
 }
 
 local InspectScoreSystem = {
-	class = "InspectView",
-	subscreen = "debug",
-	hidden = true,
+	class = "ValueView",
+	subscreen = "scoreSystemDebug",
 	transform = transform,
-	key = "scoreSystem",
+	key = "gameController.rhythmModel.scoreEngine.scoreSystem.slice",
+	format = function(...)
+		return inspect(...)
+	end,
 	x = 0,
-	y = 0,
+	baseline = 20,
 	limit = 1920,
 	font = {
 		filename = "Noto Sans Mono",
 		size = 14,
 	},
 	align = "left",
+	color = {1, 1, 1, 1}
 }
 
 local NoteSkinViewConfig = {
@@ -821,6 +825,7 @@ local NoteSkinViewConfig = {
 	HpGraph,
 	EarlyLateMissGraph,
 	InspectScoreSystem,
+	require("sphere.views.DebugInfoViewConfig"),
 }
 
 return NoteSkinViewConfig

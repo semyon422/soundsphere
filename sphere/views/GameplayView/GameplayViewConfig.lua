@@ -87,6 +87,7 @@ local GameplayViewConfig = {
 	BottomScreenMenu,
 	PauseProgressBar,
 	PauseText,
+	require("sphere.views.DebugInfoViewConfig"),
 }
 
 return GameplayViewConfig

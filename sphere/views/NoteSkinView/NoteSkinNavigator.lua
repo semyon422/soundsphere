@@ -19,6 +19,7 @@ NoteSkinNavigator.receive = function(self, event)
 	elseif scancode == "down" then self:scrollNoteSkin("down")
 	elseif scancode == "return" then self:setNoteSkin()
 	elseif scancode == "escape" then self:changeScreen("Select")
+	elseif scancode == "f1" then self:switchSubscreen("debug")
 	end
 end
 

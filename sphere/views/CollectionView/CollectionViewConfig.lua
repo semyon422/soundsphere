@@ -139,7 +139,8 @@ local CollectionViewConfig = {
 	CollectionList,
 	CollectionScrollBar,
 	CacheView,
-	Rectangle
+	Rectangle,
+	require("sphere.views.DebugInfoViewConfig"),
 }
 
 return CollectionViewConfig

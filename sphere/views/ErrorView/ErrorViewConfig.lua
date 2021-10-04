@@ -86,6 +86,7 @@ local GameplayViewConfig = {
 	BottomScreenMenu,
 	Title,
 	ErrorText,
+	require("sphere.views.DebugInfoViewConfig"),
 }
 
 return GameplayViewConfig

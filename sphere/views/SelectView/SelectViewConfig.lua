@@ -719,9 +719,9 @@ local SelectViewConfig = {
 	LeftScreenMenu,
 	UpdateStatus,
 	SessionTime,
-
 	Rectangle,
 	Line,
+	require("sphere.views.DebugInfoViewConfig"),
 }
 
 return SelectViewConfig

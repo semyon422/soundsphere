@@ -18,12 +18,13 @@ SequenceView.construct = function(self)
 	self.views = {}
 	self.sequenceConfig = {}
 	self.states = {}
-	self.co = coroutine.create(function()
-		while true do
-			getConfigs(self.sequenceConfig)
-			coroutine.yield()
+
+	self.viewIterator = self:newViewIterator(
+		true,
+		function()
+			self.iterating = false
 		end
-	end)
+	)
 end
 
 SequenceView.setSequenceConfig = function(self, config)
@@ -72,26 +73,36 @@ SequenceView.getState = function(self, config)
 	return self.states[config]
 end
 
+SequenceView.newViewIterator = function(self, skipHidden, stop)
+	local co = coroutine.create(function()
+		while true do
+			getConfigs(self.sequenceConfig)
+			coroutine.yield()
+		end
+	end)
+
+	return function()
+		while true do
+			local _, config = coroutine.resume(co)
+			if not config then
+				if stop then stop() end
+				return
+			end
+			local view = self:getView(config)
+			if view and (not skipHidden or not view.state.hidden) then
+				return view
+			end
+		end
+	end
+end
+
 SequenceView.getViewIterator = function(self)
 	if self.iterating then
 		return noViews
 	end
 
 	self.iterating = true
-	return function()
-		while true do
-			local status, config = coroutine.resume(self.co)
-			if not config then
-				self.iterating = false
-				return
-			end
-			local state = self.states[config]
-			local view = self:getView(config)
-			if view and not state.hidden then
-				return view
-			end
-		end
-	end
+	return self.viewIterator
 end
 
 SequenceView.load = function(self)

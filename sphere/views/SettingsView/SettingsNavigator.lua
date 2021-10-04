@@ -27,12 +27,14 @@ SettingsNavigator.receive = function(self, event)
 		elseif scancode == "right" then self:increaseSettingValue(nil, 1)
 		elseif scancode == "left" then self:increaseSettingValue(nil, -1)
 		elseif scancode == "escape" then self.activeElement = "sections"
+		elseif scancode == "f1" then self:switchSubscreen("debug")
 		end
 	elseif self.activeElement == "sections" then
 		if scancode == "up" then self:scrollSections("up")
 		elseif scancode == "down" then self:scrollSections("down")
 		elseif scancode == "return" then self.activeElement = "settings"
 		elseif scancode == "escape" then self:changeScreen("Select")
+		elseif scancode == "f1" then self:switchSubscreen("debug")
 		end
 	elseif self.activeElement == "inputHandler" then
 		self:setInputBinding(scancode)

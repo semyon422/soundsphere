@@ -23,6 +23,7 @@ InputNavigator.receive = function(self, event)
 		elseif scancode == "down" then self:scrollInput("down")
 		elseif scancode == "return" then self:setInputHandler()
 		elseif scancode == "escape" then self:changeScreen("Select")
+		elseif scancode == "f1" then self:switchSubscreen("debug")
 		end
 	elseif self.activeElement == "inputHandler" then
 		self:setInputBinding(scancode)

@@ -123,7 +123,8 @@ local InputViewConfig = {
 	BottomScreenMenu,
 	InputList,
 	InputScrollBar,
-	Rectangle
+	Rectangle,
+	require("sphere.views.DebugInfoViewConfig"),
 }
 
 return InputViewConfig

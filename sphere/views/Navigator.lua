@@ -11,6 +11,7 @@ end
 
 Navigator.load = function(self)
 	self.observable:add(self.view.controller)
+	self.viewIterator = self.sequenceView:newViewIterator()
 	self:setHidden(nil, true, true)
 end
 
@@ -80,10 +81,10 @@ Navigator.switchSubscreen = function(self, subscreen)
 end
 
 Navigator.setHidden = function(self, subscreen, value, other)
-	local sequenceView = self.sequenceView
-	for _, config in ipairs(self.viewConfig) do
+	for view in self.viewIterator do
+		local config = view.config
+		local state = view.state
 		if not other and config.subscreen == subscreen or other and config.subscreen ~= subscreen then
-			local state = sequenceView:getState(config)
 			state.hidden = value
 		end
 	end
