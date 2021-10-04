@@ -15,7 +15,6 @@ local WindowManager				= require("sphere.window.WindowManager")
 local FpsLimiter				= require("sphere.window.FpsLimiter")
 local Screenshot				= require("sphere.window.Screenshot")
 local DirectoryManager			= require("sphere.filesystem.DirectoryManager")
-local NotificationView			= require("sphere.views.NotificationView")
 local NotificationModel			= require("sphere.models.NotificationModel")
 local ThemeModel				= require("sphere.models.ThemeModel")
 local OnlineModel				= require("sphere.models.OnlineModel")
@@ -44,7 +43,6 @@ local GameController = Class:new()
 GameController.construct = function(self)
 	self.configModel = ConfigModel:new()
 	self.notificationModel = NotificationModel:new()
-	self.notificationView = NotificationView:new()
 	self.windowManager = WindowManager:new()
 	self.mountModel = MountModel:new()
 	self.mountController = MountController:new()
@@ -79,7 +77,6 @@ end
 
 GameController.load = function(self)
 	local notificationModel = self.notificationModel
-	local notificationView = self.notificationView
 	local configModel = self.configModel
 	local windowManager = self.windowManager
 	local mountModel = self.mountModel
@@ -184,8 +181,6 @@ GameController.load = function(self)
 	themeModel:load()
 	modifierModel:load()
 	mountModel:load()
-	notificationModel.observable:add(notificationView)
-	notificationView:load()
 	updateModel:load()
 	windowManager:load()
 	scoreModel:select()
@@ -234,9 +229,9 @@ GameController.update = function(self, dt)
 	ThreadPool:update()
 
 	DiscordPresence:update()
+	self.notificationModel:update()
 	self.backgroundModel:update(dt)
 	self.screenManager:update(dt)
-	self.notificationView:update(dt)
 	self.onlineController:update()
 	self.fpsLimiter:update()
 	self.windowManager:update()
@@ -244,7 +239,6 @@ end
 
 GameController.draw = function(self)
 	self.screenManager:draw()
-	self.notificationView:draw()
 end
 
 GameController.receive = function(self, event)
@@ -262,7 +256,6 @@ GameController.receive = function(self, event)
 	self.windowManager:receive(event)
 	self.screenshot:receive(event)
 	self.mountController:receive(event)
-	self.notificationView:receive(event)
 end
 
 return GameController

@@ -1,8 +1,6 @@
 local Class						= require("aqua.util.Class")
-local RhythmModel				= require("sphere.models.RhythmModel")
 local TimeController			= require("sphere.controllers.TimeController")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
-local CacheDatabase				= require("sphere.models.CacheModel.CacheDatabase")
 
 local GameplayController = Class:new()
 
@@ -37,9 +35,7 @@ GameplayController.load = function(self)
 	view.controller = self
 	view.gameController = self.gameController
 
-	timeController.rhythmModel = rhythmModel
-	timeController.configModel = configModel
-	timeController.notificationModel = notificationModel
+	timeController.gameController = self.gameController
 
 	local noteChart = noteChartModel:loadNoteChart(self:getImporterSettings())
 	rhythmModel:setNoteChart(noteChart)
@@ -142,13 +138,6 @@ GameplayController.receive = function(self, event)
 		perspective.z = event.z
 		perspective.pitch = event.pitch
 		perspective.yaw = event.yaw
-	elseif event.name == "increaseLocalOffset" then
-		CacheDatabase:load()
-		local noteChartDataEntry = self.gameController.noteChartModel.noteChartDataEntry
-		noteChartDataEntry.localOffset = noteChartDataEntry.localOffset + event.delta
-		CacheDatabase:setNoteChartDataEntry(noteChartDataEntry)
-		print("local offset", noteChartDataEntry.localOffset)
-		CacheDatabase:unload()
 	elseif event.name == "quit" then
 		self:skip()
 		self:saveScore()

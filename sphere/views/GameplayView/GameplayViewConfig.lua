@@ -79,6 +79,21 @@ local PauseText = {
 	},
 }
 
+local Notification = {
+	class = "ValueView",
+	transform = transform,
+	key = "gameController.notificationModel.message",
+	color = {1, 1, 1, 1},
+	x = 733,
+	baseline = 53,
+	limit = 454,
+	align = "center",
+	font = {
+		filename = "Noto Sans",
+		size = 24,
+	},
+}
+
 local GameplayViewConfig = {
 	BackgroundBlurSwitch,
 	Background,
@@ -87,6 +102,7 @@ local GameplayViewConfig = {
 	BottomScreenMenu,
 	PauseProgressBar,
 	PauseText,
+	Notification,
 	require("sphere.views.DebugInfoViewConfig"),
 }
 

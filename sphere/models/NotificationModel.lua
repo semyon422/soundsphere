@@ -1,20 +1,22 @@
 local Class = require("aqua.util.Class")
-local Observable = require("aqua.util.Observable")
 
 local NotificationModel = Class:new()
 
 NotificationModel.construct = function(self)
-    self.observable = Observable:new()
-    self.messages = {}
+	self.message = ""
+	self.time = 0
+	self.delay = 1
 end
 
 NotificationModel.notify = function(self, message)
-    local messages = self.messages
-    messages[#messages + 1] = message
-    self.observable:send({
-        name = "Notification",
-        message = message
-    })
+	self.message = message
+	self.time = love.timer.getTime()
+end
+
+NotificationModel.update = function(self)
+	if love.timer.getTime() > self.time + self.delay then
+		self.message = ""
+	end
 end
 
 return NotificationModel
