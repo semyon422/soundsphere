@@ -1,23 +1,39 @@
 local aquafs	= require("aqua.filesystem")
 local Class		= require("aqua.util.Class")
-local json		= require("json")
 
 local MountModel = Class:new()
+
+MountModel.construct = function(self)
+	self.mountStatuses = {}
+end
 
 MountModel.configPath = "userdata/mount.json"
 MountModel.chartsPath = "userdata/charts"
 
 MountModel.load = function(self)
 	self.mountInfo = self.configModel.configs.mount
+	local mountStatuses = self.mountStatuses
 
 	for _, entry in ipairs(self.mountInfo) do
-		aquafs.mount(entry[1], entry[2], 1)
+		local path, mountpoint = entry[1], entry[2]
+		local status, err = pcall(aquafs.mount, path, mountpoint, 1)
+		local mountStatus
+		if status then
+			mountStatus = "mounted"
+		else
+			print(err)
+			mountStatus = "not found"
+		end
+		mountStatuses[path] = mountStatus
 	end
 end
 
 MountModel.unload = function(self)
 	for _, entry in ipairs(self.mountInfo) do
-		aquafs.unmount(entry[1])
+		local path = entry[1]
+		if self.mountStatuses[path] == "mounted" then
+			aquafs.unmount(path)
+		end
 	end
 end
 
