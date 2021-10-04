@@ -4,7 +4,7 @@ local transformFull = {0, 0, 0, {1, 0}, {0, 1}, 0, 0, 0, 0}
 local ErrorText = {
 	class = "ValueView",
 	key = "gameController.errorController.error",
-	format = "%s", defaultValue = "",
+	format = "%s",
 	color = {1, 1, 1, 1},
 	x = 89,
 	baseline = 144,

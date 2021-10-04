@@ -26,6 +26,9 @@ ValueView.draw = function(self)
 	local format = config.format
 	local value = config.value or inside(self, config.key)
 	if value then
+		if type(value) == "function" then
+			value = value()
+		end
 		if config.multiplier and tonumber(value) then
 			value = value * config.multiplier
 		end

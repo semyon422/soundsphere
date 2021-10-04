@@ -412,7 +412,7 @@ local ScoreScrollBar = {
 local SongTitleView = {
 	class = "ValueView",
 	key = "gameController.noteChartModel.noteChartDataEntry.title",
-	format = "%s", defaultValue = "",
+	format = "%s",
 	color = {1, 1, 1, 1},
 	x = 279 + 44,
 	baseline = 144 + 45,
@@ -428,7 +428,7 @@ local SongTitleView = {
 local SongArtistView = {
 	class = "ValueView",
 	key = "gameController.noteChartModel.noteChartDataEntry.artist",
-	format = "%s", defaultValue = "",
+	format = "%s",
 	color = {1, 1, 1, 1},
 	x = 279 + 45,
 	baseline = 144 + 19,
@@ -444,7 +444,7 @@ local SongArtistView = {
 local ChartNameView = {
 	class = "ValueView",
 	key = "gameController.noteChartModel.noteChartDataEntry.name",
-	format = "%s", defaultValue = "",
+	format = "%s",
 	color = {1, 1, 1, 1},
 	x = 279 + 116 + 29,
 	baseline = 216 + 45,
@@ -460,7 +460,7 @@ local ChartNameView = {
 local ChartCreatorView = {
 	class = "ValueView",
 	key = "gameController.noteChartModel.noteChartDataEntry.creator",
-	format = "%s", defaultValue = "",
+	format = "%s",
 	color = {1, 1, 1, 1},
 	x = 279 + 117 + 29,
 	baseline = 216 + 19,
@@ -476,7 +476,7 @@ local ChartCreatorView = {
 local ChartInputModeView = {
 	class = "ValueView",
 	key = "gameController.noteChartModel.noteChartDataEntry.inputMode",
-	format = "%s", defaultValue = "",
+	format = "%s",
 	color = {1, 1, 1, 1},
 	x = 279 + 29 + 17,
 	baseline = 216 + 19,
@@ -492,7 +492,6 @@ local ChartInputModeView = {
 local ChartDifficultyView = {
 	class = "ValueView",
 	key = "gameController.noteChartModel.noteChartDataEntry.difficulty",
-	defaultValue = 0,
 	color = {1, 1, 1, 1},
 	x = 279 + 29,
 	baseline = 216 + 45,

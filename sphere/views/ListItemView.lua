@@ -44,6 +44,9 @@ end
 ListItemView.drawValue = function(self, valueConfig, value)
 	local config = self.listView.config
 
+	if type(value) == "function" then
+		value = value()
+	end
 	if valueConfig.format then
 		local format = valueConfig.format
 		if type(format) == "string" then
@@ -60,7 +63,7 @@ ListItemView.drawValue = function(self, valueConfig, value)
 	local font = spherefonts.get(valueConfig.font)
 	love.graphics.setFont(font)
 	baseline_print(
-		value,
+		tostring(value),
 		valueConfig.x,
 		(self.visualIndex - 1) * config.h / config.rows + valueConfig.baseline,
 		valueConfig.limit,

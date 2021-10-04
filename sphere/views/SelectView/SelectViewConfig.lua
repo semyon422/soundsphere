@@ -483,8 +483,7 @@ local UpdateStatus = {
 local SessionTime = {
 	class = "ValueView",
 	transform = transform,
-	value = "",
-	format = function()
+	value = function()
 		local event = require("aqua.event")
 		local rtime = require("aqua.util.rtime")
 		return rtime(event.time - event.startTime)

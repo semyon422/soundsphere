@@ -1,5 +1,6 @@
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 local transformLeft = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
+local transformRight = {{1, 0}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local SectionsList = {
 	class = "SectionsListView",
@@ -199,9 +200,11 @@ local BottomScreenMenu = {
 local FpsView = {
 	class = "ValueView",
 	transform = transformLeft,
-	value = "",
+	value = function()
+		return ("FPS:  %d\n1/dt: %0.2f"):format(love.timer.getFPS(), 1 / love.timer.getDelta())
+	end,
 	x = 0,
-	baseline = 20,
+	baseline = 30,
 	limit = 1920,
 	color = {1, 1, 1, 1},
 	font = {
@@ -209,9 +212,23 @@ local FpsView = {
 		size = 24,
 	},
 	align = "left",
-	format = function()
-		return ("FPS:  %d\n1/dt: %0.2f"):format(love.timer.getFPS(), 1 / love.timer.getDelta())
+}
+
+local RendererInfo = {
+	class = "ValueView",
+	transform = transformRight,
+	value = function()
+		return ("%s\n%s\n%s\n%s"):format(love.graphics.getRendererInfo())
 	end,
+	x = -1920,
+	baseline = 30,
+	limit = 1920,
+	color = {1, 1, 1, 1},
+	font = {
+		filename = "Noto Sans Mono",
+		size = 24,
+	},
+	align = "right",
 }
 
 local SettingsViewConfig = {
@@ -224,6 +241,7 @@ local SettingsViewConfig = {
 	SectionsScrollBar,
 	Rectangle,
 	FpsView,
+	RendererInfo,
 }
 
 return SettingsViewConfig

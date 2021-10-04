@@ -73,6 +73,9 @@ StageInfoView.drawTextCell = function(self, cell)
 	if type(value) == "nil" then
 		value = 0
 	end
+	if type(value) == "function" then
+		value = value()
+	end
 	if cell.format then
 		local format = cell.format
 		if cell.multiplier and tonumber(value) then
