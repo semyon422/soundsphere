@@ -1,11 +1,13 @@
 
 local Class = require("aqua.util.Class")
 local Observable = require("aqua.util.Observable")
+local Queue = require("aqua.util.Queue")
 
 local Navigator = Class:new()
 
 Navigator.construct = function(self)
 	self.observable = Observable:new()
+	self.queue = Queue:new()
 	self.subscreens = {}
 end
 
@@ -19,10 +21,14 @@ Navigator.unload = function(self)
 	self.observable:remove(self.view.controller)
 end
 
-Navigator.update = function(self) end
+Navigator.update = function(self)
+	for event in self.queue do
+		self.observable:send(event)
+	end
+end
 
 Navigator.send = function(self, event)
-	return self.observable:send(event)
+	return self.queue:add(event)
 end
 
 Navigator.receive = function(self, event) end

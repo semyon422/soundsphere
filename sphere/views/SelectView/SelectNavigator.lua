@@ -55,6 +55,7 @@ end
 SelectNavigator.update = function(self)
 	self:removeLessSubscreens("score", "options")
 	self:removeLessSubscreens("notecharts", "collections")
+	Navigator.update(self)
 end
 
 SelectNavigator.openDirectory = function(self)
