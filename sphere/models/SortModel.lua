@@ -6,57 +6,62 @@ SortModel.getSortFunction = function(self)
 	return self.sortItemsFunctions[self.name]
 end
 
-local title = function(a, b)
-	return a.title < b.title
-end
-
-local artist = function(a, b)
-	return a.artist < b.artist
-end
-
-local creator = function(a, b)
-	return a.creator < b.creator
-end
-
-local difficulty = function(a, b)
-	return a.difficulty < b.difficulty
-end
-
-local name = function(a, b)
-	return a.name < b.name
-end
-
 SortModel.sortItemsFunctions = {
+	id = function(a, b)
+		return a.id < b.id
+	end,
 	title = function(a, b)
 		if a.title ~= b.title then
-			return title(a, b)
+			return a.title < b.title
 		elseif a.artist ~= b.artist then
-			return artist(a, b)
+			return a.artist < b.artist
 		elseif a.creator ~= b.creator then
-			return creator(a, b)
+			return a.creator < b.creator
+		elseif a.difficulty ~= b.difficulty then
+			return a.difficulty < b.difficulty
 		end
-		return difficulty(a, b)
+		return a.id < b.id
 	end,
 	artist = function(a, b)
 		if a.artist ~= b.artist then
-			return artist(a, b)
+			return a.artist < b.artist
 		elseif a.title ~= b.title then
-			return title(a, b)
+			return a.title < b.title
 		elseif a.creator ~= b.creator then
-			return creator(a, b)
+			return a.creator < b.creator
+		elseif a.difficulty ~= b.difficulty then
+			return a.difficulty < b.difficulty
 		end
-		return difficulty(a, b)
+		return a.id < b.id
 	end,
 	difficulty = function(a, b)
 		if a.difficulty ~= b.difficulty then
-			return difficulty(a, b)
+			return a.difficulty < b.difficulty
 		end
-		return name(a, b)
+		return a.id < b.id
+	end,
+	level = function(a, b)
+		if a.level ~= b.level then
+			return a.level < b.level
+		end
+		return a.id < b.id
+	end,
+	length = function(a, b)
+		if a.length ~= b.length then
+			return a.length < b.length
+		end
+		return a.id < b.id
+	end,
+	bpm = function(a, b)
+		if a.bpm ~= b.bpm then
+			return a.bpm < b.bpm
+		end
+		return a.id < b.id
 	end,
 }
 
 SortModel.name = "title"
-SortModel.names = {"title", "artist", "difficulty"}
+SortModel.names = {"id", "title", "artist", "difficulty", "level", "length", "bpm"}
 
 SortModel.toIndexValue = function(self, name)
 	for i, currentName in ipairs(self.names) do
