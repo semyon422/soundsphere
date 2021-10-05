@@ -19,6 +19,14 @@ SelectNavigator.receive = function(self, event)
 	local collections = self:getSubscreen("collections")
 
 	local scancode = event.args[2]
+
+	if scancode == "f1" then self:changeScreen("Modifier")
+	elseif scancode == "f2" then self:changeScreen("NoteSkin")
+	elseif scancode == "f3" then self:changeScreen("Input")
+	elseif scancode == "f4" then self:changeScreen("Settings")
+	elseif scancode == "lctrl" then self:changeSearchMode()
+	elseif scancode == "lshift" then self:changeCollapse()
+	end
 	if notecharts then
 		if scancode == "up" then self:scrollNoteChart("up")
 		elseif scancode == "down" then self:scrollNoteChart("down")
@@ -29,14 +37,8 @@ SelectNavigator.receive = function(self, event)
 		elseif scancode == "home" then self:scrollNoteChartSet("up", math.huge)
 		elseif scancode == "end" then self:scrollNoteChartSet("down", math.huge)
 		elseif scancode == "return" then self:play()
-		elseif scancode == "lctrl" then self:changeSearchMode()
-		elseif scancode == "lshift" then self:changeCollapse()
 		elseif scancode == "tab" then self:addSubscreen("collections")
 		elseif scancode == "lalt" then self:changeScreen("Result")
-		elseif scancode == "f1" then self:changeScreen("Modifier")
-		elseif scancode == "f2" then self:changeScreen("NoteSkin")
-		elseif scancode == "f3" then self:changeScreen("Input")
-		elseif scancode == "f4" then self:changeScreen("Settings")
 		end
 	elseif collections then
 		if scancode == "up" or scancode == "left" then self:scrollCollection("up")
