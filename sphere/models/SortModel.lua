@@ -1,4 +1,5 @@
 local Class = require("aqua.util.Class")
+local sort = require("aqua.util.sort")
 
 local SortModel = Class:new()
 
@@ -7,57 +8,13 @@ SortModel.getSortFunction = function(self)
 end
 
 SortModel.sortItemsFunctions = {
-	id = function(a, b)
-		return a.id < b.id
-	end,
-	title = function(a, b)
-		if a.title ~= b.title then
-			return a.title < b.title
-		elseif a.artist ~= b.artist then
-			return a.artist < b.artist
-		elseif a.creator ~= b.creator then
-			return a.creator < b.creator
-		elseif a.difficulty ~= b.difficulty then
-			return a.difficulty < b.difficulty
-		end
-		return a.id < b.id
-	end,
-	artist = function(a, b)
-		if a.artist ~= b.artist then
-			return a.artist < b.artist
-		elseif a.title ~= b.title then
-			return a.title < b.title
-		elseif a.creator ~= b.creator then
-			return a.creator < b.creator
-		elseif a.difficulty ~= b.difficulty then
-			return a.difficulty < b.difficulty
-		end
-		return a.id < b.id
-	end,
-	difficulty = function(a, b)
-		if a.difficulty ~= b.difficulty then
-			return a.difficulty < b.difficulty
-		end
-		return a.id < b.id
-	end,
-	level = function(a, b)
-		if a.level ~= b.level then
-			return a.level < b.level
-		end
-		return a.id < b.id
-	end,
-	length = function(a, b)
-		if a.length ~= b.length then
-			return a.length < b.length
-		end
-		return a.id < b.id
-	end,
-	bpm = function(a, b)
-		if a.bpm ~= b.bpm then
-			return a.bpm < b.bpm
-		end
-		return a.id < b.id
-	end,
+	id = function(a, b) return a.id < b.id end,
+	title = sort("title", "artist", "creator", "difficulty", "id"),
+	artist = sort("artist", "title", "creator", "difficulty", "id"),
+	difficulty = sort("difficulty", "id"),
+	level = sort("level", "id"),
+	length = sort("length", "id"),
+	bpm = sort("bpm", "id"),
 }
 
 SortModel.name = "title"
