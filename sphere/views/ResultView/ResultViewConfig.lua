@@ -621,7 +621,7 @@ StageInfo.cells = {
 		x = 3, y = 5,
 		name = "perfect",
 		key = {
-			{"gameController.rhythmModel.scoreEngine.scoreSystem.judgement.perfect", showLoadedScore},
+			{"gameController.rhythmModel.scoreEngine.scoreSystem.judgement.counters.perfect", showLoadedScore},
 			"gameController.selectModel.scoreItem.scoreEntry.perfect"
 		},
 	},
@@ -631,7 +631,7 @@ StageInfo.cells = {
 		x = {2, 3}, y = 6,
 		name = "not perfect",
 		key = {
-			{"gameController.rhythmModel.scoreEngine.scoreSystem.judgement.not perfect", showLoadedScore},
+			{"gameController.rhythmModel.scoreEngine.scoreSystem.judgement.counters.not perfect", showLoadedScore},
 			"gameController.selectModel.scoreItem.scoreEntry.notPerfect"
 		},
 	},

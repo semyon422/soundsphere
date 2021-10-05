@@ -15,7 +15,25 @@ JudgementScoreSystem.construct = function(self)
 	self.ratio = 0
 	self.judgementName = ""
 	self.maxDeltaTime = 0
+	self.deltaTime = 0
+	self.earlylate = 0
+	self.counters = {}
 	table.sort(self.judgements, function(a, b) return math.abs(a[1]) < math.abs(b[1]) end)
+end
+
+JudgementScoreSystem.getSlice = function(self)
+	local counters = {}
+	for k, v in pairs(self.counters) do
+		counters[k] = v
+	end
+	return {
+		counters = counters,
+		ratio = self.ratio,
+		judgementName = self.judgementName,
+		maxDeltaTime = self.maxDeltaTime,
+		deltaTime = self.deltaTime,
+		earlylate = self.earlylate,
+	}
 end
 
 JudgementScoreSystem.processJudgement = function(self, event)
@@ -26,20 +44,21 @@ JudgementScoreSystem.processJudgement = function(self, event)
 		self.maxDeltaTime = deltaTime
 	end
 
+	local counters = self.counters
 	for _, judgement in ipairs(self.judgements) do
 		local time = judgement[1]
 		if deltaTime * time > 0 and math.abs(deltaTime) <= math.abs(time) then
 			for i = 2, #judgement do
 				local name = judgement[i]
-				self[name] = (self[name] or 0) + 1
+				counters[name] = (counters[name] or 0) + 1
 			end
 			self.judgementName = judgement[2]
 			break
 		end
 	end
 
-	self.ratio = (self.perfect or 0) / (self.all or 1)
-	self.earlylate = (self.early or 0) / (self.late or 1)
+	self.ratio = (counters.perfect or 0) / (counters.all or 1)
+	self.earlylate = (counters.early or 0) / (counters.late or 1)
 end
 
 JudgementScoreSystem.processMiss = function(self, event)

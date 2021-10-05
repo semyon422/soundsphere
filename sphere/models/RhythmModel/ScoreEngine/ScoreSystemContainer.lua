@@ -48,7 +48,7 @@ ScoreSystemContainer.receive = function(self, event)
 
 	local slice = self:getSlice()
 	self.slice = slice
-	table.insert(self.sequence, self:getSlice())
+	table.insert(self.sequence, slice)
 end
 
 return ScoreSystemContainer

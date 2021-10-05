@@ -8,6 +8,8 @@ EntryScoreSystem.accuracy = 0
 EntryScoreSystem.rating = 0
 EntryScoreSystem.maxCombo = 0
 
+EntryScoreSystem.getSlice = function(self) end
+
 EntryScoreSystem.after = function(self, event)
 	local container = self.container
 
@@ -17,8 +19,8 @@ EntryScoreSystem.after = function(self, event)
 	self.maxCombo = container.base.maxCombo
 	self.pauses = container.base.pauses
 	self.ratio = container.judgement.ratio
-	self.perfect = container.judgement.perfect
-	self.notPerfect = container.judgement["not perfect"]
+	self.perfect = container.judgement.counters.perfect
+	self.notPerfect = container.judgement.counters["not perfect"]
 	self.missCount = container.base.missCount
 	self.mean = container.normalscore.normalscore.mean
 	self.earlylate = container.judgement.earlylate
