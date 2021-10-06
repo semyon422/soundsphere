@@ -3,12 +3,14 @@ local ncdk			= require("ncdk")
 local NoteSkin		= require("sphere.models.NoteSkinModel.NoteSkin")
 local OsuNoteSkin		= require("sphere.models.NoteSkinModel.OsuNoteSkin")
 local TomlNoteSkin = require("sphere.models.NoteSkinModel.TomlNoteSkin")
+local BaseNoteSkin = require("sphere.models.NoteSkinModel.BaseNoteSkin")
 
 local NoteSkinModel = Class:new()
 
 NoteSkinModel.construct = function(self)
 	self.emptyNoteSkin = NoteSkin:new()
 	self.items = {}
+	self.baseNoteSkins = {}
 end
 
 NoteSkinModel.path = "userdata/skins"
@@ -105,6 +107,19 @@ NoteSkinModel.loadOsu = function(self, path, directoryPath, fileName)
 	return noteSkins
 end
 
+NoteSkinModel.getBaseNoteSkin = function(self, inputMode, stringInputMode)
+	local baseNoteSkins = self.baseNoteSkins
+	if baseNoteSkins[stringInputMode] then
+		return baseNoteSkins[stringInputMode]
+	end
+	local noteSkin = BaseNoteSkin:new()
+	noteSkin.directoryPath = "resources"
+	noteSkin:setInputMode(inputMode, stringInputMode)
+	noteSkin:load()
+	baseNoteSkins[stringInputMode] = noteSkin
+	return noteSkin
+end
+
 NoteSkinModel.getNoteSkins = function(self, inputMode)
 	local stringInputMode = inputMode
 	if type(inputMode) == "string" then
@@ -120,6 +135,7 @@ NoteSkinModel.getNoteSkins = function(self, inputMode)
 	local items = {}
 	self.items = items
 
+	items[#items + 1] = self:getBaseNoteSkin(inputMode, stringInputMode)
 	for _, noteSkin in ipairs(self.noteSkins) do
 		if noteSkin.inputMode >= inputMode then
 			items[#items + 1] = noteSkin
