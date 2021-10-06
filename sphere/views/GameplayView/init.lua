@@ -41,10 +41,17 @@ GameplayView.load = function(self)
 	self:loadViews(self.views)
 	for i, config in ipairs(self.viewConfig) do
 		if config.class == "PlayfieldView" then
+			self.playfieldViewConfig = self.viewConfig[i]
+			self.playfieldViewConfigIndex = i
 			self.viewConfig[i] = noteSkin.playField
 		end
 	end
 	ScreenView.load(self)
+end
+
+GameplayView.unload = function(self)
+	self.viewConfig[self.playfieldViewConfigIndex] = self.playfieldViewConfig
+	ScreenView.unload(self)
 end
 
 return GameplayView
