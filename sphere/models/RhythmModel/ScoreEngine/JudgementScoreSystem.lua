@@ -5,10 +5,15 @@ local JudgementScoreSystem = ScoreSystem:new()
 JudgementScoreSystem.name = "judgement"
 
 JudgementScoreSystem.judgements = {
-	{-1, "early not perfect", "not perfect", "all", "early"},
-	{-0.016, "perfect", "all", "early"},
-	{0.016, "perfect", "all", "late"},
-	{1, "late not perfect", "not perfect", "all", "late"},
+	all = {"count"},
+	earlylate = {"early", 0, "late"},
+	soundsphere = {
+		{"early not perfect", "not perfect"},
+		-0.016,
+		"perfect",
+		0.016,
+		{"late not perfect", "not perfect"}
+	},
 }
 
 JudgementScoreSystem.construct = function(self)
@@ -21,13 +26,20 @@ JudgementScoreSystem.construct = function(self)
 	table.sort(self.judgements, function(a, b) return math.abs(a[1]) < math.abs(b[1]) end)
 end
 
-JudgementScoreSystem.getSlice = function(self)
-	local counters = {}
-	for k, v in pairs(self.counters) do
-		counters[k] = v
+JudgementScoreSystem.getJudgement = function(_, judgements, deltaTime)
+	for i, v in ipairs(judgements) do
+		if type(v) ~= "number" then
+			local prev = judgements[i - 1] or -math.huge
+			local next = judgements[i + 1] or math.huge
+			if deltaTime >= prev and deltaTime < next then
+				return v
+			end
+		end
 	end
+end
+
+JudgementScoreSystem.getSlice = function(self)
 	return {
-		counters = counters,
 		ratio = self.ratio,
 		judgementName = self.judgementName,
 		maxDeltaTime = self.maxDeltaTime,
@@ -45,20 +57,22 @@ JudgementScoreSystem.processJudgement = function(self, event)
 	end
 
 	local counters = self.counters
-	for _, judgement in ipairs(self.judgements) do
-		local time = judgement[1]
-		if deltaTime * time > 0 and math.abs(deltaTime) <= math.abs(time) then
-			for i = 2, #judgement do
-				local name = judgement[i]
-				counters[name] = (counters[name] or 0) + 1
+	for name, judgements in pairs(self.judgements) do
+		counters[name] = counters[name] or {}
+		local judgement = self:getJudgement(judgements, deltaTime)
+		if judgement then
+			if type(judgement) == "string" then
+				counters[name][judgement] = (counters[name][judgement] or 0) + 1
+			elseif type(judgement) == "table" then
+				for _, j in ipairs(judgement) do
+					counters[name][j] = (counters[name][j] or 0) + 1
+				end
 			end
-			self.judgementName = judgement[2]
-			break
 		end
 	end
 
-	self.ratio = (counters.perfect or 0) / (counters.all or 1)
-	self.earlylate = (counters.early or 0) / (counters.late or 1)
+	self.ratio = (counters.soundsphere.perfect or 0) / (counters.all.count or 1)
+	self.earlylate = (counters.earlylate.early or 0) / (counters.earlylate.late or 1)
 end
 
 JudgementScoreSystem.processMiss = function(self, event)

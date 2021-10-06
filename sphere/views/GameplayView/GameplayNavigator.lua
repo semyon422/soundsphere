@@ -44,6 +44,8 @@ GameplayNavigator.update = function(self)
 	elseif state == "pause" then
 		self:addSubscreen("pause")
 	end
+
+	Navigator.update(self)
 end
 
 GameplayNavigator.keypressed = function(self, event)

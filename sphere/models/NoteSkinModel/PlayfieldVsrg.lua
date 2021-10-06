@@ -160,6 +160,35 @@ PlayfieldVsrg.addJudgement = function(self, object)
 	end
 	self:add({
 		class = "JudgementView",
+		key = "gameController.rhythmModel.scoreEngine.scoreSystem.judgement.counters",
+		judgements = judgements
+	})
+end
+
+PlayfieldVsrg.addJudgementDelta = function(self, object)
+	local judgements = {}
+	for i, judgement in ipairs(object.judgements) do
+		if type(judgement) == "table" then
+			local config = {
+				class = "ImageAnimationView",
+				x = object.x, y = object.y,
+				w = object.w, h = object.h,
+				sx = object.sx or object.scale, sy = object.sy or object.scale,
+				ox = object.ox, oy = object.oy,
+				transform = object.transform,
+				image = judgement[1],
+				range = judgement[2],
+				quad = judgement[3],
+				rate = object.rate,
+			}
+			judgements[i] = config
+			self:add(config)
+		else
+			judgements[i] = judgement
+		end
+	end
+	self:add({
+		class = "JudgementDeltaView",
 		key = "gameController.rhythmModel.scoreEngine.scoreSystem.judgement",
 		judgements = judgements
 	})
