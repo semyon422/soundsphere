@@ -54,7 +54,7 @@ local BottomScreenMenu = {
 local PauseProgressBar = {
 	class = "ProgressView",
 	current = {
-		key = "gameController.configModel.configs.rhythmModel.pauseManager.progress",
+		key = "gameController.rhythmModel.pauseManager.progress",
 	},
 	x = 0, y = 0, w = 1920, h = 20,
 	color = {1, 1, 1, 1},
