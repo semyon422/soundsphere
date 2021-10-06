@@ -5,6 +5,7 @@ local ScoreSystems = {
 	require("sphere.models.RhythmModel.ScoreEngine.HpScoreSystem"),
 	require("sphere.models.RhythmModel.ScoreEngine.JudgementScoreSystem"),
 	require("sphere.models.RhythmModel.ScoreEngine.NormalscoreScoreSystem"),
+	require("sphere.models.RhythmModel.ScoreEngine.MiscScoreSystem"),
 	require("sphere.models.RhythmModel.ScoreEngine.EntryScoreSystem"),
 }
 

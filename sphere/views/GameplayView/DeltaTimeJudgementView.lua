@@ -2,9 +2,9 @@ local Class				= require("aqua.util.Class")
 local inside = require("aqua.util.inside")
 local JudgementScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.JudgementScoreSystem")
 
-local JudgementDeltaView = Class:new()
+local DeltaTimeJudgementView = Class:new()
 
-JudgementDeltaView.load = function(self)
+DeltaTimeJudgementView.load = function(self)
 	local config = self.config
 	local state = self.state
 
@@ -13,7 +13,7 @@ JudgementDeltaView.load = function(self)
 	state.judgement = nil
 end
 
-JudgementDeltaView.update = function(self)
+DeltaTimeJudgementView.update = function(self)
 	local config = self.config
 	local state = self.state
 	local judgementTable = state.judgementTable
@@ -41,4 +41,4 @@ JudgementDeltaView.update = function(self)
 	end
 end
 
-return JudgementDeltaView
+return DeltaTimeJudgementView

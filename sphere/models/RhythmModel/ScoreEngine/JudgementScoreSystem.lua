@@ -16,14 +16,46 @@ JudgementScoreSystem.judgements = {
 	},
 }
 
+for od = 0, 10 do
+	local _3od = 3 * od
+	local _300g = 16
+	local _300 = 64 - _3od
+	local _200 = 97 - _3od
+	local _100 = 127 - _3od
+	local _50 = 151 - _3od
+	local early_miss = 188 - _3od
+	JudgementScoreSystem.judgements["osuOD" .. od] = {
+		-early_miss,
+		"early miss",
+		-_50,
+		"50",
+		-_100,
+		"100",
+		-_200,
+		"200",
+		-_300,
+		"300",
+		-_300g,
+		"300g",
+		_300g,
+		"300",
+		_300,
+		"200",
+		_200,
+		"100",
+		_100,
+		"50",
+		_50,
+		"miss"
+	}
+end
+
 JudgementScoreSystem.construct = function(self)
-	self.ratio = 0
-	self.judgementName = ""
-	self.maxDeltaTime = 0
-	self.deltaTime = 0
-	self.earlylate = 0
 	self.counters = {}
-	table.sort(self.judgements, function(a, b) return math.abs(a[1]) < math.abs(b[1]) end)
+	local counters = self.counters
+	for name, judgements in pairs(self.judgements) do
+		counters[name] = counters[name] or {}
+	end
 end
 
 JudgementScoreSystem.getJudgement = function(_, judgements, deltaTime)
@@ -38,23 +70,9 @@ JudgementScoreSystem.getJudgement = function(_, judgements, deltaTime)
 	end
 end
 
-JudgementScoreSystem.getSlice = function(self)
-	return {
-		ratio = self.ratio,
-		judgementName = self.judgementName,
-		maxDeltaTime = self.maxDeltaTime,
-		deltaTime = self.deltaTime,
-		earlylate = self.earlylate,
-	}
-end
-
 JudgementScoreSystem.processJudgement = function(self, event)
 	local noteStartTime = event.noteStartTime or event.noteTime
 	local deltaTime = (event.currentTime - noteStartTime) / math.abs(event.timeRate)
-	self.deltaTime = deltaTime
-	if math.abs(deltaTime) > math.abs(self.maxDeltaTime) then
-		self.maxDeltaTime = deltaTime
-	end
 
 	local counters = self.counters
 	for name, judgements in pairs(self.judgements) do
@@ -70,16 +88,9 @@ JudgementScoreSystem.processJudgement = function(self, event)
 			end
 		end
 	end
-
-	self.ratio = (counters.soundsphere.perfect or 0) / (counters.all.count or 1)
-	self.earlylate = (counters.earlylate.early or 0) / (counters.earlylate.late or 1)
 end
 
-JudgementScoreSystem.processMiss = function(self, event)
-	local noteStartTime = event.noteStartTime or event.noteTime
-	local deltaTime = (event.currentTime - noteStartTime) / math.abs(event.timeRate)
-	self.deltaTime = deltaTime
-end
+JudgementScoreSystem.processMiss = function(self, event) end
 
 JudgementScoreSystem.notes = {
 	ShortScoreNote = {

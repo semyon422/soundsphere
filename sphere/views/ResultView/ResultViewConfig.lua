@@ -102,7 +102,7 @@ local HitGraph = {
 	backgroundRadius = 4,
 	key = "gameController.rhythmModel.scoreEngine.scoreSystem.sequence",
 	time = "base.currentTime",
-	value = "judgement.deltaTime",
+	value = "misc.deltaTime",
 	unit = 0.16,
 	point = function(time, startTime, endTime, value, unit)
 		if math.abs(value) > 0.12 then
@@ -129,7 +129,7 @@ local EarlyLateMissGraph = {
 	backgroundRadius = 4,
 	key = "gameController.rhythmModel.scoreEngine.scoreSystem.sequence",
 	time = "base.currentTime",
-	value = "judgement.deltaTime",
+	value = "misc.deltaTime",
 	unit = 0.16,
 	point = function(time, startTime, endTime, value, unit)
 		if math.abs(value) <= 0.12 or math.abs(value) > 0.16 then
@@ -611,7 +611,7 @@ StageInfo.cells = {
 		x = {1, 2}, y = 5,
 		name = "perfect/hits",
 		key = {
-			{"gameController.rhythmModel.scoreEngine.scoreSystem.judgement.ratio", showLoadedScore},
+			{"gameController.rhythmModel.scoreEngine.scoreSystem.misc.ratio", showLoadedScore},
 			"gameController.selectModel.scoreItem.scoreEntry.ratio"
 		},
 	},
@@ -621,7 +621,7 @@ StageInfo.cells = {
 		x = 3, y = 5,
 		name = "perfect",
 		key = {
-			{"gameController.rhythmModel.scoreEngine.scoreSystem.judgement.counters.perfect", showLoadedScore},
+			{"gameController.rhythmModel.scoreEngine.scoreSystem.judgement.counters.soundsphere.perfect", showLoadedScore},
 			"gameController.selectModel.scoreItem.scoreEntry.perfect"
 		},
 	},
@@ -631,7 +631,7 @@ StageInfo.cells = {
 		x = {2, 3}, y = 6,
 		name = "not perfect",
 		key = {
-			{"gameController.rhythmModel.scoreEngine.scoreSystem.judgement.counters.not perfect", showLoadedScore},
+			{"gameController.rhythmModel.scoreEngine.scoreSystem.judgement.counters.soundsphere.not perfect", showLoadedScore},
 			"gameController.selectModel.scoreItem.scoreEntry.notPerfect"
 		},
 	},
@@ -651,7 +651,7 @@ StageInfo.cells = {
 		x = {3, 4}, y = 6,
 		name = "early/late",
 		key = {
-			{"gameController.rhythmModel.scoreEngine.scoreSystem.judgement.earlylate", showLoadedScore},
+			{"gameController.rhythmModel.scoreEngine.scoreSystem.misc.earlylate", showLoadedScore},
 			"gameController.selectModel.scoreItem.scoreEntry.earlylate"
 		},
 		format = function(earlylate)
@@ -682,7 +682,7 @@ StageInfo.cells = {
 		name = "max delta",
 		multiplier = 1000,
 		format = "%d",
-		key = "gameController.rhythmModel.scoreEngine.scoreSystem.judgement.maxDeltaTime",
+		key = "gameController.rhythmModel.scoreEngine.scoreSystem.misc.maxDeltaTime",
 		show = showLoadedScore
 	},
 	{

@@ -158,14 +158,18 @@ PlayfieldVsrg.addJudgement = function(self, object)
 		judgements[judgement[1]] = config
 		self:add(config)
 	end
+	local key = "gameController.rhythmModel.scoreEngine.scoreSystem.judgement.counters"
+	if object.key then
+		key = key .. "." .. object.key
+	end
 	self:add({
 		class = "JudgementView",
-		key = "gameController.rhythmModel.scoreEngine.scoreSystem.judgement.counters",
+		key = key,
 		judgements = judgements
 	})
 end
 
-PlayfieldVsrg.addJudgementDelta = function(self, object)
+PlayfieldVsrg.addDeltaTimeJudgement = function(self, object)
 	local judgements = {}
 	for i, judgement in ipairs(object.judgements) do
 		if type(judgement) == "table" then
@@ -188,8 +192,8 @@ PlayfieldVsrg.addJudgementDelta = function(self, object)
 		end
 	end
 	self:add({
-		class = "JudgementDeltaView",
-		key = "gameController.rhythmModel.scoreEngine.scoreSystem.judgement",
+		class = "DeltaTimeJudgementView",
+		key = "gameController.rhythmModel.scoreEngine.scoreSystem.misc",
 		judgements = judgements
 	})
 end
