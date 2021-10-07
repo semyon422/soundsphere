@@ -99,6 +99,8 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 		if itemIndex then
 			self.gameController.selectModel:scrollScore(nil, itemIndex)
 		end
+		rhythmModel.inputManager:setMode("external")
+		rhythmModel.replayModel:setMode("record")
 	else
 		return self.gameController.screenManager:set(gameplayController)
 	end

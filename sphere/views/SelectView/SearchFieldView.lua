@@ -21,7 +21,10 @@ SearchFieldView.receive = function(self, event)
 	local state = self.state
 	state.textInput:receive(event)
 	self.navigator:setSearchString(state.textInput.text)
-	state.textInput:setText(self.gameController.searchModel.searchString)
+end
+
+SearchFieldView.update = function(self)
+	self.state.textInput:setText(self.gameController.searchModel.searchString)
 end
 
 SearchFieldView.draw = function(self)
