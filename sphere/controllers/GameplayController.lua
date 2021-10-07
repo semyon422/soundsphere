@@ -101,10 +101,13 @@ GameplayController.getImporterSettings = function(self)
 end
 
 GameplayController.unload = function(self)
-	self.gameController.rhythmModel:unloadAllEngines()
-	self.gameController.rhythmModel:unload()
+	local rhythmModel = self.gameController.rhythmModel
+	rhythmModel:unloadAllEngines()
+	rhythmModel:unload()
 	self.view:unload()
-	self.gameController.rhythmModel.observable:remove(self.view)
+	rhythmModel.observable:remove(self.view)
+	rhythmModel.inputManager:setMode("external")
+	rhythmModel.replayModel:setMode("record")
 end
 
 GameplayController.update = function(self, dt)
