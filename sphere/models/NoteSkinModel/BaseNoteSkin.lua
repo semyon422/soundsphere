@@ -71,6 +71,7 @@ BaseNoteSkin.load = function(self, content)
 		if not oldInputType then
 			oldInputType = inputType
 		elseif oldInputType ~= inputType then
+			oldInputType = inputType
 			guidelines.w[i] = 1
 		end
 		guidelines.y[i] = 0

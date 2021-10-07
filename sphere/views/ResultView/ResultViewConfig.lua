@@ -217,6 +217,11 @@ local ScoreList = {
 		{
 			type = "text",
 			key = "itemIndex",
+			-- key = {
+			-- 	{"gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.scoreAdjusted", showLoadedListScore},
+			-- 	"scoreEntry.score"
+			-- },
+			-- format = formatScore,
 			onNew = false,
 			x = 22,
 			baseline = 45,
@@ -429,7 +434,7 @@ local ChartInputModeView = {
 	color = {1, 1, 1, 1},
 	x = 279 + 29 + 17,
 	baseline = 216 + 19,
-	limit = 47,
+	limit = 500,
 	align = "left",
 	font = {
 		filename = "Noto Sans",
