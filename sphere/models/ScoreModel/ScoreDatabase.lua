@@ -73,8 +73,8 @@ local createTableRequest = [[
 		`mean` REAL,
 		`earlylate` REAL,
 		`inputMode` TEXT,
-		`difficulty` REAL,
 		`timeRate` REAL,
+		`difficulty` REAL,
 		`pausesCount` REAL
 	);
 ]]
