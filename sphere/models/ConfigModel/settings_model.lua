@@ -26,7 +26,7 @@ local settings = {
 	},
 	{
 		name = "round off time",
-		section = "general",
+		section = "gameplay",
 		key = "gameplay.needTimeRound",
 		type = "switch",
 		displayRange = {"no", "yes"}
