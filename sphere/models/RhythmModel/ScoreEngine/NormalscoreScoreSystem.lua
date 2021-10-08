@@ -7,7 +7,10 @@ NormalscoreScoreSystem.name = "normalscore"
 
 NormalscoreScoreSystem.construct = function(self)
 	self.normalscore = normalscore:new()
-	self.hitTimingWindow = 0.12
+end
+
+NormalscoreScoreSystem.load = function(self)
+	self.hitTimingWindow = self.scoreEngine.timingWindows.normalscore
 end
 
 NormalscoreScoreSystem.after = function(self, event)

@@ -5,19 +5,23 @@ local HpScoreSystem = ScoreSystem:new()
 HpScoreSystem.name = "hp"
 
 HpScoreSystem.construct = function(self)
-	self.hp = 0.5
 	self.failed = false
+end
+
+HpScoreSystem.load = function(self)
+	self.config = self.scoreEngine.hp
+	self.hp = self.config.start
 end
 
 HpScoreSystem.increaseHp = function(self)
 	if self.failed then
 		return
 	end
-	self.hp = math.min(self.hp + 0.001, 1)
+	self.hp = math.min(self.hp + self.config.increase, self.config.max)
 end
 
 HpScoreSystem.decreaseHp = function(self)
-	self.hp = math.max(self.hp - 0.05, 0)
+	self.hp = math.max(self.hp - self.config.decrease, self.config.min)
 	if self.hp < 1e-6 then
 		self.failed = true
 	end

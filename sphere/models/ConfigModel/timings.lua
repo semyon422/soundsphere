@@ -1,4 +1,5 @@
 return {
+	normalscore = 0.12,
 	ShortScoreNote = {
 		hit = {-0.12, 0.12},
 		miss = {-0.16, 0.16}

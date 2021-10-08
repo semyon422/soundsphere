@@ -58,19 +58,15 @@ end
 
 JudgementScoreSystem.construct = function(self)
 	self.counters = {}
-	local counters = self.counters
-	for name, judgements in pairs(self.judgements) do
-		counters[name] = counters[name] or {}
-	end
 end
 
 JudgementScoreSystem.load = function(self)
-	self:addJudgements()
-end
-
-JudgementScoreSystem.addJudgements = function(self)
 	for name, judgements in pairs(self.scoreEngine.judgements) do
 		self.judgements[name] = judgements
+	end
+	local counters = self.counters
+	for name, judgements in pairs(self.judgements) do
+		counters[name] = counters[name] or {}
 	end
 end
 

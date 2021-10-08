@@ -3,9 +3,9 @@ local Class = require("aqua.util.Class")
 local ScoreSystem = Class:new()
 
 ScoreSystem.notes = {}
-ScoreSystem.load = function() end
-ScoreSystem.before = function() end
-ScoreSystem.after = function() end
+ScoreSystem.load = function(self) end
+ScoreSystem.before = function(self, event) end
+ScoreSystem.after = function(self, event) end
 
 ScoreSystem.receive = function(self, event)
 	if event.name ~= "ScoreNoteState" or not event.currentTime then

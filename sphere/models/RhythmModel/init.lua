@@ -58,6 +58,7 @@ RhythmModel.load = function(self)
 	graphicEngine.logicEngine = logicEngine
 	scoreEngine.timingWindows = self.timings
 	scoreEngine.judgements = self.judgements
+	scoreEngine.hp = self.hp
 
 	inputManager.observable:add(logicEngine)
 	inputManager.observable:add(replayModel)
