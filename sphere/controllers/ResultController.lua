@@ -53,6 +53,7 @@ ResultController.receive = function(self, event)
 
 	if event.name == "changeScreen" then
 		self:resetConfigs()
+		self.gameController.screenManager:set(self.selectController)
 	elseif event.name == "loadScore" then
 		self:resetConfigs()
 		self:replayNoteChart(event.mode, event.scoreEntry, event.itemIndex)
