@@ -206,18 +206,22 @@ GameController.load = function(self)
 	self.screenManager:set(selectController)
 end
 
-GameController.unload = function(self)
-	self.screenManager:unload()
-	DiscordPresence:unload()
-	self.backgroundModel:unload()
+GameController.writeConfigs = function(self)
 	self.configModel:writeConfig("settings")
 	self.configModel:writeConfig("select")
 	self.configModel:writeConfig("modifier")
 	self.configModel:writeConfig("input")
 	self.configModel:writeConfig("mount")
 	self.configModel:writeConfig("online")
+end
+
+GameController.unload = function(self)
+	self.screenManager:unload()
+	DiscordPresence:unload()
+	self.backgroundModel:unload()
 	self.mountModel:unload()
 	self.onlineModel:unload()
+	self:writeConfigs()
 end
 
 GameController.update = function(self, dt)

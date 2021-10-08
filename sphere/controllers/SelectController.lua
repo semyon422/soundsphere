@@ -8,6 +8,8 @@ SelectController.load = function(self)
 	local selectModel = self.gameController.selectModel
 	local previewModel = self.gameController.previewModel
 
+	self.gameController:writeConfigs()
+
 	local theme = themeModel:getTheme()
 	self.theme = theme
 
@@ -27,6 +29,7 @@ end
 SelectController.unload = function(self)
 	self.gameController.previewModel:unload()
 	self.view:unload()
+	self.gameController:writeConfigs()
 end
 
 SelectController.update = function(self, dt)
