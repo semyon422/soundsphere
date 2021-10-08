@@ -20,6 +20,8 @@ userdata/select.lua
 userdata/settings.lua
 userdata/window.lua
 userdata/online.lua
+userdata/timings.lua
+userdata/judgements.lua
 userdata/files.lua
 userdata/avatar.png
 

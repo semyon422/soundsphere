@@ -19,13 +19,12 @@ ScoreSystemContainer.load = function(self)
 	for _, ScoreSystem in ipairs(ScoreSystems) do
 		local scoreSystem = ScoreSystem:new()
 		scoreSystem.container = self
+		scoreSystem.scoreEngine = self.scoreEngine
 
 		table.insert(scoreSystems, scoreSystem)
 		self[ScoreSystem.name] = scoreSystem
 
-		if not self.timingWindows and scoreSystem.timingWindows then
-			self.timingWindows = scoreSystem.timingWindows
-		end
+		scoreSystem:load()
 	end
 end
 

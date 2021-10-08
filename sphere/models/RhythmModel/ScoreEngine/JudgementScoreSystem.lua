@@ -64,6 +64,16 @@ JudgementScoreSystem.construct = function(self)
 	end
 end
 
+JudgementScoreSystem.load = function(self)
+	self:addJudgements()
+end
+
+JudgementScoreSystem.addJudgements = function(self)
+	for name, judgements in pairs(self.scoreEngine.judgements) do
+		self.judgements[name] = judgements
+	end
+end
+
 JudgementScoreSystem.getJudgement = function(_, judgements, deltaTime)
 	for i, v in ipairs(judgements) do
 		if type(v) ~= "number" then

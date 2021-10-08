@@ -15,14 +15,14 @@ end
 LongScoreNote.getStartTimeState = function(self)
 	local currentTime = self.logicalNote:getEventTime()
 	local deltaTime = (currentTime - self.startNoteData.timePoint.absoluteTime) / math.abs(self.scoreEngine.timeRate)
-	local config = self.scoreEngine.scoreSystem.timingWindows.LongScoreNote
+	local config = self.scoreEngine.timingWindows.LongScoreNote
 	return self:getTimeStateFromConfig(config.startHit, config.startMiss, deltaTime)
 end
 
 LongScoreNote.getEndTimeState = function(self)
 	local currentTime = self.logicalNote:getEventTime()
 	local deltaTime = (currentTime - self.endNoteData.timePoint.absoluteTime) / math.abs(self.scoreEngine.timeRate)
-	local config = self.scoreEngine.scoreSystem.timingWindows.LongScoreNote
+	local config = self.scoreEngine.timingWindows.LongScoreNote
 	return self:getTimeStateFromConfig(config.endHit, config.endMiss, deltaTime)
 end
 

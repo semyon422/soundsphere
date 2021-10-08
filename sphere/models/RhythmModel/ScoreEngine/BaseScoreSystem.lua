@@ -4,19 +4,6 @@ local BaseScoreSystem = ScoreSystem:new()
 
 BaseScoreSystem.name = "base"
 
-BaseScoreSystem.timingWindows = {
-	ShortScoreNote = {
-		hit = {-0.12, 0.12},
-		miss = {-0.16, 0.16}
-	},
-	LongScoreNote = {
-		startHit = {-0.12, 0.12},
-		startMiss = {-0.16, 0.16},
-		endHit = {-0.12, 0.12},
-		endMiss = {-0.16, 0.16}
-	}
-}
-
 BaseScoreSystem.construct = function(self)
 	self.hitCount = 0
 	self.missCount = 0

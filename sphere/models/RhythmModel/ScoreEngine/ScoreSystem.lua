@@ -3,6 +3,7 @@ local Class = require("aqua.util.Class")
 local ScoreSystem = Class:new()
 
 ScoreSystem.notes = {}
+ScoreSystem.load = function() end
 ScoreSystem.before = function() end
 ScoreSystem.after = function() end
 
