@@ -16,7 +16,7 @@ JudgementScoreSystem.judgements = {
 	},
 }
 
-for od = 0, 10 do
+for od = 5, 10 do
 	local _3od = 3 * od
 	local _300g = 16
 	local _300 = 64 - _3od
@@ -24,7 +24,7 @@ for od = 0, 10 do
 	local _100 = 127 - _3od
 	local _50 = 151 - _3od
 	local early_miss = 188 - _3od
-	JudgementScoreSystem.judgements["osuOD" .. od] = {
+	local judgements = {
 		-early_miss,
 		"early miss",
 		-_50,
@@ -48,6 +48,12 @@ for od = 0, 10 do
 		_50,
 		"miss"
 	}
+	for i = 1, #judgements do
+		if type(judgements[i]) == "number" then
+			judgements[i] = judgements[i] / 1000
+		end
+	end
+	JudgementScoreSystem.judgements["osuOD" .. od] = judgements
 end
 
 JudgementScoreSystem.construct = function(self)

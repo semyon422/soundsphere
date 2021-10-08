@@ -1,6 +1,7 @@
 local inspect = require("inspect")
 local rtime = require("aqua.util.rtime")
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
+local transformLeft = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local formatScore = function(score)
 	if score >= 0.1 then
@@ -836,8 +837,27 @@ local BottomRightScreenMenu = {
 local InspectScoreSystem = {
 	class = "ValueView",
 	subscreen = "scoreSystemDebug",
-	transform = transform,
+	transform = transformLeft,
 	key = "gameController.rhythmModel.scoreEngine.scoreSystem.slice",
+	format = function(...)
+		return inspect(...)
+	end,
+	x = 0,
+	baseline = 20,
+	limit = 1920,
+	font = {
+		filename = "Noto Sans Mono",
+		size = 14,
+	},
+	align = "left",
+	color = {1, 1, 1, 1}
+}
+
+local InspectCounters = {
+	class = "ValueView",
+	subscreen = "countersDebug",
+	transform = transformLeft,
+	key = "gameController.rhythmModel.scoreEngine.scoreSystem.judgement.counters",
 	format = function(...)
 		return inspect(...)
 	end,
@@ -876,6 +896,7 @@ local NoteSkinViewConfig = {
 	HpGraph,
 	EarlyLateMissGraph,
 	InspectScoreSystem,
+	InspectCounters,
 	require("sphere.views.DebugInfoViewConfig"),
 }
 
