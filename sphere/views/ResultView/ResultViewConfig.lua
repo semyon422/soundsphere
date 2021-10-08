@@ -872,6 +872,25 @@ local InspectCounters = {
 	color = {1, 1, 1, 1}
 }
 
+local InspectScoreEntry = {
+	class = "ValueView",
+	subscreen = "scoreEntryDebug",
+	transform = transformLeft,
+	key = "gameController.selectModel.scoreItem.scoreEntry",
+	format = function(...)
+		return inspect(...)
+	end,
+	x = 0,
+	baseline = 20,
+	limit = 1920,
+	font = {
+		filename = "Noto Sans Mono",
+		size = 14,
+	},
+	align = "left",
+	color = {1, 1, 1, 1}
+}
+
 local NoteSkinViewConfig = {
 	BackgroundBlurSwitch,
 	Background,
@@ -897,6 +916,7 @@ local NoteSkinViewConfig = {
 	EarlyLateMissGraph,
 	InspectScoreSystem,
 	InspectCounters,
+	InspectScoreEntry,
 	require("sphere.views.DebugInfoViewConfig"),
 }
 

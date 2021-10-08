@@ -17,6 +17,7 @@ ResultNavigator.receive = function(self, event)
 	elseif scancode == "f1" then self:switchSubscreen("debug")
 	elseif scancode == "f2" then self:switchSubscreen("scoreSystemDebug")
 	elseif scancode == "f3" then self:switchSubscreen("countersDebug")
+	elseif scancode == "f4" then self:switchSubscreen("scoreEntryDebug")
 	end
 end
 
