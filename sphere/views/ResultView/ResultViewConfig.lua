@@ -639,7 +639,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 8, y = 3,
 		name = "pauses",
-		key = "gameController.selectModel.scoreItem.scoreEntry.pauses"
+		key = "gameController.selectModel.scoreItem.scoreEntry.pausesCount",
 	},
 	{
 		type = StageInfo.smallCell,

@@ -23,6 +23,7 @@ EntryScoreSystem.after = function(self, event)
 	self.inputMode = self.scoreEngine.inputMode
 	self.timeRate = self.scoreEngine.baseTimeRate
 	self.difficulty = self.scoreEngine.enps
+	self.pausesCount = self.scoreEngine.pausesCount
 end
 
 return EntryScoreSystem

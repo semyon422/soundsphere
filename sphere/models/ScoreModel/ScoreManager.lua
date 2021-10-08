@@ -94,6 +94,7 @@ ScoreManager.insertScore = function(self, scoreSystemEntry, noteChartDataEntry, 
 		inputMode = scoreSystemEntry.inputMode,
 		timeRate = scoreSystemEntry.timeRate,
 		difficulty = scoreSystemEntry.difficulty,
+		pausesCount = scoreSystemEntry.pausesCount,
 	}
 	ScoreDatabase:load()
 	ScoreDatabase:insertScore(scoreEntry)

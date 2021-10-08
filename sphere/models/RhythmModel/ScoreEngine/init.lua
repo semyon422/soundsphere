@@ -26,6 +26,9 @@ ScoreEngine.load = function(self)
 	self.bpm = self.noteChartDataEntry.bpm * self.baseTimeRate
 	self.length = self.noteChartDataEntry.length / self.baseTimeRate
 
+	self.pausesCount = 0
+	self.paused = false
+
 	self.minTime = self.noteChart.metaData:get("minTime")
 	self.maxTime = self.noteChart.metaData:get("maxTime")
 
@@ -36,6 +39,16 @@ end
 
 ScoreEngine.update = function(self)
 	self.noteHandler:update()
+
+	if self.currentTime < self.minTime and self.currentTime > self.maxTime then
+		return
+	end
+	if self.timeRate == 0 and not self.paused then
+		self.paused = true
+		self.pausesCount = self.pausesCount + 1
+	elseif self.timeRate ~= 0 and self.paused then
+		self.paused = false
+	end
 end
 
 ScoreEngine.unload = function(self)

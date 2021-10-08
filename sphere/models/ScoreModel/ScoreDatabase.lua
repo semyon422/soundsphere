@@ -13,7 +13,6 @@ ScoreDatabase.scoresColumns = {
 	"score",
 	"accuracy",
 	"maxCombo",
-	"scoreRating",
 	"modifiers",
 	"replayHash",
 	"rating",
@@ -27,6 +26,7 @@ ScoreDatabase.scoresColumns = {
 	"inputMode",
 	"timeRate",
 	"difficulty",
+	"pausesCount",
 }
 
 ScoreDatabase.scoresNumberColumns = {
@@ -35,7 +35,6 @@ ScoreDatabase.scoresNumberColumns = {
 	"time",
 	"score",
 	"maxCombo",
-	"scoreRating",
 	"rating",
 	"pauses",
 	"ratio",
@@ -46,6 +45,7 @@ ScoreDatabase.scoresNumberColumns = {
 	"earlylate",
 	"timeRate",
 	"difficulty",
+	"pausesCount",
 }
 
 local createTableRequest = [[
@@ -62,7 +62,6 @@ local createTableRequest = [[
 		`score` REAL,
 		`accuracy` REAL,
 		`maxCombo` INTEGER,
-		`scoreRating` REAL,
 		`modifiers` TEXT,
 		`replayHash` TEXT,
 		`rating` REAL,
@@ -75,7 +74,8 @@ local createTableRequest = [[
 		`earlylate` REAL,
 		`inputMode` TEXT,
 		`difficulty` REAL,
-		`timeRate` REAL
+		`timeRate` REAL,
+		`pausesCount` REAL
 	);
 ]]
 
@@ -88,7 +88,6 @@ local insertScoreRequest = [[
 		score,
 		accuracy,
 		maxCombo,
-		scoreRating,
 		modifiers,
 		replayHash,
 		rating,
@@ -101,7 +100,8 @@ local insertScoreRequest = [[
 		earlylate,
 		inputMode,
 		timeRate,
-		difficulty
+		difficulty,
+		pausesCount
 	)
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 ]]
@@ -127,7 +127,7 @@ local updateInfoRequest = [[
 ]]
 
 local defaultInfo = {
-	version = 6
+	version = 3
 }
 
 ScoreDatabase.load = function(self)
@@ -197,7 +197,6 @@ ScoreDatabase.insertScore = function(self, scoreData)
 		scoreData.score,
 		scoreData.accuracy,
 		scoreData.maxCombo,
-		scoreData.scoreRating,
 		scoreData.modifiers,
 		scoreData.replayHash,
 		scoreData.rating,
@@ -210,7 +209,8 @@ ScoreDatabase.insertScore = function(self, scoreData)
 		scoreData.earlylate,
 		scoreData.inputMode,
 		scoreData.timeRate,
-		scoreData.difficulty
+		scoreData.difficulty,
+		scoreData.pausesCount
 	):step()
 end
 
@@ -244,12 +244,11 @@ updates[2] = [[
 		`score` REAL,
 		`accuracy` REAL,
 		`maxCombo` INTEGER,
-		`scoreRating` REAL,
 		`modifiers` TEXT,
 		`replayHash` TEXT
 	);
-	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash)
-	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, mods, "" FROM temp;
+	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, modifiers, replayHash)
+	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, mods, "" FROM temp;
 	DROP TABLE temp;
 ]]
 
@@ -264,87 +263,6 @@ updates[3] = [[
 		`score` REAL,
 		`accuracy` REAL,
 		`maxCombo` INTEGER,
-		`scoreRating` REAL,
-		`modifiers` TEXT,
-		`replayHash` TEXT,
-		`rating` REAL
-	);
-	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating)
-	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, 0 FROM temp;
-	DROP TABLE temp;
-]]
-
-updates[4] = [[
-	ALTER TABLE scores RENAME TO temp;
-	CREATE TABLE IF NOT EXISTS `scores` (
-		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		`noteChartHash` TEXT NOT NULL,
-		`noteChartIndex` REAL NOT NULL,
-		`playerName` TEXT,
-		`time` INTEGER,
-		`score` REAL,
-		`accuracy` REAL,
-		`maxCombo` INTEGER,
-		`scoreRating` REAL,
-		`modifiers` TEXT,
-		`replayHash` TEXT,
-		`rating` REAL,
-		`pauses` REAL,
-		`ratio` REAL,
-		`perfect` REAL,
-		`notPerfect` REAL,
-		`missCount` REAL,
-		`mean` REAL,
-		`earlylate` REAL
-	);
-	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating, pauses, ratio, perfect, notPerfect, missCount, mean, earlylate)
-	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating, 0, 0, 0, 0, 0, 0, 0 FROM temp;
-	DROP TABLE temp;
-]]
-
-updates[5] = [[
-	ALTER TABLE scores RENAME TO temp;
-	CREATE TABLE IF NOT EXISTS `scores` (
-		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		`noteChartHash` TEXT NOT NULL,
-		`noteChartIndex` REAL NOT NULL,
-		`playerName` TEXT,
-		`time` INTEGER,
-		`score` REAL,
-		`accuracy` REAL,
-		`maxCombo` INTEGER,
-		`scoreRating` REAL,
-		`modifiers` TEXT,
-		`replayHash` TEXT,
-		`rating` REAL,
-		`pauses` REAL,
-		`ratio` REAL,
-		`perfect` REAL,
-		`notPerfect` REAL,
-		`missCount` REAL,
-		`mean` REAL,
-		`earlylate` REAL,
-		`inputMode` TEXT,
-		`timeRate` REAL
-	);
-	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating, pauses, ratio, perfect, notPerfect, missCount, mean, earlylate, inputMode, timeRate)
-	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating, pauses, ratio, perfect, notPerfect, missCount, mean, earlylate, "", 1 FROM temp;
-	DROP TABLE temp;
-]]
-
-
-updates[6] = [[
-	ALTER TABLE scores RENAME TO temp;
-	CREATE TABLE IF NOT EXISTS `scores` (
-		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		`noteChartHash` TEXT NOT NULL,
-		`noteChartIndex` REAL NOT NULL,
-		`playerName` TEXT,
-		`time` INTEGER,
-		`score` REAL,
-		`accuracy` REAL,
-		`maxCombo` INTEGER,
-		`scoreRating` REAL,
 		`modifiers` TEXT,
 		`replayHash` TEXT,
 		`rating` REAL,
@@ -357,10 +275,46 @@ updates[6] = [[
 		`earlylate` REAL,
 		`inputMode` TEXT,
 		`timeRate` REAL,
-		`difficulty` REAL
+		`difficulty` REAL,
+		`pausesCount` REAL
 	);
-	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating, pauses, ratio, perfect, notPerfect, missCount, mean, earlylate, inputMode, timeRate, difficulty)
-	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating, pauses, ratio, perfect, notPerfect, missCount, mean, earlylate, inputMode, timeRate, 0 FROM temp;
+	INSERT INTO scores(
+		id,
+		noteChartHash,
+		noteChartIndex,
+		playerName,
+		time,
+		score,
+		accuracy,
+		maxCombo,
+		modifiers,
+		replayHash,
+		rating,
+		pauses,
+		ratio,
+		perfect,
+		notPerfect,
+		missCount,
+		mean,
+		earlylate,
+		inputMode,
+		timeRate,
+		difficulty,
+		pausesCount
+	)
+	SELECT
+		id,
+		noteChartHash,
+		noteChartIndex,
+		playerName,
+		time,
+		score * 1e-6,
+		accuracy * 1e-3,
+		maxCombo,
+		modifiers,
+		replayHash,
+		0, 0, 0, 0, 0, 0, 0, 0, "", 1, 0, 0
+	FROM temp;
 	DROP TABLE temp;
 ]]
 
@@ -371,7 +325,6 @@ ScoreDatabase.updateSchema = function(self)
 		error("you can not use newer score database in older game versions")
 	end
 
-	self.db:exec("DROP TABLE IF EXISTS temp;")
 	while info.version < defaultInfo.version do
 		info.version = info.version + 1
 		self.db:exec(updates[info.version])
