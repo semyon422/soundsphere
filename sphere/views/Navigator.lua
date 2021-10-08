@@ -93,8 +93,8 @@ Navigator.removeSubscreen = function(self, subscreen)
 	local n = #subscreens
 	subscreens[subscreen] = nil
 	subscreens[i] = nil
-	if n ~= 1 then
-		local last = subscreens[n]
+	local last = subscreens[n]
+	if last then
 		subscreens[i] = last
 		subscreens[last] = i
 		subscreens[n] = nil
