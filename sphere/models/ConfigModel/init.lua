@@ -1,6 +1,7 @@
 local Class = require("aqua.util.Class")
 local toml = require("lua-toml.toml")
 local json = require("json")
+local serpent = require("serpent")
 toml.strict = false
 
 local ConfigModel = Class:new()
@@ -85,6 +86,8 @@ ConfigModel.writeConfigFile = function(self, path, format, config)
 		return self:writeTomlFile(path, config)
 	elseif format == "json" then
 		return self:writeJsonFile(path, config)
+	elseif format == "lua" then
+		return self:writeLuaFile(path, config)
 	end
 end
 
@@ -94,6 +97,17 @@ end
 
 ConfigModel.writeJsonFile = function(self, path, config)
 	return assert(love.filesystem.write(path, json.encode(config)))
+end
+
+local serpentOptions = {
+	indent = "\t",
+	comment = false,
+	sortkeys = true,
+	numformat = "%.16g"
+}
+local serpentFormat = "return %s\n"
+ConfigModel.writeLuaFile = function(self, path, config)
+	return assert(love.filesystem.write(path, serpentFormat:format(serpent.block(config, serpentOptions))))
 end
 
 return ConfigModel

@@ -11,17 +11,16 @@ userdata/screenshots/*
 !userdata/screenshots/.keep
 
 userdata/charts.db
-userdata/input.json
-userdata/main.log
-userdata/modifier.json
-userdata/mount.json
-userdata/noteskin.toml
 userdata/scores.db
-userdata/select.toml
-userdata/settings.toml
-userdata/window.json
-userdata/online.toml
-userdata/files.json
+userdata/main.log
+userdata/input.lua
+userdata/modifier.lua
+userdata/mount.lua
+userdata/select.lua
+userdata/settings.lua
+userdata/window.lua
+userdata/online.lua
+userdata/files.lua
 userdata/avatar.png
 
 userdata/charts.db-journal

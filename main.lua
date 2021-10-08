@@ -16,6 +16,7 @@ aquapackage.add("tween")
 aquapackage.add("s3dc")
 aquapackage.add("inspect")
 aquapackage.add("lua-crc32")
+aquapackage.add("serpent/src")
 
 local ffi = require("ffi")
 
