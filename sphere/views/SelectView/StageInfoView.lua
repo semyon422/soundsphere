@@ -74,7 +74,7 @@ StageInfoView.drawTextCell = function(self, cell)
 		value = 0
 	end
 	if type(value) == "function" then
-		value = value()
+		value = value(self)
 	end
 	if cell.format then
 		local format = cell.format

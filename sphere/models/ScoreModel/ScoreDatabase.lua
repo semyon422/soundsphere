@@ -26,6 +26,7 @@ ScoreDatabase.scoresColumns = {
 	"earlylate",
 	"inputMode",
 	"timeRate",
+	"difficulty",
 }
 
 ScoreDatabase.scoresNumberColumns = {
@@ -44,6 +45,7 @@ ScoreDatabase.scoresNumberColumns = {
 	"mean",
 	"earlylate",
 	"timeRate",
+	"difficulty",
 }
 
 local createTableRequest = [[
@@ -72,6 +74,7 @@ local createTableRequest = [[
 		`mean` REAL,
 		`earlylate` REAL,
 		`inputMode` TEXT,
+		`difficulty` REAL,
 		`timeRate` REAL
 	);
 ]]
@@ -97,9 +100,10 @@ local insertScoreRequest = [[
 		mean,
 		earlylate,
 		inputMode,
-		timeRate
+		timeRate,
+		difficulty
 	)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 ]]
 
 local selectScoreRequest = [[
@@ -123,7 +127,7 @@ local updateInfoRequest = [[
 ]]
 
 local defaultInfo = {
-	version = 5
+	version = 6
 }
 
 ScoreDatabase.load = function(self)
@@ -205,7 +209,8 @@ ScoreDatabase.insertScore = function(self, scoreData)
 		scoreData.mean,
 		scoreData.earlylate,
 		scoreData.inputMode,
-		scoreData.timeRate
+		scoreData.timeRate,
+		scoreData.difficulty
 	):step()
 end
 
@@ -327,6 +332,38 @@ updates[5] = [[
 	DROP TABLE temp;
 ]]
 
+
+updates[6] = [[
+	ALTER TABLE scores RENAME TO temp;
+	CREATE TABLE IF NOT EXISTS `scores` (
+		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		`noteChartHash` TEXT NOT NULL,
+		`noteChartIndex` REAL NOT NULL,
+		`playerName` TEXT,
+		`time` INTEGER,
+		`score` REAL,
+		`accuracy` REAL,
+		`maxCombo` INTEGER,
+		`scoreRating` REAL,
+		`modifiers` TEXT,
+		`replayHash` TEXT,
+		`rating` REAL,
+		`pauses` REAL,
+		`ratio` REAL,
+		`perfect` REAL,
+		`notPerfect` REAL,
+		`missCount` REAL,
+		`mean` REAL,
+		`earlylate` REAL,
+		`inputMode` TEXT,
+		`timeRate` REAL,
+		`difficulty` REAL
+	);
+	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating, pauses, ratio, perfect, notPerfect, missCount, mean, earlylate, inputMode, timeRate, difficulty)
+	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash, rating, pauses, ratio, perfect, notPerfect, missCount, mean, earlylate, inputMode, timeRate, 0 FROM temp;
+	DROP TABLE temp;
+]]
+
 ScoreDatabase.updateSchema = function(self)
 	local info = self:selectInfo()
 
@@ -334,6 +371,7 @@ ScoreDatabase.updateSchema = function(self)
 		error("you can not use newer score database in older game versions")
 	end
 
+	self.db:exec("DROP TABLE IF EXISTS temp;")
 	while info.version < defaultInfo.version do
 		info.version = info.version + 1
 		self.db:exec(updates[info.version])

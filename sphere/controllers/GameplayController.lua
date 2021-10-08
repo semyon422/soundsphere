@@ -41,7 +41,8 @@ GameplayController.load = function(self)
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
 
-	local localOffset = noteChartModel.noteChartDataEntry.localOffset
+	local noteChartDataEntry = noteChartModel.noteChartDataEntry
+	local localOffset = noteChartDataEntry.localOffset
 
 	local config = configModel.configs.settings
 
@@ -72,14 +73,16 @@ GameplayController.load = function(self)
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
 	rhythmModel:setNoteSkin(noteSkin)
 
-	rhythmModel:loadAllEngines()
-
 	local scoreEngine = rhythmModel.scoreEngine
 
 	local enps, averageStrain, generalizedKeymode = difficultyModel:getDifficulty(noteChart)
 	scoreEngine.baseEnps = enps
 	scoreEngine.baseAverageStrain = averageStrain
 	scoreEngine.generalizedKeymode = generalizedKeymode
+
+	scoreEngine.noteChartDataEntry = noteChartDataEntry
+
+	rhythmModel:loadAllEngines()
 
 	view:load()
 

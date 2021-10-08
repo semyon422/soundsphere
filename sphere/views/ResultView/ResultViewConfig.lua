@@ -1,4 +1,5 @@
 local inspect = require("inspect")
+local rtime = require("aqua.util.rtime")
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local formatScore = function(score)
@@ -6,6 +7,17 @@ local formatScore = function(score)
 		return "100+"
 	end
 	return ("%2.2f"):format(score * 1000)
+end
+
+local formatDifficulty = function(difficulty)
+	local format = "%.2f"
+	if difficulty >= 100 then
+		format = "%s"
+		difficulty = "100+"
+	elseif difficulty >= 10 then
+		format = "%.1f"
+	end
+	return format:format(difficulty)
 end
 
 local showLoadedScore = function(self)
@@ -456,16 +468,7 @@ local ChartDifficultyView = {
 		size = 24,
 	},
 	transform = transform,
-	format = function(difficulty)
-		local format = "%.2f"
-		if difficulty >= 100 then
-			format = "%s"
-			difficulty = "100+"
-		elseif difficulty >= 10 then
-			format = "%.1f"
-		end
-		return format:format(difficulty)
-	end
+	format = formatDifficulty
 }
 
 local StageInfo = {
@@ -539,19 +542,62 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = 4, y = 2,
+		x = {3, 4}, y = 2,
 		name = "bpm",
-		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.bpm",
-		format = "%d"
+		value = function(self)
+			local show = showLoadedScore(self)
+			local baseBpm = self.gameController.selectModel.noteChartItem.noteChartDataEntry.bpm
+			local bpm = self.gameController.rhythmModel.scoreEngine.bpm
+			if not show then
+				return math.floor(baseBpm)
+			end
+			if bpm == baseBpm then
+				return math.floor(bpm)
+			end
+			return ("%d→%d"):format(baseBpm, bpm)
+		end,
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = 4, y = 3,
+		x = {3, 4}, y = 3,
 		name = "duration",
-		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.length",
-		time = true
+		value = function(self)
+			local show = showLoadedScore(self)
+			local baseLength = self.gameController.selectModel.noteChartItem.noteChartDataEntry.length
+			local length = self.gameController.rhythmModel.scoreEngine.length
+			if not show then
+				return rtime(baseLength)
+			end
+			if length == baseLength then
+				return rtime(length)
+			end
+			return ("%s→%s"):format(rtime(baseLength), rtime(length))
+		end,
 	},
+	{
+		type = StageInfo.smallCell,
+		valueType = "text",
+		x = 2, y = 3,
+		name = "density",
+		key = {
+			{"gameController.rhythmModel.scoreEngine.enps", showLoadedListScore},
+			"gameController.selectModel.scoreItem.scoreEntry.difficulty"
+		},
+		format = formatDifficulty,
+	},
+	{
+		type = StageInfo.smallCell,
+		valueType = "text",
+		x = 2, y = 2,
+		name = "time rate",
+		key = {
+			{"gameController.rhythmModel.scoreEngine.baseTimeRate", showLoadedListScore},
+			"gameController.selectModel.scoreItem.scoreEntry.timeRate"
+		},
+		format = "%0.2f",
+	},
+
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",

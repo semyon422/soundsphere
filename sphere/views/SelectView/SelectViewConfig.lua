@@ -7,6 +7,17 @@ local formatScore = function(score)
 	return ("%2.2f"):format(score * 1000)
 end
 
+local formatDifficulty = function(difficulty)
+	local format = "%.2f"
+	if difficulty >= 100 then
+		format = "%s"
+		difficulty = "100+"
+	elseif difficulty >= 10 then
+		format = "%.1f"
+	end
+	return format:format(difficulty)
+end
+
 local CacheView = {
 	class = "CacheView",
 	subscreen = "collections",
@@ -205,16 +216,7 @@ local NoteChartList = {
 				filename = "Noto Sans Mono",
 				size = 24,
 			},
-			format = function(difficulty)
-				local format = "%.2f"
-				if difficulty >= 100 then
-					format = "%s"
-					difficulty = "100+"
-				elseif difficulty >= 10 then
-					format = "%.1f"
-				end
-				return format:format(difficulty)
-			end
+			format = formatDifficulty
 		},
 		{
 			type = "circle",
@@ -382,6 +384,14 @@ StageInfo.cells = {
 		name = "miss count",
 		format = "%d",
 		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.missCount"
+	},
+	{
+		type = StageInfo.smallCell,
+		valueType = "text",
+		x = {2, 3}, y = 6,
+		name = "density",
+		format = formatDifficulty,
+		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.difficulty"
 	},
 }
 

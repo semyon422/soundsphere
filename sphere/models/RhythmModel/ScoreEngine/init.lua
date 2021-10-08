@@ -20,7 +20,11 @@ ScoreEngine.load = function(self)
 
 	self.sharedScoreNotes = {}
 	self.currentTime = 0
-	self.timeRate = 1
+	self.timeRate = self.baseTimeRate
+	self.enps = self.baseEnps * self.baseTimeRate
+
+	self.bpm = self.noteChartDataEntry.bpm * self.baseTimeRate
+	self.length = self.noteChartDataEntry.length / self.baseTimeRate
 
 	self.minTime = self.noteChart.metaData:get("minTime")
 	self.maxTime = self.noteChart.metaData:get("maxTime")

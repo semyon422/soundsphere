@@ -32,15 +32,17 @@ FastplayController.load = function(self)
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
 
-	rhythmModel:load()
-	rhythmModel:loadLogicEngines()
-
 	local scoreEngine = rhythmModel.scoreEngine
 
 	local enps, averageStrain, generalizedKeymode = difficultyModel:getDifficulty(noteChart)
 	scoreEngine.baseEnps = enps
 	scoreEngine.baseAverageStrain = averageStrain
 	scoreEngine.generalizedKeymode = generalizedKeymode
+
+	scoreEngine.noteChartDataEntry = noteChartModel.noteChartDataEntry
+
+	rhythmModel:load()
+	rhythmModel:loadLogicEngines()
 
 	self.gameController.rhythmModel.timeEngine:setTimeRate(rhythmModel.timeEngine:getBaseTimeRate())
 end
