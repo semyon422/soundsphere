@@ -66,6 +66,7 @@ RhythmModel.load = function(self)
 	replayModel.observable:add(inputManager)
 	replayModel.timeEngine = timeEngine
 	replayModel.logicEngine = logicEngine
+	replayModel.timings = self.timings
 
 	timeEngine.observable:add(observable)
 	scoreEngine.observable:add(observable)

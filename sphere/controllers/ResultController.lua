@@ -2,6 +2,20 @@ local Class				= require("aqua.util.Class")
 
 local ResultController = Class:new()
 
+ResultController.oldTimings = {
+	normalscore = 0.12,
+	ShortScoreNote = {
+		hit = {-0.12, 0.12},
+		miss = {-0.16, 0.12}
+	},
+	LongScoreNote = {
+		startHit = {-0.12, 0.12},
+		startMiss = {-0.16, 0.12},
+		endHit = {-0.12, 0.12},
+		endMiss = {-0.16, 0.12}
+	}
+}
+
 ResultController.load = function(self)
 	local themeModel = self.gameController.themeModel
 
@@ -29,13 +43,18 @@ ResultController.draw = function(self)
 	self.view:draw()
 end
 
+ResultController.resetConfigs = function(self)
+	self.gameController.modifierModel.config = self.gameController.configModel.configs.modifier
+	self.gameController.rhythmModel.timings = self.gameController.configModel.configs.timings
+end
+
 ResultController.receive = function(self, event)
 	self.view:receive(event)
 
 	if event.name == "changeScreen" then
-		self.gameController.modifierModel.config = self.gameController.configModel.configs.modifier
-		self.gameController.screenManager:set(self.selectController)
+		self:resetConfigs()
 	elseif event.name == "loadScore" then
+		self:resetConfigs()
 		self:replayNoteChart(event.mode, event.scoreEntry, event.itemIndex)
 	elseif event.name == "scrollScore" then
 		self.gameController.selectModel:scrollScore(event.direction)
@@ -72,6 +91,11 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 	end
 
 	if mode == "replay" or mode == "result" then
+		if replay.timings then
+			rhythmModel.timings = replay.timings
+		else
+			rhythmModel.timings = self.oldTimings
+		end
 		rhythmModel.scoreEngine.scoreEntry = scoreEntry
 		rhythmModel.replayModel.replay = replay
 		rhythmModel.inputManager:setMode("internal")

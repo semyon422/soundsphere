@@ -54,7 +54,8 @@ Replay.toString = function(self)
 		time = os.time(),
 		events = content,
 		size = size,
-		type = self.type
+		type = self.type,
+		timings = self.timings
 	})
 end
 
@@ -66,6 +67,7 @@ Replay.fromString = function(self, s)
 	self.modifiers = object.modifiers
 	self.player = object.player
 	self.time = object.time
+	self.timings = object.timings
 	if object.inputMode then
 		self.inputMode = InputMode:new():setString(object.inputMode)
 	end

@@ -61,6 +61,7 @@ ReplayModel.saveReplay = function(self)
 	replay.inputMode = self.noteChartModel.noteChart.inputMode
 	replay.modifierTable = self.modifierModel.config
 	replay.type = self.replayType
+	replay.timings = self.timings
 
 	local replayString = replay:toString()
 	local replayHash = md5.sumhexa(replayString)
