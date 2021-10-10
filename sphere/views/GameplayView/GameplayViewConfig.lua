@@ -93,7 +93,6 @@ local PauseText = {
 
 local Notification = {
 	class = "ValueView",
-	subscreen = "pause",
 	transform = transform,
 	key = "gameController.notificationModel.message",
 	color = {1, 1, 1, 1},

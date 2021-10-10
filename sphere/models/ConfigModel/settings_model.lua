@@ -118,6 +118,72 @@ local settings = {
 		format = "%0.1f"
 	},
 	{
+		name = "pause",
+		type = "binding",
+		section = "gameplay",
+		key = "input.pause"
+	},
+	{
+		name = "skip intro",
+		type = "binding",
+		section = "gameplay",
+		key = "input.skipIntro"
+	},
+	{
+		name = "quick restart",
+		type = "binding",
+		section = "gameplay",
+		key = "input.quickRestart"
+	},
+	{
+		name = "decrease offset",
+		type = "binding",
+		section = "gameplay",
+		key = "input.offset.decrease"
+	},
+	{
+		name = "increase offset",
+		type = "binding",
+		section = "gameplay",
+		key = "input.offset.increase"
+	},
+	{
+		name = "decrease play speed",
+		type = "binding",
+		section = "gameplay",
+		key = "input.playSpeed.decrease"
+	},
+	{
+		name = "increase play speed",
+		type = "binding",
+		section = "gameplay",
+		key = "input.playSpeed.increase"
+	},
+	{
+		name = "invert play speed",
+		type = "binding",
+		section = "gameplay",
+		key = "input.playSpeed.invert"
+	},
+	{
+		name = "decrease time rate",
+		type = "binding",
+		section = "gameplay",
+		key = "input.timeRate.decrease"
+	},
+	{
+		name = "increase time rate",
+		type = "binding",
+		section = "gameplay",
+		key = "input.timeRate.increase"
+	},
+	{
+		name = "invert time rate",
+		type = "binding",
+		section = "gameplay",
+		key = "input.timeRate.invert"
+	},
+	{
 		name = "FPS limit",
 		section = "graphics",
 		key = "graphics.fps",
@@ -324,64 +390,10 @@ local settings = {
 		displayRange = {"no", "yes"}
 	},
 	{
-		name = "pause",
-		type = "binding",
-		section = "input",
-		key = "input.pause"
-	},
-	{
-		name = "skip intro",
-		type = "binding",
-		section = "input",
-		key = "input.skipIntro"
-	},
-	{
-		name = "quick restart",
-		type = "binding",
-		section = "input",
-		key = "input.quickRestart"
-	},
-	{
 		name = "select random chart",
 		type = "binding",
 		section = "input",
 		key = "input.selectRandom"
-	},
-	{
-		name = "decrease play speed",
-		type = "binding",
-		section = "input",
-		key = "input.playSpeed.decrease"
-	},
-	{
-		name = "increase play speed",
-		type = "binding",
-		section = "input",
-		key = "input.playSpeed.increase"
-	},
-	{
-		name = "invert play speed",
-		type = "binding",
-		section = "input",
-		key = "input.playSpeed.invert"
-	},
-	{
-		name = "decrease time rate",
-		type = "binding",
-		section = "input",
-		key = "input.timeRate.decrease"
-	},
-	{
-		name = "increase time rate",
-		type = "binding",
-		section = "input",
-		key = "input.timeRate.increase"
-	},
-	{
-		name = "invert time rate",
-		type = "binding",
-		section = "input",
-		key = "input.timeRate.invert"
 	},
 	{
 		name = "capture screenshot",

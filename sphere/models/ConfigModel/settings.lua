@@ -84,6 +84,10 @@ return {
 	},
 	input = {
 		pause = "escape",
+		offset = {
+			decrease = "-",
+			increase = "="
+		},
 		playSpeed = {
 			decrease = "f3",
 			increase = "f4",

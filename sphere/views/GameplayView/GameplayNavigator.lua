@@ -66,38 +66,45 @@ GameplayNavigator.keypressed = function(self, event)
 	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
 	local scancode = event.args[2]
 
-	if scancode == "-" then self:increaseLocalOffset(-0.001)
-	elseif scancode == "=" or scancode == "+" then self:increaseLocalOffset(0.001)
+	local input = self.gameController.configModel.configs.settings.input
+
+	if scancode == input.skipIntro then self:skipIntro()
+	elseif scancode == input.offset.decrease then self:increaseLocalOffset(-0.001)
+	elseif scancode == input.offset.increase then self:increaseLocalOffset(0.001)
+	elseif scancode == input.timeRate.decrease then self:increaseTimeRate(-0.05)
+	elseif scancode == input.timeRate.increase then self:increaseTimeRate(0.05)
+	elseif scancode == input.timeRate.invert then self:invertTimeRate()
+	elseif scancode == input.playSpeed.decrease then self:increasePlaySpeed(-0.05)
+	elseif scancode == input.playSpeed.increase then self:increasePlaySpeed(0.05)
+	elseif scancode == input.playSpeed.invert then self:invertPlaySpeed()
 	end
 
 	if scancode == "f1" then self:switchSubscreen("debug") end
 	if state == "play" then
-		if scancode == "escape" and not shift then self:pause()
-		elseif scancode == "escape" and shift then self:quit()
-		elseif scancode == "`" then self:retry()
+		if scancode == input.pause and not shift then self:pause()
+		elseif scancode == input.pause and shift then self:quit()
+		elseif scancode == input.quickRestart then self:retry()
 		end
 	elseif state == "pause" then
-		if scancode == "up" then self:scrollMenu("up")
-		elseif scancode == "down" then self:scrollMenu("down")
-		elseif scancode == "return" then
-		elseif scancode == "escape" and not shift then self:play()
-		elseif scancode == "escape" and shift then self:quit()
-		elseif scancode == "`" then self:retry()
+		if scancode == input.pause and not shift then self:play()
+		elseif scancode == input.pause and shift then self:quit()
+		elseif scancode == input.quickRestart then self:retry()
 		end
-	elseif state == "pause-play" and scancode == "escape" then
+	elseif state == "pause-play" and scancode == input.pause then
 		self:pause()
 	end
 end
 
 GameplayNavigator.keyreleased = function(self, event)
 	local state = self.gameController.rhythmModel.pauseManager.state
+	local input = self.gameController.configModel.configs.settings.input
 
 	local scancode = event.args[2]
-	if state == "play-pause" and scancode == "escape" then
+	if state == "play-pause" and scancode == input.pause then
 		self:play()
-	elseif state == "pause-retry" and scancode == "`" then
+	elseif state == "pause-retry" and scancode == input.quickRestart then
 		self:pause()
-	elseif state == "play-retry" and scancode == "`" then
+	elseif state == "play-retry" and scancode == input.quickRestart then
 		self:play()
 	end
 end
@@ -113,10 +120,42 @@ GameplayNavigator.saveCamera = function(self, x, y, z, pitch, yaw)
 	})
 end
 
+GameplayNavigator.skipIntro = function(self)
+	self:send({
+		name = "skipIntro",
+	})
+end
+
 GameplayNavigator.increaseLocalOffset = function(self, delta)
 	self:send({
 		name = "increaseLocalOffset",
 		delta = delta
+	})
+end
+
+GameplayNavigator.increaseTimeRate = function(self, delta)
+	self:send({
+		name = "increaseTimeRate",
+		delta = delta
+	})
+end
+
+GameplayNavigator.invertTimeRate = function(self)
+	self:send({
+		name = "invertTimeRate"
+	})
+end
+
+GameplayNavigator.increasePlaySpeed = function(self, delta)
+	self:send({
+		name = "increasePlaySpeed",
+		delta = delta
+	})
+end
+
+GameplayNavigator.invertPlaySpeed = function(self)
+	self:send({
+		name = "invertPlaySpeed"
 	})
 end
 

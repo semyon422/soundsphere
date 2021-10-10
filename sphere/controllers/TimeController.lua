@@ -12,40 +12,26 @@ TimeController.receive = function(self, event)
 	local graphicEngine = rhythmModel.graphicEngine
 
 	local config = configModel.configs.settings
-	local input = config.input
 	local gameplay = config.gameplay
 
-	if event.name == "keypressed" then
-		local key = event.args[1]
-		local delta = 0.05
-
-		if key == input.timeRate.decrease then
-			timeEngine:increaseTimeRate(-delta)
-			notificationModel:notify("rate: " .. timeEngine.timeRate)
-			rhythmModel.prohibitSavingScore = true
-		elseif key == input.timeRate.increase then
-			timeEngine:increaseTimeRate(delta)
-			notificationModel:notify("rate: " .. timeEngine.timeRate)
-			rhythmModel.prohibitSavingScore = true
-		elseif key == input.timeRate.invert then
-			timeEngine:setTimeRate(-timeEngine.timeRate)
-			notificationModel:notify("rate: " .. timeEngine.timeRate)
-			rhythmModel.prohibitSavingScore = true
-		elseif key == input.skipIntro then
-			timeEngine:skipIntro()
-		elseif key == input.playSpeed.invert then
-			graphicEngine.targetVisualTimeRate = -graphicEngine.targetVisualTimeRate
-			graphicEngine:setVisualTimeRate(graphicEngine.targetVisualTimeRate)
-			notificationModel:notify("scroll speed: " .. graphicEngine.targetVisualTimeRate)
-		elseif key == input.playSpeed.decrease then
-			graphicEngine:increaseVisualTimeRate(-delta)
-			gameplay.speed = graphicEngine.targetVisualTimeRate
-			notificationModel:notify("scroll speed: " .. graphicEngine.targetVisualTimeRate)
-		elseif key == input.playSpeed.increase then
-			graphicEngine:increaseVisualTimeRate(delta)
-			gameplay.speed = graphicEngine.targetVisualTimeRate
-			notificationModel:notify("scroll speed: " .. graphicEngine.targetVisualTimeRate)
-		end
+	if event.name == "skipIntro" then
+		timeEngine:skipIntro()
+	elseif event.name == "increaseTimeRate" then
+		timeEngine:increaseTimeRate(event.delta)
+		notificationModel:notify("rate: " .. timeEngine.timeRate)
+		rhythmModel.prohibitSavingScore = true
+	elseif event.name == "invertTimeRate" then
+		timeEngine:setTimeRate(-timeEngine.timeRate)
+		notificationModel:notify("rate: " .. timeEngine.timeRate)
+		rhythmModel.prohibitSavingScore = true
+	elseif event.name == "increasePlaySpeed" then
+		graphicEngine:increaseVisualTimeRate(event.delta)
+		gameplay.speed = graphicEngine.targetVisualTimeRate
+		notificationModel:notify("scroll speed: " .. graphicEngine.targetVisualTimeRate)
+	elseif event.name == "invertPlaySpeed" then
+		graphicEngine.targetVisualTimeRate = -graphicEngine.targetVisualTimeRate
+		graphicEngine:setVisualTimeRate(graphicEngine.targetVisualTimeRate)
+		notificationModel:notify("scroll speed: " .. graphicEngine.targetVisualTimeRate)
 	elseif event.name == "increaseLocalOffset" then
 		CacheDatabase:load()
 		local noteChartDataEntry = self.gameController.noteChartModel.noteChartDataEntry
