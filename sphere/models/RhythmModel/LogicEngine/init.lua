@@ -42,6 +42,9 @@ LogicEngine.send = function(self, event)
 end
 
 LogicEngine.receive = function(self, event)
+	if event.name == "TimeState" then
+		self.timeRate = event.timeRate
+	end
 	self.events:add(event)
 end
 
@@ -81,6 +84,9 @@ LogicEngine.loadNoteHandlers = function(self)
 end
 
 LogicEngine.updateNoteHandlers = function(self)
+	if self.timeRate == 0 then
+		return
+	end
 	for noteHandler in pairs(self.noteHandlers) do
 		noteHandler:update()
 	end
