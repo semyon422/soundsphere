@@ -1,5 +1,6 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
+local Queue				= require("aqua.util.Queue")
 local NoteHandler		= require("sphere.models.RhythmModel.LogicEngine.NoteHandler")
 
 local LogicEngine = Class:new()
@@ -13,26 +14,23 @@ LogicEngine.load = function(self)
 	self.sharedLogicalNotes = {}
 	self.currentTime = 0
 	self.exactCurrentTimeNoOffset = -math.huge
-	self.events = {}
+	self.events = Queue:new()
 
 	self:loadNoteHandlers()
 end
 
-local sortEvents = function(a, b)
-	return a.time < b.time
-end
+-- local sortEvents = function(a, b)
+-- 	return a.time < b.time
+-- end
 LogicEngine.update = function(self)
-	local events = self.events
-	table.sort(events, sortEvents)
+	-- table.sort(events, sortEvents)
 
-	for _, event in ipairs(events) do
+	for event in self.events do
 		self.currentTime = event.time
 		self:updateNoteHandlers()
 		self:_receive(event)
 		self:updateNoteHandlers()
 	end
-
-	self.events = {}
 end
 
 LogicEngine.unload = function(self)
@@ -44,7 +42,7 @@ LogicEngine.send = function(self, event)
 end
 
 LogicEngine.receive = function(self, event)
-	self.events[#self.events + 1] = event
+	self.events:add(event)
 end
 
 LogicEngine._receive = function(self, event)
