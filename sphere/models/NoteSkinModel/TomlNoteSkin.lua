@@ -67,7 +67,8 @@ TomlNoteSkin.load = function(self, content)
 		elseif name == "score" then playfield:addScore(tomlData.score)
 		elseif name == "accuracy" then playfield:addAccuracy(tomlData.accuracy)
 		elseif name == "combo" then playfield:addCombo(tomlData.combo)
-		elseif name == "judgement" then playfield:addJudgement(tomlData.judgement)
+		elseif name == "judgement.counters" then playfield:addJudgement(tomlData.judgement.counters)
+		elseif name == "judgement.delta" then playfield:addDeltaTimeJudgement(tomlData.judgement.delta)
 		end
 	end
 end
