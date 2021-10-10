@@ -144,6 +144,8 @@ TimeEngine.setTimeRate = function(self, timeRate, needTween)
 		self.timeRate = timeRate
 		self.targetTimeRate = timeRate
 		self.timeManager:setRate(timeRate)
+	elseif timeRate == 0 and self.timeRate == 0 then
+		return
 	elseif not needTween then
 		self.timeRate = timeRate
 		self.targetTimeRate = timeRate
