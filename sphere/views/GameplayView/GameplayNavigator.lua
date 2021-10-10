@@ -45,6 +45,11 @@ GameplayNavigator.update = function(self)
 		self:addSubscreen("pause")
 	end
 
+	local timeEngine = self.gameController.rhythmModel.timeEngine
+	if timeEngine.currentTime >= timeEngine.maxTime + 1 and not self.quited then
+		self:quit()
+	end
+
 	Navigator.update(self)
 end
 
@@ -145,6 +150,7 @@ GameplayNavigator.quit = function(self)
 	self:send({
 		name = "quit"
 	})
+	self.quited = true
 end
 
 return GameplayNavigator
