@@ -86,7 +86,7 @@ SelectController.receive = function(self, event)
 	elseif event.name == "resetModifiedNoteChart" then
 		self:resetModifiedNoteChart()
 	elseif event.name == "quickLogin" then
-		self.gameController.onlineModel:quickLogin(self.gameController.configModel:getConfig("online").quick_login_key)
+		self.gameController.onlineModel:quickLogin(self.gameController.configModel.configs.online.quick_login_key)
 	elseif event.name == "openDirectory" then
 		local selectModel = self.gameController.selectModel
 		local path = selectModel.noteChartItem.noteChartEntry.path:match("^(.+)/.-$")
