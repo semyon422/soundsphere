@@ -94,6 +94,7 @@ GameplayController.load = function(self)
 	end)
 
 	rhythmModel.observable:add(view)
+	love.mouse.setVisible(false)
 end
 
 GameplayController.getImporterSettings = function(self)
@@ -111,6 +112,7 @@ GameplayController.unload = function(self)
 	rhythmModel.observable:remove(self.view)
 	rhythmModel.inputManager:setMode("external")
 	rhythmModel.replayModel:setMode("record")
+	love.mouse.setVisible(true)
 end
 
 GameplayController.update = function(self, dt)
