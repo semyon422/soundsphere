@@ -23,13 +23,14 @@ local Background = {
 
 local BottomScreenMenu = {
 	class = "ScreenMenuView",
+	subscreen = "pause",
 	transform = transform,
 	x = 279,
 	y = 991,
-	w = 227,
+	w = 227 * 6,
 	h = 89,
 	rows = 1,
-	columns = 1,
+	columns = 6,
 	text = {
 		x = 0,
 		baseline = 54,
@@ -43,10 +44,20 @@ local BottomScreenMenu = {
 	items = {
 		{
 			{
-				method = "changeScreen",
-				value = "Select",
-				displayName = "back"
-			}
+				method = "play",
+				displayName = "continue"
+			},
+			{},
+			{},
+			{},
+			{
+				method = "retry",
+				displayName = "retry"
+			},
+			{
+				method = "quit",
+				displayName = "quit"
+			},
 		}
 	}
 }
