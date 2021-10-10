@@ -1,5 +1,6 @@
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 local transformFull = {0, 0, 0, {1 / 1920, 0}, {0, 1 / 1080}, 0, 0, 0, 0}
+local topCenter = {{1 / 2, 0}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local PlayfieldView = {
 	class = "PlayfieldView"
@@ -92,6 +93,7 @@ local PauseText = {
 
 local Notification = {
 	class = "ValueView",
+	subscreen = "pause",
 	transform = transform,
 	key = "gameController.notificationModel.message",
 	color = {1, 1, 1, 1},
@@ -105,6 +107,25 @@ local Notification = {
 	},
 }
 
+local Failed = {
+	class = "ValueView",
+	subscreen = "pause",
+	value = function(self)
+		if self.gameController.rhythmModel.scoreEngine.scoreSystem.hp.failed then
+			return "failed"
+		end
+		return ""
+	end,
+	x = -1080, baseline = 540, limit = 2160,
+	align = "center",
+	color = {1, 1, 1, 0.25},
+	font = {
+		filename = "Noto Sans",
+		size = 240
+	},
+	transform = topCenter
+}
+
 local GameplayViewConfig = {
 	BackgroundBlurSwitch,
 	Background,
@@ -114,6 +135,7 @@ local GameplayViewConfig = {
 	PauseProgressBar,
 	PauseText,
 	Notification,
+	Failed,
 	require("sphere.views.DebugInfoViewConfig"),
 }
 

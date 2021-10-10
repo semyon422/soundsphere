@@ -25,6 +25,7 @@ return {
 			judgement = 0,
 			note = 0
 		},
+		pauseOnFail = false,
 		replayType = "NanoChart",
 		speed = 1,
 		time = {

@@ -50,6 +50,13 @@ GameplayNavigator.update = function(self)
 		self:quit()
 	end
 
+	local pauseOnFail = self.gameController.configModel.configs.settings.gameplay.pauseOnFail
+	local failed = self.gameController.rhythmModel.scoreEngine.scoreSystem.hp.failed
+	if pauseOnFail and failed and not self.failed then
+		self:pause()
+		self.failed = true
+	end
+
 	Navigator.update(self)
 end
 

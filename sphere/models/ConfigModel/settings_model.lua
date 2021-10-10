@@ -17,6 +17,13 @@ local settings = {
 		format = "%0.2f"
 	},
 	{
+		name = "pause on fail",
+		section = "gameplay",
+		key = "gameplay.pauseOnFail",
+		type = "switch",
+		displayRange = {"no", "yes"}
+	},
+	{
 		name = "replay type",
 		section = "gameplay",
 		key = "gameplay.replayType",
