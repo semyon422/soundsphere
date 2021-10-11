@@ -33,7 +33,7 @@ UserInfoView.receive = function(self, event)
 	if belong(mx, x, x + w) and belong(my, y, y + h) then
 		local button = event.args[3]
 		if button == 1 then
-			self.navigator:quickLogin()
+			self.navigator:call("quickLogin")
 		end
 	end
 end

@@ -33,6 +33,12 @@ end
 
 Navigator.receive = function(self, event) end
 
+Navigator.call = function(self, method, value)
+	if self[method] then
+		self[method](self, value)
+	end
+end
+
 Navigator.changeScreen = function(self, screenName)
 	self:send({
 		name = "changeScreen",
