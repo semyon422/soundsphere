@@ -76,7 +76,8 @@ local ModifierId = {
 	[BracketSwap] = 18,
 	[FullLongNote] = 19,
 	[MinLnLength] = 20,
-	[ToOsu] = 21
+	[ToOsu] = 21,
+	[Alternate2] = 22,
 }
 
 local OneUseModifiers = {
