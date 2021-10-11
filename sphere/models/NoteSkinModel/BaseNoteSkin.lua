@@ -1,5 +1,5 @@
 local NoteSkinVsrg = require("sphere.models.NoteSkinModel.NoteSkinVsrg")
-local PlayfieldVsrg = require("sphere.models.NoteSkinModel.PlayfieldVsrg")
+local BasePlayfield = require("sphere.models.NoteSkinModel.BasePlayfield")
 
 local BaseNoteSkin = NoteSkinVsrg:new()
 
@@ -118,7 +118,7 @@ BaseNoteSkin.load = function(self, content)
 		color = {0.25, 0.25, 0.25, 1},
 	})
 
-	local playfield = PlayfieldVsrg:new({
+	local playfield = BasePlayfield:new({
 		noteskin = self
 	})
 
@@ -134,6 +134,7 @@ BaseNoteSkin.load = function(self, content)
 	})
 	playfield:addGuidelines(guidelines)
 	playfield:disableCamera()
+	playfield:addBaseElements()
 end
 
 return BaseNoteSkin

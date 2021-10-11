@@ -298,10 +298,13 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 end
 
 PlayfieldVsrg.addGuidelines = function(self, object)
-	local noteskin = self.noteskin
+	if not object then
+		return
+	end
 	if not object.transform then
 		object.transform = self:newNoteskinTransform()
 	end
+	local noteskin = self.noteskin
 	local inputs = noteskin.inputsCount
 	for i = 1, #object.w do
 		local bw = object.w[i]
