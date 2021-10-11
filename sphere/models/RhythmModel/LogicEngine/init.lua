@@ -35,6 +35,8 @@ end
 
 LogicEngine.unload = function(self)
 	self:unloadNoteHandlers()
+	self.autoplay = false
+	self.promode = false
 end
 
 LogicEngine.send = function(self, event)
