@@ -28,7 +28,6 @@
         "*/spec",
         "*/test",
         "*/tests",
-        "userdata",
         "discordrpc/main.lua"
     ],
     "Lua.completion.autoRequire": false,
