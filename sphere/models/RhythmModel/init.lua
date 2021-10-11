@@ -55,6 +55,7 @@ RhythmModel.load = function(self)
 	pauseManager.timeEngine = timeEngine
 	pauseManager.logicEngine = logicEngine
 
+	graphicEngine.timeEngine = timeEngine
 	graphicEngine.logicEngine = logicEngine
 	scoreEngine.timingWindows = self.timings
 	scoreEngine.judgements = self.judgements
@@ -62,6 +63,7 @@ RhythmModel.load = function(self)
 
 	inputManager.observable:add(logicEngine)
 	inputManager.observable:add(replayModel)
+	inputManager.timeEngine = timeEngine
 
 	replayModel.observable:add(inputManager)
 	replayModel.timeEngine = timeEngine
@@ -262,6 +264,14 @@ end
 
 RhythmModel.setPauseTimes = function(self, ...)
 	self.pauseManager:setPauseTimes(...)
+end
+
+RhythmModel.setScaleInputOffset = function(self, scaleInputOffset)
+	self.inputManager:setScaleInputOffset(scaleInputOffset)
+end
+
+RhythmModel.setScaleVisualOffset = function(self, scaleVisualOffset)
+	self.graphicEngine:setScaleVisualOffset(scaleVisualOffset)
 end
 
 return RhythmModel

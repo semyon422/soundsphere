@@ -20,7 +20,7 @@ NoteChartResourceLoader.init = function(self)
 end
 
 NoteChartResourceLoader.getNoteChartType = function(self, noteChart)
-	if noteChart.type == "bms" or noteChart.type == "osu" or noteChart.type == "quaver" or noteChart.type == "ksm" then
+	if noteChart.type == "bms" or noteChart.type == "osu" or noteChart.type == "quaver" or noteChart.type == "ksm" or noteChart.type == "sm" then
 		return "bms"
 	elseif noteChart.type == "o2jam" then
 		return "o2jam"
@@ -30,7 +30,7 @@ NoteChartResourceLoader.getNoteChartType = function(self, noteChart)
 end
 
 NoteChartResourceLoader.load = function(self, path, noteChart, callback)
-	local directoryPath = path:match("^(.+)/")
+	local directoryPath = path:match("^(.+)/.-$")
 	local noteChartType = self:getNoteChartType(noteChart)
 
 	if self.noteChart and self.sample_gain ~= sound.sample_gain then
@@ -64,7 +64,7 @@ NoteChartResourceLoader.load = function(self, path, noteChart, callback)
 end
 
 NoteChartResourceLoader.loadOJM = function(self)
-	local path = self.path:match("(.+)n$") .. "m"
+	local path = self.path:match("^(.+)n$") .. "m"
 	JamLoader:load(path, function(samples)
 		for name in pairs(samples) do
 			self.localAliases[name] = path .. "/" .. name
@@ -167,9 +167,10 @@ NoteChartResourceLoader.unloadAll = function(self)
 end
 
 NoteChartResourceLoader.unload = function(self)
-	if self.noteChart.type == "bms" or self.noteChart.type == "osu" or self.noteChart.type == "quaver" or self.noteChart.type == "ksm" or self.noteChart.type == "midi" then
+	local noteChartType = self:getNoteChartType(self.noteChart)
+	if noteChartType == "bms" then
 		self:unloadBMS()
-	elseif self.noteChart.type == "o2jam" then
+	elseif noteChartType == "o2jam" then
 		self:unloadOJM()
 	end
 end
@@ -190,7 +191,7 @@ NoteChartResourceLoader.unloadBMS = function(self)
 end
 
 NoteChartResourceLoader.unloadOJM = function(self)
-	JamLoader:unload(self.path:match("(.+)n$") .. "m", function() end)
+	JamLoader:unload(self.path:match("^(.+)n$") .. "m", function() end)
 end
 
 NoteChartResourceLoader:init()
