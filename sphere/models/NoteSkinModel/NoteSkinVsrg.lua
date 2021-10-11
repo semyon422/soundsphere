@@ -7,6 +7,7 @@ NoteSkinVsrg.setColumns = function(self, columns)
 	self.align = columns.align
 	self.width = columns.width
 	self.space = columns.space
+	self.upscroll = columns.upscroll
 
 	local fullWidth = 0
 	for j = 1, #columns.width do

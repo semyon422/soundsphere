@@ -25,6 +25,10 @@ PlayfieldVsrg.newNoteskinTransform = function(self)
 	elseif align == "right" then
 		transform[1] = {1, 0}
 	end
+	if self.noteskin.upscroll then
+		transform[5][2] = -transform[5][2]
+		transform[7] = height
+	end
 	return transform
 end
 
