@@ -213,24 +213,30 @@ PlayfieldVsrg.addKeyImages = function(self, object)
 		object.transform = self:newNoteskinTransform()
 	end
 	for i = 1, #object.pressed do
-		local pressed = {
-			class = "ImageView",
-			x = noteskin.columns[i],
-			y = noteskin.unit - object.h - object.padding,
-			w = noteskin.width[i],
-			h = object.h,
-			transform = object.transform,
-			image = object.pressed[i],
-		}
-		local released = {
-			class = "ImageView",
-			x = noteskin.columns[i],
-			y = noteskin.unit - object.h - object.padding,
-			w = noteskin.width[i],
-			h = object.h,
-			transform = object.transform,
-			image = object.released[i],
-		}
+		local pressed
+		local released
+		if object.pressed[i] then
+			pressed = {
+				class = "ImageView",
+				x = noteskin.columns[i],
+				y = noteskin.unit - object.h - object.padding,
+				w = noteskin.width[i],
+				h = object.h,
+				transform = object.transform,
+				image = object.pressed[i],
+			}
+		end
+		if object.released[i] then
+			released = {
+				class = "ImageView",
+				x = noteskin.columns[i],
+				y = noteskin.unit - object.h - object.padding,
+				w = noteskin.width[i],
+				h = object.h,
+				transform = object.transform,
+				image = object.released[i],
+			}
+		end
 		local inputType, inputIndex = noteskin.inputs[i]:match("^(.-)(%d+)$")
 		local key = {
 			class = "InputView",
