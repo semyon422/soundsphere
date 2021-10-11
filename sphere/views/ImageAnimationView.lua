@@ -12,7 +12,7 @@ ImageAnimationView.load = function(self)
 
 	local animation = Animation:new()
 	animation.cycles = 1
-	animation.range = config.range
+	animation.range = config.range or {0, 0}
 	animation.rate = config.rate
 	animation.time = math.huge
 	state.animation = animation
@@ -29,8 +29,12 @@ ImageAnimationView.loadImages = function(self)
 
 	local images = {}
 	local range = config.range
-	for i = range[1], range[2], range[1] < range[2] and 1 or -1 do
-		images[i] = love.graphics.newImage(self.root .. "/" .. config.image:format(i))
+	if not range then
+		images[0] = love.graphics.newImage(self.root .. "/" .. config.image)
+	else
+		for i = range[1], range[2], range[1] < range[2] and 1 or -1 do
+			images[i] = love.graphics.newImage(self.root .. "/" .. config.image:format(i))
+		end
 	end
 	state.images = images
 end

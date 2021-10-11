@@ -174,6 +174,9 @@ PlayfieldVsrg.addDeltaTimeJudgement = function(self, object)
 	local judgements = {}
 	local transform = self:newLaneCenterTransform(1080)
 	for i, judgement in ipairs(object.judgements) do
+		if type(judgement) == "string" then
+			judgement = {judgement}
+		end
 		if type(judgement) == "table" then
 			local config = {
 				class = "ImageAnimationView",
