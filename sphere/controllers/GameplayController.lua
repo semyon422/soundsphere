@@ -40,6 +40,7 @@ GameplayController.load = function(self)
 	local noteChart = noteChartModel:loadNoteChart(self:getImporterSettings())
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
+	rhythmModel.prohibitSavingScore = false
 
 	local noteChartDataEntry = noteChartModel.noteChartDataEntry
 	local localOffset = noteChartDataEntry.localOffset
@@ -185,7 +186,7 @@ GameplayController.receive = function(self, event)
 		self.gameController.discordModel:setPresence({})
 		self:skip()
 		self:saveScore()
-		if not rhythmModel.logicEngine.autoplay then
+		if not rhythmModel.logicEngine.autoplay and not rhythmModel.prohibitSavingScore then
 			local ResultController = require("sphere.controllers.ResultController")
 			local resultController = ResultController:new()
 
@@ -232,6 +233,10 @@ GameplayController.skip = function(self)
 
 	rhythmModel.audioEngine:unload()
 	rhythmModel.logicEngine.observable:remove(rhythmModel.audioEngine)
+
+	if timeEngine.currentTime < timeEngine.minTime then
+		rhythmModel.prohibitSavingScore = true
+	end
 
 	local time = math.huge
 	timeEngine:setTimeRate(timeEngine:getBaseTimeRate())
