@@ -37,6 +37,7 @@ local PreviewModel		= require("sphere.models.PreviewModel")
 local UpdateModel		= require("sphere.models.UpdateModel")
 local RhythmModel		= require("sphere.models.RhythmModel")
 local MainLog					= require("sphere.MainLog")
+local FrameTimeView					= require("sphere.views.FrameTimeView")
 
 local GameController = Class:new()
 
@@ -74,6 +75,7 @@ GameController.construct = function(self)
 	self.fpsLimiter = FpsLimiter:new()
 	self.rhythmModel = RhythmModel:new()
 	self.discordModel = DiscordModel:new()
+	self.frameTimeView = FrameTimeView:new()
 end
 
 GameController.load = function(self)
@@ -204,6 +206,7 @@ GameController.load = function(self)
 	collectionModel:load()
 	selectModel:load()
 	previewModel:load()
+	self.frameTimeView:load()
 
 	self.screenManager:setTransition(self.fadeTransition)
 
@@ -237,6 +240,8 @@ GameController.unload = function(self)
 end
 
 GameController.update = function(self, dt)
+	local startTime = love.timer.getTime()
+
 	ThreadPool:update()
 
 	self.discordModel:update()
@@ -246,17 +251,30 @@ GameController.update = function(self, dt)
 	self.onlineController:update()
 	self.fpsLimiter:update()
 	self.windowManager:update()
+
+	self.frameTimeView.updateFrameTime = love.timer.getTime() - startTime
 end
 
 GameController.draw = function(self)
+	local startTime = love.timer.getTime()
+
 	self.screenManager:draw()
+
+	love.graphics.origin()
+	self.frameTimeView:draw()
+
+	self.frameTimeView.drawFrameTime = love.timer.getTime() - startTime
 end
 
 GameController.receive = function(self, event)
+	local startTime = love.timer.getTime()
+
 	if event.name == "update" then
 		return self:update(event.args[1])
 	elseif event.name == "draw" then
 		return self:draw()
+	elseif event.name == "resize" then
+		self.frameTimeView:load()
 	elseif event.name == "quit" then
 		self:unload()
 		aquaevent.quit()
@@ -267,6 +285,9 @@ GameController.receive = function(self, event)
 	self.windowManager:receive(event)
 	self.screenshot:receive(event)
 	self.mountController:receive(event)
+	self.frameTimeView:receive(event)
+
+	self.frameTimeView.receiveFrameTime = love.timer.getTime() - startTime
 end
 
 return GameController

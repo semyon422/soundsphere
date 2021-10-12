@@ -1,6 +1,5 @@
 local Class = require("aqua.util.Class")
 local Profiler = require("aqua.util.Profiler")
-local aquafonts = require("aqua.assets.fonts")
 local spherefonts = require("sphere.assets.fonts")
 
 local FrameTimeView = Class:new()
@@ -19,8 +18,8 @@ FrameTimeView.load = function(self)
 	self.width = love.graphics.getWidth()
 	self.height = love.graphics.getHeight()
 
-	self.font = aquafonts.getFont(spherefonts.NotoMonoRegular, 20)
-	self.largeFont = aquafonts.getFont(spherefonts.NotoMonoRegular, 40)
+	self.font = spherefonts.get({filename = "Noto Sans Mono", size = 20})
+	self.largeFont = spherefonts.get({filename = "Noto Sans Mono", size = 40})
 end
 
 local colors = {
