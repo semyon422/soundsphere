@@ -8,6 +8,10 @@ NoteChartListItemView.receive = function(self, event)
 		return
 	end
 
+	if self.itemIndex ~= self.listView.gameController.selectModel.noteChartItemIndex then
+		return
+	end
+
 	local config = self.listView.config
 
 	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
