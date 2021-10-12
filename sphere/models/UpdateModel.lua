@@ -59,7 +59,7 @@ UpdateModel.startUpdate = function(self)
 			local UpdateModel = require("sphere.models.UpdateModel")
 			local updateModel = UpdateModel:new()
 			updateModel.configModel = configModel
-			updateModel.files = configModel:getConfig("files")
+			updateModel.files = configModel.configs.files
 			updateModel.thread = thread
 			updateModel:load()
 
