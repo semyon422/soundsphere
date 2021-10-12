@@ -124,6 +124,33 @@ GameplayController.draw = function(self)
 	self.view:draw()
 end
 
+GameplayController.discordPlay = function(self)
+	local noteChartDataEntry = self.gameController.noteChartModel.noteChartDataEntry
+	local rhythmModel = self.gameController.rhythmModel
+	local length = math.min(noteChartDataEntry.length, 3600 * 24)
+	self.gameController.discordModel:setPresence({
+		state = "Playing",
+		details = ("%s - %s [%s]"):format(
+			noteChartDataEntry.artist,
+			noteChartDataEntry.title,
+			noteChartDataEntry.name
+		),
+		endTimestamp = math.floor(os.time() + (length - rhythmModel.timeEngine.currentTime) / rhythmModel.timeEngine:getBaseTimeRate())
+	})
+end
+
+GameplayController.discordPause = function(self)
+	local noteChartDataEntry = self.gameController.noteChartModel.noteChartDataEntry
+	self.gameController.discordModel:setPresence({
+		state = "Playing (paused)",
+		details = ("%s - %s [%s]"):format(
+			noteChartDataEntry.artist,
+			noteChartDataEntry.title,
+			noteChartDataEntry.name
+		)
+	})
+end
+
 GameplayController.receive = function(self, event)
 	self.timeController:receive(event)
 	local rhythmModel = self.gameController.rhythmModel
@@ -132,13 +159,21 @@ GameplayController.receive = function(self, event)
 
 	if event.name == "play" then
 		rhythmModel.pauseManager:play()
+		self:discordPlay()
 	elseif event.name == "pause" then
 		rhythmModel.pauseManager:pause()
+		self:discordPause()
 	elseif event.name == "retry" then
 		rhythmModel.inputManager:setMode("external")
 		rhythmModel.replayModel:setMode("record")
 		self:unload()
 		self:load()
+	elseif event.name == "playStateChange" then
+		if event.state == "play" then
+			self:discordPlay()
+		elseif event.state == "pause" then
+			self:discordPause()
+		end
 	elseif event.name == "saveCamera" then
 		local perspective = self.gameController.configModel.configs.settings.graphics.perspective
 		perspective.x = event.x
@@ -147,6 +182,7 @@ GameplayController.receive = function(self, event)
 		perspective.pitch = event.pitch
 		perspective.yaw = event.yaw
 	elseif event.name == "quit" then
+		self.gameController.discordModel:setPresence({})
 		self:skip()
 		self:saveScore()
 		if not rhythmModel.logicEngine.autoplay then

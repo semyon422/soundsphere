@@ -2,7 +2,6 @@ local viewspackage = (...):match("^(.-%.views%.)")
 
 local RhythmView = require("sphere.views.RhythmView")
 local GameplayViewConfig = require("sphere.views.GameplayView.GameplayViewConfig")
-local DiscordGameplayView = require("sphere.views.DiscordGameplayView")
 local ProgressView	= require("sphere.views.GameplayView.ProgressView")
 local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
 local InputView	= require("sphere.views.GameplayView.InputView")

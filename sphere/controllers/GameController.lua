@@ -3,7 +3,7 @@ local Class						= require("aqua.util.Class")
 local ThreadPool				= require("aqua.thread.ThreadPool")
 local ConfigModel				= require("sphere.models.ConfigModel")
 local ScoreModel				= require("sphere.models.ScoreModel")
-local DiscordPresence			= require("sphere.discord.DiscordPresence")
+local DiscordModel				= require("sphere.models.DiscordModel")
 local MountModel				= require("sphere.models.MountModel")
 local MountController			= require("sphere.controllers.MountController")
 local OnlineController			= require("sphere.controllers.OnlineController")
@@ -73,6 +73,7 @@ GameController.construct = function(self)
 	self.updateModel = UpdateModel:new()
 	self.fpsLimiter = FpsLimiter:new()
 	self.rhythmModel = RhythmModel:new()
+	self.discordModel = DiscordModel:new()
 end
 
 GameController.load = function(self)
@@ -106,6 +107,7 @@ GameController.load = function(self)
 	local scoreLibraryModel = self.scoreLibraryModel
 	local sortModel = self.sortModel
 	local previewModel = self.previewModel
+	local discordModel = self.discordModel
 
 	onlineController.onlineModel = onlineModel
 	onlineController.cacheModel = cacheModel
@@ -197,7 +199,7 @@ GameController.load = function(self)
 	cacheModel:load()
 	noteChartModel:load()
 	onlineController:load()
-	DiscordPresence:load()
+	discordModel:load()
 	backgroundModel:load()
 	collectionModel:load()
 	selectModel:load()
@@ -227,7 +229,7 @@ end
 
 GameController.unload = function(self)
 	self.screenManager:unload()
-	DiscordPresence:unload()
+	self.discordModel:unload()
 	self.backgroundModel:unload()
 	self.mountModel:unload()
 	self.onlineModel:unload()
@@ -237,7 +239,7 @@ end
 GameController.update = function(self, dt)
 	ThreadPool:update()
 
-	DiscordPresence:update()
+	self.discordModel:update()
 	self.notificationModel:update()
 	self.backgroundModel:update(dt)
 	self.screenManager:update(dt)

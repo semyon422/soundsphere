@@ -1,6 +1,4 @@
 local Class			= require("aqua.util.Class")
-local Observable	= require("aqua.util.Observable")
-local json			= require("json")
 
 local InputModel = Class:new()
 
