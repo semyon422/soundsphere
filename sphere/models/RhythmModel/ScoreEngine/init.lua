@@ -40,7 +40,7 @@ end
 ScoreEngine.update = function(self)
 	self.noteHandler:update()
 
-	if self.currentTime < self.minTime and self.currentTime > self.maxTime then
+	if self.currentTime < self.minTime or self.currentTime > self.maxTime then
 		return
 	end
 	if self.timeRate == 0 and not self.paused then
