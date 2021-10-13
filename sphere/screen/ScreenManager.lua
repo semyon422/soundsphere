@@ -16,6 +16,7 @@ ScreenManager.construct = function(self)
 			self.currentScreen = screen
 			local ok, err = xpcall(screen.load, debug.traceback, screen)
 			if not ok then
+				pcall(screen.unload, screen)
 				screen = self.fallback
 				if not screen then
 					error(err)
