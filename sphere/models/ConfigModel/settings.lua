@@ -107,6 +107,6 @@ return {
 		}
 	},
 	miscellaneous = {
-		autoUpdate = false
+		autoUpdate = true
 	}
 }
