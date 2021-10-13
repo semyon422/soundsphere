@@ -12,8 +12,16 @@ TimeRateQ.format = "%3s"
 TimeRateQ.range = {-10, 10}
 
 TimeRateQ.getString = function(self, config)
-    if config.value ~= 0 then
+    if config.value == -10 then
+		return config.value
+	elseif config.value ~= 0 then
 		return config.value .. "Q"
+    end
+end
+
+TimeRateQ.getSubString = function(self, config)
+    if config.value == -10 then
+		return "Q"
     end
 end
 

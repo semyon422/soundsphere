@@ -15,7 +15,14 @@ TimeRateX.step = 0.05
 TimeRateX.getString = function(self, config)
 	local value = config.value
     if value ~= 1 then
-		return value .. "X"
+		return math.floor(value) .. "."
+	end
+end
+
+TimeRateX.getSubString = function(self, config)
+	local value = config.value
+    if value ~= 1 then
+		return tostring(value - math.floor(value)):sub(3) .. "X"
 	end
 end
 
