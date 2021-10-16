@@ -58,14 +58,16 @@ end
 
 NoteChartLibraryModel.sortItemsFunction = function(a, b)
 	a, b = a.noteChartDataEntry, b.noteChartDataEntry
-	if
-		#a.inputMode < #b.inputMode or
-		#a.inputMode == #b.inputMode and a.inputMode < b.inputMode or
-		a.inputMode == b.inputMode and a.difficulty < b.difficulty or
-		a.difficulty == b.difficulty and a.name < b.name
-	then
-		return true
+	if #a.inputMode ~= #b.inputMode then
+		return #a.inputMode < #b.inputMode
+	elseif a.inputMode ~= b.inputMode then
+		return a.inputMode < b.inputMode
+	elseif a.difficulty ~= b.difficulty then
+		return a.difficulty < b.difficulty
+	elseif a.name ~= b.name then
+		return a.name < b.name
 	end
+	return a.id < b.id
 end
 
 NoteChartLibraryModel.getItemIndex = function(self, noteChartEntryId, noteChartDataEntryId)
