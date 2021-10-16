@@ -85,7 +85,10 @@ UpdateModel.downloadFile = function(self, url, path)
 			result = message
 		})
 	end
-	love.filesystem.createDirectory(path:match("^(.+)/.-$"))
+	local directory = path:match("^(.+)/.-$")
+	if directory then
+		love.filesystem.createDirectory(directory)
+	end
 	love.filesystem.write(path, result.body)
 	self.thread:push({
 		name = "UpdateProgressResponse",
