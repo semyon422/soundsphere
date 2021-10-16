@@ -561,7 +561,7 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = {3, 4}, y = 3,
+		x = {2, 4}, y = 3,
 		name = "duration",
 		value = function(self)
 			local show = showLoadedScore(self)

@@ -309,7 +309,7 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = 2, y = 3,
+		x = {1, 2}, y = 3,
 		name = "duration",
 		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.length",
 		time = true
