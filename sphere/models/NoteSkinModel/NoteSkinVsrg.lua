@@ -3,6 +3,11 @@ local NoteSkin = require("sphere.models.NoteSkinModel.NoteSkin")
 local NoteSkinVsrg = NoteSkin:new()
 
 NoteSkinVsrg.setColumns = function(self, columns)
+	local inputsCount = self.inputsCount
+
+	assert(#columns.width == inputsCount, "Table columns.width should contain " .. inputsCount .. " values")
+	assert(#columns.space == inputsCount + 1, "Table columns.space should contain " .. inputsCount + 1 .. " values")
+
 	self.offset = columns.offset
 	self.align = columns.align
 	self.width = columns.width
@@ -95,25 +100,25 @@ end
 NoteSkinVsrg.setShortNote = function(self, params)
 	local h = params.h or 0
 	local height = {}
-	for i = 1, #self.width do
+	for i = 1, self.inputsCount do
 		height[i] = h
 	end
 
 	local image = params.image
 	if type(params.image) == "string" then
 		image = {}
-		for i = 1, #self.width do
+		for i = 1, self.inputsCount do
 			image[i] = params.image
 		end
 	end
 
 	local color = {}
-	for i = 1, #self.width do
+	for i = 1, self.inputsCount do
 		color[i] = self.color
 	end
 
 	local oy = {}
-	for i = 1, #self.width do
+	for i = 1, self.inputsCount do
 		oy[i] = 1
 	end
 
@@ -135,43 +140,43 @@ end
 NoteSkinVsrg.setLongNote = function(self, params)
 	local h = params.h or 0
 	local height = {}
-	for i = 1, #self.width do
+	for i = 1, self.inputsCount do
 		height[i] = h
 	end
 
 	local tail = params.tail
 	if type(params.tail) == "string" then
 		tail = {}
-		for i = 1, #self.width do
+		for i = 1, self.inputsCount do
 			tail[i] = params.tail
 		end
 	end
 	local body = params.body
 	if type(params.body) == "string" then
 		body = {}
-		for i = 1, #self.width do
+		for i = 1, self.inputsCount do
 			body[i] = params.body
 		end
 	end
 	local head = params.head
 	if type(params.head) == "string" then
 		head = {}
-		for i = 1, #self.width do
+		for i = 1, self.inputsCount do
 			head[i] = params.head
 		end
 	end
 
 	local color = {}
-	for i = 1, #self.width do
+	for i = 1, self.inputsCount do
 		color[i] = self.color
 	end
 
 	local oy = {}
-	for i = 1, #self.width do
+	for i = 1, self.inputsCount do
 		oy[i] = 1
 	end
 	local bh = {}
-	for i = 1, #self.width do
+	for i = 1, self.inputsCount do
 		bh[i] = 0
 	end
 
