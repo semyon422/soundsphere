@@ -24,7 +24,7 @@ end
 
 OnlineScoreManager.submit = function(self, noteChartEntry, noteChartDataEntry, replayHash)
 	return ThreadPool:execute(
-		[[
+		function(...)
 			local http = require("aqua.http")
 			local request = require("luajit-request")
 
@@ -49,7 +49,7 @@ OnlineScoreManager.submit = function(self, noteChartEntry, noteChartDataEntry, r
 				status = response.code == 200,
 				body = response.body
 			})
-		]],
+		end,
 		{
 			{
 				host = self.host,

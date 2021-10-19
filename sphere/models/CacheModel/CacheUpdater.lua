@@ -47,14 +47,14 @@ CacheUpdater.start = function(self, path, force)
 	if not self.isUpdating then
 		self.isUpdating = true
 		return ThreadPool:execute(
-			[[
+			function(...)
 				local CacheDatabase	= require("sphere.models.CacheModel.CacheDatabase")
 				local CacheManager	= require("sphere.models.CacheModel.CacheManager")
 
 				local cacheManager = CacheManager:new()
 
 				cacheManager:generateCacheFull(...)
-			]],
+			end,
 			{path, force}
 		)
 	end

@@ -26,7 +26,7 @@ NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry, url)
     print(noteChartEntry.path)
 
 	return ThreadPool:execute(
-		[[
+		function(...)
 			local data = ({...})[1]
             local path = data.path
 
@@ -57,15 +57,15 @@ NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry, url)
                 print(err, message)
             else
                 print(result.body)
-                
+
                 thread:push({
                     name = "NoteChartSubmitResponse",
                     body = result.body
                 })
             end
-            
+
             os.remove(tempName)
-		]],
+		end,
         {
             {
                 host = self.host,

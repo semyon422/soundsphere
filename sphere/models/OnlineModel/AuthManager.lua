@@ -34,7 +34,7 @@ end
 
 AuthManager.createToken = function(self, email, password)
 	return ThreadPool:execute(
-		[[
+		function(...)
 			local http = require("aqua.http")
 			local request = require("luajit-request")
 
@@ -56,7 +56,7 @@ AuthManager.createToken = function(self, email, password)
 				status = response.code == 200,
 				body = response.body
 			})
-		]],
+		end,
 		{
 			{
 				host = self.host,
@@ -69,7 +69,7 @@ end
 
 AuthManager.createSession = function(self, token)
 	return ThreadPool:execute(
-		[[
+		function(...)
 			local http = require("aqua.http")
 			local request = require("luajit-request")
 
@@ -90,7 +90,7 @@ AuthManager.createSession = function(self, token)
 				status = response.code == 200,
 				body = response.body
 			})
-		]],
+		end,
 		{
 			{
 				host = self.host,
@@ -102,7 +102,7 @@ end
 
 AuthManager.checkSession = function(self)
 	return ThreadPool:execute(
-		[[
+		function(...)
 			local http = require("aqua.http")
 			local request = require("luajit-request")
 
@@ -123,7 +123,7 @@ AuthManager.checkSession = function(self)
 				status = response.code == 200,
 				body = response.body
 			})
-		]],
+		end,
 		{
 			{
 				host = self.host,
@@ -135,7 +135,7 @@ end
 
 AuthManager.updateSession = function(self)
 	return ThreadPool:execute(
-		[[
+		function(...)
 			local http = require("aqua.http")
 			local request = require("luajit-request")
 
@@ -156,7 +156,7 @@ AuthManager.updateSession = function(self)
 				status = response.code == 200,
 				body = response.body
 			})
-		]],
+		end,
 		{
 			{
 				host = self.host,
@@ -168,7 +168,7 @@ end
 
 AuthManager.quickLogin = function(self, key)
 	return ThreadPool:execute(
-		[[
+		function(...)
 			local http = require("aqua.http")
 			local request = require("luajit-request")
 
@@ -201,7 +201,7 @@ AuthManager.quickLogin = function(self, key)
 					body = response.body
 				})
 			end
-		]],
+		end,
 		{
 			{
 				host = self.host,

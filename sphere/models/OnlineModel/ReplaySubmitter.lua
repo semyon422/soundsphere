@@ -26,7 +26,7 @@ ReplaySubmitter.submitReplay = function(self, replayHash, url)
     print(replayHash)
 
 	return ThreadPool:execute(
-		[[
+		function(...)
 			local data = ({...})[1]
 
             local replayFile = love.filesystem.newFile("userdata/replays/" .. data.hash, "r")
@@ -56,7 +56,7 @@ ReplaySubmitter.submitReplay = function(self, replayHash, url)
                 print(err, message)
             else
                 print(result.body)
-                
+
                 thread:push({
                     name = "ReplaySubmitResponse",
                     body = result.body
@@ -64,7 +64,7 @@ ReplaySubmitter.submitReplay = function(self, replayHash, url)
             end
 
             os.remove(tempName)
-		]],
+		end,
 		{
             {
                 host = self.host,
