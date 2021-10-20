@@ -1,5 +1,4 @@
 local Class = require("aqua.util.Class")
-local Observable = require("aqua.util.Observable")
 local ThreadPool	= require("aqua.thread.ThreadPool")
 local aquaimage			= require("aqua.image")
 local tween				= require("tween")
@@ -7,8 +6,15 @@ local tween				= require("tween")
 local BackgroundModel = Class:new()
 
 BackgroundModel.construct = function(self)
-	self.observable = Observable:new()
 	self.currentPath = ""
+	self.alpha = 0
+	self.loadable = 0
+end
+
+BackgroundModel.load = function(self)
+	self.config = self.configModel.configs.select
+	self.noteChartDataEntryId = 0
+	self.backgroundPath = ""
 
 	self.emptyImageData = love.image.newImageData(1, 1)
 	self.emptyImageData:setPixel(0, 0, 0.25, 0.25, 0.25, 1)
@@ -16,20 +22,6 @@ BackgroundModel.construct = function(self)
 	self.images = {
 		self.emptyImage
 	}
-	self.alpha = 0
-	self.loadable = 0
-end
-
-BackgroundModel.load = function(self)
-	ThreadPool.observable:add(self)
-
-	self.config = self.configModel.configs.select
-	self.noteChartDataEntryId = 0
-	self.backgroundPath = ""
-end
-
-BackgroundModel.unload = function(self)
-	ThreadPool.observable:remove(self)
 end
 
 BackgroundModel.update = function(self, dt)
@@ -128,15 +120,14 @@ BackgroundModel.loadImage = function(self, path)
 end
 
 BackgroundModel.loadOJN = function(self, path)
-	return ThreadPool:execute(
-		[[
+	return ThreadPool:execute({
+		f = function(params)
 			require("love.filesystem")
 			require("love.image")
 
 			local OJN = require("o2jam.OJN")
 
-			local path = ...
-			local file = love.filesystem.newFile(path)
+			local file = love.filesystem.newFile(params.path)
 			file:open("r")
 			local content = file:read()
 			file:close()
@@ -147,23 +138,16 @@ BackgroundModel.loadOJN = function(self, path)
 			end
 
 			local fileData = love.filesystem.newFileData(ojn.cover, "cover")
-			local imageData = love.image.newImageData(fileData)
-
-			thread:push({
-				name = "OJNBackground",
-				imageData = imageData,
-				path = path
-			})
-		]],
-		{path}
-	)
-end
-
-BackgroundModel.receive = function(self, event)
-	if event.name == "OJNBackground" then
-		local image = love.graphics.newImage(event.imageData)
-		self:setBackground(image)
-	end
+			return love.image.newImageData(fileData)
+		end,
+		params = {
+			path = path
+		},
+		result = function(imageData)
+			local image = love.graphics.newImage(imageData)
+			self:setBackground(image)
+		end
+	})
 end
 
 return BackgroundModel

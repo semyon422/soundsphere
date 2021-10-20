@@ -1,35 +1,15 @@
 local ThreadPool	= require("aqua.thread.ThreadPool")
 local Observable	= require("aqua.util.Observable")
 local Class			= require("aqua.util.Class")
+local inspect = require("inspect")
 
 local ReplaySubmitter = Class:new()
 
-ReplaySubmitter.construct = function(self)
-	self.observable = Observable:new()
-end
-
-ReplaySubmitter.load = function(self)
-	ThreadPool.observable:add(self)
-end
-
-ReplaySubmitter.unload = function(self)
-	ThreadPool.observable:remove(self)
-end
-
-ReplaySubmitter.receive = function(self, event)
-	if event.name == "ReplaySubmitResponse" then
-		self.onlineModel:receive(event)
-	end
-end
-
 ReplaySubmitter.submitReplay = function(self, replayHash, url)
-    print(replayHash)
-
-	return ThreadPool:execute(
-		function(...)
-			local data = ({...})[1]
-
-            local replayFile = love.filesystem.newFile("userdata/replays/" .. data.hash, "r")
+    print("submit replay", replayHash)
+	return ThreadPool:execute({
+		f = function(params)
+            local replayFile = love.filesystem.newFile("userdata/replays/" .. params.hash, "r")
             local content = replayFile:read()
             local tempName = "rp" .. os.time()
             local tempFile, err = io.open(tempName, "wb")
@@ -43,36 +23,29 @@ ReplaySubmitter.submitReplay = function(self, replayHash, url)
             tempFile:close()
 
             local request = require("luajit-request")
+			local json = require("json")
 
-            print("POST " .. data.host .. "/" .. data.url)
-            local result, err, message = request.send(data.host .. "/" .. data.url, {
+            print("POST " .. params.host .. "/" .. params.url)
+            local response, err, message = request.send(params.host .. "/" .. params.url, {
                 method = "POST",
                 files = {
                     replay = tempName
                 }
             })
-
-            if not result then
-                print(err, message)
-            else
-                print(result.body)
-
-                thread:push({
-                    name = "ReplaySubmitResponse",
-                    body = result.body
-                })
-            end
-
             os.remove(tempName)
+
+			return json.decode(response.body)
 		end,
-		{
-            {
-                host = self.host,
-                url = url,
-                hash = replayHash
-            }
-        }
-	)
+		params = {
+			host = self.config.host,
+			url = url,
+			hash = replayHash
+        },
+		result = function(response)
+			print(inspect(response))
+		end,
+		error = print
+	})
 end
 
 return ReplaySubmitter

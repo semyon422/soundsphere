@@ -1,66 +1,50 @@
 local Observable	= require("aqua.util.Observable")
 local Class			= require("aqua.util.Class")
 local ThreadPool	= require("aqua.thread.ThreadPool")
+local inspect = require("inspect")
 
 local OnlineScoreManager = Class:new()
 
-OnlineScoreManager.construct = function(self)
-	self.observable = Observable:new()
-end
-
-OnlineScoreManager.load = function(self)
-	ThreadPool.observable:add(self)
-end
-
-OnlineScoreManager.unload = function(self)
-	ThreadPool.observable:remove(self)
-end
-
-OnlineScoreManager.receive = function(self, event)
-	if event.name == "ScoreSubmitResponse" then
-		self.onlineModel:receive(event)
-	end
-end
-
 OnlineScoreManager.submit = function(self, noteChartEntry, noteChartDataEntry, replayHash)
-	return ThreadPool:execute(
-		function(...)
+	return ThreadPool:execute({
+		f = function(params)
+			local json = require("json")
 			local http = require("aqua.http")
 			local request = require("luajit-request")
 
-			local data = ({...})[1]
-			for k, v in pairs(data) do
-				data[k] = tostring(v)
-			end
-
-			local response = request.send(data.host .. "/score", {
+			local response = request.send(params.host .. "/score", {
 				method = "POST",
 				data = {
-					session = data.session,
-					replay_hash = data.replayHash,
-					notechart_hash = data.hash,
-					notechart_index = data.index,
-					notechart_filename = data.fileName
+					session = params.session,
+					replay_hash = params.replayHash,
+					notechart_hash = params.hash,
+					notechart_index = tostring(params.index),
+					notechart_filename = params.fileName
 				}
 			})
-
-			thread:push({
-				name = "ScoreSubmitResponse",
-				status = response.code == 200,
-				body = response.body
-			})
+			return json.decode(response.body)
 		end,
-		{
-			{
-				host = self.host,
-				session = self.session,
-				replayHash = replayHash,
-				hash = noteChartDataEntry.hash,
-				index = noteChartDataEntry.index,
-				fileName = noteChartEntry.path:match("^.+/(.-)$")
-			}
-		}
-	)
+		params = {
+			host = self.config.host,
+			session = self.config.session,
+			replayHash = replayHash,
+			hash = noteChartDataEntry.hash,
+			index = noteChartDataEntry.index,
+			fileName = noteChartEntry.path:match("^.+/(.-)$")
+		},
+		result = function(response)
+			print(inspect(response))
+			local noteChartUploadUrl = response.notechart
+			local replayUploadUrl = response.replay
+			if noteChartUploadUrl and noteChartEntry.hash == response.notechart_hash then
+				self.noteChartSubmitter:submitNoteChart(noteChartEntry, noteChartUploadUrl)
+			end
+			if replayUploadUrl then
+				self.replaySubmitter:submitReplay(response.replay_hash, replayUploadUrl)
+			end
+		end,
+		error = print
+	})
 end
 
 return OnlineScoreManager

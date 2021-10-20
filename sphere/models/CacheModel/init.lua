@@ -12,12 +12,9 @@ end
 CacheModel.load = function(self)
 	self.cacheUpdater.cacheManager = self.cacheManager
 	self.cacheManager:select()
-	self.cacheUpdater:load()
 end
 
-CacheModel.unload = function(self)
-	self.cacheUpdater:unload()
-end
+CacheModel.unload = function(self) end
 
 CacheModel.startUpdate = function(self, path, force)
 	self.cacheUpdater:start(path, force)

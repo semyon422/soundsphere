@@ -216,7 +216,7 @@ GameplayController.saveScore = function(self)
 		replayModel.replayType = self.gameController.configModel.configs.settings.gameplay.replayType
 		local replayHash = replayModel:saveReplay()
 		local scoreEntry = self.gameController.scoreModel:insertScore(scoreSystemEntry, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
-		self.gameController.onlineModel:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
+		self.gameController.onlineModel.onlineScoreManager:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
 
 		rhythmModel.scoreEngine.scoreEntry = scoreEntry
 		local config = self.gameController.configModel.configs.select

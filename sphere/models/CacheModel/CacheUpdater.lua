@@ -8,18 +8,6 @@ CacheUpdater.state = 0
 CacheUpdater.noteChartCount = 0
 CacheUpdater.cachePercent = 0
 
-CacheUpdater.construct = function(self)
-	self.observable = Observable:new()
-end
-
-CacheUpdater.load = function(self)
-	ThreadPool.observable:add(self)
-end
-
-CacheUpdater.unload = function(self)
-	ThreadPool.observable:remove(self)
-end
-
 CacheUpdater.receive = function(self, event)
 	if event.name ~= "CacheProgress" then
 		return
@@ -46,17 +34,25 @@ end
 CacheUpdater.start = function(self, path, force)
 	if not self.isUpdating then
 		self.isUpdating = true
-		return ThreadPool:execute(
-			function(...)
-				local CacheDatabase	= require("sphere.models.CacheModel.CacheDatabase")
-				local CacheManager	= require("sphere.models.CacheModel.CacheManager")
+		return ThreadPool:execute({
+			f = function(params)
+				local CacheManager = require("sphere.models.CacheModel.CacheManager")
 
 				local cacheManager = CacheManager:new()
 
-				cacheManager:generateCacheFull(...)
+				cacheManager:generateCacheFull(params.path, params.force)
 			end,
-			{path, force}
-		)
+			params = {
+				path = path,
+				force = force
+			},
+			receive = function(event)
+				self:receive(event)
+			end,
+			error = function(message)
+				print(message)
+			end
+		})
 	end
 end
 

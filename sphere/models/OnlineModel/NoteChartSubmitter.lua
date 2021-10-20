@@ -1,34 +1,15 @@
 local ThreadPool	= require("aqua.thread.ThreadPool")
 local Observable	= require("aqua.util.Observable")
 local Class			= require("aqua.util.Class")
+local inspect = require("inspect")
 
 local NoteChartSubmitter = Class:new()
 
-NoteChartSubmitter.construct = function(self)
-	self.observable = Observable:new()
-end
-
-NoteChartSubmitter.load = function(self)
-	ThreadPool.observable:add(self)
-end
-
-NoteChartSubmitter.unload = function(self)
-	ThreadPool.observable:remove(self)
-end
-
-NoteChartSubmitter.receive = function(self, event)
-	if event.name == "NoteChartSubmitResponse" then
-		self.onlineModel:receive(event)
-	end
-end
-
 NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry, url)
-    print(noteChartEntry.path)
-
-	return ThreadPool:execute(
-		function(...)
-			local data = ({...})[1]
-            local path = data.path
+    print("submit notechart", noteChartEntry.path)
+	return ThreadPool:execute({
+		f = function(params)
+            local path = params.path
 
             local noteChartFile = love.filesystem.newFile(path, "r")
             local content = noteChartFile:read()
@@ -44,36 +25,29 @@ NoteChartSubmitter.submitNoteChart = function(self, noteChartEntry, url)
             tempFile:close()
 
             local request = require("luajit-request")
+			local json = require("json")
 
-            print("POST " .. data.host .. "/" .. data.url)
-            local result, err, message = request.send(data.host .. "/" .. data.url, {
+            print("POST " .. params.host .. "/" .. params.url)
+            local response, err, message = request.send(params.host .. "/" .. params.url, {
                 method = "POST",
                 files = {
                     notechart = tempName
                 }
             })
-
-            if not result then
-                print(err, message)
-            else
-                print(result.body)
-
-                thread:push({
-                    name = "NoteChartSubmitResponse",
-                    body = result.body
-                })
-            end
-
             os.remove(tempName)
+
+			return json.decode(response.body)
 		end,
-        {
-            {
-                host = self.host,
-                url = url,
-                path = noteChartEntry.path
-            }
-        }
-	)
+        params = {
+			host = self.config.host,
+			url = url,
+			path = noteChartEntry.path
+        },
+		result = function(response)
+			print(inspect(response))
+		end,
+		error = print
+	})
 end
 
 return NoteChartSubmitter

@@ -16,7 +16,6 @@ NoteChartResourceLoader.init = function(self)
 	self.observable = Observable:new()
 	self.localAliases = {}
 	self.globalAliases = {}
-	JamLoader:init()
 end
 
 NoteChartResourceLoader.getNoteChartType = function(self, noteChart)
