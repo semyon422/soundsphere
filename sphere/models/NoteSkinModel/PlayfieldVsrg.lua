@@ -146,7 +146,9 @@ end
 
 PlayfieldVsrg.addJudgement = function(self, object)
 	local judgements = {}
-	local transform = self:newLaneCenterTransform(1080)
+	if not object.transform then
+		object.transform = self:newLaneCenterTransform(1080)
+	end
 	for _, judgement in ipairs(object.judgements) do
 		local config = {
 			class = "ImageAnimationView",
@@ -154,7 +156,7 @@ PlayfieldVsrg.addJudgement = function(self, object)
 			w = object.w, h = object.h,
 			sx = object.sx or object.scale, sy = object.sy or object.scale,
 			ox = object.ox, oy = object.oy,
-			transform = transform,
+			transform = object.transform,
 			image = judgement[2],
 			range = judgement[3],
 			quad = judgement[4],
@@ -176,7 +178,9 @@ end
 
 PlayfieldVsrg.addDeltaTimeJudgement = function(self, object)
 	local judgements = {}
-	local transform = self:newLaneCenterTransform(1080)
+	if not object.transform then
+		object.transform = self:newLaneCenterTransform(1080)
+	end
 	for i, judgement in ipairs(object.judgements) do
 		if type(judgement) == "string" then
 			judgement = {judgement}
@@ -188,7 +192,7 @@ PlayfieldVsrg.addDeltaTimeJudgement = function(self, object)
 				w = object.w, h = object.h,
 				sx = object.sx or object.scale, sy = object.sy or object.scale,
 				ox = object.ox, oy = object.oy,
-				transform = transform,
+				transform = object.transform,
 				image = judgement[1],
 				range = judgement[2],
 				quad = judgement[3],
