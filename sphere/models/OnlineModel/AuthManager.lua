@@ -139,7 +139,7 @@ AuthManager.quickLogin = function(self)
 	print("quick login")
 	local config = self.config
 	local token = config.token
-	if #token == 0 then
+	if #token ~= 0 then
 		return
 	end
 	return ThreadPool:execute({
