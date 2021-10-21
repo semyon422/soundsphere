@@ -45,7 +45,7 @@ end
 
 UpdateModel.startUpdate = function(self)
 	return ThreadPool:execute({
-		function(params)
+		f = function(params)
 			local ConfigModel = require("sphere.models.ConfigModel")
 			local configModel = ConfigModel:new()
 			configModel:addConfig("settings", "userdata/settings.lua", "sphere/models/ConfigModel/settings.lua", "lua")
