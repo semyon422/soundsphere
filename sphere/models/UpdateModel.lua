@@ -21,7 +21,6 @@ UpdateModel.load = function(self)
 		return
 	end
 
-	ThreadPool.observable:add(self)
 	print("start auto update")
 	self:startUpdate()
 	self.status = "Checking for updates..."
@@ -45,8 +44,8 @@ UpdateModel.receive = function(self, event)
 end
 
 UpdateModel.startUpdate = function(self)
-	return ThreadPool:execute(
-		[[
+	return ThreadPool:execute({
+		function(params)
 			local ConfigModel = require("sphere.models.ConfigModel")
 			local configModel = ConfigModel:new()
 			configModel:addConfig("settings", "userdata/settings.lua", "sphere/models/ConfigModel/settings.lua", "lua")
@@ -70,9 +69,11 @@ UpdateModel.startUpdate = function(self)
 				result = err
 			})
 			configModel:writeConfig("files")
-		]],
-		{}
-	)
+		end,
+		params = {},
+		result = function(response) end,
+		receive = function(event) self:receive(event) end,
+	})
 end
 
 UpdateModel.downloadFile = function(self, url, path)
