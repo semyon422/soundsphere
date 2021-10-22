@@ -225,6 +225,13 @@ local settings = {
 		end
 	},
 	{
+		name = "cursor",
+		section = "graphics",
+		key = "graphics.cursor",
+		type = "stepper",
+		values = {"circle", "arrow", "system"}
+	},
+	{
 		name = "dim select",
 		section = "graphics",
 		key = "graphics.dim.select",
@@ -233,13 +240,6 @@ local settings = {
 		displayRange = {0, 100},
 		step = 0.01,
 		format = "%d"
-	},
-	{
-		name = "cursor",
-		section = "graphics",
-		key = "graphics.cursor",
-		type = "stepper",
-		values = {"circle", "arrow", "system"}
 	},
 	{
 		name = "dim gameplay",
