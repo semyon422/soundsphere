@@ -137,7 +137,7 @@ NoteSkinModel.getNoteSkins = function(self, inputMode)
 
 	items[#items + 1] = self:getBaseNoteSkin(inputMode, stringInputMode)
 	for _, noteSkin in ipairs(self.noteSkins) do
-		if noteSkin.inputMode >= inputMode then
+		if noteSkin.inputMode == inputMode then
 			items[#items + 1] = noteSkin
 		end
 	end

@@ -115,6 +115,8 @@ SelectController.resetModifiedNoteChart = function(self)
 	local noteChartModel = self.gameController.noteChartModel
 	local modifierModel = self.gameController.modifierModel
 
+	noteChartModel:load()
+
 	local noteChart = noteChartModel:loadNoteChart()
 
 	if not noteChart then
