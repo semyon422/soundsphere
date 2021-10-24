@@ -14,9 +14,9 @@ NoteSkinModel.construct = function(self)
 end
 
 NoteSkinModel.path = "userdata/skins"
-NoteSkinModel.inputMode = ""
 
 NoteSkinModel.load = function(self)
+	self.inputMode = ""
 	self.noteSkins = {}
 	self.config = self.configModel.configs.settings
 	return self:lookup(self.path)

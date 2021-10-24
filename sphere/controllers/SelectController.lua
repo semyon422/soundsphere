@@ -27,6 +27,7 @@ SelectController.load = function(self)
 end
 
 SelectController.unload = function(self)
+	self.gameController.noteSkinModel:load()
 	self.gameController.previewModel:unload()
 	self.view:unload()
 	self.gameController:writeConfigs()
