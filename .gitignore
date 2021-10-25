@@ -29,3 +29,9 @@ userdata/charts.db-journal
 userdata/scores.db-journal
 
 moddedgame
+
+lapis/*
+temp/*
+logs
+nginx.conf.compiled
+req.http
