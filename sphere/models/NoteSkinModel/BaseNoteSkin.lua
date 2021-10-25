@@ -44,7 +44,7 @@ BaseNoteSkin.load = function(self, content)
 	self.inputMode = self.inputMode
 	self.range = {-1, 1}
 	self.unit = 480
-	self.hitposition = 440
+	self.hitposition = 450
 
 	local inputs = self:getInputTable()
 	self:setInput(inputs)
