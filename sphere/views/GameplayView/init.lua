@@ -4,6 +4,7 @@ local RhythmView = require("sphere.views.RhythmView")
 local GameplayViewConfig = require("sphere.views.GameplayView.GameplayViewConfig")
 local ProgressView	= require("sphere.views.GameplayView.ProgressView")
 local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
+local HitErrorView = require("sphere.views.GameplayView.HitErrorView")
 local InputView	= require("sphere.views.GameplayView.InputView")
 local InputAnimationView	= require("sphere.views.GameplayView.InputAnimationView")
 local GameplayNavigator	= require("sphere.views.GameplayView.GameplayNavigator")
@@ -18,6 +19,7 @@ GameplayView.views = {
 	{"rhythmView", RhythmView, "RhythmView"},
 	{"progressView", ProgressView, "ProgressView"},
 	{"pointGraphView", PointGraphView, "PointGraphView"},
+	{"hitErrorView", HitErrorView, "HitErrorView"},
 	{"inputView", InputView, "InputView"},
 	{"inputAnimationView", InputAnimationView, "InputAnimationView"},
 	{"judgementView", JudgementView, "JudgementView"},

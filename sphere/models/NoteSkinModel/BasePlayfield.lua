@@ -71,6 +71,26 @@ BasePlayfield.addBaseCombo = function(self)
 	})
 end
 
+BasePlayfield.addBaseHitError = function(self)
+	self:addHitError({
+		transform = self:newLaneCenterTransform(1080),
+		x = 0,
+		y = 1041,
+		w = 432,
+		h = 24,
+		origin = {
+			w = 2,
+			h = 34,
+			color = {1, 1, 1, 1}
+		},
+		background = {
+			color = {0.25, 0.25, 0.25, 0.5}
+		},
+		radius = 3,
+		count = 20,
+	})
+end
+
 BasePlayfield.addBaseElements = function(self, elements)
 	if not elements then
 		self:addBaseProgressBar()
@@ -78,6 +98,7 @@ BasePlayfield.addBaseElements = function(self, elements)
 		self:addBaseScore()
 		self:addBaseAccuracy()
 		self:addBaseCombo()
+		self:addBaseHitError()
 		return
 	end
 	for i, element in ipairs(elements) do
@@ -91,6 +112,8 @@ BasePlayfield.addBaseElements = function(self, elements)
 			self:addBaseAccuracy()
 		elseif element == "combo" then
 			self:addBaseCombo()
+		elseif element == "hit error" then
+			self:addBaseHitError()
 		end
 	end
 end
