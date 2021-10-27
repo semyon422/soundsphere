@@ -138,11 +138,11 @@ OsuNoteSkin.load = function(self)
 
 	playfield:addNotes()
 
-	local pressed = {}
-	local released = {}
+	local pressed, released = self:getDefaultKeyImages()
 	for i = 1, keysCount do
-		pressed[i] = self:findImage(mania["KeyImage" .. (i - 1) .. "D"])
-		released[i] = self:findImage(mania["KeyImage" .. (i - 1)])
+		local ki = "KeyImage" .. (i - 1)
+		pressed[i] = self:findImage(mania[ki .. "D"]) or self:findImage(pressed[i])
+		released[i] = self:findImage(mania[ki]) or self:findImage(released[i])
 	end
 	playfield:addKeyImages({
 		sy = 480 / 768,
@@ -160,24 +160,24 @@ local getNoteType = function(key, keymode)
 			return "S"
 		else
 			if (half - key + 1) % 2 == 1 then
-				return 1
-			else
 				return 2
+			else
+				return 1
 			end
 		end
 	else
 		local half = keymode / 2
 		if key <= keymode / 2 then
 			if (half - key + 1) % 2 == 1 then
-				return 1
-			else
 				return 2
+			else
+				return 1
 			end
 		else
 			if (half - key + 1) % 2 == 1 then
-				return 2
-			else
 				return 1
+			else
+				return 2
 			end
 		end
 	end
@@ -190,13 +190,28 @@ OsuNoteSkin.getDefaultNoteImages = function(self)
 	local images = {}
 	for i = 1, keysCount do
 		local ni = "NoteImage" .. (i - 1)
-		local mn = "mania-note" .. getNoteType(i - 1, keysCount)
+		local mn = "mania-note" .. getNoteType(i, keysCount)
 		table.insert(images, {ni .. "L", mn .. "L"})
 		table.insert(images, {ni .. "T", mn .. "T"})
 		table.insert(images, {ni .. "H", mn .. "H"})
 		table.insert(images, {ni, mn})
 	end
 	return images
+end
+
+OsuNoteSkin.getDefaultKeyImages = function(self)
+	local mania = self.mania
+	local keysCount = tonumber(mania.Keys)
+
+	local pressed = {}
+	local released = {}
+	for i = 1, keysCount do
+		local ni = "KeyImage" .. (i - 1)
+		local mn = "mania-key" .. getNoteType(i, keysCount)
+		pressed[i] = mn .. "D"
+		released[i] = mn
+	end
+	return pressed, released
 end
 
 OsuNoteSkin.findImage = function(self, value)
@@ -243,6 +258,20 @@ OsuNoteSkin.addStages = function(self)
 			oy = 1,
 			transform = playfield:newNoteskinTransform(),
 			image = stageRight,
+		})
+	end
+
+	local stageHint = self:findImage(mania.StageHint) or self:findImage("mania-stage-hint")
+	if stageHint then
+		playfield:add({
+			class = "ImageView",
+			x = self.columns[1] - self.space[1],
+			y = self.hitposition,
+			w = self.fullWidth,
+			sy = 480 / 768,
+			oy = 0.5,
+			transform = playfield:newNoteskinTransform(),
+			image = stageHint,
 		})
 	end
 end
