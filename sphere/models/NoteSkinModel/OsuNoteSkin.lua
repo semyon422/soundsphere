@@ -134,13 +134,15 @@ OsuNoteSkin.load = function(self)
 		color = colors
 	})
 
+	self:addStages()
+
 	playfield:addNotes()
 
 	local pressed = {}
 	local released = {}
 	for i = 1, keysCount do
-		pressed[i] = mania["KeyImage" .. (i - 1) .. "D"] .. ".png"
-		released[i] = mania["KeyImage" .. (i - 1)] .. ".png"
+		pressed[i] = self:findImage(mania["KeyImage" .. (i - 1) .. "D"])
+		released[i] = self:findImage(mania["KeyImage" .. (i - 1)])
 	end
 	playfield:addKeyImages({
 		sy = 480 / 768,
@@ -198,6 +200,9 @@ OsuNoteSkin.getDefaultNoteImages = function(self)
 end
 
 OsuNoteSkin.findImage = function(self, value)
+	if not value then
+		return
+	end
 	value = value:gsub("\\", "/"):lower()
 	for _, file in pairs(self.files) do
 		if file:lower():find(value, 1, true) == 1 then
@@ -206,6 +211,39 @@ OsuNoteSkin.findImage = function(self, value)
 				return file
 			end
 		end
+	end
+end
+
+OsuNoteSkin.addStages = function(self)
+	local mania = self.mania
+	local playfield = self.playField
+	local stageLeft = self:findImage(mania.StageLeft) or self:findImage("mania-stage-left")
+	if stageLeft then
+		playfield:add({
+			class = "ImageView",
+			x = self.columns[1] - self.space[1],
+			y = 480,
+			sx = 480 / 768,
+			sy = 480 / 768,
+			oy = 1,
+			ox = 1,
+			transform = playfield:newNoteskinTransform(),
+			image = stageLeft,
+		})
+	end
+
+	local stageRight = self:findImage(mania.StageRight) or self:findImage("mania-stage-right")
+	if stageRight then
+		playfield:add({
+			class = "ImageView",
+			x = self.columns[self.inputsCount] + self.width[self.inputsCount] + self.space[self.inputsCount + 1],
+			y = 480,
+			sx = 480 / 768,
+			sy = 480 / 768,
+			oy = 1,
+			transform = playfield:newNoteskinTransform(),
+			image = stageRight,
+		})
 	end
 end
 
