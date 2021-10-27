@@ -90,35 +90,40 @@ RhythmView.draw = function(self)
 	end
 end
 
-RhythmView.loadTexture = function(self, path)
+RhythmView.loadTexture = function(self, key, path)
 	local state = self.state
+	local textures = state.textures
+	local spriteBatches = state.spriteBatches
 
 	local texture = love.graphics.newImage(self.gameController.rhythmModel.graphicEngine.noteSkin.directoryPath .. "/" .. path)
 	local spriteBatch = love.graphics.newSpriteBatch(texture, 1000)
 
-	state.textures[path] = texture
-	state.spriteBatches[path] = spriteBatch
-	table.insert(state.spriteBatches, spriteBatch)
+	textures[key] = textures[key] or {}
+	textures[key][path] = texture
+	spriteBatches[key] = spriteBatches[key] or {}
+	spriteBatches[key][path] = spriteBatch
+	table.insert(spriteBatches, spriteBatch)
 end
 
 RhythmView.loadImages = function(self)
 	local state = self.state
 
-	for _, path in ipairs(self.gameController.rhythmModel.graphicEngine.noteSkin.textures) do
+	for i, texture in ipairs(self.gameController.rhythmModel.graphicEngine.noteSkin.textures) do
+		local key, path = next(texture)
 		if type(path) == "string" then
-			self:loadTexture(path)
+			self:loadTexture(key, path)
 		elseif type(path) == "table" then
 			local range = path[2]
 			for i = range[1], range[2] do
-				self:loadTexture(path[1]:format(i))
+				self:loadTexture(key, path[1]:format(i))
 			end
 		end
 	end
 
 	for imageName, image in pairs(self.gameController.rhythmModel.graphicEngine.noteSkin.images) do
-		local path = image[1]
+		local key, path = next(image[1])
 		if type(path) == "string" then
-			local texture = state.textures[path]
+			local texture = state.textures[key][path]
 			local w, h = texture:getDimensions()
 			image[3] = {w, h}
 
@@ -139,7 +144,7 @@ RhythmView.loadImages = function(self)
 			end
 			state.quads[imageName] = quad
 		elseif type(path) == "table" then
-			local texture = state.textures[path[1]:format(path[2][1])]
+			local texture = state.textures[key][path[1]:format(path[2][1])]
 			local w, h = texture:getDimensions()
 			image[3] = {w, h}
 		end
@@ -160,10 +165,11 @@ RhythmView.getSpriteBatch = function(self, note, part, key, timeState)
 		return
 	end
 	local texture = image[1]
-	if type(texture) == "string" then
-		return state.spriteBatches[texture]
+	local key, path = next(texture)
+	if type(path) == "string" then
+		return state.spriteBatches[key][path]
 	elseif type(texture) == "table" then
-		return state.spriteBatches[texture[1]:format(frame)]
+		return state.spriteBatches[key][path[1]:format(frame)]
 	end
 end
 

@@ -35,17 +35,17 @@ NoteSkin.get = function(self, noteView, part, key, timeState)
 end
 
 NoteSkin.setTextures = function(self, textures)
-	for i, texture in ipairs(textures) do
-		local k, v = next(texture)
-		textures[k] = v
-		textures[i] = v
-	end
 	self.textures = textures
 end
 
 NoteSkin.setImages = function(self, images)
+	local map = {}
+	for i, texture in ipairs(self.textures) do
+		local k, v = next(texture)
+		map[k] = texture
+	end
 	for _, image in pairs(images) do
-		image[1] = self.textures[image[1]]
+		image[1] = map[image[1]]
 	end
 	self.images = images
 end
