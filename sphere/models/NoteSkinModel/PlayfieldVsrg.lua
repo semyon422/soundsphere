@@ -223,9 +223,11 @@ PlayfieldVsrg.addKeyImages = function(self, object)
 			pressed = {
 				class = "ImageView",
 				x = noteskin.columns[i],
-				y = noteskin.unit - object.h - object.padding,
+				y = noteskin.unit - object.padding,
 				w = noteskin.width[i],
 				h = object.h,
+				sy = object.sy,
+				oy = 1,
 				transform = object.transform,
 				image = object.pressed[i],
 			}
@@ -234,9 +236,11 @@ PlayfieldVsrg.addKeyImages = function(self, object)
 			released = {
 				class = "ImageView",
 				x = noteskin.columns[i],
-				y = noteskin.unit - object.h - object.padding,
+				y = noteskin.unit - object.padding,
 				w = noteskin.width[i],
 				h = object.h,
+				sy = object.sy,
+				oy = 1,
 				transform = object.transform,
 				image = object.released[i],
 			}

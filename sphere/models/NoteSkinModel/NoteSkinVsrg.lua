@@ -139,9 +139,11 @@ end
 
 NoteSkinVsrg.setLongNote = function(self, params)
 	local h = params.h or 0
-	local height = {}
+	local headHeight = {}
+	local tailHeight = {}
 	for i = 1, self.inputsCount do
-		height[i] = h
+		headHeight[i] = h
+		tailHeight[i] = h
 	end
 
 	local tail = params.tail
@@ -171,9 +173,11 @@ NoteSkinVsrg.setLongNote = function(self, params)
 		color[i] = self.color
 	end
 
-	local oy = {}
+	local headOy = {}
+	local tailOy = {}
 	for i = 1, self.inputsCount do
-		oy[i] = 1
+		headOy[i] = 1
+		tailOy[i] = 1
 	end
 	local bh = {}
 	for i = 1, self.inputsCount do
@@ -184,11 +188,11 @@ NoteSkinVsrg.setLongNote = function(self, params)
 		x = self.columns,
 		y = function(...) return self:getPosition(...) end,
 		w = self.width,
-		h = height,
+		h = headHeight,
 		sx = {},
 		sy = {},
 		ox = {},
-		oy = oy,
+		oy = headOy,
 		r = {},
 		color = color,
 		image = head
@@ -198,11 +202,11 @@ NoteSkinVsrg.setLongNote = function(self, params)
 		x = self.columns,
 		y = function(...) return self:getPosition(...) end,
 		w = self.width,
-		h = height,
+		h = tailHeight,
 		sx = {},
 		sy = {},
 		ox = {},
-		oy = oy,
+		oy = tailOy,
 		r = {},
 		color = color,
 		image = tail

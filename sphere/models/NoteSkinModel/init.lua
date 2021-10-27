@@ -18,8 +18,12 @@ NoteSkinModel.path = "userdata/skins"
 NoteSkinModel.load = function(self)
 	self.inputMode = ""
 	self.noteSkins = {}
+	self.files = {}
+	self.filesMap = {}
+	self.foundNoteSkins = {}
 	self.config = self.configModel.configs.settings
-	return self:lookup(self.path)
+	self:lookup(self.path)
+	self:loadNoteSkins()
 end
 
 NoteSkinModel.lookup = function(self, directoryPath)
@@ -28,11 +32,30 @@ NoteSkinModel.lookup = function(self, directoryPath)
 	for _, itemName in ipairs(items) do
 		local path = directoryPath .. "/" .. itemName
 		local info = love.filesystem.getInfo(path)
-		if info and info.type == "file" and itemName:find("^.-skin%.%a-$") then
-			self:loadNoteSkin(path, directoryPath, itemName)
+		if info and info.type == "file" then
+			if itemName:lower():find("^.-skin%.%a-$") then
+				table.insert(self.foundNoteSkins, {path, directoryPath, itemName})
+			end
+			self.filesMap[path] = true
 		elseif info and info.type == "directory" then
 			self:lookup(path)
 		end
+	end
+end
+
+NoteSkinModel.loadNoteSkins = function(self)
+	local files = self.files
+	for _, paths in ipairs(self.foundNoteSkins) do
+		local path, directoryPath, itemName = unpack(paths)
+		files[directoryPath] = files[directoryPath] or {}
+		local dfiles = files[directoryPath]
+		for fpath in pairs(self.filesMap) do
+			if fpath:find(directoryPath, 1, true) then
+				table.insert(dfiles, fpath:sub(#directoryPath + 2))
+			end
+		end
+		table.sort(dfiles)
+		self:loadNoteSkin(path, directoryPath, itemName)
 	end
 end
 
@@ -90,6 +113,7 @@ NoteSkinModel.loadOsu = function(self, path, directoryPath, fileName)
 
 	for i, mania in ipairs(skinini.Mania) do
 		local noteSkin = OsuNoteSkin:new()
+		noteSkin.files = self.files[directoryPath]
 		noteSkin.path = path
 		noteSkin.directoryPath = directoryPath
 		noteSkin.fileName = fileName
