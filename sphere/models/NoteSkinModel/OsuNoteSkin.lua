@@ -119,6 +119,21 @@ OsuNoteSkin.load = function(self)
 	})
 
 	playfield:enableCamera()
+
+	local colors = {}
+	local defaultColor = {0, 0, 0, 1}
+	for i = 1, keysCount do
+		local key = "Colour" .. i
+		local value = toarray(mania[key])
+		for j = 1, 4 do
+			value[j] = value[j] and value[j] / 255 or defaultColor[j]
+		end
+		colors[i] = value
+	end
+	playfield:addColumnsBackground({
+		color = colors
+	})
+
 	playfield:addNotes()
 
 	local pressed = {}

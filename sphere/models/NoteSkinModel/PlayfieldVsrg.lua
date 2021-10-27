@@ -315,6 +315,41 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 	end
 end
 
+PlayfieldVsrg.addColumnsBackground = function(self, object)
+	if not object then
+		return
+	end
+	if not object.transform then
+		object.transform = self:newNoteskinTransform()
+	end
+	local noteskin = self.noteskin
+	local inputs = noteskin.inputsCount
+	local rectangles = {}
+	for i = 1, inputs do
+		local color = object.color[i]
+		if type(object.color[1]) == "number" then
+			color = object.color
+		end
+		table.insert(rectangles, {
+			color = color,
+			mode = "fill",
+			lineStyle = "rough",
+			lineWidth = 1,
+			x = noteskin.columns[i],
+			y = 0,
+			w = noteskin.width[i],
+			h = 480,
+			rx = 0,
+			ry = 0
+		})
+	end
+	self:add({
+		class = "RectangleView",
+		transform = object.transform,
+		rectangles = rectangles
+	})
+end
+
 PlayfieldVsrg.addGuidelines = function(self, object)
 	if not object then
 		return
@@ -324,7 +359,7 @@ PlayfieldVsrg.addGuidelines = function(self, object)
 	end
 	local noteskin = self.noteskin
 	local inputs = noteskin.inputsCount
-	for i = 1, #object.w do
+	for i = 1, inputs do
 		local bw = object.w[i]
 		local bh = object.h[i]
 
