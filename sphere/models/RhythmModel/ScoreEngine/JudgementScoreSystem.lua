@@ -16,17 +16,17 @@ JudgementScoreSystem.judgements = {
 	},
 }
 
-for od = 5, 10 do
+for od = 0, 10 do
 	local _3od = 3 * od
 	local _300g = 16
 	local _300 = 64 - _3od
 	local _200 = 97 - _3od
 	local _100 = 127 - _3od
 	local _50 = 151 - _3od
-	local early_miss = 188 - _3od
+	local _0 = 188 - _3od
 	local judgements = {
-		-early_miss,
-		"early miss",
+		-_0,
+		"0",
 		-_50,
 		"50",
 		-_100,
@@ -46,7 +46,7 @@ for od = 5, 10 do
 		_100,
 		"50",
 		_50,
-		"miss"
+		"0"
 	}
 	for i = 1, #judgements do
 		if type(judgements[i]) == "number" then
@@ -102,7 +102,7 @@ JudgementScoreSystem.processJudgement = function(self, event)
 	end
 end
 
-JudgementScoreSystem.processMiss = function(self, event) end
+JudgementScoreSystem.processMiss = JudgementScoreSystem.processJudgement
 
 JudgementScoreSystem.notes = {
 	ShortScoreNote = {

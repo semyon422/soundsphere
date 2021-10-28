@@ -151,6 +151,8 @@ OsuNoteSkin.load = function(self)
 		released = released,
 	})
 	playfield:disableCamera()
+
+	self:addJudgements()
 end
 
 local getNoteType = function(key, keymode)
@@ -181,6 +183,47 @@ local getNoteType = function(key, keymode)
 			end
 		end
 	end
+end
+
+local defaultJudgements = {
+	{"0", "Hit0", "mania-hit0"},
+	{"50", "Hit50", "mania-hit50"},
+	{"100", "Hit100", "mania-hit100"},
+	{"200", "Hit200", "mania-hit200"},
+	{"300", "Hit300", "mania-hit300"},
+	{"300g", "Hit300g", "mania-hit300g"},
+}
+
+OsuNoteSkin.addJudgements = function(self)
+	local mania = self.mania
+	local rate = tonumber(mania.AnimationFramerate) or -1
+	local od = tonumber(mania.OverallDifficulty) or 5
+
+	local judgements = {}
+	for i, jd in ipairs(defaultJudgements) do
+		local name, key, default = unpack(jd)
+		local path, range = self:findAnimation(mania[key])
+		if not path then
+			path, range = self:findAnimation(default)
+		end
+		if path then
+			local judgement = {name, path, range}
+			if rate ~= -1 then
+				judgement.rate = rate
+			elseif range then
+				judgement.rate = 1 / (range[2] - range[1] + 1)
+			else
+				judgement.rate = 1
+			end
+			table.insert(judgements, judgement)
+		end
+	end
+	self.playField:addJudgement({
+		x = 0, y = self.hitposition, ox = 0.5, oy = 0.5,
+		transform = self.playField:newLaneCenterTransform(1080),
+		key = "osuOD" .. od,
+		judgements = judgements,
+	})
 end
 
 OsuNoteSkin.getDefaultNoteImages = function(self)
@@ -227,6 +270,44 @@ OsuNoteSkin.findImage = function(self, value)
 			end
 		end
 	end
+end
+
+OsuNoteSkin.findAnimation = function(self, value)
+	if not value then
+		return
+	end
+	value = value:gsub("\\", "/"):lower()
+	local frames = {}
+	local path
+	for _, file in pairs(self.files) do
+		if file:lower():find(value, 1, true) == 1 then
+			local rest = file:sub(#value + 1)
+			if rest:find("^%.[^%.]+$") then
+				return file
+			end
+			if rest:find("^-%d+%.[^%.]+$") then
+				local frame, format = rest:match("^-(%d+)%.([^%.]+)$")
+				table.insert(frames, tonumber(frame))
+				if not path then
+					path = value .. "-%d." .. format
+				end
+			end
+		end
+	end
+	if #frames == 0 then
+		return
+	end
+	table.sort(frames)
+	local startFrame = frames[1]
+	local endFrame = frames[#frames]
+	for i = 2, #frames do
+		local frame, nextFrame = frames[i - 1], frames[i]
+		if nextFrame - frame ~= 1 then
+			endFrame = frame
+			break
+		end
+	end
+	return path, {startFrame, endFrame}
 end
 
 OsuNoteSkin.addStages = function(self)

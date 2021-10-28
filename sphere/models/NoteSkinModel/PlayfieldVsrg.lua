@@ -160,7 +160,7 @@ PlayfieldVsrg.addJudgement = function(self, object)
 			image = judgement[2],
 			range = judgement[3],
 			quad = judgement[4],
-			rate = object.rate,
+			rate = judgement.rate or object.rate,
 		}
 		judgements[judgement[1]] = config
 		self:add(config)
@@ -196,7 +196,7 @@ PlayfieldVsrg.addDeltaTimeJudgement = function(self, object)
 				image = judgement[1],
 				range = judgement[2],
 				quad = judgement[3],
-				rate = object.rate,
+				rate = judgement.rate or object.rate,
 			}
 			judgements[i] = config
 			self:add(config)
