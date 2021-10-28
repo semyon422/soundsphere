@@ -359,11 +359,13 @@ PlayfieldVsrg.addGuidelines = function(self, object)
 	end
 	local noteskin = self.noteskin
 	local inputs = noteskin.inputsCount
-	for i = 1, inputs do
+	for i = 1, inputs + 1 do
 		local bw = object.w[i]
 		local bh = object.h[i]
+		local by = object.y[i]
+		local bi = object.image[i]
 
-		if bw ~= 0 and bh ~= 0 then
+		if bw and bh and by and bi and bw ~= 0 and bh ~= 0 then
 			local x
 			if bw > 0 then
 				if i <= inputs then
@@ -382,11 +384,11 @@ PlayfieldVsrg.addGuidelines = function(self, object)
 			local view = {
 				class = "ImageView",
 				x = x,
-				y = object.y[i],
-				w = object.w[i],
-				h = object.h[i],
+				y = by,
+				w = bw,
+				h = bh,
 				transform = object.transform,
-				image = object.image[i],
+				image = bi,
 			}
 			self:add(view)
 		end
