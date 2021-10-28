@@ -51,6 +51,7 @@ OsuNoteSkin.load = function(self)
 
 	local textures = {}
 	local images = {}
+	local blendModes = {}
 	local defaultNoteImages = self:getDefaultNoteImages()
 	for _, data in ipairs(defaultNoteImages) do
 		local key, value = unpack(data)
@@ -63,8 +64,56 @@ OsuNoteSkin.load = function(self)
 			images[key] = {key}
 		end
 	end
+	local lightingN, rangeN = self:findAnimation(mania.LightingN)
+	if not lightingN then
+		lightingN, rangeN = self:findAnimation("LightingN")
+	end
+	if lightingN then
+		if rangeN then
+			table.insert(textures, {lightingN = {lightingN, rangeN}})
+		else
+			table.insert(textures, {lightingN = lightingN})
+		end
+		images.lightingN = {"lightingN"}
+		blendModes.lightingN = {"add", "alphamultiply"}
+	end
+	local lightingL, rangeL = self:findAnimation(mania.LightingL)
+	if not lightingL then
+		lightingL, rangeL = self:findAnimation("LightingL")
+	end
+	if lightingL then
+		if rangeL then
+			table.insert(textures, {lightingL = {lightingL, rangeL}})
+		else
+			table.insert(textures, {lightingL = lightingL})
+		end
+		images.lightingL = {"lightingL"}
+		blendModes.lightingL = {"add", "alphamultiply"}
+	end
 	self:setTextures(textures)
 	self:setImages(images)
+	self:setBlendModes(blendModes)
+
+	local rate = tonumber(mania.LightFramePerSecond) or 30
+	if lightingN then
+		self:setLighting({
+			image = "lightingN",
+			scale = 480 / 1080,
+			rate = rate,
+			range = rangeN,
+			offset = 0,
+		})
+	end
+	if lightingL then
+		self:setLighting({
+			image = "lightingL",
+			scale = 480 / 1080,
+			rate = rate,
+			range = rangeL,
+			offset = 0,
+			long = true,
+		})
+	end
 
 	local shead = {}
 	for i = 1, keysCount do
@@ -151,6 +200,7 @@ OsuNoteSkin.load = function(self)
 		pressed = pressed,
 		released = released,
 	})
+	playfield:addLightings()
 	playfield:disableCamera()
 
 	self:addJudgements()

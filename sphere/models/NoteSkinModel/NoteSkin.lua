@@ -7,6 +7,7 @@ NoteSkin.construct = function(self)
 	self.inputs = {}
 	self.textures = {}
 	self.images = {}
+	self.blendModes = {}
 end
 
 NoteSkin.check = function(self, note)
@@ -48,6 +49,10 @@ NoteSkin.setImages = function(self, images)
 		image[1] = map[image[1]]
 	end
 	self.images = images
+end
+
+NoteSkin.setBlendModes = function(self, blendModes)
+	self.blendModes = blendModes
 end
 
 NoteSkin.getDimensions = function(self, imageName)

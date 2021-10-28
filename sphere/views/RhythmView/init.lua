@@ -84,9 +84,19 @@ RhythmView.draw = function(self)
 	love.graphics.replaceTransform(tf)
 	tf:release()
 
+	local noteSkin = self.gameController.rhythmModel.graphicEngine.noteSkin
+	local blendModes = noteSkin.blendModes
 	for _, spriteBatch in ipairs(state.spriteBatches) do
+		local key = state.spriteBatches[spriteBatch]
+		local blendMode = blendModes[key]
+		if blendMode then
+			love.graphics.setBlendMode(blendMode[1], blendMode[2])
+		end
 		love.graphics.draw(spriteBatch)
 		spriteBatch:clear()
+		if blendMode then
+			love.graphics.setBlendMode("alpha")
+		end
 	end
 end
 
@@ -103,6 +113,7 @@ RhythmView.loadTexture = function(self, key, path)
 	spriteBatches[key] = spriteBatches[key] or {}
 	spriteBatches[key][path] = spriteBatch
 	table.insert(spriteBatches, spriteBatch)
+	spriteBatches[spriteBatch] = key
 end
 
 RhythmView.loadImages = function(self)

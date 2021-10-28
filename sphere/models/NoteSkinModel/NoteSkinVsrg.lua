@@ -90,6 +90,9 @@ NoteSkinVsrg.color = function(timeState, noteView)
 end
 
 local function getFrame(a, deltaTime)
+	if not a.range then
+		return
+	end
 	return math.floor(deltaTime * a.rate) % a.frames * (a.range[2] - a.range[1]) / (a.frames - 1) + a.range[1]
 end
 
@@ -304,7 +307,11 @@ NoteSkinVsrg.addMeasureLine = function(self, params)
 end
 
 NoteSkinVsrg.setLighting = function(self, params)
-	params.frames = math.abs(params.range[2] - params.range[1]) + 1
+	if params.range then
+		params.frames = math.abs(params.range[2] - params.range[1]) + 1
+	else
+		params.frames = 1
+	end
 	local note = {Head = {
 		x = function(_, _, column) return self.columns[column] + self.width[column] / 2 end,
 		y = self.hitposition + params.offset,
