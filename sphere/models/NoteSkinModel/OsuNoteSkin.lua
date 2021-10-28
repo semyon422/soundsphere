@@ -1,5 +1,6 @@
 local NoteSkinVsrg = require("sphere.models.NoteSkinModel.NoteSkinVsrg")
 local PlayfieldVsrg = require("sphere.models.NoteSkinModel.PlayfieldVsrg")
+local BasePlayfield = require("sphere.models.NoteSkinModel.BasePlayfield")
 
 local OsuNoteSkin = NoteSkinVsrg:new()
 
@@ -153,6 +154,7 @@ OsuNoteSkin.load = function(self)
 	playfield:disableCamera()
 
 	self:addJudgements()
+	BasePlayfield.addBaseHitError(playfield)
 end
 
 local getNoteType = function(key, keymode)
