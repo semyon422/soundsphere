@@ -3,6 +3,7 @@ local NoteSkin = require("sphere.models.NoteSkinModel.NoteSkin")
 local NoteSkinVsrg = NoteSkin:new()
 
 NoteSkinVsrg.setColumns = function(self, columns)
+	self.columns = columns
 	local inputsCount = self.inputsCount
 
 	assert(#columns.width == inputsCount, "Table columns.width should contain " .. inputsCount .. " values")

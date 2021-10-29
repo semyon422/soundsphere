@@ -35,13 +35,15 @@ end
 PlayfieldVsrg.newLaneCenterTransform = function(self, height)
 	local noteskin = self.noteskin
 	local align = noteskin.align
+	local offset = noteskin.baseOffset or 0
+	local unit = noteskin.unit or 1
 	local transform = {0, 0, 0, {0, 1 / height}, {0, 1 / height}, 0, 0, 0, 0}
 	if align == "center" then
-		transform[1] = {1 / 2, 0}
+		transform[1] = {1 / 2, offset / unit}
 	elseif align == "right" then
-		transform[1] = {1, -noteskin.fullWidth / noteskin.unit / 2}
+		transform[1] = {1, -noteskin.fullWidth / unit / 2 + offset / unit}
 	elseif align == "left" then
-		transform[1] = {0, noteskin.fullWidth / noteskin.unit / 2}
+		transform[1] = {0, noteskin.fullWidth / unit / 2 + offset / unit}
 	end
 	return transform
 end

@@ -43,8 +43,8 @@ OsuNoteSkin.load = function(self)
 		end
 	end
 	self:setColumns({
-		offset = 0,
-		align = "center",
+		offset = tonumber(mania.ColumnStart) or 136,
+		align = "left",
 		width = toarray(mania.ColumnWidth),
 		space = space,
 	})
@@ -279,7 +279,7 @@ OsuNoteSkin.addJudgements = function(self)
 	self.playField:addJudgement({
 		x = 0, y = position, ox = 0.5, oy = 0.5,
 		scale = 480 / 768,
-		transform = self.playField:newNoteskinTransform(),
+		transform = self.playField:newLaneCenterTransform(480),
 		key = "osuOD" .. od,
 		judgements = judgements,
 	})
@@ -311,7 +311,7 @@ OsuNoteSkin.addCombo = function(self)
 	local files = self:findCharFiles(fonts.ComboPrefix or "score")
 	self.playField:addCombo({
 		class = "ImageValueView",
-		transform = self.playField:newNoteskinTransform(),
+		transform = self.playField:newLaneCenterTransform(480),
 		x = 0,
 		y = tonumber(self.mania.ComboPosition) or 240,
 		oy = 0.5,
@@ -327,11 +327,10 @@ OsuNoteSkin.addScore = function(self)
 	local files = self:findCharFiles(fonts.ScorePrefix or "score")
 	self.playField:addScore({
 		class = "ImageValueView",
-		transform = self.playField:newTransform(640, 480, "right"),
-		x = 640,
+		transform = self.playField:newTransform(1024, 768, "right"),
+		x = 1024,
 		y = 0,
 		align = "right",
-		scale = 480 / 768,
 		overlap = tonumber(fonts.ScoreOverlap) or 0,
 		files = files,
 	})
