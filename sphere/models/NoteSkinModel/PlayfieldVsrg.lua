@@ -120,28 +120,31 @@ end
 
 PlayfieldVsrg.addScore = function(self, object)
 	object = object or {}
+	object.class = object.class or "ValueView"
 	object.key = "gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.score"
 	object.format = "%0.2f"
 	object.multiplier = 1000
 	object.color = object.color or {1, 1, 1, 1}
-	self:addValueView(object)
+	self:add(object)
 end
 
 PlayfieldVsrg.addAccuracy = function(self, object)
 	object = object or {}
+	object.class = object.class or "ValueView"
 	object.key = "gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.accuracy"
 	object.format = "%0.2f"
 	object.multiplier = 1000
 	object.color = object.color or {1, 1, 1, 1}
-	self:addValueView(object)
+	self:add(object)
 end
 
 PlayfieldVsrg.addCombo = function(self, object)
 	object = object or {}
+	object.class = object.class or "ValueView"
 	object.key = "gameController.rhythmModel.scoreEngine.scoreSystem.base.combo"
 	object.format = "%d"
 	object.color = object.color or {1, 1, 1, 1}
-	self:addValueView(object)
+	self:add(object)
 end
 
 PlayfieldVsrg.addJudgement = function(self, object)

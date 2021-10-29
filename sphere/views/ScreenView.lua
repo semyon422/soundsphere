@@ -16,6 +16,7 @@ local ImageView = require(viewspackage .. "ImageView")
 local CameraView = require(viewspackage .. "CameraView")
 local GaussianBlurView = require(viewspackage .. "GaussianBlurView")
 local ImageAnimationView = require(viewspackage .. "ImageAnimationView")
+local ImageValueView = require(viewspackage .. "ImageValueView")
 
 local ScreenView = Class:new()
 
@@ -33,6 +34,7 @@ ScreenView.views = {
 	{"cameraView", CameraView, "CameraView"},
 	{"gaussianBlurView", GaussianBlurView, "GaussianBlurView"},
 	{"imageAnimationView", ImageAnimationView, "ImageAnimationView"},
+	{"imageValueView", ImageValueView, "ImageValueView"},
 }
 
 ScreenView.construct = function(self)

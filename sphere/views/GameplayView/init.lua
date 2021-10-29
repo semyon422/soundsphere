@@ -38,6 +38,7 @@ GameplayView.load = function(self)
 	local noteSkin = self.gameController.rhythmModel.graphicEngine.noteSkin
 	self.imageAnimationView.root = noteSkin.directoryPath
 	self.imageView.root = noteSkin.directoryPath
+	self.imageValueView.root = noteSkin.directoryPath
 	self:loadViews(ScreenView.views)
 	self:loadViews(self.views)
 	for i, config in ipairs(self.viewConfig) do

@@ -201,6 +201,9 @@ OsuNoteSkin.load = function(self)
 		released = released,
 	})
 	playfield:addLightings()
+
+	self:addCombo()
+
 	playfield:disableCamera()
 
 	self:addJudgements()
@@ -250,6 +253,7 @@ OsuNoteSkin.addJudgements = function(self)
 	local mania = self.mania
 	local rate = tonumber(mania.AnimationFramerate) or -1
 	local od = tonumber(mania.OverallDifficulty) or 5
+	local position = tonumber(mania.ScorePosition) or 240
 
 	local judgements = {}
 	for i, jd in ipairs(defaultJudgements) do
@@ -271,10 +275,51 @@ OsuNoteSkin.addJudgements = function(self)
 		end
 	end
 	self.playField:addJudgement({
-		x = 0, y = self.hitposition, ox = 0.5, oy = 0.5,
-		transform = self.playField:newLaneCenterTransform(1080),
+		x = 0, y = position, ox = 0.5, oy = 0.5,
+		scale = 480 / 768,
+		transform = self.playField:newNoteskinTransform(),
 		key = "osuOD" .. od,
 		judgements = judgements,
+	})
+end
+
+local chars = {
+	comma = ",",
+	dot = ".",
+	percent = "%",
+}
+OsuNoteSkin.addCombo = function(self)
+	local fonts = self.skinini.Fonts
+
+	local prefix = fonts.ComboPrefix or "score"
+	local overlap = tonumber(fonts.ComboOverlap) or 0
+	local position = tonumber(self.mania.ComboPosition) or 240
+
+	-- print(prefix, overlap)
+
+	local files = {}
+
+	prefix = prefix:gsub("\\", "/"):lower()
+	for _, file in pairs(self.files) do
+		if file:lower():find(prefix, 1, true) == 1 then
+			local rest = file:sub(#prefix + 1)
+			if rest:find("^-[^%.]+%.[^%.]+$") then
+				local char = rest:match("^-([^%.]+)%.[^%.]+$")
+				char = chars[char] or char
+				files[char] = file
+			end
+		end
+	end
+	-- print(require("inspect")(files))
+
+	self.playField:addCombo({
+		class = "ImageValueView",
+		transform = self.playField:newNoteskinTransform(),
+		x = 0,
+		y = position,
+		scale = 480 / 768,
+		overlap = overlap,
+		files = files,
 	})
 end
 
@@ -331,11 +376,12 @@ OsuNoteSkin.findAnimation = function(self, value)
 	value = value:gsub("\\", "/"):lower()
 	local frames = {}
 	local path
+	local singlePath
 	for _, file in pairs(self.files) do
 		if file:lower():find(value, 1, true) == 1 then
 			local rest = file:sub(#value + 1)
 			if rest:find("^%.[^%.]+$") then
-				return file
+				singlePath = file
 			end
 			if rest:find("^-%d+%.[^%.]+$") then
 				local frame, format = rest:match("^-(%d+)%.([^%.]+)$")
@@ -347,7 +393,7 @@ OsuNoteSkin.findAnimation = function(self, value)
 		end
 	end
 	if #frames == 0 then
-		return
+		return singlePath
 	end
 	table.sort(frames)
 	local startFrame = frames[1]
