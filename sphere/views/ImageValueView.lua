@@ -15,24 +15,26 @@ ImageValueView.load = function(self)
 	state.images = images
 end
 
-ImageValueView.getWidth = function(self, value)
+ImageValueView.getDimensions = function(self, value)
 	local config = self.config
 	local state = self.state
 	local images = state.images
 	local overlap = config.overlap or 0
 
 	local width = 0
+	local height = 0
 	for i = 1, #value do
 		local char = value:sub(i, i)
 		local image = images[char]
 		if image then
 			width = width + image:getWidth() - overlap
+			height = math.max(height, image:getHeight())
 		end
 	end
 	if width > 0 then
 		width = width + overlap
 	end
-	return width
+	return width, height
 end
 
 ImageValueView.draw = function(self)
@@ -66,15 +68,22 @@ ImageValueView.draw = function(self)
 
 	local sx = config.scale or config.sx or 1
 	local sy = config.scale or config.sy or 1
+	local oy = config.oy or 0
+	local align = config.align
 
-	local width = self:getWidth(value) * sx
+	local width, height = self:getDimensions(value)
 
-	local x = config.x - width / 2
+	local x = config.x
+	if align == "center" then
+		x = x - width / 2 * sx
+	elseif align == "right" then
+		x = x - width * sx
+	end
 	for i = 1, #value do
 		local char = value:sub(i, i)
 		local image = images[char]
 		if image then
-			love.graphics.draw(image, x, config.y - image:getHeight() / 2 * sy, 0, sx, sy)
+			love.graphics.draw(image, x, config.y + (height * (1 - oy) - image:getHeight()) * sy, 0, sx, sy)
 			x = x + (image:getWidth() - overlap) * sx
 		end
 	end

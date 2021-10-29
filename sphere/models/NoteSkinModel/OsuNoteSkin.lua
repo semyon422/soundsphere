@@ -203,6 +203,8 @@ OsuNoteSkin.load = function(self)
 	playfield:addLightings()
 
 	self:addCombo()
+	self:addScore()
+	-- self:addAccuracy()
 
 	playfield:disableCamera()
 
@@ -288,17 +290,8 @@ local chars = {
 	dot = ".",
 	percent = "%",
 }
-OsuNoteSkin.addCombo = function(self)
-	local fonts = self.skinini.Fonts
-
-	local prefix = fonts.ComboPrefix or "score"
-	local overlap = tonumber(fonts.ComboOverlap) or 0
-	local position = tonumber(self.mania.ComboPosition) or 240
-
-	-- print(prefix, overlap)
-
+OsuNoteSkin.findCharFiles = function(self, prefix)
 	local files = {}
-
 	prefix = prefix:gsub("\\", "/"):lower()
 	for _, file in pairs(self.files) do
 		if file:lower():find(prefix, 1, true) == 1 then
@@ -310,15 +303,36 @@ OsuNoteSkin.addCombo = function(self)
 			end
 		end
 	end
-	-- print(require("inspect")(files))
+	return files
+end
 
+OsuNoteSkin.addCombo = function(self)
+	local fonts = self.skinini.Fonts
+	local files = self:findCharFiles(fonts.ComboPrefix or "score")
 	self.playField:addCombo({
 		class = "ImageValueView",
 		transform = self.playField:newNoteskinTransform(),
 		x = 0,
-		y = position,
+		y = tonumber(self.mania.ComboPosition) or 240,
+		oy = 0.5,
+		align = "center",
 		scale = 480 / 768,
-		overlap = overlap,
+		overlap = tonumber(fonts.ComboOverlap) or 0,
+		files = files,
+	})
+end
+
+OsuNoteSkin.addScore = function(self)
+	local fonts = self.skinini.Fonts
+	local files = self:findCharFiles(fonts.ScorePrefix or "score")
+	self.playField:addScore({
+		class = "ImageValueView",
+		transform = self.playField:newTransform(640, 480, "right"),
+		x = 640,
+		y = 0,
+		align = "right",
+		scale = 480 / 768,
+		overlap = tonumber(fonts.ScoreOverlap) or 0,
 		files = files,
 	})
 end
