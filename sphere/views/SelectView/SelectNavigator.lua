@@ -47,7 +47,7 @@ SelectNavigator.receive = function(self, event)
 		elseif scancode == "pagedown" then self:scrollCollection("down", 10)
 		elseif scancode == "home" then self:scrollCollection("up", math.huge)
 		elseif scancode == "end" then self:scrollCollection("down", math.huge)
-		elseif scancode == "return" or scancode == "tab" then self:addSubscreen("notecharts")
+		elseif scancode == "return" or scancode == "tab" then self:addSubscreen("notecharts") self:pullNoteChartSet()
 		end
 	end
 end
@@ -60,6 +60,10 @@ end
 
 SelectNavigator.openDirectory = function(self)
 	self:send({name = "openDirectory"})
+end
+
+SelectNavigator.pullNoteChartSet = function(self)
+	self:send({name = "pullNoteChartSet"})
 end
 
 SelectNavigator.updateCache = function(self, force)
