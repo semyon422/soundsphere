@@ -37,7 +37,7 @@ SelectNavigator.receive = function(self, event)
 		elseif scancode == "home" then self:scrollNoteChartSet("up", math.huge)
 		elseif scancode == "end" then self:scrollNoteChartSet("down", math.huge)
 		elseif scancode == "return" then self:play()
-		elseif scancode == "tab" then self:addSubscreen("collections")
+		elseif scancode == "tab" then self:switchToCollections()
 		elseif scancode == "lalt" then self:changeScreen("Result")
 		end
 	elseif collections then
@@ -47,7 +47,7 @@ SelectNavigator.receive = function(self, event)
 		elseif scancode == "pagedown" then self:scrollCollection("down", 10)
 		elseif scancode == "home" then self:scrollCollection("up", math.huge)
 		elseif scancode == "end" then self:scrollCollection("down", math.huge)
-		elseif scancode == "return" or scancode == "tab" then self:addSubscreen("notecharts") self:pullNoteChartSet()
+		elseif scancode == "return" or scancode == "tab" then self:switchToNoteCharts()
 		end
 	end
 end
@@ -56,6 +56,15 @@ SelectNavigator.update = function(self)
 	self:removeLessSubscreens("score", "options")
 	self:removeLessSubscreens("notecharts", "collections")
 	Navigator.update(self)
+end
+
+SelectNavigator.switchToNoteCharts = function(self)
+	self:addSubscreen("notecharts")
+	self:pullNoteChartSet()
+end
+
+SelectNavigator.switchToCollections = function(self)
+	self:addSubscreen("collections")
 end
 
 SelectNavigator.openDirectory = function(self)

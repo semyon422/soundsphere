@@ -612,8 +612,7 @@ local BottomRightNotechartsScreenMenu = {
 	},
 	items = {{
 		{
-			method = "addSubscreen",
-			value = "collections",
+			method = "switchToCollections",
 			displayName = "collections"
 		},
 	}}
@@ -641,8 +640,7 @@ local BottomRightCollectionsScreenMenu = {
 	},
 	items = {{
 		{
-			method = "addSubscreen",
-			value = "notecharts",
+			method = "switchToNoteCharts",
 			displayName = "notecharts"
 		},
 	}}
