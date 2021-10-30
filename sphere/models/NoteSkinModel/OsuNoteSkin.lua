@@ -47,6 +47,7 @@ OsuNoteSkin.load = function(self)
 		align = "left",
 		width = toarray(mania.ColumnWidth),
 		space = space,
+		upscroll = tonumber(mania.UpsideDown) == 1,
 	})
 
 	local textures = {}
@@ -279,6 +280,9 @@ OsuNoteSkin.addJudgements = function(self)
 	local rate = tonumber(mania.AnimationFramerate) or -1
 	local od = tonumber(mania.OverallDifficulty) or 5
 	local position = tonumber(mania.ScorePosition) or 240
+	if self.upscroll then
+		position = 480 - position
+	end
 
 	local judgements = {}
 	for i, jd in ipairs(defaultJudgements) do
@@ -336,11 +340,15 @@ end
 OsuNoteSkin.addCombo = function(self)
 	local fonts = self.skinini.Fonts
 	local files = self:findCharFiles(fonts.ComboPrefix or "score")
+	local position = tonumber(self.mania.ComboPosition) or 240
+	if self.upscroll then
+		position = 480 - position
+	end
 	self.playField:addCombo({
 		class = "ImageValueView",
 		transform = self.playField:newLaneCenterTransform(480),
 		x = 0,
-		y = tonumber(self.mania.ComboPosition) or 240,
+		y = position,
 		oy = 0.5,
 		align = "center",
 		scale = 480 / 768,
