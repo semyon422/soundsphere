@@ -208,7 +208,11 @@ OsuNoteSkin.load = function(self)
 		color = guidelinesColor,
 	})
 
-	playfield:addNotes()
+	local keysUnderNotes = tonumber(mania.KeysUnderNotes) == 1
+
+	if not keysUnderNotes then
+		playfield:addNotes()
+	end
 
 	local pressed, released = self:getDefaultKeyImages()
 	for i = 1, keysCount do
@@ -222,6 +226,11 @@ OsuNoteSkin.load = function(self)
 		pressed = pressed,
 		released = released,
 	})
+
+	if keysUnderNotes then
+		playfield:addNotes()
+	end
+
 	playfield:addLightings()
 
 	self:addCombo()
