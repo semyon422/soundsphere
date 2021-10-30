@@ -1,6 +1,7 @@
 local Class = require("aqua.util.Class")
 local ThreadPool	= require("aqua.thread.ThreadPool")
 local aquaimage			= require("aqua.image")
+local newPixel = require("aqua.graphics.newPixel")
 local tween				= require("tween")
 
 local BackgroundModel = Class:new()
@@ -16,9 +17,7 @@ BackgroundModel.load = function(self)
 	self.noteChartDataEntryId = 0
 	self.backgroundPath = ""
 
-	self.emptyImageData = love.image.newImageData(1, 1)
-	self.emptyImageData:setPixel(0, 0, 0.25, 0.25, 0.25, 1)
-	self.emptyImage = love.graphics.newImage(self.emptyImageData)
+	self.emptyImage = newPixel(0.25, 0.25, 0.25, 1)
 	self.images = {
 		self.emptyImage
 	}
