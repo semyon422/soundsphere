@@ -368,9 +368,8 @@ PlayfieldVsrg.addGuidelines = function(self, object)
 		local bw = object.w[i]
 		local bh = object.h[i]
 		local by = object.y[i]
-		local bi = object.image[i]
 
-		if bw and bh and by and bi and bw ~= 0 and bh ~= 0 then
+		if bw and bh and by and bw ~= 0 and bh ~= 0 then
 			local x
 			if bw > 0 then
 				if i <= inputs then
@@ -386,6 +385,11 @@ PlayfieldVsrg.addGuidelines = function(self, object)
 				end
 			end
 
+			local color = object.color[i]
+			if type(object.color[1]) == "number" then
+				color = object.color
+			end
+
 			local view = {
 				class = "ImageView",
 				x = x,
@@ -393,7 +397,8 @@ PlayfieldVsrg.addGuidelines = function(self, object)
 				w = bw,
 				h = bh,
 				transform = object.transform,
-				image = bi,
+				image = object.image[i],
+				color = color,
 			}
 			self:add(view)
 		end

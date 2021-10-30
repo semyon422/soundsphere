@@ -186,6 +186,27 @@ OsuNoteSkin.load = function(self)
 
 	self:addStages()
 
+	local guidelines = toarray(mania.ColumnLineWidth)
+	local guidelinesHeight = {}
+	local guidelinesY = {}
+	for i = 1, keysCount + 1 do
+		guidelines[i] = (guidelines[i] or 2) * 480 / 768
+		guidelinesHeight[i] = self.hitposition
+		guidelinesY[i] = 0
+	end
+	local guidelinesColor = toarray(mania.ColourColumnLine)
+	local defaultColor = {1, 1, 1, 1}
+	for i = 1, 4 do
+		guidelinesColor[i] = guidelinesColor[i] and guidelinesColor[i] / 255 or defaultColor[i]
+	end
+	playfield:addGuidelines({
+		y = guidelinesY,
+		w = guidelines,
+		h = guidelinesHeight,
+		image = {},
+		color = guidelinesColor,
+	})
+
 	playfield:addNotes()
 
 	local pressed, released = self:getDefaultKeyImages()

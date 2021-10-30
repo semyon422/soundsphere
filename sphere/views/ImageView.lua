@@ -1,5 +1,6 @@
 
 local transform = require("aqua.graphics.transform")
+local newPixel = require("aqua.graphics.newPixel")
 local Class = require("aqua.util.Class")
 
 local ImageView = Class:new()
@@ -10,7 +11,11 @@ ImageView.load = function(self)
 	local config = self.config
 	local state = self.state
 
-	state.image = love.graphics.newImage(self.root .. "/" .. config.image)
+	if config.image then
+		state.image = love.graphics.newImage(self.root .. "/" .. config.image)
+	else
+		state.image = newPixel()
+	end
 	state.imageWidth = state.image:getWidth()
 	state.imageHeight = state.image:getHeight()
 end
@@ -31,7 +36,11 @@ ImageView.draw = function(self)
 	love.graphics.replaceTransform(tf)
 	tf:release()
 
-	love.graphics.setColor(1, 1, 1, 1)
+	if config.color then
+		love.graphics.setColor(config.color)
+	else
+		love.graphics.setColor(1, 1, 1, 1)
+	end
     love.graphics.draw(
         state.image,
 		config.x,
