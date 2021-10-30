@@ -33,6 +33,7 @@ NoteSkinVsrg.setColumns = function(self, columns)
 		offset = columns.offset - fullWidth / 2
 	end
 	self.baseOffset = offset
+	self.columnsOffset = columns.offset
 
 	local x = {}
 	for i = 1, #columns.width do

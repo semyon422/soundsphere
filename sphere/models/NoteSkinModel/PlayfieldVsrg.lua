@@ -35,7 +35,7 @@ end
 PlayfieldVsrg.newLaneCenterTransform = function(self, height)
 	local noteskin = self.noteskin
 	local align = noteskin.align
-	local offset = noteskin.baseOffset or 0
+	local offset = noteskin.columnsOffset or 0
 	local unit = noteskin.unit or 1
 	local transform = {0, 0, 0, {0, 1 / height}, {0, 1 / height}, 0, 0, 0, 0}
 	if align == "center" then
