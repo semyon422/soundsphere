@@ -231,6 +231,8 @@ OsuNoteSkin.load = function(self)
 
 	self:addJudgements()
 	BasePlayfield.addBaseHitError(playfield)
+	BasePlayfield.addBaseProgressBar(playfield)
+	BasePlayfield.addBaseHpBar(playfield)
 end
 
 local getNoteType = function(key, keymode)
