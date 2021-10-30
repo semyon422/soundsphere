@@ -95,11 +95,20 @@ OsuNoteSkin.load = function(self)
 	self:setImages(images)
 	self:setBlendModes(blendModes)
 
+	local lightingNWidth = toarray(mania.LightingNWidth)
+	local lightingLWidth = toarray(mania.LightingLWidth)
+	local lightingNScale = {}
+	local lightingLScale = {}
+	for i = 1, keysCount do
+		lightingNScale[i] = (lightingNWidth[i] and lightingNWidth[i] > 0 or self.width[i]) / 30 * 480 / 768
+		lightingLScale[i] = (lightingLWidth[i] and lightingLWidth[i] > 0 or self.width[i]) / 30 * 480 / 768
+	end
+
 	local rate = tonumber(mania.LightFramePerSecond) or 30
 	if lightingN then
 		self:setLighting({
 			image = "lightingN",
-			scale = 480 / 1080,
+			scale = lightingNScale,
 			rate = rate,
 			range = rangeN,
 			offset = 0,
@@ -108,7 +117,7 @@ OsuNoteSkin.load = function(self)
 	if lightingL then
 		self:setLighting({
 			image = "lightingL",
-			scale = 480 / 1080,
+			scale = lightingLScale,
 			rate = rate,
 			range = rangeL,
 			offset = 0,
@@ -322,7 +331,9 @@ OsuNoteSkin.addJudgements = function(self)
 end
 
 local deleteDpiScale = function(s)
-	return s:gsub("@%dx", "")
+	local dpi = s:match("(@%d+x)")
+	local noDpi = s:gsub("@%d+x", "")
+	return noDpi, dpi
 end
 
 local chars = {
@@ -446,7 +457,7 @@ OsuNoteSkin.findImage = function(self, value)
 	for _, file in pairs(self.files) do
 		if file:lower():find(value, 1, true) == 1 then
 			local rest = file:sub(#value + 1)
-			if rest:find("^%.[^%.]+$") or rest:find("^-0%.[^%.]+$") then
+			if rest:find("^%.[^%.]+$") or rest:find("^-0[^%.]*%.[^%.]+$") then
 				local format = rest:match("^.*%.([^%.]+)$")
 				if supportedImageFormats[format] then
 					return file
@@ -467,19 +478,23 @@ OsuNoteSkin.findAnimation = function(self, value)
 	for _, file in pairs(self.files) do
 		if file:lower():find(value, 1, true) == 1 then
 			local rest = file:sub(#value + 1)
-			if rest:find("^%.[^%.]+$") then
+			if rest:find("^%.[^%.]+$") or rest:find("^@%d+x%.[^%.]+$") then
 				local format = rest:match("^%.([^%.]+)$")
 				if supportedImageFormats[format] then
 					singlePath = file
 				end
 			end
-			if rest:find("^-%d+%.[^%.]+$") then
-				local frame, format = rest:match("^-(%d+)%.([^%.]+)$")
-				frame = deleteDpiScale(frame)
+			if rest:find("^-%d+%.[^%.]+$") or rest:find("^-%d+@%d+x%.[^%.]+$") then
+				local frame, format = rest:match("^-([^%.]+)%.([^%.]+)$")
+				local frame, dpi = deleteDpiScale(frame)
 				if supportedImageFormats[format] then
 					table.insert(frames, tonumber(frame))
 					if not path then
-						path = value .. "-%d." .. format
+						if not dpi then
+							path = value .. "-%d." .. format
+						else
+							path = value .. "-%d" .. dpi .. "." .. format
+						end
 					end
 				end
 			end
