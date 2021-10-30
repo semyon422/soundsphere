@@ -131,6 +131,7 @@ end
 
 SequenceView.draw = function(self)
 	for view in self:getViewIterator() do
+		if view.config.beforeDraw then view.config.beforeDraw(view) end
 		if view.draw then view:draw() end
 	end
 end

@@ -72,6 +72,8 @@ ImageValueView.draw = function(self)
 	local align = config.align
 
 	local width, height = self:getDimensions(value)
+	config.width = width
+	config.height = height
 
 	local x = config.x
 	if align == "center" then

@@ -124,7 +124,7 @@ PlayfieldVsrg.addScore = function(self, object)
 	object = object or {}
 	object.class = object.class or "ValueView"
 	object.key = "gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.score"
-	object.format = "%0.2f"
+	object.format = object.format or "%0.2f"
 	object.multiplier = 1000
 	object.color = object.color or {1, 1, 1, 1}
 	self:add(object)
@@ -134,7 +134,7 @@ PlayfieldVsrg.addAccuracy = function(self, object)
 	object = object or {}
 	object.class = object.class or "ValueView"
 	object.key = "gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.accuracy"
-	object.format = "%0.2f"
+	object.format = object.format or "%0.2f"
 	object.multiplier = 1000
 	object.color = object.color or {1, 1, 1, 1}
 	self:add(object)
@@ -144,7 +144,7 @@ PlayfieldVsrg.addCombo = function(self, object)
 	object = object or {}
 	object.class = object.class or "ValueView"
 	object.key = "gameController.rhythmModel.scoreEngine.scoreSystem.base.combo"
-	object.format = "%d"
+	object.format = object.format or "%d"
 	object.color = object.color or {1, 1, 1, 1}
 	self:add(object)
 end

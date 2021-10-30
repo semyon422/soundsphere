@@ -225,7 +225,7 @@ OsuNoteSkin.load = function(self)
 
 	self:addCombo()
 	self:addScore()
-	-- self:addAccuracy()
+	self:addAccuracy()
 
 	playfield:disableCamera()
 
@@ -350,7 +350,7 @@ end
 OsuNoteSkin.addScore = function(self)
 	local fonts = self.skinini.Fonts
 	local files = self:findCharFiles(fonts.ScorePrefix or "score")
-	self.playField:addScore({
+	self.scoreConfig = {
 		class = "ImageValueView",
 		transform = self.playField:newTransform(1024, 768, "right"),
 		x = 1024,
@@ -358,6 +358,27 @@ OsuNoteSkin.addScore = function(self)
 		align = "right",
 		overlap = tonumber(fonts.ScoreOverlap) or 0,
 		files = files,
+	}
+	self.playField:addScore(self.scoreConfig)
+end
+
+OsuNoteSkin.addAccuracy = function(self)
+	local fonts = self.skinini.Fonts
+	local files = self:findCharFiles(fonts.ScorePrefix or "score")
+	local scoreConfig = self.scoreConfig
+	self.playField:addAccuracy({
+		class = "ImageValueView",
+		transform = self.playField:newTransform(1024, 768, "right"),
+		x = 1024,
+		y = 0,
+		scale = 0.6,
+		align = "right",
+		format = "%0.2f%%",
+		overlap = tonumber(fonts.ScoreOverlap) or 0,
+		files = files,
+		beforeDraw = function(self)
+			self.config.y = scoreConfig.height
+		end
 	})
 end
 
