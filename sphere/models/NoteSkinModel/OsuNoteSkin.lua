@@ -285,6 +285,10 @@ OsuNoteSkin.addJudgements = function(self)
 	})
 end
 
+local deleteDpiScale = function(s)
+	return s:gsub("@%dx", "")
+end
+
 local chars = {
 	comma = ",",
 	dot = ".",
@@ -297,7 +301,7 @@ OsuNoteSkin.findCharFiles = function(self, prefix)
 		if file:lower():find(prefix, 1, true) == 1 then
 			local rest = file:sub(#prefix + 1)
 			if rest:find("^-[^%.]+%.[^%.]+$") then
-				local char = rest:match("^-([^%.]+)%.[^%.]+$")
+				local char = deleteDpiScale(rest:match("^-([^%.]+)%.[^%.]+$"))
 				char = chars[char] or char
 				files[char] = file
 			end
@@ -367,6 +371,12 @@ OsuNoteSkin.getDefaultKeyImages = function(self)
 	return pressed, released
 end
 
+local supportedImageFormats = {
+	"png", "bmp", "tga", "jpg", "jpeg"
+}
+for _, format in ipairs(supportedImageFormats) do
+	supportedImageFormats[format] = true
+end
 OsuNoteSkin.findImage = function(self, value)
 	if not value then
 		return
@@ -376,7 +386,10 @@ OsuNoteSkin.findImage = function(self, value)
 		if file:lower():find(value, 1, true) == 1 then
 			local rest = file:sub(#value + 1)
 			if rest:find("^%.[^%.]+$") or rest:find("^-0%.[^%.]+$") then
-				return file
+				local format = rest:match("^.*%.([^%.]+)$")
+				if supportedImageFormats[format] then
+					return file
+				end
 			end
 		end
 	end
@@ -394,13 +407,19 @@ OsuNoteSkin.findAnimation = function(self, value)
 		if file:lower():find(value, 1, true) == 1 then
 			local rest = file:sub(#value + 1)
 			if rest:find("^%.[^%.]+$") then
-				singlePath = file
+				local format = rest:match("^%.([^%.]+)$")
+				if supportedImageFormats[format] then
+					singlePath = file
+				end
 			end
 			if rest:find("^-%d+%.[^%.]+$") then
 				local frame, format = rest:match("^-(%d+)%.([^%.]+)$")
-				table.insert(frames, tonumber(frame))
-				if not path then
-					path = value .. "-%d." .. format
+				frame = deleteDpiScale(frame)
+				if supportedImageFormats[format] then
+					table.insert(frames, tonumber(frame))
+					if not path then
+						path = value .. "-%d." .. format
+					end
 				end
 			end
 		end
