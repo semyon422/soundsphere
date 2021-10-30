@@ -96,6 +96,7 @@ GameplayController.load = function(self)
 
 	rhythmModel.observable:add(view)
 	love.mouse.setVisible(false)
+	self.drawing = true
 end
 
 GameplayController.getImporterSettings = function(self)
@@ -122,7 +123,9 @@ GameplayController.update = function(self, dt)
 end
 
 GameplayController.draw = function(self)
-	self.view:draw()
+	if self.drawing then
+		self.view:draw()
+	end
 end
 
 GameplayController.discordPlay = function(self)
@@ -183,6 +186,7 @@ GameplayController.receive = function(self, event)
 		perspective.pitch = event.pitch
 		perspective.yaw = event.yaw
 	elseif event.name == "quit" then
+		self.drawing = false
 		self.gameController.discordModel:setPresence({})
 		self:skip()
 		self:saveScore()
