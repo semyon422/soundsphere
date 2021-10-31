@@ -15,17 +15,48 @@ local toarray = function(s)
 	return array
 end
 
+local fromDefault = function(t, default)
+	for i, v in ipairs(default) do
+		t[i] = t[i] or v
+	end
+	return t
+end
+
+local fixColor = function(t)
+	for i, v in ipairs(t) do
+		t[i] = t[i] / 255
+	end
+	return t
+end
+
 OsuNoteSkin.load = function(self)
 	local skinini = self.skinini
-	local mania = self.mania
 
+	local mania = self.mania
 	local keysCount = tonumber(mania.Keys)
+	local defaultMania = self:getDefaultManiaSection(keysCount)
+
+	for k, default in pairs(defaultMania) do
+		local v = mania[k]
+		if not v then
+			mania[k] = default
+		elseif type(default) == "table" then
+			local arr = toarray(v)
+			if k:find("Colour") then
+				fixColor(arr)
+			end
+			mania[k] = fromDefault(arr, default)
+		elseif type(default) == "number" then
+			mania[k] = tonumber(mania[k]) or default
+		end
+	end
+	self:fixManiaValues()
 
 	self.name = skinini.General.Name
 	self.playField = {}
 	self.range = {-1, 1}
 	self.unit = 480
-	self.hitposition = tonumber(mania.HitPosition)
+	self.hitposition = mania.HitPosition
 
 	local keys = {}
 	for i = 1, keysCount do
@@ -33,7 +64,7 @@ OsuNoteSkin.load = function(self)
 	end
 	self:setInput(keys)
 
-	local space = toarray(mania.ColumnSpacing)
+	local space = mania.ColumnSpacing
 	if #space == keysCount - 1 then
 		table.insert(space, 1, 0)
 		table.insert(space, 0)
@@ -43,11 +74,11 @@ OsuNoteSkin.load = function(self)
 		end
 	end
 	self:setColumns({
-		offset = tonumber(mania.ColumnStart) or 136,
+		offset = mania.ColumnStart,
 		align = "left",
-		width = toarray(mania.ColumnWidth),
+		width = mania.ColumnWidth,
 		space = space,
-		upscroll = tonumber(mania.UpsideDown) == 1,
+		upscroll = mania.UpsideDown == 1,
 	})
 
 	local textures = {}
@@ -95,16 +126,16 @@ OsuNoteSkin.load = function(self)
 	self:setImages(images)
 	self:setBlendModes(blendModes)
 
-	local lightingNWidth = toarray(mania.LightingNWidth)
-	local lightingLWidth = toarray(mania.LightingLWidth)
+	local lightingNWidth = mania.LightingNWidth
+	local lightingLWidth = mania.LightingLWidth
 	local lightingNScale = {}
 	local lightingLScale = {}
 	for i = 1, keysCount do
-		lightingNScale[i] = (lightingNWidth[i] and lightingNWidth[i] > 0 or self.width[i]) / 30 * 480 / 768
-		lightingLScale[i] = (lightingLWidth[i] and lightingLWidth[i] > 0 or self.width[i]) / 30 * 480 / 768
+		lightingNScale[i] = (lightingNWidth[i] > 0 and lightingNWidth[i] or self.width[i]) / 30 * 480 / 768
+		lightingLScale[i] = (lightingLWidth[i] > 0 and lightingLWidth[i] or self.width[i]) / 30 * 480 / 768
 	end
 
-	local rate = tonumber(mania.LightFramePerSecond) or 30
+	local rate = mania.LightFramePerSecond
 	if lightingN then
 		self:setLighting({
 			image = "lightingN",
@@ -153,7 +184,7 @@ OsuNoteSkin.load = function(self)
 		tail = ltail,
 	})
 	for i = 1, keysCount do
-		local wfnhs = tonumber(mania.WidthForNoteHeightScale)
+		local wfnhs = mania.WidthForNoteHeightScale
 		local width = wfnhs and wfnhs ~= 0 and wfnhs or self.width[i]
 		self.notes.ShortNote.Head.h[i] = function()
 			local w, h = self:getDimensions(shead[i])
@@ -181,14 +212,8 @@ OsuNoteSkin.load = function(self)
 	playfield:enableCamera()
 
 	local colors = {}
-	local defaultColor = {0, 0, 0, 1}
 	for i = 1, keysCount do
-		local key = "Colour" .. i
-		local value = toarray(mania[key])
-		for j = 1, 4 do
-			value[j] = value[j] and value[j] / 255 or defaultColor[j]
-		end
-		colors[i] = value
+		colors[i] = mania["Colour" .. i]
 	end
 	playfield:addColumnsBackground({
 		color = colors
@@ -197,7 +222,7 @@ OsuNoteSkin.load = function(self)
 	self:addStages()
 	self:addHpBar()
 
-	local guidelines = toarray(mania.ColumnLineWidth)
+	local guidelines = mania.ColumnLineWidth
 	local guidelinesHeight = {}
 	local guidelinesY = {}
 	for i = 1, keysCount + 1 do
@@ -205,20 +230,15 @@ OsuNoteSkin.load = function(self)
 		guidelinesHeight[i] = self.hitposition
 		guidelinesY[i] = 0
 	end
-	local guidelinesColor = toarray(mania.ColourColumnLine)
-	local defaultColor = {1, 1, 1, 1}
-	for i = 1, 4 do
-		guidelinesColor[i] = guidelinesColor[i] and guidelinesColor[i] / 255 or defaultColor[i]
-	end
 	playfield:addGuidelines({
 		y = guidelinesY,
 		w = guidelines,
 		h = guidelinesHeight,
 		image = {},
-		color = guidelinesColor,
+		color = mania.ColourColumnLine,
 	})
 
-	local keysUnderNotes = tonumber(mania.KeysUnderNotes) == 1
+	local keysUnderNotes = mania.KeysUnderNotes == 1
 
 	if not keysUnderNotes then
 		playfield:addNotes()
@@ -295,9 +315,9 @@ local defaultJudgements = {
 
 OsuNoteSkin.addJudgements = function(self)
 	local mania = self.mania
-	local rate = tonumber(mania.AnimationFramerate) or -1
+	local rate = tonumber(self.skinini.AnimationFramerate) or -1
 	local od = tonumber(mania.OverallDifficulty) or 5
-	local position = tonumber(mania.ScorePosition) or 240
+	local position = mania.ScorePosition
 	if self.upscroll then
 		position = 480 - position
 	end
@@ -360,7 +380,7 @@ end
 OsuNoteSkin.addCombo = function(self)
 	local fonts = self.skinini.Fonts
 	local files = self:findCharFiles(fonts.ComboPrefix or "score")
-	local position = tonumber(self.mania.ComboPosition) or 240
+	local position = self.mania.ComboPosition
 	if self.upscroll then
 		position = 480 - position
 	end
@@ -414,7 +434,7 @@ end
 
 OsuNoteSkin.getDefaultNoteImages = function(self)
 	local mania = self.mania
-	local keysCount = tonumber(mania.Keys)
+	local keysCount = mania.Keys
 
 	local images = {}
 	for i = 1, keysCount do
@@ -430,7 +450,7 @@ end
 
 OsuNoteSkin.getDefaultKeyImages = function(self)
 	local mania = self.mania
-	local keysCount = tonumber(mania.Keys)
+	local keysCount = mania.Keys
 
 	local pressed = {}
 	local released = {}
@@ -611,6 +631,11 @@ end
 
 OsuNoteSkin.parseSkinIni = function(self, content)
 	local skinini = {}
+	skinini.General = skinini.General or {}
+	skinini.Colours = skinini.Colours or {}
+	skinini.Fonts = skinini.Fonts or {}
+	skinini.CatchTheBeat = skinini.CatchTheBeat or {}
+	skinini.Mania = skinini.Mania or {}
 	local block
 	for line in (content .. "\n"):gmatch("(.-)\n") do
 		line = line:match("^%s*(.-)%s*$")
@@ -630,7 +655,123 @@ OsuNoteSkin.parseSkinIni = function(self, content)
 			end
 		end
 	end
+	local skinnedKeys = {}
+	for i, mania in ipairs(skinini.Mania) do
+		local keys = tonumber(mania.Keys)
+		if keys then
+			skinnedKeys[keys] = true
+		end
+	end
+	for i = 1, 18 do
+		if not skinnedKeys[i] then
+			table.insert(skinini.Mania, {Keys = i})
+		end
+	end
 	return skinini
+end
+
+local tovalues = function(value, count)
+	local t = {}
+	for i = 1, count do
+		t[i] = value
+	end
+	return t
+end
+
+OsuNoteSkin.getDefaultManiaSection = function(self, keys)
+	local mania = {}
+	mania.Keys = keys
+	mania.ColumnStart = 136
+	mania.ColumnRight = 19
+	mania.ColumnSpacing = tovalues(0, keys - 1)
+	mania.ColumnWidth = tovalues(30, keys)
+	mania.ColumnLineWidth = tovalues(2, keys + 1)
+	mania.BarlineHeight = 1.2
+	mania.LightingNWidth = tovalues(0, keys)
+	mania.LightingLWidth = tovalues(0, keys)
+	mania.WidthForNoteHeightScale = 0  -- If not defined, the height scale of the smallest column width is used
+	mania.HitPosition = 402
+	mania.LightPosition = 413
+	mania.ScorePosition = 325
+	mania.ComboPosition = 111
+	mania.JudgementLine = 0
+	mania.LightFramePerSecond = 60
+	mania.SpecialStyle = 0
+	mania.ComboBurstStyle = 1
+	mania.SplitStages = 0
+	mania.StageSeparation = 40
+	mania.SeparateScore = 1
+	mania.KeysUnderNotes = 0
+	mania.UpsideDown = 0
+	mania.KeyFlipWhenUpsideDown = 1
+	mania.NoteFlipWhenUpsideDown = 1
+	mania.NoteBodyStyle = 1
+	mania.ColourColumnLine = {1, 1, 1, 1}
+	mania.ColourBarline = {1, 1, 1, 1}
+	mania.ColourJudgementLine = {1, 1, 1}
+	mania.ColourKeyWarning = {0, 0, 0}
+	mania.ColourHold = {1, 199 / 255, 51 / 255, 1}
+	mania.ColourBreak = {1, 0, 0}
+	mania.StageLeft = "mania-stage-left"
+	mania.StageRight = "mania-stage-right"
+	mania.StageBottom = "mania-stage-bottom"
+	mania.StageHint = "mania-stage-hint"
+	mania.StageLight = "mania-stage-light"
+	mania.LightingN = "LightingN"
+	mania.LightingL = "LightingL"
+	mania.WarningArrow = "WarningArrow"
+	mania.Hit0 = "mania-hit0"
+	mania.Hit50 = "mania-hit50"
+	mania.Hit100 = "mania-hit100"
+	mania.Hit200 = "mania-hit200"
+	mania.Hit300 = "mania-hit300"
+	mania.Hit300g = "mania-hit300g"
+
+	for i = 0, keys - 1 do
+		mania["KeyFlipWhenUpsideDown" .. i] = 1
+		mania["KeyFlipWhenUpsideDown" .. i .. "D"] = 1
+		mania["NoteFlipWhenUpsideDown" .. i] = 1
+		mania["NoteFlipWhenUpsideDown" .. i .. "H"] = 1
+		mania["NoteFlipWhenUpsideDown" .. i .. "L"] = 1
+		mania["NoteFlipWhenUpsideDown" .. i .. "T"] = 1
+		mania["NoteBodyStyle" .. i] = 1
+		mania["Colour" .. i + 1] = {0, 0, 0, 1}
+		mania["ColourLight" .. i + 1] = {55 / 255, 1, 1}
+		mania["KeyImage" .. i] = "mania-key" .. getNoteType(i + 1, keys)
+		mania["KeyImage" .. i .. "D"] = "mania-key" .. getNoteType(i + 1, keys) .. "D"
+		mania["NoteImage" .. i] = "mania-note" .. getNoteType(i + 1, keys)
+		mania["NoteImage" .. i .. "H"] = "mania-note" .. getNoteType(i + 1, keys) .. "H"
+		mania["NoteImage" .. i .. "L"] = "mania-note" .. getNoteType(i + 1, keys) .. "L"
+		mania["NoteImage" .. i .. "T"] = "mania-note" .. getNoteType(i + 1, keys) .. "T"
+	end
+
+	return mania
+end
+
+OsuNoteSkin.fixManiaValues = function(self)
+	local mania = self.mania
+
+	do
+		local w = mania.ColumnLineWidth
+		for i = 1, #w do
+			local wi = w[i]
+			w[i] = wi > 0 and wi < 2 and 2 or wi
+		end
+	end
+	do
+		local w = mania.ColumnWidth
+		for i = 1, #w do
+			w[i] = math.min(math.max(w[i], 5), 100)
+		end
+	end
+	for i = 1, mania.Keys - 1 do
+		mania.ColumnSpacing[i] = math.max(mania.ColumnSpacing[i], -mania.ColumnWidth[i + 1])
+	end
+	mania.StageSeparation = math.max(mania.StageSeparation, 5)
+	mania.HitPosition = math.min(math.max(mania.HitPosition, 240), 480)
+	if mania.LightFramePerSecond <= 0 then
+		mania.LightFramePerSecond = 24
+	end
 end
 
 return OsuNoteSkin

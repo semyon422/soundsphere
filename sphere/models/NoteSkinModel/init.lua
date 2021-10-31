@@ -112,19 +112,22 @@ NoteSkinModel.loadOsu = function(self, path, directoryPath, fileName)
 	local skinini = OsuNoteSkin:parseSkinIni(love.filesystem.read(path))
 
 	for i, mania in ipairs(skinini.Mania) do
-		local noteSkin = OsuNoteSkin:new()
-		noteSkin.files = self.files[directoryPath]
-		noteSkin.path = path
-		noteSkin.directoryPath = directoryPath
-		noteSkin.fileName = fileName
-		noteSkin.skinini = skinini
-		noteSkin:setKeys(tonumber(mania.Keys))
-		noteSkin.inputMode = ncdk.InputMode:new():setString(tonumber(mania.Keys) .. "key")
-		local status, err = xpcall(noteSkin.load, debug.traceback, noteSkin)
-		if status then
-			table.insert(noteSkins, noteSkin)
-		else
-			print(err)
+		local keys = tonumber(mania.Keys)
+		if keys then
+			local noteSkin = OsuNoteSkin:new()
+			noteSkin.files = self.files[directoryPath]
+			noteSkin.path = path
+			noteSkin.directoryPath = directoryPath
+			noteSkin.fileName = fileName
+			noteSkin.skinini = skinini
+			noteSkin:setKeys(keys)
+			noteSkin.inputMode = ncdk.InputMode:new():setString(keys .. "key")
+			local status, err = xpcall(noteSkin.load, debug.traceback, noteSkin)
+			if status then
+				table.insert(noteSkins, noteSkin)
+			else
+				print(err)
+			end
 		end
 	end
 
