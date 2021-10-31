@@ -135,8 +135,11 @@ OsuNoteSkin.load = function(self)
 		lightingLScale[i] = (lightingLWidth[i] > 0 and lightingLWidth[i] or self.width[i]) / 30 * 480 / 768
 	end
 
-	local rate = mania.LightFramePerSecond
 	if lightingN then
+		local rate = 1000 / 170
+		if rangeN then
+			rate = 1000 / math.max(170 / (rangeN[2] - rangeN[1] + 1), 1000 / 60)
+		end
 		self:setLighting({
 			image = "lightingN",
 			scale = lightingNScale,
@@ -146,6 +149,10 @@ OsuNoteSkin.load = function(self)
 		})
 	end
 	if lightingL then
+		local rate = 1000 / 170
+		if rangeL then
+			rate = 1000 / math.max(170 / (rangeL[2] - rangeL[1] + 1), 1000 / 60)
+		end
 		self:setLighting({
 			image = "lightingL",
 			scale = lightingLScale,
