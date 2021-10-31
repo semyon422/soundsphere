@@ -219,9 +219,6 @@ OsuNoteSkin.load = function(self)
 		color = colors
 	})
 
-	self:addStages()
-	self:addHpBar()
-
 	local guidelines = mania.ColumnLineWidth
 	local guidelinesHeight = {}
 	local guidelinesY = {}
@@ -256,6 +253,9 @@ OsuNoteSkin.load = function(self)
 		pressed = pressed,
 		released = released,
 	})
+
+	self:addStages()
+	self:addHpBar()
 
 	if keysUnderNotes then
 		playfield:addNotes()
@@ -575,10 +575,24 @@ OsuNoteSkin.addStages = function(self)
 			x = self.columns[1] - self.space[1],
 			y = self.hitposition,
 			w = self.fullWidth,
-			sy = 480 / 768,
+			sy = 1,
 			oy = 0.5,
 			transform = playfield:newNoteskinTransform(),
 			image = stageHint,
+		})
+	end
+
+	local stageBottom = self:findImage(mania.StageBottom) or self:findImage("mania-stage-bottom")
+	if stageBottom then
+		playfield:add({
+			class = "ImageView",
+			x = self.columns[1] - self.space[1],
+			y = 480,
+			w = self.fullWidth,
+			sy = 1,
+			oy = 1,
+			transform = playfield:newNoteskinTransform(),
+			image = stageBottom,
 		})
 	end
 end
