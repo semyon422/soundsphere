@@ -96,7 +96,7 @@ end
 
 PlayfieldVsrg.addProgressBar = function(self, object)
 	object = object or {}
-	object.class = "ProgressView"
+	object.class = object.class or "ProgressView"
 	object.min = {key = "gameController.rhythmModel.timeEngine.minTime"}
 	object.max = {key = "gameController.rhythmModel.timeEngine.maxTime"}
 	object.start = {key = "gameController.rhythmModel.timeEngine.startTime"}
@@ -106,7 +106,7 @@ end
 
 PlayfieldVsrg.addHpBar = function(self, object)
 	object = object or {}
-	object.class = "ProgressView"
+	object.class = object.class or "ProgressView"
 	object.min = {value = 0}
 	object.max = {value = 1}
 	object.start = {value = 0}

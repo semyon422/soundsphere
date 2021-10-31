@@ -5,11 +5,6 @@ local inside = require("aqua.util.inside")
 
 local ProgressView = Class:new()
 
-ProgressView.load = function(self) end
-ProgressView.update = function(self, dt) end
-ProgressView.unload = function(self) end
-ProgressView.receive = function(self, event) end
-
 ProgressView.draw = function(self)
 	local config = self.config
 

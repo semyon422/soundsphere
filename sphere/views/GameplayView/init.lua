@@ -3,6 +3,7 @@ local viewspackage = (...):match("^(.-%.views%.)")
 local RhythmView = require("sphere.views.RhythmView")
 local GameplayViewConfig = require("sphere.views.GameplayView.GameplayViewConfig")
 local ProgressView	= require("sphere.views.GameplayView.ProgressView")
+local ImageProgressView	= require("sphere.views.GameplayView.ImageProgressView")
 local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
 local HitErrorView = require("sphere.views.GameplayView.HitErrorView")
 local InputView	= require("sphere.views.GameplayView.InputView")
@@ -18,6 +19,7 @@ GameplayView.views = {
 	{"menuProgressView", ProgressView, "ProgressView"},
 	{"rhythmView", RhythmView, "RhythmView"},
 	{"progressView", ProgressView, "ProgressView"},
+	{"imageProgressView", ImageProgressView, "ImageProgressView"},
 	{"pointGraphView", PointGraphView, "PointGraphView"},
 	{"hitErrorView", HitErrorView, "HitErrorView"},
 	{"inputView", InputView, "InputView"},
@@ -39,6 +41,7 @@ GameplayView.load = function(self)
 	self.imageAnimationView.root = noteSkin.directoryPath
 	self.imageView.root = noteSkin.directoryPath
 	self.imageValueView.root = noteSkin.directoryPath
+	self.imageProgressView.root = noteSkin.directoryPath
 	self:loadViews(ScreenView.views)
 	self:loadViews(self.views)
 	for i, config in ipairs(self.viewConfig) do

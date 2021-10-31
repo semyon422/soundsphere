@@ -252,7 +252,6 @@ OsuNoteSkin.load = function(self)
 	self:addJudgements()
 	BasePlayfield.addBaseHitError(playfield)
 	BasePlayfield.addBaseProgressBar(playfield)
-	BasePlayfield.addBaseHpBar(playfield)
 end
 
 local getNoteType = function(key, keymode)
@@ -586,14 +585,16 @@ OsuNoteSkin.addHpBar = function(self)
 
 	local scoreBar = self:findImage("scorebar-colour")
 	if scoreBar then
-		playfield:add({
-			class = "ImageView",
+		playfield:addHpBar({
+			class = "ImageProgressView",
 			x = right + 8,
 			y = 478,
 			sx = 480 / 768 * 0.7,
 			sy = 480 / 768 * 0.7,
 			r = -math.pi / 2,
 			transform = playfield:newNoteskinTransform(),
+			direction = "left-right",
+			mode = "+",
 			image = scoreBar,
 		})
 	end
