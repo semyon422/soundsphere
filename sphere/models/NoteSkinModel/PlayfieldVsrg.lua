@@ -365,9 +365,9 @@ PlayfieldVsrg.addGuidelines = function(self, object)
 	local noteskin = self.noteskin
 	local inputs = noteskin.inputsCount
 	for i = 1, inputs + 1 do
-		local bw = object.w[i]
-		local bh = object.h[i]
-		local by = object.y[i]
+		local bw = object.w and object.w[i]
+		local bh = object.h and object.h[i]
+		local by = object.y and object.y[i]
 
 		if bw and bh and by and bw ~= 0 and bh ~= 0 then
 			local x
@@ -385,8 +385,8 @@ PlayfieldVsrg.addGuidelines = function(self, object)
 				end
 			end
 
-			local color = object.color[i]
-			if type(object.color[1]) == "number" then
+			local color = object.color and object.color[i]
+			if color and type(color) == "number" then
 				color = object.color
 			end
 
