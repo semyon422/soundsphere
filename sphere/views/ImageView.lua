@@ -45,7 +45,7 @@ ImageView.draw = function(self)
         state.image,
 		config.x,
 		config.y,
-        0,
+        config.r or 0,
 		sx, sy, ox, oy
     )
 end

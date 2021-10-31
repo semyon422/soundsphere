@@ -195,6 +195,7 @@ OsuNoteSkin.load = function(self)
 	})
 
 	self:addStages()
+	self:addHpBar()
 
 	local guidelines = toarray(mania.ColumnLineWidth)
 	local guidelinesHeight = {}
@@ -559,6 +560,41 @@ OsuNoteSkin.addStages = function(self)
 			oy = 0.5,
 			transform = playfield:newNoteskinTransform(),
 			image = stageHint,
+		})
+	end
+end
+
+OsuNoteSkin.addHpBar = function(self)
+	local mania = self.mania
+	local playfield = self.playField
+
+	local right = self.columns[self.inputsCount] + self.width[self.inputsCount] + self.space[self.inputsCount + 1]
+
+	local scoreBarBg = self:findImage("scorebar-bg")
+	if scoreBarBg then
+		playfield:add({
+			class = "ImageView",
+			x = right + 1,
+			y = 480,
+			sx = 480 / 768 * 0.7,
+			sy = 480 / 768 * 0.7,
+			r = -math.pi / 2,
+			transform = playfield:newNoteskinTransform(),
+			image = scoreBarBg,
+		})
+	end
+
+	local scoreBar = self:findImage("scorebar-colour")
+	if scoreBar then
+		playfield:add({
+			class = "ImageView",
+			x = right + 8,
+			y = 478,
+			sx = 480 / 768 * 0.7,
+			sy = 480 / 768 * 0.7,
+			r = -math.pi / 2,
+			transform = playfield:newNoteskinTransform(),
+			image = scoreBar,
 		})
 	end
 end
