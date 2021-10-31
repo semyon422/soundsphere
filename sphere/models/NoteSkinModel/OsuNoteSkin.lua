@@ -604,11 +604,20 @@ OsuNoteSkin.addHpBar = function(self)
 	end
 
 	local scoreBar = self:findImage("scorebar-colour")
+	local scoreBarMarker = self:findImage("scorebar-marker")
 	if scoreBar then
+		local x, y
+		if scoreBarMarker then
+			x = right + 6.6
+			y = 474.8
+		else
+			x = right + 8
+			y = 478
+		end
 		playfield:addHpBar({
 			class = "ImageProgressView",
-			x = right + 8,
-			y = 478,
+			x = x,
+			y = y,
 			sx = 480 / 768 * 0.7,
 			sy = 480 / 768 * 0.7,
 			r = -math.pi / 2,
