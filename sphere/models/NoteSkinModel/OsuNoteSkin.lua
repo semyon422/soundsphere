@@ -535,7 +535,7 @@ OsuNoteSkin.findAnimation = function(self, value)
 	local endFrame = frames[#frames]
 	for i = 2, #frames do
 		local frame, nextFrame = frames[i - 1], frames[i]
-		if nextFrame - frame ~= 1 then
+		if nextFrame - frame > 1 then
 			endFrame = frame
 			break
 		end
