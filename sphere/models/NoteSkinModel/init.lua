@@ -37,7 +37,7 @@ NoteSkinModel.lookup = function(self, directoryPath)
 				table.insert(self.foundNoteSkins, {path, directoryPath, itemName})
 			end
 			self.filesMap[path] = true
-		elseif info and info.type == "directory" then
+		elseif info and info.type == "directory" and itemName ~= "__MACOSX" then
 			self:lookup(path)
 		end
 	end
