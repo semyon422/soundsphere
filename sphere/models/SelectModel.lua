@@ -95,6 +95,14 @@ SelectModel.scrollCollection = function(self, direction, destination)
 	self:pullNoteChartSet(oldCollectionItem.path == collectionItem.path)
 end
 
+SelectModel.scrollRandom = function(self)
+	local noteChartSetItems = self.noteChartSetLibraryModel.items
+
+	local destination = math.random(1, #noteChartSetItems)
+
+	self:scrollNoteChartSet(nil, destination)
+end
+
 SelectModel.scrollNoteChartSet = function(self, direction, destination)
 	local noteChartSetItems = self.noteChartSetLibraryModel.items
 

@@ -21,9 +21,7 @@ SelectNavigator.receive = function(self, event)
 	local scancode = event.args[2]
 
 	if scancode == "f1" then self:changeScreen("Modifier")
-	elseif scancode == "f2" then self:changeScreen("NoteSkin")
-	elseif scancode == "f3" then self:changeScreen("Input")
-	elseif scancode == "f4" then self:changeScreen("Settings")
+	elseif scancode == "f2" then self:scrollRandom()
 	elseif scancode == "lctrl" then self:changeSearchMode()
 	elseif scancode == "lshift" then self:changeCollapse()
 	end
@@ -73,6 +71,10 @@ end
 
 SelectNavigator.pullNoteChartSet = function(self)
 	self:send({name = "pullNoteChartSet"})
+end
+
+SelectNavigator.scrollRandom = function(self)
+	self:send({name = "scrollRandom"})
 end
 
 SelectNavigator.updateCache = function(self, force)

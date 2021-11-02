@@ -56,6 +56,8 @@ SelectController.receive = function(self, event)
 		self.gameController.selectModel:scrollNoteChart(event.direction)
 	elseif event.name == "scrollScore" then
 		self.gameController.selectModel:scrollScore(event.direction)
+	elseif event.name == "scrollRandom" then
+		self.gameController.selectModel:scrollRandom()
 	elseif event.name == "setSortFunction" then
 		self.gameController.selectModel:setSortFunction(event.sortFunction)
 	elseif event.name == "scrollSortFunction" then
