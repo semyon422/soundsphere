@@ -45,8 +45,8 @@ return {
 		cursor = "circle",
 		dim = {
 			gameplay = 0.8,
-			result = 0.6,
-			select = 0.5
+			result = 0.8,
+			select = 0.8
 		},
 		fps = 240,
 		mode = {
