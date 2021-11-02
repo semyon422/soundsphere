@@ -30,7 +30,6 @@ GameplayController.load = function(self)
 	noteSkinModel.configModel = configModel
 
 	noteChartModel:load()
-	noteSkinModel:load()
 
 	view.controller = self
 	view.gameController = self.gameController
