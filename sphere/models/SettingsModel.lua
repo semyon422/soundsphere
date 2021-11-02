@@ -47,7 +47,7 @@ SettingsModel.increaseValue = function(self, settingConfig, delta)
 	if settingConfig.type == "slider" then
 		value = math.min(math.max(value + settingConfig.step * delta, settingConfig.range[1]), settingConfig.range[2])
 	elseif settingConfig.type == "stepper" then
-		value = settingConfig.values[math.min(math.max(self:getValue(settingConfig) + delta, 1), #settingConfig.values)]
+		value = self:fromIndexValue(settingConfig, self:toIndexValue(settingConfig) + delta)
 	end
 	outside(self.config, key, value)
 end
