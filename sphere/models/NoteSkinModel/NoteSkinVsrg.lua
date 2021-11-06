@@ -110,7 +110,7 @@ NoteSkinVsrg.setShortNote = function(self, params)
 	end
 
 	local image = params.image
-	if type(params.image) == "string" then
+	if type(params.image) ~= "table" then
 		image = {}
 		for i = 1, self.inputsCount do
 			image[i] = params.image
@@ -152,21 +152,21 @@ NoteSkinVsrg.setLongNote = function(self, params)
 	end
 
 	local tail = params.tail
-	if type(params.tail) == "string" then
+	if type(params.tail) ~= "table" then
 		tail = {}
 		for i = 1, self.inputsCount do
 			tail[i] = params.tail
 		end
 	end
 	local body = params.body
-	if type(params.body) == "string" then
+	if type(params.body) ~= "table" then
 		body = {}
 		for i = 1, self.inputsCount do
 			body[i] = params.body
 		end
 	end
 	local head = params.head
-	if type(params.head) == "string" then
+	if type(params.head) ~= "table" then
 		head = {}
 		for i = 1, self.inputsCount do
 			head[i] = params.head

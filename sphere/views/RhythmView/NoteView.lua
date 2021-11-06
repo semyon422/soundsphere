@@ -3,6 +3,12 @@ local NotePartView = require("sphere.views.RhythmView.NotePartView")
 
 local NoteView = Class:new()
 
+NoteView.construct = function(self)
+	self.startChord = {}
+	self.endChord = {}
+	self.middleChord = {}
+end
+
 NoteView.newNotePartView = function(self, part)
 	return NotePartView:new({}, self, part)
 end
@@ -37,6 +43,37 @@ NoteView.getDraw = function(self, quad, ...)
 		return quad, ...
 	end
 	return ...
+end
+
+NoteView.updateChord = function(self, noteViews)
+	local startChord = self.startChord
+	local endChord = self.endChord
+	local middleChord = self.middleChord
+	for i = 1, self.noteSkin.inputsCount do
+		startChord[i] = false
+		endChord[i] = false
+		middleChord[i] = false
+	end
+
+	local timePoint = self.startNoteData.timePoint
+	local endTimePoint = self.endNoteData and self.endNoteData.timePoint
+	local inputs = self.noteSkin.inputs
+	for _, noteView in ipairs(noteViews) do
+		local nd = noteView.startNoteData
+		local endNd = noteView.endNoteData
+		local column = inputs[nd.inputType .. nd.inputIndex]
+		if column then
+			if timePoint == nd.timePoint or (endNd and timePoint == endNd.timePoint) then
+				startChord[column] = true
+			end
+			if endTimePoint == nd.timePoint or (endNd and endTimePoint == endNd.timePoint) then
+				endChord[column] = true
+			end
+			if startChord[column] and endChord[column] then
+				middleChord[column] = true
+			end
+		end
+	end
 end
 
 NoteView.draw = function(self) end

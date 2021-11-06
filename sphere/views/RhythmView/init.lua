@@ -76,7 +76,13 @@ RhythmView.draw = function(self)
 	table.sort(noteViews, function(a, b)
 		return a.startNoteData.timePoint > b.startNoteData.timePoint
 	end)
+
+	local computeChords = self.gameController.configModel.configs.settings.gameplay.computeChords
+
 	for _, noteView in ipairs(noteViews) do
+		if computeChords then
+			noteView:updateChord(noteViews)
+		end
 		noteView:draw()
 	end
 
