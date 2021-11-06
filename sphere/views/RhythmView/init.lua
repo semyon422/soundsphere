@@ -77,12 +77,37 @@ RhythmView.draw = function(self)
 		return a.startNoteData.timePoint > b.startNoteData.timePoint
 	end)
 
-	local computeChords = self.gameController.configModel.configs.settings.gameplay.computeChords
+	local noteSkin = self.gameController.rhythmModel.graphicEngine.noteSkin
+	local inputsCount = noteSkin.inputsCount
+	local inputs = noteSkin.inputs
+
+	local chords = {}
+	for _, noteView in ipairs(noteViews) do
+		local startNoteData = noteView.startNoteData
+		local endNoteData = noteView.endNoteData
+
+		local time = startNoteData.timePoint.absoluteTime
+		chords[time] = chords[time] or {}
+		local chord = chords[time]
+
+		local column = inputs[startNoteData.inputType .. startNoteData.inputIndex]
+		if column and column <= inputsCount then
+			chord[column] = 1
+			noteView.startChord = chord
+
+			if endNoteData then
+				time = endNoteData.timePoint.absoluteTime
+				chords[time] = chords[time] or {}
+				chord = chords[time]
+
+				chord[column] = 0
+				noteView.endChord = chord
+			end
+		end
+	end
 
 	for _, noteView in ipairs(noteViews) do
-		if computeChords then
-			noteView:updateChord(noteViews)
-		end
+		noteView:updateMiddleChord()
 		noteView:draw()
 	end
 

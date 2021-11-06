@@ -45,33 +45,14 @@ NoteView.getDraw = function(self, quad, ...)
 	return ...
 end
 
-NoteView.updateChord = function(self, noteViews)
+NoteView.updateMiddleChord = function(self)
 	local startChord = self.startChord
 	local endChord = self.endChord
 	local middleChord = self.middleChord
 	for i = 1, self.noteSkin.inputsCount do
-		startChord[i] = false
-		endChord[i] = false
-		middleChord[i] = false
-	end
-
-	local timePoint = self.startNoteData.timePoint
-	local endTimePoint = self.endNoteData and self.endNoteData.timePoint
-	local inputs = self.noteSkin.inputs
-	for _, noteView in ipairs(noteViews) do
-		local nd = noteView.startNoteData
-		local endNd = noteView.endNoteData
-		local column = inputs[nd.inputType .. nd.inputIndex]
-		if column then
-			if timePoint == nd.timePoint or (endNd and timePoint == endNd.timePoint) then
-				startChord[column] = true
-			end
-			if endTimePoint == nd.timePoint or (endNd and endTimePoint == endNd.timePoint) then
-				endChord[column] = true
-			end
-			if startChord[column] and endChord[column] then
-				middleChord[column] = true
-			end
+		middleChord[i] = nil
+		if startChord[i] == 1 and endChord[i] == 0 then
+			middleChord[i] = 1
 		end
 	end
 end
