@@ -39,6 +39,15 @@ NoteSkin.setTextures = function(self, textures)
 	self.textures = textures
 end
 
+NoteSkin.setImagesAuto = function(self)
+	local images = {}
+	for i, texture in ipairs(self.textures) do
+		local k, v = next(texture)
+		images[k] = {k}
+	end
+	self:setImages(images)
+end
+
 NoteSkin.setImages = function(self, images)
 	local map = {}
 	for i, texture in ipairs(self.textures) do
