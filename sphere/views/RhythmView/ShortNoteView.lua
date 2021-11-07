@@ -22,6 +22,14 @@ ShortNoteView.draw = function(self)
 	spriteBatch:add(self:getDraw(self.headView:getQuad(), self:getTransformParams()))
 end
 
+ShortNoteView.isVisible = function(self)
+	local color = self.headView:get("color")
+	if not color then
+		return
+	end
+	return color[4] > 0
+end
+
 ShortNoteView.getTransformParams = function(self)
 	local hw = self.headView
 	local w, h = hw:getDimensions()

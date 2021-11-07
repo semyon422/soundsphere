@@ -91,7 +91,7 @@ RhythmView.draw = function(self)
 		local chord = chords[time]
 
 		local column = inputs[startNoteData.inputType .. startNoteData.inputIndex]
-		if column and column <= inputsCount then
+		if column and column <= inputsCount and noteView:isVisible() then
 			chord[column] = 1
 			noteView.startChord = chord
 

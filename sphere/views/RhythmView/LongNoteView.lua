@@ -43,6 +43,8 @@ LongNoteView.draw = function(self)
 	end
 end
 
+LongNoteView.isVisible = ShortNoteView.isVisible
+
 LongNoteView.getHeadTransformParams = ShortNoteView.getTransformParams
 
 LongNoteView.getTailTransformParams = function(self)

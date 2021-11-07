@@ -7,6 +7,7 @@ NoteView.construct = function(self)
 	self.startChord = {}
 	self.endChord = {}
 	self.middleChord = {}
+	self.middleChordFixed = false
 end
 
 NoteView.newNotePartView = function(self, part)
@@ -46,6 +47,10 @@ NoteView.getDraw = function(self, quad, ...)
 end
 
 NoteView.updateMiddleChord = function(self)
+	if self.middleChordFixed then
+		return
+	end
+
 	local startChord = self.startChord
 	local endChord = self.endChord
 	local middleChord = self.middleChord
@@ -55,6 +60,7 @@ NoteView.updateMiddleChord = function(self)
 			middleChord[i] = 1
 		end
 	end
+	self.middleChordFixed = true
 end
 
 NoteView.draw = function(self) end
@@ -62,6 +68,10 @@ NoteView.draw = function(self) end
 NoteView.update = function(self) end
 
 NoteView.receive = function(self, event) end
+
+NoteView.isVisible = function(self)
+	return true
+end
 
 NoteView.whereWillDraw = function(self)
 	return 0
