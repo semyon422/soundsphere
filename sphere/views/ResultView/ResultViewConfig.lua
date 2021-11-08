@@ -834,6 +834,25 @@ local BottomRightScreenMenu = {
 	}
 }
 
+local SessionTime = {
+	class = "ValueView",
+	transform = transform,
+	value = function()
+		local event = require("aqua.event")
+		local rtime = require("aqua.util.rtime")
+		return rtime(event.time - event.startTime)
+	end,
+	x = 301,
+	baseline = 279 + 522 - 6,
+	limit = 1920,
+	color = {1, 1, 1, 1},
+	font = {
+		filename = "Noto Sans",
+		size = 20,
+	},
+	align = "left",
+}
+
 local InspectScoreSystem = {
 	class = "ValueView",
 	subscreen = "scoreSystemDebug",
@@ -914,6 +933,7 @@ local NoteSkinViewConfig = {
 	ComboGraph,
 	HpGraph,
 	EarlyLateMissGraph,
+	SessionTime,
 	InspectScoreSystem,
 	InspectCounters,
 	InspectScoreEntry,

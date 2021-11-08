@@ -540,7 +540,7 @@ local SessionTime = {
 		return rtime(event.time - event.startTime)
 	end,
 	x = 301,
-	baseline = 818,
+	baseline = 279 + 522 - 6,
 	limit = 1920,
 	color = {1, 1, 1, 1},
 	font = {
