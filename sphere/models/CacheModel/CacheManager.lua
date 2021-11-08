@@ -594,23 +594,18 @@ CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, for
 		if not force and self:getNoteChartDataEntry(hash, 1) then
 			self:setNoteChartEntry(noteChartEntry)
 		else
-			fileDatas[#fileDatas + 1] = {
-				path = path,
-				content = content,
-				hash = hash,
-				noteChartEntry = noteChartEntry
-			}
+			local entries, noteCharts = NoteChartDataEntryFactory:getEntries(path, content, hash, noteChartEntry)
+			if entries then
+				for i, entry in ipairs(entries) do
+					local noteChart = noteCharts[i]
+					local difficulty, longNoteRatio = DifficultyModel:getDifficulty(noteChart)
+					entry.difficulty = difficulty
+					entry.longNoteRatio = longNoteRatio
+					self:setNoteChartDataEntry(entry)
+					self:setNoteChartEntry(entry.noteChartEntry)
+				end
+			end
 		end
-	end
-
-	local entries, noteCharts = NoteChartDataEntryFactory:getEntries(fileDatas)
-	for i, entry in ipairs(entries) do
-		local noteChart = noteCharts[i]
-		local difficulty, longNoteRatio = DifficultyModel:getDifficulty(noteChart)
-		entry.difficulty = difficulty
-		entry.longNoteRatio = longNoteRatio
-		self:setNoteChartDataEntry(entry)
-		self:setNoteChartEntry(entry.noteChartEntry)
 	end
 end
 

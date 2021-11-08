@@ -54,10 +54,10 @@ DifficultyModel.getDifficulty = function(self, noteChart)
 	if lowSum > 0 then
 		low = lowSum / lowCount * generalizedKeymode
 	end
-	print("enps: " .. math.floor(enpsValue * 100) / 100)
-	print("low enps: " .. math.floor(low * 100) / 100 .. ", " .. math.floor(low / enpsValue * 100) / 100 .. ", " .. math.floor(low / enpsValue * 100) - 100 .. "%")
-	print("high enps: " .. math.floor(high * 100) / 100 .. ", " .. math.floor(high / enpsValue * 100) / 100 .. ", " .. math.floor(high / enpsValue * 100) - 100 .. "%")
-	print("high/all: " .. math.floor(highCount / (lowCount + highCount) * 100) / 100)
+	-- print("enps: " .. math.floor(enpsValue * 100) / 100)
+	-- print("low enps: " .. math.floor(low * 100) / 100 .. ", " .. math.floor(low / enpsValue * 100) / 100 .. ", " .. math.floor(low / enpsValue * 100) - 100 .. "%")
+	-- print("high enps: " .. math.floor(high * 100) / 100 .. ", " .. math.floor(high / enpsValue * 100) / 100 .. ", " .. math.floor(high / enpsValue * 100) - 100 .. "%")
+	-- print("high/all: " .. math.floor(highCount / (lowCount + highCount) * 100) / 100)
 
 	return enpsValue, longNoteCount / #notes
 end
