@@ -19,6 +19,7 @@ return {
 			image = false,
 			video = false
 		},
+		longNoteShortening = 0,
 		needTimeRound = true,
 		offset = {
 			input = 0,

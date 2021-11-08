@@ -246,6 +246,10 @@ RhythmModel.setTimeRound = function(self, needRound)
 	self.inputManager.needRound = needRound
 end
 
+RhythmModel.setLongNoteShortening = function(self, longNoteShortening)
+	self.graphicEngine.longNoteShortening = longNoteShortening
+end
+
 RhythmModel.setTimeToPrepare = function(self, timeToPrepare)
 	self.timeEngine.timeToPrepare = timeToPrepare
 end

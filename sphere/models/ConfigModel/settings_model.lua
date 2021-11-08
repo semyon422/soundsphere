@@ -39,6 +39,16 @@ local settings = {
 		displayRange = {"no", "yes"}
 	},
 	{
+		name = "visual long note shortening",
+		section = "gameplay",
+		key = "gameplay.longNoteShortening",
+		type = "slider",
+		range = {-0.3, 0},
+		displayRange = {-300, 0},
+		step = 0.001,
+		format = "%d"
+	},
+	{
 		name = "note offset",
 		section = "gameplay",
 		key = "gameplay.offset.note",
