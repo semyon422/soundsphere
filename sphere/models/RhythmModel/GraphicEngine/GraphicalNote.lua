@@ -34,6 +34,8 @@ end
 GraphicalNote.receive = function(self, event) end
 
 GraphicalNote.where = function(self, time)
+	local rate = self.graphicEngine:getVisualTimeRate()
+	time = time * rate / math.abs(rate)
 	local range = self.noteSkin.range
 	if -time > range[2] then
 		return 1
