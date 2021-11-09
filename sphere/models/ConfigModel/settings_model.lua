@@ -360,12 +360,12 @@ local settings = {
 		values = {
 			"sample",
 			"streamMemoryTempo",
-			"streamOpenAL", "sampleOpenAL"
+			-- "streamOpenAL", "sampleOpenAL"
 		},
 		displayValues = {
 			"sample",
 			"memory",
-			"streamOAL", "sampleOAL"
+			-- "streamOAL", "sampleOAL"
 		}
 	},
 	{
@@ -376,12 +376,12 @@ local settings = {
 		values = {
 			"sample",
 			"streamMemoryTempo",
-			"streamOpenAL", "sampleOpenAL"
+			-- "streamOpenAL", "sampleOpenAL"
 		},
 		displayValues = {
 			"sample",
 			"memory",
-			"streamOAL", "sampleOAL"
+			-- "streamOAL", "sampleOAL"
 		}
 	},
 	{
