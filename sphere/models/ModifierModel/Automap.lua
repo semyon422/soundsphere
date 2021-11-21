@@ -1,9 +1,11 @@
 local aquamath				= require("aqua.math")
+local Upscaler				= require("libchart.Upscaler")
 local NextUpscaler			= require("libchart.NextUpscaler")
 local Reductor				= require("libchart.Reductor")
 local BlockFinder			= require("libchart.BlockFinder")
 local NotePreprocessor		= require("libchart.NotePreprocessor")
 local Modifier				= require("sphere.models.ModifierModel.Modifier")
+local AutomapOldConfig		= require("sphere.models.ModifierModel.AutomapOldConfig")
 
 local Automap = Modifier:new()
 
@@ -27,6 +29,7 @@ Automap.apply = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
 	self.noteChart = noteChart
 
+	self.old = config.old
 	self.targetMode = config.value
 	self.columnCount = math.floor(self.noteChart.inputMode:getInputCount("key"))
 
@@ -109,26 +112,15 @@ Automap.processUpscaler = function(self)
 	bf.columnCount = columnCount
 	bf:process()
 
-	local nbs = bf:getNoteBlocks()
+	self.nbs = bf:getNoteBlocks()
 
-	NotePreprocessor:process(nbs)
+	NotePreprocessor:process(self.nbs)
 
-	local am = NextUpscaler:new()
-	am.targetMode = targetMode
-	am.columnCount = columnCount
-	am.notes = nbs
-	am:process()
-
-	local columns = {}
-	local notes = {}
-	for _, noteBlock in ipairs(nbs) do
-		for _, note in ipairs(noteBlock:getNotes()) do
-			notes[#notes + 1] = note
-			columns[noteBlock.columnIndex] = (columns[noteBlock.columnIndex] or 0) + 1
-		end
-	end
-	for columnIndex = 1, targetMode do
-		print(columnIndex, columns[columnIndex])
+	local notes
+	if self.old then
+		notes = self:getOldUpscalerNotes()
+	else
+		notes = self:getUpscalerNotes()
 	end
 
 	for i = 1, #notes do
@@ -142,6 +134,37 @@ Automap.processUpscaler = function(self)
 	end
 
 	self.noteChart.inputMode:setInputCount("key", targetMode)
+end
+
+Automap.getOldUpscalerNotes = function(self)
+	local am = Upscaler:new()
+	am.columns = AutomapOldConfig[self.targetMode][self.columnCount]
+	am:load(self.targetMode)
+	local notes, blocks = am:process(self.nbs)
+
+	return notes
+end
+
+Automap.getUpscalerNotes = function(self)
+	local am = NextUpscaler:new()
+	am.targetMode = self.targetMode
+	am.columnCount = self.columnCount
+	am.notes = self.nbs
+	am:process()
+
+	local columns = {}
+	local notes = {}
+	for _, noteBlock in ipairs(self.nbs) do
+		for _, note in ipairs(noteBlock:getNotes()) do
+			notes[#notes + 1] = note
+			columns[noteBlock.columnIndex] = (columns[noteBlock.columnIndex] or 0) + 1
+		end
+	end
+	for columnIndex = 1, self.targetMode do
+		print(columnIndex, columns[columnIndex])
+	end
+
+	return notes
 end
 
 Automap.processReductor = function(self)

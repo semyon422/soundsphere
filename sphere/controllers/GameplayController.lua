@@ -114,6 +114,7 @@ GameplayController.unload = function(self)
 	rhythmModel.observable:remove(self.view)
 	rhythmModel.inputManager:setMode("external")
 	rhythmModel.replayModel:setMode("record")
+	self.gameController:resetGameplayConfigs()
 	love.mouse.setVisible(true)
 end
 

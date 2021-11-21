@@ -220,6 +220,11 @@ GameController.load = function(self)
 	self.screenManager:set(selectController)
 end
 
+GameController.resetGameplayConfigs = function(self)
+	self.modifierModel.config = self.configModel.configs.modifier
+	self.rhythmModel.timings = self.configModel.configs.timings
+end
+
 GameController.writeConfigs = function(self)
 	self.configModel:writeConfig("settings")
 	self.configModel:writeConfig("select")

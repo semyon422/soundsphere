@@ -287,7 +287,7 @@ ModifierModel.decode = function(self, encodedConfig)
 	return config
 end
 
-ModifierModel.fixOldFormat = function(self, oldConfig)
+ModifierModel.fixOldFormat = function(self, oldConfig, oldFlag)
 	for _, modifierConfig in ipairs(oldConfig) do
 		local modifier = self:getModifier(modifierConfig)
 		if modifier then
@@ -300,6 +300,9 @@ ModifierModel.fixOldFormat = function(self, oldConfig)
 			end
 			if type(modifierConfig.value) == "number" and type(modifier.defaultValue) == "string" then
 				modifierConfig.value = modifier:fromIndexValue(modifierConfig.value)
+			end
+			if oldFlag then
+				modifierConfig.old = true
 			end
 		end
 	end

@@ -43,19 +43,14 @@ ResultController.draw = function(self)
 	self.view:draw()
 end
 
-ResultController.resetConfigs = function(self)
-	self.gameController.modifierModel.config = self.gameController.configModel.configs.modifier
-	self.gameController.rhythmModel.timings = self.gameController.configModel.configs.timings
-end
-
 ResultController.receive = function(self, event)
 	self.view:receive(event)
 
 	if event.name == "changeScreen" then
-		self:resetConfigs()
+		self.gameController:resetGameplayConfigs()
 		self.gameController.screenManager:set(self.selectController)
 	elseif event.name == "loadScore" then
-		self:resetConfigs()
+		self.gameController:resetGameplayConfigs()
 		self:replayNoteChart(event.mode, event.scoreEntry, event.itemIndex)
 	elseif event.name == "scrollScore" then
 		self.gameController.selectModel:scrollScore(event.direction)
@@ -88,7 +83,7 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 	modifierModel.config = modifierModel:decode(scoreEntry.modifiers)
 	if #modifierModel.config == 0 and replay.modifiers then
 		modifierModel.config = replay.modifiers
-		modifierModel:fixOldFormat(replay.modifiers)
+		modifierModel:fixOldFormat(replay.modifiers, not replay.timings)
 	end
 
 	if mode == "replay" or mode == "result" then
