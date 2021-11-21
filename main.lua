@@ -42,23 +42,20 @@ love.window.setMode(1, 1)
 local aquafs = require("aqua.filesystem")
 
 local source = love.filesystem.getSource()
+local sourceBase = love.filesystem.getSourceBaseDirectory()
+local moddedgame = love.filesystem.getInfo("moddedgame")
+local moddedgamePrefix = ""
 if source:find("^.+%.love$") then
 	print("starting from .love file directly")
-	aquafs.mount(love.filesystem.getSourceBaseDirectory(), "/", true)
-	aquafs.setWriteDir(love.filesystem.getSourceBaseDirectory())
-
-	local moddedgame = love.filesystem.getInfo("moddedgame")
-	if moddedgame and moddedgame.type == "directory" then
-		aquafs.mount(love.filesystem.getSourceBaseDirectory() .. "/moddedgame", "/", false)
-	end
+	aquafs.mount(sourceBase, "/", true)
+	aquafs.setWriteDir(sourceBase)
+	moddedgamePrefix = sourceBase .. "/"
 else
 	print("starting from current directory")
-	aquafs.setWriteDir(love.filesystem.getSource())
-
-	local moddedgame = love.filesystem.getInfo("moddedgame")
-	if moddedgame and moddedgame.type == "directory" then
-		aquafs.mount("moddedgame", "/", false)
-	end
+	aquafs.setWriteDir(source)
+end
+if moddedgame and moddedgame.type == "directory" then
+	aquafs.mount(moddedgamePrefix .. "moddedgame", "/", false)
 end
 
 require("luamidi")
