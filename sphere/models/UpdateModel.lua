@@ -17,7 +17,12 @@ UpdateModel.load = function(self)
 	local online = self.configModel.configs.online
 
 	self.filesUrl = online.update
-	if not settings.miscellaneous.autoUpdate or online.update == "" or self.thread then
+	if
+		not settings.miscellaneous.autoUpdate or
+		online.update == "" or
+		self.thread or
+		love.filesystem.getInfo(".git")
+	then
 		return
 	end
 
