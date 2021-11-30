@@ -29,7 +29,7 @@ ImageNoteView.draw = function(self)
 	love.graphics.replaceTransform(tf)
 	tf:release()
 
-	love.graphics.setColor(self.headView:get("color"))
+	love.graphics.setColor(self.headView:getColor())
 	love.graphics.draw(drawable, self:getTransformParams())
 end
 

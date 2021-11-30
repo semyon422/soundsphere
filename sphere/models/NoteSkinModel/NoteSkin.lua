@@ -29,7 +29,7 @@ NoteSkin.get = function(self, noteView, part, key, timeState)
 		value = value[column]
 	end
 	if type(value) == "function" then
-		return value(timeState, noteView, column)
+		value = value(timeState, noteView, column)
 	end
 
 	return value
@@ -39,8 +39,8 @@ NoteSkin.setTextures = function(self, textures)
 	self.textures = textures
 end
 
-NoteSkin.setImagesAuto = function(self)
-	local images = {}
+NoteSkin.setImagesAuto = function(self, images)
+	images = images or {}
 	for i, texture in ipairs(self.textures) do
 		local k, v = next(texture)
 		images[k] = {k}

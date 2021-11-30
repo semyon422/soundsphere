@@ -91,6 +91,17 @@ NoteSkinVsrg.color = function(timeState, noteView)
 	return colors.clear
 end
 
+local bufferColor = {0, 0, 0, 0}
+NoteSkinVsrg.multiplyColors = function(self, source, color)
+	if type(color) == "function" then
+		color = color()
+	end
+	for i = 1, 4 do
+		bufferColor[i] = (source[i] or 1) * (color[i] or 1)
+	end
+	return bufferColor
+end
+
 local function getFrame(a, deltaTime)
 	if not a.range then
 		return

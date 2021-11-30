@@ -18,12 +18,12 @@ ShortNoteView.draw = function(self)
 	if not spriteBatch then
 		return
 	end
-	spriteBatch:setColor(self.headView:get("color"))
+	spriteBatch:setColor(self.headView:getColor())
 	spriteBatch:add(self:getDraw(self.headView:getQuad(), self:getTransformParams()))
 end
 
 ShortNoteView.isVisible = function(self)
-	local color = self.headView:get("color")
+	local color = self.headView:getColor()
 	if not color then
 		return
 	end
