@@ -243,10 +243,13 @@ OsuNoteSkin.load = function(self)
 	end
 
 	local pressed, released = self:getDefaultKeyImages()
+	local stageLight = {}
+	local stageLightImage, stageLightRange = self:findAnimation("mania-stage-light")
 	for i = 1, keysCount do
 		local ki = "KeyImage" .. (i - 1)
 		pressed[i] = self:findImage(mania[ki .. "D"]) or self:findImage(pressed[i])
 		released[i] = self:findImage(mania[ki]) or self:findImage(released[i])
+		stageLight[i] = {stageLightImage, stageLightRange}
 	end
 	playfield:addKeyImages({
 		sy = 480 / 768,
@@ -254,6 +257,14 @@ OsuNoteSkin.load = function(self)
 		pressed = pressed,
 		released = released,
 	})
+	if stageLightImage then
+		playfield:addKeyImageAnimations({
+			sy = 480 / 768,
+			padding = 480 - mania.LightPosition,
+			hold = stageLight,
+			rate = mania.LightFramePerSecond,
+		})
+	end
 
 	self:addStages()
 	self:addHpBar()
@@ -489,7 +500,7 @@ OsuNoteSkin.getMaxResolution = function(self, images)
 	return file, dpi
 end
 
-OsuNoteSkin.findImage = function(self, value)
+OsuNoteSkin.findImage = function(self, value, preferFrame)
 	if not value then
 		return
 	end
@@ -518,7 +529,9 @@ OsuNoteSkin.findImage = function(self, value)
 		end
 	end
 	local file
-	if next(single) then
+	if preferFrame and next(frame) then
+		file = self:getMaxResolution(frame)
+	elseif next(single) then
 		file = self:getMaxResolution(single)
 	elseif next(frame) then
 		file = self:getMaxResolution(frame)

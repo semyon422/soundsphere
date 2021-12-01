@@ -221,10 +221,10 @@ PlayfieldVsrg.addKeyImages = function(self, object)
 	if not object.transform then
 		object.transform = self:newNoteskinTransform()
 	end
-	for i = 1, #object.pressed do
+	for i = 1, noteskin.inputsCount do
 		local pressed
 		local released
-		if object.pressed[i] then
+		if object.pressed and object.pressed[i] then
 			pressed = {
 				class = "ImageView",
 				x = noteskin.columns[i],
@@ -237,7 +237,7 @@ PlayfieldVsrg.addKeyImages = function(self, object)
 				image = object.pressed[i],
 			}
 		end
-		if object.released[i] then
+		if object.released and object.released[i] then
 			released = {
 				class = "ImageView",
 				x = noteskin.columns[i],
@@ -268,43 +268,56 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 	if not object.transform then
 		object.transform = self:newNoteskinTransform()
 	end
-	for i = 1, #object.pressed do
-		local pressed = {
-			class = "ImageAnimationView",
-			x = noteskin.columns[i],
-			y = noteskin.unit - object.h - object.padding,
-			w = noteskin.width[i],
-			h = object.h,
-			transform = object.transform,
-			image = object.pressed[i][1],
-			range = object.pressed[i][2],
-			quad = object.pressed[i][3],
-			rate = object.rate,
-		}
-		local hold = {
-			class = "ImageAnimationView",
-			x = noteskin.columns[i],
-			y = noteskin.unit - object.h - object.padding,
-			w = noteskin.width[i],
-			h = object.h,
-			transform = object.transform,
-			image = object.hold[i][1],
-			range = object.hold[i][2],
-			quad = object.hold[i][3],
-			rate = object.rate,
-		}
-		local released = {
-			class = "ImageAnimationView",
-			x = noteskin.columns[i],
-			y = noteskin.unit - object.h - object.padding,
-			w = noteskin.width[i],
-			h = object.h,
-			transform = object.transform,
-			image = object.released[i][1],
-			range = object.released[i][2],
-			quad = object.released[i][3],
-			rate = object.rate,
-		}
+	for i = 1, noteskin.inputsCount do
+		local pressed, hold, release
+		if object.pressed and object.pressed[i] then
+			pressed = {
+				class = "ImageAnimationView",
+				x = noteskin.columns[i],
+				y = noteskin.unit - object.padding,
+				w = noteskin.width[i],
+				h = object.h,
+				sy = object.sy,
+				oy = 1,
+				transform = object.transform,
+				image = object.pressed[i][1],
+				range = object.pressed[i][2],
+				quad = object.pressed[i][3],
+				rate = object.rate,
+			}
+		end
+		if object.hold and object.hold[i] then
+			hold = {
+				class = "ImageAnimationView",
+				x = noteskin.columns[i],
+				y = noteskin.unit - object.padding,
+				w = noteskin.width[i],
+				h = object.h,
+				sy = object.sy,
+				oy = 1,
+				transform = object.transform,
+				image = object.hold[i][1],
+				range = object.hold[i][2],
+				quad = object.hold[i][3],
+				rate = object.rate,
+			}
+		end
+		if object.released and object.released[i] then
+			released = {
+				class = "ImageAnimationView",
+				x = noteskin.columns[i],
+				y = noteskin.unit - object.padding,
+				w = noteskin.width[i],
+				h = object.h,
+				sy = object.sy,
+				oy = 1,
+				transform = object.transform,
+				image = object.released[i][1],
+				range = object.released[i][2],
+				quad = object.released[i][3],
+				rate = object.rate,
+			}
+		end
 		local inputType, inputIndex = noteskin.inputs[i]:match("^(.-)(%d+)$")
 		local key = {
 			class = "InputAnimationView",
