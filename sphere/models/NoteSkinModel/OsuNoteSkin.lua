@@ -97,9 +97,6 @@ OsuNoteSkin.load = function(self)
 		end
 	end
 	local lightingN, rangeN = self:findAnimation(mania.LightingN)
-	if not lightingN then
-		lightingN, rangeN = self:findAnimation("LightingN")
-	end
 	if lightingN then
 		if rangeN then
 			table.insert(textures, {lightingN = {lightingN, rangeN}})
@@ -110,9 +107,6 @@ OsuNoteSkin.load = function(self)
 		blendModes.lightingN = {"add", "alphamultiply"}
 	end
 	local lightingL, rangeL = self:findAnimation(mania.LightingL)
-	if not lightingL then
-		lightingL, rangeL = self:findAnimation("LightingL")
-	end
 	if lightingL then
 		if rangeL then
 			table.insert(textures, {lightingL = {lightingL, rangeL}})
@@ -638,12 +632,13 @@ OsuNoteSkin.addStages = function(self)
 	if stageBottom then
 		playfield:add({
 			class = "ImageView",
-			x = self.columns[1] - self.space[1],
+			x = 0,
 			y = 480,
-			w = self.fullWidth,
+			sx = 1,
 			sy = 1,
 			oy = 1,
-			transform = playfield:newNoteskinTransform(),
+			ox = 0.5,
+			transform = self.playField:newLaneCenterTransform(480),
 			image = stageBottom,
 		})
 	end
