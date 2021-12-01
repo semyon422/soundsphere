@@ -29,7 +29,7 @@ NoteSkin.get = function(self, noteView, part, key, timeState)
 		value = value[column]
 	end
 	if type(value) == "function" then
-		value = value(timeState, noteView, column)
+		return value(timeState, noteView, column)  -- multiple values
 	end
 
 	return value

@@ -288,24 +288,24 @@ local getNoteType = function(key, keymode)
 			return "S"
 		else
 			if (half - key + 1) % 2 == 1 then
-				return 2
-			else
 				return 1
+			else
+				return 2
 			end
 		end
 	else
 		local half = keymode / 2
 		if key <= keymode / 2 then
 			if (half - key + 1) % 2 == 1 then
-				return 2
-			else
 				return 1
+			else
+				return 2
 			end
 		else
 			if (half - key + 1) % 2 == 1 then
-				return 1
-			else
 				return 2
+			else
+				return 1
 			end
 		end
 	end

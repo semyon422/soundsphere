@@ -210,7 +210,7 @@ RhythmView.getSpriteBatch = function(self, note, part, key, timeState)
 	local key, path = next(texture)
 	if type(path) == "string" then
 		return state.spriteBatches[key][path]
-	elseif type(texture) == "table" then
+	elseif type(path) == "table" then
 		return state.spriteBatches[key][path[1]:format(frame)]
 	end
 end
