@@ -504,7 +504,8 @@ OsuNoteSkin.findImage = function(self, value)
 	local frame = {}
 	for _, file in pairs(self.files) do
 		if file:lower():find(value, 1, true) == 1 then
-			local rest = file:sub(#value + 1)
+			local trueValue = file:sub(1, #value)
+			local rest = file:sub(#trueValue + 1)
 			local format = rest:match("^.*%.([^%.]+)$")
 			if supportedImageFormats[format] then
 				rest = rest:sub(1, -#format - 2)
@@ -542,7 +543,8 @@ OsuNoteSkin.findAnimation = function(self, value)
 	local framesPath = {}
 	for _, file in pairs(self.files) do
 		if file:lower():find(value, 1, true) == 1 then
-			local rest = file:sub(#value + 1)
+			local trueValue = file:sub(1, #value)
+			local rest = file:sub(#trueValue + 1)
 			local format = rest:match("^.*%.([^%.]+)$")
 			if supportedImageFormats[format] then
 				rest = rest:sub(1, -#format - 2)
@@ -555,13 +557,13 @@ OsuNoteSkin.findAnimation = function(self, value)
 					local frame = tonumber(rest:match("^-(%d+)$"))
 					frames[1] = frames[1] or {}
 					table.insert(frames[1], frame)
-					framesPath[1] = value .. "-%d." .. format
+					framesPath[1] = trueValue .. "-%d." .. format
 				elseif rest:find("^-%d+@%d+x$") then
 					local frame, dpi = rest:match("^-(%d+)@(%d+)x$")
 					frame, dpi = tonumber(frame), tonumber(dpi)
 					frames[dpi] = frames[dpi] or {}
 					table.insert(frames[dpi], frame)
-					framesPath[dpi] = value .. "-%d@" .. dpi .. "x." .. format
+					framesPath[dpi] = trueValue .. "-%d@" .. dpi .. "x." .. format
 				end
 			end
 		end
