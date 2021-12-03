@@ -38,6 +38,7 @@ return {
 		}
 	},
 	graphics = {
+		asynckey = false,
 		blur = {
 			gameplay = 0,
 			result = 0,

@@ -225,6 +225,13 @@ local settings = {
 		displayValues = {"enabled", "disabled", "adaptive"}
 	},
 	{
+		name = "threaded input",
+		section = "graphics",
+		key = "graphics.asynckey",
+		type = "switch",
+		displayRange = {"disabled", "enabled"}
+	},
+	{
 		name = "start window resolution",
 		section = "graphics",
 		key = "graphics.mode.window",

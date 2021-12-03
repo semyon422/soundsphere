@@ -89,9 +89,10 @@ InputManager.receive = function(self, event)
 		return
 	end
 
-	local eventTime = self.currentTime
+	-- local eventTime = self.currentTime
+	local eventTime = event.time - self.timeEngine.timeManager.eventTime + self.currentTime - self.timeEngine.timeManager.eventDelta
 	if self.needRound then
-		eventTime =  math.floor(self.currentTime * 1024) / 1024
+		eventTime =  math.floor(eventTime * 1024) / 1024
 	end
 
 	local offset = self.offset
