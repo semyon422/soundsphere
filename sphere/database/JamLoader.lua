@@ -37,7 +37,6 @@ JamLoader.load = function(self, path, callback)
 				path = path
 			},
 			result = function(soundDatas)
-				local path = event.path
 				ojms[path] = soundDatas
 
 				for i, soundData in pairs(soundDatas) do
