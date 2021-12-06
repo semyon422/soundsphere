@@ -263,6 +263,29 @@ PlayfieldVsrg.addKeyImages = function(self, object)
 	end
 end
 
+PlayfieldVsrg.addStaticKeyImages = function(self, object)
+	local noteskin = self.noteskin
+	if not object.transform then
+		object.transform = self:newNoteskinTransform()
+	end
+	for i = 1, noteskin.inputsCount do
+		if object.image and object.image[i] then
+			local image = {
+				class = "ImageView",
+				x = noteskin.columns[i],
+				y = noteskin.unit - object.padding,
+				w = noteskin.width[i],
+				h = object.h,
+				sy = object.sy,
+				oy = 1,
+				transform = object.transform,
+				image = object.image[i],
+			}
+			self:add(image)
+		end
+	end
+end
+
 PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 	local noteskin = self.noteskin
 	if not object.transform then
