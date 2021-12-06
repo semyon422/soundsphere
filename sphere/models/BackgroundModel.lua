@@ -143,6 +143,9 @@ BackgroundModel.loadOJN = function(self, path)
 			path = path
 		},
 		result = function(imageData)
+			if not imageData then
+				return self:setBackground(self.emptyImage)
+			end
 			local image = love.graphics.newImage(imageData)
 			self:setBackground(image)
 		end
