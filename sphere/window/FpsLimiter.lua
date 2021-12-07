@@ -7,6 +7,7 @@ FpsLimiter.update = function(self)
 	local settings = self.configModel.configs.settings
 	aquaevent.fpslimit = settings.graphics.fps
 	aquaevent.asynckey = settings.graphics.asynckey
+	aquaevent.dwmflush = settings.graphics.dwmflush
 end
 
 return FpsLimiter

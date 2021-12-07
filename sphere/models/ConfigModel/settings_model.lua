@@ -225,6 +225,13 @@ local settings = {
 		displayValues = {"enabled", "disabled", "adaptive"}
 	},
 	{
+		name = "DWM flush",
+		section = "graphics",
+		key = "graphics.dwmflush",
+		type = "switch",
+		displayRange = {"disabled", "enabled"}
+	},
+	{
 		name = "threaded input",
 		section = "graphics",
 		key = "graphics.asynckey",

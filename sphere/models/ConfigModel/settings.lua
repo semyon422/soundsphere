@@ -50,6 +50,7 @@ return {
 			result = 0.8,
 			select = 0.8
 		},
+		dwmflush = false,
 		fps = 240,
 		mode = {
 			flags = {
