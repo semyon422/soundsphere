@@ -232,6 +232,13 @@ local settings = {
 		displayRange = {"disabled", "enabled"}
 	},
 	{
+		name = "predict draw time",
+		section = "graphics",
+		key = "graphics.predictDrawTime",
+		type = "switch",
+		displayRange = {"disabled", "enabled"}
+	},
+	{
 		name = "threaded input",
 		section = "graphics",
 		key = "graphics.asynckey",

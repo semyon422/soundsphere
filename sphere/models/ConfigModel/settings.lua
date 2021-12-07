@@ -83,7 +83,8 @@ return {
 			y = 0.5,
 			yaw = 0,
 			z = -0.71407400337105997
-		}
+		},
+		predictDrawTime = false
 	},
 	input = {
 		pause = "escape",
