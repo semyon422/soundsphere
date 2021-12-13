@@ -56,8 +56,8 @@ NoteView.updateMiddleChord = function(self)
 	local middleChord = self.middleChord
 	for i = 1, self.noteSkin.inputsCount do
 		middleChord[i] = nil
-		if startChord[i] == 1 and endChord[i] == 0 then
-			middleChord[i] = 1
+		if startChord[i] == "LongNoteStart" and endChord[i] == "LongNoteEnd" then
+			middleChord[i] = startChord[i]
 		end
 	end
 	self.middleChordFixed = true

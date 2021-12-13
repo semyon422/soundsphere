@@ -92,7 +92,7 @@ RhythmView.draw = function(self)
 
 		local column = inputs[startNoteData.inputType .. startNoteData.inputIndex]
 		if column and column <= inputsCount and noteView:isVisible() then
-			chord[column] = 1
+			chord[column] = startNoteData.noteType
 			noteView.startChord = chord
 
 			if endNoteData then
@@ -100,7 +100,7 @@ RhythmView.draw = function(self)
 				chords[time] = chords[time] or {}
 				chord = chords[time]
 
-				chord[column] = 0
+				chord[column] = endNoteData.noteType
 				noteView.endChord = chord
 			end
 		end
