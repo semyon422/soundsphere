@@ -1,6 +1,7 @@
 local ScoreDatabase	= require("sphere.models.ScoreModel.ScoreDatabase")
 local Log			= require("aqua.util.Log")
 local Class			= require("aqua.util.Class")
+local erfunc = require("libchart.erfunc")
 
 local ScoreManager = Class:new()
 
@@ -10,8 +11,17 @@ ScoreManager.init = function(self)
 	self.log.path = "userdata/scores.log"
 end
 
-local sortByScore = function(a, b)
-	return a.score < b.score
+local sortScores = function(a, b)
+	return a.rating > b.rating
+end
+
+ScoreManager.transformScoreEntry = function(self, scoreEntry)
+	if not self.newRating then
+		return scoreEntry
+	end
+	local enps = scoreEntry.rating * scoreEntry.accuracy
+	scoreEntry.rating = enps * erfunc.erf(self.ratingHitTimingWindow / (scoreEntry.accuracy * math.sqrt(2)))
+	return scoreEntry
 end
 
 ScoreManager.select = function(self)
@@ -29,6 +39,7 @@ ScoreManager.select = function(self)
 	local row = stmt:step()
 	while row do
 		local entry = ScoreDatabase:transformScoreEntry(row)
+		entry = self:transformScoreEntry(entry)
 		scores[#scores + 1] = entry
 
 		row = stmt:step()
@@ -64,7 +75,7 @@ ScoreManager.select = function(self)
 	end
 	for _, list in pairs(scoresHashIndex) do
 		for _, sublist in pairs(list) do
-			table.sort(sublist, sortByScore)
+			table.sort(sublist, sortScores)
 		end
 	end
 

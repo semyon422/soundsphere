@@ -12,9 +12,11 @@ end
 
 local formatDifficulty = function(difficulty)
 	local format = "%.2f"
-	if difficulty >= 100 then
+	if difficulty >= 10000 then
 		format = "%s"
-		difficulty = "100+"
+		difficulty = "????"
+	elseif difficulty >= 100 then
+		format = "%d"
 	elseif difficulty >= 10 then
 		format = "%.1f"
 	end
@@ -265,7 +267,7 @@ local ScoreList = {
 				"scoreEntry.rating"
 			},
 			onNew = false,
-			format = "%d",
+			format = formatDifficulty,
 			x = 94,
 			baseline = 45,
 			limit = 72,

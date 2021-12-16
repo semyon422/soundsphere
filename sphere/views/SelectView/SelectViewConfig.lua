@@ -9,9 +9,11 @@ end
 
 local formatDifficulty = function(difficulty)
 	local format = "%.2f"
-	if difficulty >= 100 then
+	if difficulty >= 10000 then
 		format = "%s"
-		difficulty = "100+"
+		difficulty = "????"
+	elseif difficulty >= 100 then
+		format = "%d"
 	elseif difficulty >= 10 then
 		format = "%.1f"
 	end
@@ -366,7 +368,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 3, y = 5,
 		name = "rating",
-		format = "%d",
+		format = formatDifficulty,
 		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.rating"
 	},
 	{

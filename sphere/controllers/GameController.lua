@@ -156,6 +156,7 @@ GameController.load = function(self)
 	backgroundModel.cacheModel = cacheModel
 	collectionModel.configModel = configModel
 	collectionModel.cacheModel = cacheModel
+	scoreModel.configModel = configModel
 
 	directoryManager:createDirectories()
 
