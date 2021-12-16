@@ -19,6 +19,7 @@ return {
 			image = false,
 			video = false
 		},
+		lastMeanValues = 10,
 		longNoteShortening = 0,
 		needTimeRound = true,
 		offset = {

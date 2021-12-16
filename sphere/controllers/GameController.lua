@@ -126,6 +126,7 @@ GameController.load = function(self)
 	modifierModel.rhythmModel = rhythmModel
 	inputModel.configModel = configModel
 	rhythmModel.modifierModel = modifierModel
+	rhythmModel.configModel = configModel
 	noteChartSetLibraryModel.cacheModel = cacheModel
 	noteChartSetLibraryModel.collectionModel = collectionModel
 	noteChartSetLibraryModel.searchModel = searchModel

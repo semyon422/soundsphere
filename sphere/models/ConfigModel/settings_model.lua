@@ -69,6 +69,15 @@ local settings = {
 		format = "%d"
 	},
 	{
+		name = "last mean values",
+		section = "gameplay",
+		key = "gameplay.lastMeanValues",
+		type = "slider",
+		range = {10, 100},
+		step = 10,
+		format = "%d"
+	},
+	{
 		name = "new rating",
 		section = "gameplay",
 		key = "gameplay.newRating",

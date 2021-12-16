@@ -1,4 +1,5 @@
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
+local RingBuffer = require("aqua.util.RingBuffer")
 
 local BaseScoreSystem = ScoreSystem:new()
 
@@ -17,9 +18,14 @@ BaseScoreSystem.construct = function(self)
 	self.isLongNoteComboBreak = false
 
 	self.counters = {}
+
+	self.lastMean = 0
 end
 
 BaseScoreSystem.before = function(self, event)
+	local gameplay = self.scoreEngine.configModel.configs.settings.gameplay
+	self.meanRingBuffer = self.meanRingBuffer or RingBuffer:new({size = gameplay.lastMeanValues})
+
 	self.currentTime = event.currentTime
 	self.isMiss = false
 	self.isLongNoteComboBreak = false
@@ -55,16 +61,29 @@ BaseScoreSystem.miss = function(self)
 	self.isMiss = true
 end
 
+BaseScoreSystem.countLastMean = function(self, event)
+	local noteStartTime = event.noteStartTime or event.noteTime
+	local deltaTime = (event.currentTime - noteStartTime) / math.abs(event.timeRate)
+
+	local rb = self.meanRingBuffer
+	rb:write(deltaTime)
+	local sum = 0
+	for i = 1, rb.size do
+		sum = sum + rb:read()
+	end
+	self.lastMean = sum / rb.size
+end
+
 BaseScoreSystem.notes = {
 	ShortScoreNote = {
 		clear = {
-			passed = BaseScoreSystem.success,
+			passed = {BaseScoreSystem.success, BaseScoreSystem.countLastMean},
 			missed = {BaseScoreSystem.breakCombo, BaseScoreSystem.miss},
 		},
 	},
 	LongScoreNote = {
 		clear = {
-			startPassedPressed = nil,
+			startPassedPressed = BaseScoreSystem.countLastMean,
 			startMissed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
 			startMissedPressed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
 		},

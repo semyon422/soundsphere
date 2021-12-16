@@ -57,6 +57,7 @@ RhythmModel.load = function(self)
 
 	graphicEngine.timeEngine = timeEngine
 	graphicEngine.logicEngine = logicEngine
+	scoreEngine.configModel = self.configModel
 	scoreEngine.timingWindows = self.timings
 	scoreEngine.judgements = self.judgements
 	scoreEngine.hp = self.hp
