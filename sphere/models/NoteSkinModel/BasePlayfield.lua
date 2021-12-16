@@ -3,7 +3,7 @@ local PlayfieldVsrg = require("sphere.models.NoteSkinModel.PlayfieldVsrg")
 local BasePlayfield = PlayfieldVsrg:new({construct = false})
 
 BasePlayfield.addBaseProgressBar = function(self)
-	self:addProgressBar({
+	return self:addProgressBar({
 		x = 0,
 		y = 1070,
 		w = 1920,
@@ -16,7 +16,7 @@ BasePlayfield.addBaseProgressBar = function(self)
 end
 
 BasePlayfield.addBaseHpBar = function(self)
-	self:addHpBar({
+	return self:addHpBar({
 		x = 0,
 		y = 0,
 		w = 10,
@@ -29,7 +29,7 @@ BasePlayfield.addBaseHpBar = function(self)
 end
 
 BasePlayfield.addBaseScore = function(self)
-	self:addScore({
+	return self:addScore({
 		x = 0,
 		baseline = 52,
 		limit = 1906,
@@ -43,7 +43,7 @@ BasePlayfield.addBaseScore = function(self)
 end
 
 BasePlayfield.addBaseAccuracy = function(self)
-	self:addAccuracy({
+	return self:addAccuracy({
 		x = 0,
 		baseline = 94,
 		limit = 1905,
@@ -57,7 +57,7 @@ BasePlayfield.addBaseAccuracy = function(self)
 end
 
 BasePlayfield.addBaseCombo = function(self)
-	self:addCombo({
+	return self:addCombo({
 		x = -540,
 		baseline = 476,
 		limit = 1080,
@@ -72,7 +72,7 @@ BasePlayfield.addBaseCombo = function(self)
 end
 
 BasePlayfield.addBaseHitError = function(self)
-	self:addHitError({
+	return self:addHitError({
 		transform = self:newLaneCenterTransform(1080),
 		x = 0,
 		y = 1041,

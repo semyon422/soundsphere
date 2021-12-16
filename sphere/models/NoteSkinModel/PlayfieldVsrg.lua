@@ -54,17 +54,18 @@ end
 
 PlayfieldVsrg.add = function(self, ...)
 	table.insert(self, ...)
+	return ...
 end
 
 PlayfieldVsrg.enableCamera = function(self)
-	self:add({
+	return self:add({
 		class = "CameraView",
 		draw_start = true,
 	})
 end
 
 PlayfieldVsrg.disableCamera = function(self)
-	self:add({
+	return self:add({
 		class = "CameraView",
 		draw_end = true,
 	})
@@ -75,23 +76,23 @@ PlayfieldVsrg.addRhythmView = function(self, object)
 	if not object.transform then
 		object.transform = self:newNoteskinTransform()
 	end
-	self:add(object)
+	return self:add(object)
 end
 
 PlayfieldVsrg.addNotes = function(self, object)
-	self:addRhythmView(object or {})
+	return self:addRhythmView(object or {})
 end
 
 PlayfieldVsrg.addLightings = function(self, object)
 	object = object or {}
 	object.mode = "lighting"
-	self:addRhythmView(object)
+	return self:addRhythmView(object)
 end
 
 PlayfieldVsrg.addBga = function(self, object)
 	object = object or {}
 	object.mode = "bga"
-	self:addRhythmView(object)
+	return self:addRhythmView(object)
 end
 
 PlayfieldVsrg.addProgressBar = function(self, object)
@@ -101,7 +102,7 @@ PlayfieldVsrg.addProgressBar = function(self, object)
 	object.max = {key = "gameController.rhythmModel.timeEngine.maxTime"}
 	object.start = {key = "gameController.rhythmModel.timeEngine.startTime"}
 	object.current = {key = "gameController.rhythmModel.timeEngine.currentTime"}
-	self:add(object)
+	return self:add(object)
 end
 
 PlayfieldVsrg.addHpBar = function(self, object)
@@ -111,13 +112,13 @@ PlayfieldVsrg.addHpBar = function(self, object)
 	object.max = {value = 1}
 	object.start = {value = 0}
 	object.current = {key = "gameController.rhythmModel.scoreEngine.scoreSystem.hp.hp"}
-	self:add(object)
+	return self:add(object)
 end
 
 PlayfieldVsrg.addValueView = function(self, object)
 	object = object or {}
 	object.class = "ValueView"
-	self:add(object)
+	return self:add(object)
 end
 
 PlayfieldVsrg.addScore = function(self, object)
@@ -127,7 +128,7 @@ PlayfieldVsrg.addScore = function(self, object)
 	object.format = object.format or "%0.2f"
 	object.multiplier = 1000
 	object.color = object.color or {1, 1, 1, 1}
-	self:add(object)
+	return self:add(object)
 end
 
 PlayfieldVsrg.addAccuracy = function(self, object)
@@ -137,7 +138,7 @@ PlayfieldVsrg.addAccuracy = function(self, object)
 	object.format = object.format or "%0.2f"
 	object.multiplier = 1000
 	object.color = object.color or {1, 1, 1, 1}
-	self:add(object)
+	return self:add(object)
 end
 
 PlayfieldVsrg.addCombo = function(self, object)
@@ -146,7 +147,7 @@ PlayfieldVsrg.addCombo = function(self, object)
 	object.key = "gameController.rhythmModel.scoreEngine.scoreSystem.base.combo"
 	object.format = object.format or "%d"
 	object.color = object.color or {1, 1, 1, 1}
-	self:add(object)
+	return self:add(object)
 end
 
 PlayfieldVsrg.addJudgement = function(self, object)
@@ -174,7 +175,7 @@ PlayfieldVsrg.addJudgement = function(self, object)
 	if object.key then
 		key = key .. "." .. object.key
 	end
-	self:add({
+	return self:add({
 		class = "JudgementView",
 		key = key,
 		judgements = judgements
@@ -209,7 +210,7 @@ PlayfieldVsrg.addDeltaTimeJudgement = function(self, object)
 			judgements[i] = judgement
 		end
 	end
-	self:add({
+	return self:add({
 		class = "DeltaTimeJudgementView",
 		key = "gameController.rhythmModel.scoreEngine.scoreSystem.misc",
 		judgements = judgements
@@ -384,7 +385,7 @@ PlayfieldVsrg.addColumnsBackground = function(self, object)
 			ry = 0
 		})
 	end
-	self:add({
+	return self:add({
 		class = "RectangleView",
 		transform = object.transform,
 		rectangles = rectangles
@@ -463,7 +464,7 @@ PlayfieldVsrg.addHitError = function(self, object)
 		return notPerfectColor
 	end
 
-	self:add(object)
+	return self:add(object)
 end
 
 return PlayfieldVsrg

@@ -37,6 +37,7 @@ end
 
 NoteSkin.setTextures = function(self, textures)
 	self.textures = textures
+	return textures
 end
 
 NoteSkin.setImagesAuto = function(self, images)
@@ -45,7 +46,7 @@ NoteSkin.setImagesAuto = function(self, images)
 		local k, v = next(texture)
 		images[k] = {k}
 	end
-	self:setImages(images)
+	return self:setImages(images)
 end
 
 NoteSkin.setImages = function(self, images)
@@ -58,10 +59,12 @@ NoteSkin.setImages = function(self, images)
 		image[1] = map[image[1]]
 	end
 	self.images = images
+	return images
 end
 
 NoteSkin.setBlendModes = function(self, blendModes)
 	self.blendModes = blendModes
+	return blendModes
 end
 
 NoteSkin.getDimensions = function(self, imageName)
