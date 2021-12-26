@@ -18,14 +18,30 @@ ProgressView.draw = function(self)
 	love.graphics.rectangle("fill", x, y, w, h)
 end
 
+ProgressView.getValue = function(self, field)
+	if type(field) == "number" then
+		return field
+	elseif type(field) == "string" then
+		return inside(self, field)
+	elseif type(field) == "function" then
+		return field(self)
+	elseif type(field) == "table" then
+		if field.value then
+			return self:getValue(field.value)
+		elseif field.key then
+			return inside(self, field.key)
+		end
+	end
+end
+
 ProgressView.getRectangle = function(self)
 	local config = self.config
 
 	local direction = config.direction
-	local minTime = config.min and (config.min.value or inside(self, config.min.key)) or 0
-	local maxTime = config.max and (config.max.value or inside(self, config.max.key)) or 1
-	local startTime = config.start and (config.start.value or inside(self, config.start.key)) or 0
-	local currentTime = config.current and (config.current.value or inside(self, config.current.key)) or 0
+	local minTime = self:getValue(config.min) or 0
+	local maxTime = self:getValue(config.max) or 1
+	local startTime = self:getValue(config.start) or 0
+	local currentTime = self:getValue(config.current) or 0
 
 	local normTime = 1
 	if currentTime < minTime then
