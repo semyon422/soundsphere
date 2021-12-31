@@ -6,6 +6,7 @@ local ImageView	= require("sphere.views.ImageView")
 local ImageProgressView = Class:new()
 
 ImageProgressView.getRectangle = ProgressView.getRectangle
+ImageProgressView.getValue = ProgressView.getValue
 
 ImageProgressView.load = function(self)
 	ImageView.load(self)
