@@ -709,7 +709,9 @@ StageInfo.cells = {
 			"gameController.selectModel.scoreItem.scoreEntry.earlylate"
 		},
 		format = function(earlylate)
-			if earlylate > 1 then
+			if earlylate == 0 then
+				return "undef"
+			elseif earlylate > 1 then
 				return ("-%d%%"):format((earlylate - 1) * 100)
 			elseif earlylate < 1 then
 				return ("%d%%"):format((1 / earlylate - 1) * 100)
