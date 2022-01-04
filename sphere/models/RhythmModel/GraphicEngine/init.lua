@@ -1,4 +1,3 @@
-local aquaevent				= require("aqua.event")
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
 local NoteDrawer		= require("sphere.models.RhythmModel.GraphicEngine.NoteDrawer")
@@ -66,6 +65,7 @@ GraphicEngine.receive = function(self, event)
 	if event.name == "TimeState" then
 		self.currentTime = event.currentTime
 		if self.timeEngine.timeManager.eventTime then
+			local aquaevent = require("aqua.event")
 			self.currentTime = aquaevent.predictedPresentTime - self.timeEngine.timeManager.eventTime + event.currentTime
 		end
 		if event.timeRate ~= 0 then

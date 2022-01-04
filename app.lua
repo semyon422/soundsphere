@@ -33,4 +33,11 @@ local WebNoteChartController = require("sphere.controllers.WebNoteChartControlle
 app:match("/replay", json_params(respond_to(WebReplayController)))
 app:match("/notechart", json_params(respond_to(WebNoteChartController)))
 
+function app:handle_error(err, trace)
+	return {status = 500, json = {
+		err = err,
+		trace = trace,
+	}}
+end
+
 return app
