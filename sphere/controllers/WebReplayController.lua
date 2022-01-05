@@ -47,6 +47,7 @@ WebReplayController.POST = function(self)
 	rhythmModel.timings = require("sphere.models.ConfigModel.timings")
 	rhythmModel.judgements = require("sphere.models.ConfigModel.judgements")
 	rhythmModel.hp = require("sphere.models.ConfigModel.hp")
+	rhythmModel.settings = require("sphere.models.ConfigModel.settings")
 
 	noteChartModel.noteChart = noteChart
 	noteChartModel.load = function() end
@@ -76,7 +77,13 @@ WebReplayController.POST = function(self)
 
 	local score = rhythmModel.scoreEngine.scoreSystem:getSlice()
 
-	return {json = {score = score}}
+	return {json = {
+		score = score,
+		inputMode = noteChart.inputMode:getString(),
+		modifiers = replay.modifiers,
+		modifiersEncoded = modifierModel:encode(replay.modifiers),
+		modifiersString = modifierModel:getString(replay.modifiers),
+	}}
 end
 
 

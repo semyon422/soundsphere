@@ -1,4 +1,4 @@
-local Class = require("aqua.util.Class")
+local DifficultyModel = require("sphere.models.DifficultyModel")
 
 local NoteChartFactory = require("notechart.NoteChartFactory")
 
@@ -23,6 +23,9 @@ end
 WebNoteChartController.POST = function(self)
 	local noteChart = WebNoteChartController.getNoteChart(self.params.notechart)
 	local noteChartDataEntry = noteChart.metaData:getTable()
+
+	local difficulty, longNoteRatio = DifficultyModel:getDifficulty(noteChart)
+	noteChartDataEntry.difficulty = difficulty
 
 	return {json = {notechart = noteChartDataEntry}}
 end

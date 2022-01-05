@@ -264,6 +264,23 @@ ModifierModel.receive = function(self, event)
 	end
 end
 
+ModifierModel.getString = function(self, config)
+	config = config or self.config
+	local t = {}
+	for _, modifierConfig in ipairs(config) do
+		local modifier = self:getModifier(modifierConfig)
+		if modifier then
+			local modifierString = ""
+			modifierString = modifierString .. (modifier:getString(modifierConfig) or "")
+			modifierString = modifierString .. (modifier:getSubString(modifierConfig) or "")
+			if #modifierString > 0 then
+				table.insert(t, modifierString)
+			end
+		end
+	end
+	return table.concat(t, " ")
+end
+
 ModifierModel.encode = function(self, config)
 	config = config or self.config
 	local t = {}

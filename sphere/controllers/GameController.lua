@@ -188,6 +188,7 @@ GameController.load = function(self)
 	rhythmModel.timings = configModel.configs.timings
 	rhythmModel.judgements = configModel.configs.judgements
 	rhythmModel.hp = configModel.configs.hp
+	rhythmModel.settings = configModel.configs.settings
 
 	settingsModel:load()
 	themeModel:load()

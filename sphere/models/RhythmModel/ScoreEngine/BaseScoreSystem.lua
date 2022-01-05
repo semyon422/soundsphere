@@ -23,7 +23,7 @@ BaseScoreSystem.construct = function(self)
 end
 
 BaseScoreSystem.before = function(self, event)
-	local gameplay = self.scoreEngine.configModel.configs.settings.gameplay
+	local gameplay = self.scoreEngine.settings.gameplay
 	self.meanRingBuffer = self.meanRingBuffer or RingBuffer:new({size = gameplay.lastMeanValues})
 
 	self.currentTime = event.currentTime
