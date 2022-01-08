@@ -16,10 +16,11 @@ local toarray = function(s)
 end
 
 local fromDefault = function(t, default)
+	local out = {}
 	for i, v in ipairs(default) do
-		t[i] = t[i] or v
+		out[i] = t[i] or v
 	end
-	return t
+	return out
 end
 
 local fixColor = function(t)
