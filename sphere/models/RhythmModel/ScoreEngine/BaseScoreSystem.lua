@@ -13,6 +13,7 @@ BaseScoreSystem.construct = function(self)
 	self.combo = 0
 	self.maxCombo = 0
 	self.currentTime = 0
+	self.timeRate = 0
 
 	self.isMiss = false
 	self.isLongNoteComboBreak = false
@@ -29,6 +30,8 @@ BaseScoreSystem.before = function(self, event)
 	self.currentTime = event.currentTime
 	self.isMiss = false
 	self.isLongNoteComboBreak = false
+
+	self.timeRate =  math.abs(event.timeRate)
 
 	if self.noteCount ~= 0 then
 		return
