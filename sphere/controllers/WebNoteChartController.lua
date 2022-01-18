@@ -4,7 +4,7 @@ local NoteChartFactory = require("notechart.NoteChartFactory")
 
 local WebNoteChartController = {}
 
-WebNoteChartController.getNoteChart = function(notechart)
+WebNoteChartController.getNoteCharts = function(notechart)
 	local file = io.open(notechart.path, "r")
 	if not file then
 		error("Notechart not found")
@@ -17,17 +17,21 @@ WebNoteChartController.getNoteChart = function(notechart)
 		content,
 		notechart.index
 	)
-	return noteCharts[1]
+	return noteCharts
 end
 
 WebNoteChartController.POST = function(self)
-	local noteChart = WebNoteChartController.getNoteChart(self.params.notechart)
-	local noteChartDataEntry = noteChart.metaData:getTable()
+	local noteCharts = WebNoteChartController.getNoteCharts(self.params.notechart)
 
-	local difficulty, longNoteRatio = DifficultyModel:getDifficulty(noteChart)
-	noteChartDataEntry.difficulty = difficulty
+	local noteChartDataEntries = {}
+	for _, noteChart in ipairs(noteCharts) do
+		local noteChartDataEntry = noteChart.metaData:getTable()
+		local difficulty, longNoteRatio = DifficultyModel:getDifficulty(noteChart)
+		noteChartDataEntry.difficulty = difficulty
+		table.insert(noteChartDataEntries, noteChartDataEntry)
+	end
 
-	return {json = {notechart = noteChartDataEntry}}
+	return {json = {notecharts = noteChartDataEntries}}
 end
 
 
