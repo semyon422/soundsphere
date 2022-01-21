@@ -54,14 +54,21 @@ ModifierNavigator.scrollAvailableModifier = function(self, direction)
 end
 
 ModifierNavigator.removeModifier = function(self, itemIndex)
+	local modifierConfig = self.gameController.modifierModel.config[itemIndex or self.gameController.modifierModel.modifierItemIndex]
+	if not modifierConfig then
+		return
+	end
 	self:send({
 		name = "removeModifier",
-		modifierConfig = self.gameController.modifierModel.config[itemIndex or self.gameController.modifierModel.modifierItemIndex]
+		modifierConfig = modifierConfig
 	})
 end
 
 ModifierNavigator.increaseModifierValue = function(self, itemIndex, delta)
 	local modifierConfig = self.gameController.modifierModel.config[itemIndex or self.gameController.modifierModel.modifierItemIndex]
+	if not modifierConfig then
+		return
+	end
 	self:send({
 		name = "increaseModifierValue",
 		modifierConfig = modifierConfig,
