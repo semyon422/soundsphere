@@ -29,15 +29,21 @@ WebApi.get = function(url, params)
 	return request.send(url)
 end
 
-WebApi.post = function(url, params, method)
+WebApi.post = function(url, method, params, buffers)
 	local json = require("json")
 	local request = require("luajit-request")
 	require("preloaders.preloadall")
 
+	local request_buffers = {json_params = json.encode(params)}
+	if buffers then
+		for k, v in pairs(buffers) do
+			request_buffers[k] = v
+		end
+	end
+
 	return request.send(url, {
 		method = method,
-		headers = {["content-type"] = "application/json"},
-		data = json.encode(params),
+		buffers = request_buffers,
 	})
 end
 
@@ -68,12 +74,12 @@ WebApi.init = function(self)
 				local path = %q
 				local response
 				if field == "get" then
-					response = WebApi.get(host .. "/api" .. path, ...)
+					response = WebApi.get(host .. "/api" .. path, unpack(...))
 				else
-					response = WebApi.post(host .. "/api" .. path, ..., field:upper())
+					response = WebApi.post(host .. "/api" .. path, field:upper(), unpack(...))
 				end
 				return WebApi.processResponse(method, response)
-			]]):format(t.key, self.host, t.prevPath))(...)
+			]]):format(t.key, self.host, t.prevPath))({...})
 		end
 	}
 	setmetatable(self.api, mt)
