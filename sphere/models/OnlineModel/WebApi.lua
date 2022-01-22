@@ -110,30 +110,6 @@ WebApi.load = function(self)
 		end
 	}
 	setmetatable(self.api, mt)
-
-	local api = self.api
-	thread.call(function()
-	-- 	print(api.users:get({search = "adm"})[1].name)  -- admin
-	-- 	print(api.users[1]:get().name)  -- admin
-	-- 	print(api.users[1]:get({roles = true}).user_roles[1].role)  -- creator
-		-- print(require("inspect")(api.test:_post({
-		-- 	query_number = 0,
-		-- 	query_boolean = true,
-		-- 	recaptcha_token = 1,
-		-- 	params = true,
-		-- 	query_exists = 1,
-		-- 	body_exists = 1,
-		-- 	body_number = 1,
-		-- 	body_boolean = false,
-		-- 	body_table = {
-		-- 		body_table_exists = "4",
-		-- 		body_table_table = {
-		-- 			body_table_table_exists = "3"
-		-- 		}
-		-- 	},
-		-- }, {file = {data = "123", filename = "t.txt"}})))
-		-- print(require("inspect")(api.test:___post({})))
-	end)
 end
 
 return WebApi
