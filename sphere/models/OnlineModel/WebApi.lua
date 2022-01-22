@@ -78,38 +78,31 @@ end
 WebApi.load = function(self)
 	local config = self.config
 
-	self.api = {}
-
-	local mt
-	mt = {
+	self.resource_mt = {
 		__index = function(t, k)
-			local prevPath = rawget(t, "path")
-			local path = (prevPath or "") .. "/" .. k
 			return setmetatable({
-				path = path,
-				key = k,
-				prevPath = prevPath,
-			}, mt)
+				__url = rawget(t, "__url") .. "/" .. k,
+			}, self.resource_mt)
 		end,
 		__call = function(t, s, ...)
+			local url, key = t.__url:match("^(.+)/(.-)$")
 			return thread.async(([[
 				local WebApi = require("sphere.models.OnlineModel.WebApi")
-				local method = %q
-				local field = method:gsub("_", "")
-				local host = %q
-				local path = %q
+				local url = %q
+				local key = %q
+				local method = key:gsub("_", "")
 				WebApi.token = %q
 				local response
-				if field == "get" then
-					response = WebApi.get(host .. path, unpack(...))
+				if method == "get" then
+					response = WebApi.get(url, unpack(...))
 				else
-					response = WebApi.post(host .. path, field:upper(), unpack(...))
+					response = WebApi.post(url, method:upper(), unpack(...))
 				end
-				return WebApi.processResponse(method, response)
-			]]):format(t.key, config.host, t.prevPath, config.token))({...})
+				return WebApi.processResponse(key, response)
+			]]):format(url, key, config.token))({...})
 		end
 	}
-	setmetatable(self.api, mt)
+	self.api = setmetatable({__url = config.host}, self.resource_mt)
 end
 
 return WebApi
