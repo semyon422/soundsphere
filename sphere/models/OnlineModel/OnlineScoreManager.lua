@@ -8,24 +8,49 @@ OnlineScoreManager.submit = thread.coro(function(self, noteChartEntry, noteChart
 	local api = self.webApi.api
 	local host = self.config.host
 
-	print("POST " .. host .. "/score")
-	local response = api.score:_post({
-		session = self.config.session,
-		replay_hash = replayHash,
+	print("POST " .. host .. "/scores")
+	local response = api.scores:_post({
+		notechart_filename = noteChartEntry.path:match("^.+/(.-)$"),
+		notechart_filesize = 0,
 		notechart_hash = noteChartDataEntry.hash,
-		notechart_index = tostring(noteChartDataEntry.index),
-		notechart_filename = noteChartEntry.path:match("^.+/(.-)$")
+		notechart_index = noteChartDataEntry.index,
+		replay_hash = replayHash,
+		replay_size = 0,
 	})
 	print(inspect(response))
 
-	local noteChartUploadUrl = response.notechart
-	local replayUploadUrl = response.replay
-	if noteChartUploadUrl and noteChartEntry.hash == response.notechart_hash then
-		self.noteChartSubmitter:submitNoteChart(noteChartEntry, noteChartUploadUrl)
-	end
-	if replayUploadUrl then
-		self.replaySubmitter:submitReplay(response.replay_hash, replayUploadUrl)
-	end
+	-- local noteChartUploadUrl = response.notechart
+	-- local replayUploadUrl = response.replay
+	-- if noteChartUploadUrl and noteChartEntry.hash == response.notechart_hash then
+	-- 	self:submitNoteChart(noteChartEntry, noteChartUploadUrl)
+	-- end
+	-- if replayUploadUrl then
+	-- 	self:submitReplay(response.replay_hash, replayUploadUrl)
+	-- end
+end)
+
+OnlineScoreManager.submitNoteChart = thread.coro(function(self, noteChartEntry, url)
+    print("submit notechart", noteChartEntry.path)
+	local api = self.webApi.api
+	local host = self.config.host
+
+    local file = love.filesystem.newFile(noteChartEntry.path, "r")
+    local content = file:read()
+    print("POST " .. host .. "/" .. url)
+    local response = api[url]:_post({}, {notechart = content})
+    print(inspect(response))
+end)
+
+OnlineScoreManager.submitReplay = thread.coro(function(self, replayHash, url)
+	print("submit replay", replayHash)
+	local api = self.webApi.api
+	local host = self.config.host
+
+	local file = love.filesystem.newFile("userdata/replays/" .. replayHash, "r")
+	local content = file:read()
+	print("POST " .. host .. "/" .. url)
+	local response = api[url]:_post({}, {replay = content})
+	print(inspect(response))
 end)
 
 return OnlineScoreManager
