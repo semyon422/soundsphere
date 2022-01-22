@@ -1,7 +1,7 @@
 return {
 	host = "https://soundsphere.xyz",
 	update = "https://dl.soundsphere.xyz/files.json",
-	session = "",
+	session = {},
 	token = "",
 	userId = 1,
 	email = "",

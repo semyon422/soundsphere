@@ -7,11 +7,6 @@ OnlineController.construct = function(self)
 end
 
 OnlineController.load = function(self)
-	local config = self.configModel.configs.online
-	local token = config.token
-	if #token == 0 then
-		return self.onlineModel.authManager:createToken()
-	end
 	self.onlineModel.authManager:checkSession()
 end
 

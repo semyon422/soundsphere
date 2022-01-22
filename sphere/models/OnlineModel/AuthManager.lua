@@ -1,187 +1,73 @@
 local Class = require("aqua.util.Class")
-local ThreadPool = require("aqua.thread.ThreadPool")
+local thread	= require("aqua.thread")
 local inspect = require("inspect")
 
 local AuthManager = Class:new()
 
-AuthManager.createToken = function(self)
-	print("create token")
-	local config = self.config
-	return ThreadPool:execute({
-		f = function(params)
-			local json = require("json")
-			local request = require("luajit-request")
-
-			local response = request.send(params.host .. "/auth/token", {
-				method = "POST",
-				data = {
-					email = params.email,
-					password = params.password
-				}
-			})
-
-			return json.decode(response.body)
-		end,
-		params = {
-			host = config.host,
-			email = config.email,
-			password = config.password
-		},
-		result = function(response)
-			print(inspect(response))
-			if response.status then
-				config.token = response.token
-				self:checkSession()
-				config.email = ""
-				config.password = ""
-			end
-		end,
-	})
-end
-
-AuthManager.createSession = function(self)
-	print("create session")
-	local config = self.config
-	return ThreadPool:execute({
-		f = function(params)
-			local json = require("json")
-			local request = require("luajit-request")
-
-			local response = request.send(params.host .. "/auth/session", {
-				method = "POST",
-				data = {
-					token = params.token
-				}
-			})
-
-			return json.decode(response.body)
-		end,
-		params = {
-			host = config.host,
-			token = config.token
-		},
-		result = function(response)
-			print(inspect(response))
-			config.session = response.session
-		end,
-		error = function(message)
-			print("Session was not created")
-			print(message)
-		end,
-	})
-end
-
 AuthManager.checkSession = function(self)
 	print("check session")
+	local api = self.webApi.api
 	local config = self.config
-	return ThreadPool:execute({
-		f = function(params)
-			local json = require("json")
-			local request = require("luajit-request")
 
-			local response = request.send(params.host .. "/auth/session/check", {
-				method = "POST",
-				data = {
-					session = params.session
-				}
-			})
-
-			return json.decode(response.body)
-		end,
-		params = {
-			host = config.host,
-			session = config.session,
-		},
-		result = function(response)
-			print(inspect(response))
-			if response.status then
-				self:updateSession()
-			else
-				self:createSession()
-			end
-		end,
-		error = function(message)
-			print("error")
-			print(message)
-		end,
-	})
+	thread.call(function()
+		print("POST " .. config.host .. "/auth/check")
+		local response = api.auth.check:_get()
+		print(inspect(response))
+		if not response then
+			return
+		end
+		config.session = response.session or {}
+	end)
 end
 
 AuthManager.updateSession = function(self)
 	print("update session")
+	local api = self.webApi.api
 	local config = self.config
-	return ThreadPool:execute({
-		f = function(params)
-			local json = require("json")
-			local http = require("aqua.http")
-			local request = require("luajit-request")
 
-			local response = request.send(params.host .. "/auth/session/update", {
-				method = "POST",
-				data = {
-					session = params.session
-				}
-			})
-
-			return json.decode(response.body)
-		end,
-		params = {
-			host = config.host,
-			session = config.session,
-		},
-		result = function(response)
-			print(inspect(response))
-		end,
-	})
+	thread.call(function()
+		print("POST " .. config.host .. "/auth/update")
+		local response = api.auth.update:_post()
+		print(inspect(response))
+		if not response then
+			return
+		end
+		config.session = response.session or {}
+		config.token = response.token or ""
+	end)
 end
 
 AuthManager.quickLogin = function(self)
 	print("quick login")
+	local api = self.webApi.api
 	local config = self.config
-	local token = config.token
-	if #token ~= 0 then
-		return
-	end
-	return ThreadPool:execute({
-		f = function(params)
-			local json = require("json")
-			local request = require("luajit-request")
+	local key = config.quick_login_key
 
-			if params.key and #params.key ~= 0 then
-				local response = request.send(params.host .. "/auth/quick", {
-					method = "POST",
-					data = {
-						key = params.key
-					}
-				})
-
-				return json.decode(response.body)
-			else
-				local response = request.send(params.host .. "/auth/quick", {
-					method = "GET"
-				})
-
-				return json.decode(response.body)
-			end
-		end,
-		params = {
-			host = config.host,
-			key = config.quick_login_key
-		},
-		result = function(response)
-			print(inspect(response))
-			if response.key then
-				config.quick_login_key = response.key
-				local url = config.host .. "/quick_login?key=" .. response.key
-				print(url)
-				love.system.openURL(url)
-			elseif response.token then
-				config.quick_login_key = ""
-				config.token = response.token
-				self:checkSession()
-			end
+	thread.call(function()
+		local response
+		if key and #key ~= 0 then
+			print("GET 2 " .. config.host .. "/auth/quick")
+			response = api.auth.quick:_get({
+				key = key,
+			})
+		else
+			print("GET " .. config.host .. "/auth/quick")
+			response = api.auth.quick:_get()
 		end
-	})
+		print(inspect(response))
+		if response.key then
+			config.quick_login_key = response.key
+			local url = config.host .. "/html/auth/quick?key=" .. response.key
+			print(url)
+			love.system.openURL(url)
+		elseif response.token then
+			config.quick_login_key = ""
+			config.token = response.token
+			self:checkSession()
+		else
+			config.quick_login_key = ""
+		end
+	end)
 end
 
 return AuthManager
