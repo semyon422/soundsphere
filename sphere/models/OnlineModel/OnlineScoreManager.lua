@@ -31,6 +31,11 @@ OnlineScoreManager.submit = thread.coro(function(self, noteChartEntry, noteChart
 		notechart_file = true,
 		file = true,
 	})
+	if not score or not score.file or not score.notechart or not score.notechart.file then
+		print("not score")
+		return
+	end
+
 	local notechart = score.notechart
 	if not notechart.is_complete then
 		local file = notechart.file
