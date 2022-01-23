@@ -4,53 +4,58 @@ local inspect = require("inspect")
 
 local OnlineScoreManager = Class:new()
 
+local async_read = thread.async(function(...) return love.filesystem.read(...) end)
+
 OnlineScoreManager.submit = thread.coro(function(self, noteChartEntry, noteChartDataEntry, replayHash)
-	local api = self.webApi.api
+	local webApi = self.webApi
+	local api = webApi.api
 	local host = self.config.host
 
 	print("POST " .. host .. "/scores")
-	local response = api.scores:_post({
-		notechart_filename = noteChartEntry.path:match("^.+/(.-)$"),
+	local notechart_filename = noteChartEntry.path:match("^.+/(.-)$")
+	local response, code, headers = api.scores:post({
+		notechart_filename = notechart_filename,
 		notechart_filesize = 0,
 		notechart_hash = noteChartDataEntry.hash,
 		notechart_index = noteChartDataEntry.index,
 		replay_hash = replayHash,
 		replay_size = 0,
 	})
-	print(inspect(response))
+	if code ~= 201 then
+		print(inspect(response))
+		return
+	end
 
-	-- local noteChartUploadUrl = response.notechart
-	-- local replayUploadUrl = response.replay
-	-- if noteChartUploadUrl and noteChartEntry.hash == response.notechart_hash then
-	-- 	self:submitNoteChart(noteChartEntry, noteChartUploadUrl)
-	-- end
-	-- if replayUploadUrl then
-	-- 	self:submitReplay(response.replay_hash, replayUploadUrl)
-	-- end
-end)
+	local score = webApi:newResource(headers.location):get({
+		notechart = true,
+		notechart_file = true,
+		file = true,
+	})
+	local notechart = score.notechart
+	if not notechart.is_complete then
+		local file = notechart.file
+		if not file.uploaded then
+			local content = async_read(noteChartEntry.path)
+			api.files[file.id]:put(nil, {
+				file = {content, filename = notechart_filename},
+			})
+		end
+		api.notecharts[notechart.id]:patch()
+	end
+	if not score.is_complete then
+		local file = score.file
+		if not file.uploaded then
+			local content = async_read("userdata/replays/" .. replayHash)
+			api.files[file.id]:put(nil, {
+				file = {content, filename = replayHash},
+			})
+		end
+		api.scores[score.id]:patch()
+	end
+	api.scores[score.id].leaderboards:put()
 
-OnlineScoreManager.submitNoteChart = thread.coro(function(self, noteChartEntry, url)
-    print("submit notechart", noteChartEntry.path)
-	local api = self.webApi.api
-	local host = self.config.host
-
-    local file = love.filesystem.newFile(noteChartEntry.path, "r")
-    local content = file:read()
-    print("POST " .. host .. "/" .. url)
-    local response = api[url]:_post({}, {notechart = content})
-    print(inspect(response))
-end)
-
-OnlineScoreManager.submitReplay = thread.coro(function(self, replayHash, url)
-	print("submit replay", replayHash)
-	local api = self.webApi.api
-	local host = self.config.host
-
-	local file = love.filesystem.newFile("userdata/replays/" .. replayHash, "r")
-	local content = file:read()
-	print("POST " .. host .. "/" .. url)
-	local response = api[url]:_post({}, {replay = content})
-	print(inspect(response))
+	score = api.scores[score.id]:get()
+	print(inspect(score))
 end)
 
 return OnlineScoreManager

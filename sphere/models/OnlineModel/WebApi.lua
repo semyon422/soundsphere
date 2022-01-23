@@ -61,7 +61,10 @@ WebApi.post = function(url, method, params, buffers)
 	local request = require("luajit-request")
 	require("preloaders.preloadall")
 
-	local request_buffers = {json_params = json.encode(params)}
+	local request_buffers = {}
+	if params then
+		request_buffers.json_params = json.encode(params)
+	end
 	if buffers then
 		for k, v in pairs(buffers) do
 			request_buffers[k] = v
@@ -108,7 +111,7 @@ WebApi.load = function(self)
 					return false, code, err
 				end
 				return WebApi.processResponse(select(2, key:gsub("_", "")), response)
-			]]):format(url, key, config.token))({...})
+			]]):format(url, key, config.token))(...)
 			return response, code, headers
 		end
 	}
