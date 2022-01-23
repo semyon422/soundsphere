@@ -1,41 +1,43 @@
 local Class = require("aqua.util.Class")
 local thread = require("aqua.thread")
+local json = require("json")
 
 local WebApi = Class:new()
 
 WebApi.token = ""
 
-WebApi.processResponse = function(method, response)
-	if not response then return end
-	local json = require("json")
-	if method:find("^___") then
+WebApi.processResponse = function(level, response)
+	local code = response.code
+
+	local headers = {}
+	for k, v in pairs(response.headers) do
+		headers[k:lower()] = v
+	end
+
+	if level == 3 then
 		return response
-	elseif method:find("^__") and response then
-		if response.body then
-			return response.body
-		end
-		return ""
-	elseif method:find("^_") then
-		if response.body then
-			local status, err = pcall(json.decode, response.body)
-			if status then
-				return err
-			end
-		end
-		return {}
+	elseif level == 2 then
+		return response.body, code, headers
 	end
-	local object = {}
-	if response.body then
-		local status, err = pcall(json.decode, response.body)
-		if status then
-			object = err
-		end
+
+	local status, json_response = pcall(json.decode, response.body)
+
+	if not status then
+		return nil, code, headers
 	end
-	for _, v in pairs(object) do
-		if type(v) == "table" then
-			return v
+
+	if level == 1 then
+		return json_response, code, headers
+	end
+
+	local object
+	for k, v in pairs(json_response) do
+		if type(v) == "table" and not k:find("^_") then
+			object = v
+			break
 		end
 	end
+	return object, code, headers
 end
 
 WebApi.get = function(url, params)
@@ -75,6 +77,10 @@ WebApi.post = function(url, method, params, buffers)
 	})
 end
 
+WebApi.newResource = function(self, url)
+	return setmetatable({__url = url}, self.resource_mt)
+end
+
 WebApi.load = function(self)
 	local config = self.config
 
@@ -82,27 +88,31 @@ WebApi.load = function(self)
 		__index = function(t, k)
 			return setmetatable({
 				__url = rawget(t, "__url") .. "/" .. k,
-			}, self.resource_mt)
+			}, getmetatable(t))
 		end,
 		__call = function(t, s, ...)
 			local url, key = t.__url:match("^(.+)/(.-)$")
-			return thread.async(([[
+			local response, code, headers = thread.async(([[
 				local WebApi = require("sphere.models.OnlineModel.WebApi")
 				local url = %q
 				local key = %q
 				local method = key:gsub("_", "")
 				WebApi.token = %q
-				local response
+				local response, code, err
 				if method == "get" then
-					response = WebApi.get(url, unpack(...))
+					response, code, err = WebApi.get(url, ...)
 				else
-					response = WebApi.post(url, method:upper(), unpack(...))
+					response, code, err = WebApi.post(url, method:upper(), ...)
 				end
-				return WebApi.processResponse(key, response)
+				if not response then
+					return false, code, err
+				end
+				return WebApi.processResponse(select(2, key:gsub("_", "")), response)
 			]]):format(url, key, config.token))({...})
+			return response, code, headers
 		end
 	}
-	self.api = setmetatable({__url = config.host}, self.resource_mt)
+	self.api = self:newResource(config.host)
 end
 
 return WebApi

@@ -15,14 +15,13 @@ JamLoader.load = function(self, path, callback)
 		callbacks[path] = {}
 
 		ThreadPool:execute({
-			f = function(params)
+			f = function(path)
 				local byte = require("byte")
 
 				local file = require("aqua.file")
 				local sound = require("aqua.sound")
 				local OJM = require("o2jam.OJM")
 
-				local path = params.path
 				local fileData = file.new(path)
 				local ojm = OJM:new(fileData:getString())
 				local soundDatas = {}
@@ -33,9 +32,7 @@ JamLoader.load = function(self, path, callback)
 
 				return soundDatas
 			end,
-			params = {
-				path = path
-			},
+			params = {path},
 			result = function(soundDatas)
 				ojms[path] = soundDatas
 
@@ -57,15 +54,13 @@ end
 JamLoader.unload = function(self, path, callback)
 	if ojms[path] then
 		return ThreadPool:execute({
-			f = function(params)
+			f = function(ojms)
 				local sound = require("aqua.sound")
-				for _, soundData in pairs(params.path) do
+				for _, soundData in pairs(ojms) do
 					sound.free(soundData)
 				end
 			end,
-			params = {
-				path = ojms[path]
-			},
+			params = {ojms[path]},
 			result = function(result)
 				for i, soundData in pairs(ojms[path]) do
 					sound.remove(path .. "/" .. i)

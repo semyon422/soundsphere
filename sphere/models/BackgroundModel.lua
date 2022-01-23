@@ -120,13 +120,13 @@ end
 
 BackgroundModel.loadOJN = function(self, path)
 	return ThreadPool:execute({
-		f = function(params)
+		f = function(path)
 			require("love.filesystem")
 			require("love.image")
 
 			local OJN = require("o2jam.OJN")
 
-			local file = love.filesystem.newFile(params.path)
+			local file = love.filesystem.newFile(path)
 			file:open("r")
 			local content = file:read()
 			file:close()
@@ -139,9 +139,7 @@ BackgroundModel.loadOJN = function(self, path)
 			local fileData = love.filesystem.newFileData(ojn.cover, "cover")
 			return love.image.newImageData(fileData)
 		end,
-		params = {
-			path = path
-		},
+		params = {path},
 		result = function(imageData)
 			if not imageData then
 				return self:setBackground(self.emptyImage)

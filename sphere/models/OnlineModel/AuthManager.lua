@@ -5,30 +5,33 @@ local inspect = require("inspect")
 local AuthManager = Class:new()
 
 AuthManager.checkSession = thread.coro(function(self)
-	print("check session")
 	local api = self.webApi.api
 	local config = self.config
 
+	print("check session")
 	print("POST " .. config.host .. "/auth/check")
-	local response = api.auth.check:_get()
-	print(inspect(response))
+	local response, code, headers = api.auth.check:_get()
 	if not response then
+		print(code, headers)
 		return
 	end
+	print(inspect(response))
+	print(inspect(headers))
 	config.session = response.session or {}
 end)
 
 AuthManager.updateSession = thread.coro(function(self)
-	print("update session")
 	local api = self.webApi.api
 	local config = self.config
 
+	print("update session")
 	print("POST " .. config.host .. "/auth/update")
-	local response = api.auth.update:_post()
-	print(inspect(response))
+	local response, code, headers = api.auth.update:_post()
 	if not response then
+		print(code, headers)
 		return
 	end
+	print(inspect(response))
 	config.session = response.session or {}
 	config.token = response.token or ""
 end)
@@ -39,17 +42,22 @@ AuthManager.quickLogin = thread.coro(function(self)
 	local config = self.config
 	local key = config.quick_login_key
 
-	local response
+	local response, code, headers
 	if key and #key ~= 0 then
-		print("GET 2 " .. config.host .. "/auth/quick")
-		response = api.auth.quick:_get({
+		print("GET " .. config.host .. "/auth/quick?key=" .. key)
+		response, code, headers = api.auth.quick:_get({
 			key = key,
 		})
 	else
 		print("GET " .. config.host .. "/auth/quick")
-		response = api.auth.quick:_get()
+		response, code, headers = api.auth.quick:_get()
+	end
+	if not response then
+		print(code, headers)
+		return
 	end
 	print(inspect(response))
+
 	if response.key then
 		config.quick_login_key = response.key
 		local url = config.host .. "/html/auth/quick?key=" .. response.key
