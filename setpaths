@@ -1,7 +1,10 @@
 #!/bin/bash
 
-LUA_ROOT=$HOME/lua
-OR_ROOT=/opt/openresty
+LUA_ROOT=$PWD
+
+[ -d /usr/local/openresty ] && OR_ROOT=/usr/local/openresty
+[ -d /opt/openresty ] && OR_ROOT=/opt/openresty
+[ -z "${OR_ROOT}" ] && echo "openresty not found" && exit 1
 
 LUA_PATH="$LUA_PATH;$PWD/?.lua;$PWD/?/init.lua"
 
@@ -10,6 +13,7 @@ PATH=$OR_ROOT/luajit/bin:$PATH
 PATH=$LUA_ROOT/tree/bin:$PATH
 
 LUA_PATH="$LUA_PATH;$LUA_ROOT/share/?.lua;$LUA_ROOT/share/?/init.lua"
+
 LUA_PATH="$LUA_PATH;$LUA_ROOT/tree/share/lua/5.1/?.lua;$LUA_ROOT/tree/share/lua/5.1/?/init.lua"
 LUA_CPATH="$LUA_CPATH;$LUA_ROOT/tree/lib/lua/5.1/?.so"
 
@@ -18,7 +22,7 @@ LUA_CPATH="$LUA_CPATH;$OR_ROOT/lualib/?.so;$OR_ROOT/?.so;$OR_ROOT/loadall.so"
 
 LUA_PATH="$LUA_PATH;$OR_ROOT/lualib/?.lua;$OR_ROOT/lualib/?/init.lua"
 
-LUAROCKS="luarocks --lua-version 5.1 --lua-dir /opt/openresty/luajit --tree $LUA_ROOT/tree"
+LUAROCKS="luarocks --lua-version 5.1 --lua-dir $OR_ROOT/luajit --tree $LUA_ROOT/tree"
 
 export PATH
 export LUA_PATH

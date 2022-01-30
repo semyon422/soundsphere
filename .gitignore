@@ -31,8 +31,15 @@ userdata/scores.db-journal
 moddedgame
 
 lapis/*
-temp/*
+tree
 logs
-nginx.conf.compiled
-req.http
 storages
+nginx.conf.compiled
+storages/notecharts/*
+storages/replays/*
+!storages/notecharts/.keep
+!storages/replays/.keep
+share/*
+temp/*
+!share/.keep
+!temp/.keep

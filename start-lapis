@@ -1,6 +1,0 @@
-#!/bin/bash
-. ./setpaths
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD/bin/linux64
-mkdir -p temp
-#screen -dmS soundsphere-server lapis server
-lapis server

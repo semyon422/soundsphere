@@ -1,0 +1,3 @@
+#!/bin/bash
+. ./setpaths
+$LUAROCKS install lapis
