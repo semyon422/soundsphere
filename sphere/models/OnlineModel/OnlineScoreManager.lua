@@ -9,9 +9,8 @@ local async_read = thread.async(function(...) return love.filesystem.read(...) e
 OnlineScoreManager.submit = thread.coro(function(self, noteChartEntry, noteChartDataEntry, replayHash)
 	local webApi = self.webApi
 	local api = webApi.api
-	local host = self.config.host
 
-	print("POST " .. host .. "/scores")
+	print("POST " .. api.scores)
 	local notechart_filename = noteChartEntry.path:match("^.+/(.-)$")
 	local response, code, headers = api.scores:post({
 		notechart_filename = notechart_filename,
@@ -22,6 +21,7 @@ OnlineScoreManager.submit = thread.coro(function(self, noteChartEntry, noteChart
 		replay_size = 0,
 	})
 	if code ~= 201 then
+		print(code)
 		print(inspect(response))
 		return
 	end

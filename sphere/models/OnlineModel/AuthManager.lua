@@ -9,7 +9,7 @@ AuthManager.checkSession = thread.coro(function(self)
 	local config = self.config
 
 	print("check session")
-	print("POST " .. config.host .. "/auth/check")
+	print("POST " .. api.auth.check)
 	local response, code, headers = api.auth.check:_get()
 	if not response then
 		print(code, headers)
@@ -25,7 +25,7 @@ AuthManager.updateSession = thread.coro(function(self)
 	local config = self.config
 
 	print("update session")
-	print("POST " .. config.host .. "/auth/update")
+	print("POST " .. api.auth.update)
 	local response, code, headers = api.auth.update:_post()
 	if not response then
 		print(code, headers)
@@ -44,12 +44,12 @@ AuthManager.quickLogin = thread.coro(function(self)
 
 	local response, code, headers
 	if key and #key ~= 0 then
-		print("GET " .. config.host .. "/auth/quick?key=" .. key)
+		print("GET " .. api.auth.quick .. "?key=" .. key)
 		response, code, headers = api.auth.quick:_get({
 			key = key,
 		})
 	else
-		print("GET " .. config.host .. "/auth/quick")
+		print("GET " .. api.auth.quick)
 		response, code, headers = api.auth.quick:_get()
 	end
 	if not response then
@@ -60,7 +60,7 @@ AuthManager.quickLogin = thread.coro(function(self)
 
 	if response.key then
 		config.quick_login_key = response.key
-		local url = config.host .. "/html/auth/quick?key=" .. response.key
+		local url = api.auth.quick .. "?key=" .. response.key
 		print(url)
 		love.system.openURL(url)
 	elseif response.token then

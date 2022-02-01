@@ -1,6 +1,7 @@
 local Class = require("aqua.util.Class")
 local thread = require("aqua.thread")
 local json = require("json")
+local socket_url = require("socket.url")
 
 local WebApi = Class:new()
 
@@ -81,6 +82,7 @@ WebApi.post = function(url, method, params, buffers)
 end
 
 WebApi.newResource = function(self, url)
+	url = socket_url.absolute(self.config.host, url)
 	return setmetatable({__url = url}, self.resource_mt)
 end
 
@@ -89,9 +91,15 @@ WebApi.load = function(self)
 
 	self.resource_mt = {
 		__index = function(t, k)
-			return setmetatable({
+			return rawget(t, k) or setmetatable({
 				__url = rawget(t, "__url") .. "/" .. k,
 			}, getmetatable(t))
+		end,
+		__tostring = function(t)
+			return rawget(t, "__url")
+		end,
+		__concat = function(t, a)
+			return tostring(t) .. tostring(a)
 		end,
 		__call = function(t, s, ...)
 			local url, key = t.__url:match("^(.+)/(.-)$")
@@ -115,7 +123,7 @@ WebApi.load = function(self)
 			return response, code, headers
 		end
 	}
-	self.api = self:newResource(config.host)
+	self.api = self:newResource("/api")
 end
 
 return WebApi
