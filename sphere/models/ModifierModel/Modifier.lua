@@ -19,7 +19,8 @@ Modifier.range = {0, 1}
 Modifier.step = 1
 
 Modifier.encode = function(self, config)
-	return ("%d,%s"):format(config.version, config.value)
+	local version = config.version or 0
+	return ("%d,%s"):format(version, config.value)
 end
 
 Modifier.decode = function(self, configData)
