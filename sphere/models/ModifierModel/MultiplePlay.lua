@@ -12,6 +12,9 @@ MultiplePlay.defaultValue = 2
 MultiplePlay.range = {2, 4}
 
 MultiplePlay.getString = function(self, config)
+	if config.old then
+		return config.value + 1
+	end
 	return config.value
 end
 
@@ -22,6 +25,9 @@ end
 MultiplePlay.apply = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
 	local value = config.value
+	if config.old then
+		value = value + 1
+	end
 
 	local inputCounts = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do
