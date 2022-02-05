@@ -62,7 +62,7 @@ WebReplayController.POST = function(self)
 	}
 
 	modifierModel.config = replay.modifiers
-	modifierModel:fixOldFormat(replay.modifiers)
+	modifierModel:fixOldFormat(replay.modifiers, not replay.timings)
 
 	if replay.timings then
 		rhythmModel.timings = replay.timings
