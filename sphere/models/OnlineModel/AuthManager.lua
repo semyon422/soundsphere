@@ -16,7 +16,6 @@ AuthManager.checkSession = thread.coro(function(self)
 		return
 	end
 	print(inspect(response))
-	print(inspect(headers))
 	config.session = response.session or {}
 end)
 
@@ -36,39 +35,62 @@ AuthManager.updateSession = thread.coro(function(self)
 	config.token = response.token or ""
 end)
 
-AuthManager.quickLogin = thread.coro(function(self)
-	print("quick login")
+AuthManager.quickGetKey = thread.coro(function(self)
 	local api = self.webApi.api
 	local config = self.config
-	local key = config.quick_login_key
+	config.quick_login_key = ""
 
-	local response, code, headers
-	if key and #key ~= 0 then
-		print("GET " .. api.auth.quick .. "?key=" .. key)
-		response, code, headers = api.auth.quick:_get({
-			key = key,
-		})
-	else
-		print("GET " .. api.auth.quick)
-		response, code, headers = api.auth.quick:_get()
-	end
+	print("GET " .. api.auth.quick)
+	local response, code, headers = api.auth.quick:_get()
 	if not response then
 		print(code, headers)
 		return
 	end
 	print(inspect(response))
 
-	if response.key then
-		config.quick_login_key = response.key
-		local url = api.auth.quick .. "?key=" .. response.key
-		print(url)
-		love.system.openURL(url)
-	elseif response.token then
-		config.quick_login_key = ""
-		config.token = response.token
-		self:checkSession()
+	config.quick_login_key = response.key
+	local url = api.html.auth.quick .. "?method=POST&key=" .. response.key
+	print(url)
+	love.system.openURL(url)
+end)
+
+AuthManager.quickGetToken = thread.coro(function(self)
+	local api = self.webApi.api
+	local config = self.config
+	local key = config.quick_login_key
+
+	print("PUT " .. api.auth.quick .. "?key=" .. key)
+	local response, code, headers = api.auth.quick:_put({
+		key = key,
+	})
+	if not response then
+		print(code, headers)
+		return
+	end
+	print(inspect(response))
+
+	if code ~= 200 then
+		print(response.message)
+		if code >= 400 and code < 500 then
+			self:quickGetKey()
+		end
+		return
+	end
+
+	config.quick_login_key = ""
+	config.token = response.token
+	self:checkSession()
+end)
+
+AuthManager.quickLogin = thread.coro(function(self)
+	print("quick login")
+	local config = self.config
+	local key = config.quick_login_key
+
+	if key and #key ~= 0 then
+		self:quickGetToken()
 	else
-		config.quick_login_key = ""
+		self:quickGetKey()
 	end
 end)
 
