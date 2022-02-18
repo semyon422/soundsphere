@@ -8,6 +8,8 @@ AuthManager.checkSession = thread.coro(function(self)
 	local api = self.webApi.api
 	local config = self.config
 
+	config.session = {}
+
 	print("check session")
 	print("POST " .. api.auth.check)
 	local response, code, headers = api.auth.check:_get()
