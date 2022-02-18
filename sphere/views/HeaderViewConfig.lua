@@ -28,7 +28,8 @@ local Logo = {
 local UserInfo = {
 	class = "UserInfoView",
 	transform = transform,
-	key = "gameController.configModel.configs.online.username",
+	username = "gameController.configModel.configs.online.username",
+	session = "gameController.configModel.configs.online.session",
 	file = "userdata/avatar.png",
 	x = 1187,
 	y = 0,
@@ -39,6 +40,13 @@ local UserInfo = {
 		y = 20,
 		w = 48,
 		h = 48
+	},
+	marker = {
+		x = 1641 - 1187 + 8,
+		-- x = 386 + 48 + 21 + 8,
+		-- x = 1641 + 8,
+		y = 20 + 24,
+		r = 8,
 	},
 	text = {
 		x = 0,

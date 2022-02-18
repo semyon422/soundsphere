@@ -50,9 +50,9 @@ UserInfoView.draw = function(self)
 	local font = spherefonts.get(config.text.font)
 	love.graphics.setFont(font)
 
-	local value = config.value or inside(self, config.key)
+	local username = config.username and inside(self, config.username) or ""
 	baseline_print(
-		value,
+		username,
 		config.text.x,
 		config.text.baseline,
 		config.text.limit,
@@ -78,6 +78,22 @@ UserInfoView.draw = function(self)
 		config.image.y + config.image.h / 2,
 		config.image.h / 2
 	)
+
+	local session = config.session and inside(self, config.session)
+	if session and session.active then
+		love.graphics.circle(
+			"fill",
+			config.marker.x,
+			config.marker.y,
+			config.marker.r
+		)
+		love.graphics.circle(
+			"line",
+			config.marker.x,
+			config.marker.y,
+			config.marker.r
+		)
+	end
 end
 
 return UserInfoView
