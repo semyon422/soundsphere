@@ -45,7 +45,11 @@ OnlineScoreManager.submit = thread.coro(function(self, noteChartEntry, noteChart
 				file = {content, filename = notechart_filename},
 			})
 		end
-		api.notecharts[notechart.id]:patch()
+		response, code, headers = api.notecharts[notechart.id]:_patch()
+		if code ~= 200 then
+			print(code)
+			print(inspect(response))
+		end
 	end
 	if not score.is_complete then
 		local file = score.file
@@ -55,7 +59,11 @@ OnlineScoreManager.submit = thread.coro(function(self, noteChartEntry, noteChart
 				file = {content, filename = replayHash},
 			})
 		end
-		api.scores[score.id]:patch()
+		response, code, headers = api.scores[score.id]:_patch()
+		if code ~= 200 then
+			print(code)
+			print(inspect(response))
+		end
 	end
 	api.scores[score.id].leaderboards:put()
 
