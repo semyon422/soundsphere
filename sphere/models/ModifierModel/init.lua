@@ -315,6 +315,9 @@ ModifierModel.fixOldFormat = function(self, oldConfig, oldFlag)
 					end
 				end
 			end
+			if modifierConfig.value == nil then
+				modifierConfig.value = true
+			end
 			if type(modifierConfig.value) == "number" and type(modifier.defaultValue) == "string" then
 				modifierConfig.value = modifier:fromIndexValue(modifierConfig.value)
 			end
