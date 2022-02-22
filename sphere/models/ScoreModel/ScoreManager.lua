@@ -16,9 +16,6 @@ local sortScores = function(a, b)
 end
 
 ScoreManager.transformScoreEntry = function(self, scoreEntry)
-	if not self.newRating then
-		return scoreEntry
-	end
 	local enps = scoreEntry.rating * scoreEntry.accuracy
 	scoreEntry.rating = enps * erfunc.erf(self.ratingHitTimingWindow / (scoreEntry.accuracy * math.sqrt(2)))
 	return scoreEntry

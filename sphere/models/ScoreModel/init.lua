@@ -18,7 +18,6 @@ end
 
 ScoreModel.select = function(self)
 	local config = self.configModel.configs.settings.gameplay
-	self.scoreManager.newRating = config.newRating
 	self.scoreManager.ratingHitTimingWindow = config.ratingHitTimingWindow
     self.scoreManager:select()
 end

@@ -78,20 +78,13 @@ local settings = {
 		format = "%d"
 	},
 	{
-		name = "new rating",
-		section = "gameplay",
-		key = "gameplay.newRating",
-		type = "switch",
-		displayRange = {"disabled", "enabled"}
-	},
-	{
 		name = "rating hit timing window",
 		section = "gameplay",
 		key = "gameplay.ratingHitTimingWindow",
 		type = "slider",
-		range = {0.016, 0.064},
-		step = 0.016,
-		displayRange = {16, 64},
+		range = {0.016, 0.048},
+		step = 0.001,
+		displayRange = {16, 48},
 		format = "%d"
 	},
 	{
