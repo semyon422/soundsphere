@@ -125,8 +125,14 @@ PlayfieldVsrg.addScore = function(self, object)
 	object = object or {}
 	object.class = object.class or "ValueView"
 	object.key = "gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.score"
-	object.format = object.format or "%0.2f"
-	object.multiplier = 1000
+	object.value = function(self)
+		local erfunc = require("libchart.erfunc")
+		local ratingHitTimingWindow = self.gameController.configModel.configs.settings.gameplay.ratingHitTimingWindow
+		local normalscore = self.gameController.rhythmModel.scoreEngine.scoreSystem.normalscore
+		return ("%d"):format(
+			erfunc.erf(ratingHitTimingWindow / ((normalscore.accuracyAdjusted or math.huge) * math.sqrt(2))) * 10000
+		)
+	end
 	object.color = object.color or {1, 1, 1, 1}
 	return self:add(object)
 end
@@ -134,7 +140,7 @@ end
 PlayfieldVsrg.addAccuracy = function(self, object)
 	object = object or {}
 	object.class = object.class or "ValueView"
-	object.key = "gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.accuracy"
+	object.key = "gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.accuracyAdjusted"
 	object.format = object.format or "%0.2f"
 	object.multiplier = 1000
 	object.color = object.color or {1, 1, 1, 1}
