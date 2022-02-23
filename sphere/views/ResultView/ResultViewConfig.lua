@@ -635,7 +635,21 @@ StageInfo.cells = {
 			{"gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.scoreAdjusted", showLoadedScore},
 			"gameController.selectModel.scoreItem.scoreEntry.score"
 		},
-		format = formatScore
+		value = function(self)
+			if showLoadedScore(self) then
+				local erfunc = require("libchart.erfunc")
+				local ratingHitTimingWindow = self.gameController.configModel.configs.settings.gameplay.ratingHitTimingWindow
+				local normalscore = self.gameController.rhythmModel.scoreEngine.scoreSystem.normalscore
+				return ("%d"):format(
+					-- self.gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.rating32p * 100
+					erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2))) * 10000
+				)
+			end
+			return ("%d"):format(
+				self.gameController.selectModel.scoreItem.scoreEntry.rating /
+				self.gameController.selectModel.scoreItem.scoreEntry.difficulty * 10000
+			)
+		end,
 	},
 	{
 		type = StageInfo.smallCell,

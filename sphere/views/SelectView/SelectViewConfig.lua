@@ -350,9 +350,9 @@ StageInfo.cells = {
 		type = StageInfo.largeCell,
 		valueType = "text",
 		x = 2, y = 1,
-		name = "score",
-		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.score",
-		format = formatScore
+		name = "rating",
+		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.rating",
+		format = formatDifficulty
 	},
 	{
 		type = StageInfo.smallCell,
@@ -367,9 +367,16 @@ StageInfo.cells = {
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 3, y = 5,
-		name = "rating",
-		format = formatDifficulty,
-		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.rating"
+		name = "score",
+		value = function(self)
+			if not self.gameController.scoreLibraryModel.firstScoreItem then
+				return "0"
+			end
+			return ("%d"):format(
+				self.gameController.scoreLibraryModel.firstScoreItem.scoreEntry.rating /
+				self.gameController.scoreLibraryModel.firstScoreItem.scoreEntry.difficulty * 10000
+			)
+		end
 	},
 	{
 		type = StageInfo.smallCell,
