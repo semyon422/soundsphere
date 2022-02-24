@@ -31,7 +31,7 @@ NotePartView.getColor = function(self)
 	local imageName, frame = noteSkin:get(self.noteView, self.name, "image", self.timeState)
 	local image = noteSkin.images[imageName]
 	if not image then
-		return
+		return color
 	end
 	if not image.color then
 		return color
