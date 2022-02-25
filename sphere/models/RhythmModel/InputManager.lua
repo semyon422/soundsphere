@@ -103,16 +103,16 @@ InputManager.receive = function(self, event)
 	local events = {}
 	for _, key in ipairs(keyConfig.press) do
 		events[#events + 1] = {
+			key,
 			name = "keypressed",
-			args = {key},
 			virtual = true,
 			time = eventTime + offset
 		}
 	end
 	for _, key in ipairs(keyConfig.release) do
 		events[#events + 1] = {
+			key,
 			name = "keyreleased",
-			args = {key},
 			virtual = true,
 			time = eventTime + offset
 		}
