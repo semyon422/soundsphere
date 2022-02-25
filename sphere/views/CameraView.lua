@@ -57,26 +57,26 @@ CameraView.receive = function(self, event)
 	end
 
 	if event.name == "keypressed" and state.camera then
-		local key = event.args[2]
+		local key = event[2]
 		if key == "f10" then
 			s3dc.show(0, 0, love.graphics.getDimensions())
 		elseif key == "f9" then
 			state.moveCamera = not state.moveCamera
 		end
 	elseif event.name == "mousepressed" and state.moveCamera then
-		local button = event.args[3]
+		local button = event[3]
 		if button == 1 then
 			state.dragging = true
 			love.mouse.setRelativeMode(true)
 		end
 	elseif event.name == "mousereleased" and state.moveCamera then
-		local button = event.args[3]
+		local button = event[3]
 		if button == 1 then
 			state.dragging = false
 			love.mouse.setRelativeMode(false)
 		end
 	elseif event.name == "mousemoved" and state.dragging and state.camera and state.moveCamera then
-		local dx, dy = event.args[3], event.args[4]
+		local dx, dy = event[3], event[4]
 		local angle = self.sensitivity
 
 		local perspective = self.gameController.configModel.configs.settings.graphics.perspective

@@ -85,7 +85,7 @@ SettingsListView.wheelmoved = function(self, event)
 	local sh = config.scroll.h
 
 	if mx >= sx and mx < sx + sw and my >= sy and my < sy + sh then
-		local wy = event.args[2]
+		local wy = event[2]
 		if wy == 1 then
 			self:scrollUp()
 		elseif wy == -1 then

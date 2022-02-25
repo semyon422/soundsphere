@@ -14,7 +14,7 @@ SearchFieldView.load = function(self)
 end
 
 SearchFieldView.receive = function(self, event)
-	if not (event.name == "textinput" or event.name == "keypressed" and event.args[1] == "backspace") then
+	if not (event.name == "textinput" or event.name == "keypressed" and event[1] == "backspace") then
 		return
 	end
 

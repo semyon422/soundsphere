@@ -22,7 +22,7 @@ GameplayNavigator.receive = function(self, event)
 
 	if
 		event.name == "focus" and
-		not event.args[1] and
+		not event[1] and
 		self.state ~= "pause" and
 		not self.gameController.rhythmModel.logicEngine.autoplay and
 		self.gameController.rhythmModel.inputManager.mode ~= "internal"
@@ -64,7 +64,7 @@ GameplayNavigator.keypressed = function(self, event)
 	local state = self.gameController.rhythmModel.pauseManager.state
 
 	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
-	local scancode = event.args[2]
+	local scancode = event[2]
 
 	local input = self.gameController.configModel.configs.settings.input
 
@@ -99,7 +99,7 @@ GameplayNavigator.keyreleased = function(self, event)
 	local state = self.gameController.rhythmModel.pauseManager.state
 	local input = self.gameController.configModel.configs.settings.input
 
-	local scancode = event.args[2]
+	local scancode = event[2]
 	if state == "play-pause" and scancode == input.pause then
 		self:play()
 	elseif state == "pause-retry" and scancode == input.quickRestart then

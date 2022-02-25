@@ -46,10 +46,10 @@ CacheView.receive = function(self, event)
 	local config = self.config
 	if event.name == "mousepressed" then
 		local tf = transform(config.transform)
-		local mx, my = tf:inverseTransformPoint(event.args[1], event.args[2])
+		local mx, my = tf:inverseTransformPoint(event[1], event[2])
 		tf:release()
 
-		local button = event.args[3]
+		local button = event[3]
 
 		local x = config.x
 		local y = config.y

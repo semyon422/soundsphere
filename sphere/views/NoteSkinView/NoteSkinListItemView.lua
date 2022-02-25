@@ -22,7 +22,7 @@ NoteSkinListItemView.receive = function(self, event)
 	tf:release()
 
 	if (mx >= x and mx <= x + w and my >= y and my <= y + h) then
-		local button = event.args[3]
+		local button = event[3]
 		if button == 1 then
 			self.listView.navigator:setNoteSkin(self.itemIndex)
 		end

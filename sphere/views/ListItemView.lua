@@ -99,7 +99,7 @@ ListItemView.receive = function(self, event)
 	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
 
 	local tf = transform(config.transform):translate(config.x, config.y)
-	local mx, my = tf:inverseTransformPoint(event.args[1], event.args[2])
+	local mx, my = tf:inverseTransformPoint(event[1], event[2])
 	tf:release()
 
 	if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then

@@ -50,7 +50,7 @@ ReplayNanoChart.encode = function(self, events, inputMode)
 		notes[#notes + 1] = {
 			time = event.time,
 			type = event.name:find("pressed") and 1 or 0,
-			input = inputMap[event.args[1]]
+			input = inputMap[event[1]]
 		}
 	end
 

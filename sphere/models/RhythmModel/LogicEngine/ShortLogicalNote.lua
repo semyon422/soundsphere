@@ -81,7 +81,7 @@ ShortLogicalNote.receive = function(self, event)
 		return
 	end
 
-	local key = event.args and event.args[1]
+	local key = event and event[1]
 	if key == self.keyBind then
 		if event.name == "keypressed" then
 			self.keyState = true

@@ -276,7 +276,7 @@ GameController.receive = function(self, event)
 	local startTime = love.timer.getTime()
 
 	if event.name == "update" then
-		return self:update(event.args[1])
+		return self:update(event[1])
 	elseif event.name == "draw" then
 		return self:draw()
 	elseif event.name == "resize" then

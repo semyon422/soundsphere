@@ -69,21 +69,21 @@ InputManager.receive = function(self, event)
 
 	local keyConfig
 	if event.name == "keypressed" and self.inputConfig.press.keyboard then
-		keyConfig = self.inputConfig.press.keyboard[event.args[2]]
+		keyConfig = self.inputConfig.press.keyboard[event[2]]
 	elseif event.name == "keyreleased" and self.inputConfig.release.keyboard then
-		keyConfig = self.inputConfig.release.keyboard[event.args[2]]
+		keyConfig = self.inputConfig.release.keyboard[event[2]]
 	elseif event.name == "gamepadpressed" then
-		keyConfig = self.inputConfig.press.gamepad[tostring(event.args[2])]
+		keyConfig = self.inputConfig.press.gamepad[tostring(event[2])]
 	elseif event.name == "gamepadreleased" then
-		keyConfig = self.inputConfig.release.gamepad[tostring(event.args[2])]
+		keyConfig = self.inputConfig.release.gamepad[tostring(event[2])]
 	elseif event.name == "joystickpressed" and self.inputConfig.press.joystick then
-		keyConfig = self.inputConfig.press.joystick[tostring(event.args[2])]
+		keyConfig = self.inputConfig.press.joystick[tostring(event[2])]
 	elseif event.name == "joystickreleased" and self.inputConfig.release.joystick then
-		keyConfig = self.inputConfig.release.joystick[tostring(event.args[2])]
+		keyConfig = self.inputConfig.release.joystick[tostring(event[2])]
 	elseif event.name == "midipressed" then
-		keyConfig = self.inputConfig.press.midi[tostring(event.args[1])]
+		keyConfig = self.inputConfig.press.midi[tostring(event[1])]
 	elseif event.name == "midireleased" then
-		keyConfig = self.inputConfig.release.midi[tostring(event.args[1])]
+		keyConfig = self.inputConfig.release.midi[tostring(event[1])]
 	end
 	if not keyConfig then
 		return

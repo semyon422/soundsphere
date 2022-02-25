@@ -24,7 +24,7 @@ InputListItemView.isActive = function(self)
 end
 
 InputListItemView.mousepressed = function(self, event)
-	local button = event.args[3]
+	local button = event[3]
 	if button == 1 then
 		self.listView.navigator:setInputHandler(self.itemIndex)
 	end

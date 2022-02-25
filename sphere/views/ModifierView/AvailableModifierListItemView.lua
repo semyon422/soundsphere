@@ -43,7 +43,7 @@ AvailableModifierListItemView.receive = function(self, event)
 	tf:release()
 
 	if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then
-		local button = event.args[3]
+		local button = event[3]
 		if button == 1 then
 			self.listView.navigator:addModifier(self.itemIndex)
 		end

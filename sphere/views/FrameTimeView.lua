@@ -131,7 +131,7 @@ FrameTimeView.drawFPS = function(self)
 end
 
 FrameTimeView.receive = function(self, event)
-	if event.name == "keypressed" and event.args[1] == "rctrl" and love.keyboard.isDown("lctrl") then
+	if event.name == "keypressed" and event[1] == "rctrl" and love.keyboard.isDown("lctrl") then
 		self.visible = not self.visible
 		self:load()
 	end
@@ -140,10 +140,10 @@ FrameTimeView.receive = function(self, event)
 	end
 
 	if event.name == "keypressed" then
-		return self:keypressed(event.args[1])
+		return self:keypressed(event[1])
 	end
 	if event.name == "wheelmoved" then
-		return self:wheelmoved(event.args[2])
+		return self:wheelmoved(event[2])
 	end
 end
 
