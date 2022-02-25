@@ -113,7 +113,7 @@ NoteSkinVsrg.getPosition = function(self, timeState)
 	return self.hitposition + self.unit * (timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
 end
 
-NoteSkinVsrg.setShortNote = function(self, params)
+NoteSkinVsrg.setShortNote = function(self, params, noteType)
 	local h = params.h or 0
 	local height = {}
 	for i = 1, self.inputsCount do
@@ -130,7 +130,7 @@ NoteSkinVsrg.setShortNote = function(self, params)
 
 	local color = {}
 	for i = 1, self.inputsCount do
-		color[i] = self.color
+		color[i] = params.color or self.color
 	end
 
 	local oy = {}
@@ -138,7 +138,8 @@ NoteSkinVsrg.setShortNote = function(self, params)
 		oy[i] = 1
 	end
 
-	self.notes.ShortNote = {Head = {
+	noteType = noteType or "ShortNote"
+	self.notes[noteType] = {Head = {
 		x = self.columns,
 		y = function(...) return self:getPosition(...) end,
 		w = self.width,
