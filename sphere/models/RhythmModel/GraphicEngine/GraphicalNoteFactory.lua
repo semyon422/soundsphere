@@ -2,7 +2,6 @@ local FileManager			= require("sphere.filesystem.FileManager")
 local ShortGraphicalNote	= require("sphere.models.RhythmModel.GraphicEngine.ShortGraphicalNote")
 local LongGraphicalNote		= require("sphere.models.RhythmModel.GraphicEngine.LongGraphicalNote")
 local ImageNote				= require("sphere.models.RhythmModel.GraphicEngine.ImageNote")
-local VideoNote				= require("sphere.models.RhythmModel.GraphicEngine.VideoNote")
 
 local GraphicalNoteFactory = {}
 
@@ -32,11 +31,10 @@ GraphicalNoteFactory.getNote = function(self, noteData)
 		end
 		if fileType == "image" then
 			graphicalNote.noteType = "ImageNote"
-			return ImageNote:new(graphicalNote)
 		elseif fileType == "video" then
 			graphicalNote.noteType = "VideoNote"
-			return VideoNote:new(graphicalNote)
 		end
+		return ImageNote:new(graphicalNote)
 	end
 end
 
