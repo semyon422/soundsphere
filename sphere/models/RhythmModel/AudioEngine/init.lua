@@ -33,6 +33,8 @@ AudioEngine.load = function(self)
 end
 
 AudioEngine.update = function(self)
+	self.currentTime = self.rhythmModel.timeEngine.exactCurrentTimeNoOffset
+	self:setTimeRate(self.rhythmModel.timeEngine.timeRate)
 	self.backgroundContainer:update()
 	self.foregroundContainer:update()
 end
@@ -51,9 +53,6 @@ AudioEngine.receive = function(self, event)
 		local soundNote = SoundNoteFactory:getNote(event.note)
 		soundNote.audioEngine = self
 		return soundNote:receive(event)
-	elseif event.name == "TimeState" then
-		self.currentTime = event.exactCurrentTimeNoOffset
-		self:setTimeRate(event.timeRate)
 	end
 end
 
@@ -94,6 +93,9 @@ AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
 end
 
 AudioEngine.setTimeRate = function(self, timeRate)
+	if self.timeRate == timeRate then
+		return
+	end
 	if timeRate == 0 and self.timeRate ~= 0 then
 		self.backgroundContainer:pause()
 		self.foregroundContainer:pause()

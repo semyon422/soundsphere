@@ -38,6 +38,8 @@ ScoreEngine.load = function(self)
 end
 
 ScoreEngine.update = function(self)
+	self.currentTime = self.rhythmModel.timeEngine.currentTime
+	self.timeRate = self.rhythmModel.timeEngine.timeRate
 	self.noteHandler:update()
 
 	if self.currentTime < self.minTime or self.currentTime > self.maxTime then
@@ -59,12 +61,7 @@ ScoreEngine.send = function(self, event)
 	return self.observable:send(event)
 end
 
-ScoreEngine.receive = function(self, event)
-	if event.name == "TimeState" then
-		self.currentTime = event.exactCurrentTime
-		self.timeRate = event.timeRate
-	end
-end
+ScoreEngine.receive = function(self, event) end
 
 ScoreEngine.getScoreNote = function(self, noteData)
 	return self.sharedScoreNotes[noteData]

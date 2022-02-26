@@ -85,6 +85,7 @@ TimeEngine.sync = function(self, time, dt)
 
 	self.currentTime = timeManager:getTime() + self.offset
 	self.exactCurrentTime = timeManager:getExactTime() + self.offset
+	self.exactCurrentTimeNoOffset = self.exactCurrentTime - self.offset
 	self:sendState()
 end
 

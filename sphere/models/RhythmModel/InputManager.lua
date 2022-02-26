@@ -48,11 +48,6 @@ InputManager.setInputMode = function(self, inputMode)
 end
 
 InputManager.receive = function(self, event)
-	if event.name == "TimeState" then
-		self.currentTime = event.exactCurrentTime
-		return
-	end
-
 	local mode = self.mode
 
 	if event.virtual and mode == "internal" then
@@ -89,8 +84,8 @@ InputManager.receive = function(self, event)
 		return
 	end
 
-	-- local eventTime = self.currentTime
-	local eventTime = event.time - self.timeEngine.timeManager.eventTime + self.currentTime - self.timeEngine.timeManager.eventDelta
+	local timeEngine = self.rhythmModel.timeEngine
+	local eventTime = event.time - timeEngine.timeManager.eventTime + timeEngine.currentTime - timeEngine.timeManager.eventDelta
 	if self.needRound then
 		eventTime =  math.floor(eventTime * 1024) / 1024
 	end

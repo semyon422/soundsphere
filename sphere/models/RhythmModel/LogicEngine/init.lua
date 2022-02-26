@@ -23,14 +23,17 @@ end
 -- 	return a.time < b.time
 -- end
 LogicEngine.update = function(self)
+	self.currentTime = self.rhythmModel.timeEngine.exactCurrentTime
+	self.exactCurrentTimeNoOffset = self.rhythmModel.timeEngine.exactCurrentTimeNoOffset
+	self.timeRate = self.rhythmModel.timeEngine.timeRate
 	-- table.sort(events, sortEvents)
 
-	for event in self.events do
-		self.currentTime = event.time
+	-- for event in self.events do
+	-- 	self.currentTime = event.time
 		self:updateNoteHandlers()
-		self:_receive(event)
-		self:updateNoteHandlers()
-	end
+	-- 	self:_receive(event)
+	-- 	self:updateNoteHandlers()
+	-- end
 end
 
 LogicEngine.unload = function(self)
@@ -44,19 +47,14 @@ LogicEngine.send = function(self, event)
 end
 
 LogicEngine.receive = function(self, event)
-	if event.name == "TimeState" then
-		self.timeRate = event.timeRate
-	end
-	self.events:add(event)
+	-- self.currentTime = self.rhythmModel.timeEngine.exactCurrentTime
+	-- self.exactCurrentTimeNoOffset = self.rhythmModel.timeEngine.exactCurrentTimeNoOffset
+	-- self.timeRate = self.rhythmModel.timeEngine.timeRate
+	-- self.events:add(event)
+	self:_receive(event)
 end
 
 LogicEngine._receive = function(self, event)
-	if event.name == "TimeState" then
-		self.currentTime = event.exactCurrentTime
-		self.exactCurrentTimeNoOffset = event.exactCurrentTimeNoOffset
-		return
-	end
-
 	if not event.virtual or self.promode then
 		return
 	end

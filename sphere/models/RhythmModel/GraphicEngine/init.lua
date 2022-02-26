@@ -23,6 +23,11 @@ GraphicEngine.load = function(self)
 end
 
 GraphicEngine.update = function(self, dt)
+	self.currentTime = self.rhythmModel.timeEngine.exactCurrentTime
+	if self.rhythmModel.timeEngine.timeRate ~= 0 then
+		self.timeRate = self.rhythmModel.timeEngine.timeRate
+	end
+
 	if self.visualTimeRateTween and self.updateTween then
 		self.visualTimeRateTween:update(dt)
 	end
@@ -60,18 +65,6 @@ end
 GraphicEngine.receive = function(self, event)
 	for noteDrawer in pairs(self.noteDrawers) do
 		noteDrawer:receive(event)
-	end
-
-	if event.name == "TimeState" then
-		self.currentTime = event.currentTime
-		if self.timeEngine.timeManager.eventTime then
-			local aquaevent = require("aqua.event")
-			self.currentTime = aquaevent.predictedPresentTime - self.timeEngine.timeManager.eventTime + event.currentTime
-		end
-		if event.timeRate ~= 0 then
-			self.timeRate = event.timeRate
-		end
-		return
 	end
 end
 
