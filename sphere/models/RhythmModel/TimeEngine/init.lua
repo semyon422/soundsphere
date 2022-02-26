@@ -86,28 +86,10 @@ TimeEngine.sync = function(self, time, dt)
 	self.currentTime = timeManager:getTime() + self.offset
 	self.exactCurrentTime = timeManager:getExactTime() + self.offset
 	self.exactCurrentTimeNoOffset = self.exactCurrentTime - self.offset
-	self:sendState()
-end
-
-TimeEngine.sendState = function(self)
-	return self.observable:send({
-		name = "TimeState",
-		time = self.exactCurrentTime,
-		currentTime = self.currentTime,
-		exactCurrentTime = self.exactCurrentTime,
-		exactCurrentTimeNoOffset = self.exactCurrentTime - self.offset,
-		timeRate = self.timeRate
-	})
 end
 
 TimeEngine.unload = function(self)
 	self.timeManager:unload()
-end
-
-TimeEngine.receive = function(self, event)
-	if event.name == "framestarted" then
-		self:sync(event.time, event.dt)
-	end
 end
 
 TimeEngine.skipIntro = function(self)

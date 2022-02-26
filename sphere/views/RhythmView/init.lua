@@ -49,10 +49,6 @@ RhythmView.receive = function(self, event)
 			end
 			noteViews[note] = nil
 		end
-	elseif event.name == "TimeState" then
-		for _, note in pairs(state.noteViews) do
-			note:receive(event)
-		end
 	end
 end
 

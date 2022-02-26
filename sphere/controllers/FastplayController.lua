@@ -13,7 +13,6 @@ FastplayController.play = function(self)
 		local time = absoluteTimeList[i]
 		timeEngine.currentTime = time
 		timeEngine.exactCurrentTime = time
-		timeEngine:sendState()
 		self:update()
 		rhythmModel.replayModel:update()
 		self:update()

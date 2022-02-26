@@ -36,6 +36,9 @@ VideoNoteView.draw = ImageNoteView.draw
 VideoNoteView.getTransformParams = ImageNoteView.getTransformParams
 
 VideoNoteView.update = function(self, dt)
+	local graphicEngine = self.graphicalNote.graphicEngine
+	self:setTimeRate(graphicEngine.rhythmModel.timeEngine.timeRate)
+
 	self.timeState = self.graphicalNote.timeState
 	self.logicalState = self.graphicalNote.logicalNote:getLastState()
 	self.headView.timeState = self.graphicalNote.startTimeState or self.graphicalNote.timeState
@@ -46,16 +49,9 @@ VideoNoteView.update = function(self, dt)
 	end
 end
 
-VideoNoteView.receive = function(self, event)
-	if event.name == "TimeState" then
-		self:setTimeRate(event.timeRate)
-		self.timeRate = event.timeRate
-	end
-end
-
 VideoNoteView.setTimeRate = function(self, timeRate)
 	local vid = self.video
-	if not vid then
+	if not vid or timeRate == self.timeRate then
 		return
 	end
 
@@ -67,6 +63,8 @@ VideoNoteView.setTimeRate = function(self, timeRate)
 	elseif timeRate ~= 0 and self.timeRate ~= 0 then
 		vid:setRate(timeRate)
 	end
+
+	self.timeRate = timeRate
 end
 
 return VideoNoteView

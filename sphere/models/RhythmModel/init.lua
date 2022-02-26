@@ -47,7 +47,6 @@ RhythmModel.load = function(self)
 	local graphicEngine = self.graphicEngine
 	local observable = self.observable
 
-	timeEngine.observable:add(replayModel)
 	timeEngine.logicEngine = logicEngine
 	timeEngine.audioEngine = audioEngine
 
@@ -73,13 +72,8 @@ RhythmModel.load = function(self)
 	inputManager.timeEngine = timeEngine
 
 	replayModel.observable:add(inputManager)
-	replayModel.timeEngine = timeEngine
-	replayModel.logicEngine = logicEngine
 	replayModel.timings = self.timings
 
-	timeEngine.observable:add(observable)
-	scoreEngine.observable:add(observable)
-	logicEngine.observable:add(observable)
 	inputManager.observable:add(observable)
 	graphicEngine.observable:add(observable)
 end
@@ -95,8 +89,6 @@ RhythmModel.unload = function(self)
 	local graphicEngine = self.graphicEngine
 	local observable = self.observable
 
-	timeEngine.observable:remove(replayModel)
-
 	logicEngine.observable:remove(modifierModel)
 	logicEngine.observable:remove(audioEngine)
 
@@ -105,9 +97,6 @@ RhythmModel.unload = function(self)
 
 	replayModel.observable:remove(inputManager)
 
-	timeEngine.observable:remove(observable)
-	scoreEngine.observable:remove(observable)
-	logicEngine.observable:remove(observable)
 	inputManager.observable:remove(observable)
 	graphicEngine.observable:remove(observable)
 end
@@ -177,12 +166,17 @@ RhythmModel.unloadLogicEngines = function(self)
 end
 
 RhythmModel.receive = function(self, event)
-	self.timeEngine:receive(event)
+	if event.name == "framestarted" then
+		self.timeEngine:sync(event.time, event.dt)
+	end
+
 	self.modifierModel:receive(event)
 	if self.timeEngine.timeRate ~= 0 then
 		self.inputManager:receive(event)
 	end
 	self.pauseManager:receive(event)
+
+	self.replayModel.currentTime = self.timeEngine.currentTime
 end
 
 RhythmModel.update = function(self, dt)
