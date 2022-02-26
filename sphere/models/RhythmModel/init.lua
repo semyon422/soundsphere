@@ -47,20 +47,9 @@ RhythmModel.load = function(self)
 	local graphicEngine = self.graphicEngine
 	local observable = self.observable
 
-	timeEngine.logicEngine = logicEngine
-	timeEngine.audioEngine = audioEngine
-
 	logicEngine.observable:add(modifierModel)
 	logicEngine.observable:add(audioEngine)
-	logicEngine.scoreEngine = scoreEngine
 
-	scoreEngine.timeEngine = timeEngine
-	audioEngine.timeEngine = timeEngine
-	pauseManager.timeEngine = timeEngine
-	pauseManager.logicEngine = logicEngine
-
-	graphicEngine.timeEngine = timeEngine
-	graphicEngine.logicEngine = logicEngine
 	scoreEngine.configModel = self.configModel
 	scoreEngine.timingWindows = self.timings
 	scoreEngine.judgements = self.judgements
@@ -69,7 +58,6 @@ RhythmModel.load = function(self)
 
 	inputManager.observable:add(logicEngine)
 	inputManager.observable:add(replayModel)
-	inputManager.timeEngine = timeEngine
 
 	replayModel.observable:add(inputManager)
 	replayModel.timings = self.timings

@@ -16,7 +16,7 @@ ScoreEngine.load = function(self)
 	scoreSystem:load()
 
 	self.inputMode = self.noteChart.inputMode:getString()
-	self.baseTimeRate = self.timeEngine:getBaseTimeRate()
+	self.baseTimeRate = self.rhythmModel.timeEngine:getBaseTimeRate()
 
 	self.sharedScoreNotes = {}
 	self.currentTime = 0

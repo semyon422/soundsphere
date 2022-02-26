@@ -81,13 +81,13 @@ PauseManager.startProgress = function(self, time)
 end
 
 PauseManager.play = function(self)
-	self.timeEngine:setTimeRate(self.timeEngine:getBaseTimeRate())
+	self.rhythmModel.timeEngine:setTimeRate(self.rhythmModel.timeEngine:getBaseTimeRate())
 	self.state = "play"
 	love.mouse.setVisible(false)
 end
 
 PauseManager.pause = function(self)
-	self.timeEngine:setTimeRate(0)
+	self.rhythmModel.timeEngine:setTimeRate(0)
 	self.state = "pause"
 	love.mouse.setVisible(true)
 end

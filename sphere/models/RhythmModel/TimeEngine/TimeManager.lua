@@ -18,7 +18,7 @@ TimeManager.load = function(self)
 end
 
 TimeManager.getAdjustTime = function(self)
-	return self.timeEngine.audioEngine:getPosition()
+	return self.timeEngine.rhythmModel.audioEngine:getPosition()
 end
 
 TimeManager.loadTimePoints = function(self)

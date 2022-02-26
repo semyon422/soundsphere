@@ -69,7 +69,7 @@ GraphicEngine.receive = function(self, event)
 end
 
 GraphicEngine.getLogicalNote = function(self, noteData)
-	return self.logicEngine.sharedLogicalNotes[noteData]
+	return self.rhythmModel.logicEngine.sharedLogicalNotes[noteData]
 end
 
 GraphicEngine.getNoteDrawer = function(self, layerIndex, inputType, inputIndex)

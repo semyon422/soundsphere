@@ -100,7 +100,7 @@ LogicEngine.unloadNoteHandlers = function(self)
 end
 
 LogicEngine.getScoreNote = function(self, noteData)
-	return self.scoreEngine:getScoreNote(noteData)
+	return self.rhythmModel.scoreEngine:getScoreNote(noteData)
 end
 
 return LogicEngine
