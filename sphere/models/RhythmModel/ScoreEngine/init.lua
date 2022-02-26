@@ -1,6 +1,5 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
-local NoteHandler		= require("sphere.models.RhythmModel.ScoreEngine.NoteHandler")
 local ScoreSystemContainer	= require("sphere.models.RhythmModel.ScoreEngine.ScoreSystemContainer")
 
 local ScoreEngine = Class:new()
@@ -31,16 +30,11 @@ ScoreEngine.load = function(self)
 
 	self.minTime = self.noteChart.metaData:get("minTime")
 	self.maxTime = self.noteChart.metaData:get("maxTime")
-
-	self.noteHandler = NoteHandler:new()
-	self.noteHandler.scoreEngine = self
-	self.noteHandler:load()
 end
 
 ScoreEngine.update = function(self)
 	self.currentTime = self.rhythmModel.timeEngine.currentTime
 	self.timeRate = self.rhythmModel.timeEngine.timeRate
-	self.noteHandler:update()
 
 	if self.currentTime < self.minTime or self.currentTime > self.maxTime then
 		return
@@ -53,18 +47,12 @@ ScoreEngine.update = function(self)
 	end
 end
 
-ScoreEngine.unload = function(self)
-	self.noteHandler:unload()
-end
-
-ScoreEngine.send = function(self, event)
-	return self.observable:send(event)
-end
+ScoreEngine.unload = function(self) end
 
 ScoreEngine.receive = function(self, event) end
 
-ScoreEngine.getScoreNote = function(self, noteData)
-	return self.sharedScoreNotes[noteData]
+ScoreEngine.send = function(self, event)
+	-- return self.observable:send(event)
 end
 
 return ScoreEngine

@@ -11,10 +11,7 @@ LongLogicalNote.construct = function(self)
 	self.noteData = nil
 
 	self.keyBind = self.startNoteData.inputType .. self.startNoteData.inputIndex
-
-	LogicalNote.construct(self)
-
-	self:switchState("clear")
+	self.state = "clear"
 end
 
 LongLogicalNote.update = function(self)
@@ -22,27 +19,18 @@ LongLogicalNote.update = function(self)
 		return
 	end
 
-	-- self.eventTime = self.eventTime or self.logicEngine.currentTime
+	local startTimeState = self:getStartTimeState()
+	local endTimeState = self:getEndTimeState()
 
-	local startTimeState = self.scoreNote:getStartTimeState()
-	local endTimeState = self.scoreNote:getEndTimeState()
-
-	local numStates = #self.states
-	if not self.autoplay then
-		self:processTimeState(startTimeState, endTimeState)
-	else
-		self:processAuto()
+	if self.autoplay then
+		return self:processAuto()
 	end
 
-	-- if numStates ~= #self.states then
-	-- 	return self:update()
-	-- else
-	-- 	self.eventTime = nil
-	-- end
+	self:processTimeState(startTimeState, endTimeState)
 end
 
 LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
-	local lastState = self:getLastState()
+	local lastState = self.state
 
 	local keyState = self.keyState
 	if keyState and startTimeState == "too early" then
@@ -102,13 +90,36 @@ LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
 	if not nextNote then
 		return
 	end
-	if self:getLastState() == "startMissed" and nextNote:isReachable() then
+	if self.state == "startMissed" and nextNote:isReachable() then
 		return self:next()
 	end
 end
 
+LongLogicalNote.switchState = function(self, newState)
+	local oldState = self.state
+	self.state = newState
+
+	if self.autoplay then
+		return
+	end
+
+	self:sendScore({
+		name = "ScoreNoteState",
+		noteType = "LongScoreNote",
+		currentTime = self:getEventTime(),
+		noteStartTime = self.startNoteData.timePoint.absoluteTime,
+		noteEndTime = self.endNoteData.timePoint.absoluteTime,
+		timeRate = self.scoreEngine.timeRate,
+		notesCount = self.logicEngine.notesCount,
+		oldState = oldState,
+		newState = newState,
+		minTime = self.scoreEngine.minTime,
+		maxTime = self.scoreEngine.maxTime
+	})
+end
+
 LongLogicalNote.processAuto = function(self)
-	local currentTime = self.logicEngine.exactCurrentTimeNoOffset
+	local currentTime = self.logicEngine.exactCurrentTimeNoOffset or self.logicEngine.currentTime
 	if self.logicEngine.autoplay then
 		currentTime = self.logicEngine.currentTime
 	end
@@ -132,6 +143,24 @@ LongLogicalNote.processAuto = function(self)
 		self:processTimeState("too late", "exactly")
 		self.eventTime = nil
 	end
+end
+
+LongLogicalNote.getStartTimeState = function(self)
+	local currentTime = self:getEventTime()
+	local deltaTime = (currentTime - self.startNoteData.timePoint.absoluteTime) / math.abs(self.logicEngine.timeRate)
+	local config = self.logicEngine.timings.LongScoreNote
+	return self:getTimeStateFromConfig(config.startHit, config.startMiss, deltaTime)
+end
+
+LongLogicalNote.getEndTimeState = function(self)
+	local currentTime = self:getEventTime()
+	local deltaTime = (currentTime - self.endNoteData.timePoint.absoluteTime) / math.abs(self.logicEngine.timeRate)
+	local config = self.logicEngine.timings.LongScoreNote
+	return self:getTimeStateFromConfig(config.endHit, config.endMiss, deltaTime)
+end
+
+LongLogicalNote.isReachable = function(self)
+	return self:getStartTimeState() ~= "too early"
 end
 
 LongLogicalNote.receive = ShortLogicalNote.receive

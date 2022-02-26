@@ -40,7 +40,7 @@ VideoNoteView.update = function(self, dt)
 	self:setTimeRate(graphicEngine.rhythmModel.timeEngine.timeRate)
 
 	self.timeState = self.graphicalNote.timeState
-	self.logicalState = self.graphicalNote.logicalNote:getLastState()
+	self.logicalState = self.graphicalNote.logicalNote.state
 	self.headView.timeState = self.graphicalNote.startTimeState or self.graphicalNote.timeState
 
 	local vid = self.video

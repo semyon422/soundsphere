@@ -67,7 +67,7 @@ LongGraphicalNote.updateFakeStartTime = function(self)
 end
 
 LongGraphicalNote.getFakeStartTime = function(self)
-	if self.logicalNote:getLastState() == "startPassedPressed" then
+	if self.logicalNote.state == "startPassedPressed" then
 		self:updateFakeStartTime()
 		return self.fakeStartTime
 	else
@@ -76,7 +76,7 @@ LongGraphicalNote.getFakeStartTime = function(self)
 end
 
 LongGraphicalNote.getFakeVelocityData = function(self)
-	if self.logicalNote:getLastState() == "startPassedPressed" and self.fakeStartTime then
+	if self.logicalNote.state == "startPassedPressed" and self.fakeStartTime then
 		return "current"
 	else
 		return self.fakeVelocityData or self.startNoteData.timePoint.velocityData

@@ -5,7 +5,7 @@ local LightingNoteView = ShortNoteView:new()
 LightingNoteView.update = function(self)
 	local timeState = self.graphicalNote.startTimeState or self.graphicalNote.timeState
 	self.headView.timeState = timeState
-	local logicalState = self.graphicalNote.logicalNote:getLastState()
+	local logicalState = self.graphicalNote.logicalNote.state
 	if
 		not self.startTime and (
 			logicalState == "passed" or

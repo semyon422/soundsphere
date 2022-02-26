@@ -9,10 +9,7 @@ ShortLogicalNote.construct = function(self)
 	self.noteData = nil
 
 	self.keyBind = self.startNoteData.inputType .. self.startNoteData.inputIndex
-
-	LogicalNote.construct(self)
-
-	self:switchState("clear")
+	self.state = "clear"
 end
 
 ShortLogicalNote.update = function(self)
@@ -20,22 +17,13 @@ ShortLogicalNote.update = function(self)
 		return
 	end
 
-	-- self.eventTime = self.eventTime or self.logicEngine.currentTime
+	local timeState = self:getTimeState()
 
-	local timeState = self.scoreNote:getTimeState()
-
-	local numStates = #self.states
-	if not self.autoplay then
-		self:processTimeState(timeState)
-	else
-		self:processAuto()
+	if self.autoplay then
+		return self:processAuto()
 	end
 
-	-- if numStates ~= #self.states then
-	-- 	return self:update()
-	-- else
-	-- 	self.eventTime = nil
-	-- end
+	self:processTimeState(timeState)
 end
 
 ShortLogicalNote.processTimeState = function(self, timeState)
@@ -51,8 +39,30 @@ ShortLogicalNote.processTimeState = function(self, timeState)
 	end
 end
 
+ShortLogicalNote.switchState = function(self, newState)
+	local oldState = self.state
+	self.state = newState
+
+	if self.autoplay then
+		return
+	end
+
+	self:sendScore({
+		name = "ScoreNoteState",
+		noteType = "ShortScoreNote",
+		currentTime = self:getEventTime(),
+		noteTime = self.startNoteData.timePoint.absoluteTime,
+		timeRate = self.scoreEngine.timeRate,
+		notesCount = self.logicEngine.notesCount,
+		oldState = oldState,
+		newState = newState,
+		minTime = self.scoreEngine.minTime,
+		maxTime = self.scoreEngine.maxTime
+	})
+end
+
 ShortLogicalNote.processAuto = function(self)
-	local currentTime = self.logicEngine.exactCurrentTimeNoOffset
+	local currentTime = self.logicEngine.exactCurrentTimeNoOffset or self.logicEngine.currentTime
 	if self.logicEngine.autoplay then
 		currentTime = self.logicEngine.currentTime
 	end
@@ -66,6 +76,17 @@ ShortLogicalNote.processAuto = function(self)
 		self:processTimeState("exactly")
 		self.eventTime = nil
 	end
+end
+
+ShortLogicalNote.getTimeState = function(self)
+	local currentTime = self:getEventTime()
+	local deltaTime = (currentTime - self.startNoteData.timePoint.absoluteTime) / math.abs(self.logicEngine.timeRate)
+	local config = self.logicEngine.timings.ShortScoreNote
+	return self:getTimeStateFromConfig(config.hit, config.miss, deltaTime)
+end
+
+ShortLogicalNote.isReachable = function(self)
+	return self:getTimeState() ~= "too early"
 end
 
 ShortLogicalNote.receive = function(self, event)

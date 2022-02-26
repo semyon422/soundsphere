@@ -12,6 +12,7 @@ end
 
 LogicEngine.load = function(self)
 	self.sharedLogicalNotes = {}
+	self.notesCount = {}
 	self.currentTime = 0
 	self.exactCurrentTimeNoOffset = -math.huge
 	self.events = Queue:new()
@@ -96,8 +97,8 @@ LogicEngine.unloadNoteHandlers = function(self)
 	self.noteHandlers = {}
 end
 
-LogicEngine.getScoreNote = function(self, noteData)
-	return self.rhythmModel.scoreEngine:getScoreNote(noteData)
-end
+-- LogicEngine.getScoreNote = function(self, noteData)
+-- 	return self.rhythmModel.scoreEngine:getScoreNote(noteData)
+-- end
 
 return LogicEngine

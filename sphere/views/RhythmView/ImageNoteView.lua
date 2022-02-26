@@ -15,7 +15,7 @@ end
 
 ImageNoteView.update = function(self)
 	self.timeState = self.graphicalNote.timeState
-	self.logicalState = self.graphicalNote.logicalNote:getLastState()
+	self.logicalState = self.graphicalNote.logicalNote.state
 	self.headView.timeState = self.graphicalNote.startTimeState or self.graphicalNote.timeState
 end
 

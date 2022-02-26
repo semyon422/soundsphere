@@ -13,7 +13,7 @@ end
 LongNoteView.update = function(self)
 	self.startTimeState = self.graphicalNote.startTimeState
 	self.endTimeState = self.graphicalNote.endTimeState
-	self.logicalState = self.graphicalNote.logicalNote:getLastState()
+	self.logicalState = self.graphicalNote.logicalNote.state
 
 	self.headView.timeState = self.startTimeState
 	self.bodyView.timeState = self.startTimeState
