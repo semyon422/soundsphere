@@ -20,7 +20,7 @@ ShortLogicalNote.update = function(self)
 		return
 	end
 
-	self.eventTime = self.eventTime or self.logicEngine.currentTime
+	-- self.eventTime = self.eventTime or self.logicEngine.currentTime
 
 	local timeState = self.scoreNote:getTimeState()
 
@@ -31,11 +31,11 @@ ShortLogicalNote.update = function(self)
 		self:processAuto()
 	end
 
-	if numStates ~= #self.states then
-		return self:update()
-	else
-		self.eventTime = nil
-	end
+	-- if numStates ~= #self.states then
+	-- 	return self:update()
+	-- else
+	-- 	self.eventTime = nil
+	-- end
 end
 
 ShortLogicalNote.processTimeState = function(self, timeState)
@@ -92,6 +92,7 @@ ShortLogicalNote.receive = function(self, event)
 			self:sendState("keyState")
 			self.eventTime = event.time
 		end
+		self:update()
 	end
 end
 

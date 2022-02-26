@@ -22,7 +22,7 @@ LongLogicalNote.update = function(self)
 		return
 	end
 
-	self.eventTime = self.eventTime or self.logicEngine.currentTime
+	-- self.eventTime = self.eventTime or self.logicEngine.currentTime
 
 	local startTimeState = self.scoreNote:getStartTimeState()
 	local endTimeState = self.scoreNote:getEndTimeState()
@@ -34,11 +34,11 @@ LongLogicalNote.update = function(self)
 		self:processAuto()
 	end
 
-	if numStates ~= #self.states then
-		return self:update()
-	else
-		self.eventTime = nil
-	end
+	-- if numStates ~= #self.states then
+	-- 	return self:update()
+	-- else
+	-- 	self.eventTime = nil
+	-- end
 end
 
 LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)

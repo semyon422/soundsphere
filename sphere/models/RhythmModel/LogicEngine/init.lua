@@ -47,14 +47,11 @@ LogicEngine.send = function(self, event)
 end
 
 LogicEngine.receive = function(self, event)
-	-- self.currentTime = self.rhythmModel.timeEngine.exactCurrentTime
-	-- self.exactCurrentTimeNoOffset = self.rhythmModel.timeEngine.exactCurrentTimeNoOffset
-	-- self.timeRate = self.rhythmModel.timeEngine.timeRate
 	-- self.events:add(event)
-	self:_receive(event)
-end
+-- 	self:_receive(event)
+-- end
 
-LogicEngine._receive = function(self, event)
+-- LogicEngine._receive = function(self, event)
 	if not event.virtual or self.promode then
 		return
 	end
