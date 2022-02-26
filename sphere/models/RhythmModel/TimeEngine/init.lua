@@ -107,14 +107,14 @@ TimeEngine.increaseTimeRate = function(self, delta)
 end
 
 TimeEngine.setPosition = function(self, position)
-	self.audioEngine:setPosition(position)
+	self.rhythmModel.audioEngine:setPosition(position)
 	self.timeManager:setPosition(position)
 	self.timeManager:adjustTime(true)
 	self:sync()
 
-	self.audioEngine.forcePosition = true
+	self.rhythmModel.audioEngine.forcePosition = true
 	self.logicEngine:update()
-	self.audioEngine.forcePosition = false
+	self.rhythmModel.audioEngine.forcePosition = false
 end
 
 TimeEngine.setTimeRate = function(self, timeRate, needTween)
