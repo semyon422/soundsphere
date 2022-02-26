@@ -113,7 +113,7 @@ TimeEngine.setPosition = function(self, position)
 	self:sync()
 
 	self.rhythmModel.audioEngine.forcePosition = true
-	self.logicEngine:update()
+	self.rhythmModel.logicEngine:update()
 	self.rhythmModel.audioEngine.forcePosition = false
 end
 
