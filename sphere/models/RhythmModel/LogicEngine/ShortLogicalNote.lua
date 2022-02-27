@@ -54,14 +54,13 @@ ShortLogicalNote.switchState = function(self, newState)
 	end
 
 	local config = self.logicEngine.timings.ShortScoreNote
-	local currentTime = math.min(self.timeEngine.currentTime, self.startNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.hit, config.miss))
-	if self.keyState then
-		currentTime = self.eventTime
-		print(currentTime, self.startNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.hit, config.miss))
-		print(self.startNoteData.timePoint.absoluteTime, self:getLastTimeFromConfig(config.hit, config.miss))
-		print(self:getTimeState())
-		assert(currentTime <= self.startNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.hit, config.miss))
-	end
+	local currentTime = math.min(self.eventTime or self.timeEngine.currentTime, self.startNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.hit, config.miss) * math.abs(self.timeEngine.timeRate))
+	-- if self.keyState then
+		-- currentTime = self.eventTime
+		-- print(currentTime, self.startNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.hit, config.miss) * math.abs(self.timeEngine.timeRate))
+		-- print(self:getTimeState())
+		-- assert(currentTime <= self.startNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.hit, config.miss) * math.abs(self.timeEngine.timeRate))
+	-- end
 
 	-- print("score", self:getEventTime())
 	self:sendScore({

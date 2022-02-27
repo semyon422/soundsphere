@@ -26,6 +26,13 @@ LongLogicalNote.update = function(self)
 	local startTimeState = self:getStartTimeState()
 	local endTimeState = self:getEndTimeState()
 	self:processTimeState(startTimeState, endTimeState)
+
+	if self.ended then
+		local nextNote = self:getNextPlayable()
+		if nextNote then
+			return nextNote:update()
+		end
+	end
 end
 
 LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
@@ -102,10 +109,20 @@ LongLogicalNote.switchState = function(self, newState)
 		return
 	end
 
+	local config = self.logicEngine.timings.LongScoreNote
+	local currentTime = math.min(self.eventTime or self.timeEngine.currentTime, self.endNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.endHit, config.endMiss) * math.abs(self.timeEngine.timeRate))
+	-- if self.keyState then
+	-- 	currentTime = self.eventTime or currentTime
+	-- 	print(currentTime, self.endNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.endHit, config.endMiss) * math.abs(self.timeEngine.timeRate) * math.abs(self.timeEngine.timeRate))
+	-- 	print(self:getStartTimeState(), self:getEndTimeState())
+	-- 	currentTime = math.min(currentTime, self.endNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.endHit, config.endMiss) * math.abs(self.timeEngine.timeRate))
+	-- 	-- assert(currentTime <= self.endNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.endHit, config.endMiss) * math.abs(self.timeEngine.timeRate) * math.abs(self.timeEngine.timeRate))
+	-- end
+
 	self:sendScore({
 		name = "ScoreNoteState",
 		noteType = "LongScoreNote",
-		currentTime = self:getEventTime(),
+		currentTime = currentTime,
 		noteStartTime = self.startNoteData.timePoint.absoluteTime,
 		noteEndTime = self.endNoteData.timePoint.absoluteTime,
 		timeRate = self.scoreEngine.timeRate,
