@@ -8,6 +8,10 @@ LogicalNote.getTimeState = function(self)
 	return "none"
 end
 
+LogicalNote.getLastTimeFromConfig = function(self, hit, miss)
+	return math.max(hit[2], miss[2])
+end
+
 LogicalNote.getTimeStateFromConfig = function(self, hit, miss, deltaTime)
 	if deltaTime >= hit[1] and deltaTime <= hit[2] then
 		return "exactly"
