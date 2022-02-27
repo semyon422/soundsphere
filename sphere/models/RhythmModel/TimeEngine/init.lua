@@ -83,9 +83,10 @@ TimeEngine.sync = function(self, time, dt)
 
 	timeManager:update()
 
-	self.currentTime = timeManager:getTime() + self.offset
-	self.exactCurrentTime = timeManager:getExactTime() + self.offset
-	self.exactCurrentTimeNoOffset = self.exactCurrentTime - self.offset
+	self.currentTime = math.floor((timeManager:getExactTime() + self.offset) * 1024) / 1024
+	-- self.currentTime = math.floor((timeManager:getTime() + self.offset) * 1024) / 1024
+	self.exactCurrentTime = math.floor((timeManager:getExactTime() + self.offset) * 1024) / 1024
+	-- self.exactCurrentTimeNoOffset = self.exactCurrentTime - self.offset
 end
 
 TimeEngine.unload = function(self)

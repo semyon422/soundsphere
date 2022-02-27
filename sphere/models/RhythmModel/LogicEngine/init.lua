@@ -13,8 +13,8 @@ end
 LogicEngine.load = function(self)
 	self.sharedLogicalNotes = {}
 	self.notesCount = {}
-	self.currentTime = 0
-	self.exactCurrentTimeNoOffset = -math.huge
+	-- self.currentTime = 0
+	-- self.exactCurrentTimeNoOffset = -math.huge
 	self.events = Queue:new()
 
 	self:loadNoteHandlers()
@@ -24,9 +24,9 @@ end
 -- 	return a.time < b.time
 -- end
 LogicEngine.update = function(self)
-	self.currentTime = self.rhythmModel.timeEngine.exactCurrentTime
-	self.exactCurrentTimeNoOffset = self.rhythmModel.timeEngine.exactCurrentTimeNoOffset
-	self.timeRate = self.rhythmModel.timeEngine.timeRate
+	-- self.currentTime = self.rhythmModel.timeEngine.exactCurrentTime
+	-- self.exactCurrentTimeNoOffset = self.rhythmModel.timeEngine.exactCurrentTimeNoOffset
+	-- self.timeRate = self.rhythmModel.timeEngine.timeRate
 	-- table.sort(events, sortEvents)
 
 	-- for event in self.events do

@@ -62,7 +62,8 @@ LogicalNote.next = function(self)
 end
 
 LogicalNote.isHere = function(self)
-	return self.startNoteData.timePoint.absoluteTime <= self:getEventTime()
+	return self.startNoteData.timePoint.absoluteTime <= self.timeEngine.currentTime
+	-- return self.startNoteData.timePoint.absoluteTime <= self:getEventTime()
 end
 
 LogicalNote.isReachable = function(self)
@@ -70,7 +71,7 @@ LogicalNote.isReachable = function(self)
 end
 
 LogicalNote.getEventTime = function(self)
-	return self.eventTime or self.logicEngine.currentTime
+	return self.eventTime or self.timeEngine.currentTime
 end
 
 LogicalNote.load = function(self)

@@ -15,6 +15,7 @@ NoteHandler.loadNoteData = function(self)
 
 	local logicEngine = self.logicEngine
 	local scoreEngine = self.logicEngine.rhythmModel.scoreEngine
+	local timeEngine = self.logicEngine.rhythmModel.timeEngine
 	for layerDataIndex in logicEngine.noteChart:getLayerDataIndexIterator() do
 		local layerData = logicEngine.noteChart:requireLayerData(layerDataIndex)
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
@@ -27,6 +28,7 @@ NoteHandler.loadNoteData = function(self)
 					logicalNote.noteHandler = self
 					logicalNote.logicEngine = logicEngine
 					logicalNote.scoreEngine = scoreEngine
+					logicalNote.timeEngine = timeEngine
 					notesCount[logicalNote.noteClass] = (notesCount[logicalNote.noteClass] or 0) + 1
 					table.insert(self.noteData, logicalNote)
 

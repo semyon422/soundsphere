@@ -85,9 +85,10 @@ InputManager.receive = function(self, event)
 	end
 
 	local timeEngine = self.rhythmModel.timeEngine
-	local eventTime = event.time - timeEngine.timeManager.eventTime + timeEngine.currentTime - timeEngine.timeManager.eventDelta
+	local eventTime = timeEngine.currentTime
+	-- local eventTime = event.time - timeEngine.timeManager.eventTime + timeEngine.currentTime - timeEngine.timeManager.eventDelta
 	if self.needRound then
-		eventTime =  math.floor(eventTime * 1024) / 1024
+		eventTime = math.floor(eventTime * 1024) / 1024
 	end
 
 	local offset = self.offset

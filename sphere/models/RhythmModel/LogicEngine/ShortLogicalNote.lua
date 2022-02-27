@@ -17,12 +17,11 @@ ShortLogicalNote.update = function(self)
 		return
 	end
 
-	local timeState = self:getTimeState()
-
 	if self.autoplay then
 		return self:processAuto()
 	end
 
+	local timeState = self:getTimeState()
 	self:processTimeState(timeState)
 end
 
@@ -47,10 +46,12 @@ ShortLogicalNote.switchState = function(self, newState)
 		return
 	end
 
+	-- print("score", self:getEventTime())
 	self:sendScore({
 		name = "ScoreNoteState",
 		noteType = "ShortScoreNote",
-		currentTime = self:getEventTime(),
+		currentTime = self.eventTime,
+		-- currentTime = self:getEventTime(),
 		noteTime = self.startNoteData.timePoint.absoluteTime,
 		timeRate = self.scoreEngine.timeRate,
 		notesCount = self.logicEngine.notesCount,
@@ -62,10 +63,11 @@ ShortLogicalNote.switchState = function(self, newState)
 end
 
 ShortLogicalNote.processAuto = function(self)
-	local currentTime = self.logicEngine.exactCurrentTimeNoOffset or self.logicEngine.currentTime
-	if self.logicEngine.autoplay then
-		currentTime = self.logicEngine.currentTime
-	end
+	local currentTime = self.timeEngine.currentTime
+	-- local currentTime = self.logicEngine.exactCurrentTimeNoOffset or self.logicEngine.currentTime
+	-- if self.logicEngine.autoplay then
+	-- 	currentTime = self.logicEngine.currentTime
+	-- end
 
 	local deltaTime = currentTime - self.startNoteData.timePoint.absoluteTime
 	if deltaTime >= 0 then
@@ -79,8 +81,12 @@ ShortLogicalNote.processAuto = function(self)
 end
 
 ShortLogicalNote.getTimeState = function(self)
-	local currentTime = self:getEventTime()
-	local deltaTime = (currentTime - self.startNoteData.timePoint.absoluteTime) / math.abs(self.logicEngine.timeRate)
+	local currentTime = self.timeEngine.currentTime
+	if self.keyState then
+		currentTime = self.eventTime
+	end
+	-- local currentTime = self:getEventTime()
+	local deltaTime = (currentTime - self.startNoteData.timePoint.absoluteTime) / math.abs(self.timeEngine.timeRate)
 	local config = self.logicEngine.timings.ShortScoreNote
 	return self:getTimeStateFromConfig(config.hit, config.miss, deltaTime)
 end
@@ -114,6 +120,7 @@ ShortLogicalNote.receive = function(self, event)
 			self.eventTime = event.time
 		end
 		self:update()
+		self.eventTime = nil
 	end
 end
 

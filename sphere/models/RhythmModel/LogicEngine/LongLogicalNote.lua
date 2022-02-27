@@ -19,13 +19,12 @@ LongLogicalNote.update = function(self)
 		return
 	end
 
-	local startTimeState = self:getStartTimeState()
-	local endTimeState = self:getEndTimeState()
-
 	if self.autoplay then
 		return self:processAuto()
 	end
 
+	local startTimeState = self:getStartTimeState()
+	local endTimeState = self:getEndTimeState()
 	self:processTimeState(startTimeState, endTimeState)
 end
 
@@ -119,10 +118,11 @@ LongLogicalNote.switchState = function(self, newState)
 end
 
 LongLogicalNote.processAuto = function(self)
-	local currentTime = self.logicEngine.exactCurrentTimeNoOffset or self.logicEngine.currentTime
-	if self.logicEngine.autoplay then
-		currentTime = self.logicEngine.currentTime
-	end
+	local currentTime = self.timeEngine.currentTime
+	-- local currentTime = self.logicEngine.exactCurrentTimeNoOffset or self.logicEngine.currentTime
+	-- if self.logicEngine.autoplay then
+	-- 	currentTime = self.logicEngine.currentTime
+	-- end
 
 	local deltaStartTime = currentTime - self.startNoteData.timePoint.absoluteTime
 	local deltaEndTime = currentTime - self.endNoteData.timePoint.absoluteTime
@@ -147,14 +147,14 @@ end
 
 LongLogicalNote.getStartTimeState = function(self)
 	local currentTime = self:getEventTime()
-	local deltaTime = (currentTime - self.startNoteData.timePoint.absoluteTime) / math.abs(self.logicEngine.timeRate)
+	local deltaTime = (currentTime - self.startNoteData.timePoint.absoluteTime) / math.abs(self.timeEngine.timeRate)
 	local config = self.logicEngine.timings.LongScoreNote
 	return self:getTimeStateFromConfig(config.startHit, config.startMiss, deltaTime)
 end
 
 LongLogicalNote.getEndTimeState = function(self)
 	local currentTime = self:getEventTime()
-	local deltaTime = (currentTime - self.endNoteData.timePoint.absoluteTime) / math.abs(self.logicEngine.timeRate)
+	local deltaTime = (currentTime - self.endNoteData.timePoint.absoluteTime) / math.abs(self.timeEngine.timeRate)
 	local config = self.logicEngine.timings.LongScoreNote
 	return self:getTimeStateFromConfig(config.endHit, config.endMiss, deltaTime)
 end
