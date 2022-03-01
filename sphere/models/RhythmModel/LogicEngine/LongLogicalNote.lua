@@ -27,12 +27,12 @@ LongLogicalNote.update = function(self)
 	local endTimeState = self:getEndTimeState()
 	self:processTimeState(startTimeState, endTimeState)
 
-	if self.ended then
-		local nextNote = self:getNextPlayable()
-		if nextNote then
-			return nextNote:update()
-		end
-	end
+	-- if self.ended then
+	-- 	local nextNote = self:getNextPlayable()
+	-- 	if nextNote then
+	-- 		return nextNote:update()
+	-- 	end
+	-- end
 end
 
 LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
@@ -97,10 +97,12 @@ LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
 		return
 	end
 	if self.state == "startMissed" and nextNote:isReachable() then
+		self:switchState("endMissed")
 		return self:next()
 	end
 end
 
+local f = io.open("2.txt", "w")
 LongLogicalNote.switchState = function(self, newState)
 	local oldState = self.state
 	self.state = newState
@@ -110,7 +112,22 @@ LongLogicalNote.switchState = function(self, newState)
 	end
 
 	local config = self.logicEngine.timings.LongScoreNote
-	local currentTime = math.min(self.eventTime or self.timeEngine.currentTime, self.endNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.endHit, config.endMiss) * math.abs(self.timeEngine.timeRate))
+
+	local currentTime
+	if oldState == "clear" then
+		currentTime = math.min(self.eventTime or self.timeEngine.currentTime, self.startNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.startHit, config.startMiss) * math.abs(self.timeEngine.timeRate))
+		-- if self.eventTime then
+		-- 	assert(self.eventTime <= self.startNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.startHit, config.startMiss) * math.abs(self.timeEngine.timeRate))
+		-- end
+	else
+		currentTime = math.min(self.eventTime or self.timeEngine.currentTime, self.endNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.endHit, config.endMiss) * math.abs(self.timeEngine.timeRate))
+		-- if self.eventTime then
+		-- 	local startTimeState = self:getStartTimeState()
+		-- 	local endTimeState = self:getEndTimeState()
+		-- 	print(startTimeState, endTimeState)
+		-- 	assert(self.eventTime <= self.endNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.endHit, config.endMiss) * math.abs(self.timeEngine.timeRate))
+		-- end
+	end
 	-- if self.keyState then
 	-- 	currentTime = self.eventTime or currentTime
 	-- 	print(currentTime, self.endNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.endHit, config.endMiss) * math.abs(self.timeEngine.timeRate) * math.abs(self.timeEngine.timeRate))
@@ -118,6 +135,10 @@ LongLogicalNote.switchState = function(self, newState)
 	-- 	currentTime = math.min(currentTime, self.endNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.endHit, config.endMiss) * math.abs(self.timeEngine.timeRate))
 	-- 	-- assert(currentTime <= self.endNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.endHit, config.endMiss) * math.abs(self.timeEngine.timeRate) * math.abs(self.timeEngine.timeRate))
 	-- end
+
+	f:write(("%s:%s:%s:%s:%s:%s\n"):format(currentTime, self.eventTime, self.startNoteData.timePoint.absoluteTime, self.startNoteData.inputIndex, oldState, newState))
+	f:flush()
+
 
 	self:sendScore({
 		name = "ScoreNoteState",

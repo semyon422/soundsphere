@@ -57,7 +57,7 @@ LogicEngine.receive = function(self, event)
 		return
 	end
 
-	for noteHandler in pairs(self.noteHandlers) do
+	for _, noteHandler in ipairs(self.noteHandlers) do
 		noteHandler:receive(event)
 	end
 end
@@ -75,7 +75,7 @@ LogicEngine.loadNoteHandlers = function(self)
 	for inputType, inputIndex in self.noteChart:getInputIteraator() do
 		local noteHandler = self:getNoteHandler(inputType, inputIndex)
 		if noteHandler then
-			self.noteHandlers[noteHandler] = noteHandler
+			table.insert(self.noteHandlers, noteHandler)
 			noteHandler:load()
 		end
 	end
@@ -85,13 +85,13 @@ LogicEngine.updateNoteHandlers = function(self)
 	if self.timeRate == 0 then
 		return
 	end
-	for noteHandler in pairs(self.noteHandlers) do
+	for _, noteHandler in ipairs(self.noteHandlers) do
 		noteHandler:update()
 	end
 end
 
 LogicEngine.unloadNoteHandlers = function(self)
-	for noteHandler in pairs(self.noteHandlers) do
+	for _, noteHandler in ipairs(self.noteHandlers) do
 		noteHandler:unload()
 	end
 	self.noteHandlers = {}

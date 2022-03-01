@@ -55,26 +55,41 @@ end
 NoteHandler.update = function(self)
 	local currentNote = self.currentNote
 
-	if not self.currentNote then return end
+	if not currentNote then return end
+	if not currentNote.ended then currentNote:update() end
+	if not currentNote.ended then return end
 
-	currentNote:update()
+	self:switchNext()
+	return self:update()
+end
 
-	if not currentNote.ended then
-		return
-	end
-
+NoteHandler.switchNext = function(self)
+	local currentNote = self.currentNote
 	local nextNote = currentNote:getNext()
 	if nextNote then
 		currentNote:unload()
 		nextNote:load()
 		self.currentNote = nextNote
-		return self:update()
+	else
+		self.currentNote = nil
 	end
+	print("switch")
 end
 
 NoteHandler.receive = function(self, event)
-	if not self.currentNote then return end
-	return self.currentNote:receive(event)
+	local currentNote = self.currentNote
+
+	print("NoteHandler.receive", currentNote, currentNote and currentNote.ended, self.inputIndex)
+	if not currentNote then return end
+	if currentNote.ended then
+		self:switchNext()
+		return self:receive(event)
+	end
+	print("apply")
+	if currentNote:receive(event) then
+		self:switchNext()
+		return self:receive(event)
+	end
 end
 
 return NoteHandler

@@ -24,12 +24,9 @@ ShortLogicalNote.update = function(self)
 	local timeState = self:getTimeState()
 	self:processTimeState(timeState)
 
-	if self.ended then
-		local nextNote = self:getNextPlayable()
-		if nextNote then
-			return nextNote:update()
-		end
-	end
+	-- if self.ended then
+	-- 	self.noteHandler:switchNext(self)
+	-- end
 end
 
 ShortLogicalNote.processTimeState = function(self, timeState)
@@ -97,11 +94,11 @@ ShortLogicalNote.processAuto = function(self)
 end
 
 ShortLogicalNote.getTimeState = function(self)
-	local currentTime = self.timeEngine.currentTime
-	if self.eventTime then
-		currentTime = self.eventTime
-	end
-	-- local currentTime = self:getEventTime()
+	-- local currentTime = self.timeEngine.currentTime
+	-- if self.eventTime then
+	-- 	currentTime = self.eventTime
+	-- end
+	local currentTime = self:getEventTime()
 	local deltaTime = (currentTime - self.startNoteData.timePoint.absoluteTime) / math.abs(self.timeEngine.timeRate)
 	local config = self.logicEngine.timings.ShortScoreNote
 	return self:getTimeStateFromConfig(config.hit, config.miss, deltaTime)
@@ -111,7 +108,8 @@ ShortLogicalNote.isReachable = function(self)
 	return self:getTimeState() ~= "too early"
 end
 
-ShortLogicalNote.receive = function(self, event)
+-- local f = io.open("1.txt", "w")
+ShortLogicalNote.receive = function(self, event, isRec)
 	if self.logicEngine.autoplay then
 		return
 	end
@@ -124,16 +122,21 @@ ShortLogicalNote.receive = function(self, event)
 		return
 	end
 
+	print(require("inspect")(event))
+
 	local key = event and event[1]
 	if key == self.keyBind then
 		self.eventTime = event.time
+
+		-- f:write(("%s:%s:%s:%s:%s\n"):format(isRec ~= nil, self.eventTime, event.name, self.startNoteData.timePoint.absoluteTime, self.startNoteData.inputIndex))
+		-- f:flush()
+
 		self:update()
 		if self.ended then
-			local nextNote = self:getNextPlayable()
-			if nextNote then
-				return nextNote:receive(event)
-			end
-			return
+			-- self.noteHandler:switchNext(self)
+			-- self.noteHandler:receive(event)
+			print("break")
+			return true
 		end
 		if event.name == "keypressed" then
 			self.keyState = true
