@@ -59,6 +59,9 @@ ShortLogicalNote.switchState = function(self, newState)
 		-- assert(currentTime <= self.startNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.hit, config.miss) * math.abs(self.timeEngine.timeRate))
 	-- end
 
+	f:write(("SN:%s:%s:%s:%s:%s:%s\n"):format(currentTime, self.eventTime, self.startNoteData.timePoint.absoluteTime, self.startNoteData.inputIndex, oldState, newState))
+	f:flush()
+
 	-- print("score", self:getEventTime())
 	self:sendScore({
 		name = "ScoreNoteState",
@@ -104,8 +107,12 @@ ShortLogicalNote.getTimeState = function(self)
 	return self:getTimeStateFromConfig(config.hit, config.miss, deltaTime)
 end
 
-ShortLogicalNote.isReachable = function(self)
-	return self:getTimeState() ~= "too early"
+ShortLogicalNote.isReachable = function(self, currentNote)
+	local eventTime = self.eventTime
+	self.eventTime = currentNote.eventTime
+	local isReachable = self:getTimeState() ~= "too early"
+	self.eventTime = eventTime
+	return isReachable
 end
 
 -- local f = io.open("1.txt", "w")

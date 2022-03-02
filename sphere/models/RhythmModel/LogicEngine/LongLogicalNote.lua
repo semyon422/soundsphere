@@ -96,13 +96,13 @@ LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
 	if not nextNote then
 		return
 	end
-	if self.state == "startMissed" and nextNote:isReachable() then
+	if self.state == "startMissed" and nextNote:isReachable(self) then
 		self:switchState("endMissed")
 		return self:next()
 	end
 end
 
-local f = io.open("2.txt", "w")
+-- local f = io.open("2.txt", "w")
 LongLogicalNote.switchState = function(self, newState)
 	local oldState = self.state
 	self.state = newState
@@ -136,7 +136,7 @@ LongLogicalNote.switchState = function(self, newState)
 	-- 	-- assert(currentTime <= self.endNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.endHit, config.endMiss) * math.abs(self.timeEngine.timeRate) * math.abs(self.timeEngine.timeRate))
 	-- end
 
-	f:write(("%s:%s:%s:%s:%s:%s\n"):format(currentTime, self.eventTime, self.startNoteData.timePoint.absoluteTime, self.startNoteData.inputIndex, oldState, newState))
+	f:write(("LN:%s:%s:%s:%s:%s:%s\n"):format(currentTime, self.eventTime, self.startNoteData.timePoint.absoluteTime, self.startNoteData.inputIndex, oldState, newState))
 	f:flush()
 
 
@@ -197,8 +197,12 @@ LongLogicalNote.getEndTimeState = function(self)
 	return self:getTimeStateFromConfig(config.endHit, config.endMiss, deltaTime)
 end
 
-LongLogicalNote.isReachable = function(self)
-	return self:getStartTimeState() ~= "too early"
+LongLogicalNote.isReachable = function(self, currentNote)
+	local eventTime = self.eventTime
+	self.eventTime = currentNote.eventTime
+	local isReachable = self:getStartTimeState() ~= "too early"
+	self.eventTime = eventTime
+	return isReachable
 end
 
 LongLogicalNote.receive = ShortLogicalNote.receive

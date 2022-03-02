@@ -106,25 +106,22 @@ local function test(notes, events)
 	logicEngine:load()
 
 	local function press(time)
-		timeEngine.currentTime = time
 		logicEngine:receive({
 			"key1",
 			name = "keypressed",
 			virtual = true,
-			time = timeEngine.currentTime
+			time = time
 		})
 	end
 	local function release(time)
-		timeEngine.currentTime = time
 		logicEngine:receive({
 			"key1",
 			name = "keyreleased",
 			virtual = true,
-			time = timeEngine.currentTime
+			time = time
 		})
 	end
 	local function update(time)
-		timeEngine.currentTime = time
 		logicEngine:update()
 	end
 
@@ -137,20 +134,17 @@ local function test(notes, events)
 				release(time)
 			elseif char == "u" then
 				update(time)
+			elseif char == "t" then
+				timeEngine.currentTime = time
 			end
 		end
 	end
 end
 
 test(
-	{{0, 1}, {1, 1.5}, 2},
+	{{0, 1}, 1},
 	{
-		{0, "p"},
-		{1.5, "r"},
-		-- {1, "p"},
-		{2, "u"},
-		-- {1.5, "r"},
-		-- {2, "pr"},
+		{1, "p"},
 	}
 )
 
