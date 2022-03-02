@@ -84,7 +84,10 @@ end
 
 LongGraphicalNote.getFakeVelocityData = function(self)
 	if self.logicalNote.state == "startPassedPressed" and self.fakeStartTime then
-		return "current"
+		local fakeVelocityData = self.noteDrawer.currentVelocityData
+		-- local fakeVelocityData = self.noteDrawer.currentClearVelocityData
+		self.fakeVelocityData = fakeVelocityData
+		return fakeVelocityData
 	else
 		return self.fakeVelocityData or self.startNoteData.timePoint.velocityData
 	end
@@ -93,24 +96,31 @@ end
 LongGraphicalNote.getFakeVisualStartTime = function(self)
 	local fakeStartTime = self:getFakeStartTime()
 	local fakeVelocityData = self:getFakeVelocityData()
-	if fakeVelocityData == "current" then
-		fakeVelocityData = self.noteDrawer.currentVelocityData
-		self.fakeVelocityData = fakeVelocityData
-	end
 
 	-- self.startNoteData.timePoint.currentVisualTime + visualOffset
 
+	local timePoint = self.noteDrawer.currentTimePoint
+	local offset = self.timeEngine.visualOffset
+	-- if self.fakeStartTime == self.graphicEngine.currentTime - self.timeEngine.visualOffset then
+	if self.fakeStartTime then
+		timePoint = self.noteDrawer.currentClearTimePoint
+		fakeVelocityData = self.noteDrawer.currentClearVelocityData
+		-- offset = 0
+	end
+
 	local fakeVisualClearStartTime
+		-- = (fakeStartTime - timePoint.absoluteTime)
 		= (fakeStartTime - fakeVelocityData.timePoint.absoluteTime)
 		* fakeVelocityData.currentSpeed
 		+ fakeVelocityData.timePoint.zeroClearVisualTime
+		-- + timePoint.zeroClearVisualTime
 
 	local fakeVisualStartTime
-		= (fakeVisualClearStartTime - self.noteDrawer.currentTimePoint.zeroClearVisualTime)
+		= (fakeVisualClearStartTime - timePoint.zeroClearVisualTime)
 		* self.noteDrawer.globalSpeed
-		+ self.noteDrawer.currentTimePoint.absoluteTime
+		+ timePoint.absoluteTime
 
-	return fakeVisualStartTime + self.timeEngine.visualOffset
+	return fakeVisualStartTime + offset
 end
 
 LongGraphicalNote.whereWillDraw = function(self)

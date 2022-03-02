@@ -33,6 +33,9 @@ NoteDrawer.load = function(self)
 	self.currentTimePoint = self.layerData:getTimePoint()
 	self.currentTimePoint.zeroClearVisualTime = 0
 	self.currentVelocityDataIndex = 1
+	self.currentClearTimePoint = self.layerData:getTimePoint()
+	self.currentClearTimePoint.zeroClearVisualTime = 0
+	self.currentClearVelocityDataIndex = 1
 
 	table.sort(self.noteData, function(a, b)
 		return a.startNoteData.timePoint.zeroClearVisualTime < b.startNoteData.timePoint.zeroClearVisualTime
@@ -47,7 +50,7 @@ NoteDrawer.load = function(self)
 end
 
 NoteDrawer.updateCurrentTime = function(self)
-	self.currentTimePoint.absoluteTime = self.graphicEngine.currentTime
+	self.currentTimePoint.absoluteTime = self.graphicEngine.currentTime - self.graphicEngine.rhythmModel.timeEngine.visualOffset
 
 	self.currentVelocityData = self.layerData.spaceData:getVelocityData(self.currentVelocityDataIndex)
 	self.nextVelocityData = self.layerData.spaceData:getVelocityData(self.currentVelocityDataIndex + 1)
@@ -62,6 +65,22 @@ NoteDrawer.updateCurrentTime = function(self)
 	end
 	self.currentTimePoint.velocityData = self.currentVelocityData
 	self.currentTimePoint:computeZeroClearVisualTime()
+
+	self.currentClearTimePoint.absoluteTime = self.graphicEngine.currentTime
+
+	self.currentClearVelocityData = self.layerData.spaceData:getVelocityData(self.currentClearVelocityDataIndex)
+	self.nextClearVelocityData = self.layerData.spaceData:getVelocityData(self.currentClearVelocityDataIndex + 1)
+	while true do
+		if self.nextClearVelocityData and self.nextClearVelocityData.timePoint <= self.currentClearTimePoint then
+			self.currentClearVelocityDataIndex = self.currentClearVelocityDataIndex + 1
+			self.currentClearVelocityData = self.layerData.spaceData:getVelocityData(self.currentClearVelocityDataIndex)
+			self.nextClearVelocityData = self.layerData.spaceData:getVelocityData(self.currentClearVelocityDataIndex + 1)
+		else
+			break
+		end
+	end
+	self.currentClearTimePoint.velocityData = self.currentClearVelocityData
+	self.currentClearTimePoint:computeZeroClearVisualTime()
 end
 
 NoteDrawer.update = function(self)
