@@ -65,8 +65,12 @@ LogicalNote.next = function(self)
 	self.ended = true
 end
 
+LogicalNote.getNoteTime = function(self)
+	return self.startNoteData.timePoint.absoluteTime
+end
+
 LogicalNote.isHere = function(self)
-	return self.startNoteData.timePoint.absoluteTime <= self.timeEngine.currentTime
+	return self:getNoteTime() <= self.timeEngine.currentTime
 	-- return self.startNoteData.timePoint.absoluteTime <= self:getEventTime()
 end
 

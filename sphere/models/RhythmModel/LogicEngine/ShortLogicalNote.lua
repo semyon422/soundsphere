@@ -46,12 +46,12 @@ ShortLogicalNote.switchState = function(self, newState)
 	local oldState = self.state
 	self.state = newState
 
-	if self.autoplay then
+	if not self.scorable then
 		return
 	end
 
 	local config = self.logicEngine.timings.ShortScoreNote
-	local currentTime = math.min(self.eventTime or self.timeEngine.currentTime, self.startNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.hit, config.miss) * math.abs(self.timeEngine.timeRate))
+	local currentTime = math.min(self.eventTime or self.timeEngine.currentTime, self:getNoteTime() + self:getLastTimeFromConfig(config.hit, config.miss) * math.abs(self.timeEngine.timeRate))
 	-- if self.keyState then
 		-- currentTime = self.eventTime
 		-- print(currentTime, self.startNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.hit, config.miss) * math.abs(self.timeEngine.timeRate))
@@ -59,7 +59,7 @@ ShortLogicalNote.switchState = function(self, newState)
 		-- assert(currentTime <= self.startNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.hit, config.miss) * math.abs(self.timeEngine.timeRate))
 	-- end
 
-	f:write(("SN:%s:%s:%s:%s:%s:%s\n"):format(currentTime, self.eventTime, self.startNoteData.timePoint.absoluteTime, self.startNoteData.inputIndex, oldState, newState))
+	f:write(("SN:%s:%s:%s:%s:%s:%s\n"):format(currentTime, self.eventTime, self:getNoteTime(), self.startNoteData.inputIndex, oldState, newState))
 	f:flush()
 
 	-- print("score", self:getEventTime())
@@ -68,7 +68,7 @@ ShortLogicalNote.switchState = function(self, newState)
 		noteType = "ShortScoreNote",
 		currentTime = currentTime,
 		-- currentTime = self:getEventTime(),
-		noteTime = self.startNoteData.timePoint.absoluteTime,
+		noteTime = self:getNoteTime(),
 		timeRate = self.scoreEngine.timeRate,
 		notesCount = self.logicEngine.notesCount,
 		oldState = oldState,
@@ -85,12 +85,12 @@ ShortLogicalNote.processAuto = function(self)
 	-- 	currentTime = self.logicEngine.currentTime
 	-- end
 
-	local deltaTime = currentTime - self.startNoteData.timePoint.absoluteTime
-	if deltaTime >= 0 then
+	-- local deltaTime = currentTime - self:getNoteTime()
+	if self:isHere() then
 		self.keyState = true
 		self:sendState("keyState")
 
-		self.eventTime = self.startNoteData.timePoint.absoluteTime
+		self.eventTime = self:getNoteTime()
 		self:processTimeState("exactly")
 		self.eventTime = nil
 	end
@@ -102,7 +102,7 @@ ShortLogicalNote.getTimeState = function(self)
 	-- 	currentTime = self.eventTime
 	-- end
 	local currentTime = self:getEventTime()
-	local deltaTime = (currentTime - self.startNoteData.timePoint.absoluteTime) / math.abs(self.timeEngine.timeRate)
+	local deltaTime = (currentTime - self:getNoteTime()) / math.abs(self.timeEngine.timeRate)
 	local config = self.logicEngine.timings.ShortScoreNote
 	return self:getTimeStateFromConfig(config.hit, config.miss, deltaTime)
 end
