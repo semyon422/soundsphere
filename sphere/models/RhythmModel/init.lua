@@ -9,6 +9,7 @@ local InputManager		= require("sphere.models.RhythmModel.InputManager")
 local PauseManager		= require("sphere.models.RhythmModel.PauseManager")
 local ReplayModel		= require("sphere.models.ReplayModel")
 local ModifierModel		= require("sphere.models.ModifierModel")
+local Test		= require("sphere.models.RhythmModel.LogicEngine.Test")
 
 local RhythmModel = Class:new()
 
@@ -241,11 +242,11 @@ RhythmModel.setTimeToPrepare = function(self, timeToPrepare)
 end
 
 RhythmModel.setInputOffset = function(self, offset)
-	self.inputManager:setInputOffset(offset)
+	self.timeEngine.inputOffset = offset
 end
 
-RhythmModel.setNoteOffset = function(self, offset)
-	self.timeEngine:setOffset(offset)
+RhythmModel.setVisualOffset = function(self, offset)
+	self.timeEngine.visualOffset = offset
 end
 
 RhythmModel.setScoreBasePath = function(self, path)
@@ -257,11 +258,11 @@ RhythmModel.setPauseTimes = function(self, ...)
 end
 
 RhythmModel.setScaleInputOffset = function(self, scaleInputOffset)
-	self.inputManager:setScaleInputOffset(scaleInputOffset)
+	-- self.inputManager:setScaleInputOffset(scaleInputOffset)
 end
 
 RhythmModel.setScaleVisualOffset = function(self, scaleVisualOffset)
-	self.graphicEngine:setScaleVisualOffset(scaleVisualOffset)
+	-- self.graphicEngine:setScaleVisualOffset(scaleVisualOffset)
 end
 
 return RhythmModel

@@ -66,7 +66,11 @@ LogicalNote.next = function(self)
 end
 
 LogicalNote.getNoteTime = function(self)
-	return self.startNoteData.timePoint.absoluteTime
+	local offset = 0
+	if self.playable then
+		offset = self.timeEngine.inputOffset
+	end
+	return self.startNoteData.timePoint.absoluteTime + offset
 end
 
 LogicalNote.isHere = function(self)

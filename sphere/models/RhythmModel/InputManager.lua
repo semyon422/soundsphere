@@ -8,8 +8,6 @@ InputManager.path = "userdata/input.json"
 
 InputManager.mode = "external"
 InputManager.needRound = true
-InputManager.scaleInputOffset = false
-InputManager.offset = 0
 
 InputManager.types = {
 	"keyboard",
@@ -26,14 +24,6 @@ InputManager.setMode = function(self, mode)
 	self.mode = mode
 end
 
-InputManager.setInputOffset = function(self, offset)
-	self.offset = offset
-end
-
-InputManager.setScaleInputOffset = function(self, scaleInputOffset)
-	self.scaleInputOffset = scaleInputOffset
-end
-
 InputManager.setBindings = function(self, inputBindings)
 	self.inputBindings = inputBindings
 end
@@ -47,10 +37,13 @@ InputManager.setInputMode = function(self, inputMode)
 	self.inputConfig = self.inputBindings[inputMode]
 end
 
+f = io.open("2.txt", "w")
 InputManager.receive = function(self, event)
 	local mode = self.mode
 
 	if event.virtual and mode == "internal" then
+		f:write(("event-1:%s:%s\n"):format(event.name, event.time))
+		f:flush()
 		return self:send(event)
 	end
 
@@ -91,18 +84,13 @@ InputManager.receive = function(self, event)
 		eventTime = math.floor(eventTime * 1024) / 1024
 	end
 
-	local offset = self.offset
-	if self.scaleInputOffset then
-		offset = offset * self.timeEngine.timeRate
-	end
-
 	local events = {}
 	for _, key in ipairs(keyConfig.press) do
 		events[#events + 1] = {
 			key,
 			name = "keypressed",
 			virtual = true,
-			time = eventTime + offset
+			time = eventTime
 		}
 	end
 	for _, key in ipairs(keyConfig.release) do
@@ -110,10 +98,12 @@ InputManager.receive = function(self, event)
 			key,
 			name = "keyreleased",
 			virtual = true,
-			time = eventTime + offset
+			time = eventTime
 		}
 	end
 	for _, event in ipairs(events) do
+		f:write(("event-2:%s:%s\n"):format(event.name, event.time))
+		f:flush()
 		self:send(event)
 	end
 end

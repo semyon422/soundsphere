@@ -29,7 +29,7 @@ ShortGraphicalNote.computeTimeState = function(self)
 	timeState.currentVisualTime = self.startNoteData.timePoint.currentVisualTime
 
 	timeState.absoluteDeltaTime = currentTime - self.startNoteData.timePoint.absoluteTime
-	timeState.visualDeltaTime = currentTime - self.startNoteData.timePoint.currentVisualTime
+	timeState.visualDeltaTime = currentTime - (self.startNoteData.timePoint.currentVisualTime + self.timeEngine.visualOffset)
 	timeState.scaledVisualDeltaTime = timeState.visualDeltaTime * self.graphicEngine:getVisualTimeRate()
 end
 

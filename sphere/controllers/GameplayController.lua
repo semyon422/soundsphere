@@ -54,8 +54,8 @@ GameplayController.load = function(self)
 	rhythmModel:setTimeRound(config.gameplay.needTimeRound)
 	rhythmModel:setLongNoteShortening(config.gameplay.longNoteShortening)
 	rhythmModel:setTimeToPrepare(config.gameplay.time.prepare)
-	rhythmModel:setNoteOffset(config.gameplay.offset.note + localOffset)
-	rhythmModel:setInputOffset(config.gameplay.offset.input)
+	rhythmModel:setInputOffset(config.gameplay.offset.input + localOffset)
+	rhythmModel:setVisualOffset(config.gameplay.offset.visual + localOffset)
 	rhythmModel:setVisualTimeRate(config.gameplay.speed)
 	rhythmModel:setPauseTimes(
 		config.gameplay.time.playPause,

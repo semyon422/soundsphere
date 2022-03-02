@@ -9,6 +9,8 @@ NoteDrawer.load = function(self)
 	self.layerData = self.graphicEngine.noteChart:requireLayerData(self.layerIndex)
 	-- local inputModeString = self.layerData.layerDataSequence.noteChart.inputMode:getString()
 
+	local graphicEngine = self.graphicEngine
+	local timeEngine = self.graphicEngine.rhythmModel.timeEngine
 	for noteDataIndex = 1, self.layerData:getNoteDataCount() do
 		local noteData = self.layerData:getNoteData(noteDataIndex)
 
@@ -17,11 +19,11 @@ NoteDrawer.load = function(self)
 
 			if graphicalNote then
 				graphicalNote.noteDrawer = self
-				graphicalNote.graphicEngine = self.graphicEngine -- !!!!!!!!!!!!!!!!!!!!!
-				assert(graphicalNote.graphicEngine)
-				graphicalNote.noteSkin = self.graphicEngine.noteSkin
+				graphicalNote.graphicEngine = graphicEngine
+				graphicalNote.timeEngine = timeEngine
+				graphicalNote.noteSkin = graphicEngine.noteSkin
 				graphicalNote:init()
-				if self.graphicEngine.noteSkin:check(graphicalNote) then
+				if graphicEngine.noteSkin:check(graphicalNote) then
 					table.insert(self.noteData, graphicalNote)
 				end
 			end

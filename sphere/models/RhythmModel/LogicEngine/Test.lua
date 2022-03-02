@@ -15,6 +15,7 @@ logicEngine.rhythmModel = rhythmModel
 local timeEngine = {
 	currentTime = 0,
 	timeRate = 1,
+	inputOffset = 0,
 }
 rhythmModel.timeEngine = timeEngine
 

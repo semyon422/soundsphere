@@ -100,10 +100,14 @@ LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
 end
 
 LongLogicalNote.getNoteTime = function(self, side)
+	local offset = 0
+	if self.playable then
+		offset = self.timeEngine.inputOffset
+	end
 	if not side or side == "start" then
-		return self.startNoteData.timePoint.absoluteTime
+		return self.startNoteData.timePoint.absoluteTime + offset
 	elseif side == "end" then
-		return self.endNoteData.timePoint.absoluteTime
+		return self.endNoteData.timePoint.absoluteTime + offset
 	end
 	error("Wrong side")
 end
@@ -113,7 +117,7 @@ LongLogicalNote.switchState = function(self, newState)
 	local oldState = self.state
 	self.state = newState
 
-	if not self.scorable then
+	if not self.playable then
 		return
 	end
 

@@ -8,13 +8,13 @@ LogicalNoteFactory.getNote = function(self, noteData)
 	local logicalNote = {noteData = noteData}
 
 	if noteData.noteType == "ShortNote" then
-		logicalNote.scorable = true
+		logicalNote.playable = true
 		return ShortLogicalNote:new(logicalNote)
 	elseif noteData.noteType == "LongNoteStart" then
-		logicalNote.scorable = true
+		logicalNote.playable = true
 		return LongLogicalNote:new(logicalNote)
 	elseif noteData.noteType == "LaserNoteStart" then
-		logicalNote.scorable = true
+		logicalNote.playable = true
 		return LaserLogicalNote:new(logicalNote)
 	elseif noteData.noteType == "LineNoteStart" then
 		logicalNote.autoplay = true

@@ -46,7 +46,7 @@ ShortLogicalNote.switchState = function(self, newState)
 	local oldState = self.state
 	self.state = newState
 
-	if not self.scorable then
+	if not self.playable then
 		return
 	end
 
