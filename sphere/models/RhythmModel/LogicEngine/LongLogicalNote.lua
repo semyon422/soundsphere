@@ -93,10 +93,7 @@ LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
 	end
 
 	local nextNote = self:getNextPlayable()
-	if not nextNote then
-		return
-	end
-	if self.state == "startMissed" and nextNote:isReachable(self) then
+	if self.state == "startMissed" and (not nextNote or nextNote:isReachable(self)) then
 		self:switchState("endMissed")
 		return self:next()
 	end
