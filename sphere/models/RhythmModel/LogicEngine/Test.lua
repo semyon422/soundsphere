@@ -18,20 +18,6 @@ local timeEngine = {
 }
 rhythmModel.timeEngine = timeEngine
 
-rhythmModel.scoreEngine = {
-	send = function(self, event)
-		print(inspect({
-			currentTime = event.currentTime,
-			newState = event.newState,
-			noteEndTime = event.noteEndTime,
-			noteStartTime = event.noteStartTime,
-			noteType = event.noteType,
-			oldState = event.oldState,
-		}))
-	end,
-	scoreSystem = {receive = function(self, event) end},
-}
-
 logicEngine.timings = {
 	normalscore = 0.1,
 	ShortScoreNote = {
@@ -46,7 +32,7 @@ logicEngine.timings = {
 	}
 }
 
-local function test(notes, events)
+local function test(notes, events, states)
 	local noteChart = NoteChart:new()
 
 	local layerData = noteChart.layerDataSequence:requireLayerData(1)
@@ -103,6 +89,23 @@ local function test(notes, events)
 	noteChart:compute()
 
 	logicEngine.noteChart = noteChart
+
+	local newStates = {}
+	rhythmModel.scoreEngine = {
+		send = function(self, event)
+			print(inspect({
+				currentTime = event.currentTime,
+				newState = event.newState,
+				noteEndTime = event.noteEndTime,
+				noteStartTime = event.noteStartTime,
+				noteType = event.noteType,
+				oldState = event.oldState,
+			}))
+			table.insert(newStates, event)
+		end,
+		scoreSystem = {receive = function(self, event) end},
+	}
+
 	logicEngine:load()
 
 	local function press(time)
@@ -139,28 +142,45 @@ local function test(notes, events)
 			end
 		end
 	end
+
+	if not states then return end
+	assert(#states == #newStates)
+	for i, event in ipairs(newStates) do
+		assert(event.currentTime == states[i][1])
+		assert(event.oldState == states[i][2])
+		assert(event.newState == states[i][3])
+	end
 end
+
+test(
+	{0},
+	{
+		{1, "tu"},
+	},
+	{
+		{0.2, "clear", "missed"},
+	}
+)
+
+test(
+	{{0, 1}},
+	{
+		{2, "tu"},
+	},
+	{
+		{0.2, "clear", "startMissed"},
+		{1.2, "startMissed", "endMissed"},
+	}
+)
 
 test(
 	{{0, 1}, 1},
 	{
 		{1, "p"},
+	},
+	{
+		{0.2, "clear", "startMissed"},
+		{1, "startMissed", "endMissed"},
+		{1, "clear", "passed"},
 	}
 )
-
--- test(
--- 	{0, {1, 1.5}, 2},
--- 	{
--- 		{0, "pr"},
--- 		{1, "p"},
--- 		{1.5, "r"},
--- 		{2, "pr"},
--- 	}
--- )
-
--- test(
--- 	{0, {1, 1.5}, 2},
--- 	{
--- 		{3, "u"},
--- 	}
--- )
