@@ -50,7 +50,7 @@ NoteDrawer.load = function(self)
 end
 
 NoteDrawer.updateCurrentTime = function(self)
-	self.currentTimePoint.absoluteTime = self.graphicEngine.currentTime - self.graphicEngine.rhythmModel.timeEngine.visualOffset
+	self.currentTimePoint.absoluteTime = self.graphicEngine.currentTime - self.graphicEngine.rhythmModel.timeEngine.inputOffset
 
 	self.currentVelocityData = self.layerData.spaceData:getVelocityData(self.currentVelocityDataIndex)
 	self.nextVelocityData = self.layerData.spaceData:getVelocityData(self.currentVelocityDataIndex + 1)
@@ -65,22 +65,6 @@ NoteDrawer.updateCurrentTime = function(self)
 	end
 	self.currentTimePoint.velocityData = self.currentVelocityData
 	self.currentTimePoint:computeZeroClearVisualTime()
-
-	self.currentClearTimePoint.absoluteTime = self.graphicEngine.currentTime
-
-	self.currentClearVelocityData = self.layerData.spaceData:getVelocityData(self.currentClearVelocityDataIndex)
-	self.nextClearVelocityData = self.layerData.spaceData:getVelocityData(self.currentClearVelocityDataIndex + 1)
-	while true do
-		if self.nextClearVelocityData and self.nextClearVelocityData.timePoint <= self.currentClearTimePoint then
-			self.currentClearVelocityDataIndex = self.currentClearVelocityDataIndex + 1
-			self.currentClearVelocityData = self.layerData.spaceData:getVelocityData(self.currentClearVelocityDataIndex)
-			self.nextClearVelocityData = self.layerData.spaceData:getVelocityData(self.currentClearVelocityDataIndex + 1)
-		else
-			break
-		end
-	end
-	self.currentClearTimePoint.velocityData = self.currentClearVelocityData
-	self.currentClearTimePoint:computeZeroClearVisualTime()
 end
 
 NoteDrawer.update = function(self)

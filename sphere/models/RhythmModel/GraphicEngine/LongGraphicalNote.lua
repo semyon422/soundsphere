@@ -36,9 +36,7 @@ LongGraphicalNote.computeTimeState = function(self)
 	startTimeState.scaledVisualDeltaTime = startTimeState.visualDeltaTime * self.graphicEngine:getVisualTimeRate()
 
 	startTimeState.fakeCurrentVisualTime = self:getFakeVisualStartTime()
-	-- startTimeState.fakeCurrentVisualTime = self:getFakeVisualStartTime() or self.startNoteData.timePoint.currentVisualTime + visualOffset
-	-- startTimeState.fakeVisualDeltaTime = currentTime - (startTimeState.fakeCurrentVisualTime + visualOffset)
-	startTimeState.fakeVisualDeltaTime = currentTime - startTimeState.fakeCurrentVisualTime
+	startTimeState.fakeVisualDeltaTime = currentTime - (startTimeState.fakeCurrentVisualTime + visualOffset)
 	startTimeState.scaledFakeVisualDeltaTime = startTimeState.fakeVisualDeltaTime * self.graphicEngine:getVisualTimeRate()
 
 	self.endTimeState = self.endTimeState or {}
@@ -54,73 +52,55 @@ LongGraphicalNote.computeTimeState = function(self)
 
 	local longNoteShortening = self.graphicEngine.longNoteShortening
 	endTimeState.fakeCurrentVisualTime = math.max(startTimeState.fakeCurrentVisualTime, self.endNoteData.timePoint.currentVisualTime + visualOffset + longNoteShortening)
-	endTimeState.fakeVisualDeltaTime = currentTime - (endTimeState.fakeCurrentVisualTime)
-	-- endTimeState.fakeVisualDeltaTime = currentTime - endTimeState.fakeCurrentVisualTime
+	endTimeState.fakeVisualDeltaTime = currentTime - endTimeState.fakeCurrentVisualTime
 	endTimeState.scaledFakeVisualDeltaTime = endTimeState.fakeVisualDeltaTime * self.graphicEngine:getVisualTimeRate()
 
 	endTimeState.startTimeState = startTimeState
 	startTimeState.endTimeState = endTimeState
 end
 
-LongGraphicalNote.updateFakeStartTime = function(self)
-	local currentTime = self.graphicEngine.currentTime - self.timeEngine.visualOffset
-	-- local currentTime = self.graphicEngine.currentTime
-	-- local startTime = self.startNoteData.timePoint.absoluteTime + self.timeEngine.visualOffset
-	-- local endTime = self.endNoteData.timePoint.absoluteTime + self.timeEngine.visualOffset
+LongGraphicalNote.getFakeStartTime = function(self)
+	local currentTime = self.fakeVisualStartTimeLimit
 	local startTime = self.startNoteData.timePoint.absoluteTime
 	local endTime = self.endNoteData.timePoint.absoluteTime
-	self.fakeStartTime = currentTime > startTime and currentTime or startTime
-	self.fakeStartTime = math.min(self.fakeStartTime, endTime)
-end
-
-LongGraphicalNote.getFakeStartTime = function(self)
 	if self.logicalNote.state == "startPassedPressed" then
-		self:updateFakeStartTime()
-		return self.fakeStartTime
-	else
-		return self.fakeStartTime or self.startNoteData.timePoint.absoluteTime
+		self.fakeStartTime = math.min(currentTime > startTime and currentTime or startTime, endTime)
 	end
-end
-
-LongGraphicalNote.getFakeVelocityData = function(self)
-	if self.logicalNote.state == "startPassedPressed" and self.fakeStartTime then
-		local fakeVelocityData = self.noteDrawer.currentVelocityData
-		-- local fakeVelocityData = self.noteDrawer.currentClearVelocityData
-		self.fakeVelocityData = fakeVelocityData
-		return fakeVelocityData
-	else
-		return self.fakeVelocityData or self.startNoteData.timePoint.velocityData
-	end
+	return self.fakeStartTime or startTime
 end
 
 LongGraphicalNote.getFakeVisualStartTime = function(self)
-	local fakeStartTime = self:getFakeStartTime()
-	local fakeVelocityData = self:getFakeVelocityData()
-
-	-- self.startNoteData.timePoint.currentVisualTime + visualOffset
-
 	local timePoint = self.noteDrawer.currentTimePoint
 	local offset = self.timeEngine.visualOffset
-	-- if self.fakeStartTime == self.graphicEngine.currentTime - self.timeEngine.visualOffset then
-	if self.fakeStartTime then
-		timePoint = self.noteDrawer.currentClearTimePoint
-		fakeVelocityData = self.noteDrawer.currentClearVelocityData
-		-- offset = 0
-	end
+
+	local velocityData = self.startNoteData.timePoint.velocityData
+	local offsetSum = self.timeEngine.visualOffset - self.timeEngine.inputOffset
+
+	local deltaZeroClearVisualTime
+		= timePoint.zeroClearVisualTime
+		- velocityData.timePoint.zeroClearVisualTime
+		- offsetSum / self.noteDrawer.globalSpeed
+
+	--[[
+		fakeVisualStartTimeLimit is derived
+		from (fakeVisualStartTime == currentTime == currentVisualTime)
+		as fakeStartTime
+	]]
+	self.fakeVisualStartTimeLimit = deltaZeroClearVisualTime / velocityData.currentSpeed + velocityData.timePoint.absoluteTime
+
+	local fakeStartTime = self:getFakeStartTime()
 
 	local fakeVisualClearStartTime
-		-- = (fakeStartTime - timePoint.absoluteTime)
-		= (fakeStartTime - fakeVelocityData.timePoint.absoluteTime)
-		* fakeVelocityData.currentSpeed
-		+ fakeVelocityData.timePoint.zeroClearVisualTime
-		-- + timePoint.zeroClearVisualTime
+		= (fakeStartTime - velocityData.timePoint.absoluteTime)
+		* velocityData.currentSpeed
+		+ velocityData.timePoint.zeroClearVisualTime
 
 	local fakeVisualStartTime
 		= (fakeVisualClearStartTime - timePoint.zeroClearVisualTime)
 		* self.noteDrawer.globalSpeed
 		+ timePoint.absoluteTime
 
-	return fakeVisualStartTime + offset
+	return fakeVisualStartTime
 end
 
 LongGraphicalNote.whereWillDraw = function(self)
