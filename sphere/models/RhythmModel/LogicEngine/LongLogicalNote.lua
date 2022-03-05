@@ -112,7 +112,6 @@ LongLogicalNote.getNoteTime = function(self, side)
 	error("Wrong side")
 end
 
--- local f = io.open("2.txt", "w")
 LongLogicalNote.switchState = function(self, newState)
 	local oldState = self.state
 	self.state = newState
@@ -124,31 +123,13 @@ LongLogicalNote.switchState = function(self, newState)
 	local config = self.logicEngine.timings.LongScoreNote
 
 	local currentTime
+	local eventTime = self.eventTime or self.timeEngine.currentTime
+	local timeRate = math.abs(self.timeEngine.timeRate)
 	if oldState == "clear" then
-		currentTime = math.min(self.eventTime or self.timeEngine.currentTime, self:getNoteTime("start") + self:getLastTimeFromConfig(config.startHit, config.startMiss) * math.abs(self.timeEngine.timeRate))
-		-- if self.eventTime then
-		-- 	assert(self.eventTime <= self.startNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.startHit, config.startMiss) * math.abs(self.timeEngine.timeRate))
-		-- end
+		currentTime = math.min(eventTime, self:getNoteTime("start") + self:getLastTimeFromConfig(config.startHit, config.startMiss) * timeRate)
 	else
-		currentTime = math.min(self.eventTime or self.timeEngine.currentTime, self:getNoteTime("end") + self:getLastTimeFromConfig(config.endHit, config.endMiss) * math.abs(self.timeEngine.timeRate))
-		-- if self.eventTime then
-		-- 	local startTimeState = self:getStartTimeState()
-		-- 	local endTimeState = self:getEndTimeState()
-		-- 	print(startTimeState, endTimeState)
-		-- 	assert(self.eventTime <= self.endNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.endHit, config.endMiss) * math.abs(self.timeEngine.timeRate))
-		-- end
+		currentTime = math.min(eventTime, self:getNoteTime("end") + self:getLastTimeFromConfig(config.endHit, config.endMiss) * timeRate)
 	end
-	-- if self.keyState then
-	-- 	currentTime = self.eventTime or currentTime
-	-- 	print(currentTime, self.endNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.endHit, config.endMiss) * math.abs(self.timeEngine.timeRate) * math.abs(self.timeEngine.timeRate))
-	-- 	print(self:getStartTimeState(), self:getEndTimeState())
-	-- 	currentTime = math.min(currentTime, self.endNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.endHit, config.endMiss) * math.abs(self.timeEngine.timeRate))
-	-- 	-- assert(currentTime <= self.endNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.endHit, config.endMiss) * math.abs(self.timeEngine.timeRate) * math.abs(self.timeEngine.timeRate))
-	-- end
-
-	f:write(("LN:%s:%s:%s:%s:%s:%s\n"):format(currentTime, self.eventTime, self:getNoteTime("start"), self.startNoteData.inputIndex, oldState, newState))
-	f:flush()
-
 
 	self:sendScore({
 		name = "ScoreNoteState",
@@ -167,10 +148,6 @@ end
 
 LongLogicalNote.processAuto = function(self)
 	local currentTime = self.timeEngine.currentTime
-	-- local currentTime = self.logicEngine.exactCurrentTimeNoOffset or self.logicEngine.currentTime
-	-- if self.logicEngine.autoplay then
-	-- 	currentTime = self.logicEngine.currentTime
-	-- end
 
 	local deltaStartTime = currentTime - self:getNoteTime("start")
 	local deltaEndTime = currentTime - self:getNoteTime("end")

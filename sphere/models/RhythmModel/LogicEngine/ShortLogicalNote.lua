@@ -23,10 +23,6 @@ ShortLogicalNote.update = function(self)
 
 	local timeState = self:getTimeState()
 	self:processTimeState(timeState)
-
-	-- if self.ended then
-	-- 	self.noteHandler:switchNext(self)
-	-- end
 end
 
 ShortLogicalNote.processTimeState = function(self, timeState)
@@ -52,17 +48,7 @@ ShortLogicalNote.switchState = function(self, newState)
 
 	local config = self.logicEngine.timings.ShortScoreNote
 	local currentTime = math.min(self.eventTime or self.timeEngine.currentTime, self:getNoteTime() + self:getLastTimeFromConfig(config.hit, config.miss) * math.abs(self.timeEngine.timeRate))
-	-- if self.keyState then
-		-- currentTime = self.eventTime
-		-- print(currentTime, self.startNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.hit, config.miss) * math.abs(self.timeEngine.timeRate))
-		-- print(self:getTimeState())
-		-- assert(currentTime <= self.startNoteData.timePoint.absoluteTime + self:getLastTimeFromConfig(config.hit, config.miss) * math.abs(self.timeEngine.timeRate))
-	-- end
 
-	f:write(("SN:%s:%s:%s:%s:%s:%s\n"):format(currentTime, self.eventTime, self:getNoteTime(), self.startNoteData.inputIndex, oldState, newState))
-	f:flush()
-
-	-- print("score", self:getEventTime())
 	self:sendScore({
 		name = "ScoreNoteState",
 		noteType = "ShortScoreNote",
@@ -79,13 +65,6 @@ ShortLogicalNote.switchState = function(self, newState)
 end
 
 ShortLogicalNote.processAuto = function(self)
-	local currentTime = self.timeEngine.currentTime
-	-- local currentTime = self.logicEngine.exactCurrentTimeNoOffset or self.logicEngine.currentTime
-	-- if self.logicEngine.autoplay then
-	-- 	currentTime = self.logicEngine.currentTime
-	-- end
-
-	-- local deltaTime = currentTime - self:getNoteTime()
 	if self:isHere() then
 		self.keyState = true
 		self:sendState("keyState")
@@ -97,10 +76,6 @@ ShortLogicalNote.processAuto = function(self)
 end
 
 ShortLogicalNote.getTimeState = function(self)
-	-- local currentTime = self.timeEngine.currentTime
-	-- if self.eventTime then
-	-- 	currentTime = self.eventTime
-	-- end
 	local currentTime = self:getEventTime()
 	local deltaTime = (currentTime - self:getNoteTime()) / math.abs(self.timeEngine.timeRate)
 	local config = self.logicEngine.timings.ShortScoreNote
@@ -115,7 +90,6 @@ ShortLogicalNote.isReachable = function(self, currentNote)
 	return isReachable
 end
 
--- local f = io.open("1.txt", "w")
 ShortLogicalNote.receive = function(self, event, isRec)
 	if self.logicEngine.autoplay then
 		return
@@ -129,20 +103,11 @@ ShortLogicalNote.receive = function(self, event, isRec)
 		return
 	end
 
-	print(require("inspect")(event))
-
 	local key = event and event[1]
 	if key == self.keyBind then
 		self.eventTime = event.time
-
-		-- f:write(("%s:%s:%s:%s:%s\n"):format(isRec ~= nil, self.eventTime, event.name, self.startNoteData.timePoint.absoluteTime, self.startNoteData.inputIndex))
-		-- f:flush()
-
 		self:update()
 		if self.ended then
-			-- self.noteHandler:switchNext(self)
-			-- self.noteHandler:receive(event)
-			print("break")
 			return true
 		end
 		if event.name == "keypressed" then

@@ -73,25 +73,17 @@ NoteHandler.switchNext = function(self)
 	else
 		self.currentNote = nil
 	end
-	-- print("switch")
-	f:write("switch\n")
 end
 
 NoteHandler.receive = function(self, event, count)
 	count = count or 0
 	local currentNote = self.currentNote
 
-	print("NoteHandler.receive", currentNote, currentNote and currentNote.ended, self.inputIndex)
 	if not currentNote then return end
 	if currentNote.ended then
 		self:switchNext()
 		return self:receive(event, count + 1)
 	end
-	-- print("apply")
-	f:write(("apply-%d\n"):format(count))
-	f:write("event time ")
-	f:write(event.time)
-	f:write("\n")
 	if currentNote:receive(event) then
 		self:switchNext()
 		return self:receive(event, count + 1)

@@ -60,8 +60,6 @@ local function test(notes, events, states)
 			noteData.inputType = "key"
 			noteData.inputIndex = 1
 
-			-- noteData.noteType = "LongNoteStart"
-			-- noteData.noteType = "LongNoteEnd"
 			noteData.noteType = "ShortNote"
 
 			layerData:addNoteData(noteData)
@@ -94,14 +92,14 @@ local function test(notes, events, states)
 	local newStates = {}
 	rhythmModel.scoreEngine = {
 		send = function(self, event)
-			print(inspect({
-				currentTime = event.currentTime,
-				newState = event.newState,
-				noteEndTime = event.noteEndTime,
-				noteStartTime = event.noteStartTime,
-				noteType = event.noteType,
-				oldState = event.oldState,
-			}))
+			-- print(inspect({
+			-- 	currentTime = event.currentTime,
+			-- 	newState = event.newState,
+			-- 	noteEndTime = event.noteEndTime,
+			-- 	noteStartTime = event.noteStartTime,
+			-- 	noteType = event.noteType,
+			-- 	oldState = event.oldState,
+			-- }))
 			table.insert(newStates, event)
 		end,
 		scoreSystem = {receive = function(self, event) end},

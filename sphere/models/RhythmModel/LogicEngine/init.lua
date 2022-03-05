@@ -1,6 +1,5 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
-local Queue				= require("aqua.util.Queue")
 local NoteHandler		= require("sphere.models.RhythmModel.LogicEngine.NoteHandler")
 
 local LogicEngine = Class:new()
@@ -13,28 +12,12 @@ end
 LogicEngine.load = function(self)
 	self.sharedLogicalNotes = {}
 	self.notesCount = {}
-	-- self.currentTime = 0
-	-- self.exactCurrentTimeNoOffset = -math.huge
-	self.events = Queue:new()
 
 	self:loadNoteHandlers()
 end
 
--- local sortEvents = function(a, b)
--- 	return a.time < b.time
--- end
 LogicEngine.update = function(self)
-	-- self.currentTime = self.rhythmModel.timeEngine.exactCurrentTime
-	-- self.exactCurrentTimeNoOffset = self.rhythmModel.timeEngine.exactCurrentTimeNoOffset
-	-- self.timeRate = self.rhythmModel.timeEngine.timeRate
-	-- table.sort(events, sortEvents)
-
-	-- for event in self.events do
-	-- 	self.currentTime = event.time
-		self:updateNoteHandlers()
-	-- 	self:_receive(event)
-	-- 	self:updateNoteHandlers()
-	-- end
+	self:updateNoteHandlers()
 end
 
 LogicEngine.unload = function(self)
@@ -48,11 +31,6 @@ LogicEngine.send = function(self, event)
 end
 
 LogicEngine.receive = function(self, event)
-	-- self.events:add(event)
--- 	self:_receive(event)
--- end
-
--- LogicEngine._receive = function(self, event)
 	if not event.virtual or self.promode then
 		return
 	end
@@ -96,9 +74,5 @@ LogicEngine.unloadNoteHandlers = function(self)
 	end
 	self.noteHandlers = {}
 end
-
--- LogicEngine.getScoreNote = function(self, noteData)
--- 	return self.rhythmModel.scoreEngine:getScoreNote(noteData)
--- end
 
 return LogicEngine

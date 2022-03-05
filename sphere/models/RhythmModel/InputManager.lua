@@ -37,13 +37,10 @@ InputManager.setInputMode = function(self, inputMode)
 	self.inputConfig = self.inputBindings[inputMode]
 end
 
-f = io.open("2.txt", "w")
 InputManager.receive = function(self, event)
 	local mode = self.mode
 
 	if event.virtual and mode == "internal" then
-		f:write(("event-1:%s:%s\n"):format(event.name, event.time))
-		f:flush()
 		return self:send(event)
 	end
 
@@ -102,8 +99,6 @@ InputManager.receive = function(self, event)
 		}
 	end
 	for _, event in ipairs(events) do
-		f:write(("event-2:%s:%s\n"):format(event.name, event.time))
-		f:flush()
 		self:send(event)
 	end
 end
