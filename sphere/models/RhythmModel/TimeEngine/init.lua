@@ -19,8 +19,8 @@ end
 TimeEngine.currentTime = 0
 TimeEngine.currentVisualTime = 0
 TimeEngine.baseTimeRate = 1
-TimeEngine.timeRate = 0
-TimeEngine.targetTimeRate = 0
+TimeEngine.timeRate = 1
+TimeEngine.targetTimeRate = 1
 TimeEngine.backwardCounter = 0
 TimeEngine.inputOffset = 0
 TimeEngine.visualOffset = 0
@@ -46,9 +46,7 @@ TimeEngine.updateTimeToPrepare = function(self)
 end
 
 TimeEngine.createTimeRateHandler = function(self)
-	local timeRateHandler = {
-		timeRate = 1
-	}
+	local timeRateHandler = {timeRate = 1}
 
 	local timeRateHandlers = self.timeRateHandlers
 	timeRateHandlers[#timeRateHandlers + 1] = timeRateHandler
@@ -74,6 +72,9 @@ TimeEngine.sync = function(self, time, dt)
 	if self.timeRateTween then
 		self.timeRateTween:update(dt)
 		timeManager:setRate(self.timeRate)
+		if timeManager.rate == self.targetTimeRate then
+			self.timeRateTween = nil
+		end
 	end
 
 	timeManager:update()
@@ -93,8 +94,7 @@ end
 
 TimeEngine.increaseTimeRate = function(self, delta)
 	if self.targetTimeRate + delta >= 0.1 then
-		self.targetTimeRate = self.targetTimeRate + delta
-		self:setTimeRate(self.targetTimeRate)
+		self:setTimeRate(self.targetTimeRate + delta)
 	end
 end
 
@@ -109,25 +109,22 @@ TimeEngine.setPosition = function(self, position)
 	self.rhythmModel.audioEngine.forcePosition = false
 end
 
+TimeEngine.pause = function(self)
+	self.timeManager:pause()
+end
+
+TimeEngine.play = function(self)
+	self.timeManager:play()
+end
+
 TimeEngine.setTimeRate = function(self, timeRate, needTween)
-	if timeRate == 0 and self.timeRate ~= 0 then
-		self.timeManager:pause()
-		self.timeRate = 0
-		self.targetTimeRate = 0
-	elseif timeRate ~= 0 and self.timeRate == 0 then
-		self.timeManager:play()
-		self.timeRate = timeRate
-		self.targetTimeRate = timeRate
-		self.timeManager:setRate(timeRate)
-	elseif timeRate == 0 and self.timeRate == 0 then
-		return
-	elseif not needTween then
-		self.timeRate = timeRate
-		self.targetTimeRate = timeRate
-		self.timeManager:setRate(timeRate)
-	else
+	self.targetTimeRate = timeRate
+	if needTween then
 		self.timeRateTween = tween.new(0.25, self, {timeRate = timeRate}, "inOutQuad")
+		return
 	end
+	self.timeRate = timeRate
+	self.timeManager:setRate(timeRate)
 end
 
 return TimeEngine

@@ -16,18 +16,11 @@ end
 
 GraphicEngine.load = function(self)
 	self.noteCount = 0
-	-- self.currentTime = 0
-	self.timeRate = 1
 
 	self:loadNoteDrawers()
 end
 
 GraphicEngine.update = function(self, dt)
-	-- self.currentTime = self.rhythmModel.timeEngine.currentVisualTime
-	if self.rhythmModel.timeEngine.timeRate ~= 0 then
-		self.timeRate = self.rhythmModel.timeEngine.timeRate
-	end
-
 	if self.visualTimeRateTween and self.updateTween then
 		self.visualTimeRateTween:update(dt)
 	end
@@ -55,7 +48,7 @@ GraphicEngine.setVisualTimeRate = function(self, visualTimeRate)
 end
 
 GraphicEngine.getVisualTimeRate = function(self)
-	return self.visualTimeRate / math.abs(self.timeRate)
+	return self.visualTimeRate / math.abs(self.rhythmModel.timeEngine.timeRate)
 end
 
 GraphicEngine.unload = function(self)

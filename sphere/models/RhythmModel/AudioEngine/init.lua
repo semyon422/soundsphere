@@ -33,8 +33,7 @@ AudioEngine.load = function(self)
 end
 
 AudioEngine.update = function(self)
-	self.currentTime = self.rhythmModel.timeEngine.currentTime
-	self:setTimeRate(self.rhythmModel.timeEngine.timeRate)
+	self:updateTimeRate()
 	self.backgroundContainer:update()
 	self.foregroundContainer:update()
 end
@@ -57,10 +56,11 @@ AudioEngine.receive = function(self, event)
 end
 
 AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
+	local currentTime = self.rhythmModel.timeEngine.currentTime
+	local aliases = self.localAliases
 	if not paths then return end
 	for i = 1, #paths do
 		local path = paths[i][1]
-		local aliases = self.localAliases
 		if not keysound and not aliases[path] then
 			aliases = self.globalAliases
 		end
@@ -76,11 +76,11 @@ AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
 		local audio = AudioFactory:getAudio(apath, mode)
 
 		if audio then
-			audio.offset = offset or self.currentTime
+			audio.offset = offset or currentTime
 			audio:setRate(self.timeRate)
 			audio:setBaseVolume(paths[i][2])
 			if self.forcePosition then
-				audio:setPosition(self.currentTime - audio.offset)
+				audio:setPosition(currentTime - audio.offset)
 			end
 			if layer == "background" then
 				self.backgroundContainer:add(audio)
@@ -92,22 +92,23 @@ AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
 	end
 end
 
-AudioEngine.setTimeRate = function(self, timeRate)
+AudioEngine.play = function(self)
+	self.backgroundContainer:play()
+	self.foregroundContainer:play()
+end
+
+AudioEngine.pause = function(self)
+	self.backgroundContainer:pause()
+	self.foregroundContainer:pause()
+end
+
+AudioEngine.updateTimeRate = function(self)
+	local timeRate = self.rhythmModel.timeEngine.timeRate
 	if self.timeRate == timeRate then
 		return
 	end
-	if timeRate == 0 and self.timeRate ~= 0 then
-		self.backgroundContainer:pause()
-		self.foregroundContainer:pause()
-	elseif timeRate ~= 0 and self.timeRate == 0 then
-		self.backgroundContainer:setRate(timeRate)
-		self.foregroundContainer:setRate(timeRate)
-		self.backgroundContainer:play()
-		self.foregroundContainer:play()
-	elseif timeRate ~= 0 and self.timeRate ~= 0 then
-		self.backgroundContainer:setRate(timeRate)
-		self.foregroundContainer:setRate(timeRate)
-	end
+	self.backgroundContainer:setRate(timeRate)
+	self.foregroundContainer:setRate(timeRate)
 	self.timeRate = timeRate
 end
 
