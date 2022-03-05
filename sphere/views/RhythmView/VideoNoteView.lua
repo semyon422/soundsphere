@@ -21,11 +21,7 @@ VideoNoteView.construct = function(self)
 		vid:rewind()
 		image = vid.image
 
-		local deltaTime = self.startNoteData.timePoint.absoluteTime
-		vid.getAdjustTime = function()
-			return graphicEngine.currentTime - deltaTime
-		end
-		vid:setRate(graphicEngine.timeRate)
+		vid:setTimer(self.graphicalNote.timeEngine.timeManager)
 
 		self.video = vid
 		self.drawable = image
@@ -36,9 +32,6 @@ VideoNoteView.draw = ImageNoteView.draw
 VideoNoteView.getTransformParams = ImageNoteView.getTransformParams
 
 VideoNoteView.update = function(self, dt)
-	local graphicEngine = self.graphicalNote.graphicEngine
-	self:setTimeRate(graphicEngine.rhythmModel.timeEngine.timeRate)
-
 	self.timeState = self.graphicalNote.timeState
 	self.logicalState = self.graphicalNote.logicalNote.state
 	self.headView.timeState = self.graphicalNote.startTimeState or self.graphicalNote.timeState
@@ -47,24 +40,6 @@ VideoNoteView.update = function(self, dt)
 	if vid then
 		vid:update(dt)
 	end
-end
-
-VideoNoteView.setTimeRate = function(self, timeRate)
-	local vid = self.video
-	if not vid or timeRate == self.timeRate then
-		return
-	end
-
-	if timeRate == 0 and self.timeRate ~= 0 then
-		vid:pause()
-	elseif timeRate ~= 0 and self.timeRate == 0 then
-		vid:setRate(timeRate)
-		vid:play()
-	elseif timeRate ~= 0 and self.timeRate ~= 0 then
-		vid:setRate(timeRate)
-	end
-
-	self.timeRate = timeRate
 end
 
 return VideoNoteView
