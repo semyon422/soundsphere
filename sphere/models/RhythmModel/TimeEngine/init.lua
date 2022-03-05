@@ -17,7 +17,7 @@ TimeEngine.construct = function(self)
 end
 
 TimeEngine.currentTime = 0
-TimeEngine.exactCurrentTime = 0
+TimeEngine.currentVisualTime = 0
 TimeEngine.baseTimeRate = 1
 TimeEngine.timeRate = 0
 TimeEngine.targetTimeRate = 0
@@ -28,7 +28,7 @@ TimeEngine.visualOffset = 0
 TimeEngine.load = function(self)
 	self.startTime = -self.timeToPrepare
 	self.currentTime = self.startTime
-	self.exactCurrentTime = self.startTime
+	self.currentVisualTime = self.startTime
 	self.baseTimeRate = TimeEngine.baseTimeRate
 	self.timeRate = TimeEngine.timeRate
 	self.targetTimeRate = TimeEngine.targetTimeRate
@@ -37,14 +37,12 @@ TimeEngine.load = function(self)
 	self.timeManager:load()
 	self.timeRateHandlers = {}
 
-	self.timeManager.offset = self.startTime
-
 	self.minTime = self.noteChart.metaData:get("minTime")
 	self.maxTime = self.noteChart.metaData:get("maxTime")
 end
 
 TimeEngine.updateTimeToPrepare = function(self)
-	self.timeManager.offset = -self.timeToPrepare * self:getBaseTimeRate()
+	self.timeManager:setPosition(-self.timeToPrepare * self:getBaseTimeRate())
 end
 
 TimeEngine.createTimeRateHandler = function(self)
@@ -80,14 +78,11 @@ TimeEngine.sync = function(self, time, dt)
 
 	timeManager:update()
 
-	self.currentTime = math.floor((timeManager:getExactTime()) * 1024) / 1024
-	-- self.currentTime = math.floor((timeManager:getTime() + self.offset) * 1024) / 1024
-	self.exactCurrentTime = math.floor((timeManager:getExactTime()) * 1024) / 1024
+	self.currentTime = timeManager:getTime()
+	self.currentVisualTime = timeManager:getVisualTime()
 end
 
-TimeEngine.unload = function(self)
-	self.timeManager:unload()
-end
+TimeEngine.unload = function(self) end
 
 TimeEngine.skipIntro = function(self)
 	local skipTime = self.minTime - self.timeToPrepare * math.abs(self.timeRate)

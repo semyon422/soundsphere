@@ -75,11 +75,7 @@ InputManager.receive = function(self, event)
 	end
 
 	local timeEngine = self.rhythmModel.timeEngine
-	local eventTime = timeEngine.currentTime
-	-- local eventTime = event.time - timeEngine.timeManager.eventTime + timeEngine.currentTime - timeEngine.timeManager.eventDelta
-	if self.needRound then
-		eventTime = math.floor(eventTime * 1024) / 1024
-	end
+	local eventTime = timeEngine.timeManager:transformEventTime(event.time)
 
 	local events = {}
 	for _, key in ipairs(keyConfig.press) do

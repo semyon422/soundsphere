@@ -253,7 +253,7 @@ GameplayController.skip = function(self)
 	local time = math.huge
 	timeEngine:setTimeRate(timeEngine:getBaseTimeRate())
 	timeEngine.currentTime = time
-	timeEngine.exactCurrentTime = time
+	timeEngine.currentVisualTime = time
 	self:update(0)
 	rhythmModel.replayModel:update()
 	self:update(0)

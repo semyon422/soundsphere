@@ -3,18 +3,18 @@ local Timer = require("aqua.util.Timer")
 local TimeManager = Timer:new()
 
 TimeManager.getAbsoluteTime = function(self)
-	return self.eventTime or Timer.getAbsoluteTime(self)
+	return self.eventTime
 end
 
 TimeManager.getAbsoluteDelta = function(self)
-	return self.eventDelta or Timer.getAbsoluteDelta(self)
+	return self.eventDelta
 end
 
 TimeManager.load = function(self)
 	self:loadTimePoints()
 	self:reset()
-	self.eventTime = nil
-	self.eventDelta = nil
+	self.eventTime = love.timer.getTime()
+	self.eventDelta = 0
 end
 
 TimeManager.getAdjustTime = function(self)
@@ -69,34 +69,29 @@ TimeManager.getNearestTime = function(self)
 	local prevDelta = math.abs(self.currentTime - prevTime)
 	local nextDelta = math.abs(self.currentTime - nextTime)
 
-	if prevDelta < nextDelta then
-		return prevTime
-	else
-		return nextTime
-	end
+	return prevDelta < nextDelta and prevTime or nextTime
 end
 
 TimeManager.update = function(self)
 	Timer.update(self)
-
 	self:updateNextTimeIndex()
 end
 
-TimeManager.unload = function(self)
-
+TimeManager.getVisualTime = function(self)
+	local nearestTime = self:getNearestTime()
+	if math.abs(self.currentTime - nearestTime) < 0.001 then
+		return nearestTime
+	end
+	return self.currentTime
 end
 
 TimeManager.getTime = function(self)
-	local nearestTime = self:getNearestTime()
-	if math.abs(self.currentTime - nearestTime) < 0.001 then
-		return nearestTime + self.offset
-	else
-		return self.currentTime + self.offset
-	end
+	return self.currentTime
 end
 
-TimeManager.getExactTime = function(self)
-	return self.currentTime + self.offset
+TimeManager.transformEventTime = function(self, eventTime)
+	assert(eventTime - self.eventTime <= 0)
+	return eventTime - self.eventTime + self.currentTime
 end
 
 return TimeManager

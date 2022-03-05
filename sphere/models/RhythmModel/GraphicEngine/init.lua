@@ -16,14 +16,14 @@ end
 
 GraphicEngine.load = function(self)
 	self.noteCount = 0
-	self.currentTime = 0
+	-- self.currentTime = 0
 	self.timeRate = 1
 
 	self:loadNoteDrawers()
 end
 
 GraphicEngine.update = function(self, dt)
-	self.currentTime = self.rhythmModel.timeEngine.exactCurrentTime
+	-- self.currentTime = self.rhythmModel.timeEngine.currentVisualTime
 	if self.rhythmModel.timeEngine.timeRate ~= 0 then
 		self.timeRate = self.rhythmModel.timeEngine.timeRate
 	end

@@ -10,13 +10,11 @@ FastplayController.play = function(self)
 	local timeEngine = rhythmModel.timeEngine
 	local absoluteTimeList = self.absoluteTimeList
 	timeEngine.currentTime = -math.huge
-	timeEngine.exactCurrentTime = -math.huge
 	for i = 1, #absoluteTimeList do
 		local time = absoluteTimeList[i]
 		rhythmModel.replayModel.currentTime = time
 		rhythmModel.replayModel:update()
 		timeEngine.currentTime = time
-		timeEngine.exactCurrentTime = time
 		rhythmModel.logicEngine:update()
 		rhythmModel.scoreEngine:update()
 		rhythmModel.modifierModel:update()

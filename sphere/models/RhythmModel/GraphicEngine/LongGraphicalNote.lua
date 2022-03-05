@@ -24,7 +24,7 @@ LongGraphicalNote.computeTimeState = function(self)
 	self.startTimeState = self.startTimeState or {}
 	local startTimeState = self.startTimeState
 
-	local currentTime = self.graphicEngine.currentTime
+	local currentTime = self.timeEngine.currentVisualTime
 	local visualOffset = self.timeEngine.visualOffset
 
 	startTimeState.currentTime = currentTime

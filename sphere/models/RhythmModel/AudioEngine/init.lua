@@ -33,7 +33,7 @@ AudioEngine.load = function(self)
 end
 
 AudioEngine.update = function(self)
-	self.currentTime = self.rhythmModel.timeEngine.exactCurrentTime
+	self.currentTime = self.rhythmModel.timeEngine.currentTime
 	self:setTimeRate(self.rhythmModel.timeEngine.timeRate)
 	self.backgroundContainer:update()
 	self.foregroundContainer:update()

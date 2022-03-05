@@ -22,7 +22,7 @@ ShortGraphicalNote.computeTimeState = function(self)
 	self.timeState = self.timeState or {}
 	local timeState = self.timeState
 
-	local currentTime = self.graphicEngine.currentTime
+	local currentTime = self.timeEngine.currentVisualTime
 
 	timeState.currentTime = currentTime
 	timeState.absoluteTime = self.startNoteData.timePoint.absoluteTime

@@ -7,7 +7,6 @@ NoteDrawer.load = function(self)
 	self.noteData = {}
 
 	self.layerData = self.graphicEngine.noteChart:requireLayerData(self.layerIndex)
-	-- local inputModeString = self.layerData.layerDataSequence.noteChart.inputMode:getString()
 
 	local graphicEngine = self.graphicEngine
 	local timeEngine = self.graphicEngine.rhythmModel.timeEngine
@@ -50,7 +49,8 @@ NoteDrawer.load = function(self)
 end
 
 NoteDrawer.updateCurrentTime = function(self)
-	self.currentTimePoint.absoluteTime = self.graphicEngine.currentTime - self.graphicEngine.rhythmModel.timeEngine.inputOffset
+	local timeEngine = self.graphicEngine.rhythmModel.timeEngine
+	self.currentTimePoint.absoluteTime = timeEngine.currentVisualTime - timeEngine.inputOffset
 
 	self.currentVelocityData = self.layerData.spaceData:getVelocityData(self.currentVelocityDataIndex)
 	self.nextVelocityData = self.layerData.spaceData:getVelocityData(self.currentVelocityDataIndex + 1)
