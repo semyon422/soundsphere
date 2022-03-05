@@ -2,7 +2,6 @@ local AudioFactory		= require("aqua.audio.AudioFactory")
 local AudioContainer	= require("aqua.audio.Container")
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
-local SoundNoteFactory	= require("sphere.models.RhythmModel.AudioEngine.SoundNoteFactory")
 
 local AudioEngine = Class:new()
 
@@ -45,14 +44,28 @@ AudioEngine.unload = function(self)
 end
 
 AudioEngine.receive = function(self, event)
-	if not self.loaded then
+	if not self.loaded or event.name ~= "LogicalNoteState" or event.key ~= "keyState" then
 		return
 	end
-	if event.name == "LogicalNoteState" then
-		local soundNote = SoundNoteFactory:getNote(event.note)
-		soundNote.audioEngine = self
-		return soundNote:receive(event)
+
+	local noteData
+	local note = event.note
+	if note.noteClass == "ShortLogicalNote" and event.value then
+		noteData = note.startNoteData
+	elseif note.noteClass == "LongLogicalNote" then
+		if event.value then
+			noteData = note.startNoteData
+		else
+			noteData = note.endNoteData
+		end
 	end
+
+	if not noteData then
+		return
+	end
+	local layer = note.autoplay and "background" or "foreground"
+
+	self:playAudio(noteData.sounds, layer, noteData.keysound, noteData.stream, noteData.timePoint.absoluteTime)
 end
 
 AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
