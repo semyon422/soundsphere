@@ -43,6 +43,29 @@ LongNoteView.draw = function(self)
 	end
 end
 
+LongNoteView.fillChords = function(self, chords, column)
+	local startNoteData = self.startNoteData
+	local endNoteData = self.endNoteData
+
+	if startNoteData then
+		local time = startNoteData.timePoint.absoluteTime
+		chords[time] = chords[time] or {}
+		local chord = chords[time]
+
+		chord[column] = startNoteData.noteType
+		self.startChord = chord
+	end
+
+	if endNoteData then
+		local time = endNoteData.timePoint.absoluteTime
+		chords[time] = chords[time] or {}
+		local chord = chords[time]
+
+		chord[column] = endNoteData.noteType
+		self.endChord = chord
+	end
+end
+
 LongNoteView.isVisible = ShortNoteView.isVisible
 
 LongNoteView.getHeadTransformParams = ShortNoteView.getTransformParams

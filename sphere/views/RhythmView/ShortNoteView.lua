@@ -22,6 +22,17 @@ ShortNoteView.draw = function(self)
 	spriteBatch:add(self:getDraw(self.headView:getQuad(), self:getTransformParams()))
 end
 
+ShortNoteView.fillChords = function(self, chords, column)
+	local startNoteData = self.startNoteData
+
+	local time = startNoteData.timePoint.absoluteTime
+	chords[time] = chords[time] or {}
+	local chord = chords[time]
+
+	chord[column] = startNoteData.noteType
+	self.startChord = chord
+end
+
 ShortNoteView.isVisible = function(self)
 	local color = self.headView:getColor()
 	if not color then
