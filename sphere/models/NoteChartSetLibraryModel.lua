@@ -23,20 +23,21 @@ NoteChartSetLibraryModel.updateItems = function(self)
 	for i = 1, #noteChartDataEntries do
 		local noteChartDataEntry = noteChartDataEntries[i]
 		local noteChartEntries = self.cacheModel.cacheManager:getNoteChartsAtHash(noteChartDataEntry.hash)
-		local noteChartEntry = noteChartEntries[1]
-		local setId = noteChartEntry and noteChartEntry.setId
-		local noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(setId)
-		local check = self:checkNoteChartDataEntry(noteChartDataEntry, noteChartEntry, noteChartSetEntry)
-		if check or self.searchMode == "show" then
-			if setId and (not self.collapse or setId ~= prevSetId) then
-				items[#items + 1] = {
-					noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(setId),
-					noteChartEntry = noteChartEntries[1],
-					noteChartDataEntry = noteChartDataEntry,
-					tagged = self.searchMode == "show" and check
-				}
+		for _, noteChartEntry in ipairs(noteChartEntries) do
+			local setId = noteChartEntry and noteChartEntry.setId
+			local noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(setId)
+			local check = self:checkNoteChartDataEntry(noteChartDataEntry, noteChartEntry, noteChartSetEntry)
+			if check or self.searchMode == "show" then
+				if setId and (not self.collapse or setId ~= prevSetId) then
+					items[#items + 1] = {
+						noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(setId),
+						noteChartEntry = noteChartEntry,
+						noteChartDataEntry = noteChartDataEntry,
+						tagged = self.searchMode == "show" and check
+					}
+				end
+				prevSetId = setId
 			end
-			prevSetId = setId
 		end
 	end
 end
