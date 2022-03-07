@@ -1,6 +1,5 @@
 local ShortLogicalNote	= require("sphere.models.RhythmModel.LogicEngine.ShortLogicalNote")
 local LongLogicalNote	= require("sphere.models.RhythmModel.LogicEngine.LongLogicalNote")
-local LaserLogicalNote	= require("sphere.models.RhythmModel.LogicEngine.LaserLogicalNote")
 
 local LogicalNoteFactory = {}
 
@@ -15,7 +14,7 @@ LogicalNoteFactory.getNote = function(self, noteData)
 		return LongLogicalNote:new(logicalNote)
 	elseif noteData.noteType == "LaserNoteStart" then
 		logicalNote.playable = true
-		return LaserLogicalNote:new(logicalNote)
+		return LongLogicalNote:new(logicalNote)
 	elseif noteData.noteType == "LineNoteStart" then
 		logicalNote.autoplay = true
 		return ShortLogicalNote:new(logicalNote)
