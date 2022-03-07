@@ -12,16 +12,12 @@ TimeEngine.construct = function(self)
 
 	self.timeManager = TimeManager:new()
 	self.timeManager.timeEngine = self
-
-	self.timeRateHandlers = {}
 end
 
 TimeEngine.currentTime = 0
 TimeEngine.currentVisualTime = 0
-TimeEngine.baseTimeRate = 1
 TimeEngine.timeRate = 1
 TimeEngine.targetTimeRate = 1
-TimeEngine.backwardCounter = 0
 TimeEngine.inputOffset = 0
 TimeEngine.visualOffset = 0
 
@@ -29,12 +25,11 @@ TimeEngine.load = function(self)
 	self.startTime = -self.timeToPrepare
 	self.currentTime = self.startTime
 	self.currentVisualTime = self.startTime
-	self.baseTimeRate = TimeEngine.baseTimeRate
-	self.timeRate = TimeEngine.timeRate
-	self.targetTimeRate = TimeEngine.targetTimeRate
-	self.backwardCounter = TimeEngine.backwardCounter
+	self.timeRate = 1
+	self.targetTimeRate = 1
 
-	self.timeManager:load()
+	self.timeManager:reset()
+	self:loadTimePoints()
 	self.timeRateHandlers = {}
 
 	self.minTime = self.noteChart.metaData:get("minTime")
@@ -78,12 +73,19 @@ TimeEngine.sync = function(self, time, dt)
 	end
 
 	timeManager:update()
+	self:updateNextTimeIndex()
 
 	self.currentTime = timeManager:getTime()
-	self.currentVisualTime = timeManager:getVisualTime()
+	self.currentVisualTime = self:getVisualTime()
 end
 
-TimeEngine.unload = function(self) end
+TimeEngine.getVisualTime = function(self)
+	local nearestTime = self:getNearestTime()
+	if math.abs(self.currentTime - nearestTime) < 0.001 then
+		return nearestTime
+	end
+	return self.currentTime
+end
 
 TimeEngine.skipIntro = function(self)
 	local skipTime = self.minTime - self.timeToPrepare * math.abs(self.timeRate)
@@ -99,14 +101,18 @@ TimeEngine.increaseTimeRate = function(self, delta)
 end
 
 TimeEngine.setPosition = function(self, position)
-	self.rhythmModel.audioEngine:setPosition(position)
-	self.timeManager:setPosition(position)
-	self.timeManager:adjustTime(true)
-	self:sync()
+	local timeManager = self.timeManager
+	local audioEngine = self.rhythmModel.audioEngine
 
-	self.rhythmModel.audioEngine.forcePosition = true
+	audioEngine:setPosition(position)
+	timeManager:setPosition(position)
+	timeManager:adjustTime(true)
+	self.currentTime = timeManager:getTime()
+	self.currentVisualTime = self:getVisualTime()
+
+	audioEngine.forcePosition = true
 	self.rhythmModel.logicEngine:update()
-	self.rhythmModel.audioEngine.forcePosition = false
+	audioEngine.forcePosition = false
 end
 
 TimeEngine.pause = function(self)
@@ -125,6 +131,57 @@ TimeEngine.setTimeRate = function(self, timeRate, needTween)
 	end
 	self.timeRate = timeRate
 	self.timeManager:setRate(timeRate)
+end
+
+TimeEngine.loadTimePoints = function(self)
+	local absoluteTimes = {}
+
+	local noteChart = self.noteChart
+	for layerIndex in noteChart:getLayerDataIndexIterator() do
+		local timePointList = noteChart:requireLayerData(layerIndex).timeData.timePointList
+		for timePointIndex = 1, #timePointList do
+			local timePoint = timePointList[timePointIndex]
+			absoluteTimes[timePoint.absoluteTime] = true
+		end
+	end
+
+	local absoluteTimeList = {}
+	for time in pairs(absoluteTimes) do
+		absoluteTimeList[#absoluteTimeList + 1] = time
+	end
+	table.sort(absoluteTimeList)
+
+	self.absoluteTimeList = absoluteTimeList
+	self.nextTimeIndex = 1
+end
+
+TimeEngine.updateNextTimeIndex = function(self)
+	local timeList = self.absoluteTimeList
+	while true do
+		if
+			timeList[self.nextTimeIndex + 1] and
+			self.currentTime >= timeList[self.nextTimeIndex]
+		then
+			self.nextTimeIndex = self.nextTimeIndex + 1
+		else
+			break
+		end
+	end
+end
+
+TimeEngine.getNearestTime = function(self)
+	local timeList = self.absoluteTimeList
+	local prevTime = timeList[self.nextTimeIndex - 1]
+	local nextTime = timeList[self.nextTimeIndex]
+
+	if not prevTime then
+		return nextTime
+	end
+
+	local prevDelta = math.abs(self.currentTime - prevTime)
+	local nextDelta = math.abs(self.currentTime - nextTime)
+
+	return prevDelta < nextDelta and prevTime or nextTime
 end
 
 return TimeEngine
