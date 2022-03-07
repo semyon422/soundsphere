@@ -58,14 +58,14 @@ TimeEngine.getBaseTimeRate = function(self)
 	return timeRate
 end
 
-TimeEngine.sync = function(self, time, dt)
+TimeEngine.sync = function(self, event)
 	local timer = self.timer
 
-	timer.eventTime = time
-	timer.eventDelta = dt
+	timer.eventTime = event.time
+	timer.eventDelta = event.dt
 
 	if self.timeRateTween then
-		self.timeRateTween:update(dt)
+		self.timeRateTween:update(event.dt)
 		timer:setRate(self.timeRate)
 		if timer.rate == self.targetTimeRate then
 			self.timeRateTween = nil
@@ -81,10 +81,11 @@ end
 
 TimeEngine.getVisualTime = function(self)
 	local nearestTime = self:getNearestTime()
-	if math.abs(self.currentTime - nearestTime) < 0.001 then
+	local currentTime = self.currentTime
+	if math.abs(currentTime - nearestTime) < 0.001 then
 		return nearestTime
 	end
-	return self.currentTime
+	return currentTime
 end
 
 TimeEngine.skipIntro = function(self)
@@ -178,8 +179,9 @@ TimeEngine.getNearestTime = function(self)
 		return nextTime
 	end
 
-	local prevDelta = math.abs(self.currentTime - prevTime)
-	local nextDelta = math.abs(self.currentTime - nextTime)
+	local currentTime = self.currentTime
+	local prevDelta = math.abs(currentTime - prevTime)
+	local nextDelta = math.abs(currentTime - nextTime)
 
 	return prevDelta < nextDelta and prevTime or nextTime
 end

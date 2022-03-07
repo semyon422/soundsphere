@@ -160,7 +160,7 @@ RhythmModel.receive = function(self, event)
 	end
 
 	if event.name == "framestarted" then
-		self.timeEngine:sync(event.time, event.dt)
+		self.timeEngine:sync(event)
 	end
 
 	self.modifierModel:receive(event)
