@@ -10,8 +10,8 @@ TimeEngine.timeToPrepare = 2
 TimeEngine.construct = function(self)
 	self.observable = Observable:new()
 
-	self.timeManager = TimeManager:new()
-	self.timeManager.timeEngine = self
+	self.timer = TimeManager:new()
+	self.timer.timeEngine = self
 end
 
 TimeEngine.currentTime = 0
@@ -28,7 +28,7 @@ TimeEngine.load = function(self)
 	self.timeRate = 1
 	self.targetTimeRate = 1
 
-	self.timeManager:reset()
+	self.timer:reset()
 	self:loadTimePoints()
 	self.timeRateHandlers = {}
 
@@ -37,7 +37,7 @@ TimeEngine.load = function(self)
 end
 
 TimeEngine.updateTimeToPrepare = function(self)
-	self.timeManager:setPosition(-self.timeToPrepare * self:getBaseTimeRate())
+	self.timer:setPosition(-self.timeToPrepare * self:getBaseTimeRate())
 end
 
 TimeEngine.createTimeRateHandler = function(self)
@@ -59,23 +59,23 @@ TimeEngine.getBaseTimeRate = function(self)
 end
 
 TimeEngine.sync = function(self, time, dt)
-	local timeManager = self.timeManager
+	local timer = self.timer
 
-	timeManager.eventTime = time
-	timeManager.eventDelta = dt
+	timer.eventTime = time
+	timer.eventDelta = dt
 
 	if self.timeRateTween then
 		self.timeRateTween:update(dt)
-		timeManager:setRate(self.timeRate)
-		if timeManager.rate == self.targetTimeRate then
+		timer:setRate(self.timeRate)
+		if timer.rate == self.targetTimeRate then
 			self.timeRateTween = nil
 		end
 	end
 
-	timeManager:update()
+	timer:update()
 	self:updateNextTimeIndex()
 
-	self.currentTime = timeManager:getTime()
+	self.currentTime = timer:getTime()
 	self.currentVisualTime = self:getVisualTime()
 end
 
@@ -101,13 +101,13 @@ TimeEngine.increaseTimeRate = function(self, delta)
 end
 
 TimeEngine.setPosition = function(self, position)
-	local timeManager = self.timeManager
+	local timer = self.timer
 	local audioEngine = self.rhythmModel.audioEngine
 
 	audioEngine:setPosition(position)
-	timeManager:setPosition(position)
-	timeManager:adjustTime(true)
-	self.currentTime = timeManager:getTime()
+	timer:setPosition(position)
+	timer:adjustTime(true)
+	self.currentTime = timer:getTime()
 	self.currentVisualTime = self:getVisualTime()
 
 	audioEngine.forcePosition = true
@@ -116,11 +116,11 @@ TimeEngine.setPosition = function(self, position)
 end
 
 TimeEngine.pause = function(self)
-	self.timeManager:pause()
+	self.timer:pause()
 end
 
 TimeEngine.play = function(self)
-	self.timeManager:play()
+	self.timer:play()
 end
 
 TimeEngine.setTimeRate = function(self, timeRate, needTween)
@@ -130,7 +130,7 @@ TimeEngine.setTimeRate = function(self, timeRate, needTween)
 		return
 	end
 	self.timeRate = timeRate
-	self.timeManager:setRate(timeRate)
+	self.timer:setRate(timeRate)
 end
 
 TimeEngine.loadTimePoints = function(self)

@@ -75,7 +75,7 @@ InputManager.receive = function(self, event)
 	end
 
 	local timeEngine = self.rhythmModel.timeEngine
-	local eventTime = timeEngine.timeManager:transformTime(event.time)
+	local eventTime = timeEngine.timer:transformTime(event.time)
 
 	local events = {}
 	for _, key in ipairs(keyConfig.press) do

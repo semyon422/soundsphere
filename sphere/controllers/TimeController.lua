@@ -15,7 +15,7 @@ TimeController.receive = function(self, event)
 	local gameplay = config.gameplay
 
 	if event.name == "skipIntro" then
-		if not timeEngine.timeManager.isPlaying then
+		if not timeEngine.timer.isPlaying then
 			return
 		end
 		timeEngine:skipIntro()

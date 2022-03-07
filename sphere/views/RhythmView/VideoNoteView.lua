@@ -21,7 +21,7 @@ VideoNoteView.construct = function(self)
 		vid:rewind()
 		image = vid.image
 
-		vid:setTimer(self.graphicalNote.timeEngine.timeManager)
+		vid:setTimer(self.graphicalNote.timeEngine.timer)
 
 		self.video = vid
 		self.drawable = image
