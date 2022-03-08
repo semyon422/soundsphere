@@ -98,13 +98,12 @@ LogicalNote.update = function(self) end
 
 LogicalNote.receive = function(self, event) end
 
+local event = {name = "LogicalNoteState"}
 LogicalNote.sendState = function(self, key)
-	return self.logicEngine:send({
-		name = "LogicalNoteState",
-		note = self,
-		key = key,
-		value = self[key]
-	})
+	event.note = self
+	event.key = key
+	event.value = self[key]
+	return self.logicEngine:send(event)
 end
 
 return LogicalNote

@@ -112,6 +112,10 @@ LongLogicalNote.getNoteTime = function(self, side)
 	error("Wrong side")
 end
 
+local scoreEvent = {
+	name = "ScoreNoteState",
+	noteType = "LongScoreNote",
+}
 LongLogicalNote.switchState = function(self, newState)
 	local oldState = self.state
 	self.state = newState
@@ -131,19 +135,17 @@ LongLogicalNote.switchState = function(self, newState)
 		currentTime = math.min(eventTime, self:getNoteTime("end") + self:getLastTimeFromConfig(config.endHit, config.endMiss) * timeRate)
 	end
 
-	self:sendScore({
-		name = "ScoreNoteState",
-		noteType = "LongScoreNote",
-		currentTime = currentTime,
-		noteStartTime = self:getNoteTime("start"),
-		noteEndTime = self:getNoteTime("end"),
-		timeRate = self.timeEngine.timeRate,
-		notesCount = self.logicEngine.notesCount,
-		oldState = oldState,
-		newState = newState,
-		minTime = self.scoreEngine.minTime,
-		maxTime = self.scoreEngine.maxTime
-	})
+
+	scoreEvent.currentTime = currentTime
+	scoreEvent.noteStartTime = self:getNoteTime("start")
+	scoreEvent.noteEndTime = self:getNoteTime("end")
+	scoreEvent.timeRate = self.timeEngine.timeRate
+	scoreEvent.notesCount = self.logicEngine.notesCount
+	scoreEvent.oldState = oldState
+	scoreEvent.newState = newState
+	scoreEvent.minTime = self.scoreEngine.minTime
+	scoreEvent.maxTime = self.scoreEngine.maxTime
+	self:sendScore(scoreEvent)
 end
 
 LongLogicalNote.processAuto = function(self)

@@ -92,15 +92,16 @@ local function test(notes, events, states)
 	local newStates = {}
 	rhythmModel.scoreEngine = {
 		send = function(self, event)
-			-- print(inspect({
-			-- 	currentTime = event.currentTime,
-			-- 	newState = event.newState,
-			-- 	noteEndTime = event.noteEndTime,
-			-- 	noteStartTime = event.noteStartTime,
-			-- 	noteType = event.noteType,
-			-- 	oldState = event.oldState,
-			-- }))
-			table.insert(newStates, event)
+			local eventCopy = {
+				currentTime = event.currentTime,
+				newState = event.newState,
+				noteEndTime = event.noteEndTime,
+				noteStartTime = event.noteStartTime,
+				noteType = event.noteType,
+				oldState = event.oldState,
+			}
+			-- print(inspect(eventCopy))
+			table.insert(newStates, eventCopy)
 		end,
 		scoreSystem = {receive = function(self, event) end},
 	}
