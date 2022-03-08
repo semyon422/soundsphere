@@ -143,7 +143,6 @@ RhythmModel.loadLogicEngines = function(self)
 end
 
 RhythmModel.unloadAllEngines = function(self)
-	self.scoreEngine:unload()
 	self.audioEngine:unload()
 	self.logicEngine:unload()
 	self.graphicEngine:unload()

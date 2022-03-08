@@ -31,7 +31,6 @@ LogicalNote.switchState = function(self, name)
 end
 
 LogicalNote.sendScore = function(self, event)
-	self.scoreEngine:send(event)
 	self.scoreEngine.scoreSystem:receive(event)
 end
 

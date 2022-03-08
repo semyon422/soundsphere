@@ -91,7 +91,7 @@ local function test(notes, events, states)
 
 	local newStates = {}
 	rhythmModel.scoreEngine = {
-		send = function(self, event)
+		scoreSystem = {receive = function(self, event)
 			local eventCopy = {
 				currentTime = event.currentTime,
 				newState = event.newState,
@@ -102,8 +102,7 @@ local function test(notes, events, states)
 			}
 			-- print(inspect(eventCopy))
 			table.insert(newStates, eventCopy)
-		end,
-		scoreSystem = {receive = function(self, event) end},
+		end},
 	}
 
 	logicEngine:load()

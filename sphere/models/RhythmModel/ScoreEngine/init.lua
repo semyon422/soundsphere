@@ -18,8 +18,6 @@ ScoreEngine.load = function(self)
 	self.baseTimeRate = self.rhythmModel.timeEngine:getBaseTimeRate()
 
 	self.sharedScoreNotes = {}
-	self.currentTime = 0
-	self.timeRate = self.baseTimeRate
 	self.enps = self.baseEnps * self.baseTimeRate
 
 	self.bpm = self.noteChartDataEntry.bpm * self.baseTimeRate
@@ -33,26 +31,19 @@ ScoreEngine.load = function(self)
 end
 
 ScoreEngine.update = function(self)
-	self.currentTime = self.rhythmModel.timeEngine.currentTime
-	self.timeRate = self.rhythmModel.timeEngine.timeRate
+	local timeEngine = self.rhythmModel.timeEngine
+	local timer = timeEngine.timer
+	local currentTime = timeEngine.currentTime
 
-	if self.currentTime < self.minTime or self.currentTime > self.maxTime then
+	if currentTime < self.minTime or currentTime > self.maxTime then
 		return
 	end
-	if self.timeRate == 0 and not self.paused then
+	if not timer.isPlaying and not self.paused then
 		self.paused = true
 		self.pausesCount = self.pausesCount + 1
-	elseif self.timeRate ~= 0 and self.paused then
+	elseif timer.isPlaying and self.paused then
 		self.paused = false
 	end
-end
-
-ScoreEngine.unload = function(self) end
-
-ScoreEngine.receive = function(self, event) end
-
-ScoreEngine.send = function(self, event)
-	-- return self.observable:send(event)
 end
 
 return ScoreEngine
