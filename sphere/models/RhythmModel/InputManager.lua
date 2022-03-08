@@ -77,25 +77,20 @@ InputManager.receive = function(self, event)
 	local timeEngine = self.rhythmModel.timeEngine
 	local eventTime = timeEngine.timer:transformTime(event.time)
 
-	local events = {}
+	local virtualEvent = {
+		virtual = true,
+		time = eventTime,
+	}
+
+	virtualEvent.name = "keypressed"
 	for _, key in ipairs(keyConfig.press) do
-		events[#events + 1] = {
-			key,
-			name = "keypressed",
-			virtual = true,
-			time = eventTime
-		}
+		virtualEvent[1] = key
+		self:send(virtualEvent)
 	end
+	virtualEvent.name = "keyreleased"
 	for _, key in ipairs(keyConfig.release) do
-		events[#events + 1] = {
-			key,
-			name = "keyreleased",
-			virtual = true,
-			time = eventTime
-		}
-	end
-	for _, event in ipairs(events) do
-		self:send(event)
+		virtualEvent[1] = key
+		self:send(virtualEvent)
 	end
 end
 
