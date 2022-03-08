@@ -49,7 +49,7 @@ WindowManager.update = function(self)
 end
 
 WindowManager.receive = function(self, event)
-	if event.name == "keypressed" and event.args[1] == "f11" then
+	if event.name == "keypressed" and event[1] == "f11" then
 		local mode = self.mode
 		self.fullscreen = not self.fullscreen
 		mode.flags.fullscreen = self.fullscreen

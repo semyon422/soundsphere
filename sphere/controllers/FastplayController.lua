@@ -9,14 +9,15 @@ FastplayController.play = function(self)
 	local rhythmModel = self.gameController.rhythmModel
 	local timeEngine = rhythmModel.timeEngine
 	local absoluteTimeList = self.absoluteTimeList
+	timeEngine.currentTime = -math.huge
 	for i = 1, #absoluteTimeList do
 		local time = absoluteTimeList[i]
-		timeEngine.currentTime = time
-		timeEngine.exactCurrentTime = time
-		timeEngine:sendState()
-		self:update()
+		rhythmModel.replayModel.currentTime = time
 		rhythmModel.replayModel:update()
-		self:update()
+		timeEngine.currentTime = time
+		rhythmModel.logicEngine:update()
+		rhythmModel.scoreEngine:update()
+		rhythmModel.modifierModel:update()
 	end
 
 	self:unload()
@@ -51,16 +52,6 @@ FastplayController.unload = function(self)
 	local rhythmModel = self.gameController.rhythmModel
 	rhythmModel:unloadAllEngines()
 	rhythmModel:unload()
-end
-
-FastplayController.update = function(self, dt)
-	local rhythmModel = self.gameController.rhythmModel
-	rhythmModel.logicEngine:update()
-	rhythmModel.scoreEngine:update()
-	rhythmModel.modifierModel:update()
-end
-
-FastplayController.draw = function(self)
 end
 
 FastplayController.receive = function(self, event)

@@ -34,10 +34,10 @@ ScreenMenuItemView.receive = function(self, event)
 
 	if event.name == "mousepressed" then
 		local tf = transform(config.transform)
-		local mx, my = tf:inverseTransformPoint(event.args[1], event.args[2])
+		local mx, my = tf:inverseTransformPoint(event[1], event[2])
 		tf:release()
 
-		local button = event.args[3]
+		local button = event[3]
 
 		local x = config.x + (self.column - 1) * config.w / config.columns
 		local y = config.y + (self.row - 1) * config.h / config.rows

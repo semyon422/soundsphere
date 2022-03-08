@@ -9,7 +9,7 @@ end
 
 ShortNoteView.update = function(self)
 	self.timeState = self.graphicalNote.timeState
-	self.logicalState = self.graphicalNote.logicalNote:getLastState()
+	self.logicalState = self.graphicalNote.logicalNote.state
 	self.headView.timeState = self.graphicalNote.startTimeState or self.graphicalNote.timeState
 end
 
@@ -20,6 +20,17 @@ ShortNoteView.draw = function(self)
 	end
 	spriteBatch:setColor(self.headView:getColor())
 	spriteBatch:add(self:getDraw(self.headView:getQuad(), self:getTransformParams()))
+end
+
+ShortNoteView.fillChords = function(self, chords, column)
+	local startNoteData = self.startNoteData
+
+	local time = startNoteData.timePoint.absoluteTime
+	chords[time] = chords[time] or {}
+	local chord = chords[time]
+
+	chord[column] = startNoteData.noteType
+	self.startChord = chord
 end
 
 ShortNoteView.isVisible = function(self)

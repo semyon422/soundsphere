@@ -28,7 +28,7 @@ ImageNote.willDrawBeforeStart = function(self)
 end
 
 ImageNote.willDrawAfterEnd = function(self)
-	local dt = self.graphicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
+	local dt = self.timeEngine.currentVisualTime - self.startNoteData.timePoint.absoluteTime
 
 	if dt < 0 then
 		return true

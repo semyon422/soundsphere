@@ -80,7 +80,7 @@ NoteSkinVsrg.color = function(timeState, noteView)
 	local endTimeState = timeState.endTimeState or timeState
 	local sdt = timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime
 
-	if startTimeState.fakeCurrentVisualTime >= endTimeState.absoluteTime then
+	if startTimeState.fakeCurrentVisualTime >= endTimeState.fakeCurrentVisualTime then
 		return colors.transparent
 	elseif logicalState == "clear" then
 		return colors.clear

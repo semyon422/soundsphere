@@ -106,7 +106,7 @@ SortStepperView.wheelmoved = function(self, event)
 		return
 	end
 
-	local wy = event.args[2]
+	local wy = event[2]
 	if wy == 1 then
 		self:increaseValue(1)
 	elseif wy == -1 then

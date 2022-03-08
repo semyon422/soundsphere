@@ -24,8 +24,7 @@ return {
 		needTimeRound = true,
 		offset = {
 			input = 0,
-			judgement = 0,
-			note = 0
+			visual = 0
 		},
 		pauseOnFail = false,
 		ratingHitTimingWindow = 0.032,
@@ -86,7 +85,6 @@ return {
 			yaw = 0,
 			z = -0.71407400337105997
 		},
-		predictDrawTime = false
 	},
 	input = {
 		pause = "escape",

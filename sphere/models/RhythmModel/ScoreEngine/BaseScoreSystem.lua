@@ -44,8 +44,8 @@ BaseScoreSystem.before = function(self, event)
 	end
 
 	local noteCount = 0
-	noteCount = noteCount + (event.scoreNotesCount["ShortScoreNote"] or 0)
-	noteCount = noteCount + (event.scoreNotesCount["LongScoreNote"] or 0)
+	noteCount = noteCount + (event.notesCount["ShortLogicalNote"] or 0)
+	noteCount = noteCount + (event.notesCount["LongLogicalNote"] or 0)
 
 	self.noteCount = noteCount
 end

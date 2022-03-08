@@ -13,7 +13,7 @@ end
 LongNoteView.update = function(self)
 	self.startTimeState = self.graphicalNote.startTimeState
 	self.endTimeState = self.graphicalNote.endTimeState
-	self.logicalState = self.graphicalNote.logicalNote:getLastState()
+	self.logicalState = self.graphicalNote.logicalNote.state
 
 	self.headView.timeState = self.startTimeState
 	self.bodyView.timeState = self.startTimeState
@@ -40,6 +40,29 @@ LongNoteView.draw = function(self)
 	if headSpriteBatch then
 		headSpriteBatch:setColor(headView:getColor())
 		headSpriteBatch:add(self:getDraw(headView:getQuad(), self:getHeadTransformParams()))
+	end
+end
+
+LongNoteView.fillChords = function(self, chords, column)
+	local startNoteData = self.startNoteData
+	local endNoteData = self.endNoteData
+
+	if startNoteData then
+		local time = startNoteData.timePoint.absoluteTime
+		chords[time] = chords[time] or {}
+		local chord = chords[time]
+
+		chord[column] = startNoteData.noteType
+		self.startChord = chord
+	end
+
+	if endNoteData then
+		local time = endNoteData.timePoint.absoluteTime
+		chords[time] = chords[time] or {}
+		local chord = chords[time]
+
+		chord[column] = endNoteData.noteType
+		self.endChord = chord
 	end
 end
 

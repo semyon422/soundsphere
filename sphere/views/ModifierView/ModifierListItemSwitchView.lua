@@ -23,7 +23,7 @@ ModifierListItemSwitchView.setValue = function(self, value)
 end
 
 ModifierListItemSwitchView.mousepressed = function(self, event)
-	local button = event.args[3]
+	local button = event[3]
 	if button == 2 then
 		self.listView.navigator:removeModifier(self.itemIndex)
 	end

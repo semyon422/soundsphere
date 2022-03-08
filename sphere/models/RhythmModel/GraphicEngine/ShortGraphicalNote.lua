@@ -22,14 +22,14 @@ ShortGraphicalNote.computeTimeState = function(self)
 	self.timeState = self.timeState or {}
 	local timeState = self.timeState
 
-	local currentTime = self.graphicEngine.currentTime
+	local currentTime = self.timeEngine.currentVisualTime
 
 	timeState.currentTime = currentTime
 	timeState.absoluteTime = self.startNoteData.timePoint.absoluteTime
 	timeState.currentVisualTime = self.startNoteData.timePoint.currentVisualTime
 
 	timeState.absoluteDeltaTime = currentTime - self.startNoteData.timePoint.absoluteTime
-	timeState.visualDeltaTime = currentTime - self.startNoteData.timePoint.currentVisualTime
+	timeState.visualDeltaTime = currentTime - (self.startNoteData.timePoint.currentVisualTime + self.timeEngine.visualOffset)
 	timeState.scaledVisualDeltaTime = timeState.visualDeltaTime * self.graphicEngine:getVisualTimeRate()
 end
 

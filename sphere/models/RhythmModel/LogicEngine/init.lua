@@ -1,6 +1,5 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
-local Queue				= require("aqua.util.Queue")
 local NoteHandler		= require("sphere.models.RhythmModel.LogicEngine.NoteHandler")
 
 local LogicEngine = Class:new()
@@ -12,25 +11,13 @@ end
 
 LogicEngine.load = function(self)
 	self.sharedLogicalNotes = {}
-	self.currentTime = 0
-	self.exactCurrentTimeNoOffset = -math.huge
-	self.events = Queue:new()
+	self.notesCount = {}
 
 	self:loadNoteHandlers()
 end
 
--- local sortEvents = function(a, b)
--- 	return a.time < b.time
--- end
 LogicEngine.update = function(self)
-	-- table.sort(events, sortEvents)
-
-	for event in self.events do
-		self.currentTime = event.time
-		self:updateNoteHandlers()
-		self:_receive(event)
-		self:updateNoteHandlers()
-	end
+	self:updateNoteHandlers()
 end
 
 LogicEngine.unload = function(self)
@@ -44,24 +31,11 @@ LogicEngine.send = function(self, event)
 end
 
 LogicEngine.receive = function(self, event)
-	if event.name == "TimeState" then
-		self.timeRate = event.timeRate
-	end
-	self.events:add(event)
-end
-
-LogicEngine._receive = function(self, event)
-	if event.name == "TimeState" then
-		self.currentTime = event.exactCurrentTime
-		self.exactCurrentTimeNoOffset = event.exactCurrentTimeNoOffset
-		return
-	end
-
 	if not event.virtual or self.promode then
 		return
 	end
 
-	for noteHandler in pairs(self.noteHandlers) do
+	for _, noteHandler in ipairs(self.noteHandlers) do
 		noteHandler:receive(event)
 	end
 end
@@ -79,7 +53,7 @@ LogicEngine.loadNoteHandlers = function(self)
 	for inputType, inputIndex in self.noteChart:getInputIteraator() do
 		local noteHandler = self:getNoteHandler(inputType, inputIndex)
 		if noteHandler then
-			self.noteHandlers[noteHandler] = noteHandler
+			table.insert(self.noteHandlers, noteHandler)
 			noteHandler:load()
 		end
 	end
@@ -89,20 +63,16 @@ LogicEngine.updateNoteHandlers = function(self)
 	if self.timeRate == 0 then
 		return
 	end
-	for noteHandler in pairs(self.noteHandlers) do
+	for _, noteHandler in ipairs(self.noteHandlers) do
 		noteHandler:update()
 	end
 end
 
 LogicEngine.unloadNoteHandlers = function(self)
-	for noteHandler in pairs(self.noteHandlers) do
+	for _, noteHandler in ipairs(self.noteHandlers) do
 		noteHandler:unload()
 	end
 	self.noteHandlers = {}
-end
-
-LogicEngine.getScoreNote = function(self, noteData)
-	return self.scoreEngine:getScoreNote(noteData)
 end
 
 return LogicEngine

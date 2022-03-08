@@ -20,7 +20,7 @@ end
 InputAnimationView.receive = function(self, event)
 	local config = self.config
 
-	local key = event.args and event.args[1]
+	local key = event and event[1]
 	if key == config.inputType .. config.inputIndex then
 		if event.name == "keypressed" then
 			-- if config.released then

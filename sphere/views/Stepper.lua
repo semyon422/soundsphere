@@ -30,11 +30,11 @@ end
 
 Stepper.receive = function(self, event)
 	if event.name == "mousepressed" then
-        local button = event.args[3]
+        local button = event[3]
         if button ~= 1 then
             return
         end
-		local mx, my = self.transform:inverseTransformPoint(event.args[1], event.args[2])
+		local mx, my = self.transform:inverseTransformPoint(event[1], event[2])
 		local x, y, w, h = self.x, self.y, self.w, self.h
 		if belong(mx, x, x + h) and belong(my, y, y + h) then
 			self.value = math.max(self.value - 1, 1)

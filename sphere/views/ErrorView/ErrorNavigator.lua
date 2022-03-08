@@ -9,7 +9,7 @@ ErrorNavigator.receive = function(self, event)
 		return
 	end
 
-	local scancode = event.args[2]
+	local scancode = event[2]
 	if scancode == "escape" then self:changeScreen("Select")
 	elseif scancode == "f1" then self:switchSubscreen("debug")
 	end

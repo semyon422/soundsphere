@@ -29,11 +29,6 @@ ReplayModel.send = function(self, event)
 end
 
 ReplayModel.receive = function(self, event)
-	if event.name == "TimeState" then
-		self.currentTime = event.exactCurrentTime
-		return
-	end
-
 	if self.mode == "record" and event.virtual then
 		self.replay:receive(event)
 	end

@@ -18,7 +18,7 @@ SelectNavigator.receive = function(self, event)
 	local notecharts = self:getSubscreen("notecharts")
 	local collections = self:getSubscreen("collections")
 
-	local scancode = event.args[2]
+	local scancode = event[2]
 
 	if scancode == "f1" then self:changeScreen("Modifier")
 	elseif scancode == "f2" then self:scrollRandom()

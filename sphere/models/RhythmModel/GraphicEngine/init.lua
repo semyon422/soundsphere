@@ -16,8 +16,6 @@ end
 
 GraphicEngine.load = function(self)
 	self.noteCount = 0
-	self.currentTime = 0
-	self.timeRate = 1
 
 	self:loadNoteDrawers()
 end
@@ -50,7 +48,7 @@ GraphicEngine.setVisualTimeRate = function(self, visualTimeRate)
 end
 
 GraphicEngine.getVisualTimeRate = function(self)
-	return self.visualTimeRate / math.abs(self.timeRate)
+	return self.visualTimeRate / math.abs(self.rhythmModel.timeEngine.timeRate)
 end
 
 GraphicEngine.unload = function(self)
@@ -61,22 +59,10 @@ GraphicEngine.receive = function(self, event)
 	for noteDrawer in pairs(self.noteDrawers) do
 		noteDrawer:receive(event)
 	end
-
-	if event.name == "TimeState" then
-		self.currentTime = event.currentTime
-		if self.timeEngine.timeManager.eventTime then
-			local aquaevent = require("aqua.event")
-			self.currentTime = aquaevent.predictedPresentTime - self.timeEngine.timeManager.eventTime + event.currentTime
-		end
-		if event.timeRate ~= 0 then
-			self.timeRate = event.timeRate
-		end
-		return
-	end
 end
 
 GraphicEngine.getLogicalNote = function(self, noteData)
-	return self.logicEngine.sharedLogicalNotes[noteData]
+	return self.rhythmModel.logicEngine.sharedLogicalNotes[noteData]
 end
 
 GraphicEngine.getNoteDrawer = function(self, layerIndex, inputType, inputIndex)

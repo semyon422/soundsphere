@@ -104,6 +104,11 @@ BaseNoteSkin.load = function(self, content)
 		body = image,
 		h = self.noteHeight
 	})
+	self:setShortNote({
+		image = image,
+		h = self.noteHeight,
+		color = {1, 0.25, 0.25, 1},
+	}, "SoundNote")
 	self:addMeasureLine({
 		h = 4,
 		color = {1, 1, 1, 0.5},

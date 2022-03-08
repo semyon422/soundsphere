@@ -72,7 +72,7 @@ ListItemSliderView.wheelmoved = function(self, event)
 
 	x, y, w, h = self.listView:getItemElementPosition(self.itemIndex, config.slider)
 	if mx >= x and mx <= x + w then
-		local wy = event.args[2]
+		local wy = event[2]
 		if wy == 1 then
 			self:increaseValue(1)
 		elseif wy == -1 then

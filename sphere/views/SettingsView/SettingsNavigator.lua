@@ -18,7 +18,7 @@ SettingsNavigator.receive = function(self, event)
 		return
 	end
 
-	local scancode = event.args[2]
+	local scancode = event[2]
 	if self.activeElement == "settings" then
 		if scancode == "up" then self:scrollSettings("up")
 		elseif scancode == "down" then self:scrollSettings("down")

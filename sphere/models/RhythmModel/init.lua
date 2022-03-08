@@ -9,6 +9,7 @@ local InputManager		= require("sphere.models.RhythmModel.InputManager")
 local PauseManager		= require("sphere.models.RhythmModel.PauseManager")
 local ReplayModel		= require("sphere.models.ReplayModel")
 local ModifierModel		= require("sphere.models.ModifierModel")
+local Test		= require("sphere.models.RhythmModel.LogicEngine.Test")
 
 local RhythmModel = Class:new()
 
@@ -23,6 +24,16 @@ RhythmModel.construct = function(self)
 	self.logicEngine = LogicEngine:new()
 	self.graphicEngine = GraphicEngine:new()
 	self.observable = Observable:new()
+	self.modifierModel.rhythmModel = self
+	self.inputManager.rhythmModel = self
+	self.pauseManager.rhythmModel = self
+	self.replayModel.rhythmModel = self
+	self.timeEngine.rhythmModel = self
+	self.scoreEngine.rhythmModel = self
+	self.audioEngine.rhythmModel = self
+	self.logicEngine.rhythmModel = self
+	self.graphicEngine.rhythmModel = self
+	self.observable.rhythmModel = self
 end
 
 RhythmModel.load = function(self)
@@ -37,44 +48,23 @@ RhythmModel.load = function(self)
 	local graphicEngine = self.graphicEngine
 	local observable = self.observable
 
-	timeEngine.observable:add(audioEngine)
-	timeEngine.observable:add(scoreEngine)
-	timeEngine.observable:add(logicEngine)
-	timeEngine.observable:add(graphicEngine)
-	timeEngine.observable:add(replayModel)
-	timeEngine.observable:add(inputManager)
-	timeEngine.logicEngine = logicEngine
-	timeEngine.audioEngine = audioEngine
-
 	logicEngine.observable:add(modifierModel)
 	logicEngine.observable:add(audioEngine)
-	logicEngine.scoreEngine = scoreEngine
 
-	scoreEngine.timeEngine = timeEngine
-	audioEngine.timeEngine = timeEngine
-	pauseManager.timeEngine = timeEngine
-	pauseManager.logicEngine = logicEngine
-
-	graphicEngine.timeEngine = timeEngine
-	graphicEngine.logicEngine = logicEngine
 	scoreEngine.configModel = self.configModel
-	scoreEngine.timingWindows = self.timings
+	scoreEngine.timings = self.timings
 	scoreEngine.judgements = self.judgements
 	scoreEngine.hp = self.hp
 	scoreEngine.settings = self.settings
 
+	logicEngine.timings = self.timings
+
 	inputManager.observable:add(logicEngine)
 	inputManager.observable:add(replayModel)
-	inputManager.timeEngine = timeEngine
 
 	replayModel.observable:add(inputManager)
-	replayModel.timeEngine = timeEngine
-	replayModel.logicEngine = logicEngine
 	replayModel.timings = self.timings
 
-	timeEngine.observable:add(observable)
-	scoreEngine.observable:add(observable)
-	logicEngine.observable:add(observable)
 	inputManager.observable:add(observable)
 	graphicEngine.observable:add(observable)
 end
@@ -90,13 +80,6 @@ RhythmModel.unload = function(self)
 	local graphicEngine = self.graphicEngine
 	local observable = self.observable
 
-	timeEngine.observable:remove(audioEngine)
-	timeEngine.observable:remove(scoreEngine)
-	timeEngine.observable:remove(logicEngine)
-	timeEngine.observable:remove(graphicEngine)
-	timeEngine.observable:remove(replayModel)
-	timeEngine.observable:remove(inputManager)
-
 	logicEngine.observable:remove(modifierModel)
 	logicEngine.observable:remove(audioEngine)
 
@@ -105,9 +88,6 @@ RhythmModel.unload = function(self)
 
 	replayModel.observable:remove(inputManager)
 
-	timeEngine.observable:remove(observable)
-	scoreEngine.observable:remove(observable)
-	logicEngine.observable:remove(observable)
 	inputManager.observable:remove(observable)
 	graphicEngine.observable:remove(observable)
 end
@@ -163,7 +143,6 @@ RhythmModel.loadLogicEngines = function(self)
 end
 
 RhythmModel.unloadAllEngines = function(self)
-	self.timeEngine:unload()
 	self.scoreEngine:unload()
 	self.audioEngine:unload()
 	self.logicEngine:unload()
@@ -171,18 +150,26 @@ RhythmModel.unloadAllEngines = function(self)
 end
 
 RhythmModel.unloadLogicEngines = function(self)
-	self.timeEngine:unload()
 	self.scoreEngine:unload()
 	self.logicEngine:unload()
 end
 
 RhythmModel.receive = function(self, event)
-	self.timeEngine:receive(event)
+	if event.time then
+		event.time = math.floor(event.time * 1024) / 1024
+	end
+
+	if event.name == "framestarted" then
+		self.timeEngine:sync(event)
+	end
+
 	self.modifierModel:receive(event)
 	if self.timeEngine.timeRate ~= 0 then
 		self.inputManager:receive(event)
 	end
 	self.pauseManager:receive(event)
+
+	self.replayModel.currentTime = self.timeEngine.currentTime
 end
 
 RhythmModel.update = function(self, dt)
@@ -257,11 +244,11 @@ RhythmModel.setTimeToPrepare = function(self, timeToPrepare)
 end
 
 RhythmModel.setInputOffset = function(self, offset)
-	self.inputManager:setInputOffset(offset)
+	self.timeEngine.inputOffset = offset
 end
 
-RhythmModel.setNoteOffset = function(self, offset)
-	self.timeEngine:setOffset(offset)
+RhythmModel.setVisualOffset = function(self, offset)
+	self.timeEngine.visualOffset = offset
 end
 
 RhythmModel.setScoreBasePath = function(self, path)
@@ -273,11 +260,11 @@ RhythmModel.setPauseTimes = function(self, ...)
 end
 
 RhythmModel.setScaleInputOffset = function(self, scaleInputOffset)
-	self.inputManager:setScaleInputOffset(scaleInputOffset)
+	-- self.inputManager:setScaleInputOffset(scaleInputOffset)
 end
 
 RhythmModel.setScaleVisualOffset = function(self, scaleVisualOffset)
-	self.graphicEngine:setScaleVisualOffset(scaleVisualOffset)
+	-- self.graphicEngine:setScaleVisualOffset(scaleVisualOffset)
 end
 
 return RhythmModel

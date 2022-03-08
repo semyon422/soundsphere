@@ -49,9 +49,9 @@ local settings = {
 		format = "%d"
 	},
 	{
-		name = "note offset",
+		name = "input offset",
 		section = "gameplay",
-		key = "gameplay.offset.note",
+		key = "gameplay.offset.input",
 		type = "slider",
 		range = {-0.3, 0.3},
 		displayRange = {-300, 300},
@@ -59,9 +59,9 @@ local settings = {
 		format = "%d"
 	},
 	{
-		name = "input offset",
+		name = "visual offset",
 		section = "gameplay",
-		key = "gameplay.offset.input",
+		key = "gameplay.offset.visual",
 		type = "slider",
 		range = {-0.3, 0.3},
 		displayRange = {-300, 300},
@@ -247,13 +247,6 @@ local settings = {
 		name = "DWM flush",
 		section = "graphics",
 		key = "graphics.dwmflush",
-		type = "switch",
-		displayRange = {"disabled", "enabled"}
-	},
-	{
-		name = "predict draw time",
-		section = "graphics",
-		key = "graphics.predictDrawTime",
 		type = "switch",
 		displayRange = {"disabled", "enabled"}
 	},

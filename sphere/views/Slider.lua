@@ -32,7 +32,7 @@ end
 
 Slider.receive = function(self, event)
 	if event.name == "mousepressed" then
-		local mx, my = self.transform:inverseTransformPoint(event.args[1], event.args[2])
+		local mx, my = self.transform:inverseTransformPoint(event[1], event[2])
 		if belong(mx, self.x, self.x + self.w) and belong(my, self.y, self.y + self.h) then
 			self.pressed = true
 			self:updateValueMouse(mx)
@@ -40,7 +40,7 @@ Slider.receive = function(self, event)
 	elseif event.name == "mousereleased" and self.pressed then
 		self.pressed = false
 	elseif event.name == "mousemoved" and self.pressed then
-		local mx, my = self.transform:inverseTransformPoint(event.args[1], event.args[2])
+		local mx, my = self.transform:inverseTransformPoint(event[1], event[2])
 		self:updateValueMouse(mx)
 	end
 end

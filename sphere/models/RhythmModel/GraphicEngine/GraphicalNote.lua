@@ -72,11 +72,10 @@ GraphicalNote.deactivate = function(self)
 	self:sendState()
 end
 
+local event = {name = "GraphicalNoteState"}
 GraphicalNote.sendState = function(self)
-	return self.graphicEngine.observable:send({
-		name = "GraphicalNoteState",
-		note = self
-	})
+	event.note = self
+	return self.graphicEngine.observable:send(event)
 end
 
 return GraphicalNote

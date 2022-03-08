@@ -7,8 +7,9 @@ NoteDrawer.load = function(self)
 	self.noteData = {}
 
 	self.layerData = self.graphicEngine.noteChart:requireLayerData(self.layerIndex)
-	-- local inputModeString = self.layerData.layerDataSequence.noteChart.inputMode:getString()
 
+	local graphicEngine = self.graphicEngine
+	local timeEngine = self.graphicEngine.rhythmModel.timeEngine
 	for noteDataIndex = 1, self.layerData:getNoteDataCount() do
 		local noteData = self.layerData:getNoteData(noteDataIndex)
 
@@ -17,11 +18,11 @@ NoteDrawer.load = function(self)
 
 			if graphicalNote then
 				graphicalNote.noteDrawer = self
-				graphicalNote.graphicEngine = self.graphicEngine -- !!!!!!!!!!!!!!!!!!!!!
-				assert(graphicalNote.graphicEngine)
-				graphicalNote.noteSkin = self.graphicEngine.noteSkin
+				graphicalNote.graphicEngine = graphicEngine
+				graphicalNote.timeEngine = timeEngine
+				graphicalNote.noteSkin = graphicEngine.noteSkin
 				graphicalNote:init()
-				if self.graphicEngine.noteSkin:check(graphicalNote) then
+				if graphicEngine.noteSkin:check(graphicalNote) then
 					table.insert(self.noteData, graphicalNote)
 				end
 			end
@@ -31,6 +32,9 @@ NoteDrawer.load = function(self)
 	self.currentTimePoint = self.layerData:getTimePoint()
 	self.currentTimePoint.zeroClearVisualTime = 0
 	self.currentVelocityDataIndex = 1
+	self.currentClearTimePoint = self.layerData:getTimePoint()
+	self.currentClearTimePoint.zeroClearVisualTime = 0
+	self.currentClearVelocityDataIndex = 1
 
 	table.sort(self.noteData, function(a, b)
 		return a.startNoteData.timePoint.zeroClearVisualTime < b.startNoteData.timePoint.zeroClearVisualTime
@@ -45,7 +49,8 @@ NoteDrawer.load = function(self)
 end
 
 NoteDrawer.updateCurrentTime = function(self)
-	self.currentTimePoint.absoluteTime = self.graphicEngine.currentTime
+	local timeEngine = self.graphicEngine.rhythmModel.timeEngine
+	self.currentTimePoint.absoluteTime = timeEngine.currentVisualTime - timeEngine.inputOffset
 
 	self.currentVelocityData = self.layerData.spaceData:getVelocityData(self.currentVelocityDataIndex)
 	self.nextVelocityData = self.layerData.spaceData:getVelocityData(self.currentVelocityDataIndex + 1)

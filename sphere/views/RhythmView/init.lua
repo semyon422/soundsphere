@@ -49,10 +49,6 @@ RhythmView.receive = function(self, event)
 			end
 			noteViews[note] = nil
 		end
-	elseif event.name == "TimeState" then
-		for _, note in pairs(state.noteViews) do
-			note:receive(event)
-		end
 	end
 end
 
@@ -84,24 +80,11 @@ RhythmView.draw = function(self)
 	local chords = {}
 	for _, noteView in ipairs(noteViews) do
 		local startNoteData = noteView.startNoteData
-		local endNoteData = noteView.endNoteData
-
-		local time = startNoteData.timePoint.absoluteTime
-		chords[time] = chords[time] or {}
-		local chord = chords[time]
 
 		local column = inputs[startNoteData.inputType .. startNoteData.inputIndex]
 		if column and column <= inputsCount and noteView:isVisible() then
-			chord[column] = startNoteData.noteType
-			noteView.startChord = chord
-
-			if endNoteData then
-				time = endNoteData.timePoint.absoluteTime
-				chords[time] = chords[time] or {}
-				chord = chords[time]
-
-				chord[column] = endNoteData.noteType
-				noteView.endChord = chord
+			if noteView.fillChords then
+				noteView:fillChords(chords, column)
 			end
 		end
 	end

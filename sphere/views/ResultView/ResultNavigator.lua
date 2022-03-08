@@ -9,7 +9,7 @@ ResultNavigator.receive = function(self, event)
 		return
 	end
 
-	local scancode = event.args[2]
+	local scancode = event[2]
 	if scancode == "up" then self:scrollScore("up")
 	elseif scancode == "down" then self:scrollScore("down")
 	elseif scancode == "escape" then self:changeScreen("Select")

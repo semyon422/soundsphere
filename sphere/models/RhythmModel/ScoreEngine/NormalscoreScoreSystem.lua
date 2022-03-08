@@ -11,7 +11,7 @@ NormalscoreScoreSystem.construct = function(self)
 end
 
 NormalscoreScoreSystem.load = function(self)
-	self.hitTimingWindow = self.scoreEngine.timingWindows.normalscore
+	self.hitTimingWindow = self.scoreEngine.timings.normalscore
 end
 
 NormalscoreScoreSystem.after = function(self, event)
@@ -30,7 +30,7 @@ NormalscoreScoreSystem.after = function(self, event)
 
 	self.performance = self.enps / self.accuracyAdjusted
 	self.adjustRatio = ns.score_adjusted / ns.score
-	
+
     self.rating16 = self.enps * erfunc.erf(0.016 / (self.accuracyAdjusted * math.sqrt(2)))
     self.rating32 = self.enps * erfunc.erf(0.032 / (self.accuracyAdjusted * math.sqrt(2)))
     self.rating48 = self.enps * erfunc.erf(0.048 / (self.accuracyAdjusted * math.sqrt(2)))

@@ -14,7 +14,7 @@ ModifierNavigator.receive = function(self, event)
 		return
 	end
 
-	local scancode = event.args[2]
+	local scancode = event[2]
 	if self.activeList == "modifierList" then
 		if scancode == "up" then self:scrollModifier("up")
 		elseif scancode == "down" then self:scrollModifier("down")

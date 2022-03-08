@@ -32,7 +32,7 @@ WindUp.update = function(self, config)
 	local timeEngine = self.rhythmModel.timeEngine
 	local startTime = timeEngine.noteChart.metaData:get("minTime")
 	local endTime = timeEngine.noteChart.metaData:get("maxTime")
-	local currentTime = timeEngine.exactCurrentTime
+	local currentTime = timeEngine.currentTime
 
 	if timeEngine.timeRate == 0 then
 		return

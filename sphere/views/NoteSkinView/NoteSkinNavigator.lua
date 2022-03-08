@@ -14,7 +14,7 @@ NoteSkinNavigator.receive = function(self, event)
 		return
 	end
 
-	local scancode = event.args[2]
+	local scancode = event[2]
 	if scancode == "up" then self:scrollNoteSkin("up")
 	elseif scancode == "down" then self:scrollNoteSkin("down")
 	elseif scancode == "return" then self:setNoteSkin()

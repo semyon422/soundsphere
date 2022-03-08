@@ -49,7 +49,7 @@ ListView.wheelmoved = function(self, event)
 	local w = config.w
 	local h = config.h
 	if mx >= x and mx < x + w and my >= y and my < y + h then
-		local wy = event.args[2]
+		local wy = event[2]
 		if wy == 1 then
 			self:scrollUp()
 		elseif wy == -1 then

@@ -8,7 +8,6 @@ FpsLimiter.update = function(self)
 	aquaevent.fpslimit = settings.graphics.fps
 	aquaevent.asynckey = settings.graphics.asynckey
 	aquaevent.dwmflush = settings.graphics.dwmflush
-	aquaevent.predictDrawTime = settings.graphics.predictDrawTime
 end
 
 return FpsLimiter
