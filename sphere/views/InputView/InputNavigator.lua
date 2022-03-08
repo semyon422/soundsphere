@@ -13,6 +13,19 @@ InputNavigator.construct = function(self)
 end
 
 InputNavigator.receive = function(self, event)
+	if self.activeElement == "inputHandler" then
+		if event.name == "keypressed" then
+			self:setInputBinding("keyboard", event[2])
+		elseif event.name == "gamepadpressed" then
+			self:setInputBinding("gamepad", event[2])
+		elseif event.name == "joystickpressed" then
+			self:setInputBinding("joystick", event[2])
+		elseif event.name == "midipressed" then
+			self:setInputBinding("midi", event[1])
+		end
+		return
+	end
+
 	if event.name ~= "keypressed" then
 		return
 	end
@@ -25,8 +38,6 @@ InputNavigator.receive = function(self, event)
 		elseif scancode == "escape" then self:changeScreen("Select")
 		elseif scancode == "f1" then self:switchSubscreen("debug")
 		end
-	elseif self.activeElement == "inputHandler" then
-		self:setInputBinding(scancode)
 	end
 end
 
@@ -53,12 +64,12 @@ InputNavigator.setInputHandler = function(self, itemIndex)
 	self.activeElement = "inputHandler"
 end
 
-InputNavigator.setInputBinding = function(self, scancode)
+InputNavigator.setInputBinding = function(self, type, value)
 	self:send({
 		name = "setInputBinding",
 		virtualKey = self.virtualKey,
-		value = scancode,
-		type = "keyboard",
+		value = value,
+		type = type,
 		inputMode = self.inputModeString,
 	})
 	self.activeElement = "list"
