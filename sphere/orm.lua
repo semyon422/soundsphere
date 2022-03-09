@@ -1,4 +1,4 @@
-local sqlite = require("ljsqlite3.init")
+local sqlite = require("ljsqlite3")
 
 local orm = {}
 
@@ -11,6 +11,18 @@ end
 
 function orm:open(db)
 	self.c = sqlite.open(db)
+end
+
+function orm:close(db)
+	return self.c:close()
+end
+
+function orm:begin()
+	return self.c:exec("BEGIN;")
+end
+
+function orm:commit()
+	return self.c:exec("COMMIT;")
 end
 
 function orm:toobject(object, row, colnames)
@@ -54,6 +66,12 @@ function orm:update(table_name, values, conditions, ...)
 
 	self:query(("update %q set %s where %s returning *"):format(
 		table_name, table.concat(assigns, ", "), conditions
+	), ...)
+end
+
+function orm:delete(table_name, conditions, ...)
+	self:query(("delete from %q where %s"):format(
+		table_name, conditions
 	), ...)
 end
 
