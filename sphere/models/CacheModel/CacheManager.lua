@@ -1,4 +1,5 @@
 local CacheDatabase				= require("sphere.models.CacheModel.CacheDatabase")
+local NoteChartFinder				= require("sphere.models.CacheModel.NoteChartFinder")
 local DifficultyModel			= require("sphere.models.DifficultyModel")
 local NoteChartFactory			= require("notechart.NoteChartFactory")
 local NoteChartDataEntryFactory	= require("notechart.NoteChartDataEntryFactory")
@@ -383,43 +384,21 @@ CacheManager.generateCacheFull = function(self, path, force)
 end
 
 CacheManager.lookup = function(self, directoryPath, recursive)
-	if self.needStop then
-		return
-	end
+	local iterator = NoteChartFinder:newFileIterator(directoryPath, recursive, function(...)
+		return self:checkNoteChartSetEntry(...)
+	end)
 
-	local items = love.filesystem.getDirectoryItems(directoryPath)
-
-	local chartPaths = {}
-	for _, itemName in ipairs(items) do
-		local path = directoryPath .. "/" .. itemName
-		local info = love.filesystem.getInfo(path)
-		if info and info.type == "file" and NoteChartFactory:isRelatedContainer(path) then
-			chartPaths[#chartPaths + 1] = path
+	local noteChartSetPath
+	local noteChartSetEntry
+	for path, dirPath in iterator do
+		if dirPath ~= noteChartSetPath then
+			noteChartSetPath = dirPath
+			noteChartSetEntry = self:processNoteChartSet(dirPath)
+			self:checkProgress()
 		end
-	end
-	if #chartPaths > 0 then
-		self:processNoteChartEntries(chartPaths, directoryPath)
-		return
-	end
-
-	local containerPaths = {}
-	for _, itemName in ipairs(items) do
-		local path = directoryPath .. "/" .. itemName
-		local info = love.filesystem.getInfo(path)
-		if info and info.type == "file" and NoteChartFactory:isUnrelatedContainer(path) and self:checkNoteChartSetEntry(path) then
-			containerPaths[#containerPaths + 1] = path
-			self:processNoteChartEntries({path}, path)
-		end
-	end
-	if #containerPaths > 0 then
-		return
-	end
-
-	for _, itemName in ipairs(items) do
-		local path = directoryPath .. "/" .. itemName
-		local info = love.filesystem.getInfo(path)
-		if info and (info.type == "directory" or info.type == "symlink") and (recursive or self:checkNoteChartSetEntry(path)) then
-			self:lookup(path, recursive)
+		self:processNoteChartEntries(path, noteChartSetEntry)
+		if self.needStop then
+			return
 		end
 	end
 end
@@ -438,7 +417,7 @@ CacheManager.checkNoteChartSetEntry = function(self, path)
 	return false
 end
 
-CacheManager.processNoteChartEntries = function(self, noteChartPaths, noteChartSetPath)
+CacheManager.processNoteChartSet = function(self, noteChartSetPath)
 	local info = love.filesystem.getInfo(noteChartSetPath)
 	local noteChartSetEntry = self:getNoteChartSetEntry({
 		path = noteChartSetPath,
@@ -458,34 +437,33 @@ CacheManager.processNoteChartEntries = function(self, noteChartPaths, noteChartS
 		end
 	end
 
-	for i = 1, #noteChartPaths do
-		local path = noteChartPaths[i]
-		local info = love.filesystem.getInfo(path)
-		local lastModified = info.modtime
-		local entry = self:getNoteChartEntryByPath(path)
+	return noteChartSetEntry
+end
 
-		if entry then
-			if entry.lastModified ~= lastModified then
-				entry.hash = nil
-				entry.lastModified = lastModified
-				entry.setId = noteChartSetEntry.id
-				self:setNoteChartEntry(entry)
-			elseif entry.setId ~= noteChartSetEntry.id then
-				entry.setId = noteChartSetEntry.id
-				self:setNoteChartEntry(entry)
-			end
-		else
-			self:setNoteChartEntry({
-				hash = nil,
-				path = noteChartPaths[i],
-				lastModified = lastModified,
-				setId = noteChartSetEntry.id
-			})
-			self.noteChartCount = self.noteChartCount + 1
+CacheManager.processNoteChartEntries = function(self, noteChartPath, noteChartSetEntry)
+	local info = love.filesystem.getInfo(noteChartPath)
+	local lastModified = info.modtime
+	local entry = self:getNoteChartEntryByPath(noteChartPath)
+
+	if entry then
+		if entry.lastModified ~= lastModified then
+			entry.hash = nil
+			entry.lastModified = lastModified
+			entry.setId = noteChartSetEntry.id
+			self:setNoteChartEntry(entry)
+		elseif entry.setId ~= noteChartSetEntry.id then
+			entry.setId = noteChartSetEntry.id
+			self:setNoteChartEntry(entry)
 		end
+	else
+		self:setNoteChartEntry({
+			hash = nil,
+			path = noteChartPath,
+			lastModified = lastModified,
+			setId = noteChartSetEntry.id
+		})
+		self.noteChartCount = self.noteChartCount + 1
 	end
-
-	self:checkProgress()
 end
 
 CacheManager.generate = function(self, path, force)
