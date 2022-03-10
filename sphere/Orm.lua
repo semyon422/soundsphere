@@ -1,27 +1,27 @@
 local sqlite = require("ljsqlite3")
 
-local orm = {}
+local Orm = {}
 
-function orm:new()
-	local object = {}
+function Orm:new()
+	local object = {table_infos = {}}
 	setmetatable(object, self)
 	self.__index = self
 	return object
 end
 
-function orm:open(db)
+function Orm:open(db)
 	self.c = sqlite.open(db)
 end
 
-function orm:close()
+function Orm:close()
 	return self.c:close()
 end
 
-function orm:begin()
+function Orm:begin()
 	return self.c:exec("BEGIN")
 end
 
-function orm:commit()
+function Orm:commit()
 	return self.c:exec("COMMIT")
 end
 
@@ -45,7 +45,11 @@ local function escape_identifier(s)
 	return '`' .. (s:gsub('`', '``')) .. '`'
 end
 
-function orm:query(query, ...)
+function Orm:exec(query)
+	return self.c:exec(query)
+end
+
+function Orm:query(query, ...)
 	local stmt = self.c:prepare(query)
 	for i = 1, select("#", ...) do
 		stmt:bind1(i, select(i, ...))
@@ -65,16 +69,34 @@ function orm:query(query, ...)
 	return objects
 end
 
-function orm:select(query, ...)
-	return self:query("SELECT " .. query, ...) or {}
+function Orm:table_info(table_name)
+	local info = self.table_infos[table_name]
+	if info then
+		return info
+	end
+	info = self:query("PRAGMA table_info(" .. escape_identifier(table_name) .. ")")
+	self.table_infos[table_name] = info
+	return info
 end
 
-function orm:update(table_name, values, conditions, ...)
+function Orm:select(table_name, conditions, ...)
+	return self:query(("SELECT * FROM %s %s"):format(
+		escape_identifier(table_name), conditions and "WHERE " .. conditions or ""
+	), ...) or {}
+end
+
+function Orm:update(table_name, values, conditions, ...)
+	local table_info = self:table_info(table_name)
+
 	local assigns = {}
-	for k, v in pairs(values) do
-		table.insert(assigns, ("%s = %q"):format(
-			escape_identifier(k), v
-		))
+	for _, column in ipairs(table_info) do
+		local key = column.name
+		local value = values[key]
+		if value then
+			table.insert(assigns, ("%s = %q"):format(
+				escape_identifier(key), value
+			))
+		end
 	end
 
 	self:query(("UPDATE %s SET %s WHERE %s"):format(
@@ -82,31 +104,47 @@ function orm:update(table_name, values, conditions, ...)
 	), ...)
 end
 
-function orm:delete(table_name, conditions, ...)
+function Orm:delete(table_name, conditions, ...)
 	self:query(("DELETE FROM %s WHERE %s"):format(
 		escape_identifier(table_name), conditions
 	), ...)
 end
 
-function orm:insert(table_name, values)
-	local count = 0
-	local keys = {}
-	for key in pairs(values) do
-		count = count + 1
-		keys[count] = escape_identifier(key)
-	end
-	local pattern = ("(%s)"):format(("?, "):rep(count - 1) .. "?")
+function Orm:insert(table_name, values, ignore)
+	local table_info = self:table_info(table_name)
 
-	local stmt = self.c:prepare(("INSERT INTO %s %s VALUES %s RETURNING *"):format(
-		escape_identifier(table_name), ("(%s)"):format(table.concat(keys, ", ")), pattern
+	local count = 0
+	local query_keys = {}
+	for _, column in ipairs(table_info) do
+		local key = column.name
+		if values[key] then
+			table.insert(query_keys, escape_identifier(key))
+			count = count + 1
+		end
+	end
+
+	local pattern = ("(%s)"):format(("?, "):rep(count - 1) .. "?")
+	query_keys = ("(%s)"):format(table.concat(query_keys, ", "))
+
+	local stmt = self.c:prepare(("INSERT%s INTO %s %s VALUES %s RETURNING *"):format(
+		ignore and " OR IGNORE" or "", escape_identifier(table_name), query_keys, pattern
 	))
 
-	for i, key in ipairs(keys) do
-		stmt:bind1(i, values[key])
+	local i = 1
+	for _, column in ipairs(table_info) do
+		local key = column.name
+		if values[key] then
+			stmt:bind1(i, values[key])
+			i = i + 1
+		end
 	end
 
 	local row, colnames = stmt:step({}, {})
+	assert(not stmt:step())
+	if not colnames then
+		return values
+	end
 	return to_object(values, row, colnames)
 end
 
-return orm
+return Orm

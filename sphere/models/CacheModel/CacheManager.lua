@@ -37,71 +37,43 @@ CacheManager.select = function(self)
 		CacheDatabase:load()
 	end
 
-	local selectAllNoteChartsStatement		= CacheDatabase.selectAllNoteChartsStatement
-	local selectAllNoteChartSetsStatement	= CacheDatabase.selectAllNoteChartSetsStatement
-	local selectAllNoteChartDatasStatement	= CacheDatabase.selectAllNoteChartDatasStatement
-
 	local noteChartsAtSet = {}
 	local noteChartsAtHash = {}
 	self.noteChartsAtSet = noteChartsAtSet
 	self.noteChartsAtHash = noteChartsAtHash
 
-	local noteChartSets = {}
+	local noteChartSets = CacheDatabase:selectAllNoteChartSets()
 	self.noteChartSets = noteChartSets
-
-	local stmt = selectAllNoteChartSetsStatement:reset()
-	local row = stmt:step()
-	while row do
-		local entry = CacheDatabase:transformNoteChartSetEntry(row)
-		noteChartSets[#noteChartSets + 1] = entry
-
-		noteChartsAtSet[entry.id] = {}
-
-		row = stmt:step()
+	for _, noteChartSet in ipairs(noteChartSets) do
+		noteChartsAtSet[noteChartSet.id] = {}
 	end
 
-	local noteChartDatas = {}
+	local noteChartDatas = CacheDatabase:selectAllNoteChartDatas()
 	self.noteChartDatas = noteChartDatas
-
-	local stmt = selectAllNoteChartDatasStatement:reset()
-	local row = stmt:step()
-	while row do
-		local entry = CacheDatabase:transformNoteChartDataEntry(row)
-		noteChartDatas[#noteChartDatas + 1] = entry
-
-		noteChartsAtHash[entry.hash] = {}
-
-		row = stmt:step()
+	for _, noteChartData in ipairs(noteChartDatas) do
+		noteChartsAtHash[noteChartData.hash] = {}
 	end
 
-	local noteCharts = {}
+	local noteCharts = CacheDatabase:selectAllNoteCharts()
 	self.noteCharts = noteCharts
-
-	local stmt = selectAllNoteChartsStatement:reset()
-	local row = stmt:step()
-	while row do
-		local entry = CacheDatabase:transformNoteChartEntry(row)
-		noteCharts[#noteCharts + 1] = entry
-
-		if entry.setId then
-			local setList = noteChartsAtSet[entry.setId]
+	for _, noteChart in ipairs(noteCharts) do
+		if noteChart.setId then
+			local setList = noteChartsAtSet[noteChart.setId]
 			if setList then
-				setList[#setList + 1] = entry
+				setList[#setList + 1] = noteChart
 			else
-				entry.setId = nil
+				noteChart.setId = nil
 			end
 		end
 
-		if entry.hash then
-			local hashList = noteChartsAtHash[entry.hash]
+		if noteChart.hash then
+			local hashList = noteChartsAtHash[noteChart.hash]
 			if hashList then
-				hashList[#hashList + 1] = entry
+				hashList[#hashList + 1] = noteChart
 			else
-				entry.hash = nil
+				noteChart.hash = nil
 			end
 		end
-
-		row = stmt:step()
 	end
 
 	local noteChartsId = {}
