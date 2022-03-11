@@ -155,22 +155,12 @@ CacheManager.setNoteChartEntry = function(self, entry)
 end
 
 CacheManager.setNoteChartDataEntry = function(self, entry)
-	-- local oldEntry = self:getNoteChartDataEntry(entry.hash, entry.index)
 	local oldEntry = CacheDatabase:selectNoteCharDatatEntry(entry.hash, entry.index)
-
-	-- CacheDatabase:setNoteChartDataEntry(entry)
 
 	if not oldEntry then
 		CacheDatabase:insertNoteChartDataEntry(entry)
-		-- self.noteChartDatas[#self.noteChartDatas + 1] = entry
-		-- self.noteChartsAtHash[entry.hash] = {}
-		-- self.noteChartDatasHashIndex[entry.hash] = self.noteChartDatasHashIndex[entry.hash] or {}
-		-- self.noteChartDatasHashIndex[entry.hash][entry.index] = entry
 	else
 		CacheDatabase:updateNoteChartDataEntry(entry)
-		-- for k, v in pairs(entry) do
-		-- 	oldEntry[k] = v
-		-- end
 	end
 end
 
@@ -183,12 +173,7 @@ end
 CacheManager.deleteNoteChartSetEntry = function(self, entry)
 	CacheDatabase:deleteNoteChartSetEntry(entry.path)
 
-	-- local noteChartsAtSet = self:getNoteChartsAtSet(entry.id) or {}
 	local noteChartsAtSet = CacheDatabase:getNoteChartsAtSet(entry.id)
-	-- local cachedEntries = {}
-	-- for i = 1, #noteChartsAtSet do
-	-- 	cachedEntries[i] = noteChartsAtSet[i]
-	-- end
 	for i = 1, #noteChartsAtSet do
 		self:deleteNoteChartEntry(noteChartsAtSet[i])
 	end
@@ -463,7 +448,6 @@ CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, for
 		return self:deleteNoteChartSetEntry(noteChartSetEntry)
 	end
 
-	-- local noteChartEntries = self:getNoteChartsAtSet(noteChartSetEntry.id)
 	local noteChartEntries = CacheDatabase:getNoteChartsAtSet(noteChartSetEntry.id)
 
 	local newNoteChartEntries = {}
@@ -496,7 +480,6 @@ CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, for
 		local hash = fileHash[path]
 		noteChartEntry.hash = hash
 
-		-- if not force and self:getNoteChartDataEntry(hash, 1) then
 		if not force and CacheDatabase:selectNoteCharDatatEntry(hash, 1) then
 			self:setNoteChartEntry(noteChartEntry)
 		else
