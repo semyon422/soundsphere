@@ -80,10 +80,8 @@ CacheDatabase.deleteNoteChartSetEntry = function(self, path)
 	return self.db:delete("noteChartSets", "path = ?", path)
 end
 
-CacheDatabase.getNoteChartSetEntry = function(self, entry)
-	self:insertNoteChartSetEntry(entry)
-	self:updateNoteChartSetEntry(entry)
-	return self:selectNoteChartSetEntry(entry.path)
+CacheDatabase.selectNoteChartSets = function(self, path)
+	return self.db:select("noteChartSets", "substr(path, 1, ?) = ?", #path, path)
 end
 
 ----------------------------------------------------------------
@@ -98,11 +96,6 @@ end
 
 CacheDatabase.selectNoteCharDatatEntry = function(self, hash, index)
 	return self.db:select("noteChartDatas", "hash = ? and `index` = ?", hash, index)[1]
-end
-
-CacheDatabase.setNoteChartDataEntry = function(self, entry)
-	self:insertNoteChartDataEntry(entry)
-	return self:updateNoteChartDataEntry(entry)
 end
 
 return CacheDatabase

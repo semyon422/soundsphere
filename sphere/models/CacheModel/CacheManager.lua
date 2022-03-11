@@ -155,19 +155,22 @@ CacheManager.setNoteChartEntry = function(self, entry)
 end
 
 CacheManager.setNoteChartDataEntry = function(self, entry)
-	local oldEntry = self:getNoteChartDataEntry(entry.hash, entry.index)
+	-- local oldEntry = self:getNoteChartDataEntry(entry.hash, entry.index)
+	local oldEntry = CacheDatabase:selectNoteCharDatatEntry(entry.hash, entry.index)
 
-	CacheDatabase:setNoteChartDataEntry(entry)
+	-- CacheDatabase:setNoteChartDataEntry(entry)
 
 	if not oldEntry then
-		self.noteChartDatas[#self.noteChartDatas + 1] = entry
-		self.noteChartsAtHash[entry.hash] = {}
-		self.noteChartDatasHashIndex[entry.hash] = self.noteChartDatasHashIndex[entry.hash] or {}
-		self.noteChartDatasHashIndex[entry.hash][entry.index] = entry
+		CacheDatabase:insertNoteChartDataEntry(entry)
+		-- self.noteChartDatas[#self.noteChartDatas + 1] = entry
+		-- self.noteChartsAtHash[entry.hash] = {}
+		-- self.noteChartDatasHashIndex[entry.hash] = self.noteChartDatasHashIndex[entry.hash] or {}
+		-- self.noteChartDatasHashIndex[entry.hash][entry.index] = entry
 	else
-		for k, v in pairs(entry) do
-			oldEntry[k] = v
-		end
+		CacheDatabase:updateNoteChartDataEntry(entry)
+		-- for k, v in pairs(entry) do
+		-- 	oldEntry[k] = v
+		-- end
 	end
 end
 
@@ -180,13 +183,14 @@ end
 CacheManager.deleteNoteChartSetEntry = function(self, entry)
 	CacheDatabase:deleteNoteChartSetEntry(entry.path)
 
-	local noteChartsAtSet = self:getNoteChartsAtSet(entry.id) or {}
-	local cachedEntries = {}
+	-- local noteChartsAtSet = self:getNoteChartsAtSet(entry.id) or {}
+	local noteChartsAtSet = CacheDatabase:getNoteChartsAtSet(entry.id)
+	-- local cachedEntries = {}
+	-- for i = 1, #noteChartsAtSet do
+	-- 	cachedEntries[i] = noteChartsAtSet[i]
+	-- end
 	for i = 1, #noteChartsAtSet do
-		cachedEntries[i] = noteChartsAtSet[i]
-	end
-	for i = 1, #cachedEntries do
-		self:deleteNoteChartEntry(cachedEntries[i])
+		self:deleteNoteChartEntry(noteChartsAtSet[i])
 	end
 end
 
@@ -320,8 +324,6 @@ CacheManager.generateCacheFull = function(self, path, force)
 	local path = path or "userdata/charts"
 	CacheDatabase:load()
 
-	self:select()
-
 	self:resetProgress()
 	self.state = 1
 	self:checkProgress()
@@ -330,7 +332,6 @@ CacheManager.generateCacheFull = function(self, path, force)
 	self:lookup(path, false)
 	CacheDatabase:commit()
 
-	self:select()
 	self.state = 2
 	self:checkProgress()
 
@@ -426,18 +427,13 @@ CacheManager.processNoteChartEntries = function(self, noteChartPath, noteChartSe
 end
 
 CacheManager.generate = function(self, path, force)
-	local noteChartSets = self.noteChartSets
-	local entries = {}
-	for i = 1, #noteChartSets do
-		local entry = noteChartSets[i]
-		if entry.path:find(path, 1, true) then
-			entries[#entries + 1] = entry
-		end
-	end
+	local entries = CacheDatabase:selectNoteChartSets(path)
 
 	CacheDatabase:begin()
 	for i = 1, #entries do
-		local status, err = xpcall(function() return self:processNoteChartDataEntries(entries[i], force) end, debug.traceback)
+		local status, err = xpcall(function()
+			return self:processNoteChartDataEntries(entries[i], force)
+		end, debug.traceback)
 
 		if not status then
 			self.log:write("error", entries[i].id)
@@ -467,7 +463,8 @@ CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, for
 		return self:deleteNoteChartSetEntry(noteChartSetEntry)
 	end
 
-	local noteChartEntries = self:getNoteChartsAtSet(noteChartSetEntry.id)
+	-- local noteChartEntries = self:getNoteChartsAtSet(noteChartSetEntry.id)
+	local noteChartEntries = CacheDatabase:getNoteChartsAtSet(noteChartSetEntry.id)
 
 	local newNoteChartEntries = {}
 	for i = 1, #noteChartEntries do
@@ -491,7 +488,6 @@ CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, for
 		end
 	end
 
-	local fileDatas = {}
 	for i = 1, #noteChartEntries do
 		local path = noteChartEntries[i].path
 
@@ -500,7 +496,8 @@ CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, for
 		local hash = fileHash[path]
 		noteChartEntry.hash = hash
 
-		if not force and self:getNoteChartDataEntry(hash, 1) then
+		-- if not force and self:getNoteChartDataEntry(hash, 1) then
+		if not force and CacheDatabase:selectNoteCharDatatEntry(hash, 1) then
 			self:setNoteChartEntry(noteChartEntry)
 		else
 			local entries, noteCharts = NoteChartDataEntryFactory:getEntries(path, content, hash, noteChartEntry)
