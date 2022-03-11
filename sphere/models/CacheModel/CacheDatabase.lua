@@ -58,9 +58,8 @@ CacheDatabase.deleteNoteChartEntry = function(self, path)
 	return self.db:delete("noteCharts", "path = ?", path)
 end
 
-CacheDatabase.setNoteChartEntry = function(self, entry)
-	self:insertNoteChartEntry(entry)
-	return self:updateNoteChartEntry(entry)
+CacheDatabase.getNoteChartsAtSet = function(self, setId)
+	return self.db:select("noteCharts", "setId = ?", setId)
 end
 
 ----------------------------------------------------------------
