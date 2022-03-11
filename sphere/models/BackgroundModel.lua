@@ -67,10 +67,9 @@ BackgroundModel.setBackground = function(self, image)
 end
 
 BackgroundModel.getBackgroundPath = function(self)
-	local config = self.config
-
-	local noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(config.noteChartSetEntryId)
-	local noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntryById(config.noteChartDataEntryId)
+	local selectModel = self.selectModel
+	local noteChartSetEntry = selectModel.noteChartSetItem.noteChartSetEntry
+	local noteChartDataEntry = selectModel.noteChartItem.noteChartDataEntry
 
 	if not noteChartSetEntry or not noteChartDataEntry then
 		return
