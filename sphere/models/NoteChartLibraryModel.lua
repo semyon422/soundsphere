@@ -38,14 +38,12 @@ NoteChartLibraryModel.updateItems = function(self)
 		end
 	end
 
-	local noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(self.setId)
 	local foundList, foundMap = self.searchModel:search(noteChartDataEntries)
 	for i = 1, #noteChartDataEntries do
 		local noteChartDataEntry = noteChartDataEntries[i]
 		local check = foundMap[noteChartDataEntry]
 		if check or self.searchMode == "show" then
 			items[#items + 1] = {
-				noteChartSetEntry = noteChartSetEntry,
 				noteChartDataEntry = noteChartDataEntry,
 				noteChartEntry = map[noteChartDataEntry],
 				tagged = self.searchMode == "show" and check

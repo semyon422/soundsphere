@@ -94,8 +94,36 @@ CacheDatabase.updateNoteChartDataEntry = function(self, entry)
 	return self.db:update("noteChartDatas", entry, "hash = ? and `index` = ?", entry.hash, entry.index)
 end
 
-CacheDatabase.selectNoteCharDatatEntry = function(self, hash, index)
+CacheDatabase.selectNoteCharDataEntry = function(self, hash, index)
 	return self.db:select("noteChartDatas", "hash = ? and `index` = ?", hash, index)[1]
+end
+
+----------------------------------------------------------------
+
+CacheDatabase.selectAllIdPairs = function(self, orders, conditions, ...)
+	return self.db:query(([[
+		SELECT noteCharts.id AS noteChartId, noteChartDatas.id AS noteChartDataId
+		FROM noteCharts
+		INNER JOIN noteChartDatas ON noteCharts.hash = noteChartDatas.hash
+		%s
+		ORDER BY %s
+	]]):format(
+		conditions and "WHERE " .. conditions or "",
+		orders
+	), ...) or {}
+end
+
+CacheDatabase.selectPairs = function(self, orders, conditions, ...)
+	return self.db:query(([[
+		SELECT noteChartDatas.*, noteCharts.id AS noteChartId, noteCharts.path AS path
+		FROM noteChartDatas
+		INNER JOIN noteCharts ON noteChartDatas.hash = noteCharts.hash
+		%s
+		ORDER BY %s
+	]]):format(
+		conditions and "WHERE " .. conditions or "",
+		orders
+	), ...) or {}
 end
 
 return CacheDatabase

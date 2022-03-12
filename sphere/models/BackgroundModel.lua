@@ -68,14 +68,14 @@ end
 
 BackgroundModel.getBackgroundPath = function(self)
 	local selectModel = self.selectModel
-	local noteChartSetEntry = selectModel.noteChartSetItem.noteChartSetEntry
+	local noteChartEntry = selectModel.noteChartSetItem.noteChartEntry
 	local noteChartDataEntry = selectModel.noteChartItem.noteChartDataEntry
 
-	if not noteChartSetEntry or not noteChartDataEntry then
+	if not noteChartEntry or not noteChartDataEntry then
 		return
 	end
 
-	local directoryPath = noteChartSetEntry.path
+	local directoryPath = noteChartEntry.path:match("^(.+)/(.-)$") or ""
 	local stagePath = noteChartDataEntry.stagePath
 
 	if stagePath and stagePath ~= "" then

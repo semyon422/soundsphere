@@ -25,12 +25,10 @@ NoteChartSetLibraryModel.updateItems = function(self)
 		local noteChartEntries = self.cacheModel.cacheManager:getNoteChartsAtHash(noteChartDataEntry.hash)
 		for _, noteChartEntry in ipairs(noteChartEntries) do
 			local setId = noteChartEntry and noteChartEntry.setId
-			local noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(setId)
-			local check = self:checkNoteChartDataEntry(noteChartDataEntry, noteChartEntry, noteChartSetEntry)
+			local check = self:checkNoteChartDataEntry(noteChartDataEntry, noteChartEntry)
 			if check or self.searchMode == "show" then
 				if setId and (not self.collapse or setId ~= prevSetId) then
 					items[#items + 1] = {
-						noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(setId),
 						noteChartEntry = noteChartEntry,
 						noteChartDataEntry = noteChartDataEntry,
 						tagged = self.searchMode == "show" and check
@@ -42,11 +40,11 @@ NoteChartSetLibraryModel.updateItems = function(self)
 	end
 end
 
-NoteChartSetLibraryModel.checkNoteChartDataEntry = function(self, noteChartDataEntry, noteChartEntry, noteChartSetEntry)
-	if not noteChartEntry or not noteChartSetEntry then
+NoteChartSetLibraryModel.checkNoteChartDataEntry = function(self, noteChartDataEntry, noteChartEntry)
+	if not noteChartEntry then
 		return
 	end
-	return self.searchModel:check(noteChartDataEntry, noteChartEntry, noteChartSetEntry)
+	return self.searchModel:check(noteChartDataEntry, noteChartEntry)
 end
 
 NoteChartSetLibraryModel.getItemIndex = function(self, noteChartSetEntryId, noteChartEntryId, noteChartDataEntryId)
@@ -59,8 +57,8 @@ NoteChartSetLibraryModel.getItemIndex = function(self, noteChartSetEntryId, note
 	local collapsedItemIndex
 	for i = 1, #items do
 		local item = items[i]
-		if item.noteChartSetEntry.id == noteChartSetEntryId then
-			if item.noteChartEntry.id == noteChartEntryId and item.noteChartDataEntry.id == noteChartDataEntryId then
+		if item.noteChartEntry.setId == noteChartSetEntryId then
+			if item.noteChartEntry.setId == noteChartEntryId and item.noteChartDataEntry.id == noteChartDataEntryId then
 				return i
 			elseif self.collapse then
 				collapsedItemIndex = i

@@ -155,7 +155,7 @@ CacheManager.setNoteChartEntry = function(self, entry)
 end
 
 CacheManager.setNoteChartDataEntry = function(self, entry)
-	local oldEntry = CacheDatabase:selectNoteCharDatatEntry(entry.hash, entry.index)
+	local oldEntry = CacheDatabase:selectNoteCharDataEntry(entry.hash, entry.index)
 
 	if not oldEntry then
 		CacheDatabase:insertNoteChartDataEntry(entry)
@@ -185,16 +185,8 @@ CacheManager.getNoteChartEntryById = function(self, id)
 	return self.noteChartsId[id]
 end
 
-CacheManager.getNoteChartEntryByPath = function(self, path)
-	return self.noteChartsPath[path]
-end
-
 CacheManager.getNoteChartSetEntryById = function(self, id)
 	return self.noteChartSetsId[id]
-end
-
-CacheManager.getNoteChartSetEntryByPath = function(self, path)
-	return self.noteChartSetsPath[path]
 end
 
 ----------------------------------------------------------------
@@ -480,7 +472,7 @@ CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, for
 		local hash = fileHash[path]
 		noteChartEntry.hash = hash
 
-		if not force and CacheDatabase:selectNoteCharDatatEntry(hash, 1) then
+		if not force and CacheDatabase:selectNoteCharDataEntry(hash, 1) then
 			self:setNoteChartEntry(noteChartEntry)
 		else
 			local entries, noteCharts = NoteChartDataEntryFactory:getEntries(path, content, hash, noteChartEntry)
