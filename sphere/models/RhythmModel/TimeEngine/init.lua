@@ -58,6 +58,10 @@ TimeEngine.getBaseTimeRate = function(self)
 	return timeRate
 end
 
+TimeEngine.resetTimeRate = function(self)
+	self:setTimeRate(self:getBaseTimeRate())
+end
+
 TimeEngine.sync = function(self, event)
 	local timer = self.timer
 
