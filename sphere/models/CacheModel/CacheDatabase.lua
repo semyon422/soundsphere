@@ -10,7 +10,14 @@ CacheDatabase.load = function(self)
 	db:open(self.dbpath)
 	db:exec(love.filesystem.read("sphere/models/CacheModel/database.sql"))
 	self.loaded = true
-	db:table_info("noteCharts")
+
+	-- print(require("inspect")(self:selectAllIdPairs("noteCharts.setId DESC", "noteCharts.id < ?", 10)))
+	-- print(require("inspect")(self:selectPairs("level DESC")))
+	-- print(require("inspect")(self:selectAllIdPairs("level DESC")))
+
+	self.noteCharts = setmetatable({}, {__mode = "v"})
+	self.noteChartDatas = setmetatable({}, {__mode = "v"})
+	self.noteChartSets = setmetatable({}, {__mode = "v"})
 end
 
 CacheDatabase.unload = function(self)
@@ -24,6 +31,36 @@ end
 
 CacheDatabase.commit = function(self)
 	return self.db:commit()
+end
+
+CacheDatabase.getNoteChartData = function(self, id)
+	local noteChartData = self.noteChartDatas[id]
+	if noteChartData then
+		return noteChartData
+	end
+	noteChartData = self.db:select("noteChartDatas", "id = ?", id)[1]
+	self.noteChartDatas[id] = noteChartData
+	return noteChartData
+end
+
+CacheDatabase.getNoteChart = function(self, id)
+	local noteChart = self.noteCharts[id]
+	if noteChart then
+		return noteChart
+	end
+	noteChart = self.db:select("noteCharts", "id = ?", id)[1]
+	self.noteCharts[id] = noteChart
+	return noteChart
+end
+
+CacheDatabase.getNoteChartSet = function(self, id)
+	local noteChartSet = self.noteChartSets[id]
+	if noteChartSet then
+		return noteChartSet
+	end
+	noteChartSet = self.db:select("noteChartSets", "id = ?", id)[1]
+	self.noteChartSets[id] = noteChartSet
+	return noteChartSet
 end
 
 ----------------------------------------------------------------
@@ -102,9 +139,9 @@ end
 
 CacheDatabase.selectAllIdPairs = function(self, orders, conditions, ...)
 	return self.db:query(([[
-		SELECT noteCharts.id AS noteChartId, noteChartDatas.id AS noteChartDataId
-		FROM noteCharts
-		INNER JOIN noteChartDatas ON noteCharts.hash = noteChartDatas.hash
+		SELECT noteChartDatas.id AS noteChartDataId, noteCharts.id AS noteChartId, noteCharts.setId
+		FROM noteChartDatas
+		INNER JOIN noteCharts ON noteChartDatas.hash = noteCharts.hash
 		%s
 		ORDER BY %s
 	]]):format(
@@ -115,7 +152,7 @@ end
 
 CacheDatabase.selectPairs = function(self, orders, conditions, ...)
 	return self.db:query(([[
-		SELECT noteChartDatas.*, noteCharts.id AS noteChartId, noteCharts.path AS path
+		SELECT noteChartDatas.*, noteCharts.id AS noteChartId, noteCharts.path, noteCharts.setId
 		FROM noteChartDatas
 		INNER JOIN noteCharts ON noteChartDatas.hash = noteCharts.hash
 		%s

@@ -133,6 +133,7 @@ GameController.load = function(self)
 	noteChartLibraryModel.cacheModel = cacheModel
 	noteChartLibraryModel.searchModel = searchModel
 	scoreLibraryModel.scoreModel = scoreModel
+	selectModel.cacheModel = cacheModel
 	selectModel.collectionModel = collectionModel
 	selectModel.configModel = configModel
 	selectModel.searchModel = searchModel

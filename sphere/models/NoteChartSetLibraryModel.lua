@@ -13,6 +13,9 @@ NoteChartSetLibraryModel.updateItems = function(self)
 	local items = {}
 	self.items = items
 
+	self.items = self.cacheModel.cacheManager.idObjects
+	do return end
+
 	local noteChartDataEntries = self.cacheModel.cacheManager:getNoteChartDatas()
 	local sortFunction = self.sortFunction
 	if sortFunction then
@@ -49,6 +52,8 @@ end
 
 NoteChartSetLibraryModel.getItemIndex = function(self, noteChartSetEntryId, noteChartEntryId, noteChartDataEntryId)
 	local items = self.items
+
+	do return 1 end
 
 	if not items then
 		return 1

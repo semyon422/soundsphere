@@ -116,11 +116,15 @@ SelectModel.scrollNoteChartSet = function(self, direction, destination)
 
 	local noteChartSetItem = noteChartSetItems[self.noteChartSetItemIndex]
 	self.noteChartSetItem = noteChartSetItem
-	self.config.noteChartSetEntryId = noteChartSetItem.noteChartEntry.setId
-	self.config.noteChartEntryId = noteChartSetItem.noteChartEntry and noteChartSetItem.noteChartEntry.id
-	self.config.noteChartDataEntryId = noteChartSetItem.noteChartDataEntry and noteChartSetItem.noteChartDataEntry.id
+	self.config.noteChartSetEntryId = noteChartSetItem.setId
+	self.config.noteChartEntryId = noteChartSetItem.noteChartId
+	self.config.noteChartDataEntryId = noteChartSetItem.noteChartDataId
+	-- self.config.noteChartSetEntryId = noteChartSetItem.noteChartEntry.setId
+	-- self.config.noteChartEntryId = noteChartSetItem.noteChartEntry and noteChartSetItem.noteChartEntry.id
+	-- self.config.noteChartDataEntryId = noteChartSetItem.noteChartDataEntry and noteChartSetItem.noteChartDataEntry.id
 
-	self:pullNoteChart(oldNoteChartSetItem.noteChartEntry.setId == noteChartSetItem.noteChartEntry.setId)
+	self:pullNoteChart(oldNoteChartSetItem.setId == noteChartSetItem.setId)
+	-- self:pullNoteChart(oldNoteChartSetItem.noteChartEntry.setId == noteChartSetItem.noteChartEntry.setId)
 end
 
 SelectModel.scrollNoteChart = function(self, direction, destination)
@@ -177,7 +181,8 @@ SelectModel.pullNoteChartSet = function(self, noUpdate)
 	local noteChartSetItem = noteChartSetItems[self.noteChartSetItemIndex]
 	self.noteChartSetItem = noteChartSetItem
 	if noteChartSetItem then
-		self.config.noteChartSetEntryId = noteChartSetItem.noteChartEntry.setId
+		-- self.config.noteChartSetEntryId = noteChartSetItem.noteChartEntry.setId
+		self.config.noteChartSetEntryId = noteChartSetItem.setId
 		self:pullNoteChart(noUpdate)
 	end
 end

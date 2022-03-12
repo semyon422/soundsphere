@@ -107,6 +107,8 @@ CacheManager.select = function(self)
 		noteChartDatasId[entry.id] = entry
 	end
 
+	self.idObjects = CacheDatabase:selectAllIdPairs("setId ASC")
+
 	if not loaded then
 		CacheDatabase:unload()
 	end
