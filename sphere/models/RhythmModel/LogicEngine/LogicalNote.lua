@@ -36,7 +36,6 @@ end
 
 LogicalNote.switchAutoplay = function(self, value)
 	self.autoplay = value
-	self:switchState("clear")
 end
 
 LogicalNote.getNext = function(self)

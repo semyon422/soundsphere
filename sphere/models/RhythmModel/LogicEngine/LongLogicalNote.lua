@@ -188,7 +188,7 @@ end
 
 LongLogicalNote.isReachable = function(self, currentNote)
 	local eventTime = self.eventTime
-	self.eventTime = currentNote.eventTime
+	self.eventTime = currentNote:getEventTime()
 	local isReachable = self:getStartTimeState() ~= "too early"
 	self.eventTime = eventTime
 	return isReachable
