@@ -219,14 +219,21 @@ GameplayController.saveScore = function(self)
 	local noteChartModel = self.gameController.noteChartModel
 	local modifierModel = rhythmModel.modifierModel
 	local replayModel = rhythmModel.replayModel
-	if scoreSystemEntry.score > 0 and rhythmModel.replayModel.mode ~= "replay" and not rhythmModel.logicEngine.autoplay then
+	if
+		scoreSystemEntry.score > 0 and
+		rhythmModel.replayModel.mode ~= "replay" and
+		not rhythmModel.logicEngine.autoplay
+	then
 		replayModel.noteChartModel = noteChartModel
 		replayModel.modifierModel = modifierModel
 		replayModel.replayType = self.gameController.configModel.configs.settings.gameplay.replayType
 		local replayHash = replayModel:saveReplay()
 		local scoreEntry = self.gameController.scoreModel:insertScore(scoreSystemEntry, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
 
-		if rhythmModel.scoreEngine.scoreSystem.base.progress >= 1 then
+		if
+			rhythmModel.scoreEngine.scoreSystem.base.progress >= 1 and
+			not rhythmModel.logicEngine.promode
+		then
 			self.gameController.onlineModel.onlineScoreManager:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
 		end
 
