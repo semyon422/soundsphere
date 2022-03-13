@@ -163,7 +163,7 @@ RhythmModel.receive = function(self, event)
 	end
 
 	self.modifierModel:receive(event)
-	if self.timeEngine.timeRate ~= 0 then
+	if self.timeEngine.timer.isPlaying then
 		self.inputManager:receive(event)
 	end
 	self.pauseManager:receive(event)

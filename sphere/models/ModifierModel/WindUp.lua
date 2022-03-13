@@ -34,7 +34,7 @@ WindUp.update = function(self, config)
 	local endTime = timeEngine.noteChart.metaData:get("maxTime")
 	local currentTime = timeEngine.currentTime
 
-	if timeEngine.timeRate == 0 then
+	if not timeEngine.timer.isPlaying then
 		return
 	end
 

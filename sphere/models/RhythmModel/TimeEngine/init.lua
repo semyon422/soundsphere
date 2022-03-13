@@ -94,7 +94,7 @@ end
 
 TimeEngine.skipIntro = function(self)
 	local skipTime = self.minTime - self.timeToPrepare * math.abs(self.timeRate)
-	if self.currentTime < skipTime and self.timeRate ~= 0 then
+	if self.currentTime < skipTime and self.timer.isPlaying then
 		self:setPosition(skipTime)
 	end
 end
