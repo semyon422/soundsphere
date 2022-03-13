@@ -56,17 +56,26 @@ for od = 0, 10 do
 	JudgementScoreSystem.judgements["osuOD" .. od] = judgements
 end
 
-JudgementScoreSystem.construct = function(self)
-	self.counters = {}
-end
-
 JudgementScoreSystem.load = function(self)
 	for name, judgements in pairs(self.scoreEngine.judgements) do
 		self.judgements[name] = judgements
 	end
+
+	self.counters = {}
 	local counters = self.counters
 	for name, judgements in pairs(self.judgements) do
 		counters[name] = counters[name] or {}
+		for i, judgement in ipairs(judgements) do
+			if type(judgement) ~= "number" then
+				if type(judgement) == "string" then
+					counters[name][judgement] = 0
+				elseif type(judgement) == "table" then
+					for _, j in ipairs(judgement) do
+						counters[name][j] = 0
+					end
+				end
+			end
+		end
 	end
 end
 
@@ -88,14 +97,13 @@ JudgementScoreSystem.processJudgement = function(self, event)
 
 	local counters = self.counters
 	for name, judgements in pairs(self.judgements) do
-		counters[name] = counters[name] or {}
 		local judgement = self:getJudgement(judgements, deltaTime)
 		if judgement then
 			if type(judgement) == "string" then
-				counters[name][judgement] = (counters[name][judgement] or 0) + 1
+				counters[name][judgement] = counters[name][judgement] + 1
 			elseif type(judgement) == "table" then
 				for _, j in ipairs(judgement) do
-					counters[name][j] = (counters[name][j] or 0) + 1
+					counters[name][j] = counters[name][j] + 1
 				end
 			end
 		end
