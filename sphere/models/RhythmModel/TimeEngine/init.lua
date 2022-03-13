@@ -77,9 +77,12 @@ TimeEngine.sync = function(self, event)
 	end
 
 	timer:update()
-	self:updateNextTimeIndex()
-
 	self.currentTime = timer:getTime()
+
+	if not self.nextTimeIndex then
+		return
+	end
+	self:updateNextTimeIndex()
 	self.currentVisualTime = self:getVisualTime()
 end
 
