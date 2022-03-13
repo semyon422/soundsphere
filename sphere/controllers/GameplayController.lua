@@ -89,6 +89,10 @@ GameplayController.load = function(self)
 
 	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChart, function()
 		rhythmModel:setResourceAliases(NoteChartResourceLoader.localAliases, NoteChartResourceLoader.globalAliases)
+		rhythmModel.timeEngine:sync({
+			time = love.timer.getTime(),
+			delta = 0,
+		})
 		self:receive({
 			name = "play"
 		})
