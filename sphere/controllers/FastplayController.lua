@@ -8,6 +8,10 @@ FastplayController.play = function(self)
 	local rhythmModel = self.gameController.rhythmModel
 	local timeEngine = rhythmModel.timeEngine
 
+	rhythmModel.timeEngine:sync({
+		time = 0,
+		dt = 0,
+	})
 	timeEngine:resetTimeRate()
 	timeEngine:play()
 	timeEngine.currentTime = math.huge
@@ -41,8 +45,6 @@ FastplayController.load = function(self)
 
 	rhythmModel:load()
 	rhythmModel:loadLogicEngines()
-
-	self.gameController.rhythmModel.timeEngine:setTimeRate(rhythmModel.timeEngine:getBaseTimeRate())
 end
 
 FastplayController.unload = function(self)
