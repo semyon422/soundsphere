@@ -76,6 +76,7 @@ InputManager.receive = function(self, event)
 
 	local timeEngine = self.rhythmModel.timeEngine
 	local eventTime = timeEngine.timer:transformTime(event.time)
+	eventTime = math.floor(eventTime * 1024) / 1024
 
 	local virtualEvent = {
 		virtual = true,

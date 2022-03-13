@@ -239,6 +239,8 @@ GameplayController.skip = function(self)
 	local rhythmModel = self.gameController.rhythmModel
 	local timeEngine = rhythmModel.timeEngine
 
+	self:update(0)
+
 	rhythmModel.audioEngine:unload()
 	rhythmModel.logicEngine.observable:remove(rhythmModel.audioEngine)
 
@@ -250,13 +252,14 @@ GameplayController.skip = function(self)
 		rhythmModel.prohibitSavingScore = true
 	end
 
-	local time = math.huge
-	timeEngine:setTimeRate(timeEngine:getBaseTimeRate())
-	timeEngine.currentTime = time
-	timeEngine.currentVisualTime = time
-	self:update(0)
+	timeEngine:resetTimeRate()
+	timeEngine:play()
+	timeEngine.currentTime = math.huge
+	rhythmModel.replayModel.currentTime = math.huge
 	rhythmModel.replayModel:update()
-	self:update(0)
+	rhythmModel.logicEngine:update()
+	rhythmModel.scoreEngine:update()
+	rhythmModel.modifierModel:update()
 end
 
 return GameplayController

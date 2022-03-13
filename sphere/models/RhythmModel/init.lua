@@ -154,12 +154,8 @@ RhythmModel.unloadLogicEngines = function(self)
 end
 
 RhythmModel.receive = function(self, event)
-	if event.time then
-		event.time = math.floor(event.time * 1024) / 1024
-	end
-
 	if event.name == "framestarted" then
-		self.timeEngine:sync(event)
+		return self.timeEngine:sync(event)
 	end
 
 	self.modifierModel:receive(event)

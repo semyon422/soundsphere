@@ -23,7 +23,11 @@ Replay.receive = function(self, event)
 	end
 
 	local events = self.events
-	events[#events + 1] = event
+	events[#events + 1] = {
+		event[1],
+		name = event.name,
+		time = event.time,
+	}
 end
 
 Replay.reset = function(self)
