@@ -155,7 +155,9 @@ end
 
 RhythmModel.receive = function(self, event)
 	if event.name == "framestarted" then
-		return self.timeEngine:sync(event)
+		self.timeEngine:sync(event)
+		self.replayModel.currentTime = self.timeEngine.currentTime
+		return
 	end
 
 	self.modifierModel:receive(event)
@@ -163,8 +165,6 @@ RhythmModel.receive = function(self, event)
 		self.inputManager:receive(event)
 	end
 	self.pauseManager:receive(event)
-
-	self.replayModel.currentTime = self.timeEngine.currentTime
 end
 
 RhythmModel.update = function(self, dt)
