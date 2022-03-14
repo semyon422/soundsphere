@@ -9,8 +9,6 @@ end
 GraphicalNote.update = function(self)
 	self:computeVisualTime()
 	self:computeTimeState()
-
-	return self:tryNext()
 end
 
 GraphicalNote.computeVisualTime = function(self) end
@@ -19,16 +17,6 @@ GraphicalNote.computeTimeState = function(self) end
 
 GraphicalNote.getNext = function(self, offset)
 	return self.noteDrawer.noteData[self.index + offset]
-end
-
-GraphicalNote.tryNext = function(self)
-	if self.index == self.noteDrawer.startNoteIndex and self:willDrawBeforeStart() then
-		self:deactivate()
-		self.noteDrawer.startNoteIndex = self.noteDrawer.startNoteIndex + 1
-	elseif self.index == self.noteDrawer.endNoteIndex and self:willDrawAfterEnd() then
-		self:deactivate()
-		self.noteDrawer.endNoteIndex = self.noteDrawer.endNoteIndex - 1
-	end
 end
 
 GraphicalNote.where = function(self, time)
