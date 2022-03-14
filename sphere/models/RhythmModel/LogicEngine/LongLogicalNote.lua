@@ -162,7 +162,8 @@ LongLogicalNote.processAuto = function(self)
 		self.eventTime = self:getNoteTime("start")
 		self:processTimeState("exactly", "too early")
 		self.eventTime = nil
-	elseif deltaEndTime >= 0 and self.keyState or nextNote and nextNote:isHere() then
+	end
+	if deltaEndTime >= 0 and self.keyState or nextNote and nextNote:isHere() then
 		self.keyState = false
 		self:sendState("keyState")
 
