@@ -32,9 +32,6 @@ NoteDrawer.load = function(self)
 	self.currentTimePoint = self.layerData:getTimePoint()
 	self.currentTimePoint.zeroClearVisualTime = 0
 	self.currentVelocityDataIndex = 1
-	self.currentClearTimePoint = self.layerData:getTimePoint()
-	self.currentClearTimePoint.zeroClearVisualTime = 0
-	self.currentClearVelocityDataIndex = 1
 
 	table.sort(self.noteData, function(a, b)
 		return a.startNoteData.timePoint.zeroClearVisualTime < b.startNoteData.timePoint.zeroClearVisualTime
@@ -111,12 +108,6 @@ end
 NoteDrawer.unload = function(self)
 	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
 		self.noteData[currentNoteIndex]:deactivate()
-	end
-end
-
-NoteDrawer.receive = function(self, event)
-	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
-		self.noteData[currentNoteIndex]:receive(event)
 	end
 end
 

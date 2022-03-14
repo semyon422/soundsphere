@@ -7,13 +7,6 @@ ShortGraphicalNote.construct = function(self)
 	self.noteData = nil
 end
 
-ShortGraphicalNote.update = function(self)
-	self:computeVisualTime()
-	self:computeTimeState()
-
-	return self:tryNext()
-end
-
 ShortGraphicalNote.computeVisualTime = function(self)
 	return self.startNoteData.timePoint:computeVisualTime(self.noteDrawer.currentTimePoint)
 end
