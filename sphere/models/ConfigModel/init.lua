@@ -27,7 +27,11 @@ ConfigModel.addConfig = function(self, name, path, defaultPath, format)
 end
 
 ConfigModel.readConfig = function(self, name)
-	local config = assert(self.configs[name])
+	local config = self.configs[name]
+	if type(config) ~= "table" then
+		config = {}
+		self.configs[name] = self.configs[name]
+	end
 
 	local path = self.paths[name]
 	local defaultPath = self.defaultPaths[name]
@@ -48,7 +52,9 @@ end
 ConfigModel.copyTable = function(self, from, to)
 	for key, value in pairs(from) do
 		if type(value) == "table" then
-			to[key] = to[key] or {}
+			if type(to[key]) ~= "table" then
+				to[key] = {}
+			end
 			self:copyTable(value, to[key])
 		else
 			to[key] = value
