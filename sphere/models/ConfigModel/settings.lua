@@ -21,7 +21,6 @@ return {
 		},
 		lastMeanValues = 10,
 		longNoteShortening = 0,
-		needTimeRound = true,
 		offset = {
 			input = 0,
 			visual = 0

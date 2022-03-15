@@ -1,20 +1,9 @@
 local Class			= require("aqua.util.Class")
 local Observable	= require("aqua.util.Observable")
-local json			= require("json")
 
 local InputManager = Class:new()
 
-InputManager.path = "userdata/input.json"
-
 InputManager.mode = "external"
-InputManager.needRound = true
-
-InputManager.types = {
-	"keyboard",
-	"gamepad",
-	"joystick",
-	"midi"
-}
 
 InputManager.construct = function(self)
 	self.observable = Observable:new()
@@ -37,6 +26,33 @@ InputManager.setInputMode = function(self, inputMode)
 	self.inputConfig = self.inputBindings[inputMode]
 end
 
+InputManager.getKeyConfig = function(self, event)
+	if not event.name:find("^.+pressed$") and not event.name:find("^.+released$") then
+		return
+	end
+
+	local device = event.name:match("^(.+)pressed$") or event.name:match("^(.+)released$")
+	if device == "key" then
+		device = "keyboard"
+	end
+
+	local state = "press"
+	if event.name:find("^.+released$") then
+		state = "release"
+	end
+
+	local key = tostring(event[2])
+	if device == "midi" then
+		key = tostring(event[1])
+	end
+
+	local inputConfig = self.inputConfig
+	return
+		inputConfig[state] and
+		inputConfig[state][device] and
+		inputConfig[state][device][key]
+end
+
 InputManager.receive = function(self, event)
 	local mode = self.mode
 
@@ -44,32 +60,16 @@ InputManager.receive = function(self, event)
 		return self:send(event)
 	end
 
-	if mode ~= "external" then
+	if mode ~= "external" or not self.inputConfig then
 		return
 	end
 
-	if not self.inputConfig then
+	local isPlaying = self.rhythmModel.timeEngine.timer.isPlaying
+	if not isPlaying then
 		return
 	end
 
-	local keyConfig
-	if event.name == "keypressed" and self.inputConfig.press.keyboard then
-		keyConfig = self.inputConfig.press.keyboard[event[2]]
-	elseif event.name == "keyreleased" and self.inputConfig.release.keyboard then
-		keyConfig = self.inputConfig.release.keyboard[event[2]]
-	elseif event.name == "gamepadpressed" then
-		keyConfig = self.inputConfig.press.gamepad[tostring(event[2])]
-	elseif event.name == "gamepadreleased" then
-		keyConfig = self.inputConfig.release.gamepad[tostring(event[2])]
-	elseif event.name == "joystickpressed" and self.inputConfig.press.joystick then
-		keyConfig = self.inputConfig.press.joystick[tostring(event[2])]
-	elseif event.name == "joystickreleased" and self.inputConfig.release.joystick then
-		keyConfig = self.inputConfig.release.joystick[tostring(event[2])]
-	elseif event.name == "midipressed" then
-		keyConfig = self.inputConfig.press.midi[tostring(event[1])]
-	elseif event.name == "midireleased" then
-		keyConfig = self.inputConfig.release.midi[tostring(event[1])]
-	end
+	local keyConfig = self:getKeyConfig(event)
 	if not keyConfig then
 		return
 	end

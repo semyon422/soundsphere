@@ -161,9 +161,7 @@ RhythmModel.receive = function(self, event)
 	end
 
 	self.modifierModel:receive(event)
-	if self.timeEngine.timer.isPlaying then
-		self.inputManager:receive(event)
-	end
+	self.inputManager:receive(event)
 	self.pauseManager:receive(event)
 end
 
@@ -224,10 +222,6 @@ end
 RhythmModel.setVisualTimeRate = function(self, visualTimeRate)
 	self.graphicEngine.visualTimeRate = visualTimeRate
 	self.graphicEngine.targetVisualTimeRate = visualTimeRate
-end
-
-RhythmModel.setTimeRound = function(self, needRound)
-	self.inputManager.needRound = needRound
 end
 
 RhythmModel.setLongNoteShortening = function(self, longNoteShortening)
