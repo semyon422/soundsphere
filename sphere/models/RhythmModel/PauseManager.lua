@@ -83,6 +83,7 @@ end
 PauseManager.play = function(self)
 	self.rhythmModel.timeEngine:play()
 	self.rhythmModel.audioEngine:play()
+	self.rhythmModel.inputManager:loadState()
 	self.state = "play"
 	love.mouse.setVisible(false)
 end
@@ -90,6 +91,7 @@ end
 PauseManager.pause = function(self)
 	self.rhythmModel.timeEngine:pause()
 	self.rhythmModel.audioEngine:pause()
+	self.rhythmModel.inputManager:saveState()
 	self.state = "pause"
 	love.mouse.setVisible(true)
 end
