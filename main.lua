@@ -28,18 +28,20 @@ local arch = jit.arch
 if jit_os == "Windows" then
 	local bin = arch == "x64" and "bin/win64" or "bin/win32"
 	ffi.cdef("int _putenv_s(const char *varname, const char *value_string);")
+	ffi.cdef("int _chdir(const char *dirname);")
 	ffi.C._putenv_s("PATH", os.getenv("PATH") .. ";" .. sourceBase .. "/" .. bin)
+	ffi.C._chdir(sourceBase)
 	aquapackage.add(bin)
 elseif jit_os == "Linux" then
 	local ldlp = os.getenv("LD_LIBRARY_PATH")
 	if not ldlp or not ldlp:find("bin/linux64") then
 		ffi.cdef("int setenv(const char *name, const char *value, int overwrite);")
-		ffi.cdef("int chdir(const char *path);")
 		ffi.C.setenv("LD_LIBRARY_PATH", (ldlp or "") .. ":" .. sourceBase .. "/bin/linux64", true)
-		ffi.C.chdir(sourceBase)
 		os.execute(arg[-2] .. " " .. arg[1] .. " &")
 		return os.exit()
 	end
+	ffi.cdef("int chdir(const char *path);")
+	ffi.C.chdir(sourceBase)
 	aquapackage.add("bin/linux64")
 end
 love.window.setMode(1, 1)
