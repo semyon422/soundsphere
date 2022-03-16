@@ -59,8 +59,28 @@ local Stats = {
 	align = "left",
 }
 
+local Version = {
+	class = "ValueView",
+	subscreen = "debug",
+	transform = transformLeft,
+	value = function()
+		local version = require("version")
+		return version.date .. "\n" .. version.commit
+	end,
+	x = 0,
+	baseline = 1040,
+	limit = 1920,
+	color = {1, 1, 1, 1},
+	font = {
+		filename = "Noto Sans Mono",
+		size = 24,
+	},
+	align = "left",
+}
+
 return {
 	Fps,
 	RendererInfo,
 	Stats,
+	Version,
 }
