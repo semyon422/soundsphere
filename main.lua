@@ -53,7 +53,6 @@ elseif jit_os == "Linux" then
 	ffi.C.chdir(root)
 	aquapackage.add("bin/linux64")
 end
-love.window.setMode(1, 1)
 
 local aquafs = require("aqua.filesystem")
 aquafs.setWriteDir(root)
@@ -77,6 +76,7 @@ setmetatable(_G, {
 })
 
 require("preloaders.preloadall")
+require("love.window")
 
 local aquaevent = require("aqua.event")
 aquaevent:init()
