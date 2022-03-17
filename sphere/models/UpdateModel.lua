@@ -50,19 +50,22 @@ end
 
 local async_download = thread.async(function(url, path)
 	local request = require("luajit-request")
+	local socket_url = require("socket.url")
 	require("preloaders.preloadall")
 
-	local response = request.send(url)
+	url = socket_url.build(socket_url.parse(url))
+	local response, _, err = request.send(url)
 	local body = response and response.body
 	if not body or not path then
-		return body
+		return body, err
 	end
 
 	local directory = path:match("^(.+)/.-$")
-	if directory then
-		love.filesystem.createDirectory(directory)
+	if directory and not love.filesystem.createDirectory(directory) then
+		return false, ("Could not open directory %s (not a directory)"):format(directory)
 	end
-	love.filesystem.write(path, body)
+
+	return love.filesystem.write(path, body)
 end)
 
 local async_remove = thread.async(function(...) return love.filesystem.remove(...) end)
@@ -105,7 +108,10 @@ UpdateModel.updateFiles = thread.coro(function(self)
 			print("check", file.path)
 			if file.hash ~= async_crc32(file.path) then
 				self:setStatus(("download: %s"):format(file.path))
-				async_download(file.url, file.path)
+				local res, err = async_download(file.url, file.path)
+				if not res then
+					return self:setStatus(err)
+				end
 				count = count + 1
 			end
 		end
