@@ -154,14 +154,11 @@ UpdateModel.updateFiles = function(self)
 			print("remove", file.path)
 			love.filesystem.remove(file.path)
 		elseif file.hash and not file.hash_old or file.hash ~= file.hash_old then
-			local info = love.filesystem.getInfo(file.path)
-			if info then
+			local content = love.filesystem.read(file.path)
+			if content then
 				print("check", file.path)
-				local f = love.filesystem.newFile(file.path)
-				f:open("r")
-				local hash = ("%8X"):format(crc32.hash(f:read()))
-				f:close()
-				if file.hash ~= hash then
+				print("check", file.path)
+				if file.hash ~= crc32.hash(content) then
 					self:downloadFile(file.url, file.path)
 				end
 			else
