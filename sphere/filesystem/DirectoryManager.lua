@@ -5,15 +5,12 @@ local DirectoryManager = Class:new()
 DirectoryManager.createDirectories = function(self)
 	self:createDirectory("userdata")
 	self:createDirectory("userdata/skins")
-	self:createDirectory("userdata/themes")
 	self:createDirectory("userdata/charts")
 	self:createDirectory("userdata/export")
 	self:createDirectory("userdata/hitsounds")
 	self:createDirectory("userdata/replays")
 	self:createDirectory("userdata/score_systems")
 	self:createDirectory("userdata/screenshots")
-
-	self:createDirectory("moddedgame")
 end
 
 DirectoryManager.createDirectory = function(self, path)
