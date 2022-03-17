@@ -173,6 +173,7 @@ GameController.load = function(self)
 	configModel:addConfig("timings", "userdata/timings.lua", "sphere/models/ConfigModel/timings.lua", "lua")
 	configModel:addConfig("judgements", "userdata/judgements.lua", "sphere/models/ConfigModel/judgements.lua", "lua")
 	configModel:addConfig("hp", "userdata/hp.lua", "sphere/models/ConfigModel/hp.lua", "lua")
+	configModel:addConfig("files", "userdata/files.lua", "sphere/models/ConfigModel/files.lua", "lua")
 
 	configModel:readConfig("settings_model")
 	configModel:readConfig("settings")
@@ -184,6 +185,7 @@ GameController.load = function(self)
 	configModel:readConfig("timings")
 	configModel:readConfig("judgements")
 	configModel:readConfig("hp")
+	configModel:readConfig("files")
 
 	rhythmModel.timings = configModel.configs.timings
 	rhythmModel.judgements = configModel.configs.judgements

@@ -1,140 +1,36 @@
 local Class = require("aqua.util.Class")
-local ThreadPool = require("aqua.thread.ThreadPool")
 local json = require("json")
-local crc32 = require("crc32")
-local request = require("luajit-request")
+local thread = require("aqua.thread")
 
 local UpdateModel = Class:new()
 
-UpdateModel.anyError = false
 UpdateModel.status = ""
-UpdateModel.filesUrl = ""
-
-UpdateModel.construct = function(self) end
 
 UpdateModel.load = function(self)
-	local settings = self.configModel.configs.settings
-	local online = self.configModel.configs.online
+	local configs = self.configModel.configs
 
-	self.filesUrl = online.update
 	if
-		not settings.miscellaneous.autoUpdate or
-		online.update == "" or
-		self.thread or
+		not configs.settings.miscellaneous.autoUpdate or
+		configs.online.update == "" or
 		love.filesystem.getInfo(".git")
 	then
 		return
 	end
 
 	print("start auto update")
-	self:startUpdate()
-	self.status = "Checking for updates..."
+	self:updateFiles()
 end
 
-UpdateModel.receive = function(self, event)
-	if event.name == "UpdateResultResponse" then
-		print(event.status, event.result)
-		if event.status and not self.anyError then
-			self.status = ""
-		else
-			self.status = "Update error"
-		end
-	elseif event.name == "UpdateProgressResponse" then
-		print(event.status, event.result)
-		self.status = event.result
-		if not event.status then
-			self.anyError = true
-		end
-	end
-end
-
-UpdateModel.startUpdate = function(self)
-	return ThreadPool:execute({
-		f = function()
-			local ConfigModel = require("sphere.models.ConfigModel")
-			local configModel = ConfigModel:new()
-			configModel:addConfig("settings", "userdata/settings.lua", "sphere/models/ConfigModel/settings.lua", "lua")
-			configModel:addConfig("online", "userdata/online.lua", "sphere/models/ConfigModel/online.lua", "lua")
-			configModel:addConfig("files", "userdata/files.lua", "sphere/models/ConfigModel/files.lua", "lua")
-			configModel:readConfig("settings")
-			configModel:readConfig("online")
-			configModel:readConfig("files")
-
-			local UpdateModel = require("sphere.models.UpdateModel")
-			local updateModel = UpdateModel:new()
-			updateModel.configModel = configModel
-			updateModel.files = configModel.configs.files
-			updateModel.thread = thread
-			updateModel:load()
-
-			local status, err = xpcall(updateModel.updateFiles, debug.traceback, updateModel, thread)
-			thread:push({
-				name = "UpdateResultResponse",
-				status = status,
-				result = err
-			})
-			configModel:writeConfig("files")
-		end,
-		params = {},
-		result = function(response) end,
-		receive = function(event) self:receive(event) end,
-	})
-end
-
-UpdateModel.downloadFile = function(self, url, path)
-	print("download", url, path)
-	local result, err, message = request.send(url)
-	if not result then
-		return self.thread:push({
-			name = "UpdateProgressResponse",
-			status = false,
-			result = message
-		})
-	end
-	local directory = path:match("^(.+)/.-$")
-	if directory then
-		love.filesystem.createDirectory(directory)
-	end
-	love.filesystem.write(path, result.body)
-	self.thread:push({
-		name = "UpdateProgressResponse",
-		status = true,
-		result = path
-	})
-end
-
-UpdateModel.updateFiles = function(self)
-	local thread = self.thread
-	local result, err, message = request.send(self.filesUrl)
-	if not result then
-		thread:push({
-			name = "UpdateProgressResponse",
-			status = false,
-			result = message
-		})
-		return
-	end
-	local status, server_filelist = pcall(json.decode, result.body)
-	if not status then
-		thread:push({
-			name = "UpdateProgressResponse",
-			status = false,
-			result = server_filelist
-		})
-		return
-	end
-
-	local client_filelist = self.files
-
+local crossFiles = function(server, client)
 	local filemap = {}
-	for _, file in ipairs(server_filelist) do
+	for _, file in ipairs(server) do
 		local path = file.path
 		filemap[path] = filemap[path] or {}
 		filemap[path].hash = file.hash
 		filemap[path].path = path
 		filemap[path].url = file.url
 	end
-	for _, file in ipairs(client_filelist) do
+	for _, file in ipairs(client) do
 		local path = file.path
 		filemap[path] = filemap[path] or {}
 		filemap[path].hash_old = file.hash
@@ -149,22 +45,75 @@ UpdateModel.updateFiles = function(self)
 		return a.path < b.path
 	end)
 
+	return filelist
+end
+
+local async_download = thread.async(function(url, path)
+	local request = require("luajit-request")
+	require("preloaders.preloadall")
+
+	local response = request.send(url)
+	local body = response and response.body
+	if not body or not path then
+		return body
+	end
+
+	local directory = path:match("^(.+)/.-$")
+	if directory then
+		love.filesystem.createDirectory(directory)
+	end
+	love.filesystem.write(path, body)
+end)
+
+local async_remove = thread.async(function(...) return love.filesystem.remove(...) end)
+local async_crc32 = thread.async(function(...)
+	local content = love.filesystem.read(...)
+	if not content then
+		return
+	end
+	return require("crc32").hash(content)
+end)
+
+UpdateModel.setStatus = function(self, status)
+	self.status = status
+	print(status)
+end
+
+UpdateModel.updateFiles = thread.coro(function(self)
+	local configs = self.configModel.configs
+	self:setStatus("Checking for updates...")
+
+	local response = async_download(configs.online.update)
+	if not response then
+		return self:setStatus("Can't download file list")
+	end
+
+	local status, server_filelist = pcall(json.decode, response)
+	if not status then
+		return self:setStatus("Can't decode json")
+	end
+
+	local client_filelist = configs.files
+	local filelist = crossFiles(server_filelist, client_filelist)
+
+	local count = 0
 	for _, file in ipairs(filelist) do
 		if file.hash_old and not file.hash then
-			print("remove", file.path)
-			love.filesystem.remove(file.path)
+			self:setStatus(("remove: %s"):format(file.path))
+			async_remove(file.path)
 		elseif file.hash and not file.hash_old or file.hash ~= file.hash_old then
-			local content = love.filesystem.read(file.path)
-			if content then
-				print("check", file.path)
-				print("check", file.path)
-				if file.hash ~= crc32.hash(content) then
-					self:downloadFile(file.url, file.path)
-				end
-			else
-				self:downloadFile(file.url, file.path)
+			print("check", file.path)
+			if file.hash ~= async_crc32(file.path) then
+				self:setStatus(("download: %s"):format(file.path))
+				async_download(file.url, file.path)
+				count = count + 1
 			end
 		end
+	end
+
+	self:setStatus(("files updated: %s"):format(count))
+	if count == 0 then
+		self:setStatus("")
 	end
 
 	for k in pairs(client_filelist) do
@@ -174,7 +123,7 @@ UpdateModel.updateFiles = function(self)
 		client_filelist[k] = v
 	end
 
-	return true
-end
+	self.configModel:writeConfig("files")
+end)
 
 return UpdateModel
