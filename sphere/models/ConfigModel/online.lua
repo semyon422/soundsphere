@@ -1,6 +1,6 @@
 return {
-	host = "https://soundsphere.xyz",
-	update = "https://dl.soundsphere.xyz/files.json",
+	host = "",
+	update = "",
 	session = {},
 	token = "",
 	userId = 1,
