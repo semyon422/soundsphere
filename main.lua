@@ -76,7 +76,6 @@ setmetatable(_G, {
 })
 
 require("preloaders.preloadall")
-require("love.window")
 
 local aquaevent = require("aqua.event")
 aquaevent:init()
