@@ -162,7 +162,8 @@ LongLogicalNote.processAuto = function(self)
 		self.eventTime = self:getNoteTime("start")
 		self:processTimeState("exactly", "too early")
 		self.eventTime = nil
-	elseif deltaEndTime >= 0 and self.keyState or nextNote and nextNote:isHere() then
+	end
+	if deltaEndTime >= 0 and self.keyState or nextNote and nextNote:isHere() then
 		self.keyState = false
 		self:sendState("keyState")
 
@@ -188,7 +189,7 @@ end
 
 LongLogicalNote.isReachable = function(self, currentNote)
 	local eventTime = self.eventTime
-	self.eventTime = currentNote.eventTime
+	self.eventTime = currentNote:getEventTime()
 	local isReachable = self:getStartTimeState() ~= "too early"
 	self.eventTime = eventTime
 	return isReachable

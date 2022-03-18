@@ -84,7 +84,7 @@ end
 
 ShortLogicalNote.isReachable = function(self, currentNote)
 	local eventTime = self.eventTime
-	self.eventTime = currentNote.eventTime
+	self.eventTime = currentNote:getEventTime()
 	local isReachable = self:getTimeState() ~= "too early"
 	self.eventTime = eventTime
 	return isReachable

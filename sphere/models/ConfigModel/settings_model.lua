@@ -32,13 +32,6 @@ local settings = {
 		displayValues = {"NanoChart", "Json"}
 	},
 	{
-		name = "round off time",
-		section = "gameplay",
-		key = "gameplay.needTimeRound",
-		type = "switch",
-		displayRange = {"no", "yes"}
-	},
-	{
 		name = "visual long note shortening",
 		section = "gameplay",
 		key = "gameplay.longNoteShortening",

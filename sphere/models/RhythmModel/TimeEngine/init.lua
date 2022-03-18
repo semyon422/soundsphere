@@ -58,6 +58,10 @@ TimeEngine.getBaseTimeRate = function(self)
 	return timeRate
 end
 
+TimeEngine.resetTimeRate = function(self)
+	self:setTimeRate(self:getBaseTimeRate())
+end
+
 TimeEngine.sync = function(self, event)
 	local timer = self.timer
 
@@ -73,9 +77,12 @@ TimeEngine.sync = function(self, event)
 	end
 
 	timer:update()
-	self:updateNextTimeIndex()
-
 	self.currentTime = timer:getTime()
+
+	if not self.nextTimeIndex then
+		return
+	end
+	self:updateNextTimeIndex()
 	self.currentVisualTime = self:getVisualTime()
 end
 
@@ -90,7 +97,7 @@ end
 
 TimeEngine.skipIntro = function(self)
 	local skipTime = self.minTime - self.timeToPrepare * math.abs(self.timeRate)
-	if self.currentTime < skipTime and self.timeRate ~= 0 then
+	if self.currentTime < skipTime and self.timer.isPlaying then
 		self:setPosition(skipTime)
 	end
 end

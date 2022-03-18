@@ -16,6 +16,7 @@ local timeEngine = {
 	currentTime = 0,
 	timeRate = 1,
 	inputOffset = 0,
+	timer = {isPlaying = true}
 }
 rhythmModel.timeEngine = timeEngine
 

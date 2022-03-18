@@ -34,15 +34,13 @@ WindUp.update = function(self, config)
 	local endTime = timeEngine.noteChart.metaData:get("maxTime")
 	local currentTime = timeEngine.currentTime
 
-	if timeEngine.timeRate == 0 then
+	if not timeEngine.timer.isPlaying then
 		return
 	end
 
 	local timeRate = map(currentTime, startTime, endTime, 0.75, 1.5)
 	self.timeRateHandler.timeRate = timeRate
-
-	local baseTimeRate = self.rhythmModel.timeEngine:getBaseTimeRate()
-	timeEngine:setTimeRate(baseTimeRate, false)
+	timeEngine:resetTimeRate()
 end
 
 return WindUp

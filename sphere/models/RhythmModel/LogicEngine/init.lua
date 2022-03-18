@@ -60,7 +60,7 @@ LogicEngine.loadNoteHandlers = function(self)
 end
 
 LogicEngine.updateNoteHandlers = function(self)
-	if self.timeRate == 0 then
+	if not self.rhythmModel.timeEngine.timer.isPlaying then
 		return
 	end
 	for _, noteHandler in ipairs(self.noteHandlers) do

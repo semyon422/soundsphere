@@ -51,7 +51,6 @@ GameplayController.load = function(self)
 	rhythmModel:setVolume("effects", config.audio.volume.effects)
 	rhythmModel:setAudioMode("primary", config.audio.mode.primary)
 	rhythmModel:setAudioMode("secondary", config.audio.mode.secondary)
-	rhythmModel:setTimeRound(config.gameplay.needTimeRound)
 	rhythmModel:setLongNoteShortening(config.gameplay.longNoteShortening)
 	rhythmModel:setTimeToPrepare(config.gameplay.time.prepare)
 	rhythmModel:setInputOffset(config.gameplay.offset.input + localOffset)
@@ -89,6 +88,10 @@ GameplayController.load = function(self)
 
 	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChart, function()
 		rhythmModel:setResourceAliases(NoteChartResourceLoader.localAliases, NoteChartResourceLoader.globalAliases)
+		rhythmModel.timeEngine:sync({
+			time = love.timer.getTime(),
+			delta = 0,
+		})
 		self:receive({
 			name = "play"
 		})
@@ -215,14 +218,22 @@ GameplayController.saveScore = function(self)
 	local noteChartModel = self.gameController.noteChartModel
 	local modifierModel = rhythmModel.modifierModel
 	local replayModel = rhythmModel.replayModel
-	if scoreSystemEntry.score > 0 and rhythmModel.replayModel.mode ~= "replay" and not rhythmModel.logicEngine.autoplay then
+	if
+		scoreSystemEntry.score > 0 and
+		scoreSystemEntry.score < math.huge and
+		rhythmModel.replayModel.mode ~= "replay" and
+		not rhythmModel.logicEngine.autoplay
+	then
 		replayModel.noteChartModel = noteChartModel
 		replayModel.modifierModel = modifierModel
 		replayModel.replayType = self.gameController.configModel.configs.settings.gameplay.replayType
 		local replayHash = replayModel:saveReplay()
 		local scoreEntry = self.gameController.scoreModel:insertScore(scoreSystemEntry, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
 
-		if rhythmModel.scoreEngine.scoreSystem.base.progress >= 1 then
+		if
+			rhythmModel.scoreEngine.scoreSystem.base.progress >= 1 and
+			not rhythmModel.logicEngine.promode
+		then
 			self.gameController.onlineModel.onlineScoreManager:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
 		end
 
@@ -239,6 +250,8 @@ GameplayController.skip = function(self)
 	local rhythmModel = self.gameController.rhythmModel
 	local timeEngine = rhythmModel.timeEngine
 
+	self:update(0)
+
 	rhythmModel.audioEngine:unload()
 	rhythmModel.logicEngine.observable:remove(rhythmModel.audioEngine)
 
@@ -250,13 +263,14 @@ GameplayController.skip = function(self)
 		rhythmModel.prohibitSavingScore = true
 	end
 
-	local time = math.huge
-	timeEngine:setTimeRate(timeEngine:getBaseTimeRate())
-	timeEngine.currentTime = time
-	timeEngine.currentVisualTime = time
-	self:update(0)
+	timeEngine:resetTimeRate()
+	timeEngine:play()
+	timeEngine.currentTime = math.huge
+	rhythmModel.replayModel.currentTime = math.huge
 	rhythmModel.replayModel:update()
-	self:update(0)
+	rhythmModel.logicEngine:update()
+	rhythmModel.scoreEngine:update()
+	rhythmModel.modifierModel:update()
 end
 
 return GameplayController

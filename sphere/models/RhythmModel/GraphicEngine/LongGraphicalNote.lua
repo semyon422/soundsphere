@@ -8,13 +8,6 @@ LongGraphicalNote.construct = function(self)
 	self.noteData = nil
 end
 
-LongGraphicalNote.update = function(self)
-	self:computeVisualTime()
-	self:computeTimeState()
-
-	return self:tryNext()
-end
-
 LongGraphicalNote.computeVisualTime = function(self)
 	self.startNoteData.timePoint:computeVisualTime(self.noteDrawer.currentTimePoint)
 	self.endNoteData.timePoint:computeVisualTime(self.noteDrawer.currentTimePoint)
@@ -26,6 +19,7 @@ LongGraphicalNote.computeTimeState = function(self)
 
 	local currentTime = self.timeEngine.currentVisualTime
 	local visualOffset = self.timeEngine.visualOffset
+	local visualTimeRate = self.graphicEngine:getVisualTimeRate()
 
 	startTimeState.currentTime = currentTime
 
@@ -33,11 +27,11 @@ LongGraphicalNote.computeTimeState = function(self)
 	startTimeState.currentVisualTime = self.startNoteData.timePoint.currentVisualTime
 	startTimeState.absoluteDeltaTime = currentTime - self.startNoteData.timePoint.absoluteTime
 	startTimeState.visualDeltaTime = currentTime - (self.startNoteData.timePoint.currentVisualTime + visualOffset)
-	startTimeState.scaledVisualDeltaTime = startTimeState.visualDeltaTime * self.graphicEngine:getVisualTimeRate()
+	startTimeState.scaledVisualDeltaTime = startTimeState.visualDeltaTime * visualTimeRate
 
 	startTimeState.fakeCurrentVisualTime = self:getFakeVisualStartTime()
 	startTimeState.fakeVisualDeltaTime = currentTime - (startTimeState.fakeCurrentVisualTime + visualOffset)
-	startTimeState.scaledFakeVisualDeltaTime = startTimeState.fakeVisualDeltaTime * self.graphicEngine:getVisualTimeRate()
+	startTimeState.scaledFakeVisualDeltaTime = startTimeState.fakeVisualDeltaTime * visualTimeRate
 
 	self.endTimeState = self.endTimeState or {}
 	local endTimeState = self.endTimeState
@@ -48,12 +42,12 @@ LongGraphicalNote.computeTimeState = function(self)
 	endTimeState.currentVisualTime = self.endNoteData.timePoint.currentVisualTime
 	endTimeState.absoluteDeltaTime = currentTime - self.endNoteData.timePoint.absoluteTime
 	endTimeState.visualDeltaTime = currentTime - (self.endNoteData.timePoint.currentVisualTime + visualOffset)
-	endTimeState.scaledVisualDeltaTime = endTimeState.visualDeltaTime * self.graphicEngine:getVisualTimeRate()
+	endTimeState.scaledVisualDeltaTime = endTimeState.visualDeltaTime * visualTimeRate
 
 	local longNoteShortening = self.graphicEngine.longNoteShortening
 	endTimeState.fakeCurrentVisualTime = math.max(startTimeState.fakeCurrentVisualTime, self.endNoteData.timePoint.currentVisualTime + visualOffset + longNoteShortening)
 	endTimeState.fakeVisualDeltaTime = currentTime - endTimeState.fakeCurrentVisualTime
-	endTimeState.scaledFakeVisualDeltaTime = endTimeState.fakeVisualDeltaTime * self.graphicEngine:getVisualTimeRate()
+	endTimeState.scaledFakeVisualDeltaTime = endTimeState.fakeVisualDeltaTime * visualTimeRate
 
 	endTimeState.startTimeState = startTimeState
 	startTimeState.endTimeState = endTimeState

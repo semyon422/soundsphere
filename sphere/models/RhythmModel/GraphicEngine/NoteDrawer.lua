@@ -32,9 +32,6 @@ NoteDrawer.load = function(self)
 	self.currentTimePoint = self.layerData:getTimePoint()
 	self.currentTimePoint.zeroClearVisualTime = 0
 	self.currentVelocityDataIndex = 1
-	self.currentClearTimePoint = self.layerData:getTimePoint()
-	self.currentClearTimePoint.zeroClearVisualTime = 0
-	self.currentClearVelocityDataIndex = 1
 
 	table.sort(self.noteData, function(a, b)
 		return a.startNoteData.timePoint.zeroClearVisualTime < b.startNoteData.timePoint.zeroClearVisualTime
@@ -71,12 +68,13 @@ NoteDrawer.update = function(self)
 	self:updateCurrentTime()
 	self.globalSpeed = self.currentTimePoint.velocityData.globalSpeed
 
+	local noteData = self.noteData
 	local note
+
 	for currentNoteIndex = self.startNoteIndex, 0, -1 do
-		note = self.noteData[currentNoteIndex - 1]
+		note = noteData[currentNoteIndex - 1]
 		if note then
-			note:computeVisualTime()
-			note:computeTimeState()
+			note:update()
 			if not note:willDrawBeforeStart() and note.index == self.startNoteIndex - 1 then
 				self.startNoteIndex = self.startNoteIndex - 1
 				note:activate()
@@ -87,11 +85,11 @@ NoteDrawer.update = function(self)
 			break
 		end
 	end
-	for currentNoteIndex = self.endNoteIndex, #self.noteData, 1 do
-		note = self.noteData[currentNoteIndex + 1]
+
+	for currentNoteIndex = self.endNoteIndex, #noteData, 1 do
+		note = noteData[currentNoteIndex + 1]
 		if note then
-			note:computeVisualTime()
-			note:computeTimeState()
+			note:update()
 			if not note:willDrawAfterEnd() and note.index == self.endNoteIndex + 1 then
 				self.endNoteIndex = self.endNoteIndex + 1
 				note:activate()
@@ -103,20 +101,34 @@ NoteDrawer.update = function(self)
 		end
 	end
 
-	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
-		self.noteData[currentNoteIndex]:update()
+	for i = self.startNoteIndex, self.endNoteIndex do
+		noteData[i]:update()
+	end
+
+	for i = self.startNoteIndex, self.endNoteIndex do
+		note = noteData[i]
+		if note:willDrawBeforeStart() then
+			note:deactivate()
+			self.startNoteIndex = self.startNoteIndex + 1
+		else
+			break
+		end
+	end
+
+	for i = self.endNoteIndex, self.startNoteIndex, -1 do
+		note = noteData[i]
+		if note:willDrawAfterEnd() then
+			note:deactivate()
+			self.endNoteIndex = self.endNoteIndex - 1
+		else
+			break
+		end
 	end
 end
 
 NoteDrawer.unload = function(self)
 	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
 		self.noteData[currentNoteIndex]:deactivate()
-	end
-end
-
-NoteDrawer.receive = function(self, event)
-	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
-		self.noteData[currentNoteIndex]:receive(event)
 	end
 end
 

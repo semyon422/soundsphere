@@ -154,21 +154,15 @@ RhythmModel.unloadLogicEngines = function(self)
 end
 
 RhythmModel.receive = function(self, event)
-	if event.time then
-		event.time = math.floor(event.time * 1024) / 1024
-	end
-
 	if event.name == "framestarted" then
 		self.timeEngine:sync(event)
+		self.replayModel.currentTime = self.timeEngine.currentTime
+		return
 	end
 
 	self.modifierModel:receive(event)
-	if self.timeEngine.timeRate ~= 0 then
-		self.inputManager:receive(event)
-	end
+	self.inputManager:receive(event)
 	self.pauseManager:receive(event)
-
-	self.replayModel.currentTime = self.timeEngine.currentTime
 end
 
 RhythmModel.update = function(self, dt)
@@ -228,10 +222,6 @@ end
 RhythmModel.setVisualTimeRate = function(self, visualTimeRate)
 	self.graphicEngine.visualTimeRate = visualTimeRate
 	self.graphicEngine.targetVisualTimeRate = visualTimeRate
-end
-
-RhythmModel.setTimeRound = function(self, needRound)
-	self.inputManager.needRound = needRound
 end
 
 RhythmModel.setLongNoteShortening = function(self, longNoteShortening)

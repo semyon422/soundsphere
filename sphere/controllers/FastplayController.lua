@@ -3,22 +3,19 @@ local Class						= require("aqua.util.Class")
 local FastplayController = Class:new()
 
 FastplayController.play = function(self)
-	self:loadTimePoints()
 	self:load()
 
 	local rhythmModel = self.gameController.rhythmModel
 	local timeEngine = rhythmModel.timeEngine
-	local absoluteTimeList = self.absoluteTimeList
-	timeEngine.currentTime = -math.huge
-	for i = 1, #absoluteTimeList do
-		local time = absoluteTimeList[i]
-		rhythmModel.replayModel.currentTime = time
-		rhythmModel.replayModel:update()
-		timeEngine.currentTime = time
-		rhythmModel.logicEngine:update()
-		rhythmModel.scoreEngine:update()
-		rhythmModel.modifierModel:update()
-	end
+
+	timeEngine:resetTimeRate()
+	timeEngine:play()
+	timeEngine.currentTime = math.huge
+	rhythmModel.replayModel.currentTime = math.huge
+	rhythmModel.replayModel:update()
+	rhythmModel.logicEngine:update()
+	rhythmModel.scoreEngine:update()
+	rhythmModel.modifierModel:update()
 
 	self:unload()
 end
@@ -43,9 +40,11 @@ FastplayController.load = function(self)
 	scoreEngine.noteChartDataEntry = noteChartModel.noteChartDataEntry
 
 	rhythmModel:load()
+	rhythmModel.timeEngine:sync({
+		time = 0,
+		dt = 0,
+	})
 	rhythmModel:loadLogicEngines()
-
-	self.gameController.rhythmModel.timeEngine:setTimeRate(rhythmModel.timeEngine:getBaseTimeRate())
 end
 
 FastplayController.unload = function(self)
@@ -56,25 +55,6 @@ end
 
 FastplayController.receive = function(self, event)
 	self.gameController.rhythmModel:receive(event)
-end
-
-FastplayController.loadTimePoints = function(self)
-	local absoluteTimes = {}
-
-	local events = self.gameController.rhythmModel.replayModel.replay.events
-	for i = 1, #events do
-		absoluteTimes[events[i].time] = true
-	end
-
-	local absoluteTimeList = {}
-	for time in pairs(absoluteTimes) do
-		absoluteTimeList[#absoluteTimeList + 1] = time
-	end
-	table.sort(absoluteTimeList)
-	absoluteTimeList[#absoluteTimeList + 1] = math.huge
-
-	self.absoluteTimeList = absoluteTimeList
-	self.nextTimeIndex = 1
 end
 
 return FastplayController

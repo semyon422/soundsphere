@@ -16,8 +16,14 @@ FadeTransition.needResume = false
 FadeTransition.alpha = 1
 FadeTransition.phase = 0
 
-FadeTransition.construct = function(self)
-	self.shader = love.graphics.newShader(self.shaderText)
+FadeTransition.checkShader = function(self)
+	if not love.graphics then
+		return
+	end
+	if not self.shader then
+		self.shader = love.graphics.newShader(self.shaderText)
+	end
+	return true
 end
 
 FadeTransition.fadeIn = function(self)
@@ -53,7 +59,7 @@ FadeTransition.update = function(self, dt)
 end
 
 FadeTransition.drawBefore = function(self)
-	if not self.transiting then
+	if not self.transiting or not self:checkShader() then
 		return
 	end
 
@@ -62,7 +68,7 @@ FadeTransition.drawBefore = function(self)
 end
 
 FadeTransition.drawAfter = function(self)
-	if not self.transiting then
+	if not self.transiting or not self:checkShader() then
 		return
 	end
 

@@ -24,7 +24,9 @@ GraphicEngine.update = function(self, dt)
 	if self.visualTimeRateTween and self.updateTween then
 		self.visualTimeRateTween:update(dt)
 	end
-	self:updateNoteDrawers()
+	for _, noteDrawer in pairs(self.noteDrawers) do
+		noteDrawer:update()
+	end
 end
 
 GraphicEngine.increaseVisualTimeRate = function(self, delta)
@@ -52,13 +54,10 @@ GraphicEngine.getVisualTimeRate = function(self)
 end
 
 GraphicEngine.unload = function(self)
-	self:unloadNoteDrawers()
-end
-
-GraphicEngine.receive = function(self, event)
-	for noteDrawer in pairs(self.noteDrawers) do
-		noteDrawer:receive(event)
+	for _, noteDrawer in pairs(self.noteDrawers) do
+		noteDrawer:unload()
 	end
+	self.noteDrawers = {}
 end
 
 GraphicEngine.getLogicalNote = function(self, noteData)
@@ -81,25 +80,12 @@ GraphicEngine.loadNoteDrawers = function(self)
 			for inputType, inputIndex in self.noteChart:getInputIteraator() do
 				local noteDrawer = self:getNoteDrawer(layerIndex, inputType, inputIndex)
 				if noteDrawer then
-					self.noteDrawers[noteDrawer] = noteDrawer
+					table.insert(self.noteDrawers, noteDrawer)
 					noteDrawer:load()
 				end
 			end
 		end
 	end
-end
-
-GraphicEngine.updateNoteDrawers = function(self)
-	for noteDrawer in pairs(self.noteDrawers) do
-		noteDrawer:update()
-	end
-end
-
-GraphicEngine.unloadNoteDrawers = function(self)
-	for noteDrawer in pairs(self.noteDrawers) do
-		noteDrawer:unload()
-	end
-	self.noteDrawers = {}
 end
 
 return GraphicEngine

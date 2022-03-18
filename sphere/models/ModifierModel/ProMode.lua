@@ -35,7 +35,7 @@ ProMode.receive = function(self, config, event)
 	local logicEngine = self.rhythmModel.logicEngine
 
 	local nearestNote
-	for noteHandler in pairs(logicEngine.noteHandlers) do
+	for _, noteHandler in pairs(logicEngine.noteHandlers) do
 		local currentNote = noteHandler.currentNote
 		if
 			currentNote and
@@ -44,7 +44,7 @@ ProMode.receive = function(self, config, event)
 				currentNote.startNoteData.timePoint.absoluteTime < nearestNote.startNoteData.timePoint.absoluteTime
 			) and
 			not currentNote.ended and
-			currentNote:isReachable() and
+			currentNote:isReachable(currentNote) and
 			not currentNote.autoplay and
 			(
 				currentNote.startNoteData.noteType == "ShortNote" or
@@ -56,9 +56,6 @@ ProMode.receive = function(self, config, event)
 	end
 	if nearestNote then
 		nearestNote:switchAutoplay(true)
-		print(nearestNote.keyBind)
-	else
-		print("no note")
 	end
 end
 
