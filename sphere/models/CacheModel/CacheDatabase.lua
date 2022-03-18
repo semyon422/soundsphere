@@ -163,4 +163,25 @@ CacheDatabase.selectPairs = function(self, orders, conditions, ...)
 	), ...) or {}
 end
 
+--[[
+	SELECT * FROM
+	(
+		SELECT ROW_NUMBER() OVER(ORDER BY noteChartDatas.title ASC) AS pos, noteCharts.id as ncId, noteChartDatas.id as ncdId, noteCharts.setId
+		FROM noteChartDatas
+		INNER JOIN noteCharts ON noteChartDatas.hash = noteCharts.hash
+		WHERE ncId > 100
+	) A
+	WHERE ncId = 2406 and ncdId = 2961 and setId = 612;
+]]
+
+--[[
+    SELECT ROW_NUMBER() OVER(ORDER BY noteChartDatas.title ASC) AS pos, noteCharts.id as ncId, noteChartDatas.id as ncdId, noteCharts.setId,
+    CASE WHEN difficulty > 10 THEN 'hard'
+    ELSE 'easy'
+    END diff
+    FROM noteChartDatas
+	INNER JOIN noteCharts ON noteChartDatas.hash = noteCharts.hash
+	WHERE ncId > 100
+]]
+
 return CacheDatabase

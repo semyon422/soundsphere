@@ -50,18 +50,17 @@ end
 
 PreviewModel.getAudioPathPreview = function(self)
 	local selectModel = self.selectModel
-	local noteChartEntry = selectModel.noteChartSetItem.noteChartEntry
-	local noteChartDataEntry = selectModel.noteChartItem.noteChartDataEntry
 
-	if not noteChartEntry or not noteChartDataEntry then
+	local noteChartItem = selectModel.noteChartItem
+	if not noteChartItem then
 		return
 	end
 
-	local directoryPath = noteChartEntry.path:match("^(.+)/(.-)$") or ""
-	local audioPath = noteChartDataEntry.audioPath
+	local directoryPath = noteChartItem.path:match("^(.+)/(.-)$") or ""
+	local audioPath = noteChartItem.audioPath
 
 	if audioPath and audioPath ~= "" then
-		return directoryPath .. "/" .. audioPath, noteChartDataEntry.previewTime
+		return directoryPath .. "/" .. audioPath, noteChartItem.previewTime
 	end
 
 	return directoryPath .. "/preview.ogg", 0

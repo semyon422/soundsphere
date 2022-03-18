@@ -122,7 +122,7 @@ local NoteChartSetList = {
 	elements = {
 		{
 			type = "text",
-			key = "noteChartDataEntry.title",
+			key = "title",
 			onNew = false,
 			x = 44,
 			baseline = 45,
@@ -135,7 +135,7 @@ local NoteChartSetList = {
 		},
 		{
 			type = "text",
-			key = "noteChartDataEntry.artist",
+			key = "artist",
 			onNew = false,
 			x = 45,
 			baseline = 19,
@@ -169,7 +169,7 @@ local NoteChartList = {
 	elements = {
 		{
 			type = "text",
-			key = "noteChartDataEntry.name",
+			key = "name",
 			onNew = false,
 			x = 116,
 			baseline = 45,
@@ -182,7 +182,7 @@ local NoteChartList = {
 		},
 		{
 			type = "text",
-			key = "noteChartDataEntry.creator",
+			key = "creator",
 			onNew = true,
 			x = 117,
 			baseline = 19,
@@ -195,7 +195,7 @@ local NoteChartList = {
 		},
 		{
 			type = "text",
-			key = "noteChartDataEntry.inputMode",
+			key = "inputMode",
 			onNew = true,
 			x = 17,
 			baseline = 19,
@@ -208,7 +208,7 @@ local NoteChartList = {
 		},
 		{
 			type = "text",
-			key = "noteChartDataEntry.difficulty",
+			key = "difficulty",
 			onNew = false,
 			x = 0,
 			baseline = 45,
@@ -306,14 +306,14 @@ StageInfo.cells = {
 		x = 1, y = 3,
 		name = "bpm",
 		format = "%d",
-		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.bpm"
+		key = "gameController.selectModel.noteChartItem.bpm"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = {1, 2}, y = 3,
 		name = "duration",
-		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.length",
+		key = "gameController.selectModel.noteChartItem.length",
 		time = true
 	},
 	{
@@ -321,14 +321,14 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 2, y = 4,
 		name = "notes",
-		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.noteCount"
+		key = "gameController.selectModel.noteChartItem.noteCount"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "bar",
 		x = {3, 4}, y = 4,
 		name = "long notes",
-		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.longNoteRatio"
+		key = "gameController.selectModel.noteChartItem.longNoteRatio"
 	},
 	{
 		type = StageInfo.smallCell,
@@ -337,14 +337,14 @@ StageInfo.cells = {
 		name = "local offset",
 		format = "%d",
 		multiplier = 1000,
-		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.localOffset"
+		key = "gameController.selectModel.noteChartItem.localOffset"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 1, y = 4,
 		name = "level",
-		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.level"
+		key = "gameController.selectModel.noteChartItem.level"
 	},
 	{
 		type = StageInfo.largeCell,
