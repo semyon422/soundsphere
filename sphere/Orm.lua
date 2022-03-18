@@ -29,7 +29,14 @@ local function to_object(object, row, colnames)
 	object = object or {}
 	for i, k in ipairs(colnames) do
 		local value = row[i]
-		if type(value) == "cdata" then
+		if k:find("^__boolean_") then
+			k = k:sub(11)
+			if tonumber(value) == 1 then
+				value = true
+			else
+				value = false
+			end
+		elseif type(value) == "cdata" then
 			value = tonumber(value) or value
 		end
 		object[k] = value
