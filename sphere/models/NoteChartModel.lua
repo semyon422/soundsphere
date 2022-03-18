@@ -1,5 +1,6 @@
 local Class = require("aqua.util.Class")
 local NoteChartFactory			= require("notechart.NoteChartFactory")
+local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 
 local NoteChartModel = Class:new()
 
@@ -8,17 +9,17 @@ NoteChartModel.load = function(self)
 
 	local cacheManager = self.cacheModel.cacheManager
 
-	self.noteChartSetEntry = cacheManager:getNoteChartSetEntryById(config.noteChartSetEntryId)
+	self.noteChartSetEntry = CacheDatabase:selectNoteChartSetEntryById(config.noteChartSetEntryId)
 	if not self.noteChartSetEntry then
 		return
 	end
 
-	self.noteChartEntry = cacheManager:getNoteChartEntryById(config.noteChartEntryId)
+	self.noteChartEntry = CacheDatabase:selectNoteChartEntryById(config.noteChartEntryId)
 	if not self.noteChartEntry then
 		return
 	end
 
-	self.noteChartDataEntry = cacheManager:getNoteChartDataEntryById(config.noteChartDataEntryId)
+	self.noteChartDataEntry = CacheDatabase:selectNoteChartDataEntryById(config.noteChartDataEntryId)
 		or cacheManager:getEmptyNoteChartDataEntry(self.noteChartEntry.path)
 	self.scoreEntry = self.scoreModel.scoreManager:getScoreEntryById(config.scoreEntryId)
 end

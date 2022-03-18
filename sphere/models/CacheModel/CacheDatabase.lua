@@ -5,19 +5,11 @@ local CacheDatabase = {}
 CacheDatabase.dbpath = "userdata/charts.db"
 
 CacheDatabase.load = function(self)
-	local db = Orm:new()
-	self.db = db
+	self.db = Orm:new()
+	local db = self.db
 	db:open(self.dbpath)
 	db:exec(love.filesystem.read("sphere/models/CacheModel/database.sql"))
 	self.loaded = true
-
-	-- print(require("inspect")(self:selectAllIdPairs("noteCharts.setId DESC", "noteCharts.id < ?", 10)))
-	-- print(require("inspect")(self:selectPairs("level DESC")))
-	-- print(require("inspect")(self:selectAllIdPairs("level DESC")))
-
-	self.noteCharts = setmetatable({}, {__mode = "v"})
-	self.noteChartDatas = setmetatable({}, {__mode = "v"})
-	self.noteChartSets = setmetatable({}, {__mode = "v"})
 end
 
 CacheDatabase.unload = function(self)
@@ -91,6 +83,10 @@ CacheDatabase.selectNoteChartEntry = function(self, path)
 	return self.db:select("noteCharts", "path = ?", path)[1]
 end
 
+CacheDatabase.selectNoteChartEntryById = function(self, id)
+	return self.db:select("noteCharts", "id = ?", id)[1]
+end
+
 CacheDatabase.deleteNoteChartEntry = function(self, path)
 	return self.db:delete("noteCharts", "path = ?", path)
 end
@@ -113,6 +109,10 @@ CacheDatabase.selectNoteChartSetEntry = function(self, path)
 	return self.db:select("noteChartSets", "path = ?", path)[1]
 end
 
+CacheDatabase.selectNoteChartSetEntryById = function(self, id)
+	return self.db:select("noteChartSets", "id = ?", id)[1]
+end
+
 CacheDatabase.deleteNoteChartSetEntry = function(self, path)
 	return self.db:delete("noteChartSets", "path = ?", path)
 end
@@ -133,6 +133,10 @@ end
 
 CacheDatabase.selectNoteCharDataEntry = function(self, hash, index)
 	return self.db:select("noteChartDatas", "hash = ? and `index` = ?", hash, index)[1]
+end
+
+CacheDatabase.selectNoteChartDataEntryById = function(self, id)
+	return self.db:select("noteChartDatas", "id = ?", id)[1]
 end
 
 ----------------------------------------------------------------

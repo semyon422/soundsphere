@@ -18,7 +18,6 @@ NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
 end
 
 NoteChartLibraryModel.updateItems = function(self)
-	CacheDatabase:load()
 	self.items = CacheDatabase.db:query([[
 		SELECT noteChartDatas.*, noteChartDatas.id AS noteChartDataId, noteCharts.id AS noteChartId, noteCharts.path, noteCharts.setId,
 			CASE WHEN difficulty > 10 THEN TRUE
@@ -29,7 +28,6 @@ NoteChartLibraryModel.updateItems = function(self)
 		WHERE setId = ?
 		ORDER BY id
 	]], self.setId) or {}
-	CacheDatabase:unload()
 end
 
 -- NoteChartLibraryModel.sortItemsFunction = function(a, b)
@@ -47,7 +45,6 @@ end
 -- end
 
 NoteChartLibraryModel.getItemIndex = function(self, noteChartEntryId, noteChartDataEntryId)
-	CacheDatabase:load()
 	local result = CacheDatabase.db:query([[
 		SELECT * FROM
 		(
@@ -58,7 +55,6 @@ NoteChartLibraryModel.getItemIndex = function(self, noteChartEntryId, noteChartD
 		) A
 		WHERE setId = ? AND ncId = ? and ncdId = ?
 	]], self.setId, self.setId, noteChartEntryId, noteChartDataEntryId)
-	CacheDatabase:unload()
 	return result and result[1] and tonumber(result[1].pos) or 1
 end
 

@@ -11,7 +11,6 @@ NoteChartSetLibraryModel.construct = function(self)
 end
 
 NoteChartSetLibraryModel.updateItems = function(self)
-	CacheDatabase:load()
 	self.items = CacheDatabase.db:query([[
 		SELECT noteChartDatas.*, noteChartDatas.id AS noteChartDataId, noteCharts.id AS noteChartId, noteCharts.path, noteCharts.setId,
 			CASE WHEN difficulty > 10 THEN TRUE
@@ -21,11 +20,9 @@ NoteChartSetLibraryModel.updateItems = function(self)
 		INNER JOIN noteCharts ON noteChartDatas.hash = noteCharts.hash
 		ORDER BY id
 	]]) or {}
-	CacheDatabase:unload()
 end
 
 NoteChartSetLibraryModel.getItemIndex = function(self, noteChartSetEntryId, noteChartEntryId, noteChartDataEntryId)
-	CacheDatabase:load()
 	local result = CacheDatabase.db:query([[
 		SELECT * FROM
 		(
@@ -35,7 +32,6 @@ NoteChartSetLibraryModel.getItemIndex = function(self, noteChartSetEntryId, note
 		) A
 		WHERE setId = ? AND ncId = ? and ncdId = ?
 	]], noteChartSetEntryId, noteChartEntryId, noteChartDataEntryId)
-	CacheDatabase:unload()
 	return result and result[1] and tonumber(result[1].pos) or 1
 end
 

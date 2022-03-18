@@ -1,7 +1,6 @@
 local CacheDatabase				= require("sphere.models.CacheModel.CacheDatabase")
 local NoteChartFinder				= require("sphere.models.CacheModel.NoteChartFinder")
 local DifficultyModel			= require("sphere.models.DifficultyModel")
-local NoteChartFactory			= require("notechart.NoteChartFactory")
 local NoteChartDataEntryFactory	= require("notechart.NoteChartDataEntryFactory")
 local Log						= require("aqua.util.Log")
 local Class						= require("aqua.util.Class")
@@ -15,120 +14,7 @@ CacheManager.construct = function(self)
 	self.log.path = "userdata/cache.log"
 
 	self.state = 0
-
-	self:clear()
 end
-
-CacheManager.clear = function(self)
-	self.noteChartsAtSet = {}
-	self.noteChartsAtHash = {}
-	self.noteChartSets = {}
-	self.noteChartDatas = {}
-	self.noteCharts = {}
-	self.noteChartsId = {}
-	self.noteChartsPath = {}
-	self.noteChartSetsId = {}
-	self.noteChartSetsPath = {}
-	self.noteChartDatasHashIndex = {}
-end
-
-CacheManager.select = function(self)
-	local loaded = CacheDatabase.loaded
-	if not loaded then
-		CacheDatabase:load()
-	end
-
-	local noteChartsAtSet = {}
-	local noteChartsAtHash = {}
-	self.noteChartsAtSet = noteChartsAtSet
-	self.noteChartsAtHash = noteChartsAtHash
-
-	local noteChartSets = CacheDatabase:selectAllNoteChartSets()
-	self.noteChartSets = noteChartSets
-	for _, noteChartSet in ipairs(noteChartSets) do
-		noteChartsAtSet[noteChartSet.id] = {}
-	end
-
-	local noteChartDatas = CacheDatabase:selectAllNoteChartDatas()
-	self.noteChartDatas = noteChartDatas
-	for _, noteChartData in ipairs(noteChartDatas) do
-		noteChartsAtHash[noteChartData.hash] = {}
-	end
-
-	local noteCharts = CacheDatabase:selectAllNoteCharts()
-	self.noteCharts = noteCharts
-	for _, noteChart in ipairs(noteCharts) do
-		if noteChart.setId then
-			local setList = noteChartsAtSet[noteChart.setId]
-			if setList then
-				setList[#setList + 1] = noteChart
-			else
-				noteChart.setId = nil
-			end
-		end
-
-		if noteChart.hash then
-			local hashList = noteChartsAtHash[noteChart.hash]
-			if hashList then
-				hashList[#hashList + 1] = noteChart
-			else
-				noteChart.hash = nil
-			end
-		end
-	end
-
-	local noteChartsId = {}
-	local noteChartsPath = {}
-	local noteChartSetsId = {}
-	local noteChartSetsPath = {}
-	local noteChartDatasId = {}
-	local noteChartDatasHashIndex = {}
-	self.noteChartsId = noteChartsId
-	self.noteChartsPath = noteChartsPath
-	self.noteChartSetsId = noteChartSetsId
-	self.noteChartSetsPath = noteChartSetsPath
-	self.noteChartDatasId = noteChartDatasId
-	self.noteChartDatasHashIndex = noteChartDatasHashIndex
-
-	for i = 1, #noteCharts do
-		local entry = noteCharts[i]
-		noteChartsId[entry.id] = entry
-		noteChartsPath[entry.path] = entry
-	end
-	for i = 1, #noteChartSets do
-		local entry = noteChartSets[i]
-		noteChartSetsId[entry.id] = entry
-		noteChartSetsPath[entry.path] = entry
-	end
-	for i = 1, #noteChartDatas do
-		local entry = noteChartDatas[i]
-		noteChartDatasHashIndex[entry.hash] = noteChartDatasHashIndex[entry.hash] or {}
-		noteChartDatasHashIndex[entry.hash][entry.index] = entry
-		noteChartDatasId[entry.id] = entry
-	end
-
-	self.idObjects = CacheDatabase:selectAllIdPairs("setId ASC")
-
-	if not loaded then
-		CacheDatabase:unload()
-	end
-end
-
-----------------------------------------------------------------
-
-CacheManager.getNoteCharts = function(self)
-	return self.noteCharts
-end
-
-CacheManager.getNoteChartSets = function(self)
-	return self.noteChartSets
-end
-
-CacheManager.getNoteChartDatas = function(self)
-	return self.noteChartDatas
-end
-
-----------------------------------------------------------------
 
 CacheManager.getNoteChartSetEntry = function(self, entry)
 	local oldEntry = CacheDatabase:selectNoteChartSetEntry(entry.path)
@@ -179,50 +65,6 @@ CacheManager.deleteNoteChartSetEntry = function(self, entry)
 	for i = 1, #noteChartsAtSet do
 		self:deleteNoteChartEntry(noteChartsAtSet[i])
 	end
-end
-
-----------------------------------------------------------------
-
-CacheManager.getNoteChartEntryById = function(self, id)
-	return self.noteChartsId[id]
-end
-
-CacheManager.getNoteChartSetEntryById = function(self, id)
-	return self.noteChartSetsId[id]
-end
-
-----------------------------------------------------------------
-
-CacheManager.getNoteChartsAtSet = function(self, setId)
-	return self.noteChartsAtSet[setId]
-end
-
-CacheManager.getNoteChartsAtHash = function(self, hash)
-	return self.noteChartsAtHash[hash]
-end
-
-CacheManager.getNoteChartDataEntry = function(self, hash, index)
-	local t = self.noteChartDatasHashIndex
-	return t[hash] and t[hash][index]
-end
-
-CacheManager.getNoteChartDataEntryById = function(self, id)
-	return self.noteChartDatasId[id]
-end
-
-CacheManager.getAllNoteChartDataEntries = function(self, hash)
-	local t = {}
-
-	local hashIndex = self.noteChartDatasHashIndex[hash]
-	if not hashIndex then
-		return t
-	end
-
-	for k, v in pairs(hashIndex) do
-		t[k] = v
-	end
-
-	return t
 end
 
 ----------------------------------------------------------------
@@ -318,8 +160,6 @@ CacheManager.generateCacheFull = function(self, path, force)
 
 	self.state = 3
 	self:checkProgress()
-
-	CacheDatabase:unload()
 end
 
 CacheManager.lookup = function(self, directoryPath, recursive)
