@@ -1,5 +1,6 @@
 local Class = require("aqua.util.Class")
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
+local ObjectQuery = require("sphere.ObjectQuery")
 
 local NoteChartSetLibraryModel = Class:new()
 
@@ -10,6 +11,27 @@ NoteChartSetLibraryModel.construct = function(self)
 	self.items = {}
 	self.pages = {}
 	self.perPage = 10
+end
+
+NoteChartSetLibraryModel.load = function(self)
+	local objectQuery = ObjectQuery:new()
+	self.objectQuery = objectQuery
+	objectQuery.db = CacheDatabase.db
+
+	objectQuery.table = "noteChartDatas"
+	objectQuery.fields = {
+		"noteChartDatas.title",
+		"noteChartDatas.artist",
+		"noteChartDatas.id AS noteChartDataId",
+		"noteCharts.id AS noteChartId",
+		"noteCharts.path",
+		"noteCharts.setId",
+		objectQuery:newBooleanCase("tagged", "difficulty > 10"),
+	}
+	objectQuery:setInnerJoin("noteCharts", "noteChartDatas.hash = noteCharts.hash")
+	-- objectQuery.where = "noteChartDatas.inputMode = '4key'"
+	-- objectQuery.groupBy = "noteCharts.setId"
+	objectQuery.orderBy = "noteChartDatas.id ASC"
 end
 
 NoteChartSetLibraryModel.newItems = function(self)
@@ -59,25 +81,11 @@ NoteChartSetLibraryModel.loadPage = function(self, pageNum)
 	end
 
 	local perPage = self.perPage
-	pages[pageNum] = CacheDatabase.db:query([[
-		SELECT noteChartDatas.*, noteChartDatas.id AS noteChartDataId, noteCharts.id AS noteChartId, noteCharts.path, noteCharts.setId,
-			CASE WHEN difficulty > 10 THEN TRUE
-			ELSE FALSE
-			END __boolean_tagged
-		FROM noteChartDatas
-		INNER JOIN noteCharts ON noteChartDatas.hash = noteCharts.hash
-		ORDER BY id
-		LIMIT ?
-		OFFSET ?
-	]], perPage, (pageNum - 1) * perPage) or {}
+	pages[pageNum] = self.objectQuery:getPage(pageNum, perPage)
 end
 
 NoteChartSetLibraryModel.updateItems = function(self)
-	local itemsCount = CacheDatabase.db:query([[
-		SELECT COUNT(1) as c
-		FROM noteChartDatas
-		INNER JOIN noteCharts ON noteChartDatas.hash = noteCharts.hash
-	]])[1].c
+	local itemsCount = self.objectQuery:getCount()
 
 	self.items = newproxy(true)
 
@@ -90,17 +98,8 @@ NoteChartSetLibraryModel.updateItems = function(self)
 	end
 end
 
-NoteChartSetLibraryModel.getItemIndex = function(self, noteChartSetEntryId, noteChartEntryId, noteChartDataEntryId)
-	local result = CacheDatabase.db:query([[
-		SELECT * FROM
-		(
-			SELECT ROW_NUMBER() OVER(ORDER BY noteChartDatas.id) AS pos, noteCharts.id as ncId, noteChartDatas.id as ncdId, noteCharts.setId
-			FROM noteChartDatas
-			INNER JOIN noteCharts ON noteChartDatas.hash = noteCharts.hash
-		) A
-		WHERE setId = ? AND ncId = ? and ncdId = ?
-	]], noteChartSetEntryId, noteChartEntryId, noteChartDataEntryId)
-	return result and result[1] and tonumber(result[1].pos) or 1
+NoteChartSetLibraryModel.getItemIndex = function(self, noteChartDataEntryId, noteChartEntryId)
+	return self.objectQuery:getPosition(noteChartDataEntryId, noteChartEntryId) or 1
 end
 
 return NoteChartSetLibraryModel

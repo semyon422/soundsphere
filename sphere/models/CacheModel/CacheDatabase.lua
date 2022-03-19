@@ -25,50 +25,6 @@ CacheDatabase.commit = function(self)
 	return self.db:commit()
 end
 
-CacheDatabase.getNoteChartData = function(self, id)
-	local noteChartData = self.noteChartDatas[id]
-	if noteChartData then
-		return noteChartData
-	end
-	noteChartData = self.db:select("noteChartDatas", "id = ?", id)[1]
-	self.noteChartDatas[id] = noteChartData
-	return noteChartData
-end
-
-CacheDatabase.getNoteChart = function(self, id)
-	local noteChart = self.noteCharts[id]
-	if noteChart then
-		return noteChart
-	end
-	noteChart = self.db:select("noteCharts", "id = ?", id)[1]
-	self.noteCharts[id] = noteChart
-	return noteChart
-end
-
-CacheDatabase.getNoteChartSet = function(self, id)
-	local noteChartSet = self.noteChartSets[id]
-	if noteChartSet then
-		return noteChartSet
-	end
-	noteChartSet = self.db:select("noteChartSets", "id = ?", id)[1]
-	self.noteChartSets[id] = noteChartSet
-	return noteChartSet
-end
-
-----------------------------------------------------------------
-
-CacheDatabase.selectAllNoteCharts = function(self)
-	return self.db:select("noteCharts")
-end
-
-CacheDatabase.selectAllNoteChartSets = function(self)
-	return self.db:select("noteChartSets")
-end
-
-CacheDatabase.selectAllNoteChartDatas = function(self)
-	return self.db:select("noteChartDatas")
-end
-
 ----------------------------------------------------------------
 
 CacheDatabase.insertNoteChartEntry = function(self, entry)
@@ -138,54 +94,5 @@ end
 CacheDatabase.selectNoteChartDataEntryById = function(self, id)
 	return self.db:select("noteChartDatas", "id = ?", id)[1]
 end
-
-----------------------------------------------------------------
-
-CacheDatabase.selectAllIdPairs = function(self, orders, conditions, ...)
-	return self.db:query(([[
-		SELECT noteChartDatas.id AS noteChartDataId, noteCharts.id AS noteChartId, noteCharts.setId
-		FROM noteChartDatas
-		INNER JOIN noteCharts ON noteChartDatas.hash = noteCharts.hash
-		%s
-		ORDER BY %s
-	]]):format(
-		conditions and "WHERE " .. conditions or "",
-		orders
-	), ...) or {}
-end
-
-CacheDatabase.selectPairs = function(self, orders, conditions, ...)
-	return self.db:query(([[
-		SELECT noteChartDatas.*, noteCharts.id AS noteChartId, noteCharts.path, noteCharts.setId
-		FROM noteChartDatas
-		INNER JOIN noteCharts ON noteChartDatas.hash = noteCharts.hash
-		%s
-		ORDER BY %s
-	]]):format(
-		conditions and "WHERE " .. conditions or "",
-		orders
-	), ...) or {}
-end
-
---[[
-	SELECT * FROM
-	(
-		SELECT ROW_NUMBER() OVER(ORDER BY noteChartDatas.title ASC) AS pos, noteCharts.id as ncId, noteChartDatas.id as ncdId, noteCharts.setId
-		FROM noteChartDatas
-		INNER JOIN noteCharts ON noteChartDatas.hash = noteCharts.hash
-		WHERE ncId > 100
-	) A
-	WHERE ncId = 2406 and ncdId = 2961 and setId = 612;
-]]
-
---[[
-    SELECT ROW_NUMBER() OVER(ORDER BY noteChartDatas.title ASC) AS pos, noteCharts.id as ncId, noteChartDatas.id as ncdId, noteCharts.setId,
-    CASE WHEN difficulty > 10 THEN 'hard'
-    ELSE 'easy'
-    END diff
-    FROM noteChartDatas
-	INNER JOIN noteCharts ON noteChartDatas.hash = noteCharts.hash
-	WHERE ncId > 100
-]]
 
 return CacheDatabase
