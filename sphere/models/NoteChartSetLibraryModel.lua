@@ -47,12 +47,40 @@ NoteChartSetLibraryModel.updateItems = function(self)
 	return PaginatedLibraryModel.updateItems(self)
 end
 
+NoteChartSetLibraryModel.getPagePosition = function(self, noteChartDataId, noteChartId)
+	for pageNum, page in pairs(self.pages) do
+		local offset = (pageNum - 1) * self.perPage
+		for i, item in ipairs(page) do
+			if item.noteChartDataId == noteChartDataId and item.noteChartId == noteChartId then
+				return offset + i
+			end
+		end
+	end
+end
+
+NoteChartSetLibraryModel.getPageSetPosition = function(self, noteChartSetId)
+	for pageNum, page in pairs(self.pages) do
+		local offset = (pageNum - 1) * self.perPage
+		for i, item in ipairs(page) do
+			if item.setId == noteChartSetId then
+				return offset + i
+			end
+		end
+	end
+end
+
 NoteChartSetLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId, noteChartSetId)
 	local objectQuery = self.objectQuery
 	if not objectQuery.groupBy then
-		return objectQuery:getPosition(noteChartDataId, noteChartId) or 1
+		return
+			self:getPagePosition(noteChartDataId, noteChartId) or
+			objectQuery:getPosition(noteChartDataId, noteChartId) or
+			1
 	end
-	return objectQuery:getPosition(noteChartSetId) or 1
+	return
+		self:getPageSetPosition(noteChartSetId) or
+		objectQuery:getPosition(noteChartSetId) or
+		1
 end
 
 return NoteChartSetLibraryModel
