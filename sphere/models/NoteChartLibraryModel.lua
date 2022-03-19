@@ -1,65 +1,62 @@
-local Class = require("aqua.util.Class")
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
+local PaginatedLibraryModel = require("sphere.models.PaginatedLibraryModel")
+local ObjectQuery = require("sphere.ObjectQuery")
 
-local NoteChartLibraryModel = Class:new()
+local NoteChartLibraryModel = PaginatedLibraryModel:new()
 
 NoteChartLibraryModel.searchMode = "hide"
 NoteChartLibraryModel.setId = 1
 
-NoteChartLibraryModel.construct = function(self)
-	self.items = {}
+NoteChartLibraryModel.load = function(self)
+	local objectQuery = ObjectQuery:new()
+	self.objectQuery = objectQuery
+	objectQuery.db = CacheDatabase.db
+
+	objectQuery.table = "noteChartDatas"
+	objectQuery.fields = {
+		"noteChartDatas.*",
+		"noteChartDatas.id AS noteChartDataId",
+		"noteCharts.id AS noteChartId",
+		"noteCharts.path",
+		"noteCharts.setId",
+		objectQuery:newBooleanCase("tagged", "difficulty > 10"),
+	}
+	objectQuery:setInnerJoin("noteCharts", "noteChartDatas.hash = noteCharts.hash")
+	objectQuery.where = "setId = " .. self.setId
+	objectQuery.orderBy = [[
+		length(noteChartDatas.inputMode) ASC,
+		noteChartDatas.inputMode ASC,
+		noteChartDatas.difficulty ASC,
+		noteChartDatas.name ASC,
+		noteChartDatas.id ASC
+	]]
 end
 
 NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
-	if setId == self.setId then
-		return
-	end
 	self.setId = setId
 end
 
+NoteChartLibraryModel.getPageItem = function(self, itemIndex)
+	self.currentItemIndex = self.selectModel.noteChartItemIndex
+	return PaginatedLibraryModel.getPageItem(self, itemIndex)
+end
+
+NoteChartLibraryModel.getPage = function(self, pageNum, perPage)
+	return self.objectQuery:getPage(pageNum, perPage)
+end
+
 NoteChartLibraryModel.updateItems = function(self)
-	self.items = CacheDatabase.db:query([[
-		SELECT noteChartDatas.*, noteChartDatas.id AS noteChartDataId, noteCharts.id AS noteChartId, noteCharts.path, noteCharts.setId,
-			CASE WHEN difficulty > 10 THEN TRUE
-			ELSE FALSE
-			END __boolean_tagged
-		FROM noteChartDatas
-		INNER JOIN noteCharts ON noteChartDatas.hash = noteCharts.hash
-		WHERE setId = ?
-		ORDER BY id
-	]], self.setId) or {}
+	self.itemsCount = self.objectQuery:getCount()
+	self.objectQuery.where = "setId = " .. self.setId
+	return PaginatedLibraryModel.updateItems(self)
 end
 
--- NoteChartLibraryModel.sortItemsFunction = function(a, b)
--- 	a, b = a.noteChartDataEntry, b.noteChartDataEntry
--- 	if #a.inputMode ~= #b.inputMode then
--- 		return #a.inputMode < #b.inputMode
--- 	elseif a.inputMode ~= b.inputMode then
--- 		return a.inputMode < b.inputMode
--- 	elseif a.difficulty ~= b.difficulty then
--- 		return a.difficulty < b.difficulty
--- 	elseif a.name ~= b.name then
--- 		return a.name < b.name
--- 	end
--- 	return a.id < b.id
--- end
-
-NoteChartLibraryModel.getItemIndex = function(self, noteChartEntryId, noteChartDataEntryId)
-	local result = CacheDatabase.db:query([[
-		SELECT * FROM
-		(
-			SELECT ROW_NUMBER() OVER(ORDER BY noteChartDatas.id) AS pos, noteCharts.id as ncId, noteChartDatas.id as ncdId, noteCharts.setId
-			FROM noteChartDatas
-			INNER JOIN noteCharts ON noteChartDatas.hash = noteCharts.hash
-			WHERE setId = ?
-		) A
-		WHERE setId = ? AND ncId = ? and ncdId = ?
-	]], self.setId, self.setId, noteChartEntryId, noteChartDataEntryId)
-	return result and result[1] and tonumber(result[1].pos) or 1
+NoteChartLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId)
+	return self.objectQuery:getPosition(noteChartDataId, noteChartId) or 1
 end
 
-NoteChartLibraryModel.getItem = function(self, noteChartEntryId, noteChartDataEntryId)
-	local itemIndex = self:getItemIndex(noteChartEntryId, noteChartDataEntryId)
+NoteChartLibraryModel.getItem = function(self, noteChartDataId, noteChartId)
+	local itemIndex = self:getItemIndex(noteChartDataId, noteChartId)
 	if itemIndex then
 		return self.items[itemIndex]
 	end

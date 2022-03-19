@@ -13,8 +13,15 @@ SelectModel.load = function(self)
 	self.noteChartSetLibraryModel.collapse = config.collapse
 
 	self.collectionItemIndex = self.collectionModel:getItemIndex(config.collection)
-	self.noteChartSetItemIndex = self.noteChartSetLibraryModel:getItemIndex(config.noteChartDataEntryId, config.noteChartEntryId)
-	self.noteChartItemIndex = self.noteChartLibraryModel:getItemIndex(config.noteChartEntryId, config.noteChartDataEntryId)
+	self.noteChartSetItemIndex = self.noteChartSetLibraryModel:getItemIndex(
+		config.noteChartDataEntryId,
+		config.noteChartEntryId,
+		config.noteChartSetEntryId
+	)
+	self.noteChartItemIndex = self.noteChartLibraryModel:getItemIndex(
+		config.noteChartDataEntryId,
+		config.noteChartEntryId
+	)
 	self.scoreItemIndex = self.scoreLibraryModel:getItemIndex(config.scoreEntryId)
 
 	self.collectionItem = self.collectionModel.items[self.collectionItemIndex]
@@ -170,7 +177,8 @@ SelectModel.pullNoteChartSet = function(self, noUpdate)
 	local noteChartSetItems = self.noteChartSetLibraryModel.items
 	self.noteChartSetItemIndex = self.noteChartSetLibraryModel:getItemIndex(
 		self.config.noteChartDataEntryId,
-		self.config.noteChartEntryId
+		self.config.noteChartEntryId,
+		self.config.noteChartSetEntryId
 	)
 
 	local noteChartSetItem = noteChartSetItems[self.noteChartSetItemIndex]
@@ -189,8 +197,8 @@ SelectModel.pullNoteChart = function(self, noUpdate)
 
 	local noteChartItems = self.noteChartLibraryModel.items
 	self.noteChartItemIndex = self.noteChartLibraryModel:getItemIndex(
-		self.config.noteChartEntryId,
-		self.config.noteChartDataEntryId
+		self.config.noteChartDataEntryId,
+		self.config.noteChartEntryId
 	)
 
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]

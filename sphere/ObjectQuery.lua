@@ -45,7 +45,7 @@ ObjectQuery.getPage = function(self, pageNum, perPage)
 
 	table.insert(out, "LIMIT ? OFFSET ?")
 
-	return self.db:query(table.concat(out, " "), perPage, (pageNum - 1) * perPage)
+	return self.db:query(table.concat(out, " "), perPage, (pageNum - 1) * perPage) or {}
 end
 
 ObjectQuery.getCount = function(self)
@@ -64,9 +64,14 @@ ObjectQuery.getPosition = function(self, ...)
 
 	local fields = {("ROW_NUMBER() OVER(ORDER BY %s) AS pos"):format(self.orderBy or self.table .. "_id")}
 	local where = {}
-	for _, dbTable in ipairs(dbTables) do
-		table.insert(fields, dbTable .. ".id AS " .. dbTable .. "_id")
-		table.insert(where, dbTable .. "_id = ?")
+	if not self.groupBy then
+		for _, dbTable in ipairs(dbTables) do
+			table.insert(fields, dbTable .. ".id AS " .. dbTable .. "_id")
+			table.insert(where, dbTable .. "_id = ?")
+		end
+	else
+		table.insert(fields, self.groupBy .. " AS " .. self.groupBy:gsub("%.", "_"))
+		table.insert(where, self.groupBy:gsub("%.", "_") .. " = ?")
 	end
 
 	local out = {}
