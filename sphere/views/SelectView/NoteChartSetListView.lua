@@ -12,6 +12,7 @@ NoteChartSetListView.construct = function(self)
 end
 
 NoteChartSetListView.reloadItems = function(self)
+	self.state.stateCounter = self.gameController.selectModel.noteChartSetStateCounter
 	self.state.items = self.gameController.noteChartSetLibraryModel.items
 end
 

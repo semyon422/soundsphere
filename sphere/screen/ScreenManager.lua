@@ -14,17 +14,18 @@ ScreenManager.construct = function(self)
 			coroutine.yield()
 			self.currentScreen:unload()
 			self.currentScreen = screen
-			local ok, err = xpcall(screen.load, debug.traceback, screen)
-			if not ok then
-				pcall(screen.unload, screen)
-				screen = self.fallback
-				if not screen then
-					error(err)
-				end
-				self.currentScreen = screen
-				assert(xpcall(screen.load, debug.traceback, screen))
-				screen.error = err
-			end
+			-- local ok, err = xpcall(screen.load, debug.traceback, screen)
+			self.screenToLoad = screen
+			-- if not ok then
+			-- 	pcall(screen.unload, screen)
+			-- 	screen = self.fallback
+			-- 	if not screen then
+			-- 		error(err)
+			-- 	end
+			-- 	self.currentScreen = screen
+			-- 	assert(xpcall(screen.load, debug.traceback, screen))
+			-- 	screen.error = err
+			-- end
 			self.transition:fadeOut()
 			coroutine.yield()
 		end
@@ -55,6 +56,11 @@ ScreenManager.update = function(self, dt)
 	if transition.needResume then
 		assert(coroutine.resume(self.coroutine))
 		transition.needResume = false
+	end
+
+	if self.screenToLoad then
+		self.screenToLoad:load()
+		self.screenToLoad = nil
 	end
 end
 

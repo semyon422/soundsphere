@@ -5,6 +5,9 @@ local CacheDatabase = {}
 CacheDatabase.dbpath = "userdata/charts.db"
 
 CacheDatabase.load = function(self)
+	if self.loaded then
+		return
+	end
 	self.db = Orm:new()
 	local db = self.db
 	db:open(self.dbpath)
@@ -13,6 +16,9 @@ CacheDatabase.load = function(self)
 end
 
 CacheDatabase.unload = function(self)
+	if not self.loaded then
+		return
+	end
 	self.loaded = false
 	return self.db:close()
 end

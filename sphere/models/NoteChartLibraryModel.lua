@@ -1,6 +1,8 @@
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 local PaginatedLibraryModel = require("sphere.models.PaginatedLibraryModel")
 local ObjectQuery = require("sphere.ObjectQuery")
+local aquathread = require("aqua.thread")
+local aquatimer = require("aqua.timer")
 
 local NoteChartLibraryModel = PaginatedLibraryModel:new()
 
@@ -10,6 +12,8 @@ NoteChartLibraryModel.setId = 1
 NoteChartLibraryModel.load = function(self)
 	local objectQuery = ObjectQuery:new()
 	self.objectQuery = objectQuery
+
+	CacheDatabase:load()
 	objectQuery.db = CacheDatabase.db
 
 	objectQuery.table = "noteChartDatas"
@@ -41,17 +45,33 @@ NoteChartLibraryModel.getPageItem = function(self, itemIndex)
 	return PaginatedLibraryModel.getPageItem(self, itemIndex)
 end
 
-NoteChartLibraryModel.getPage = function(self, pageNum, perPage)
+NoteChartLibraryModel._getPage = function(self, pageNum, perPage)
+	if pageNum <= 0 then
+		return {}
+	end
 	return self.objectQuery:getPage(pageNum, perPage)
+end
+
+local getPage = aquathread.async(function(pageNum, perPage, setId)
+	local NoteChartLibraryModel = require("sphere.models.NoteChartLibraryModel")
+	local noteChartLibraryModel = NoteChartLibraryModel:new()
+	noteChartLibraryModel.setId = setId
+	noteChartLibraryModel:load()
+	return noteChartLibraryModel:_getPage(pageNum, perPage)
+end)
+
+NoteChartLibraryModel.getPage = function(self, pageNum, perPage)
+	return getPage(pageNum, perPage, self.setId)
 end
 
 NoteChartLibraryModel.updateItems = function(self)
 	self.itemsCount = self.objectQuery:getCount()
 	self.objectQuery.where = "setId = " .. self.setId
+	self.requestComplete = false
 	return PaginatedLibraryModel.updateItems(self)
 end
 
-NoteChartLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId)
+NoteChartLibraryModel._getItemIndex = function(self, noteChartDataId, noteChartId)
 	return self.objectQuery:getPosition(noteChartDataId, noteChartId) or 1
 end
 
@@ -60,6 +80,17 @@ NoteChartLibraryModel.getItem = function(self, noteChartDataId, noteChartId)
 	if itemIndex then
 		return self.items[itemIndex]
 	end
+end
+
+local getItemIndex = aquathread.async(function(noteChartDataId, noteChartId)
+	local NoteChartLibraryModel = require("sphere.models.NoteChartLibraryModel")
+	local noteChartLibraryModel = NoteChartLibraryModel:new()
+	noteChartLibraryModel:load()
+	return noteChartLibraryModel:_getItemIndex(noteChartDataId, noteChartId)
+end)
+
+NoteChartLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId)
+	return getItemIndex(noteChartDataId, noteChartId)
 end
 
 return NoteChartLibraryModel

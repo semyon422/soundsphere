@@ -1,10 +1,14 @@
 local Class = require("aqua.util.Class")
+local aquatimer = require("aqua.timer")
 
 local PaginatedLibraryModel = Class:new()
 
 PaginatedLibraryModel.construct = function(self)
 	self.items = {}
 	self.pages = {}
+	self.requestComplete = false
+	self.requestPageNum = 0
+	self.requestDelay = 1
 	self.perPage = 10
 	self.itemsCount = 1
 	self.currentItemIndex = 1
@@ -24,13 +28,11 @@ PaginatedLibraryModel.getPageItem = function(self, itemIndex)
 		return
 	end
 
-	self:loadPage(pageNum)
-	self:unloadPages(self.currentItemIndex)
-	return self.pages[pageNum][pageItemIndex]
+	local pages = self.pages
+	return pages[pageNum] and pages[pageNum][pageItemIndex]
 end
 
-PaginatedLibraryModel.unloadPages = function(self, itemIndex)
-	local currentPageNum = self:getPageNum(itemIndex)
+PaginatedLibraryModel.unloadPages = function(self, currentPageNum)
 	local pages = self.pages
 	for pageNum in pairs(pages) do
 		if math.abs(pageNum - currentPageNum) > 1 then
@@ -39,19 +41,31 @@ PaginatedLibraryModel.unloadPages = function(self, itemIndex)
 	end
 end
 
-PaginatedLibraryModel.loadPage = function(self, pageNum)
-	local pages = self.pages
-	if pages[pageNum] then
+PaginatedLibraryModel.update = function(self)
+	local currentPageNum = self:getPageNum(self.currentItemIndex)
+
+	self:unloadPages(currentPageNum)
+	if currentPageNum == self.requestPageNum and self.requestComplete then
 		return
 	end
+	self.requestComplete = true
+	self.requestPageNum = currentPageNum
 
-	if pageNum <= 0 then
-		pages[pageNum] = {}
-		return
-	end
+	print("loadPagesDebounce")
+	aquatimer.debounce(self, "loadPagesDebounce", 1, self.loadPages, self)
+end
 
+PaginatedLibraryModel.loadPages = function(self)
+	local currentPageNum = self:getPageNum(self.currentItemIndex)
 	local perPage = self.perPage
-	pages[pageNum] = self:getPage(pageNum, perPage)
+	local pages = self.pages
+	print("loadPages")
+	for pageNum = currentPageNum - 1, currentPageNum + 1 do
+		if not pages[pageNum] then
+			pages[pageNum] = self:getPage(pageNum, perPage)
+			print("PAGE", pageNum, #pages[pageNum])
+		end
+	end
 end
 
 PaginatedLibraryModel.updateItems = function(self)

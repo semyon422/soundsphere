@@ -1,6 +1,7 @@
 local aquaevent					= require("aqua.event")
 local Class						= require("aqua.util.Class")
-local ThreadPool				= require("aqua.thread.ThreadPool")
+local aquathread				= require("aqua.thread")
+local aquatimer					= require("aqua.timer")
 local ConfigModel				= require("sphere.models.ConfigModel")
 local ScoreModel				= require("sphere.models.ScoreModel")
 local DiscordModel				= require("sphere.models.DiscordModel")
@@ -255,7 +256,8 @@ end
 GameController.update = function(self, dt)
 	local startTime = love.timer.getTime()
 
-	ThreadPool:update()
+	aquathread:update()
+	aquatimer:update()
 
 	self.discordModel:update()
 	self.notificationModel:update()
@@ -264,6 +266,9 @@ GameController.update = function(self, dt)
 	self.onlineController:update()
 	self.fpsLimiter:update()
 	self.windowManager:update()
+
+	self.noteChartSetLibraryModel:update()
+	self.noteChartLibraryModel:update()
 
 	self.frameTimeView.updateFrameTime = love.timer.getTime() - startTime
 end
