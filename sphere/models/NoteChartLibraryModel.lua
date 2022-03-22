@@ -71,8 +71,23 @@ NoteChartLibraryModel.updateItems = function(self)
 	return PaginatedLibraryModel.updateItems(self)
 end
 
+NoteChartLibraryModel.getPagePosition = function(self, noteChartDataId, noteChartId)
+	for pageNum, page in pairs(self.pages) do
+		local offset = (pageNum - 1) * self.perPage
+		for i, item in ipairs(page) do
+			if item.noteChartDataId == noteChartDataId and item.noteChartId == noteChartId then
+				return offset + i
+			end
+		end
+	end
+end
+
 NoteChartLibraryModel._getItemIndex = function(self, noteChartDataId, noteChartId)
-	return self.objectQuery:getPosition(noteChartDataId, noteChartId) or 1
+	print("_GET", self.objectQuery.where)
+	return
+		self:getPagePosition(noteChartDataId, noteChartId) or
+		self.objectQuery:getPosition(noteChartDataId, noteChartId) or
+		1
 end
 
 NoteChartLibraryModel.getItem = function(self, noteChartDataId, noteChartId)
@@ -82,15 +97,16 @@ NoteChartLibraryModel.getItem = function(self, noteChartDataId, noteChartId)
 	end
 end
 
-local getItemIndex = aquathread.async(function(noteChartDataId, noteChartId)
+local getItemIndex = aquathread.async(function(noteChartDataId, noteChartId, setId)
 	local NoteChartLibraryModel = require("sphere.models.NoteChartLibraryModel")
 	local noteChartLibraryModel = NoteChartLibraryModel:new()
+	noteChartLibraryModel.setId = setId
 	noteChartLibraryModel:load()
 	return noteChartLibraryModel:_getItemIndex(noteChartDataId, noteChartId)
 end)
 
 NoteChartLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId)
-	return getItemIndex(noteChartDataId, noteChartId)
+	return getItemIndex(noteChartDataId, noteChartId, self.setId)
 end
 
 return NoteChartLibraryModel
