@@ -22,8 +22,10 @@ SelectModel.load = function(self)
 	self.noteChartSetStateCounter = 1
 	self.noteChartStateCounter = 1
 
+	self.scrollDebounceDelay = 0.1
+
 	aquatimer.debounce(
-		self, "noteChartSetDebounce", 1,
+		self, "noteChartSetDebounce", self.scrollDebounceDelay,
 		self.pullNoteChartSet, self
 	)
 end
@@ -43,7 +45,7 @@ SelectModel.setSortFunction = function(self, sortFunctionName)
 	self.sortModel.name = sortFunctionName
 	self.noteChartSetLibraryModel.sortFunction = self.sortModel:getSortFunction()
 	aquatimer.debounce(
-		self, "noteChartSetDebounce", 1,
+		self, "noteChartSetDebounce", self.scrollDebounceDelay,
 		self.pullNoteChartSet, self
 	)
 end
@@ -62,7 +64,7 @@ SelectModel.changeSearchMode = function(self)
 	end
 	self:setSearchMode(config.searchMode)
 	aquatimer.debounce(
-		self, "noteChartSetDebounce", 1,
+		self, "noteChartSetDebounce", self.scrollDebounceDelay,
 		self.pullNoteChartSet, self
 	)
 end
@@ -72,7 +74,7 @@ SelectModel.changeCollapse = function(self)
 	config.collapse = not config.collapse
 	self.noteChartSetLibraryModel.collapse = config.collapse
 	aquatimer.debounce(
-		self, "noteChartSetDebounce", 1,
+		self, "noteChartSetDebounce", self.scrollDebounceDelay,
 		self.pullNoteChartSet, self
 	)
 end
@@ -86,7 +88,7 @@ SelectModel.updateSearch = function(self)
 	if self.config.searchString ~= newSearchString then
 		self.config.searchString = newSearchString
 		aquatimer.debounce(
-			self, "noteChartSetDebounce", 1,
+			self, "noteChartSetDebounce", self.scrollDebounceDelay,
 			self.pullNoteChartSet, self
 		)
 	end
@@ -108,7 +110,7 @@ SelectModel.scrollCollection = function(self, direction, destination)
 	self.config.collection = collectionItem.path
 
 	aquatimer.debounce(
-		self, "noteChartSetDebounce", 1,
+		self, "noteChartSetDebounce", self.scrollDebounceDelay,
 		self.pullNoteChartSet, self, oldCollectionItem.path == collectionItem.path
 	)
 end
@@ -139,7 +141,7 @@ SelectModel.scrollNoteChartSet = function(self, direction, destination)
 	self.config.noteChartDataEntryId = noteChartSetItem.noteChartDataId
 
 	aquatimer.debounce(
-		self, "noteChartDebounce", 1,
+		self, "noteChartDebounce", self.scrollDebounceDelay,
 		self.pullNoteChart, self, oldNoteChartSetItem and oldNoteChartSetItem.setId == noteChartSetItem.setId
 	)
 end
@@ -161,13 +163,14 @@ SelectModel.scrollNoteChart = function(self, direction, destination)
 	self.config.noteChartSetEntryId = noteChartItem.setId
 	self.config.noteChartEntryId = noteChartItem.noteChartId
 	self.config.noteChartDataEntryId = noteChartItem.noteChartDataId
+	print("SCROLL", self.noteChartItemIndex, self.config.noteChartDataEntryId, self.config.noteChartEntryId)
 
 	aquatimer.debounce(
-		self, "noteChartSetDebounce", 1,
+		self, "noteChartSetDebounce", self.scrollDebounceDelay,
 		self.pullNoteChartSet, self, true
 	)
 	aquatimer.debounce(
-		self, "scoreDebounce", 1,
+		self, "scoreDebounce", self.scrollDebounceDelay,
 		self.pullScore, self
 	)
 end
@@ -205,7 +208,10 @@ SelectModel.pullNoteChartSet = aquathread.coro(function(self, noUpdate)
 		self.config.noteChartSetEntryId
 	)
 
-	self.noteChartSetStateCounter = self.noteChartSetStateCounter + 1
+	if not noUpdate then
+		self.noteChartSetStateCounter = self.noteChartSetStateCounter + 1
+	end
+
 	local noteChartSetItem = noteChartSetItems[self.noteChartSetItemIndex]
 	self.noteChartSetItem = noteChartSetItem
 	if noteChartSetItem then
@@ -215,6 +221,7 @@ SelectModel.pullNoteChartSet = aquathread.coro(function(self, noUpdate)
 end)
 
 SelectModel.pullNoteChart = aquathread.coro(function(self, noUpdate)
+	print("noUpdate", noUpdate)
 	if not noUpdate then
 		self.noteChartLibraryModel:setNoteChartSetId(self.config.noteChartSetEntryId)
 		self.noteChartLibraryModel:updateItems()
@@ -229,8 +236,12 @@ SelectModel.pullNoteChart = aquathread.coro(function(self, noUpdate)
 		self.config.noteChartDataEntryId,
 		self.config.noteChartEntryId
 	)
+	print("PULL", self.noteChartItemIndex, self.config.noteChartDataEntryId, self.config.noteChartEntryId)
 
-	self.noteChartStateCounter = self.noteChartStateCounter + 1
+	if not noUpdate then
+		self.noteChartStateCounter = self.noteChartStateCounter + 1
+	end
+
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
 	self.noteChartItem = noteChartItem
 	if not noteChartItem then

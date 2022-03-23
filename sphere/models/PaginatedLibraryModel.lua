@@ -12,6 +12,7 @@ PaginatedLibraryModel.construct = function(self)
 	self.perPage = 10
 	self.itemsCount = 1
 	self.currentItemIndex = 1
+	self.scrollDebounceDelay = 0.001
 end
 
 PaginatedLibraryModel.getPageNum = function(self, itemIndex)
@@ -52,7 +53,7 @@ PaginatedLibraryModel.update = function(self)
 	self.requestPageNum = currentPageNum
 
 	print("loadPagesDebounce")
-	aquatimer.debounce(self, "loadPagesDebounce", 1, self.loadPages, self)
+	aquatimer.debounce(self, "loadPagesDebounce", self.scrollDebounceDelay, self.loadPages, self)
 end
 
 PaginatedLibraryModel.loadPages = function(self)
