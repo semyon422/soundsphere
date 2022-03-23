@@ -56,11 +56,16 @@ function Orm:exec(query)
 	return self.c:exec(query)
 end
 
-function Orm:query(query, ...)
+function Orm:stmt(query, ...)
 	local stmt = self.c:prepare(query)
 	for i = 1, select("#", ...) do
 		stmt:bind1(i, select(i, ...))
 	end
+	return stmt
+end
+
+function Orm:query(...)
+	local stmt = self:stmt(...)
 
 	local colnames = {}
 	local objects = {}
