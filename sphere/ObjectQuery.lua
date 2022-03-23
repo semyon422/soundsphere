@@ -26,7 +26,7 @@ ObjectQuery.concatJoins = function(self)
 	return table.concat(out, "\n")
 end
 
-ObjectQuery.getPage = function(self, pageNum, perPage)
+ObjectQuery.getQueryParams = function(self)
 	local out = {}
 
 	table.insert(out, ("SELECT %s"):format(table.concat(self.fields, ", ")))
@@ -43,9 +43,11 @@ ObjectQuery.getPage = function(self, pageNum, perPage)
 		table.insert(out, ("ORDER BY %s"):format(self.orderBy))
 	end
 
-	table.insert(out, "LIMIT ? OFFSET ?")
+	return table.concat(out, " ")
+end
 
-	return self.db:query(table.concat(out, " "), perPage, (pageNum - 1) * perPage) or {}
+ObjectQuery.getPage = function(self, pageNum, perPage)
+	return self.db:query(self:getQueryParams() .. " LIMIT ? OFFSET ?", perPage, (pageNum - 1) * perPage) or {}
 end
 
 ObjectQuery.getCount = function(self)
