@@ -26,7 +26,7 @@ Replay.receive = function(self, event)
 	events[#events + 1] = {
 		event[1],
 		name = event.name,
-		time = event.time,
+		time = event.time - self.timeEngine.inputOffset,
 	}
 end
 
