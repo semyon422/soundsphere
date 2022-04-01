@@ -22,12 +22,7 @@ SelectModel.load = function(self)
 	self.noteChartSetStateCounter = 1
 	self.noteChartStateCounter = 1
 
-	self.scrollDebounceDelay = 0.1
-
-	aquatimer.debounce(
-		self, "noteChartSetDebounce", self.scrollDebounceDelay,
-		self.pullNoteChartSet, self
-	)
+	self:pullNoteChartSet()
 end
 
 SelectModel.setSearchMode = function(self, searchMode)
@@ -44,10 +39,7 @@ SelectModel.setSortFunction = function(self, sortFunctionName)
 	config.sortFunction = sortFunctionName
 	self.sortModel.name = sortFunctionName
 	self.noteChartSetLibraryModel.sortFunction = self.sortModel:getSortFunction()
-	aquatimer.debounce(
-		self, "noteChartSetDebounce", self.scrollDebounceDelay,
-		self.pullNoteChartSet, self
-	)
+	self:pullNoteChartSet()
 end
 
 SelectModel.scrollSortFunction = function(self, delta)
@@ -63,20 +55,14 @@ SelectModel.changeSearchMode = function(self)
 		config.searchMode = "hide"
 	end
 	self:setSearchMode(config.searchMode)
-	aquatimer.debounce(
-		self, "noteChartSetDebounce", self.scrollDebounceDelay,
-		self.pullNoteChartSet, self
-	)
+	self:pullNoteChartSet()
 end
 
 SelectModel.changeCollapse = function(self)
 	local config = self.config
 	config.collapse = not config.collapse
 	self.noteChartSetLibraryModel.collapse = config.collapse
-	aquatimer.debounce(
-		self, "noteChartSetDebounce", self.scrollDebounceDelay,
-		self.pullNoteChartSet, self
-	)
+	self:pullNoteChartSet()
 end
 
 SelectModel.update = function(self)
@@ -87,10 +73,7 @@ SelectModel.updateSearch = function(self)
 	local newSearchString = self.searchModel.searchString
 	if self.config.searchString ~= newSearchString then
 		self.config.searchString = newSearchString
-		aquatimer.debounce(
-			self, "noteChartSetDebounce", self.scrollDebounceDelay,
-			self.pullNoteChartSet, self
-		)
+		self:pullNoteChartSet()
 	end
 end
 
@@ -109,10 +92,7 @@ SelectModel.scrollCollection = function(self, direction, destination)
 	self.collectionItem = collectionItem
 	self.config.collection = collectionItem.path
 
-	aquatimer.debounce(
-		self, "noteChartSetDebounce", self.scrollDebounceDelay,
-		self.pullNoteChartSet, self, oldCollectionItem.path == collectionItem.path
-	)
+	self:pullNoteChartSet(oldCollectionItem.path == collectionItem.path)
 end
 
 SelectModel.scrollRandom = function(self)
@@ -140,10 +120,7 @@ SelectModel.scrollNoteChartSet = function(self, direction, destination)
 	self.config.noteChartEntryId = noteChartSetItem.noteChartId
 	self.config.noteChartDataEntryId = noteChartSetItem.noteChartDataId
 
-	aquatimer.debounce(
-		self, "noteChartDebounce", self.scrollDebounceDelay,
-		self.pullNoteChart, self, oldNoteChartSetItem and oldNoteChartSetItem.setId == noteChartSetItem.setId
-	)
+	self:pullNoteChart(oldNoteChartSetItem and oldNoteChartSetItem.setId == noteChartSetItem.setId)
 end
 
 SelectModel.scrollNoteChart = function(self, direction, destination)
@@ -165,14 +142,8 @@ SelectModel.scrollNoteChart = function(self, direction, destination)
 	self.config.noteChartDataEntryId = noteChartItem.noteChartDataId
 	print("SCROLL", self.noteChartItemIndex, self.config.noteChartDataEntryId, self.config.noteChartEntryId)
 
-	aquatimer.debounce(
-		self, "noteChartSetDebounce", self.scrollDebounceDelay,
-		self.pullNoteChartSet, self, true
-	)
-	aquatimer.debounce(
-		self, "scoreDebounce", self.scrollDebounceDelay,
-		self.pullScore, self
-	)
+	self:pullNoteChartSet(true)
+	self:pullScore()
 end
 
 SelectModel.scrollScore = function(self, direction, destination)
@@ -190,16 +161,12 @@ SelectModel.scrollScore = function(self, direction, destination)
 	self.config.scoreEntryId = scoreItem.scoreEntry.id
 end
 
-SelectModel.pullNoteChartSet = aquathread.coro(function(self, noUpdate)
+SelectModel.pullNoteChartSet = function(self, noUpdate)
 	if not noUpdate then
 		self.searchModel:setCollection(self.collectionItem)
 		self.noteChartLibraryModel:updateItems()
 		self.noteChartSetLibraryModel:updateItems()
 	end
-
-	aquatimer.wait(function()
-		return self.noteChartSetLibraryModel.requestComplete and self.noteChartLibraryModel.requestComplete
-	end)
 
 	local noteChartSetItems = self.noteChartSetLibraryModel.items
 	self.noteChartSetItemIndex = self.noteChartSetLibraryModel:getItemIndex(
@@ -218,25 +185,21 @@ SelectModel.pullNoteChartSet = aquathread.coro(function(self, noUpdate)
 		self.config.noteChartSetEntryId = noteChartSetItem.setId
 		self:pullNoteChart(noUpdate)
 	end
-end)
+end
 
-SelectModel.pullNoteChart = aquathread.coro(function(self, noUpdate)
+SelectModel.pullNoteChart = function(self, noUpdate)
 	print("noUpdate", noUpdate)
 	if not noUpdate then
 		self.noteChartLibraryModel:setNoteChartSetId(self.config.noteChartSetEntryId)
 		self.noteChartLibraryModel:updateItems()
 	end
 
-	aquatimer.wait(function()
-		return self.noteChartLibraryModel.requestComplete
-	end)
-
 	local noteChartItems = self.noteChartLibraryModel.items
 	self.noteChartItemIndex = self.noteChartLibraryModel:getItemIndex(
 		self.config.noteChartDataEntryId,
-		self.config.noteChartEntryId
+		self.config.noteChartEntryId,
+		self.config.noteChartSetEntryId
 	)
-	print("PULL", self.noteChartItemIndex, self.config.noteChartDataEntryId, self.config.noteChartEntryId)
 
 	if not noUpdate then
 		self.noteChartStateCounter = self.noteChartStateCounter + 1
@@ -251,9 +214,9 @@ SelectModel.pullNoteChart = aquathread.coro(function(self, noUpdate)
 	self.config.noteChartEntryId = noteChartItem.noteChartId
 	self.config.noteChartDataEntryId = noteChartItem.noteChartDataId
 	self:pullScore(noUpdate)
-end)
+end
 
-SelectModel.pullScore = aquathread.coro(function(self, noUpdate)
+SelectModel.pullScore = function(self, noUpdate)
 	local noteChartItems = self.noteChartLibraryModel.items
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
 
@@ -275,6 +238,6 @@ SelectModel.pullScore = aquathread.coro(function(self, noUpdate)
 	if scoreItem then
 		self.config.scoreEntryId = scoreItem.scoreEntry.id
 	end
-end)
+end
 
 return SelectModel

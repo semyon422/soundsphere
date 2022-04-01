@@ -52,7 +52,7 @@ PreviewModel.getAudioPathPreview = function(self)
 	local selectModel = self.selectModel
 
 	local noteChartItem = selectModel.noteChartItem
-	if not noteChartItem then
+	if not noteChartItem or not noteChartItem.path or not noteChartItem.audioPath then
 		return
 	end
 

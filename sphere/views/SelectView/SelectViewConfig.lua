@@ -9,7 +9,9 @@ end
 
 local formatDifficulty = function(difficulty)
 	local format = "%.2f"
-	if difficulty >= 10000 then
+	if not difficulty then
+		return ""
+	elseif difficulty >= 10000 then
 		format = "%s"
 		difficulty = "????"
 	elseif difficulty >= 100 then
