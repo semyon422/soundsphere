@@ -18,6 +18,7 @@ ReplayModel.load = function(self)
 	elseif self.mode == "replay" then
 		self.replay:reset()
 	end
+	self.replay.timeEngine = self.rhythmModel.timeEngine
 end
 
 ReplayModel.setMode = function(self, mode)
@@ -42,6 +43,8 @@ ReplayModel.update = function(self)
 			return
 		end
 
+		nextEvent.baseTime = nextEvent.baseTime or nextEvent.time
+		nextEvent.time = nextEvent.baseTime + self.rhythmModel.timeEngine.inputOffset
 		if self.currentTime >= nextEvent.time then
 			self:send(nextEvent)
 			replay:step()

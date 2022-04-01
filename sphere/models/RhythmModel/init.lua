@@ -233,7 +233,7 @@ RhythmModel.setTimeToPrepare = function(self, timeToPrepare)
 end
 
 RhythmModel.setInputOffset = function(self, offset)
-	self.timeEngine.inputOffset = offset
+	self.timeEngine.inputOffset = math.floor(offset * 1024) / 1024
 end
 
 RhythmModel.setVisualOffset = function(self, offset)
