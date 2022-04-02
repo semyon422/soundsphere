@@ -1,3 +1,4 @@
+local TimedCache = require("aqua.util.TimedCache")
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 local LibraryModel = require("sphere.models.LibraryModel")
 
@@ -9,23 +10,26 @@ NoteChartSetLibraryModel.collapse = false
 NoteChartSetLibraryModel.load = function(self)
 	self.entry = CacheDatabase.EntryStruct()
 	self.itemsCount = CacheDatabase.noteChartSetItemsCount
+	self.itemsCache = TimedCache:new()
+	self.itemsCache.getObject = function(_, itemIndex)
+		return setmetatable({}, {__index = function(t, k)
+			local entry = CacheDatabase.noteChartSetItems[itemIndex - 1]
+			if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" then
+				return entry[k]
+			end
+			local noteChart = CacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
+			local noteChartData = CacheDatabase:getCachedEntry("noteChartDatas", entry.noteChartDataId)
+			return noteChartData[k] or noteChart[k]
+		end})
+	end
+end
+
+NoteChartSetLibraryModel.update = function(self)
+	self.itemsCache:update()
 end
 
 NoteChartSetLibraryModel.getItemByIndex = function(self, itemIndex)
-	self.currentItemIndex = self.selectModel.noteChartSetItemIndex
-	if itemIndex < 1 or itemIndex > self.itemsCount then
-		return
-	end
-	return setmetatable({}, {__index = function(t, k)
-		local entry = CacheDatabase.noteChartSetItems[itemIndex - 1]
-		if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" then
-			return entry[k]
-		end
-		-- local noteChartSet = CacheDatabase:getCachedEntry("noteChartSets", entry.setId)
-		local noteChart = CacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
-		local noteChartData = CacheDatabase:getCachedEntry("noteChartDatas", entry.noteChartDataId)
-		return noteChartData[k] or noteChart[k]
-	end})
+	return self.itemsCache:getObject(itemIndex)
 end
 
 NoteChartSetLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId, noteChartSetId)

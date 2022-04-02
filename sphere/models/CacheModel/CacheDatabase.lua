@@ -1,3 +1,4 @@
+local TimedCache = require("aqua.util.TimedCache")
 local Orm = require("sphere.Orm")
 local ObjectQuery = require("sphere.ObjectQuery")
 local ffi = require("ffi")
@@ -26,9 +27,15 @@ CacheDatabase.load = function(self)
 	-- self.noteChartSlices = {}
 	-- self.entryKeyToLocalOffset = {}
 
-	self.entryCache = {}
-	self.time = 0
-	self.cacheTime = 5
+	local entryCaches = {}
+	for _, t in ipairs({"noteChartSets", "noteCharts", "noteChartDatas"}) do
+		entryCaches[t] = TimedCache:new()
+		entryCaches[t].timeout = 1
+		entryCaches[t].loadObject = function(_, id)
+			return self.db:select(t, "id = ?", id)[1]
+		end
+	end
+	self.entryCaches = entryCaches
 
 	self:queryAll()
 end
@@ -52,30 +59,12 @@ end
 ----------------------------------------------------------------
 
 CacheDatabase.getCachedEntry = function(self, t, id)
-	local entryCache = self.entryCache
-	local time = self.time
-	entryCache[t] = entryCache[t] or {}
-	entryCache[t][id] = entryCache[t][id] or {
-		entry = {},
-		loaded = false,
-	}
-	entryCache[t][id].time = time
-	return entryCache[t][id].entry
+	return self.entryCaches[t]:getObject(id)
 end
 
 CacheDatabase.update = function(self)
-	local cacheTime = self.cacheTime
-	local time = love.timer.getTime()
-	self.time = time
-	for tableName, t in pairs(self.entryCache) do
-		for id, obj in pairs(t) do
-			if obj.time + cacheTime < time then
-				t[id] = nil
-			elseif not obj.loaded then
-				obj.loaded = true
-				obj.entry = self.db:select(tableName, "id = ?", id)[1]
-			end
-		end
+	for _, entryCache in pairs(self.entryCaches) do
+		entryCache:update()
 	end
 end
 

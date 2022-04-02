@@ -1,3 +1,4 @@
+local TimedCache = require("aqua.util.TimedCache")
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 local LibraryModel = require("sphere.models.LibraryModel")
 
@@ -9,6 +10,26 @@ NoteChartLibraryModel.setId = 1
 NoteChartLibraryModel.load = function(self)
 	self.entry = CacheDatabase.EntryStruct()
 	self.itemsCount = 0
+	self.itemsCache = TimedCache:new()
+	self.itemsCache.loadObject = function(_, itemIndex)
+		return setmetatable({}, {__index = function(t, k)
+			local entry = CacheDatabase.noteChartItems[self.slice.offset + itemIndex - 1]
+			if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" then
+				return entry[k]
+			end
+			local noteChart = CacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
+			local noteChartData = CacheDatabase:getCachedEntry("noteChartDatas", entry.noteChartDataId)
+			return noteChartData[k] or noteChart[k]
+		end})
+	end
+end
+
+NoteChartLibraryModel.update = function(self)
+	self.itemsCache:update()
+end
+
+NoteChartLibraryModel.getItemByIndex = function(self, itemIndex)
+	return self.itemsCache:getObject(itemIndex)
 end
 
 NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
@@ -20,22 +41,6 @@ NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
 		return
 	end
 	self.itemsCount = slice.size
-end
-
-NoteChartLibraryModel.getItemByIndex = function(self, itemIndex)
-	self.currentItemIndex = self.selectModel.noteChartItemIndex
-	if itemIndex < 1 or itemIndex > self.itemsCount then
-		return
-	end
-	return setmetatable({}, {__index = function(t, k)
-		local entry = CacheDatabase.noteChartItems[self.slice.offset + itemIndex - 1]
-		if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" then
-			return entry[k]
-		end
-		local noteChart = CacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
-		local noteChartData = CacheDatabase:getCachedEntry("noteChartDatas", entry.noteChartDataId)
-		return noteChartData[k] or noteChart[k]
-	end})
 end
 
 NoteChartLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId, noteChartSetId)

@@ -16,6 +16,9 @@ LibraryModel.updateItems = function(self)
 
 	local mt = getmetatable(self.items)
 	mt.__index = function(_, i)
+		if i < 1 or i > self.itemsCount then
+			return
+		end
 		return self:getItemByIndex(i)
 	end
 	mt.__len = function()
