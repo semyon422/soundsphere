@@ -25,4 +25,8 @@ CacheModel.stopUpdate = function(self)
 	self.cacheUpdater:stop()
 end
 
+CacheModel.update = function(self)
+	CacheDatabase:update()
+end
+
 return CacheModel

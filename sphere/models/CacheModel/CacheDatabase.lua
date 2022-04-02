@@ -26,6 +26,10 @@ CacheDatabase.load = function(self)
 	-- self.noteChartSlices = {}
 	-- self.entryKeyToLocalOffset = {}
 
+	self.entryCache = {}
+	self.time = 0
+	self.cacheTime = 5
+
 	self:queryAll()
 end
 
@@ -43,6 +47,36 @@ end
 
 CacheDatabase.commit = function(self)
 	return self.db:commit()
+end
+
+----------------------------------------------------------------
+
+CacheDatabase.getCachedEntry = function(self, t, id)
+	local entryCache = self.entryCache
+	local time = self.time
+	entryCache[t] = entryCache[t] or {}
+	entryCache[t][id] = entryCache[t][id] or {
+		entry = {},
+		loaded = false,
+	}
+	entryCache[t][id].time = time
+	return entryCache[t][id].entry
+end
+
+CacheDatabase.update = function(self)
+	local cacheTime = self.cacheTime
+	local time = love.timer.getTime()
+	self.time = time
+	for tableName, t in pairs(self.entryCache) do
+		for id, obj in pairs(t) do
+			if obj.time + cacheTime < time then
+				t[id] = nil
+			elseif not obj.loaded then
+				obj.loaded = true
+				obj.entry = self.db:select(tableName, "id = ?", id)[1]
+			end
+		end
+	end
 end
 
 ----------------------------------------------------------------

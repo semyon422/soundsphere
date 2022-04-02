@@ -1,6 +1,4 @@
 local Class = require("aqua.util.Class")
-local aquatimer = require("aqua.timer")
-local aquathread = require("aqua.thread")
 
 local SelectModel = Class:new()
 
@@ -140,7 +138,6 @@ SelectModel.scrollNoteChart = function(self, direction, destination)
 	self.config.noteChartSetEntryId = noteChartItem.setId
 	self.config.noteChartEntryId = noteChartItem.noteChartId
 	self.config.noteChartDataEntryId = noteChartItem.noteChartDataId
-	print("SCROLL", self.noteChartItemIndex, self.config.noteChartDataEntryId, self.config.noteChartEntryId)
 
 	self:pullNoteChartSet(true)
 	self:pullScore()
@@ -188,7 +185,6 @@ SelectModel.pullNoteChartSet = function(self, noUpdate)
 end
 
 SelectModel.pullNoteChart = function(self, noUpdate)
-	print("noUpdate", noUpdate)
 	if not noUpdate then
 		self.noteChartLibraryModel:setNoteChartSetId(self.config.noteChartSetEntryId)
 		self.noteChartLibraryModel:updateItems()

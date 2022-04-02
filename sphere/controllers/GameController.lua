@@ -267,8 +267,7 @@ GameController.update = function(self, dt)
 	self.fpsLimiter:update()
 	self.windowManager:update()
 
-	self.noteChartSetLibraryModel:update()
-	self.noteChartLibraryModel:update()
+	self.cacheModel:update()
 
 	self.frameTimeView.updateFrameTime = love.timer.getTime() - startTime
 end

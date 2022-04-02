@@ -105,8 +105,6 @@ ListView.update = function(self, dt)
 	local stateCounter = self.state.stateCounter
 	self:reloadItems()
 	if stateCounter ~= self.state.stateCounter then
-		print("FORCE", self.state.stateCounter)
-	-- if items ~= self.state.items or numberItems ~= #items then
 		self:forceScroll()
 	end
 end

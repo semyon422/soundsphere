@@ -1,8 +1,5 @@
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
-local ObjectQuery = require("sphere.ObjectQuery")
 local LibraryModel = require("sphere.models.LibraryModel")
-local aquathread = require("aqua.thread")
-local aquatimer = require("aqua.timer")
 
 local NoteChartSetLibraryModel = LibraryModel:new()
 
@@ -19,7 +16,16 @@ NoteChartSetLibraryModel.getItemByIndex = function(self, itemIndex)
 	if itemIndex < 1 or itemIndex > self.itemsCount then
 		return
 	end
-	return CacheDatabase.noteChartSetItems[itemIndex - 1]
+	return setmetatable({}, {__index = function(t, k)
+		local entry = CacheDatabase.noteChartSetItems[itemIndex - 1]
+		if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" then
+			return entry[k]
+		end
+		-- local noteChartSet = CacheDatabase:getCachedEntry("noteChartSets", entry.setId)
+		local noteChart = CacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
+		local noteChartData = CacheDatabase:getCachedEntry("noteChartDatas", entry.noteChartDataId)
+		return noteChartData[k] or noteChart[k]
+	end})
 end
 
 NoteChartSetLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId, noteChartSetId)
