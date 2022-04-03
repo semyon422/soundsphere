@@ -18,14 +18,14 @@ CacheDatabase.load = function(self)
 	db:exec(love.filesystem.read("sphere/models/CacheModel/database.sql"))
 	self.loaded = true
 
-	-- self.noteChartSetItemsCount = 0
-	-- self.noteChartSetItems = {}
-	-- self.entryKeyToGlobalOffset = {}
-	-- self.noteChartSetIdToOffset = {}
-	-- self.noteChartItemsCount = 0
-	-- self.noteChartItems = {}
-	-- self.noteChartSlices = {}
-	-- self.entryKeyToLocalOffset = {}
+	self.noteChartSetItemsCount = 0
+	self.noteChartSetItems = {}
+	self.entryKeyToGlobalOffset = {}
+	self.noteChartSetIdToOffset = {}
+	self.noteChartItemsCount = 0
+	self.noteChartItems = {}
+	self.noteChartSlices = {}
+	self.entryKeyToLocalOffset = {}
 
 	local entryCaches = {}
 	for _, t in ipairs({"noteChartSets", "noteCharts", "noteChartDatas"}) do
@@ -37,7 +37,14 @@ CacheDatabase.load = function(self)
 	end
 	self.entryCaches = entryCaches
 
-	self:queryAll()
+	self.queryParams = {
+		-- where = "noteChartDatas.difficulty > 25",
+		-- where = "noteChartDatas.inputMode = '4key'",
+		-- groupBy = "noteCharts.setId",
+		-- orderBy = "noteChartDatas.difficulty ASC",
+	}
+	-- self:queryNoteChartSets(self.queryParams)
+	-- self:queryNoteCharts(self.queryParams)
 end
 
 CacheDatabase.unload = function(self)
@@ -167,7 +174,57 @@ local function fillObject(object, row, colnames)
 	end
 end
 
-CacheDatabase.queryAll = function(self, params, ...)
+CacheDatabase.queryNoteChartSets = function(self, params, ...)
+	params = params or {}
+
+	local objectQuery = ObjectQuery:new()
+
+	objectQuery.db = self.db
+
+	objectQuery.table = "noteChartDatas"
+	objectQuery.fields = {
+		"noteChartDatas.id AS noteChartDataId",
+		"noteCharts.id AS noteChartId",
+		"noteCharts.setId",
+	}
+	objectQuery:setInnerJoin("noteCharts", "noteChartDatas.hash = noteCharts.hash")
+
+	objectQuery.where = params.where
+	objectQuery.groupBy = params.groupBy
+	objectQuery.orderBy = [[
+		noteCharts.setId ASC,
+		length(noteChartDatas.inputMode) ASC,
+		noteChartDatas.inputMode ASC,
+		noteChartDatas.difficulty ASC,
+		noteChartDatas.name ASC,
+		noteChartDatas.id ASC
+	]]
+
+	local count = objectQuery:getCount()
+	local noteChartSets = ffi.new("EntryStruct[?]", count)
+	local entryKeyToGlobalOffset = {}
+	local noteChartSetIdToOffset = {}
+	self.noteChartSetItems = noteChartSets
+	self.entryKeyToGlobalOffset = entryKeyToGlobalOffset
+	self.noteChartSetIdToOffset = noteChartSetIdToOffset
+
+	local stmt = self.db:stmt(objectQuery:getQueryParams(), ...)
+	local colnames = {}
+
+	local row = stmt:step({}, colnames)
+	local i = 0
+	while row do
+		local entry = noteChartSets[i]
+		fillObject(entry, row, colnames)
+		noteChartSetIdToOffset[entry.setId] = i
+		entryKeyToGlobalOffset[entry.key] = i
+		i = i + 1
+		row = stmt:step(row)
+	end
+	self.noteChartSetItemsCount = i
+end
+
+CacheDatabase.queryNoteCharts = function(self, params, ...)
 	params = params or {}
 
 	local objectQuery = ObjectQuery:new()
@@ -183,75 +240,50 @@ CacheDatabase.queryAll = function(self, params, ...)
 	}
 	objectQuery:setInnerJoin("noteCharts", "noteChartDatas.hash = noteCharts.hash")
 
-	-- notechart sets
-	objectQuery.where = params.where
-	objectQuery.groupBy = params.groupBy
-	objectQuery.orderBy = params.orderBy
-
-	local count = objectQuery:getCount(...)
-	local noteChartSets = ffi.new("EntryStruct[?]", count)
-	local entryKeyToGlobalOffset = {}
-	local noteChartSetIdToOffset = {}
-	self.noteChartSetItemsCount = count
-	self.noteChartSetItems = noteChartSets
-	self.entryKeyToGlobalOffset = entryKeyToGlobalOffset
-	self.noteChartSetIdToOffset = noteChartSetIdToOffset
-
-	local stmt = self.db:stmt(objectQuery:getQueryParams(), ...)
-	local colnames = {}
-
-	local row = stmt:step({}, colnames)
-	local i = 0
-	while row do
-		if i < count then
-			local entry = noteChartSets[i]
-			fillObject(entry, row, colnames)
-			noteChartSetIdToOffset[entry.setId] = i
-			entryKeyToGlobalOffset[entry.key] = i
-		end
-		i = i + 1
-		row = stmt:step(row)
-	end
-
-	-- notecharts
 	objectQuery.where = params.where
 	objectQuery.groupBy = nil
-	objectQuery.orderBy = "setId ASC"  -- add sort by input mode, etc
+	objectQuery.orderBy = [[
+		noteCharts.setId ASC,
+		length(noteChartDatas.inputMode) ASC,
+		noteChartDatas.inputMode ASC,
+		noteChartDatas.difficulty ASC,
+		noteChartDatas.name ASC,
+		noteChartDatas.id ASC
+	]]
 
-	count = objectQuery:getCount(...)
+	local count = objectQuery:getCount()
 	local noteCharts = ffi.new("EntryStruct[?]", count)
 	local slices = {}
 	local entryKeyToLocalOffset = {}
-	self.noteChartItemsCount = count
 	self.noteChartItems = noteCharts
 	self.noteChartSlices = slices
 	self.entryKeyToLocalOffset = entryKeyToLocalOffset
 
-	stmt = self.db:stmt(objectQuery:getQueryParams(), ...)
+	local stmt = self.db:stmt(objectQuery:getQueryParams(), ...)
+	local colnames = {}
 
 	local offset = 0
 	local size = 0
 	local setId
-	row = stmt:step({}, colnames)
-	i = 0
+	local row = stmt:step({}, colnames)
+	local i = 0
 	while row do
-		if i < count then
-			local entry = noteCharts[i]
-			fillObject(entry, row, colnames)
-			if setId and setId ~= entry.setId then
-				slices[setId] = {
-					offset = offset,
-					size = size,
-				}
-				offset = i
-			end
-			size = i - offset + 1
-			setId = entry.setId
-			entryKeyToLocalOffset[entry.key] = i - offset
+		local entry = noteCharts[i]
+		fillObject(entry, row, colnames)
+		if setId and setId ~= entry.setId then
+			slices[setId] = {
+				offset = offset,
+				size = size,
+			}
+			offset = i
 		end
+		size = i - offset + 1
+		setId = entry.setId
+		entryKeyToLocalOffset[entry.key] = i - offset
 		i = i + 1
 		row = stmt:step(row)
 	end
+	self.noteChartItemsCount = i
 end
 
 return CacheDatabase

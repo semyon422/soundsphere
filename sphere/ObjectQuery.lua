@@ -63,55 +63,14 @@ ObjectQuery.getCountQueryParams = function(self)
 	return table.concat(out, " ")
 end
 
--- ObjectQuery.getPage = function(self, pageNum, perPage)
--- 	return self.db:query(self:getQueryParams() .. " LIMIT ? OFFSET ?", perPage, (pageNum - 1) * perPage) or {}
--- end
+ObjectQuery.getCount = function(self)
+	local out = {}
 
-ObjectQuery.getCount = function(self, ...)
-	return self.db:query(self:getCountQueryParams(), ...)[1].c
+	table.insert(out, "SELECT COUNT(1) as c")
+	table.insert(out, ("FROM %s"):format(self.table))
+	table.insert(out, self:concatJoins())
+
+	return self.db:query(table.concat(out, " "))[1].c
 end
-
--- ObjectQuery.getPosition = function(self, ...)
--- 	local dbTables = {self.table}
--- 	for _, join in ipairs(self.joins) do
--- 		table.insert(dbTables, join[2])
--- 	end
-
--- 	local fields = {("ROW_NUMBER() OVER(ORDER BY %s) AS pos"):format(self.orderBy or self.table .. "_id")}
--- 	local where = {}
--- 	if not self.groupBy then
--- 		for _, dbTable in ipairs(dbTables) do
--- 			table.insert(fields, dbTable .. ".id AS " .. dbTable .. "_id")
--- 			table.insert(where, dbTable .. "_id = ?")
--- 		end
--- 	else
--- 		table.insert(fields, self.groupBy .. " AS " .. self.groupBy:gsub("%.", "_"))
--- 		table.insert(where, self.groupBy:gsub("%.", "_") .. " = ?")
--- 	end
-
--- 	local out = {}
-
--- 	table.insert(out, ("SELECT %s"):format(table.concat(fields, ", ")))
--- 	table.insert(out, ("FROM %s"):format(self.table))
--- 	table.insert(out, self:concatJoins())
-
--- 	if self.where then
--- 		table.insert(out, ("WHERE %s"):format(self.where))
--- 	end
--- 	if self.groupBy then
--- 		table.insert(out, ("GROUP BY %s"):format(self.groupBy))
--- 	end
-
--- 	local result = self.db:query(([[
--- 		SELECT pos FROM
--- 		(%s)
--- 		WHERE %s
--- 	]]):format(
--- 		table.concat(out, " "),
--- 		table.concat(where, " and ")
--- 	), ...)
-
--- 	return result and result[1] and tonumber(result[1].pos)
--- end
 
 return ObjectQuery

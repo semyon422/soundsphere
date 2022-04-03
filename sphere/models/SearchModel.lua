@@ -33,7 +33,7 @@ end
 
 local fieldLikePattern = {}
 for _, key in ipairs(fieldList) do
-	table.insert(fieldLikePattern, ("%s LIKE %s"):format(key, "<substring>"))
+	table.insert(fieldLikePattern, ("noteChartDatas.%s LIKE <substring>"):format(key))
 end
 fieldLikePattern = "(" .. table.concat(fieldLikePattern, " OR ") .. ")"
 

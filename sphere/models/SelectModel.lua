@@ -161,8 +161,8 @@ end
 SelectModel.pullNoteChartSet = function(self, noUpdate)
 	if not noUpdate then
 		self.searchModel:setCollection(self.collectionItem)
-		self.noteChartLibraryModel:updateItems()
 		self.noteChartSetLibraryModel:updateItems()
+		self.noteChartLibraryModel:updateItems()
 	end
 
 	local noteChartSetItems = self.noteChartSetLibraryModel.items
@@ -185,10 +185,10 @@ SelectModel.pullNoteChartSet = function(self, noUpdate)
 end
 
 SelectModel.pullNoteChart = function(self, noUpdate)
-	if not noUpdate then
-		self.noteChartLibraryModel:setNoteChartSetId(self.config.noteChartSetEntryId)
-		self.noteChartLibraryModel:updateItems()
-	end
+	self.noteChartLibraryModel:setNoteChartSetId(self.config.noteChartSetEntryId)
+	-- if not noUpdate then
+	-- 	self.noteChartLibraryModel:updateItems()
+	-- end
 
 	local noteChartItems = self.noteChartLibraryModel.items
 	self.noteChartItemIndex = self.noteChartLibraryModel:getItemIndex(

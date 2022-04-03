@@ -1,4 +1,3 @@
-local TimedCache = require("aqua.util.TimedCache")
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 local LibraryModel = require("sphere.models.LibraryModel")
 
@@ -8,11 +7,11 @@ NoteChartLibraryModel.searchMode = "hide"
 NoteChartLibraryModel.setId = 1
 
 NoteChartLibraryModel.load = function(self)
-	self.entry = CacheDatabase.EntryStruct()
-	self.itemsCount = 0
-	self.itemsCache = TimedCache:new()
 	self.itemsCache.loadObject = function(_, itemIndex)
 		return setmetatable({}, {__index = function(t, k)
+			if not self.slice then
+				return
+			end
 			local entry = CacheDatabase.noteChartItems[self.slice.offset + itemIndex - 1]
 			if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" then
 				return entry[k]
@@ -24,14 +23,6 @@ NoteChartLibraryModel.load = function(self)
 	end
 end
 
-NoteChartLibraryModel.update = function(self)
-	self.itemsCache:update()
-end
-
-NoteChartLibraryModel.getItemByIndex = function(self, itemIndex)
-	return self.itemsCache:getObject(itemIndex)
-end
-
 NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
 	self.setId = setId
 	local slice = CacheDatabase.noteChartSlices[setId]
@@ -41,6 +32,11 @@ NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
 		return
 	end
 	self.itemsCount = slice.size
+end
+
+NoteChartLibraryModel.updateItems = function(self)
+	CacheDatabase:queryNoteCharts(CacheDatabase.queryParams)
+	self:setNoteChartSetId(self.setId)
 end
 
 NoteChartLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId, noteChartSetId)

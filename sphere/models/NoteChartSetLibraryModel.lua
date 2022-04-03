@@ -1,4 +1,3 @@
-local TimedCache = require("aqua.util.TimedCache")
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 local LibraryModel = require("sphere.models.LibraryModel")
 
@@ -8,9 +7,6 @@ NoteChartSetLibraryModel.searchMode = "hide"
 NoteChartSetLibraryModel.collapse = false
 
 NoteChartSetLibraryModel.load = function(self)
-	self.entry = CacheDatabase.EntryStruct()
-	self.itemsCount = CacheDatabase.noteChartSetItemsCount
-	self.itemsCache = TimedCache:new()
 	self.itemsCache.getObject = function(_, itemIndex)
 		return setmetatable({}, {__index = function(t, k)
 			local entry = CacheDatabase.noteChartSetItems[itemIndex - 1]
@@ -24,12 +20,22 @@ NoteChartSetLibraryModel.load = function(self)
 	end
 end
 
-NoteChartSetLibraryModel.update = function(self)
-	self.itemsCache:update()
-end
-
-NoteChartSetLibraryModel.getItemByIndex = function(self, itemIndex)
-	return self.itemsCache:getObject(itemIndex)
+NoteChartSetLibraryModel.updateItems = function(self)
+	local params = CacheDatabase.queryParams
+	if self.collapse then
+		params.groupBy = "noteCharts.setId"
+	else
+		params.groupBy = nil
+		-- params.orderBy = nil
+	end
+	local where = self.searchModel:getConditions()
+	if where ~= "" then
+		params.where = where
+	else
+		params.where = nil
+	end
+	CacheDatabase:queryNoteChartSets(CacheDatabase.queryParams)
+	self.itemsCount = CacheDatabase.noteChartSetItemsCount
 end
 
 NoteChartSetLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId, noteChartSetId)
