@@ -26,14 +26,17 @@ NoteChartSetLibraryModel.updateItems = function(self)
 		params.groupBy = "noteCharts.setId"
 	else
 		params.groupBy = nil
-		-- params.orderBy = nil
 	end
+
+	params.orderBy = self.sortFunction
+
 	local where = self.searchModel:getConditions()
 	if where ~= "" then
 		params.where = where
 	else
 		params.where = nil
 	end
+
 	CacheDatabase:queryNoteChartSets(CacheDatabase.queryParams)
 	self.itemsCount = CacheDatabase.noteChartSetItemsCount
 end

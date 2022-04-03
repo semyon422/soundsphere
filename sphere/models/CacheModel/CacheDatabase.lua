@@ -191,14 +191,7 @@ CacheDatabase.queryNoteChartSets = function(self, params, ...)
 
 	objectQuery.where = params.where
 	objectQuery.groupBy = params.groupBy
-	objectQuery.orderBy = [[
-		noteCharts.setId ASC,
-		length(noteChartDatas.inputMode) ASC,
-		noteChartDatas.inputMode ASC,
-		noteChartDatas.difficulty ASC,
-		noteChartDatas.name ASC,
-		noteChartDatas.id ASC
-	]]
+	objectQuery.orderBy = params.orderBy
 
 	local count = objectQuery:getCount()
 	local noteChartSets = ffi.new("EntryStruct[?]", count)
