@@ -15,7 +15,7 @@ Automap.interfaceType = "slider"
 Automap.name = "Automap"
 
 Automap.defaultValue = 10
-Automap.range = {1, 20}
+Automap.range = {1, 26}
 
 Automap.getString = function(self, config)
 	return "AM"
