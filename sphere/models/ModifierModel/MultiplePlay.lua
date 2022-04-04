@@ -3,32 +3,31 @@ local Modifier	= require("sphere.models.ModifierModel.Modifier")
 
 local MultiplePlay = Modifier:new()
 
-MultiplePlay.sequential = true
 MultiplePlay.type = "NoteChartModifier"
 
 MultiplePlay.name = "MultiplePlay"
-MultiplePlay.shortName = "MP"
+MultiplePlay.interfaceType = "stepper"
 
-MultiplePlay.variableType = "number"
-MultiplePlay.variableName = "value"
-MultiplePlay.variableFormat = "%s"
-MultiplePlay.variableRange = {1, 1, 3}
-MultiplePlay.variableValues = {"DP", "TP", "QP"}
-MultiplePlay.value = 1
+MultiplePlay.defaultValue = 2
+MultiplePlay.range = {2, 4}
 
-MultiplePlay.modeNames = {"DP", "TP", "QP"}
-
-MultiplePlay.tostring = function(self)
-	return self.modeNames[self.value]
+MultiplePlay.getString = function(self, config)
+	if config.old then
+		return config.value + 1
+	end
+	return config.value
 end
 
-MultiplePlay.tojson = function(self)
-	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
+MultiplePlay.getSubString = function(self, config)
+	return "P"
 end
 
-MultiplePlay.apply = function(self)
+MultiplePlay.apply = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
-	local value = self.value
+	local value = config.value
+	if config.old then
+		value = value + 1
+	end
 
 	local inputCounts = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do
@@ -41,15 +40,15 @@ MultiplePlay.apply = function(self)
 	end
 
 	local layerDataSequence = noteChart.layerDataSequence
-	
+
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
-		
+
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 			local inputCount = inputCounts[noteData.inputType]
 			if inputCount then
-				for i = 1, value do
+				for i = 1, value - 1 do
 					local newInputIndex = noteData.inputIndex + inputCount * i
 
 					local newNoteData = NoteData:new(noteData.timePoint)
@@ -66,9 +65,9 @@ MultiplePlay.apply = function(self)
 			end
 		end
 	end
-	
+
 	for inputType, inputCount in pairs(inputCounts) do
-		noteChart.inputMode:setInputCount(inputType, inputCount * (value + 1))
+		noteChart.inputMode:setInputCount(inputType, inputCount * value)
 	end
 
 	noteChart:compute()

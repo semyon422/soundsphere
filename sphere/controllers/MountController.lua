@@ -8,12 +8,11 @@ MountController.receive = function(self, event)
 	end
 
 	local mountModel = self.mountModel
-	local path = event.args[1]
+	local path = event[1]
 	if not mountModel:isAdded(path) then
 		self.mountModel:addPath(path)
 	end
 	self.mountModel:mount(path)
-	self.mountModel:writeConfig()
 end
 
 return MountController

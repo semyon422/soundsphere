@@ -4,22 +4,7 @@ function love.conf(t)
 	t.accelerometerjoystick = true
 	t.gammacorrect = false
 
-	t.window.title = "soundsphere"
-	t.window.icon = "resources/icon.png"
-	t.window.width = 1024
-	t.window.height = 576
-	t.window.borderless = false
-	t.window.resizable = true
-	t.window.minwidth = 1
-	t.window.minheight = 1
-	t.window.fullscreen = false
-	t.window.fullscreentype = "desktop"
-	t.window.vsync = false
-	t.window.msaa = 0
-	t.window.display = 1
-	t.window.highdpi = false
-	t.window.x = nil
-	t.window.y = nil
+	t.window = nil
 
 	t.modules.audio = true
 	t.modules.event = true

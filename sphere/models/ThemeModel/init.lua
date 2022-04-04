@@ -12,7 +12,8 @@ ThemeModel.path = "userdata/themes"
 
 ThemeModel.load = function(self)
 	self.themes = {}
-	return self:lookup(self.path)
+	self.config = self.configModel.configs.settings
+	-- return self:lookup(self.path)
 end
 
 ThemeModel.lookup = function(self, directoryPath)
@@ -20,26 +21,15 @@ ThemeModel.lookup = function(self, directoryPath)
 		local path = directoryPath .. "/" .. itemName
 		local info = love.filesystem.getInfo(path)
 		if info.type == "directory" or info.type == "symlink" then
-			local info = love.filesystem.getInfo(path .. "/metadata.json")
-			if info then
-				self:loadMetaData(path, "metadata.json")
-			end
+			local UserTheme = require(path:gsub("/", "."))
+			local userTheme = UserTheme:new()
+			userTheme.path = path
+			userTheme:load()
+
+			local themes = self.themes
+			themes[#themes + 1] = userTheme
 		end
 	end
-end
-
-ThemeModel.loadMetaData = function(self, path, fileName)
-	local contents = love.filesystem.read(path .. "/" .. fileName)
-	local jsonObject = json.decode(contents)
-
-	local theme = Theme:new()
-
-	theme.name = jsonObject.name
-	theme.path = path
-	theme:load()
-
-	local themes = self.themes
-	themes[#themes + 1] = theme
 end
 
 ThemeModel.getThemes = function(self)
@@ -47,27 +37,27 @@ ThemeModel.getThemes = function(self)
 end
 
 ThemeModel.setDefaultTheme = function(self, theme)
-	self.theme = theme
-	return self.configModel:set("theme", theme.path)
+	-- self.theme = theme
+	-- self.config.general.theme = theme.path
 end
 
 ThemeModel.getTheme = function(self)
-	if love.keyboard.isDown("lshift") then
-		return self.themes[1]
-	end
+	-- if love.keyboard.isDown("lshift") then
+	-- 	return self.themes[1] or self.theme
+	-- end
 
-	local configValue = self.configModel:get("theme")
+	-- local configValue = self.config.general.theme
 
-	if configValue then
-		for _, theme in ipairs(self.themes) do
-			if theme.path == configValue then
-				self.theme = theme
-				return theme
-			end
-		end
-	end
+	-- if configValue then
+	-- 	for _, theme in ipairs(self.themes) do
+	-- 		if theme.path == configValue then
+	-- 			self.theme = theme
+	-- 			return theme
+	-- 		end
+	-- 	end
+	-- end
 
-	self:setDefaultTheme(self.themes[1] or self.theme)
+	-- self:setDefaultTheme(self.themes[1] or self.theme)
 
 	return self.theme
 end

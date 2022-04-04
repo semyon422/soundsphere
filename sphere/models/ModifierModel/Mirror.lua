@@ -2,30 +2,24 @@ local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 
 local Mirror = SwapModifier:new()
 
-Mirror.sequential = true
 Mirror.type = "NoteChartModifier"
+Mirror.interfaceType = "stepper"
 
 Mirror.name = "Mirror"
-Mirror.shortName = "Mirror"
 
-Mirror.variableType = "number"
-Mirror.variableName = "value"
-Mirror.variableFormat = "%s"
-Mirror.variableRange = {1, 1, 3}
-Mirror.variableValues = {"all", "left", "right"}
-Mirror.value = 1
+Mirror.defaultValue = "all"
+Mirror.range = {1, 3}
+Mirror.values = {"all", "left", "right"}
 
-Mirror.modeNames = {"A", "L", "R"}
-
-Mirror.tostring = function(self)
-	return self.shortName .. self.modeNames[self.value]
+Mirror.getString = function(self, config)
+	return "MR"
 end
 
-Mirror.tojson = function(self)
-	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
+Mirror.getSubString = function(self, config)
+	return config.value:sub(1, 1):upper()
 end
 
-Mirror.getMap = function(self)
+Mirror.getMap = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
 
 	local inputCounts = {}
@@ -40,7 +34,7 @@ Mirror.getMap = function(self)
 
 	local map = {}
 
-	local value = self.value
+	local value = config.value
 	for inputType, inputCount in pairs(inputCounts) do
 		map[inputType] = {}
 		local submap = map[inputType]

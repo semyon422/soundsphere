@@ -1,20 +1,46 @@
-local Screen			= require("sphere.screen.Screen")
+local Class = require("aqua.util.Class")
+local Screen = require("sphere.screen.Screen")
 
-local ScreenManager = {}
+local ScreenManager = Class:new()
 
-ScreenManager.init = function(self)
+ScreenManager.construct = function(self)
 	self.currentScreen = Screen:new()
-end
-
-ScreenManager.set = function(self, screen, callback)
-	self.transition:transit(function()
-		self.currentScreen:unload()
-		self.currentScreen = screen
-		screen:load()
-		if callback then
-			callback()
+	self.coroutine = coroutine.create(function()
+		while true do
+			self.waitForScreen = true
+			local screen = coroutine.yield()
+			self.waitForScreen = false
+			self.transition:fadeIn()
+			coroutine.yield()
+			self.currentScreen:unload()
+			self.currentScreen = screen
+			local ok, err = xpcall(screen.load, debug.traceback, screen)
+			if not ok then
+				pcall(screen.unload, screen)
+				screen = self.fallback
+				if not screen then
+					error(err)
+				end
+				self.currentScreen = screen
+				assert(xpcall(screen.load, debug.traceback, screen))
+				screen.error = err
+			end
+			self.transition:fadeOut()
+			coroutine.yield()
 		end
 	end)
+	coroutine.resume(self.coroutine)
+end
+
+ScreenManager.setFallback = function(self, screen)
+	self.fallback = screen
+end
+
+ScreenManager.set = function(self, screen)
+	if not self.waitForScreen then
+		return
+	end
+	assert(coroutine.resume(self.coroutine, screen))
 end
 
 ScreenManager.setTransition = function(self, transition)
@@ -23,7 +49,13 @@ end
 
 ScreenManager.update = function(self, dt)
 	self.currentScreen:update(dt)
-	self.transition:update(dt)
+
+	local transition = self.transition
+	transition:update(dt)
+	if transition.needResume then
+		assert(coroutine.resume(self.coroutine))
+		transition.needResume = false
+	end
 end
 
 ScreenManager.draw = function(self)
@@ -39,7 +71,5 @@ end
 ScreenManager.unload = function(self)
 	self.currentScreen:unload()
 end
-
-ScreenManager:init()
 
 return ScreenManager

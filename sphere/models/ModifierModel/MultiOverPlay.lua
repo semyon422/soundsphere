@@ -3,32 +3,31 @@ local Modifier	= require("sphere.models.ModifierModel.Modifier")
 
 local MultiOverPlay = Modifier:new()
 
-MultiOverPlay.sequential = true
 MultiOverPlay.type = "NoteChartModifier"
+MultiOverPlay.interfaceType = "stepper"
 
 MultiOverPlay.name = "MultiOverPlay"
-MultiOverPlay.shortName = "MOP"
 
-MultiOverPlay.variableType = "number"
-MultiOverPlay.variableName = "value"
-MultiOverPlay.variableFormat = "%s"
-MultiOverPlay.variableRange = {1, 1, 3}
-MultiOverPlay.variableValues = {"DO", "TO", "QO"}
-MultiOverPlay.value = 1
+MultiOverPlay.defaultValue = 2
+MultiOverPlay.range = {2, 4}
 
-MultiOverPlay.modeNames = {"DO", "TO", "QO"}
-
-MultiOverPlay.tostring = function(self)
-	return self.modeNames[self.value]
+MultiOverPlay.getString = function(self, config)
+	if config.old then
+		return config.value + 1
+	end
+	return config.value
 end
 
-MultiOverPlay.tojson = function(self)
-	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
+MultiOverPlay.getSubString = function(self, config)
+	return "OP"
 end
 
-MultiOverPlay.apply = function(self)
+MultiOverPlay.apply = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
-	local value = self.value
+	local value = config.value
+	if config.old then
+		value = value + 1
+	end
 
 	local inputCounts = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do
@@ -50,11 +49,11 @@ MultiOverPlay.apply = function(self)
 			local inputCount = inputCounts[noteData.inputType]
             if inputCount then
                 local inputIndex = noteData.inputIndex
-                local newInputIndex = (inputIndex - 1) * (value + 1) + 1
+                local newInputIndex = (inputIndex - 1) * value + 1
 				layerDataSequence:increaseInputCount(noteData.inputType, inputIndex, -1)
 				layerDataSequence:increaseInputCount(noteData.inputType, newInputIndex, 1)
 				noteData.inputIndex = newInputIndex
-				for i = 1, value do
+				for i = 1, value - 1 do
 					newInputIndex = newInputIndex + i
 
 					local newNoteData = NoteData:new(noteData.timePoint)
@@ -73,7 +72,7 @@ MultiOverPlay.apply = function(self)
 	end
 
 	for inputType, inputCount in pairs(inputCounts) do
-		noteChart.inputMode:setInputCount(inputType, inputCount * (value + 1))
+		noteChart.inputMode:setInputCount(inputType, inputCount * value)
 	end
 
 	noteChart:compute()

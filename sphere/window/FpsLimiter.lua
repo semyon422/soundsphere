@@ -1,11 +1,13 @@
 local aquaevent = require("aqua.event")
+local Class = require("aqua.util.Class")
 
-local FpsLimiter = {}
+local FpsLimiter = Class:new()
 
-FpsLimiter.receive = function(self, event)
-	if event.name == "ConfigModel.set" and event.key == "fps" then
-		aquaevent.fpslimit = event.value
-	end
+FpsLimiter.update = function(self)
+	local settings = self.configModel.configs.settings
+	aquaevent.fpslimit = settings.graphics.fps
+	aquaevent.asynckey = settings.graphics.asynckey
+	aquaevent.dwmflush = settings.graphics.dwmflush
 end
 
 return FpsLimiter

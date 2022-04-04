@@ -2,20 +2,26 @@ local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 
 local BracketSwap = SwapModifier:new()
 
-BracketSwap.sequential = true
 BracketSwap.type = "NoteChartModifier"
+BracketSwap.interfaceType = "toggle"
 
+BracketSwap.defaultValue = true
 BracketSwap.name = "BracketSwap"
 BracketSwap.shortName = "BS"
 
-BracketSwap.variableType = "boolean"
+BracketSwap.getString = function(self, config)
+	if not config.value then
+		return
+	end
+	return SwapModifier.getString(self)
+end
 
 BracketSwap.hardcodedMaps = {
 	[4] = {1, 3, 2, 4},
 	[5] = {2, 1, 3, 5, 4}
 }
 
-BracketSwap.getMap = function(self)
+BracketSwap.getMap = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
 
 	local keyCount = noteChart.inputMode:getInputCount("key")

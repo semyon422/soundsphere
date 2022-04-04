@@ -13,39 +13,57 @@ aquapackage.add("luajit-request")
 aquapackage.add("json")
 aquapackage.add("tinyyaml")
 aquapackage.add("tween")
+aquapackage.add("s3dc")
+aquapackage.add("inspect")
+aquapackage.add("lua-crc32")
+aquapackage.add("serpent/src")
 
-local os = jit.os
+local ffi = require("ffi")
+
+local source = love.filesystem.getSource()
+local sourceBase = love.filesystem.getSourceBaseDirectory()
+
+local root
+if source:find("^.+%.love$") then
+	print("starting from .love file directly")
+	root = sourceBase
+else
+	print("starting from current directory")
+	root = source
+end
+
+local jit_os = jit.os
 local arch = jit.arch
-if os == "Windows" then
-	if arch == "x64" then
-		aquapackage.add("bin/win64")
-	elseif arch == "x86" then
-		aquapackage.add("bin/win32")
+if jit_os == "Windows" then
+	local bin = arch == "x64" and "bin/win64" or "bin/win32"
+	ffi.cdef("int _putenv_s(const char *varname, const char *value_string);")
+	ffi.cdef("int _chdir(const char *dirname);")
+	ffi.C._putenv_s("PATH", os.getenv("PATH") .. ";" .. root .. "/" .. bin)
+	ffi.C._chdir(root)
+	aquapackage.add(bin)
+elseif jit_os == "Linux" then
+	local ldlp = os.getenv("LD_LIBRARY_PATH")
+	if not ldlp or not ldlp:find("bin/linux64") then
+		ffi.cdef("int setenv(const char *name, const char *value, int overwrite);")
+		ffi.C.setenv("LD_LIBRARY_PATH", (ldlp or "") .. ":" .. root .. "/bin/linux64", true)
+		os.execute(arg[-2] .. " " .. arg[1] .. " &")
+		return os.exit()
 	end
-elseif os == "Linux" then
+	ffi.cdef("int chdir(const char *path);")
+	ffi.C.chdir(root)
 	aquapackage.add("bin/linux64")
 end
 
 local aquafs = require("aqua.filesystem")
+aquafs.setWriteDir(root)
 
-local git_dir_info = love.filesystem.getInfo(".git")
-if not git_dir_info then
-	print("launcher filesystem mode")
-	aquafs.mount(love.filesystem.getSourceBaseDirectory(), "/", true)
-	aquafs.setWriteDir(love.filesystem.getSourceBaseDirectory())
+if root == sourceBase then
+	aquafs.mount(root, "/", true)
+end
 
-	local moddedgame = love.filesystem.getInfo("moddedgame")
-	if moddedgame and moddedgame.type == "directory" then
-		aquafs.mount(love.filesystem.getSourceBaseDirectory() .. "/moddedgame", "/", false)
-	end
-else
-	print("repository filesystem mode")
-	aquafs.setWriteDir(love.filesystem.getSource())
-
-	local moddedgame = love.filesystem.getInfo("moddedgame")
-	if moddedgame and moddedgame.type == "directory" then
-		aquafs.mount("moddedgame", "/", false)
-	end
+local moddedgame = love.filesystem.getInfo("moddedgame")
+if moddedgame and moddedgame.type == "directory" then
+	aquafs.mount(root .. "/moddedgame", "/", false)
 end
 
 require("luamidi")
@@ -58,8 +76,6 @@ setmetatable(_G, {
 })
 
 require("preloaders.preloadall")
-
-local aqua = require("aqua")
 
 local aquaevent = require("aqua.event")
 aquaevent:init()

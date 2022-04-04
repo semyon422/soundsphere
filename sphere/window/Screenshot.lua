@@ -6,10 +6,6 @@ Screenshot.path = "userdata/screenshots"
 Screenshot.captureKey = ""
 Screenshot.openKey = ""
 
-Screenshot.setDirectory = function(self, path)
-	self.path = path
-end
-
 Screenshot.capture = function(self)
 	love.graphics.captureScreenshot(function(imageData)
 		self.imageData = imageData
@@ -41,22 +37,13 @@ Screenshot.open = function(self)
 end
 
 Screenshot.receive = function(self, event)
-	if event.name == "ConfigModel.set" then
-		if event.key == "screenshot.capture" then
-			self.captureKey = event.value
-		elseif event.key == "screenshot.open" then
-			self.openKey = event.value
-		end
-		return
-	end
-
 	if event.name ~= "keypressed" then
 		return
 	end
 
-	local key = event.args[1]
-	if key == self.captureKey then
-		self.needOpen = love.keyboard.isDown(self.openKey)
+	local settings = self.configModel.configs.settings
+	if event[1] == settings.input.screenshotCapture then
+		self.needOpen = love.keyboard.isDown(settings.input.screenshotOpen)
 		self:capture()
 	end
 end

@@ -11,31 +11,19 @@ end
 
 LogicEngine.load = function(self)
 	self.sharedLogicalNotes = {}
-	self.currentTime = 0
-	self.events = {}
+	self.notesCount = {}
 
 	self:loadNoteHandlers()
 end
 
-local sortEvents = function(a, b)
-	return a.time < b.time
-end
 LogicEngine.update = function(self)
-	local events = self.events
-	table.sort(events, sortEvents)
-
-	for _, event in ipairs(events) do
-		self.currentTime = event.time
-		self:updateNoteHandlers()
-		self:_receive(event)
-		self:updateNoteHandlers()
-	end
-
-	self.events = {}
+	self:updateNoteHandlers()
 end
 
 LogicEngine.unload = function(self)
 	self:unloadNoteHandlers()
+	self.autoplay = false
+	self.promode = false
 end
 
 LogicEngine.send = function(self, event)
@@ -43,20 +31,11 @@ LogicEngine.send = function(self, event)
 end
 
 LogicEngine.receive = function(self, event)
-	self.events[#self.events + 1] = event
-end
-
-LogicEngine._receive = function(self, event)
-	if event.name == "TimeState" then
-		self.currentTime = event.exactCurrentTime
-		return
-	end
-
 	if not event.virtual or self.promode then
 		return
 	end
 
-	for noteHandler in pairs(self.noteHandlers) do
+	for _, noteHandler in ipairs(self.noteHandlers) do
 		noteHandler:receive(event)
 	end
 end
@@ -74,27 +53,26 @@ LogicEngine.loadNoteHandlers = function(self)
 	for inputType, inputIndex in self.noteChart:getInputIteraator() do
 		local noteHandler = self:getNoteHandler(inputType, inputIndex)
 		if noteHandler then
-			self.noteHandlers[noteHandler] = noteHandler
+			table.insert(self.noteHandlers, noteHandler)
 			noteHandler:load()
 		end
 	end
 end
 
 LogicEngine.updateNoteHandlers = function(self)
-	for noteHandler in pairs(self.noteHandlers) do
+	if not self.rhythmModel.timeEngine.timer.isPlaying then
+		return
+	end
+	for _, noteHandler in ipairs(self.noteHandlers) do
 		noteHandler:update()
 	end
 end
 
 LogicEngine.unloadNoteHandlers = function(self)
-	for noteHandler in pairs(self.noteHandlers) do
+	for _, noteHandler in ipairs(self.noteHandlers) do
 		noteHandler:unload()
 	end
 	self.noteHandlers = {}
-end
-
-LogicEngine.getScoreNote = function(self, noteData)
-	return self.scoreEngine:getScoreNote(noteData)
 end
 
 return LogicEngine

@@ -1,4 +1,5 @@
 local CacheDatabase				= require("sphere.models.CacheModel.CacheDatabase")
+local DifficultyModel			= require("sphere.models.DifficultyModel")
 local NoteChartFactory			= require("notechart.NoteChartFactory")
 local NoteChartDataEntryFactory	= require("notechart.NoteChartDataEntryFactory")
 local Log						= require("aqua.util.Log")
@@ -13,19 +14,21 @@ CacheManager.construct = function(self)
 	self.log.path = "userdata/cache.log"
 
 	self.state = 0
+
+	self:clear()
 end
 
 CacheManager.clear = function(self)
-	self.noteChartsAtSet = nil
-	self.noteChartsAtHash = nil
-	self.noteChartSets = nil
-	self.noteChartDatas = nil
-	self.noteCharts = nil
-	self.noteChartsId = nil
-	self.noteChartsPath = nil
-	self.noteChartSetsId = nil
-	self.noteChartSetsPath = nil
-	self.noteChartDatasHashIndex = nil
+	self.noteChartsAtSet = {}
+	self.noteChartsAtHash = {}
+	self.noteChartSets = {}
+	self.noteChartDatas = {}
+	self.noteCharts = {}
+	self.noteChartsId = {}
+	self.noteChartsPath = {}
+	self.noteChartSetsId = {}
+	self.noteChartSetsPath = {}
+	self.noteChartDatasHashIndex = {}
 end
 
 CacheManager.select = function(self)
@@ -144,6 +147,10 @@ end
 
 CacheManager.getNoteChartSets = function(self)
 	return self.noteChartSets
+end
+
+CacheManager.getNoteChartDatas = function(self)
+	return self.noteChartDatas
 end
 
 ----------------------------------------------------------------
@@ -323,7 +330,9 @@ CacheManager.getEmptyNoteChartDataEntry = function(self, path)
 		length = 0,
 		bpm = 0,
 		level = 0,
-		difficultyRate = 0
+		difficulty = 0,
+		longNoteRatio = 0,
+		localOffset = 0,
 	}
 end
 
@@ -566,10 +575,7 @@ CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, for
 	for i = 1, #noteChartEntries do
 		local path = noteChartEntries[i].path
 		if not fileContent[path] then
-			local file = love.filesystem.newFile(path)
-			file:open("r")
-			local content = file:read()
-			file:close()
+			local content = love.filesystem.read(path)
 
 			fileContent[path] = content
 			fileHash[path] = md5.sumhexa(content)
@@ -588,19 +594,18 @@ CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, for
 		if not force and self:getNoteChartDataEntry(hash, 1) then
 			self:setNoteChartEntry(noteChartEntry)
 		else
-			fileDatas[#fileDatas + 1] = {
-				path = path,
-				content = content,
-				hash = hash,
-				noteChartEntry = noteChartEntry
-			}
+			local entries, noteCharts = NoteChartDataEntryFactory:getEntries(path, content, hash, noteChartEntry)
+			if entries then
+				for i, entry in ipairs(entries) do
+					local noteChart = noteCharts[i]
+					local difficulty, longNoteRatio = DifficultyModel:getDifficulty(noteChart)
+					entry.difficulty = difficulty
+					entry.longNoteRatio = longNoteRatio
+					self:setNoteChartDataEntry(entry)
+					self:setNoteChartEntry(entry.noteChartEntry)
+				end
+			end
 		end
-	end
-
-	local entries = NoteChartDataEntryFactory:getEntries(fileDatas)
-	for _, entry in ipairs(entries) do
-		self:setNoteChartDataEntry(entry)
-		self:setNoteChartEntry(entry.noteChartEntry)
 	end
 end
 

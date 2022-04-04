@@ -1,98 +1,60 @@
 local Class						= require("aqua.util.Class")
-local RhythmModel				= require("sphere.models.RhythmModel")
-local NoteChartModel			= require("sphere.models.NoteChartModel")
 
 local FastplayController = Class:new()
 
-FastplayController.construct = function(self)
-	self.noteChartModel = NoteChartModel:new()
-	self.rhythmModel = RhythmModel:new()
-end
-
 FastplayController.play = function(self)
-	self:loadTimePoints()
 	self:load()
 
-	local timeEngine = self.rhythmModel.timeEngine
-	local absoluteTimeList = self.absoluteTimeList
-	for i = 1, #absoluteTimeList do
-		local time = absoluteTimeList[i]
-		timeEngine.currentTime = time
-		timeEngine.exactCurrentTime = time
-		timeEngine:sendState()
-		self:update()
-		self.rhythmModel.replayModel:update()
-		self:update()
-	end
+	local rhythmModel = self.gameController.rhythmModel
+	local timeEngine = rhythmModel.timeEngine
+
+	timeEngine:resetTimeRate()
+	timeEngine:play()
+	timeEngine.currentTime = math.huge
+	rhythmModel.replayModel.currentTime = math.huge
+	rhythmModel.replayModel:update()
+	rhythmModel.logicEngine:update()
+	rhythmModel.scoreEngine:update()
+	rhythmModel.modifierModel:update()
 
 	self:unload()
 end
 
 FastplayController.load = function(self)
-	local noteChartModel = self.noteChartModel
-	local rhythmModel = self.rhythmModel
-	local modifierModel = self.modifierModel
-	local difficultyModel = self.difficultyModel
-
-	rhythmModel.modifierModel = modifierModel
-
-	modifierModel.rhythmModel = rhythmModel
-	modifierModel.noteChartModel = noteChartModel
-
+	local noteChartModel = self.gameController.noteChartModel
+	local difficultyModel = self.gameController.difficultyModel
+	local rhythmModel = self.gameController.rhythmModel
 	noteChartModel:load()
 
 	local noteChart = noteChartModel:loadNoteChart()
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
 
-	rhythmModel:load()
-	rhythmModel:loadLogicEngines()
+	local scoreEngine = rhythmModel.scoreEngine
 
-	local scoreSystem = rhythmModel.scoreEngine.scoreSystem
 	local enps, averageStrain, generalizedKeymode = difficultyModel:getDifficulty(noteChart)
-	scoreSystem:set("baseEnps", enps)
-	scoreSystem:set("baseAverageStrain", averageStrain)
-	scoreSystem:set("generalizedKeymode", generalizedKeymode)
+	scoreEngine.baseEnps = enps
+	scoreEngine.baseAverageStrain = averageStrain
+	scoreEngine.generalizedKeymode = generalizedKeymode
 
-	self.rhythmModel.timeEngine:setTimeRate(self.rhythmModel.timeEngine:getBaseTimeRate())
+	scoreEngine.noteChartDataEntry = noteChartModel.noteChartDataEntry
+
+	rhythmModel:load()
+	rhythmModel.timeEngine:sync({
+		time = 0,
+		dt = 0,
+	})
+	rhythmModel:loadLogicEngines()
 end
 
 FastplayController.unload = function(self)
-	self.rhythmModel:unloadLogicEngines()
-	self.rhythmModel:unload()
-end
-
-FastplayController.update = function(self, dt)
-	local rhythmModel = self.rhythmModel
-	rhythmModel.logicEngine:update()
-	rhythmModel.scoreEngine:update()
-	rhythmModel.modifierModel:update()
-end
-
-FastplayController.draw = function(self)
+	local rhythmModel = self.gameController.rhythmModel
+	rhythmModel:unloadAllEngines()
+	rhythmModel:unload()
 end
 
 FastplayController.receive = function(self, event)
-	self.rhythmModel:receive(event)
-end
-
-FastplayController.loadTimePoints = function(self)
-	local absoluteTimes = {}
-
-	local events = self.rhythmModel.replayModel.replay.events
-	for i = 1, #events do
-		absoluteTimes[events[i].time] = true
-	end
-
-	local absoluteTimeList = {}
-	for time in pairs(absoluteTimes) do
-		absoluteTimeList[#absoluteTimeList + 1] = time
-	end
-	table.sort(absoluteTimeList)
-	absoluteTimeList[#absoluteTimeList + 1] = math.huge
-
-	self.absoluteTimeList = absoluteTimeList
-	self.nextTimeIndex = 1
+	self.gameController.rhythmModel:receive(event)
 end
 
 return FastplayController

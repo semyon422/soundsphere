@@ -2,35 +2,27 @@ local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 
 local Shift = SwapModifier:new()
 
-Shift.sequential = true
 Shift.type = "NoteChartModifier"
+Shift.interfaceType = "slider"
 
 Shift.name = "Shift"
-Shift.shortName = "Shift"
 
-Shift.variableType = "number"
-Shift.variableName = "value"
+Shift.defaultValue = 0
+Shift.range = {-5, 5}
 
-Shift.variableFormat = "%3s"
-Shift.variableRange = {-5, 1, 5}
-
-Shift.value = 0
-
-Shift.tostring = function(self)
-    if self.value > 0 then
-        return self.shortName .. "+" .. self.value
-    elseif self.value < 0 then
-        return self.shortName .. "-" .. -self.value
-    else
-        return self.shortName .. self.value
+Shift.getString = function(self, config)
+    if config.value > 0 then
+        return "S+"
+    elseif config.value < 0 then
+        return "S-"
     end
 end
 
-Shift.tojson = function(self)
-	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
+Shift.getSubString = function(self, config)
+    return math.abs(config.value)
 end
 
-Shift.getMap = function(self)
+Shift.getMap = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
 
 	local inputCounts = {}
@@ -45,7 +37,7 @@ Shift.getMap = function(self)
 
 	local map = {}
 
-	local value = self.value
+	local value = config.value
 	for inputType, inputCount in pairs(inputCounts) do
 		map[inputType] = {}
 		local submap = map[inputType]

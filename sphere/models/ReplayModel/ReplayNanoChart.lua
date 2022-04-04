@@ -50,7 +50,7 @@ ReplayNanoChart.encode = function(self, events, inputMode)
 		notes[#notes + 1] = {
 			time = event.time,
 			type = event.name:find("pressed") and 1 or 0,
-			input = inputMap[event.args[1]]
+			input = inputMap[event[1]]
 		}
 	end
 
@@ -67,10 +67,10 @@ ReplayNanoChart.decode = function(self, content, size, inputMode)
 	local events = {}
 	for _, note in ipairs(notes) do
 		events[#events + 1] = {
+			reversedInputMap[note.input],
 			time = note.time,
 			name = note.type == 1 and "keypressed" or "keyreleased",
-			args = {reversedInputMap[note.input]},
-			virtual = true
+			virtual = true,
 		}
 	end
 

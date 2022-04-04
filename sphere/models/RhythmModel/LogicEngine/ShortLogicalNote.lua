@@ -9,10 +9,7 @@ ShortLogicalNote.construct = function(self)
 	self.noteData = nil
 
 	self.keyBind = self.startNoteData.inputType .. self.startNoteData.inputIndex
-
-	LogicalNote.construct(self)
-
-	self:switchState("clear")
+	self.state = "clear"
 end
 
 ShortLogicalNote.update = function(self)
@@ -20,52 +17,80 @@ ShortLogicalNote.update = function(self)
 		return
 	end
 
-	self.eventTime = self.eventTime or self.logicEngine.currentTime
-
-	local timeState = self.scoreNote:getTimeState()
-
-	local numStates = #self.states
-	if not self.autoplay then
-		self:processTimeState(timeState)
-	else
-		self:processAuto()
+	if self.autoplay then
+		return self:processAuto()
 	end
 
-	if numStates ~= #self.states then
-		return self:update()
-	else
-		self.eventTime = nil
-	end
+	local timeState = self:getTimeState()
+	self:processTimeState(timeState)
 end
 
 ShortLogicalNote.processTimeState = function(self, timeState)
-	if self.keyState and timeState == "none" then
+	local keyState = self.keyState
+	if keyState and timeState == "too early" then
 		self.keyState = false
-	elseif self.keyState and timeState == "early" then
+	elseif keyState and (timeState == "early" or timeState == "late") or timeState == "too late" then
 		self:switchState("missed")
 		return self:next()
-	elseif timeState == "late" then
-		self:switchState("missed")
-		return self:next()
-	elseif self.keyState and timeState == "exactly" then
+	elseif keyState and timeState == "exactly" then
 		self:switchState("passed")
 		return self:next()
 	end
 end
 
+local scoreEvent = {
+	name = "ScoreNoteState",
+	noteType = "ShortScoreNote",
+}
+ShortLogicalNote.switchState = function(self, newState)
+	local oldState = self.state
+	self.state = newState
+
+	if not self.playable then
+		return
+	end
+
+	local config = self.logicEngine.timings.ShortScoreNote
+	local currentTime = math.min(self.eventTime or self.timeEngine.currentTime, self:getNoteTime() + self:getLastTimeFromConfig(config.hit, config.miss) * math.abs(self.timeEngine.timeRate))
+
+	scoreEvent.currentTime = currentTime
+	scoreEvent.noteTime = self:getNoteTime()
+	scoreEvent.timeRate = self.timeEngine.timeRate
+	scoreEvent.notesCount = self.logicEngine.notesCount
+	scoreEvent.oldState = oldState
+	scoreEvent.newState = newState
+	scoreEvent.minTime = self.scoreEngine.minTime
+	scoreEvent.maxTime = self.scoreEngine.maxTime
+	self:sendScore(scoreEvent)
+end
+
 ShortLogicalNote.processAuto = function(self)
-	local deltaTime = self.logicEngine.currentTime - self.startNoteData.timePoint.absoluteTime
-	if deltaTime >= 0 then
+	if self:isHere() then
 		self.keyState = true
 		self:sendState("keyState")
 
-		self.eventTime = self.startNoteData.timePoint.absoluteTime
+		self.eventTime = self:getNoteTime()
 		self:processTimeState("exactly")
 		self.eventTime = nil
 	end
 end
 
-ShortLogicalNote.receive = function(self, event)
+ShortLogicalNote.getTimeState = function(self)
+	local currentTime = self:getEventTime()
+	local deltaTime = (currentTime - self:getNoteTime()) / math.abs(self.timeEngine.timeRate)
+	local config = self.logicEngine.timings.ShortScoreNote
+	return self:getTimeStateFromConfig(config.hit, config.miss, deltaTime)
+end
+
+ShortLogicalNote.isReachable = function(self, currentNote)
+	local eventTime = self.eventTime
+	self.eventTime = currentNote:getEventTime()
+	local isReachable = self:getTimeState() ~= "too early"
+	self.eventTime = eventTime
+	return isReachable
+end
+
+ShortLogicalNote.receive = function(self, event, isRec)
 	if self.logicEngine.autoplay then
 		return
 	end
@@ -78,17 +103,21 @@ ShortLogicalNote.receive = function(self, event)
 		return
 	end
 
-	local key = event.args and event.args[1]
+	local key = event and event[1]
 	if key == self.keyBind then
+		self.eventTime = event.time
+		self:update()
+		if self.ended then
+			return true
+		end
 		if event.name == "keypressed" then
 			self.keyState = true
-			self:sendState("keyState")
-			self.eventTime = event.time
 		elseif event.name == "keyreleased" then
 			self.keyState = false
-			self:sendState("keyState")
-			self.eventTime = event.time
 		end
+		self:sendState("keyState")
+		self:update()
+		self.eventTime = nil
 	end
 end
 

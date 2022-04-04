@@ -1,49 +1,14 @@
 local Class					= require("aqua.util.Class")
-local ScreenManager			= require("sphere.screen.ScreenManager")
-local NoteChartModel		= require("sphere.models.NoteChartModel")
-local ModifierModel			= require("sphere.models.ModifierModel")
-local NoteSkinModel			= require("sphere.models.NoteSkinModel")
-local InputModel			= require("sphere.models.InputModel")
-local CacheModel			= require("sphere.models.CacheModel")
-local ModifierController	= require("sphere.controllers.ModifierController")
-local DifficultyModel		= require("sphere.models.DifficultyModel")
-local NoteChartSetLibraryModel		= require("sphere.models.NoteChartSetLibraryModel")
-local NoteChartLibraryModel		= require("sphere.models.NoteChartLibraryModel")
-local ScoreLibraryModel		= require("sphere.models.ScoreLibraryModel")
-local SearchLineModel		= require("sphere.models.SearchLineModel")
 
 local SelectController = Class:new()
 
-SelectController.construct = function(self)
-	self.modifierModel = ModifierModel:new()
-	self.noteSkinModel = NoteSkinModel:new()
-	self.noteChartModel = NoteChartModel:new()
-	self.inputModel = InputModel:new()
-	self.modifierController = ModifierController:new()
-	self.difficultyModel = DifficultyModel:new()
-	self.noteChartSetLibraryModel = NoteChartSetLibraryModel:new()
-	self.noteChartLibraryModel = NoteChartLibraryModel:new()
-	self.scoreLibraryModel = ScoreLibraryModel:new()
-	self.searchLineModel = SearchLineModel:new()
-end
-
 SelectController.load = function(self)
-	local modifierModel = self.modifierModel
-	local noteSkinModel = self.noteSkinModel
-	local noteChartModel = self.noteChartModel
-	local inputModel = self.inputModel
-	local cacheModel = self.cacheModel
-	local themeModel = self.themeModel
-	local modifierController = self.modifierController
-	local configModel = self.configModel
-	local mountModel = self.mountModel
-	local scoreModel = self.scoreModel
-	local onlineModel = self.onlineModel
-	local difficultyModel = self.difficultyModel
-	local noteChartSetLibraryModel = self.noteChartSetLibraryModel
-	local noteChartLibraryModel = self.noteChartLibraryModel
-	local scoreLibraryModel = self.scoreLibraryModel
-	local searchLineModel = self.searchLineModel
+	local noteChartModel = self.gameController.noteChartModel
+	local themeModel = self.gameController.themeModel
+	local selectModel = self.gameController.selectModel
+	local previewModel = self.gameController.previewModel
+
+	self.gameController:writeConfigs()
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -51,55 +16,26 @@ SelectController.load = function(self)
 	local view = theme:newView("SelectView")
 	self.view = view
 
-	noteChartModel.cacheModel = cacheModel
-	noteSkinModel.configModel = configModel
-	modifierModel.noteChartModel = noteChartModel
-	modifierModel.difficultyModel = difficultyModel
-	modifierModel.scoreModel = scoreModel
-	noteChartSetLibraryModel.cacheModel = cacheModel
-	noteChartLibraryModel.cacheModel = cacheModel
-	scoreLibraryModel.scoreModel = scoreModel
-
 	view.controller = self
-	view.themeModel = themeModel
-	view.noteChartModel = noteChartModel
-	view.modifierModel = modifierModel
-	view.noteSkinModel = noteSkinModel
-	view.inputModel = inputModel
-	view.cacheModel = cacheModel
-	view.configModel = configModel
-	view.mountModel = mountModel
-	view.scoreModel = scoreModel
-	view.onlineModel = onlineModel
-	view.noteChartSetLibraryModel = noteChartSetLibraryModel
-	view.noteChartLibraryModel = noteChartLibraryModel
-	view.scoreLibraryModel = scoreLibraryModel
-	view.searchLineModel = searchLineModel
+	view.gameController = self.gameController
 
-	modifierController.modifierModel = modifierModel
-	modifierController.noteChartModel = noteChartModel
-	modifierController.difficultyModel = difficultyModel
-	modifierController.scoreModel = scoreModel
-	modifierController.configModel = configModel
-	modifierController.selectController = self
-
-	inputModel:load()
-	modifierModel:load()
-	noteSkinModel:load()
-	cacheModel:load()
 	noteChartModel:load()
+	selectModel:load()
+	previewModel:load()
 
 	view:load()
 end
 
 SelectController.unload = function(self)
-	self.modifierModel:unload()
-	self.noteChartModel:unload()
+	self.gameController.noteSkinModel:load()
+	self.gameController.previewModel:unload()
 	self.view:unload()
-	self.inputModel:unload()
+	self.gameController:writeConfigs()
 end
 
 SelectController.update = function(self, dt)
+	self.gameController.previewModel:update(dt)
+	self.gameController.selectModel:update()
 	self.view:update(dt)
 end
 
@@ -109,21 +45,44 @@ end
 
 SelectController.receive = function(self, event)
 	self.view:receive(event)
-	self.modifierController:receive(event)
 
-    if event.name == "setNoteSkin" then
-		self.noteSkinModel:setDefaultNoteSkin(event.inputMode, event.metaData)
-	elseif event.name == "setTheme" then
+	if event.name == "setTheme" then
 		self.themeModel:setDefaultTheme(event.theme)
-	elseif event.name == "setInputBinding" then
-		self.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
-	elseif event.name == "selectNoteChart" then
-		if event.type == "noteChartEntry" then
-			self.noteChartModel:selectNoteChart(event.noteChartEntryId, event.noteChartDataEntryId)
-		elseif event.type == "noteChartSetEntry" then
-			self.noteChartModel:selectNoteChartSet(event.id)
+	elseif event.name == "scrollCollection" then
+		self.gameController.selectModel:scrollCollection(event.direction)
+	elseif event.name == "scrollNoteChartSet" then
+		self.gameController.selectModel:scrollNoteChartSet(event.direction)
+	elseif event.name == "scrollNoteChart" then
+		self.gameController.selectModel:scrollNoteChart(event.direction)
+	elseif event.name == "scrollScore" then
+		self.gameController.selectModel:scrollScore(event.direction)
+	elseif event.name == "scrollRandom" then
+		self.gameController.selectModel:scrollRandom()
+	elseif event.name == "setSortFunction" then
+		self.gameController.selectModel:setSortFunction(event.sortFunction)
+	elseif event.name == "scrollSortFunction" then
+		self.gameController.selectModel:scrollSortFunction(event.delta)
+	elseif event.name == "setSearchString" then
+		self.gameController.searchModel:setSearchString(event.text)
+	elseif event.name == "changeScreen" then
+		if event.screenName == "Modifier" then
+			self:switchModifierController()
+		elseif event.screenName == "NoteSkin" then
+			self:switchNoteSkinController()
+		elseif event.screenName == "Input" then
+			self:switchInputController()
+		elseif event.screenName == "Settings" then
+			self:switchSettingsController()
+		elseif event.screenName == "Result" then
+			self:switchResultController()
 		end
-	elseif event.action == "playNoteChart" then
+	elseif event.name == "changeSearchMode" then
+		self.gameController.selectModel:changeSearchMode()
+	elseif event.name == "changeCollapse" then
+		self.gameController.selectModel:changeCollapse()
+	elseif event.name == "pullNoteChartSet" then
+		self.gameController.selectModel:pullNoteChartSet()
+	elseif event.name == "playNoteChart" then
 		self:playNoteChart()
 	elseif event.name == "loadModifiedNoteChart" then
 		self:loadModifiedNoteChart()
@@ -131,33 +90,37 @@ SelectController.receive = function(self, event)
 		self:unloadModifiedNoteChart()
 	elseif event.name == "resetModifiedNoteChart" then
 		self:resetModifiedNoteChart()
-	elseif event.action == "replayNoteChart" then
-		self:replayNoteChart(event.mode, event.scoreEntry.replayHash)
 	elseif event.name == "quickLogin" then
-		self.onlineModel:quickLogin(self.configModel:get("online.quick_login_key"))
-	elseif event.name == "setScreen" then
-		if event.screenName == "BrowserScreen" then
-			local BrowserController = require("sphere.controllers.BrowserController")
-			local browserController = BrowserController:new()
-			browserController.configModel = self.configModel
-			browserController.cacheModel = self.cacheModel
-			browserController.themeModel = self.themeModel
-			browserController.selectController = self
-			return ScreenManager:set(browserController)
-		elseif event.screenName == "SettingsScreen" then
-			local SettingsController = require("sphere.controllers.SettingsController")
-			local settingsController = SettingsController:new()
-			settingsController.configModel = self.configModel
-			settingsController.themeModel = self.themeModel
-			settingsController.selectController = self
-			return ScreenManager:set(settingsController)
+		self.gameController.onlineModel.authManager:quickLogin()
+	elseif event.name == "openDirectory" then
+		local selectModel = self.gameController.selectModel
+		local path = selectModel.noteChartItem.noteChartEntry.path:match("^(.+)/.-$")
+		local mountPath = self.gameController.mountModel:getRealPath(path)
+		local realPath =
+			mountPath or
+			love.filesystem.getSource() .. "/" .. path
+		love.system.openURL("file://" .. realPath)
+	elseif event.name == "updateCache" then
+		local selectModel = self.gameController.selectModel
+		local path = selectModel.noteChartItem.noteChartEntry.path:match("^(.+)/.-$")
+		self.gameController.cacheModel:startUpdate(path, event.force)
+	elseif event.name == "updateCacheCollection" then
+		local state = self.gameController.cacheModel.cacheUpdater.state
+		if state == 0 or state == 3 then
+			self.gameController.cacheModel:startUpdate(event.collection.path, event.force)
+		else
+			self.gameController.cacheModel:stopUpdate()
 		end
+	elseif event.name == "deleteNoteChart" then
+	elseif event.name == "deleteNoteChartSet" then
 	end
 end
 
 SelectController.resetModifiedNoteChart = function(self)
-	local noteChartModel = self.noteChartModel
-	local modifierModel = self.modifierModel
+	local noteChartModel = self.gameController.noteChartModel
+	local modifierModel = self.gameController.modifierModel
+
+	noteChartModel:load()
 
 	local noteChart = noteChartModel:loadNoteChart()
 
@@ -179,92 +142,81 @@ SelectController.unloadModifiedNoteChart = function(self)
 	self.noteChartModel:unloadNoteChart()
 end
 
+SelectController.switchModifierController = function(self)
+	if not self.gameController.noteChartModel:getFileInfo() then
+		return
+	end
+
+	local ModifierController = require("sphere.controllers.ModifierController")
+	local modifierController = ModifierController:new()
+	modifierController.selectController = self
+	modifierController.gameController = self.gameController
+	return self.gameController.screenManager:set(modifierController)
+end
+
+SelectController.switchNoteSkinController = function(self)
+	if not self.gameController.noteChartModel:getFileInfo() then
+		return
+	end
+
+	self:resetModifiedNoteChart()
+
+	local NoteSkinController = require("sphere.controllers.NoteSkinController")
+	local noteSkinController = NoteSkinController:new()
+	noteSkinController.selectController = self
+	noteSkinController.gameController = self.gameController
+	return self.gameController.screenManager:set(noteSkinController)
+end
+
+SelectController.switchInputController = function(self)
+	if not self.gameController.noteChartModel:getFileInfo() then
+		return
+	end
+
+	self:resetModifiedNoteChart()
+
+	local InputController = require("sphere.controllers.InputController")
+	local inputController = InputController:new()
+	inputController.selectController = self
+	inputController.gameController = self.gameController
+	return self.gameController.screenManager:set(inputController)
+end
+
+SelectController.switchSettingsController = function(self)
+	local SettingsController = require("sphere.controllers.SettingsController")
+	local settingsController = SettingsController:new()
+	settingsController.selectController = self
+	settingsController.gameController = self.gameController
+	return self.gameController.screenManager:set(settingsController)
+end
+
+SelectController.switchResultController = function(self)
+	local ResultController = require("sphere.controllers.ResultController")
+	local resultController = ResultController:new()
+	resultController.selectController = self
+	resultController.gameController = self.gameController
+
+	local selectModel = self.gameController.selectModel
+	local scoreItemIndex = selectModel.scoreItemIndex
+	local scoreItem = selectModel.scoreItem
+	if not scoreItem then
+		return
+	end
+	resultController:replayNoteChart("result", scoreItem.scoreEntry, scoreItemIndex)
+
+	return self.gameController.screenManager:set(resultController)
+end
+
 SelectController.playNoteChart = function(self)
-	local noteChartModel = self.noteChartModel
-	local info = love.filesystem.getInfo(noteChartModel.noteChartEntry.path)
-	if not info then
+	if not self.gameController.noteChartModel:getFileInfo() then
 		return
 	end
 
 	local GameplayController = require("sphere.controllers.GameplayController")
 	local gameplayController = GameplayController:new()
-	gameplayController.noteChartModel = noteChartModel
-	gameplayController.themeModel = self.themeModel
-	gameplayController.modifierModel = self.modifierModel
-	gameplayController.configModel = self.configModel
-	gameplayController.notificationModel = self.notificationModel
-	gameplayController.scoreModel = self.scoreModel
-	gameplayController.onlineModel = self.onlineModel
-	gameplayController.difficultyModel = self.difficultyModel
 	gameplayController.selectController = self
-	return ScreenManager:set(gameplayController)
-end
-
-SelectController.replayNoteChart = function(self, mode, hash)
-	local noteChartModel = self.noteChartModel
-	local info = love.filesystem.getInfo(noteChartModel.noteChartEntry.path)
-	if not info then
-		return
-	end
-	if noteChartModel.noteChartDataEntry.hash == "" then
-		return
-	end
-
-	local gameplayController
-	if mode == "result" then
-		local FastplayController = require("sphere.controllers.FastplayController")
-		gameplayController = FastplayController:new()
-	else
-		local GameplayController = require("sphere.controllers.GameplayController")
-		gameplayController = GameplayController:new()
-	end
-
-	local replay = gameplayController.rhythmModel.replayModel:loadReplay(hash)
-
-	if replay.modifiers then
-		self.modifierModel:fromTable(replay.modifiers)
-	end
-	if mode == "replay" or mode == "result" then
-		gameplayController.rhythmModel.replayModel.replay = replay
-		gameplayController.rhythmModel.inputManager:setMode("internal")
-		gameplayController.rhythmModel.replayModel:setMode("replay")
-	elseif mode == "retry" then
-		gameplayController.rhythmModel.inputManager:setMode("external")
-		gameplayController.rhythmModel.replayModel:setMode("record")
-	end
-
-	gameplayController.noteChartModel = noteChartModel
-	gameplayController.modifierModel = self.modifierModel
-	gameplayController.configModel = self.configModel
-	gameplayController.notificationModel = self.notificationModel
-	gameplayController.themeModel = self.themeModel
-	gameplayController.scoreModel = self.scoreModel
-	gameplayController.onlineModel = self.onlineModel
-	gameplayController.difficultyModel = self.difficultyModel
-	gameplayController.selectController = self
-
-	if mode == "result" then
-		noteChartModel:unload()
-		gameplayController:play()
-
-		local ResultController = require("sphere.controllers.ResultController")
-		local resultController = ResultController:new()
-
-		resultController.scoreSystem = gameplayController.rhythmModel.scoreEngine.scoreSystem
-		resultController.noteChartModel = noteChartModel
-		resultController.themeModel = self.themeModel
-		resultController.modifierModel = self.modifierModel
-		resultController.configModel = self.configModel
-		resultController.scoreModel = self.scoreModel
-		resultController.onlineModel = self.onlineModel
-		resultController.difficultyModel = self.difficultyModel
-		resultController.autoplay = gameplayController.rhythmModel.logicEngine.autoplay
-		resultController.selectController = self
-
-		ScreenManager:set(resultController)
-	else
-		return ScreenManager:set(gameplayController)
-	end
+	gameplayController.gameController = self.gameController
+	return self.gameController.screenManager:set(gameplayController)
 end
 
 return SelectController

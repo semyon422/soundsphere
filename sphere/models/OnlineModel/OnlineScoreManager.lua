@@ -1,66 +1,74 @@
-local Observable	= require("aqua.util.Observable")
+local thread	= require("aqua.thread")
 local Class			= require("aqua.util.Class")
-local ThreadPool	= require("aqua.thread.ThreadPool")
+local inspect = require("inspect")
 
 local OnlineScoreManager = Class:new()
 
-OnlineScoreManager.construct = function(self)
-	self.observable = Observable:new()
-end
+local async_read = thread.async(function(...) return love.filesystem.read(...) end)
 
-OnlineScoreManager.load = function(self)
-	ThreadPool.observable:add(self)
-end
+OnlineScoreManager.submit = thread.coro(function(self, noteChartEntry, noteChartDataEntry, replayHash)
+	local webApi = self.webApi
+	local api = webApi.api
 
-OnlineScoreManager.unload = function(self)
-	ThreadPool.observable:remove(self)
-end
-
-OnlineScoreManager.receive = function(self, event)
-	if event.name == "ScoreSubmitResponse" then
-		self.onlineModel:receive(event)
+	print("POST " .. api.scores)
+	local notechart_filename = noteChartEntry.path:match("^.+/(.-)$")
+	local response, code, headers = api.scores:post({
+		notechart_filename = notechart_filename,
+		notechart_filesize = 0,
+		notechart_hash = noteChartDataEntry.hash,
+		notechart_index = noteChartDataEntry.index,
+		replay_hash = replayHash,
+		replay_size = 0,
+	})
+	if code ~= 201 then
+		print(code)
+		print(inspect(response))
+		return
 	end
-end
 
-OnlineScoreManager.submit = function(self, noteChartEntry, noteChartDataEntry, replayHash)
-	return ThreadPool:execute(
-		[[
-			local http = require("aqua.http")
-			local request = require("luajit-request")
+	local score = webApi:newResource(headers.location):get({
+		notechart = true,
+		notechart_file = true,
+		file = true,
+	})
+	if not score or not score.file or not score.notechart or not score.notechart.file then
+		print("not score")
+		return
+	end
 
-			local data = ({...})[1]
-			for k, v in pairs(data) do
-				data[k] = tostring(v)
-			end
-
-			local response = request.send(data.host .. "/score", {
-				method = "POST",
-				data = {
-					session = data.session,
-					replay_hash = data.replayHash,
-					notechart_hash = data.hash,
-					notechart_index = data.index,
-					notechart_filename = data.fileName
-				}
+	local notechart = score.notechart
+	if not notechart.is_complete then
+		local file = notechart.file
+		if not file.uploaded then
+			local content = async_read(noteChartEntry.path)
+			api.files[file.id]:put(nil, {
+				file = {content, filename = notechart_filename},
 			})
-
-			thread:push({
-				name = "ScoreSubmitResponse",
-				status = response.code == 200,
-				body = response.body
+		end
+		response, code, headers = api.notecharts[notechart.id]:_patch()
+		if code ~= 200 then
+			print(code)
+			print(inspect(response))
+		end
+	end
+	if not score.is_complete then
+		local file = score.file
+		if not file.uploaded then
+			local content = async_read("userdata/replays/" .. replayHash)
+			api.files[file.id]:put(nil, {
+				file = {content, filename = replayHash},
 			})
-		]],
-		{
-			{
-				host = self.host,
-				session = self.session,
-				replayHash = replayHash,
-				hash = noteChartDataEntry.hash,
-				index = noteChartDataEntry.index,
-				fileName = noteChartEntry.path:match("^.+/(.-)$")
-			}
-		}
-	)
-end
+		end
+		response, code, headers = api.scores[score.id]:_patch()
+		if code ~= 200 then
+			print(code)
+			print(inspect(response))
+		end
+	end
+	api.scores[score.id].leaderboards:put()
+
+	score = api.scores[score.id]:get()
+	print(inspect(score))
+end)
 
 return OnlineScoreManager

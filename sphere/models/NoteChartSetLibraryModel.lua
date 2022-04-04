@@ -1,86 +1,74 @@
 local Class = require("aqua.util.Class")
-local SearchManager			= require("sphere.database.SearchManager")
 
 local NoteChartSetLibraryModel = Class:new()
 
+NoteChartSetLibraryModel.searchMode = "hide"
+NoteChartSetLibraryModel.collapse = false
+
 NoteChartSetLibraryModel.construct = function(self)
-	self:setSearchString("")
-end
-
-NoteChartSetLibraryModel.setSearchString = function(self, searchString)
-	if searchString == self.searchString then
-		return
-	end
-	self.searchString = searchString
-	self.items = nil
-end
-
-NoteChartSetLibraryModel.getItems = function(self)
-	if not self.items then
-		self:updateItems()
-	end
-	return self.items
+	self.items = {}
 end
 
 NoteChartSetLibraryModel.updateItems = function(self)
 	local items = {}
 	self.items = items
 
-	local noteChartSetEntries = self.cacheModel.cacheManager:getNoteChartSets()
-	for i = 1, #noteChartSetEntries do
-		local noteChartSetEntry = noteChartSetEntries[i]
-		if self:checkNoteChartSetEntry(noteChartSetEntry) then
-			local noteChartEntries = self.cacheModel.cacheManager:getNoteChartsAtSet(noteChartSetEntry.id)
-			local noteChartDataEntries = self.cacheModel.cacheManager:getAllNoteChartDataEntries(noteChartEntries[1].hash)
-			items[#items + 1] = {
-				noteChartSetEntry = noteChartSetEntry,
-				noteChartEntries = noteChartEntries,
-				noteChartDataEntries = noteChartDataEntries
-			}
-		end
-	end
-end
-
-
-NoteChartSetLibraryModel.checkNoteChartSetEntry = function(self, entry)
-	-- local base = entry.path:find(self.basePath, 1, true)
-	-- if not base then return false end
-	-- if not self.needSearch then return true end
-
-	local list = self.cacheModel.cacheManager:getNoteChartsAtSet(entry.id)
-	if not list or not list[1] then
-		return
+	local noteChartDataEntries = self.cacheModel.cacheManager:getNoteChartDatas()
+	local sortFunction = self.sortFunction
+	if sortFunction then
+		table.sort(noteChartDataEntries, sortFunction)
 	end
 
-	for i = 1, #list do
-		local entries = self.cacheModel.cacheManager:getAllNoteChartDataEntries(list[i].hash)
-		for _, entry in pairs(entries) do
-			local found = SearchManager:check(entry, self.searchString)
-			if found == true then
-				return true
+	local prevSetId = 0
+	for i = 1, #noteChartDataEntries do
+		local noteChartDataEntry = noteChartDataEntries[i]
+		local noteChartEntries = self.cacheModel.cacheManager:getNoteChartsAtHash(noteChartDataEntry.hash)
+		for _, noteChartEntry in ipairs(noteChartEntries) do
+			local setId = noteChartEntry and noteChartEntry.setId
+			local noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(setId)
+			local check = self:checkNoteChartDataEntry(noteChartDataEntry, noteChartEntry, noteChartSetEntry)
+			if check or self.searchMode == "show" then
+				if setId and (not self.collapse or setId ~= prevSetId) then
+					items[#items + 1] = {
+						noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(setId),
+						noteChartEntry = noteChartEntry,
+						noteChartDataEntry = noteChartDataEntry,
+						tagged = self.searchMode == "show" and check
+					}
+				end
+				prevSetId = setId
 			end
 		end
 	end
 end
 
-NoteChartSetLibraryModel.sortItemsFunction = function(a, b)
-	return a.noteChartSetEntry.path < b.noteChartSetEntry.path
+NoteChartSetLibraryModel.checkNoteChartDataEntry = function(self, noteChartDataEntry, noteChartEntry, noteChartSetEntry)
+	if not noteChartEntry or not noteChartSetEntry then
+		return
+	end
+	return self.searchModel:check(noteChartDataEntry, noteChartEntry, noteChartSetEntry)
 end
 
-NoteChartSetLibraryModel.getItemIndex = function(self, item)
+NoteChartSetLibraryModel.getItemIndex = function(self, noteChartSetEntryId, noteChartEntryId, noteChartDataEntryId)
 	local items = self.items
 
-	if not item or not items then
+	if not items then
 		return 1
 	end
 
+	local collapsedItemIndex
 	for i = 1, #items do
-		if items[i].noteChartSetEntry == item.noteChartSetEntry then
-			return i
+		local item = items[i]
+		if item.noteChartSetEntry.id == noteChartSetEntryId then
+			if item.noteChartEntry.id == noteChartEntryId and item.noteChartDataEntry.id == noteChartDataEntryId then
+				return i
+			elseif self.collapse then
+				collapsedItemIndex = i
+			end
 		end
 	end
 
-	return 1
+	return collapsedItemIndex or 1
 end
 
 return NoteChartSetLibraryModel

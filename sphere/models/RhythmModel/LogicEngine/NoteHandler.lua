@@ -11,29 +11,33 @@ NoteHandler.unload = function(self) end
 
 NoteHandler.loadNoteData = function(self)
 	self.noteData = {}
-	
+	local notesCount = self.logicEngine.notesCount
+
 	local logicEngine = self.logicEngine
+	local scoreEngine = self.logicEngine.rhythmModel.scoreEngine
+	local timeEngine = self.logicEngine.rhythmModel.timeEngine
 	for layerDataIndex in logicEngine.noteChart:getLayerDataIndexIterator() do
 		local layerData = logicEngine.noteChart:requireLayerData(layerDataIndex)
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
-			
+
 			if noteData.inputType == self.inputType and noteData.inputIndex == self.inputIndex then
 				local logicalNote = LogicalNoteFactory:getNote(noteData)
-				
+
 				if logicalNote then
 					logicalNote.noteHandler = self
 					logicalNote.logicEngine = logicEngine
-					logicalNote.scoreNote = self.logicEngine:getScoreNote(noteData)
-					logicalNote.scoreNote.logicalNote = logicalNote
+					logicalNote.scoreEngine = scoreEngine
+					logicalNote.timeEngine = timeEngine
+					notesCount[logicalNote.noteClass] = (notesCount[logicalNote.noteClass] or 0) + 1
 					table.insert(self.noteData, logicalNote)
-					
+
 					logicEngine.sharedLogicalNotes[noteData] = logicalNote
 				end
 			end
 		end
 	end
-	
+
 	table.sort(self.noteData, function(a, b)
 		return a.startNoteData.timePoint < b.startNoteData.timePoint
 	end)
@@ -41,7 +45,7 @@ NoteHandler.loadNoteData = function(self)
 	for index, logicalNote in ipairs(self.noteData) do
 		logicalNote.index = index
 	end
-	
+
 	self.startNoteIndex = 1
 	self.currentNote = self.noteData[1]
 	if not self.currentNote then return end
@@ -51,26 +55,39 @@ end
 NoteHandler.update = function(self)
 	local currentNote = self.currentNote
 
-	if not self.currentNote then return end
-	
-	currentNote:update()
+	if not currentNote then return end
+	if not currentNote.ended then currentNote:update() end
+	if not currentNote.ended then return end
 
-	if not currentNote.ended then
-		return
-	end
-	
+	self:switchNext()
+	return self:update()
+end
+
+NoteHandler.switchNext = function(self)
+	local currentNote = self.currentNote
 	local nextNote = currentNote:getNext()
 	if nextNote then
 		currentNote:unload()
 		nextNote:load()
 		self.currentNote = nextNote
-		return self:update()
+	else
+		self.currentNote = nil
 	end
 end
 
-NoteHandler.receive = function(self, event)
-	if not self.currentNote then return end
-	return self.currentNote:receive(event)
+NoteHandler.receive = function(self, event, count)
+	count = count or 0
+	local currentNote = self.currentNote
+
+	if not currentNote then return end
+	if currentNote.ended then
+		self:switchNext()
+		return self:receive(event, count + 1)
+	end
+	if currentNote:receive(event) then
+		self:switchNext()
+		return self:receive(event, count + 1)
+	end
 end
 
 return NoteHandler

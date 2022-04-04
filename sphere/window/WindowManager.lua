@@ -1,29 +1,93 @@
 local Class	= require("aqua.util.Class")
-local json	= require("json")
+local cursor = require("sphere.cursor")
 
 local WindowManager = Class:new()
 
 WindowManager.path = "userdata/window.json"
 
 WindowManager.load = function(self)
-	local contents = love.filesystem.read(self.path)
-	self.modes = json.decode(contents)
+	self.graphics = self.configModel.configs.settings.graphics
+	self.mode = self.graphics.mode
+	local mode = self.mode
+	local flags = mode.flags
 
-	self.currentMode = 1
-	self:setMode()
+	local width, height
+	if flags.fullscreen then
+		width, height = love.window.getDesktopDimensions()
+	else
+		width, height = mode.window.width, mode.window.height
+	end
+	love.window.setMode(width, height, mode.flags)
+
+	self:setIcon()
+	love.window.setTitle("soundsphere")
+
+	self.fullscreen = flags.fullscreen
+	self.fullscreentype = flags.fullscreentype
+	self.vsync = flags.vsync
+	self.cursor = self.graphics.cursor
+
+	self:setCursor()
 end
 
-WindowManager.receive = function(self, event)
-	if event.name == "keypressed" and event.args[1] == "f11" then
-		self.currentMode = self.currentMode % #self.modes + 1
-		self:setMode()
+WindowManager.update = function(self)
+	local flags = self.mode.flags
+	local graphics = self.graphics
+	if self.vsync ~= flags.vsync then
+		self.vsync = flags.vsync
+		love.window.setVSync(self.vsync)
+	end
+	if self.fullscreen ~= flags.fullscreen or (self.fullscreen and self.fullscreentype ~= flags.fullscreentype) then
+		self.fullscreen = flags.fullscreen
+		self.fullscreentype = flags.fullscreentype
+		self:setFullscreen(self.fullscreen, self.fullscreentype)
+	end
+	if self.cursor ~= graphics.cursor then
+		self.cursor = graphics.cursor
+		self:setCursor()
 	end
 end
 
-WindowManager.setMode = function(self)
-	local mode = self.modes[self.currentMode]
-	love.window.setMode(mode.width, mode.height, mode.flags)
-	love.resize(mode.width, mode.height)
+WindowManager.receive = function(self, event)
+	if event.name == "keypressed" and event[1] == "f11" then
+		local mode = self.mode
+		self.fullscreen = not self.fullscreen
+		mode.flags.fullscreen = self.fullscreen
+		self:setFullscreen(self.fullscreen, mode.flags.fullscreentype)
+	end
+end
+
+WindowManager.setCursor = function(self)
+	if self.cursor == "circle" then
+		cursor:setCircleCursor()
+	elseif self.cursor == "arrow" then
+		cursor:setArrowCursor()
+	elseif self.cursor == "system" then
+		cursor:setSystemCursor()
+	end
+end
+
+WindowManager.setFullscreen = function(self, fullscreen, fullscreentype)
+	local mode = self.mode
+	local width, height
+	if self.fullscreen then
+		width, height = love.window.getDesktopDimensions()
+	else
+		width, height = mode.window.width, mode.window.height
+	end
+	love.window.updateMode(width, height, {
+		fullscreen = fullscreen,
+		fullscreentype = fullscreentype
+	})
+end
+
+local icon_path = "resources/icon.png"
+WindowManager.setIcon = function(self)
+	local info = love.filesystem.getInfo(icon_path)
+	if info then
+		local imageData = love.image.newImageData(icon_path)
+		love.window.setIcon(imageData)
+	end
 end
 
 return WindowManager

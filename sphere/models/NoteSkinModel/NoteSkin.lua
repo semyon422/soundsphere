@@ -1,84 +1,78 @@
-local tween = require("tween")
 local Class = require("aqua.util.Class")
-local InputMode	= require("ncdk.InputMode")
-local NoteSkinLoader = require("sphere.models.NoteSkinModel.NoteSkinLoader")
 
 local NoteSkin = Class:new()
 
 NoteSkin.construct = function(self)
-	self.data = {}
-	self.env = {}
 	self.notes = {}
-	self.playField = {}
-
-	self.name = ""
-	self.inputMode = InputMode:new()
-	self.type = ""
-	self.path = ""
-	self.directoryPath = ""
+	self.inputs = {}
+	self.textures = {}
+	self.images = {}
+	self.blendModes = {}
 end
 
-NoteSkin.visualTimeRate = 1
-NoteSkin.targetVisualTimeRate = 1
-NoteSkin.scaleScroll = false
-NoteSkin.timeRate = 1
-
-NoteSkin.load = function(self)
-	return NoteSkinLoader:load(self)
+NoteSkin.check = function(self, note)
+	local noteData = note.startNoteData
+	return self.inputs[noteData.inputType .. noteData.inputIndex] and self.notes[note.noteType]
 end
 
-NoteSkin.update = function(self, dt)
-	if self.visualTimeRateTween and self.updateTween then
-		self.visualTimeRateTween:update(dt)
+NoteSkin.get = function(self, noteView, part, key, timeState)
+	local noteData = noteView.startNoteData
+	local noteType = noteView.noteType
+	local column = self.inputs[noteData.inputType .. noteData.inputIndex]
+
+	local value =
+		self.notes[noteType] and
+		self.notes[noteType][part] and
+		self.notes[noteType][part][key]
+
+	if type(value) == "table" then
+		value = value[column]
 	end
-end
-
-NoteSkin.increaseVisualTimeRate = function(self, delta)
-	if math.abs(self.targetVisualTimeRate + delta) > 0.001 then
-		self.targetVisualTimeRate = self.targetVisualTimeRate + delta
-		self:setVisualTimeRate(self.targetVisualTimeRate)
-	else
-		self.targetVisualTimeRate = 0
-		self:setVisualTimeRate(self.targetVisualTimeRate)
+	if type(value) == "function" then
+		return value(timeState, noteView, column)  -- multiple values
 	end
+
+	return value
 end
 
-NoteSkin.setVisualTimeRate = function(self, visualTimeRate)
-	if visualTimeRate * self.visualTimeRate < 0 then
-		self.visualTimeRate = visualTimeRate
-		self.updateTween = false
-	else
-		self.updateTween = true
-		self.visualTimeRateTween = tween.new(0.25, self, {visualTimeRate = visualTimeRate}, "inOutQuad")
+NoteSkin.setTextures = function(self, textures)
+	self.textures = textures
+	return textures
+end
+
+NoteSkin.setImagesAuto = function(self, images)
+	images = images or {}
+	for i, texture in ipairs(self.textures) do
+		local k, v = next(texture)
+		images[k] = {k}
 	end
+	return self:setImages(images)
 end
 
-NoteSkin.getVisualTimeRate = function(self)
-	if not self.scaleScroll then
-		return self.visualTimeRate / math.abs(self.timeRate)
+NoteSkin.setImages = function(self, images)
+	local map = {}
+	for i, texture in ipairs(self.textures) do
+		local k, v = next(texture)
+		map[k] = texture
 	end
-	return self.visualTimeRate
+	for _, image in pairs(images) do
+		image[1] = map[image[1]]
+	end
+	self.images = images
+	return images
 end
 
-NoteSkin.checkNote = function(self, note)
-	return self.notes[note.id]
+NoteSkin.setBlendModes = function(self, blendModes)
+	self.blendModes = blendModes
+	return blendModes
 end
 
-NoteSkin.getG = function(self, note, part, name, timeState)
-	local seq = self.notes[note.id][part].gc[name]
-
-	return self.env[seq[1]](timeState, note.logicalState, seq[2])
-end
-
-NoteSkin.whereWillDraw = function(self, note, part, time)
-	local drawInterval = self.notes[note.id][part].drawInterval
-
-	if -time > drawInterval[2] then
-		return 1
-	elseif -time < drawInterval[1] then
-		return -1
-	else
-		return 0
+NoteSkin.getDimensions = function(self, imageName)
+	local image = self.images[imageName]
+	if image[2] then
+		return image[2][3], image[2][4]
+	elseif image[3] then
+		return image[3][1], image[3][2]
 	end
 end
 

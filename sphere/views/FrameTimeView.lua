@@ -1,6 +1,5 @@
 local Class = require("aqua.util.Class")
 local Profiler = require("aqua.util.Profiler")
-local aquafonts = require("aqua.assets.fonts")
 local spherefonts = require("sphere.assets.fonts")
 
 local FrameTimeView = Class:new()
@@ -19,8 +18,8 @@ FrameTimeView.load = function(self)
 	self.width = love.graphics.getWidth()
 	self.height = love.graphics.getHeight()
 
-	self.font = aquafonts.getFont(spherefonts.NotoMonoRegular, 20)
-	self.largeFont = aquafonts.getFont(spherefonts.NotoMonoRegular, 40)
+	self.font = spherefonts.get({filename = "Noto Sans Mono", size = 20})
+	self.largeFont = spherefonts.get({filename = "Noto Sans Mono", size = 40})
 end
 
 local colors = {
@@ -132,7 +131,7 @@ FrameTimeView.drawFPS = function(self)
 end
 
 FrameTimeView.receive = function(self, event)
-	if event.name == "keypressed" and event.args[1] == "rctrl" and love.keyboard.isDown("lctrl") then
+	if event.name == "keypressed" and event[1] == "rctrl" and love.keyboard.isDown("lctrl") then
 		self.visible = not self.visible
 		self:load()
 	end
@@ -141,10 +140,10 @@ FrameTimeView.receive = function(self, event)
 	end
 
 	if event.name == "keypressed" then
-		return self:keypressed(event.args[1])
+		return self:keypressed(event[1])
 	end
 	if event.name == "wheelmoved" then
-		return self:wheelmoved(event.args[2])
+		return self:wheelmoved(event[2])
 	end
 end
 

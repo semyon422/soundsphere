@@ -1,7 +1,7 @@
 # soundsphere
 Open-source rhythm game
 ## Installing
-https://github.com/semyon422/soundsphere-updater
+https://soundsphere.xyz
 ## Used libraries
 * [tween](https://github.com/kikito/tween.lua "tween") by kikito
 * [md5](https://github.com/kikito/md5.lua "md5") by kikito

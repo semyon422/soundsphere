@@ -1,11 +1,9 @@
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
 local NoteDrawer		= require("sphere.models.RhythmModel.GraphicEngine.NoteDrawer")
+local tween = require("tween")
 
 local GraphicEngine = Class:new()
-
-GraphicEngine.offset = 0
-GraphicEngine.scaleVisualOffset = false
 
 GraphicEngine.construct = function(self)
 	self.observable = Observable:new()
@@ -18,54 +16,52 @@ end
 
 GraphicEngine.load = function(self)
 	self.noteCount = 0
-	self.currentTime = 0
-	self.timeRate = 1
 
 	self:loadNoteDrawers()
 end
 
 GraphicEngine.update = function(self, dt)
-	self:updateNoteDrawers()
+	if self.visualTimeRateTween and self.updateTween then
+		self.visualTimeRateTween:update(dt)
+	end
+	for _, noteDrawer in pairs(self.noteDrawers) do
+		noteDrawer:update()
+	end
+end
 
-	self.noteSkin:update(dt)
+GraphicEngine.increaseVisualTimeRate = function(self, delta)
+	if math.abs(self.targetVisualTimeRate + delta) > 0.001 then
+		self.targetVisualTimeRate = self.targetVisualTimeRate + delta
+		self:setVisualTimeRate(self.targetVisualTimeRate)
+	else
+		self.targetVisualTimeRate = 0
+		self:setVisualTimeRate(self.targetVisualTimeRate)
+	end
+end
+
+GraphicEngine.setVisualTimeRate = function(self, visualTimeRate)
+	if visualTimeRate * self.visualTimeRate < 0 then
+		self.visualTimeRate = visualTimeRate
+		self.updateTween = false
+	else
+		self.updateTween = true
+		self.visualTimeRateTween = tween.new(0.25, self, {visualTimeRate = visualTimeRate}, "inOutQuad")
+	end
+end
+
+GraphicEngine.getVisualTimeRate = function(self)
+	return self.visualTimeRate / math.abs(self.rhythmModel.timeEngine.timeRate)
 end
 
 GraphicEngine.unload = function(self)
-	self:unloadNoteDrawers()
-end
-
-GraphicEngine.receive = function(self, event)
-	for noteDrawer in pairs(self.noteDrawers) do
-		noteDrawer:receive(event)
+	for _, noteDrawer in pairs(self.noteDrawers) do
+		noteDrawer:unload()
 	end
-
-	if event.name == "TimeState" then
-		self.currentTime = event.currentTime
-		self.timeRate = event.timeRate
-		if self.noteSkin and event.timeRate ~= 0 then
-			self.noteSkin.timeRate = event.timeRate
-		end
-		return
-	end
-end
-
-GraphicEngine.setVisualOffset = function(self, offset)
-	self.offset = offset
-end
-
-GraphicEngine.getVisualOffset = function(self)
-	if not self.scaleVisualOffset then
-		return self.offset
-	end
-	return self.offset * self.timeEngine.timeRate
-end
-
-GraphicEngine.setScaleVisualOffset = function(self, scaleVisualOffset)
-	self.scaleVisualOffset = scaleVisualOffset
+	self.noteDrawers = {}
 end
 
 GraphicEngine.getLogicalNote = function(self, noteData)
-	return self.logicEngine.sharedLogicalNotes[noteData]
+	return self.rhythmModel.logicEngine.sharedLogicalNotes[noteData]
 end
 
 GraphicEngine.getNoteDrawer = function(self, layerIndex, inputType, inputIndex)
@@ -84,30 +80,11 @@ GraphicEngine.loadNoteDrawers = function(self)
 			for inputType, inputIndex in self.noteChart:getInputIteraator() do
 				local noteDrawer = self:getNoteDrawer(layerIndex, inputType, inputIndex)
 				if noteDrawer then
-					self.noteDrawers[noteDrawer] = noteDrawer
+					table.insert(self.noteDrawers, noteDrawer)
 					noteDrawer:load()
 				end
 			end
 		end
-	end
-end
-
-GraphicEngine.updateNoteDrawers = function(self)
-	for noteDrawer in pairs(self.noteDrawers) do
-		noteDrawer:update()
-	end
-end
-
-GraphicEngine.unloadNoteDrawers = function(self)
-	for noteDrawer in pairs(self.noteDrawers) do
-		noteDrawer:unload()
-	end
-	self.noteDrawers = {}
-end
-
-GraphicEngine.reloadNoteDrawers = function(self)
-	for noteDrawer in pairs(self.noteDrawers) do
-		noteDrawer:reload()
 	end
 end
 

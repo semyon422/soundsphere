@@ -18,6 +18,7 @@ ReplayModel.load = function(self)
 	elseif self.mode == "replay" then
 		self.replay:reset()
 	end
+	self.replay.timeEngine = self.rhythmModel.timeEngine
 end
 
 ReplayModel.setMode = function(self, mode)
@@ -29,11 +30,6 @@ ReplayModel.send = function(self, event)
 end
 
 ReplayModel.receive = function(self, event)
-	if event.name == "TimeState" then
-		self.currentTime = event.exactCurrentTime
-		return
-	end
-
 	if self.mode == "record" and event.virtual then
 		self.replay:receive(event)
 	end
@@ -47,6 +43,8 @@ ReplayModel.update = function(self)
 			return
 		end
 
+		nextEvent.baseTime = nextEvent.baseTime or nextEvent.time
+		nextEvent.time = nextEvent.baseTime + self.rhythmModel.timeEngine.inputOffset
 		if self.currentTime >= nextEvent.time then
 			self:send(nextEvent)
 			replay:step()
@@ -59,13 +57,14 @@ ReplayModel.saveReplay = function(self)
 	local replay = self.replay
 	replay.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
 	replay.inputMode = self.noteChartModel.noteChart.inputMode
-	replay.modifierTable = self.modifierModel:toTable()
+	replay.modifierTable = self.modifierModel.config
 	replay.type = self.replayType
+	replay.timings = self.timings
 
 	local replayString = replay:toString()
 	local replayHash = md5.sumhexa(replayString)
 
-	love.filesystem.write(self.path .. "/" .. replayHash, replayString)
+	assert(love.filesystem.write(self.path .. "/" .. replayHash, replayString))
 
 	return replayHash
 end
@@ -79,7 +78,6 @@ ReplayModel.loadReplay = function(self, replayHash)
 	end
 
 	local replayString = love.filesystem.read(path)
-
 	return Replay:new():fromString(replayString)
 end
 

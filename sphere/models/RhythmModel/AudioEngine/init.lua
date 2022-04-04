@@ -2,7 +2,6 @@ local AudioFactory		= require("aqua.audio.AudioFactory")
 local AudioContainer	= require("aqua.audio.Container")
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
-local SoundNoteFactory	= require("sphere.models.RhythmModel.AudioEngine.SoundNoteFactory")
 
 local AudioEngine = Class:new()
 
@@ -28,9 +27,12 @@ AudioEngine.updateVolume = function(self)
 	self.foregroundContainer:setVolume(self.globalVolume * self.effectsVolume)
 end
 
-AudioEngine.load = function(self) end
+AudioEngine.load = function(self)
+	self.loaded = true
+end
 
 AudioEngine.update = function(self)
+	self:updateTimeRate()
 	self.backgroundContainer:update()
 	self.foregroundContainer:update()
 end
@@ -38,24 +40,40 @@ end
 AudioEngine.unload = function(self)
 	self.backgroundContainer:stop()
 	self.foregroundContainer:stop()
+	self.loaded = false
 end
 
 AudioEngine.receive = function(self, event)
-	if event.name == "LogicalNoteState" then
-		local soundNote = SoundNoteFactory:getNote(event.note)
-		soundNote.audioEngine = self
-		return soundNote:receive(event)
-	elseif event.name == "TimeState" then
-		self.currentTime = event.exactCurrentTime
-		self:setTimeRate(event.timeRate)
+	if not self.loaded or event.name ~= "LogicalNoteState" or event.key ~= "keyState" then
+		return
 	end
+
+	local noteData
+	local note = event.note
+	if note.noteClass == "ShortLogicalNote" and event.value then
+		noteData = note.startNoteData
+	elseif note.noteClass == "LongLogicalNote" then
+		if event.value then
+			noteData = note.startNoteData
+		else
+			noteData = note.endNoteData
+		end
+	end
+
+	if not noteData then
+		return
+	end
+	local layer = note.autoplay and "background" or "foreground"
+
+	self:playAudio(noteData.sounds, layer, noteData.keysound, noteData.stream, noteData.timePoint.absoluteTime)
 end
 
 AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
+	local currentTime = self.rhythmModel.timeEngine.currentTime
+	local aliases = self.localAliases
 	if not paths then return end
 	for i = 1, #paths do
 		local path = paths[i][1]
-		local aliases = self.localAliases
 		if not keysound and not aliases[path] then
 			aliases = self.globalAliases
 		end
@@ -71,11 +89,11 @@ AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
 		local audio = AudioFactory:getAudio(apath, mode)
 
 		if audio then
-			audio.offset = offset or self.currentTime
+			audio.offset = offset or currentTime
 			audio:setRate(self.timeRate)
 			audio:setBaseVolume(paths[i][2])
 			if self.forcePosition then
-				audio:setPosition(self.currentTime - audio.offset)
+				audio:setPosition(currentTime - audio.offset)
 			end
 			if layer == "background" then
 				self.backgroundContainer:add(audio)
@@ -87,19 +105,23 @@ AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
 	end
 end
 
-AudioEngine.setTimeRate = function(self, timeRate)
-	if timeRate == 0 and self.timeRate ~= 0 then
-		self.backgroundContainer:pause()
-		self.foregroundContainer:pause()
-	elseif timeRate ~= 0 and self.timeRate == 0 then
-		self.backgroundContainer:setRate(timeRate)
-		self.foregroundContainer:setRate(timeRate)
-		self.backgroundContainer:play()
-		self.foregroundContainer:play()
-	elseif timeRate ~= 0 and self.timeRate ~= 0 then
-		self.backgroundContainer:setRate(timeRate)
-		self.foregroundContainer:setRate(timeRate)
+AudioEngine.play = function(self)
+	self.backgroundContainer:play()
+	self.foregroundContainer:play()
+end
+
+AudioEngine.pause = function(self)
+	self.backgroundContainer:pause()
+	self.foregroundContainer:pause()
+end
+
+AudioEngine.updateTimeRate = function(self)
+	local timeRate = self.rhythmModel.timeEngine.timeRate
+	if self.timeRate == timeRate then
+		return
 	end
+	self.backgroundContainer:setRate(timeRate)
+	self.foregroundContainer:setRate(timeRate)
 	self.timeRate = timeRate
 end
 

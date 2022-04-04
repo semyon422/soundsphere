@@ -13,9 +13,20 @@ ScoreDatabase.scoresColumns = {
 	"score",
 	"accuracy",
 	"maxCombo",
-	"scoreRating",
 	"modifiers",
-	"replayHash"
+	"replayHash",
+	"rating",
+	"pauses",
+	"ratio",
+	"perfect",
+	"notPerfect",
+	"missCount",
+	"mean",
+	"earlylate",
+	"inputMode",
+	"timeRate",
+	"difficulty",
+	"pausesCount",
 }
 
 ScoreDatabase.scoresNumberColumns = {
@@ -24,7 +35,17 @@ ScoreDatabase.scoresNumberColumns = {
 	"time",
 	"score",
 	"maxCombo",
-	"scoreRating"
+	"rating",
+	"pauses",
+	"ratio",
+	"perfect",
+	"notPerfect",
+	"missCount",
+	"mean",
+	"earlylate",
+	"timeRate",
+	"difficulty",
+	"pausesCount",
 }
 
 local createTableRequest = [[
@@ -41,9 +62,20 @@ local createTableRequest = [[
 		`score` REAL,
 		`accuracy` REAL,
 		`maxCombo` INTEGER,
-		`scoreRating` REAL,
 		`modifiers` TEXT,
-		`replayHash` TEXT
+		`replayHash` TEXT,
+		`rating` REAL,
+		`pauses` REAL,
+		`ratio` REAL,
+		`perfect` REAL,
+		`notPerfect` REAL,
+		`missCount` REAL,
+		`mean` REAL,
+		`earlylate` REAL,
+		`inputMode` TEXT,
+		`timeRate` REAL,
+		`difficulty` REAL,
+		`pausesCount` REAL
 	);
 ]]
 
@@ -56,11 +88,22 @@ local insertScoreRequest = [[
 		score,
 		accuracy,
 		maxCombo,
-		scoreRating,
 		modifiers,
-		replayHash
+		replayHash,
+		rating,
+		pauses,
+		ratio,
+		perfect,
+		notPerfect,
+		missCount,
+		mean,
+		earlylate,
+		inputMode,
+		timeRate,
+		difficulty,
+		pausesCount
 	)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 ]]
 
 local selectScoreRequest = [[
@@ -84,7 +127,7 @@ local updateInfoRequest = [[
 ]]
 
 local defaultInfo = {
-	version = 2
+	version = 3
 }
 
 ScoreDatabase.load = function(self)
@@ -154,9 +197,20 @@ ScoreDatabase.insertScore = function(self, scoreData)
 		scoreData.score,
 		scoreData.accuracy,
 		scoreData.maxCombo,
-		scoreData.scoreRating,
 		scoreData.modifiers,
-		scoreData.replayHash
+		scoreData.replayHash,
+		scoreData.rating,
+		scoreData.pauses,
+		scoreData.ratio,
+		scoreData.perfect,
+		scoreData.notPerfect,
+		scoreData.missCount,
+		scoreData.mean,
+		scoreData.earlylate,
+		scoreData.inputMode,
+		scoreData.timeRate,
+		scoreData.difficulty,
+		scoreData.pausesCount
 	):step()
 end
 
@@ -190,12 +244,77 @@ updates[2] = [[
 		`score` REAL,
 		`accuracy` REAL,
 		`maxCombo` INTEGER,
-		`scoreRating` REAL,
 		`modifiers` TEXT,
 		`replayHash` TEXT
 	);
-	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, modifiers, replayHash)
-	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, scoreRating, mods, "" FROM temp;
+	INSERT INTO scores(id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, modifiers, replayHash)
+	SELECT id, noteChartHash, noteChartIndex, playerName, time, score, accuracy, maxCombo, mods, "" FROM temp;
+	DROP TABLE temp;
+]]
+
+updates[3] = [[
+	ALTER TABLE scores RENAME TO temp;
+	CREATE TABLE IF NOT EXISTS `scores` (
+		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		`noteChartHash` TEXT NOT NULL,
+		`noteChartIndex` REAL NOT NULL,
+		`playerName` TEXT,
+		`time` INTEGER,
+		`score` REAL,
+		`accuracy` REAL,
+		`maxCombo` INTEGER,
+		`modifiers` TEXT,
+		`replayHash` TEXT,
+		`rating` REAL,
+		`pauses` REAL,
+		`ratio` REAL,
+		`perfect` REAL,
+		`notPerfect` REAL,
+		`missCount` REAL,
+		`mean` REAL,
+		`earlylate` REAL,
+		`inputMode` TEXT,
+		`timeRate` REAL,
+		`difficulty` REAL,
+		`pausesCount` REAL
+	);
+	INSERT INTO scores(
+		id,
+		noteChartHash,
+		noteChartIndex,
+		playerName,
+		time,
+		score,
+		accuracy,
+		maxCombo,
+		modifiers,
+		replayHash,
+		rating,
+		pauses,
+		ratio,
+		perfect,
+		notPerfect,
+		missCount,
+		mean,
+		earlylate,
+		inputMode,
+		timeRate,
+		difficulty,
+		pausesCount
+	)
+	SELECT
+		id,
+		noteChartHash,
+		noteChartIndex,
+		playerName,
+		time,
+		score * 1e-6,
+		accuracy * 1e-3,
+		maxCombo,
+		modifiers,
+		replayHash,
+		0, 0, 0, 0, 0, 0, 0, 0, "", 1, 0, 0
+	FROM temp;
 	DROP TABLE temp;
 ]]
 

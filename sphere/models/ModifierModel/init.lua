@@ -1,40 +1,42 @@
 local Class			= require("aqua.util.Class")
-local json			= require("json")
 
 local AutoPlay		= require("sphere.models.ModifierModel.AutoPlay")
-local Automap		= require("sphere.models.ModifierModel.Automap")
 local ProMode		= require("sphere.models.ModifierModel.ProMode")
-local WindUp		= require("sphere.models.ModifierModel.WindUp")
+local AutoKeySound	= require("sphere.models.ModifierModel.AutoKeySound")
 local SpeedMode		= require("sphere.models.ModifierModel.SpeedMode")
 local TimeRateQ		= require("sphere.models.ModifierModel.TimeRateQ")
 local TimeRateX		= require("sphere.models.ModifierModel.TimeRateX")
+local WindUp		= require("sphere.models.ModifierModel.WindUp")
 local AudioClip		= require("sphere.models.ModifierModel.AudioClip")
 local NoScratch		= require("sphere.models.ModifierModel.NoScratch")
-local Mirror		= require("sphere.models.ModifierModel.Mirror")
-local Random		= require("sphere.models.ModifierModel.Random")
-local BracketSwap	= require("sphere.models.ModifierModel.BracketSwap")
 local NoLongNote	= require("sphere.models.ModifierModel.NoLongNote")
 local NoMeasureLine	= require("sphere.models.ModifierModel.NoMeasureLine")
-local FullLongNote	= require("sphere.models.ModifierModel.FullLongNote")
-local ToOsu			= require("sphere.models.ModifierModel.ToOsu")
-local AutoKeySound	= require("sphere.models.ModifierModel.AutoKeySound")
+local Automap		= require("sphere.models.ModifierModel.Automap")
 local MultiplePlay	= require("sphere.models.ModifierModel.MultiplePlay")
 local MinLnLength	= require("sphere.models.ModifierModel.MinLnLength")
 local Alternate		= require("sphere.models.ModifierModel.Alternate")
+local Alternate2		= require("sphere.models.ModifierModel.Alternate2")
 local MultiOverPlay	= require("sphere.models.ModifierModel.MultiOverPlay")
+local Alternate		= require("sphere.models.ModifierModel.Alternate")
 local Shift			= require("sphere.models.ModifierModel.Shift")
+local Mirror		= require("sphere.models.ModifierModel.Mirror")
+local Random		= require("sphere.models.ModifierModel.Random")
+local BracketSwap	= require("sphere.models.ModifierModel.BracketSwap")
+local FullLongNote	= require("sphere.models.ModifierModel.FullLongNote")
+local MinLnLength	= require("sphere.models.ModifierModel.MinLnLength")
+local ToOsu			= require("sphere.models.ModifierModel.ToOsu")
 
 local ModifierModel = Class:new()
 
-ModifierModel.modifiers = {
+local Modifiers = {
 	AutoPlay,
 	ProMode,
 	AutoKeySound,
 	SpeedMode,
 	TimeRateQ,
 	TimeRateX,
-	AudioClip,
 	WindUp,
+	AudioClip,
 	NoScratch,
 	NoLongNote,
 	NoMeasureLine,
@@ -42,6 +44,7 @@ ModifierModel.modifiers = {
 	MultiplePlay,
 	MultiOverPlay,
 	Alternate,
+	Alternate2,
 	Shift,
 	Mirror,
 	Random,
@@ -51,179 +54,275 @@ ModifierModel.modifiers = {
 	ToOsu
 }
 
-ModifierModel.construct = function(self)
-	self.sequential = {}
-	self.inconsequential = {}
+local ModifierId = {
+	[AutoPlay] = 0,
+	[ProMode] = 1,
+	[AutoKeySound] = 2,
+	[SpeedMode] = 3,
+	[TimeRateQ] = 4,
+	[TimeRateX] = 5,
+	[WindUp] = 6,
+	[AudioClip] = 7,
+	[NoScratch] = 8,
+	[NoLongNote] = 9,
+	[NoMeasureLine] = 10,
+	[Automap] = 11,
+	[MultiplePlay] = 12,
+	[MultiOverPlay] = 13,
+	[Alternate] = 14,
+	[Shift] = 15,
+	[Mirror] = 16,
+	[Random] = 17,
+	[BracketSwap] = 18,
+	[FullLongNote] = 19,
+	[MinLnLength] = 20,
+	[ToOsu] = 21,
+	[Alternate2] = 22,
+}
 
-	self:addInconsequential()
-end
-
-ModifierModel.inconsequentialClassList = {
+local OneUseModifiers = {
 	AutoPlay,
 	ProMode,
+	AutoKeySound,
 	SpeedMode,
 	TimeRateQ,
 	TimeRateX,
-	AudioClip,
 	WindUp,
+	AudioClip,
 	NoScratch,
 	NoLongNote,
-	NoMeasureLine,
-	AutoKeySound,
-	ToOsu
+	NoMeasureLine
 }
 
-ModifierModel.path = "userdata/modifiers.json"
+ModifierModel.construct = function(self)
+	self.modifiers = {}
+	self.oneUseModifiers = {}
+	self.modifierByName = {}
+	self.modifierById = {}
+	self:createModifiers()
+end
 
 ModifierModel.load = function(self)
-	local info = love.filesystem.getInfo(self.path)
-	if info and info.size ~= 0 then
-		local contents = love.filesystem.read(self.path)
-		local jsonObject = json.decode(contents)
+	local config = self.configModel.configs.modifier
+	self.config = config
 
-        self:fromTable(jsonObject)
+	self.availableModifierItemIndex = 1
+	self.modifierItemIndex = #config
+
+	for _, modifierConfig in ipairs(self.config) do
+		local modifier = self:getModifier(modifierConfig)
+		if modifier then
+			modifier.added = true
+		end
 	end
 end
 
-ModifierModel.unload = function(self)
-	love.filesystem.write(self.path, self:toJson())
+ModifierModel.scrollAvailableModifier = function(self, direction)
+	if not self.modifiers[self.availableModifierItemIndex + direction] then
+		return
+	end
+	self.availableModifierItemIndex = self.availableModifierItemIndex + direction
 end
 
-ModifierModel.addInconsequential = function(self)
-	local list = self.inconsequential
+ModifierModel.scrollModifier = function(self, direction)
+	local newModifierItemIndex = self.modifierItemIndex + direction
+	if not self.config[newModifierItemIndex] and not self.config[newModifierItemIndex - 1] then
+		return
+	end
+	self.modifierItemIndex = newModifierItemIndex
+end
 
-	for _, Modifier in ipairs(self.inconsequentialClassList) do
+ModifierModel.createModifiers = function(self)
+	local modifierByName = self.modifierByName
+	local modifierById = self.modifierById
+	for _, Modifier in ipairs(Modifiers) do
 		local modifier = Modifier:new()
 		modifier.modifierModel = self
-		modifier.enabled = false
-		modifier.Class = Modifier
-		list[#list + 1] = modifier
-		if
-			Modifier == TimeRateX or
-			Modifier == TimeRateQ or
-			Modifier == SpeedMode or
-			Modifier == AudioClip
-		then
-			modifier.enabled = true
+		modifier.id = ModifierId[Modifier]
+		modifierByName[modifier.name] = modifier
+		modifierById[modifier.id] = modifier
+		table.insert(self.modifiers, modifier)
+		if self:isOneUseModifier(Modifier) then
+			modifier.oneUse = true
+			table.insert(self.oneUseModifiers, modifier)
 		end
 	end
 end
 
-ModifierModel.get = function(self, Modifier)
-	for _, modifier in ipairs(self.inconsequential) do
-		if modifier.Class == Modifier then
-			return modifier
+ModifierModel.getModifier = function(self, modifierConfig)
+	if type(modifierConfig) == "number" then
+		return self.modifierById[modifierConfig]
+	end
+	return self.modifierByName[modifierConfig.name]
+end
+
+ModifierModel.isOneUseModifier = function(self, Modifier)
+	for _, OneUseModifier in ipairs(OneUseModifiers) do
+		if Modifier == OneUseModifier then
+			return true
 		end
 	end
 end
 
-ModifierModel.add = function(self, Modifier)
-	local modifier = Modifier:new()
-	modifier.modifierModel = self
-	modifier.Class = Modifier
-	self.sequential[#self.sequential + 1] = modifier
-	return modifier
+ModifierModel.getMinimalModifierIndex = function(self, modifier)
+	local index = 1
+	for _, oneUseModifier in ipairs(self.oneUseModifiers) do
+		if oneUseModifier.added then
+			index = index + 1
+		end
+		if modifier == oneUseModifier then
+			return index
+		end
+	end
+	return index
 end
 
-ModifierModel.remove = function(self, modifier)
-	local list = self.sequential
-	for i, listModifier in ipairs(list) do
-		if listModifier == modifier then
-			table.remove(list, i)
+ModifierModel.add = function(self, modifier)
+	local modifierConfig = modifier:getDefaultConfig()
+	local config = self.config
+	local minimalModifierIndex = self:getMinimalModifierIndex(modifier)
+	local index = math.max(self.modifierItemIndex, minimalModifierIndex)
+	if modifier.oneUse then
+		if modifier.added then
+			return
+		end
+		index = minimalModifierIndex
+	end
+	table.insert(config, index, modifierConfig)
+	self.modifierItemIndex = index + 1
+	modifier.added = true
+end
+
+ModifierModel.remove = function(self, modifierConfig)
+	for i, foundModifierConfig in ipairs(self.config) do
+		if foundModifierConfig == modifierConfig then
+			table.remove(self.config, i)
+			break
+		end
+	end
+	if not self.config[self.modifierItemIndex] then
+		self.modifierItemIndex = math.max(self.modifierItemIndex - 1, 0)
+	end
+	local modifier = self:getModifier(modifierConfig)
+	for i, foundModifierConfig in ipairs(self.config) do
+		if foundModifierConfig.name == modifierConfig.name then
 			return
 		end
 	end
+	modifier.added = false
 end
 
-ModifierModel.getEnabledModifiers = function(self)
-	local list = {}
+ModifierModel.setModifierValue = function(self, modifierConfig, value)
+	local modifier = self:getModifier(modifierConfig)
+	modifier:setValue(modifierConfig, value)
+end
 
-	for _, modifier in ipairs(self.inconsequential) do
-		if not modifier.after and modifier.enabled then
-			list[#list + 1] = modifier
+ModifierModel.increaseModifierValue = function(self, modifierConfig, delta)
+	local modifier = self:getModifier(modifierConfig)
+	if type(modifier.defaultValue) == "number" then
+		modifier:setValue(modifierConfig, modifierConfig.value + delta * modifier.step)
+	elseif type(modifier.defaultValue) == "boolean" then
+		local value = false
+		if delta == 1 then
+			value = true
 		end
+		modifier:setValue(modifierConfig, value)
+	elseif type(modifier.defaultValue) == "string" then
+		local indexValue = modifier:toIndexValue(modifierConfig.value)
+		modifier:setValue(modifierConfig, modifier:fromIndexValue(indexValue + delta * modifier.step))
 	end
-	for _, modifier in ipairs(self.sequential) do
-		list[#list + 1] = modifier
-	end
-	for _, modifier in ipairs(self.inconsequential) do
-		if modifier.after and modifier.enabled then
-			list[#list + 1] = modifier
-		end
-	end
-
-	return list
 end
 
 ModifierModel.apply = function(self, modifierType)
-	for _, modifier in ipairs(self:getEnabledModifiers()) do
-		if modifier.type == modifierType then
+	for _, modifierConfig in ipairs(self.config) do
+		local modifier = self:getModifier(modifierConfig)
+		if modifier and modifier.type == modifierType then
 			modifier.noteChartModel = self.noteChartModel
 			modifier.rhythmModel = self.rhythmModel
 			modifier.difficultyModel = self.difficultyModel
 			modifier.scoreModel = self.scoreModel
-			modifier:apply()
+			modifier:apply(modifierConfig)
 		end
 	end
 end
 
 ModifierModel.update = function(self)
-	for _, modifier in ipairs(self:getEnabledModifiers()) do
-		modifier:update()
+	for _, modifierConfig in ipairs(self.config) do
+		local modifier = self:getModifier(modifierConfig)
+		if modifier then
+			modifier:update(modifierConfig)
+		end
 	end
 end
 
 ModifierModel.receive = function(self, event)
-	for _, modifier in ipairs(self:getEnabledModifiers()) do
-		modifier:receive(event)
-	end
-end
-
-ModifierModel.getString = function(self)
-	local out = {}
-
-	for _, modifier in ipairs(self:getEnabledModifiers()) do
-		local s = modifier:tostring()
-		if s then
-			out[#out + 1] = s
+	for _, modifierConfig in ipairs(self.config) do
+		local modifier = self:getModifier(modifierConfig)
+		if modifier then
+			modifier:receive(modifierConfig, event)
 		end
 	end
-
-	return table.concat(out, ", ")
 end
 
--- TODO: rework this awful approach
-ModifierModel.toJson = function(self)
-	local out = {}
-
-	for _, modifier in ipairs(self:getEnabledModifiers()) do
-		out[#out + 1] = modifier:tojson()
+ModifierModel.getString = function(self, config)
+	config = config or self.config
+	local t = {}
+	for _, modifierConfig in ipairs(config) do
+		local modifier = self:getModifier(modifierConfig)
+		if modifier then
+			local modifierString = ""
+			modifierString = modifierString .. (modifier:getString(modifierConfig) or "")
+			modifierString = modifierString .. (modifier:getSubString(modifierConfig) or "")
+			if #modifierString > 0 then
+				table.insert(t, modifierString)
+			end
+		end
 	end
-
-	return ("[%s]"):format(table.concat(out, ","))
+	return table.concat(t, " ")
 end
 
-ModifierModel.toTable = function(self)
-	return json.decode(self:toJson())
+ModifierModel.encode = function(self, config)
+	config = config or self.config
+	local t = {}
+	for _, modifierConfig in ipairs(config) do
+		local modifier = self:getModifier(modifierConfig)
+		if modifier then
+			table.insert(t, ("%d:%s"):format(modifier.id, modifier:encode(modifierConfig)))
+		end
+	end
+	return table.concat(t, ";")
 end
 
-ModifierModel.fromTable = function(self, modifiersTable)
-	self:construct()
+ModifierModel.decode = function(self, encodedConfig)
+	local config = {}
+	for modifierId, modifierData in encodedConfig:gmatch("(%d+):([^;]+)") do
+		local modifier = self:getModifier(tonumber(modifierId))
+		if modifier then
+			table.insert(config, modifier:decode(modifierData))
+		end
+	end
+	return config
+end
 
-	for _, modifierData in ipairs(modifiersTable) do
-		for _, Modifier in ipairs(self.modifiers) do
-			if modifierData.name == Modifier.name then
-				local modifier
-				if Modifier.inconsequential then
-					modifier = self:get(Modifier)
-					modifier.enabled = true
-				elseif Modifier.sequential then
-					modifier = self:add(Modifier)
+ModifierModel.fixOldFormat = function(self, oldConfig, oldFlag)
+	for _, modifierConfig in ipairs(oldConfig) do
+		local modifier = self:getModifier(modifierConfig)
+		if modifier then
+			if not modifierConfig.value then
+				for k, v in pairs(modifierConfig) do
+					if k ~= "name" then
+						modifierConfig.value = v
+					end
 				end
-
-				if modifier.variableName then
-					modifier[modifier.variableName] = modifierData[modifier.variableName]
-				end
+			end
+			if modifierConfig.value == nil then
+				modifierConfig.value = true
+			end
+			if type(modifierConfig.value) == "number" and type(modifier.defaultValue) == "string" then
+				modifierConfig.value = modifier:fromIndexValue(modifierConfig.value)
+			end
+			if oldFlag then
+				modifierConfig.old = true
 			end
 		end
 	end

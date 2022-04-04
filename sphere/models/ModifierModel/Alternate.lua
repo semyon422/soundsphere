@@ -1,32 +1,25 @@
-local NoteData	= require("ncdk.NoteData")
 local Modifier	= require("sphere.models.ModifierModel.Modifier")
 
 local Alternate = Modifier:new()
 
-Alternate.sequential = true
 Alternate.type = "NoteChartModifier"
+Alternate.interfaceType = "stepper"
 
 Alternate.name = "Alternate"
-Alternate.shortName = "Alt"
 
-Alternate.variableType = "number"
-Alternate.variableName = "value"
-Alternate.variableFormat = "%s"
-Alternate.variableRange = {1, 1, 2}
-Alternate.variableValues = {"key", "scratch"}
-Alternate.value = 1
+Alternate.defaultValue = "key"
+Alternate.range = {1, 2}
+Alternate.values = {"key", "scratch"}
 
-Alternate.modeNames = {"K", "S"}
-
-Alternate.tostring = function(self)
-	return self.shortName .. self.modeNames[self.value]
+Alternate.getString = function(self, config)
+	return "Alt"
 end
 
-Alternate.tojson = function(self)
-	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
+Alternate.getSubString = function(self, config)
+	return config.value:sub(1, 1):upper()
 end
 
-Alternate.apply = function(self)
+Alternate.apply = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
 
 	local inputCounts = {}
@@ -40,7 +33,7 @@ Alternate.apply = function(self)
 	end
 
 	local layerDataSequence = noteChart.layerDataSequence
-	local inputType = self.variableValues[self.value]
+	local inputType = config.value
 	local inputAlternate = {}
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do

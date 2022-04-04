@@ -7,8 +7,9 @@ NoteDrawer.load = function(self)
 	self.noteData = {}
 
 	self.layerData = self.graphicEngine.noteChart:requireLayerData(self.layerIndex)
-	-- local inputModeString = self.layerData.layerDataSequence.noteChart.inputMode:getString()
 
+	local graphicEngine = self.graphicEngine
+	local timeEngine = self.graphicEngine.rhythmModel.timeEngine
 	for noteDataIndex = 1, self.layerData:getNoteDataCount() do
 		local noteData = self.layerData:getNoteData(noteDataIndex)
 
@@ -17,11 +18,11 @@ NoteDrawer.load = function(self)
 
 			if graphicalNote then
 				graphicalNote.noteDrawer = self
-				graphicalNote.graphicEngine = self.graphicEngine -- !!!!!!!!!!!!!!!!!!!!!
-				assert(graphicalNote.graphicEngine)
-				graphicalNote.noteSkin = self.graphicEngine.noteSkin
+				graphicalNote.graphicEngine = graphicEngine
+				graphicalNote.timeEngine = timeEngine
+				graphicalNote.noteSkin = graphicEngine.noteSkin
 				graphicalNote:init()
-				if self.graphicEngine.noteSkin:checkNote(graphicalNote) then
+				if graphicEngine.noteSkin:check(graphicalNote) then
 					table.insert(self.noteData, graphicalNote)
 				end
 			end
@@ -45,7 +46,8 @@ NoteDrawer.load = function(self)
 end
 
 NoteDrawer.updateCurrentTime = function(self)
-	self.currentTimePoint.absoluteTime = self.graphicEngine.currentTime
+	local timeEngine = self.graphicEngine.rhythmModel.timeEngine
+	self.currentTimePoint.absoluteTime = timeEngine.currentVisualTime - timeEngine.inputOffset
 
 	self.currentVelocityData = self.layerData.spaceData:getVelocityData(self.currentVelocityDataIndex)
 	self.nextVelocityData = self.layerData.spaceData:getVelocityData(self.currentVelocityDataIndex + 1)
@@ -66,12 +68,13 @@ NoteDrawer.update = function(self)
 	self:updateCurrentTime()
 	self.globalSpeed = self.currentTimePoint.velocityData.globalSpeed
 
+	local noteData = self.noteData
 	local note
+
 	for currentNoteIndex = self.startNoteIndex, 0, -1 do
-		note = self.noteData[currentNoteIndex - 1]
+		note = noteData[currentNoteIndex - 1]
 		if note then
-			note:computeVisualTime()
-			note:computeTimeState()
+			note:update()
 			if not note:willDrawBeforeStart() and note.index == self.startNoteIndex - 1 then
 				self.startNoteIndex = self.startNoteIndex - 1
 				note:activate()
@@ -82,11 +85,11 @@ NoteDrawer.update = function(self)
 			break
 		end
 	end
-	for currentNoteIndex = self.endNoteIndex, #self.noteData, 1 do
-		note = self.noteData[currentNoteIndex + 1]
+
+	for currentNoteIndex = self.endNoteIndex, #noteData, 1 do
+		note = noteData[currentNoteIndex + 1]
 		if note then
-			note:computeVisualTime()
-			note:computeTimeState()
+			note:update()
 			if not note:willDrawAfterEnd() and note.index == self.endNoteIndex + 1 then
 				self.endNoteIndex = self.endNoteIndex + 1
 				note:activate()
@@ -98,26 +101,34 @@ NoteDrawer.update = function(self)
 		end
 	end
 
-	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
-		self.noteData[currentNoteIndex]:update()
+	for i = self.startNoteIndex, self.endNoteIndex do
+		noteData[i]:update()
+	end
+
+	for i = self.startNoteIndex, self.endNoteIndex do
+		note = noteData[i]
+		if note:willDrawBeforeStart() then
+			note:deactivate()
+			self.startNoteIndex = self.startNoteIndex + 1
+		else
+			break
+		end
+	end
+
+	for i = self.endNoteIndex, self.startNoteIndex, -1 do
+		note = noteData[i]
+		if note:willDrawAfterEnd() then
+			note:deactivate()
+			self.endNoteIndex = self.endNoteIndex - 1
+		else
+			break
+		end
 	end
 end
 
 NoteDrawer.unload = function(self)
 	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
 		self.noteData[currentNoteIndex]:deactivate()
-	end
-end
-
-NoteDrawer.reload = function(self)
-	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
-		self.noteData[currentNoteIndex]:reload()
-	end
-end
-
-NoteDrawer.receive = function(self, event)
-	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
-		self.noteData[currentNoteIndex]:receive(event)
 	end
 end
 

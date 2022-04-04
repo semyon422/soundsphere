@@ -1,47 +1,47 @@
 local Class = require("aqua.util.Class")
+local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 
 local TimeController = Class:new()
 
 TimeController.receive = function(self, event)
-	local configModel = self.configModel
-	local rhythmModel = self.rhythmModel
-	local notificationModel = self.notificationModel
+	local configModel = self.gameController.configModel
+	local rhythmModel = self.gameController.rhythmModel
+	local notificationModel = self.gameController.notificationModel
 
 	local timeEngine = rhythmModel.timeEngine
 	local graphicEngine = rhythmModel.graphicEngine
-	local noteSkin = graphicEngine.noteSkin
 
-	if event.name == "keypressed" then
-		local key = event.args[1]
-		local delta = 0.05
+	local config = configModel.configs.settings
+	local gameplay = config.gameplay
 
-		if key == configModel:get("gameplay.decreaseTimeRate") then
-			timeEngine:increaseTimeRate(-delta)
-			notificationModel:notify("timeRate: " .. timeEngine.timeRate)
-			rhythmModel.prohibitSavingScore = true
-		elseif key == configModel:get("gameplay.increaseTimeRate") then
-			timeEngine:increaseTimeRate(delta)
-			notificationModel:notify("timeRate: " .. timeEngine.timeRate)
-			rhythmModel.prohibitSavingScore = true
-		elseif key == configModel:get("gameplay.invertTimeRate") then
-			timeEngine:setTimeRate(-timeEngine.timeRate)
-			notificationModel:notify("timeRate: " .. timeEngine.timeRate)
-			rhythmModel.prohibitSavingScore = true
-		elseif key == configModel:get("gameplay.skipIntro") then
-			timeEngine:skipIntro()
-		elseif key == configModel:get("gameplay.invertPlaySpeed") then
-			noteSkin.targetVisualTimeRate = -noteSkin.targetVisualTimeRate
-			noteSkin:setVisualTimeRate(noteSkin.targetVisualTimeRate)
-			notificationModel:notify("visualTimeRate: " .. noteSkin.targetVisualTimeRate)
-		elseif key == configModel:get("gameplay.decreasePlaySpeed") then
-			noteSkin:increaseVisualTimeRate(-delta)
-			configModel:set("speed", noteSkin.targetVisualTimeRate)
-			notificationModel:notify("visualTimeRate: " .. noteSkin.targetVisualTimeRate)
-		elseif key == configModel:get("gameplay.increasePlaySpeed") then
-			noteSkin:increaseVisualTimeRate(delta)
-			configModel:set("speed", noteSkin.targetVisualTimeRate)
-			notificationModel:notify("visualTimeRate: " .. noteSkin.targetVisualTimeRate)
+	if event.name == "skipIntro" then
+		if not timeEngine.timer.isPlaying then
+			return
 		end
+		timeEngine:skipIntro()
+	elseif event.name == "increaseTimeRate" then
+		timeEngine:increaseTimeRate(event.delta)
+		notificationModel:notify("rate: " .. timeEngine.timeRate)
+		rhythmModel.prohibitSavingScore = true
+	elseif event.name == "invertTimeRate" then
+		timeEngine:setTimeRate(-timeEngine.timeRate)
+		notificationModel:notify("rate: " .. timeEngine.timeRate)
+		rhythmModel.prohibitSavingScore = true
+	elseif event.name == "increasePlaySpeed" then
+		graphicEngine:increaseVisualTimeRate(event.delta)
+		gameplay.speed = graphicEngine.targetVisualTimeRate
+		notificationModel:notify("scroll speed: " .. graphicEngine.targetVisualTimeRate)
+	elseif event.name == "invertPlaySpeed" then
+		graphicEngine.targetVisualTimeRate = -graphicEngine.targetVisualTimeRate
+		graphicEngine:setVisualTimeRate(graphicEngine.targetVisualTimeRate)
+		notificationModel:notify("scroll speed: " .. graphicEngine.targetVisualTimeRate)
+	elseif event.name == "increaseLocalOffset" then
+		CacheDatabase:load()
+		local noteChartDataEntry = self.gameController.noteChartModel.noteChartDataEntry
+		noteChartDataEntry.localOffset = noteChartDataEntry.localOffset + event.delta
+		CacheDatabase:setNoteChartDataEntry(noteChartDataEntry)
+		notificationModel:notify("local offset: " .. noteChartDataEntry.localOffset)
+		CacheDatabase:unload()
 	end
 end
 

@@ -1,237 +1,36 @@
 local aquamath				= require("aqua.math")
 local Upscaler				= require("libchart.Upscaler")
+local NextUpscaler			= require("libchart.NextUpscaler")
 local Reductor				= require("libchart.Reductor")
 local BlockFinder			= require("libchart.BlockFinder")
 local NotePreprocessor		= require("libchart.NotePreprocessor")
 local Modifier				= require("sphere.models.ModifierModel.Modifier")
-
-local config = {}
-
-config[5] = {}
-
-config[5][4] = {
-	{1,1,0,0,0},
-	{0,1,1,0,0},
-	{0,0,1,1,0},
-	{0,0,0,1,1},
-}
-
-config[6] = {}
-
-config[6][4] = {
-	{1,1,0,0,0,0},
-	{0,1,1,0,0,0},
-	{0,0,0,1,1,0},
-	{0,0,0,0,1,1},
-}
-
-config[6][5] = {
-	{1,1,0,0,0,0},
-	{0,1,1,0,0,0},
-	{0,0,1,1,0,0},
-	{0,0,0,1,1,0},
-	{0,0,0,0,1,1},
-}
-
-config[7] = {}
-
-config[7][4] = {
-	{1,1,0,0,0,0,0},
-	{0,1,1,1,0,0,0},
-	{0,0,0,1,1,1,0},
-	{0,0,0,0,0,1,1},
-}
-
-config[7][5] = {
-	{1,1,0,0,0,0,0},
-	{0,1,1,0,0,0,0},
-	{0,0,1,1,1,0,0},
-	{0,0,0,0,1,1,0},
-	{0,0,0,0,0,1,1},
-}
-
-config[7][6] = {
-	{1,1,0,0,0,0,0},
-	{0,1,1,0,0,0,0},
-	{0,0,1,1,0,0,0},
-	{0,0,0,1,1,0,0},
-	{0,0,0,0,1,1,0},
-	{0,0,0,0,0,1,1},
-}
-
-config[8] = {}
-
-config[8][4] = {
-	{1,1,0,0,0,0,0,0},
-	{0,0,1,1,0,0,0,0},
-	{0,0,0,0,1,1,0,0},
-	{0,0,0,0,0,0,1,1},
-}
-
-config[8][5] = {
-	{1,1,0,0,0,0,0,0},
-	{0,1,1,1,0,0,0,0},
-	{0,0,0,1,1,0,0,0},
-	{0,0,0,0,1,1,1,0},
-	{0,0,0,0,0,0,1,1},
-}
-
-config[8][6] = {
-	{1,1,0,0,0,0,0,0},
-	{0,1,1,0,0,0,0,0},
-	{0,0,1,1,0,0,0,0},
-	{0,0,0,0,1,1,0,0},
-	{0,0,0,0,0,1,1,0},
-	{0,0,0,0,0,0,1,1},
-}
-
-config[8][7] = {
-	{1,1,0,0,0,0,0,0},
-	{0,1,1,0,0,0,0,0},
-	{0,0,1,1,0,0,0,0},
-	{0,0,0,1,1,0,0,0},
-	{0,0,0,0,1,1,0,0},
-	{0,0,0,0,0,1,1,0},
-	{0,0,0,0,0,0,1,1},
-}
-
-config[9] = {}
-
-config[9][4] = {
-	{1,1,1,0,0,0,0,0,0},
-	{0,0,1,1,1,0,0,0,0},
-	{0,0,0,0,1,1,1,0,0},
-	{0,0,0,0,0,0,1,1,1},
-}
-
-config[9][5] = {
-	{1,1,0,0,0,0,0,0,0},
-	{0,1,1,1,0,0,0,0,0},
-	{0,0,0,1,1,1,0,0,0},
-	{0,0,0,0,0,1,1,1,0},
-	{0,0,0,0,0,0,0,1,1},
-}
-
-config[9][6] = {
-	{1,1,0,0,0,0,0,0,0},
-	{0,1,1,1,0,0,0,0,0},
-	{0,0,0,1,1,0,0,0,0},
-	{0,0,0,0,1,1,0,0,0},
-	{0,0,0,0,0,1,1,1,0},
-	{0,0,0,0,0,0,0,1,1},
-}
-
-config[9][7] = {
-	{1,1,0,0,0,0,0,0,0},
-	{0,1,1,0,0,0,0,0,0},
-	{0,0,1,1,0,0,0,0,0},
-	{0,0,0,1,1,1,0,0,0},
-	{0,0,0,0,0,1,1,0,0},
-	{0,0,0,0,0,0,1,1,0},
-	{0,0,0,0,0,0,0,1,1},
-}
-
-config[9][8] = {
-	{1,1,0,0,0,0,0,0,0},
-	{0,1,1,0,0,0,0,0,0},
-	{0,0,1,1,0,0,0,0,0},
-	{0,0,0,1,1,0,0,0,0},
-	{0,0,0,0,1,1,0,0,0},
-	{0,0,0,0,0,1,1,0,0},
-	{0,0,0,0,0,0,1,1,0},
-	{0,0,0,0,0,0,0,1,1},
-}
-
-config[10] = {}
-
-config[10][4] = {
-	{1,1,1,0,0,0,0,0,0,0},
-	{0,0,1,1,1,0,0,0,0,0},
-	{0,0,0,0,0,1,1,1,0,0},
-	{0,0,0,0,0,0,0,1,1,1},
-}
-
-config[10][5] = {
-	{1,1,0,0,0,0,0,0,0,0},
-	{0,0,1,1,0,0,0,0,0,0},
-	{0,0,0,0,1,1,0,0,0,0},
-	{0,0,0,0,0,0,1,1,0,0},
-	{0,0,0,0,0,0,0,0,1,1},
-}
-
-config[10][6] = {
-	{1,1,0,0,0,0,0,0,0,0},
-	{0,1,1,1,0,0,0,0,0,0},
-	{0,0,0,1,1,0,0,0,0,0},
-	{0,0,0,0,0,1,1,0,0,0},
-	{0,0,0,0,0,0,1,1,1,0},
-	{0,0,0,0,0,0,0,0,1,1},
-}
-
-config[10][7] = {
-	{1,1,0,0,0,0,0,0,0,0},
-	{0,1,1,1,0,0,0,0,0,0},
-	{0,0,1,1,1,0,0,0,0,0},
-	{0,0,0,0,1,1,0,0,0,0},
-	{0,0,0,0,0,1,1,1,0,0},
-	{0,0,0,0,0,0,1,1,1,0},
-	{0,0,0,0,0,0,0,0,1,1},
-}
-
-config[10][8] = {
-	{1,1,0,0,0,0,0,0,0,0},
-	{0,1,1,0,0,0,0,0,0,0},
-	{0,0,1,1,0,0,0,0,0,0},
-	{0,0,0,1,1,0,0,0,0,0},
-	{0,0,0,0,0,1,1,0,0,0},
-	{0,0,0,0,0,0,1,1,0,0},
-	{0,0,0,0,0,0,0,1,1,0},
-	{0,0,0,0,0,0,0,0,1,1},
-}
-
-config[10][9] = {
-	{1,1,0,0,0,0,0,0,0,0},
-	{0,1,1,0,0,0,0,0,0,0},
-	{0,0,1,1,0,0,0,0,0,0},
-	{0,0,0,1,1,0,0,0,0,0},
-	{0,0,0,0,1,1,0,0,0,0},
-	{0,0,0,0,0,1,1,0,0,0},
-	{0,0,0,0,0,0,1,1,0,0},
-	{0,0,0,0,0,0,0,1,1,0},
-	{0,0,0,0,0,0,0,0,1,1},
-}
+local AutomapOldConfig		= require("sphere.models.ModifierModel.AutomapOldConfig")
 
 local Automap = Modifier:new()
 
-Automap.sequential = true
 Automap.type = "NoteChartModifier"
+Automap.interfaceType = "slider"
 
 Automap.name = "Automap"
-Automap.shortName = "AM"
 
-Automap.variableType = "number"
-Automap.variableName = "keys"
-Automap.variableRange = {4, 1, 10}
+Automap.defaultValue = 10
+Automap.range = {1, 20}
 
-Automap.keys = 10
-
-Automap.construct = function(self)
-	self.keys = Automap.keys
+Automap.getString = function(self, config)
+	return "AM"
 end
 
-Automap.tostring = function(self)
-	return self.shortName .. self.keys
+Automap.getSubString = function(self, config)
+	return config.value
 end
 
-Automap.tojson = function(self)
-	return ([[{"name":"%s","keys":%s}]]):format(self.name, self.keys)
-end
-
-Automap.apply = function(self)
+Automap.apply = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
 	self.noteChart = noteChart
 
-	self.targetMode = self.keys
+	self.old = config.old
+	self.targetMode = config.value
 	self.columnCount = math.floor(self.noteChart.inputMode:getInputCount("key"))
 
 	print(self.targetMode == self.columnCount or self.columnCount == 0)
@@ -313,14 +112,16 @@ Automap.processUpscaler = function(self)
 	bf.columnCount = columnCount
 	bf:process()
 
-	local nbs = bf:getNoteBlocks()
+	self.nbs = bf:getNoteBlocks()
 
-	NotePreprocessor:process(nbs)
+	NotePreprocessor:process(self.nbs)
 
-	local am = Upscaler:new()
-	am.columns = config[targetMode][columnCount]
-	am:load(targetMode)
-	local notes, blocks = am:process(nbs)
+	local notes
+	if self.old then
+		notes = self:getOldUpscalerNotes()
+	else
+		notes = self:getUpscalerNotes()
+	end
 
 	for i = 1, #notes do
 		local tNoteData = notes[i]
@@ -333,6 +134,37 @@ Automap.processUpscaler = function(self)
 	end
 
 	self.noteChart.inputMode:setInputCount("key", targetMode)
+end
+
+Automap.getOldUpscalerNotes = function(self)
+	local am = Upscaler:new()
+	am.columns = AutomapOldConfig[self.targetMode][self.columnCount]
+	am:load(self.targetMode)
+	local notes, blocks = am:process(self.nbs)
+
+	return notes
+end
+
+Automap.getUpscalerNotes = function(self)
+	local am = NextUpscaler:new()
+	am.targetMode = self.targetMode
+	am.columnCount = self.columnCount
+	am.notes = self.nbs
+	am:process()
+
+	local columns = {}
+	local notes = {}
+	for _, noteBlock in ipairs(self.nbs) do
+		for _, note in ipairs(noteBlock:getNotes()) do
+			notes[#notes + 1] = note
+			columns[noteBlock.columnIndex] = (columns[noteBlock.columnIndex] or 0) + 1
+		end
+	end
+	for columnIndex = 1, self.targetMode do
+		print(columnIndex, columns[columnIndex])
+	end
+
+	return notes
 end
 
 Automap.processReductor = function(self)

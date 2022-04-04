@@ -4,31 +4,31 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 
 local AudioClip = Modifier:new()
 
-AudioClip.inconsequential = true
 AudioClip.type = "TimeEngineModifier"
+AudioClip.interfaceType = "slider"
 
 AudioClip.name = "AudioClip"
-AudioClip.shortName = "Clip"
 
-AudioClip.variableType = "number"
-AudioClip.variableName = "value"
-AudioClip.variableFormat = "%3s"
-AudioClip.variableRange = {0, 10, 100}
+AudioClip.defaultValue = 0
+AudioClip.step = 10
+AudioClip.range = {0, 100}
 
-AudioClip.value = 0
-
-AudioClip.tostring = function(self)
-    if self.value > 0 then
-	    return "+" .. self.value .. "dB"
-    end
+AudioClip.getString = function(self, config)
+	local value = config.value
+    if value > 0 then
+	    return value
+	end
 end
 
-AudioClip.tojson = function(self)
-	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
+AudioClip.getSubString = function(self, config)
+	local value = config.value
+    if value > 0 then
+	    return "dB"
+	end
 end
 
-AudioClip.apply = function(self)
-	sound.set_gain(self.value)
+AudioClip.apply = function(self, config)
+	sound.set_gain(config.value)
 end
 
 return AudioClip

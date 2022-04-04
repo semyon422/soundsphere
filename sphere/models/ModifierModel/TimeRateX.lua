@@ -2,31 +2,33 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 
 local TimeRateX = Modifier:new()
 
-TimeRateX.inconsequential = true
 TimeRateX.type = "TimeEngineModifier"
+TimeRateX.interfaceType = "slider"
 
 TimeRateX.name = "TimeRateX"
-TimeRateX.shortName = "TimeRateX"
 
-TimeRateX.variableType = "number"
-TimeRateX.variableName = "value"
-TimeRateX.variableFormat = "%0.2f"
-TimeRateX.variableRange = {0.5, 0.05, 2}
+TimeRateX.defaultValue = 1
+TimeRateX.format = "%0.2f"
+TimeRateX.range = {0.5, 2}
+TimeRateX.step = 0.05
 
-TimeRateX.value = 1
-
-TimeRateX.tostring = function(self)
-    if self.value ~= 1 then
-		return self.value .. "X"
-    end
+TimeRateX.getString = function(self, config)
+	local value = config.value
+    if value ~= 1 then
+		return math.floor(value) .. "."
+	end
 end
 
-TimeRateX.tojson = function(self)
-	return ([[{"name":"%s","value":%s}]]):format(self.name, self.value)
+TimeRateX.getSubString = function(self, config)
+	local value = config.value
+    if value ~= 1 then
+		return tostring(value - math.floor(value)):sub(3) .. "X"
+	end
 end
 
-TimeRateX.apply = function(self)
-	self.rhythmModel.timeEngine:createTimeRateHandler().timeRate = self.value
+TimeRateX.apply = function(self, config)
+	self.rhythmModel.timeEngine:createTimeRateHandler().timeRate = config.value
+	self.rhythmModel.timeEngine:resetTimeRate()
 end
 
 return TimeRateX

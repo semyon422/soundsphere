@@ -1,6 +1,7 @@
+local Class = require("aqua.util.Class")
 local tween = require("tween")
 
-local FadeTransition = {}
+local FadeTransition = Class:new()
 
 FadeTransition.shaderText = [[
 	extern number alpha;
@@ -10,82 +11,68 @@ FadeTransition.shaderText = [[
 	}
 ]]
 
-FadeTransition.isTransiting = false
-FadeTransition.needTransit = false
+FadeTransition.transiting = false
+FadeTransition.needResume = false
 FadeTransition.alpha = 1
 FadeTransition.phase = 0
 
-FadeTransition.init = function(self)
-	self.shader = love.graphics.newShader(self.shaderText)
+FadeTransition.checkShader = function(self)
+	if not love.graphics then
+		return
+	end
+	if not self.shader then
+		self.shader = love.graphics.newShader(self.shaderText)
+	end
+	return true
+end
+
+FadeTransition.fadeIn = function(self)
+	self.transiting = true
+	self.phase = 1
+	self.needResume = false
+	self.tween = tween.new(0.1, self, {alpha = 0}, "inOutQuad")
+end
+
+FadeTransition.fadeOut = function(self)
+	self.phase = 2
+	self.needResume = false
+	self.tween = tween.new(0.1, self, {alpha = 1}, "inOutQuad")
 end
 
 FadeTransition.update = function(self, dt)
-	if self.phase == 0 then
+	if not self.transiting then
 		return
 	end
+
+	self.tween:update(dt)
 
 	if self.phase == 1 then
-		self.phase = 2
-		self.tween = tween.new(0.1, self, {alpha = 0}, "inOutQuad")
-	end
-	if self.phase == 2 then
-		self.tween:update(dt)
 		if self.alpha == 0 then
-			self.phase = 3
-			if self.callbackMiddle then
-				self.callbackMiddle()
-				self.callbackMiddle = false
-			end
+			self.needResume = true
 		end
-	end
-	if self.phase == 3 then
-		self.phase = 4
-		self.tween = tween.new(0.1, self, {alpha = 1}, "inOutQuad")
-	end
-	if self.phase == 4 then
-		self.tween:update(dt)
+	elseif self.phase == 2 then
 		if self.alpha == 1 then
-			self.phase = 0
-			self.needTransit = false
-			if self.callbackEnd then
-				self.callbackEnd()
-				self.callbackEnd = false
-			end
+			self.transiting = false
+			self.needResume = true
 		end
 	end
-end
-
-FadeTransition.transit = function(self, callbackMiddle, callbackEnd)
-	if self.needTransit then
-		return
-	end
-
-	self.callbackMiddle = callbackMiddle
-	self.callbackEnd = callbackEnd
-
-	self.needTransit = true
-	self.phase = 1
 end
 
 FadeTransition.drawBefore = function(self)
-	if not self.needTransit then
+	if not self.transiting or not self:checkShader() then
 		return
 	end
-	self.isTransiting = true
 
 	love.graphics.setShader(self.shader)
 	self.shader:send("alpha", self.alpha)
 end
 
 FadeTransition.drawAfter = function(self)
-	if not self.isTransiting then
+	if not self.transiting or not self:checkShader() then
 		return
 	end
 
 	love.graphics.setShader()
-	self.isTransiting = false
 end
-
-FadeTransition:init()
 
 return FadeTransition
