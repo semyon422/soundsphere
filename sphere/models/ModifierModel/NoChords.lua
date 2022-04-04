@@ -32,6 +32,7 @@ NoChords.apply = function(self, config)
 	end
 
 	local noteChart = self.noteChartModel.noteChart
+	local layerDataSequence = noteChart.layerDataSequence
 	local inputCount = noteChart.inputMode:getInputCount("key")
 	local chords = {}
 	local columns = {}
@@ -91,11 +92,18 @@ NoChords.apply = function(self, config)
 
 			for _, noteData in pairs(chord.notes) do
 				if noteData ~= noteDataToKeep then
-					noteData.noteType = "Ignore"
-
 					for _, futureChord in ipairs(sortedChords) do
 						futureChord.columnSizes[noteData.inputIndex] = futureChord.columnSizes[noteData.inputIndex] - 1
 					end
+					
+					layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, -1)
+
+					noteData.noteType = "SoundNote"
+					noteData.inputType = "auto"
+					noteData.inputIndex = 0
+
+					layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, 1)
+
 				end
 			end
 		end
