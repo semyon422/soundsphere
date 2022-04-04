@@ -152,6 +152,7 @@ ffi.cdef([[
 		double noteChartDataId;
 		double noteChartId;
 		double setId;
+		bool tagged;
 	} EntryStruct
 ]])
 
@@ -163,14 +164,25 @@ ffi.metatype("EntryStruct", {__index = function(t, k)
 			byte.double_to_string_le(t.noteChartDataId) ..
 			byte.double_to_string_le(t.noteChartId) ..
 			byte.double_to_string_le(t.setId)
-	elseif k == "noteChartDataId" or k == "noteChartId" or k == "setId" then
+	elseif k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "tagged" then
 		return rawget(t, k)
 	end
 end})
 
 local function fillObject(object, row, colnames)
 	for i, k in ipairs(colnames) do
-		object[k] = row[i]
+		local value = row[i]
+		if k:find("^__boolean_") then
+			k = k:sub(11)
+			if tonumber(value) == 1 then
+				value = true
+			else
+				value = false
+			end
+		elseif type(value) == "cdata" then
+			value = tonumber(value) or value
+		end
+		object[k] = value
 	end
 end
 
@@ -188,6 +200,10 @@ CacheDatabase.queryNoteChartSets = function(self, params, ...)
 		"noteCharts.setId",
 	}
 	objectQuery:setInnerJoin("noteCharts", "noteChartDatas.hash = noteCharts.hash")
+
+	if params.tagged then
+		table.insert(objectQuery.fields, objectQuery:newBooleanCase("tagged", params.tagged))
+	end
 
 	objectQuery.where = params.where
 	objectQuery.groupBy = params.groupBy
@@ -232,6 +248,10 @@ CacheDatabase.queryNoteCharts = function(self, params, ...)
 		"noteCharts.setId",
 	}
 	objectQuery:setInnerJoin("noteCharts", "noteChartDatas.hash = noteCharts.hash")
+
+	if params.tagged then
+		table.insert(objectQuery.fields, objectQuery:newBooleanCase("tagged", params.tagged))
+	end
 
 	objectQuery.where = params.where
 	objectQuery.groupBy = nil

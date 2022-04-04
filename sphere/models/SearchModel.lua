@@ -23,6 +23,7 @@ local fieldList = {
 	"tags",
 	"creator",
 	"inputMode",
+	"difficulty",
 	"bpm",
 }
 
@@ -46,8 +47,8 @@ for _, operator in ipairs(operators) do
 	end
 end
 
-SearchModel.getConditions = function(self)
-	local searchString = self.searchString
+SearchModel.transformSearchString = function(self, s)
+	local searchString = s
 	local conditions = {}
 
 	for _, searchSubString in ipairs(searchString:split(" ")) do
@@ -60,6 +61,22 @@ SearchModel.getConditions = function(self)
 	end
 
 	return table.concat(conditions, " AND ")
+end
+
+SearchModel.getConditions = function(self)
+	local searchString = self.searchString
+
+	local delimiter = searchString:find("|")
+	if not delimiter or #searchString == delimiter then
+		return self:transformSearchString(searchString)
+	end
+
+	print(searchString, searchString:sub(delimiter + 1, -1),
+	self:transformSearchString(searchString:sub(delimiter + 1, -1)))
+
+	return
+		self:transformSearchString(searchString:sub(1, delimiter - 1)),
+		self:transformSearchString(searchString:sub(delimiter + 1, -1))
 end
 
 SearchModel.search = function(self, list)

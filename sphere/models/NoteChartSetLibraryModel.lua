@@ -10,7 +10,7 @@ NoteChartSetLibraryModel.load = function(self)
 	self.itemsCache.getObject = function(_, itemIndex)
 		return setmetatable({}, {__index = function(t, k)
 			local entry = CacheDatabase.noteChartSetItems[itemIndex - 1]
-			if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" then
+			if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "tagged" then
 				return entry[k]
 			end
 			local noteChart = CacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
@@ -31,11 +31,16 @@ NoteChartSetLibraryModel.updateItems = function(self)
 		params.groupBy = nil
 	end
 
-	local where = self.searchModel:getConditions()
+	local where, tagged = self.searchModel:getConditions()
 	if where ~= "" then
 		params.where = where
 	else
 		params.where = nil
+	end
+	if tagged ~= "" then
+		params.tagged = tagged
+	else
+		params.tagged = nil
 	end
 
 	CacheDatabase:queryNoteChartSets(CacheDatabase.queryParams)
