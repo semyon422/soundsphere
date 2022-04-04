@@ -25,6 +25,7 @@ local BracketSwap	= require("sphere.models.ModifierModel.BracketSwap")
 local FullLongNote	= require("sphere.models.ModifierModel.FullLongNote")
 local MinLnLength	= require("sphere.models.ModifierModel.MinLnLength")
 local ToOsu			= require("sphere.models.ModifierModel.ToOsu")
+local NoChords	= require("sphere.models.ModifierModel.NoChords")
 
 local ModifierModel = Class:new()
 
@@ -51,7 +52,8 @@ local Modifiers = {
 	BracketSwap,
 	FullLongNote,
 	MinLnLength,
-	ToOsu
+	ToOsu,
+	NoChords,
 }
 
 local ModifierId = {
@@ -78,6 +80,7 @@ local ModifierId = {
 	[MinLnLength] = 20,
 	[ToOsu] = 21,
 	[Alternate2] = 22,
+	[NoChords] = 23,
 }
 
 local OneUseModifiers = {
@@ -91,7 +94,8 @@ local OneUseModifiers = {
 	AudioClip,
 	NoScratch,
 	NoLongNote,
-	NoMeasureLine
+	NoMeasureLine,
+	NoChords,
 }
 
 ModifierModel.construct = function(self)
