@@ -152,7 +152,7 @@ ffi.cdef([[
 		double noteChartDataId;
 		double noteChartId;
 		double setId;
-		bool tagged;
+		bool lamp;
 	} EntryStruct
 ]])
 
@@ -164,7 +164,7 @@ ffi.metatype("EntryStruct", {__index = function(t, k)
 			byte.double_to_string_le(t.noteChartDataId) ..
 			byte.double_to_string_le(t.noteChartId) ..
 			byte.double_to_string_le(t.setId)
-	elseif k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "tagged" then
+	elseif k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "lamp" then
 		return rawget(t, k)
 	end
 end})
@@ -201,8 +201,8 @@ CacheDatabase.queryNoteChartSets = function(self, params, ...)
 	}
 	objectQuery:setInnerJoin("noteCharts", "noteChartDatas.hash = noteCharts.hash")
 
-	if params.tagged then
-		table.insert(objectQuery.fields, objectQuery:newBooleanCase("tagged", params.tagged))
+	if params.lamp then
+		table.insert(objectQuery.fields, objectQuery:newBooleanCase("lamp", params.lamp))
 	end
 
 	objectQuery.where = params.where
@@ -249,8 +249,8 @@ CacheDatabase.queryNoteCharts = function(self, params, ...)
 	}
 	objectQuery:setInnerJoin("noteCharts", "noteChartDatas.hash = noteCharts.hash")
 
-	if params.tagged then
-		table.insert(objectQuery.fields, objectQuery:newBooleanCase("tagged", params.tagged))
+	if params.lamp then
+		table.insert(objectQuery.fields, objectQuery:newBooleanCase("lamp", params.lamp))
 	end
 
 	objectQuery.where = params.where

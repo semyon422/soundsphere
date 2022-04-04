@@ -13,7 +13,7 @@ NoteChartLibraryModel.load = function(self)
 				return
 			end
 			local entry = CacheDatabase.noteChartItems[self.slice.offset + itemIndex - 1]
-			if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "tagged" then
+			if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "lamp" then
 				return entry[k]
 			end
 			local noteChart = CacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)

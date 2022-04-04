@@ -24,7 +24,7 @@ local NoteSkinList = {
 		},
 		{
 			type = "circle",
-			key = "tagged",
+			key = "lamp",
 			onNew = false,
 			x = 22,
 			y = 36,
