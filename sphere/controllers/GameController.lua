@@ -132,6 +132,7 @@ GameController.load = function(self)
 	noteChartSetLibraryModel.collectionModel = collectionModel
 	noteChartSetLibraryModel.searchModel = searchModel
 	noteChartSetLibraryModel.selectModel = selectModel
+	noteChartSetLibraryModel.sortModel = sortModel
 	noteChartLibraryModel.cacheModel = cacheModel
 	noteChartLibraryModel.searchModel = searchModel
 	noteChartLibraryModel.selectModel = selectModel

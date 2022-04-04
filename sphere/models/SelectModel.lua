@@ -9,7 +9,6 @@ SelectModel.load = function(self)
 	self.searchModel:setSearchString(config.searchString)
 	self:setSearchMode(config.searchMode)
 	self.sortModel.name = config.sortFunction
-	self.noteChartSetLibraryModel.sortFunction = self.sortModel:getSortFunction()
 	self.noteChartSetLibraryModel.collapse = config.collapse
 
 	self.collectionItemIndex = 1
@@ -36,7 +35,6 @@ SelectModel.setSortFunction = function(self, sortFunctionName)
 	local config = self.config
 	config.sortFunction = sortFunctionName
 	self.sortModel.name = sortFunctionName
-	self.noteChartSetLibraryModel.sortFunction = self.sortModel:getSortFunction()
 	self:pullNoteChartSet()
 end
 

@@ -22,13 +22,14 @@ end
 
 NoteChartSetLibraryModel.updateItems = function(self)
 	local params = CacheDatabase.queryParams
-	if self.collapse then
+
+	local isCollapseAllowed
+	params.orderBy, isCollapseAllowed = self.sortModel:getOrderBy()
+	if self.collapse and isCollapseAllowed then
 		params.groupBy = "noteCharts.setId"
 	else
 		params.groupBy = nil
 	end
-
-	params.orderBy = self.sortFunction
 
 	local where = self.searchModel:getConditions()
 	if where ~= "" then

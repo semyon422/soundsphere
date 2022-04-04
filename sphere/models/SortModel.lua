@@ -10,18 +10,19 @@ end
 
 local SortModel = Class:new()
 
-SortModel.getSortFunction = function(self)
-	return self.sortItemsFunctions[self.name]
+SortModel.getOrderBy = function(self)
+	local f = self.sortItemsFunctions[self.name]
+	return f[1], f[2]
 end
 
 SortModel.sortItemsFunctions = {
-	id = sort("id"),
-	title = sort("title", "artist", "creator", "inputMode", "difficulty", "name", "id"),
-	artist = sort("artist", "title", "creator", "inputMode", "difficulty", "name", "id"),
-	difficulty = sort("difficulty", "name", "id"),
-	level = sort("level", "id"),
-	length = sort("length", "id"),
-	bpm = sort("bpm", "id"),
+	id = {sort("id"), true},
+	title = {sort("title", "artist", "creator", "inputMode", "difficulty", "name", "id"), true},
+	artist = {sort("artist", "title", "creator", "inputMode", "difficulty", "name", "id"), true},
+	difficulty = {sort("difficulty", "name", "id"), false},
+	level = {sort("level", "id"), false},
+	length = {sort("length", "id"), false},
+	bpm = {sort("bpm", "id"), false},
 }
 
 SortModel.name = "title"
