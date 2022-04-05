@@ -34,11 +34,6 @@ NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
 	self.itemsCount = slice.size
 end
 
-NoteChartLibraryModel.updateItems = function(self)
-	CacheDatabase:queryNoteCharts(CacheDatabase.queryParams)
-	self:setNoteChartSetId(self.setId)
-end
-
 NoteChartLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId, noteChartSetId)
 	local entry = self.entry
 	entry.noteChartDataId = noteChartDataId

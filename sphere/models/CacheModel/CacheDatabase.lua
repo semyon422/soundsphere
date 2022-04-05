@@ -37,14 +37,7 @@ CacheDatabase.load = function(self)
 	end
 	self.entryCaches = entryCaches
 
-	self.queryParams = {
-		-- where = "noteChartDatas.difficulty > 25",
-		-- where = "noteChartDatas.inputMode = '4key'",
-		-- groupBy = "noteCharts.setId",
-		-- orderBy = "noteChartDatas.difficulty ASC",
-	}
-	-- self:queryNoteChartSets(self.queryParams)
-	-- self:queryNoteCharts(self.queryParams)
+	self.queryParams = {}
 end
 
 CacheDatabase.unload = function(self)

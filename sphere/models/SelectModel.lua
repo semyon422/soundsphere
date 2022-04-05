@@ -1,6 +1,9 @@
 local Class = require("aqua.util.Class")
+local aquatimer = require("aqua.timer")
 
 local SelectModel = Class:new()
+
+SelectModel.debounceTime = 0.5
 
 SelectModel.load = function(self)
 	local config = self.configModel.configs.select
@@ -35,7 +38,7 @@ SelectModel.setSortFunction = function(self, sortFunctionName)
 	local config = self.config
 	config.sortFunction = sortFunctionName
 	self.sortModel.name = sortFunctionName
-	self:pullNoteChartSet()
+	aquatimer.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self)
 end
 
 SelectModel.scrollSortFunction = function(self, delta)
@@ -51,14 +54,14 @@ SelectModel.changeSearchMode = function(self)
 		config.searchMode = "hide"
 	end
 	self:setSearchMode(config.searchMode)
-	self:pullNoteChartSet()
+	aquatimer.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self)
 end
 
 SelectModel.changeCollapse = function(self)
 	local config = self.config
 	config.collapse = not config.collapse
 	self.noteChartSetLibraryModel.collapse = config.collapse
-	self:pullNoteChartSet()
+	aquatimer.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self)
 end
 
 SelectModel.update = function(self)
@@ -69,7 +72,7 @@ SelectModel.updateSearch = function(self)
 	local newSearchString = self.searchModel.searchString
 	if self.config.searchString ~= newSearchString then
 		self.config.searchString = newSearchString
-		self:pullNoteChartSet()
+		aquatimer.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self)
 	end
 end
 
@@ -88,7 +91,9 @@ SelectModel.scrollCollection = function(self, direction, destination)
 	self.collectionItem = collectionItem
 	self.config.collection = collectionItem.path
 
-	self:pullNoteChartSet(oldCollectionItem.path == collectionItem.path)
+	aquatimer.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self,
+		oldCollectionItem.path == collectionItem.path
+	)
 end
 
 SelectModel.scrollRandom = function(self)
@@ -160,7 +165,6 @@ SelectModel.pullNoteChartSet = function(self, noUpdate)
 	if not noUpdate then
 		self.searchModel:setCollection(self.collectionItem)
 		self.noteChartSetLibraryModel:updateItems()
-		self.noteChartLibraryModel:updateItems()
 	end
 
 	local noteChartSetItems = self.noteChartSetLibraryModel.items
@@ -184,9 +188,6 @@ end
 
 SelectModel.pullNoteChart = function(self, noUpdate)
 	self.noteChartLibraryModel:setNoteChartSetId(self.config.noteChartSetEntryId)
-	-- if not noUpdate then
-	-- 	self.noteChartLibraryModel:updateItems()
-	-- end
 
 	local noteChartItems = self.noteChartLibraryModel.items
 	self.noteChartItemIndex = self.noteChartLibraryModel:getItemIndex(

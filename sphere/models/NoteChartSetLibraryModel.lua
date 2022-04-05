@@ -44,6 +44,7 @@ NoteChartSetLibraryModel.updateItems = function(self)
 	end
 
 	CacheDatabase:queryNoteChartSets(CacheDatabase.queryParams)
+	CacheDatabase:queryNoteCharts(CacheDatabase.queryParams)
 	self.itemsCount = CacheDatabase.noteChartSetItemsCount
 end
 
