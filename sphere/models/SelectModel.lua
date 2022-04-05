@@ -9,8 +9,9 @@ SelectModel.load = function(self)
 	local config = self.configModel.configs.select
 	self.config = config
 
-	self.searchModel:setSearchString(config.searchString)
-	self:setSearchMode(config.searchMode)
+	self.searchModel:setSearchFilter(config.searchFilter)
+	self.searchModel:setSearchLamp(config.searchLamp)
+	self.searchModel:setSearchMode(config.searchMode)
 	self.sortModel.name = config.sortFunction
 	self.noteChartSetLibraryModel.collapse = config.collapse
 
@@ -21,24 +22,20 @@ SelectModel.load = function(self)
 
 	self.noteChartSetStateCounter = 1
 	self.noteChartStateCounter = 1
+	self.searchStateCounter = self.searchModel.stateCounter
 
 	self:pullNoteChartSet()
 end
 
-SelectModel.setSearchMode = function(self, searchMode)
-	if searchMode ~= "show" and searchMode ~= "hide" then
-		return
-	end
-	self.noteChartSetLibraryModel.searchMode = searchMode
-	self.noteChartLibraryModel.searchMode = searchMode
-	self.searchModel.searchMode = searchMode
+SelectModel.debouncePullNoteChartSet = function(self, ...)
+	aquatimer.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self, ...)
 end
 
 SelectModel.setSortFunction = function(self, sortFunctionName)
 	local config = self.config
 	config.sortFunction = sortFunctionName
 	self.sortModel.name = sortFunctionName
-	aquatimer.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self)
+	self:debouncePullNoteChartSet()
 end
 
 SelectModel.scrollSortFunction = function(self, delta)
@@ -47,32 +44,24 @@ SelectModel.scrollSortFunction = function(self, delta)
 end
 
 SelectModel.changeSearchMode = function(self)
-	local config = self.config
-	if config.searchMode == "hide" then
-		config.searchMode = "show"
-	else
-		config.searchMode = "hide"
-	end
-	self:setSearchMode(config.searchMode)
-	aquatimer.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self)
+	self.searchModel:switchSearchMode()
+	self.config.searchMode = self.searchModel.searchMode
 end
 
 SelectModel.changeCollapse = function(self)
 	local config = self.config
 	config.collapse = not config.collapse
 	self.noteChartSetLibraryModel.collapse = config.collapse
-	aquatimer.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self)
+	self:debouncePullNoteChartSet()
 end
 
 SelectModel.update = function(self)
-	self:updateSearch()
-end
-
-SelectModel.updateSearch = function(self)
-	local newSearchString = self.searchModel.searchString
-	if self.config.searchString ~= newSearchString then
-		self.config.searchString = newSearchString
-		aquatimer.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self)
+	local stateCounter = self.searchModel.stateCounter
+	if self.searchStateCounter ~= stateCounter then
+		self.config.searchFilter = self.searchModel.searchFilter
+		self.config.searchLamp = self.searchModel.searchLamp
+		self.searchStateCounter = stateCounter
+		self:debouncePullNoteChartSet()
 	end
 end
 
@@ -91,9 +80,7 @@ SelectModel.scrollCollection = function(self, direction, destination)
 	self.collectionItem = collectionItem
 	self.config.collection = collectionItem.path
 
-	aquatimer.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self,
-		oldCollectionItem.path == collectionItem.path
-	)
+	self:debouncePullNoteChartSet(oldCollectionItem.path == collectionItem.path)
 end
 
 SelectModel.scrollRandom = function(self)

@@ -3,7 +3,6 @@ local LibraryModel = require("sphere.models.LibraryModel")
 
 local NoteChartSetLibraryModel = LibraryModel:new()
 
-NoteChartSetLibraryModel.searchMode = "hide"
 NoteChartSetLibraryModel.collapse = false
 
 NoteChartSetLibraryModel.load = function(self)

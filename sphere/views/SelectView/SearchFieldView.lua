@@ -68,7 +68,7 @@ SearchFieldView.draw = function(self)
 		config.frame.h / 2
 	)
 
-	if searchModel.searchMode == "show" then
+	if searchModel.searchMode == "lamp" then
 		love.graphics.circle(
 			"line",
 			config.frame.x + config.frame.w - config.frame.h / 2,

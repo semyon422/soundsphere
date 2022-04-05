@@ -3,11 +3,38 @@ local Class = require("aqua.util.Class")
 local SearchModel = Class:new()
 
 SearchModel.searchString = ""
-SearchModel.searchMode = "hide"
+SearchModel.searchFilter = ""
+SearchModel.searchLamp = ""
+SearchModel.searchMode = "filter"
 SearchModel.collection = {path = ""}
+SearchModel.stateCounter = 1
 
 SearchModel.setSearchString = function(self, text)
+	if self.searchMode == "filter" then
+		self:setSearchFilter(text)
+	else
+		self:setSearchLamp(text)
+	end
+	self.stateCounter = self.stateCounter + 1
+end
+
+SearchModel.setSearchFilter = function(self, text)
+	self.searchFilter = text
 	self.searchString = text
+end
+
+SearchModel.setSearchLamp = function(self, text)
+	self.searchLamp = text
+	self.searchString = text
+end
+
+SearchModel.setSearchMode = function(self, searchMode)
+	self.searchMode = searchMode
+	self.searchString = searchMode == "filter" and self.searchFilter or self.searchLamp
+end
+
+SearchModel.switchSearchMode = function(self)
+	self:setSearchMode(self.searchMode == "filter" and "lamp" or "filter")
 end
 
 SearchModel.setCollection = function(self, collection)
@@ -64,32 +91,13 @@ SearchModel.transformSearchString = function(self, s)
 end
 
 SearchModel.getConditions = function(self)
-	local searchString = self.searchString
-
-	local delimiter = searchString:find("|")
-	if not delimiter or #searchString == delimiter then
-		return self:transformSearchString(searchString)
+	if self.searchLamp == "" then
+		return self:transformSearchString(self.searchFilter)
 	end
-
-	print(searchString, searchString:sub(delimiter + 1, -1),
-	self:transformSearchString(searchString:sub(delimiter + 1, -1)))
 
 	return
-		self:transformSearchString(searchString:sub(1, delimiter - 1)),
-		self:transformSearchString(searchString:sub(delimiter + 1, -1))
-end
-
-SearchModel.search = function(self, list)
-	local foundMap = {}
-	for i = 1, #list do
-		foundMap[list[i]] = true
-	end
-	-- print(self:getConditions())
-	return list, foundMap
-end
-
-SearchModel.check = function(self, noteChartDataEntry, noteChartEntry, noteChartSetEntry)
-	return true
+		self:transformSearchString(self.searchFilter),
+		self:transformSearchString(self.searchLamp)
 end
 
 return SearchModel
