@@ -256,11 +256,12 @@ GameplayController.skip = function(self)
 	rhythmModel.audioEngine:unload()
 	rhythmModel.logicEngine.observable:remove(rhythmModel.audioEngine)
 
+	local base = rhythmModel.scoreEngine.scoreSystem.base
 	if timeEngine.currentTime >= timeEngine.maxTime then
-		rhythmModel.scoreEngine.scoreSystem.base.progress = 1
+		base.progress = 1
 	end
 
-	if timeEngine.currentTime < timeEngine.minTime then
+	if timeEngine.currentTime < timeEngine.minTime or base.hitCount == 0 then
 		rhythmModel.prohibitSavingScore = true
 	end
 
