@@ -24,5 +24,6 @@ CREATE TABLE IF NOT EXISTS `scores` (
     `inputMode` TEXT,
     `timeRate` REAL,
     `difficulty` REAL,
-    `pausesCount` REAL
+    `pausesCount` REAL,
+    `isTop` INTEGER DEFAULT 0
 );

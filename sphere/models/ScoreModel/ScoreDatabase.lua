@@ -31,12 +31,20 @@ ScoreDatabase.unload = function(self)
 	self.loaded = false
 end
 
+ScoreDatabase.selectAllScores = function(self)
+	return self.db:select("scores")
+end
+
 ScoreDatabase.selectScore = function(self, id)
 	return self.db:select("scores", "id = ?", id)[1]
 end
 
 ScoreDatabase.insertScore = function(self, score)
 	return self.db:insert("scores", score, true)
+end
+
+ScoreDatabase.updateScore = function(self, score)
+	return self.db:update("scores", score, "id = ?", score.id)
 end
 
 ScoreDatabase.getScoreEntries = function(self, hash, index)
