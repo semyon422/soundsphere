@@ -153,9 +153,10 @@ end
 
 ffi.cdef([[
 	typedef struct {
-		double noteChartDataId;
-		double noteChartId;
-		double setId;
+		uint32_t noteChartDataId;
+		uint32_t noteChartId;
+		uint32_t setId;
+		uint32_t scoreId;
 		bool lamp;
 	} EntryStruct
 ]])
@@ -168,7 +169,7 @@ ffi.metatype("EntryStruct", {__index = function(t, k)
 			byte.double_to_string_le(t.noteChartDataId) ..
 			byte.double_to_string_le(t.noteChartId) ..
 			byte.double_to_string_le(t.setId)
-	elseif k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "lamp" then
+	elseif k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "scoreId" or k == "lamp" then
 		return rawget(t, k)
 	end
 end})
@@ -186,7 +187,7 @@ local function fillObject(object, row, colnames)
 		elseif type(value) == "cdata" then
 			value = tonumber(value) or value
 		end
-		object[k] = value
+		object[k] = value or 0
 	end
 end
 
@@ -245,8 +246,14 @@ CacheDatabase.queryNoteChartSets = function(self)
 		"noteChartDatas.id AS noteChartDataId",
 		"noteCharts.id AS noteChartId",
 		"noteCharts.setId",
+		"scores.id AS scoreId",
 	}
 	objectQuery:setInnerJoin("noteCharts", "noteChartDatas.hash = noteCharts.hash")
+	objectQuery:setLeftJoin("scores", [[
+		noteChartDatas.hash = scores.noteChartHash AND
+		noteChartDatas.`index` = scores.noteChartIndex AND
+		scores.isTop = TRUE
+	]])
 
 	if params.lamp then
 		table.insert(objectQuery.fields, objectQuery:newBooleanCase("lamp", params.lamp))
@@ -293,8 +300,14 @@ CacheDatabase.queryNoteCharts = function(self)
 		"noteChartDatas.id AS noteChartDataId",
 		"noteCharts.id AS noteChartId",
 		"noteCharts.setId",
+		"scores.id AS scoreId",
 	}
 	objectQuery:setInnerJoin("noteCharts", "noteChartDatas.hash = noteCharts.hash")
+	objectQuery:setLeftJoin("scores", [[
+		noteChartDatas.hash = scores.noteChartHash AND
+		noteChartDatas.`index` = scores.noteChartIndex AND
+		scores.isTop = TRUE
+	]])
 
 	if params.lamp then
 		table.insert(objectQuery.fields, objectQuery:newBooleanCase("lamp", params.lamp))

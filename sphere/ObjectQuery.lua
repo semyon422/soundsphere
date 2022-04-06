@@ -6,8 +6,16 @@ ObjectQuery.construct = function(self)
 	self.joins = {}
 end
 
+ObjectQuery.setJoin = function(self, t, dbTable, on)
+	table.insert(self.joins, {t .. " JOIN", dbTable, on})
+end
+
 ObjectQuery.setInnerJoin = function(self, dbTable, on)
-	table.insert(self.joins, {"INNER JOIN", dbTable, on})
+	self:setJoin("INNER", dbTable, on)
+end
+
+ObjectQuery.setLeftJoin = function(self, dbTable, on)
+	self:setJoin("LEFT", dbTable, on)
 end
 
 ObjectQuery.newBooleanCase = function(self, field, condition)

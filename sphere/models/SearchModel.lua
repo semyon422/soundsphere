@@ -88,7 +88,7 @@ SearchModel.transformSearchString = function(self, s)
 	for _, searchSubString in ipairs(searchString:split(" ")) do
 		local key, operator, value = searchSubString:match("^(.-)([=><~!]+)(.+)$")
 		if key and fieldMap[key] and operatorsMap[operator] and tonumber(value) then
-			table.insert(conditions, ("%s %s %s"):format(key, operatorsMap[operator], tonumber(value)))
+			table.insert(conditions, ("noteChartDatas.%s %s %s"):format(key, operatorsMap[operator], tonumber(value)))
 		elseif not key and searchSubString ~= "" then
 			table.insert(conditions, (fieldLikePattern:gsub("<substring>", ("%q"):format("%%" .. searchSubString .. "%%"))))
 		end
