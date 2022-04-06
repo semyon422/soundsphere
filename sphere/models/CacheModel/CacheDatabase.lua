@@ -17,6 +17,7 @@ CacheDatabase.load = function(self)
 	local db = self.db
 	db:open(self.dbpath)
 	db:exec(love.filesystem.read("sphere/models/CacheModel/database.sql"))
+	self:attachScores()
 	self.loaded = true
 
 	self.noteChartSetItemsCount = 0
@@ -46,6 +47,7 @@ CacheDatabase.unload = function(self)
 		return
 	end
 	self.loaded = false
+	self:detachScores()
 	return self.db:close()
 end
 
@@ -55,6 +57,14 @@ end
 
 CacheDatabase.commit = function(self)
 	return self.db:commit()
+end
+
+CacheDatabase.attachScores = function(self)
+	self.db:exec("ATTACH 'userdata/scores.db' AS scores_db")
+end
+
+CacheDatabase.detachScores = function(self)
+	self.db:exec("DETACH scores_db")
 end
 
 ----------------------------------------------------------------
@@ -192,7 +202,7 @@ local _asyncQueryAll = aquathread.async(function(queryParams)
 	self.queryParams = queryParams
 	self:queryNoteChartSets()
 	self:queryNoteCharts()
-	return {
+	local t = {
 		noteChartSetItemsCount = self.noteChartSetItemsCount,
 		entryKeyToGlobalOffset = self.entryKeyToGlobalOffset,
 		noteChartSetIdToOffset = self.noteChartSetIdToOffset,
@@ -202,6 +212,8 @@ local _asyncQueryAll = aquathread.async(function(queryParams)
 		noteChartSetItems = ffi.string(self.noteChartSetItems, ffi.sizeof(self.noteChartSetItems)),
 		noteChartItems = ffi.string(self.noteChartItems, ffi.sizeof(self.noteChartItems)),
 	}
+	self:unload()
+	return t
 end)
 
 CacheDatabase.asyncQueryAll = function(self)

@@ -1,4 +1,5 @@
 local Class = require("aqua.util.Class")
+local erfunc = require("libchart.erfunc")
 
 local SearchModel = Class:new()
 
@@ -8,6 +9,12 @@ SearchModel.searchLamp = ""
 SearchModel.searchMode = "filter"
 SearchModel.collection = {path = ""}
 SearchModel.stateCounter = 1
+
+SearchModel.transformScoreEntry = function(self, scoreEntry)
+	local enps = scoreEntry.rating * scoreEntry.accuracy
+	scoreEntry.rating = enps * erfunc.erf(self.ratingHitTimingWindow / (scoreEntry.accuracy * math.sqrt(2)))
+	return scoreEntry
+end
 
 SearchModel.setSearchString = function(self, text)
 	if self.searchMode == "filter" then

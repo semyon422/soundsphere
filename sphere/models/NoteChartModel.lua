@@ -21,7 +21,7 @@ NoteChartModel.load = function(self)
 
 	self.noteChartDataEntry = CacheDatabase:selectNoteChartDataEntryById(config.noteChartDataEntryId)
 		or cacheManager:getEmptyNoteChartDataEntry(self.noteChartEntry.path)
-	self.scoreEntry = self.scoreModel.scoreManager:getScoreEntryById(config.scoreEntryId)
+	self.scoreEntry = self.scoreModel:getScoreEntryById(config.scoreEntryId)
 end
 
 NoteChartModel.getFileInfo = function(self)

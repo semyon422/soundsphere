@@ -1,37 +1,43 @@
 local Class = require("aqua.util.Class")
-local Observable = require("aqua.util.Observable")
-local ScoreManager = require("sphere.models.ScoreModel.ScoreManager")
+local ScoreDatabase = require("sphere.models.ScoreModel.ScoreDatabase")
 
 local ScoreModel = Class:new()
 
-ScoreModel.construct = function(self)
-	self.observable = Observable:new()
-	self.scoreManager = ScoreManager:new()
-end
-
 ScoreModel.load = function(self)
-	self:select()
-end
-
-ScoreModel.unload = function(self)
-end
-
-ScoreModel.select = function(self)
-	local config = self.configModel.configs.settings.gameplay
-	self.scoreManager.ratingHitTimingWindow = config.ratingHitTimingWindow
-    self.scoreManager:select()
+	ScoreDatabase:load()
 end
 
 ScoreModel.getScoreEntries = function(self, hash, index)
-    return self.scoreManager:getScoreEntries(hash, index)
+    return ScoreDatabase:getScoreEntries(hash, index)
 end
 
-ScoreModel.insertScore = function(self, scoreTable, noteChartDataEntry, replayHash, modifierModel)
-    return self.scoreManager:insertScore(scoreTable, noteChartDataEntry, replayHash, modifierModel)
+ScoreModel.getScoreEntryById = function(self, id)
+    return ScoreDatabase:selectScore(id)
 end
 
-ScoreModel.receive = function(self, event)
-	self.observable:send(event)
+ScoreModel.insertScore = function(self, scoreSystemEntry, noteChartDataEntry, replayHash, modifierModel)
+	return ScoreDatabase:insertScore({
+		noteChartHash = noteChartDataEntry.hash,
+		noteChartIndex = noteChartDataEntry.index,
+		playerName = "Player",
+		time = os.time(),
+		score = scoreSystemEntry.score,
+		accuracy = scoreSystemEntry.accuracy,
+		maxCombo = scoreSystemEntry.maxCombo,
+		modifiers = modifierModel:encode(),
+		replayHash = replayHash,
+		rating = scoreSystemEntry.rating,
+		ratio = scoreSystemEntry.ratio,
+		perfect = scoreSystemEntry.perfect,
+		notPerfect = scoreSystemEntry.notPerfect,
+		missCount = scoreSystemEntry.missCount,
+		mean = scoreSystemEntry.mean,
+		earlylate = scoreSystemEntry.earlylate,
+		inputMode = scoreSystemEntry.inputMode,
+		timeRate = scoreSystemEntry.timeRate,
+		difficulty = scoreSystemEntry.difficulty,
+		pausesCount = scoreSystemEntry.pausesCount,
+	})
 end
 
 return ScoreModel
