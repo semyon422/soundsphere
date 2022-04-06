@@ -42,8 +42,7 @@ NoteChartSetLibraryModel.updateItems = function(self)
 		params.lamp = nil
 	end
 
-	CacheDatabase:queryNoteChartSets(CacheDatabase.queryParams)
-	CacheDatabase:queryNoteCharts(CacheDatabase.queryParams)
+	CacheDatabase:asyncQueryAll()
 	self.itemsCount = CacheDatabase.noteChartSetItemsCount
 end
 

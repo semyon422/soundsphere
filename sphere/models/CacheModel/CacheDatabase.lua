@@ -1,4 +1,5 @@
 local TimedCache = require("aqua.util.TimedCache")
+local aquathread = require("aqua.thread")
 local Orm = require("sphere.Orm")
 local ObjectQuery = require("sphere.ObjectQuery")
 local ffi = require("ffi")
@@ -179,8 +180,49 @@ local function fillObject(object, row, colnames)
 	end
 end
 
-CacheDatabase.queryNoteChartSets = function(self, params, ...)
-	params = params or {}
+CacheDatabase.queryAll = function(self)
+	self:queryNoteChartSets()
+	self:queryNoteCharts()
+end
+
+local _asyncQueryAll = aquathread.async(function(queryParams)
+	local ffi = require("ffi")
+	local self = require("sphere.models.CacheModel.CacheDatabase")
+	self:load()
+	self.queryParams = queryParams
+	self:queryNoteChartSets()
+	self:queryNoteCharts()
+	return {
+		noteChartSetItemsCount = self.noteChartSetItemsCount,
+		entryKeyToGlobalOffset = self.entryKeyToGlobalOffset,
+		noteChartSetIdToOffset = self.noteChartSetIdToOffset,
+		noteChartItemsCount = self.noteChartItemsCount,
+		noteChartSlices = self.noteChartSlices,
+		entryKeyToLocalOffset = self.entryKeyToLocalOffset,
+		noteChartSetItems = ffi.string(self.noteChartSetItems, ffi.sizeof(self.noteChartSetItems)),
+		noteChartItems = ffi.string(self.noteChartItems, ffi.sizeof(self.noteChartItems)),
+	}
+end)
+
+CacheDatabase.asyncQueryAll = function(self)
+	local t = _asyncQueryAll(self.queryParams)
+
+	self.noteChartSetItemsCount = t.noteChartSetItemsCount
+	self.entryKeyToGlobalOffset = t.entryKeyToGlobalOffset
+	self.noteChartSetIdToOffset = t.noteChartSetIdToOffset
+	self.noteChartItemsCount = t.noteChartItemsCount
+	self.noteChartSlices = t.noteChartSlices
+	self.entryKeyToLocalOffset = t.entryKeyToLocalOffset
+
+	local size = ffi.sizeof("EntryStruct")
+	self.noteChartSetItems = ffi.new("EntryStruct[?]", #t.noteChartSetItems / size)
+	self.noteChartItems = ffi.new("EntryStruct[?]", #t.noteChartItems / size)
+	ffi.copy(self.noteChartSetItems, t.noteChartSetItems)
+	ffi.copy(self.noteChartItems, t.noteChartItems)
+end
+
+CacheDatabase.queryNoteChartSets = function(self)
+	local params = CacheDatabase.queryParams
 
 	local objectQuery = ObjectQuery:new()
 
@@ -210,7 +252,7 @@ CacheDatabase.queryNoteChartSets = function(self, params, ...)
 	self.entryKeyToGlobalOffset = entryKeyToGlobalOffset
 	self.noteChartSetIdToOffset = noteChartSetIdToOffset
 
-	local stmt = self.db:stmt(objectQuery:getQueryParams(), ...)
+	local stmt = self.db:stmt(objectQuery:getQueryParams())
 	local colnames = {}
 
 	local row = stmt:step({}, colnames)
@@ -226,8 +268,8 @@ CacheDatabase.queryNoteChartSets = function(self, params, ...)
 	self.noteChartSetItemsCount = i
 end
 
-CacheDatabase.queryNoteCharts = function(self, params, ...)
-	params = params or {}
+CacheDatabase.queryNoteCharts = function(self)
+	local params = CacheDatabase.queryParams
 
 	local objectQuery = ObjectQuery:new()
 
@@ -265,7 +307,7 @@ CacheDatabase.queryNoteCharts = function(self, params, ...)
 	self.noteChartSlices = slices
 	self.entryKeyToLocalOffset = entryKeyToLocalOffset
 
-	local stmt = self.db:stmt(objectQuery:getQueryParams(), ...)
+	local stmt = self.db:stmt(objectQuery:getQueryParams())
 	local colnames = {}
 
 	local offset = 0

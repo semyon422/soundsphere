@@ -1,5 +1,6 @@
 local Class = require("aqua.util.Class")
 local aquatimer = require("aqua.timer")
+local aquathread = require("aqua.thread")
 
 local SelectModel = Class:new()
 
@@ -24,12 +25,16 @@ SelectModel.load = function(self)
 	self.noteChartStateCounter = 1
 	self.searchStateCounter = self.searchModel.stateCounter
 
-	self:pullNoteChartSet()
+	self:coroPullNoteChartSet()
 end
 
 SelectModel.debouncePullNoteChartSet = function(self, ...)
 	aquatimer.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self, ...)
 end
+
+SelectModel.coroPullNoteChartSet = aquathread.coro(function(self, ...)
+	return self:pullNoteChartSet(...)
+end)
 
 SelectModel.setSortFunction = function(self, sortFunctionName)
 	local config = self.config

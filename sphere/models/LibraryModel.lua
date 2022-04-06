@@ -6,7 +6,7 @@ local LibraryModel = Class:new()
 
 LibraryModel.construct = function(self)
 	self.items = {}
-	self.itemsCount = 1
+	self.itemsCount = 0
 	self.itemsCache = TimedCache:new()
 	self.entry = CacheDatabase.EntryStruct()
 	self.items = newproxy(true)
