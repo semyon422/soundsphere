@@ -90,6 +90,7 @@ local OneUseModifiers = {
 	TimeRateX,
 	WindUp,
 	AudioClip,
+	NoChords,
 	NoScratch,
 	NoLongNote,
 	NoMeasureLine,
