@@ -549,7 +549,7 @@ StageInfo.cells = {
 		name = "bpm",
 		value = function(self)
 			local show = showLoadedScore(self)
-			local baseBpm = self.gameController.selectModel.noteChartItem.noteChartDataEntry.bpm
+			local baseBpm = self.gameController.selectModel.noteChartItem.bpm
 			local bpm = self.gameController.rhythmModel.scoreEngine.bpm
 			if not show then
 				return math.floor(baseBpm)
@@ -567,7 +567,7 @@ StageInfo.cells = {
 		name = "duration",
 		value = function(self)
 			local show = showLoadedScore(self)
-			local baseLength = self.gameController.selectModel.noteChartItem.noteChartDataEntry.length
+			local baseLength = self.gameController.selectModel.noteChartItem.length
 			local length = self.gameController.rhythmModel.scoreEngine.length
 			if not show then
 				return rtime(baseLength)
@@ -606,14 +606,14 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 4, y = 4,
 		name = "notes",
-		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.noteCount"
+		key = "gameController.selectModel.noteChartItem.noteCount"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 1, y = 4,
 		name = "level",
-		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.level"
+		key = "gameController.selectModel.noteChartItem.level"
 	},
 	{
 		type = StageInfo.largeCell,

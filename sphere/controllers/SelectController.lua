@@ -94,7 +94,7 @@ SelectController.receive = function(self, event)
 		self.gameController.onlineModel.authManager:quickLogin()
 	elseif event.name == "openDirectory" then
 		local selectModel = self.gameController.selectModel
-		local path = selectModel.noteChartItem.noteChartEntry.path:match("^(.+)/.-$")
+		local path = selectModel.noteChartItem.path:match("^(.+)/.-$")
 		local mountPath = self.gameController.mountModel:getRealPath(path)
 		local realPath =
 			mountPath or
@@ -102,7 +102,7 @@ SelectController.receive = function(self, event)
 		love.system.openURL("file://" .. realPath)
 	elseif event.name == "updateCache" then
 		local selectModel = self.gameController.selectModel
-		local path = selectModel.noteChartItem.noteChartEntry.path:match("^(.+)/.-$")
+		local path = selectModel.noteChartItem.path:match("^(.+)/.-$")
 		self.gameController.cacheModel:startUpdate(path, event.force)
 	elseif event.name == "updateCacheCollection" then
 		local state = self.gameController.cacheModel.cacheUpdater.state

@@ -11,7 +11,7 @@ ScoreListItemView.draw = function(self)
 	item.scoreEngine = scoreEngine
 
 	if scoreEntry then
-		item.loaded = scoreEntry.replayHash == item.scoreEntry.replayHash
+		item.loaded = scoreEntry.replayHash == item.replayHash
 	else
 		item.loaded = false
 	end
