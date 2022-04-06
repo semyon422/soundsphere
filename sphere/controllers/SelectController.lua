@@ -202,7 +202,7 @@ SelectController.switchResultController = function(self)
 	if not scoreItem then
 		return
 	end
-	resultController:replayNoteChart("result", scoreItem.scoreEntry, scoreItemIndex)
+	resultController:replayNoteChart("result", scoreItem, scoreItemIndex)
 
 	return self.gameController.screenManager:set(resultController)
 end

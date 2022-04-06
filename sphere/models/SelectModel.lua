@@ -150,7 +150,7 @@ SelectModel.scrollScore = function(self, direction, destination)
 	local scoreItem = scoreItems[self.scoreItemIndex]
 	self.scoreItem = scoreItem
 
-	self.config.scoreEntryId = scoreItem.scoreEntry.id
+	self.config.scoreEntryId = scoreItem.id
 end
 
 SelectModel.pullNoteChartSet = function(self, noUpdate)
@@ -216,7 +216,7 @@ SelectModel.pullScore = function(self, noUpdate)
 	local scoreItems = self.scoreLibraryModel.items
 	local scoreItemIndex = 1
 	for i, scoreItem in ipairs(scoreItems) do
-		if scoreItem.scoreEntry.isTop then
+		if scoreItem.isTop then
 			scoreItemIndex = i
 			break
 		end
@@ -227,7 +227,7 @@ SelectModel.pullScore = function(self, noUpdate)
 	local scoreItem = scoreItems[scoreItemIndex]
 	self.scoreItem = scoreItem
 	if scoreItem then
-		self.config.scoreEntryId = scoreItem.scoreEntry.id
+		self.config.scoreEntryId = scoreItem.id
 	end
 end
 

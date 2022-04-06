@@ -27,7 +27,7 @@ local showLoadedScore = function(self)
 	if not self.gameController.rhythmModel.scoreEngine.scoreEntry then
 		return
 	end
-	return self.gameController.selectModel.scoreItem.scoreEntry.id == self.gameController.rhythmModel.scoreEngine.scoreEntry.id
+	return self.gameController.selectModel.scoreItem.id == self.gameController.rhythmModel.scoreEngine.scoreEntry.id
 end
 
 local showLoadedListScore = function(self)
@@ -585,7 +585,7 @@ StageInfo.cells = {
 		name = "density",
 		key = {
 			{"gameController.rhythmModel.scoreEngine.enps", showLoadedListScore},
-			"gameController.selectModel.scoreItem.scoreEntry.difficulty"
+			"gameController.selectModel.scoreItem.difficulty"
 		},
 		format = formatDifficulty,
 	},
@@ -596,7 +596,7 @@ StageInfo.cells = {
 		name = "time rate",
 		key = {
 			{"gameController.rhythmModel.scoreEngine.baseTimeRate", showLoadedListScore},
-			"gameController.selectModel.scoreItem.scoreEntry.timeRate"
+			"gameController.selectModel.scoreItem.timeRate"
 		},
 		format = "%0.2f",
 	},
@@ -622,7 +622,7 @@ StageInfo.cells = {
 		name = "accuracy",
 		key = {
 			{"gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.accuracyAdjusted", showLoadedScore},
-			"gameController.selectModel.scoreItem.scoreEntry.accuracy"
+			"gameController.selectModel.scoreItem.accuracy"
 		},
 		format = formatScore
 	},
@@ -633,7 +633,7 @@ StageInfo.cells = {
 		name = "score",
 		key = {
 			{"gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.scoreAdjusted", showLoadedScore},
-			"gameController.selectModel.scoreItem.scoreEntry.score"
+			"gameController.selectModel.scoreItem.score"
 		},
 		value = function(self)
 			if showLoadedScore(self) then
@@ -646,8 +646,8 @@ StageInfo.cells = {
 				)
 			end
 			return ("%d"):format(
-				self.gameController.selectModel.scoreItem.scoreEntry.rating /
-				self.gameController.selectModel.scoreItem.scoreEntry.difficulty * 10000
+				self.gameController.selectModel.scoreItem.rating /
+				self.gameController.selectModel.scoreItem.difficulty * 10000
 			)
 		end,
 	},
@@ -656,7 +656,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 8, y = 3,
 		name = "pauses",
-		key = "gameController.selectModel.scoreItem.scoreEntry.pausesCount",
+		key = "gameController.selectModel.scoreItem.pausesCount",
 	},
 	{
 		type = StageInfo.smallCell,
@@ -680,7 +680,7 @@ StageInfo.cells = {
 		name = "perfect/hits",
 		key = {
 			{"gameController.rhythmModel.scoreEngine.scoreSystem.misc.ratio", showLoadedScore},
-			"gameController.selectModel.scoreItem.scoreEntry.ratio"
+			"gameController.selectModel.scoreItem.ratio"
 		},
 	},
 	{
@@ -690,7 +690,7 @@ StageInfo.cells = {
 		name = "perfect",
 		key = {
 			{"gameController.rhythmModel.scoreEngine.scoreSystem.judgement.counters.soundsphere.perfect", showLoadedScore},
-			"gameController.selectModel.scoreItem.scoreEntry.perfect"
+			"gameController.selectModel.scoreItem.perfect"
 		},
 	},
 	{
@@ -700,7 +700,7 @@ StageInfo.cells = {
 		name = "not perfect",
 		key = {
 			{"gameController.rhythmModel.scoreEngine.scoreSystem.judgement.counters.soundsphere.not perfect", showLoadedScore},
-			"gameController.selectModel.scoreItem.scoreEntry.notPerfect"
+			"gameController.selectModel.scoreItem.notPerfect"
 		},
 	},
 	{
@@ -710,7 +710,7 @@ StageInfo.cells = {
 		name = "miss",
 		key = {
 			{"gameController.rhythmModel.scoreEngine.scoreSystem.base.missCount", showLoadedScore},
-			"gameController.selectModel.scoreItem.scoreEntry.missCount"
+			"gameController.selectModel.scoreItem.missCount"
 		},
 	},
 	{
@@ -720,7 +720,7 @@ StageInfo.cells = {
 		name = "early/late",
 		key = {
 			{"gameController.rhythmModel.scoreEngine.scoreSystem.misc.earlylate", showLoadedScore},
-			"gameController.selectModel.scoreItem.scoreEntry.earlylate"
+			"gameController.selectModel.scoreItem.earlylate"
 		},
 		format = function(earlylate)
 			if earlylate == 0 then
@@ -742,7 +742,7 @@ StageInfo.cells = {
 		format = "%0.1f",
 		key = {
 			{"gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.normalscore.mean", showLoadedScore},
-			"gameController.selectModel.scoreItem.scoreEntry.mean"
+			"gameController.selectModel.scoreItem.mean"
 		},
 	},
 	{
@@ -783,7 +783,7 @@ local ModifierIconGrid = {
 	noModifier = true,
 	config = {
 		{"gameController.modifierModel.config", showLoadedScore},
-		"gameController.selectModel.scoreItem.scoreEntry.modifiers"
+		"gameController.selectModel.scoreItem.modifiers"
 	},
 }
 
@@ -913,7 +913,7 @@ local InspectScoreEntry = {
 	class = "ValueView",
 	subscreen = "scoreEntryDebug",
 	transform = transformLeft,
-	key = "gameController.selectModel.scoreItem.scoreEntry",
+	key = "gameController.selectModel.scoreItem",
 	format = function(...)
 		return inspect(...)
 	end,

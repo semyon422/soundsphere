@@ -353,7 +353,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 2, y = 1,
 		name = "rating",
-		key = "gameController.selectModel.scoreItem.scoreEntry.rating",
+		key = "gameController.selectModel.scoreItem.rating",
 		format = formatDifficulty
 	},
 	{
@@ -375,8 +375,8 @@ StageInfo.cells = {
 				return "0"
 			end
 			return ("%d"):format(
-				self.gameController.selectModel.scoreItem.scoreEntry.rating /
-				self.gameController.selectModel.scoreItem.scoreEntry.difficulty * 10000
+				self.gameController.selectModel.scoreItem.rating /
+				self.gameController.selectModel.scoreItem.difficulty * 10000
 			)
 		end
 	},
@@ -385,7 +385,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 4, y = 5,
 		name = "accuracy",
-		key = "gameController.selectModel.scoreItem.scoreEntry.accuracy",
+		key = "gameController.selectModel.scoreItem.accuracy",
 		format = formatScore
 	},
 	{
@@ -394,7 +394,7 @@ StageInfo.cells = {
 		x = {3, 4}, y = 6,
 		name = "miss count",
 		format = "%d",
-		key = "gameController.selectModel.scoreItem.scoreEntry.missCount"
+		key = "gameController.selectModel.scoreItem.missCount"
 	},
 	{
 		type = StageInfo.smallCell,
@@ -402,7 +402,7 @@ StageInfo.cells = {
 		x = {2, 3}, y = 6,
 		name = "density",
 		format = formatDifficulty,
-		key = "gameController.selectModel.scoreItem.scoreEntry.difficulty"
+		key = "gameController.selectModel.scoreItem.difficulty"
 	},
 }
 
@@ -523,7 +523,7 @@ local StageInfoModifierIconGrid = {
 	h = 138,
 	columns = 4,
 	rows = 3,
-	config = "gameController.selectModel.scoreItem.scoreEntry.modifiers",
+	config = "gameController.selectModel.scoreItem.modifiers",
 	noModifier = true
 }
 
