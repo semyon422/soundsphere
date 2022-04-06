@@ -353,7 +353,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 2, y = 1,
 		name = "rating",
-		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.rating",
+		key = "gameController.selectModel.scoreItem.scoreEntry.rating",
 		format = formatDifficulty
 	},
 	{
@@ -361,7 +361,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = {3, 4}, y = 8,
 		name = "played time ago",
-		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.time",
+		key = "gameController.selectModelscoreEntry.time",
 		ago = true,
 		suffix = ""
 	},
@@ -371,12 +371,12 @@ StageInfo.cells = {
 		x = 3, y = 5,
 		name = "score",
 		value = function(self)
-			if not self.gameController.scoreLibraryModel.firstScoreItem then
+			if not self.gameController.selectModel.scoreItem then
 				return "0"
 			end
 			return ("%d"):format(
-				self.gameController.scoreLibraryModel.firstScoreItem.scoreEntry.rating /
-				self.gameController.scoreLibraryModel.firstScoreItem.scoreEntry.difficulty * 10000
+				self.gameController.selectModel.scoreItem.scoreEntry.rating /
+				self.gameController.selectModel.scoreItem.scoreEntry.difficulty * 10000
 			)
 		end
 	},
@@ -385,7 +385,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 4, y = 5,
 		name = "accuracy",
-		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.accuracy",
+		key = "gameController.selectModel.scoreItem.scoreEntry.accuracy",
 		format = formatScore
 	},
 	{
@@ -394,7 +394,7 @@ StageInfo.cells = {
 		x = {3, 4}, y = 6,
 		name = "miss count",
 		format = "%d",
-		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.missCount"
+		key = "gameController.selectModel.scoreItem.scoreEntry.missCount"
 	},
 	{
 		type = StageInfo.smallCell,
@@ -402,7 +402,7 @@ StageInfo.cells = {
 		x = {2, 3}, y = 6,
 		name = "density",
 		format = formatDifficulty,
-		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.difficulty"
+		key = "gameController.selectModel.scoreItem.scoreEntry.difficulty"
 	},
 }
 
@@ -523,7 +523,7 @@ local StageInfoModifierIconGrid = {
 	h = 138,
 	columns = 4,
 	rows = 3,
-	config = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.modifiers",
+	config = "gameController.selectModel.scoreItem.scoreEntry.modifiers",
 	noModifier = true
 }
 

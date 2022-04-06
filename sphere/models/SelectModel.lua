@@ -214,13 +214,17 @@ SelectModel.pullScore = function(self, noUpdate)
 	end
 
 	local scoreItems = self.scoreLibraryModel.items
+	local scoreItemIndex = 1
+	for i, scoreItem in ipairs(scoreItems) do
+		if scoreItem.scoreEntry.isTop then
+			scoreItemIndex = i
+			break
+		end
+	end
 
-	self.config.noteChartEntryId = noteChartItem.noteChartId
-	self.config.noteChartDataEntryId = noteChartItem.noteChartDataId
+	self.scoreItemIndex = scoreItemIndex
 
-	self.scoreItemIndex = self.scoreLibraryModel:getItemIndex(self.config.scoreEntryId) or self.scoreItemIndex
-
-	local scoreItem = scoreItems[self.scoreItemIndex]
+	local scoreItem = scoreItems[scoreItemIndex]
 	self.scoreItem = scoreItem
 	if scoreItem then
 		self.config.scoreEntryId = scoreItem.scoreEntry.id

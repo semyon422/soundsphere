@@ -105,6 +105,9 @@ function Orm:update(table_name, values, conditions, ...)
 		local key = column.name
 		local value = values[key]
 		if value then
+			if type(value) == "boolean" then
+				value = value and 1 or 0
+			end
 			table.insert(assigns, ("%s = %q"):format(
 				escape_identifier(key), value
 			))
