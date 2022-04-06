@@ -28,6 +28,9 @@ ScoreLibraryModel.updateItems = function(self)
 		self.firstScoreItem = nil
 		return items
 	end
+	table.sort(scoreEntries, function(a, b)
+		return a.rating > b.rating
+	end)
 
 	for itemIndex, scoreEntry in ipairs(scoreEntries) do
 		items[#items + 1] = {
