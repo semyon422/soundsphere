@@ -24,6 +24,9 @@ ScoreLibraryModel.updateItems = function(self)
 	table.sort(scoreEntries, function(a, b)
 		return a.rating > b.rating
 	end)
+	for i = 1, #scoreEntries do
+		scoreEntries[i].rank = i
+	end
 	self.items = scoreEntries
 end
 

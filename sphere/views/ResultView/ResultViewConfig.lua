@@ -12,7 +12,9 @@ end
 
 local formatDifficulty = function(difficulty)
 	local format = "%.2f"
-	if difficulty >= 10000 then
+	if not difficulty then
+		return ""
+	elseif difficulty >= 10000 then
 		format = "%s"
 		difficulty = "????"
 	elseif difficulty >= 100 then
@@ -31,10 +33,7 @@ local showLoadedScore = function(self)
 end
 
 local showLoadedListScore = function(self)
-	if not self.scoreEntry then
-		return
-	end
-	return self.gameController.rhythmModel.scoreEngine.scoreEntry.id == self.scoreEntry.id
+	return self.gameController.rhythmModel.scoreEngine.scoreEntry.id == self.id
 end
 
 local BackgroundBlurSwitch = {
@@ -231,12 +230,7 @@ local ScoreList = {
 		},
 		{
 			type = "text",
-			key = "itemIndex",
-			-- key = {
-			-- 	{"gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.scoreAdjusted", showLoadedListScore},
-			-- 	"scoreEntry.score"
-			-- },
-			-- format = formatScore,
+			key = "rank",
 			onNew = false,
 			x = 22,
 			baseline = 45,
@@ -264,7 +258,7 @@ local ScoreList = {
 			type = "text",
 			key = {
 				{"gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.performance", showLoadedListScore},
-				"scoreEntry.rating"
+				"rating"
 			},
 			onNew = false,
 			format = formatDifficulty,
@@ -294,7 +288,7 @@ local ScoreList = {
 			type = "text",
 			key = {
 				{"gameController.rhythmModel.scoreEngine.timeRate", showLoadedListScore},
-				"scoreEntry.timeRate"
+				"timeRate"
 			},
 			onNew = false,
 			x = 166,
@@ -327,7 +321,7 @@ local ScoreList = {
 		},
 		{
 			type = "text",
-			key = "scoreEntry.time",
+			key = "time",
 			ago = true,
 			onNew = false,
 			x = 162,
@@ -343,7 +337,7 @@ local ScoreList = {
 			type = "text",
 			key = {
 				{"gameController.rhythmModel.scoreEngine.inputMode", showLoadedListScore},
-				"scoreEntry.inputMode"
+				"inputMode"
 			},
 			x = 162,
 			baseline = 45,
