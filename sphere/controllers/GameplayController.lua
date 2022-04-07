@@ -42,7 +42,7 @@ GameplayController.load = function(self)
 	rhythmModel.prohibitSavingScore = false
 
 	local noteChartDataEntry = noteChartModel.noteChartDataEntry
-	local localOffset = noteChartDataEntry.localOffset
+	local localOffset = noteChartDataEntry.localOffset or 0
 
 	local config = configModel.configs.settings
 
