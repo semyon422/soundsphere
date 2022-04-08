@@ -29,7 +29,9 @@ NoteHandler.loadNoteData = function(self)
 					logicalNote.logicEngine = logicEngine
 					logicalNote.scoreEngine = scoreEngine
 					logicalNote.timeEngine = timeEngine
-					notesCount[logicalNote.noteClass] = (notesCount[logicalNote.noteClass] or 0) + 1
+					if logicalNote.playable then
+						notesCount[logicalNote.noteClass] = (notesCount[logicalNote.noteClass] or 0) + 1
+					end
 					table.insert(self.noteData, logicalNote)
 
 					logicEngine.sharedLogicalNotes[noteData] = logicalNote
