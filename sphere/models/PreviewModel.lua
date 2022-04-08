@@ -25,7 +25,6 @@ PreviewModel.update = function(self, dt)
 			self.audioPath = audioPath
 			self.previewTime = previewTime
 			aquatimer.debounce(self, "playDebounce", 0.1, self.play, self, self.audioPath, self.previewTime)
-			print("LOAD PV", audioPath)
 		end
 	end
 
