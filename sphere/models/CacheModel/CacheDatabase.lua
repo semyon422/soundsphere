@@ -284,6 +284,7 @@ CacheDatabase.queryNoteChartSets = function(self)
 		i = i + 1
 		row = stmt:step(row)
 	end
+	stmt:close()
 	self.noteChartSetItemsCount = i
 end
 
@@ -356,6 +357,7 @@ CacheDatabase.queryNoteCharts = function(self)
 		i = i + 1
 		row = stmt:step(row)
 	end
+	stmt:close()
 	self.noteChartItemsCount = i
 end
 

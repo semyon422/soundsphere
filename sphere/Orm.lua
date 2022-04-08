@@ -72,12 +72,14 @@ function Orm:query(...)
 
 	local row = stmt:step({}, colnames)
 	if not row then
+		stmt:close()
 		return
 	end
 	while row do
 		objects[#objects + 1] = to_object({}, row, colnames)
 		row = stmt:step(row)
 	end
+	stmt:close()
 	return objects
 end
 
@@ -156,6 +158,7 @@ function Orm:insert(table_name, values, ignore)
 
 	local row, colnames = stmt:step({}, {})
 	assert(not stmt:step())
+	stmt:close()
 	if not colnames then
 		return values
 	end
