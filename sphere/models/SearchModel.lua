@@ -48,7 +48,56 @@ SearchModel.setCollection = function(self, collection)
 	self.collection = collection
 end
 
-local fieldList = {
+local numberFields = {
+	{
+		keys = {"difficulty", "d"},
+		field = "noteChartDatas.difficulty",
+	},
+	{
+		keys = {"length", "l"},
+		field = "noteChartDatas.length",
+		transform = function(self, v)
+			if tonumber(v) then
+				return tonumber(v)
+			end
+			local n, s = v:match("(%d+)(%a+)")
+			if s == "m" then
+				return n * 60
+			end
+		end,
+	},
+	{
+		keys = {"bpm", "b"},
+		field = "noteChartDatas.bpm",
+	},
+	{
+		keys = {"notesCount", "nc"},
+		field = "noteChartDatas.notesCount",
+	},
+
+	{
+		keys = {"rating", "r"},
+		field = "scores.rating",
+	},
+	{
+		keys = {"accuracy", "a"},
+		field = "scores.accuracy * 1000",
+	},
+	{
+		keys = {"score", "s"},
+		field = "scores.rating / scores.difficulty * 10000",
+	},
+}
+
+local numberFieldsMap = {}
+for _, config in ipairs(numberFields) do
+	for _, k in ipairs(config.keys) do
+		assert(not numberFieldsMap[k], "duplicate key: " .. k)
+		numberFieldsMap[k] = config
+	end
+end
+
+local textFields = {
 	"hash",
 	"artist",
 	"title",
@@ -57,17 +106,10 @@ local fieldList = {
 	"tags",
 	"creator",
 	"inputMode",
-	"difficulty",
-	"bpm",
 }
 
-local fieldMap = {}
-for _, key in ipairs(fieldList) do
-	fieldMap[key] = true
-end
-
 local fieldLikePattern = {}
-for _, key in ipairs(fieldList) do
+for _, key in ipairs(textFields) do
 	table.insert(fieldLikePattern, ("noteChartDatas.%s LIKE <substring>"):format(key))
 end
 fieldLikePattern = "(" .. table.concat(fieldLikePattern, " OR ") .. ")"
@@ -87,8 +129,19 @@ SearchModel.transformSearchString = function(self, s)
 
 	for _, searchSubString in ipairs(searchString:split(" ")) do
 		local key, operator, value = searchSubString:match("^(.-)([=><~!]+)(.+)$")
-		if key and fieldMap[key] and operatorsMap[operator] and tonumber(value) then
-			table.insert(conditions, ("noteChartDatas.%s %s %s"):format(key, operatorsMap[operator], tonumber(value)))
+		if key and operatorsMap[operator] then
+			local config = numberFieldsMap[key]
+			operator = operatorsMap[operator]
+			if config then
+				if config.transform then
+					value = config.transform(self, value)
+				else
+					value = tonumber(value)
+				end
+				if value then
+					table.insert(conditions, ("%s %s %s"):format(config.field, operator, value))
+				end
+			end
 		elseif not key and searchSubString ~= "" then
 			table.insert(conditions, (fieldLikePattern:gsub("<substring>", ("%q"):format("%%" .. searchSubString .. "%%"))))
 		end
