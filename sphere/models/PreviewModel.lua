@@ -1,12 +1,8 @@
 local Class = require("aqua.util.Class")
 local AudioFactory	= require("aqua.audio.AudioFactory")
-local tween				= require("tween")
+local aquatimer				= require("aqua.timer")
 
 local PreviewModel = Class:new()
-
-PreviewModel.construct = function(self)
-	self.loadable = 0
-end
 
 PreviewModel.load = function(self)
 	self.config = self.configModel.configs.select
@@ -20,29 +16,20 @@ PreviewModel.unload = function(self)
 end
 
 PreviewModel.update = function(self, dt)
-	if self.loadTween then
-		self.loadTween:update(dt)
-	end
-
 	if self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
-		self.noteChartDataEntryId = self.config.noteChartDataEntryId
 		local audioPath, previewTime = self:getAudioPathPreview()
+		if audioPath then
+			self.noteChartDataEntryId = self.config.noteChartDataEntryId
+		end
 		if audioPath and self.audioPath ~= audioPath then
 			self.audioPath = audioPath
 			self.previewTime = previewTime
-			self.loadable = 0
-			self.loadTween = tween.new(0.1, self, {loadable = 1}, "inOutQuad")
+			aquatimer.debounce(self, "playDebounce", 0.1, self.play, self, self.audioPath, self.previewTime)
+			print("LOAD PV", audioPath)
 		end
 	end
 
-	if self.loadable == 1 then
-		self:play(self.audioPath, self.previewTime)
-		self.loadable = 0
-	end
-
-	if not self.audio then return end
-
-	if not self.audio:isPlaying() then
+	if self.audio and not self.audio:isPlaying() then
 		self.audio:setPosition(self.position)
 		self.audio:play()
 	end

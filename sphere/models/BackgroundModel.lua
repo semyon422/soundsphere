@@ -3,13 +3,13 @@ local ThreadPool	= require("aqua.thread.ThreadPool")
 local aquaimage			= require("aqua.image")
 local newPixel = require("aqua.graphics.newPixel")
 local tween				= require("tween")
+local aquatimer				= require("aqua.timer")
 
 local BackgroundModel = Class:new()
 
 BackgroundModel.construct = function(self)
 	self.currentPath = ""
 	self.alpha = 0
-	self.loadable = 0
 end
 
 BackgroundModel.load = function(self)
@@ -24,23 +24,15 @@ BackgroundModel.load = function(self)
 end
 
 BackgroundModel.update = function(self, dt)
-	if self.loadTween then
-		self.loadTween:update(dt)
-	end
-
 	if self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
-		self.noteChartDataEntryId = self.config.noteChartDataEntryId
 		local backgroundPath = self:getBackgroundPath()
+		if backgroundPath then
+			self.noteChartDataEntryId = self.config.noteChartDataEntryId
+		end
 		if backgroundPath and self.backgroundPath ~= backgroundPath then
 			self.backgroundPath = backgroundPath
-			self.loadable = 0
-			self.loadTween = tween.new(0.1, self, {loadable = 1}, "inOutQuad")
+			aquatimer.debounce(self, "loadDebounce", 0.1, self.loadBackground, self)
 		end
-	end
-
-	if self.loadable == 1 then
-		self:loadBackground(self.backgroundPath)
-		self.loadable = 0
 	end
 
 	if self.alphaTween then
@@ -84,11 +76,8 @@ BackgroundModel.getBackgroundPath = function(self)
 	return directoryPath
 end
 
-BackgroundModel.reloadBackground = function(self)
-	self:loadBackground(self.backgroundPath)
-end
-
-BackgroundModel.loadBackground = function(self, path)
+BackgroundModel.loadBackground = function(self)
+	local path = self.backgroundPath
 	local info = love.filesystem.getInfo(path)
 	if not info or info.type == "directory" then
 		self:setBackground(self.emptyImage)
