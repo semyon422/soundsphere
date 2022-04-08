@@ -10,12 +10,6 @@ SearchModel.searchMode = "filter"
 SearchModel.collection = {path = ""}
 SearchModel.stateCounter = 1
 
-SearchModel.transformScoreEntry = function(self, scoreEntry)
-	local enps = scoreEntry.rating * scoreEntry.accuracy
-	scoreEntry.rating = enps * erfunc.erf(self.ratingHitTimingWindow / (scoreEntry.accuracy * math.sqrt(2)))
-	return scoreEntry
-end
-
 SearchModel.setSearchString = function(self, text)
 	if self.searchMode == "filter" then
 		self:setSearchFilter(text)
@@ -85,7 +79,15 @@ local numberFields = {
 	},
 	{
 		keys = {"score", "s"},
-		field = "scores.rating / scores.difficulty * 10000",
+		field = "-scores.accuracy",
+		transform = function(self, v)
+			if not tonumber(v) then
+				return
+			end
+			local window = self.configModel.configs.settings.gameplay.ratingHitTimingWindow
+			local accuracy = window / (erfunc.erfinv(v / 10000) * math.sqrt(2))
+			return accuracy == accuracy and -accuracy
+		end,
 	},
 }
 

@@ -149,6 +149,7 @@ GameController.load = function(self)
 	previewModel.configModel = configModel
 	previewModel.selectModel = selectModel
 	searchModel.scoreModel = scoreModel
+	searchModel.configModel = configModel
 	settingsModel.configModel = configModel
 	themeModel.configModel = configModel
 	mountModel.configModel = configModel
