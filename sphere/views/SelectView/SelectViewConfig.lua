@@ -361,7 +361,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = {3, 4}, y = 8,
 		name = "played time ago",
-		key = "gameController.selectModelscoreEntry.time",
+		key = "gameController.selectModel.scoreItem.time",
 		ago = true,
 		suffix = ""
 	},

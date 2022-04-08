@@ -57,7 +57,8 @@ ListItemView.drawValue = function(self, valueConfig, value)
 	elseif valueConfig.time then
 		value = rtime(tonumber(value) or 0)
 	elseif valueConfig.ago then
-		value = time_ago_in_words(tonumber(value) or 0, valueConfig.parts, valueConfig.suffix)
+		value = tonumber(value) or 0
+		value = value ~= 0 and time_ago_in_words(value, valueConfig.parts, valueConfig.suffix) or "never"
 	end
 
 	local font = spherefonts.get(valueConfig.font)
