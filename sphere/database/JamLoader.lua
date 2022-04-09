@@ -50,25 +50,12 @@ end
 
 JamLoader.unload = function(self, path, callback)
 	if ojms[path] then
-		return ThreadPool:execute({
-			f = function(ojms)
-				local sound = require("aqua.sound")
-				for _, soundData in pairs(ojms) do
-					sound.free(soundData)
-				end
-			end,
-			params = {ojms[path]},
-			result = function(result)
-				for i, soundData in pairs(ojms[path]) do
-					sound.remove(path .. "/" .. i)
-				end
-				ojms[path] = nil
-				return callback()
-			end
-		})
-	else
-		return callback()
+		for i, soundData in pairs(ojms[path]) do
+			sound.free(soundData)
+			sound.remove(path .. "/" .. i)
+		end
 	end
+	return callback()
 end
 
 return JamLoader
