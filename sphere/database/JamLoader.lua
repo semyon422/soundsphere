@@ -16,18 +16,15 @@ JamLoader.load = function(self, path, callback)
 
 		ThreadPool:execute({
 			f = function(path)
-				local byte = require("byte")
-
-				local file = require("aqua.file")
 				local sound = require("aqua.sound")
 				local OJM = require("o2jam.OJM")
 
-				local fileData = file.new(path)
+				local fileData = love.filesystem.newFileData(path)
 				local ojm = OJM:new(fileData:getString())
 				local soundDatas = {}
 
 				for sampleIndex, sampleData in pairs(ojm.samples) do
-					soundDatas[sampleIndex] = sound.new(nil, file.new(sampleData.sampleData, sampleIndex))
+					soundDatas[sampleIndex] = sound.new(nil, love.filesystem.newFileData(sampleData.sampleData, sampleIndex))
 				end
 
 				return soundDatas
