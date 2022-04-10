@@ -24,7 +24,7 @@ PreviewModel.update = function(self, dt)
 		if audioPath and self.audioPath ~= audioPath then
 			self.audioPath = audioPath
 			self.previewTime = previewTime
-			aquatimer.debounce(self, "playDebounce", 0.1, self.play, self, self.audioPath, self.previewTime)
+			aquatimer.debounce(self, "playDebounce", 0.1, self.play, self)
 		end
 	end
 
@@ -52,7 +52,10 @@ PreviewModel.getAudioPathPreview = function(self)
 	return directoryPath .. "/preview.ogg", 0
 end
 
-PreviewModel.play = function(self, path, position)
+PreviewModel.play = function(self)
+	local path = self.audioPath
+	local position = self.previewTime
+
 	local info = love.filesystem.getInfo(path)
 	if not info then
 		self:stop()
