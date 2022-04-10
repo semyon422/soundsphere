@@ -17,14 +17,13 @@ local MinLnLength	= require("sphere.models.ModifierModel.MinLnLength")
 local Alternate		= require("sphere.models.ModifierModel.Alternate")
 local Alternate2		= require("sphere.models.ModifierModel.Alternate2")
 local MultiOverPlay	= require("sphere.models.ModifierModel.MultiOverPlay")
-local Alternate		= require("sphere.models.ModifierModel.Alternate")
 local Shift			= require("sphere.models.ModifierModel.Shift")
 local Mirror		= require("sphere.models.ModifierModel.Mirror")
 local Random		= require("sphere.models.ModifierModel.Random")
 local BracketSwap	= require("sphere.models.ModifierModel.BracketSwap")
 local FullLongNote	= require("sphere.models.ModifierModel.FullLongNote")
-local MinLnLength	= require("sphere.models.ModifierModel.MinLnLength")
 local ToOsu			= require("sphere.models.ModifierModel.ToOsu")
+local NoChords	= require("sphere.models.ModifierModel.NoChords")
 
 local ModifierModel = Class:new()
 
@@ -37,6 +36,7 @@ local Modifiers = {
 	TimeRateX,
 	WindUp,
 	AudioClip,
+	NoChords,
 	NoScratch,
 	NoLongNote,
 	NoMeasureLine,
@@ -51,7 +51,7 @@ local Modifiers = {
 	BracketSwap,
 	FullLongNote,
 	MinLnLength,
-	ToOsu
+	ToOsu,
 }
 
 local ModifierId = {
@@ -78,6 +78,7 @@ local ModifierId = {
 	[MinLnLength] = 20,
 	[ToOsu] = 21,
 	[Alternate2] = 22,
+	[NoChords] = 23,
 }
 
 local OneUseModifiers = {
@@ -89,9 +90,10 @@ local OneUseModifiers = {
 	TimeRateX,
 	WindUp,
 	AudioClip,
+	NoChords,
 	NoScratch,
 	NoLongNote,
-	NoMeasureLine
+	NoMeasureLine,
 }
 
 ModifierModel.construct = function(self)

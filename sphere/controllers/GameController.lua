@@ -1,7 +1,5 @@
 local aquaevent					= require("aqua.event")
 local Class						= require("aqua.util.Class")
-local aquathread				= require("aqua.thread")
-local aquatimer					= require("aqua.timer")
 local ConfigModel				= require("sphere.models.ConfigModel")
 local ScoreModel				= require("sphere.models.ScoreModel")
 local DiscordModel				= require("sphere.models.DiscordModel")
@@ -257,9 +255,6 @@ end
 
 GameController.update = function(self, dt)
 	local startTime = love.timer.getTime()
-
-	aquathread:update()
-	aquatimer:update()
 
 	self.discordModel:update()
 	self.notificationModel:update()

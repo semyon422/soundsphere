@@ -16,18 +16,15 @@ JamLoader.load = function(self, path, callback)
 
 		ThreadPool:execute({
 			f = function(path)
-				local byte = require("byte")
-
-				local file = require("aqua.file")
 				local sound = require("aqua.sound")
 				local OJM = require("o2jam.OJM")
 
-				local fileData = file.new(path)
+				local fileData = love.filesystem.newFileData(path)
 				local ojm = OJM:new(fileData:getString())
 				local soundDatas = {}
 
 				for sampleIndex, sampleData in pairs(ojm.samples) do
-					soundDatas[sampleIndex] = sound.new(nil, file.new(sampleData.sampleData, sampleIndex))
+					soundDatas[sampleIndex] = sound.new(nil, love.filesystem.newFileData(sampleData.sampleData, sampleIndex))
 				end
 
 				return soundDatas
@@ -53,25 +50,12 @@ end
 
 JamLoader.unload = function(self, path, callback)
 	if ojms[path] then
-		return ThreadPool:execute({
-			f = function(ojms)
-				local sound = require("aqua.sound")
-				for _, soundData in pairs(ojms) do
-					sound.free(soundData)
-				end
-			end,
-			params = {ojms[path]},
-			result = function(result)
-				for i, soundData in pairs(ojms[path]) do
-					sound.remove(path .. "/" .. i)
-				end
-				ojms[path] = nil
-				return callback()
-			end
-		})
-	else
-		return callback()
+		for i, soundData in pairs(ojms[path]) do
+			sound.free(soundData)
+			sound.remove(path .. "/" .. i)
+		end
 	end
+	return callback()
 end
 
 return JamLoader
