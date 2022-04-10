@@ -76,6 +76,7 @@ setmetatable(_G, {
 })
 
 require("preloaders.preloadall")
+require("luajit-request").init()
 
 local aquaevent = require("aqua.event")
 aquaevent:init()
