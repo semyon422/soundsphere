@@ -1,3 +1,5 @@
+require("hooks")
+
 require("mime")
 require("ltn12")
 require("enet")
