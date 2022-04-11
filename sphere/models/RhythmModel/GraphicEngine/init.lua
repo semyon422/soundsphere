@@ -12,6 +12,7 @@ GraphicEngine.construct = function(self)
 	self.globalAliases = {}
 
 	self.noteDrawers = {}
+	self.loaded = false
 end
 
 GraphicEngine.load = function(self)
@@ -24,7 +25,7 @@ GraphicEngine.update = function(self, dt)
 	if self.visualTimeRateTween and self.updateTween then
 		self.visualTimeRateTween:update(dt)
 	end
-	for _, noteDrawer in pairs(self.noteDrawers) do
+	for _, noteDrawer in ipairs(self.noteDrawers) do
 		noteDrawer:update()
 	end
 end
@@ -54,7 +55,8 @@ GraphicEngine.getVisualTimeRate = function(self)
 end
 
 GraphicEngine.unload = function(self)
-	for _, noteDrawer in pairs(self.noteDrawers) do
+	self.loaded = false
+	for _, noteDrawer in ipairs(self.noteDrawers) do
 		noteDrawer:unload()
 	end
 	self.noteDrawers = {}
@@ -74,6 +76,8 @@ GraphicEngine.getNoteDrawer = function(self, layerIndex, inputType, inputIndex)
 end
 
 GraphicEngine.loadNoteDrawers = function(self)
+	assert(not self.loaded)
+	self.loaded = true
 	for layerIndex in self.noteChart:getLayerDataIndexIterator() do
 		local layerData = self.noteChart:requireLayerData(layerIndex)
 		if not layerData.invisible then
