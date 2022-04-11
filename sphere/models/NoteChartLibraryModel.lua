@@ -17,7 +17,7 @@ NoteChartLibraryModel.load = function(self)
 			end
 			local noteChart = CacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
 			local noteChartData = CacheDatabase:getCachedEntry("noteChartDatas", entry.noteChartDataId)
-			return noteChartData[k] or noteChart[k]
+			return noteChartData and noteChartData[k] or noteChart and noteChart[k]
 		end})
 	end
 end

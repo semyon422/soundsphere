@@ -125,9 +125,13 @@ for _, operator in ipairs(operators) do
 	end
 end
 
-SearchModel.transformSearchString = function(self, s)
+SearchModel.transformSearchString = function(self, s, addCollectionFilter)
 	local searchString = s
 	local conditions = {}
+
+	if addCollectionFilter then
+		table.insert(conditions, ("substr(noteCharts.path, 1, %d) = %q"):format(#self.collection.path, self.collection.path))
+	end
 
 	for _, searchSubString in ipairs(searchString:split(" ")) do
 		local key, operator, value = searchSubString:match("^(.-)([=><~!]+)(.+)$")
@@ -154,11 +158,11 @@ end
 
 SearchModel.getConditions = function(self)
 	if self.searchLamp == "" then
-		return self:transformSearchString(self.searchFilter)
+		return self:transformSearchString(self.searchFilter, true)
 	end
 
 	return
-		self:transformSearchString(self.searchFilter),
+		self:transformSearchString(self.searchFilter, true),
 		self:transformSearchString(self.searchLamp)
 end
 
