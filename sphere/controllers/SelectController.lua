@@ -81,7 +81,7 @@ SelectController.receive = function(self, event)
 	elseif event.name == "changeCollapse" then
 		self.gameController.selectModel:changeCollapse()
 	elseif event.name == "pullNoteChartSet" then
-		self.gameController.selectModel:pullNoteChartSet()
+		self.gameController.selectModel:debouncePullNoteChartSet()
 	elseif event.name == "playNoteChart" then
 		self:playNoteChart()
 	elseif event.name == "loadModifiedNoteChart" then

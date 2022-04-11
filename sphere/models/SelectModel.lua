@@ -85,7 +85,7 @@ SelectModel.scrollCollection = function(self, direction, destination)
 	self.collectionItem = collectionItem
 	self.config.collection = collectionItem.path
 
-	self:debouncePullNoteChartSet(oldCollectionItem.path == collectionItem.path)
+	self:debouncePullNoteChartSet(oldCollectionItem and oldCollectionItem.path == collectionItem.path)
 end
 
 SelectModel.scrollRandom = function(self)
