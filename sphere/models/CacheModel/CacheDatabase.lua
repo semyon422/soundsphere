@@ -357,6 +357,10 @@ CacheDatabase.queryNoteCharts = function(self)
 		i = i + 1
 		row = stmt:step(row)
 	end
+	slices[setId] = {
+		offset = offset,
+		size = size,
+	}
 	stmt:close()
 	self.noteChartItemsCount = i
 end
