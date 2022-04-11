@@ -1,3 +1,5 @@
+require("hooks")
+
 require("mime")
 require("ltn12")
 require("enet")
@@ -76,6 +78,7 @@ setmetatable(_G, {
 })
 
 require("preloaders.preloadall")
+require("luajit-request").init()
 
 local aquaevent = require("aqua.event")
 aquaevent:init()
