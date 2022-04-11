@@ -16,7 +16,6 @@ SelectModel.load = function(self)
 	self.sortModel.name = config.sortFunction
 	self.noteChartSetLibraryModel.collapse = config.collapse
 
-	self.collectionItemIndex = 1
 	self.noteChartSetItemIndex = 1
 	self.noteChartItemIndex = 1
 	self.scoreItemIndex = 1
@@ -24,6 +23,9 @@ SelectModel.load = function(self)
 	self.noteChartSetStateCounter = 1
 	self.noteChartStateCounter = 1
 	self.searchStateCounter = self.searchModel.stateCounter
+
+	self.collectionItemIndex = self.collectionModel:getItemIndex(config.collection)
+	self.collectionItem = self.collectionModel.items[self.collectionItemIndex]
 
 	self:coroPullNoteChartSet()
 end
