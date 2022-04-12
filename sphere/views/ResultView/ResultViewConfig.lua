@@ -646,10 +646,12 @@ StageInfo.cells = {
 					erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2))) * 10000
 				)
 			end
-			return ("%d"):format(
-				self.gameController.selectModel.scoreItem.scoreEntry.rating /
-				self.gameController.selectModel.scoreItem.scoreEntry.difficulty * 10000
-			)
+			local scoreEntry = self.gameController.selectModel.scoreItem.scoreEntry
+			local score = scoreEntry.rating / scoreEntry.difficulty * 10000
+			if score ~= score then
+				return "nan"
+			end
+			return ("%d"):format(score)
 		end,
 	},
 	{

@@ -373,10 +373,12 @@ StageInfo.cells = {
 			if not self.gameController.scoreLibraryModel.firstScoreItem then
 				return "0"
 			end
-			return ("%d"):format(
-				self.gameController.scoreLibraryModel.firstScoreItem.scoreEntry.rating /
-				self.gameController.scoreLibraryModel.firstScoreItem.scoreEntry.difficulty * 10000
-			)
+			local scoreEntry = self.gameController.scoreLibraryModel.firstScoreItem.scoreEntry
+			local score = scoreEntry.rating / scoreEntry.difficulty * 10000
+			if score ~= score then
+				return "nan"
+			end
+			return ("%d"):format(score)
 		end
 	},
 	{
