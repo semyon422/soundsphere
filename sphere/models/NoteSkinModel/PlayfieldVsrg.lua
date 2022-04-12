@@ -299,7 +299,7 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 		object.transform = self:newNoteskinTransform()
 	end
 	for i = 1, noteskin.inputsCount do
-		local pressed, hold, release
+		local pressed, hold, released
 		if object.pressed and object.pressed[i] then
 			pressed = {
 				class = "ImageAnimationView",
