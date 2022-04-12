@@ -1,6 +1,7 @@
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local formatScore = function(score)
+	score = tonumber(score) or math.huge
 	if score >= 0.1 then
 		return "100+"
 	end
