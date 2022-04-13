@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS `scores` (
     `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     `noteChartHash` TEXT NOT NULL,
     `noteChartIndex` REAL NOT NULL,
+    `isTop` INTEGER DEFAULT FALSE,
     `playerName` TEXT,
     `time` INTEGER,
     `accuracy` REAL,
@@ -22,6 +23,8 @@ CREATE TABLE IF NOT EXISTS `scores` (
     `inputMode` TEXT,
     `timeRate` REAL,
     `difficulty` REAL,
-    `pausesCount` REAL,
-    `isTop` INTEGER DEFAULT 0
+    `pausesCount` REAL
 );
+CREATE INDEX IF NOT EXISTS isTopIndex ON scores(isTop) WHERE isTop = TRUE;
+CREATE INDEX IF NOT EXISTS hashIndexIndex ON scores(noteChartHash, noteChartIndex);
+CREATE INDEX IF NOT EXISTS accuracyIndex ON scores(accuracy);

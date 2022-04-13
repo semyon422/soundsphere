@@ -5,7 +5,7 @@ local ScoreDatabase = {}
 ScoreDatabase.dbpath = "userdata/scores.db"
 
 local defaultInfo = {
-	version = 3
+	version = 4
 }
 
 ScoreDatabase.load = function(self)

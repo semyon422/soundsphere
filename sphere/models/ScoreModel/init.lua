@@ -9,6 +9,10 @@ ScoreModel.load = function(self)
 	-- self:calculateTopScores()
 end
 
+ScoreModel.unload = function(self)
+	ScoreDatabase:unload()
+end
+
 ScoreModel.transformScoreEntry = function(self, score)
 	local window = self.configModel.configs.settings.gameplay.ratingHitTimingWindow
 	local s = erfunc.erf(window / (score.accuracy * math.sqrt(2)))

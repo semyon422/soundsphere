@@ -70,10 +70,6 @@ local numberFields = {
 	},
 
 	{
-		keys = {"rating", "r"},
-		field = "scores.rating",
-	},
-	{
 		keys = {"accuracy", "a"},
 		field = "scores.accuracy * 1000",
 	},
