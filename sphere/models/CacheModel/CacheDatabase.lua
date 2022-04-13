@@ -197,6 +197,7 @@ CacheDatabase.queryAll = function(self)
 end
 
 local _asyncQueryAll = aquathread.async(function(queryParams)
+	local time = love.timer.getTime()
 	local ffi = require("ffi")
 	local self = require("sphere.models.CacheModel.CacheDatabase")
 	self:load()
@@ -214,6 +215,7 @@ local _asyncQueryAll = aquathread.async(function(queryParams)
 		noteChartItems = ffi.string(self.noteChartItems, ffi.sizeof(self.noteChartItems)),
 	}
 	self:unload()
+	print("queryAll: " .. love.timer.getTime() - time)
 	return t
 end)
 
@@ -357,10 +359,12 @@ CacheDatabase.queryNoteCharts = function(self)
 		i = i + 1
 		row = stmt:step(row)
 	end
-	slices[setId] = {
-		offset = offset,
-		size = size,
-	}
+	if setId then
+		slices[setId] = {
+			offset = offset,
+			size = size,
+		}
+	end
 	stmt:close()
 	self.noteChartItemsCount = i
 end
