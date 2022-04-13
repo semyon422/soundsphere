@@ -80,6 +80,13 @@ local numberFields = {
 			if not tonumber(v) then
 				return
 			end
+			v = tonumber(v)
+			if v <= 0 then
+				return -1000
+			end
+			if v >= 10000 then
+				return 0
+			end
 			local window = self.configModel.configs.settings.gameplay.ratingHitTimingWindow
 			local accuracy = window / (erfunc.erfinv(v / 10000) * math.sqrt(2))
 			if accuracy ~= accuracy or math.abs(accuracy) == math.huge then
@@ -134,7 +141,9 @@ SearchModel.transformSearchString = function(self, s, addCollectionFilter)
 
 	for _, searchSubString in ipairs(searchString:split(" ")) do
 		local key, operator, value = searchSubString:match("^(.-)([=><~!]+)(.+)$")
-		if key and operatorsMap[operator] then
+		if searchSubString == "!" or searchSubString == "~" then
+			table.insert(conditions, "scores.id IS NULL")
+		elseif key and operatorsMap[operator] then
 			local config = numberFieldsMap[key]
 			operator = operatorsMap[operator]
 			if config then
