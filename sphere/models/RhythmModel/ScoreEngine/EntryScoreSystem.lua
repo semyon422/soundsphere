@@ -9,9 +9,7 @@ EntryScoreSystem.getSlice = function(self) end
 EntryScoreSystem.after = function(self, event)
 	local container = self.container
 
-	self.score = container.normalscore.scoreAdjusted
 	self.accuracy = container.normalscore.accuracyAdjusted
-	self.rating = container.normalscore.performance
 	self.mean = container.normalscore.normalscore.mean
 	self.maxCombo = container.base.maxCombo
 	self.pauses = container.base.pauses

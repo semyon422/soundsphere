@@ -220,8 +220,8 @@ GameplayController.saveScore = function(self)
 	local modifierModel = rhythmModel.modifierModel
 	local replayModel = rhythmModel.replayModel
 	if
-		scoreSystemEntry.score > 0 and
-		scoreSystemEntry.score < math.huge and
+		scoreSystemEntry.accuracy > 0 and
+		scoreSystemEntry.accuracy < math.huge and
 		rhythmModel.replayModel.mode ~= "replay" and
 		not rhythmModel.logicEngine.autoplay
 	then
