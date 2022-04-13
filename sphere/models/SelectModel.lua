@@ -4,6 +4,12 @@ local aquathread = require("aqua.thread")
 
 local SelectModel = Class:new()
 
+SelectModel.construct = function(self)
+	self.noteChartSetItemIndex = 1
+	self.noteChartItemIndex = 1
+	self.scoreItemIndex = 1
+end
+
 SelectModel.debounceTime = 0.5
 
 SelectModel.load = function(self)
@@ -15,10 +21,6 @@ SelectModel.load = function(self)
 	self.searchModel:setSearchMode(config.searchMode)
 	self.sortModel.name = config.sortFunction
 	self.noteChartSetLibraryModel.collapse = config.collapse
-
-	self.noteChartSetItemIndex = 1
-	self.noteChartItemIndex = 1
-	self.scoreItemIndex = 1
 
 	self.noteChartSetStateCounter = 1
 	self.noteChartStateCounter = 1
