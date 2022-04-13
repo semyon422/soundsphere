@@ -352,6 +352,16 @@ local ScoreList = {
 		{
 			type = "circle",
 			key = "loaded",
+			mode = "line",
+			onNew = false,
+			x = 23,
+			y = 36,
+			r = 7
+		},
+		{
+			type = "circle",
+			key = "isTop",
+			mode = "both",
 			onNew = false,
 			x = 23,
 			y = 36,

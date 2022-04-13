@@ -79,18 +79,24 @@ ListItemView.drawCircle = function(self, valueConfig, value)
 	local config = self.listView.config
 
 	local y = (self.visualIndex - 1) * config.h / config.rows
-	love.graphics.circle(
-		"line",
-		valueConfig.x,
-		y + valueConfig.y,
-		valueConfig.r
-	)
-	love.graphics.circle(
-		"fill",
-		valueConfig.x,
-		y + valueConfig.y,
-		valueConfig.r
-	)
+
+	local t = valueConfig.mode
+	if not t or t == "line" or t == "both" then
+		love.graphics.circle(
+			"line",
+			valueConfig.x,
+			y + valueConfig.y,
+			valueConfig.r
+		)
+	end
+	if not t or t == "fill" or t == "both" then
+		love.graphics.circle(
+			"fill",
+			valueConfig.x,
+			y + valueConfig.y,
+			valueConfig.r
+		)
+	end
 end
 
 ListItemView.receive = function(self, event)
