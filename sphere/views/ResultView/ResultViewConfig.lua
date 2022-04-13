@@ -4,6 +4,7 @@ local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 
 local transformLeft = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local formatScore = function(score)
+	score = tonumber(score) or math.huge
 	if score >= 0.1 then
 		return "100+"
 	end
@@ -639,10 +640,12 @@ StageInfo.cells = {
 					erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2))) * 10000
 				)
 			end
-			return ("%d"):format(
-				self.gameController.selectModel.scoreItem.rating /
-				self.gameController.selectModel.scoreItem.difficulty * 10000
-			)
+			local scoreEntry = self.gameController.selectModel.scoreItem
+			local score = scoreEntry.rating / scoreEntry.difficulty * 10000
+			if score ~= score then
+				return "nan"
+			end
+			return ("%d"):format(score)
 		end,
 	},
 	{
