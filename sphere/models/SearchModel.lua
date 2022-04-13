@@ -82,7 +82,10 @@ local numberFields = {
 			end
 			local window = self.configModel.configs.settings.gameplay.ratingHitTimingWindow
 			local accuracy = window / (erfunc.erfinv(v / 10000) * math.sqrt(2))
-			return accuracy == accuracy and -accuracy
+			if accuracy ~= accuracy or math.abs(accuracy) == math.huge then
+				return 0
+			end
+			return -accuracy
 		end,
 	},
 }
