@@ -2,16 +2,12 @@ local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
 local json				= require("json")
 local ReplayNanoChart	= require("sphere.models.ReplayModel.ReplayNanoChart")
-local ReplayJson		= require("sphere.models.ReplayModel.ReplayJson")
 local InputMode			= require("ncdk.InputMode")
 
 local Replay = Class:new()
 
-Replay.type = "NanoChart"
-
 Replay.construct = function(self)
 	self.replayNanoChart = ReplayNanoChart:new()
-	self.replayJson = ReplayJson:new()
 	self.observable = Observable:new()
 	self.events = {}
 	self.eventOffset = 0
@@ -43,12 +39,7 @@ Replay.getNextEvent = function(self)
 end
 
 Replay.toString = function(self)
-	local content, size
-	if self.type == "NanoChart" then
-		content, size = self.replayNanoChart:encode(self.events, self.inputMode)
-	elseif self.type == "Json" then
-		content, size = self.replayJson:encode(self.events)
-	end
+	local content, size = self.replayNanoChart:encode(self.events, self.inputMode)
 	return json.encode({
 		hash = self.noteChartDataEntry.hash,
 		index = self.noteChartDataEntry.index,
@@ -58,7 +49,7 @@ Replay.toString = function(self)
 		time = os.time(),
 		events = content,
 		size = size,
-		type = self.type,
+		type = "NanoChart",
 		timings = self.timings
 	})
 end
@@ -76,11 +67,7 @@ Replay.fromString = function(self, s)
 		self.inputMode = InputMode:new():setString(object.inputMode)
 	end
 
-	if object.type == "NanoChart" then
-		self.events = self.replayNanoChart:decode(object.events, object.size, self.inputMode)
-	elseif object.type == "Json" or not object.type then
-		self.events = self.replayJson:decode(object.events, object.size)
-	end
+	self.events = self.replayNanoChart:decode(object.events, object.size, self.inputMode)
 
 	return self
 end

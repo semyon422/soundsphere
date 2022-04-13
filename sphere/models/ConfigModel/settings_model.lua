@@ -24,14 +24,6 @@ local settings = {
 		displayRange = {"no", "yes"}
 	},
 	{
-		name = "replay type",
-		section = "gameplay",
-		key = "gameplay.replayType",
-		type = "stepper",
-		values = {"NanoChart", "Json"},
-		displayValues = {"NanoChart", "Json"}
-	},
-	{
 		name = "visual long note shortening",
 		section = "gameplay",
 		key = "gameplay.longNoteShortening",

@@ -27,7 +27,6 @@ return {
 		},
 		pauseOnFail = false,
 		ratingHitTimingWindow = 0.032,
-		replayType = "NanoChart",
 		speed = 1,
 		time = {
 			pausePlay = 0.5,

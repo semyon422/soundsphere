@@ -227,7 +227,6 @@ GameplayController.saveScore = function(self)
 	then
 		replayModel.noteChartModel = noteChartModel
 		replayModel.modifierModel = modifierModel
-		replayModel.replayType = self.gameController.configModel.configs.settings.gameplay.replayType
 		local replayHash = replayModel:saveReplay()
 		local scoreEntry = self.gameController.scoreModel:insertScore(scoreSystemEntry, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
 
