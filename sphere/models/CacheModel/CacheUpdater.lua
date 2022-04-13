@@ -18,7 +18,6 @@ CacheUpdater.receive = function(self, event)
 	elseif event.state == 2 then
 		self.cachePercent = event.cachePercent
 	elseif event.state == 3 then
-		self.cacheManager:select()
 		self.isUpdating = false
 	end
 	self.state = event.state
