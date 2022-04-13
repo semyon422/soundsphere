@@ -636,12 +636,10 @@ StageInfo.cells = {
 				local ratingHitTimingWindow = self.gameController.configModel.configs.settings.gameplay.ratingHitTimingWindow
 				local normalscore = self.gameController.rhythmModel.scoreEngine.scoreSystem.normalscore
 				return ("%d"):format(
-					-- self.gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.rating32p * 100
 					erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2))) * 10000
 				)
 			end
-			local scoreEntry = self.gameController.selectModel.scoreItem
-			local score = scoreEntry.rating / scoreEntry.difficulty * 10000
+			local score = self.gameController.selectModel.scoreItem.score
 			if score ~= score then
 				return "nan"
 			end

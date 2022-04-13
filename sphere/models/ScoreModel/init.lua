@@ -11,7 +11,9 @@ end
 
 ScoreModel.transformScoreEntry = function(self, score)
 	local window = self.configModel.configs.settings.gameplay.ratingHitTimingWindow
-	score.rating = score.difficulty * erfunc.erf(window / (score.accuracy * math.sqrt(2)))
+	local s = erfunc.erf(window / (score.accuracy * math.sqrt(2)))
+	score.rating = score.difficulty * s
+	score.score = s * 10000
 	if tonumber(score.isTop) == 1 then
 		score.isTop = true
 	else

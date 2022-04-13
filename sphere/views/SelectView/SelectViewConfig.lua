@@ -372,11 +372,11 @@ StageInfo.cells = {
 		x = 3, y = 5,
 		name = "score",
 		value = function(self)
-			if not self.gameController.selectModel.scoreItem then
+			local scoreEntry = self.gameController.selectModel.scoreItem
+			if not scoreEntry then
 				return "0"
 			end
-			local scoreEntry = self.gameController.selectModel.scoreItem
-			local score = scoreEntry.rating / scoreEntry.difficulty * 10000
+			local score = scoreEntry.score
 			if score ~= score then
 				return "nan"
 			end
