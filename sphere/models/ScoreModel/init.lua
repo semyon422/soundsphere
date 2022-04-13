@@ -66,6 +66,7 @@ local sortScores = function(a, b)
 	end
 end
 ScoreModel.calculateTopScores = function(self)
+	print("calculating top scores")
 	local map = {}
 	for _, score in ipairs(ScoreDatabase:selectAllScores()) do
 		self:transformScoreEntry(score)
@@ -90,6 +91,7 @@ ScoreModel.calculateTopScores = function(self)
 			end
 		end
 	end
+	print("calculated top scores: " .. counter)
 end
 
 return ScoreModel

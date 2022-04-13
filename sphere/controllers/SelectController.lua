@@ -111,6 +111,8 @@ SelectController.receive = function(self, event)
 		else
 			self.gameController.cacheModel:stopUpdate()
 		end
+	elseif event.name == "calculateTopScores" then
+		self.gameController.scoreModel:calculateTopScores()
 	elseif event.name == "deleteNoteChart" then
 	elseif event.name == "deleteNoteChartSet" then
 	end

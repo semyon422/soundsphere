@@ -77,6 +77,10 @@ SelectNavigator.scrollRandom = function(self)
 	self:send({name = "scrollRandom"})
 end
 
+SelectNavigator.calculateTopScores = function(self)
+	self:send({name = "calculateTopScores"})
+end
+
 SelectNavigator.updateCache = function(self, force)
 	self:send({
 		name = "updateCache",

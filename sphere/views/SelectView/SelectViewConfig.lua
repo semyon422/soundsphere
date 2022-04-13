@@ -564,8 +564,9 @@ local SessionTime = {
 	align = "left",
 }
 
-local BottomScreenMenu = {
+local BottomNotechartsScreenMenu = {
 	class = "ScreenMenuView",
+	subscreen = "notecharts",
 	transform = transform,
 	x = 392,
 	y = 991,
@@ -600,6 +601,36 @@ local BottomScreenMenu = {
 				value = "Input",
 				displayName = "input"
 			}
+		}
+	}
+}
+
+local BottomCollectionsScreenMenu = {
+	class = "ScreenMenuView",
+	subscreen = "collections",
+	transform = transform,
+	x = 392,
+	y = 991,
+	w = 681,
+	h = 89,
+	rows = 1,
+	columns = 3,
+	text = {
+		x = 0,
+		baseline = 54,
+		limit = 228,
+		align = "center",
+		font = {
+			filename = "Noto Sans",
+			size = 24,
+		},
+	},
+	items = {
+		{
+			{
+				method = "calculateTopScores",
+				displayName = "calc top scores"
+			},
 		}
 	}
 }
@@ -851,7 +882,8 @@ local SelectViewConfig = {
 	SortStepper,
 	ModifierIconGrid,
 	StageInfoModifierIconGrid,
-	BottomScreenMenu,
+	BottomNotechartsScreenMenu,
+	BottomCollectionsScreenMenu,
 	BottomRightNotechartsScreenMenu,
 	BottomRightCollectionsScreenMenu,
 	NoteChartSubScreenMenu,
