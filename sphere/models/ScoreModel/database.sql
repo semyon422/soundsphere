@@ -25,6 +25,3 @@ CREATE TABLE IF NOT EXISTS `scores` (
     `difficulty` REAL,
     `pausesCount` REAL
 );
-CREATE INDEX IF NOT EXISTS isTopIndex ON scores(isTop) WHERE isTop = TRUE;
-CREATE INDEX IF NOT EXISTS hashIndexIndex ON scores(noteChartHash, noteChartIndex);
-CREATE INDEX IF NOT EXISTS accuracyIndex ON scores(accuracy);
