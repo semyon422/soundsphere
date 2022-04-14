@@ -35,8 +35,7 @@ end
 
 ScoreModel.getScoreEntryById = function(self, id)
 	local score = ScoreDatabase:selectScore(id)
-	self:transformScoreEntry(score)
-	return score
+	return score and self:transformScoreEntry(score)
 end
 
 ScoreModel.insertScore = function(self, scoreSystemEntry, noteChartDataEntry, replayHash, modifierModel)
