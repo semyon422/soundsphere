@@ -1,12 +1,12 @@
 local Class = require("aqua.util.Class")
 local erfunc = require("libchart.erfunc")
+local aquathread = require("aqua.thread")
 local ScoreDatabase = require("sphere.models.ScoreModel.ScoreDatabase")
 
 local ScoreModel = Class:new()
 
 ScoreModel.load = function(self)
 	ScoreDatabase:load()
-	-- self:calculateTopScores()
 end
 
 ScoreModel.unload = function(self)
@@ -97,6 +97,7 @@ ScoreModel.calculateTopScore = function(self, scores)
 	return counter
 end
 ScoreModel.calculateTopScores = function(self)
+	local time = love.timer.getTime()
 	print("calculating top scores")
 	local map = {}
 	for _, score in ipairs(ScoreDatabase:selectAllScores()) do
@@ -112,7 +113,30 @@ ScoreModel.calculateTopScores = function(self)
 			counter = counter + self:calculateTopScore(scores)
 		end
 	end
-	print("calculated top scores: " .. counter)
+	print("processed " .. counter .. " scores in " .. math.floor((love.timer.getTime() - time) * 1000) .. "ms")
 end
+
+local calculateTopScores = aquathread.async(function()
+	local ConfigModel = require("sphere.models.ConfigModel")
+	local configModel = ConfigModel:new()
+	configModel:addConfig("settings", "userdata/settings.lua", "sphere/models/ConfigModel/settings.lua", "lua")
+	configModel:readConfig("settings")
+
+	local ScoreModel = require("sphere.models.ScoreModel")
+	local scoreModel = ScoreModel:new()
+	scoreModel.configModel = configModel
+	scoreModel:load()
+	scoreModel:calculateTopScores()
+	scoreModel:unload()
+end)
+
+ScoreModel.asyncCalculateTopScores = aquathread.coro(function(self)
+	if self.calculating then
+		return
+	end
+	self.calculating = true
+	calculateTopScores()
+	self.calculating = false
+end)
 
 return ScoreModel
