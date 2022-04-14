@@ -2,6 +2,8 @@ local sqlite = require("ljsqlite3")
 
 local Orm = {}
 
+Orm.print_queries = false
+
 function Orm:new()
 	local object = {table_infos = {}}
 	setmetatable(object, self)
@@ -57,6 +59,12 @@ function Orm:exec(query)
 end
 
 function Orm:stmt(query, ...)
+	if self.print_queries then
+		print(
+			(query:gsub("\n", " "):gsub("%s+", " ")) ..
+			(select("#", ...) and (" {%s}"):format(table.concat({...}, ", ")) or "")
+		)
+	end
 	local stmt = self.c:prepare(query)
 	for i = 1, select("#", ...) do
 		stmt:bind1(i, select(i, ...))
@@ -106,11 +114,14 @@ function Orm:update(table_name, values, conditions, ...)
 	for _, column in ipairs(table_info) do
 		local key = column.name
 		local value = values[key]
-		if value then
+		if value ~= nil then
 			if type(value) == "boolean" then
 				value = value and 1 or 0
 			end
-			table.insert(assigns, ("%s = %q"):format(
+			if type(value) ~= "number" then
+				value = ("%q"):format(value)
+			end
+			table.insert(assigns, ("%s = %s"):format(
 				escape_identifier(key), value
 			))
 		end
@@ -143,7 +154,7 @@ function Orm:insert(table_name, values, ignore)
 	local pattern = ("(%s)"):format(("?, "):rep(count - 1) .. "?")
 	query_keys = ("(%s)"):format(table.concat(query_keys, ", "))
 
-	local stmt = self.c:prepare(("INSERT%s INTO %s %s VALUES %s RETURNING *"):format(
+	local stmt = self:stmt(("INSERT%s INTO %s %s VALUES %s RETURNING *"):format(
 		ignore and " OR IGNORE" or "", escape_identifier(table_name), query_keys, pattern
 	))
 
