@@ -65,7 +65,7 @@ if moddedgame and moddedgame.type == "directory" then
 	aquafs.mount(root .. "/moddedgame", "/", false)
 end
 
-aquafs.mount(root .. "/cimgui-love/src", "/cimgui", false)
+aquafs.mount("cimgui-love/src", "/cimgui", false)
 require("luamidi")
 
 setmetatable(_G, {
