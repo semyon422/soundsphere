@@ -31,25 +31,24 @@ CacheUpdater.stop = function(self)
 end
 
 CacheUpdater.start = function(self, path, force)
-	if not self.isUpdating then
-		self.isUpdating = true
-		return ThreadPool:execute({
-			f = function(path, force)
-				local CacheManager = require("sphere.models.CacheModel.CacheManager")
-
-				local cacheManager = CacheManager:new()
-
-				cacheManager:generateCacheFull(path, force)
-			end,
-			params = {path, force},
-			receive = function(event)
-				self:receive(event)
-			end,
-			error = function(message)
-				print(message)
-			end
-		})
+	if self.isUpdating then
+		return
 	end
+	self.isUpdating = true
+	return ThreadPool:execute({
+		f = function(path, force)
+			local CacheManager = require("sphere.models.CacheModel.CacheManager")
+			local cacheManager = CacheManager:new()
+			cacheManager:generateCacheFull(path, force)
+		end,
+		params = {path, force},
+		receive = function(event)
+			self:receive(event)
+		end,
+		error = function(message)
+			print(message)
+		end
+	})
 end
 
 return CacheUpdater

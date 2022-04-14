@@ -215,7 +215,7 @@ local _asyncQueryAll = aquathread.async(function(queryParams)
 		noteChartItems = ffi.string(self.noteChartItems, ffi.sizeof(self.noteChartItems)),
 	}
 	self:unload()
-	print("queryAll: " .. love.timer.getTime() - time)
+	print("query all: " .. math.floor((love.timer.getTime() - time) * 1000) .. "ms")
 	return t
 end)
 
@@ -232,8 +232,8 @@ CacheDatabase.asyncQueryAll = function(self)
 	local size = ffi.sizeof("EntryStruct")
 	self.noteChartSetItems = ffi.new("EntryStruct[?]", #t.noteChartSetItems / size)
 	self.noteChartItems = ffi.new("EntryStruct[?]", #t.noteChartItems / size)
-	ffi.copy(self.noteChartSetItems, t.noteChartSetItems)
-	ffi.copy(self.noteChartItems, t.noteChartItems)
+	ffi.copy(self.noteChartSetItems, t.noteChartSetItems, #t.noteChartSetItems)
+	ffi.copy(self.noteChartItems, t.noteChartItems, #t.noteChartItems)
 end
 
 CacheDatabase.queryNoteChartSets = function(self)
