@@ -40,7 +40,7 @@ ScoreModel.getScoreEntryById = function(self, id)
 end
 
 ScoreModel.insertScore = function(self, scoreSystemEntry, noteChartDataEntry, replayHash, modifierModel)
-	return ScoreDatabase:insertScore({
+	local score = ScoreDatabase:insertScore({
 		noteChartHash = noteChartDataEntry.hash,
 		noteChartIndex = noteChartDataEntry.index,
 		playerName = "Player",
@@ -60,6 +60,14 @@ ScoreModel.insertScore = function(self, scoreSystemEntry, noteChartDataEntry, re
 		difficulty = scoreSystemEntry.difficulty,
 		pausesCount = scoreSystemEntry.pausesCount,
 	})
+
+	local scoreEntries = self:getScoreEntries(
+		noteChartDataEntry.hash,
+		noteChartDataEntry.index
+	)
+	self:calculateTopScore(scoreEntries)
+
+	return score
 end
 
 local sortScores = function(a, b)
@@ -68,6 +76,25 @@ local sortScores = function(a, b)
 	else
 		return a.rating > b.rating
 	end
+end
+ScoreModel.calculateTopScore = function(self, scores)
+	local counter = 0
+	table.sort(scores, sortScores)
+	for i, score in ipairs(scores) do
+		if i == 1 and not score.isTop then
+			ScoreDatabase:updateScore({
+				id = score.id,
+				isTop = true,
+			})
+		elseif i > 1 and score.isTop then
+			ScoreDatabase:updateScore({
+				id = score.id,
+				isTop = false,
+			})
+		end
+		counter = counter + 1
+	end
+	return counter
 end
 ScoreModel.calculateTopScores = function(self)
 	print("calculating top scores")
@@ -82,17 +109,7 @@ ScoreModel.calculateTopScores = function(self)
 	local counter = 0
 	for _, c in pairs(map) do
 		for _, scores in pairs(c) do
-			table.sort(scores, sortScores)
-			for i, score in ipairs(scores) do
-				if i == 1 and not score.isTop then
-					score.isTop = true
-					ScoreDatabase:updateScore(score)
-				elseif i > 1 and score.isTop then
-					score.isTop = false
-					ScoreDatabase:updateScore(score)
-				end
-				counter = counter + 1
-			end
+			counter = counter + self:calculateTopScore(scores)
 		end
 	end
 	print("calculated top scores: " .. counter)
