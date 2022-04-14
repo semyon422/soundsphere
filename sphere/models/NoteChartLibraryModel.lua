@@ -22,6 +22,11 @@ NoteChartLibraryModel.load = function(self)
 	end
 end
 
+NoteChartLibraryModel.clear = function(self)
+	self.slice = nil
+	self.itemsCount = 0
+end
+
 NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
 	self.setId = setId
 	local slice = CacheDatabase.noteChartSlices[setId]

@@ -7,20 +7,22 @@ local NoteChartModel = Class:new()
 NoteChartModel.load = function(self)
 	local config = self.configModel.configs.select
 
-	local cacheManager = self.cacheModel.cacheManager
-
 	self.noteChartSetEntry = CacheDatabase:selectNoteChartSetEntryById(config.noteChartSetEntryId)
 	if not self.noteChartSetEntry then
+		self.noteChartEntry = nil
+		self.noteChartDataEntry = nil
+		self.scoreEntry = nil
 		return
 	end
 
 	self.noteChartEntry = CacheDatabase:selectNoteChartEntryById(config.noteChartEntryId)
 	if not self.noteChartEntry then
+		self.noteChartDataEntry = nil
+		self.scoreEntry = nil
 		return
 	end
 
 	self.noteChartDataEntry = CacheDatabase:selectNoteChartDataEntryById(config.noteChartDataEntryId)
-		or cacheManager:getEmptyNoteChartDataEntry(self.noteChartEntry.path)
 	self.scoreEntry = self.scoreModel:getScoreEntryById(config.scoreEntryId)
 end
 

@@ -8,6 +8,10 @@ ScoreLibraryModel.construct = function(self)
 	self.items = {}
 end
 
+ScoreLibraryModel.clear = function(self)
+	self.items = {}
+end
+
 ScoreLibraryModel.setHash = function(self, hash)
 	self.hash = hash
 end

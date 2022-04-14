@@ -178,8 +178,18 @@ SelectModel.pullNoteChartSet = function(self, noUpdate)
 	self.noteChartSetItem = noteChartSetItem
 	if noteChartSetItem then
 		self.config.noteChartSetEntryId = noteChartSetItem.setId
-		self:pullNoteChart(noUpdate)
+		return self:pullNoteChart(noUpdate)
 	end
+
+	self.config.noteChartSetEntryId = 0
+	self.config.noteChartEntryId = 0
+	self.config.noteChartDataEntryId = 0
+
+	self.noteChartItem = nil
+	self.scoreItem = nil
+
+	self.noteChartLibraryModel:clear()
+	self.scoreLibraryModel:clear()
 end
 
 SelectModel.pullNoteChart = function(self, noUpdate)
@@ -198,18 +208,27 @@ SelectModel.pullNoteChart = function(self, noUpdate)
 
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
 	self.noteChartItem = noteChartItem
-	if not noteChartItem then
-		return
+	if noteChartItem then
+		self.config.noteChartEntryId = noteChartItem.noteChartId
+		self.config.noteChartDataEntryId = noteChartItem.noteChartDataId
+		return self:pullScore(noUpdate)
 	end
 
-	self.config.noteChartEntryId = noteChartItem.noteChartId
-	self.config.noteChartDataEntryId = noteChartItem.noteChartDataId
-	self:pullScore(noUpdate)
+	self.config.noteChartEntryId = 0
+	self.config.noteChartDataEntryId = 0
+
+	self.scoreItem = nil
+
+	self.scoreLibraryModel:clear()
 end
 
 SelectModel.pullScore = function(self, noUpdate)
 	local noteChartItems = self.noteChartLibraryModel.items
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
+
+	if not noteChartItem then
+		return
+	end
 
 	if not noUpdate then
 		self.scoreLibraryModel:setHash(noteChartItem.hash)

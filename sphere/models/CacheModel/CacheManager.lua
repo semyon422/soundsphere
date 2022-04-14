@@ -69,32 +69,6 @@ end
 
 ----------------------------------------------------------------
 
-CacheManager.getEmptyNoteChartDataEntry = function(self, path)
-	return {
-		hash = "",
-		index = 1,
-		title = path:match(".+/(.-)$"),
-		artist = "",
-		source = "",
-		tags = "",
-		name = path:match(".+/(.-)$"),
-		creator = "",
-		audioPath = "",
-		stagePath = "",
-		previewTime = 0,
-		inputMode = "",
-		noteCount = 0,
-		length = 0,
-		bpm = 0,
-		level = 0,
-		difficulty = 0,
-		longNoteRatio = 0,
-		localOffset = 0,
-	}
-end
-
-----------------------------------------------------------------
-
 CacheManager.checkThreadEvent = function(self)
 	if thread then
 		local event = thread:pop()
