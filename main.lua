@@ -34,16 +34,13 @@ else
 	root = source
 end
 
-local jit_os = jit.os
-local arch = jit.arch
-if jit_os == "Windows" then
-	local bin = arch == "x64" and "bin/win64" or "bin/win32"
+if jit.os == "Windows" then
 	ffi.cdef("int _putenv_s(const char *varname, const char *value_string);")
 	ffi.cdef("int _chdir(const char *dirname);")
-	ffi.C._putenv_s("PATH", os.getenv("PATH") .. ";" .. root .. "/" .. bin)
+	ffi.C._putenv_s("PATH", os.getenv("PATH") .. ";" .. root .. "/bin/win64")
 	ffi.C._chdir(root)
-	aquapackage.add(bin)
-elseif jit_os == "Linux" then
+	aquapackage.add("bin/win64")
+elseif jit.os == "Linux" then
 	local ldlp = os.getenv("LD_LIBRARY_PATH")
 	if not ldlp or not ldlp:find("bin/linux64") then
 		ffi.cdef("int setenv(const char *name, const char *value, int overwrite);")
@@ -68,6 +65,7 @@ if moddedgame and moddedgame.type == "directory" then
 	aquafs.mount(root .. "/moddedgame", "/", false)
 end
 
+aquafs.mount(root .. "/cimgui-love/src", "/cimgui", false)
 require("luamidi")
 
 setmetatable(_G, {
