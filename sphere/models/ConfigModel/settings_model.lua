@@ -442,6 +442,13 @@ local settings = {
 		type = "switch",
 		displayRange = {"disabled", "enabled"}
 	},
+	{
+		name = "imgui.ShowDemoWindow",
+		section = "miscellaneous",
+		key = "miscellaneous.imguiShowDemoWindow",
+		type = "switch",
+		displayRange = {"disabled", "enabled"}
+	},
 }
 
 return settings

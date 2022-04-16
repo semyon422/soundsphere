@@ -109,6 +109,7 @@ return {
 		}
 	},
 	miscellaneous = {
-		autoUpdate = true
+		autoUpdate = true,
+		imguiShowDemoWindow = false
 	}
 }
