@@ -37,9 +37,9 @@ TimeController.receive = function(self, event)
 		notificationModel:notify("scroll speed: " .. graphicEngine.targetVisualTimeRate)
 	elseif event.name == "increaseLocalOffset" then
 		local noteChartDataEntry = self.gameController.noteChartModel.noteChartDataEntry
-		noteChartDataEntry.localOffset = noteChartDataEntry.localOffset + event.delta
-		CacheDatabase:setNoteChartDataEntry(noteChartDataEntry)
-		notificationModel:notify("local offset: " .. noteChartDataEntry.localOffset)
+		noteChartDataEntry.localOffset = (noteChartDataEntry.localOffset or 0) + event.delta
+		CacheDatabase:updateNoteChartDataEntry(noteChartDataEntry)
+		notificationModel:notify("local offset: " .. noteChartDataEntry.localOffset * 1000 .. "ms")
 	end
 end
 
