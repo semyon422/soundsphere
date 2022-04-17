@@ -55,8 +55,8 @@ GameplayView.load = function(self)
 end
 
 GameplayView.unload = function(self)
-	self.viewConfig[self.playfieldViewConfigIndex] = self.playfieldViewConfig
 	ScreenView.unload(self)
+	self.viewConfig[self.playfieldViewConfigIndex] = self.playfieldViewConfig
 end
 
 return GameplayView

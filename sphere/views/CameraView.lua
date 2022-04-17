@@ -62,6 +62,7 @@ CameraView.receive = function(self, event)
 			s3dc.show(0, 0, love.graphics.getDimensions())
 		elseif key == "f9" then
 			state.moveCamera = not state.moveCamera
+			self:unload()
 		end
 	elseif event.name == "mousepressed" and state.moveCamera then
 		local button = event[3]
