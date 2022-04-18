@@ -1,11 +1,47 @@
 # soundsphere
 Open-source rhythm game
-## Installing
-https://soundsphere.xyz
-## Used libraries
-* [tween](https://github.com/kikito/tween.lua "tween") by kikito
-* [md5](https://github.com/kikito/md5.lua "md5") by kikito
-* [tinyyaml](https://github.com/peposso/lua-tinyyaml "tinyyaml") by peposso
-* [json](https://github.com/rxi/json.lua "json") by rxi
-* [lua-ljsqlite3](https://github.com/stepelu/lua-ljsqlite3 "ljsqlite3") by stepelu
-* [lua-discordRPC](https://github.com/pfirsich/lua-discordRPC "discordrpc") by pfirsich
+## Links
+- [Website](https://soundsphere.xyz)
+- [Download](https://dl.soundsphere.xyz/soundsphere.zip)
+- [Installation guide](https://youtu.be/FvdafJSMx-s)
+- [Discord server](https://discord.gg/ubKMtTk)
+
+## Features:
+
+- A website with communities, leaderboards and difficulty tables
+- Windows and Linux
+- Asyncronous input on windows
+- Mounting directories or archives with charts
+- bms, ksh, mid, ojn, osu, qua, sm
+- Discord integration
+- Modding the game
+- 3D perspective
+- Replays
+- osu! skins
+- Lua skins
+- A lot of modifiers (including anyK to anyK converter)
+- Offset auto adjustment integrated in score
+- Configurable difficulty of score system
+- Subdirectories as collections
+- Partitial controller support
+- Search filters (e.g. l>5m)
+- Clear lamps (using filters)
+- Sorting
+- Visual long note shortening
+- Input, visual local offsets
+- Customizable prepare/play/pause time
+- And much more
+
+## Future plans:
+
+- Multiplayer
+- Offset wizzard
+- More score systems and difficulty calculators
+- Settings for noteskins
+- Flexible collections 
+- Difficulty tables
+- Multiple profiles
+- Replay import
+- New design
+- Editor
+- And much more
