@@ -1,13 +1,11 @@
 local Class			= require("aqua.util.Class")
 local ncdk			= require("ncdk")
-local NoteSkin		= require("sphere.models.NoteSkinModel.NoteSkin")
 local OsuNoteSkin		= require("sphere.models.NoteSkinModel.OsuNoteSkin")
 local BaseNoteSkin = require("sphere.models.NoteSkinModel.BaseNoteSkin")
 
 local NoteSkinModel = Class:new()
 
 NoteSkinModel.construct = function(self)
-	self.emptyNoteSkin = NoteSkin:new()
 	self.items = {}
 	self.baseNoteSkins = {}
 end
@@ -179,7 +177,7 @@ NoteSkinModel.getNoteSkin = function(self, inputMode)
 		self:setDefaultNoteSkin(list[1])
 	end
 
-	return list[1] or self.emptyNoteSkin
+	return list[1]
 end
 
 return NoteSkinModel
