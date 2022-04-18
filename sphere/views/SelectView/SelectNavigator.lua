@@ -1,4 +1,5 @@
 local viewspackage = (...):match("^(.-%.views%.)")
+local ffi = require("ffi")
 
 local Navigator = require(viewspackage .. "Navigator")
 
@@ -8,6 +9,7 @@ SelectNavigator.load = function(self)
 	Navigator.load(self)
 	self:addSubscreen("score")
 	self:addSubscreen("notecharts")
+	self.isNoteSkinsOpen = ffi.new("bool[1]", false)
 end
 
 SelectNavigator.receive = function(self, event)
@@ -163,6 +165,23 @@ end
 
 SelectNavigator.quickLogin = function(self)
 	self:send({name = "quickLogin"})
+end
+
+SelectNavigator.openNoteSkins = function(self, itemIndex)
+	local isOpen = self.isNoteSkinsOpen
+	isOpen[0] = not isOpen[0]
+	if isOpen[0] then
+		self:send({name = "resetModifiedNoteChart"})
+	end
+end
+
+SelectNavigator.setNoteSkin = function(self, itemIndex)
+	local noteChart = self.gameController.noteChartModel.noteChart
+	local noteSkins = self.gameController.noteSkinModel:getNoteSkins(noteChart.inputMode)
+	self:send({
+		name = "setNoteSkin",
+		noteSkin = noteSkins[itemIndex or self.noteSkinItemIndex]
+	})
 end
 
 return SelectNavigator

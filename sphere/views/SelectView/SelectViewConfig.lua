@@ -592,8 +592,7 @@ local BottomNotechartsScreenMenu = {
 				displayName = "modifiers"
 			},
 			{
-				method = "changeScreen",
-				value = "NoteSkin",
+				method = "openNoteSkins",
 				displayName = "noteskins"
 			},
 			{

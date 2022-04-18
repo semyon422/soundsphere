@@ -90,6 +90,8 @@ SelectController.receive = function(self, event)
 		self:unloadModifiedNoteChart()
 	elseif event.name == "resetModifiedNoteChart" then
 		self:resetModifiedNoteChart()
+	elseif event.name == "setNoteSkin" then
+		self.gameController.noteSkinModel:setDefaultNoteSkin(event.noteSkin)
 	elseif event.name == "quickLogin" then
 		self.gameController.onlineModel.authManager:quickLogin()
 	elseif event.name == "openDirectory" then

@@ -12,6 +12,7 @@ local StageInfoView = require(viewspackage .. "SelectView.StageInfoView")
 local ModifierIconGridView = require(viewspackage .. "SelectView.ModifierIconGridView")
 local CollectionListView = require(viewspackage .. "SelectView.CollectionListView")
 local CacheView = require(viewspackage .. "SelectView.CacheView")
+local NoteSkinView = require("sphere.views.NoteSkinView")
 
 local SelectView = ScreenView:new({construct = false})
 
@@ -32,12 +33,23 @@ SelectView.construct = function(self)
 	self.navigator = SelectNavigator:new()
 	self:createViews(ScreenView.views)
 	self:createViews(self.views)
+
+	self.noteSkinView = NoteSkinView:new()
 end
 
 SelectView.load = function(self)
 	self:loadViews(ScreenView.views)
 	self:loadViews(self.views)
 	ScreenView.load(self)
+
+	self.noteSkinView.gameController = self.gameController
+	self.noteSkinView.navigator = self.navigator
+	self.noteSkinView.isOpen = self.navigator.isNoteSkinsOpen
+end
+
+SelectView.draw = function(self)
+	ScreenView.draw(self)
+	self.noteSkinView:draw()
 end
 
 return SelectView
