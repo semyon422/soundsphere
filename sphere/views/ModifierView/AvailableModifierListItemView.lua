@@ -9,7 +9,6 @@ AvailableModifierListItemView.draw = function(self)
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	love.graphics.setColor(1, 1, 1, 1)
 
@@ -40,7 +39,6 @@ AvailableModifierListItemView.receive = function(self, event)
 	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
 	local tf = transform(config.transform):translate(config.x, config.y)
 	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
-	tf:release()
 
 	if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then
 		local button = event[3]

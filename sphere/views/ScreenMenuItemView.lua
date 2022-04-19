@@ -10,7 +10,6 @@ ScreenMenuItemView.draw = function(self)
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	love.graphics.setColor(1, 1, 1, 1)
 
@@ -35,7 +34,6 @@ ScreenMenuItemView.receive = function(self, event)
 	if event.name == "mousepressed" then
 		local tf = transform(config.transform)
 		local mx, my = tf:inverseTransformPoint(event[1], event[2])
-		tf:release()
 
 		local button = event[3]
 

@@ -96,7 +96,6 @@ RhythmView.draw = function(self)
 
 	local tf = transform(config.transform)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	local noteSkin = self.gameController.rhythmModel.graphicEngine.noteSkin
 	local blendModes = noteSkin.blendModes

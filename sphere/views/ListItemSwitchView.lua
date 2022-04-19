@@ -47,7 +47,6 @@ ListItemSwitchView.receive = function(self, event)
 	switch:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.switch))
 	switch:setValue(self:getValue())
 	switch:receive(event)
-	tf:release()
 
 	if switch.valueUpdated then
 		self:setValue(switch.value)

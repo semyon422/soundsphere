@@ -30,7 +30,6 @@ ModifierIconView.draw = function(self)
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	love.graphics.setColor(1, 1, 1, 1)
 
@@ -50,7 +49,6 @@ ModifierIconView.drawText = function(self, lines, topText, bottomText)
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	local fx = config.size / 8
 	local fy = config.size / 8
@@ -70,7 +68,8 @@ end
 ModifierIconView.drawSquareBorder = function(self, shape)
 	local config = self.config
 
-	love.graphics.replaceTransform(transform(config.transform))
+	local tf = transform(config.transform)
+	love.graphics.replaceTransform(tf)
 	love.graphics.translate(config.x, config.y)
 	love.graphics.setColor(1, 1, 1, 1)
 

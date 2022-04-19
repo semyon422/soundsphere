@@ -10,7 +10,6 @@ ProgressView.draw = function(self)
 
 	local tf = transform(config.transform)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
     local x, y, w, h = self:getRectangle()
 

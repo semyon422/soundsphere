@@ -17,12 +17,8 @@ NoteSkinView.draw = function(self)
 	local selectedNoteSkin = self.gameController.noteSkinModel:getNoteSkin(noteChart.inputMode)
 
 	if self.isOpen[0] then
-		local tf = transform(tfTable)
-		imgui.SetNextWindowPos({tf:transformPoint(279, 279)}, 0)
-		tf:release()
-		tf = transform(tfOriginTable)
-		imgui.SetNextWindowSize({tf:transformPoint(454, 522)}, 0)
-		tf:release()
+		imgui.SetNextWindowPos({transform(tfTable):transformPoint(279, 279)}, 0)
+		imgui.SetNextWindowSize({transform(tfOriginTable):transformPoint(454, 522)}, 0)
 		local flags = bit.bor(imgui.ImGuiWindowFlags_NoMove, imgui.ImGuiWindowFlags_NoResize)
 		if imgui.Begin("Noteskins", self.isOpen, flags) then
 			if imgui.BeginListBox("Noteskins", {-imgui.FLT_MIN, -imgui.FLT_MIN}) then
@@ -45,12 +41,8 @@ NoteSkinView.draw = function(self)
 			return
 		end
 
-		tf = transform(tfTable)
-		imgui.SetNextWindowPos({tf:transformPoint(733, 279)}, 0)
-		tf:release()
-		tf = transform(tfOriginTable)
-		imgui.SetNextWindowSize({tf:transformPoint(454, 522)}, 0)
-		tf:release()
+		imgui.SetNextWindowPos({transform(tfTable):transformPoint(733, 279)}, 0)
+		imgui.SetNextWindowSize({transform(tfOriginTable):transformPoint(454, 522)}, 0)
 		if imgui.Begin("Noteskin config", nil, flags) then
 			selectedNoteSkin.config:render()
 		end

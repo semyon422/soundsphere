@@ -14,7 +14,6 @@ ListItemView.draw = function(self)
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	love.graphics.setColor(1, 1, 1, 1)
 
@@ -107,7 +106,6 @@ ListItemView.receive = function(self, event)
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	local mx, my = tf:inverseTransformPoint(event[1], event[2])
-	tf:release()
 
 	if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then
 		listView.activeItem = self.itemIndex

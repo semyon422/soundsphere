@@ -72,7 +72,6 @@ ModifierListView.wheelmoved = function(self, event)
 
 	local tf = transform(config.transform)
 	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
-	tf:release()
 
 	local sx = config.x + config.scroll.x
 	local sy = config.y + config.scroll.y

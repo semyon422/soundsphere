@@ -35,7 +35,6 @@ SortStepperView.draw = function(self)
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	love.graphics.setColor(1, 1, 1, 1)
 
@@ -87,7 +86,6 @@ SortStepperView.receive = function(self, event)
 	stepper:setValue(self:getIndexValue())
 	stepper:setCount(self:getCount())
 	stepper:receive(event)
-	tf:release()
 
 	if stepper.valueUpdated then
 		self:updateIndexValue(stepper.value)

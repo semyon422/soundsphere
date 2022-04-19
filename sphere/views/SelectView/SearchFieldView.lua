@@ -34,7 +34,6 @@ SearchFieldView.draw = function(self)
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	local searchString = searchModel.searchString
 	if searchString == "" then

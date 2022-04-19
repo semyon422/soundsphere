@@ -8,7 +8,6 @@ ScrollBarView.draw = function(self)
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	love.graphics.setColor(config.backgroundColor)
 	love.graphics.rectangle(

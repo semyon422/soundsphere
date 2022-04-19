@@ -89,7 +89,6 @@ ImageAnimationView.draw = function(self)
 
 	local tf = transform(config.transform)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	love.graphics.setColor(1, 1, 1, 1)
 	if config.quad then

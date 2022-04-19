@@ -27,7 +27,6 @@ UserInfoView.receive = function(self, event)
 	local config = self.config
 	local tf = transform(config.transform)
 	local mx, my = tf:inverseTransformPoint(event[1], event[2])
-	tf:release()
 
 	local x, y, w, h = config.x, config.y, config.w, config.h
 	if belong(mx, x, x + w) and belong(my, y, y + h) then
@@ -44,7 +43,6 @@ UserInfoView.draw = function(self)
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local font = spherefonts.get(config.text.font)
