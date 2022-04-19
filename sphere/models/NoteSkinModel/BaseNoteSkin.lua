@@ -1,5 +1,6 @@
 local NoteSkinVsrg = require("sphere.models.NoteSkinModel.NoteSkinVsrg")
 local BasePlayfield = require("sphere.models.NoteSkinModel.BasePlayfield")
+local ImguiConfig = require("sphere.ImguiConfig")
 
 local BaseNoteSkin = NoteSkinVsrg:new()
 
@@ -39,12 +40,17 @@ BaseNoteSkin.getInputTable = function(self)
 	return allInputs
 end
 
-BaseNoteSkin.load = function(self, content)
+BaseNoteSkin.load = function(self)
+	local config = ImguiConfig:new({defaultContent = self.configContent}):fromFile(
+		"userdata/skins/base." .. self.stringInputMode .. ".config.lua"
+	)
+	self.config = config
+
 	self.name = self.stringInputMode .. " base skin"
 	self.inputMode = self.inputMode
 	self.range = {-1, 1}
 	self.unit = 480
-	self.hitposition = 450
+	self.hitposition = config:get("hitposition")
 
 	local inputs = self:getInputTable()
 	self:setInput(inputs)
@@ -109,11 +115,13 @@ BaseNoteSkin.load = function(self, content)
 		h = self.noteHeight,
 		color = {1, 0.25, 0.25, 1},
 	}, "SoundNote")
-	self:addMeasureLine({
-		h = 4,
-		color = {1, 1, 1, 0.5},
-		image = "pixel"
-	})
+	if config:get("measureLine") then
+		self:addMeasureLine({
+			h = 4,
+			color = {1, 1, 1, 0.5},
+			image = "pixel"
+		})
+	end
 
 	self:addBga({
 		x = 0,
@@ -127,13 +135,14 @@ BaseNoteSkin.load = function(self, content)
 		noteskin = self
 	})
 
+	local judgementLineHeight = config:get("judgementLineHeight")
 	playfield:addBga({transform = self.bgaTransform})
 	playfield:enableCamera()
 	playfield:addNotes()
 	playfield:addLightings()
 	playfield:addKeyImages({
-		h = self.judgementLineHeight,
-		padding = self.unit - self.hitposition - self.judgementLineHeight,
+		h = judgementLineHeight,
+		padding = self.unit - self.hitposition - judgementLineHeight,
 		pressed = keyImage,
 		released = keyImage,
 	})
@@ -141,5 +150,29 @@ BaseNoteSkin.load = function(self, content)
 	playfield:disableCamera()
 	playfield:addBaseElements()
 end
+
+BaseNoteSkin.configContent = [=[
+local ImguiConfig = require("sphere.ImguiConfig")
+local imgui = require("cimgui")
+
+local config = ImguiConfig:new()
+
+local ptrs = config:setDefs(--[[defs]] {
+	hitposition = {"float[?]", 1, {450}},
+	measureLine = {"bool[?]", 1, {true}},
+	judgementLineHeight = {"float[?]", 1, {4}},
+} --[[/defs]])
+
+function config:render()
+	imgui.SliderFloat("Hit position", ptrs.hitposition, 240, 480, "%.0f")
+	imgui.SliderFloat("Judgement line height", ptrs.judgementLineHeight, 0, 32, "%.0f")
+	imgui.Checkbox("Measure line", ptrs.measureLine)
+	if imgui.Button("Save") then
+		self:write()
+	end
+end
+
+return config
+]=]
 
 return BaseNoteSkin

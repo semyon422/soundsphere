@@ -7,7 +7,6 @@ local NoteSkinModel = Class:new()
 
 NoteSkinModel.construct = function(self)
 	self.items = {}
-	self.baseNoteSkins = {}
 end
 
 NoteSkinModel.path = "userdata/skins"
@@ -115,15 +114,10 @@ NoteSkinModel.loadOsu = function(self, path, directoryPath, fileName)
 end
 
 NoteSkinModel.getBaseNoteSkin = function(self, inputMode, stringInputMode)
-	local baseNoteSkins = self.baseNoteSkins
-	if baseNoteSkins[stringInputMode] then
-		return baseNoteSkins[stringInputMode]
-	end
 	local noteSkin = BaseNoteSkin:new()
 	noteSkin.directoryPath = "resources"
 	noteSkin:setInputMode(inputMode, stringInputMode)
 	noteSkin:load()
-	baseNoteSkins[stringInputMode] = noteSkin
 	return noteSkin
 end
 

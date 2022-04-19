@@ -27,8 +27,8 @@ end
 function ImguiConfig:render() end
 
 function ImguiConfig:fromFile(path)
-	local content = love.filesystem.read(path)
-	local config = loadstring(content)()
+	local content = love.filesystem.read(path) or self.defaultContent
+	local config = content and assert(loadstring(content))() or ImguiConfig:new()
 	config.content = content
 	config.path = path
 	return config
@@ -61,5 +61,22 @@ function ImguiConfig:export(s)
 		("--[[defs]] %s --[[/defs]]"):format(serpent.block(self.defs, opts))
 	))
 end
+
+ImguiConfig.defaultContent = [=[
+local ImguiConfig = require("sphere.ImguiConfig")
+local imgui = require("cimgui")
+
+local config = ImguiConfig:new()
+
+local ptrs = config:setDefs(--[[defs]] {} --[[/defs]])
+
+function config:render()
+	if imgui.Button("Save") then
+		self:write()
+	end
+end
+
+return config
+]=]
 
 return ImguiConfig
