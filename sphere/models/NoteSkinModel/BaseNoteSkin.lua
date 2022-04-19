@@ -165,11 +165,9 @@ local ptrs = config:setDefs(--[[defs]] {
 
 function config:render()
 	imgui.SliderFloat("Hit position", ptrs.hitposition, 240, 480, "%.0f")
-	imgui.SliderFloat("Judgement line height", ptrs.judgementLineHeight, 0, 32, "%.0f")
+	imgui.SliderFloat("J. line height", ptrs.judgementLineHeight, 0, 32, "%.0f")
 	imgui.Checkbox("Measure line", ptrs.measureLine)
-	if imgui.Button("Save") then
-		self:write()
-	end
+	self:renderAfter()
 end
 
 return config

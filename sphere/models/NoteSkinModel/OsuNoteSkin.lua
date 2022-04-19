@@ -1,6 +1,7 @@
 local NoteSkinVsrg = require("sphere.models.NoteSkinModel.NoteSkinVsrg")
 local PlayfieldVsrg = require("sphere.models.NoteSkinModel.PlayfieldVsrg")
 local BasePlayfield = require("sphere.models.NoteSkinModel.BasePlayfield")
+local ImguiConfig = require("sphere.ImguiConfig")
 
 local OsuNoteSkin = NoteSkinVsrg:new()
 
@@ -52,6 +53,22 @@ OsuNoteSkin.load = function(self)
 		end
 	end
 	self:fixManiaValues()
+
+	local config, exists = ImguiConfig:new({defaultContent = self.configContent}):fromFile(
+		self.path:gsub("skin%.ini$", keysCount .. "key.config.lua")
+	)
+	self.config = config
+	if not exists then
+		config:set("HitPosition", mania.HitPosition)
+		config:set("ScorePosition", mania.ScorePosition)
+		config:set("ComboPosition", mania.ComboPosition)
+		config:set("UpsideDown", mania.UpsideDown == 1)
+	else
+		mania.HitPosition = config:get("HitPosition")
+		mania.ScorePosition = config:get("ScorePosition")
+		mania.ComboPosition = config:get("ComboPosition")
+		mania.UpsideDown = config:get("UpsideDown") and 1 or 0
+	end
 
 	self.name = skinini.General.Name
 	self.playField = {}
@@ -286,6 +303,30 @@ OsuNoteSkin.load = function(self)
 	BasePlayfield.addBaseHitError(playfield)
 	BasePlayfield.addBaseProgressBar(playfield)
 end
+
+OsuNoteSkin.configContent = [=[
+local ImguiConfig = require("sphere.ImguiConfig")
+local imgui = require("cimgui")
+
+local config = ImguiConfig:new()
+
+local ptrs = config:setDefs(--[[defs]] {
+	HitPosition = {"float[?]", 1, {240}},
+	ScorePosition = {"float[?]", 1, {240}},
+	ComboPosition = {"float[?]", 1, {240}},
+	UpsideDown = {"bool[?]", 1, {false}},
+} --[[/defs]])
+
+function config:render()
+	imgui.SliderFloat("Hit Position", ptrs.HitPosition, 240, 480, "%.0f")
+	imgui.SliderFloat("Score Position", ptrs.ScorePosition, 0, 480, "%.0f")
+	imgui.SliderFloat("Combo Position", ptrs.ComboPosition, 0, 480, "%.0f")
+	imgui.Checkbox("Upside Down", ptrs.UpsideDown)
+	self:renderAfter()
+end
+
+return config
+]=]
 
 local getNoteType = function(key, keymode)
 	if keymode % 2 == 1 then

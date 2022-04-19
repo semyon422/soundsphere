@@ -1,4 +1,5 @@
 local ffi = require("ffi")
+local imgui = require("cimgui")
 local serpent = require("serpent")
 local Class = require("aqua.util.Class")
 
@@ -20,22 +21,46 @@ local function _unpack(tab, i, j)
 	end
 	return tab[i], _unpack(tab, i + 1, j)
 end
-function ImguiConfig:get(name)
-	return _unpack(self.ptrs[name], 0, self.defs[name][2] - 1)
+function ImguiConfig:get(key)
+	return _unpack(self.ptrs[key], 0, self.defs[key][2] - 1)
+end
+
+function ImguiConfig:set(key, ...)
+	local nelem = self.defs[key][2]
+	assert(nelem == select("#", ...), "Wrong number of arguments")
+	local ptr = self.ptrs[key]
+	for i = 1, nelem do
+		ptr[i - 1] = select(i, ...)
+	end
 end
 
 function ImguiConfig:render() end
 
+function ImguiConfig:renderAfter()
+	if imgui.Button("Write config file") then
+		self:write()
+	end
+	if imgui.Button("Delete config file") then
+		self:remove()
+	end
+end
+
 function ImguiConfig:fromFile(path)
-	local content = love.filesystem.read(path) or self.defaultContent
-	local config = content and assert(loadstring(content))() or ImguiConfig:new()
+	local content = love.filesystem.read(path)
+	local exists = content ~= nil
+	content = content or self.defaultContent
+	local config = assert(loadstring(content))()
 	config.content = content
 	config.path = path
-	return config
+	return config, exists
 end
 
 function ImguiConfig:write()
 	love.filesystem.write(self.path, self:export(self.content))
+end
+
+function ImguiConfig:remove()
+	love.filesystem.remove(self.path)
 end
 
 local opts = {
