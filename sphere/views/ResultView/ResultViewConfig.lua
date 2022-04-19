@@ -301,10 +301,12 @@ local ScoreList = {
 				size = 24,
 			},
 			format = function(timeRate)
-				if math.abs(timeRate % 0.05) < 1e-6 then
-					return ("%0.2f"):format(timeRate)
+				local exp = 10 * math.log(timeRate) / math.log(2)
+				local roundedExp = math.floor(exp + 0.5)
+				if math.abs(exp - roundedExp) % 1 < 1e-2 and math.abs(exp) > 1e-2 then
+					return ("%dQ"):format(roundedExp)
 				end
-				return ("%dQ"):format(10 * math.log(timeRate) / math.log(2))
+				return ("%.2f"):format(timeRate)
 			end
 		},
 		{
