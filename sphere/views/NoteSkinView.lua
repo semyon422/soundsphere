@@ -41,6 +41,20 @@ NoteSkinView.draw = function(self)
 			end
 		end
 		imgui.End()
+		if not selectedNoteSkin.config then
+			return
+		end
+
+		tf = transform(tfTable)
+		imgui.SetNextWindowPos({tf:transformPoint(733, 279)}, 0)
+		tf:release()
+		tf = transform(tfOriginTable)
+		imgui.SetNextWindowSize({tf:transformPoint(454, 522)}, 0)
+		tf:release()
+		if imgui.Begin("Noteskin config", nil, flags) then
+			selectedNoteSkin.config:render()
+		end
+		imgui.End()
 	end
 end
 
