@@ -30,6 +30,7 @@ Open-source rhythm game
 - Visual long note shortening
 - Input, visual local offsets
 - Customizable prepare/play/pause time
+- Settings for noteskins
 - And much more
 
 ## Future plans:
@@ -37,7 +38,6 @@ Open-source rhythm game
 - Multiplayer
 - Offset wizzard
 - More score systems and difficulty calculators
-- Settings for noteskins
 - Flexible collections 
 - Difficulty tables
 - Multiple profiles
