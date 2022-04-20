@@ -15,23 +15,24 @@ function ImguiConfig:setDefs(defs)
 	return ptrs, defs
 end
 
-local function _unpack(tab, i, j)
-	if i == j then
-		return tab[i]
-	end
-	return tab[i], _unpack(tab, i + 1, j)
+local function _unpack(t, i, j)
+	if i == j then return t[i] end
+	return t[i], _unpack(t, i + 1, j)
 end
+
+local function _pack(t, s, ...)
+	for i = 1, select("#", ...) do
+		t[i - s - 1] = select(i, ...)
+	end
+end
+
 function ImguiConfig:get(key)
 	return _unpack(self.ptrs[key], 0, self.defs[key][2] - 1)
 end
 
 function ImguiConfig:set(key, ...)
-	local nelem = self.defs[key][2]
-	assert(nelem == select("#", ...), "Wrong number of arguments")
-	local ptr = self.ptrs[key]
-	for i = 1, nelem do
-		ptr[i - 1] = select(i, ...)
-	end
+	assert(self.defs[key][2] == select("#", ...), "Wrong number of arguments")
+	_pack(self.ptrs[key], 0, ...)
 end
 
 function ImguiConfig:render() end
