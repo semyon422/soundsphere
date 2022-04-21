@@ -8,9 +8,9 @@ local Hotkey = ImguiElement:new()
 
 local keymap = imgui.love.keymap
 Hotkey.render = function(self)
-	local ptr = self:getPointer("int[1]")
+	local ptr = self:getPointer("int[2]")
 	ptr[0] = keymap[inside(self, self.key)] or 0
-	if not ImGui_Hotkey(self.name, ptr) then return end
+	if not ImGui_Hotkey(self.name, ptr, ptr + 1) then return end
 	outside(self, self.key, keymap[ptr[0]] or 0)
 end
 
