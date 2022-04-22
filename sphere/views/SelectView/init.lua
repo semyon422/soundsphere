@@ -13,6 +13,7 @@ local ModifierIconGridView = require(viewspackage .. "SelectView.ModifierIconGri
 local CollectionListView = require(viewspackage .. "SelectView.CollectionListView")
 local CacheView = require(viewspackage .. "SelectView.CacheView")
 local NoteSkinView = require("sphere.views.NoteSkinView")
+local InputView = require("sphere.views.InputView")
 
 local SelectView = ScreenView:new({construct = false})
 
@@ -35,6 +36,7 @@ SelectView.construct = function(self)
 	self:createViews(self.views)
 
 	self.noteSkinView = NoteSkinView:new()
+	self.inputView = InputView:new()
 end
 
 SelectView.load = function(self)
@@ -45,11 +47,16 @@ SelectView.load = function(self)
 	self.noteSkinView.gameController = self.gameController
 	self.noteSkinView.navigator = self.navigator
 	self.noteSkinView.isOpen = self.navigator.isNoteSkinsOpen
+
+	self.inputView.gameController = self.gameController
+	self.inputView.navigator = self.navigator
+	self.inputView.isOpen = self.navigator.isInputOpen
 end
 
 SelectView.draw = function(self)
 	ScreenView.draw(self)
 	self.noteSkinView:draw()
+	self.inputView:draw()
 end
 
 return SelectView

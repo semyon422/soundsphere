@@ -115,6 +115,8 @@ SelectController.receive = function(self, event)
 		end
 	elseif event.name == "calculateTopScores" then
 		self.gameController.scoreModel:asyncCalculateTopScores()
+	elseif event.name == "setInputBinding" then
+		self.gameController.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
 	elseif event.name == "deleteNoteChart" then
 	elseif event.name == "deleteNoteChartSet" then
 	end

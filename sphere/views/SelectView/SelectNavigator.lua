@@ -10,6 +10,7 @@ SelectNavigator.load = function(self)
 	self:addSubscreen("score")
 	self:addSubscreen("notecharts")
 	self.isNoteSkinsOpen = ffi.new("bool[1]", false)
+	self.isInputOpen = ffi.new("bool[1]", false)
 end
 
 SelectNavigator.receive = function(self, event)
@@ -167,8 +168,16 @@ SelectNavigator.quickLogin = function(self)
 	self:send({name = "quickLogin"})
 end
 
-SelectNavigator.openNoteSkins = function(self, itemIndex)
+SelectNavigator.openNoteSkins = function(self)
 	local isOpen = self.isNoteSkinsOpen
+	isOpen[0] = not isOpen[0]
+	if isOpen[0] then
+		self:send({name = "resetModifiedNoteChart"})
+	end
+end
+
+SelectNavigator.openInput = function(self)
+	local isOpen = self.isInputOpen
 	isOpen[0] = not isOpen[0]
 	if isOpen[0] then
 		self:send({name = "resetModifiedNoteChart"})
@@ -181,6 +190,16 @@ SelectNavigator.setNoteSkin = function(self, itemIndex)
 	self:send({
 		name = "setNoteSkin",
 		noteSkin = noteSkins[itemIndex or self.noteSkinItemIndex]
+	})
+end
+
+SelectNavigator.setInputBinding = function(self, inputMode, virtualKey, key, type)
+	self:send({
+		name = "setInputBinding",
+		virtualKey = virtualKey,
+		value = key,
+		type = type,
+		inputMode = inputMode,
 	})
 end
 

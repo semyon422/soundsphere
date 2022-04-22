@@ -596,8 +596,7 @@ local BottomNotechartsScreenMenu = {
 				displayName = "noteskins"
 			},
 			{
-				method = "changeScreen",
-				value = "Input",
+				method = "openInput",
 				displayName = "input"
 			}
 		}
