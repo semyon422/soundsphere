@@ -197,10 +197,9 @@ SelectController.switchSettingsController = function(self)
 end
 
 SelectController.switchResultController = function(self)
-	local ResultController = require("sphere.controllers.ResultController")
-	local resultController = ResultController:new()
-	resultController.selectController = self
-	resultController.gameController = self.gameController
+	if not self.gameController.noteChartModel:getFileInfo() then
+		return
+	end
 
 	local selectModel = self.gameController.selectModel
 	local scoreItemIndex = selectModel.scoreItemIndex
@@ -208,6 +207,11 @@ SelectController.switchResultController = function(self)
 	if not scoreItem then
 		return
 	end
+
+	local ResultController = require("sphere.controllers.ResultController")
+	local resultController = ResultController:new()
+	resultController.selectController = self
+	resultController.gameController = self.gameController
 	resultController:replayNoteChart("result", scoreItem, scoreItemIndex)
 
 	return self.gameController.screenManager:set(resultController)
