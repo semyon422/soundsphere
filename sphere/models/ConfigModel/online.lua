@@ -7,4 +7,9 @@ return {
 	email = "",
 	username = "",
 	quick_login_key = "",
+	osu = {
+		storage = "",
+		static = "",
+		web = "",
+	},
 }
