@@ -1,10 +1,21 @@
-local Class = require("aqua.util.Class")
+local LibraryModel = require("sphere.models.LibraryModel")
 local thread = require("aqua.thread")
 local osudirect_urls = require("sphere.osudirect.urls")
 local osudirect_parse = require("sphere.osudirect.parse")
 local socket_url = require("socket.url")
 
-local OsudirectModel = Class:new()
+local OsudirectModel = LibraryModel:new()
+
+OsudirectModel.load = function(self)
+	self.itemsCache.getObject = function(_, itemIndex)
+		return setmetatable({}, {__index = function(t, k)
+			local item = self.beatmapSets[itemIndex]
+			if item then
+				return item[k]
+			end
+		end})
+	end
+end
 
 OsudirectModel.searchString = ""
 
@@ -24,7 +35,17 @@ OsudirectModel.search = thread.coro(function(self)
 	local url = socket_url.absolute(config.web, osudirect_urls.search(self.searchString))
 	local body = asyncRequest(url)
 	local beatmaps, err = osudirect_parse(body)
-	print(require("inspect")(beatmaps))
+	self.beatmapSets = beatmaps
+	self.itemsCount = #beatmaps
+	print(#self.items)
 end)
+
+OsudirectModel.updateItems = function(self)
+	self:search()
+end
+
+OsudirectModel.getItemIndex = function(self, noteChartDataId, noteChartId, noteChartSetId)
+	return 1
+end
 
 return OsudirectModel

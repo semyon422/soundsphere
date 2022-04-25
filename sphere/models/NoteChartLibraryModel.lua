@@ -39,6 +39,10 @@ NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
 end
 
 NoteChartLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId, noteChartSetId)
+	if not noteChartDataId or not noteChartId or not noteChartSetId then
+		return 1
+	end
+
 	local entry = self.entry
 	entry.noteChartDataId = noteChartDataId
 	entry.noteChartId = noteChartId

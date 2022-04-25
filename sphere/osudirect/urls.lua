@@ -18,7 +18,7 @@ local urls = {}
 	Most Played
 ]]
 function urls.search(q, r, p)
-	return ("/web/osu-search.php?m=3&q=%s&r=%s&p=%s"):format(escape(q), r or 4, p or 0)
+	return ("/web/osu-search.php?m=3&q=%s&r=%s&p=%s"):format(escape(q), r or 0, p or 0)
 end
 
 function urls.download(setId, noVideo)
@@ -27,6 +27,14 @@ end
 
 function urls.thumbnail(setId, large)
 	return ("/thumb/%s%s.jpg"):format(setId, large and "l" or "")
+end
+
+function urls.card(setId, large)
+	return ("/beatmaps/%s/covers/card%s.jpg"):format(setId, large and "@2x" or "")
+end
+
+function urls.cover(setId, large)
+	return ("/beatmaps/%s/covers/cover%s.jpg"):format(setId, large and "@2x" or "")
 end
 
 function urls.preview(setId)

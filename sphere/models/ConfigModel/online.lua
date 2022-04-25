@@ -8,6 +8,7 @@ return {
 	username = "",
 	quick_login_key = "",
 	osu = {
+		assets = "",
 		storage = "",
 		static = "",
 		web = "",

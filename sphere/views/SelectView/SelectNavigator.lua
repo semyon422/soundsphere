@@ -55,7 +55,7 @@ end
 
 SelectNavigator.update = function(self)
 	self:removeLessSubscreens("score", "options")
-	self:removeLessSubscreens("notecharts", "collections")
+	self:removeLessSubscreens("notecharts", "collections", "osudirect")
 	Navigator.update(self)
 end
 
@@ -66,6 +66,10 @@ end
 
 SelectNavigator.switchToCollections = function(self)
 	self:addSubscreen("collections")
+end
+
+SelectNavigator.switchToOsudirect = function(self)
+	self:addSubscreen("osudirect")
 end
 
 SelectNavigator.openDirectory = function(self)

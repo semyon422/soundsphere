@@ -144,6 +144,7 @@ GameController.load = function(self)
 	selectModel.searchModel = searchModel
 	selectModel.noteChartSetLibraryModel = noteChartSetLibraryModel
 	selectModel.noteChartLibraryModel = noteChartLibraryModel
+	selectModel.osudirectModel = osudirectModel
 	selectModel.sortModel = sortModel
 	selectModel.scoreLibraryModel = scoreLibraryModel
 	selectModel.collectionModel = collectionModel
@@ -214,6 +215,7 @@ GameController.load = function(self)
 	noteChartModel:load()
 	noteChartSetLibraryModel:load()
 	noteChartLibraryModel:load()
+	osudirectModel:load()
 	onlineController:load()
 	discordModel:load()
 	backgroundModel:load()

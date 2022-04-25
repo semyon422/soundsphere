@@ -44,6 +44,45 @@ local CacheView = {
 	},
 }
 
+local OsudirectList = {
+	class = "OsudirectListView",
+	subscreen = "osudirect",
+	transform = transform,
+	x = 1187,
+	y = 144,
+	w = 454,
+	h = 792,
+	rows = 11,
+	elements = {
+		{
+			type = "text",
+			key = "title",
+			onNew = false,
+			x = 44,
+			baseline = 45,
+			limit = math.huge,
+			align = "left",
+			font = {
+				filename = "Noto Sans",
+				size = 24,
+			},
+		},
+		{
+			type = "text",
+			key = "artist",
+			onNew = false,
+			x = 45,
+			baseline = 19,
+			limit = math.huge,
+			align = "left",
+			font = {
+				filename = "Noto Sans",
+				size = 16,
+			},
+		},
+	},
+}
+
 local CollectionList = {
 	class = "CollectionListView",
 	subscreen = "collections",
@@ -665,12 +704,12 @@ local BottomRightCollectionsScreenMenu = {
 	class = "ScreenMenuView",
 	subscreen = "collections",
 	transform = transform,
-	x = 1300,
+	x = 1300 - 227,
 	y = 991,
-	w = 227,
+	w = 227 * 2,
 	h = 89,
 	rows = 1,
-	columns = 1,
+	columns = 2,
 	text = {
 		x = 0,
 		baseline = 54,
@@ -683,8 +722,40 @@ local BottomRightCollectionsScreenMenu = {
 	},
 	items = {{
 		{
+			method = "switchToOsudirect",
+			displayName = "direct"
+		},
+		{
 			method = "switchToNoteCharts",
 			displayName = "notecharts"
+		},
+	}}
+}
+
+local BottomRightOsudirectScreenMenu = {
+	class = "ScreenMenuView",
+	subscreen = "osudirect",
+	transform = transform,
+	x = 1300,
+	y = 991,
+	w = 227 * 2,
+	h = 89,
+	rows = 1,
+	columns = 2,
+	text = {
+		x = 0,
+		baseline = 54,
+		limit = 228,
+		align = "center",
+		font = {
+			filename = "Noto Sans",
+			size = 24,
+		},
+	},
+	items = {{
+		{
+			method = "switchToCollections",
+			displayName = "collections"
 		},
 	}}
 }
@@ -873,6 +944,7 @@ local SelectViewConfig = {
 	StageInfo,
 	NoteChartSetScrollBar,
 	CacheView,
+	OsudirectList,
 	CollectionList,
 	CollectionScrollBar,
 	require("sphere.views.HeaderViewConfig"),
@@ -884,6 +956,7 @@ local SelectViewConfig = {
 	BottomCollectionsScreenMenu,
 	BottomRightNotechartsScreenMenu,
 	BottomRightCollectionsScreenMenu,
+	BottomRightOsudirectScreenMenu,
 	NoteChartSubScreenMenu,
 	NoteChartOptionsScreenMenu,
 	LeftScreenMenu,
