@@ -35,6 +35,7 @@ local SelectModel		= require("sphere.models.SelectModel")
 local PreviewModel		= require("sphere.models.PreviewModel")
 local UpdateModel		= require("sphere.models.UpdateModel")
 local RhythmModel		= require("sphere.models.RhythmModel")
+local OsudirectModel		= require("sphere.models.OsudirectModel")
 local MainLog					= require("sphere.MainLog")
 local FrameTimeView					= require("sphere.views.FrameTimeView")
 
@@ -74,6 +75,7 @@ GameController.construct = function(self)
 	self.fpsLimiter = FpsLimiter:new()
 	self.rhythmModel = RhythmModel:new()
 	self.discordModel = DiscordModel:new()
+	self.osudirectModel = OsudirectModel:new()
 	self.frameTimeView = FrameTimeView:new()
 end
 
@@ -109,6 +111,7 @@ GameController.load = function(self)
 	local sortModel = self.sortModel
 	local previewModel = self.previewModel
 	local discordModel = self.discordModel
+	local osudirectModel = self.osudirectModel
 
 	onlineController.onlineModel = onlineModel
 	onlineController.cacheModel = cacheModel
@@ -162,6 +165,7 @@ GameController.load = function(self)
 	collectionModel.configModel = configModel
 	collectionModel.cacheModel = cacheModel
 	scoreModel.configModel = configModel
+	osudirectModel.configModel = configModel
 
 	directoryManager:createDirectories()
 
