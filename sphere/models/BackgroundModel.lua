@@ -1,6 +1,5 @@
 local Class = require("aqua.util.Class")
-local ThreadPool	= require("aqua.thread.ThreadPool")
-local aquaimage			= require("aqua.image")
+local aquathread = require("aqua.thread")
 local newPixel = require("aqua.graphics.newPixel")
 local tween				= require("tween")
 local aquatimer				= require("aqua.timer")
@@ -66,6 +65,10 @@ BackgroundModel.getBackgroundPath = function(self)
 		return
 	end
 
+	if noteChartItem.path:find("%.ojn$") then
+		return noteChartItem.path
+	end
+
 	local directoryPath = noteChartItem.path:match("^(.+)/(.-)$") or ""
 	local stagePath = noteChartItem.stagePath
 
@@ -87,7 +90,7 @@ BackgroundModel.loadBackground = function(self)
 	if path ~= self.currentPath then
 		self.currentPath = path
 		if path:find("%.ojn$") then
-			self:loadOJN(path)
+			self:loadImage(path, "ojn")
 		elseif path:find("%.mid$") then
 			self:loadImage("resources/midi/background.jpg")
 		else
@@ -96,45 +99,52 @@ BackgroundModel.loadBackground = function(self)
 	end
 end
 
-BackgroundModel.loadImage = function(self, path)
-	aquaimage.load(path, function(imageData)
-		if imageData then
-			local image = love.graphics.newImage(imageData)
-			self:setBackground(image)
-		end
-	end)
-end
+local loadImage = aquathread.async(function(path)
+	require("love.filesystem")
+	require("love.image")
 
-BackgroundModel.loadOJN = function(self, path)
-	return ThreadPool:execute({
-		f = function(path)
-			require("love.filesystem")
-			require("love.image")
+	local info = love.filesystem.getInfo(path)
+	if not info then
+		return
+	end
 
-			local OJN = require("o2jam.OJN")
+	local status, imageData = pcall(love.image.newImageData, path)
+	if status then
+		return imageData
+	end
+end)
 
-			local file = love.filesystem.newFile(path)
-			file:open("r")
-			local content = file:read()
-			file:close()
+local loadOJN = aquathread.async(function(path)
+	require("love.filesystem")
+	require("love.image")
+	local OJN = require("o2jam.OJN")
 
-			local ojn = OJN:new(content)
-			if ojn.cover == "" then
-				return
-			end
+	local content = love.filesystem.read(path)
+	if not content then
+		return
+	end
 
-			local fileData = love.filesystem.newFileData(ojn.cover, "cover")
-			return love.image.newImageData(fileData)
-		end,
-		params = {path},
-		result = function(imageData)
-			if not imageData then
-				return self:setBackground(self.emptyImage)
-			end
-			local image = love.graphics.newImage(imageData)
-			self:setBackground(image)
-		end
-	})
-end
+	local ojn = OJN:new(content)
+	if ojn.cover == "" then
+		return
+	end
+
+	local fileData = love.filesystem.newFileData(ojn.cover, "cover")
+	return love.image.newImageData(fileData)
+end)
+
+BackgroundModel.loadImage = aquathread.coro(function(self, path, type)
+	local imageData
+	if type == "ojn" then
+		imageData = loadOJN(path)
+	else
+		imageData = loadImage(path)
+	end
+	if not imageData then
+		return self:setBackground(self.emptyImage)
+	end
+	local image = love.graphics.newImage(imageData)
+	self:setBackground(image)
+end)
 
 return BackgroundModel
