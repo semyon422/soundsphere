@@ -37,7 +37,6 @@ OsudirectModel.search = thread.coro(function(self)
 	local beatmaps, err = osudirect_parse(body)
 	self.beatmapSets = beatmaps
 	self.itemsCount = #beatmaps
-	print(#self.items)
 end)
 
 OsudirectModel.updateItems = function(self)

@@ -83,6 +83,20 @@ local OsudirectList = {
 	},
 }
 
+local OsudirectScrollBar = {
+	class = "ScrollBarView",
+	subscreen = "osudirect",
+	transform = transform,
+	list = OsudirectList,
+	x = 1641,
+	y = 144,
+	w = 16,
+	h = 792,
+	rows = 11,
+	backgroundColor = {1, 1, 1, 0.33},
+	color = {1, 1, 1, 0.66}
+}
+
 local CollectionList = {
 	class = "CollectionListView",
 	subscreen = "collections",
@@ -947,6 +961,7 @@ local SelectViewConfig = {
 	OsudirectList,
 	CollectionList,
 	CollectionScrollBar,
+	OsudirectScrollBar,
 	require("sphere.views.HeaderViewConfig"),
 	SearchField,
 	SortStepper,

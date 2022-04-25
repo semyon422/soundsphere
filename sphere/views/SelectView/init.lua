@@ -11,6 +11,7 @@ local SortStepperView = require(viewspackage .. "SelectView.SortStepperView")
 local StageInfoView = require(viewspackage .. "SelectView.StageInfoView")
 local ModifierIconGridView = require(viewspackage .. "SelectView.ModifierIconGridView")
 local CollectionListView = require(viewspackage .. "SelectView.CollectionListView")
+local OsudirectListView = require(viewspackage .. "SelectView.OsudirectListView")
 local CacheView = require(viewspackage .. "SelectView.CacheView")
 local NoteSkinView = require("sphere.views.NoteSkinView")
 local InputView = require("sphere.views.InputView")
@@ -25,6 +26,7 @@ SelectView.views = {
 	{"stageInfoView", StageInfoView, "StageInfoView"},
 	{"modifierIconGridView", ModifierIconGridView, "ModifierIconGridView"},
 	{"collectionListView", CollectionListView, "CollectionListView"},
+	{"osudirectListView", OsudirectListView, "OsudirectListView"},
 	{"cacheView", CacheView, "CacheView"},
 }
 

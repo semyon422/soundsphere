@@ -16,15 +16,15 @@ OsudirectListView.reloadItems = function(self)
 end
 
 OsudirectListView.getItemIndex = function(self)
-	return self.gameController.selectModel.collectionItemIndex
+	return self.navigator.osudirectItemIndex or 1
 end
 
 OsudirectListView.scrollUp = function(self)
-	self.navigator:scrollCollection("up")
+	self.navigator:scrollOsudirect("up")
 end
 
 OsudirectListView.scrollDown = function(self)
-	self.navigator:scrollCollection("down")
+	self.navigator:scrollOsudirect("down")
 end
 
 return OsudirectListView

@@ -117,6 +117,8 @@ SelectController.receive = function(self, event)
 		self.gameController.scoreModel:asyncCalculateTopScores()
 	elseif event.name == "setInputBinding" then
 		self.gameController.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
+	elseif event.name == "searchOsudirect" then
+		self.gameController.osudirectModel:search()
 	elseif event.name == "deleteNoteChart" then
 	elseif event.name == "deleteNoteChartSet" then
 	end

@@ -11,15 +11,13 @@ SelectNavigator.load = function(self)
 	self:addSubscreen("notecharts")
 	self.isNoteSkinsOpen = ffi.new("bool[1]", false)
 	self.isInputOpen = ffi.new("bool[1]", false)
+	self.osudirectItemIndex = 1
 end
 
 SelectNavigator.receive = function(self, event)
 	if event.name ~= "keypressed" then
 		return
 	end
-
-	local notecharts = self:getSubscreen("notecharts")
-	local collections = self:getSubscreen("collections")
 
 	local scancode = event[2]
 
@@ -28,7 +26,7 @@ SelectNavigator.receive = function(self, event)
 	elseif scancode == "lctrl" then self:changeSearchMode()
 	elseif scancode == "lshift" then self:changeCollapse()
 	end
-	if notecharts then
+	if self:getSubscreen("notecharts") then
 		if scancode == "up" then self:scrollNoteChart("up")
 		elseif scancode == "down" then self:scrollNoteChart("down")
 		elseif scancode == "left" then self:scrollNoteChartSet("up")
@@ -41,7 +39,7 @@ SelectNavigator.receive = function(self, event)
 		elseif scancode == "tab" then self:switchToCollections()
 		elseif scancode == "lalt" then self:changeScreen("Result")
 		end
-	elseif collections then
+	elseif self:getSubscreen("collections") then
 		if scancode == "up" or scancode == "left" then self:scrollCollection("up")
 		elseif scancode == "down" or scancode == "right" then self:scrollCollection("down")
 		elseif scancode == "pageup" then self:scrollCollection("up", 10)
@@ -49,6 +47,15 @@ SelectNavigator.receive = function(self, event)
 		elseif scancode == "home" then self:scrollCollection("up", math.huge)
 		elseif scancode == "end" then self:scrollCollection("down", math.huge)
 		elseif scancode == "return" or scancode == "tab" then self:switchToNoteCharts()
+		end
+	elseif self:getSubscreen("osudirect") then
+		if scancode == "up" or scancode == "left" then self:scrollOsudirect("up")
+		elseif scancode == "down" or scancode == "right" then self:scrollOsudirect("down")
+		elseif scancode == "pageup" then self:scrollOsudirect("up", 10)
+		elseif scancode == "pagedown" then self:scrollOsudirect("down", 10)
+		elseif scancode == "home" then self:scrollOsudirect("up", math.huge)
+		elseif scancode == "end" then self:scrollOsudirect("down", math.huge)
+		elseif scancode == "escape" or scancode == "tab" then self:switchToCollections()
 		end
 	end
 end
@@ -70,6 +77,7 @@ end
 
 SelectNavigator.switchToOsudirect = function(self)
 	self:addSubscreen("osudirect")
+	self:send({name = "searchOsudirect"})
 end
 
 SelectNavigator.openDirectory = function(self)
@@ -117,6 +125,19 @@ end
 
 SelectNavigator.changeCollapse = function(self)
 	self:send({name = "changeCollapse"})
+end
+
+SelectNavigator.scrollOsudirect = function(self, direction, count)
+	count = count or 1
+	direction = direction == "up" and -count or count
+	local items = self.gameController.osudirectModel.items
+
+	local itemIndex = math.min(math.max(self.osudirectItemIndex + direction, 1), #items)
+	if not items[itemIndex] then
+		return
+	end
+
+	self.osudirectItemIndex = itemIndex
 end
 
 SelectNavigator.scrollCollection = function(self, direction, count)
