@@ -1,8 +1,7 @@
 local image			= require("aqua.image")
 local sound			= require("aqua.sound")
-local Group			= require("aqua.util.Group")
-local Observable	= require("aqua.util.Observable")
 local video			= require("aqua.video")
+local Group			= require("aqua.util.Group")
 local JamLoader		= require("sphere.database.JamLoader")
 local FileManager	= require("sphere.filesystem.FileManager")
 
@@ -10,11 +9,7 @@ local NoteChartResourceLoader = {}
 
 NoteChartResourceLoader.hitSoundsPath = "userdata/hitsounds"
 NoteChartResourceLoader.sample_gain = 0
-
-NoteChartResourceLoader.init = function(self)
-	self.observable = Observable:new()
-	self.aliases = {}
-end
+NoteChartResourceLoader.aliases = {}
 
 NoteChartResourceLoader.getNoteChartType = function(self, noteChart)
 	if noteChart.type == "bms" or noteChart.type == "osu" or noteChart.type == "quaver" or noteChart.type == "ksm" or noteChart.type == "sm" then
@@ -80,37 +75,19 @@ NoteChartResourceLoader.loadBMS = function(self)
 	self.imageGroup = Group:new()
 	self.videoGroup = Group:new()
 	for resourceType, name, sequence in self.noteChart:getResourceIterator() do
-		if resourceType == "sound" then
-			for _, path in ipairs(sequence) do
-				local soundFilePath = FileManager:findFile(path, "audio")
-				if soundFilePath then
-					if not self.soundGroup.objects[soundFilePath] then
-						self.soundGroup:add(soundFilePath)
-						self.resourceCount = self.resourceCount + 1
-						self.aliases[name] = soundFilePath
-					end
-					break
+		for _, path in ipairs(sequence) do
+			local filePath, fileType = FileManager:findFile(path)
+			if filePath then
+				if fileType == "audio" then
+					self.soundGroup:add(filePath)
+				elseif fileType == "image" then
+					self.imageGroup:add(filePath)
+				elseif fileType == "video" then
+					self.videoGroup:add(filePath)
 				end
-			end
-		elseif resourceType == "image" then
-			for _, path in ipairs(sequence) do
-				local imageFilePath = FileManager:findFile(path, "image")
-				local videoFilePath = FileManager:findFile(path, "video")
-				if imageFilePath then
-					if not self.imageGroup.objects[imageFilePath] then
-						self.imageGroup:add(imageFilePath)
-						self.resourceCount = self.resourceCount + 1
-						self.aliases[name] = imageFilePath
-					end
-					break
-				elseif videoFilePath then
-					if not self.videoGroup.objects[videoFilePath] then
-						self.videoGroup:add(videoFilePath)
-						self.resourceCount = self.resourceCount + 1
-						self.aliases[name] = videoFilePath
-					end
-					break
-				end
+				self.aliases[name] = filePath
+				self.resourceCount = self.resourceCount + 1
+				break
 			end
 		end
 	end
@@ -120,11 +97,6 @@ NoteChartResourceLoader.loadBMS = function(self)
 		if self.resourceCountLoaded == self.resourceCount then
 			self.callback()
 		end
-
-		return self.observable:send({
-			name = "notify",
-			text = self.resourceCountLoaded .. "/" .. self.resourceCount
-		})
 	end
 
 	local directoryPath = self.directoryPath
@@ -177,7 +149,5 @@ end
 NoteChartResourceLoader.unloadOJM = function(self)
 	JamLoader:unload(self.path:match("^(.+)n$") .. "m")
 end
-
-NoteChartResourceLoader:init()
 
 return NoteChartResourceLoader

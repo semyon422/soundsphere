@@ -1,35 +1,26 @@
 local FileManager = {}
 
-FileManager.AudioFormats = {
-	"wav", "ogg", "mp3"
+local FileTypes = {
+	audio = {"wav", "ogg", "mp3"},
+	image = {"png", "bmp", "jpg"},
+	video = {"mpg", "avi", "mp4", "mpeg", "wmv"},
 }
 
-FileManager.ImageFormats = {
-	"png", "bmp", "jpg"
-}
+local FileTypeMap = {}
+for format, list in pairs(FileTypes) do
+	for i = 1, #list do
+		FileTypeMap[list[i]] = format
+	end
+end
 
-FileManager.VideoFormats = {
-	"mpg", "avi", "mp4", "mpeg", "wmv"
-}
-
-FileManager.Formats = {
-	audio = FileManager.AudioFormats,
-	image = FileManager.ImageFormats,
-	video = FileManager.VideoFormats
-}
+local removeExtension = function(fileName)
+	local ext = fileName:match("%.([^%.]+)$")
+	local format = FileTypeMap[ext]
+	return format and fileName:sub(1, -#ext - 2) or fileName, format
+end
 
 FileManager.priority = {}
 FileManager.paths = {}
-
-FileManager.getType = function(self, path)
-	for type, formats in pairs(self.Formats) do
-		for _, ext in ipairs(formats) do
-			if path:lower():find("%." .. ext .. "$") then
-				return type
-			end
-		end
-	end
-end
 
 local sortPaths = function(a, b)
 	return FileManager.priority[a] > FileManager.priority[b]
@@ -37,11 +28,11 @@ end
 
 FileManager.addPath = function(self, path, priority)
 	local paths = self.paths
-	local spriority = self.priority
-	if not spriority[path] then
+	local _priority = self.priority
+	if not _priority[path] then
 		paths[#paths + 1] = path
 	end
-	spriority[path] = priority or 0
+	_priority[path] = priority or 0
 	table.sort(paths, sortPaths)
 end
 
@@ -50,40 +41,31 @@ FileManager.removePath = function(self, path)
 	self.priority[path] = nil
 	for i = 1, #paths do
 		if paths[i] == path then
-			table.remove(paths, i)
+			return table.remove(paths, i)
 		end
 	end
 end
 
-FileManager.findFile = function(self, fileName, fileType)
-	local originalFileName = fileName:gsub("\\", "/")
-	local fileName = self:removeExtension(originalFileName, fileType)
+FileManager.findFile = function(self, fullFileName)
+	fullFileName = fullFileName:gsub("\\", "/")
+	local fileName, fileType = removeExtension(fullFileName)
+
+	if not fileType then
+		return
+	end
 
 	for _, path in ipairs(self.paths) do
-		local originalFilePath = path .. "/" .. originalFileName
-		local info = love.filesystem.getInfo(originalFilePath)
-		if info and self:getType(originalFileName) == fileType then
-			return originalFilePath
+		local filePath = path .. "/" .. fullFileName
+		if love.filesystem.getInfo(filePath) then
+			return filePath, fileType
 		end
-		for _, format in ipairs(self.Formats[fileType]) do
-			local filePath = path .. "/" .. fileName .. "." .. format
-			local info = love.filesystem.getInfo(filePath)
-			if info then
-				return filePath
+		for _, ext in ipairs(FileTypes[fileType]) do
+			local filePath = path .. "/" .. fileName .. "." .. ext
+			if love.filesystem.getInfo(filePath) then
+				return filePath, fileType
 			end
 		end
 	end
-end
-
-FileManager.removeExtension = function(self, fileName, fileType)
-	for _, format in ipairs(self.Formats[fileType]) do
-		local position = fileName:lower():find("%." .. format .. "$")
-		if position then
-			return fileName:sub(1, position - 1)
-		end
-	end
-
-	return fileName
 end
 
 return FileManager
