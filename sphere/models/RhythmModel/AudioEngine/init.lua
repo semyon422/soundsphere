@@ -15,8 +15,7 @@ AudioEngine.secondaryAudioMode = "sample"
 AudioEngine.construct = function(self)
 	self.observable = Observable:new()
 
-	self.localAliases = {}
-	self.globalAliases = {}
+	self.aliases = {}
 
 	self.backgroundContainer = AudioContainer:new()
 	self.foregroundContainer = AudioContainer:new()
@@ -70,14 +69,9 @@ end
 
 AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
 	local currentTime = self.rhythmModel.timeEngine.currentTime
-	local aliases = self.localAliases
+	local aliases = self.aliases
 	if not paths then return end
 	for i = 1, #paths do
-		local path = paths[i][1]
-		if not keysound and not aliases[path] then
-			aliases = self.globalAliases
-		end
-
 		local mode
 		if stream then
 			mode = self.primaryAudioMode
@@ -85,8 +79,7 @@ AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
 			mode = self.secondaryAudioMode
 		end
 
-		local apath = aliases[paths[i][1]]
-		local audio = AudioFactory:getAudio(apath, mode)
+		local audio = AudioFactory:getAudio(aliases[paths[i][1]], mode)
 
 		if audio then
 			audio.offset = offset or currentTime

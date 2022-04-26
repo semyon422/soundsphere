@@ -8,14 +8,12 @@ local FileManager	= require("sphere.filesystem.FileManager")
 
 local NoteChartResourceLoader = {}
 
-NoteChartResourceLoader.resourceNames = {}
 NoteChartResourceLoader.hitSoundsPath = "userdata/hitsounds"
 NoteChartResourceLoader.sample_gain = 0
 
 NoteChartResourceLoader.init = function(self)
 	self.observable = Observable:new()
-	self.localAliases = {}
-	self.globalAliases = {}
+	self.aliases = {}
 end
 
 NoteChartResourceLoader.getNoteChartType = function(self, noteChart)
@@ -66,7 +64,7 @@ NoteChartResourceLoader.loadOJM = function(self)
 	local path = self.path:match("^(.+)n$") .. "m"
 	JamLoader:load(path, function(samples)
 		for name in pairs(samples) do
-			self.localAliases[name] = path .. "/" .. name
+			self.aliases[name] = path .. "/" .. name
 		end
 		self.callback()
 	end)
@@ -89,11 +87,7 @@ NoteChartResourceLoader.loadBMS = function(self)
 					if not self.soundGroup.objects[soundFilePath] then
 						self.soundGroup:add(soundFilePath)
 						self.resourceCount = self.resourceCount + 1
-						if soundFilePath:find(self.directoryPath, 1, true) then
-							self.localAliases[name] = soundFilePath
-						else
-							self.globalAliases[name] = soundFilePath
-						end
+						self.aliases[name] = soundFilePath
 					end
 					break
 				end
@@ -106,22 +100,14 @@ NoteChartResourceLoader.loadBMS = function(self)
 					if not self.imageGroup.objects[imageFilePath] then
 						self.imageGroup:add(imageFilePath)
 						self.resourceCount = self.resourceCount + 1
-						if imageFilePath:find(self.directoryPath, 1, true) then
-							self.localAliases[name] = imageFilePath
-						else
-							self.globalAliases[name] = imageFilePath
-						end
+						self.aliases[name] = imageFilePath
 					end
 					break
 				elseif videoFilePath then
 					if not self.videoGroup.objects[videoFilePath] then
 						self.videoGroup:add(videoFilePath)
 						self.resourceCount = self.resourceCount + 1
-						if videoFilePath:find(self.directoryPath, 1, true) then
-							self.localAliases[name] = videoFilePath
-						else
-							self.globalAliases[name] = videoFilePath
-						end
+						self.aliases[name] = videoFilePath
 					end
 					break
 				end
@@ -161,8 +147,7 @@ end
 
 NoteChartResourceLoader.unloadAll = function(self)
 	self:unload()
-	self.localAliases = {}
-	self.globalAliases = {}
+	self.aliases = {}
 end
 
 NoteChartResourceLoader.unload = function(self)

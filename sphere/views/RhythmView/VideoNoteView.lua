@@ -12,7 +12,7 @@ VideoNoteView.construct = function(self)
 
 	local images = self.startNoteData.images
 	local graphicEngine = self.graphicalNote.graphicEngine
-	local path = graphicEngine.localAliases[images[1][1]] or graphicEngine.globalAliases[images[1][1]]
+	local path = graphicEngine.aliases[images[1][1]]
 
 	local vid = video.new(path)
 	local image

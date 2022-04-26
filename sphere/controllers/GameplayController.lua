@@ -92,7 +92,7 @@ GameplayController.load = function(self)
 	view:load()
 
 	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChart, function()
-		rhythmModel:setResourceAliases(NoteChartResourceLoader.localAliases, NoteChartResourceLoader.globalAliases)
+		rhythmModel:setResourceAliases(NoteChartResourceLoader.aliases)
 		self:receive({
 			name = "play"
 		})
