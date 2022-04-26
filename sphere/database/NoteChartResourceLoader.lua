@@ -10,20 +10,23 @@ local NoteChartResourceLoader = {}
 NoteChartResourceLoader.hitSoundsPath = "userdata/hitsounds"
 NoteChartResourceLoader.sample_gain = 0
 NoteChartResourceLoader.aliases = {}
+NoteChartResourceLoader.resources = {}
 
-NoteChartResourceLoader.getNoteChartType = function(self, noteChart)
-	if noteChart.type == "bms" or noteChart.type == "osu" or noteChart.type == "quaver" or noteChart.type == "ksm" or noteChart.type == "sm" then
-		return "bms"
-	elseif noteChart.type == "o2jam" then
-		return "o2jam"
-	elseif noteChart.type == "midi" then
-		return "midi"
+local NoteChartTypes = {
+	bms = {"bms", "osu", "quaver", "ksm", "sm"},
+	o2jam = {"o2jam"},
+	midi = {"midi"},
+}
+local NoteChartTypeMap = {}
+for t, list in pairs(NoteChartTypes) do
+	for i = 1, #list do
+		NoteChartTypeMap[list[i]] = t
 	end
 end
 
 NoteChartResourceLoader.load = function(self, path, noteChart, callback)
 	local directoryPath = path:match("^(.+)/.-$")
-	local noteChartType = self:getNoteChartType(noteChart)
+	local noteChartType = NoteChartTypeMap[noteChart.type]
 
 	if self.noteChart and self.sample_gain ~= sound.sample_gain then
 		self:unloadAll()
@@ -123,11 +126,9 @@ NoteChartResourceLoader.unloadAll = function(self)
 end
 
 NoteChartResourceLoader.unload = function(self)
-	local noteChartType = self:getNoteChartType(self.noteChart)
+	local noteChartType = NoteChartTypeMap[self.noteChart.type]
 	if noteChartType == "bms" then
 		self:unloadBMS()
-	elseif noteChartType == "o2jam" then
-		self:unloadOJM()
 	end
 end
 
@@ -144,10 +145,6 @@ NoteChartResourceLoader.unloadBMS = function(self)
 	self.videoGroup:call(function(videoFilePath)
 		return video.unload(videoFilePath, function() end)
 	end)
-end
-
-NoteChartResourceLoader.unloadOJM = function(self)
-	JamLoader:unload(self.path:match("^(.+)n$") .. "m")
 end
 
 return NoteChartResourceLoader
