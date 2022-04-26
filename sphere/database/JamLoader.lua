@@ -10,7 +10,11 @@ local loadOjm = aquathread.async(function(path)
 	local sound = require("aqua.sound")
 	local OJM = require("o2jam.OJM")
 
-	local fileData = love.filesystem.newFileData(path)
+	local fileData, err = love.filesystem.newFileData(path)
+	if not fileData then
+		return false, err
+	end
+
 	local ojm = OJM:new(fileData:getFFIPointer(), fileData:getSize())
 	local soundDatas = {}
 
@@ -31,7 +35,12 @@ JamLoader.load = aquathread.coro(function(self, path, callback)
 		end
 	end
 
-	local soundDatas = loadOjm(path)
+	local soundDatas, err = loadOjm(path)
+	if not soundDatas then
+		print(err)
+		return
+	end
+
 	loadedPath = path
 	loadedSoundDatas = soundDatas
 
