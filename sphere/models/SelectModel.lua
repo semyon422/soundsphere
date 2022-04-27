@@ -8,6 +8,7 @@ SelectModel.construct = function(self)
 	self.noteChartSetItemIndex = 1
 	self.noteChartItemIndex = 1
 	self.scoreItemIndex = 1
+	self.pullingNoteChartSet = false
 end
 
 SelectModel.debounceTime = 0.5
@@ -41,6 +42,9 @@ SelectModel.coroPullNoteChartSet = aquathread.coro(function(self, ...)
 end)
 
 SelectModel.setSortFunction = function(self, sortFunctionName)
+	if self.pullingNoteChartSet then
+		return
+	end
 	local config = self.config
 	config.sortFunction = sortFunctionName
 	self.sortModel.name = sortFunctionName
@@ -58,6 +62,9 @@ SelectModel.changeSearchMode = function(self)
 end
 
 SelectModel.changeCollapse = function(self)
+	if self.pullingNoteChartSet then
+		return
+	end
 	local config = self.config
 	config.collapse = not config.collapse
 	self.noteChartSetLibraryModel.collapse = config.collapse
@@ -66,15 +73,20 @@ end
 
 SelectModel.update = function(self)
 	local stateCounter = self.searchModel.stateCounter
-	if self.searchStateCounter ~= stateCounter then
-		self.config.searchFilter = self.searchModel.searchFilter
-		self.config.searchLamp = self.searchModel.searchLamp
-		self.searchStateCounter = stateCounter
-		self:debouncePullNoteChartSet()
+	if self.searchStateCounter == stateCounter or self.pullingNoteChartSet then
+		return
 	end
+	self.config.searchFilter = self.searchModel.searchFilter
+	self.config.searchLamp = self.searchModel.searchLamp
+	self.searchStateCounter = stateCounter
+	self:debouncePullNoteChartSet()
 end
 
 SelectModel.scrollCollection = function(self, direction, destination)
+	if self.pullingNoteChartSet then
+		return
+	end
+
 	local collectionItems = self.collectionModel.items
 
 	destination = math.min(math.max(destination or self.collectionItemIndex + direction, 1), #collectionItems)
@@ -158,6 +170,8 @@ SelectModel.scrollScore = function(self, direction, destination)
 end
 
 SelectModel.pullNoteChartSet = function(self, noUpdate)
+	self.pullingNoteChartSet = true
+
 	if not noUpdate then
 		self.searchModel:setCollection(self.collectionItem)
 		self.noteChartSetLibraryModel:updateItems()
@@ -178,6 +192,7 @@ SelectModel.pullNoteChartSet = function(self, noUpdate)
 	self.noteChartSetItem = noteChartSetItem
 	if noteChartSetItem then
 		self.config.noteChartSetEntryId = noteChartSetItem.setId
+		self.pullingNoteChartSet = false
 		return self:pullNoteChart(noUpdate)
 	end
 
@@ -190,6 +205,8 @@ SelectModel.pullNoteChartSet = function(self, noUpdate)
 
 	self.noteChartLibraryModel:clear()
 	self.scoreLibraryModel:clear()
+
+	self.pullingNoteChartSet = false
 end
 
 SelectModel.pullNoteChart = function(self, noUpdate)
