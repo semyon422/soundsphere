@@ -109,7 +109,10 @@ local loadOJN = aquathread.async(function(path)
 	end
 
 	local fileData = love.filesystem.newFileData(ojn.cover, "cover")
-	return love.image.newImageData(fileData)
+	local status, imageData = pcall(love.image.newImageData, fileData)
+	if status then
+		return imageData
+	end
 end)
 
 BackgroundModel.loadImage = aquathread.coro(function(self, path, type)
