@@ -26,7 +26,9 @@ end
 local asyncRequest = thread.async(function(url)
 	local request = require("luajit-request")
 	local response, code, err = request.send(url)
-	assert(response, err)
+	if not response then
+		return
+	end
 	return response.body, response.code
 end)
 
@@ -34,17 +36,12 @@ OsudirectModel.search = thread.coro(function(self)
 	local config = self.configModel.configs.online.osu
 	local url = socket_url.absolute(config.web, osudirect_urls.search(self.searchString))
 	local body = asyncRequest(url)
+	if not body then
+		return
+	end
 	local beatmaps, err = osudirect_parse(body)
 	self.beatmapSets = beatmaps
 	self.itemsCount = #beatmaps
 end)
-
-OsudirectModel.updateItems = function(self)
-	self:search()
-end
-
-OsudirectModel.getItemIndex = function(self, noteChartDataId, noteChartId, noteChartSetId)
-	return 1
-end
 
 return OsudirectModel

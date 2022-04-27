@@ -138,6 +138,12 @@ SelectNavigator.scrollOsudirect = function(self, direction, count)
 	end
 
 	self.osudirectItemIndex = itemIndex
+
+	self:send({
+		name = "osudirectBeatmap",
+		itemIndex = self.osudirectItemIndex,
+		beatmap = items[itemIndex],
+	})
 end
 
 SelectNavigator.scrollCollection = function(self, direction, count)
