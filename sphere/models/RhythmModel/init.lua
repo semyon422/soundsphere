@@ -195,6 +195,7 @@ end
 
 RhythmModel.setResourceAliases = function(self, aliases)
 	self.audioEngine.aliases = aliases
+	self.graphicEngine.aliases = aliases
 end
 
 RhythmModel.setVolume = function(self, layer, value)

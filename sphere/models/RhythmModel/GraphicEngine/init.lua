@@ -8,6 +8,7 @@ local GraphicEngine = Class:new()
 GraphicEngine.construct = function(self)
 	self.observable = Observable:new()
 
+	self.aliases = {}
 	self.noteDrawers = {}
 	self.loaded = false
 end
