@@ -26,6 +26,11 @@ local sortPaths = function(a, b)
 	return FileManager.priority[a] > FileManager.priority[b]
 end
 
+FileManager.reset = function(self)
+	self.priority = {}
+	self.paths = {}
+end
+
 FileManager.getType = function(self, fileName)
 	local ext = fileName:match("%.([^%.]+)$")
 	return FileTypeMap[ext]

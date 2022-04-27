@@ -1,9 +1,9 @@
 local image			= require("aqua.image")
 local sound			= require("aqua.sound")
 local video			= require("aqua.video")
-local Group			= require("aqua.util.Group")
 local JamLoader		= require("sphere.database.JamLoader")
 local FileManager	= require("sphere.filesystem.FileManager")
+local array_update = require("aqua.util.array_update")
 
 local NoteChartResourceLoader = {}
 
@@ -28,32 +28,24 @@ NoteChartResourceLoader.load = function(self, path, noteChart, callback)
 	local directoryPath = path:match("^(.+)/.-$")
 	local noteChartType = NoteChartTypeMap[noteChart.type]
 
-	if self.noteChart and self.sample_gain ~= sound.sample_gain then
-		self:unloadAll()
+	if self.sample_gain ~= sound.sample_gain then
+		self:unloadAudio()
 		self.sample_gain = sound.sample_gain
 	end
 
-	if noteChartType == "bms" then
-		if self.directoryPath and self.directoryPath ~= directoryPath then
-			self:unloadAll()
-		end
-	elseif noteChartType == "o2jam" then
-		if self.path and self.path ~= path then
-			self:unloadAll()
-		end
-	end
-
-	self.directoryPath = directoryPath
 	self.path = path
 	self.noteChart = noteChart
 	self.callback = callback
 
+	FileManager:reset()
 	if noteChartType == "bms" then
+		FileManager:addPath(directoryPath, 2)
+		FileManager:addPath(self.hitSoundsPath, 1)
 		self:loadBMS()
 	elseif noteChartType == "o2jam" then
 		self:loadOJM()
 	elseif noteChartType == "midi" then
-		self.hitSoundsPath = self.hitSoundsPath .. "/midi"
+		FileManager:addPath(self.hitSoundsPath .. "/midi", 1)
 		self:loadBMS()
 	end
 end
@@ -69,82 +61,72 @@ NoteChartResourceLoader.loadOJM = function(self)
 end
 
 NoteChartResourceLoader.loadBMS = function(self)
-	FileManager:addPath(self.directoryPath, 1)
-	FileManager:addPath(self.hitSoundsPath, 0)
+	local resourceCount = 0
+	local resourceCountLoaded = 0
 
-	self.resourceCount = 0
-	self.resourceCountLoaded = 0
-	self.soundGroup = Group:new()
-	self.imageGroup = Group:new()
-	self.videoGroup = Group:new()
+	self.aliases = {}
+	local newResources = {}
 	for resourceType, name, sequence in self.noteChart:getResourceIterator() do
 		for _, path in ipairs(sequence) do
 			local filePath, fileType = FileManager:findFile(path)
 			if filePath then
-				if fileType == "audio" then
-					self.soundGroup:add(filePath)
-				elseif fileType == "image" then
-					self.imageGroup:add(filePath)
-				elseif fileType == "video" then
-					self.videoGroup:add(filePath)
-				end
+				table.insert(newResources, filePath)
 				self.aliases[name] = filePath
-				self.resourceCount = self.resourceCount + 1
+				resourceCount = resourceCount + 1
 				break
 			end
 		end
 	end
 
+	local new, old, all = array_update(newResources, self.resources)
+	if #new == 0 then
+		return self.callback()
+	end
+
 	local resourceLoadedCallback = function()
-		self.resourceCountLoaded = self.resourceCountLoaded + 1
-		if self.resourceCountLoaded == self.resourceCount then
+		resourceCountLoaded = resourceCountLoaded + 1
+		if resourceCountLoaded == resourceCount then
 			self.callback()
+			self.resources = all
 		end
 	end
 
-	local directoryPath = self.directoryPath
-	self.soundGroup:call(function(soundFilePath)
-		if self.directoryPath == directoryPath then
-			return sound.load(soundFilePath, resourceLoadedCallback)
-		end
-	end)
-	self.imageGroup:call(function(imageFilePath)
-		if self.directoryPath == directoryPath then
-			return image.load(imageFilePath, resourceLoadedCallback)
-		end
-	end)
-	self.videoGroup:call(function(videoFilePath)
-		if self.directoryPath == directoryPath then
+	for _, path in ipairs(new) do
+		local fileType = FileManager:getType(path)
+		if fileType == "image" then
+			image.load(path, resourceLoadedCallback)
+		elseif fileType == "audio" then
+			sound.load(path, resourceLoadedCallback)
+		elseif fileType == "video" then
 			resourceLoadedCallback()
+			-- video.load(path, resourceLoadedCallback)
 		end
-	end)
-end
+	end
 
-NoteChartResourceLoader.unloadAll = function(self)
-	self:unload()
-	self.aliases = {}
-end
-
-NoteChartResourceLoader.unload = function(self)
-	local noteChartType = NoteChartTypeMap[self.noteChart.type]
-	if noteChartType == "bms" then
-		self:unloadBMS()
+	for _, path in ipairs(old) do
+		local fileType = FileManager:getType(path)
+		if fileType == "image" then
+			image.unload(path, function() end)
+		elseif fileType == "audio" then
+			sound.unload(path, function() end)
+		elseif fileType == "video" then
+			video.unload(path, function() end)
+		end
 	end
 end
 
-NoteChartResourceLoader.unloadBMS = function(self)
-	FileManager:removePath(self.directoryPath)
-	FileManager:removePath(self.hitSoundsPath)
+NoteChartResourceLoader.unloadAudio = function(self)
+	local audios = {}
+	for _, path in ipairs(self.resources) do
+		local fileType = FileManager:getType(path)
+		if fileType == "audio" then
+			table.insert(audios, path)
+			sound.unload(path, function() end)
+		end
+	end
 
-	self.soundGroup:call(function(soundFilePath)
-		return sound.unload(soundFilePath, function() end)
-	end)
-	self.imageGroup:call(function(imageFilePath)
-		return image.unload(imageFilePath, function() end)
-	end)
-	self.videoGroup:call(function(videoFilePath)
-		return video.unload(videoFilePath, function() end)
-	end)
+	local new, old, all = array_update(audios, self.resources)
+	self.resources = old
 end
 
 return NoteChartResourceLoader
