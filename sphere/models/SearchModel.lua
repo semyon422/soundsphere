@@ -68,6 +68,10 @@ local numberFields = {
 		keys = {"notesCount", "nc"},
 		field = "noteChartDatas.notesCount",
 	},
+	{
+		keys = {"level", "lv"},
+		field = "noteChartDatas.level",
+	},
 
 	{
 		keys = {"accuracy", "a"},
