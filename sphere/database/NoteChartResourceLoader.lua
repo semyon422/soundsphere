@@ -106,11 +106,11 @@ NoteChartResourceLoader.loadBMS = function(self)
 	for _, path in ipairs(old) do
 		local fileType = FileManager:getType(path)
 		if fileType == "image" then
-			image.unload(path, function() end)
+			image.unload(path)
 		elseif fileType == "audio" then
-			sound.unload(path, function() end)
+			sound.unload(path)
 		elseif fileType == "video" then
-			video.unload(path, function() end)
+			video.unload(path)
 		end
 	end
 end
@@ -121,7 +121,7 @@ NoteChartResourceLoader.unloadAudio = function(self)
 		local fileType = FileManager:getType(path)
 		if fileType == "audio" then
 			table.insert(audios, path)
-			sound.unload(path, function() end)
+			sound.unload(path)
 		end
 	end
 
