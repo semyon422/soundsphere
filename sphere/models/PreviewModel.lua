@@ -16,8 +16,9 @@ PreviewModel.unload = function(self)
 end
 
 PreviewModel.update = function(self, dt)
-	if self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
-		local audioPath, previewTime = self:getAudioPathPreview()
+	local noteChartItem = self.selectModel.noteChartItem
+	if noteChartItem and self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
+		local audioPath, previewTime = noteChartItem:getAudioPathPreview()
 		if audioPath then
 			self.noteChartDataEntryId = self.config.noteChartDataEntryId
 		end
@@ -32,24 +33,6 @@ PreviewModel.update = function(self, dt)
 		self.audio:setPosition(self.position)
 		self.audio:play()
 	end
-end
-
-PreviewModel.getAudioPathPreview = function(self)
-	local selectModel = self.selectModel
-
-	local noteChartItem = selectModel.noteChartItem
-	if not noteChartItem or not noteChartItem.path or not noteChartItem.audioPath then
-		return
-	end
-
-	local directoryPath = noteChartItem.path:match("^(.+)/(.-)$") or ""
-	local audioPath = noteChartItem.audioPath
-
-	if audioPath and audioPath ~= "" then
-		return directoryPath .. "/" .. audioPath, noteChartItem.previewTime
-	end
-
-	return directoryPath .. "/preview.ogg", 0
 end
 
 PreviewModel.play = function(self)

@@ -23,8 +23,9 @@ BackgroundModel.load = function(self)
 end
 
 BackgroundModel.update = function(self, dt)
-	if self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
-		local backgroundPath = self:getBackgroundPath()
+	local noteChartItem = self.selectModel.noteChartItem
+	if noteChartItem and self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
+		local backgroundPath = noteChartItem:getBackgroundPath()
 		if backgroundPath then
 			self.noteChartDataEntryId = self.config.noteChartDataEntryId
 		end
@@ -55,28 +56,6 @@ BackgroundModel.setBackground = function(self, image)
 	if layer == 2 then
 		self.alpha = 0
 	end
-end
-
-BackgroundModel.getBackgroundPath = function(self)
-	local selectModel = self.selectModel
-
-	local noteChartItem = selectModel.noteChartItem
-	if not noteChartItem or not noteChartItem.path or not noteChartItem.stagePath then
-		return
-	end
-
-	if noteChartItem.path:find("%.ojn$") then
-		return noteChartItem.path
-	end
-
-	local directoryPath = noteChartItem.path:match("^(.+)/(.-)$") or ""
-	local stagePath = noteChartItem.stagePath
-
-	if stagePath and stagePath ~= "" then
-		return directoryPath .. "/" .. stagePath
-	end
-
-	return directoryPath
 end
 
 BackgroundModel.loadBackground = function(self)

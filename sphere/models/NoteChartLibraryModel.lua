@@ -5,20 +5,66 @@ local NoteChartLibraryModel = LibraryModel:new()
 
 NoteChartLibraryModel.setId = 1
 
+local NoteChartItem = {}
+
+NoteChartItem.getBackgroundPath = function(self)
+	if not self.path or not self.stagePath then
+		return
+	end
+
+	if self.path:find("%.ojn$") then
+		return self.path
+	end
+
+	local directoryPath = self.path:match("^(.+)/(.-)$") or ""
+	local stagePath = self.stagePath
+
+	if stagePath and stagePath ~= "" then
+		return directoryPath .. "/" .. stagePath
+	end
+
+	return directoryPath
+end
+
+NoteChartItem.getAudioPathPreview = function(self)
+	if not self.path or not self.audioPath then
+		return
+	end
+
+	local directoryPath = self.path:match("^(.+)/(.-)$") or ""
+	local audioPath = self.audioPath
+
+	if audioPath and audioPath ~= "" then
+		return directoryPath .. "/" .. audioPath, self.previewTime
+	end
+
+	return directoryPath .. "/preview.ogg", 0
+end
+
+NoteChartItem.__index = function(self, k)
+	local raw = rawget(NoteChartItem, k)
+	if raw then
+		return raw
+	end
+	local model = self.noteChartLibraryModel
+	if not model.slice then
+		return
+	end
+	local entry = CacheDatabase.noteChartItems[model.slice.offset + self.itemIndex - 1]
+	if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "lamp" then
+		return entry[k]
+	end
+	local noteChart = CacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
+	local noteChartData = CacheDatabase:getCachedEntry("noteChartDatas", entry.noteChartDataId)
+	return noteChartData and noteChartData[k] or noteChart and noteChart[k]
+end
+
 NoteChartLibraryModel.load = function(self)
 	self.itemsCache.loadObject = function(_, itemIndex)
-		return setmetatable({}, {__index = function(t, k)
-			if not self.slice then
-				return
-			end
-			local entry = CacheDatabase.noteChartItems[self.slice.offset + itemIndex - 1]
-			if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "lamp" then
-				return entry[k]
-			end
-			local noteChart = CacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
-			local noteChartData = CacheDatabase:getCachedEntry("noteChartDatas", entry.noteChartDataId)
-			return noteChartData and noteChartData[k] or noteChart and noteChart[k]
-		end})
+		return setmetatable({
+			noteChartLibraryModel = self,
+			itemIndex = itemIndex,
+		}, NoteChartItem)
 	end
 end
 

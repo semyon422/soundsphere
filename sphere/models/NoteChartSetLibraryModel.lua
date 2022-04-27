@@ -5,17 +5,23 @@ local NoteChartSetLibraryModel = LibraryModel:new()
 
 NoteChartSetLibraryModel.collapse = false
 
+local NoteChartSetItem = {}
+
+NoteChartSetItem.__index = function(self, k)
+	local entry = CacheDatabase.noteChartSetItems[self.itemIndex - 1]
+	if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "lamp" then
+		return entry[k]
+	end
+	local noteChart = CacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
+	local noteChartData = CacheDatabase:getCachedEntry("noteChartDatas", entry.noteChartDataId)
+	return noteChartData and noteChartData[k] or noteChart and noteChart[k]
+end
+
 NoteChartSetLibraryModel.load = function(self)
-	self.itemsCache.getObject = function(_, itemIndex)
-		return setmetatable({}, {__index = function(t, k)
-			local entry = CacheDatabase.noteChartSetItems[itemIndex - 1]
-			if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "lamp" then
-				return entry[k]
-			end
-			local noteChart = CacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
-			local noteChartData = CacheDatabase:getCachedEntry("noteChartDatas", entry.noteChartDataId)
-			return noteChartData and noteChartData[k] or noteChart and noteChart[k]
-		end})
+	self.itemsCache.loadObject = function(_, itemIndex)
+		return setmetatable({
+			itemIndex = itemIndex,
+		}, NoteChartSetItem)
 	end
 end
 
