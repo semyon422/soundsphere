@@ -61,7 +61,6 @@ NoteChartResourceLoader.loadOJM = function(self)
 end
 
 NoteChartResourceLoader.loadBMS = function(self)
-
 	self.aliases = {}
 	local newResources = {}
 	for resourceType, name, sequence in self.noteChart:getResourceIterator() do
