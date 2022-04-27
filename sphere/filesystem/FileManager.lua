@@ -26,6 +26,11 @@ local sortPaths = function(a, b)
 	return FileManager.priority[a] > FileManager.priority[b]
 end
 
+FileManager.getType = function(self, fileName)
+	local ext = fileName:match("%.([^%.]+)$")
+	return FileTypeMap[ext]
+end
+
 FileManager.addPath = function(self, path, priority)
 	local paths = self.paths
 	local _priority = self.priority
