@@ -61,8 +61,6 @@ NoteChartResourceLoader.loadOJM = function(self)
 end
 
 NoteChartResourceLoader.loadBMS = function(self)
-	local resourceCount = 0
-	local resourceCountLoaded = 0
 
 	self.aliases = {}
 	local newResources = {}
@@ -72,22 +70,37 @@ NoteChartResourceLoader.loadBMS = function(self)
 			if filePath then
 				table.insert(newResources, filePath)
 				self.aliases[name] = filePath
-				resourceCount = resourceCount + 1
 				break
 			end
 		end
 	end
 
 	local new, old, all = array_update(newResources, self.resources)
+
+	for _, path in ipairs(old) do
+		local fileType = FileManager:getType(path)
+		if fileType == "image" then
+			image.unload(path)
+		elseif fileType == "audio" then
+			sound.unload(path)
+		elseif fileType == "video" then
+			video.unload(path)
+		end
+	end
+
 	if #new == 0 then
+		self.resources = all
 		return self.callback()
 	end
+
+	local resourceCount = #new
+	local resourceCountLoaded = 0
 
 	local resourceLoadedCallback = function()
 		resourceCountLoaded = resourceCountLoaded + 1
 		if resourceCountLoaded == resourceCount then
-			self.callback()
 			self.resources = all
+			return self.callback()
 		end
 	end
 
@@ -100,17 +113,6 @@ NoteChartResourceLoader.loadBMS = function(self)
 		elseif fileType == "video" then
 			resourceLoadedCallback()
 			-- video.load(path, resourceLoadedCallback)
-		end
-	end
-
-	for _, path in ipairs(old) do
-		local fileType = FileManager:getType(path)
-		if fileType == "image" then
-			image.unload(path)
-		elseif fileType == "audio" then
-			sound.unload(path)
-		elseif fileType == "video" then
-			video.unload(path)
 		end
 	end
 end
