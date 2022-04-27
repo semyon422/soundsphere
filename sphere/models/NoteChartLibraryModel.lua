@@ -8,15 +8,16 @@ NoteChartLibraryModel.setId = 1
 local NoteChartItem = {}
 
 NoteChartItem.getBackgroundPath = function(self)
-	if not self.path or not self.stagePath then
+	local path = self.path
+	if not path or not self.stagePath then
 		return
 	end
 
-	if self.path:find("%.ojn$") then
-		return self.path
+	if path:find("%.ojn$") or path:find("%.mid$") then
+		return path
 	end
 
-	local directoryPath = self.path:match("^(.+)/(.-)$") or ""
+	local directoryPath = path:match("^(.+)/(.-)$") or ""
 	local stagePath = self.stagePath
 
 	if stagePath and stagePath ~= "" then
