@@ -6,32 +6,27 @@ local aquatimer				= require("aqua.timer")
 
 local BackgroundModel = Class:new()
 
-BackgroundModel.construct = function(self)
-	self.currentPath = ""
-	self.alpha = 0
-end
+BackgroundModel.alpha = 0
 
 BackgroundModel.load = function(self)
 	self.config = self.configModel.configs.select
 	self.noteChartDataEntryId = 0
-	self.backgroundPath = ""
+	self.path = ""
 
 	self.emptyImage = newPixel(0.25, 0.25, 0.25, 1)
-	self.images = {
-		self.emptyImage
-	}
+	self.images = {self.emptyImage}
 end
 
 BackgroundModel.update = function(self, dt)
 	local noteChartItem = self.selectModel.noteChartItem
 	if noteChartItem and self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
-		local backgroundPath = noteChartItem:getBackgroundPath()
-		if backgroundPath then
+		local path = noteChartItem:getBackgroundPath()
+		if path then
 			self.noteChartDataEntryId = self.config.noteChartDataEntryId
 		end
-		if backgroundPath and self.backgroundPath ~= backgroundPath then
-			self.backgroundPath = backgroundPath
-			aquatimer.debounce(self, "loadDebounce", 0.1, self.loadBackground, self)
+		if path and self.path ~= path then
+			self.path = path
+			self:loadBackgroundDebounce()
 		end
 	end
 
@@ -58,23 +53,40 @@ BackgroundModel.setBackground = function(self, image)
 	end
 end
 
+BackgroundModel.loadBackgroundDebounce = function(self, path)
+	self.path = path or self.path
+	aquatimer.debounce(self, "loadDebounce", 0.1, self.loadBackground, self)
+end
+
 BackgroundModel.loadBackground = function(self)
-	local path = self.backgroundPath
-	local info = love.filesystem.getInfo(path)
-	if not info or info.type == "directory" then
-		self:setBackground(self.emptyImage)
-		self.currentPath = path
-		return
-	end
-	if path ~= self.currentPath then
-		self.currentPath = path
-		if path:find("%.ojn$") then
-			self:loadImage(path, "ojn")
-		elseif path:find("%.mid$") then
-			self:loadImage("resources/midi/background.jpg")
-		else
-			self:loadImage(path)
+	local path = self.path
+
+	if not path:find("^http") then
+		local info = love.filesystem.getInfo(path)
+		if not info or info.type == "directory" then
+			self:setBackground(self.emptyImage)
+			return
 		end
+	end
+
+	local image
+	if path:find("%.ojn$") then
+		image = self:loadImage(path, "ojn")
+	elseif path:find("^http") then
+		image = self:loadImage(path, "http")
+	elseif path:find("%.mid$") then
+		image = self:loadImage("resources/midi/background.jpg")
+	else
+		image = self:loadImage(path)
+	end
+	if image then
+		return self:setBackground(image)
+	end
+
+	self:setBackground(self.emptyImage)
+
+	if path ~= self.path then
+		self:loadBackground()
 	end
 end
 
@@ -115,18 +127,34 @@ local loadOJN = aquathread.async(function(path)
 	end
 end)
 
-BackgroundModel.loadImage = aquathread.coro(function(self, path, type)
+local loadHttp = aquathread.async(function(url)
+	local request = require("luajit-request")
+	local response, code, err = request.send(url)
+	if not response then
+		return
+	end
+
+	require("love.image")
+	local fileData = love.filesystem.newFileData(response.body, "cover")
+	local status, imageData = pcall(love.image.newImageData, fileData)
+	if status then
+		return imageData
+	end
+end)
+
+BackgroundModel.loadImage = function(self, path, type)
 	local imageData
 	if type == "ojn" then
 		imageData = loadOJN(path)
+	elseif type == "http" then
+		imageData = loadHttp(path)
 	else
 		imageData = loadImage(path)
 	end
 	if not imageData then
-		return self:setBackground(self.emptyImage)
+		return
 	end
-	local image = love.graphics.newImage(imageData)
-	self:setBackground(image)
-end)
+	return love.graphics.newImage(imageData)
+end
 
 return BackgroundModel

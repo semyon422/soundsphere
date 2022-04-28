@@ -44,4 +44,9 @@ OsudirectModel.search = thread.coro(function(self)
 	self.itemsCount = #beatmaps
 end)
 
+OsudirectModel.getBackgroundUrl = function(self, beatmap)
+	local config = self.configModel.configs.online.osu
+	return socket_url.absolute(config.static, osudirect_urls.thumbnail(beatmap.setId, true))
+end
+
 return OsudirectModel
