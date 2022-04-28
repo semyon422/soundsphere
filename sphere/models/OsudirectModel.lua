@@ -46,7 +46,7 @@ end)
 
 OsudirectModel.getBackgroundUrl = function(self, beatmap)
 	local config = self.configModel.configs.online.osu
-	return socket_url.absolute(config.static, osudirect_urls.thumbnail(beatmap.setId, true))
+	return socket_url.absolute(config.assets, osudirect_urls.cover(beatmap.setId, true))
 end
 
 return OsudirectModel

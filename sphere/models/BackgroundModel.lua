@@ -55,7 +55,7 @@ end
 
 BackgroundModel.loadBackgroundDebounce = function(self, path)
 	self.path = path or self.path
-	aquatimer.debounce(self, "loadDebounce", 0.1, self.loadBackground, self)
+	aquatimer.debounce(self, "loadDebounce", 0.5, self.loadBackground, self)
 end
 
 BackgroundModel.loadBackground = function(self)
@@ -79,15 +79,16 @@ BackgroundModel.loadBackground = function(self)
 	else
 		image = self:loadImage(path)
 	end
+
+	if path ~= self.path then
+		return self:loadBackground()
+	end
+
 	if image then
 		return self:setBackground(image)
 	end
 
 	self:setBackground(self.emptyImage)
-
-	if path ~= self.path then
-		self:loadBackground()
-	end
 end
 
 local loadImage = aquathread.async(function(path)
