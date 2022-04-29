@@ -92,12 +92,18 @@ local extract = aquathread.async(function(archive, path, remove)
 	local aquafs = require("aqua.filesystem")
 	local rcopy = require("aqua.util.rcopy")
 	local mount = path .. "_temp"
-	assert(aquafs.mount(archive, mount, true))
+	local status, err = pcall(aquafs.mount, archive, mount, true)
+	if not status then
+		print(err)
+		love.filesystem.remove(archive)
+		return
+	end
 	rcopy(mount, path)
 	assert(aquafs.unmount(archive))
 	if remove then
 		love.filesystem.remove(archive)
 	end
+	return true
 end)
 
 OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self)
@@ -112,12 +118,18 @@ OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self)
 	local url = socket_url.absolute(config.storage, osudirect_urls.download(setId))
 	local savePath = "userdata/charts/downloads/" .. setId .. ".osz"
 	print(("Downloading: %s"):format(url))
-	download(url, savePath)
+	local downloaded = download(url, savePath)
+	if not downloaded then
+		return
+	end
 	print(("Downloaded: %s"):format(savePath))
 
 	local extractPath = "userdata/charts/downloads/" .. setId
 	print(("Extracting to: %s"):format(extractPath))
-	extract(savePath, extractPath, true)
+	local extracted = extract(savePath, extractPath, true)
+	if not extracted then
+		return
+	end
 	print(("Extracted to: %s"):format(extractPath))
 end)
 
