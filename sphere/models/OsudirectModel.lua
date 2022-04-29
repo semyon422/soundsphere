@@ -2,6 +2,7 @@ local LibraryModel = require("sphere.models.LibraryModel")
 local thread = require("aqua.thread")
 local osudirect_urls = require("sphere.osudirect.urls")
 local osudirect_parse = require("sphere.osudirect.parse")
+local aquathread = require("aqua.thread")
 local socket_url = require("socket.url")
 
 local OsudirectModel = LibraryModel:new()
@@ -63,5 +64,32 @@ OsudirectModel.getPreviewUrl = function(self)
 	local config = self.configModel.configs.online.osu
 	return socket_url.absolute(config.static, osudirect_urls.preview(self.beatmap.setId))
 end
+
+local download = aquathread.async(function(url, savePath)
+	local request = require("luajit-request")
+	local response, code, err = request.send(url)
+	if not response then
+		return
+	end
+
+	require("love.filesystem")
+	return love.filesystem.write(savePath, response.body)
+end)
+
+OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self)
+	local beatmap = self.beatmap
+	if not beatmap then
+		return
+	end
+
+	local config = self.configModel.configs.online.osu
+
+	local setId = beatmap.setId
+	local url = socket_url.absolute(config.storage, osudirect_urls.download(setId))
+	local savePath = "userdata/charts/" .. setId .. ".osz"
+	print(("Downloading: %s"):format(url))
+	download(url, savePath)
+	print(("Downloaded: %s"):format(savePath))
+end)
 
 return OsudirectModel

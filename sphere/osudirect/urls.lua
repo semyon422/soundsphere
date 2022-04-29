@@ -21,8 +21,8 @@ function urls.search(q, r, p)
 	return ("/web/osu-search.php?m=3&q=%s&r=%s&p=%s"):format(escape(q), r or 0, p or 0)
 end
 
-function urls.download(setId, noVideo)
-	return ("/d/%s%s"):format(setId, noVideo and "n" or "")
+function urls.download(setId)
+	return ("/d/%s"):format(setId)
 end
 
 function urls.thumbnail(setId, large)

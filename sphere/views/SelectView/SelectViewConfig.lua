@@ -817,12 +817,12 @@ local BottomRightOsudirectScreenMenu = {
 	class = "ScreenMenuView",
 	subscreen = "osudirect",
 	transform = transform,
-	x = 1300,
+	x = 1300 - 227 * 2,
 	y = 991,
-	w = 227 * 2,
+	w = 227 * 3,
 	h = 89,
 	rows = 1,
-	columns = 2,
+	columns = 3,
 	text = {
 		x = 0,
 		baseline = 54,
@@ -834,6 +834,11 @@ local BottomRightOsudirectScreenMenu = {
 		},
 	},
 	items = {{
+		{
+			method = "downloadBeatmapSet",
+			displayName = "download"
+		},
+		{},
 		{
 			method = "switchToCollections",
 			displayName = "collections"

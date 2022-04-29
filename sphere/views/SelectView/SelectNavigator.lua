@@ -184,6 +184,10 @@ SelectNavigator.scrollNoteChart = function(self, direction, count)
 	})
 end
 
+SelectNavigator.downloadBeatmapSet = function(self)
+	self:send({name = "downloadBeatmapSet"})
+end
+
 SelectNavigator.play = function(self)
 	self:send({name = "playNoteChart"})
 end

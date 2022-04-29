@@ -126,6 +126,8 @@ SelectController.receive = function(self, event)
 		local previewUrl = self.gameController.osudirectModel:getPreviewUrl()
 		self.gameController.backgroundModel:loadBackgroundDebounce(backgroundUrl)
 		self.gameController.previewModel:loadPreviewDebounce(previewUrl)
+	elseif event.name == "downloadBeatmapSet" then
+		self.gameController.osudirectModel:downloadBeatmapSet()
 	elseif event.name == "deleteNoteChart" then
 	elseif event.name == "deleteNoteChartSet" then
 	end
