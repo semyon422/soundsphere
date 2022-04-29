@@ -19,12 +19,12 @@ OnlineModel.load = function(self)
 	authManager.onlineModel = self
 	onlineScoreManager.onlineModel = self
 
-	local config = self.configModel.configs.online
-	webApi.config = config
+	local configs = self.configModel.configs
+	webApi.token = configs.online.token
+	webApi.host = configs.urls.host
 	webApi:load()
 
-	onlineScoreManager.config = config
-	authManager.config = config
+	authManager.config = configs.online
 
 	onlineScoreManager.webApi = webApi
 	authManager.webApi = webApi

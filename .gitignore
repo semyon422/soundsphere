@@ -23,6 +23,7 @@ userdata/online.lua
 userdata/timings.lua
 userdata/judgements.lua
 userdata/files.lua
+userdata/urls.lua
 userdata/avatar.png
 
 userdata/charts.db-journal

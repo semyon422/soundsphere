@@ -82,13 +82,11 @@ WebApi.post = function(url, method, params, buffers)
 end
 
 WebApi.newResource = function(self, url)
-	url = socket_url.absolute(self.config.host, url)
+	url = socket_url.absolute(self.host, url)
 	return setmetatable({__url = url}, self.resource_mt)
 end
 
 WebApi.load = function(self)
-	local config = self.config
-
 	self.resource_mt = {
 		__index = function(t, k)
 			return rawget(t, k) or setmetatable({
@@ -119,7 +117,7 @@ WebApi.load = function(self)
 					return false, code, err
 				end
 				return WebApi.processResponse(select(2, key:gsub("_", "")), response)
-			]]):format(url, key, config.token))(...)
+			]]):format(url, key, self.token))(...)
 			return response, code, headers
 		end
 	}
