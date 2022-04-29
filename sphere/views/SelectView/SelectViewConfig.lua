@@ -569,6 +569,7 @@ local NoteChartSetScrollBar = {
 
 local SearchField = {
 	class = "SearchFieldView",
+	subscreen = "notecharts",
 	transform = transform,
 	x = 733,
 	y = 89,
@@ -594,11 +595,49 @@ local SearchField = {
 	},
 	point = {
 		r = 7
-	}
+	},
+	searchString = "gameController.searchModel.searchString",
+	searchMode = "gameController.searchModel.searchMode",
+	collapse = "gameController.noteChartSetLibraryModel.collapse",
+}
+
+local OsudirectSearchField = {
+	class = "SearchFieldView",
+	subscreen = "osudirect",
+	transform = transform,
+	x = 733,
+	y = 89,
+	w = 454,
+	h = 55,
+	frame = {
+		x = 6,
+		y = 6,
+		w = 454 - 6 * 2,
+		h = 43,
+		lineStyle = "smooth",
+		lineWidth = 1
+	},
+	text = {
+		x = 27,
+		baseline = 35,
+		limit = 454,
+		align = "left",
+		font = {
+			filename = "Noto Sans",
+			size = 20,
+		},
+	},
+	point = {
+		r = 7
+	},
+	searchString = "gameController.osudirectModel.searchString",
+	searchMode = "?",
+	collapse = "?",
 }
 
 local SortStepper = {
 	class = "SortStepperView",
+	subscreen = "notecharts",
 	transform = transform,
 	x = 1014,
 	y = 89,
@@ -1036,6 +1075,7 @@ local SelectViewConfig = {
 	OsudirectScrollBar,
 	require("sphere.views.HeaderViewConfig"),
 	SearchField,
+	OsudirectSearchField,
 	SortStepper,
 	ModifierIconGrid,
 	StageInfoModifierIconGrid,

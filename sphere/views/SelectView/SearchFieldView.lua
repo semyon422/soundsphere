@@ -3,6 +3,7 @@ local Class = require("aqua.util.Class")
 local transform = require("aqua.graphics.transform")
 local baseline_print = require("aqua.graphics.baseline_print")
 local spherefonts		= require("sphere.assets.fonts")
+local inside = require("aqua.util.inside")
 local TextInput = require("aqua.util.TextInput")
 
 local SearchFieldView = Class:new()
@@ -10,7 +11,7 @@ local SearchFieldView = Class:new()
 SearchFieldView.load = function(self)
 	local state = self.state
 	state.textInput = TextInput:new()
-	state.textInput:setText(self.gameController.searchModel.searchString)
+	state.textInput:setText(inside(self, self.config.searchString))
 end
 
 SearchFieldView.receive = function(self, event)
@@ -24,18 +25,16 @@ SearchFieldView.receive = function(self, event)
 end
 
 SearchFieldView.update = function(self)
-	self.state.textInput:setText(self.gameController.searchModel.searchString)
+	self.state.textInput:setText(inside(self, self.config.searchString))
 end
 
 SearchFieldView.draw = function(self)
-	local searchModel = self.gameController.searchModel
-	local noteChartSetLibraryModel = self.gameController.noteChartSetLibraryModel
 	local config = self.config
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
 
-	local searchString = searchModel.searchString
+	local searchString = inside(self, self.config.searchString)
 	if searchString == "" then
 		love.graphics.setColor(1, 1, 1, 0.5)
 		searchString = "Search..."
@@ -67,7 +66,7 @@ SearchFieldView.draw = function(self)
 		config.frame.h / 2
 	)
 
-	if searchModel.searchMode == "lamp" then
+	if inside(self, self.config.searchMode) == "lamp" then
 		love.graphics.circle(
 			"line",
 			config.frame.x + config.frame.w - config.frame.h / 2,
@@ -82,7 +81,7 @@ SearchFieldView.draw = function(self)
 		)
 	end
 
-	if noteChartSetLibraryModel.collapse then
+	if inside(self, self.config.collapse) then
 		love.graphics.circle(
 			"line",
 			config.frame.x + config.frame.w - config.frame.h,

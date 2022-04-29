@@ -3,6 +3,7 @@ local thread = require("aqua.thread")
 local osudirect_urls = require("sphere.osudirect.urls")
 local osudirect_parse = require("sphere.osudirect.parse")
 local aquathread = require("aqua.thread")
+local aquatimer = require("aqua.timer")
 local socket_url = require("socket.url")
 
 local OsudirectModel = LibraryModel:new()
@@ -26,6 +27,7 @@ OsudirectModel.searchString = ""
 
 OsudirectModel.setSearchString = function(self, s)
 	self.searchString = s
+	self:searchDebounce()
 end
 
 local empty = {}
@@ -43,9 +45,14 @@ local asyncRequest = thread.async(function(url)
 	return response.body, response.code
 end)
 
-OsudirectModel.search = thread.coro(function(self)
+OsudirectModel.searchDebounce = function(self)
+	aquatimer.debounce(self, "loadDebounce", 0.1, self.search, self)
+end
+
+OsudirectModel.search = function(self)
+	local searchString = self.searchString
 	local config = self.configModel.configs.online.osu
-	local url = socket_url.absolute(config.web, osudirect_urls.search(self.searchString))
+	local url = socket_url.absolute(config.web, osudirect_urls.search(searchString))
 	local body = asyncRequest(url)
 	if not body then
 		return
@@ -53,7 +60,10 @@ OsudirectModel.search = thread.coro(function(self)
 	local beatmaps, err = osudirect_parse(body)
 	self.beatmapSets = beatmaps
 	self.itemsCount = #beatmaps
-end)
+	if searchString ~= self.searchString then
+		self:search()
+	end
+end
 
 OsudirectModel.getBackgroundUrl = function(self)
 	local config = self.configModel.configs.online.osu

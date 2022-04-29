@@ -207,10 +207,17 @@ SelectNavigator.scrollSortFunction = function(self, delta)
 end
 
 SelectNavigator.setSearchString = function(self, text)
-	self:send({
-		name = "setSearchString",
-		text = text
-	})
+	if self:getSubscreen("notecharts") then
+		self:send({
+			name = "setSearchString",
+			text = text
+		})
+	elseif self:getSubscreen("osudirect") then
+		self:send({
+			name = "setOsudirectSearchString",
+			text = text
+		})
+	end
 end
 
 SelectNavigator.quickLogin = function(self)

@@ -118,7 +118,7 @@ SelectController.receive = function(self, event)
 	elseif event.name == "setInputBinding" then
 		self.gameController.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
 	elseif event.name == "searchOsudirect" then
-		self.gameController.osudirectModel:search()
+		self.gameController.osudirectModel:searchDebounce()
 	elseif event.name == "osudirectBeatmap" then
 		local osudirectModel = self.gameController.osudirectModel
 		osudirectModel:setBeatmap(event.beatmap)
@@ -128,6 +128,8 @@ SelectController.receive = function(self, event)
 		self.gameController.previewModel:loadPreviewDebounce(previewUrl)
 	elseif event.name == "downloadBeatmapSet" then
 		self.gameController.osudirectModel:downloadBeatmapSet()
+	elseif event.name == "setOsudirectSearchString" then
+		self.gameController.osudirectModel:setSearchString(event.text)
 	elseif event.name == "deleteNoteChart" then
 	elseif event.name == "deleteNoteChartSet" then
 	end

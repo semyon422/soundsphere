@@ -18,7 +18,7 @@ local urls = {}
 	Most Played
 ]]
 function urls.search(q, r, p)
-	return ("/web/osu-search.php?m=3&q=%s&r=%s&p=%s"):format(escape(q), r or 0, p or 0)
+	return ("/web/osu-search.php?m=3&q=%s&r=%s&p=%s"):format(escape(q), r or 4, p or 0)
 end
 
 function urls.download(setId)
