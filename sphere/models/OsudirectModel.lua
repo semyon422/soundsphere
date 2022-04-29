@@ -17,10 +17,20 @@ OsudirectModel.load = function(self)
 	end
 end
 
+OsudirectModel.setBeatmap = function(self, beatmap)
+	self.beatmap = beatmap
+end
+
 OsudirectModel.searchString = ""
 
 OsudirectModel.setSearchString = function(self, s)
 	self.searchString = s
+end
+
+local empty = {}
+OsudirectModel.getDifficulties = function(self)
+	local beatmap = self.beatmap
+	return beatmap and beatmap.difficulties or empty
 end
 
 local asyncRequest = thread.async(function(url)
@@ -44,14 +54,14 @@ OsudirectModel.search = thread.coro(function(self)
 	self.itemsCount = #beatmaps
 end)
 
-OsudirectModel.getBackgroundUrl = function(self, beatmap)
+OsudirectModel.getBackgroundUrl = function(self)
 	local config = self.configModel.configs.online.osu
-	return socket_url.absolute(config.assets, osudirect_urls.cover(beatmap.setId, true))
+	return socket_url.absolute(config.assets, osudirect_urls.cover(self.beatmap.setId, true))
 end
 
-OsudirectModel.getPreviewUrl = function(self, beatmap)
+OsudirectModel.getPreviewUrl = function(self)
 	local config = self.configModel.configs.online.osu
-	return socket_url.absolute(config.static, osudirect_urls.preview(beatmap.setId))
+	return socket_url.absolute(config.static, osudirect_urls.preview(self.beatmap.setId))
 end
 
 return OsudirectModel

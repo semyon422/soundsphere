@@ -67,6 +67,11 @@ PreviewModel.loadPreview = function(self)
 	else
 		audio = self:loadAudio(path)
 	end
+
+	if path ~= self.audioPath then
+		return self:loadPreview()
+	end
+
 	if not audio then
 		return
 	end

@@ -12,6 +12,7 @@ local StageInfoView = require(viewspackage .. "SelectView.StageInfoView")
 local ModifierIconGridView = require(viewspackage .. "SelectView.ModifierIconGridView")
 local CollectionListView = require(viewspackage .. "SelectView.CollectionListView")
 local OsudirectListView = require(viewspackage .. "SelectView.OsudirectListView")
+local OsudirectDifficultiesListView = require(viewspackage .. "SelectView.OsudirectDifficultiesListView")
 local CacheView = require(viewspackage .. "SelectView.CacheView")
 local NoteSkinView = require("sphere.views.NoteSkinView")
 local InputView = require("sphere.views.InputView")
@@ -27,6 +28,7 @@ SelectView.views = {
 	{"modifierIconGridView", ModifierIconGridView, "ModifierIconGridView"},
 	{"collectionListView", CollectionListView, "CollectionListView"},
 	{"osudirectListView", OsudirectListView, "OsudirectListView"},
+	{"osudirectDifficultiesListView", OsudirectDifficultiesListView, "OsudirectDifficultiesListView"},
 	{"cacheView", CacheView, "CacheView"},
 }
 

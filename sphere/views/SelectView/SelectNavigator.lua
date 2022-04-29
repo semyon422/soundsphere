@@ -12,6 +12,7 @@ SelectNavigator.load = function(self)
 	self.isNoteSkinsOpen = ffi.new("bool[1]", false)
 	self.isInputOpen = ffi.new("bool[1]", false)
 	self.osudirectItemIndex = 1
+	self.osudirectDifficultyItemIndex = 1
 end
 
 SelectNavigator.receive = function(self, event)
@@ -144,6 +145,19 @@ SelectNavigator.scrollOsudirect = function(self, direction, count)
 		itemIndex = self.osudirectItemIndex,
 		beatmap = items[itemIndex],
 	})
+end
+
+SelectNavigator.scrollOsudirectDifficulty = function(self, direction, count)
+	count = count or 1
+	direction = direction == "up" and -count or count
+	local items = self.gameController.osudirectModel:getDifficulties()
+
+	local itemIndex = math.min(math.max(self.osudirectDifficultyItemIndex + direction, 1), #items)
+	if not items[itemIndex] then
+		return
+	end
+
+	self.osudirectDifficultyItemIndex = itemIndex
 end
 
 SelectNavigator.scrollCollection = function(self, direction, count)

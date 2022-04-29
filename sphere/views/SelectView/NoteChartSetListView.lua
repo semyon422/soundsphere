@@ -1,7 +1,8 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
 local ListView = require(viewspackage .. "ListView")
-local NoteChartSetListItemView = require(viewspackage .. "SelectView.NoteChartSetListItemView")
+local ListItemView = require("sphere.views.ListItemView")
+local NoteChartSetListItemView = ListItemView:new({construct = false})
 
 local NoteChartSetListView = ListView:new({construct = false})
 

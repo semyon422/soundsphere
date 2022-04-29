@@ -1,7 +1,8 @@
 local viewspackage = (...):match("^(.-%.views%.)")
 
 local ListView = require(viewspackage .. "ListView")
-local OsudirectListItemView = require(viewspackage .. "SelectView.OsudirectListItemView")
+local ListItemView = require("sphere.views.ListItemView")
+local OsudirectListItemView = ListItemView:new({construct = false})
 
 local OsudirectListView = ListView:new({construct = false})
 

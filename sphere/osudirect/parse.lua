@@ -29,16 +29,24 @@ local function parseBeatmap(line)
 		beatmap.filesize_novideo = tonumber(l[13])
 	end
 	if 13 < #l then
-		beatmap.difficulties = l[14]:split(",")
-		for i, subline in ipairs(beatmap.difficulties) do
-			local name, sr, bpm, length = subline:match("^(.+) %((.+)★~(.+)♫~.+~.+~.+~.+~(.+)%)@3$")
-			beatmap.difficulties[i] = {
-				name = name,
-				sr = tonumber(sr),
-				bpm = tonumber(bpm),
-				length = length,
-			}
+		local difficulties = l[14]:split(",")
+		beatmap.difficulties = {}
+		for i, subline in ipairs(difficulties) do
+			local name, sr, bpm, cs, length = subline:match("^(.+) %((.+)★~(.+)♫~.+~.+~CS(.+)~.+~(.+)%)@3$")
+			if name then
+				table.insert(beatmap.difficulties, {
+					name = name,
+					sr = tonumber(sr),
+					bpm = tonumber(bpm),
+					cs = tonumber(cs),
+					length = length,
+					beatmap = beatmap,
+				})
+			end
 		end
+		table.sort(beatmap.difficulties, function(a, b)
+			return a.sr < b.sr
+		end)
 	end
 
 	return beatmap

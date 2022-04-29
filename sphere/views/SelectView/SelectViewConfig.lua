@@ -97,6 +97,73 @@ local OsudirectScrollBar = {
 	color = {1, 1, 1, 0.66}
 }
 
+local OsudirectDifficultiesList = {
+	class = "OsudirectDifficultiesListView",
+	subscreen = "osudirect",
+	transform = transform,
+	x = 733,
+	y = 216,
+	w = 454,
+	h = 648,
+	rows = 9,
+	elements = {
+		{
+			type = "text",
+			key = "name",
+			onNew = false,
+			x = 116,
+			baseline = 45,
+			limit = math.huge,
+			align = "left",
+			font = {
+				filename = "Noto Sans",
+				size = 24,
+			},
+		},
+		{
+			type = "text",
+			key = "beatmap.creator",
+			onNew = true,
+			x = 117,
+			baseline = 19,
+			limit = math.huge,
+			align = "left",
+			font = {
+				filename = "Noto Sans",
+				size = 16,
+			},
+		},
+		{
+			type = "text",
+			key = "cs",
+			format = "%skey",
+			onNew = true,
+			x = 17,
+			baseline = 19,
+			limit = 500,
+			align = "left",
+			font = {
+				filename = "Noto Sans",
+				size = 16,
+			},
+		},
+		{
+			type = "text",
+			key = "sr",
+			onNew = false,
+			x = 0,
+			baseline = 45,
+			limit = 72,
+			align = "right",
+			font = {
+				filename = "Noto Sans Mono",
+				size = 24,
+			},
+			format = formatDifficulty
+		},
+	},
+}
+
 local CollectionList = {
 	class = "CollectionListView",
 	subscreen = "collections",
@@ -972,6 +1039,7 @@ local SelectViewConfig = {
 	BottomRightNotechartsScreenMenu,
 	BottomRightCollectionsScreenMenu,
 	BottomRightOsudirectScreenMenu,
+	OsudirectDifficultiesList,
 	NoteChartSubScreenMenu,
 	NoteChartOptionsScreenMenu,
 	LeftScreenMenu,

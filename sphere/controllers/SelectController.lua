@@ -120,9 +120,11 @@ SelectController.receive = function(self, event)
 	elseif event.name == "searchOsudirect" then
 		self.gameController.osudirectModel:search()
 	elseif event.name == "osudirectBeatmap" then
-		local backgroundUrl = self.gameController.osudirectModel:getBackgroundUrl(event.beatmap)
+		local osudirectModel = self.gameController.osudirectModel
+		osudirectModel:setBeatmap(event.beatmap)
+		local backgroundUrl = self.gameController.osudirectModel:getBackgroundUrl()
+		local previewUrl = self.gameController.osudirectModel:getPreviewUrl()
 		self.gameController.backgroundModel:loadBackgroundDebounce(backgroundUrl)
-		local previewUrl = self.gameController.osudirectModel:getPreviewUrl(event.beatmap)
 		self.gameController.previewModel:loadPreviewDebounce(previewUrl)
 	elseif event.name == "deleteNoteChart" then
 	elseif event.name == "deleteNoteChartSet" then
