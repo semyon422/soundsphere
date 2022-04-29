@@ -4,7 +4,6 @@ return {
 			constantVolume = false
 		},
 		mode = {
-			preview = "streamOpenAL",
 			primary = "streamMemoryTempo",
 			secondary = "sample"
 		},

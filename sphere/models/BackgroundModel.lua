@@ -55,7 +55,7 @@ end
 
 BackgroundModel.loadBackgroundDebounce = function(self, path)
 	self.path = path or self.path
-	aquatimer.debounce(self, "loadDebounce", 0.5, self.loadBackground, self)
+	aquatimer.debounce(self, "loadDebounce", 0.1, self.loadBackground, self)
 end
 
 BackgroundModel.loadBackground = function(self)
@@ -135,6 +135,7 @@ local loadHttp = aquathread.async(function(url)
 		return
 	end
 
+	require("love.filesystem")
 	require("love.image")
 	local fileData = love.filesystem.newFileData(response.body, "cover")
 	local status, imageData = pcall(love.image.newImageData, fileData)

@@ -49,4 +49,9 @@ OsudirectModel.getBackgroundUrl = function(self, beatmap)
 	return socket_url.absolute(config.assets, osudirect_urls.cover(beatmap.setId, true))
 end
 
+OsudirectModel.getPreviewUrl = function(self, beatmap)
+	local config = self.configModel.configs.online.osu
+	return socket_url.absolute(config.static, osudirect_urls.preview(beatmap.setId))
+end
+
 return OsudirectModel

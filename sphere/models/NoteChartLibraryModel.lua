@@ -36,7 +36,7 @@ NoteChartItem.getAudioPathPreview = function(self)
 	local audioPath = self.audioPath
 
 	if audioPath and audioPath ~= "" then
-		return directoryPath .. "/" .. audioPath, self.previewTime
+		return directoryPath .. "/" .. audioPath, math.max(0, self.previewTime or 0)
 	end
 
 	return directoryPath .. "/preview.ogg", 0

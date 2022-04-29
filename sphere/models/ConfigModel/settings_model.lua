@@ -403,14 +403,6 @@ local settings = {
 		}
 	},
 	{
-		name = "preview audio mode",
-		section = "audio",
-		key = "audio.mode.preview",
-		type = "stepper",
-		values = {"stream", "streamTempo", "streamOpenAL"},
-		displayValues = {"stream", "tempo", "streamOAL"}
-	},
-	{
 		name = "midi constant volume",
 		section = "audio",
 		key = "audio.midi.constantVolume",
