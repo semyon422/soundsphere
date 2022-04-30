@@ -14,6 +14,10 @@ end
 
 OsudirectListView.reloadItems = function(self)
 	self.state.items = self.gameController.osudirectModel.items
+	if self.navigator.osudirectItemIndex > #self.state.items then
+		self.navigator.osudirectItemIndex = 1
+		self.state.stateCounter = (self.state.stateCounter or 0) + 1
+	end
 end
 
 OsudirectListView.getItemIndex = function(self)

@@ -5,14 +5,15 @@ local Navigator = require(viewspackage .. "Navigator")
 
 local SelectNavigator = Navigator:new({construct = false})
 
+SelectNavigator.osudirectItemIndex = 1
+SelectNavigator.osudirectDifficultyItemIndex = 1
+
 SelectNavigator.load = function(self)
 	Navigator.load(self)
 	self:addSubscreen("score")
 	self:addSubscreen("notecharts")
 	self.isNoteSkinsOpen = ffi.new("bool[1]", false)
 	self.isInputOpen = ffi.new("bool[1]", false)
-	self.osudirectItemIndex = 1
-	self.osudirectDifficultyItemIndex = 1
 end
 
 SelectNavigator.receive = function(self, event)
