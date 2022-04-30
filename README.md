@@ -31,8 +31,8 @@ Open-source rhythm game
 - Input, visual local offsets
 - Customizable prepare/play/pause time
 - Settings for noteskins
-- And much more
 - osu!direct
+- And much more
 
 ## Future plans:
 
