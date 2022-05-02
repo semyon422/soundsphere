@@ -4,11 +4,7 @@ local jit = require("jit")
 local load = ffi.load
 
 local _load = function(name)
-	if jit.os == "Windows" then
-		return load("bin/win64/cimgui.dll")
-	elseif jit.os == "Linux" then
-		return load("cimgui")
-	end
+	return load("cimgui")
 end
 
 local cimgui_preloader = {}

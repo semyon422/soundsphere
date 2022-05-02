@@ -5,7 +5,7 @@ local load = ffi.load
 
 local _load = function(name)
 	if jit.os == "Windows" then
-		return load("bin/win64/libiconv-2.dll")
+		return load("libiconv-2")
 	elseif jit.os == "Linux" then
 		return load("iconv")
 	end
