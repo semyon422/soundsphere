@@ -4,11 +4,11 @@ local imgui = require("cimgui")
 local transform = require("aqua.graphics.transform")
 local ImguiView = require("sphere.views.ImguiView")
 local ImguiHotkey = require("aqua.imgui.Hotkey")
-local Keymap = require("aqua.imgui.Keymap")
 
 local InputView = ImguiView:new()
 
-local keyPtr = ffi.new("int[2]")
+local keyPtr = ffi.new("const char*[1]")
+local devicePtr = ffi.new("const char*[1]")
 
 local tfTable = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 local tfOriginTable = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
@@ -29,9 +29,11 @@ InputView.draw = function(self)
 			for i = 1, #items do
 				local virtualKey = items[i].virtualKey
 				local key, device = self.gameController.inputModel:getKey(inputModeString, virtualKey)
-				Keymap:set(keyPtr, keyPtr + 1, key, device)
-				if ImguiHotkey(virtualKey, keyPtr, keyPtr + 1) then
-					key, device = Keymap:get(keyPtr, keyPtr + 1)
+				keyPtr[0] = key
+				devicePtr[0] = device
+				if ImguiHotkey(virtualKey, keyPtr, devicePtr) then
+					key = ffi.string(keyPtr[0])
+					device = ffi.string(devicePtr[0])
 					self.navigator:setInputBinding(inputModeString, virtualKey, key, device)
 				end
 			end
