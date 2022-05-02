@@ -17,7 +17,6 @@ CircleView.drawCircle = function(self, circle)
 
 	local tf = transform(config.transform)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	love.graphics.setColor(circle.color)
 	love.graphics.setLineWidth(circle.lineWidth)

@@ -9,7 +9,7 @@ ImageNoteView.construct = function(self)
 	self.headView = self:newNotePartView("Head")
 
 	local images = self.startNoteData.images
-	local path = self.graphicalNote.graphicEngine.localAliases[images[1][1]] or self.graphicalNote.graphicEngine.globalAliases[images[1][1]]
+	local path = self.graphicalNote.graphicEngine.aliases[images[1][1]]
 	self.drawable = image.getImage(path)
 end
 
@@ -27,7 +27,6 @@ ImageNoteView.draw = function(self)
 
 	local tf = transform(self.rhythmView.config.transform)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	love.graphics.setColor(self.headView:getColor())
 	love.graphics.draw(drawable, self:getTransformParams())

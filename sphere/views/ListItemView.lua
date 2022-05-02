@@ -14,7 +14,6 @@ ListItemView.draw = function(self)
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	love.graphics.setColor(1, 1, 1, 1)
 
@@ -57,7 +56,8 @@ ListItemView.drawValue = function(self, valueConfig, value)
 	elseif valueConfig.time then
 		value = rtime(tonumber(value) or 0)
 	elseif valueConfig.ago then
-		value = time_ago_in_words(tonumber(value) or 0, valueConfig.parts, valueConfig.suffix)
+		value = tonumber(value) or 0
+		value = value ~= 0 and time_ago_in_words(value, valueConfig.parts, valueConfig.suffix) or "never"
 	end
 
 	local font = spherefonts.get(valueConfig.font)
@@ -78,18 +78,24 @@ ListItemView.drawCircle = function(self, valueConfig, value)
 	local config = self.listView.config
 
 	local y = (self.visualIndex - 1) * config.h / config.rows
-	love.graphics.circle(
-		"line",
-		valueConfig.x,
-		y + valueConfig.y,
-		valueConfig.r
-	)
-	love.graphics.circle(
-		"fill",
-		valueConfig.x,
-		y + valueConfig.y,
-		valueConfig.r
-	)
+
+	local t = valueConfig.mode
+	if not t or t == "line" or t == "both" then
+		love.graphics.circle(
+			"line",
+			valueConfig.x,
+			y + valueConfig.y,
+			valueConfig.r
+		)
+	end
+	if not t or t == "fill" or t == "both" then
+		love.graphics.circle(
+			"fill",
+			valueConfig.x,
+			y + valueConfig.y,
+			valueConfig.r
+		)
+	end
 end
 
 ListItemView.receive = function(self, event)
@@ -100,7 +106,6 @@ ListItemView.receive = function(self, event)
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	local mx, my = tf:inverseTransformPoint(event[1], event[2])
-	tf:release()
 
 	if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then
 		listView.activeItem = self.itemIndex

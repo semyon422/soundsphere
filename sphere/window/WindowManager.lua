@@ -54,6 +54,8 @@ WindowManager.receive = function(self, event)
 		self.fullscreen = not self.fullscreen
 		mode.flags.fullscreen = self.fullscreen
 		self:setFullscreen(self.fullscreen, mode.flags.fullscreentype)
+	elseif event.name == "mousemoved" then
+		self:setCursor()
 	end
 end
 

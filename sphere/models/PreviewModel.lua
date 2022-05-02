@@ -1,12 +1,8 @@
 local Class = require("aqua.util.Class")
-local AudioFactory	= require("aqua.audio.AudioFactory")
-local tween				= require("tween")
+local aquatimer = require("aqua.timer")
+local aquathread = require("aqua.thread")
 
 local PreviewModel = Class:new()
-
-PreviewModel.construct = function(self)
-	self.loadable = 0
-end
 
 PreviewModel.load = function(self)
 	self.config = self.configModel.configs.select
@@ -20,60 +16,43 @@ PreviewModel.unload = function(self)
 end
 
 PreviewModel.update = function(self, dt)
-	if self.loadTween then
-		self.loadTween:update(dt)
-	end
-
-	if self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
-		self.noteChartDataEntryId = self.config.noteChartDataEntryId
-		local audioPath, previewTime = self:getAudioPathPreview()
+	local noteChartItem = self.selectModel.noteChartItem
+	if noteChartItem and self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
+		local audioPath, previewTime = noteChartItem:getAudioPathPreview()
+		if audioPath then
+			self.noteChartDataEntryId = self.config.noteChartDataEntryId
+		end
 		if audioPath and self.audioPath ~= audioPath then
 			self.audioPath = audioPath
 			self.previewTime = previewTime
-			self.loadable = 0
-			self.loadTween = tween.new(0.1, self, {loadable = 1}, "inOutQuad")
+			self:loadPreviewDebounce()
 		end
 	end
 
-	if self.loadable == 1 then
-		self:play(self.audioPath, self.previewTime)
-		self.loadable = 0
-	end
-
-	if not self.audio then return end
-
-	if not self.audio:isPlaying() then
-		self.audio:setPosition(self.position)
+	if self.audio and not self.audio:isPlaying() then
+		self.audio:seek(self.position or 0)
 		self.audio:play()
 	end
 end
 
-PreviewModel.getAudioPathPreview = function(self)
-	local config = self.config
-
-	local noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(config.noteChartSetEntryId)
-	local noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntryById(config.noteChartDataEntryId)
-
-	if not noteChartSetEntry or not noteChartDataEntry then
-		return
-	end
-
-	local directoryPath = noteChartSetEntry.path
-	local audioPath = noteChartDataEntry.audioPath
-
-	if audioPath and audioPath ~= "" then
-		return directoryPath .. "/" .. audioPath, noteChartDataEntry.previewTime
-	end
-
-	return directoryPath .. "/preview.ogg", 0
+PreviewModel.loadPreviewDebounce = function(self, audioPath, previewTime)
+	self.audioPath = audioPath or self.audioPath
+	self.previewTime = previewTime or self.previewTime
+	aquatimer.debounce(self, "loadDebounce", 0.1, self.loadPreview, self)
 end
 
-PreviewModel.play = function(self, path, position)
-	local info = love.filesystem.getInfo(path)
-	if not info then
-		self:stop()
-		return
+PreviewModel.loadPreview = function(self)
+	local path = self.audioPath
+	local position = self.previewTime
+
+	if not path:find("^http") then
+		local info = love.filesystem.getInfo(path)
+		if not info then
+			self:stop()
+			return
+		end
 	end
+
 	if self.audio then
 		if self.path ~= path then
 			self:stop()
@@ -82,27 +61,81 @@ PreviewModel.play = function(self, path, position)
 		end
 	end
 
-	local config = self.configModel.configs.settings
-	local audio = AudioFactory:getAudio(path, config.audio.mode.preview)
+	local audio
+	if path:find("^http") then
+		audio = self:loadAudio(path, "http")
+	else
+		audio = self:loadAudio(path)
+	end
+
+	if path ~= self.audioPath then
+		return self:loadPreview()
+	end
 
 	if not audio then
 		return
 	end
 
+	self.audio = audio
 	self.path = path
 	self.position = position
-	self.audio = audio
-	self.audio:setPosition(position)
-	self.audio:setVolume(config.audio.volume.master * config.audio.volume.music)
-	self.audio:play()
+
+	local volume = self.configModel.configs.settings.audio.volume
+	audio:seek(position or 0)
+	audio:setVolume(volume.master * volume.music)
+	audio:play()
 end
 
 PreviewModel.stop = function(self)
-	if self.audio then
-		self.audio:stop()
-		self.audio:free()
+	if not self.audio then
+		return
 	end
+	self.audio:stop()
+	self.audio:release()
 	self.audio = nil
+end
+
+local loadHttp = aquathread.async(function(url)
+	local request = require("luajit-request")
+	local response, code, err = request.send(url)
+	if not response then
+		return
+	end
+
+	require("love.filesystem")
+	require("love.audio")
+	require("love.sound")
+	local fileData = love.filesystem.newFileData(response.body, url:match("^.+/(.-)$"))
+	local status, source = pcall(love.audio.newSource, fileData, "static")
+	if status then
+		return source
+	end
+end)
+
+local loadAudio = aquathread.async(function(path)
+	require("love.filesystem")
+	require("love.audio")
+	require("love.sound")
+
+	local info = love.filesystem.getInfo(path)
+	if not info then
+		return
+	end
+
+	local status, source = pcall(love.audio.newSource, path, "stream")
+	if status then
+		return source
+	end
+end)
+
+PreviewModel.loadAudio = function(self, path, type)
+	local source
+	if type == "http" then
+		source = loadHttp(path)
+	else
+		source = loadAudio(path)
+	end
+	return source
 end
 
 return PreviewModel

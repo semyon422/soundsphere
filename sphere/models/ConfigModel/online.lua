@@ -1,6 +1,4 @@
 return {
-	host = "",
-	update = "",
 	session = {},
 	token = "",
 	userId = 1,

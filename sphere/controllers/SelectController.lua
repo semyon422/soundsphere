@@ -81,7 +81,7 @@ SelectController.receive = function(self, event)
 	elseif event.name == "changeCollapse" then
 		self.gameController.selectModel:changeCollapse()
 	elseif event.name == "pullNoteChartSet" then
-		self.gameController.selectModel:pullNoteChartSet()
+		self.gameController.selectModel:debouncePullNoteChartSet()
 	elseif event.name == "playNoteChart" then
 		self:playNoteChart()
 	elseif event.name == "loadModifiedNoteChart" then
@@ -90,11 +90,13 @@ SelectController.receive = function(self, event)
 		self:unloadModifiedNoteChart()
 	elseif event.name == "resetModifiedNoteChart" then
 		self:resetModifiedNoteChart()
+	elseif event.name == "setNoteSkin" then
+		self.gameController.noteSkinModel:setDefaultNoteSkin(event.noteSkin)
 	elseif event.name == "quickLogin" then
 		self.gameController.onlineModel.authManager:quickLogin()
 	elseif event.name == "openDirectory" then
 		local selectModel = self.gameController.selectModel
-		local path = selectModel.noteChartItem.noteChartEntry.path:match("^(.+)/.-$")
+		local path = selectModel.noteChartItem.path:match("^(.+)/.-$")
 		local mountPath = self.gameController.mountModel:getRealPath(path)
 		local realPath =
 			mountPath or
@@ -102,7 +104,7 @@ SelectController.receive = function(self, event)
 		love.system.openURL("file://" .. realPath)
 	elseif event.name == "updateCache" then
 		local selectModel = self.gameController.selectModel
-		local path = selectModel.noteChartItem.noteChartEntry.path:match("^(.+)/.-$")
+		local path = selectModel.noteChartItem.path:match("^(.+)/.-$")
 		self.gameController.cacheModel:startUpdate(path, event.force)
 	elseif event.name == "updateCacheCollection" then
 		local state = self.gameController.cacheModel.cacheUpdater.state
@@ -111,6 +113,23 @@ SelectController.receive = function(self, event)
 		else
 			self.gameController.cacheModel:stopUpdate()
 		end
+	elseif event.name == "calculateTopScores" then
+		self.gameController.scoreModel:asyncCalculateTopScores()
+	elseif event.name == "setInputBinding" then
+		self.gameController.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
+	elseif event.name == "searchOsudirect" then
+		self.gameController.osudirectModel:searchDebounce()
+	elseif event.name == "osudirectBeatmap" then
+		local osudirectModel = self.gameController.osudirectModel
+		osudirectModel:setBeatmap(event.beatmap)
+		local backgroundUrl = self.gameController.osudirectModel:getBackgroundUrl()
+		local previewUrl = self.gameController.osudirectModel:getPreviewUrl()
+		self.gameController.backgroundModel:loadBackgroundDebounce(backgroundUrl)
+		self.gameController.previewModel:loadPreviewDebounce(previewUrl)
+	elseif event.name == "downloadBeatmapSet" then
+		self.gameController.osudirectModel:downloadBeatmapSet()
+	elseif event.name == "setOsudirectSearchString" then
+		self.gameController.osudirectModel:setSearchString(event.text)
 	elseif event.name == "deleteNoteChart" then
 	elseif event.name == "deleteNoteChartSet" then
 	end
@@ -191,10 +210,9 @@ SelectController.switchSettingsController = function(self)
 end
 
 SelectController.switchResultController = function(self)
-	local ResultController = require("sphere.controllers.ResultController")
-	local resultController = ResultController:new()
-	resultController.selectController = self
-	resultController.gameController = self.gameController
+	if not self.gameController.noteChartModel:getFileInfo() then
+		return
+	end
 
 	local selectModel = self.gameController.selectModel
 	local scoreItemIndex = selectModel.scoreItemIndex
@@ -202,7 +220,12 @@ SelectController.switchResultController = function(self)
 	if not scoreItem then
 		return
 	end
-	resultController:replayNoteChart("result", scoreItem.scoreEntry, scoreItemIndex)
+
+	local ResultController = require("sphere.controllers.ResultController")
+	local resultController = ResultController:new()
+	resultController.selectController = self
+	resultController.gameController = self.gameController
+	resultController:replayNoteChart("result", scoreItem, scoreItemIndex)
 
 	return self.gameController.screenManager:set(resultController)
 end

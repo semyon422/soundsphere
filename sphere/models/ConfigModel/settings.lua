@@ -4,7 +4,6 @@ return {
 			constantVolume = false
 		},
 		mode = {
-			preview = "streamOpenAL",
 			primary = "streamMemoryTempo",
 			secondary = "sample"
 		},
@@ -27,7 +26,6 @@ return {
 		},
 		pauseOnFail = false,
 		ratingHitTimingWindow = 0.032,
-		replayType = "NanoChart",
 		speed = 1,
 		time = {
 			pausePlay = 0.5,
@@ -110,6 +108,7 @@ return {
 		}
 	},
 	miscellaneous = {
-		autoUpdate = true
+		autoUpdate = true,
+		imguiShowDemoWindow = false
 	}
 }

@@ -1,26 +1,29 @@
 local Class = require("aqua.util.Class")
 local NoteChartFactory			= require("notechart.NoteChartFactory")
+local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 
 local NoteChartModel = Class:new()
 
 NoteChartModel.load = function(self)
 	local config = self.configModel.configs.select
 
-	local cacheManager = self.cacheModel.cacheManager
-
-	self.noteChartSetEntry = cacheManager:getNoteChartSetEntryById(config.noteChartSetEntryId)
+	self.noteChartSetEntry = CacheDatabase:selectNoteChartSetEntryById(config.noteChartSetEntryId)
 	if not self.noteChartSetEntry then
+		self.noteChartEntry = nil
+		self.noteChartDataEntry = nil
+		self.scoreEntry = nil
 		return
 	end
 
-	self.noteChartEntry = cacheManager:getNoteChartEntryById(config.noteChartEntryId)
+	self.noteChartEntry = CacheDatabase:selectNoteChartEntryById(config.noteChartEntryId)
 	if not self.noteChartEntry then
+		self.noteChartDataEntry = nil
+		self.scoreEntry = nil
 		return
 	end
 
-	self.noteChartDataEntry = cacheManager:getNoteChartDataEntryById(config.noteChartDataEntryId)
-		or cacheManager:getEmptyNoteChartDataEntry(self.noteChartEntry.path)
-	self.scoreEntry = self.scoreModel.scoreManager:getScoreEntryById(config.scoreEntryId)
+	self.noteChartDataEntry = CacheDatabase:selectNoteChartDataEntryById(config.noteChartDataEntryId)
+	self.scoreEntry = self.scoreModel:getScoreEntryById(config.scoreEntryId)
 end
 
 NoteChartModel.getFileInfo = function(self)

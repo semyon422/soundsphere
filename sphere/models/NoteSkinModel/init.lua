@@ -1,16 +1,12 @@
 local Class			= require("aqua.util.Class")
 local ncdk			= require("ncdk")
-local NoteSkin		= require("sphere.models.NoteSkinModel.NoteSkin")
 local OsuNoteSkin		= require("sphere.models.NoteSkinModel.OsuNoteSkin")
-local TomlNoteSkin = require("sphere.models.NoteSkinModel.TomlNoteSkin")
 local BaseNoteSkin = require("sphere.models.NoteSkinModel.BaseNoteSkin")
 
 local NoteSkinModel = Class:new()
 
 NoteSkinModel.construct = function(self)
-	self.emptyNoteSkin = NoteSkin:new()
 	self.items = {}
-	self.baseNoteSkins = {}
 end
 
 NoteSkinModel.path = "userdata/skins"
@@ -67,9 +63,7 @@ end
 
 NoteSkinModel.loadNoteSkin = function(self, path, directoryPath, itemName)
 	local noteSkin
-	if path:find("^.+%.toml$") then
-		noteSkin = self:loadToml(path, directoryPath, itemName)
-	elseif path:find("^.+%.lua$") then
+	if path:find("^.+%.lua$") then
 		noteSkin = self:loadLua(path, directoryPath, itemName)
 	elseif path:find("^.+%.ini$") then
 		return self:addNoteSkins(self:loadOsu(path, directoryPath, itemName))
@@ -80,21 +74,6 @@ end
 NoteSkinModel.loadLua = function(self, path, directoryPath, fileName)
 	local noteSkin = assert(love.filesystem.load(path))(path)
 
-	noteSkin.path = path
-	noteSkin.directoryPath = directoryPath
-	noteSkin.fileName = fileName
-	noteSkin.inputMode = ncdk.InputMode:new():setString(noteSkin.inputMode)
-	if type(noteSkin.playField) == "string" then
-		noteSkin.playField = love.filesystem.load(directoryPath .. "/" .. noteSkin.playField)()
-	end
-
-	return noteSkin
-end
-
-NoteSkinModel.loadToml = function(self, path, directoryPath, fileName)
-	local noteSkin = TomlNoteSkin:new()
-
-	noteSkin:load(love.filesystem.read(path))
 	noteSkin.path = path
 	noteSkin.directoryPath = directoryPath
 	noteSkin.fileName = fileName
@@ -135,15 +114,10 @@ NoteSkinModel.loadOsu = function(self, path, directoryPath, fileName)
 end
 
 NoteSkinModel.getBaseNoteSkin = function(self, inputMode, stringInputMode)
-	local baseNoteSkins = self.baseNoteSkins
-	if baseNoteSkins[stringInputMode] then
-		return baseNoteSkins[stringInputMode]
-	end
 	local noteSkin = BaseNoteSkin:new()
 	noteSkin.directoryPath = "resources"
 	noteSkin:setInputMode(inputMode, stringInputMode)
 	noteSkin:load()
-	baseNoteSkins[stringInputMode] = noteSkin
 	return noteSkin
 end
 
@@ -197,7 +171,7 @@ NoteSkinModel.getNoteSkin = function(self, inputMode)
 		self:setDefaultNoteSkin(list[1])
 	end
 
-	return list[1] or self.emptyNoteSkin
+	return list[1]
 end
 
 return NoteSkinModel

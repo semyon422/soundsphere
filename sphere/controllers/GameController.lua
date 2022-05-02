@@ -1,6 +1,5 @@
 local aquaevent					= require("aqua.event")
 local Class						= require("aqua.util.Class")
-local ThreadPool				= require("aqua.thread.ThreadPool")
 local ConfigModel				= require("sphere.models.ConfigModel")
 local ScoreModel				= require("sphere.models.ScoreModel")
 local DiscordModel				= require("sphere.models.DiscordModel")
@@ -36,6 +35,7 @@ local SelectModel		= require("sphere.models.SelectModel")
 local PreviewModel		= require("sphere.models.PreviewModel")
 local UpdateModel		= require("sphere.models.UpdateModel")
 local RhythmModel		= require("sphere.models.RhythmModel")
+local OsudirectModel		= require("sphere.models.OsudirectModel")
 local MainLog					= require("sphere.MainLog")
 local FrameTimeView					= require("sphere.views.FrameTimeView")
 
@@ -75,6 +75,7 @@ GameController.construct = function(self)
 	self.fpsLimiter = FpsLimiter:new()
 	self.rhythmModel = RhythmModel:new()
 	self.discordModel = DiscordModel:new()
+	self.osudirectModel = OsudirectModel:new()
 	self.frameTimeView = FrameTimeView:new()
 end
 
@@ -110,6 +111,7 @@ GameController.load = function(self)
 	local sortModel = self.sortModel
 	local previewModel = self.previewModel
 	local discordModel = self.discordModel
+	local osudirectModel = self.osudirectModel
 
 	onlineController.onlineModel = onlineModel
 	onlineController.cacheModel = cacheModel
@@ -130,20 +132,26 @@ GameController.load = function(self)
 	noteChartSetLibraryModel.cacheModel = cacheModel
 	noteChartSetLibraryModel.collectionModel = collectionModel
 	noteChartSetLibraryModel.searchModel = searchModel
+	noteChartSetLibraryModel.selectModel = selectModel
+	noteChartSetLibraryModel.sortModel = sortModel
 	noteChartLibraryModel.cacheModel = cacheModel
 	noteChartLibraryModel.searchModel = searchModel
+	noteChartLibraryModel.selectModel = selectModel
 	scoreLibraryModel.scoreModel = scoreModel
+	selectModel.cacheModel = cacheModel
 	selectModel.collectionModel = collectionModel
 	selectModel.configModel = configModel
 	selectModel.searchModel = searchModel
 	selectModel.noteChartSetLibraryModel = noteChartSetLibraryModel
 	selectModel.noteChartLibraryModel = noteChartLibraryModel
+	selectModel.osudirectModel = osudirectModel
 	selectModel.sortModel = sortModel
 	selectModel.scoreLibraryModel = scoreLibraryModel
 	selectModel.collectionModel = collectionModel
 	previewModel.configModel = configModel
-	previewModel.cacheModel = cacheModel
+	previewModel.selectModel = selectModel
 	searchModel.scoreModel = scoreModel
+	searchModel.configModel = configModel
 	settingsModel.configModel = configModel
 	themeModel.configModel = configModel
 	mountModel.configModel = configModel
@@ -154,10 +162,11 @@ GameController.load = function(self)
 	fpsLimiter.configModel = configModel
 	onlineModel.configModel = configModel
 	backgroundModel.configModel = configModel
-	backgroundModel.cacheModel = cacheModel
+	backgroundModel.selectModel = selectModel
 	collectionModel.configModel = configModel
 	collectionModel.cacheModel = cacheModel
 	scoreModel.configModel = configModel
+	osudirectModel.configModel = configModel
 
 	directoryManager:createDirectories()
 
@@ -170,6 +179,7 @@ GameController.load = function(self)
 	configModel:addConfig("input", "userdata/input.lua", "sphere/models/ConfigModel/input.lua", "lua")
 	configModel:addConfig("mount", "userdata/mount.lua", "sphere/models/ConfigModel/mount.lua", "lua")
 	configModel:addConfig("online", "userdata/online.lua", "sphere/models/ConfigModel/online.lua", "lua")
+	configModel:addConfig("urls", "userdata/urls.lua", "sphere/models/ConfigModel/urls.lua", "lua")
 	configModel:addConfig("timings", "userdata/timings.lua", "sphere/models/ConfigModel/timings.lua", "lua")
 	configModel:addConfig("judgements", "userdata/judgements.lua", "sphere/models/ConfigModel/judgements.lua", "lua")
 	configModel:addConfig("hp", "userdata/hp.lua", "sphere/models/ConfigModel/hp.lua", "lua")
@@ -182,6 +192,7 @@ GameController.load = function(self)
 	configModel:readConfig("input")
 	configModel:readConfig("mount")
 	configModel:readConfig("online")
+	configModel:readConfig("urls")
 	configModel:readConfig("timings")
 	configModel:readConfig("judgements")
 	configModel:readConfig("hp")
@@ -198,12 +209,15 @@ GameController.load = function(self)
 	mountModel:load()
 	updateModel:load()
 	windowManager:load()
-	scoreModel:select()
+	scoreModel:load()
 	onlineModel:load()
 	inputModel:load()
 	noteSkinModel:load()
 	cacheModel:load()
 	noteChartModel:load()
+	noteChartSetLibraryModel:load()
+	noteChartLibraryModel:load()
+	osudirectModel:load()
 	onlineController:load()
 	discordModel:load()
 	backgroundModel:load()
@@ -250,8 +264,6 @@ end
 GameController.update = function(self, dt)
 	local startTime = love.timer.getTime()
 
-	ThreadPool:update()
-
 	self.discordModel:update()
 	self.notificationModel:update()
 	self.backgroundModel:update(dt)
@@ -259,6 +271,10 @@ GameController.update = function(self, dt)
 	self.onlineController:update()
 	self.fpsLimiter:update()
 	self.windowManager:update()
+
+	self.cacheModel:update()
+	-- self.noteChartSetLibraryModel:update()
+	-- self.noteChartLibraryModel:update()
 
 	self.frameTimeView.updateFrameTime = love.timer.getTime() - startTime
 end

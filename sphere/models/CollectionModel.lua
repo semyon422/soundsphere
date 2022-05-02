@@ -1,4 +1,5 @@
 local Class = require("aqua.util.Class")
+local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 
 local CollectionModel = Class:new()
 
@@ -10,7 +11,7 @@ CollectionModel.load = function(self)
 	local basePath = self.basePath
 
 	local dict = {}
-	for _, chartSetData in ipairs(self.cacheModel.cacheManager:getNoteChartSets()) do
+	for _, chartSetData in ipairs(CacheDatabase:selectNoteChartSets(self.basePath)) do
 		local parent = chartSetData.path:match("^(.+)/.-$")
 		dict[parent] = (dict[parent] or 0) + 1
 	end

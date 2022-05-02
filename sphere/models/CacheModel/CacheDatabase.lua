@@ -1,425 +1,372 @@
-local sqlite			= require("ljsqlite3")
+local TimedCache = require("aqua.util.TimedCache")
+local aquathread = require("aqua.thread")
+local Orm = require("sphere.Orm")
+local ObjectQuery = require("sphere.ObjectQuery")
+local ffi = require("ffi")
+local byte = require("byte")
 
 local CacheDatabase = {}
 
 CacheDatabase.dbpath = "userdata/charts.db"
-CacheDatabase.chartspath = "userdata/charts"
-
-----------------------------------------------------------------
-
-CacheDatabase.noteChartDatasColumns = {
-	"id",
-	"hash",
-	"index",
-	"format",
-	"title",
-	"artist",
-	"source",
-	"tags",
-	"name",
-	"creator",
-	"level",
-	"audioPath",
-	"stagePath",
-	"previewTime",
-	"inputMode",
-	"noteCount",
-	"length",
-	"bpm",
-	"difficulty",
-	"longNoteRatio",
-	"localOffset",
-}
-
-CacheDatabase.noteChartsColumns = {
-	"id",
-	"path",
-	"hash",
-	"setId",
-	"lastModified"
-}
-
-CacheDatabase.noteChartSetsColumns = {
-	"id",
-	"path",
-	"lastModified"
-}
-
-----------------------------------------------------------------
-
-CacheDatabase.noteChartDatasNumberColumns = {
-	"id",
-	"index",
-	"level",
-	"previewTime",
-	"noteCount",
-	"length",
-	"bpm",
-	"difficulty",
-	"longNoteRatio",
-	"localOffset",
-}
-
-CacheDatabase.noteChartsNumberColumns = {
-	"id",
-	"setId",
-	"lastModified"
-}
-
-CacheDatabase.noteChartSetsNumberColumns = {
-	"id",
-	"lastModified"
-}
-
-----------------------------------------------------------------
-
-local createTableRequest = [[
-	CREATE TABLE IF NOT EXISTS `noteCharts` (
-		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		`path` TEXT NOT NULL UNIQUE,
-		`hash` TEXT,
-		`setId` INTEGER,
-		`lastModified` INTEGER
-	);
-	CREATE TABLE IF NOT EXISTS `noteChartSets` (
-		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		`path` TEXT NOT NULL UNIQUE,
-		`lastModified` INTEGER
-	);
-	CREATE TABLE IF NOT EXISTS `noteChartDatas` (
-		`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		`hash` TEXT NOT NULL,
-		`index` REAL NOT NULL,
-		`format` TEXT,
-		`title` TEXT,
-		`artist` TEXT,
-		`source` TEXT,
-		`tags` TEXT,
-		`name` TEXT,
-		`creator` TEXT,
-		`level` REAL,
-		`audioPath` TEXT,
-		`stagePath` TEXT,
-		`previewTime` REAL,
-		`inputMode` TEXT,
-		`noteCount` REAL,
-		`length` REAL,
-		`bpm` REAL,
-		`difficulty` REAL,
-		`longNoteRatio` REAL,
-		`localOffset` REAL,
-		UNIQUE(`hash`, `index`)
-	);
-]]
-
-----------------------------------------------------------------
-
-local insertNoteChartRequest = [[
-	INSERT OR IGNORE INTO `noteCharts` (
-		`path`, `hash`, `setId`, `lastModified`
-	)
-	VALUES (?, ?, ?, ?);
-]]
-
-local updateNoteChartRequest = [[
-	UPDATE `noteCharts` SET
-		`hash` = ?,
-		`setId` = ?,
-		`lastModified` = ?
-	WHERE `path` = ?;
-]]
-
-local selectNoteChartRequest = [[
-	SELECT * FROM `noteCharts` WHERE `path` = ?
-]]
-
-local selectAllNoteChartsRequest = [[
-	SELECT * FROM `noteCharts`;
-]]
-
-local deleteNoteChartRequest = [[
-	DELETE FROM `noteCharts` WHERE `path` = ?
-]]
-
-----------------------------------------------------------------
-
-local insertNoteChartSetRequest = [[
-	INSERT OR IGNORE INTO `noteChartSets` (
-		`path`, `lastModified`
-	)
-	VALUES (?, ?);
-]]
-
-local updateNoteChartSetRequest = [[
-	UPDATE `noteChartSets` SET
-		`lastModified` = ?
-	WHERE `path` = ?;
-]]
-
-local selectNoteChartSetRequest = [[
-	SELECT * FROM `noteChartSets` WHERE `path` = ?
-]]
-
-local selectAllNoteChartSetsRequest = [[
-	SELECT * FROM `noteChartSets`;
-]]
-
-local deleteNoteChartSetRequest = [[
-	DELETE FROM `noteChartSets` WHERE `path` = ?
-]]
-
-----------------------------------------------------------------
-
-local insertNoteChartDataRequest = [[
-	INSERT OR IGNORE INTO `noteChartDatas` (
-		`hash`,
-		`index`,
-		`format`,
-		`title`,
-		`artist`,
-		`source`,
-		`tags`,
-		`name`,
-		`creator`,
-		`level`,
-		`audioPath`,
-		`stagePath`,
-		`previewTime`,
-		`inputMode`,
-		`noteCount`,
-		`length`,
-		`bpm`,
-		`difficulty`,
-		`longNoteRatio`,
-		`localOffset`
-	)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-]]
-
-local updateNoteChartDataRequest = [[
-	UPDATE `noteChartDatas` SET
-		`format` = ?,
-		`title` = ?,
-		`artist` = ?,
-		`source` = ?,
-		`tags` = ?,
-		`name` = ?,
-		`creator` = ?,
-		`level` = ?,
-		`audioPath` = ?,
-		`stagePath` = ?,
-		`previewTime` = ?,
-		`inputMode` = ?,
-		`noteCount` = ?,
-		`length` = ?,
-		`bpm` = ?,
-		`difficulty` = ?,
-		`longNoteRatio` = ?,
-		`localOffset` = ?
-	WHERE `hash` = ? AND `index` = ?;
-]]
-
-local selectNoteChartDataRequest = [[
-	SELECT * FROM `noteChartDatas` WHERE `hash` = ? AND `index` = ?;
-]]
-
-local selectAllNoteChartDatasRequest = [[
-	SELECT * FROM `noteChartDatas`;
-]]
-
-----------------------------------------------------------------
 
 CacheDatabase.load = function(self)
-	self.db = sqlite.open(self.dbpath)
+	if self.loaded then
+		return
+	end
+	self.db = Orm:new()
 	local db = self.db
-
-	db:exec(createTableRequest)
-
-	self.insertNoteChartStatement = db:prepare(insertNoteChartRequest)
-	self.updateNoteChartStatement = db:prepare(updateNoteChartRequest)
-	self.selectNoteChartStatement = db:prepare(selectNoteChartRequest)
-	self.deleteNoteChartStatement = db:prepare(deleteNoteChartRequest)
-	self.selectAllNoteChartsStatement = db:prepare(selectAllNoteChartsRequest)
-
-	self.insertNoteChartSetStatement = db:prepare(insertNoteChartSetRequest)
-	self.updateNoteChartSetStatement = db:prepare(updateNoteChartSetRequest)
-	self.selectNoteChartSetStatement = db:prepare(selectNoteChartSetRequest)
-	self.deleteNoteChartSetStatement = db:prepare(deleteNoteChartSetRequest)
-	self.selectAllNoteChartSetsStatement = db:prepare(selectAllNoteChartSetsRequest)
-
-	self.insertNoteChartDataStatement = db:prepare(insertNoteChartDataRequest)
-	self.updateNoteChartDataStatement = db:prepare(updateNoteChartDataRequest)
-	self.selectNoteChartDataStatement = db:prepare(selectNoteChartDataRequest)
-	self.selectAllNoteChartDatasStatement = db:prepare(selectAllNoteChartDatasRequest)
-
+	db:open(self.dbpath)
+	db:exec(love.filesystem.read("sphere/models/CacheModel/database.sql"))
+	self:attachScores()
 	self.loaded = true
+
+	self.noteChartSetItemsCount = 0
+	self.noteChartSetItems = {}
+	self.entryKeyToGlobalOffset = {}
+	self.noteChartSetIdToOffset = {}
+	self.noteChartItemsCount = 0
+	self.noteChartItems = {}
+	self.noteChartSlices = {}
+	self.entryKeyToLocalOffset = {}
+
+	local entryCaches = {}
+	for _, t in ipairs({"noteChartSets", "noteCharts", "noteChartDatas"}) do
+		entryCaches[t] = TimedCache:new()
+		entryCaches[t].timeout = 1
+		entryCaches[t].loadObject = function(_, id)
+			return self.db:select(t, "id = ?", id)[1]
+		end
+	end
+	self.entryCaches = entryCaches
+
+	self.queryParams = {}
 end
 
 CacheDatabase.unload = function(self)
+	if not self.loaded then
+		return
+	end
 	self.loaded = false
+	self:detachScores()
 	return self.db:close()
 end
 
 CacheDatabase.begin = function(self)
-	return self.db:exec("BEGIN;")
+	return self.db:begin()
 end
 
 CacheDatabase.commit = function(self)
-	return self.db:exec("COMMIT;")
+	return self.db:commit()
+end
+
+CacheDatabase.attachScores = function(self)
+	self.db:exec("ATTACH 'userdata/scores.db' AS scores_db")
+end
+
+CacheDatabase.detachScores = function(self)
+	self.db:exec("DETACH scores_db")
+end
+
+----------------------------------------------------------------
+
+CacheDatabase.getCachedEntry = function(self, t, id)
+	return self.entryCaches[t]:getObject(id)
+end
+
+CacheDatabase.update = function(self)
+	for _, entryCache in pairs(self.entryCaches) do
+		entryCache:update()
+	end
 end
 
 ----------------------------------------------------------------
 
 CacheDatabase.insertNoteChartEntry = function(self, entry)
-	return self.insertNoteChartStatement:reset():bind(
-		entry.path,
-		entry.hash,
-		entry.setId,
-		entry.lastModified
-	):step()
+	return self.db:insert("noteCharts", entry, true)
 end
 
 CacheDatabase.updateNoteChartEntry = function(self, entry)
-	return self.updateNoteChartStatement:reset():bind(
-		entry.hash,
-		entry.setId,
-		entry.lastModified,
-		entry.path
-	):step()
+	return self.db:update("noteCharts", entry, "path = ?", entry.path)
 end
 
 CacheDatabase.selectNoteChartEntry = function(self, path)
-	local entry = self.selectNoteChartStatement:reset():bind(path):step()
-	return self:transformNoteChartEntry(entry)
+	return self.db:select("noteCharts", "path = ?", path)[1]
+end
+
+CacheDatabase.selectNoteChartEntryById = function(self, id)
+	return self.db:select("noteCharts", "id = ?", id)[1]
 end
 
 CacheDatabase.deleteNoteChartEntry = function(self, path)
-	return self.deleteNoteChartStatement:reset():bind(path):step()
+	return self.db:delete("noteCharts", "path = ?", path)
 end
 
-CacheDatabase.setNoteChartEntry = function(self, entry)
-	self:insertNoteChartEntry(entry)
-	return self:updateNoteChartEntry(entry)
+CacheDatabase.getNoteChartsAtSet = function(self, setId)
+	return self.db:select("noteCharts", "setId = ?", setId)
 end
 
 ----------------------------------------------------------------
 
 CacheDatabase.insertNoteChartSetEntry = function(self, entry)
-	return self.insertNoteChartSetStatement:reset():bind(
-		entry.path,
-		entry.lastModified
-	):step()
+	return self.db:insert("noteChartSets", entry, true)
 end
 
 CacheDatabase.updateNoteChartSetEntry = function(self, entry)
-	return self.updateNoteChartSetStatement:reset():bind(
-		entry.lastModified,
-		entry.path
-	):step()
+	return self.db:update("noteChartSets", entry, "path = ?", entry.path)
 end
 
 CacheDatabase.selectNoteChartSetEntry = function(self, path)
-	local entry = self.selectNoteChartSetStatement:reset():bind(path):step()
-	return self:transformNoteChartSetEntry(entry)
+	return self.db:select("noteChartSets", "path = ?", path)[1]
+end
+
+CacheDatabase.selectNoteChartSetEntryById = function(self, id)
+	return self.db:select("noteChartSets", "id = ?", id)[1]
 end
 
 CacheDatabase.deleteNoteChartSetEntry = function(self, path)
-	return self.deleteNoteChartSetStatement:reset():bind(path):step()
+	return self.db:delete("noteChartSets", "path = ?", path)
 end
 
-CacheDatabase.getNoteChartSetEntry = function(self, entry)
-	self:insertNoteChartSetEntry(entry)
-	self:updateNoteChartSetEntry(entry)
-	return self:selectNoteChartSetEntry(entry.path)
+CacheDatabase.selectNoteChartSets = function(self, path)
+	return self.db:select("noteChartSets", "substr(path, 1, ?) = ?", #path, path)
 end
 
 ----------------------------------------------------------------
 
 CacheDatabase.insertNoteChartDataEntry = function(self, entry)
-	return self.insertNoteChartDataStatement:reset():bind(
-		entry.hash,
-		entry.index,
-		entry.format,
-		entry.title,
-		entry.artist,
-		entry.source,
-		entry.tags,
-		entry.name,
-		entry.creator,
-		entry.level,
-		entry.audioPath,
-		entry.stagePath,
-		entry.previewTime,
-		entry.inputMode,
-		entry.noteCount,
-		entry.length,
-		entry.bpm,
-		entry.difficulty,
-		entry.longNoteRatio,
-		entry.localOffset
-	):step()
+	return self.db:insert("noteChartDatas", entry, true)
 end
 
 CacheDatabase.updateNoteChartDataEntry = function(self, entry)
-	return self.updateNoteChartDataStatement:reset():bind(
-		entry.format,
-		entry.title,
-		entry.artist,
-		entry.source,
-		entry.tags,
-		entry.name,
-		entry.creator,
-		entry.level,
-		entry.audioPath,
-		entry.stagePath,
-		entry.previewTime,
-		entry.inputMode,
-		entry.noteCount,
-		entry.length,
-		entry.bpm,
-		entry.difficulty,
-		entry.longNoteRatio,
-		entry.localOffset,
-		entry.hash,
-		entry.index
-	):step()
+	return self.db:update("noteChartDatas", entry, "hash = ? and `index` = ?", entry.hash, entry.index)
 end
 
-CacheDatabase.selectNoteCharDatatEntry = function(self, hash, index)
-	local entry = self.selectNoteChartDataStatement:reset():bind(hash, index):step()
-	return self:transformNoteChartDataEntry(entry)
+CacheDatabase.selectNoteCharDataEntry = function(self, hash, index)
+	return self.db:select("noteChartDatas", "hash = ? and `index` = ?", hash, index)[1]
 end
 
-CacheDatabase.setNoteChartDataEntry = function(self, entry)
-	self:insertNoteChartDataEntry(entry)
-	return self:updateNoteChartDataEntry(entry)
+CacheDatabase.selectNoteChartDataEntryById = function(self, id)
+	return self.db:select("noteChartDatas", "id = ?", id)[1]
 end
 
 ----------------------------------------------------------------
 
-CacheDatabase.transformEntry = function(self, row, columns, numberColumns)
-	local entry = {}
+ffi.cdef([[
+	typedef struct {
+		uint32_t noteChartDataId;
+		uint32_t noteChartId;
+		uint32_t setId;
+		uint32_t scoreId;
+		bool lamp;
+	} EntryStruct
+]])
 
-	for i = 1, #columns do
-		entry[columns[i]] = row[i] or ""
+CacheDatabase.EntryStruct = ffi.typeof("EntryStruct")
+
+ffi.metatype("EntryStruct", {__index = function(t, k)
+	if k == "key" then
+		return
+			byte.double_to_string_le(t.noteChartDataId) ..
+			byte.double_to_string_le(t.noteChartId) ..
+			byte.double_to_string_le(t.setId)
+	elseif k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "scoreId" or k == "lamp" then
+		return rawget(t, k)
 	end
-	for i = 1, #numberColumns do
-		entry[numberColumns[i]] = tonumber(entry[numberColumns[i]]) or 0
+end})
+
+local function fillObject(object, row, colnames)
+	for i, k in ipairs(colnames) do
+		local value = row[i]
+		if k:find("^__boolean_") then
+			k = k:sub(11)
+			if tonumber(value) == 1 then
+				value = true
+			else
+				value = false
+			end
+		elseif type(value) == "cdata" then
+			value = tonumber(value) or value
+		end
+		object[k] = value or 0
+	end
+end
+
+CacheDatabase.queryAll = function(self)
+	self:queryNoteChartSets()
+	self:queryNoteCharts()
+end
+
+local _asyncQueryAll = aquathread.async(function(queryParams)
+	local time = love.timer.getTime()
+	local ffi = require("ffi")
+	local self = require("sphere.models.CacheModel.CacheDatabase")
+	self:load()
+	self.queryParams = queryParams
+	self:queryNoteChartSets()
+	self:queryNoteCharts()
+	local t = {
+		noteChartSetItemsCount = self.noteChartSetItemsCount,
+		entryKeyToGlobalOffset = self.entryKeyToGlobalOffset,
+		noteChartSetIdToOffset = self.noteChartSetIdToOffset,
+		noteChartItemsCount = self.noteChartItemsCount,
+		noteChartSlices = self.noteChartSlices,
+		entryKeyToLocalOffset = self.entryKeyToLocalOffset,
+		noteChartSetItems = ffi.string(self.noteChartSetItems, ffi.sizeof(self.noteChartSetItems)),
+		noteChartItems = ffi.string(self.noteChartItems, ffi.sizeof(self.noteChartItems)),
+	}
+	self:unload()
+	print("query all: " .. math.floor((love.timer.getTime() - time) * 1000) .. "ms")
+	return t
+end)
+
+CacheDatabase.asyncQueryAll = function(self)
+	local t = _asyncQueryAll(self.queryParams)
+
+	self.noteChartSetItemsCount = t.noteChartSetItemsCount
+	self.entryKeyToGlobalOffset = t.entryKeyToGlobalOffset
+	self.noteChartSetIdToOffset = t.noteChartSetIdToOffset
+	self.noteChartItemsCount = t.noteChartItemsCount
+	self.noteChartSlices = t.noteChartSlices
+	self.entryKeyToLocalOffset = t.entryKeyToLocalOffset
+
+	local size = ffi.sizeof("EntryStruct")
+	self.noteChartSetItems = ffi.new("EntryStruct[?]", #t.noteChartSetItems / size)
+	self.noteChartItems = ffi.new("EntryStruct[?]", #t.noteChartItems / size)
+	ffi.copy(self.noteChartSetItems, t.noteChartSetItems, #t.noteChartSetItems)
+	ffi.copy(self.noteChartItems, t.noteChartItems, #t.noteChartItems)
+end
+
+CacheDatabase.queryNoteChartSets = function(self)
+	local params = CacheDatabase.queryParams
+
+	local objectQuery = ObjectQuery:new()
+
+	objectQuery.db = self.db
+
+	objectQuery.table = "noteChartDatas"
+	objectQuery.fields = {
+		"noteChartDatas.id AS noteChartDataId",
+		"noteCharts.id AS noteChartId",
+		"noteCharts.setId",
+		"scores.id AS scoreId",
+	}
+	objectQuery:setInnerJoin("noteCharts", "noteChartDatas.hash = noteCharts.hash")
+	objectQuery:setLeftJoin("scores", [[
+		noteChartDatas.hash = scores.noteChartHash AND
+		noteChartDatas.`index` = scores.noteChartIndex AND
+		scores.isTop = TRUE
+	]])
+
+	if params.lamp then
+		table.insert(objectQuery.fields, objectQuery:newBooleanCase("lamp", params.lamp))
 	end
 
-	return entry
+	objectQuery.where = params.where
+	objectQuery.groupBy = params.groupBy
+	objectQuery.orderBy = params.orderBy
+
+	local count = objectQuery:getCount()
+	local noteChartSets = ffi.new("EntryStruct[?]", count)
+	local entryKeyToGlobalOffset = {}
+	local noteChartSetIdToOffset = {}
+	self.noteChartSetItems = noteChartSets
+	self.entryKeyToGlobalOffset = entryKeyToGlobalOffset
+	self.noteChartSetIdToOffset = noteChartSetIdToOffset
+
+	local stmt = self.db:stmt(objectQuery:getQueryParams())
+	local colnames = {}
+
+	local row = stmt:step({}, colnames)
+	local i = 0
+	while row do
+		local entry = noteChartSets[i]
+		fillObject(entry, row, colnames)
+		noteChartSetIdToOffset[entry.setId] = i
+		entryKeyToGlobalOffset[entry.key] = i
+		i = i + 1
+		row = stmt:step(row)
+	end
+	stmt:close()
+	self.noteChartSetItemsCount = i
 end
 
-CacheDatabase.transformNoteChartEntry = function(self, entry)
-	return self:transformEntry(entry, self.noteChartsColumns, self.noteChartsNumberColumns)
-end
+CacheDatabase.queryNoteCharts = function(self)
+	local params = CacheDatabase.queryParams
 
-CacheDatabase.transformNoteChartSetEntry = function(self, entry)
-	return self:transformEntry(entry, self.noteChartSetsColumns, self.noteChartSetsNumberColumns)
-end
+	local objectQuery = ObjectQuery:new()
 
-CacheDatabase.transformNoteChartDataEntry = function(self, entry)
-	return self:transformEntry(entry, self.noteChartDatasColumns, self.noteChartDatasNumberColumns)
+	self:load()
+	objectQuery.db = self.db
+
+	objectQuery.table = "noteChartDatas"
+	objectQuery.fields = {
+		"noteChartDatas.id AS noteChartDataId",
+		"noteCharts.id AS noteChartId",
+		"noteCharts.setId",
+		"scores.id AS scoreId",
+	}
+	objectQuery:setInnerJoin("noteCharts", "noteChartDatas.hash = noteCharts.hash")
+	objectQuery:setLeftJoin("scores", [[
+		noteChartDatas.hash = scores.noteChartHash AND
+		noteChartDatas.`index` = scores.noteChartIndex AND
+		scores.isTop = TRUE
+	]])
+
+	if params.lamp then
+		table.insert(objectQuery.fields, objectQuery:newBooleanCase("lamp", params.lamp))
+	end
+
+	objectQuery.where = params.where
+	objectQuery.groupBy = nil
+	objectQuery.orderBy = [[
+		noteCharts.setId ASC,
+		length(noteChartDatas.inputMode) ASC,
+		noteChartDatas.inputMode ASC,
+		noteChartDatas.difficulty ASC,
+		noteChartDatas.name ASC,
+		noteChartDatas.id ASC
+	]]
+
+	local count = objectQuery:getCount()
+	local noteCharts = ffi.new("EntryStruct[?]", count)
+	local slices = {}
+	local entryKeyToLocalOffset = {}
+	self.noteChartItems = noteCharts
+	self.noteChartSlices = slices
+	self.entryKeyToLocalOffset = entryKeyToLocalOffset
+
+	local stmt = self.db:stmt(objectQuery:getQueryParams())
+	local colnames = {}
+
+	local offset = 0
+	local size = 0
+	local setId
+	local row = stmt:step({}, colnames)
+	local i = 0
+	while row do
+		local entry = noteCharts[i]
+		fillObject(entry, row, colnames)
+		if setId and setId ~= entry.setId then
+			slices[setId] = {
+				offset = offset,
+				size = size,
+			}
+			offset = i
+		end
+		size = i - offset + 1
+		setId = entry.setId
+		entryKeyToLocalOffset[entry.key] = i - offset
+		i = i + 1
+		row = stmt:step(row)
+	end
+	if setId then
+		slices[setId] = {
+			offset = offset,
+			size = size,
+		}
+	end
+	stmt:close()
+	self.noteChartItemsCount = i
 end
 
 return CacheDatabase

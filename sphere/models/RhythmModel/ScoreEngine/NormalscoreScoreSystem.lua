@@ -20,25 +20,12 @@ NormalscoreScoreSystem.after = function(self, event)
 	end
 
 	local ns = self.normalscore
-	self.score = ns.score / math.abs(event.timeRate)
-	self.scoreAdjusted = ns.score_adjusted / math.abs(event.timeRate)
 	self.accuracy = ns.score
 	self.accuracyAdjusted = ns.score_adjusted
+	self.adjustRatio = ns.score_adjusted / ns.score
 
 	self.enps = self.scoreEngine.baseEnps * event.timeRate
 	self.averageStrain = self.scoreEngine.baseAverageStrain * event.timeRate
-
-	self.performance = self.enps / self.accuracyAdjusted
-	self.adjustRatio = ns.score_adjusted / ns.score
-
-    self.rating16 = self.enps * erfunc.erf(0.016 / (self.accuracyAdjusted * math.sqrt(2)))
-    self.rating32 = self.enps * erfunc.erf(0.032 / (self.accuracyAdjusted * math.sqrt(2)))
-    self.rating48 = self.enps * erfunc.erf(0.048 / (self.accuracyAdjusted * math.sqrt(2)))
-    self.rating64 = self.enps * erfunc.erf(0.064 / (self.accuracyAdjusted * math.sqrt(2)))
-    self.rating16p = 100 * erfunc.erf(0.016 / (self.accuracyAdjusted * math.sqrt(2)))
-    self.rating32p = 100 * erfunc.erf(0.032 / (self.accuracyAdjusted * math.sqrt(2)))
-    self.rating48p = 100 * erfunc.erf(0.048 / (self.accuracyAdjusted * math.sqrt(2)))
-    self.rating64p = 100 * erfunc.erf(0.064 / (self.accuracyAdjusted * math.sqrt(2)))
 end
 
 NormalscoreScoreSystem.hit = function(self, event)

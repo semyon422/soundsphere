@@ -1,6 +1,7 @@
 local Class = require("aqua.util.Class")
 local CacheUpdater = require("sphere.models.CacheModel.CacheUpdater")
 local CacheManager = require("sphere.models.CacheModel.CacheManager")
+local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 
 local CacheModel = Class:new()
 
@@ -11,7 +12,7 @@ end
 
 CacheModel.load = function(self)
 	self.cacheUpdater.cacheManager = self.cacheManager
-	self.cacheManager:select()
+	CacheDatabase:load()
 end
 
 CacheModel.unload = function(self) end
@@ -22,6 +23,10 @@ end
 
 CacheModel.stopUpdate = function(self)
 	self.cacheUpdater:stop()
+end
+
+CacheModel.update = function(self)
+	CacheDatabase:update()
 end
 
 return CacheModel

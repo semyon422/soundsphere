@@ -299,7 +299,7 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 		object.transform = self:newNoteskinTransform()
 	end
 	for i = 1, noteskin.inputsCount do
-		local pressed, hold, release
+		local pressed, hold, released
 		if object.pressed and object.pressed[i] then
 			pressed = {
 				class = "ImageAnimationView",
@@ -456,7 +456,7 @@ PlayfieldVsrg.addHitError = function(self, object)
 		return
 	end
 	object.class = "HitErrorView"
-	object.transform = object.transform or playfield:newLaneCenterTransform(1080)
+	object.transform = object.transform or self:newLaneCenterTransform(1080)
 	object.count = object.count or 1
 	object.key = "gameController.rhythmModel.scoreEngine.scoreSystem.sequence"
 	object.value = "misc.deltaTime"

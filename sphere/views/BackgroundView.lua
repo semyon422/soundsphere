@@ -24,7 +24,6 @@ BackgroundView.drawBackground = function(self)
 
 	local tf = transform(config.transform)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	local images = backgroundModel.images
 	local alpha = backgroundModel.alpha

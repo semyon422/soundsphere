@@ -1,20 +1,28 @@
 local Class = require("aqua.util.Class")
-local sort = require("aqua.util.sort")
+
+local function sort(...)
+	local fields = {...}
+	for i, field in ipairs(fields) do
+		fields[i] = "noteChartDatas." .. field .. " ASC"
+	end
+	return table.concat(fields, ",")
+end
 
 local SortModel = Class:new()
 
-SortModel.getSortFunction = function(self)
-	return self.sortItemsFunctions[self.name]
+SortModel.getOrderBy = function(self)
+	local f = self.sortItemsFunctions[self.name]
+	return f[1], f[2]
 end
 
 SortModel.sortItemsFunctions = {
-	id = function(a, b) return a.id < b.id end,
-	title = sort("title", "artist", "creator", "difficulty", "id"),
-	artist = sort("artist", "title", "creator", "difficulty", "id"),
-	difficulty = sort("difficulty", "id"),
-	level = sort("level", "id"),
-	length = sort("length", "id"),
-	bpm = sort("bpm", "id"),
+	id = {sort("id"), true},
+	title = {sort("title", "artist", "creator", "inputMode", "difficulty", "name", "id"), true},
+	artist = {sort("artist", "title", "creator", "inputMode", "difficulty", "name", "id"), true},
+	difficulty = {sort("difficulty", "name", "id"), false},
+	level = {sort("level", "id"), false},
+	length = {sort("length", "id"), false},
+	bpm = {sort("bpm", "id"), false},
 }
 
 SortModel.name = "title"

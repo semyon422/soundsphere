@@ -24,14 +24,6 @@ local settings = {
 		displayRange = {"no", "yes"}
 	},
 	{
-		name = "replay type",
-		section = "gameplay",
-		key = "gameplay.replayType",
-		type = "stepper",
-		values = {"NanoChart", "Json"},
-		displayValues = {"NanoChart", "Json"}
-	},
-	{
 		name = "visual long note shortening",
 		section = "gameplay",
 		key = "gameplay.longNoteShortening",
@@ -411,14 +403,6 @@ local settings = {
 		}
 	},
 	{
-		name = "preview audio mode",
-		section = "audio",
-		key = "audio.mode.preview",
-		type = "stepper",
-		values = {"stream", "streamTempo", "streamOpenAL"},
-		displayValues = {"stream", "tempo", "streamOAL"}
-	},
-	{
 		name = "midi constant volume",
 		section = "audio",
 		key = "audio.midi.constantVolume",
@@ -447,6 +431,13 @@ local settings = {
 		name = "auto update on game start",
 		section = "miscellaneous",
 		key = "miscellaneous.autoUpdate",
+		type = "switch",
+		displayRange = {"disabled", "enabled"}
+	},
+	{
+		name = "imgui.ShowDemoWindow",
+		section = "miscellaneous",
+		key = "miscellaneous.imguiShowDemoWindow",
 		type = "switch",
 		displayRange = {"disabled", "enabled"}
 	},

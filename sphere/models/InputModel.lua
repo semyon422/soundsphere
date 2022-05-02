@@ -69,18 +69,18 @@ InputModel.getKey = function(self, inputMode, virtualKey)
 	local inputConfig = inputBindings[inputMode]
 
 	if not inputConfig or not inputConfig.press then
-		return "none"
+		return "none", "none"
 	end
 
 	for type, keys in pairs(inputConfig.press) do
 		for key, data in pairs(keys) do
 			if data.press and data.press[1] == virtualKey then
-				return key
+				return key, type
 			end
 		end
 	end
 
-	return "none"
+	return "none", "none"
 end
 
 InputModel.getInputs = function(self, inputModeString)

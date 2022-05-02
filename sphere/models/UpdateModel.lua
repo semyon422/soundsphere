@@ -11,7 +11,7 @@ UpdateModel.load = function(self)
 
 	if
 		not configs.settings.miscellaneous.autoUpdate or
-		configs.online.update == "" or
+		configs.urls.update == "" or
 		love.filesystem.getInfo(".git")
 	then
 		return
@@ -86,7 +86,7 @@ UpdateModel.updateFiles = thread.coro(function(self)
 	local configs = self.configModel.configs
 	self:setStatus("Checking for updates...")
 
-	local response = async_download(configs.online.update)
+	local response = async_download(configs.urls.update)
 	if not response then
 		return self:setStatus("Can't download file list")
 	end

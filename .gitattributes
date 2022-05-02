@@ -1,1 +1,8 @@
-start-linux64 text eol=lf
+game-appimage text eol=lf
+game-install-ubuntu64 text eol=lf
+game-linux text eol=lf
+install text eol=lf
+lapis_server_development text eol=lf
+lapis_server_development_screen text eol=lf
+lapis_term text eol=lf
+setpaths text eol=lf

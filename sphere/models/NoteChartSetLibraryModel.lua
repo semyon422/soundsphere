@@ -1,74 +1,65 @@
-local Class = require("aqua.util.Class")
+local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
+local LibraryModel = require("sphere.models.LibraryModel")
 
-local NoteChartSetLibraryModel = Class:new()
+local NoteChartSetLibraryModel = LibraryModel:new()
 
-NoteChartSetLibraryModel.searchMode = "hide"
 NoteChartSetLibraryModel.collapse = false
 
-NoteChartSetLibraryModel.construct = function(self)
-	self.items = {}
+local NoteChartSetItem = {}
+
+NoteChartSetItem.__index = function(self, k)
+	local entry = CacheDatabase.noteChartSetItems[self.itemIndex - 1]
+	if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "lamp" then
+		return entry[k]
+	end
+	local noteChart = CacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
+	local noteChartData = CacheDatabase:getCachedEntry("noteChartDatas", entry.noteChartDataId)
+	return noteChartData and noteChartData[k] or noteChart and noteChart[k]
+end
+
+NoteChartSetLibraryModel.load = function(self)
+	self.itemsCache.loadObject = function(_, itemIndex)
+		return setmetatable({
+			itemIndex = itemIndex,
+		}, NoteChartSetItem)
+	end
 end
 
 NoteChartSetLibraryModel.updateItems = function(self)
-	local items = {}
-	self.items = items
+	local params = CacheDatabase.queryParams
 
-	local noteChartDataEntries = self.cacheModel.cacheManager:getNoteChartDatas()
-	local sortFunction = self.sortFunction
-	if sortFunction then
-		table.sort(noteChartDataEntries, sortFunction)
+	local isCollapseAllowed
+	params.orderBy, isCollapseAllowed = self.sortModel:getOrderBy()
+	if self.collapse and isCollapseAllowed then
+		params.groupBy = "noteCharts.setId"
+	else
+		params.groupBy = nil
 	end
 
-	local prevSetId = 0
-	for i = 1, #noteChartDataEntries do
-		local noteChartDataEntry = noteChartDataEntries[i]
-		local noteChartEntries = self.cacheModel.cacheManager:getNoteChartsAtHash(noteChartDataEntry.hash)
-		for _, noteChartEntry in ipairs(noteChartEntries) do
-			local setId = noteChartEntry and noteChartEntry.setId
-			local noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(setId)
-			local check = self:checkNoteChartDataEntry(noteChartDataEntry, noteChartEntry, noteChartSetEntry)
-			if check or self.searchMode == "show" then
-				if setId and (not self.collapse or setId ~= prevSetId) then
-					items[#items + 1] = {
-						noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(setId),
-						noteChartEntry = noteChartEntry,
-						noteChartDataEntry = noteChartDataEntry,
-						tagged = self.searchMode == "show" and check
-					}
-				end
-				prevSetId = setId
-			end
-		end
+	local where, lamp = self.searchModel:getConditions()
+	if where ~= "" then
+		params.where = where
+	else
+		params.where = nil
 	end
+	if lamp ~= "" then
+		params.lamp = lamp
+	else
+		params.lamp = nil
+	end
+
+	CacheDatabase:asyncQueryAll()
+	self.itemsCount = CacheDatabase.noteChartSetItemsCount
 end
 
-NoteChartSetLibraryModel.checkNoteChartDataEntry = function(self, noteChartDataEntry, noteChartEntry, noteChartSetEntry)
-	if not noteChartEntry or not noteChartSetEntry then
-		return
-	end
-	return self.searchModel:check(noteChartDataEntry, noteChartEntry, noteChartSetEntry)
-end
+NoteChartSetLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId, noteChartSetId)
+	local entry = self.entry
+	entry.noteChartDataId = noteChartDataId
+	entry.noteChartId = noteChartId
+	entry.setId = noteChartSetId
+	local key = entry.key
 
-NoteChartSetLibraryModel.getItemIndex = function(self, noteChartSetEntryId, noteChartEntryId, noteChartDataEntryId)
-	local items = self.items
-
-	if not items then
-		return 1
-	end
-
-	local collapsedItemIndex
-	for i = 1, #items do
-		local item = items[i]
-		if item.noteChartSetEntry.id == noteChartSetEntryId then
-			if item.noteChartEntry.id == noteChartEntryId and item.noteChartDataEntry.id == noteChartDataEntryId then
-				return i
-			elseif self.collapse then
-				collapsedItemIndex = i
-			end
-		end
-	end
-
-	return collapsedItemIndex or 1
+	return (CacheDatabase.entryKeyToGlobalOffset[key] or CacheDatabase.noteChartSetIdToOffset[noteChartSetId] or 0) + 1
 end
 
 return NoteChartSetLibraryModel

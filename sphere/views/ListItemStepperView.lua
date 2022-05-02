@@ -54,7 +54,6 @@ ListItemStepperView.receive = function(self, event)
 	stepper:setValue(self:getIndexValue())
 	stepper:setCount(self:getCount())
 	stepper:receive(event)
-	tf:release()
 
 	if stepper.valueUpdated then
 		self:updateIndexValue(stepper.value)

@@ -58,3 +58,6 @@
 [submodule "serpent"]
 	path = serpent
 	url = https://github.com/pkulchenko/serpent
+[submodule "cimgui-love"]
+	path = cimgui-love
+	url = https://github.com/semyon422/cimgui-love

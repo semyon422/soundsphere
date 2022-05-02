@@ -16,7 +16,6 @@ HitErrorView.draw = function(self)
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	if config.background then
 		self:drawBackground()

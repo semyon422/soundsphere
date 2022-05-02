@@ -42,7 +42,7 @@ GameplayController.load = function(self)
 	rhythmModel.prohibitSavingScore = false
 
 	local noteChartDataEntry = noteChartModel.noteChartDataEntry
-	local localOffset = noteChartDataEntry.localOffset
+	local localOffset = noteChartDataEntry.localOffset or 0
 
 	local config = configModel.configs.settings
 
@@ -92,7 +92,7 @@ GameplayController.load = function(self)
 	view:load()
 
 	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChart, function()
-		rhythmModel:setResourceAliases(NoteChartResourceLoader.localAliases, NoteChartResourceLoader.globalAliases)
+		rhythmModel:setResourceAliases(NoteChartResourceLoader.aliases)
 		self:receive({
 			name = "play"
 		})
@@ -220,14 +220,13 @@ GameplayController.saveScore = function(self)
 	local modifierModel = rhythmModel.modifierModel
 	local replayModel = rhythmModel.replayModel
 	if
-		scoreSystemEntry.score > 0 and
-		scoreSystemEntry.score < math.huge and
+		scoreSystemEntry.accuracy > 0 and
+		scoreSystemEntry.accuracy < math.huge and
 		rhythmModel.replayModel.mode ~= "replay" and
 		not rhythmModel.logicEngine.autoplay
 	then
 		replayModel.noteChartModel = noteChartModel
 		replayModel.modifierModel = modifierModel
-		replayModel.replayType = self.gameController.configModel.configs.settings.gameplay.replayType
 		local replayHash = replayModel:saveReplay()
 		local scoreEntry = self.gameController.scoreModel:insertScore(scoreSystemEntry, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
 
@@ -256,11 +255,12 @@ GameplayController.skip = function(self)
 	rhythmModel.audioEngine:unload()
 	rhythmModel.logicEngine.observable:remove(rhythmModel.audioEngine)
 
+	local base = rhythmModel.scoreEngine.scoreSystem.base
 	if timeEngine.currentTime >= timeEngine.maxTime then
-		rhythmModel.scoreEngine.scoreSystem.base.progress = 1
+		base.progress = 1
 	end
 
-	if timeEngine.currentTime < timeEngine.minTime then
+	if timeEngine.currentTime < timeEngine.minTime or base.hitCount == 0 then
 		rhythmModel.prohibitSavingScore = true
 	end
 

@@ -1,45 +1,54 @@
 local Class = require("aqua.util.Class")
+local aquatimer = require("aqua.timer")
+local aquathread = require("aqua.thread")
 
 local SelectModel = Class:new()
+
+SelectModel.construct = function(self)
+	self.noteChartSetItemIndex = 1
+	self.noteChartItemIndex = 1
+	self.scoreItemIndex = 1
+	self.pullingNoteChartSet = false
+end
+
+SelectModel.debounceTime = 0.5
 
 SelectModel.load = function(self)
 	local config = self.configModel.configs.select
 	self.config = config
 
-	self.searchModel:setSearchString(config.searchString)
-	self:setSearchMode(config.searchMode)
+	self.searchModel:setSearchFilter(config.searchFilter)
+	self.searchModel:setSearchLamp(config.searchLamp)
+	self.searchModel:setSearchMode(config.searchMode)
 	self.sortModel.name = config.sortFunction
-	self.noteChartSetLibraryModel.sortFunction = self.sortModel:getSortFunction()
 	self.noteChartSetLibraryModel.collapse = config.collapse
 
+	self.noteChartSetStateCounter = 1
+	self.noteChartStateCounter = 1
+	self.searchStateCounter = self.searchModel.stateCounter
+
 	self.collectionItemIndex = self.collectionModel:getItemIndex(config.collection)
-	self.noteChartSetItemIndex = self.noteChartSetLibraryModel:getItemIndex(config.noteChartSetEntryId)
-	self.noteChartItemIndex = self.noteChartLibraryModel:getItemIndex(config.noteChartEntryId, config.noteChartDataEntryId)
-	self.scoreItemIndex = self.scoreLibraryModel:getItemIndex(config.scoreEntryId)
-
 	self.collectionItem = self.collectionModel.items[self.collectionItemIndex]
-	self.noteChartSetItem = self.noteChartSetLibraryModel.items[self.noteChartSetItemIndex]
-	self.noteChartItem = self.noteChartLibraryModel.items[self.noteChartItemIndex]
-	self.scoreItem = self.scoreLibraryModel.items[self.scoreItemIndex]
 
-	self:pullNoteChartSet()
+	self:coroPullNoteChartSet()
 end
 
-SelectModel.setSearchMode = function(self, searchMode)
-	if searchMode ~= "show" and searchMode ~= "hide" then
-		return
-	end
-	self.noteChartSetLibraryModel.searchMode = searchMode
-	self.noteChartLibraryModel.searchMode = searchMode
-	self.searchModel.searchMode = searchMode
+SelectModel.debouncePullNoteChartSet = function(self, ...)
+	aquatimer.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self, ...)
 end
+
+SelectModel.coroPullNoteChartSet = aquathread.coro(function(self, ...)
+	return self:pullNoteChartSet(...)
+end)
 
 SelectModel.setSortFunction = function(self, sortFunctionName)
+	if self.pullingNoteChartSet then
+		return
+	end
 	local config = self.config
 	config.sortFunction = sortFunctionName
 	self.sortModel.name = sortFunctionName
-	self.noteChartSetLibraryModel.sortFunction = self.sortModel:getSortFunction()
-	self:pullNoteChartSet()
+	self:debouncePullNoteChartSet()
 end
 
 SelectModel.scrollSortFunction = function(self, delta)
@@ -48,36 +57,36 @@ SelectModel.scrollSortFunction = function(self, delta)
 end
 
 SelectModel.changeSearchMode = function(self)
-	local config = self.config
-	if config.searchMode == "hide" then
-		config.searchMode = "show"
-	else
-		config.searchMode = "hide"
-	end
-	self:setSearchMode(config.searchMode)
-	self:pullNoteChartSet()
+	self.searchModel:switchSearchMode()
+	self.config.searchMode = self.searchModel.searchMode
 end
 
 SelectModel.changeCollapse = function(self)
+	if self.pullingNoteChartSet then
+		return
+	end
 	local config = self.config
 	config.collapse = not config.collapse
 	self.noteChartSetLibraryModel.collapse = config.collapse
-	self:pullNoteChartSet()
+	self:debouncePullNoteChartSet()
 end
 
 SelectModel.update = function(self)
-	self:updateSearch()
-end
-
-SelectModel.updateSearch = function(self)
-	local newSearchString = self.searchModel.searchString
-	if self.config.searchString ~= newSearchString then
-		self.config.searchString = newSearchString
-		self:pullNoteChartSet()
+	local stateCounter = self.searchModel.stateCounter
+	if self.searchStateCounter == stateCounter or self.pullingNoteChartSet then
+		return
 	end
+	self.config.searchFilter = self.searchModel.searchFilter
+	self.config.searchLamp = self.searchModel.searchLamp
+	self.searchStateCounter = stateCounter
+	self:debouncePullNoteChartSet()
 end
 
 SelectModel.scrollCollection = function(self, direction, destination)
+	if self.pullingNoteChartSet then
+		return
+	end
+
 	local collectionItems = self.collectionModel.items
 
 	destination = math.min(math.max(destination or self.collectionItemIndex + direction, 1), #collectionItems)
@@ -92,7 +101,7 @@ SelectModel.scrollCollection = function(self, direction, destination)
 	self.collectionItem = collectionItem
 	self.config.collection = collectionItem.path
 
-	self:pullNoteChartSet(oldCollectionItem.path == collectionItem.path)
+	self:debouncePullNoteChartSet(oldCollectionItem and oldCollectionItem.path == collectionItem.path)
 end
 
 SelectModel.scrollRandom = function(self)
@@ -116,11 +125,11 @@ SelectModel.scrollNoteChartSet = function(self, direction, destination)
 
 	local noteChartSetItem = noteChartSetItems[self.noteChartSetItemIndex]
 	self.noteChartSetItem = noteChartSetItem
-	self.config.noteChartSetEntryId = noteChartSetItem.noteChartSetEntry.id
-	self.config.noteChartEntryId = noteChartSetItem.noteChartEntry and noteChartSetItem.noteChartEntry.id
-	self.config.noteChartDataEntryId = noteChartSetItem.noteChartDataEntry and noteChartSetItem.noteChartDataEntry.id
+	self.config.noteChartSetEntryId = noteChartSetItem.setId
+	self.config.noteChartEntryId = noteChartSetItem.noteChartId
+	self.config.noteChartDataEntryId = noteChartSetItem.noteChartDataId
 
-	self:pullNoteChart(oldNoteChartSetItem.noteChartSetEntry.id == noteChartSetItem.noteChartSetEntry.id)
+	self:pullNoteChart(oldNoteChartSetItem and oldNoteChartSetItem.setId == noteChartSetItem.setId)
 end
 
 SelectModel.scrollNoteChart = function(self, direction, destination)
@@ -137,9 +146,9 @@ SelectModel.scrollNoteChart = function(self, direction, destination)
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
 	self.noteChartItem = noteChartItem
 
-	self.config.noteChartSetEntryId = noteChartItem.noteChartSetEntry.id
-	self.config.noteChartEntryId = noteChartItem.noteChartEntry.id
-	self.config.noteChartDataEntryId = noteChartItem.noteChartDataEntry and noteChartItem.noteChartDataEntry.id
+	self.config.noteChartSetEntryId = noteChartItem.setId
+	self.config.noteChartEntryId = noteChartItem.noteChartId
+	self.config.noteChartDataEntryId = noteChartItem.noteChartDataId
 
 	self:pullNoteChartSet(true)
 	self:pullScore()
@@ -157,75 +166,100 @@ SelectModel.scrollScore = function(self, direction, destination)
 	local scoreItem = scoreItems[self.scoreItemIndex]
 	self.scoreItem = scoreItem
 
-	self.config.scoreEntryId = scoreItem.scoreEntry.id
+	self.config.scoreEntryId = scoreItem.id
 end
 
 SelectModel.pullNoteChartSet = function(self, noUpdate)
+	self.pullingNoteChartSet = true
+
 	if not noUpdate then
 		self.searchModel:setCollection(self.collectionItem)
-		self.noteChartLibraryModel:updateItems()
 		self.noteChartSetLibraryModel:updateItems()
 	end
 
 	local noteChartSetItems = self.noteChartSetLibraryModel.items
 	self.noteChartSetItemIndex = self.noteChartSetLibraryModel:getItemIndex(
-		self.config.noteChartSetEntryId,
+		self.config.noteChartDataEntryId,
 		self.config.noteChartEntryId,
-		self.config.noteChartDataEntryId
+		self.config.noteChartSetEntryId
 	)
+
+	if not noUpdate then
+		self.noteChartSetStateCounter = self.noteChartSetStateCounter + 1
+	end
 
 	local noteChartSetItem = noteChartSetItems[self.noteChartSetItemIndex]
 	self.noteChartSetItem = noteChartSetItem
 	if noteChartSetItem then
-		self.config.noteChartSetEntryId = noteChartSetItem.noteChartSetEntry.id
-		self:pullNoteChart(noUpdate)
+		self.config.noteChartSetEntryId = noteChartSetItem.setId
+		self.pullingNoteChartSet = false
+		return self:pullNoteChart(noUpdate)
 	end
+
+	self.config.noteChartSetEntryId = 0
+	self.config.noteChartEntryId = 0
+	self.config.noteChartDataEntryId = 0
+
+	self.noteChartItem = nil
+	self.scoreItem = nil
+
+	self.noteChartLibraryModel:clear()
+	self.scoreLibraryModel:clear()
+
+	self.pullingNoteChartSet = false
 end
 
 SelectModel.pullNoteChart = function(self, noUpdate)
-	if not noUpdate then
-		self.noteChartLibraryModel:setNoteChartSetId(self.config.noteChartSetEntryId)
-		self.noteChartLibraryModel:updateItems()
-	end
+	self.noteChartLibraryModel:setNoteChartSetId(self.config.noteChartSetEntryId)
 
 	local noteChartItems = self.noteChartLibraryModel.items
 	self.noteChartItemIndex = self.noteChartLibraryModel:getItemIndex(
+		self.config.noteChartDataEntryId,
 		self.config.noteChartEntryId,
-		self.config.noteChartDataEntryId
+		self.config.noteChartSetEntryId
 	)
+
+	if not noUpdate then
+		self.noteChartStateCounter = self.noteChartStateCounter + 1
+	end
 
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
 	self.noteChartItem = noteChartItem
-	if not noteChartItem then
-		return
+	if noteChartItem then
+		self.config.noteChartEntryId = noteChartItem.noteChartId
+		self.config.noteChartDataEntryId = noteChartItem.noteChartDataId
+		return self:pullScore(noUpdate)
 	end
 
-	self.config.noteChartEntryId = noteChartItem.noteChartEntry.id
-	self.config.noteChartDataEntryId = noteChartItem.noteChartDataEntry.id
-	self:pullScore(noUpdate)
+	self.config.noteChartEntryId = 0
+	self.config.noteChartDataEntryId = 0
+
+	self.scoreItem = nil
+
+	self.scoreLibraryModel:clear()
 end
 
 SelectModel.pullScore = function(self, noUpdate)
 	local noteChartItems = self.noteChartLibraryModel.items
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
 
+	if not noteChartItem then
+		return
+	end
+
 	if not noUpdate then
-		self.scoreLibraryModel:setHash(noteChartItem.noteChartDataEntry.hash)
-		self.scoreLibraryModel:setIndex(noteChartItem.noteChartDataEntry.index)
+		self.scoreLibraryModel:setHash(noteChartItem.hash)
+		self.scoreLibraryModel:setIndex(noteChartItem.index)
 		self.scoreLibraryModel:updateItems()
 	end
 
 	local scoreItems = self.scoreLibraryModel.items
-
-	self.config.noteChartEntryId = noteChartItem.noteChartEntry.id
-	self.config.noteChartDataEntryId = noteChartItem.noteChartDataEntry.id
-
-	self.scoreItemIndex = self.scoreLibraryModel:getItemIndex(self.config.scoreEntryId) or self.scoreItemIndex
+	self.scoreItemIndex = self.scoreLibraryModel:getItemIndex(self.config.scoreEntryId)
 
 	local scoreItem = scoreItems[self.scoreItemIndex]
 	self.scoreItem = scoreItem
 	if scoreItem then
-		self.config.scoreEntryId = scoreItem.scoreEntry.id
+		self.config.scoreEntryId = scoreItem.id
 	end
 end
 

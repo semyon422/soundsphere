@@ -193,11 +193,9 @@ RhythmModel.setInputBindings = function(self, inputBindings)
 	self.inputManager:setBindings(inputBindings)
 end
 
-RhythmModel.setResourceAliases = function(self, localAliases, globalAliases)
-	self.audioEngine.localAliases = localAliases
-	self.audioEngine.globalAliases = globalAliases
-	self.graphicEngine.localAliases = localAliases
-	self.graphicEngine.globalAliases = globalAliases
+RhythmModel.setResourceAliases = function(self, aliases)
+	self.audioEngine.aliases = aliases
+	self.graphicEngine.aliases = aliases
 end
 
 RhythmModel.setVolume = function(self, layer, value)

@@ -17,7 +17,6 @@ RectangleView.drawRectangle = function(self, rectangle)
 
 	local tf = transform(config.transform)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	love.graphics.setColor(rectangle.color)
 	love.graphics.setLineWidth(rectangle.lineWidth)

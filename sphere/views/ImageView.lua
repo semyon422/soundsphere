@@ -34,7 +34,6 @@ ImageView.draw = function(self)
 
 	local tf = transform(config.transform)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	if config.color then
 		love.graphics.setColor(config.color)

@@ -1,22 +1,25 @@
 local viewspackage = (...):match("^(.-%.views%.)")
+local ffi = require("ffi")
 
 local Navigator = require(viewspackage .. "Navigator")
 
 local SelectNavigator = Navigator:new({construct = false})
 
+SelectNavigator.osudirectItemIndex = 1
+SelectNavigator.osudirectDifficultyItemIndex = 1
+
 SelectNavigator.load = function(self)
 	Navigator.load(self)
 	self:addSubscreen("score")
 	self:addSubscreen("notecharts")
+	self.isNoteSkinsOpen = ffi.new("bool[1]", false)
+	self.isInputOpen = ffi.new("bool[1]", false)
 end
 
 SelectNavigator.receive = function(self, event)
 	if event.name ~= "keypressed" then
 		return
 	end
-
-	local notecharts = self:getSubscreen("notecharts")
-	local collections = self:getSubscreen("collections")
 
 	local scancode = event[2]
 
@@ -25,7 +28,7 @@ SelectNavigator.receive = function(self, event)
 	elseif scancode == "lctrl" then self:changeSearchMode()
 	elseif scancode == "lshift" then self:changeCollapse()
 	end
-	if notecharts then
+	if self:getSubscreen("notecharts") then
 		if scancode == "up" then self:scrollNoteChart("up")
 		elseif scancode == "down" then self:scrollNoteChart("down")
 		elseif scancode == "left" then self:scrollNoteChartSet("up")
@@ -38,7 +41,7 @@ SelectNavigator.receive = function(self, event)
 		elseif scancode == "tab" then self:switchToCollections()
 		elseif scancode == "lalt" then self:changeScreen("Result")
 		end
-	elseif collections then
+	elseif self:getSubscreen("collections") then
 		if scancode == "up" or scancode == "left" then self:scrollCollection("up")
 		elseif scancode == "down" or scancode == "right" then self:scrollCollection("down")
 		elseif scancode == "pageup" then self:scrollCollection("up", 10)
@@ -47,12 +50,21 @@ SelectNavigator.receive = function(self, event)
 		elseif scancode == "end" then self:scrollCollection("down", math.huge)
 		elseif scancode == "return" or scancode == "tab" then self:switchToNoteCharts()
 		end
+	elseif self:getSubscreen("osudirect") then
+		if scancode == "up" or scancode == "left" then self:scrollOsudirect("up")
+		elseif scancode == "down" or scancode == "right" then self:scrollOsudirect("down")
+		elseif scancode == "pageup" then self:scrollOsudirect("up", 10)
+		elseif scancode == "pagedown" then self:scrollOsudirect("down", 10)
+		elseif scancode == "home" then self:scrollOsudirect("up", math.huge)
+		elseif scancode == "end" then self:scrollOsudirect("down", math.huge)
+		elseif scancode == "escape" or scancode == "tab" then self:switchToCollections()
+		end
 	end
 end
 
 SelectNavigator.update = function(self)
 	self:removeLessSubscreens("score", "options")
-	self:removeLessSubscreens("notecharts", "collections")
+	self:removeLessSubscreens("notecharts", "collections", "osudirect")
 	Navigator.update(self)
 end
 
@@ -65,6 +77,11 @@ SelectNavigator.switchToCollections = function(self)
 	self:addSubscreen("collections")
 end
 
+SelectNavigator.switchToOsudirect = function(self)
+	self:addSubscreen("osudirect")
+	self:send({name = "searchOsudirect"})
+end
+
 SelectNavigator.openDirectory = function(self)
 	self:send({name = "openDirectory"})
 end
@@ -75,6 +92,10 @@ end
 
 SelectNavigator.scrollRandom = function(self)
 	self:send({name = "scrollRandom"})
+end
+
+SelectNavigator.calculateTopScores = function(self)
+	self:send({name = "calculateTopScores"})
 end
 
 SelectNavigator.updateCache = function(self, force)
@@ -108,6 +129,38 @@ SelectNavigator.changeCollapse = function(self)
 	self:send({name = "changeCollapse"})
 end
 
+SelectNavigator.scrollOsudirect = function(self, direction, count)
+	count = count or 1
+	direction = direction == "up" and -count or count
+	local items = self.gameController.osudirectModel.items
+
+	local itemIndex = math.min(math.max(self.osudirectItemIndex + direction, 1), #items)
+	if not items[itemIndex] then
+		return
+	end
+
+	self.osudirectItemIndex = itemIndex
+
+	self:send({
+		name = "osudirectBeatmap",
+		itemIndex = self.osudirectItemIndex,
+		beatmap = items[itemIndex],
+	})
+end
+
+SelectNavigator.scrollOsudirectDifficulty = function(self, direction, count)
+	count = count or 1
+	direction = direction == "up" and -count or count
+	local items = self.gameController.osudirectModel:getDifficulties()
+
+	local itemIndex = math.min(math.max(self.osudirectDifficultyItemIndex + direction, 1), #items)
+	if not items[itemIndex] then
+		return
+	end
+
+	self.osudirectDifficultyItemIndex = itemIndex
+end
+
 SelectNavigator.scrollCollection = function(self, direction, count)
 	count = count or 1
 	self:send({
@@ -132,6 +185,10 @@ SelectNavigator.scrollNoteChart = function(self, direction, count)
 	})
 end
 
+SelectNavigator.downloadBeatmapSet = function(self)
+	self:send({name = "downloadBeatmapSet"})
+end
+
 SelectNavigator.play = function(self)
 	self:send({name = "playNoteChart"})
 end
@@ -151,14 +208,56 @@ SelectNavigator.scrollSortFunction = function(self, delta)
 end
 
 SelectNavigator.setSearchString = function(self, text)
-	self:send({
-		name = "setSearchString",
-		text = text
-	})
+	if self:getSubscreen("notecharts") then
+		self:send({
+			name = "setSearchString",
+			text = text
+		})
+	elseif self:getSubscreen("osudirect") then
+		self:send({
+			name = "setOsudirectSearchString",
+			text = text
+		})
+	end
 end
 
 SelectNavigator.quickLogin = function(self)
 	self:send({name = "quickLogin"})
+end
+
+SelectNavigator.openNoteSkins = function(self)
+	local isOpen = self.isNoteSkinsOpen
+	isOpen[0] = not isOpen[0]
+	if isOpen[0] then
+		self:send({name = "resetModifiedNoteChart"})
+	end
+end
+
+SelectNavigator.openInput = function(self)
+	local isOpen = self.isInputOpen
+	isOpen[0] = not isOpen[0]
+	if isOpen[0] then
+		self:send({name = "resetModifiedNoteChart"})
+	end
+end
+
+SelectNavigator.setNoteSkin = function(self, itemIndex)
+	local noteChart = self.gameController.noteChartModel.noteChart
+	local noteSkins = self.gameController.noteSkinModel:getNoteSkins(noteChart.inputMode)
+	self:send({
+		name = "setNoteSkin",
+		noteSkin = noteSkins[itemIndex or self.noteSkinItemIndex]
+	})
+end
+
+SelectNavigator.setInputBinding = function(self, inputMode, virtualKey, key, type)
+	self:send({
+		name = "setInputBinding",
+		virtualKey = virtualKey,
+		value = key,
+		type = type,
+		inputMode = inputMode,
+	})
 end
 
 return SelectNavigator

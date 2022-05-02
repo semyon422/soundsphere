@@ -1,46 +1,33 @@
 local Class = require("aqua.util.Class")
-local ThreadPool	= require("aqua.thread.ThreadPool")
-local aquaimage			= require("aqua.image")
+local aquathread = require("aqua.thread")
 local newPixel = require("aqua.graphics.newPixel")
 local tween				= require("tween")
+local aquatimer				= require("aqua.timer")
 
 local BackgroundModel = Class:new()
 
-BackgroundModel.construct = function(self)
-	self.currentPath = ""
-	self.alpha = 0
-	self.loadable = 0
-end
+BackgroundModel.alpha = 0
 
 BackgroundModel.load = function(self)
 	self.config = self.configModel.configs.select
 	self.noteChartDataEntryId = 0
-	self.backgroundPath = ""
+	self.path = ""
 
 	self.emptyImage = newPixel(0.25, 0.25, 0.25, 1)
-	self.images = {
-		self.emptyImage
-	}
+	self.images = {self.emptyImage}
 end
 
 BackgroundModel.update = function(self, dt)
-	if self.loadTween then
-		self.loadTween:update(dt)
-	end
-
-	if self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
-		self.noteChartDataEntryId = self.config.noteChartDataEntryId
-		local backgroundPath = self:getBackgroundPath()
-		if backgroundPath and self.backgroundPath ~= backgroundPath then
-			self.backgroundPath = backgroundPath
-			self.loadable = 0
-			self.loadTween = tween.new(0.1, self, {loadable = 1}, "inOutQuad")
+	local noteChartItem = self.selectModel.noteChartItem
+	if noteChartItem and self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
+		local path = noteChartItem:getBackgroundPath()
+		if path then
+			self.noteChartDataEntryId = self.config.noteChartDataEntryId
 		end
-	end
-
-	if self.loadable == 1 then
-		self:loadBackground(self.backgroundPath)
-		self.loadable = 0
+		if path and self.path ~= path then
+			self.path = path
+			self:loadBackgroundDebounce()
+		end
 	end
 
 	if self.alphaTween then
@@ -66,88 +53,110 @@ BackgroundModel.setBackground = function(self, image)
 	end
 end
 
-BackgroundModel.getBackgroundPath = function(self)
-	local config = self.config
-
-	local noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(config.noteChartSetEntryId)
-	local noteChartDataEntry = self.cacheModel.cacheManager:getNoteChartDataEntryById(config.noteChartDataEntryId)
-
-	if not noteChartSetEntry or not noteChartDataEntry then
-		return
-	end
-
-	local directoryPath = noteChartSetEntry.path
-	local stagePath = noteChartDataEntry.stagePath
-
-	if stagePath and stagePath ~= "" then
-		return directoryPath .. "/" .. stagePath
-	end
-
-	return directoryPath
+BackgroundModel.loadBackgroundDebounce = function(self, path)
+	self.path = path or self.path
+	aquatimer.debounce(self, "loadDebounce", 0.1, self.loadBackground, self)
 end
 
-BackgroundModel.reloadBackground = function(self)
-	self:loadBackground(self.backgroundPath)
+BackgroundModel.loadBackground = function(self)
+	local path = self.path
+
+	if not path:find("^http") then
+		local info = love.filesystem.getInfo(path)
+		if not info or info.type == "directory" then
+			self:setBackground(self.emptyImage)
+			return
+		end
+	end
+
+	local image
+	if path:find("%.ojn$") then
+		image = self:loadImage(path, "ojn")
+	elseif path:find("^http") then
+		image = self:loadImage(path, "http")
+	elseif path:find("%.mid$") then
+		image = self:loadImage("resources/midi/background.jpg")
+	else
+		image = self:loadImage(path)
+	end
+
+	if path ~= self.path then
+		return self:loadBackground()
+	end
+
+	if image then
+		return self:setBackground(image)
+	end
+
+	self:setBackground(self.emptyImage)
 end
 
-BackgroundModel.loadBackground = function(self, path)
+local loadImage = aquathread.async(function(path)
+	require("love.filesystem")
+	require("love.image")
+
 	local info = love.filesystem.getInfo(path)
-	if not info or info.type == "directory" then
-		self:setBackground(self.emptyImage)
-		self.currentPath = path
+	if not info then
 		return
 	end
-	if path ~= self.currentPath then
-		self.currentPath = path
-		if path:find("%.ojn$") then
-			self:loadOJN(path)
-		elseif path:find("%.mid$") then
-			self:loadImage("resources/midi/background.jpg")
-		else
-			self:loadImage(path)
-		end
+
+	local status, imageData = pcall(love.image.newImageData, path)
+	if status then
+		return imageData
 	end
-end
+end)
 
-BackgroundModel.loadImage = function(self, path)
-	aquaimage.load(path, function(imageData)
-		if imageData then
-			local image = love.graphics.newImage(imageData)
-			self:setBackground(image)
-		end
-	end)
-end
+local loadOJN = aquathread.async(function(path)
+	require("love.filesystem")
+	require("love.image")
+	local OJN = require("o2jam.OJN")
 
-BackgroundModel.loadOJN = function(self, path)
-	return ThreadPool:execute({
-		f = function(path)
-			require("love.filesystem")
-			require("love.image")
+	local content = love.filesystem.read(path)
+	if not content then
+		return
+	end
 
-			local OJN = require("o2jam.OJN")
+	local ojn = OJN:new(content)
+	if ojn.cover == "" then
+		return
+	end
 
-			local file = love.filesystem.newFile(path)
-			file:open("r")
-			local content = file:read()
-			file:close()
+	local fileData = love.filesystem.newFileData(ojn.cover, "cover")
+	local status, imageData = pcall(love.image.newImageData, fileData)
+	if status then
+		return imageData
+	end
+end)
 
-			local ojn = OJN:new(content)
-			if ojn.cover == "" then
-				return
-			end
+local loadHttp = aquathread.async(function(url)
+	local request = require("luajit-request")
+	local response, code, err = request.send(url)
+	if not response then
+		return
+	end
 
-			local fileData = love.filesystem.newFileData(ojn.cover, "cover")
-			return love.image.newImageData(fileData)
-		end,
-		params = {path},
-		result = function(imageData)
-			if not imageData then
-				return self:setBackground(self.emptyImage)
-			end
-			local image = love.graphics.newImage(imageData)
-			self:setBackground(image)
-		end
-	})
+	require("love.filesystem")
+	require("love.image")
+	local fileData = love.filesystem.newFileData(response.body, "cover")
+	local status, imageData = pcall(love.image.newImageData, fileData)
+	if status then
+		return imageData
+	end
+end)
+
+BackgroundModel.loadImage = function(self, path, type)
+	local imageData
+	if type == "ojn" then
+		imageData = loadOJN(path)
+	elseif type == "http" then
+		imageData = loadHttp(path)
+	else
+		imageData = loadImage(path)
+	end
+	if not imageData then
+		return
+	end
+	return love.graphics.newImage(imageData)
 end
 
 return BackgroundModel

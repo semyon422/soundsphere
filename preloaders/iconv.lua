@@ -3,24 +3,11 @@ local jit = require("jit")
 
 local load = ffi.load
 
-local get_libiconv_name = function()
-	local os = jit.os
-	local arch = jit.arch
-
-	if os == "Windows" then
-		if arch == "x64" then
-			return "bin/win64/libiconv-2.dll"
-		elseif arch == "x86" then
-			return "bin/win32/libiconv-2.dll"
-		end
-	elseif os == "Linux" then
-		return "libiconv"
-	end
-end
-
 local _load = function(name)
-	if name == "libiconv" then
-		return load(get_libiconv_name())
+	if jit.os == "Windows" then
+		return load("libiconv-2")
+	elseif jit.os == "Linux" then
+		return load("iconv")
 	end
 end
 

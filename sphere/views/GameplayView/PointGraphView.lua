@@ -62,7 +62,6 @@ PointGraphView.drawPoints = function(self, counter, canvas, color, radius)
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
-	tf:release()
 
 	local points = inside(self, config.key)
 	for i = state[counter] + 1, #points do

@@ -1,6 +1,7 @@
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local formatScore = function(score)
+	score = tonumber(score) or math.huge
 	if score >= 0.1 then
 		return "100+"
 	end
@@ -9,7 +10,9 @@ end
 
 local formatDifficulty = function(difficulty)
 	local format = "%.2f"
-	if difficulty >= 10000 then
+	if not difficulty then
+		return ""
+	elseif difficulty >= 10000 then
 		format = "%s"
 		difficulty = "????"
 	elseif difficulty >= 100 then
@@ -37,6 +40,126 @@ local CacheView = {
 		font = {
 			filename = "Noto Sans",
 			size = 24,
+		},
+	},
+}
+
+local OsudirectList = {
+	class = "OsudirectListView",
+	subscreen = "osudirect",
+	transform = transform,
+	x = 1187,
+	y = 144,
+	w = 454,
+	h = 792,
+	rows = 11,
+	elements = {
+		{
+			type = "text",
+			key = "title",
+			onNew = false,
+			x = 44,
+			baseline = 45,
+			limit = math.huge,
+			align = "left",
+			font = {
+				filename = "Noto Sans",
+				size = 24,
+			},
+		},
+		{
+			type = "text",
+			key = "artist",
+			onNew = false,
+			x = 45,
+			baseline = 19,
+			limit = math.huge,
+			align = "left",
+			font = {
+				filename = "Noto Sans",
+				size = 16,
+			},
+		},
+	},
+}
+
+local OsudirectScrollBar = {
+	class = "ScrollBarView",
+	subscreen = "osudirect",
+	transform = transform,
+	list = OsudirectList,
+	x = 1641,
+	y = 144,
+	w = 16,
+	h = 792,
+	rows = 11,
+	backgroundColor = {1, 1, 1, 0.33},
+	color = {1, 1, 1, 0.66}
+}
+
+local OsudirectDifficultiesList = {
+	class = "OsudirectDifficultiesListView",
+	subscreen = "osudirect",
+	transform = transform,
+	x = 733,
+	y = 216,
+	w = 454,
+	h = 648,
+	rows = 9,
+	elements = {
+		{
+			type = "text",
+			key = "name",
+			onNew = false,
+			x = 116,
+			baseline = 45,
+			limit = math.huge,
+			align = "left",
+			font = {
+				filename = "Noto Sans",
+				size = 24,
+			},
+		},
+		{
+			type = "text",
+			key = "beatmap.creator",
+			onNew = true,
+			x = 117,
+			baseline = 19,
+			limit = math.huge,
+			align = "left",
+			font = {
+				filename = "Noto Sans",
+				size = 16,
+			},
+		},
+		{
+			type = "text",
+			key = "cs",
+			format = "%skey",
+			onNew = true,
+			x = 17,
+			baseline = 19,
+			limit = 500,
+			align = "left",
+			font = {
+				filename = "Noto Sans",
+				size = 16,
+			},
+		},
+		{
+			type = "text",
+			key = "sr",
+			onNew = false,
+			x = 0,
+			baseline = 45,
+			limit = 72,
+			align = "right",
+			font = {
+				filename = "Noto Sans Mono",
+				size = 24,
+			},
+			format = formatDifficulty
 		},
 	},
 }
@@ -122,7 +245,7 @@ local NoteChartSetList = {
 	elements = {
 		{
 			type = "text",
-			key = "noteChartDataEntry.title",
+			key = "title",
 			onNew = false,
 			x = 44,
 			baseline = 45,
@@ -135,7 +258,7 @@ local NoteChartSetList = {
 		},
 		{
 			type = "text",
-			key = "noteChartDataEntry.artist",
+			key = "artist",
 			onNew = false,
 			x = 45,
 			baseline = 19,
@@ -148,7 +271,7 @@ local NoteChartSetList = {
 		},
 		{
 			type = "circle",
-			key = "tagged",
+			key = "lamp",
 			onNew = false,
 			x = 22,
 			y = 36,
@@ -169,7 +292,7 @@ local NoteChartList = {
 	elements = {
 		{
 			type = "text",
-			key = "noteChartDataEntry.name",
+			key = "name",
 			onNew = false,
 			x = 116,
 			baseline = 45,
@@ -182,7 +305,7 @@ local NoteChartList = {
 		},
 		{
 			type = "text",
-			key = "noteChartDataEntry.creator",
+			key = "creator",
 			onNew = true,
 			x = 117,
 			baseline = 19,
@@ -195,7 +318,7 @@ local NoteChartList = {
 		},
 		{
 			type = "text",
-			key = "noteChartDataEntry.inputMode",
+			key = "inputMode",
 			onNew = true,
 			x = 17,
 			baseline = 19,
@@ -208,7 +331,7 @@ local NoteChartList = {
 		},
 		{
 			type = "text",
-			key = "noteChartDataEntry.difficulty",
+			key = "difficulty",
 			onNew = false,
 			x = 0,
 			baseline = 45,
@@ -222,7 +345,7 @@ local NoteChartList = {
 		},
 		{
 			type = "circle",
-			key = "tagged",
+			key = "lamp",
 			onNew = false,
 			x = 94,
 			y = 36,
@@ -306,14 +429,14 @@ StageInfo.cells = {
 		x = 1, y = 3,
 		name = "bpm",
 		format = "%d",
-		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.bpm"
+		key = "gameController.selectModel.noteChartItem.bpm"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = {1, 2}, y = 3,
 		name = "duration",
-		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.length",
+		key = "gameController.selectModel.noteChartItem.length",
 		time = true
 	},
 	{
@@ -321,14 +444,14 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 2, y = 4,
 		name = "notes",
-		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.noteCount"
+		key = "gameController.selectModel.noteChartItem.noteCount"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "bar",
 		x = {3, 4}, y = 4,
 		name = "long notes",
-		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.longNoteRatio"
+		key = "gameController.selectModel.noteChartItem.longNoteRatio"
 	},
 	{
 		type = StageInfo.smallCell,
@@ -337,21 +460,21 @@ StageInfo.cells = {
 		name = "local offset",
 		format = "%d",
 		multiplier = 1000,
-		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.localOffset"
+		key = "gameController.selectModel.noteChartItem.localOffset"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 1, y = 4,
 		name = "level",
-		key = "gameController.selectModel.noteChartItem.noteChartDataEntry.level"
+		key = "gameController.selectModel.noteChartItem.level"
 	},
 	{
 		type = StageInfo.largeCell,
 		valueType = "text",
 		x = 2, y = 1,
 		name = "rating",
-		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.rating",
+		key = "gameController.selectModel.scoreItem.rating",
 		format = formatDifficulty
 	},
 	{
@@ -359,7 +482,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = {3, 4}, y = 8,
 		name = "played time ago",
-		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.time",
+		key = "gameController.selectModel.scoreItem.time",
 		ago = true,
 		suffix = ""
 	},
@@ -369,13 +492,15 @@ StageInfo.cells = {
 		x = 3, y = 5,
 		name = "score",
 		value = function(self)
-			if not self.gameController.scoreLibraryModel.firstScoreItem then
+			local scoreEntry = self.gameController.selectModel.scoreItem
+			if not scoreEntry then
 				return "0"
 			end
-			return ("%d"):format(
-				self.gameController.scoreLibraryModel.firstScoreItem.scoreEntry.rating /
-				self.gameController.scoreLibraryModel.firstScoreItem.scoreEntry.difficulty * 10000
-			)
+			local score = scoreEntry.score
+			if score ~= score then
+				return "nan"
+			end
+			return ("%d"):format(score)
 		end
 	},
 	{
@@ -383,7 +508,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 4, y = 5,
 		name = "accuracy",
-		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.accuracy",
+		key = "gameController.selectModel.scoreItem.accuracy",
 		format = formatScore
 	},
 	{
@@ -392,7 +517,7 @@ StageInfo.cells = {
 		x = {3, 4}, y = 6,
 		name = "miss count",
 		format = "%d",
-		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.missCount"
+		key = "gameController.selectModel.scoreItem.missCount"
 	},
 	{
 		type = StageInfo.smallCell,
@@ -400,7 +525,7 @@ StageInfo.cells = {
 		x = {2, 3}, y = 6,
 		name = "density",
 		format = formatDifficulty,
-		key = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.difficulty"
+		key = "gameController.selectModel.scoreItem.difficulty"
 	},
 }
 
@@ -444,6 +569,7 @@ local NoteChartSetScrollBar = {
 
 local SearchField = {
 	class = "SearchFieldView",
+	subscreen = "notecharts",
 	transform = transform,
 	x = 733,
 	y = 89,
@@ -469,11 +595,49 @@ local SearchField = {
 	},
 	point = {
 		r = 7
-	}
+	},
+	searchString = "gameController.searchModel.searchString",
+	searchMode = "gameController.searchModel.searchMode",
+	collapse = "gameController.noteChartSetLibraryModel.collapse",
+}
+
+local OsudirectSearchField = {
+	class = "SearchFieldView",
+	subscreen = "osudirect",
+	transform = transform,
+	x = 733,
+	y = 89,
+	w = 454,
+	h = 55,
+	frame = {
+		x = 6,
+		y = 6,
+		w = 454 - 6 * 2,
+		h = 43,
+		lineStyle = "smooth",
+		lineWidth = 1
+	},
+	text = {
+		x = 27,
+		baseline = 35,
+		limit = 454,
+		align = "left",
+		font = {
+			filename = "Noto Sans",
+			size = 20,
+		},
+	},
+	point = {
+		r = 7
+	},
+	searchString = "gameController.osudirectModel.searchString",
+	searchMode = "?",
+	collapse = "?",
 }
 
 local SortStepper = {
 	class = "SortStepperView",
+	subscreen = "notecharts",
 	transform = transform,
 	x = 1014,
 	y = 89,
@@ -521,7 +685,7 @@ local StageInfoModifierIconGrid = {
 	h = 138,
 	columns = 4,
 	rows = 3,
-	config = "gameController.scoreLibraryModel.firstScoreItem.scoreEntry.modifiers",
+	config = "gameController.selectModel.scoreItem.modifiers",
 	noModifier = true
 }
 
@@ -559,8 +723,9 @@ local SessionTime = {
 	align = "left",
 }
 
-local BottomScreenMenu = {
+local BottomNotechartsScreenMenu = {
 	class = "ScreenMenuView",
+	subscreen = "notecharts",
 	transform = transform,
 	x = 392,
 	y = 991,
@@ -586,15 +751,43 @@ local BottomScreenMenu = {
 				displayName = "modifiers"
 			},
 			{
-				method = "changeScreen",
-				value = "NoteSkin",
+				method = "openNoteSkins",
 				displayName = "noteskins"
 			},
 			{
-				method = "changeScreen",
-				value = "Input",
+				method = "openInput",
 				displayName = "input"
 			}
+		}
+	}
+}
+
+local BottomCollectionsScreenMenu = {
+	class = "ScreenMenuView",
+	subscreen = "collections",
+	transform = transform,
+	x = 392,
+	y = 991,
+	w = 681,
+	h = 89,
+	rows = 1,
+	columns = 3,
+	text = {
+		x = 0,
+		baseline = 54,
+		limit = 228,
+		align = "center",
+		font = {
+			filename = "Noto Sans",
+			size = 24,
+		},
+	},
+	items = {
+		{
+			{
+				method = "calculateTopScores",
+				displayName = "calc top scores"
+			},
 		}
 	}
 }
@@ -631,12 +824,12 @@ local BottomRightCollectionsScreenMenu = {
 	class = "ScreenMenuView",
 	subscreen = "collections",
 	transform = transform,
-	x = 1300,
+	x = 1300 - 227,
 	y = 991,
-	w = 227,
+	w = 227 * 2,
 	h = 89,
 	rows = 1,
-	columns = 1,
+	columns = 2,
 	text = {
 		x = 0,
 		baseline = 54,
@@ -649,8 +842,45 @@ local BottomRightCollectionsScreenMenu = {
 	},
 	items = {{
 		{
+			method = "switchToOsudirect",
+			displayName = "direct"
+		},
+		{
 			method = "switchToNoteCharts",
 			displayName = "notecharts"
+		},
+	}}
+}
+
+local BottomRightOsudirectScreenMenu = {
+	class = "ScreenMenuView",
+	subscreen = "osudirect",
+	transform = transform,
+	x = 1300 - 227 * 2,
+	y = 991,
+	w = 227 * 3,
+	h = 89,
+	rows = 1,
+	columns = 3,
+	text = {
+		x = 0,
+		baseline = 54,
+		limit = 228,
+		align = "center",
+		font = {
+			filename = "Noto Sans",
+			size = 24,
+		},
+	},
+	items = {{
+		{
+			method = "downloadBeatmapSet",
+			displayName = "download"
+		},
+		{},
+		{
+			method = "switchToCollections",
+			displayName = "collections"
 		},
 	}}
 }
@@ -839,16 +1069,22 @@ local SelectViewConfig = {
 	StageInfo,
 	NoteChartSetScrollBar,
 	CacheView,
+	OsudirectList,
 	CollectionList,
 	CollectionScrollBar,
+	OsudirectScrollBar,
 	require("sphere.views.HeaderViewConfig"),
 	SearchField,
+	OsudirectSearchField,
 	SortStepper,
 	ModifierIconGrid,
 	StageInfoModifierIconGrid,
-	BottomScreenMenu,
+	BottomNotechartsScreenMenu,
+	BottomCollectionsScreenMenu,
 	BottomRightNotechartsScreenMenu,
 	BottomRightCollectionsScreenMenu,
+	BottomRightOsudirectScreenMenu,
+	OsudirectDifficultiesList,
 	NoteChartSubScreenMenu,
 	NoteChartOptionsScreenMenu,
 	LeftScreenMenu,

@@ -1,97 +1,102 @@
-local Class = require("aqua.util.Class")
+local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
+local LibraryModel = require("sphere.models.LibraryModel")
 
-local NoteChartLibraryModel = Class:new()
+local NoteChartLibraryModel = LibraryModel:new()
 
-NoteChartLibraryModel.searchMode = "hide"
 NoteChartLibraryModel.setId = 1
 
-NoteChartLibraryModel.construct = function(self)
-	self.items = {}
+local NoteChartItem = {}
+
+NoteChartItem.getBackgroundPath = function(self)
+	local path = self.path
+	if not path or not self.stagePath then
+		return
+	end
+
+	if path:find("%.ojn$") or path:find("%.mid$") then
+		return path
+	end
+
+	local directoryPath = path:match("^(.+)/(.-)$") or ""
+	local stagePath = self.stagePath
+
+	if stagePath and stagePath ~= "" then
+		return directoryPath .. "/" .. stagePath
+	end
+
+	return directoryPath
+end
+
+NoteChartItem.getAudioPathPreview = function(self)
+	if not self.path or not self.audioPath then
+		return
+	end
+
+	local directoryPath = self.path:match("^(.+)/(.-)$") or ""
+	local audioPath = self.audioPath
+
+	if audioPath and audioPath ~= "" then
+		return directoryPath .. "/" .. audioPath, math.max(0, self.previewTime or 0)
+	end
+
+	return directoryPath .. "/preview.ogg", 0
+end
+
+NoteChartItem.__index = function(self, k)
+	local raw = rawget(NoteChartItem, k)
+	if raw then
+		return raw
+	end
+	local model = self.noteChartLibraryModel
+	if not model.slice then
+		return
+	end
+	local entry = CacheDatabase.noteChartItems[model.slice.offset + self.itemIndex - 1]
+	if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "lamp" then
+		return entry[k]
+	end
+	local noteChart = CacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
+	local noteChartData = CacheDatabase:getCachedEntry("noteChartDatas", entry.noteChartDataId)
+	return noteChartData and noteChartData[k] or noteChart and noteChart[k]
+end
+
+NoteChartLibraryModel.load = function(self)
+	self.itemsCache.loadObject = function(_, itemIndex)
+		return setmetatable({
+			noteChartLibraryModel = self,
+			itemIndex = itemIndex,
+		}, NoteChartItem)
+	end
+end
+
+NoteChartLibraryModel.clear = function(self)
+	self.slice = nil
+	self.itemsCount = 0
 end
 
 NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
-	if setId == self.setId then
+	self.setId = setId
+	local slice = CacheDatabase.noteChartSlices[setId]
+	self.slice = slice
+	if not slice then
+		self.itemsCount = 0
 		return
 	end
-	self.setId = setId
+	self.itemsCount = slice.size
 end
 
-NoteChartLibraryModel.updateItems = function(self)
-	local items = {}
-	self.items = items
-
-	local noteChartEntries = self.cacheModel.cacheManager:getNoteChartsAtSet(self.setId)
-	if not noteChartEntries or not noteChartEntries[1] then
-		return items
-	end
-
-	local map = {}
-	local noteChartDataEntries = {}
-	for i = 1, #noteChartEntries do
-		local allEntries = self.cacheModel.cacheManager:getAllNoteChartDataEntries(noteChartEntries[i].hash)
-		if #allEntries == 0 then
-			allEntries = {self.cacheModel.cacheManager:getEmptyNoteChartDataEntry(noteChartEntries[i].path)}
-		end
-		for _, entry in pairs(allEntries) do
-			noteChartDataEntries[#noteChartDataEntries + 1] = entry
-			map[entry] = noteChartEntries[i]
-		end
-	end
-
-	local noteChartSetEntry = self.cacheModel.cacheManager:getNoteChartSetEntryById(self.setId)
-	local foundList, foundMap = self.searchModel:search(noteChartDataEntries)
-	for i = 1, #noteChartDataEntries do
-		local noteChartDataEntry = noteChartDataEntries[i]
-		local check = foundMap[noteChartDataEntry]
-		if check or self.searchMode == "show" then
-			items[#items + 1] = {
-				noteChartSetEntry = noteChartSetEntry,
-				noteChartDataEntry = noteChartDataEntry,
-				noteChartEntry = map[noteChartDataEntry],
-				tagged = self.searchMode == "show" and check
-			}
-		end
-	end
-
-	table.sort(items, self.sortItemsFunction)
-end
-
-NoteChartLibraryModel.sortItemsFunction = function(a, b)
-	a, b = a.noteChartDataEntry, b.noteChartDataEntry
-	if #a.inputMode ~= #b.inputMode then
-		return #a.inputMode < #b.inputMode
-	elseif a.inputMode ~= b.inputMode then
-		return a.inputMode < b.inputMode
-	elseif a.difficulty ~= b.difficulty then
-		return a.difficulty < b.difficulty
-	elseif a.name ~= b.name then
-		return a.name < b.name
-	end
-	return a.id < b.id
-end
-
-NoteChartLibraryModel.getItemIndex = function(self, noteChartEntryId, noteChartDataEntryId)
-	local items = self.items
-
-	if not items then
+NoteChartLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId, noteChartSetId)
+	if not noteChartDataId or not noteChartId or not noteChartSetId then
 		return 1
 	end
 
-	for i = 1, #items do
-		local item = items[i]
-		if item.noteChartEntry.id == noteChartEntryId and item.noteChartDataEntry.id == noteChartDataEntryId then
-			return i
-		end
-	end
+	local entry = self.entry
+	entry.noteChartDataId = noteChartDataId
+	entry.noteChartId = noteChartId
+	entry.setId = noteChartSetId
+	local key = entry.key
 
-	return 1
-end
-
-NoteChartLibraryModel.getItem = function(self, noteChartEntryId, noteChartDataEntryId)
-	local itemIndex = self:getItemIndex(noteChartEntryId, noteChartDataEntryId)
-	if itemIndex then
-		return self.items[itemIndex]
-	end
+	return (CacheDatabase.entryKeyToLocalOffset[key] or 0) + 1
 end
 
 return NoteChartLibraryModel
