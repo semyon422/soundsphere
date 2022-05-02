@@ -74,7 +74,7 @@ InputManager.getKeyConfig = function(self, event)
 
 	local key = tostring(event[2])
 	if device == "midi" then
-		key = tostring(event[1])
+		key = event[1]
 	end
 
 	local inputConfig = self.inputConfig
