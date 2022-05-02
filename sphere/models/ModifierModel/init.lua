@@ -36,9 +36,9 @@ local Modifiers = {
 	TimeRateX,
 	WindUp,
 	AudioClip,
-	NoChords,
 	NoScratch,
 	NoLongNote,
+	NoChords,
 	NoMeasureLine,
 	Automap,
 	MultiplePlay,
@@ -90,9 +90,9 @@ local OneUseModifiers = {
 	TimeRateX,
 	WindUp,
 	AudioClip,
-	NoChords,
 	NoScratch,
 	NoLongNote,
+	NoChords,
 	NoMeasureLine,
 }
 
