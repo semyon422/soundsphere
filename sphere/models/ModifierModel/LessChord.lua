@@ -7,17 +7,17 @@ LessChord.interfaceType = "stepper"
 
 LessChord.name = "LessChord"
 
-LessChord.defaultValue = "all"
+LessChord.defaultValue = "none"
 LessChord.range = {1, 8}
-LessChord.values = {"all", "-5", "-4", "-3", "2", "3", "4", "5"}
+LessChord.values = {"none", "-5", "-4", "-3", "2", "3", "4", "5"}
 
 LessChord.getString = function(self, config)
 	return "LC"
 end
 
 LessChord.getSubString = function(self, config)
-	if config.value == "all" then
-		return "A"
+	if config.value == "none" then
+		return "N"
 	end
 	return config.value
 end
@@ -26,7 +26,7 @@ end
 --		 and LN + LN chords
 LessChord.apply = function(self, config)
 	local configVal
-	if (config.value ~= "all") then
+	if (config.value ~= "none") then
 		configVal = tonumber(config.value)
 	end
 
@@ -79,8 +79,8 @@ LessChord.apply = function(self, config)
 
 		for chordCount, chord in ipairs(sortedChords) do
 			if configVal == nil or
-					(configVal > 0 and chordCount % configVal ~= 0) or
-					(configVal < 0 and chordCount % math.abs(configVal) == 0) then
+					(configVal > 0 and chordCount % configVal == 0) or
+					(configVal < 0 and chordCount % math.abs(configVal) ~= 0) then
 				table.sort(chord.notes, function(a, b) return a.inputIndex < b.inputIndex end)
 				local lowestSize = math.huge
 				local noteDataToKeep
