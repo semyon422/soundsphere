@@ -3,34 +3,24 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 local NoChords = Modifier:new()
 
 NoChords.type = "NoteChartModifier"
-NoChords.interfaceType = "toggle"
+NoChords.interfaceType = "slider"
 
-NoChords.defaultValue = true
 NoChords.name = "NoChords"
-NoChords.shortName = "NCH"
+
+NoChords.defaultValue = 0
+NoChords.range = {0, 5}
 
 NoChords.getString = function(self, config)
-	if not config.value then
-		return
-	end
-	return Modifier.getString(self)
+	return "NCH"
 end
 
-local function getColumnSizes(columns)
-	local columnSizes = {}
-	for i, v in ipairs(columns) do
-		columnSizes[i] = v.size
-	end
-	return columnSizes
+NoChords.getSubString = function(self, config)
+	return config.value
 end
 
 -- TODO: Also remove LN + ShortNote chords
 --		 and LN + LN chords
 NoChords.apply = function(self, config)
-	if not config.value then
-		return
-	end
-
 	local noteChart = self.noteChartModel.noteChart
 	local layerDataSequence = noteChart.layerDataSequence
 	local inputCount = noteChart.inputMode:getInputCount("key")
@@ -39,9 +29,10 @@ NoChords.apply = function(self, config)
 		local layerData = noteChart:requireLayerData(layerIndex)
 
 		local chords = {}
-		local columns = {}
+		local noteDatas = {}
+		local columnSizes = {}
 		for i=0, inputCount do
-			columns[i] = { size=0 }
+			columnSizes[i] = 0
 		end
 
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
@@ -51,25 +42,22 @@ NoChords.apply = function(self, config)
 				local index = noteData.inputIndex
 				local time = noteData.timePoint.absoluteTime
 
-				columns[index].size = columns[index].size + 1
+				columnSizes[index] = columnSizes[index] + 1
 				if noteData.noteType == "ShortNote" then
 					if chords[time] ~= nil then
 						table.insert(chords[time].notes, noteData)
-						chords[time].columnSizes = getColumnSizes(columns)
+						chords[time].columnSizes = { unpack(columnSizes) }
 					else
-						for _, column in ipairs(columns) do
-							if column[time] ~= nil then
-								chords[time] = {
-									time = time,
-									notes = { column[time], noteData },
-									columnSizes = getColumnSizes(columns)
-								}
-								break
-							end
+						if noteDatas[time] ~= nil then
+							chords[time] = {
+								time = time,
+								notes = { noteDatas[time], noteData },
+								columnSizes =  { unpack(columnSizes) }
+							}
 						end
-					end
 
-					columns[index][time] = noteData
+						noteDatas[time] = noteData
+					end
 				end
 			end
 		end

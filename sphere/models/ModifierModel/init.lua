@@ -38,7 +38,6 @@ local Modifiers = {
 	AudioClip,
 	NoScratch,
 	NoLongNote,
-	NoChords,
 	NoMeasureLine,
 	Automap,
 	MultiplePlay,
@@ -49,6 +48,7 @@ local Modifiers = {
 	Mirror,
 	Random,
 	BracketSwap,
+	NoChords,
 	FullLongNote,
 	MinLnLength,
 	ToOsu,
@@ -92,7 +92,6 @@ local OneUseModifiers = {
 	AudioClip,
 	NoScratch,
 	NoLongNote,
-	NoChords,
 	NoMeasureLine,
 }
 
