@@ -25,6 +25,10 @@ InputModel.getInputBindings = function(self)
 end
 
 InputModel.setKey = function(self, inputMode, virtualKey, key, type)
+	if type == "midi" then
+		key = tonumber(key)
+	end
+
 	local inputBindings = self.inputBindings
 
 	inputBindings[inputMode] = inputBindings[inputMode] or {}

@@ -29,7 +29,7 @@ InputView.draw = function(self)
 			for i = 1, #items do
 				local virtualKey = items[i].virtualKey
 				local key, device = self.gameController.inputModel:getKey(inputModeString, virtualKey)
-				keyPtr[0] = key
+				keyPtr[0] = tostring(key)
 				devicePtr[0] = device
 				if ImguiHotkey(virtualKey, keyPtr, devicePtr) then
 					key = ffi.string(keyPtr[0])
