@@ -77,7 +77,7 @@ elseif jit.os == "Linux" then
 	if not ldlp or not ldlp:find("bin/linux64") then
 		ffi.cdef("int setenv(const char *name, const char *value, int overwrite);")
 		ffi.C.setenv("LD_LIBRARY_PATH", (ldlp or "") .. ":" .. root .. "/bin/linux64", true)
-		os.execute(arg[-2] .. " " .. arg[1] .. " &")
+		os.execute(("%q %q &"):format(arg[-2], arg[1]))
 		return os.exit()
 	end
 	ffi.cdef("int chdir(const char *path);")
