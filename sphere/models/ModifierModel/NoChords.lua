@@ -34,14 +34,15 @@ NoChords.apply = function(self, config)
 	local noteChart = self.noteChartModel.noteChart
 	local layerDataSequence = noteChart.layerDataSequence
 	local inputCount = noteChart.inputMode:getInputCount("key")
-	local chords = {}
-	local columns = {}
-	for i=0, inputCount do
-		columns[i] = { size=0 }
-	end
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
+
+		local chords = {}
+		local columns = {}
+		for i=0, inputCount do
+			columns[i] = { size=0 }
+		end
 
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
@@ -63,12 +64,13 @@ NoChords.apply = function(self, config)
 									notes = { column[time], noteData },
 									columnSizes = getColumnSizes(columns)
 								}
+								break
 							end
 						end
 					end
-				end
 
-				columns[index][time] = noteData
+					columns[index][time] = noteData
+				end
 			end
 		end
 
@@ -95,7 +97,7 @@ NoChords.apply = function(self, config)
 					for _, futureChord in ipairs(sortedChords) do
 						futureChord.columnSizes[noteData.inputIndex] = futureChord.columnSizes[noteData.inputIndex] - 1
 					end
-					
+
 					layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, -1)
 
 					noteData.noteType = "SoundNote"
@@ -103,7 +105,6 @@ NoChords.apply = function(self, config)
 					noteData.inputIndex = 0
 
 					layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, 1)
-
 				end
 			end
 		end
