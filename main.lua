@@ -34,11 +34,43 @@ else
 	root = source
 end
 
+local to_wchar_t
+do
+	local defined = false
+	to_wchar_t = function(s)
+		if not defined then
+			ffi.cdef([[
+				int MultiByteToWideChar(
+					uint32_t CodePage,
+					uint32_t dwFlags,
+					const char *lpMultiByteStr,
+					int32_t cbMultiByte,
+					wchar_t *lpWideCharStr,
+					int32_t cchWideChar
+				);
+			]])
+			defined = true
+		end
+
+		local size = ffi.C.MultiByteToWideChar(65001, 8, s, #s, nil, 0)
+		assert(size > 0, "conversion error")
+
+		local buf = ffi.new("wchar_t[?]", size + 1)
+		assert(ffi.C.MultiByteToWideChar(65001, 8, s, #s, buf, size) ~= 0, "conversion error")
+
+		return buf
+	end
+end
+
 if jit.os == "Windows" then
-	ffi.cdef("int _putenv_s(const char *varname, const char *value_string);")
-	ffi.cdef("int _chdir(const char *dirname);")
-	ffi.C._putenv_s("PATH", os.getenv("PATH") .. ";" .. root .. "/bin/win64")
-	ffi.C._chdir(root)
+	-- ffi.cdef("int _putenv_s(const char *varname, const char *value_string);")
+	-- ffi.cdef("int _chdir(const char *dirname);")
+	-- assert(ffi.C._putenv_s("PATH", os.getenv("PATH") .. ";" .. root .. "/bin/win64") == 0)
+	-- assert(ffi.C._chdir(root) == 0)
+	ffi.cdef("int _wputenv_s(const wchar_t *varname, const wchar_t *value_string);")
+	ffi.cdef("int _wchdir(const wchar_t *dirname);")
+	assert(ffi.C._wputenv_s(to_wchar_t("PATH"), to_wchar_t(os.getenv("PATH") .. ";" .. root .. "/bin/win64")) == 0)
+	assert(ffi.C._wchdir(to_wchar_t(root)) == 0)
 	aquapackage.add("bin/win64")
 elseif jit.os == "Linux" then
 	local ldlp = os.getenv("LD_LIBRARY_PATH")
