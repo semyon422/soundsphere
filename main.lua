@@ -53,6 +53,12 @@ elseif jit.os == "Linux" then
 	aquapackage.add("bin/linux64")
 end
 
+local aquautf8 = require("aqua.utf8")
+local errhand = love.errhand
+function love.errhand(msg)
+	return errhand(aquautf8.validate(msg))
+end
+
 local aquafs = require("aqua.filesystem")
 aquafs.setWriteDir(root)
 
