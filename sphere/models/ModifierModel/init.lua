@@ -23,7 +23,7 @@ local Random		= require("sphere.models.ModifierModel.Random")
 local BracketSwap	= require("sphere.models.ModifierModel.BracketSwap")
 local FullLongNote	= require("sphere.models.ModifierModel.FullLongNote")
 local ToOsu			= require("sphere.models.ModifierModel.ToOsu")
-local NoChords	= require("sphere.models.ModifierModel.NoChords")
+local LessChord	= require("sphere.models.ModifierModel.LessChord")
 
 local ModifierModel = Class:new()
 
@@ -48,7 +48,7 @@ local Modifiers = {
 	Mirror,
 	Random,
 	BracketSwap,
-	NoChords,
+	LessChord,
 	FullLongNote,
 	MinLnLength,
 	ToOsu,
@@ -78,7 +78,7 @@ local ModifierId = {
 	[MinLnLength] = 20,
 	[ToOsu] = 21,
 	[Alternate2] = 22,
-	[NoChords] = 23,
+	[LessChord] = 23,
 }
 
 local OneUseModifiers = {
