@@ -38,6 +38,7 @@ local Modifiers = {
 	AudioClip,
 	NoScratch,
 	NoLongNote,
+	NoChords,
 	NoMeasureLine,
 	Automap,
 	MultiplePlay,
@@ -92,6 +93,7 @@ local OneUseModifiers = {
 	AudioClip,
 	NoScratch,
 	NoLongNote,
+	NoChords,
 	NoMeasureLine,
 }
 
