@@ -24,6 +24,7 @@ Open-source rhythm game
 - Configurable difficulty of score system
 - Subdirectories as collections
 - Partitial controller support
+- Midi input support
 - Search filters (e.g. l>5m)
 - Clear lamps (using filters)
 - Sorting
