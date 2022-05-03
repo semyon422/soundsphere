@@ -1,15 +1,11 @@
-local Class = require("aqua.util.Class")
-
 local FastplayController = require("sphere.controllers.FastplayController")
 local ResultController = require("sphere.controllers.ResultController")
 local WebNoteChartController = require("sphere.controllers.WebNoteChartController")
 
 local Replay = require("sphere.models.ReplayModel.Replay")
-local NoteChartFactory = require("notechart.NoteChartFactory")
 local ModifierModel = require("sphere.models.ModifierModel")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local RhythmModel = require("sphere.models.RhythmModel")
-local NoteChartModel = require("sphere.models.NoteChartModel")
 
 local WebReplayController = {}
 
@@ -36,7 +32,7 @@ WebReplayController.POST = function(self)
 
 	local rhythmModel = RhythmModel:new()
 	local modifierModel = ModifierModel:new()
-	local noteChartModel = NoteChartModel:new()
+	local noteChartModel = {}
 	local difficultyModel = DifficultyModel:new()
 
 	modifierModel.noteChartModel = noteChartModel
