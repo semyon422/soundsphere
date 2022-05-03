@@ -44,7 +44,7 @@ ListItemView.drawValue = function(self, valueConfig, value)
 	local config = self.listView.config
 
 	if type(value) == "function" then
-		value = value()
+		value = value(self.listView, self.item)
 	end
 	if valueConfig.format then
 		local format = valueConfig.format

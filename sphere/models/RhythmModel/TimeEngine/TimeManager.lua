@@ -3,11 +3,11 @@ local Timer = require("aqua.util.Timer")
 local TimeManager = Timer:new()
 
 TimeManager.getAbsoluteTime = function(self)
-	return self.eventTime
+	return self.eventTime or 0
 end
 
 TimeManager.getAbsoluteDelta = function(self)
-	return self.eventDelta
+	return self.eventDelta or 0
 end
 
 TimeManager.getAdjustTime = function(self)

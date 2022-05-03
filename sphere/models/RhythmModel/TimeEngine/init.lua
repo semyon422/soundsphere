@@ -20,6 +20,7 @@ TimeEngine.timeRate = 1
 TimeEngine.targetTimeRate = 1
 TimeEngine.inputOffset = 0
 TimeEngine.visualOffset = 0
+TimeEngine.baseTimeRate = 1
 
 TimeEngine.load = function(self)
 	self.startTime = -self.timeToPrepare
@@ -27,10 +28,11 @@ TimeEngine.load = function(self)
 	self.currentVisualTime = self.startTime
 	self.timeRate = 1
 	self.targetTimeRate = 1
+	self.baseTimeRate = 1
 
 	self.timer:reset()
 	self:loadTimePoints()
-	self.timeRateHandlers = {}
+	self:resetTimeRateHandlers()
 
 	self.minTime = self.noteChart.metaData:get("minTime")
 	self.maxTime = self.noteChart.metaData:get("maxTime")
@@ -38,6 +40,10 @@ end
 
 TimeEngine.updateTimeToPrepare = function(self)
 	self.timer:setPosition(-self.timeToPrepare * self:getBaseTimeRate())
+end
+
+TimeEngine.resetTimeRateHandlers = function(self)
+	self.timeRateHandlers = {}
 end
 
 TimeEngine.createTimeRateHandler = function(self)
@@ -55,6 +61,7 @@ TimeEngine.getBaseTimeRate = function(self)
 	for i = 1, #timeRateHandlers do
 		timeRate = timeRate * timeRateHandlers[i].timeRate
 	end
+	self.baseTimeRate = timeRate
 	return timeRate
 end
 
