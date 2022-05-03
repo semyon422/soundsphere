@@ -333,7 +333,7 @@ local NoteChartList = {
 			type = "text",
 			value = function(self, item)
 				local baseTimeRate = self.gameController.rhythmModel.timeEngine.baseTimeRate
-				return item.difficulty * baseTimeRate
+				return (item.difficulty or 0) * baseTimeRate
 			end,
 			onNew = false,
 			x = 0,
