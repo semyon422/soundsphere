@@ -55,7 +55,7 @@ OsuNoteSkin.load = function(self)
 	self:fixManiaValues()
 
 	local config, exists = ImguiConfig:new({defaultContent = self.configContent}):fromFile(
-		self.path:gsub("skin%.ini$", keysCount .. "key.config.lua")
+		self.path:sub(1, -9) .. keysCount .. "key.config.lua"
 	)
 	self.config = config
 	if not exists then
