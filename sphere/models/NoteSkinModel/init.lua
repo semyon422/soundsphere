@@ -63,9 +63,9 @@ end
 
 NoteSkinModel.loadNoteSkin = function(self, path, directoryPath, itemName)
 	local noteSkin
-	if path:find("^.+%.lua$") then
+	if path:lower():find("^.+%.lua$") then
 		noteSkin = self:loadLua(path, directoryPath, itemName)
-	elseif path:find("^.+%.ini$") then
+	elseif path:lower():find("^.+%.ini$") then
 		return self:addNoteSkins(self:loadOsu(path, directoryPath, itemName))
 	end
 	table.insert(self.noteSkins, noteSkin)
