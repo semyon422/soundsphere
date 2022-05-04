@@ -9,6 +9,7 @@ BaseScoreSystem.name = "base"
 BaseScoreSystem.construct = function(self)
 	self.hitCount = 0
 	self.missCount = 0
+	self.earlyHitCount = 0
 
 	self.noteCount = 0
 	self.combo = 0
@@ -70,6 +71,10 @@ BaseScoreSystem.miss = function(self)
 	self.isMiss = true
 end
 
+BaseScoreSystem.earlyHit = function(self)
+	self.earlyHitCount = self.earlyHitCount + 1
+end
+
 BaseScoreSystem.countLastMean = function(self, event)
 	local noteStartTime = event.noteStartTime or event.noteTime
 	local deltaTime = (event.currentTime - noteStartTime) / math.abs(event.timeRate)
@@ -88,6 +93,7 @@ BaseScoreSystem.notes = {
 		clear = {
 			passed = {BaseScoreSystem.success, BaseScoreSystem.countLastMean},
 			missed = {BaseScoreSystem.breakCombo, BaseScoreSystem.miss},
+			clear = BaseScoreSystem.earlyHit,
 		},
 	},
 	LongScoreNote = {
@@ -95,6 +101,7 @@ BaseScoreSystem.notes = {
 			startPassedPressed = BaseScoreSystem.countLastMean,
 			startMissed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
 			startMissedPressed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
+			clear = BaseScoreSystem.earlyHit,
 		},
 		startPassedPressed = {
 			startMissed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},

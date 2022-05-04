@@ -100,6 +100,8 @@ PointGraphView.drawPoint = function(self, point, color, radius)
 		if not x then
 			return
 		end
+		x = math.min(math.max(x, 0), 1)
+		y = math.min(math.max(y, 0), 1)
 		local _x, _y = map(x, 0, 1, 0, config.w), map(y, 0, 1, 0, config.h)
 		love.graphics.rectangle("fill", _x - radius, _y - radius, radius * 2, radius * 2)
 	elseif config.line then
@@ -107,6 +109,7 @@ PointGraphView.drawPoint = function(self, point, color, radius)
 		if not x then
 			return
 		end
+		x = math.min(math.max(x, 0), 1)
 		local _x = map(x, 0, 1, 0, config.w)
 		love.graphics.rectangle("fill", _x - radius, 0, radius * 2, config.h)
 	end

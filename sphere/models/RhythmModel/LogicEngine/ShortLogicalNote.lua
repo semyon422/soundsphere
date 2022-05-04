@@ -28,6 +28,7 @@ end
 ShortLogicalNote.processTimeState = function(self, timeState)
 	local keyState = self.keyState
 	if keyState and timeState == "too early" then
+		self:switchState("clear")
 		self.keyState = false
 	elseif keyState and (timeState == "early" or timeState == "late") or timeState == "too late" then
 		self:switchState("missed")

@@ -40,18 +40,17 @@ LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
 
 	local keyState = self.keyState
 	if keyState and startTimeState == "too early" then
+		self:switchState("clear")
 		self.keyState = false
 	elseif lastState == "clear" then
 		if startTimeState == "too late" then
 			self:switchState("startMissed")
-			self.started = true
 		elseif keyState then
 			if startTimeState == "early" or startTimeState == "late" then
 				self:switchState("startMissedPressed")
 			elseif startTimeState == "exactly" then
 				self:switchState("startPassedPressed")
 			end
-			self.started = true
 		end
 	elseif lastState == "startPassedPressed" then
 		if endTimeState == "too late" then

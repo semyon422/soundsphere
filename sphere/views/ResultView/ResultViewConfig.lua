@@ -723,6 +723,14 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
+		x = 2, y = 7,
+		name = "spam",
+		key = "gameController.rhythmModel.scoreEngine.scoreSystem.base.earlyHitCount",
+		show = showLoadedScore,
+	},
+	{
+		type = StageInfo.smallCell,
+		valueType = "text",
 		x = {3, 4}, y = 6,
 		name = "early/late",
 		key = {
