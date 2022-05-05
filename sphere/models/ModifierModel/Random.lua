@@ -40,13 +40,13 @@ Random.getMap = function(self, config)
 		local halfFloor = math.floor(inputCount / 2)
 		local halfCeil = math.ceil(inputCount / 2)
 		for i = 1, #subInputs do
-			if value == 1 then
+			if value == "all" then
 				filteredSubInputs[#filteredSubInputs + 1] = subInputs[i]
-			elseif value == 2 then
+			elseif value == "left" then
 				if subInputs[i] <= halfFloor then
 					filteredSubInputs[#filteredSubInputs + 1] = subInputs[i]
 				end
-			elseif value == 3 then
+			elseif value == "right" then
 				if subInputs[i] > halfCeil then
 					filteredSubInputs[#filteredSubInputs + 1] = subInputs[i]
 				end

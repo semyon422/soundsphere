@@ -40,15 +40,15 @@ Mirror.getMap = function(self, config)
 		local submap = map[inputType]
 		local halfFloor = math.floor(inputCount / 2)
 		local halfCeil = math.ceil(inputCount / 2)
-		if value == 1 then
+		if value == "all" then
 			for i = 1, inputCount do
 				submap[i] = inputCount - i + 1
 			end
-		elseif value == 2 then
+		elseif value == "left" then
 			for i = 1, halfFloor do
 				submap[i] = halfFloor - i + 1
 			end
-		elseif value == 3 then
+		elseif value == "right" then
 			for i = 1, halfFloor do
 				submap[halfCeil + i] = inputCount - i + 1
 			end
