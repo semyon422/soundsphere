@@ -1,3 +1,4 @@
+local utf8 = require("utf8")
 local Class = require("aqua.util.Class")
 local erfunc = require("libchart.erfunc")
 
@@ -140,7 +141,10 @@ SearchModel.transformSearchString = function(self, s, addCollectionFilter)
 	local conditions = {}
 
 	if addCollectionFilter then
-		table.insert(conditions, ("substr(noteCharts.path, 1, %d) = %q"):format(#self.collection.path, self.collection.path))
+		table.insert(
+			conditions,
+			("substr(noteCharts.path, 1, %d) = %q"):format(utf8.len(self.collection.path), self.collection.path)
+		)
 	end
 
 	for _, searchSubString in ipairs(searchString:split(" ")) do
