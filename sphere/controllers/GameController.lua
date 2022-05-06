@@ -282,9 +282,7 @@ GameController.receive = function(self, event)
 	elseif event.name == "resize" then
 		self.frameTimeView:load()
 	elseif event.name == "quit" then
-		self:unload()
-		aquaevent.quit()
-		return
+		return self:unload()
 	end
 
 	self.screenManager:receive(event)
