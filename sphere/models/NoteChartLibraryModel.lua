@@ -7,6 +7,10 @@ NoteChartLibraryModel.setId = 1
 
 local NoteChartItem = {}
 
+local function evalPath(path)
+	return path:gsub("\\", "/"):gsub("/[^/]-/%.%./", "/")
+end
+
 NoteChartItem.getBackgroundPath = function(self)
 	local path = self.path
 	if not path or not self.stagePath then
@@ -21,7 +25,7 @@ NoteChartItem.getBackgroundPath = function(self)
 	local stagePath = self.stagePath
 
 	if stagePath and stagePath ~= "" then
-		return directoryPath .. "/" .. stagePath
+		return evalPath(directoryPath .. "/" .. stagePath)
 	end
 
 	return directoryPath
@@ -36,7 +40,7 @@ NoteChartItem.getAudioPathPreview = function(self)
 	local audioPath = self.audioPath
 
 	if audioPath and audioPath ~= "" then
-		return directoryPath .. "/" .. audioPath, math.max(0, self.previewTime or 0)
+		return evalPath(directoryPath .. "/" .. audioPath), math.max(0, self.previewTime or 0)
 	end
 
 	return directoryPath .. "/preview.ogg", 0
