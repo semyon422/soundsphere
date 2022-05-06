@@ -21,7 +21,7 @@ local tfTable = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0,
 local tfOriginTable = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 SettingsView.draw = function(self)
 	local config = self.gameController.configModel.configs.settings
-	local sections = self.gameController.settingsModel.sections
+	local settings_model = self.gameController.configModel.configs.settings_model
 
 	if self.isOpen[0] then
 		imgui.SetNextWindowPos({transform(tfTable):transformPoint(279 + 454 * 3 / 4, 279)}, 0)
@@ -29,11 +29,18 @@ SettingsView.draw = function(self)
 		local flags = bit.bor(imgui.ImGuiWindowFlags_NoMove, imgui.ImGuiWindowFlags_NoResize)
 		if imgui.Begin("Game settings", self.isOpen, flags) then
 			if imgui.BeginTabBar("Section tab bar", 0) then
-				for _, settings in ipairs(sections) do
-					if imgui.BeginTabItem(settings[1].section) then
-						for _, item in ipairs(settings) do
-							-- imgui.Text(item.name)
-							if ImguiElements[item.type] then
+				local sections = {}
+				local section
+				for _, item in ipairs(settings_model) do
+					if item.section ~= section then
+						section = item.section
+						table.insert(sections, section)
+					end
+				end
+				for _, section in ipairs(sections) do
+					if imgui.BeginTabItem(section) then
+						for _, item in ipairs(settings_model) do
+							if item.section == section and ImguiElements[item.type] then
 								ImguiElements[item.type](item, config)
 							end
 						end

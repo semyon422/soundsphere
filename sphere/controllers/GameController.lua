@@ -25,7 +25,6 @@ local InputModel			= require("sphere.models.InputModel")
 local CacheModel			= require("sphere.models.CacheModel")
 local DifficultyModel		= require("sphere.models.DifficultyModel")
 local CollectionModel		= require("sphere.models.CollectionModel")
-local SettingsModel		= require("sphere.models.SettingsModel")
 local NoteChartSetLibraryModel		= require("sphere.models.NoteChartSetLibraryModel")
 local NoteChartLibraryModel		= require("sphere.models.NoteChartLibraryModel")
 local ScoreLibraryModel		= require("sphere.models.ScoreLibraryModel")
@@ -63,7 +62,6 @@ GameController.construct = function(self)
 	self.inputModel = InputModel:new()
 	self.difficultyModel = DifficultyModel:new()
 	self.collectionModel = CollectionModel:new()
-	self.settingsModel = SettingsModel:new()
 	self.noteChartSetLibraryModel = NoteChartSetLibraryModel:new()
 	self.noteChartLibraryModel = NoteChartLibraryModel:new()
 	self.scoreLibraryModel = ScoreLibraryModel:new()
@@ -99,7 +97,6 @@ GameController.load = function(self)
 	local inputModel = self.inputModel
 	local difficultyModel = self.difficultyModel
 	local collectionModel = self.collectionModel
-	local settingsModel = self.settingsModel
 	local selectModel = self.selectModel
 	local updateModel = self.updateModel
 	local fpsLimiter = self.fpsLimiter
@@ -152,7 +149,6 @@ GameController.load = function(self)
 	previewModel.selectModel = selectModel
 	searchModel.scoreModel = scoreModel
 	searchModel.configModel = configModel
-	settingsModel.configModel = configModel
 	themeModel.configModel = configModel
 	mountModel.configModel = configModel
 	mountController.mountModel = mountModel
@@ -203,7 +199,6 @@ GameController.load = function(self)
 	rhythmModel.hp = configModel.configs.hp
 	rhythmModel.settings = configModel.configs.settings
 
-	settingsModel:load()
 	themeModel:load()
 	modifierModel:load()
 	mountModel:load()

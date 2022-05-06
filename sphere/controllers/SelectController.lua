@@ -72,12 +72,6 @@ SelectController.receive = function(self, event)
 	elseif event.name == "changeScreen" then
 		if event.screenName == "Modifier" then
 			self:switchModifierController()
-		elseif event.screenName == "NoteSkin" then
-			self:switchNoteSkinController()
-		elseif event.screenName == "Input" then
-			self:switchInputController()
-		elseif event.screenName == "Settings" then
-			self:switchSettingsController()
 		elseif event.screenName == "Result" then
 			self:switchResultController()
 		end
@@ -176,42 +170,6 @@ SelectController.switchModifierController = function(self)
 	modifierController.selectController = self
 	modifierController.gameController = self.gameController
 	return self.gameController.screenManager:set(modifierController)
-end
-
-SelectController.switchNoteSkinController = function(self)
-	if not self.gameController.noteChartModel:getFileInfo() then
-		return
-	end
-
-	self:resetModifiedNoteChart()
-
-	local NoteSkinController = require("sphere.controllers.NoteSkinController")
-	local noteSkinController = NoteSkinController:new()
-	noteSkinController.selectController = self
-	noteSkinController.gameController = self.gameController
-	return self.gameController.screenManager:set(noteSkinController)
-end
-
-SelectController.switchInputController = function(self)
-	if not self.gameController.noteChartModel:getFileInfo() then
-		return
-	end
-
-	self:resetModifiedNoteChart()
-
-	local InputController = require("sphere.controllers.InputController")
-	local inputController = InputController:new()
-	inputController.selectController = self
-	inputController.gameController = self.gameController
-	return self.gameController.screenManager:set(inputController)
-end
-
-SelectController.switchSettingsController = function(self)
-	local SettingsController = require("sphere.controllers.SettingsController")
-	local settingsController = SettingsController:new()
-	settingsController.selectController = self
-	settingsController.gameController = self.gameController
-	return self.gameController.screenManager:set(settingsController)
 end
 
 SelectController.switchResultController = function(self)
