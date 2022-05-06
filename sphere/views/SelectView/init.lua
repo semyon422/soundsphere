@@ -16,6 +16,7 @@ local OsudirectDifficultiesListView = require(viewspackage .. "SelectView.Osudir
 local CacheView = require(viewspackage .. "SelectView.CacheView")
 local NoteSkinView = require("sphere.views.NoteSkinView")
 local InputView = require("sphere.views.InputView")
+local SettingsView = require("sphere.views.SettingsView")
 
 local SelectView = ScreenView:new({construct = false})
 
@@ -41,6 +42,7 @@ SelectView.construct = function(self)
 
 	self.noteSkinView = NoteSkinView:new()
 	self.inputView = InputView:new()
+	self.settingsView = SettingsView:new()
 end
 
 SelectView.load = function(self)
@@ -55,12 +57,17 @@ SelectView.load = function(self)
 	self.inputView.gameController = self.gameController
 	self.inputView.navigator = self.navigator
 	self.inputView.isOpen = self.navigator.isInputOpen
+
+	self.settingsView.gameController = self.gameController
+	self.settingsView.navigator = self.navigator
+	self.settingsView.isOpen = self.navigator.isSettingsOpen
 end
 
 SelectView.draw = function(self)
 	ScreenView.draw(self)
 	self.noteSkinView:draw()
 	self.inputView:draw()
+	self.settingsView:draw()
 end
 
 return SelectView

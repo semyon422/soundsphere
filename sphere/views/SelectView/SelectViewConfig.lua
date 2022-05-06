@@ -1005,8 +1005,7 @@ local LeftScreenMenu = {
 	items = {
 		{
 			{
-				method = "changeScreen",
-				value = "Settings",
+				method = "openSettings",
 				displayName = "settings"
 			}
 		},

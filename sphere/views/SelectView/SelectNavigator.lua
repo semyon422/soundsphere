@@ -14,6 +14,7 @@ SelectNavigator.load = function(self)
 	self:addSubscreen("notecharts")
 	self.isNoteSkinsOpen = ffi.new("bool[1]", false)
 	self.isInputOpen = ffi.new("bool[1]", false)
+	self.isSettingsOpen = ffi.new("bool[1]", false)
 end
 
 SelectNavigator.receive = function(self, event)
@@ -239,6 +240,11 @@ SelectNavigator.openInput = function(self)
 	if isOpen[0] then
 		self:send({name = "resetModifiedNoteChart"})
 	end
+end
+
+SelectNavigator.openSettings = function(self)
+	local isOpen = self.isSettingsOpen
+	isOpen[0] = not isOpen[0]
 end
 
 SelectNavigator.setNoteSkin = function(self, itemIndex)

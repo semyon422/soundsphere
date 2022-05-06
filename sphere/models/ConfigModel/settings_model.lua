@@ -1,3 +1,5 @@
+local imgui = require("cimgui")
+
 local modes = love.window.getFullscreenModes()
 table.sort(modes, function(a, b)
 	if a.width ~= b.width then
@@ -11,370 +13,330 @@ local settings = {
 		name = "play speed",
 		section = "gameplay",
 		key = "gameplay.speed",
-		type = "slider",
-		range = {0, 3},
+		type = "InputFloat",
 		step = 0.05,
-		format = "%0.2f"
+		format = "%0.2f",
 	},
 	{
 		name = "pause on fail",
 		section = "gameplay",
 		key = "gameplay.pauseOnFail",
-		type = "switch",
-		displayRange = {"no", "yes"}
+		type = "Checkbox",
 	},
 	{
-		name = "visual long note shortening",
+		name = "visual LN shortening",
 		section = "gameplay",
 		key = "gameplay.longNoteShortening",
-		type = "slider",
+		type = "SliderInt",
 		range = {-0.3, 0},
-		displayRange = {-300, 0},
-		step = 0.001,
-		format = "%d"
+		multiplier = 1000,
 	},
 	{
 		name = "input offset",
 		section = "gameplay",
 		key = "gameplay.offset.input",
-		type = "slider",
-		range = {-0.3, 0.3},
-		displayRange = {-300, 300},
+		type = "InputInt",
 		step = 0.001,
-		format = "%d"
+		step_fast = 0.01,
+		multiplier = 1000,
 	},
 	{
 		name = "visual offset",
 		section = "gameplay",
 		key = "gameplay.offset.visual",
-		type = "slider",
-		range = {-0.3, 0.3},
-		displayRange = {-300, 300},
+		type = "InputInt",
 		step = 0.001,
-		format = "%d"
+		step_fast = 0.01,
+		multiplier = 1000,
 	},
 	{
 		name = "last mean values",
 		section = "gameplay",
 		key = "gameplay.lastMeanValues",
-		type = "slider",
+		type = "SliderInt",
 		range = {10, 100},
-		step = 10,
-		format = "%d"
 	},
 	{
 		name = "rating hit timing window",
 		section = "gameplay",
 		key = "gameplay.ratingHitTimingWindow",
-		type = "slider",
-		range = {0.016, 0.048},
+		type = "InputInt",
 		step = 0.001,
-		displayRange = {16, 48},
-		format = "%d"
+		step_fast = 0.01,
+		multiplier = 1000,
 	},
 	{
 		name = "video BGA",
 		section = "gameplay",
 		key = "gameplay.bga.video",
-		type = "switch",
-		displayRange = {"disabled", "enabled"}
+		type = "Checkbox",
 	},
 	{
 		name = "image BGA",
 		section = "gameplay",
 		key = "gameplay.bga.image",
-		type = "switch",
-		displayRange = {"disabled", "enabled"}
+		type = "Checkbox",
 	},
 	{
 		name = "time to prepare",
 		section = "gameplay",
 		key = "gameplay.time.prepare",
-		type = "slider",
+		type = "SliderFloat",
 		range = {0.5, 3},
-		step = 0.5,
-		format = "%0.1f"
+		format = "%0.1f",
 	},
 	{
 		name = "time to play-pause",
 		section = "gameplay",
 		key = "gameplay.time.playPause",
-		type = "slider",
+		type = "SliderFloat",
 		range = {0, 2},
-		step = 0.1,
-		format = "%0.1f"
+		format = "%0.1f",
 	},
 	{
 		name = "time to pause-play",
 		section = "gameplay",
 		key = "gameplay.time.pausePlay",
-		type = "slider",
+		type = "SliderFloat",
 		range = {0, 2},
-		step = 0.1,
-		format = "%0.1f"
+		format = "%0.1f",
 	},
 	{
 		name = "time to play-retry",
 		section = "gameplay",
 		key = "gameplay.time.playRetry",
-		type = "slider",
+		type = "SliderFloat",
 		range = {0, 2},
-		step = 0.1,
-		format = "%0.1f"
+		format = "%0.1f",
 	},
 	{
 		name = "time to pause-retry",
 		section = "gameplay",
 		key = "gameplay.time.pauseRetry",
-		type = "slider",
+		type = "SliderFloat",
 		range = {0, 2},
-		step = 0.1,
-		format = "%0.1f"
+		format = "%0.1f",
 	},
 	{
 		name = "pause",
-		type = "binding",
+		type = "Hotkey",
 		section = "gameplay",
-		key = "input.pause"
+		key = "input.pause",
 	},
 	{
 		name = "skip intro",
-		type = "binding",
+		type = "Hotkey",
 		section = "gameplay",
-		key = "input.skipIntro"
+		key = "input.skipIntro",
 	},
 	{
 		name = "quick restart",
-		type = "binding",
+		type = "Hotkey",
 		section = "gameplay",
-		key = "input.quickRestart"
+		key = "input.quickRestart",
 	},
 	{
 		name = "decrease offset",
-		type = "binding",
+		type = "Hotkey",
 		section = "gameplay",
-		key = "input.offset.decrease"
+		key = "input.offset.decrease",
 	},
 	{
 		name = "increase offset",
-		type = "binding",
+		type = "Hotkey",
 		section = "gameplay",
-		key = "input.offset.increase"
+		key = "input.offset.increase",
 	},
 	{
 		name = "decrease play speed",
-		type = "binding",
+		type = "Hotkey",
 		section = "gameplay",
-		key = "input.playSpeed.decrease"
+		key = "input.playSpeed.decrease",
 	},
 	{
 		name = "increase play speed",
-		type = "binding",
+		type = "Hotkey",
 		section = "gameplay",
-		key = "input.playSpeed.increase"
+		key = "input.playSpeed.increase",
 	},
 	{
 		name = "invert play speed",
-		type = "binding",
+		type = "Hotkey",
 		section = "gameplay",
-		key = "input.playSpeed.invert"
+		key = "input.playSpeed.invert",
 	},
 	{
 		name = "decrease time rate",
-		type = "binding",
+		type = "Hotkey",
 		section = "gameplay",
-		key = "input.timeRate.decrease"
+		key = "input.timeRate.decrease",
 	},
 	{
 		name = "increase time rate",
-		type = "binding",
+		type = "Hotkey",
 		section = "gameplay",
-		key = "input.timeRate.increase"
+		key = "input.timeRate.increase",
 	},
 	{
 		name = "invert time rate",
-		type = "binding",
+		type = "Hotkey",
 		section = "gameplay",
-		key = "input.timeRate.invert"
+		key = "input.timeRate.invert",
 	},
 	{
 		name = "FPS limit",
 		section = "graphics",
 		key = "graphics.fps",
-		type = "slider",
+		type = "SliderFloat",
 		range = {10, 1000},
-		step = 10,
-		format = "%d"
+		format = "%0.0f",
 	},
 	{
 		name = "fullscreen",
 		section = "graphics",
 		key = "graphics.mode.flags.fullscreen",
-		type = "switch",
-		displayRange = {"disabled", "enabled"}
+		type = "Checkbox",
 	},
 	{
 		name = "fullscreen type",
 		section = "graphics",
 		key = "graphics.mode.flags.fullscreentype",
-		type = "stepper",
+		type = "Combo",
 		values = {"desktop", "exclusive"},
 	},
 	{
 		name = "vsync",
 		section = "graphics",
 		key = "graphics.mode.flags.vsync",
-		type = "stepper",
+		type = "Combo",
 		values = {1, 0, -1},
-		displayValues = {"enabled", "disabled", "adaptive"}
+		displayValues = {"enabled", "disabled", "adaptive"},
 	},
 	{
 		name = "DWM flush",
 		section = "graphics",
 		key = "graphics.dwmflush",
-		type = "switch",
-		displayRange = {"disabled", "enabled"}
+		type = "Checkbox",
 	},
 	{
 		name = "threaded input",
 		section = "graphics",
 		key = "graphics.asynckey",
-		type = "switch",
-		displayRange = {"disabled", "enabled"}
+		type = "Checkbox",
 	},
 	{
 		name = "start window resolution",
 		section = "graphics",
 		key = "graphics.mode.window",
-		type = "stepper",
+		type = "Combo",
 		values = modes,
-		format = function(mode)
-			return ("%dx%d"):format(mode.width, mode.height)
-		end
+		displayValues = (function()
+			local displayValues = {}
+			for i, mode in ipairs(modes) do
+				displayValues[i] = ("%dx%d"):format(mode.width, mode.height)
+			end
+			return displayValues
+		end)(),
 	},
 	{
 		name = "cursor",
 		section = "graphics",
 		key = "graphics.cursor",
-		type = "stepper",
-		values = {"circle", "arrow", "system"}
+		type = "Combo",
+		values = {"circle", "arrow", "system"},
 	},
 	{
 		name = "dim select",
 		section = "graphics",
 		key = "graphics.dim.select",
-		type = "slider",
+		type = "SliderInt",
 		range = {0, 1},
-		displayRange = {0, 100},
-		step = 0.01,
-		format = "%d"
+		multiplier = 100,
 	},
 	{
 		name = "dim gameplay",
 		section = "graphics",
 		key = "graphics.dim.gameplay",
-		type = "slider",
+		type = "SliderInt",
 		range = {0, 1},
-		displayRange = {0, 100},
-		step = 0.01,
-		format = "%d"
+		multiplier = 100,
 	},
 	{
 		name = "dim result",
 		section = "graphics",
 		key = "graphics.dim.result",
-		type = "slider",
+		type = "SliderInt",
 		range = {0, 1},
-		displayRange = {0, 100},
-		step = 0.01,
-		format = "%d"
+		multiplier = 100,
 	},
 	{
 		name = "blur select",
 		section = "graphics",
 		key = "graphics.blur.select",
-		type = "slider",
+		type = "SliderInt",
 		range = {0, 50},
-		displayRange = {0, 50},
-		step = 1,
-		format = "%d"
 	},
 	{
 		name = "blur gameplay",
 		section = "graphics",
 		key = "graphics.blur.gameplay",
-		type = "slider",
+		type = "SliderInt",
 		range = {0, 50},
-		displayRange = {0, 50},
-		step = 1,
-		format = "%d"
 	},
 	{
 		name = "blur result",
 		section = "graphics",
 		key = "graphics.blur.result",
-		type = "slider",
+		type = "SliderInt",
 		range = {0, 50},
-		displayRange = {0, 50},
-		step = 1,
-		format = "%d"
 	},
 	{
 		name = "enable camera",
 		section = "graphics",
 		key = "graphics.perspective.camera",
-		type = "switch",
-		displayRange = {"disabled", "enabled"}
+		type = "Checkbox",
 	},
 	{
 		name = "allow rotate x",
 		section = "graphics",
 		key = "graphics.perspective.rx",
-		type = "switch",
-		displayRange = {"disabled", "enabled"}
+		type = "Checkbox",
 	},
 	{
 		name = "allow rotate y",
 		section = "graphics",
 		key = "graphics.perspective.ry",
-		type = "switch",
-		displayRange = {"disabled", "enabled"}
+		type = "Checkbox",
 	},
 	{
 		name = "master volume",
 		section = "audio",
 		key = "audio.volume.master",
-		type = "slider",
+		type = "SliderInt",
 		range = {0, 1},
-		displayRange = {0, 100},
-		step = 0.01,
-		format = "%d"
+		multiplier = 100,
 	},
 	{
 		name = "music volume",
 		section = "audio",
 		key = "audio.volume.music",
-		type = "slider",
+		type = "SliderInt",
 		range = {0, 1},
-		displayRange = {0, 100},
-		step = 0.01,
-		format = "%d"
+		multiplier = 100,
 	},
 	{
 		name = "effects volume",
 		section = "audio",
 		key = "audio.volume.effects",
-		type = "slider",
+		type = "SliderInt",
 		range = {0, 1},
-		displayRange = {0, 100},
-		step = 0.01,
-		format = "%d"
+		multiplier = 100,
 	},
 	{
 		name = "primary audio mode",
 		section = "audio",
 		key = "audio.mode.primary",
-		type = "stepper",
+		type = "Combo",
 		values = {
 			"sample",
 			"streamMemoryTempo",
@@ -384,13 +346,13 @@ local settings = {
 			"sample",
 			"memory",
 			-- "streamOAL", "sampleOAL"
-		}
+		},
 	},
 	{
 		name = "secondary audio mode",
 		section = "audio",
 		key = "audio.mode.secondary",
-		type = "stepper",
+		type = "Combo",
 		values = {
 			"sample",
 			"streamMemoryTempo",
@@ -400,46 +362,43 @@ local settings = {
 			"sample",
 			"memory",
 			-- "streamOAL", "sampleOAL"
-		}
+		},
 	},
 	{
 		name = "midi constant volume",
 		section = "audio",
 		key = "audio.midi.constantVolume",
-		type = "switch",
-		displayRange = {"no", "yes"}
+		type = "Checkbox",
 	},
 	{
 		name = "select random chart",
-		type = "binding",
+		type = "Hotkey",
 		section = "input",
-		key = "input.selectRandom"
+		key = "input.selectRandom",
 	},
 	{
 		name = "capture screenshot",
-		type = "binding",
+		type = "Hotkey",
 		section = "input",
-		key = "input.screenshot.capture"
+		key = "input.screenshot.capture",
 	},
 	{
 		name = "open screenshot",
-		type = "binding",
+		type = "Hotkey",
 		section = "input",
-		key = "input.screenshot.open"
+		key = "input.screenshot.open",
 	},
 	{
 		name = "auto update on game start",
 		section = "miscellaneous",
 		key = "miscellaneous.autoUpdate",
-		type = "switch",
-		displayRange = {"disabled", "enabled"}
+		type = "Checkbox",
 	},
 	{
 		name = "imgui.ShowDemoWindow",
 		section = "miscellaneous",
 		key = "miscellaneous.imguiShowDemoWindow",
-		type = "switch",
-		displayRange = {"disabled", "enabled"}
+		type = "Checkbox",
 	},
 }
 
