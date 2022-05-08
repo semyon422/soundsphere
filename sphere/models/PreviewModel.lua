@@ -9,6 +9,7 @@ PreviewModel.load = function(self)
 	self.noteChartDataEntryId = 0
 	self.audioPath = ""
 	self.previewTime = 0
+	self.volume = 0
 end
 
 PreviewModel.unload = function(self)
@@ -29,9 +30,20 @@ PreviewModel.update = function(self, dt)
 		end
 	end
 
-	if self.audio and not self.audio:isPlaying() then
-		self.audio:seek(self.position or 0)
-		self.audio:play()
+	local audio = self.audio
+	if not audio then
+		return
+	end
+	if not audio:isPlaying() then
+		audio:seek(self.position or 0)
+		audio:play()
+	end
+
+	local volumeConfig = self.configModel.configs.settings.audio.volume
+	local volume = volumeConfig.master * volumeConfig.music
+	if self.volume ~= volume then
+		audio:setVolume(volume)
+		self.volume = volume
 	end
 end
 
@@ -80,10 +92,12 @@ PreviewModel.loadPreview = function(self)
 	self.path = path
 	self.position = position
 
-	local volume = self.configModel.configs.settings.audio.volume
+	local volumeConfig = self.configModel.configs.settings.audio.volume
+	local volume = volumeConfig.master * volumeConfig.music
 	audio:seek(position or 0)
-	audio:setVolume(volume.master * volume.music)
+	audio:setVolume(volume)
 	audio:play()
+	self.volume = volume
 end
 
 PreviewModel.stop = function(self)
