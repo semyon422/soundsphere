@@ -56,6 +56,7 @@ GameplayController.load = function(self)
 	rhythmModel:setInputOffset(config.gameplay.offset.input + localOffset)
 	rhythmModel:setVisualOffset(config.gameplay.offset.visual + localOffset)
 	rhythmModel:setVisualTimeRate(config.gameplay.speed)
+	rhythmModel:setVisualTimeRateScale(config.gameplay.scaleSpeed)
 	rhythmModel:setPauseTimes(
 		config.gameplay.time.playPause,
 		config.gameplay.time.pausePlay,

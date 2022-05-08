@@ -10,6 +10,7 @@ GraphicEngine.construct = function(self)
 
 	self.aliases = {}
 	self.noteDrawers = {}
+	self.scaleSpeed = false
 	self.loaded = false
 end
 
@@ -49,7 +50,11 @@ GraphicEngine.setVisualTimeRate = function(self, visualTimeRate)
 end
 
 GraphicEngine.getVisualTimeRate = function(self)
-	return self.visualTimeRate / math.abs(self.rhythmModel.timeEngine.timeRate)
+	local visualTimeRate = self.visualTimeRate / math.abs(self.rhythmModel.timeEngine.timeRate)
+	if self.scaleSpeed then
+		visualTimeRate = visualTimeRate * self.rhythmModel.timeEngine.timeRate
+	end
+	return visualTimeRate
 end
 
 GraphicEngine.unload = function(self)

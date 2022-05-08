@@ -246,6 +246,10 @@ RhythmModel.setPauseTimes = function(self, ...)
 	self.pauseManager:setPauseTimes(...)
 end
 
+RhythmModel.setVisualTimeRateScale = function(self, scaleSpeed)
+	self.graphicEngine.scaleSpeed = scaleSpeed
+end
+
 RhythmModel.setScaleInputOffset = function(self, scaleInputOffset)
 	-- self.inputManager:setScaleInputOffset(scaleInputOffset)
 end

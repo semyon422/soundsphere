@@ -24,6 +24,12 @@ local settings = {
 		type = "Checkbox",
 	},
 	{
+		name = "scale scroll speed with rate",
+		section = "gameplay",
+		key = "gameplay.scaleSpeed",
+		type = "Checkbox",
+	},
+	{
 		name = "visual LN shortening",
 		section = "gameplay",
 		key = "gameplay.longNoteShortening",

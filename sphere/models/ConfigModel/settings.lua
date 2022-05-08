@@ -26,6 +26,7 @@ return {
 		},
 		pauseOnFail = false,
 		ratingHitTimingWindow = 0.032,
+		scaleSpeed = false,
 		speed = 1,
 		time = {
 			pausePlay = 0.5,
