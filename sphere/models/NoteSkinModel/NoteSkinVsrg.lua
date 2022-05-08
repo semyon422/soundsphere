@@ -284,13 +284,19 @@ NoteSkinVsrg.addBga = function(self, params)
 	end
 end
 
-NoteSkinVsrg.addImageNote = function(self, head, input, params)
-	local i = self.inputs[input]
+NoteSkinVsrg.setInputListIndex = function(self, input)
+	local inputs = self.inputs
+	local i = inputs[input]
 	if not i then
-		i = #self.inputs + 1
-		self.inputs[i] = input
-		self.inputs[input] = i
+		i = #inputs + 1
+		inputs[i] = input
+		inputs[input] = i
 	end
+	return i
+end
+
+NoteSkinVsrg.addImageNote = function(self, head, input, params)
+	local i = self:setInputListIndex(input)
 
 	head.x[i] = params.x or 0
 	head.y[i] = params.y or 0
@@ -300,16 +306,9 @@ NoteSkinVsrg.addImageNote = function(self, head, input, params)
 end
 
 NoteSkinVsrg.addMeasureLine = function(self, params)
+	local i = self:setInputListIndex("measure1")
+
 	local Head = self.notes.LongNote.Head
-
-	local input = "measure1"
-	local i = self.inputs[input]
-	if not i then
-		i = #self.inputs + 1
-		self.inputs[i] = input
-		self.inputs[input] = i
-	end
-
 	Head.x[i] = self.baseOffset
 	Head.w[i] = self.fullWidth
 	Head.h[i] = params.h

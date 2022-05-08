@@ -27,7 +27,7 @@ BaseNoteSkin.getInputTable = function(self)
 		if a[2] ~= b[2] then
 			return a[2] > b[2]
 		else
-			return a[1] < b [1]
+			return a[1] < b[1]
 		end
 	end)
 
@@ -38,6 +38,14 @@ BaseNoteSkin.getInputTable = function(self)
 		end
 	end
 	return allInputs
+end
+
+local function copyTable(t)
+	local t2 = {}
+	for k, v in pairs(t) do
+		t2[k] = v
+	end
+	return t2
 end
 
 BaseNoteSkin.load = function(self)
@@ -99,19 +107,19 @@ BaseNoteSkin.load = function(self)
 	})
 
 	self:setTextures({{pixel = "pixel.png"}})
-	self:setImages({pixel = {"pixel"}})
+	self:setImagesAuto()
 	self:setShortNote({
-		image = image,
+		image = copyTable(image),
 		h = self.noteHeight
 	})
 	self:setLongNote({
-		head = image,
-		tail = image,
-		body = image,
+		head = copyTable(image),
+		tail = copyTable(image),
+		body = copyTable(image),
 		h = self.noteHeight
 	})
 	self:setShortNote({
-		image = image,
+		image = copyTable(image),
 		h = self.noteHeight,
 		color = {1, 0.25, 0.25, 1},
 	}, "SoundNote")
