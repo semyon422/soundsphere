@@ -62,11 +62,13 @@ OsuNoteSkin.load = function(self)
 		config:set("HitPosition", mania.HitPosition)
 		config:set("ScorePosition", mania.ScorePosition)
 		config:set("ComboPosition", mania.ComboPosition)
+		config:set("OverallDifficulty", mania.OverallDifficulty or 5)
 		config:set("UpsideDown", mania.UpsideDown == 1)
 	else
 		mania.HitPosition = config:get("HitPosition")
 		mania.ScorePosition = config:get("ScorePosition")
 		mania.ComboPosition = config:get("ComboPosition")
+		mania.OverallDifficulty = config:get("OverallDifficulty")
 		mania.UpsideDown = config:get("UpsideDown") and 1 or 0
 	end
 
@@ -311,16 +313,18 @@ local imgui = require("cimgui")
 local config = ImguiConfig:new()
 
 local ptrs = config:setDefs(--[[defs]] {
-	HitPosition = {"float[?]", 1, {240}},
-	ScorePosition = {"float[?]", 1, {240}},
-	ComboPosition = {"float[?]", 1, {240}},
+	HitPosition = {"int[?]", 1, {240}},
+	ScorePosition = {"int[?]", 1, {240}},
+	ComboPosition = {"int[?]", 1, {240}},
+	OverallDifficulty = {"int[?]", 1, {5}},
 	UpsideDown = {"bool[?]", 1, {false}},
 } --[[/defs]])
 
 function config:render()
-	imgui.SliderFloat("Hit Position", ptrs.HitPosition, 240, 480, "%.0f")
-	imgui.SliderFloat("Score Position", ptrs.ScorePosition, 0, 480, "%.0f")
-	imgui.SliderFloat("Combo Position", ptrs.ComboPosition, 0, 480, "%.0f")
+	imgui.SliderInt("Hit Position", ptrs.HitPosition, 240, 480)
+	imgui.SliderInt("Score Position", ptrs.ScorePosition, 0, 480)
+	imgui.SliderInt("Combo Position", ptrs.ComboPosition, 0, 480)
+	imgui.SliderInt("Overall Difficulty", ptrs.OverallDifficulty, 0, 10)
 	imgui.Checkbox("Upside Down", ptrs.UpsideDown)
 	self:renderAfter()
 end
