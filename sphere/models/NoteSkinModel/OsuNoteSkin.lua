@@ -64,6 +64,7 @@ OsuNoteSkin.load = function(self)
 		config:set("ComboPosition", mania.ComboPosition)
 		config:set("OverallDifficulty", mania.OverallDifficulty or 5)
 		config:set("UpsideDown", mania.UpsideDown == 1)
+		config:set("Barline", true)
 	else
 		mania.HitPosition = config:get("HitPosition")
 		mania.ScorePosition = config:get("ScorePosition")
@@ -104,6 +105,9 @@ OsuNoteSkin.load = function(self)
 	local textures = {}
 	local images = {}
 	local blendModes = {}
+	table.insert(textures, {pixel = ""})
+	images.pixel = {"pixel"}
+
 	local defaultNoteImages = self:getDefaultNoteImages()
 	for _, data in ipairs(defaultNoteImages) do
 		local key, value = unpack(data)
@@ -225,6 +229,16 @@ OsuNoteSkin.load = function(self)
 			return self:getPosition(...) - h / w * width / 2
 		end
 	end
+	self:setShortNote({
+		image = ltail,
+	}, "SoundNote")
+	if config:get("Barline") then
+		self:addMeasureLine({
+			h = mania.BarlineHeight,
+			color = mania.ColourBarline,
+			image = "pixel"
+		})
+	end
 
 	local playfield = PlayfieldVsrg:new({
 		noteskin = self
@@ -318,6 +332,7 @@ local ptrs = config:setDefs(--[[defs]] {
 	ComboPosition = {"int[?]", 1, {240}},
 	OverallDifficulty = {"int[?]", 1, {5}},
 	UpsideDown = {"bool[?]", 1, {false}},
+	Barline = {"bool[?]", 1, {true}},
 } --[[/defs]])
 
 function config:render()
@@ -326,6 +341,7 @@ function config:render()
 	imgui.SliderInt("Combo Position", ptrs.ComboPosition, 0, 480)
 	imgui.SliderInt("Overall Difficulty", ptrs.OverallDifficulty, 0, 10)
 	imgui.Checkbox("Upside Down", ptrs.UpsideDown)
+	imgui.Checkbox("Barline", ptrs.Barline)
 	self:renderAfter()
 end
 
