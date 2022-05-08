@@ -1,6 +1,7 @@
 local Class = require("aqua.util.Class")
 local NoteViewFactory = require("sphere.views.RhythmView.NoteViewFactory")
 local transform = require("aqua.graphics.transform")
+local newPixel = require("aqua.graphics.newPixel")
 
 local RhythmView = Class:new()
 
@@ -118,7 +119,8 @@ RhythmView.loadTexture = function(self, key, path)
 	local textures = state.textures
 	local spriteBatches = state.spriteBatches
 
-	local texture = love.graphics.newImage(self.gameController.rhythmModel.graphicEngine.noteSkin.directoryPath .. "/" .. path)
+	local status, err = pcall(love.graphics.newImage, self.gameController.rhythmModel.graphicEngine.noteSkin.directoryPath .. "/" .. path)
+	local texture = status and err or newPixel(1, 1, 1, 1)
 	local spriteBatch = love.graphics.newSpriteBatch(texture, 1000)
 
 	textures[key] = textures[key] or {}
