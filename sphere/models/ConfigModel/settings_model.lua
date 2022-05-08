@@ -213,6 +213,12 @@ local settings = {
 		displayValues = {"enabled", "disabled", "adaptive"},
 	},
 	{
+		name = "vsync on select",
+		section = "graphics",
+		key = "graphics.vsyncOnSelect",
+		type = "Checkbox",
+	},
+	{
 		name = "DWM flush",
 		section = "graphics",
 		key = "graphics.dwmflush",

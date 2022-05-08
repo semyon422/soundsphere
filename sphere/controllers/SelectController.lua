@@ -42,6 +42,12 @@ SelectController.update = function(self, dt)
 	self.gameController.previewModel:update(dt)
 	self.gameController.selectModel:update()
 	self.view:update(dt)
+
+	local graphics = self.gameController.configModel.configs.settings.graphics
+	local flags = graphics.mode.flags
+	if graphics.vsyncOnSelect and flags.vsync == 0 then
+		flags.vsync = self.gameController.baseVsync
+	end
 end
 
 SelectController.draw = function(self)

@@ -82,6 +82,7 @@ return {
 			yaw = 0,
 			z = -0.71407400337105997
 		},
+		vsyncOnSelect = true
 	},
 	input = {
 		pause = "escape",

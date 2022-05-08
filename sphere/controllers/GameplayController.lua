@@ -101,6 +101,13 @@ GameplayController.load = function(self)
 	rhythmModel.observable:add(view)
 	love.mouse.setVisible(false)
 	self.drawing = true
+
+	local graphics = self.gameController.configModel.configs.settings.graphics
+	local flags = graphics.mode.flags
+	if graphics.vsyncOnSelect then
+		self.gameController.baseVsync = flags.vsync ~= 0 and flags.vsync or 1
+		flags.vsync = 0
+	end
 end
 
 GameplayController.getImporterSettings = function(self)
@@ -120,6 +127,12 @@ GameplayController.unload = function(self)
 	rhythmModel.replayModel:setMode("record")
 	self.gameController:resetGameplayConfigs()
 	love.mouse.setVisible(true)
+
+	local graphics = self.gameController.configModel.configs.settings.graphics
+	local flags = graphics.mode.flags
+	if graphics.vsyncOnSelect and flags.vsync == 0 then
+		flags.vsync = self.gameController.baseVsync
+	end
 end
 
 GameplayController.update = function(self, dt)

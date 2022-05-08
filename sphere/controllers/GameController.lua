@@ -40,6 +40,8 @@ local FrameTimeView					= require("sphere.views.FrameTimeView")
 
 local GameController = Class:new()
 
+GameController.baseVsync = 1
+
 GameController.construct = function(self)
 	self.configModel = ConfigModel:new()
 	self.notificationModel = NotificationModel:new()
