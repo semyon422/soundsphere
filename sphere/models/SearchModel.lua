@@ -75,6 +75,10 @@ local numberFields = {
 	},
 
 	{
+		keys = {"missCount", "m"},
+		field = "scores.missCount",
+	},
+	{
 		keys = {"accuracy", "a"},
 		field = "scores.accuracy * 1000",
 	},
