@@ -36,10 +36,6 @@ BaseScoreSystem.before = function(self, event)
 
 	self.timeRate =  math.abs(event.timeRate)
 
-	if self.currentTime < math.huge then
-		self.progress = map(self.currentTime, self.scoreEngine.minTime, self.scoreEngine.maxTime, 0, 1)
-	end
-
 	if self.noteCount ~= 0 then
 		return
 	end
@@ -55,6 +51,10 @@ BaseScoreSystem.success = function(self)
 	self.hitCount = self.hitCount + 1
 	self.combo = self.combo + 1
 	self.maxCombo = math.max(self.maxCombo, self.combo)
+
+	if self.currentTime < math.huge then
+		self.progress = map(self.currentTime, self.scoreEngine.minTime, self.scoreEngine.maxTime, 0, 1)
+	end
 end
 
 BaseScoreSystem.breakCombo = function(self)
