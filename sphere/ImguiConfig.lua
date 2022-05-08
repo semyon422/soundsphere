@@ -16,6 +16,7 @@ function ImguiConfig:setDefs(defs)
 end
 
 local function _unpack(t, i, j)
+	if not t then return end
 	if i == j then return t[i] end
 	return t[i], _unpack(t, i + 1, j)
 end
