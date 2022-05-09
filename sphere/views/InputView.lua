@@ -10,8 +10,6 @@ local InputView = ImguiView:new()
 local keyPtr = ffi.new("const char*[1]")
 local devicePtr = ffi.new("const char*[1]")
 
-local tfTable = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
-local tfOriginTable = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 InputView.draw = function(self)
 	local noteChart = self.gameController.noteChartModel.noteChart
 	if not noteChart then
@@ -22,8 +20,8 @@ InputView.draw = function(self)
 	local items = self.gameController.inputModel:getInputs(inputModeString)
 
 	if self.isOpen[0] then
-		imgui.SetNextWindowPos({transform(tfTable):transformPoint(279, 279)}, 0)
-		imgui.SetNextWindowSize({transform(tfOriginTable):transformPoint(454, 522)}, 0)
+		imgui.SetNextWindowPos({279, 279}, 0)
+		imgui.SetNextWindowSize({454, 522}, 0)
 		local flags = bit.bor(imgui.ImGuiWindowFlags_NoMove, imgui.ImGuiWindowFlags_NoResize)
 		if imgui.Begin("Input bindings", self.isOpen, flags) then
 			for i = 1, #items do
