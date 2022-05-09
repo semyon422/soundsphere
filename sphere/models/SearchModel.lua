@@ -73,6 +73,10 @@ local numberFields = {
 		keys = {"level", "lv"},
 		field = "noteChartDatas.level",
 	},
+	{
+		keys = {"longNotes", "ln"},
+		field = "noteChartDatas.longNoteRatio * 100",
+	},
 
 	{
 		keys = {"missCount", "m"},
