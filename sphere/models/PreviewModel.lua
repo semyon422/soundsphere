@@ -10,6 +10,7 @@ PreviewModel.load = function(self)
 	self.audioPath = ""
 	self.previewTime = 0
 	self.volume = 0
+	self.pitch = 1
 end
 
 PreviewModel.unload = function(self)
@@ -42,6 +43,12 @@ PreviewModel.update = function(self, dt)
 	if self.volume ~= volume then
 		audio:setVolume(volume)
 		self.volume = volume
+	end
+
+	local baseTimeRate = self.rhythmModel.timeEngine.baseTimeRate
+	if self.pitch ~= baseTimeRate then
+		audio:setPitch(baseTimeRate)
+		self.pitch = baseTimeRate
 	end
 end
 
@@ -93,10 +100,12 @@ PreviewModel.loadPreview = function(self)
 	self.path = path
 	self.position = position
 
+	local baseTimeRate = self.rhythmModel.timeEngine.baseTimeRate
 	local volumeConfig = self.configModel.configs.settings.audio.volume
 	local volume = volumeConfig.master * volumeConfig.music
 	audio:seek(position or 0)
 	audio:setVolume(volume)
+	audio:setPitch(baseTimeRate)
 	audio:play()
 	self.volume = volume
 end

@@ -149,6 +149,7 @@ GameController.load = function(self)
 	selectModel.collectionModel = collectionModel
 	previewModel.configModel = configModel
 	previewModel.selectModel = selectModel
+	previewModel.rhythmModel = rhythmModel
 	searchModel.scoreModel = scoreModel
 	searchModel.configModel = configModel
 	themeModel.configModel = configModel
