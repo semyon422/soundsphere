@@ -78,7 +78,7 @@ FileManager.findFile = function(self, fullFileName)
 			end
 		end
 		for _, file in ipairs(files) do
-			local trueFileName, trueFileType = removeExtension(fullFileName)
+			local trueFileName, trueFileType = removeExtension(file)
 			if fileName:lower() == trueFileName:lower() and fileType == trueFileType then
 				return path .. "/" .. file, fileType
 			end
