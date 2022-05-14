@@ -20,11 +20,9 @@ end
 BackgroundModel.update = function(self, dt)
 	local noteChartItem = self.selectModel.noteChartItem
 	if noteChartItem and self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
+		self.noteChartDataEntryId = self.config.noteChartDataEntryId
 		local path = noteChartItem:getBackgroundPath()
-		if path then
-			self.noteChartDataEntryId = self.config.noteChartDataEntryId
-		end
-		if path and self.path ~= path then
+		if self.path ~= path then
 			self.path = path
 			self:loadBackgroundDebounce()
 		end
@@ -60,6 +58,9 @@ end
 
 BackgroundModel.loadBackground = function(self)
 	local path = self.path
+	if not path then
+		return self:setBackground(self.emptyImage)
+	end
 
 	if not path:find("^http") then
 		local info = love.filesystem.getInfo(path)

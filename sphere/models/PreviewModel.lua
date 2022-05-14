@@ -19,11 +19,9 @@ end
 PreviewModel.update = function(self, dt)
 	local noteChartItem = self.selectModel.noteChartItem
 	if noteChartItem and self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
+		self.noteChartDataEntryId = self.config.noteChartDataEntryId
 		local audioPath, previewTime = noteChartItem:getAudioPathPreview()
-		if audioPath then
-			self.noteChartDataEntryId = self.config.noteChartDataEntryId
-		end
-		if audioPath and self.audioPath ~= audioPath then
+		if self.audioPath ~= audioPath then
 			self.audioPath = audioPath
 			self.previewTime = previewTime
 			self:loadPreviewDebounce()
@@ -57,11 +55,14 @@ PreviewModel.loadPreview = function(self)
 	local path = self.audioPath
 	local position = self.previewTime
 
+	if not path then
+		return self:stop()
+	end
+
 	if not path:find("^http") then
 		local info = love.filesystem.getInfo(path)
 		if not info then
-			self:stop()
-			return
+			return self:stop()
 		end
 	end
 
