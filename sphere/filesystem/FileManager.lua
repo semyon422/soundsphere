@@ -15,6 +15,7 @@ end
 
 local removeExtension = function(fileName)
 	local ext = fileName:match("%.([^%.]+)$")
+	ext = ext and ext:lower()
 	local format = FileTypeMap[ext]
 	return format and fileName:sub(1, -#ext - 2) or fileName, format
 end
@@ -33,6 +34,7 @@ end
 
 FileManager.getType = function(self, fileName)
 	local ext = fileName:match("%.([^%.]+)$")
+	ext = ext and ext:lower()
 	return FileTypeMap[ext]
 end
 
@@ -69,10 +71,16 @@ FileManager.findFile = function(self, fullFileName)
 		if love.filesystem.getInfo(filePath) then
 			return filePath, fileType
 		end
-		for _, ext in ipairs(FileTypes[fileType]) do
-			local filePath = path .. "/" .. fileName .. "." .. ext
-			if love.filesystem.getInfo(filePath) then
-				return filePath, fileType
+		local files = love.filesystem.getDirectoryItems(path)
+		for _, file in ipairs(files) do
+			if file:lower() == fullFileName:lower() then
+				return path .. "/" .. file, fileType
+			end
+		end
+		for _, file in ipairs(files) do
+			local trueFileName, trueFileType = removeExtension(fullFileName)
+			if fileName:lower() == trueFileName:lower() and fileType == trueFileType then
+				return path .. "/" .. file, fileType
 			end
 		end
 	end
