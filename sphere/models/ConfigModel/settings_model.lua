@@ -345,6 +345,14 @@ local settings = {
 		multiplier = 100,
 	},
 	{
+		name = "gain with clipping",
+		section = "audio",
+		key = "audio.sampleGain",
+		type = "SliderFloat",
+		range = {0, 100},
+		format = "+%0.0fdB",
+	},
+	{
 		name = "primary audio mode",
 		section = "audio",
 		key = "audio.mode.primary",

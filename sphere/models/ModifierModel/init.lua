@@ -7,7 +7,6 @@ local SpeedMode		= require("sphere.models.ModifierModel.SpeedMode")
 local TimeRateQ		= require("sphere.models.ModifierModel.TimeRateQ")
 local TimeRateX		= require("sphere.models.ModifierModel.TimeRateX")
 local WindUp		= require("sphere.models.ModifierModel.WindUp")
-local AudioClip		= require("sphere.models.ModifierModel.AudioClip")
 local NoScratch		= require("sphere.models.ModifierModel.NoScratch")
 local NoLongNote	= require("sphere.models.ModifierModel.NoLongNote")
 local NoMeasureLine	= require("sphere.models.ModifierModel.NoMeasureLine")
@@ -35,7 +34,6 @@ local Modifiers = {
 	TimeRateQ,
 	TimeRateX,
 	WindUp,
-	AudioClip,
 	NoScratch,
 	NoLongNote,
 	NoMeasureLine,
@@ -62,7 +60,7 @@ local ModifierId = {
 	[TimeRateQ] = 4,
 	[TimeRateX] = 5,
 	[WindUp] = 6,
-	[AudioClip] = 7,
+	-- [AudioClip] = 7,
 	[NoScratch] = 8,
 	[NoLongNote] = 9,
 	[NoMeasureLine] = 10,
@@ -89,7 +87,6 @@ local OneUseModifiers = {
 	TimeRateQ,
 	TimeRateX,
 	WindUp,
-	AudioClip,
 	NoScratch,
 	NoLongNote,
 	NoMeasureLine,

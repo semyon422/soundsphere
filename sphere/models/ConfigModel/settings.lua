@@ -7,6 +7,7 @@ return {
 			primary = "streamMemoryTempo",
 			secondary = "sample"
 		},
+		sampleGain = 0,
 		volume = {
 			effects = 1,
 			master = 1,

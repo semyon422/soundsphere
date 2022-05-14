@@ -1,4 +1,5 @@
 local Class						= require("aqua.util.Class")
+local sound						= require("aqua.sound")
 local TimeController			= require("sphere.controllers.TimeController")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 
@@ -92,6 +93,7 @@ GameplayController.load = function(self)
 
 	view:load()
 
+	sound.sample_gain = config.audio.sampleGain
 	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChart, function()
 		rhythmModel:setResourceAliases(NoteChartResourceLoader.aliases)
 		self:receive({
