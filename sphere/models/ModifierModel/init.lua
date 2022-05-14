@@ -9,7 +9,6 @@ local TimeRateX		= require("sphere.models.ModifierModel.TimeRateX")
 local WindUp		= require("sphere.models.ModifierModel.WindUp")
 local NoScratch		= require("sphere.models.ModifierModel.NoScratch")
 local NoLongNote	= require("sphere.models.ModifierModel.NoLongNote")
-local NoMeasureLine	= require("sphere.models.ModifierModel.NoMeasureLine")
 local Automap		= require("sphere.models.ModifierModel.Automap")
 local MultiplePlay	= require("sphere.models.ModifierModel.MultiplePlay")
 local MinLnLength	= require("sphere.models.ModifierModel.MinLnLength")
@@ -36,7 +35,6 @@ local Modifiers = {
 	WindUp,
 	NoScratch,
 	NoLongNote,
-	NoMeasureLine,
 	Automap,
 	MultiplePlay,
 	MultiOverPlay,
@@ -63,7 +61,7 @@ local ModifierId = {
 	-- [AudioClip] = 7,
 	[NoScratch] = 8,
 	[NoLongNote] = 9,
-	[NoMeasureLine] = 10,
+	-- [NoMeasureLine] = 10,
 	[Automap] = 11,
 	[MultiplePlay] = 12,
 	[MultiOverPlay] = 13,
@@ -89,7 +87,6 @@ local OneUseModifiers = {
 	WindUp,
 	NoScratch,
 	NoLongNote,
-	NoMeasureLine,
 }
 
 ModifierModel.construct = function(self)
