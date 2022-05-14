@@ -26,7 +26,9 @@ CacheManager.getNoteChartSetEntry = function(self, entry)
 	if not oldEntry then
 		entry = CacheDatabase:insertNoteChartSetEntry(entry)
 	else
+		oldEntry.lastModified = entry.lastModified
 		CacheDatabase:updateNoteChartSetEntry(entry)
+		entry = oldEntry
 	end
 
 	return entry
@@ -178,11 +180,7 @@ CacheManager.processNoteChartSet = function(self, noteChartSetPath)
 	})
 	self.noteChartSetCount = self.noteChartSetCount + 1
 
-	local noteChartsAtSet = CacheDatabase:getNoteChartsAtSet(noteChartSetEntry.id)
-	local cachedEntries = {}
-	for i = 1, #noteChartsAtSet do
-		cachedEntries[i] = noteChartsAtSet[i]
-	end
+	local cachedEntries = CacheDatabase:getNoteChartsAtSet(noteChartSetEntry.id)
 	for i = 1, #cachedEntries do
 		local info = love.filesystem.getInfo(cachedEntries[i].path)
 		if not info then
