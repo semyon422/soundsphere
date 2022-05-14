@@ -432,7 +432,14 @@ StageInfo.cells = {
 		x = 1, y = 3,
 		name = "bpm",
 		format = "%d",
-		key = "gameController.selectModel.noteChartItem.bpm"
+		value = function(self)
+			local baseTimeRate = self.gameController.rhythmModel.timeEngine.baseTimeRate
+			local noteChartItem = self.gameController.selectModel.noteChartItem
+			if not noteChartItem then
+				return 0
+			end
+			return noteChartItem.bpm * baseTimeRate
+		end,
 	},
 	{
 		type = StageInfo.smallCell,
@@ -440,7 +447,15 @@ StageInfo.cells = {
 		x = {1, 2}, y = 3,
 		name = "duration",
 		key = "gameController.selectModel.noteChartItem.length",
-		time = true
+		time = true,
+		value = function(self)
+			local baseTimeRate = self.gameController.rhythmModel.timeEngine.baseTimeRate
+			local noteChartItem = self.gameController.selectModel.noteChartItem
+			if not noteChartItem then
+				return 0
+			end
+			return noteChartItem.length / baseTimeRate
+		end,
 	},
 	{
 		type = StageInfo.smallCell,
