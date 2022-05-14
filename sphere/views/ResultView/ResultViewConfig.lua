@@ -20,7 +20,7 @@ local formatDifficulty = function(difficulty)
 		difficulty = "????"
 	elseif difficulty >= 100 then
 		format = "%d"
-	elseif difficulty >= 10 then
+	elseif difficulty > 9.995 then
 		format = "%.1f"
 	end
 	return format:format(difficulty)
