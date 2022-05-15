@@ -1,7 +1,7 @@
 local bit = require("bit")
 local imgui = require("cimgui")
-local transform = require("aqua.graphics.transform")
 local ImguiView = require("sphere.views.ImguiView")
+local align = require("aqua.imgui.config").align
 
 local NoteSkinView = ImguiView:new()
 
@@ -15,7 +15,7 @@ NoteSkinView.draw = function(self)
 	local selectedNoteSkin = self.gameController.noteSkinModel:getNoteSkin(noteChart.inputMode)
 
 	if self.isOpen[0] then
-		imgui.SetNextWindowPos({279, 279}, 0)
+		imgui.SetNextWindowPos({align(0.5, 279), 279}, 0)
 		imgui.SetNextWindowSize({454, 522}, 0)
 		local flags = bit.bor(imgui.ImGuiWindowFlags_NoMove, imgui.ImGuiWindowFlags_NoResize)
 		if imgui.Begin("Noteskins", self.isOpen, flags) then
@@ -39,7 +39,7 @@ NoteSkinView.draw = function(self)
 			return
 		end
 
-		imgui.SetNextWindowPos({733, 279}, 0)
+		imgui.SetNextWindowPos({align(0.5, 733), 279}, 0)
 		imgui.SetNextWindowSize({454, 522}, 0)
 		if imgui.Begin("Noteskin config", nil, flags) then
 			selectedNoteSkin.config:render()

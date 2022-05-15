@@ -1,9 +1,6 @@
-local bit = require("bit")
-local ffi = require("ffi")
 local imgui = require("cimgui")
-local transform = require("aqua.graphics.transform")
 local ImguiView = require("sphere.views.ImguiView")
-local ImguiHotkey = require("aqua.imgui.Hotkey")
+local align = require("aqua.imgui.config").align
 
 local ImguiElements = {
 	Checkbox = require("sphere.imgui.Checkbox"),
@@ -22,9 +19,9 @@ SettingsView.draw = function(self)
 	local settings_model = self.gameController.configModel.configs.settings_model
 
 	if self.isOpen[0] then
-		imgui.SetNextWindowPos({279 + 454 * 3 / 4, 279}, 0)
+		imgui.SetNextWindowPos({align(0.5, 279 + 454 * 3 / 4), 279}, 0)
 		imgui.SetNextWindowSize({454 * 1.5, 522}, 0)
-		local flags = bit.bor(imgui.ImGuiWindowFlags_NoMove, imgui.ImGuiWindowFlags_NoResize)
+		local flags = imgui.love.WindowFlags("NoMove", "NoResize")
 		if imgui.Begin("Game settings", self.isOpen, flags) then
 			if imgui.BeginTabBar("Section tab bar", 0) then
 				local sections = {}
