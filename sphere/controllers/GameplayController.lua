@@ -54,8 +54,6 @@ GameplayController.load = function(self)
 	rhythmModel:setAudioMode("secondary", config.audio.mode.secondary)
 	rhythmModel:setLongNoteShortening(config.gameplay.longNoteShortening)
 	rhythmModel:setTimeToPrepare(config.gameplay.time.prepare)
-	rhythmModel:setInputOffset(config.gameplay.offset.input + localOffset)
-	rhythmModel:setVisualOffset(config.gameplay.offset.visual + localOffset)
 	rhythmModel:setVisualTimeRate(config.gameplay.speed)
 	rhythmModel:setVisualTimeRateScale(config.gameplay.scaleSpeed)
 	rhythmModel:setPauseTimes(
@@ -90,6 +88,18 @@ GameplayController.load = function(self)
 	})
 
 	rhythmModel:loadAllEngines()
+
+	local baseTimeRate = rhythmModel.timeEngine:getBaseTimeRate()
+	local inputOffset = config.gameplay.offset.input + localOffset
+	local visualOffset = config.gameplay.offset.visual + localOffset
+	if config.gameplay.offsetScale.input then
+		inputOffset = inputOffset * baseTimeRate
+	end
+	if config.gameplay.offsetScale.visual then
+		visualOffset = visualOffset * baseTimeRate
+	end
+	rhythmModel:setInputOffset(inputOffset)
+	rhythmModel:setVisualOffset(visualOffset)
 
 	view:load()
 

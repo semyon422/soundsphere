@@ -25,6 +25,10 @@ return {
 			input = 0,
 			visual = 0
 		},
+		offsetScale = {
+			input = false,
+			visual = false
+		},
 		pauseOnFail = false,
 		ratingHitTimingWindow = 0.032,
 		scaleSpeed = false,

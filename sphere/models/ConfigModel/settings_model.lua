@@ -56,6 +56,18 @@ local settings = {
 		multiplier = 1000,
 	},
 	{
+		name = "input offset * time rate",
+		section = "gameplay",
+		key = "gameplay.offsetScale.input",
+		type = "Checkbox",
+	},
+	{
+		name = "visual offset * time rate",
+		section = "gameplay",
+		key = "gameplay.offsetScale.visual",
+		type = "Checkbox",
+	},
+	{
 		name = "last mean values",
 		section = "gameplay",
 		key = "gameplay.lastMeanValues",
