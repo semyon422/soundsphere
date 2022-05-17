@@ -99,6 +99,8 @@ SelectController.receive = function(self, event)
 		self.gameController.noteSkinModel:setDefaultNoteSkin(event.noteSkin)
 	elseif event.name == "quickLogin" then
 		self.gameController.onlineModel.authManager:quickLogin()
+	elseif event.name == "login" then
+		self.gameController.onlineModel.authManager:login(event.email, event.password)
 	elseif event.name == "openDirectory" then
 		local selectModel = self.gameController.selectModel
 		local path = selectModel.noteChartItem.path:match("^(.+)/.-$")

@@ -19,6 +19,14 @@ AuthManager.checkSession = thread.coro(function(self)
 	end
 	print(inspect(response))
 	config.session = response.session or {}
+
+	if not config.session.user_id then
+		return
+	end
+
+	print("GET " .. api.users[config.session.user_id])
+	local user = api.users[config.session.user_id]:get()
+	config.user = user or {}
 end)
 
 AuthManager.updateSession = thread.coro(function(self)
@@ -94,6 +102,32 @@ AuthManager.quickLogin = thread.coro(function(self)
 	else
 		self:quickGetKey()
 	end
+end)
+
+AuthManager.login = thread.coro(function(self, email, password)
+	print("login")
+	local api = self.webApi.api
+	local config = self.config
+
+	print("POST " .. api.auth.login)
+	local response, code, headers = api.auth.login:_post({
+		email = email,
+		password = password,
+		params = true,
+	})
+	if not response then
+		print(code, headers)
+		return
+	end
+
+	if code ~= 200 then
+		print(response.message)
+		return
+	end
+
+	print(inspect(response))
+	config.token = response.token or ""
+	self:checkSession()
 end)
 
 return AuthManager

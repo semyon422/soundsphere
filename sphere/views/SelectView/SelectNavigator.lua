@@ -15,6 +15,7 @@ SelectNavigator.load = function(self)
 	self.isNoteSkinsOpen = ffi.new("bool[1]", false)
 	self.isInputOpen = ffi.new("bool[1]", false)
 	self.isSettingsOpen = ffi.new("bool[1]", false)
+	self.isOnlineOpen = ffi.new("bool[1]", false)
 end
 
 SelectNavigator.receive = function(self, event)
@@ -226,6 +227,14 @@ SelectNavigator.quickLogin = function(self)
 	self:send({name = "quickLogin"})
 end
 
+SelectNavigator.login = function(self, email, password)
+	self:send({
+		name = "login",
+		email = email,
+		password = password,
+	})
+end
+
 SelectNavigator.openNoteSkins = function(self)
 	local isOpen = self.isNoteSkinsOpen
 	isOpen[0] = not isOpen[0]
@@ -244,6 +253,11 @@ end
 
 SelectNavigator.openSettings = function(self)
 	local isOpen = self.isSettingsOpen
+	isOpen[0] = not isOpen[0]
+end
+
+SelectNavigator.openOnline = function(self)
+	local isOpen = self.isOnlineOpen
 	isOpen[0] = not isOpen[0]
 end
 

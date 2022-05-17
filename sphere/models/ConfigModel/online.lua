@@ -1,8 +1,6 @@
 return {
 	session = {},
+	user = {},
 	token = "",
-	userId = 1,
-	email = "",
-	username = "",
 	quick_login_key = "",
 }

@@ -22,7 +22,7 @@ InputView.draw = function(self)
 	if self.isOpen[0] then
 		imgui.SetNextWindowPos({align(0.5, 279), 279}, 0)
 		imgui.SetNextWindowSize({454, 522}, 0)
-		local flags = bit.bor(imgui.ImGuiWindowFlags_NoMove, imgui.ImGuiWindowFlags_NoResize)
+		local flags = imgui.love.WindowFlags("NoMove", "NoResize")
 		if imgui.Begin("Input bindings", self.isOpen, flags) then
 			for i = 1, #items do
 				local virtualKey = items[i].virtualKey
