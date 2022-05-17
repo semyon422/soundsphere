@@ -14,6 +14,7 @@ local CollectionListView = require(viewspackage .. "SelectView.CollectionListVie
 local OsudirectListView = require(viewspackage .. "SelectView.OsudirectListView")
 local OsudirectDifficultiesListView = require(viewspackage .. "SelectView.OsudirectDifficultiesListView")
 local CacheView = require(viewspackage .. "SelectView.CacheView")
+local SelectOverlayView = require(viewspackage .. "SelectView.SelectOverlayView")
 local NoteSkinView = require("sphere.views.NoteSkinView")
 local InputView = require("sphere.views.InputView")
 local SettingsView = require("sphere.views.SettingsView")
@@ -43,6 +44,7 @@ SelectView.construct = function(self)
 	self.noteSkinView = NoteSkinView:new()
 	self.inputView = InputView:new()
 	self.settingsView = SettingsView:new()
+	self.selectOverlayView = SelectOverlayView:new()
 end
 
 SelectView.load = function(self)
@@ -68,6 +70,7 @@ SelectView.draw = function(self)
 	self.noteSkinView:draw()
 	self.inputView:draw()
 	self.settingsView:draw()
+	-- self.selectOverlayView:draw()
 end
 
 return SelectView
