@@ -2,21 +2,23 @@ local Class = require("aqua.util.Class")
 
 local DirectoryManager = Class:new()
 
-DirectoryManager.createDirectories = function(self)
-	self:createDirectory("userdata")
-	self:createDirectory("userdata/skins")
-	self:createDirectory("userdata/charts")
-	self:createDirectory("userdata/charts/downloads")
-	self:createDirectory("userdata/export")
-	self:createDirectory("userdata/hitsounds")
-	self:createDirectory("userdata/replays")
-	self:createDirectory("userdata/score_systems")
-	self:createDirectory("userdata/screenshots")
-end
+local defaultDirectories = {
+	"userdata",
+	"userdata/skins",
+	"userdata/charts",
+	"userdata/charts/downloads",
+	"userdata/export",
+	"userdata/hitsounds",
+	"userdata/replays",
+	"userdata/score_systems",
+	"userdata/screenshots",
+}
 
-DirectoryManager.createDirectory = function(self, path)
-	if not love.filesystem.getInfo(path) then
-		love.filesystem.createDirectory(path)
+DirectoryManager.createDirectories = function(self)
+	for _, path in ipairs(defaultDirectories) do
+		if not love.filesystem.getInfo(path) then
+			love.filesystem.createDirectory(path)
+		end
 	end
 end
 
