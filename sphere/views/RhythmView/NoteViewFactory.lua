@@ -1,5 +1,5 @@
 local Class					= require("aqua.util.Class")
-local FileManager			= require("sphere.filesystem.FileManager")
+local FileFinder			= require("sphere.filesystem.FileFinder")
 local ShortNoteView	= require("sphere.views.RhythmView.ShortNoteView")
 local LongNoteView		= require("sphere.views.RhythmView.LongNoteView")
 local LightingNoteView		= require("sphere.views.RhythmView.LightingNoteView")
@@ -53,7 +53,7 @@ NoteViewFactory.getNoteView = function(self, graphicalNote)
 	local fileType
 	local images = noteData.images[1] and noteData.images[1][1]
 	if images then
-		fileType = FileManager:getType(images)
+		fileType = FileFinder:getType(images)
 	end
 	if fileType == "image" and self.imageBgaEnabled then
 		noteView.noteType = "ImageNote"

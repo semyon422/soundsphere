@@ -1,4 +1,4 @@
-local FileManager = {}
+local FileFinder = {}
 
 local FileTypes = {
 	audio = {"wav", "ogg", "mp3"},
@@ -20,25 +20,25 @@ local removeExtension = function(fileName)
 	return format and fileName:sub(1, -#ext - 2) or fileName, format
 end
 
-FileManager.priority = {}
-FileManager.paths = {}
+FileFinder.priority = {}
+FileFinder.paths = {}
 
 local sortPaths = function(a, b)
-	return FileManager.priority[a] > FileManager.priority[b]
+	return FileFinder.priority[a] > FileFinder.priority[b]
 end
 
-FileManager.reset = function(self)
+FileFinder.reset = function(self)
 	self.priority = {}
 	self.paths = {}
 end
 
-FileManager.getType = function(self, fileName)
+FileFinder.getType = function(self, fileName)
 	local ext = fileName:match("%.([^%.]+)$")
 	ext = ext and ext:lower()
 	return FileTypeMap[ext]
 end
 
-FileManager.addPath = function(self, path, priority)
+FileFinder.addPath = function(self, path, priority)
 	local paths = self.paths
 	local _priority = self.priority
 	if not _priority[path] then
@@ -48,7 +48,7 @@ FileManager.addPath = function(self, path, priority)
 	table.sort(paths, sortPaths)
 end
 
-FileManager.removePath = function(self, path)
+FileFinder.removePath = function(self, path)
 	local paths = self.paths
 	self.priority[path] = nil
 	for i = 1, #paths do
@@ -58,7 +58,7 @@ FileManager.removePath = function(self, path)
 	end
 end
 
-FileManager.findFile = function(self, fullFileName)
+FileFinder.findFile = function(self, fullFileName)
 	fullFileName = fullFileName:gsub("\\", "/")
 	local fileName, fileType = removeExtension(fullFileName)
 
@@ -86,4 +86,4 @@ FileManager.findFile = function(self, fullFileName)
 	end
 end
 
-return FileManager
+return FileFinder

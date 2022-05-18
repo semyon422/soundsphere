@@ -1,4 +1,4 @@
-local FileManager			= require("sphere.filesystem.FileManager")
+local FileFinder			= require("sphere.filesystem.FileFinder")
 local ShortGraphicalNote	= require("sphere.models.RhythmModel.GraphicEngine.ShortGraphicalNote")
 local LongGraphicalNote		= require("sphere.models.RhythmModel.GraphicEngine.LongGraphicalNote")
 local ImageNote				= require("sphere.models.RhythmModel.GraphicEngine.ImageNote")
@@ -27,7 +27,7 @@ GraphicalNoteFactory.getNote = function(self, noteData)
 		local fileType
 		local images = noteData.images[1] and noteData.images[1][1]
 		if images then
-			fileType = FileManager:getType(images)
+			fileType = FileFinder:getType(images)
 		end
 		if fileType == "image" then
 			graphicalNote.noteType = "ImageNote"

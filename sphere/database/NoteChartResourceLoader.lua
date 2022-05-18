@@ -2,7 +2,7 @@ local image			= require("aqua.image")
 local sound			= require("aqua.sound")
 local video			= require("aqua.video")
 local JamLoader		= require("sphere.database.JamLoader")
-local FileManager	= require("sphere.filesystem.FileManager")
+local FileFinder	= require("sphere.filesystem.FileFinder")
 local array_update = require("aqua.util.array_update")
 
 local NoteChartResourceLoader = {}
@@ -37,15 +37,15 @@ NoteChartResourceLoader.load = function(self, path, noteChart, callback)
 	self.noteChart = noteChart
 	self.callback = callback
 
-	FileManager:reset()
+	FileFinder:reset()
 	if noteChartType == "bms" then
-		FileManager:addPath(directoryPath, 2)
-		FileManager:addPath(self.hitSoundsPath, 1)
+		FileFinder:addPath(directoryPath, 2)
+		FileFinder:addPath(self.hitSoundsPath, 1)
 		self:loadBMS()
 	elseif noteChartType == "o2jam" then
 		self:loadOJM()
 	elseif noteChartType == "midi" then
-		FileManager:addPath(self.hitSoundsPath .. "/midi", 1)
+		FileFinder:addPath(self.hitSoundsPath .. "/midi", 1)
 		self:loadBMS()
 	end
 end
@@ -65,7 +65,7 @@ NoteChartResourceLoader.loadBMS = function(self)
 	local newResources = {}
 	for resourceType, name, sequence in self.noteChart:getResourceIterator() do
 		for _, path in ipairs(sequence) do
-			local filePath, fileType = FileManager:findFile(path)
+			local filePath, fileType = FileFinder:findFile(path)
 			if filePath then
 				table.insert(newResources, filePath)
 				self.aliases[name] = filePath
@@ -77,7 +77,7 @@ NoteChartResourceLoader.loadBMS = function(self)
 	local new, old, all = array_update(newResources, self.resources)
 
 	for _, path in ipairs(old) do
-		local fileType = FileManager:getType(path)
+		local fileType = FileFinder:getType(path)
 		if fileType == "image" then
 			image.unload(path)
 		elseif fileType == "audio" then
@@ -104,7 +104,7 @@ NoteChartResourceLoader.loadBMS = function(self)
 	end
 
 	for _, path in ipairs(new) do
-		local fileType = FileManager:getType(path)
+		local fileType = FileFinder:getType(path)
 		if fileType == "image" then
 			image.load(path, resourceLoadedCallback)
 		elseif fileType == "audio" then
@@ -119,7 +119,7 @@ end
 NoteChartResourceLoader.unloadAudio = function(self)
 	local audios = {}
 	for _, path in ipairs(self.resources) do
-		local fileType = FileManager:getType(path)
+		local fileType = FileFinder:getType(path)
 		if fileType == "audio" then
 			table.insert(audios, path)
 			sound.unload(path)
