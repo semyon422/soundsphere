@@ -28,10 +28,12 @@ SelectOverlayView.draw = function(self)
 		self.navigator:changeCollapse()
 	end
 
-	if imgui.IsWindowFocused() then
-		imgui.CaptureMouseFromApp(false)
-		imgui.CaptureKeyboardFromApp(false)
+	local capture = false
+	if not imgui.IsWindowFocused() then
+		capture = true
 	end
+	imgui.CaptureMouseFromApp(capture)
+	imgui.CaptureKeyboardFromApp(capture)
 
 	imgui.End()
 end
