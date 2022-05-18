@@ -75,6 +75,9 @@ SelectView.load = function(self)
 	self.mountsView.gameController = self.gameController
 	self.mountsView.navigator = self.navigator
 	self.mountsView.isOpen = self.navigator.isMountsOpen
+
+	self.selectOverlayView.gameController = self.gameController
+	self.selectOverlayView.navigator = self.navigator
 end
 
 SelectView.draw = function(self)
@@ -84,7 +87,7 @@ SelectView.draw = function(self)
 	self.settingsView:draw()
 	self.onlineView:draw()
 	self.mountsView:draw()
-	-- self.selectOverlayView:draw()
+	self.selectOverlayView:draw()
 end
 
 return SelectView
