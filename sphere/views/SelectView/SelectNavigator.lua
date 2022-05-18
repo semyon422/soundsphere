@@ -16,6 +16,7 @@ SelectNavigator.load = function(self)
 	self.isInputOpen = ffi.new("bool[1]", false)
 	self.isSettingsOpen = ffi.new("bool[1]", false)
 	self.isOnlineOpen = ffi.new("bool[1]", false)
+	self.isMountsOpen = ffi.new("bool[1]", false)
 end
 
 SelectNavigator.receive = function(self, event)
@@ -258,6 +259,11 @@ end
 
 SelectNavigator.openOnline = function(self)
 	local isOpen = self.isOnlineOpen
+	isOpen[0] = not isOpen[0]
+end
+
+SelectNavigator.openMounts = function(self)
+	local isOpen = self.isMountsOpen
 	isOpen[0] = not isOpen[0]
 end
 

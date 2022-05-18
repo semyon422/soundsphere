@@ -1024,6 +1024,12 @@ local LeftScreenMenu = {
 				displayName = "settings"
 			}
 		},
+		{
+			{
+				method = "openMounts",
+				displayName = "mounts"
+			}
+		},
 	}
 }
 
