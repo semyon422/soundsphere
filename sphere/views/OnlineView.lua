@@ -12,6 +12,7 @@ OnlineView.draw = function(self)
 	if not self.isOpen[0] then
 		return
 	end
+	self:closeOnEscape()
 
 	imgui.SetNextWindowPos({align(0.5, 733), 279}, 0)
 	imgui.SetNextWindowSize({454, 522}, 0)

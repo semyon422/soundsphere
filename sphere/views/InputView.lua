@@ -19,25 +19,28 @@ InputView.draw = function(self)
 	local inputModeString = noteChart.inputMode:getString()
 	local items = self.gameController.inputModel:getInputs(inputModeString)
 
-	if self.isOpen[0] then
-		imgui.SetNextWindowPos({align(0.5, 279), 279}, 0)
-		imgui.SetNextWindowSize({454, 522}, 0)
-		local flags = imgui.love.WindowFlags("NoMove", "NoResize")
-		if imgui.Begin("Input bindings", self.isOpen, flags) then
-			for i = 1, #items do
-				local virtualKey = items[i].virtualKey
-				local key, device = self.gameController.inputModel:getKey(inputModeString, virtualKey)
-				keyPtr[0] = tostring(key)
-				devicePtr[0] = device
-				if ImguiHotkey(virtualKey, keyPtr, devicePtr) then
-					key = ffi.string(keyPtr[0])
-					device = ffi.string(devicePtr[0])
-					self.navigator:setInputBinding(inputModeString, virtualKey, key, device)
-				end
+	if not self.isOpen[0] then
+		return
+	end
+	self:closeOnEscape()
+
+	imgui.SetNextWindowPos({align(0.5, 279), 279}, 0)
+	imgui.SetNextWindowSize({454, 522}, 0)
+	local flags = imgui.love.WindowFlags("NoMove", "NoResize")
+	if imgui.Begin("Input bindings", self.isOpen, flags) then
+		for i = 1, #items do
+			local virtualKey = items[i].virtualKey
+			local key, device = self.gameController.inputModel:getKey(inputModeString, virtualKey)
+			keyPtr[0] = tostring(key)
+			devicePtr[0] = device
+			if ImguiHotkey(virtualKey, keyPtr, devicePtr) then
+				key = ffi.string(keyPtr[0])
+				device = ffi.string(devicePtr[0])
+				self.navigator:setInputBinding(inputModeString, virtualKey, key, device)
 			end
 		end
-		imgui.End()
 	end
+	imgui.End()
 end
 
 return InputView
