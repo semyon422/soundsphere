@@ -22,6 +22,7 @@ end
 
 FileFinder.priority = {}
 FileFinder.paths = {}
+FileFinder.fileLists = {}
 
 local sortPaths = function(a, b)
 	return FileFinder.priority[a] > FileFinder.priority[b]
@@ -30,6 +31,7 @@ end
 FileFinder.reset = function(self)
 	self.priority = {}
 	self.paths = {}
+	self.fileLists = {}
 end
 
 FileFinder.getType = function(self, fileName)
@@ -58,6 +60,30 @@ FileFinder.removePath = function(self, path)
 	end
 end
 
+FileFinder.getFileListRecursive = function(self, path, list, prefix)
+	list = list or {}
+	prefix = prefix or ""
+	local files = love.filesystem.getDirectoryItems(path)
+	for i = 1, #files do
+		local info = love.filesystem.getInfo(path .. "/" .. files[i])
+		if info.type == "directory" then
+			self:getFileListRecursive(path .. "/" .. files[i], list, prefix .. files[i] .. "/")
+		else
+			table.insert(list, prefix .. files[i])
+		end
+	end
+	return list
+end
+
+FileFinder.getFileList = function(self, path)
+	local fileLists = self.fileLists
+	if fileLists[path] then
+		return fileLists[path]
+	end
+	fileLists[path] = self:getFileListRecursive(path)
+	return fileLists[path]
+end
+
 FileFinder.findFile = function(self, fullFileName)
 	fullFileName = fullFileName:gsub("\\", "/")
 	local fileName, fileType = removeExtension(fullFileName)
@@ -71,7 +97,7 @@ FileFinder.findFile = function(self, fullFileName)
 		if love.filesystem.getInfo(filePath) then
 			return filePath, fileType
 		end
-		local files = love.filesystem.getDirectoryItems(path)
+		local files = self:getFileList(path)
 		for _, file in ipairs(files) do
 			if file:lower() == fullFileName:lower() then
 				return path .. "/" .. file, fileType
