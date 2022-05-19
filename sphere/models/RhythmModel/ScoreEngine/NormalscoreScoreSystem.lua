@@ -25,7 +25,6 @@ NormalscoreScoreSystem.after = function(self, event)
 	self.adjustRatio = ns.score_adjusted / ns.score
 
 	self.enps = self.scoreEngine.baseEnps * event.timeRate
-	self.averageStrain = self.scoreEngine.baseAverageStrain * event.timeRate
 end
 
 NormalscoreScoreSystem.hit = function(self, event)

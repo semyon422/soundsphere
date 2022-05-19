@@ -75,10 +75,8 @@ GameplayController.load = function(self)
 
 	local scoreEngine = rhythmModel.scoreEngine
 
-	local enps, averageStrain, generalizedKeymode = difficultyModel:getDifficulty(noteChart)
+	local enps, longNoteRatio, longNoteArea = difficultyModel:getDifficulty(noteChart)
 	scoreEngine.baseEnps = enps
-	scoreEngine.baseAverageStrain = averageStrain
-	scoreEngine.generalizedKeymode = generalizedKeymode
 
 	scoreEngine.noteChartDataEntry = noteChartDataEntry
 

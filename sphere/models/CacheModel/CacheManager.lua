@@ -293,7 +293,7 @@ CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, for
 			if entries then
 				for i, entry in ipairs(entries) do
 					local noteChart = noteCharts[i]
-					local difficulty, longNoteRatio = DifficultyModel:getDifficulty(noteChart)
+					local difficulty, longNoteRatio, longNoteArea = DifficultyModel:getDifficulty(noteChart)
 					entry.difficulty = difficulty
 					entry.longNoteRatio = longNoteRatio
 					self:setNoteChartDataEntry(entry)
