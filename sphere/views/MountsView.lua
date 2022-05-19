@@ -38,9 +38,8 @@ MountsView.draw = function(self)
 		end
 		imgui.EndChild()
 		if selectedItem then
-			local avail = imgui.GetContentRegionAvail()
 			if imgui.BeginChild_Str("Mount point child window", {0, 0}, false, 0) then
-				imgui.Text("Status: " .. mountModel.mountStatuses[selectedItem[1]])
+				imgui.Text("Status: " .. (mountModel.mountStatuses[selectedItem[1]] or "unknown"))
 				imgui.Text("Real path: ")
 				imgui.TextWrapped(selectedItem[1])
 				if imgui.Button("Open") then
