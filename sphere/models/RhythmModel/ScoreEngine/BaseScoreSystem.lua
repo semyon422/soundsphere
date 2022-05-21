@@ -98,23 +98,23 @@ BaseScoreSystem.notes = {
 	LongNote = {
 		clear = {
 			startPassedPressed = function(self, event) self:countLastMean(event, "noteStartTime") end,
-			startMissed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
-			startMissedPressed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
+			startMissed = BaseScoreSystem.breakComboLongNote,
+			startMissedPressed = BaseScoreSystem.breakComboLongNote,
 			clear = BaseScoreSystem.earlyHit,
 		},
 		startPassedPressed = {
-			startMissed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
+			startMissed = BaseScoreSystem.breakComboLongNote,
 			endMissed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
 			endPassed = {BaseScoreSystem.success, function(self, event) self:countLastMean(event, "noteEndTime") end},
 		},
 		startMissedPressed = {
-			endMissedPassed = nil,
+			endMissedPassed = {BaseScoreSystem.success, function(self, event) self:countLastMean(event, "noteEndTime") end},
 			startMissed = BaseScoreSystem.breakComboLongNote,
-			endMissed = BaseScoreSystem.breakComboLongNote,
+			endMissed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
 		},
 		startMissed = {
 			startMissedPressed = nil,
-			endMissed = BaseScoreSystem.breakComboLongNote,
+			endMissed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
 		},
 	},
 }

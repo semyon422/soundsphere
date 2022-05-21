@@ -60,18 +60,18 @@ NormalscoreScoreSystem.notes = {
 			startMissedPressed = function(self) self:miss("noteStartTime") end,
 		},
 		startPassedPressed = {
-			startMissed = function(self) self:miss("noteEndTime") end,
+			startMissed = nil,
 			endMissed = function(self) self:miss("noteEndTime") end,
 			endPassed = function(self, event) self:hit(event, "noteEndTime") end,
 		},
 		startMissedPressed = {
-			endMissedPassed = nil,
+			endMissedPassed = function(self, event) self:hit(event, "noteEndTime") end,
 			startMissed = nil,
-			endMissed = nil,
+			endMissed = function(self) self:miss("noteEndTime") end,
 		},
 		startMissed = {
 			startMissedPressed = nil,
-			endMissed = nil,
+			endMissed = function(self) self:miss("noteEndTime") end,
 		},
 	},
 }

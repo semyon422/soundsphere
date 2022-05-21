@@ -41,18 +41,18 @@ HpScoreSystem.notes = {
 			startMissedPressed = HpScoreSystem.decreaseHp,
 		},
 		startPassedPressed = {
-			startMissed = HpScoreSystem.decreaseHp,
+			startMissed = nil,
 			endMissed = HpScoreSystem.decreaseHp,
 			endPassed = HpScoreSystem.increaseHp,
 		},
 		startMissedPressed = {
-			endMissedPassed = nil,
+			endMissedPassed = HpScoreSystem.increaseHp,
 			startMissed = nil,
-			endMissed = nil,
+			endMissed = HpScoreSystem.decreaseHp,
 		},
 		startMissed = {
 			startMissedPressed = nil,
-			endMissed = nil,
+			endMissed = HpScoreSystem.decreaseHp,
 		},
 	},
 }

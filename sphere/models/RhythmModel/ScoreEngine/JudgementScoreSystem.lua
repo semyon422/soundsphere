@@ -123,18 +123,18 @@ JudgementScoreSystem.notes = {
 			startMissedPressed = function(self, event) self:hit(event, "noteStartTime") end,
 		},
 		startPassedPressed = {
-			startMissed = function(self, event) self:hit(event, "noteEndTime") end,
+			startMissed = nil,
 			endMissed = function(self, event) self:hit(event, "noteEndTime") end,
 			endPassed = function(self, event) self:hit(event, "noteEndTime") end,
 		},
 		startMissedPressed = {
-			endMissedPassed = nil,
+			endMissedPassed = function(self, event) self:hit(event, "noteEndTime") end,
 			startMissed = nil,
-			endMissed = nil,
+			endMissed = function(self, event) self:hit(event, "noteEndTime") end,
 		},
 		startMissed = {
 			startMissedPressed = nil,
-			endMissed = nil,
+			endMissed = function(self, event) self:hit(event, "noteEndTime") end,
 		},
 	},
 }
