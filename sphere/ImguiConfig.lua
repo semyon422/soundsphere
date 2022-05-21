@@ -5,14 +5,22 @@ local Class = require("aqua.util.Class")
 
 local ImguiConfig = Class:new()
 
+ImguiConfig.construct = function(self)
+	self.ptrs = {}
+	self.defs = {}
+	self:setDef("autosave", {"bool[?]", 1, false})
+end
+
+function ImguiConfig:setDef(name, def)
+	self.defs[name] = def
+	self.ptrs[name] = ffi.new(unpack(def))
+end
+
 function ImguiConfig:setDefs(defs)
-	local ptrs = {}
 	for k, v in pairs(defs) do
-		ptrs[k] = ffi.new(unpack(v))
+		self:setDef(k, v)
 	end
-	self.ptrs = ptrs
-	self.defs = defs
-	return ptrs, defs
+	return self.ptrs, self.defs
 end
 
 local function _unpack(t, i, j)
@@ -39,11 +47,19 @@ end
 function ImguiConfig:render() end
 
 function ImguiConfig:renderAfter()
+	imgui.Separator()
 	if imgui.Button("Write config file") then
 		self:write()
 	end
 	if imgui.Button("Delete config file") then
 		self:remove()
+	end
+	imgui.Checkbox("Autosave", self.ptrs.autosave)
+end
+
+function ImguiConfig:close()
+	if self:get("autosave") then
+		self:write()
 	end
 end
 

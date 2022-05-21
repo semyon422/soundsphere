@@ -11,13 +11,21 @@ NoteSkinView.draw = function(self)
 		return
 	end
 
-	local items = self.gameController.noteSkinModel:getNoteSkins(noteChart.inputMode)
-	local selectedNoteSkin = self.gameController.noteSkinModel:getNoteSkin(noteChart.inputMode)
-
 	if not self.isOpen[0] then
 		return
 	end
-	self:closeOnEscape()
+	local closed = self:closeOnEscape()
+
+	local selectedNoteSkin = self.gameController.noteSkinModel:getNoteSkin(noteChart.inputMode)
+
+	if closed then
+		if selectedNoteSkin.config then
+			selectedNoteSkin.config:close()
+		end
+		return
+	end
+
+	local items = self.gameController.noteSkinModel:getNoteSkins(noteChart.inputMode)
 
 	imgui.SetNextWindowPos({align(0.5, 279), 279}, 0)
 	imgui.SetNextWindowSize({454, 522}, 0)

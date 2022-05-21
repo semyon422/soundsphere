@@ -21,6 +21,7 @@ end
 ImguiView.closeOnEscape = function(self)
 	if keystate.escape then
 		self.isOpen[0] = false
+		return true
 	end
 end
 
