@@ -91,9 +91,8 @@ JudgementScoreSystem.getJudgement = function(_, judgements, deltaTime)
 	end
 end
 
-JudgementScoreSystem.processJudgement = function(self, event)
-	local noteStartTime = event.noteStartTime or event.noteTime
-	local deltaTime = (event.currentTime - noteStartTime) / math.abs(event.timeRate)
+JudgementScoreSystem.hit = function(self, event, timeKey)
+	local deltaTime = (event.currentTime - event[timeKey]) / math.abs(event.timeRate)
 
 	local counters = self.counters
 	for name, judgements in pairs(self.judgements) do
@@ -110,25 +109,23 @@ JudgementScoreSystem.processJudgement = function(self, event)
 	end
 end
 
-JudgementScoreSystem.processMiss = JudgementScoreSystem.processJudgement
-
 JudgementScoreSystem.notes = {
-	ShortScoreNote = {
+	ShortNote = {
 		clear = {
-			passed = JudgementScoreSystem.processJudgement,
-			missed = JudgementScoreSystem.processMiss,
+			passed = function(self, event) self:hit(event, "noteTime") end,
+			missed = function(self, event) self:hit(event, "noteTime") end,
 		},
 	},
-	LongScoreNote = {
+	LongNote = {
 		clear = {
-			startPassedPressed = JudgementScoreSystem.processJudgement,
-			startMissed = JudgementScoreSystem.processMiss,
-			startMissedPressed = JudgementScoreSystem.processMiss,
+			startPassedPressed = function(self, event) self:hit(event, "noteStartTime") end,
+			startMissed = function(self, event) self:hit(event, "noteStartTime") end,
+			startMissedPressed = function(self, event) self:hit(event, "noteStartTime") end,
 		},
 		startPassedPressed = {
-			startMissed = nil,
-			endMissed = nil,
-			endPassed = nil,
+			startMissed = function(self, event) self:hit(event, "noteEndTime") end,
+			endMissed = function(self, event) self:hit(event, "noteEndTime") end,
+			endPassed = function(self, event) self:hit(event, "noteEndTime") end,
 		},
 		startMissedPressed = {
 			endMissedPassed = nil,

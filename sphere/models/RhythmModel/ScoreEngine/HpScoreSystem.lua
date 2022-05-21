@@ -28,15 +28,15 @@ HpScoreSystem.decreaseHp = function(self)
 end
 
 HpScoreSystem.notes = {
-	ShortScoreNote = {
+	ShortNote = {
 		clear = {
 			passed = HpScoreSystem.increaseHp,
 			missed = HpScoreSystem.decreaseHp,
 		},
 	},
-	LongScoreNote = {
+	LongNote = {
 		clear = {
-			startPassedPressed = nil,
+			startPassedPressed = HpScoreSystem.increaseHp,
 			startMissed = HpScoreSystem.decreaseHp,
 			startMissedPressed = HpScoreSystem.decreaseHp,
 		},

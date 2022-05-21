@@ -1,6 +1,5 @@
 
 local LogicEngine = require("sphere.models.RhythmModel.LogicEngine")
-local inspect = require("inspect")
 
 local NoteChart		= require("ncdk.NoteChart")
 local VelocityData	= require("ncdk.VelocityData")
@@ -21,12 +20,11 @@ local timeEngine = {
 rhythmModel.timeEngine = timeEngine
 
 logicEngine.timings = {
-	normalscore = 0.1,
-	ShortScoreNote = {
+	ShortNote = {
 		hit = {-0.1, 0.1},
 		miss = {-0.2, 0.2}
 	},
-	LongScoreNote = {
+	LongNote = {
 		startHit = {-0.1, 0.1},
 		startMiss = {-0.2, 0.2},
 		endHit = {-0.1, 0.1},

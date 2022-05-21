@@ -112,8 +112,8 @@ LongLogicalNote.getNoteTime = function(self, side)
 end
 
 local scoreEvent = {
-	name = "ScoreNoteState",
-	noteType = "LongScoreNote",
+	name = "NoteState",
+	noteType = "LongNote",
 }
 LongLogicalNote.switchState = function(self, newState)
 	local oldState = self.state
@@ -123,7 +123,7 @@ LongLogicalNote.switchState = function(self, newState)
 		return
 	end
 
-	local config = self.logicEngine.timings.LongScoreNote
+	local config = self.logicEngine.timings.LongNote
 
 	local currentTime
 	local eventTime = self.eventTime or self.timeEngine.currentTime
@@ -175,14 +175,14 @@ end
 LongLogicalNote.getStartTimeState = function(self)
 	local currentTime = self:getEventTime()
 	local deltaTime = (currentTime - self:getNoteTime("start")) / math.abs(self.timeEngine.timeRate)
-	local config = self.logicEngine.timings.LongScoreNote
+	local config = self.logicEngine.timings.LongNote
 	return self:getTimeStateFromConfig(config.startHit, config.startMiss, deltaTime)
 end
 
 LongLogicalNote.getEndTimeState = function(self)
 	local currentTime = self:getEventTime()
 	local deltaTime = (currentTime - self:getNoteTime("end")) / math.abs(self.timeEngine.timeRate)
-	local config = self.logicEngine.timings.LongScoreNote
+	local config = self.logicEngine.timings.LongNote
 	return self:getTimeStateFromConfig(config.endHit, config.endMiss, deltaTime)
 end
 

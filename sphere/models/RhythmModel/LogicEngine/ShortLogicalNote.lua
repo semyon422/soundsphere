@@ -40,8 +40,8 @@ ShortLogicalNote.processTimeState = function(self, timeState)
 end
 
 local scoreEvent = {
-	name = "ScoreNoteState",
-	noteType = "ShortScoreNote",
+	name = "NoteState",
+	noteType = "ShortNote",
 }
 ShortLogicalNote.switchState = function(self, newState)
 	local oldState = self.state
@@ -51,7 +51,7 @@ ShortLogicalNote.switchState = function(self, newState)
 		return
 	end
 
-	local config = self.logicEngine.timings.ShortScoreNote
+	local config = self.logicEngine.timings.ShortNote
 	local currentTime = math.min(self.eventTime or self.timeEngine.currentTime, self:getNoteTime() + self:getLastTimeFromConfig(config.hit, config.miss) * math.abs(self.timeEngine.timeRate))
 
 	scoreEvent.currentTime = currentTime
@@ -79,7 +79,7 @@ end
 ShortLogicalNote.getTimeState = function(self)
 	local currentTime = self:getEventTime()
 	local deltaTime = (currentTime - self:getNoteTime()) / math.abs(self.timeEngine.timeRate)
-	local config = self.logicEngine.timings.ShortScoreNote
+	local config = self.logicEngine.timings.ShortNote
 	return self:getTimeStateFromConfig(config.hit, config.miss, deltaTime)
 end
 

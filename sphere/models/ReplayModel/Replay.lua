@@ -69,6 +69,14 @@ Replay.fromString = function(self, s)
 
 	self.events = self.replayNanoChart:decode(object.events, object.size, self.inputMode)
 
+	local timings = self.timings
+	if not timings.ShortNote then
+		timings.ShortNote = timings.ShortScoreNote
+		timings.LongNote = timings.LongScoreNote
+		timings.ShortScoreNote = nil
+		timings.LongScoreNote = nil
+	end
+
 	return self
 end
 

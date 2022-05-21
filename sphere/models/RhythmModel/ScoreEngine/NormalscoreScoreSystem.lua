@@ -1,17 +1,24 @@
-local normalscore = require("libchart.normalscore")
-local erfunc = require("libchart.erfunc")
+local normalscore = require("libchart.normalscore2")
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 
 local NormalscoreScoreSystem = ScoreSystem:new()
 
 NormalscoreScoreSystem.name = "normalscore"
 
-NormalscoreScoreSystem.construct = function(self)
-	self.normalscore = normalscore:new()
-end
+local rangeNames = {
+	noteTime = 1,
+	noteStartTime = 2,
+	noteEndTime = 3,
+}
 
 NormalscoreScoreSystem.load = function(self)
-	self.hitTimingWindow = self.scoreEngine.timings.normalscore
+	local timings = self.scoreEngine.timings
+	local ranges = {
+		{timings.ShortNote.hit[1], timings.ShortNote.hit[2]},
+		{timings.LongNote.startHit[1], timings.LongNote.startHit[2]},
+		{timings.LongNote.endHit[1], timings.LongNote.endHit[2]},
+	}
+	self.normalscore = normalscore:new(ranges)
 end
 
 NormalscoreScoreSystem.after = function(self, event)
@@ -20,6 +27,8 @@ NormalscoreScoreSystem.after = function(self, event)
 	end
 
 	local ns = self.normalscore
+
+	ns:update()
 	self.accuracy = ns.score
 	self.accuracyAdjusted = ns.score_adjusted
 	self.adjustRatio = ns.score_adjusted / ns.score
@@ -27,34 +36,33 @@ NormalscoreScoreSystem.after = function(self, event)
 	self.enps = self.scoreEngine.baseEnps * event.timeRate
 end
 
-NormalscoreScoreSystem.hit = function(self, event)
-	local noteStartTime = event.noteStartTime or event.noteTime
-	local deltaTime = (event.currentTime - noteStartTime) / math.abs(event.timeRate)
+NormalscoreScoreSystem.hit = function(self, event, timeKey)
+	local deltaTime = (event.currentTime - event[timeKey]) / math.abs(event.timeRate)
 
-	self.normalscore:hit(deltaTime, self.hitTimingWindow)
+	self.normalscore:press(deltaTime, assert(rangeNames[timeKey]))
 end
 
-NormalscoreScoreSystem.miss = function(self, event)
-	self.normalscore:hit(self.hitTimingWindow + 1, self.hitTimingWindow)
+NormalscoreScoreSystem.miss = function(self, timeKey)
+	self.normalscore:press(math.huge, assert(rangeNames[timeKey]))
 end
 
 NormalscoreScoreSystem.notes = {
-	ShortScoreNote = {
+	ShortNote = {
 		clear = {
-			passed = NormalscoreScoreSystem.hit,
-			missed = NormalscoreScoreSystem.miss,
+			passed = function(self, event) self:hit(event, "noteTime") end,
+			missed = function(self) self:miss("noteTime") end,
 		},
 	},
-	LongScoreNote = {
+	LongNote = {
 		clear = {
-			startPassedPressed = NormalscoreScoreSystem.hit,
-			startMissed = NormalscoreScoreSystem.miss,
-			startMissedPressed = NormalscoreScoreSystem.miss,
+			startPassedPressed = function(self, event) self:hit(event, "noteStartTime") end,
+			startMissed = function(self) self:miss("noteStartTime") end,
+			startMissedPressed = function(self) self:miss("noteStartTime") end,
 		},
 		startPassedPressed = {
-			startMissed = nil,
-			endMissed = nil,
-			endPassed = nil,
+			startMissed = function(self) self:miss("noteEndTime") end,
+			endMissed = function(self) self:miss("noteEndTime") end,
+			endPassed = function(self, event) self:hit(event, "noteEndTime") end,
 		},
 		startMissedPressed = {
 			endMissedPassed = nil,

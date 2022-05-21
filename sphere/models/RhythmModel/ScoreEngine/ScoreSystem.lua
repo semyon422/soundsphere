@@ -8,7 +8,7 @@ ScoreSystem.before = function(self, event) end
 ScoreSystem.after = function(self, event) end
 
 ScoreSystem.receive = function(self, event)
-	if event.name ~= "ScoreNoteState" or not event.currentTime then
+	if event.name ~= "NoteState" or not event.currentTime then
 		return
 	end
 

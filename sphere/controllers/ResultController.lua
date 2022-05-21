@@ -3,12 +3,11 @@ local Class				= require("aqua.util.Class")
 local ResultController = Class:new()
 
 ResultController.oldTimings = {
-	normalscore = 0.12,
-	ShortScoreNote = {
+	ShortNote = {
 		hit = {-0.12, 0.12},
 		miss = {-0.16, 0.12}
 	},
-	LongScoreNote = {
+	LongNote = {
 		startHit = {-0.12, 0.12},
 		startMiss = {-0.16, 0.12},
 		endHit = {-0.12, 0.12},

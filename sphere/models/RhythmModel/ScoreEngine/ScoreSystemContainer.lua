@@ -37,7 +37,7 @@ ScoreSystemContainer.getSlice = function(self)
 end
 
 ScoreSystemContainer.receive = function(self, event)
-	if event.name ~= "ScoreNoteState" or not event.currentTime then
+	if event.name ~= "NoteState" or not event.currentTime then
 		return
 	end
 
