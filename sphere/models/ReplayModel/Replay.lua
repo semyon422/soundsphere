@@ -58,7 +58,7 @@ Replay.fromString = function(self, s)
 	local object = json.decode(s)
 
 	self.hash = object.hash
-	self.index = object.hash
+	self.index = object.index
 	self.modifiers = object.modifiers
 	self.player = object.player
 	self.time = object.time
