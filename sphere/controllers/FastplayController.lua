@@ -24,11 +24,19 @@ FastplayController.load = function(self)
 	local noteChartModel = self.gameController.noteChartModel
 	local difficultyModel = self.gameController.difficultyModel
 	local rhythmModel = self.gameController.rhythmModel
+	local modifierModel = rhythmModel.modifierModel
 	noteChartModel:load()
 
 	local noteChart = noteChartModel:loadNoteChart()
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
+
+	rhythmModel:load()
+
+	modifierModel:apply("NoteChartModifier")
+	modifierModel:apply("TimeEngineModifier")
+	modifierModel:apply("ScoreEngineModifier")
+	modifierModel:apply("LogicEngineModifier")
 
 	local scoreEngine = rhythmModel.scoreEngine
 
@@ -39,7 +47,6 @@ FastplayController.load = function(self)
 
 	scoreEngine.noteChartDataEntry = noteChartModel.noteChartDataEntry
 
-	rhythmModel:load()
 	rhythmModel.timeEngine:sync({
 		time = 0,
 		dt = 0,

@@ -128,16 +128,8 @@ RhythmModel.loadLogicEngines = function(self)
 	local scoreEngine = self.scoreEngine
 	local logicEngine = self.logicEngine
 
-	modifierModel:apply("NoteChartModifier")
-
 	timeEngine:load()
-	modifierModel:apply("TimeEngineModifier")
-
 	scoreEngine:load()
-	modifierModel:apply("ScoreEngineModifier")
-
-	modifierModel:apply("LogicEngineModifier")
-
 	logicEngine:load()
 	replayModel:load()
 end
