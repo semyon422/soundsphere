@@ -11,6 +11,7 @@ end
 HpScoreSystem.load = function(self)
 	self.config = self.scoreEngine.hp
 	self.hp = self.config.start
+	self.allHp = self.config.max - self.config.min
 end
 
 HpScoreSystem.increaseHp = function(self)

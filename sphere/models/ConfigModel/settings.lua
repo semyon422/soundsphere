@@ -19,6 +19,13 @@ return {
 			image = false,
 			video = false
 		},
+		hp = {
+			start = 500,
+			min = 0,
+			max = 1000,
+			increase = 1,
+			decrease = 50,
+		},
 		lastMeanValues = 10,
 		longNoteShortening = 0,
 		offset = {
@@ -39,6 +46,18 @@ return {
 			playPause = 0,
 			playRetry = 0.5,
 			prepare = 2
+		},
+		timings = {
+			ShortNote = {
+				hit = {-0.12, 0.12},
+				miss = {-0.16, 0.16}
+			},
+			LongNote = {
+				startHit = {-0.12, 0.12},
+				startMiss = {-0.16, 0.16},
+				endHit = {-0.12, 0.12},
+				endMiss = {-0.16, 0.16}
+			}
 		}
 	},
 	graphics = {

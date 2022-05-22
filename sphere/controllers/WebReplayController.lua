@@ -40,10 +40,10 @@ WebReplayController.POST = function(self)
 	modifierModel.rhythmModel = rhythmModel
 
 	rhythmModel.modifierModel = modifierModel
-	rhythmModel.timings = require("sphere.models.ConfigModel.timings")
-	rhythmModel.judgements = require("sphere.models.ConfigModel.judgements")
-	rhythmModel.hp = require("sphere.models.ConfigModel.hp")
+	rhythmModel.judgements = {}
 	rhythmModel.settings = require("sphere.models.ConfigModel.settings")
+	rhythmModel.timings = rhythmModel.settings.gameplay.timings
+	rhythmModel.hp = rhythmModel.settings.gameplay.hp
 
 	noteChartModel.noteChart = noteChart
 	noteChartModel.load = function() end

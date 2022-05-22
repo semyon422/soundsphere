@@ -179,14 +179,12 @@ GameController.load = function(self)
 	configModel:readConfig("mount", "userdata/mount.lua", "sphere/models/ConfigModel/mount.lua")
 	configModel:readConfig("online", "userdata/online.lua", "sphere/models/ConfigModel/online.lua")
 	configModel:readConfig("urls", "userdata/urls.lua", "sphere/models/ConfigModel/urls.lua")
-	configModel:readConfig("timings", "userdata/timings.lua", "sphere/models/ConfigModel/timings.lua")
 	configModel:readConfig("judgements", "userdata/judgements.lua", "sphere/models/ConfigModel/judgements.lua")
-	configModel:readConfig("hp", "userdata/hp.lua", "sphere/models/ConfigModel/hp.lua")
 	configModel:readConfig("files", "userdata/files.lua", "sphere/models/ConfigModel/files.lua")
 
-	rhythmModel.timings = configModel.configs.timings
+	rhythmModel.timings = configModel.configs.settings.gameplay.timings
 	rhythmModel.judgements = configModel.configs.judgements
-	rhythmModel.hp = configModel.configs.hp
+	rhythmModel.hp = configModel.configs.settings.gameplay.hp
 	rhythmModel.settings = configModel.configs.settings
 
 	themeModel:load()

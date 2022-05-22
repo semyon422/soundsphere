@@ -5,6 +5,7 @@ local align = require("aqua.imgui.config").align
 local ImguiElements = {
 	Checkbox = require("sphere.imgui.Checkbox"),
 	SliderFloat = require("sphere.imgui.SliderFloat"),
+	DragInt2 = require("sphere.imgui.DragInt2"),
 	SliderInt = require("sphere.imgui.SliderInt"),
 	InputFloat = require("sphere.imgui.InputFloat"),
 	InputInt = require("sphere.imgui.InputInt"),
