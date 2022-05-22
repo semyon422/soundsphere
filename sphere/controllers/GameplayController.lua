@@ -77,6 +77,8 @@ GameplayController.load = function(self)
 
 	local enps, longNoteRatio, longNoteArea = difficultyModel:getDifficulty(noteChart)
 	scoreEngine.baseEnps = enps
+	scoreEngine.longNoteRatio = longNoteRatio
+	scoreEngine.longNoteArea = longNoteArea
 
 	scoreEngine.noteChartDataEntry = noteChartDataEntry
 

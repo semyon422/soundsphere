@@ -6,7 +6,7 @@ local DifficultyModel = Class:new()
 DifficultyModel.getDifficulty = function(self, noteChart)
 	local notes = {}
 
-	local areaSum = 0
+	local longAreaSum = 0
 	local longNoteCount = 0
 	local minTime = math.huge
 	local maxTime = -math.huge
@@ -34,13 +34,14 @@ DifficultyModel.getDifficulty = function(self, noteChart)
 				longNoteCount = longNoteCount + 1
 				minTime = math.min(minTime, noteData.endNoteData.timePoint.absoluteTime)
 				maxTime = math.max(maxTime, noteData.endNoteData.timePoint.absoluteTime)
-				areaSum = areaSum + noteData.endNoteData.timePoint.absoluteTime - noteData.timePoint.absoluteTime
+				longAreaSum = longAreaSum + noteData.endNoteData.timePoint.absoluteTime - noteData.timePoint.absoluteTime
 			end
 		end
 	end
 
 	local enpsValue, aStrain, generalizedKeymode, strains = enps.getEnps(notes)
-	local area = areaSum / (maxTime - minTime) / generalizedKeymode
+	local longArea = longAreaSum / (maxTime - minTime) / generalizedKeymode
+	local longRatio = longNoteCount / #notes
 
 	local highSum = 0
 	local highCount = 0
@@ -70,7 +71,7 @@ DifficultyModel.getDifficulty = function(self, noteChart)
 	-- print("high enps: " .. math.floor(high * 100) / 100 .. ", " .. math.floor(high / enpsValue * 100) / 100 .. ", " .. math.floor(high / enpsValue * 100) - 100 .. "%")
 	-- print("high/all: " .. math.floor(highCount / (lowCount + highCount) * 100) / 100)
 
-	return enpsValue, longNoteCount / #notes, area
+	return enpsValue, longRatio, longArea
 end
 
 return DifficultyModel

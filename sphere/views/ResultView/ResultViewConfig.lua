@@ -257,10 +257,6 @@ local ScoreList = {
 		},
 		{
 			type = "text",
-			key = {
-				{"gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.performance", showLoadedListScore},
-				"rating"
-			},
 			onNew = false,
 			format = formatDifficulty,
 			x = 94,
@@ -271,6 +267,20 @@ local ScoreList = {
 				filename = "Noto Sans Mono",
 				size = 24,
 			},
+			value = function(self, item)
+				if self.gameController.rhythmModel.scoreEngine.scoreEntry.id == item.id then
+					local erfunc = require("libchart.erfunc")
+					local ratingHitTimingWindow = self.gameController.configModel.configs.settings.gameplay.ratingHitTimingWindow
+					local normalscore = self.gameController.rhythmModel.scoreEngine.scoreSystem.normalscore
+					local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
+					return s * self.gameController.rhythmModel.scoreEngine.enps
+				end
+				local rating = item.rating
+				if rating ~= rating then
+					return "nan"
+				end
+				return rating
+			end,
 		},
 		{
 			type = "text",
@@ -638,10 +648,6 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 2, y = 1,
 		name = "score",
-		key = {
-			{"gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.scoreAdjusted", showLoadedScore},
-			"gameController.selectModel.scoreItem.score"
-		},
 		value = function(self)
 			if showLoadedScore(self) then
 				local erfunc = require("libchart.erfunc")
@@ -678,6 +684,30 @@ StageInfo.cells = {
 			return ("%d%%"):format((1 - adjustRatio) * 100)
 		end,
 		show = showLoadedScore
+	},
+	{
+		type = StageInfo.smallCell,
+		valueType = "text",
+		x = {6, 7}, y = 3,
+		name = "new diff.",
+		key = "gameController.rhythmModel.scoreEngine.ratingDifficulty",
+		format = "%0.2f",
+		show = showLoadedScore
+	},
+	{
+		type = StageInfo.smallCell,
+		valueType = "text",
+		x = {6, 7}, y = 4,
+		name = "new rating",
+		format = "%0.2f",
+		show = showLoadedScore,
+		value = function(self)
+			local erfunc = require("libchart.erfunc")
+			local ratingHitTimingWindow = self.gameController.configModel.configs.settings.gameplay.ratingHitTimingWindow
+			local normalscore = self.gameController.rhythmModel.scoreEngine.scoreSystem.normalscore
+			local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
+			return s * self.gameController.rhythmModel.scoreEngine.ratingDifficulty
+		end,
 	},
 
 	{
