@@ -33,7 +33,6 @@ Automap.apply = function(self, config)
 	self.targetMode = config.value
 	self.columnCount = math.floor(self.noteChart.inputMode:getInputCount("key"))
 
-	print(self.targetMode == self.columnCount or self.columnCount == 0)
 	if self.targetMode == self.columnCount or self.columnCount == 0 then
 		return
 	end
