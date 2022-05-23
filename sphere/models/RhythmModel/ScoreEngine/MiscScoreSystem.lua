@@ -28,11 +28,16 @@ MiscScoreSystem.miss = function(self, event, timeKey)
 	self.deltaTime = (event.currentTime - event[timeKey]) / math.abs(event.timeRate)
 end
 
+MiscScoreSystem.early = function(self)
+	self.deltaTime = -math.huge
+end
+
 MiscScoreSystem.notes = {
 	ShortNote = {
 		clear = {
 			passed = function(self, event) self:hit(event, "noteTime") end,
 			missed = function(self, event) self:miss(event, "noteTime") end,
+			clear = MiscScoreSystem.early,
 		},
 	},
 	LongNote = {
@@ -40,6 +45,7 @@ MiscScoreSystem.notes = {
 			startPassedPressed = function(self, event) self:hit(event, "noteStartTime") end,
 			startMissed = function(self, event) self:miss(event, "noteStartTime") end,
 			startMissedPressed = function(self, event) self:miss(event, "noteStartTime") end,
+			clear = MiscScoreSystem.early,
 		},
 		startPassedPressed = {
 			startMissed = nil,
