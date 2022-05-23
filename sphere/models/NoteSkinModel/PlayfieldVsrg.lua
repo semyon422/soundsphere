@@ -109,7 +109,7 @@ PlayfieldVsrg.addHpBar = function(self, object)
 	object = object or {}
 	object.class = object.class or "ProgressView"
 	object.min = {value = 0}
-	object.max = {value = 1}
+	object.max = {value = 1000}
 	object.start = {value = 0}
 	object.current = {key = "gameController.rhythmModel.scoreEngine.scoreSystem.hp.hp"}
 	return self:add(object)
