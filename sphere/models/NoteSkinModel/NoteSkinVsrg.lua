@@ -6,8 +6,16 @@ NoteSkinVsrg.setColumns = function(self, columns)
 	self.columns = columns
 	local inputsCount = self.inputsCount
 
-	assert(#columns.width == inputsCount, "Table columns.width should contain " .. inputsCount .. " values")
-	assert(#columns.space == inputsCount + 1, "Table columns.space should contain " .. inputsCount + 1 .. " values")
+	assert(columns.width, "columns.width is required")
+	assert(#columns.width == inputsCount, "table columns.width should contain " .. inputsCount .. " values")
+
+	assert(columns.space or columns.position, "either columns.space or columns.position is required")
+	assert(not (columns.space and columns.position), "columns.space and columns.position are mutually exclusive")
+	if columns.space then
+		assert(#columns.space == inputsCount + 1, "table columns.space should contain " .. inputsCount + 1 .. " values")
+	elseif columns.position then
+		columns.space = self:xwToSpace(columns.position, columns.width)
+	end
 
 	self.offset = columns.offset
 	self.align = columns.align
@@ -100,6 +108,17 @@ NoteSkinVsrg.multiplyColors = function(self, source, color)
 		bufferColor[i] = (source[i] or 1) * (color[i] or 1)
 	end
 	return bufferColor
+end
+
+NoteSkinVsrg.xwToSpace = function(self, x, w)
+	local s = {}
+	local sum = 0
+	for i = 1, #w do
+		s[i] = x[i] - sum
+		sum = sum + w[i] + s[i]
+	end
+	s[#s + 1] = 0
+	return s
 end
 
 local function getFrame(a, deltaTime)
