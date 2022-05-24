@@ -61,3 +61,6 @@
 [submodule "cimgui-love"]
 	path = cimgui-love
 	url = https://github.com/semyon422/cimgui-love
+[submodule "lua-MessagePack"]
+	path = lua-MessagePack
+	url = https://framagit.org/fperrad/lua-MessagePack
