@@ -35,6 +35,7 @@ local PreviewModel		= require("sphere.models.PreviewModel")
 local UpdateModel		= require("sphere.models.UpdateModel")
 local RhythmModel		= require("sphere.models.RhythmModel")
 local OsudirectModel		= require("sphere.models.OsudirectModel")
+local MultiplayerModel		= require("sphere.models.MultiplayerModel")
 local MainLog					= require("sphere.MainLog")
 local FrameTimeView					= require("sphere.views.FrameTimeView")
 
@@ -76,6 +77,7 @@ GameController.construct = function(self)
 	self.rhythmModel = RhythmModel:new()
 	self.discordModel = DiscordModel:new()
 	self.osudirectModel = OsudirectModel:new()
+	self.multiplayerModel = MultiplayerModel:new()
 	self.frameTimeView = FrameTimeView:new()
 end
 
@@ -111,6 +113,7 @@ GameController.load = function(self)
 	local previewModel = self.previewModel
 	local discordModel = self.discordModel
 	local osudirectModel = self.osudirectModel
+	local multiplayerModel = self.multiplayerModel
 
 	onlineController.onlineModel = onlineModel
 	onlineController.cacheModel = cacheModel
@@ -207,6 +210,7 @@ GameController.load = function(self)
 	collectionModel:load()
 	selectModel:load()
 	previewModel:load()
+	multiplayerModel:load()
 	self.frameTimeView:load()
 
 	self.screenManager:setTransition(self.fadeTransition)
@@ -241,6 +245,7 @@ GameController.unload = function(self)
 	self.discordModel:unload()
 	self.mountModel:unload()
 	self.onlineModel:unload()
+	self.multiplayerModel:unload()
 	self:writeConfigs()
 end
 
@@ -254,10 +259,8 @@ GameController.update = function(self, dt)
 	self.onlineController:update()
 	self.fpsLimiter:update()
 	self.windowManager:update()
-
+	self.multiplayerModel:update()
 	self.cacheModel:update()
-	-- self.noteChartSetLibraryModel:update()
-	-- self.noteChartLibraryModel:update()
 
 	self.frameTimeView.updateFrameTime = love.timer.getTime() - startTime
 end
