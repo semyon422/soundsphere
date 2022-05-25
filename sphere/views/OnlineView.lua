@@ -25,8 +25,8 @@ OnlineView.draw = function(self)
 	local flags = imgui.love.WindowFlags("NoMove", "NoResize")
 	if imgui.Begin("Online", self.isOpen, flags) then
 		if imgui.BeginTabBar("Online tab bar") then
+			local active = inside(self, "gameController.configModel.configs.online.session.active")
 			if imgui.BeginTabItem("Login") then
-				local active = inside(self, "gameController.configModel.configs.online.session.active")
 				if active then
 					imgui.Text("You are logged in")
 				end
@@ -40,7 +40,7 @@ OnlineView.draw = function(self)
 				end
 				imgui.EndTabItem()
 			end
-			if imgui.BeginTabItem("Multiplayer") then
+			if active and imgui.BeginTabItem("Multiplayer") then
 				local multiplayerModel = self.gameController.multiplayerModel
 				imgui.Text("Coming soon")
 				if not multiplayerModel.peer and imgui.Button("Connect") then
@@ -50,6 +50,27 @@ OnlineView.draw = function(self)
 				end
 
 				if multiplayerModel.peer then
+					imgui.SameLine()
+					if imgui.Button("Login") then
+						multiplayerModel:login()
+					end
+					if multiplayerModel.user then
+						imgui.Text("You are logged in as " .. multiplayerModel.user.name)
+					end
+					if imgui.BeginListBox("Users", {0, 150}) then
+						for i = 1, #multiplayerModel.users do
+							local user = multiplayerModel.users[i]
+							local isSelected = multiplayerModel.user == user
+							if imgui.Selectable_Bool(user.name, isSelected) then
+								multiplayerModel.room = user
+							end
+
+							if isSelected then
+								imgui.SetItemDefaultFocus()
+							end
+						end
+						imgui.EndListBox()
+					end
 					if imgui.BeginListBox("Rooms", {0, 150}) then
 						for i = 1, #multiplayerModel.rooms do
 							local room = multiplayerModel.rooms[i]

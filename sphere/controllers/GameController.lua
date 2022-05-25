@@ -169,6 +169,8 @@ GameController.load = function(self)
 	collectionModel.cacheModel = cacheModel
 	scoreModel.configModel = configModel
 	osudirectModel.configModel = configModel
+	multiplayerModel.configModel = configModel
+	multiplayerModel.onlineModel = onlineModel
 
 	directoryManager:createDirectories()
 
