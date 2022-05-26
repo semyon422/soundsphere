@@ -11,6 +11,7 @@ local passwordPtr = ffi.new("char[128]")
 local roomNamePtr = ffi.new("char[128]")
 local roomPasswordPtr = ffi.new("char[128]")
 local newRoomPasswordPtr = ffi.new("char[128]")
+local freeModifiersPtr = ffi.new("bool[1]")
 OnlineView.draw = function(self)
 	if not self.isOpen[0] then
 		return
@@ -110,14 +111,14 @@ OnlineView.draw = function(self)
 						multiplayerModel:joinRoom(ffi.string(roomPasswordPtr))
 					end
 				else
-					if imgui.Button("Leave") then
-						multiplayerModel:leaveRoom()
-					end
+					imgui.Text("Room name: " .. multiplayerModel.room.name)
+					imgui.Text("Room host: " .. multiplayerModel.room.hostUser.name)
 					if imgui.BeginListBox("Players", {0, 150}) then
 						for i = 1, #multiplayerModel.room.users do
 							local user = multiplayerModel.room.users[i]
 							local isSelected = false
-							if imgui.Selectable_Bool(user.name, isSelected) then
+							local name = ("%s (%s)"):format(user.name, user.isReady and "ready" or "not ready")
+							if imgui.Selectable_Bool(name, isSelected) then
 							end
 
 							if isSelected then
@@ -125,6 +126,28 @@ OnlineView.draw = function(self)
 							end
 						end
 						imgui.EndListBox()
+					end
+					if imgui.Button("Leave") then
+						multiplayerModel:leaveRoom()
+					end
+					imgui.SameLine()
+
+					local user = multiplayerModel.user
+					local hostUser = multiplayerModel.room.hostUser
+					local isHost = user.id == hostUser.id
+
+					local isReady = user.isReady
+					if imgui.Button(isReady and "Ready" or "Not ready") then
+						multiplayerModel:switchReady()
+					end
+					if isHost then
+						if imgui.Button("Start match") then
+							multiplayerModel:startMatch()
+						end
+						freeModifiersPtr[0] = multiplayerModel.room.isFreeModifiers
+						if imgui.Checkbox("Free modifiers", freeModifiersPtr) then
+							multiplayerModel:setFreeModifiers(freeModifiersPtr[0])
+						end
 					end
 				end
 				imgui.EndTabItem()

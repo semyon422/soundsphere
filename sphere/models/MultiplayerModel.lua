@@ -31,15 +31,10 @@ MultiplayerModel.refresh = function(self)
 	if not peer then
 		return
 	end
-	local rooms = peer.getRooms()
-	local users = peer.getUsers()
 
-	if rooms then
-		self.rooms = rooms
-	end
-	if users then
-		self.users = users
-	end
+	self.rooms = peer.getRooms() or {}
+	self.users = peer.getUsers() or {}
+	self.room = peer.getRoom()
 end
 
 MultiplayerModel.connect = function(self)
@@ -54,6 +49,20 @@ MultiplayerModel.disconnect = function(self)
 	self.selectedRoom = nil
 	self.user = nil
 end
+
+MultiplayerModel.switchReady = remote.wrap(function(self)
+	self.peer.switchReady()
+	self.user = self.peer.getUser()
+end)
+
+MultiplayerModel.startMatch = remote.wrap(function(self)
+end)
+
+MultiplayerModel.setFreeModifiers = remote.wrap(function(self, isFreeModifiers)
+	self.room.isFreeModifiers = isFreeModifiers
+	self.peer.setFreeModifiers(isFreeModifiers)
+	self.room = self.peer.getRoom()
+end)
 
 MultiplayerModel.createRoom = remote.wrap(function(self, user, password)
 	self.room = self.peer.createRoom(user, password)
