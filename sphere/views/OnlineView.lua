@@ -45,7 +45,6 @@ OnlineView.draw = function(self)
 				imgui.EndTabItem()
 			end
 			if active and imgui.BeginTabItem("Multiplayer") then
-				imgui.Text("Coming soon")
 				if not multiplayerModel.peer and imgui.Button("Connect") then
 					multiplayerModel:connect()
 				elseif multiplayerModel.peer and imgui.Button("Disconnect") then
@@ -53,11 +52,8 @@ OnlineView.draw = function(self)
 				end
 
 				if multiplayerModel.peer then
-					imgui.SameLine()
-					if imgui.Button("Login") then
-						multiplayerModel:login()
-					end
 					if multiplayerModel.user then
+						imgui.SameLine()
 						imgui.Text("You are logged in as " .. multiplayerModel.user.name)
 					end
 					if imgui.BeginListBox("Players", {0, 150}) then

@@ -96,6 +96,8 @@ end)
 MultiplayerModel.peerconnected = function(self, peer)
 	print("connected")
 	self.peer = peer
+
+	self:login()
 end
 
 MultiplayerModel.peerdisconnected = function(self, peer)
