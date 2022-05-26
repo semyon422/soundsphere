@@ -7,8 +7,6 @@ local MultiplayerModel = Class:new()
 MultiplayerModel.construct = function(self)
 	self.rooms = {}
 	self.users = {}
-	self.room = nil
-	self.user = nil
 end
 
 MultiplayerModel.load = function(self)
@@ -29,6 +27,7 @@ MultiplayerModel.disconnect = function(self)
 	self.rooms = {}
 	self.users = {}
 	self.room = nil
+	self.selectedRoom = nil
 	self.user = nil
 end
 
@@ -41,7 +40,19 @@ MultiplayerModel.updateUsers = remote.wrap(function(self)
 end)
 
 MultiplayerModel.createRoom = remote.wrap(function(self, user, password)
-	self.peer.createRoom(user, password)
+	self.room = self.peer.createRoom(user, password)
+	self.rooms = self.peer.getRooms()
+end)
+
+MultiplayerModel.joinRoom = remote.wrap(function(self, password)
+	self.room = self.peer.joinRoom(self.selectedRoom.id, password)
+end)
+
+MultiplayerModel.leaveRoom = remote.wrap(function(self)
+	local isLeft = self.peer.leaveRoom()
+	if isLeft then
+		self.room = nil
+	end
 	self.rooms = self.peer.getRooms()
 end)
 
@@ -49,6 +60,9 @@ MultiplayerModel.login = remote.wrap(function(self)
 	local api = self.onlineModel.webApi.api
 
 	local key = self.peer.login()
+	if not key then
+		return
+	end
 
 	print("POST " .. api.auth.multiplayer)
 	local response, code, headers = api.auth.multiplayer:_post({key = key})

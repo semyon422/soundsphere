@@ -10,6 +10,7 @@ local emailPtr = ffi.new("char[128]")
 local passwordPtr = ffi.new("char[128]")
 local roomNamePtr = ffi.new("char[128]")
 local roomPasswordPtr = ffi.new("char[128]")
+local newRoomPasswordPtr = ffi.new("char[128]")
 OnlineView.draw = function(self)
 	if not self.isOpen[0] then
 		return
@@ -19,6 +20,8 @@ OnlineView.draw = function(self)
 	if closed then
 		return
 	end
+
+	local multiplayerModel = self.gameController.multiplayerModel
 
 	imgui.SetNextWindowPos({align(0.5, 279 + 454 * 3 / 4), 279}, 0)
 	imgui.SetNextWindowSize({454 * 1.5, 522}, 0)
@@ -41,7 +44,6 @@ OnlineView.draw = function(self)
 				imgui.EndTabItem()
 			end
 			if active and imgui.BeginTabItem("Multiplayer") then
-				local multiplayerModel = self.gameController.multiplayerModel
 				imgui.Text("Coming soon")
 				if not multiplayerModel.peer and imgui.Button("Connect") then
 					multiplayerModel:connect()
@@ -57,7 +59,7 @@ OnlineView.draw = function(self)
 					if multiplayerModel.user then
 						imgui.Text("You are logged in as " .. multiplayerModel.user.name)
 					end
-					if imgui.BeginListBox("Users", {0, 150}) then
+					if imgui.BeginListBox("Players", {0, 150}) then
 						for i = 1, #multiplayerModel.users do
 							local user = multiplayerModel.users[i]
 							local isSelected = multiplayerModel.user == user
@@ -71,35 +73,64 @@ OnlineView.draw = function(self)
 						end
 						imgui.EndListBox()
 					end
-					if imgui.BeginListBox("Rooms", {0, 150}) then
-						for i = 1, #multiplayerModel.rooms do
-							local room = multiplayerModel.rooms[i]
-							local isSelected = multiplayerModel.room == room
-							if imgui.Selectable_Bool(room.name, isSelected) then
-								multiplayerModel.room = room
-							end
-
-							if isSelected then
-								imgui.SetItemDefaultFocus()
-							end
-						end
-						imgui.EndListBox()
-					end
-					imgui.SameLine()
-					if imgui.Button("Update") then
-						multiplayerModel:updateRooms()
-					end
-
-					imgui.Separator()
-
-					imgui.Text("Create new room")
-					imgui.InputText("Name", roomNamePtr, ffi.sizeof(roomNamePtr))
-					imgui.InputText("Password", roomPasswordPtr, ffi.sizeof(roomPasswordPtr), imgui.love.InputTextFlags("Password"))
-					if imgui.Button("Create room") then
-						multiplayerModel:createRoom(ffi.string(roomNamePtr), ffi.string(roomPasswordPtr))
-					end
 				end
 
+				imgui.EndTabItem()
+			end
+			if multiplayerModel.peer and multiplayerModel.user and imgui.BeginTabItem("Lobby") then
+				if imgui.BeginListBox("Rooms", {0, 150}) then
+					for i = 1, #multiplayerModel.rooms do
+						local room = multiplayerModel.rooms[i]
+						local isSelected = multiplayerModel.selectedRoom == room
+						if imgui.Selectable_Bool(room.name, isSelected) then
+							multiplayerModel.selectedRoom = room
+						end
+
+						if isSelected then
+							imgui.SetItemDefaultFocus()
+						end
+					end
+					imgui.EndListBox()
+				end
+				imgui.SameLine()
+				if imgui.Button("Update") then
+					multiplayerModel:updateRooms()
+				end
+
+				imgui.Separator()
+
+				imgui.Text("Create new room")
+				imgui.InputText("Name", roomNamePtr, ffi.sizeof(roomNamePtr))
+				imgui.InputText("Password", newRoomPasswordPtr, ffi.sizeof(newRoomPasswordPtr), imgui.love.InputTextFlags("Password"))
+				if imgui.Button("Create room") then
+					multiplayerModel:createRoom(ffi.string(roomNamePtr), ffi.string(newRoomPasswordPtr))
+				end
+				imgui.EndTabItem()
+			end
+			if (multiplayerModel.selectedRoom or multiplayerModel.room) and imgui.BeginTabItem("Room") then
+				if not multiplayerModel.room then
+					imgui.InputText("Password", roomPasswordPtr, ffi.sizeof(roomPasswordPtr), imgui.love.InputTextFlags("Password"))
+					if imgui.Button("Join") then
+						multiplayerModel:joinRoom(ffi.string(roomPasswordPtr))
+					end
+				else
+					if imgui.Button("Leave") then
+						multiplayerModel:leaveRoom()
+					end
+				end
+				if imgui.BeginListBox("Players", {0, 150}) then
+					for i = 1, #multiplayerModel.room.users do
+						local user = multiplayerModel.room.users[i]
+						local isSelected = false
+						if imgui.Selectable_Bool(user.name, isSelected) then
+						end
+
+						if isSelected then
+							imgui.SetItemDefaultFocus()
+						end
+					end
+					imgui.EndListBox()
+				end
 				imgui.EndTabItem()
 			end
 			imgui.EndTabBar()
