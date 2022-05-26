@@ -92,10 +92,6 @@ OnlineView.draw = function(self)
 					end
 					imgui.EndListBox()
 				end
-				imgui.SameLine()
-				if imgui.Button("Update") then
-					multiplayerModel:updateRooms()
-				end
 
 				imgui.Separator()
 
@@ -117,19 +113,19 @@ OnlineView.draw = function(self)
 					if imgui.Button("Leave") then
 						multiplayerModel:leaveRoom()
 					end
-				end
-				if imgui.BeginListBox("Players", {0, 150}) then
-					for i = 1, #multiplayerModel.room.users do
-						local user = multiplayerModel.room.users[i]
-						local isSelected = false
-						if imgui.Selectable_Bool(user.name, isSelected) then
-						end
+					if imgui.BeginListBox("Players", {0, 150}) then
+						for i = 1, #multiplayerModel.room.users do
+							local user = multiplayerModel.room.users[i]
+							local isSelected = false
+							if imgui.Selectable_Bool(user.name, isSelected) then
+							end
 
-						if isSelected then
-							imgui.SetItemDefaultFocus()
+							if isSelected then
+								imgui.SetItemDefaultFocus()
+							end
 						end
+						imgui.EndListBox()
 					end
-					imgui.EndListBox()
 				end
 				imgui.EndTabItem()
 			end

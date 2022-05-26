@@ -1,5 +1,6 @@
 local Class = require("aqua.util.Class")
 local remote = require("aqua.util.remote")
+local aquatimer = require("aqua.timer")
 local enet = require("enet")
 
 local MultiplayerModel = Class:new()
@@ -11,11 +12,34 @@ end
 
 MultiplayerModel.load = function(self)
 	self.host = enet.host_create()
+	self.stopRefresh = false
+	aquatimer.every(1, self.refresh, self)
 end
 
 MultiplayerModel.unload = function(self)
 	self.host:flush()
 	self.host = nil
+	self.stopRefresh = true
+end
+
+MultiplayerModel.refresh = function(self)
+	if self.stopRefresh then
+		return true
+	end
+
+	local peer = self.peer
+	if not peer then
+		return
+	end
+	local rooms = peer.getRooms()
+	local users = peer.getUsers()
+
+	if rooms then
+		self.rooms = rooms
+	end
+	if users then
+		self.users = users
+	end
 end
 
 MultiplayerModel.connect = function(self)
@@ -31,17 +55,8 @@ MultiplayerModel.disconnect = function(self)
 	self.user = nil
 end
 
-MultiplayerModel.updateRooms = remote.wrap(function(self)
-	self.rooms = self.peer.getRooms()
-end)
-
-MultiplayerModel.updateUsers = remote.wrap(function(self)
-	self.users = self.peer.getUsers()
-end)
-
 MultiplayerModel.createRoom = remote.wrap(function(self, user, password)
 	self.room = self.peer.createRoom(user, password)
-	self.rooms = self.peer.getRooms()
 end)
 
 MultiplayerModel.joinRoom = remote.wrap(function(self, password)
@@ -52,8 +67,8 @@ MultiplayerModel.leaveRoom = remote.wrap(function(self)
 	local isLeft = self.peer.leaveRoom()
 	if isLeft then
 		self.room = nil
+		self.selectedRoom = nil
 	end
-	self.rooms = self.peer.getRooms()
 end)
 
 MultiplayerModel.login = remote.wrap(function(self)
@@ -64,19 +79,14 @@ MultiplayerModel.login = remote.wrap(function(self)
 		return
 	end
 
-	print("POST " .. api.auth.multiplayer)
 	local response, code, headers = api.auth.multiplayer:_post({key = key})
 
 	self.user = self.peer.getUser()
-	self.users = self.peer.getUsers()
 end)
 
 MultiplayerModel.peerconnected = function(self, peer)
 	print("connected")
 	self.peer = peer
-
-	self:updateRooms()
-	self:updateUsers()
 end
 
 MultiplayerModel.peerdisconnected = function(self, peer)
@@ -97,6 +107,8 @@ MultiplayerModel.update = function(self)
 		end
 		event = host:service()
 	end
+
+	remote.update()
 end
 
 return MultiplayerModel
