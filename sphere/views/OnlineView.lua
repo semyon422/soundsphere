@@ -107,8 +107,17 @@ OnlineView.draw = function(self)
 						multiplayerModel:joinRoom(ffi.string(roomPasswordPtr))
 					end
 				else
+					local noteChartItem = self.gameController.selectModel.noteChartItem
+					local song = "None"
+					local name = "None"
+					if noteChartItem then
+						song = ("%s - %s"):format(noteChartItem.artist, noteChartItem.title)
+						name = noteChartItem.name
+					end
 					imgui.Text("Room name: " .. multiplayerModel.room.name)
 					imgui.Text("Room host: " .. multiplayerModel.room.hostUser.name)
+					imgui.Text("Song: " .. song)
+					imgui.Text("Difficulty: " .. name)
 					if imgui.BeginListBox("Players", {0, 150}) then
 						for i = 1, #multiplayerModel.room.users do
 							local user = multiplayerModel.room.users[i]

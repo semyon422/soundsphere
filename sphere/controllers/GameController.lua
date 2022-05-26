@@ -171,6 +171,8 @@ GameController.load = function(self)
 	osudirectModel.configModel = configModel
 	multiplayerModel.configModel = configModel
 	multiplayerModel.onlineModel = onlineModel
+	multiplayerModel.selectModel = selectModel
+	multiplayerModel.modifierModel = modifierModel
 
 	directoryManager:createDirectories()
 
