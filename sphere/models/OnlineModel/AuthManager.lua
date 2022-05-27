@@ -5,8 +5,11 @@ local inspect = require("inspect")
 local AuthManager = Class:new()
 
 AuthManager.checkSession = thread.coro(function(self)
-	local api = self.webApi.api
+	local webApi = self.webApi
+	local api = webApi.api
 	local config = self.config
+
+	webApi.token = config.token
 
 	config.session = {}
 
@@ -30,8 +33,11 @@ AuthManager.checkSession = thread.coro(function(self)
 end)
 
 AuthManager.updateSession = thread.coro(function(self)
-	local api = self.webApi.api
+	local webApi = self.webApi
+	local api = webApi.api
 	local config = self.config
+
+	webApi.token = config.token
 
 	print("update session")
 	print("POST " .. api.auth.update)
@@ -113,7 +119,6 @@ AuthManager.login = thread.coro(function(self, email, password)
 	local response, code, headers = api.auth.login:_post({
 		email = email,
 		password = password,
-		params = true,
 	})
 	if not response then
 		print(code, headers)
@@ -129,5 +134,16 @@ AuthManager.login = thread.coro(function(self, email, password)
 	config.token = response.token or ""
 	self:checkSession()
 end)
+
+AuthManager.logout = function(self)
+	local webApi = self.webApi
+	local config = self.config
+
+	webApi.token = ""
+
+	config.session = {}
+	config.user = {}
+	config.token = ""
+end
 
 return AuthManager
