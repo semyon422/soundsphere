@@ -48,6 +48,7 @@ end
 
 MultiplayerModel.disconnect = function(self)
 	self.server:disconnect()
+	self.server = nil
 	self.rooms = {}
 	self.users = {}
 	self.room = nil
@@ -111,6 +112,9 @@ MultiplayerModel.peerdisconnected = function(self, peer)
 end
 
 MultiplayerModel.update = function(self)
+	if not self.server then
+		return
+	end
 	local host = self.host
 	local event = host:service()
 	while event do
