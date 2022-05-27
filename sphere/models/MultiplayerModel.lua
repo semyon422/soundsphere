@@ -14,6 +14,11 @@ MultiplayerModel.load = function(self)
 	self.host = enet.host_create()
 	self.stopRefresh = false
 	aquatimer.every(1, self.refresh, self)
+
+	local handlers = remote.handlers
+	handlers.set = function(peer, key, value)
+		self[key] = value
+	end
 end
 
 MultiplayerModel.unload = function(self)
@@ -32,8 +37,8 @@ MultiplayerModel.refresh = function(self)
 		return
 	end
 
-	self.rooms = peer.getRooms() or {}
-	self.users = peer.getUsers() or {}
+	-- self.rooms = peer.getRooms() or {}
+	-- self.users = peer.getUsers() or {}
 	self.room = peer.getRoom()
 end
 
@@ -90,7 +95,7 @@ MultiplayerModel.login = remote.wrap(function(self)
 
 	local response, code, headers = api.auth.multiplayer:_post({key = key})
 
-	self.user = self.peer.getUser()
+	-- self.user = self.peer.getUser()
 end)
 
 MultiplayerModel.peerconnected = function(self, peer)
