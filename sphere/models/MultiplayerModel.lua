@@ -1,7 +1,11 @@
 local Class = require("aqua.util.Class")
-local remote = require("aqua.util.remote")
 local aquatimer = require("aqua.timer")
 local enet = require("enet")
+local MessagePack = require("MessagePack")
+local remote = require("aqua.util.remote")
+
+remote.encode = MessagePack.pack
+remote.decode = MessagePack.unpack
 
 local MultiplayerModel = Class:new()
 
@@ -10,17 +14,15 @@ MultiplayerModel.construct = function(self)
 	self.users = {}
 	self.roomUsers = {}
 	self.modifiers = {}
+	self.handlers = {set = function(peer, key, value)
+		self[key] = value
+	end}
 end
 
 MultiplayerModel.load = function(self)
 	self.host = enet.host_create()
 	self.stopRefresh = false
 	aquatimer.every(1, self.refresh, self)
-
-	local handlers = remote.handlers
-	handlers.set = function(peer, key, value)
-		self[key] = value
-	end
 end
 
 MultiplayerModel.unload = function(self)
@@ -134,7 +136,7 @@ MultiplayerModel.update = function(self)
 		if event.type == "connect" then
 			self:peerconnected(remote.peer(event.peer))
 		elseif event.type == "receive" then
-			remote.receive(event)
+			remote.receive(event, self.handlers)
 		elseif event.type == "disconnect" then
 			self:peerdisconnected(remote.peer(event.peer))
 		end
