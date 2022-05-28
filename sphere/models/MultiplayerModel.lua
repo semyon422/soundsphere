@@ -8,6 +8,8 @@ local MultiplayerModel = Class:new()
 MultiplayerModel.construct = function(self)
 	self.rooms = {}
 	self.users = {}
+	self.roomUsers = {}
+	self.modifiers = {}
 end
 
 MultiplayerModel.load = function(self)
@@ -39,7 +41,7 @@ MultiplayerModel.refresh = function(self)
 
 	-- self.rooms = peer.getRooms() or {}
 	-- self.users = peer.getUsers() or {}
-	self.room = peer.getRoom()
+	-- self.room = peer.getRoom()
 end
 
 MultiplayerModel.connect = function(self)
@@ -48,12 +50,6 @@ end
 
 MultiplayerModel.disconnect = function(self)
 	self.server:disconnect()
-	self.server = nil
-	self.rooms = {}
-	self.users = {}
-	self.room = nil
-	self.selectedRoom = nil
-	self.user = nil
 end
 
 MultiplayerModel.switchReady = remote.wrap(function(self)
@@ -70,8 +66,12 @@ MultiplayerModel.setFreeModifiers = remote.wrap(function(self, isFreeModifiers)
 	self.room = self.peer.getRoom()
 end)
 
-MultiplayerModel.createRoom = remote.wrap(function(self, user, password)
-	self.room = self.peer.createRoom(user, password)
+MultiplayerModel.createRoom = remote.wrap(function(self, name, password)
+	self.room = self.peer.createRoom(name, password)
+	if not self.room then
+		return
+	end
+	self.peer._setModifiers(self.modifierModel.config)
 end)
 
 MultiplayerModel.joinRoom = remote.wrap(function(self, password)
@@ -79,11 +79,18 @@ MultiplayerModel.joinRoom = remote.wrap(function(self, password)
 end)
 
 MultiplayerModel.leaveRoom = remote.wrap(function(self)
-	local isLeft = self.peer.leaveRoom()
-	if isLeft then
+	if self.peer.leaveRoom() then
 		self.room = nil
 		self.selectedRoom = nil
+		self.roomUsers = {}
 	end
+end)
+
+MultiplayerModel.pushModifiers = remote.wrap(function(self)
+	if not self.room then
+		return
+	end
+	self.peer._setModifiers(self.modifierModel.config)
 end)
 
 MultiplayerModel.login = remote.wrap(function(self)
@@ -94,9 +101,8 @@ MultiplayerModel.login = remote.wrap(function(self)
 		return
 	end
 
+	print("POST " .. api.auth.multiplayer)
 	local response, code, headers = api.auth.multiplayer:_post({key = key})
-
-	-- self.user = self.peer.getUser()
 end)
 
 MultiplayerModel.peerconnected = function(self, peer)
@@ -109,6 +115,13 @@ end
 MultiplayerModel.peerdisconnected = function(self, peer)
 	print("disconnected")
 	self.peer = nil
+
+	self.rooms = {}
+	self.users = {}
+	self.roomUsers = {}
+	self.room = nil
+	self.selectedRoom = nil
+	self.user = nil
 end
 
 MultiplayerModel.update = function(self)
@@ -129,6 +142,11 @@ MultiplayerModel.update = function(self)
 	end
 
 	remote.update()
+
+	local room = self.room
+	if room and room.hostPeerId ~= self.user.peerId and not room.isFreeModifiers then
+		self.modifierModel.config = self.modifiers
+	end
 end
 
 return MultiplayerModel

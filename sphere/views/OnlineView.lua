@@ -60,9 +60,7 @@ OnlineView.draw = function(self)
 						for i = 1, #multiplayerModel.users do
 							local user = multiplayerModel.users[i]
 							local isSelected = multiplayerModel.user == user
-							if imgui.Selectable_Bool(user.name, isSelected) then
-								multiplayerModel.room = user
-							end
+							imgui.Selectable_Bool(user.name, isSelected)
 
 							if isSelected then
 								imgui.SetItemDefaultFocus()
@@ -115,16 +113,19 @@ OnlineView.draw = function(self)
 						name = noteChartItem.name
 					end
 					imgui.Text("Room name: " .. multiplayerModel.room.name)
-					imgui.Text("Room host: " .. multiplayerModel.room.hostUser.name)
 					imgui.Text("Song: " .. song)
 					imgui.Text("Difficulty: " .. name)
 					if imgui.BeginListBox("Players", {0, 150}) then
-						for i = 1, #multiplayerModel.room.users do
-							local user = multiplayerModel.room.users[i]
+						for i = 1, #multiplayerModel.roomUsers do
+							local user = multiplayerModel.roomUsers[i]
 							local isSelected = false
-							local name = ("%s (%s)"):format(user.name, user.isReady and "ready" or "not ready")
-							if imgui.Selectable_Bool(name, isSelected) then
+							local name = user.name
+							name = name .. " (" .. (user.isReady and "ready" or "not ready")
+							if multiplayerModel.room.hostPeerId == user.peerId then
+								name = name .. ", host"
 							end
+							name = name .. ")"
+							imgui.Selectable_Bool(name, isSelected)
 
 							if isSelected then
 								imgui.SetItemDefaultFocus()
@@ -138,14 +139,14 @@ OnlineView.draw = function(self)
 					imgui.SameLine()
 
 					local user = multiplayerModel.user
-					local hostUser = multiplayerModel.room.hostUser
-					local isHost = user.id == hostUser.id
+					local isHost = user.peerId == multiplayerModel.room.hostPeerId
 
 					local isReady = user.isReady
 					if imgui.Button(isReady and "Ready" or "Not ready") then
 						multiplayerModel:switchReady()
 					end
 					if isHost then
+						imgui.SameLine()
 						if imgui.Button("Start match") then
 							multiplayerModel:startMatch()
 						end
@@ -153,6 +154,8 @@ OnlineView.draw = function(self)
 						if imgui.Checkbox("Free modifiers", freeModifiersPtr) then
 							multiplayerModel:setFreeModifiers(freeModifiersPtr[0])
 						end
+					else
+						imgui.Text("Free modifiers: " .. (multiplayerModel.room.isFreeModifiers and "yes" or "no"))
 					end
 				end
 				imgui.EndTabItem()

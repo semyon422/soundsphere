@@ -22,6 +22,7 @@ end
 
 ModifierController.unload = function(self)
 	self.view:unload()
+	self.gameController.multiplayerModel:pushModifiers()
 end
 
 ModifierController.update = function(self, dt)
