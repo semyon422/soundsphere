@@ -72,8 +72,9 @@ MultiplayerModel.refresh = function(self)
 end
 
 MultiplayerModel.connect = function(self)
+	local urls = self.gameController.configModel.configs.urls
 	if self.status == "disconnected" then
-		self.server = self.host:connect("localhost:9000")
+		self.server = self.host:connect(urls.multiplayer)
 		self.status = "connecting"
 	end
 end

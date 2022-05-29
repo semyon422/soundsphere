@@ -15,6 +15,7 @@ local roomNamePtr = ffi.new("char[128]")
 local roomPasswordPtr = ffi.new("char[128]")
 local newRoomPasswordPtr = ffi.new("char[128]")
 local freeModifiersPtr = ffi.new("bool[1]")
+local readyPtr = ffi.new("bool[1]")
 OnlineView.draw = function(self)
 	if not self.isOpen[0] then
 		return
@@ -165,8 +166,9 @@ OnlineView.draw = function(self)
 					local user = multiplayerModel.user
 					local isHost = user.peerId == room.hostPeerId
 
-					local isReady = user.isReady
-					if imgui.Button(isReady and "Ready" or "Not ready") then
+					readyPtr[0] = user.isReady
+					if imgui.Checkbox("Ready", readyPtr) then
+						user.isReady = readyPtr[0]
 						multiplayerModel:switchReady()
 					end
 					if isHost then
