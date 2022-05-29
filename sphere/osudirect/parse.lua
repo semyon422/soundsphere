@@ -61,6 +61,9 @@ return function(response)
 	local lines = response:split("\n")
 
 	local status = tonumber(lines[1])
+	if not status then
+		return false
+	end
 	if status < 0 then
 		return false, lines[2]
 	end

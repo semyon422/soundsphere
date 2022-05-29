@@ -53,6 +53,11 @@ OsudirectModel.search = function(self)
 		return
 	end
 	local beatmaps, err = osudirect_parse(body)
+	if not beatmaps then
+		self.beatmapSets = {}
+		self.itemsCount = 0
+		return
+	end
 	self.beatmapSets = beatmaps
 	self.itemsCount = #beatmaps
 	if searchString ~= self.searchString then
