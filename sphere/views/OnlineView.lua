@@ -142,12 +142,15 @@ OnlineView.draw = function(self)
 							if room.hostPeerId == user.peerId then
 								name = name .. "host"
 							elseif not user.isNotechartFound then
-								name = name .. ", no chart"
+								name = name .. "no chart"
+							end
+							if name:sub(-1) ~= "(" then
+								name = name .. ", "
 							end
 							if user.isPlaying then
-								name = name .. ", playing"
+								name = name .. "playing"
 							else
-								name = name .. ", " .. (user.isReady and "ready" or "not ready")
+								name = name .. (user.isReady and "ready" or "not ready")
 							end
 							name = name .. ")"
 							imgui.Selectable_Bool(name, isSelected)
@@ -164,14 +167,13 @@ OnlineView.draw = function(self)
 					imgui.SameLine()
 
 					local user = multiplayerModel.user
-					local isHost = user.peerId == room.hostPeerId
 
 					readyPtr[0] = user.isReady
 					if imgui.Checkbox("Ready", readyPtr) then
 						user.isReady = readyPtr[0]
 						multiplayerModel:switchReady()
 					end
-					if isHost then
+					if multiplayerModel:isHost() then
 						freeModifiersPtr[0] = room.isFreeModifiers
 						if imgui.Button("Set notechart") then
 							multiplayerModel:pushNotechart()
