@@ -24,10 +24,13 @@ MultiplayerModel.construct = function(self)
 			self[key] = value
 			if key == "notechart" then
 				self.notechartChanged = true
+			elseif key == "modifiers" then
+				self.modifierModel.config = value
 			end
 		end,
 		startMatch = function(peer)
-			if not self.isPlaying then
+			if not self.isPlaying and self.noteChartItem then
+				self.selectModel:setConfig(self.noteChartItem)
 				self.gameController.selectController:playNoteChart()
 			end
 		end,
@@ -86,14 +89,30 @@ MultiplayerModel.disconnect = function(self)
 	end
 end
 
+MultiplayerModel.isHost = function(self)
+	local room = self.room
+	if not room then
+		return false
+	end
+	return room.hostPeerId == self.user.peerId
+end
+
 MultiplayerModel.findNotechart = remote.wrap(function(self)
 	self.noteChartSetLibraryModel:findNotechart(self.notechart.hash or "", self.notechart.index or 0)
 	self.selectModel:scrollNoteChartSet(0)
-	if self.selectModel.noteChartItem then
-		self.selectModel:setConfig(self.selectModel.noteChartItem)
+
+	local item = self.selectModel.noteChartItem
+	if item then
+		self.noteChartItem = {
+			setId = item.setId,
+			noteChartId = item.noteChartId,
+			noteChartDataId = item.noteChartDataId,
+		}
+		self.selectModel:setConfig(item)
 		self.peer.setNotechartFound(true)
 		return
 	end
+	self.noteChartItem = nil
 	self.peer.setNotechartFound(false)
 end)
 
@@ -119,6 +138,9 @@ MultiplayerModel.stopMatch = remote.wrap(function(self)
 end)
 
 MultiplayerModel.setFreeModifiers = remote.wrap(function(self, isFreeModifiers)
+	if not self:isHost() then
+		return
+	end
 	self.room.isFreeModifiers = isFreeModifiers
 	self.peer.setFreeModifiers(isFreeModifiers)
 	self.room = self.peer.getRoom()
@@ -145,20 +167,25 @@ MultiplayerModel.leaveRoom = remote.wrap(function(self)
 end)
 
 MultiplayerModel.pushModifiers = remote.wrap(function(self)
-	if not self.room then
+	if not self:isHost() then
 		return
 	end
 	self.peer._setModifiers(self.modifierModel.config)
 end)
 
 MultiplayerModel.pushNotechart = remote.wrap(function(self)
-	if not self.room then
+	if not self:isHost() then
 		return
 	end
 	local nc = self.selectModel.noteChartItem
 	if not nc then
 		return
 	end
+	self.noteChartItem = {
+		setId = nc.setId,
+		noteChartId = nc.noteChartId,
+		noteChartDataId = nc.noteChartDataId,
+	}
 	self.notechart = {
 		hash = nc.hash,
 		index = nc.index,
@@ -233,14 +260,10 @@ MultiplayerModel.update = function(self)
 
 	remote.update()
 
-	local room = self.room
-	if not room or room.hostPeerId == self.user.peerId then
+	if not self.room or self:isHost() then
 		return
 	end
 
-	if not room.isFreeModifiers then
-		self.modifierModel.config = self.modifiers
-	end
 	if self.notechartChanged then
 		self.notechartChanged = false
 		self:findNotechart()
