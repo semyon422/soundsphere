@@ -210,6 +210,7 @@ SelectController.playNoteChart = function(self)
 	local gameplayController = GameplayController:new()
 	gameplayController.selectController = self
 	gameplayController.gameController = self.gameController
+	self.gameController.gameplayController = gameplayController
 	return self.gameController.screenManager:set(gameplayController)
 end
 

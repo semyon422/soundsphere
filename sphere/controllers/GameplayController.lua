@@ -121,6 +121,8 @@ GameplayController.load = function(self)
 		self.gameController.baseVsync = flags.vsync ~= 0 and flags.vsync or 1
 		flags.vsync = 0
 	end
+
+	self.gameController.multiplayerModel:setIsPlaying(true)
 end
 
 GameplayController.getImporterSettings = function(self)
@@ -146,6 +148,8 @@ GameplayController.unload = function(self)
 	if graphics.vsyncOnSelect and flags.vsync == 0 then
 		flags.vsync = self.gameController.baseVsync
 	end
+
+	self.gameController.multiplayerModel:setIsPlaying(false)
 end
 
 GameplayController.update = function(self, dt)
@@ -217,21 +221,26 @@ GameplayController.receive = function(self, event)
 		perspective.pitch = event.pitch
 		perspective.yaw = event.yaw
 	elseif event.name == "quit" then
-		self.drawing = false
-		self.gameController.discordModel:setPresence({})
-		self:skip()
-		self:saveScore()
-		if not rhythmModel.logicEngine.autoplay and not rhythmModel.prohibitSavingScore then
-			local ResultController = require("sphere.controllers.ResultController")
-			local resultController = ResultController:new()
+		self:quit()
+	end
+end
 
-			resultController.selectController = self.selectController
-			resultController.gameController = self.gameController
+GameplayController.quit = function(self)
+	local rhythmModel = self.gameController.rhythmModel
+	self.drawing = false
+	self.gameController.discordModel:setPresence({})
+	self:skip()
+	self:saveScore()
+	if not rhythmModel.logicEngine.autoplay and not rhythmModel.prohibitSavingScore then
+		local ResultController = require("sphere.controllers.ResultController")
+		local resultController = ResultController:new()
 
-			self.gameController.screenManager:set(resultController)
-		else
-			self.gameController.screenManager:set(self.selectController)
-		end
+		resultController.selectController = self.selectController
+		resultController.gameController = self.gameController
+
+		self.gameController.screenManager:set(resultController)
+	else
+		self.gameController.screenManager:set(self.selectController)
 	end
 end
 

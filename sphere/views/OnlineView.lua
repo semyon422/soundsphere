@@ -48,16 +48,21 @@ OnlineView.draw = function(self)
 				imgui.EndTabItem()
 			end
 			if active and imgui.BeginTabItem("Multiplayer") then
-				if not multiplayerModel.peer and imgui.Button("Connect") then
+				local status = multiplayerModel.status
+				if status == "disconnected" and imgui.Button("Connect") then
 					multiplayerModel:connect()
-				elseif multiplayerModel.peer and imgui.Button("Disconnect") then
+				elseif status == "connected" and imgui.Button("Disconnect") then
 					multiplayerModel:disconnect()
+				elseif status == "connecting" then
+					imgui.Text("Connecting...")
+				elseif status == "disconnecting" then
+					imgui.Text("Disconnecting...")
 				end
 
 				if multiplayerModel.peer then
 					if multiplayerModel.user then
 						imgui.SameLine()
-						imgui.Text("You are logged in as " .. multiplayerModel.user.name)
+						imgui.Text("logged in as " .. multiplayerModel.user.name)
 					end
 					if imgui.BeginListBox("Players", {0, 150}) then
 						for i = 1, #multiplayerModel.users do
@@ -80,7 +85,11 @@ OnlineView.draw = function(self)
 					for i = 1, #multiplayerModel.rooms do
 						local room = multiplayerModel.rooms[i]
 						local isSelected = multiplayerModel.selectedRoom == room
-						if imgui.Selectable_Bool(room.name, isSelected) then
+						local name = room.name
+						if room.isPlaying then
+							name = name .. " (playing)"
+						end
+						if imgui.Selectable_Bool(name, isSelected) then
 							multiplayerModel.selectedRoom = room
 						end
 
@@ -101,8 +110,9 @@ OnlineView.draw = function(self)
 				end
 				imgui.EndTabItem()
 			end
-			if (multiplayerModel.selectedRoom or multiplayerModel.room) and imgui.BeginTabItem("Room") then
-				if not multiplayerModel.room then
+			local room = multiplayerModel.room
+			if (multiplayerModel.selectedRoom or room) and imgui.BeginTabItem("Room") then
+				if not room then
 					imgui.InputText("Password", roomPasswordPtr, ffi.sizeof(roomPasswordPtr), imgui.love.InputTextFlags("Password"))
 					if imgui.Button("Join") then
 						multiplayerModel:joinRoom(ffi.string(roomPasswordPtr))
@@ -111,7 +121,11 @@ OnlineView.draw = function(self)
 					local notechart = multiplayerModel.notechart
 					local song = ("%s - %s"):format(notechart.artist or "?", notechart.title or "?")
 					local name = notechart.name or "?"
-					imgui.Text("Room name: " .. multiplayerModel.room.name)
+					imgui.Text("Room name: " .. room.name)
+					if room.isPlaying then
+						imgui.SameLine()
+						imgui.Text("(playing)")
+					end
 					imgui.Text("Song: " .. song)
 					imgui.Text("Difficulty:")
 					imgui.SameLine()
@@ -123,11 +137,16 @@ OnlineView.draw = function(self)
 							local user = multiplayerModel.roomUsers[i]
 							local isSelected = false
 							local name = user.name
-							name = name .. " (" .. (user.isReady and "ready" or "not ready")
-							if multiplayerModel.room.hostPeerId == user.peerId then
-								name = name .. ", host"
+							name = name .. " ("
+							if room.hostPeerId == user.peerId then
+								name = name .. "host"
 							elseif not user.isNotechartFound then
 								name = name .. ", no chart"
+							end
+							if user.isPlaying then
+								name = name .. ", playing"
+							else
+								name = name .. ", " .. (user.isReady and "ready" or "not ready")
 							end
 							name = name .. ")"
 							imgui.Selectable_Bool(name, isSelected)
@@ -144,26 +163,28 @@ OnlineView.draw = function(self)
 					imgui.SameLine()
 
 					local user = multiplayerModel.user
-					local isHost = user.peerId == multiplayerModel.room.hostPeerId
+					local isHost = user.peerId == room.hostPeerId
 
 					local isReady = user.isReady
 					if imgui.Button(isReady and "Ready" or "Not ready") then
 						multiplayerModel:switchReady()
 					end
 					if isHost then
-						imgui.SameLine()
-						if imgui.Button("Start match") then
-							multiplayerModel:startMatch()
-						end
-						freeModifiersPtr[0] = multiplayerModel.room.isFreeModifiers
-						if imgui.Checkbox("Free modifiers", freeModifiersPtr) then
-							multiplayerModel:setFreeModifiers(freeModifiersPtr[0])
-						end
+						freeModifiersPtr[0] = room.isFreeModifiers
 						if imgui.Button("Set notechart") then
 							multiplayerModel:pushNotechart()
 						end
+						imgui.SameLine()
+						if imgui.Checkbox("Free modifiers", freeModifiersPtr) then
+							multiplayerModel:setFreeModifiers(freeModifiersPtr[0])
+						end
+						if not room.isPlaying and imgui.Button("Start match") then
+							multiplayerModel:startMatch()
+						elseif room.isPlaying and imgui.Button("Stop match") then
+							multiplayerModel:stopMatch()
+						end
 					else
-						imgui.Text("Free modifiers: " .. (multiplayerModel.room.isFreeModifiers and "yes" or "no"))
+						imgui.Text("Free modifiers: " .. (room.isFreeModifiers and "yes" or "no"))
 					end
 				end
 				imgui.EndTabItem()

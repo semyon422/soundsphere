@@ -10,12 +10,15 @@ remote.decode = MessagePack.unpack
 local MultiplayerModel = Class:new()
 
 MultiplayerModel.construct = function(self)
+	self.status = "disconnected"
 	self.rooms = {}
 	self.users = {}
 	self.roomUsers = {}
 	self.modifiers = {}
 	self.notechart = {}
 	self.notechartChanged = false
+
+	self.isPlaying = false
 	self.handlers = {
 		set = function(peer, key, value)
 			self[key] = value
@@ -24,46 +27,38 @@ MultiplayerModel.construct = function(self)
 			end
 		end,
 		startMatch = function(peer)
-			self.gameController.selectController:playNoteChart()
+			if not self.isPlaying then
+				self.gameController.selectController:playNoteChart()
+			end
+		end,
+		stopMatch = function(peer)
+			if self.isPlaying then
+				self.gameController.gameplayController:quit()
+			end
 		end,
 	}
 end
 
 MultiplayerModel.load = function(self)
 	self.host = enet.host_create()
-	self.stopRefresh = false
-	aquatimer.every(0.1, self.refresh, self)
-	aquatimer.every(0.1, self.refreshScore, self)
+	self.stopRefresh = aquatimer.every(0.1, self.refresh, self)
 end
 
 MultiplayerModel.unload = function(self)
+	self:disconnect()
 	self.host:flush()
 	self.host = nil
-	self.stopRefresh = true
+	self.stopRefresh()
 end
 
 MultiplayerModel.refresh = function(self)
-	if self.stopRefresh then
-		return true
-	end
-
 	local peer = self.peer
-	if not peer then
+	local room = self.room
+	if not peer or not room then
 		return
 	end
 
 	self.roomUsers = peer.getRoomUsers() or {}
-end
-
-MultiplayerModel.refreshScore = function(self)
-	if self.stopRefresh then
-		return true
-	end
-
-	local peer = self.peer
-	if not peer then
-		return
-	end
 
 	local scoreSystem = self.gameController.rhythmModel.scoreEngine.scoreSystem
 	if not scoreSystem.entry then
@@ -77,11 +72,17 @@ MultiplayerModel.refreshScore = function(self)
 end
 
 MultiplayerModel.connect = function(self)
-	self.server = self.host:connect("localhost:9000")
+	if self.status == "disconnected" then
+		self.server = self.host:connect("localhost:9000")
+		self.status = "connecting"
+	end
 end
 
 MultiplayerModel.disconnect = function(self)
-	self.server:disconnect()
+	if self.status == "connected" then
+		self.server:disconnect()
+		self.status = "disconnecting"
+	end
 end
 
 MultiplayerModel.findNotechart = remote.wrap(function(self)
@@ -100,8 +101,20 @@ MultiplayerModel.switchReady = remote.wrap(function(self)
 	self.user = self.peer.getUser()
 end)
 
+MultiplayerModel.setIsPlaying = remote.wrap(function(self, value)
+	if not self.peer then
+		return
+	end
+	self.isPlaying = value
+	self.peer._setIsPlaying(value)
+end)
+
 MultiplayerModel.startMatch = remote.wrap(function(self)
 	self.peer._startMatch()
+end)
+
+MultiplayerModel.stopMatch = remote.wrap(function(self)
+	self.peer._stopMatch()
 end)
 
 MultiplayerModel.setFreeModifiers = remote.wrap(function(self, isFreeModifiers)
@@ -180,6 +193,7 @@ end)
 
 MultiplayerModel.peerconnected = function(self, peer)
 	print("connected")
+	self.status = "connected"
 	self.peer = peer
 
 	self:login()
@@ -187,6 +201,7 @@ end
 
 MultiplayerModel.peerdisconnected = function(self, peer)
 	print("disconnected")
+	self.status = "disconnected"
 	self.peer = nil
 
 	self.rooms = {}
@@ -201,6 +216,7 @@ MultiplayerModel.update = function(self)
 	if not self.server then
 		return
 	end
+
 	local host = self.host
 	local event = host:service()
 	while event do
@@ -217,10 +233,14 @@ MultiplayerModel.update = function(self)
 	remote.update()
 
 	local room = self.room
-	if room and room.hostPeerId ~= self.user.peerId and not room.isFreeModifiers then
+	if not room or room.hostPeerId == self.user.peerId then
+		return
+	end
+
+	if not room.isFreeModifiers then
 		self.modifierModel.config = self.modifiers
 	end
-	if room and room.hostPeerId ~= self.user.peerId and self.notechartChanged then
+	if self.notechartChanged then
 		self.notechartChanged = false
 		self:findNotechart()
 	end
