@@ -3,6 +3,9 @@ local imgui = require("cimgui")
 local ImguiView = require("sphere.views.ImguiView")
 local align = require("aqua.imgui.config").align
 local inside = require("aqua.util.inside")
+local aquathread = require("aqua.thread")
+local HelpMarker = require("sphere.imgui.HelpMarker")
+local inspect = require("inspect")
 
 local OnlineView = ImguiView:new()
 
@@ -105,16 +108,16 @@ OnlineView.draw = function(self)
 						multiplayerModel:joinRoom(ffi.string(roomPasswordPtr))
 					end
 				else
-					local noteChartItem = self.gameController.selectModel.noteChartItem
-					local song = "None"
-					local name = "None"
-					if noteChartItem then
-						song = ("%s - %s"):format(noteChartItem.artist, noteChartItem.title)
-						name = noteChartItem.name
-					end
+					local notechart = multiplayerModel.notechart
+					local song = ("%s - %s"):format(notechart.artist or "?", notechart.title or "?")
+					local name = notechart.name or "?"
 					imgui.Text("Room name: " .. multiplayerModel.room.name)
 					imgui.Text("Song: " .. song)
-					imgui.Text("Difficulty: " .. name)
+					imgui.Text("Difficulty:")
+					imgui.SameLine()
+					HelpMarker(inspect(notechart))
+					imgui.SameLine()
+					imgui.Text(name)
 					if imgui.BeginListBox("Players", {0, 150}) then
 						for i = 1, #multiplayerModel.roomUsers do
 							local user = multiplayerModel.roomUsers[i]
@@ -123,6 +126,8 @@ OnlineView.draw = function(self)
 							name = name .. " (" .. (user.isReady and "ready" or "not ready")
 							if multiplayerModel.room.hostPeerId == user.peerId then
 								name = name .. ", host"
+							elseif not user.isNotechartFound then
+								name = name .. ", no chart"
 							end
 							name = name .. ")"
 							imgui.Selectable_Bool(name, isSelected)
@@ -153,6 +158,9 @@ OnlineView.draw = function(self)
 						freeModifiersPtr[0] = multiplayerModel.room.isFreeModifiers
 						if imgui.Checkbox("Free modifiers", freeModifiersPtr) then
 							multiplayerModel:setFreeModifiers(freeModifiersPtr[0])
+						end
+						if imgui.Button("Set notechart") then
+							multiplayerModel:pushNotechart()
 						end
 					else
 						imgui.Text("Free modifiers: " .. (multiplayerModel.room.isFreeModifiers and "yes" or "no"))

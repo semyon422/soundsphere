@@ -52,6 +52,17 @@ NoteChartSetLibraryModel.updateItems = function(self)
 	self.itemsCount = CacheDatabase.noteChartSetItemsCount
 end
 
+NoteChartSetLibraryModel.findNotechart = function(self, hash, index)
+	local params = CacheDatabase.queryParams
+
+	params.groupBy = nil
+	params.lamp = nil
+	params.where = ("noteChartDatas.hash = %q AND noteChartDatas.`index` = %d"):format(hash, index)
+
+	CacheDatabase:asyncQueryAll()
+	self.itemsCount = CacheDatabase.noteChartSetItemsCount
+end
+
 NoteChartSetLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId, noteChartSetId)
 	local entry = self.entry
 	entry.noteChartDataId = noteChartDataId

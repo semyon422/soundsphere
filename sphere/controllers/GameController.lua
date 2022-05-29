@@ -173,6 +173,7 @@ GameController.load = function(self)
 	multiplayerModel.onlineModel = onlineModel
 	multiplayerModel.selectModel = selectModel
 	multiplayerModel.modifierModel = modifierModel
+	multiplayerModel.noteChartSetLibraryModel = noteChartSetLibraryModel
 
 	directoryManager:createDirectories()
 

@@ -14,8 +14,13 @@ MultiplayerModel.construct = function(self)
 	self.users = {}
 	self.roomUsers = {}
 	self.modifiers = {}
+	self.notechart = {}
+	self.notechartChanged = false
 	self.handlers = {set = function(peer, key, value)
 		self[key] = value
+		if key == "notechart" then
+			self.notechartChanged = true
+		end
 	end}
 end
 
@@ -53,6 +58,17 @@ end
 MultiplayerModel.disconnect = function(self)
 	self.server:disconnect()
 end
+
+MultiplayerModel.findNotechart = remote.wrap(function(self)
+	self.noteChartSetLibraryModel:findNotechart(self.notechart.hash or "", self.notechart.index or 0)
+	self.selectModel:scrollNoteChartSet(0)
+	if self.selectModel.noteChartItem then
+		self.selectModel:setConfig(self.selectModel.noteChartItem)
+		self.peer.setNotechartFound(true)
+		return
+	end
+	self.peer.setNotechartFound(false)
+end)
 
 MultiplayerModel.switchReady = remote.wrap(function(self)
 	self.peer.switchReady()
@@ -93,6 +109,35 @@ MultiplayerModel.pushModifiers = remote.wrap(function(self)
 		return
 	end
 	self.peer._setModifiers(self.modifierModel.config)
+end)
+
+MultiplayerModel.pushNotechart = remote.wrap(function(self)
+	if not self.room then
+		return
+	end
+	local nc = self.selectModel.noteChartItem
+	if not nc then
+		return
+	end
+	self.notechart = {
+		hash = nc.hash,
+		index = nc.index,
+		format = nc.format,
+		title = nc.title,
+		artist = nc.artist,
+		source = nc.source,
+		tags = nc.tags,
+		name = nc.name,
+		creator = nc.creator,
+		level = nc.level,
+		inputMode = nc.inputMode,
+		noteCount = nc.noteCount,
+		length = nc.length,
+		bpm = nc.bpm,
+		difficulty = nc.difficulty,
+		longNoteRatio = nc.longNoteRatio,
+	}
+	self.peer._setNotechart(self.notechart)
 end)
 
 MultiplayerModel.login = remote.wrap(function(self)
@@ -148,6 +193,10 @@ MultiplayerModel.update = function(self)
 	local room = self.room
 	if room and room.hostPeerId ~= self.user.peerId and not room.isFreeModifiers then
 		self.modifierModel.config = self.modifiers
+	end
+	if room and room.hostPeerId ~= self.user.peerId and self.notechartChanged then
+		self.notechartChanged = false
+		self:findNotechart()
 	end
 end
 

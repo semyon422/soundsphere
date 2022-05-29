@@ -112,6 +112,12 @@ SelectModel.scrollRandom = function(self)
 	self:scrollNoteChartSet(nil, destination)
 end
 
+SelectModel.setConfig = function(self, item)
+	self.config.noteChartSetEntryId = item.setId
+	self.config.noteChartEntryId = item.noteChartId
+	self.config.noteChartDataEntryId = item.noteChartDataId
+end
+
 SelectModel.scrollNoteChartSet = function(self, direction, destination)
 	local noteChartSetItems = self.noteChartSetLibraryModel.items
 
@@ -125,9 +131,7 @@ SelectModel.scrollNoteChartSet = function(self, direction, destination)
 
 	local noteChartSetItem = noteChartSetItems[self.noteChartSetItemIndex]
 	self.noteChartSetItem = noteChartSetItem
-	self.config.noteChartSetEntryId = noteChartSetItem.setId
-	self.config.noteChartEntryId = noteChartSetItem.noteChartId
-	self.config.noteChartDataEntryId = noteChartSetItem.noteChartDataId
+	self:setConfig(noteChartSetItem)
 
 	self:pullNoteChart(oldNoteChartSetItem and oldNoteChartSetItem.setId == noteChartSetItem.setId)
 end
@@ -146,9 +150,7 @@ SelectModel.scrollNoteChart = function(self, direction, destination)
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
 	self.noteChartItem = noteChartItem
 
-	self.config.noteChartSetEntryId = noteChartItem.setId
-	self.config.noteChartEntryId = noteChartItem.noteChartId
-	self.config.noteChartDataEntryId = noteChartItem.noteChartDataId
+	self:setConfig(noteChartItem)
 
 	self:pullNoteChartSet(true)
 	self:pullScore()
