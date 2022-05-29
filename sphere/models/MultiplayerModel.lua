@@ -16,12 +16,17 @@ MultiplayerModel.construct = function(self)
 	self.modifiers = {}
 	self.notechart = {}
 	self.notechartChanged = false
-	self.handlers = {set = function(peer, key, value)
-		self[key] = value
-		if key == "notechart" then
-			self.notechartChanged = true
-		end
-	end}
+	self.handlers = {
+		set = function(peer, key, value)
+			self[key] = value
+			if key == "notechart" then
+				self.notechartChanged = true
+			end
+		end,
+		startMatch = function(peer)
+			self.gameController.selectController:playNoteChart()
+		end,
+	}
 end
 
 MultiplayerModel.load = function(self)
@@ -76,6 +81,7 @@ MultiplayerModel.switchReady = remote.wrap(function(self)
 end)
 
 MultiplayerModel.startMatch = remote.wrap(function(self)
+	self.peer._startMatch()
 end)
 
 MultiplayerModel.setFreeModifiers = remote.wrap(function(self, isFreeModifiers)
