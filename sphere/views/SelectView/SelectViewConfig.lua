@@ -435,6 +435,9 @@ StageInfo.cells = {
 		value = function(self)
 			local baseTimeRate = self.gameController.rhythmModel.timeEngine.baseTimeRate
 			local noteChartItem = self.gameController.selectModel.noteChartItem
+			if not noteChartItem then
+				return 0
+			end
 			return (noteChartItem.bpm or 0) * baseTimeRate
 		end,
 	},
@@ -448,6 +451,9 @@ StageInfo.cells = {
 		value = function(self)
 			local baseTimeRate = self.gameController.rhythmModel.timeEngine.baseTimeRate
 			local noteChartItem = self.gameController.selectModel.noteChartItem
+			if not noteChartItem then
+				return 0
+			end
 			return (noteChartItem.length or 0) / baseTimeRate
 		end,
 	},
