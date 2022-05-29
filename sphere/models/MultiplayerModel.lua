@@ -54,6 +54,18 @@ MultiplayerModel.refresh = function(self)
 	-- self.rooms = peer.getRooms() or {}
 	-- self.users = peer.getUsers() or {}
 	-- self.room = peer.getRoom()
+
+	self.roomUsers = peer.getRoomUsers() or {}
+
+	local scoreSystem = self.gameController.rhythmModel.scoreEngine.scoreSystem
+	if not scoreSystem.entry then
+		return
+	end
+	peer._setScore({
+		accuracy = scoreSystem.entry.accuracy,
+		combo = scoreSystem.base.combo,
+		failed = scoreSystem.hp.failed,
+	})
 end
 
 MultiplayerModel.connect = function(self)

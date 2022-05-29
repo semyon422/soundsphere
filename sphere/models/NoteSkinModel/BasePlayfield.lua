@@ -91,6 +91,18 @@ BasePlayfield.addBaseHitError = function(self)
 	})
 end
 
+BasePlayfield.addBaseMatchPlayers = function(self)
+	return self:addMatchPlayers({
+		transform = self:newTransform(1920, 1080, "left"),
+		x = 20,
+		y = 540,
+		font = {
+			filename = "Noto Sans Mono",
+			size = 24
+		},
+	})
+end
+
 BasePlayfield.addBaseElements = function(self, elements)
 	if not elements then
 		self:addBaseProgressBar()
@@ -99,6 +111,7 @@ BasePlayfield.addBaseElements = function(self, elements)
 		self:addBaseAccuracy()
 		self:addBaseCombo()
 		self:addBaseHitError()
+		self:addBaseMatchPlayers()
 		return
 	end
 	for i, element in ipairs(elements) do
@@ -114,6 +127,8 @@ BasePlayfield.addBaseElements = function(self, elements)
 			self:addBaseCombo()
 		elseif element == "hit error" then
 			self:addBaseHitError()
+		elseif element == "match players" then
+			self:addBaseMatchPlayers()
 		end
 	end
 end

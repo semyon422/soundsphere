@@ -9,6 +9,7 @@ local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
 local ScoreListView	= require("sphere.views.ResultView.ScoreListView")
 local ModifierIconGridView = require(viewspackage .. "SelectView.ModifierIconGridView")
 local StageInfoView = require(viewspackage .. "SelectView.StageInfoView")
+local MatchPlayersView	= require("sphere.views.GameplayView.MatchPlayersView")
 
 local ResultView = ScreenView:new({construct = false})
 
@@ -17,6 +18,7 @@ ResultView.views = {
 	{"modifierIconGridView", ModifierIconGridView, "ModifierIconGridView"},
 	{"stageInfoView", StageInfoView, "StageInfoView"},
 	{"scoreListView", ScoreListView, "ScoreListView"},
+	{"MatchPlayersView", MatchPlayersView, "MatchPlayersView"},
 }
 
 ResultView.construct = function(self)

@@ -11,6 +11,7 @@ local InputAnimationView	= require("sphere.views.GameplayView.InputAnimationView
 local GameplayNavigator	= require("sphere.views.GameplayView.GameplayNavigator")
 local JudgementView	= require("sphere.views.GameplayView.JudgementView")
 local DeltaTimeJudgementView	= require("sphere.views.GameplayView.DeltaTimeJudgementView")
+local MatchPlayersView	= require("sphere.views.GameplayView.MatchPlayersView")
 local ScreenView = require(viewspackage .. "ScreenView")
 
 local GameplayView = ScreenView:new({construct = false})
@@ -26,6 +27,7 @@ GameplayView.views = {
 	{"inputAnimationView", InputAnimationView, "InputAnimationView"},
 	{"judgementView", JudgementView, "JudgementView"},
 	{"deltaTimeJudgementView", DeltaTimeJudgementView, "DeltaTimeJudgementView"},
+	{"matchPlayersView", MatchPlayersView, "MatchPlayersView"},
 }
 
 GameplayView.construct = function(self)

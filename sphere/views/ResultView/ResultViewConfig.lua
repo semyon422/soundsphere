@@ -916,6 +916,18 @@ local SessionTime = {
 	align = "left",
 }
 
+local MatchPlayers = {
+	class = "MatchPlayersView",
+	transform = transformLeft,
+	key = "gameController.multiplayerModel.roomUsers",
+	x = 20,
+	y = 540,
+	font = {
+		filename = "Noto Sans Mono",
+		size = 24
+	},
+}
+
 local InspectScoreSystem = {
 	class = "ValueView",
 	subscreen = "scoreSystemDebug",
@@ -997,6 +1009,7 @@ local NoteSkinViewConfig = {
 	HpGraph,
 	EarlyLateMissGraph,
 	SessionTime,
+	MatchPlayers,
 	InspectScoreSystem,
 	InspectCounters,
 	InspectScoreEntry,

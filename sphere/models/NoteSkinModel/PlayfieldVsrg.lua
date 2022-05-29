@@ -473,4 +473,15 @@ PlayfieldVsrg.addHitError = function(self, object)
 	return self:add(object)
 end
 
+PlayfieldVsrg.addMatchPlayers = function(self, object)
+	if not object then
+		return
+	end
+	object.class = "MatchPlayersView"
+	object.transform = object.transform or self:newTransform(1920, 1080, "left")
+	object.key = "gameController.multiplayerModel.roomUsers"
+
+	return self:add(object)
+end
+
 return PlayfieldVsrg
