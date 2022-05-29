@@ -32,7 +32,8 @@ end
 MultiplayerModel.load = function(self)
 	self.host = enet.host_create()
 	self.stopRefresh = false
-	aquatimer.every(1, self.refresh, self)
+	aquatimer.every(0.1, self.refresh, self)
+	aquatimer.every(0.1, self.refreshScore, self)
 end
 
 MultiplayerModel.unload = function(self)
@@ -51,11 +52,18 @@ MultiplayerModel.refresh = function(self)
 		return
 	end
 
-	-- self.rooms = peer.getRooms() or {}
-	-- self.users = peer.getUsers() or {}
-	-- self.room = peer.getRoom()
-
 	self.roomUsers = peer.getRoomUsers() or {}
+end
+
+MultiplayerModel.refreshScore = function(self)
+	if self.stopRefresh then
+		return true
+	end
+
+	local peer = self.peer
+	if not peer then
+		return
+	end
 
 	local scoreSystem = self.gameController.rhythmModel.scoreEngine.scoreSystem
 	if not scoreSystem.entry then
