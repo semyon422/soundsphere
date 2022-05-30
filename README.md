@@ -33,11 +33,12 @@ Open-source rhythm game
 - Customizable prepare/play/pause time
 - Settings for noteskins
 - osu!direct
+- Multiplayer
 - And much more
 
 ## Future plans:
 
-- Multiplayer
+- Spectator
 - Offset wizzard
 - More score systems and difficulty calculators
 - Flexible collections 
