@@ -38,6 +38,7 @@ DifficultyModel.getDifficulty = function(self, noteChart)
 			end
 		end
 	end
+	table.sort(notes, function(a, b) return a.time < b.time end)
 
 	local enpsValue, aStrain, generalizedKeymode, strains = enps.getEnps(notes)
 	local longArea = longAreaSum / (maxTime - minTime) / generalizedKeymode
