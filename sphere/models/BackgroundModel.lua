@@ -26,6 +26,8 @@ BackgroundModel.update = function(self, dt)
 			self.path = path
 			self:loadBackgroundDebounce()
 		end
+	elseif not noteChartItem and self.images[1] ~= self.emptyImage then
+		self.images = {self.emptyImage}
 	end
 
 	if self.alphaTween then

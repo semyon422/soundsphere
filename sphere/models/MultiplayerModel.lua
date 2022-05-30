@@ -99,9 +99,9 @@ end
 
 MultiplayerModel.findNotechart = remote.wrap(function(self)
 	self.noteChartSetLibraryModel:findNotechart(self.notechart.hash or "", self.notechart.index or 0)
-	self.selectModel:scrollNoteChartSet(0)
+	local items = self.noteChartSetLibraryModel.items
 
-	local item = self.selectModel.noteChartItem
+	local item = items[1]
 	if item then
 		self.noteChartItem = {
 			setId = item.setId,
@@ -109,10 +109,17 @@ MultiplayerModel.findNotechart = remote.wrap(function(self)
 			noteChartDataId = item.noteChartDataId,
 		}
 		self.selectModel:setConfig(item)
+		self.selectModel:pullNoteChartSet(true)
 		self.peer.setNotechartFound(true)
 		return
 	end
+	self.selectModel:setConfig({
+		setId = 0,
+		noteChartId = 0,
+		noteChartDataId = 0,
+	})
 	self.noteChartItem = nil
+	self.selectModel:pullNoteChartSet(true)
 	self.peer.setNotechartFound(false)
 end)
 

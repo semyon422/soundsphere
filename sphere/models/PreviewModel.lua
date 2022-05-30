@@ -27,6 +27,8 @@ PreviewModel.update = function(self, dt)
 			self.previewTime = previewTime
 			self:loadPreviewDebounce()
 		end
+	elseif not noteChartItem then
+		self:stop()
 	end
 
 	local audio = self.audio
