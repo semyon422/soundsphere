@@ -92,6 +92,9 @@ OnlineView.draw = function(self)
 						end
 						if imgui.Selectable_Bool(name, isSelected) then
 							multiplayerModel.selectedRoom = room
+							if not multiplayerModel.room then
+								multiplayerModel:joinRoom("")
+							end
 						end
 
 						if isSelected then
@@ -105,9 +108,13 @@ OnlineView.draw = function(self)
 
 				imgui.Text("Create new room")
 				imgui.InputText("Name", roomNamePtr, ffi.sizeof(roomNamePtr))
-				imgui.InputText("Password", newRoomPasswordPtr, ffi.sizeof(newRoomPasswordPtr), imgui.love.InputTextFlags("Password"))
+				imgui.InputText("Password (optional)", newRoomPasswordPtr, ffi.sizeof(newRoomPasswordPtr), imgui.love.InputTextFlags("Password"))
 				if imgui.Button("Create room") then
-					multiplayerModel:createRoom(ffi.string(roomNamePtr), ffi.string(newRoomPasswordPtr))
+					local name = ffi.string(roomNamePtr)
+					local password = ffi.string(newRoomPasswordPtr)
+					if name ~= "" then
+						multiplayerModel:createRoom(name, password)
+					end
 				end
 				imgui.EndTabItem()
 			end

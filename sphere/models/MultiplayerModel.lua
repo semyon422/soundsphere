@@ -159,11 +159,16 @@ MultiplayerModel.createRoom = remote.wrap(function(self, name, password)
 	if not self.room then
 		return
 	end
+	self.selectedRoom = nil
 	self.peer._setModifiers(self.modifierModel.config)
 end)
 
 MultiplayerModel.joinRoom = remote.wrap(function(self, password)
 	self.room = self.peer.joinRoom(self.selectedRoom.id, password)
+	if not self.room then
+		return
+	end
+	self.selectedRoom = nil
 end)
 
 MultiplayerModel.leaveRoom = remote.wrap(function(self)
