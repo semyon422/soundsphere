@@ -168,6 +168,27 @@ OnlineView.draw = function(self)
 							if isSelected then
 								imgui.SetItemDefaultFocus()
 							end
+
+							if multiplayerModel:isHost() and room.hostPeerId ~= user.peerId then
+								if imgui.BeginPopupContextItem() then
+									imgui.Text(name)
+									if imgui.Button("Kick") then
+										multiplayerModel:kickUser(user.peerId)
+										imgui.CloseCurrentPopup()
+									end
+									if imgui.Button("Give host") then
+										multiplayerModel:setHost(user.peerId)
+										imgui.CloseCurrentPopup()
+									end
+									if imgui.Button("Close") then
+										imgui.CloseCurrentPopup()
+									end
+									imgui.EndPopup()
+								end
+								if imgui.IsItemHovered() then
+									imgui.SetTooltip("Right-click to open popup")
+								end
+							end
 						end
 						imgui.EndListBox()
 					end

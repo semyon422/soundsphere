@@ -162,6 +162,14 @@ MultiplayerModel.stopMatch = remote.wrap(function(self)
 	self.peer._stopMatch()
 end)
 
+MultiplayerModel.setHost = remote.wrap(function(self, peerId)
+	self.peer._setHost(peerId)
+end)
+
+MultiplayerModel.kickUser = remote.wrap(function(self, peerId)
+	self.peer._kickUser(peerId)
+end)
+
 MultiplayerModel.setFreeModifiers = remote.wrap(function(self, isFreeModifiers)
 	if not self:isHost() then
 		return
