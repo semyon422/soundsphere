@@ -233,7 +233,7 @@ GameController.load = function(self)
 end
 
 GameController.resetGameplayConfigs = function(self)
-	self.modifierModel.config = self.configModel.configs.modifier
+	self.modifierModel:setConfig(self.configModel.configs.modifier)
 	self.rhythmModel.timings = self.configModel.configs.settings.gameplay.timings
 end
 

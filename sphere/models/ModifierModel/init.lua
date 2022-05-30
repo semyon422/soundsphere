@@ -98,11 +98,9 @@ ModifierModel.construct = function(self)
 end
 
 ModifierModel.load = function(self)
-	local config = self.configModel.configs.modifier
-	self.config = config
+	self:setConfig(self.configModel.configs.modifier)
 
 	self.availableModifierItemIndex = 1
-	self.modifierItemIndex = #config
 
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
@@ -110,6 +108,11 @@ ModifierModel.load = function(self)
 			modifier.added = true
 		end
 	end
+end
+
+ModifierModel.setConfig = function(self, config)
+	self.config = config
+	self.modifierItemIndex = #config
 end
 
 ModifierModel.scrollAvailableModifier = function(self, direction)

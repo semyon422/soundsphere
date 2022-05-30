@@ -79,9 +79,9 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 	local replay = rhythmModel.replayModel:loadReplay(hash)
 
 	local modifierModel = self.gameController.modifierModel
-	modifierModel.config = modifierModel:decode(scoreEntry.modifiers)
+	modifierModel:setConfig(modifierModel:decode(scoreEntry.modifiers))
 	if #modifierModel.config == 0 and replay.modifiers then
-		modifierModel.config = replay.modifiers
+		modifierModel:setConfig(replay.modifiers)
 		modifierModel:fixOldFormat(replay.modifiers, not replay.timings)
 	end
 

@@ -25,7 +25,8 @@ MultiplayerModel.construct = function(self)
 			if key == "notechart" then
 				self.notechartChanged = true
 			elseif key == "modifiers" then
-				self.modifierModel.config = value
+				self.modifierModel:setConfig(value)
+				self.configModel.configs.modifier = value
 			end
 		end,
 		startMatch = function(peer)
