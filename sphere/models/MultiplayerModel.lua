@@ -184,6 +184,7 @@ MultiplayerModel.leaveRoom = remote.wrap(function(self)
 		self.room = nil
 		self.selectedRoom = nil
 		self.roomUsers = {}
+		self.roomMessages = {}
 	end
 end)
 
@@ -256,6 +257,7 @@ MultiplayerModel.peerdisconnected = function(self, peer)
 	self.rooms = {}
 	self.users = {}
 	self.roomUsers = {}
+	self.roomMessages = {}
 	self.room = nil
 	self.selectedRoom = nil
 	self.user = nil

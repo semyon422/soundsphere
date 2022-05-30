@@ -217,6 +217,7 @@ OnlineView.draw = function(self)
 					imgui.InputText("Message", messagePtr, ffi.sizeof(messagePtr))
 					if imgui.Button("Send") then
 						multiplayerModel:sendMessage(ffi.string(messagePtr))
+						ffi.fill(messagePtr, ffi.sizeof(messagePtr), 0)
 					end
 				end
 				imgui.EndTabItem()
