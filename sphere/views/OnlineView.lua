@@ -9,11 +9,13 @@ local inspect = require("inspect")
 
 local OnlineView = ImguiView:new()
 
+local messagesCount = 0
 local emailPtr = ffi.new("char[128]")
 local passwordPtr = ffi.new("char[128]")
 local roomNamePtr = ffi.new("char[128]")
 local roomPasswordPtr = ffi.new("char[128]")
 local newRoomPasswordPtr = ffi.new("char[128]")
+local messagePtr = ffi.new("char[256]")
 local freeModifiersPtr = ffi.new("bool[1]")
 local readyPtr = ffi.new("bool[1]")
 OnlineView.draw = function(self)
@@ -28,8 +30,8 @@ OnlineView.draw = function(self)
 
 	local multiplayerModel = self.gameController.multiplayerModel
 
-	imgui.SetNextWindowPos({align(0.5, 279 + 454 * 3 / 4), 279}, 0)
-	imgui.SetNextWindowSize({454 * 1.5, 522}, 0)
+	imgui.SetNextWindowPos({align(0.5, 279 + 454 * 3 / 4), 279 / 2}, 0)
+	imgui.SetNextWindowSize({454 * 1.5, 522 * 1.5}, 0)
 	local flags = imgui.love.WindowFlags("NoMove", "NoResize")
 	if imgui.Begin("Online", self.isOpen, flags) then
 		if imgui.BeginTabBar("Online tab bar") then
@@ -189,6 +191,7 @@ OnlineView.draw = function(self)
 						if imgui.Checkbox("Free modifiers", freeModifiersPtr) then
 							multiplayerModel:setFreeModifiers(freeModifiersPtr[0])
 						end
+						imgui.SameLine()
 						if not room.isPlaying and imgui.Button("Start match") then
 							multiplayerModel:startMatch()
 						elseif room.isPlaying and imgui.Button("Stop match") then
@@ -196,6 +199,24 @@ OnlineView.draw = function(self)
 						end
 					else
 						imgui.Text("Free modifiers: " .. (room.isFreeModifiers and "yes" or "no"))
+					end
+					imgui.Separator()
+					imgui.Text("Chat")
+
+					imgui.BeginListBox("Messages", {0, 150})
+					for i = 1, #multiplayerModel.roomMessages do
+						local message = multiplayerModel.roomMessages[i]
+						imgui.Selectable_Bool(message, false)
+					end
+					if messagesCount ~= #multiplayerModel.roomMessages then
+						messagesCount = #multiplayerModel.roomMessages
+						imgui.SetScrollHereY(1)
+					end
+					imgui.EndListBox()
+
+					imgui.InputText("Message", messagePtr, ffi.sizeof(messagePtr))
+					if imgui.Button("Send") then
+						multiplayerModel:sendMessage(ffi.string(messagePtr))
 					end
 				end
 				imgui.EndTabItem()

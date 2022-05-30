@@ -16,6 +16,7 @@ MultiplayerModel.construct = function(self)
 	self.roomUsers = {}
 	self.modifiers = {}
 	self.notechart = {}
+	self.roomMessages = {}
 	self.notechartChanged = false
 
 	self.isPlaying = false
@@ -39,6 +40,9 @@ MultiplayerModel.construct = function(self)
 			if self.isPlaying then
 				self.gameController.gameplayController:quit()
 			end
+		end,
+		addMessage = function(peer, message)
+			table.insert(self.roomMessages, message)
 		end,
 	}
 end
@@ -135,6 +139,10 @@ MultiplayerModel.setIsPlaying = remote.wrap(function(self, value)
 	end
 	self.isPlaying = value
 	self.peer._setIsPlaying(value)
+end)
+
+MultiplayerModel.sendMessage = remote.wrap(function(self, message)
+	self.peer._sendMessage(message)
 end)
 
 MultiplayerModel.startMatch = remote.wrap(function(self)
