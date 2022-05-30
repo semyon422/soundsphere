@@ -17,6 +17,7 @@ local roomPasswordPtr = ffi.new("char[128]")
 local newRoomPasswordPtr = ffi.new("char[128]")
 local messagePtr = ffi.new("char[256]")
 local freeModifiersPtr = ffi.new("bool[1]")
+local freeNotechartPtr = ffi.new("bool[1]")
 local readyPtr = ffi.new("bool[1]")
 OnlineView.draw = function(self)
 	if not self.isOpen[0] then
@@ -192,6 +193,10 @@ OnlineView.draw = function(self)
 							multiplayerModel:setFreeModifiers(freeModifiersPtr[0])
 						end
 						imgui.SameLine()
+						if imgui.Checkbox("Free notechart", freeNotechartPtr) then
+							multiplayerModel:setFreeNotechart(freeNotechartPtr[0])
+						end
+						imgui.SameLine()
 						if not room.isPlaying and imgui.Button("Start match") then
 							multiplayerModel:startMatch()
 						elseif room.isPlaying and imgui.Button("Stop match") then
@@ -199,6 +204,15 @@ OnlineView.draw = function(self)
 						end
 					else
 						imgui.Text("Free modifiers: " .. (room.isFreeModifiers and "yes" or "no"))
+						imgui.SameLine()
+						if imgui.SmallButton("reset##modifiers") then
+							multiplayerModel:pullModifiers()
+						end
+						imgui.Text("Free notechart: " .. (room.isFreeNotechart and "yes" or "no"))
+						imgui.SameLine()
+						if imgui.SmallButton("reset##notechart") then
+							multiplayerModel:pullNotechart()
+						end
 					end
 					imgui.Separator()
 					imgui.Text("Chat")

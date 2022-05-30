@@ -3,6 +3,7 @@ local aquatimer = require("aqua.timer")
 local enet = require("enet")
 local MessagePack = require("MessagePack")
 local remote = require("aqua.util.remote")
+local deepclone = require("aqua.util.deepclone")
 
 remote.encode = MessagePack.pack
 remote.decode = MessagePack.unpack
@@ -28,11 +29,19 @@ MultiplayerModel.construct = function(self)
 			elseif key == "modifiers" then
 				self.modifierModel:setConfig(value)
 				self.configModel.configs.modifier = value
+				self.modifiers = deepclone(value)
 			end
 		end,
 		startMatch = function(peer)
 			if not self.isPlaying and self.noteChartItem then
-				self.selectModel:setConfig(self.noteChartItem)
+				if not self.room.isFreeModifiers then
+					local modifiers = deepclone(self.modifiers)
+					self.modifierModel:setConfig(modifiers)
+					self.configModel.configs.modifier = modifiers
+				end
+				if not self.room.isFreeNotechart then
+					self.selectModel:setConfig(self.noteChartItem)
+				end
 				self.gameController.selectController:playNoteChart()
 			end
 		end,
@@ -162,6 +171,15 @@ MultiplayerModel.setFreeModifiers = remote.wrap(function(self, isFreeModifiers)
 	self.room = self.peer.getRoom()
 end)
 
+MultiplayerModel.setFreeNotechart = remote.wrap(function(self, isFreeNotechart)
+	if not self:isHost() then
+		return
+	end
+	self.room.isFreeNotechart = isFreeNotechart
+	self.peer.setFreeNotechart(isFreeNotechart)
+	self.room = self.peer.getRoom()
+end)
+
 MultiplayerModel.createRoom = remote.wrap(function(self, name, password)
 	self.room = self.peer.createRoom(name, password)
 	if not self.room then
@@ -229,6 +247,24 @@ MultiplayerModel.pushNotechart = remote.wrap(function(self)
 	self.peer._setNotechart(self.notechart)
 end)
 
+MultiplayerModel.pullModifiers = remote.wrap(function(self)
+	local modifiers = self.peer.getRoomModifiers()
+	if not modifiers then
+		return
+	end
+	self.modifierModel:setConfig(modifiers)
+	self.configModel.configs.modifier = modifiers
+end)
+
+MultiplayerModel.pullNotechart = remote.wrap(function(self)
+	local notechart = self.peer.getRoomNotechart()
+	if not notechart then
+		return
+	end
+	self.notechart = notechart
+	self:findNotechart()
+end)
+
 MultiplayerModel.login = remote.wrap(function(self)
 	local api = self.onlineModel.webApi.api
 
@@ -289,7 +325,9 @@ MultiplayerModel.update = function(self)
 
 	if self.notechartChanged then
 		self.notechartChanged = false
-		self:findNotechart()
+		if not self.room.isFreeNotechart then
+			self:findNotechart()
+		end
 	end
 end
 
