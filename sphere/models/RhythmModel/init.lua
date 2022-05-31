@@ -106,13 +106,9 @@ RhythmModel.loadAllEngines = function(self)
 	timeEngine:updateTimeToPrepare()
 
 	scoreEngine:load()
-	modifierModel:apply("ScoreEngineModifier")
-
 	audioEngine:load()
-	modifierModel:apply("AudioEngineModifier")
 
 	modifierModel:apply("LogicEngineModifier")
-	modifierModel:apply("GraphicEngineModifier")
 
 	logicEngine:load()
 	graphicEngine:load()
@@ -129,6 +125,11 @@ RhythmModel.loadLogicEngines = function(self)
 	local logicEngine = self.logicEngine
 
 	timeEngine:load()
+	modifierModel:apply("TimeEngineModifier")
+	timeEngine:updateTimeToPrepare()
+
+	modifierModel:apply("LogicEngineModifier")
+
 	scoreEngine:load()
 	logicEngine:load()
 	replayModel:load()
