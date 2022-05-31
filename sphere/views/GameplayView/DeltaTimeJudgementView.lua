@@ -1,27 +1,26 @@
 local Class				= require("aqua.util.Class")
-local inside = require("aqua.util.inside")
 local JudgementScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.JudgementScoreSystem")
 
 local DeltaTimeJudgementView = Class:new()
 
 DeltaTimeJudgementView.load = function(self)
-	local config = self.config
 	local state = self.state
 
-	state.judgementTable = inside(self, config.key)
-	state.deltaTime = state.judgementTable.deltaTime
+	state.deltaTime = 0
 	state.judgement = nil
+	state.judgementCounter = 0
 end
 
 DeltaTimeJudgementView.update = function(self)
 	local config = self.config
 	local state = self.state
-	local judgementTable = state.judgementTable
+	local scoreSystem = self.gameController.rhythmModel.scoreEngine.scoreSystem
 
-	if judgementTable.deltaTime == state.deltaTime then
+	if scoreSystem.judgement.counter == state.judgementCounter then
 		return
 	end
-	state.deltaTime = judgementTable.deltaTime
+	state.judgementCounter = scoreSystem.judgement.counter
+	state.deltaTime = scoreSystem.misc.deltaTime
 
 	local judgement = JudgementScoreSystem:getJudgement(config.judgements, state.deltaTime)
 	state.judgement = judgement

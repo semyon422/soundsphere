@@ -57,6 +57,8 @@ for od = 0, 10 do
 end
 
 JudgementScoreSystem.load = function(self)
+	self.counter = 0
+
 	for name, judgements in pairs(self.scoreEngine.judgements) do
 		self.judgements[name] = judgements
 	end
@@ -107,6 +109,8 @@ JudgementScoreSystem.hit = function(self, event, timeKey)
 			end
 		end
 	end
+
+	self.counter = self.counter + 1
 end
 
 JudgementScoreSystem.notes = {

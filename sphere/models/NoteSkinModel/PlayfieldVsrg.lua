@@ -218,7 +218,6 @@ PlayfieldVsrg.addDeltaTimeJudgement = function(self, object)
 	end
 	return self:add({
 		class = "DeltaTimeJudgementView",
-		key = "gameController.rhythmModel.scoreEngine.scoreSystem.misc",
 		judgements = judgements
 	})
 end
