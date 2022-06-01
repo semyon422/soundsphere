@@ -91,7 +91,7 @@ ShortLogicalNote.isReachable = function(self, currentNote)
 	return isReachable
 end
 
-ShortLogicalNote.receive = function(self, event, isRec)
+ShortLogicalNote.receive = function(self, event)
 	if self.logicEngine.autoplay then
 		return
 	end

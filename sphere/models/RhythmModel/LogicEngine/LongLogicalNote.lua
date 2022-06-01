@@ -26,13 +26,6 @@ LongLogicalNote.update = function(self)
 	local startTimeState = self:getStartTimeState()
 	local endTimeState = self:getEndTimeState()
 	self:processTimeState(startTimeState, endTimeState)
-
-	-- if self.ended then
-	-- 	local nextNote = self:getNextPlayable()
-	-- 	if nextNote then
-	-- 		return nextNote:update()
-	-- 	end
-	-- end
 end
 
 LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
@@ -45,6 +38,10 @@ LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
 	elseif lastState == "clear" then
 		if startTimeState == "too late" then
 			self:switchState("startMissed")
+			if endTimeState == "too late" then
+				self:switchState("endMissed")
+				return self:next()
+			end
 		elseif keyState then
 			if startTimeState == "early" or startTimeState == "late" then
 				self:switchState("startMissedPressed")
@@ -92,8 +89,8 @@ LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
 	end
 
 	local nextNote = self:getNextPlayable()
-	if self.state == "startMissed" and (not nextNote or nextNote:isReachable(self)) then
-		self:switchState("endMissed")
+	if self.state == "startMissed" and nextNote and nextNote:isReachable(self) then
+		self:switchState("endMissed", nextNote)
 		return self:next()
 	end
 end
@@ -115,7 +112,7 @@ local scoreEvent = {
 	name = "NoteState",
 	noteType = "LongNote",
 }
-LongLogicalNote.switchState = function(self, newState)
+LongLogicalNote.switchState = function(self, newState, nextNote)
 	local oldState = self.state
 	self.state = newState
 
@@ -134,6 +131,10 @@ LongLogicalNote.switchState = function(self, newState)
 		currentTime = math.min(eventTime, self:getNoteTime("end") + self:getLastTimeFromConfig(config.endHit, config.endMiss) * timeRate)
 	end
 
+	if nextNote then
+		local config = self.logicEngine.timings.ShortNote
+		currentTime = math.min(currentTime, nextNote:getNoteTime("start") + self:getFirstTimeFromConfig(config.hit, config.miss) * timeRate)
+	end
 
 	scoreEvent.currentTime = currentTime
 	scoreEvent.noteStartTime = self:getNoteTime("start")

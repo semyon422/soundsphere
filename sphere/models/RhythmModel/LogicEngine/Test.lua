@@ -141,6 +141,8 @@ local function test(notes, events, states)
 		end
 	end
 
+	-- print(require("inspect")(newStates))
+
 	if not states then return end
 	assert(#states == #newStates)
 	for i, event in ipairs(newStates) do
@@ -150,21 +152,103 @@ local function test(notes, events, states)
 	end
 end
 
+--[[
+	Specs:
+
+	press, release or update can change many states on one call
+	press and release can affect the time of only one state change
+	update should not affect the time of any state change
+]]
+
+-- 1 short note tests
+
 test(
 	{0},
+	{{-1, "p"}},
+	{{-1, "clear", "clear"}}
+)
+
+test(
+	{0},
+	{{-0.15, "p"}},
+	{{-0.15, "clear", "missed"}}
+)
+
+test(
+	{0},
+	{{0, "p"}},
+	{{0, "clear", "passed"}}
+)
+
+test(
+	{0},
+	{{0.15, "p"}},
+	{{0.15, "clear", "missed"}}
+)
+
+test(
+	{0},
+	{{0.25, "p"}},
+	{{0.2, "clear", "missed"}}
+)
+
+test(
+	{0},
+	{{1, "tu"}},
+	{{0.2, "clear", "missed"}}
+)
+
+-- 2 short notes tests
+
+test(
+	{0, 0.3},
+	{{0.15, "pp"}},
 	{
-		{1, "tu"},
-	},
-	{
-		{0.2, "clear", "missed"},
+		{0.15, "clear", "missed"},
+		{0.15, "clear", "missed"},
 	}
 )
 
 test(
-	{{0, 1}},
+	{0, 0.15},
+	{{0.075, "pp"}},
 	{
-		{2, "tu"},
-	},
+		{0.075, "clear", "passed"},
+		{0.075, "clear", "passed"},
+	}
+)
+
+test(
+	{0, 0.25},
+	{{0.25, "p"}},
+	{
+		{0.2, "clear", "missed"},
+		{0.25, "clear", "passed"},
+	}
+)
+
+test(
+	{0, 0.15},
+	{{0.15, "p"}},
+	{
+		{0.15, "clear", "missed"},
+	}
+)
+
+test(
+	{0, 0.15},
+	{{0.15, "pp"}},
+	{
+		{0.15, "clear", "missed"},
+		{0.15, "clear", "passed"},
+	}
+)
+
+-- 1 long note tests
+
+test(
+	{{0, 1}},
+	{{2, "tu"}},
 	{
 		{0.2, "clear", "startMissed"},
 		{1.2, "startMissed", "endMissed"},
@@ -172,13 +256,139 @@ test(
 )
 
 test(
-	{{0, 1}, 1},
+	{{0, 1}},
+	{{0, "p"}, {1, "r"}},
 	{
-		{1, "p"},
-	},
+		{0, "clear", "startPassedPressed"},
+		{1, "startPassedPressed", "endPassed"},
+	}
+)
+
+test(
+	{{0, 1}},
+	{{-1, "p"}, {1, "r"}, {2, "tu"}},
+	{
+		{-1, "clear", "clear"},
+		{0.2, "clear", "startMissed"},
+		{1.2, "startMissed", "endMissed"},
+	}
+)
+
+test(
+	{{0, 1}},
+	{{-0.15, "p"}},
+	{{-0.15, "clear", "startMissedPressed"}}
+)
+
+test(
+	{{0, 1}},
+	{{0.15, "p"}},
+	{{0.15, "clear", "startMissedPressed"}}
+)
+
+test(
+	{{0, 1}},
+	{{0.5, "p"}},
 	{
 		{0.2, "clear", "startMissed"},
-		{1, "startMissed", "endMissed"},
+		{0.5, "startMissed", "startMissedPressed"},
+	}
+)
+
+test(
+	{{0, 1}},
+	{{0, "p"}, {0.85, "r"}},
+	{
+		{0, "clear", "startPassedPressed"},
+		{0.85, "startPassedPressed", "endMissed"},
+	}
+)
+
+test(
+	{{0, 1}},
+	{{0, "p"}, {1.15, "r"}},
+	{
+		{0, "clear", "startPassedPressed"},
+		{1.15, "startPassedPressed", "endMissed"},
+	}
+)
+
+test(
+	{{0, 1}},
+	{{0, "p"}, {1.25, "r"}},
+	{
+		{0, "clear", "startPassedPressed"},
+		{1.2, "startPassedPressed", "endMissed"},
+	}
+)
+
+test(
+	{{0, 1}},
+	{{0, "p"}, {0.85, "r"}},
+	{
+		{0, "clear", "startPassedPressed"},
+		{0.85, "startPassedPressed", "endMissed"},
+	}
+)
+
+-- long note + short note tests
+
+test(
+	{{0, 1}, 1},
+	{{0, "p"}, {1, "r"}, {1, "p"}},
+	{
+		{0, "clear", "startPassedPressed"},
+		{1, "startPassedPressed", "endPassed"},
 		{1, "clear", "passed"},
+	}
+)
+
+test(
+	{{0, 1}, 1},
+	{{1, "tu"}},
+	{
+		{0.2, "clear", "startMissed"},
+		{0.8, "startMissed", "endMissed"},
+	}
+)
+
+test(
+	{{0, 1}, 1},
+	{{2, "tu"}},
+	{
+		{0.2, "clear", "startMissed"},
+		{1.2, "startMissed", "endMissed"},
+		{1.2, "clear", "missed"},
+	}
+)
+
+test(
+	{{0, 1}, 1},
+	{{1, "p"}},
+	{
+		{0.2, "clear", "startMissed"},
+		{0.8, "startMissed", "endMissed"},
+		{1, "clear", "passed"},
+	}
+)
+
+test(
+	{{0, 1}, 1},
+	{{-1, "p"}, {1, "r"}},
+	{
+		{-1, "clear", "clear"},
+		{0.2, "clear", "startMissed"},
+		{0.8, "startMissed", "endMissed"},
+	}
+)
+
+test(
+	{{0, 1}, {2, 3}},
+	{{4, "tu"}},
+	{
+		{0.2, "clear", "startMissed"},
+		{1.2, "startMissed", "endMissed"},
+		{2.2, "clear", "startMissed"},
+		{3.2, "startMissed", "endMissed"},
 	}
 )
