@@ -44,7 +44,7 @@ ProMode.receive = function(self, config, event)
 				currentNote.startNoteData.timePoint.absoluteTime < nearestNote.startNoteData.timePoint.absoluteTime
 			) and
 			not currentNote.ended and
-			currentNote:isReachable(currentNote) and
+			currentNote:isReachable(currentNote:getEventTime()) and
 			not currentNote.autoplay and
 			(
 				currentNote.startNoteData.noteType == "ShortNote" or

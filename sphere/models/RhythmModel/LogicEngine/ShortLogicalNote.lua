@@ -52,9 +52,16 @@ ShortLogicalNote.switchState = function(self, newState)
 	end
 
 	local config = self.logicEngine.timings.ShortNote
-	local currentTime = math.min(self.eventTime or self.timeEngine.currentTime, self:getNoteTime() + self:getLastTimeFromConfig(config.hit, config.miss) * math.abs(self.timeEngine.timeRate))
+	local eventTime = self:getEventTime()
+	local timeRate = math.abs(self.timeEngine.timeRate)
+
+	local lastTime = self:getLastTimeFromConfig(config.hit, config.miss)
+	local time = self:getNoteTime() + lastTime * timeRate
+	local currentTime = math.min(eventTime, time)
+	local deltaTime = currentTime == time and lastTime or (currentTime - self:getNoteTime()) / timeRate
 
 	scoreEvent.currentTime = currentTime
+	scoreEvent.deltaTime = deltaTime
 	scoreEvent.noteTime = self:getNoteTime()
 	scoreEvent.timeRate = self.timeEngine.timeRate
 	scoreEvent.notesCount = self.logicEngine.notesCount
@@ -83,9 +90,9 @@ ShortLogicalNote.getTimeState = function(self)
 	return self:getTimeStateFromConfig(config.hit, config.miss, deltaTime)
 end
 
-ShortLogicalNote.isReachable = function(self, currentNote)
+ShortLogicalNote.isReachable = function(self, _eventTime)
 	local eventTime = self.eventTime
-	self.eventTime = currentNote:getEventTime()
+	self.eventTime = _eventTime
 	local isReachable = self:getTimeState() ~= "too early"
 	self.eventTime = eventTime
 	return isReachable

@@ -11,8 +11,8 @@ MiscScoreSystem.construct = function(self)
 	self.earlylate = 0
 end
 
-MiscScoreSystem.hit = function(self, event, timeKey)
-	local deltaTime = (event.currentTime - event[timeKey]) / math.abs(event.timeRate)
+MiscScoreSystem.hit = function(self, event)
+	local deltaTime = event.deltaTime
 	self.deltaTime = deltaTime
 	if math.abs(deltaTime) > math.abs(self.maxDeltaTime) then
 		self.maxDeltaTime = deltaTime
@@ -24,8 +24,8 @@ MiscScoreSystem.hit = function(self, event, timeKey)
 	self.earlylate = (counters.earlylate.early or 0) / (counters.earlylate.late or 1)
 end
 
-MiscScoreSystem.miss = function(self, event, timeKey)
-	self.deltaTime = (event.currentTime - event[timeKey]) / math.abs(event.timeRate)
+MiscScoreSystem.miss = function(self, event)
+	self.deltaTime = event.deltaTime
 end
 
 MiscScoreSystem.early = function(self)
@@ -35,31 +35,31 @@ end
 MiscScoreSystem.notes = {
 	ShortNote = {
 		clear = {
-			passed = function(self, event) self:hit(event, "noteTime") end,
-			missed = function(self, event) self:miss(event, "noteTime") end,
+			passed = function(self, event) self:hit(event) end,
+			missed = function(self, event) self:miss(event) end,
 			clear = MiscScoreSystem.early,
 		},
 	},
 	LongNote = {
 		clear = {
-			startPassedPressed = function(self, event) self:hit(event, "noteStartTime") end,
-			startMissed = function(self, event) self:miss(event, "noteStartTime") end,
-			startMissedPressed = function(self, event) self:miss(event, "noteStartTime") end,
+			startPassedPressed = function(self, event) self:hit(event) end,
+			startMissed = function(self, event) self:miss(event) end,
+			startMissedPressed = function(self, event) self:miss(event) end,
 			clear = MiscScoreSystem.early,
 		},
 		startPassedPressed = {
 			startMissed = nil,
-			endMissed = function(self, event) self:miss(event, "noteEndTime") end,
-			endPassed = function(self, event) self:hit(event, "noteEndTime") end,
+			endMissed = function(self, event) self:miss(event) end,
+			endPassed = function(self, event) self:hit(event) end,
 		},
 		startMissedPressed = {
-			endMissedPassed = function(self, event) self:hit(event, "noteEndTime") end,
+			endMissedPassed = function(self, event) self:hit(event) end,
 			startMissed = nil,
-			endMissed = function(self, event) self:miss(event, "noteEndTime") end,
+			endMissed = function(self, event) self:miss(event) end,
 		},
 		startMissed = {
 			startMissedPressed = nil,
-			endMissed = function(self, event) self:miss(event, "noteEndTime") end,
+			endMissed = function(self, event) self:miss(event) end,
 		},
 	},
 }

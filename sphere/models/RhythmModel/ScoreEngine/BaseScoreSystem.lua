@@ -75,11 +75,9 @@ BaseScoreSystem.earlyHit = function(self)
 	self.earlyHitCount = self.earlyHitCount + 1
 end
 
-BaseScoreSystem.countLastMean = function(self, event, timeKey)
-	local deltaTime = (event.currentTime - event[timeKey]) / math.abs(event.timeRate)
-
+BaseScoreSystem.countLastMean = function(self, event)
 	local rb = self.meanRingBuffer
-	rb:write(deltaTime)
+	rb:write(event.deltaTime)
 	local sum = 0
 	for i = 1, rb.size do
 		sum = sum + rb:read()
@@ -90,14 +88,14 @@ end
 BaseScoreSystem.notes = {
 	ShortNote = {
 		clear = {
-			passed = {BaseScoreSystem.success, function(self, event) self:countLastMean(event, "noteTime") end},
+			passed = {BaseScoreSystem.success, function(self, event) self:countLastMean(event) end},
 			missed = {BaseScoreSystem.breakCombo, BaseScoreSystem.miss},
 			clear = BaseScoreSystem.earlyHit,
 		},
 	},
 	LongNote = {
 		clear = {
-			startPassedPressed = function(self, event) self:countLastMean(event, "noteStartTime") end,
+			startPassedPressed = function(self, event) self:countLastMean(event) end,
 			startMissed = BaseScoreSystem.breakComboLongNote,
 			startMissedPressed = BaseScoreSystem.breakComboLongNote,
 			clear = BaseScoreSystem.earlyHit,
@@ -105,10 +103,10 @@ BaseScoreSystem.notes = {
 		startPassedPressed = {
 			startMissed = BaseScoreSystem.breakComboLongNote,
 			endMissed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
-			endPassed = {BaseScoreSystem.success, function(self, event) self:countLastMean(event, "noteEndTime") end},
+			endPassed = {BaseScoreSystem.success, function(self, event) self:countLastMean(event) end},
 		},
 		startMissedPressed = {
-			endMissedPassed = {BaseScoreSystem.success, function(self, event) self:countLastMean(event, "noteEndTime") end},
+			endMissedPassed = {BaseScoreSystem.success, function(self, event) self:countLastMean(event) end},
 			startMissed = BaseScoreSystem.breakComboLongNote,
 			endMissed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
 		},

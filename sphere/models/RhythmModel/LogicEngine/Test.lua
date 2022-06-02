@@ -126,6 +126,13 @@ local function test(notes, events, states)
 		logicEngine:update()
 	end
 
+	-- for t = events[1][1], events[#events][1], 0.01 do
+	-- 	table.insert(events, {t, "tu"})
+	-- end
+	-- table.sort(events, function(a, b) return a[1] < b[1] end)
+
+	-- print(require("inspect")(events))
+
 	for _, event in ipairs(events) do
 		local time = event[1]
 		for char in event[2]:gmatch(".") do
@@ -335,7 +342,7 @@ test(
 
 test(
 	{{0, 1}, 1},
-	{{0, "p"}, {1, "r"}, {1, "p"}},
+	{{0, "p"}, {1, "rp"}},
 	{
 		{0, "clear", "startPassedPressed"},
 		{1, "startPassedPressed", "endPassed"},
@@ -357,7 +364,7 @@ test(
 	{{2, "tu"}},
 	{
 		{0.2, "clear", "startMissed"},
-		{1.2, "startMissed", "endMissed"},
+		{0.8, "startMissed", "endMissed"},
 		{1.2, "clear", "missed"},
 	}
 )
@@ -379,6 +386,26 @@ test(
 		{-1, "clear", "clear"},
 		{0.2, "clear", "startMissed"},
 		{0.8, "startMissed", "endMissed"},
+	}
+)
+
+test(
+	{{0, 1}, 1},
+	{{1, "tu"}, {10, "tu"}},
+	{
+		{0.2, "clear", "startMissed"},
+		{0.8, "startMissed", "endMissed"},
+		{1.2, "clear", "missed"},
+	}
+)
+
+test(
+	{{0, 1}, 1},
+	{{10, "tu"}},
+	{
+		{0.2, "clear", "startMissed"},
+		{0.8, "startMissed", "endMissed"},
+		{1.2, "clear", "missed"},
 	}
 )
 

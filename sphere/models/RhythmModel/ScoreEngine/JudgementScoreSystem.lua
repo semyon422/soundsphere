@@ -93,12 +93,10 @@ JudgementScoreSystem.getJudgement = function(_, judgements, deltaTime)
 	end
 end
 
-JudgementScoreSystem.hit = function(self, event, timeKey)
-	local deltaTime = (event.currentTime - event[timeKey]) / math.abs(event.timeRate)
-
+JudgementScoreSystem.hit = function(self, event)
 	local counters = self.counters
 	for name, judgements in pairs(self.judgements) do
-		local judgement = self:getJudgement(judgements, deltaTime)
+		local judgement = self:getJudgement(judgements, event.deltaTime)
 		if judgement then
 			if type(judgement) == "string" then
 				counters[name][judgement] = counters[name][judgement] + 1
@@ -116,29 +114,29 @@ end
 JudgementScoreSystem.notes = {
 	ShortNote = {
 		clear = {
-			passed = function(self, event) self:hit(event, "noteTime") end,
-			missed = function(self, event) self:hit(event, "noteTime") end,
+			passed = function(self, event) self:hit(event) end,
+			missed = function(self, event) self:hit(event) end,
 		},
 	},
 	LongNote = {
 		clear = {
-			startPassedPressed = function(self, event) self:hit(event, "noteStartTime") end,
-			startMissed = function(self, event) self:hit(event, "noteStartTime") end,
-			startMissedPressed = function(self, event) self:hit(event, "noteStartTime") end,
+			startPassedPressed = function(self, event) self:hit(event) end,
+			startMissed = function(self, event) self:hit(event) end,
+			startMissedPressed = function(self, event) self:hit(event) end,
 		},
 		startPassedPressed = {
 			startMissed = nil,
-			endMissed = function(self, event) self:hit(event, "noteEndTime") end,
-			endPassed = function(self, event) self:hit(event, "noteEndTime") end,
+			endMissed = function(self, event) self:hit(event) end,
+			endPassed = function(self, event) self:hit(event) end,
 		},
 		startMissedPressed = {
-			endMissedPassed = function(self, event) self:hit(event, "noteEndTime") end,
+			endMissedPassed = function(self, event) self:hit(event) end,
 			startMissed = nil,
-			endMissed = function(self, event) self:hit(event, "noteEndTime") end,
+			endMissed = function(self, event) self:hit(event) end,
 		},
 		startMissed = {
 			startMissedPressed = nil,
-			endMissed = function(self, event) self:hit(event, "noteEndTime") end,
+			endMissed = function(self, event) self:hit(event) end,
 		},
 	},
 }

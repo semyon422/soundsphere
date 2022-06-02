@@ -37,9 +37,7 @@ NormalscoreScoreSystem.after = function(self, event)
 end
 
 NormalscoreScoreSystem.hit = function(self, event, timeKey)
-	local deltaTime = (event.currentTime - event[timeKey]) / math.abs(event.timeRate)
-
-	self.normalscore:press(deltaTime, assert(rangeNames[timeKey]))
+	self.normalscore:press(event.deltaTime, assert(rangeNames[timeKey]))
 end
 
 NormalscoreScoreSystem.miss = function(self, timeKey)
