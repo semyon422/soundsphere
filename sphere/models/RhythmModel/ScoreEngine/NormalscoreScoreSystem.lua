@@ -5,20 +5,14 @@ local NormalscoreScoreSystem = ScoreSystem:new()
 
 NormalscoreScoreSystem.name = "normalscore"
 
-local rangeNames = {
-	noteTime = 1,
-	noteStartTime = 2,
-	noteEndTime = 3,
-}
-
 NormalscoreScoreSystem.load = function(self)
 	local timings = self.scoreEngine.timings
-	local ranges = {
-		{timings.ShortNote.hit[1], timings.ShortNote.hit[2]},
-		{timings.LongNote.startHit[1], timings.LongNote.startHit[2]},
-		{timings.LongNote.endHit[1], timings.LongNote.endHit[2]},
+	self.ranges = {
+		ShortNote = {timings.ShortNote.hit[1], timings.ShortNote.hit[2]},
+		LongNoteStart = {timings.LongNote.startHit[1], timings.LongNote.startHit[2]},
+		LongNoteEnd = {timings.LongNote.endHit[1], timings.LongNote.endHit[2]},
 	}
-	self.normalscore = normalscore:new(ranges)
+	self.normalscore = normalscore:new()
 end
 
 NormalscoreScoreSystem.after = function(self, event)
@@ -37,39 +31,39 @@ NormalscoreScoreSystem.after = function(self, event)
 end
 
 NormalscoreScoreSystem.hit = function(self, event, timeKey)
-	self.normalscore:press(event.deltaTime, assert(rangeNames[timeKey]))
+	self.normalscore:press(event.deltaTime, assert(self.ranges[timeKey]))
 end
 
 NormalscoreScoreSystem.miss = function(self, timeKey)
-	self.normalscore:press(math.huge, assert(rangeNames[timeKey]))
+	self.normalscore:press(math.huge, assert(self.ranges[timeKey]))
 end
 
 NormalscoreScoreSystem.notes = {
 	ShortNote = {
 		clear = {
-			passed = function(self, event) self:hit(event, "noteTime") end,
-			missed = function(self) self:miss("noteTime") end,
+			passed = function(self, event) self:hit(event, "ShortNote") end,
+			missed = function(self) self:miss("ShortNote") end,
 		},
 	},
 	LongNote = {
 		clear = {
-			startPassedPressed = function(self, event) self:hit(event, "noteStartTime") end,
-			startMissed = function(self) self:miss("noteStartTime") end,
-			startMissedPressed = function(self) self:miss("noteStartTime") end,
+			startPassedPressed = function(self, event) self:hit(event, "LongNoteStart") end,
+			startMissed = function(self) self:miss("LongNoteStart") end,
+			startMissedPressed = function(self) self:miss("LongNoteStart") end,
 		},
 		startPassedPressed = {
 			startMissed = nil,
-			endMissed = function(self) self:miss("noteEndTime") end,
-			endPassed = function(self, event) self:hit(event, "noteEndTime") end,
+			endMissed = function(self) self:miss("LongNoteEnd") end,
+			endPassed = function(self, event) self:hit(event, "LongNoteEnd") end,
 		},
 		startMissedPressed = {
-			endMissedPassed = function(self, event) self:hit(event, "noteEndTime") end,
+			endMissedPassed = function(self, event) self:hit(event, "LongNoteEnd") end,
 			startMissed = nil,
-			endMissed = function(self) self:miss("noteEndTime") end,
+			endMissed = function(self) self:miss("LongNoteEnd") end,
 		},
 		startMissed = {
 			startMissedPressed = nil,
-			endMissed = function(self) self:miss("noteEndTime") end,
+			endMissed = function(self) self:miss("LongNoteEnd") end,
 		},
 	},
 }
