@@ -169,6 +169,7 @@ end
 
 -- 1 short note tests
 
+local function test1sn()
 test(
 	{0},
 	{{-1, "p"}},
@@ -204,6 +205,7 @@ test(
 	{{1, "tu"}},
 	{{0.2, "clear", "missed"}}
 )
+end
 
 -- 2 short notes tests
 
@@ -253,6 +255,7 @@ test(
 
 -- 1 long note tests
 
+local function test1ln()
 test(
 	{{0, 1}},
 	{{2, "tu"}},
@@ -337,9 +340,11 @@ test(
 		{0.85, "startPassedPressed", "endMissed"},
 	}
 )
+end
 
 -- long note + short note tests
 
+local function test1lnsn()
 test(
 	{{0, 1}, 1},
 	{{0, "p"}, {1, "rp"}},
@@ -417,5 +422,109 @@ test(
 		{1.2, "startMissed", "endMissed"},
 		{2.2, "clear", "startMissed"},
 		{3.2, "startMissed", "endMissed"},
+	}
+)
+end
+
+-- nearest logic
+
+logicEngine.timings.nearest = true
+
+test1sn()
+
+-- 2 short notes tests
+
+test(
+	{0, 0.3},
+	{{0.14, "pp"}},
+	{
+		{0.14, "clear", "missed"},
+		{0.14, "clear", "missed"},
+	}
+)
+
+test(
+	{0, 0.3},
+	{{0.16, "p"}},
+	{
+		{0.15, "clear", "missed"},
+		{0.16, "clear", "missed"},
+	}
+)
+
+test(
+	{0, 0.3},
+	{{0.15, "pp"}},
+	{
+		{0.15, "clear", "missed"},
+		{0.15, "clear", "missed"},
+	}
+)
+
+test(
+	{0, 0.15},
+	{{0.075, "pp"}},
+	{
+		{0.075, "clear", "passed"},
+		{0.075, "clear", "passed"},
+	}
+)
+
+test(
+	{0, 0.15},
+	{{0.07, "pp"}},
+	{
+		{0.07, "clear", "passed"},
+		{0.07, "clear", "passed"},
+	}
+)
+
+test(
+	{0, 0.15},
+	{{0.08, "pp"}},
+	{
+		{0.075, "clear", "missed"},
+		{0.08, "clear", "passed"},
+	}
+)
+
+test(
+	{0, 0.25},
+	{{0.25, "p"}},
+	{
+		{0.125, "clear", "missed"},
+		{0.25, "clear", "passed"},
+	}
+)
+
+test(
+	{0, 0.15},
+	{{0.15, "p"}},
+	{
+		{0.075, "clear", "missed"},
+		{0.15, "clear", "passed"},
+	}
+)
+
+test1ln()
+test1lnsn()
+
+test(
+	{{0, 0.1}, 0.1},
+	{{0.04, "pr"}, {0.1, "p"}},
+	{
+		{0.04, "clear", "startPassedPressed"},
+		{0.04, "startPassedPressed", "endPassed"},
+		{0.1, "clear", "passed"},
+	}
+)
+
+test(
+	{{0, 0.1}, 0.1},
+	{{0.06, "p"}},
+	{
+		{0.05, "clear", "startMissed"},
+		{-0.1, "startMissed", "endMissed"},
+		{0.06, "clear", "passed"},
 	}
 )

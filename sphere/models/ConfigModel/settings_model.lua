@@ -18,6 +18,12 @@ local settings = {
 		format = "%0.2f",
 	},
 	{
+		name = "nearest input",
+		section = "gameplay",
+		key = "gameplay.timings.nearest",
+		type = "Checkbox",
+	},
+	{
 		name = "pause on fail",
 		section = "gameplay",
 		key = "gameplay.pauseOnFail",

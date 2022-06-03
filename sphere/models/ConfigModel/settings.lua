@@ -48,6 +48,7 @@ return {
 			prepare = 2
 		},
 		timings = {
+			nearest = false,
 			ShortNote = {
 				hit = {-0.12, 0.12},
 				miss = {-0.16, 0.16}
