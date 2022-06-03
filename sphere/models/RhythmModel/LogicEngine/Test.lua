@@ -206,6 +206,7 @@ test(
 	{{0.2, "clear", "missed"}}
 )
 end
+test1sn()
 
 -- 2 short notes tests
 
@@ -341,6 +342,7 @@ test(
 	}
 )
 end
+test1ln()
 
 -- long note + short note tests
 
@@ -425,6 +427,7 @@ test(
 	}
 )
 end
+test1lnsn()
 
 -- nearest logic
 
