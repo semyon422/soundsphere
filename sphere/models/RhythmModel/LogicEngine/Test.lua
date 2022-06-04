@@ -17,6 +17,7 @@ local timeEngine = {
 	inputOffset = 0,
 	timer = {isPlaying = true}
 }
+logicEngine.timeEngine = timeEngine
 rhythmModel.timeEngine = timeEngine
 
 logicEngine.timings = {
@@ -94,10 +95,8 @@ local function test(notes, events, states)
 			local eventCopy = {
 				currentTime = event.currentTime,
 				newState = event.newState,
-				noteEndTime = event.noteEndTime,
-				noteStartTime = event.noteStartTime,
-				noteType = event.noteType,
 				oldState = event.oldState,
+				noteIndex = event.noteIndex,
 			}
 			-- print(inspect(eventCopy))
 			table.insert(newStates, eventCopy)
@@ -126,6 +125,8 @@ local function test(notes, events, states)
 		logicEngine:update()
 	end
 
+	-- print("TEST")
+
 	-- for t = events[1][1], events[#events][1], 0.01 do
 	-- 	table.insert(events, {t, "tu"})
 	-- end
@@ -148,6 +149,7 @@ local function test(notes, events, states)
 		end
 	end
 
+	-- print(require("inspect")(states))
 	-- print(require("inspect")(newStates))
 
 	if not states then return end
@@ -156,6 +158,9 @@ local function test(notes, events, states)
 		assert(event.currentTime == states[i][1])
 		assert(event.oldState == states[i][2])
 		assert(event.newState == states[i][3])
+		if states[i][4] then
+			assert(event.noteIndex == states[i][4])
+		end
 	end
 end
 
@@ -214,8 +219,8 @@ test(
 	{0, 0.3},
 	{{0.15, "pp"}},
 	{
-		{0.15, "clear", "missed"},
-		{0.15, "clear", "missed"},
+		{0.15, "clear", "missed", 1},
+		{0.15, "clear", "missed", 2},
 	}
 )
 
@@ -223,8 +228,8 @@ test(
 	{0, 0.15},
 	{{0.075, "pp"}},
 	{
-		{0.075, "clear", "passed"},
-		{0.075, "clear", "passed"},
+		{0.075, "clear", "passed", 1},
+		{0.075, "clear", "passed", 2},
 	}
 )
 
@@ -232,8 +237,8 @@ test(
 	{0, 0.25},
 	{{0.25, "p"}},
 	{
-		{0.2, "clear", "missed"},
-		{0.25, "clear", "passed"},
+		{0.2, "clear", "missed", 1},
+		{0.25, "clear", "passed", 2},
 	}
 )
 
@@ -241,7 +246,7 @@ test(
 	{0, 0.15},
 	{{0.15, "p"}},
 	{
-		{0.15, "clear", "missed"},
+		{0.15, "clear", "missed", 1},
 	}
 )
 
@@ -249,8 +254,8 @@ test(
 	{0, 0.15},
 	{{0.15, "pp"}},
 	{
-		{0.15, "clear", "missed"},
-		{0.15, "clear", "passed"},
+		{0.15, "clear", "missed", 1},
+		{0.15, "clear", "passed", 2},
 	}
 )
 
@@ -429,6 +434,8 @@ test(
 end
 test1lnsn()
 
+-- do return end
+
 -- nearest logic
 
 logicEngine.timings.nearest = true
@@ -441,17 +448,17 @@ test(
 	{0, 0.3},
 	{{0.14, "pp"}},
 	{
-		{0.14, "clear", "missed"},
-		{0.14, "clear", "missed"},
+		{0.14, "clear", "missed", 1},
+		{0.14, "clear", "missed", 2},
 	}
 )
 
 test(
 	{0, 0.3},
-	{{0.16, "p"}},
+	{{0.16, "pp"}},
 	{
-		{0.15, "clear", "missed"},
-		{0.16, "clear", "missed"},
+		{0.16, "clear", "missed", 2},
+		{0.16, "clear", "missed", 1},
 	}
 )
 
@@ -459,8 +466,8 @@ test(
 	{0, 0.3},
 	{{0.15, "pp"}},
 	{
-		{0.15, "clear", "missed"},
-		{0.15, "clear", "missed"},
+		{0.15, "clear", "missed", 1},
+		{0.15, "clear", "missed", 2},
 	}
 )
 
@@ -468,8 +475,8 @@ test(
 	{0, 0.15},
 	{{0.075, "pp"}},
 	{
-		{0.075, "clear", "passed"},
-		{0.075, "clear", "passed"},
+		{0.075, "clear", "passed", 1},
+		{0.075, "clear", "passed", 2},
 	}
 )
 
@@ -477,8 +484,8 @@ test(
 	{0, 0.15},
 	{{0.07, "pp"}},
 	{
-		{0.07, "clear", "passed"},
-		{0.07, "clear", "passed"},
+		{0.07, "clear", "passed", 1},
+		{0.07, "clear", "passed", 2},
 	}
 )
 
@@ -486,8 +493,8 @@ test(
 	{0, 0.15},
 	{{0.08, "pp"}},
 	{
-		{0.075, "clear", "missed"},
-		{0.08, "clear", "passed"},
+		{0.08, "clear", "passed", 2},
+		{0.08, "clear", "passed", 1},
 	}
 )
 
@@ -495,8 +502,8 @@ test(
 	{0, 0.25},
 	{{0.25, "p"}},
 	{
-		{0.125, "clear", "missed"},
-		{0.25, "clear", "passed"},
+		{0.2, "clear", "missed", 1},
+		{0.25, "clear", "passed", 2},
 	}
 )
 
@@ -504,8 +511,16 @@ test(
 	{0, 0.15},
 	{{0.15, "p"}},
 	{
-		{0.075, "clear", "missed"},
-		{0.15, "clear", "passed"},
+		{0.15, "clear", "passed", 2},
+	}
+)
+
+test(
+	{0, 0.15},
+	{{0.15, "pp"}},
+	{
+		{0.15, "clear", "passed", 2},
+		{0.15, "clear", "missed", 1},
 	}
 )
 
@@ -526,8 +541,37 @@ test(
 	{{0, 0.1}, 0.1},
 	{{0.06, "p"}},
 	{
-		{0.05, "clear", "startMissed"},
-		{-0.1, "startMissed", "endMissed"},
 		{0.06, "clear", "passed"},
+	}
+)
+
+test(
+	{{0, 0.1}, 0.1},
+	{{0.06, "ppr"}},
+	{
+		{0.06, "clear", "passed"},
+		{0.06, "clear", "startPassedPressed"},
+		{0.06, "startPassedPressed", "endPassed"},
+	}
+)
+
+test(
+	{0, 0.01, 0.02},
+	{{0.01, "ppp"}},
+	{
+		{0.01, "clear", "passed", 2},
+		{0.01, "clear", "passed", 1},
+		{0.01, "clear", "passed", 3},
+	}
+)
+
+
+test(
+	{0, 0.01, 0.02},
+	{{0.01, "ppp"}},
+	{
+		{0.01, "clear", "passed", 2},
+		{0.01, "clear", "passed", 1},
+		{0.01, "clear", "passed", 3},
 	}
 )

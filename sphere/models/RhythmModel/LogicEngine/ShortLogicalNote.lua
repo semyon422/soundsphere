@@ -58,19 +58,12 @@ ShortLogicalNote.switchState = function(self, newState)
 	local noteTime = self:getNoteTime()
 
 	local lastTime = self:getLastTimeFromConfig(config.hit, config.miss)
-	local baseLastTime = lastTime
 	local time = noteTime + lastTime * timeRate
 
-	local nextNote = self:getNextPlayable()
-	if timings.nearest and nextNote then
-		local nextTime = nextNote:getNoteTime()
-		lastTime = (nextTime - noteTime) / 2
-		time = math.min(time, noteTime + lastTime)
-	end
-
 	local currentTime = math.min(eventTime, time)
-	local deltaTime = currentTime == time and baseLastTime or (currentTime - noteTime) / timeRate
+	local deltaTime = currentTime == time and lastTime or (currentTime - noteTime) / timeRate
 
+	scoreEvent.noteIndex = self.index
 	scoreEvent.currentTime = currentTime
 	scoreEvent.deltaTime = deltaTime
 	scoreEvent.noteTime = self:getNoteTime()
@@ -96,16 +89,8 @@ end
 
 ShortLogicalNote.getTimeState = function(self)
 	local timings = self.logicEngine.timings
-	local currentTime = self:getEventTime()
+	local currentTime = self.logicEngine:getEventTime()
 	local noteTime = self:getNoteTime()
-
-	local nextNote = self:getNextPlayable()
-	if timings.nearest and nextNote then
-		local nextTime = nextNote:getNoteTime()
-		if 2 * currentTime > nextTime + noteTime then  -- map(currentTime, noteTime, nextTime, 0, 1) > 0.5
-			return "too late"
-		end
-	end
 
 	local deltaTime = (currentTime - noteTime) / math.abs(self.timeEngine.timeRate)
 	local config = timings.ShortNote

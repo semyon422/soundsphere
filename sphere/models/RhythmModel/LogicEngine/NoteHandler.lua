@@ -49,46 +49,89 @@ NoteHandler.loadNoteData = function(self)
 	end
 
 	self.startNoteIndex = 1
+	self.endNoteIndex = 1
 	self.currentNote = self.noteData[1]
 	if not self.currentNote then return end
 	self.currentNote:load()
 end
 
+NoteHandler.updateRange = function(self)
+	for i = self.startNoteIndex, #self.noteData do
+		local logicalNote = self.noteData[i]
+		if not logicalNote.ended then
+			self.startNoteIndex = i
+			break
+		end
+	end
+
+	local eventTime = self.logicEngine:getEventTime()
+	for i = self.endNoteIndex, #self.noteData do
+		local logicalNote = self.noteData[i]
+		if not logicalNote.ended and logicalNote:getNoteTime() >= eventTime then
+			self.endNoteIndex = i
+			break
+		end
+		if i == #self.noteData then
+			self.endNoteIndex = #self.noteData
+		end
+	end
+end
+
+NoteHandler.getCurrentNote = function(self)
+	self:updateRange()
+
+	for i = self.startNoteIndex, self.endNoteIndex do
+		local logicalNote = self.noteData[i]
+		if not logicalNote.ended and logicalNote.state ~= "clear" then
+			return logicalNote
+		end
+	end
+
+	local timings = self.logicEngine.timings
+	if not timings.nearest then
+		local logicalNote = self.noteData[self.startNoteIndex]
+		return not logicalNote.ended and logicalNote
+	end
+
+	local eventTime = self.logicEngine:getEventTime()
+
+	local nearestIndex
+	local nearestTime = math.huge
+	for i = self.startNoteIndex, self.endNoteIndex do
+		local logicalNote = self.noteData[i]
+		local noteTime = logicalNote:getNoteTime()
+		local time = math.abs(noteTime - eventTime)
+		if not logicalNote.ended and time < nearestTime then
+			nearestTime = time
+			nearestIndex = i
+		end
+	end
+
+	return self.noteData[nearestIndex]
+end
+
 NoteHandler.update = function(self)
-	local currentNote = self.currentNote
+	self:updateRange()
 
-	if not currentNote then return end
-	if not currentNote.ended then currentNote:update() end
-	if not currentNote.ended then return end
-
-	self:switchNext()
-	return self:update()
-end
-
-NoteHandler.switchNext = function(self)
-	local currentNote = self.currentNote
-	local nextNote = currentNote:getNext()
-	if nextNote then
-		currentNote:unload()
-		nextNote:load()
-		self.currentNote = nextNote
-	else
-		self.currentNote = nil
+	for i = self.startNoteIndex, self.endNoteIndex do
+		local logicalNote = self.noteData[i]
+		logicalNote:update()
 	end
 end
 
-NoteHandler.receive = function(self, event, count)
-	count = count or 0
-	local currentNote = self.currentNote
+NoteHandler.receive = function(self, event)
+	for i = self.startNoteIndex, self.endNoteIndex do
+		local logicalNote = self.noteData[i]
+		logicalNote.eventTime = event.time
+		logicalNote:update()
+		logicalNote.eventTime = nil
+	end
+
+	local currentNote = self:getCurrentNote()
 
 	if not currentNote then return end
-	if currentNote.ended then
-		self:switchNext()
-		return self:receive(event, count + 1)
-	end
 	if currentNote:receive(event) then
-		self:switchNext()
-		return self:receive(event, count + 1)
+		return self:receive(event)
 	end
 end
 

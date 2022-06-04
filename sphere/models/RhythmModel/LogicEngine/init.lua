@@ -30,14 +30,20 @@ LogicEngine.send = function(self, event)
 	return self.observable:send(event)
 end
 
+LogicEngine.getEventTime = function(self)
+	return self.eventTime or self.timeEngine.currentTime
+end
+
 LogicEngine.receive = function(self, event)
 	if not event.virtual or self.promode then
 		return
 	end
 
+	self.eventTime = event.time
 	for _, noteHandler in ipairs(self.noteHandlers) do
 		noteHandler:receive(event)
 	end
+	self.eventTime = nil
 end
 
 LogicEngine.getNoteHandler = function(self, inputType, inputIndex)
