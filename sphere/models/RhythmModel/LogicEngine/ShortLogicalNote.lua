@@ -52,12 +52,11 @@ ShortLogicalNote.switchState = function(self, newState)
 	end
 
 	local timings = self.logicEngine.timings
-	local config = timings.ShortNote
 	local timeRate = math.abs(self.timeEngine.timeRate)
 	local eventTime = self:getEventTime()
 	local noteTime = self:getNoteTime()
 
-	local lastTime = self:getLastTimeFromConfig(config.hit, config.miss)
+	local lastTime = self:getLastTimeFromConfig(timings.ShortNote)
 	local time = noteTime + lastTime * timeRate
 
 	local currentTime = math.min(eventTime, time)
@@ -90,10 +89,8 @@ ShortLogicalNote.processAuto = function(self)
 end
 
 ShortLogicalNote.getTimeState = function(self)
-	local currentTime = self:getEventTime()
-	local deltaTime = (currentTime - self:getNoteTime()) / math.abs(self.timeEngine.timeRate)
-	local config = self.logicEngine.timings.ShortNote
-	return self:getTimeStateFromConfig(config.hit, config.miss, deltaTime)
+	local deltaTime = (self:getEventTime() - self:getNoteTime()) / math.abs(self.timeEngine.timeRate)
+	return self:getTimeStateFromConfig(self.logicEngine.timings.ShortNote, deltaTime)
 end
 
 ShortLogicalNote.isReachable = function(self, _eventTime)

@@ -101,7 +101,7 @@ local settings = {
 	{
 		name = "long note start hit",
 		section = "gameplay",
-		key = "gameplay.timings.LongNote.startHit",
+		key = "gameplay.timings.LongNoteStart.hit",
 		type = "DragInt2",
 		range = {-0.5, 0.5},
 		format = "%d ms",
@@ -110,7 +110,7 @@ local settings = {
 	{
 		name = "long note end hit",
 		section = "gameplay",
-		key = "gameplay.timings.LongNote.endHit",
+		key = "gameplay.timings.LongNoteEnd.hit",
 		type = "DragInt2",
 		range = {-0.5, 0.5},
 		format = "%d ms",
@@ -128,7 +128,7 @@ local settings = {
 	{
 		name = "long note start miss",
 		section = "gameplay",
-		key = "gameplay.timings.LongNote.startMiss",
+		key = "gameplay.timings.LongNoteStart.miss",
 		type = "DragInt2",
 		range = {-0.5, 0.5},
 		format = "%d ms",
@@ -137,7 +137,7 @@ local settings = {
 	{
 		name = "long note end miss",
 		section = "gameplay",
-		key = "gameplay.timings.LongNote.endMiss",
+		key = "gameplay.timings.LongNoteEnd.miss",
 		type = "DragInt2",
 		range = {-0.5, 0.5},
 		format = "%d ms",

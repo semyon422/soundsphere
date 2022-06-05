@@ -9,8 +9,8 @@ NormalscoreScoreSystem.load = function(self)
 	local timings = self.scoreEngine.timings
 	self.ranges = {
 		ShortNote = {timings.ShortNote.hit[1], timings.ShortNote.hit[2]},
-		LongNoteStart = {timings.LongNote.startHit[1], timings.LongNote.startHit[2]},
-		LongNoteEnd = {timings.LongNote.endHit[1], timings.LongNote.endHit[2]},
+		LongNoteStart = {timings.LongNoteStart.hit[1], timings.LongNoteStart.hit[2]},
+		LongNoteEnd = {timings.LongNoteEnd.hit[1], timings.LongNoteEnd.hit[2]},
 	}
 	self.normalscore = normalscore:new()
 end

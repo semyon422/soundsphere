@@ -100,9 +100,8 @@ LongLogicalNote.tryNextNote = function(self)
 
 	local eventTime = self:getEventTime()
 	local timeRate = math.abs(self.timeEngine.timeRate)
-	local config = self.logicEngine.timings.LongNote
 
-	local lastTime = self:getLastTimeFromConfig(config.endHit, config.endMiss)
+	local lastTime = self:getLastTimeFromConfig(self.logicEngine.timings.LongNoteEnd)
 	local time = self:getNoteTime("end") + lastTime * timeRate
 	local currentTime = math.min(eventTime, time)
 
@@ -138,30 +137,28 @@ LongLogicalNote.switchState = function(self, newState, reachableNote)
 	end
 
 	local timings = self.logicEngine.timings
-	local config = timings.LongNote
 
 	local currentTime, deltaTime
 	local eventTime = self:getEventTime()
 	local timeRate = math.abs(self.timeEngine.timeRate)
 	if oldState == "clear" then
 		local noteTime = self:getNoteTime("start")
-		local lastTime = self:getLastTimeFromConfig(config.startHit, config.startMiss)
+		local lastTime = self:getLastTimeFromConfig(timings.LongNoteStart)
 		local time = noteTime + lastTime * timeRate
 
 		currentTime = math.min(eventTime, time)
 		deltaTime = currentTime == time and lastTime or (currentTime - self:getNoteTime("start")) / timeRate
 	else
-		local lastTime = self:getLastTimeFromConfig(config.endHit, config.endMiss)
+		local lastTime = self:getLastTimeFromConfig(timings.LongNoteEnd)
 		local time = self:getNoteTime("end") + lastTime * timeRate
 		currentTime = math.min(eventTime, time)
 		deltaTime = currentTime == time and lastTime or (currentTime - self:getNoteTime("end")) / timeRate
 	end
 
 	if reachableNote then
-		local _config = self.logicEngine.timings.ShortNote
-		currentTime = math.min(currentTime, reachableNote:getNoteTime("start") + self:getFirstTimeFromConfig(_config.hit, _config.miss) * timeRate)
-		deltaTime = self:getLastTimeFromConfig(config.endHit, config.endMiss)
-		-- currentTime = self:getNoteTime("end") + self:getLastTimeFromConfig(config.endHit, config.endMiss) * timeRate
+		currentTime = math.min(currentTime, reachableNote:getNoteTime("start") + self:getFirstTimeFromConfig(timings.ShortNote) * timeRate)
+		deltaTime = self:getLastTimeFromConfig(timings.LongNoteEnd)
+		-- currentTime = self:getNoteTime("end") + self:getLastTimeFromConfig(timings.LongNoteEnd) * timeRate
 	end
 
 	scoreEvent.noteIndex = self.index
@@ -204,17 +201,13 @@ LongLogicalNote.processAuto = function(self)
 end
 
 LongLogicalNote.getStartTimeState = function(self)
-	local currentTime = self:getEventTime()
-	local deltaTime = (currentTime - self:getNoteTime("start")) / math.abs(self.timeEngine.timeRate)
-	local config = self.logicEngine.timings.LongNote
-	return self:getTimeStateFromConfig(config.startHit, config.startMiss, deltaTime)
+	local deltaTime = (self:getEventTime() - self:getNoteTime("start")) / math.abs(self.timeEngine.timeRate)
+	return self:getTimeStateFromConfig(self.logicEngine.timings.LongNoteStart, deltaTime)
 end
 
 LongLogicalNote.getEndTimeState = function(self)
-	local currentTime = self:getEventTime()
-	local deltaTime = (currentTime - self:getNoteTime("end")) / math.abs(self.timeEngine.timeRate)
-	local config = self.logicEngine.timings.LongNote
-	return self:getTimeStateFromConfig(config.endHit, config.endMiss, deltaTime)
+	local deltaTime = (self:getEventTime() - self:getNoteTime("end")) / math.abs(self.timeEngine.timeRate)
+	return self:getTimeStateFromConfig(self.logicEngine.timings.LongNoteEnd, deltaTime)
 end
 
 LongLogicalNote.isReachable = function(self, _eventTime)

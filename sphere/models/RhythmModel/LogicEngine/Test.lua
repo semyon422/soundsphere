@@ -25,11 +25,13 @@ logicEngine.timings = {
 		hit = {-0.1, 0.1},
 		miss = {-0.2, 0.2}
 	},
-	LongNote = {
-		startHit = {-0.1, 0.1},
-		startMiss = {-0.2, 0.2},
-		endHit = {-0.1, 0.1},
-		endMiss = {-0.2, 0.2}
+	LongNoteStart = {
+		hit = {-0.1, 0.1},
+		miss = {-0.2, 0.2},
+	},
+	LongNoteEnd = {
+		hit = {-0.1, 0.1},
+		miss = {-0.2, 0.2},
 	}
 }
 

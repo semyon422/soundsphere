@@ -70,11 +70,33 @@ Replay.fromString = function(self, s)
 	self.events = self.replayNanoChart:decode(object.events, object.size, self.inputMode)
 
 	local timings = self.timings
-	if timings and not timings.ShortNote then
+	if not timings then
+		return self
+	end
+
+	if not timings.ShortNote then
 		timings.ShortNote = timings.ShortScoreNote
-		timings.LongNote = timings.LongScoreNote
+		timings.LongNoteStart = {
+			hit = timings.LongScoreNote.startHit,
+			miss = timings.LongScoreNote.startMiss,
+		}
+		timings.LongNoteEnd = {
+			hit = timings.LongScoreNote.endHit,
+			miss = timings.LongScoreNote.endMiss,
+		}
 		timings.ShortScoreNote = nil
 		timings.LongScoreNote = nil
+	end
+	if not timings.LongNoteStart then
+		timings.LongNoteStart = {
+			hit = timings.LongNote.startHit,
+			miss = timings.LongNote.startMiss,
+		}
+		timings.LongNoteEnd = {
+			hit = timings.LongNote.endHit,
+			miss = timings.LongNote.endMiss,
+		}
+		timings.LongNote = nil
 	end
 
 	return self

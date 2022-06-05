@@ -7,11 +7,13 @@ ResultController.oldTimings = {
 		hit = {-0.12, 0.12},
 		miss = {-0.16, 0.12}
 	},
-	LongNote = {
-		startHit = {-0.12, 0.12},
-		startMiss = {-0.16, 0.12},
-		endHit = {-0.12, 0.12},
-		endMiss = {-0.16, 0.12}
+	LongNoteStart = {
+		hit = {-0.12, 0.12},
+		miss = {-0.16, 0.12},
+	},
+	LongNoteEnd = {
+		hit = {-0.12, 0.12},
+		miss = {-0.16, 0.12}
 	}
 }
 
