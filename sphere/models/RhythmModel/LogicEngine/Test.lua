@@ -259,6 +259,20 @@ test(
 	}
 )
 
+local function testmsn()
+	test(
+		{0, 1, 2, 3},
+		{{3, "p"}},
+		{
+			{0.2, "clear", "missed", 1},
+			{1.2, "clear", "missed", 2},
+			{2.2, "clear", "missed", 3},
+			{3, "clear", "passed", 4},
+		}
+	)
+end
+testmsn()
+
 -- 1 long note tests
 
 local function test1ln()
@@ -441,6 +455,7 @@ test1lnsn()
 logicEngine.timings.nearest = true
 
 test1sn()
+testmsn()
 
 -- 2 short notes tests
 
@@ -565,13 +580,32 @@ test(
 	}
 )
 
+test(
+	{0, 0.01, 0.02},
+	{{0.011, "ppp"}},
+	{
+		{0.011, "clear", "passed", 2},
+		{0.011, "clear", "passed", 3},
+		{0.011, "clear", "passed", 1},
+	}
+)
 
 test(
 	{0, 0.01, 0.02},
-	{{0.01, "ppp"}},
+	{{0.001, "ppp"}},
 	{
-		{0.01, "clear", "passed", 2},
-		{0.01, "clear", "passed", 1},
-		{0.01, "clear", "passed", 3},
+		{0.001, "clear", "passed", 1},
+		{0.001, "clear", "passed", 2},
+		{0.001, "clear", "passed", 3},
+	}
+)
+
+test(
+	{0, 0.01, 0.02},
+	{{0.019, "ppp"}},
+	{
+		{0.019, "clear", "passed", 3},
+		{0.019, "clear", "passed", 2},
+		{0.019, "clear", "passed", 1},
 	}
 )

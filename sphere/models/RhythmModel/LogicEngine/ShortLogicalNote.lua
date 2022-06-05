@@ -17,7 +17,7 @@ ShortLogicalNote.update = function(self)
 		return
 	end
 
-	if self.autoplay then
+	if self.autoplay or self.logicEngine.autoplay then
 		return self:processAuto()
 	end
 
@@ -89,7 +89,7 @@ end
 
 ShortLogicalNote.getTimeState = function(self)
 	local timings = self.logicEngine.timings
-	local currentTime = self.logicEngine:getEventTime()
+	local currentTime = self:getEventTime()
 	local noteTime = self:getNoteTime()
 
 	local deltaTime = (currentTime - noteTime) / math.abs(self.timeEngine.timeRate)
@@ -120,21 +120,17 @@ ShortLogicalNote.receive = function(self, event)
 	end
 
 	local key = event and event[1]
-	if key == self.keyBind then
-		self.eventTime = event.time
-		self:update()
-		if self.ended then
-			return true
-		end
-		if event.name == "keypressed" then
-			self.keyState = true
-		elseif event.name == "keyreleased" then
-			self.keyState = false
-		end
-		self:sendState("keyState")
-		self:update()
-		self.eventTime = nil
+	if key ~= self.keyBind then
+		return
 	end
+
+	if event.name == "keypressed" then
+		self.keyState = true
+	elseif event.name == "keyreleased" then
+		self.keyState = false
+	end
+	self:sendState("keyState")
+	self:update()
 end
 
 return ShortLogicalNote

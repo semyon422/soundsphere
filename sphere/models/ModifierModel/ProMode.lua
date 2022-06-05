@@ -36,7 +36,7 @@ ProMode.receive = function(self, config, event)
 
 	local nearestNote
 	for _, noteHandler in pairs(logicEngine.noteHandlers) do
-		local currentNote = noteHandler.currentNote
+		local currentNote = noteHandler:getCurrentNote()
 		if
 			currentNote and
 			(
@@ -44,7 +44,7 @@ ProMode.receive = function(self, config, event)
 				currentNote.startNoteData.timePoint.absoluteTime < nearestNote.startNoteData.timePoint.absoluteTime
 			) and
 			not currentNote.ended and
-			currentNote:isReachable(currentNote:getEventTime()) and
+			currentNote:isReachable(logicEngine:getEventTime()) and
 			not currentNote.autoplay and
 			(
 				currentNote.startNoteData.noteType == "ShortNote" or

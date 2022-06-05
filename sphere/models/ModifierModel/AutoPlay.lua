@@ -23,20 +23,4 @@ AutoPlay.apply = function(self, config)
 	self.rhythmModel.logicEngine.autoplay = true
 end
 
-AutoPlay.receive = function(self, config, event)
-	if not config.value then
-		return
-	end
-
-	if event.name ~= "LogicalNoteState" then
-		return
-	end
-
-	if event.key == "load" then
-		event.note.autoplay = true
-	elseif event.key == "unload" then
-		event.note.autoplay = false
-	end
-end
-
 return AutoPlay

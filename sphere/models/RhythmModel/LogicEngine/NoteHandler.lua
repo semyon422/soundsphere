@@ -50,9 +50,6 @@ NoteHandler.loadNoteData = function(self)
 
 	self.startNoteIndex = 1
 	self.endNoteIndex = 1
-	self.currentNote = self.noteData[1]
-	if not self.currentNote then return end
-	self.currentNote:load()
 end
 
 NoteHandler.updateRange = function(self)
@@ -112,27 +109,16 @@ end
 
 NoteHandler.update = function(self)
 	self:updateRange()
-
 	for i = self.startNoteIndex, self.endNoteIndex do
-		local logicalNote = self.noteData[i]
-		logicalNote:update()
+		self.noteData[i]:update()
 	end
 end
 
 NoteHandler.receive = function(self, event)
-	for i = self.startNoteIndex, self.endNoteIndex do
-		local logicalNote = self.noteData[i]
-		logicalNote.eventTime = event.time
-		logicalNote:update()
-		logicalNote.eventTime = nil
-	end
-
+	self:update()
 	local currentNote = self:getCurrentNote()
-
 	if not currentNote then return end
-	if currentNote:receive(event) then
-		return self:receive(event)
-	end
+	currentNote:receive(event)
 end
 
 return NoteHandler

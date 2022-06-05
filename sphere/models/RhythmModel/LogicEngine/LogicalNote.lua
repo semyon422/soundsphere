@@ -85,7 +85,7 @@ LogicalNote.isReachable = function(self)
 end
 
 LogicalNote.getEventTime = function(self)
-	return self.eventTime or self.timeEngine.currentTime
+	return self.eventTime or self.logicEngine:getEventTime()
 end
 
 LogicalNote.load = function(self)

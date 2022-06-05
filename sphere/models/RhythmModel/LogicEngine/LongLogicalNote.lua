@@ -19,7 +19,7 @@ LongLogicalNote.update = function(self)
 		return
 	end
 
-	if self.autoplay then
+	if self.autoplay or self.logicEngine.autoplay then
 		return self:processAuto()
 	end
 
