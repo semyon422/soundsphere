@@ -88,17 +88,7 @@ LogicalNote.getEventTime = function(self)
 	return self.eventTime or self.logicEngine:getEventTime()
 end
 
-LogicalNote.load = function(self)
-	self:sendState("load")
-end
-
-LogicalNote.unload = function(self)
-	self:sendState("unload")
-end
-
 LogicalNote.update = function(self) end
-
-LogicalNote.receive = function(self, event) end
 
 local event = {name = "LogicalNoteState"}
 LogicalNote.sendState = function(self, key)
@@ -106,6 +96,33 @@ LogicalNote.sendState = function(self, key)
 	event.key = key
 	event.value = self[key]
 	return self.logicEngine:send(event)
+end
+
+LogicalNote.receive = function(self, event)
+	if self.logicEngine.autoplay then
+		return
+	end
+
+	if self.autoplay then
+		local nextNote = self:getNextPlayable()
+		if nextNote then
+			return nextNote:receive(event)
+		end
+		return
+	end
+
+	local key = event and event[1]
+	if key ~= self.keyBind then
+		return
+	end
+
+	if event.name == "keypressed" then
+		self.keyState = true
+	elseif event.name == "keyreleased" then
+		self.keyState = false
+	end
+	self:sendState("keyState")
+	self:update()
 end
 
 return LogicalNote

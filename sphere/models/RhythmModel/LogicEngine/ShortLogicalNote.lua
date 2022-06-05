@@ -77,24 +77,22 @@ ShortLogicalNote.switchState = function(self, newState)
 end
 
 ShortLogicalNote.processAuto = function(self)
-	if self:isHere() then
-		self.keyState = true
-		self:sendState("keyState")
-
-		self.eventTime = self:getNoteTime()
-		self:processTimeState("exactly")
-		self.eventTime = nil
+	if not self:isHere() then
+		return
 	end
+
+	self.keyState = true
+	self:sendState("keyState")
+
+	self.eventTime = self:getNoteTime()
+	self:processTimeState("exactly")
+	self.eventTime = nil
 end
 
 ShortLogicalNote.getTimeState = function(self)
-	local timings = self.logicEngine.timings
 	local currentTime = self:getEventTime()
-	local noteTime = self:getNoteTime()
-
-	local deltaTime = (currentTime - noteTime) / math.abs(self.timeEngine.timeRate)
-	local config = timings.ShortNote
-
+	local deltaTime = (currentTime - self:getNoteTime()) / math.abs(self.timeEngine.timeRate)
+	local config = self.logicEngine.timings.ShortNote
 	return self:getTimeStateFromConfig(config.hit, config.miss, deltaTime)
 end
 
@@ -104,33 +102,6 @@ ShortLogicalNote.isReachable = function(self, _eventTime)
 	local isReachable = self:getTimeState() ~= "too early"
 	self.eventTime = eventTime
 	return isReachable
-end
-
-ShortLogicalNote.receive = function(self, event)
-	if self.logicEngine.autoplay then
-		return
-	end
-
-	if self.autoplay then
-		local nextNote = self:getNextPlayable()
-		if nextNote then
-			return nextNote:receive(event)
-		end
-		return
-	end
-
-	local key = event and event[1]
-	if key ~= self.keyBind then
-		return
-	end
-
-	if event.name == "keypressed" then
-		self.keyState = true
-	elseif event.name == "keyreleased" then
-		self.keyState = false
-	end
-	self:sendState("keyState")
-	self:update()
 end
 
 return ShortLogicalNote

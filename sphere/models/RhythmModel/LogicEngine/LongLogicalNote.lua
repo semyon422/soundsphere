@@ -204,13 +204,9 @@ LongLogicalNote.processAuto = function(self)
 end
 
 LongLogicalNote.getStartTimeState = function(self)
-	local timings = self.logicEngine.timings
 	local currentTime = self:getEventTime()
-	local noteTime = self:getNoteTime("start")
-
-	local deltaTime = (currentTime - noteTime) / math.abs(self.timeEngine.timeRate)
-	local config = timings.LongNote
-
+	local deltaTime = (currentTime - self:getNoteTime("start")) / math.abs(self.timeEngine.timeRate)
+	local config = self.logicEngine.timings.LongNote
 	return self:getTimeStateFromConfig(config.startHit, config.startMiss, deltaTime)
 end
 
@@ -228,7 +224,5 @@ LongLogicalNote.isReachable = function(self, _eventTime)
 	self.eventTime = eventTime
 	return isReachable
 end
-
-LongLogicalNote.receive = ShortLogicalNote.receive
 
 return LongLogicalNote
