@@ -11,13 +11,13 @@ local keyPtr = ffi.new("const char*[1]")
 local devicePtr = ffi.new("const char*[1]")
 
 InputView.draw = function(self)
-	local noteChart = self.gameController.noteChartModel.noteChart
+	local noteChart = self.game.noteChartModel.noteChart
 	if not noteChart then
 		return
 	end
 
 	local inputModeString = noteChart.inputMode:getString()
-	local items = self.gameController.inputModel:getInputs(inputModeString)
+	local items = self.game.inputModel:getInputs(inputModeString)
 
 	if not self.isOpen[0] then
 		return
@@ -34,7 +34,7 @@ InputView.draw = function(self)
 	if imgui.Begin("Input bindings", self.isOpen, flags) then
 		for i = 1, #items do
 			local virtualKey = items[i].virtualKey
-			local key, device = self.gameController.inputModel:getKey(inputModeString, virtualKey)
+			local key, device = self.game.inputModel:getKey(inputModeString, virtualKey)
 			keyPtr[0] = tostring(key)
 			devicePtr[0] = device
 			if ImguiHotkey(virtualKey, keyPtr, devicePtr) then

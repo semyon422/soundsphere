@@ -20,7 +20,7 @@ AutoPlay.apply = function(self, config)
 	if not config.value then
 		return
 	end
-	self.gameController.rhythmModel.logicEngine.autoplay = true
+	self.game.rhythmModel.logicEngine.autoplay = true
 end
 
 return AutoPlay

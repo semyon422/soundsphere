@@ -115,38 +115,38 @@ GameController.load = function(self)
 	local osudirectModel = self.osudirectModel
 	local multiplayerModel = self.multiplayerModel
 
-	notificationModel.gameController = self
-	configModel.gameController = self
-	windowManager.gameController = self
-	mountModel.gameController = self
-	mountController.gameController = self
-	onlineController.gameController = self
-	screenshot.gameController = self
-	directoryManager.gameController = self
-	themeModel.gameController = self
-	scoreModel.gameController = self
-	onlineModel.gameController = self
-	cacheModel.gameController = self
-	backgroundModel.gameController = self
-	modifierModel.gameController = self
-	noteSkinModel.gameController = self
-	noteChartModel.gameController = self
-	inputModel.gameController = self
-	difficultyModel.gameController = self
-	collectionModel.gameController = self
-	selectModel.gameController = self
-	updateModel.gameController = self
-	fpsLimiter.gameController = self
-	rhythmModel.gameController = self
-	noteChartSetLibraryModel.gameController = self
-	noteChartLibraryModel.gameController = self
-	searchModel.gameController = self
-	scoreLibraryModel.gameController = self
-	sortModel.gameController = self
-	previewModel.gameController = self
-	discordModel.gameController = self
-	osudirectModel.gameController = self
-	multiplayerModel.gameController = self
+	notificationModel.game = self
+	configModel.game = self
+	windowManager.game = self
+	mountModel.game = self
+	mountController.game = self
+	onlineController.game = self
+	screenshot.game = self
+	directoryManager.game = self
+	themeModel.game = self
+	scoreModel.game = self
+	onlineModel.game = self
+	cacheModel.game = self
+	backgroundModel.game = self
+	modifierModel.game = self
+	noteSkinModel.game = self
+	noteChartModel.game = self
+	inputModel.game = self
+	difficultyModel.game = self
+	collectionModel.game = self
+	selectModel.game = self
+	updateModel.game = self
+	fpsLimiter.game = self
+	rhythmModel.game = self
+	noteChartSetLibraryModel.game = self
+	noteChartLibraryModel.game = self
+	searchModel.game = self
+	scoreLibraryModel.game = self
+	sortModel.game = self
+	previewModel.game = self
+	discordModel.game = self
+	osudirectModel.game = self
+	multiplayerModel.game = self
 
 	directoryManager:createDirectories()
 
@@ -195,12 +195,12 @@ GameController.load = function(self)
 
 	local errorController = ErrorController:new()
 	self.errorController = errorController
-	errorController.gameController = self
+	errorController.game = self
 	self.screenManager:setFallback(errorController)
 
 	local selectController = SelectController:new()
 	self.selectController = selectController
-	selectController.gameController = self
+	selectController.game = self
 	self.screenManager:set(selectController)
 end
 

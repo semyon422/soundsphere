@@ -21,7 +21,7 @@ end
 
 MinLnLength.apply = function(self, config)
 	local duration = config.value
-	local noteChart = self.gameController.noteChartModel.noteChart
+	local noteChart = self.game.noteChartModel.noteChart
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)

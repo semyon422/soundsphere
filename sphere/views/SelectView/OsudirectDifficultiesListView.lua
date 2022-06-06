@@ -13,7 +13,7 @@ OsudirectDifficultiesListView.construct = function(self)
 end
 
 OsudirectDifficultiesListView.reloadItems = function(self)
-	self.state.items = self.gameController.osudirectModel:getDifficulties()
+	self.state.items = self.game.osudirectModel:getDifficulties()
 	if self.navigator.osudirectDifficultyItemIndex > #self.state.items then
 		self.navigator.osudirectDifficultyItemIndex = 1
 		self.state.stateCounter = (self.state.stateCounter or 0) + 1

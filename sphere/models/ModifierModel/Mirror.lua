@@ -20,7 +20,7 @@ Mirror.getSubString = function(self, config)
 end
 
 Mirror.getMap = function(self, config)
-	local noteChart = self.gameController.noteChartModel.noteChart
+	local noteChart = self.game.noteChartModel.noteChart
 
 	local inputCounts = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do

@@ -25,7 +25,7 @@ MatchPlayersView.draw = function(self)
 
 	local users = inside(self, config.key)
 
-	local window = self.gameController.configModel.configs.settings.gameplay.ratingHitTimingWindow
+	local window = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 
 	local scores = {}
 	for i, user in ipairs(users) do

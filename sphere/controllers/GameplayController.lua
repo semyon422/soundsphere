@@ -12,15 +12,15 @@ end
 GameplayController.load = function(self)
 	local timeController = self.timeController
 
-	local rhythmModel = self.gameController.rhythmModel
-	local noteChartModel = self.gameController.noteChartModel
-	local noteSkinModel = self.gameController.noteSkinModel
-	local inputModel = self.gameController.inputModel
-	local configModel = self.gameController.configModel
-	local modifierModel = self.gameController.modifierModel
-	local notificationModel = self.gameController.notificationModel
-	local themeModel = self.gameController.themeModel
-	local difficultyModel = self.gameController.difficultyModel
+	local rhythmModel = self.game.rhythmModel
+	local noteChartModel = self.game.noteChartModel
+	local noteSkinModel = self.game.noteSkinModel
+	local inputModel = self.game.inputModel
+	local configModel = self.game.configModel
+	local modifierModel = self.game.modifierModel
+	local notificationModel = self.game.notificationModel
+	local themeModel = self.game.themeModel
+	local difficultyModel = self.game.difficultyModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -33,9 +33,9 @@ GameplayController.load = function(self)
 	noteChartModel:load()
 
 	view.controller = self
-	view.gameController = self.gameController
+	view.game = self.game
 
-	timeController.gameController = self.gameController
+	timeController.game = self.game
 
 	local noteChart = noteChartModel:loadNoteChart(self:getImporterSettings())
 	rhythmModel:setNoteChart(noteChart)
@@ -86,7 +86,7 @@ GameplayController.load = function(self)
 		time = love.timer.getTime(),
 		delta = 0,
 	})
-	assert(self.gameController.modifierModel.config)
+	assert(self.game.modifierModel.config)
 	rhythmModel:loadAllEngines()
 
 	local baseTimeRate = rhythmModel.timeEngine:getBaseTimeRate()
@@ -115,45 +115,45 @@ GameplayController.load = function(self)
 	love.mouse.setVisible(false)
 	self.drawing = true
 
-	local graphics = self.gameController.configModel.configs.settings.graphics
+	local graphics = self.game.configModel.configs.settings.graphics
 	local flags = graphics.mode.flags
 	if graphics.vsyncOnSelect then
-		self.gameController.baseVsync = flags.vsync ~= 0 and flags.vsync or 1
+		self.game.baseVsync = flags.vsync ~= 0 and flags.vsync or 1
 		flags.vsync = 0
 	end
 
-	self.gameController.multiplayerModel:setIsPlaying(true)
+	self.game.multiplayerModel:setIsPlaying(true)
 end
 
 GameplayController.getImporterSettings = function(self)
-	local config = self.gameController.configModel.configs.settings
+	local config = self.game.configModel.configs.settings
 	return {
 		midiConstantVolume = config.audio.midi.constantVolume
 	}
 end
 
 GameplayController.unload = function(self)
-	local rhythmModel = self.gameController.rhythmModel
+	local rhythmModel = self.game.rhythmModel
 	rhythmModel:unloadAllEngines()
 	rhythmModel:unload()
 	self.view:unload()
 	rhythmModel.observable:remove(self.view)
 	rhythmModel.inputManager:setMode("external")
 	rhythmModel.replayModel:setMode("record")
-	self.gameController:resetGameplayConfigs()
+	self.game:resetGameplayConfigs()
 	love.mouse.setVisible(true)
 
-	local graphics = self.gameController.configModel.configs.settings.graphics
+	local graphics = self.game.configModel.configs.settings.graphics
 	local flags = graphics.mode.flags
 	if graphics.vsyncOnSelect and flags.vsync == 0 then
-		flags.vsync = self.gameController.baseVsync
+		flags.vsync = self.game.baseVsync
 	end
 
-	self.gameController.multiplayerModel:setIsPlaying(false)
+	self.game.multiplayerModel:setIsPlaying(false)
 end
 
 GameplayController.update = function(self, dt)
-	self.gameController.rhythmModel:update(dt)
+	self.game.rhythmModel:update(dt)
 	self.view:update(dt)
 end
 
@@ -164,10 +164,10 @@ GameplayController.draw = function(self)
 end
 
 GameplayController.discordPlay = function(self)
-	local noteChartDataEntry = self.gameController.noteChartModel.noteChartDataEntry
-	local rhythmModel = self.gameController.rhythmModel
+	local noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry
+	local rhythmModel = self.game.rhythmModel
 	local length = math.min(noteChartDataEntry.length, 3600 * 24)
-	self.gameController.discordModel:setPresence({
+	self.game.discordModel:setPresence({
 		state = "Playing",
 		details = ("%s - %s [%s]"):format(
 			noteChartDataEntry.artist,
@@ -179,8 +179,8 @@ GameplayController.discordPlay = function(self)
 end
 
 GameplayController.discordPause = function(self)
-	local noteChartDataEntry = self.gameController.noteChartModel.noteChartDataEntry
-	self.gameController.discordModel:setPresence({
+	local noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry
+	self.game.discordModel:setPresence({
 		state = "Playing (paused)",
 		details = ("%s - %s [%s]"):format(
 			noteChartDataEntry.artist,
@@ -192,7 +192,7 @@ end
 
 GameplayController.receive = function(self, event)
 	self.timeController:receive(event)
-	local rhythmModel = self.gameController.rhythmModel
+	local rhythmModel = self.game.rhythmModel
 	rhythmModel:receive(event)
 	self.view:receive(event)
 
@@ -214,7 +214,7 @@ GameplayController.receive = function(self, event)
 			self:discordPause()
 		end
 	elseif event.name == "saveCamera" then
-		local perspective = self.gameController.configModel.configs.settings.graphics.perspective
+		local perspective = self.game.configModel.configs.settings.graphics.perspective
 		perspective.x = event.x
 		perspective.y = event.y
 		perspective.z = event.z
@@ -226,9 +226,9 @@ GameplayController.receive = function(self, event)
 end
 
 GameplayController.quit = function(self)
-	local rhythmModel = self.gameController.rhythmModel
+	local rhythmModel = self.game.rhythmModel
 	self.drawing = false
-	self.gameController.discordModel:setPresence({})
+	self.game.discordModel:setPresence({})
 	self:skip()
 	self:saveScore()
 	if not rhythmModel.logicEngine.autoplay and not rhythmModel.prohibitSavingScore then
@@ -236,22 +236,22 @@ GameplayController.quit = function(self)
 		local resultController = ResultController:new()
 
 		resultController.selectController = self.selectController
-		resultController.gameController = self.gameController
+		resultController.game = self.game
 
-		self.gameController.screenManager:set(resultController)
+		self.game.screenManager:set(resultController)
 	else
-		self.gameController.screenManager:set(self.selectController)
+		self.game.screenManager:set(self.selectController)
 	end
 end
 
 GameplayController.saveScore = function(self)
-	local rhythmModel = self.gameController.rhythmModel
+	local rhythmModel = self.game.rhythmModel
 	if rhythmModel.prohibitSavingScore then
 		return
 	end
 
 	local scoreSystemEntry = rhythmModel.scoreEngine.scoreSystem.entry
-	local noteChartModel = self.gameController.noteChartModel
+	local noteChartModel = self.game.noteChartModel
 	local modifierModel = rhythmModel.modifierModel
 	local replayModel = rhythmModel.replayModel
 	if
@@ -263,26 +263,26 @@ GameplayController.saveScore = function(self)
 		replayModel.noteChartModel = noteChartModel
 		replayModel.modifierModel = modifierModel
 		local replayHash = replayModel:saveReplay()
-		local scoreEntry = self.gameController.scoreModel:insertScore(scoreSystemEntry, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
+		local scoreEntry = self.game.scoreModel:insertScore(scoreSystemEntry, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
 
 		if
 			rhythmModel.scoreEngine.scoreSystem.base.progress >= 1 and
 			not rhythmModel.logicEngine.promode
 		then
-			self.gameController.onlineModel.onlineScoreManager:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
+			self.game.onlineModel.onlineScoreManager:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
 		end
 
 		rhythmModel.scoreEngine.scoreEntry = scoreEntry
-		local config = self.gameController.configModel.configs.select
+		local config = self.game.configModel.configs.select
 		config.scoreEntryId = scoreEntry.id
-		self.gameController.selectModel:pullScore()
+		self.game.selectModel:pullScore()
 
 		return scoreEntry
 	end
 end
 
 GameplayController.skip = function(self)
-	local rhythmModel = self.gameController.rhythmModel
+	local rhythmModel = self.game.rhythmModel
 	local timeEngine = rhythmModel.timeEngine
 
 	self:update(0)
@@ -306,7 +306,7 @@ GameplayController.skip = function(self)
 	rhythmModel.replayModel:update()
 	rhythmModel.logicEngine:update()
 	rhythmModel.scoreEngine:update()
-	self.gameController.modifierModel:update()
+	self.game.modifierModel:update()
 end
 
 return GameplayController

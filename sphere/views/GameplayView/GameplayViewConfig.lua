@@ -8,7 +8,7 @@ local PlayfieldView = {
 
 local BackgroundBlurSwitch = {
 	class = "GaussianBlurView",
-	blur = {key = "gameController.configModel.configs.settings.graphics.blur.gameplay"}
+	blur = {key = "game.configModel.configs.settings.graphics.blur.gameplay"}
 }
 
 local Background = {
@@ -19,7 +19,7 @@ local Background = {
 	w = 1920,
 	h = 1080,
 	parallax = 0.01,
-	dim = {key = "gameController.configModel.configs.settings.graphics.dim.gameplay"},
+	dim = {key = "game.configModel.configs.settings.graphics.dim.gameplay"},
 }
 
 local BottomScreenMenu = {
@@ -66,7 +66,7 @@ local BottomScreenMenu = {
 local PauseProgressBar = {
 	class = "ProgressView",
 	current = {
-		key = "gameController.rhythmModel.pauseManager.progress",
+		key = "game.rhythmModel.pauseManager.progress",
 	},
 	x = 0, y = 0, w = 1920, h = 20,
 	color = {1, 1, 1, 1},
@@ -94,7 +94,7 @@ local PauseText = {
 local Notification = {
 	class = "ValueView",
 	transform = transform,
-	key = "gameController.notificationModel.message",
+	key = "game.notificationModel.message",
 	color = {1, 1, 1, 1},
 	x = 733,
 	baseline = 53,
@@ -110,7 +110,7 @@ local Failed = {
 	class = "ValueView",
 	subscreen = "pause",
 	value = function(self)
-		if self.gameController.rhythmModel.scoreEngine.scoreSystem.hp.failed then
+		if self.game.rhythmModel.scoreEngine.scoreSystem.hp.failed then
 			return "failed"
 		end
 		return ""

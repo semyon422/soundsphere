@@ -10,7 +10,7 @@ CameraView.load = function(self)
 	local state = self.state
 	local config = self.config
 
-	local perspective = self.gameController.configModel.configs.settings.graphics.perspective
+	local perspective = self.game.configModel.configs.settings.graphics.perspective
 	state.camera = perspective.camera
 	if not state.camera or not config.draw_start then
 		return
@@ -23,7 +23,7 @@ CameraView.loadCamera = function(self)
 	s3dc.load()
 	local w, h = love.graphics.getDimensions()
 	state.w, state.h = w, h
-	local perspective = self.gameController.configModel.configs.settings.graphics.perspective
+	local perspective = self.game.configModel.configs.settings.graphics.perspective
 	s3dc.translate(perspective.x * w, perspective.y * h, perspective.z * h)
 	s3dc.rotate(perspective.pitch, perspective.yaw)
 end
@@ -80,7 +80,7 @@ CameraView.receive = function(self, event)
 		local dx, dy = event[3], event[4]
 		local angle = self.sensitivity
 
-		local perspective = self.gameController.configModel.configs.settings.graphics.perspective
+		local perspective = self.game.configModel.configs.settings.graphics.perspective
 		if not perspective.ry then
 			dy = 0
 		end

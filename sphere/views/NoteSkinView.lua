@@ -6,7 +6,7 @@ local align = require("aqua.imgui.config").align
 local NoteSkinView = ImguiView:new()
 
 NoteSkinView.draw = function(self)
-	local noteChart = self.gameController.noteChartModel.noteChart
+	local noteChart = self.game.noteChartModel.noteChart
 	if not noteChart then
 		return
 	end
@@ -16,7 +16,7 @@ NoteSkinView.draw = function(self)
 	end
 	local closed = self:closeOnEscape()
 
-	local selectedNoteSkin = self.gameController.noteSkinModel:getNoteSkin(noteChart.inputMode)
+	local selectedNoteSkin = self.game.noteSkinModel:getNoteSkin(noteChart.inputMode)
 
 	if closed then
 		if selectedNoteSkin.config then
@@ -25,7 +25,7 @@ NoteSkinView.draw = function(self)
 		return
 	end
 
-	local items = self.gameController.noteSkinModel:getNoteSkins(noteChart.inputMode)
+	local items = self.game.noteSkinModel:getNoteSkins(noteChart.inputMode)
 
 	imgui.SetNextWindowPos({align(0.5, 279), 279}, 0)
 	imgui.SetNextWindowSize({454, 522}, 0)

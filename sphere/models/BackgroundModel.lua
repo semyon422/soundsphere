@@ -9,7 +9,7 @@ local BackgroundModel = Class:new()
 BackgroundModel.alpha = 0
 
 BackgroundModel.load = function(self)
-	self.config = self.gameController.configModel.configs.select
+	self.config = self.game.configModel.configs.select
 	self.noteChartDataEntryId = 0
 	self.path = ""
 
@@ -18,7 +18,7 @@ BackgroundModel.load = function(self)
 end
 
 BackgroundModel.update = function(self, dt)
-	local noteChartItem = self.gameController.selectModel.noteChartItem
+	local noteChartItem = self.game.selectModel.noteChartItem
 	if noteChartItem and self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
 		self.noteChartDataEntryId = self.config.noteChartDataEntryId
 		local path = noteChartItem:getBackgroundPath()

@@ -20,7 +20,7 @@ FullLongNote.getSubString = function(self, config)
 end
 
 FullLongNote.apply = function(self, config)
-	local noteChart = self.gameController.noteChartModel.noteChart
+	local noteChart = self.game.noteChartModel.noteChart
 	self.noteDatas = {}
 	self.noteDataLayers = {}
 

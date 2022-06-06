@@ -16,8 +16,8 @@ local ImguiElements = {
 local SettingsView = ImguiView:new({construct = false})
 
 SettingsView.draw = function(self)
-	local config = self.gameController.configModel.configs.settings
-	local settings_model = self.gameController.configModel.configs.settings_model
+	local config = self.game.configModel.configs.settings
+	local settings_model = self.game.configModel.configs.settings_model
 
 	if not self.isOpen[0] then
 		return

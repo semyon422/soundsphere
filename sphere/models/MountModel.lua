@@ -11,7 +11,7 @@ MountModel.configPath = "userdata/mount.json"
 MountModel.chartsPath = "userdata/charts"
 
 MountModel.load = function(self)
-	self.mountInfo = self.gameController.configModel.configs.mount
+	self.mountInfo = self.game.configModel.configs.mount
 	local mountStatuses = self.mountStatuses
 
 	for _, entry in ipairs(self.mountInfo) do

@@ -27,8 +27,8 @@ TimeRateX.getSubString = function(self, config)
 end
 
 TimeRateX.apply = function(self, config)
-	self.gameController.rhythmModel.timeEngine:createTimeRateHandler().timeRate = config.value
-	self.gameController.rhythmModel.timeEngine:resetTimeRate()
+	self.game.rhythmModel.timeEngine:createTimeRateHandler().timeRate = config.value
+	self.game.rhythmModel.timeEngine:resetTimeRate()
 end
 
 return TimeRateX

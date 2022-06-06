@@ -98,10 +98,10 @@ end
 PlayfieldVsrg.addProgressBar = function(self, object)
 	object = object or {}
 	object.class = object.class or "ProgressView"
-	object.min = {key = "gameController.rhythmModel.timeEngine.minTime"}
-	object.max = {key = "gameController.rhythmModel.timeEngine.maxTime"}
-	object.start = {key = "gameController.rhythmModel.timeEngine.startTime"}
-	object.current = {key = "gameController.rhythmModel.timeEngine.currentTime"}
+	object.min = {key = "game.rhythmModel.timeEngine.minTime"}
+	object.max = {key = "game.rhythmModel.timeEngine.maxTime"}
+	object.start = {key = "game.rhythmModel.timeEngine.startTime"}
+	object.current = {key = "game.rhythmModel.timeEngine.currentTime"}
 	return self:add(object)
 end
 
@@ -111,7 +111,7 @@ PlayfieldVsrg.addHpBar = function(self, object)
 	object.min = {value = 0}
 	object.max = {value = 1000}
 	object.start = {value = 0}
-	object.current = {key = "gameController.rhythmModel.scoreEngine.scoreSystem.hp.hp"}
+	object.current = {key = "game.rhythmModel.scoreEngine.scoreSystem.hp.hp"}
 	return self:add(object)
 end
 
@@ -124,11 +124,11 @@ end
 PlayfieldVsrg.addScore = function(self, object)
 	object = object or {}
 	object.class = object.class or "ValueView"
-	object.key = "gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.score"
+	object.key = "game.rhythmModel.scoreEngine.scoreSystem.normalscore.score"
 	object.value = function(self)
 		local erfunc = require("libchart.erfunc")
-		local ratingHitTimingWindow = self.gameController.configModel.configs.settings.gameplay.ratingHitTimingWindow
-		local normalscore = self.gameController.rhythmModel.scoreEngine.scoreSystem.normalscore
+		local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
+		local normalscore = self.game.rhythmModel.scoreEngine.scoreSystem.normalscore
 		return ("%d"):format(
 			erfunc.erf(ratingHitTimingWindow / ((normalscore.accuracyAdjusted or math.huge) * math.sqrt(2))) * 10000
 		)
@@ -140,7 +140,7 @@ end
 PlayfieldVsrg.addAccuracy = function(self, object)
 	object = object or {}
 	object.class = object.class or "ValueView"
-	object.key = "gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.accuracyAdjusted"
+	object.key = "game.rhythmModel.scoreEngine.scoreSystem.normalscore.accuracyAdjusted"
 	object.format = object.format or "%0.2f"
 	object.multiplier = 1000
 	object.color = object.color or {1, 1, 1, 1}
@@ -150,7 +150,7 @@ end
 PlayfieldVsrg.addCombo = function(self, object)
 	object = object or {}
 	object.class = object.class or "ValueView"
-	object.key = "gameController.rhythmModel.scoreEngine.scoreSystem.base.combo"
+	object.key = "game.rhythmModel.scoreEngine.scoreSystem.base.combo"
 	object.format = object.format or "%d"
 	object.color = object.color or {1, 1, 1, 1}
 	return self:add(object)
@@ -177,7 +177,7 @@ PlayfieldVsrg.addJudgement = function(self, object)
 		judgements[judgement[1]] = config
 		self:add(config)
 	end
-	local key = "gameController.rhythmModel.scoreEngine.scoreSystem.judgement.counters"
+	local key = "game.rhythmModel.scoreEngine.scoreSystem.judgement.counters"
 	if object.key then
 		key = key .. "." .. object.key
 	end
@@ -457,7 +457,7 @@ PlayfieldVsrg.addHitError = function(self, object)
 	object.class = "HitErrorView"
 	object.transform = object.transform or self:newLaneCenterTransform(1080)
 	object.count = object.count or 1
-	object.key = "gameController.rhythmModel.scoreEngine.scoreSystem.sequence"
+	object.key = "game.rhythmModel.scoreEngine.scoreSystem.sequence"
 	object.value = "misc.deltaTime"
 	object.unit = 0.16
 	object.color = object.color or function(value, unit)
@@ -478,7 +478,7 @@ PlayfieldVsrg.addMatchPlayers = function(self, object)
 	end
 	object.class = "MatchPlayersView"
 	object.transform = object.transform or self:newTransform(1920, 1080, "left")
-	object.key = "gameController.multiplayerModel.roomUsers"
+	object.key = "game.multiplayerModel.roomUsers"
 
 	return self:add(object)
 end

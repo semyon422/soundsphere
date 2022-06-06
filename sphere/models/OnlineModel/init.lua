@@ -19,7 +19,7 @@ OnlineModel.load = function(self)
 	authManager.onlineModel = self
 	onlineScoreManager.onlineModel = self
 
-	local configs = self.gameController.configModel.configs
+	local configs = self.game.configModel.configs
 	webApi.token = configs.online.token
 	webApi.host = configs.urls.host
 	webApi:load()

@@ -12,11 +12,11 @@ ScoreListView.construct = function(self)
 end
 
 ScoreListView.reloadItems = function(self)
-	self.state.items = self.gameController.scoreLibraryModel.items
+	self.state.items = self.game.scoreLibraryModel.items
 end
 
 ScoreListView.getItemIndex = function(self)
-	return self.gameController.selectModel.scoreItemIndex
+	return self.game.selectModel.scoreItemIndex
 end
 
 ScoreListView.scrollUp = function(self)

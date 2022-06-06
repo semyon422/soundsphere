@@ -111,7 +111,7 @@ end
 SelectNavigator.updateCacheCollection = function(self)
 	self:send({
 		name = "updateCacheCollection",
-		collection = self.gameController.selectModel.collectionItem,
+		collection = self.game.selectModel.collectionItem,
 		force = love.keyboard.isDown("lshift")
 	})
 end
@@ -135,7 +135,7 @@ end
 SelectNavigator.scrollOsudirect = function(self, direction, count)
 	count = count or 1
 	direction = direction == "up" and -count or count
-	local items = self.gameController.osudirectModel.items
+	local items = self.game.osudirectModel.items
 
 	local itemIndex = math.min(math.max(self.osudirectItemIndex + direction, 1), #items)
 	if not items[itemIndex] then
@@ -154,7 +154,7 @@ end
 SelectNavigator.scrollOsudirectDifficulty = function(self, direction, count)
 	count = count or 1
 	direction = direction == "up" and -count or count
-	local items = self.gameController.osudirectModel:getDifficulties()
+	local items = self.game.osudirectModel:getDifficulties()
 
 	local itemIndex = math.min(math.max(self.osudirectDifficultyItemIndex + direction, 1), #items)
 	if not items[itemIndex] then
@@ -268,8 +268,8 @@ SelectNavigator.openMounts = function(self)
 end
 
 SelectNavigator.setNoteSkin = function(self, itemIndex)
-	local noteChart = self.gameController.noteChartModel.noteChart
-	local noteSkins = self.gameController.noteSkinModel:getNoteSkins(noteChart.inputMode)
+	local noteChart = self.game.noteChartModel.noteChart
+	local noteSkins = self.game.noteSkinModel:getNoteSkins(noteChart.inputMode)
 	self:send({
 		name = "setNoteSkin",
 		noteSkin = noteSkins[itemIndex or self.noteSkinItemIndex]

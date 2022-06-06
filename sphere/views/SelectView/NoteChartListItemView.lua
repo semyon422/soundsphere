@@ -8,7 +8,7 @@ NoteChartListItemView.receive = function(self, event)
 		return
 	end
 
-	if self.itemIndex ~= self.listView.gameController.selectModel.noteChartItemIndex then
+	if self.itemIndex ~= self.listView.game.selectModel.noteChartItemIndex then
 		return
 	end
 

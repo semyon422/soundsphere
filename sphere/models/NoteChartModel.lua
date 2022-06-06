@@ -5,7 +5,7 @@ local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 local NoteChartModel = Class:new()
 
 NoteChartModel.load = function(self)
-	local config = self.gameController.configModel.configs.select
+	local config = self.game.configModel.configs.select
 
 	self.noteChartSetEntry = CacheDatabase:selectNoteChartSetEntryById(config.noteChartSetEntryId)
 	if not self.noteChartSetEntry then
@@ -23,7 +23,7 @@ NoteChartModel.load = function(self)
 	end
 
 	self.noteChartDataEntry = CacheDatabase:selectNoteChartDataEntryById(config.noteChartDataEntryId)
-	self.scoreEntry = self.gameController.scoreModel:getScoreEntryById(config.scoreEntryId)
+	self.scoreEntry = self.game.scoreModel:getScoreEntryById(config.scoreEntryId)
 end
 
 NoteChartModel.getFileInfo = function(self)

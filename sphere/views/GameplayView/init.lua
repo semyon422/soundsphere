@@ -39,7 +39,7 @@ GameplayView.construct = function(self)
 end
 
 GameplayView.load = function(self)
-	local noteSkin = self.gameController.rhythmModel.graphicEngine.noteSkin
+	local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
 	self.imageAnimationView.root = noteSkin.directoryPath
 	self.imageView.root = noteSkin.directoryPath
 	self.imageValueView.root = noteSkin.directoryPath

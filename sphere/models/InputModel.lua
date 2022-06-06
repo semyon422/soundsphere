@@ -15,7 +15,7 @@ InputModel.types = {
 }
 
 InputModel.load = function(self)
-	self.inputBindings = self.gameController.configModel.configs.input
+	self.inputBindings = self.game.configModel.configs.input
 end
 
 InputModel.unload = function(self) end

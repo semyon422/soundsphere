@@ -6,7 +6,7 @@ local CollectionModel = Class:new()
 CollectionModel.basePath = "userdata/charts"
 
 CollectionModel.load = function(self)
-	self.config = self.gameController.configModel.configs.select
+	self.config = self.game.configModel.configs.select
 	local collectionPath = self.config.collection
 	local basePath = self.basePath
 

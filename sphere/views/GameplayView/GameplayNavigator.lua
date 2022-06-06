@@ -24,34 +24,34 @@ GameplayNavigator.receive = function(self, event)
 		event.name == "focus" and
 		not event[1] and
 		self.state ~= "pause" and
-		not self.gameController.rhythmModel.logicEngine.autoplay and
-		self.gameController.rhythmModel.inputManager.mode ~= "internal"
+		not self.game.rhythmModel.logicEngine.autoplay and
+		self.game.rhythmModel.inputManager.mode ~= "internal"
 	then
 		self:forcePause()
 	end
 end
 
 GameplayNavigator.update = function(self)
-	local needRetry = self.gameController.rhythmModel.pauseManager.needRetry
+	local needRetry = self.game.rhythmModel.pauseManager.needRetry
 
 	if needRetry then
 		self:forceRetry()
 	end
 
-	local state = self.gameController.rhythmModel.pauseManager.state
+	local state = self.game.rhythmModel.pauseManager.state
 	if state == "play" then
 		self:removeSubscreen("pause")
 	elseif state == "pause" then
 		self:addSubscreen("pause")
 	end
 
-	local timeEngine = self.gameController.rhythmModel.timeEngine
+	local timeEngine = self.game.rhythmModel.timeEngine
 	if timeEngine.currentTime >= timeEngine.maxTime + 1 and not self.quited then
 		self:quit()
 	end
 
-	local pauseOnFail = self.gameController.configModel.configs.settings.gameplay.pauseOnFail
-	local failed = self.gameController.rhythmModel.scoreEngine.scoreSystem.hp.failed
+	local pauseOnFail = self.game.configModel.configs.settings.gameplay.pauseOnFail
+	local failed = self.game.rhythmModel.scoreEngine.scoreSystem.hp.failed
 	if pauseOnFail and failed and not self.failed then
 		self:pause()
 		self.failed = true
@@ -61,12 +61,12 @@ GameplayNavigator.update = function(self)
 end
 
 GameplayNavigator.keypressed = function(self, event)
-	local state = self.gameController.rhythmModel.pauseManager.state
+	local state = self.game.rhythmModel.pauseManager.state
 
 	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
 	local scancode = event[2]
 
-	local input = self.gameController.configModel.configs.settings.input
+	local input = self.game.configModel.configs.settings.input
 
 	if scancode == input.skipIntro then self:skipIntro()
 	elseif scancode == input.offset.decrease then self:increaseLocalOffset(-0.001)
@@ -96,8 +96,8 @@ GameplayNavigator.keypressed = function(self, event)
 end
 
 GameplayNavigator.keyreleased = function(self, event)
-	local state = self.gameController.rhythmModel.pauseManager.state
-	local input = self.gameController.configModel.configs.settings.input
+	local state = self.game.rhythmModel.pauseManager.state
+	local input = self.game.configModel.configs.settings.input
 
 	local scancode = event[2]
 	if state == "play-pause" and scancode == input.pause then

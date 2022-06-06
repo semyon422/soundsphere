@@ -36,13 +36,13 @@ WebReplayController.POST = function(self)
 	local noteChartModel = {}
 	local difficultyModel = DifficultyModel:new()
 
-	local gameController = {}
-	gameController.rhythmModel = rhythmModel
-	gameController.modifierModel = modifierModel
-	gameController.noteChartModel = noteChartModel
-	gameController.difficultyModel = difficultyModel
+	local game = {}
+	game.rhythmModel = rhythmModel
+	game.modifierModel = modifierModel
+	game.noteChartModel = noteChartModel
+	game.difficultyModel = difficultyModel
 
-	modifierModel.gameController = gameController
+	modifierModel.game = game
 
 	rhythmModel.modifierModel = modifierModel
 	rhythmModel.judgements = {}
@@ -56,7 +56,7 @@ WebReplayController.POST = function(self)
 
 	noteChartModel.noteChartDataEntry = noteChartDataEntry
 
-	fastplayController.gameController = gameController
+	fastplayController.game = game
 
 	modifierModel:setConfig(replay.modifiers)
 	modifierModel:fixOldFormat(replay.modifiers, not replay.timings)

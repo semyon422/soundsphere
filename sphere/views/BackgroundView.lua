@@ -19,7 +19,7 @@ BackgroundView.draw = function(self)
 end
 
 BackgroundView.drawBackground = function(self)
-	local backgroundModel = self.gameController.backgroundModel
+	local backgroundModel = self.game.backgroundModel
 	local config = self.config
 
 	-- local tf = transform(config.transform)

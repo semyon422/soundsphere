@@ -27,19 +27,19 @@ local formatDifficulty = function(difficulty)
 end
 
 local showLoadedScore = function(self)
-	if not self.gameController.rhythmModel.scoreEngine.scoreEntry then
+	if not self.game.rhythmModel.scoreEngine.scoreEntry then
 		return
 	end
-	return self.gameController.selectModel.scoreItem.id == self.gameController.rhythmModel.scoreEngine.scoreEntry.id
+	return self.game.selectModel.scoreItem.id == self.game.rhythmModel.scoreEngine.scoreEntry.id
 end
 
 local showLoadedListScore = function(self)
-	return self.gameController.rhythmModel.scoreEngine.scoreEntry.id == self.id
+	return self.game.rhythmModel.scoreEngine.scoreEntry.id == self.id
 end
 
 local BackgroundBlurSwitch = {
 	class = "GaussianBlurView",
-	blur = {key = "gameController.configModel.configs.settings.graphics.blur.result"}
+	blur = {key = "game.configModel.configs.settings.graphics.blur.result"}
 }
 
 local Background = {
@@ -50,7 +50,7 @@ local Background = {
 	w = 1920,
 	h = 1080,
 	parallax = 0.01,
-	dim = {key = "gameController.configModel.configs.settings.graphics.dim.result"},
+	dim = {key = "game.configModel.configs.settings.graphics.dim.result"},
 }
 
 local Rectangle = {
@@ -84,7 +84,7 @@ local ComboGraph = {
 	background = true,
 	backgroundColor = {0, 0, 0, 0.2},
 	backgroundRadius = 4,
-	key = "gameController.rhythmModel.scoreEngine.scoreSystem.sequence",
+	key = "game.rhythmModel.scoreEngine.scoreSystem.sequence",
 	time = "base.currentTime",
 	value = "base.combo",
 	unit = "base.noteCount",
@@ -115,7 +115,7 @@ local HitGraph = {
 	background = true,
 	backgroundColor = {0, 0, 0, 0.2},
 	backgroundRadius = 4,
-	key = "gameController.rhythmModel.scoreEngine.scoreSystem.sequence",
+	key = "game.rhythmModel.scoreEngine.scoreSystem.sequence",
 	time = "base.currentTime",
 	value = "misc.deltaTime",
 	unit = 0.16,
@@ -142,7 +142,7 @@ local EarlyLateMissGraph = {
 	background = true,
 	backgroundColor = {1, 1, 1, 1},
 	backgroundRadius = 4,
-	key = "gameController.rhythmModel.scoreEngine.scoreSystem.sequence",
+	key = "game.rhythmModel.scoreEngine.scoreSystem.sequence",
 	time = "base.currentTime",
 	value = "misc.deltaTime",
 	unit = 0.16,
@@ -169,7 +169,7 @@ local MissGraph = {
 	background = true,
 	backgroundColor = {1, 1, 1, 0},
 	backgroundRadius = 3,
-	key = "gameController.rhythmModel.scoreEngine.scoreSystem.sequence",
+	key = "game.rhythmModel.scoreEngine.scoreSystem.sequence",
 	time = "base.currentTime",
 	value = "base.isMiss",
 	unit = 0.16,
@@ -195,7 +195,7 @@ local HpGraph = {
 	background = true,
 	backgroundColor = {0, 0, 0, 0.2},
 	backgroundRadius = 4,
-	key = "gameController.rhythmModel.scoreEngine.scoreSystem.sequence",
+	key = "game.rhythmModel.scoreEngine.scoreSystem.sequence",
 	time = "base.currentTime",
 	value = "hp.hp",
 	unit = "hp.allHp",
@@ -268,12 +268,12 @@ local ScoreList = {
 				size = 24,
 			},
 			value = function(self, item)
-				if self.gameController.rhythmModel.scoreEngine.scoreEntry.id == item.id then
+				if self.game.rhythmModel.scoreEngine.scoreEntry.id == item.id then
 					local erfunc = require("libchart.erfunc")
-					local ratingHitTimingWindow = self.gameController.configModel.configs.settings.gameplay.ratingHitTimingWindow
-					local normalscore = self.gameController.rhythmModel.scoreEngine.scoreSystem.normalscore
+					local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
+					local normalscore = self.game.rhythmModel.scoreEngine.scoreSystem.normalscore
 					local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-					return s * self.gameController.rhythmModel.scoreEngine.enps
+					return s * self.game.rhythmModel.scoreEngine.enps
 				end
 				local rating = item.rating
 				if rating ~= rating then
@@ -298,7 +298,7 @@ local ScoreList = {
 		{
 			type = "text",
 			key = {
-				{"gameController.rhythmModel.scoreEngine.timeRate", showLoadedListScore},
+				{"game.rhythmModel.scoreEngine.timeRate", showLoadedListScore},
 				"timeRate"
 			},
 			onNew = false,
@@ -349,7 +349,7 @@ local ScoreList = {
 		{
 			type = "text",
 			key = {
-				{"gameController.rhythmModel.scoreEngine.inputMode", showLoadedListScore},
+				{"game.rhythmModel.scoreEngine.inputMode", showLoadedListScore},
 				"inputMode"
 			},
 			x = 162,
@@ -397,7 +397,7 @@ local ScoreScrollBar = {
 
 local SongTitleView = {
 	class = "ValueView",
-	key = "gameController.noteChartModel.noteChartDataEntry.title",
+	key = "game.noteChartModel.noteChartDataEntry.title",
 	format = "%s",
 	color = {1, 1, 1, 1},
 	x = 279 + 44,
@@ -413,7 +413,7 @@ local SongTitleView = {
 
 local SongArtistView = {
 	class = "ValueView",
-	key = "gameController.noteChartModel.noteChartDataEntry.artist",
+	key = "game.noteChartModel.noteChartDataEntry.artist",
 	format = "%s",
 	color = {1, 1, 1, 1},
 	x = 279 + 45,
@@ -429,7 +429,7 @@ local SongArtistView = {
 
 local ChartNameView = {
 	class = "ValueView",
-	key = "gameController.noteChartModel.noteChartDataEntry.name",
+	key = "game.noteChartModel.noteChartDataEntry.name",
 	format = "%s",
 	color = {1, 1, 1, 1},
 	x = 279 + 116 + 29,
@@ -445,7 +445,7 @@ local ChartNameView = {
 
 local ChartCreatorView = {
 	class = "ValueView",
-	key = "gameController.noteChartModel.noteChartDataEntry.creator",
+	key = "game.noteChartModel.noteChartDataEntry.creator",
 	format = "%s",
 	color = {1, 1, 1, 1},
 	x = 279 + 117 + 29,
@@ -461,7 +461,7 @@ local ChartCreatorView = {
 
 local ChartInputModeView = {
 	class = "ValueView",
-	key = "gameController.noteChartModel.noteChartDataEntry.inputMode",
+	key = "game.noteChartModel.noteChartDataEntry.inputMode",
 	format = "%s",
 	color = {1, 1, 1, 1},
 	x = 279 + 29 + 17,
@@ -477,7 +477,7 @@ local ChartInputModeView = {
 
 local ChartDifficultyView = {
 	class = "ValueView",
-	key = "gameController.noteChartModel.noteChartDataEntry.difficulty",
+	key = "game.noteChartModel.noteChartDataEntry.difficulty",
 	color = {1, 1, 1, 1},
 	x = 279 + 29,
 	baseline = 216 + 45,
@@ -566,8 +566,8 @@ StageInfo.cells = {
 		name = "bpm",
 		value = function(self)
 			local show = showLoadedScore(self)
-			local baseBpm = self.gameController.selectModel.noteChartItem.bpm
-			local bpm = self.gameController.rhythmModel.scoreEngine.bpm
+			local baseBpm = self.game.selectModel.noteChartItem.bpm
+			local bpm = self.game.rhythmModel.scoreEngine.bpm
 			if not show then
 				return math.floor(baseBpm)
 			end
@@ -584,8 +584,8 @@ StageInfo.cells = {
 		name = "duration",
 		value = function(self)
 			local show = showLoadedScore(self)
-			local baseLength = self.gameController.selectModel.noteChartItem.length
-			local length = self.gameController.rhythmModel.scoreEngine.length
+			local baseLength = self.game.selectModel.noteChartItem.length
+			local length = self.game.rhythmModel.scoreEngine.length
 			if not show then
 				return rtime(baseLength)
 			end
@@ -601,8 +601,8 @@ StageInfo.cells = {
 		x = 2, y = 3,
 		name = "density",
 		key = {
-			{"gameController.rhythmModel.scoreEngine.enps", showLoadedListScore},
-			"gameController.selectModel.scoreItem.difficulty"
+			{"game.rhythmModel.scoreEngine.enps", showLoadedListScore},
+			"game.selectModel.scoreItem.difficulty"
 		},
 		format = formatDifficulty,
 	},
@@ -612,8 +612,8 @@ StageInfo.cells = {
 		x = 2, y = 2,
 		name = "time rate",
 		key = {
-			{"gameController.rhythmModel.scoreEngine.baseTimeRate", showLoadedListScore},
-			"gameController.selectModel.scoreItem.timeRate"
+			{"game.rhythmModel.scoreEngine.baseTimeRate", showLoadedListScore},
+			"game.selectModel.scoreItem.timeRate"
 		},
 		format = "%0.2f",
 	},
@@ -623,14 +623,14 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 4, y = 4,
 		name = "notes",
-		key = "gameController.selectModel.noteChartItem.noteCount"
+		key = "game.selectModel.noteChartItem.noteCount"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 1, y = 4,
 		name = "level",
-		key = "gameController.selectModel.noteChartItem.level"
+		key = "game.selectModel.noteChartItem.level"
 	},
 	{
 		type = StageInfo.largeCell,
@@ -638,8 +638,8 @@ StageInfo.cells = {
 		x = 1, y = 1,
 		name = "accuracy",
 		key = {
-			{"gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.accuracyAdjusted", showLoadedScore},
-			"gameController.selectModel.scoreItem.accuracy"
+			{"game.rhythmModel.scoreEngine.scoreSystem.normalscore.accuracyAdjusted", showLoadedScore},
+			"game.selectModel.scoreItem.accuracy"
 		},
 		format = formatScore
 	},
@@ -651,13 +651,13 @@ StageInfo.cells = {
 		value = function(self)
 			if showLoadedScore(self) then
 				local erfunc = require("libchart.erfunc")
-				local ratingHitTimingWindow = self.gameController.configModel.configs.settings.gameplay.ratingHitTimingWindow
-				local normalscore = self.gameController.rhythmModel.scoreEngine.scoreSystem.normalscore
+				local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
+				local normalscore = self.game.rhythmModel.scoreEngine.scoreSystem.normalscore
 				return ("%d"):format(
 					erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2))) * 10000
 				)
 			end
-			local score = self.gameController.selectModel.scoreItem.score
+			local score = self.game.selectModel.scoreItem.score
 			if score ~= score then
 				return "nan"
 			end
@@ -669,14 +669,14 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 8, y = 3,
 		name = "pauses",
-		key = "gameController.selectModel.scoreItem.pausesCount",
+		key = "game.selectModel.scoreItem.pausesCount",
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = {7, 8}, y = 4,
 		name = "adjust",
-		key = "gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.adjustRatio",
+		key = "game.rhythmModel.scoreEngine.scoreSystem.normalscore.adjustRatio",
 		format = function(adjustRatio)
 			if adjustRatio ~= adjustRatio then
 				adjustRatio = 1
@@ -690,7 +690,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = {6, 7}, y = 3,
 		name = "new diff.",
-		key = "gameController.rhythmModel.scoreEngine.ratingDifficulty",
+		key = "game.rhythmModel.scoreEngine.ratingDifficulty",
 		format = "%0.2f",
 		show = showLoadedScore
 	},
@@ -703,10 +703,10 @@ StageInfo.cells = {
 		show = showLoadedScore,
 		value = function(self)
 			local erfunc = require("libchart.erfunc")
-			local ratingHitTimingWindow = self.gameController.configModel.configs.settings.gameplay.ratingHitTimingWindow
-			local normalscore = self.gameController.rhythmModel.scoreEngine.scoreSystem.normalscore
+			local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
+			local normalscore = self.game.rhythmModel.scoreEngine.scoreSystem.normalscore
 			local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-			return s * self.gameController.rhythmModel.scoreEngine.ratingDifficulty
+			return s * self.game.rhythmModel.scoreEngine.ratingDifficulty
 		end,
 	},
 
@@ -716,8 +716,8 @@ StageInfo.cells = {
 		x = {1, 2}, y = 5,
 		name = "perfect/hits",
 		key = {
-			{"gameController.rhythmModel.scoreEngine.scoreSystem.misc.ratio", showLoadedScore},
-			"gameController.selectModel.scoreItem.ratio"
+			{"game.rhythmModel.scoreEngine.scoreSystem.misc.ratio", showLoadedScore},
+			"game.selectModel.scoreItem.ratio"
 		},
 	},
 	{
@@ -726,8 +726,8 @@ StageInfo.cells = {
 		x = 3, y = 5,
 		name = "perfect",
 		key = {
-			{"gameController.rhythmModel.scoreEngine.scoreSystem.judgement.counters.soundsphere.perfect", showLoadedScore},
-			"gameController.selectModel.scoreItem.perfect"
+			{"game.rhythmModel.scoreEngine.scoreSystem.judgement.counters.soundsphere.perfect", showLoadedScore},
+			"game.selectModel.scoreItem.perfect"
 		},
 	},
 	{
@@ -736,8 +736,8 @@ StageInfo.cells = {
 		x = {2, 3}, y = 6,
 		name = "not perfect",
 		key = {
-			{"gameController.rhythmModel.scoreEngine.scoreSystem.judgement.counters.soundsphere.not perfect", showLoadedScore},
-			"gameController.selectModel.scoreItem.notPerfect"
+			{"game.rhythmModel.scoreEngine.scoreSystem.judgement.counters.soundsphere.not perfect", showLoadedScore},
+			"game.selectModel.scoreItem.notPerfect"
 		},
 	},
 	{
@@ -746,8 +746,8 @@ StageInfo.cells = {
 		x = 3, y = 7,
 		name = "miss",
 		key = {
-			{"gameController.rhythmModel.scoreEngine.scoreSystem.base.missCount", showLoadedScore},
-			"gameController.selectModel.scoreItem.missCount"
+			{"game.rhythmModel.scoreEngine.scoreSystem.base.missCount", showLoadedScore},
+			"game.selectModel.scoreItem.missCount"
 		},
 	},
 	{
@@ -755,7 +755,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 2, y = 7,
 		name = "spam",
-		key = "gameController.rhythmModel.scoreEngine.scoreSystem.base.earlyHitCount",
+		key = "game.rhythmModel.scoreEngine.scoreSystem.base.earlyHitCount",
 		show = showLoadedScore,
 	},
 	{
@@ -764,8 +764,8 @@ StageInfo.cells = {
 		x = {3, 4}, y = 6,
 		name = "early/late",
 		key = {
-			{"gameController.rhythmModel.scoreEngine.scoreSystem.misc.earlylate", showLoadedScore},
-			"gameController.selectModel.scoreItem.earlylate"
+			{"game.rhythmModel.scoreEngine.scoreSystem.misc.earlylate", showLoadedScore},
+			"game.selectModel.scoreItem.earlylate"
 		},
 		format = function(earlylate)
 			if earlylate == 0 then
@@ -786,8 +786,8 @@ StageInfo.cells = {
 		multiplier = 1000,
 		format = "%0.1f",
 		key = {
-			{"gameController.rhythmModel.scoreEngine.scoreSystem.normalscore.normalscore.mean", showLoadedScore},
-			"gameController.selectModel.scoreItem.mean"
+			{"game.rhythmModel.scoreEngine.scoreSystem.normalscore.normalscore.mean", showLoadedScore},
+			"game.selectModel.scoreItem.mean"
 		},
 	},
 	{
@@ -797,7 +797,7 @@ StageInfo.cells = {
 		name = "max delta",
 		multiplier = 1000,
 		format = "%d",
-		key = "gameController.rhythmModel.scoreEngine.scoreSystem.misc.maxDeltaTime",
+		key = "game.rhythmModel.scoreEngine.scoreSystem.misc.maxDeltaTime",
 		show = showLoadedScore
 	},
 	{
@@ -805,7 +805,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 1, y = 7,
 		name = "",
-		key = "gameController.rhythmModel.scoreEngine.scoreSystem.hp.failed",
+		key = "game.rhythmModel.scoreEngine.scoreSystem.hp.failed",
 		format = function(failed)
 			if failed then
 				return "fail"
@@ -827,8 +827,8 @@ local ModifierIconGrid = {
 	rows = 2,
 	noModifier = true,
 	config = {
-		{"gameController.modifierModel.config", showLoadedScore},
-		"gameController.selectModel.scoreItem.modifiers"
+		{"game.modifierModel.config", showLoadedScore},
+		"game.selectModel.scoreItem.modifiers"
 	},
 }
 
@@ -919,7 +919,7 @@ local SessionTime = {
 local MatchPlayers = {
 	class = "MatchPlayersView",
 	transform = transformLeft,
-	key = "gameController.multiplayerModel.roomUsers",
+	key = "game.multiplayerModel.roomUsers",
 	x = 20,
 	y = 540,
 	font = {
@@ -932,7 +932,7 @@ local InspectScoreSystem = {
 	class = "ValueView",
 	subscreen = "scoreSystemDebug",
 	transform = transformLeft,
-	key = "gameController.rhythmModel.scoreEngine.scoreSystem.slice",
+	key = "game.rhythmModel.scoreEngine.scoreSystem.slice",
 	format = function(...)
 		return inspect(...)
 	end,
@@ -951,7 +951,7 @@ local InspectCounters = {
 	class = "ValueView",
 	subscreen = "countersDebug",
 	transform = transformLeft,
-	key = "gameController.rhythmModel.scoreEngine.scoreSystem.judgement.counters",
+	key = "game.rhythmModel.scoreEngine.scoreSystem.judgement.counters",
 	format = function(...)
 		return inspect(...)
 	end,
@@ -970,7 +970,7 @@ local InspectScoreEntry = {
 	class = "ValueView",
 	subscreen = "scoreEntryDebug",
 	transform = transformLeft,
-	key = "gameController.selectModel.scoreItem",
+	key = "game.selectModel.scoreItem",
 	format = function(...)
 		return inspect(...)
 	end,

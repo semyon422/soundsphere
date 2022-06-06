@@ -332,7 +332,7 @@ local NoteChartList = {
 		{
 			type = "text",
 			value = function(self, item)
-				local baseTimeRate = self.gameController.rhythmModel.timeEngine.baseTimeRate
+				local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
 				return (item.difficulty or 0) * baseTimeRate
 			end,
 			onNew = false,
@@ -433,8 +433,8 @@ StageInfo.cells = {
 		name = "bpm",
 		format = "%d",
 		value = function(self)
-			local baseTimeRate = self.gameController.rhythmModel.timeEngine.baseTimeRate
-			local noteChartItem = self.gameController.selectModel.noteChartItem
+			local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
+			local noteChartItem = self.game.selectModel.noteChartItem
 			if not noteChartItem then
 				return 0
 			end
@@ -446,11 +446,11 @@ StageInfo.cells = {
 		valueType = "text",
 		x = {1, 2}, y = 3,
 		name = "duration",
-		key = "gameController.selectModel.noteChartItem.length",
+		key = "game.selectModel.noteChartItem.length",
 		time = true,
 		value = function(self)
-			local baseTimeRate = self.gameController.rhythmModel.timeEngine.baseTimeRate
-			local noteChartItem = self.gameController.selectModel.noteChartItem
+			local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
+			local noteChartItem = self.game.selectModel.noteChartItem
 			if not noteChartItem then
 				return 0
 			end
@@ -462,14 +462,14 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 2, y = 4,
 		name = "notes",
-		key = "gameController.selectModel.noteChartItem.noteCount"
+		key = "game.selectModel.noteChartItem.noteCount"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "bar",
 		x = {3, 4}, y = 4,
 		name = "long notes",
-		key = "gameController.selectModel.noteChartItem.longNoteRatio"
+		key = "game.selectModel.noteChartItem.longNoteRatio"
 	},
 	{
 		type = StageInfo.smallCell,
@@ -478,21 +478,21 @@ StageInfo.cells = {
 		name = "local offset",
 		format = "%d",
 		multiplier = 1000,
-		key = "gameController.selectModel.noteChartItem.localOffset"
+		key = "game.selectModel.noteChartItem.localOffset"
 	},
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
 		x = 1, y = 4,
 		name = "level",
-		key = "gameController.selectModel.noteChartItem.level"
+		key = "game.selectModel.noteChartItem.level"
 	},
 	{
 		type = StageInfo.largeCell,
 		valueType = "text",
 		x = 2, y = 1,
 		name = "rating",
-		key = "gameController.selectModel.scoreItem.rating",
+		key = "game.selectModel.scoreItem.rating",
 		format = formatDifficulty
 	},
 	{
@@ -500,7 +500,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = {3, 4}, y = 8,
 		name = "played time ago",
-		key = "gameController.selectModel.scoreItem.time",
+		key = "game.selectModel.scoreItem.time",
 		ago = true,
 		suffix = ""
 	},
@@ -510,7 +510,7 @@ StageInfo.cells = {
 		x = 3, y = 5,
 		name = "score",
 		value = function(self)
-			local scoreEntry = self.gameController.selectModel.scoreItem
+			local scoreEntry = self.game.selectModel.scoreItem
 			if not scoreEntry then
 				return "0"
 			end
@@ -526,7 +526,7 @@ StageInfo.cells = {
 		valueType = "text",
 		x = 4, y = 5,
 		name = "accuracy",
-		key = "gameController.selectModel.scoreItem.accuracy",
+		key = "game.selectModel.scoreItem.accuracy",
 		format = formatScore
 	},
 	{
@@ -535,7 +535,7 @@ StageInfo.cells = {
 		x = {3, 4}, y = 6,
 		name = "miss count",
 		format = "%d",
-		key = "gameController.selectModel.scoreItem.missCount"
+		key = "game.selectModel.scoreItem.missCount"
 	},
 	{
 		type = StageInfo.smallCell,
@@ -543,13 +543,13 @@ StageInfo.cells = {
 		x = {2, 3}, y = 6,
 		name = "density",
 		format = formatDifficulty,
-		key = "gameController.selectModel.scoreItem.difficulty"
+		key = "game.selectModel.scoreItem.difficulty"
 	},
 }
 
 local BackgroundBlurSwitch = {
 	class = "GaussianBlurView",
-	blur = {key = "gameController.configModel.configs.settings.graphics.blur.select"}
+	blur = {key = "game.configModel.configs.settings.graphics.blur.select"}
 }
 
 local Background = {
@@ -560,7 +560,7 @@ local Background = {
 	w = 1920,
 	h = 1080,
 	parallax = 0.01,
-	dim = {key = "gameController.configModel.configs.settings.graphics.dim.select"},
+	dim = {key = "game.configModel.configs.settings.graphics.dim.select"},
 }
 
 local Preview = {
@@ -614,9 +614,9 @@ local SearchField = {
 	point = {
 		r = 7
 	},
-	searchString = "gameController.searchModel.searchString",
-	searchMode = "gameController.searchModel.searchMode",
-	collapse = "gameController.noteChartSetLibraryModel.collapse",
+	searchString = "game.searchModel.searchString",
+	searchMode = "game.searchModel.searchMode",
+	collapse = "game.noteChartSetLibraryModel.collapse",
 }
 
 local OsudirectSearchField = {
@@ -648,7 +648,7 @@ local OsudirectSearchField = {
 	point = {
 		r = 7
 	},
-	searchString = "gameController.osudirectModel.searchString",
+	searchString = "game.osudirectModel.searchString",
 	searchMode = "?",
 	collapse = "?",
 }
@@ -690,7 +690,7 @@ local ModifierIconGrid = {
 	h = 136,
 	columns = 6,
 	rows = 2,
-	config = "gameController.modifierModel.config"
+	config = "game.modifierModel.config"
 }
 
 local StageInfoModifierIconGrid = {
@@ -703,14 +703,14 @@ local StageInfoModifierIconGrid = {
 	h = 138,
 	columns = 4,
 	rows = 3,
-	config = "gameController.selectModel.scoreItem.modifiers",
+	config = "game.selectModel.scoreItem.modifiers",
 	noModifier = true
 }
 
 local UpdateStatus = {
 	class = "ValueView",
 	transform = transform,
-	key = "gameController.updateModel.status",
+	key = "game.updateModel.status",
 	x = 0,
 	baseline = 1070,
 	limit = 1920,

@@ -120,7 +120,7 @@ local aquaevent = require("aqua.event")
 aquaevent:init()
 
 local GameController = require("sphere.controllers.GameController")
-local gameController = GameController:new()
+local game = GameController:new()
 
-aquaevent:add(gameController)
-gameController:load()
+aquaevent:add(game)
+game:load()

@@ -3,8 +3,8 @@ local Class = require("aqua.util.Class")
 local ModifierController = Class:new()
 
 ModifierController.load = function(self)
-	local noteChartModel = self.gameController.noteChartModel
-	local themeModel = self.gameController.themeModel
+	local noteChartModel = self.game.noteChartModel
+	local themeModel = self.game.themeModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -13,7 +13,7 @@ ModifierController.load = function(self)
 	self.view = view
 
 	view.controller = self
-	view.gameController = self.gameController
+	view.game = self.game
 
 	noteChartModel:load()
 
@@ -22,7 +22,7 @@ end
 
 ModifierController.unload = function(self)
 	self.view:unload()
-	self.gameController.multiplayerModel:pushModifiers()
+	self.game.multiplayerModel:pushModifiers()
 end
 
 ModifierController.update = function(self, dt)
@@ -37,21 +37,21 @@ ModifierController.receive = function(self, event)
 	self.view:receive(event)
 
 	if event.name == "addModifier" then
-		self.gameController.modifierModel:add(event.modifier)
+		self.game.modifierModel:add(event.modifier)
 	elseif event.name == "removeModifier" then
-		self.gameController.modifierModel:remove(event.modifierConfig)
+		self.game.modifierModel:remove(event.modifierConfig)
 	elseif event.name == "setModifierValue" then
-		self.gameController.modifierModel:setModifierValue(event.modifierConfig, event.value)
+		self.game.modifierModel:setModifierValue(event.modifierConfig, event.value)
 	elseif event.name == "increaseModifierValue" then
-		self.gameController.modifierModel:increaseModifierValue(event.modifierConfig, event.delta)
+		self.game.modifierModel:increaseModifierValue(event.modifierConfig, event.delta)
 	elseif event.name == "scrollModifier" then
-		self.gameController.modifierModel:scrollModifier(event.direction)
+		self.game.modifierModel:scrollModifier(event.direction)
 	elseif event.name == "scrollAvailableModifier" then
-		self.gameController.modifierModel:scrollAvailableModifier(event.direction)
+		self.game.modifierModel:scrollAvailableModifier(event.direction)
 	elseif event.name == "adjustDifficulty" then
 		self:adjustDifficulty()
 	elseif event.name == "changeScreen" then
-		self.gameController.screenManager:set(self.selectController)
+		self.game.screenManager:set(self.selectController)
 	end
 end
 

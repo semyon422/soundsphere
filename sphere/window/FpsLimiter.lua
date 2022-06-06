@@ -4,7 +4,7 @@ local Class = require("aqua.util.Class")
 local FpsLimiter = Class:new()
 
 FpsLimiter.update = function(self)
-	local settings = self.gameController.configModel.configs.settings
+	local settings = self.game.configModel.configs.settings
 	aquaevent.fpslimit = settings.graphics.fps
 	aquaevent.asynckey = settings.graphics.asynckey
 	aquaevent.dwmflush = settings.graphics.dwmflush

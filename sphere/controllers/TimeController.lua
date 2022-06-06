@@ -4,9 +4,9 @@ local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 local TimeController = Class:new()
 
 TimeController.receive = function(self, event)
-	local configModel = self.gameController.configModel
-	local rhythmModel = self.gameController.rhythmModel
-	local notificationModel = self.gameController.notificationModel
+	local configModel = self.game.configModel
+	local rhythmModel = self.game.rhythmModel
+	local notificationModel = self.game.notificationModel
 
 	local timeEngine = rhythmModel.timeEngine
 	local graphicEngine = rhythmModel.graphicEngine
@@ -36,7 +36,7 @@ TimeController.receive = function(self, event)
 		graphicEngine:setVisualTimeRate(graphicEngine.targetVisualTimeRate)
 		notificationModel:notify("scroll speed: " .. graphicEngine.targetVisualTimeRate)
 	elseif event.name == "increaseLocalOffset" then
-		local noteChartDataEntry = self.gameController.noteChartModel.noteChartDataEntry
+		local noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry
 		noteChartDataEntry.localOffset = (noteChartDataEntry.localOffset or 0) + event.delta
 		CacheDatabase:updateNoteChartDataEntry(noteChartDataEntry)
 		notificationModel:notify("local offset: " .. noteChartDataEntry.localOffset * 1000 .. "ms")

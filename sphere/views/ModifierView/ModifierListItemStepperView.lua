@@ -23,17 +23,17 @@ ModifierListItemStepperView.getDisplayValue = function(self)
 end
 
 ModifierListItemStepperView.getIndexValue = function(self)
-	local modifier = self.listView.gameController.modifierModel:getModifier(self.item)
+	local modifier = self.listView.game.modifierModel:getModifier(self.item)
 	return modifier:toIndexValue(self.item.value)
 end
 
 ModifierListItemStepperView.getCount = function(self)
-	local modifier = self.listView.gameController.modifierModel:getModifier(self.item)
+	local modifier = self.listView.game.modifierModel:getModifier(self.item)
 	return modifier:getCount()
 end
 
 ModifierListItemStepperView.updateIndexValue = function(self, indexValue)
-	local modifier = self.listView.gameController.modifierModel:getModifier(self.item)
+	local modifier = self.listView.game.modifierModel:getModifier(self.item)
 	self.listView.navigator:setModifierValue(
 		self.item,
 		modifier:fromIndexValue(indexValue)

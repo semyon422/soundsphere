@@ -6,8 +6,8 @@ local MountsView = ImguiView:new({construct = false})
 
 local selectedItem
 MountsView.draw = function(self)
-	local mountModel = self.gameController.mountModel
-	local items = self.gameController.configModel.configs.mount
+	local mountModel = self.game.mountModel
+	local items = self.game.configModel.configs.mount
 	selectedItem = selectedItem or items[1]
 
 	if not self.isOpen[0] then

@@ -21,7 +21,7 @@ ScoreLibraryModel.setIndex = function(self, index)
 end
 
 ScoreLibraryModel.updateItems = function(self)
-	local scoreEntries = self.gameController.scoreModel:getScoreEntries(
+	local scoreEntries = self.game.scoreModel:getScoreEntries(
 		self.hash,
 		self.index
 	)

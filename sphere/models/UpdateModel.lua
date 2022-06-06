@@ -7,7 +7,7 @@ local UpdateModel = Class:new()
 UpdateModel.status = ""
 
 UpdateModel.load = function(self)
-	local configs = self.gameController.configModel.configs
+	local configs = self.game.configModel.configs
 
 	if
 		not configs.settings.miscellaneous.autoUpdate or

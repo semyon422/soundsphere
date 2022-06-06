@@ -5,7 +5,7 @@ local FastplayController = Class:new()
 FastplayController.play = function(self)
 	self:load()
 
-	local rhythmModel = self.gameController.rhythmModel
+	local rhythmModel = self.game.rhythmModel
 	local timeEngine = rhythmModel.timeEngine
 
 	timeEngine:resetTimeRate()
@@ -15,16 +15,16 @@ FastplayController.play = function(self)
 	rhythmModel.replayModel:update()
 	rhythmModel.logicEngine:update()
 	rhythmModel.scoreEngine:update()
-	self.gameController.modifierModel:update()
+	self.game.modifierModel:update()
 
 	self:unload()
 end
 
 FastplayController.load = function(self)
-	local noteChartModel = self.gameController.noteChartModel
-	local difficultyModel = self.gameController.difficultyModel
-	local rhythmModel = self.gameController.rhythmModel
-	local modifierModel = self.gameController.modifierModel
+	local noteChartModel = self.game.noteChartModel
+	local difficultyModel = self.game.difficultyModel
+	local rhythmModel = self.game.rhythmModel
+	local modifierModel = self.game.modifierModel
 	noteChartModel:load()
 
 	local noteChart = noteChartModel:loadNoteChart()
@@ -52,13 +52,13 @@ FastplayController.load = function(self)
 end
 
 FastplayController.unload = function(self)
-	local rhythmModel = self.gameController.rhythmModel
+	local rhythmModel = self.game.rhythmModel
 	rhythmModel:unloadAllEngines()
 	rhythmModel:unload()
 end
 
 FastplayController.receive = function(self, event)
-	self.gameController.rhythmModel:receive(event)
+	self.game.rhythmModel:receive(event)
 end
 
 return FastplayController

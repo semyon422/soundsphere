@@ -9,7 +9,7 @@ RhythmView.load = function(self)
 	local config = self.config
 	local state = self.state
 
-	local bga = self.gameController.configModel.configs.settings.gameplay.bga
+	local bga = self.game.configModel.configs.settings.gameplay.bga
 
 	state.noteViews = {}
 
@@ -39,7 +39,7 @@ RhythmView.receive = function(self, event)
 			if not noteView then
 				return
 			end
-			noteView.graphicEngine = self.gameController.rhythmModel.graphicEngine
+			noteView.graphicEngine = self.game.rhythmModel.graphicEngine
 			noteView.noteSkin = noteView.graphicEngine.noteSkin
 			noteView.rhythmView = self
 			noteViews[note] = noteView
@@ -74,7 +74,7 @@ RhythmView.draw = function(self)
 		return a.startNoteData.timePoint > b.startNoteData.timePoint
 	end)
 
-	local noteSkin = self.gameController.rhythmModel.graphicEngine.noteSkin
+	local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
 	local inputsCount = noteSkin.inputsCount
 	local inputs = noteSkin.inputs
 
@@ -98,7 +98,7 @@ RhythmView.draw = function(self)
 	local tf = transform(config.transform)
 	love.graphics.replaceTransform(tf)
 
-	local noteSkin = self.gameController.rhythmModel.graphicEngine.noteSkin
+	local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
 	local blendModes = noteSkin.blendModes
 	for _, spriteBatch in ipairs(state.spriteBatches) do
 		local key = state.spriteBatches[spriteBatch]
@@ -119,7 +119,7 @@ RhythmView.loadTexture = function(self, key, path)
 	local textures = state.textures
 	local spriteBatches = state.spriteBatches
 
-	local status, err = pcall(love.graphics.newImage, self.gameController.rhythmModel.graphicEngine.noteSkin.directoryPath .. "/" .. path)
+	local status, err = pcall(love.graphics.newImage, self.game.rhythmModel.graphicEngine.noteSkin.directoryPath .. "/" .. path)
 	local texture = status and err or newPixel(1, 1, 1, 1)
 	local spriteBatch = love.graphics.newSpriteBatch(texture, 1000)
 
@@ -134,7 +134,7 @@ end
 RhythmView.loadImages = function(self)
 	local state = self.state
 
-	for i, texture in ipairs(self.gameController.rhythmModel.graphicEngine.noteSkin.textures) do
+	for i, texture in ipairs(self.game.rhythmModel.graphicEngine.noteSkin.textures) do
 		local key, path = next(texture)
 		if type(path) == "string" then
 			self:loadTexture(key, path)
@@ -146,7 +146,7 @@ RhythmView.loadImages = function(self)
 		end
 	end
 
-	for imageName, image in pairs(self.gameController.rhythmModel.graphicEngine.noteSkin.images) do
+	for imageName, image in pairs(self.game.rhythmModel.graphicEngine.noteSkin.images) do
 		local key, path = next(image[1])
 		if type(path) == "string" then
 			local texture = state.textures[key][path]
@@ -178,13 +178,13 @@ RhythmView.loadImages = function(self)
 end
 
 RhythmView.getDimensions = function(self, note, part, key, timeState)
-	local noteSkin = self.gameController.rhythmModel.graphicEngine.noteSkin
+	local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
 	return noteSkin:getDimensions(noteSkin:get(note, part, key, timeState))
 end
 
 RhythmView.getSpriteBatch = function(self, note, part, key, timeState)
 	local state = self.state
-	local noteSkin = self.gameController.rhythmModel.graphicEngine.noteSkin
+	local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
 	local imageName, frame = noteSkin:get(note, part, key, timeState)
 	local image = noteSkin.images[imageName]
 	if not image then
@@ -201,7 +201,7 @@ end
 
 RhythmView.getQuad = function(self, note, part, key, timeState)
 	local state = self.state
-	local noteSkin = self.gameController.rhythmModel.graphicEngine.noteSkin
+	local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
 	local imageName, frame = noteSkin:get(note, part, key, timeState)
 	local quad = state.quads[imageName]
 	if type(quad) == "table" then

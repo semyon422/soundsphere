@@ -14,7 +14,7 @@ end
 DeltaTimeJudgementView.update = function(self)
 	local config = self.config
 	local state = self.state
-	local scoreSystem = self.gameController.rhythmModel.scoreEngine.scoreSystem
+	local scoreSystem = self.game.rhythmModel.scoreEngine.scoreSystem
 
 	if scoreSystem.judgement.counter == state.judgementCounter then
 		return

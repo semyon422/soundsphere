@@ -21,7 +21,7 @@ NoScratch.apply = function(self, config)
 		return
 	end
 
-	local noteChart = self.gameController.noteChartModel.noteChart
+	local noteChart = self.game.noteChartModel.noteChart
 	local layerDataSequence = noteChart.layerDataSequence
 
 	noteChart.inputMode:setInputCount("scratch", nil)

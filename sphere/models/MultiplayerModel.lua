@@ -27,8 +27,8 @@ MultiplayerModel.construct = function(self)
 			if key == "notechart" then
 				self.notechartChanged = true
 			elseif key == "modifiers" then
-				self.gameController.modifierModel:setConfig(value)
-				self.gameController.configModel.configs.modifier = value
+				self.game.modifierModel:setConfig(value)
+				self.game.configModel.configs.modifier = value
 				self.modifiers = deepclone(value)
 			end
 		end,
@@ -36,18 +36,18 @@ MultiplayerModel.construct = function(self)
 			if not self.isPlaying and self.noteChartItem then
 				if not self.room.isFreeModifiers then
 					local modifiers = deepclone(self.modifiers)
-					self.gameController.modifierModel:setConfig(modifiers)
-					self.gameController.configModel.configs.modifier = modifiers
+					self.game.modifierModel:setConfig(modifiers)
+					self.game.configModel.configs.modifier = modifiers
 				end
 				if not self.room.isFreeNotechart then
-					self.gameController.selectModel:setConfig(self.noteChartItem)
+					self.game.selectModel:setConfig(self.noteChartItem)
 				end
-				self.gameController.selectController:playNoteChart()
+				self.game.selectController:playNoteChart()
 			end
 		end,
 		stopMatch = function(peer)
 			if self.isPlaying then
-				self.gameController.gameplayController:quit()
+				self.game.gameplayController:quit()
 			end
 		end,
 		addMessage = function(peer, message)
@@ -77,7 +77,7 @@ MultiplayerModel.refresh = function(self)
 
 	self.roomUsers = peer.getRoomUsers() or {}
 
-	local scoreSystem = self.gameController.rhythmModel.scoreEngine.scoreSystem
+	local scoreSystem = self.game.rhythmModel.scoreEngine.scoreSystem
 	if not scoreSystem.entry then
 		return
 	end
@@ -89,7 +89,7 @@ MultiplayerModel.refresh = function(self)
 end
 
 MultiplayerModel.connect = function(self)
-	local urls = self.gameController.configModel.configs.urls
+	local urls = self.game.configModel.configs.urls
 	if self.status == "disconnected" then
 		self.server = self.host:connect(urls.multiplayer)
 		self.status = "connecting"
@@ -112,8 +112,8 @@ MultiplayerModel.isHost = function(self)
 end
 
 MultiplayerModel.findNotechart = remote.wrap(function(self)
-	self.gameController.noteChartSetLibraryModel:findNotechart(self.notechart.hash or "", self.notechart.index or 0)
-	local items = self.gameController.noteChartSetLibraryModel.items
+	self.game.noteChartSetLibraryModel:findNotechart(self.notechart.hash or "", self.notechart.index or 0)
+	local items = self.game.noteChartSetLibraryModel.items
 
 	local item = items[1]
 	if item then
@@ -122,18 +122,18 @@ MultiplayerModel.findNotechart = remote.wrap(function(self)
 			noteChartId = item.noteChartId,
 			noteChartDataId = item.noteChartDataId,
 		}
-		self.gameController.selectModel:setConfig(item)
-		self.gameController.selectModel:pullNoteChartSet(true)
+		self.game.selectModel:setConfig(item)
+		self.game.selectModel:pullNoteChartSet(true)
 		self.peer.setNotechartFound(true)
 		return
 	end
-	self.gameController.selectModel:setConfig({
+	self.game.selectModel:setConfig({
 		setId = 0,
 		noteChartId = 0,
 		noteChartDataId = 0,
 	})
 	self.noteChartItem = nil
-	self.gameController.selectModel:pullNoteChartSet(true)
+	self.game.selectModel:pullNoteChartSet(true)
 	self.peer.setNotechartFound(false)
 end)
 
@@ -194,7 +194,7 @@ MultiplayerModel.createRoom = remote.wrap(function(self, name, password)
 		return
 	end
 	self.selectedRoom = nil
-	self.peer._setModifiers(self.gameController.modifierModel.config)
+	self.peer._setModifiers(self.game.modifierModel.config)
 end)
 
 MultiplayerModel.joinRoom = remote.wrap(function(self, password)
@@ -218,14 +218,14 @@ MultiplayerModel.pushModifiers = remote.wrap(function(self)
 	if not self:isHost() then
 		return
 	end
-	self.peer._setModifiers(self.gameController.modifierModel.config)
+	self.peer._setModifiers(self.game.modifierModel.config)
 end)
 
 MultiplayerModel.pushNotechart = remote.wrap(function(self)
 	if not self:isHost() then
 		return
 	end
-	local nc = self.gameController.selectModel.noteChartItem
+	local nc = self.game.selectModel.noteChartItem
 	if not nc then
 		return
 	end
@@ -260,8 +260,8 @@ MultiplayerModel.pullModifiers = remote.wrap(function(self)
 	if not modifiers then
 		return
 	end
-	self.gameController.modifierModel:setConfig(modifiers)
-	self.gameController.configModel.configs.modifier = modifiers
+	self.game.modifierModel:setConfig(modifiers)
+	self.game.configModel.configs.modifier = modifiers
 end)
 
 MultiplayerModel.pullNotechart = remote.wrap(function(self)
@@ -274,7 +274,7 @@ MultiplayerModel.pullNotechart = remote.wrap(function(self)
 end)
 
 MultiplayerModel.login = remote.wrap(function(self)
-	local api = self.gameController.onlineModel.webApi.api
+	local api = self.game.onlineModel.webApi.api
 
 	local key = self.peer.login()
 	if not key then

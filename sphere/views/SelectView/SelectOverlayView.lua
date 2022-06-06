@@ -29,7 +29,7 @@ SelectOverlayView.draw = function(self)
 	imgui.SetCursorPos({align(0.5, 1187 + margin), 89 + margin})
 	imgui.PushItemWidth(454 - 2 * margin)
 
-	groupPtr[0] = self.gameController.noteChartSetLibraryModel.collapse
+	groupPtr[0] = self.game.noteChartSetLibraryModel.collapse
 	if imgui.Checkbox("Group", groupPtr) then
 		self.navigator:changeCollapse()
 	end

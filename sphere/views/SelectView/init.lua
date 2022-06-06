@@ -56,27 +56,27 @@ SelectView.load = function(self)
 	self:loadViews(self.views)
 	ScreenView.load(self)
 
-	self.noteSkinView.gameController = self.gameController
+	self.noteSkinView.game = self.game
 	self.noteSkinView.navigator = self.navigator
 	self.noteSkinView.isOpen = self.navigator.isNoteSkinsOpen
 
-	self.inputView.gameController = self.gameController
+	self.inputView.game = self.game
 	self.inputView.navigator = self.navigator
 	self.inputView.isOpen = self.navigator.isInputOpen
 
-	self.settingsView.gameController = self.gameController
+	self.settingsView.game = self.game
 	self.settingsView.navigator = self.navigator
 	self.settingsView.isOpen = self.navigator.isSettingsOpen
 
-	self.onlineView.gameController = self.gameController
+	self.onlineView.game = self.game
 	self.onlineView.navigator = self.navigator
 	self.onlineView.isOpen = self.navigator.isOnlineOpen
 
-	self.mountsView.gameController = self.gameController
+	self.mountsView.game = self.game
 	self.mountsView.navigator = self.navigator
 	self.mountsView.isOpen = self.navigator.isMountsOpen
 
-	self.selectOverlayView.gameController = self.gameController
+	self.selectOverlayView.game = self.game
 	self.selectOverlayView.navigator = self.navigator
 end
 

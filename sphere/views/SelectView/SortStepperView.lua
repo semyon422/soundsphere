@@ -14,15 +14,15 @@ SortStepperView.construct = function(self)
 end
 
 SortStepperView.getIndexValue = function(self)
-	return self.gameController.sortModel:toIndexValue(self.gameController.sortModel.name)
+	return self.game.sortModel:toIndexValue(self.game.sortModel.name)
 end
 
 SortStepperView.getCount = function(self)
-	return #self.gameController.sortModel.names
+	return #self.game.sortModel.names
 end
 
 SortStepperView.updateIndexValue = function(self, indexValue)
-	self.navigator:setSortFunction(self.gameController.sortModel:fromIndexValue(indexValue))
+	self.navigator:setSortFunction(self.game.sortModel:fromIndexValue(indexValue))
 end
 
 SortStepperView.increaseValue = function(self, delta)
@@ -30,7 +30,7 @@ SortStepperView.increaseValue = function(self, delta)
 end
 
 SortStepperView.draw = function(self)
-	local sortModel = self.gameController.sortModel
+	local sortModel = self.game.sortModel
 	local config = self.config
 
 	local tf = transform(config.transform):translate(config.x, config.y)

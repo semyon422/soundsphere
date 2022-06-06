@@ -23,12 +23,12 @@ ModifierListItemSliderView.getDisplayValue = function(self)
 end
 
 ModifierListItemSliderView.getNormValue = function(self)
-	local modifier = self.listView.gameController.modifierModel:getModifier(self.item)
+	local modifier = self.listView.game.modifierModel:getModifier(self.item)
 	return modifier:toNormValue(self.item.value)
 end
 
 ModifierListItemSliderView.updateNormValue = function(self, normValue)
-	local modifier = self.listView.gameController.modifierModel:getModifier(self.item)
+	local modifier = self.listView.game.modifierModel:getModifier(self.item)
 	self.listView.navigator:setModifierValue(
 		self.item,
 		modifier:fromNormValue(normValue)

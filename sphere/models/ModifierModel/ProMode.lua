@@ -20,7 +20,7 @@ ProMode.apply = function(self, config)
 	if not config.value then
 		return
 	end
-	self.gameController.rhythmModel.logicEngine.promode = true
+	self.game.rhythmModel.logicEngine.promode = true
 end
 
 ProMode.receive = function(self, config, event)
@@ -32,7 +32,7 @@ ProMode.receive = function(self, config, event)
 		return
 	end
 
-	local logicEngine = self.gameController.rhythmModel.logicEngine
+	local logicEngine = self.game.rhythmModel.logicEngine
 
 	local nearestNote
 	for _, noteHandler in pairs(logicEngine.noteHandlers) do

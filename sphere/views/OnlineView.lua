@@ -29,14 +29,14 @@ OnlineView.draw = function(self)
 		return
 	end
 
-	local multiplayerModel = self.gameController.multiplayerModel
+	local multiplayerModel = self.game.multiplayerModel
 
 	imgui.SetNextWindowPos({align(0.5, 279 + 454 * 3 / 4), 279 / 2}, 0)
 	imgui.SetNextWindowSize({454 * 1.5, 522 * 1.5}, 0)
 	local flags = imgui.love.WindowFlags("NoMove", "NoResize")
 	if imgui.Begin("Online", self.isOpen, flags) then
 		if imgui.BeginTabBar("Online tab bar") then
-			local active = inside(self, "gameController.configModel.configs.online.session.active")
+			local active = inside(self, "game.configModel.configs.online.session.active")
 			if imgui.BeginTabItem("Login") then
 				if active then
 					imgui.Text("You are logged in")

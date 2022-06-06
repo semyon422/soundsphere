@@ -3,12 +3,12 @@ local Class					= require("aqua.util.Class")
 local SelectController = Class:new()
 
 SelectController.load = function(self)
-	local noteChartModel = self.gameController.noteChartModel
-	local themeModel = self.gameController.themeModel
-	local selectModel = self.gameController.selectModel
-	local previewModel = self.gameController.previewModel
+	local noteChartModel = self.game.noteChartModel
+	local themeModel = self.game.themeModel
+	local selectModel = self.game.selectModel
+	local previewModel = self.game.previewModel
 
-	self.gameController:writeConfigs()
+	self.game:writeConfigs()
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -17,7 +17,7 @@ SelectController.load = function(self)
 	self.view = view
 
 	view.controller = self
-	view.gameController = self.gameController
+	view.game = self.game
 
 	noteChartModel:load()
 	selectModel:load()
@@ -25,28 +25,28 @@ SelectController.load = function(self)
 
 	view:load()
 
-	local timeEngine = self.gameController.rhythmModel.timeEngine
+	local timeEngine = self.game.rhythmModel.timeEngine
 	timeEngine:resetTimeRateHandlers()
-	self.gameController.modifierModel:apply("TimeEngineModifier")
+	self.game.modifierModel:apply("TimeEngineModifier")
 	timeEngine:getBaseTimeRate()
 end
 
 SelectController.unload = function(self)
-	self.gameController.noteSkinModel:load()
-	self.gameController.previewModel:unload()
+	self.game.noteSkinModel:load()
+	self.game.previewModel:unload()
 	self.view:unload()
-	self.gameController:writeConfigs()
+	self.game:writeConfigs()
 end
 
 SelectController.update = function(self, dt)
-	self.gameController.previewModel:update(dt)
-	self.gameController.selectModel:update()
+	self.game.previewModel:update(dt)
+	self.game.selectModel:update()
 	self.view:update(dt)
 
-	local graphics = self.gameController.configModel.configs.settings.graphics
+	local graphics = self.game.configModel.configs.settings.graphics
 	local flags = graphics.mode.flags
 	if graphics.vsyncOnSelect and flags.vsync == 0 then
-		flags.vsync = self.gameController.baseVsync
+		flags.vsync = self.game.baseVsync
 	end
 end
 
@@ -60,21 +60,21 @@ SelectController.receive = function(self, event)
 	if event.name == "setTheme" then
 		self.themeModel:setDefaultTheme(event.theme)
 	elseif event.name == "scrollCollection" then
-		self.gameController.selectModel:scrollCollection(event.direction)
+		self.game.selectModel:scrollCollection(event.direction)
 	elseif event.name == "scrollNoteChartSet" then
-		self.gameController.selectModel:scrollNoteChartSet(event.direction)
+		self.game.selectModel:scrollNoteChartSet(event.direction)
 	elseif event.name == "scrollNoteChart" then
-		self.gameController.selectModel:scrollNoteChart(event.direction)
+		self.game.selectModel:scrollNoteChart(event.direction)
 	elseif event.name == "scrollScore" then
-		self.gameController.selectModel:scrollScore(event.direction)
+		self.game.selectModel:scrollScore(event.direction)
 	elseif event.name == "scrollRandom" then
-		self.gameController.selectModel:scrollRandom()
+		self.game.selectModel:scrollRandom()
 	elseif event.name == "setSortFunction" then
-		self.gameController.selectModel:setSortFunction(event.sortFunction)
+		self.game.selectModel:setSortFunction(event.sortFunction)
 	elseif event.name == "scrollSortFunction" then
-		self.gameController.selectModel:scrollSortFunction(event.delta)
+		self.game.selectModel:scrollSortFunction(event.delta)
 	elseif event.name == "setSearchString" then
-		self.gameController.searchModel:setSearchString(event.text)
+		self.game.searchModel:setSearchString(event.text)
 	elseif event.name == "changeScreen" then
 		if event.screenName == "Modifier" then
 			self:switchModifierController()
@@ -82,11 +82,11 @@ SelectController.receive = function(self, event)
 			self:switchResultController()
 		end
 	elseif event.name == "changeSearchMode" then
-		self.gameController.selectModel:changeSearchMode()
+		self.game.selectModel:changeSearchMode()
 	elseif event.name == "changeCollapse" then
-		self.gameController.selectModel:changeCollapse()
+		self.game.selectModel:changeCollapse()
 	elseif event.name == "pullNoteChartSet" then
-		self.gameController.selectModel:debouncePullNoteChartSet()
+		self.game.selectModel:debouncePullNoteChartSet()
 	elseif event.name == "playNoteChart" then
 		self:playNoteChart()
 	elseif event.name == "loadModifiedNoteChart" then
@@ -96,55 +96,55 @@ SelectController.receive = function(self, event)
 	elseif event.name == "resetModifiedNoteChart" then
 		self:resetModifiedNoteChart()
 	elseif event.name == "setNoteSkin" then
-		self.gameController.noteSkinModel:setDefaultNoteSkin(event.noteSkin)
+		self.game.noteSkinModel:setDefaultNoteSkin(event.noteSkin)
 	elseif event.name == "quickLogin" then
-		self.gameController.onlineModel.authManager:quickLogin()
+		self.game.onlineModel.authManager:quickLogin()
 	elseif event.name == "login" then
-		self.gameController.onlineModel.authManager:login(event.email, event.password)
+		self.game.onlineModel.authManager:login(event.email, event.password)
 	elseif event.name == "openDirectory" then
-		local selectModel = self.gameController.selectModel
+		local selectModel = self.game.selectModel
 		local path = selectModel.noteChartItem.path:match("^(.+)/.-$")
-		local mountPath = self.gameController.mountModel:getRealPath(path)
+		local mountPath = self.game.mountModel:getRealPath(path)
 		local realPath =
 			mountPath or
 			love.filesystem.getSource() .. "/" .. path
 		love.system.openURL("file://" .. realPath)
 	elseif event.name == "updateCache" then
-		local selectModel = self.gameController.selectModel
+		local selectModel = self.game.selectModel
 		local path = selectModel.noteChartItem.path:match("^(.+)/.-$")
-		self.gameController.cacheModel:startUpdate(path, event.force)
+		self.game.cacheModel:startUpdate(path, event.force)
 	elseif event.name == "updateCacheCollection" then
-		local state = self.gameController.cacheModel.cacheUpdater.state
+		local state = self.game.cacheModel.cacheUpdater.state
 		if state == 0 or state == 3 then
-			self.gameController.cacheModel:startUpdate(event.collection.path, event.force)
+			self.game.cacheModel:startUpdate(event.collection.path, event.force)
 		else
-			self.gameController.cacheModel:stopUpdate()
+			self.game.cacheModel:stopUpdate()
 		end
 	elseif event.name == "calculateTopScores" then
-		self.gameController.scoreModel:asyncCalculateTopScores()
+		self.game.scoreModel:asyncCalculateTopScores()
 	elseif event.name == "setInputBinding" then
-		self.gameController.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
+		self.game.inputModel:setKey(event.inputMode, event.virtualKey, event.value, event.type)
 	elseif event.name == "searchOsudirect" then
-		self.gameController.osudirectModel:searchDebounce()
+		self.game.osudirectModel:searchDebounce()
 	elseif event.name == "osudirectBeatmap" then
-		local osudirectModel = self.gameController.osudirectModel
+		local osudirectModel = self.game.osudirectModel
 		osudirectModel:setBeatmap(event.beatmap)
-		local backgroundUrl = self.gameController.osudirectModel:getBackgroundUrl()
-		local previewUrl = self.gameController.osudirectModel:getPreviewUrl()
-		self.gameController.backgroundModel:loadBackgroundDebounce(backgroundUrl)
-		self.gameController.previewModel:loadPreviewDebounce(previewUrl)
+		local backgroundUrl = self.game.osudirectModel:getBackgroundUrl()
+		local previewUrl = self.game.osudirectModel:getPreviewUrl()
+		self.game.backgroundModel:loadBackgroundDebounce(backgroundUrl)
+		self.game.previewModel:loadPreviewDebounce(previewUrl)
 	elseif event.name == "downloadBeatmapSet" then
-		self.gameController.osudirectModel:downloadBeatmapSet()
+		self.game.osudirectModel:downloadBeatmapSet()
 	elseif event.name == "setOsudirectSearchString" then
-		self.gameController.osudirectModel:setSearchString(event.text)
+		self.game.osudirectModel:setSearchString(event.text)
 	elseif event.name == "deleteNoteChart" then
 	elseif event.name == "deleteNoteChartSet" then
 	end
 end
 
 SelectController.resetModifiedNoteChart = function(self)
-	local noteChartModel = self.gameController.noteChartModel
-	local modifierModel = self.gameController.modifierModel
+	local noteChartModel = self.game.noteChartModel
+	local modifierModel = self.game.modifierModel
 
 	noteChartModel:load()
 
@@ -169,23 +169,23 @@ SelectController.unloadModifiedNoteChart = function(self)
 end
 
 SelectController.switchModifierController = function(self)
-	if not self.gameController.noteChartModel:getFileInfo() then
+	if not self.game.noteChartModel:getFileInfo() then
 		return
 	end
 
 	local ModifierController = require("sphere.controllers.ModifierController")
 	local modifierController = ModifierController:new()
 	modifierController.selectController = self
-	modifierController.gameController = self.gameController
-	return self.gameController.screenManager:set(modifierController)
+	modifierController.game = self.game
+	return self.game.screenManager:set(modifierController)
 end
 
 SelectController.switchResultController = function(self)
-	if not self.gameController.noteChartModel:getFileInfo() then
+	if not self.game.noteChartModel:getFileInfo() then
 		return
 	end
 
-	local selectModel = self.gameController.selectModel
+	local selectModel = self.game.selectModel
 	local scoreItemIndex = selectModel.scoreItemIndex
 	local scoreItem = selectModel.scoreItem
 	if not scoreItem then
@@ -195,23 +195,23 @@ SelectController.switchResultController = function(self)
 	local ResultController = require("sphere.controllers.ResultController")
 	local resultController = ResultController:new()
 	resultController.selectController = self
-	resultController.gameController = self.gameController
+	resultController.game = self.game
 	resultController:replayNoteChart("result", scoreItem, scoreItemIndex)
 
-	return self.gameController.screenManager:set(resultController)
+	return self.game.screenManager:set(resultController)
 end
 
 SelectController.playNoteChart = function(self)
-	if not self.gameController.noteChartModel:getFileInfo() then
+	if not self.game.noteChartModel:getFileInfo() then
 		return
 	end
 
 	local GameplayController = require("sphere.controllers.GameplayController")
 	local gameplayController = GameplayController:new()
 	gameplayController.selectController = self
-	gameplayController.gameController = self.gameController
-	self.gameController.gameplayController = gameplayController
-	return self.gameController.screenManager:set(gameplayController)
+	gameplayController.game = self.game
+	self.game.gameplayController = gameplayController
+	return self.game.screenManager:set(gameplayController)
 end
 
 return SelectController

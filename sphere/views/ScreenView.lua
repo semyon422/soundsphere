@@ -49,11 +49,11 @@ end
 
 ScreenView.loadViews = function(self, views)
 	local navigator = assert(self.navigator)
-	local gameController = assert(self.gameController)
+	local game = assert(self.game)
 	local sequenceView = assert(self.sequenceView)
 	for _, a in ipairs(views) do
 		local view = self[a[1]]
-		view.gameController = gameController
+		view.game = game
 		view.navigator = navigator
 		sequenceView:setView(a[3], view)
 	end
@@ -64,7 +64,7 @@ ScreenView.load = function(self)
 	local sequenceView = self.sequenceView
 
 	navigator.view = self
-	navigator.gameController = self.gameController
+	navigator.game = self.game
 	navigator.viewConfig = assert(self.viewConfig)
 	navigator.sequenceView = sequenceView
 

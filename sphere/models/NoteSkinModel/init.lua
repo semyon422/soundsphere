@@ -17,7 +17,7 @@ NoteSkinModel.load = function(self)
 	self.files = {}
 	self.filesMap = {}
 	self.foundNoteSkins = {}
-	self.config = self.gameController.configModel.configs.settings
+	self.config = self.game.configModel.configs.settings
 	self:lookup(self.path)
 	self:loadNoteSkins()
 end

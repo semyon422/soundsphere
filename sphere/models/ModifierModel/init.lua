@@ -98,7 +98,7 @@ ModifierModel.construct = function(self)
 end
 
 ModifierModel.load = function(self)
-	self:setConfig(self.gameController.configModel.configs.modifier)
+	self:setConfig(self.game.configModel.configs.modifier)
 
 	self.availableModifierItemIndex = 1
 
@@ -235,7 +235,7 @@ ModifierModel.apply = function(self, modifierType)
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
 		if modifier and modifier.type == modifierType then
-			modifier.gameController = self.gameController
+			modifier.game = self.game
 			modifier:apply(modifierConfig)
 		end
 	end

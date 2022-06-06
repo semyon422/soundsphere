@@ -23,7 +23,7 @@ SpeedMode.getSubString = function(self, config)
 end
 
 SpeedMode.applySpeed = function(self, speed)
-	local noteChart = self.gameController.noteChartModel.noteChart
+	local noteChart = self.game.noteChartModel.noteChart
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
@@ -40,7 +40,7 @@ SpeedMode.applySpeed = function(self, speed)
 end
 
 SpeedMode.applyConstant = function(self)
-	local noteChart = self.gameController.noteChartModel.noteChart
+	local noteChart = self.game.noteChartModel.noteChart
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
@@ -59,7 +59,7 @@ SpeedMode.applyConstant = function(self)
 end
 
 SpeedMode.apply = function(self, config)
-	local noteChart = self.gameController.noteChartModel.noteChart
+	local noteChart = self.game.noteChartModel.noteChart
 
 	local minTime = noteChart.metaData:get("minTime")
 	local maxTime = noteChart.metaData:get("maxTime")

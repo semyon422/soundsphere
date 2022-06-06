@@ -34,7 +34,7 @@ RhythmModel.construct = function(self)
 end
 
 RhythmModel.load = function(self)
-	local modifierModel = self.gameController.modifierModel
+	local modifierModel = self.game.modifierModel
 	local inputManager = self.inputManager
 	local pauseManager = self.pauseManager
 	local replayModel = self.replayModel
@@ -68,7 +68,7 @@ RhythmModel.load = function(self)
 end
 
 RhythmModel.unload = function(self)
-	local modifierModel = self.gameController.modifierModel
+	local modifierModel = self.game.modifierModel
 	local inputManager = self.inputManager
 	local replayModel = self.replayModel
 	local timeEngine = self.timeEngine
@@ -91,7 +91,7 @@ RhythmModel.unload = function(self)
 end
 
 RhythmModel.loadAllEngines = function(self)
-	local modifierModel = self.gameController.modifierModel
+	local modifierModel = self.game.modifierModel
 	local replayModel = self.replayModel
 	local timeEngine = self.timeEngine
 	local scoreEngine = self.scoreEngine
@@ -116,7 +116,7 @@ RhythmModel.loadAllEngines = function(self)
 end
 
 RhythmModel.loadLogicEngines = function(self)
-	local modifierModel = self.gameController.modifierModel
+	local modifierModel = self.game.modifierModel
 	local replayModel = self.replayModel
 	local timeEngine = self.timeEngine
 	local scoreEngine = self.scoreEngine
@@ -151,7 +151,7 @@ RhythmModel.receive = function(self, event)
 		return
 	end
 
-	self.gameController.modifierModel:receive(event)
+	self.game.modifierModel:receive(event)
 	self.inputManager:receive(event)
 	self.pauseManager:receive(event)
 end
@@ -162,13 +162,13 @@ RhythmModel.update = function(self, dt)
 	self.audioEngine:update()
 	self.scoreEngine:update()
 	self.graphicEngine:update(dt)
-	self.gameController.modifierModel:update()
+	self.game.modifierModel:update()
 	self.pauseManager:update(dt)
 end
 
 RhythmModel.setNoteChart = function(self, noteChart)
 	assert(noteChart)
-	self.gameController.modifierModel.noteChart = noteChart
+	self.game.modifierModel.noteChart = noteChart
 	self.timeEngine.noteChart = noteChart
 	self.scoreEngine.noteChart = noteChart
 	self.logicEngine.noteChart = noteChart

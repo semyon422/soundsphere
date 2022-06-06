@@ -3,7 +3,7 @@ local Class = require("aqua.util.Class")
 local ErrorController = Class:new()
 
 ErrorController.load = function(self)
-	local themeModel = self.gameController.themeModel
+	local themeModel = self.game.themeModel
 
 	local theme = themeModel:getTheme()
 	self.theme = theme
@@ -12,7 +12,7 @@ ErrorController.load = function(self)
 	self.view = view
 
 	view.controller = self
-	view.gameController = self.gameController
+	view.game = self.game
 	self.error = ""
 
 	view:load()
@@ -34,7 +34,7 @@ ErrorController.receive = function(self, event)
 	self.view:receive(event)
 
 	if event.name == "changeScreen" then
-		self.gameController.screenManager:set(self.gameController.selectController)
+		self.game.screenManager:set(self.game.selectController)
 	end
 end
 
