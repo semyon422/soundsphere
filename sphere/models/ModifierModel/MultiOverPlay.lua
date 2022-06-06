@@ -23,7 +23,7 @@ MultiOverPlay.getSubString = function(self, config)
 end
 
 MultiOverPlay.apply = function(self, config)
-	local noteChart = self.noteChartModel.noteChart
+	local noteChart = self.gameController.noteChartModel.noteChart
 	local value = config.value
 	if config.old then
 		value = value + 1

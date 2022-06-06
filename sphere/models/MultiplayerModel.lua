@@ -27,8 +27,8 @@ MultiplayerModel.construct = function(self)
 			if key == "notechart" then
 				self.notechartChanged = true
 			elseif key == "modifiers" then
-				self.modifierModel:setConfig(value)
-				self.configModel.configs.modifier = value
+				self.gameController.modifierModel:setConfig(value)
+				self.gameController.configModel.configs.modifier = value
 				self.modifiers = deepclone(value)
 			end
 		end,
@@ -36,11 +36,11 @@ MultiplayerModel.construct = function(self)
 			if not self.isPlaying and self.noteChartItem then
 				if not self.room.isFreeModifiers then
 					local modifiers = deepclone(self.modifiers)
-					self.modifierModel:setConfig(modifiers)
-					self.configModel.configs.modifier = modifiers
+					self.gameController.modifierModel:setConfig(modifiers)
+					self.gameController.configModel.configs.modifier = modifiers
 				end
 				if not self.room.isFreeNotechart then
-					self.selectModel:setConfig(self.noteChartItem)
+					self.gameController.selectModel:setConfig(self.noteChartItem)
 				end
 				self.gameController.selectController:playNoteChart()
 			end
@@ -112,8 +112,8 @@ MultiplayerModel.isHost = function(self)
 end
 
 MultiplayerModel.findNotechart = remote.wrap(function(self)
-	self.noteChartSetLibraryModel:findNotechart(self.notechart.hash or "", self.notechart.index or 0)
-	local items = self.noteChartSetLibraryModel.items
+	self.gameController.noteChartSetLibraryModel:findNotechart(self.notechart.hash or "", self.notechart.index or 0)
+	local items = self.gameController.noteChartSetLibraryModel.items
 
 	local item = items[1]
 	if item then
@@ -122,18 +122,18 @@ MultiplayerModel.findNotechart = remote.wrap(function(self)
 			noteChartId = item.noteChartId,
 			noteChartDataId = item.noteChartDataId,
 		}
-		self.selectModel:setConfig(item)
-		self.selectModel:pullNoteChartSet(true)
+		self.gameController.selectModel:setConfig(item)
+		self.gameController.selectModel:pullNoteChartSet(true)
 		self.peer.setNotechartFound(true)
 		return
 	end
-	self.selectModel:setConfig({
+	self.gameController.selectModel:setConfig({
 		setId = 0,
 		noteChartId = 0,
 		noteChartDataId = 0,
 	})
 	self.noteChartItem = nil
-	self.selectModel:pullNoteChartSet(true)
+	self.gameController.selectModel:pullNoteChartSet(true)
 	self.peer.setNotechartFound(false)
 end)
 
@@ -194,7 +194,7 @@ MultiplayerModel.createRoom = remote.wrap(function(self, name, password)
 		return
 	end
 	self.selectedRoom = nil
-	self.peer._setModifiers(self.modifierModel.config)
+	self.peer._setModifiers(self.gameController.modifierModel.config)
 end)
 
 MultiplayerModel.joinRoom = remote.wrap(function(self, password)
@@ -218,14 +218,14 @@ MultiplayerModel.pushModifiers = remote.wrap(function(self)
 	if not self:isHost() then
 		return
 	end
-	self.peer._setModifiers(self.modifierModel.config)
+	self.peer._setModifiers(self.gameController.modifierModel.config)
 end)
 
 MultiplayerModel.pushNotechart = remote.wrap(function(self)
 	if not self:isHost() then
 		return
 	end
-	local nc = self.selectModel.noteChartItem
+	local nc = self.gameController.selectModel.noteChartItem
 	if not nc then
 		return
 	end
@@ -260,8 +260,8 @@ MultiplayerModel.pullModifiers = remote.wrap(function(self)
 	if not modifiers then
 		return
 	end
-	self.modifierModel:setConfig(modifiers)
-	self.configModel.configs.modifier = modifiers
+	self.gameController.modifierModel:setConfig(modifiers)
+	self.gameController.configModel.configs.modifier = modifiers
 end)
 
 MultiplayerModel.pullNotechart = remote.wrap(function(self)
@@ -274,7 +274,7 @@ MultiplayerModel.pullNotechart = remote.wrap(function(self)
 end)
 
 MultiplayerModel.login = remote.wrap(function(self)
-	local api = self.onlineModel.webApi.api
+	local api = self.gameController.onlineModel.webApi.api
 
 	local key = self.peer.login()
 	if not key then

@@ -23,6 +23,7 @@ end
 WebReplayController.POST = function(self)
 	local params = self.params
 
+
 	local noteChart = WebNoteChartController.getNoteCharts(params.notechart)[1]
 	local noteChartDataEntry = noteChart.metaData:getTable()
 
@@ -35,9 +36,13 @@ WebReplayController.POST = function(self)
 	local noteChartModel = {}
 	local difficultyModel = DifficultyModel:new()
 
-	modifierModel.noteChartModel = noteChartModel
-	modifierModel.difficultyModel = difficultyModel
-	modifierModel.rhythmModel = rhythmModel
+	local gameController = {}
+	gameController.rhythmModel = rhythmModel
+	gameController.modifierModel = modifierModel
+	gameController.noteChartModel = noteChartModel
+	gameController.difficultyModel = difficultyModel
+
+	modifierModel.gameController = gameController
 
 	rhythmModel.modifierModel = modifierModel
 	rhythmModel.judgements = {}
@@ -51,11 +56,7 @@ WebReplayController.POST = function(self)
 
 	noteChartModel.noteChartDataEntry = noteChartDataEntry
 
-	fastplayController.gameController = {
-		noteChartModel = noteChartModel,
-		difficultyModel = difficultyModel,
-		rhythmModel = rhythmModel,
-	}
+	fastplayController.gameController = gameController
 
 	modifierModel:setConfig(replay.modifiers)
 	modifierModel:fixOldFormat(replay.modifiers, not replay.timings)

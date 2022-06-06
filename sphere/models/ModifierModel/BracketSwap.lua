@@ -22,7 +22,7 @@ BracketSwap.hardcodedMaps = {
 }
 
 BracketSwap.getMap = function(self, config)
-	local noteChart = self.noteChartModel.noteChart
+	local noteChart = self.gameController.noteChartModel.noteChart
 
 	local keyCount = noteChart.inputMode:getInputCount("key")
 

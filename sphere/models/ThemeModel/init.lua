@@ -12,7 +12,7 @@ ThemeModel.path = "userdata/themes"
 
 ThemeModel.load = function(self)
 	self.themes = {}
-	self.config = self.configModel.configs.settings
+	self.config = self.gameController.configModel.configs.settings
 	-- return self:lookup(self.path)
 end
 

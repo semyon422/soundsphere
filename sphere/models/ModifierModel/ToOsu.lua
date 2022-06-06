@@ -12,15 +12,15 @@ ToOsu.shortName = "OSU"
 
 ToOsu.apply = function(self, config)
 	local nce = NoteChartExporter:new()
-	nce.noteChart = self.noteChartModel.noteChart
-	nce.noteChartEntry = self.noteChartModel.noteChartEntry
-	nce.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
+	nce.noteChart = self.gameController.noteChartModel.noteChart
+	nce.noteChartEntry = self.gameController.noteChartModel.noteChartEntry
+	nce.noteChartDataEntry = self.gameController.noteChartModel.noteChartDataEntry
 
-	if not self.noteChartModel.noteChartEntry then
+	if not self.gameController.noteChartModel.noteChartEntry then
 		return
 	end
 
-	local path = self.noteChartModel.noteChartEntry.path
+	local path = self.gameController.noteChartModel.noteChartEntry.path
 	path = path:find("^.+/.$") and path:match("^(.+)/.$") or path
 	local fileName = path:match("^.+/(.-)$"):match("^(.+)%..-$")
 

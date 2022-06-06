@@ -27,8 +27,8 @@ end
 
 -- https://github.com/Quaver/Quaver/issues/666
 TimeRateQ.apply = function(self, config)
-	self.rhythmModel.timeEngine:createTimeRateHandler().timeRate = 2 ^ (0.1 * config.value)
-	self.rhythmModel.timeEngine:resetTimeRate()
+	self.gameController.rhythmModel.timeEngine:createTimeRateHandler().timeRate = 2 ^ (0.1 * config.value)
+	self.gameController.rhythmModel.timeEngine:resetTimeRate()
 end
 
 return TimeRateQ

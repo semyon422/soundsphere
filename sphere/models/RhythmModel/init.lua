@@ -8,13 +8,11 @@ local TimeEngine		= require("sphere.models.RhythmModel.TimeEngine")
 local InputManager		= require("sphere.models.RhythmModel.InputManager")
 local PauseManager		= require("sphere.models.RhythmModel.PauseManager")
 local ReplayModel		= require("sphere.models.ReplayModel")
-local ModifierModel		= require("sphere.models.ModifierModel")
 local Test		= require("sphere.models.RhythmModel.LogicEngine.Test")
 
 local RhythmModel = Class:new()
 
 RhythmModel.construct = function(self)
-	self.modifierModel = ModifierModel:new()
 	self.inputManager = InputManager:new()
 	self.pauseManager = PauseManager:new()
 	self.replayModel = ReplayModel:new()
@@ -24,7 +22,6 @@ RhythmModel.construct = function(self)
 	self.logicEngine = LogicEngine:new()
 	self.graphicEngine = GraphicEngine:new()
 	self.observable = Observable:new()
-	self.modifierModel.rhythmModel = self
 	self.inputManager.rhythmModel = self
 	self.pauseManager.rhythmModel = self
 	self.replayModel.rhythmModel = self
@@ -37,7 +34,7 @@ RhythmModel.construct = function(self)
 end
 
 RhythmModel.load = function(self)
-	local modifierModel = self.modifierModel
+	local modifierModel = self.gameController.modifierModel
 	local inputManager = self.inputManager
 	local pauseManager = self.pauseManager
 	local replayModel = self.replayModel
@@ -71,7 +68,7 @@ RhythmModel.load = function(self)
 end
 
 RhythmModel.unload = function(self)
-	local modifierModel = self.modifierModel
+	local modifierModel = self.gameController.modifierModel
 	local inputManager = self.inputManager
 	local replayModel = self.replayModel
 	local timeEngine = self.timeEngine
@@ -94,7 +91,7 @@ RhythmModel.unload = function(self)
 end
 
 RhythmModel.loadAllEngines = function(self)
-	local modifierModel = self.modifierModel
+	local modifierModel = self.gameController.modifierModel
 	local replayModel = self.replayModel
 	local timeEngine = self.timeEngine
 	local scoreEngine = self.scoreEngine
@@ -119,7 +116,7 @@ RhythmModel.loadAllEngines = function(self)
 end
 
 RhythmModel.loadLogicEngines = function(self)
-	local modifierModel = self.modifierModel
+	local modifierModel = self.gameController.modifierModel
 	local replayModel = self.replayModel
 	local timeEngine = self.timeEngine
 	local scoreEngine = self.scoreEngine
@@ -154,7 +151,7 @@ RhythmModel.receive = function(self, event)
 		return
 	end
 
-	self.modifierModel:receive(event)
+	self.gameController.modifierModel:receive(event)
 	self.inputManager:receive(event)
 	self.pauseManager:receive(event)
 end
@@ -165,13 +162,13 @@ RhythmModel.update = function(self, dt)
 	self.audioEngine:update()
 	self.scoreEngine:update()
 	self.graphicEngine:update(dt)
-	self.modifierModel:update()
+	self.gameController.modifierModel:update()
 	self.pauseManager:update(dt)
 end
 
 RhythmModel.setNoteChart = function(self, noteChart)
 	assert(noteChart)
-	self.modifierModel.noteChart = noteChart
+	self.gameController.modifierModel.noteChart = noteChart
 	self.timeEngine.noteChart = noteChart
 	self.scoreEngine.noteChart = noteChart
 	self.logicEngine.noteChart = noteChart

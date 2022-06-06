@@ -26,7 +26,7 @@ Automap.getSubString = function(self, config)
 end
 
 Automap.apply = function(self, config)
-	local noteChart = self.noteChartModel.noteChart
+	local noteChart = self.gameController.noteChartModel.noteChart
 	self.noteChart = noteChart
 
 	self.old = config.old
@@ -48,7 +48,7 @@ Automap.apply = function(self, config)
 end
 
 Automap.applyAutomap = function(self)
-	local noteChart = self.noteChartModel.noteChart
+	local noteChart = self.gameController.noteChartModel.noteChart
 	self.noteChart = noteChart
 
 	local noteDatas = {}

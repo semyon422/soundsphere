@@ -15,7 +15,7 @@ FastplayController.play = function(self)
 	rhythmModel.replayModel:update()
 	rhythmModel.logicEngine:update()
 	rhythmModel.scoreEngine:update()
-	rhythmModel.modifierModel:update()
+	self.gameController.modifierModel:update()
 
 	self:unload()
 end
@@ -24,7 +24,7 @@ FastplayController.load = function(self)
 	local noteChartModel = self.gameController.noteChartModel
 	local difficultyModel = self.gameController.difficultyModel
 	local rhythmModel = self.gameController.rhythmModel
-	local modifierModel = rhythmModel.modifierModel
+	local modifierModel = self.gameController.modifierModel
 	noteChartModel:load()
 
 	local noteChart = noteChartModel:loadNoteChart()

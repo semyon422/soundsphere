@@ -23,7 +23,7 @@ Shift.getSubString = function(self, config)
 end
 
 Shift.getMap = function(self, config)
-	local noteChart = self.noteChartModel.noteChart
+	local noteChart = self.gameController.noteChartModel.noteChart
 
 	local inputCounts = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do

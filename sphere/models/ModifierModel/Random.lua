@@ -20,7 +20,7 @@ Random.getSubString = function(self, config)
 end
 
 Random.getMap = function(self, config)
-	local noteChart = self.noteChartModel.noteChart
+	local noteChart = self.gameController.noteChartModel.noteChart
 	local value = config.value
 
 	local inputs = {}

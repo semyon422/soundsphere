@@ -20,7 +20,7 @@ Alternate.getSubString = function(self, config)
 end
 
 Alternate.apply = function(self, config)
-	local noteChart = self.noteChartModel.noteChart
+	local noteChart = self.gameController.noteChartModel.noteChart
 
 	local inputCounts = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do

@@ -86,7 +86,7 @@ GameplayController.load = function(self)
 		time = love.timer.getTime(),
 		delta = 0,
 	})
-
+	assert(self.gameController.modifierModel.config)
 	rhythmModel:loadAllEngines()
 
 	local baseTimeRate = rhythmModel.timeEngine:getBaseTimeRate()
@@ -306,7 +306,7 @@ GameplayController.skip = function(self)
 	rhythmModel.replayModel:update()
 	rhythmModel.logicEngine:update()
 	rhythmModel.scoreEngine:update()
-	rhythmModel.modifierModel:update()
+	self.gameController.modifierModel:update()
 end
 
 return GameplayController

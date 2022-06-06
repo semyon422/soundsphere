@@ -7,11 +7,11 @@ OnlineController.construct = function(self)
 end
 
 OnlineController.load = function(self)
-	self.onlineModel.authManager:checkSession()
+	self.gameController.onlineModel.authManager:checkSession()
 end
 
 OnlineController.update = function(self, dt)
-	local config = self.configModel.configs.online
+	local config = self.gameController.configModel.configs.online
 	local token = config.token
 	if #token == 0 then
 		return
@@ -19,7 +19,7 @@ OnlineController.update = function(self, dt)
 
 	local time = os.time()
 	if time - self.startTime > 300 then
-		self.onlineModel.authManager:checkSession()
+		self.gameController.onlineModel.authManager:checkSession()
 		self.startTime = time
 	end
 end

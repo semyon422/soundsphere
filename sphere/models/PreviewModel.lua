@@ -5,7 +5,7 @@ local aquathread = require("aqua.thread")
 local PreviewModel = Class:new()
 
 PreviewModel.load = function(self)
-	self.config = self.configModel.configs.select
+	self.config = self.gameController.configModel.configs.select
 	self.noteChartDataEntryId = 0
 	self.audioPath = ""
 	self.previewTime = 0
@@ -18,7 +18,7 @@ PreviewModel.unload = function(self)
 end
 
 PreviewModel.update = function(self, dt)
-	local noteChartItem = self.selectModel.noteChartItem
+	local noteChartItem = self.gameController.selectModel.noteChartItem
 	if noteChartItem and self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
 		self.noteChartDataEntryId = self.config.noteChartDataEntryId
 		local audioPath, previewTime = noteChartItem:getAudioPathPreview()
@@ -40,14 +40,14 @@ PreviewModel.update = function(self, dt)
 		audio:play()
 	end
 
-	local volumeConfig = self.configModel.configs.settings.audio.volume
+	local volumeConfig = self.gameController.configModel.configs.settings.audio.volume
 	local volume = volumeConfig.master * volumeConfig.music
 	if self.volume ~= volume then
 		audio:setVolume(volume)
 		self.volume = volume
 	end
 
-	local baseTimeRate = self.rhythmModel.timeEngine.baseTimeRate
+	local baseTimeRate = self.gameController.rhythmModel.timeEngine.baseTimeRate
 	if self.pitch ~= baseTimeRate then
 		audio:setPitch(baseTimeRate)
 		self.pitch = baseTimeRate
@@ -102,8 +102,8 @@ PreviewModel.loadPreview = function(self)
 	self.path = path
 	self.position = position
 
-	local baseTimeRate = self.rhythmModel.timeEngine.baseTimeRate
-	local volumeConfig = self.configModel.configs.settings.audio.volume
+	local baseTimeRate = self.gameController.rhythmModel.timeEngine.baseTimeRate
+	local volumeConfig = self.gameController.configModel.configs.settings.audio.volume
 	local volume = volumeConfig.master * volumeConfig.music
 	audio:seek(position or 0)
 	audio:setVolume(volume)
