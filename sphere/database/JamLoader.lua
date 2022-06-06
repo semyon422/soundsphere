@@ -28,11 +28,11 @@ end)
 JamLoader.load = aquathread.coro(function(self, path, callback)
 	if loadedPath == path then
 		return callback(loadedSoundDatas)
-	else
-		for i, soundData in pairs(loadedSoundDatas) do
-			sound.free(soundData)
-			sound.remove(path .. "/" .. i)
-		end
+	end
+
+	for i, soundData in pairs(loadedSoundDatas) do
+		sound.free(soundData)
+		sound.remove(loadedPath .. "/" .. i)
 	end
 
 	local soundDatas, err = loadOjm(path)
