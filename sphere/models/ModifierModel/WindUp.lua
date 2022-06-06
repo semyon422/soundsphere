@@ -18,7 +18,7 @@ WindUp.getString = function(self, config)
 end
 
 WindUp.apply = function(self, config)
-	if config.value == 0 then
+	if not config.value then
 		return
 	end
 	self.timeRateHandler = self.rhythmModel.timeEngine:createTimeRateHandler()

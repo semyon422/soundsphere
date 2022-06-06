@@ -24,7 +24,7 @@ ProMode.apply = function(self, config)
 end
 
 ProMode.receive = function(self, config, event)
-	if config.value == 0 then
+	if not config.value then
 		return
 	end
 

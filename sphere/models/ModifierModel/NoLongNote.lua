@@ -17,7 +17,7 @@ NoLongNote.getString = function(self, config)
 end
 
 NoLongNote.apply = function(self, config)
-	if config.value == 0 then
+	if not config.value then
 		return
 	end
 
