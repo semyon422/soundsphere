@@ -51,7 +51,7 @@ ModifierController.receive = function(self, event)
 	elseif event.name == "adjustDifficulty" then
 		self:adjustDifficulty()
 	elseif event.name == "changeScreen" then
-		self.game.screenManager:set(self.selectController)
+		self.game.screenManager:set(self.game.selectController)
 	end
 end
 

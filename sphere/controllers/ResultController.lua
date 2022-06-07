@@ -49,7 +49,7 @@ ResultController.receive = function(self, event)
 
 	if event.name == "changeScreen" then
 		self.game:resetGameplayConfigs()
-		self.game.screenManager:set(self.selectController)
+		self.game.screenManager:set(self.game.selectController)
 	elseif event.name == "loadScore" then
 		self.game:resetGameplayConfigs()
 		self:replayNoteChart(event.mode, event.scoreEntry, event.itemIndex)
@@ -69,11 +69,9 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 
 	local gameplayController
 	if mode == "result" then
-		local FastplayController = require("sphere.controllers.FastplayController")
-		gameplayController = FastplayController:new()
+		gameplayController = self.game.fastplayController
 	else
-		local GameplayController = require("sphere.controllers.GameplayController")
-		gameplayController = GameplayController:new()
+		gameplayController = self.game.gameplayController
 	end
 
 	local hash = scoreEntry.replayHash

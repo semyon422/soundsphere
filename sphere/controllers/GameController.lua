@@ -4,12 +4,8 @@ local ConfigModel				= require("sphere.models.ConfigModel")
 local ScoreModel				= require("sphere.models.ScoreModel")
 local DiscordModel				= require("sphere.models.DiscordModel")
 local MountModel				= require("sphere.models.MountModel")
-local MountController			= require("sphere.controllers.MountController")
-local OnlineController			= require("sphere.controllers.OnlineController")
 local ScreenManager				= require("sphere.screen.ScreenManager")
 local FadeTransition			= require("sphere.screen.FadeTransition")
-local SelectController			= require("sphere.controllers.SelectController")
-local ErrorController			= require("sphere.controllers.ErrorController")
 local WindowManager				= require("sphere.window.WindowManager")
 local FpsLimiter				= require("sphere.window.FpsLimiter")
 local Screenshot				= require("sphere.window.Screenshot")
@@ -39,17 +35,35 @@ local MultiplayerModel		= require("sphere.models.MultiplayerModel")
 local MainLog					= require("sphere.MainLog")
 local FrameTimeView					= require("sphere.views.FrameTimeView")
 
+local MountController			= require("sphere.controllers.MountController")
+local OnlineController			= require("sphere.controllers.OnlineController")
+local SelectController			= require("sphere.controllers.SelectController")
+local ErrorController			= require("sphere.controllers.ErrorController")
+local ModifierController 		= require("sphere.controllers.ModifierController")
+local GameplayController		= require("sphere.controllers.GameplayController")
+local FastplayController		= require("sphere.controllers.FastplayController")
+local ResultController			= require("sphere.controllers.ResultController")
+local TimeController			= require("sphere.controllers.TimeController")
+
 local GameController = Class:new()
 
 GameController.baseVsync = 1
 
 GameController.construct = function(self)
+	self.mountController = MountController:new()
+	self.onlineController = OnlineController:new()
+	self.errorController = ErrorController:new()
+	self.selectController = SelectController:new()
+	self.modifierController = ModifierController:new()
+	self.gameplayController = GameplayController:new()
+	self.fastplayController = FastplayController:new()
+	self.resultController = ResultController:new()
+	self.timeController = TimeController:new()
+
 	self.configModel = ConfigModel:new()
 	self.notificationModel = NotificationModel:new()
 	self.windowManager = WindowManager:new()
 	self.mountModel = MountModel:new()
-	self.mountController = MountController:new()
-	self.onlineController = OnlineController:new()
 	self.screenshot = Screenshot:new()
 	self.directoryManager = DirectoryManager:new()
 	self.themeModel = ThemeModel:new()
@@ -79,74 +93,18 @@ GameController.construct = function(self)
 	self.osudirectModel = OsudirectModel:new()
 	self.multiplayerModel = MultiplayerModel:new()
 	self.frameTimeView = FrameTimeView:new()
+
+	for k, v in pairs(self) do
+		v.game = self
+	end
 end
 
 GameController.load = function(self)
-	local notificationModel = self.notificationModel
-	local configModel = self.configModel
-	local windowManager = self.windowManager
-	local mountModel = self.mountModel
-	local mountController = self.mountController
-	local onlineController = self.onlineController
-	local screenshot = self.screenshot
-	local directoryManager = self.directoryManager
-	local themeModel = self.themeModel
-	local scoreModel = self.scoreModel
-	local onlineModel = self.onlineModel
-	local cacheModel = self.cacheModel
-	local backgroundModel = self.backgroundModel
-	local modifierModel = self.modifierModel
-	local noteSkinModel = self.noteSkinModel
-	local noteChartModel = self.noteChartModel
-	local inputModel = self.inputModel
-	local difficultyModel = self.difficultyModel
-	local collectionModel = self.collectionModel
-	local selectModel = self.selectModel
-	local updateModel = self.updateModel
-	local fpsLimiter = self.fpsLimiter
-	local rhythmModel = self.rhythmModel
-	local noteChartSetLibraryModel = self.noteChartSetLibraryModel
-	local noteChartLibraryModel = self.noteChartLibraryModel
-	local searchModel = self.searchModel
-	local scoreLibraryModel = self.scoreLibraryModel
-	local sortModel = self.sortModel
-	local previewModel = self.previewModel
-	local discordModel = self.discordModel
-	local osudirectModel = self.osudirectModel
-	local multiplayerModel = self.multiplayerModel
+	local selectController = self.selectController
 
-	notificationModel.game = self
-	configModel.game = self
-	windowManager.game = self
-	mountModel.game = self
-	mountController.game = self
-	onlineController.game = self
-	screenshot.game = self
-	directoryManager.game = self
-	themeModel.game = self
-	scoreModel.game = self
-	onlineModel.game = self
-	cacheModel.game = self
-	backgroundModel.game = self
-	modifierModel.game = self
-	noteSkinModel.game = self
-	noteChartModel.game = self
-	inputModel.game = self
-	difficultyModel.game = self
-	collectionModel.game = self
-	selectModel.game = self
-	updateModel.game = self
-	fpsLimiter.game = self
-	rhythmModel.game = self
-	noteChartSetLibraryModel.game = self
-	noteChartLibraryModel.game = self
-	searchModel.game = self
-	scoreLibraryModel.game = self
-	sortModel.game = self
-	previewModel.game = self
-	discordModel.game = self
-	osudirectModel.game = self
-	multiplayerModel.game = self
+	local configModel = self.configModel
+	local directoryManager = self.directoryManager
+	local rhythmModel = self.rhythmModel
 
 	directoryManager:createDirectories()
 
@@ -168,39 +126,30 @@ GameController.load = function(self)
 	rhythmModel.hp = configModel.configs.settings.gameplay.hp
 	rhythmModel.settings = configModel.configs.settings
 
-	themeModel:load()
-	modifierModel:load()
-	mountModel:load()
-	updateModel:load()
-	windowManager:load()
-	scoreModel:load()
-	onlineModel:load()
-	inputModel:load()
-	noteSkinModel:load()
-	cacheModel:load()
-	noteChartModel:load()
-	noteChartSetLibraryModel:load()
-	noteChartLibraryModel:load()
-	osudirectModel:load()
-	onlineController:load()
-	discordModel:load()
-	backgroundModel:load()
-	collectionModel:load()
-	selectModel:load()
-	previewModel:load()
-	multiplayerModel:load()
+	self.themeModel:load()
+	self.modifierModel:load()
+	self.mountModel:load()
+	self.updateModel:load()
+	self.windowManager:load()
+	self.scoreModel:load()
+	self.onlineModel:load()
+	self.inputModel:load()
+	self.noteSkinModel:load()
+	self.cacheModel:load()
+	self.noteChartModel:load()
+	self.noteChartSetLibraryModel:load()
+	self.noteChartLibraryModel:load()
+	self.osudirectModel:load()
+	self.onlineController:load()
+	self.discordModel:load()
+	self.backgroundModel:load()
+	self.collectionModel:load()
+	self.selectModel:load()
+	self.previewModel:load()
+	self.multiplayerModel:load()
 	self.frameTimeView:load()
 
 	self.screenManager:setTransition(self.fadeTransition)
-
-	local errorController = ErrorController:new()
-	self.errorController = errorController
-	errorController.game = self
-	self.screenManager:setFallback(errorController)
-
-	local selectController = SelectController:new()
-	self.selectController = selectController
-	selectController.game = self
 	self.screenManager:set(selectController)
 end
 

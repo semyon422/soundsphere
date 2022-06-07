@@ -1,17 +1,10 @@
 local Class						= require("aqua.util.Class")
 local sound						= require("aqua.sound")
-local TimeController			= require("sphere.controllers.TimeController")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 
 local GameplayController = Class:new()
 
-GameplayController.construct = function(self)
-	self.timeController = TimeController:new()
-end
-
 GameplayController.load = function(self)
-	local timeController = self.timeController
-
 	local rhythmModel = self.game.rhythmModel
 	local noteChartModel = self.game.noteChartModel
 	local noteSkinModel = self.game.noteSkinModel
@@ -34,8 +27,6 @@ GameplayController.load = function(self)
 
 	view.controller = self
 	view.game = self.game
-
-	timeController.game = self.game
 
 	local noteChart = noteChartModel:loadNoteChart(self:getImporterSettings())
 	rhythmModel:setNoteChart(noteChart)
@@ -191,7 +182,7 @@ GameplayController.discordPause = function(self)
 end
 
 GameplayController.receive = function(self, event)
-	self.timeController:receive(event)
+	self.game.timeController:receive(event)
 	local rhythmModel = self.game.rhythmModel
 	rhythmModel:receive(event)
 	self.view:receive(event)
@@ -232,15 +223,9 @@ GameplayController.quit = function(self)
 	self:skip()
 	self:saveScore()
 	if not rhythmModel.logicEngine.autoplay and not rhythmModel.prohibitSavingScore then
-		local ResultController = require("sphere.controllers.ResultController")
-		local resultController = ResultController:new()
-
-		resultController.selectController = self.selectController
-		resultController.game = self.game
-
-		self.game.screenManager:set(resultController)
+		self.game.screenManager:set(self.game.resultController)
 	else
-		self.game.screenManager:set(self.selectController)
+		self.game.screenManager:set(self.game.selectController)
 	end
 end
 

@@ -173,11 +173,7 @@ SelectController.switchModifierController = function(self)
 		return
 	end
 
-	local ModifierController = require("sphere.controllers.ModifierController")
-	local modifierController = ModifierController:new()
-	modifierController.selectController = self
-	modifierController.game = self.game
-	return self.game.screenManager:set(modifierController)
+	return self.game.screenManager:set(self.game.modifierController)
 end
 
 SelectController.switchResultController = function(self)
@@ -192,10 +188,7 @@ SelectController.switchResultController = function(self)
 		return
 	end
 
-	local ResultController = require("sphere.controllers.ResultController")
-	local resultController = ResultController:new()
-	resultController.selectController = self
-	resultController.game = self.game
+	local resultController = self.game.resultController
 	resultController:replayNoteChart("result", scoreItem, scoreItemIndex)
 
 	return self.game.screenManager:set(resultController)
@@ -206,12 +199,7 @@ SelectController.playNoteChart = function(self)
 		return
 	end
 
-	local GameplayController = require("sphere.controllers.GameplayController")
-	local gameplayController = GameplayController:new()
-	gameplayController.selectController = self
-	gameplayController.game = self.game
-	self.game.gameplayController = gameplayController
-	return self.game.screenManager:set(gameplayController)
+	return self.game.screenManager:set(self.game.gameplayController)
 end
 
 return SelectController
