@@ -7,7 +7,6 @@ local AudioEngine		= require("sphere.models.RhythmModel.AudioEngine")
 local TimeEngine		= require("sphere.models.RhythmModel.TimeEngine")
 local InputManager		= require("sphere.models.RhythmModel.InputManager")
 local PauseManager		= require("sphere.models.RhythmModel.PauseManager")
-local ReplayModel		= require("sphere.models.ReplayModel")
 local Test		= require("sphere.models.RhythmModel.LogicEngine.Test")
 
 local RhythmModel = Class:new()
@@ -15,7 +14,6 @@ local RhythmModel = Class:new()
 RhythmModel.construct = function(self)
 	self.inputManager = InputManager:new()
 	self.pauseManager = PauseManager:new()
-	self.replayModel = ReplayModel:new()
 	self.timeEngine = TimeEngine:new()
 	self.scoreEngine = ScoreEngine:new()
 	self.audioEngine = AudioEngine:new()
@@ -24,7 +22,6 @@ RhythmModel.construct = function(self)
 	self.observable = Observable:new()
 	self.inputManager.rhythmModel = self
 	self.pauseManager.rhythmModel = self
-	self.replayModel.rhythmModel = self
 	self.timeEngine.rhythmModel = self
 	self.scoreEngine.rhythmModel = self
 	self.audioEngine.rhythmModel = self
@@ -37,7 +34,7 @@ RhythmModel.load = function(self)
 	local modifierModel = self.game.modifierModel
 	local inputManager = self.inputManager
 	local pauseManager = self.pauseManager
-	local replayModel = self.replayModel
+	local replayModel = self.game.replayModel
 	local timeEngine = self.timeEngine
 	local scoreEngine = self.scoreEngine
 	local audioEngine = self.audioEngine
@@ -70,7 +67,7 @@ end
 RhythmModel.unload = function(self)
 	local modifierModel = self.game.modifierModel
 	local inputManager = self.inputManager
-	local replayModel = self.replayModel
+	local replayModel = self.game.replayModel
 	local timeEngine = self.timeEngine
 	local scoreEngine = self.scoreEngine
 	local audioEngine = self.audioEngine
@@ -92,7 +89,7 @@ end
 
 RhythmModel.loadAllEngines = function(self)
 	local modifierModel = self.game.modifierModel
-	local replayModel = self.replayModel
+	local replayModel = self.game.replayModel
 	local timeEngine = self.timeEngine
 	local scoreEngine = self.scoreEngine
 	local audioEngine = self.audioEngine
@@ -117,7 +114,7 @@ end
 
 RhythmModel.loadLogicEngines = function(self)
 	local modifierModel = self.game.modifierModel
-	local replayModel = self.replayModel
+	local replayModel = self.game.replayModel
 	local timeEngine = self.timeEngine
 	local scoreEngine = self.scoreEngine
 	local logicEngine = self.logicEngine
@@ -147,7 +144,7 @@ end
 RhythmModel.receive = function(self, event)
 	if event.name == "framestarted" then
 		self.timeEngine:sync(event)
-		self.replayModel.currentTime = self.timeEngine.currentTime
+		self.game.replayModel.currentTime = self.timeEngine.currentTime
 		return
 	end
 
@@ -157,7 +154,7 @@ RhythmModel.receive = function(self, event)
 end
 
 RhythmModel.update = function(self, dt)
-	self.replayModel:update()
+	self.game.replayModel:update()
 	self.logicEngine:update()
 	self.audioEngine:update()
 	self.scoreEngine:update()

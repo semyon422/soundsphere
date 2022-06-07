@@ -130,7 +130,7 @@ GameplayController.unload = function(self)
 	self.view:unload()
 	rhythmModel.observable:remove(self.view)
 	rhythmModel.inputManager:setMode("external")
-	rhythmModel.replayModel:setMode("record")
+	self.game.replayModel:setMode("record")
 	self.game:resetGameplayConfigs()
 	love.mouse.setVisible(true)
 
@@ -195,7 +195,7 @@ GameplayController.receive = function(self, event)
 		self:discordPause()
 	elseif event.name == "retry" then
 		rhythmModel.inputManager:setMode("external")
-		rhythmModel.replayModel:setMode("record")
+		self.game.replayModel:setMode("record")
 		self:unload()
 		self:load()
 	elseif event.name == "playStateChange" then
@@ -237,12 +237,12 @@ GameplayController.saveScore = function(self)
 
 	local scoreSystemEntry = rhythmModel.scoreEngine.scoreSystem.entry
 	local noteChartModel = self.game.noteChartModel
-	local modifierModel = rhythmModel.modifierModel
-	local replayModel = rhythmModel.replayModel
+	local modifierModel = self.game.modifierModel
+	local replayModel = self.game.replayModel
 	if
 		scoreSystemEntry.accuracy > 0 and
 		scoreSystemEntry.accuracy < math.huge and
-		rhythmModel.replayModel.mode ~= "replay" and
+		replayModel.mode ~= "replay" and
 		not rhythmModel.logicEngine.autoplay
 	then
 		replayModel.noteChartModel = noteChartModel
@@ -287,8 +287,8 @@ GameplayController.skip = function(self)
 	timeEngine:resetTimeRate()
 	timeEngine:play()
 	timeEngine.currentTime = math.huge
-	rhythmModel.replayModel.currentTime = math.huge
-	rhythmModel.replayModel:update()
+	self.game.replayModel.currentTime = math.huge
+	self.game.replayModel:update()
 	rhythmModel.logicEngine:update()
 	rhythmModel.scoreEngine:update()
 	self.game.modifierModel:update()

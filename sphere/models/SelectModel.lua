@@ -47,7 +47,7 @@ SelectModel.setSortFunction = function(self, sortFunctionName)
 	end
 	local config = self.config
 	config.sortFunction = sortFunctionName
-	self.sortModel.name = sortFunctionName
+	self.game.sortModel.name = sortFunctionName
 	self:debouncePullNoteChartSet()
 end
 

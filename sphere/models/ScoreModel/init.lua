@@ -116,13 +116,17 @@ ScoreModel.calculateTopScores = function(self)
 end
 
 local calculateTopScores = aquathread.async(function()
+	local game = {}
+
 	local ConfigModel = require("sphere.models.ConfigModel")
-	local configModel = ConfigModel:new()
-	configModel:readConfig("settings", "userdata/settings.lua", "sphere/models/ConfigModel/settings.lua")
+	game.configModel = ConfigModel:new()
+	game.configModel:readConfig("settings", "userdata/settings.lua", "sphere/models/ConfigModel/settings.lua")
 
 	local ScoreModel = require("sphere.models.ScoreModel")
 	local scoreModel = ScoreModel:new()
-	scoreModel.configModel = configModel
+	scoreModel.game = game
+	game.scoreModel = scoreModel
+
 	scoreModel:load()
 	scoreModel:calculateTopScores()
 	scoreModel:unload()

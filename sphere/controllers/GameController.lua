@@ -34,6 +34,7 @@ local OsudirectModel		= require("sphere.models.OsudirectModel")
 local MultiplayerModel		= require("sphere.models.MultiplayerModel")
 local MainLog					= require("sphere.MainLog")
 local FrameTimeView					= require("sphere.views.FrameTimeView")
+local ReplayModel		= require("sphere.models.ReplayModel")
 
 local MountController			= require("sphere.controllers.MountController")
 local OnlineController			= require("sphere.controllers.OnlineController")
@@ -92,6 +93,7 @@ GameController.construct = function(self)
 	self.discordModel = DiscordModel:new()
 	self.osudirectModel = OsudirectModel:new()
 	self.multiplayerModel = MultiplayerModel:new()
+	self.replayModel = ReplayModel:new()
 	self.frameTimeView = FrameTimeView:new()
 
 	for k, v in pairs(self) do

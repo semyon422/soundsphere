@@ -76,7 +76,7 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 
 	local hash = scoreEntry.replayHash
 	local rhythmModel = self.game.rhythmModel
-	local replay = rhythmModel.replayModel:loadReplay(hash)
+	local replay = self.game.replayModel:loadReplay(hash)
 
 	local modifierModel = self.game.modifierModel
 	modifierModel:setConfig(modifierModel:decode(scoreEntry.modifiers))
@@ -92,12 +92,12 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 			rhythmModel.timings = self.oldTimings
 		end
 		rhythmModel.scoreEngine.scoreEntry = scoreEntry
-		rhythmModel.replayModel.replay = replay
+		self.game.replayModel.replay = replay
 		rhythmModel.inputManager:setMode("internal")
-		rhythmModel.replayModel:setMode("replay")
+		self.game.replayModel:setMode("replay")
 	elseif mode == "retry" then
 		rhythmModel.inputManager:setMode("external")
-		rhythmModel.replayModel:setMode("record")
+		self.game.replayModel:setMode("record")
 	end
 
 	gameplayController.selectController = self.game.selectController
@@ -119,7 +119,7 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 			self.game.selectModel:scrollScore(nil, itemIndex)
 		end
 		rhythmModel.inputManager:setMode("external")
-		rhythmModel.replayModel:setMode("record")
+		self.game.replayModel:setMode("record")
 	else
 		return self.game.screenManager:set(gameplayController)
 	end

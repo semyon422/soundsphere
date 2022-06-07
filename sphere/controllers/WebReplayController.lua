@@ -66,9 +66,9 @@ WebReplayController.POST = function(self)
 	else
 		rhythmModel.timings = ResultController.oldTimings
 	end
-	rhythmModel.replayModel.replay = replay
+	self.game.replayModel.replay = replay
 	rhythmModel.inputManager:setMode("internal")
-	rhythmModel.replayModel:setMode("replay")
+	self.game.replayModel:setMode("replay")
 
 	fastplayController:play()
 
