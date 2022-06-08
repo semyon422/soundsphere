@@ -102,9 +102,4 @@ SelectView.update = function(self, dt)
 	ScreenView.update(self, dt)
 end
 
-SelectView.receive = function(self, event)
-	self.game.selectController:receive(event)
-	ScreenView.receive(self, event)
-end
-
 return SelectView

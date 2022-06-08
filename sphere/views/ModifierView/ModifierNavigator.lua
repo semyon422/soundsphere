@@ -38,19 +38,11 @@ ModifierNavigator.receive = function(self, event)
 end
 
 ModifierNavigator.scrollModifier = function(self, direction)
-	direction = direction == "up" and -1 or 1
-	self:send({
-		name = "scrollModifier",
-		direction = direction
-	})
+	self.game.modifierModel:scrollModifier(direction == "up" and -1 or 1)
 end
 
 ModifierNavigator.scrollAvailableModifier = function(self, direction)
-	direction = direction == "up" and -1 or 1
-	self:send({
-		name = "scrollAvailableModifier",
-		direction = direction
-	})
+	self.game.modifierModel:scrollAvailableModifier(direction == "up" and -1 or 1)
 end
 
 ModifierNavigator.removeModifier = function(self, itemIndex)
@@ -58,10 +50,7 @@ ModifierNavigator.removeModifier = function(self, itemIndex)
 	if not modifierConfig then
 		return
 	end
-	self:send({
-		name = "removeModifier",
-		modifierConfig = modifierConfig
-	})
+	self.game.modifierModel:remove(modifierConfig)
 end
 
 ModifierNavigator.increaseModifierValue = function(self, itemIndex, delta)
@@ -69,27 +58,16 @@ ModifierNavigator.increaseModifierValue = function(self, itemIndex, delta)
 	if not modifierConfig then
 		return
 	end
-	self:send({
-		name = "increaseModifierValue",
-		modifierConfig = modifierConfig,
-		delta = delta
-	})
+	self.game.modifierModel:increaseModifierValue(modifierConfig, delta)
 end
 
 ModifierNavigator.addModifier = function(self, itemIndex)
 	local modifier = self.game.modifierModel.modifiers[itemIndex or self.game.modifierModel.availableModifierItemIndex]
-	self:send({
-		name = "addModifier",
-		modifier = modifier
-	})
+	self.game.modifierModel:add(modifier)
 end
 
 ModifierNavigator.setModifierValue = function(self, modifierConfig, value)
-	self:send({
-		name = "setModifierValue",
-		modifierConfig = modifierConfig,
-		value = value
-	})
+	self.game.modifierModel:setModifierValue(modifierConfig, value)
 end
 
 return ModifierNavigator

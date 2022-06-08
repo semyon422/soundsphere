@@ -17,12 +17,6 @@ ResultController.oldTimings = {
 	}
 }
 
-ResultController.receive = function(self, event)
-	if event.name == "scrollScore" then
-		self.game.selectModel:scrollScore(event.direction)
-	end
-end
-
 ResultController.replaySelectedNoteChart = function(self)
 	local selectModel = self.game.selectModel
 	local scoreItemIndex = selectModel.scoreItemIndex

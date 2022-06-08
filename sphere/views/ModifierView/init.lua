@@ -35,14 +35,4 @@ ModifierView.unload = function(self)
 	ScreenView.unload(self)
 end
 
-ModifierView.update = function(self, dt)
-	self.game.modifierController:update(dt)
-	ScreenView.update(self, dt)
-end
-
-ModifierView.receive = function(self, event)
-	self.game.modifierController:receive(event)
-	ScreenView.receive(self, event)
-end
-
 return ModifierView

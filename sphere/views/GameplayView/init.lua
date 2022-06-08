@@ -73,6 +73,7 @@ GameplayView.update = function(self, dt)
 end
 
 GameplayView.receive = function(self, event)
+	self.game.timeController:receive(event)
 	self.game.gameplayController:receive(event)
 	ScreenView.receive(self, event)
 end

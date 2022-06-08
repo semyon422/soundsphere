@@ -115,14 +115,7 @@ GameplayNavigator.keyreleased = function(self, event)
 end
 
 GameplayNavigator.saveCamera = function(self, x, y, z, pitch, yaw)
-	self:send({
-		name = "saveCamera",
-		x = x,
-		y = y,
-		z = z,
-		pitch = pitch,
-		yaw = yaw,
-	})
+	self.game.gameplayController:saveCamera(x, y, z, pitch, yaw)
 end
 
 GameplayNavigator.skipIntro = function(self)
@@ -178,12 +171,6 @@ GameplayNavigator.pause = function(self)
 	})
 end
 
-GameplayNavigator.forcePause = function(self)
-	self:send({
-		name = "pause"
-	})
-end
-
 GameplayNavigator.retry = function(self)
 	self:send({
 		name = "playStateChange",
@@ -191,10 +178,12 @@ GameplayNavigator.retry = function(self)
 	})
 end
 
+GameplayNavigator.forcePause = function(self)
+	self.game.gameplayController:pause()
+end
+
 GameplayNavigator.forceRetry = function(self)
-	self:send({
-		name = "retry"
-	})
+	self.game.gameplayController:retry()
 end
 
 GameplayNavigator.quit = function(self)

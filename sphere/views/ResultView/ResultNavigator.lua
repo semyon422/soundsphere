@@ -22,10 +22,7 @@ ResultNavigator.receive = function(self, event)
 end
 
 ResultNavigator.scrollScore = function(self, direction)
-	self:send({
-		name = "scrollScore",
-		direction = direction == "down" and 1 or -1
-	})
+	self.game.selectModel:scrollScore(direction == "down" and 1 or -1)
 end
 
 ResultNavigator.loadScore = function(self, itemIndex)

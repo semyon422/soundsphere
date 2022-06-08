@@ -84,9 +84,7 @@ GameplayController.load = function(self)
 	sound.sample_gain = config.audio.sampleGain
 	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChart, function()
 		rhythmModel:setResourceAliases(NoteChartResourceLoader.aliases)
-		self:receive({
-			name = "play"
-		})
+		self:play()
 	end)
 
 	love.mouse.setVisible(false)
@@ -159,35 +157,42 @@ GameplayController.discordPause = function(self)
 end
 
 GameplayController.receive = function(self, event)
-	self.game.timeController:receive(event)
 	local rhythmModel = self.game.rhythmModel
 	rhythmModel:receive(event)
 
-	if event.name == "play" then
-		rhythmModel.pauseManager:play()
-		self:discordPlay()
-	elseif event.name == "pause" then
-		rhythmModel.pauseManager:pause()
-		self:discordPause()
-	elseif event.name == "retry" then
-		rhythmModel.inputManager:setMode("external")
-		self.game.replayModel:setMode("record")
-		self:unload()
-		self:load()
-	elseif event.name == "playStateChange" then
+	if event.name == "playStateChange" then
 		if event.state == "play" then
 			self:discordPlay()
 		elseif event.state == "pause" then
 			self:discordPause()
 		end
-	elseif event.name == "saveCamera" then
-		local perspective = self.game.configModel.configs.settings.graphics.perspective
-		perspective.x = event.x
-		perspective.y = event.y
-		perspective.z = event.z
-		perspective.pitch = event.pitch
-		perspective.yaw = event.yaw
 	end
+end
+
+GameplayController.retry = function(self)
+	self.game.rhythmModel.inputManager:setMode("external")
+	self.game.replayModel:setMode("record")
+	self:unload()
+	self:load()
+end
+
+GameplayController.pause = function(self)
+	self.game.rhythmModel.pauseManager:pause()
+	self:discordPause()
+end
+
+GameplayController.play = function(self)
+	self.game.rhythmModel.pauseManager:play()
+	self:discordPlay()
+end
+
+GameplayController.saveCamera = function(self, x, y, z, pitch, yaw)
+	local perspective = self.game.configModel.configs.settings.graphics.perspective
+	perspective.x = x
+	perspective.y = y
+	perspective.z = z
+	perspective.pitch = pitch
+	perspective.yaw = yaw
 end
 
 GameplayController.quit = function(self)

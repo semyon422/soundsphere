@@ -82,38 +82,34 @@ end
 
 SelectNavigator.switchToOsudirect = function(self)
 	self:addSubscreen("osudirect")
-	self:send({name = "searchOsudirect"})
+	self.game.osudirectModel:searchDebounce()
 end
 
 SelectNavigator.openDirectory = function(self)
-	self:send({name = "openDirectory"})
+	self.game.selectController:openDirectory()
 end
 
 SelectNavigator.pullNoteChartSet = function(self)
-	self:send({name = "pullNoteChartSet"})
+	self.game.selectModel:debouncePullNoteChartSet()
 end
 
 SelectNavigator.scrollRandom = function(self)
-	self:send({name = "scrollRandom"})
+	self.game.selectModel:scrollRandom()
 end
 
 SelectNavigator.calculateTopScores = function(self)
-	self:send({name = "calculateTopScores"})
+	self.game.scoreModel:asyncCalculateTopScores()
 end
 
 SelectNavigator.updateCache = function(self, force)
-	self:send({
-		name = "updateCache",
-		force = force
-	})
+	self.game.selectController:updateCache(force)
 end
 
 SelectNavigator.updateCacheCollection = function(self)
-	self:send({
-		name = "updateCacheCollection",
-		collection = self.game.selectModel.collectionItem,
-		force = love.keyboard.isDown("lshift")
-	})
+	self.game.selectController:updateCacheCollection(
+		self.game.selectModel.collectionItem.path,
+		love.keyboard.isDown("lshift")
+	)
 end
 
 SelectNavigator.deleteNoteChart = function(self)
@@ -125,11 +121,11 @@ SelectNavigator.deleteNoteChartSet = function(self)
 end
 
 SelectNavigator.changeSearchMode = function(self)
-	self:send({name = "changeSearchMode"})
+	self.game.selectModel:changeSearchMode()
 end
 
 SelectNavigator.changeCollapse = function(self)
-	self:send({name = "changeCollapse"})
+	self.game.selectModel:changeCollapse()
 end
 
 SelectNavigator.scrollOsudirect = function(self, direction, count)
@@ -144,11 +140,7 @@ SelectNavigator.scrollOsudirect = function(self, direction, count)
 
 	self.osudirectItemIndex = itemIndex
 
-	self:send({
-		name = "osudirectBeatmap",
-		itemIndex = self.osudirectItemIndex,
-		beatmap = items[itemIndex],
-	})
+	self.game.selectController:osudirectBeatmap(items[itemIndex])
 end
 
 SelectNavigator.scrollOsudirectDifficulty = function(self, direction, count)
@@ -166,90 +158,65 @@ end
 
 SelectNavigator.scrollCollection = function(self, direction, count)
 	count = count or 1
-	self:send({
-		name = "scrollCollection",
-		direction = direction == "up" and -count or count
-	})
+	self.game.selectModel:scrollCollection(direction == "up" and -count or count)
 end
 
 SelectNavigator.scrollNoteChartSet = function(self, direction, count)
 	count = count or 1
-	self:send({
-		name = "scrollNoteChartSet",
-		direction = direction == "up" and -count or count
-	})
+	self.game.selectModel:scrollNoteChartSet(direction == "up" and -count or count)
 end
 
 SelectNavigator.scrollNoteChart = function(self, direction, count)
 	count = count or 1
-	self:send({
-		name = "scrollNoteChart",
-		direction = direction == "up" and -count or count
-	})
+	self.game.selectModel:scrollNoteChart(direction == "up" and -count or count)
 end
 
 SelectNavigator.downloadBeatmapSet = function(self)
-	self:send({name = "downloadBeatmapSet"})
+	self.game.osudirectModel:downloadBeatmapSet()
 end
 
 SelectNavigator.play = function(self)
-	if self.game.selectController:checkChartExists() then
+	if self.game.noteChartModel:getFileInfo() then
 		self:changeScreen("gameplayView")
 	end
 end
 
 SelectNavigator.result = function(self)
-	if self.game.selectController:checkChartExists() then
+	if self.game.noteChartModel:getFileInfo() then
 		self.game.resultController:replaySelectedNoteChart()
 		self:changeScreen("resultView")
 	end
 end
 
 SelectNavigator.setSortFunction = function(self, sortFunction)
-	self:send({
-		name = "setSortFunction",
-		sortFunction = sortFunction
-	})
+	self.game.selectModel:setSortFunction(sortFunction)
 end
 
 SelectNavigator.scrollSortFunction = function(self, delta)
-	self:send({
-		name = "scrollSortFunction",
-		delta = delta
-	})
+	self.game.selectModel:scrollSortFunction(delta)
 end
 
 SelectNavigator.setSearchString = function(self, text)
 	if self:getSubscreen("notecharts") then
-		self:send({
-			name = "setSearchString",
-			text = text
-		})
+		self.game.searchModel:setSearchString(text)
 	elseif self:getSubscreen("osudirect") then
-		self:send({
-			name = "setOsudirectSearchString",
-			text = text
-		})
+		self.game.osudirectModel:setSearchString(text)
 	end
 end
 
 SelectNavigator.quickLogin = function(self)
-	self:send({name = "quickLogin"})
+	self.game.onlineModel.authManager:quickLogin()
 end
 
 SelectNavigator.login = function(self, email, password)
-	self:send({
-		name = "login",
-		email = email,
-		password = password,
-	})
+	self.game.onlineModel.authManager:login(email, password)
 end
 
 SelectNavigator.openNoteSkins = function(self)
 	local isOpen = self.isNoteSkinsOpen
 	isOpen[0] = not isOpen[0]
 	if isOpen[0] then
-		self:send({name = "resetModifiedNoteChart"})
+		self.game.selectController:resetModifiedNoteChart()
 	end
 end
 
@@ -257,7 +224,7 @@ SelectNavigator.openInput = function(self)
 	local isOpen = self.isInputOpen
 	isOpen[0] = not isOpen[0]
 	if isOpen[0] then
-		self:send({name = "resetModifiedNoteChart"})
+		self.game.selectController:resetModifiedNoteChart()
 	end
 end
 
@@ -279,20 +246,11 @@ end
 SelectNavigator.setNoteSkin = function(self, itemIndex)
 	local noteChart = self.game.noteChartModel.noteChart
 	local noteSkins = self.game.noteSkinModel:getNoteSkins(noteChart.inputMode)
-	self:send({
-		name = "setNoteSkin",
-		noteSkin = noteSkins[itemIndex or self.noteSkinItemIndex]
-	})
+	self.game.noteSkinModel:setDefaultNoteSkin(noteSkins[itemIndex or self.noteSkinItemIndex])
 end
 
 SelectNavigator.setInputBinding = function(self, inputMode, virtualKey, key, type)
-	self:send({
-		name = "setInputBinding",
-		virtualKey = virtualKey,
-		value = key,
-		type = type,
-		inputMode = inputMode,
-	})
+	self.game.inputModel:setKey(inputMode, virtualKey, key, type)
 end
 
 return SelectNavigator
