@@ -4,26 +4,14 @@ local SelectController = Class:new()
 
 SelectController.load = function(self)
 	local noteChartModel = self.game.noteChartModel
-	local themeModel = self.game.themeModel
 	local selectModel = self.game.selectModel
 	local previewModel = self.game.previewModel
 
 	self.game:writeConfigs()
 
-	local theme = themeModel:getTheme()
-	self.theme = theme
-
-	local view = theme:newView("SelectView")
-	self.view = view
-
-	view.controller = self
-	view.game = self.game
-
 	noteChartModel:load()
 	selectModel:load()
 	previewModel:load()
-
-	view:load()
 
 	local timeEngine = self.game.rhythmModel.timeEngine
 	timeEngine:resetTimeRateHandlers()
@@ -34,14 +22,12 @@ end
 SelectController.unload = function(self)
 	self.game.noteSkinModel:load()
 	self.game.previewModel:unload()
-	self.view:unload()
 	self.game:writeConfigs()
 end
 
 SelectController.update = function(self, dt)
 	self.game.previewModel:update(dt)
 	self.game.selectModel:update()
-	self.view:update(dt)
 
 	local graphics = self.game.configModel.configs.settings.graphics
 	local flags = graphics.mode.flags
@@ -50,16 +36,8 @@ SelectController.update = function(self, dt)
 	end
 end
 
-SelectController.draw = function(self)
-	self.view:draw()
-end
-
 SelectController.receive = function(self, event)
-	self.view:receive(event)
-
-	if event.name == "setTheme" then
-		self.themeModel:setDefaultTheme(event.theme)
-	elseif event.name == "scrollCollection" then
+	if event.name == "scrollCollection" then
 		self.game.selectModel:scrollCollection(event.direction)
 	elseif event.name == "scrollNoteChartSet" then
 		self.game.selectModel:scrollNoteChartSet(event.direction)
@@ -75,20 +53,12 @@ SelectController.receive = function(self, event)
 		self.game.selectModel:scrollSortFunction(event.delta)
 	elseif event.name == "setSearchString" then
 		self.game.searchModel:setSearchString(event.text)
-	elseif event.name == "changeScreen" then
-		if event.screenName == "Modifier" then
-			self:switchModifierController()
-		elseif event.screenName == "Result" then
-			self:switchResultController()
-		end
 	elseif event.name == "changeSearchMode" then
 		self.game.selectModel:changeSearchMode()
 	elseif event.name == "changeCollapse" then
 		self.game.selectModel:changeCollapse()
 	elseif event.name == "pullNoteChartSet" then
 		self.game.selectModel:debouncePullNoteChartSet()
-	elseif event.name == "playNoteChart" then
-		self:playNoteChart()
 	elseif event.name == "loadModifiedNoteChart" then
 		self:loadModifiedNoteChart()
 	elseif event.name == "unloadModifiedNoteChart" then
@@ -168,38 +138,8 @@ SelectController.unloadModifiedNoteChart = function(self)
 	self.noteChartModel:unloadNoteChart()
 end
 
-SelectController.switchModifierController = function(self)
-	if not self.game.noteChartModel:getFileInfo() then
-		return
-	end
-
-	return self.game.screenManager:set(self.game.modifierController)
-end
-
-SelectController.switchResultController = function(self)
-	if not self.game.noteChartModel:getFileInfo() then
-		return
-	end
-
-	local selectModel = self.game.selectModel
-	local scoreItemIndex = selectModel.scoreItemIndex
-	local scoreItem = selectModel.scoreItem
-	if not scoreItem then
-		return
-	end
-
-	local resultController = self.game.resultController
-	resultController:replayNoteChart("result", scoreItem, scoreItemIndex)
-
-	return self.game.screenManager:set(resultController)
-end
-
-SelectController.playNoteChart = function(self)
-	if not self.game.noteChartModel:getFileInfo() then
-		return
-	end
-
-	return self.game.screenManager:set(self.game.gameplayController)
+SelectController.checkChartExists = function(self)
+	return self.game.noteChartModel:getFileInfo() ~= nil
 end
 
 return SelectController

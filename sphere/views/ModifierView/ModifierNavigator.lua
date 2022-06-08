@@ -23,7 +23,7 @@ ModifierNavigator.receive = function(self, event)
 		elseif scancode == "backspace" then self:removeModifier()
 		elseif scancode == "right" then self:increaseModifierValue(nil, 1)
 		elseif scancode == "left" then self:increaseModifierValue(nil, -1)
-		elseif scancode == "escape" then self:changeScreen("Select")
+		elseif scancode == "escape" then self:changeScreen("selectView")
 		elseif scancode == "f1" then self:switchSubscreen("debug")
 		end
 	elseif self.activeList == "availableModifierList" then
@@ -31,7 +31,7 @@ ModifierNavigator.receive = function(self, event)
 		elseif scancode == "down" then self:scrollAvailableModifier("down")
 		elseif scancode == "tab" then self.activeList = "modifierList"
 		elseif scancode == "return" then self:addModifier()
-		elseif scancode == "escape" then self:changeScreen("Select")
+		elseif scancode == "escape" then self:changeScreen("selectView")
 		elseif scancode == "f1" then self:switchSubscreen("debug")
 		end
 	end

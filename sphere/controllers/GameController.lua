@@ -4,7 +4,6 @@ local ConfigModel				= require("sphere.models.ConfigModel")
 local ScoreModel				= require("sphere.models.ScoreModel")
 local DiscordModel				= require("sphere.models.DiscordModel")
 local MountModel				= require("sphere.models.MountModel")
-local ScreenManager				= require("sphere.screen.ScreenManager")
 local FadeTransition			= require("sphere.screen.FadeTransition")
 local WindowManager				= require("sphere.window.WindowManager")
 local FpsLimiter				= require("sphere.window.FpsLimiter")
@@ -39,12 +38,21 @@ local ReplayModel		= require("sphere.models.ReplayModel")
 local MountController			= require("sphere.controllers.MountController")
 local OnlineController			= require("sphere.controllers.OnlineController")
 local SelectController			= require("sphere.controllers.SelectController")
-local ErrorController			= require("sphere.controllers.ErrorController")
 local ModifierController 		= require("sphere.controllers.ModifierController")
 local GameplayController		= require("sphere.controllers.GameplayController")
 local FastplayController		= require("sphere.controllers.FastplayController")
 local ResultController			= require("sphere.controllers.ResultController")
 local TimeController			= require("sphere.controllers.TimeController")
+
+local GameView = require("sphere.views.GameView")
+local SelectView = require("sphere.views.SelectView")
+local ModifierView = require("sphere.views.ModifierView")
+local NoteSkinView = require("sphere.views.NoteSkinView")
+local InputView = require("sphere.views.InputView")
+local SettingsView = require("sphere.views.SettingsView")
+local ResultView = require("sphere.views.ResultView")
+local GameplayView = require("sphere.views.GameplayView")
+local ErrorView = require("sphere.views.ErrorView")
 
 local GameController = Class:new()
 
@@ -53,13 +61,22 @@ GameController.baseVsync = 1
 GameController.construct = function(self)
 	self.mountController = MountController:new()
 	self.onlineController = OnlineController:new()
-	self.errorController = ErrorController:new()
 	self.selectController = SelectController:new()
 	self.modifierController = ModifierController:new()
 	self.gameplayController = GameplayController:new()
 	self.fastplayController = FastplayController:new()
 	self.resultController = ResultController:new()
 	self.timeController = TimeController:new()
+
+	self.gameView = GameView:new()
+	self.selectView = SelectView:new()
+	self.modifierView = ModifierView:new()
+	self.noteSkinView = NoteSkinView:new()
+	self.inputView = InputView:new()
+	self.settingsView = SettingsView:new()
+	self.resultView = ResultView:new()
+	self.gameplayView = GameplayView:new()
+	self.errorView = ErrorView:new()
 
 	self.configModel = ConfigModel:new()
 	self.notificationModel = NotificationModel:new()
@@ -73,7 +90,6 @@ GameController.construct = function(self)
 	self.cacheModel = CacheModel:new()
 	self.backgroundModel = BackgroundModel:new()
 	self.fadeTransition = FadeTransition:new()
-	self.screenManager = ScreenManager:new()
 	self.modifierModel = ModifierModel:new()
 	self.noteSkinModel = NoteSkinModel:new()
 	self.noteChartModel = NoteChartModel:new()
@@ -102,16 +118,12 @@ GameController.construct = function(self)
 end
 
 GameController.load = function(self)
-	local selectController = self.selectController
-
 	local configModel = self.configModel
-	local directoryManager = self.directoryManager
 	local rhythmModel = self.rhythmModel
-
-	directoryManager:createDirectories()
 
 	MainLog:write("trace", "starting game")
 
+	self.directoryManager:createDirectories()
 	configModel:readConfig("settings_model", "userdata/settings_model.lua", "sphere/models/ConfigModel/settings_model.lua")
 	configModel:readConfig("settings", "userdata/settings.lua", "sphere/models/ConfigModel/settings.lua")
 	configModel:readConfig("select", "userdata/select.lua", "sphere/models/ConfigModel/select.lua")
@@ -151,8 +163,15 @@ GameController.load = function(self)
 	self.multiplayerModel:load()
 	self.frameTimeView:load()
 
-	self.screenManager:setTransition(self.fadeTransition)
-	self.screenManager:set(selectController)
+	self:setView(self.gameView)
+end
+
+GameController.setView = function(self, view)
+	if self.view then
+		self.view:unload()
+	end
+	self.view = view
+	self.view:load()
 end
 
 GameController.resetGameplayConfigs = function(self)
@@ -170,7 +189,7 @@ GameController.writeConfigs = function(self)
 end
 
 GameController.unload = function(self)
-	self.screenManager:unload()
+	self.view:unload()
 	self.discordModel:unload()
 	self.mountModel:unload()
 	self.onlineModel:unload()
@@ -184,7 +203,7 @@ GameController.update = function(self, dt)
 	self.discordModel:update()
 	self.notificationModel:update()
 	self.backgroundModel:update(dt)
-	self.screenManager:update(dt)
+	self.view:update(dt)
 	self.onlineController:update()
 	self.fpsLimiter:update()
 	self.windowManager:update()
@@ -197,7 +216,7 @@ end
 GameController.draw = function(self)
 	local startTime = love.timer.getTime()
 
-	self.screenManager:draw()
+	self.view:draw()
 
 	love.graphics.origin()
 	self.frameTimeView:draw()
@@ -218,7 +237,7 @@ GameController.receive = function(self, event)
 		return self:unload()
 	end
 
-	self.screenManager:receive(event)
+	self.view:receive(event)
 	self.windowManager:receive(event)
 	self.screenshot:receive(event)
 	self.mountController:receive(event)

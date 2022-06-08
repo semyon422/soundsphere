@@ -23,7 +23,7 @@ NoteChartListItemView.receive = function(self, event)
 		if button == 1 then
 			self.listView.navigator:play()
 		elseif button == 2 then
-			self.listView.navigator:changeScreen("Result")
+			self.listView.navigator:result()
 		end
 	end
 end

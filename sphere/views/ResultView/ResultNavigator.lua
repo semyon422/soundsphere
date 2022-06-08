@@ -12,7 +12,7 @@ ResultNavigator.receive = function(self, event)
 	local scancode = event[2]
 	if scancode == "up" then self:scrollScore("up")
 	elseif scancode == "down" then self:scrollScore("down")
-	elseif scancode == "escape" then self:changeScreen("Select")
+	elseif scancode == "escape" then self:changeScreen("selectView")
 	elseif scancode == "return" then self:loadScore()
 	elseif scancode == "f1" then self:switchSubscreen("debug")
 	elseif scancode == "f2" then self:switchSubscreen("scoreSystemDebug")
@@ -33,21 +33,23 @@ ResultNavigator.loadScore = function(self, itemIndex)
 	if itemIndex then
 		scoreEntry = self.game.scoreLibraryModel.items[itemIndex]
 	end
-	self:send({
-		name = "loadScore",
-		mode = "result",
-		scoreEntry = scoreEntry,
-		itemIndex = itemIndex
-	})
+	self.game:resetGameplayConfigs()
+	self.game.resultController:replayNoteChart("result", scoreEntry, itemIndex)
+	return self:changeScreen("resultView")
 end
 
 ResultNavigator.play = function(self, mode)
 	local scoreEntry = self.game.selectModel.scoreItem
-	self:send({
-		name = "loadScore",
-		mode = mode,
-		scoreEntry = scoreEntry
-	})
+	local isResult = self.game.resultController:replayNoteChart(mode, scoreEntry)
+	if isResult then
+		return self:changeScreen("resultView")
+	end
+	self:changeScreen("gameplayView")
+end
+
+ResultNavigator.back = function(self)
+	self.game:resetGameplayConfigs()
+	self:changeScreen("selectView")
 end
 
 return ResultNavigator

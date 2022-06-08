@@ -203,7 +203,7 @@ local BottomScreenMenu = {
 		{
 			{
 				method = "changeScreen",
-				value = "Select",
+				value = "selectView",
 				displayName = "back"
 			}
 		}

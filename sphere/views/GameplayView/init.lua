@@ -39,6 +39,10 @@ GameplayView.construct = function(self)
 end
 
 GameplayView.load = function(self)
+	self.controller = self.game.gameplayController
+	self.game.rhythmModel.observable:add(self.sequenceView)
+	self.game.gameplayController:load()
+
 	local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
 	self.imageAnimationView.root = noteSkin.directoryPath
 	self.imageView.root = noteSkin.directoryPath
@@ -57,8 +61,20 @@ GameplayView.load = function(self)
 end
 
 GameplayView.unload = function(self)
+	self.game.gameplayController:unload()
+	self.game.rhythmModel.observable:remove(self.sequenceView)
 	ScreenView.unload(self)
 	self.viewConfig[self.playfieldViewConfigIndex] = self.playfieldViewConfig
+end
+
+GameplayView.update = function(self, dt)
+	self.game.gameplayController:update(dt)
+	ScreenView.update(self, dt)
+end
+
+GameplayView.receive = function(self, event)
+	self.game.gameplayController:receive(event)
+	ScreenView.receive(self, event)
 end
 
 return GameplayView

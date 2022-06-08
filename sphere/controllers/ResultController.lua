@@ -17,45 +17,21 @@ ResultController.oldTimings = {
 	}
 }
 
-ResultController.load = function(self)
-	local themeModel = self.game.themeModel
-
-	local theme = themeModel:getTheme()
-	self.theme = theme
-
-	local view = theme:newView("ResultView")
-	self.view = view
-
-	view.controller = self
-	view.game = self.game
-
-	view:load()
-end
-
-ResultController.unload = function(self)
-	self.view:unload()
-end
-
-ResultController.update = function(self, dt)
-	self.view:update(dt)
-end
-
-ResultController.draw = function(self)
-	self.view:draw()
-end
-
 ResultController.receive = function(self, event)
-	self.view:receive(event)
-
-	if event.name == "changeScreen" then
-		self.game:resetGameplayConfigs()
-		self.game.screenManager:set(self.game.selectController)
-	elseif event.name == "loadScore" then
-		self.game:resetGameplayConfigs()
-		self:replayNoteChart(event.mode, event.scoreEntry, event.itemIndex)
-	elseif event.name == "scrollScore" then
+	if event.name == "scrollScore" then
 		self.game.selectModel:scrollScore(event.direction)
 	end
+end
+
+ResultController.replaySelectedNoteChart = function(self)
+	local selectModel = self.game.selectModel
+	local scoreItemIndex = selectModel.scoreItemIndex
+	local scoreItem = selectModel.scoreItem
+	if not scoreItem then
+		return
+	end
+
+	self:replayNoteChart("result", scoreItem, scoreItemIndex)
 end
 
 ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
@@ -65,13 +41,6 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 	end
 	if noteChartModel.noteChartDataEntry.hash == "" then
 		return
-	end
-
-	local gameplayController
-	if mode == "result" then
-		gameplayController = self.game.fastplayController
-	else
-		gameplayController = self.game.gameplayController
 	end
 
 	local hash = scoreEntry.replayHash
@@ -100,29 +69,28 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 		self.game.replayModel:setMode("record")
 	end
 
-	gameplayController.selectController = self.game.selectController
-	gameplayController.game = self.game
-
-	if mode == "result" then
-		gameplayController:play()
-
-		local view = self.view
-		if view then
-			view:unload()
-			view:load()
-		end
-
-		rhythmModel.scoreEngine.scoreEntry = scoreEntry
-		local config = self.game.configModel.configs.select
-		config.scoreEntryId = scoreEntry.id
-		if itemIndex then
-			self.game.selectModel:scrollScore(nil, itemIndex)
-		end
-		rhythmModel.inputManager:setMode("external")
-		self.game.replayModel:setMode("record")
-	else
-		return self.game.screenManager:set(gameplayController)
+	if mode ~= "result" then
+		return
 	end
+
+	self.game.fastplayController:play()
+
+	local view = self.view
+	if view then
+		view:unload()
+		view:load()
+	end
+
+	rhythmModel.scoreEngine.scoreEntry = scoreEntry
+	local config = self.game.configModel.configs.select
+	config.scoreEntryId = scoreEntry.id
+	if itemIndex then
+		self.game.selectModel:scrollScore(nil, itemIndex)
+	end
+	rhythmModel.inputManager:setMode("external")
+	self.game.replayModel:setMode("record")
+
+	return true
 end
 
 return ResultController

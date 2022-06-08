@@ -765,7 +765,7 @@ local BottomNotechartsScreenMenu = {
 		{
 			{
 				method = "changeScreen",
-				value = "Modifier",
+				value = "modifierView",
 				displayName = "modifiers"
 			},
 			{

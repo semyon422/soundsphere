@@ -26,7 +26,7 @@ SelectNavigator.receive = function(self, event)
 
 	local scancode = event[2]
 
-	if scancode == "f1" then self:changeScreen("Modifier")
+	if scancode == "f1" then self:changeScreen("modifierView")
 	elseif scancode == "f2" then self:scrollRandom()
 	elseif scancode == "lctrl" then self:changeSearchMode()
 	elseif scancode == "lshift" then self:changeCollapse()
@@ -193,7 +193,16 @@ SelectNavigator.downloadBeatmapSet = function(self)
 end
 
 SelectNavigator.play = function(self)
-	self:send({name = "playNoteChart"})
+	if self.game.selectController:checkChartExists() then
+		self:changeScreen("gameplayView")
+	end
+end
+
+SelectNavigator.result = function(self)
+	if self.game.selectController:checkChartExists() then
+		self.game.resultController:replaySelectedNoteChart()
+		self:changeScreen("resultView")
+	end
 end
 
 SelectNavigator.setSortFunction = function(self, sortFunction)

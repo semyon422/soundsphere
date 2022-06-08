@@ -19,6 +19,7 @@ ReplayModel.load = function(self)
 		self.replay:reset()
 	end
 	self.replay.timeEngine = self.game.rhythmModel.timeEngine
+	self.currentTime = -math.huge
 end
 
 ReplayModel.setMode = function(self, mode)

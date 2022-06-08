@@ -1,12 +1,6 @@
 local Class = require("aqua.util.Class")
-local json = require("json")
-local Theme = require("sphere.models.ThemeModel.Theme")
 
 local ThemeModel = Class:new()
-
-ThemeModel.construct = function(self)
-	self.theme = Theme:new()
-end
 
 ThemeModel.path = "userdata/themes"
 

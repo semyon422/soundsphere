@@ -13,6 +13,11 @@ GameplayNavigator.construct = function(self)
 	self.state = "play"
 end
 
+GameplayNavigator.load = function(self)
+	Navigator.load(self)
+	self.quited = false
+end
+
 GameplayNavigator.receive = function(self, event)
 	if event.name == "keypressed" then
 		return self:keypressed(event)
@@ -193,10 +198,12 @@ GameplayNavigator.forceRetry = function(self)
 end
 
 GameplayNavigator.quit = function(self)
-	self:send({
-		name = "quit"
-	})
 	self.quited = true
+	local isResult = self.game.gameplayController:quit()
+	if isResult then
+		return self:changeScreen("resultView")
+	end
+	return self:changeScreen("selectView")
 end
 
 return GameplayNavigator

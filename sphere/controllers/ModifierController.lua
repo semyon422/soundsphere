@@ -4,38 +4,18 @@ local ModifierController = Class:new()
 
 ModifierController.load = function(self)
 	local noteChartModel = self.game.noteChartModel
-	local themeModel = self.game.themeModel
-
-	local theme = themeModel:getTheme()
-	self.theme = theme
-
-	local view = theme:newView("ModifierView")
-	self.view = view
-
-	view.controller = self
-	view.game = self.game
-
 	noteChartModel:load()
-
-	view:load()
 end
 
 ModifierController.unload = function(self)
-	self.view:unload()
 	self.game.multiplayerModel:pushModifiers()
 end
 
-ModifierController.update = function(self, dt)
-	self.view:update(dt)
-end
+ModifierController.update = function(self, dt) end
 
-ModifierController.draw = function(self)
-	self.view:draw()
-end
+ModifierController.draw = function(self) end
 
 ModifierController.receive = function(self, event)
-	self.view:receive(event)
-
 	if event.name == "addModifier" then
 		self.game.modifierModel:add(event.modifier)
 	elseif event.name == "removeModifier" then
@@ -48,10 +28,6 @@ ModifierController.receive = function(self, event)
 		self.game.modifierModel:scrollModifier(event.direction)
 	elseif event.name == "scrollAvailableModifier" then
 		self.game.modifierModel:scrollAvailableModifier(event.direction)
-	elseif event.name == "adjustDifficulty" then
-		self:adjustDifficulty()
-	elseif event.name == "changeScreen" then
-		self.game.screenManager:set(self.game.selectController)
 	end
 end
 

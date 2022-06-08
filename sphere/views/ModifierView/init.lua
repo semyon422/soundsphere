@@ -23,9 +23,26 @@ ModifierView.construct = function(self)
 end
 
 ModifierView.load = function(self)
+	self.controller = self.game.modifierController
+	self.game.modifierController:load()
 	self:loadViews(ScreenView.views)
 	self:loadViews(self.views)
 	ScreenView.load(self)
+end
+
+ModifierView.unload = function(self)
+	self.game.modifierController:unload()
+	ScreenView.unload(self)
+end
+
+ModifierView.update = function(self, dt)
+	self.game.modifierController:update(dt)
+	ScreenView.update(self, dt)
+end
+
+ModifierView.receive = function(self, event)
+	self.game.modifierController:receive(event)
+	ScreenView.receive(self, event)
 end
 
 return ModifierView

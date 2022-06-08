@@ -52,6 +52,8 @@ SelectView.construct = function(self)
 end
 
 SelectView.load = function(self)
+	self.controller = self.game.selectController
+	self.game.selectController:load()
 	self:loadViews(ScreenView.views)
 	self:loadViews(self.views)
 	ScreenView.load(self)
@@ -88,6 +90,21 @@ SelectView.draw = function(self)
 	self.onlineView:draw()
 	self.mountsView:draw()
 	self.selectOverlayView:draw()
+end
+
+SelectView.unload = function(self)
+	self.game.selectController:unload()
+	ScreenView.unload(self)
+end
+
+SelectView.update = function(self, dt)
+	self.game.selectController:update(dt)
+	ScreenView.update(self, dt)
+end
+
+SelectView.receive = function(self, event)
+	self.game.selectController:receive(event)
+	ScreenView.receive(self, event)
 end
 
 return SelectView

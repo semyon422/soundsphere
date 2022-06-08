@@ -11,22 +11,11 @@ GameplayController.load = function(self)
 	local inputModel = self.game.inputModel
 	local configModel = self.game.configModel
 	local modifierModel = self.game.modifierModel
-	local notificationModel = self.game.notificationModel
-	local themeModel = self.game.themeModel
 	local difficultyModel = self.game.difficultyModel
-
-	local theme = themeModel:getTheme()
-	self.theme = theme
-
-	local view = theme:newView("GameplayView")
-	self.view = view
 
 	noteSkinModel.configModel = configModel
 
 	noteChartModel:load()
-
-	view.controller = self
-	view.game = self.game
 
 	local noteChart = noteChartModel:loadNoteChart(self:getImporterSettings())
 	rhythmModel:setNoteChart(noteChart)
@@ -92,8 +81,6 @@ GameplayController.load = function(self)
 	rhythmModel:setInputOffset(inputOffset)
 	rhythmModel:setVisualOffset(visualOffset)
 
-	view:load()
-
 	sound.sample_gain = config.audio.sampleGain
 	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChart, function()
 		rhythmModel:setResourceAliases(NoteChartResourceLoader.aliases)
@@ -102,7 +89,6 @@ GameplayController.load = function(self)
 		})
 	end)
 
-	rhythmModel.observable:add(view)
 	love.mouse.setVisible(false)
 	self.drawing = true
 
@@ -127,8 +113,6 @@ GameplayController.unload = function(self)
 	local rhythmModel = self.game.rhythmModel
 	rhythmModel:unloadAllEngines()
 	rhythmModel:unload()
-	self.view:unload()
-	rhythmModel.observable:remove(self.view)
 	rhythmModel.inputManager:setMode("external")
 	self.game.replayModel:setMode("record")
 	self.game:resetGameplayConfigs()
@@ -145,13 +129,6 @@ end
 
 GameplayController.update = function(self, dt)
 	self.game.rhythmModel:update(dt)
-	self.view:update(dt)
-end
-
-GameplayController.draw = function(self)
-	if self.drawing then
-		self.view:draw()
-	end
 end
 
 GameplayController.discordPlay = function(self)
@@ -185,7 +162,6 @@ GameplayController.receive = function(self, event)
 	self.game.timeController:receive(event)
 	local rhythmModel = self.game.rhythmModel
 	rhythmModel:receive(event)
-	self.view:receive(event)
 
 	if event.name == "play" then
 		rhythmModel.pauseManager:play()
@@ -211,8 +187,6 @@ GameplayController.receive = function(self, event)
 		perspective.z = event.z
 		perspective.pitch = event.pitch
 		perspective.yaw = event.yaw
-	elseif event.name == "quit" then
-		self:quit()
 	end
 end
 
@@ -223,9 +197,7 @@ GameplayController.quit = function(self)
 	self:skip()
 	self:saveScore()
 	if not rhythmModel.logicEngine.autoplay and not rhythmModel.prohibitSavingScore then
-		self.game.screenManager:set(self.game.resultController)
-	else
-		self.game.screenManager:set(self.game.selectController)
+		return true  -- is result
 	end
 end
 

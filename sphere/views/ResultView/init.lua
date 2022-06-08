@@ -30,6 +30,7 @@ ResultView.construct = function(self)
 end
 
 ResultView.load = function(self)
+	self.controller = self.game.resultController
 	self:loadViews(ScreenView.views)
 	self:loadViews(self.views)
 	ScreenView.load(self)

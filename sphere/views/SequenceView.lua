@@ -19,12 +19,10 @@ SequenceView.construct = function(self)
 	self.sequenceConfig = {}
 	self.states = {}
 
-	self.viewIterator = self:newViewIterator(
-		true,
-		function()
-			self.iterating = false
-		end
-	)
+	self.viewIterator = self:newViewIterator(true)
+	self.loadViewIterator = self:newViewIterator(false)
+
+	self.abortViewIterator = false
 end
 
 SequenceView.setSequenceConfig = function(self, config)
@@ -96,44 +94,58 @@ SequenceView.newViewIterator = function(self, skipHidden, stop)
 	end
 end
 
-SequenceView.getViewIterator = function(self)
-	if self.iterating then
-		return noViews
-	end
-
-	self.iterating = true
-	return self.viewIterator
-end
-
 SequenceView.load = function(self)
-	for view in self:getViewIterator() do
+	self.abortViewIterator = true
+	for view in self.loadViewIterator do
 		if view.load then view:load() end
 	end
 end
 
 SequenceView.unload = function(self)
-	for view in self:getViewIterator() do
+	self.abortViewIterator = true
+	for view in self.loadViewIterator do
 		if view.unload then view:unload() end
 	end
 end
 
 SequenceView.receive = function(self, event)
-	for view in self:getViewIterator() do
-		if view.receive then view:receive(event) end
+	if self.iterating then
+		return
 	end
+	self.iterating = true
+	for view in self.viewIterator do
+		if view.receive then view:receive(event) end
+		if self.abortViewIterator then break end
+	end
+	self.abortViewIterator = false
+	self.iterating = false
 end
 
 SequenceView.update = function(self, dt)
-	for view in self:getViewIterator() do
-		if view.update then view:update(dt) end
+	if self.iterating then
+		return
 	end
+	self.iterating = true
+	for view in self.viewIterator do
+		if view.update then view:update(dt) end
+		if self.abortViewIterator then break end
+	end
+	self.abortViewIterator = false
+	self.iterating = false
 end
 
 SequenceView.draw = function(self)
-	for view in self:getViewIterator() do
+	if self.iterating then
+		return
+	end
+	self.iterating = true
+	for view in self.viewIterator do
 		if view.config.beforeDraw then view.config.beforeDraw(view) end
 		if view.draw then view:draw() end
+		if self.abortViewIterator then break end
 	end
+	self.abortViewIterator = false
+	self.iterating = false
 end
 
 return SequenceView

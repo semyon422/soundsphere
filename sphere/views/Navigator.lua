@@ -13,7 +13,8 @@ end
 
 Navigator.load = function(self)
 	self.observable:add(self.view.controller)
-	self.viewIterator = self.sequenceView:newViewIterator()
+	self.viewIterator = self.sequenceView.loadViewIterator
+	self.subscreens = {}
 	self:setHidden(nil, true, true)
 end
 
@@ -40,10 +41,7 @@ Navigator.call = function(self, method, value)
 end
 
 Navigator.changeScreen = function(self, screenName)
-	self:send({
-		name = "changeScreen",
-		screenName = screenName
-	})
+	self.game:setView(self.game[screenName])
 end
 
 Navigator.resetSubscreens = function(self)
