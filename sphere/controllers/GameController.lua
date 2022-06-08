@@ -124,16 +124,18 @@ GameController.load = function(self)
 	MainLog:write("trace", "starting game")
 
 	self.directoryManager:createDirectories()
-	configModel:readConfig("settings_model", "userdata/settings_model.lua", "sphere/models/ConfigModel/settings_model.lua")
-	configModel:readConfig("settings", "userdata/settings.lua", "sphere/models/ConfigModel/settings.lua")
-	configModel:readConfig("select", "userdata/select.lua", "sphere/models/ConfigModel/select.lua")
-	configModel:readConfig("modifier", "userdata/modifier.lua", "sphere/models/ConfigModel/modifier.lua")
-	configModel:readConfig("input", "userdata/input.lua", "sphere/models/ConfigModel/input.lua")
-	configModel:readConfig("mount", "userdata/mount.lua", "sphere/models/ConfigModel/mount.lua")
-	configModel:readConfig("online", "userdata/online.lua", "sphere/models/ConfigModel/online.lua")
-	configModel:readConfig("urls", "userdata/urls.lua", "sphere/models/ConfigModel/urls.lua")
-	configModel:readConfig("judgements", "userdata/judgements.lua", "sphere/models/ConfigModel/judgements.lua")
-	configModel:readConfig("files", "userdata/files.lua", "sphere/models/ConfigModel/files.lua")
+	configModel:read(
+		"settings_model",
+		"settings",
+		"select",
+		"modifier",
+		"input",
+		"mount",
+		"online",
+		"urls",
+		"judgements",
+		"files"
+	)
 
 	rhythmModel.timings = configModel.configs.settings.gameplay.timings
 	rhythmModel.judgements = configModel.configs.judgements
@@ -180,12 +182,14 @@ GameController.resetGameplayConfigs = function(self)
 end
 
 GameController.writeConfigs = function(self)
-	self.configModel:writeConfig("settings")
-	self.configModel:writeConfig("select")
-	self.configModel:writeConfig("modifier")
-	self.configModel:writeConfig("input")
-	self.configModel:writeConfig("mount")
-	self.configModel:writeConfig("online")
+	self.configModel:write(
+		"settings",
+		"select",
+		"modifier",
+		"input",
+		"mount",
+		"online"
+	)
 end
 
 GameController.unload = function(self)

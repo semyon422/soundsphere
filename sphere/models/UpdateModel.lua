@@ -129,7 +129,7 @@ UpdateModel.updateFiles = thread.coro(function(self)
 		client_filelist[k] = v
 	end
 
-	self.configModel:writeConfig("files")
+	self.configModel:write("files")
 end)
 
 return UpdateModel

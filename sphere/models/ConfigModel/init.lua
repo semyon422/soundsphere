@@ -3,6 +3,9 @@ local serpent = require("serpent")
 
 local ConfigModel = Class:new()
 
+ConfigModel.userdataPath = "userdata"
+ConfigModel.configModelPath = "sphere/models/ConfigModel"
+
 ConfigModel.construct = function(self)
 	self.configs = {}
 	self.paths = {}
@@ -21,27 +24,42 @@ local function copyTable(from, to)
 	end
 end
 
-ConfigModel.readConfig = function(self, name, path, defaultPath)
+ConfigModel._read = function(self, name)
 	local configs = self.configs
 	local paths = self.paths
+
+	local path = self.userdataPath .. "/" .. name .. ".lua"
+	local defaultPath = self.configModelPath .. "/" .. name .. ".lua"
 
 	paths[name] = path
 	configs[name] = {}
 	local config = configs[name]
 
 	if defaultPath then
-		copyTable(self:readConfigFile(defaultPath), config)
+		copyTable(self:readFile(defaultPath), config)
 	end
-	copyTable(self:readConfigFile(path), config)
+	copyTable(self:readFile(path), config)
 end
 
-ConfigModel.writeConfig = function(self, name)
+ConfigModel.read = function(self, ...)
+	for i = 1, select("#", ...) do
+		self:_read(select(i, ...))
+	end
+end
+
+ConfigModel._write = function(self, name)
 	local config = assert(self.configs[name])
 	local path = self.paths[name]
-	return self:writeConfigFile(path, config)
+	return self:writeFile(path, config)
 end
 
-ConfigModel.readConfigFile = function(self, path)
+ConfigModel.write = function(self, ...)
+	for i = 1, select("#", ...) do
+		self:_write(select(i, ...))
+	end
+end
+
+ConfigModel.readFile = function(self, path)
 	local info = love.filesystem.getInfo(path)
 	if not info or info.size == 0 then
 		return {}
@@ -57,7 +75,7 @@ local serpentOptions = {
 	numformat = "%.16g"
 }
 local serpentFormat = "return %s\n"
-ConfigModel.writeConfigFile = function(self, path, config)
+ConfigModel.writeFile = function(self, path, config)
 	return assert(love.filesystem.write(path, serpentFormat:format(serpent.block(config, serpentOptions))))
 end
 
