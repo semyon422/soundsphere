@@ -41,8 +41,8 @@ ScreenView.construct = function(self)
 	self.sequenceView = SequenceView:new()
 end
 
-ScreenView.changeScreen = function(self, screenName)
-	self.gameView:setView(self.game[screenName])
+ScreenView.changeScreen = function(self, screenName, noTransition)
+	self.gameView:setView(self.game[screenName], noTransition)
 end
 
 ScreenView.createViews = function(self, views)

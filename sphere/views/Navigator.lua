@@ -23,8 +23,8 @@ Navigator.call = function(self, method, value)
 	end
 end
 
-Navigator.changeScreen = function(self, screenName)
-	self.view:changeScreen(screenName)
+Navigator.changeScreen = function(self, ...)
+	self.view:changeScreen(...)
 end
 
 Navigator.resetSubscreens = function(self)

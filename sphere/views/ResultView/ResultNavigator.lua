@@ -30,16 +30,15 @@ ResultNavigator.loadScore = function(self, itemIndex)
 	if itemIndex then
 		scoreEntry = self.game.scoreLibraryModel.items[itemIndex]
 	end
-	self.game:resetGameplayConfigs()
 	self.game.resultController:replayNoteChart("result", scoreEntry, itemIndex)
-	return self:changeScreen("resultView")
+	return self:changeScreen("resultView", true)
 end
 
 ResultNavigator.play = function(self, mode)
 	local scoreEntry = self.game.selectModel.scoreItem
 	local isResult = self.game.resultController:replayNoteChart(mode, scoreEntry)
 	if isResult then
-		return self:changeScreen("resultView")
+		return self:changeScreen("resultView", true)
 	end
 	self:changeScreen("gameplayView")
 end

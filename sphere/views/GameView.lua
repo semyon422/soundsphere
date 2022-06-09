@@ -11,15 +11,21 @@ GameView.load = function(self)
 	self:setView(self.game.selectView)
 end
 
-GameView.setView = function(self, view)
-	view.gameView = self
-	self.fadeTransition:transitIn(function()
-		if self.view then
-			self.view:unload()
-		end
-		self.view = view
-		self.view:load()
+GameView._setView = function(self, view)
+	if self.view then
+		self.view:unload()
+	end
+	self.view = view
+	self.view:load()
+end
 
+GameView.setView = function(self, view, noTransition)
+	view.gameView = self
+	if noTransition then
+		return self:_setView(view)
+	end
+	self.fadeTransition:transitIn(function()
+		self:_setView(view)
 		self.fadeTransition:transitOut()
 	end)
 end
