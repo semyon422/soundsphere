@@ -24,7 +24,7 @@ Navigator.call = function(self, method, value)
 end
 
 Navigator.changeScreen = function(self, screenName)
-	self.game:setView(self.game[screenName])
+	self.view:changeScreen(screenName)
 end
 
 Navigator.resetSubscreens = function(self)

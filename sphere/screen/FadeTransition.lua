@@ -12,7 +12,6 @@ FadeTransition.shaderText = [[
 ]]
 
 FadeTransition.transiting = false
-FadeTransition.needResume = false
 FadeTransition.alpha = 1
 FadeTransition.phase = 0
 
@@ -26,17 +25,22 @@ FadeTransition.checkShader = function(self)
 	return true
 end
 
-FadeTransition.fadeIn = function(self)
+FadeTransition.transitIn = function(self, callback)
+	if self.transiting then
+		return
+	end
+	self.callback = callback
 	self.transiting = true
 	self.phase = 1
-	self.needResume = false
-	self.tween = tween.new(0.1, self, {alpha = 0}, "inOutQuad")
+	self.tween = tween.new(0.2, self, {alpha = 0}, "inOutQuad")
 end
 
-FadeTransition.fadeOut = function(self)
+FadeTransition.transitOut = function(self)
+	if not self.transiting then
+		return
+	end
 	self.phase = 2
-	self.needResume = false
-	self.tween = tween.new(0.1, self, {alpha = 1}, "inOutQuad")
+	self.tween = tween.new(0.2, self, {alpha = 1}, "inOutQuad")
 end
 
 FadeTransition.update = function(self, dt)
@@ -44,16 +48,15 @@ FadeTransition.update = function(self, dt)
 		return
 	end
 
-	self.tween:update(dt)
+	self.tween:update(math.min(dt, 1 / 60))
 
 	if self.phase == 1 then
 		if self.alpha == 0 then
-			self.needResume = true
+			self.callback()
 		end
 	elseif self.phase == 2 then
 		if self.alpha == 1 then
 			self.transiting = false
-			self.needResume = true
 		end
 	end
 end

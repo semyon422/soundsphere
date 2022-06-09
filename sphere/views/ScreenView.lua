@@ -41,6 +41,12 @@ ScreenView.construct = function(self)
 	self.sequenceView = SequenceView:new()
 end
 
+ScreenView.changeScreen = function(self, screenName)
+	self.game.fadeTransition:transitIn(function()
+		self.game:setView(self.game[screenName])
+	end)
+end
+
 ScreenView.createViews = function(self, views)
 	for _, a in ipairs(views) do
 		self[a[1]] = a[2]:new()

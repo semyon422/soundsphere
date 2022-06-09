@@ -174,6 +174,8 @@ GameController.setView = function(self, view)
 	end
 	self.view = view
 	self.view:load()
+
+	self.fadeTransition:transitOut()
 end
 
 GameController.resetGameplayConfigs = function(self)
@@ -213,6 +215,7 @@ GameController.update = function(self, dt)
 	self.windowManager:update()
 	self.multiplayerModel:update()
 	self.cacheModel:update()
+	self.fadeTransition:update(dt)
 
 	self.frameTimeView.updateFrameTime = love.timer.getTime() - startTime
 end
@@ -220,7 +223,9 @@ end
 GameController.draw = function(self)
 	local startTime = love.timer.getTime()
 
+	self.fadeTransition:drawBefore()
 	self.view:draw()
+	self.fadeTransition:drawAfter()
 
 	love.graphics.origin()
 	self.frameTimeView:draw()
