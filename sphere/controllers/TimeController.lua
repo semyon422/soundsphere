@@ -3,44 +3,53 @@ local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 
 local TimeController = Class:new()
 
-TimeController.receive = function(self, event)
-	local configModel = self.game.configModel
+TimeController.skipIntro = function(self)
 	local rhythmModel = self.game.rhythmModel
-	local notificationModel = self.game.notificationModel
-
 	local timeEngine = rhythmModel.timeEngine
-	local graphicEngine = rhythmModel.graphicEngine
-
-	local config = configModel.configs.settings
-	local gameplay = config.gameplay
-
-	if event.name == "skipIntro" then
-		if not timeEngine.timer.isPlaying then
-			return
-		end
-		timeEngine:skipIntro()
-	elseif event.name == "increaseTimeRate" then
-		timeEngine:increaseTimeRate(event.delta)
-		notificationModel:notify("rate: " .. timeEngine.timeRate)
-		rhythmModel.prohibitSavingScore = true
-	elseif event.name == "invertTimeRate" then
-		timeEngine:setTimeRate(-timeEngine.timeRate)
-		notificationModel:notify("rate: " .. timeEngine.timeRate)
-		rhythmModel.prohibitSavingScore = true
-	elseif event.name == "increasePlaySpeed" then
-		graphicEngine:increaseVisualTimeRate(event.delta)
-		gameplay.speed = graphicEngine.targetVisualTimeRate
-		notificationModel:notify("scroll speed: " .. graphicEngine.targetVisualTimeRate)
-	elseif event.name == "invertPlaySpeed" then
-		graphicEngine.targetVisualTimeRate = -graphicEngine.targetVisualTimeRate
-		graphicEngine:setVisualTimeRate(graphicEngine.targetVisualTimeRate)
-		notificationModel:notify("scroll speed: " .. graphicEngine.targetVisualTimeRate)
-	elseif event.name == "increaseLocalOffset" then
-		local noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry
-		noteChartDataEntry.localOffset = (noteChartDataEntry.localOffset or 0) + event.delta
-		CacheDatabase:updateNoteChartDataEntry(noteChartDataEntry)
-		notificationModel:notify("local offset: " .. noteChartDataEntry.localOffset * 1000 .. "ms")
+	if not timeEngine.timer.isPlaying then
+		return
 	end
+	timeEngine:skipIntro()
+end
+
+TimeController.increaseTimeRate = function(self, delta)
+	local rhythmModel = self.game.rhythmModel
+	local timeEngine = rhythmModel.timeEngine
+	timeEngine:increaseTimeRate(delta)
+	rhythmModel.prohibitSavingScore = true
+	self.game.notificationModel:notify("rate: " .. timeEngine.timeRate)
+end
+
+TimeController.invertTimeRate = function(self, delta)
+	local rhythmModel = self.game.rhythmModel
+	local timeEngine = rhythmModel.timeEngine
+	timeEngine:setTimeRate(-timeEngine.timeRate)
+	rhythmModel.prohibitSavingScore = true
+	self.game.notificationModel:notify("rate: " .. timeEngine.timeRate)
+end
+
+TimeController.increasePlaySpeed = function(self, delta)
+	local gameplay = self.game.configModel.configs.settings.gameplay
+	local rhythmModel = self.game.rhythmModel
+	local graphicEngine = rhythmModel.graphicEngine
+	graphicEngine:increaseVisualTimeRate(delta)
+	gameplay.speed = graphicEngine.targetVisualTimeRate
+	self.game.notificationModel:notify("scroll speed: " .. graphicEngine.targetVisualTimeRate)
+end
+
+TimeController.invertPlaySpeed = function(self)
+	local rhythmModel = self.game.rhythmModel
+	local graphicEngine = rhythmModel.graphicEngine
+	graphicEngine.targetVisualTimeRate = -graphicEngine.targetVisualTimeRate
+	graphicEngine:setVisualTimeRate(graphicEngine.targetVisualTimeRate)
+	self.game.notificationModel:notify("scroll speed: " .. graphicEngine.targetVisualTimeRate)
+end
+
+TimeController.increaseLocalOffset = function(self, delta)
+	local noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry
+	noteChartDataEntry.localOffset = (noteChartDataEntry.localOffset or 0) + delta
+	CacheDatabase:updateNoteChartDataEntry(noteChartDataEntry)
+	self.game.notificationModel:notify("local offset: " .. noteChartDataEntry.localOffset * 1000 .. "ms")
 end
 
 return TimeController

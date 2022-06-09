@@ -4,14 +4,7 @@ local Navigator = require(viewspackage .. "Navigator")
 
 local GameplayNavigator = Navigator:new({construct = false})
 
-GameplayNavigator.construct = function(self)
-	Navigator.construct(self)
-	-- self.itemIndex = 1
-	-- self.inputItemIndex = 1
-	-- self.virtualKey = ""
-	-- self.activeElement = "list"
-	self.state = "play"
-end
+GameplayNavigator.state = "play"
 
 GameplayNavigator.load = function(self)
 	Navigator.load(self)
@@ -119,42 +112,27 @@ GameplayNavigator.saveCamera = function(self, x, y, z, pitch, yaw)
 end
 
 GameplayNavigator.skipIntro = function(self)
-	self:send({
-		name = "skipIntro",
-	})
+	self.game.timeController:skipIntro()
 end
 
 GameplayNavigator.increaseLocalOffset = function(self, delta)
-	self:send({
-		name = "increaseLocalOffset",
-		delta = delta
-	})
+	self.game.timeController:increaseLocalOffset(delta)
 end
 
 GameplayNavigator.increaseTimeRate = function(self, delta)
-	self:send({
-		name = "increaseTimeRate",
-		delta = delta
-	})
+	self.game.timeController:increaseTimeRate(delta)
 end
 
 GameplayNavigator.invertTimeRate = function(self)
-	self:send({
-		name = "invertTimeRate"
-	})
+	self.game.timeController:invertTimeRate()
 end
 
 GameplayNavigator.increasePlaySpeed = function(self, delta)
-	self:send({
-		name = "increasePlaySpeed",
-		delta = delta
-	})
+	self.game.timeController:increasePlaySpeed(delta)
 end
 
 GameplayNavigator.invertPlaySpeed = function(self)
-	self:send({
-		name = "invertPlaySpeed"
-	})
+	self.game.timeController:invertPlaySpeed()
 end
 
 GameplayNavigator.play = function(self)

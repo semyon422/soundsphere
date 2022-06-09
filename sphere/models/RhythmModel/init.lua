@@ -31,9 +31,7 @@ RhythmModel.construct = function(self)
 end
 
 RhythmModel.load = function(self)
-	local modifierModel = self.game.modifierModel
 	local inputManager = self.inputManager
-	local pauseManager = self.pauseManager
 	local replayModel = self.game.replayModel
 	local timeEngine = self.timeEngine
 	local scoreEngine = self.scoreEngine
@@ -42,7 +40,6 @@ RhythmModel.load = function(self)
 	local graphicEngine = self.graphicEngine
 	local observable = self.observable
 
-	logicEngine.observable:add(modifierModel)
 	logicEngine.observable:add(audioEngine)
 
 	scoreEngine.configModel = self.configModel
@@ -65,17 +62,13 @@ RhythmModel.load = function(self)
 end
 
 RhythmModel.unload = function(self)
-	local modifierModel = self.game.modifierModel
 	local inputManager = self.inputManager
 	local replayModel = self.game.replayModel
-	local timeEngine = self.timeEngine
-	local scoreEngine = self.scoreEngine
 	local audioEngine = self.audioEngine
 	local logicEngine = self.logicEngine
 	local graphicEngine = self.graphicEngine
 	local observable = self.observable
 
-	logicEngine.observable:remove(modifierModel)
 	logicEngine.observable:remove(audioEngine)
 
 	inputManager.observable:remove(logicEngine)
@@ -226,24 +219,12 @@ RhythmModel.setVisualOffset = function(self, offset)
 	self.timeEngine.visualOffset = offset
 end
 
-RhythmModel.setScoreBasePath = function(self, path)
-	self.scoreEngine:setBasePath(path)
-end
-
 RhythmModel.setPauseTimes = function(self, ...)
 	self.pauseManager:setPauseTimes(...)
 end
 
 RhythmModel.setVisualTimeRateScale = function(self, scaleSpeed)
 	self.graphicEngine.scaleSpeed = scaleSpeed
-end
-
-RhythmModel.setScaleInputOffset = function(self, scaleInputOffset)
-	-- self.inputManager:setScaleInputOffset(scaleInputOffset)
-end
-
-RhythmModel.setScaleVisualOffset = function(self, scaleVisualOffset)
-	-- self.graphicEngine:setScaleVisualOffset(scaleVisualOffset)
 end
 
 return RhythmModel
