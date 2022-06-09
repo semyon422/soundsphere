@@ -30,8 +30,22 @@ ResultView.construct = function(self)
 end
 
 ResultView.load = function(self)
+	self.game.resultController:load()
 	self:loadViews(ScreenView.views)
 	self:loadViews(self.views)
+	ScreenView.load(self)
+end
+
+ResultView.unload = function(self)
+	if self.resetConfigs then
+		self.game:resetGameplayConfigs()
+		self.resetConfigs = false
+	end
+	ScreenView.unload(self)
+end
+
+ResultView.reload = function(self)
+	ScreenView.unload(self)
 	ScreenView.load(self)
 end
 

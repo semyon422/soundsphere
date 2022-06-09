@@ -183,7 +183,6 @@ end
 
 SelectNavigator.result = function(self)
 	if self.game.noteChartModel:getFileInfo() then
-		self.game.resultController:replaySelectedNoteChart()
 		self:changeScreen("resultView")
 	end
 end

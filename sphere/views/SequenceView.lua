@@ -95,14 +95,12 @@ SequenceView.newViewIterator = function(self, skipHidden, stop)
 end
 
 SequenceView.load = function(self)
-	self.abortViewIterator = true
 	for view in self.loadViewIterator do
 		if view.load then view:load() end
 	end
 end
 
 SequenceView.unload = function(self)
-	self.abortViewIterator = true
 	for view in self.loadViewIterator do
 		if view.unload then view:unload() end
 	end

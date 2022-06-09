@@ -17,7 +17,7 @@ ResultController.oldTimings = {
 	}
 }
 
-ResultController.replaySelectedNoteChart = function(self)
+ResultController.load = function(self)
 	local selectModel = self.game.selectModel
 	local scoreItemIndex = selectModel.scoreItemIndex
 	local scoreItem = selectModel.scoreItem
@@ -25,10 +25,11 @@ ResultController.replaySelectedNoteChart = function(self)
 		return
 	end
 
-	self:replayNoteChart("result", scoreItem, scoreItemIndex)
+	self:replayNoteChart("result", scoreItem)
+	self.game.selectModel:scrollScore(nil, scoreItemIndex)
 end
 
-ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
+ResultController.replayNoteChart = function(self, mode, scoreEntry)
 	local noteChartModel = self.game.noteChartModel
 	if not noteChartModel:getFileInfo() then
 		return
@@ -69,18 +70,9 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry, itemIndex)
 
 	self.game.fastplayController:play()
 
-	local view = self.view
-	if view then
-		view:unload()
-		view:load()
-	end
-
 	rhythmModel.scoreEngine.scoreEntry = scoreEntry
 	local config = self.game.configModel.configs.select
 	config.scoreEntryId = scoreEntry.id
-	if itemIndex then
-		self.game.selectModel:scrollScore(nil, itemIndex)
-	end
 	rhythmModel.inputManager:setMode("external")
 	self.game.replayModel:setMode("record")
 
