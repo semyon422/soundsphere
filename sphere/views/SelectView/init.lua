@@ -52,7 +52,6 @@ SelectView.construct = function(self)
 end
 
 SelectView.load = function(self)
-	self.controller = self.game.selectController
 	self.game.selectController:load()
 	self:loadViews(ScreenView.views)
 	self:loadViews(self.views)

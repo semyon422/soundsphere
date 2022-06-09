@@ -136,21 +136,21 @@ GameplayNavigator.invertPlaySpeed = function(self)
 end
 
 GameplayNavigator.play = function(self)
-	self:send({
+	self.game.gameplayController:receive({
 		name = "playStateChange",
 		state = "play"
 	})
 end
 
 GameplayNavigator.pause = function(self)
-	self:send({
+	self.game.gameplayController:receive({
 		name = "playStateChange",
 		state = "pause"
 	})
 end
 
 GameplayNavigator.retry = function(self)
-	self:send({
+	self.game.gameplayController:receive({
 		name = "playStateChange",
 		state = "retry"
 	})

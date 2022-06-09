@@ -39,7 +39,6 @@ GameplayView.construct = function(self)
 end
 
 GameplayView.load = function(self)
-	self.controller = self.game.gameplayController
 	self.game.rhythmModel.observable:add(self.sequenceView)
 	self.game.gameplayController:load()
 

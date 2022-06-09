@@ -23,7 +23,6 @@ ModifierView.construct = function(self)
 end
 
 ModifierView.load = function(self)
-	self.controller = self.game.modifierController
 	self.game.modifierController:load()
 	self:loadViews(ScreenView.views)
 	self:loadViews(self.views)
