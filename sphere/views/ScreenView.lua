@@ -42,9 +42,7 @@ ScreenView.construct = function(self)
 end
 
 ScreenView.changeScreen = function(self, screenName)
-	self.game.fadeTransition:transitIn(function()
-		self.game:setView(self.game[screenName])
-	end)
+	self.gameView:setView(self.game[screenName])
 end
 
 ScreenView.createViews = function(self, views)

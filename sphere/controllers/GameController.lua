@@ -4,7 +4,6 @@ local ConfigModel				= require("sphere.models.ConfigModel")
 local ScoreModel				= require("sphere.models.ScoreModel")
 local DiscordModel				= require("sphere.models.DiscordModel")
 local MountModel				= require("sphere.models.MountModel")
-local FadeTransition			= require("sphere.screen.FadeTransition")
 local WindowManager				= require("sphere.window.WindowManager")
 local FpsLimiter				= require("sphere.window.FpsLimiter")
 local Screenshot				= require("sphere.window.Screenshot")
@@ -89,7 +88,6 @@ GameController.construct = function(self)
 	self.onlineModel = OnlineModel:new()
 	self.cacheModel = CacheModel:new()
 	self.backgroundModel = BackgroundModel:new()
-	self.fadeTransition = FadeTransition:new()
 	self.modifierModel = ModifierModel:new()
 	self.noteSkinModel = NoteSkinModel:new()
 	self.noteChartModel = NoteChartModel:new()
@@ -164,18 +162,7 @@ GameController.load = function(self)
 	self.previewModel:load()
 	self.multiplayerModel:load()
 	self.frameTimeView:load()
-
-	self:setView(self.gameView)
-end
-
-GameController.setView = function(self, view)
-	if self.view then
-		self.view:unload()
-	end
-	self.view = view
-	self.view:load()
-
-	self.fadeTransition:transitOut()
+	self.gameView:load()
 end
 
 GameController.resetGameplayConfigs = function(self)
@@ -195,7 +182,7 @@ GameController.writeConfigs = function(self)
 end
 
 GameController.unload = function(self)
-	self.view:unload()
+	self.gameView:unload()
 	self.discordModel:unload()
 	self.mountModel:unload()
 	self.onlineModel:unload()
@@ -209,13 +196,12 @@ GameController.update = function(self, dt)
 	self.discordModel:update()
 	self.notificationModel:update()
 	self.backgroundModel:update(dt)
-	self.view:update(dt)
+	self.gameView:update(dt)
 	self.onlineController:update()
 	self.fpsLimiter:update()
 	self.windowManager:update()
 	self.multiplayerModel:update()
 	self.cacheModel:update()
-	self.fadeTransition:update(dt)
 
 	self.frameTimeView.updateFrameTime = love.timer.getTime() - startTime
 end
@@ -223,9 +209,7 @@ end
 GameController.draw = function(self)
 	local startTime = love.timer.getTime()
 
-	self.fadeTransition:drawBefore()
-	self.view:draw()
-	self.fadeTransition:drawAfter()
+	self.gameView:draw()
 
 	love.graphics.origin()
 	self.frameTimeView:draw()
@@ -246,7 +230,7 @@ GameController.receive = function(self, event)
 		return self:unload()
 	end
 
-	self.view:receive(event)
+	self.gameView:receive(event)
 	self.windowManager:receive(event)
 	self.screenshot:receive(event)
 	self.mountController:receive(event)
