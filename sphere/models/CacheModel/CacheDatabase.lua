@@ -202,8 +202,10 @@ local _asyncQueryAll = aquathread.async(function(queryParams)
 	local self = require("sphere.models.CacheModel.CacheDatabase")
 	self:load()
 	self.queryParams = queryParams
-	self:queryNoteChartSets()
-	self:queryNoteCharts()
+	local status, err = pcall(self.queryAll, self)
+	if not status then
+		return
+	end
 	local t = {
 		noteChartSetItemsCount = self.noteChartSetItemsCount,
 		entryKeyToGlobalOffset = self.entryKeyToGlobalOffset,
@@ -221,6 +223,9 @@ end)
 
 CacheDatabase.asyncQueryAll = function(self)
 	local t = _asyncQueryAll(self.queryParams)
+	if not t then
+		return
+	end
 
 	self.noteChartSetItemsCount = t.noteChartSetItemsCount
 	self.entryKeyToGlobalOffset = t.entryKeyToGlobalOffset

@@ -83,7 +83,7 @@ UpdateModel.setStatus = function(self, status)
 end
 
 UpdateModel.updateFiles = thread.coro(function(self)
-	local configs = self.configModel.configs
+	local configs = self.game.configModel.configs
 	self:setStatus("Checking for updates...")
 
 	local response = async_download(configs.urls.update)
@@ -129,7 +129,7 @@ UpdateModel.updateFiles = thread.coro(function(self)
 		client_filelist[k] = v
 	end
 
-	self.configModel:write("files")
+	self.game.configModel:write("files")
 end)
 
 return UpdateModel

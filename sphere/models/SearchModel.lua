@@ -100,7 +100,7 @@ local numberFields = {
 			if v >= 10000 then
 				return 0
 			end
-			local window = self.configModel.configs.settings.gameplay.ratingHitTimingWindow
+			local window = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 			local accuracy = window / (erfunc.erfinv(v / 10000) * math.sqrt(2))
 			if accuracy ~= accuracy or math.abs(accuracy) == math.huge then
 				return 0

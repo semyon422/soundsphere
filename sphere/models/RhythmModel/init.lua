@@ -41,7 +41,6 @@ RhythmModel.load = function(self)
 	local scoreEngine = self.scoreEngine
 	local logicEngine = self.logicEngine
 
-	scoreEngine.configModel = self.configModel
 	scoreEngine.timings = self.timings
 	scoreEngine.judgements = self.judgements
 	scoreEngine.hp = self.hp

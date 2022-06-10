@@ -46,7 +46,7 @@ end
 
 OsudirectModel.search = function(self)
 	local searchString = self.searchString
-	local config = self.configModel.configs.urls.osu
+	local config = self.game.configModel.configs.urls.osu
 	local url = socket_url.absolute(config.web, osudirect_urls.search(searchString))
 	local body = asyncRequest(url)
 	if not body then
@@ -66,12 +66,12 @@ OsudirectModel.search = function(self)
 end
 
 OsudirectModel.getBackgroundUrl = function(self)
-	local config = self.configModel.configs.urls.osu
+	local config = self.game.configModel.configs.urls.osu
 	return socket_url.absolute(config.assets, osudirect_urls.cover(self.beatmap.setId, true))
 end
 
 OsudirectModel.getPreviewUrl = function(self)
-	local config = self.configModel.configs.urls.osu
+	local config = self.game.configModel.configs.urls.osu
 	return socket_url.absolute(config.static, osudirect_urls.preview(self.beatmap.setId))
 end
 
@@ -84,7 +84,7 @@ OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self)
 		return
 	end
 
-	local config = self.configModel.configs.urls.osu
+	local config = self.game.configModel.configs.urls.osu
 
 	local setId = beatmap.setId
 	local url = socket_url.absolute(config.storage, osudirect_urls.download(setId))
