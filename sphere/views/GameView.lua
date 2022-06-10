@@ -15,6 +15,7 @@ GameView._setView = function(self, view)
 	if self.view then
 		self.view:unload()
 	end
+	view.prevView = self.view
 	self.view = view
 	self.view:load()
 end

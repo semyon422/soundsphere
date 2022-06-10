@@ -30,7 +30,9 @@ ResultView.construct = function(self)
 end
 
 ResultView.load = function(self)
-	self.game.resultController:load()
+	if self.prevView == self.game.selectView then
+		self.game.resultController:load()
+	end
 	self:loadViews(ScreenView.views)
 	self:loadViews(self.views)
 	ScreenView.load(self)
