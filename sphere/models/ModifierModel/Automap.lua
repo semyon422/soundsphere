@@ -159,9 +159,6 @@ Automap.getUpscalerNotes = function(self)
 			columns[noteBlock.columnIndex] = (columns[noteBlock.columnIndex] or 0) + 1
 		end
 	end
-	for columnIndex = 1, self.targetMode do
-		print(columnIndex, columns[columnIndex])
-	end
 
 	return notes
 end
