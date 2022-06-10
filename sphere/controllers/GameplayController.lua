@@ -113,7 +113,6 @@ GameplayController.unload = function(self)
 	rhythmModel:unload()
 	rhythmModel.inputManager:setMode("external")
 	self.game.replayModel:setMode("record")
-	self.game:resetGameplayConfigs()
 	love.mouse.setVisible(true)
 
 	local graphics = self.game.configModel.configs.settings.graphics

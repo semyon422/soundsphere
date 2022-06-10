@@ -12,7 +12,7 @@ ResultNavigator.receive = function(self, event)
 	local scancode = event[2]
 	if scancode == "up" then self:scrollScore("up")
 	elseif scancode == "down" then self:scrollScore("down")
-	elseif scancode == "escape" then self:changeScreen("selectView")
+	elseif scancode == "escape" then self:back()
 	elseif scancode == "return" then self:loadScore()
 	elseif scancode == "f1" then self:switchSubscreen("debug")
 	elseif scancode == "f2" then self:switchSubscreen("scoreSystemDebug")
@@ -45,7 +45,6 @@ ResultNavigator.play = function(self, mode)
 end
 
 ResultNavigator.back = function(self)
-	self.view.resetConfigs = true
 	self:changeScreen("selectView")
 end
 

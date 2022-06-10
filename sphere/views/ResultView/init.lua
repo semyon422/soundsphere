@@ -37,10 +37,6 @@ ResultView.load = function(self)
 end
 
 ResultView.unload = function(self)
-	if self.resetConfigs then
-		self.game:resetGameplayConfigs()
-		self.resetConfigs = false
-	end
 	ScreenView.unload(self)
 end
 
