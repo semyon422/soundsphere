@@ -42,6 +42,7 @@ local GameplayController		= require("sphere.controllers.GameplayController")
 local FastplayController		= require("sphere.controllers.FastplayController")
 local ResultController			= require("sphere.controllers.ResultController")
 local TimeController			= require("sphere.controllers.TimeController")
+local MultiplayerController			= require("sphere.controllers.MultiplayerController")
 
 local GameView = require("sphere.views.GameView")
 local SelectView = require("sphere.views.SelectView")
@@ -66,6 +67,7 @@ GameController.construct = function(self)
 	self.fastplayController = FastplayController:new()
 	self.resultController = ResultController:new()
 	self.timeController = TimeController:new()
+	self.multiplayerController = MultiplayerController:new()
 
 	self.gameView = GameView:new()
 	self.selectView = SelectView:new()
@@ -154,14 +156,16 @@ GameController.load = function(self)
 	self.noteChartSetLibraryModel:load()
 	self.noteChartLibraryModel:load()
 	self.osudirectModel:load()
-	self.onlineController:load()
 	self.discordModel:load()
 	self.backgroundModel:load()
 	self.collectionModel:load()
 	self.selectModel:load()
 	self.previewModel:load()
-	self.multiplayerModel:load()
 	self.frameTimeView:load()
+
+	self.multiplayerController:load()
+	self.onlineController:load()
+
 	self.gameView:load()
 end
 
@@ -186,7 +190,7 @@ GameController.unload = function(self)
 	self.discordModel:unload()
 	self.mountModel:unload()
 	self.onlineModel:unload()
-	self.multiplayerModel:unload()
+	self.multiplayerController:unload()
 	self:writeConfigs()
 end
 
@@ -196,12 +200,15 @@ GameController.update = function(self, dt)
 	self.discordModel:update()
 	self.notificationModel:update()
 	self.backgroundModel:update(dt)
-	self.gameView:update(dt)
+
+	self.multiplayerController:update()
 	self.onlineController:update()
+
 	self.fpsLimiter:update()
 	self.windowManager:update()
-	self.multiplayerModel:update()
 	self.cacheModel:update()
+
+	self.gameView:update(dt)
 
 	self.frameTimeView.updateFrameTime = love.timer.getTime() - startTime
 end

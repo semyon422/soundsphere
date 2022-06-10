@@ -3,7 +3,6 @@ local aquatimer = require("aqua.timer")
 local enet = require("enet")
 local MessagePack = require("MessagePack")
 local remote = require("aqua.util.remote")
-local deepclone = require("aqua.util.deepclone")
 
 remote.encode = MessagePack.pack
 remote.decode = MessagePack.unpack
@@ -18,42 +17,8 @@ MultiplayerModel.construct = function(self)
 	self.modifiers = {}
 	self.notechart = {}
 	self.roomMessages = {}
-	self.notechartChanged = false
 
 	self.isPlaying = false
-	self.handlers = {
-		set = function(peer, key, value)
-			self[key] = value
-			if key == "notechart" then
-				self.notechartChanged = true
-			elseif key == "modifiers" then
-				self.game.modifierModel:setConfig(value)
-				self.game.configModel.configs.modifier = value
-				self.modifiers = deepclone(value)
-			end
-		end,
-		startMatch = function(peer)
-			if not self.isPlaying and self.noteChartItem then
-				if not self.room.isFreeModifiers then
-					local modifiers = deepclone(self.modifiers)
-					self.game.modifierModel:setConfig(modifiers)
-					self.game.configModel.configs.modifier = modifiers
-				end
-				if not self.room.isFreeNotechart then
-					self.game.selectModel:setConfig(self.noteChartItem)
-				end
-				self.game.selectController:playNoteChart()
-			end
-		end,
-		stopMatch = function(peer)
-			if self.isPlaying then
-				self.game.gameplayController:quit()
-			end
-		end,
-		addMessage = function(peer, message)
-			table.insert(self.roomMessages, message)
-		end,
-	}
 end
 
 MultiplayerModel.load = function(self)
@@ -101,6 +66,10 @@ MultiplayerModel.disconnect = function(self)
 		self.server:disconnect()
 		self.status = "disconnecting"
 	end
+end
+
+MultiplayerModel.addMessage = function(self, message)
+	table.insert(self.roomMessages, message)
 end
 
 MultiplayerModel.isHost = function(self)
@@ -326,17 +295,6 @@ MultiplayerModel.update = function(self)
 	end
 
 	remote.update()
-
-	if not self.room or self:isHost() then
-		return
-	end
-
-	if self.notechartChanged then
-		self.notechartChanged = false
-		if not self.room.isFreeNotechart then
-			self:findNotechart()
-		end
-	end
 end
 
 return MultiplayerModel

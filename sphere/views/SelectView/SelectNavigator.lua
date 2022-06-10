@@ -68,6 +68,12 @@ end
 SelectNavigator.update = function(self)
 	self:removeLessSubscreens("score", "options")
 	self:removeLessSubscreens("notecharts", "collections", "osudirect")
+
+	local multiplayerModel = self.game.multiplayerModel
+	if multiplayerModel.room and multiplayerModel.isPlaying then
+		self:play()
+	end
+
 	Navigator.update(self)
 end
 

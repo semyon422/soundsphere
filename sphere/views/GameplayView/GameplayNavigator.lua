@@ -6,11 +6,6 @@ local GameplayNavigator = Navigator:new({construct = false})
 
 GameplayNavigator.state = "play"
 
-GameplayNavigator.load = function(self)
-	Navigator.load(self)
-	self.quited = false
-end
-
 GameplayNavigator.receive = function(self, event)
 	if event.name == "keypressed" then
 		return self:keypressed(event)
@@ -44,7 +39,7 @@ GameplayNavigator.update = function(self)
 	end
 
 	local timeEngine = self.game.rhythmModel.timeEngine
-	if timeEngine.currentTime >= timeEngine.maxTime + 1 and not self.quited then
+	if timeEngine.currentTime >= timeEngine.maxTime + 1 then
 		self:quit()
 	end
 
@@ -53,6 +48,11 @@ GameplayNavigator.update = function(self)
 	if pauseOnFail and failed and not self.failed then
 		self:pause()
 		self.failed = true
+	end
+
+	local multiplayerModel = self.game.multiplayerModel
+	if multiplayerModel.room and not multiplayerModel.isPlaying then
+		self:quit()
 	end
 
 	Navigator.update(self)
@@ -165,7 +165,6 @@ GameplayNavigator.forceRetry = function(self)
 end
 
 GameplayNavigator.quit = function(self)
-	self.quited = true
 	local hasResult = self.game.gameplayController:hasResult()
 	if hasResult then
 		return self:changeScreen("resultView")
