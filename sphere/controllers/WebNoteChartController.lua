@@ -7,7 +7,7 @@ local WebNoteChartController = {}
 WebNoteChartController.getNoteCharts = function(notechart)
 	local file = io.open(notechart.path, "r")
 	if not file then
-		error("Notechart not found")
+		return
 	end
 	local content = file:read("*a")
 	file:close()
@@ -22,6 +22,9 @@ end
 
 WebNoteChartController.POST = function(self)
 	local noteCharts = WebNoteChartController.getNoteCharts(self.params.notechart)
+	if not noteCharts then
+		return {status = 404}
+	end
 
 	local noteChartDataEntries = {}
 	for _, noteChart in ipairs(noteCharts) do
@@ -33,7 +36,7 @@ WebNoteChartController.POST = function(self)
 		table.insert(noteChartDataEntries, noteChartDataEntry)
 	end
 
-	return {json = {notecharts = noteChartDataEntries}}
+	return {status = 200, json = {notecharts = noteChartDataEntries}}
 end
 
 
