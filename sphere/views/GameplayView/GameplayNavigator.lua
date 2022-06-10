@@ -166,8 +166,8 @@ end
 
 GameplayNavigator.quit = function(self)
 	self.quited = true
-	local isResult = self.game.gameplayController:quit()
-	if isResult then
+	local hasResult = self.game.gameplayController:hasResult()
+	if hasResult then
 		return self:changeScreen("resultView")
 	end
 	return self:changeScreen("selectView")

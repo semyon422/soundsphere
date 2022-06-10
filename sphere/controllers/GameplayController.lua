@@ -93,6 +93,10 @@ GameplayController.getImporterSettings = function(self)
 end
 
 GameplayController.unload = function(self)
+	self.game.discordModel:setPresence({})
+	self:skip()
+	self:saveScore()
+
 	local rhythmModel = self.game.rhythmModel
 	rhythmModel:unloadAllEngines()
 	rhythmModel:unload()
@@ -179,14 +183,9 @@ GameplayController.saveCamera = function(self, x, y, z, pitch, yaw)
 	perspective.yaw = yaw
 end
 
-GameplayController.quit = function(self)
+GameplayController.hasResult = function(self)
 	local rhythmModel = self.game.rhythmModel
-	self.game.discordModel:setPresence({})
-	self:skip()
-	self:saveScore()
-	if not rhythmModel.logicEngine.autoplay and not rhythmModel.prohibitSavingScore then
-		return true  -- is result
-	end
+	return not rhythmModel.logicEngine.autoplay and not rhythmModel.prohibitSavingScore
 end
 
 GameplayController.saveScore = function(self)
