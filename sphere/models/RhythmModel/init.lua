@@ -146,7 +146,6 @@ RhythmModel.setNoteChart = function(self, noteChart)
 	self.scoreEngine.noteChart = noteChart
 	self.logicEngine.noteChart = noteChart
 	self.graphicEngine.noteChart = noteChart
-	self.inputManager:setInputMode(noteChart.inputMode:getString())
 end
 
 RhythmModel.setNoteSkin = function(self, noteSkin)

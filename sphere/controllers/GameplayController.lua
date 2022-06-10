@@ -35,6 +35,7 @@ GameplayController.load = function(self)
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel:setNoteSkin(noteSkinModel:getNoteSkin(noteChart.inputMode))
+	rhythmModel.inputManager:setInputMode(noteChart.inputMode:getString())
 
 	rhythmModel:load()
 
@@ -232,7 +233,6 @@ GameplayController.skip = function(self)
 	self:update(0)
 
 	rhythmModel.audioEngine:unload()
-	rhythmModel.logicEngine.observable:remove(rhythmModel.audioEngine)
 
 	local base = rhythmModel.scoreEngine.scoreSystem.base
 	if timeEngine.currentTime >= timeEngine.maxTime then
