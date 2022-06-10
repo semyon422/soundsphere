@@ -17,7 +17,6 @@ local timeEngine = {
 	inputOffset = 0,
 	timer = {isPlaying = true}
 }
-logicEngine.timeEngine = timeEngine
 rhythmModel.timeEngine = timeEngine
 
 logicEngine.timings = {

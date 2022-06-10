@@ -31,7 +31,7 @@ LogicEngine.send = function(self, event)
 end
 
 LogicEngine.getEventTime = function(self)
-	return self.eventTime or self.timeEngine.currentTime
+	return self.eventTime or self.rhythmModel.timeEngine.currentTime
 end
 
 LogicEngine.receive = function(self, event)

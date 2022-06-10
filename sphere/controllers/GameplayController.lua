@@ -13,45 +13,30 @@ GameplayController.load = function(self)
 	local modifierModel = self.game.modifierModel
 	local difficultyModel = self.game.difficultyModel
 
-	noteSkinModel.configModel = configModel
-
 	noteChartModel:load()
 
 	local noteChart = noteChartModel:loadNoteChart(self:getImporterSettings())
-	rhythmModel:setNoteChart(noteChart)
-	rhythmModel.noteChart = noteChart
-	rhythmModel.prohibitSavingScore = false
+	modifierModel:apply("NoteChartModifier")
+
+	self.game.modifierModel.noteChart = noteChart
 
 	local noteChartDataEntry = noteChartModel.noteChartDataEntry
 	local localOffset = noteChartDataEntry.localOffset or 0
 
 	local config = configModel.configs.settings
 
-	rhythmModel:setVolume("global", config.audio.volume.master)
-	rhythmModel:setVolume("music", config.audio.volume.music)
-	rhythmModel:setVolume("effects", config.audio.volume.effects)
-	rhythmModel:setAudioMode("primary", config.audio.mode.primary)
-	rhythmModel:setAudioMode("secondary", config.audio.mode.secondary)
+	rhythmModel:setVolume(config.audio.volume)
+	rhythmModel:setAudioMode(config.audio.mode)
 	rhythmModel:setLongNoteShortening(config.gameplay.longNoteShortening)
 	rhythmModel:setTimeToPrepare(config.gameplay.time.prepare)
 	rhythmModel:setVisualTimeRate(config.gameplay.speed)
 	rhythmModel:setVisualTimeRateScale(config.gameplay.scaleSpeed)
-	rhythmModel:setPauseTimes(
-		config.gameplay.time.playPause,
-		config.gameplay.time.pausePlay,
-		config.gameplay.time.playRetry,
-		config.gameplay.time.pauseRetry
-	)
-
+	rhythmModel:setPauseTimes(config.gameplay.time)
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
+	rhythmModel:setNoteChart(noteChart)
+	rhythmModel:setNoteSkin(noteSkinModel:getNoteSkin(noteChart.inputMode))
+
 	rhythmModel:load()
-
-	modifierModel:apply("NoteChartModifier")
-
-	rhythmModel.inputManager:setInputMode(noteChart.inputMode:getString())
-
-	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
-	rhythmModel:setNoteSkin(noteSkin)
 
 	local scoreEngine = rhythmModel.scoreEngine
 
@@ -88,7 +73,6 @@ GameplayController.load = function(self)
 	end)
 
 	love.mouse.setVisible(false)
-	self.drawing = true
 
 	local graphics = self.game.configModel.configs.settings.graphics
 	local flags = graphics.mode.flags
@@ -196,7 +180,6 @@ end
 
 GameplayController.quit = function(self)
 	local rhythmModel = self.game.rhythmModel
-	self.drawing = false
 	self.game.discordModel:setPresence({})
 	self:skip()
 	self:saveScore()

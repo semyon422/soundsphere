@@ -6,15 +6,19 @@ local Observable		= require("aqua.util.Observable")
 local AudioEngine = Class:new()
 
 AudioEngine.timeRate = 1
-AudioEngine.globalVolume = 1
-AudioEngine.musicVolume = 1
-AudioEngine.effectsVolume = 1
-AudioEngine.primaryAudioMode = "sample"
-AudioEngine.secondaryAudioMode = "sample"
 
 AudioEngine.construct = function(self)
 	self.observable = Observable:new()
 
+	self.volume = {
+		master = 1,
+		music = 1,
+		effects = 1,
+	}
+	self.mode = {
+		primary = "sample",
+		secondary = "sample",
+	}
 	self.aliases = {}
 
 	self.backgroundContainer = AudioContainer:new()
@@ -22,8 +26,8 @@ AudioEngine.construct = function(self)
 end
 
 AudioEngine.updateVolume = function(self)
-	self.backgroundContainer:setVolume(self.globalVolume * self.musicVolume)
-	self.foregroundContainer:setVolume(self.globalVolume * self.effectsVolume)
+	self.backgroundContainer:setVolume(self.volume.master * self.volume.music)
+	self.foregroundContainer:setVolume(self.volume.master * self.volume.effects)
 end
 
 AudioEngine.load = function(self)
@@ -74,9 +78,9 @@ AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
 	for i = 1, #paths do
 		local mode
 		if stream then
-			mode = self.primaryAudioMode
+			mode = self.mode.primary
 		else
-			mode = self.secondaryAudioMode
+			mode = self.mode.secondary
 		end
 
 		local audio = AudioFactory:getAudio(aliases[paths[i][1]], mode)

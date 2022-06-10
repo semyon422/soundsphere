@@ -28,19 +28,18 @@ RhythmModel.construct = function(self)
 	self.logicEngine.rhythmModel = self
 	self.graphicEngine.rhythmModel = self
 	self.observable.rhythmModel = self
+
+	self.logicEngine.observable:add(self.audioEngine)
+	self.graphicEngine.observable:add(self.observable)
+
+	self.inputManager.observable:add(self.logicEngine)
+	self.inputManager.observable:add(self.observable)
 end
 
 RhythmModel.load = function(self)
-	local inputManager = self.inputManager
 	local replayModel = self.game.replayModel
-	local timeEngine = self.timeEngine
 	local scoreEngine = self.scoreEngine
-	local audioEngine = self.audioEngine
 	local logicEngine = self.logicEngine
-	local graphicEngine = self.graphicEngine
-	local observable = self.observable
-
-	logicEngine.observable:add(audioEngine)
 
 	scoreEngine.configModel = self.configModel
 	scoreEngine.timings = self.timings
@@ -49,35 +48,20 @@ RhythmModel.load = function(self)
 	scoreEngine.settings = self.settings
 
 	logicEngine.timings = self.timings
-	logicEngine.timeEngine = timeEngine
-
-	inputManager.observable:add(logicEngine)
-	inputManager.observable:add(replayModel)
-
-	replayModel.observable:add(inputManager)
 	replayModel.timings = self.timings
 
-	inputManager.observable:add(observable)
-	graphicEngine.observable:add(observable)
+	self.inputManager.observable:add(replayModel)
+	replayModel.observable:add(self.inputManager)
+
+	self.prohibitSavingScore = false
 end
 
 RhythmModel.unload = function(self)
 	local inputManager = self.inputManager
 	local replayModel = self.game.replayModel
-	local audioEngine = self.audioEngine
-	local logicEngine = self.logicEngine
-	local graphicEngine = self.graphicEngine
-	local observable = self.observable
 
-	logicEngine.observable:remove(audioEngine)
-
-	inputManager.observable:remove(logicEngine)
 	inputManager.observable:remove(replayModel)
-
 	replayModel.observable:remove(inputManager)
-
-	inputManager.observable:remove(observable)
-	graphicEngine.observable:remove(observable)
 end
 
 RhythmModel.loadAllEngines = function(self)
@@ -158,11 +142,11 @@ end
 
 RhythmModel.setNoteChart = function(self, noteChart)
 	assert(noteChart)
-	self.game.modifierModel.noteChart = noteChart
 	self.timeEngine.noteChart = noteChart
 	self.scoreEngine.noteChart = noteChart
 	self.logicEngine.noteChart = noteChart
 	self.graphicEngine.noteChart = noteChart
+	self.inputManager:setInputMode(noteChart.inputMode:getString())
 end
 
 RhythmModel.setNoteSkin = function(self, noteSkin)
@@ -179,23 +163,13 @@ RhythmModel.setResourceAliases = function(self, aliases)
 	self.graphicEngine.aliases = aliases
 end
 
-RhythmModel.setVolume = function(self, layer, value)
-	if layer == "global" then
-		self.audioEngine.globalVolume = value
-	elseif layer == "music" then
-		self.audioEngine.musicVolume = value
-	elseif layer == "effects" then
-		self.audioEngine.effectsVolume = value
-	end
+RhythmModel.setVolume = function(self, volume)
+	self.audioEngine.volume = volume
 	self.audioEngine:updateVolume()
 end
 
-RhythmModel.setAudioMode = function(self, layer, value)
-	if layer == "primary" then
-		self.audioEngine.primaryAudioMode = value
-	elseif layer == "secondary" then
-		self.audioEngine.secondaryAudioMode = value
-	end
+RhythmModel.setAudioMode = function(self, mode)
+	self.audioEngine.mode = mode
 end
 
 RhythmModel.setVisualTimeRate = function(self, visualTimeRate)

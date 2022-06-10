@@ -9,12 +9,12 @@ PauseManager.load = function(self)
 	self.needRetry = false
 end
 
-PauseManager.setPauseTimes = function(self, timePlayPause, timePausePlay, timePlayRetry, timePauseRetry)
+PauseManager.setPauseTimes = function(self, config)
 	self.progressTime = {
-		["play-pause"] = timePlayPause,
-		["pause-play"] = timePausePlay,
-		["play-retry"] = timePlayRetry,
-		["pause-retry"] = timePauseRetry,
+		["play-pause"] = config.playPause,
+		["pause-play"] = config.pausePlay,
+		["play-retry"] = config.playRetry,
+		["pause-retry"] = config.pauseRetry,
 	}
 end
 
