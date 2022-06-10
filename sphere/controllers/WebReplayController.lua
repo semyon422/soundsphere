@@ -3,6 +3,7 @@ local ResultController = require("sphere.controllers.ResultController")
 local WebNoteChartController = require("sphere.controllers.WebNoteChartController")
 
 local Replay = require("sphere.models.ReplayModel.Replay")
+local ReplayModel = require("sphere.models.ReplayModel")
 local ModifierModel = require("sphere.models.ModifierModel")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local RhythmModel = require("sphere.models.RhythmModel")
@@ -23,7 +24,6 @@ end
 WebReplayController.POST = function(self)
 	local params = self.params
 
-
 	local noteChart = WebNoteChartController.getNoteCharts(params.notechart)[1]
 	local noteChartDataEntry = noteChart.metaData:getTable()
 
@@ -35,16 +35,20 @@ WebReplayController.POST = function(self)
 	local modifierModel = ModifierModel:new()
 	local noteChartModel = {}
 	local difficultyModel = DifficultyModel:new()
+	local replayModel = ReplayModel:new()
 
 	local game = {}
+	game.fastplayController = fastplayController
 	game.rhythmModel = rhythmModel
 	game.modifierModel = modifierModel
 	game.noteChartModel = noteChartModel
 	game.difficultyModel = difficultyModel
+	game.replayModel = replayModel
 
-	modifierModel.game = game
+	for k, v in pairs(game) do
+		v.game = game
+	end
 
-	rhythmModel.modifierModel = modifierModel
 	rhythmModel.judgements = {}
 	rhythmModel.settings = require("sphere.models.ConfigModel.settings")
 	rhythmModel.timings = rhythmModel.settings.gameplay.timings
@@ -66,9 +70,9 @@ WebReplayController.POST = function(self)
 	else
 		rhythmModel.timings = ResultController.oldTimings
 	end
-	self.game.replayModel.replay = replay
+	replayModel.replay = replay
+	replayModel:setMode("replay")
 	rhythmModel.inputManager:setMode("internal")
-	self.game.replayModel:setMode("replay")
 
 	fastplayController:play()
 
