@@ -13,11 +13,11 @@ end
 
 MountController.directorydropped = function(self, path)
 	path = path:gsub("\\", "/")
-	local mountModel = self.mountModel
+	local mountModel = self.game.mountModel
 	if not mountModel:isAdded(path) then
-		self.mountModel:addPath(path)
+		self.game.mountModel:addPath(path)
 	end
-	self.mountModel:mount(path)
+	self.game.mountModel:mount(path)
 end
 
 MountController.filedropped = function(self, file)
