@@ -56,7 +56,7 @@ end
 
 DiscordModel.update = function(self)
 	if self.nextUpdate < love.timer.getTime() then
-		discordrpc.updatePresence(self.presence)
+		pcall(discordrpc.updatePresence, self.presence)
 		self.nextUpdate = love.timer.getTime() + 2
 	end
 	return discordrpc.runCallbacks()
