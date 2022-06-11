@@ -26,12 +26,6 @@ NoteChartModel.load = function(self)
 	self.scoreEntry = self.game.scoreModel:getScoreEntryById(config.scoreEntryId)
 end
 
-NoteChartModel.getFileInfo = function(self)
-	if self.noteChartEntry then
-		return love.filesystem.getInfo(self.noteChartEntry.path)
-	end
-end
-
 NoteChartModel.loadNoteChart = function(self, settings)
 	local noteChartEntry = self.noteChartEntry
 	local noteChartDataEntry = self.noteChartDataEntry

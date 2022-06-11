@@ -33,6 +33,17 @@ SelectModel.load = function(self)
 	self:coroPullNoteChartSet()
 end
 
+SelectModel.notechartExists = function(self)
+	local noteChartItem = self.noteChartItem
+	if noteChartItem then
+		return love.filesystem.getInfo(noteChartItem.path)
+	end
+end
+
+SelectModel.isPlayed = function(self)
+	return self:notechartExists() and self.scoreItem
+end
+
 SelectModel.debouncePullNoteChartSet = function(self, ...)
 	aquatimer.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self, ...)
 end

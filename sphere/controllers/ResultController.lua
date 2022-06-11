@@ -30,11 +30,7 @@ ResultController.load = function(self)
 end
 
 ResultController.replayNoteChart = function(self, mode, scoreEntry)
-	local noteChartModel = self.game.noteChartModel
-	if not noteChartModel:getFileInfo() then
-		return
-	end
-	if noteChartModel.noteChartDataEntry.hash == "" then
+	if not self.game.selectModel:notechartExists() then
 		return
 	end
 

@@ -182,13 +182,13 @@ SelectNavigator.downloadBeatmapSet = function(self)
 end
 
 SelectNavigator.play = function(self)
-	if self.game.noteChartModel:getFileInfo() then
+	if self.game.selectModel:notechartExists() then
 		self:changeScreen("gameplayView")
 	end
 end
 
 SelectNavigator.result = function(self)
-	if self.game.selectController:isPlayed() then
+	if self.game.selectModel:isPlayed() then
 		self:changeScreen("resultView")
 	end
 end
