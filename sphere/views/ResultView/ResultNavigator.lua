@@ -30,9 +30,11 @@ ResultNavigator.loadScore = function(self, itemIndex)
 	if itemIndex then
 		scoreEntry = self.game.scoreLibraryModel.items[itemIndex]
 	end
-	self.game.resultController:replayNoteChart("result", scoreEntry, itemIndex)
+	self.game.resultController:replayNoteChart("result", scoreEntry)
 	self.view:reload()
-	self.game.selectModel:scrollScore(nil, itemIndex)
+	if itemIndex then
+		self.game.selectModel:scrollScore(nil, itemIndex)
+	end
 end
 
 ResultNavigator.play = function(self, mode)
