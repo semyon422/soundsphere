@@ -160,8 +160,13 @@ end
 GameplayController.retry = function(self)
 	self.game.rhythmModel.inputManager:setMode("external")
 	self.game.replayModel:setMode("record")
+
+	self.game.rhythmModel.prohibitSavingScore = true
+
 	self:unload()
 	self:load()
+
+	self.game.rhythmModel.prohibitSavingScore = false
 end
 
 GameplayController.pause = function(self)
@@ -185,7 +190,14 @@ end
 
 GameplayController.hasResult = function(self)
 	local rhythmModel = self.game.rhythmModel
-	return not rhythmModel.logicEngine.autoplay and not rhythmModel.prohibitSavingScore
+	local timeEngine = rhythmModel.timeEngine
+	local base = rhythmModel.scoreEngine.scoreSystem.base
+
+	return
+		not rhythmModel.logicEngine.autoplay and
+		not rhythmModel.prohibitSavingScore and
+		timeEngine.currentTime >= timeEngine.minTime and
+		base.hitCount > 0
 end
 
 GameplayController.saveScore = function(self)
