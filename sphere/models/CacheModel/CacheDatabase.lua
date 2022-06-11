@@ -34,7 +34,11 @@ CacheDatabase.load = function(self)
 		entryCaches[t] = TimedCache:new()
 		entryCaches[t].timeout = 1
 		entryCaches[t].loadObject = function(_, id)
-			return self.db:select(t, "id = ?", id)[1]
+			local status, entries = pcall(self.db.select, self.db, t, "id = ?", id)
+			if not status then
+				return
+			end
+			return entries[1]
 		end
 	end
 	self.entryCaches = entryCaches
