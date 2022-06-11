@@ -37,6 +37,10 @@ SelectController.update = function(self, dt)
 	end
 end
 
+SelectController.isPlayed = function(self)
+	return self.game.noteChartModel:getFileInfo() and self.game.selectModel.scoreItem
+end
+
 SelectController.openDirectory = function(self)
 	local selectModel = self.game.selectModel
 	local path = selectModel.noteChartItem.path:match("^(.+)/.-$")

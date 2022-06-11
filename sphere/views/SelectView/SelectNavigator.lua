@@ -42,7 +42,7 @@ SelectNavigator.receive = function(self, event)
 		elseif scancode == "end" then self:scrollNoteChartSet("down", math.huge)
 		elseif scancode == "return" then self:play()
 		elseif scancode == "tab" then self:switchToCollections()
-		elseif scancode == "lalt" then self:changeScreen("Result")
+		elseif scancode == "lalt" then self:result()
 		end
 	elseif self:getSubscreen("collections") then
 		if scancode == "up" or scancode == "left" then self:scrollCollection("up")
@@ -188,7 +188,7 @@ SelectNavigator.play = function(self)
 end
 
 SelectNavigator.result = function(self)
-	if self.game.noteChartModel:getFileInfo() then
+	if self.game.selectController:isPlayed() then
 		self:changeScreen("resultView")
 	end
 end
