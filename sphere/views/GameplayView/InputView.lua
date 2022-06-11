@@ -16,6 +16,9 @@ InputView.load = function(self)
 end
 
 InputView.receive = function(self, event)
+	if not event.virtual then
+		return
+	end
 	local config = self.config
 
 	local key = event and event[1]

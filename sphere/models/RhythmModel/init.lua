@@ -110,6 +110,14 @@ RhythmModel.unloadAllEngines = function(self)
 	self.audioEngine:unload()
 	self.logicEngine:unload()
 	self.graphicEngine:unload()
+
+	for inputType, inputIndex in self.noteChart:getInputIteraator() do
+		self.observable:send({
+			name = "keyreleased",
+			virtual = true,
+			inputType .. inputIndex
+		})
+	end
 end
 
 RhythmModel.unloadLogicEngines = function(self)
@@ -141,6 +149,7 @@ end
 
 RhythmModel.setNoteChart = function(self, noteChart)
 	assert(noteChart)
+	self.noteChart = noteChart
 	self.timeEngine.noteChart = noteChart
 	self.scoreEngine.noteChart = noteChart
 	self.logicEngine.noteChart = noteChart
