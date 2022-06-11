@@ -54,6 +54,9 @@ do
 		end
 
 		local size = ffi.C.MultiByteToWideChar(65001, 8, s, #s, nil, 0)
+		if size == 0 then
+			return ffi.new("wchar_t[?]", size + 1)
+		end
 		assert(size > 0, "conversion error")
 
 		local buf = ffi.new("wchar_t[?]", size + 1)
