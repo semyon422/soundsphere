@@ -5,6 +5,13 @@ local CollectionModel = Class:new()
 
 CollectionModel.basePath = "userdata/charts"
 
+local ignoredNames = {
+	".keep",
+}
+for i = 1, #ignoredNames do
+	ignoredNames[ignoredNames[i]] = true
+end
+
 CollectionModel.load = function(self)
 	self.config = self.game.configModel.configs.select
 	local collectionPath = self.config.collection
@@ -18,8 +25,10 @@ CollectionModel.load = function(self)
 
 	local directoryItems = love.filesystem.getDirectoryItems(basePath)
 	for _, name in ipairs(directoryItems) do
-		local path = basePath .. "/" .. name
-		dict[path] = dict[path] or 0
+		if not ignoredNames[name] then
+			local path = basePath .. "/" .. name
+			dict[path] = dict[path] or 0
+		end
 	end
 
 	local items = {{
