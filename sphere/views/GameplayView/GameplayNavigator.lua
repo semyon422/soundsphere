@@ -23,6 +23,7 @@ GameplayNavigator.receive = function(self, event)
 		not event[1] and
 		self.state ~= "pause" and
 		not self.game.rhythmModel.logicEngine.autoplay and
+		not self.game.multiplayerModel.isPlaying and
 		self.game.rhythmModel.inputManager.mode ~= "internal"
 	then
 		self:forcePause()
