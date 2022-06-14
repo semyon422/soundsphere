@@ -9,7 +9,7 @@ MultiplayerController.load = function(self)
 	mpModel.handlers = {
 		set = function(peer, key, value)
 			mpModel[key] = value
-			if key == "notechart" and mpModel.room and not mpModel:isHost() then
+			if key == "notechart" and not mpModel:isHost() then
 				self:findNotechart()
 			elseif key == "modifiers" then
 				self.game.modifierModel:setConfig(value)

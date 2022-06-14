@@ -13,6 +13,7 @@ TimeController.skipIntro = function(self)
 end
 
 TimeController.increaseTimeRate = function(self, delta)
+	if self.game.multiplayerModel.isPlaying then return end
 	local rhythmModel = self.game.rhythmModel
 	local timeEngine = rhythmModel.timeEngine
 	timeEngine:increaseTimeRate(delta)
@@ -21,6 +22,7 @@ TimeController.increaseTimeRate = function(self, delta)
 end
 
 TimeController.invertTimeRate = function(self, delta)
+	if self.game.multiplayerModel.isPlaying then return end
 	local rhythmModel = self.game.rhythmModel
 	local timeEngine = rhythmModel.timeEngine
 	timeEngine:setTimeRate(-timeEngine.timeRate)

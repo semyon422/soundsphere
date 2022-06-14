@@ -145,6 +145,10 @@ GameplayController.discordPause = function(self)
 end
 
 GameplayController.receive = function(self, event)
+	if event.name == "playStateChange" and self.game.multiplayerModel.isPlaying then
+		return
+	end
+
 	local rhythmModel = self.game.rhythmModel
 	rhythmModel:receive(event)
 

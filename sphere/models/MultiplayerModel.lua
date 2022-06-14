@@ -80,32 +80,6 @@ MultiplayerModel.isHost = function(self)
 	return room.hostPeerId == self.user.peerId
 end
 
-MultiplayerModel.findNotechart = remote.wrap(function(self)
-	self.game.noteChartSetLibraryModel:findNotechart(self.notechart.hash or "", self.notechart.index or 0)
-	local items = self.game.noteChartSetLibraryModel.items
-
-	local item = items[1]
-	if item then
-		self.noteChartItem = {
-			setId = item.setId,
-			noteChartId = item.noteChartId,
-			noteChartDataId = item.noteChartDataId,
-		}
-		self.game.selectModel:setConfig(item)
-		self.game.selectModel:pullNoteChartSet(true)
-		self.peer.setNotechartFound(true)
-		return
-	end
-	self.game.selectModel:setConfig({
-		setId = 0,
-		noteChartId = 0,
-		noteChartDataId = 0,
-	})
-	self.noteChartItem = nil
-	self.game.selectModel:pullNoteChartSet(true)
-	self.peer.setNotechartFound(false)
-end)
-
 MultiplayerModel.switchReady = remote.wrap(function(self)
 	self.peer.switchReady()
 	self.user = self.peer.getUser()
@@ -229,8 +203,7 @@ MultiplayerModel.pullModifiers = remote.wrap(function(self)
 	if not modifiers then
 		return
 	end
-	self.game.modifierModel:setConfig(modifiers)
-	self.game.configModel.configs.modifier = modifiers
+	self.handlers.set(self.peer, "modifiers", modifiers)
 end)
 
 MultiplayerModel.pullNotechart = remote.wrap(function(self)
@@ -238,8 +211,7 @@ MultiplayerModel.pullNotechart = remote.wrap(function(self)
 	if not notechart then
 		return
 	end
-	self.notechart = notechart
-	self:findNotechart()
+	self.handlers.set(self.peer, "notechart", notechart)
 end)
 
 MultiplayerModel.login = remote.wrap(function(self)
