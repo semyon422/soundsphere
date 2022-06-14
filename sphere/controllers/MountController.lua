@@ -18,6 +18,7 @@ MountController.directorydropped = function(self, path)
 		self.game.mountModel:addPath(path)
 	end
 	self.game.mountModel:mount(path)
+	self.game.configModel:write("mount")
 end
 
 MountController.filedropped = function(self, file)
