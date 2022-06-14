@@ -6,6 +6,11 @@ local GameplayNavigator = Navigator:new({construct = false})
 
 GameplayNavigator.state = "play"
 
+GameplayNavigator.load = function(self)
+	self.failed = false
+	Navigator.load(self)
+end
+
 GameplayNavigator.receive = function(self, event)
 	if event.name == "keypressed" then
 		return self:keypressed(event)
@@ -161,6 +166,7 @@ GameplayNavigator.forcePause = function(self)
 end
 
 GameplayNavigator.forceRetry = function(self)
+	self.failed = false
 	self.game.gameplayController:retry()
 end
 
