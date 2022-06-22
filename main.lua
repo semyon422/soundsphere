@@ -20,6 +20,7 @@ aquapackage.add("inspect")
 aquapackage.add("lua-crc32")
 aquapackage.add("serpent/src")
 aquapackage.add("lua-MessagePack/src")
+aquapackage.add("love-just-ui")
 
 local ffi = require("ffi")
 

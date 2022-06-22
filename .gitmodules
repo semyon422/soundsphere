@@ -64,3 +64,6 @@
 [submodule "lua-MessagePack"]
 	path = lua-MessagePack
 	url = https://framagit.org/fperrad/lua-MessagePack
+[submodule "love-just-ui"]
+	path = love-just-ui
+	url = https://github.com/semyon422/love-just-ui
