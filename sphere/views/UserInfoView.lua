@@ -1,4 +1,5 @@
 
+local just = require("just")
 local Class = require("aqua.util.Class")
 local transform = require("aqua.graphics.transform")
 local spherefonts		= require("sphere.assets.fonts")
@@ -19,34 +20,24 @@ UserInfoView.load = function(self)
 	state.image = love.graphics.newImage(config.file)
 end
 
-UserInfoView.receive = function(self, event)
-	if event.name ~= "mousepressed" then
-		return
-	end
-
-	local config = self.config
-	local tf = transform(config.transform)
-	local mx, my = tf:inverseTransformPoint(event[1], event[2])
-
-	local x, y, w, h = config.x, config.y, config.w, config.h
-	if belong(mx, x, x + w) and belong(my, y, y + h) then
-		local button = event[3]
-		if button == 1 then
-			self.navigator:call(config.action)
-		end
-	end
-end
-
 UserInfoView.draw = function(self)
 	local config = self.config
 	local state = self.state
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
-	love.graphics.setColor(1, 1, 1, 1)
+
+	local x, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+	local over = 0 <= x and x <= config.w and 0 <= y and y <= config.h
+
+	local changed, active, hovered = just.button_behavior(self, over)
+	if changed then
+		self.navigator:call(config.action)
+	end
 
 	local font = spherefonts.get(config.text.font)
 	love.graphics.setFont(font)
+	love.graphics.setColor(1, 1, 1, 1)
 
 	local username = config.username and inside(self, config.username) or ""
 	baseline_print(
@@ -76,9 +67,20 @@ UserInfoView.draw = function(self)
 		config.image.y + config.image.h / 2,
 		config.image.h / 2
 	)
+	if hovered then
+		local alpha = active and 0.2 or 0.1
+		love.graphics.setColor(1, 1, 1, alpha)
+		love.graphics.circle(
+			"fill",
+			config.image.x + config.image.w / 2,
+			config.image.y + config.image.h / 2,
+			config.image.h / 2
+		)
+	end
 
 	local session = config.session and inside(self, config.session)
 	if session and session.active then
+		love.graphics.setColor(1, 1, 1, 1)
 		love.graphics.circle(
 			"fill",
 			config.marker.x,
