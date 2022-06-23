@@ -5,7 +5,6 @@ local transform = require("aqua.graphics.transform")
 local spherefonts		= require("sphere.assets.fonts")
 local baseline_print = require("aqua.graphics.baseline_print")
 local inside = require("aqua.util.inside")
-local belong		= require("aqua.math").belong
 
 local UserInfoView = Class:new()
 
