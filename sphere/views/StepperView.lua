@@ -1,42 +1,31 @@
-local Class			= require("aqua.util.Class")
+local Class = require("aqua.util.Class")
 
 local StepperView = Class:new()
 
-StepperView.x = 0
-StepperView.y = 0
-StepperView.w = 0
-StepperView.h = 0
-StepperView.value = 1
-StepperView.count = 1
+StepperView.isOver = function(self, w, h)
+	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 
-StepperView.setPosition = function(self, x, y, w, h)
-	self.x, self.y, self.w, self.h = x, y, w, h
+	local inh = 0 <= my and my <= h
+	return
+		0 <= mx and mx <= w and inh,
+		0 <= mx and mx <= h and inh,
+		w - h <= mx and mx <= w and inh
 end
 
-StepperView.setValue = function(self, value)
-	self.value = value
-end
-
-StepperView.setCount = function(self, count)
-	self.count = count
-end
-
-StepperView.draw = function(self)
-	local x, y, w, h = self.x, self.y, self.w, self.h
-
+StepperView.draw = function(self, w, h, value, count)
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local ty = y + h / 3
-	local by = y + 2 * h / 3
-	local my = y + h / 2
+	local ty = h / 3
+	local by = 2 * h / 3
+	local my = h / 2
 
-	local rx1 = x + h / 2
+	local rx1 = h / 2
 	local lx1 = rx1 - h / 6
 
 	local lx2 = rx1 + w - h
 	local rx2 = lx2 + h / 6
 
-    if self.value > 1 then
+    if value > 1 then
 		love.graphics.polygon(
 			"fill",
 			rx1, ty,
@@ -44,7 +33,7 @@ StepperView.draw = function(self)
 			rx1, by
 		)
     end
-    if self.value < self.count then
+    if value < count then
 		love.graphics.polygon(
 			"fill",
 			lx2, ty,

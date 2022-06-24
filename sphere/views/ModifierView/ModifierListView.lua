@@ -3,9 +3,6 @@ local ListView = require("sphere.views.ListView")
 local ModifierListItemSwitchView = require("sphere.views.ModifierView.ModifierListItemSwitchView")
 local ModifierListItemSliderView = require("sphere.views.ModifierView.ModifierListItemSliderView")
 local ModifierListItemStepperView = require("sphere.views.ModifierView.ModifierListItemStepperView")
-local Slider = require("sphere.views.Slider")
-local Switch = require("sphere.views.Switch")
-local Stepper = require("sphere.views.Stepper")
 
 local ModifierListView = ListView:new({construct = false})
 
@@ -18,10 +15,6 @@ ModifierListView.construct = function(self)
 	self.itemSwitchView.listView = self
 	self.itemSliderView.listView = self
 	self.itemStepperView.listView = self
-
-	self.sliderObject = Slider:new()
-	self.switchObject = Switch:new()
-	self.stepperObject = Stepper:new()
 end
 
 ModifierListView.load = function(self)

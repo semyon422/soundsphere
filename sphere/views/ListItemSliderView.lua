@@ -1,3 +1,4 @@
+local just = require("just")
 local ListItemView = require("sphere.views.ListItemView")
 local SliderView = require("sphere.views.SliderView")
 local transform = require("aqua.graphics.transform")
@@ -24,9 +25,21 @@ ListItemSliderView.draw = function(self)
 	self:drawValue(listView.slider.value, self:getDisplayValue())
 
 	local sliderView = self.sliderView
-	sliderView:setPosition(listView:getItemElementPosition(self.itemIndex, listView.slider))
-	sliderView:setValue(self:getNormValue())
-	sliderView:draw()
+	local x, y, w, h = listView:getItemElementPosition(self.itemIndex, listView.slider)
+	love.graphics.push()
+	love.graphics.translate(x, y)
+
+	local ptr = {value = self:getNormValue()}
+	local over = sliderView:isOver(w, h)
+	local pos = sliderView:getPosition(w, h)
+
+	local changed, active, hovered = just.slider_behavior(self.item, over, pos, {value = ptr}, 0, 1)
+	if changed then
+		self:updateNormValue(ptr.value)
+	end
+	sliderView:draw(w, h, ptr.value)
+
+	love.graphics.pop()
 end
 
 ListItemSliderView.receive = function(self, event)
@@ -34,24 +47,6 @@ ListItemSliderView.receive = function(self, event)
 
 	if event.name == "wheelmoved" then
 		return self:wheelmoved(event)
-	end
-
-	local listView = self.listView
-	if listView.activeItem ~= self.itemIndex then
-		return
-	end
-
-	local config = listView
-	local slider = listView.sliderObject
-	local tf = transform(config.transform):translate(config.x, config.y)
-	slider:setTransform(tf)
-	slider:setPosition(listView:getItemElementPosition(self.itemIndex, config.slider))
-	slider:setValue(self:getNormValue())
-	slider:receive(event)
-
-	if slider.valueUpdated then
-		self:updateNormValue(slider.value)
-		slider.valueUpdated = false
 	end
 end
 

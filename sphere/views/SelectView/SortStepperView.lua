@@ -1,16 +1,15 @@
 
 local Class = require("aqua.util.Class")
+local just = require("just")
 local transform = require("aqua.graphics.transform")
 local spherefonts		= require("sphere.assets.fonts")
 local baseline_print = require("aqua.graphics.baseline_print")
 local StepperView = require("sphere.views.StepperView")
-local Stepper = require("sphere.views.Stepper")
 
 local SortStepperView = Class:new()
 
 SortStepperView.construct = function(self)
 	self.stepperView = StepperView:new()
-	self.stepper = Stepper:new()
 end
 
 SortStepperView.getIndexValue = function(self)
@@ -62,32 +61,28 @@ SortStepperView.draw = function(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	local stepperView = self.stepperView
-	stepperView:setPosition(0, 0, self.w, self.h)
-	stepperView:setValue(self:getIndexValue())
-	stepperView:setCount(self:getCount())
-	stepperView:draw()
+	local w, h = self.w, self.h
+
+	local value = self:getIndexValue()
+	local count = self:getCount()
+
+	local overAll, overLeft, overRight = stepperView:isOver(w, h)
+
+	local changedLeft = just.button_behavior(tostring(self.item) .. "L", overLeft)
+	local changedRight = just.button_behavior(tostring(self.item) .. "R", overRight)
+	if changedLeft then
+		value = math.max(value - 1, 1)
+		self:updateIndexValue(value)
+	elseif changedRight then
+		value = math.min(value + 1, count)
+		self:updateIndexValue(value)
+	end
+	stepperView:draw(w, h, value, count)
 end
 
 SortStepperView.receive = function(self, event)
 	if event.name == "wheelmoved" then
 		return self:wheelmoved(event)
-	end
-
-	if event.name ~= "mousepressed" then
-		return
-	end
-
-	local stepper = self.stepper
-	local tf = transform(self.transform)
-	stepper:setTransform(tf)
-	stepper:setPosition(self.x, self.y, self.w, self.h)
-	stepper:setValue(self:getIndexValue())
-	stepper:setCount(self:getCount())
-	stepper:receive(event)
-
-	if stepper.valueUpdated then
-		self:updateIndexValue(stepper.value)
-		stepper.valueUpdated = false
 	end
 end
 

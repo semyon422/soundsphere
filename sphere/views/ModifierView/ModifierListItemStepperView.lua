@@ -1,12 +1,6 @@
 local ListItemStepperView = require("sphere.views.ListItemStepperView")
-local StepperView = require("sphere.views.StepperView")
 
 local ModifierListItemStepperView = ListItemStepperView:new({construct = false})
-
-ModifierListItemStepperView.construct = function(self)
-	ListItemStepperView.construct(self)
-	self.stepperView = StepperView:new()
-end
 
 ModifierListItemStepperView.getName = function(self)
 	return self.item.name

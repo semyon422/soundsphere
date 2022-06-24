@@ -1,12 +1,6 @@
 local ListItemSliderView = require("sphere.views.ListItemSliderView")
-local SliderView = require("sphere.views.SliderView")
 
 local ModifierListItemSliderView = ListItemSliderView:new({construct = false})
-
-ModifierListItemSliderView.construct = function(self)
-	ListItemSliderView.construct(self)
-	self.sliderView = SliderView:new()
-end
 
 ModifierListItemSliderView.getName = function(self)
 	return self.item.name

@@ -1,7 +1,7 @@
 local ListItemView = require("sphere.views.ListItemView")
 local ListItemSliderView = require("sphere.views.ListItemSliderView")
 local StepperView = require("sphere.views.StepperView")
-local transform = require("aqua.graphics.transform")
+local just = require("just")
 
 local ListItemStepperView = ListItemView:new({construct = false})
 
@@ -26,10 +26,27 @@ ListItemStepperView.draw = function(self)
 	self:drawValue(listView.stepper.value, self:getDisplayValue())
 
 	local stepperView = self.stepperView
-	stepperView:setPosition(listView:getItemElementPosition(self.itemIndex, listView.stepper))
-	stepperView:setValue(self:getIndexValue())
-	stepperView:setCount(self:getCount())
-	stepperView:draw()
+	local x, y, w, h = listView:getItemElementPosition(self.itemIndex, listView.stepper)
+	love.graphics.push()
+	love.graphics.translate(x, y)
+
+	local value = self:getIndexValue()
+	local count = self:getCount()
+
+	local overAll, overLeft, overRight = stepperView:isOver(w, h)
+
+	local changedLeft = just.button_behavior(tostring(self.item) .. "L", overLeft)
+	local changedRight = just.button_behavior(tostring(self.item) .. "R", overRight)
+	if changedLeft then
+		value = math.max(value - 1, 1)
+		self:updateIndexValue(value)
+	elseif changedRight then
+		value = math.min(value + 1, count)
+		self:updateIndexValue(value)
+	end
+	stepperView:draw(w, h, value, count)
+
+	love.graphics.pop()
 end
 
 ListItemStepperView.receive = function(self, event)
@@ -37,24 +54,6 @@ ListItemStepperView.receive = function(self, event)
 
 	if event.name == "wheelmoved" then
 		return self:wheelmoved(event)
-	end
-
-	local listView = self.listView
-	if listView.activeItem ~= self.itemIndex then
-		return
-	end
-
-	local stepper = listView.stepperObject
-	local tf = transform(listView.transform):translate(listView.x, listView.y)
-	stepper:setTransform(tf)
-	stepper:setPosition(listView:getItemElementPosition(self.itemIndex, listView.stepper))
-	stepper:setValue(self:getIndexValue())
-	stepper:setCount(self:getCount())
-	stepper:receive(event)
-
-	if stepper.valueUpdated then
-		self:updateIndexValue(stepper.value)
-		stepper.valueUpdated = false
 	end
 end
 

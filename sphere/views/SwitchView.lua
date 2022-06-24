@@ -1,42 +1,21 @@
-local Class			= require("aqua.util.Class")
+local Class = require("aqua.util.Class")
 
 local SwitchView = Class:new()
 
-SwitchView.x = 0
-SwitchView.y = 0
-SwitchView.w = 0
-SwitchView.h = 0
-SwitchView.value = false
-
-SwitchView.setPosition = function(self, x, y, w, h)
-	self.x, self.y, self.w, self.h = x, y, w, h
+SwitchView.isOver = function(self, w, h)
+	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+	return 0 <= mx and mx <= w and 0 <= my and my <= h
 end
 
-SwitchView.setValue = function(self, value)
-	self.value = value
-end
-
-SwitchView.draw = function(self)
-	local x, y, w, h = self.x, self.y, self.w, self.h
-
+SwitchView.draw = function(self, w, h, value)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setLineStyle("smooth")
 	love.graphics.setLineWidth(1)
 
-	if self.value then
-		love.graphics.circle(
-			"fill",
-			x + w - h / 2,
-			y + h / 2,
-			h / 4
-		)
+	if value then
+		love.graphics.circle("fill", w - h / 2, h / 2, h / 4)
 	end
-	love.graphics.circle(
-		"line",
-		x + w - h / 2,
-		y + h / 2,
-		h / 4
-	)
+	love.graphics.circle("line", w - h / 2, h / 2, h / 4)
 end
 
 return SwitchView

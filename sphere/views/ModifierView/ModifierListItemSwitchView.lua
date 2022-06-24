@@ -1,12 +1,6 @@
 local ListItemSwitchView = require("sphere.views.ListItemSwitchView")
-local SwitchView = require("sphere.views.SwitchView")
 
 local ModifierListItemSwitchView = ListItemSwitchView:new({construct = false})
-
-ModifierListItemSwitchView.construct = function(self)
-	ListItemSwitchView.construct(self)
-	self.switchView = SwitchView:new()
-end
 
 ModifierListItemSwitchView.getName = function(self)
 	return self.item.name

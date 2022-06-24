@@ -3,46 +3,41 @@ local Class			= require("aqua.util.Class")
 
 local SliderView = Class:new()
 
-SliderView.x = 0
-SliderView.y = 0
-SliderView.w = 0
-SliderView.h = 0
-SliderView.value = 0
-
-SliderView.setPosition = function(self, x, y, w, h)
-	self.x, self.y, self.w, self.h = x, y, w, h
+SliderView.isOver = function(self, w, h)
+	local x, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+	return 0 <= x and x <= w and 0 <= y and y <= h
 end
 
-SliderView.setValue = function(self, value)
-	self.value = value
+SliderView.getPosition = function(self, w, h)
+	local x, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+	local value = map(x, h / 2, w - h / 2, 0, 1)
+	return math.min(math.max(value, 0), 1)
 end
 
-SliderView.draw = function(self)
-	local x, y, w, h = self.x, self.y, self.w, self.h
-
-	local barHeight = h / 3
+SliderView.draw = function(self, w, h, value)
+	local bh = h / 3
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.rectangle(
 		"line",
-		x + (h - barHeight) / 2,
-		y + (h - barHeight) / 2,
-		w - (h - barHeight),
-		barHeight,
-		barHeight / 2,
-		barHeight / 2
+		(h - bh) / 2,
+		(h - bh) / 2,
+		w - (h - bh),
+		bh,
+		bh / 2,
+		bh / 2
 	)
 
 	love.graphics.circle(
 		"fill",
-		map(self.value, 0, 1, x + h / 2, x + w - h / 2),
-		y + h / 2,
+		map(value, 0, 1, h / 2, w - h / 2),
+		h / 2,
 		h / 4
 	)
 	love.graphics.circle(
 		"line",
-		map(self.value, 0, 1, x + h / 2, x + w - h / 2),
-		y + h / 2,
+		map(value, 0, 1, h / 2, w - h / 2),
+		h / 2,
 		h / 4
 	)
 end
