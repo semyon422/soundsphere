@@ -1,3 +1,5 @@
+local ValueView = require("sphere.views.ValueView")
+
 local inspect = require("inspect")
 local aquaevent = require("aqua.event")
 
@@ -5,8 +7,7 @@ local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 
 local transformLeft = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 local transformRight = {{1, 0}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
-local Fps = {
-	class = "ValueView",
+local Fps = ValueView:new({
 	subscreen = "debug",
 	transform = transformLeft,
 	value = function()
@@ -21,10 +22,9 @@ local Fps = {
 		size = 24,
 	},
 	align = "left",
-}
+})
 
-local RendererInfo = {
-	class = "ValueView",
+local RendererInfo = ValueView:new({
 	subscreen = "debug",
 	transform = transformRight,
 	value = function()
@@ -39,10 +39,9 @@ local RendererInfo = {
 		size = 24,
 	},
 	align = "right",
-}
+})
 
-local Stats = {
-	class = "ValueView",
+local Stats = ValueView:new({
 	subscreen = "debug",
 	transform = transformLeft,
 	value = function()
@@ -57,10 +56,9 @@ local Stats = {
 		size = 24,
 	},
 	align = "left",
-}
+})
 
-local Version = {
-	class = "ValueView",
+local Version = ValueView:new({
 	subscreen = "debug",
 	transform = transformLeft,
 	value = function()
@@ -76,7 +74,7 @@ local Version = {
 		size = 24,
 	},
 	align = "left",
-}
+})
 
 return {
 	Fps,
