@@ -14,11 +14,6 @@ local function getViews(views, out)
 	return out
 end
 
-SequenceView.construct = function(self)
-	self.views = {}
-	self.abortIterating = false
-end
-
 SequenceView.setSequenceConfig = function(self, config)
 	self.views = getViews(config)
 	for _, view in ipairs(self.views) do
@@ -29,57 +24,49 @@ SequenceView.setSequenceConfig = function(self, config)
 end
 
 SequenceView.load = function(self)
-	self.abortIterating = true
+	if self.iterating then
+		self.abortIterating = true
+	end
 	for _, view in ipairs(self.views) do
 		if view.load then view:load() end
 	end
 end
 
 SequenceView.unload = function(self)
-	self.abortIterating = true
+	if self.iterating then
+		self.abortIterating = true
+	end
 	for _, view in ipairs(self.views) do
 		if view.unload then view:unload() end
 	end
 end
 
-SequenceView.receive = function(self, event)
+SequenceView.callMethod = function(self, method, ...)
 	if self.iterating then
 		return
 	end
 	self.iterating = true
 	for _, view in ipairs(self.views) do
-		if view.receive and not view.hidden then view:receive(event) end
+		if not view.hidden and view[method] then
+			view[method](view, ...)
+		end
 		if self.abortIterating then break end
 	end
 	self.abortIterating = false
 	self.iterating = false
+end
+
+SequenceView.receive = function(self, event)
+	self:callMethod("receive", event)
 end
 
 SequenceView.update = function(self, dt)
-	if self.iterating then
-		return
-	end
-	self.iterating = true
-	for _, view in ipairs(self.views) do
-		if view.update and not view.hidden then view:update(dt) end
-		if self.abortIterating then break end
-	end
-	self.abortIterating = false
-	self.iterating = false
+	self:callMethod("update", dt)
 end
 
 SequenceView.draw = function(self)
-	if self.iterating then
-		return
-	end
-	self.iterating = true
-	for _, view in ipairs(self.views) do
-		if view.beforeDraw and not view.hidden then view:beforeDraw() end
-		if view.draw and not view.hidden then view:draw() end
-		if self.abortIterating then break end
-	end
-	self.abortIterating = false
-	self.iterating = false
+	self:callMethod("beforeDraw")
+	self:callMethod("draw")
 end
 
 return SequenceView
