@@ -7,24 +7,24 @@ local transform = require("aqua.graphics.transform")
 local ScreenMenuItemView = Class:new()
 
 ScreenMenuItemView.draw = function(self)
-	local config = self.listView
+	local listView = self.listView
 	local item = self.item
 
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(listView.transform):translate(listView.x, listView.y)
 	love.graphics.replaceTransform(tf)
 
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 
-	local x = (self.column - 1) * config.w / config.columns
-	local y = (self.row - 1) * config.h / config.rows
-	local w = config.w / config.columns
-	local h = config.h / config.rows
+	local x = (self.column - 1) * listView.w / listView.columns
+	local y = (self.row - 1) * listView.h / listView.rows
+	local w = listView.w / listView.columns
+	local h = listView.h / listView.rows
 
 	local over = x <= mx and mx <= x + w and y <= my and my <= y + h
 
 	local changed, active, hovered = just.button_behavior(item, over)
 	if changed then
-		self.listView.navigator:call(item.method, item.value)
+		listView.navigator:call(item.method, item.value)
 	end
 
 	if hovered then
@@ -35,15 +35,15 @@ ScreenMenuItemView.draw = function(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local font = spherefonts.get(config.text.font)
+	local font = spherefonts.get(listView.text.font)
 	love.graphics.setFont(font)
 	baseline_print(
 		item.displayName,
-		(self.column - 1) * config.w / config.columns + config.text.x,
-		(self.row - 1) * config.h / config.rows + config.text.baseline,
-		config.text.limit,
+		(self.column - 1) * listView.w / listView.columns + listView.text.x,
+		(self.row - 1) * listView.h / listView.rows + listView.text.baseline,
+		listView.text.limit,
 		1,
-		config.text.align
+		listView.text.align
 	)
 end
 

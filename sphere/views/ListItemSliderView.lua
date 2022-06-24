@@ -19,12 +19,12 @@ ListItemSliderView.increaseValue = function(self, delta) end
 ListItemSliderView.draw = function(self)
 	ListItemView.draw(self)
 
-	local config = self.listView
-	self:drawValue(config.name, self:getName())
-	self:drawValue(config.slider.value, self:getDisplayValue())
+	local listView = self.listView
+	self:drawValue(listView.name, self:getName())
+	self:drawValue(listView.slider.value, self:getDisplayValue())
 
 	local sliderView = self.sliderView
-	sliderView:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.slider))
+	sliderView:setPosition(listView:getItemElementPosition(self.itemIndex, listView.slider))
 	sliderView:setValue(self:getNormValue())
 	sliderView:draw()
 end
@@ -56,17 +56,17 @@ ListItemSliderView.receive = function(self, event)
 end
 
 ListItemSliderView.wheelmoved = function(self, event)
-	local config = self.listView
+	local listView = self.listView
 
-	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local x, y, w, h = listView:getItemPosition(self.itemIndex)
+	local tf = transform(listView.transform):translate(listView.x, listView.y)
 	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
 
 	if not (mx >= x and mx <= x + w and my >= y and my <= y + h) then
 		return
 	end
 
-	x, y, w, h = self.listView:getItemElementPosition(self.itemIndex, config.slider)
+	x, y, w, h = listView:getItemElementPosition(self.itemIndex, listView.slider)
 	if mx >= x and mx <= x + w then
 		local wy = event[2]
 		if wy == 1 then

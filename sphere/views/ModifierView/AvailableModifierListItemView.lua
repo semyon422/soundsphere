@@ -5,23 +5,23 @@ local ListItemView = require("sphere.views.ListItemView")
 local AvailableModifierListItemView = ListItemView:new({construct = false})
 
 AvailableModifierListItemView.draw = function(self)
-	local config = self.listView
+	local listView = self.listView
 
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(listView.transform):translate(listView.x, listView.y)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local y = (self.visualIndex - 1) * config.h / config.rows
+	local y = (self.visualIndex - 1) * listView.h / listView.rows
 	local item = self.item
 
 	local prevItem = self.prevItem
 
 	if item.oneUse and item.added then
-		love.graphics.setColor(config.name.addedColor)
+		love.graphics.setColor(listView.name.addedColor)
 	end
 
-	self:drawValue(config.name, item.name)
+	self:drawValue(listView.name, item.name)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	if not prevItem or prevItem.oneUse ~= item.oneUse then
@@ -29,7 +29,7 @@ AvailableModifierListItemView.draw = function(self)
 		if not item.oneUse then
 			text = "Sequential modifiers"
 		end
-		self:drawValue(config.section, text)
+		self:drawValue(listView.section, text)
 	end
 end
 

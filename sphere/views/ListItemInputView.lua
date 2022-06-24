@@ -9,12 +9,12 @@ ListItemInputView.isActive = function(self) end
 ListItemInputView.draw = function(self)
 	ListItemView.draw(self)
 
-	local config = self.listView
-	self:drawValue(config.name, self:getName())
+	local listView = self.listView
+	self:drawValue(listView.name, self:getName())
 	if self:isActive() then
-		return self:drawValue(config.input.value, "???")
+		return self:drawValue(listView.input.value, "???")
 	end
-	self:drawValue(config.input.value, self:getValue())
+	self:drawValue(listView.input.value, self:getValue())
 end
 
 ListItemInputView.receive = function(self, event)

@@ -8,22 +8,21 @@ NoteChartListItemView.receive = function(self, event)
 		return
 	end
 
-	if self.itemIndex ~= self.listView.game.selectModel.noteChartItemIndex then
+	local listView = self.listView
+	if self.itemIndex ~= listView.game.selectModel.noteChartItemIndex then
 		return
 	end
 
-	local config = self.listView
-
-	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local x, y, w, h = listView:getItemPosition(self.itemIndex)
+	local tf = transform(listView.transform):translate(listView.x, listView.y)
 	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
 
 	if (mx >= x and mx <= x + w and my >= y and my <= y + h) then
 		local button = event[3]
 		if button == 1 then
-			self.listView.navigator:play()
+			listView.navigator:play()
 		elseif button == 2 then
-			self.listView.navigator:result()
+			listView.navigator:result()
 		end
 	end
 end

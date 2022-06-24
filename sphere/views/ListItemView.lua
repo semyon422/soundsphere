@@ -10,15 +10,15 @@ local Class = require("aqua.util.Class")
 local ListItemView = Class:new()
 
 ListItemView.draw = function(self)
-	local config = self.listView
+	local listView = self.listView
 
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(listView.transform):translate(listView.x, listView.y)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	if config.elements then
-		self:drawElements(config.elements)
+	if listView.elements then
+		self:drawElements(listView.elements)
 	end
 end
 
@@ -41,10 +41,10 @@ ListItemView.drawElements = function(self, elements)
 end
 
 ListItemView.drawValue = function(self, valueConfig, value)
-	local config = self.listView
+	local listView = self.listView
 
 	if type(value) == "function" then
-		value = value(self.listView, self.item)
+		value = value(listView, self.item)
 	end
 	if valueConfig.format then
 		local format = valueConfig.format
@@ -65,7 +65,7 @@ ListItemView.drawValue = function(self, valueConfig, value)
 	baseline_print(
 		tostring(value),
 		valueConfig.x,
-		(self.visualIndex - 1) * config.h / config.rows + valueConfig.baseline,
+		(self.visualIndex - 1) * listView.h / listView.rows + valueConfig.baseline,
 		valueConfig.limit,
 		1,
 		valueConfig.align
@@ -75,9 +75,9 @@ end
 ListItemView.drawCircle = function(self, valueConfig, value)
 	if not value then return end
 
-	local config = self.listView
+	local listView = self.listView
 
-	local y = (self.visualIndex - 1) * config.h / config.rows
+	local y = (self.visualIndex - 1) * listView.h / listView.rows
 
 	local t = valueConfig.mode
 	if not t or t == "line" or t == "both" then
@@ -100,11 +100,10 @@ end
 
 ListItemView.receive = function(self, event)
 	local listView = self.listView
-	local config = self.listView
 
-	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
+	local x, y, w, h = listView:getItemPosition(self.itemIndex)
 
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(listView.transform):translate(listView.x, listView.y)
 	local mx, my = tf:inverseTransformPoint(event[1], event[2])
 
 	if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then

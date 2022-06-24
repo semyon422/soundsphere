@@ -17,11 +17,11 @@ ListItemSwitchView.setValue = function(self, delta) end
 ListItemSwitchView.draw = function(self)
 	ListItemView.draw(self)
 
-	local config = self.listView
-	self:drawValue(config.name, self:getName())
+	local listView = self.listView
+	self:drawValue(listView.name, self:getName())
 
 	local switchView = self.switchView
-	switchView:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.switch))
+	switchView:setPosition(listView:getItemElementPosition(self.itemIndex, listView.switch))
 	switchView:setValue(self:getValue())
 	switchView:draw()
 end
@@ -38,11 +38,10 @@ ListItemSwitchView.receive = function(self, event)
 
 	local listView = self.listView
 
-	local config = listView
 	local switch = listView.switchObject
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(listView.transform):translate(listView.x, listView.y)
 	switch:setTransform(tf)
-	switch:setPosition(self.listView:getItemElementPosition(self.itemIndex, config.switch))
+	switch:setPosition(listView:getItemElementPosition(self.itemIndex, listView.switch))
 	switch:setValue(self:getValue())
 	switch:receive(event)
 
