@@ -1,7 +1,5 @@
-local viewspackage = (...):match("^(.-%.views%.)")
-
-local ListView = require(viewspackage .. "ListView")
-local AvailableModifierListItemView = require(viewspackage .. "ModifierView.AvailableModifierListItemView")
+local ListView = require("sphere.views.ListView")
+local AvailableModifierListItemView = require("sphere.views.ModifierView.AvailableModifierListItemView")
 
 local AvailableModifierListView = ListView:new({construct = false})
 
@@ -12,7 +10,7 @@ AvailableModifierListView.construct = function(self)
 end
 
 AvailableModifierListView.reloadItems = function(self)
-	self.state.items = self.game.modifierModel.modifiers
+	self.items = self.game.modifierModel.modifiers
 end
 
 AvailableModifierListView.getItemIndex = function(self)

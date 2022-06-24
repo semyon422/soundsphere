@@ -7,112 +7,100 @@ local ImageAnimationView = Class:new()
 ImageAnimationView.root = "."
 
 ImageAnimationView.load = function(self)
-	local config = self.config
-	local state = self.state
-
 	local animation = Animation:new()
 	animation.cycles = 1
-	animation.range = config.range or {0, 0}
-	animation.rate = config.rate
+	animation.range = self.range or {0, 0}
+	animation.rate = self.rate
 	animation.time = math.huge
-	state.animation = animation
+	self.animation = animation
 
-	if config.quad then
+	if self.quad then
 		return self:loadQuads()
 	end
 	return self:loadImages()
 end
 
 ImageAnimationView.loadImages = function(self)
-	local config = self.config
-	local state = self.state
-
 	local images = {}
-	local range = config.range
+	local range = self.range
 	if not range then
-		images[0] = love.graphics.newImage(self.root .. "/" .. config.image)
+		images[0] = love.graphics.newImage(self.root .. "/" .. self.image)
 	else
 		for i = range[1], range[2], range[1] < range[2] and 1 or -1 do
-			images[i] = love.graphics.newImage(self.root .. "/" .. config.image:format(i))
+			images[i] = love.graphics.newImage(self.root .. "/" .. self.image:format(i))
 		end
 	end
-	state.images = images
+	self.images = images
 end
 
 ImageAnimationView.loadQuads = function(self)
-	local config = self.config
-	local state = self.state
-
-	local image = love.graphics.newImage(self.root .. "/" .. config.image)
+	local image = love.graphics.newImage(self.root .. "/" .. self.image)
 	local w, h = image:getDimensions()
-	state.image = image
+	self.image = image
 
-	local q = config.quad
+	local q = self.quad
 	local quads = {}
-	local range = config.range
+	local range = self.range
 	for i = range[1], range[2], range[1] < range[2] and 1 or -1 do
 		quads[i] = love.graphics.newQuad(q[1] + i * q[3], q[2], q[3], q[4], w, h)
 	end
-	state.quads = quads
+	self.quads = quads
 end
 
 ImageAnimationView.setTime = function(self, time)
-	self.state.animation.time = time
+	self.animation.time = time
 end
 
 ImageAnimationView.setCycles = function(self, cycles)
-	self.state.animation.cycles = cycles
+	self.animation.cycles = cycles
 end
 
 ImageAnimationView.draw = function(self)
-	local config = self.config
-	local state = self.state
-
-	local animation = state.animation
+	local animation = self.animation
 	if not animation.frame then
 		return
 	end
 
 	local w, h
-	if config.quad then
-		w, h = config.quad[3], config.quad[4]
+	if self.quad then
+		w, h = self.quad[3], self.quad[4]
 	else
-		local image = state.images[animation.frame]
+		local image = self.images[animation.frame]
 		w, h = image:getWidth(), image:getHeight()
 	end
 
-	local cw, ch = config.w, config.h
-	local sx = cw and cw / w or config.sx or 1
-	local sy = ch and ch / h or config.sy or 1
-	local ox = (config.ox or 0) * w
-	local oy = (config.oy or 0) * h
+	local cw, ch = self.w, self.h
+	local sx = cw and cw / w or self.sx or 1
+	local sy = ch and ch / h or self.sy or 1
+	local ox = (self.ox or 0) * w
+	local oy = (self.oy or 0) * h
 
-	local tf = transform(config.transform)
+	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)
-	if config.quad then
+	if self.quad then
 		love.graphics.draw(
-			state.image,
-			state.quads[animation.frame],
-			config.x,
-			config.y,
+			self.image,
+			self.quads[animation.frame],
+			self.x,
+			self.y,
 			0,
 			sx, sy, ox, oy
 		)
 		return
 	end
 	love.graphics.draw(
-		state.images[animation.frame],
-		config.x,
-		config.y,
+		self.images[animation.frame],
+		self.x,
+		self.y,
 		0,
 		sx, sy, ox, oy
 	)
 end
 
 ImageAnimationView.update = function(self, dt)
-	self.state.animation:update(dt)
+	self.animation:update(dt)
 end
 
 return ImageAnimationView

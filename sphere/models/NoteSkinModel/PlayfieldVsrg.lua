@@ -1,5 +1,32 @@
 local Class = require("aqua.util.Class")
 
+local SequenceView = require("sphere.views.SequenceView")
+local ScrollBarView = require("sphere.views.ScrollBarView")
+local RectangleView = require("sphere.views.RectangleView")
+local CircleView = require("sphere.views.CircleView")
+local LineView = require("sphere.views.LineView")
+local UserInfoView = require("sphere.views.UserInfoView")
+local LogoView = require("sphere.views.LogoView")
+local ScreenMenuView = require("sphere.views.ScreenMenuView")
+local BackgroundView = require("sphere.views.BackgroundView")
+local ValueView = require("sphere.views.ValueView")
+local ImageView = require("sphere.views.ImageView")
+local CameraView = require("sphere.views.CameraView")
+local GaussianBlurView = require("sphere.views.GaussianBlurView")
+local ImageAnimationView = require("sphere.views.ImageAnimationView")
+local ImageValueView = require("sphere.views.ImageValueView")
+
+local RhythmView = require("sphere.views.RhythmView")
+local ProgressView	= require("sphere.views.GameplayView.ProgressView")
+local ImageProgressView	= require("sphere.views.GameplayView.ImageProgressView")
+local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
+local HitErrorView = require("sphere.views.GameplayView.HitErrorView")
+local InputView	= require("sphere.views.GameplayView.InputView")
+local InputAnimationView	= require("sphere.views.GameplayView.InputAnimationView")
+local JudgementView	= require("sphere.views.GameplayView.JudgementView")
+local DeltaTimeJudgementView	= require("sphere.views.GameplayView.DeltaTimeJudgementView")
+local MatchPlayersView	= require("sphere.views.GameplayView.MatchPlayersView")
+
 local PlayfieldVsrg = Class:new()
 
 PlayfieldVsrg.construct = function(self)
@@ -58,25 +85,22 @@ PlayfieldVsrg.add = function(self, ...)
 end
 
 PlayfieldVsrg.enableCamera = function(self)
-	return self:add({
-		class = "CameraView",
+	return self:add(CameraView:new({
 		draw_start = true,
-	})
+	}))
 end
 
 PlayfieldVsrg.disableCamera = function(self)
-	return self:add({
-		class = "CameraView",
+	return self:add(CameraView:new({
 		draw_end = true,
-	})
+	}))
 end
 
 PlayfieldVsrg.addRhythmView = function(self, object)
-	object.class = "RhythmView"
 	if not object.transform then
 		object.transform = self:newNoteskinTransform()
 	end
-	return self:add(object)
+	return self:add(RhythmView:new(object))
 end
 
 PlayfieldVsrg.addNotes = function(self, object)
@@ -97,7 +121,9 @@ end
 
 PlayfieldVsrg.addProgressBar = function(self, object)
 	object = object or {}
-	object.class = object.class or "ProgressView"
+	if not getmetatable(object) then
+		object = ProgressView:new(object)
+	end
 	object.min = {key = "game.rhythmModel.timeEngine.minTime"}
 	object.max = {key = "game.rhythmModel.timeEngine.maxTime"}
 	object.start = {key = "game.rhythmModel.timeEngine.startTime"}
@@ -107,7 +133,9 @@ end
 
 PlayfieldVsrg.addHpBar = function(self, object)
 	object = object or {}
-	object.class = object.class or "ProgressView"
+	if not getmetatable(object) then
+		object = ProgressView:new(object)
+	end
 	object.min = {value = 0}
 	object.max = {value = 1000}
 	object.start = {value = 0}
@@ -117,13 +145,14 @@ end
 
 PlayfieldVsrg.addValueView = function(self, object)
 	object = object or {}
-	object.class = "ValueView"
-	return self:add(object)
+	return self:add(ValueView:new(object))
 end
 
 PlayfieldVsrg.addScore = function(self, object)
 	object = object or {}
-	object.class = object.class or "ValueView"
+	if not getmetatable(object) then
+		object = ValueView:new(object)
+	end
 	object.key = "game.rhythmModel.scoreEngine.scoreSystem.normalscore.score"
 	object.value = function(self)
 		local erfunc = require("libchart.erfunc")
@@ -139,7 +168,9 @@ end
 
 PlayfieldVsrg.addAccuracy = function(self, object)
 	object = object or {}
-	object.class = object.class or "ValueView"
+	if not getmetatable(object) then
+		object = ValueView:new(object)
+	end
 	object.key = "game.rhythmModel.scoreEngine.scoreSystem.normalscore.accuracyAdjusted"
 	object.format = object.format or "%0.2f"
 	object.multiplier = 1000
@@ -149,7 +180,9 @@ end
 
 PlayfieldVsrg.addCombo = function(self, object)
 	object = object or {}
-	object.class = object.class or "ValueView"
+	if not getmetatable(object) then
+		object = ValueView:new(object)
+	end
 	object.key = "game.rhythmModel.scoreEngine.scoreSystem.base.combo"
 	object.format = object.format or "%d"
 	object.color = object.color or {1, 1, 1, 1}
@@ -162,8 +195,7 @@ PlayfieldVsrg.addJudgement = function(self, object)
 		object.transform = self:newLaneCenterTransform(1080)
 	end
 	for _, judgement in ipairs(object.judgements) do
-		local config = {
-			class = "ImageAnimationView",
+		local config = ImageAnimationView:new({
 			x = object.x, y = object.y,
 			w = object.w, h = object.h,
 			sx = object.sx or object.scale, sy = object.sy or object.scale,
@@ -173,7 +205,8 @@ PlayfieldVsrg.addJudgement = function(self, object)
 			range = judgement[3],
 			quad = judgement[4],
 			rate = judgement.rate or object.rate,
-		}
+			root = self.noteskin.directoryPath,
+		})
 		judgements[judgement[1]] = config
 		self:add(config)
 	end
@@ -181,11 +214,10 @@ PlayfieldVsrg.addJudgement = function(self, object)
 	if object.key then
 		key = key .. "." .. object.key
 	end
-	return self:add({
-		class = "JudgementView",
+	return self:add(JudgementView:new({
 		key = key,
 		judgements = judgements
-	})
+	}))
 end
 
 PlayfieldVsrg.addDeltaTimeJudgement = function(self, object)
@@ -198,8 +230,7 @@ PlayfieldVsrg.addDeltaTimeJudgement = function(self, object)
 			judgement = {judgement}
 		end
 		if type(judgement) == "table" then
-			local config = {
-				class = "ImageAnimationView",
+			local config = ImageAnimationView:new({
 				x = object.x, y = object.y,
 				w = object.w, h = object.h,
 				sx = object.sx or object.scale, sy = object.sy or object.scale,
@@ -209,17 +240,17 @@ PlayfieldVsrg.addDeltaTimeJudgement = function(self, object)
 				range = judgement[2],
 				quad = judgement[3],
 				rate = judgement.rate or object.rate,
-			}
+				root = self.noteskin.directoryPath,
+			})
 			judgements[i] = config
 			self:add(config)
 		else
 			judgements[i] = judgement
 		end
 	end
-	return self:add({
-		class = "DeltaTimeJudgementView",
+	return self:add(DeltaTimeJudgementView:new({
 		judgements = judgements
-	})
+	}))
 end
 
 PlayfieldVsrg.addKeyImages = function(self, object)
@@ -231,8 +262,7 @@ PlayfieldVsrg.addKeyImages = function(self, object)
 		local pressed
 		local released
 		if object.pressed and object.pressed[i] then
-			pressed = {
-				class = "ImageView",
+			pressed = ImageView:new({
 				x = noteskin.columns[i],
 				y = noteskin.unit - object.padding,
 				w = noteskin.width[i],
@@ -241,11 +271,11 @@ PlayfieldVsrg.addKeyImages = function(self, object)
 				oy = 1,
 				transform = object.transform,
 				image = object.pressed[i],
-			}
+				root = self.noteskin.directoryPath,
+			})
 		end
 		if object.released and object.released[i] then
-			released = {
-				class = "ImageView",
+			released = ImageView:new({
 				x = noteskin.columns[i],
 				y = noteskin.unit - object.padding,
 				w = noteskin.width[i],
@@ -254,15 +284,15 @@ PlayfieldVsrg.addKeyImages = function(self, object)
 				oy = 1,
 				transform = object.transform,
 				image = object.released[i],
-			}
+				root = self.noteskin.directoryPath,
+			})
 		end
 		local inputType, inputIndex = noteskin.inputs[i]:match("^(.-)(%d+)$")
-		local key = {
-			class = "InputView",
+		local key = InputView:new({
 			inputType = inputType, inputIndex = tonumber(inputIndex),
 			pressed = pressed,
 			released = released,
-		}
+		})
 		self:add(pressed)
 		self:add(released)
 		self:add(key)
@@ -276,8 +306,7 @@ PlayfieldVsrg.addStaticKeyImages = function(self, object)
 	end
 	for i = 1, noteskin.inputsCount do
 		if object.image and object.image[i] then
-			local image = {
-				class = "ImageView",
+			local image = ImageView:new({
 				x = noteskin.columns[i],
 				y = noteskin.unit - object.padding,
 				w = noteskin.width[i],
@@ -286,7 +315,8 @@ PlayfieldVsrg.addStaticKeyImages = function(self, object)
 				oy = 1,
 				transform = object.transform,
 				image = object.image[i],
-			}
+				root = self.noteskin.directoryPath,
+			})
 			self:add(image)
 		end
 	end
@@ -300,8 +330,7 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 	for i = 1, noteskin.inputsCount do
 		local pressed, hold, released
 		if object.pressed and object.pressed[i] then
-			pressed = {
-				class = "ImageAnimationView",
+			pressed = ImageAnimationView:new({
 				x = noteskin.columns[i],
 				y = noteskin.unit - object.padding,
 				w = noteskin.width[i],
@@ -313,11 +342,11 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 				range = object.pressed[i][2],
 				quad = object.pressed[i][3],
 				rate = object.rate,
-			}
+				root = self.noteskin.directoryPath,
+			})
 		end
 		if object.hold and object.hold[i] then
-			hold = {
-				class = "ImageAnimationView",
+			hold = ImageAnimationView:new({
 				x = noteskin.columns[i],
 				y = noteskin.unit - object.padding,
 				w = noteskin.width[i],
@@ -329,11 +358,11 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 				range = object.hold[i][2],
 				quad = object.hold[i][3],
 				rate = object.rate,
-			}
+				root = self.noteskin.directoryPath,
+			})
 		end
 		if object.released and object.released[i] then
-			released = {
-				class = "ImageAnimationView",
+			released = ImageAnimationView:new({
 				x = noteskin.columns[i],
 				y = noteskin.unit - object.padding,
 				w = noteskin.width[i],
@@ -345,16 +374,16 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 				range = object.released[i][2],
 				quad = object.released[i][3],
 				rate = object.rate,
-			}
+				root = self.noteskin.directoryPath,
+			})
 		end
 		local inputType, inputIndex = noteskin.inputs[i]:match("^(.-)(%d+)$")
-		local key = {
-			class = "InputAnimationView",
+		local key = InputAnimationView:new({
 			inputType = inputType, inputIndex = tonumber(inputIndex),
 			pressed = pressed,
 			hold = hold,
 			released = released,
-		}
+		})
 		self:add(pressed)
 		self:add(hold)
 		self:add(released)
@@ -390,11 +419,10 @@ PlayfieldVsrg.addColumnsBackground = function(self, object)
 			ry = 0
 		})
 	end
-	return self:add({
-		class = "RectangleView",
+	return self:add(RectangleView:new({
 		transform = object.transform,
 		rectangles = rectangles
-	})
+	}))
 end
 
 PlayfieldVsrg.addGuidelines = function(self, object)
@@ -432,8 +460,7 @@ PlayfieldVsrg.addGuidelines = function(self, object)
 				color = object.color
 			end
 
-			local view = {
-				class = "ImageView",
+			local view = ImageView:new({
 				x = x,
 				y = by,
 				w = bw,
@@ -441,7 +468,8 @@ PlayfieldVsrg.addGuidelines = function(self, object)
 				transform = object.transform,
 				image = object.image[i],
 				color = color,
-			}
+				root = self.noteskin.directoryPath,
+			})
 			self:add(view)
 		end
 	end
@@ -454,7 +482,6 @@ PlayfieldVsrg.addHitError = function(self, object)
 	if not object then
 		return
 	end
-	object.class = "HitErrorView"
 	object.transform = object.transform or self:newLaneCenterTransform(1080)
 	object.count = object.count or 1
 	object.key = "game.rhythmModel.scoreEngine.scoreSystem.sequence"
@@ -469,18 +496,17 @@ PlayfieldVsrg.addHitError = function(self, object)
 		return notPerfectColor
 	end
 
-	return self:add(object)
+	return self:add(HitErrorView:new(object))
 end
 
 PlayfieldVsrg.addMatchPlayers = function(self, object)
 	if not object then
 		return
 	end
-	object.class = "MatchPlayersView"
 	object.transform = object.transform or self:newTransform(1920, 1080, "left")
 	object.key = "game.multiplayerModel.roomUsers"
 
-	return self:add(object)
+	return self:add(MatchPlayersView:new(object))
 end
 
 return PlayfieldVsrg

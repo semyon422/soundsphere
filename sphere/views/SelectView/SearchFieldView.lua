@@ -9,9 +9,8 @@ local TextInput = require("aqua.util.TextInput")
 local SearchFieldView = Class:new()
 
 SearchFieldView.load = function(self)
-	local state = self.state
-	state.textInput = TextInput:new()
-	state.textInput:setText(inside(self, self.config.searchString))
+	self.textInput = TextInput:new()
+	self.textInput:setText(inside(self, self.searchString))
 end
 
 SearchFieldView.receive = function(self, event)
@@ -19,22 +18,19 @@ SearchFieldView.receive = function(self, event)
 		return
 	end
 
-	local state = self.state
-	state.textInput:receive(event)
-	self.navigator:setSearchString(state.textInput.text)
+	self.textInput:receive(event)
+	self.navigator:setSearchString(self.textInput.text)
 end
 
 SearchFieldView.update = function(self)
-	self.state.textInput:setText(inside(self, self.config.searchString))
+	self.textInput:setText(inside(self, self.searchString))
 end
 
 SearchFieldView.draw = function(self)
-	local config = self.config
-
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
-	local searchString = inside(self, self.config.searchString)
+	local searchString = inside(self, self.searchString)
 	if searchString == "" then
 		love.graphics.setColor(1, 1, 1, 0.5)
 		searchString = "Search..."
@@ -42,51 +38,51 @@ SearchFieldView.draw = function(self)
 		love.graphics.setColor(1, 1, 1, 1)
 	end
 
-	local font = spherefonts.get(config.text.font)
+	local font = spherefonts.get(self.text.font)
 	love.graphics.setFont(font)
 	baseline_print(
 		searchString,
-		config.text.x,
-		config.text.baseline,
-		config.text.limit,
+		self.text.x,
+		self.text.baseline,
+		self.text.limit,
 		1,
-		config.text.align
+		self.text.align
 	)
 
 	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.setLineWidth(config.frame.lineWidth)
-	love.graphics.setLineStyle(config.frame.lineStyle)
+	love.graphics.setLineWidth(self.frame.lineWidth)
+	love.graphics.setLineStyle(self.frame.lineStyle)
 	love.graphics.rectangle(
 		"line",
-		config.frame.x,
-		config.frame.y,
-		config.frame.w,
-		config.frame.h,
-		config.frame.h / 2,
-		config.frame.h / 2
+		self.frame.x,
+		self.frame.y,
+		self.frame.w,
+		self.frame.h,
+		self.frame.h / 2,
+		self.frame.h / 2
 	)
 
-	if inside(self, self.config.searchMode) == "lamp" then
+	if inside(self, self.searchMode) == "lamp" then
 		love.graphics.circle(
 			"line",
-			config.frame.x + config.frame.w - config.frame.h / 2,
-			config.frame.y + config.frame.h / 2,
-			config.point.r
+			self.frame.x + self.frame.w - self.frame.h / 2,
+			self.frame.y + self.frame.h / 2,
+			self.point.r
 		)
 		love.graphics.circle(
 			"fill",
-			config.frame.x + config.frame.w - config.frame.h / 2,
-			config.frame.y + config.frame.h / 2,
-			config.point.r
+			self.frame.x + self.frame.w - self.frame.h / 2,
+			self.frame.y + self.frame.h / 2,
+			self.point.r
 		)
 	end
 
-	if inside(self, self.config.collapse) then
+	if inside(self, self.collapse) then
 		love.graphics.circle(
 			"line",
-			config.frame.x + config.frame.w - config.frame.h,
-			config.frame.y + config.frame.h / 2,
-			config.point.r
+			self.frame.x + self.frame.w - self.frame.h,
+			self.frame.y + self.frame.h / 2,
+			self.point.r
 		)
 	end
 end

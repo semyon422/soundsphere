@@ -4,31 +4,27 @@ local JudgementScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.Judg
 local DeltaTimeJudgementView = Class:new()
 
 DeltaTimeJudgementView.load = function(self)
-	local state = self.state
-
-	state.deltaTime = 0
-	state.judgement = nil
-	state.judgementCounter = 0
+	self.deltaTime = 0
+	self.judgement = nil
+	self.judgementCounter = 0
 end
 
 DeltaTimeJudgementView.update = function(self)
-	local config = self.config
-	local state = self.state
 	local scoreSystem = self.game.rhythmModel.scoreEngine.scoreSystem
 
-	if scoreSystem.judgement.counter == state.judgementCounter then
+	if scoreSystem.judgement.counter == self.judgementCounter then
 		return
 	end
-	state.judgementCounter = scoreSystem.judgement.counter
-	state.deltaTime = scoreSystem.misc.deltaTime
+	self.judgementCounter = scoreSystem.judgement.counter
+	self.deltaTime = scoreSystem.misc.deltaTime
 
-	local judgement = JudgementScoreSystem:getJudgement(config.judgements, state.deltaTime)
-	state.judgement = judgement
+	local judgement = JudgementScoreSystem:getJudgement(self.judgements, self.deltaTime)
+	self.judgement = judgement
 	if not judgement then
 		return
 	end
 
-	for _, viewConfig in ipairs(config.judgements) do
+	for _, viewConfig in ipairs(self.judgements) do
 		if type(viewConfig) ~= "number" then
 			local view = self.sequenceView:getView(viewConfig)
 			if viewConfig == judgement then

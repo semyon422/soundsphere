@@ -5,17 +5,13 @@ local transform = require("aqua.graphics.transform")
 local RectangleView = Class:new()
 
 RectangleView.draw = function(self)
-	local config = self.config
-
-	for _, rectangle in ipairs(config.rectangles) do
+	for _, rectangle in ipairs(self.rectangles) do
 		self:drawRectangle(rectangle)
 	end
 end
 
 RectangleView.drawRectangle = function(self, rectangle)
-	local config = self.config
-
-	local tf = transform(config.transform)
+	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(rectangle.color)

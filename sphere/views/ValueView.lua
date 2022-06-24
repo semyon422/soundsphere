@@ -7,29 +7,24 @@ local Class = require("aqua.util.Class")
 local ValueView = Class:new()
 
 ValueView.load = function(self)
-	local config = self.config
-	local state = self.state
-
-	state.font = spherefonts.get(config.font)
+	self.fontObject = spherefonts.get(self.font)
 end
 
 ValueView.draw = function(self)
-	local config = self.config
-
-	local tf = transform(config.transform)
+	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 
-	love.graphics.setFont(self.state.font)
-	love.graphics.setColor(config.color)
+	love.graphics.setFont(self.fontObject)
+	love.graphics.setColor(self.color)
 
-	local format = config.format
-	local value = config.value or inside(self, config.key)
+	local format = self.format
+	local value = self.value or inside(self, self.key)
 	if value then
 		if type(value) == "function" then
 			value = value(self)
 		end
-		if config.multiplier and tonumber(value) then
-			value = value * config.multiplier
+		if self.multiplier and tonumber(value) then
+			value = value * self.multiplier
 		end
 		if type(format) == "string" then
 			value = format:format(value)
@@ -40,16 +35,12 @@ ValueView.draw = function(self)
 
 	baseline_print(
 		tostring(value),
-		config.x,
-		config.baseline,
-		config.limit,
+		self.x,
+		self.baseline,
+		self.limit,
 		1,
-		config.align
+		self.align
 	)
 end
-
-ValueView.update = function(self, dt) end
-ValueView.receive = function(self, event) end
-ValueView.unload = function(self) end
 
 return ValueView

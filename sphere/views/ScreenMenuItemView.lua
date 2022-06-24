@@ -7,7 +7,7 @@ local transform = require("aqua.graphics.transform")
 local ScreenMenuItemView = Class:new()
 
 ScreenMenuItemView.draw = function(self)
-	local config = self.listView.config
+	local config = self.listView
 	local item = self.item
 
 	local tf = transform(config.transform):translate(config.x, config.y)

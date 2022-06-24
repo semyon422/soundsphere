@@ -5,17 +5,13 @@ local transform = require("aqua.graphics.transform")
 local LineView = Class:new()
 
 LineView.draw = function(self)
-	local config = self.config
-
-	for _, line in ipairs(config.lines) do
+	for _, line in ipairs(self.lines) do
 		self:drawLine(line)
 	end
 end
 
 LineView.drawLine = function(self, line)
-	local config = self.config
-
-	local tf = transform(config.transform)
+	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(line.color)

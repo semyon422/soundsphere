@@ -31,39 +31,38 @@ end
 
 SortStepperView.draw = function(self)
 	local sortModel = self.game.sortModel
-	local config = self.config
 
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local font = spherefonts.get(config.text.font)
+	local font = spherefonts.get(self.text.font)
 	love.graphics.setFont(font)
 	baseline_print(
 		sortModel.name,
-		config.text.x,
-		config.text.baseline,
-		config.text.limit,
+		self.text.x,
+		self.text.baseline,
+		self.text.limit,
 		1,
-		config.text.align
+		self.text.align
 	)
 
-	love.graphics.setLineWidth(config.frame.lineWidth)
-	love.graphics.setLineStyle(config.frame.lineStyle)
+	love.graphics.setLineWidth(self.frame.lineWidth)
+	love.graphics.setLineStyle(self.frame.lineStyle)
 	love.graphics.rectangle(
 		"line",
-		config.frame.x,
-		config.frame.y,
-		config.frame.w,
-		config.frame.h,
-		config.frame.h / 2,
-		config.frame.h / 2
+		self.frame.x,
+		self.frame.y,
+		self.frame.w,
+		self.frame.h,
+		self.frame.h / 2,
+		self.frame.h / 2
 	)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	local stepperView = self.stepperView
-	stepperView:setPosition(0, 0, config.w, config.h)
+	stepperView:setPosition(0, 0, self.w, self.h)
 	stepperView:setValue(self:getIndexValue())
 	stepperView:setCount(self:getCount())
 	stepperView:draw()
@@ -78,11 +77,10 @@ SortStepperView.receive = function(self, event)
 		return
 	end
 
-	local config = self.config
 	local stepper = self.stepper
-	local tf = transform(config.transform)
+	local tf = transform(self.transform)
 	stepper:setTransform(tf)
-	stepper:setPosition(config.x, config.y, config.w, config.h)
+	stepper:setPosition(self.x, self.y, self.w, self.h)
 	stepper:setValue(self:getIndexValue())
 	stepper:setCount(self:getCount())
 	stepper:receive(event)
@@ -94,10 +92,8 @@ SortStepperView.receive = function(self, event)
 end
 
 SortStepperView.wheelmoved = function(self, event)
-	local config = self.config
-
-	local x, y, w, h = config.x, config.y, config.w, config.h
-	local tf = transform(config.transform)
+	local x, y, w, h = self.x, self.y, self.w, self.h
+	local tf = transform(self.transform)
 	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
 
 	if not (mx >= x and mx <= x + w and my >= y and my <= y + h) then

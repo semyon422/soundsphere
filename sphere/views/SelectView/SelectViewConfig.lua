@@ -1,3 +1,30 @@
+local SequenceView = require("sphere.views.SequenceView")
+local ScrollBarView = require("sphere.views.ScrollBarView")
+local RectangleView = require("sphere.views.RectangleView")
+local CircleView = require("sphere.views.CircleView")
+local LineView = require("sphere.views.LineView")
+local UserInfoView = require("sphere.views.UserInfoView")
+local LogoView = require("sphere.views.LogoView")
+local ScreenMenuView = require("sphere.views.ScreenMenuView")
+local BackgroundView = require("sphere.views.BackgroundView")
+local ValueView = require("sphere.views.ValueView")
+local ImageView = require("sphere.views.ImageView")
+local CameraView = require("sphere.views.CameraView")
+local GaussianBlurView = require("sphere.views.GaussianBlurView")
+local ImageAnimationView = require("sphere.views.ImageAnimationView")
+local ImageValueView = require("sphere.views.ImageValueView")
+
+local NoteChartSetListView = require("sphere.views.SelectView.NoteChartSetListView")
+local NoteChartListView = require("sphere.views.SelectView.NoteChartListView")
+local SearchFieldView = require("sphere.views.SelectView.SearchFieldView")
+local SortStepperView = require("sphere.views.SelectView.SortStepperView")
+local StageInfoView = require("sphere.views.SelectView.StageInfoView")
+local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
+local CollectionListView = require("sphere.views.SelectView.CollectionListView")
+local OsudirectListView = require("sphere.views.SelectView.OsudirectListView")
+local OsudirectDifficultiesListView = require("sphere.views.SelectView.OsudirectDifficultiesListView")
+local CacheView = require("sphere.views.SelectView.CacheView")
+
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local formatScore = function(score)
@@ -23,8 +50,7 @@ local formatDifficulty = function(difficulty)
 	return format:format(difficulty)
 end
 
-local CacheView = {
-	class = "CacheView",
+local Cache = CacheView:new({
 	subscreen = "collections",
 	transform = transform,
 	x = 733,
@@ -42,10 +68,9 @@ local CacheView = {
 			size = 24,
 		},
 	},
-}
+})
 
-local OsudirectList = {
-	class = "OsudirectListView",
+local OsudirectList = OsudirectListView:new({
 	subscreen = "osudirect",
 	transform = transform,
 	x = 1187,
@@ -81,10 +106,9 @@ local OsudirectList = {
 			},
 		},
 	},
-}
+})
 
-local OsudirectScrollBar = {
-	class = "ScrollBarView",
+local OsudirectScrollBar = ScrollBarView:new({
 	subscreen = "osudirect",
 	transform = transform,
 	list = OsudirectList,
@@ -95,10 +119,9 @@ local OsudirectScrollBar = {
 	rows = 11,
 	backgroundColor = {1, 1, 1, 0.33},
 	color = {1, 1, 1, 0.66}
-}
+})
 
-local OsudirectDifficultiesList = {
-	class = "OsudirectDifficultiesListView",
+local OsudirectDifficultiesList = OsudirectDifficultiesListView:new({
 	subscreen = "osudirect",
 	transform = transform,
 	x = 733,
@@ -162,10 +185,9 @@ local OsudirectDifficultiesList = {
 			format = formatDifficulty
 		},
 	},
-}
+})
 
-local CollectionList = {
-	class = "CollectionListView",
+local CollectionList = CollectionListView:new({
 	subscreen = "collections",
 	transform = transform,
 	x = 1187,
@@ -217,10 +239,9 @@ local CollectionList = {
 			},
 		},
 	},
-}
+})
 
-local CollectionScrollBar = {
-	class = "ScrollBarView",
+local CollectionScrollBar = ScrollBarView:new({
 	subscreen = "collections",
 	transform = transform,
 	list = CollectionList,
@@ -231,10 +252,9 @@ local CollectionScrollBar = {
 	rows = 11,
 	backgroundColor = {1, 1, 1, 0.33},
 	color = {1, 1, 1, 0.66}
-}
+})
 
-local NoteChartSetList = {
-	class = "NoteChartSetListView",
+local NoteChartSetList = NoteChartSetListView:new({
 	subscreen = "notecharts",
 	transform = transform,
 	x = 1187,
@@ -278,10 +298,9 @@ local NoteChartSetList = {
 			r = 7
 		},
 	},
-}
+})
 
-local NoteChartList = {
-	class = "NoteChartListView",
+local NoteChartList = NoteChartListView:new({
 	subscreen = "notecharts",
 	transform = transform,
 	x = 733,
@@ -355,10 +374,9 @@ local NoteChartList = {
 			r = 7
 		},
 	},
-}
+})
 
-local StageInfo = {
-	class = "StageInfoView",
+local StageInfo = StageInfoView:new({
 	subscreen = "score",
 	transform = transform,
 	x = 279,
@@ -423,7 +441,7 @@ local StageInfo = {
 			}
 		}
 	}
-}
+})
 
 StageInfo.cells = {
 	{
@@ -547,13 +565,11 @@ StageInfo.cells = {
 	},
 }
 
-local BackgroundBlurSwitch = {
-	class = "GaussianBlurView",
+local BackgroundBlurSwitch = GaussianBlurView:new({
 	blur = {key = "game.configModel.configs.settings.graphics.blur.select"}
-}
+})
 
-local Background = {
-	class = "BackgroundView",
+local Background = BackgroundView:new({
 	transform = transform,
 	x = 0,
 	y = 0,
@@ -561,7 +577,7 @@ local Background = {
 	h = 1080,
 	parallax = 0.01,
 	dim = {key = "game.configModel.configs.settings.graphics.dim.select"},
-}
+})
 
 local Preview = {
 	transform = transform,
@@ -571,8 +587,7 @@ local Preview = {
 	h = 1080
 }
 
-local NoteChartSetScrollBar = {
-	class = "ScrollBarView",
+local NoteChartSetScrollBar = ScrollBarView:new({
 	subscreen = "notecharts",
 	transform = transform,
 	list = NoteChartSetList,
@@ -583,10 +598,9 @@ local NoteChartSetScrollBar = {
 	rows = 11,
 	backgroundColor = {1, 1, 1, 0.33},
 	color = {1, 1, 1, 0.66}
-}
+})
 
-local SearchField = {
-	class = "SearchFieldView",
+local SearchField = SearchFieldView:new({
 	subscreen = "notecharts",
 	transform = transform,
 	x = 733,
@@ -617,10 +631,9 @@ local SearchField = {
 	searchString = "game.searchModel.searchString",
 	searchMode = "game.searchModel.searchMode",
 	collapse = "game.noteChartSetLibraryModel.collapse",
-}
+})
 
-local OsudirectSearchField = {
-	class = "SearchFieldView",
+local OsudirectSearchField = SearchFieldView:new({
 	subscreen = "osudirect",
 	transform = transform,
 	x = 733,
@@ -651,10 +664,9 @@ local OsudirectSearchField = {
 	searchString = "game.osudirectModel.searchString",
 	searchMode = "?",
 	collapse = "?",
-}
+})
 
-local SortStepper = {
-	class = "SortStepperView",
+local SortStepper = SortStepperView:new({
 	subscreen = "notecharts",
 	transform = transform,
 	x = 1014,
@@ -679,10 +691,9 @@ local SortStepper = {
 			size = 20,
 		},
 	}
-}
+})
 
-local ModifierIconGrid = {
-	class = "ModifierIconGridView",
+local ModifierIconGrid = ModifierIconGridView:new({
 	transform = transform,
 	x = 301,
 	y = 855,
@@ -691,10 +702,9 @@ local ModifierIconGrid = {
 	columns = 6,
 	rows = 2,
 	config = "game.modifierModel.config"
-}
+})
 
-local StageInfoModifierIconGrid = {
-	class = "ModifierIconGridView",
+local StageInfoModifierIconGrid = ModifierIconGridView:new({
 	subscreen = "score",
 	transform = transform,
 	x = 301,
@@ -705,10 +715,9 @@ local StageInfoModifierIconGrid = {
 	rows = 3,
 	config = "game.selectModel.scoreItem.modifiers",
 	noModifier = true
-}
+})
 
-local UpdateStatus = {
-	class = "ValueView",
+local UpdateStatus = ValueView:new({
 	transform = transform,
 	key = "game.updateModel.status",
 	x = 0,
@@ -720,10 +729,9 @@ local UpdateStatus = {
 		size = 24,
 	},
 	align = "left",
-}
+})
 
-local SessionTime = {
-	class = "ValueView",
+local SessionTime = ValueView:new({
 	transform = transform,
 	value = function()
 		local event = require("aqua.event")
@@ -739,10 +747,9 @@ local SessionTime = {
 		size = 20,
 	},
 	align = "left",
-}
+})
 
-local BottomNotechartsScreenMenu = {
-	class = "ScreenMenuView",
+local BottomNotechartsScreenMenu = ScreenMenuView:new({
 	subscreen = "notecharts",
 	transform = transform,
 	x = 392,
@@ -778,10 +785,9 @@ local BottomNotechartsScreenMenu = {
 			}
 		}
 	}
-}
+})
 
-local BottomCollectionsScreenMenu = {
-	class = "ScreenMenuView",
+local BottomCollectionsScreenMenu = ScreenMenuView:new({
 	subscreen = "collections",
 	transform = transform,
 	x = 392,
@@ -808,10 +814,9 @@ local BottomCollectionsScreenMenu = {
 			},
 		}
 	}
-}
+})
 
-local BottomRightNotechartsScreenMenu = {
-	class = "ScreenMenuView",
+local BottomRightNotechartsScreenMenu = ScreenMenuView:new({
 	subscreen = "notecharts",
 	transform = transform,
 	x = 1300,
@@ -836,10 +841,9 @@ local BottomRightNotechartsScreenMenu = {
 			displayName = "collections"
 		},
 	}}
-}
+})
 
-local BottomRightCollectionsScreenMenu = {
-	class = "ScreenMenuView",
+local BottomRightCollectionsScreenMenu = ScreenMenuView:new({
 	subscreen = "collections",
 	transform = transform,
 	x = 1300 - 227,
@@ -868,10 +872,9 @@ local BottomRightCollectionsScreenMenu = {
 			displayName = "notecharts"
 		},
 	}}
-}
+})
 
-local BottomRightOsudirectScreenMenu = {
-	class = "ScreenMenuView",
+local BottomRightOsudirectScreenMenu = ScreenMenuView:new({
 	subscreen = "osudirect",
 	transform = transform,
 	x = 1300 - 227 * 2,
@@ -901,10 +904,9 @@ local BottomRightOsudirectScreenMenu = {
 			displayName = "collections"
 		},
 	}}
-}
+})
 
-local NoteChartSubScreenMenu = {
-	class = "ScreenMenuView",
+local NoteChartSubScreenMenu = ScreenMenuView:new({
 	transform = transform,
 	x = 279,
 	y = 224,
@@ -939,10 +941,9 @@ local NoteChartSubScreenMenu = {
 			},
 		}
 	}
-}
+})
 
-local NoteChartOptionsScreenMenu = {
-	class = "ScreenMenuView",
+local NoteChartOptionsScreenMenu = ScreenMenuView:new({
 	subscreen = "options",
 	transform = transform,
 	x = 506,
@@ -996,10 +997,9 @@ local NoteChartOptionsScreenMenu = {
 		},
 		]]
 	}
-}
+})
 
-local LeftScreenMenu = {
-	class = "ScreenMenuView",
+local LeftScreenMenu = ScreenMenuView:new({
 	transform = transform,
 	x = 0,
 	y = 279,
@@ -1031,10 +1031,9 @@ local LeftScreenMenu = {
 			}
 		},
 	}
-}
+})
 
-local Rectangle = {
-	class = "RectangleView",
+local Rectangle = RectangleView:new({
 	transform = transform,
 	rectangles = {
 		{
@@ -1074,13 +1073,12 @@ local Rectangle = {
 			ry = 1
 		}
 	}
-}
+})
 
-local Line = {
-	class = "LineView",
+local Line = LineView:new({
 	transform = transform,
 	lines = {}
-}
+})
 
 local SelectViewConfig = {
 	BackgroundBlurSwitch,
@@ -1091,7 +1089,7 @@ local SelectViewConfig = {
 	NoteChartList,
 	StageInfo,
 	NoteChartSetScrollBar,
-	CacheView,
+	Cache,
 	OsudirectList,
 	CollectionList,
 	CollectionScrollBar,

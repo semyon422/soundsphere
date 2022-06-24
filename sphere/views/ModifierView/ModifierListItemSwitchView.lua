@@ -1,7 +1,5 @@
-local viewspackage = (...):match("^(.-%.views%.)")
-
-local ListItemSwitchView = require(viewspackage .. "ListItemSwitchView")
-local SwitchView = require(viewspackage .. "SwitchView")
+local ListItemSwitchView = require("sphere.views.ListItemSwitchView")
+local SwitchView = require("sphere.views.SwitchView")
 
 local ModifierListItemSwitchView = ListItemSwitchView:new({construct = false})
 

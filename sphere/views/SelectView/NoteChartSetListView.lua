@@ -1,6 +1,4 @@
-local viewspackage = (...):match("^(.-%.views%.)")
-
-local ListView = require(viewspackage .. "ListView")
+local ListView = require("sphere.views.ListView")
 local ListItemView = require("sphere.views.ListItemView")
 local NoteChartSetListItemView = ListItemView:new({construct = false})
 
@@ -13,8 +11,8 @@ NoteChartSetListView.construct = function(self)
 end
 
 NoteChartSetListView.reloadItems = function(self)
-	self.state.stateCounter = self.game.selectModel.noteChartSetStateCounter
-	self.state.items = self.game.noteChartSetLibraryModel.items
+	self.stateCounter = self.game.selectModel.noteChartSetStateCounter
+	self.items = self.game.noteChartSetLibraryModel.items
 end
 
 NoteChartSetListView.getItemIndex = function(self)

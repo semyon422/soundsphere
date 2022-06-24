@@ -1,6 +1,4 @@
-local viewspackage = (...):match("^(.-%.views%.)")
-
-local ListItemView = require(viewspackage .. "ListItemView")
+local ListItemView = require("sphere.views.ListItemView")
 
 local ListItemInputView = ListItemView:new({construct = false})
 
@@ -11,7 +9,7 @@ ListItemInputView.isActive = function(self) end
 ListItemInputView.draw = function(self)
 	ListItemView.draw(self)
 
-	local config = self.listView.config
+	local config = self.listView
 	self:drawValue(config.name, self:getName())
 	if self:isActive() then
 		return self:drawValue(config.input.value, "???")

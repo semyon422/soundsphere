@@ -11,45 +11,39 @@ ImageProgressView.getValue = ProgressView.getValue
 ImageProgressView.load = function(self)
 	ImageView.load(self)
 
-	local config = self.config
-	local state = self.state
-
-	config.w, config.h = state.image:getDimensions()
+	self.w, self.h = self.image:getDimensions()
 	local rx, ry, rw, rh = self:getRectangle()
-	state.quad = love.graphics.newQuad(rx - config.x, ry - config.y, rw, rh, state.image)
+	self.quad = love.graphics.newQuad(rx - config.x, ry - config.y, rw, rh, self.image)
 end
 
 ImageProgressView.draw = function(self)
-	local config = self.config
-	local state = self.state
+	local w, h = self.imageWidth, self.imageHeight
 
-	local w, h = state.imageWidth, state.imageHeight
+	local cw, ch = self.w, self.h
+	local sx = self.sx or 1
+	local sy = self.sy or 1
+	local ox = (self.ox or 0) * w
+	local oy = (self.oy or 0) * h
 
-	local cw, ch = config.w, config.h
-	local sx = config.sx or 1
-	local sy = config.sy or 1
-	local ox = (config.ox or 0) * w
-	local oy = (config.oy or 0) * h
-
-	local tf = transform(config.transform)
+	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 
-	if config.color then
-		love.graphics.setColor(config.color)
+	if self.color then
+		love.graphics.setColor(self.color)
 	else
 		love.graphics.setColor(1, 1, 1, 1)
 	end
 
 	local rx, ry, rw, rh = self:getRectangle()
-	local quad = state.quad
-	quad:setViewport(rx - config.x, ry - config.y, rw, rh, state.image:getDimensions())
+	local quad = self.quad
+	quad:setViewport(rx - self.x, ry - self.y, rw, rh, self.image:getDimensions())
 
 	love.graphics.draw(
-		state.image,
+		self.image,
 		quad,
 		rx,
 		ry,
-		config.r or 0,
+		self.r or 0,
 		sx, sy, ox, oy
 	)
 end

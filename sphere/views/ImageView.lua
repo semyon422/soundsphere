@@ -8,43 +8,37 @@ local ImageView = Class:new()
 ImageView.root = "."
 
 ImageView.load = function(self)
-	local config = self.config
-	local state = self.state
-
-	if config.image then
-		state.image = love.graphics.newImage(self.root .. "/" .. config.image)
+	if self.image then
+		self.imageObject = love.graphics.newImage(self.root .. "/" .. self.image)
 	else
-		state.image = newPixel()
+		self.imageObject = newPixel()
 	end
-	state.imageWidth = state.image:getWidth()
-	state.imageHeight = state.image:getHeight()
+	self.imageWidth = self.imageObject:getWidth()
+	self.imageHeight = self.imageObject:getHeight()
 end
 
 ImageView.draw = function(self)
-	local config = self.config
-	local state = self.state
+	local w, h = self.imageWidth, self.imageHeight
 
-	local w, h = state.imageWidth, state.imageHeight
+	local cw, ch = self.w, self.h
+	local sx = cw and cw / w or self.sx or 1
+	local sy = ch and ch / h or self.sy or 1
+	local ox = (self.ox or 0) * w
+	local oy = (self.oy or 0) * h
 
-	local cw, ch = config.w, config.h
-	local sx = cw and cw / w or config.sx or 1
-	local sy = ch and ch / h or config.sy or 1
-	local ox = (config.ox or 0) * w
-	local oy = (config.oy or 0) * h
-
-	local tf = transform(config.transform)
+	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 
-	if config.color then
-		love.graphics.setColor(config.color)
+	if self.color then
+		love.graphics.setColor(self.color)
 	else
 		love.graphics.setColor(1, 1, 1, 1)
 	end
     love.graphics.draw(
-        state.image,
-		config.x,
-		config.y,
-        config.r or 0,
+        self.imageObject,
+		self.x,
+		self.y,
+        self.r or 0,
 		sx, sy, ox, oy
     )
 end

@@ -6,24 +6,16 @@ local erfunc = require("libchart.erfunc")
 
 local MatchPlayersView = Class:new()
 
-MatchPlayersView.load = function(self)
-	local config = self.config
-	local state = self.state
-end
-
 MatchPlayersView.draw = function(self)
-	local config = self.config
-	local state = self.state
-
-	local tf = transform(config.transform)
+	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local font = spherefonts.get(config.font)
+	local font = spherefonts.get(self.font)
 	love.graphics.setFont(font)
 
-	local users = inside(self, config.key)
+	local users = inside(self, self.key)
 
 	local window = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 
@@ -48,7 +40,7 @@ MatchPlayersView.draw = function(self)
 		end
 	end
 
-	love.graphics.printf(table.concat(rows, "\n"), config.x, config.y, math.huge, config.align or "left")
+	love.graphics.printf(table.concat(rows, "\n"), self.x, self.y, math.huge, self.align or "left")
 end
 
 return MatchPlayersView

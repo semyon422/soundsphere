@@ -1,7 +1,5 @@
-local viewspackage = (...):match("^(.-%.views%.)")
-
-local ListItemStepperView = require(viewspackage .. "ListItemStepperView")
-local StepperView = require(viewspackage .. "StepperView")
+local ListItemStepperView = require("sphere.views.ListItemStepperView")
+local StepperView = require("sphere.views.StepperView")
 
 local ModifierListItemStepperView = ListItemStepperView:new({construct = false})
 

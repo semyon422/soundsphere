@@ -5,7 +5,7 @@ local ListItemView = require("sphere.views.ListItemView")
 local AvailableModifierListItemView = ListItemView:new({construct = false})
 
 AvailableModifierListItemView.draw = function(self)
-	local config = self.listView.config
+	local config = self.listView
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
@@ -34,7 +34,7 @@ AvailableModifierListItemView.draw = function(self)
 end
 
 AvailableModifierListItemView.receive = function(self, event)
-	local config = self.listView.config
+	local config = self.listView
 
 	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
 	local tf = transform(config.transform):translate(config.x, config.y)

@@ -5,17 +5,13 @@ local transform = require("aqua.graphics.transform")
 local CircleView = Class:new()
 
 CircleView.draw = function(self)
-	local config = self.config
-
-	for _, circle in ipairs(config.circles) do
+	for _, circle in ipairs(self.circles) do
 		self:drawCircle(circle)
 	end
 end
 
 CircleView.drawCircle = function(self, circle)
-	local config = self.config
-
-	local tf = transform(config.transform)
+	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(circle.color)

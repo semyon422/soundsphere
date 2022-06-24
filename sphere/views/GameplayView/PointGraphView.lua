@@ -7,35 +7,30 @@ local inside = require("aqua.util.inside")
 local PointGraphView = Class:new()
 
 PointGraphView.load = function(self)
-	local state = self.state
+	self.drawnPoints = 0
+	self.drawnBackgroundPoints = 0
 
-	state.drawnPoints = 0
-	state.drawnBackgroundPoints = 0
+	self.startTime = self.game.noteChartModel.noteChart.metaData:get("minTime")
+	self.endTime = self.game.noteChartModel.noteChart.metaData:get("maxTime")
 
-	state.startTime = self.game.noteChartModel.noteChart.metaData:get("minTime")
-	state.endTime = self.game.noteChartModel.noteChart.metaData:get("maxTime")
-
-	state.canvas = love.graphics.newCanvas()
-	state.backgroundCanvas = love.graphics.newCanvas()
+	self.canvas = love.graphics.newCanvas()
+	self.backgroundCanvas = love.graphics.newCanvas()
 end
 
 PointGraphView.draw = function(self)
-	local state = self.state
-	local config = self.config
-
-	if config.show and not config.show(self) then
+	if self.show and not self.show(self) then
 		return
 	end
 
-	if config.background then
-		self:drawPoints("drawnBackgroundPoints", state.backgroundCanvas, config.backgroundColor, config.backgroundRadius)
+	if self.background then
+		self:drawPoints("drawnBackgroundPoints", self.backgroundCanvas, self.backgroundColor, self.backgroundRadius)
 	end
-	self:drawPoints("drawnPoints", state.canvas, config.color, config.radius)
+	self:drawPoints("drawnPoints", self.canvas, self.color, self.radius)
 
 	love.graphics.origin()
 	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.draw(state.backgroundCanvas, 0, 0)
-	love.graphics.draw(state.canvas, 0, 0)
+	love.graphics.draw(self.backgroundCanvas, 0, 0)
+	love.graphics.draw(self.canvas, 0, 0)
 end
 
 PointGraphView.update = function(self, dt) end
@@ -53,65 +48,59 @@ PointGraphView.reload = function(self)
 end
 
 PointGraphView.drawPoints = function(self, counter, canvas, color, radius)
-	local config = self.config
-	local state = self.state
-
 	local shader = love.graphics.getShader()
 	love.graphics.setShader()
 	love.graphics.setCanvas(canvas)
 
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
-	local points = inside(self, config.key)
-	for i = state[counter] + 1, #points do
+	local points = inside(self, self.key)
+	for i = self[counter] + 1, #points do
 		self:drawPoint(points[i], color, radius)
 	end
-	state[counter] = #points
+	self[counter] = #points
 
 	love.graphics.setCanvas()
 	love.graphics.setShader(shader)
 end
 
 PointGraphView.drawPoint = function(self, point, color, radius)
-	local config = self.config
-	local state = self.state
-
-	local time = inside(point, config.time)
-	local value = inside(point, config.value)
-	local unit = inside(point, config.unit)
+	local time = inside(point, self.time)
+	local value = inside(point, self.value)
+	local unit = inside(point, self.unit)
 	if type(time) == "nil" then
-		time = tonumber(config.time) or 0
+		time = tonumber(self.time) or 0
 	end
 	if type(value) == "nil" then
-		value = tonumber(config.value) or 0
+		value = tonumber(self.value) or 0
 	end
 	if type(unit) == "nil" then
-		unit = tonumber(config.unit) or 1
+		unit = tonumber(self.unit) or 1
 	end
 
 	if type(color) == "function" then
-		color = color(time, state.startTime, state.endTime, value, unit)
+		color = color(time, self.startTime, self.endTime, value, unit)
 	end
 	love.graphics.setColor(color)
 
-	if config.point then
-		local x, y = config.point(time, state.startTime, state.endTime, value, unit)
+	if self.point then
+		local x, y = self.point(time, self.startTime, self.endTime, value, unit)
 		if not x then
 			return
 		end
 		x = math.min(math.max(x, 0), 1)
 		y = math.min(math.max(y, 0), 1)
-		local _x, _y = map(x, 0, 1, 0, config.w), map(y, 0, 1, 0, config.h)
+		local _x, _y = map(x, 0, 1, 0, self.w), map(y, 0, 1, 0, self.h)
 		love.graphics.rectangle("fill", _x - radius, _y - radius, radius * 2, radius * 2)
-	elseif config.line then
-		local x = config.line(time, state.startTime, state.endTime, value, unit)
+	elseif self.line then
+		local x = self.line(time, self.startTime, self.endTime, value, unit)
 		if not x then
 			return
 		end
 		x = math.min(math.max(x, 0), 1)
-		local _x = map(x, 0, 1, 0, config.w)
-		love.graphics.rectangle("fill", _x - radius, 0, radius * 2, config.h)
+		local _x = map(x, 0, 1, 0, self.w)
+		love.graphics.rectangle("fill", _x - radius, 0, radius * 2, self.h)
 	end
 end
 

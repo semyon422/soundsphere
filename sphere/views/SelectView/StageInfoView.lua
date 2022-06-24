@@ -9,7 +9,7 @@ local time_ago_in_words = require("aqua.util").time_ago_in_words
 local StageInfoView = Class:new()
 
 StageInfoView.draw = function(self)
-	for _, cell in ipairs(self.config.cells) do
+	for _, cell in ipairs(self.cells) do
 		if not cell.show or cell.show(self) then
 			self:drawCellName(cell)
 			if cell.valueType == "text" then
@@ -22,9 +22,7 @@ StageInfoView.draw = function(self)
 end
 
 StageInfoView.drawCellName = function(self, cell)
-	local config = self.config
-
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)
@@ -51,9 +49,7 @@ StageInfoView.drawCellName = function(self, cell)
 end
 
 StageInfoView.drawTextCell = function(self, cell)
-	local config = self.config
-
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)
@@ -104,9 +100,7 @@ StageInfoView.drawTextCell = function(self, cell)
 end
 
 StageInfoView.drawBarCell = function(self, cell)
-	local config = self.config
-
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)

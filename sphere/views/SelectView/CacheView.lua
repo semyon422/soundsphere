@@ -7,14 +7,12 @@ local spherefonts = require("sphere.assets.fonts")
 local CacheView = Class:new()
 
 CacheView.draw = function(self)
-	local config = self.config
-
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local font = spherefonts.get(config.text.font)
+	local font = spherefonts.get(self.text.font)
 	love.graphics.setFont(font)
 
 	local cacheUpdater = self.game.cacheModel.cacheUpdater
@@ -33,26 +31,25 @@ CacheView.draw = function(self)
 
 	baseline_print(
 		text,
-		config.text.x,
-		config.text.baseline,
-		config.text.limit,
+		self.text.x,
+		self.text.baseline,
+		self.text.limit,
 		1,
-		config.text.align
+		self.text.align
 	)
 end
 
 CacheView.receive = function(self, event)
-	local config = self.config
 	if event.name == "mousepressed" then
-		local tf = transform(config.transform)
+		local tf = transform(self.transform)
 		local mx, my = tf:inverseTransformPoint(event[1], event[2])
 
 		local button = event[3]
 
-		local x = config.x
-		local y = config.y
-		local w = config.w
-		local h = config.h
+		local x = self.x
+		local y = self.y
+		local w = self.w
+		local h = self.h
 
 		if mx >= x and mx < x + w and my >= y and my < y + h and button == 1 then
 			self.navigator:updateCacheCollection()

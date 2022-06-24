@@ -1,9 +1,7 @@
-local viewspackage = (...):match("^(.-%.views%.)")
-
 local tween = require("tween")
 local Class = require("aqua.util.Class")
 local transform = require("aqua.graphics.transform")
-local ListItemView = require(viewspackage .. "ListItemView")
+local ListItemView = require("sphere.views.ListItemView")
 
 local ListView = Class:new()
 
@@ -22,13 +20,13 @@ end
 
 ListView.forceScroll = function(self)
 	local itemIndex = assert(self:getItemIndex())
-	self.state.selectedItem = itemIndex
-	self.state.selectedVisualItem = itemIndex
+	self.selectedItem = itemIndex
+	self.selectedVisualItem = itemIndex
 end
 
 ListView.reloadItems = function(self)
-	self.state.stateCounter = 1
-	self.state.items = {}
+	self.stateCounter = 1
+	self.items = {}
 end
 
 ListView.receive = function(self, event)
@@ -38,15 +36,13 @@ ListView.receive = function(self, event)
 end
 
 ListView.wheelmoved = function(self, event)
-	local config = self.config
-
-	local tf = transform(config.transform)
+	local tf = transform(self.transform)
 	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
 
-	local x = config.x
-	local y = config.y
-	local w = config.w
-	local h = config.h
+	local x = self.x
+	local y = self.y
+	local w = self.w
+	local h = self.h
 	if mx >= x and mx < x + w and my >= y and my < y + h then
 		local wy = event[2]
 		if wy == 1 then
@@ -58,22 +54,19 @@ ListView.wheelmoved = function(self, event)
 end
 
 ListView.receiveItems = function(self, event)
-	local state = self.state
-	local config = self.config
-
-	local deltaItemIndex = state.selectedItem - state.selectedVisualItem
-	for i = 0 - math.floor(deltaItemIndex), config.rows - math.floor(deltaItemIndex) do
-		local itemIndex = i + state.selectedItem - math.ceil(config.rows / 2)
+	local deltaItemIndex = self.selectedItem - self.selectedVisualItem
+	for i = 0 - math.floor(deltaItemIndex), self.rows - math.floor(deltaItemIndex) do
+		local itemIndex = i + self.selectedItem - math.ceil(self.rows / 2)
 		local visualIndex = i + deltaItemIndex
-		local item = state.items[itemIndex]
+		local item = self.items[itemIndex]
 		if item then
 			local itemView = self:getItemView(item)
 			itemView.visualIndex = visualIndex
 			itemView.itemIndex = itemIndex
 			itemView.item = item
 			itemView.listView = self
-			itemView.prevItem = state.items[itemIndex - 1]
-			itemView.nextItem = state.items[itemIndex + 1]
+			itemView.prevItem = self.items[itemIndex - 1]
+			itemView.nextItem = self.items[itemIndex + 1]
 			itemView:receive(event)
 		end
 	end
@@ -85,25 +78,25 @@ ListView.scrollDown = function(self) end
 
 ListView.update = function(self, dt)
 	local itemIndex = assert(self:getItemIndex())
-	if self.state.selectedItem ~= itemIndex then
-		self.state.scrollTween = tween.new(
+	if self.selectedItem ~= itemIndex then
+		self.scrollTween = tween.new(
 			0.1,
-			self.state,
+			self,
 			{selectedVisualItem = itemIndex},
 			"linear"
 		)
-		self.state.selectedItem = itemIndex
+		self.selectedItem = itemIndex
 	end
-	if self.state.selectedVisualItem == self.state.selectedItem then
-		self.state.scrollTween = nil
+	if self.selectedVisualItem == self.selectedItem then
+		self.scrollTween = nil
 	end
-	if self.state.scrollTween then
-		self.state.scrollTween:update(math.min(dt, 1 / 60))
+	if self.scrollTween then
+		self.scrollTween:update(math.min(dt, 1 / 60))
 	end
 
-	local stateCounter = self.state.stateCounter
+	local stateCounter = self.stateCounter
 	self:reloadItems()
-	if stateCounter ~= self.state.stateCounter then
+	if stateCounter ~= self.stateCounter then
 		self:forceScroll()
 	end
 end
@@ -117,19 +110,17 @@ ListView.getItemView = function(self, item)
 end
 
 ListView.drawStencil = function(self)
-	local config = self.config
-
-	local tf = transform(config.transform)
+	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
 	love.graphics.rectangle(
 		"fill",
-		config.x,
-		config.y,
-		config.w,
-		config.h
+		self.x,
+		self.y,
+		self.w,
+		self.h
 	)
 end
 
@@ -142,22 +133,19 @@ ListView.draw = function(self)
 	)
 	love.graphics.setStencilTest("greater", 0)
 
-	local state = self.state
-	local config = self.config
-
-	local deltaItemIndex = state.selectedItem - state.selectedVisualItem
-	for i = 0 - math.floor(deltaItemIndex), config.rows - math.floor(deltaItemIndex) do
-		local itemIndex = i + state.selectedItem - math.ceil(config.rows / 2)
+	local deltaItemIndex = self.selectedItem - self.selectedVisualItem
+	for i = 0 - math.floor(deltaItemIndex), self.rows - math.floor(deltaItemIndex) do
+		local itemIndex = i + self.selectedItem - math.ceil(self.rows / 2)
 		local visualIndex = i + deltaItemIndex
-		local item = state.items[itemIndex]
+		local item = self.items[itemIndex]
 		if item then
 			local itemView = self:getItemView(item)
 			itemView.visualIndex = visualIndex
 			itemView.itemIndex = itemIndex
 			itemView.item = item
 			itemView.listView = self
-			itemView.prevItem = state.items[itemIndex - 1]
-			itemView.nextItem = state.items[itemIndex + 1]
+			itemView.prevItem = self.items[itemIndex - 1]
+			itemView.nextItem = self.items[itemIndex + 1]
 			itemView:draw()
 		end
 	end
@@ -166,19 +154,15 @@ ListView.draw = function(self)
 end
 
 ListView.getItemPosition = function(self, itemIndex)
-	local config = self.config
+	local visualIndex = math.ceil(self.rows / 2) + itemIndex - self.selectedVisualItem
+	local h = self.h / self.rows
 
-	local visualIndex = math.ceil(config.rows / 2) + itemIndex - self.state.selectedVisualItem
-	local h = config.h / config.rows
-
-	return 0, (visualIndex - 1) * h, config.w, h
+	return 0, (visualIndex - 1) * h, self.w, h
 end
 
 ListView.getItemElementPosition = function(self, itemIndex, el)
-	local config = self.config
-	local state = self.state
-	local visualIndex = math.ceil(config.rows / 2) + itemIndex - state.selectedVisualItem
-	local h = config.h / config.rows
+	local visualIndex = math.ceil(self.rows / 2) + itemIndex - self.selectedVisualItem
+	local h = self.h / self.rows
 
 	return el.x, (visualIndex - 1) * h + el.y, el.w, el.h
 end

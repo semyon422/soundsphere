@@ -12,12 +12,9 @@ local function getConfigs(configs)
 	end
 end
 
-local noViews = function() end
-
 SequenceView.construct = function(self)
 	self.views = {}
 	self.sequenceConfig = {}
-	self.states = {}
 
 	self.viewIterator = self:newViewIterator(true)
 	self.loadViewIterator = self:newViewIterator(false)
@@ -27,18 +24,6 @@ end
 
 SequenceView.setSequenceConfig = function(self, config)
 	self.sequenceConfig = config
-	self:createStates(config)
-end
-
-SequenceView.createStates = function(self, config)
-	local states = self.states
-	for _, subConfig in ipairs(config) do
-		if #subConfig == 0 then
-			states[subConfig] = {}
-		else
-			self:createStates(subConfig)
-		end
-	end
 end
 
 SequenceView.clone = function(self)
@@ -53,22 +38,11 @@ SequenceView.setView = function(self, viewClass, view)
 	self.views[viewClass] = view
 end
 
-SequenceView.getView = function(self, config)
-	local state = self.states[config]
-	local view = self.views[config.class]
-	if not view and self.sequenceView then
-		view = self.sequenceView.views[config.class]
-	end
-	if view and state then
-		view.config = config
-		view.state = state
-		view.sequenceView = self
-		return view
-	end
-end
-
-SequenceView.getState = function(self, config)
-	return self.states[config]
+SequenceView.getView = function(self, view)
+	view.sequenceView = self
+	view.game = self.game
+	view.navigator = self.navigator
+	return view
 end
 
 SequenceView.newViewIterator = function(self, skipHidden, stop)
@@ -87,7 +61,7 @@ SequenceView.newViewIterator = function(self, skipHidden, stop)
 				return
 			end
 			local view = self:getView(config)
-			if view and (not skipHidden or not view.state.hidden) then
+			if view and (not skipHidden or not view.hidden) then
 				return view
 			end
 		end
@@ -138,7 +112,7 @@ SequenceView.draw = function(self)
 	end
 	self.iterating = true
 	for view in self.viewIterator do
-		if view.config.beforeDraw then view.config.beforeDraw(view) end
+		if view.beforeDraw then view.beforeDraw(view) end
 		if view.draw then view:draw() end
 		if self.abortViewIterator then break end
 	end

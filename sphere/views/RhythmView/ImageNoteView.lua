@@ -25,7 +25,7 @@ ImageNoteView.draw = function(self)
 		return
 	end
 
-	local tf = transform(self.rhythmView.config.transform)
+	local tf = transform(self.rhythmView.transform)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(self.headView:getColor())

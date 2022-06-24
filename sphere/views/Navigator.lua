@@ -99,10 +99,8 @@ end
 
 Navigator.setHidden = function(self, subscreen, value, other)
 	for view in self.viewIterator do
-		local config = view.config
-		local state = view.state
-		if not other and config.subscreen == subscreen or other and config.subscreen ~= subscreen then
-			state.hidden = value
+		if not other and view.subscreen == subscreen or other and view.subscreen ~= subscreen then
+			view.hidden = value
 		end
 	end
 end

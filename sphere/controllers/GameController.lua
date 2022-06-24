@@ -52,7 +52,6 @@ local InputView = require("sphere.views.InputView")
 local SettingsView = require("sphere.views.SettingsView")
 local ResultView = require("sphere.views.ResultView")
 local GameplayView = require("sphere.views.GameplayView")
-local ErrorView = require("sphere.views.ErrorView")
 
 local GameController = Class:new()
 
@@ -77,7 +76,6 @@ GameController.construct = function(self)
 	self.settingsView = SettingsView:new()
 	self.resultView = ResultView:new()
 	self.gameplayView = GameplayView:new()
-	self.errorView = ErrorView:new()
 
 	self.configModel = ConfigModel:new()
 	self.notificationModel = NotificationModel:new()

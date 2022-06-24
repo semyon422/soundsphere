@@ -8,37 +8,35 @@ local transform = require("aqua.graphics.transform")
 local LogoView = Class:new()
 
 LogoView.draw = function(self)
-	local config = self.config
-
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local font = spherefonts.get(config.text.font)
+	local font = spherefonts.get(self.text.font)
 	love.graphics.setFont(font)
 	baseline_print(
 		"soundsphere",
-		config.text.x,
-		config.text.baseline,
-		config.text.limit,
+		self.text.x,
+		self.text.baseline,
+		self.text.limit,
 		1,
-		config.text.align
+		self.text.align
 	)
 
 	love.graphics.setLineStyle("smooth")
 	love.graphics.setLineWidth(1)
     logo.draw(
         "line",
-		config.image.x,
-		config.image.y,
-		config.image.h
+		self.image.x,
+		self.image.y,
+		self.image.h
     )
     logo.draw(
         "fill",
-		config.image.x,
-		config.image.y,
-		config.image.h
+		self.image.x,
+		self.image.y,
+		self.image.h
     )
 end
 

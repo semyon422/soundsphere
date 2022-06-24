@@ -1,7 +1,5 @@
-local viewspackage = (...):match("^(.-%.views%.)")
-
-local ListItemSliderView = require(viewspackage .. "ListItemSliderView")
-local SliderView = require(viewspackage .. "SliderView")
+local ListItemSliderView = require("sphere.views.ListItemSliderView")
+local SliderView = require("sphere.views.SliderView")
 
 local ModifierListItemSliderView = ListItemSliderView:new({construct = false})
 

@@ -1,7 +1,5 @@
-local viewspackage = (...):match("^(.-%.views%.)")
-
-local ListView = require(viewspackage .. "ListView")
-local ScoreListItemView = require(viewspackage .. "ResultView.ScoreListItemView")
+local ListView = require("sphere.views.ListView")
+local ScoreListItemView = require("sphere.views.ResultView.ScoreListItemView")
 
 local ScoreListView = ListView:new({construct = false})
 
@@ -12,7 +10,7 @@ ScoreListView.construct = function(self)
 end
 
 ScoreListView.reloadItems = function(self)
-	self.state.items = self.game.scoreLibraryModel.items
+	self.items = self.game.scoreLibraryModel.items
 end
 
 ScoreListView.getItemIndex = function(self)

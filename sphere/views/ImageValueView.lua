@@ -5,21 +5,16 @@ local Class = require("aqua.util.Class")
 local ImageValueView = Class:new()
 
 ImageValueView.load = function(self)
-	local config = self.config
-	local state = self.state
-
 	local images = {}
-	for char, path in pairs(config.files) do
+	for char, path in pairs(self.files) do
 		images[char] = love.graphics.newImage(self.root .. "/" .. path)
 	end
-	state.images = images
+	self.images = images
 end
 
 ImageValueView.getDimensions = function(self, value)
-	local config = self.config
-	local state = self.state
-	local images = state.images
-	local overlap = config.overlap or 0
+	local images = self.images
+	local overlap = self.overlap or 0
 
 	local width = 0
 	local height = 0
@@ -38,24 +33,22 @@ ImageValueView.getDimensions = function(self, value)
 end
 
 ImageValueView.draw = function(self)
-	local config = self.config
-	local state = self.state
-	local images = state.images
-	local overlap = config.overlap or 0
+	local images = self.images
+	local overlap = self.overlap or 0
 
-	local tf = transform(config.transform)
+	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local format = config.format
-	local value = config.value or inside(self, config.key)
+	local format = self.format
+	local value = self.value or inside(self, self.key)
 	if value then
 		if type(value) == "function" then
 			value = value(self)
 		end
-		if config.multiplier and tonumber(value) then
-			value = value * config.multiplier
+		if self.multiplier and tonumber(value) then
+			value = value * self.multiplier
 		end
 		if type(format) == "string" then
 			value = format:format(value)
@@ -65,16 +58,16 @@ ImageValueView.draw = function(self)
 	end
 	value = tostring(value)
 
-	local sx = config.scale or config.sx or 1
-	local sy = config.scale or config.sy or 1
-	local oy = config.oy or 0
-	local align = config.align
+	local sx = self.scale or self.sx or 1
+	local sy = self.scale or self.sy or 1
+	local oy = self.oy or 0
+	local align = self.align
 
 	local width, height = self:getDimensions(value)
-	config.width = width
-	config.height = height
+	self.width = width
+	self.height = height
 
-	local x = config.x
+	local x = self.x
 	if align == "center" then
 		x = x - width / 2 * sx
 	elseif align == "right" then
@@ -84,7 +77,7 @@ ImageValueView.draw = function(self)
 		local char = value:sub(i, i)
 		local image = images[char]
 		if image then
-			love.graphics.draw(image, x, config.y + (height * (1 - oy) - image:getHeight()) * sy, 0, sx, sy)
+			love.graphics.draw(image, x, self.y + (height * (1 - oy) - image:getHeight()) * sy, 0, sx, sy)
 			x = x + (image:getWidth() - overlap) * sx
 		end
 	end

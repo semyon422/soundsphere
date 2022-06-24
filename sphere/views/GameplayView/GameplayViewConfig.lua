@@ -1,3 +1,30 @@
+local SequenceView = require("sphere.views.SequenceView")
+local ScrollBarView = require("sphere.views.ScrollBarView")
+local RectangleView = require("sphere.views.RectangleView")
+local CircleView = require("sphere.views.CircleView")
+local LineView = require("sphere.views.LineView")
+local UserInfoView = require("sphere.views.UserInfoView")
+local LogoView = require("sphere.views.LogoView")
+local ScreenMenuView = require("sphere.views.ScreenMenuView")
+local BackgroundView = require("sphere.views.BackgroundView")
+local ValueView = require("sphere.views.ValueView")
+local ImageView = require("sphere.views.ImageView")
+local CameraView = require("sphere.views.CameraView")
+local GaussianBlurView = require("sphere.views.GaussianBlurView")
+local ImageAnimationView = require("sphere.views.ImageAnimationView")
+local ImageValueView = require("sphere.views.ImageValueView")
+
+local RhythmView = require("sphere.views.RhythmView")
+local ProgressView	= require("sphere.views.GameplayView.ProgressView")
+local ImageProgressView	= require("sphere.views.GameplayView.ImageProgressView")
+local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
+local HitErrorView = require("sphere.views.GameplayView.HitErrorView")
+local InputView	= require("sphere.views.GameplayView.InputView")
+local InputAnimationView	= require("sphere.views.GameplayView.InputAnimationView")
+local JudgementView	= require("sphere.views.GameplayView.JudgementView")
+local DeltaTimeJudgementView	= require("sphere.views.GameplayView.DeltaTimeJudgementView")
+local MatchPlayersView	= require("sphere.views.GameplayView.MatchPlayersView")
+
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 local transformFull = {0, 0, 0, {1 / 1920, 0}, {0, 1 / 1080}, 0, 0, 0, 0}
 local topCenter = {{1 / 2, 0}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
@@ -6,13 +33,11 @@ local PlayfieldView = {
 	class = "PlayfieldView"
 }
 
-local BackgroundBlurSwitch = {
-	class = "GaussianBlurView",
+local BackgroundBlurSwitch = GaussianBlurView:new({
 	blur = {key = "game.configModel.configs.settings.graphics.blur.gameplay"}
-}
+})
 
-local Background = {
-	class = "BackgroundView",
+local Background = BackgroundView:new({
 	transform = transform,
 	x = 0,
 	y = 0,
@@ -20,10 +45,9 @@ local Background = {
 	h = 1080,
 	parallax = 0.01,
 	dim = {key = "game.configModel.configs.settings.graphics.dim.gameplay"},
-}
+})
 
-local BottomScreenMenu = {
-	class = "ScreenMenuView",
+local BottomScreenMenu = ScreenMenuView:new({
 	subscreen = "pause",
 	transform = transform,
 	x = 279,
@@ -61,10 +85,9 @@ local BottomScreenMenu = {
 			},
 		}
 	}
-}
+})
 
-local PauseProgressBar = {
-	class = "ProgressView",
+local PauseProgressBar = ProgressView:new({
 	current = {
 		key = "game.rhythmModel.pauseManager.progress",
 	},
@@ -73,10 +96,9 @@ local PauseProgressBar = {
 	transform = transformFull,
 	direction = "left-right",
 	mode = "+"
-}
+})
 
-local PauseText = {
-	class = "ValueView",
+local PauseText = ValueView:new({
 	subscreen = "pause",
 	transform = transformFull,
 	value = "pause",
@@ -89,10 +111,9 @@ local PauseText = {
 		filename = "Noto Sans",
 		size = 40,
 	},
-}
+})
 
-local Notification = {
-	class = "ValueView",
+local Notification = ValueView:new({
 	transform = transform,
 	key = "game.notificationModel.message",
 	color = {1, 1, 1, 1},
@@ -104,10 +125,9 @@ local Notification = {
 		filename = "Noto Sans",
 		size = 24,
 	},
-}
+})
 
-local Failed = {
-	class = "ValueView",
+local Failed = ValueView:new({
 	subscreen = "pause",
 	value = function(self)
 		if self.game.rhythmModel.scoreEngine.scoreSystem.hp.failed then
@@ -123,7 +143,7 @@ local Failed = {
 		size = 240
 	},
 	transform = topCenter
-}
+})
 
 local GameplayViewConfig = {
 	BackgroundBlurSwitch,

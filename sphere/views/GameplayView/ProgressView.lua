@@ -6,14 +6,12 @@ local inside = require("aqua.util.inside")
 local ProgressView = Class:new()
 
 ProgressView.draw = function(self)
-	local config = self.config
-
-	local tf = transform(config.transform)
+	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 
     local x, y, w, h = self:getRectangle()
 
-	love.graphics.setColor(config.color)
+	love.graphics.setColor(self.color)
 	love.graphics.rectangle("fill", x, y, w, h)
 end
 
@@ -34,13 +32,11 @@ ProgressView.getValue = function(self, field)
 end
 
 ProgressView.getRectangle = function(self)
-	local config = self.config
-
-	local direction = config.direction
-	local minTime = self:getValue(config.min) or 0
-	local maxTime = self:getValue(config.max) or 1
-	local startTime = self:getValue(config.start) or 0
-	local currentTime = self:getValue(config.current) or 0
+	local direction = self.direction
+	local minTime = self:getValue(self.min) or 0
+	local maxTime = self:getValue(self.max) or 1
+	local startTime = self:getValue(self.start) or 0
+	local currentTime = self:getValue(self.current) or 0
 
 	local normTime = 1
 	if currentTime < minTime then
@@ -50,9 +46,9 @@ ProgressView.getRectangle = function(self)
 	end
 	local rNormTime = 1 - normTime
 
-	local x0, y0, w0, h0 = config.x, config.y, config.w, config.h
+	local x0, y0, w0, h0 = self.x, self.y, self.w, self.h
 	local x, y, w, h = x0, y0, w0, h0
-	if config.mode == "+" then
+	if self.mode == "+" then
 		if direction == "left-right" then
 			if currentTime < minTime then
 				w = w0 * rNormTime
@@ -82,7 +78,7 @@ ProgressView.getRectangle = function(self)
 				y = y0 + h0 - h
 			end
 		end
-	elseif config.mode == "-" then
+	elseif self.mode == "-" then
 		if direction == "left-right" then
 			if currentTime < minTime then
 				w = w0 * normTime

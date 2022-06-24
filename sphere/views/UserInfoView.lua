@@ -9,88 +9,82 @@ local inside = require("aqua.util.inside")
 local UserInfoView = Class:new()
 
 UserInfoView.load = function(self)
-	local config = self.config
-	local state = self.state
-
-	if not config.file or not love.filesystem.getInfo(config.file) then
+	if not self.file or not love.filesystem.getInfo(self.file) then
 		return
 	end
 
-	state.image = love.graphics.newImage(config.file)
+	self.imageObject = love.graphics.newImage(self.file)
 end
 
 UserInfoView.draw = function(self)
-	local config = self.config
-	local state = self.state
-
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
 	local x, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-	local over = 0 <= x and x <= config.w and 0 <= y and y <= config.h
+	local over = 0 <= x and x <= self.w and 0 <= y and y <= self.h
 
 	local changed, active, hovered = just.button_behavior(self, over)
 	if changed then
-		self.navigator:call(config.action)
+		self.navigator:call(self.action)
 	end
 
-	local font = spherefonts.get(config.text.font)
+	local font = spherefonts.get(self.text.font)
 	love.graphics.setFont(font)
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local username = config.username and inside(self, config.username) or ""
+	local username = self.username and inside(self, self.username) or ""
 	baseline_print(
 		username,
-		config.text.x,
-		config.text.baseline,
-		config.text.limit,
+		self.text.x,
+		self.text.baseline,
+		self.text.limit,
 		1,
-		config.text.align
+		self.text.align
 	)
 
-	local image = state.image
-	if state.image then
+	local imageObject = self.imageObject
+	if self.imageObject then
 		love.graphics.draw(
-			image,
-			config.image.x,
-			config.image.y,
+			imageObject,
+			self.image.x,
+			self.image.y,
 			0,
-			config.image.w / image:getWidth(),
-			config.image.h / image:getHeight()
+			self.image.w / imageObject:getWidth(),
+			self.image.h / imageObject:getHeight()
 		)
 	end
 
 	love.graphics.circle(
 		"line",
-		config.image.x + config.image.w / 2,
-		config.image.y + config.image.h / 2,
-		config.image.h / 2
+		self.image.x + self.image.w / 2,
+		self.image.y + self.image.h / 2,
+		self.image.h / 2
 	)
 	if hovered then
 		local alpha = active and 0.2 or 0.1
 		love.graphics.setColor(1, 1, 1, alpha)
 		love.graphics.circle(
 			"fill",
-			config.image.x + config.image.w / 2,
-			config.image.y + config.image.h / 2,
-			config.image.h / 2
+			self.image.x + self.image.w / 2,
+			self.image.y + self.image.h / 2,
+			self.image.h / 2
 		)
 	end
 
-	local session = config.session and inside(self, config.session)
+	local session = self.session and inside(self, self.session)
 	if session and session.active then
 		love.graphics.setColor(1, 1, 1, 1)
 		love.graphics.circle(
 			"fill",
-			config.marker.x,
-			config.marker.y,
-			config.marker.r
+			self.marker.x,
+			self.marker.y,
+			self.marker.r
 		)
 		love.graphics.circle(
 			"line",
-			config.marker.x,
-			config.marker.y,
-			config.marker.r
+			self.marker.x,
+			self.marker.y,
+			self.marker.r
 		)
 	end
 end

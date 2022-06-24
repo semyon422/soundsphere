@@ -3,6 +3,33 @@ local PlayfieldVsrg = require("sphere.models.NoteSkinModel.PlayfieldVsrg")
 local BasePlayfield = require("sphere.models.NoteSkinModel.BasePlayfield")
 local ImguiConfig = require("sphere.ImguiConfig")
 
+local SequenceView = require("sphere.views.SequenceView")
+local ScrollBarView = require("sphere.views.ScrollBarView")
+local RectangleView = require("sphere.views.RectangleView")
+local CircleView = require("sphere.views.CircleView")
+local LineView = require("sphere.views.LineView")
+local UserInfoView = require("sphere.views.UserInfoView")
+local LogoView = require("sphere.views.LogoView")
+local ScreenMenuView = require("sphere.views.ScreenMenuView")
+local BackgroundView = require("sphere.views.BackgroundView")
+local ValueView = require("sphere.views.ValueView")
+local ImageView = require("sphere.views.ImageView")
+local CameraView = require("sphere.views.CameraView")
+local GaussianBlurView = require("sphere.views.GaussianBlurView")
+local ImageAnimationView = require("sphere.views.ImageAnimationView")
+local ImageValueView = require("sphere.views.ImageValueView")
+
+local RhythmView = require("sphere.views.RhythmView")
+local ProgressView	= require("sphere.views.GameplayView.ProgressView")
+local ImageProgressView	= require("sphere.views.GameplayView.ImageProgressView")
+local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
+local HitErrorView = require("sphere.views.GameplayView.HitErrorView")
+local InputView	= require("sphere.views.GameplayView.InputView")
+local InputAnimationView	= require("sphere.views.GameplayView.InputAnimationView")
+local JudgementView	= require("sphere.views.GameplayView.JudgementView")
+local DeltaTimeJudgementView	= require("sphere.views.GameplayView.DeltaTimeJudgementView")
+local MatchPlayersView	= require("sphere.views.GameplayView.MatchPlayersView")
+
 local OsuNoteSkin = NoteSkinVsrg:new()
 
 local toarray = function(s)
@@ -471,8 +498,7 @@ OsuNoteSkin.addCombo = function(self)
 	if self.upscroll then
 		position = 480 - position
 	end
-	self.playField:addCombo({
-		class = "ImageValueView",
+	self.playField:addCombo(ImageValueView:new({
 		transform = self.playField:newLaneCenterTransform(480),
 		x = 0,
 		y = position,
@@ -481,21 +507,22 @@ OsuNoteSkin.addCombo = function(self)
 		scale = 480 / 768,
 		overlap = tonumber(fonts.ComboOverlap) or 0,
 		files = files,
-	})
+		root = self.directoryPath,
+	}))
 end
 
 OsuNoteSkin.addScore = function(self)
 	local fonts = self.skinini.Fonts
 	local files = self:findCharFiles(fonts.ScorePrefix or "score")
-	self.scoreConfig = {
-		class = "ImageValueView",
+	self.scoreConfig = ImageValueView:new({
 		transform = self.playField:newTransform(1024, 768, "right"),
 		x = 1024,
 		y = 0,
 		align = "right",
 		overlap = tonumber(fonts.ScoreOverlap) or 0,
 		files = files,
-	}
+		root = self.directoryPath,
+	})
 	self.playField:addScore(self.scoreConfig)
 end
 
@@ -503,8 +530,7 @@ OsuNoteSkin.addAccuracy = function(self)
 	local fonts = self.skinini.Fonts
 	local files = self:findCharFiles(fonts.ScorePrefix or "score")
 	local scoreConfig = self.scoreConfig
-	self.playField:addAccuracy({
-		class = "ImageValueView",
+	self.playField:addAccuracy(ImageValueView:new({
 		transform = self.playField:newTransform(1024, 768, "right"),
 		x = 1024,
 		y = 0,
@@ -514,9 +540,10 @@ OsuNoteSkin.addAccuracy = function(self)
 		overlap = tonumber(fonts.ScoreOverlap) or 0,
 		files = files,
 		beforeDraw = function(self)
-			self.config.y = scoreConfig.height
-		end
-	})
+			self.y = scoreConfig.height
+		end,
+		root = self.directoryPath,
+	}))
 end
 
 OsuNoteSkin.getDefaultNoteImages = function(self)
@@ -662,8 +689,7 @@ OsuNoteSkin.addStages = function(self)
 	local playfield = self.playField
 	local stageLeft = self:findImage(mania.StageLeft) or self:findImage("mania-stage-left")
 	if stageLeft then
-		playfield:add({
-			class = "ImageView",
+		playfield:add(ImageView:new({
 			x = self.columns[1] - self.space[1],
 			y = 480,
 			sx = 480 / 768,
@@ -672,13 +698,13 @@ OsuNoteSkin.addStages = function(self)
 			ox = 1,
 			transform = playfield:newNoteskinTransform(),
 			image = stageLeft,
-		})
+			root = self.directoryPath,
+		}))
 	end
 
 	local stageRight = self:findImage(mania.StageRight) or self:findImage("mania-stage-right")
 	if stageRight then
-		playfield:add({
-			class = "ImageView",
+		playfield:add(ImageView:new({
 			x = self.columns[self.inputsCount] + self.width[self.inputsCount] + self.space[self.inputsCount + 1],
 			y = 480,
 			sx = 480 / 768,
@@ -686,13 +712,13 @@ OsuNoteSkin.addStages = function(self)
 			oy = 1,
 			transform = playfield:newNoteskinTransform(),
 			image = stageRight,
-		})
+			root = self.directoryPath,
+		}))
 	end
 
 	local stageHint = self:findImage(mania.StageHint) or self:findImage("mania-stage-hint")
 	if stageHint then
-		playfield:add({
-			class = "ImageView",
+		playfield:add(ImageView:new({
 			x = self.columns[1] - self.space[1],
 			y = self.hitposition,
 			w = self.fullWidth,
@@ -700,13 +726,13 @@ OsuNoteSkin.addStages = function(self)
 			oy = 0.5,
 			transform = playfield:newNoteskinTransform(),
 			image = stageHint,
-		})
+			root = self.directoryPath,
+		}))
 	end
 
 	local stageBottom = self:findImage(mania.StageBottom) or self:findImage("mania-stage-bottom")
 	if stageBottom then
-		playfield:add({
-			class = "ImageView",
+		playfield:add(ImageView:new({
 			x = 0,
 			y = 480,
 			sx = 1,
@@ -715,7 +741,8 @@ OsuNoteSkin.addStages = function(self)
 			ox = 0.5,
 			transform = self.playField:newLaneCenterTransform(480),
 			image = stageBottom,
-		})
+			root = self.directoryPath,
+		}))
 	end
 end
 
@@ -727,8 +754,7 @@ OsuNoteSkin.addHpBar = function(self)
 
 	local scoreBarBg = self:findImage("scorebar-bg")
 	if scoreBarBg then
-		playfield:add({
-			class = "ImageView",
+		playfield:add(ImageView:new({
 			x = right + 1,
 			y = 480,
 			sx = 480 / 768 * 0.7,
@@ -736,7 +762,8 @@ OsuNoteSkin.addHpBar = function(self)
 			r = -math.pi / 2,
 			transform = playfield:newNoteskinTransform(),
 			image = scoreBarBg,
-		})
+			root = self.directoryPath,
+		}))
 	end
 
 	local scoreBar = self:findImage("scorebar-colour")
@@ -750,8 +777,7 @@ OsuNoteSkin.addHpBar = function(self)
 			x = right + 8
 			y = 478
 		end
-		playfield:addHpBar({
-			class = "ImageProgressView",
+		playfield:addHpBar(ImageProgressView:new({
 			x = x,
 			y = y,
 			sx = 480 / 768 * 0.7,
@@ -761,7 +787,7 @@ OsuNoteSkin.addHpBar = function(self)
 			direction = "left-right",
 			mode = "+",
 			image = scoreBar,
-		})
+		}))
 	end
 end
 

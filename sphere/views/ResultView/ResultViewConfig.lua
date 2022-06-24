@@ -1,3 +1,25 @@
+local SequenceView = require("sphere.views.SequenceView")
+local ScrollBarView = require("sphere.views.ScrollBarView")
+local RectangleView = require("sphere.views.RectangleView")
+local CircleView = require("sphere.views.CircleView")
+local LineView = require("sphere.views.LineView")
+local UserInfoView = require("sphere.views.UserInfoView")
+local LogoView = require("sphere.views.LogoView")
+local ScreenMenuView = require("sphere.views.ScreenMenuView")
+local BackgroundView = require("sphere.views.BackgroundView")
+local ValueView = require("sphere.views.ValueView")
+local ImageView = require("sphere.views.ImageView")
+local CameraView = require("sphere.views.CameraView")
+local GaussianBlurView = require("sphere.views.GaussianBlurView")
+local ImageAnimationView = require("sphere.views.ImageAnimationView")
+local ImageValueView = require("sphere.views.ImageValueView")
+
+local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
+local ScoreListView	= require("sphere.views.ResultView.ScoreListView")
+local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
+local StageInfoView = require("sphere.views.SelectView.StageInfoView")
+local MatchPlayersView	= require("sphere.views.GameplayView.MatchPlayersView")
+
 local inspect = require("inspect")
 local rtime = require("aqua.util.rtime")
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
@@ -37,13 +59,11 @@ local showLoadedListScore = function(self)
 	return self.game.rhythmModel.scoreEngine.scoreEntry.id == self.id
 end
 
-local BackgroundBlurSwitch = {
-	class = "GaussianBlurView",
+local BackgroundBlurSwitch = GaussianBlurView:new({
 	blur = {key = "game.configModel.configs.settings.graphics.blur.result"}
-}
+})
 
-local Background = {
-	class = "BackgroundView",
+local Background = BackgroundView:new({
 	transform = transform,
 	x = 0,
 	y = 0,
@@ -51,10 +71,9 @@ local Background = {
 	h = 1080,
 	parallax = 0.01,
 	dim = {key = "game.configModel.configs.settings.graphics.dim.result"},
-}
+})
 
-local Rectangle = {
-	class = "RectangleView",
+local Rectangle = RectangleView:new({
 	transform = transform,
 	rectangles = {
 		{
@@ -70,10 +89,9 @@ local Rectangle = {
 			ry = 0
 		},
 	}
-}
+})
 
-local ComboGraph = {
-	class = "PointGraphView",
+local ComboGraph = PointGraphView:new({
 	transform = transform,
 	x = 279,
 	y = 801,
@@ -94,12 +112,11 @@ local ComboGraph = {
 		return x, y
 	end,
 	show = showLoadedScore
-}
+})
 
 local perfectColor = {1, 1, 1, 1}
 local notPerfectColor = {1, 0.6, 0.4, 1}
-local HitGraph = {
-	class = "PointGraphView",
+local HitGraph = PointGraphView:new({
 	transform = transform,
 	x = 279,
 	y = 801,
@@ -128,10 +145,9 @@ local HitGraph = {
 		return x, y
 	end,
 	show = showLoadedScore
-}
+})
 
-local EarlyLateMissGraph = {
-	class = "PointGraphView",
+local EarlyLateMissGraph = PointGraphView:new({
 	transform = transform,
 	x = 279,
 	y = 801,
@@ -155,10 +171,9 @@ local EarlyLateMissGraph = {
 		return x, y
 	end,
 	show = showLoadedScore
-}
+})
 
-local MissGraph = {
-	class = "PointGraphView",
+local MissGraph = PointGraphView:new({
 	transform = transform,
 	x = 279,
 	y = 801,
@@ -181,10 +196,9 @@ local MissGraph = {
 		return x
 	end,
 	show = showLoadedScore
-}
+})
 
-local HpGraph = {
-	class = "PointGraphView",
+local HpGraph = PointGraphView:new({
 	transform = transform,
 	x = 279,
 	y = 801,
@@ -205,10 +219,9 @@ local HpGraph = {
 		return x, y
 	end,
 	show = showLoadedScore
-}
+})
 
-local ScoreList = {
-	class = "ScoreListView",
+local ScoreList = ScoreListView:new({
 	transform = transform,
 	x = 1187,
 	y = 288,
@@ -380,10 +393,9 @@ local ScoreList = {
 			r = 7
 		},
 	},
-}
+})
 
-local ScoreScrollBar = {
-	class = "ScrollBarView",
+local ScoreScrollBar = ScrollBarView:new({
 	transform = transform,
 	list = ScoreList,
 	x = 1641,
@@ -393,10 +405,9 @@ local ScoreScrollBar = {
 	rows = 11,
 	backgroundColor = {1, 1, 1, 0.33},
 	color = {1, 1, 1, 0.66}
-}
+})
 
-local SongTitleView = {
-	class = "ValueView",
+local SongTitleView = ValueView:new({
 	key = "game.noteChartModel.noteChartDataEntry.title",
 	format = "%s",
 	color = {1, 1, 1, 1},
@@ -409,10 +420,9 @@ local SongTitleView = {
 		size = 24,
 	},
 	transform = transform
-}
+})
 
-local SongArtistView = {
-	class = "ValueView",
+local SongArtistView = ValueView:new({
 	key = "game.noteChartModel.noteChartDataEntry.artist",
 	format = "%s",
 	color = {1, 1, 1, 1},
@@ -425,10 +435,9 @@ local SongArtistView = {
 		size = 16,
 	},
 	transform = transform
-}
+})
 
-local ChartNameView = {
-	class = "ValueView",
+local ChartNameView = ValueView:new({
 	key = "game.noteChartModel.noteChartDataEntry.name",
 	format = "%s",
 	color = {1, 1, 1, 1},
@@ -441,10 +450,9 @@ local ChartNameView = {
 		size = 24,
 	},
 	transform = transform
-}
+})
 
-local ChartCreatorView = {
-	class = "ValueView",
+local ChartCreatorView = ValueView:new({
 	key = "game.noteChartModel.noteChartDataEntry.creator",
 	format = "%s",
 	color = {1, 1, 1, 1},
@@ -457,10 +465,9 @@ local ChartCreatorView = {
 		size = 16,
 	},
 	transform = transform
-}
+})
 
-local ChartInputModeView = {
-	class = "ValueView",
+local ChartInputModeView = ValueView:new({
 	key = "game.noteChartModel.noteChartDataEntry.inputMode",
 	format = "%s",
 	color = {1, 1, 1, 1},
@@ -473,10 +480,9 @@ local ChartInputModeView = {
 		size = 16,
 	},
 	transform = transform
-}
+})
 
-local ChartDifficultyView = {
-	class = "ValueView",
+local ChartDifficultyView = ValueView:new({
 	key = "game.noteChartModel.noteChartDataEntry.difficulty",
 	color = {1, 1, 1, 1},
 	x = 279 + 29,
@@ -489,10 +495,9 @@ local ChartDifficultyView = {
 	},
 	transform = transform,
 	format = formatDifficulty
-}
+})
 
-local StageInfo = {
-	class = "StageInfoView",
+local StageInfo = StageInfoView:new({
 	transform = transform,
 	x = 279,
 	y = 279,
@@ -556,7 +561,7 @@ local StageInfo = {
 			}
 		}
 	}
-}
+})
 
 StageInfo.cells = {
 	{
@@ -816,8 +821,7 @@ StageInfo.cells = {
 	},
 }
 
-local ModifierIconGrid = {
-	class = "ModifierIconGridView",
+local ModifierIconGrid = ModifierIconGridView:new({
 	transform = transform,
 	x = 755,
 	y = 598,
@@ -830,10 +834,9 @@ local ModifierIconGrid = {
 		{"game.modifierModel.config", showLoadedScore},
 		"game.selectModel.scoreItem.modifiers"
 	},
-}
+})
 
-local BottomScreenMenu = {
-	class = "ScreenMenuView",
+local BottomScreenMenu = ScreenMenuView:new({
 	transform = transform,
 	x = 279,
 	y = 991,
@@ -859,10 +862,9 @@ local BottomScreenMenu = {
 			}
 		}
 	}
-}
+})
 
-local BottomRightScreenMenu = {
-	class = "ScreenMenuView",
+local BottomRightScreenMenu = ScreenMenuView:new({
 	transform = transform,
 	x = 1187,
 	y = 991,
@@ -894,10 +896,9 @@ local BottomRightScreenMenu = {
 			},
 		}
 	}
-}
+})
 
-local SessionTime = {
-	class = "ValueView",
+local SessionTime = ValueView:new({
 	transform = transform,
 	value = function()
 		local event = require("aqua.event")
@@ -913,10 +914,9 @@ local SessionTime = {
 		size = 20,
 	},
 	align = "left",
-}
+})
 
-local MatchPlayers = {
-	class = "MatchPlayersView",
+local MatchPlayers = MatchPlayersView:new({
 	transform = transformLeft,
 	key = "game.multiplayerModel.roomUsers",
 	x = 20,
@@ -925,10 +925,9 @@ local MatchPlayers = {
 		filename = "Noto Sans Mono",
 		size = 24
 	},
-}
+})
 
-local InspectScoreSystem = {
-	class = "ValueView",
+local InspectScoreSystem = ValueView:new({
 	subscreen = "scoreSystemDebug",
 	transform = transformLeft,
 	key = "game.rhythmModel.scoreEngine.scoreSystem.slice",
@@ -944,10 +943,9 @@ local InspectScoreSystem = {
 	},
 	align = "left",
 	color = {1, 1, 1, 1}
-}
+})
 
-local InspectCounters = {
-	class = "ValueView",
+local InspectCounters = ValueView:new({
 	subscreen = "countersDebug",
 	transform = transformLeft,
 	key = "game.rhythmModel.scoreEngine.scoreSystem.judgement.counters",
@@ -963,10 +961,9 @@ local InspectCounters = {
 	},
 	align = "left",
 	color = {1, 1, 1, 1}
-}
+})
 
-local InspectScoreEntry = {
-	class = "ValueView",
+local InspectScoreEntry = ValueView:new({
 	subscreen = "scoreEntryDebug",
 	transform = transformLeft,
 	key = "game.selectModel.scoreItem",
@@ -982,7 +979,7 @@ local InspectScoreEntry = {
 	},
 	align = "left",
 	color = {1, 1, 1, 1}
-}
+})
 
 local NoteSkinViewConfig = {
 	BackgroundBlurSwitch,

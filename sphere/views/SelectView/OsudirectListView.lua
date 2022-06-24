@@ -1,6 +1,4 @@
-local viewspackage = (...):match("^(.-%.views%.)")
-
-local ListView = require(viewspackage .. "ListView")
+local ListView = require("sphere.views.ListView")
 local ListItemView = require("sphere.views.ListItemView")
 local OsudirectListItemView = ListItemView:new({construct = false})
 
@@ -13,10 +11,10 @@ OsudirectListView.construct = function(self)
 end
 
 OsudirectListView.reloadItems = function(self)
-	self.state.items = self.game.osudirectModel.items
-	if self.navigator.osudirectItemIndex > #self.state.items then
+	self.items = self.game.osudirectModel.items
+	if self.navigator.osudirectItemIndex > #self.items then
 		self.navigator.osudirectItemIndex = 1
-		self.state.stateCounter = (self.state.stateCounter or 0) + 1
+		self.stateCounter = (self.stateCounter or 0) + 1
 	end
 end
 

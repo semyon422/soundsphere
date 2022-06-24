@@ -1,7 +1,6 @@
-local viewspackage = (...):match("^(.-%.views%.)")
 local ffi = require("ffi")
 
-local Navigator = require(viewspackage .. "Navigator")
+local Navigator = require("sphere.views.Navigator")
 
 local SelectNavigator = Navigator:new({construct = false})
 

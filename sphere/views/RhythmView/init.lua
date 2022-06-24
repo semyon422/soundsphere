@@ -6,36 +6,30 @@ local newPixel = require("aqua.graphics.newPixel")
 local RhythmView = Class:new()
 
 RhythmView.load = function(self)
-	local config = self.config
-	local state = self.state
-
 	local bga = self.game.configModel.configs.settings.gameplay.bga
 
-	state.noteViews = {}
+	self.noteViews = {}
 
 	local noteViewFactory = NoteViewFactory:new()
 	noteViewFactory.videoBgaEnabled = bga.video
 	noteViewFactory.imageBgaEnabled = bga.image
-	if config.mode then
-		noteViewFactory.mode = config.mode
+	if self.mode then
+		noteViewFactory.mode = self.mode
 	end
-	state.noteViewFactory = noteViewFactory
+	self.noteViewFactory = noteViewFactory
 
-	state.textures = {}
-	state.quads = {}
-	state.spriteBatches = {}
+	self.textures = {}
+	self.quads = {}
+	self.spriteBatches = {}
 	self:loadImages()
 end
 
 RhythmView.receive = function(self, event)
-	local config = self.config
-	local state = self.state
-
 	if event.name == "GraphicalNoteState" then
-		local noteViews = state.noteViews
+		local noteViews = self.noteViews
 		local note = event.note
 		if note.activated then
-			local noteView = state.noteViewFactory:getNoteView(note)
+			local noteView = self.noteViewFactory:getNoteView(note)
 			if not noteView then
 				return
 			end
@@ -54,20 +48,16 @@ RhythmView.receive = function(self, event)
 end
 
 RhythmView.update = function(self, dt)
-	local state = self.state
-	for _, noteView in pairs(state.noteViews) do
+	for _, noteView in pairs(self.noteViews) do
 		noteView:update(dt)
 	end
 end
 
 RhythmView.draw = function(self)
-	local config = self.config
-	local state = self.state
-
 	love.graphics.origin()
 	love.graphics.setColor(1, 1, 1, 1)
 	local noteViews = {}
-	for _, noteView in pairs(state.noteViews) do
+	for _, noteView in pairs(self.noteViews) do
 		table.insert(noteViews, noteView)
 	end
 	table.sort(noteViews, function(a, b)
@@ -95,13 +85,13 @@ RhythmView.draw = function(self)
 		noteView:draw()
 	end
 
-	local tf = transform(config.transform)
+	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 
 	local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
 	local blendModes = noteSkin.blendModes
-	for _, spriteBatch in ipairs(state.spriteBatches) do
-		local key = state.spriteBatches[spriteBatch]
+	for _, spriteBatch in ipairs(self.spriteBatches) do
+		local key = self.spriteBatches[spriteBatch]
 		local blendMode = blendModes[key]
 		if blendMode then
 			love.graphics.setBlendMode(blendMode[1], blendMode[2])
@@ -115,11 +105,12 @@ RhythmView.draw = function(self)
 end
 
 RhythmView.loadTexture = function(self, key, path)
-	local state = self.state
-	local textures = state.textures
-	local spriteBatches = state.spriteBatches
+	local textures = self.textures
+	local spriteBatches = self.spriteBatches
 
 	local status, err = pcall(love.graphics.newImage, self.game.rhythmModel.graphicEngine.noteSkin.directoryPath .. "/" .. path)
+	-- async load, use FileManager
+
 	local texture = status and err or newPixel(1, 1, 1, 1)
 	local spriteBatch = love.graphics.newSpriteBatch(texture, 1000)
 
@@ -132,8 +123,6 @@ RhythmView.loadTexture = function(self, key, path)
 end
 
 RhythmView.loadImages = function(self)
-	local state = self.state
-
 	for i, texture in ipairs(self.game.rhythmModel.graphicEngine.noteSkin.textures) do
 		local key, path = next(texture)
 		if type(path) == "string" then
@@ -149,7 +138,7 @@ RhythmView.loadImages = function(self)
 	for imageName, image in pairs(self.game.rhythmModel.graphicEngine.noteSkin.images) do
 		local key, path = next(image[1])
 		if type(path) == "string" then
-			local texture = state.textures[key][path]
+			local texture = self.textures[key][path]
 			local w, h = texture:getDimensions()
 			image[3] = {w, h}
 
@@ -168,9 +157,9 @@ RhythmView.loadImages = function(self)
 					end
 				end
 			end
-			state.quads[imageName] = quad
+			self.quads[imageName] = quad
 		elseif type(path) == "table" then
-			local texture = state.textures[key][path[1]:format(path[2][1])]
+			local texture = self.textures[key][path[1]:format(path[2][1])]
 			local w, h = texture:getDimensions()
 			image[3] = {w, h}
 		end
@@ -183,7 +172,6 @@ RhythmView.getDimensions = function(self, note, part, key, timeState)
 end
 
 RhythmView.getSpriteBatch = function(self, note, part, key, timeState)
-	local state = self.state
 	local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
 	local imageName, frame = noteSkin:get(note, part, key, timeState)
 	local image = noteSkin.images[imageName]
@@ -193,17 +181,16 @@ RhythmView.getSpriteBatch = function(self, note, part, key, timeState)
 	local texture = image[1]
 	local key, path = next(texture)
 	if type(path) == "string" then
-		return state.spriteBatches[key][path]
+		return self.spriteBatches[key][path]
 	elseif type(path) == "table" then
-		return state.spriteBatches[key][path[1]:format(frame)]
+		return self.spriteBatches[key][path[1]:format(frame)]
 	end
 end
 
 RhythmView.getQuad = function(self, note, part, key, timeState)
-	local state = self.state
 	local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
 	local imageName, frame = noteSkin:get(note, part, key, timeState)
-	local quad = state.quads[imageName]
+	local quad = self.quads[imageName]
 	if type(quad) == "table" then
 		return quad[frame]
 	end

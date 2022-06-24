@@ -4,38 +4,33 @@ local transform = require("aqua.graphics.transform")
 local ScrollBarView = Class:new()
 
 ScrollBarView.draw = function(self)
-	local config = self.config
-
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
-	love.graphics.setColor(config.backgroundColor)
+	love.graphics.setColor(self.backgroundColor)
 	love.graphics.rectangle(
 		"fill",
 		0,
 		0,
-		config.w,
-		config.h,
-		config.w / 2,
-		config.w / 2
+		self.w,
+		self.h,
+		self.w / 2,
+		self.w / 2
 	)
 
-	local listViewConfig = config.list
-	local listViewState = self.sequenceView:getState(listViewConfig)
+	local itemCount = #self.list.items
+	local rows = self.list.rows
+	local h = self.w + (self.h - self.w) * rows / (itemCount + rows)
 
-	local itemCount = #listViewState.items
-	local rows = listViewConfig.rows
-	local h = config.w + (config.h - config.w) * rows / (itemCount + rows)
-
-	love.graphics.setColor(config.color)
+	love.graphics.setColor(self.color)
 	love.graphics.rectangle(
 		"fill",
 		0,
-		(config.h - h) * (listViewState.selectedVisualItem - 1) / (itemCount - 1),
-		config.w,
+		(self.h - h) * (self.list.selectedVisualItem - 1) / (itemCount - 1),
+		self.w,
 		h,
-		config.w / 2,
-		config.w / 2
+		self.w / 2,
+		self.w / 2
 	)
 end
 

@@ -8,9 +8,7 @@ local inside = require("aqua.util.inside")
 local BackgroundView = Class:new()
 
 BackgroundView.draw = function(self)
-	local config = self.config
-
-	local dim = config.dim.value or inside(self, config.dim.key)
+	local dim = self.dim.value or inside(self, self.dim.key)
 	if dim == 1 then
 		return
 	end
@@ -20,16 +18,14 @@ end
 
 BackgroundView.drawBackground = function(self)
 	local backgroundModel = self.game.backgroundModel
-	local config = self.config
-
-	-- local tf = transform(config.transform)
+	-- local tf = transform(self.transform)
 	-- love.graphics.replaceTransform(tf)
 	love.graphics.origin()
 
 	local images = backgroundModel.images
 	local alpha = backgroundModel.alpha
 
-	local dim = 1 - (config.dim.value or inside(self, config.dim.key))
+	local dim = 1 - (self.dim.value or inside(self, self.dim.key))
 	local r, g, b = dim, dim, dim
 
 	local mx, my = love.mouse.getPosition()
@@ -49,10 +45,10 @@ BackgroundView.drawBackground = function(self)
 
 		frame_draw(
 			images[i],
-			-map(mx, 0, w, config.parallax, 0) * w,
-			-map(my, 0, h, config.parallax, 0) * h,
-			(1 + 2 * config.parallax) * w,
-			(1 + 2 * config.parallax) * h,
+			-map(mx, 0, w, self.parallax, 0) * w,
+			-map(my, 0, h, self.parallax, 0) * h,
+			(1 + 2 * self.parallax) * w,
+			(1 + 2 * self.parallax) * h,
 			"out"
 		)
 	end

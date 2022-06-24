@@ -1,13 +1,11 @@
-local viewspackage = (...):match("^(.-%.views%.)")
-
 local transform = require("aqua.graphics.transform")
-local ListView = require(viewspackage .. "ListView")
-local ModifierListItemSwitchView = require(viewspackage .. "ModifierView.ModifierListItemSwitchView")
-local ModifierListItemSliderView = require(viewspackage .. "ModifierView.ModifierListItemSliderView")
-local ModifierListItemStepperView = require(viewspackage .. "ModifierView.ModifierListItemStepperView")
-local Slider = require(viewspackage .. "Slider")
-local Switch = require(viewspackage .. "Switch")
-local Stepper = require(viewspackage .. "Stepper")
+local ListView = require("sphere.views.ListView")
+local ModifierListItemSwitchView = require("sphere.views.ModifierView.ModifierListItemSwitchView")
+local ModifierListItemSliderView = require("sphere.views.ModifierView.ModifierListItemSliderView")
+local ModifierListItemStepperView = require("sphere.views.ModifierView.ModifierListItemStepperView")
+local Slider = require("sphere.views.Slider")
+local Switch = require("sphere.views.Switch")
+local Stepper = require("sphere.views.Stepper")
 
 local ModifierListView = ListView:new({construct = false})
 
@@ -21,14 +19,14 @@ ModifierListView.construct = function(self)
 	self.itemSliderView.listView = self
 	self.itemStepperView.listView = self
 
-	self.slider = Slider:new()
-	self.switch = Switch:new()
-	self.stepper = Stepper:new()
+	self.sliderObject = Slider:new()
+	self.switchObject = Switch:new()
+	self.stepperObject = Stepper:new()
 end
 
 ModifierListView.load = function(self)
 	ListView.load(self)
-	self.state.activeItem = self.state.selectedItem
+	self.activeItem = self.selectedItem
 end
 
 ModifierListView.getItemView = function(self, modifierConfig)
@@ -43,7 +41,7 @@ ModifierListView.getItemView = function(self, modifierConfig)
 end
 
 ModifierListView.reloadItems = function(self)
-	self.state.items = self.game.modifierModel.config
+	self.items = self.game.modifierModel.config
 end
 
 ModifierListView.getItemIndex = function(self)
@@ -68,15 +66,13 @@ ModifierListView.receive = function(self, event)
 end
 
 ModifierListView.wheelmoved = function(self, event)
-	local config = self.config
-
-	local tf = transform(config.transform)
+	local tf = transform(self.transform)
 	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
 
-	local sx = config.x + config.scroll.x
-	local sy = config.y + config.scroll.y
-	local sw = config.scroll.w
-	local sh = config.scroll.h
+	local sx = self.x + self.scroll.x
+	local sy = self.y + self.scroll.y
+	local sw = self.scroll.w
+	local sh = self.scroll.h
 
 	if mx >= sx and mx < sx + sw and my >= sy and my < sy + sh then
 		local wy = event[2]
@@ -88,10 +84,10 @@ ModifierListView.wheelmoved = function(self, event)
 		return
 	end
 
-	local x = config.x
-	local y = config.y
-	local w = config.w
-	local h = config.h
+	local x = self.x
+	local y = self.y
+	local w = self.w
+	local h = self.h
 
 	if mx >= x and mx < x + w and my >= y and my < y + h then
 		self:receiveItems(event)

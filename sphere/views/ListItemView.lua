@@ -10,7 +10,7 @@ local Class = require("aqua.util.Class")
 local ListItemView = Class:new()
 
 ListItemView.draw = function(self)
-	local config = self.listView.config
+	local config = self.listView
 
 	local tf = transform(config.transform):translate(config.x, config.y)
 	love.graphics.replaceTransform(tf)
@@ -41,7 +41,7 @@ ListItemView.drawElements = function(self, elements)
 end
 
 ListItemView.drawValue = function(self, valueConfig, value)
-	local config = self.listView.config
+	local config = self.listView
 
 	if type(value) == "function" then
 		value = value(self.listView, self.item)
@@ -75,7 +75,7 @@ end
 ListItemView.drawCircle = function(self, valueConfig, value)
 	if not value then return end
 
-	local config = self.listView.config
+	local config = self.listView
 
 	local y = (self.visualIndex - 1) * config.h / config.rows
 
@@ -100,7 +100,7 @@ end
 
 ListItemView.receive = function(self, event)
 	local listView = self.listView
-	local config = self.listView.config
+	local config = self.listView
 
 	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
 

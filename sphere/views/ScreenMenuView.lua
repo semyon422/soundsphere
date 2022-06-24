@@ -1,7 +1,5 @@
-local viewspackage = (...):match("^(.-%.views%.)")
-
 local Class = require("aqua.util.Class")
-local ScreenMenuItemView = require(viewspackage .. "ScreenMenuItemView")
+local ScreenMenuItemView = require("sphere.views.ScreenMenuItemView")
 
 local ScreenMenuView = Class:new()
 
@@ -11,14 +9,13 @@ ScreenMenuView.construct = function(self)
 end
 
 ScreenMenuView.load = function(self)
-	self.state.selectedItem = 1
+	self.selectedItem = 1
 end
 
 ScreenMenuView.draw = function(self)
-	local config = self.config
-	local items = config.items
-	for i = 1, self.config.rows do
-		for j = 1, self.config.columns do
+	local items = self.items
+	for i = 1, self.rows do
+		for j = 1, self.columns do
 			local item = items[i] and items[i][j]
 			if item and item.displayName then
 				local itemView = self.itemView
@@ -26,9 +23,6 @@ ScreenMenuView.draw = function(self)
 				itemView.column = j
 				itemView.item = item
 				itemView:draw()
-				if config ~= self.config then
-					return
-				end
 			end
 		end
 	end

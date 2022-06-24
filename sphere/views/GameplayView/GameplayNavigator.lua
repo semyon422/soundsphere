@@ -1,6 +1,4 @@
-local viewspackage = (...):match("^(.-%.views%.)")
-
-local Navigator = require(viewspackage .. "Navigator")
+local Navigator = require("sphere.views.Navigator")
 
 local GameplayNavigator = Navigator:new({construct = false})
 

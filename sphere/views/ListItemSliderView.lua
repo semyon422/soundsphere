@@ -1,7 +1,5 @@
-local viewspackage = (...):match("^(.-%.views%.)")
-
-local ListItemView = require(viewspackage .. "ListItemView")
-local SliderView = require(viewspackage .. "SliderView")
+local ListItemView = require("sphere.views.ListItemView")
+local SliderView = require("sphere.views.SliderView")
 local transform = require("aqua.graphics.transform")
 
 local ListItemSliderView = ListItemView:new({construct = false})
@@ -21,7 +19,7 @@ ListItemSliderView.increaseValue = function(self, delta) end
 ListItemSliderView.draw = function(self)
 	ListItemView.draw(self)
 
-	local config = self.listView.config
+	local config = self.listView
 	self:drawValue(config.name, self:getName())
 	self:drawValue(config.slider.value, self:getDisplayValue())
 
@@ -43,8 +41,8 @@ ListItemSliderView.receive = function(self, event)
 		return
 	end
 
-	local config = listView.config
-	local slider = listView.slider
+	local config = listView
+	local slider = listView.sliderObject
 	local tf = transform(config.transform):translate(config.x, config.y)
 	slider:setTransform(tf)
 	slider:setPosition(listView:getItemElementPosition(self.itemIndex, config.slider))
@@ -58,7 +56,7 @@ ListItemSliderView.receive = function(self, event)
 end
 
 ListItemSliderView.wheelmoved = function(self, event)
-	local config = self.listView.config
+	local config = self.listView
 
 	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
 	local tf = transform(config.transform):translate(config.x, config.y)

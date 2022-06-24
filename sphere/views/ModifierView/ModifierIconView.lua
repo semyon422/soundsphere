@@ -26,33 +26,29 @@ ModifierIconView.font = {
 }
 
 ModifierIconView.draw = function(self)
-	local config = self.config
-
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
 	love.graphics.setLineStyle("smooth")
-	love.graphics.setLineWidth(config.size / 32)
+	love.graphics.setLineWidth(self.size / 32)
 
-	self:drawSquareBorder(self.shapes[config.shape] or self.shapes.allArcs)
-	if config.modifierSubString then
-		self:drawText(self.lines.two, config.modifierString, config.modifierSubString)
+	self:drawSquareBorder(self.shapes[self.shape] or self.shapes.allArcs)
+	if self.modifierSubString then
+		self:drawText(self.lines.two, self.modifierString, self.modifierSubString)
 	else
-		self:drawText(self.lines.one, config.modifierString)
+		self:drawText(self.lines.one, self.modifierString)
 	end
 end
 
 ModifierIconView.drawText = function(self, lines, topText, bottomText)
-	local config = self.config
-
-	local tf = transform(config.transform):translate(config.x, config.y)
+	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
-	local fx = config.size / 8
-	local fy = config.size / 8
-	local fs = config.size * 3 / 4
+	local fx = self.size / 8
+	local fy = self.size / 8
+	local fs = self.size * 3 / 4
 	local fr = fs / 4
 
 	local font = spherefonts.get(self.font)
@@ -66,19 +62,17 @@ ModifierIconView.drawText = function(self, lines, topText, bottomText)
 end
 
 ModifierIconView.drawSquareBorder = function(self, shape)
-	local config = self.config
-
-	local tf = transform(config.transform)
+	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
-	love.graphics.translate(config.x, config.y)
+	love.graphics.translate(self.x, self.y)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	love.graphics.setLineStyle("smooth")
-	love.graphics.setLineWidth(config.size / 40)
+	love.graphics.setLineWidth(self.size / 40)
 
-	local fx = config.size / 8
-	local fy = config.size / 8
-	local fs = config.size * 3 / 4
+	local fx = self.size / 8
+	local fy = self.size / 8
+	local fs = self.size * 3 / 4
 	local fr = fs / 4
 
 	local fr1 = shape[5] and fs * shape[5] or fr

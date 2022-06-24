@@ -17,7 +17,7 @@ ScoreListItemView.draw = function(self)
 end
 
 ScoreListItemView.receive = function(self, event)
-	local config = self.listView.config
+	local config = self.listView
 
 	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
 	local tf = transform(config.transform):translate(config.x, config.y)
