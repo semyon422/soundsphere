@@ -1,5 +1,4 @@
 local ListItemView = require("sphere.views.ListItemView")
-local ListItemSliderView = require("sphere.views.ListItemSliderView")
 local SwitchView = require("sphere.views.SwitchView")
 local just = require("just")
 
@@ -26,33 +25,19 @@ ListItemSwitchView.draw = function(self)
 	love.graphics.translate(x, y)
 
 	local value = self:getValue()
+	local over = switchView:isOver(w, h)
 
-	local changed, active, hovered = just.button_behavior(self.item, switchView:isOver(w, h))
+	local scrolled, delta = just.wheel_behavior(self.item, over)
+	local changed, active, hovered = just.button_behavior(self.item, over)
 	if changed then
 		value = not value
 		self:setValue(value)
+	elseif delta ~= 0 then
+		self:setValue(delta == 1)
 	end
 	switchView:draw(w, h, value)
 
 	love.graphics.pop()
 end
-
-ListItemSwitchView.receive = function(self, event)
-	ListItemView.receive(self, event)
-
-	if event.name == "wheelmoved" then
-		return self:wheelmoved(event)
-	end
-end
-
-ListItemSwitchView.increaseValue = function(self, delta)
-	if delta == 1 then
-		self:setValue(true)
-	elseif delta == -1 then
-		self:setValue(false)
-	end
-end
-
-ListItemSwitchView.wheelmoved = ListItemSliderView.wheelmoved
 
 return ListItemSwitchView

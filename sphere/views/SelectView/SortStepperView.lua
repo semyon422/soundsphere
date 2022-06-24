@@ -68,39 +68,18 @@ SortStepperView.draw = function(self)
 
 	local overAll, overLeft, overRight = stepperView:isOver(w, h)
 
-	local changedLeft = just.button_behavior(tostring(self.item) .. "L", overLeft)
-	local changedRight = just.button_behavior(tostring(self.item) .. "R", overRight)
-	if changedLeft then
-		value = math.max(value - 1, 1)
-		self:updateIndexValue(value)
-	elseif changedRight then
-		value = math.min(value + 1, count)
-		self:updateIndexValue(value)
-	end
-	stepperView:draw(w, h, value, count)
-end
+	local id = tostring(self.item)
+	local scrolled, delta = just.wheel_behavior(id .. "A", overAll)
+	local changedLeft = just.button_behavior(id .. "L", overLeft)
+	local changedRight = just.button_behavior(id .. "R", overRight)
 
-SortStepperView.receive = function(self, event)
-	if event.name == "wheelmoved" then
-		return self:wheelmoved(event)
-	end
-end
-
-SortStepperView.wheelmoved = function(self, event)
-	local x, y, w, h = self.x, self.y, self.w, self.h
-	local tf = transform(self.transform)
-	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
-
-	if not (mx >= x and mx <= x + w and my >= y and my <= y + h) then
-		return
-	end
-
-	local wy = event[2]
-	if wy == 1 then
-		self:increaseValue(1)
-	elseif wy == -1 then
+	if changedLeft or delta == -1 then
 		self:increaseValue(-1)
+	elseif changedRight or delta == 1 then
+		self:increaseValue(1)
 	end
+
+	stepperView:draw(w, h, value, count)
 end
 
 return SortStepperView
