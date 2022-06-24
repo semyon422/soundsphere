@@ -24,10 +24,9 @@ DeltaTimeJudgementView.update = function(self)
 		return
 	end
 
-	for _, viewConfig in ipairs(self.judgements) do
-		if type(viewConfig) ~= "number" then
-			local view = self.sequenceView:getView(viewConfig)
-			if viewConfig == judgement then
+	for _, view in ipairs(self.judgements) do
+		if type(view) ~= "number" then
+			if view == judgement then
 				view:setTime(0)
 			else
 				view:setTime(math.huge)

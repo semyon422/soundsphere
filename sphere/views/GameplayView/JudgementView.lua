@@ -28,8 +28,7 @@ JudgementView.update = function(self, dt)
 	if not judgement then
 		return
 	end
-	for name, viewConfig in pairs(self.judgements) do
-		local view = self.sequenceView:getView(viewConfig)
+	for name, view in pairs(self.judgements) do
 		if name == judgement then
 			view:setTime(0)
 		else

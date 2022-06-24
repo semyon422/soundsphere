@@ -8,7 +8,6 @@ Navigator.construct = function(self)
 end
 
 Navigator.load = function(self)
-	self.viewIterator = self.sequenceView.loadViewIterator
 	self.subscreens = {}
 	self:setHidden(nil, true, true)
 end
@@ -98,7 +97,7 @@ Navigator.switchSubscreen = function(self, subscreen)
 end
 
 Navigator.setHidden = function(self, subscreen, value, other)
-	for view in self.viewIterator do
+	for _, view in ipairs(self.sequenceView.views) do
 		if not other and view.subscreen == subscreen or other and view.subscreen ~= subscreen then
 			view.hidden = value
 		end

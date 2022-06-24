@@ -2,80 +2,42 @@ local Class = require("aqua.util.Class")
 
 local SequenceView = Class:new()
 
-local function getConfigs(configs)
-	for _, config in ipairs(configs) do
-		if #config == 0 then
-			coroutine.yield(config)
+local function getViews(views, out)
+	out = out or {}
+	for _, view in ipairs(views) do
+		if #view == 0 then
+			table.insert(out, view)
 		else
-			getConfigs(config)
+			getViews(view, out)
 		end
 	end
+	return out
 end
 
 SequenceView.construct = function(self)
 	self.views = {}
-	self.sequenceConfig = {}
-
-	self.viewIterator = self:newViewIterator(true)
-	self.loadViewIterator = self:newViewIterator(false)
-
-	self.abortViewIterator = false
+	self.abortIterating = false
 end
 
 SequenceView.setSequenceConfig = function(self, config)
-	self.sequenceConfig = config
-end
-
-SequenceView.clone = function(self)
-	local sequenceView = SequenceView:new()
-	for viewClass, view in pairs(self.views) do
-		sequenceView:setView(viewClass, view)
-	end
-	return sequenceView
-end
-
-SequenceView.setView = function(self, viewClass, view)
-	self.views[viewClass] = view
-end
-
-SequenceView.getView = function(self, view)
-	view.sequenceView = self
-	view.game = self.game
-	view.navigator = self.navigator
-	return view
-end
-
-SequenceView.newViewIterator = function(self, skipHidden, stop)
-	local co = coroutine.create(function()
-		while true do
-			getConfigs(self.sequenceConfig)
-			coroutine.yield()
-		end
-	end)
-
-	return function()
-		while true do
-			local _, config = coroutine.resume(co)
-			if not config then
-				if stop then stop() end
-				return
-			end
-			local view = self:getView(config)
-			if view and (not skipHidden or not view.hidden) then
-				return view
-			end
-		end
+	self.views = getViews(config)
+	for _, view in ipairs(self.views) do
+		view.sequenceView = self
+		view.game = self.game
+		view.navigator = self.navigator
 	end
 end
 
 SequenceView.load = function(self)
-	for view in self.loadViewIterator do
+	self.abortIterating = true
+	for _, view in ipairs(self.views) do
 		if view.load then view:load() end
 	end
 end
 
 SequenceView.unload = function(self)
-	for view in self.loadViewIterator do
+	self.abortIterating = true
+	for _, view in ipairs(self.views) do
 		if view.unload then view:unload() end
 	end
 end
@@ -85,11 +47,11 @@ SequenceView.receive = function(self, event)
 		return
 	end
 	self.iterating = true
-	for view in self.viewIterator do
-		if view.receive then view:receive(event) end
-		if self.abortViewIterator then break end
+	for _, view in ipairs(self.views) do
+		if view.receive and not view.hidden then view:receive(event) end
+		if self.abortIterating then break end
 	end
-	self.abortViewIterator = false
+	self.abortIterating = false
 	self.iterating = false
 end
 
@@ -98,11 +60,11 @@ SequenceView.update = function(self, dt)
 		return
 	end
 	self.iterating = true
-	for view in self.viewIterator do
-		if view.update then view:update(dt) end
-		if self.abortViewIterator then break end
+	for _, view in ipairs(self.views) do
+		if view.update and not view.hidden then view:update(dt) end
+		if self.abortIterating then break end
 	end
-	self.abortViewIterator = false
+	self.abortIterating = false
 	self.iterating = false
 end
 
@@ -111,12 +73,12 @@ SequenceView.draw = function(self)
 		return
 	end
 	self.iterating = true
-	for view in self.viewIterator do
-		if view.beforeDraw then view.beforeDraw(view) end
-		if view.draw then view:draw() end
-		if self.abortViewIterator then break end
+	for _, view in ipairs(self.views) do
+		if view.beforeDraw and not view.hidden then view:beforeDraw() end
+		if view.draw and not view.hidden then view:draw() end
+		if self.abortIterating then break end
 	end
-	self.abortViewIterator = false
+	self.abortIterating = false
 	self.iterating = false
 end
 
