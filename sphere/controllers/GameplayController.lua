@@ -1,6 +1,7 @@
 local Class						= require("aqua.util.Class")
 local sound						= require("aqua.sound")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
+local FileFinder	= require("sphere.filesystem.FileFinder")
 
 local GameplayController = Class:new()
 
@@ -20,6 +21,8 @@ GameplayController.load = function(self)
 
 	self.game.modifierModel.noteChart = noteChart
 
+	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
+
 	local noteChartDataEntry = noteChartModel.noteChartDataEntry
 	local localOffset = noteChartDataEntry.localOffset or 0
 
@@ -34,7 +37,7 @@ GameplayController.load = function(self)
 	rhythmModel:setPauseTimes(config.gameplay.time)
 	rhythmModel:setInputBindings(inputModel:getInputBindings())
 	rhythmModel:setNoteChart(noteChart)
-	rhythmModel:setNoteSkin(noteSkinModel:getNoteSkin(noteChart.inputMode))
+	rhythmModel:setNoteSkin(noteSkin)
 	rhythmModel.inputManager:setInputMode(noteChart.inputMode:getString())
 
 	rhythmModel:load()
@@ -66,6 +69,12 @@ GameplayController.load = function(self)
 	end
 	rhythmModel:setInputOffset(inputOffset)
 	rhythmModel:setVisualOffset(visualOffset)
+
+	FileFinder:reset()
+	FileFinder:addPath(noteChartModel.noteChartEntry.path:match("^(.+)/.-$"))
+	FileFinder:addPath(noteSkin.directoryPath)
+	FileFinder:addPath("userdata/hitsounds")
+	FileFinder:addPath("userdata/hitsounds/midi")
 
 	sound.sample_gain = config.audio.sampleGain
 	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChart, function()

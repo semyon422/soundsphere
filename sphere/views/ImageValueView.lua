@@ -1,5 +1,6 @@
 local transform = require("aqua.graphics.transform")
 local inside = require("aqua.util.inside")
+local FileFinder = require("sphere.filesystem.FileFinder")
 local Class = require("aqua.util.Class")
 
 local ImageValueView = Class:new()
@@ -7,7 +8,7 @@ local ImageValueView = Class:new()
 ImageValueView.load = function(self)
 	local images = {}
 	for char, path in pairs(self.files) do
-		images[char] = love.graphics.newImage(self.root .. "/" .. path)
+		images[char] = love.graphics.newImage(FileFinder:findFile(path))
 	end
 	self.images = images
 end

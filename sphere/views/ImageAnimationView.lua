@@ -1,10 +1,9 @@
 local transform = require("aqua.graphics.transform")
+local FileFinder = require("sphere.filesystem.FileFinder")
 local Class = require("aqua.util.Class")
 local Animation = require("aqua.util.Animation")
 
 local ImageAnimationView = Class:new()
-
-ImageAnimationView.root = "."
 
 ImageAnimationView.load = function(self)
 	local animation = Animation:new()
@@ -24,17 +23,17 @@ ImageAnimationView.loadImages = function(self)
 	local images = {}
 	local range = self.range
 	if not range then
-		images[0] = love.graphics.newImage(self.root .. "/" .. self.image)
+		images[0] = love.graphics.newImage(FileFinder:findFile(self.image))
 	else
 		for i = range[1], range[2], range[1] < range[2] and 1 or -1 do
-			images[i] = love.graphics.newImage(self.root .. "/" .. self.image:format(i))
+			images[i] = love.graphics.newImage(FileFinder:findFile(self.image:format(i)))
 		end
 	end
 	self.images = images
 end
 
 ImageAnimationView.loadQuads = function(self)
-	local image = love.graphics.newImage(self.root .. "/" .. self.image)
+	local image = love.graphics.newImage(FileFinder:findFile(self.image))
 	local w, h = image:getDimensions()
 	self.image = image
 

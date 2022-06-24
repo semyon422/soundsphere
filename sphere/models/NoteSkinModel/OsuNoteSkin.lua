@@ -507,7 +507,6 @@ OsuNoteSkin.addCombo = function(self)
 		scale = 480 / 768,
 		overlap = tonumber(fonts.ComboOverlap) or 0,
 		files = files,
-		root = self.directoryPath,
 	}))
 end
 
@@ -521,7 +520,6 @@ OsuNoteSkin.addScore = function(self)
 		align = "right",
 		overlap = tonumber(fonts.ScoreOverlap) or 0,
 		files = files,
-		root = self.directoryPath,
 	})
 	self.playField:addScore(self.scoreConfig)
 end
@@ -542,7 +540,6 @@ OsuNoteSkin.addAccuracy = function(self)
 		beforeDraw = function(self)
 			self.y = scoreConfig.height
 		end,
-		root = self.directoryPath,
 	}))
 end
 
@@ -698,7 +695,6 @@ OsuNoteSkin.addStages = function(self)
 			ox = 1,
 			transform = playfield:newNoteskinTransform(),
 			image = stageLeft,
-			root = self.directoryPath,
 		}))
 	end
 
@@ -712,7 +708,6 @@ OsuNoteSkin.addStages = function(self)
 			oy = 1,
 			transform = playfield:newNoteskinTransform(),
 			image = stageRight,
-			root = self.directoryPath,
 		}))
 	end
 
@@ -726,7 +721,6 @@ OsuNoteSkin.addStages = function(self)
 			oy = 0.5,
 			transform = playfield:newNoteskinTransform(),
 			image = stageHint,
-			root = self.directoryPath,
 		}))
 	end
 
@@ -741,7 +735,6 @@ OsuNoteSkin.addStages = function(self)
 			ox = 0.5,
 			transform = self.playField:newLaneCenterTransform(480),
 			image = stageBottom,
-			root = self.directoryPath,
 		}))
 	end
 end
@@ -762,7 +755,6 @@ OsuNoteSkin.addHpBar = function(self)
 			r = -math.pi / 2,
 			transform = playfield:newNoteskinTransform(),
 			image = scoreBarBg,
-			root = self.directoryPath,
 		}))
 	end
 

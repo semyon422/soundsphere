@@ -205,7 +205,6 @@ PlayfieldVsrg.addJudgement = function(self, object)
 			range = judgement[3],
 			quad = judgement[4],
 			rate = judgement.rate or object.rate,
-			root = self.noteskin.directoryPath,
 		})
 		judgements[judgement[1]] = config
 		self:add(config)
@@ -240,7 +239,6 @@ PlayfieldVsrg.addDeltaTimeJudgement = function(self, object)
 				range = judgement[2],
 				quad = judgement[3],
 				rate = judgement.rate or object.rate,
-				root = self.noteskin.directoryPath,
 			})
 			judgements[i] = config
 			self:add(config)
@@ -271,7 +269,6 @@ PlayfieldVsrg.addKeyImages = function(self, object)
 				oy = 1,
 				transform = object.transform,
 				image = object.pressed[i],
-				root = self.noteskin.directoryPath,
 			})
 		end
 		if object.released and object.released[i] then
@@ -284,7 +281,6 @@ PlayfieldVsrg.addKeyImages = function(self, object)
 				oy = 1,
 				transform = object.transform,
 				image = object.released[i],
-				root = self.noteskin.directoryPath,
 			})
 		end
 		local inputType, inputIndex = noteskin.inputs[i]:match("^(.-)(%d+)$")
@@ -315,7 +311,6 @@ PlayfieldVsrg.addStaticKeyImages = function(self, object)
 				oy = 1,
 				transform = object.transform,
 				image = object.image[i],
-				root = self.noteskin.directoryPath,
 			})
 			self:add(image)
 		end
@@ -342,7 +337,6 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 				range = object.pressed[i][2],
 				quad = object.pressed[i][3],
 				rate = object.rate,
-				root = self.noteskin.directoryPath,
 			})
 		end
 		if object.hold and object.hold[i] then
@@ -358,7 +352,6 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 				range = object.hold[i][2],
 				quad = object.hold[i][3],
 				rate = object.rate,
-				root = self.noteskin.directoryPath,
 			})
 		end
 		if object.released and object.released[i] then
@@ -374,7 +367,6 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 				range = object.released[i][2],
 				quad = object.released[i][3],
 				rate = object.rate,
-				root = self.noteskin.directoryPath,
 			})
 		end
 		local inputType, inputIndex = noteskin.inputs[i]:match("^(.-)(%d+)$")
@@ -468,7 +460,6 @@ PlayfieldVsrg.addGuidelines = function(self, object)
 				transform = object.transform,
 				image = object.image[i],
 				color = color,
-				root = self.noteskin.directoryPath,
 			})
 			self:add(view)
 		end

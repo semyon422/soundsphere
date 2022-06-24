@@ -1,15 +1,15 @@
 
 local transform = require("aqua.graphics.transform")
 local newPixel = require("aqua.graphics.newPixel")
+local FileFinder = require("sphere.filesystem.FileFinder")
 local Class = require("aqua.util.Class")
 
 local ImageView = Class:new()
 
-ImageView.root = "."
-
 ImageView.load = function(self)
-	if self.image then
-		self.imageObject = love.graphics.newImage(self.root .. "/" .. self.image)
+	local path = FileFinder:findFile(self.image)
+	if path then
+		self.imageObject = love.graphics.newImage(path)
 	else
 		self.imageObject = newPixel()
 	end

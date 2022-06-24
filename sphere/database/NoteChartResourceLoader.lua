@@ -7,7 +7,6 @@ local array_update = require("aqua.util.array_update")
 
 local NoteChartResourceLoader = {}
 
-NoteChartResourceLoader.hitSoundsPath = "userdata/hitsounds"
 NoteChartResourceLoader.sample_gain = 0
 NoteChartResourceLoader.aliases = {}
 NoteChartResourceLoader.resources = {}
@@ -25,7 +24,6 @@ for t, list in pairs(NoteChartTypes) do
 end
 
 NoteChartResourceLoader.load = function(self, path, noteChart, callback)
-	local directoryPath = path:match("^(.+)/.-$")
 	local noteChartType = NoteChartTypeMap[noteChart.type]
 
 	if self.sample_gain ~= sound.sample_gain then
@@ -37,15 +35,11 @@ NoteChartResourceLoader.load = function(self, path, noteChart, callback)
 	self.noteChart = noteChart
 	self.callback = callback
 
-	FileFinder:reset()
 	if noteChartType == "bms" then
-		FileFinder:addPath(directoryPath, 2)
-		FileFinder:addPath(self.hitSoundsPath, 1)
 		self:loadBMS()
 	elseif noteChartType == "o2jam" then
 		self:loadOJM()
 	elseif noteChartType == "midi" then
-		FileFinder:addPath(self.hitSoundsPath .. "/midi", 1)
 		self:loadBMS()
 	end
 end
@@ -65,7 +59,7 @@ NoteChartResourceLoader.loadBMS = function(self)
 	local newResources = {}
 	for resourceType, name, sequence in self.noteChart:getResourceIterator() do
 		for _, path in ipairs(sequence) do
-			local filePath, fileType = FileFinder:findFile(path)
+			local filePath = FileFinder:findFile(path)
 			if filePath then
 				table.insert(newResources, filePath)
 				self.aliases[name] = filePath

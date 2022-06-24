@@ -11,9 +11,9 @@ ImageProgressView.getValue = ProgressView.getValue
 ImageProgressView.load = function(self)
 	ImageView.load(self)
 
-	self.w, self.h = self.image:getDimensions()
+	self.w, self.h = self.imageObject:getDimensions()
 	local rx, ry, rw, rh = self:getRectangle()
-	self.quad = love.graphics.newQuad(rx - config.x, ry - config.y, rw, rh, self.image)
+	self.quad = love.graphics.newQuad(rx - self.x, ry - self.y, rw, rh, self.imageObject)
 end
 
 ImageProgressView.draw = function(self)
@@ -36,10 +36,10 @@ ImageProgressView.draw = function(self)
 
 	local rx, ry, rw, rh = self:getRectangle()
 	local quad = self.quad
-	quad:setViewport(rx - self.x, ry - self.y, rw, rh, self.image:getDimensions())
+	quad:setViewport(rx - self.x, ry - self.y, rw, rh, self.imageObject:getDimensions())
 
 	love.graphics.draw(
-		self.image,
+		self.imageObject,
 		quad,
 		rx,
 		ry,
