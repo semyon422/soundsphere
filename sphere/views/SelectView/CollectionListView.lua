@@ -1,11 +1,11 @@
 local ListView = require("sphere.views.ListView")
-local CollectionListItemView = require("sphere.views.SelectView.CollectionListItemView")
+local ListItemView = require("sphere.views.ListItemView")
 
 local CollectionListView = ListView:new({construct = false})
 
 CollectionListView.construct = function(self)
 	ListView.construct(self)
-	self.itemView = CollectionListItemView:new()
+	self.itemView = ListItemView:new()
 	self.itemView.listView = self
 end
 

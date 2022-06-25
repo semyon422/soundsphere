@@ -25,6 +25,7 @@ end
 ResultView.reload = function(self)
 	ScreenView.unload(self)
 	ScreenView.load(self)
+	self.sequenceView.abortIterating = false
 end
 
 return ResultView
