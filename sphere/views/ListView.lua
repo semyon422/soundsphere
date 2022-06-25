@@ -51,12 +51,6 @@ ListView.update = function(self, dt)
 	if self.scrollTween then
 		self.scrollTween:update(math.min(dt, 1 / 60))
 	end
-
-	local stateCounter = self.stateCounter
-	self:reloadItems()
-	if stateCounter ~= self.stateCounter then
-		self:forceScroll()
-	end
 end
 
 ListView.getItemIndex = function(self)
@@ -83,6 +77,12 @@ ListView.drawStencil = function(self)
 end
 
 ListView.draw = function(self)
+	local stateCounter = self.stateCounter
+	self:reloadItems()
+	if stateCounter ~= self.stateCounter then
+		self:forceScroll()
+	end
+
 	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
