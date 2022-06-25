@@ -26,13 +26,4 @@ NoteChartListView.scrollDown = function(self)
 	self.navigator:scrollNoteChart("down")
 end
 
-NoteChartListView.receive = function(self, event)
-	if event.name == "wheelmoved" then
-		return self:wheelmoved(event)
-	end
-	if event.name == "mousepressed" or event.name == "mousereleased" or event.name == "mousemoved" then
-		self:receiveItems(event)
-	end
-end
-
 return NoteChartListView

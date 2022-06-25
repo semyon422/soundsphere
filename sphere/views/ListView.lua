@@ -1,3 +1,4 @@
+local just = require("just")
 local tween = require("tween")
 local Class = require("aqua.util.Class")
 local transform = require("aqua.graphics.transform")
@@ -29,51 +30,8 @@ ListView.reloadItems = function(self)
 	self.items = {}
 end
 
-ListView.receive = function(self, event)
-	if event.name == "wheelmoved" then
-		return self:wheelmoved(event)
-	end
-end
-
-ListView.wheelmoved = function(self, event)
-	local tf = transform(self.transform)
-	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
-
-	local x = self.x
-	local y = self.y
-	local w = self.w
-	local h = self.h
-	if mx >= x and mx < x + w and my >= y and my < y + h then
-		local wy = event[2]
-		if wy == 1 then
-			self:scrollUp()
-		elseif wy == -1 then
-			self:scrollDown()
-		end
-	end
-end
-
-ListView.receiveItems = function(self, event)
-	local deltaItemIndex = self.selectedItem - self.selectedVisualItem
-	for i = 0 - math.floor(deltaItemIndex), self.rows - math.floor(deltaItemIndex) do
-		local itemIndex = i + self.selectedItem - math.ceil(self.rows / 2)
-		local visualIndex = i + deltaItemIndex
-		local item = self.items[itemIndex]
-		if item then
-			local itemView = self:getItemView(item)
-			itemView.visualIndex = visualIndex
-			itemView.itemIndex = itemIndex
-			itemView.item = item
-			itemView.listView = self
-			itemView.prevItem = self.items[itemIndex - 1]
-			itemView.nextItem = self.items[itemIndex + 1]
-			itemView:receive(event)
-		end
-	end
-end
-
+ListView.receive = function(self, event) end
 ListView.scrollUp = function(self) end
-
 ListView.scrollDown = function(self) end
 
 ListView.update = function(self, dt)
@@ -125,6 +83,19 @@ ListView.drawStencil = function(self)
 end
 
 ListView.draw = function(self)
+	local tf = transform(self.transform):translate(self.x, self.y)
+	love.graphics.replaceTransform(tf)
+
+	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+	local over = 0 <= mx and mx <= self.w and 0 <= my and my <= self.h
+
+	local scrolled, delta = just.wheel_behavior(self, over)
+	if delta == 1 then
+		self:scrollUp()
+	elseif delta == -1 then
+		self:scrollDown()
+	end
+
 	love.graphics.stencil(
 		self.stencilfunction,
 		"replace",
@@ -146,7 +117,11 @@ ListView.draw = function(self)
 			itemView.listView = self
 			itemView.prevItem = self.items[itemIndex - 1]
 			itemView.nextItem = self.items[itemIndex + 1]
-			itemView:draw()
+
+			local x, y, w, h = self:getItemPosition(itemIndex)
+			local tf = transform(self.transform):translate(self.x + x, self.y + y)
+			love.graphics.replaceTransform(tf)
+			itemView:draw(w, h)
 		end
 	end
 
@@ -160,11 +135,8 @@ ListView.getItemPosition = function(self, itemIndex)
 	return 0, (visualIndex - 1) * h, self.w, h
 end
 
-ListView.getItemElementPosition = function(self, itemIndex, el)
-	local visualIndex = math.ceil(self.rows / 2) + itemIndex - self.selectedVisualItem
-	local h = self.h / self.rows
-
-	return el.x, (visualIndex - 1) * h + el.y, el.w, el.h
+ListView.getItemElementPosition = function(self, el)
+	return el.x, el.y, el.w, el.h
 end
 
 return ListView

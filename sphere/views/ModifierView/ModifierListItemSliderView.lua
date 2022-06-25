@@ -1,3 +1,4 @@
+local just = require("just")
 local ListItemSliderView = require("sphere.views.ListItemSliderView")
 
 local ModifierListItemSliderView = ListItemSliderView:new({construct = false})
@@ -31,11 +32,12 @@ ModifierListItemSliderView.increaseValue = function(self, delta)
 	self.listView.navigator:increaseModifierValue(self.itemIndex, delta)
 end
 
-ModifierListItemSliderView.mousepressed = function(self, event)
-	local button = event[3]
-	if button == 2 then
+ModifierListItemSliderView.draw = function(self, w, h)
+	if just.button_behavior(tostring(self.item) .. "1", self:isOver(w, h), 2) then
 		self.listView.navigator:removeModifier(self.itemIndex)
 	end
+
+	ListItemSliderView.draw(self)
 end
 
 return ModifierListItemSliderView

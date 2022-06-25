@@ -1,3 +1,4 @@
+local just = require("just")
 local ListItemSwitchView = require("sphere.views.ListItemSwitchView")
 
 local ModifierListItemSwitchView = ListItemSwitchView:new({construct = false})
@@ -14,11 +15,12 @@ ModifierListItemSwitchView.setValue = function(self, value)
 	self.listView.navigator:setModifierValue(self.item, value)
 end
 
-ModifierListItemSwitchView.mousepressed = function(self, event)
-	local button = event[3]
-	if button == 2 then
+ModifierListItemSwitchView.draw = function(self, w, h)
+	if just.button_behavior(tostring(self.item) .. "1", self:isOver(w, h), 2) then
 		self.listView.navigator:removeModifier(self.itemIndex)
 	end
+
+	ListItemSwitchView.draw(self)
 end
 
 return ModifierListItemSwitchView

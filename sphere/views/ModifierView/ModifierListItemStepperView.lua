@@ -1,3 +1,4 @@
+local just = require("just")
 local ListItemStepperView = require("sphere.views.ListItemStepperView")
 
 local ModifierListItemStepperView = ListItemStepperView:new({construct = false})
@@ -36,11 +37,12 @@ ModifierListItemStepperView.increaseValue = function(self, delta)
 	self.listView.navigator:increaseModifierValue(self.itemIndex, delta)
 end
 
-ModifierListItemStepperView.mousepressed = function(self, event)
-	local button = event[3]
-	if button == 2 then
+ModifierListItemStepperView.draw = function(self, w, h)
+	if just.button_behavior(tostring(self.item) .. "1", self:isOver(w, h), 2) then
 		self.listView.navigator:removeModifier(self.itemIndex)
 	end
+
+	ListItemStepperView.draw(self)
 end
 
 return ModifierListItemStepperView

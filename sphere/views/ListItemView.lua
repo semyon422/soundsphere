@@ -1,6 +1,5 @@
 local spherefonts		= require("sphere.assets.fonts")
 local baseline_print = require("aqua.graphics.baseline_print")
-local transform = require("aqua.graphics.transform")
 local inside = require("aqua.util.inside")
 local rtime = require("aqua.util.rtime")
 local time_ago_in_words = require("aqua.util").time_ago_in_words
@@ -9,13 +8,13 @@ local Class = require("aqua.util.Class")
 
 local ListItemView = Class:new()
 
+ListItemView.isOver = function(self, w, h)
+	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+	return 0 <= mx and mx <= w and 0 <= my and my <= h
+end
+
 ListItemView.draw = function(self)
 	local listView = self.listView
-
-	local tf = transform(listView.transform):translate(listView.x, listView.y)
-	love.graphics.replaceTransform(tf)
-
-	love.graphics.setColor(1, 1, 1, 1)
 
 	if listView.elements then
 		self:drawElements(listView.elements)
@@ -65,7 +64,7 @@ ListItemView.drawValue = function(self, valueConfig, value)
 	baseline_print(
 		tostring(value),
 		valueConfig.x,
-		(self.visualIndex - 1) * listView.h / listView.rows + valueConfig.baseline,
+		valueConfig.baseline,
 		valueConfig.limit,
 		1,
 		valueConfig.align
@@ -75,16 +74,12 @@ end
 ListItemView.drawCircle = function(self, valueConfig, value)
 	if not value then return end
 
-	local listView = self.listView
-
-	local y = (self.visualIndex - 1) * listView.h / listView.rows
-
 	local t = valueConfig.mode
 	if not t or t == "line" or t == "both" then
 		love.graphics.circle(
 			"line",
 			valueConfig.x,
-			y + valueConfig.y,
+			valueConfig.y,
 			valueConfig.r
 		)
 	end
@@ -92,31 +87,10 @@ ListItemView.drawCircle = function(self, valueConfig, value)
 		love.graphics.circle(
 			"fill",
 			valueConfig.x,
-			y + valueConfig.y,
+			valueConfig.y,
 			valueConfig.r
 		)
 	end
 end
-
-ListItemView.receive = function(self, event)
-	local listView = self.listView
-
-	local x, y, w, h = listView:getItemPosition(self.itemIndex)
-
-	local tf = transform(listView.transform):translate(listView.x, listView.y)
-	local mx, my = tf:inverseTransformPoint(event[1], event[2])
-
-	if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then
-		listView.activeItem = self.itemIndex
-		self:mousepressed(event)
-	end
-	if event.name == "mousereleased" then
-		self:mousereleased(event)
-		listView.activeItem = listView.selectedItem
-	end
-end
-
-ListItemView.mousepressed = function(self, event) end
-ListItemView.mousereleased = function(self, event) end
 
 return ListItemView

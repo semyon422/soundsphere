@@ -1,4 +1,3 @@
-local transform = require("aqua.graphics.transform")
 local ListView = require("sphere.views.ListView")
 local ModifierListItemSwitchView = require("sphere.views.ModifierView.ModifierListItemSwitchView")
 local ModifierListItemSliderView = require("sphere.views.ModifierView.ModifierListItemSliderView")
@@ -15,11 +14,6 @@ ModifierListView.construct = function(self)
 	self.itemSwitchView.listView = self
 	self.itemSliderView.listView = self
 	self.itemStepperView.listView = self
-end
-
-ModifierListView.load = function(self)
-	ListView.load(self)
-	self.activeItem = self.selectedItem
 end
 
 ModifierListView.getItemView = function(self, modifierConfig)
@@ -47,41 +41,6 @@ end
 
 ModifierListView.scrollDown = function(self)
 	self.navigator:scrollModifier("down")
-end
-
-ModifierListView.receive = function(self, event)
-	if event.name == "wheelmoved" then
-		return self:wheelmoved(event)
-	end
-end
-
-ModifierListView.wheelmoved = function(self, event)
-	local tf = transform(self.transform)
-	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
-
-	local sx = self.x + self.scroll.x
-	local sy = self.y + self.scroll.y
-	local sw = self.scroll.w
-	local sh = self.scroll.h
-
-	if mx >= sx and mx < sx + sw and my >= sy and my < sy + sh then
-		local wy = event[2]
-		if wy == 1 then
-			self:scrollUp()
-		elseif wy == -1 then
-			self:scrollDown()
-		end
-		return
-	end
-
-	local x = self.x
-	local y = self.y
-	local w = self.w
-	local h = self.h
-
-	if mx >= x and mx < x + w and my >= y and my < y + h then
-		self:receiveItems(event)
-	end
 end
 
 return ModifierListView

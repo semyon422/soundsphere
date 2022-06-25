@@ -24,7 +24,7 @@ ListItemSliderView.draw = function(self)
 	self:drawValue(listView.slider.value, self:getDisplayValue())
 
 	local sliderView = self.sliderView
-	local x, y, w, h = listView:getItemElementPosition(self.itemIndex, listView.slider)
+	local x, y, w, h = listView:getItemElementPosition(listView.slider)
 	love.graphics.push()
 	love.graphics.translate(x, y)
 

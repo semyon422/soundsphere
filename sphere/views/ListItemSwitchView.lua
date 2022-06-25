@@ -20,7 +20,7 @@ ListItemSwitchView.draw = function(self)
 	self:drawValue(listView.name, self:getName())
 
 	local switchView = self.switchView
-	local x, y, w, h = listView:getItemElementPosition(self.itemIndex, listView.switch)
+	local x, y, w, h = listView:getItemElementPosition(listView.switch)
 	love.graphics.push()
 	love.graphics.translate(x, y)
 

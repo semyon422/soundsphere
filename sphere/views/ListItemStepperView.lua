@@ -25,7 +25,7 @@ ListItemStepperView.draw = function(self)
 	self:drawValue(listView.stepper.value, self:getDisplayValue())
 
 	local stepperView = self.stepperView
-	local x, y, w, h = listView:getItemElementPosition(self.itemIndex, listView.stepper)
+	local x, y, w, h = listView:getItemElementPosition(listView.stepper)
 	love.graphics.push()
 	love.graphics.translate(x, y)
 

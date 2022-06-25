@@ -1,22 +1,20 @@
-local transform = require("aqua.graphics.transform")
+local just = require("just")
 
 local ListItemView = require("sphere.views.ListItemView")
 
 local AvailableModifierListItemView = ListItemView:new({construct = false})
 
-AvailableModifierListItemView.draw = function(self)
+AvailableModifierListItemView.draw = function(self, w, h)
 	local listView = self.listView
 
-	local tf = transform(listView.transform):translate(listView.x, listView.y)
-	love.graphics.replaceTransform(tf)
+	if just.button_behavior(tostring(self.item) .. "1", self:isOver(w, h)) then
+		self.listView.navigator:addModifier(self.itemIndex)
+	end
 
-	love.graphics.setColor(1, 1, 1, 1)
-
-	local y = (self.visualIndex - 1) * listView.h / listView.rows
 	local item = self.item
-
 	local prevItem = self.prevItem
 
+	love.graphics.setColor(1, 1, 1, 1)
 	if item.oneUse and item.added then
 		love.graphics.setColor(listView.name.addedColor)
 	end
@@ -30,21 +28,6 @@ AvailableModifierListItemView.draw = function(self)
 			text = "Sequential modifiers"
 		end
 		self:drawValue(listView.section, text)
-	end
-end
-
-AvailableModifierListItemView.receive = function(self, event)
-	local config = self.listView
-
-	local x, y, w, h = self.listView:getItemPosition(self.itemIndex)
-	local tf = transform(config.transform):translate(config.x, config.y)
-	local mx, my = tf:inverseTransformPoint(love.mouse.getPosition())
-
-	if event.name == "mousepressed" and (mx >= x and mx <= x + w and my >= y and my <= y + h) then
-		local button = event[3]
-		if button == 1 then
-			self.listView.navigator:addModifier(self.itemIndex)
-		end
 	end
 end
 
