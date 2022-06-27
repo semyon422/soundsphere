@@ -23,9 +23,6 @@ GameplayController.load = function(self)
 
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
 
-	local noteChartDataEntry = noteChartModel.noteChartDataEntry
-	local localOffset = noteChartDataEntry.localOffset or 0
-
 	local config = configModel.configs.settings
 
 	rhythmModel:setVolume(config.audio.volume)
@@ -49,7 +46,7 @@ GameplayController.load = function(self)
 	scoreEngine.longNoteRatio = longNoteRatio
 	scoreEngine.longNoteArea = longNoteArea
 
-	scoreEngine.noteChartDataEntry = noteChartDataEntry
+	scoreEngine.noteChartDataEntry = noteChartModel.noteChartDataEntry
 
 	rhythmModel.timeEngine:sync({
 		time = love.timer.getTime(),
@@ -58,17 +55,7 @@ GameplayController.load = function(self)
 	assert(self.game.modifierModel.config)
 	rhythmModel:loadAllEngines()
 
-	local baseTimeRate = rhythmModel.timeEngine:getBaseTimeRate()
-	local inputOffset = config.gameplay.offset.input + localOffset
-	local visualOffset = config.gameplay.offset.visual + localOffset
-	if config.gameplay.offsetScale.input then
-		inputOffset = inputOffset * baseTimeRate
-	end
-	if config.gameplay.offsetScale.visual then
-		visualOffset = visualOffset * baseTimeRate
-	end
-	rhythmModel:setInputOffset(inputOffset)
-	rhythmModel:setVisualOffset(visualOffset)
+	self.game.timeController:updateOffsets()
 
 	FileFinder:reset()
 	FileFinder:addPath(noteChartModel.noteChartEntry.path:match("^(.+)/.-$"))

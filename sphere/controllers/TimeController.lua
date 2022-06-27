@@ -12,6 +12,25 @@ TimeController.skipIntro = function(self)
 	timeEngine:skipIntro()
 end
 
+TimeController.updateOffsets = function(self)
+	local rhythmModel = self.game.rhythmModel
+	local noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry
+	local config = self.game.configModel.configs.settings
+
+	local localOffset = noteChartDataEntry.localOffset or 0
+	local baseTimeRate = rhythmModel.timeEngine:getBaseTimeRate()
+	local inputOffset = config.gameplay.offset.input + localOffset
+	local visualOffset = config.gameplay.offset.visual + localOffset
+	if config.gameplay.offsetScale.input then
+		inputOffset = inputOffset * baseTimeRate
+	end
+	if config.gameplay.offsetScale.visual then
+		visualOffset = visualOffset * baseTimeRate
+	end
+	rhythmModel:setInputOffset(inputOffset)
+	rhythmModel:setVisualOffset(visualOffset)
+end
+
 TimeController.increaseTimeRate = function(self, delta)
 	if self.game.multiplayerModel.isPlaying then return end
 	local rhythmModel = self.game.rhythmModel
@@ -52,6 +71,7 @@ TimeController.increaseLocalOffset = function(self, delta)
 	noteChartDataEntry.localOffset = (noteChartDataEntry.localOffset or 0) + delta
 	CacheDatabase:updateNoteChartDataEntry(noteChartDataEntry)
 	self.game.notificationModel:notify("local offset: " .. noteChartDataEntry.localOffset * 1000 .. "ms")
+	self:updateOffsets()
 end
 
 return TimeController
