@@ -91,6 +91,10 @@ PlayfieldVsrg.addRhythmView = function(self, object)
 	return self:add(RhythmView:new(object))
 end
 
+PlayfieldVsrg.addImageView = function(self, object)
+	return self:add(ImageView:new(object))
+end
+
 PlayfieldVsrg.addNotes = function(self, object)
 	return self:addRhythmView(object or {})
 end
