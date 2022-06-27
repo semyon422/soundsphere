@@ -198,6 +198,7 @@ end
 CacheDatabase.queryAll = function(self)
 	self:queryNoteChartSets()
 	self:queryNoteCharts()
+	self:reassignData()
 end
 
 local _asyncQueryAll = aquathread.async(function(queryParams)
@@ -376,6 +377,38 @@ CacheDatabase.queryNoteCharts = function(self)
 	end
 	stmt:close()
 	self.noteChartItemsCount = i
+end
+
+CacheDatabase.reassignData = function(self)
+	if not CacheDatabase.queryParams.groupBy then
+		return
+	end
+
+	for i = 0, self.noteChartSetItemsCount - 1 do
+		local entry = self.noteChartSetItems[i]
+		local setId = entry.setId
+		local slice = self.noteChartSlices[setId]
+
+		local lastScoreId = 0
+		local currentEntry = entry
+		local lamp = false
+
+		for j = slice.offset, slice.offset + slice.size - 1 do
+			local entry = self.noteChartItems[j]
+			if entry.lamp then
+				lamp = true
+			end
+			if entry.scoreId > lastScoreId then
+				lastScoreId = entry.scoreId
+				currentEntry = entry
+			end
+		end
+
+		entry.noteChartDataId = currentEntry.noteChartDataId
+		entry.noteChartId = currentEntry.noteChartId
+		entry.scoreId = currentEntry.scoreId
+		entry.lamp = lamp
+	end
 end
 
 return CacheDatabase
