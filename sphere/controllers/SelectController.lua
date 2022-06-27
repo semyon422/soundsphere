@@ -38,15 +38,22 @@ SelectController.update = function(self, dt)
 end
 
 SelectController.openDirectory = function(self)
-	local selectModel = self.game.selectModel
-	local path = selectModel.noteChartItem.path:match("^(.+)/.-$")
+	local noteChartItem = self.game.selectModel.noteChartItem
+	if not noteChartItem then
+		return
+	end
+	local path = noteChartItem.path:match("^(.+)/.-$")
 	local mountPath = self.game.mountModel:getRealPath(path)
 	local realPath = mountPath or love.filesystem.getSource() .. "/" .. path
 	love.system.openURL("file://" .. realPath)
 end
 
 SelectController.updateCache = function(self, force)
-	local path = self.game.selectModel.noteChartItem.path:match("^(.+)/.-$")
+	local noteChartItem = self.game.selectModel.noteChartItem
+	if not noteChartItem then
+		return
+	end
+	local path = noteChartItem.path:match("^(.+)/.-$")
 	self.game.cacheModel:startUpdate(path, force)
 end
 
