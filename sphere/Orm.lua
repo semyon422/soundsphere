@@ -121,6 +121,9 @@ function Orm:update(table_name, values, conditions, ...)
 			if type(value) ~= "number" then
 				value = ("%q"):format(value)
 			end
+			if value ~= value then
+				value = 0
+			end
 			table.insert(assigns, ("%s = %s"):format(
 				escape_identifier(key), value
 			))
