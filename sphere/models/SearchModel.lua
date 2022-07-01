@@ -149,9 +149,10 @@ SearchModel.transformSearchString = function(self, s, addCollectionFilter)
 	local conditions = {}
 
 	if addCollectionFilter then
+		local path = self.collection.path .. "/"
 		table.insert(
 			conditions,
-			("substr(noteCharts.path, 1, %d) = %q"):format(utf8.len(self.collection.path), self.collection.path)
+			("substr(noteCharts.path, 1, %d) = %q"):format(utf8.len(path), path)
 		)
 	end
 
