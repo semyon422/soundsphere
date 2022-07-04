@@ -17,6 +17,9 @@ SearchFieldView.receive = function(self, event)
 	if not (event.name == "textinput" or event.name == "keypressed" and event[1] == "backspace") then
 		return
 	end
+	if self.navigator.searchMode ~= self.searchMode then
+		return
+	end
 
 	self.textInput:receive(event)
 	self.navigator:setSearchString(self.textInput.text)
@@ -33,7 +36,7 @@ SearchFieldView.draw = function(self)
 	local searchString = inside(self, self.searchString)
 	if searchString == "" then
 		love.graphics.setColor(1, 1, 1, 0.5)
-		searchString = "Search..."
+		searchString = self.placeholder or "Search..."
 	else
 		love.graphics.setColor(1, 1, 1, 1)
 	end
@@ -49,42 +52,49 @@ SearchFieldView.draw = function(self)
 		self.text.align
 	)
 
+	if self.navigator.searchMode ~= self.searchMode then
+		return
+	end
+
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setLineWidth(self.frame.lineWidth)
 	love.graphics.setLineStyle(self.frame.lineStyle)
+
+	local padding = self.frame.padding
+	local h = self.h - padding * 2
 	love.graphics.rectangle(
 		"line",
-		self.frame.x,
-		self.frame.y,
-		self.frame.w,
-		self.frame.h,
-		self.frame.h / 2,
-		self.frame.h / 2
+		padding,
+		padding,
+		self.w - padding * 2,
+		h,
+		h / 2,
+		h / 2
 	)
 
-	if inside(self, self.searchMode) == "lamp" then
-		love.graphics.circle(
-			"line",
-			self.frame.x + self.frame.w - self.frame.h / 2,
-			self.frame.y + self.frame.h / 2,
-			self.point.r
-		)
-		love.graphics.circle(
-			"fill",
-			self.frame.x + self.frame.w - self.frame.h / 2,
-			self.frame.y + self.frame.h / 2,
-			self.point.r
-		)
-	end
+	-- if inside(self, self.searchMode) == "lamp" then
+	-- 	love.graphics.circle(
+	-- 		"line",
+	-- 		self.frame.x + self.frame.w - self.frame.h / 2,
+	-- 		self.frame.y + self.frame.h / 2,
+	-- 		self.point.r
+	-- 	)
+	-- 	love.graphics.circle(
+	-- 		"fill",
+	-- 		self.frame.x + self.frame.w - self.frame.h / 2,
+	-- 		self.frame.y + self.frame.h / 2,
+	-- 		self.point.r
+	-- 	)
+	-- end
 
-	if inside(self, self.collapse) then
-		love.graphics.circle(
-			"line",
-			self.frame.x + self.frame.w - self.frame.h,
-			self.frame.y + self.frame.h / 2,
-			self.point.r
-		)
-	end
+	-- if inside(self, self.collapse) then
+	-- 	love.graphics.circle(
+	-- 		"line",
+	-- 		self.frame.x + self.frame.w - self.frame.h,
+	-- 		self.frame.y + self.frame.h / 2,
+	-- 		self.point.r
+	-- 	)
+	-- end
 end
 
 return SearchFieldView

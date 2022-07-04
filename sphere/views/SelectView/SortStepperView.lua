@@ -38,25 +38,29 @@ SortStepperView.draw = function(self)
 
 	local font = spherefonts.get(self.text.font)
 	love.graphics.setFont(font)
+
 	baseline_print(
 		sortModel.name,
 		self.text.x,
 		self.text.baseline,
-		self.text.limit,
+		self.w - self.text.x - self.text.xr,
 		1,
 		self.text.align
 	)
+
+	local padding = self.frame.padding
+	local h = self.h - padding * 2
 
 	love.graphics.setLineWidth(self.frame.lineWidth)
 	love.graphics.setLineStyle(self.frame.lineStyle)
 	love.graphics.rectangle(
 		"line",
-		self.frame.x,
-		self.frame.y,
-		self.frame.w,
-		self.frame.h,
-		self.frame.h / 2,
-		self.frame.h / 2
+		padding,
+		padding,
+		self.w - padding * 2,
+		h,
+		h / 2,
+		h / 2
 	)
 
 	love.graphics.setColor(1, 1, 1, 1)

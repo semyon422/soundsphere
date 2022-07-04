@@ -4,15 +4,13 @@ local erfunc = require("libchart.erfunc")
 
 local SearchModel = Class:new()
 
-SearchModel.searchString = ""
 SearchModel.searchFilter = ""
 SearchModel.searchLamp = ""
-SearchModel.searchMode = "filter"
 SearchModel.collection = {path = ""}
 SearchModel.stateCounter = 1
 
-SearchModel.setSearchString = function(self, text)
-	if self.searchMode == "filter" then
+SearchModel.setSearchString = function(self, searchMode, text)
+	if searchMode == "filter" then
 		self:setSearchFilter(text)
 	else
 		self:setSearchLamp(text)
@@ -22,21 +20,10 @@ end
 
 SearchModel.setSearchFilter = function(self, text)
 	self.searchFilter = text
-	self.searchString = text
 end
 
 SearchModel.setSearchLamp = function(self, text)
 	self.searchLamp = text
-	self.searchString = text
-end
-
-SearchModel.setSearchMode = function(self, searchMode)
-	self.searchMode = searchMode
-	self.searchString = searchMode == "filter" and self.searchFilter or self.searchLamp
-end
-
-SearchModel.switchSearchMode = function(self)
-	self:setSearchMode(self.searchMode == "filter" and "lamp" or "filter")
 end
 
 SearchModel.setCollection = function(self, collection)

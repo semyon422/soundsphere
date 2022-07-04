@@ -9,9 +9,12 @@ local time_ago_in_words = require("aqua.util").time_ago_in_words
 local StageInfoView = Class:new()
 
 StageInfoView.draw = function(self)
+	local tf = transform(self.transform):translate(self.x, self.y)
 	for _, cell in ipairs(self.cells) do
 		if not cell.show or cell.show(self) then
+			love.graphics.replaceTransform(tf)
 			self:drawCellName(cell)
+			love.graphics.replaceTransform(tf)
 			if cell.valueType == "text" then
 				self:drawTextCell(cell)
 			elseif cell.valueType == "bar" then
@@ -22,46 +25,34 @@ StageInfoView.draw = function(self)
 end
 
 StageInfoView.drawCellName = function(self, cell)
-	local tf = transform(self.transform):translate(self.x, self.y)
-	love.graphics.replaceTransform(tf)
-
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local cx, dcw
-	if type(cell.x) == "table" then
-		cx = cell.type.x[cell.x[1]]
-		dcw = cell.type.x[cell.x[2]] - cell.type.x[cell.x[1]]
-	else
-		cx = cell.type.x[cell.x]
-		dcw = 0
-	end
+	local t = cell.type
 
-	local fontName = spherefonts.get(cell.type.name.font)
+	local cx = t.x[cell.x]
+	local cy = t.y[cell.y]
+	local dcw = ((cell.size or 1) - 1) * t.w
+
+	local fontName = spherefonts.get(t.name.font)
 	love.graphics.setFont(fontName)
 	baseline_print(
 		cell.name,
-		cx + cell.type.name.x,
-		cell.type.y[cell.y] + cell.type.name.baseline,
-		cell.type.name.limit + dcw,
+		cx + t.name.x,
+		cy + t.name.baseline,
+		t.name.limit + dcw,
 		1,
-		cell.type.name.align
+		t.name.align
 	)
 end
 
 StageInfoView.drawTextCell = function(self, cell)
-	local tf = transform(self.transform):translate(self.x, self.y)
-	love.graphics.replaceTransform(tf)
-
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local cx, dcw
-	if type(cell.x) == "table" then
-		cx = cell.type.x[cell.x[1]]
-		dcw = cell.type.x[cell.x[2]] - cell.type.x[cell.x[1]]
-	else
-		cx = cell.type.x[cell.x]
-		dcw = 0
-	end
+	local t = cell.type
+
+	local cx = t.x[cell.x]
+	local cy = t.y[cell.y]
+	local dcw = ((cell.size or 1) - 1) * t.w
 
 	local value = cell.value or inside(self, cell.key)
 	if type(value) == "nil" then
@@ -87,42 +78,40 @@ StageInfoView.drawTextCell = function(self, cell)
 		value = value ~= 0 and time_ago_in_words(value, cell.parts, cell.suffix) or "never"
 	end
 
-	local fontValue = spherefonts.get(cell.type.value.text.font)
+	local text = t.value.text
+
+	local fontValue = spherefonts.get(text.font)
 	love.graphics.setFont(fontValue)
 	baseline_print(
 		value,
-		cx + cell.type.value.text.x,
-		cell.type.y[cell.y] + cell.type.value.text.baseline,
-		cell.type.value.text.limit + dcw,
+		cx + text.x,
+		cy + text.baseline,
+		text.limit + dcw,
 		1,
-		cell.type.value.text.align
+		text.align
 	)
 end
 
 StageInfoView.drawBarCell = function(self, cell)
-	local tf = transform(self.transform):translate(self.x, self.y)
-	love.graphics.replaceTransform(tf)
-
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local cx, dcw
-	if type(cell.x) == "table" then
-		cx = cell.type.x[cell.x[1]]
-		dcw = cell.type.x[cell.x[2]] - cell.type.x[cell.x[1]]
-	else
-		cx = cell.type.x[cell.x]
-		dcw = 0
-	end
+	local t = cell.type
+
+	local cx = t.x[cell.x]
+	local cy = t.y[cell.y]
+	local dcw = ((cell.size or 1) - 1) * t.w
+
+	local bar = t.value.bar
 
 	love.graphics.setColor(1, 1, 1, 0.25)
 	love.graphics.rectangle(
 		"fill",
-		cx + cell.type.value.bar.x,
-		cell.type.y[cell.y] + cell.type.value.bar.y,
-		cell.type.value.bar.w + dcw,
-		cell.type.value.bar.h,
-		cell.type.value.bar.h / 2,
-		cell.type.value.bar.h / 2
+		cx + bar.x,
+		cy + bar.y,
+		bar.w + dcw,
+		bar.h,
+		bar.h / 2,
+		bar.h / 2
 	)
 
 	local value = cell.value or inside(self, cell.key) or 0
@@ -133,12 +122,12 @@ StageInfoView.drawBarCell = function(self, cell)
 	love.graphics.setColor(1, 1, 1, 0.75)
 	love.graphics.rectangle(
 		"fill",
-		cx + cell.type.value.bar.x,
-		cell.type.y[cell.y] + cell.type.value.bar.y,
-		(cell.type.value.bar.w + dcw - cell.type.value.bar.h) * value + cell.type.value.bar.h,
-		cell.type.value.bar.h,
-		cell.type.value.bar.h / 2,
-		cell.type.value.bar.h / 2
+		cx + bar.x,
+		cy + bar.y,
+		(bar.w + dcw - bar.h) * value + bar.h,
+		bar.h,
+		bar.h / 2,
+		bar.h / 2
 	)
 end
 

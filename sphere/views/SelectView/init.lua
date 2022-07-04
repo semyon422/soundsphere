@@ -2,7 +2,6 @@ local ScreenView = require("sphere.views.ScreenView")
 
 local SelectViewConfig = require("sphere.views.SelectView.SelectViewConfig")
 local SelectNavigator = require("sphere.views.SelectView.SelectNavigator")
-local SelectOverlayView = require("sphere.views.SelectView.SelectOverlayView")
 local NoteSkinView = require("sphere.views.NoteSkinView")
 local InputView = require("sphere.views.InputView")
 local SettingsView = require("sphere.views.SettingsView")
@@ -21,7 +20,6 @@ SelectView.construct = function(self)
 	self.settingsView = SettingsView:new()
 	self.onlineView = OnlineView:new()
 	self.mountsView = MountsView:new()
-	self.selectOverlayView = SelectOverlayView:new()
 end
 
 SelectView.load = function(self)
@@ -47,9 +45,6 @@ SelectView.load = function(self)
 	self.mountsView.game = self.game
 	self.mountsView.navigator = self.navigator
 	self.mountsView.isOpen = self.navigator.isMountsOpen
-
-	self.selectOverlayView.game = self.game
-	self.selectOverlayView.navigator = self.navigator
 end
 
 SelectView.draw = function(self)
@@ -59,7 +54,6 @@ SelectView.draw = function(self)
 	self.settingsView:draw()
 	self.onlineView:draw()
 	self.mountsView:draw()
-	self.selectOverlayView:draw()
 end
 
 SelectView.unload = function(self)

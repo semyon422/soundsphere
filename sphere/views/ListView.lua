@@ -121,11 +121,17 @@ ListView.draw = function(self)
 			local x, y, w, h = self:getItemPosition(itemIndex)
 			local tf = transform(self.transform):translate(self.x + x, self.y + y)
 			love.graphics.replaceTransform(tf)
-			itemView:draw(w, h)
+			self:drawItem(itemIndex, w, h)
 		end
 	end
 
 	love.graphics.setStencilTest()
+end
+
+ListView.drawItem = function(self, itemIndex, w, h)
+	local item = self.items[itemIndex]
+	local itemView = self:getItemView(item)
+	itemView:draw(w, h)
 end
 
 ListView.getItemPosition = function(self, itemIndex)

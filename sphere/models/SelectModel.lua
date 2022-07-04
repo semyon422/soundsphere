@@ -19,7 +19,7 @@ SelectModel.load = function(self)
 
 	self.game.searchModel:setSearchFilter(config.searchFilter)
 	self.game.searchModel:setSearchLamp(config.searchLamp)
-	self.game.searchModel:setSearchMode(config.searchMode)
+	self.searchMode = config.searchMode
 	self.game.sortModel.name = config.sortFunction
 	self.game.noteChartSetLibraryModel.collapse = config.collapse
 
@@ -67,10 +67,10 @@ SelectModel.scrollSortFunction = function(self, delta)
 	self:setSortFunction(self.game.sortModel.name)
 end
 
-SelectModel.changeSearchMode = function(self)
-	self.game.searchModel:switchSearchMode()
-	self.config.searchMode = self.game.searchModel.searchMode
-end
+-- SelectModel.changeSearchMode = function(self)
+-- 	self.game.searchModel:switchSearchMode()
+-- 	self.config.searchMode = self.game.searchModel.searchMode
+-- end
 
 SelectModel.changeCollapse = function(self)
 	if self.pullingNoteChartSet then

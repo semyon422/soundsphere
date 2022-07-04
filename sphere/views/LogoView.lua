@@ -13,16 +13,18 @@ LogoView.draw = function(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local font = spherefonts.get(self.text.font)
-	love.graphics.setFont(font)
-	baseline_print(
-		"soundsphere",
-		self.text.x,
-		self.text.baseline,
-		self.text.limit,
-		1,
-		self.text.align
-	)
+	if self.text then
+		local font = spherefonts.get(self.text.font)
+		love.graphics.setFont(font)
+		baseline_print(
+			"soundsphere",
+			self.text.x,
+			self.text.baseline,
+			self.text.limit,
+			1,
+			self.text.align
+		)
+	end
 
 	love.graphics.setLineStyle("smooth")
 	love.graphics.setLineWidth(1)

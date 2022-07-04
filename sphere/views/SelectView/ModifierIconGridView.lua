@@ -32,12 +32,18 @@ ModifierIconGridView.draw = function(self)
 	local drawIndex = 1
 
 	modifierIconView.transform = self.transform
-	modifierIconView.size = self.w / self.columns
-	local maxIndex = self.rows * self.columns
+
+	local size = self.size or self.w / self.columns
+	modifierIconView.size = size
+
+	local columns = self.columns or math.floor(self.w / size)
+	local rows = self.rows or math.floor(self.h / size)
+
+	local maxIndex = rows * columns
 
 	while true do
-		local row = math.floor((drawIndex - 1) / self.columns) + 1
-		local column = (drawIndex - 1) % self.columns + 1
+		local row = math.floor((drawIndex - 1) / columns) + 1
+		local column = (drawIndex - 1) % columns + 1
 		local modifierConfig = configModifier[modifierIndex]
 		if modifierConfig then
 			if drawIndex == maxIndex and #configModifier + drawIndex - modifierIndex > maxIndex then
@@ -49,8 +55,11 @@ ModifierIconGridView.draw = function(self)
 				if modifierString then
 					modifierIconView.modifierString = modifierString
 					modifierIconView.modifierSubString = modifier:getSubString(modifierConfig)
-					modifierIconView.x = self.x + modifierIconView.size * (column - 1)
-					modifierIconView.y = self.y + modifierIconView.size * (row - 1)
+					modifierIconView.x = self.x + size * (column - 1)
+					modifierIconView.y = self.y + size * (row - 1)
+					if self.growUp then
+						modifierIconView.y = self.y + size * (rows - row)
+					end
 					modifierIconView:draw()
 					drawIndex = drawIndex + 1
 				end
@@ -65,8 +74,10 @@ end
 ModifierIconGridView.drawNoModifier = function(self)
 	local modifierIconView = self.modifierIconView
 
+	local size = self.size or self.w / self.columns
+
 	modifierIconView.transform = self.transform
-	modifierIconView.size = self.w / self.columns
+	modifierIconView.size = size
 	modifierIconView.modifierString = "NO"
 	modifierIconView.modifierSubString = "MOD"
 	modifierIconView.x = self.x
@@ -79,12 +90,19 @@ end
 ModifierIconGridView.drawMoreModifier = function(self)
 	local modifierIconView = self.modifierIconView
 
+	local size = self.size or self.w / self.columns
+	local columns = self.columns or math.floor(self.w / size)
+	local rows = self.rows or math.floor(self.h / size)
+
 	modifierIconView.transform = self.transform
-	modifierIconView.size = self.w / self.columns
+	modifierIconView.size = size
 	modifierIconView.modifierString = "..."
 	modifierIconView.modifierSubString = nil
-	modifierIconView.x = self.x + modifierIconView.size * (self.columns - 1)
-	modifierIconView.y = self.y + modifierIconView.size * (self.rows - 1)
+	modifierIconView.x = self.x + size * (columns - 1)
+	modifierIconView.y = self.y + size * (rows - 1)
+	if self.growUp then
+		modifierIconView.y = self.y
+	end
 	modifierIconView.shape = "empty"
 	modifierIconView:draw()
 	modifierIconView.shape = nil

@@ -1,3 +1,5 @@
+local just = require("just")
+local _transform = require("aqua.graphics.transform")
 local ScrollBarView = require("sphere.views.ScrollBarView")
 local RectangleView = require("sphere.views.RectangleView")
 local CircleView = require("sphere.views.CircleView")
@@ -9,6 +11,34 @@ local AvailableModifierListView = require("sphere.views.ModifierView.AvailableMo
 local ModifierListView = require("sphere.views.ModifierView.ModifierListView")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
+
+local Frames = {draw = function()
+	local width, height = love.graphics.getDimensions()
+	love.graphics.origin()
+
+	love.graphics.setColor(1, 1, 1, 0.2)
+	love.graphics.rectangle("fill", 0, 0, width, height)
+
+	love.graphics.replaceTransform(_transform(transform))
+
+	local _x, _y = love.graphics.inverseTransformPoint(0, 0)
+	local _xw, _yh = love.graphics.inverseTransformPoint(width, height)
+	local _w, _h = _xw - _x, _yh - _y
+
+	local x_int = 24
+	local y_int = 55
+
+	-- local x1, w1 = just.layout(0, 1920, {24, -1/3, -1/3, -1/3, 24})
+
+	local y0, h0 = just.layout(0, 1080, {89, y_int, -1, y_int, 89})
+
+
+
+	love.graphics.setColor(0, 0, 0, 0.8)
+	love.graphics.rectangle("fill", _x, y0[3], _w, h0[3])
+	love.graphics.rectangle("fill", _x, _y, _w, h0[1])
+	love.graphics.rectangle("fill", _x, _yh - h0[5], _w, h0[1])
+end}
 
 local AvailableModifierList = AvailableModifierListView:new({
 	transform = transform,
@@ -216,6 +246,7 @@ local ModifierViewConfig = {
 	BackgroundBlurSwitch,
 	Background,
 	BackgroundBlurSwitch,
+	Frames,
 	BottomScreenMenu,
 	AvailableModifierList,
 	ModifierList,

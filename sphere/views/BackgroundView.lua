@@ -18,9 +18,9 @@ end
 
 BackgroundView.drawBackground = function(self)
 	local backgroundModel = self.game.backgroundModel
-	-- local tf = transform(self.transform)
-	-- love.graphics.replaceTransform(tf)
-	love.graphics.origin()
+	local tf = transform(self.transform):translate(self.x, self.y)
+	love.graphics.replaceTransform(tf)
+	-- love.graphics.origin()
 
 	local images = backgroundModel.images
 	local alpha = backgroundModel.alpha
@@ -29,7 +29,8 @@ BackgroundView.drawBackground = function(self)
 	local r, g, b = dim, dim, dim
 
 	local mx, my = love.mouse.getPosition()
-	local w, h = love.graphics.getDimensions()
+	-- local w, h = love.graphics.getDimensions()
+	local w, h = self.w, self.h
 	for i = 1, 3 do
 		if not images[i] then
 			return

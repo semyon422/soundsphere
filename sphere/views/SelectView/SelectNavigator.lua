@@ -6,6 +6,7 @@ local SelectNavigator = Navigator:new({construct = false})
 
 SelectNavigator.osudirectItemIndex = 1
 SelectNavigator.osudirectDifficultyItemIndex = 1
+SelectNavigator.searchMode = "filter"
 
 SelectNavigator.load = function(self)
 	Navigator.load(self)
@@ -78,6 +79,7 @@ end
 
 SelectNavigator.switchToNoteCharts = function(self)
 	self:addSubscreen("notecharts")
+	self.searchMode = "filter"
 	self:pullNoteChartSet()
 end
 
@@ -86,6 +88,7 @@ SelectNavigator.switchToCollections = function(self)
 end
 
 SelectNavigator.switchToOsudirect = function(self)
+	self.searchMode = "osudirect"
 	self:addSubscreen("osudirect")
 	self.game.osudirectModel:searchDebounce()
 end
@@ -126,7 +129,12 @@ SelectNavigator.deleteNoteChartSet = function(self)
 end
 
 SelectNavigator.changeSearchMode = function(self)
-	self.game.selectModel:changeSearchMode()
+	-- self.game.selectModel:changeSearchMode()
+	if self.searchMode == "filter" then
+		self.searchMode = "lamp"
+	else
+		self.searchMode = "filter"
+	end
 end
 
 SelectNavigator.changeCollapse = function(self)
@@ -176,6 +184,16 @@ SelectNavigator.scrollNoteChart = function(self, direction, count)
 	self.game.selectModel:scrollNoteChart(direction == "up" and -count or count)
 end
 
+SelectNavigator.scrollScore = function(self, direction)
+	self.game.selectModel:scrollScore(direction == "down" and 1 or -1)
+end
+
+SelectNavigator.loadScore = function(self, itemIndex)
+	if itemIndex then
+		self.game.selectModel:scrollScore(nil, itemIndex)
+	end
+end
+
 SelectNavigator.downloadBeatmapSet = function(self)
 	self.game.osudirectModel:downloadBeatmapSet()
 end
@@ -202,7 +220,7 @@ end
 
 SelectNavigator.setSearchString = function(self, text)
 	if self:getSubscreen("notecharts") then
-		self.game.searchModel:setSearchString(text)
+		self.game.searchModel:setSearchString(self.searchMode, text)
 	elseif self:getSubscreen("osudirect") then
 		self.game.osudirectModel:setSearchString(text)
 	end

@@ -74,7 +74,7 @@ return {
 		dim = {
 			gameplay = 0.8,
 			result = 0.8,
-			select = 0.8
+			select = 0
 		},
 		dwmflush = false,
 		fps = 240,

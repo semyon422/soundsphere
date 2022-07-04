@@ -497,6 +497,7 @@ local StageInfo = StageInfoView:new({
 	smallCell = {
 		x = {0, 113, 227, 340, 452, 565, 678, 791},
 		y = {0, 50, 101, 152, 319, 370, 421, 472},
+		w = 113,
 		name = {
 			x = 22,
 			baseline = 18,
@@ -529,6 +530,7 @@ local StageInfo = StageInfoView:new({
 	largeCell = {
 		x = {454, 454 + 227},
 		y = {225},
+		w = 227,
 		name = {
 			x = 22,
 			baseline = 15,
@@ -558,7 +560,7 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = {3, 4}, y = 2,
+		x = 3, y = 2, size = 2,
 		name = "bpm",
 		value = function(self)
 			local show = showLoadedScore(self)
@@ -576,7 +578,7 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = {2, 4}, y = 3,
+		x = 3, y = 3, size = 2,
 		name = "duration",
 		value = function(self)
 			local show = showLoadedScore(self)
@@ -670,7 +672,7 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = {7, 8}, y = 4,
+		x = 7, y = 4, size = 2,
 		name = "adjust",
 		key = "game.rhythmModel.scoreEngine.scoreSystem.normalscore.adjustRatio",
 		format = function(adjustRatio)
@@ -684,7 +686,7 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = {6, 7}, y = 3,
+		x = 6, y = 3, size = 2,
 		name = "new diff.",
 		key = "game.rhythmModel.scoreEngine.ratingDifficulty",
 		format = "%0.2f",
@@ -693,7 +695,7 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = {6, 7}, y = 4,
+		x = 6, y = 4, size = 2,
 		name = "new rating",
 		format = "%0.2f",
 		show = showLoadedScore,
@@ -709,7 +711,7 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "bar",
-		x = {1, 2}, y = 5,
+		x = 1, y = 5, size = 2,
 		name = "perfect/hits",
 		key = {
 			{"game.rhythmModel.scoreEngine.scoreSystem.misc.ratio", showLoadedScore},
@@ -729,7 +731,7 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = {2, 3}, y = 6,
+		x = 2, y = 6, size = 2,
 		name = "not perfect",
 		key = {
 			{"game.rhythmModel.scoreEngine.scoreSystem.judgement.counters.soundsphere.not perfect", showLoadedScore},
@@ -757,7 +759,7 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = {3, 4}, y = 6,
+		x = 3, y = 6, size = 2,
 		name = "early/late",
 		key = {
 			{"game.rhythmModel.scoreEngine.scoreSystem.misc.earlylate", showLoadedScore},
@@ -789,7 +791,7 @@ StageInfo.cells = {
 	{
 		type = StageInfo.smallCell,
 		valueType = "text",
-		x = {3, 4}, y = 7,
+		x = 3, y = 7, size = 2,
 		name = "max delta",
 		multiplier = 1000,
 		format = "%d",
