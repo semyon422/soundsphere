@@ -214,7 +214,7 @@ local Frames = {draw = function()
 	drawFrame(Layout.column2row2)
 	drawFrame(Layout.column3)
 
-	love.graphics.setColor(0.4, 0.4, 0.4, 0.5)
+	love.graphics.setColor(0.4, 0.4, 0.4, 0.7)
 
 	local x, y, w, h = getRect(nil, Layout.column2row2row1)
 	rectangle2("fill", x, y, w, h, 36)
