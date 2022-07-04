@@ -9,8 +9,12 @@ local ImageView = Class:new()
 ImageView.load = function(self)
 	local path = FileFinder:findFile(self.image)
 	if path then
-		self.imageObject = love.graphics.newImage(path)
-	else
+		local status, image = pcall(love.graphics.newImage, path)
+		if status then
+			self.imageObject = image
+		end
+	end
+	if not self.imageObject then
 		self.imageObject = newPixel()
 	end
 	self.imageWidth = self.imageObject:getWidth()
