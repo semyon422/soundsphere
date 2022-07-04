@@ -703,9 +703,17 @@ local Cells = CellView:new({
 
 		local bpm = 0
 		local length = 0
+		local noteCount = 0
+		local level = 0
+		local longNoteRatio = 0
+		local localOffset = 0
 		if noteChartItem then
 			bpm = (noteChartItem.bpm or 0) * baseTimeRate
 			length = (noteChartItem.length or 0) / baseTimeRate
+			noteCount = noteChartItem.noteCount
+			level = noteChartItem.level
+			longNoteRatio = noteChartItem.longNoteRatio
+			localOffset = noteChartItem.localOffset or 0
 		end
 
 		local score = 0
@@ -729,12 +737,12 @@ local Cells = CellView:new({
 		just.sameline()
 		self:drawCell(self.smallCell, "text", 1, "duration", rtime(length))
 		just.sameline()
-		self:drawCell(self.smallCell, "text", 1, "notes", noteChartItem.noteCount)
+		self:drawCell(self.smallCell, "text", 1, "notes", noteCount)
 		just.sameline()
-		self:drawCell(self.smallCell, "text", 1, "level", noteChartItem.level)
-		self:drawCell(self.smallCell, "bar", 2, "long notes", noteChartItem.longNoteRatio)
+		self:drawCell(self.smallCell, "text", 1, "level", level)
+		self:drawCell(self.smallCell, "bar", 2, "long notes", longNoteRatio)
 		just.sameline()
-		self:drawCell(self.smallCell, "text", 2, "local offset", (noteChartItem.localOffset or 0) * 1000)
+		self:drawCell(self.smallCell, "text", 2, "local offset", localOffset * 1000)
 
 		getRect(self, Layout.column1row2)
 
