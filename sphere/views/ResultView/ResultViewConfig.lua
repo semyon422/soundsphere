@@ -228,10 +228,7 @@ local ScoreList = ScoreListView:new({
 			baseline = 19,
 			limit = 72,
 			align = "right",
-			font = {
-				filename = "Noto Sans",
-				size = 16,
-			},
+			font = {"Noto Sans", 16},
 		},
 		{
 			type = "text",
@@ -241,10 +238,7 @@ local ScoreList = ScoreListView:new({
 			baseline = 45,
 			limit = 72,
 			align = "right",
-			font = {
-				filename = "Noto Sans Mono",
-				size = 24,
-			},
+			font = {"Noto Sans Mono", 24},
 		},
 		{
 			type = "text",
@@ -254,10 +248,7 @@ local ScoreList = ScoreListView:new({
 			baseline = 19,
 			limit = 72,
 			align = "right",
-			font = {
-				filename = "Noto Sans",
-				size = 16,
-			},
+			font = {"Noto Sans", 16},
 		},
 		{
 			type = "text",
@@ -267,10 +258,7 @@ local ScoreList = ScoreListView:new({
 			baseline = 45,
 			limit = 72,
 			align = "right",
-			font = {
-				filename = "Noto Sans Mono",
-				size = 24,
-			},
+			font = {"Noto Sans Mono", 24},
 			value = function(self, item)
 				if self.game.rhythmModel.scoreEngine.scoreEntry.id == item.id then
 					local erfunc = require("libchart.erfunc")
@@ -294,10 +282,7 @@ local ScoreList = ScoreListView:new({
 			baseline = 19,
 			limit = 94,
 			align = "right",
-			font = {
-				filename = "Noto Sans",
-				size = 16,
-			},
+			font = {"Noto Sans", 16},
 		},
 		{
 			type = "text",
@@ -310,10 +295,7 @@ local ScoreList = ScoreListView:new({
 			baseline = 45,
 			limit = 94,
 			align = "right",
-			font = {
-				filename = "Noto Sans Mono",
-				size = 24,
-			},
+			font = {"Noto Sans Mono", 24},
 			format = function(timeRate)
 				local exp = 10 * math.log(timeRate) / math.log(2)
 				local roundedExp = math.floor(exp + 0.5)
@@ -331,10 +313,7 @@ local ScoreList = ScoreListView:new({
 			baseline = 19,
 			limit = 270,
 			align = "right",
-			font = {
-				filename = "Noto Sans",
-				size = 16,
-			},
+			font = {"Noto Sans", 16},
 		},
 		{
 			type = "text",
@@ -345,10 +324,7 @@ local ScoreList = ScoreListView:new({
 			baseline = 19,
 			limit = 270,
 			align = "right",
-			font = {
-				filename = "Noto Sans",
-				size = 16,
-			},
+			font = {"Noto Sans", 16},
 		},
 		{
 			type = "text",
@@ -360,10 +336,7 @@ local ScoreList = ScoreListView:new({
 			baseline = 45,
 			limit = 270,
 			align = "right",
-			font = {
-				filename = "Noto Sans",
-				size = 24,
-			},
+			font = {"Noto Sans", 24},
 		},
 		{
 			type = "circle",
@@ -406,10 +379,7 @@ local SongTitleView = ValueView:new({
 	baseline = 144 + 45,
 	limit = math.huge,
 	align = "left",
-	font = {
-		filename = "Noto Sans",
-		size = 24,
-	},
+	font = {"Noto Sans", 24},
 	transform = transform
 })
 
@@ -421,10 +391,7 @@ local SongArtistView = ValueView:new({
 	baseline = 144 + 19,
 	limit = math.huge,
 	align = "left",
-	font = {
-		filename = "Noto Sans",
-		size = 16,
-	},
+	font = {"Noto Sans", 16},
 	transform = transform
 })
 
@@ -436,10 +403,7 @@ local ChartNameView = ValueView:new({
 	baseline = 216 + 45,
 	limit = math.huge,
 	align = "left",
-	font = {
-		filename = "Noto Sans",
-		size = 24,
-	},
+	font = {"Noto Sans", 24},
 	transform = transform
 })
 
@@ -451,10 +415,7 @@ local ChartCreatorView = ValueView:new({
 	baseline = 216 + 19,
 	limit = math.huge,
 	align = "left",
-	font = {
-		filename = "Noto Sans",
-		size = 16,
-	},
+	font = {"Noto Sans", 16},
 	transform = transform
 })
 
@@ -466,10 +427,7 @@ local ChartInputModeView = ValueView:new({
 	baseline = 216 + 19,
 	limit = 500,
 	align = "left",
-	font = {
-		filename = "Noto Sans",
-		size = 16,
-	},
+	font = {"Noto Sans", 16},
 	transform = transform
 })
 
@@ -480,10 +438,7 @@ local ChartDifficultyView = ValueView:new({
 	baseline = 216 + 45,
 	limit = 72,
 	align = "right",
-	font = {
-		filename = "Noto Sans Mono",
-		size = 24,
-	},
+	font = {"Noto Sans Mono", 24},
 	transform = transform,
 	format = formatDifficulty
 })
@@ -503,10 +458,7 @@ local StageInfo = StageInfoView:new({
 			baseline = 18,
 			limit = 69,
 			align = "right",
-			font = {
-				filename = "Noto Sans",
-				size = 16,
-			},
+			font = {"Noto Sans", 16},
 		},
 		value = {
 			text = {
@@ -514,10 +466,7 @@ local StageInfo = StageInfoView:new({
 				baseline = 44,
 				limit = 70,
 				align = "right",
-				font = {
-					filename = "Noto Sans",
-					size = 24,
-				},
+				font = {"Noto Sans", 24},
 			},
 			bar = {
 				x = 22,
@@ -536,10 +485,7 @@ local StageInfo = StageInfoView:new({
 			baseline = 15,
 			limit = 160,
 			align = "right",
-			font = {
-				filename = "Noto Sans",
-				size = 18,
-			},
+			font = {"Noto Sans", 18},
 		},
 		value = {
 			text = {
@@ -547,10 +493,7 @@ local StageInfo = StageInfoView:new({
 				baseline = 49,
 				limit = 161,
 				align = "right",
-				font = {
-					filename = "Noto Sans",
-					size = 36,
-				},
+				font = {"Noto Sans", 36},
 			}
 		}
 	}
@@ -842,10 +785,7 @@ local BottomScreenMenu = ScreenMenuView:new({
 		baseline = 54,
 		limit = 227,
 		align = "center",
-		font = {
-			filename = "Noto Sans",
-			size = 24,
-		},
+		font = {"Noto Sans", 24},
 	},
 	items = {
 		{
@@ -870,10 +810,7 @@ local BottomRightScreenMenu = ScreenMenuView:new({
 		baseline = 54,
 		limit = 227,
 		align = "center",
-		font = {
-			filename = "Noto Sans",
-			size = 24,
-		},
+		font = {"Noto Sans", 24},
 	},
 	items = {
 		{
@@ -902,10 +839,7 @@ local SessionTime = ValueView:new({
 	baseline = 279 + 522 - 6,
 	limit = 1920,
 	color = {1, 1, 1, 1},
-	font = {
-		filename = "Noto Sans",
-		size = 20,
-	},
+	font = {"Noto Sans", 20},
 	align = "left",
 })
 
@@ -914,10 +848,7 @@ local MatchPlayers = MatchPlayersView:new({
 	key = "game.multiplayerModel.roomUsers",
 	x = 20,
 	y = 540,
-	font = {
-		filename = "Noto Sans Mono",
-		size = 24
-	},
+	font = {"Noto Sans Mono", 24},
 })
 
 local InspectScoreSystem = ValueView:new({
@@ -930,10 +861,7 @@ local InspectScoreSystem = ValueView:new({
 	x = 0,
 	baseline = 20,
 	limit = 1920,
-	font = {
-		filename = "Noto Sans Mono",
-		size = 14,
-	},
+	font = {"Noto Sans Mono", 14},
 	align = "left",
 	color = {1, 1, 1, 1}
 })
@@ -948,10 +876,7 @@ local InspectCounters = ValueView:new({
 	x = 0,
 	baseline = 20,
 	limit = 1920,
-	font = {
-		filename = "Noto Sans Mono",
-		size = 14,
-	},
+	font = {"Noto Sans Mono", 14},
 	align = "left",
 	color = {1, 1, 1, 1}
 })
@@ -966,10 +891,7 @@ local InspectScoreEntry = ValueView:new({
 	x = 0,
 	baseline = 20,
 	limit = 1920,
-	font = {
-		filename = "Noto Sans Mono",
-		size = 14,
-	},
+	font = {"Noto Sans Mono", 14},
 	align = "left",
 	color = {1, 1, 1, 1}
 })

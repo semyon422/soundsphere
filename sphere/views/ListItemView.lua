@@ -59,8 +59,7 @@ ListItemView.drawValue = function(self, valueConfig, value)
 		value = value ~= 0 and time_ago_in_words(value, valueConfig.parts, valueConfig.suffix) or "never"
 	end
 
-	local font = spherefonts.get(valueConfig.font)
-	love.graphics.setFont(font)
+	love.graphics.setFont(spherefonts.get(unpack(valueConfig.font)))
 	baseline_print(
 		tostring(value),
 		valueConfig.x,

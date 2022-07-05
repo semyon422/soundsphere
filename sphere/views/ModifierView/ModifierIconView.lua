@@ -20,10 +20,7 @@ ModifierIconView.lines = {
 	two = {-6 / 64, 24 / 64},
 }
 
-ModifierIconView.font = {
-	filename = "Noto Sans Mono",
-	size = 32
-}
+ModifierIconView.font = {"Noto Sans Mono", 32}
 
 ModifierIconView.draw = function(self)
 	local tf = transform(self.transform):translate(self.x, self.y)
@@ -51,8 +48,7 @@ ModifierIconView.drawText = function(self, lines, topText, bottomText)
 	local fs = self.size * 3 / 4
 	local fr = fs / 4
 
-	local font = spherefonts.get(self.font)
-	love.graphics.setFont(font)
+	love.graphics.setFont(spherefonts.get(unpack(self.font)))
 	if topText then
 		love.graphics.printf(topText, fx, fy + lines[1] * fs, 64, "center", 0, fs / 64, fs / 64)
 	end

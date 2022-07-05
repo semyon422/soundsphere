@@ -28,8 +28,7 @@ UserInfoView.draw = function(self)
 		self.navigator:call(self.action)
 	end
 
-	local font = spherefonts.get(self.text.font)
-	love.graphics.setFont(font)
+	love.graphics.setFont(spherefonts.get(unpack(self.text.font)))
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local username = self.username and inside(self, self.username) or ""

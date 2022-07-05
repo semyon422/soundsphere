@@ -7,17 +7,11 @@ local spherefonts = require("sphere.assets.fonts")
 
 local CacheView = Class:new()
 
-CacheView.font = {
-	filename = "Noto Sans",
-	size = 24,
-}
-
 CacheView.draw = function(self)
 	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
-	local font = spherefonts.get(self.font)
-	love.graphics.setFont(font)
+	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	local cacheUpdater = self.game.cacheModel.cacheUpdater
 	local state = cacheUpdater.state

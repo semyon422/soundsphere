@@ -24,9 +24,7 @@ local getFirstFile = function(list)
 	end
 end
 
-fonts.get = function(t)
-	local filename = t.filename
-	local size = t.size
+fonts.get = function(filename, size)
 	if instances[filename] and instances[filename][size] then
 		return instances[filename][size]
 	end

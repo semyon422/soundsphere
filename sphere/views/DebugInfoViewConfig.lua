@@ -17,10 +17,7 @@ local Fps = ValueView:new({
 	baseline = 30,
 	limit = 1920,
 	color = {1, 1, 1, 1},
-	font = {
-		filename = "Noto Sans Mono",
-		size = 24,
-	},
+	font = {"Noto Sans Mono", 24},
 	align = "left",
 })
 
@@ -34,10 +31,7 @@ local RendererInfo = ValueView:new({
 	baseline = 30,
 	limit = 1920,
 	color = {1, 1, 1, 1},
-	font = {
-		filename = "Noto Sans Mono",
-		size = 24,
-	},
+	font = {"Noto Sans Mono", 24},
 	align = "right",
 })
 
@@ -51,10 +45,7 @@ local Stats = ValueView:new({
 	baseline = 160,
 	limit = 1920,
 	color = {1, 1, 1, 1},
-	font = {
-		filename = "Noto Sans Mono",
-		size = 24,
-	},
+	font = {"Noto Sans Mono", 24},
 	align = "left",
 })
 
@@ -69,10 +60,7 @@ local Version = ValueView:new({
 	baseline = 1040,
 	limit = 1920,
 	color = {1, 1, 1, 1},
-	font = {
-		filename = "Noto Sans Mono",
-		size = 24,
-	},
+	font = {"Noto Sans Mono", 24},
 	align = "left",
 })
 

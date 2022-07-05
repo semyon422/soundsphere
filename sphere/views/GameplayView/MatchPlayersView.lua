@@ -11,9 +11,7 @@ MatchPlayersView.draw = function(self)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)
-
-	local font = spherefonts.get(self.font)
-	love.graphics.setFont(font)
+	love.graphics.setFont(spherefonts.get(unpack(self.font)))
 
 	local users = inside(self, self.key)
 

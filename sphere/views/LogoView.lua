@@ -14,8 +14,7 @@ LogoView.draw = function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	if self.text then
-		local font = spherefonts.get(self.text.font)
-		love.graphics.setFont(font)
+		love.graphics.setFont(spherefonts.get(unpack(self.text.font)))
 		baseline_print(
 			"soundsphere",
 			self.text.x,

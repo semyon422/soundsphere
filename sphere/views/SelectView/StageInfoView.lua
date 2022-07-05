@@ -33,8 +33,7 @@ StageInfoView.drawCellName = function(self, cell)
 	local cy = t.y[cell.y]
 	local dcw = ((cell.size or 1) - 1) * t.w
 
-	local fontName = spherefonts.get(t.name.font)
-	love.graphics.setFont(fontName)
+	love.graphics.setFont(spherefonts.get(unpack(t.name.font)))
 	baseline_print(
 		cell.name,
 		cx + t.name.x,
@@ -80,8 +79,7 @@ StageInfoView.drawTextCell = function(self, cell)
 
 	local text = t.value.text
 
-	local fontValue = spherefonts.get(text.font)
-	love.graphics.setFont(fontValue)
+	love.graphics.setFont(spherefonts.get(unpack(text.font)))
 	baseline_print(
 		value,
 		cx + text.x,

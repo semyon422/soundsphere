@@ -34,10 +34,7 @@ BasePlayfield.addBaseScore = function(self)
 		baseline = 52,
 		limit = 1906,
 		align = "right",
-		font = {
-			filename = "Noto Sans Mono",
-			size = 48
-		},
+		font = {"Noto Sans Mono", 48},
 		transform = self:newTransform(1920, 1080, "right")
 	})
 end
@@ -48,10 +45,7 @@ BasePlayfield.addBaseAccuracy = function(self)
 		baseline = 94,
 		limit = 1905,
 		align = "right",
-		font = {
-			filename = "Noto Sans Mono",
-			size = 32
-		},
+		font = {"Noto Sans Mono", 32},
 		transform = self:newTransform(1920, 1080, "right")
 	})
 end
@@ -62,10 +56,7 @@ BasePlayfield.addBaseCombo = function(self)
 		baseline = 476,
 		limit = 1080,
 		align = "center",
-		font = {
-			filename = "Noto Sans Mono",
-			size = 240
-		},
+		font = {"Noto Sans Mono", 240},
 		transform = self:newLaneCenterTransform(1080),
 		color = {1, 1, 1, 0.4},
 	})
@@ -96,10 +87,7 @@ BasePlayfield.addBaseMatchPlayers = function(self)
 		transform = self:newTransform(1920, 1080, "left"),
 		x = 20,
 		y = 540,
-		font = {
-			filename = "Noto Sans Mono",
-			size = 24
-		},
+		font = {"Noto Sans Mono", 24},
 	})
 end
 

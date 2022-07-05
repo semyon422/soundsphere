@@ -51,10 +51,7 @@ local Logo = LogoView:new({
 		baseline = 56,
 		limit = 365,
 		align = "left",
-		font = {
-			filename = "Noto Sans",
-			size = 32,
-		},
+		font = {"Noto Sans", 32},
 	}
 })
 
@@ -87,10 +84,7 @@ local UserInfo = UserInfoView:new({
 		baseline = 54,
 		limit = 365,
 		align = "right",
-		font = {
-			filename = "Noto Sans",
-			size = 26,
-		},
+		font = {"Noto Sans", 26},
 	}
 })
 

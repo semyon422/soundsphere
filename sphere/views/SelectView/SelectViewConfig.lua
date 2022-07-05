@@ -453,10 +453,7 @@ local SearchField = SearchFieldView:new({
 		baseline = 35,
 		limit = math.huge,
 		align = "left",
-		font = {
-			filename = "Noto Sans",
-			size = 20,
-		},
+		font = {"Noto Sans", 20},
 	},
 	placeholder = "Filter...",
 	searchString = "game.searchModel.searchFilter",
@@ -484,10 +481,7 @@ local SearchFieldLamp = SearchFieldView:new({
 		baseline = 35,
 		limit = math.huge,
 		align = "left",
-		font = {
-			filename = "Noto Sans",
-			size = 20,
-		},
+		font = {"Noto Sans", 20},
 	},
 	placeholder = "Lamp...",
 	searchString = "game.searchModel.searchLamp",
@@ -514,10 +508,7 @@ local OsudirectSearchField = SearchFieldView:new({
 		baseline = 35,
 		limit = 454,
 		align = "left",
-		font = {
-			filename = "Noto Sans",
-			size = 20,
-		},
+		font = {"Noto Sans", 20},
 	},
 	searchString = "game.osudirectModel.searchString",
 	searchMode = "osudirect",
@@ -544,10 +535,7 @@ local SortStepper = SortStepperView:new({
 		xr = 27,
 		baseline = 35,
 		align = "center",
-		font = {
-			filename = "Noto Sans",
-			size = 20,
-		},
+		font = {"Noto Sans", 20},
 	}
 })
 
@@ -571,28 +559,9 @@ local GroupCheckbox = {
 
 		love.graphics.translate(self.h / 2, 0)
 
-		local text = self.text
-		local font = spherefonts.get(text.font)
-		love.graphics.setFont(font)
-		baseline_print(
-			"group",
-			text.x,
-			text.baseline,
-			self.w - text.x - text.xr,
-			1,
-			text.align
-		)
+		love.graphics.setFont(spherefonts.get("Noto Sans", 20))
+		baseline_print("group", 27, 35, self.w - 54, 1, "left")
 	end,
-	text = {
-		x = 27,
-		xr = 27,
-		baseline = 35,
-		align = "left",
-		font = {
-			filename = "Noto Sans",
-			size = 20,
-		},
-	}
 }
 
 local ModifierIconGrid = ModifierIconGridView:new({
@@ -629,10 +598,7 @@ local UpdateStatus = ValueView:new({
 	baseline = 1070,
 	limit = 1920,
 	color = {1, 1, 1, 1},
-	font = {
-		filename = "Noto Sans Mono",
-		size = 24,
-	},
+	font = {"Noto Sans Mono", 24},
 	align = "left",
 })
 
@@ -651,19 +617,12 @@ local SessionTime = ValueView:new({
 	end,
 	limit = 1920,
 	color = {1, 1, 1, 1},
-	font = {
-		filename = "Noto Sans",
-		size = 20,
-	},
+	font = {"Noto Sans", 20},
 	align = "left",
 })
 
 local BottomNotechartsScreenMenu = ScreenMenuView:new({
 	subscreen = "notecharts",
-	font = {
-		filename = "Noto Sans",
-		size = 24,
-	},
 	draw = function(self)
 		getRect(self, Layout.footer)
 		self.x = Layout.column1.x
@@ -671,8 +630,7 @@ local BottomNotechartsScreenMenu = ScreenMenuView:new({
 
 		local w = Layout.column1.w / 2
 
-		local font = spherefonts.get(self.font)
-		love.graphics.setFont(font)
+		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 		local tf = _transform(transform):translate(self.x, self.y)
 		love.graphics.replaceTransform(tf)
@@ -701,13 +659,8 @@ local BottomNotechartsScreenMenu = ScreenMenuView:new({
 
 local BottomCollectionsScreenMenu = ScreenMenuView:new({
 	subscreen = "collections",
-	font = {
-		filename = "Noto Sans",
-		size = 24,
-	},
 	draw = function(self)
-		local font = spherefonts.get(self.font)
-		love.graphics.setFont(font)
+		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 		local tf = _transform(transform):translate(Layout.column1.x, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
@@ -728,13 +681,8 @@ local BottomCollectionsScreenMenu = ScreenMenuView:new({
 
 local BottomRightOsudirectScreenMenu = ScreenMenuView:new({
 	subscreen = "osudirect",
-	font = {
-		filename = "Noto Sans",
-		size = 24,
-	},
 	draw = function(self)
-		local font = spherefonts.get(self.font)
-		love.graphics.setFont(font)
+		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 		local tf = _transform(transform):translate(Layout.column2.x, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
@@ -747,15 +695,10 @@ local BottomRightOsudirectScreenMenu = ScreenMenuView:new({
 
 local NoteChartOptionsScreenMenu = {
 	subscreen = "notecharts",
-	font = {
-		filename = "Noto Sans",
-		size = 20,
-	},
 	draw = function(self)
 		getRect(self, Layout.column2row2row1)
 
-		local font = spherefonts.get(self.font)
-		love.graphics.setFont(font)
+		love.graphics.setFont(spherefonts.get("Noto Sans", 20))
 
 		local tf = _transform(transform):translate(self.x, self.y)
 		love.graphics.replaceTransform(tf)
@@ -828,10 +771,7 @@ local UserInfo = UserInfoView:new({
 		baseline = 54,
 		limit = 365,
 		align = "right",
-		font = {
-			filename = "Noto Sans",
-			size = 26,
-		},
+		font = {"Noto Sans", 26},
 	}
 })
 

@@ -18,8 +18,8 @@ FrameTimeView.load = function(self)
 	self.width = love.graphics.getWidth()
 	self.height = love.graphics.getHeight()
 
-	self.font = spherefonts.get({filename = "Noto Sans Mono", size = 20})
-	self.largeFont = spherefonts.get({filename = "Noto Sans Mono", size = 40})
+	self.font = spherefonts.get("Noto Sans Mono", 20)
+	self.largeFont = spherefonts.get("Noto Sans Mono", 40)
 end
 
 local colors = {

@@ -41,10 +41,7 @@ local BottomScreenMenu = ScreenMenuView:new({
 		baseline = 54,
 		limit = 227,
 		align = "center",
-		font = {
-			filename = "Noto Sans",
-			size = 24,
-		},
+		font = {"Noto Sans", 24},
 	},
 	items = {
 		{
@@ -87,10 +84,7 @@ local PauseText = ValueView:new({
 	baseline = 64,
 	limit = 1920,
 	align = "left",
-	font = {
-		filename = "Noto Sans",
-		size = 40,
-	},
+	font = {"Noto Sans", 40},
 })
 
 local Notification = ValueView:new({
@@ -101,10 +95,7 @@ local Notification = ValueView:new({
 	baseline = 53,
 	limit = 454,
 	align = "center",
-	font = {
-		filename = "Noto Sans",
-		size = 24,
-	},
+	font = {"Noto Sans", 24},
 })
 
 local Failed = ValueView:new({
@@ -118,10 +109,7 @@ local Failed = ValueView:new({
 	x = -1080, baseline = 540, limit = 2160,
 	align = "center",
 	color = {1, 1, 1, 0.25},
-	font = {
-		filename = "Noto Sans",
-		size = 240
-	},
+	font = {"Noto Sans", 240},
 	transform = topCenter
 })
 

@@ -16,8 +16,7 @@ ScreenMenuView.load = function(self)
 end
 
 ScreenMenuView.draw = function(self)
-	local font = spherefonts.get(self.text.font)
-	love.graphics.setFont(font)
+	love.graphics.setFont(spherefonts.get(unpack(self.text.font)))
 
 	local items = self.items
 	for i = 1, self.rows do

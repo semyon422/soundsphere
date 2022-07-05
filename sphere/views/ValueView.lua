@@ -7,7 +7,11 @@ local Class = require("aqua.util.Class")
 local ValueView = Class:new()
 
 ValueView.load = function(self)
-	self.fontObject = spherefonts.get(self.font)
+	local font = self.font
+	if font.filename then
+		font[1], font[2] = font.filename, font.size
+	end
+	self.fontObject = spherefonts.get(unpack(font))
 end
 
 ValueView.draw = function(self)

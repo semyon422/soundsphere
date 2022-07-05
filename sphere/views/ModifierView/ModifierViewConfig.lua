@@ -52,10 +52,7 @@ local AvailableModifierList = AvailableModifierListView:new({
 		baseline = 45,
 		limit = 410,
 		align = "left",
-		font = {
-			filename = "Noto Sans",
-			size = 24,
-		},
+		font = {"Noto Sans", 24},
 		addedColor = {1, 1, 1, 0.5}
 	},
 	section = {
@@ -63,10 +60,7 @@ local AvailableModifierList = AvailableModifierListView:new({
 		baseline = 19,
 		limit = 409,
 		align = "right",
-		font = {
-			filename = "Noto Sans",
-			size = 16,
-		},
+		font = {"Noto Sans", 16},
 	}
 })
 
@@ -88,10 +82,7 @@ local ModifierList = ModifierListView:new({
 		baseline = 45,
 		limit = 183,
 		align = "left",
-		font = {
-			filename = "Noto Sans",
-			size = 24,
-		},
+		font = {"Noto Sans", 24},
 	},
 	slider = {
 		x = 227,
@@ -103,10 +94,7 @@ local ModifierList = ModifierListView:new({
 			baseline = 45,
 			limit = 227,
 			align = "right",
-			font = {
-				filename = "Noto Sans",
-				size = 24,
-			},
+			font = {"Noto Sans", 24},
 		}
 	},
 	stepper = {
@@ -119,10 +107,7 @@ local ModifierList = ModifierListView:new({
 			baseline = 45,
 			limit = 227,
 			align = "center",
-			font = {
-				filename = "Noto Sans",
-				size = 24,
-			},
+			font = {"Noto Sans", 24},
 		}
 	},
 	switch = {
@@ -226,10 +211,7 @@ local BottomScreenMenu = ScreenMenuView:new({
 		baseline = 54,
 		limit = 227,
 		align = "center",
-		font = {
-			filename = "Noto Sans",
-			size = 24,
-		},
+		font = {"Noto Sans", 24},
 	},
 	items = {
 		{
