@@ -29,43 +29,9 @@ local OsudirectDifficultiesListView = require("sphere.views.SelectView.Osudirect
 local CacheView = require("sphere.views.SelectView.CacheView")
 local BarCellImView = require("sphere.views.SelectView.BarCellImView")
 local TextCellImView = require("sphere.views.SelectView.TextCellImView")
+local Format = require("sphere.views.Format")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
-
-local formatScore = function(score)
-	score = tonumber(score) or math.huge
-	if score >= 0.1 then
-		return "100+"
-	end
-	return ("%2.2f"):format(score * 1000)
-end
-
-local formatDifficulty = function(difficulty)
-	if difficulty ~= difficulty then
-		return "nan"
-	end
-	local format = "%.2f"
-	if not difficulty then
-		return ""
-	elseif difficulty >= 10000 then
-		format = "%s"
-		difficulty = "????"
-	elseif difficulty >= 100 then
-		format = "%d"
-	elseif difficulty > 9.995 then
-		format = "%.1f"
-	end
-	return format:format(difficulty)
-end
-
-local formatTimeRate = function(timeRate)
-	local exp = 10 * math.log(timeRate) / math.log(2)
-	local roundedExp = math.floor(exp + 0.5)
-	if math.abs(exp - roundedExp) % 1 < 1e-2 and math.abs(exp) > 1e-2 then
-		return ("%dQ"):format(roundedExp)
-	end
-	return ("%.2f"):format(timeRate)
-end
 
 local function getRect(out, r)
 	if not out then
@@ -149,9 +115,9 @@ local ScoreList = ScoreListView:new({
 		just.indent(22)
 		TextCellImView(w, h, "right", i == 1 and "rank" or "", item.rank)
 		just.sameline()
-		TextCellImView(w, h, "right", i == 1 and "rating" or "", formatDifficulty(item.rating))
+		TextCellImView(w, h, "right", i == 1 and "rating" or "", Format.difficulty(item.rating))
 		just.sameline()
-		TextCellImView(w, h, "right", i == 1 and "time rate" or "", formatTimeRate(item.timeRate))
+		TextCellImView(w, h, "right", i == 1 and "time rate" or "", Format.timeRate(item.timeRate))
 		just.sameline()
 		TextCellImView(w * 2, h, "right", item.time ~= 0 and time_ago_in_words(item.time) or "never", item.inputMode)
 	end,
@@ -226,7 +192,6 @@ local NoteChartSetList = NoteChartSetListView:new({
 	end,
 	rows = 11,
 })
-
 
 local NoteChartSetSelectFrameOff = {
 	draw = function(self)
@@ -307,7 +272,7 @@ local NoteChartList = NoteChartListView:new({
 
 		local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
 
-		local difficulty = formatDifficulty((item.difficulty or 0) * baseTimeRate)
+		local difficulty = Format.difficulty((item.difficulty or 0) * baseTimeRate)
 		local inputMode = item.inputMode
 		local name = item.name
 		local creator = item.creator
@@ -399,9 +364,9 @@ local Cells = {draw = function(self)
 
 	TextCellImView(w, h, "right", "score", ("%d"):format(score))
 	just.sameline()
-	TextCellImView(w, h, "right", "accuracy", formatScore(accuracy))
+	TextCellImView(w, h, "right", "accuracy", Format.accuracy(accuracy))
 
-	TextCellImView(w, h, "right", "difficulty", formatDifficulty(difficulty))
+	TextCellImView(w, h, "right", "difficulty", Format.difficulty(difficulty))
 	just.sameline()
 	TextCellImView(w, h, "right", "miss count", ("%d"):format(missCount))
 end}
@@ -618,11 +583,6 @@ local GroupCheckbox = {
 			text.align
 		)
 	end,
-	frame = {
-		padding = 6,
-		lineStyle = "smooth",
-		lineWidth = 1
-	},
 	text = {
 		x = 27,
 		xr = 27,
@@ -689,7 +649,6 @@ local SessionTime = ValueView:new({
 		local rtime = require("aqua.util.rtime")
 		return rtime(event.time - event.startTime)
 	end,
-	baseline = 279 + 522 - 6,
 	limit = 1920,
 	color = {1, 1, 1, 1},
 	font = {
