@@ -726,6 +726,7 @@ local Cells = CellView:new({
 			score = scoreItem.score
 			rating = scoreItem.rating
 			difficulty = scoreItem.difficulty
+			accuracy = scoreItem.accuracy
 			time = scoreItem.time
 			missCount = scoreItem.missCount
 			if score ~= score then
