@@ -71,30 +71,6 @@ SearchFieldView.draw = function(self)
 		h / 2,
 		h / 2
 	)
-
-	-- if inside(self, self.searchMode) == "lamp" then
-	-- 	love.graphics.circle(
-	-- 		"line",
-	-- 		self.frame.x + self.frame.w - self.frame.h / 2,
-	-- 		self.frame.y + self.frame.h / 2,
-	-- 		self.point.r
-	-- 	)
-	-- 	love.graphics.circle(
-	-- 		"fill",
-	-- 		self.frame.x + self.frame.w - self.frame.h / 2,
-	-- 		self.frame.y + self.frame.h / 2,
-	-- 		self.point.r
-	-- 	)
-	-- end
-
-	-- if inside(self, self.collapse) then
-	-- 	love.graphics.circle(
-	-- 		"line",
-	-- 		self.frame.x + self.frame.w - self.frame.h,
-	-- 		self.frame.y + self.frame.h / 2,
-	-- 		self.point.r
-	-- 	)
-	-- end
 end
 
 return SearchFieldView

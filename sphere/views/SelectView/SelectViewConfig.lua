@@ -8,9 +8,7 @@ local time_ago_in_words = require("aqua.util").time_ago_in_words
 local newGradient = require("aqua.graphics.newGradient")
 
 local ScrollBarView = require("sphere.views.ScrollBarView")
-local IconButtonView = require("sphere.views.IconButtonView")
-local RectangleView = require("sphere.views.RectangleView")
-local LineView = require("sphere.views.LineView")
+local IconButtonImView = require("sphere.views.IconButtonImView")
 local ScreenMenuView = require("sphere.views.ScreenMenuView")
 local BackgroundView = require("sphere.views.BackgroundView")
 local ValueView = require("sphere.views.ValueView")
@@ -24,13 +22,13 @@ local NoteChartSetListView = require("sphere.views.SelectView.NoteChartSetListVi
 local NoteChartListView = require("sphere.views.SelectView.NoteChartListView")
 local SearchFieldView = require("sphere.views.SelectView.SearchFieldView")
 local SortStepperView = require("sphere.views.SelectView.SortStepperView")
-local StageInfoView = require("sphere.views.SelectView.StageInfoView")
 local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
 local CollectionListView = require("sphere.views.SelectView.CollectionListView")
 local OsudirectListView = require("sphere.views.SelectView.OsudirectListView")
 local OsudirectDifficultiesListView = require("sphere.views.SelectView.OsudirectDifficultiesListView")
 local CacheView = require("sphere.views.SelectView.CacheView")
-local CellView = require("sphere.views.SelectView.CellView")
+local BarCellImView = require("sphere.views.SelectView.BarCellImView")
+local TextCellImView = require("sphere.views.SelectView.TextCellImView")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -69,31 +67,6 @@ local formatTimeRate = function(timeRate)
 	return ("%.2f"):format(timeRate)
 end
 
-local Layout = {
-	header = {},
-	footer = {},
-	subheader = {},
-	column1 = {},
-	column2 = {},
-	column3 = {},
-	column2row1 = {},
-	column2row2 = {},
-	column2row2row1 = {},
-	column2row2row2 = {},
-	column1row1 = {},
-	column1row2 = {},
-	column1row3 = {},
-	column1row1row1 = {},
-	column1row1row2 = {},
-}
-
-local function setRect(t, x, y, w, h)
-	t.x = assert(x)
-	t.y = assert(y)
-	t.w = assert(w)
-	t.h = assert(h)
-end
-
 local function getRect(out, r)
 	if not out then
 		return r.x, r.y, r.w, r.h
@@ -104,149 +77,15 @@ local function getRect(out, r)
 	out.h = r.h
 end
 
-local function addPoint(points, x, y)
-	table.insert(points, x)
-	table.insert(points, y)
-end
-local function rectangle2(mode, x, y, w, h, r)
-	local points = {}
-	addPoint(points, x + r, y)
-	addPoint(points, x + w - r, y)
-	for a = -math.pi / 2, 0, math.pi / 64 do
-		addPoint(points, x + w - r + math.cos(a) * r, y + r + math.sin(a) * r)
-	end
-	addPoint(points, x + w, y + h)
-	addPoint(points, x, y + h)
-	addPoint(points, x, y + r)
-	for a = -math.pi, -math.pi / 2, math.pi / 64 do
-		addPoint(points, x + r + math.cos(a) * r, y + r + math.sin(a) * r)
-	end
-	love.graphics.polygon(mode, points)
-
-	points = {}
-	addPoint(points, x + w, y + h)
-	addPoint(points, x + w, y + h + r)
-	for a = 0, -math.pi / 2, -math.pi / 64 do
-		addPoint(points, x + w - r + math.cos(a) * r, y + h + r + math.sin(a) * r)
-	end
-	addPoint(points, x + w - r, y + h)
-	love.graphics.polygon(mode, points)
-
-	points = {}
-	addPoint(points, x, y + h)
-	addPoint(points, x + r, y + h)
-	for a = -math.pi / 2, -math.pi, -math.pi / 64 do
-		addPoint(points, x + r + math.cos(a) * r, y + h + r + math.sin(a) * r)
-	end
-	addPoint(points, x, y + h + r)
-	love.graphics.polygon(mode, points)
-end
-
-local function drawFrame(rect)
-	local x, y, w, h = getRect(nil, rect)
-	love.graphics.rectangle("fill", x, y, w, h, 36)
-end
-
-local Frames = {draw = function()
-	local width, height = love.graphics.getDimensions()
-	love.graphics.origin()
-
-	love.graphics.setColor(1, 1, 1, 0.2)
-	love.graphics.rectangle("fill", 0, 0, width, height)
-
-	love.graphics.replaceTransform(_transform(transform))
-
-	local _x, _y = love.graphics.inverseTransformPoint(0, 0)
-	local _xw, _yh = love.graphics.inverseTransformPoint(width, height)
-	local _w, _h = _xw - _x, _yh - _y
-
-	Layout.x, Layout.x = _x, _y
-	Layout.w, Layout.h = _w, _h
-
-	local x_int = 24
-	local y_int = 55
-
-	local x0, w0 = just.layout(0, 1920, {1920})
-	-- local x1, w1 = just.layout(0, 1920, {24, -1/3, -1/3, -1/3, 24})
-	local x1, w1 = just.layout(_x, _w, {y_int, -1/3, x_int, -1/3, x_int, -1/3, y_int})
-
-	local y0, h0 = just.layout(0, 1080, {89, y_int, -1, y_int, 89})
-
-	Layout.x0, Layout.w0 = x0, w0
-	Layout.x1, Layout.w1 = x1, w1
-	Layout.y0, Layout.h0 = y0, h0
-
-	setRect(Layout.header, x0[1], y0[1], w0[1], h0[1])
-	setRect(Layout.footer, x0[1], y0[5], w0[1], h0[5])
-	setRect(Layout.subheader, x1[4], y0[2], w1[4], h0[2])
-
-	setRect(Layout.column1, x1[2], y0[3], w1[2], h0[3])
-	setRect(Layout.column2, x1[4], y0[3], w1[4], h0[3])
-	setRect(Layout.column3, x1[6], y0[3], w1[6], h0[3])
-
-	local y1, h1 = just.layout(Layout.column2.y, Layout.column2.h, {-1, x_int, 72 * 6})
-
-	setRect(Layout.column2row1, x1[4], y1[1], w1[4], h1[1])
-	setRect(Layout.column2row2, x1[4], y1[3], w1[4], h1[3])
-
-	local y2, h2 = just.layout(Layout.column2row2.y, Layout.column2row2.h, {72, 72 * 5})
-
-	setRect(Layout.column2row2row1, x1[4], y2[1], w1[4], h2[1])
-	setRect(Layout.column2row2row2, x1[4], y2[2], w1[4], h2[2])
-
-	local y3, h3 = just.layout(Layout.column1.y, Layout.column1.h, {72 * 6, x_int, -1, x_int, 72 * 2})
-
-	setRect(Layout.column1row1, x1[2], y3[1], w1[2], h3[1])
-	setRect(Layout.column1row2, x1[2], y3[3], w1[2], h3[3])
-	setRect(Layout.column1row3, x1[2], y3[5], w1[2], h3[5])
-
-	local y4, h4 = just.layout(Layout.column1row1.y, Layout.column1row1.h, {72, -1})
-
-	setRect(Layout.column1row1row1, x1[2], y4[1], w1[2], h4[1])
-	setRect(Layout.column1row1row2, x1[2], y4[2], w1[2], h4[2])
-
-	love.graphics.setColor(0, 0, 0, 0.8)
-
-	drawFrame(Layout.column1row1)
-	drawFrame(Layout.column1row2)
-	drawFrame(Layout.column1row3)
-	drawFrame(Layout.column2row1)
-	drawFrame(Layout.column2row2)
-	drawFrame(Layout.column3)
-
-	love.graphics.setColor(0.4, 0.4, 0.4, 0.7)
-
-	local x, y, w, h = getRect(nil, Layout.column2row2row1)
-	rectangle2("fill", x, y, w, h, 36)
-
-	x, y, w, h = getRect(nil, Layout.column1row1row1)
-	rectangle2("fill", x, y, w, h, 36)
-
-	love.graphics.setColor(0, 0, 0, 0.8)
-	love.graphics.rectangle("fill", _x, _y, _w, h0[1])
-	love.graphics.rectangle("fill", _x, _yh - h0[5], _w, h0[1])
-end}
+local Layout = require("sphere.views.SelectView.Layout")
 
 local Cache = CacheView:new({
 	subscreen = "collections",
 	transform = transform,
 	draw = function(self)
-		getRect(self, Layout.column2)
-		self.y = 504
-		self.h = 72
+		getRect(self, Layout.column2row2row1)
 		self.__index.draw(self)
 	end,
-	text = {
-		type = "text",
-		x = 44,
-		baseline = 45,
-		limit = 1920,
-		align = "left",
-		font = {
-			filename = "Noto Sans",
-			size = 24,
-		},
-	},
 })
 
 local OsudirectList = OsudirectListView:new({
@@ -256,35 +95,13 @@ local OsudirectList = OsudirectListView:new({
 		getRect(self, Layout.column3)
 		self.__index.draw(self)
 	end,
+	drawItem = function(self, i, w, h)
+		local item = self.items[i]
+
+		just.indent(44)
+		TextCellImView(math.huge, h, "left", item.artist, item.title)
+	end,
 	rows = 11,
-	elements = {
-		{
-			type = "text",
-			key = "title",
-			onNew = false,
-			x = 44,
-			baseline = 45,
-			limit = math.huge,
-			align = "left",
-			font = {
-				filename = "Noto Sans",
-				size = 24,
-			},
-		},
-		{
-			type = "text",
-			key = "artist",
-			onNew = false,
-			x = 45,
-			baseline = 19,
-			limit = math.huge,
-			align = "left",
-			font = {
-				filename = "Noto Sans",
-				size = 16,
-			},
-		},
-	},
 })
 
 local OsudirectScrollBar = ScrollBarView:new({
@@ -309,111 +126,36 @@ local OsudirectDifficultiesList = OsudirectDifficultiesListView:new({
 		getRect(self, Layout.column2row2row2)
 		self.__index.draw(self)
 	end,
-	rows = 5,
-	elements = {
-		{
-			type = "text",
-			key = "name",
-			onNew = false,
-			x = 116,
-			baseline = 45,
-			limit = math.huge,
-			align = "left",
-			font = {
-				filename = "Noto Sans",
-				size = 24,
-			},
-		},
-		{
-			type = "text",
-			key = "beatmap.creator",
-			onNew = true,
-			x = 117,
-			baseline = 19,
-			limit = math.huge,
-			align = "left",
-			font = {
-				filename = "Noto Sans",
-				size = 16,
-			},
-		},
-		{
-			type = "text",
-			key = "cs",
-			format = "%skey",
-			onNew = true,
-			x = 17,
-			baseline = 19,
-			limit = 500,
-			align = "left",
-			font = {
-				filename = "Noto Sans",
-				size = 16,
-			},
-		},
-		{
-			type = "text",
-			key = "sr",
-			onNew = false,
-			x = 0,
-			baseline = 45,
-			limit = 72,
-			align = "right",
-			font = {
-				filename = "Noto Sans Mono",
-				size = 24,
-			},
-			format = formatDifficulty
-		},
-	},
-})
+	drawItem = function(self, i, w, h)
+		local item = self.items[i]
 
+		just.indent(22)
+		TextCellImView(math.huge, h, "left", item.beatmap.creator, item.name)
+	end,
+	rows = 5,
+})
 
 local ScoreList = ScoreListView:new({
 	subscreen = "notecharts",
 	transform = transform,
 	draw = function(self)
 		getRect(self, Layout.column1row1row2)
-		self.cell.w = self.w / 5
 		self.__index.draw(self)
 	end,
-	drawItem = function(self, itemIndex, w, h)
-		local item = self.items[itemIndex]
+	drawItem = function(self, i, w, h)
+		local item = self.items[i]
+		w = (w - 44) / 5
 
-		CellView:drawCell(self.cell, "text", 1, itemIndex == 1 and "rank" or "", item.rank)
+		just.indent(22)
+		TextCellImView(w, h, "right", i == 1 and "rank" or "", item.rank)
 		just.sameline()
-		CellView:drawCell(self.cell, "text", 1, itemIndex == 1 and "rating" or "", formatDifficulty(item.rating))
+		TextCellImView(w, h, "right", i == 1 and "rating" or "", formatDifficulty(item.rating))
 		just.sameline()
-		CellView:drawCell(self.cell, "text", 1, itemIndex == 1 and "time rate" or "", formatTimeRate(item.timeRate))
+		TextCellImView(w, h, "right", i == 1 and "time rate" or "", formatTimeRate(item.timeRate))
 		just.sameline()
-		CellView:drawCell(self.cell, "text", 2, item.time ~= 0 and time_ago_in_words(item.time) or "never", item.inputMode)
+		TextCellImView(w * 2, h, "right", item.time ~= 0 and time_ago_in_words(item.time) or "never", item.inputMode)
 	end,
 	rows = 5,
-	cell = {
-		h = 72,
-		name = {
-			x = 22,
-			xr = 22,
-			baseline = 19,
-			align = "right",
-			font = {
-				filename = "Noto Sans",
-				size = 16,
-			},
-		},
-		value = {
-			text = {
-				x = 22,
-				xr = 22,
-				baseline = 45,
-				align = "right",
-				font = {
-					filename = "Noto Sans",
-					size = 24,
-				},
-			},
-		}
-	},
 })
 
 local ScoreScrollBar = ScrollBarView:new({
@@ -438,51 +180,15 @@ local CollectionList = CollectionListView:new({
 		getRect(self, Layout.column3)
 		self.__index.draw(self)
 	end,
+	drawItem = function(self, i, w, h)
+		local item = self.items[i]
+
+		TextCellImView(72, h, "right", "", item.count ~= 0 and item.count or "", true)
+		just.sameline()
+		just.indent(44)
+		TextCellImView(math.huge, h, "left", item.shortPath, item.name)
+	end,
 	rows = 11,
-	elements = {
-		{
-			type = "text",
-			key = "name",
-			onNew = false,
-			x = 116,
-			baseline = 45,
-			limit = math.huge,
-			align = "left",
-			font = {
-				filename = "Noto Sans",
-				size = 24,
-			},
-		},
-		{
-			type = "text",
-			key = "shortPath",
-			onNew = false,
-			x = 117,
-			baseline = 19,
-			limit = math.huge,
-			align = "left",
-			font = {
-				filename = "Noto Sans",
-				size = 16,
-			},
-		},
-		{
-			type = "text",
-			key = "count",
-			onNew = false,
-			format = function(value)
-				return value ~= 0 and value or ""
-			end,
-			x = 0,
-			baseline = 45,
-			limit = 72,
-			align = "right",
-			font = {
-				filename = "Noto Sans Mono",
-				size = 24,
-			},
-		},
-	},
 })
 
 local CollectionScrollBar = ScrollBarView:new({
@@ -507,43 +213,18 @@ local NoteChartSetList = NoteChartSetListView:new({
 		getRect(self, Layout.column3)
 		self.__index.draw(self)
 	end,
+	drawItem = function(self, i, w, h)
+		local item = self.items[i]
+
+		if item.lamp then
+			love.graphics.circle("fill", 22, 36, 7)
+			love.graphics.circle("line", 22, 36, 7)
+		end
+
+		just.indent(44)
+		TextCellImView(math.huge, h, "left", item.artist, item.title)
+	end,
 	rows = 11,
-	elements = {
-		{
-			type = "text",
-			key = "title",
-			onNew = false,
-			x = 44,
-			baseline = 45,
-			limit = math.huge,
-			align = "left",
-			font = {
-				filename = "Noto Sans",
-				size = 24,
-			},
-		},
-		{
-			type = "text",
-			key = "artist",
-			onNew = false,
-			x = 45,
-			baseline = 19,
-			limit = math.huge,
-			align = "left",
-			font = {
-				filename = "Noto Sans",
-				size = 16,
-			},
-		},
-		{
-			type = "circle",
-			key = "lamp",
-			onNew = false,
-			x = 22,
-			y = 36,
-			r = 7
-		},
-	},
 })
 
 
@@ -579,15 +260,16 @@ local NoteChartSetSelectFrameOn = {
 		love.graphics.replaceTransform(tf)
 
 		getRect(self, Layout.column3)
-		self.h = self.h / NoteChartSetList.rows
-		self.y = self.y + 5 * self.h
+		local h = self.h / NoteChartSetList.rows
+		local y = self.y + 5 * h
+		local x, w = self.x, self.w
 
 		love.graphics.setColor(1, 1, 1, 1)
 		love.graphics.setCanvas({getCanvas(1), stencil = true})
 		love.graphics.clear()
 
 		love.graphics.setColor(1, 0.7, 0.2, 1)
-		love.graphics.rectangle("fill", self.x, self.y, self.w, self.h, self.h / 2)
+		love.graphics.rectangle("fill", x, y, w, h, h / 2)
 		love.graphics.setColor(1, 1, 1, 1)
 
 		NoteChartSetSelectFrameOff.shader = love.graphics.getShader()
@@ -595,8 +277,8 @@ local NoteChartSetSelectFrameOn = {
 
 		love.graphics.replaceTransform(_transform(transform))
 
-		local _x, _y = love.graphics.transformPoint(self.x, self.y)
-		local _xw, _yh = love.graphics.transformPoint(self.x + self.w, self.y + self.h)
+		local _x, _y = love.graphics.transformPoint(x, y)
+		local _xw, _yh = love.graphics.transformPoint(x + w, y + h)
 		local _w, _h = _xw - _x, _yh - _y
 
 		self.invertShader:send("rect", {_x, _y, _w, _h})
@@ -617,215 +299,112 @@ local NoteChartList = NoteChartListView:new({
 		)
 		self.__index.draw(self)
 	end,
-	rows = 5,
-	elements = {
-		{
-			type = "text",
-			key = "name",
-			onNew = false,
-			x = 116 + 18,
-			baseline = 45,
-			limit = math.huge,
-			align = "left",
-			font = {
-				filename = "Noto Sans",
-				size = 24,
-			},
-		},
-		{
-			type = "text",
-			key = "creator",
-			onNew = true,
-			x = 117 + 18,
-			baseline = 19,
-			limit = math.huge,
-			align = "left",
-			font = {
-				filename = "Noto Sans",
-				size = 16,
-			},
-		},
-		{
-			type = "text",
-			key = "inputMode",
-			onNew = true,
-			x = 17 + 18,
-			baseline = 19,
-			limit = 500,
-			align = "left",
-			font = {
-				filename = "Noto Sans",
-				size = 16,
-			},
-		},
-		{
-			type = "text",
-			value = function(self, item)
-				local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
-				return (item.difficulty or 0) * baseTimeRate
-			end,
-			onNew = false,
-			x = 0 + 18,
-			baseline = 45,
-			limit = 72,
-			align = "right",
-			font = {
-				filename = "Noto Sans Mono",
-				size = 24,
-			},
-			format = formatDifficulty
-		},
-		{
-			type = "circle",
-			key = "lamp",
-			onNew = false,
-			x = 94 + 18,
-			y = 36,
-			r = 7
-		},
-	},
-})
+	drawItem = function(self, i, w, h)
+		local items = self.items
+		local item = items[i]
 
-local Cells = CellView:new({
-	subscreen = "notecharts",
-	transform = transform,
-	draw = function(self)
-		getRect(self, Layout.column2row1)
-
-		self.smallCell.w = self.w / 4
-
-		local tf = _transform(transform):translate(self.x, self.y + self.h - 118)
-		love.graphics.replaceTransform(tf)
+		just.indent(18)
 
 		local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
-		local noteChartItem = self.game.selectModel.noteChartItem
-		local scoreItem = self.game.selectModel.scoreItem
 
-		local bpm = 0
-		local length = 0
-		local noteCount = 0
-		local level = 0
-		local longNoteRatio = 0
-		local localOffset = 0
-		if noteChartItem then
-			bpm = (noteChartItem.bpm or 0) * baseTimeRate
-			length = (noteChartItem.length or 0) / baseTimeRate
-			noteCount = noteChartItem.noteCount
-			level = noteChartItem.level
-			longNoteRatio = noteChartItem.longNoteRatio
-			localOffset = noteChartItem.localOffset or 0
+		local difficulty = formatDifficulty((item.difficulty or 0) * baseTimeRate)
+		local inputMode = item.inputMode
+		local name = item.name
+		local creator = item.creator
+		if items[i - 1] and items[i - 1].inputMode == inputMode then
+			inputMode = ""
+		end
+		if items[i - 1] and items[i - 1].creator == creator then
+			creator = ""
 		end
 
-		local score = 0
-		local rating = 0
-		local difficulty = 0
-		local accuracy = 0
-		local time = 0
-		local missCount = 0
-		if scoreItem then
-			score = scoreItem.score
-			rating = scoreItem.rating
-			difficulty = scoreItem.difficulty
-			accuracy = scoreItem.accuracy
-			time = scoreItem.time
-			missCount = scoreItem.missCount
-			if score ~= score then
-				score = 0
-			end
+		TextCellImView(72, h, "right", inputMode, difficulty, true)
+		just.sameline()
+
+		if item.lamp then
+			love.graphics.circle("fill", 22, 36, 7)
+			love.graphics.circle("line", 22, 36, 7)
 		end
+		just.indent(44)
 
-		self:drawCell(self.smallCell, "text", 1, "bpm", ("%d"):format(bpm))
-		just.sameline()
-		self:drawCell(self.smallCell, "text", 1, "duration", rtime(length))
-		just.sameline()
-		self:drawCell(self.smallCell, "text", 1, "notes", noteCount)
-		just.sameline()
-		self:drawCell(self.smallCell, "text", 1, "level", level)
-		self:drawCell(self.smallCell, "bar", 2, "long notes", longNoteRatio)
-		just.sameline()
-		self:drawCell(self.smallCell, "text", 2, "local offset", localOffset * 1000)
-
-		getRect(self, Layout.column1row2)
-
-		tf = _transform(transform):translate(self.x + self.w / 2, self.y + 6)
-		love.graphics.replaceTransform(tf)
-
-		-- self:drawCell(self.smallCell, "text", 1, "rating", formatDifficulty(rating))
-		-- just.sameline()
-		self:drawCell(self.smallCell, "text", 1, "score", ("%d"):format(score))
-		just.sameline()
-		self:drawCell(self.smallCell, "text", 1, "accuracy", formatScore(accuracy))
-
-		-- local time_ago = time ~= 0 and time_ago_in_words(time) or "never"
-		-- self:drawCell(self.smallCell, "text", 1, "played time ago", time_ago)
-		self:drawCell(self.smallCell, "text", 1, "difficulty", formatDifficulty(difficulty))
-		just.sameline()
-
-		-- love.graphics.push()
-		self:drawCell(self.smallCell, "text", 1, "miss count", ("%d"):format(missCount))
-		-- love.graphics.pop()
-
+		TextCellImView(math.huge, h, "left", creator, name)
 	end,
-	smallCell = {
-		w = 90,
-		-- w = 113,
-		h = 50,
-		name = {
-			x = 22,
-			xr = 22,
-			baseline = 18,
-			align = "right",
-			font = {
-				filename = "Noto Sans",
-				size = 16,
-			},
-		},
-		value = {
-			text = {
-				x = 22,
-				xr = 22,
-				baseline = 44,
-				align = "right",
-				font = {
-					filename = "Noto Sans",
-					size = 24,
-				},
-			},
-			bar = {
-				x = 22,
-				xr = 22,
-				y = 26,
-				h = 19
-			}
-		}
-	},
-	largeCell = {
-		w = 227,
-		h = 72,
-		name = {
-			x = 22,
-			xr = 22,
-			baseline = 15,
-			align = "right",
-			font = {
-				filename = "Noto Sans",
-				size = 18,
-			},
-		},
-		value = {
-			text = {
-				x = 22,
-				xr = 22,
-				baseline = 49,
-				align = "right",
-				font = {
-					filename = "Noto Sans",
-					size = 36,
-				},
-			}
-		}
-	}
+	rows = 5,
 })
+
+local Cells = {draw = function(self)
+	if not self.navigator:getSubscreen("notecharts") then
+		return
+	end
+
+	getRect(self, Layout.column2row1)
+
+	local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
+	local noteChartItem = self.game.selectModel.noteChartItem
+	local scoreItem = self.game.selectModel.scoreItem
+
+	local bpm = 0
+	local length = 0
+	local noteCount = 0
+	local level = 0
+	local longNoteRatio = 0
+	local localOffset = 0
+	if noteChartItem then
+		bpm = (noteChartItem.bpm or 0) * baseTimeRate
+		length = (noteChartItem.length or 0) / baseTimeRate
+		noteCount = noteChartItem.noteCount
+		level = noteChartItem.level
+		longNoteRatio = noteChartItem.longNoteRatio
+		localOffset = noteChartItem.localOffset or 0
+	end
+
+	local score = 0
+	local difficulty = 0
+	local accuracy = 0
+	local missCount = 0
+	if scoreItem then
+		score = scoreItem.score
+		difficulty = scoreItem.difficulty
+		accuracy = scoreItem.accuracy
+		missCount = scoreItem.missCount
+		if score ~= score then
+			score = 0
+		end
+	end
+
+	local w = (self.w - 44) / 4
+	local h = 50
+
+	local tf = _transform(transform):translate(self.x, self.y + self.h - 118)
+	love.graphics.replaceTransform(tf)
+
+	just.indent(22)
+	TextCellImView(w, h, "right", "bpm", ("%d"):format(bpm))
+	just.sameline()
+	TextCellImView(w, h, "right", "duration", rtime(length))
+	just.sameline()
+	TextCellImView(w, h, "right", "notes", noteCount)
+	just.sameline()
+	TextCellImView(w, h, "right", "level", level)
+
+	just.indent(22)
+	BarCellImView(2 * w, h, "right", "long notes", longNoteRatio)
+	just.sameline()
+	TextCellImView(2 * w, h, "right", "local offset", localOffset * 1000)
+
+	getRect(self, Layout.column1row2)
+
+	tf = _transform(transform):translate(self.x + self.w / 2, self.y + 6)
+	love.graphics.replaceTransform(tf)
+
+	TextCellImView(w, h, "right", "score", ("%d"):format(score))
+	just.sameline()
+	TextCellImView(w, h, "right", "accuracy", formatScore(accuracy))
+
+	TextCellImView(w, h, "right", "difficulty", formatDifficulty(difficulty))
+	just.sameline()
+	TextCellImView(w, h, "right", "miss count", ("%d"):format(missCount))
+end}
 
 local BackgroundBlurSwitch = GaussianBlurView:new({
 	blur = {key = "game.configModel.configs.settings.graphics.blur.select"}
@@ -840,10 +419,6 @@ local Background = BackgroundView:new({
 		self.h = Layout.h or 0
 		self.__index.draw(self)
 	end,
-	x = 0,
-	y = 0,
-	w = 1920,
-	h = 1080,
 	parallax = 0.01,
 	dim = {key = "game.configModel.configs.settings.graphics.dim.select"},
 })
@@ -855,14 +430,14 @@ local BackgroundBanner = BackgroundView:new({
 		self.stencilFunction = function()
 			love.graphics.replaceTransform(_transform(transform))
 			love.graphics.setColor(1, 1, 1, 1)
-			drawFrame(Layout.column2row1)
+			local x, y, w, h = getRect(nil, Layout.column2row1)
+			love.graphics.rectangle("fill", x, y, w, h, 36)
 		end
 		self.gradient = newGradient(
 			"vertical",
 			{0, 0, 0, 0},
 			{0, 0, 0, 1}
 		)
-		print(self.gradient)
 	end,
 	draw = function(self)
 		getRect(self, Layout.column2row1)
@@ -874,10 +449,6 @@ local BackgroundBanner = BackgroundView:new({
 		love.graphics.draw(self.gradient, self.x, self.y, 0, self.w, self.h)
 		love.graphics.setStencilTest()
 	end,
-	x = 0,
-	y = 0,
-	w = 1920,
-	h = 1080,
 	parallax = 0,
 	dim = {value = 0},
 })
@@ -892,10 +463,6 @@ local NoteChartSetScrollBar = ScrollBarView:new({
 		self.w = 16
 		self.__index.draw(self)
 	end,
-	x = 1641,
-	y = 144,
-	w = 16,
-	h = 792,
 	rows = 11,
 	backgroundColor = {1, 1, 1, 0},
 	color = {1, 1, 1, 0.66}
@@ -926,6 +493,7 @@ local SearchField = SearchFieldView:new({
 			size = 20,
 		},
 	},
+	placeholder = "Filter...",
 	searchString = "game.searchModel.searchFilter",
 	searchMode = "filter",
 })
@@ -1150,11 +718,11 @@ local BottomNotechartsScreenMenu = ScreenMenuView:new({
 		local tf = _transform(transform):translate(self.x, self.y)
 		love.graphics.replaceTransform(tf)
 
-		if IconButtonView:draw("settings", "settings", self.h, 0.5) then
+		if IconButtonImView("settings", "settings", self.h, 0.5) then
 			self.navigator:call("openSettings")
 		end
 		just.sameline()
-		if IconButtonView:draw("mounts", "folder_open", self.h, 0.5) then
+		if IconButtonImView("mounts", "folder_open", self.h, 0.5) then
 			self.navigator:call("openMounts")
 		end
 		just.sameline()
@@ -1234,32 +802,27 @@ local NoteChartOptionsScreenMenu = {
 		love.graphics.replaceTransform(tf)
 
 		just.indent(36)
-		if IconButtonView:draw("open directory", "folder_open", self.h, 0.5) then
+		if IconButtonImView("open directory", "folder_open", self.h, 0.5) then
 			self.navigator:call("openDirectory")
 		end
 		just.sameline()
-		if IconButtonView:draw("update cache", "refresh", self.h, 0.5) then
+		if IconButtonImView("update cache", "refresh", self.h, 0.5) then
 			self.navigator:call("updateCache", true)
 		end
 		just.sameline()
 
 		local tf = _transform(transform):translate(self.x + self.w - self.h * 2 - 36, self.y)
 		love.graphics.replaceTransform(tf)
-		if IconButtonView:draw("result", "info_outline", self.h, 0.5) then
+		if IconButtonImView("result", "info_outline", self.h, 0.5) then
 			self.navigator:call("result")
 		end
 		just.sameline()
-		if IconButtonView:draw("play", "keyboard_arrow_right", self.h, 0.5) then
+		if IconButtonImView("play", "keyboard_arrow_right", self.h, 0.5) then
 			self.navigator:call("play")
 		end
 		just.sameline()
 	end,
 }
-
-local Rectangle = RectangleView:new({
-	transform = transform,
-	rectangles = {},
-})
 
 local Logo = LogoView:new({
 	transform = transform,
@@ -1275,16 +838,6 @@ local Logo = LogoView:new({
 		w = 48,
 		h = 48
 	},
-	-- text = {
-	-- 	x = 89,
-	-- 	baseline = 56,
-	-- 	limit = 365,
-	-- 	align = "left",
-	-- 	font = {
-	-- 		filename = "Noto Sans",
-	-- 		size = 32,
-	-- 	},
-	-- }
 })
 
 local UserInfo = UserInfoView:new({
@@ -1298,10 +851,6 @@ local UserInfo = UserInfoView:new({
 		self.x = self.x + self.w - Layout.header.h
 		self.y = 0
 		self.h = Layout.header.h
-		-- self.x = Layout.x1[5] - Layout.h0[1]
-		-- self.y = Layout.y0[1]
-		-- self.w = Layout.w1[2]
-		-- self.h = Layout.h0[1]
 		self.__index.draw(self)
 	end,
 	image = {
@@ -1331,7 +880,7 @@ local SelectViewConfig = {
 	BackgroundBlurSwitch,
 	Background,
 	BackgroundBlurSwitch,
-	Frames,
+	Layout,
 	BackgroundBanner,
 	NoteChartSetSelectFrameOn,
 	NoteChartSetList,
@@ -1360,7 +909,6 @@ local SelectViewConfig = {
 	NoteChartOptionsScreenMenu,
 	UpdateStatus,
 	SessionTime,
-	Rectangle,
 	Logo,
 	UserInfo,
 	require("sphere.views.DebugInfoViewConfig"),

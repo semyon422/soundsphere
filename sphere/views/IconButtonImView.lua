@@ -1,8 +1,6 @@
 local just = require("just")
 local icons = require("sphere.assets.icons")
 
-local IconButtonView = {}
-
 local images = {}
 local function getImage(name)
 	if not images[name] then
@@ -11,7 +9,7 @@ local function getImage(name)
 	return images[name]
 end
 
-IconButtonView.draw = function(self, id, name, size, scale)
+return function(id, name, size, scale)
 	local image = getImage(name)
 	local width = image:getWidth()
 
@@ -32,5 +30,3 @@ IconButtonView.draw = function(self, id, name, size, scale)
 
 	return changed
 end
-
-return IconButtonView
