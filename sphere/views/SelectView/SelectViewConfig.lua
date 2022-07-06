@@ -10,12 +10,13 @@ local newGradient = require("aqua.graphics.newGradient")
 local ScrollBarView = require("sphere.views.ScrollBarView")
 local IconButtonImView = require("sphere.views.IconButtonImView")
 local TextButtonImView = require("sphere.views.TextButtonImView")
+local CheckboxImView = require("sphere.views.CheckboxImView")
+local LabelImView = require("sphere.views.LabelImView")
 local BackgroundView = require("sphere.views.BackgroundView")
 local ValueView = require("sphere.views.ValueView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
 local UserInfoView = require("sphere.views.UserInfoView")
 local LogoView = require("sphere.views.LogoView")
-local SwitchView = require("sphere.views.SwitchView")
 local ScoreListView	= require("sphere.views.ResultView.ScoreListView")
 
 local NoteChartSetListView = require("sphere.views.SelectView.NoteChartSetListView")
@@ -545,22 +546,18 @@ local GroupCheckbox = {
 		getRect(self, Layout.column2)
 		self.x = self.x + self.w * 1 / 3
 		self.w = self.w / 3
-		self.y = Layout.header.y + 17
-		self.h = Layout.header.h - 34
+		self.y = Layout.header.y
+		self.h = Layout.header.h
 		love.graphics.replaceTransform(_transform(transform):translate(self.x, self.y))
 
-		local over = SwitchView:isOver(self.w, self.h)
-		local changed = just.button_behavior(self, over)
-		if changed then
+		local collapse = self.game.noteChartSetLibraryModel.collapse
+		if CheckboxImView(self, collapse, self.h, 0.4) then
 			self.navigator:changeCollapse()
 		end
-		local collapse = self.game.noteChartSetLibraryModel.collapse
-		SwitchView:draw(self.h, self.h, collapse)
-
-		love.graphics.translate(self.h / 2, 0)
+		just.sameline()
 
 		love.graphics.setFont(spherefonts.get("Noto Sans", 20))
-		baseline_print("group", 27, 35, self.w - 54, 1, "left")
+		LabelImView("group", self.h, "left")
 	end,
 }
 
