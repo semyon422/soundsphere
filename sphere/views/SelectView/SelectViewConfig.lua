@@ -9,7 +9,7 @@ local newGradient = require("aqua.graphics.newGradient")
 
 local ScrollBarView = require("sphere.views.ScrollBarView")
 local IconButtonImView = require("sphere.views.IconButtonImView")
-local ScreenMenuView = require("sphere.views.ScreenMenuView")
+local TextButtonImView = require("sphere.views.TextButtonImView")
 local BackgroundView = require("sphere.views.BackgroundView")
 local ValueView = require("sphere.views.ValueView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
@@ -621,7 +621,7 @@ local SessionTime = ValueView:new({
 	align = "left",
 })
 
-local BottomNotechartsScreenMenu = ScreenMenuView:new({
+local BottomNotechartsScreenMenu = {
 	subscreen = "notecharts",
 	draw = function(self)
 		getRect(self, Layout.footer)
@@ -643,21 +643,28 @@ local BottomNotechartsScreenMenu = ScreenMenuView:new({
 			self.navigator:call("openMounts")
 		end
 		just.sameline()
-
-		self:button("modifiers", w, self.h, "changeScreen", "modifierView")
+		if TextButtonImView("modifiers", "modifiers", w, self.h) then
+			self.navigator:call("changeScreen", "modifierView")
+		end
 		just.sameline()
-		self:button("noteskins", w, self.h, "openNoteSkins")
+		if TextButtonImView("noteskins", "noteskins", w, self.h) then
+			self.navigator:call("openNoteSkins")
+		end
 		just.sameline()
-		self:button("input", w, self.h, "openInput")
+		if TextButtonImView("input", "input", w, self.h) then
+			self.navigator:call("openInput")
+		end
 
 		local tf = _transform(transform):translate(Layout.column3.x, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
 
-		self:button("collections", Layout.column3.w, Layout.footer.h, "switchToCollections")
+		if TextButtonImView("collections", "collections", Layout.column3.w, Layout.footer.h) then
+			self.navigator:call("switchToCollections")
+		end
 	end,
-})
+}
 
-local BottomCollectionsScreenMenu = ScreenMenuView:new({
+local BottomCollectionsScreenMenu = {
 	subscreen = "collections",
 	draw = function(self)
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
@@ -665,21 +672,27 @@ local BottomCollectionsScreenMenu = ScreenMenuView:new({
 		local tf = _transform(transform):translate(Layout.column1.x, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
 
-		self:button("calc top scores", Layout.column1.w, Layout.footer.h, "calculateTopScores")
+		if TextButtonImView("calc top scores", "calc top scores", Layout.column1.w, Layout.footer.h) then
+			self.navigator:call("calculateTopScores")
+		end
 
 		local tf = _transform(transform):translate(Layout.column2.x + Layout.column2.w / 2, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
 
-		self:button("direct", Layout.column2.w / 2, Layout.footer.h, "switchToOsudirect")
+		if TextButtonImView("direct", "direct", Layout.column2.w / 2, Layout.footer.h) then
+			self.navigator:call("switchToOsudirect")
+		end
 
 		local tf = _transform(transform):translate(Layout.column3.x, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
 
-		self:button("notecharts", Layout.column3.w, Layout.footer.h, "switchToNoteCharts")
+		if TextButtonImView("notecharts", "notecharts", Layout.column3.w, Layout.footer.h) then
+			self.navigator:call("switchToNoteCharts")
+		end
 	end,
-})
+}
 
-local BottomRightOsudirectScreenMenu = ScreenMenuView:new({
+local BottomRightOsudirectScreenMenu = {
 	subscreen = "osudirect",
 	draw = function(self)
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
@@ -687,11 +700,15 @@ local BottomRightOsudirectScreenMenu = ScreenMenuView:new({
 		local tf = _transform(transform):translate(Layout.column2.x, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
 
-		self:button("download", Layout.column2.w, Layout.footer.h, "downloadBeatmapSet")
+		if TextButtonImView("download", "download", Layout.column2.w, Layout.footer.h) then
+			self.navigator:call("downloadBeatmapSet")
+		end
 		just.sameline()
-		self:button("collections", Layout.column3.w, Layout.footer.h, "switchToCollections")
+		if TextButtonImView("collections", "collections", Layout.column3.w, Layout.footer.h) then
+			self.navigator:call("switchToCollections")
+		end
 	end,
-})
+}
 
 local NoteChartOptionsScreenMenu = {
 	subscreen = "notecharts",
