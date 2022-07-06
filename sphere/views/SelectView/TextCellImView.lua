@@ -21,5 +21,5 @@ return function(w, h, align, name, value, isMono)
 	end
 	baseline_print(value or 0, x, 45, limit, 1, align)
 
-	just.nextline(w, h)
+	just.next(w, h)
 end

@@ -23,5 +23,5 @@ return function(w, h, align, name, value)
 		love.graphics.rectangle("fill", 0, 26, (w - bh) * value + bh, bh, bh / 2, bh / 2)
 	end
 
-	just.nextline(w, h)
+	just.next(w, h)
 end

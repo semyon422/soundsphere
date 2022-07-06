@@ -15,7 +15,7 @@ return function(id, text, w, h)
 
 	frame_print(text, 0, 0, w, h, 1, "center", "center")
 
-	just.nextline(w, h)
+	just.next(w, h)
 
 	return changed
 end

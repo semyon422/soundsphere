@@ -47,7 +47,7 @@ ScreenMenuView.button = function(self, text, w, h, method, ...)
 
 	self.itemView:_draw(text, w, h, active, hovered)
 
-	just.nextline(w, h)
+	just.next(w, h)
 
 	return changed
 end

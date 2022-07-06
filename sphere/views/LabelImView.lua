@@ -9,5 +9,5 @@ return function(text, h, align)
 
 	frame_print(text, 0, 0, w, h, 1, align, "center")
 
-	just.nextline(w, h)
+	just.next(w, h)
 end

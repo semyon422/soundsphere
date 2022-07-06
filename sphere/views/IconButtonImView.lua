@@ -26,7 +26,7 @@ return function(id, name, size, scale)
 
 	love.graphics.draw(image, size * (1 - scale) / 2, size * (1 - scale) / 2, 0, size / width * scale)
 
-	just.nextline(size, size)
+	just.next(size, size)
 
 	return changed
 end

@@ -18,7 +18,7 @@ return function(id, v, size, scale)
 		love.graphics.circle("line", size / 2, size / 2, size / 2 * scale * 0.6)
 	end
 
-	just.nextline(size, size)
+	just.next(size, size)
 
 	return changed
 end

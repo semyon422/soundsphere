@@ -113,14 +113,13 @@ local ScoreList = ScoreListView:new({
 		local item = self.items[i]
 		w = (w - 44) / 5
 
+		just.row(true)
 		just.indent(22)
 		TextCellImView(w, h, "right", i == 1 and "rank" or "", item.rank)
-		just.sameline()
 		TextCellImView(w, h, "right", i == 1 and "rating" or "", Format.difficulty(item.rating))
-		just.sameline()
 		TextCellImView(w, h, "right", i == 1 and "time rate" or "", Format.timeRate(item.timeRate))
-		just.sameline()
 		TextCellImView(w * 2, h, "right", item.time ~= 0 and time_ago_in_words(item.time) or "never", item.inputMode)
+		just.row(false)
 	end,
 	rows = 5,
 })
@@ -344,32 +343,32 @@ local Cells = {draw = function(self)
 	local tf = _transform(transform):translate(self.x, self.y + self.h - 118)
 	love.graphics.replaceTransform(tf)
 
+	just.row(true)
 	just.indent(22)
 	TextCellImView(w, h, "right", "bpm", ("%d"):format(bpm))
-	just.sameline()
 	TextCellImView(w, h, "right", "duration", rtime(length))
-	just.sameline()
 	TextCellImView(w, h, "right", "notes", noteCount)
-	just.sameline()
 	TextCellImView(w, h, "right", "level", level)
 
+	just.row(true)
 	just.indent(22)
 	BarCellImView(2 * w, h, "right", "long notes", longNoteRatio)
-	just.sameline()
 	TextCellImView(2 * w, h, "right", "local offset", localOffset * 1000)
 
 	getRect(self, Layout.column1row2)
 
+	just.row(false)
 	tf = _transform(transform):translate(self.x + self.w / 2, self.y + 6)
 	love.graphics.replaceTransform(tf)
 
+	just.row(true)
 	TextCellImView(w, h, "right", "score", ("%d"):format(score))
-	just.sameline()
 	TextCellImView(w, h, "right", "accuracy", Format.accuracy(accuracy))
 
+	just.row(true)
 	TextCellImView(w, h, "right", "difficulty", Format.difficulty(difficulty))
-	just.sameline()
 	TextCellImView(w, h, "right", "miss count", ("%d"):format(missCount))
+	just.row(false)
 end}
 
 local BackgroundBlurSwitch = GaussianBlurView:new({
@@ -632,25 +631,23 @@ local BottomNotechartsScreenMenu = {
 		local tf = _transform(transform):translate(self.x, self.y)
 		love.graphics.replaceTransform(tf)
 
+		just.row(true)
 		if IconButtonImView("settings", "settings", self.h, 0.5) then
 			self.navigator:call("openSettings")
 		end
-		just.sameline()
 		if IconButtonImView("mounts", "folder_open", self.h, 0.5) then
 			self.navigator:call("openMounts")
 		end
-		just.sameline()
 		if TextButtonImView("modifiers", "modifiers", w, self.h) then
 			self.navigator:call("changeScreen", "modifierView")
 		end
-		just.sameline()
 		if TextButtonImView("noteskins", "noteskins", w, self.h) then
 			self.navigator:call("openNoteSkins")
 		end
-		just.sameline()
 		if TextButtonImView("input", "input", w, self.h) then
 			self.navigator:call("openInput")
 		end
+		just.row(false)
 
 		local tf = _transform(transform):translate(Layout.column3.x, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
@@ -717,26 +714,27 @@ local NoteChartOptionsScreenMenu = {
 		local tf = _transform(transform):translate(self.x, self.y)
 		love.graphics.replaceTransform(tf)
 
+		just.row(true)
 		just.indent(36)
 		if IconButtonImView("open directory", "folder_open", self.h, 0.5) then
 			self.navigator:call("openDirectory")
 		end
-		just.sameline()
 		if IconButtonImView("update cache", "refresh", self.h, 0.5) then
 			self.navigator:call("updateCache", true)
 		end
-		just.sameline()
 
+		just.row(false)
 		local tf = _transform(transform):translate(self.x + self.w - self.h * 2 - 36, self.y)
 		love.graphics.replaceTransform(tf)
+
+		just.row(true)
 		if IconButtonImView("result", "info_outline", self.h, 0.5) then
 			self.navigator:call("result")
 		end
-		just.sameline()
 		if IconButtonImView("play", "keyboard_arrow_right", self.h, 0.5) then
 			self.navigator:call("play")
 		end
-		just.sameline()
+		just.row(false)
 	end,
 }
 
