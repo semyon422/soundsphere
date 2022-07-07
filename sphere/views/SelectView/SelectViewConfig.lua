@@ -308,30 +308,22 @@ local Cells = {draw = function(self)
 	local noteChartItem = self.game.selectModel.noteChartItem
 	local scoreItem = self.game.selectModel.scoreItem
 
-	local bpm = 0
-	local length = 0
-	local noteCount = 0
-	local level = 0
-	local longNoteRatio = 0
-	local localOffset = 0
+	local bpm, length, noteCount, level, longNoteRatio, localOffset
 	if noteChartItem then
 		bpm = (noteChartItem.bpm or 0) * baseTimeRate
 		length = (noteChartItem.length or 0) / baseTimeRate
-		noteCount = noteChartItem.noteCount
-		level = noteChartItem.level
-		longNoteRatio = noteChartItem.longNoteRatio
+		noteCount = noteChartItem.noteCount or 0
+		level = noteChartItem.level or 0
+		longNoteRatio = noteChartItem.longNoteRatio or 0
 		localOffset = noteChartItem.localOffset or 0
 	end
 
-	local score = 0
-	local difficulty = 0
-	local accuracy = 0
-	local missCount = 0
+	local score, difficulty, accuracy, missCount
 	if scoreItem then
-		score = scoreItem.score
-		difficulty = scoreItem.difficulty
-		accuracy = scoreItem.accuracy
-		missCount = scoreItem.missCount
+		score = scoreItem.score or 0
+		difficulty = scoreItem.difficulty or 0
+		accuracy = scoreItem.accuracy or 0
+		missCount = scoreItem.missCount or 0
 		if score ~= score then
 			score = 0
 		end
