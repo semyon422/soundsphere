@@ -43,6 +43,7 @@ InputView.draw = function(self)
 				self.navigator:setInputBinding(inputModeString, virtualKey, key, device)
 			end
 		end
+		imgui.CaptureKeyboardFromApp(true)
 	end
 	imgui.End()
 end
