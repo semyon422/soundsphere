@@ -475,8 +475,8 @@ local settings = {
 			-- "streamOpenAL", "sampleOpenAL"
 		},
 		displayValues = {
-			"sample",
-			"memory",
+			"bass sample",
+			"bass fx tempo",
 			-- "streamOAL", "sampleOAL"
 		},
 	},
@@ -491,8 +491,8 @@ local settings = {
 			-- "streamOpenAL", "sampleOpenAL"
 		},
 		displayValues = {
-			"sample",
-			"memory",
+			"bass sample",
+			"bass fx tempo",
 			-- "streamOAL", "sampleOAL"
 		},
 	},

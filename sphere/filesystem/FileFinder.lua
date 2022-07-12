@@ -20,12 +20,10 @@ local removeExtension = function(fileName)
 	return format and fileName:sub(1, -#ext - 2) or fileName, format
 end
 
-FileFinder.priority = {}
 FileFinder.paths = {}
 FileFinder.fileLists = {}
 
 FileFinder.reset = function(self)
-	self.priority = {}
 	self.paths = {}
 	self.fileLists = {}
 end

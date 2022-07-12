@@ -65,7 +65,6 @@ GameplayController.load = function(self)
 
 	sound.sample_gain = config.audio.sampleGain
 	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChart, function()
-		rhythmModel:setResourceAliases(NoteChartResourceLoader.aliases)
 		self:play()
 	end)
 

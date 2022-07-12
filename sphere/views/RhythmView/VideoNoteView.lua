@@ -1,6 +1,7 @@
 local NoteView = require("sphere.views.RhythmView.NoteView")
 local ImageNoteView		= require("sphere.views.RhythmView.ImageNoteView")
 local video			= require("aqua.video")
+local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 
 local VideoNoteView = NoteView:new({construct = false})
 
@@ -11,20 +12,16 @@ VideoNoteView.construct = function(self)
 	self.headView = self:newNotePartView("Head")
 
 	local images = self.startNoteData.images
-	local graphicEngine = self.graphicalNote.graphicEngine
-	local path = graphicEngine.aliases[images[1][1]]
+	local path = NoteChartResourceLoader.aliases[images[1][1]]
 
-	local vid = video.new(path)
-	local image
+	local vid = video.newVideo(path)
 
 	if vid then
 		vid:rewind()
-		image = vid.image
-
 		vid:setTimer(self.graphicalNote.timeEngine.timer)
 
 		self.video = vid
-		self.drawable = image
+		self.drawable = vid.image
 	end
 end
 

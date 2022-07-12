@@ -2,6 +2,7 @@ local AudioFactory		= require("aqua.audio.AudioFactory")
 local AudioContainer	= require("aqua.audio.Container")
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
+local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 
 local AudioEngine = Class:new()
 
@@ -19,7 +20,6 @@ AudioEngine.construct = function(self)
 		primary = "sample",
 		secondary = "sample",
 	}
-	self.aliases = {}
 
 	self.backgroundContainer = AudioContainer:new()
 	self.foregroundContainer = AudioContainer:new()
@@ -41,8 +41,8 @@ AudioEngine.update = function(self)
 end
 
 AudioEngine.unload = function(self)
-	self.backgroundContainer:stop()
-	self.foregroundContainer:stop()
+	self.backgroundContainer:release()
+	self.foregroundContainer:release()
 	self.loaded = false
 end
 
@@ -63,48 +63,44 @@ AudioEngine.receive = function(self, event)
 		end
 	end
 
-	if not noteData then
+	if not noteData or not noteData.sounds then
 		return
 	end
 	local layer = note.autoplay and "background" or "foreground"
 
-	self:playAudio(noteData.sounds, layer, noteData.keysound, noteData.stream, noteData.timePoint.absoluteTime)
+	self:playAudio(noteData.sounds, note.autoplay, noteData.stream, noteData.timePoint.absoluteTime)
 end
 
-AudioEngine.playAudio = function(self, paths, layer, keysound, stream, offset)
+AudioEngine.playAudio = function(self, sounds, isBackground, stream, offset)
 	local currentTime = self.rhythmModel.timeEngine.currentTime
-	local aliases = self.aliases
-	if not paths then return end
-	for i = 1, #paths do
-		local mode
-		if stream then
-			mode = self.mode.primary
-		else
-			mode = self.mode.secondary
-		end
+	local aliases = NoteChartResourceLoader.aliases
+	local resources = NoteChartResourceLoader.resources
+	for i = 1, #sounds do
+		local mode = stream and self.mode.primary or self.mode.secondary
 
-		local audio = AudioFactory:getAudio(aliases[paths[i][1]], mode)
+		local soundData = resources[aliases[sounds[i][1]]]
+		local audio = AudioFactory:getAudio(soundData, mode)
 
 		if audio then
 			audio.offset = offset or currentTime
-			audio:setRate(self.timeRate)
-			audio:setBaseVolume(paths[i][2])
+			audio:setBaseVolume(sounds[i][2])
 			local shouldPlay = true
 			if self.forcePosition then
 				local p = currentTime - audio.offset
-				if p > audio:getLength() then
+				if p >= audio:getLength() then
 					shouldPlay = false
 				else
 					audio:setPosition(p)
 				end
 			end
 			if shouldPlay then
-				if layer == "background" then
+				if isBackground then
 					self.backgroundContainer:add(audio)
-				elseif layer == "foreground" then
+				else
 					self.foregroundContainer:add(audio)
 				end
-				audio:play()
+			else
+				audio:release()
 			end
 		end
 	end

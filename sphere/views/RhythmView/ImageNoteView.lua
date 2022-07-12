@@ -1,6 +1,6 @@
-local image			= require("aqua.image")
 local transform = require("aqua.graphics.transform")
 local NoteView = require("sphere.views.RhythmView.NoteView")
+local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 
 local ImageNoteView = NoteView:new({construct = false})
 
@@ -9,8 +9,8 @@ ImageNoteView.construct = function(self)
 	self.headView = self:newNotePartView("Head")
 
 	local images = self.startNoteData.images
-	local path = self.graphicalNote.graphicEngine.aliases[images[1][1]]
-	self.drawable = image.getImage(path)
+	local path = NoteChartResourceLoader.aliases[images[1][1]]
+	self.drawable = NoteChartResourceLoader.resources[path].image
 end
 
 ImageNoteView.update = function(self)

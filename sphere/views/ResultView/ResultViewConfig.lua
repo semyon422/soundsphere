@@ -628,31 +628,6 @@ StageInfo.cells = {
 	},
 	{
 		type = StageInfo.smallCell,
-		valueType = "text",
-		x = 6, y = 3, size = 2,
-		name = "new diff.",
-		key = "game.rhythmModel.scoreEngine.ratingDifficulty",
-		format = "%0.2f",
-		show = showLoadedScore
-	},
-	{
-		type = StageInfo.smallCell,
-		valueType = "text",
-		x = 6, y = 4, size = 2,
-		name = "new rating",
-		format = "%0.2f",
-		show = showLoadedScore,
-		value = function(self)
-			local erfunc = require("libchart.erfunc")
-			local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
-			local normalscore = self.game.rhythmModel.scoreEngine.scoreSystem.normalscore
-			local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-			return s * self.game.rhythmModel.scoreEngine.ratingDifficulty
-		end,
-	},
-
-	{
-		type = StageInfo.smallCell,
 		valueType = "bar",
 		x = 1, y = 5, size = 2,
 		name = "perfect/hits",

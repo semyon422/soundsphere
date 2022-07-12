@@ -1,10 +1,7 @@
-local sound			= require("aqua.sound")
 local aquathread	= require("aqua.thread")
+local sound	= require("aqua.sound")
 
 local JamLoader = {}
-
-local loadedPath
-local loadedSoundDatas = {}
 
 local loadOjm = aquathread.async(function(path)
 	local sound = require("aqua.sound")
@@ -19,36 +16,21 @@ local loadOjm = aquathread.async(function(path)
 	local soundDatas = {}
 
 	for sampleIndex, sampleData in pairs(ojm.samples) do
-		soundDatas[sampleIndex] = sound.new(nil, love.filesystem.newFileData(sampleData, sampleIndex))
+		soundDatas[sampleIndex] = sound.newSoundData(love.filesystem.newFileData(sampleData, sampleIndex))
 	end
 
 	return soundDatas
 end)
 
-JamLoader.load = aquathread.coro(function(self, path, callback)
-	if loadedPath == path then
-		return callback(loadedSoundDatas)
-	end
-
-	for i, soundData in pairs(loadedSoundDatas) do
-		sound.free(soundData)
-		sound.remove(loadedPath .. "/" .. i)
-	end
-
-	local soundDatas, err = loadOjm(path)
+JamLoader.loadAsync = function(self, path)
+	local soundDatas = loadOjm(path)
 	if not soundDatas then
-		print(err)
 		return
 	end
-
-	loadedPath = path
-	loadedSoundDatas = soundDatas
-
-	for i, soundData in pairs(soundDatas) do
-		sound.add(path .. "/" .. i, soundData)
+	for _, soundData in pairs(soundDatas) do
+		setmetatable(soundData, {__index = sound.SoundData})
 	end
-
-	callback(soundDatas)
-end)
+	return soundDatas
+end
 
 return JamLoader
