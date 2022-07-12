@@ -34,4 +34,10 @@ Format.timeRate = function(timeRate)
 	return ("%.2f"):format(timeRate)
 end
 
+Format.inputMode = function(inputMode)
+	return inputMode
+		:gsub("key", "K")
+		:gsub("scratch", "S")
+end
+
 return Format

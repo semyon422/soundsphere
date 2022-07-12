@@ -1,5 +1,4 @@
 local _transform = require("aqua.graphics.transform")
-local baseline_print = require("aqua.graphics.baseline_print")
 local just = require("just")
 local spherefonts		= require("sphere.assets.fonts")
 local getCanvas		= require("aqua.graphics.canvas")
@@ -118,7 +117,7 @@ local ScoreList = ScoreListView:new({
 		TextCellImView(w, h, "right", i == 1 and "rank" or "", item.rank)
 		TextCellImView(w, h, "right", i == 1 and "rating" or "", Format.difficulty(item.rating))
 		TextCellImView(w, h, "right", i == 1 and "time rate" or "", Format.timeRate(item.timeRate))
-		TextCellImView(w * 2, h, "right", item.time ~= 0 and time_ago_in_words(item.time) or "never", item.inputMode)
+		TextCellImView(w * 2, h, "right", item.time ~= 0 and time_ago_in_words(item.time) or "never", Format.inputMode(item.inputMode))
 		just.row(false)
 	end,
 	rows = 5,
@@ -283,7 +282,7 @@ local NoteChartList = NoteChartListView:new({
 			creator = ""
 		end
 
-		TextCellImView(72, h, "right", inputMode, difficulty, true)
+		TextCellImView(72, h, "right", Format.inputMode(inputMode), difficulty, true)
 		just.sameline()
 
 		if item.lamp then
