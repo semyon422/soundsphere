@@ -131,7 +131,7 @@ for _, operator in ipairs(operators) do
 	end
 end
 
-SearchModel.transformSearchString = function(self, s, addCollectionFilter)
+SearchModel.transformSearchString = function(self, s, addCollectionFilter, showNonManiaCharts)
 	local searchString = s
 	local conditions = {}
 
@@ -141,6 +141,12 @@ SearchModel.transformSearchString = function(self, s, addCollectionFilter)
 			conditions,
 			("substr(noteCharts.path, 1, %d) = %q"):format(utf8.len(path), path)
 		)
+	end
+
+	if not showNonManiaCharts then
+		table.insert(conditions, "noteChartDatas.inputMode != \"1osu\"")
+		table.insert(conditions, "noteChartDatas.inputMode != \"1taiko\"")
+		table.insert(conditions, "noteChartDatas.inputMode != \"1fruits\"")
 	end
 
 	for _, searchSubString in ipairs(searchString:split(" ")) do
@@ -169,12 +175,15 @@ SearchModel.transformSearchString = function(self, s, addCollectionFilter)
 end
 
 SearchModel.getConditions = function(self)
+	local settings = self.game.configModel.configs.settings
+	local showNonManiaCharts = settings.miscellaneous.showNonManiaCharts
+
 	if self.searchLamp == "" then
-		return self:transformSearchString(self.searchFilter, true)
+		return self:transformSearchString(self.searchFilter, true, showNonManiaCharts)
 	end
 
 	return
-		self:transformSearchString(self.searchFilter, true),
+		self:transformSearchString(self.searchFilter, true, showNonManiaCharts),
 		self:transformSearchString(self.searchLamp)
 end
 

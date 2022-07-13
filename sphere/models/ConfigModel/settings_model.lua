@@ -532,6 +532,12 @@ local settings = {
 		key = "miscellaneous.imguiShowDemoWindow",
 		type = "Checkbox",
 	},
+	{
+		name = "show non-mania charts",
+		section = "miscellaneous",
+		key = "miscellaneous.showNonManiaCharts",
+		type = "Checkbox",
+	},
 }
 
 return settings

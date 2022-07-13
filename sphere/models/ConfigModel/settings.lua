@@ -138,6 +138,7 @@ return {
 	},
 	miscellaneous = {
 		autoUpdate = true,
-		imguiShowDemoWindow = false
+		imguiShowDemoWindow = false,
+		showNonManiaCharts = false
 	}
 }
