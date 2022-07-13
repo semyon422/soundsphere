@@ -38,7 +38,7 @@ end
 
 if jit.os == "Windows" then
 	local winapi = require("winapi")
-	winapi.putenv("PATH", ("%s;%s"):format(os.getenv("PATH"), root .. "/bin/win64"))
+	winapi.putenv("PATH", ("%s;%s"):format(winapi.getenv("PATH"), root .. "/bin/win64"))
 	winapi.chdir(root)
 	aquapackage.add("bin/win64")
 elseif jit.os == "Linux" then
