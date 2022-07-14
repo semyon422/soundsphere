@@ -40,7 +40,7 @@ ScreenMenuView.draw = function(self)
 end
 
 ScreenMenuView.button = function(self, text, w, h, method, ...)
-	local changed, active, hovered = just.button_behavior(text .. w .. h, self.itemView:isOver(w, h))
+	local changed, active, hovered = just.button_behavior(text .. w .. h, just.is_over(w, h))
 	if changed then
 		self.navigator:call(method, ...)
 	end

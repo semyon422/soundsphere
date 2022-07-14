@@ -1,13 +1,6 @@
 local ListView = require("sphere.views.ListView")
-local NoteChartListItemView = require("sphere.views.SelectView.NoteChartListItemView")
 
 local NoteChartListView = ListView:new({construct = false})
-
-NoteChartListView.construct = function(self)
-	ListView.construct(self)
-	self.itemView = NoteChartListItemView:new()
-	self.itemView.listView = self
-end
 
 NoteChartListView.reloadItems = function(self)
 	self.stateCounter = self.game.selectModel.noteChartStateCounter

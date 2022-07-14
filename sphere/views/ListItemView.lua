@@ -8,11 +8,6 @@ local Class = require("aqua.util.Class")
 
 local ListItemView = Class:new()
 
-ListItemView.isOver = function(self, w, h)
-	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-	return 0 <= mx and mx <= w and 0 <= my and my <= h
-end
-
 ListItemView.draw = function(self)
 	local listView = self.listView
 

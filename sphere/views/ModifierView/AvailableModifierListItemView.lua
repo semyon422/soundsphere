@@ -7,7 +7,7 @@ local AvailableModifierListItemView = ListItemView:new({construct = false})
 AvailableModifierListItemView.draw = function(self, w, h)
 	local listView = self.listView
 
-	if just.button_behavior(tostring(self.item) .. "1", self:isOver(w, h)) then
+	if just.button_behavior(tostring(self.item) .. "1", just.is_over(w, h)) then
 		self.listView.navigator:addModifier(self.itemIndex)
 	end
 

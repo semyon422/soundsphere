@@ -38,7 +38,7 @@ ModifierListItemStepperView.increaseValue = function(self, delta)
 end
 
 ModifierListItemStepperView.draw = function(self, w, h)
-	if just.button_behavior(tostring(self.item) .. "1", self:isOver(w, h), 2) then
+	if just.button_behavior(tostring(self.item) .. "1", just.is_over(w, h), 2) then
 		self.listView.navigator:removeModifier(self.itemIndex)
 	end
 
