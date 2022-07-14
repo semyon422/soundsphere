@@ -1,48 +1,45 @@
 local just = require("just")
-local ListItemStepperView = require("sphere.views.ListItemStepperView")
+local ListItemView = require("sphere.views.ListItemView")
+local StepperView = require("sphere.views.StepperView")
 
-local ModifierListItemStepperView = ListItemStepperView:new({construct = false})
-
-ModifierListItemStepperView.getName = function(self)
-	return self.item.name
-end
-
-ModifierListItemStepperView.getValue = function(self)
-	return self.item.value
-end
-
-ModifierListItemStepperView.getDisplayValue = function(self)
-	return self.item.value
-end
-
-ModifierListItemStepperView.getIndexValue = function(self)
-	local modifier = self.listView.game.modifierModel:getModifier(self.item)
-	return modifier:toIndexValue(self.item.value)
-end
-
-ModifierListItemStepperView.getCount = function(self)
-	local modifier = self.listView.game.modifierModel:getModifier(self.item)
-	return modifier:getCount()
-end
-
-ModifierListItemStepperView.updateIndexValue = function(self, indexValue)
-	local modifier = self.listView.game.modifierModel:getModifier(self.item)
-	self.listView.navigator:setModifierValue(
-		self.item,
-		modifier:fromIndexValue(indexValue)
-	)
-end
-
-ModifierListItemStepperView.increaseValue = function(self, delta)
-	self.listView.navigator:increaseModifierValue(self.itemIndex, delta)
-end
+local ModifierListItemStepperView = ListItemView:new({construct = false})
 
 ModifierListItemStepperView.draw = function(self, w, h)
-	if just.button_behavior(tostring(self.item) .. "1", just.is_over(w, h), 2) then
-		self.listView.navigator:removeModifier(self.itemIndex)
+	ListItemView.draw(self)
+
+	local listView = self.listView
+	local item = self.item
+
+	self:drawValue(listView.name, item.name)
+	self:drawValue(listView.stepper.value, item.value)
+
+	if just.button_behavior(tostring(item) .. "1", just.is_over(w, h), 2) then
+		listView.navigator:removeModifier(self.itemIndex)
 	end
 
-	ListItemStepperView.draw(self)
+	local x, y, w, h = listView:getItemElementPosition(listView.stepper)
+	love.graphics.push()
+	love.graphics.translate(x, y)
+
+	local modifier = listView.game.modifierModel:getModifier(item)
+	local value =  modifier:toIndexValue(item.value)
+	local count = modifier:getCount()
+
+	local overAll, overLeft, overRight = StepperView:isOver(w, h)
+
+	local id = tostring(item)
+	local scrolled, delta = just.wheel_behavior(id .. "A", overAll)
+	local changedLeft = just.button_behavior(id .. "L", overLeft)
+	local changedRight = just.button_behavior(id .. "R", overRight)
+
+	if changedLeft or delta == -1 then
+		listView.navigator:increaseModifierValue(self.itemIndex, -1)
+	elseif changedRight or delta == 1 then
+		listView.navigator:increaseModifierValue(self.itemIndex, 1)
+	end
+	StepperView:draw(w, h, value, count)
+
+	love.graphics.pop()
 end
 
 return ModifierListItemStepperView

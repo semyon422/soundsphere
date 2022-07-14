@@ -1,5 +1,14 @@
-local just = require("just")
 local _transform = require("aqua.graphics.transform")
+local just = require("just")
+local spherefonts = require("sphere.assets.fonts")
+
+local IconButtonImView = require("sphere.views.IconButtonImView")
+local TextButtonImView = require("sphere.views.TextButtonImView")
+local CheckboxImView = require("sphere.views.CheckboxImView")
+local LabelImView = require("sphere.views.LabelImView")
+local BarCellImView = require("sphere.views.SelectView.BarCellImView")
+local TextCellImView = require("sphere.views.SelectView.TextCellImView")
+
 local ScrollBarView = require("sphere.views.ScrollBarView")
 local RectangleView = require("sphere.views.RectangleView")
 local CircleView = require("sphere.views.CircleView")
@@ -32,8 +41,6 @@ local Frames = {draw = function()
 
 	local y0, h0 = just.layout(0, 1080, {89, y_int, -1, y_int, 89})
 
-
-
 	love.graphics.setColor(0, 0, 0, 0.8)
 	love.graphics.rectangle("fill", _x, y0[3], _w, h0[3])
 	love.graphics.rectangle("fill", _x, _y, _w, h0[1])
@@ -47,21 +54,34 @@ local AvailableModifierList = AvailableModifierListView:new({
 	w = 454,
 	h = 792,
 	rows = 11,
-	name = {
-		x = 44,
-		baseline = 45,
-		limit = 410,
-		align = "left",
-		font = {"Noto Sans", 24},
-		addedColor = {1, 1, 1, 0.5}
-	},
-	section = {
-		x = 0,
-		baseline = 19,
-		limit = 409,
-		align = "right",
-		font = {"Noto Sans", 16},
-	}
+	drawItem = function(self, i, w, h)
+		local item = self.items[i]
+		local prevItem = self.items[i - 1]
+
+		if just.button_behavior(i, just.is_over(w, h)) then
+			self.navigator:addModifier(i)
+		end
+
+		love.graphics.setColor(1, 1, 1, 1)
+		if item.oneUse and item.added then
+			love.graphics.setColor(1, 1, 1, 0.5)
+		end
+
+		just.row(true)
+		just.indent(44)
+		TextCellImView(410, 72, "left", "", item.name)
+		just.indent(-410 - 44)
+
+		love.graphics.setColor(1, 1, 1, 1)
+		if not prevItem or prevItem.oneUse ~= item.oneUse then
+			local text = "One use modifiers"
+			if not item.oneUse then
+				text = "Sequential modifiers"
+			end
+			TextCellImView(410, 72, "right", text, "")
+		end
+		just.row(false)
+	end,
 })
 
 local ModifierList = ModifierListView:new({
@@ -71,12 +91,9 @@ local ModifierList = ModifierListView:new({
 	w = 454,
 	h = 792,
 	rows = 11,
-	scroll = {
-		x = 0,
-		y = 0,
-		w = 227,
-		h = 792
-	},
+	draw = function(self)
+		self.__index.draw(self)
+	end,
 	name = {
 		x = 44,
 		baseline = 45,

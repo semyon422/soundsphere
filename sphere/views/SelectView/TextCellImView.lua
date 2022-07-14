@@ -3,8 +3,6 @@ local spherefonts = require("sphere.assets.fonts")
 local baseline_print = require("aqua.graphics.baseline_print")
 
 return function(w, h, align, name, value, isMono)
-	love.graphics.setColor(1, 1, 1, 1)
-
 	local limit = 2 * w
 	local x = 0
 	if align == "right" then

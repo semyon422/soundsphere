@@ -344,6 +344,8 @@ local Cells = {draw = function(self)
 	local tf = _transform(transform):translate(self.x, self.y + self.h - 118)
 	love.graphics.replaceTransform(tf)
 
+	love.graphics.setColor(1, 1, 1, 1)
+
 	just.row(true)
 	just.indent(22)
 	TextCellImView(w, h, "right", "bpm", ("%d"):format(bpm))
