@@ -1,3 +1,8 @@
+local just = require("just")
+local spherefonts		= require("sphere.assets.fonts")
+local time_ago_in_words = require("aqua.util").time_ago_in_words
+local _transform = require("aqua.graphics.transform")
+
 local ScrollBarView = require("sphere.views.ScrollBarView")
 local RectangleView = require("sphere.views.RectangleView")
 local ScreenMenuView = require("sphere.views.ScreenMenuView")
@@ -10,34 +15,18 @@ local ScoreListView	= require("sphere.views.ResultView.ScoreListView")
 local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
 local StageInfoView = require("sphere.views.SelectView.StageInfoView")
 local MatchPlayersView	= require("sphere.views.GameplayView.MatchPlayersView")
+local TextCellImView = require("sphere.views.SelectView.TextCellImView")
+local BarCellImView = require("sphere.views.SelectView.BarCellImView")
+local IconButtonImView = require("sphere.views.IconButtonImView")
+local TextButtonImView = require("sphere.views.TextButtonImView")
+local CheckboxImView = require("sphere.views.CheckboxImView")
+local LabelImView = require("sphere.views.LabelImView")
+local Format = require("sphere.views.Format")
 
 local inspect = require("inspect")
 local rtime = require("aqua.util.rtime")
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 local transformLeft = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
-
-local formatScore = function(score)
-	score = tonumber(score) or math.huge
-	if score >= 0.1 then
-		return "100+"
-	end
-	return ("%2.2f"):format(score * 1000)
-end
-
-local formatDifficulty = function(difficulty)
-	local format = "%.2f"
-	if not difficulty then
-		return ""
-	elseif difficulty >= 10000 then
-		format = "%s"
-		difficulty = "????"
-	elseif difficulty >= 100 then
-		format = "%d"
-	elseif difficulty > 9.995 then
-		format = "%.1f"
-	end
-	return format:format(difficulty)
-end
 
 local showLoadedScore = function(self)
 	if not self.game.rhythmModel.scoreEngine.scoreEntry then
@@ -219,144 +208,52 @@ local ScoreList = ScoreListView:new({
 	w = 454,
 	h = 504,
 	rows = 7,
-	elements = {
-		{
-			type = "text",
-			value = "rank",
-			onNew = true,
-			x = 22,
-			baseline = 19,
-			limit = 72,
-			align = "right",
-			font = {"Noto Sans", 16},
-		},
-		{
-			type = "text",
-			key = "rank",
-			onNew = false,
-			x = 22,
-			baseline = 45,
-			limit = 72,
-			align = "right",
-			font = {"Noto Sans Mono", 24},
-		},
-		{
-			type = "text",
-			value = "rating",
-			onNew = true,
-			x = 94,
-			baseline = 19,
-			limit = 72,
-			align = "right",
-			font = {"Noto Sans", 16},
-		},
-		{
-			type = "text",
-			onNew = false,
-			format = formatDifficulty,
-			x = 94,
-			baseline = 45,
-			limit = 72,
-			align = "right",
-			font = {"Noto Sans Mono", 24},
-			value = function(self, item)
-				if self.game.rhythmModel.scoreEngine.scoreEntry.id == item.id then
-					local erfunc = require("libchart.erfunc")
-					local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
-					local normalscore = self.game.rhythmModel.scoreEngine.scoreSystem.normalscore
-					local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-					return s * self.game.rhythmModel.scoreEngine.enps
-				end
-				local rating = item.rating
-				if rating ~= rating then
-					return "nan"
-				end
-				return rating
-			end,
-		},
-		{
-			type = "text",
-			value = "time rate",
-			onNew = true,
-			x = 166,
-			baseline = 19,
-			limit = 94,
-			align = "right",
-			font = {"Noto Sans", 16},
-		},
-		{
-			type = "text",
-			key = {
-				{"game.rhythmModel.scoreEngine.timeRate", showLoadedListScore},
-				"timeRate"
-			},
-			onNew = false,
-			x = 166,
-			baseline = 45,
-			limit = 94,
-			align = "right",
-			font = {"Noto Sans Mono", 24},
-			format = function(timeRate)
-				local exp = 10 * math.log(timeRate) / math.log(2)
-				local roundedExp = math.floor(exp + 0.5)
-				if math.abs(exp - roundedExp) % 1 < 1e-2 and math.abs(exp) > 1e-2 then
-					return ("%dQ"):format(roundedExp)
-				end
-				return ("%.2f"):format(timeRate)
-			end
-		},
-		{
-			type = "text",
-			value = "",
-			onNew = true,
-			x = 162,
-			baseline = 19,
-			limit = 270,
-			align = "right",
-			font = {"Noto Sans", 16},
-		},
-		{
-			type = "text",
-			key = "time",
-			ago = true,
-			onNew = false,
-			x = 162,
-			baseline = 19,
-			limit = 270,
-			align = "right",
-			font = {"Noto Sans", 16},
-		},
-		{
-			type = "text",
-			key = {
-				{"game.rhythmModel.scoreEngine.inputMode", showLoadedListScore},
-				"inputMode"
-			},
-			x = 162,
-			baseline = 45,
-			limit = 270,
-			align = "right",
-			font = {"Noto Sans", 24},
-		},
-		{
-			type = "circle",
-			key = "loaded",
-			mode = "line",
-			onNew = false,
-			x = 23,
-			y = 36,
-			r = 7
-		},
-		{
-			type = "circle",
-			key = "isTop",
-			mode = "both",
-			onNew = false,
-			x = 23,
-			y = 36,
-			r = 7
-		},
-	},
+	drawItem = function(self, i, w, h)
+		local item = self.items[i]
+
+		local scoreEngine = self.game.rhythmModel.scoreEngine
+		local scoreEntry = scoreEngine.scoreEntry
+		local loaded = scoreEntry and scoreEntry.replayHash == item.replayHash
+
+		if just.button_behavior(item, just.is_over(w, h)) then
+			self.navigator:loadScore(i)
+		end
+
+		if item.isTop then
+			love.graphics.circle("fill", 22, 36, 7)
+		end
+		if loaded or item.isTop then
+			love.graphics.circle("line", 22, 36, 7)
+		end
+
+		local rating = item.rating
+		local timeRate = item.timeRate
+		local inputMode = item.inputMode
+
+		if scoreEntry.id == item.id then
+			local erfunc = require("libchart.erfunc")
+			local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
+			local normalscore = scoreEngine.scoreSystem.normalscore
+			local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
+			rating = s * scoreEngine.enps
+
+			timeRate = scoreEngine.timeRate or timeRate
+			inputMode = scoreEngine.inputMode or inputMode
+		end
+
+		if rating ~= rating then
+			rating = "nan"
+		end
+
+		just.row(true)
+		just.indent(22)
+		TextCellImView(72, h, "right", i == 1 and "rank" or "", item.rank, true)
+		just.indent(22)
+		TextCellImView(72, h, "right", i == 1 and "rating" or "", Format.difficulty(rating), true)
+		TextCellImView(72 + 22, h, "right", i == 1 and "time rate" or "", Format.timeRate(timeRate), true)
+		TextCellImView(150, h, "right", item.time ~= 0 and time_ago_in_words(item.time) or "never", Format.inputMode(inputMode))
+		just.row(false)
+	end,
 })
 
 local ScoreScrollBar = ScrollBarView:new({
@@ -440,7 +337,7 @@ local ChartDifficultyView = ValueView:new({
 	align = "right",
 	font = {"Noto Sans Mono", 24},
 	transform = transform,
-	format = formatDifficulty
+	format = Format.difficulty
 })
 
 local StageInfo = StageInfoView:new({
@@ -545,7 +442,7 @@ StageInfo.cells = {
 			{"game.rhythmModel.scoreEngine.enps", showLoadedListScore},
 			"game.selectModel.scoreItem.difficulty"
 		},
-		format = formatDifficulty,
+		format = Format.difficulty,
 	},
 	{
 		type = StageInfo.smallCell,
@@ -582,7 +479,7 @@ StageInfo.cells = {
 			{"game.rhythmModel.scoreEngine.scoreSystem.normalscore.accuracyAdjusted", showLoadedScore},
 			"game.selectModel.scoreItem.accuracy"
 		},
-		format = formatScore
+		format = Format.accuracy
 	},
 	{
 		type = StageInfo.largeCell,
@@ -747,61 +644,27 @@ local ModifierIconGrid = ModifierIconGridView:new({
 	},
 })
 
-local BottomScreenMenu = ScreenMenuView:new({
-	transform = transform,
-	x = 279,
-	y = 991,
-	w = 227,
-	h = 89,
-	rows = 1,
-	columns = 1,
-	text = {
-		x = 0,
-		baseline = 54,
-		limit = 227,
-		align = "center",
-		font = {"Noto Sans", 24},
-	},
-	items = {
-		{
-			{
-				method = "back",
-				displayName = "back"
-			}
-		}
-	}
-})
+local BottomScreenMenu = {draw = function(self)
+	local w = 227
+	local h = 89
 
-local BottomRightScreenMenu = ScreenMenuView:new({
-	transform = transform,
-	x = 1187,
-	y = 991,
-	w = 454,
-	h = 89,
-	rows = 1,
-	columns = 2,
-	text = {
-		x = 0,
-		baseline = 54,
-		limit = 227,
-		align = "center",
-		font = {"Noto Sans", 24},
-	},
-	items = {
-		{
-			{
-				method = "play",
-				value = "replay",
-				displayName = "replay"
-			},
-			{
-				method = "play",
-				value = "retry",
-				displayName = "retry"
-			},
-		}
-	}
-})
+	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
+
+	local tf = _transform(transform):translate(279, 991)
+	love.graphics.replaceTransform(tf)
+
+	just.row(true)
+	if IconButtonImView("back", "arrow_back", h, 0.5) then
+		self.navigator:back()
+	end
+	if IconButtonImView("retry", "refresh", h, 0.5) then
+		self.navigator:play("retry")
+	end
+	if TextButtonImView("replay", "watch replay", w, h) then
+		self.navigator:play("replay")
+	end
+	just.row(false)
+end}
 
 local SessionTime = ValueView:new({
 	transform = transform,
@@ -876,7 +739,6 @@ local NoteSkinViewConfig = {
 	Background,
 	BackgroundBlurSwitch,
 	BottomScreenMenu,
-	BottomRightScreenMenu,
 	Rectangle,
 	require("sphere.views.HeaderViewConfig"),
 	SongTitleView,
