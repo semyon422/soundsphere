@@ -7,6 +7,8 @@ return function(w, h, align, name, value, isMono)
 	local x = 0
 	if align == "right" then
 		x = -w
+	elseif align == "center" then
+		limit = w
 	end
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 16))

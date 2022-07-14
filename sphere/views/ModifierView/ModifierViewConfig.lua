@@ -12,9 +12,11 @@ local TextCellImView = require("sphere.views.SelectView.TextCellImView")
 local ScrollBarView = require("sphere.views.ScrollBarView")
 local RectangleView = require("sphere.views.RectangleView")
 local CircleView = require("sphere.views.CircleView")
-local ScreenMenuView = require("sphere.views.ScreenMenuView")
 local BackgroundView = require("sphere.views.BackgroundView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
+local SwitchView = require("sphere.views.SwitchView")
+local StepperView = require("sphere.views.StepperView")
+local SliderView = require("sphere.views.SliderView")
 
 local AvailableModifierListView = require("sphere.views.ModifierView.AvailableModifierListView")
 local ModifierListView = require("sphere.views.ModifierView.ModifierListView")
@@ -91,48 +93,76 @@ local ModifierList = ModifierListView:new({
 	w = 454,
 	h = 792,
 	rows = 11,
-	draw = function(self)
-		self.__index.draw(self)
+	drawItem = function(self, i, w, h)
+		local item = self.items[i]
+		local w2 = w / 2
+
+		if just.button_behavior(tostring(item) .. "1", just.is_over(w2, h), 2) then
+			self.navigator:removeModifier(self.itemIndex)
+		end
+
+		just.row(true)
+		just.indent(44)
+		TextCellImView(w2 - 44, 72, "left", "", item.name)
+
+		local modifier = self.game.modifierModel:getModifier(item)
+		if modifier.interfaceType == "toggle" then
+			just.indent((w2 - h) / 2)
+			w2 = 72
+			local over = SwitchView:isOver(w2, h)
+			local scrolled, delta = just.wheel_behavior(item, over)
+			local changed, active, hovered = just.button_behavior(item, over)
+
+			local value = item.value
+			if changed then
+				value = not value
+			elseif delta ~= 0 then
+				value = delta == 1
+			end
+			if changed or delta ~= 0 then
+				self.navigator:setModifierValue(item, value)
+			end
+			SwitchView:draw(w2, h, value)
+		elseif modifier.interfaceType == "slider" then
+			just.indent(-w2)
+			TextCellImView(w2, 72, "right", "", item.value)
+
+			local value = modifier:toNormValue(item.value)
+
+			local over = SliderView:isOver(w2, h)
+			local pos = SliderView:getPosition(w2, h)
+
+			local scrolled, delta = just.wheel_behavior(item, over)
+			local changed, value, active, hovered = just.slider_behavior(item, over, pos, value, 0, 1)
+			if changed then
+				self.navigator:setModifierValue(item, modifier:fromNormValue(value))
+			elseif delta ~= 0 then
+				self.navigator:increaseModifierValue(self.itemIndex, delta)
+			end
+			SliderView:draw(w2, h, value)
+		elseif modifier.interfaceType == "stepper" then
+			TextCellImView(w2, 72, "center", "", item.value)
+			just.indent(-w2)
+
+			local value = modifier:toIndexValue(item.value)
+			local count = modifier:getCount()
+
+			local overAll, overLeft, overRight = StepperView:isOver(w2, h)
+
+			local id = tostring(item)
+			local scrolled, delta = just.wheel_behavior(id .. "A", overAll)
+			local changedLeft = just.button_behavior(id .. "L", overLeft)
+			local changedRight = just.button_behavior(id .. "R", overRight)
+
+			if changedLeft or delta == -1 then
+				self.navigator:increaseModifierValue(i, -1)
+			elseif changedRight or delta == 1 then
+				self.navigator:increaseModifierValue(i, 1)
+			end
+			StepperView:draw(w2, h, value, count)
+		end
+		just.row(false)
 	end,
-	name = {
-		x = 44,
-		baseline = 45,
-		limit = 183,
-		align = "left",
-		font = {"Noto Sans", 24},
-	},
-	slider = {
-		x = 227,
-		y = 0,
-		w = 227,
-		h = 72,
-		value = {
-			x = 0,
-			baseline = 45,
-			limit = 227,
-			align = "right",
-			font = {"Noto Sans", 24},
-		}
-	},
-	stepper = {
-		x = 227,
-		y = 0,
-		w = 227,
-		h = 72,
-		value = {
-			x = 227,
-			baseline = 45,
-			limit = 227,
-			align = "center",
-			font = {"Noto Sans", 24},
-		}
-	},
-	switch = {
-		x = 305,
-		y = 0,
-		w = 72,
-		h = 72
-	},
 })
 
 local AvailableModifierScrollBar = ScrollBarView:new({
@@ -215,31 +245,13 @@ local Circle = CircleView:new({
 	}
 })
 
-local BottomScreenMenu = ScreenMenuView:new({
-	transform = transform,
-	x = 279,
-	y = 991,
-	w = 227,
-	h = 89,
-	rows = 1,
-	columns = 1,
-	text = {
-		x = 0,
-		baseline = 54,
-		limit = 227,
-		align = "center",
-		font = {"Noto Sans", 24},
-	},
-	items = {
-		{
-			{
-				method = "changeScreen",
-				value = "selectView",
-				displayName = "back"
-			}
-		}
-	}
-})
+local BottomScreenMenu = {draw = function(self)
+	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.translate(279, 991)
+	if IconButtonImView(self, "arrow_back", 89, 0.5) then
+		self.navigator:changeScreen("selectView")
+	end
+end}
 
 local ModifierViewConfig = {
 	BackgroundBlurSwitch,
