@@ -137,12 +137,26 @@ return {
 
 		love.graphics.setColor(0, 0, 0, 0.8)
 
+		love.graphics.rectangle("fill", _x, _y, _w, h0[1])
+		love.graphics.rectangle("fill", _x, _yh - h0[5], _w, h0[1])
+
+		if self.navigator:getSubscreen("notecharts") then
+			return self:drawNotecharts()
+		end
+		if self.navigator:getSubscreen("collections") then
+			return self:drawCollections()
+		end
+		if self.navigator:getSubscreen("osudirect") then
+			return self:drawOsudirect()
+		end
+	end,
+	drawNotecharts = function(self)
+		drawFrame(self.column3)
 		drawFrame(self.column1row1)
 		drawFrame(self.column1row2)
 		drawFrame(self.column1row3)
 		drawFrame(self.column2row1)
 		drawFrame(self.column2row2)
-		drawFrame(self.column3)
 
 		love.graphics.setColor(0.4, 0.4, 0.4, 0.7)
 
@@ -151,9 +165,18 @@ return {
 
 		x, y, w, h = getRect(nil, self.column1row1row1)
 		rectangle2("fill", x, y, w, h, 36)
+	end,
+	drawCollections = function(self)
+		drawFrame(self.column3)
+		drawFrame(self.column2row2row1)
+	end,
+	drawOsudirect = function(self)
+		drawFrame(self.column3)
+		drawFrame(self.column2row2)
 
-		love.graphics.setColor(0, 0, 0, 0.8)
-		love.graphics.rectangle("fill", _x, _y, _w, h0[1])
-		love.graphics.rectangle("fill", _x, _yh - h0[5], _w, h0[1])
-	end
+		love.graphics.setColor(0.4, 0.4, 0.4, 0.7)
+
+		local x, y, w, h = getRect(nil, self.column2row2row1)
+		rectangle2("fill", x, y, w, h, 36)
+	end,
 }

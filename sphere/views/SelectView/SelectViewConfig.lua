@@ -50,6 +50,8 @@ local Cache = CacheView:new({
 	transform = transform,
 	draw = function(self)
 		getRect(self, Layout.column2row2row1)
+		self.x = self.x + self.h / 2
+		self.w = self.w - self.h
 		self.__index.draw(self)
 	end,
 })
@@ -560,6 +562,7 @@ local GroupCheckbox = {
 }
 
 local ModifierIconGrid = ModifierIconGridView:new({
+	subscreen = "notecharts",
 	transform = transform,
 	draw = function(self)
 		getRect(self, Layout.column1row3)
@@ -573,6 +576,7 @@ local ModifierIconGrid = ModifierIconGridView:new({
 })
 
 local StageInfoModifierIconGrid = ModifierIconGridView:new({
+	subscreen = "notecharts",
 	transform = transform,
 	draw = function(self)
 		getRect(self, Layout.column1row2)
@@ -690,15 +694,19 @@ local BottomRightOsudirectScreenMenu = {
 	draw = function(self)
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-		local tf = _transform(transform):translate(Layout.column2.x, Layout.footer.y)
+		local tf = _transform(transform):translate(Layout.column3.x, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
 
-		if TextButtonImView("download", "download", Layout.column2.w, Layout.footer.h) then
-			self.navigator:call("downloadBeatmapSet")
-		end
-		just.sameline()
 		if TextButtonImView("collections", "collections", Layout.column3.w, Layout.footer.h) then
 			self.navigator:call("switchToCollections")
+		end
+
+		local tf = _transform(transform):translate(Layout.column2row2row1.x, Layout.column2row2row1.y)
+		love.graphics.replaceTransform(tf)
+
+		just.indent(36)
+		if TextButtonImView("download", "download", Layout.column2.w - 72, Layout.column2row2row1.h) then
+			self.navigator:call("downloadBeatmapSet")
 		end
 	end,
 }

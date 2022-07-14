@@ -4,6 +4,10 @@ local Class = require("aqua.util.Class")
 local transform = require("aqua.graphics.transform")
 local baseline_print = require("aqua.graphics.baseline_print")
 local spherefonts = require("sphere.assets.fonts")
+local IconButtonImView = require("sphere.views.IconButtonImView")
+local TextButtonImView = require("sphere.views.TextButtonImView")
+local CheckboxImView = require("sphere.views.CheckboxImView")
+local LabelImView = require("sphere.views.LabelImView")
 
 local CacheView = Class:new()
 
@@ -27,10 +31,7 @@ CacheView.draw = function(self)
 		text = "update"
 	end
 
-	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-	local over = 0 <= mx and mx <= self.w and 0 <= my and my <= self.h
-
-	local changed, active, hovered = just.button_behavior(self, over)
+	local changed, active, hovered = just.button_behavior(self, just.is_over(self.w, self.h))
 	if hovered then
 		local alpha = active and 0.2 or 0.1
 		love.graphics.setColor(1, 1, 1, alpha)
