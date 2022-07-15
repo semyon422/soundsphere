@@ -67,12 +67,17 @@ OsudirectModel.search = function(self)
 	self.items = {self.statusBeatmap}
 	self.page = 0
 
+	local searchString = self.searchString
 	self:searchNext()
+	if searchString ~= self.searchString then
+		return self:search()
+	end
 end
 
 OsudirectModel.searchRequest = function(self, searchString, page)
 	local config = self.game.configModel.configs.urls.osu
 	local url = socket_url.absolute(config.web, osudirect_urls.search(searchString, nil, page - 1))
+	print("GET " .. url)
 	local body = asyncRequest(url)
 	if not body then
 		return
@@ -87,6 +92,10 @@ OsudirectModel.searchNext = function(self)
 	local beatmaps = self:searchRequest(searchString, self.page)
 	if not beatmaps then
 		self.statusBeatmap.title = "UNAVAILABLE"
+		return
+	end
+	if #beatmaps == 0 then
+		self.statusBeatmap.title = "NO RESULTS"
 		return
 	end
 
