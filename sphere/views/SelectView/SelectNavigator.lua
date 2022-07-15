@@ -80,7 +80,7 @@ end
 SelectNavigator.switchToNoteCharts = function(self)
 	self:addSubscreen("notecharts")
 	self.searchMode = "filter"
-	self:pullNoteChartSet()
+	self.game.selectModel:noDebouncePullNoteChartSet()
 end
 
 SelectNavigator.switchToCollections = function(self)
@@ -90,7 +90,7 @@ end
 SelectNavigator.switchToOsudirect = function(self)
 	self.searchMode = "osudirect"
 	self:addSubscreen("osudirect")
-	self.game.osudirectModel:searchDebounce()
+	self.game.osudirectModel:searchNoDebounce()
 end
 
 SelectNavigator.openDirectory = function(self)

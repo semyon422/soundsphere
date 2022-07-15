@@ -54,6 +54,12 @@ SelectModel.debouncePullNoteChartSet = function(self, ...)
 	aquatimer.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self, ...)
 end
 
+SelectModel.noDebouncePullNoteChartSet = function(self, ...)
+	coroutine.wrap(function(...)
+		self:pullNoteChartSet(...)
+	end)(...)
+end
+
 SelectModel.coroPullNoteChartSet = aquathread.coro(function(self, ...)
 	return self:pullNoteChartSet(...)
 end)

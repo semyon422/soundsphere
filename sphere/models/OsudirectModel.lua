@@ -11,8 +11,10 @@ local socket_url = require("socket.url")
 local OsudirectModel = Class:new()
 
 OsudirectModel.load = function(self)
-	self.items = {}
+	self.statusBeatmap = {title = "LOADING", artist = ""}
+	self.items = {self.statusBeatmap}
 	self.processing = {}
+	self.page = 1
 end
 
 OsudirectModel.isChanged = function(self)
@@ -24,6 +26,15 @@ end
 OsudirectModel.setBeatmap = function(self, beatmap)
 	self.beatmap = beatmap
 	self.changed = true
+
+	local statusBeatmap = self.statusBeatmap
+	if beatmap ~= statusBeatmap or self.items[1] == beatmap or statusBeatmap.title == "LOADING" then
+		return
+	end
+	statusBeatmap.title = "LOADING"
+	coroutine.wrap(function()
+		self:searchNext()
+	end)()
 end
 
 OsudirectModel.searchString = ""
@@ -45,25 +56,50 @@ OsudirectModel.searchDebounce = function(self)
 	aquatimer.debounce(self, "loadDebounce", 0.1, self.search, self)
 end
 
+OsudirectModel.searchNoDebounce = function(self)
+	coroutine.wrap(function()
+		self:search()
+	end)()
+end
+
 OsudirectModel.search = function(self)
-	local searchString = self.searchString
+	self.statusBeatmap.title = "LOADING"
+	self.items = {self.statusBeatmap}
+	self.page = 0
+
+	self:searchNext()
+end
+
+OsudirectModel.searchRequest = function(self, searchString, page)
 	local config = self.game.configModel.configs.urls.osu
-	local url = socket_url.absolute(config.web, osudirect_urls.search(searchString))
+	local url = socket_url.absolute(config.web, osudirect_urls.search(searchString, nil, page - 1))
 	local body = asyncRequest(url)
 	if not body then
 		return
 	end
-	local beatmaps, err = osudirect_parse(body)
+	return osudirect_parse(body)
+end
+
+OsudirectModel.searchNext = function(self)
+	self.page = self.page + 1
+
+	local searchString = self.searchString
+	local beatmaps = self:searchRequest(searchString, self.page)
 	if not beatmaps then
-		self.items = {}
+		self.statusBeatmap.title = "UNAVAILABLE"
 		return
 	end
-	self.items = beatmaps
-	if searchString ~= self.searchString then
-		return self:search()
+
+	local newPos = #self.items
+	table.remove(self.items, newPos)
+	for _, beatmap in ipairs(beatmaps) do
+		table.insert(self.items, beatmap)
 	end
 
-	self:setBeatmap(self.items[1])
+	self.statusBeatmap.title = "LOAD MORE"
+	table.insert(self.items, self.statusBeatmap)
+
+	self:setBeatmap(self.items[newPos])
 end
 
 OsudirectModel.getBackgroundUrl = function(self)
@@ -81,7 +117,7 @@ local extract = aquathread.async(fsextract)
 
 OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self)
 	local beatmap = self.beatmap
-	if not beatmap then
+	if not beatmap or beatmap == self.statusBeatmap then
 		return
 	end
 
