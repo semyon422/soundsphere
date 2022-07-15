@@ -35,6 +35,22 @@ SelectController.update = function(self, dt)
 	if graphics.vsyncOnSelect and flags.vsync == 0 then
 		flags.vsync = self.game.baseVsync
 	end
+
+	local noteChartItem = self.game.selectModel.noteChartItem
+	if self.game.selectModel:isChanged() and noteChartItem then
+		local bgPath = noteChartItem:getBackgroundPath()
+		local audioPath, previewTime = noteChartItem:getAudioPathPreview()
+		self.game.backgroundModel:setBackgroundPath(bgPath)
+		self.game.previewModel:setAudioPathPreview(audioPath, previewTime)
+	end
+
+	local osudirectModel = self.game.osudirectModel
+	if osudirectModel:isChanged() then
+		local backgroundUrl = osudirectModel:getBackgroundUrl()
+		local previewUrl = osudirectModel:getPreviewUrl()
+		self.game.backgroundModel:loadBackgroundDebounce(backgroundUrl)
+		self.game.previewModel:loadPreviewDebounce(previewUrl)
+	end
 end
 
 SelectController.openDirectory = function(self)
@@ -64,15 +80,6 @@ SelectController.updateCacheCollection = function(self, path, force)
 	else
 		self.game.cacheModel:stopUpdate()
 	end
-end
-
-SelectController.osudirectBeatmap = function(self, beatmap)
-	local osudirectModel = self.game.osudirectModel
-	osudirectModel:setBeatmap(beatmap)
-	local backgroundUrl = self.game.osudirectModel:getBackgroundUrl()
-	local previewUrl = self.game.osudirectModel:getPreviewUrl()
-	self.game.backgroundModel:loadBackgroundDebounce(backgroundUrl)
-	self.game.previewModel:loadPreviewDebounce(previewUrl)
 end
 
 SelectController.resetModifiedNoteChart = function(self)

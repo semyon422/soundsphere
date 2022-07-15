@@ -153,7 +153,7 @@ SelectNavigator.scrollOsudirect = function(self, direction, count)
 
 	self.osudirectItemIndex = itemIndex
 
-	self.game.selectController:osudirectBeatmap(items[itemIndex])
+	self.game.osudirectModel:setBeatmap(items[itemIndex])
 end
 
 SelectNavigator.scrollOsudirectDifficulty = function(self, direction, count)

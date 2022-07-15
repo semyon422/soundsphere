@@ -21,8 +21,15 @@ OsudirectModel.load = function(self)
 	end
 end
 
+OsudirectModel.isChanged = function(self)
+	local changed = self.changed
+	self.changed = false
+	return changed
+end
+
 OsudirectModel.setBeatmap = function(self, beatmap)
 	self.beatmap = beatmap
+	self.changed = true
 end
 
 OsudirectModel.searchString = ""
@@ -61,8 +68,10 @@ OsudirectModel.search = function(self)
 	self.beatmapSets = beatmaps
 	self.itemsCount = #beatmaps
 	if searchString ~= self.searchString then
-		self:search()
+		return self:search()
 	end
+
+	self:setBeatmap(self.beatmapSets[1])
 end
 
 OsudirectModel.getBackgroundUrl = function(self)

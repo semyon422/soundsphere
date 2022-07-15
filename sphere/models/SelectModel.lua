@@ -33,6 +33,12 @@ SelectModel.load = function(self)
 	self:coroPullNoteChartSet()
 end
 
+SelectModel.isChanged = function(self)
+	local changed = self.changed
+	self.changed = false
+	return changed
+end
+
 SelectModel.notechartExists = function(self)
 	local noteChartItem = self.noteChartItem
 	if noteChartItem then
@@ -160,6 +166,7 @@ SelectModel.scrollNoteChart = function(self, direction, destination)
 
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
 	self.noteChartItem = noteChartItem
+	self.changed = true
 
 	self:setConfig(noteChartItem)
 
@@ -215,6 +222,7 @@ SelectModel.pullNoteChartSet = function(self, noUpdate)
 
 	self.noteChartItem = nil
 	self.scoreItem = nil
+	self.changed = true
 
 	self.game.noteChartLibraryModel:clear()
 	self.game.scoreLibraryModel:clear()
@@ -238,6 +246,8 @@ SelectModel.pullNoteChart = function(self, noUpdate)
 
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
 	self.noteChartItem = noteChartItem
+	self.changed = true
+
 	if noteChartItem then
 		self.config.noteChartEntryId = noteChartItem.noteChartId
 		self.config.noteChartDataEntryId = noteChartItem.noteChartDataId

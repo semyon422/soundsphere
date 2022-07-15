@@ -17,19 +17,14 @@ BackgroundModel.load = function(self)
 	self.images = {self.emptyImage}
 end
 
-BackgroundModel.update = function(self, dt)
-	local noteChartItem = self.game.selectModel.noteChartItem
-	if noteChartItem and self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
-		self.noteChartDataEntryId = self.config.noteChartDataEntryId
-		local path = noteChartItem:getBackgroundPath()
-		if self.path ~= path then
-			self.path = path
-			self:loadBackgroundDebounce()
-		end
-	elseif not noteChartItem and self.images[1] ~= self.emptyImage then
-		self.images = {self.emptyImage}
+BackgroundModel.setBackgroundPath = function(self, path)
+	if self.path ~= path then
+		self.path = path
+		self:loadBackgroundDebounce()
 	end
+end
 
+BackgroundModel.update = function(self, dt)
 	if self.alphaTween then
 		self.alphaTween:update(dt)
 	end

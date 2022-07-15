@@ -17,20 +17,15 @@ PreviewModel.unload = function(self)
 	self:stop()
 end
 
-PreviewModel.update = function(self, dt)
-	local noteChartItem = self.game.selectModel.noteChartItem
-	if noteChartItem and self.noteChartDataEntryId ~= self.config.noteChartDataEntryId then
-		self.noteChartDataEntryId = self.config.noteChartDataEntryId
-		local audioPath, previewTime = noteChartItem:getAudioPathPreview()
-		if self.audioPath ~= audioPath then
-			self.audioPath = audioPath
-			self.previewTime = previewTime
-			self:loadPreviewDebounce()
-		end
-	elseif not noteChartItem then
-		self:stop()
+PreviewModel.setAudioPathPreview = function(self, audioPath, previewTime)
+	if self.audioPath ~= audioPath then
+		self.audioPath = audioPath
+		self.previewTime = previewTime
+		self:loadPreviewDebounce()
 	end
+end
 
+PreviewModel.update = function(self, dt)
 	local audio = self.audio
 	if not audio then
 		return
