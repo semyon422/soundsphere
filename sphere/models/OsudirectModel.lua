@@ -1,4 +1,4 @@
-local LibraryModel = require("sphere.models.LibraryModel")
+local Class = require("aqua.util.Class")
 local osudirect_urls = require("sphere.osudirect.urls")
 local osudirect_parse = require("sphere.osudirect.parse")
 local fsextract = require("sphere.filesystem.extract")
@@ -8,17 +8,10 @@ local aquathread = require("aqua.thread")
 local aquatimer = require("aqua.timer")
 local socket_url = require("socket.url")
 
-local OsudirectModel = LibraryModel:new()
+local OsudirectModel = Class:new()
 
 OsudirectModel.load = function(self)
-	self.itemsCache.getObject = function(_, itemIndex)
-		return setmetatable({}, {__index = function(t, k)
-			local item = self.beatmapSets[itemIndex]
-			if item then
-				return item[k]
-			end
-		end})
-	end
+	self.items = {}
 end
 
 OsudirectModel.isChanged = function(self)
@@ -61,17 +54,15 @@ OsudirectModel.search = function(self)
 	end
 	local beatmaps, err = osudirect_parse(body)
 	if not beatmaps then
-		self.beatmapSets = {}
-		self.itemsCount = 0
+		self.items = {}
 		return
 	end
-	self.beatmapSets = beatmaps
-	self.itemsCount = #beatmaps
+	self.items = beatmaps
 	if searchString ~= self.searchString then
 		return self:search()
 	end
 
-	self:setBeatmap(self.beatmapSets[1])
+	self:setBeatmap(self.items[1])
 end
 
 OsudirectModel.getBackgroundUrl = function(self)
