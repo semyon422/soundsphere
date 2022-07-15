@@ -171,6 +171,7 @@ return {
 		drawFrame(self.column2row2row1)
 	end,
 	drawOsudirect = function(self)
+		drawFrame(self.column1)
 		drawFrame(self.column3)
 		drawFrame(self.column2row2)
 

@@ -12,6 +12,7 @@ local OsudirectModel = Class:new()
 
 OsudirectModel.load = function(self)
 	self.items = {}
+	self.processing = {}
 end
 
 OsudirectModel.isChanged = function(self)
@@ -84,6 +85,9 @@ OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self)
 		return
 	end
 
+	table.insert(self.processing, 1, beatmap)
+	print(require("inspect")(beatmap))
+
 	local config = self.game.configModel.configs.urls.osu
 
 	local saveDir = "userdata/charts/downloads"
@@ -91,25 +95,38 @@ OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self)
 	local setId = beatmap.setId
 	local url = socket_url.absolute(config.storage, osudirect_urls.download(setId))
 	print(("Downloading: %s"):format(url))
+	beatmap.status = "Downloading"
 	local downloaded, filename = download(url, saveDir)
 	if not downloaded then
+		beatmap.status = "Downloading error"
 		return
 	end
 
 	local savePath = saveDir .. "/" .. filename
 	print(("Downloaded: %s"):format(savePath))
 	if not filename:find("%.osz$") then
+		beatmap.status = "Unsupported file type"
 		print("Unsupported file type")
 		return
 	end
 
 	local extractPath = saveDir .. "/" .. filename:match("^(.+)%.osz$")
 	print("Extracting")
+	beatmap.status = "Extracting"
 	local extracted = extract(savePath, extractPath, true)
 	if not extracted then
+		beatmap.status = "Extracting error"
 		return
 	end
 	print(("Extracted to: %s"):format(extractPath))
+
+	beatmap.status = "Extracted"
+	for i, v in ipairs(self.processing) do
+		if v == beatmap then
+			table.remove(self.processing, i)
+			break
+		end
+	end
 end)
 
 return OsudirectModel

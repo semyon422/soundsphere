@@ -26,6 +26,7 @@ local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridVi
 local CollectionListView = require("sphere.views.SelectView.CollectionListView")
 local OsudirectListView = require("sphere.views.SelectView.OsudirectListView")
 local OsudirectDifficultiesListView = require("sphere.views.SelectView.OsudirectDifficultiesListView")
+local OsudirectProcessingListView = require("sphere.views.SelectView.OsudirectProcessingListView")
 local CacheView = require("sphere.views.SelectView.CacheView")
 local BarCellImView = require("sphere.views.SelectView.BarCellImView")
 local TextCellImView = require("sphere.views.SelectView.TextCellImView")
@@ -101,6 +102,26 @@ local OsudirectDifficultiesList = OsudirectDifficultiesListView:new({
 		TextCellImView(math.huge, h, "left", item.beatmap.creator, item.name)
 	end,
 	rows = 5,
+})
+
+local OsudirectProcessingList = OsudirectProcessingListView:new({
+	subscreen = "osudirect",
+	transform = transform,
+	draw = function(self)
+		getRect(self, Layout.column1)
+		self.__index.draw(self)
+	end,
+	drawItem = function(self, i, w, h)
+		local item = self.items[i]
+
+		just.row(true)
+		just.indent(44)
+		TextCellImView(w - 88, h, "right", item.status, "")
+		just.indent(88 - w)
+		TextCellImView(math.huge, h, "left", item.artist, item.title)
+		just.row(false)
+	end,
+	rows = 11,
 })
 
 local ScoreList = ScoreListView:new({
@@ -823,6 +844,7 @@ local SelectViewConfig = {
 	ModifierIconGrid,
 	StageInfoModifierIconGrid,
 	OsudirectDifficultiesList,
+	OsudirectProcessingList,
 	BottomNotechartsScreenMenu,
 	BottomCollectionsScreenMenu,
 	BottomRightOsudirectScreenMenu,
