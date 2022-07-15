@@ -86,18 +86,25 @@ OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self)
 
 	local config = self.game.configModel.configs.urls.osu
 
+	local saveDir = "userdata/charts/downloads"
+
 	local setId = beatmap.setId
 	local url = socket_url.absolute(config.storage, osudirect_urls.download(setId))
-	local savePath = "userdata/charts/downloads/" .. setId .. ".osz"
 	print(("Downloading: %s"):format(url))
-	local downloaded = download(url, savePath)
+	local downloaded, filename = download(url, saveDir)
 	if not downloaded then
 		return
 	end
-	print(("Downloaded: %s"):format(savePath))
 
-	local extractPath = "userdata/charts/downloads/" .. setId
-	print(("Extracting to: %s"):format(extractPath))
+	local savePath = saveDir .. "/" .. filename
+	print(("Downloaded: %s"):format(savePath))
+	if not filename:find("%.osz$") then
+		print("Unsupported file type")
+		return
+	end
+
+	local extractPath = saveDir .. "/" .. filename:match("^(.+)%.osz$")
+	print("Extracting")
 	local extracted = extract(savePath, extractPath, true)
 	if not extracted then
 		return
