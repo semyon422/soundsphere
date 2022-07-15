@@ -128,12 +128,15 @@ SelectNavigator.deleteNoteChartSet = function(self)
 	self:send({name = "deleteNoteChartSet"})
 end
 
+SelectNavigator.setSearchMode = function(self, searchMode)
+	self.searchMode = searchMode
+end
+
 SelectNavigator.changeSearchMode = function(self)
-	-- self.game.selectModel:changeSearchMode()
 	if self.searchMode == "filter" then
-		self.searchMode = "lamp"
+		self:setSearchMode("lamp")
 	else
-		self.searchMode = "filter"
+		self:setSearchMode("filter")
 	end
 end
 

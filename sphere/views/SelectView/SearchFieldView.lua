@@ -1,4 +1,5 @@
 
+local just = require("just")
 local Class = require("aqua.util.Class")
 local transform = require("aqua.graphics.transform")
 local baseline_print = require("aqua.graphics.baseline_print")
@@ -33,6 +34,29 @@ SearchFieldView.draw = function(self)
 	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
+	local changed, active, hovered = just.button_behavior(self, just.is_over(self.w, self.h))
+	if changed then
+		self.navigator:setSearchMode(self.searchMode)
+	end
+
+	local padding = self.frame.padding
+	local h = self.h - padding * 2
+
+	love.graphics.setColor(1, 1, 1, 0.08)
+	if hovered then
+		love.graphics.setColor(1, 1, 1, active and 0.2 or 0.15)
+	end
+
+	love.graphics.rectangle(
+		"fill",
+		padding,
+		padding,
+		self.w - padding * 2,
+		h,
+		h / 2,
+		h / 2
+	)
+
 	local searchString = inside(self, self.searchString)
 	if searchString == "" then
 		love.graphics.setColor(1, 1, 1, 0.5)
@@ -59,8 +83,6 @@ SearchFieldView.draw = function(self)
 	love.graphics.setLineWidth(self.frame.lineWidth)
 	love.graphics.setLineStyle(self.frame.lineStyle)
 
-	local padding = self.frame.padding
-	local h = self.h - padding * 2
 	love.graphics.rectangle(
 		"line",
 		padding,

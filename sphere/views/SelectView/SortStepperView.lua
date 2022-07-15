@@ -34,8 +34,44 @@ SortStepperView.draw = function(self)
 	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
-	love.graphics.setColor(1, 1, 1, 1)
+	local stepperView = self.stepperView
+	local w, h = self.w, self.h
 
+	local padding = self.frame.padding
+
+	local value = self:getIndexValue()
+	local count = self:getCount()
+
+	local overAll, overLeft, overRight = stepperView:isOver(w, h)
+
+	local id = tostring(self.item)
+	local scrolled, delta = just.wheel_behavior(id .. "A", overAll)
+	local changedLeft, activeLeft, hoveredLeft = just.button_behavior(id .. "L", overLeft)
+	local changedRight, activeRight, hoveredRight = just.button_behavior(id .. "R", overRight)
+
+	if changedLeft or delta == -1 then
+		self:increaseValue(-1)
+	elseif changedRight or delta == 1 then
+		self:increaseValue(1)
+	end
+
+	love.graphics.setColor(1, 1, 1, 0.08)
+	if hoveredLeft or hoveredRight then
+		love.graphics.setColor(1, 1, 1, (activeLeft or activeRight) and 0.2 or 0.15)
+	end
+
+	local hm = h - padding * 2
+	love.graphics.rectangle(
+		"fill",
+		padding,
+		padding,
+		w - padding * 2,
+		hm,
+		hm / 2,
+		hm / 2
+	)
+
+	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get(unpack(self.text.font)))
 
 	baseline_print(
@@ -47,9 +83,6 @@ SortStepperView.draw = function(self)
 		self.text.align
 	)
 
-	local padding = self.frame.padding
-	local h = self.h - padding * 2
-
 	love.graphics.setLineWidth(self.frame.lineWidth)
 	love.graphics.setLineStyle(self.frame.lineStyle)
 	love.graphics.rectangle(
@@ -57,30 +90,10 @@ SortStepperView.draw = function(self)
 		padding,
 		padding,
 		self.w - padding * 2,
-		h,
-		h / 2,
-		h / 2
+		hm,
+		hm / 2,
+		hm / 2
 	)
-
-	love.graphics.setColor(1, 1, 1, 1)
-	local stepperView = self.stepperView
-	local w, h = self.w, self.h
-
-	local value = self:getIndexValue()
-	local count = self:getCount()
-
-	local overAll, overLeft, overRight = stepperView:isOver(w, h)
-
-	local id = tostring(self.item)
-	local scrolled, delta = just.wheel_behavior(id .. "A", overAll)
-	local changedLeft = just.button_behavior(id .. "L", overLeft)
-	local changedRight = just.button_behavior(id .. "R", overRight)
-
-	if changedLeft or delta == -1 then
-		self:increaseValue(-1)
-	elseif changedRight or delta == 1 then
-		self:increaseValue(1)
-	end
 
 	stepperView:draw(w, h, value, count)
 end
