@@ -122,7 +122,6 @@ OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self)
 	end
 
 	table.insert(self.processing, 1, beatmap)
-	print(require("inspect")(beatmap))
 
 	local config = self.game.configModel.configs.urls.osu
 
