@@ -35,6 +35,9 @@ Format.timeRate = function(timeRate)
 end
 
 Format.inputMode = function(inputMode)
+	if type(inputMode) ~= "string" then
+		return ""
+	end
 	return inputMode
 		:gsub("key", "K")
 		:gsub("scratch", "S")
