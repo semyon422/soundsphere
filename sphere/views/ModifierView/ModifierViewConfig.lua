@@ -98,7 +98,7 @@ local ModifierList = ModifierListView:new({
 		local w2 = w / 2
 
 		if just.button_behavior(tostring(item) .. "1", just.is_over(w2, h), 2) then
-			self.navigator:removeModifier(self.itemIndex)
+			self.navigator:removeModifier(i)
 		end
 
 		just.row(true)
@@ -137,7 +137,7 @@ local ModifierList = ModifierListView:new({
 			if changed then
 				self.navigator:setModifierValue(item, modifier:fromNormValue(value))
 			elseif delta ~= 0 then
-				self.navigator:increaseModifierValue(self.itemIndex, delta)
+				self.navigator:increaseModifierValue(i, delta)
 			end
 			SliderView:draw(w2, h, value)
 		elseif modifier.interfaceType == "stepper" then
