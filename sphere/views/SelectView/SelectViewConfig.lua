@@ -678,9 +678,14 @@ local BottomNotechartsScreenMenu = {
 		local tf = _transform(transform):translate(Layout.column3.x, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
 
-		if TextButtonImView("collections", "collections", Layout.column3.w, Layout.footer.h) then
+		just.row(true)
+		if TextButtonImView("collections", "collections", Layout.column3.w / 2, Layout.footer.h) then
 			self.navigator:call("switchToCollections")
 		end
+		if TextButtonImView("direct", "direct", Layout.column3.w / 2, Layout.footer.h) then
+			self.navigator:call("switchToOsudirect")
+		end
+		just.row(false)
 	end,
 }
 
@@ -692,23 +697,21 @@ local BottomCollectionsScreenMenu = {
 		local tf = _transform(transform):translate(Layout.column1.x, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
 
-		if TextButtonImView("calc top scores", "calc top scores", Layout.column1.w, Layout.footer.h) then
+		if TextButtonImView("calc top scores", "calc top scores", Layout.column1.w / 2, Layout.footer.h) then
 			self.navigator:call("calculateTopScores")
-		end
-
-		local tf = _transform(transform):translate(Layout.column2.x + Layout.column2.w / 2, Layout.footer.y)
-		love.graphics.replaceTransform(tf)
-
-		if TextButtonImView("direct", "direct", Layout.column2.w / 2, Layout.footer.h) then
-			self.navigator:call("switchToOsudirect")
 		end
 
 		local tf = _transform(transform):translate(Layout.column3.x, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
 
-		if TextButtonImView("notecharts", "notecharts", Layout.column3.w, Layout.footer.h) then
+		just.row(true)
+		if TextButtonImView("notecharts", "notecharts", Layout.column3.w / 2, Layout.footer.h) then
 			self.navigator:call("switchToNoteCharts")
 		end
+		if TextButtonImView("direct", "direct", Layout.column3.w / 2, Layout.footer.h) then
+			self.navigator:call("switchToOsudirect")
+		end
+		just.row(false)
 	end,
 }
 
@@ -720,9 +723,14 @@ local BottomRightOsudirectScreenMenu = {
 		local tf = _transform(transform):translate(Layout.column3.x, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
 
-		if TextButtonImView("collections", "collections", Layout.column3.w, Layout.footer.h) then
+		just.row(true)
+		if TextButtonImView("notecharts", "notecharts", Layout.column3.w / 2, Layout.footer.h) then
+			self.navigator:call("switchToNoteCharts")
+		end
+		if TextButtonImView("collections", "collections", Layout.column3.w / 2, Layout.footer.h) then
 			self.navigator:call("switchToCollections")
 		end
+		just.row(false)
 
 		local tf = _transform(transform):translate(Layout.column2row2row1.x, Layout.column2row2row1.y)
 		love.graphics.replaceTransform(tf)
