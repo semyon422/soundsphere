@@ -29,10 +29,12 @@ local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 
 local transformLeft = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local showLoadedScore = function(self)
-	if not self.game.rhythmModel.scoreEngine.scoreEntry then
+	local scoreEntry = self.game.rhythmModel.scoreEngine.scoreEntry
+	local scoreItem = self.game.selectModel.scoreItem
+	if not scoreEntry or not scoreItem then
 		return
 	end
-	return self.game.selectModel.scoreItem.id == self.game.rhythmModel.scoreEngine.scoreEntry.id
+	return scoreItem.id == scoreEntry.id
 end
 
 local showLoadedListScore = function(self)
