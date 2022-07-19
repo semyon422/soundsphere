@@ -21,7 +21,7 @@ local ScoreListView	= require("sphere.views.ResultView.ScoreListView")
 local NoteChartSetListView = require("sphere.views.SelectView.NoteChartSetListView")
 local NoteChartListView = require("sphere.views.SelectView.NoteChartListView")
 local SearchFieldView = require("sphere.views.SelectView.SearchFieldView")
-local SortStepperView = require("sphere.views.SelectView.SortStepperView")
+local SortDropdownView = require("sphere.views.SelectView.SortDropdownView")
 local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
 local CollectionListView = require("sphere.views.SelectView.CollectionListView")
 local OsudirectListView = require("sphere.views.SelectView.OsudirectListView")
@@ -538,7 +538,7 @@ local OsudirectSearchField = SearchFieldView:new({
 	searchMode = "osudirect",
 })
 
-local SortStepper = SortStepperView:new({
+local SortStepper = SortDropdownView:new({
 	subscreen = "notecharts",
 	transform = transform,
 	draw = function(self)
