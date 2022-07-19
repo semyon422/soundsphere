@@ -24,6 +24,7 @@ userdata/timings.lua
 userdata/judgements.lua
 userdata/files.lua
 userdata/urls.lua
+userdata/filters.lua
 userdata/avatar.png
 
 userdata/charts.db-journal

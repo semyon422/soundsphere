@@ -9,6 +9,7 @@ ConfigModel.configModelPath = "sphere/models/ConfigModel"
 ConfigModel.construct = function(self)
 	self.configs = {}
 	self.paths = {}
+	self.notWritable = {}
 end
 
 local function copyTable(from, to)
@@ -38,7 +39,14 @@ ConfigModel._read = function(self, name)
 	if defaultPath then
 		copyTable(self:readFile(defaultPath), config)
 	end
-	copyTable(self:readFile(path), config)
+
+	local c = self:readFile(path)
+	if type(c) == "table" then
+		copyTable(c, config)
+	elseif type(c) == "function" then
+		self.notWritable[name] = true
+		c(config)
+	end
 end
 
 ConfigModel.read = function(self, ...)
@@ -48,6 +56,9 @@ ConfigModel.read = function(self, ...)
 end
 
 ConfigModel._write = function(self, name)
+	if self.notWritable[name] then
+		return
+	end
 	local config = assert(self.configs[name])
 	local path = self.paths[name]
 	return self:writeFile(path, config)
