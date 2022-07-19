@@ -4,26 +4,26 @@ local erfunc = require("libchart.erfunc")
 
 local SearchModel = Class:new()
 
-SearchModel.searchFilter = ""
-SearchModel.searchLamp = ""
+SearchModel.filterString = ""
+SearchModel.lampString = ""
 SearchModel.collection = {path = ""}
 SearchModel.stateCounter = 1
 
 SearchModel.setSearchString = function(self, searchMode, text)
 	if searchMode == "filter" then
-		self:setSearchFilter(text)
+		self:setFilterString(text)
 	else
-		self:setSearchLamp(text)
+		self:setLampString(text)
 	end
 	self.stateCounter = self.stateCounter + 1
 end
 
-SearchModel.setSearchFilter = function(self, text)
-	self.searchFilter = text
+SearchModel.setFilterString = function(self, text)
+	self.filterString = text
 end
 
-SearchModel.setSearchLamp = function(self, text)
-	self.searchLamp = text
+SearchModel.setLampString = function(self, text)
+	self.lampString = text
 end
 
 SearchModel.setCollection = function(self, collection)
@@ -131,23 +131,9 @@ for _, operator in ipairs(operators) do
 	end
 end
 
-SearchModel.transformSearchString = function(self, s, addCollectionFilter, showNonManiaCharts)
+SearchModel.transformSearchString = function(self, s, conditions)
 	local searchString = s
-	local conditions = {}
-
-	if addCollectionFilter then
-		local path = self.collection.path .. "/"
-		table.insert(
-			conditions,
-			("substr(noteCharts.path, 1, %d) = %q"):format(utf8.len(path), path)
-		)
-	end
-
-	if not showNonManiaCharts then
-		table.insert(conditions, "noteChartDatas.inputMode != \"1osu\"")
-		table.insert(conditions, "noteChartDatas.inputMode != \"1taiko\"")
-		table.insert(conditions, "noteChartDatas.inputMode != \"1fruits\"")
-	end
+	conditions = conditions or {}
 
 	for _, searchSubString in ipairs(searchString:split(" ")) do
 		local key, operator, value = searchSubString:match("^(.-)([=><~!]+)(.+)$")
@@ -171,20 +157,60 @@ SearchModel.transformSearchString = function(self, s, addCollectionFilter, showN
 		end
 	end
 
+	for i = 1, #conditions do
+		conditions[i] = "(" .. conditions[i] .. ")"
+	end
+
 	return table.concat(conditions, " AND ")
 end
 
-SearchModel.getConditions = function(self)
-	local settings = self.game.configModel.configs.settings
-	local showNonManiaCharts = settings.miscellaneous.showNonManiaCharts
+SearchModel.getFilter = function(self)
+	local configs = self.game.configModel.configs
+	local filters = configs.filters
+	local select = configs.select
 
-	if self.searchLamp == "" then
-		return self:transformSearchString(self.searchFilter, true, showNonManiaCharts)
+	for _, filter in ipairs(filters.notechart) do
+		if filter.name == select.filterName then
+			return filter
+		end
+	end
+end
+
+SearchModel.getConditions = function(self)
+	local configs = self.game.configModel.configs
+	local settings = configs.settings
+
+	local conditions = {}
+	local path = self.collection.path .. "/"
+	table.insert(
+		conditions,
+		("substr(noteCharts.path, 1, %d) = %q"):format(utf8.len(path), path)
+	)
+
+	if not settings.miscellaneous.showNonManiaCharts then
+		table.insert(conditions, "noteChartDatas.inputMode != \"1osu\"")
+		table.insert(conditions, "noteChartDatas.inputMode != \"1taiko\"")
+		table.insert(conditions, "noteChartDatas.inputMode != \"1fruits\"")
+	end
+
+	local filterString = self.filterString
+	local filter = self:getFilter()
+	if filter then
+		if filter.string then
+			filterString = filterString .. " " .. filter.string
+		end
+		if filter.condition then
+			table.insert(conditions, filter.condition)
+		end
+	end
+
+	if self.lampString == "" then
+		return self:transformSearchString(filterString, conditions)
 	end
 
 	return
-		self:transformSearchString(self.searchFilter, true, showNonManiaCharts),
-		self:transformSearchString(self.searchLamp)
+		self:transformSearchString(filterString, conditions),
+		self:transformSearchString(self.lampString)
 end
 
 return SearchModel

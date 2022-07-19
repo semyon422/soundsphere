@@ -22,6 +22,7 @@ local NoteChartSetListView = require("sphere.views.SelectView.NoteChartSetListVi
 local NoteChartListView = require("sphere.views.SelectView.NoteChartListView")
 local SearchFieldView = require("sphere.views.SelectView.SearchFieldView")
 local SortDropdownView = require("sphere.views.SelectView.SortDropdownView")
+local NotechartFilterDropdownView = require("sphere.views.SelectView.NotechartFilterDropdownView")
 local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
 local CollectionListView = require("sphere.views.SelectView.CollectionListView")
 local OsudirectListView = require("sphere.views.SelectView.OsudirectListView")
@@ -480,7 +481,7 @@ local SearchField = SearchFieldView:new({
 		font = {"Noto Sans", 20},
 	},
 	placeholder = "Filter...",
-	searchString = "game.searchModel.searchFilter",
+	searchString = "game.searchModel.filterString",
 	searchMode = "filter",
 })
 
@@ -508,7 +509,7 @@ local SearchFieldLamp = SearchFieldView:new({
 		font = {"Noto Sans", 20},
 	},
 	placeholder = "Lamp...",
-	searchString = "game.searchModel.searchLamp",
+	searchString = "game.searchModel.lampString",
 	searchMode = "lamp",
 })
 
@@ -538,7 +539,7 @@ local OsudirectSearchField = SearchFieldView:new({
 	searchMode = "osudirect",
 })
 
-local SortStepper = SortDropdownView:new({
+local SortDropdown = SortDropdownView:new({
 	subscreen = "notecharts",
 	transform = transform,
 	draw = function(self)
@@ -549,18 +550,20 @@ local SortStepper = SortDropdownView:new({
 		self.h = Layout.header.h - 34
 		self.__index.draw(self)
 	end,
-	frame = {
-		padding = 6,
-		lineStyle = "smooth",
-		lineWidth = 1
-	},
-	text = {
-		x = 27,
-		xr = 27,
-		baseline = 35,
-		align = "center",
-		font = {"Noto Sans", 20},
-	}
+})
+
+local NotechartFilterDropdown = NotechartFilterDropdownView:new({
+	subscreen = "notecharts",
+	transform = transform,
+	draw = function(self)
+		getRect(self, Layout.column3)
+		local size = 1 / 4
+		self.x = self.x + self.w * (1 - size) - 6 - 20
+		self.w = self.w * size
+		self.y = self.y + 6
+		self.h = 55
+		self.__index.draw(self)
+	end,
 })
 
 local GroupCheckbox = {
@@ -847,7 +850,8 @@ local SelectViewConfig = {
 	SearchField,
 	SearchFieldLamp,
 	OsudirectSearchField,
-	SortStepper,
+	SortDropdown,
+	NotechartFilterDropdown,
 	GroupCheckbox,
 	ModifierIconGrid,
 	StageInfoModifierIconGrid,

@@ -132,6 +132,7 @@ GameController.load = function(self)
 		"online",
 		"urls",
 		"judgements",
+		"filters",
 		"files"
 	)
 

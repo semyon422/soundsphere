@@ -6,7 +6,8 @@ return {
 	noteChartSetEntryId = 1,
 	scoreEntryId = 1,
 	searchMode = "filter",
-	searchFilter = "",
-	searchLamp = "",
-	sortFunction = "title"
+	filterName = "No filter",
+	filterString = "",
+	lampString = "",
+	sortFunction = "title",
 }

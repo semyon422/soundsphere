@@ -17,8 +17,8 @@ SelectModel.load = function(self)
 	local config = self.game.configModel.configs.select
 	self.config = config
 
-	self.game.searchModel:setSearchFilter(config.searchFilter)
-	self.game.searchModel:setSearchLamp(config.searchLamp)
+	self.game.searchModel:setFilterString(config.filterString)
+	self.game.searchModel:setLampString(config.lampString)
 	self.searchMode = config.searchMode
 	self.game.sortModel.name = config.sortFunction
 	self.game.noteChartSetLibraryModel.collapse = config.collapse
@@ -99,8 +99,8 @@ SelectModel.update = function(self)
 	if self.searchStateCounter == stateCounter or self.pullingNoteChartSet then
 		return
 	end
-	self.config.searchFilter = self.game.searchModel.searchFilter
-	self.config.searchLamp = self.game.searchModel.searchLamp
+	self.config.filterString = self.game.searchModel.filterString
+	self.config.lampString = self.game.searchModel.lampString
 	self.searchStateCounter = stateCounter
 	self:debouncePullNoteChartSet()
 end
