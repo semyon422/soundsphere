@@ -23,6 +23,7 @@ local NoteChartListView = require("sphere.views.SelectView.NoteChartListView")
 local SearchFieldView = require("sphere.views.SelectView.SearchFieldView")
 local SortDropdownView = require("sphere.views.SelectView.SortDropdownView")
 local NotechartFilterDropdownView = require("sphere.views.SelectView.NotechartFilterDropdownView")
+local ScoreFilterDropdownView = require("sphere.views.SelectView.ScoreFilterDropdownView")
 local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
 local CollectionListView = require("sphere.views.SelectView.CollectionListView")
 local OsudirectListView = require("sphere.views.SelectView.OsudirectListView")
@@ -555,13 +556,28 @@ local SortDropdown = SortDropdownView:new({
 local NotechartFilterDropdown = NotechartFilterDropdownView:new({
 	subscreen = "notecharts",
 	transform = transform,
+	closedBackgroundColor = {0, 0, 0, 0.8},
 	draw = function(self)
 		getRect(self, Layout.column3)
 		local size = 1 / 4
 		self.x = self.x + self.w * (1 - size) - 6 - 20
 		self.w = self.w * size
-		self.y = self.y + 6
 		self.h = 55
+		self.y = self.y + (72 - self.h) / 2
+		self.__index.draw(self)
+	end,
+})
+
+local ScoreFilterDropdown = ScoreFilterDropdownView:new({
+	subscreen = "notecharts",
+	transform = transform,
+	draw = function(self)
+		getRect(self, Layout.column1)
+		local size = 1 / 4
+		self.x = self.x + self.w * (1 - size) - 6 - 20
+		self.w = self.w * size
+		self.h = 55
+		self.y = self.y + (72 - self.h) / 2
 		self.__index.draw(self)
 	end,
 })
@@ -852,6 +868,7 @@ local SelectViewConfig = {
 	OsudirectSearchField,
 	SortDropdown,
 	NotechartFilterDropdown,
+	ScoreFilterDropdown,
 	GroupCheckbox,
 	ModifierIconGrid,
 	StageInfoModifierIconGrid,

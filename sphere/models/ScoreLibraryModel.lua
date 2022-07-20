@@ -20,6 +20,30 @@ ScoreLibraryModel.setIndex = function(self, index)
 	self.index = index
 end
 
+ScoreLibraryModel.filterScores = function(self, scores)
+	local filters = self.game.configModel.configs.filters.score
+	local select = self.game.configModel.configs.select
+	local index
+	for i, filter in ipairs(filters) do
+		if filter.name == select.scoreFilterName then
+			index = i
+			break
+		end
+	end
+	index = index or 1
+	local filter = filters[index]
+	if not filter.check then
+		return scores
+	end
+	local newScores = {}
+	for i, score in ipairs(scores) do
+		if filter.check(score) then
+			table.insert(newScores, score)
+		end
+	end
+	return newScores
+end
+
 ScoreLibraryModel.updateItems = function(self)
 	local scoreEntries = self.game.scoreModel:getScoreEntries(
 		self.hash,
@@ -28,6 +52,7 @@ ScoreLibraryModel.updateItems = function(self)
 	table.sort(scoreEntries, function(a, b)
 		return a.rating > b.rating
 	end)
+	scoreEntries = self:filterScores(scoreEntries)
 	for i = 1, #scoreEntries do
 		scoreEntries[i].rank = i
 	end

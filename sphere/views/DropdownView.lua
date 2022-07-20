@@ -43,6 +43,11 @@ DropdownView.draw = function(self)
 	local hmf = h - padding * 2
 	local r = hm / 2
 
+	if self.closedBackgroundColor then
+		love.graphics.setColor(self.closedBackgroundColor)
+		love.graphics.rectangle("fill", padding, padding, wm, hmf, r, r)
+	end
+
 	if self.isOpen then
 		hmf = hm * count
 

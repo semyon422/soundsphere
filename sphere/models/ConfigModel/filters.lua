@@ -1,3 +1,12 @@
+local function newInputModeScoreFilter(name, inputMode)
+	return {
+		name = name,
+		check = function(score)
+			return score.inputMode == inputMode
+		end
+	}
+end
+
 return {
 	notechart = {
 		{name = "No filter"},
@@ -14,20 +23,16 @@ return {
 		-- },
 	},
 	score = {
-		{
-			name = "No filter",
-		},
-		{
-			name = "4K",
-			check = function(score)
-				return score.inputMode == "4key"
-			end
-		},
-		{
-			name = "10K",
-			check = function(score)
-				return score.inputMode == "10key"
-			end
-		},
+		{name = "No filter"},
+		{name = "FC", check = function(score)
+			return score.missCount == 0
+		end},
+		newInputModeScoreFilter("4K", "4key"),
+		newInputModeScoreFilter("5K", "5key"),
+		newInputModeScoreFilter("6K", "6key"),
+		newInputModeScoreFilter("7K", "7key"),
+		newInputModeScoreFilter("8K", "8key"),
+		newInputModeScoreFilter("9K", "9key"),
+		newInputModeScoreFilter("10K", "10key"),
 	}
 }

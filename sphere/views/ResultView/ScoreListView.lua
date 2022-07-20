@@ -3,6 +3,7 @@ local ListView = require("sphere.views.ListView")
 local ScoreListView = ListView:new({construct = false})
 
 ScoreListView.reloadItems = function(self)
+	self.stateCounter = self.game.selectModel.scoreStateCounter
 	self.items = self.game.scoreLibraryModel.items
 end
 

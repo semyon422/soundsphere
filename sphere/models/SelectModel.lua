@@ -25,6 +25,7 @@ SelectModel.load = function(self)
 
 	self.noteChartSetStateCounter = 1
 	self.noteChartStateCounter = 1
+	self.scoreStateCounter = 1
 	self.searchStateCounter = self.game.searchModel.stateCounter
 
 	self.collectionItemIndex = self.game.collectionModel:getItemIndex(config.collection)
@@ -250,6 +251,7 @@ SelectModel.pullNoteChart = function(self, noUpdate)
 		self.noteChartStateCounter = self.noteChartStateCounter + 1
 	end
 
+	local oldNoteChartItem = self.noteChartItem
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
 	self.noteChartItem = noteChartItem
 	self.changed = true
@@ -257,7 +259,7 @@ SelectModel.pullNoteChart = function(self, noUpdate)
 	if noteChartItem then
 		self.config.noteChartEntryId = noteChartItem.noteChartId
 		self.config.noteChartDataEntryId = noteChartItem.noteChartDataId
-		return self:pullScore(noUpdate)
+		return self:pullScore(oldNoteChartItem and oldNoteChartItem.id == noteChartItem.id)
 	end
 
 	self.config.noteChartEntryId = 0
@@ -277,6 +279,7 @@ SelectModel.pullScore = function(self, noUpdate)
 	end
 
 	if not noUpdate then
+		self.scoreStateCounter = self.scoreStateCounter + 1
 		self.game.scoreLibraryModel:setHash(noteChartItem.hash)
 		self.game.scoreLibraryModel:setIndex(noteChartItem.index)
 		self.game.scoreLibraryModel:updateItems()
