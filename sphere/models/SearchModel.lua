@@ -53,8 +53,8 @@ local numberFields = {
 		field = "noteChartDatas.bpm",
 	},
 	{
-		keys = {"notesCount", "nc"},
-		field = "noteChartDatas.notesCount",
+		keys = {"noteCount", "nc"},
+		field = "noteChartDatas.noteCount",
 	},
 	{
 		keys = {"level", "lv"},
