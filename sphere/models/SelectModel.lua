@@ -177,7 +177,7 @@ SelectModel.scrollNoteChart = function(self, direction, destination)
 
 	self:setConfig(noteChartItem)
 
-	self:pullNoteChartSet(true)
+	self:pullNoteChartSet(true, true)
 	self:pullScore()
 end
 
@@ -196,7 +196,7 @@ SelectModel.scrollScore = function(self, direction, destination)
 	self.config.scoreEntryId = scoreItem.id
 end
 
-SelectModel.pullNoteChartSet = function(self, noUpdate)
+SelectModel.pullNoteChartSet = function(self, noUpdate, noPullNext)
 	self.pullingNoteChartSet = true
 
 	if not noUpdate then
@@ -220,7 +220,10 @@ SelectModel.pullNoteChartSet = function(self, noUpdate)
 	if noteChartSetItem then
 		self.config.noteChartSetEntryId = noteChartSetItem.setId
 		self.pullingNoteChartSet = false
-		return self:pullNoteChart(noUpdate)
+		if not noPullNext then
+			self:pullNoteChart(noUpdate)
+		end
+		return
 	end
 
 	self.config.noteChartSetEntryId = 0
@@ -237,7 +240,7 @@ SelectModel.pullNoteChartSet = function(self, noUpdate)
 	self.pullingNoteChartSet = false
 end
 
-SelectModel.pullNoteChart = function(self, noUpdate)
+SelectModel.pullNoteChart = function(self, noUpdate, noPullNext)
 	self.game.noteChartLibraryModel:setNoteChartSetId(self.config.noteChartSetEntryId)
 
 	local noteChartItems = self.game.noteChartLibraryModel.items
@@ -251,7 +254,6 @@ SelectModel.pullNoteChart = function(self, noUpdate)
 		self.noteChartStateCounter = self.noteChartStateCounter + 1
 	end
 
-	local oldNoteChartItem = self.noteChartItem
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
 	self.noteChartItem = noteChartItem
 	self.changed = true
@@ -259,7 +261,10 @@ SelectModel.pullNoteChart = function(self, noUpdate)
 	if noteChartItem then
 		self.config.noteChartEntryId = noteChartItem.noteChartId
 		self.config.noteChartDataEntryId = noteChartItem.noteChartDataId
-		return self:pullScore(oldNoteChartItem and oldNoteChartItem.id == noteChartItem.id)
+		if not noPullNext then
+			self:pullScore()
+		end
+		return
 	end
 
 	self.config.noteChartEntryId = 0
