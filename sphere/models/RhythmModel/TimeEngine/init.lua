@@ -110,8 +110,11 @@ TimeEngine.skipIntro = function(self)
 end
 
 TimeEngine.increaseTimeRate = function(self, delta)
-	if self.targetTimeRate + delta >= 0.1 then
-		self:setTimeRate(self.targetTimeRate + delta)
+	local target = self.targetTimeRate
+	local newTarget = math.floor((target + delta) / delta + 0.5) * delta
+
+	if newTarget >= 0.1 then
+		self:setTimeRate(newTarget)
 	end
 end
 

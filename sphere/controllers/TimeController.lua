@@ -40,14 +40,14 @@ TimeController.increaseTimeRate = function(self, delta)
 	self.game.notificationModel:notify("rate: " .. timeEngine.timeRate)
 end
 
-TimeController.invertTimeRate = function(self, delta)
-	if self.game.multiplayerModel.isPlaying then return end
-	local rhythmModel = self.game.rhythmModel
-	local timeEngine = rhythmModel.timeEngine
-	timeEngine:setTimeRate(-timeEngine.timeRate)
-	rhythmModel.prohibitSavingScore = true
-	self.game.notificationModel:notify("rate: " .. timeEngine.timeRate)
-end
+-- TimeController.invertTimeRate = function(self)
+-- 	if self.game.multiplayerModel.isPlaying then return end
+-- 	local rhythmModel = self.game.rhythmModel
+-- 	local timeEngine = rhythmModel.timeEngine
+-- 	timeEngine:setTimeRate(-timeEngine.timeRate)
+-- 	rhythmModel.prohibitSavingScore = true
+-- 	self.game.notificationModel:notify("rate: " .. timeEngine.timeRate)
+-- end
 
 TimeController.increasePlaySpeed = function(self, delta)
 	local gameplay = self.game.configModel.configs.settings.gameplay
