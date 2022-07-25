@@ -112,7 +112,7 @@ end
 
 ModifierModel.setConfig = function(self, config)
 	self.config = config
-	self.modifierItemIndex = #config
+	self.modifierItemIndex = math.max(1, #config + 1)
 end
 
 ModifierModel.scrollAvailableModifier = function(self, direction)
