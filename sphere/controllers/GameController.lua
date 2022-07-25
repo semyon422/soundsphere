@@ -31,7 +31,6 @@ local RhythmModel		= require("sphere.models.RhythmModel")
 local OsudirectModel		= require("sphere.models.OsudirectModel")
 local MultiplayerModel		= require("sphere.models.MultiplayerModel")
 local MainLog					= require("sphere.MainLog")
-local FrameTimeView					= require("sphere.views.FrameTimeView")
 local ReplayModel		= require("sphere.models.ReplayModel")
 
 local MountController			= require("sphere.controllers.MountController")
@@ -108,7 +107,6 @@ GameController.construct = function(self)
 	self.osudirectModel = OsudirectModel:new()
 	self.multiplayerModel = MultiplayerModel:new()
 	self.replayModel = ReplayModel:new()
-	self.frameTimeView = FrameTimeView:new()
 
 	for k, v in pairs(self) do
 		v.game = self
@@ -160,7 +158,6 @@ GameController.load = function(self)
 	self.collectionModel:load()
 	self.selectModel:load()
 	self.previewModel:load()
-	self.frameTimeView:load()
 
 	self.multiplayerController:load()
 	self.onlineController:load()
@@ -194,8 +191,6 @@ GameController.unload = function(self)
 end
 
 GameController.update = function(self, dt)
-	local startTime = love.timer.getTime()
-
 	self.discordModel:update()
 	self.notificationModel:update()
 	self.backgroundModel:update(dt)
@@ -208,30 +203,17 @@ GameController.update = function(self, dt)
 	self.cacheModel:update()
 
 	self.gameView:update(dt)
-
-	self.frameTimeView.updateFrameTime = love.timer.getTime() - startTime
 end
 
 GameController.draw = function(self)
-	local startTime = love.timer.getTime()
-
 	self.gameView:draw()
-
-	love.graphics.origin()
-	self.frameTimeView:draw()
-
-	self.frameTimeView.drawFrameTime = love.timer.getTime() - startTime
 end
 
 GameController.receive = function(self, event)
-	local startTime = love.timer.getTime()
-
 	if event.name == "update" then
 		return self:update(event[1])
 	elseif event.name == "draw" then
 		return self:draw()
-	elseif event.name == "resize" then
-		self.frameTimeView:load()
 	elseif event.name == "quit" then
 		return self:unload()
 	end
@@ -240,9 +222,6 @@ GameController.receive = function(self, event)
 	self.windowManager:receive(event)
 	self.screenshot:receive(event)
 	self.mountController:receive(event)
-	self.frameTimeView:receive(event)
-
-	self.frameTimeView.receiveFrameTime = love.timer.getTime() - startTime
 end
 
 return GameController

@@ -538,6 +538,12 @@ local settings = {
 		key = "miscellaneous.showNonManiaCharts",
 		type = "Checkbox",
 	},
+	{
+		name = "show FPS",
+		section = "miscellaneous",
+		key = "miscellaneous.showFPS",
+		type = "Checkbox",
+	},
 }
 
 return settings

@@ -139,6 +139,7 @@ return {
 	miscellaneous = {
 		autoUpdate = true,
 		imguiShowDemoWindow = false,
-		showNonManiaCharts = false
+		showNonManiaCharts = false,
+		showFPS = false
 	}
 }

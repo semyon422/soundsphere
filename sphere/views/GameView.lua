@@ -1,13 +1,17 @@
 local Class = require("aqua.util.Class")
 local FadeTransition = require("sphere.views.FadeTransition")
+local FrameTimeView = require("sphere.views.FrameTimeView")
 
 local GameView = Class:new()
 
 GameView.construct = function(self)
 	self.fadeTransition = FadeTransition:new()
+	self.frameTimeView = FrameTimeView:new()
 end
 
 GameView.load = function(self)
+	self.frameTimeView.game = self.game
+	self.frameTimeView:load()
 	self:setView(self.game.selectView)
 end
 
@@ -53,6 +57,7 @@ GameView.draw = function(self)
 	self.fadeTransition:drawBefore()
 	self.view:draw()
 	self.fadeTransition:drawAfter()
+	self.frameTimeView:draw()
 end
 
 GameView.receive = function(self, event)
@@ -60,6 +65,7 @@ GameView.receive = function(self, event)
 		return
 	end
 	self.view:receive(event)
+	self.frameTimeView:receive(event)
 end
 
 return GameView
