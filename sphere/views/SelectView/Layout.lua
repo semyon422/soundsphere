@@ -1,5 +1,6 @@
 local just = require("just")
 local transform = require("aqua.graphics.transform")
+local just_layout = require("just.layout")
 
 local function setRect(t, x, y, w, h)
 	t.x = assert(x)
@@ -97,10 +98,10 @@ return {
 		local x_int = 24
 		local y_int = 55
 
-		local x0, w0 = just.layout(0, 1920, {1920})
-		local x1, w1 = just.layout(_x, _w, {y_int, -1/3, x_int, -1/3, x_int, -1/3, y_int})
+		local x0, w0 = just_layout(0, 1920, {1920})
+		local x1, w1 = just_layout(_x, _w, {y_int, -1/3, x_int, -1/3, x_int, -1/3, y_int})
 
-		local y0, h0 = just.layout(0, 1080, {89, y_int, -1, y_int, 89})
+		local y0, h0 = just_layout(0, 1080, {89, y_int, -1, y_int, 89})
 
 		self.x0, self.w0 = x0, w0
 		self.x1, self.w1 = x1, w1
@@ -114,23 +115,23 @@ return {
 		setRect(self.column2, x1[4], y0[3], w1[4], h0[3])
 		setRect(self.column3, x1[6], y0[3], w1[6], h0[3])
 
-		local y1, h1 = just.layout(self.column2.y, self.column2.h, {-1, x_int, 72 * 6})
+		local y1, h1 = just_layout(self.column2.y, self.column2.h, {-1, x_int, 72 * 6})
 
 		setRect(self.column2row1, x1[4], y1[1], w1[4], h1[1])
 		setRect(self.column2row2, x1[4], y1[3], w1[4], h1[3])
 
-		local y2, h2 = just.layout(self.column2row2.y, self.column2row2.h, {72, 72 * 5})
+		local y2, h2 = just_layout(self.column2row2.y, self.column2row2.h, {72, 72 * 5})
 
 		setRect(self.column2row2row1, x1[4], y2[1], w1[4], h2[1])
 		setRect(self.column2row2row2, x1[4], y2[2], w1[4], h2[2])
 
-		local y3, h3 = just.layout(self.column1.y, self.column1.h, {72 * 6, x_int, -1, x_int, 72 * 2})
+		local y3, h3 = just_layout(self.column1.y, self.column1.h, {72 * 6, x_int, -1, x_int, 72 * 2})
 
 		setRect(self.column1row1, x1[2], y3[1], w1[2], h3[1])
 		setRect(self.column1row2, x1[2], y3[3], w1[2], h3[3])
 		setRect(self.column1row3, x1[2], y3[5], w1[2], h3[5])
 
-		local y4, h4 = just.layout(self.column1row1.y, self.column1row1.h, {72, -1})
+		local y4, h4 = just_layout(self.column1row1.y, self.column1row1.h, {72, -1})
 
 		setRect(self.column1row1row1, x1[2], y4[1], w1[2], h4[1])
 		setRect(self.column1row1row2, x1[2], y4[2], w1[2], h4[2])

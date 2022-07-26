@@ -15,7 +15,9 @@ return function(w, h, align, name, value, isMono)
 	baseline_print(name, x, 19, limit, 1, align)
 
 	if isMono then
-		love.graphics.setFont(spherefonts.get("Noto Sans Mono", 24))
+		local font = spherefonts.get("Noto Sans Mono", 24)
+		font:setFallbacks(spherefonts.get("Noto Sans", 24))
+		love.graphics.setFont(font)
 	else
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 	end

@@ -27,10 +27,10 @@ DropdownView.draw = function(self)
 
 	local over = just.is_over(w, h)
 
-	local scrolled, delta = just.wheel_behavior(self, over)
+	local delta = just.wheel_behavior(self, over)
 	local changed, active, hovered = just.button_behavior(self, over)
 
-	if scrolled then
+	if delta then
 		self:scroll(delta)
 	end
 

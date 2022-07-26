@@ -16,6 +16,13 @@ JudgementScoreSystem.judgements = {
 	},
 }
 
+JudgementScoreSystem.judgementLists = {
+	soundsphere = {
+		"perfect",
+		"not perfect",
+	},
+}
+
 for od = 0, 10 do
 	local _3od = 3 * od
 	local _300g = 16
@@ -54,6 +61,14 @@ for od = 0, 10 do
 		end
 	end
 	JudgementScoreSystem.judgements["osuOD" .. od] = judgements
+	JudgementScoreSystem.judgementLists["osuOD" .. od] = {
+		"300g",
+		"300",
+		"200",
+		"100",
+		"50",
+		"0",
+	}
 end
 
 JudgementScoreSystem.load = function(self)

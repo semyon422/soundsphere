@@ -89,7 +89,7 @@ ListView.draw = function(self)
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local over = 0 <= mx and mx <= self.w and 0 <= my and my <= self.h
 
-	local scrolled, delta = just.wheel_behavior(self, over)
+	local delta = just.wheel_behavior(self, over)
 	if delta == 1 then
 		self:scrollUp()
 	elseif delta == -1 then
