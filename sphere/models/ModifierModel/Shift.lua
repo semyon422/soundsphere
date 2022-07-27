@@ -10,6 +10,8 @@ Shift.name = "Shift"
 Shift.defaultValue = 0
 Shift.range = {-5, 5}
 
+Shift.description = "Shift the note chart"
+
 Shift.getString = function(self, config)
     if config.value > 0 then
         return "S+"
