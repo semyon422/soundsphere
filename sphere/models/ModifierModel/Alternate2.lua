@@ -11,6 +11,8 @@ Alternate2.defaultValue = "key"
 Alternate2.range = {1, 2}
 Alternate2.values = {"key", "scratch"}
 
+Alternate2.description = "1 1 1 1 -> 1 1 2 2, doubles the input mode"
+
 Alternate2.getString = function(self, config)
 	return "Alt"
 end

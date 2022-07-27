@@ -12,6 +12,8 @@ TimeRateX.format = "%0.2f"
 TimeRateX.range = {0.5, 2}
 TimeRateX.step = 0.05
 
+TimeRateX.description = "Change the time rate"
+
 TimeRateX.getString = function(self, config)
 	local value = config.value
     if value ~= 1 then

@@ -17,6 +17,8 @@ Automap.name = "Automap"
 Automap.defaultValue = 10
 Automap.range = {1, 26}
 
+Automap.description = "anyK to anyK conversion"
+
 Automap.getString = function(self, config)
 	return "AM"
 end

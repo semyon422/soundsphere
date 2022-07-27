@@ -11,6 +11,8 @@ TimeRateQ.defaultValue = 0
 TimeRateQ.format = "%3s"
 TimeRateQ.range = {-10, 10}
 
+TimeRateQ.description = "Powers of ¹⁰√2 for rates, Quaver issue 666"
+
 TimeRateQ.getString = function(self, config)
     if config.value == -10 then
 		return config.value

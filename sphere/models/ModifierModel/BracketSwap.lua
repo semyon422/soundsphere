@@ -9,6 +9,8 @@ BracketSwap.defaultValue = true
 BracketSwap.name = "BracketSwap"
 BracketSwap.shortName = "BS"
 
+BracketSwap.description = "Brackets to connected chords"
+
 BracketSwap.getString = function(self, config)
 	if not config.value then
 		return

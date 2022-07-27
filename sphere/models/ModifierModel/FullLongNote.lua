@@ -11,6 +11,8 @@ FullLongNote.name = "FullLongNote"
 FullLongNote.defaultValue = 0
 FullLongNote.range = {0, 3}
 
+FullLongNote.description = "Replace short notes with long notes"
+
 FullLongNote.getString = function(self, config)
 	return "FLN"
 end

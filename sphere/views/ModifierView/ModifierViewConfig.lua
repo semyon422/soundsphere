@@ -4,6 +4,7 @@ local spherefonts = require("sphere.assets.fonts")
 local just_layout = require("just.layout")
 
 local TextCellImView = require("sphere.views.SelectView.TextCellImView")
+local TextTooltipImView = require("sphere.views.TextTooltipImView")
 
 local ScrollBarView = require("sphere.views.ScrollBarView")
 local RectangleView = require("sphere.views.RectangleView")
@@ -16,6 +17,14 @@ local AvailableModifierListView = require("sphere.views.ModifierView.AvailableMo
 local ModifierListView = require("sphere.views.ModifierView.ModifierListView")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
+
+local Tooltip = {draw = function(self)
+	if self.text then
+		love.graphics.setFont(spherefonts.get("Noto Sans", 28))
+		TextTooltipImView("modifier tooltip", self.text)
+	end
+	self.text = nil
+end}
 
 local Frames = {draw = function()
 	local width, height = love.graphics.getDimensions()
@@ -77,6 +86,9 @@ local AvailableModifierList = AvailableModifierListView:new({
 		just.row(true)
 		just.indent(44)
 		TextCellImView(410, 72, "left", "", item.name)
+		if just.is_over(-410, 72) then
+			Tooltip.text = item.description
+		end
 		just.indent(-410 - 44)
 
 		love.graphics.setColor(1, 1, 1, 1)
@@ -246,6 +258,7 @@ local ModifierViewConfig = {
 	Circle,
 	ContainerEnd,
 	require("sphere.views.DebugInfoViewConfig"),
+	Tooltip,
 }
 
 return ModifierViewConfig

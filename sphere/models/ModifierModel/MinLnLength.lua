@@ -11,6 +11,8 @@ MinLnLength.defaultValue = 0.4
 MinLnLength.range = {0, 40}
 MinLnLength.step = 0.025
 
+MinLnLength.description = "Convert long notes to short notes if they are shorter than this length"
+
 MinLnLength.getString = function(self, config)
 	return "MLL"
 end

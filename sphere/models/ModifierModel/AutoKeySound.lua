@@ -10,6 +10,8 @@ AutoKeySound.defaultValue = true
 AutoKeySound.name = "AutoKeySound"
 AutoKeySound.shortName = "AKS"
 
+AutoKeySound.description = "Key sounds will not depend on the input"
+
 AutoKeySound.getString = function(self, config)
 	if not config.value then
 		return

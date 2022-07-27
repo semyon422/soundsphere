@@ -10,6 +10,8 @@ WindUp.defaultValue = true
 WindUp.name = "WindUp"
 WindUp.shortName = "WU"
 
+WindUp.description = "Change time rate from 0.75 to 1.5 during the play"
+
 WindUp.getString = function(self, config)
 	if not config.value then
 		return

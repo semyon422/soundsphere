@@ -11,6 +11,8 @@ LessChord.defaultValue = "none"
 LessChord.range = {1, 8}
 LessChord.values = {"none", "-5", "-4", "-3", "2", "3", "4", "5"}
 
+LessChord.description = "Remove chords"
+
 LessChord.getString = function(self, config)
 	return "LC"
 end

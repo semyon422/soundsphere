@@ -9,6 +9,8 @@ NoLongNote.defaultValue = true
 NoLongNote.name = "NoLongNote"
 NoLongNote.shortName = "NLN"
 
+NoLongNote.description = "Remove long notes"
+
 NoLongNote.getString = function(self, config)
 	if not config.value then
 		return

@@ -9,6 +9,8 @@ ProMode.defaultValue = true
 ProMode.name = "ProMode"
 ProMode.shortName = "PRO"
 
+ProMode.description = "Press any keys to play like an AutoPlay"
+
 ProMode.getString = function(self, config)
 	if not config.value then
 		return

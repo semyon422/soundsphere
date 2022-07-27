@@ -11,6 +11,8 @@ Random.defaultValue = "all"
 Random.range = {1, 3}
 Random.values = {"all", "left", "right"}
 
+Random.description = "Randomize the note chart"
+
 Random.getString = function(self, config)
 	return "RD"
 end

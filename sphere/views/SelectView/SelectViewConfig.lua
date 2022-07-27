@@ -11,6 +11,7 @@ local IconButtonImView = require("sphere.views.IconButtonImView")
 local TextButtonImView = require("sphere.views.TextButtonImView")
 local CheckboxImView = require("sphere.views.CheckboxImView")
 local LabelImView = require("sphere.views.LabelImView")
+local TextTooltipImView = require("sphere.views.TextTooltipImView")
 local BackgroundView = require("sphere.views.BackgroundView")
 local ValueView = require("sphere.views.ValueView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
@@ -47,6 +48,14 @@ local function getRect(out, r)
 end
 
 local Layout = require("sphere.views.SelectView.Layout")
+
+local Tooltip = {draw = function(self)
+	if self.text then
+		love.graphics.setFont(spherefonts.get("Noto Sans", 28))
+		TextTooltipImView("select tooltip", self.text)
+	end
+	self.text = nil
+end}
 
 local Cache = CacheView:new({
 	subscreen = "collections",
@@ -142,7 +151,13 @@ local ScoreList = ScoreListView:new({
 		TextCellImView(w, h, "right", i == 1 and "rank" or "", item.rank)
 		TextCellImView(w, h, "right", i == 1 and "rating" or "", Format.difficulty(item.rating))
 		TextCellImView(w, h, "right", i == 1 and "time rate" or "", Format.timeRate(item.timeRate))
+		if just.is_over(-w, h) then
+			Tooltip.text = ("%0.2fX"):format(item.timeRate)
+		end
 		TextCellImView(w * 2, h, "right", item.time ~= 0 and time_ago_in_words(item.time) or "never", Format.inputMode(item.inputMode))
+		if just.is_over(-w * 2, h) then
+			Tooltip.text = os.date("%c", item.time)
+		end
 		just.row(false)
 	end,
 	rows = 5,
@@ -883,6 +898,7 @@ local SelectViewConfig = {
 	Logo,
 	UserInfo,
 	require("sphere.views.DebugInfoViewConfig"),
+	Tooltip,
 }
 
 return SelectViewConfig

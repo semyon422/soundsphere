@@ -11,6 +11,8 @@ MultiOverPlay.name = "MultiOverPlay"
 MultiOverPlay.defaultValue = 2
 MultiOverPlay.range = {2, 4}
 
+MultiOverPlay.description = "1 2 1 2 -> 12 34 12 34, doubles the input mode"
+
 MultiOverPlay.getString = function(self, config)
 	if config.old then
 		return config.value + 1

@@ -9,6 +9,8 @@ NoScratch.defaultValue = true
 NoScratch.name = "NoScratch"
 NoScratch.shortName = "NSC"
 
+NoScratch.description = "Remove scratch notes"
+
 NoScratch.getString = function(self, config)
 	if not config.value then
 		return

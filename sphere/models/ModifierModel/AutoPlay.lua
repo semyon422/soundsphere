@@ -9,6 +9,8 @@ AutoPlay.defaultValue = true
 AutoPlay.name = "AutoPlay"
 AutoPlay.shortName = "AP"
 
+AutoPlay.description = "Watch a perfect playthrough"
+
 AutoPlay.getString = function(self, config)
 	if not config.value then
 		return

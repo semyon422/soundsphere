@@ -10,6 +10,8 @@ ToOsu.defaultValue = true
 ToOsu.name = "ToOsu"
 ToOsu.shortName = "OSU"
 
+ToOsu.description = "Convert to osu format"
+
 ToOsu.apply = function(self, config)
 	local nce = NoteChartExporter:new()
 	nce.noteChart = self.game.noteChartModel.noteChart

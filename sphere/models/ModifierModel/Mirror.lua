@@ -11,6 +11,8 @@ Mirror.defaultValue = "all"
 Mirror.range = {1, 3}
 Mirror.values = {"all", "left", "right"}
 
+Mirror.description = "Mirror the note chart"
+
 Mirror.getString = function(self, config)
 	return "MR"
 end
