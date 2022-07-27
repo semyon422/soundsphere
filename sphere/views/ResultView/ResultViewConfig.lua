@@ -214,7 +214,7 @@ local ScoreList = ScoreListView:new({
 		local scoreEntry = scoreEngine.scoreEntry
 		local loaded = scoreEntry and scoreEntry.replayHash == item.replayHash
 
-		if just.button_behavior(item, just.is_over(w, h)) then
+		if just.button(item, just.is_over(w, h)) then
 			self.navigator:loadScore(i)
 		end
 

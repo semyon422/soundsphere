@@ -7,7 +7,7 @@ local ScreenMenuItemView = Class:new()
 ScreenMenuItemView.draw = function(self, text, w, h, method, ...)
 	local listView = self.listView
 
-	local changed, active, hovered = just.button_behavior(self.item, just.is_over(w, h))
+	local changed, active, hovered = just.button(self.item, just.is_over(w, h))
 	if changed then
 		listView.navigator:call(method, ...)
 	end

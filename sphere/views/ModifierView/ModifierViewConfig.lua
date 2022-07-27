@@ -46,12 +46,12 @@ local ContainerBegin = {draw = function(self)
 	love.graphics.translate(x, y)
 
 	local over = just.is_over(w, h)
-	just.begin_container_behavior("modifiers window", over)
-	just.wheel_behavior("modifiers window", over)
+	just.container("modifiers window", over)
+	just.wheel_over("modifiers window", over)
 end}
 
 local ContainerEnd = {draw = function(self)
-	just.end_container_behavior()
+	just.container()
 end}
 
 local AvailableModifierList = AvailableModifierListView:new({
@@ -65,7 +65,7 @@ local AvailableModifierList = AvailableModifierListView:new({
 		local item = self.items[i]
 		local prevItem = self.items[i - 1]
 
-		if just.button_behavior(i, just.is_over(w, h)) then
+		if just.button(i, just.is_over(w, h)) then
 			self.navigator:addModifier(i)
 		end
 
@@ -102,7 +102,7 @@ local ModifierList = ModifierListView:new({
 		local item = self.items[i]
 		local w2 = w / 2
 
-		if just.button_behavior(tostring(item) .. "1", just.is_over(w2, h), 2) then
+		if just.button(tostring(item) .. "1", just.is_over(w2, h), 2) then
 			self.navigator:removeModifier(i)
 		end
 
@@ -115,8 +115,8 @@ local ModifierList = ModifierListView:new({
 			just.indent((w2 - h) / 2)
 			w2 = 72
 			local over = SwitchView:isOver(w2, h)
-			local delta = just.wheel_behavior(item, over)
-			local changed, active, hovered = just.button_behavior(item, over)
+			local delta = just.wheel_over(item, over)
+			local changed, active, hovered = just.button(item, over)
 
 			local value = item.value
 			if changed then
@@ -137,8 +137,8 @@ local ModifierList = ModifierListView:new({
 			local over = SliderView:isOver(w2, h)
 			local pos = SliderView:getPosition(w2, h)
 
-			local delta = just.wheel_behavior(item, over)
-			local new_value, active, hovered = just.slider_behavior(item, over, pos, value)
+			local delta = just.wheel_over(item, over)
+			local new_value, active, hovered = just.slider(item, over, pos, value)
 			if new_value then
 				self.navigator:setModifierValue(item, modifier:fromNormValue(new_value))
 			elseif delta then
@@ -155,9 +155,9 @@ local ModifierList = ModifierListView:new({
 			local overAll, overLeft, overRight = StepperView:isOver(w2, h)
 
 			local id = tostring(item)
-			local delta = just.wheel_behavior(id .. "A", overAll)
-			local changedLeft = just.button_behavior(id .. "L", overLeft)
-			local changedRight = just.button_behavior(id .. "R", overRight)
+			local delta = just.wheel_over(id .. "A", overAll)
+			local changedLeft = just.button(id .. "L", overLeft)
+			local changedRight = just.button(id .. "R", overRight)
 
 			if changedLeft or delta == -1 then
 				self.navigator:increaseModifierValue(i, -1)

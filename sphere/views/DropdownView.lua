@@ -27,8 +27,8 @@ DropdownView.draw = function(self)
 
 	local over = just.is_over(w, h)
 
-	local delta = just.wheel_behavior(self, over)
-	local changed, active, hovered = just.button_behavior(self, over)
+	local delta = just.wheel_over(self, over)
+	local changed, active, hovered = just.button(self, over)
 
 	if delta then
 		self:scroll(delta)
@@ -77,7 +77,7 @@ DropdownView.draw = function(self)
 	for i = 1, count do
 		local id = tostring(self) .. i
 
-		local changed, active, hovered = just.button_behavior(id, just.is_over(wm, hm))
+		local changed, active, hovered = just.button(id, just.is_over(wm, hm))
 		if changed then
 			self:select(i)
 			self.isOpen = false

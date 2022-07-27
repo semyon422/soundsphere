@@ -23,7 +23,7 @@ UserInfoView.draw = function(self)
 	local x, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local over = 0 <= x and x <= self.h and 0 <= y and y <= self.h
 
-	local changed, active, hovered = just.button_behavior(self, over)
+	local changed, active, hovered = just.button(self, over)
 	if changed then
 		self.navigator:call(self.action)
 	end

@@ -31,7 +31,7 @@ CacheView.draw = function(self)
 		text = "update"
 	end
 
-	local changed, active, hovered = just.button_behavior(self, just.is_over(self.w, self.h))
+	local changed, active, hovered = just.button(self, just.is_over(self.w, self.h))
 	if hovered then
 		local alpha = active and 0.2 or 0.1
 		love.graphics.setColor(1, 1, 1, alpha)

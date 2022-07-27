@@ -57,7 +57,7 @@ FrameTimeView.drawSmall = function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.printf(text, 0, 0, twidth, "right")
 
-	if just.button_behavior(self, just.is_over(twidth, theight)) then
+	if just.button(self, just.is_over(twidth, theight)) then
 		self.visible = not self.visible
 	end
 end

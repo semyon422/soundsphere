@@ -34,7 +34,7 @@ SearchFieldView.draw = function(self)
 	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
-	local changed, active, hovered = just.button_behavior(self, just.is_over(self.w, self.h))
+	local changed, active, hovered = just.button(self, just.is_over(self.w, self.h))
 	if changed then
 		self.navigator:setSearchMode(self.searchMode)
 	end

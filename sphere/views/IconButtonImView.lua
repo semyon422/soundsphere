@@ -16,7 +16,7 @@ return function(id, name, size, scale)
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local over = 0 <= mx and mx <= size and 0 <= my and my <= size
 
-	local changed, active, hovered = just.button_behavior(id, over)
+	local changed, active, hovered = just.button(id, over)
 	if hovered then
 		local alpha = active and 0.2 or 0.1
 		love.graphics.setColor(1, 1, 1, alpha)
