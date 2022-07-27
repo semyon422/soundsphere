@@ -7,6 +7,7 @@ local InputView = require("sphere.views.InputView")
 local SettingsView = require("sphere.views.SettingsView")
 local OnlineView = require("sphere.views.OnlineView")
 local MountsView = require("sphere.views.MountsView")
+local ModifierView = require("sphere.views.ModifierView")
 
 local SelectView = ScreenView:new({construct = false})
 
@@ -20,6 +21,7 @@ SelectView.construct = function(self)
 	self.settingsView = SettingsView:new()
 	self.onlineView = OnlineView:new()
 	self.mountsView = MountsView:new()
+	self.modifierView = ModifierView:new()
 end
 
 SelectView.load = function(self)
@@ -45,6 +47,11 @@ SelectView.load = function(self)
 	self.mountsView.game = self.game
 	self.mountsView.navigator = self.navigator
 	self.mountsView.isOpen = self.navigator.isMountsOpen
+
+	self.modifierView.game = self.game
+	self.modifierView.navigator = self.navigator
+	self.modifierView:load()
+	self.modifierView.isOpen = self.navigator.isModifiersOpen
 end
 
 SelectView.draw = function(self)
@@ -54,15 +61,18 @@ SelectView.draw = function(self)
 	self.settingsView:draw()
 	self.onlineView:draw()
 	self.mountsView:draw()
+	self.modifierView:draw()
 end
 
 SelectView.unload = function(self)
 	self.game.selectController:unload()
+	self.modifierView:unload()
 	ScreenView.unload(self)
 end
 
 SelectView.update = function(self, dt)
 	self.game.selectController:update(dt)
+	self.modifierView:update(dt)
 	ScreenView.update(self, dt)
 end
 

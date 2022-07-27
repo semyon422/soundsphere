@@ -3,18 +3,11 @@ local just = require("just")
 local spherefonts = require("sphere.assets.fonts")
 local just_layout = require("just.layout")
 
-local IconButtonImView = require("sphere.views.IconButtonImView")
-local TextButtonImView = require("sphere.views.TextButtonImView")
-local CheckboxImView = require("sphere.views.CheckboxImView")
-local LabelImView = require("sphere.views.LabelImView")
-local BarCellImView = require("sphere.views.SelectView.BarCellImView")
 local TextCellImView = require("sphere.views.SelectView.TextCellImView")
 
 local ScrollBarView = require("sphere.views.ScrollBarView")
 local RectangleView = require("sphere.views.RectangleView")
 local CircleView = require("sphere.views.CircleView")
-local BackgroundView = require("sphere.views.BackgroundView")
-local GaussianBlurView = require("sphere.views.GaussianBlurView")
 local SwitchView = require("sphere.views.SwitchView")
 local StepperView = require("sphere.views.StepperView")
 local SliderView = require("sphere.views.SliderView")
@@ -27,9 +20,6 @@ local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 
 local Frames = {draw = function()
 	local width, height = love.graphics.getDimensions()
 	love.graphics.origin()
-
-	love.graphics.setColor(1, 1, 1, 0.2)
-	love.graphics.rectangle("fill", 0, 0, width, height)
 
 	love.graphics.replaceTransform(_transform(transform))
 
@@ -45,9 +35,23 @@ local Frames = {draw = function()
 	local y0, h0 = just_layout(0, 1080, {89, y_int, -1, y_int, 89})
 
 	love.graphics.setColor(0, 0, 0, 0.8)
-	love.graphics.rectangle("fill", _x, y0[3], _w, h0[3])
-	love.graphics.rectangle("fill", _x, _y, _w, h0[1])
-	love.graphics.rectangle("fill", _x, _yh - h0[5], _w, h0[1])
+	local x, y, w, h = 279, 144, 1362, 792
+	love.graphics.rectangle("fill", x, y, w, h, 36)
+end}
+
+local ContainerBegin = {draw = function(self)
+	love.graphics.replaceTransform(_transform(transform))
+
+	local x, y, w, h = 279, 144, 1362, 792
+	love.graphics.translate(x, y)
+
+	local over = just.is_over(w, h)
+	just.begin_container_behavior("modifiers window", over)
+	just.wheel_behavior("modifiers window", over)
+end}
+
+local ContainerEnd = {draw = function(self)
+	just.end_container_behavior()
 end}
 
 local AvailableModifierList = AvailableModifierListView:new({
@@ -178,20 +182,6 @@ local AvailableModifierScrollBar = ScrollBarView:new({
 	color = {1, 1, 1, 0.66}
 })
 
-local BackgroundBlurSwitch = GaussianBlurView:new({
-	blur = {key = "game.configModel.configs.settings.graphics.blur.select"}
-})
-
-local Background = BackgroundView:new({
-	transform = transform,
-	x = 0,
-	y = 0,
-	w = 1920,
-	h = 1080,
-	parallax = 0.01,
-	dim = {key = "game.configModel.configs.settings.graphics.dim.select"},
-})
-
 local Rectangle = RectangleView:new({
 	transform = transform,
 	rectangles = {
@@ -246,25 +236,15 @@ local Circle = CircleView:new({
 	}
 })
 
-local BottomScreenMenu = {draw = function(self)
-	love.graphics.replaceTransform(_transform(transform))
-	love.graphics.translate(279, 991)
-	if IconButtonImView(self, "arrow_back", 89, 0.5) then
-		self.navigator:changeScreen("selectView")
-	end
-end}
-
 local ModifierViewConfig = {
-	BackgroundBlurSwitch,
-	Background,
-	BackgroundBlurSwitch,
 	Frames,
-	BottomScreenMenu,
+	ContainerBegin,
 	AvailableModifierList,
 	ModifierList,
 	AvailableModifierScrollBar,
 	Rectangle,
 	Circle,
+	ContainerEnd,
 	require("sphere.views.DebugInfoViewConfig"),
 }
 

@@ -17,6 +17,9 @@ SelectNavigator.load = function(self)
 	self.isSettingsOpen = ffi.new("bool[1]", false)
 	self.isOnlineOpen = ffi.new("bool[1]", false)
 	self.isMountsOpen = ffi.new("bool[1]", false)
+	self.isModifiersOpen = ffi.new("bool[1]", false)
+
+	self.activeList = "modifierList"
 end
 
 SelectNavigator.receive = function(self, event)
@@ -26,7 +29,28 @@ SelectNavigator.receive = function(self, event)
 
 	local scancode = event[2]
 
-	if scancode == "f1" then self:changeScreen("modifierView")
+	if self.isModifiersOpen[0] then
+		if self.activeList == "modifierList" then
+			if scancode == "up" then self:scrollModifier("up")
+			elseif scancode == "down" then self:scrollModifier("down")
+			elseif scancode == "tab" then self.activeList = "availableModifierList"
+			elseif scancode == "return" then
+			elseif scancode == "backspace" then self:removeModifier()
+			elseif scancode == "right" then self:increaseModifierValue(nil, 1)
+			elseif scancode == "left" then self:increaseModifierValue(nil, -1)
+			end
+		elseif self.activeList == "availableModifierList" then
+			if scancode == "up" then self:scrollAvailableModifier("up")
+			elseif scancode == "down" then self:scrollAvailableModifier("down")
+			elseif scancode == "tab" then self.activeList = "modifierList"
+			elseif scancode == "return" then self:addModifier()
+			end
+		end
+		if scancode == "escape" or scancode == "f1" then self:openModifiers() end
+		return
+	end
+
+	if scancode == "f1" then self:openModifiers()
 	elseif scancode == "f2" then self:scrollRandom()
 	elseif scancode == "lctrl" then self:changeSearchMode()
 	elseif scancode == "lshift" then self:changeCollapse()
@@ -268,6 +292,12 @@ SelectNavigator.openMounts = function(self)
 	isOpen[0] = not isOpen[0]
 end
 
+SelectNavigator.openModifiers = function(self)
+	local isOpen = self.isModifiersOpen
+	isOpen[0] = not isOpen[0]
+	self.game.multiplayerModel:pushModifiers()
+end
+
 SelectNavigator.setNoteSkin = function(self, itemIndex)
 	local noteChart = self.game.noteChartModel.noteChart
 	local noteSkins = self.game.noteSkinModel:getNoteSkins(noteChart.inputMode)
@@ -277,5 +307,39 @@ end
 SelectNavigator.setInputBinding = function(self, inputMode, virtualKey, key, type)
 	self.game.inputModel:setKey(inputMode, virtualKey, key, type)
 end
+
+SelectNavigator.scrollModifier = function(self, direction)
+	self.game.modifierModel:scrollModifier(direction == "up" and -1 or 1)
+end
+
+SelectNavigator.scrollAvailableModifier = function(self, direction)
+	self.game.modifierModel:scrollAvailableModifier(direction == "up" and -1 or 1)
+end
+
+SelectNavigator.removeModifier = function(self, itemIndex)
+	local modifierConfig = self.game.modifierModel.config[itemIndex or self.game.modifierModel.modifierItemIndex]
+	if not modifierConfig then
+		return
+	end
+	self.game.modifierModel:remove(modifierConfig)
+end
+
+SelectNavigator.increaseModifierValue = function(self, itemIndex, delta)
+	local modifierConfig = self.game.modifierModel.config[itemIndex or self.game.modifierModel.modifierItemIndex]
+	if not modifierConfig then
+		return
+	end
+	self.game.modifierModel:increaseModifierValue(modifierConfig, delta)
+end
+
+SelectNavigator.addModifier = function(self, itemIndex)
+	local modifier = self.game.modifierModel.modifiers[itemIndex or self.game.modifierModel.availableModifierItemIndex]
+	self.game.modifierModel:add(modifier)
+end
+
+SelectNavigator.setModifierValue = function(self, modifierConfig, value)
+	self.game.modifierModel:setModifierValue(modifierConfig, value)
+end
+
 
 return SelectNavigator

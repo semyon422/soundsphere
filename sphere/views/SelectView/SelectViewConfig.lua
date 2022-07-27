@@ -684,7 +684,7 @@ local BottomNotechartsScreenMenu = {
 			self.navigator:call("openMounts")
 		end
 		if TextButtonImView("modifiers", "modifiers", w, self.h) then
-			self.navigator:call("changeScreen", "modifierView")
+			self.navigator:call("openModifiers")
 		end
 		if TextButtonImView("noteskins", "noteskins", w, self.h) then
 			self.navigator:call("openNoteSkins")
