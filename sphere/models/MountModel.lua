@@ -15,6 +15,8 @@ MountModel.load = function(self)
 	local mountStatuses = self.mountStatuses
 
 	for _, entry in ipairs(self.mountInfo) do
+		entry[1] = entry[1]:match("^(.-)[/]*$")
+		entry[2] = entry[2]:match("^(.-)[/]*$")
 		local path, mountpoint = entry[1], entry[2]
 		local status, err = pcall(aquafs.mount, path, mountpoint, 1)
 		local mountStatus
@@ -39,6 +41,14 @@ end
 
 MountModel.getMountPoint = function(self, path)
 	return self.chartsPath .. "/" .. path:gsub("\\", "/"):match("^.+/(.-)$")
+end
+
+MountModel.isMountPath = function(self, path)
+	for _, entry in ipairs(self.mountInfo) do
+		if entry[1]:gsub("\\", "/") == path:gsub("\\", "/") then
+			return true
+		end
+	end
 end
 
 MountModel.getRealPath = function(self, path)

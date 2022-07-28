@@ -59,9 +59,16 @@ SelectController.openDirectory = function(self)
 		return
 	end
 	local path = noteChartItem.path:match("^(.+)/.-$")
-	local mountPath = self.game.mountModel:getRealPath(path)
-	local realPath = mountPath or love.filesystem.getSource() .. "/" .. path
-	love.system.openURL("file://" .. realPath)
+
+	local realDirectory = love.filesystem.getRealDirectory(path)
+
+	local realPath
+	if self.game.mountModel:isMountPath(realDirectory) then
+		realPath = self.game.mountModel:getRealPath(path)
+	else
+		realPath = realDirectory .. "/" .. path
+	end
+	love.system.openURL(realPath)
 end
 
 SelectController.updateCache = function(self, force)
