@@ -21,8 +21,9 @@ local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 
 local Tooltip = {draw = function(self)
 	if self.text then
 		love.graphics.setFont(spherefonts.get("Noto Sans", 28))
-		TextTooltipImView("modifier tooltip", self.text)
+		TextTooltipImView(self.id, self.text)
 	end
+	self.id = nil
 	self.text = nil
 end}
 
@@ -88,6 +89,7 @@ local AvailableModifierList = AvailableModifierListView:new({
 		TextCellImView(410, 72, "left", "", item.name)
 		if just.is_over(-410, 72) then
 			Tooltip.text = item.description
+			Tooltip.id = i
 		end
 		just.indent(-410 - 44)
 

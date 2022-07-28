@@ -52,8 +52,9 @@ local Layout = require("sphere.views.SelectView.Layout")
 local Tooltip = {draw = function(self)
 	if self.text then
 		love.graphics.setFont(spherefonts.get("Noto Sans", 28))
-		TextTooltipImView("select tooltip", self.text)
+		TextTooltipImView(self.id, self.text)
 	end
+	self.id = nil
 	self.text = nil
 end}
 
@@ -153,10 +154,12 @@ local ScoreList = ScoreListView:new({
 		TextCellImView(w, h, "right", i == 1 and "time rate" or "", Format.timeRate(item.timeRate))
 		if just.is_over(-w, h) then
 			Tooltip.text = ("%0.2fX"):format(item.timeRate)
+			Tooltip.id = self
 		end
 		TextCellImView(w * 2, h, "right", item.time ~= 0 and time_ago_in_words(item.time) or "never", Format.inputMode(item.inputMode))
 		if just.is_over(-w * 2, h) then
 			Tooltip.text = os.date("%c", item.time)
+			Tooltip.id = self
 		end
 		just.row(false)
 	end,
