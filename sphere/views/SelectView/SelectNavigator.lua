@@ -222,7 +222,7 @@ SelectNavigator.loadScore = function(self, itemIndex)
 end
 
 SelectNavigator.downloadBeatmapSet = function(self)
-	self.game.osudirectModel:downloadBeatmapSet()
+	self.game.osudirectModel:downloadBeatmapSet(self.game.osudirectModel.beatmap)
 end
 
 SelectNavigator.play = function(self)

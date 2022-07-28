@@ -48,6 +48,7 @@ MultiplayerController.findNotechart = remote.wrap(function(self)
 	self.game.noteChartSetLibraryModel:findNotechart(mpModel.notechart.hash or "", mpModel.notechart.index or 0)
 	local items = self.game.noteChartSetLibraryModel.items
 
+	mpModel.downloadingBeatmap = nil
 	local item = items[1]
 	if item then
 		mpModel.noteChartItem = {

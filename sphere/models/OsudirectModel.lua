@@ -124,8 +124,7 @@ end
 local download = aquathread.async(fsdownload)
 local extract = aquathread.async(fsextract)
 
-OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self)
-	local beatmap = self.beatmap
+OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self, beatmap, callback)
 	if not beatmap or beatmap == self.statusBeatmap then
 		return
 	end
@@ -177,6 +176,10 @@ OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self)
 			table.remove(self.processing, i)
 			break
 		end
+	end
+
+	if callback then
+		callback()
 	end
 end)
 

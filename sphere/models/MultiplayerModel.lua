@@ -1,5 +1,6 @@
 local Class = require("aqua.util.Class")
 local aquatimer = require("aqua.timer")
+local aquathread = require("aqua.thread")
 local enet = require("enet")
 local MessagePack = require("MessagePack")
 local remote = require("aqua.util.remote")
@@ -164,6 +165,8 @@ MultiplayerModel.pushModifiers = remote.wrap(function(self)
 	self.peer._setModifiers(self.game.modifierModel.config)
 end)
 
+local async_read = aquathread.async(function(...) return love.filesystem.read(...) end)
+
 MultiplayerModel.pushNotechart = remote.wrap(function(self)
 	if not self:isHost() then
 		return
@@ -172,6 +175,14 @@ MultiplayerModel.pushNotechart = remote.wrap(function(self)
 	if not nc then
 		return
 	end
+
+	local path = nc.path
+	local osuSetId
+	if path:find("%.osu$") then
+		local content = async_read(path)
+		osuSetId = tonumber(content:match("BeatmapSetID:%s*(%d+)"))
+	end
+
 	self.noteChartItem = {
 		setId = nc.setId,
 		noteChartId = nc.noteChartId,
@@ -194,6 +205,7 @@ MultiplayerModel.pushNotechart = remote.wrap(function(self)
 		bpm = nc.bpm,
 		difficulty = nc.difficulty,
 		longNoteRatio = nc.longNoteRatio,
+		osuSetId = osuSetId,
 	}
 	self.peer._setNotechart(self.notechart)
 end)
@@ -267,6 +279,21 @@ MultiplayerModel.update = function(self)
 	end
 
 	remote.update()
+end
+
+MultiplayerModel.downloadNoteChart = function(self)
+	if self.downloadingBeatmap then
+		return
+	end
+
+	self.downloadingBeatmap = {
+		setId = self.notechart.osuSetId,
+		status = "",
+	}
+	self.game.osudirectModel:downloadBeatmapSet(self.downloadingBeatmap, function()
+		self.downloadingBeatmap.status = "done"
+		self:pullNotechart()
+	end)
 end
 
 return MultiplayerModel

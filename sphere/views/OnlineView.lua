@@ -137,6 +137,16 @@ OnlineView.draw = function(self)
 						imgui.SameLine()
 						imgui.Text("(playing)")
 					end
+					if notechart.osuSetId and not multiplayerModel.noteChartItem and not multiplayerModel:isHost() then
+						local beatmap = multiplayerModel.downloadingBeatmap
+						if beatmap then
+							imgui.Text(beatmap.status)
+						else
+							if imgui.Button("Download") then
+								multiplayerModel:downloadNoteChart()
+							end
+						end
+					end
 					imgui.Text("Song: " .. song)
 					imgui.Text("Difficulty:")
 					imgui.SameLine()
