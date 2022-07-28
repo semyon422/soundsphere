@@ -296,6 +296,7 @@ SelectNavigator.openModifiers = function(self)
 	local isOpen = self.isModifiersOpen
 	isOpen[0] = not isOpen[0]
 	self.game.multiplayerModel:pushModifiers()
+	self.game.selectController:applyTimeRate()
 end
 
 SelectNavigator.setNoteSkin = function(self, itemIndex)
@@ -340,6 +341,5 @@ end
 SelectNavigator.setModifierValue = function(self, modifierConfig, value)
 	self.game.modifierModel:setModifierValue(modifierConfig, value)
 end
-
 
 return SelectNavigator

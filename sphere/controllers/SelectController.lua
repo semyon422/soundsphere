@@ -14,6 +14,10 @@ SelectController.load = function(self)
 	selectModel:load()
 	previewModel:load()
 
+	self:applyTimeRate()
+end
+
+SelectController.applyTimeRate = function(self)
 	local timeEngine = self.game.rhythmModel.timeEngine
 	timeEngine:resetTimeRateHandlers()
 	self.game.modifierModel:apply("TimeEngineModifier")
