@@ -164,7 +164,14 @@ OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self)
 	end
 	print(("Extracted to: %s"):format(extractPath))
 
-	beatmap.status = "Extracted"
+	beatmap.status = "Cacheing"
+
+	local c = coroutine.running()
+	self.game.cacheModel:startUpdate(extractPath, true, function()
+		coroutine.resume(c)
+	end)
+	coroutine.yield()
+
 	for i, v in ipairs(self.processing) do
 		if v == beatmap then
 			table.remove(self.processing, i)

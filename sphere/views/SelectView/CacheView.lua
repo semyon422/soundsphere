@@ -17,14 +17,14 @@ CacheView.draw = function(self)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-	local cacheUpdater = self.game.cacheModel.cacheUpdater
-	local state = cacheUpdater.state
+	local cacheModel = self.game.cacheModel
+	local state = cacheModel.state
 
 	local text = ""
 	if state == 1 then
-		text = ("searching for charts: %d"):format(cacheUpdater.noteChartCount)
+		text = ("searching for charts: %d"):format(cacheModel.noteChartCount)
 	elseif state == 2 then
-		text = ("creating cache: %0.2f%%"):format(cacheUpdater.cachePercent)
+		text = ("creating cache: %0.2f%%"):format(cacheModel.cachePercent)
 	elseif state == 3 then
 		text = "complete"
 	elseif state == 0 then

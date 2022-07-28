@@ -31,7 +31,13 @@ MountController.filedropped = function(self, file)
 
 	print(("Extracting to: %s"):format(extractPath))
 	local extracted = extract(path, extractPath, false)
-	print(extracted and "Extracted" or "Failed to extract")
+	if not extracted then
+		print("Failed to extract")
+		return
+	end
+	print("Extracted")
+
+	self.game.cacheModel:startUpdate(extractPath, true)
 end
 
 return MountController

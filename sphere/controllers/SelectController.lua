@@ -74,7 +74,7 @@ SelectController.updateCache = function(self, force)
 end
 
 SelectController.updateCacheCollection = function(self, path, force)
-	local state = self.game.cacheModel.cacheUpdater.state
+	local state = self.game.cacheModel.state
 	if state == 0 or state == 3 then
 		self.game.cacheModel:startUpdate(path, force)
 	else
