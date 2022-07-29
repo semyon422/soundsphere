@@ -303,7 +303,7 @@ ModifierModel.fixOldFormat = function(self, oldConfig, oldFlag)
 	for _, modifierConfig in ipairs(oldConfig) do
 		local modifier = self:getModifier(modifierConfig)
 		if modifier then
-			if not modifierConfig.value then
+			if modifierConfig.value == nil then
 				for k, v in pairs(modifierConfig) do
 					if k ~= "name" then
 						modifierConfig.value = v
