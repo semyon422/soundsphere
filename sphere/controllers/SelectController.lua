@@ -75,6 +75,16 @@ SelectController.openDirectory = function(self)
 	love.system.openURL(realPath)
 end
 
+SelectController.openWebNotechart = function(self)
+	local noteChartItem = self.game.selectModel.noteChartItem
+	if not noteChartItem then
+		return
+	end
+
+	local hash, index = noteChartItem.hash, noteChartItem.index
+	self.game.onlineModel.onlineNotechartManager:openWebNotechart(hash, index)
+end
+
 SelectController.updateCache = function(self, force)
 	local noteChartItem = self.game.selectModel.noteChartItem
 	if not noteChartItem then

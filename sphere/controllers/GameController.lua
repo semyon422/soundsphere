@@ -183,7 +183,6 @@ GameController.unload = function(self)
 	self.gameView:unload()
 	self.discordModel:unload()
 	self.mountModel:unload()
-	self.onlineModel:unload()
 	self.multiplayerController:unload()
 	self:writeConfigs()
 end

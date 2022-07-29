@@ -121,6 +121,10 @@ SelectNavigator.openDirectory = function(self)
 	self.game.selectController:openDirectory()
 end
 
+SelectNavigator.openWebNotechart = function(self)
+	self.game.selectController:openWebNotechart()
+end
+
 SelectNavigator.pullNoteChartSet = function(self)
 	self.game.selectModel:debouncePullNoteChartSet()
 end

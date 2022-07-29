@@ -782,10 +782,9 @@ local BottomRightOsudirectScreenMenu = {
 local NoteChartOptionsScreenMenu = {
 	subscreen = "notecharts",
 	draw = function(self)
-		getRect(self, Layout.column2row2row1)
-
 		love.graphics.setFont(spherefonts.get("Noto Sans", 20))
 
+		getRect(self, Layout.column2row2row1)
 		local tf = _transform(transform):translate(self.x, self.y)
 		love.graphics.replaceTransform(tf)
 
@@ -810,6 +809,15 @@ local NoteChartOptionsScreenMenu = {
 			self.navigator:call("play")
 		end
 		just.row(false)
+
+		getRect(self, Layout.column1row1row1)
+		local tf = _transform(transform):translate(self.x, self.y)
+		love.graphics.replaceTransform(tf)
+
+		just.indent(36)
+		if IconButtonImView("open notechart page", "info_outline", self.h, 0.5) then
+			self.navigator:openWebNotechart()
+		end
 	end,
 }
 
