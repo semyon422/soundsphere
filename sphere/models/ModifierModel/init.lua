@@ -176,6 +176,7 @@ ModifierModel.getMinimalModifierIndex = function(self, modifier)
 end
 
 ModifierModel.add = function(self, modifier)
+	modifier = modifier or self.modifiers[self.availableModifierItemIndex]
 	local modifierConfig = modifier:getDefaultConfig()
 	local config = self.config
 	local minimalModifierIndex = self:getMinimalModifierIndex(modifier)
@@ -192,6 +193,7 @@ ModifierModel.add = function(self, modifier)
 end
 
 ModifierModel.remove = function(self, modifierConfig)
+	modifierConfig = modifierConfig or self.config[self.modifierItemIndex]
 	for i, foundModifierConfig in ipairs(self.config) do
 		if foundModifierConfig == modifierConfig then
 			table.remove(self.config, i)
@@ -211,11 +213,13 @@ ModifierModel.remove = function(self, modifierConfig)
 end
 
 ModifierModel.setModifierValue = function(self, modifierConfig, value)
+	modifierConfig = modifierConfig or self.config[self.modifierItemIndex]
 	local modifier = self:getModifier(modifierConfig)
 	modifier:setValue(modifierConfig, value)
 end
 
 ModifierModel.increaseModifierValue = function(self, modifierConfig, delta)
+	modifierConfig = modifierConfig or self.config[self.modifierItemIndex]
 	local modifier = self:getModifier(modifierConfig)
 	if type(modifier.defaultValue) == "number" then
 		modifier:setValue(modifierConfig, modifierConfig.value + delta * modifier.step)

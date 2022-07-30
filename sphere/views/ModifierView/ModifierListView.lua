@@ -10,12 +10,8 @@ ModifierListView.getItemIndex = function(self)
 	return self.game.modifierModel.modifierItemIndex
 end
 
-ModifierListView.scrollUp = function(self)
-	self.navigator:scrollModifier("up")
-end
-
-ModifierListView.scrollDown = function(self)
-	self.navigator:scrollModifier("down")
+ModifierListView.scroll = function(self, count)
+	self.game.modifierModel:scrollModifier(count)
 end
 
 return ModifierListView

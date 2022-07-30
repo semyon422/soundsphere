@@ -11,12 +11,8 @@ ScoreListView.getItemIndex = function(self)
 	return self.game.selectModel.scoreItemIndex
 end
 
-ScoreListView.scrollUp = function(self)
-	self.navigator:scrollScore("up")
-end
-
-ScoreListView.scrollDown = function(self)
-	self.navigator:scrollScore("down")
+ScoreListView.scroll = function(self, delta)
+	self.game.selectModel:scrollScore(delta)
 end
 
 return ScoreListView

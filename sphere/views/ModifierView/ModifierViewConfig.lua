@@ -76,7 +76,8 @@ local AvailableModifierList = AvailableModifierListView:new({
 		local prevItem = self.items[i - 1]
 
 		if just.button(i, just.is_over(w, h)) then
-			self.navigator:addModifier(i)
+			local modifier = self.game.modifierModel.modifiers[i]
+			self.game.modifierModel:add(modifier)
 		end
 
 		love.graphics.setColor(1, 1, 1, 1)
@@ -117,7 +118,7 @@ local ModifierList = ModifierListView:new({
 		local w2 = w / 2
 
 		if just.button(tostring(item) .. "1", just.is_over(w2, h), 2) then
-			self.navigator:removeModifier(i)
+			self.game.modifierModel:remove(item)
 		end
 
 		just.row(true)
@@ -139,7 +140,7 @@ local ModifierList = ModifierListView:new({
 				value = delta == 1
 			end
 			if changed or delta then
-				self.navigator:setModifierValue(item, value)
+				self.game.modifierModel:setModifierValue(item, value)
 			end
 			SwitchView:draw(w2, h, value)
 		elseif modifier.interfaceType == "slider" then
@@ -154,9 +155,9 @@ local ModifierList = ModifierListView:new({
 			local delta = just.wheel_over(item, over)
 			local new_value, active, hovered = just.slider(item, over, pos, value)
 			if new_value then
-				self.navigator:setModifierValue(item, modifier:fromNormValue(new_value))
+				self.game.modifierModel:setModifierValue(item, modifier:fromNormValue(new_value))
 			elseif delta then
-				self.navigator:increaseModifierValue(i, delta)
+				self.game.modifierModel:increaseModifierValue(item, delta)
 			end
 			SliderView:draw(w2, h, value)
 		elseif modifier.interfaceType == "stepper" then
@@ -174,9 +175,9 @@ local ModifierList = ModifierListView:new({
 			local changedRight = just.button(id .. "R", overRight)
 
 			if changedLeft or delta == -1 then
-				self.navigator:increaseModifierValue(i, -1)
+				self.game.modifierModel:increaseModifierValue(item, -1)
 			elseif changedRight or delta == 1 then
-				self.navigator:increaseModifierValue(i, 1)
+				self.game.modifierModel:increaseModifierValue(item, 1)
 			end
 			StepperView:draw(w2, h, value, count)
 		end

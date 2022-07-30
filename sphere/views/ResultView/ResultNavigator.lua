@@ -7,45 +7,16 @@ ResultNavigator.receive = function(self, event)
 		return
 	end
 
-	local scancode = event[2]
-	if scancode == "up" then self:scrollScore("up")
-	elseif scancode == "down" then self:scrollScore("down")
-	elseif scancode == "escape" then self:back()
-	elseif scancode == "return" then self:loadScore()
-	elseif scancode == "f1" then self:switchSubscreen("debug")
-	elseif scancode == "f2" then self:switchSubscreen("scoreSystemDebug")
-	elseif scancode == "f3" then self:switchSubscreen("countersDebug")
-	elseif scancode == "f4" then self:switchSubscreen("scoreEntryDebug")
+	local s = event[2]
+	if s == "up" then self.game.selectModel:scrollScore(-1)
+	elseif s == "down" then self.game.selectModel:scrollScore(1)
+	elseif s == "escape" then self.screenView:changeScreen("selectView")
+	elseif s == "return" then self.screenView:loadScore()
+	elseif s == "f1" then self.screenView.subscreen = "debug"
+	elseif s == "f2" then self.screenView.subscreen = "scoreSystemDebug"
+	elseif s == "f3" then self.screenView.subscreen = "countersDebug"
+	elseif s == "f4" then self.screenView.subscreen = "scoreEntryDebug"
 	end
-end
-
-ResultNavigator.scrollScore = function(self, direction)
-	self.game.selectModel:scrollScore(direction == "down" and 1 or -1)
-end
-
-ResultNavigator.loadScore = function(self, itemIndex)
-	local scoreEntry = self.game.selectModel.scoreItem
-	if itemIndex then
-		scoreEntry = self.game.scoreLibraryModel.items[itemIndex]
-	end
-	self.game.resultController:replayNoteChart("result", scoreEntry)
-	self.view:reload()
-	if itemIndex then
-		self.game.selectModel:scrollScore(nil, itemIndex)
-	end
-end
-
-ResultNavigator.play = function(self, mode)
-	local scoreEntry = self.game.selectModel.scoreItem
-	local isResult = self.game.resultController:replayNoteChart(mode, scoreEntry)
-	if isResult then
-		return self.view:reload()
-	end
-	self:changeScreen("gameplayView")
-end
-
-ResultNavigator.back = function(self)
-	self:changeScreen("selectView")
 end
 
 return ResultNavigator

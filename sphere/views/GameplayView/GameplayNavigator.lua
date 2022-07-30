@@ -5,7 +5,6 @@ local GameplayNavigator = Navigator:new({construct = false})
 GameplayNavigator.state = "play"
 
 GameplayNavigator.load = function(self)
-	self.failed = false
 	Navigator.load(self)
 end
 
@@ -24,157 +23,60 @@ GameplayNavigator.receive = function(self, event)
 		not self.game.multiplayerModel.isPlaying and
 		self.game.rhythmModel.inputManager.mode ~= "internal"
 	then
-		self:forcePause()
+		self.game.gameplayController:pause()
 	end
-end
-
-GameplayNavigator.update = function(self)
-	local needRetry = self.game.rhythmModel.pauseManager.needRetry
-
-	if needRetry then
-		self:forceRetry()
-	end
-
-	local state = self.game.rhythmModel.pauseManager.state
-	if state == "play" then
-		self:removeSubscreen("pause")
-	elseif state == "pause" then
-		self:addSubscreen("pause")
-	end
-
-	local timeEngine = self.game.rhythmModel.timeEngine
-	if timeEngine.currentTime >= timeEngine.maxTime + 1 then
-		self:quit()
-	end
-
-	local pauseOnFail = self.game.configModel.configs.settings.gameplay.pauseOnFail
-	local failed = self.game.rhythmModel.scoreEngine.scoreSystem.hp.failed
-	if pauseOnFail and failed and not self.failed then
-		self:pause()
-		self.failed = true
-	end
-
-	local multiplayerModel = self.game.multiplayerModel
-	if multiplayerModel.room and not multiplayerModel.isPlaying then
-		self:quit()
-	end
-
-	Navigator.update(self)
 end
 
 GameplayNavigator.keypressed = function(self, event)
 	local state = self.game.rhythmModel.pauseManager.state
 
 	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
-	local scancode = event[2]
+	local s = event[2]
 
 	local input = self.game.configModel.configs.settings.input
+	local timeController = self.game.timeController
 
-	if scancode == input.skipIntro then self:skipIntro()
-	elseif scancode == input.offset.decrease then self:increaseLocalOffset(-0.001)
-	elseif scancode == input.offset.increase then self:increaseLocalOffset(0.001)
-	elseif scancode == input.timeRate.decrease then self:increaseTimeRate(-0.05)
-	elseif scancode == input.timeRate.increase then self:increaseTimeRate(0.05)
-	-- elseif scancode == input.timeRate.invert then self:invertTimeRate()
-	elseif scancode == input.playSpeed.decrease then self:increasePlaySpeed(-0.05)
-	elseif scancode == input.playSpeed.increase then self:increasePlaySpeed(0.05)
-	elseif scancode == input.playSpeed.invert then self:invertPlaySpeed()
+	if s == input.skipIntro then self.game.timeController:skipIntro()
+	elseif s == input.offset.decrease then timeController:increaseLocalOffset(-0.001)
+	elseif s == input.offset.increase then timeController:increaseLocalOffset(0.001)
+	elseif s == input.timeRate.decrease then timeController:increaseTimeRate(-0.05)
+	elseif s == input.timeRate.increase then timeController:increaseTimeRate(0.05)
+	-- elseif scancode == input.timeRate.invert then timeController:invertTimeRate()
+	elseif s == input.playSpeed.decrease then timeController:increasePlaySpeed(-0.05)
+	elseif s == input.playSpeed.increase then timeController:increasePlaySpeed(0.05)
+	elseif s == input.playSpeed.invert then timeController:invertPlaySpeed()
 	end
 
-	if scancode == "f1" then self:switchSubscreen("debug") end
+	local gameplayController = self.game.gameplayController
+
 	if state == "play" then
-		if scancode == input.pause and not shift then self:pause()
-		elseif scancode == input.pause and shift then self:quit()
-		elseif scancode == input.quickRestart then self:retry()
+		if s == input.pause and not shift then gameplayController:changePlayState("pause")
+		elseif s == input.pause and shift then self.screenView:quit()
+		elseif s == input.quickRestart then gameplayController:changePlayState("retry")
 		end
 	elseif state == "pause" then
-		if scancode == input.pause and not shift then self:play()
-		elseif scancode == input.pause and shift then self:quit()
-		elseif scancode == input.quickRestart then self:retry()
+		if s == input.pause and not shift then gameplayController:changePlayState("play")
+		elseif s == input.pause and shift then self.screenView:quit()
+		elseif s == input.quickRestart then gameplayController:changePlayState("retry")
 		end
-	elseif state == "pause-play" and scancode == input.pause then
-		self:pause()
+	elseif state == "pause-play" and s == input.pause then
+		self.game.gameplayController:changePlayState("pause")
 	end
 end
 
 GameplayNavigator.keyreleased = function(self, event)
 	local state = self.game.rhythmModel.pauseManager.state
 	local input = self.game.configModel.configs.settings.input
+	local gameplayController = self.game.gameplayController
 
-	local scancode = event[2]
-	if state == "play-pause" and scancode == input.pause then
-		self:play()
-	elseif state == "pause-retry" and scancode == input.quickRestart then
-		self:pause()
-	elseif state == "play-retry" and scancode == input.quickRestart then
-		self:play()
+	local s = event[2]
+	if state == "play-pause" and s == input.pause then
+		gameplayController:changePlayState("play")
+	elseif state == "pause-retry" and s == input.quickRestart then
+		gameplayController:changePlayState("pause")
+	elseif state == "play-retry" and s == input.quickRestart then
+		gameplayController:changePlayState("play")
 	end
-end
-
-GameplayNavigator.saveCamera = function(self, x, y, z, pitch, yaw)
-	self.game.gameplayController:saveCamera(x, y, z, pitch, yaw)
-end
-
-GameplayNavigator.skipIntro = function(self)
-	self.game.timeController:skipIntro()
-end
-
-GameplayNavigator.increaseLocalOffset = function(self, delta)
-	self.game.timeController:increaseLocalOffset(delta)
-end
-
-GameplayNavigator.increaseTimeRate = function(self, delta)
-	self.game.timeController:increaseTimeRate(delta)
-end
-
-GameplayNavigator.invertTimeRate = function(self)
-	self.game.timeController:invertTimeRate()
-end
-
-GameplayNavigator.increasePlaySpeed = function(self, delta)
-	self.game.timeController:increasePlaySpeed(delta)
-end
-
-GameplayNavigator.invertPlaySpeed = function(self)
-	self.game.timeController:invertPlaySpeed()
-end
-
-GameplayNavigator.play = function(self)
-	self.game.gameplayController:receive({
-		name = "playStateChange",
-		state = "play"
-	})
-end
-
-GameplayNavigator.pause = function(self)
-	self.game.gameplayController:receive({
-		name = "playStateChange",
-		state = "pause"
-	})
-end
-
-GameplayNavigator.retry = function(self)
-	self.game.gameplayController:receive({
-		name = "playStateChange",
-		state = "retry"
-	})
-end
-
-GameplayNavigator.forcePause = function(self)
-	self.game.gameplayController:pause()
-end
-
-GameplayNavigator.forceRetry = function(self)
-	self.failed = false
-	self.game.gameplayController:retry()
-end
-
-GameplayNavigator.quit = function(self)
-	local hasResult = self.game.gameplayController:hasResult()
-	if hasResult then
-		return self:changeScreen("resultView")
-	end
-	return self:changeScreen("selectView")
 end
 
 return GameplayNavigator

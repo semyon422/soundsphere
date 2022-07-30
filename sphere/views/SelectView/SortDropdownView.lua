@@ -7,7 +7,7 @@ SortDropdownView.getCount = function(self)
 end
 
 SortDropdownView.scroll = function(self, delta)
-	self.navigator:scrollSortFunction(delta)
+	self.game.selectModel:scrollSortFunction(delta)
 end
 
 SortDropdownView.getPreview = function(self)
@@ -15,7 +15,7 @@ SortDropdownView.getPreview = function(self)
 end
 
 SortDropdownView.select = function(self, i)
-	self.navigator:setSortFunction(self.game.sortModel:fromIndexValue(i))
+	self.game.selectModel:setSortFunction(self.game.sortModel:fromIndexValue(i))
 end
 
 SortDropdownView.getItemText = function(self, i)

@@ -34,7 +34,7 @@ CameraView.unload = function(self)
 	x = x / w
 	y = y / h
 	z = z / h
-	self.navigator:saveCamera(x, y, z, s3dc.angle.pitch, s3dc.angle.yaw)
+	self.game.gameplayController:saveCamera(x, y, z, s3dc.angle.pitch, s3dc.angle.yaw)
 end
 
 CameraView.receive = function(self, event)

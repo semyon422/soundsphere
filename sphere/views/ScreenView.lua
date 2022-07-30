@@ -15,13 +15,13 @@ ScreenView.load = function(self)
 	local navigator = self.navigator
 	local sequenceView = self.sequenceView
 
-	navigator.view = self
+	navigator.screenView = self
 	navigator.game = self.game
 	navigator.viewConfig = assert(self.viewConfig)
 	navigator.sequenceView = sequenceView
 
 	sequenceView.game = self.game
-	sequenceView.navigator = navigator
+	sequenceView.screenView = self
 	sequenceView:setSequenceConfig(self.viewConfig)
 	sequenceView:load()
 

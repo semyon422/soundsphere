@@ -40,7 +40,10 @@ CacheView.draw = function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	if changed then
-		self.navigator:updateCacheCollection()
+		self.game.selectController:updateCacheCollection(
+			self.game.selectModel.collectionItem.path,
+			love.keyboard.isDown("lshift")
+		)
 	end
 
 	baseline_print(text, 44, 45, math.huge, 1, "left")

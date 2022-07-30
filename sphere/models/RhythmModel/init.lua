@@ -134,7 +134,6 @@ RhythmModel.receive = function(self, event)
 
 	self.game.modifierModel:receive(event)
 	self.inputManager:receive(event)
-	self.pauseManager:receive(event)
 end
 
 RhythmModel.update = function(self, dt)

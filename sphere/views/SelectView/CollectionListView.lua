@@ -18,12 +18,8 @@ CollectionListView.getItemIndex = function(self)
 	return self.game.selectModel.collectionItemIndex
 end
 
-CollectionListView.scrollUp = function(self)
-	self.navigator:scrollCollection("up")
-end
-
-CollectionListView.scrollDown = function(self)
-	self.navigator:scrollCollection("down")
+CollectionListView.scroll = function(self, count)
+	self.game.selectModel:scrollCollection(count)
 end
 
 return CollectionListView

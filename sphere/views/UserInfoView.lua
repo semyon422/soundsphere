@@ -24,8 +24,10 @@ UserInfoView.draw = function(self)
 	local over = 0 <= x and x <= self.h and 0 <= y and y <= self.h
 
 	local changed, active, hovered = just.button(self, over)
-	if changed then
-		self.navigator:call(self.action)
+
+	local onlineView = self.screenView.onlineView
+	if changed and onlineView then
+		onlineView:toggle()
 	end
 
 	love.graphics.setFont(spherefonts.get(unpack(self.text.font)))

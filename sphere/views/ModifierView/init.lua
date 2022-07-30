@@ -8,10 +8,24 @@ local ModifierView = Class:new()
 ModifierView.construct = function(self)
 	self.sequenceView = SequenceView:new()
 	self.viewConfig = ModifierViewConfig
+
+	self.isOpen = false
+end
+
+ModifierView.toggle = function(self, state)
+	if state == nil then
+		self.isOpen = not self.isOpen
+	else
+		self.isOpen = state
+	end
+	if self.isOpen then
+		self.game.multiplayerModel:pushModifiers()
+		self.game.selectController:applyTimeRate()
+	end
 end
 
 ModifierView.draw = function(self)
-	if not self.isOpen[0] then
+	if not self.isOpen then
 		return
 	end
 
@@ -22,7 +36,7 @@ ModifierView.load = function(self)
 	local sequenceView = self.sequenceView
 
 	sequenceView.game = self.game
-	sequenceView.navigator = self.navigator
+	sequenceView.screenView = self.screenView
 	sequenceView:setSequenceConfig(self.viewConfig)
 	sequenceView:load()
 end

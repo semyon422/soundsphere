@@ -51,21 +51,19 @@ PauseManager.updateState = function(self)
 	end
 end
 
-PauseManager.receive = function(self, event)
+PauseManager.changePlayState = function(self, newState)
 	local state = self.state
 	local progressTime = self.progressTime
-	if event.name == "playStateChange" then
-		local progressState = state .. "-" .. event.state
-		local time
-		if not progressTime[state] and progressTime[progressState] then
-			state = progressState
-			time = progressTime[progressState]
-		elseif progressTime[state] and state:sub(1, #event.state) == event.state then
-			state = event.state
-		end
-		self.state = state
-		self:startProgress(time)
+	local progressState = state .. "-" .. newState
+	local time
+	if not progressTime[state] and progressTime[progressState] then
+		state = progressState
+		time = progressTime[progressState]
+	elseif progressTime[state] and state:sub(1, #newState) == newState then
+		state = newState
 	end
+	self.state = state
+	self:startProgress(time)
 end
 
 PauseManager.startProgress = function(self, time)

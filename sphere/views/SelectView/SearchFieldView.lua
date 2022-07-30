@@ -18,12 +18,16 @@ SearchFieldView.receive = function(self, event)
 	if not (event.name == "textinput" or event.name == "keypressed" and event[1] == "backspace") then
 		return
 	end
-	if self.navigator.searchMode ~= self.searchMode then
+	if self.screenView.searchMode ~= self.searchMode then
 		return
 	end
 
 	self.textInput:receive(event)
-	self.navigator:setSearchString(self.textInput.text)
+	if self.screenView.subscreen == "notecharts" then
+		self.game.searchModel:setSearchString(self.searchMode, self.textInput.text)
+	elseif self.screenView.subscreen == "osudirect" then
+		self.game.osudirectModel:setSearchString(self.textInput.text)
+	end
 end
 
 SearchFieldView.update = function(self)
@@ -36,7 +40,7 @@ SearchFieldView.draw = function(self)
 
 	local changed, active, hovered = just.button(self, just.is_over(self.w, self.h))
 	if changed then
-		self.navigator:setSearchMode(self.searchMode)
+		self.screenView:setSearchMode(self.searchMode)
 	end
 
 	local padding = self.frame.padding
@@ -75,7 +79,7 @@ SearchFieldView.draw = function(self)
 		self.text.align
 	)
 
-	if self.navigator.searchMode ~= self.searchMode then
+	if self.screenView.searchMode ~= self.searchMode then
 		return
 	end
 

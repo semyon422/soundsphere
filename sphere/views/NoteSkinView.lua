@@ -5,6 +5,13 @@ local align = require("aqua.imgui.config").align
 
 local NoteSkinView = ImguiView:new()
 
+NoteSkinView.toggle = function(self, state)
+	ImguiView.toggle(self, state)
+	if self.isOpen[0] then
+		self.game.selectController:resetModifiedNoteChart()
+	end
+end
+
 NoteSkinView.draw = function(self)
 	local noteChart = self.game.noteChartModel.noteChart
 	if not noteChart then
@@ -36,7 +43,7 @@ NoteSkinView.draw = function(self)
 				local noteSkin = items[i]
 				local isSelected = selectedNoteSkin == noteSkin
 				if imgui.Selectable_Bool(noteSkin.name, isSelected) then
-					self.navigator:setNoteSkin(i)
+					self.game.noteSkinModel:setDefaultNoteSkin(items[i])
 				end
 
 				if isSelected then

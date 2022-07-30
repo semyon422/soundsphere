@@ -16,10 +16,14 @@ end
 
 SequenceView.setSequenceConfig = function(self, config)
 	self.views = getViews(config)
+	self.viewById = {}
 	for _, view in ipairs(self.views) do
 		view.sequenceView = self
 		view.game = self.game
-		view.navigator = self.navigator
+		view.screenView = self.screenView
+		if view.id then
+			self.viewById[view.id] = view
+		end
 	end
 end
 
@@ -47,7 +51,7 @@ SequenceView.callMethod = function(self, method, ...)
 	end
 	self.iterating = true
 	for _, view in ipairs(self.views) do
-		if not view.hidden and view[method] then
+		if view[method] and not view.hidden and (not view.subscreen or self.screenView.subscreen == view.subscreen) then
 			view[method](view, ...)
 		end
 		if self.abortIterating then break end

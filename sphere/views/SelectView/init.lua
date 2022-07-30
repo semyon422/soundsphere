@@ -11,6 +11,9 @@ local ModifierView = require("sphere.views.ModifierView")
 
 local SelectView = ScreenView:new({construct = false})
 
+SelectView.subscreen = "notecharts"
+SelectView.searchMode = "filter"
+
 SelectView.construct = function(self)
 	ScreenView.construct(self)
 	self.viewConfig = SelectViewConfig
@@ -29,29 +32,13 @@ SelectView.load = function(self)
 	ScreenView.load(self)
 
 	self.noteSkinView.game = self.game
-	self.noteSkinView.navigator = self.navigator
-	self.noteSkinView.isOpen = self.navigator.isNoteSkinsOpen
-
 	self.inputView.game = self.game
-	self.inputView.navigator = self.navigator
-	self.inputView.isOpen = self.navigator.isInputOpen
-
 	self.settingsView.game = self.game
-	self.settingsView.navigator = self.navigator
-	self.settingsView.isOpen = self.navigator.isSettingsOpen
-
 	self.onlineView.game = self.game
-	self.onlineView.navigator = self.navigator
-	self.onlineView.isOpen = self.navigator.isOnlineOpen
-
 	self.mountsView.game = self.game
-	self.mountsView.navigator = self.navigator
-	self.mountsView.isOpen = self.navigator.isMountsOpen
-
 	self.modifierView.game = self.game
-	self.modifierView.navigator = self.navigator
+	self.modifierView.screenView = self
 	self.modifierView:load()
-	self.modifierView.isOpen = self.navigator.isModifiersOpen
 end
 
 SelectView.draw = function(self)
@@ -73,7 +60,53 @@ end
 SelectView.update = function(self, dt)
 	self.game.selectController:update(dt)
 	self.modifierView:update(dt)
+
+	local multiplayerModel = self.game.multiplayerModel
+	if multiplayerModel.room and multiplayerModel.isPlaying then
+		self:play()
+	end
+
 	ScreenView.update(self, dt)
+end
+
+SelectNavigator.play = function(self)
+	if self.game.selectModel:notechartExists() then
+		self:changeScreen("gameplayView")
+	end
+end
+
+SelectNavigator.result = function(self)
+	if self.game.selectModel:isPlayed() then
+		self:changeScreen("resultView")
+	end
+end
+
+SelectView.switchToNoteCharts = function(self)
+	self.subscreen = "notecharts"
+	self.searchMode = "filter"
+	self.game.selectModel:noDebouncePullNoteChartSet()
+end
+
+SelectView.switchToCollections = function(self)
+	self.subscreen = "collections"
+end
+
+SelectView.switchToOsudirect = function(self)
+	self.searchMode = "osudirect"
+	self.subscreen = "osudirect"
+	self.game.osudirectModel:searchNoDebounce()
+end
+
+SelectView.setSearchMode = function(self, searchMode)
+	self.searchMode = searchMode
+end
+
+SelectView.changeSearchMode = function(self)
+	if self.searchMode == "filter" then
+		self:setSearchMode("lamp")
+	else
+		self:setSearchMode("filter")
+	end
 end
 
 return SelectView

@@ -1,7 +1,12 @@
-local ScreenMenuView = require("sphere.views.ScreenMenuView")
 local BackgroundView = require("sphere.views.BackgroundView")
 local ValueView = require("sphere.views.ValueView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
+
+local _transform = require("aqua.graphics.transform")
+local just = require("just")
+local spherefonts		= require("sphere.assets.fonts")
+
+local TextButtonImView = require("sphere.views.TextButtonImView")
 
 local ProgressView	= require("sphere.views.GameplayView.ProgressView")
 
@@ -27,42 +32,30 @@ local Background = BackgroundView:new({
 	dim = {key = "game.configModel.configs.settings.graphics.dim.gameplay"},
 })
 
-local BottomScreenMenu = ScreenMenuView:new({
+local BottomScreenMenu = {
 	subscreen = "pause",
-	transform = transform,
-	x = 279,
-	y = 991,
-	w = 227 * 6,
-	h = 89,
-	rows = 1,
-	columns = 6,
-	text = {
-		x = 0,
-		baseline = 54,
-		limit = 227,
-		align = "center",
-		font = {"Noto Sans", 24},
-	},
-	items = {
-		{
-			{
-				method = "play",
-				displayName = "continue"
-			},
-			{},
-			{},
-			{},
-			{
-				method = "retry",
-				displayName = "retry"
-			},
-			{
-				method = "quit",
-				displayName = "quit"
-			},
-		}
-	}
-})
+	draw = function(self)
+		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
+
+		local tf = _transform(transform):translate(279, 991)
+		love.graphics.replaceTransform(tf)
+
+		local w, h = 227, 89
+
+		just.row(true)
+		if TextButtonImView("continue", "continue", w, h) then
+			self.screenView:play()
+		end
+		just.indent(w * 3)
+		if TextButtonImView("retry", "retry", w, h) then
+			self.screenView:retry()
+		end
+		if TextButtonImView("quit", "quit", w, h) then
+			self.screenView:quit()
+		end
+		just.row(false)
+	end,
+}
 
 local PauseProgressBar = ProgressView:new({
 	current = {

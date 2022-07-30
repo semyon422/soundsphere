@@ -70,6 +70,7 @@ local Cache = CacheView:new({
 })
 
 local OsudirectList = OsudirectListView:new({
+	id = "OsudirectListView",
 	subscreen = "osudirect",
 	transform = transform,
 	draw = function(self)
@@ -340,7 +341,7 @@ local NoteChartList = NoteChartListView:new({
 })
 
 local Cells = {draw = function(self)
-	if not self.navigator:getSubscreen("notecharts") then
+	if self.screenView.subscreen ~= "notecharts" then
 		return
 	end
 
@@ -612,7 +613,7 @@ local GroupCheckbox = {
 
 		local collapse = self.game.noteChartSetLibraryModel.collapse
 		if CheckboxImView(self, collapse, self.h, 0.4) then
-			self.navigator:changeCollapse()
+			self.game.selectModel:changeCollapse()
 		end
 		just.sameline()
 
@@ -696,19 +697,19 @@ local BottomNotechartsScreenMenu = {
 
 		just.row(true)
 		if IconButtonImView("settings", "settings", self.h, 0.5) then
-			self.navigator:call("openSettings")
+			self.screenView.settingsView:toggle()
 		end
 		if IconButtonImView("mounts", "folder_open", self.h, 0.5) then
-			self.navigator:call("openMounts")
+			self.screenView.mountsView:toggle()
 		end
 		if TextButtonImView("modifiers", "modifiers", w, self.h) then
-			self.navigator:call("openModifiers")
+			self.screenView.modifierView:toggle()
 		end
 		if TextButtonImView("noteskins", "noteskins", w, self.h) then
-			self.navigator:call("openNoteSkins")
+			self.screenView.noteSkinView:toggle()
 		end
 		if TextButtonImView("input", "input", w, self.h) then
-			self.navigator:call("openInput")
+			self.screenView.inputView:toggle()
 		end
 		just.row(false)
 
@@ -717,10 +718,10 @@ local BottomNotechartsScreenMenu = {
 
 		just.row(true)
 		if TextButtonImView("collections", "collections", Layout.column3.w / 2, Layout.footer.h) then
-			self.navigator:call("switchToCollections")
+			self.screenView:switchToCollections()
 		end
 		if TextButtonImView("direct", "direct", Layout.column3.w / 2, Layout.footer.h) then
-			self.navigator:call("switchToOsudirect")
+			self.screenView:switchToOsudirect()
 		end
 		just.row(false)
 	end,
@@ -735,7 +736,7 @@ local BottomCollectionsScreenMenu = {
 		love.graphics.replaceTransform(tf)
 
 		if TextButtonImView("calc top scores", "calc top scores", Layout.column1.w / 2, Layout.footer.h) then
-			self.navigator:call("calculateTopScores")
+			self.game.scoreModel:asyncCalculateTopScores()
 		end
 
 		local tf = _transform(transform):translate(Layout.column3.x, Layout.footer.y)
@@ -743,10 +744,10 @@ local BottomCollectionsScreenMenu = {
 
 		just.row(true)
 		if TextButtonImView("notecharts", "notecharts", Layout.column3.w / 2, Layout.footer.h) then
-			self.navigator:call("switchToNoteCharts")
+			self.screenView:switchToNoteCharts()
 		end
 		if TextButtonImView("direct", "direct", Layout.column3.w / 2, Layout.footer.h) then
-			self.navigator:call("switchToOsudirect")
+			self.screenView:switchToOsudirect()
 		end
 		just.row(false)
 	end,
@@ -762,10 +763,10 @@ local BottomRightOsudirectScreenMenu = {
 
 		just.row(true)
 		if TextButtonImView("notecharts", "notecharts", Layout.column3.w / 2, Layout.footer.h) then
-			self.navigator:call("switchToNoteCharts")
+			self.screenView:switchToNoteCharts()
 		end
 		if TextButtonImView("collections", "collections", Layout.column3.w / 2, Layout.footer.h) then
-			self.navigator:call("switchToCollections")
+			self.screenView:switchToCollections()
 		end
 		just.row(false)
 
@@ -774,7 +775,7 @@ local BottomRightOsudirectScreenMenu = {
 
 		just.indent(36)
 		if TextButtonImView("download", "download", Layout.column2.w - 72, Layout.column2row2row1.h) then
-			self.navigator:call("downloadBeatmapSet")
+			self.game.osudirectModel:downloadBeatmapSet(self.game.osudirectModel.beatmap)
 		end
 	end,
 }
@@ -791,10 +792,10 @@ local NoteChartOptionsScreenMenu = {
 		just.row(true)
 		just.indent(36)
 		if IconButtonImView("open directory", "folder_open", self.h, 0.5) then
-			self.navigator:call("openDirectory")
+			self.game.selectController:openDirectory()
 		end
 		if IconButtonImView("update cache", "refresh", self.h, 0.5) then
-			self.navigator:call("updateCache", true)
+			self.game.selectController:updateCache(true)
 		end
 
 		just.row(false)
@@ -803,10 +804,14 @@ local NoteChartOptionsScreenMenu = {
 
 		just.row(true)
 		if IconButtonImView("result", "info_outline", self.h, 0.5) then
-			self.navigator:call("result")
+			if self.game.selectModel:isPlayed() then
+				self.screenView:changeScreen("resultView")
+			end
 		end
 		if IconButtonImView("play", "keyboard_arrow_right", self.h, 0.5) then
-			self.navigator:call("play")
+			if self.game.selectModel:notechartExists() then
+				self.screenView:changeScreen("gameplayView")
+			end
 		end
 		just.row(false)
 
@@ -816,7 +821,7 @@ local NoteChartOptionsScreenMenu = {
 
 		just.indent(36)
 		if IconButtonImView("open notechart page", "info_outline", self.h, 0.5) then
-			self.navigator:openWebNotechart()
+			self.game.selectController:openWebNotechart()
 		end
 	end,
 }

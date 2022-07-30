@@ -15,6 +15,7 @@ ResultView.load = function(self)
 	if self.prevView == self.game.selectView then
 		self.game.resultController:load()
 	end
+	self.subscreen = ""
 	ScreenView.load(self)
 end
 
@@ -26,6 +27,27 @@ ResultView.reload = function(self)
 	ScreenView.unload(self)
 	ScreenView.load(self)
 	self.sequenceView.abortIterating = false
+end
+
+ResultView.loadScore = function(self, itemIndex)
+	local scoreEntry = self.game.selectModel.scoreItem
+	if itemIndex then
+		scoreEntry = self.game.scoreLibraryModel.items[itemIndex]
+	end
+	self.game.resultController:replayNoteChart("result", scoreEntry)
+	self:reload()
+	if itemIndex then
+		self.game.selectModel:scrollScore(nil, itemIndex)
+	end
+end
+
+ResultView.play = function(self, mode)
+	local scoreEntry = self.game.selectModel.scoreItem
+	local isResult = self.game.resultController:replayNoteChart(mode, scoreEntry)
+	if isResult then
+		return self.view:reload()
+	end
+	self:changeScreen("gameplayView")
 end
 
 return ResultView

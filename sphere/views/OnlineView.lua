@@ -44,10 +44,10 @@ OnlineView.draw = function(self)
 				imgui.InputText("Email", emailPtr, ffi.sizeof(emailPtr))
 				imgui.InputText("Password", passwordPtr, ffi.sizeof(passwordPtr), imgui.love.InputTextFlags("Password"))
 				if imgui.Button("Login") then
-					self.navigator:login(ffi.string(emailPtr), ffi.string(passwordPtr))
+					self.game.onlineModel.authManager:login(ffi.string(emailPtr), ffi.string(passwordPtr))
 				end
 				if imgui.Button("Quick login using browser") then
-					self.navigator:quickLogin()
+					self.game.onlineModel.authManager:quickLogin()
 				end
 				imgui.EndTabItem()
 			end

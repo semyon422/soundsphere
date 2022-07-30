@@ -22,6 +22,9 @@ GameplayView.load = function(self)
 			self.viewConfig[i] = noteSkin.playField
 		end
 	end
+
+	self.subscreen = ""
+	self.failed = false
 	ScreenView.load(self)
 end
 
@@ -34,12 +37,50 @@ end
 
 GameplayView.update = function(self, dt)
 	self.game.gameplayController:update(dt)
+
+	local state = self.game.rhythmModel.pauseManager.state
+	if state == "play" then
+		self.subscreen = ""
+	elseif state == "pause" then
+		self.subscreen = "pause"
+	end
+
+	if self.game.rhythmModel.pauseManager.needRetry then
+		self.failed = false
+		self.game.gameplayController:retry()
+	end
+
+	local timeEngine = self.game.rhythmModel.timeEngine
+	if timeEngine.currentTime >= timeEngine.maxTime + 1 then
+		self:quit()
+	end
+
+	local pauseOnFail = self.game.configModel.configs.settings.gameplay.pauseOnFail
+	local failed = self.game.rhythmModel.scoreEngine.scoreSystem.hp.failed
+	if pauseOnFail and failed and not self.failed then
+		self.game.gameplayController:playStateChange("pause")
+		self.failed = true
+	end
+
+	local multiplayerModel = self.game.multiplayerModel
+	if multiplayerModel.room and not multiplayerModel.isPlaying then
+		self:quit()
+	end
+
 	ScreenView.update(self, dt)
 end
 
 GameplayView.receive = function(self, event)
 	self.game.gameplayController:receive(event)
 	ScreenView.receive(self, event)
+end
+
+GameplayView.quit = function(self)
+	local hasResult = self.game.gameplayController:hasResult()
+	if hasResult then
+		return self:changeScreen("resultView")
+	end
+	return self:changeScreen("selectView")
 end
 
 return GameplayView

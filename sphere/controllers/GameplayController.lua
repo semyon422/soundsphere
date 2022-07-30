@@ -139,21 +139,22 @@ GameplayController.discordPause = function(self)
 	})
 end
 
-GameplayController.receive = function(self, event)
-	if event.name == "playStateChange" and self.game.multiplayerModel.isPlaying then
+GameplayController.changePlayState = function(self, state)
+	if self.game.multiplayerModel.isPlaying then
 		return
 	end
 
-	local rhythmModel = self.game.rhythmModel
-	rhythmModel:receive(event)
-
-	if event.name == "playStateChange" then
-		if event.state == "play" then
-			self:discordPlay()
-		elseif event.state == "pause" then
-			self:discordPause()
-		end
+	if state == "play" then
+		self:discordPlay()
+	elseif state == "pause" then
+		self:discordPause()
 	end
+
+	self.game.rhythmModel.pauseManager:changePlayState(state)
+end
+
+GameplayController.receive = function(self, event)
+	self.game.rhythmModel:receive(event)
 end
 
 GameplayController.retry = function(self)

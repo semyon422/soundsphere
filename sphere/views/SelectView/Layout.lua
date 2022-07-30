@@ -141,13 +141,11 @@ return {
 		love.graphics.rectangle("fill", _x, _y, _w, h0[1])
 		love.graphics.rectangle("fill", _x, _yh - h0[5], _w, h0[1])
 
-		if self.navigator:getSubscreen("notecharts") then
+		if self.screenView.subscreen == "notecharts" then
 			return self:drawNotecharts()
-		end
-		if self.navigator:getSubscreen("collections") then
+		elseif self.screenView.subscreen == "collections" then
 			return self:drawCollections()
-		end
-		if self.navigator:getSubscreen("osudirect") then
+		elseif self.screenView.subscreen == "osudirect" then
 			return self:drawOsudirect()
 		end
 	end,

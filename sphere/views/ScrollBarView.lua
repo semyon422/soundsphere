@@ -26,7 +26,7 @@ ScrollBarView.draw = function(self)
 	love.graphics.rectangle(
 		"fill",
 		0,
-		(self.h - h) * (self.list.selectedVisualItem - 1) / (itemCount - 1),
+		(self.h - h) * (self.list.visualItemIndex - 1) / (itemCount - 1),
 		self.w,
 		h,
 		self.w / 2,

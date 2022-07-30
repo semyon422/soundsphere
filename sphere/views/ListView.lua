@@ -6,6 +6,10 @@ local ListItemView = require("sphere.views.ListItemView")
 
 local ListView = Class:new()
 
+ListView.targetItemIndex = 1
+ListView.itemIndex = 1
+ListView.visualItemIndex = 1
+
 ListView.construct = function(self)
 	self.itemView = ListItemView:new()
 	self.itemView.listView = self
@@ -21,8 +25,8 @@ end
 
 ListView.forceScroll = function(self)
 	local itemIndex = assert(self:getItemIndex())
-	self.selectedItem = itemIndex
-	self.selectedVisualItem = itemIndex
+	self.itemIndex = itemIndex
+	self.visualItemIndex = itemIndex
 end
 
 ListView.reloadItems = function(self)
@@ -31,21 +35,23 @@ ListView.reloadItems = function(self)
 end
 
 ListView.receive = function(self, event) end
-ListView.scrollUp = function(self) end
-ListView.scrollDown = function(self) end
+
+ListView.scroll = function(self, delta)
+	self.targetItemIndex = math.min(math.max(self.targetItemIndex + delta, 1), #self.items)
+end
 
 ListView.update = function(self, dt)
 	local itemIndex = assert(self:getItemIndex())
-	if self.selectedItem ~= itemIndex then
+	if self.itemIndex ~= itemIndex then
 		self.scrollTween = tween.new(
 			0.1,
 			self,
-			{selectedVisualItem = itemIndex},
+			{visualItemIndex = itemIndex},
 			"linear"
 		)
-		self.selectedItem = itemIndex
+		self.itemIndex = itemIndex
 	end
-	if self.selectedVisualItem == self.selectedItem then
+	if self.visualItemIndex == self.itemIndex then
 		self.scrollTween = nil
 	end
 	if self.scrollTween then
@@ -54,7 +60,7 @@ ListView.update = function(self, dt)
 end
 
 ListView.getItemIndex = function(self)
-	return 1
+	return self.targetItemIndex
 end
 
 ListView.getItemView = function(self, item)
@@ -90,10 +96,8 @@ ListView.draw = function(self)
 	local over = 0 <= mx and mx <= self.w and 0 <= my and my <= self.h
 
 	local delta = just.wheel_over(self, over)
-	if delta == 1 then
-		self:scrollUp()
-	elseif delta == -1 then
-		self:scrollDown()
+	if delta then
+		self:scroll(-delta)
 	end
 
 	love.graphics.stencil(
@@ -104,9 +108,9 @@ ListView.draw = function(self)
 	)
 	love.graphics.setStencilTest("greater", 0)
 
-	local deltaItemIndex = self.selectedItem - self.selectedVisualItem
+	local deltaItemIndex = self.itemIndex - self.visualItemIndex
 	for i = 0 - math.floor(deltaItemIndex), self.rows - math.floor(deltaItemIndex) do
-		local itemIndex = i + self.selectedItem - math.ceil(self.rows / 2)
+		local itemIndex = i + self.itemIndex - math.ceil(self.rows / 2)
 		local visualIndex = i + deltaItemIndex
 		local item = self.items[itemIndex]
 		if item then
@@ -135,7 +139,7 @@ ListView.drawItem = function(self, itemIndex, w, h)
 end
 
 ListView.getItemPosition = function(self, itemIndex)
-	local visualIndex = math.ceil(self.rows / 2) + itemIndex - self.selectedVisualItem
+	local visualIndex = math.ceil(self.rows / 2) + itemIndex - self.visualItemIndex
 	local h = self.h / self.rows
 
 	return 0, (visualIndex - 1) * h, self.w, h

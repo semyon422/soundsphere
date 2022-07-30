@@ -6,7 +6,6 @@ local _transform = require("aqua.graphics.transform")
 
 local ScrollBarView = require("sphere.views.ScrollBarView")
 local RectangleView = require("sphere.views.RectangleView")
-local ScreenMenuView = require("sphere.views.ScreenMenuView")
 local BackgroundView = require("sphere.views.BackgroundView")
 local ValueView = require("sphere.views.ValueView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
@@ -215,7 +214,7 @@ local ScoreList = ScoreListView:new({
 		local loaded = scoreEntry and scoreEntry.replayHash == item.replayHash
 
 		if just.button(item, just.is_over(w, h)) then
-			self.navigator:loadScore(i)
+			self.screenView:loadScore(i)
 		end
 
 		if item.isTop then
@@ -624,7 +623,7 @@ local BottomScreenMenu = {draw = function(self)
 
 	love.graphics.translate(0, 72 / 2)
 	if IconButtonImView("back", "clear", 72, 0.618) then
-		self.navigator:back()
+		self.screenView:changeScreen("selectView")
 	end
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
@@ -634,10 +633,10 @@ local BottomScreenMenu = {draw = function(self)
 	love.graphics.replaceTransform(tf)
 	just.row(true)
 	if TextButtonImView("retry", "retry", 72 * 2, self.h) then
-		self.navigator:play("retry")
+		self.screenView:play("retry")
 	end
 	if TextButtonImView("replay", "watch replay", 72 * 3, self.h) then
-		self.navigator:play("replay")
+		self.screenView:play("replay")
 	end
 	just.row(false)
 end}

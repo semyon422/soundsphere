@@ -10,6 +10,13 @@ local InputView = ImguiView:new()
 local keyPtr = ffi.new("const char*[1]")
 local devicePtr = ffi.new("const char*[1]")
 
+InputView.toggle = function(self, state)
+	ImguiView.toggle(self, state)
+	if self.isOpen[0] then
+		self.game.selectController:resetModifiedNoteChart()
+	end
+end
+
 InputView.draw = function(self)
 	local noteChart = self.game.noteChartModel.noteChart
 	if not noteChart then
@@ -40,7 +47,7 @@ InputView.draw = function(self)
 			if ImguiHotkey(virtualKey, keyPtr, devicePtr) then
 				key = ffi.string(keyPtr[0])
 				device = ffi.string(devicePtr[0])
-				self.navigator:setInputBinding(inputModeString, virtualKey, key, device)
+				self.game.inputModel:setKey(inputModeString, virtualKey, key, device)
 			end
 		end
 		imgui.CaptureKeyboardFromApp(true)
