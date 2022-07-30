@@ -4,7 +4,7 @@ local inspect = require("inspect")
 
 local AuthManager = Class:new()
 
-AuthManager.checkSession = thread.coro(function(self)
+AuthManager.checkSessionAsync = function(self)
 	local webApi = self.webApi
 	local api = webApi.api
 	local config = self.config
@@ -30,9 +30,10 @@ AuthManager.checkSession = thread.coro(function(self)
 	print("GET " .. api.users[config.session.user_id])
 	local user = api.users[config.session.user_id]:get()
 	config.user = user or {}
-end)
+end
+AuthManager.checkSession = thread.coro(AuthManager.checkSessionAsync)
 
-AuthManager.updateSession = thread.coro(function(self)
+AuthManager.updateSessionAsync = function(self)
 	local webApi = self.webApi
 	local api = webApi.api
 	local config = self.config
@@ -49,9 +50,10 @@ AuthManager.updateSession = thread.coro(function(self)
 	print(inspect(response))
 	config.session = response.session or {}
 	config.token = response.token or ""
-end)
+end
+AuthManager.updateSession = thread.coro(AuthManager.updateSessionAsync)
 
-AuthManager.quickGetKey = thread.coro(function(self)
+AuthManager.quickGetKeyAsync = function(self)
 	local api = self.webApi.api
 	local config = self.config
 	config.quick_login_key = ""
@@ -68,9 +70,10 @@ AuthManager.quickGetKey = thread.coro(function(self)
 	local url = api.html.auth.quick .. "?method=POST&key=" .. response.key
 	print(url)
 	love.system.openURL(url)
-end)
+end
+AuthManager.quickGetKey = thread.coro(AuthManager.quickGetKeyAsync)
 
-AuthManager.quickGetToken = thread.coro(function(self)
+AuthManager.quickGetTokenAsync = function(self)
 	local api = self.webApi.api
 	local config = self.config
 	local key = config.quick_login_key
@@ -88,17 +91,18 @@ AuthManager.quickGetToken = thread.coro(function(self)
 	if code ~= 200 then
 		print(response.message)
 		if code >= 400 and code < 500 then
-			self:quickGetKey()
+			self:quickGetKeyAsync()
 		end
 		return
 	end
 
 	config.quick_login_key = ""
 	config.token = response.token
-	self:checkSession()
-end)
+	self:checkSessionAsync()
+end
+AuthManager.quickGetToken = thread.coro(AuthManager.quickGetTokenAsync)
 
-AuthManager.quickLogin = thread.coro(function(self)
+AuthManager.quickLogin = function(self)
 	print("quick login")
 	local config = self.config
 	local key = config.quick_login_key
@@ -108,9 +112,9 @@ AuthManager.quickLogin = thread.coro(function(self)
 	else
 		self:quickGetKey()
 	end
-end)
+end
 
-AuthManager.login = thread.coro(function(self, email, password)
+AuthManager.loginAsync = function(self, email, password)
 	print("login")
 	local api = self.webApi.api
 	local config = self.config
@@ -132,8 +136,9 @@ AuthManager.login = thread.coro(function(self, email, password)
 
 	print(inspect(response))
 	config.token = response.token or ""
-	self:checkSession()
-end)
+	self:checkSessionAsync()
+end
+AuthManager.login = thread.coro(AuthManager.loginAsync)
 
 AuthManager.logout = function(self)
 	local webApi = self.webApi
