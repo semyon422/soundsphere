@@ -69,13 +69,13 @@ SelectView.update = function(self, dt)
 	ScreenView.update(self, dt)
 end
 
-SelectNavigator.play = function(self)
+SelectView.play = function(self)
 	if self.game.selectModel:notechartExists() then
 		self:changeScreen("gameplayView")
 	end
 end
 
-SelectNavigator.result = function(self)
+SelectView.result = function(self)
 	if self.game.selectModel:isPlayed() then
 		self:changeScreen("resultView")
 	end
