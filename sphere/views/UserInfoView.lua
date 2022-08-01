@@ -52,7 +52,7 @@ UserInfoView.draw = function(self)
 	love.graphics.setFont(spherefonts.get(unpack(self.text.font)))
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local username = self.game.configModel.configs.online.user.name
+	local username = self.game.configModel.configs.online.user.name or ""
 	baseline_print(
 		username,
 		self.text.x,
