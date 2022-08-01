@@ -270,6 +270,24 @@ SelectModel.pullNoteChart = function(self, noUpdate, noPullNext)
 	self.game.scoreLibraryModel:clear()
 end
 
+SelectModel.updateScoreOnlineAsync = function(self)
+	self.game.scoreLibraryModel:updateItemsAsync()
+	self:findScore()
+end
+
+SelectModel.updateScoreOnline = aquathread.coro(SelectModel.updateScoreOnlineAsync)
+
+SelectModel.findScore = function(self)
+	local scoreItems = self.game.scoreLibraryModel.items
+	self.scoreItemIndex = self.game.scoreLibraryModel:getItemIndex(self.config.scoreEntryId) or 1
+
+	local scoreItem = scoreItems[self.scoreItemIndex]
+	self.scoreItem = scoreItem
+	if scoreItem then
+		self.config.scoreEntryId = scoreItem.id
+	end
+end
+
 SelectModel.pullScore = function(self, noUpdate)
 	local noteChartItems = self.game.noteChartLibraryModel.items
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
@@ -284,23 +302,17 @@ SelectModel.pullScore = function(self, noUpdate)
 		self.game.scoreLibraryModel:setIndex(noteChartItem.index)
 
 		local select = self.game.configModel.configs.select
-		if select.scoreSourceName == "local" then
-			return self.game.scoreLibraryModel:updateItems()
+		if select.scoreSourceName == "online" then
+			self.game.scoreLibraryModel:clear()
+			aquatimer.debounce(self, "scoreDebounce", self.debounceTime,
+				self.updateScoreOnlineAsync, self
+			)
+			return
 		end
-		self.game.scoreLibraryModel:clear()
-		aquatimer.debounce(self, "scoreDebounce", self.debounceTime,
-			self.game.scoreLibraryModel.updateItemsAsync, self.game.scoreLibraryModel
-		)
+		self.game.scoreLibraryModel:updateItems()
 	end
 
-	local scoreItems = self.game.scoreLibraryModel.items
-	self.scoreItemIndex = self.game.scoreLibraryModel:getItemIndex(self.config.scoreEntryId)
-
-	local scoreItem = scoreItems[self.scoreItemIndex]
-	self.scoreItem = scoreItem
-	if scoreItem then
-		self.config.scoreEntryId = scoreItem.id
-	end
+	self:findScore()
 end
 
 return SelectModel

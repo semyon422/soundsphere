@@ -52,26 +52,19 @@ ScoreLibraryModel.filterScores = function(self, scores)
 end
 
 ScoreLibraryModel.updateItemsAsync = function(self)
+	local hash_index = self.hash .. self.index
 	self.items = {}
 
 	local select = self.game.configModel.configs.select
 	if select.scoreSourceName == "online" then
-		return self:updateItemsOnline()
+		self:updateItemsOnline()
+	else
+		self:updateItemsLocal()
 	end
 
-	local scoreEntries = self.game.scoreModel:getScoreEntries(
-		self.hash,
-		self.index
-	)
-	table.sort(scoreEntries, function(a, b)
-		return a.rating > b.rating
-	end)
-	scoreEntries = self:filterScores(scoreEntries)
-	for i = 1, #scoreEntries do
-		scoreEntries[i].rank = i
+	if self.hash .. self.index ~= hash_index then
+		return self:updateItemsAsync()
 	end
-	self.items = scoreEntries
-	self.scoreSourceName = "local"
 end
 
 ScoreLibraryModel.updateItems = aquathread.coro(ScoreLibraryModel.updateItemsAsync)
@@ -90,12 +83,29 @@ ScoreLibraryModel.updateItemsOnline = function(self)
 		return
 	end
 
+	print("GET " .. api.notecharts[id].scores)
 	local scores = api.notecharts[id].scores:get({
 		user = true,
 		modifierset = true,
 	})
 	self.items = scores or {}
 	self.scoreSourceName = "online"
+end
+
+ScoreLibraryModel.updateItemsLocal = function(self)
+	local scoreEntries = self.game.scoreModel:getScoreEntries(
+		self.hash,
+		self.index
+	)
+	table.sort(scoreEntries, function(a, b)
+		return a.rating > b.rating
+	end)
+	scoreEntries = self:filterScores(scoreEntries)
+	for i = 1, #scoreEntries do
+		scoreEntries[i].rank = i
+	end
+	self.items = scoreEntries
+	self.scoreSourceName = "local"
 end
 
 ScoreLibraryModel.getItemIndex = function(self, scoreEntryId)

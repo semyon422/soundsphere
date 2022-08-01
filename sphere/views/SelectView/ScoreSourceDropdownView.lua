@@ -14,7 +14,7 @@ ScoreSourceDropdownView.select = function(self, i)
 	local scoreSources = self.game.scoreLibraryModel.scoreSources
 	local select = self.game.configModel.configs.select
 	select.scoreSourceName = scoreSources[i]
-	self.game.scoreLibraryModel:updateItems()
+	self.game.selectModel:updateScoreOnline()
 end
 
 ScoreSourceDropdownView.getItemText = function(self, i)

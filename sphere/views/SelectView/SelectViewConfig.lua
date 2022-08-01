@@ -568,7 +568,10 @@ local StageInfoModifierIconGrid = ModifierIconGridView:new({
 		self.size = (self.h - 8) / 3
 		self.__index.draw(self)
 	end,
-	config = "game.selectModel.scoreItem.modifiers",
+	config = {
+		"game.selectModel.scoreItem.modifiers",
+		"game.selectModel.scoreItem.modifierset.encoded",
+	},
 	noModifier = true
 })
 
