@@ -7,6 +7,13 @@ local transform = require("aqua.graphics.transform")
 
 local LogoView = Class:new()
 
+LogoView.image = {
+	x = 21,
+	y = 20,
+	w = 48,
+	h = 48
+}
+
 LogoView.draw = function(self)
 	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)

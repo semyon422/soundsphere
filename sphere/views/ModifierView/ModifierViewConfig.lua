@@ -1,31 +1,15 @@
 local _transform = require("aqua.graphics.transform")
 local just = require("just")
-local spherefonts = require("sphere.assets.fonts")
 local just_layout = require("just.layout")
-
-local TextCellImView = require("sphere.views.SelectView.TextCellImView")
-local TextTooltipImView = require("sphere.views.TextTooltipImView")
 
 local ScrollBarView = require("sphere.views.ScrollBarView")
 local RectangleView = require("sphere.views.RectangleView")
 local CircleView = require("sphere.views.CircleView")
-local SwitchView = require("sphere.views.SwitchView")
-local StepperView = require("sphere.views.StepperView")
-local SliderView = require("sphere.views.SliderView")
 
 local AvailableModifierListView = require("sphere.views.ModifierView.AvailableModifierListView")
 local ModifierListView = require("sphere.views.ModifierView.ModifierListView")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
-
-local Tooltip = {draw = function(self)
-	if self.text then
-		love.graphics.setFont(spherefonts.get("Noto Sans", 28))
-		TextTooltipImView(self.id, self.text)
-	end
-	self.id = nil
-	self.text = nil
-end}
 
 local Frames = {draw = function()
 	local width, height = love.graphics.getDimensions()
@@ -71,39 +55,6 @@ local AvailableModifierList = AvailableModifierListView:new({
 	w = 454,
 	h = 792,
 	rows = 11,
-	drawItem = function(self, i, w, h)
-		local item = self.items[i]
-		local prevItem = self.items[i - 1]
-
-		if just.button(i, just.is_over(w, h)) then
-			local modifier = self.game.modifierModel.modifiers[i]
-			self.game.modifierModel:add(modifier)
-		end
-
-		love.graphics.setColor(1, 1, 1, 1)
-		if item.oneUse and item.added then
-			love.graphics.setColor(1, 1, 1, 0.5)
-		end
-
-		just.row(true)
-		just.indent(44)
-		TextCellImView(410, 72, "left", "", item.name)
-		if just.is_over(-410, 72) then
-			Tooltip.text = item.description
-			Tooltip.id = i
-		end
-		just.indent(-410 - 44)
-
-		love.graphics.setColor(1, 1, 1, 1)
-		if not prevItem or prevItem.oneUse ~= item.oneUse then
-			local text = "One use modifiers"
-			if not item.oneUse then
-				text = "Sequential modifiers"
-			end
-			TextCellImView(410, 72, "right", text, "")
-		end
-		just.row(false)
-	end,
 })
 
 local ModifierList = ModifierListView:new({
@@ -113,76 +64,6 @@ local ModifierList = ModifierListView:new({
 	w = 454,
 	h = 792,
 	rows = 11,
-	drawItem = function(self, i, w, h)
-		local item = self.items[i]
-		local w2 = w / 2
-
-		if just.button(tostring(item) .. "1", just.is_over(w2, h), 2) then
-			self.game.modifierModel:remove(item)
-		end
-
-		just.row(true)
-		just.indent(44)
-		TextCellImView(w2 - 44, 72, "left", "", item.name)
-
-		local modifier = self.game.modifierModel:getModifier(item)
-		if modifier.interfaceType == "toggle" then
-			just.indent((w2 - h) / 2)
-			w2 = 72
-			local over = SwitchView:isOver(w2, h)
-			local delta = just.wheel_over(item, over)
-			local changed, active, hovered = just.button(item, over)
-
-			local value = item.value
-			if changed then
-				value = not value
-			elseif delta then
-				value = delta == 1
-			end
-			if changed or delta then
-				self.game.modifierModel:setModifierValue(item, value)
-			end
-			SwitchView:draw(w2, h, value)
-		elseif modifier.interfaceType == "slider" then
-			just.indent(-w2)
-			TextCellImView(w2, 72, "right", "", item.value)
-
-			local value = modifier:toNormValue(item.value)
-
-			local over = SliderView:isOver(w2, h)
-			local pos = SliderView:getPosition(w2, h)
-
-			local delta = just.wheel_over(item, over)
-			local new_value, active, hovered = just.slider(item, over, pos, value)
-			if new_value then
-				self.game.modifierModel:setModifierValue(item, modifier:fromNormValue(new_value))
-			elseif delta then
-				self.game.modifierModel:increaseModifierValue(item, delta)
-			end
-			SliderView:draw(w2, h, value)
-		elseif modifier.interfaceType == "stepper" then
-			TextCellImView(w2, 72, "center", "", item.value)
-			just.indent(-w2)
-
-			local value = modifier:toIndexValue(item.value)
-			local count = modifier:getCount()
-
-			local overAll, overLeft, overRight = StepperView:isOver(w2, h)
-
-			local id = tostring(item)
-			local delta = just.wheel_over(id .. "A", overAll)
-			local changedLeft = just.button(id .. "L", overLeft)
-			local changedRight = just.button(id .. "R", overRight)
-
-			if changedLeft or delta == -1 then
-				self.game.modifierModel:increaseModifierValue(item, -1)
-			elseif changedRight or delta == 1 then
-				self.game.modifierModel:increaseModifierValue(item, 1)
-			end
-			StepperView:draw(w2, h, value, count)
-		end
-		just.row(false)
-	end,
 })
 
 local AvailableModifierScrollBar = ScrollBarView:new({
@@ -261,7 +142,6 @@ local ModifierViewConfig = {
 	Circle,
 	ContainerEnd,
 	require("sphere.views.DebugInfoViewConfig"),
-	Tooltip,
 }
 
 return ModifierViewConfig

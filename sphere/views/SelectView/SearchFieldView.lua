@@ -9,6 +9,8 @@ local TextInput = require("aqua.util.TextInput")
 
 local SearchFieldView = Class:new()
 
+SearchFieldView.padding = 6
+
 SearchFieldView.load = function(self)
 	self.textInput = TextInput:new()
 	self.textInput:setText(inside(self, self.searchString))
@@ -43,7 +45,7 @@ SearchFieldView.draw = function(self)
 		self.screenView:setSearchMode(self.searchMode)
 	end
 
-	local padding = self.frame.padding
+	local padding = self.padding
 	local h = self.h - padding * 2
 
 	love.graphics.setColor(1, 1, 1, 0.08)
@@ -84,8 +86,8 @@ SearchFieldView.draw = function(self)
 	end
 
 	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.setLineWidth(self.frame.lineWidth)
-	love.graphics.setLineStyle(self.frame.lineStyle)
+	love.graphics.setLineWidth(1)
+	love.graphics.setLineStyle("smooth")
 
 	love.graphics.rectangle(
 		"line",

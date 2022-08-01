@@ -1,9 +1,7 @@
-local just = require("just")
+local spherefonts = require("sphere.assets.fonts")
 
-return function(id, text, limit)
-	if not just.mouse_over(id, true, "mouse") then
-		return
-	end
+return function(text, limit)
+	love.graphics.setFont(spherefonts.get("Noto Sans", 28))
 
 	local _limit = limit or math.huge
 	local font = love.graphics.getFont()

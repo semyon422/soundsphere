@@ -1,13 +1,8 @@
 local ListView = require("sphere.views.ListView")
-local ListItemView = require("sphere.views.ListItemView")
+local just = require("just")
+local TextCellImView = require("sphere.views.SelectView.TextCellImView")
 
 local CollectionListView = ListView:new({construct = false})
-
-CollectionListView.construct = function(self)
-	ListView.construct(self)
-	self.itemView = ListItemView:new()
-	self.itemView.listView = self
-end
 
 CollectionListView.reloadItems = function(self)
 	self.items = self.game.collectionModel.items
@@ -20,6 +15,15 @@ end
 
 CollectionListView.scroll = function(self, count)
 	self.game.selectModel:scrollCollection(count)
+end
+
+CollectionListView.drawItem = function(self, i, w, h)
+	local item = self.items[i]
+
+	TextCellImView(72, h, "right", "", item.count ~= 0 and item.count or "", true)
+	just.sameline()
+	just.indent(44)
+	TextCellImView(math.huge, h, "left", item.shortPath, item.name)
 end
 
 return CollectionListView

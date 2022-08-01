@@ -5,19 +5,19 @@ local getCanvas		= require("aqua.graphics.canvas")
 local rtime = require("aqua.util.rtime")
 local time_ago_in_words = require("aqua.util").time_ago_in_words
 local newGradient = require("aqua.graphics.newGradient")
+local event = require("aqua.event")
 
 local ScrollBarView = require("sphere.views.ScrollBarView")
 local IconButtonImView = require("sphere.views.IconButtonImView")
 local TextButtonImView = require("sphere.views.TextButtonImView")
 local CheckboxImView = require("sphere.views.CheckboxImView")
 local LabelImView = require("sphere.views.LabelImView")
-local TextTooltipImView = require("sphere.views.TextTooltipImView")
 local BackgroundView = require("sphere.views.BackgroundView")
 local ValueView = require("sphere.views.ValueView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
 local UserInfoView = require("sphere.views.UserInfoView")
 local LogoView = require("sphere.views.LogoView")
-local ScoreListView	= require("sphere.views.ResultView.ScoreListView")
+local ScoreListView	= require("sphere.views.SelectView.ScoreListView")
 
 local NoteChartSetListView = require("sphere.views.SelectView.NoteChartSetListView")
 local NoteChartListView = require("sphere.views.SelectView.NoteChartListView")
@@ -48,15 +48,6 @@ local function getRect(out, r)
 end
 
 local Layout = require("sphere.views.SelectView.Layout")
-
-local Tooltip = {draw = function(self)
-	if self.text then
-		love.graphics.setFont(spherefonts.get("Noto Sans", 28))
-		TextTooltipImView(self.id, self.text)
-	end
-	self.id = nil
-	self.text = nil
-end}
 
 local Cache = CacheView:new({
 	subscreen = "collections",
@@ -144,26 +135,6 @@ local ScoreList = ScoreListView:new({
 		getRect(self, Layout.column1row1row2)
 		self.__index.draw(self)
 	end,
-	drawItem = function(self, i, w, h)
-		local item = self.items[i]
-		w = (w - 44) / 5
-
-		just.row(true)
-		just.indent(22)
-		TextCellImView(w, h, "right", i == 1 and "rank" or "", item.rank)
-		TextCellImView(w, h, "right", i == 1 and "rating" or "", Format.difficulty(item.rating))
-		TextCellImView(w, h, "right", i == 1 and "time rate" or "", Format.timeRate(item.timeRate))
-		if just.is_over(-w, h) then
-			Tooltip.text = ("%0.2fX"):format(item.timeRate)
-			Tooltip.id = self
-		end
-		TextCellImView(w * 2, h, "right", item.time ~= 0 and time_ago_in_words(item.time) or "never", Format.inputMode(item.inputMode))
-		if just.is_over(-w * 2, h) then
-			Tooltip.text = os.date("%c", item.time)
-			Tooltip.id = self
-		end
-		just.row(false)
-	end,
 	rows = 5,
 })
 
@@ -189,14 +160,6 @@ local CollectionList = CollectionListView:new({
 		getRect(self, Layout.column3)
 		self.__index.draw(self)
 	end,
-	drawItem = function(self, i, w, h)
-		local item = self.items[i]
-
-		TextCellImView(72, h, "right", "", item.count ~= 0 and item.count or "", true)
-		just.sameline()
-		just.indent(44)
-		TextCellImView(math.huge, h, "left", item.shortPath, item.name)
-	end,
 	rows = 11,
 })
 
@@ -221,17 +184,6 @@ local NoteChartSetList = NoteChartSetListView:new({
 	draw = function(self)
 		getRect(self, Layout.column3)
 		self.__index.draw(self)
-	end,
-	drawItem = function(self, i, w, h)
-		local item = self.items[i]
-
-		if item.lamp then
-			love.graphics.circle("fill", 22, 36, 7)
-			love.graphics.circle("line", 22, 36, 7)
-		end
-
-		just.indent(44)
-		TextCellImView(math.huge, h, "left", item.artist, item.title)
 	end,
 	rows = 11,
 })
@@ -306,36 +258,6 @@ local NoteChartList = NoteChartListView:new({
 			self.x, self.y + 72 * 2.8
 		)
 		self.__index.draw(self)
-	end,
-	drawItem = function(self, i, w, h)
-		local items = self.items
-		local item = items[i]
-
-		just.indent(18)
-
-		local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
-
-		local difficulty = Format.difficulty((item.difficulty or 0) * baseTimeRate)
-		local inputMode = item.inputMode
-		local name = item.name
-		local creator = item.creator
-		if items[i - 1] and items[i - 1].inputMode == inputMode then
-			inputMode = ""
-		end
-		if items[i - 1] and items[i - 1].creator == creator then
-			creator = ""
-		end
-
-		TextCellImView(72, h, "right", Format.inputMode(inputMode), difficulty, true)
-		just.sameline()
-
-		if item.lamp then
-			love.graphics.circle("fill", 22, 36, 7)
-			love.graphics.circle("line", 22, 36, 7)
-		end
-		just.indent(44)
-
-		TextCellImView(math.huge, h, "left", creator, name)
 	end,
 	rows = 5,
 })
@@ -473,7 +395,6 @@ local NoteChartSetScrollBar = ScrollBarView:new({
 		self.w = 16
 		self.__index.draw(self)
 	end,
-	rows = 11,
 	backgroundColor = {1, 1, 1, 0},
 	color = {1, 1, 1, 0.66}
 })
@@ -488,11 +409,6 @@ local SearchField = SearchFieldView:new({
 		self.h = Layout.header.h - 34
 		self.__index.draw(self)
 	end,
-	frame = {
-		padding = 6,
-		lineStyle = "smooth",
-		lineWidth = 1
-	},
 	text = {
 		x = 27,
 		baseline = 35,
@@ -516,11 +432,6 @@ local SearchFieldLamp = SearchFieldView:new({
 		self.h = Layout.header.h - 34
 		self.__index.draw(self)
 	end,
-	frame = {
-		padding = 6,
-		lineStyle = "smooth",
-		lineWidth = 1
-	},
 	text = {
 		x = 27,
 		baseline = 35,
@@ -543,11 +454,6 @@ local OsudirectSearchField = SearchFieldView:new({
 		self.h = Layout.header.h - 34
 		self.__index.draw(self)
 	end,
-	frame = {
-		padding = 6,
-		lineStyle = "smooth",
-		lineWidth = 1
-	},
 	text = {
 		x = 27,
 		baseline = 35,
@@ -662,26 +568,19 @@ local UpdateStatus = ValueView:new({
 	align = "left",
 })
 
-local SessionTime = ValueView:new({
-	transform = transform,
-	draw = function(self)
-		getRect(self, Layout.column2)
-		self.x = self.x + 10
-		self.baseline = Layout.header.y + Layout.header.h / 2 + 7
-		self.__index.draw(self)
-	end,
-	value = function()
-		local event = require("aqua.event")
-		local rtime = require("aqua.util.rtime")
-		return rtime(event.time - event.startTime)
-	end,
-	limit = 1920,
-	color = {1, 1, 1, 1},
-	font = {"Noto Sans", 20},
-	align = "left",
-})
+local SessionTime = {draw = function(self)
+	getRect(self, Layout.column2)
+	self.x = self.x + 10
+	self.y = Layout.header.y + Layout.header.h / 2 - 17
 
-local BottomNotechartsScreenMenu = {
+	local tf = _transform(transform):translate(self.x, self.y)
+	love.graphics.replaceTransform(tf)
+
+	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
+	just.text(rtime(event.time - event.startTime))
+end}
+
+local NotechartsSubscreen = {
 	subscreen = "notecharts",
 	draw = function(self)
 		getRect(self, Layout.footer)
@@ -724,10 +623,44 @@ local BottomNotechartsScreenMenu = {
 			self.screenView:switchToOsudirect()
 		end
 		just.row(false)
+
+		getRect(self, Layout.column2row2row1)
+		local tf = _transform(transform):translate(self.x, self.y)
+		love.graphics.replaceTransform(tf)
+
+		just.row(true)
+		just.indent(36)
+		if IconButtonImView("open directory", "folder_open", self.h, 0.5) then
+			self.game.selectController:openDirectory()
+		end
+		if IconButtonImView("update cache", "refresh", self.h, 0.5) then
+			self.game.selectController:updateCache(true)
+		end
+		just.offset(self.w - self.h * 2 - 36)
+		if IconButtonImView("result", "info_outline", self.h, 0.5) then
+			if self.game.selectModel:isPlayed() then
+				self.screenView:changeScreen("resultView")
+			end
+		end
+		if IconButtonImView("play", "keyboard_arrow_right", self.h, 0.5) then
+			if self.game.selectModel:notechartExists() then
+				self.screenView:changeScreen("gameplayView")
+			end
+		end
+		just.row(false)
+
+		getRect(self, Layout.column1row1row1)
+		local tf = _transform(transform):translate(self.x, self.y)
+		love.graphics.replaceTransform(tf)
+
+		just.indent(36)
+		if IconButtonImView("open notechart page", "info_outline", self.h, 0.5) then
+			self.game.selectController:openWebNotechart()
+		end
 	end,
 }
 
-local BottomCollectionsScreenMenu = {
+local CollectionsSubscreen = {
 	subscreen = "collections",
 	draw = function(self)
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
@@ -753,7 +686,7 @@ local BottomCollectionsScreenMenu = {
 	end,
 }
 
-local BottomRightOsudirectScreenMenu = {
+local OsudirectSubscreen = {
 	subscreen = "osudirect",
 	draw = function(self)
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
@@ -780,52 +713,6 @@ local BottomRightOsudirectScreenMenu = {
 	end,
 }
 
-local NoteChartOptionsScreenMenu = {
-	subscreen = "notecharts",
-	draw = function(self)
-		love.graphics.setFont(spherefonts.get("Noto Sans", 20))
-
-		getRect(self, Layout.column2row2row1)
-		local tf = _transform(transform):translate(self.x, self.y)
-		love.graphics.replaceTransform(tf)
-
-		just.row(true)
-		just.indent(36)
-		if IconButtonImView("open directory", "folder_open", self.h, 0.5) then
-			self.game.selectController:openDirectory()
-		end
-		if IconButtonImView("update cache", "refresh", self.h, 0.5) then
-			self.game.selectController:updateCache(true)
-		end
-
-		just.row(false)
-		local tf = _transform(transform):translate(self.x + self.w - self.h * 2 - 36, self.y)
-		love.graphics.replaceTransform(tf)
-
-		just.row(true)
-		if IconButtonImView("result", "info_outline", self.h, 0.5) then
-			if self.game.selectModel:isPlayed() then
-				self.screenView:changeScreen("resultView")
-			end
-		end
-		if IconButtonImView("play", "keyboard_arrow_right", self.h, 0.5) then
-			if self.game.selectModel:notechartExists() then
-				self.screenView:changeScreen("gameplayView")
-			end
-		end
-		just.row(false)
-
-		getRect(self, Layout.column1row1row1)
-		local tf = _transform(transform):translate(self.x, self.y)
-		love.graphics.replaceTransform(tf)
-
-		just.indent(36)
-		if IconButtonImView("open notechart page", "info_outline", self.h, 0.5) then
-			self.game.selectController:openWebNotechart()
-		end
-	end,
-}
-
 local Logo = LogoView:new({
 	transform = transform,
 	draw = function(self)
@@ -834,20 +721,10 @@ local Logo = LogoView:new({
 		self.h = Layout.header.h
 		self.__index.draw(self)
 	end,
-	image = {
-		x = 21,
-		y = 20,
-		w = 48,
-		h = 48
-	},
 })
 
 local UserInfo = UserInfoView:new({
 	transform = transform,
-	username = "game.configModel.configs.online.user.name",
-	session = "game.configModel.configs.online.session",
-	file = "userdata/avatar.png",
-	action = "openOnline",
 	draw = function(self)
 		getRect(self, Layout.column1)
 		self.x = self.x + self.w - Layout.header.h
@@ -855,24 +732,6 @@ local UserInfo = UserInfoView:new({
 		self.h = Layout.header.h
 		self.__index.draw(self)
 	end,
-	image = {
-		x = 21,
-		y = 20,
-		w = 48,
-		h = 48
-	},
-	marker = {
-		x = 97,
-		y = 44,
-		r = 8,
-	},
-	text = {
-		x = -454 + 89,
-		baseline = 54,
-		limit = 365,
-		align = "right",
-		font = {"Noto Sans", 26},
-	}
 })
 
 local SelectViewConfig = {
@@ -905,16 +764,14 @@ local SelectViewConfig = {
 	StageInfoModifierIconGrid,
 	OsudirectDifficultiesList,
 	OsudirectProcessingList,
-	BottomNotechartsScreenMenu,
-	BottomCollectionsScreenMenu,
-	BottomRightOsudirectScreenMenu,
-	NoteChartOptionsScreenMenu,
+	NotechartsSubscreen,
+	CollectionsSubscreen,
+	OsudirectSubscreen,
 	UpdateStatus,
 	SessionTime,
 	Logo,
 	UserInfo,
 	require("sphere.views.DebugInfoViewConfig"),
-	Tooltip,
 }
 
 return SelectViewConfig

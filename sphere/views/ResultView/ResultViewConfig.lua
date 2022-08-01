@@ -206,53 +206,6 @@ local ScoreList = ScoreListView:new({
 		self.__index.draw(self)
 	end,
 	rows = 5,
-	drawItem = function(self, i, w, h)
-		local item = self.items[i]
-
-		local scoreEngine = self.game.rhythmModel.scoreEngine
-		local scoreEntry = scoreEngine.scoreEntry
-		local loaded = scoreEntry and scoreEntry.replayHash == item.replayHash
-
-		if just.button(item, just.is_over(w, h)) then
-			self.screenView:loadScore(i)
-		end
-
-		if item.isTop then
-			love.graphics.circle("fill", 44, 36, 7)
-		end
-		if loaded or item.isTop then
-			love.graphics.circle("line", 44, 36, 7)
-		end
-
-		local rating = item.rating
-		local timeRate = item.timeRate
-		local inputMode = item.inputMode
-
-		if scoreEntry.id == item.id then
-			local erfunc = require("libchart.erfunc")
-			local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
-			local normalscore = scoreEngine.scoreSystem.normalscore
-			local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-			rating = s * scoreEngine.enps
-
-			timeRate = scoreEngine.timeRate or timeRate
-			inputMode = scoreEngine.inputMode or inputMode
-		end
-
-		if rating ~= rating then
-			rating = "nan"
-		end
-
-		local cw = (w - 44) / 5
-
-		just.row(true)
-		just.indent(22)
-		TextCellImView(cw, h, "right", i == 1 and "rank" or "", item.rank, true)
-		TextCellImView(cw, h, "right", i == 1 and "rating" or "", Format.difficulty(rating), true)
-		TextCellImView(cw, h, "right", i == 1 and "time rate" or "", Format.timeRate(timeRate), true)
-		TextCellImView(cw * 2, h, "right", item.time ~= 0 and time_ago_in_words(item.time) or "never", Format.inputMode(inputMode))
-		just.row(false)
-	end,
 })
 
 local ScoreScrollBar = ScrollBarView:new({
@@ -641,21 +594,6 @@ local BottomScreenMenu = {draw = function(self)
 	just.row(false)
 end}
 
-local SessionTime = ValueView:new({
-	transform = transform,
-	value = function()
-		local event = require("aqua.event")
-		local rtime = require("aqua.util.rtime")
-		return rtime(event.time - event.startTime)
-	end,
-	x = 301,
-	baseline = 279 + 522 - 6,
-	limit = 1920,
-	color = {1, 1, 1, 1},
-	font = {"Noto Sans", 20},
-	align = "left",
-})
-
 local MatchPlayers = MatchPlayersView:new({
 	transform = transformLeft,
 	key = "game.multiplayerModel.roomUsers",
@@ -727,7 +665,6 @@ local NoteSkinViewConfig = {
 	HpGraph,
 	EarlyLateMissGraph,
 	BottomScreenMenu,
-	-- SessionTime,
 	MatchPlayers,
 	InspectScoreSystem,
 	InspectCounters,

@@ -4,17 +4,36 @@ local Class = require("aqua.util.Class")
 local transform = require("aqua.graphics.transform")
 local spherefonts		= require("sphere.assets.fonts")
 local baseline_print = require("aqua.graphics.baseline_print")
-local inside = require("aqua.util.inside")
 
 local UserInfoView = Class:new()
 
 UserInfoView.load = function(self)
-	if not self.file or not love.filesystem.getInfo(self.file) then
+	local path = "userdata/avatar.png"
+	if not love.filesystem.getInfo(path) then
 		return
 	end
 
-	self.imageObject = love.graphics.newImage(self.file)
+	self.imageObject = love.graphics.newImage(path)
 end
+
+UserInfoView.image = {
+	x = 21,
+	y = 20,
+	w = 48,
+	h = 48
+}
+UserInfoView.marker = {
+	x = 97,
+	y = 44,
+	r = 8,
+}
+UserInfoView.text = {
+	x = -454 + 89,
+	baseline = 54,
+	limit = 365,
+	align = "right",
+	font = {"Noto Sans", 26},
+}
 
 UserInfoView.draw = function(self)
 	local tf = transform(self.transform):translate(self.x, self.y)
@@ -33,7 +52,7 @@ UserInfoView.draw = function(self)
 	love.graphics.setFont(spherefonts.get(unpack(self.text.font)))
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local username = self.username and inside(self, self.username) or ""
+	local username = self.game.configModel.configs.online.user.name
 	baseline_print(
 		username,
 		self.text.x,
@@ -72,7 +91,7 @@ UserInfoView.draw = function(self)
 		)
 	end
 
-	local session = self.session and inside(self, self.session)
+	local session = self.game.configModel.configs.online.session
 	if session and session.active then
 		love.graphics.setColor(1, 1, 1, 1)
 		love.graphics.circle(
