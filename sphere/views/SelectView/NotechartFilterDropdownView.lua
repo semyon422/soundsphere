@@ -37,7 +37,7 @@ NotechartFilterDropdownView.select = function(self, i)
 	local filters = self.game.configModel.configs.filters.notechart
 	local select = self.game.configModel.configs.select
 	select.filterName = filters[i].name
-	self.game.selectModel:debouncePullNoteChartSet()
+	self.game.selectModel:noDebouncePullNoteChartSet()
 end
 
 NotechartFilterDropdownView.getItemText = function(self, i)

@@ -8,6 +8,7 @@ return {
 	searchMode = "filter",
 	judgements = "soundsphere",
 	scoreFilterName = "No filter",
+	scoreSourceName = "local",
 	filterName = "No filter",
 	filterString = "",
 	lampString = "",

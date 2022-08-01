@@ -15,7 +15,7 @@ SortDropdownView.getPreview = function(self)
 end
 
 SortDropdownView.select = function(self, i)
-	self.game.selectModel:setSortFunction(self.game.sortModel:fromIndexValue(i))
+	self.game.selectModel:setSortFunction(self.game.sortModel:fromIndexValue(i), true)
 end
 
 SortDropdownView.getItemText = function(self, i)

@@ -38,9 +38,10 @@ Format.inputMode = function(inputMode)
 	if type(inputMode) ~= "string" then
 		return ""
 	end
-	return inputMode
+	inputMode = inputMode
 		:gsub("key", "K")
 		:gsub("scratch", "S")
+	return inputMode
 end
 
 return Format

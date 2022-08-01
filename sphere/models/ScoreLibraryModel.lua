@@ -1,6 +1,13 @@
+local aquathread = require("aqua.thread")
 local Class = require("aqua.util.Class")
 
 local ScoreLibraryModel = Class:new()
+
+ScoreLibraryModel.scoreSources = {
+	"local",
+	"online",
+}
+ScoreLibraryModel.scoreSourceName = "local"
 
 ScoreLibraryModel.construct = function(self)
 	self.hash = ""
@@ -44,7 +51,14 @@ ScoreLibraryModel.filterScores = function(self, scores)
 	return newScores
 end
 
-ScoreLibraryModel.updateItems = function(self)
+ScoreLibraryModel.updateItemsAsync = function(self)
+	self.items = {}
+
+	local select = self.game.configModel.configs.select
+	if select.scoreSourceName == "online" then
+		return self:updateItemsOnline()
+	end
+
 	local scoreEntries = self.game.scoreModel:getScoreEntries(
 		self.hash,
 		self.index
@@ -57,6 +71,31 @@ ScoreLibraryModel.updateItems = function(self)
 		scoreEntries[i].rank = i
 	end
 	self.items = scoreEntries
+	self.scoreSourceName = "local"
+end
+
+ScoreLibraryModel.updateItems = aquathread.coro(ScoreLibraryModel.updateItemsAsync)
+
+ScoreLibraryModel.updateItemsOnline = function(self)
+	local api = self.game.onlineModel.webApi.api
+
+	print("GET " .. api.notecharts)
+	local notecharts = api.notecharts:get({
+		hash = self.hash,
+		index = self.index,
+	})
+	local id = notecharts and notecharts[1] and notecharts[1].id
+
+	if not id then
+		return
+	end
+
+	local scores = api.notecharts[id].scores:get({
+		user = true,
+		modifierset = true,
+	})
+	self.items = scores or {}
+	self.scoreSourceName = "online"
 end
 
 ScoreLibraryModel.getItemIndex = function(self, scoreEntryId)
