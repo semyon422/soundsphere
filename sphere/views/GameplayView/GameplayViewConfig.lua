@@ -44,11 +44,11 @@ local BottomScreenMenu = {
 
 		just.row(true)
 		if TextButtonImView("continue", "continue", w, h) then
-			self.screenView:play()
+			self.game.gameplayController:play()
 		end
 		just.indent(w * 3)
 		if TextButtonImView("retry", "retry", w, h) then
-			self.screenView:retry()
+			self.game.gameplayController:retry()
 		end
 		if TextButtonImView("quit", "quit", w, h) then
 			self.screenView:quit()
