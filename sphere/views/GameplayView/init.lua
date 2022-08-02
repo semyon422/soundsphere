@@ -58,7 +58,7 @@ GameplayView.update = function(self, dt)
 	local pauseOnFail = self.game.configModel.configs.settings.gameplay.pauseOnFail
 	local failed = self.game.rhythmModel.scoreEngine.scoreSystem.hp.failed
 	if pauseOnFail and failed and not self.failed then
-		self.game.gameplayController:playStateChange("pause")
+		self.game.gameplayController:changePlayState("pause")
 		self.failed = true
 	end
 

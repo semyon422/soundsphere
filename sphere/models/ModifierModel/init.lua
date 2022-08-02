@@ -194,6 +194,9 @@ end
 
 ModifierModel.remove = function(self, modifierConfig)
 	modifierConfig = modifierConfig or self.config[self.modifierItemIndex]
+	if not modifierConfig then
+		return
+	end
 	for i, foundModifierConfig in ipairs(self.config) do
 		if foundModifierConfig == modifierConfig then
 			table.remove(self.config, i)
@@ -214,12 +217,18 @@ end
 
 ModifierModel.setModifierValue = function(self, modifierConfig, value)
 	modifierConfig = modifierConfig or self.config[self.modifierItemIndex]
+	if not modifierConfig then
+		return
+	end
 	local modifier = self:getModifier(modifierConfig)
 	modifier:setValue(modifierConfig, value)
 end
 
 ModifierModel.increaseModifierValue = function(self, modifierConfig, delta)
 	modifierConfig = modifierConfig or self.config[self.modifierItemIndex]
+	if not modifierConfig then
+		return
+	end
 	local modifier = self:getModifier(modifierConfig)
 	if type(modifier.defaultValue) == "number" then
 		modifier:setValue(modifierConfig, modifierConfig.value + delta * modifier.step)
