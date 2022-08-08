@@ -235,6 +235,8 @@ SelectModel.pullNoteChartSet = function(self, noUpdate, noPullNext)
 end
 
 SelectModel.pullNoteChart = function(self, noUpdate, noPullNext)
+	local oldId = self.noteChartItem and self.noteChartItem.id
+
 	self.game.noteChartLibraryModel:setNoteChartSetId(self.config.noteChartSetEntryId)
 
 	local noteChartItems = self.game.noteChartLibraryModel.items
@@ -247,8 +249,6 @@ SelectModel.pullNoteChart = function(self, noUpdate, noPullNext)
 	if not noUpdate then
 		self.noteChartStateCounter = self.noteChartStateCounter + 1
 	end
-
-	local oldNoteChartItem = self.noteChartItem
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
 	self.noteChartItem = noteChartItem
 	self.changed = true
@@ -257,7 +257,7 @@ SelectModel.pullNoteChart = function(self, noUpdate, noPullNext)
 		self.config.noteChartEntryId = noteChartItem.noteChartId
 		self.config.noteChartDataEntryId = noteChartItem.noteChartDataId
 		if not noPullNext then
-			self:pullScore(oldNoteChartItem and oldNoteChartItem == noteChartItem)
+			self:pullScore(oldId and oldId == noteChartItem.id)
 		end
 		return
 	end
