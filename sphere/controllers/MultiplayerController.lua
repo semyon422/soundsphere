@@ -17,7 +17,7 @@ MultiplayerController.load = function(self)
 				mpModel.modifiers = deepclone(value)
 			elseif key == "roomUsers" then
 				for _, user in ipairs(value) do
-					if user.id == mpModel.user.id then
+					if user.peerId == mpModel.user.peerId then
 						mpModel.user = user
 						break
 					end
