@@ -26,7 +26,6 @@ end
 
 SelectController.unload = function(self)
 	self.game.noteSkinModel:load()
-	self.game.previewModel:unload()
 	self.game:writeConfigs()
 end
 
@@ -41,9 +40,12 @@ SelectController.update = function(self, dt)
 	end
 
 	local noteChartItem = self.game.selectModel.noteChartItem
-	if self.game.selectModel:isChanged() and noteChartItem then
-		local bgPath = noteChartItem:getBackgroundPath()
-		local audioPath, previewTime = noteChartItem:getAudioPathPreview()
+	if self.game.selectModel:isChanged() then
+		local bgPath, audioPath, previewTime
+		if noteChartItem then
+			bgPath = noteChartItem:getBackgroundPath()
+			audioPath, previewTime = noteChartItem:getAudioPathPreview()
+		end
 		self.game.backgroundModel:setBackgroundPath(bgPath)
 		self.game.previewModel:setAudioPathPreview(audioPath, previewTime)
 	end
@@ -54,6 +56,11 @@ SelectController.update = function(self, dt)
 		local previewUrl = osudirectModel:getPreviewUrl()
 		self.game.backgroundModel:loadBackgroundDebounce(backgroundUrl)
 		self.game.previewModel:loadPreviewDebounce(previewUrl)
+	end
+
+	if self.game.modifierModel:isChanged() then
+		self.game.multiplayerModel:pushModifiers()
+		self:applyTimeRate()
 	end
 end
 

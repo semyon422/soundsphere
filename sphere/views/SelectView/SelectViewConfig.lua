@@ -418,8 +418,17 @@ local SearchField = SearchFieldView:new({
 		font = {"Noto Sans", 20},
 	},
 	placeholder = "Filter...",
-	searchString = "game.searchModel.filterString",
-	searchMode = "filter",
+	getText = function(self)
+		return self.game.searchModel.filterString
+	end,
+	setText = function(self, text)
+		self.game.searchModel:setSearchString("filter", text)
+	end,
+	update = function(self)
+		if not just.focused_id then
+			just.focus(self)
+		end
+	end,
 })
 
 local SearchFieldLamp = SearchFieldView:new({
@@ -441,8 +450,17 @@ local SearchFieldLamp = SearchFieldView:new({
 		font = {"Noto Sans", 20},
 	},
 	placeholder = "Lamp...",
-	searchString = "game.searchModel.lampString",
-	searchMode = "lamp",
+	getText = function(self)
+		return self.game.searchModel.lampString
+	end,
+	setText = function(self, text)
+		self.game.searchModel:setSearchString("lamp", text)
+	end,
+	update = function(self)
+		if not just.focused_id then
+			just.focus(self)
+		end
+	end,
 })
 
 local OsudirectSearchField = SearchFieldView:new({
@@ -462,8 +480,12 @@ local OsudirectSearchField = SearchFieldView:new({
 		align = "left",
 		font = {"Noto Sans", 20},
 	},
-	searchString = "game.osudirectModel.searchString",
-	searchMode = "osudirect",
+	getText = function(self)
+		return self.game.osudirectModel.searchString
+	end,
+	setText = function(self, text)
+		self.game.osudirectModel:setSearchString(text)
+	end,
 })
 
 local SortDropdown = SortDropdownView:new({
@@ -539,7 +561,7 @@ local GroupCheckbox = {
 		just.sameline()
 
 		love.graphics.setFont(spherefonts.get("Noto Sans", 20))
-		LabelImView("group", self.h, "left")
+		LabelImView(self, "group", self.h, "left")
 	end,
 }
 
@@ -605,28 +627,32 @@ local NotechartsSubscreen = {
 		self.x = Layout.column1.x
 		self.w = Layout.column1.w
 
-		local w = Layout.column1.w / 2
+		local w = Layout.column1.w / 2.5
 
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 		local tf = _transform(transform):translate(self.x, self.y)
 		love.graphics.replaceTransform(tf)
 
+		local gameView = self.game.gameView
 		just.row(true)
 		if IconButtonImView("settings", "settings", self.h, 0.5) then
-			self.screenView.settingsView:toggle()
+			gameView.settingsView:toggle()
 		end
 		if IconButtonImView("mounts", "folder_open", self.h, 0.5) then
-			self.screenView.mountsView:toggle()
+			gameView.mountsView:toggle()
 		end
 		if TextButtonImView("modifiers", "modifiers", w, self.h) then
-			self.screenView.modifierView:toggle()
+			gameView.modifierView:toggle()
 		end
 		if TextButtonImView("noteskins", "noteskins", w, self.h) then
-			self.screenView.noteSkinView:toggle()
+			gameView.noteSkinView:toggle()
 		end
 		if TextButtonImView("input", "input", w, self.h) then
-			self.screenView.inputView:toggle()
+			gameView.inputView:toggle()
+		end
+		if TextButtonImView("multi", "multi", self.h, self.h) then
+			gameView.lobbyView:toggle()
 		end
 		just.row(false)
 
@@ -656,14 +682,10 @@ local NotechartsSubscreen = {
 		end
 		just.offset(self.w - self.h * 2 - 36)
 		if IconButtonImView("result", "info_outline", self.h, 0.5) then
-			if self.game.selectModel:isPlayed() then
-				self.screenView:changeScreen("resultView")
-			end
+			self.screenView:result()
 		end
 		if IconButtonImView("play", "keyboard_arrow_right", self.h, 0.5) then
-			if self.game.selectModel:notechartExists() then
-				self.screenView:changeScreen("gameplayView")
-			end
+			self.screenView:play()
 		end
 		just.row(false)
 

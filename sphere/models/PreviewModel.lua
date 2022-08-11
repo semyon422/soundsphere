@@ -13,12 +13,8 @@ PreviewModel.load = function(self)
 	self.pitch = 1
 end
 
-PreviewModel.unload = function(self)
-	self:stop()
-end
-
 PreviewModel.setAudioPathPreview = function(self, audioPath, previewTime)
-	if self.audioPath ~= audioPath then
+	if self.audioPath ~= audioPath or not self.audio then
 		self.audioPath = audioPath
 		self.previewTime = previewTime
 		self:loadPreviewDebounce()

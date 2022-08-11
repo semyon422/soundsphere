@@ -57,7 +57,12 @@ end
 MultiplayerModel.connect = function(self)
 	local urls = self.game.configModel.configs.urls
 	if self.status == "disconnected" then
-		self.server = self.host:connect(urls.multiplayer)
+		local status, err = pcall(self.host.connect, self.host, urls.multiplayer)
+		if not status then
+			self.status = err
+			return
+		end
+		self.server = err
 		self.status = "connecting"
 	end
 end
@@ -139,6 +144,7 @@ MultiplayerModel.createRoom = remote.wrap(function(self, name, password)
 	end
 	self.selectedRoom = nil
 	self.peer._setModifiers(self.game.modifierModel.config)
+	self:pushNotechart()
 end)
 
 MultiplayerModel.joinRoom = remote.wrap(function(self, password)

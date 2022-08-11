@@ -50,4 +50,11 @@ ResultView.play = function(self, mode)
 	self:changeScreen("gameplayView")
 end
 
+ResultView.quit = function(self)
+	if self.game.multiplayerModel.room then
+		return self:changeScreen("multiplayerView")
+	end
+	self:changeScreen("selectView")
+end
+
 return ResultView

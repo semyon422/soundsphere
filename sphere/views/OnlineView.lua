@@ -216,6 +216,7 @@ OnlineView.draw = function(self)
 					end
 					if multiplayerModel:isHost() then
 						freeModifiersPtr[0] = room.isFreeModifiers
+						freeNotechartPtr[0] = room.isFreeNotechart
 						if imgui.Button("Set notechart") then
 							multiplayerModel:pushNotechart()
 						end

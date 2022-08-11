@@ -78,6 +78,8 @@ GameplayController.load = function(self)
 	end
 
 	self.game.multiplayerModel:setIsPlaying(true)
+
+	self.game.previewModel:stop()
 end
 
 GameplayController.getImporterSettings = function(self)
@@ -140,7 +142,7 @@ GameplayController.discordPause = function(self)
 end
 
 GameplayController.changePlayState = function(self, state)
-	if self.game.multiplayerModel.isPlaying then
+	if self.game.multiplayerModel.room then
 		return
 	end
 

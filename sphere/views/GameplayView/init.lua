@@ -76,9 +76,10 @@ GameplayView.receive = function(self, event)
 end
 
 GameplayView.quit = function(self)
-	local hasResult = self.game.gameplayController:hasResult()
-	if hasResult then
+	if self.game.gameplayController:hasResult() then
 		return self:changeScreen("resultView")
+	elseif self.game.multiplayerModel.room then
+		return self:changeScreen("multiplayerView")
 	end
 	return self:changeScreen("selectView")
 end

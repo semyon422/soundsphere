@@ -12,12 +12,18 @@ SelectNavigator.receive = function(self, event)
 		return
 	end
 
+	local gameView = self.game.gameView
 	local selectModel = self.game.selectModel
 	local modifierModel = self.game.modifierModel
 	local subscreen = self.screenView.subscreen
 	local s = event[2]
 
-	if self.screenView.modifierView.isOpen then
+	if s == "escape" then
+		gameView:hideAllWindows()
+	end
+
+	local modifierView = gameView.modifierView
+	if modifierView.isOpen then
 		if self.activeList == "modifierList" then
 			if s == "up" then modifierModel:scrollModifier(-1)
 			elseif s == "down" then modifierModel:scrollModifier(1)
@@ -34,11 +40,11 @@ SelectNavigator.receive = function(self, event)
 			elseif s == "return" then modifierModel:add()
 			end
 		end
-		if s == "escape" or s == "f1" then self.screenView.modifierView:toggle(false) end
+		if s == "f1" then modifierView:toggle(false) end
 		return
 	end
 
-	if s == "f1" then self.screenView.modifierView:toggle(true)
+	if s == "f1" then gameView:hideAllWindows() modifierView:toggle(true)
 	elseif s == "f2" then selectModel:scrollRandom()
 	elseif s == "lctrl" then self.screenView:changeSearchMode()
 	elseif s == "lshift" then selectModel:changeCollapse()

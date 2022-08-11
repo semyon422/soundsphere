@@ -50,8 +50,9 @@ SequenceView.callMethod = function(self, method, ...)
 		return
 	end
 	self.iterating = true
+	local subscreen = self.screenView and self.screenView.subscreen
 	for _, view in ipairs(self.views) do
-		if view[method] and not view.hidden and (not view.subscreen or self.screenView.subscreen == view.subscreen) then
+		if view[method] and not view.hidden and (not view.subscreen or subscreen == view.subscreen) then
 			view[method](view, ...)
 		end
 		if self.abortIterating then break end

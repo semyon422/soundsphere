@@ -3,45 +3,29 @@ local just = require("just")
 local Class = require("aqua.util.Class")
 local transform = require("aqua.graphics.transform")
 local baseline_print = require("aqua.graphics.baseline_print")
-local spherefonts		= require("sphere.assets.fonts")
-local inside = require("aqua.util.inside")
-local TextInput = require("aqua.util.TextInput")
+local spherefonts = require("sphere.assets.fonts")
 
 local SearchFieldView = Class:new()
 
 SearchFieldView.padding = 6
 
-SearchFieldView.load = function(self)
-	self.textInput = TextInput:new()
-	self.textInput:setText(inside(self, self.searchString))
-end
-
-SearchFieldView.receive = function(self, event)
-	if not (event.name == "textinput" or event.name == "keypressed" and event[1] == "backspace") then
-		return
-	end
-	if self.screenView.searchMode ~= self.searchMode then
-		return
-	end
-
-	self.textInput:receive(event)
-	if self.screenView.subscreen == "notecharts" then
-		self.game.searchModel:setSearchString(self.searchMode, self.textInput.text)
-	elseif self.screenView.subscreen == "osudirect" then
-		self.game.osudirectModel:setSearchString(self.textInput.text)
-	end
-end
-
-SearchFieldView.update = function(self)
-	self.textInput:setText(inside(self, self.searchString))
-end
+SearchFieldView.setText = function(self, text) end
+SearchFieldView.getText = function(self) return "" end
 
 SearchFieldView.draw = function(self)
+	if just.focused_id == self then
+		local changed, text = just.textinput(self:getText())
+		if changed == "text" then
+			self:setText(text)
+		end
+	end
+
 	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
 	local changed, active, hovered = just.button(self, just.is_over(self.w, self.h))
 	if changed then
+		just.focus(self)
 		self.screenView:setSearchMode(self.searchMode)
 	end
 
@@ -63,7 +47,7 @@ SearchFieldView.draw = function(self)
 		h / 2
 	)
 
-	local searchString = inside(self, self.searchString)
+	local searchString = self:getText()
 	if searchString == "" then
 		love.graphics.setColor(1, 1, 1, 0.5)
 		searchString = self.placeholder or "Search..."
@@ -81,7 +65,7 @@ SearchFieldView.draw = function(self)
 		self.text.align
 	)
 
-	if self.screenView.searchMode ~= self.searchMode then
+	if just.focused_id ~= self then
 		return
 	end
 

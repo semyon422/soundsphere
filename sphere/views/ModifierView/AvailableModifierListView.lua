@@ -34,7 +34,7 @@ AvailableModifierListView.drawItem = function(self, i, w, h)
 	just.indent(44)
 	TextCellImView(410, 72, "left", "", item.name)
 	if just.mouse_over(i, just.is_over(-410, 72), "mouse") then
-		self.game.gameView.tooltipView.text = item.description
+		self.game.gameView.tooltip = item.description
 	end
 	just.indent(-410 - 44)
 

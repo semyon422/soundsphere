@@ -8,10 +8,13 @@ ScreenView.construct = function(self)
 end
 
 ScreenView.changeScreen = function(self, screenName, noTransition)
+	self.isChangingScreen = true
 	self.gameView:setView(self.game[screenName], noTransition)
 end
 
 ScreenView.load = function(self)
+	self.isChangingScreen = false
+
 	local navigator = self.navigator
 	local sequenceView = self.sequenceView
 

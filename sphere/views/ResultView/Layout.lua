@@ -1,6 +1,6 @@
-local just = require("just")
 local transform = require("aqua.graphics.transform")
 local just_layout = require("just.layout")
+local RoundedRectangle = require("sphere.views.RoundedRectangle")
 
 local function setRect(t, x, y, w, h)
 	t.x = assert(x)
@@ -17,91 +17,6 @@ local function getRect(out, r)
 	out.y = r.y
 	out.w = r.w
 	out.h = r.h
-end
-
-local function addPoint(points, x, y)
-	table.insert(points, x)
-	table.insert(points, y)
-end
-local function rectangle2(mode, x, y, w, h, r, rotateLeft, rotateRight)
-	local r1, r2, r3, r4 = r, r, r, r
-	if type(r) == "table" then
-		r1, r2, r3, r4 = r[1], r[2], r[3], r[4]
-	end
-
-	local points = {}
-	addPoint(points, x + r1, y)
-	addPoint(points, x + w - r2, y)
-	for a = -math.pi / 2, 0, math.pi / 64 do
-		addPoint(points, x + w - r2 + math.cos(a) * r2, y + r2 + math.sin(a) * r2)
-	end
-	addPoint(points, x + w, y + h)
-	addPoint(points, x, y + h)
-	addPoint(points, x, y + r1)
-	for a = -math.pi, -math.pi / 2, math.pi / 64 do
-		addPoint(points, x + r1 + math.cos(a) * r1, y + r1 + math.sin(a) * r1)
-	end
-	love.graphics.polygon(mode, points)
-
-	r = r3
-
-	points = {}
-	addPoint(points, x, y + h)
-	if rotateLeft then
-		addPoint(points, x - r, y + h)
-		for a = math.pi / 2, 0, -math.pi / 64 do
-			addPoint(points, x - r + math.cos(a) * r, y + h - r + math.sin(a) * r)
-		end
-		addPoint(points, x, y + h - r)
-	else
-		addPoint(points, x + r, y + h)
-		for a = -math.pi / 2, -math.pi, -math.pi / 64 do
-			addPoint(points, x + r + math.cos(a) * r, y + h + r + math.sin(a) * r)
-		end
-		addPoint(points, x, y + h + r)
-	end
-	love.graphics.polygon(mode, points)
-
-	r = r4
-
-	points = {}
-	addPoint(points, x + w, y + h)
-	if rotateRight then
-		addPoint(points, x + w + r, y + h)
-		for a = math.pi / 2, math.pi, math.pi / 64 do
-			addPoint(points, x + w + r + math.cos(a) * r, y + h - r + math.sin(a) * r)
-		end
-		addPoint(points, x + w, y + h - r)
-	else
-		addPoint(points, x + w, y + h + r)
-		for a = 0, -math.pi / 2, -math.pi / 64 do
-			addPoint(points, x + w - r + math.cos(a) * r, y + h + r + math.sin(a) * r)
-		end
-		addPoint(points, x + w - r, y + h)
-	end
-	love.graphics.polygon(mode, points)
-end
-
-local function rectangle3(mode, x, y, w, h, r, rotateLeft, rotateRight, rotateAll)
-	love.graphics.push()
-
-	if not rotateAll or rotateAll == 0 then
-		rectangle2(mode, 0, 0, w, h, r, rotateLeft, rotateRight)
-	elseif rotateAll == 1 then
-		love.graphics.translate(x + w, y)
-		love.graphics.rotate(math.pi / 2)
-		rectangle2(mode, 0, 0, h, w, r, rotateLeft, rotateRight)
-	elseif rotateAll == 2 then
-		love.graphics.translate(x + w, y + h)
-		love.graphics.rotate(math.pi)
-		rectangle2(mode, 0, 0, w, h, r, rotateLeft, rotateRight)
-	elseif rotateAll == 3 then
-		love.graphics.translate(x, y + h)
-		love.graphics.rotate(-math.pi / 2)
-		rectangle2(mode, 0, 0, h, w, r, rotateLeft, rotateRight)
-	end
-
-	love.graphics.pop()
 end
 
 local function drawFrame(rect)
@@ -176,10 +91,10 @@ return {
 		drawFrame(self.graphs)
 
 		setRect(self.graphs_sup_left, x1[2], y1[5], w1[2], h1[5])
-		rectangle2("fill", x1[2], y1[5], w1[2], h1[5], {36, h1[5] / 2, 36, h1[5] / 2}, false, true)
+		RoundedRectangle("fill", x1[2], y1[5], w1[2], h1[5], {36, h1[5] / 2, 36, h1[5] / 2}, false, true)
 
 		setRect(self.graphs_sup_right, x1[6], y1[5], w1[6], h1[5])
-		rectangle2("fill", x1[6], y1[5], w1[6], h1[5], {h1[5] / 2, 36, h1[5] / 2, 36}, true, false)
+		RoundedRectangle("fill", x1[6], y1[5], w1[6], h1[5], {h1[5] / 2, 36, h1[5] / 2, 36}, true, false)
 
 		setRect(self.column1, x1[2], y1[3], w1[2], h1[3])
 		drawFrame(self.column1)
@@ -198,27 +113,27 @@ return {
 
 		setRect(self.column1row1, x1[2], y3[1], w1[2], h3[1])
 		local x, y, w, h = getRect(nil, self.column1row1)
-		rectangle2("fill", x, y, w, h, 36)
+		RoundedRectangle("fill", x, y, w, h, 36)
 
 		setRect(self.column3row1, x1[6], y3[1], w1[6], h3[1])
 		local x, y, w, h = getRect(nil, self.column3row1)
-		rectangle2("fill", x, y, w, h, 36)
+		RoundedRectangle("fill", x, y, w, h, 36)
 
 		love.graphics.setColor(0.1, 0.1, 0.1, 0.8)
 
 		setRect(self.title_left, x11[2], y1[1], w11[2], h1[1])
-		rectangle3("fill", x11[2], y1[1], w11[2], h1[1], 36, false, false, 3)
+		RoundedRectangle("fill", x11[2], y1[1], w11[2], h1[1], 36, false, false, 3)
 
 		setRect(self.title_sub, x1[4], y1[2], w1[4], 72)
-		rectangle3("fill", x1[4], y1[2], w1[4], 72, 36, true, true, 2)
+		RoundedRectangle("fill", x1[4], y1[2], w1[4], 72, 36, true, true, 2)
 
 		setRect(self.title_right, x11[4], y1[1], w11[4], h1[1])
-		rectangle3("fill", x11[4], y1[1], w11[4], h1[1], 36, false, false, 1)
+		RoundedRectangle("fill", x11[4], y1[1], w11[4], h1[1], 36, false, false, 1)
 
 		love.graphics.setColor(0.4, 0.4, 0.4, 0.3)
 		-- love.graphics.setColor(0.4, 0.4, 0.4, 0.7)
 
 		setRect(self.middle_sub, x1[4], y2[3] - 72, w1[4], 72)
-		rectangle3("fill", x1[4], y2[3] - 72, w1[4], 72, 36, false, false, 2)
+		RoundedRectangle("fill", x1[4], y2[3] - 72, w1[4], 72, 36, false, false, 2)
 	end,
 }

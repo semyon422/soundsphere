@@ -110,9 +110,16 @@ ModifierModel.load = function(self)
 	end
 end
 
+ModifierModel.isChanged = function(self)
+	local changed = self.changed
+	self.changed = false
+	return changed
+end
+
 ModifierModel.setConfig = function(self, config)
 	self.config = config
 	self.modifierItemIndex = math.max(1, #config + 1)
+	self.changed = true
 end
 
 ModifierModel.scrollAvailableModifier = function(self, direction)
@@ -190,6 +197,7 @@ ModifierModel.add = function(self, modifier)
 	table.insert(config, index, modifierConfig)
 	self.modifierItemIndex = index + 1
 	modifier.added = true
+	self.changed = true
 end
 
 ModifierModel.remove = function(self, modifierConfig)
@@ -213,6 +221,7 @@ ModifierModel.remove = function(self, modifierConfig)
 		end
 	end
 	modifier.added = false
+	self.changed = true
 end
 
 ModifierModel.setModifierValue = function(self, modifierConfig, value)
@@ -222,6 +231,7 @@ ModifierModel.setModifierValue = function(self, modifierConfig, value)
 	end
 	local modifier = self:getModifier(modifierConfig)
 	modifier:setValue(modifierConfig, value)
+	self.changed = true
 end
 
 ModifierModel.increaseModifierValue = function(self, modifierConfig, delta)
@@ -242,6 +252,7 @@ ModifierModel.increaseModifierValue = function(self, modifierConfig, delta)
 		local indexValue = modifier:toIndexValue(modifierConfig.value)
 		modifier:setValue(modifierConfig, modifier:fromIndexValue(indexValue + delta * modifier.step))
 	end
+	self.changed = true
 end
 
 ModifierModel.apply = function(self, modifierType)

@@ -31,6 +31,9 @@ local Frames = {draw = function()
 	love.graphics.setColor(0, 0, 0, 0.8)
 	local x, y, w, h = 279, 144, 1362, 792
 	love.graphics.rectangle("fill", x, y, w, h, 36)
+
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.rectangle("line", x, y, w, h, 36)
 end}
 
 local ContainerBegin = {draw = function(self)

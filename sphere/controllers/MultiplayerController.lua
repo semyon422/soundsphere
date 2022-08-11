@@ -9,9 +9,9 @@ MultiplayerController.load = function(self)
 	mpModel.handlers = {
 		set = function(peer, key, value)
 			mpModel[key] = value
-			if key == "notechart" and not mpModel:isHost() then
+			if key == "notechart" then
 				self:findNotechart()
-			elseif key == "modifiers" then
+			elseif key == "modifiers" and not mpModel:isHost() then
 				self.game.modifierModel:setConfig(value)
 				self.game.configModel.configs.modifier = value
 				mpModel.modifiers = deepclone(value)
@@ -48,6 +48,8 @@ MultiplayerController.findNotechart = remote.wrap(function(self)
 	self.game.noteChartSetLibraryModel:findNotechart(mpModel.notechart.hash or "", mpModel.notechart.index or 0)
 	local items = self.game.noteChartSetLibraryModel.items
 
+	local selectModel = self.game.selectModel
+
 	mpModel.downloadingBeatmap = nil
 	local item = items[1]
 	if item then
@@ -56,18 +58,18 @@ MultiplayerController.findNotechart = remote.wrap(function(self)
 			noteChartId = item.noteChartId,
 			noteChartDataId = item.noteChartDataId,
 		}
-		self.game.selectModel:setConfig(item)
-		self.game.selectModel:pullNoteChartSet(true)
+		selectModel:setConfig(item)
+		selectModel:pullNoteChartSet(true)
 		mpModel.peer.setNotechartFound(true)
 		return
 	end
-	self.game.selectModel:setConfig({
+	selectModel:setConfig({
 		setId = 0,
 		noteChartId = 0,
 		noteChartDataId = 0,
 	})
 	mpModel.noteChartItem = nil
-	self.game.selectModel:pullNoteChartSet(true)
+	selectModel:pullNoteChartSet(true)
 	mpModel.peer.setNotechartFound(false)
 end)
 

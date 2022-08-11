@@ -44,12 +44,9 @@ local MultiplayerController			= require("sphere.controllers.MultiplayerControlle
 
 local GameView = require("sphere.views.GameView")
 local SelectView = require("sphere.views.SelectView")
-local ModifierView = require("sphere.views.ModifierView")
-local NoteSkinView = require("sphere.views.NoteSkinView")
-local InputView = require("sphere.views.InputView")
-local SettingsView = require("sphere.views.SettingsView")
 local ResultView = require("sphere.views.ResultView")
 local GameplayView = require("sphere.views.GameplayView")
+local MultiplayerView = require("sphere.views.MultiplayerView")
 
 local GameController = Class:new()
 
@@ -67,12 +64,9 @@ GameController.construct = function(self)
 
 	self.gameView = GameView:new()
 	self.selectView = SelectView:new()
-	self.modifierView = ModifierView:new()
-	self.noteSkinView = NoteSkinView:new()
-	self.inputView = InputView:new()
-	self.settingsView = SettingsView:new()
 	self.resultView = ResultView:new()
 	self.gameplayView = GameplayView:new()
+	self.multiplayerView = MultiplayerView:new()
 
 	self.configModel = ConfigModel:new()
 	self.notificationModel = NotificationModel:new()

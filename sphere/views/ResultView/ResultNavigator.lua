@@ -10,7 +10,7 @@ ResultNavigator.receive = function(self, event)
 	local s = event[2]
 	if s == "up" then self.game.selectModel:scrollScore(-1)
 	elseif s == "down" then self.game.selectModel:scrollScore(1)
-	elseif s == "escape" then self.screenView:changeScreen("selectView")
+	elseif s == "escape" then self.screenView:quit()
 	elseif s == "return" then self.screenView:loadScore()
 	elseif s == "f1" then self.screenView.subscreen = "debug"
 	elseif s == "f2" then self.screenView.subscreen = "scoreSystemDebug"

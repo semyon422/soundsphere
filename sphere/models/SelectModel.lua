@@ -40,6 +40,10 @@ SelectModel.isChanged = function(self)
 	return changed
 end
 
+SelectModel.setChanged = function(self)
+	self.changed = true
+end
+
 SelectModel.notechartExists = function(self)
 	local noteChartItem = self.noteChartItem
 	if noteChartItem then
