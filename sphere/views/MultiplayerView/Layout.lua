@@ -61,14 +61,10 @@ return {
 		local x_int = 24
 		local y_int = 55
 
-		local x0, w0 = just_layout(0, 1920, {1920})
+		local x0, w0 = just_layout(_x, _w, {-1})
 		local x1, w1 = just_layout(_x, _w, {y_int, -1/2, x_int, -1/3, x_int, -(1 - 1/2 - 1/3), y_int})
 
 		local y0, h0 = just_layout(0, 1080, {89, y_int, -1, y_int, 1080 / 3})
-
-		self.x0, self.w0 = x0, w0
-		self.x1, self.w1 = x1, w1
-		self.y0, self.h0 = y0, h0
 
 		setRect(self.header, x0[1], y0[1], w0[1], h0[1])
 		setRect(self.footer, x0[1], y0[5], w0[1], h0[5])
