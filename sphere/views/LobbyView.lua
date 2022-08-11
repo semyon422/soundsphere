@@ -48,6 +48,8 @@ LobbyView.draw = function(self)
 	local status = multiplayerModel.status
 	if status ~= "connected" then
 		LabelImView("Connection status", status, inputHeight)
+	elseif not multiplayerModel.user then
+		LabelImView("Login status", "Not logged in", inputHeight)
 	elseif not multiplayerModel.selectedRoom and not multiplayerModel.room then
 		just.indent(r)
 		LabelImView("Create room", "Create room", inputHeight)

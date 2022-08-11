@@ -238,6 +238,14 @@ MultiplayerModel.login = remote.wrap(function(self)
 	local key = self.peer.login()
 	if not key then
 		return
+	elseif key == "" then
+		local user = self.game.configModel.configs.online.user
+		local id, name = 0, "username"
+		if user and user.name then
+			id = user.id
+			name = user.name
+		end
+		return self.peer.loginOffline(id, name)
 	end
 
 	print("POST " .. api.auth.multiplayer)

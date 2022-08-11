@@ -15,6 +15,13 @@ MultiplayerController.load = function(self)
 				self.game.modifierModel:setConfig(value)
 				self.game.configModel.configs.modifier = value
 				mpModel.modifiers = deepclone(value)
+			elseif key == "roomUsers" then
+				for _, user in ipairs(value) do
+					if user.id == mpModel.user.id then
+						mpModel.user = user
+						break
+					end
+				end
 			end
 		end,
 		startMatch = function(peer)
