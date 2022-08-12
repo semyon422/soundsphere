@@ -159,11 +159,6 @@ RhythmModel.setNoteSkin = function(self, noteSkin)
 	self.graphicEngine.noteSkin = noteSkin
 end
 
-RhythmModel.setInputBindings = function(self, inputBindings)
-	assert(inputBindings)
-	self.inputManager:setBindings(inputBindings)
-end
-
 RhythmModel.setVolume = function(self, volume)
 	self.audioEngine.volume = volume
 	self.audioEngine:updateVolume()

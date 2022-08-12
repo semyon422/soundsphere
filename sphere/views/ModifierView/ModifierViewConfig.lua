@@ -45,6 +45,10 @@ local ContainerBegin = {draw = function(self)
 	local over = just.is_over(w, h)
 	just.container("modifiers window", over)
 	just.wheel_over("modifiers window", over)
+
+	if just.keypressed("escape") then
+		self.game.gameView.modifierView:toggle(false)
+	end
 end}
 
 local ContainerEnd = {draw = function(self)

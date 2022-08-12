@@ -32,7 +32,7 @@ MultiplayerNavigator.receive = function(self, event)
 			elseif s == "return" then modifierModel:add()
 			end
 		end
-		if s == "escape" or s == "f1" then modifierView:toggle(false) end
+		if s == "f1" then modifierView:toggle(false) end
 		return
 	end
 end

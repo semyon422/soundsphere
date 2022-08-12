@@ -127,41 +127,6 @@ LobbyView.draw = function(self)
 	love.graphics.pop()
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.rectangle("line", 0, 0, w, h, r)
-
-	-- if imgui.BeginListBox("Rooms", {0, 150}) then
-	-- 	for i = 1, #multiplayerModel.rooms do
-	-- 		local room = multiplayerModel.rooms[i]
-	-- 		local isSelected = multiplayerModel.selectedRoom == room
-	-- 		local name = room.name
-	-- 		if room.isPlaying then
-	-- 			name = name .. " (playing)"
-	-- 		end
-	-- 		if imgui.Selectable_Bool(name, isSelected) then
-	-- 			multiplayerModel.selectedRoom = room
-	-- 			if not multiplayerModel.room then
-	-- 				multiplayerModel:joinRoom("")
-	-- 			end
-	-- 		end
-
-	-- 		if isSelected then
-	-- 			imgui.SetItemDefaultFocus()
-	-- 		end
-	-- 	end
-	-- 	imgui.EndListBox()
-	-- end
-
-	-- imgui.Separator()
-
-	-- imgui.Text("Create new room")
-	-- imgui.InputText("Name", roomNamePtr, ffi.sizeof(roomNamePtr))
-	-- imgui.InputText("Password (optional)", newRoomPasswordPtr, ffi.sizeof(newRoomPasswordPtr), imgui.love.InputTextFlags("Password"))
-	-- if imgui.Button("Create room") then
-	-- 	local name = ffi.string(roomNamePtr)
-	-- 	local password = ffi.string(newRoomPasswordPtr)
-	-- 	if name ~= "" then
-	-- 		multiplayerModel:createRoom(name, password)
-	-- 	end
-	-- end
 end
 
 return LobbyView

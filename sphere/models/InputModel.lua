@@ -1,106 +1,109 @@
-local Class			= require("aqua.util.Class")
+local Class = require("aqua.util.Class")
 
 local InputModel = Class:new()
 
-InputModel.path = "userdata/input.json"
-
-InputModel.mode = "external"
-InputModel.inputModeString = ""
-
-InputModel.types = {
+InputModel.inputMode = ""
+InputModel.devices = {
 	"keyboard",
 	"gamepad",
 	"joystick",
 	"midi"
 }
 
-InputModel.load = function(self)
-	self.inputBindings = self.game.configModel.configs.input
+InputModel.transformEvent = function(self, inputMode, event)
+	if not event.name:find("^.+pressed$") and not event.name:find("^.+released$") then
+		return
+	end
+
+	local device = event.name:match("^(.+)pressed$") or event.name:match("^(.+)released$")
+	if device == "key" then
+		device = "keyboard"
+	end
+
+	local state = true
+	if event.name:find("^.+released$") then
+		state = false
+	end
+
+	local key = event[2]
+	if device == "midi" then
+		key = event[1]
+	end
+
+	local config = self.game.configModel.configs.input
+	local inputConfig = config[inputMode]
+	local deviceConfig = inputConfig and inputConfig[device]
+
+	if not deviceConfig then
+		return
+	end
+
+	local _i
+	for i, k in pairs(deviceConfig) do
+		if type(k) == "table" then
+			for _, _k in pairs(k) do
+				if _k == key then
+					_i = i
+					break
+				end
+			end
+		elseif k == key then
+			_i = i
+			break
+		end
+	end
+
+	local inputs = self:getInputs(inputMode)
+	return inputs[_i], state
 end
 
-InputModel.unload = function(self) end
+InputModel.setKey = function(self, inputMode, virtualKey, device, key)
+	local inputs = self:getInputs(inputMode)
 
-InputModel.getInputBindings = function(self)
-	return self.inputBindings
-end
-
-InputModel.setKey = function(self, inputMode, virtualKey, key, type)
-	if type == "midi" then
+	if device == "midi" then
 		key = tonumber(key)
 	end
 
-	local inputBindings = self.inputBindings
+	local config = self.game.configModel.configs.input
 
-	inputBindings[inputMode] = inputBindings[inputMode] or {}
-	local inputConfig = inputBindings[inputMode]
+	config[inputMode] = config[inputMode] or {}
+	local inputConfig = config[inputMode]
 
-	inputConfig.press = inputConfig.press or {}
-	local press = inputConfig.press
-	press[type] = press[type] or {}
+	inputConfig[device] = inputConfig[device] or {}
+	local deviceConfig = inputConfig[device]
 
-	inputConfig.release = inputConfig.release or {}
-	local release = inputConfig.release
-	release[type] = release[type] or {}
-
-	for type, keys in pairs(press) do
-		for key, data in pairs(keys) do
-			if data.press and data.press[1] == virtualKey then
-				press[type][key] = nil
-			end
-		end
-	end
-	for type, keys in pairs(release) do
-		for key, data in pairs(keys) do
-			if data.release and data.release[1] == virtualKey then
-				release[type][key] = nil
-			end
-		end
-	end
-
-	press[type][key] = {
-		press = {virtualKey},
-		release = {}
-	}
-	release[type][key] = {
-		press = {},
-		release = {virtualKey}
-	}
+	deviceConfig[inputs[virtualKey]] = key
 end
 
-InputModel.getKey = function(self, inputMode, virtualKey)
-	local inputBindings = self.inputBindings
+InputModel.getKey = function(self, inputMode, virtualKey, device)
+	local inputs = self:getInputs(inputMode)
 
-	local inputConfig = inputBindings[inputMode]
+	local config = self.game.configModel.configs.input
+	local inputConfig = config[inputMode]
+	local deviceConfig = inputConfig and inputConfig[device]
+	local key = deviceConfig and deviceConfig[inputs[virtualKey]]
 
-	if not inputConfig or not inputConfig.press then
-		return "none", "none"
+	if type(key) == "table" then
+		key = table.concat(key, ", ")
 	end
 
-	for type, keys in pairs(inputConfig.press) do
-		for key, data in pairs(keys) do
-			if data.press and data.press[1] == virtualKey then
-				return key, type
-			end
-		end
-	end
-
-	return "none", "none"
+	return key or "none"
 end
 
-InputModel.getInputs = function(self, inputModeString)
-	if inputModeString == self.inputModeString then
+InputModel.getInputs = function(self, inputMode)
+	if inputMode == self.inputMode then
 		return self.inputs
 	end
-	self.inputModeString = inputModeString
+	self.inputMode = inputMode
 
 	local inputs = {}
 	self.inputs = inputs
 
-	for inputCount, inputType in inputModeString:gmatch("([0-9]+)([a-z]+)") do
+	for inputCount, inputType in inputMode:gmatch("([0-9]+)([a-z]+)") do
 		for i = 1, inputCount do
-			inputs[#inputs + 1] = {
-				virtualKey = inputType .. i
-			}
+			local input = inputType .. i
+			inputs[i] = input
+			inputs[input] = i
 		end
 	end
 

@@ -1,4 +1,5 @@
 local Navigator = require("sphere.views.Navigator")
+local just = require("just")
 
 local SelectNavigator = Navigator:new({construct = false})
 
@@ -17,10 +18,6 @@ SelectNavigator.receive = function(self, event)
 	local modifierModel = self.game.modifierModel
 	local subscreen = self.screenView.subscreen
 	local s = event[2]
-
-	if s == "escape" then
-		gameView:hideAllWindows()
-	end
 
 	local modifierView = gameView.modifierView
 	if modifierView.isOpen then
