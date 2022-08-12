@@ -36,6 +36,7 @@
     ],
     "Lua.workspace.checkThirdParty": false,
     "Lua.diagnostics.disable": [
-        "undefined-field"
+        "undefined-field",
+        "cast-local-type"
     ]
 }
