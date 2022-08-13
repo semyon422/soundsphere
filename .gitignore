@@ -3,12 +3,12 @@ userdata/hitsounds/*
 userdata/export/*
 userdata/replays/*
 userdata/screenshots/*
+userdata/charts
+userdata/export
+userdata/replays
+userdata/screenshots
+userdata/hitsounds
 !userdata/hitsounds/midi
-!userdata/charts/.keep
-!userdata/hitsounds/.keep
-!userdata/export/.keep
-!userdata/replays/.keep
-!userdata/screenshots/.keep
 
 userdata/charts.db
 userdata/scores.db
