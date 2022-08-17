@@ -6,21 +6,6 @@ local UpdateModel = Class:new()
 
 UpdateModel.status = ""
 
-UpdateModel.load = function(self)
-	local configs = self.game.configModel.configs
-
-	if
-		not configs.settings.miscellaneous.autoUpdate or
-		configs.urls.update == "" or
-		love.filesystem.getInfo(".git")
-	then
-		return
-	end
-
-	print("start auto update")
-	self:updateFiles()
-end
-
 local crossFiles = function(server, client)
 	local filemap = {}
 	for _, file in ipairs(server) do
@@ -51,7 +36,6 @@ end
 local async_download = thread.async(function(url, path)
 	local request = require("luajit-request")
 	local socket_url = require("socket.url")
-	require("preloaders.preloadall")
 
 	url = socket_url.build(socket_url.parse(url))
 	local response, _, err = request.send(url)
@@ -82,18 +66,20 @@ UpdateModel.setStatus = function(self, status)
 	print(status)
 end
 
-UpdateModel.updateFiles = thread.coro(function(self)
+UpdateModel.updateFilesAsync = function(self)
 	local configs = self.game.configModel.configs
 	self:setStatus("Checking for updates...")
 
 	local response = async_download(configs.urls.update)
 	if not response then
-		return self:setStatus("Can't download file list")
+		self:setStatus("Can't download file list")
+		return
 	end
 
 	local status, server_filelist = pcall(json.decode, response)
 	if not status then
-		return self:setStatus("Can't decode json")
+		self:setStatus("Can't decode json")
+		return
 	end
 
 	local client_filelist = configs.files
@@ -105,12 +91,13 @@ UpdateModel.updateFiles = thread.coro(function(self)
 			self:setStatus(("remove: %s"):format(file.path))
 			async_remove(file.path)
 		elseif file.hash and not file.hash_old or file.hash ~= file.hash_old then
-			print("check", file.path)
+			self:setStatus(("check: %s"):format(file.path))
 			if file.hash ~= async_crc32(file.path) then
 				self:setStatus(("download: %s"):format(file.path))
 				local res, err = async_download(file.url, file.path)
 				if not res then
-					return self:setStatus(err)
+					self:setStatus(err)
+					return
 				end
 				count = count + 1
 			end
@@ -130,6 +117,10 @@ UpdateModel.updateFiles = thread.coro(function(self)
 	end
 
 	self.game.configModel:write("files")
-end)
+
+	return count > 0
+end
+
+UpdateModel.updateFiles = thread.coro(UpdateModel.updateFilesAsync)
 
 return UpdateModel

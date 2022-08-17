@@ -72,23 +72,43 @@ if moddedgame and moddedgame.type == "directory" then
 	aquafs.mount(root .. "/moddedgame", "/", false)
 end
 
-require("luamidi")
-
-setmetatable(_G, {
-	__newindex = function(a, b, c)
-		print(a, b, c, debug.traceback())
-		rawset(a, b, c)
-	end
-})
-
 require("preloaders.preloadall")
 require("luajit-request").init()
 
-local aquaevent = require("aqua.event")
-aquaevent:init()
+local defaultLoop = love.loop or love.run()
+function love.run()
+	return function()
+		return defaultLoop()
+	end
+end
 
-local GameController = require("sphere.controllers.GameController")
-local game = GameController:new()
+local aquathread = require("aqua.thread")
+aquathread.coro(function()
+	local UpdateController = require("sphere.controllers.UpdateController")
+	local updateController = UpdateController:new()
+	local needRestart = updateController:updateAsync()
+	if needRestart then
+		aquathread.unload()
+		aquathread.waitAsync()
+		return love.event.quit("restart")
+	end
 
-aquaevent:add(game)
-game:load()
+	require("luamidi")
+
+	setmetatable(_G, {
+		__newindex = function(a, b, c)
+			print(a, b, c, debug.traceback())
+			rawset(a, b, c)
+		end
+	})
+
+	local GameController = require("sphere.controllers.GameController")
+	local game = GameController:new()
+
+	game:load()
+
+	local aquaevent = require("aqua.event")
+	aquaevent:init()
+	defaultLoop = aquaevent.run()
+	aquaevent:add(game)
+end)()

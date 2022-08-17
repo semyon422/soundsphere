@@ -3,8 +3,6 @@ local cursor = require("sphere.cursor")
 
 local WindowManager = Class:new()
 
-WindowManager.path = "userdata/window.json"
-
 WindowManager.load = function(self)
 	self.graphics = self.game.configModel.configs.settings.graphics
 	self.mode = self.graphics.mode
@@ -17,7 +15,9 @@ WindowManager.load = function(self)
 	else
 		width, height = mode.window.width, mode.window.height
 	end
-	love.window.setMode(width, height, mode.flags)
+	if not love.window.isOpen() then
+		love.window.setMode(width, height, mode.flags)
+	end
 
 	self:setIcon()
 	love.window.setTitle("soundsphere")
