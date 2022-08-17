@@ -4,7 +4,11 @@ local JudgementsDropdownView = DropdownView:new()
 
 JudgementsDropdownView.load = function(self)
 	self.items = {}
-	for k in pairs(self.game.rhythmModel.scoreEngine.scoreSystem.judgement.judgementLists) do
+	local judgement = self.game.rhythmModel.scoreEngine.scoreSystem.judgement
+	if not judgement then
+		return
+	end
+	for k in pairs(judgement.judgementLists) do
 		table.insert(self.items, k)
 	end
 	table.sort(self.items)

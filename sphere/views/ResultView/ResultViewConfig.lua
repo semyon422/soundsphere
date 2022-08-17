@@ -242,7 +242,11 @@ local Judgements = {draw = function(self)
 	local show = showLoadedScore(self)
 	local scoreEngine = self.game.rhythmModel.scoreEngine
 	local scoreItem = self.game.selectModel.scoreItem
-	local noteChartItem = self.game.selectModel.noteChartItem
+	local judgement = scoreEngine.scoreSystem.judgement
+
+	if not judgement then
+		return
+	end
 
 	local padding = 24
 
@@ -253,9 +257,9 @@ local Judgements = {draw = function(self)
 	local w = self.w - padding * 2
 
 	local counterName = self.game.configModel.configs.select.judgements
-	local counters = scoreEngine.scoreSystem.judgement.counters
-	local judgements = scoreEngine.scoreSystem.judgement.judgements
-	local judgementLists = scoreEngine.scoreSystem.judgement.judgementLists
+	local counters = judgement.counters
+	local judgements = judgement.judgements
+	local judgementLists = judgement.judgementLists
 	local counter = counters[counterName]
 
 	local base = scoreEngine.scoreSystem.base
@@ -319,6 +323,11 @@ local NotechartInfo = {draw = function(self)
 		topScoreItem = scoreItem
 	end
 
+	local scoreEntry = scoreEngine.scoreEntry
+	if not scoreEntry then
+		return
+	end
+
 	local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
 
 	local show = showLoadedScore(self)
@@ -366,8 +375,8 @@ local NotechartInfo = {draw = function(self)
 	just.indent(36)
 	just.text(("%0.2fx"):format(show and baseTimeRate or scoreItem.timeRate))
 
-	local failed = scoreEngine.scoreSystem.hp.failed
-	if show and failed then
+	local hp = scoreEngine.scoreSystem.hp
+	if show and hp and hp.failed then
 		just.sameline()
 		just.offset(0)
 
@@ -386,7 +395,6 @@ local NotechartInfo = {draw = function(self)
 	local accuracyValue = show and normalscore.accuracyAdjusted or scoreItem.accuracy
 	local accuracy = Format.accuracy(accuracyValue)
 
-	local scoreEntry = scoreEngine.scoreEntry
 	local rating = scoreItem.rating
 
 	if scoreEntry.id == scoreItem.id then

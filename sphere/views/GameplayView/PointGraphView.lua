@@ -6,12 +6,18 @@ local inside = require("aqua.util.inside")
 
 local PointGraphView = Class:new()
 
+PointGraphView.startTime = 0
+PointGraphView.endTime = 0
+
 PointGraphView.load = function(self)
 	self.drawnPoints = 0
 	self.drawnBackgroundPoints = 0
 
-	self.startTime = self.game.noteChartModel.noteChart.metaData:get("minTime")
-	self.endTime = self.game.noteChartModel.noteChart.metaData:get("maxTime")
+	local noteChart = self.game.noteChartModel.noteChart
+	if noteChart then
+		self.startTime = noteChart.metaData:get("minTime")
+		self.endTime = noteChart.metaData:get("maxTime")
+	end
 
 	self.canvas = love.graphics.newCanvas()
 	self.backgroundCanvas = love.graphics.newCanvas()
@@ -56,8 +62,10 @@ PointGraphView.drawPoints = function(self, counter, canvas, color, radius)
 	love.graphics.replaceTransform(tf)
 
 	local points = inside(self, self.key)
-	for i = self[counter] + 1, #points do
-		self:drawPoint(points[i], color, radius)
+	if points then
+		for i = self[counter] + 1, #points do
+			self:drawPoint(points[i], color, radius)
+		end
 	end
 	self[counter] = #points
 

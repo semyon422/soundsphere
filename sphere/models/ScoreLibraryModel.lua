@@ -86,10 +86,15 @@ ScoreLibraryModel.updateItemsOnline = function(self)
 	print("GET " .. api.notecharts[id].scores)
 	local scores = api.notecharts[id].scores:get({
 		user = true,
+		file = true,
 		modifierset = true,
 	})
 	self.items = scores or {}
 	self.scoreSourceName = "online"
+
+	for i, score in ipairs(self.items) do
+		self.items[i] = self:transformOnlineScore(score)
+	end
 end
 
 ScoreLibraryModel.updateItemsLocal = function(self)
@@ -123,6 +128,36 @@ ScoreLibraryModel.getItemIndex = function(self, scoreEntryId)
 	end
 
 	return 1
+end
+
+ScoreLibraryModel.transformOnlineScore = function(self, score)
+	local s = {
+		id = score.id,
+		noteChartHash = "",
+		noteChartIndex = 1,
+		isTop = false,
+		playerName = score.user.name,
+		time = score.created_at,
+		accuracy = score.accuracy,
+		maxCombo = score.max_combo,
+		modifiers = score.modifierset.encoded,
+		replayHash = score.file.hash,
+		pauses = 0,
+		ratio = score.ratio0,
+		perfect = 0,
+		notPerfect = 0,
+		missCount = score.misses_count,
+		mean = 0,
+		earlylate = 0,
+		inputMode = score.inputmode,
+		timeRate = score.modifierset.timerate,
+		difficulty = score.difficulty,
+		pausesCount = 0,
+	}
+	for k, v in pairs(s) do
+		score[k] = v
+	end
+	return score
 end
 
 return ScoreLibraryModel

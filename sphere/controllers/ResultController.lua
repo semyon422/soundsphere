@@ -1,4 +1,5 @@
-local Class				= require("aqua.util.Class")
+local Class = require("aqua.util.Class")
+local aquathread = require("aqua.thread")
 
 local ResultController = Class:new()
 
@@ -25,22 +26,30 @@ ResultController.load = function(self)
 		return
 	end
 
-	self:replayNoteChart("result", scoreItem)
 	self.game.selectModel:scrollScore(nil, scoreItemIndex)
 end
 
-ResultController.replayNoteChart = function(self, mode, scoreEntry)
+local readAsync = aquathread.async(function(...) return love.filesystem.read(...) end)
+
+ResultController.replayNoteChartAsync = function(self, mode, scoreEntry)
 	if not self.game.selectModel:notechartExists() then
 		return
 	end
 
-	local hash = scoreEntry.replayHash
+	local replayModel = self.game.replayModel
 	local rhythmModel = self.game.rhythmModel
-	local replay = self.game.replayModel:loadReplay(hash)
-
 	local modifierModel = self.game.modifierModel
-	modifierModel:setConfig(modifierModel:decode(scoreEntry.modifiers))
-	if #modifierModel.config == 0 and replay.modifiers then
+	local webApi = self.game.onlineModel.webApi
+
+	local content
+	if scoreEntry.file then
+		content = webApi.api.files[scoreEntry.file.id]:__get({download = true})
+	elseif scoreEntry.replayHash then
+		content = readAsync(replayModel.path .. "/" .. scoreEntry.replayHash)
+	end
+	local replay = replayModel:loadReplay(content)
+
+	if replay.modifiers then
 		modifierModel:setConfig(replay.modifiers)
 		modifierModel:fixOldFormat(replay.modifiers, not replay.timings)
 	end
@@ -74,5 +83,7 @@ ResultController.replayNoteChart = function(self, mode, scoreEntry)
 
 	return true
 end
+
+ResultController.replayNoteChart = aquathread.coro(ResultController.replayNoteChartAsync)
 
 return ResultController

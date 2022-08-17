@@ -2,6 +2,7 @@ local Class			= require("aqua.util.Class")
 local Observable	= require("aqua.util.Observable")
 local Replay		= require("sphere.models.ReplayModel.Replay")
 local md5			= require("md5")
+local aquathread = require("aqua.thread")
 
 local ReplayModel = Class:new()
 
@@ -69,16 +70,13 @@ ReplayModel.saveReplay = function(self)
 	return replayHash
 end
 
-ReplayModel.loadReplay = function(self, replayHash)
-	local path = self.path .. "/" .. replayHash
-
-	local info = love.filesystem.getInfo(path)
-	if not info or info.type == "directory" then
-		return Replay:new()
+ReplayModel.loadReplay = function(self, content)
+	local replay = Replay:new()
+	if not content then
+		return replay
 	end
 
-	local replayString = love.filesystem.read(path)
-	return Replay:new():fromString(replayString)
+	return replay:fromString(content)
 end
 
 return ReplayModel

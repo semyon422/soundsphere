@@ -41,7 +41,7 @@ ScoreListView.drawItem = function(self, i, w, h)
 	local timeRate = item.timeRate
 	local inputMode = item.inputMode
 
-	if scoreEntry.id == item.id then
+	if loaded then
 		local erfunc = require("libchart.erfunc")
 		local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 		local normalscore = scoreEngine.scoreSystem.normalscore
@@ -58,12 +58,31 @@ ScoreListView.drawItem = function(self, i, w, h)
 
 	local cw = (w - 44) / 5
 
+	local scoreSourceName = self.game.scoreLibraryModel.scoreSourceName
+	if scoreSourceName == "online" then
+		return self:drawItemOnline(i, w, h)
+	end
+
 	just.row(true)
 	just.indent(22)
 	TextCellImView(cw, h, "right", i == 1 and "rank" or "", item.rank, true)
 	TextCellImView(cw, h, "right", i == 1 and "rating" or "", Format.difficulty(rating), true)
 	TextCellImView(cw, h, "right", i == 1 and "time rate" or "", Format.timeRate(timeRate), true)
 	TextCellImView(cw * 2, h, "right", item.time ~= 0 and time_ago_in_words(item.time) or "never", Format.inputMode(inputMode))
+	just.row(false)
+end
+
+ScoreListView.drawItemOnline = function(self, i, w, h)
+	local item = self.items[i]
+	w = (w - 44) / 7
+
+	just.row(true)
+	just.indent(22)
+	TextCellImView(w, h, "right", i == 1 and "rank" or "", item.rank)
+	TextCellImView(w, h, "right", i == 1 and "rating" or "", Format.difficulty(item.rating))
+	TextCellImView(w, h, "right", i == 1 and "rate" or "", Format.timeRate(item.modifierset.timerate))
+	TextCellImView(w, h, "right", i == 1 and "mode" or "", Format.inputMode(item.inputmode))
+	TextCellImView(w * 3, h, "right", item.time ~= 0 and time_ago_in_words(item.created_at) or "never", item.user.name)
 	just.row(false)
 end
 
