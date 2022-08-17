@@ -44,9 +44,16 @@ local async_download = thread.async(function(url, path)
 		return body, err
 	end
 
-	local directory = path:match("^(.+)/.-$")
+	local directory, name = path:match("^(.+)/(.-)$")
 	if directory and not love.filesystem.createDirectory(directory) then
 		return false, ("Could not open directory %s (not a directory)"):format(directory)
+	end
+
+	if name == "conf.lua" then
+		local f = assert(io.open(path, "w"))
+		f:write(body)
+		f:close()
+		return
 	end
 
 	return love.filesystem.write(path, body)
