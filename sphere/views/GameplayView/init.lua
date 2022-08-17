@@ -35,6 +35,12 @@ GameplayView.unload = function(self)
 	self.viewConfig[self.playfieldViewConfigIndex] = self.playfieldViewConfig
 end
 
+GameplayView.retry = function(self)
+	self.game.gameplayController:retry()
+	self.sequenceView:unload()
+	self.sequenceView:load()
+end
+
 GameplayView.update = function(self, dt)
 	self.game.gameplayController:update(dt)
 
@@ -47,7 +53,7 @@ GameplayView.update = function(self, dt)
 
 	if self.game.rhythmModel.pauseManager.needRetry then
 		self.failed = false
-		self.game.gameplayController:retry()
+		self:retry()
 	end
 
 	local timeEngine = self.game.rhythmModel.timeEngine
