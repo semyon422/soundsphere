@@ -75,7 +75,9 @@ end
 require("preloaders.preloadall")
 require("luajit-request").init()
 
-local defaultLoop = love.loop or love.run()
+local love_run = require("love_run")
+love.load = function() end  -- for compatibility with old conf.lua
+local defaultLoop = love.loop or love_run()
 function love.run()
 	return function()
 		return defaultLoop()
