@@ -36,7 +36,7 @@ return {
 			input = false,
 			visual = false
 		},
-		pauseOnFail = false,
+		actionOnFail = "none",
 		ratingHitTimingWindow = 0.032,
 		scaleSpeed = false,
 		speed = 1,

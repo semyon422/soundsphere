@@ -24,10 +24,11 @@ local settings = {
 		type = "Checkbox",
 	},
 	{
-		name = "pause on fail",
+		name = "action on fail",
 		section = "gameplay",
-		key = "gameplay.pauseOnFail",
-		type = "Checkbox",
+		key = "gameplay.actionOnFail",
+		type = "Combo",
+		values = {"none", "pause", "quit"},
 	},
 	{
 		name = "scale scroll speed with rate",

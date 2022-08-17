@@ -61,11 +61,15 @@ GameplayView.update = function(self, dt)
 		self:quit()
 	end
 
-	local pauseOnFail = self.game.configModel.configs.settings.gameplay.pauseOnFail
+	local actionOnFail = self.game.configModel.configs.settings.gameplay.actionOnFail
 	local failed = self.game.rhythmModel.scoreEngine.scoreSystem.hp.failed
-	if pauseOnFail and failed and not self.failed then
-		self.game.gameplayController:changePlayState("pause")
-		self.failed = true
+	if failed and not self.failed then
+		if actionOnFail == "pause" then
+			self.game.gameplayController:changePlayState("pause")
+			self.failed = true
+		elseif actionOnFail == "quit" then
+			self:quit()
+		end
 	end
 
 	local multiplayerModel = self.game.multiplayerModel
