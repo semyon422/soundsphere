@@ -99,11 +99,13 @@ InputModel.getInputs = function(self, inputMode)
 	local inputs = {}
 	self.inputs = inputs
 
+	local j = 1
 	for inputCount, inputType in inputMode:gmatch("([0-9]+)([a-z]+)") do
 		for i = 1, inputCount do
 			local input = inputType .. i
-			inputs[i] = input
-			inputs[input] = i
+			inputs[j] = input
+			inputs[input] = j
+			j = j + 1
 		end
 	end
 
