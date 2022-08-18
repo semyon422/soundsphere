@@ -42,8 +42,6 @@ InputView.draw = function(self)
 	local w, h = 454 * 1.5, 1080 / 2
 	local r = 8
 
-	love.graphics.push()
-
 	love.graphics.setColor(0, 0, 0, 0.8)
 	love.graphics.rectangle("fill", 0, 0, w, h, r)
 	love.graphics.setColor(1, 1, 1, 1)
@@ -107,7 +105,6 @@ InputView.draw = function(self)
 		self.scroll = math.min(math.max(self.scroll - scroll * 50, 0), overlap)
 	end
 
-	love.graphics.pop()
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.rectangle("line", 0, 0, w, h, r)
 end

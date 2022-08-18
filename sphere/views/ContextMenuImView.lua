@@ -10,7 +10,6 @@ return function(w)
 		just.container()
 		height = just.height - height_start
 		just.clip()
-		love.graphics.pop()
 		love.graphics.setColor(1, 1, 1, 1)
 		love.graphics.rectangle("line", 0, 0, width, height, 8, 8)
 		if just.button("close context menu", not over) or w then
@@ -28,8 +27,6 @@ return function(w)
 		ix, iy = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	end
 	love.graphics.translate(ix, iy)
-
-	love.graphics.push()
 
 	love.graphics.setColor(0, 0, 0, 1)
 	love.graphics.rectangle("fill", 0, 0, width, height, 8, 8)
