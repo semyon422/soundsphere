@@ -129,29 +129,31 @@ end
 JudgementScoreSystem.notes = {
 	ShortNote = {
 		clear = {
-			passed = function(self, event) self:hit(event) end,
-			missed = function(self, event) self:hit(event) end,
+			passed = "hit",
+			missed = "hit",
+			clear = nil,
 		},
 	},
 	LongNote = {
 		clear = {
-			startPassedPressed = function(self, event) self:hit(event) end,
-			startMissed = function(self, event) self:hit(event) end,
-			startMissedPressed = function(self, event) self:hit(event) end,
+			startPassedPressed = "hit",
+			startMissed = "hit",
+			startMissedPressed = "hit",
+			clear = nil,
 		},
 		startPassedPressed = {
 			startMissed = nil,
-			endMissed = function(self, event) self:hit(event) end,
-			endPassed = function(self, event) self:hit(event) end,
+			endMissed = "hit",
+			endPassed = "hit",
 		},
 		startMissedPressed = {
-			endMissedPassed = function(self, event) self:hit(event) end,
+			endMissedPassed = "hit",
 			startMissed = nil,
-			endMissed = function(self, event) self:hit(event) end,
+			endMissed = "hit",
 		},
 		startMissed = {
 			startMissedPressed = nil,
-			endMissed = function(self, event) self:hit(event) end,
+			endMissed = "hit",
 		},
 	},
 }

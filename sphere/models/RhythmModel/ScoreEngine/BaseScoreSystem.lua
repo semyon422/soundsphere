@@ -88,31 +88,31 @@ end
 BaseScoreSystem.notes = {
 	ShortNote = {
 		clear = {
-			passed = {BaseScoreSystem.success, function(self, event) self:countLastMean(event) end},
-			missed = {BaseScoreSystem.breakCombo, BaseScoreSystem.miss},
-			clear = BaseScoreSystem.earlyHit,
+			passed = {"success", "countLastMean"},
+			missed = {"breakCombo", "miss"},
+			clear = "earlyHit",
 		},
 	},
 	LongNote = {
 		clear = {
-			startPassedPressed = function(self, event) self:countLastMean(event) end,
-			startMissed = BaseScoreSystem.breakComboLongNote,
-			startMissedPressed = BaseScoreSystem.breakComboLongNote,
-			clear = BaseScoreSystem.earlyHit,
+			startPassedPressed = "countLastMean",
+			startMissed = "breakComboLongNote",
+			startMissedPressed = "breakComboLongNote",
+			clear = "earlyHit",
 		},
 		startPassedPressed = {
-			startMissed = BaseScoreSystem.breakComboLongNote,
-			endMissed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
-			endPassed = {BaseScoreSystem.success, function(self, event) self:countLastMean(event) end},
+			startMissed = "breakComboLongNote",
+			endMissed = {"breakComboLongNote", "miss"},
+			endPassed = {"success", "countLastMean"},
 		},
 		startMissedPressed = {
-			endMissedPassed = {BaseScoreSystem.success, function(self, event) self:countLastMean(event) end},
-			startMissed = BaseScoreSystem.breakComboLongNote,
-			endMissed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
+			endMissedPassed = {"success", "countLastMean"},
+			startMissed = "breakComboLongNote",
+			endMissed = {"breakComboLongNote", "miss"},
 		},
 		startMissed = {
 			startMissedPressed = nil,
-			endMissed = {BaseScoreSystem.breakComboLongNote, BaseScoreSystem.miss},
+			endMissed = {"breakComboLongNote", "miss"},
 		},
 	},
 }

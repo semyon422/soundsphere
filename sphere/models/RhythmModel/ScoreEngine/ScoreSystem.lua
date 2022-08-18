@@ -7,6 +7,18 @@ ScoreSystem.load = function(self) end
 ScoreSystem.before = function(self, event) end
 ScoreSystem.after = function(self, event) end
 
+local function handle(self, handler, event)
+	if type(handler) == "function" then
+		handler(self, event)
+	elseif type(handler) == "string" then
+		self[handler](self, event)
+	elseif type(handler) == "table" then
+		for _, h in ipairs(handler) do
+			handle(self, h, event)
+		end
+	end
+end
+
 ScoreSystem.receive = function(self, event)
 	if event.name ~= "NoteState" or not event.currentTime then
 		return
@@ -20,13 +32,7 @@ ScoreSystem.receive = function(self, event)
 		self.notes[event.noteType][oldState] and
 		self.notes[event.noteType][oldState][newState]
 
-	if type(handler) == "function" then
-		handler(self, event)
-	elseif type(handler) == "table" then
-		for _, h in ipairs(handler) do
-			h(self, event)
-		end
-	end
+	handle(self, handler, event)
 
 	self:after(event)
 end

@@ -35,31 +35,31 @@ end
 MiscScoreSystem.notes = {
 	ShortNote = {
 		clear = {
-			passed = function(self, event) self:hit(event) end,
-			missed = function(self, event) self:miss(event) end,
-			clear = MiscScoreSystem.early,
+			passed = "hit",
+			missed = "miss",
+			clear = "early",
 		},
 	},
 	LongNote = {
 		clear = {
-			startPassedPressed = function(self, event) self:hit(event) end,
-			startMissed = function(self, event) self:miss(event) end,
-			startMissedPressed = function(self, event) self:miss(event) end,
-			clear = MiscScoreSystem.early,
+			startPassedPressed = "hit",
+			startMissed = "miss",
+			startMissedPressed = "miss",
+			clear = "early",
 		},
 		startPassedPressed = {
 			startMissed = nil,
-			endMissed = function(self, event) self:miss(event) end,
-			endPassed = function(self, event) self:hit(event) end,
+			endMissed = "miss",
+			endPassed = "hit",
 		},
 		startMissedPressed = {
-			endMissedPassed = function(self, event) self:hit(event) end,
+			endMissedPassed = "hit",
 			startMissed = nil,
-			endMissed = function(self, event) self:miss(event) end,
+			endMissed = "miss",
 		},
 		startMissed = {
 			startMissedPressed = nil,
-			endMissed = function(self, event) self:miss(event) end,
+			endMissed = "miss",
 		},
 	},
 }

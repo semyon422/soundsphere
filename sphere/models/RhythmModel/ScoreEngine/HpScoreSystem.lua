@@ -31,29 +31,31 @@ end
 HpScoreSystem.notes = {
 	ShortNote = {
 		clear = {
-			passed = HpScoreSystem.increaseHp,
-			missed = HpScoreSystem.decreaseHp,
+			passed = "increaseHp",
+			missed = "decreaseHp",
+			clear = nil,
 		},
 	},
 	LongNote = {
 		clear = {
-			startPassedPressed = HpScoreSystem.increaseHp,
-			startMissed = HpScoreSystem.decreaseHp,
-			startMissedPressed = HpScoreSystem.decreaseHp,
+			startPassedPressed = "increaseHp",
+			startMissed = "decreaseHp",
+			startMissedPressed = "decreaseHp",
+			clear = nil,
 		},
 		startPassedPressed = {
 			startMissed = nil,
-			endMissed = HpScoreSystem.decreaseHp,
-			endPassed = HpScoreSystem.increaseHp,
+			endMissed = "decreaseHp",
+			endPassed = "increaseHp",
 		},
 		startMissedPressed = {
-			endMissedPassed = HpScoreSystem.increaseHp,
+			endMissedPassed = "increaseHp",
 			startMissed = nil,
-			endMissed = HpScoreSystem.decreaseHp,
+			endMissed = "decreaseHp",
 		},
 		startMissed = {
 			startMissedPressed = nil,
-			endMissed = HpScoreSystem.decreaseHp,
+			endMissed = "decreaseHp",
 		},
 	},
 }
