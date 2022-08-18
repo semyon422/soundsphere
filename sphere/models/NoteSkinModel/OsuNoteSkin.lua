@@ -321,7 +321,26 @@ OsuNoteSkin.load = function(self)
 	playfield:disableCamera()
 
 	self:addJudgements()
-	BasePlayfield.addBaseHitError(playfield)
+
+	local h = 14
+	BasePlayfield.addHitError(playfield, {
+		transform = playfield:newLaneCenterTransform(self.unit),
+		x = 0,
+		y = config:get("HitErrorPosition") or 480,
+		w = 64 * 4,
+		h = h,
+		origin = {
+			w = 2,
+			h = h + 4,
+			color = {1, 1, 1, 1}
+		},
+		background = {
+			color = {0.25, 0.25, 0.25, 0.5}
+		},
+		radius = 1.5,
+		count = 20,
+	})
+
 	BasePlayfield.addBaseProgressBar(playfield)
 end
 
@@ -336,6 +355,7 @@ local ptrs = config:setDefs(--[[defs]] {
 	ScorePosition = {"int[?]", 1, {240}},
 	ComboPosition = {"int[?]", 1, {240}},
 	OverallDifficulty = {"int[?]", 1, {5}},
+	HitErrorPosition = {"int[?]", 1, {240}},
 	UpsideDown = {"bool[?]", 1, {false}},
 	Barline = {"bool[?]", 1, {true}},
 } --[[/defs]])
@@ -345,6 +365,7 @@ function config:render()
 	imgui.SliderInt("Score Position", ptrs.ScorePosition, 0, 480)
 	imgui.SliderInt("Combo Position", ptrs.ComboPosition, 0, 480)
 	imgui.SliderInt("Overall Difficulty", ptrs.OverallDifficulty, 0, 10)
+	imgui.SliderInt("Hit Error Position", ptrs.HitErrorPosition, 0, 480)
 	imgui.Checkbox("Upside Down", ptrs.UpsideDown)
 	imgui.Checkbox("Barline", ptrs.Barline)
 	self:renderAfter()
