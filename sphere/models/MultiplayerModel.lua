@@ -54,18 +54,29 @@ MultiplayerModel.refresh = function(self)
 	})
 end
 
-MultiplayerModel.connect = function(self)
-	local urls = self.game.configModel.configs.urls
-	if self.status == "disconnected" then
-		local status, err = pcall(self.host.connect, self.host, urls.multiplayer)
-		if not status then
-			self.status = err
-			return
-		end
-		self.server = err
-		self.status = "connecting"
+local toipAsync = aquathread.async(function(host)
+	local socket = require("socket")
+	return socket.dns.toip(host)
+end)
+
+local connecting = false
+MultiplayerModel.connect = aquathread.coro(function(self)
+	if connecting or self.status == "connecting" then
+		return
 	end
-end
+	self.status = "connecting"
+	connecting = true
+	local url = self.game.configModel.configs.urls.multiplayer
+	local host, port = url:match("^(.+):(.-)$")
+	local ip = toipAsync(host)
+	local status, err = pcall(self.host.connect, self.host, ("%s:%s"):format(ip, port))
+	if not status then
+		self.status = err
+		return
+	end
+	self.server = err
+	connecting = false
+end)
 
 MultiplayerModel.disconnect = function(self)
 	if self.status == "connected" then
