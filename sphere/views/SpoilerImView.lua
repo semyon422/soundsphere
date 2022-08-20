@@ -20,11 +20,10 @@ return function(id, w, h, preview)
 		return
 	end
 
-	if just.button(id, just.is_over(w, h)) then
+	if just.focused_id ~= id and just.button(id, just.is_over(w, h)) then
 		just.focus(id)
 		open_frame_id = id
 	end
-
 	if just.focused_id ~= id or open_frame_id == id then
 		love.graphics.setColor(0, 0, 0, 1)
 		love.graphics.rectangle("fill", 0, 0, w, h, 8, 8)
@@ -34,8 +33,9 @@ return function(id, w, h, preview)
 		just.next(w, h)
 		if open_frame_id == id then
 			just.clip(love.graphics.rectangle, "fill", 0, 0, 0, 0)
+			return true
 		end
-		return open_frame_id == id
+		return
 	end
 
 	height_start = just.height
