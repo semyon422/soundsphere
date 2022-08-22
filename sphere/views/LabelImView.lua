@@ -1,5 +1,5 @@
-local frame_print = require("aqua.graphics.frame_print")
 local just = require("just")
+local just_print = require("just.print")
 
 return function(id, text, h, align)
 	love.graphics.setColor(1, 1, 1, 1)
@@ -9,7 +9,7 @@ return function(id, text, h, align)
 
 	just.mouse_over(id, just.is_over(w, h), "mouse")
 
-	frame_print(text, 0, 0, w, h, 1, align, "center")
+	just_print(text, 0, 0, w, h, align, "center")
 
 	just.next(w, h)
 end

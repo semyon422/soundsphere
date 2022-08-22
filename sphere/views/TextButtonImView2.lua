@@ -1,17 +1,22 @@
 local just = require("just")
 local just_print = require("just.print")
 
+local size = 0.75
 return function(id, text, w, h)
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local over = 0 <= mx and mx <= w and 0 <= my and my <= h
 
 	local changed, active, hovered = just.button(id, over)
+
+	local r = h * size / 2
+	local x = h * size * (1 - size) / 2
 	if hovered then
 		local alpha = active and 0.2 or 0.1
 		love.graphics.setColor(1, 1, 1, alpha)
-		love.graphics.rectangle("fill", 0, 0, w, h)
+		love.graphics.rectangle("fill", x, x, w - x * 2, h * size, r)
 	end
 	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.rectangle("line", x, x, w - x * 2, h * size, r)
 
 	just_print(text, 0, 0, w, h, "center", "center")
 

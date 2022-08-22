@@ -4,6 +4,7 @@ local HotkeyImView = require("sphere.views.HotkeyImView")
 local TextButtonImView = require("sphere.views.TextButtonImView")
 local Class = require("aqua.util.Class")
 local _transform = require("aqua.graphics.transform")
+local spherefonts = require("sphere.assets.fonts")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -36,6 +37,8 @@ InputView.draw = function(self)
 	local inputMode = noteChart.inputMode:getString()
 	local inputs = self.game.inputModel:getInputs(inputMode)
 	local devices = self.game.inputModel.devices
+
+	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	love.graphics.replaceTransform(_transform(transform))
 	love.graphics.translate(279 + 454 * 3 / 4, 1080 / 4)
@@ -74,9 +77,6 @@ InputView.draw = function(self)
 	just.row(false)
 	love.graphics.line(0, 0, w, 0)
 
-	love.graphics.translate(r, 0)
-	just.emptyline(r)
-
 	for i = 1, #inputs do
 		local virtualKey = inputs[i]
 		local key = self.game.inputModel:getKey(inputMode, virtualKey, self.device)
@@ -88,9 +88,8 @@ InputView.draw = function(self)
 			end
 		end
 		just.sameline()
-		just.indent(r)
+		just.indent(8)
 		LabelImView(i, virtualKey, inputHeight)
-		just.emptyline(r)
 	end
 
 	just.container()
