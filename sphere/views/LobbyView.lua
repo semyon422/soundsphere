@@ -1,8 +1,8 @@
 local just = require("just")
 local Class = require("aqua.util.Class")
-local LabelImView = require("sphere.views.LabelImView")
-local TextButtonImView = require("sphere.views.TextButtonImView")
-local TextInputImView = require("sphere.views.TextInputImView")
+local LabelImView = require("sphere.imviews.LabelImView")
+local TextButtonImView = require("sphere.imviews.TextButtonImView")
+local TextInputImView = require("sphere.imviews.TextInputImView")
 local _transform = require("aqua.graphics.transform")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}

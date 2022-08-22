@@ -1,6 +1,6 @@
 local ListView = require("sphere.views.ListView")
 local just = require("just")
-local TextCellImView = require("sphere.views.SelectView.TextCellImView")
+local TextCellImView = require("sphere.imviews.TextCellImView")
 local SwitchView = require("sphere.views.SwitchView")
 local SliderView = require("sphere.views.SliderView")
 local StepperView = require("sphere.views.StepperView")

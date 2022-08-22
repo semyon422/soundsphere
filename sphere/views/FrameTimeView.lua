@@ -3,7 +3,7 @@ local Profiler = require("aqua.util.Profiler")
 local spherefonts = require("sphere.assets.fonts")
 local aquaevent = require("aqua.event")
 local just = require("just")
-local TextButtonImView = require("sphere.views.TextButtonImView")
+local TextButtonImView = require("sphere.imviews.TextButtonImView")
 
 local FrameTimeView = Class:new()
 

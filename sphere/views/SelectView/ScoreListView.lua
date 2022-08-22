@@ -1,6 +1,6 @@
 local ListView = require("sphere.views.ListView")
 local just = require("just")
-local TextCellImView = require("sphere.views.SelectView.TextCellImView")
+local TextCellImView = require("sphere.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
 local time_ago_in_words = require("aqua.util").time_ago_in_words
 

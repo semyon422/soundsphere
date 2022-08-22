@@ -1,9 +1,9 @@
 local ListView = require("sphere.views.ListView")
 local just = require("just")
-local TextCellImView = require("sphere.views.SelectView.TextCellImView")
-local LabelImView = require("sphere.views.LabelImView")
+local TextCellImView = require("sphere.imviews.TextCellImView")
+local LabelImView = require("sphere.imviews.LabelImView")
 local Format = require("sphere.views.Format")
-local TextButtonImView = require("sphere.views.TextButtonImView")
+local TextButtonImView = require("sphere.imviews.TextButtonImView")
 
 local RoomUsersListView = ListView:new({construct = false})
 

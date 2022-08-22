@@ -6,7 +6,7 @@ local _transform = require("aqua.graphics.transform")
 local just = require("just")
 local spherefonts		= require("sphere.assets.fonts")
 
-local TextButtonImView = require("sphere.views.TextButtonImView")
+local TextButtonImView = require("sphere.imviews.TextButtonImView")
 
 local ProgressView	= require("sphere.views.GameplayView.ProgressView")
 
