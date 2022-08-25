@@ -456,11 +456,6 @@ local SearchFieldLamp = SearchFieldView:new({
 	setText = function(self, text)
 		self.game.searchModel:setSearchString("lamp", text)
 	end,
-	update = function(self)
-		if not just.focused_id then
-			just.focus(self)
-		end
-	end,
 })
 
 local OsudirectSearchField = SearchFieldView:new({
