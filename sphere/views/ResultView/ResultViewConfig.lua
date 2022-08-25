@@ -244,7 +244,7 @@ local Judgements = {draw = function(self)
 	local scoreItem = self.game.selectModel.scoreItem
 	local judgement = scoreEngine.scoreSystem.judgement
 
-	if not judgement then
+	if not judgement or not scoreItem then
 		return
 	end
 
@@ -314,6 +314,10 @@ local NotechartInfo = {draw = function(self)
 	local noteChartItem = self.game.selectModel.noteChartItem
 	local scoreItem = self.game.selectModel.scoreItem
 	local scoreEngine = self.game.rhythmModel.scoreEngine
+
+	if not scoreItem then
+		return
+	end
 
 	local topScoreItem = self.game.scoreLibraryModel.items[1]
 	if topScoreItem == scoreItem then

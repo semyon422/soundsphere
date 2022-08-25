@@ -91,7 +91,10 @@ end
 GameplayController.unload = function(self)
 	self.game.discordModel:setPresence({})
 	self:skip()
-	self:saveScore()
+
+	if self:hasResult() then
+		self:saveScore()
+	end
 
 	local rhythmModel = self.game.rhythmModel
 	rhythmModel:unloadAllEngines()
@@ -191,51 +194,43 @@ end
 
 GameplayController.hasResult = function(self)
 	local rhythmModel = self.game.rhythmModel
+	local replayModel = self.game.replayModel
 	local timeEngine = rhythmModel.timeEngine
 	local base = rhythmModel.scoreEngine.scoreSystem.base
+	local entry = rhythmModel.scoreEngine.scoreSystem.entry
 
 	return
-		not rhythmModel.logicEngine.autoplay and
 		not rhythmModel.prohibitSavingScore and
+		not rhythmModel.logicEngine.autoplay and
+		not rhythmModel.logicEngine.promode and
 		timeEngine.currentTime >= timeEngine.minTime and
-		base.hitCount > 0
+		base.hitCount > 0 and
+		entry.accuracy > 0 and
+		entry.accuracy < math.huge and
+		replayModel.mode ~= "replay"
 end
 
 GameplayController.saveScore = function(self)
 	local rhythmModel = self.game.rhythmModel
-	if rhythmModel.prohibitSavingScore then
-		return
-	end
-
-	local scoreSystemEntry = rhythmModel.scoreEngine.scoreSystem.entry
 	local noteChartModel = self.game.noteChartModel
 	local modifierModel = self.game.modifierModel
 	local replayModel = self.game.replayModel
-	if
-		scoreSystemEntry.accuracy > 0 and
-		scoreSystemEntry.accuracy < math.huge and
-		replayModel.mode ~= "replay" and
-		not rhythmModel.logicEngine.autoplay
-	then
-		replayModel.noteChartModel = noteChartModel
-		replayModel.modifierModel = modifierModel
-		local replayHash = replayModel:saveReplay()
-		local scoreEntry = self.game.scoreModel:insertScore(scoreSystemEntry, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
+	local scoreSystemEntry = rhythmModel.scoreEngine.scoreSystem.entry
 
-		if
-			rhythmModel.scoreEngine.scoreSystem.base.progress >= 1 and
-			not rhythmModel.logicEngine.promode
-		then
-			self.game.onlineModel.onlineScoreManager:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
-		end
+	replayModel.noteChartModel = noteChartModel
+	replayModel.modifierModel = modifierModel
+	local replayHash = replayModel:saveReplay()
+	local scoreEntry = self.game.scoreModel:insertScore(scoreSystemEntry, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
 
-		rhythmModel.scoreEngine.scoreEntry = scoreEntry
-		local config = self.game.configModel.configs.select
-		config.scoreEntryId = scoreEntry.id
-		self.game.selectModel:pullScore()
-
-		return scoreEntry
+	local base = rhythmModel.scoreEngine.scoreSystem.base
+	if base.hitCount / base.noteCount >= 0.5 then
+		self.game.onlineModel.onlineScoreManager:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
 	end
+
+	rhythmModel.scoreEngine.scoreEntry = scoreEntry
+	local config = self.game.configModel.configs.select
+	config.scoreEntryId = scoreEntry.id
+	self.game.selectModel:pullScore()
 end
 
 GameplayController.skip = function(self)
