@@ -4,6 +4,7 @@ local FadeTransition = require("sphere.views.FadeTransition")
 local FrameTimeView = require("sphere.views.FrameTimeView")
 local TextTooltipImView = require("sphere.imviews.TextTooltipImView")
 local ContextMenuImView = require("sphere.imviews.ContextMenuImView")
+local ModalImView = require("sphere.imviews.ModalImView")
 local NoteSkinView = require("sphere.views.NoteSkinView")
 local InputView = require("sphere.views.InputView")
 local SettingsView = require("sphere.views.SettingsView")
@@ -96,6 +97,9 @@ GameView.draw = function(self)
 	self.modifierView:draw()
 	self.lobbyView:draw()
 
+	if ModalImView(self.modal, self) then
+		self.modal = nil
+	end
 	if self.contextMenu and ContextMenuImView(self.contextMenuWidth) then
 		if ContextMenuImView(self.contextMenu()) then
 			self.contextMenu = nil
@@ -121,6 +125,10 @@ end
 GameView.setContextMenu = function(self, f, width)
 	self.contextMenu = f
 	self.contextMenuWidth = width
+end
+
+GameView.setModal = function(self, f)
+	self.modal = f
 end
 
 GameView.hideAllWindows = function(self)

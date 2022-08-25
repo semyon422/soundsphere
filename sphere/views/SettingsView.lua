@@ -8,6 +8,7 @@ local SpoilerImView = require("sphere.imviews.SpoilerImView")
 local SliderImView = require("sphere.imviews.SliderImView")
 local CheckboxImView = require("sphere.imviews.CheckboxImView")
 local HotkeyImView = require("sphere.imviews.HotkeyImView")
+local TimingsModalView = require("sphere.views.TimingsModalView")
 local _transform = require("aqua.graphics.transform")
 local round = require("aqua.math").round
 local map = require("aqua.math").map
@@ -54,7 +55,7 @@ SettingsView.draw = function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	just.clip(love.graphics.rectangle, "fill", 0, 0, w, h, r)
-	just.container("ContextMenuImView", just.is_over(w, h))
+	just.container("SettingsView", just.is_over(w, h))
 
 	local scroll = just.wheel_over(self, just.is_over(w, h))
 	self.scroll = self.scroll or 0
@@ -170,7 +171,13 @@ SettingsView.gameplay = function(self, w)
 	local i = settings.input
 
 	g.speed = round(slider("speed", g.speed, 0, 3, ("play speed: %0.2f"):format(g.speed)), 0.05)
+
+	if TextButtonImView2("open timings", "timings", _w / 2, _h) then
+		self.game.gameView:setModal(TimingsModalView)
+	end
+	just.sameline()
 	g.timings.nearest = checkbox("nearest", g.timings.nearest, "nearest input")
+
 	g.actionOnFail = combo("actionOnFail", g.actionOnFail, {"none", "pause", "quit"}, nil, "action on fail")
 	g.scaleSpeed = checkbox("scaleSpeed", g.scaleSpeed, "scale scroll speed with rate")
 	g.longNoteShortening = round(slider(
@@ -182,13 +189,6 @@ SettingsView.gameplay = function(self, w)
 	g.offsetScale.visual = checkbox("offsetScale.visual", g.offsetScale.visual, "visual offset * time rate")
 	g.lastMeanValues = intButtons("lastMeanValues", g.lastMeanValues, 10, ("last mean values: %d"):format(g.lastMeanValues))
 	g.ratingHitTimingWindow = intButtonsMs("ratingHitTimingWindow", g.ratingHitTimingWindow, "rating hit timing window: %d")
-
-	-- g.timings.ShortNote.hit = intButtonsMs("sn.hit", g.timings.ShortNote.hit, "short note hit: %d")
-	-- g.timings.LongNoteStart.hit = intButtonsMs("lns.hit", g.timings.LongNoteStart.hit, "long note start hit: %d")
-	-- g.timings.LongNoteEnd.hit = intButtonsMs("lne.hit", g.timings.LongNoteEnd.hit, "long note end hit: %d")
-	-- g.timings.ShortNote.miss = intButtonsMs("sn.miss", g.timings.ShortNote.miss, "short note miss: %d")
-	-- g.timings.LongNoteStart.miss = intButtonsMs("lns.miss", g.timings.LongNoteStart.miss, "long note start miss: %d")
-	-- g.timings.LongNoteEnd.miss = intButtonsMs("lne.miss", g.timings.LongNoteEnd.miss, "long note end miss: %d")
 
 	-- g.hp.start = intButtons("hp.start", g.hp.start, "hp start: %d")
 	-- g.hp.min = intButtons("hp.min", g.hp.min, "hp min: %d")
