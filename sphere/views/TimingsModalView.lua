@@ -96,13 +96,13 @@ return function(self)
 
 	just.emptyline(20)
 	just.indent(10)
-	just.text("short note start")
+	just.text("long note start")
 	drawTimings(timings.LongNoteStart.hit, "hit", "lns hit", norm, nil, w, _h)
 	drawTimings(timings.LongNoteStart.miss, "miss", "lns miss", norm, timings.LongNoteStart.hit, w, _h)
 
 	just.emptyline(20)
 	just.indent(10)
-	just.text("short note end")
+	just.text("long note end")
 	drawTimings(timings.LongNoteEnd.hit, "hit", "lne hit", norm, nil, w, _h)
 	drawTimings(timings.LongNoteEnd.miss, "miss", "lne miss", norm, timings.LongNoteEnd.hit, w, _h)
 
