@@ -13,6 +13,9 @@ local _transform = require("aqua.graphics.transform")
 local round = require("aqua.math").round
 local map = require("aqua.math").map
 local spherefonts = require("sphere.assets.fonts")
+local deepclone = require("aqua.util.deepclone")
+
+local _timings = require("sphere.models.RhythmModel.ScoreEngine.timings")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -42,17 +45,19 @@ local function drawTimings(t, name, id, norm, mins, w, h)
 	end
 	just.row(true)
 	t[1] = math.min(math.max(intButtonsMs(id .. 1, t[1], w / 4, h), -1), min1)
-	JudgementBarImView(w / 4, h, -t[1] / norm, name, -t[1] * 1000, true)
+	JudgementBarImView(w / 4, h, -t[1] / norm, name, t[1] * 1000, true)
 	JudgementBarImView(w / 4, h, t[2] / norm, name, t[2] * 1000)
 	t[2] = math.min(math.max(intButtonsMs(id .. 2, t[2], w / 4, h), min2), 1)
 	just.row(false)
 end
 
+local osuOD = 0
+
 return ModalImView(function(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	love.graphics.replaceTransform(_transform(transform))
-	local w, h = 1080, 1080 / 2
+	local w, h = 1080, 680
 	love.graphics.translate((1920 - w) / 2, (1080 - h) / 2)
 	local r = 8
 
@@ -68,13 +73,34 @@ return ModalImView(function(self)
 	just.button(window_id, over)
 	just.wheel_over(window_id, over)
 
-	local timings = self.game.configModel.configs.settings.gameplay.timings
-
 	local _w, _h = w / 3, 44
+	local _h2 = 55
 	local quit = false
-	-- if TextButtonImView("quit timings", "quit", _w, _h) then
-	-- 	quit = true
-	-- end
+
+	local gameplay = self.game.configModel.configs.settings.gameplay
+
+	just.row(true)
+	just.indent(10)
+	LabelImView("presets label", "Timings presets:", _h2)
+	if TextButtonImView2("default timings", "soundsphere", 200, _h2) then
+		gameplay.timings = deepclone(_timings.soundsphere)
+		self.game:resetGameplayConfigs()
+	end
+	if TextButtonImView2("lr2 timings", "LR2", 100, _h2) then
+		gameplay.timings = deepclone(_timings.lr2)
+		self.game:resetGameplayConfigs()
+	end
+	if TextButtonImView2("osu timings", "osu OD" .. osuOD, 150, _h2) then
+		gameplay.timings = deepclone(_timings.osu(osuOD))
+		self.game:resetGameplayConfigs()
+		osuOD = (osuOD + 1) % 11
+	end
+	just.row(false)
+
+	local timings = gameplay.timings
+
+	just.indent(10)
+	just.text("Current preset: " .. _timings.getName(timings))
 
 	local maxt = 0
 	for _, t in pairs(timings) do
