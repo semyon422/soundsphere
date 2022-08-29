@@ -3,31 +3,17 @@ local Class = require("aqua.util.Class")
 local LabelImView = require("sphere.imviews.LabelImView")
 local TextButtonImView = require("sphere.imviews.TextButtonImView")
 local TextInputImView = require("sphere.imviews.TextInputImView")
+local ModalImView = require("sphere.imviews.ModalImView")
 local _transform = require("aqua.graphics.transform")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
-local LobbyView = Class:new()
+local name = ""
+local nameIndex = 1
+local password = ""
+local passwordIndex = 1
 
-LobbyView.name = ""
-LobbyView.nameIndex = 1
-LobbyView.password = ""
-LobbyView.passwordIndex = 1
-LobbyView.isOpen = false
-
-LobbyView.toggle = function(self, state)
-	if state == nil then
-		self.isOpen = not self.isOpen
-	else
-		self.isOpen = state
-	end
-end
-
-LobbyView.draw = function(self)
-	if not self.isOpen then
-		return
-	end
-
+return ModalImView(function(self)
 	local multiplayerModel = self.game.multiplayerModel
 
 	love.graphics.replaceTransform(_transform(transform))
@@ -42,7 +28,14 @@ LobbyView.draw = function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	just.clip(love.graphics.rectangle, "fill", 0, 0, w, h, r)
-	just.container("ContextMenuImView", just.is_over(w, h))
+
+	local window_id = "ContextMenuImView"
+	local over = just.is_over(w, h)
+	just.container(window_id, over)
+	just.button(window_id, over)
+	just.wheel_over(window_id, over)
+
+	local close = false
 
 	local inputHeight = 55
 	local status = multiplayerModel.status
@@ -56,21 +49,21 @@ LobbyView.draw = function(self)
 
 		local _
 		love.graphics.translate(r, r)
-		_, self.name, self.nameIndex = TextInputImView("LobbyView name", self.name, self.nameIndex, w / 2 - 2 * r, inputHeight)
+		_, name, nameIndex = TextInputImView("LobbyView name", name, nameIndex, w / 2 - 2 * r, inputHeight)
 		just.sameline()
 		just.indent(r)
 		LabelImView("LobbyView name", "Name", inputHeight)
 		just.emptyline(r)
 
-		_, self.password, self.passwordIndex = TextInputImView("LobbyView password", self.password, self.passwordIndex, w / 2 - 2 * r, inputHeight)
+		_, password, passwordIndex = TextInputImView("LobbyView password", password, passwordIndex, w / 2 - 2 * r, inputHeight)
 		just.sameline()
 		just.indent(r)
 		LabelImView("LobbyView password", "Password", inputHeight)
 
 		just.sameline()
 		just.offset(w - 144)
-		if TextButtonImView("Create", "Create", 144, inputHeight) and self.name ~= "" then
-			multiplayerModel:createRoom(self.name, self.password)
+		if TextButtonImView("Create", "Create", 144, inputHeight) and name ~= "" then
+			multiplayerModel:createRoom(name, password)
 		end
 
 		love.graphics.translate(-r, r)
@@ -102,14 +95,14 @@ LobbyView.draw = function(self)
 	elseif not multiplayerModel.room then
 		local _
 		love.graphics.translate(r, r)
-		_, self.password, self.passwordIndex = TextInputImView("LobbyView password", self.password, self.passwordIndex, w / 2 - 2 * r, inputHeight)
+		_, password, passwordIndex = TextInputImView("LobbyView password", password, passwordIndex, w / 2 - 2 * r, inputHeight)
 		just.sameline()
 		just.indent(r)
 		LabelImView("LobbyView password", "Password", inputHeight)
 		just.sameline()
 		just.offset(w - 144)
 		if TextButtonImView("LobbyView join", "Join", 144, inputHeight) then
-			multiplayerModel:joinRoom(self.password)
+			multiplayerModel:joinRoom(password)
 			just.focus()
 		end
 		if TextButtonImView("LobbyView back", "Back", 144, inputHeight) then
@@ -117,7 +110,7 @@ LobbyView.draw = function(self)
 			just.focus()
 		end
 	else
-		self.isOpen = false
+		close = true
 		self.game.gameView.view:changeScreen("multiplayerView")
 	end
 
@@ -127,6 +120,6 @@ LobbyView.draw = function(self)
 	love.graphics.pop()
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.rectangle("line", 0, 0, w, h, r)
-end
 
-return LobbyView
+	return close
+end)

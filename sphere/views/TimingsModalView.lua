@@ -8,7 +8,7 @@ local SpoilerImView = require("sphere.imviews.SpoilerImView")
 local SliderImView = require("sphere.imviews.SliderImView")
 local CheckboxImView = require("sphere.imviews.CheckboxImView")
 local JudgementBarImView = require("sphere.imviews.JudgementBarImView")
-local HotkeyImView = require("sphere.imviews.HotkeyImView")
+local ModalImView = require("sphere.imviews.ModalImView")
 local _transform = require("aqua.graphics.transform")
 local round = require("aqua.math").round
 local map = require("aqua.math").map
@@ -48,7 +48,7 @@ local function drawTimings(t, name, id, norm, mins, w, h)
 	just.row(false)
 end
 
-return function(self)
+return ModalImView(function(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	love.graphics.replaceTransform(_transform(transform))
@@ -60,10 +60,13 @@ return function(self)
 	love.graphics.rectangle("fill", 0, 0, w, h, r)
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local over = just.is_over(w, h)
-	just.wheel_over("TimingsModalView", over)
 	just.clip(love.graphics.rectangle, "fill", 0, 0, w, h, r)
-	just.container("TimingsModalView", over)
+
+	local window_id = "TimingsModalView"
+	local over = just.is_over(w, h)
+	just.container(window_id, over)
+	just.button(window_id, over)
+	just.wheel_over(window_id, over)
 
 	local timings = self.game.configModel.configs.settings.gameplay.timings
 
@@ -117,4 +120,4 @@ return function(self)
 	love.graphics.rectangle("line", 0, 0, w, h, r)
 
 	return quit
-end
+end)

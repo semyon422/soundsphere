@@ -1,18 +1,23 @@
 local just = require("just")
 
-return function(f, self)
-	if not f then
-		return
-	end
-
-	love.graphics.origin()
-	love.graphics.setColor(0, 0, 0, 0.8)
-	love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
-
-	if just.button("close modal", true) then
+local function _draw(f, ...)
+	just.keyboard_over()
+	if f(...) then
 		return true
 	end
-	if f(self) then
+	if just.keypressed("escape") then
 		return true
+	end
+end
+
+return function(draw, close)
+	return function(...)
+		just.container("ModalImView", true)
+		local ret = _draw(draw, ...)
+		just.container()
+		if ret and close then
+			close(...)
+		end
+		return ret
 	end
 end

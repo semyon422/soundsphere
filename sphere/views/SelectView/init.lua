@@ -2,7 +2,6 @@ local just = require("just")
 local ScreenView = require("sphere.views.ScreenView")
 
 local SelectViewConfig = require("sphere.views.SelectView.SelectViewConfig")
-local SelectNavigator = require("sphere.views.SelectView.SelectNavigator")
 
 local SelectView = ScreenView:new({construct = false})
 
@@ -12,7 +11,6 @@ SelectView.searchMode = "filter"
 SelectView.construct = function(self)
 	ScreenView.construct(self)
 	self.viewConfig = SelectViewConfig
-	self.navigator = SelectNavigator:new()
 end
 
 SelectView.load = function(self)
@@ -21,7 +19,31 @@ SelectView.load = function(self)
 end
 
 SelectView.draw = function(self)
+	just.container("select container", true)
+
+	local kp = just.keypressed
+	if kp("f1") then
+		self.gameView:hideAllWindows()
+		self.gameView.modifierView:toggle(true)
+	elseif kp("f2") then self.game.selectModel:scrollRandom()
+	elseif kp("lctrl") then self:changeSearchMode()
+	elseif kp("lshift") then self.game.selectModel:changeCollapse()
+	end
+	if self.subscreen == "notecharts" then
+		if kp("return") then self:play()
+		elseif kp("lalt") then self:result()
+		elseif kp("tab") then self:switchToCollections()
+		end
+	elseif self.subscreen == "collections" then
+		if kp("return") or kp("tab") then self:switchToNoteCharts()
+		end
+	elseif self.subscreen == "osudirect" then
+		if kp("escape") or kp("tab") then self:switchToCollections()
+		end
+	end
+
 	ScreenView.draw(self)
+	just.container()
 end
 
 SelectView.unload = function(self)

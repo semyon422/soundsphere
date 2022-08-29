@@ -2,38 +2,17 @@ local just = require("just")
 local LabelImView = require("sphere.imviews.LabelImView")
 local HotkeyImView = require("sphere.imviews.HotkeyImView")
 local TextButtonImView = require("sphere.imviews.TextButtonImView")
-local Class = require("aqua.util.Class")
+local ModalImView = require("sphere.imviews.ModalImView")
 local _transform = require("aqua.graphics.transform")
 local spherefonts = require("sphere.assets.fonts")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
-local InputView = Class:new()
+local currentDevice = "keyboard"
+local scrollY = 0
 
-InputView.isOpen = false
-InputView.device = "keyboard"
-
-InputView.toggle = function(self, state)
-	if state == nil then
-		self.isOpen = not self.isOpen
-	else
-		self.isOpen = state
-	end
-	if self.isOpen then
-		self.game.selectController:resetModifiedNoteChart()
-	end
-end
-
-InputView.draw = function(self)
+return ModalImView(function(self)
 	local noteChart = self.game.noteChartModel.noteChart
-	if not noteChart then
-		return
-	end
-
-	if not self.isOpen then
-		return
-	end
-
 	local inputMode = noteChart.inputMode:getString()
 	local inputs = self.game.inputModel:getInputs(inputMode)
 	local devices = self.game.inputModel.devices
@@ -49,29 +28,30 @@ InputView.draw = function(self)
 	love.graphics.rectangle("fill", 0, 0, w, h, r)
 	love.graphics.setColor(1, 1, 1, 1)
 
-	just.catch(just.focused_id)
-
 	just.clip(love.graphics.rectangle, "fill", 0, 0, w, h, r)
-	just.container("ContextMenuImView", just.is_over(w, h))
+
+	local window_id = "InputView"
+	local over = just.is_over(w, h)
+	just.container(window_id, over)
+	just.button(window_id, over)
 
 	local inputHeight = 55
 
-	local scroll = just.wheel_over(self, just.is_over(w, h))
+	local scroll = just.wheel_over(window_id, just.is_over(w, h))
 
-	self.scroll = self.scroll or 0
-	love.graphics.translate(0, -self.scroll)
+	love.graphics.translate(0, -scrollY)
 
 	local startHeight = just.height
 
 	just.row(true)
 	for _, device in ipairs(devices) do
-		if device == self.device then
+		if device == currentDevice then
 			love.graphics.setColor(1, 1, 1, 0.1)
 			love.graphics.rectangle("fill", 0, 0, w / #devices, inputHeight)
 		end
 		love.graphics.setColor(1, 1, 1, 1)
 		if TextButtonImView("InputView " .. device, device, w / #devices, inputHeight) then
-			self.device = device
+			currentDevice = device
 		end
 	end
 	just.row(false)
@@ -79,10 +59,10 @@ InputView.draw = function(self)
 
 	for i = 1, #inputs do
 		local virtualKey = inputs[i]
-		local key = self.game.inputModel:getKey(inputMode, virtualKey, self.device)
-		local changed, key = HotkeyImView(i, self.device, key, w / 2, inputHeight)
+		local key = self.game.inputModel:getKey(inputMode, virtualKey, currentDevice)
+		local changed, key = HotkeyImView(i, currentDevice, key, w / 2, inputHeight)
 		if changed then
-			self.game.inputModel:setKey(inputMode, virtualKey, self.device, key)
+			self.game.inputModel:setKey(inputMode, virtualKey, currentDevice, key)
 			if i + 1 <= #inputs then
 				just.focus(i + 1)
 			end
@@ -95,17 +75,11 @@ InputView.draw = function(self)
 	just.container()
 	just.clip()
 
-	if just.keypressed("escape") and not just.catch() then
-		self:toggle(false)
-	end
-
 	local overlap = math.max(just.height - startHeight - h, 0)
 	if overlap > 0 and scroll then
-		self.scroll = math.min(math.max(self.scroll - scroll * 50, 0), overlap)
+		scrollY = math.min(math.max(scrollY - scroll * 50, 0), overlap)
 	end
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.rectangle("line", 0, 0, w, h, r)
-end
-
-return InputView
+end)

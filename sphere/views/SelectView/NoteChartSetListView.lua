@@ -17,6 +17,19 @@ NoteChartSetListView.scroll = function(self, count)
 	self.game.selectModel:scrollNoteChartSet(count)
 end
 
+NoteChartSetListView.draw = function(self)
+	ListView.draw(self)
+
+	local kp = just.keypressed
+	if kp("left") then self:scroll(-1)
+	elseif kp("right") then self:scroll(1)
+	elseif kp("pageup") then self:scroll(-10)
+	elseif kp("pagedown") then self:scroll(10)
+	elseif kp("home") then self:scroll(-math.huge)
+	elseif kp("end") then self:scroll(math.huge)
+	end
+end
+
 NoteChartSetListView.drawItem = function(self, i, w, h)
 	local item = self.items[i]
 

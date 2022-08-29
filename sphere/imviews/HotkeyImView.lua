@@ -27,12 +27,11 @@ return function(id, device, key, w, h)
 			changed = true
 			just.focus()
 		end
-	end
-
-	if just.keypressed("escape") then
-		changed = false
-		key = _key
-		just.focus()
+		if just.keypressed("escape", true) then
+			changed = false
+			key = _key
+			just.focus()
+		end
 	end
 
 	if just.button(id, just.is_over(w, h)) then

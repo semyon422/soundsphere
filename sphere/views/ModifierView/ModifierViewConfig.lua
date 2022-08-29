@@ -42,9 +42,11 @@ local ContainerBegin = {draw = function(self)
 	local x, y, w, h = 279, 144, 1362, 792
 	love.graphics.translate(x, y)
 
+	local window_id = "modifiers window"
 	local over = just.is_over(w, h)
-	just.container("modifiers window", over)
-	just.wheel_over("modifiers window", over)
+	just.container(window_id, over)
+	just.button(window_id, over)
+	just.wheel_over(window_id, over)
 
 	if just.keypressed("escape") then
 		self.game.gameView.modifierView:toggle(false)

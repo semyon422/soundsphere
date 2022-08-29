@@ -1,28 +1,24 @@
 local imgui = require("cimgui")
-local ImguiView = require("sphere.views.ImguiView")
+local ffi = require("ffi")
 local align = require("aqua.imgui.config").align
-
-local MountsView = ImguiView:new({construct = false})
+local ModalImView = require("sphere.imviews.ModalImView")
 
 local selectedItem
-MountsView.draw = function(self)
+local isOpen = ffi.new("bool[1]", true)
+return ModalImView(function(self)
+	if not isOpen[0] then
+		isOpen[0] = true
+		return true
+	end
+
 	local mountModel = self.game.mountModel
 	local items = self.game.configModel.configs.mount
 	selectedItem = selectedItem or items[1]
 
-	if not self.isOpen[0] then
-		return
-	end
-
-	local closed = self:closeOnEscape()
-	if closed then
-		return
-	end
-
 	imgui.SetNextWindowPos({align(0.5, 279 + 454 * 3 / 4), 279}, 0)
 	imgui.SetNextWindowSize({454 * 1.5, 522}, 0)
 	local flags = imgui.love.WindowFlags("NoMove", "NoResize")
-	if imgui.Begin("Mounted directories", self.isOpen, flags) then
+	if imgui.Begin("Mounted directories", isOpen, flags) then
 		local avail = imgui.GetContentRegionAvail()
 		if imgui.BeginChild_Str("Mount points child window", {0, avail.y / 3}, false, 0) then
 			if imgui.BeginListBox("##Mount points", {-imgui.FLT_MIN, -imgui.FLT_MIN}) then
@@ -63,6 +59,4 @@ MountsView.draw = function(self)
 		end
 	end
 	imgui.End()
-end
-
-return MountsView
+end)

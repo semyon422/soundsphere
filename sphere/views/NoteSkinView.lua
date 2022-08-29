@@ -1,43 +1,24 @@
-local bit = require("bit")
+local ffi = require("ffi")
 local imgui = require("cimgui")
-local ImguiView = require("sphere.views.ImguiView")
 local align = require("aqua.imgui.config").align
+local ModalImView = require("sphere.imviews.ModalImView")
 
-local NoteSkinView = ImguiView:new()
-
-NoteSkinView.toggle = function(self, state)
-	ImguiView.toggle(self, state)
-	if self.isOpen[0] then
-		self.game.selectController:resetModifiedNoteChart()
+local isOpen = ffi.new("bool[1]", true)
+local function draw(self)
+	if not isOpen[0] then
+		isOpen[0] = true
+		return true
 	end
-end
 
-NoteSkinView.draw = function(self)
 	local noteChart = self.game.noteChartModel.noteChart
-	if not noteChart then
-		return
-	end
-
-	if not self.isOpen[0] then
-		return
-	end
-	local closed = self:closeOnEscape()
-
 	local selectedNoteSkin = self.game.noteSkinModel:getNoteSkin(noteChart.inputMode)
-
-	if closed then
-		if selectedNoteSkin.config then
-			selectedNoteSkin.config:close()
-		end
-		return
-	end
 
 	local items = self.game.noteSkinModel:getNoteSkins(noteChart.inputMode)
 
 	imgui.SetNextWindowPos({align(0.5, 279), 279}, 0)
 	imgui.SetNextWindowSize({454, 522}, 0)
 	local flags = imgui.love.WindowFlags("NoMove", "NoResize")
-	if imgui.Begin("Noteskins", self.isOpen, flags) then
+	if imgui.Begin("Noteskins", isOpen, flags) then
 		if imgui.BeginListBox("Noteskins", {-imgui.FLT_MIN, -imgui.FLT_MIN}) then
 			for i = 1, #items do
 				local noteSkin = items[i]
@@ -66,4 +47,13 @@ NoteSkinView.draw = function(self)
 	imgui.End()
 end
 
-return NoteSkinView
+local function close(self)
+	local noteChart = self.game.noteChartModel.noteChart
+	local selectedNoteSkin = self.game.noteSkinModel:getNoteSkin(noteChart.inputMode)
+
+	if selectedNoteSkin.config then
+		selectedNoteSkin.config:close()
+	end
+end
+
+return ModalImView(draw, close)

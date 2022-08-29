@@ -1,13 +1,12 @@
 local GameplayViewConfig = require("sphere.views.GameplayView.GameplayViewConfig")
-local GameplayNavigator	= require("sphere.views.GameplayView.GameplayNavigator")
 local ScreenView = require("sphere.views.ScreenView")
+local just = require("just")
 
 local GameplayView = ScreenView:new({construct = false})
 
 GameplayView.construct = function(self)
 	ScreenView.construct(self)
 	self.viewConfig = GameplayViewConfig
-	self.navigator = GameplayNavigator:new()
 end
 
 GameplayView.load = function(self)
@@ -39,6 +38,28 @@ GameplayView.retry = function(self)
 	self.game.gameplayController:retry()
 	self.sequenceView:unload()
 	self.sequenceView:load()
+end
+
+GameplayView.draw = function(self)
+	just.container("screen container", true)
+	self:keypressed()
+	self:keyreleased()
+
+	ScreenView.draw(self)
+	just.container()
+
+	local state = self.game.rhythmModel.pauseManager.state
+	local multiplayerModel = self.game.multiplayerModel
+	local isPlaying = multiplayerModel.room and multiplayerModel.isPlaying
+	if
+		not love.window.hasFocus() and
+		state == "play" and
+		not self.game.rhythmModel.logicEngine.autoplay and
+		not isPlaying and
+		self.game.rhythmModel.inputManager.mode ~= "internal"
+	then
+		self.game.gameplayController:pause()
+	end
 end
 
 GameplayView.update = function(self, dt)
@@ -92,6 +113,56 @@ GameplayView.quit = function(self)
 		return self:changeScreen("multiplayerView")
 	end
 	return self:changeScreen("selectView")
+end
+
+GameplayView.keypressed = function(self)
+	local input = self.game.configModel.configs.settings.input
+	local timeController = self.game.timeController
+
+	local kp = just.keypressed
+	if kp(input.skipIntro) then timeController:skipIntro()
+	elseif kp(input.offset.decrease) then timeController:increaseLocalOffset(-0.001)
+	elseif kp(input.offset.increase) then timeController:increaseLocalOffset(0.001)
+	elseif kp(input.timeRate.decrease) then timeController:increaseTimeRate(-0.05)
+	elseif kp(input.timeRate.increase) then timeController:increaseTimeRate(0.05)
+	-- elseif scancode == input.timeRate.invert then timeController:invertTimeRate()
+	elseif kp(input.playSpeed.decrease) then timeController:increasePlaySpeed(-0.05)
+	elseif kp(input.playSpeed.increase) then timeController:increasePlaySpeed(0.05)
+	elseif kp(input.playSpeed.invert) then timeController:invertPlaySpeed()
+	end
+
+	local gameplayController = self.game.gameplayController
+
+	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
+	local state = self.game.rhythmModel.pauseManager.state
+	if state == "play" then
+		if kp(input.pause) and not shift then gameplayController:changePlayState("pause")
+		elseif kp(input.pause) and shift then self:quit()
+		elseif kp(input.quickRestart) then gameplayController:changePlayState("retry")
+		end
+	elseif state == "pause" then
+		if kp(input.pause) and not shift then gameplayController:changePlayState("play")
+		elseif kp(input.pause) and shift then self:quit()
+		elseif kp(input.quickRestart) then gameplayController:changePlayState("retry")
+		end
+	elseif state == "pause-play" and kp(input.pause) then
+		gameplayController:changePlayState("pause")
+	end
+end
+
+GameplayView.keyreleased = function(self)
+	local state = self.game.rhythmModel.pauseManager.state
+	local input = self.game.configModel.configs.settings.input
+	local gameplayController = self.game.gameplayController
+
+	local kr = just.keyreleased
+	if state == "play-pause" and kr(input.pause) then
+		gameplayController:changePlayState("play")
+	elseif state == "pause-retry" and kr(input.quickRestart) then
+		gameplayController:changePlayState("pause")
+	elseif state == "play-retry" and kr(input.quickRestart) then
+		gameplayController:changePlayState("play")
+	end
 end
 
 return GameplayView

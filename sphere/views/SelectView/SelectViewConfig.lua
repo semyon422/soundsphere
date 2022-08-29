@@ -632,22 +632,28 @@ local NotechartsSubscreen = {
 		local gameView = self.game.gameView
 		just.row(true)
 		if IconButtonImView("settings", "settings", self.h, 0.5) then
-			gameView.settingsView:toggle()
+			gameView:setModal(require("sphere.views.SettingsView"))
 		end
 		if IconButtonImView("mounts", "folder_open", self.h, 0.5) then
-			gameView.mountsView:toggle()
+			gameView:setModal(require("sphere.views.MountsView"))
 		end
 		if TextButtonImView("modifiers", "modifiers", w, self.h) then
 			gameView.modifierView:toggle()
 		end
 		if TextButtonImView("noteskins", "noteskins", w, self.h) then
-			gameView.noteSkinView:toggle()
+			self.game.selectController:resetModifiedNoteChart()
+			if self.game.noteChartModel.noteChart then
+				gameView:setModal(require("sphere.views.NoteSkinView"))
+			end
 		end
 		if TextButtonImView("input", "input", w, self.h) then
-			gameView.inputView:toggle()
+			self.game.selectController:resetModifiedNoteChart()
+			if self.game.noteChartModel.noteChart then
+				gameView:setModal(require("sphere.views.InputView"))
+			end
 		end
 		if TextButtonImView("multi", "multi", self.h, self.h) then
-			gameView.lobbyView:toggle()
+			gameView:setModal(require("sphere.views.LobbyView"))
 		end
 		just.row(false)
 

@@ -54,7 +54,9 @@ return function(id, w, h, preview)
 	love.graphics.setColor(1, 1, 1, 1)
 	just.clip(love.graphics.rectangle, "fill", x, x, width - x * 2, height, r)
 
-	just.container(id, just.is_over(width, height))
+	local over = just.is_over(width, height)
+	just.container(id, over)
+	just.mouse_over(id, over, "mouse")
 	love.graphics.translate(x, x)
 
 	return true

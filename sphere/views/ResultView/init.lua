@@ -1,7 +1,7 @@
 local ScreenView = require("sphere.views.ScreenView")
 local aquathread = require("aqua.thread")
+local just = require("just")
 
-local ResultNavigator = require("sphere.views.ResultView.ResultNavigator")
 local ResultViewConfig = require("sphere.views.ResultView.ResultViewConfig")
 
 local ResultView = ScreenView:new({construct = false})
@@ -9,7 +9,6 @@ local ResultView = ScreenView:new({construct = false})
 ResultView.construct = function(self)
 	ScreenView.construct(self)
 	self.viewConfig = ResultViewConfig
-	self.navigator = ResultNavigator:new()
 end
 
 local loading
@@ -31,6 +30,24 @@ ResultView.load = aquathread.coro(function(self)
 	self.subscreen = ""
 	loading = false
 end)
+
+ResultView.draw = function(self)
+	just.container("screen container", true)
+
+	local kp = just.keypressed
+	if kp("up") then self.game.selectModel:scrollScore(-1)
+	elseif kp("down") then self.game.selectModel:scrollScore(1)
+	elseif kp("escape") then self:quit()
+	elseif kp("return") then self:loadScore()
+	elseif kp("f1") then self.subscreen = "debug"
+	elseif kp("f2") then self.subscreen = "scoreSystemDebug"
+	elseif kp("f3") then self.subscreen = "countersDebug"
+	elseif kp("f4") then self.subscreen = "scoreEntryDebug"
+	end
+
+	ScreenView.draw(self)
+	just.container()
+end
 
 ResultView.unload = function(self)
 	ScreenView.unload(self)

@@ -35,7 +35,9 @@ return function(w)
 	just.clip(love.graphics.rectangle, "fill", 0, 0, width, height, 8, 8)
 
 	over = just.is_over(width, height)
-	just.container("ContextMenuImView", over)
+	local id = "ContextMenuImView"
+	just.container(id, over)
+	just.button(id, over)
 
 	return true
 end

@@ -13,7 +13,8 @@ SearchFieldView.setText = function(self, text) end
 SearchFieldView.getText = function(self) return "" end
 
 SearchFieldView.draw = function(self)
-	if just.focused_id == self then
+	local focused = just.focused_id == self
+	if focused then
 		local changed, text = just.textinput(self:getText())
 		if changed == "text" then
 			self:setText(text)
@@ -65,7 +66,7 @@ SearchFieldView.draw = function(self)
 		self.text.align
 	)
 
-	if just.focused_id ~= self then
+	if not (just.keyboard_over() and focused) then
 		return
 	end
 

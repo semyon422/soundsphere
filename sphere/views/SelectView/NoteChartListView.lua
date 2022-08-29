@@ -18,6 +18,14 @@ NoteChartListView.scroll = function(self, count)
 	self.game.selectModel:scrollNoteChart(count)
 end
 
+NoteChartListView.draw = function(self)
+	ListView.draw(self)
+
+	if just.keypressed("up") then self:scroll(-1)
+	elseif just.keypressed("down") then self:scroll(1)
+	end
+end
+
 NoteChartListView.drawItem = function(self, i, w, h)
 	local items = self.items
 	local item = items[i]

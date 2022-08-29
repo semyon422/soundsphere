@@ -4,14 +4,8 @@ local FadeTransition = require("sphere.views.FadeTransition")
 local FrameTimeView = require("sphere.views.FrameTimeView")
 local TextTooltipImView = require("sphere.imviews.TextTooltipImView")
 local ContextMenuImView = require("sphere.imviews.ContextMenuImView")
-local ModalImView = require("sphere.imviews.ModalImView")
-local NoteSkinView = require("sphere.views.NoteSkinView")
-local InputView = require("sphere.views.InputView")
-local SettingsView = require("sphere.views.SettingsView")
 local OnlineView = require("sphere.views.OnlineView")
-local MountsView = require("sphere.views.MountsView")
 local ModifierView = require("sphere.views.ModifierView")
-local LobbyView = require("sphere.views.LobbyView")
 
 local GameView = Class:new()
 
@@ -19,23 +13,13 @@ GameView.construct = function(self)
 	self.fadeTransition = FadeTransition:new()
 	self.frameTimeView = FrameTimeView:new()
 
-	self.noteSkinView = NoteSkinView:new()
-	self.inputView = InputView:new()
-	self.settingsView = SettingsView:new()
 	self.onlineView = OnlineView:new()
-	self.mountsView = MountsView:new()
 	self.modifierView = ModifierView:new()
-	self.lobbyView = LobbyView:new()
 end
 
 GameView.load = function(self)
-	self.noteSkinView.game = self.game
-	self.inputView.game = self.game
-	self.settingsView.game = self.game
 	self.onlineView.game = self.game
-	self.mountsView.game = self.game
 	self.modifierView.game = self.game
-	self.lobbyView.game = self.game
 
 	self.frameTimeView.game = self.game
 
@@ -89,15 +73,10 @@ GameView.draw = function(self)
 	self.fadeTransition:drawBefore()
 	self.view:draw()
 
-	self.noteSkinView:draw()
-	self.inputView:draw()
-	self.settingsView:draw()
 	self.onlineView:draw()
-	self.mountsView:draw()
 	self.modifierView:draw()
-	self.lobbyView:draw()
 
-	if ModalImView(self.modal, self) then
+	if self.modal and self.modal(self) then
 		self.modal = nil
 	end
 	if self.contextMenu and ContextMenuImView(self.contextMenuWidth) then
@@ -128,17 +107,16 @@ GameView.setContextMenu = function(self, f, width)
 end
 
 GameView.setModal = function(self, f)
+	if self.modal == f then
+		self.modal = nil
+		return
+	end
 	self.modal = f
 end
 
 GameView.hideAllWindows = function(self)
-	self.noteSkinView:toggle(false)
-	self.inputView:toggle(false)
-	self.settingsView:toggle(false)
 	self.onlineView:toggle(false)
-	self.mountsView:toggle(false)
 	self.modifierView:toggle(false)
-	self.lobbyView:toggle(false)
 end
 
 return GameView

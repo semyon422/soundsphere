@@ -17,6 +17,19 @@ CollectionListView.scroll = function(self, count)
 	self.game.selectModel:scrollCollection(count)
 end
 
+CollectionListView.draw = function(self)
+	ListView.draw(self)
+
+	local kp = just.keypressed
+	if kp("up") or kp("left") then self:scroll(-1)
+	elseif kp("down") or kp("right") then self:scroll(1)
+	elseif kp("pageup") then self:scroll(-10)
+	elseif kp("pagedown") then self:scroll(10)
+	elseif kp("home") then self:scroll(-math.huge)
+	elseif kp("end") then self:scroll(math.huge)
+	end
+end
+
 CollectionListView.drawItem = function(self, i, w, h)
 	local item = self.items[i]
 

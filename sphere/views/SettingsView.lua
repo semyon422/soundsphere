@@ -8,6 +8,7 @@ local SpoilerImView = require("sphere.imviews.SpoilerImView")
 local SliderImView = require("sphere.imviews.SliderImView")
 local CheckboxImView = require("sphere.imviews.CheckboxImView")
 local HotkeyImView = require("sphere.imviews.HotkeyImView")
+local ModalImView = require("sphere.imviews.ModalImView")
 local TimingsModalView = require("sphere.views.TimingsModalView")
 local _transform = require("aqua.graphics.transform")
 local round = require("aqua.math").round
@@ -16,10 +17,6 @@ local spherefonts = require("sphere.assets.fonts")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
-local SettingsView = Class:new()
-
-SettingsView.isOpen = false
-
 local sections = {
 	"gameplay",
 	"graphics",
@@ -27,51 +24,48 @@ local sections = {
 	"input",
 	"misc",
 }
-SettingsView.section = sections[1]
+local currentSection = sections[1]
 
-SettingsView.toggle = function(self, state)
-	if state == nil then
-		self.isOpen = not self.isOpen
-	else
-		self.isOpen = state
-	end
-end
+local scrollY = 0
 
-local _w, _h = 0, 0
-SettingsView.draw = function(self)
-	if not self.isOpen then
-		return
-	end
+local w, h = 454 * 1.5, 1080 / 2
+local _w, _h = w / 2, 55
+local r = 8
 
+local window_id = "settings window"
+
+local drawTabs
+local drawSection = {}
+
+local function draw(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	love.graphics.replaceTransform(_transform(transform))
 	love.graphics.translate(279 + 454 * 3 / 4, 1080 / 4)
-	local w, h = 454 * 1.5, 1080 / 2
-	local r = 8
 
 	love.graphics.setColor(0, 0, 0, 0.8)
 	love.graphics.rectangle("fill", 0, 0, w, h, r)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	just.clip(love.graphics.rectangle, "fill", 0, 0, w, h, r)
-	just.container("SettingsView", just.is_over(w, h))
 
-	local scroll = just.wheel_over(self, just.is_over(w, h))
-	self.scroll = self.scroll or 0
-	love.graphics.translate(0, -self.scroll)
+	local over = just.is_over(w, h)
+	just.container(window_id, over)
+	just.button(window_id, over)
+
+	local scroll = just.wheel_over(window_id, over)
+	love.graphics.translate(0, -scrollY)
 	local startHeight = just.height
 
-	_w, _h = w / 2, 55
-	self:drawTabs(w, _h)
-	self[self.section](self, w)
+	drawTabs()
+	drawSection[currentSection](self)
 
 	local overlap = math.max(just.height - startHeight - h, 0)
 	if overlap > 0 and scroll then
-		self.scroll = math.min(math.max(self.scroll - scroll * _h * 2, 0), overlap)
+		scrollY = math.min(math.max(scrollY - scroll * _h * 2, 0), overlap)
 	end
 	if overlap == 0 then
-		self.scroll = 0
+		scrollY = 0
 	end
 
 	just.container()
@@ -81,16 +75,16 @@ SettingsView.draw = function(self)
 	love.graphics.rectangle("line", 0, 0, w, h, r)
 end
 
-SettingsView.drawTabs = function(self, w, h)
+function drawTabs()
 	just.row(true)
 	for _, section in ipairs(sections) do
-		if section == self.section then
+		if section == currentSection then
 			love.graphics.setColor(1, 1, 1, 0.1)
-			love.graphics.rectangle("fill", 0, 0, w / #sections, h)
+			love.graphics.rectangle("fill", 0, 0, w / #sections, _h)
 		end
 		love.graphics.setColor(1, 1, 1, 1)
-		if TextButtonImView("section " .. section, section, w / #sections, h) then
-			self.section = section
+		if TextButtonImView("section " .. section, section, w / #sections, _h) then
+			currentSection = section
 		end
 	end
 	just.row(false)
@@ -165,7 +159,7 @@ local function hotkey(id, key, label)
 	return key
 end
 
-SettingsView.gameplay = function(self, w)
+drawSection.gameplay = function(self)
 	local settings = self.game.configModel.configs.settings
 	local g = settings.gameplay
 	local i = settings.input
@@ -244,7 +238,7 @@ local vsyncNames = {
 local function formatVsync(v)
 	return vsyncNames[v] or ""
 end
-SettingsView.graphics = function(self, w)
+drawSection.graphics = function(self)
 	local settings = self.game.configModel.configs.settings
 	local g = settings.graphics
 
@@ -286,7 +280,7 @@ local _formatModes = {
 local function formatModes(mode)
 	return _formatModes[mode] or mode
 end
-SettingsView.audio = function(self, w)
+drawSection.audio = function(self)
 	local settings = self.game.configModel.configs.settings
 	local a = settings.audio
 
@@ -306,7 +300,7 @@ SettingsView.audio = function(self, w)
 	a.midi.constantVolume = checkbox("midi.constantVolume", a.midi.constantVolume, "midi constant volume")
 end
 
-SettingsView.input = function(self, w)
+drawSection.input = function(self)
 	local settings = self.game.configModel.configs.settings
 	local i = settings.input
 
@@ -315,7 +309,7 @@ SettingsView.input = function(self, w)
 	i.screenshot.open = hotkey("screenshot.open", i.screenshot.open, "open screenshot")
 end
 
-SettingsView.misc = function(self, w)
+drawSection.misc = function(self)
 	local settings = self.game.configModel.configs.settings
 	local m = settings.miscellaneous
 
@@ -325,4 +319,4 @@ SettingsView.misc = function(self, w)
 	m.showFPS = checkbox("showFPS", m.showFPS, "show FPS")
 end
 
-return SettingsView
+return ModalImView(draw)
