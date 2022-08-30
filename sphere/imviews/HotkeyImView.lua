@@ -34,8 +34,10 @@ return function(id, device, key, w, h)
 		end
 	end
 
-	if just.button(id, just.is_over(w, h)) then
+	local _changed, active, hovered = just.button(id, just.is_over(w, h))
+	if _changed then
 		just.focus(id)
+		active = true
 	end
 
 	just.push()
@@ -45,12 +47,16 @@ return function(id, device, key, w, h)
 
 	local r = h * size / 2
 	local x = h * size * (1 - size) / 2
-	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.rectangle("line", x, x, w - x * 2, h * size, r)
-	if just.focused_id == id then
-		love.graphics.setColor(1, 1, 1, 0.2)
-		love.graphics.rectangle("fill", x, x, w - x * 2, h * size, r)
+
+	local alpha = 0.2
+	if hovered then
+		alpha = active and 0.4 or 0.3
 	end
+	if just.focused_id == id or active then
+		alpha = 0.4
+	end
+	love.graphics.setColor(1, 1, 1, alpha)
+	love.graphics.rectangle("fill", x, x, w - x * 2, h * size, r)
 	love.graphics.translate(r, (h - lh) / 2)
 
 	love.graphics.setColor(1, 1, 1, 1)

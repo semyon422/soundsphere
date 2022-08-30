@@ -33,13 +33,19 @@ return function(id, w, h, preview)
 	width = w
 	local _w, _h = w - x * 2, h - x * 2
 
-	if just.focused_id ~= id and just.button(id, just.is_over(w, h)) then
+	local changed, active, hovered = just.button(id, just.is_over(w, h))
+	if just.focused_id ~= id and changed then
 		just.focus(id)
 		open_frame_id = id
 	end
 	if just.focused_id ~= id or open_frame_id == id then
+		love.graphics.setColor(1, 1, 1, 0.2)
+		if hovered then
+			local alpha = active and 0.4 or 0.3
+			love.graphics.setColor(1, 1, 1, alpha)
+		end
+		love.graphics.rectangle("fill", x, x, _w, _h, r)
 		love.graphics.setColor(1, 1, 1, 1)
-		love.graphics.rectangle("line", x, x, _w, _h, r)
 		just_print(preview, x, x, _w, _h, "center", "center")
 		if open_frame_id == id then
 			just.clip(love.graphics.rectangle, "fill", 0, 0, 0, 0)

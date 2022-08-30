@@ -10,14 +10,14 @@ return function(id, text, w, h)
 
 	local r = h * size / 2
 	local x = h * size * (1 - size) / 2
+	love.graphics.setColor(1, 1, 1, 0.2)
 	if hovered then
-		local alpha = active and 0.2 or 0.1
+		local alpha = active and 0.4 or 0.3
 		love.graphics.setColor(1, 1, 1, alpha)
-		love.graphics.rectangle("fill", x, x, w - x * 2, h * size, r)
 	end
-	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.rectangle("line", x, x, w - x * 2, h * size, r)
+	love.graphics.rectangle("fill", x, x, w - x * 2, h * size, r)
 
+	love.graphics.setColor(1, 1, 1, 1)
 	just_print(text, 0, 0, w, h, "center", "center")
 
 	just.next(w, h)

@@ -21,9 +21,13 @@ return function(id, value, w, h)
 
 	local bh = h * 0.75
 
-	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.setColor(1, 1, 1, 0.2)
+	if hovered then
+		local alpha = active and 0.4 or 0.3
+		love.graphics.setColor(1, 1, 1, alpha)
+	end
 	love.graphics.rectangle(
-		"line",
+		"fill",
 		(h - bh) / 2,
 		(h - bh) / 2,
 		w - (h - bh),
@@ -31,6 +35,8 @@ return function(id, value, w, h)
 		bh / 2,
 		bh / 2
 	)
+
+	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.circle(
 		"fill",
 		map(value, 0, 1, h / 2, w - h / 2),

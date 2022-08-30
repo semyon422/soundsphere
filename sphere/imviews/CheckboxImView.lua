@@ -5,17 +5,18 @@ return function(id, v, size, scale)
 	local over = 0 <= mx and mx <= size and 0 <= my and my <= size
 
 	local changed, active, hovered = just.button(id, over)
-	if hovered then
-		local alpha = active and 0.2 or 0.1
-		love.graphics.setColor(1, 1, 1, alpha)
-		love.graphics.rectangle("fill", 0, 0, size, size)
-	end
-	love.graphics.setColor(1, 1, 1, 1)
 
-	love.graphics.circle("line", size / 2, size / 2, size / 2 * scale)
+	love.graphics.setColor(1, 1, 1, 0.2)
+	if hovered then
+		local alpha = active and 0.4 or 0.3
+		love.graphics.setColor(1, 1, 1, alpha)
+	end
+	love.graphics.circle("fill", size / 2, size / 2, size / 2 * scale)
+
+	love.graphics.setColor(1, 1, 1, 1)
 	if v then
-		love.graphics.circle("fill", size / 2, size / 2, size / 2 * scale * 0.6)
-		love.graphics.circle("line", size / 2, size / 2, size / 2 * scale * 0.6)
+		love.graphics.circle("fill", size / 2, size / 2, size / 4 * scale / 0.75)
+		love.graphics.circle("line", size / 2, size / 2, size / 4 * scale / 0.75)
 	end
 
 	just.next(size, size)

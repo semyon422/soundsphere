@@ -58,7 +58,9 @@ local function draw(self)
 	local startHeight = just.height
 
 	drawTabs()
+	just.emptyline(8)
 	drawSection[currentSection](self)
+	just.emptyline(8)
 
 	local overlap = math.max(just.height - startHeight - h, 0)
 	if overlap > 0 and scroll then
@@ -89,6 +91,12 @@ function drawTabs()
 	end
 	just.row(false)
 	love.graphics.line(0, 0, w, 0)
+end
+
+local function separator()
+	just.emptyline(8)
+	love.graphics.line(0, 0, w, 0)
+	just.emptyline(8)
 end
 
 local function slider(id, v, a, b, label)
@@ -193,12 +201,12 @@ drawSection.gameplay = function(self)
 	g.bga.video = checkbox("bga.video", g.bga.video, "video BGA")
 	g.bga.image = checkbox("bga.image", g.bga.image, "image BGA")
 
-	love.graphics.line(0, 0, w, 0)
+	separator()
 	i.pause = hotkey("pause", i.pause, "pause")
 	i.skipIntro = hotkey("skipIntro", i.skipIntro, "skip intro")
 	i.quickRestart = hotkey("quickRestart", i.quickRestart, "quick restart")
 
-	love.graphics.line(0, 0, w, 0)
+	separator()
 	just.indent(10)
 	just.text("time to")
 	g.time.prepare = round(slider("time.prepare", g.time.prepare, 0.5, 3, ("prepare: %0.1f"):format(g.time.prepare)), 0.1)
@@ -207,20 +215,20 @@ drawSection.gameplay = function(self)
 	g.time.playRetry = round(slider("time.playRetry", g.time.playRetry, 0, 2, ("play-retry: %0.1f"):format(g.time.playRetry)), 0.1)
 	g.time.pauseRetry = round(slider("time.pauseRetry", g.time.pauseRetry, 0, 2, ("pause-retry: %0.1f"):format(g.time.pauseRetry)), 0.1)
 
-	love.graphics.line(0, 0, w, 0)
+	separator()
 	just.indent(10)
 	just.text("offset")
 	i.offset.decrease = hotkey("offset.decrease", i.offset.decrease, "decrease")
 	i.offset.increase = hotkey("offset.increase", i.offset.increase, "increase")
 
-	love.graphics.line(0, 0, w, 0)
+	separator()
 	just.indent(10)
 	just.text("play speed")
 	i.playSpeed.decrease = hotkey("playSpeed.decrease", i.playSpeed.decrease, "decrease")
 	i.playSpeed.increase = hotkey("playSpeed.increase", i.playSpeed.increase, "increase")
 	i.playSpeed.invert = hotkey("playSpeed.invert", i.playSpeed.invert, "invert ")
 
-	love.graphics.line(0, 0, w, 0)
+	separator()
 	just.indent(10)
 	just.text("time rate")
 	i.timeRate.decrease = hotkey("timeRate.decrease", i.timeRate.decrease, "decrease")
