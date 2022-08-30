@@ -593,15 +593,29 @@ local BottomScreenMenu = {draw = function(self)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
+	local scoreItem = self.game.selectModel.scoreItem
+	local scoreEngine = self.game.rhythmModel.scoreEngine
+	local scoreEntry = scoreEngine.scoreEntry
+
 	getRect(self, Layout.graphs_sup_right)
 	local tf = _transform(transform):translate(self.x + 55, self.y)
 	love.graphics.replaceTransform(tf)
 	just.row(true)
-	if TextButtonImView("retry", "retry", 72 * 2, self.h) then
+	if TextButtonImView("retry", "retry", 72 * 1.5, self.h) then
 		self.screenView:play("retry")
 	end
 	if TextButtonImView("replay", "watch replay", 72 * 3, self.h) then
 		self.screenView:play("replay")
+	end
+	if scoreItem and scoreEntry and scoreItem.id == scoreEntry.id and not scoreItem.file then
+		if TextButtonImView("submit", "resubmit", 72 * 2, self.h) then
+			local noteChartModel = self.game.noteChartModel
+			self.game.onlineModel.onlineScoreManager:submit(
+				noteChartModel.noteChartEntry,
+				noteChartModel.noteChartDataEntry,
+				scoreItem.replayHash
+			)
+		end
 	end
 	just.row(false)
 end}
