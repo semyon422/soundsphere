@@ -58,18 +58,19 @@ return ModalImView(function(self)
 	love.graphics.line(0, 0, w, 0)
 
 	for i = 1, #inputs do
+		local hotkey_id = "input hotkey" .. i
 		local virtualKey = inputs[i]
 		local key = self.game.inputModel:getKey(inputMode, virtualKey, currentDevice)
-		local changed, key = HotkeyImView(i, currentDevice, key, w / 2, inputHeight)
+		local changed, key = HotkeyImView(hotkey_id, currentDevice, key, w / 2, inputHeight)
 		if changed then
 			self.game.inputModel:setKey(inputMode, virtualKey, currentDevice, key)
 			if i + 1 <= #inputs then
-				just.focus(i + 1)
+				just.focus("input hotkey" .. (i + 1))
 			end
 		end
 		just.sameline()
 		just.indent(8)
-		LabelImView(i, virtualKey, inputHeight)
+		LabelImView(hotkey_id, virtualKey, inputHeight)
 	end
 
 	just.container()

@@ -20,7 +20,8 @@ AvailableModifierListView.drawItem = function(self, i, w, h)
 	local item = self.items[i]
 	local prevItem = self.items[i - 1]
 
-	if just.button(i, just.is_over(w, h)) then
+	local id = "available modifier" .. i
+	if just.button(id, just.is_over(w, h)) then
 		local modifier = self.game.modifierModel.modifiers[i]
 		self.game.modifierModel:add(modifier)
 	end
@@ -33,7 +34,7 @@ AvailableModifierListView.drawItem = function(self, i, w, h)
 	just.row(true)
 	just.indent(44)
 	TextCellImView(410, 72, "left", "", item.name)
-	if just.mouse_over(i, just.is_over(-410, 72), "mouse") then
+	if just.mouse_over(id, just.is_over(-410, 72), "mouse") then
 		self.game.gameView.tooltip = item.description
 	end
 	just.indent(-410 - 44)

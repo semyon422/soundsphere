@@ -41,7 +41,7 @@ RoomUsersListView.drawItem = function(self, i, w, h)
 
 	just.row(true)
 	just.indent(18)
-	LabelImView(i, name, h)
+	LabelImView(user, name, h)
 	just.row(false)
 
 	if not multiplayerModel:isHost() or room.hostPeerId == user.peerId then
