@@ -34,8 +34,12 @@ Alternate.apply = function(self, config)
 		end
 	end
 
-	local layerDataSequence = noteChart.layerDataSequence
 	local inputType = config.value
+	if not inputCounts[inputType] then
+		return
+	end
+
+	local layerDataSequence = noteChart.layerDataSequence
 	local inputAlternate = {}
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
