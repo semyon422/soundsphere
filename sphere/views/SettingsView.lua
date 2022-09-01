@@ -14,6 +14,7 @@ local _transform = require("aqua.graphics.transform")
 local round = require("aqua.math").round
 local map = require("aqua.math").map
 local spherefonts = require("sphere.assets.fonts")
+local version = require("version")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -325,6 +326,11 @@ drawSection.misc = function(self)
 	m.imguiShowDemoWindow = checkbox("imguiShowDemoWindow", m.imguiShowDemoWindow, "show imgui demo window")
 	m.showNonManiaCharts = checkbox("showNonManiaCharts", m.showNonManiaCharts, "show non-mania charts")
 	m.showFPS = checkbox("showFPS", m.showFPS, "show FPS")
+
+	just.indent(8)
+	just.text(version.commit)
+	just.indent(8)
+	just.text(version.date)
 end
 
 return ModalImView(draw)
