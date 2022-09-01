@@ -176,18 +176,12 @@ MultiplayerModel.leaveRoom = remote.wrap(function(self)
 end)
 
 MultiplayerModel.pushModifiers = remote.wrap(function(self)
-	if not self:isHost() then
-		return
-	end
 	self.peer._setModifiers(self.game.modifierModel.config)
 end)
 
 local async_read = aquathread.async(function(...) return love.filesystem.read(...) end)
 
 MultiplayerModel.pushNotechart = remote.wrap(function(self)
-	if not self:isHost() then
-		return
-	end
 	local nc = self.game.selectModel.noteChartItem
 	if not nc then
 		return

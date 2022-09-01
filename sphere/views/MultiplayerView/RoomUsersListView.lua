@@ -4,8 +4,18 @@ local TextCellImView = require("sphere.imviews.TextCellImView")
 local LabelImView = require("sphere.imviews.LabelImView")
 local Format = require("sphere.views.Format")
 local TextButtonImView = require("sphere.imviews.TextButtonImView")
+local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
+local spherefonts		= require("sphere.assets.fonts")
 
 local RoomUsersListView = ListView:new({construct = false})
+
+RoomUsersListView.load = function(self)
+	self.modifierIconGrid = ModifierIconGridView:new()
+
+	self.modifierIconGrid.game = self.game
+	self.modifierIconGrid.x = 0
+	self.modifierIconGrid.y = 0
+end
 
 RoomUsersListView.reloadItems = function(self)
 	self.items = self.game.multiplayerModel.roomUsers
@@ -16,7 +26,7 @@ RoomUsersListView.drawItem = function(self, i, w, h)
 	local user = items[i]
 
 	local multiplayerModel = self.game.multiplayerModel
-	local room = self.game.multiplayerModel.room
+	local room = multiplayerModel.room
 	if not room then
 		return
 	end
@@ -39,9 +49,36 @@ RoomUsersListView.drawItem = function(self, i, w, h)
 		name = name .. " playing"
 	end
 
+	local modifierModel = self.game.modifierModel
+
+	local configModifier = user.modifiers
+	if type(configModifier) == "string" then
+		configModifier = modifierModel:decode(configModifier)
+	end
+	configModifier = configModifier or {}
+	local modifiers = modifierModel:getString(configModifier)
+
+	local title = user.notechart.title or ""
+	local diffname = user.notechart.name or ""
+
+	local description = ""
+	if room.isFreeNotechart then
+		description = ("%s - %s"):format(title, diffname)
+		if room.isFreeModifiers then
+			description = description .. "\n"
+		end
+	end
+	if room.isFreeModifiers then
+		description = description .. modifiers
+	end
+
 	just.row(true)
 	just.indent(18)
+	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 	LabelImView(user, name, h)
+	just.offset(w / 2)
+	love.graphics.setFont(spherefonts.get("Noto Sans", 18))
+	LabelImView(user, description, h)
 	just.row(false)
 
 	if not multiplayerModel:isHost() or room.hostPeerId == user.peerId then
