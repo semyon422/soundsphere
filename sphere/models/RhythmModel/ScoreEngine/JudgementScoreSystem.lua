@@ -23,6 +23,10 @@ JudgementScoreSystem.judgementLists = {
 	},
 }
 
+local function osuAccuracy(c)
+	local total = c["0"] + c["50"] + c["100"] + c["200"] + c["300"] + c["300g"]
+	return (c["50"] * 50 + c["100"] * 100 + c["200"] * 200 + (c["300"] + c["300g"]) * 300) / (total * 300)
+end
 for od = 0, 10 do
 	local _3od = 3 * od
 	local _300g = 16
@@ -32,6 +36,7 @@ for od = 0, 10 do
 	local _50 = 151 - _3od
 	local _0 = 188 - _3od
 	local judgements = {
+		accuracy = osuAccuracy,
 		-_0,
 		"0",
 		-_50,

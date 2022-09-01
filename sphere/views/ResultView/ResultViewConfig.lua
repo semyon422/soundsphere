@@ -258,7 +258,6 @@ local Judgements = {draw = function(self)
 
 	local counterName = self.game.configModel.configs.select.judgements
 	local counters = judgement.counters
-	local judgements = judgement.judgements
 	local judgementLists = judgement.judgementLists
 	local counter = counters[counterName]
 
@@ -305,6 +304,37 @@ local JudgementsDropdown = JudgementsDropdownView:new({
 		self.__index.draw(self)
 	end,
 })
+
+local JudgementsAccuracy = {
+	draw = function(self)
+		local show = showLoadedScore(self)
+		local scoreEngine = self.game.rhythmModel.scoreEngine
+		local scoreItem = self.game.selectModel.scoreItem
+		local judgement = scoreEngine.scoreSystem.judgement
+
+		if not show or not judgement or not scoreItem then
+			return
+		end
+
+		local counterName = self.game.configModel.configs.select.judgements
+		local counter = judgement.counters[counterName]
+		local judgements = judgement.judgements[counterName]
+
+		if not judgements.accuracy then
+			return
+		end
+
+		getRect(self, Layout.column1row1)
+		local size = 1 / 3
+		self.x = self.x + self.w * 1 / 3
+		self.w = self.w * size
+		love.graphics.replaceTransform(_transform(transform):translate(self.x, self.y))
+
+		love.graphics.setColor(1, 1, 1, 1)
+		love.graphics.setFont(spherefonts.get("Noto Sans Mono", 32))
+		LabelImView("j.acc", ("%3.2f%%"):format(judgements.accuracy(counter) * 100), self.h)
+	end,
+}
 
 local NotechartInfo = {draw = function(self)
 	local erfunc = require("libchart.erfunc")
@@ -682,6 +712,7 @@ local NoteSkinViewConfig = {
 	NotechartInfo,
 	Judgements,
 	JudgementsDropdown,
+	JudgementsAccuracy,
 	ModifierIconGrid,
 	ScoreList,
 	ScoreScrollBar,
