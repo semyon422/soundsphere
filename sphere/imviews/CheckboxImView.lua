@@ -1,6 +1,7 @@
 local just = require("just")
 
 return function(id, v, size, scale)
+	scale = scale or 0.75
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local over = 0 <= mx and mx <= size and 0 <= my and my <= size
 
