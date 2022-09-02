@@ -12,7 +12,7 @@ local getPosition = function(w, h, _h)
 	return math.min(math.max(value, 0), 1)
 end
 
-local size = 1
+local size = 1/2
 return function(id, value, w, h, overlap)
 	if overlap == 0 then
 		return 0
@@ -31,7 +31,7 @@ return function(id, value, w, h, overlap)
 	end
 	love.graphics.rectangle("fill", 0, 0, w, h, w / 2, w / 2)
 
-	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.setColor(1, 1, 1, 0.8)
 
 	local x = w * (1 - size) / 2
 	love.graphics.rectangle(
