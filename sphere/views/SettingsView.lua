@@ -8,6 +8,8 @@ local SpoilerImView = require("sphere.imviews.SpoilerImView")
 local SliderImView = require("sphere.imviews.SliderImView")
 local CheckboxImView = require("sphere.imviews.CheckboxImView")
 local HotkeyImView = require("sphere.imviews.HotkeyImView")
+local ContainerImView = require("sphere.imviews.ContainerImView")
+local ListImView = require("sphere.imviews.ListImView")
 local ModalImView = require("sphere.imviews.ModalImView")
 local TimingsModalView = require("sphere.views.TimingsModalView")
 local _transform = require("aqua.graphics.transform")
@@ -29,7 +31,7 @@ local currentSection = sections[1]
 
 local scrollY = 0
 
-local w, h = 454 * 1.5, 1080 / 2
+local w, h = 768, 1080 / 2
 local _w, _h = w / 2, 55
 local r = 8
 
@@ -42,37 +44,23 @@ local function draw(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	love.graphics.replaceTransform(_transform(transform))
-	love.graphics.translate(279 + 454 * 3 / 4, 1080 / 4)
+	love.graphics.translate((1920 - w) / 2, (1080 - h) / 2)
 
 	love.graphics.setColor(0, 0, 0, 0.8)
 	love.graphics.rectangle("fill", 0, 0, w, h, r)
 	love.graphics.setColor(1, 1, 1, 1)
 
-	just.clip(love.graphics.rectangle, "fill", 0, 0, w, h, r)
-
-	local over = just.is_over(w, h)
-	just.container(window_id, over)
-	just.button(window_id, over)
-
-	local scroll = just.wheel_over(window_id, over)
-	love.graphics.translate(0, -scrollY)
-	local startHeight = just.height
+	just.push()
 
 	drawTabs()
+	ContainerImView(window_id, w, h - _h, _h * 2, scrollY)
+
 	just.emptyline(8)
 	drawSection[currentSection](self)
 	just.emptyline(8)
 
-	local overlap = math.max(just.height - startHeight - h, 0)
-	if overlap > 0 and scroll then
-		scrollY = math.min(math.max(scrollY - scroll * _h * 2, 0), overlap)
-	end
-	if overlap == 0 then
-		scrollY = 0
-	end
-
-	just.container()
-	just.clip()
+	scrollY = ContainerImView()
+	just.pop()
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.rectangle("line", 0, 0, w, h, r)
@@ -88,6 +76,7 @@ function drawTabs()
 		love.graphics.setColor(1, 1, 1, 1)
 		if TextButtonImView("section " .. section, section, w / #sections, _h) then
 			currentSection = section
+			scrollY = 0
 		end
 	end
 	just.row(false)
@@ -131,6 +120,23 @@ local function combo(id, v, values, format, label)
 		end
 		SpoilerImView()
 	end
+	just.sameline()
+	just.indent(8)
+	LabelImView(id .. "label", label, _h)
+	return v
+end
+
+local scrolls = {}
+local function list(id, v, values, height, format, label)
+	scrolls[id] = scrolls[id] or 0
+	ListImView(id, _w, height, _h, scrolls[id])
+	for i, _v in ipairs(values) do
+		local dv = format and format(_v) or _v
+		if TextButtonImView(id .. i, dv, _w - _h * 0.125, _h * 0.75) then
+			v = _v
+		end
+	end
+	scrolls[id] = ListImView()
 	just.sameline()
 	just.indent(8)
 	LabelImView(id .. "label", label, _h)
@@ -328,9 +334,9 @@ drawSection.misc = function(self)
 	m.showFPS = checkbox("showFPS", m.showFPS, "show FPS")
 
 	just.indent(8)
-	just.text(version.commit)
+	just.text("Commit: " .. version.commit)
 	just.indent(8)
-	just.text(version.date)
+	just.text("Date: " .. version.date)
 end
 
 return ModalImView(draw)
