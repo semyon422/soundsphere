@@ -51,17 +51,25 @@ PreviewModel.loadPreviewDebounce = function(self, audioPath, previewTime)
 	aquatimer.debounce(self, "loadDebounce", 0.1, self.loadPreview, self)
 end
 
+local loadingPreview
 PreviewModel.loadPreview = function(self)
+	if loadingPreview then
+		return
+	end
+	loadingPreview = true
+
 	local path = self.audioPath
 	local position = self.previewTime
 
 	if not path then
+		loadingPreview = false
 		return self:stop()
 	end
 
 	if not path:find("^http") then
 		local info = love.filesystem.getInfo(path)
 		if not info then
+			loadingPreview = false
 			return self:stop()
 		end
 	end
@@ -70,6 +78,7 @@ PreviewModel.loadPreview = function(self)
 		if self.path ~= path then
 			self:stop()
 		else
+			loadingPreview = false
 			return
 		end
 	end
@@ -81,6 +90,7 @@ PreviewModel.loadPreview = function(self)
 		audio = self:loadAudio(path)
 	end
 
+	loadingPreview = false
 	if path ~= self.audioPath then
 		return self:loadPreview()
 	end
