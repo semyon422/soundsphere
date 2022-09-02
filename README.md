@@ -34,6 +34,7 @@ Open-source rhythm game
 - Settings for noteskins
 - osu!direct
 - Multiplayer
+- Auto-updater
 - And much more
 
 ## Future plans:
@@ -45,6 +46,5 @@ Open-source rhythm game
 - Difficulty tables
 - Multiple profiles
 - Replay import
-- New design
 - Editor
 - And much more
