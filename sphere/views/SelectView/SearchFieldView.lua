@@ -19,6 +19,9 @@ SearchFieldView.draw = function(self)
 		if changed == "text" then
 			self:setText(text)
 		end
+		if changed and love.keyboard.isDown("lctrl") and love.keyboard.isDown("backspace") then
+			self:setText("")
+		end
 	end
 
 	local tf = transform(self.transform):translate(self.x, self.y)
