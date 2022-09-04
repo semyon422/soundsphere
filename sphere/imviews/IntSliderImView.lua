@@ -3,7 +3,7 @@ local SliderImView = require("sphere.imviews.SliderImView")
 
 return function(id, value, min, max, w, h)
 	local _value = map(value, min, max, 0, 1)
-	local new_value = SliderImView(id, _value, w, h)
+	local new_value = SliderImView(id, _value, w, h, value)
 	if not new_value then
 		return value
 	end
