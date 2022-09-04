@@ -89,9 +89,9 @@ local function separator()
 	just.emptyline(8)
 end
 
-local function slider(id, v, a, b, label)
+local function slider(id, v, a, b, displayValue, label)
 	local _v = map(v, a, b, 0, 1)
-	_v = SliderImView(id, _v, _w, _h) or _v
+	_v = SliderImView(id, _v, _w, _h, displayValue) or _v
 	just.sameline()
 	just.indent(8)
 	LabelImView(id .. "label", label, _h)
@@ -145,15 +145,19 @@ end
 
 local function intButtons(id, v, s, label)
 	just.row(true)
-	if TextButtonImView2(id .. "-1", "-1", _w / 4, _h) then v = v - 1 end
-	if TextButtonImView2(id .. "+1", "+1", _w / 4, _h) then v = v + 1 end
+	TextButtonImView2(nil, v, _w / 4, _h)
+	local button = TextButtonImView2(id .. "1", "±1", _w / 4, _h)
+	if button == 1 then v = v + 1 end
+	if button == 2 then v = v - 1 end
 	if s >= 10 then
-		if TextButtonImView2(id .. "-10", "-10", _w / 4, _h) then v = v - 10 end
-		if TextButtonImView2(id .. "+10", "+10", _w / 4, _h) then v = v + 10 end
+		button = TextButtonImView2(id .. "10", "±10", _w / 4, _h)
+		if button == 1 then v = v + 10 end
+		if button == 2 then v = v - 10 end
 	end
 	if s >= 100 then
-		if TextButtonImView2(id .. "-100", "-100", _w / 4, _h) then v = v - 100 end
-		if TextButtonImView2(id .. "+100", "+100", _w / 4, _h) then v = v + 100 end
+		button = TextButtonImView2(id .. "100", "±100", _w / 4, _h)
+		if button == 1 then v = v + 100 end
+		if button == 2 then v = v - 100 end
 	end
 	just.indent(8)
 	LabelImView(id .. "label", label, _h)
@@ -161,8 +165,8 @@ local function intButtons(id, v, s, label)
 	return math.floor(v)
 end
 
-local function intButtonsMs(id, v, labelFormat)
-	return intButtons(id, v * 1000, 10, labelFormat:format(v * 1000)) / 1000
+local function intButtonsMs(id, v, label)
+	return intButtons(id, v * 1000, 10, label) / 1000
 end
 
 local function hotkey(id, key, label)
@@ -179,7 +183,7 @@ drawSection.gameplay = function(self)
 	local g = settings.gameplay
 	local i = settings.input
 
-	g.speed = round(slider("speed", g.speed, 0, 3, ("play speed: %0.2f"):format(g.speed)), 0.05)
+	g.speed = round(slider("speed", g.speed, 0, 3, ("%0.2f"):format(g.speed), "play speed"), 0.05)
 
 	if TextButtonImView2("open timings", "timings", _w / 2, _h) then
 		self.game.gameView:setModal(TimingsModalView)
@@ -191,13 +195,14 @@ drawSection.gameplay = function(self)
 	g.scaleSpeed = checkbox("scaleSpeed", g.scaleSpeed, "scale scroll speed with rate")
 	g.longNoteShortening = round(slider(
 		"shortening", g.longNoteShortening, -0.3, 0,
-		("visual LN shortening: %dms"):format(g.longNoteShortening * 1000)), 0.01)
-	g.offset.input = intButtonsMs("input offset", g.offset.input, "input offset: %d")
-	g.offset.visual = intButtonsMs("visual offset", g.offset.visual, "visual offset: %d")
+		("%dms"):format(g.longNoteShortening * 1000),
+		"visual LN shortening"), 0.01)
+	g.offset.input = intButtonsMs("input offset", g.offset.input, "input offset")
+	g.offset.visual = intButtonsMs("visual offset", g.offset.visual, "visual offset")
 	g.offsetScale.input = checkbox("offsetScale.input", g.offsetScale.input, "input offset * time rate")
 	g.offsetScale.visual = checkbox("offsetScale.visual", g.offsetScale.visual, "visual offset * time rate")
-	g.lastMeanValues = intButtons("lastMeanValues", g.lastMeanValues, 10, ("last mean values: %d"):format(g.lastMeanValues))
-	g.ratingHitTimingWindow = intButtonsMs("ratingHitTimingWindow", g.ratingHitTimingWindow, "rating hit timing window: %d")
+	g.lastMeanValues = intButtons("lastMeanValues", g.lastMeanValues, 10, "last mean values")
+	g.ratingHitTimingWindow = intButtonsMs("ratingHitTimingWindow", g.ratingHitTimingWindow, "rating hit timing window")
 
 	-- g.hp.start = intButtons("hp.start", g.hp.start, "hp start: %d")
 	-- g.hp.min = intButtons("hp.min", g.hp.min, "hp min: %d")
@@ -216,11 +221,11 @@ drawSection.gameplay = function(self)
 	separator()
 	just.indent(10)
 	just.text("time to")
-	g.time.prepare = round(slider("time.prepare", g.time.prepare, 0.5, 3, ("prepare: %0.1f"):format(g.time.prepare)), 0.1)
-	g.time.playPause = round(slider("time.playPause", g.time.playPause, 0, 2, ("play-pause: %0.1f"):format(g.time.playPause)), 0.1)
-	g.time.pausePlay = round(slider("time.pausePlay", g.time.pausePlay, 0, 2, ("pause-play: %0.1f"):format(g.time.pausePlay)), 0.1)
-	g.time.playRetry = round(slider("time.playRetry", g.time.playRetry, 0, 2, ("play-retry: %0.1f"):format(g.time.playRetry)), 0.1)
-	g.time.pauseRetry = round(slider("time.pauseRetry", g.time.pauseRetry, 0, 2, ("pause-retry: %0.1f"):format(g.time.pauseRetry)), 0.1)
+	g.time.prepare = round(slider("time.prepare", g.time.prepare, 0.5, 3, ("%0.1f"):format(g.time.prepare), "prepare"), 0.1)
+	g.time.playPause = round(slider("time.playPause", g.time.playPause, 0, 2, ("%0.1f"):format(g.time.playPause), "play-pause"), 0.1)
+	g.time.pausePlay = round(slider("time.pausePlay", g.time.pausePlay, 0, 2, ("%0.1f"):format(g.time.pausePlay), "pause-play"), 0.1)
+	g.time.playRetry = round(slider("time.playRetry", g.time.playRetry, 0, 2, ("%0.1f"):format(g.time.playRetry), "play-retry"), 0.1)
+	g.time.pauseRetry = round(slider("time.pauseRetry", g.time.pauseRetry, 0, 2, ("%0.1f"):format(g.time.pauseRetry), "pause-retry"), 0.1)
 
 	separator()
 	just.indent(10)
@@ -257,7 +262,7 @@ drawSection.graphics = function(self)
 	local settings = self.game.configModel.configs.settings
 	local g = settings.graphics
 
-	g.fps = intButtons("fps", g.fps, 100, ("FPS limit: %s"):format(g.fps))
+	g.fps = intButtons("fps", g.fps, 100, "FPS limit")
 
 	local flags = g.mode.flags
 	flags.fullscreen = checkbox("flags.fullscreen", flags.fullscreen, "fullscreen")
@@ -273,14 +278,14 @@ drawSection.graphics = function(self)
 	g.cursor = combo("g.cursor", g.cursor, {"circle", "arrow", "system"}, nil, "cursor")
 
 	local dim = g.dim
-	dim.select = round(slider("dim.select", dim.select, 0, 1, ("dim select: %0.2f"):format(dim.select)), 0.01)
-	dim.gameplay = round(slider("dim.gameplay", dim.gameplay, 0, 1, ("dim gameplay: %0.2f"):format(dim.gameplay)), 0.01)
-	dim.result = round(slider("dim.result", dim.result, 0, 1, ("dim result: %0.2f"):format(dim.result)), 0.01)
+	dim.select = round(slider("dim.select", dim.select, 0, 1, ("%0.2f"):format(dim.select), "dim select"), 0.01)
+	dim.gameplay = round(slider("dim.gameplay", dim.gameplay, 0, 1, ("%0.2f"):format(dim.gameplay), "dim gameplay"), 0.01)
+	dim.result = round(slider("dim.result", dim.result, 0, 1, ("%0.2f"):format(dim.result), "dim result"), 0.01)
 
 	local blur = g.blur
-	blur.select = round(slider("blur.select", blur.select, 0, 1, ("blur select: %0.2f"):format(blur.select)), 0.01)
-	blur.gameplay = round(slider("blur.gameplay", blur.gameplay, 0, 1, ("blur gameplay: %0.2f"):format(blur.gameplay)), 0.01)
-	blur.result = round(slider("blur.result", blur.result, 0, 1, ("blur result: %0.2f"):format(blur.result)), 0.01)
+	blur.select = round(slider("blur.select", blur.select, 0, 1, ("%0.2f"):format(blur.select), "blur select"), 0.01)
+	blur.gameplay = round(slider("blur.gameplay", blur.gameplay, 0, 1, ("%0.2f"):format(blur.gameplay), "blur gameplay"), 0.01)
+	blur.result = round(slider("blur.result", blur.result, 0, 1, ("%0.2f"):format(blur.result), "blur result"), 0.01)
 
 	local p = g.perspective
 	p.camera = checkbox("p.camera", p.camera, "enable camera")
@@ -300,11 +305,11 @@ drawSection.audio = function(self)
 	local a = settings.audio
 
 	local v = a.volume
-	v.master = round(slider("v.master", v.master, 0, 1, ("master volume: %0.2f"):format(v.master)), 0.01)
-	v.music = round(slider("v.music", v.music, 0, 1, ("music volume: %0.2f"):format(v.music)), 0.01)
-	v.effects = round(slider("v.effects", v.effects, 0, 1, ("effects volume: %0.2f"):format(v.effects)), 0.01)
+	v.master = round(slider("v.master", v.master, 0, 1, ("%0.2f"):format(v.master), "master volume"), 0.01)
+	v.music = round(slider("v.music", v.music, 0, 1, ("%0.2f"):format(v.music), "music volume"), 0.01)
+	v.effects = round(slider("v.effects", v.effects, 0, 1, ("%0.2f"):format(v.effects), "effects volume"), 0.01)
 
-	a.sampleGain = round(slider("sampleGain", a.sampleGain, 0, 100, ("gain with clipping: +%0.0fdB"):format(a.sampleGain)), 1)
+	a.sampleGain = round(slider("sampleGain", a.sampleGain, 0, 100, ("+%0.0fdB"):format(a.sampleGain), "gain with clipping"), 1)
 
 	local mode = a.mode
 	mode.primary = combo(

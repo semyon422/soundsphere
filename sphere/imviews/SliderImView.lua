@@ -13,7 +13,7 @@ local getPosition = function(w, h)
 	return math.min(math.max(value, 0), 1)
 end
 
-return function(id, value, w, h)
+return function(id, value, w, h, displayValue)
 	local over = isOver(w, h)
 	local pos = getPosition(w, h)
 
@@ -36,19 +36,23 @@ return function(id, value, w, h)
 		bh / 2
 	)
 
+	local r = h / 4
+	local x = map(value, 0, 1, h / 2, w - h / 2)
 	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.circle(
-		"fill",
-		map(value, 0, 1, h / 2, w - h / 2),
-		h / 2,
-		h / 4
-	)
-	love.graphics.circle(
-		"line",
-		map(value, 0, 1, h / 2, w - h / 2),
-		h / 2,
-		h / 4
-	)
+	love.graphics.circle("fill", x, h / 2, r)
+	love.graphics.circle("line", x, h / 2, r)
+
+	if displayValue then
+		local width = love.graphics.getFont():getWidth(displayValue)
+		local tx = (w - width) / 2
+		if x >= w / 2 then
+			tx = math.min(tx, x - h / 2 - width)
+		else
+			tx = math.max(tx, x + h / 2)
+		end
+		just_print(displayValue, tx, 0, width, h, "left", "center")
+	end
+
 	just.next(w, h)
 
 	return new_value
