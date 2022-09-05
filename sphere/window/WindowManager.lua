@@ -3,18 +3,22 @@ local cursor = require("sphere.cursor")
 
 local WindowManager = Class:new()
 
+local function getDimensions(mode)
+	local flags = mode.flags
+	if flags.fullscreen then
+		return love.window.getDesktopDimensions()
+	else
+		return mode.window.width, mode.window.height
+	end
+end
+
 WindowManager.load = function(self)
 	self.graphics = self.game.configModel.configs.settings.graphics
 	self.mode = self.graphics.mode
 	local mode = self.mode
 	local flags = mode.flags
 
-	local width, height
-	if flags.fullscreen then
-		width, height = love.window.getDesktopDimensions()
-	else
-		width, height = mode.window.width, mode.window.height
-	end
+	local width, height = getDimensions(mode)
 	if not love.window.isOpen() then
 		love.window.setMode(width, height, mode.flags)
 	end
@@ -49,7 +53,12 @@ WindowManager.update = function(self)
 end
 
 WindowManager.receive = function(self, event)
-	if event.name == "keypressed" and event[1] == "f11" then
+	if event.name == "keypressed" and event[1] == "f10" then
+		local mode = self.mode
+		local flags = mode.flags
+		local width, height = getDimensions(mode)
+		love.window.updateMode(width, height, flags)
+	elseif event.name == "keypressed" and event[1] == "f11" then
 		local mode = self.mode
 		self.fullscreen = not self.fullscreen
 		mode.flags.fullscreen = self.fullscreen

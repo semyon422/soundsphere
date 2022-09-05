@@ -172,6 +172,7 @@ drawSection.graphics = function(self)
 	flags.fullscreentype = imgui.combo("flags.fst", flags.fullscreentype, {"desktop", "exclusive"}, nil, "fullscreen type")
 	flags.vsync = imgui.combo("flags.vsync", flags.vsync, {1, 0, -1}, formatVsync, "vsync")
 	g.vsyncOnSelect = imgui.checkbox("vsyncOnSelect", g.vsyncOnSelect, "vsync on select")
+	flags.msaa = imgui.combo("flags.msaa", flags.msaa, {0, 1, 2, 4, 8, 16}, nil, "MSAA")
 	g.dwmflush = imgui.checkbox("dwmflush", g.dwmflush, "DWM flush")
 	g.asynckey = imgui.checkbox("asynckey", g.asynckey, "threaded input")
 
