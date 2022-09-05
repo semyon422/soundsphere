@@ -19,9 +19,17 @@ local _w, _h = w / 2, 55
 local r = 8
 local window_id = "NoteSkinView"
 
-local function draw(self)
+local selectedNoteSkin
+return ModalImView(function(self)
+	if not self then
+		if selectedNoteSkin and selectedNoteSkin.config then
+			selectedNoteSkin.config:close()
+		end
+		return true
+	end
+
 	local noteChart = self.game.noteChartModel.noteChart
-	local selectedNoteSkin = self.game.noteSkinModel:getNoteSkin(noteChart.inputMode)
+	selectedNoteSkin = self.game.noteSkinModel:getNoteSkin(noteChart.inputMode)
 
 	local items = self.game.noteSkinModel:getNoteSkins(noteChart.inputMode)
 
@@ -91,15 +99,4 @@ local function draw(self)
 		selectedNoteSkin.config:render()
 	end
 	imgui.End()
-end
-
-local function close(self)
-	local noteChart = self.game.noteChartModel.noteChart
-	local selectedNoteSkin = self.game.noteSkinModel:getNoteSkin(noteChart.inputMode)
-
-	if selectedNoteSkin.config then
-		selectedNoteSkin.config:close()
-	end
-end
-
-return ModalImView(draw, close)
+end)

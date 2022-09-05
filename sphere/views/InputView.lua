@@ -18,6 +18,10 @@ local r = 8
 local window_id = "InputView"
 
 return ModalImView(function(self)
+	if not self then
+		return true
+	end
+
 	local noteChart = self.game.noteChartModel.noteChart
 	local inputMode = noteChart.inputMode:getString()
 	local inputs = self.game.inputModel:getInputs(inputMode)

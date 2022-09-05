@@ -107,11 +107,18 @@ GameView.setContextMenu = function(self, f, width)
 end
 
 GameView.setModal = function(self, f)
-	if self.modal == f then
-		self.modal = nil
+	local _f = self.modal
+	if not _f then
+		self.modal = f
+		return
+	end
+	if not _f() then
 		return
 	end
 	self.modal = f
+	if _f == f then
+		self.modal = nil
+	end
 end
 
 GameView.hideAllWindows = function(self)

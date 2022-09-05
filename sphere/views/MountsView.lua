@@ -21,6 +21,10 @@ local window_id = "MountsView"
 local selectedItem
 
 return ModalImView(function(self)
+	if not self then
+		return true
+	end
+
 	local mountModel = self.game.mountModel
 	local items = self.game.configModel.configs.mount
 	selectedItem = selectedItem or items[1]

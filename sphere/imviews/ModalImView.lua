@@ -1,23 +1,18 @@
 local just = require("just")
 
-local function _draw(f, ...)
+local function _draw(f, self)
 	just.keyboard_over()
-	if f(...) then
-		return true
+	if self and just.keypressed("escape") then
+		return f()
 	end
-	if just.keypressed("escape") then
-		return true
-	end
+	return f(self)
 end
 
-return function(draw, close)
-	return function(...)
+return function(draw)
+	return function(self)
 		just.container("ModalImView", true)
-		local ret = _draw(draw, ...)
+		local ret = _draw(draw, self)
 		just.container()
-		if ret and close then
-			close(...)
-		end
 		return ret
 	end
 end

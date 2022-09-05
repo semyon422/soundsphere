@@ -54,6 +54,10 @@ end
 local osuOD = 0
 
 return ModalImView(function(self)
+	if not self then
+		return true
+	end
+
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	love.graphics.replaceTransform(_transform(transform))

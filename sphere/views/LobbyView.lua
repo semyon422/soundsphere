@@ -14,6 +14,10 @@ local password = ""
 local passwordIndex = 1
 
 return ModalImView(function(self)
+	if not self then
+		return true
+	end
+
 	local multiplayerModel = self.game.multiplayerModel
 
 	love.graphics.replaceTransform(_transform(transform))
