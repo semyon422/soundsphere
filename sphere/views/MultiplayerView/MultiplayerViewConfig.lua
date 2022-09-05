@@ -124,12 +124,6 @@ local Background = BackgroundView:new({
 local BackgroundBanner = BackgroundView:new({
 	transform = transform,
 	load = function(self)
-		self.stencilFunction = function()
-			love.graphics.replaceTransform(_transform(transform))
-			love.graphics.setColor(1, 1, 1, 1)
-			local x, y, w, h = getRect(nil, Layout.column2row1)
-			love.graphics.rectangle("fill", x, y, w, h, 36)
-		end
 		self.gradient = newGradient(
 			"vertical",
 			{0, 0, 0, 0},
@@ -137,14 +131,17 @@ local BackgroundBanner = BackgroundView:new({
 		)
 	end,
 	draw = function(self)
+		love.graphics.replaceTransform(_transform(transform))
+		love.graphics.setColor(1, 1, 1, 1)
+		local x, y, w, h = getRect(nil, Layout.column2row1)
 		getRect(self, Layout.column2row1)
-		love.graphics.stencil(self.stencilFunction)
-		love.graphics.setStencilTest("greater", 0)
+
+		just.clip(love.graphics.rectangle, "fill", x, y, w, h, 36)
 		self.__index.draw(self)
 		love.graphics.setColor(1, 1, 1, 1)
 		love.graphics.replaceTransform(_transform(transform))
-		love.graphics.draw(self.gradient, self.x, self.y, 0, self.w, self.h)
-		love.graphics.setStencilTest()
+		love.graphics.draw(self.gradient, x, y, 0, w, h)
+		just.clip()
 	end,
 	parallax = 0,
 	dim = {value = 0},

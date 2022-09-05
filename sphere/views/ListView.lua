@@ -67,21 +67,6 @@ ListView.getItemView = function(self, item)
 	return self.itemView
 end
 
-ListView.drawStencil = function(self)
-	local tf = transform(self.transform)
-	love.graphics.replaceTransform(tf)
-
-	love.graphics.setColor(1, 1, 1, 1)
-
-	love.graphics.rectangle(
-		"fill",
-		self.x,
-		self.y,
-		self.w,
-		self.h
-	)
-end
-
 ListView.draw = function(self)
 	local stateCounter = self.stateCounter
 	self:reloadItems()
@@ -100,13 +85,8 @@ ListView.draw = function(self)
 		self:scroll(-delta)
 	end
 
-	love.graphics.stencil(
-		self.stencilfunction,
-		"replace",
-		1,
-		false
-	)
-	love.graphics.setStencilTest("greater", 0)
+	love.graphics.setColor(1, 1, 1, 1)
+	just.clip(love.graphics.rectangle, "fill", 0, 0, self.w, self.h)
 
 	local deltaItemIndex = self.itemIndex - self.visualItemIndex
 	for i = 0 - math.floor(deltaItemIndex), self.rows - math.floor(deltaItemIndex) do
@@ -129,7 +109,7 @@ ListView.draw = function(self)
 		end
 	end
 
-	love.graphics.setStencilTest()
+	just.clip()
 end
 
 ListView.drawItem = function(self, itemIndex, w, h)
