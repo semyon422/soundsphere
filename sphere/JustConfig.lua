@@ -1,13 +1,9 @@
 local serpent = require("serpent")
 local Class = require("aqua.util.Class")
-local TextButtonImView2 = require("sphere.imviews.TextButtonImView2")
-local CheckboxImView = require("sphere.imviews.CheckboxImView")
-local LabelImView = require("sphere.imviews.LabelImView")
 local just = require("just")
+local imgui = require("sphere.imgui")
 
 local JustConfig = Class:new()
-
-JustConfig.size = 55
 
 function JustConfig:get(key)
 	return self.data[key]
@@ -17,20 +13,17 @@ function JustConfig:set(key, ...)
 	self.data[key] = ...
 end
 
-function JustConfig:draw() end
+function JustConfig:draw(w, h) end
 
 function JustConfig:drawAfter()
-	if TextButtonImView2("Write config file", "Write config file", 300, self.size) then
+	local data = self.data
+	if imgui.button("Write config file", "Write config file") then
 		self:write()
 	end
-	if TextButtonImView2("Delete config file", "Delete config file", 300, self.size) then
+	if imgui.button("Delete config file", "Delete config file") then
 		self:remove()
 	end
-	if CheckboxImView("autosave", self:get("autosave"), self.size) then
-		self:set("autosave", not self:get("autosave"))
-	end
-	just.sameline()
-	LabelImView("autosave", "Autosave", self.size)
+	data.autosave = imgui.checkbox("autosave", data.autosave, "Autosave")
 end
 
 function JustConfig:close()
@@ -50,10 +43,12 @@ function JustConfig:fromFile(path)
 end
 
 function JustConfig:write()
+	print("write", self.path)
 	love.filesystem.write(self.path, self:export(self.content))
 end
 
 function JustConfig:remove()
+	print("remove", self.path)
 	love.filesystem.remove(self.path)
 end
 
