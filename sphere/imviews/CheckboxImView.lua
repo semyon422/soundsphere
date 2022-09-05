@@ -16,8 +16,8 @@ return function(id, v, size, scale)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	if v then
-		love.graphics.circle("fill", size / 2, size / 2, size / 4 * scale / 0.75)
-		love.graphics.circle("line", size / 2, size / 2, size / 4 * scale / 0.75)
+		love.graphics.circle("fill", size / 2, size / 2, size / 4 * scale / 0.75, 64)
+		love.graphics.circle("line", size / 2, size / 2, size / 4 * scale / 0.75, 64)
 	end
 
 	just.next(size, size)
