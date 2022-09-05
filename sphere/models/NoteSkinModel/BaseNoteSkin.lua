@@ -1,14 +1,10 @@
 local NoteSkinVsrg = require("sphere.models.NoteSkinModel.NoteSkinVsrg")
 local BasePlayfield = require("sphere.models.NoteSkinModel.BasePlayfield")
-local ImguiConfig = require("sphere.ImguiConfig")
+local JustConfig = require("sphere.JustConfig")
 
 local BaseNoteSkin = NoteSkinVsrg:new()
 
 BaseNoteSkin.bgaTransform = {{1 / 2, -16 / 9 / 2}, {0, -7 / 9 / 2}, 0, {0, 16 / 9}, {0, 16 / 9}, 0, 0, 0, 0}
-
-BaseNoteSkin.columnWidth = 48
-BaseNoteSkin.noteHeight = 24
-BaseNoteSkin.judgementLineHeight = 6
 
 BaseNoteSkin.setInputMode = function(self, inputMode, stringInputMode)
 	self.inputMode = inputMode
@@ -48,8 +44,11 @@ local function copyTable(t)
 	return t2
 end
 
+local configPath = "sphere/models/NoteSkinModel/BaseNoteSkinConfig.lua"
 BaseNoteSkin.load = function(self)
-	local config = ImguiConfig:new({defaultContent = self.configContent}):fromFile(
+	BaseNoteSkin.configContent = BaseNoteSkin.configContent or love.filesystem.read(configPath)
+
+	local config = JustConfig:new({defaultContent = self.configContent}):fromFile(
 		"userdata/skins/base." .. self.stringInputMode .. ".config.lua"
 	)
 	self.config = config
@@ -58,7 +57,9 @@ BaseNoteSkin.load = function(self)
 	self.inputMode = self.inputMode
 	self.range = {-1, 1}
 	self.unit = 480
-	self.hitposition = config:get("hitposition")
+	self.hitposition = config:get("hitposition") or 450
+	self.columnWidth = config:get("noteWidth") or 48
+	self.noteHeight = config:get("noteHeight") or 24
 
 	local inputs = self:getInputTable()
 	self:setInput(inputs)
@@ -104,6 +105,7 @@ BaseNoteSkin.load = function(self)
 		align = "center",
 		width = width,
 		space = space,
+		upscroll = config:get("upscroll"),
 	})
 
 	self:setTextures({{pixel = "pixel.png"}})
@@ -143,7 +145,7 @@ BaseNoteSkin.load = function(self)
 		noteskin = self
 	})
 
-	local judgementLineHeight = config:get("judgementLineHeight")
+	local judgementLineHeight = config:get("judgementLineHeight") or 4
 	playfield:addBga({transform = self.bgaTransform})
 	playfield:enableCamera()
 	playfield:addNotes()
@@ -158,27 +160,5 @@ BaseNoteSkin.load = function(self)
 	playfield:disableCamera()
 	playfield:addBaseElements()
 end
-
-BaseNoteSkin.configContent = [=[
-local ImguiConfig = require("sphere.ImguiConfig")
-local imgui = require("cimgui")
-
-local config = ImguiConfig:new()
-
-local ptrs = config:setDefs(--[[defs]] {
-	hitposition = {"float[?]", 1, {450}},
-	measureLine = {"bool[?]", 1, {true}},
-	judgementLineHeight = {"float[?]", 1, {4}},
-} --[[/defs]])
-
-function config:render()
-	imgui.SliderFloat("Hit position", ptrs.hitposition, 240, 480, "%.0f")
-	imgui.SliderFloat("J. line height", ptrs.judgementLineHeight, 0, 32, "%.0f")
-	imgui.Checkbox("Measure line", ptrs.measureLine)
-	self:renderAfter()
-end
-
-return config
-]=]
 
 return BaseNoteSkin
