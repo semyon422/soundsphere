@@ -1,18 +1,22 @@
 local just = require("just")
-local map = require("aqua.math").map
 
 local isOver = function(w, h)
 	local x, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	return 0 <= x and x <= w and 0 <= y and y <= h
 end
 
-local getPosition = function(w, h, _h)
-	local x, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-	local value = map(y, _h / 2, h - _h / 2, 0, 1)
+local dragPosition
+local getPosition = function(h, _h)
+	if not dragPosition then
+		return 0
+	end
+	local _, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+	-- local value = map(y, _h * dragPosition, h - _h * (1 - dragPosition), 0, 1)
+	local value = (y - _h * dragPosition) / (h - _h)
 	return math.min(math.max(value, 0), 1)
 end
 
-local size = 1/2
+local size = 0.5
 return function(id, value, w, h, overlap)
 	if overlap == 0 then
 		return 0
@@ -20,16 +24,26 @@ return function(id, value, w, h, overlap)
 	local _h = w + (h - w) * h / (overlap + h)
 
 	local over = isOver(w, h)
-	local pos = getPosition(w, h, _h)
+	local pos = getPosition(h, _h)
 
 	local new_value, active, hovered = just.slider(id, over, pos, value)
+	if just.active_id == id and not dragPosition then
+		new_value = nil
+		local _, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+		dragPosition = (y - (h - _h) * value) / _h
+		if dragPosition < 0 or dragPosition > 1 then
+			dragPosition = 0.5
+		end
+	elseif just.active_id ~= id and dragPosition then
+		dragPosition = nil
+	end
 
 	love.graphics.setColor(1, 1, 1, 0.2)
 	if hovered then
 		local alpha = active and 0.4 or 0.3
 		love.graphics.setColor(1, 1, 1, alpha)
 	end
-	love.graphics.rectangle("fill", 0, 0, w, h, w / 2, w / 2)
+	love.graphics.rectangle("fill", 0, 0, w, h)
 
 	love.graphics.setColor(1, 1, 1, 0.8)
 
