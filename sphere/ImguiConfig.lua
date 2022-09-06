@@ -36,10 +36,16 @@ local function _pack(t, s, ...)
 end
 
 function ImguiConfig:get(key)
+	if not self.defs[key] then
+		return
+	end
 	return _unpack(self.ptrs[key], 0, self.defs[key][2] - 1)
 end
 
 function ImguiConfig:set(key, ...)
+	if not self.defs[key] then
+		return
+	end
 	assert(self.defs[key][2] == select("#", ...), "Wrong number of arguments")
 	_pack(self.ptrs[key], 0, ...)
 end
