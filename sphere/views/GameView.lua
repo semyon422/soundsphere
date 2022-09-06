@@ -5,7 +5,6 @@ local FrameTimeView = require("sphere.views.FrameTimeView")
 local TextTooltipImView = require("sphere.imviews.TextTooltipImView")
 local ContextMenuImView = require("sphere.imviews.ContextMenuImView")
 local OnlineView = require("sphere.views.OnlineView")
-local ModifierView = require("sphere.views.ModifierView")
 
 local GameView = Class:new()
 
@@ -14,17 +13,13 @@ GameView.construct = function(self)
 	self.frameTimeView = FrameTimeView:new()
 
 	self.onlineView = OnlineView:new()
-	self.modifierView = ModifierView:new()
 end
 
 GameView.load = function(self)
 	self.onlineView.game = self.game
-	self.modifierView.game = self.game
-
 	self.frameTimeView.game = self.game
 
 	self.frameTimeView:load()
-	self.modifierView:load()
 
 	self:setView(self.game.selectView)
 end
@@ -54,7 +49,6 @@ GameView.unload = function(self)
 		return
 	end
 	self.view:unload()
-	self.modifierView:unload()
 end
 
 GameView.update = function(self, dt)
@@ -63,7 +57,6 @@ GameView.update = function(self, dt)
 		return
 	end
 	self.view:update(dt)
-	self.modifierView:update(dt)
 end
 
 GameView.draw = function(self)
@@ -74,7 +67,6 @@ GameView.draw = function(self)
 	self.view:draw()
 
 	self.onlineView:draw()
-	self.modifierView:draw()
 
 	if self.modal and self.modal(self) then
 		self.modal = nil
@@ -119,11 +111,6 @@ GameView.setModal = function(self, f)
 	if _f == f then
 		self.modal = nil
 	end
-end
-
-GameView.hideAllWindows = function(self)
-	self.onlineView:toggle(false)
-	self.modifierView:toggle(false)
 end
 
 return GameView

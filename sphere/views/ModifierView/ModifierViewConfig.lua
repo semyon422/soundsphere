@@ -3,8 +3,6 @@ local just = require("just")
 local just_layout = require("just.layout")
 
 local ScrollBarView = require("sphere.views.ScrollBarView")
-local RectangleView = require("sphere.views.RectangleView")
-local CircleView = require("sphere.views.CircleView")
 
 local AvailableModifierListView = require("sphere.views.ModifierView.AvailableModifierListView")
 local ModifierListView = require("sphere.views.ModifierView.ModifierListView")
@@ -87,59 +85,14 @@ local AvailableModifierScrollBar = ScrollBarView:new({
 	color = {1, 1, 1, 0.66}
 })
 
-local Rectangle = RectangleView:new({
-	transform = transform,
-	rectangles = {
-		{
-			color = {1, 1, 1, 1},
-			mode = "fill",
-			lineStyle = "smooth",
-			lineWidth = 1,
-			x = 733,
-			y = 504,
-			w = 4,
-			h = 72,
-			rx = 0,
-			ry = 0
-		},
-		{
-			color = {1, 1, 1, 1},
-			mode = "fill",
-			lineStyle = "smooth",
-			lineWidth = 1,
-			x = 279,
-			y = 504,
-			w = 4,
-			h = 72,
-			rx = 0,
-			ry = 0
-		}
-	}
-})
-
-local Circle = CircleView:new({
-	transform = transform,
-	circles = {
-		{
-			color = {1, 1, 1, 1},
-			mode = "fill",
-			lineStyle = "smooth",
-			lineWidth = 1,
-			x = 755,
-			y = 504,
-			r = 4
-		},
-		{
-			color = {1, 1, 1, 1},
-			mode = "line",
-			lineStyle = "smooth",
-			lineWidth = 1,
-			x = 755,
-			y = 504,
-			r = 4
-		},
-	}
-})
+local Rectangle = {draw = function()
+	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.rectangle("fill", 733, 504, 4, 72)
+	love.graphics.rectangle("fill", 279, 504, 4, 72)
+	love.graphics.circle("fill", 755, 504, 4)
+	love.graphics.circle("line", 755, 504, 4)
+end}
 
 local ModifierViewConfig = {
 	Frames,
@@ -148,7 +101,6 @@ local ModifierViewConfig = {
 	ModifierList,
 	AvailableModifierScrollBar,
 	Rectangle,
-	Circle,
 	ContainerEnd,
 	require("sphere.views.DebugInfoViewConfig"),
 }

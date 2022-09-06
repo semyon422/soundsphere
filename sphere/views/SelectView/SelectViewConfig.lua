@@ -641,7 +641,7 @@ local NotechartsSubscreen = {
 			gameView:setModal(require("sphere.views.MountsView"))
 		end
 		if TextButtonImView("modifiers", "modifiers", w, self.h) then
-			gameView.modifierView:toggle()
+			gameView:setModal(require("sphere.views.ModifierView"))
 		end
 		if TextButtonImView("noteskins", "noteskins", w, self.h) then
 			self.game.selectController:resetModifiedNoteChart()

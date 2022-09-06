@@ -283,7 +283,7 @@ local RoomSettings = {draw = function(self)
 	end
 	if isHost or room.isFreeModifiers then
 		if TextButtonImView("Modifiers", "Modifiers", self.w - 72, 72) then
-			self.game.gameView.modifierView:toggle()
+			self.game.gameView:setModal(require("sphere.views.ModifierView"))
 		end
 	end
 

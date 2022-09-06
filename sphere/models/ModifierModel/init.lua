@@ -118,7 +118,7 @@ end
 
 ModifierModel.setConfig = function(self, config)
 	self.config = config
-	self.modifierItemIndex = math.max(1, #config + 1)
+	self.modifierItemIndex = math.min(math.max(self.modifierItemIndex or (#config + 1), 1), #config + 1)
 	self.changed = true
 end
 

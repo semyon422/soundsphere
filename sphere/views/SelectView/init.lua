@@ -23,8 +23,7 @@ SelectView.draw = function(self)
 
 	local kp = just.keypressed
 	if kp("f1") then
-		self.gameView:hideAllWindows()
-		self.gameView.modifierView:toggle(true)
+		self.gameView:setModal(require("sphere.views.ModifierView"))
 	elseif kp("f2") then self.game.selectModel:scrollRandom()
 	elseif kp("lctrl") then self:changeSearchMode()
 	elseif kp("lshift") then self.game.selectModel:changeCollapse()
