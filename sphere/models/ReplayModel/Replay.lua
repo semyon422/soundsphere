@@ -63,11 +63,14 @@ Replay.fromString = function(self, s)
 	self.player = object.player
 	self.time = object.time
 	self.timings = object.timings
-	if object.inputMode then
-		self.inputMode = InputMode:new():setString(object.inputMode)
+
+	if not object.inputMode then
+		self.events = {}
+		return self
 	end
 
-	self.events = self.replayNanoChart:decode(object.events, object.size, self.inputMode)
+	local inputMode = InputMode:new():setString(object.inputMode)
+	self.events = self.replayNanoChart:decode(object.events, object.size, inputMode)
 
 	local timings = self.timings
 	if not timings then

@@ -268,9 +268,9 @@ local Judgements = {draw = function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-	local perfect = show and counter.perfect or scoreItem.perfect
-	local notPerfect = show and counter["not perfect"] or scoreItem.notPerfect
-	local miss = show and base.missCount or scoreItem.missCount
+	local perfect = show and counter.perfect or scoreItem.perfect or 0
+	local notPerfect = show and counter["not perfect"] or scoreItem.notPerfect or 0
+	local miss = show and base.missCount or scoreItem.missCount or 0
 
 	local interval = 5
 	local lineHeight = 40
