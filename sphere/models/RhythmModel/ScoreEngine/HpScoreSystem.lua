@@ -4,58 +4,92 @@ local HpScoreSystem = ScoreSystem:new()
 
 HpScoreSystem.name = "hp"
 
-HpScoreSystem.construct = function(self)
-	self.failed = false
+HpScoreSystem.max = 1000
+
+HpScoreSystem.insertCounter = function(self, notes)
+	table.insert(self, {
+		notes = notes,
+		value = self.max / 2,
+	})
 end
 
 HpScoreSystem.load = function(self)
-	self.config = self.scoreEngine.hp
-	self.hp = self.config.start
-	self.allHp = self.config.max - self.config.min
-end
+	for i in ipairs(self) do
+		self[i] = nil
+	end
 
-HpScoreSystem.increaseHp = function(self)
-	if self.failed then
+	local config = self.scoreEngine.hp
+	if not config.shift then
+		self:insertCounter(config.notes)
 		return
 	end
-	self.hp = math.min(self.hp + self.config.increase, self.config.max)
+
+	for i = 0, math.min(config.notes, 9) do
+		self:insertCounter(i)
+	end
+	for i = 10, config.notes, 5 do
+		self:insertCounter(i)
+	end
 end
 
-HpScoreSystem.decreaseHp = function(self)
-	self.hp = math.max(self.hp - self.config.decrease, self.config.min)
-	if self.hp < 1e-6 then
-		self.failed = true
+HpScoreSystem.getSlice = function(self)
+	local slice = {}
+	for _, v in ipairs(self) do
+		table.insert(slice, {
+			notes = v.notes,
+			value = v.value,
+		})
+	end
+	return slice
+end
+
+HpScoreSystem.increase = function(self)
+	for _, h in ipairs(self) do
+		if h.value > 0 then
+			h.value = math.min(h.value + 1, self.max)
+		end
+	end
+end
+
+HpScoreSystem.decrease = function(self)
+	for _, h in ipairs(self) do
+		if h.value > 0 then
+			h.value = math.min(h.value - self.max / h.notes, self.max)
+		end
+		if h.value < 1e-3 then
+			h.value = 0
+		end
 	end
 end
 
 HpScoreSystem.notes = {
 	ShortNote = {
 		clear = {
-			passed = "increaseHp",
-			missed = "decreaseHp",
+			passed = "increase",
+			missed = "decrease",
 			clear = nil,
 		},
 	},
 	LongNote = {
 		clear = {
-			startPassedPressed = "increaseHp",
-			startMissed = "decreaseHp",
-			startMissedPressed = "decreaseHp",
+			startPassedPressed = "increase",
+			startMissed = "decrease",
+			startMissedPressed = "decrease",
 			clear = nil,
 		},
 		startPassedPressed = {
 			startMissed = nil,
-			endMissed = "decreaseHp",
-			endPassed = "increaseHp",
+			endMissed = "decrease",
+			endPassed = "increase",
 		},
 		startMissedPressed = {
-			endMissedPassed = "increaseHp",
+			endMissedPassed = "increase",
 			startMissed = nil,
-			endMissed = "decreaseHp",
+			endMissed = "decrease",
 		},
 		startMissed = {
 			startMissedPressed = nil,
-			endMissed = "decreaseHp",
+			endMissed = "decrease",
 		},
 	},
 }

@@ -53,6 +53,8 @@ PointGraphView.reload = function(self)
 	self:load()
 end
 
+PointGraphView.getPoints = function(self) return {} end
+
 PointGraphView.drawPoints = function(self, counter, canvas, color, radius)
 	local shader = love.graphics.getShader()
 	love.graphics.setShader()
@@ -61,7 +63,7 @@ PointGraphView.drawPoints = function(self, counter, canvas, color, radius)
 	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
-	local points = inside(self, self.key)
+	local points = self:getPoints()
 	if points then
 		for i = self[counter] + 1, #points do
 			self:drawPoint(points[i], color, radius)
@@ -73,27 +75,20 @@ PointGraphView.drawPoints = function(self, counter, canvas, color, radius)
 	love.graphics.setShader(shader)
 end
 
+PointGraphView.getTime = function(self, point) return 0 end
+PointGraphView.getValue = function(self, point) return 0 end
+
 PointGraphView.drawPoint = function(self, point, color, radius)
-	local time = inside(point, self.time)
-	local value = inside(point, self.value)
-	local unit = inside(point, self.unit)
-	if type(time) == "nil" then
-		time = tonumber(self.time) or 0
-	end
-	if type(value) == "nil" then
-		value = tonumber(self.value) or 0
-	end
-	if type(unit) == "nil" then
-		unit = tonumber(self.unit) or 1
-	end
+	local time = self:getTime(point)
+	local value = self:getValue(point)
 
 	if type(color) == "function" then
-		color = color(time, self.startTime, self.endTime, value, unit)
+		color = color(time, self.startTime, self.endTime, value)
 	end
 	love.graphics.setColor(color)
 
 	if self.point then
-		local x, y = self.point(time, self.startTime, self.endTime, value, unit)
+		local x, y = self.point(time, self.startTime, self.endTime, value)
 		if not x then
 			return
 		end
@@ -102,7 +97,7 @@ PointGraphView.drawPoint = function(self, point, color, radius)
 		local _x, _y = map(x, 0, 1, 0, self.w), map(y, 0, 1, 0, self.h)
 		love.graphics.rectangle("fill", _x - radius, _y - radius, radius * 2, radius * 2)
 	elseif self.line then
-		local x = self.line(time, self.startTime, self.endTime, value, unit)
+		local x = self.line(time, self.startTime, self.endTime, value)
 		if not x then
 			return
 		end

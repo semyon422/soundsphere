@@ -58,14 +58,12 @@ local BottomScreenMenu = {
 }
 
 local PauseProgressBar = ProgressView:new({
-	current = {
-		key = "game.rhythmModel.pauseManager.progress",
-	},
 	x = 0, y = 0, w = 1920, h = 20,
 	color = {1, 1, 1, 1},
 	transform = transformFull,
 	direction = "left-right",
-	mode = "+"
+	mode = "+",
+	getCurrent = function(self) return self.game.rhythmModel.pauseManager.progress end,
 })
 
 local PauseText = ValueView:new({

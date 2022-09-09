@@ -83,13 +83,18 @@ local ComboGraph = PointGraphView:new({
 	background = true,
 	backgroundColor = {0, 0, 0, 0.2},
 	backgroundRadius = 4,
-	key = "game.rhythmModel.scoreEngine.scoreSystem.sequence",
-	time = "base.currentTime",
-	value = "base.combo",
-	unit = "base.noteCount",
-	point = function(time, startTime, endTime, value, unit)
+	getPoints = function(self)
+		return self.game.rhythmModel.scoreEngine.scoreSystem.sequence
+	end,
+	getTime = function(self, point)
+		return point.base.currentTime
+	end,
+	getValue = function(self, point)
+		return point.base.combo / point.base.noteCount
+	end,
+	point = function(time, startTime, endTime, value)
 		local x = (time - startTime) / (endTime - startTime)
-		local y = -value / unit + 1
+		local y = 1 - value
 		return x, y
 	end,
 	show = showLoadedScore
@@ -101,7 +106,7 @@ local HitGraph = PointGraphView:new({
 	transform = transform,
 	draw = drawGraph,
 	radius = 1.5,
-	color = function(time, startTime, endTime, value, unit)
+	color = function(time, startTime, endTime, value)
 		if math.abs(value) <= 0.016 then
 			return perfectColor
 		end
@@ -110,16 +115,21 @@ local HitGraph = PointGraphView:new({
 	background = true,
 	backgroundColor = {0, 0, 0, 0.2},
 	backgroundRadius = 4,
-	key = "game.rhythmModel.scoreEngine.scoreSystem.sequence",
-	time = "base.currentTime",
-	value = "misc.deltaTime",
-	unit = 0.16,
-	point = function(time, startTime, endTime, value, unit)
+	getPoints = function(self)
+		return self.game.rhythmModel.scoreEngine.scoreSystem.sequence
+	end,
+	getTime = function(self, point)
+		return point.base.currentTime
+	end,
+	getValue = function(self, point)
+		return point.misc.deltaTime
+	end,
+	point = function(time, startTime, endTime, value)
 		if math.abs(value) > 0.12 then
 			return
 		end
 		local x = (time - startTime) / (endTime - startTime)
-		local y = value / unit / 2 + 0.5
+		local y = value / 0.16 / 2 + 0.5
 		return x, y
 	end,
 	show = showLoadedScore
@@ -133,16 +143,21 @@ local EarlyLateMissGraph = PointGraphView:new({
 	background = true,
 	backgroundColor = {1, 1, 1, 1},
 	backgroundRadius = 4,
-	key = "game.rhythmModel.scoreEngine.scoreSystem.sequence",
-	time = "base.currentTime",
-	value = "misc.deltaTime",
-	unit = 0.16,
-	point = function(time, startTime, endTime, value, unit)
+	getPoints = function(self)
+		return self.game.rhythmModel.scoreEngine.scoreSystem.sequence
+	end,
+	getTime = function(self, point)
+		return point.base.currentTime
+	end,
+	getValue = function(self, point)
+		return point.misc.deltaTime
+	end,
+	point = function(time, startTime, endTime, value)
 		if math.abs(value) <= 0.12 or math.abs(value) > 0.16 then
 			return
 		end
 		local x = (time - startTime) / (endTime - startTime)
-		local y = math.min(math.max(value, -0.16), 0.16) / unit / 2 + 0.5
+		local y = math.min(math.max(value, -0.16), 0.16) / 0.16 / 2 + 0.5
 		return x, y
 	end,
 	show = showLoadedScore
@@ -156,11 +171,16 @@ local MissGraph = PointGraphView:new({
 	background = true,
 	backgroundColor = {1, 1, 1, 0},
 	backgroundRadius = 3,
-	key = "game.rhythmModel.scoreEngine.scoreSystem.sequence",
-	time = "base.currentTime",
-	value = "base.isMiss",
-	unit = 0.16,
-	line = function(time, startTime, endTime, value, unit)
+	getPoints = function(self)
+		return self.game.rhythmModel.scoreEngine.scoreSystem.sequence
+	end,
+	getTime = function(self, point)
+		return point.base.currentTime
+	end,
+	getValue = function(self, point)
+		return point.base.isMiss
+	end,
+	line = function(time, startTime, endTime, value)
 		if not value then
 			return
 		end
@@ -178,13 +198,25 @@ local HpGraph = PointGraphView:new({
 	background = true,
 	backgroundColor = {0, 0, 0, 0.2},
 	backgroundRadius = 4,
-	key = "game.rhythmModel.scoreEngine.scoreSystem.sequence",
-	time = "base.currentTime",
-	value = "hp.hp",
-	unit = "hp.allHp",
-	point = function(time, startTime, endTime, value, unit)
+	getPoints = function(self)
+		return self.game.rhythmModel.scoreEngine.scoreSystem.sequence
+	end,
+	getTime = function(self, point)
+		return point.base.currentTime
+	end,
+	getValue = function(self, point)
+		local _hp = self.game.rhythmModel.scoreEngine.scoreSystem.hp
+		local hp = point.hp
+		for _, h in ipairs(hp) do
+			if h.value > 0 then
+				return h.value / _hp.max
+			end
+		end
+		return 0
+	end,
+	point = function(time, startTime, endTime, value)
 		local x = (time - startTime) / (endTime - startTime)
-		local y = -value / unit + 1
+		local y = 1 - value
 		return x, y
 	end,
 	show = showLoadedScore
@@ -400,21 +432,36 @@ local NotechartInfo = {draw = function(self)
 
 	getRect(self, Layout.title_sub)
 	love.graphics.replaceTransform(_transform(transform))
-	love.graphics.translate(self.x, self.y)
+	love.graphics.translate(self.x, self.y + 8)
 
-	local font = spherefonts.get("Noto Sans Mono", 48)
-	font:setFallbacks(spherefonts.get("Noto Sans", 48))
+	local font = spherefonts.get("Noto Sans Mono", 36)
+	font:setFallbacks(spherefonts.get("Noto Sans", 36))
 	love.graphics.setFont(font)
 
 	just.indent(36)
 	just.text(("%0.2fx"):format(show and baseTimeRate or scoreItem.timeRate))
 
 	local hp = scoreEngine.scoreSystem.hp
-	if show and hp and hp.failed then
+	if show and hp then
 		just.sameline()
 		just.offset(0)
 
-		just.text("fail", self.w - 72, true)
+		local _h
+		if not hp then
+			return
+		end
+		for _, h in ipairs(hp) do
+			if h.value > 0 then
+				_h = h
+				break
+			end
+		end
+
+		local text = "fail"
+		if _h then
+			text = _h.notes .. "hp"
+		end
+		just.text(text, self.w - 72, true)
 	end
 
 	getRect(self, Layout.middle)

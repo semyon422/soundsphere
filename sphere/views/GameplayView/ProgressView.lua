@@ -1,7 +1,6 @@
 local Class				= require("aqua.util.Class")
 local transform = require("aqua.graphics.transform")
 local map				= require("aqua.math").map
-local inside = require("aqua.util.inside")
 
 local ProgressView = Class:new()
 
@@ -15,28 +14,17 @@ ProgressView.draw = function(self)
 	love.graphics.rectangle("fill", x, y, w, h)
 end
 
-ProgressView.getValue = function(self, field)
-	if type(field) == "number" then
-		return field
-	elseif type(field) == "string" then
-		return inside(self, field)
-	elseif type(field) == "function" then
-		return field(self)
-	elseif type(field) == "table" then
-		if field.value then
-			return self:getValue(field.value)
-		elseif field.key then
-			return inside(self, field.key)
-		end
-	end
-end
+ProgressView.getMin = function(self) return 0 end
+ProgressView.getMax = function(self) return 1 end
+ProgressView.getStart = function(self) return 0 end
+ProgressView.getCurrent = function(self) return 0 end
 
 ProgressView.getRectangle = function(self)
 	local direction = self.direction
-	local minTime = self:getValue(self.min) or 0
-	local maxTime = self:getValue(self.max) or 1
-	local startTime = self:getValue(self.start) or 0
-	local currentTime = self:getValue(self.current) or 0
+	local minTime = self:getMin()
+	local maxTime = self:getMax()
+	local startTime = self:getStart()
+	local currentTime = self:getCurrent()
 
 	local normTime = 1
 	if currentTime < minTime then

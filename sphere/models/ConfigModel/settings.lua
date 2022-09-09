@@ -20,11 +20,8 @@ return {
 			video = false
 		},
 		hp = {
-			start = 500,
-			min = 0,
-			max = 1000,
-			increase = 1,
-			decrease = 50,
+			shift = false,
+			notes = 20,
 		},
 		lastMeanValues = 10,
 		longNoteShortening = 0,

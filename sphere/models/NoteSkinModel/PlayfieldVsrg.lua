@@ -116,10 +116,10 @@ PlayfieldVsrg.addProgressBar = function(self, object)
 	if not getmetatable(object) then
 		object = ProgressView:new(object)
 	end
-	object.min = {key = "game.rhythmModel.timeEngine.minTime"}
-	object.max = {key = "game.rhythmModel.timeEngine.maxTime"}
-	object.start = {key = "game.rhythmModel.timeEngine.startTime"}
-	object.current = {key = "game.rhythmModel.timeEngine.currentTime"}
+	object.getMin = function(self) return self.game.rhythmModel.timeEngine.minTime end
+	object.getMax = function(self) return self.game.rhythmModel.timeEngine.maxTime end
+	object.getStart = function(self) return self.game.rhythmModel.timeEngine.startTime end
+	object.getCurrent = function(self) return self.game.rhythmModel.timeEngine.currentTime end
 	return self:add(object)
 end
 
@@ -128,10 +128,16 @@ PlayfieldVsrg.addHpBar = function(self, object)
 	if not getmetatable(object) then
 		object = ProgressView:new(object)
 	end
-	object.min = {value = 0}
-	object.max = {value = 1000}
-	object.start = {value = 0}
-	object.current = {key = "game.rhythmModel.scoreEngine.scoreSystem.hp.hp"}
+	object.getMax = function(self) return self.game.rhythmModel.scoreEngine.scoreSystem.hp.max end
+	object.getCurrent = function(self)
+		local hp = self.game.rhythmModel.scoreEngine.scoreSystem.hp
+		for _, h in ipairs(hp) do
+			if h.value > 0 then
+				return h.value
+			end
+		end
+		return 0
+	end
 	return self:add(object)
 end
 
