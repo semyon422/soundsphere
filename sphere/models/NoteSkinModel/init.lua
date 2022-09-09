@@ -2,6 +2,7 @@ local Class			= require("aqua.util.Class")
 local ncdk			= require("ncdk")
 local OsuNoteSkin		= require("sphere.models.NoteSkinModel.OsuNoteSkin")
 local BaseNoteSkin = require("sphere.models.NoteSkinModel.BaseNoteSkin")
+local autf8 = require('aqua.utf8')
 
 local NoteSkinModel = Class:new()
 
@@ -88,7 +89,9 @@ end
 NoteSkinModel.loadOsu = function(self, path, directoryPath, fileName)
 	local noteSkins = {}
 
-	local skinini = OsuNoteSkin:parseSkinIni(love.filesystem.read(path))
+	local content = love.filesystem.read(path)
+	content = autf8.validate(content)
+	local skinini = OsuNoteSkin:parseSkinIni(content)
 
 	for i, mania in ipairs(skinini.Mania) do
 		local keys = tonumber(mania.Keys)
