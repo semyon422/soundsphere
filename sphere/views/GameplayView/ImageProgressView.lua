@@ -1,12 +1,8 @@
-local Class = require("aqua.util.Class")
 local transform = require("aqua.graphics.transform")
 local ProgressView	= require("sphere.views.GameplayView.ProgressView")
 local ImageView	= require("sphere.views.ImageView")
 
-local ImageProgressView = Class:new()
-
-ImageProgressView.getRectangle = ProgressView.getRectangle
-ImageProgressView.getValue = ProgressView.getValue
+local ImageProgressView = ProgressView:new()
 
 ImageProgressView.load = function(self)
 	ImageView.load(self)
