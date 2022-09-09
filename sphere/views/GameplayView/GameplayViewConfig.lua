@@ -92,7 +92,7 @@ local Notification = ValueView:new({
 local Failed = ValueView:new({
 	subscreen = "pause",
 	value = function(self)
-		if self.game.rhythmModel.scoreEngine.scoreSystem.hp.failed then
+		if self.game.rhythmModel.scoreEngine.scoreSystem.hp:isFailed() then
 			return "failed"
 		end
 		return ""

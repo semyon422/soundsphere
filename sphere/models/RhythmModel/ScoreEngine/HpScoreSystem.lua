@@ -43,6 +43,17 @@ HpScoreSystem.getSlice = function(self)
 	return slice
 end
 
+HpScoreSystem.isFailed = function(self)
+	local _h
+	for _, h in ipairs(self) do
+		if h.value > 0 then
+			_h = h
+			break
+		end
+	end
+	return not _h
+end
+
 HpScoreSystem.increase = function(self)
 	for _, h in ipairs(self) do
 		if h.value > 0 then

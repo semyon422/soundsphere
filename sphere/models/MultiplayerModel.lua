@@ -50,7 +50,7 @@ MultiplayerModel.refresh = function(self)
 	peer._setScore({
 		accuracy = scoreSystem.entry.accuracy,
 		combo = scoreSystem.base.combo,
-		failed = scoreSystem.hp.failed,
+		failed = scoreSystem.hp:isFailed(),
 	})
 end
 
