@@ -355,7 +355,7 @@ local ptrs = config:setDefs(--[[defs]] {
 	ScorePosition = {"int[?]", 1, {240}},
 	ComboPosition = {"int[?]", 1, {240}},
 	OverallDifficulty = {"int[?]", 1, {5}},
-	HitErrorPosition = {"int[?]", 1, {240}},
+	HitErrorPosition = {"int[?]", 1, {465}},
 	UpsideDown = {"bool[?]", 1, {false}},
 	Barline = {"bool[?]", 1, {true}},
 } --[[/defs]])
