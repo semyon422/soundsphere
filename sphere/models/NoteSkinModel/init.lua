@@ -2,7 +2,7 @@ local Class			= require("aqua.util.Class")
 local ncdk			= require("ncdk")
 local OsuNoteSkin		= require("sphere.models.NoteSkinModel.OsuNoteSkin")
 local BaseNoteSkin = require("sphere.models.NoteSkinModel.BaseNoteSkin")
-local autf8 = require('aqua.utf8')
+local autf8 = require("aqua.utf8")
 
 local NoteSkinModel = Class:new()
 

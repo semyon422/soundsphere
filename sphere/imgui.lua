@@ -85,19 +85,14 @@ end
 
 function imgui.intButtons(id, v, s, label)
 	just.row(true)
-	TextButtonImView2(nil, v, _w / 4, _h)
-	local button = TextButtonImView2(id .. "1", "±1", _w / 4, _h)
-	if button == 1 then v = v + 1 end
-	if button == 2 then v = v - 1 end
-	if s >= 10 then
-		button = TextButtonImView2(id .. "10", "±10", _w / 4, _h)
-		if button == 1 then v = v + 10 end
-		if button == 2 then v = v - 10 end
-	end
-	if s >= 100 then
-		button = TextButtonImView2(id .. "100", "±100", _w / 4, _h)
-		if button == 1 then v = v + 100 end
-		if button == 2 then v = v - 100 end
+	local bw = _w / (s + 2)
+	local button = TextButtonImView2(nil, v, bw, _h)
+	for i = 0, s do
+		local d = 10 ^ i
+		button = TextButtonImView2(id .. d, "±" .. d, bw, _h)
+		if button then
+			v = v + (button == 1 and 1 or -1) * d
+		end
 	end
 	just.indent(8)
 	LabelImView(id .. "label", label, _h)
@@ -106,7 +101,7 @@ function imgui.intButtons(id, v, s, label)
 end
 
 function imgui.intButtonsMs(id, v, label)
-	return imgui.intButtons(id, v * 1000, 10, label) / 1000
+	return imgui.intButtons(id, v * 1000, 1, label) / 1000
 end
 
 function imgui.hotkey(id, key, label)

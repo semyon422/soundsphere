@@ -104,14 +104,14 @@ drawSection.gameplay = function(self)
 	g.offset.visual = imgui.intButtonsMs("visual offset", g.offset.visual, "visual offset")
 	g.offsetScale.input = imgui.checkbox("offsetScale.input", g.offsetScale.input, "input offset * time rate")
 	g.offsetScale.visual = imgui.checkbox("offsetScale.visual", g.offsetScale.visual, "visual offset * time rate")
-	g.lastMeanValues = imgui.intButtons("lastMeanValues", g.lastMeanValues, 10, "last mean values")
+	g.lastMeanValues = imgui.intButtons("lastMeanValues", g.lastMeanValues, 1, "last mean values")
 	g.ratingHitTimingWindow = imgui.intButtonsMs("ratingHitTimingWindow", g.ratingHitTimingWindow, "rating hit timing window")
 
 	imgui.separator()
 	just.indent(10)
 	just.text("gauge/hp")
 	g.hp.shift = imgui.checkbox("hp.shift", g.hp.shift, "auto shift")
-	g.hp.notes = math.min(math.max(imgui.intButtons("hp.notes", g.hp.notes, 10, "misses to fail with full hp"), 0), 100)
+	g.hp.notes = math.min(math.max(imgui.intButtons("hp.notes", g.hp.notes, 1, "misses to fail with full hp"), 0), 100)
 
 	imgui.separator()
 	just.indent(10)
@@ -168,7 +168,7 @@ drawSection.graphics = function(self)
 	local settings = self.game.configModel.configs.settings
 	local g = settings.graphics
 
-	g.fps = imgui.intButtons("fps", g.fps, 100, "FPS limit")
+	g.fps = imgui.intButtons("fps", g.fps, 2, "FPS limit")
 
 	local flags = g.mode.flags
 	flags.fullscreen = imgui.checkbox("flags.fullscreen", flags.fullscreen, "fullscreen")
