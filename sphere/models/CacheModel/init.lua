@@ -1,14 +1,9 @@
 local aquathread = require("aqua.thread")
-local ThreadPool	= require("aqua.thread.ThreadPool")
 local Class = require("aqua.util.Class")
 local CacheManager = require("sphere.models.CacheModel.CacheManager")
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 
 local CacheModel = Class:new()
-
-CacheModel.state = 0
-CacheModel.noteChartCount = 0
-CacheModel.cachePercent = 0
 
 CacheModel.construct = function(self)
 	self.cacheManager = CacheManager:new()
@@ -17,6 +12,12 @@ end
 
 CacheModel.load = function(self)
 	CacheDatabase:load()
+	aquathread.shared.cache = {
+		state = 0,
+		noteChartCount = 0,
+		cachePercent = 0,
+	}
+	self.shared = aquathread.shared.cache
 end
 
 CacheModel.startUpdate = function(self, path, force, callback)
@@ -24,25 +25,7 @@ CacheModel.startUpdate = function(self, path, force, callback)
 end
 
 CacheModel.stopUpdate = function(self)
-	ThreadPool:receive({
-		name = "CacheUpdater",
-		action = "stop"
-	})
-end
-
-CacheModel.receive = function(self, event)
-	if event.name ~= "CacheProgress" then
-		return
-	end
-
-	if event.state == 1 then
-		self.noteChartCount = event.noteChartCount
-	elseif event.state == 2 then
-		self.cachePercent = event.cachePercent
-	elseif event.state == 3 then
-		self.isUpdating = false
-	end
-	self.state = event.state
+	self.shared.stop = true
 end
 
 local isProcessing = false
@@ -69,14 +52,7 @@ CacheModel.process = aquathread.coro(function(self)
 	local tasks = self.tasks
 	local task = table.remove(tasks, 1)
 	while task do
-		aquathread.pushTask({
-			receive = function(event)
-				self:receive(event)
-			end,
-			error = function(message)
-				print(message)
-			end
-		})
+		aquathread.pushTask({error = print})
 		updateCacheAsync(task[1], task[2])
 
 		if task[3] then
@@ -85,7 +61,6 @@ CacheModel.process = aquathread.coro(function(self)
 
 		task = table.remove(tasks, 1)
 	end
-	-- self.callback()
 
 	isProcessing = false
 end)

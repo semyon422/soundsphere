@@ -71,29 +71,6 @@ end
 
 ----------------------------------------------------------------
 
-CacheManager.checkThreadEvent = function(self)
-	if thread then
-		local event = thread:pop()
-		if event and event.name == "CacheUpdater" then
-			if event.action == "stop" then
-				self.needStop = true
-			end
-		end
-	end
-end
-
-CacheManager.sendThreadEvent = function(self)
-	if thread then
-		thread:push({
-			name = "CacheProgress",
-			noteChartSetCount = self.noteChartSetCount,
-			noteChartCount = self.noteChartCount,
-			cachePercent = self.cachePercent,
-			state = self.state
-		})
-	end
-end
-
 CacheManager.resetProgress = function(self)
 	self.noteChartSetCount = self.noteChartSets and #self.noteChartSets or 0
 	self.noteChartCount = self.noteCharts and #self.noteCharts or 0
@@ -113,8 +90,22 @@ CacheManager.checkProgress = function(self)
 		CacheDatabase:begin()
 	end
 
-	self:sendThreadEvent()
-	self:checkThreadEvent()
+	if not thread then
+		return
+	end
+
+	thread:update()
+
+	local cache = thread.shared.cache
+	cache.noteChartSetCount = self.noteChartSetCount
+	cache.noteChartCount = self.noteChartCount
+	cache.cachePercent = self.cachePercent
+	cache.state = self.state
+
+	if cache.stop then
+		cache.stop = false
+		self.needStop = true
+	end
 end
 
 CacheManager.generateCacheFull = function(self, path, force)

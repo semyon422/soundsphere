@@ -102,11 +102,12 @@ SelectController.updateCache = function(self, force)
 end
 
 SelectController.updateCacheCollection = function(self, path, force)
-	local state = self.game.cacheModel.state
+	local cacheModel = self.game.cacheModel
+	local state = cacheModel.shared.state
 	if state == 0 or state == 3 then
-		self.game.cacheModel:startUpdate(path, force)
+		cacheModel:startUpdate(path, force)
 	else
-		self.game.cacheModel:stopUpdate()
+		cacheModel:stopUpdate()
 	end
 end
 

@@ -4,10 +4,7 @@ local Class = require("aqua.util.Class")
 local transform = require("aqua.graphics.transform")
 local baseline_print = require("aqua.graphics.baseline_print")
 local spherefonts = require("sphere.assets.fonts")
-local IconButtonImView = require("sphere.imviews.IconButtonImView")
-local TextButtonImView = require("sphere.imviews.TextButtonImView")
-local CheckboxImView = require("sphere.imviews.CheckboxImView")
-local LabelImView = require("sphere.imviews.LabelImView")
+local aquathread = require("aqua.thread")
 
 local CacheView = Class:new()
 
@@ -18,13 +15,14 @@ CacheView.draw = function(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	local cacheModel = self.game.cacheModel
-	local state = cacheModel.state
+	local shared = cacheModel.shared
+	local state = shared.state
 
 	local text = ""
 	if state == 1 then
-		text = ("searching for charts: %d"):format(cacheModel.noteChartCount)
+		text = ("searching for charts: %d"):format(shared.noteChartCount)
 	elseif state == 2 then
-		text = ("creating cache: %0.2f%%"):format(cacheModel.cachePercent)
+		text = ("creating cache: %0.2f%%"):format(shared.cachePercent)
 	elseif state == 3 then
 		text = "complete"
 	elseif state == 0 then
