@@ -68,7 +68,7 @@ MultiplayerModel.connect = aquathread.coro(function(self)
 	connecting = true
 	local url = self.game.configModel.configs.urls.multiplayer
 	local host, port = url:match("^(.+):(.-)$")
-	local ip = toipAsync(host)
+	local ip = toipAsync(host or "")
 	local status, err = pcall(self.host.connect, self.host, ("%s:%s"):format(ip, port))
 	if not status then
 		self.status = err
