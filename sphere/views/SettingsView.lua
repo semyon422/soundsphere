@@ -184,16 +184,25 @@ drawSection.graphics = function(self)
 
 	g.cursor = imgui.combo("g.cursor", g.cursor, {"circle", "arrow", "system"}, nil, "cursor")
 
+	imgui.separator()
+	just.indent(10)
+	just.text("dim")
 	local dim = g.dim
-	dim.select = round(imgui.slider("dim.select", dim.select, 0, 1, ("%0.2f"):format(dim.select), "dim select"), 0.01)
-	dim.gameplay = round(imgui.slider("dim.gameplay", dim.gameplay, 0, 1, ("%0.2f"):format(dim.gameplay), "dim gameplay"), 0.01)
-	dim.result = round(imgui.slider("dim.result", dim.result, 0, 1, ("%0.2f"):format(dim.result), "dim result"), 0.01)
+	dim.select = round(imgui.slider("dim.select", dim.select, 0, 1, ("%0.2f"):format(dim.select), "select"), 0.01)
+	dim.gameplay = round(imgui.slider("dim.gameplay", dim.gameplay, 0, 1, ("%0.2f"):format(dim.gameplay), "gameplay"), 0.01)
+	dim.result = round(imgui.slider("dim.result", dim.result, 0, 1, ("%0.2f"):format(dim.result), "result"), 0.01)
 
+	imgui.separator()
+	just.indent(10)
+	just.text("blur")
 	local blur = g.blur
-	blur.select = round(imgui.slider("blur.select", blur.select, 0, 1, ("%0.2f"):format(blur.select), "blur select"), 0.01)
-	blur.gameplay = round(imgui.slider("blur.gameplay", blur.gameplay, 0, 1, ("%0.2f"):format(blur.gameplay), "blur gameplay"), 0.01)
-	blur.result = round(imgui.slider("blur.result", blur.result, 0, 1, ("%0.2f"):format(blur.result), "blur result"), 0.01)
+	blur.select = round(imgui.slider("blur.select", blur.select, 0, 1, ("%0.2f"):format(blur.select), "select"), 0.01)
+	blur.gameplay = round(imgui.slider("blur.gameplay", blur.gameplay, 0, 1, ("%0.2f"):format(blur.gameplay), "gameplay"), 0.01)
+	blur.result = round(imgui.slider("blur.result", blur.result, 0, 1, ("%0.2f"):format(blur.result), "result"), 0.01)
 
+	imgui.separator()
+	just.indent(10)
+	just.text("camera")
 	local p = g.perspective
 	p.camera = imgui.checkbox("p.camera", p.camera, "enable camera")
 	p.rx = imgui.checkbox("p.rx", p.rx, "allow rotate x")
