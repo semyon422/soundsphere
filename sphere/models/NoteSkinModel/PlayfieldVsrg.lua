@@ -131,12 +131,7 @@ PlayfieldVsrg.addHpBar = function(self, object)
 	object.getMax = function(self) return self.game.rhythmModel.scoreEngine.scoreSystem.hp.max end
 	object.getCurrent = function(self)
 		local hp = self.game.rhythmModel.scoreEngine.scoreSystem.hp
-		for _, h in ipairs(hp) do
-			if h.value > 0 then
-				return h.value
-			end
-		end
-		return 0
+		return hp:getCurrent()
 	end
 	return self:add(object)
 end

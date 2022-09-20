@@ -43,6 +43,15 @@ HpScoreSystem.getSlice = function(self)
 	return slice
 end
 
+HpScoreSystem.getCurrent = function(self)
+	for _, h in ipairs(self) do
+		if h.value > 0 then
+			return h.value, h.notes
+		end
+	end
+	return 0, 1
+end
+
 HpScoreSystem.isFailed = function(self)
 	local _h
 	for _, h in ipairs(self) do
