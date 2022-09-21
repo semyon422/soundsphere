@@ -7,28 +7,18 @@ local WebApi = Class:new()
 
 WebApi.token = ""
 
-WebApi.processResponse = function(level, response)
-	local code = response.code
-
-	local headers = {}
-	for k, v in pairs(response.headers) do
-		headers[k:lower()] = v
+WebApi.processResponse = function(level, body, ...)
+	if level == 2 then
+		return body, ...
 	end
 
-	if level == 3 then
-		return response
-	elseif level == 2 then
-		return response.body, code, headers
-	end
-
-	local status, json_response = pcall(json.decode, response.body)
-
+	local status, json_response = pcall(json.decode, body)
 	if not status then
-		return nil, code, headers
+		return nil, ...
 	end
 
 	if level == 1 then
-		return json_response, code, headers
+		return json_response, ...
 	end
 
 	local object
@@ -38,47 +28,63 @@ WebApi.processResponse = function(level, response)
 			break
 		end
 	end
-	return object, code, headers
+	return object, ...
 end
 
 WebApi.get = function(url, params)
-	local request = require("luajit-request")
+	local https = require("ssl.https")
+	local ltn12 = require("ltn12")
+
 	local encode_query_string = require("aqua.util.encode_query_string")
-	require("preloaders.preloadall")
 
 	if params then
 		url = url .. "?" .. encode_query_string(params)
 	end
-	return request.send(url, {
+
+	local t = {}
+	local _, code, headers = https.request({
+		url = url,
 		method = "GET",
+		sink = ltn12.sink.table(t),
 		headers = {
 			["Authorization"] = "Bearer " .. WebApi.token,
 		},
 	})
+
+	return table.concat(t), code, headers
 end
 
 WebApi.post = function(url, method, params, buffers)
 	local json = require("json")
-	local request = require("luajit-request")
-	require("preloaders.preloadall")
+	local https = require("ssl.https")
+	local ltn12 = require("ltn12")
+	local mfd = require("aqua.util.multipart_form_data")
 
 	local request_buffers = {}
 	if params then
-		request_buffers.json_params = json.encode(params)
+		table.insert(request_buffers, {
+			json.encode(params), name = "json_params"
+		})
 	end
 	if buffers then
-		for k, v in pairs(buffers) do
-			request_buffers[k] = v
+		for _, v in ipairs(buffers) do
+			table.insert(request_buffers, v)
 		end
 	end
 
-	return request.send(url, {
+	local body, headers = mfd(request_buffers)
+	headers["Authorization"] = "Bearer " .. WebApi.token
+
+	local t = {}
+	local _, code, _headers = https.request({
+		url = url,
 		method = method,
-		buffers = request_buffers,
-		headers = {
-			["Authorization"] = "Bearer " .. WebApi.token,
-		},
+		sink = ltn12.sink.table(t),
+		source = ltn12.source.string(body),
+		headers = headers,
 	})
+
+	return table.concat(t), code, _headers
 end
 
 WebApi.newResource = function(self, url)
@@ -107,16 +113,20 @@ WebApi.load = function(self)
 				local key = %q
 				local method = key:gsub("_", "")
 				WebApi.token = %q
-				local response, code, err
+				local body, code, headers
 				if method == "get" then
-					response, code, err = WebApi.get(url, ...)
+					body, code, headers = WebApi.get(url, ...)
 				else
-					response, code, err = WebApi.post(url, method:upper(), ...)
+					body, code, headers = WebApi.post(url, method:upper(), ...)
 				end
-				if not response then
-					return false, code, err
+				if not body then
+					return nil, code
 				end
-				return WebApi.processResponse(select(2, key:gsub("_", "")), response)
+				local _headers = {}
+				for k, v in pairs(headers) do
+					_headers[k:lower()] = v
+				end
+				return WebApi.processResponse(select(2, key:gsub("_", "")), body, code, _headers)
 			]]):format(url, key, self.token))(...)
 			return response, code, headers
 		end

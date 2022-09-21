@@ -2,7 +2,7 @@ local Class = require("aqua.util.Class")
 local osudirect_urls = require("sphere.osudirect.urls")
 local osudirect_parse = require("sphere.osudirect.parse")
 local fsextract = require("sphere.filesystem.extract")
-local fsdownload = require("sphere.filesystem.download")
+local downloadAsync = require("sphere.filesystem.download")
 local fsrequest = require("sphere.filesystem.request")
 local aquathread = require("aqua.thread")
 local aquatimer = require("aqua.timer")
@@ -15,6 +15,24 @@ OsudirectModel.load = function(self)
 	self.items = {self.statusBeatmap}
 	self.processing = {}
 	self.page = 1
+end
+
+OsudirectModel.update = function(self)
+	local dl = aquathread.shared.download
+	for _, b in ipairs(self.processing) do
+		local status = dl[b.url]
+		if status then
+			if b.isDownloading then
+				local status = dl[b.url]
+				b.status = ("%0.1fmbps - %3.2f%%"):format(
+					status.speed * 1e-6,
+					(status.total / status.size) * 100
+				)
+			else
+				dl[b.url] = nil
+			end
+		end
+	end
 end
 
 OsudirectModel.isChanged = function(self)
@@ -121,7 +139,7 @@ OsudirectModel.getPreviewUrl = function(self)
 	return socket_url.absolute(config.static, osudirect_urls.preview(self.beatmap.setId))
 end
 
-local download = aquathread.async(fsdownload)
+local download = downloadAsync
 local extract = aquathread.async(fsextract)
 
 OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self, beatmap, callback)
@@ -137,11 +155,17 @@ OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self, beatmap, call
 
 	local setId = beatmap.setId
 	local url = socket_url.absolute(config.storage, osudirect_urls.download(setId))
+	beatmap.url = url
+
 	print(("Downloading: %s"):format(url))
 	beatmap.status = "Downloading"
-	local downloaded, filename = download(url, saveDir)
-	if not downloaded then
-		beatmap.status = "Downloading error"
+
+	beatmap.isDownloading = true
+	local status, filename = download(url, saveDir)
+	beatmap.isDownloading = false
+
+	if not status then
+		beatmap.status = filename
 		return
 	end
 

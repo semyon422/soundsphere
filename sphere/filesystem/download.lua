@@ -1,21 +1,75 @@
-return function(url, saveDir, fallbackName)
-	local request = require("luajit-request")
-	local response, code, err = request.send(url)
-	if not response then
-		return
+local aquathread = require("aqua.thread")
+aquathread.shared.download = {}
+
+return aquathread.async(function(url, saveDir, fallbackName)
+	local https = require("ssl.https")
+	local ltn12 = require("ltn12")
+
+	local ok, code, headers, status_line = https.request({
+		url = url,
+		method = "HEAD",
+		sink = ltn12.sink.null(),
+	})
+	if not ok then
+		return nil, code
+	end
+	if code >= 300 then
+		return nil, status_line
 	end
 
 	local name = fallbackName or url:match("^.+/(.-)$")
-	for header, value in pairs(response.headers) do
-		if header:lower() == "content-disposition" then
+	local size
+	for header, value in pairs(headers) do
+		header = header:lower()
+		if header == "content-disposition" then
 			local filename = value:match("filename=\"(.-)\"$")
-			if filename then
-				name = filename
-				break
-			end
+			name = filename or name
+		elseif header == "content-length" then
+			size = tonumber(value) or size
 		end
 	end
 
+	if not size then
+		return nil, "Unknown file size"
+	end
+
+	thread.shared.download[url] = {
+		size = size,
+		total = 0,
+		speed = 0,
+	}
+	local shared = thread.shared.download[url]
+
+	local total = 0
+	local t = {}
+	local time
+	local function sink(chunk)
+		if chunk == nil or chunk == "" then
+			return true
+		end
+
+		time = time or love.timer.getTime()
+		total = total + #chunk
+		shared.total = total
+		shared.speed = total / (love.timer.getTime() - time)
+
+		table.insert(t, chunk)
+
+		return true
+	end
+
+	local ok, code, _, status_line = https.request({
+		url = url,
+		method = "GET",
+		sink = sink,
+	})
+	if not ok then
+		return nil, code
+	end
+	if code >= 400 then
+		return nil, status_line
+	end
+
 	require("love.filesystem")
-	return love.filesystem.write(saveDir .. "/" .. name, response.body), name
-end
+	return love.filesystem.write(saveDir .. "/" .. name, table.concat(t)), name
+end)

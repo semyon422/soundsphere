@@ -127,15 +127,15 @@ local loadOJN = aquathread.async(function(path)
 end)
 
 local loadHttp = aquathread.async(function(url)
-	local request = require("luajit-request")
-	local response, code, err = request.send(url)
-	if not response then
+	local https = require("ssl.https")
+	local body = https.request(url)
+	if not body then
 		return
 	end
 
 	require("love.filesystem")
 	require("love.image")
-	local fileData = love.filesystem.newFileData(response.body, "cover")
+	local fileData = love.filesystem.newFileData(body, "cover")
 	local status, imageData = pcall(love.image.newImageData, fileData)
 	if status then
 		return imageData

@@ -186,6 +186,7 @@ GameController.update = function(self, dt)
 
 	self.multiplayerController:update()
 	self.onlineController:update()
+	self.osudirectModel:update()
 
 	self.fpsLimiter:update()
 	self.windowManager:update()

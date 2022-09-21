@@ -1,4 +1,4 @@
-local discordrpc = require("discordrpc.discordRPC")
+local discordrpc = require("discordRPC")
 local Class = require("aqua.util.Class")
 
 local DiscordModel = Class:new()

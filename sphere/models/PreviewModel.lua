@@ -123,16 +123,16 @@ PreviewModel.stop = function(self)
 end
 
 local loadHttp = aquathread.async(function(url)
-	local request = require("luajit-request")
-	local response, code, err = request.send(url)
-	if not response then
+	local https = require("ssl.https")
+	local body = https.request(url)
+	if not body then
 		return
 	end
 
 	require("love.filesystem")
 	require("love.audio")
 	require("love.sound")
-	local fileData = love.filesystem.newFileData(response.body, url:match("^.+/(.-)$"))
+	local fileData = love.filesystem.newFileData(body, url:match("^.+/(.-)$"))
 	local status, source = pcall(love.audio.newSource, fileData, "static")
 	if status then
 		return source

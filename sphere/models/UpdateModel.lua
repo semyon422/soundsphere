@@ -34,14 +34,13 @@ local crossFiles = function(server, client)
 end
 
 local async_download = thread.async(function(url, path)
-	local request = require("luajit-request")
+	local https = require("ssl.https")
 	local socket_url = require("socket.url")
 
 	url = socket_url.build(socket_url.parse(url))
-	local response, _, err = request.send(url)
-	local body = response and response.body
+	local body, code = https.request(url)
 	if not body or not path then
-		return body, err
+		return body, code
 	end
 
 	local directory = path:match("^(.+)/.-$")
