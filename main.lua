@@ -7,6 +7,7 @@ require("socket")
 
 local aquapackage = require("aqua.aqua.package")
 aquapackage.add("3rd-deps/lib")
+aquapackage.add("bin/lib")
 aquapackage.add("3rd-deps/lua")
 aquapackage.add("aqua")
 aquapackage.add("ncdk")
