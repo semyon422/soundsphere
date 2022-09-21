@@ -7,63 +7,30 @@
 [submodule "aqua"]
 	path = aqua
 	url = https://github.com/semyon422/aqua
-[submodule "tween"]
-	path = tween
-	url = https://github.com/kikito/tween.lua
-[submodule "tinyyaml"]
-	path = tinyyaml
-	url = https://github.com/peposso/lua-tinyyaml
-[submodule "json"]
-	path = json
-	url = https://github.com/rxi/json.lua
-[submodule "ljsqlite3"]
-	path = ljsqlite3
-	url = https://github.com/stepelu/lua-ljsqlite3
 [submodule "soundsphere-skins"]
 	path = userdata/skins
 	url = https://github.com/semyon422/soundsphere-skins
 [submodule "resources"]
 	path = resources
 	url = https://github.com/semyon422/soundsphere-resources
-[submodule "discordrpc"]
-	path = discordrpc
-	url = https://github.com/pfirsich/lua-discordRPC
-[submodule "md5"]
-	path = md5
-	url = https://github.com/kikito/md5.lua
 [submodule "libchart"]
 	path = libchart
 	url = https://github.com/semyon422/libchart
-[submodule "lua-toml"]
-	path = lua-toml
-	url = https://github.com/semyon422/lua-toml
 [submodule "byte"]
 	path = byte
 	url = https://github.com/semyon422/luajit-byte
-[submodule "luajit-request"]
-	path = luajit-request
-	url = https://github.com/semyon422/luajit-request
 [submodule "luajit-iconv"]
 	path = luajit-iconv
 	url = https://github.com/semyon422/luajit-iconv
 [submodule "s3dc"]
 	path = s3dc
 	url = https://github.com/semyon422/s3dc
-[submodule "inspect"]
-	path = inspect
-	url = https://github.com/kikito/inspect.lua
 [submodule "lua-crc32"]
 	path = lua-crc32
 	url = https://github.com/semyon422/lua-crc32
-[submodule "serpent"]
-	path = serpent
-	url = https://github.com/pkulchenko/serpent
-[submodule "cimgui-love"]
-	path = cimgui-love
-	url = https://github.com/semyon422/cimgui-love
-[submodule "lua-MessagePack"]
-	path = lua-MessagePack
-	url = https://framagit.org/fperrad/lua-MessagePack
 [submodule "love-just-ui"]
 	path = love-just-ui
 	url = https://github.com/semyon422/love-just-ui
+[submodule "3rd-deps"]
+	path = 3rd-deps
+	url = https://github.com/semyon422/soundsphere-3rd-party-deps

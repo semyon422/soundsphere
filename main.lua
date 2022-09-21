@@ -6,20 +6,14 @@ require("enet")
 require("socket")
 
 local aquapackage = require("aqua.aqua.package")
+aquapackage.add("3rd-deps/lib")
+aquapackage.add("3rd-deps/lua")
 aquapackage.add("aqua")
 aquapackage.add("ncdk")
 aquapackage.add("chartbase")
 aquapackage.add("libchart")
-aquapackage.add("md5")
-aquapackage.add("luajit-request")
-aquapackage.add("json")
-aquapackage.add("tinyyaml")
-aquapackage.add("tween")
 aquapackage.add("s3dc")
-aquapackage.add("inspect")
 aquapackage.add("lua-crc32")
-aquapackage.add("serpent/src")
-aquapackage.add("lua-MessagePack/src")
 aquapackage.add("love-just-ui")
 
 local ffi = require("ffi")
@@ -73,7 +67,6 @@ if moddedgame and moddedgame.type == "directory" then
 end
 
 require("preloaders.preloadall")
-require("luajit-request").init()
 
 local love_run = require("love_run")
 love.load = function() end  -- for compatibility with old conf.lua

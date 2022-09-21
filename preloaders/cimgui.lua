@@ -1,5 +1,4 @@
 local ffi = require("ffi")
-local jit = require("jit")
 
 local load = ffi.load
 
@@ -13,7 +12,7 @@ cimgui_preloader.name = "cimgui"
 
 cimgui_preloader.preload = function()
 	ffi.load = _load
-	local cimgui = require("cimgui-love.src.init")
+	local cimgui = require("cimgui.init")
 	ffi.load = load
 	return cimgui
 end
