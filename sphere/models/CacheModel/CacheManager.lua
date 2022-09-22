@@ -5,6 +5,7 @@ local NoteChartDataEntryFactory	= require("notechart.NoteChartDataEntryFactory")
 local Log						= require("aqua.util.Log")
 local Class						= require("aqua.util.Class")
 local md5						= require("md5")
+local Orm = require("sphere.Orm")
 
 local CacheManager = Class:new()
 
@@ -34,8 +35,8 @@ CacheManager.getNoteChartSetEntry = function(self, entry)
 	return entry
 end
 
-CacheManager.setNoteChartEntry = function(self, entry)
-	local oldEntry = CacheDatabase:selectNoteChartEntry(entry.path)
+CacheManager.setNoteChartEntry = function(self, entry, isOldEntry)
+	local oldEntry = isOldEntry and entry or CacheDatabase:selectNoteChartEntry(entry.path)
 
 	if not oldEntry then
 		CacheDatabase:insertNoteChartEntry(entry)
@@ -189,17 +190,16 @@ CacheManager.processNoteChartEntries = function(self, noteChartPath, noteChartSe
 
 	if entry then
 		if entry.lastModified ~= lastModified then
-			entry.hash = nil
+			entry.hash = Orm.NULL
 			entry.lastModified = lastModified
 			entry.setId = noteChartSetEntry.id
-			self:setNoteChartEntry(entry)
+			self:setNoteChartEntry(entry, true)
 		elseif entry.setId ~= noteChartSetEntry.id then
 			entry.setId = noteChartSetEntry.id
-			self:setNoteChartEntry(entry)
+			self:setNoteChartEntry(entry, true)
 		end
 	else
 		self:setNoteChartEntry({
-			hash = nil,
 			path = noteChartPath,
 			lastModified = lastModified,
 			setId = noteChartSetEntry.id
