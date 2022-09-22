@@ -4,6 +4,7 @@ local Orm = require("sphere.Orm")
 local ObjectQuery = require("sphere.ObjectQuery")
 local ffi = require("ffi")
 local byte = require("byte")
+local utf8 = require("utf8")
 
 local CacheDatabase = {}
 
@@ -132,7 +133,7 @@ CacheDatabase.deleteNoteChartSetEntry = function(self, path)
 end
 
 CacheDatabase.selectNoteChartSets = function(self, path)
-	return self.db:select("noteChartSets", "substr(path, 1, ?) = ?", #path, path)
+	return self.db:select("noteChartSets", "substr(path, 1, ?) = ?", utf8.len(path), path)
 end
 
 ----------------------------------------------------------------
