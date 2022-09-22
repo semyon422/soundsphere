@@ -38,6 +38,10 @@ local async_download = thread.async(function(url, path)
 	local socket_url = require("socket.url")
 
 	url = socket_url.build(socket_url.parse(url))
+
+	if url:find("^http://") then
+		https = require("socket.http")
+	end
 	local body, code = https.request(url)
 	if not body or not path then
 		return body, code
@@ -48,10 +52,35 @@ local async_download = thread.async(function(url, path)
 		return false, ("Could not open directory %s (not a directory)"):format(directory)
 	end
 
+	local ok, err = love.filesystem.write(path, body)
+	if ok then
+		return ok, err
+	end
+
+	os.rename(path, path .. ".old")
 	return love.filesystem.write(path, body)
 end)
 
-local async_remove = thread.async(function(...) return love.filesystem.remove(...) end)
+local async_remove = thread.async(function(path)
+	local ok = love.filesystem.remove(path)
+	if ok then
+		return ok
+	end
+	return os.rename(path, path .. ".old")
+end)
+local async_copy = thread.async(function(src, dst)
+	local ok, err = love.filesystem.read(src)
+	if not ok then
+		return ok, err
+	end
+	local content = ok
+	ok, err = love.filesystem.write(dst, content)
+	if ok then
+		return ok, err
+	end
+	os.rename(dst, dst .. ".old")
+	return love.filesystem.write(dst, content)
+end)
 local async_crc32 = thread.async(function(...)
 	local content = love.filesystem.read(...)
 	if not content then
@@ -66,7 +95,8 @@ UpdateModel.setStatus = function(self, status)
 end
 
 UpdateModel.updateFilesAsync = function(self)
-	local configs = self.game.configModel.configs
+	local configModel = self.game.configModel
+	local configs = configModel.configs
 	self:setStatus("Checking for updates...")
 
 	local response = async_download(configs.urls.update)
@@ -84,23 +114,52 @@ UpdateModel.updateFilesAsync = function(self)
 	local client_filelist = configs.files
 	local filelist = crossFiles(server_filelist, client_filelist)
 
+	local client_filemap = {}
+	for _, file in ipairs(client_filelist) do
+		client_filemap[file.hash] = file
+	end
+
+	local downloadList = {}
+	local copyList = {}
+	local removeList = {}
+
 	local count = 0
 	for _, file in ipairs(filelist) do
 		if file.hash_old and not file.hash then
-			self:setStatus(("remove: %s"):format(file.path))
-			async_remove(file.path)
+			table.insert(removeList, file)
 		elseif file.hash and not file.hash_old or file.hash ~= file.hash_old then
-			self:setStatus(("check: %s"):format(file.path))
-			if file.hash ~= async_crc32(file.path) then
-				self:setStatus(("download: %s"):format(file.path))
-				local res, err = async_download(file.url, file.path)
-				if not res then
-					self:setStatus(err)
-					return
-				end
-				count = count + 1
+			local client_file = client_filemap[file.hash]
+			if client_file and file.hash == async_crc32(client_file.path) then
+				table.insert(copyList, {client_file, file})
+			else
+				table.insert(downloadList, file)
 			end
 		end
+	end
+
+	for _, file in ipairs(downloadList) do
+		self:setStatus(("download: %s"):format(file.path))
+		local res, err = async_download(file.url, file.path)
+		if not res then
+			self:setStatus(err)
+			return
+		end
+		count = count + 1
+	end
+	for _, files in ipairs(copyList) do
+		local file1, file2 = unpack(files)
+		self:setStatus(("copy: %s to %s"):format(file1.path, file2.path))
+		local res, err = async_copy(file1.path, file2.path)
+		if not res then
+			self:setStatus(err)
+			return
+		end
+		count = count + 1
+	end
+	for _, file in ipairs(removeList) do
+		self:setStatus(("remove: %s"):format(file.path))
+		async_remove(file.path)
+		count = count + 1
 	end
 
 	self:setStatus(("files updated: %s"):format(count))
@@ -115,7 +174,7 @@ UpdateModel.updateFilesAsync = function(self)
 		client_filelist[k] = v
 	end
 
-	self.game.configModel:write("files")
+	configModel:write("files")
 
 	return count > 0
 end
