@@ -129,7 +129,9 @@ UpdateModel.updateFilesAsync = function(self)
 			table.insert(removeList, file)
 		elseif file.hash and not file.hash_old or file.hash ~= file.hash_old then
 			local client_file = client_filemap[file.hash]
-			if client_file and file.hash == async_crc32(client_file.path) then
+			if file.hash == async_crc32(file.path) then
+				self:setStatus(("found: %s"):format(file.path))
+			elseif client_file and file.hash == async_crc32(client_file.path) then
 				table.insert(copyList, {client_file, file})
 			else
 				table.insert(downloadList, file)
