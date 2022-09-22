@@ -3,6 +3,7 @@ local sqlite = require("ljsqlite3")
 local Orm = {}
 
 Orm.print_queries = false
+Orm.NULL = {}
 
 function Orm:new()
 	local object = {table_infos = {}}
@@ -60,9 +61,13 @@ end
 
 function Orm:stmt(query, ...)
 	if self.print_queries then
+		local values = {...}
+		for i = 1, select("#", ...) do
+			values[i] = tostring(select(i, ...))
+		end
 		print(
 			(query:gsub("\n", " "):gsub("%s+", " ")) ..
-			(select("#", ...) and (" {%s}"):format(table.concat({...}, ", ")) or "")
+			(select("#", ...) > 0 and (" {%s}"):format(table.concat(values, ", ")) or "")
 		)
 	end
 	local stmt = self.c:prepare(query)
@@ -115,10 +120,11 @@ function Orm:update(table_name, values, conditions, ...)
 		local key = column.name
 		local value = values[key]
 		if value ~= nil then
-			if type(value) == "boolean" then
+			if value == self.NULL then
+				value = "NULL"
+			elseif type(value) == "boolean" then
 				value = value and 1 or 0
-			end
-			if type(value) ~= "number" then
+			elseif type(value) ~= "number" then
 				value = ("%q"):format(value)
 			end
 			if value ~= value then
@@ -146,11 +152,17 @@ function Orm:insert(table_name, values, ignore)
 
 	local count = 0
 	local query_keys = {}
+	local query_values = {}
 	for _, column in ipairs(table_info) do
 		local key = column.name
-		if values[key] then
-			table.insert(query_keys, escape_identifier(key))
+		local value = values[key]
+		if value then
+			if value == self.NULL then
+				value = nil
+			end
 			count = count + 1
+			query_keys[count] = escape_identifier(key)
+			query_values[count] = value
 		end
 	end
 
@@ -159,16 +171,7 @@ function Orm:insert(table_name, values, ignore)
 
 	local stmt = self:stmt(("INSERT%s INTO %s %s VALUES %s RETURNING *"):format(
 		ignore and " OR IGNORE" or "", escape_identifier(table_name), query_keys, pattern
-	))
-
-	local i = 1
-	for _, column in ipairs(table_info) do
-		local key = column.name
-		if values[key] then
-			stmt:bind1(i, values[key])
-			i = i + 1
-		end
-	end
+	), unpack(query_values, 1, count))
 
 	local row, colnames = stmt:step({}, {})
 	assert(not stmt:step())
