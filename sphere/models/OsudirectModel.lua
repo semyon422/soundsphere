@@ -1,6 +1,5 @@
 local Class = require("aqua.util.Class")
-local osudirect_urls = require("sphere.osudirect.urls")
-local osudirect_parse = require("sphere.osudirect.parse")
+local osudirect = require("libchart.osudirect")
 local fsextract = require("sphere.filesystem.extract")
 local downloadAsync = require("sphere.filesystem.download")
 local fsrequest = require("sphere.filesystem.request")
@@ -94,13 +93,13 @@ end
 
 OsudirectModel.searchRequest = function(self, searchString, page)
 	local config = self.game.configModel.configs.urls.osu
-	local url = socket_url.absolute(config.web, osudirect_urls.search(searchString, nil, page - 1))
+	local url = socket_url.absolute(config.web, osudirect.search(searchString, nil, page - 1))
 	print("GET " .. url)
 	local body = asyncRequest(url)
 	if not body then
 		return
 	end
-	return osudirect_parse(body)
+	return osudirect.parse(body)
 end
 
 OsudirectModel.searchNext = function(self)
@@ -131,12 +130,12 @@ end
 
 OsudirectModel.getBackgroundUrl = function(self)
 	local config = self.game.configModel.configs.urls.osu
-	return socket_url.absolute(config.assets, osudirect_urls.cover(self.beatmap.setId, true))
+	return socket_url.absolute(config.assets, osudirect.cover(self.beatmap.setId, true))
 end
 
 OsudirectModel.getPreviewUrl = function(self)
 	local config = self.game.configModel.configs.urls.osu
-	return socket_url.absolute(config.static, osudirect_urls.preview(self.beatmap.setId))
+	return socket_url.absolute(config.static, osudirect.preview(self.beatmap.setId))
 end
 
 local download = downloadAsync
@@ -154,7 +153,7 @@ OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self, beatmap, call
 	local saveDir = "userdata/charts/downloads"
 
 	local setId = beatmap.setId
-	local url = socket_url.absolute(config.storage, osudirect_urls.download(setId))
+	local url = socket_url.absolute(config.storage, osudirect.download(setId))
 	beatmap.url = url
 
 	print(("Downloading: %s"):format(url))
