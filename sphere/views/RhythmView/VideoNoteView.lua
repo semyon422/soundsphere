@@ -18,7 +18,6 @@ VideoNoteView.construct = function(self)
 
 	if vid then
 		vid:rewind()
-		vid:setTimer(self.graphicalNote.timeEngine.timer)
 
 		self.video = vid
 		self.drawable = vid.image
@@ -32,10 +31,11 @@ VideoNoteView.update = function(self, dt)
 	self.timeState = self.graphicalNote.timeState
 	self.logicalState = self.graphicalNote.logicalNote.state
 	self.headView.timeState = self.graphicalNote.startTimeState or self.graphicalNote.timeState
+	local timer = self.graphicalNote.timeEngine.timer
 
 	local vid = self.video
 	if vid then
-		vid:update(dt)
+		vid:seek(timer:getTime())
 	end
 end
 
