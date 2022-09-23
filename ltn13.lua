@@ -3,9 +3,7 @@
 local ltn13 = {}
 
 local function ret(ok, ...)
-	if ok then
-		return ...
-	end
+	if ok then return ... end
 	return nil, ...
 end
 
@@ -17,13 +15,10 @@ end
 
 function ltn13.newtry(f)
 	return function(...)
-		local ok, ret = ...
-		if not ok then
-			if f then f() end
-			error(ret, 0)
-		else
-			return ...
-		end
+		local ok, err = ...
+		if ok then return ... end
+		if f then f() end
+		error(err)
 	end
 end
 
