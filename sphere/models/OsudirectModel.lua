@@ -1,8 +1,7 @@
 local Class = require("aqua.util.Class")
 local osudirect = require("libchart.osudirect")
-local fsextract = require("sphere.filesystem.extract")
+local extractAsync = require("sphere.filesystem.extract")
 local downloadAsync = require("sphere.filesystem.download")
-local fsrequest = require("sphere.filesystem.request")
 local aquathread = require("aqua.thread")
 local aquatimer = require("aqua.timer")
 local socket_url = require("socket.url")
@@ -67,7 +66,10 @@ OsudirectModel.getDifficulties = function(self)
 	return beatmap and beatmap.difficulties or empty
 end
 
-local asyncRequest = aquathread.async(fsrequest)
+local requestAsync = aquathread.async(function(url)
+	local https = require("ssl.https")
+	return https.request(url)
+end)
 
 OsudirectModel.searchDebounce = function(self)
 	aquatimer.debounce(self, "loadDebounce", 0.1, self.search, self)
@@ -95,7 +97,7 @@ OsudirectModel.searchRequest = function(self, searchString, page)
 	local config = self.game.configModel.configs.urls.osu
 	local url = socket_url.absolute(config.web, osudirect.search(searchString, nil, page - 1))
 	print("GET " .. url)
-	local body = asyncRequest(url)
+	local body = requestAsync(url)
 	if not body then
 		return
 	end
@@ -138,9 +140,6 @@ OsudirectModel.getPreviewUrl = function(self)
 	return socket_url.absolute(config.static, osudirect.preview(self.beatmap.setId))
 end
 
-local download = downloadAsync
-local extract = aquathread.async(fsextract)
-
 OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self, beatmap, callback)
 	if not beatmap or beatmap == self.statusBeatmap then
 		return
@@ -160,11 +159,11 @@ OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self, beatmap, call
 	beatmap.status = "Downloading"
 
 	beatmap.isDownloading = true
-	local status, filename = download(url, saveDir)
+	local filename, err = downloadAsync(url, saveDir)
 	beatmap.isDownloading = false
 
-	if not status then
-		beatmap.status = filename
+	if not filename then
+		beatmap.status = err
 		return
 	end
 
@@ -179,7 +178,7 @@ OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self, beatmap, call
 	local extractPath = saveDir .. "/" .. filename:match("^(.+)%.osz$")
 	print("Extracting")
 	beatmap.status = "Extracting"
-	local extracted = extract(savePath, extractPath, true)
+	local extracted = extractAsync(savePath, extractPath, true)
 	if not extracted then
 		beatmap.status = "Extracting error"
 		return

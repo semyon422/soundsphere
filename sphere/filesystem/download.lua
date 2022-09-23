@@ -5,12 +5,12 @@ return aquathread.async(function(url, saveDir, fallbackName)
 	local https = require("ssl.https")
 	local ltn12 = require("ltn12")
 
-	local ok, code, headers, status_line = https.request({
+	local one, code, headers, status_line = https.request({
 		url = url,
 		method = "HEAD",
 		sink = ltn12.sink.null(),
 	})
-	if not ok then
+	if not one then
 		return nil, code
 	end
 	if code >= 300 then
@@ -58,12 +58,12 @@ return aquathread.async(function(url, saveDir, fallbackName)
 		return true
 	end
 
-	local ok, code, _, status_line = https.request({
+	one, code, _, status_line = https.request({
 		url = url,
 		method = "GET",
 		sink = sink,
 	})
-	if not ok then
+	if not one then
 		return nil, code
 	end
 	if code >= 400 then
@@ -71,5 +71,9 @@ return aquathread.async(function(url, saveDir, fallbackName)
 	end
 
 	require("love.filesystem")
-	return love.filesystem.write(saveDir .. "/" .. name, table.concat(t)), name
+	local ok, err = love.filesystem.write(saveDir .. "/" .. name, table.concat(t))
+	if not ok then
+		return nil, err
+	end
+	return name
 end)

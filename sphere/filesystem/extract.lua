@@ -1,4 +1,6 @@
-return function(archive, path, remove)
+local aquathread = require("aqua.thread")
+
+return aquathread.async(function(archive, path, remove)
 	require("love.filesystem")
 	local aquafs = require("aqua.filesystem")
 	local rcopy = require("aqua.util.rcopy")
@@ -15,4 +17,4 @@ return function(archive, path, remove)
 		love.filesystem.remove(archive)
 	end
 	return true
-end
+end)
