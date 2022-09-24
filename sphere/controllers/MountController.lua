@@ -1,5 +1,6 @@
 local Class = require("aqua.util.Class")
-local extract = require("sphere.filesystem.extract")
+local extractAsync = require("sphere.filesystem.extract")
+local aquathread = require("aqua.thread")
 
 local MountController = Class:new()
 
@@ -21,7 +22,7 @@ MountController.directorydropped = function(self, path)
 	self.game.configModel:write("mount")
 end
 
-MountController.filedropped = function(self, file)
+MountController.filedropped = aquathread.coro(function(self, file)
 	local path = file:getFilename():gsub("\\", "/")
 	if not path:find("%.osz$") then
 		return
@@ -30,7 +31,7 @@ MountController.filedropped = function(self, file)
 	local extractPath = "userdata/charts/dropped/" .. path:match("^.+/(.-)%.osz$")
 
 	print(("Extracting to: %s"):format(extractPath))
-	local extracted = extract(path, extractPath, false)
+	local extracted = extractAsync(path, extractPath, false)
 	if not extracted then
 		print("Failed to extract")
 		return
@@ -38,6 +39,6 @@ MountController.filedropped = function(self, file)
 	print("Extracted")
 
 	self.game.cacheModel:startUpdate(extractPath, true)
-end
+end)
 
 return MountController
