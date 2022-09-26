@@ -196,9 +196,9 @@ drawSection.graphics = function(self)
 	just.indent(10)
 	just.text("blur")
 	local blur = g.blur
-	blur.select = round(imgui.slider("blur.select", blur.select, 0, 1, ("%0.2f"):format(blur.select), "select"), 0.01)
-	blur.gameplay = round(imgui.slider("blur.gameplay", blur.gameplay, 0, 1, ("%0.2f"):format(blur.gameplay), "gameplay"), 0.01)
-	blur.result = round(imgui.slider("blur.result", blur.result, 0, 1, ("%0.2f"):format(blur.result), "result"), 0.01)
+	blur.select = round(imgui.slider("blur.select", blur.select, 0, 20, ("%d"):format(blur.select), "select"))
+	blur.gameplay = round(imgui.slider("blur.gameplay", blur.gameplay, 0, 20, ("%d"):format(blur.gameplay), "gameplay"), 0.01)
+	blur.result = round(imgui.slider("blur.result", blur.result, 0, 20, ("%d"):format(blur.result), "result"))
 
 	imgui.separator()
 	just.indent(10)

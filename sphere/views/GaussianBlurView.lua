@@ -4,23 +4,19 @@ local inside = require("aqua.util.inside")
 
 local GaussianBlurView = Class:new()
 
-GaussianBlurView.sigma = 16
-
 GaussianBlurView.load = function(self)
-	self:setSigma(self.sigma)
+	self:setSigma(0)
 	self.drawCanvas = love.graphics.newCanvas()
 	self.shaderCanvas = love.graphics.newCanvas()
 end
 
 GaussianBlurView.draw = function(self)
-	local blur = self.blur.value or inside(self, self.blur.key)
+	local blur = math.ceil(self.blur.value or inside(self, self.blur.key) or 0)
 	if blur == 0 then
 		return
 	end
 
-	if self.sigma ~= blur then
-		self:setSigma(blur)
-	end
+	self:setSigma(blur)
 
 	if not self.enabled then
 		self:enable()
