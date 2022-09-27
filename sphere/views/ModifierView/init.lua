@@ -1,23 +1,18 @@
-local SequenceView = require("sphere.views.SequenceView")
 local ModalImView = require("sphere.imviews.ModalImView")
 local just = require("just")
 
 local ModifierViewConfig = require("sphere.views.ModifierView.ModifierViewConfig")
 
 local activeList = "modifierList"
-local sequenceView
 return ModalImView(function(self)
 	if not self then
 		return true
 	end
 
-	if not sequenceView then
-		sequenceView = SequenceView:new()
-		sequenceView.game = self.game
-		sequenceView:setSequenceConfig(ModifierViewConfig)
+	for _, object in ipairs(ModifierViewConfig) do
+		object.game = self.game
+		object:draw()
 	end
-
-	sequenceView:draw()
 
 	just.container("modifier keyboard", true)
 	if not just.keyboard_over() then

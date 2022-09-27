@@ -102,7 +102,6 @@ local ModifierViewConfig = {
 	AvailableModifierScrollBar,
 	Rectangle,
 	ContainerEnd,
-	require("sphere.views.DebugInfoViewConfig"),
 }
 
 return ModifierViewConfig
