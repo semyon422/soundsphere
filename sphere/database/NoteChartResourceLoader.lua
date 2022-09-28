@@ -1,7 +1,7 @@
 local image			= require("aqua.image")
 local sound			= require("aqua.sound")
+local video			= require("aqua.video")
 local aquathread	= require("aqua.thread")
-local aquatimer	= require("aqua.timer")
 local JamLoader		= require("sphere.database.JamLoader")
 local FileFinder	= require("sphere.filesystem.FileFinder")
 local array_update = require("aqua.util.array_update")
@@ -71,6 +71,8 @@ NoteChartResourceLoader.loadResource = function(self, path)
 		resources.loaded[path] = sound.newSoundDataAsync(path)
 	elseif fileType == "image" then
 		resources.loaded[path] = image.newImageDataAsync(path)
+	elseif fileType == "video" then
+		resources.loaded[path] = video.newVideoAsync(path)
 	elseif path:lower():find("%.ojm$") then
 		local soundDatas = JamLoader:loadAsync(path)
 		if soundDatas then
