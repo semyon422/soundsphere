@@ -2,10 +2,9 @@ local _transform = require("aqua.graphics.transform")
 local just = require("just")
 local just_layout = require("just.layout")
 
-local ScrollBarView = require("sphere.views.ScrollBarView")
-
 local AvailableModifierListView = require("sphere.views.ModifierView.AvailableModifierListView")
 local ModifierListView = require("sphere.views.ModifierView.ModifierListView")
+local ScrollBarImView = require("sphere.imviews.ScrollBarImView")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -73,17 +72,18 @@ local ModifierList = ModifierListView:new({
 	rows = 11,
 })
 
-local AvailableModifierScrollBar = ScrollBarView:new({
-	transform = transform,
-	list = AvailableModifierList,
-	x = 263,
-	y = 144,
-	w = 16,
-	h = 792,
-	rows = 11,
-	backgroundColor = {1, 1, 1, 0.33},
-	color = {1, 1, 1, 0.66}
-})
+local AvailableModifierScrollBar = {draw = function(self)
+	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.translate(279, 144)
+
+	local list = AvailableModifierList
+	local count = #list.items - 1
+	local pos = (list.visualItemIndex - 1) / count
+	local newScroll = ScrollBarImView("amsb", pos, 16, 792, count / list.rows)
+	if newScroll then
+		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
+	end
+end}
 
 local Rectangle = {draw = function()
 	love.graphics.replaceTransform(_transform(transform))

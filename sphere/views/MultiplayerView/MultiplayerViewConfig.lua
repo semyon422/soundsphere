@@ -5,7 +5,6 @@ local time_ago_in_words = require("aqua.util").time_ago_in_words
 local _transform = require("aqua.graphics.transform")
 local newGradient = require("aqua.graphics.newGradient")
 
-local ScrollBarView = require("sphere.views.ScrollBarView")
 local RectangleView = require("sphere.views.RectangleView")
 local BackgroundView = require("sphere.views.BackgroundView")
 local ValueView = require("sphere.views.ValueView")

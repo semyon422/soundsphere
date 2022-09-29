@@ -4,7 +4,6 @@ local spherefonts		= require("sphere.assets.fonts")
 local time_ago_in_words = require("aqua.util").time_ago_in_words
 local _transform = require("aqua.graphics.transform")
 
-local ScrollBarView = require("sphere.views.ScrollBarView")
 local RectangleView = require("sphere.views.RectangleView")
 local BackgroundView = require("sphere.views.BackgroundView")
 local ValueView = require("sphere.views.ValueView")
@@ -24,6 +23,7 @@ local LabelImView = require("sphere.imviews.LabelImView")
 local JudgementBarImView = require("sphere.imviews.JudgementBarImView")
 local JudgementsDropdownView = require("sphere.views.ResultView.JudgementsDropdownView")
 local Format = require("sphere.views.Format")
+local ScrollBarImView = require("sphere.imviews.ScrollBarImView")
 
 local inspect = require("inspect")
 local rtime = require("aqua.util.rtime")
@@ -240,18 +240,20 @@ local ScoreList = ScoreListView:new({
 	rows = 5,
 })
 
-local ScoreScrollBar = ScrollBarView:new({
-	transform = transform,
-	list = ScoreList,
-	draw = function(self)
-		getRect(self, Layout.column3row2)
-		self.x = self.x + self.w - 16
-		self.w = 16
-		self.__index.draw(self)
-	end,
-	backgroundColor = {1, 1, 1, 0},
-	color = {1, 1, 1, 0.66}
-})
+local ScoreScrollBar = {draw = function(self)
+	getRect(self, Layout.column3row2)
+	self.x = self.x + self.w - 16
+	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.translate(self.x, self.y)
+
+	local list = ScoreList
+	local count = #list.items - 1
+	local pos = (list.visualItemIndex - 1) / count
+	local newScroll = ScrollBarImView("slsb", pos, 16, self.h, count / list.rows)
+	if newScroll then
+		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
+	end
+end}
 
 local Title = {draw = function(self)
 	local noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry

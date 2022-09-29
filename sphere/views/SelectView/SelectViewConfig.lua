@@ -7,7 +7,6 @@ local time_ago_in_words = require("aqua.util").time_ago_in_words
 local newGradient = require("aqua.graphics.newGradient")
 local event = require("aqua.event")
 
-local ScrollBarView = require("sphere.views.ScrollBarView")
 local IconButtonImView = require("sphere.imviews.IconButtonImView")
 local TextButtonImView = require("sphere.imviews.TextButtonImView")
 local CheckboxImView = require("sphere.imviews.CheckboxImView")
@@ -35,6 +34,7 @@ local CacheView = require("sphere.views.SelectView.CacheView")
 local BarCellImView = require("sphere.imviews.BarCellImView")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
+local ScrollBarImView = require("sphere.imviews.ScrollBarImView")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -78,20 +78,20 @@ local OsudirectList = OsudirectListView:new({
 	rows = 11,
 })
 
-local OsudirectScrollBar = ScrollBarView:new({
-	subscreen = "osudirect",
-	transform = transform,
-	list = OsudirectList,
-	draw = function(self)
-		getRect(self, Layout.column3)
-		self.x = self.x + self.w - 16
-		self.w = 16
-		self.__index.draw(self)
-	end,
-	rows = 11,
-	backgroundColor = {1, 1, 1, 0},
-	color = {1, 1, 1, 0.66}
-})
+local OsudirectScrollBar = {draw = function(self)
+	getRect(self, Layout.column3)
+	self.x = self.x + self.w - 16
+	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.translate(self.x, self.y)
+
+	local list = OsudirectList
+	local count = #list.items - 1
+	local pos = (list.visualItemIndex - 1) / count
+	local newScroll = ScrollBarImView("osudirect_sb", pos, 16, self.h, count / list.rows)
+	if newScroll then
+		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
+	end
+end, subscreen = "osudirect"}
 
 local OsudirectDifficultiesList = OsudirectDifficultiesListView:new({
 	subscreen = "osudirect",
@@ -139,20 +139,20 @@ local ScoreList = ScoreListView:new({
 	rows = 5,
 })
 
-local ScoreScrollBar = ScrollBarView:new({
-	subscreen = "notecharts",
-	transform = transform,
-	list = ScoreList,
-	draw = function(self)
-		getRect(self, Layout.column1row1row2)
-		self.x = self.x + self.w - 16
-		self.w = 16
-		self.__index.draw(self)
-	end,
-	rows = 11,
-	backgroundColor = {1, 1, 1, 0},
-	color = {1, 1, 1, 0.66}
-})
+local ScoreScrollBar = {draw = function(self)
+	getRect(self, Layout.column1row1row2)
+	self.x = self.x + self.w - 16
+	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.translate(self.x, self.y)
+
+	local list = ScoreList
+	local count = #list.items - 1
+	local pos = (list.visualItemIndex - 1) / count
+	local newScroll = ScrollBarImView("score_sb", pos, 16, self.h, count / list.rows)
+	if newScroll then
+		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
+	end
+end, subscreen = "notecharts"}
 
 local CollectionList = CollectionListView:new({
 	subscreen = "collections",
@@ -164,20 +164,20 @@ local CollectionList = CollectionListView:new({
 	rows = 11,
 })
 
-local CollectionScrollBar = ScrollBarView:new({
-	subscreen = "collections",
-	transform = transform,
-	list = CollectionList,
-	draw = function(self)
-		getRect(self, Layout.column3)
-		self.x = self.x + self.w - 16
-		self.w = 16
-		self.__index.draw(self)
-	end,
-	rows = 11,
-	backgroundColor = {1, 1, 1, 0},
-	color = {1, 1, 1, 0.66}
-})
+local CollectionScrollBar = {draw = function(self)
+	getRect(self, Layout.column3)
+	self.x = self.x + self.w - 16
+	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.translate(self.x, self.y)
+
+	local list = CollectionList
+	local count = #list.items - 1
+	local pos = (list.visualItemIndex - 1) / count
+	local newScroll = ScrollBarImView("collection_sb", pos, 16, self.h, count / list.rows)
+	if newScroll then
+		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
+	end
+end, subscreen = "collections"}
 
 local NoteChartSetList = NoteChartSetListView:new({
 	subscreen = "notecharts",
@@ -389,19 +389,20 @@ local BackgroundBanner = BackgroundView:new({
 	dim = {value = 0},
 })
 
-local NoteChartSetScrollBar = ScrollBarView:new({
-	subscreen = "notecharts",
-	transform = transform,
-	list = NoteChartSetList,
-	draw = function(self)
-		getRect(self, Layout.column3)
-		self.x = self.x + self.w - 16
-		self.w = 16
-		self.__index.draw(self)
-	end,
-	backgroundColor = {1, 1, 1, 0},
-	color = {1, 1, 1, 0.66}
-})
+local NoteChartSetScrollBar = {draw = function(self)
+	getRect(self, Layout.column3)
+	self.x = self.x + self.w - 16
+	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.translate(self.x, self.y)
+
+	local list = NoteChartSetList
+	local count = #list.items - 1
+	local pos = (list.visualItemIndex - 1) / count
+	local newScroll = ScrollBarImView("ncs_sb", pos, 16, self.h, count / list.rows)
+	if newScroll then
+		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
+	end
+end, subscreen = "notecharts"}
 
 local SearchField = SearchFieldView:new({
 	subscreen = "notecharts",

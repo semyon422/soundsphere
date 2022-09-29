@@ -1,10 +1,5 @@
 local just = require("just")
 
-local isOver = function(w, h)
-	local x, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-	return 0 <= x and x <= w and 0 <= y and y <= h
-end
-
 local dragPosition
 local getPosition = function(h, _h)
 	if not dragPosition then
@@ -18,12 +13,12 @@ end
 
 local size = 0.5
 return function(id, value, w, h, overlap)
-	if overlap == 0 then
-		return 0
+	if overlap <= 0 then
+		return
 	end
-	local _h = w + (h - w) * h / (overlap + h)
+	local _h = w + (h - w) / (overlap + 1)
 
-	local over = isOver(w, h)
+	local over = just.is_over(w, h)
 	local pos = getPosition(h, _h)
 
 	local new_value, active, hovered = just.slider(id, over, pos, value)
@@ -34,7 +29,7 @@ return function(id, value, w, h, overlap)
 		if dragPosition < 0 or dragPosition > 1 then
 			dragPosition = 0.5
 		end
-	elseif just.active_id ~= id and dragPosition then
+	elseif not just.active_id and dragPosition then
 		dragPosition = nil
 	end
 
@@ -59,5 +54,5 @@ return function(id, value, w, h, overlap)
 	)
 	just.next(w, h)
 
-	return new_value or value
+	return new_value
 end

@@ -19,7 +19,10 @@ return function(id, w, h, _h, scrollY)
 
 		just.push()
 		love.graphics.translate(w - 20, 0)
-		scrollY = overlap * ScrollBarImView(id .. "scrollbar", scrollY / overlap, 20, h, overlap)
+		local newScroll = ScrollBarImView(id .. "scrollbar", scrollY / overlap, 20, h, overlap / h)
+		if newScroll then
+			scrollY = overlap * newScroll
+		end
 		if overlap > 0 and scroll then
 			scrollY = math.min(math.max(scrollY - scroll * _h, 0), overlap)
 		end
