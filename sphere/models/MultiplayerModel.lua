@@ -2,11 +2,11 @@ local Class = require("aqua.util.Class")
 local aquatimer = require("aqua.timer")
 local aquathread = require("aqua.thread")
 local enet = require("enet")
-local MessagePack = require("MessagePack")
+local buffer = require("string.buffer")
 local remote = require("aqua.util.remote")
 
-remote.encode = MessagePack.pack
-remote.decode = MessagePack.unpack
+remote.encode = buffer.encode
+remote.decode = buffer.decode
 
 local MultiplayerModel = Class:new()
 
