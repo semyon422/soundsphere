@@ -1,8 +1,4 @@
 local just = require("just")
-local Class = require("aqua.util.Class")
-local LabelImView = require("sphere.imviews.LabelImView")
-local TextButtonImView = require("sphere.imviews.TextButtonImView")
-local TextInputImView = require("sphere.imviews.TextInputImView")
 local ModalImView = require("sphere.imviews.ModalImView")
 local _transform = require("aqua.graphics.transform")
 local spherefonts = require("sphere.assets.fonts")
@@ -11,9 +7,7 @@ local imgui = require("sphere.imgui")
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local name = ""
-local nameIndex = 1
 local password = ""
-local passwordIndex = 1
 
 return ModalImView(function(self)
 	if not self then
@@ -50,19 +44,18 @@ return ModalImView(function(self)
 
 	local status = multiplayerModel.status
 	if status ~= "connected" then
-		LabelImView("Connection status", status, inputHeight)
+		imgui.label("Connection status", status)
 	elseif not multiplayerModel.user then
-		LabelImView("Login status", "Not logged in", inputHeight)
+		imgui.label("Login status", "Not logged in")
 	elseif not multiplayerModel.selectedRoom and not multiplayerModel.room then
-		just.indent(r)
-		LabelImView("Create room", "Create room", inputHeight)
+		imgui.label("Create room", "Create room")
 
 		name = imgui.input("LobbyView name", name, "Name")
 		password = imgui.input("LobbyView password", password, "Password")
 
 		just.sameline()
 		just.offset(w - 144)
-		if TextButtonImView("Create", "Create", 144, inputHeight) and name ~= "" then
+		if imgui.button("Create", "Create") and name ~= "" then
 			multiplayerModel:createRoom(name, password)
 		end
 
@@ -75,11 +68,10 @@ return ModalImView(function(self)
 				name = name .. " (playing)"
 			end
 			just.row(true)
-			just.indent(36)
-			LabelImView(i, name, 72)
+			imgui.label(i, name)
 			if not multiplayerModel.room then
 				just.offset(w - 144)
-				if TextButtonImView(i, "Join", 144, 72) then
+				if imgui.button(i, "Join") then
 					multiplayerModel.selectedRoom = room
 					multiplayerModel:joinRoom("")
 					just.focus()
@@ -91,19 +83,15 @@ return ModalImView(function(self)
 			love.graphics.setColor(1, 1, 1, 1)
 		end
 	elseif not multiplayerModel.room then
-		local _
-		love.graphics.translate(r, r)
-		_, password, passwordIndex = TextInputImView("LobbyView password", password, passwordIndex, w / 2 - 2 * r, inputHeight)
-		just.sameline()
-		just.indent(r)
-		LabelImView("LobbyView password", "Password", inputHeight)
+		imgui.label("selected room name", multiplayerModel.selectedRoom.name)
+		password = imgui.input("LobbyView password", password, "Password")
 		just.sameline()
 		just.offset(w - 144)
-		if TextButtonImView("LobbyView join", "Join", 144, inputHeight) then
+		if imgui.button("LobbyView join", "Join") then
 			multiplayerModel:joinRoom(password)
 			just.focus()
 		end
-		if TextButtonImView("LobbyView back", "Back", 144, inputHeight) then
+		if imgui.button("LobbyView back", "Back") then
 			multiplayerModel.selectedRoom = nil
 			just.focus()
 		end
