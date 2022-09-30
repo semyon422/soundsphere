@@ -1,277 +1,55 @@
-local ffi = require("ffi")
-local imgui = require("cimgui")
-local ImguiView = require("sphere.views.ImguiView")
-local align = require("aqua.imgui.config").align
-local inside = require("aqua.util.inside")
-local aquathread = require("aqua.thread")
-local HelpMarker = require("sphere.imgui.HelpMarker")
-local inspect = require("inspect")
+local just = require("just")
+local ModalImView = require("sphere.imviews.ModalImView")
+local _transform = require("aqua.graphics.transform")
+local spherefonts = require("sphere.assets.fonts")
+local imgui = require("sphere.imgui")
 
-local OnlineView = ImguiView:new()
+local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
-local messagesCount = 0
-local emailPtr = ffi.new("char[128]")
-local passwordPtr = ffi.new("char[128]")
-local roomNamePtr = ffi.new("char[128]")
-local roomPasswordPtr = ffi.new("char[128]")
-local newRoomPasswordPtr = ffi.new("char[128]")
-local messagePtr = ffi.new("char[256]")
-local freeModifiersPtr = ffi.new("bool[1]")
-local freeNotechartPtr = ffi.new("bool[1]")
-local readyPtr = ffi.new("bool[1]")
-OnlineView.draw = function(self)
-	if not self.isOpen[0] then
-		return
+local email = ""
+local password = ""
+
+return ModalImView(function(self)
+	if not self then
+		return true
 	end
 
-	local closed = self:closeOnEscape()
-	if closed then
-		return
+	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
+
+	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.translate(279 + 454 * 3 / 4, 1080 / 4)
+	local w, h = 454 * 1.5, 1080 / 2
+
+	imgui.setSize(w, h, w / 2, 55)
+
+	love.graphics.setColor(0, 0, 0, 0.8)
+	love.graphics.rectangle("fill", 0, 0, w, h, 8)
+	love.graphics.setColor(1, 1, 1, 1)
+
+	just.clip(love.graphics.rectangle, "fill", 0, 0, w, h, 8)
+
+	local window_id = "ContextMenuImView"
+	local over = just.is_over(w, h)
+	just.container(window_id, over)
+	just.button(window_id, over)
+	just.wheel_over(window_id, over)
+
+	local active = self.game.configModel.configs.online.session.active
+	if active then
+		imgui.label("logged label", "You are logged in")
+	end
+	email = imgui.input("Email", email, "Email")
+	password = imgui.input("Password", password, "Password")
+	if imgui.button("Login", "Login") then
+		self.game.onlineModel.authManager:login(email, password)
+	end
+	if imgui.button("Quick login", "Quick login using browser") then
+		self.game.onlineModel.authManager:quickLogin()
 	end
 
-	local multiplayerModel = self.game.multiplayerModel
+	just.container()
+	just.clip()
 
-	imgui.SetNextWindowPos({align(0.5, 279 + 454 * 3 / 4), 279 / 2}, 0)
-	imgui.SetNextWindowSize({454 * 1.5, 522 * 1.5}, 0)
-	local flags = imgui.love.WindowFlags("NoMove", "NoResize")
-	if imgui.Begin("Online", self.isOpen, flags) then
-		if imgui.BeginTabBar("Online tab bar") then
-			local active = inside(self, "game.configModel.configs.online.session.active")
-			if imgui.BeginTabItem("Login") then
-				if active then
-					imgui.Text("You are logged in")
-				end
-				imgui.InputText("Email", emailPtr, ffi.sizeof(emailPtr))
-				imgui.InputText("Password", passwordPtr, ffi.sizeof(passwordPtr), imgui.love.InputTextFlags("Password"))
-				if imgui.Button("Login") then
-					self.game.onlineModel.authManager:login(ffi.string(emailPtr), ffi.string(passwordPtr))
-				end
-				if imgui.Button("Quick login using browser") then
-					self.game.onlineModel.authManager:quickLogin()
-				end
-				imgui.EndTabItem()
-			end
-			if active and imgui.BeginTabItem("Multiplayer") then
-				local status = multiplayerModel.status
-				if status == "disconnected" and imgui.Button("Connect") then
-					multiplayerModel:connect()
-				elseif status == "connected" and imgui.Button("Disconnect") then
-					multiplayerModel:disconnect()
-				elseif status == "connecting" then
-					imgui.Text("Connecting...")
-				elseif status == "disconnecting" then
-					imgui.Text("Disconnecting...")
-				end
-
-				if multiplayerModel.peer then
-					if multiplayerModel.user then
-						imgui.SameLine()
-						imgui.Text("logged in as " .. multiplayerModel.user.name)
-					end
-					if imgui.BeginListBox("Players", {0, 150}) then
-						for i = 1, #multiplayerModel.users do
-							local user = multiplayerModel.users[i]
-							local isSelected = multiplayerModel.user == user
-							imgui.Selectable_Bool(user.name, isSelected)
-
-							if isSelected then
-								imgui.SetItemDefaultFocus()
-							end
-						end
-						imgui.EndListBox()
-					end
-				end
-
-				imgui.EndTabItem()
-			end
-			if multiplayerModel.peer and multiplayerModel.user and imgui.BeginTabItem("Lobby") then
-				if imgui.BeginListBox("Rooms", {0, 150}) then
-					for i = 1, #multiplayerModel.rooms do
-						local room = multiplayerModel.rooms[i]
-						local isSelected = multiplayerModel.selectedRoom == room
-						local name = room.name
-						if room.isPlaying then
-							name = name .. " (playing)"
-						end
-						if imgui.Selectable_Bool(name, isSelected) then
-							multiplayerModel.selectedRoom = room
-							if not multiplayerModel.room then
-								multiplayerModel:joinRoom("")
-							end
-						end
-
-						if isSelected then
-							imgui.SetItemDefaultFocus()
-						end
-					end
-					imgui.EndListBox()
-				end
-
-				imgui.Separator()
-
-				imgui.Text("Create new room")
-				imgui.InputText("Name", roomNamePtr, ffi.sizeof(roomNamePtr))
-				imgui.InputText("Password (optional)", newRoomPasswordPtr, ffi.sizeof(newRoomPasswordPtr), imgui.love.InputTextFlags("Password"))
-				if imgui.Button("Create room") then
-					local name = ffi.string(roomNamePtr)
-					local password = ffi.string(newRoomPasswordPtr)
-					if name ~= "" then
-						multiplayerModel:createRoom(name, password)
-					end
-				end
-				imgui.EndTabItem()
-			end
-			local room = multiplayerModel.room
-			if (multiplayerModel.selectedRoom or room) and imgui.BeginTabItem("Room") then
-				if not room then
-					imgui.InputText("Password", roomPasswordPtr, ffi.sizeof(roomPasswordPtr), imgui.love.InputTextFlags("Password"))
-					if imgui.Button("Join") then
-						multiplayerModel:joinRoom(ffi.string(roomPasswordPtr))
-					end
-				else
-					local notechart = multiplayerModel.notechart
-					local song = ("%s - %s"):format(notechart.artist or "?", notechart.title or "?")
-					local name = notechart.name or "?"
-					imgui.Text("Room name: " .. room.name)
-					if room.isPlaying then
-						imgui.SameLine()
-						imgui.Text("(playing)")
-					end
-					if notechart.osuSetId and not multiplayerModel.noteChartItem and not multiplayerModel:isHost() then
-						local beatmap = multiplayerModel.downloadingBeatmap
-						if beatmap then
-							imgui.Text(beatmap.status)
-						else
-							if imgui.Button("Download") then
-								multiplayerModel:downloadNoteChart()
-							end
-						end
-					end
-					imgui.Text("Song: " .. song)
-					imgui.Text("Difficulty:")
-					imgui.SameLine()
-					HelpMarker(inspect(notechart))
-					imgui.SameLine()
-					imgui.Text(name)
-					if imgui.BeginListBox("Players", {0, 150}) then
-						for i = 1, #multiplayerModel.roomUsers do
-							local user = multiplayerModel.roomUsers[i]
-							local isSelected = false
-							local name = user.name
-							name = name .. " ("
-							if room.hostPeerId == user.peerId then
-								name = name .. "host"
-							elseif not user.isNotechartFound then
-								name = name .. "no chart"
-							end
-							if name:sub(-1) ~= "(" then
-								name = name .. ", "
-							end
-							if user.isPlaying then
-								name = name .. "playing"
-							else
-								name = name .. (user.isReady and "ready" or "not ready")
-							end
-							name = name .. ")"
-							imgui.Selectable_Bool(name, isSelected)
-
-							if isSelected then
-								imgui.SetItemDefaultFocus()
-							end
-
-							if multiplayerModel:isHost() and room.hostPeerId ~= user.peerId then
-								if imgui.BeginPopupContextItem() then
-									imgui.Text(name)
-									if imgui.Button("Kick") then
-										multiplayerModel:kickUser(user.peerId)
-										imgui.CloseCurrentPopup()
-									end
-									if imgui.Button("Give host") then
-										multiplayerModel:setHost(user.peerId)
-										imgui.CloseCurrentPopup()
-									end
-									if imgui.Button("Close") then
-										imgui.CloseCurrentPopup()
-									end
-									imgui.EndPopup()
-								end
-								if imgui.IsItemHovered() then
-									imgui.SetTooltip("Right-click to open popup")
-								end
-							end
-						end
-						imgui.EndListBox()
-					end
-					if imgui.Button("Leave") then
-						multiplayerModel:leaveRoom()
-					end
-					imgui.SameLine()
-
-					local user = multiplayerModel.user
-
-					readyPtr[0] = user.isReady
-					if imgui.Checkbox("Ready", readyPtr) then
-						user.isReady = readyPtr[0]
-						multiplayerModel:switchReady()
-					end
-					if multiplayerModel:isHost() then
-						freeModifiersPtr[0] = room.isFreeModifiers
-						freeNotechartPtr[0] = room.isFreeNotechart
-						if imgui.Button("Set notechart") then
-							multiplayerModel:pushNotechart()
-						end
-						imgui.SameLine()
-						if imgui.Checkbox("Free modifiers", freeModifiersPtr) then
-							multiplayerModel:setFreeModifiers(freeModifiersPtr[0])
-						end
-						imgui.SameLine()
-						if imgui.Checkbox("Free notechart", freeNotechartPtr) then
-							multiplayerModel:setFreeNotechart(freeNotechartPtr[0])
-						end
-						imgui.SameLine()
-						if not room.isPlaying and imgui.Button("Start match") then
-							multiplayerModel:startMatch()
-						elseif room.isPlaying and imgui.Button("Stop match") then
-							multiplayerModel:stopMatch()
-						end
-					else
-						imgui.Text("Free modifiers: " .. (room.isFreeModifiers and "yes" or "no"))
-						imgui.SameLine()
-						if imgui.SmallButton("reset##modifiers") then
-							multiplayerModel:pullModifiers()
-						end
-						imgui.Text("Free notechart: " .. (room.isFreeNotechart and "yes" or "no"))
-						imgui.SameLine()
-						if imgui.SmallButton("reset##notechart") then
-							multiplayerModel:pullNotechart()
-						end
-					end
-					imgui.Separator()
-					imgui.Text("Chat")
-
-					imgui.BeginListBox("Messages", {0, 150})
-					for i = 1, #multiplayerModel.roomMessages do
-						local message = multiplayerModel.roomMessages[i]
-						imgui.Selectable_Bool(message, false)
-					end
-					if messagesCount ~= #multiplayerModel.roomMessages then
-						messagesCount = #multiplayerModel.roomMessages
-						imgui.SetScrollHereY(1)
-					end
-					imgui.EndListBox()
-
-					imgui.InputText("Message", messagePtr, ffi.sizeof(messagePtr))
-					if imgui.Button("Send") then
-						multiplayerModel:sendMessage(ffi.string(messagePtr))
-						ffi.fill(messagePtr, ffi.sizeof(messagePtr), 0)
-					end
-				end
-				imgui.EndTabItem()
-			end
-			imgui.EndTabBar()
-		end
-	end
-	imgui.End()
-end
-
-return OnlineView
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.rectangle("line", 0, 0, w, h, 8)
+end)

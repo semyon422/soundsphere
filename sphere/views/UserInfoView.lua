@@ -45,7 +45,7 @@ UserInfoView.draw = function(self)
 	local changed, active, hovered = just.button(self, over)
 
 	if changed then
-		self.game.gameView.onlineView:toggle()
+		self.game.gameView:setModal(require("sphere.views.OnlineView"))
 	end
 
 	love.graphics.setFont(spherefonts.get(unpack(self.text.font)))

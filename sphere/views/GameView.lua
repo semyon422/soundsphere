@@ -4,19 +4,15 @@ local FadeTransition = require("sphere.views.FadeTransition")
 local FrameTimeView = require("sphere.views.FrameTimeView")
 local TextTooltipImView = require("sphere.imviews.TextTooltipImView")
 local ContextMenuImView = require("sphere.imviews.ContextMenuImView")
-local OnlineView = require("sphere.views.OnlineView")
 
 local GameView = Class:new()
 
 GameView.construct = function(self)
 	self.fadeTransition = FadeTransition:new()
 	self.frameTimeView = FrameTimeView:new()
-
-	self.onlineView = OnlineView:new()
 end
 
 GameView.load = function(self)
-	self.onlineView.game = self.game
 	self.frameTimeView.game = self.game
 
 	self.frameTimeView:load()
@@ -65,8 +61,6 @@ GameView.draw = function(self)
 	end
 	self.fadeTransition:drawBefore()
 	self.view:draw()
-
-	self.onlineView:draw()
 
 	if self.modal and self.modal(self) then
 		self.modal = nil

@@ -9,6 +9,38 @@ local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 
 local name = ""
 local password = ""
 
+--[[
+	local status = multiplayerModel.status
+	if status == "disconnected" and imgui.Button("Connect") then
+		multiplayerModel:connect()
+	elseif status == "connected" and imgui.Button("Disconnect") then
+		multiplayerModel:disconnect()
+	elseif status == "connecting" then
+		imgui.Text("Connecting...")
+	elseif status == "disconnecting" then
+		imgui.Text("Disconnecting...")
+	end
+
+	if multiplayerModel.peer then
+		if multiplayerModel.user then
+			imgui.SameLine()
+			imgui.Text("logged in as " .. multiplayerModel.user.name)
+		end
+		if imgui.BeginListBox("Players", {0, 150}) then
+			for i = 1, #multiplayerModel.users do
+				local user = multiplayerModel.users[i]
+				local isSelected = multiplayerModel.user == user
+				imgui.Selectable_Bool(user.name, isSelected)
+
+				if isSelected then
+					imgui.SetItemDefaultFocus()
+				end
+			end
+			imgui.EndListBox()
+		end
+	end
+]]
+
 return ModalImView(function(self)
 	if not self then
 		return true
@@ -23,10 +55,7 @@ return ModalImView(function(self)
 	local w, h = 454 * 1.5, 1080 / 2
 	local r = 8
 
-	local inputHeight = 55
-	imgui.setSize(w, h, w / 2, inputHeight)
-
-	love.graphics.push()
+	imgui.setSize(w, h, w / 2, 55)
 
 	love.graphics.setColor(0, 0, 0, 0.8)
 	love.graphics.rectangle("fill", 0, 0, w, h, r)
@@ -103,7 +132,6 @@ return ModalImView(function(self)
 	just.container()
 	just.clip()
 
-	love.graphics.pop()
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.rectangle("line", 0, 0, w, h, r)
 
