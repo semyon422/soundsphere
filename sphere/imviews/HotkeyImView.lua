@@ -46,7 +46,7 @@ return function(id, device, key, w, h)
 	local lh = font:getHeight() * font:getLineHeight()
 
 	local r = h * size / 2
-	local x = h * size * (1 - size) / 2
+	local x = h * (1 - size) / 2
 
 	local alpha = 0.2
 	if hovered then

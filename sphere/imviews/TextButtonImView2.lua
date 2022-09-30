@@ -9,7 +9,7 @@ return function(id, text, w, h)
 	local changed, active, hovered = just.button(id, over)
 
 	local r = h * size / 2
-	local x = h * size * (1 - size) / 2
+	local x = h * (1 - size) / 2
 	love.graphics.setColor(1, 1, 1, 0.2)
 	if hovered then
 		local alpha = active and 0.4 or 0.3

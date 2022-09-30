@@ -113,4 +113,12 @@ function imgui.hotkey(id, key, label)
 	return key
 end
 
+function imgui.input(id, text, label)
+	local _
+	_, text = TextInputImView(id, text, nil, _w, _h)
+	just.sameline()
+	LabelImView(id .. "label", label, _h)
+	return text
+end
+
 return imgui

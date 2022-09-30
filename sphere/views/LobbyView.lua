@@ -5,6 +5,8 @@ local TextButtonImView = require("sphere.imviews.TextButtonImView")
 local TextInputImView = require("sphere.imviews.TextInputImView")
 local ModalImView = require("sphere.imviews.ModalImView")
 local _transform = require("aqua.graphics.transform")
+local spherefonts = require("sphere.assets.fonts")
+local imgui = require("sphere.imgui")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -20,10 +22,15 @@ return ModalImView(function(self)
 
 	local multiplayerModel = self.game.multiplayerModel
 
+	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
+
 	love.graphics.replaceTransform(_transform(transform))
 	love.graphics.translate(279 + 454 * 3 / 4, 1080 / 4)
 	local w, h = 454 * 1.5, 1080 / 2
 	local r = 8
+
+	local inputHeight = 55
+	imgui.setSize(w, h, w / 2, inputHeight)
 
 	love.graphics.push()
 
@@ -41,7 +48,6 @@ return ModalImView(function(self)
 
 	local close = false
 
-	local inputHeight = 55
 	local status = multiplayerModel.status
 	if status ~= "connected" then
 		LabelImView("Connection status", status, inputHeight)
@@ -51,18 +57,8 @@ return ModalImView(function(self)
 		just.indent(r)
 		LabelImView("Create room", "Create room", inputHeight)
 
-		local _
-		love.graphics.translate(r, r)
-		_, name, nameIndex = TextInputImView("LobbyView name", name, nameIndex, w / 2 - 2 * r, inputHeight)
-		just.sameline()
-		just.indent(r)
-		LabelImView("LobbyView name", "Name", inputHeight)
-		just.emptyline(r)
-
-		_, password, passwordIndex = TextInputImView("LobbyView password", password, passwordIndex, w / 2 - 2 * r, inputHeight)
-		just.sameline()
-		just.indent(r)
-		LabelImView("LobbyView password", "Password", inputHeight)
+		name = imgui.input("LobbyView name", name, "Name")
+		password = imgui.input("LobbyView password", password, "Password")
 
 		just.sameline()
 		just.offset(w - 144)
@@ -70,9 +66,7 @@ return ModalImView(function(self)
 			multiplayerModel:createRoom(name, password)
 		end
 
-		love.graphics.translate(-r, r)
-
-		love.graphics.line(0, 0, w, 0)
+		imgui.separator()
 
 		for i = 1, #multiplayerModel.rooms do
 			local room = multiplayerModel.rooms[i]

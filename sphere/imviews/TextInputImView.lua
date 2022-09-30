@@ -1,20 +1,30 @@
 local utf8 = require("utf8")
 local just = require("just")
 
+local size = 0.75
 return function(id, text, index, w, h)
 	local font = love.graphics.getFont()
-	local lh = font:getHeight()
+	local lh = font:getHeight() * font:getLineHeight()
 	h = h or lh
 
-	if just.button(id, just.is_over(w, h)) then
+	local changed, active, hovered = just.button(id, just.is_over(w, h))
+	if changed then
 		just.focus(id)
 	end
 
-	love.graphics.push()
+	just.push()
 
-	local r = 8
-	love.graphics.rectangle("line", 0, 0, w, h, r)
+	local r = h * size / 2
+	local x = h * (1 - size) / 2
+	love.graphics.setColor(1, 1, 1, 0.2)
+	if hovered then
+		local alpha = active and 0.4 or 0.3
+		love.graphics.setColor(1, 1, 1, alpha)
+	end
+	love.graphics.rectangle("fill", x, x, w - x * 2, h * size, r)
+
 	love.graphics.translate(r, (h - lh) / 2)
+	love.graphics.setColor(1, 1, 1, 1)
 
 	local changed, left, right
 	if just.focused_id == id then
@@ -24,14 +34,14 @@ return function(id, text, index, w, h)
 		changed, text, index, left, right = just.textinput(text, index)
 		just.text(left)
 		just.sameline()
-		love.graphics.line(0, 0, 0, lh)
+		love.graphics.line(1, lh * 0.15, 1, lh * 0.85)
 		just.text(right)
 	else
 		index = utf8.len(text) + 1
 		just.text(text)
 	end
 
-	love.graphics.pop()
+	just.pop()
 	just.next(w, h)
 
 	return changed, text, index
