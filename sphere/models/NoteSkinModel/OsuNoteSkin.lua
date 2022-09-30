@@ -1,7 +1,7 @@
 local NoteSkinVsrg = require("sphere.models.NoteSkinModel.NoteSkinVsrg")
 local PlayfieldVsrg = require("sphere.models.NoteSkinModel.PlayfieldVsrg")
 local BasePlayfield = require("sphere.models.NoteSkinModel.BasePlayfield")
-local ImguiConfig = require("sphere.ImguiConfig")
+local JustConfig = require("sphere.JustConfig")
 
 local ImageView = require("sphere.views.ImageView")
 local ImageValueView = require("sphere.views.ImageValueView")
@@ -36,7 +36,10 @@ local fixColor = function(t)
 	return t
 end
 
+local configPath = "sphere/models/NoteSkinModel/OsuNoteSkinConfig.lua"
 OsuNoteSkin.load = function(self)
+	OsuNoteSkin.configContent = OsuNoteSkin.configContent or love.filesystem.read(configPath)
+
 	local skinini = self.skinini
 
 	local mania = self.mania
@@ -59,7 +62,7 @@ OsuNoteSkin.load = function(self)
 	end
 	self:fixManiaValues()
 
-	local config, exists = ImguiConfig:new({defaultContent = self.configContent}):fromFile(
+	local config, exists = JustConfig:new({defaultContent = self.configContent}):fromFile(
 		self.path:sub(1, -9) .. keysCount .. "key.config.lua"
 	)
 	self.config = config
@@ -343,36 +346,6 @@ OsuNoteSkin.load = function(self)
 
 	BasePlayfield.addBaseProgressBar(playfield)
 end
-
-OsuNoteSkin.configContent = [=[
-local ImguiConfig = require("sphere.ImguiConfig")
-local imgui = require("cimgui")
-
-local config = ImguiConfig:new()
-
-local ptrs = config:setDefs(--[[defs]] {
-	HitPosition = {"int[?]", 1, {240}},
-	ScorePosition = {"int[?]", 1, {240}},
-	ComboPosition = {"int[?]", 1, {240}},
-	OverallDifficulty = {"int[?]", 1, {5}},
-	HitErrorPosition = {"int[?]", 1, {465}},
-	UpsideDown = {"bool[?]", 1, {false}},
-	Barline = {"bool[?]", 1, {true}},
-} --[[/defs]])
-
-function config:render()
-	imgui.SliderInt("Hit Position", ptrs.HitPosition, 240, 480)
-	imgui.SliderInt("Score Position", ptrs.ScorePosition, 0, 480)
-	imgui.SliderInt("Combo Position", ptrs.ComboPosition, 0, 480)
-	imgui.SliderInt("Overall Difficulty", ptrs.OverallDifficulty, 0, 10)
-	imgui.SliderInt("Hit Error Position", ptrs.HitErrorPosition, 0, 480)
-	imgui.Checkbox("Upside Down", ptrs.UpsideDown)
-	imgui.Checkbox("Barline", ptrs.Barline)
-	self:renderAfter()
-end
-
-return config
-]=]
 
 local getNoteType = function(key, keymode)
 	if keymode % 2 == 1 then

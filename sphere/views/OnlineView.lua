@@ -36,7 +36,7 @@ return ModalImView(function(self)
 
 	local active = self.game.configModel.configs.online.session.active
 	if active then
-		imgui.label("logged label", "You are logged in")
+		imgui.text("You are logged in")
 	end
 	email = imgui.input("Email", email, "Email")
 	password = imgui.input("Password", password, "Password")

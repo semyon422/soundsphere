@@ -73,11 +73,11 @@ return ModalImView(function(self)
 
 	local status = multiplayerModel.status
 	if status ~= "connected" then
-		imgui.label("Connection status", status)
+		imgui.text(status)
 	elseif not multiplayerModel.user then
-		imgui.label("Login status", "Not logged in")
+		imgui.text("Not logged in")
 	elseif not multiplayerModel.selectedRoom and not multiplayerModel.room then
-		imgui.label("Create room", "Create room")
+		imgui.text("Create room")
 
 		name = imgui.input("LobbyView name", name, "Name")
 		password = imgui.input("LobbyView password", password, "Password")
@@ -112,7 +112,7 @@ return ModalImView(function(self)
 			love.graphics.setColor(1, 1, 1, 1)
 		end
 	elseif not multiplayerModel.room then
-		imgui.label("selected room name", multiplayerModel.selectedRoom.name)
+		imgui.text(multiplayerModel.selectedRoom.name)
 		password = imgui.input("LobbyView password", password, "Password")
 		just.sameline()
 		just.offset(w - 144)

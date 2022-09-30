@@ -17,12 +17,15 @@ function JustConfig:draw(w, h) end
 
 function JustConfig:drawAfter()
 	local data = self.data
-	if imgui.button("Write config file", "Write config file") then
+	imgui.text("Config file")
+	if imgui.button("Write config file", "Write") then
 		self:write()
 	end
-	if imgui.button("Delete config file", "Delete config file") then
+	just.sameline()
+	if imgui.button("Delete config file", "Delete") then
 		self:remove()
 	end
+	just.sameline()
 	data.autosave = imgui.checkbox("autosave", data.autosave, "Autosave")
 end
 
@@ -75,7 +78,6 @@ end
 
 JustConfig.defaultContent = [=[
 local JustConfig = require("sphere.JustConfig")
-local TextButtonImView2 = require("sphere.imviews.TextButtonImView2")
 
 local config = JustConfig:new()
 

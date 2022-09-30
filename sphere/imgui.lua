@@ -29,6 +29,11 @@ function imgui.label(id, label)
 	LabelImView(id .. "label", label, _h)
 end
 
+function imgui.text(text)
+	just.indent(8)
+	just.text(text)
+end
+
 function imgui.button(id, text)
 	local width = love.graphics.getFont():getWidth(text)
 	return TextButtonImView2(id, text, width + _h, _h)

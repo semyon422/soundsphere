@@ -1,9 +1,5 @@
-local ffi = require("ffi")
-local imgui = require("cimgui")
-local align = require("aqua.imgui.config").align
 local ModalImView = require("sphere.imviews.ModalImView")
 local ContainerImView = require("sphere.imviews.ContainerImView")
-local ListImView = require("sphere.imviews.ListImView")
 local TextButtonImView = require("sphere.imviews.TextButtonImView")
 local spherefonts = require("sphere.assets.fonts")
 local _transform = require("aqua.graphics.transform")
@@ -92,11 +88,4 @@ return ModalImView(function(self)
 
 		return
 	end
-
-	imgui.SetNextWindowPos({align(0.5, 733), 279}, 0)
-	imgui.SetNextWindowSize({454, 522}, 0)
-	if imgui.Begin("Noteskin config", nil, 0) then
-		selectedNoteSkin.config:render()
-	end
-	imgui.End()
 end)
