@@ -14,7 +14,7 @@ AuthManager.checkSessionAsync = function(self)
 	config.session = {}
 
 	print("check session")
-	print("POST " .. api.auth.check)
+	print("GET " .. api.auth.check)
 	local response, code, headers = api.auth.check:_get()
 	if not response then
 		print(code, headers)
