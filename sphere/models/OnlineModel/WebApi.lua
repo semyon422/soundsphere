@@ -42,7 +42,7 @@ WebApi.get = function(url, params)
 	end
 
 	local t = {}
-	local _, code, headers = https.request({
+	local one, code, headers = https.request({
 		url = url,
 		method = "GET",
 		sink = ltn12.sink.table(t),
@@ -50,6 +50,10 @@ WebApi.get = function(url, params)
 			["Authorization"] = "Bearer " .. WebApi.token,
 		},
 	})
+
+	if not one then
+		return nil, code
+	end
 
 	return table.concat(t), code, headers
 end
@@ -76,13 +80,17 @@ WebApi.post = function(url, method, params, buffers)
 	headers["Authorization"] = "Bearer " .. WebApi.token
 
 	local t = {}
-	local _, code, _headers = https.request({
+	local one, code, _headers = https.request({
 		url = url,
 		method = method,
 		sink = ltn12.sink.table(t),
 		source = ltn12.source.string(body),
 		headers = headers,
 	})
+
+	if not one then
+		return nil, code
+	end
 
 	return table.concat(t), code, _headers
 end
