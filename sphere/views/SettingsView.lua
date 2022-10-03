@@ -210,8 +210,8 @@ drawSection.graphics = function(self)
 end
 
 local _formatModes = {
-	sample = "bass sample",
-	streamMemoryTempo = "bass fx tempo",
+	bass_sample = "bass sample",
+	bass_fx_tempo = "bass fx tempo",
 }
 local function formatModes(mode)
 	return _formatModes[mode] or mode
@@ -229,9 +229,9 @@ drawSection.audio = function(self)
 
 	local mode = a.mode
 	mode.primary = imgui.combo(
-		"mode.primary", mode.primary, {"sample", "streamMemoryTempo"}, formatModes, "primary audio mode")
+		"mode.primary", mode.primary, {"bass_sample", "bass_fx_tempo"}, formatModes, "primary audio mode")
 	mode.secondary = imgui.combo(
-		"mode.secondary", mode.secondary, {"sample", "streamMemoryTempo"}, formatModes, "secondary audio mode")
+		"mode.secondary", mode.secondary, {"bass_sample", "bass_fx_tempo"}, formatModes, "secondary audio mode")
 
 	a.midi.constantVolume = imgui.checkbox("midi.constantVolume", a.midi.constantVolume, "midi constant volume")
 end

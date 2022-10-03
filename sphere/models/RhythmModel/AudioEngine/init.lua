@@ -1,4 +1,4 @@
-local AudioFactory		= require("aqua.audio.AudioFactory")
+local _audio		= require("aqua.audio")
 local AudioContainer	= require("aqua.audio.Container")
 local Class				= require("aqua.util.Class")
 local Observable		= require("aqua.util.Observable")
@@ -17,8 +17,8 @@ AudioEngine.construct = function(self)
 		effects = 1,
 	}
 	self.mode = {
-		primary = "sample",
-		secondary = "sample",
+		primary = "bass_sample",
+		secondary = "bass_sample",
 	}
 
 	self.backgroundContainer = AudioContainer:new()
@@ -79,7 +79,7 @@ AudioEngine.playAudio = function(self, sounds, isBackground, stream, offset)
 		local mode = stream and self.mode.primary or self.mode.secondary
 
 		local soundData = resources[aliases[sounds[i][1]]]
-		local audio = AudioFactory:getAudio(soundData, mode)
+		local audio = _audio:newAudio(soundData, mode)
 
 		if audio then
 			audio.offset = offset or currentTime

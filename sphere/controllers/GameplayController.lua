@@ -1,5 +1,5 @@
 local Class						= require("aqua.util.Class")
-local sound						= require("aqua.sound")
+local audio						= require("aqua.audio")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 local FileFinder	= require("sphere.filesystem.FileFinder")
 
@@ -62,7 +62,7 @@ GameplayController.load = function(self)
 	FileFinder:addPath("userdata/hitsounds")
 	FileFinder:addPath("userdata/hitsounds/midi")
 
-	sound.sample_gain = config.audio.sampleGain
+	audio.sample_gain = config.audio.sampleGain
 	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChart, function()
 		self:play()
 	end)

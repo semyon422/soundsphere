@@ -1,5 +1,5 @@
 local image			= require("aqua.image")
-local sound			= require("aqua.sound")
+local audio			= require("aqua.audio")
 local video			= require("aqua.video")
 local aquathread	= require("aqua.thread")
 local JamLoader		= require("sphere.database.JamLoader")
@@ -32,9 +32,9 @@ end
 NoteChartResourceLoader.load = function(self, chartPath, noteChart, callback)
 	local noteChartType = NoteChartTypeMap[noteChart.type]
 
-	if self.sample_gain ~= sound.sample_gain then
+	if self.sample_gain ~= audio.sample_gain then
 		self:unloadAudio()
-		self.sample_gain = sound.sample_gain
+		self.sample_gain = audio.sample_gain
 	end
 
 	self.callback = callback
@@ -68,9 +68,9 @@ end
 NoteChartResourceLoader.loadResource = function(self, path)
 	local fileType = FileFinder:getType(path)
 	if fileType == "audio" then
-		resources.loaded[path] = sound.newSoundDataAsync(path)
+		resources.loaded[path] = audio.newSoundDataAsync(path)
 	elseif fileType == "image" then
-		resources.loaded[path] = image.newImageDataAsync(path)
+		resources.loaded[path] = image.newImageAsync(path)
 	elseif fileType == "video" then
 		resources.loaded[path] = video.newVideoAsync(path)
 	elseif path:lower():find("%.ojm$") then

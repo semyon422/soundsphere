@@ -1,10 +1,10 @@
 local aquathread	= require("aqua.thread")
-local sound	= require("aqua.sound")
+local audio	= require("aqua.audio")
 
 local JamLoader = {}
 
 local loadOjm = aquathread.async(function(path)
-	local sound = require("aqua.sound")
+	local audio = require("aqua.audio")
 	local OJM = require("o2jam.OJM")
 
 	local fileData, err = love.filesystem.newFileData(path)
@@ -16,7 +16,7 @@ local loadOjm = aquathread.async(function(path)
 	local soundDatas = {}
 
 	for sampleIndex, sampleData in pairs(ojm.samples) do
-		soundDatas[sampleIndex] = sound.newSoundData(love.filesystem.newFileData(sampleData, sampleIndex))
+		soundDatas[sampleIndex] = audio.newSoundData(love.filesystem.newFileData(sampleData, sampleIndex))
 	end
 
 	return soundDatas
@@ -28,7 +28,7 @@ JamLoader.loadAsync = function(self, path)
 		return
 	end
 	for _, soundData in pairs(soundDatas) do
-		setmetatable(soundData, {__index = sound.SoundData})
+		setmetatable(soundData, {__index = audio.SoundData})
 	end
 	return soundDatas
 end

@@ -4,8 +4,8 @@ return {
 			constantVolume = false
 		},
 		mode = {
-			primary = "streamMemoryTempo",
-			secondary = "sample"
+			primary = "bass_fx_tempo",
+			secondary = "bass_sample"
 		},
 		sampleGain = 0,
 		volume = {

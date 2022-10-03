@@ -10,8 +10,7 @@ ImageNoteView.construct = function(self)
 
 	local images = self.startNoteData.images
 	local path = NoteChartResourceLoader.aliases[images[1][1]]
-	local resource = NoteChartResourceLoader.resources[path]
-	self.drawable = resource and resource.image
+	self.drawable = NoteChartResourceLoader.resources[path]
 end
 
 ImageNoteView.update = function(self)
