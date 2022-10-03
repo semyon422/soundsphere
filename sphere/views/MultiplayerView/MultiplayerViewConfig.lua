@@ -1,7 +1,6 @@
 local just = require("just")
 local just_print = require("just.print")
 local spherefonts		= require("sphere.assets.fonts")
-local time_ago_in_words = require("aqua.util").time_ago_in_words
 local _transform = require("aqua.graphics.transform")
 local newGradient = require("aqua.graphics.newGradient")
 
@@ -29,7 +28,7 @@ local JudgementsDropdownView = require("sphere.views.ResultView.JudgementsDropdo
 local Format = require("sphere.views.Format")
 
 local inspect = require("inspect")
-local rtime = require("aqua.util.rtime")
+local time_util = require("aqua.time_util")
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 local transformLeft = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -96,7 +95,7 @@ local Cells = {draw = function(self)
 	just.row(true)
 	just.indent(22)
 	TextCellImView(w, h, "right", "bpm", ("%d"):format(bpm))
-	TextCellImView(w, h, "right", "duration", rtime(length))
+	TextCellImView(w, h, "right", "duration", time_util.format(length))
 	TextCellImView(w, h, "right", "notes", noteCount)
 	TextCellImView(w, h, "right", "level", level)
 

@@ -35,10 +35,10 @@ WebApi.get = function(url, params)
 	local https = require("ssl.https")
 	local ltn12 = require("ltn12")
 
-	local encode_query_string = require("aqua.util.encode_query_string")
+	local http_util = require("aqua.http_util")
 
 	if params then
-		url = url .. "?" .. encode_query_string(params)
+		url = url .. "?" .. http_util.encode_query_string(params)
 	end
 
 	local t = {}
@@ -62,7 +62,7 @@ WebApi.post = function(url, method, params, buffers)
 	local json = require("json")
 	local https = require("ssl.https")
 	local ltn12 = require("ltn12")
-	local mfd = require("aqua.util.multipart_form_data")
+	local http_util = require("aqua.http_util")
 
 	local request_buffers = {}
 	if params then
@@ -76,7 +76,7 @@ WebApi.post = function(url, method, params, buffers)
 		end
 	end
 
-	local body, headers = mfd(request_buffers)
+	local body, headers = http_util.multipart_form_data(request_buffers)
 	headers["Authorization"] = "Bearer " .. WebApi.token
 
 	local t = {}

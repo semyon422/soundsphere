@@ -2,7 +2,7 @@ local ListView = require("sphere.views.ListView")
 local just = require("just")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
-local time_ago_in_words = require("aqua.util").time_ago_in_words
+local time_util = require("aqua.time_util")
 
 local ScoreListView = ListView:new({construct = false})
 
@@ -36,7 +36,7 @@ ScoreListView.drawItem = function(self, i, w, h)
 	if just.mouse_over(i .. "a", just.is_over(-w, h), "mouse") then
 		self.game.gameView.tooltip = ("%0.2fX"):format(item.timeRate)
 	end
-	TextCellImView(w * 2, h, "right", item.time ~= 0 and time_ago_in_words(item.time) or "never", Format.inputMode(item.inputMode))
+	TextCellImView(w * 2, h, "right", item.time ~= 0 and time_util.time_ago_in_words(item.time) or "never", Format.inputMode(item.inputMode))
 	if just.mouse_over(i .. "b", just.is_over(-w * 2, h), "mouse") then
 		self.game.gameView.tooltip = os.date("%c", item.time)
 	end
@@ -56,8 +56,8 @@ ScoreListView.drawItemOnline = function(self, i, w, h)
 	-- if just.mouse_over(i .. "a", just.is_over(-w, h), "mouse") then
 	-- 	self.game.gameView.tooltip = ("%0.2fX"):format(item.timeRate)
 	-- end
-	TextCellImView(w * 3, h, "right", item.time ~= 0 and time_ago_in_words(item.created_at) or "never", item.user.name)
-	-- TextCellImView(w * 2, h, "right", item.time ~= 0 and time_ago_in_words(item.created_at) or "never", Format.inputMode(item.inputmode))
+	TextCellImView(w * 3, h, "right", item.time ~= 0 and time_util.time_ago_in_words(item.created_at) or "never", item.user.name)
+	-- TextCellImView(w * 2, h, "right", item.time ~= 0 and time_util.time_ago_in_words(item.created_at) or "never", Format.inputMode(item.inputmode))
 	-- if just.mouse_over(i .. "b", just.is_over(-w * 2, h), "mouse") then
 	-- 	self.game.gameView.tooltip = os.date("%c", item.time)
 	-- end

@@ -2,8 +2,7 @@ local _transform = require("aqua.graphics.transform")
 local just = require("just")
 local spherefonts		= require("sphere.assets.fonts")
 local getCanvas		= require("aqua.graphics.canvas")
-local rtime = require("aqua.util.rtime")
-local time_ago_in_words = require("aqua.util").time_ago_in_words
+local time_util = require("aqua.time_util")
 local newGradient = require("aqua.graphics.newGradient")
 local gameloop = require("gameloop")
 
@@ -314,7 +313,7 @@ local Cells = {draw = function(self)
 	just.row(true)
 	just.indent(22)
 	TextCellImView(w, h, "right", "bpm", ("%d"):format(bpm))
-	TextCellImView(w, h, "right", "duration", rtime(length))
+	TextCellImView(w, h, "right", "duration", time_util.format(length))
 	TextCellImView(w, h, "right", "notes", noteCount)
 	TextCellImView(w, h, "right", "level", level)
 
@@ -616,7 +615,7 @@ local SessionTime = {draw = function(self)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
-	just.text(rtime(gameloop.time - gameloop.startTime))
+	just.text(time_util.format(gameloop.time - gameloop.startTime))
 end}
 
 local NotechartsSubscreen = {

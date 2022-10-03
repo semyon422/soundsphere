@@ -1,7 +1,6 @@
 local just = require("just")
 local just_print = require("just.print")
 local spherefonts		= require("sphere.assets.fonts")
-local time_ago_in_words = require("aqua.util").time_ago_in_words
 local _transform = require("aqua.graphics.transform")
 
 local RectangleView = require("sphere.views.RectangleView")
@@ -26,7 +25,7 @@ local Format = require("sphere.views.Format")
 local ScrollBarImView = require("sphere.imviews.ScrollBarImView")
 
 local inspect = require("inspect")
-local rtime = require("aqua.util.rtime")
+local time_util = require("aqua.time_util")
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 local transformLeft = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -421,8 +420,8 @@ local NotechartInfo = {draw = function(self)
 	TextCellImView(self.w * (1 - wr), 55, "right", "notes", noteChartItem.noteCount)
 	just.sameline()
 	TextCellImView(self.w * wr, 55, "right", "duration",
-		(not show or length == baseLength) and rtime(baseLength) or
-		("%s→%s"):format(rtime(baseLength), rtime(length))
+		(not show or length == baseLength) and time_util.format(baseLength) or
+		("%s→%s"):format(time_util.format(baseLength), time_util.format(length))
 	)
 
 	TextCellImView(self.w * (1 - wr), 55, "right", "level", noteChartItem.level)

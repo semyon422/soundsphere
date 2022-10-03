@@ -3,8 +3,7 @@ local transform = require("aqua.graphics.transform")
 local spherefonts		= require("sphere.assets.fonts")
 local baseline_print = require("aqua.graphics.baseline_print")
 local inside = require("aqua.util.inside")
-local rtime = require("aqua.util.rtime")
-local time_ago_in_words = require("aqua.util").time_ago_in_words
+local time_util = require("aqua.time_util")
 
 local StageInfoView = Class:new()
 
@@ -71,10 +70,10 @@ StageInfoView.drawTextCell = function(self, cell)
 			value = format(value)
 		end
 	elseif cell.time then
-		value = rtime(tonumber(value) or 0)
+		value = time_util.format(tonumber(value) or 0)
 	elseif cell.ago then
 		value = tonumber(value) or 0
-		value = value ~= 0 and time_ago_in_words(value, cell.parts, cell.suffix) or "never"
+		value = value ~= 0 and time_util.time_ago_in_words(value, cell.parts, cell.suffix) or "never"
 	end
 
 	local text = t.value.text

@@ -2,7 +2,7 @@ local ListView = require("sphere.views.ListView")
 local just = require("just")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
-local time_ago_in_words = require("aqua.util").time_ago_in_words
+local time_util = require("aqua.time_util")
 
 local ScoreListView = ListView:new({construct = false})
 
@@ -68,7 +68,7 @@ ScoreListView.drawItem = function(self, i, w, h)
 	TextCellImView(cw, h, "right", i == 1 and "rank" or "", item.rank, true)
 	TextCellImView(cw, h, "right", i == 1 and "rating" or "", Format.difficulty(rating), true)
 	TextCellImView(cw, h, "right", i == 1 and "time rate" or "", Format.timeRate(timeRate), true)
-	TextCellImView(cw * 2, h, "right", item.time ~= 0 and time_ago_in_words(item.time) or "never", Format.inputMode(inputMode))
+	TextCellImView(cw * 2, h, "right", item.time ~= 0 and time_util.time_ago_in_words(item.time) or "never", Format.inputMode(inputMode))
 	just.row(false)
 end
 
@@ -82,7 +82,7 @@ ScoreListView.drawItemOnline = function(self, i, w, h)
 	TextCellImView(w, h, "right", i == 1 and "rating" or "", Format.difficulty(item.rating))
 	TextCellImView(w, h, "right", i == 1 and "rate" or "", Format.timeRate(item.modifierset.timerate))
 	TextCellImView(w, h, "right", i == 1 and "mode" or "", Format.inputMode(item.inputmode))
-	TextCellImView(w * 3, h, "right", item.time ~= 0 and time_ago_in_words(item.created_at) or "never", item.user.name)
+	TextCellImView(w * 3, h, "right", item.time ~= 0 and time_util.time_ago_in_words(item.created_at) or "never", item.user.name)
 	just.row(false)
 end
 
