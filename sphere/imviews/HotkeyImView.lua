@@ -1,10 +1,10 @@
-local aquaevent = require("aqua.event")
+local gameloop = require("gameloop")
 local just = require("just")
 
-local midistate = aquaevent.midistate
-local keystate = aquaevent.keystate
-local gamepadstate = aquaevent.gamepadstate
-local joystickstate = aquaevent.joystickstate
+local midistate = gameloop.midistate
+local keystate = gameloop.keystate
+local gamepadstate = gameloop.gamepadstate
+local joystickstate = gameloop.joystickstate
 
 local allstates = {
 	midi = midistate,

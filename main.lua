@@ -103,8 +103,8 @@ aquathread.coro(function()
 
 	game:load()
 
-	local aquaevent = require("aqua.event")
-	aquaevent:init()
-	defaultLoop = aquaevent.run()
-	aquaevent:add(game)
+	local gameloop = require("gameloop")
+	gameloop:init()
+	defaultLoop = gameloop.run()
+	gameloop:add(game)
 end)()

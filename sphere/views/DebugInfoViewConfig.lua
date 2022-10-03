@@ -1,7 +1,7 @@
 local ValueView = require("sphere.views.ValueView")
 
 local inspect = require("inspect")
-local aquaevent = require("aqua.event")
+local gameloop = require("gameloop")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 local transformLeft = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
@@ -39,7 +39,7 @@ local Stats = ValueView:new({
 	subscreen = "debug",
 	transform = transformLeft,
 	value = function()
-		return inspect(aquaevent.stats)
+		return inspect(gameloop.stats)
 	end,
 	x = 0,
 	baseline = 160,

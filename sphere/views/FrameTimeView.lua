@@ -1,7 +1,7 @@
 local Class = require("aqua.util.Class")
 local Profiler = require("aqua.util.Profiler")
 local spherefonts = require("sphere.assets.fonts")
-local aquaevent = require("aqua.event")
+local gameloop = require("gameloop")
 local just = require("just")
 local TextButtonImView = require("sphere.imviews.TextButtonImView")
 
@@ -87,15 +87,15 @@ FrameTimeView.draw = function(self)
 	love.graphics.line(0.5, y, 0.5, y - love.timer.getDelta() * 1000 * self.scale)
 
 	love.graphics.setColor(colors.blue)
-	love.graphics.line(0.5, y, 0.5, y - aquaevent.timings.event * 1000 * self.scale)
+	love.graphics.line(0.5, y, 0.5, y - gameloop.timings.event * 1000 * self.scale)
 
-	y = y - aquaevent.timings.event * 1000 * self.scale
+	y = y - gameloop.timings.event * 1000 * self.scale
 	love.graphics.setColor(colors.gray, 1)
-	love.graphics.line(0.5, y, 0.5, y - aquaevent.timings.update * 1000 * self.scale)
+	love.graphics.line(0.5, y, 0.5, y - gameloop.timings.update * 1000 * self.scale)
 
-	y = y - aquaevent.timings.update * 1000 * self.scale
+	y = y - gameloop.timings.update * 1000 * self.scale
 	love.graphics.setColor(colors.yellow)
-	love.graphics.line(0.5, y, 0.5, y - aquaevent.timings.draw * 1000 * self.scale)
+	love.graphics.line(0.5, y, 0.5, y - gameloop.timings.draw * 1000 * self.scale)
 
 	love.graphics.setCanvas()
 

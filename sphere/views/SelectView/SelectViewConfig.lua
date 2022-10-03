@@ -5,7 +5,7 @@ local getCanvas		= require("aqua.graphics.canvas")
 local rtime = require("aqua.util.rtime")
 local time_ago_in_words = require("aqua.util").time_ago_in_words
 local newGradient = require("aqua.graphics.newGradient")
-local event = require("aqua.event")
+local gameloop = require("gameloop")
 
 local IconButtonImView = require("sphere.imviews.IconButtonImView")
 local TextButtonImView = require("sphere.imviews.TextButtonImView")
@@ -616,7 +616,7 @@ local SessionTime = {draw = function(self)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
-	just.text(rtime(event.time - event.startTime))
+	just.text(rtime(gameloop.time - gameloop.startTime))
 end}
 
 local NotechartsSubscreen = {
