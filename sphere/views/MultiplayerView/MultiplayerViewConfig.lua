@@ -15,7 +15,6 @@ local RoomUsersListView = require("sphere.views.MultiplayerView.RoomUsersListVie
 local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
 local ScoreListView	= require("sphere.views.ResultView.ScoreListView")
 local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
-local StageInfoView = require("sphere.views.SelectView.StageInfoView")
 local MatchPlayersView	= require("sphere.views.GameplayView.MatchPlayersView")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 local BarCellImView = require("sphere.imviews.BarCellImView")
