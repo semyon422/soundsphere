@@ -2,7 +2,7 @@ local Class = require("aqua.util.Class")
 local aquathread = require("aqua.thread")
 local newPixel = require("aqua.graphics.newPixel")
 local tween				= require("tween")
-local aquatimer				= require("aqua.timer")
+local aquadelay				= require("aqua.delay")
 
 local BackgroundModel = Class:new()
 
@@ -50,7 +50,7 @@ end
 
 BackgroundModel.loadBackgroundDebounce = function(self, path)
 	self.path = path or self.path
-	aquatimer.debounce(self, "loadDebounce", 0.1, self.loadBackground, self)
+	aquadelay.debounce(self, "loadDebounce", 0.1, self.loadBackground, self)
 end
 
 BackgroundModel.loadBackground = function(self)

@@ -3,7 +3,7 @@ local osudirect = require("libchart.osudirect")
 local extractAsync = require("sphere.filesystem.extract")
 local downloadAsync = require("sphere.filesystem.download")
 local aquathread = require("aqua.thread")
-local aquatimer = require("aqua.timer")
+local aquadelay = require("aqua.delay")
 local socket_url = require("socket.url")
 
 local OsudirectModel = Class:new()
@@ -72,7 +72,7 @@ local requestAsync = aquathread.async(function(url)
 end)
 
 OsudirectModel.searchDebounce = function(self)
-	aquatimer.debounce(self, "loadDebounce", 0.1, self.search, self)
+	aquadelay.debounce(self, "loadDebounce", 0.1, self.search, self)
 end
 
 OsudirectModel.searchNoDebounce = function(self)

@@ -1,5 +1,5 @@
 local Class = require("aqua.util.Class")
-local aquatimer = require("aqua.timer")
+local aquadelay = require("aqua.delay")
 local aquathread = require("aqua.thread")
 local enet = require("enet")
 local buffer = require("string.buffer")
@@ -24,7 +24,7 @@ end
 
 MultiplayerModel.load = function(self)
 	self.host = enet.host_create()
-	self.stopRefresh = aquatimer.every(0.1, self.refresh, self)
+	self.stopRefresh = aquadelay.every(0.1, self.refresh, self)
 end
 
 MultiplayerModel.unload = function(self)

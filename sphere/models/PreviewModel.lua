@@ -1,5 +1,5 @@
 local Class = require("aqua.util.Class")
-local aquatimer = require("aqua.timer")
+local aquadelay = require("aqua.delay")
 local aquathread = require("aqua.thread")
 
 local PreviewModel = Class:new()
@@ -48,7 +48,7 @@ end
 PreviewModel.loadPreviewDebounce = function(self, audioPath, previewTime)
 	self.audioPath = audioPath or self.audioPath
 	self.previewTime = previewTime or self.previewTime
-	aquatimer.debounce(self, "loadDebounce", 0.1, self.loadPreview, self)
+	aquadelay.debounce(self, "loadDebounce", 0.1, self.loadPreview, self)
 end
 
 local loadingPreview

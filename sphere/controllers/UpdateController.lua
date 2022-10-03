@@ -3,7 +3,7 @@ local UpdateModel = require("sphere.models.UpdateModel")
 local ConfigModel = require("sphere.models.ConfigModel")
 local WindowManager = require("sphere.window.WindowManager")
 local aquathread = require("aqua.thread")
-local aquatimer = require("aqua.timer")
+local aquadelay = require("aqua.delay")
 
 local UpdateController = Class:new()
 
@@ -37,7 +37,7 @@ UpdateController.updateAsync = function(self)
 
 	function love.update()
 		aquathread.update()
-		aquatimer.update()
+		aquadelay.update()
 		self.windowManager:update()
 	end
 

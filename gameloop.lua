@@ -1,6 +1,6 @@
 local Observable = require("aqua.util.Observable")
 local aquathread = require("aqua.thread")
-local aquatimer = require("aqua.timer")
+local aquadelay = require("aqua.delay")
 local asynckey = require("aqua.asynckey")
 local just = require("just")
 local LuaMidi = require("luamidi")
@@ -131,7 +131,7 @@ gameloop.run = function()
 		gameloop.timings.event = timingsUpdate - timingsEvent
 
 		aquathread.update()
-		aquatimer.update()
+		aquadelay.update()
 		love.update(gameloop.dt)
 
 		local timingsDraw = love.timer.getTime()
