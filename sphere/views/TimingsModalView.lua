@@ -13,7 +13,7 @@ local _transform = require("aqua.graphics.transform")
 local round = require("aqua.math").round
 local map = require("aqua.math").map
 local spherefonts = require("sphere.assets.fonts")
-local deepclone = require("aqua.util.deepclone")
+local table_util = require("aqua.table_util")
 
 local _timings = require("sphere.models.RhythmModel.ScoreEngine.timings")
 
@@ -87,15 +87,15 @@ return ModalImView(function(self)
 	just.indent(10)
 	LabelImView("presets label", "Timings presets:", _h2)
 	if TextButtonImView2("default timings", "soundsphere", 200, _h2) then
-		gameplay.timings = deepclone(_timings.soundsphere)
+		gameplay.timings = table_util.deepcopy(_timings.soundsphere)
 		self.game:resetGameplayConfigs()
 	end
 	if TextButtonImView2("lr2 timings", "LR2", 100, _h2) then
-		gameplay.timings = deepclone(_timings.lr2)
+		gameplay.timings = table_util.deepcopy(_timings.lr2)
 		self.game:resetGameplayConfigs()
 	end
 	if TextButtonImView2("osu timings", "osu OD" .. osuOD, 150, _h2) then
-		gameplay.timings = deepclone(_timings.osu(osuOD))
+		gameplay.timings = table_util.deepcopy(_timings.osu(osuOD))
 		self.game:resetGameplayConfigs()
 		osuOD = (osuOD + 1) % 11
 	end

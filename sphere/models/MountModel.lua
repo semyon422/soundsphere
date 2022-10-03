@@ -1,4 +1,4 @@
-local aquafs	= require("aqua.filesystem")
+local physfs	= require("aqua.physfs")
 local Class		= require("aqua.util.Class")
 
 local MountModel = Class:new()
@@ -7,7 +7,6 @@ MountModel.construct = function(self)
 	self.mountStatuses = {}
 end
 
-MountModel.configPath = "userdata/mount.json"
 MountModel.chartsPath = "userdata/charts"
 
 MountModel.load = function(self)
@@ -18,13 +17,9 @@ MountModel.load = function(self)
 		entry[1] = entry[1]:match("^(.-)[/]*$")
 		entry[2] = entry[2]:match("^(.-)[/]*$")
 		local path, mountpoint = entry[1], entry[2]
-		local status, err = pcall(aquafs.mount, path, mountpoint, 1)
-		local mountStatus
-		if status then
-			mountStatus = "mounted"
-		else
-			print(err)
-			mountStatus = "not found"
+		local mountStatus = "mounted"
+		if not physfs.mount(path, mountpoint, 1) then
+			mountStatus = physfs.getLastError()
 		end
 		mountStatuses[path] = mountStatus
 	end
@@ -34,7 +29,7 @@ MountModel.unload = function(self)
 	for _, entry in ipairs(self.mountInfo) do
 		local path = entry[1]
 		if self.mountStatuses[path] == "mounted" then
-			aquafs.unmount(path)
+			physfs.unmount(path)
 		end
 	end
 end
@@ -73,11 +68,11 @@ MountModel.addPath = function(self, path)
 end
 
 MountModel.mount = function(self, path)
-	aquafs.mount(path, self:getMountPoint(path), 1)
+	assert(physfs.mount(path, self:getMountPoint(path), true))
 end
 
 MountModel.unmount = function(self, path)
-	aquafs.unmount(path)
+	assert(physfs.unmount(path))
 end
 
 return MountModel

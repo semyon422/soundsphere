@@ -2,17 +2,17 @@ local aquathread = require("aqua.thread")
 
 return aquathread.async(function(archive, path, remove)
 	require("love.filesystem")
-	local aquafs = require("aqua.filesystem")
+	local physfs = require("aqua.physfs")
 	local rcopy = require("aqua.util.rcopy")
 	local mount = path .. "_temp"
-	local status, err = pcall(aquafs.mount, archive, mount, true)
-	if not status then
-		print(err)
-		love.filesystem.remove(archive)
-		return
+	if not physfs.mount(archive, mount, true) then
+		if remove then
+			love.filesystem.remove(archive)
+		end
+		return nil, physfs.getLastError()
 	end
 	rcopy(mount, path)
-	assert(aquafs.unmount(archive))
+	assert(physfs.unmount(archive))
 	if remove then
 		love.filesystem.remove(archive)
 	end

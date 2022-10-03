@@ -1,5 +1,5 @@
 local Class = require("aqua.util.Class")
-local deepclone = require("aqua.util.deepclone")
+local table_util = require("aqua.table_util")
 local remote = require("aqua.util.remote")
 
 local MultiplayerController = Class:new()
@@ -14,7 +14,7 @@ MultiplayerController.load = function(self)
 			elseif key == "modifiers" and not mpModel:isHost() then
 				self.game.modifierModel:setConfig(value)
 				self.game.configModel.configs.modifier = value
-				mpModel.modifiers = deepclone(value)
+				mpModel.modifiers = table_util.deepcopy(value)
 			elseif key == "roomUsers" then
 				for _, user in ipairs(value) do
 					if user.peerId == mpModel.user.peerId then
@@ -29,7 +29,7 @@ MultiplayerController.load = function(self)
 				return
 			end
 			if not mpModel.room.isFreeModifiers then
-				local modifiers = deepclone(mpModel.modifiers)
+				local modifiers = table_util.deepcopy(mpModel.modifiers)
 				self.game.modifierModel:setConfig(modifiers)
 				self.game.configModel.configs.modifier = modifiers
 			end

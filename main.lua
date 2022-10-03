@@ -55,16 +55,16 @@ function love.errhand(msg)
 	return errhand(aquautf8.validate(msg))
 end
 
-local aquafs = require("aqua.filesystem")
-aquafs.setWriteDir(root)
+local physfs = require("aqua.physfs")
+physfs.setWriteDir(root)
 
 if root == sourceBase then
-	aquafs.mount(root, "/", true)
+	assert(physfs.mount(root, "/", true))
 end
 
 local moddedgame = love.filesystem.getInfo("moddedgame")
 if moddedgame and moddedgame.type == "directory" then
-	aquafs.mount(root .. "/moddedgame", "/", false)
+	assert(physfs.mount(root .. "/moddedgame", "/", false))
 end
 
 require("preloaders.preloadall")
