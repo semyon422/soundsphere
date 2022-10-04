@@ -4,6 +4,7 @@ aquathread.shared.download = {}
 return aquathread.async(function(url, saveDir, fallbackName)
 	local https = require("ssl.https")
 	local ltn12 = require("ltn12")
+	local thread = require("thread")
 
 	local one, code, headers, status_line = https.request({
 		url = url,

@@ -91,10 +91,7 @@ CacheManager.checkProgress = function(self)
 		CacheDatabase:begin()
 	end
 
-	if not thread then
-		return
-	end
-
+	local thread = require("thread")
 	thread:update()
 
 	local cache = thread.shared.cache
