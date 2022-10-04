@@ -62,7 +62,7 @@ GameplayController.load = function(self)
 	FileFinder:addPath("userdata/hitsounds")
 	FileFinder:addPath("userdata/hitsounds/midi")
 
-	audio.sample_gain = config.audio.sampleGain
+	NoteChartResourceLoader.game = self.game
 	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChart, function()
 		self:play()
 	end)

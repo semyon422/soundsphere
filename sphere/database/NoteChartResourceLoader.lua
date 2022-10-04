@@ -1,10 +1,62 @@
-local image			= require("aqua.image")
 local audio			= require("aqua.audio")
-local video			= require("aqua.video")
+local video			= require("video")
+local Video			= require("sphere.database.Video")
 local aquathread	= require("aqua.thread")
 local JamLoader		= require("sphere.database.JamLoader")
 local FileFinder	= require("sphere.filesystem.FileFinder")
 local array_update = require("aqua.util.array_update")
+
+local _newSoundDataAsync = aquathread.async(function(path, sample_gain)
+	local fileData = love.filesystem.newFileData(path)
+	if not fileData then
+		return
+	end
+	local audio = require("aqua.audio")
+	local soundData = audio.newSoundData(fileData:getFFIPointer(), fileData:getSize(), sample_gain)
+	fileData:release()
+	return soundData
+end)
+
+local function newSoundDataAsync(path, sample_gain)
+	local soundData = _newSoundDataAsync(path, sample_gain)
+	if not soundData then return end
+	return setmetatable(soundData, {__index = audio.SoundData})
+end
+
+local newImageDataAsync = aquathread.async(function(s)
+	require("love.image")
+	local status, err = pcall(love.image.newImageData, s)
+	if not status then return end
+	return err
+end)
+
+local function newImageAsync(s)
+	local imageData = newImageDataAsync(s)
+	if not imageData then return end
+	return love.graphics.newImage(imageData)
+end
+
+local newFileDataAsync = aquathread.async(function(path)
+	return love.filesystem.newFileData(path)
+end)
+
+local function newVideoAsync(path)
+	local fileData = newFileDataAsync(path)
+	if not fileData then return end
+
+	local _v = video.open(fileData:getPointer(), fileData:getSize())
+	if not _v then
+		return
+	end
+
+	local v = setmetatable({}, {__index = Video})
+	v.video = _v
+	v.fileData = fileData
+	v.imageData = love.image.newImageData(_v:getDimensions())
+	v.image = love.graphics.newImage(v.imageData)
+
+	return v
+end
 
 local NoteChartResourceLoader = {}
 
@@ -32,9 +84,10 @@ end
 NoteChartResourceLoader.load = function(self, chartPath, noteChart, callback)
 	local noteChartType = NoteChartTypeMap[noteChart.type]
 
-	if self.sample_gain ~= audio.sample_gain then
+	local sample_gain = self.game.configModel.configs.settings.audio.sampleGain
+	if self.sample_gain ~= sample_gain then
 		self:unloadAudio()
-		self.sample_gain = audio.sample_gain
+		self.sample_gain = sample_gain
 	end
 
 	self.callback = callback
@@ -68,11 +121,11 @@ end
 NoteChartResourceLoader.loadResource = function(self, path)
 	local fileType = FileFinder:getType(path)
 	if fileType == "audio" then
-		resources.loaded[path] = audio.newSoundDataAsync(path)
+		resources.loaded[path] = newSoundDataAsync(path, self.sample_gain)
 	elseif fileType == "image" then
-		resources.loaded[path] = image.newImageAsync(path)
+		resources.loaded[path] = newImageAsync(path)
 	elseif fileType == "video" then
-		resources.loaded[path] = video.newVideoAsync(path)
+		resources.loaded[path] = newVideoAsync(path)
 	elseif path:lower():find("%.ojm$") then
 		local soundDatas = JamLoader:loadAsync(path)
 		if soundDatas then
