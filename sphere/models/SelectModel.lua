@@ -1,6 +1,6 @@
 local Class = require("Class")
-local aquadelay = require("delay")
-local aquathread = require("thread")
+local delay = require("delay")
+local thread = require("thread")
 
 local SelectModel = Class:new()
 
@@ -56,10 +56,10 @@ SelectModel.isPlayed = function(self)
 end
 
 SelectModel.debouncePullNoteChartSet = function(self, ...)
-	aquadelay.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self, ...)
+	delay.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self, ...)
 end
 
-SelectModel.noDebouncePullNoteChartSet = aquathread.coro(function(self, ...)
+SelectModel.noDebouncePullNoteChartSet = thread.coro(function(self, ...)
 	self:pullNoteChartSet(...)
 end)
 
@@ -277,7 +277,7 @@ SelectModel.updateScoreOnlineAsync = function(self)
 	self:findScore()
 end
 
-SelectModel.updateScoreOnline = aquathread.coro(SelectModel.updateScoreOnlineAsync)
+SelectModel.updateScoreOnline = thread.coro(SelectModel.updateScoreOnlineAsync)
 
 SelectModel.findScore = function(self)
 	local scoreItems = self.game.scoreLibraryModel.items
@@ -306,7 +306,7 @@ SelectModel.pullScore = function(self, noUpdate)
 		local select = self.game.configModel.configs.select
 		if select.scoreSourceName == "online" then
 			self.game.scoreLibraryModel:clear()
-			aquadelay.debounce(self, "scoreDebounce", self.debounceTime,
+			delay.debounce(self, "scoreDebounce", self.debounceTime,
 				self.updateScoreOnlineAsync, self
 			)
 			return

@@ -1,4 +1,4 @@
-local aquathread = require("thread")
+local thread = require("thread")
 local Class = require("Class")
 
 local ScoreLibraryModel = Class:new()
@@ -67,7 +67,7 @@ ScoreLibraryModel.updateItemsAsync = function(self)
 	end
 end
 
-ScoreLibraryModel.updateItems = aquathread.coro(ScoreLibraryModel.updateItemsAsync)
+ScoreLibraryModel.updateItems = thread.coro(ScoreLibraryModel.updateItemsAsync)
 
 ScoreLibraryModel.updateItemsOnline = function(self)
 	local api = self.game.onlineModel.webApi.api

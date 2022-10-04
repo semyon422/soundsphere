@@ -1,6 +1,6 @@
 local Class = require("Class")
 local extractAsync = require("sphere.filesystem.extract")
-local aquathread = require("thread")
+local thread = require("thread")
 
 local MountController = Class:new()
 
@@ -22,7 +22,7 @@ MountController.directorydropped = function(self, path)
 	self.game.configModel:write("mount")
 end
 
-MountController.filedropped = aquathread.coro(function(self, file)
+MountController.filedropped = thread.coro(function(self, file)
 	local path = file:getFilename():gsub("\\", "/")
 	if not path:find("%.osz$") then
 		return

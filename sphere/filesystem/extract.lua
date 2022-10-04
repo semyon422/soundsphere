@@ -1,6 +1,6 @@
-local aquathread = require("thread")
+local thread = require("thread")
 
-return aquathread.async(function(archive, path, remove)
+return thread.async(function(archive, path, remove)
 	require("love.filesystem")
 	local physfs = require("physfs")
 	local rcopy = require("rcopy")

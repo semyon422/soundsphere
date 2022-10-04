@@ -1,5 +1,5 @@
 local Class = require("Class")
-local aquathread = require("thread")
+local thread = require("thread")
 
 local ResultController = Class:new()
 
@@ -29,7 +29,7 @@ ResultController.load = function(self)
 	self.game.selectModel:scrollScore(nil, scoreItemIndex)
 end
 
-local readAsync = aquathread.async(function(...) return love.filesystem.read(...) end)
+local readAsync = thread.async(function(...) return love.filesystem.read(...) end)
 
 ResultController.replayNoteChartAsync = function(self, mode, scoreEntry)
 	if not self.game.selectModel:notechartExists() then
@@ -84,6 +84,6 @@ ResultController.replayNoteChartAsync = function(self, mode, scoreEntry)
 	return true
 end
 
-ResultController.replayNoteChart = aquathread.coro(ResultController.replayNoteChartAsync)
+ResultController.replayNoteChart = thread.coro(ResultController.replayNoteChartAsync)
 
 return ResultController

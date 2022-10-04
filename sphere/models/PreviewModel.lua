@@ -1,6 +1,6 @@
 local Class = require("Class")
-local aquadelay = require("delay")
-local aquathread = require("thread")
+local delay = require("delay")
+local thread = require("thread")
 
 local PreviewModel = Class:new()
 
@@ -48,7 +48,7 @@ end
 PreviewModel.loadPreviewDebounce = function(self, audioPath, previewTime)
 	self.audioPath = audioPath or self.audioPath
 	self.previewTime = previewTime or self.previewTime
-	aquadelay.debounce(self, "loadDebounce", 0.1, self.loadPreview, self)
+	delay.debounce(self, "loadDebounce", 0.1, self.loadPreview, self)
 end
 
 local loadingPreview
@@ -122,7 +122,7 @@ PreviewModel.stop = function(self)
 	self.audio = nil
 end
 
-local loadHttp = aquathread.async(function(url)
+local loadHttp = thread.async(function(url)
 	local https = require("ssl.https")
 	local body = https.request(url)
 	if not body then
@@ -139,7 +139,7 @@ local loadHttp = aquathread.async(function(url)
 	end
 end)
 
-local loadAudio = aquathread.async(function(path)
+local loadAudio = thread.async(function(path)
 	require("love.filesystem")
 	require("love.audio")
 	require("love.sound")

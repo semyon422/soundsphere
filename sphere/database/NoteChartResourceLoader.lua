@@ -1,12 +1,12 @@
 local audio			= require("audio")
 local video			= require("video")
 local Video			= require("sphere.database.Video")
-local aquathread	= require("thread")
+local thread	= require("thread")
 local JamLoader		= require("sphere.database.JamLoader")
 local FileFinder	= require("sphere.filesystem.FileFinder")
 local table_util = require("table_util")
 
-local _newSoundDataAsync = aquathread.async(function(path, sample_gain)
+local _newSoundDataAsync = thread.async(function(path, sample_gain)
 	local fileData = love.filesystem.newFileData(path)
 	if not fileData then
 		return
@@ -23,7 +23,7 @@ local function newSoundDataAsync(path, sample_gain)
 	return setmetatable(soundData, {__index = audio.SoundData})
 end
 
-local newImageDataAsync = aquathread.async(function(s)
+local newImageDataAsync = thread.async(function(s)
 	require("love.image")
 	local status, err = pcall(love.image.newImageData, s)
 	if not status then return end
@@ -36,7 +36,7 @@ local function newImageAsync(s)
 	return love.graphics.newImage(imageData)
 end
 
-local newFileDataAsync = aquathread.async(function(path)
+local newFileDataAsync = thread.async(function(path)
 	return love.filesystem.newFileData(path)
 end)
 
@@ -163,7 +163,7 @@ NoteChartResourceLoader.loadResources = function(self, loaded, newResources)
 end
 
 local isProcessing = false
-NoteChartResourceLoader.process = aquathread.coro(function(self)
+NoteChartResourceLoader.process = thread.coro(function(self)
 	if isProcessing then
 		return
 	end

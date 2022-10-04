@@ -1,4 +1,4 @@
-local aquathread = require("thread")
+local thread = require("thread")
 local Class = require("Class")
 local CacheManager = require("sphere.models.CacheModel.CacheManager")
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
@@ -12,12 +12,12 @@ end
 
 CacheModel.load = function(self)
 	CacheDatabase:load()
-	aquathread.shared.cache = {
+	thread.shared.cache = {
 		state = 0,
 		noteChartCount = 0,
 		cachePercent = 0,
 	}
-	self.shared = aquathread.shared.cache
+	self.shared = thread.shared.cache
 end
 
 CacheModel.startUpdate = function(self, path, force, callback)
@@ -37,13 +37,13 @@ CacheModel.update = function(self)
 	end
 end
 
-local updateCacheAsync = aquathread.async(function(path, force)
+local updateCacheAsync = thread.async(function(path, force)
 	local CacheManager = require("sphere.models.CacheModel.CacheManager")
 	local cacheManager = CacheManager:new()
 	cacheManager:generateCacheFull(path, force)
 end)
 
-CacheModel.process = aquathread.coro(function(self)
+CacheModel.process = thread.coro(function(self)
 	if isProcessing then
 		return
 	end
@@ -52,7 +52,7 @@ CacheModel.process = aquathread.coro(function(self)
 	local tasks = self.tasks
 	local task = table.remove(tasks, 1)
 	while task do
-		aquathread.pushTask({error = print})
+		thread.pushTask({error = print})
 		updateCacheAsync(task[1], task[2])
 
 		if task[3] then

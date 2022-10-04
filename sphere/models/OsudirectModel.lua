@@ -2,8 +2,8 @@ local Class = require("Class")
 local osudirect = require("libchart.osudirect")
 local extractAsync = require("sphere.filesystem.extract")
 local downloadAsync = require("sphere.filesystem.download")
-local aquathread = require("thread")
-local aquadelay = require("delay")
+local thread = require("thread")
+local delay = require("delay")
 local socket_url = require("socket.url")
 
 local OsudirectModel = Class:new()
@@ -16,7 +16,7 @@ OsudirectModel.load = function(self)
 end
 
 OsudirectModel.update = function(self)
-	local dl = aquathread.shared.download
+	local dl = thread.shared.download
 	for _, b in ipairs(self.processing) do
 		local status = dl[b.url]
 		if status then
@@ -66,13 +66,13 @@ OsudirectModel.getDifficulties = function(self)
 	return beatmap and beatmap.difficulties or empty
 end
 
-local requestAsync = aquathread.async(function(url)
+local requestAsync = thread.async(function(url)
 	local https = require("ssl.https")
 	return https.request(url)
 end)
 
 OsudirectModel.searchDebounce = function(self)
-	aquadelay.debounce(self, "loadDebounce", 0.1, self.search, self)
+	delay.debounce(self, "loadDebounce", 0.1, self.search, self)
 end
 
 OsudirectModel.searchNoDebounce = function(self)
@@ -140,7 +140,7 @@ OsudirectModel.getPreviewUrl = function(self)
 	return socket_url.absolute(config.static, osudirect.preview(self.beatmap.setId))
 end
 
-OsudirectModel.downloadBeatmapSet = aquathread.coro(function(self, beatmap, callback)
+OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback)
 	if not beatmap or beatmap == self.statusBeatmap then
 		return
 	end

@@ -1,4 +1,4 @@
-local aquamath				= require("math_util")
+local math_util				= require("math_util")
 local Upscaler				= require("libchart.Upscaler")
 local NextUpscaler			= require("libchart.NextUpscaler")
 local Reductor				= require("libchart.Reductor")
@@ -82,9 +82,9 @@ Automap.applyAutomap = function(self)
 
 		tNoteData.noteData = noteData
 
-		tNoteData.startTime = aquamath.round(noteData.timePoint.absoluteTime * 1000)
+		tNoteData.startTime = math_util.round(noteData.timePoint.absoluteTime * 1000)
 		if noteData.noteType == "LongNoteStart" and noteData.endNoteData then
-			tNoteData.endTime = aquamath.round(noteData.endNoteData.timePoint.absoluteTime * 1000)
+			tNoteData.endTime = math_util.round(noteData.endNoteData.timePoint.absoluteTime * 1000)
 			tNoteData.long = true
 		else
 			tNoteData.endTime = tNoteData.startTime

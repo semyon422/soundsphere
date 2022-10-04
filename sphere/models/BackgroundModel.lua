@@ -1,8 +1,8 @@
 local Class = require("Class")
-local aquathread = require("thread")
+local thread = require("thread")
 local gfx_util = require("gfx_util")
 local tween				= require("tween")
-local aquadelay				= require("delay")
+local delay				= require("delay")
 
 local BackgroundModel = Class:new()
 
@@ -50,7 +50,7 @@ end
 
 BackgroundModel.loadBackgroundDebounce = function(self, path)
 	self.path = path or self.path
-	aquadelay.debounce(self, "loadDebounce", 0.1, self.loadBackground, self)
+	delay.debounce(self, "loadDebounce", 0.1, self.loadBackground, self)
 end
 
 BackgroundModel.loadBackground = function(self)
@@ -89,7 +89,7 @@ BackgroundModel.loadBackground = function(self)
 	self:setBackground(self.emptyImage)
 end
 
-local loadImage = aquathread.async(function(path)
+local loadImage = thread.async(function(path)
 	require("love.filesystem")
 	require("love.image")
 
@@ -104,7 +104,7 @@ local loadImage = aquathread.async(function(path)
 	end
 end)
 
-local loadOJN = aquathread.async(function(path)
+local loadOJN = thread.async(function(path)
 	require("love.filesystem")
 	require("love.image")
 	local OJN = require("o2jam.OJN")
@@ -126,7 +126,7 @@ local loadOJN = aquathread.async(function(path)
 	end
 end)
 
-local loadHttp = aquathread.async(function(url)
+local loadHttp = thread.async(function(url)
 	local https = require("ssl.https")
 	local body = https.request(url)
 	if not body then

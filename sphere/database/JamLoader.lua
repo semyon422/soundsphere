@@ -1,9 +1,9 @@
-local aquathread	= require("thread")
+local thread	= require("thread")
 local audio	= require("audio")
 
 local JamLoader = {}
 
-local loadOjm = aquathread.async(function(path)
+local loadOjm = thread.async(function(path)
 	local audio = require("audio")
 	local OJM = require("o2jam.OJM")
 

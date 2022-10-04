@@ -1,5 +1,5 @@
 local TimedCache = require("TimedCache")
-local aquathread = require("thread")
+local thread = require("thread")
 local Orm = require("sphere.Orm")
 local ObjectQuery = require("sphere.ObjectQuery")
 local ffi = require("ffi")
@@ -202,7 +202,7 @@ CacheDatabase.queryAll = function(self)
 	self:reassignData()
 end
 
-local _asyncQueryAll = aquathread.async(function(queryParams)
+local _asyncQueryAll = thread.async(function(queryParams)
 	local time = love.timer.getTime()
 	local ffi = require("ffi")
 	local self = require("sphere.models.CacheModel.CacheDatabase")

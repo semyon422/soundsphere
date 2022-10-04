@@ -1,7 +1,7 @@
-local aquathread = require("thread")
-aquathread.shared.download = {}
+local thread = require("thread")
+thread.shared.download = {}
 
-return aquathread.async(function(url, saveDir, fallbackName)
+return thread.async(function(url, saveDir, fallbackName)
 	local https = require("ssl.https")
 	local ltn12 = require("ltn12")
 	local thread = require("thread")

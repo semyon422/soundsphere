@@ -1,6 +1,6 @@
 local Class = require("Class")
 local erfunc = require("libchart.erfunc")
-local aquathread = require("thread")
+local thread = require("thread")
 local ScoreDatabase = require("sphere.models.ScoreModel.ScoreDatabase")
 
 local ScoreModel = Class:new()
@@ -115,7 +115,7 @@ ScoreModel.calculateTopScores = function(self)
 	print("processed " .. counter .. " scores in " .. math.floor((love.timer.getTime() - time) * 1000) .. "ms")
 end
 
-local calculateTopScores = aquathread.async(function()
+local calculateTopScores = thread.async(function()
 	local game = {}
 
 	local ConfigModel = require("sphere.models.ConfigModel")
@@ -132,7 +132,7 @@ local calculateTopScores = aquathread.async(function()
 	scoreModel:unload()
 end)
 
-ScoreModel.asyncCalculateTopScores = aquathread.coro(function(self)
+ScoreModel.asyncCalculateTopScores = thread.coro(function(self)
 	if self.calculating then
 		return
 	end

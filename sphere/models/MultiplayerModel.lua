@@ -1,6 +1,6 @@
 local Class = require("Class")
-local aquadelay = require("delay")
-local aquathread = require("thread")
+local delay = require("delay")
+local thread = require("thread")
 local enet = require("enet")
 local buffer = require("string.buffer")
 local remote = require("remote")
@@ -24,7 +24,7 @@ end
 
 MultiplayerModel.load = function(self)
 	self.host = enet.host_create()
-	self.stopRefresh = aquadelay.every(0.1, self.refresh, self)
+	self.stopRefresh = delay.every(0.1, self.refresh, self)
 end
 
 MultiplayerModel.unload = function(self)
@@ -54,13 +54,13 @@ MultiplayerModel.refresh = function(self)
 	})
 end
 
-local toipAsync = aquathread.async(function(host)
+local toipAsync = thread.async(function(host)
 	local socket = require("socket")
 	return socket.dns.toip(host)
 end)
 
 local connecting = false
-MultiplayerModel.connect = aquathread.coro(function(self)
+MultiplayerModel.connect = thread.coro(function(self)
 	if connecting or self.status == "connecting" then
 		return
 	end
@@ -182,7 +182,7 @@ MultiplayerModel.pushModifiers = remote.wrap(function(self)
 	self.peer._setModifiers(self.game.modifierModel.config)
 end)
 
-local async_read = aquathread.async(function(...) return love.filesystem.read(...) end)
+local async_read = thread.async(function(...) return love.filesystem.read(...) end)
 
 MultiplayerModel.pushNotechart = remote.wrap(function(self)
 	if not self.peer then

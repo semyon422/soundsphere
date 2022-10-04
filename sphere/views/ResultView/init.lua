@@ -1,5 +1,5 @@
 local ScreenView = require("sphere.views.ScreenView")
-local aquathread = require("thread")
+local thread = require("thread")
 local just = require("just")
 
 local ResultViewConfig = require("sphere.views.ResultView.ResultViewConfig")
@@ -12,7 +12,7 @@ ResultView.construct = function(self)
 end
 
 local loading
-ResultView.load = aquathread.coro(function(self)
+ResultView.load = thread.coro(function(self)
 	if loading then
 		return
 	end
@@ -59,7 +59,7 @@ ResultView.reload = function(self)
 	self.sequenceView.abortIterating = false
 end
 
-ResultView.loadScore = aquathread.coro(function(self, itemIndex)
+ResultView.loadScore = thread.coro(function(self, itemIndex)
 	if loading then
 		return
 	end
@@ -77,7 +77,7 @@ ResultView.loadScore = aquathread.coro(function(self, itemIndex)
 end)
 
 local playing = false
-ResultView.play = aquathread.coro(function(self, mode)
+ResultView.play = thread.coro(function(self, mode)
 	if playing then
 		return
 	end

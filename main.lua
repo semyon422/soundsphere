@@ -5,15 +5,15 @@ require("ltn12")
 require("enet")
 require("socket")
 
-local aquapackage = require("aqua.package")
-aquapackage.reset()
-aquapackage.addc("3rd-deps/lib")
-aquapackage.addc("bin/lib")
-aquapackage.add("3rd-deps/lua")
-aquapackage.add("aqua")
-aquapackage.add("ncdk")
-aquapackage.add("chartbase")
-aquapackage.add("libchart")
+local pkg = require("aqua.package")
+pkg.reset()
+pkg.addc("3rd-deps/lib")
+pkg.addc("bin/lib")
+pkg.add("3rd-deps/lua")
+pkg.add("aqua")
+pkg.add("ncdk")
+pkg.add("chartbase")
+pkg.add("libchart")
 
 local ffi = require("ffi")
 
@@ -33,7 +33,7 @@ if jit.os == "Windows" then
 	local winapi = require("winapi")
 	winapi.putenv("PATH", ("%s;%s"):format(winapi.getenv("PATH"), root .. "/bin/win64"))
 	winapi.chdir(root)
-	aquapackage.addc("bin/win64")
+	pkg.addc("bin/win64")
 elseif jit.os == "Linux" then
 	local ldlp = os.getenv("LD_LIBRARY_PATH")
 	if not ldlp or not ldlp:find("bin/linux64") then
@@ -44,7 +44,7 @@ elseif jit.os == "Linux" then
 	end
 	ffi.cdef("int chdir(const char *path);")
 	ffi.C.chdir(root)
-	aquapackage.addc("bin/linux64")
+	pkg.addc("bin/linux64")
 end
 
 local utf8validate = require("utf8validate")
@@ -76,14 +76,14 @@ function love.run()
 	end
 end
 
-local aquathread = require("thread")
-aquathread.coro(function()
+local thread = require("thread")
+thread.coro(function()
 	local UpdateController = require("sphere.controllers.UpdateController")
 	local updateController = UpdateController:new()
 	local needRestart = updateController:updateAsync()
 	if needRestart then
-		aquathread.unload()
-		aquathread.waitAsync()
+		thread.unload()
+		thread.waitAsync()
 		return love.event.quit("restart")
 	end
 
