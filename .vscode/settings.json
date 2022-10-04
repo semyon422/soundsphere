@@ -1,7 +1,6 @@
 {
     "Lua.diagnostics.globals": [
         "love",
-        "thread",
         "newproxy"
     ],
     "Lua.runtime.version": "LuaJIT",
@@ -13,17 +12,11 @@
         "ncdk/?.lua",
         "chartbase/?.lua",
         "libchart/?.lua",
-        "s3dc/?.lua",
-        "lua-crc32/?.lua",
-        "love-just-ui/?.lua",
         "3rd-deps/lua/?/init.lua",
         "aqua/?/init.lua",
         "ncdk/?/init.lua",
         "chartbase/?/init.lua",
         "libchart/?/init.lua",
-        "s3dc/?/init.lua",
-        "lua-crc32/?/init.lua",
-        "love-just-ui/?/init.lua",
     ],
     "Lua.workspace.ignoreSubmodules": false,
     "Lua.workspace.maxPreload": 1000,
