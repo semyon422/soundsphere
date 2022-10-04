@@ -17,7 +17,7 @@ iconv_preloader.name = "iconv"
 
 iconv_preloader.preload = function()
 	ffi.load = _load
-	local iconv = require("luajit-iconv.init")
+	local iconv = require("aqua.iconv")
 	ffi.load = load
 	return iconv
 end

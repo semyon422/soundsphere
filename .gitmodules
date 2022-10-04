@@ -16,21 +16,6 @@
 [submodule "libchart"]
 	path = libchart
 	url = https://github.com/semyon422/libchart
-[submodule "byte"]
-	path = byte
-	url = https://github.com/semyon422/luajit-byte
-[submodule "luajit-iconv"]
-	path = luajit-iconv
-	url = https://github.com/semyon422/luajit-iconv
-[submodule "s3dc"]
-	path = s3dc
-	url = https://github.com/semyon422/s3dc
-[submodule "lua-crc32"]
-	path = lua-crc32
-	url = https://github.com/semyon422/lua-crc32
-[submodule "love-just-ui"]
-	path = love-just-ui
-	url = https://github.com/semyon422/love-just-ui
 [submodule "3rd-deps"]
 	path = 3rd-deps
 	url = https://github.com/semyon422/soundsphere-3rd-party-deps

@@ -13,9 +13,6 @@ aquapackage.add("aqua")
 aquapackage.add("ncdk")
 aquapackage.add("chartbase")
 aquapackage.add("libchart")
-aquapackage.add("s3dc")
-aquapackage.add("lua-crc32")
-aquapackage.add("love-just-ui")
 
 local ffi = require("ffi")
 
