@@ -6,8 +6,9 @@ require("enet")
 require("socket")
 
 local aquapackage = require("aqua.package")
-aquapackage.add("3rd-deps/lib")
-aquapackage.add("bin/lib")
+aquapackage.reset()
+aquapackage.addc("3rd-deps/lib")
+aquapackage.addc("bin/lib")
 aquapackage.add("3rd-deps/lua")
 aquapackage.add("aqua")
 aquapackage.add("ncdk")
@@ -32,7 +33,7 @@ if jit.os == "Windows" then
 	local winapi = require("winapi")
 	winapi.putenv("PATH", ("%s;%s"):format(winapi.getenv("PATH"), root .. "/bin/win64"))
 	winapi.chdir(root)
-	aquapackage.add("bin/win64")
+	aquapackage.addc("bin/win64")
 elseif jit.os == "Linux" then
 	local ldlp = os.getenv("LD_LIBRARY_PATH")
 	if not ldlp or not ldlp:find("bin/linux64") then
@@ -43,7 +44,7 @@ elseif jit.os == "Linux" then
 	end
 	ffi.cdef("int chdir(const char *path);")
 	ffi.C.chdir(root)
-	aquapackage.add("bin/linux64")
+	aquapackage.addc("bin/linux64")
 end
 
 local utf8validate = require("utf8validate")
