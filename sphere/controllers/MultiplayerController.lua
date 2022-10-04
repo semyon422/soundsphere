@@ -1,6 +1,6 @@
-local Class = require("aqua.util.Class")
-local table_util = require("aqua.table_util")
-local remote = require("aqua.util.remote")
+local Class = require("Class")
+local table_util = require("table_util")
+local remote = require("remote")
 
 local MultiplayerController = Class:new()
 

@@ -1,5 +1,5 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
-local map = require("aqua.math").map
+local map = require("math_util").map
 
 local WindUp = Modifier:new()
 

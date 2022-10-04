@@ -1,5 +1,5 @@
 local serpent = require("serpent")
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 local just = require("just")
 local imgui = require("sphere.imgui")
 

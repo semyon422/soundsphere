@@ -1,9 +1,8 @@
 
 local just = require("just")
-local Class = require("aqua.util.Class")
-local transform = require("aqua.graphics.transform")
+local Class = require("Class")
 local spherefonts		= require("sphere.assets.fonts")
-local baseline_print = require("aqua.graphics.baseline_print")
+local gfx_util = require("gfx_util")
 
 local UserInfoView = Class:new()
 
@@ -36,7 +35,7 @@ UserInfoView.text = {
 }
 
 UserInfoView.draw = function(self)
-	local tf = transform(self.transform):translate(self.x, self.y)
+	local tf = gfx_util.transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
 	local x, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
@@ -52,7 +51,7 @@ UserInfoView.draw = function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local username = self.game.configModel.configs.online.user.name or ""
-	baseline_print(
+	gfx_util.printBaseline(
 		username,
 		self.text.x,
 		self.text.baseline,

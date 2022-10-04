@@ -1,6 +1,6 @@
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 local json = require("json")
-local thread = require("aqua.thread")
+local thread = require("thread")
 
 local UpdateModel = Class:new()
 

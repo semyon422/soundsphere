@@ -1,4 +1,4 @@
-local Class					= require("aqua.util.Class")
+local Class					= require("Class")
 local FileFinder			= require("sphere.filesystem.FileFinder")
 local ShortNoteView	= require("sphere.views.RhythmView.ShortNoteView")
 local LongNoteView		= require("sphere.views.RhythmView.LongNoteView")

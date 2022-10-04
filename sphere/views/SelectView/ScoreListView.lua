@@ -2,7 +2,7 @@ local ListView = require("sphere.views.ListView")
 local just = require("just")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
-local time_util = require("aqua.time_util")
+local time_util = require("time_util")
 
 local ScoreListView = ListView:new({construct = false})
 

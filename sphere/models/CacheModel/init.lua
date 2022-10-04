@@ -1,5 +1,5 @@
-local aquathread = require("aqua.thread")
-local Class = require("aqua.util.Class")
+local aquathread = require("thread")
+local Class = require("Class")
 local CacheManager = require("sphere.models.CacheModel.CacheManager")
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 

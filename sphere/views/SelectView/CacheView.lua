@@ -1,15 +1,13 @@
 
 local just = require("just")
-local Class = require("aqua.util.Class")
-local transform = require("aqua.graphics.transform")
-local baseline_print = require("aqua.graphics.baseline_print")
+local Class = require("Class")
+local gfx_util = require("gfx_util")
 local spherefonts = require("sphere.assets.fonts")
-local aquathread = require("aqua.thread")
 
 local CacheView = Class:new()
 
 CacheView.draw = function(self)
-	local tf = transform(self.transform):translate(self.x, self.y)
+	local tf = gfx_util.transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
@@ -44,7 +42,7 @@ CacheView.draw = function(self)
 		)
 	end
 
-	baseline_print(text, 44, 45, math.huge, 1, "left")
+	gfx_util.printBaseline(text, 44, 45, math.huge, 1, "left")
 end
 
 return CacheView

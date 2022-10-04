@@ -1,4 +1,4 @@
-local Timer = require("aqua.util.Timer")
+local Timer = require("Timer")
 
 local TimeManager = Timer:new()
 

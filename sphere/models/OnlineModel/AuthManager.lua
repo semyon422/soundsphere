@@ -1,5 +1,5 @@
-local Class = require("aqua.util.Class")
-local thread	= require("aqua.thread")
+local Class = require("Class")
+local thread	= require("thread")
 local inspect = require("inspect")
 
 local AuthManager = Class:new()

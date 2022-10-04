@@ -1,9 +1,8 @@
 
-local Class = require("aqua.util.Class")
-local frame_draw = require("aqua.graphics.frame_draw")
-local map = require("aqua.math").map
-local transform = require("aqua.graphics.transform")
-local inside = require("aqua.util.inside")
+local Class = require("Class")
+local gfx_util = require("gfx_util")
+local map = require("math_util").map
+local inside = require("table_util").inside
 
 local BackgroundView = Class:new()
 
@@ -18,7 +17,7 @@ end
 
 BackgroundView.drawBackground = function(self)
 	local backgroundModel = self.game.backgroundModel
-	local tf = transform(self.transform):translate(self.x, self.y)
+	local tf = gfx_util.transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 	-- love.graphics.origin()
 
@@ -44,7 +43,7 @@ BackgroundView.drawBackground = function(self)
 			love.graphics.setColor(r, g, b, 0)
 		end
 
-		frame_draw(
+		gfx_util.drawFrame(
 			images[i],
 			-map(mx, 0, w, self.parallax, 0) * w,
 			-map(my, 0, h, self.parallax, 0) * h,

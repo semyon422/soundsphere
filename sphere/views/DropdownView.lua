@@ -1,6 +1,6 @@
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 local just = require("just")
-local transform = require("aqua.graphics.transform")
+local transform = require("gfx_util").transform
 local spherefonts = require("sphere.assets.fonts")
 local just_print = require("just.print")
 

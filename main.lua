@@ -5,7 +5,7 @@ require("ltn12")
 require("enet")
 require("socket")
 
-local aquapackage = require("aqua.aqua.package")
+local aquapackage = require("aqua.package")
 aquapackage.add("3rd-deps/lib")
 aquapackage.add("bin/lib")
 aquapackage.add("3rd-deps/lua")
@@ -49,13 +49,13 @@ elseif jit.os == "Linux" then
 	aquapackage.add("bin/linux64")
 end
 
-local aquautf8 = require("aqua.utf8")
+local utf8validate = require("utf8validate")
 local errhand = love.errhand
 function love.errhand(msg)
-	return errhand(aquautf8.validate(msg))
+	return errhand(utf8validate(msg))
 end
 
-local physfs = require("aqua.physfs")
+local physfs = require("physfs")
 physfs.setWriteDir(root)
 
 if root == sourceBase then
@@ -78,7 +78,7 @@ function love.run()
 	end
 end
 
-local aquathread = require("aqua.thread")
+local aquathread = require("thread")
 aquathread.coro(function()
 	local UpdateController = require("sphere.controllers.UpdateController")
 	local updateController = UpdateController:new()

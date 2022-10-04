@@ -1,4 +1,4 @@
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 local NotePartView = require("sphere.views.RhythmView.NotePartView")
 
 local NoteView = Class:new()

@@ -1,8 +1,6 @@
-
-local transform = require("aqua.graphics.transform")
-local newPixel = require("aqua.graphics.newPixel")
+local gfx_util = require("gfx_util")
 local FileFinder = require("sphere.filesystem.FileFinder")
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 
 local ImageView = Class:new()
 
@@ -15,7 +13,7 @@ ImageView.load = function(self)
 		end
 	end
 	if not self.imageObject then
-		self.imageObject = newPixel()
+		self.imageObject = gfx_util.newPixel()
 	end
 	self.imageWidth = self.imageObject:getWidth()
 	self.imageHeight = self.imageObject:getHeight()
@@ -30,7 +28,7 @@ ImageView.draw = function(self)
 	local ox = (self.ox or 0) * w
 	local oy = (self.oy or 0) * h
 
-	local tf = transform(self.transform)
+	local tf = gfx_util.transform(self.transform)
 	love.graphics.replaceTransform(tf)
 
 	if self.color then

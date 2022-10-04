@@ -1,5 +1,5 @@
-local Class			= require("aqua.util.Class")
-local Observable	= require("aqua.util.Observable")
+local Class			= require("Class")
+local Observable	= require("Observable")
 
 local InputManager = Class:new()
 

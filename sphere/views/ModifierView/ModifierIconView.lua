@@ -1,5 +1,5 @@
-local Class = require("aqua.util.Class")
-local transform = require("aqua.graphics.transform")
+local Class = require("Class")
+local transform = require("gfx_util").transform
 local spherefonts		= require("sphere.assets.fonts")
 
 local ModifierIconView = Class:new()

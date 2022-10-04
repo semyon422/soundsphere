@@ -1,9 +1,7 @@
-local _transform = require("aqua.graphics.transform")
 local just = require("just")
 local spherefonts		= require("sphere.assets.fonts")
-local getCanvas		= require("aqua.graphics.canvas")
-local time_util = require("aqua.time_util")
-local newGradient = require("aqua.graphics.newGradient")
+local gfx_util		= require("gfx_util")
+local time_util = require("time_util")
 local gameloop = require("gameloop")
 
 local IconButtonImView = require("sphere.imviews.IconButtonImView")
@@ -80,7 +78,7 @@ local OsudirectList = OsudirectListView:new({
 local OsudirectScrollBar = {draw = function(self)
 	getRect(self, Layout.column3)
 	self.x = self.x + self.w - 16
-	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(self.x, self.y)
 
 	local list = OsudirectList
@@ -141,7 +139,7 @@ local ScoreList = ScoreListView:new({
 local ScoreScrollBar = {draw = function(self)
 	getRect(self, Layout.column1row1row2)
 	self.x = self.x + self.w - 16
-	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(self.x, self.y)
 
 	local list = ScoreList
@@ -166,7 +164,7 @@ local CollectionList = CollectionListView:new({
 local CollectionScrollBar = {draw = function(self)
 	getRect(self, Layout.column3)
 	self.x = self.x + self.w - 16
-	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(self.x, self.y)
 
 	local list = CollectionList
@@ -195,7 +193,7 @@ local NoteChartSetSelectFrameOff = {
 		love.graphics.setColor(1, 1, 1, 1)
 		love.graphics.origin()
 		love.graphics.setBlendMode("alpha", "premultiplied")
-		love.graphics.draw(getCanvas(1))
+		love.graphics.draw(gfx_util.getCanvas(1))
 		love.graphics.setBlendMode("alpha")
 	end,
 }
@@ -216,7 +214,7 @@ local NoteChartSetSelectFrameOn = {
 		]]
 	end,
 	draw = function(self)
-		local tf = _transform(transform)
+		local tf = gfx_util.transform(transform)
 		love.graphics.replaceTransform(tf)
 
 		getRect(self, Layout.column3)
@@ -225,7 +223,7 @@ local NoteChartSetSelectFrameOn = {
 		local x, w = self.x, self.w
 
 		love.graphics.setColor(1, 1, 1, 1)
-		love.graphics.setCanvas({getCanvas(1), stencil = true})
+		love.graphics.setCanvas({gfx_util.getCanvas(1), stencil = true})
 		love.graphics.clear()
 
 		love.graphics.setColor(1, 0.7, 0.2, 1)
@@ -235,7 +233,7 @@ local NoteChartSetSelectFrameOn = {
 		NoteChartSetSelectFrameOff.shader = love.graphics.getShader()
 		love.graphics.setShader(self.invertShader)
 
-		love.graphics.replaceTransform(_transform(transform))
+		love.graphics.replaceTransform(gfx_util.transform(transform))
 
 		local _x, _y = love.graphics.transformPoint(x, y)
 		local _xw, _yh = love.graphics.transformPoint(x + w, y + h)
@@ -250,7 +248,7 @@ local NoteChartList = NoteChartListView:new({
 	transform = transform,
 	draw = function(self)
 		getRect(self, Layout.column2row2row2)
-		love.graphics.replaceTransform(_transform(transform))
+		love.graphics.replaceTransform(gfx_util.transform(transform))
 		love.graphics.setColor(1, 1, 1, 0.8)
 		love.graphics.polygon("fill",
 			self.x, self.y + 72 * 2.2,
@@ -305,7 +303,7 @@ local Cells = {draw = function(self)
 	local w = (self.w - 44) / 4
 	local h = 50
 
-	local tf = _transform(transform):translate(self.x, self.y + self.h - 118)
+	local tf = gfx_util.transform(transform):translate(self.x, self.y + self.h - 118)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)
@@ -325,7 +323,7 @@ local Cells = {draw = function(self)
 	getRect(self, Layout.column1row2)
 
 	just.row(false)
-	tf = _transform(transform):translate(self.x + self.w / 2, self.y + 6)
+	tf = gfx_util.transform(transform):translate(self.x + self.w / 2, self.y + 6)
 	love.graphics.replaceTransform(tf)
 
 	just.row(true)
@@ -360,19 +358,19 @@ local BackgroundBanner = BackgroundView:new({
 	transform = transform,
 	load = function(self)
 		self.stencilFunction = function()
-			love.graphics.replaceTransform(_transform(transform))
+			love.graphics.replaceTransform(gfx_util.transform(transform))
 			love.graphics.setColor(1, 1, 1, 1)
 			local x, y, w, h = getRect(nil, Layout.column2row1)
 			love.graphics.rectangle("fill", x, y, w, h, 36)
 		end
-		self.gradient = newGradient(
+		self.gradient = gfx_util.newGradient(
 			"vertical",
 			{0, 0, 0, 0},
 			{0, 0, 0, 1}
 		)
 	end,
 	draw = function(self)
-		love.graphics.replaceTransform(_transform(transform))
+		love.graphics.replaceTransform(gfx_util.transform(transform))
 		love.graphics.setColor(1, 1, 1, 1)
 		local x, y, w, h = getRect(nil, Layout.column2row1)
 		getRect(self, Layout.column2row1)
@@ -380,7 +378,7 @@ local BackgroundBanner = BackgroundView:new({
 		just.clip(love.graphics.rectangle, "fill", x, y, w, h, 36)
 		self.__index.draw(self)
 		love.graphics.setColor(1, 1, 1, 1)
-		love.graphics.replaceTransform(_transform(transform))
+		love.graphics.replaceTransform(gfx_util.transform(transform))
 		love.graphics.draw(self.gradient, x, y, 0, w, h)
 		just.clip()
 	end,
@@ -391,7 +389,7 @@ local BackgroundBanner = BackgroundView:new({
 local NoteChartSetScrollBar = {draw = function(self)
 	getRect(self, Layout.column3)
 	self.x = self.x + self.w - 16
-	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(self.x, self.y)
 
 	local list = NoteChartSetList
@@ -550,7 +548,7 @@ local GroupCheckbox = {
 		self.w = self.w / 3
 		self.y = Layout.header.y
 		self.h = Layout.header.h
-		love.graphics.replaceTransform(_transform(transform):translate(self.x, self.y))
+		love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
 
 		local collapse = self.game.noteChartSetLibraryModel.collapse
 		if CheckboxImView(self, collapse, self.h, 0.4) then
@@ -611,7 +609,7 @@ local SessionTime = {draw = function(self)
 	self.x = self.x + 10
 	self.y = Layout.header.y + Layout.header.h / 2 - 17
 
-	local tf = _transform(transform):translate(self.x, self.y)
+	local tf = gfx_util.transform(transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
@@ -629,7 +627,7 @@ local NotechartsSubscreen = {
 
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-		local tf = _transform(transform):translate(self.x, self.y)
+		local tf = gfx_util.transform(transform):translate(self.x, self.y)
 		love.graphics.replaceTransform(tf)
 
 		local gameView = self.game.gameView
@@ -660,7 +658,7 @@ local NotechartsSubscreen = {
 		end
 		just.row(false)
 
-		local tf = _transform(transform):translate(Layout.column3.x, Layout.footer.y)
+		local tf = gfx_util.transform(transform):translate(Layout.column3.x, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
 
 		just.row(true)
@@ -673,7 +671,7 @@ local NotechartsSubscreen = {
 		just.row(false)
 
 		getRect(self, Layout.column2row2row1)
-		local tf = _transform(transform):translate(self.x, self.y)
+		local tf = gfx_util.transform(transform):translate(self.x, self.y)
 		love.graphics.replaceTransform(tf)
 
 		just.row(true)
@@ -694,7 +692,7 @@ local NotechartsSubscreen = {
 		just.row(false)
 
 		getRect(self, Layout.column1row1row1)
-		local tf = _transform(transform):translate(self.x, self.y)
+		local tf = gfx_util.transform(transform):translate(self.x, self.y)
 		love.graphics.replaceTransform(tf)
 
 		just.indent(36)
@@ -709,14 +707,14 @@ local CollectionsSubscreen = {
 	draw = function(self)
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-		local tf = _transform(transform):translate(Layout.column1.x, Layout.footer.y)
+		local tf = gfx_util.transform(transform):translate(Layout.column1.x, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
 
 		if TextButtonImView("calc top scores", "calc top scores", Layout.column1.w / 2, Layout.footer.h) then
 			self.game.scoreModel:asyncCalculateTopScores()
 		end
 
-		local tf = _transform(transform):translate(Layout.column3.x, Layout.footer.y)
+		local tf = gfx_util.transform(transform):translate(Layout.column3.x, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
 
 		just.row(true)
@@ -735,7 +733,7 @@ local OsudirectSubscreen = {
 	draw = function(self)
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-		local tf = _transform(transform):translate(Layout.column3.x, Layout.footer.y)
+		local tf = gfx_util.transform(transform):translate(Layout.column3.x, Layout.footer.y)
 		love.graphics.replaceTransform(tf)
 
 		just.row(true)
@@ -747,7 +745,7 @@ local OsudirectSubscreen = {
 		end
 		just.row(false)
 
-		local tf = _transform(transform):translate(Layout.column2row2row1.x, Layout.column2row2row1.y)
+		local tf = gfx_util.transform(transform):translate(Layout.column2row2row1.x, Layout.column2row2row1.y)
 		love.graphics.replaceTransform(tf)
 
 		just.indent(36)

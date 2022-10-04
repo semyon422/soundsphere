@@ -1,7 +1,7 @@
-local Observable = require("aqua.util.Observable")
-local aquathread = require("aqua.thread")
-local aquadelay = require("aqua.delay")
-local asynckey = require("aqua.asynckey")
+local Observable = require("Observable")
+local aquathread = require("thread")
+local aquadelay = require("delay")
+local asynckey = require("asynckey")
 local just = require("just")
 local LuaMidi = require("luamidi")
 

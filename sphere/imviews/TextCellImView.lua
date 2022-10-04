@@ -1,6 +1,6 @@
 local just = require("just")
 local spherefonts = require("sphere.assets.fonts")
-local baseline_print = require("aqua.graphics.baseline_print")
+local gfx_util = require("gfx_util")
 
 return function(w, h, align, name, value, isMono)
 	local limit = 2 * w
@@ -12,7 +12,7 @@ return function(w, h, align, name, value, isMono)
 	end
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 16))
-	baseline_print(name, x, 19, limit, 1, align)
+	gfx_util.printBaseline(name, x, 19, limit, 1, align)
 
 	if isMono then
 		local font = spherefonts.get("Noto Sans Mono", 24)
@@ -21,7 +21,7 @@ return function(w, h, align, name, value, isMono)
 	else
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 	end
-	baseline_print(value or 0, x, 45, limit, 1, align)
+	gfx_util.printBaseline(value or 0, x, 45, limit, 1, align)
 
 	just.next(w, h)
 end

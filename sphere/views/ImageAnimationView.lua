@@ -1,7 +1,7 @@
-local transform = require("aqua.graphics.transform")
+local transform = require("gfx_util").transform
 local FileFinder = require("sphere.filesystem.FileFinder")
-local Class = require("aqua.util.Class")
-local Animation = require("aqua.util.Animation")
+local Class = require("Class")
+local Animation = require("Animation")
 
 local ImageAnimationView = Class:new()
 

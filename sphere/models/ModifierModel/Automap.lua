@@ -1,4 +1,4 @@
-local aquamath				= require("aqua.math")
+local aquamath				= require("math_util")
 local Upscaler				= require("libchart.Upscaler")
 local NextUpscaler			= require("libchart.NextUpscaler")
 local Reductor				= require("libchart.Reductor")

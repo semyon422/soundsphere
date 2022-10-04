@@ -1,4 +1,4 @@
-local aquathread = require("aqua.thread")
+local aquathread = require("thread")
 aquathread.shared.download = {}
 
 return aquathread.async(function(url, saveDir, fallbackName)

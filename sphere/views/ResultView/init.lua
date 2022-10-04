@@ -1,5 +1,5 @@
 local ScreenView = require("sphere.views.ScreenView")
-local aquathread = require("aqua.thread")
+local aquathread = require("thread")
 local just = require("just")
 
 local ResultViewConfig = require("sphere.views.ResultView.ResultViewConfig")

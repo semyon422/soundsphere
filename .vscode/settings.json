@@ -8,17 +8,22 @@
     "Lua.runtime.path": [
         "?.lua",
         "?/init.lua",
-        "?/?.lua",
+        "3rd-deps/lua/?.lua",
         "aqua/?.lua",
         "ncdk/?.lua",
         "chartbase/?.lua",
         "libchart/?.lua",
-        "md5/?.lua",
+        "s3dc/?.lua",
+        "lua-crc32/?.lua",
+        "love-just-ui/?.lua",
+        "3rd-deps/lua/?/init.lua",
         "aqua/?/init.lua",
         "ncdk/?/init.lua",
         "chartbase/?/init.lua",
         "libchart/?/init.lua",
-        "md5/?/init.lua"
+        "s3dc/?/init.lua",
+        "lua-crc32/?/init.lua",
+        "love-just-ui/?/init.lua",
     ],
     "Lua.workspace.ignoreSubmodules": false,
     "Lua.workspace.maxPreload": 1000,
@@ -28,7 +33,6 @@
         "*/spec",
         "*/test",
         "*/tests",
-        "discordrpc/main.lua"
     ],
     "Lua.completion.autoRequire": false,
     "Lua.workspace.library": [

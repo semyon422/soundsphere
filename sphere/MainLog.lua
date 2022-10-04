@@ -1,4 +1,4 @@
-local Log = require("aqua.util.Log")
+local Log = require("Log")
 
 local MainLog = Log:new()
 

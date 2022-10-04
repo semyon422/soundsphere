@@ -1,4 +1,4 @@
-local map = require("aqua.math").map
+local map = require("math_util").map
 local SliderImView = require("sphere.imviews.SliderImView")
 
 return function(id, value, min, max, w, h)

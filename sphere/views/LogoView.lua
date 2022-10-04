@@ -1,9 +1,8 @@
 
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 local spherefonts		= require("sphere.assets.fonts")
 local logo		= require("sphere.views.logo")
-local baseline_print = require("aqua.graphics.baseline_print")
-local transform = require("aqua.graphics.transform")
+local gfx_util = require("gfx_util")
 
 local LogoView = Class:new()
 
@@ -15,14 +14,14 @@ LogoView.image = {
 }
 
 LogoView.draw = function(self)
-	local tf = transform(self.transform):translate(self.x, self.y)
+	local tf = gfx_util.transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
 	if self.text then
 		love.graphics.setFont(spherefonts.get(unpack(self.text.font)))
-		baseline_print(
+		gfx_util.printBaseline(
 			"soundsphere",
 			self.text.x,
 			self.text.baseline,

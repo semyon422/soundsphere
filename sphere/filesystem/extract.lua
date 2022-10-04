@@ -1,9 +1,9 @@
-local aquathread = require("aqua.thread")
+local aquathread = require("thread")
 
 return aquathread.async(function(archive, path, remove)
 	require("love.filesystem")
-	local physfs = require("aqua.physfs")
-	local rcopy = require("aqua.util.rcopy")
+	local physfs = require("physfs")
+	local rcopy = require("rcopy")
 	local mount = path .. "_temp"
 	if not physfs.mount(archive, mount, true) then
 		if remove then

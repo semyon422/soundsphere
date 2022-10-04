@@ -1,8 +1,7 @@
 
 local just = require("just")
-local Class = require("aqua.util.Class")
-local transform = require("aqua.graphics.transform")
-local baseline_print = require("aqua.graphics.baseline_print")
+local Class = require("Class")
+local gfx_util = require("gfx_util")
 local spherefonts = require("sphere.assets.fonts")
 
 local SearchFieldView = Class:new()
@@ -24,7 +23,7 @@ SearchFieldView.draw = function(self)
 		end
 	end
 
-	local tf = transform(self.transform):translate(self.x, self.y)
+	local tf = gfx_util.transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
 	local changed, active, hovered = just.button(self, just.is_over(self.w, self.h))
@@ -60,7 +59,7 @@ SearchFieldView.draw = function(self)
 	end
 
 	love.graphics.setFont(spherefonts.get(unpack(self.text.font)))
-	baseline_print(
+	gfx_util.printBaseline(
 		searchString,
 		self.text.x,
 		self.text.baseline,

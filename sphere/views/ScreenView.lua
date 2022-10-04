@@ -1,4 +1,4 @@
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 local SequenceView = require("sphere.views.SequenceView")
 
 local ScreenView = Class:new()

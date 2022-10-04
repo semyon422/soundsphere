@@ -1,6 +1,6 @@
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
-local RingBuffer = require("aqua.util.RingBuffer")
-local map = require("aqua.math").map
+local RingBuffer = require("RingBuffer")
+local map = require("math_util").map
 
 local BaseScoreSystem = ScoreSystem:new()
 

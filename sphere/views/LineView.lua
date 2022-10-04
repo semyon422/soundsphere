@@ -1,6 +1,6 @@
 
-local Class = require("aqua.util.Class")
-local transform = require("aqua.graphics.transform")
+local Class = require("Class")
+local transform = require("gfx_util").transform
 
 local LineView = Class:new()
 

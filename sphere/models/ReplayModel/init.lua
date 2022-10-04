@@ -1,8 +1,8 @@
-local Class			= require("aqua.util.Class")
-local Observable	= require("aqua.util.Observable")
+local Class			= require("Class")
+local Observable	= require("Observable")
 local Replay		= require("sphere.models.ReplayModel.Replay")
 local md5			= require("md5")
-local aquathread = require("aqua.thread")
+local aquathread = require("thread")
 
 local ReplayModel = Class:new()
 

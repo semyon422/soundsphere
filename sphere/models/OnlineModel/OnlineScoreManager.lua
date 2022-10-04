@@ -1,5 +1,5 @@
-local thread	= require("aqua.thread")
-local Class			= require("aqua.util.Class")
+local thread	= require("thread")
+local Class			= require("Class")
 local inspect = require("inspect")
 
 local OnlineScoreManager = Class:new()

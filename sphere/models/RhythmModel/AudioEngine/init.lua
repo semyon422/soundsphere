@@ -1,7 +1,7 @@
-local _audio		= require("aqua.audio")
-local AudioContainer	= require("aqua.audio.Container")
-local Class				= require("aqua.util.Class")
-local Observable		= require("aqua.util.Observable")
+local _audio		= require("audio")
+local AudioContainer	= require("audio.Container")
+local Class				= require("Class")
+local Observable		= require("Observable")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 
 local AudioEngine = Class:new()

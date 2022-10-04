@@ -1,5 +1,5 @@
-local physfs	= require("aqua.physfs")
-local Class		= require("aqua.util.Class")
+local physfs	= require("physfs")
+local Class		= require("Class")
 
 local MountModel = Class:new()
 

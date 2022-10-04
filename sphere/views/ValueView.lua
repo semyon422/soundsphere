@@ -1,8 +1,7 @@
 local spherefonts = require("sphere.assets.fonts")
-local transform = require("aqua.graphics.transform")
-local baseline_print = require("aqua.graphics.baseline_print")
-local inside = require("aqua.util.inside")
-local Class = require("aqua.util.Class")
+local gfx_util = require("gfx_util")
+local inside = require("table_util").inside
+local Class = require("Class")
 
 local ValueView = Class:new()
 
@@ -15,7 +14,7 @@ ValueView.load = function(self)
 end
 
 ValueView.draw = function(self)
-	local tf = transform(self.transform)
+	local tf = gfx_util.transform(self.transform)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setFont(self.fontObject)
@@ -37,7 +36,7 @@ ValueView.draw = function(self)
 		end
 	end
 
-	baseline_print(
+	gfx_util.printBaseline(
 		tostring(value),
 		self.x,
 		self.baseline,

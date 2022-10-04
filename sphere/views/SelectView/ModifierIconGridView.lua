@@ -1,6 +1,6 @@
-local Class = require("aqua.util.Class")
-local inside = require("aqua.util.inside")
-local transform = require("aqua.graphics.transform")
+local Class = require("Class")
+local inside = require("table_util").inside
+local transform = require("gfx_util").transform
 local ModifierIconView = require("sphere.views.ModifierView.ModifierIconView")
 
 local ModifierIconGridView = Class:new()

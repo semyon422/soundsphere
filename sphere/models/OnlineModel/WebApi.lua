@@ -1,5 +1,5 @@
-local Class = require("aqua.util.Class")
-local thread = require("aqua.thread")
+local Class = require("Class")
+local thread = require("thread")
 local json = require("json")
 local socket_url = require("socket.url")
 
@@ -35,7 +35,7 @@ WebApi.get = function(url, params)
 	local https = require("ssl.https")
 	local ltn12 = require("ltn12")
 
-	local http_util = require("aqua.http_util")
+	local http_util = require("http_util")
 
 	if params then
 		url = url .. "?" .. http_util.encode_query_string(params)
@@ -62,7 +62,7 @@ WebApi.post = function(url, method, params, buffers)
 	local json = require("json")
 	local https = require("ssl.https")
 	local ltn12 = require("ltn12")
-	local http_util = require("aqua.http_util")
+	local http_util = require("http_util")
 
 	local request_buffers = {}
 	if params then

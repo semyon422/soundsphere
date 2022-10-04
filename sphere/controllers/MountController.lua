@@ -1,6 +1,6 @@
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 local extractAsync = require("sphere.filesystem.extract")
-local aquathread = require("aqua.thread")
+local aquathread = require("thread")
 
 local MountController = Class:new()
 

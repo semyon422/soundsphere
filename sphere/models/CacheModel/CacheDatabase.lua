@@ -1,5 +1,5 @@
-local TimedCache = require("aqua.util.TimedCache")
-local aquathread = require("aqua.thread")
+local TimedCache = require("TimedCache")
+local aquathread = require("thread")
 local Orm = require("sphere.Orm")
 local ObjectQuery = require("sphere.ObjectQuery")
 local ffi = require("ffi")

@@ -1,4 +1,4 @@
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 
 local InputAnimationView = Class:new()
 

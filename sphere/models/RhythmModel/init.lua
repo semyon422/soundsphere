@@ -1,5 +1,5 @@
-local Class				= require("aqua.util.Class")
-local Observable		= require("aqua.util.Observable")
+local Class				= require("Class")
+local Observable		= require("Observable")
 local ScoreEngine		= require("sphere.models.RhythmModel.ScoreEngine")
 local LogicEngine		= require("sphere.models.RhythmModel.LogicEngine")
 local GraphicEngine		= require("sphere.models.RhythmModel.GraphicEngine")

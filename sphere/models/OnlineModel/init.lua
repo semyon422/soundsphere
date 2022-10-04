@@ -1,4 +1,4 @@
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 local WebApi = require("sphere.models.OnlineModel.WebApi")
 local AuthManager = require("sphere.models.OnlineModel.AuthManager")
 local OnlineScoreManager = require("sphere.models.OnlineModel.OnlineScoreManager")

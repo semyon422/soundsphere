@@ -1,4 +1,4 @@
-local Class	= require("aqua.util.Class")
+local Class	= require("Class")
 local cursor = require("sphere.cursor")
 
 local WindowManager = Class:new()

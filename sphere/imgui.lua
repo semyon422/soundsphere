@@ -9,7 +9,7 @@ local CheckboxImView = require("sphere.imviews.CheckboxImView")
 local HotkeyImView = require("sphere.imviews.HotkeyImView")
 local ContainerImView = require("sphere.imviews.ContainerImView")
 local ListImView = require("sphere.imviews.ListImView")
-local map = require("aqua.math").map
+local map = require("math_util").map
 
 local imgui = {}
 

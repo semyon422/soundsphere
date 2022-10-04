@@ -1,5 +1,5 @@
-local map			= require("aqua.math").map
-local Class			= require("aqua.util.Class")
+local map			= require("math_util").map
+local Class			= require("Class")
 
 local SliderView = Class:new()
 

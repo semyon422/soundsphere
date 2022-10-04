@@ -1,4 +1,4 @@
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 
 local ScoreSystems = {
 	require("sphere.models.RhythmModel.ScoreEngine.BaseScoreSystem"),

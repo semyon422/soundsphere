@@ -1,6 +1,6 @@
-local Class				= require("aqua.util.Class")
-local transform = require("aqua.graphics.transform")
-local map				= require("aqua.math").map
+local Class				= require("Class")
+local transform = require("gfx_util").transform
+local map				= require("math_util").map
 
 local ProgressView = Class:new()
 

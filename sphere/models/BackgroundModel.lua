@@ -1,8 +1,8 @@
-local Class = require("aqua.util.Class")
-local aquathread = require("aqua.thread")
-local newPixel = require("aqua.graphics.newPixel")
+local Class = require("Class")
+local aquathread = require("thread")
+local gfx_util = require("gfx_util")
 local tween				= require("tween")
-local aquadelay				= require("aqua.delay")
+local aquadelay				= require("delay")
 
 local BackgroundModel = Class:new()
 
@@ -13,7 +13,7 @@ BackgroundModel.load = function(self)
 	self.noteChartDataEntryId = 0
 	self.path = ""
 
-	self.emptyImage = newPixel(0.25, 0.25, 0.25, 1)
+	self.emptyImage = gfx_util.newPixel(0.25, 0.25, 0.25, 1)
 	self.images = {self.emptyImage}
 end
 

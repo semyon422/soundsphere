@@ -1,6 +1,6 @@
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 local socket_url = require("socket.url")
-local thread	= require("aqua.thread")
+local thread	= require("thread")
 
 local OnlineNotechartManager = Class:new()
 

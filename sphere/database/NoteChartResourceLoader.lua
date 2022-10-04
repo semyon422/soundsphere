@@ -1,17 +1,17 @@
-local audio			= require("aqua.audio")
+local audio			= require("audio")
 local video			= require("video")
 local Video			= require("sphere.database.Video")
-local aquathread	= require("aqua.thread")
+local aquathread	= require("thread")
 local JamLoader		= require("sphere.database.JamLoader")
 local FileFinder	= require("sphere.filesystem.FileFinder")
-local array_update = require("aqua.util.array_update")
+local table_util = require("table_util")
 
 local _newSoundDataAsync = aquathread.async(function(path, sample_gain)
 	local fileData = love.filesystem.newFileData(path)
 	if not fileData then
 		return
 	end
-	local audio = require("aqua.audio")
+	local audio = require("audio")
 	local soundData = audio.newSoundData(fileData:getFFIPointer(), fileData:getSize(), sample_gain)
 	fileData:release()
 	return soundData
@@ -149,7 +149,7 @@ NoteChartResourceLoader.loadOJM = function(self, loaded, ojmPath)
 end
 
 NoteChartResourceLoader.loadResources = function(self, loaded, newResources)
-	local new, old, all = array_update(newResources, loaded)
+	local new, old, all = table_util.array_update(newResources, loaded)
 
 	for _, path in ipairs(old) do
 		resources.loaded[path]:release()

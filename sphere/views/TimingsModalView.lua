@@ -1,5 +1,5 @@
 local just = require("just")
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 local LabelImView = require("sphere.imviews.LabelImView")
 local TextButtonImView = require("sphere.imviews.TextButtonImView")
 local TextButtonImView2 = require("sphere.imviews.TextButtonImView2")
@@ -9,11 +9,11 @@ local SliderImView = require("sphere.imviews.SliderImView")
 local CheckboxImView = require("sphere.imviews.CheckboxImView")
 local JudgementBarImView = require("sphere.imviews.JudgementBarImView")
 local ModalImView = require("sphere.imviews.ModalImView")
-local _transform = require("aqua.graphics.transform")
-local round = require("aqua.math").round
-local map = require("aqua.math").map
+local _transform = require("gfx_util").transform
+local round = require("math_util").round
+local map = require("math_util").map
 local spherefonts = require("sphere.assets.fonts")
-local table_util = require("aqua.table_util")
+local table_util = require("table_util")
 
 local _timings = require("sphere.models.RhythmModel.ScoreEngine.timings")
 

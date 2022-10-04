@@ -1,5 +1,5 @@
 local utf8 = require("utf8")
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 local erfunc = require("libchart.erfunc")
 
 local SearchModel = Class:new()

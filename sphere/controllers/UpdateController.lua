@@ -1,9 +1,9 @@
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 local UpdateModel = require("sphere.models.UpdateModel")
 local ConfigModel = require("sphere.models.ConfigModel")
 local WindowManager = require("sphere.window.WindowManager")
-local aquathread = require("aqua.thread")
-local aquadelay = require("aqua.delay")
+local aquathread = require("thread")
+local aquadelay = require("delay")
 
 local UpdateController = Class:new()
 

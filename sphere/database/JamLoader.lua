@@ -1,10 +1,10 @@
-local aquathread	= require("aqua.thread")
-local audio	= require("aqua.audio")
+local aquathread	= require("thread")
+local audio	= require("audio")
 
 local JamLoader = {}
 
 local loadOjm = aquathread.async(function(path)
-	local audio = require("aqua.audio")
+	local audio = require("audio")
 	local OJM = require("o2jam.OJM")
 
 	local fileData, err = love.filesystem.newFileData(path)

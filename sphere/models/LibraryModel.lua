@@ -1,6 +1,6 @@
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
-local TimedCache = require("aqua.util.TimedCache")
-local Class = require("aqua.util.Class")
+local TimedCache = require("TimedCache")
+local Class = require("Class")
 
 local LibraryModel = Class:new()
 

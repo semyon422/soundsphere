@@ -1,6 +1,6 @@
-local Class = require("aqua.util.Class")
-local aquadelay = require("aqua.delay")
-local aquathread = require("aqua.thread")
+local Class = require("Class")
+local aquadelay = require("delay")
+local aquathread = require("thread")
 
 local SelectModel = Class:new()
 

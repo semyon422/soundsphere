@@ -1,9 +1,9 @@
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 local osudirect = require("libchart.osudirect")
 local extractAsync = require("sphere.filesystem.extract")
 local downloadAsync = require("sphere.filesystem.download")
-local aquathread = require("aqua.thread")
-local aquadelay = require("aqua.delay")
+local aquathread = require("thread")
+local aquadelay = require("delay")
 local socket_url = require("socket.url")
 
 local OsudirectModel = Class:new()

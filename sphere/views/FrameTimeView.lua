@@ -1,5 +1,5 @@
-local Class = require("aqua.util.Class")
-local Profiler = require("aqua.util.Profiler")
+local Class = require("Class")
+local Profiler = require("Profiler")
 local spherefonts = require("sphere.assets.fonts")
 local gameloop = require("gameloop")
 local just = require("just")

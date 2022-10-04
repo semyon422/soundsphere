@@ -1,5 +1,5 @@
-local Class = require("aqua.util.Class")
-local round = require("aqua.math").round
+local Class = require("Class")
+local round = require("math_util").round
 
 local Modifier = Class:new()
 

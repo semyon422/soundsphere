@@ -1,6 +1,6 @@
 local just = require("just")
 local spherefonts = require("sphere.assets.fonts")
-local baseline_print = require("aqua.graphics.baseline_print")
+local gfx_util = require("gfx_util")
 
 return function(w, h, align, name, value)
 	local r, g, b, a = love.graphics.getColor()
@@ -14,7 +14,7 @@ return function(w, h, align, name, value)
 	end
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 16))
-	baseline_print(name, x, 19, limit, 1, align)
+	gfx_util.printBaseline(name, x, 19, limit, 1, align)
 
 	local bh = 19
 	love.graphics.setColor(r, g, b, a * 0.25)

@@ -1,4 +1,4 @@
-local Class					= require("aqua.util.Class")
+local Class					= require("Class")
 local LogicalNoteFactory	= require("sphere.models.RhythmModel.LogicEngine.LogicalNoteFactory")
 
 local NoteHandler = Class:new()

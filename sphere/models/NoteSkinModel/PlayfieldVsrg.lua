@@ -1,4 +1,4 @@
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 
 local RectangleView = require("sphere.views.RectangleView")
 local ValueView = require("sphere.views.ValueView")

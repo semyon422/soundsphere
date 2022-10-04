@@ -1,6 +1,6 @@
 
 local NoteChartFactory = require("notechart.NoteChartFactory")
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 
 local NoteChartFinder = Class:new()
 

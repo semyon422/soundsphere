@@ -1,6 +1,6 @@
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 local erfunc = require("libchart.erfunc")
-local aquathread = require("aqua.thread")
+local aquathread = require("thread")
 local ScoreDatabase = require("sphere.models.ScoreModel.ScoreDatabase")
 
 local ScoreModel = Class:new()

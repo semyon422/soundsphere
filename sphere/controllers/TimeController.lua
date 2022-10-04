@@ -1,4 +1,4 @@
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 
 local TimeController = Class:new()

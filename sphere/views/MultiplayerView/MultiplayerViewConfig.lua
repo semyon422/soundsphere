@@ -1,8 +1,7 @@
 local just = require("just")
 local just_print = require("just.print")
 local spherefonts		= require("sphere.assets.fonts")
-local _transform = require("aqua.graphics.transform")
-local newGradient = require("aqua.graphics.newGradient")
+local gfx_util = require("gfx_util")
 
 local RectangleView = require("sphere.views.RectangleView")
 local BackgroundView = require("sphere.views.BackgroundView")
@@ -27,7 +26,7 @@ local JudgementsDropdownView = require("sphere.views.ResultView.JudgementsDropdo
 local Format = require("sphere.views.Format")
 
 local inspect = require("inspect")
-local time_util = require("aqua.time_util")
+local time_util = require("time_util")
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 local transformLeft = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -46,13 +45,13 @@ local Layout = require("sphere.views.MultiplayerView.Layout")
 local ScreenMenu = {draw = function(self)
 	local multiplayerModel = self.game.multiplayerModel
 
-	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.replaceTransform(gfx_util.transform(transform))
 
 	getRect(self, Layout.column3)
 	self.y = Layout.header.y
 	self.h = Layout.header.h
 
-	love.graphics.replaceTransform(_transform(transform):translate(self.x, self.y))
+	love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	if TextButtonImView("Leave", "Leave", 120, self.h) then
@@ -86,7 +85,7 @@ local Cells = {draw = function(self)
 	local w = (self.w - 44) / 4
 	local h = 50
 
-	local tf = _transform(transform):translate(self.x, self.y + self.h - 118)
+	local tf = gfx_util.transform(transform):translate(self.x, self.y + self.h - 118)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(1, 1, 1, 1)
@@ -121,14 +120,14 @@ local Background = BackgroundView:new({
 local BackgroundBanner = BackgroundView:new({
 	transform = transform,
 	load = function(self)
-		self.gradient = newGradient(
+		self.gradient = gfx_util.newGradient(
 			"vertical",
 			{0, 0, 0, 0},
 			{0, 0, 0, 1}
 		)
 	end,
 	draw = function(self)
-		love.graphics.replaceTransform(_transform(transform))
+		love.graphics.replaceTransform(gfx_util.transform(transform))
 		love.graphics.setColor(1, 1, 1, 1)
 		local x, y, w, h = getRect(nil, Layout.column2row1)
 		getRect(self, Layout.column2row1)
@@ -136,7 +135,7 @@ local BackgroundBanner = BackgroundView:new({
 		just.clip(love.graphics.rectangle, "fill", x, y, w, h, 36)
 		self.__index.draw(self)
 		love.graphics.setColor(1, 1, 1, 1)
-		love.graphics.replaceTransform(_transform(transform))
+		love.graphics.replaceTransform(gfx_util.transform(transform))
 		love.graphics.draw(self.gradient, x, y, 0, w, h)
 		just.clip()
 	end,
@@ -148,7 +147,7 @@ local DownloadButton = {draw = function(self)
 	getRect(self, Layout.column2)
 	self.y = Layout.header.y
 	self.h = Layout.header.h
-	love.graphics.replaceTransform(_transform(transform):translate(self.x, self.y))
+	love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	local multiplayerModel = self.game.multiplayerModel
@@ -168,7 +167,7 @@ end}
 
 local Title = {draw = function(self)
 	getRect(self, Layout.column2row2)
-	love.graphics.replaceTransform(_transform(transform):translate(self.x + 22, self.y))
+	love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x + 22, self.y))
 	local noteChartItem = self.game.selectModel.noteChartItem or self.game.multiplayerModel.notechart
 	if not noteChartItem or not noteChartItem.title then
 		return
@@ -228,7 +227,7 @@ local RoomInfo = {draw = function(self)
 	getRect(self, Layout.column2)
 	self.y = Layout.header.y
 	self.h = Layout.header.h
-	love.graphics.replaceTransform(_transform(transform):translate(self.x, self.y))
+	love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
 
 	local multiplayerModel = self.game.multiplayerModel
 	local room = multiplayerModel.room or noRoom
@@ -239,7 +238,7 @@ end}
 
 local RoomSettings = {draw = function(self)
 	getRect(self, Layout.column3)
-	love.graphics.replaceTransform(_transform(transform):translate(self.x, self.y))
+	love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
 
 	local multiplayerModel = self.game.multiplayerModel
 	local room = multiplayerModel.room or noRoom
@@ -270,7 +269,7 @@ local RoomSettings = {draw = function(self)
 	just.sameline()
 	LabelImView("Ready", "Ready", 72, "left")
 
-	love.graphics.replaceTransform(_transform(transform):translate(self.x, self.y))
+	love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
 	love.graphics.translate(36, self.h - 72 * 3)
 
 	if isHost or room.isFreeNotechart then
@@ -284,7 +283,7 @@ local RoomSettings = {draw = function(self)
 		end
 	end
 
-	love.graphics.replaceTransform(_transform(transform):translate(self.x, self.y))
+	love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
 	love.graphics.translate(36, self.h - 72)
 	if isHost then
 		if not room.isPlaying and TextButtonImView("Start match", "Start match", self.w - 72, 72) then
@@ -306,7 +305,7 @@ local ChatWindow = {
 		local lineHeight = font:getHeight()
 
 		getRect(self, Layout.footer)
-		love.graphics.replaceTransform(_transform(transform):translate(self.x + _p, self.y + _p))
+		love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x + _p, self.y + _p))
 		self.w, self.h = self.w - _p * 2, self.h - _p * 2 - lineHeight
 
 		just.clip(love.graphics.rectangle, "fill", 0, 0, self.w, self.h)
@@ -341,7 +340,7 @@ local ChatWindow = {
 		end
 
 		getRect(self, Layout.footer)
-		love.graphics.replaceTransform(_transform(transform):translate(self.x + _p, self.y + self.h - _p - lineHeight))
+		love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x + _p, self.y + self.h - _p - lineHeight))
 		self.w, self.h = self.w - _p * 2, 50
 
 		love.graphics.line(0, 0, self.w, 0)

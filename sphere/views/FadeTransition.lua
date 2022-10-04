@@ -1,4 +1,4 @@
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 local tween = require("tween")
 
 local FadeTransition = Class:new()

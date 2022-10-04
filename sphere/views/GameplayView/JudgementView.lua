@@ -1,5 +1,5 @@
-local Class				= require("aqua.util.Class")
-local inside = require("aqua.util.inside")
+local Class				= require("Class")
+local inside = require("table_util").inside
 
 local JudgementView = Class:new()
 

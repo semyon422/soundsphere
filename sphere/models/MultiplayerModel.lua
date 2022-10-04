@@ -1,9 +1,9 @@
-local Class = require("aqua.util.Class")
-local aquadelay = require("aqua.delay")
-local aquathread = require("aqua.thread")
+local Class = require("Class")
+local aquadelay = require("delay")
+local aquathread = require("thread")
 local enet = require("enet")
 local buffer = require("string.buffer")
-local remote = require("aqua.util.remote")
+local remote = require("remote")
 
 remote.encode = buffer.encode
 remote.decode = buffer.decode

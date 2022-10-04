@@ -1,4 +1,4 @@
-local transform = require("aqua.graphics.transform")
+local transform = require("gfx_util").transform
 local NoteView = require("sphere.views.RhythmView.NoteView")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 

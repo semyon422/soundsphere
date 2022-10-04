@@ -1,8 +1,8 @@
 
-local transform = require("aqua.graphics.transform")
-local map				= require("aqua.math").map
-local Class				= require("aqua.util.Class")
-local inside = require("aqua.util.inside")
+local transform = require("gfx_util").transform
+local map				= require("math_util").map
+local Class				= require("Class")
+local inside = require("table_util").inside
 
 local PointGraphView = Class:new()
 

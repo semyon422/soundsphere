@@ -1,7 +1,7 @@
 local just = require("just")
 local just_print = require("just.print")
 local spherefonts		= require("sphere.assets.fonts")
-local _transform = require("aqua.graphics.transform")
+local _transform = require("gfx_util").transform
 
 local RectangleView = require("sphere.views.RectangleView")
 local BackgroundView = require("sphere.views.BackgroundView")
@@ -24,7 +24,7 @@ local Format = require("sphere.views.Format")
 local ScrollBarImView = require("sphere.imviews.ScrollBarImView")
 
 local inspect = require("inspect")
-local time_util = require("aqua.time_util")
+local time_util = require("time_util")
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 local transformLeft = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 

@@ -1,7 +1,7 @@
-local transform = require("aqua.graphics.transform")
-local inside = require("aqua.util.inside")
+local transform = require("gfx_util").transform
+local inside = require("table_util").inside
 local FileFinder = require("sphere.filesystem.FileFinder")
-local Class = require("aqua.util.Class")
+local Class = require("Class")
 
 local ImageValueView = Class:new()
 
