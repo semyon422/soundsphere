@@ -1,8 +1,8 @@
 local just = require("just")
-local just_print = require("just.print")
+local gfx_util = require("gfx_util")
 
 local function _print(text, x, y, w, h)
-	just_print(text, x, y, w, h, "center", "center")
+	gfx_util.printFrame(text, x, y, w, h, "center", "center")
 end
 
 local function print_values(w, h, ratio, name, value, right)

@@ -1,5 +1,5 @@
 local just = require("just")
-local just_print = require("just.print")
+local gfx_util = require("gfx_util")
 
 return function(id, text, w, h, align)
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
@@ -22,7 +22,7 @@ return function(id, text, w, h, align)
 		p = (h - fh) / 2
 	end
 
-	just_print(text, p, 0, w - p * 2, h, align, "center")
+	gfx_util.printFrame(text, p, 0, w - p * 2, h, align, "center")
 
 	just.next(w, h)
 

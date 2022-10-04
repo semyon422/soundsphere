@@ -1,8 +1,6 @@
 local UserInfoView = require("sphere.views.UserInfoView")
 local LogoView = require("sphere.views.LogoView")
-local _transform = require("gfx_util").transform
-local just = require("just")
-local just_layout = require("just.layout")
+local gfx_util = require("gfx_util")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -11,7 +9,7 @@ local Layout = {}
 local Frames = {draw = function()
 	local width, height = love.graphics.getDimensions()
 
-	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.replaceTransform(gfx_util.transform(transform))
 
 	local _x, _y = love.graphics.inverseTransformPoint(0, 0)
 	local _xw, _yh = love.graphics.inverseTransformPoint(width, height)
@@ -20,9 +18,9 @@ local Frames = {draw = function()
 	local x_int = 24
 	local y_int = 55
 
-	local x1, w1 = just_layout(_x, _w, {y_int, -1/3, x_int, -1/3, x_int, -1/3, y_int})
+	local x1, w1 = gfx_util.layout(_x, _w, {y_int, -1/3, x_int, -1/3, x_int, -1/3, y_int})
 
-	local y0, h0 = just_layout(0, 1080, {89, y_int, -1, y_int, 89})
+	local y0, h0 = gfx_util.layout(0, 1080, {89, y_int, -1, y_int, 89})
 
 	Layout.x1, Layout.w1 = x1, w1
 	Layout.y0, Layout.h0 = y0, h0

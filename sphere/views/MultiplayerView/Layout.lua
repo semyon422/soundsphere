@@ -1,5 +1,4 @@
-local transform = require("gfx_util").transform
-local just_layout = require("just.layout")
+local gfx_util = require("gfx_util")
 local RoundedRectangle = require("sphere.views.RoundedRectangle")
 
 local function setRect(t, x, y, w, h)
@@ -49,7 +48,7 @@ return {
 		love.graphics.setColor(1, 1, 1, 0.2)
 		love.graphics.rectangle("fill", 0, 0, width, height)
 
-		love.graphics.replaceTransform(transform(self.transform))
+		love.graphics.replaceTransform(gfx_util.transform(self.transform))
 
 		local _x, _y = love.graphics.inverseTransformPoint(0, 0)
 		local _xw, _yh = love.graphics.inverseTransformPoint(width, height)
@@ -61,10 +60,10 @@ return {
 		local x_int = 24
 		local y_int = 55
 
-		local x0, w0 = just_layout(_x, _w, {-1})
-		local x1, w1 = just_layout(_x, _w, {y_int, -1/2, x_int, -1/3, x_int, -(1 - 1/2 - 1/3), y_int})
+		local x0, w0 = gfx_util.layout(_x, _w, {-1})
+		local x1, w1 = gfx_util.layout(_x, _w, {y_int, -1/2, x_int, -1/3, x_int, -(1 - 1/2 - 1/3), y_int})
 
-		local y0, h0 = just_layout(0, 1080, {89, y_int, -1, y_int, 1080 / 3})
+		local y0, h0 = gfx_util.layout(0, 1080, {89, y_int, -1, y_int, 1080 / 3})
 
 		setRect(self.header, x0[1], y0[1], w0[1], h0[1])
 		setRect(self.footer, x0[1], y0[5], w0[1], h0[5])
@@ -74,25 +73,25 @@ return {
 		setRect(self.column2, x1[4], y0[3], w1[4], h0[3])
 		setRect(self.column3, x1[6], y0[3], w1[6], h0[3])
 
-		local y1, h1 = just_layout(self.column2.y, self.column2.h, {336, -1, 72})
-		-- local y1, h1 = just_layout(self.column2.y, self.column2.h, {336, x_int, -1})
+		local y1, h1 = gfx_util.layout(self.column2.y, self.column2.h, {336, -1, 72})
+		-- local y1, h1 = gfx_util.layout(self.column2.y, self.column2.h, {336, x_int, -1})
 
 		setRect(self.column2row1, x1[4], y1[1], w1[4], h1[1])
 		setRect(self.column2row2, x1[4], y1[2], w1[4], h1[2])
 		setRect(self.column2row3, x1[4], y1[3], w1[4], h1[3])
 
-		local y2, h2 = just_layout(self.column2row2.y, self.column2row2.h, {72, 72 * 5})
+		local y2, h2 = gfx_util.layout(self.column2row2.y, self.column2row2.h, {72, 72 * 5})
 
 		setRect(self.column2row2row1, x1[4], y2[1], w1[4], h2[1])
 		setRect(self.column2row2row2, x1[4], y2[2], w1[4], h2[2])
 
-		local y3, h3 = just_layout(self.column1.y, self.column1.h, {72 * 6, x_int, -1, x_int, 72 * 2})
+		local y3, h3 = gfx_util.layout(self.column1.y, self.column1.h, {72 * 6, x_int, -1, x_int, 72 * 2})
 
 		setRect(self.column1row1, x1[2], y3[1], w1[2], h3[1])
 		setRect(self.column1row2, x1[2], y3[3], w1[2], h3[3])
 		setRect(self.column1row3, x1[2], y3[5], w1[2], h3[5])
 
-		local y4, h4 = just_layout(self.column1row1.y, self.column1row1.h, {72, -1})
+		local y4, h4 = gfx_util.layout(self.column1row1.y, self.column1row1.h, {72, -1})
 
 		setRect(self.column1row1row1, x1[2], y4[1], w1[2], h4[1])
 		setRect(self.column1row1row2, x1[2], y4[2], w1[2], h4[2])

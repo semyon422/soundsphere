@@ -1,5 +1,5 @@
 local just = require("just")
-local just_print = require("just.print")
+local gfx_util = require("gfx_util")
 local map = require("math_util").map
 
 local isOver = function(w, h)
@@ -50,7 +50,7 @@ return function(id, value, w, h, displayValue)
 		else
 			tx = math.max(tx, x + h / 2)
 		end
-		just_print(displayValue, tx, 0, width, h, "left", "center")
+		gfx_util.printFrame(displayValue, tx, 0, width, h, "left", "center")
 	end
 
 	just.next(w, h)

@@ -1,5 +1,4 @@
 local just = require("just")
-local just_print = require("just.print")
 local spherefonts		= require("sphere.assets.fonts")
 local gfx_util = require("gfx_util")
 
@@ -233,7 +232,7 @@ local RoomInfo = {draw = function(self)
 	local room = multiplayerModel.room or noRoom
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
-	just_print(room.name, 22, 0, self.w, self.h, "left", "center")
+	gfx_util.printFrame(room.name, 22, 0, self.w, self.h, "left", "center")
 end}
 
 local RoomSettings = {draw = function(self)

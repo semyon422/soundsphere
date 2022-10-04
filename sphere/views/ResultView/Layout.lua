@@ -1,5 +1,4 @@
-local transform = require("gfx_util").transform
-local just_layout = require("just.layout")
+local gfx_util = require("gfx_util")
 local RoundedRectangle = require("sphere.views.RoundedRectangle")
 
 local function setRect(t, x, y, w, h)
@@ -50,7 +49,7 @@ return {
 		love.graphics.setColor(1, 1, 1, 0.2)
 		love.graphics.rectangle("fill", 0, 0, width, height)
 
-		love.graphics.replaceTransform(transform(self.transform))
+		love.graphics.replaceTransform(gfx_util.transform(self.transform))
 
 		local _x, _y = love.graphics.inverseTransformPoint(0, 0)
 		local _xw, _yh = love.graphics.inverseTransformPoint(width, height)
@@ -63,17 +62,17 @@ return {
 		-- local x_int = 24
 		local y_int = 55
 
-		local x0, w0 = just_layout(0, 1920, {1920})
-		local x11, w11 = just_layout(_x, _w, {y_int, -0.2, -0.8, 72, y_int})
-		local x12, w12 = just_layout(_x, _w, {y_int, -1, y_int})
-		local x1, w1 = just_layout(_x, _w, {y_int, -1/3, x_int, -1/3, x_int, -1/3, y_int})
+		local x0, w0 = gfx_util.layout(0, 1920, {1920})
+		local x11, w11 = gfx_util.layout(_x, _w, {y_int, -0.2, -0.8, 72, y_int})
+		local x12, w12 = gfx_util.layout(_x, _w, {y_int, -1, y_int})
+		local x1, w1 = gfx_util.layout(_x, _w, {y_int, -1/3, x_int, -1/3, x_int, -1/3, y_int})
 
-		local y0, h0 = just_layout(0, 1080, {y_int, -1, y_int})
-		-- local y0, h0 = just_layout(0, 1080, {89, y_int, -1, y_int, 89})
-		local y1, h1 = just_layout(y0[2], h0[2], {72 * 2, x_int, -1, x_int, 55, 72 * 3})
-		-- local y1, h1 = just_layout(y0[2], h0[2], {72 * 2, x_int, -1, x_int, 72 * 3})
-		local y2, h2 = just_layout(0, 1080, {-1/2, 72*6, -1/2})
-		local y3, h3 = just_layout(y1[3], h1[3], {72, -1})
+		local y0, h0 = gfx_util.layout(0, 1080, {y_int, -1, y_int})
+		-- local y0, h0 = gfx_util.layout(0, 1080, {89, y_int, -1, y_int, 89})
+		local y1, h1 = gfx_util.layout(y0[2], h0[2], {72 * 2, x_int, -1, x_int, 55, 72 * 3})
+		-- local y1, h1 = gfx_util.layout(y0[2], h0[2], {72 * 2, x_int, -1, x_int, 72 * 3})
+		local y2, h2 = gfx_util.layout(0, 1080, {-1/2, 72*6, -1/2})
+		local y3, h3 = gfx_util.layout(y1[3], h1[3], {72, -1})
 
 		love.graphics.setColor(0, 0, 0, 0.8)
 

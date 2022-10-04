@@ -1,5 +1,5 @@
 local just = require("just")
-local just_print = require("just.print")
+local gfx_util = require("gfx_util")
 
 local size = 0.75
 return function(id, text, w, h)
@@ -18,7 +18,7 @@ return function(id, text, w, h)
 	love.graphics.rectangle("fill", x, x, w - x * 2, h * size, r)
 
 	love.graphics.setColor(1, 1, 1, 1)
-	just_print(text, 0, 0, w, h, "center", "center")
+	gfx_util.printFrame(text, 0, 0, w, h, "center", "center")
 
 	just.next(w, h)
 

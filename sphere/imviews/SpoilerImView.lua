@@ -1,5 +1,5 @@
 local just = require("just")
-local just_print = require("just.print")
+local gfx_util = require("gfx_util")
 
 local height = 0
 local height_start = 0
@@ -46,7 +46,7 @@ return function(id, w, h, preview)
 		end
 		love.graphics.rectangle("fill", x, x, _w, _h, r)
 		love.graphics.setColor(1, 1, 1, 1)
-		just_print(preview, x, x, _w, _h, "center", "center")
+		gfx_util.printFrame(preview, x, x, _w, _h, "center", "center")
 		if open_frame_id == id then
 			just.clip(love.graphics.rectangle, "fill", 0, 0, 0, 0)
 			return true

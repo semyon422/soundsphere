@@ -1,5 +1,4 @@
 local just = require("just")
-local just_print = require("just.print")
 local spherefonts		= require("sphere.assets.fonts")
 local _transform = require("gfx_util").transform
 

@@ -1,8 +1,7 @@
 local Class = require("Class")
 local just = require("just")
-local transform = require("gfx_util").transform
 local spherefonts = require("sphere.assets.fonts")
-local just_print = require("just.print")
+local gfx_util = require("gfx_util")
 
 local DropdownView = Class:new()
 
@@ -17,7 +16,7 @@ DropdownView.getPreview = function(self) end
 DropdownView.getItemText = function(self, i) end
 
 DropdownView.draw = function(self)
-	local tf = transform(self.transform):translate(self.x, self.y)
+	local tf = gfx_util.transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
 	local w, h = self.w, self.h
@@ -69,7 +68,7 @@ DropdownView.draw = function(self)
 	love.graphics.rectangle("line", padding, padding, wm, hmf, r, r)
 
 	if not self.isOpen then
-		just_print(self:getPreview(), padding, padding, wm, hm, "center", "center")
+		gfx_util.printFrame(self:getPreview(), padding, padding, wm, hm, "center", "center")
 		just.next(w, h)
 		return
 	end
@@ -90,7 +89,7 @@ DropdownView.draw = function(self)
 		love.graphics.rectangle("fill", padding, padding, wm, hm, r, r)
 
 		love.graphics.setColor(1, 1, 1, 1)
-		just_print(self:getItemText(i), padding, padding, wm, hm, "center", "center")
+		gfx_util.printFrame(self:getItemText(i), padding, padding, wm, hm, "center", "center")
 
 		just.next(wm, hm)
 	end
