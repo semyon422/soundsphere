@@ -42,7 +42,7 @@ OnlineScoreManager.submit = thread.coro(function(self, noteChartEntry, noteChart
 		if not file.uploaded then
 			local content = async_read(noteChartEntry.path)
 			api.files[file.id]:put(nil, {
-				file = {content, filename = notechart_filename},
+				{content, name = "file", filename = notechart_filename},
 			})
 		end
 		response, code, headers = api.notecharts[notechart.id]:_patch()
@@ -55,9 +55,15 @@ OnlineScoreManager.submit = thread.coro(function(self, noteChartEntry, noteChart
 		local file = score.file
 		if not file.uploaded then
 			local content = async_read("userdata/replays/" .. replayHash)
-			api.files[file.id]:put(nil, {
-				file = {content, filename = replayHash},
-			})
+			if content then
+				response, code, headers = api.files[file.id]:put(nil, {
+					{content, name = "file", filename = replayHash},
+				})
+				if code ~= 200 then
+					print(code)
+					print(inspect(response))
+				end
+			end
 		end
 		response, code, headers = api.scores[score.id]:_patch()
 		if code ~= 200 then
