@@ -3,7 +3,7 @@ local just = require("just")
 
 local MultiplayerViewConfig = require("sphere.views.MultiplayerView.MultiplayerViewConfig")
 
-local MultiplayerView = ScreenView:new({construct = false})
+local MultiplayerView = ScreenView:new()
 
 MultiplayerView.construct = function(self)
 	ScreenView.construct(self)

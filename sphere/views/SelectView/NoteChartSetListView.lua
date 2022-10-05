@@ -2,7 +2,7 @@ local ListView = require("sphere.views.ListView")
 local just = require("just")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 
-local NoteChartSetListView = ListView:new({construct = false})
+local NoteChartSetListView = ListView:new()
 
 NoteChartSetListView.reloadItems = function(self)
 	self.stateCounter = self.game.selectModel.noteChartSetStateCounter

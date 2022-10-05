@@ -1,6 +1,6 @@
 local PlayfieldVsrg = require("sphere.models.NoteSkinModel.PlayfieldVsrg")
 
-local BasePlayfield = PlayfieldVsrg:new({construct = false})
+local BasePlayfield = PlayfieldVsrg:extend()
 
 BasePlayfield.addBaseProgressBar = function(self)
 	return self:addProgressBar({

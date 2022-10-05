@@ -2,7 +2,7 @@ local NoteView = require("sphere.views.RhythmView.NoteView")
 local ImageNoteView		= require("sphere.views.RhythmView.ImageNoteView")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 
-local VideoNoteView = NoteView:new({construct = false})
+local VideoNoteView = NoteView:new()
 
 VideoNoteView.draw = ImageNoteView.draw
 VideoNoteView.getTransformParams = ImageNoteView.getTransformParams

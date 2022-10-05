@@ -4,11 +4,6 @@ local NotePartView = Class:new()
 
 NotePartView.timeState = {}
 
-NotePartView.construct = function(self, noteView, name)
-	self.noteView = noteView
-	self.name = name
-end
-
 NotePartView.get = function(self, key, timeState)
 	return self.noteView.noteSkin:get(self.noteView, self.name, key, timeState or self.timeState)
 end

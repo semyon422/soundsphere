@@ -2,7 +2,7 @@ local transform = require("gfx_util").transform
 local NoteView = require("sphere.views.RhythmView.NoteView")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 
-local ImageNoteView = NoteView:new({construct = false})
+local ImageNoteView = NoteView:new()
 
 ImageNoteView.construct = function(self)
 	NoteView.construct(self)

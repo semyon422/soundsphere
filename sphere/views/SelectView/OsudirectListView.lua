@@ -1,7 +1,7 @@
 local ListView = require("sphere.views.ListView")
 local just = require("just")
 
-local OsudirectListView = ListView:new({construct = false})
+local OsudirectListView = ListView:new()
 
 OsudirectListView.reloadItems = function(self)
 	self.items = self.game.osudirectModel.items

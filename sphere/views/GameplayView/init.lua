@@ -2,7 +2,7 @@ local GameplayViewConfig = require("sphere.views.GameplayView.GameplayViewConfig
 local ScreenView = require("sphere.views.ScreenView")
 local just = require("just")
 
-local GameplayView = ScreenView:new({construct = false})
+local GameplayView = ScreenView:new()
 
 GameplayView.construct = function(self)
 	ScreenView.construct(self)

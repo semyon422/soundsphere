@@ -1,5 +1,4 @@
 local just = require("just")
-local Class = require("Class")
 local LabelImView = require("sphere.imviews.LabelImView")
 local TextButtonImView = require("sphere.imviews.TextButtonImView")
 local TextButtonImView2 = require("sphere.imviews.TextButtonImView2")

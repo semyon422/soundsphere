@@ -3,7 +3,7 @@ local ScreenView = require("sphere.views.ScreenView")
 
 local SelectViewConfig = require("sphere.views.SelectView.SelectViewConfig")
 
-local SelectView = ScreenView:new({construct = false})
+local SelectView = ScreenView:new()
 
 SelectView.subscreen = "notecharts"
 SelectView.searchMode = "filter"

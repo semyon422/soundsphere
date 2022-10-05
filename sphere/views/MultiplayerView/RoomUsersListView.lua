@@ -7,7 +7,7 @@ local TextButtonImView = require("sphere.imviews.TextButtonImView")
 local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
 local spherefonts		= require("sphere.assets.fonts")
 
-local RoomUsersListView = ListView:new({construct = false})
+local RoomUsersListView = ListView:new()
 
 RoomUsersListView.load = function(self)
 	self.modifierIconGrid = ModifierIconGridView:new()

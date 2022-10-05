@@ -2,7 +2,7 @@ local ListView = require("sphere.views.ListView")
 local just = require("just")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 
-local CollectionListView = ListView:new({construct = false})
+local CollectionListView = ListView:new()
 
 CollectionListView.reloadItems = function(self)
 	self.items = self.game.collectionModel.items

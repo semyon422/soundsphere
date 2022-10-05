@@ -2,7 +2,7 @@ local ListView = require("sphere.views.ListView")
 local just = require("just")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 
-local AvailableModifierListView = ListView:new({construct = false})
+local AvailableModifierListView = ListView:new()
 
 AvailableModifierListView.reloadItems = function(self)
 	self.items = self.game.modifierModel.modifiers

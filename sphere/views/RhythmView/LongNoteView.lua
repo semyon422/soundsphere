@@ -1,7 +1,7 @@
 local NoteView = require("sphere.views.RhythmView.NoteView")
 local ShortNoteView = require("sphere.views.RhythmView.ShortNoteView")
 
-local LongNoteView = NoteView:new({construct = false})
+local LongNoteView = NoteView:new()
 
 LongNoteView.construct = function(self)
 	NoteView.construct(self)

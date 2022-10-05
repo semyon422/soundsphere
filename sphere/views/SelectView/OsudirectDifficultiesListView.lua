@@ -1,6 +1,6 @@
 local ListView = require("sphere.views.ListView")
 
-local OsudirectDifficultiesListView = ListView:new({construct = false})
+local OsudirectDifficultiesListView = ListView:new()
 
 OsudirectDifficultiesListView.reloadItems = function(self)
 	self.items = self.game.osudirectModel:getDifficulties()

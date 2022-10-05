@@ -4,7 +4,7 @@ local just = require("just")
 
 local ResultViewConfig = require("sphere.views.ResultView.ResultViewConfig")
 
-local ResultView = ScreenView:new({construct = false})
+local ResultView = ScreenView:new()
 
 ResultView.construct = function(self)
 	ScreenView.construct(self)

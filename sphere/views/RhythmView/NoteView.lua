@@ -11,7 +11,10 @@ NoteView.construct = function(self)
 end
 
 NoteView.newNotePartView = function(self, part)
-	return NotePartView:new({}, self, part)
+	return NotePartView:new({
+		noteView = self,
+		name = part,
+	})
 end
 
 NoteView.getDraw = function(self, quad, ...)

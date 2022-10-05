@@ -5,7 +5,7 @@ local SwitchView = require("sphere.views.SwitchView")
 local SliderView = require("sphere.views.SliderView")
 local StepperView = require("sphere.views.StepperView")
 
-local ModifierListView = ListView:new({construct = false})
+local ModifierListView = ListView:new()
 
 ModifierListView.reloadItems = function(self)
 	self.items = self.game.modifierModel.config

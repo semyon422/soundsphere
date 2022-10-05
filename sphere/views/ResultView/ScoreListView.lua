@@ -4,7 +4,7 @@ local TextCellImView = require("sphere.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
 local time_util = require("time_util")
 
-local ScoreListView = ListView:new({construct = false})
+local ScoreListView = ListView:new()
 
 ScoreListView.reloadItems = function(self)
 	self.stateCounter = self.game.selectModel.scoreStateCounter
