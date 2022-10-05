@@ -48,8 +48,12 @@ elseif jit.os == "Linux" then
 end
 
 local utf8validate = require("utf8validate")
+local inspect = require("inspect")
 local errhand = love.errhand
 function love.errhand(msg)
+	if type(msg) ~= "string" then
+		msg = inspect(msg)
+	end
 	return errhand(utf8validate(msg))
 end
 
