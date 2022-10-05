@@ -1,7 +1,7 @@
 local Class = require("Class")
 local Profiler = require("Profiler")
 local spherefonts = require("sphere.assets.fonts")
-local gameloop = require("gameloop")
+local loop = require("loop")
 local just = require("just")
 local TextButtonImView = require("sphere.imviews.TextButtonImView")
 
@@ -87,15 +87,15 @@ FrameTimeView.draw = function(self)
 	love.graphics.line(0.5, y, 0.5, y - love.timer.getDelta() * 1000 * self.scale)
 
 	love.graphics.setColor(colors.blue)
-	love.graphics.line(0.5, y, 0.5, y - gameloop.timings.event * 1000 * self.scale)
+	love.graphics.line(0.5, y, 0.5, y - loop.timings.event * 1000 * self.scale)
 
-	y = y - gameloop.timings.event * 1000 * self.scale
+	y = y - loop.timings.event * 1000 * self.scale
 	love.graphics.setColor(colors.gray, 1)
-	love.graphics.line(0.5, y, 0.5, y - gameloop.timings.update * 1000 * self.scale)
+	love.graphics.line(0.5, y, 0.5, y - loop.timings.update * 1000 * self.scale)
 
-	y = y - gameloop.timings.update * 1000 * self.scale
+	y = y - loop.timings.update * 1000 * self.scale
 	love.graphics.setColor(colors.yellow)
-	love.graphics.line(0.5, y, 0.5, y - gameloop.timings.draw * 1000 * self.scale)
+	love.graphics.line(0.5, y, 0.5, y - loop.timings.draw * 1000 * self.scale)
 
 	love.graphics.setCanvas()
 

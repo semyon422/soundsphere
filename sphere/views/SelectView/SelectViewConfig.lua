@@ -2,7 +2,7 @@ local just = require("just")
 local spherefonts		= require("sphere.assets.fonts")
 local gfx_util		= require("gfx_util")
 local time_util = require("time_util")
-local gameloop = require("gameloop")
+local loop = require("loop")
 
 local IconButtonImView = require("sphere.imviews.IconButtonImView")
 local TextButtonImView = require("sphere.imviews.TextButtonImView")
@@ -613,7 +613,7 @@ local SessionTime = {draw = function(self)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
-	just.text(time_util.format(gameloop.time - gameloop.startTime))
+	just.text(time_util.format(loop.time - loop.startTime))
 end}
 
 local NotechartsSubscreen = {

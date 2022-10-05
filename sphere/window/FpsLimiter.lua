@@ -1,14 +1,14 @@
-local gameloop = require("gameloop")
+local loop = require("loop")
 local Class = require("Class")
 
 local FpsLimiter = Class:new()
 
 FpsLimiter.update = function(self)
 	local settings = self.game.configModel.configs.settings
-	gameloop.fpslimit = settings.graphics.fps
-	gameloop.asynckey = settings.graphics.asynckey
-	gameloop.dwmflush = settings.graphics.dwmflush
-	gameloop.imguiShowDemoWindow = settings.miscellaneous.imguiShowDemoWindow
+	loop.fpslimit = settings.graphics.fps
+	loop.asynckey = settings.graphics.asynckey
+	loop.dwmflush = settings.graphics.dwmflush
+	loop.imguiShowDemoWindow = settings.miscellaneous.imguiShowDemoWindow
 end
 
 return FpsLimiter

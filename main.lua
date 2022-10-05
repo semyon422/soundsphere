@@ -105,8 +105,8 @@ thread.coro(function()
 
 	game:load()
 
-	local gameloop = require("gameloop")
-	gameloop:init()
-	defaultLoop = gameloop.run()
-	gameloop:add(game)
+	local loop = require("loop")
+	loop:init()
+	defaultLoop = loop.run()
+	loop:add(game)
 end)()

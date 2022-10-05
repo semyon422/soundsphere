@@ -5,27 +5,27 @@ local asynckey = require("asynckey")
 local just = require("just")
 local LuaMidi = require("luamidi")
 
-local gameloop = Observable:new()
+local loop = Observable:new()
 
-gameloop.fpslimit = 240
-gameloop.tpslimit = 240
-gameloop.time = 0
-gameloop.dt = 0
-gameloop.eventTime = 0
-gameloop.startTime = 0
-gameloop.stats = {}
-gameloop.asynckey = false
-gameloop.dwmflush = false
-gameloop.timings = {
+loop.fpslimit = 240
+loop.tpslimit = 240
+loop.time = 0
+loop.dt = 0
+loop.eventTime = 0
+loop.startTime = 0
+loop.stats = {}
+loop.asynckey = false
+loop.dwmflush = false
+loop.timings = {
 	event = 0,
 	update = 0,
 	draw = 0,
 }
 
-gameloop.midistate = {}
-gameloop.keystate = {}
-gameloop.gamepadstate = {}
-gameloop.joystickstate = {}
+loop.midistate = {}
+loop.keystate = {}
+loop.gamepadstate = {}
+loop.joystickstate = {}
 
 local dwmapi
 if love.system.getOS() == "Windows" then
@@ -40,45 +40,45 @@ local function getinportcount()
 end
 
 local framestarted = {name = "framestarted"}
-gameloop.run = function()
+loop.run = function()
 	love.math.setRandomSeed(os.time())
 	math.randomseed(os.time())
 	love.timer.step()
 
 	local fpsLimitTime = love.timer.getTime()
-	gameloop.time = fpsLimitTime
-	gameloop.startTime = fpsLimitTime
-	gameloop.dt = 0
+	loop.time = fpsLimitTime
+	loop.startTime = fpsLimitTime
+	loop.dt = 0
 
 	hasMidi = LuaMidi.getinportcount() > 0
 
 	return function()
-		if gameloop.asynckey and asynckey.start then
+		if loop.asynckey and asynckey.start then
 			asynckey.start()
 		end
 
-		gameloop.dt = love.timer.step()
-		gameloop.time = love.timer.getTime()
+		loop.dt = love.timer.step()
+		loop.time = love.timer.getTime()
 
-		local timingsEvent = gameloop.time
+		local timingsEvent = loop.time
 
 		love.event.pump()
 
-		framestarted.time = gameloop.time
-		framestarted.dt = gameloop.dt
-		gameloop:send(framestarted)
+		framestarted.time = loop.time
+		framestarted.dt = loop.dt
+		loop:send(framestarted)
 
-		local asynckeyWorking = gameloop.asynckey and asynckey.events
+		local asynckeyWorking = loop.asynckey and asynckey.events
 		if asynckeyWorking then
 			if love.window.hasFocus() then
 				for event in asynckey.events do
-					gameloop.eventTime = event.time
+					loop.eventTime = event.time
 					if event.state then
 						love.keypressed(event.key, event.key)
-						gameloop.keystate[event.key] = true
+						loop.keystate[event.key] = true
 					else
 						love.keyreleased(event.key, event.key)
-						gameloop.keystate[event.key] = nil
+						loop.keystate[event.key] = nil
 					end
 				end
 			else
@@ -86,27 +86,27 @@ gameloop.run = function()
 			end
 		end
 
-		gameloop.eventTime = gameloop.time - gameloop.dt / 2
+		loop.eventTime = loop.time - loop.dt / 2
 		for name, a, b, c, d, e, f in love.event.poll() do
 			if name == "quit" then
 				if not love.quit or not love.quit() then
-					gameloop.quit()
+					loop.quit()
 					return a or 0
 				end
 			end
 			if not asynckeyWorking or name ~= "keypressed" and name ~= "keyreleased" then
 				if name == "keypressed" then
-					gameloop.keystate[b] = true
+					loop.keystate[b] = true
 				elseif name == "keyreleased" then
-					gameloop.keystate[b] = nil
+					loop.keystate[b] = nil
 				elseif name == "gamepadpressed" then
-					gameloop.gamepadstate[b] = true
+					loop.gamepadstate[b] = true
 				elseif name == "gamepadreleased" then
-					gameloop.gamepadstate[b] = nil
+					loop.gamepadstate[b] = nil
 				elseif name == "joystickpressed" then
-					gameloop.joystickstate[b] = true
+					loop.joystickstate[b] = true
 				elseif name == "joystickreleased" then
-					gameloop.joystickstate[b] = nil
+					loop.joystickstate[b] = nil
 				end
 				love.handlers[name](a, b, c, d, e, f)
 			end
@@ -118,24 +118,24 @@ gameloop.run = function()
 			while a do
 				if a == 144 and c ~= 0 then
 					love.midipressed(b, c, d)
-					gameloop.midistate[b] = true
+					loop.midistate[b] = true
 				elseif a == 128 or c == 0 then
 					love.midireleased(b, c, d)
-					gameloop.midistate[b] = nil
+					loop.midistate[b] = nil
 				end
 				a, b, c, d = LuaMidi.getMessage(i)
 			end
 		end
 
 		local timingsUpdate = love.timer.getTime()
-		gameloop.timings.event = timingsUpdate - timingsEvent
+		loop.timings.event = timingsUpdate - timingsEvent
 
 		thread.update()
 		delay.update()
-		love.update(gameloop.dt)
+		love.update(loop.dt)
 
 		local timingsDraw = love.timer.getTime()
-		gameloop.timings.update = timingsDraw - timingsUpdate
+		loop.timings.update = timingsDraw - timingsUpdate
 
 		local frameEndTime
 		if love.graphics and love.graphics.isActive() then
@@ -144,23 +144,23 @@ gameloop.run = function()
 			love.draw()
 			just._end()
 			love.graphics.origin()
-			love.graphics.getStats(gameloop.stats)
+			love.graphics.getStats(loop.stats)
 			love.graphics.present() -- all new events are read when present is called
-			if dwmapi and gameloop.dwmflush then
+			if dwmapi and loop.dwmflush then
 				dwmapi.DwmFlush()
 			end
 			frameEndTime = love.timer.getTime()
 		end
 
 		local timingsSleep = love.timer.getTime()
-		gameloop.timings.draw = timingsSleep - timingsDraw
+		loop.timings.draw = timingsSleep - timingsDraw
 
-		fpsLimitTime = math.max(fpsLimitTime + 1 / gameloop.fpslimit, frameEndTime)
+		fpsLimitTime = math.max(fpsLimitTime + 1 / loop.fpslimit, frameEndTime)
 		love.timer.sleep(fpsLimitTime - frameEndTime)
 	end
 end
 
-gameloop.callbacks = {
+loop.callbacks = {
 	"update",
 	"draw",
 	"textinput",
@@ -186,25 +186,25 @@ gameloop.callbacks = {
 
 -- all events are from [time - dt, time]
 local clampEventTime = function(time)
-	return math.min(math.max(time, gameloop.time - gameloop.dt), gameloop.time)
+	return math.min(math.max(time, loop.time - loop.dt), loop.time)
 end
 
-gameloop.init = function()
+loop.init = function()
 	local e = {}
-	for _, name in pairs(gameloop.callbacks) do
+	for _, name in pairs(loop.callbacks) do
 		love[name] = function(...)
 			local icb = just.callbacks[name]
 			if icb and icb(...) then return end
 			e[1], e[2], e[3], e[4], e[5], e[6] = ...
 			e.name = name
-			e.time = clampEventTime(gameloop.eventTime)
-			return gameloop:send(e)
+			e.time = clampEventTime(loop.eventTime)
+			return loop:send(e)
 		end
 	end
 end
 
-gameloop.quit = function()
+loop.quit = function()
 	LuaMidi.gc()
 end
 
-return gameloop
+return loop

@@ -1,10 +1,10 @@
-local gameloop = require("gameloop")
+local loop = require("loop")
 local just = require("just")
 
-local midistate = gameloop.midistate
-local keystate = gameloop.keystate
-local gamepadstate = gameloop.gamepadstate
-local joystickstate = gameloop.joystickstate
+local midistate = loop.midistate
+local keystate = loop.keystate
+local gamepadstate = loop.gamepadstate
+local joystickstate = loop.joystickstate
 
 local allstates = {
 	midi = midistate,
