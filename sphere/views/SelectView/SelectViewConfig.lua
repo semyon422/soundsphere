@@ -623,7 +623,8 @@ local NotechartsSubscreen = {
 		self.x = Layout.column1.x
 		self.w = Layout.column1.w
 
-		local w = Layout.column1.w / 2.5
+		local h = self.h
+		local w = h * 1.5
 
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
@@ -632,28 +633,28 @@ local NotechartsSubscreen = {
 
 		local gameView = self.game.gameView
 		just.row(true)
-		if IconButtonImView("settings", "settings", self.h, 0.5) then
+		if IconButtonImView("settings", "settings", h, 0.5) then
 			gameView:setModal(require("sphere.views.SettingsView"))
 		end
-		if IconButtonImView("mounts", "folder_open", self.h, 0.5) then
+		if IconButtonImView("mounts", "folder_open", h, 0.5) then
 			gameView:setModal(require("sphere.views.MountsView"))
 		end
-		if TextButtonImView("modifiers", "modifiers", w, self.h) then
+		if TextButtonImView("modifiers", "mods", w, h) then
 			gameView:setModal(require("sphere.views.ModifierView"))
 		end
-		if TextButtonImView("noteskins", "noteskins", w, self.h) then
+		if TextButtonImView("noteskins", "skins", w, h) then
 			self.game.selectController:resetModifiedNoteChart()
 			if self.game.noteChartModel.noteChart then
 				gameView:setModal(require("sphere.views.NoteSkinView"))
 			end
 		end
-		if TextButtonImView("input", "input", w, self.h) then
+		if TextButtonImView("input", "input", w, h) then
 			self.game.selectController:resetModifiedNoteChart()
 			if self.game.noteChartModel.noteChart then
 				gameView:setModal(require("sphere.views.InputView"))
 			end
 		end
-		if TextButtonImView("multi", "multi", self.h, self.h) then
+		if TextButtonImView("multi", "multi", w, h) then
 			gameView:setModal(require("sphere.views.LobbyView"))
 		end
 		just.row(false)
@@ -674,19 +675,21 @@ local NotechartsSubscreen = {
 		local tf = gfx_util.transform(transform):translate(self.x, self.y)
 		love.graphics.replaceTransform(tf)
 
+		h = self.h
+
 		just.row(true)
 		just.indent(36)
-		if IconButtonImView("open directory", "folder_open", self.h, 0.5) then
+		if IconButtonImView("open directory", "folder_open", h, 0.5) then
 			self.game.selectController:openDirectory()
 		end
-		if IconButtonImView("update cache", "refresh", self.h, 0.5) then
+		if IconButtonImView("update cache", "refresh", h, 0.5) then
 			self.game.selectController:updateCache(true)
 		end
-		just.offset(self.w - self.h * 2 - 36)
-		if IconButtonImView("result", "info_outline", self.h, 0.5) then
+		just.offset(self.w - h * 2 - 36)
+		if IconButtonImView("result", "info_outline", h, 0.5) then
 			self.screenView:result()
 		end
-		if IconButtonImView("play", "keyboard_arrow_right", self.h, 0.5) then
+		if IconButtonImView("play", "keyboard_arrow_right", h, 0.5) then
 			self.screenView:play()
 		end
 		just.row(false)
