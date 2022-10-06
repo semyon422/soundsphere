@@ -6,10 +6,7 @@ local spherefonts = require("sphere.assets.fonts")
 
 local CacheView = Class:new()
 
-CacheView.draw = function(self)
-	local tf = gfx_util.transform(self.transform):translate(self.x, self.y)
-	love.graphics.replaceTransform(tf)
-
+CacheView.draw = function(self, w, h)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	local cacheModel = self.game.cacheModel
@@ -27,11 +24,11 @@ CacheView.draw = function(self)
 		text = "update"
 	end
 
-	local changed, active, hovered = just.button(self, just.is_over(self.w, self.h))
+	local changed, active, hovered = just.button(self, just.is_over(w, h))
 	if hovered then
 		local alpha = active and 0.2 or 0.1
 		love.graphics.setColor(1, 1, 1, alpha)
-		love.graphics.rectangle("fill", 0, 0, self.w, self.h)
+		love.graphics.rectangle("fill", 0, 0, w, h)
 	end
 	love.graphics.setColor(1, 1, 1, 1)
 

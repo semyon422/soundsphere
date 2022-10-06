@@ -4,6 +4,8 @@ local TextCellImView = require("sphere.imviews.TextCellImView")
 
 local NoteChartSetListView = ListView:new()
 
+NoteChartSetListView.rows = 11
+
 NoteChartSetListView.reloadItems = function(self)
 	self.stateCounter = self.game.selectModel.noteChartSetStateCounter
 	self.items = self.game.noteChartSetLibraryModel.items
@@ -17,8 +19,8 @@ NoteChartSetListView.scroll = function(self, count)
 	self.game.selectModel:scrollNoteChartSet(count)
 end
 
-NoteChartSetListView.draw = function(self)
-	ListView.draw(self)
+NoteChartSetListView.draw = function(self, ...)
+	ListView.draw(self, ...)
 
 	local kp = just.keypressed
 	if kp("left") then self:scroll(-1)

@@ -1,6 +1,6 @@
 local just = require("just")
 local spherefonts		= require("sphere.assets.fonts")
-local _transform = require("gfx_util").transform
+local gfx_util = require("gfx_util")
 
 local RectangleView = require("sphere.views.RectangleView")
 local BackgroundView = require("sphere.views.BackgroundView")
@@ -44,6 +44,16 @@ local function getRect(out, r)
 	out.y = r.y
 	out.w = r.w
 	out.h = r.h
+end
+
+local function move(layout)
+	local x, y, w, h = getRect(nil, layout)
+
+	local tf = gfx_util.transform(transform)
+	tf:translate(x, y)
+	love.graphics.replaceTransform(tf)
+
+	return w, h
 end
 
 local Layout = require("sphere.views.ResultView.Layout")
@@ -222,25 +232,26 @@ local HpGraph = PointGraphView:new({
 local ScoreList = ScoreListView:new({
 	transform = transform,
 	draw = function(self)
-		getRect(self, Layout.column3row2)
-		love.graphics.replaceTransform(_transform(transform))
+		local w, h = move(Layout.column3row2)
+
+		ScoreListView.game = self.game
+		ScoreListView:draw(w, h)
+
 		love.graphics.setColor(1, 1, 1, 0.8)
-		local h = self.h / self.rows
-		local c = math.floor(self.rows / 2)
+		h = h / ScoreListView.rows
+		local c = math.floor(ScoreListView.rows / 2)
 		love.graphics.polygon("fill",
-			self.x, self.y + h * (c + 0.2) + (72 - h) / 2,
-			self.x + h / 2 * 0.6, self.y + h * (c + 0.5) + (72 - h) / 2,
-			self.x, self.y + h * (c + 0.8) + (72 - h) / 2
+			0, h * (c + 0.2) + (72 - h) / 2,
+			h / 2 * 0.6, h * (c + 0.5) + (72 - h) / 2,
+			0, h * (c + 0.8) + (72 - h) / 2
 		)
-		self.__index.draw(self)
 	end,
-	rows = 5,
 })
 
 local ScoreScrollBar = {draw = function(self)
 	getRect(self, Layout.column3row2)
 	self.x = self.x + self.w - 16
-	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(self.x, self.y)
 
 	local list = ScoreList
@@ -256,7 +267,7 @@ local Title = {draw = function(self)
 	local noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry
 
 	getRect(self, Layout.title_middle)
-	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(self.x + 22, self.y)
 
 	love.graphics.setColor(1, 1, 1, 1)
@@ -282,7 +293,7 @@ local Judgements = {draw = function(self)
 	local padding = 24
 
 	getRect(self, Layout.column1row2)
-	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(self.x + padding, self.y + padding)
 
 	local w = self.w - padding * 2
@@ -317,7 +328,7 @@ local Judgements = {draw = function(self)
 		JudgementBarImView(w, lineHeight, notPerfect / count, "not perfect", notPerfect)
 	end
 
-	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(self.x + padding, self.y - padding + self.h - lineHeight)
 
 	JudgementBarImView(w, lineHeight, miss / count, "miss", miss)
@@ -359,7 +370,7 @@ local JudgementsAccuracy = {
 		local size = 1 / 3
 		self.x = self.x + self.w * 1 / 3
 		self.w = self.w * size
-		love.graphics.replaceTransform(_transform(transform):translate(self.x, self.y))
+		love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
 
 		love.graphics.setColor(1, 1, 1, 1)
 		love.graphics.setFont(spherefonts.get("Noto Sans Mono", 32))
@@ -408,7 +419,7 @@ local NotechartInfo = {draw = function(self)
 	local inputMode = show and scoreEngine.inputMode or scoreItem.inputMode
 
 	getRect(self, Layout.title_left)
-	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.replaceTransform(gfx_util.transform(transform))
 	self.x = self.x + 22
 	love.graphics.translate(self.x, self.y + 15)
 
@@ -430,7 +441,7 @@ local NotechartInfo = {draw = function(self)
 	)
 
 	getRect(self, Layout.title_sub)
-	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(self.x, self.y + 8)
 
 	local font = spherefonts.get("Noto Sans Mono", 36)
@@ -464,7 +475,7 @@ local NotechartInfo = {draw = function(self)
 	end
 
 	getRect(self, Layout.middle)
-	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(self.x, self.y)
 
 	local score = not show and scoreItem.score or
@@ -507,7 +518,7 @@ local NotechartInfo = {draw = function(self)
 
 	local w = self.w - 42 * 2
 
-	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(self.x + 42, self.y + 5)
 
 	local a, b = 6, 28
@@ -605,7 +616,7 @@ local NotechartInfo = {draw = function(self)
 	just.text(textDifficulty, w, true)
 
 	getRect(self, Layout.graphs_sup_left)
-	love.graphics.replaceTransform(_transform(transform))
+	love.graphics.replaceTransform(gfx_util.transform(transform))
 	self.x = self.x + 22
 	love.graphics.translate(self.x, self.y)
 
@@ -659,7 +670,7 @@ local ModifierIconGrid = ModifierIconGridView:new({
 
 local BottomScreenMenu = {draw = function(self)
 	getRect(self, Layout.title_right)
-	local tf = _transform(transform):translate(self.x, self.y)
+	local tf = gfx_util.transform(transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
 	love.graphics.translate(0, 72 / 2)
@@ -674,7 +685,7 @@ local BottomScreenMenu = {draw = function(self)
 	local scoreEntry = scoreEngine.scoreEntry
 
 	getRect(self, Layout.graphs_sup_right)
-	local tf = _transform(transform):translate(self.x + 55, self.y)
+	local tf = gfx_util.transform(transform):translate(self.x + 55, self.y)
 	love.graphics.replaceTransform(tf)
 	just.row(true)
 	if TextButtonImView("retry", "retry", 72 * 1.5, self.h) then

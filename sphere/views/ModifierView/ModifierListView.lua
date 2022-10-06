@@ -7,6 +7,8 @@ local StepperView = require("sphere.views.StepperView")
 
 local ModifierListView = ListView:new()
 
+ModifierListView.rows = 11
+
 ModifierListView.reloadItems = function(self)
 	self.items = self.game.modifierModel.config
 end

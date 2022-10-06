@@ -6,6 +6,8 @@ local time_util = require("time_util")
 
 local ScoreListView = ListView:new()
 
+ScoreListView.rows = 5
+
 ScoreListView.reloadItems = function(self)
 	self.stateCounter = self.game.selectModel.scoreStateCounter
 	self.items = self.game.scoreLibraryModel.items

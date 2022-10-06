@@ -1,7 +1,10 @@
 local ListView = require("sphere.views.ListView")
+local TextCellImView = require("sphere.imviews.TextCellImView")
 local just = require("just")
 
 local OsudirectListView = ListView:new()
+
+OsudirectListView.rows = 11
 
 OsudirectListView.reloadItems = function(self)
 	self.items = self.game.osudirectModel.items
@@ -16,19 +19,28 @@ OsudirectListView.scroll = function(self, count)
 	self.game.osudirectModel:setBeatmap(self.items[self.targetItemIndex])
 end
 
-OsudirectListView.draw = function(self)
-	ListView.draw(self)
+OsudirectListView.draw = function(self, ...)
+	ListView.draw(self, ...)
+
+	if not just.keyboard_over() then
+		return
+	end
 
 	local kp = just.keypressed
-	if just.keyboard_over() then
-		if kp("up") or kp("left") then self:scroll(-1)
-		elseif kp("down") or kp("right") then self:scroll(1)
-		elseif kp("pageup") then self:scroll(-10)
-		elseif kp("pagedown") then self:scroll(10)
-		elseif kp("home") then self:scroll(-math.huge)
-		elseif kp("end") then self:scroll(math.huge)
-		end
+	if kp("up") or kp("left") then self:scroll(-1)
+	elseif kp("down") or kp("right") then self:scroll(1)
+	elseif kp("pageup") then self:scroll(-10)
+	elseif kp("pagedown") then self:scroll(10)
+	elseif kp("home") then self:scroll(-math.huge)
+	elseif kp("end") then self:scroll(math.huge)
 	end
+end
+
+OsudirectListView.drawItem = function(self, i, w, h)
+	local item = self.items[i]
+
+	just.indent(44)
+	TextCellImView(math.huge, h, "left", item.artist, item.title)
 end
 
 return OsudirectListView

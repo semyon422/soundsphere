@@ -39,6 +39,16 @@ local function getRect(out, r)
 	out.h = r.h
 end
 
+local function move(layout)
+	local x, y, w, h = getRect(nil, layout)
+
+	local tf = gfx_util.transform(transform)
+	tf:translate(x, y)
+	love.graphics.replaceTransform(tf)
+
+	return w, h
+end
+
 local Layout = require("sphere.views.MultiplayerView.Layout")
 
 local ScreenMenu = {draw = function(self)
@@ -209,14 +219,14 @@ local UserInfo = UserInfoView:new({
 	end,
 })
 
-local RoomUsersList = RoomUsersListView:new({
-	transform = transform,
+local RoomUsersList = {
 	draw = function(self)
-		getRect(self, Layout.column1)
-		self.__index.draw(self)
+		local w, h = move(Layout.column1)
+
+		RoomUsersListView.game = self.game
+		RoomUsersListView:draw(w, h)
 	end,
-	rows = 9,
-})
+}
 
 local noRoom = {
 	name = "No room"
@@ -251,13 +261,13 @@ local RoomSettings = {draw = function(self)
 			multiplayerModel:setFreeNotechart(not room.isFreeNotechart)
 		end
 		just.sameline()
-		LabelImView("Free chart", "Free chart", 72, "left")
+		LabelImView("Free chart", "Free chart", 72)
 
 		if CheckboxImView("Free mods", room.isFreeModifiers, 72, 0.5) then
 			multiplayerModel:setFreeModifiers(not room.isFreeModifiers)
 		end
 		just.sameline()
-		LabelImView("Free mods", "Free mods", 72, "left")
+		LabelImView("Free mods", "Free mods", 72)
 
 		just.emptyline(36)
 	end
@@ -266,7 +276,7 @@ local RoomSettings = {draw = function(self)
 		multiplayerModel:switchReady()
 	end
 	just.sameline()
-	LabelImView("Ready", "Ready", 72, "left")
+	LabelImView("Ready", "Ready", 72)
 
 	love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
 	love.graphics.translate(36, self.h - 72 * 3)

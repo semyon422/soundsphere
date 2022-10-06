@@ -5,6 +5,8 @@ local Format = require("sphere.views.Format")
 
 local NoteChartListView = ListView:new()
 
+NoteChartListView.rows = 5
+
 NoteChartListView.reloadItems = function(self)
 	self.stateCounter = self.game.selectModel.noteChartStateCounter
 	self.items = self.game.noteChartLibraryModel.items
@@ -18,8 +20,8 @@ NoteChartListView.scroll = function(self, count)
 	self.game.selectModel:scrollNoteChart(count)
 end
 
-NoteChartListView.draw = function(self)
-	ListView.draw(self)
+NoteChartListView.draw = function(self, ...)
+	ListView.draw(self, ...)
 
 	if just.keypressed("up") then self:scroll(-1)
 	elseif just.keypressed("down") then self:scroll(1)

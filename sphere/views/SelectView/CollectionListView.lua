@@ -4,6 +4,8 @@ local TextCellImView = require("sphere.imviews.TextCellImView")
 
 local CollectionListView = ListView:new()
 
+CollectionListView.rows = 11
+
 CollectionListView.reloadItems = function(self)
 	self.items = self.game.collectionModel.items
     self.selectedCollection = self.game.selectModel.collectionItem
@@ -17,8 +19,8 @@ CollectionListView.scroll = function(self, count)
 	self.game.selectModel:scrollCollection(count)
 end
 
-CollectionListView.draw = function(self)
-	ListView.draw(self)
+CollectionListView.draw = function(self, ...)
+	ListView.draw(self, ...)
 
 	local kp = just.keypressed
 	if kp("up") or kp("left") then self:scroll(-1)

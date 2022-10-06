@@ -45,227 +45,213 @@ local function getRect(out, r)
 	out.h = r.h
 end
 
+local function move(layout)
+	local x, y, w, h = getRect(nil, layout)
+
+	local tf = gfx_util.transform(transform)
+	tf:translate(x, y)
+	love.graphics.replaceTransform(tf)
+
+	return w, h
+end
+
 local Layout = require("sphere.views.SelectView.Layout")
 
-local Cache = CacheView:new({
-	subscreen = "collections",
-	transform = transform,
-	draw = function(self)
-		getRect(self, Layout.column2row2row1)
-		self.x = self.x + self.h / 2
-		self.w = self.w - self.h
-		self.__index.draw(self)
-	end,
-})
-
-local OsudirectList = OsudirectListView:new({
-	id = "OsudirectListView",
-	subscreen = "osudirect",
-	transform = transform,
-	draw = function(self)
-		getRect(self, Layout.column3)
-		self.__index.draw(self)
-	end,
-	drawItem = function(self, i, w, h)
-		local item = self.items[i]
-
-		just.indent(44)
-		TextCellImView(math.huge, h, "left", item.artist, item.title)
-	end,
-	rows = 11,
-})
-
-local OsudirectScrollBar = {draw = function(self)
-	getRect(self, Layout.column3)
-	self.x = self.x + self.w - 16
-	love.graphics.replaceTransform(gfx_util.transform(transform))
-	love.graphics.translate(self.x, self.y)
-
-	local list = OsudirectList
-	local count = #list.items - 1
-	local pos = (list.visualItemIndex - 1) / count
-	local newScroll = ScrollBarImView("osudirect_sb", pos, 16, self.h, count / list.rows)
-	if newScroll then
-		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
-	end
-end, subscreen = "osudirect"}
-
-local OsudirectDifficultiesList = OsudirectDifficultiesListView:new({
-	subscreen = "osudirect",
-	transform = transform,
-	draw = function(self)
-		getRect(self, Layout.column2row2row2)
-		self.__index.draw(self)
-	end,
-	drawItem = function(self, i, w, h)
-		local item = self.items[i]
-
-		just.indent(22)
-		TextCellImView(math.huge, h, "left", item.beatmap.creator, item.name)
-	end,
-	rows = 5,
-})
-
-local OsudirectProcessingList = OsudirectProcessingListView:new({
-	subscreen = "osudirect",
-	transform = transform,
-	draw = function(self)
-		getRect(self, Layout.column1)
-		self.__index.draw(self)
-	end,
-	drawItem = function(self, i, w, h)
-		local item = self.items[i]
-
-		just.row(true)
-		just.indent(44)
-		TextCellImView(w - 88, h, "right", item.status, "")
-		just.indent(88 - w)
-		TextCellImView(math.huge, h, "left", item.artist, item.title)
-		just.row(false)
-	end,
-	rows = 11,
-})
-
-local ScoreList = ScoreListView:new({
-	subscreen = "notecharts",
-	transform = transform,
-	draw = function(self)
-		getRect(self, Layout.column1row1row2)
-		self.__index.draw(self)
-	end,
-	rows = 5,
-})
-
-local ScoreScrollBar = {draw = function(self)
-	getRect(self, Layout.column1row1row2)
-	self.x = self.x + self.w - 16
-	love.graphics.replaceTransform(gfx_util.transform(transform))
-	love.graphics.translate(self.x, self.y)
-
-	local list = ScoreList
-	local count = #list.items - 1
-	local pos = (list.visualItemIndex - 1) / count
-	local newScroll = ScrollBarImView("score_sb", pos, 16, self.h, count / list.rows)
-	if newScroll then
-		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
-	end
-end, subscreen = "notecharts"}
-
-local CollectionList = CollectionListView:new({
-	subscreen = "collections",
-	transform = transform,
-	draw = function(self)
-		getRect(self, Layout.column3)
-		self.__index.draw(self)
-	end,
-	rows = 11,
-})
-
-local CollectionScrollBar = {draw = function(self)
-	getRect(self, Layout.column3)
-	self.x = self.x + self.w - 16
-	love.graphics.replaceTransform(gfx_util.transform(transform))
-	love.graphics.translate(self.x, self.y)
-
-	local list = CollectionList
-	local count = #list.items - 1
-	local pos = (list.visualItemIndex - 1) / count
-	local newScroll = ScrollBarImView("collection_sb", pos, 16, self.h, count / list.rows)
-	if newScroll then
-		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
-	end
-end, subscreen = "collections"}
-
-local NoteChartSetList = NoteChartSetListView:new({
-	subscreen = "notecharts",
-	transform = transform,
-	draw = function(self)
-		getRect(self, Layout.column3)
-		self.__index.draw(self)
-	end,
-	rows = 11,
-})
-
-local NoteChartSetSelectFrameOff = {
-	draw = function(self)
-		love.graphics.setShader(self.shader)
+local invertShader, baseShader, inFrame
+local SelectFrame = function()
+	if inFrame then
+		love.graphics.setShader(baseShader)
 		love.graphics.setCanvas()
 		love.graphics.setColor(1, 1, 1, 1)
 		love.graphics.origin()
 		love.graphics.setBlendMode("alpha", "premultiplied")
 		love.graphics.draw(gfx_util.getCanvas(1))
 		love.graphics.setBlendMode("alpha")
-	end,
-}
+		inFrame = false
+		return
+	end
+	inFrame = true
 
-local NoteChartSetSelectFrameOn = {
-	load = function(self)
-		self.invertShader = self.invertShader or love.graphics.newShader[[
-			extern vec4 rect;
-			vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-				vec4 pixel = Texel(texture, texture_coords);
-				if (screen_coords.x > rect.x && screen_coords.x < rect.x + rect.z && screen_coords.y > rect.y && screen_coords.y < rect.y + rect.w) {
-					pixel.r = 1 - pixel.r;
-					pixel.g = 1 - pixel.g;
-					pixel.b = 1 - pixel.b;
-				}
-				return pixel;
+	invertShader = invertShader or love.graphics.newShader[[
+		extern vec4 rect;
+		vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
+			vec4 pixel = Texel(texture, texture_coords);
+			if (screen_coords.x > rect.x && screen_coords.x < rect.x + rect.z && screen_coords.y > rect.y && screen_coords.y < rect.y + rect.w) {
+				pixel.r = 1 - pixel.r;
+				pixel.g = 1 - pixel.g;
+				pixel.b = 1 - pixel.b;
 			}
-		]]
-	end,
+			return pixel;
+		}
+	]]
+
+	local tf = gfx_util.transform(transform)
+	love.graphics.replaceTransform(tf)
+
+	local x, y, w, h = getRect(nil, Layout.column3)
+	h = h / 11
+	y = y + 5 * h
+
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.setCanvas({gfx_util.getCanvas(1), stencil = true})
+	love.graphics.clear()
+
+	love.graphics.setColor(1, 0.7, 0.2, 1)
+	love.graphics.rectangle("fill", x, y, w, h, h / 2)
+	love.graphics.setColor(1, 1, 1, 1)
+
+	baseShader = love.graphics.getShader()
+	love.graphics.setShader(invertShader)
+
+	local _x, _y = love.graphics.transformPoint(x, y)
+	local _xw, _yh = love.graphics.transformPoint(x + w, y + h)
+	local _w, _h = _xw - _x, _yh - _y
+
+	invertShader:send("rect", {_x, _y, _w, _h})
+end
+
+local Cache = {
+	subscreen = "collections",
 	draw = function(self)
-		local tf = gfx_util.transform(transform)
-		love.graphics.replaceTransform(tf)
+		local w, h = move(Layout.column2row2row1)
 
-		getRect(self, Layout.column3)
-		local h = self.h / NoteChartSetList.rows
-		local y = self.y + 5 * h
-		local x, w = self.x, self.w
+		love.graphics.translate(h / 2, 0)
 
-		love.graphics.setColor(1, 1, 1, 1)
-		love.graphics.setCanvas({gfx_util.getCanvas(1), stencil = true})
-		love.graphics.clear()
-
-		love.graphics.setColor(1, 0.7, 0.2, 1)
-		love.graphics.rectangle("fill", x, y, w, h, h / 2)
-		love.graphics.setColor(1, 1, 1, 1)
-
-		NoteChartSetSelectFrameOff.shader = love.graphics.getShader()
-		love.graphics.setShader(self.invertShader)
-
-		love.graphics.replaceTransform(gfx_util.transform(transform))
-
-		local _x, _y = love.graphics.transformPoint(x, y)
-		local _xw, _yh = love.graphics.transformPoint(x + w, y + h)
-		local _w, _h = _xw - _x, _yh - _y
-
-		self.invertShader:send("rect", {_x, _y, _w, _h})
+		CacheView.game = self.game
+		CacheView:draw(w - h, h)
 	end,
 }
 
-local NoteChartList = NoteChartListView:new({
-	subscreen = "notecharts",
-	transform = transform,
+local OsudirectList = {
+	subscreen = "osudirect",
 	draw = function(self)
-		getRect(self, Layout.column2row2row2)
-		love.graphics.replaceTransform(gfx_util.transform(transform))
+		SelectFrame()
+		local w, h = move(Layout.column3)
+
+		OsudirectListView.game = self.game
+		OsudirectListView:draw(w, h)
+		SelectFrame()
+
+		local w, h = move(Layout.column3)
+		love.graphics.translate(w - 16, 0)
+
+		local list = OsudirectListView
+		local count = #list.items - 1
+		local pos = (list.visualItemIndex - 1) / count
+		local newScroll = ScrollBarImView("osudirect_sb", pos, 16, h, count / list.rows)
+		if newScroll then
+			list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
+		end
+	end,
+}
+
+local OsudirectDifficultiesList = {
+	subscreen = "osudirect",
+	draw = function(self)
+		local w, h = move(Layout.column2row2row2)
+		OsudirectDifficultiesListView.game = self.game
+		OsudirectDifficultiesListView:draw(w, h)
+	end,
+}
+
+local OsudirectProcessingList = {
+	subscreen = "osudirect",
+	draw = function(self)
+		local w, h = move(Layout.column1)
+		OsudirectProcessingListView.game = self.game
+		OsudirectProcessingListView:draw(w, h)
+	end,
+}
+
+local ScoreList = {
+	subscreen = "notecharts",
+	draw = function(self)
+		local w, h = move(Layout.column1row1row2)
+
+		ScoreListView.game = self.game
+		ScoreListView:draw(w, h)
+
+		love.graphics.translate(w - 16, 0)
+
+		local list = ScoreListView
+		local count = #list.items - 1
+		local pos = (list.visualItemIndex - 1) / count
+		local newScroll = ScrollBarImView("score_sb", pos, 16, h, count / list.rows)
+		if newScroll then
+			list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
+		end
+	end,
+}
+
+local CollectionList = {
+	subscreen = "collections",
+	draw = function(self)
+		SelectFrame()
+		local w, h = move(Layout.column3)
+
+		CollectionListView.game = self.game
+		CollectionListView:draw(w, h)
+		SelectFrame()
+
+		local w, h = move(Layout.column3)
+		love.graphics.translate(w - 16, 0)
+
+		local list = CollectionListView
+		local count = #list.items - 1
+		local pos = (list.visualItemIndex - 1) / count
+		local newScroll = ScrollBarImView("collection_sb", pos, 16, h, count / list.rows)
+		if newScroll then
+			list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
+		end
+	end,
+}
+
+local NoteChartSetList = {
+	subscreen = "notecharts",
+	draw = function(self)
+		SelectFrame()
+		local w, h = move(Layout.column3)
+
+		NoteChartSetListView.game = self.game
+		NoteChartSetListView:draw(w, h)
+		SelectFrame()
+
+		local w, h = move(Layout.column3)
+		love.graphics.translate(w - 16, 0)
+
+		local list = NoteChartSetListView
+		local count = #list.items - 1
+		local pos = (list.visualItemIndex - 1) / count
+		local newScroll = ScrollBarImView("ncs_sb", pos, 16, h, count / list.rows)
+		if newScroll then
+			list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
+		end
+	end,
+}
+
+local NoteChartList = {
+	subscreen = "notecharts",
+	draw = function(self)
+		local w, h = move(Layout.column2row2row2)
+
 		love.graphics.setColor(1, 1, 1, 0.8)
 		love.graphics.polygon("fill",
-			self.x, self.y + 72 * 2.2,
-			self.x + 36 * 0.6, self.y + 72 * 2.5,
-			self.x, self.y + 72 * 2.8
+			0, 72 * 2.2,
+			36 * 0.6, 72 * 2.5,
+			0, 72 * 2.8
 		)
-		self.__index.draw(self)
+
+		NoteChartListView.game = self.game
+		NoteChartListView:draw(w, h)
 	end,
-	rows = 5,
-})
+}
 
 local Cells = {draw = function(self)
 	if self.screenView.subscreen ~= "notecharts" then
 		return
 	end
 
-	getRect(self, Layout.column2row1)
+	local w, h = move(Layout.column2row1)
 
 	local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
 	local noteChartItem = self.game.selectModel.noteChartItem
@@ -300,11 +286,9 @@ local Cells = {draw = function(self)
 		end
 	end
 
-	local w = (self.w - 44) / 4
-	local h = 50
-
-	local tf = gfx_util.transform(transform):translate(self.x, self.y + self.h - 118)
-	love.graphics.replaceTransform(tf)
+	love.graphics.translate(0, h - 118)
+	w = (w - 44) / 4
+	h = 50
 
 	love.graphics.setColor(1, 1, 1, 1)
 
@@ -319,12 +303,12 @@ local Cells = {draw = function(self)
 	just.indent(22)
 	BarCellImView(2 * w, h, "right", "long notes", longNoteRatio)
 	TextCellImView(2 * w, h, "right", "local offset", localOffset * 1000)
-
-	getRect(self, Layout.column1row2)
-
 	just.row(false)
-	tf = gfx_util.transform(transform):translate(self.x + self.w / 2, self.y + 6)
-	love.graphics.replaceTransform(tf)
+
+	w, h = move(Layout.column1row2)
+	love.graphics.translate(w / 2, 6)
+	w = (w - 44) / 4
+	h = 50
 
 	just.row(true)
 	TextCellImView(w, h, "right", "score", ("%d"):format(score))
@@ -385,21 +369,6 @@ local BackgroundBanner = BackgroundView:new({
 	parallax = 0,
 	dim = {value = 0},
 })
-
-local NoteChartSetScrollBar = {draw = function(self)
-	getRect(self, Layout.column3)
-	self.x = self.x + self.w - 16
-	love.graphics.replaceTransform(gfx_util.transform(transform))
-	love.graphics.translate(self.x, self.y)
-
-	local list = NoteChartSetList
-	local count = #list.items - 1
-	local pos = (list.visualItemIndex - 1) / count
-	local newScroll = ScrollBarImView("ncs_sb", pos, 16, self.h, count / list.rows)
-	if newScroll then
-		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
-	end
-end, subscreen = "notecharts"}
 
 local SearchField = SearchFieldView:new({
 	subscreen = "notecharts",
@@ -557,7 +526,7 @@ local GroupCheckbox = {
 		just.sameline()
 
 		love.graphics.setFont(spherefonts.get("Noto Sans", 20))
-		LabelImView(self, "group", self.h, "left")
+		LabelImView(self, "group", self.h)
 	end,
 }
 
@@ -785,19 +754,13 @@ local SelectViewConfig = {
 	BackgroundBlurSwitch,
 	Layout,
 	BackgroundBanner,
-	NoteChartSetSelectFrameOn,
 	NoteChartSetList,
 	OsudirectList,
 	CollectionList,
-	NoteChartSetSelectFrameOff,
 	NoteChartList,
 	ScoreList,
-	ScoreScrollBar,
 	Cells,
-	NoteChartSetScrollBar,
 	Cache,
-	CollectionScrollBar,
-	OsudirectScrollBar,
 	SearchField,
 	SearchFieldLamp,
 	OsudirectSearchField,

@@ -4,6 +4,8 @@ local TextCellImView = require("sphere.imviews.TextCellImView")
 
 local AvailableModifierListView = ListView:new()
 
+AvailableModifierListView.rows = 11
+
 AvailableModifierListView.reloadItems = function(self)
 	self.items = self.game.modifierModel.modifiers
 end

@@ -53,29 +53,25 @@ local ContainerEnd = {draw = function(self)
 	just.container()
 end}
 
-local AvailableModifierList = AvailableModifierListView:new({
-	transform = transform,
-	x = 279,
-	y = 144,
-	w = 454,
-	h = 792,
-	rows = 11,
-})
+local AvailableModifierList = {draw = function(self)
+	love.graphics.replaceTransform(gfx_util.transform(transform))
+	love.graphics.translate(279, 144)
+	AvailableModifierListView.game = self.game
+	AvailableModifierListView:draw(454, 792)
+end}
 
-local ModifierList = ModifierListView:new({
-	transform = transform,
-	x = 733,
-	y = 144,
-	w = 454,
-	h = 792,
-	rows = 11,
-})
+local ModifierList = {draw = function(self)
+	love.graphics.replaceTransform(gfx_util.transform(transform))
+	love.graphics.translate(733, 144)
+	ModifierListView.game = self.game
+	ModifierListView:draw(454, 792)
+end}
 
 local AvailableModifierScrollBar = {draw = function(self)
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(279, 144)
 
-	local list = AvailableModifierList
+	local list = AvailableModifierListView
 	local count = #list.items - 1
 	local pos = (list.visualItemIndex - 1) / count
 	local newScroll = ScrollBarImView("amsb", pos, 16, 792, count / list.rows)

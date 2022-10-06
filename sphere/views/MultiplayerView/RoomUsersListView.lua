@@ -9,6 +9,8 @@ local spherefonts		= require("sphere.assets.fonts")
 
 local RoomUsersListView = ListView:new()
 
+RoomUsersListView.rows = 9
+
 RoomUsersListView.load = function(self)
 	self.modifierIconGrid = ModifierIconGridView:new()
 
