@@ -250,7 +250,7 @@ drawSection.misc = function(self)
 	local m = settings.miscellaneous
 
 	m.autoUpdate = imgui.checkbox("autoUpdate", m.autoUpdate, "auto update")
-	m.imguiShowDemoWindow = imgui.checkbox("imguiShowDemoWindow", m.imguiShowDemoWindow, "show imgui demo window")
+	m.muteOnUnfocus = imgui.checkbox("muteOnUnfocus", m.muteOnUnfocus, "mute on unfocus")
 	m.showNonManiaCharts = imgui.checkbox("showNonManiaCharts", m.showNonManiaCharts, "show non-mania charts")
 	m.showFPS = imgui.checkbox("showFPS", m.showFPS, "show FPS")
 

@@ -135,7 +135,7 @@ return {
 	},
 	miscellaneous = {
 		autoUpdate = true,
-		imguiShowDemoWindow = false,
+		muteOnUnfocus = false,
 		showNonManiaCharts = false,
 		showFPS = false
 	}

@@ -5,7 +5,6 @@ local thread = require("thread")
 local PreviewModel = Class:new()
 
 PreviewModel.load = function(self)
-	self.config = self.game.configModel.configs.select
 	self.noteChartDataEntryId = 0
 	self.audioPath = ""
 	self.previewTime = 0
@@ -21,17 +20,22 @@ PreviewModel.setAudioPathPreview = function(self, audioPath, previewTime)
 	end
 end
 
-PreviewModel.update = function(self, dt)
+PreviewModel.update = function(self)
+	local settings = self.game.configModel.configs.settings
+	local muteOnUnfocus = settings.miscellaneous.muteOnUnfocus
+
 	local audio = self.audio
 	if not audio then
 		return
 	end
-	if not audio:isPlaying() then
+	if not audio:isPlaying() and love.window.hasFocus() then
 		audio:seek(self.position or 0)
 		audio:play()
+	elseif audio:isPlaying() and not love.window.hasFocus() and  muteOnUnfocus then
+		audio:pause()
 	end
 
-	local volumeConfig = self.game.configModel.configs.settings.audio.volume
+	local volumeConfig = settings.audio.volume
 	local volume = volumeConfig.master * volumeConfig.music
 	if self.volume ~= volume then
 		audio:setVolume(volume)
