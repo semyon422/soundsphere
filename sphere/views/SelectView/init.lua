@@ -22,15 +22,13 @@ SelectView.draw = function(self)
 	just.container("select container", true)
 
 	local kp = just.keypressed
-	if kp("f1") then
-		self.gameView:setModal(require("sphere.views.ModifierView"))
+	if kp("f1") then self.gameView:setModal(require("sphere.views.ModifierView"))
 	elseif kp("f2") then self.game.selectModel:scrollRandom()
 	elseif kp("lctrl") then self:changeSearchMode()
 	elseif kp("lshift") then self.game.selectModel:changeCollapse()
 	end
 	if self.subscreen == "notecharts" then
 		if kp("return") then self:play()
-		elseif kp("lalt") then self:result()
 		elseif kp("tab") then self:switchToCollections()
 		end
 	elseif self.subscreen == "collections" then
