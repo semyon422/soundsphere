@@ -2,11 +2,6 @@ local just = require("just")
 local gfx_util = require("gfx_util")
 local map = require("math_util").map
 
-local isOver = function(w, h)
-	local x, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-	return 0 <= x and x <= w and 0 <= y and y <= h
-end
-
 local getPosition = function(w, h)
 	local x, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local value = map(x, h / 2, w - h / 2, 0, 1)
@@ -14,7 +9,7 @@ local getPosition = function(w, h)
 end
 
 return function(id, value, w, h, displayValue)
-	local over = isOver(w, h)
+	local over = just.is_over(w, h)
 	local pos = getPosition(w, h)
 
 	local new_value, active, hovered = just.slider(id, over, pos, value)

@@ -86,7 +86,7 @@ drawSection.gameplay = function(self)
 	local g = settings.gameplay
 	local i = settings.input
 
-	g.speed = round(imgui.slider("speed", g.speed, 0, 3, ("%0.2f"):format(g.speed), "play speed"), 0.05)
+	g.speed = imgui.slider1("speed", g.speed, "%0.2f", 0, 3, 0.05, "play speed")
 
 	if TextButtonImView2("open timings", "timings", _w / 2, _h) then
 		self.game.gameView:setModal(TimingsModalView)
@@ -96,10 +96,9 @@ drawSection.gameplay = function(self)
 
 	g.actionOnFail = imgui.combo("actionOnFail", g.actionOnFail, {"none", "pause", "quit"}, nil, "action on fail")
 	g.scaleSpeed = imgui.checkbox("scaleSpeed", g.scaleSpeed, "scale scroll speed with rate")
-	g.longNoteShortening = round(imgui.slider(
-		"shortening", g.longNoteShortening, -0.3, 0,
-		("%dms"):format(g.longNoteShortening * 1000),
-		"visual LN shortening"), 0.01)
+	g.longNoteShortening = imgui.slider1(
+		"shortening", g.longNoteShortening * 1000, "%dms", -300, 0, 10,
+		"visual LN shortening") / 1000
 	g.offset.input = imgui.intButtonsMs("input offset", g.offset.input, "input offset")
 	g.offset.visual = imgui.intButtonsMs("visual offset", g.offset.visual, "visual offset")
 	g.offsetScale.input = imgui.checkbox("offsetScale.input", g.offsetScale.input, "input offset * time rate")
@@ -127,11 +126,11 @@ drawSection.gameplay = function(self)
 	imgui.separator()
 	just.indent(10)
 	just.text("time to")
-	g.time.prepare = round(imgui.slider("time.prepare", g.time.prepare, 0.5, 3, ("%0.1f"):format(g.time.prepare), "prepare"), 0.1)
-	g.time.playPause = round(imgui.slider("time.playPause", g.time.playPause, 0, 2, ("%0.1f"):format(g.time.playPause), "play-pause"), 0.1)
-	g.time.pausePlay = round(imgui.slider("time.pausePlay", g.time.pausePlay, 0, 2, ("%0.1f"):format(g.time.pausePlay), "pause-play"), 0.1)
-	g.time.playRetry = round(imgui.slider("time.playRetry", g.time.playRetry, 0, 2, ("%0.1f"):format(g.time.playRetry), "play-retry"), 0.1)
-	g.time.pauseRetry = round(imgui.slider("time.pauseRetry", g.time.pauseRetry, 0, 2, ("%0.1f"):format(g.time.pauseRetry), "pause-retry"), 0.1)
+	g.time.prepare = imgui.slider1("time.prepare", g.time.prepare, "%0.1f", 0.5, 3, 0.1, "prepare")
+	g.time.playPause = imgui.slider1("time.playPause", g.time.playPause, "%0.1f", 0, 2, 0.1, "play-pause")
+	g.time.pausePlay = imgui.slider1("time.pausePlay", g.time.pausePlay, "%0.1f", 0, 2, 0.1, "pause-play")
+	g.time.playRetry = imgui.slider1("time.playRetry", g.time.playRetry, "%0.1f", 0, 2, 0.1, "play-retry")
+	g.time.pauseRetry = imgui.slider1("time.pauseRetry", g.time.pauseRetry, "%0.1f", 0, 2, 0.1, "pause-retry")
 
 	imgui.separator()
 	just.indent(10)
@@ -188,17 +187,17 @@ drawSection.graphics = function(self)
 	just.indent(10)
 	just.text("dim")
 	local dim = g.dim
-	dim.select = round(imgui.slider("dim.select", dim.select, 0, 1, ("%0.2f"):format(dim.select), "select"), 0.01)
-	dim.gameplay = round(imgui.slider("dim.gameplay", dim.gameplay, 0, 1, ("%0.2f"):format(dim.gameplay), "gameplay"), 0.01)
-	dim.result = round(imgui.slider("dim.result", dim.result, 0, 1, ("%0.2f"):format(dim.result), "result"), 0.01)
+	dim.select = imgui.slider1("dim.select", dim.select, "%0.2f", 0, 1, 0.01, "select")
+	dim.gameplay = imgui.slider1("dim.gameplay", dim.gameplay, "%0.2f", 0, 1, 0.01, "gameplay")
+	dim.result = imgui.slider1("dim.result", dim.result, "%0.2f", 0, 1, 0.01, "result")
 
 	imgui.separator()
 	just.indent(10)
 	just.text("blur")
 	local blur = g.blur
-	blur.select = round(imgui.slider("blur.select", blur.select, 0, 20, ("%d"):format(blur.select), "select"))
-	blur.gameplay = round(imgui.slider("blur.gameplay", blur.gameplay, 0, 20, ("%d"):format(blur.gameplay), "gameplay"), 0.01)
-	blur.result = round(imgui.slider("blur.result", blur.result, 0, 20, ("%d"):format(blur.result), "result"))
+	blur.select = imgui.slider1("blur.select", blur.select, "%d", 0, 20, 1, "select")
+	blur.gameplay = imgui.slider1("blur.gameplay", blur.gameplay, "%d", 0, 20, 1, "gameplay")
+	blur.result = imgui.slider1("blur.result", blur.result, "%d", 0, 20, 1, "result")
 
 	imgui.separator()
 	just.indent(10)
@@ -221,11 +220,11 @@ drawSection.audio = function(self)
 	local a = settings.audio
 
 	local v = a.volume
-	v.master = round(imgui.slider("v.master", v.master, 0, 1, ("%0.2f"):format(v.master), "master volume"), 0.01)
-	v.music = round(imgui.slider("v.music", v.music, 0, 1, ("%0.2f"):format(v.music), "music volume"), 0.01)
-	v.effects = round(imgui.slider("v.effects", v.effects, 0, 1, ("%0.2f"):format(v.effects), "effects volume"), 0.01)
+	v.master = imgui.slider1("v.master", v.master, "%0.2f", 0, 1, 0.01, "master volume")
+	v.music = imgui.slider1("v.music", v.music, "%0.2f", 0, 1, 0.01, "music volume")
+	v.effects = imgui.slider1("v.effects", v.effects, "%0.2f", 0, 1, 0.01, "effects volume")
 
-	a.sampleGain = round(imgui.slider("sampleGain", a.sampleGain, 0, 100, ("+%0.0fdB"):format(a.sampleGain), "gain with clipping"), 1)
+	a.sampleGain = imgui.slider1("sampleGain", a.sampleGain, "+%0.0fdB", 0, 100, 1, "gain with clipping")
 
 	local mode = a.mode
 	mode.primary = imgui.combo(

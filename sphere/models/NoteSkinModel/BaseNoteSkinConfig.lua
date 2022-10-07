@@ -18,10 +18,10 @@ function config:draw(w, h)
 	local data = self.data
 
 	imgui.setSize(w, h, w / 2, 55)
-	data.hitposition = round(imgui.slider("hitposition", data.hitposition, 240, 480, data.hitposition, "Hit position"))
-	data.noteWidth = round(imgui.slider("noteWidth", data.noteWidth, 16, 128, data.noteWidth, "Note width"))
-	data.noteHeight = round(imgui.slider("noteHeight", data.noteHeight, 16, 128, data.noteHeight, "Note height"))
-	data.judgementLineHeight = round(imgui.slider("columnSize", data.judgementLineHeight, 0, 16, data.judgementLineHeight, "J. line height"))
+	data.hitposition = imgui.slider1("hitposition", data.hitposition, "%d", 240, 480, 1, "Hit position")
+	data.noteWidth = imgui.slider1("noteWidth", data.noteWidth, "%d", 16, 128, 1, "Note width")
+	data.noteHeight = imgui.slider1("noteHeight", data.noteHeight, "%d", 16, 128, 1, "Note height")
+	data.judgementLineHeight = imgui.slider1("jlh", data.judgementLineHeight, "%d", 0, 16, 1, "J. line height")
 	data.upscroll = imgui.checkbox("upscroll", data.upscroll, "Upscroll")
 	data.measureLine = imgui.checkbox("measureLine", data.measureLine, "Measure line")
 

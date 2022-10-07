@@ -9,7 +9,7 @@ local CheckboxImView = require("sphere.imviews.CheckboxImView")
 local HotkeyImView = require("sphere.imviews.HotkeyImView")
 local ContainerImView = require("sphere.imviews.ContainerImView")
 local ListImView = require("sphere.imviews.ListImView")
-local map = require("math_util").map
+local math_util = require("math_util")
 
 local imgui = {}
 
@@ -40,12 +40,30 @@ function imgui.button(id, text)
 end
 
 function imgui.slider(id, v, a, b, displayValue, label)
-	local _v = map(v, a, b, 0, 1)
+	local _v = math_util.map(v, a, b, 0, 1)
 	_v = SliderImView(id, _v, _w, _h, displayValue) or _v
 	just.sameline()
 	just.indent(8)
 	LabelImView(id .. "label", label, _h)
-	return map(_v, 0, 1, a, b)
+	return math_util.map(_v, 0, 1, a, b)
+end
+
+function imgui.slider1(id, v, format, a, b, c, label)
+	local delta = just.wheel_over(id, just.is_over(_w, _h))
+	if delta then
+		v = math.min(math.max(v + c * delta, a), b)
+	end
+
+	local _v = math_util.map(v, a, b, 0, 1)
+	_v = SliderImView(id, _v, _w, _h, format:format(v)) or _v
+	just.sameline()
+	just.indent(8)
+	LabelImView(id .. "label", label, _h)
+
+	v = math_util.map(_v, 0, 1, a, b)
+	v = math_util.round(v, c)
+
+	return v
 end
 
 function imgui.checkbox(id, v, label)

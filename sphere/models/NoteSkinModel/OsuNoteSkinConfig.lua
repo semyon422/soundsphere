@@ -19,11 +19,11 @@ function config:draw(w, h)
 	local data = self.data
 
 	imgui.setSize(w, h, w / 2, 55)
-	data.HitPosition = round(imgui.slider("HitPosition", data.HitPosition, 240, 480, data.HitPosition, "Hit Position"))
-	data.ScorePosition = round(imgui.slider("ScorePosition", data.ScorePosition, 0, 480, data.ScorePosition, "Score Position"))
-	data.ComboPosition = round(imgui.slider("ComboPosition", data.ComboPosition, 0, 480, data.ComboPosition, "Combo Position"))
-	data.OverallDifficulty = round(imgui.slider("OverallDifficulty", data.OverallDifficulty, 0, 10, data.OverallDifficulty, "Overall Difficulty"))
-	data.HitErrorPosition = round(imgui.slider("HitErrorPosition", data.HitErrorPosition, 0, 480, data.HitErrorPosition, "Hit Error Position"))
+	data.HitPosition = imgui.slider1("HitPosition", data.HitPosition, "%d", 240, 480, 1, "Hit Position")
+	data.ScorePosition = imgui.slider1("ScorePosition", data.ScorePosition, "%d", 0, 480, 1, "Score Position")
+	data.ComboPosition = imgui.slider1("ComboPosition", data.ComboPosition, "%d", 0, 480, 1, "Combo Position")
+	data.OverallDifficulty = imgui.slider1("OverallDifficulty", data.OverallDifficulty, "%d", 0, 10, 1, "Overall Difficulty")
+	data.HitErrorPosition = imgui.slider1("HitErrorPosition", data.HitErrorPosition, "%d", 0, 480, 1, "Hit Error Position")
 	data.UpsideDown = imgui.checkbox("UpsideDown", data.UpsideDown, "Upside Down")
 	data.Barline = imgui.checkbox("Barline", data.Barline, "Barline")
 
