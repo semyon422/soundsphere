@@ -235,6 +235,7 @@ local ScoreList = ScoreListView:new({
 		local w, h = move(Layout.column3row2)
 
 		ScoreListView.game = self.game
+		ScoreListView.screenView = self.screenView
 		ScoreListView:draw(w, h)
 
 		love.graphics.setColor(1, 1, 1, 0.8)
