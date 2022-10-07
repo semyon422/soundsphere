@@ -7,7 +7,7 @@ local BackgroundView = require("sphere.views.BackgroundView")
 local ValueView = require("sphere.views.ValueView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
 local UserInfoView = require("sphere.views.UserInfoView")
-local LogoView = require("sphere.views.LogoView")
+local LogoImView = require("sphere.imviews.LogoImView")
 local RoomUsersListView = require("sphere.views.MultiplayerView.RoomUsersListView")
 
 local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
@@ -198,15 +198,17 @@ local ModifierIconGrid = ModifierIconGridView:new({
 	config = "game.modifierModel.config"
 })
 
-local Logo = LogoView:new({
-	transform = transform,
-	draw = function(self)
-		getRect(self, Layout.column1)
-		self.y = 0
-		self.h = Layout.header.h
-		self.__index.draw(self)
-	end,
-})
+local Header = {draw = function(self)
+	local w, h = move(Layout.header)
+	love.graphics.translate(Layout.column1.x, 0)
+
+	just.row(true)
+	LogoImView("logo", h, 0.5)
+	if IconButtonImView("quit game", "clear", h, 0.5) then
+		love.event.quit()
+	end
+	just.row(false)
+end}
 
 local UserInfo = UserInfoView:new({
 	transform = transform,
@@ -384,7 +386,7 @@ return {
 	ModifierIconGrid,
 	ScreenMenu,
 	Title,
-	Logo,
+	Header,
 	UserInfo,
 	RoomInfo,
 	RoomSettings,
