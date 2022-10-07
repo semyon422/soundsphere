@@ -1,6 +1,5 @@
 local JustConfig = require("sphere.JustConfig")
 local imgui = require("sphere.imgui")
-local round = require("math_util").round
 
 local config = JustConfig:new()
 

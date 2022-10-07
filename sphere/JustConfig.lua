@@ -27,6 +27,16 @@ function JustConfig:drawAfter()
 	end
 	just.sameline()
 	data.autosave = imgui.checkbox("autosave", data.autosave, "Autosave")
+
+	if imgui.button("Open config file", "Open") then
+		love.system.openURL(self.path)
+	end
+	if self.skinIniPath then
+		just.sameline()
+		if imgui.button("Open skin.ini", "skin.ini") then
+			love.system.openURL(self.skinIniPath)
+		end
+	end
 end
 
 function JustConfig:close()

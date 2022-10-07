@@ -9,7 +9,7 @@ local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 
 
 local scrollY = 0
 local scrollYconfig = 0
-local w, h = 454, 522
+local w, h = 454, 600
 -- local w, h = 768, 1080 / 2
 local _w, _h = w / 2, 55
 local r = 8
@@ -32,7 +32,7 @@ return ModalImView(function(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	love.graphics.replaceTransform(_transform(transform))
-	love.graphics.translate(279, 279)
+	love.graphics.translate(270, 240)
 	-- love.graphics.translate((1920 - w) / 2, (1080 - h) / 2)
 
 	love.graphics.setColor(0, 0, 0, 0.8)
@@ -71,7 +71,7 @@ return ModalImView(function(self)
 
 	if selectedNoteSkin.config.draw then
 		love.graphics.replaceTransform(_transform(transform))
-		love.graphics.translate(733, 279)
+		love.graphics.translate(733, 240)
 		love.graphics.setColor(0, 0, 0, 0.8)
 		love.graphics.rectangle("fill", 0, 0, w, h, r)
 		love.graphics.setColor(1, 1, 1, 1)

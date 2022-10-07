@@ -66,6 +66,7 @@ OsuNoteSkin.load = function(self)
 		self.path:sub(1, -9) .. keysCount .. "key.config.lua"
 	)
 	self.config = config
+	config.skinIniPath = self.path
 	if not exists then
 		config:set("HitPosition", mania.HitPosition)
 		config:set("ScorePosition", mania.ScorePosition)
