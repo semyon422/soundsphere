@@ -475,21 +475,18 @@ local ScoreSourceDropdown = ScoreSourceDropdownView:new({
 local GroupCheckbox = {
 	subscreen = "notecharts",
 	draw = function(self)
-		getRect(self, Layout.column2)
-		self.x = self.x + self.w * 1 / 3
-		self.w = self.w / 3
-		self.y = Layout.header.y
-		self.h = Layout.header.h
-		love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
+		local w, h = move(Layout.column2, Layout.header)
+		love.graphics.translate(w / 3, 0)
+		w = w / 3
 
 		local collapse = self.game.noteChartSetLibraryModel.collapse
-		if CheckboxImView(self, collapse, self.h, 0.4) then
+		if CheckboxImView(self, collapse, h, 0.4) then
 			self.game.selectModel:changeCollapse()
 		end
 		just.sameline()
 
 		love.graphics.setFont(spherefonts.get("Noto Sans", 20))
-		LabelImView(self, "group", self.h)
+		LabelImView(self, "group", h)
 	end,
 }
 
@@ -537,31 +534,20 @@ local UpdateStatus = ValueView:new({
 })
 
 local SessionTime = {draw = function(self)
-	getRect(self, Layout.column2)
-	self.x = self.x + 10
-	self.y = Layout.header.y + Layout.header.h / 2 - 17
-
-	local tf = gfx_util.transform(transform):translate(self.x, self.y)
-	love.graphics.replaceTransform(tf)
+	local w, h = move(Layout.column2, Layout.header)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
-	just.text(time_util.format(loop.time - loop.startTime))
+	just.indent(10)
+	LabelImView("SessionTime", time_util.format(loop.time - loop.startTime), h)
 end}
 
 local NotechartsSubscreen = {
 	subscreen = "notecharts",
 	draw = function(self)
-		getRect(self, Layout.footer)
-		self.x = Layout.column1.x
-		self.w = Layout.column1.w
-
-		local h = self.h
+		local _, h = move(Layout.column1, Layout.footer)
 		local w = h * 1.5
 
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
-
-		local tf = gfx_util.transform(transform):translate(self.x, self.y)
-		love.graphics.replaceTransform(tf)
 
 		local gameView = self.game.gameView
 		just.row(true)
@@ -591,23 +577,18 @@ local NotechartsSubscreen = {
 		end
 		just.row(false)
 
-		local tf = gfx_util.transform(transform):translate(Layout.column3.x, Layout.footer.y)
-		love.graphics.replaceTransform(tf)
+		w, h = move(Layout.column3, Layout.footer)
 
 		just.row(true)
-		if TextButtonImView("collections", "collections", Layout.column3.w / 2, Layout.footer.h) then
+		if TextButtonImView("collections", "collections", w / 2, h) then
 			self.screenView:switchToCollections()
 		end
-		if TextButtonImView("direct", "direct", Layout.column3.w / 2, Layout.footer.h) then
+		if TextButtonImView("direct", "direct", w / 2, h) then
 			self.screenView:switchToOsudirect()
 		end
 		just.row(false)
 
-		getRect(self, Layout.column2row2row1)
-		local tf = gfx_util.transform(transform):translate(self.x, self.y)
-		love.graphics.replaceTransform(tf)
-
-		h = self.h
+		w, h = move(Layout.column2row2row1)
 
 		just.row(true)
 		just.indent(36)
@@ -617,7 +598,7 @@ local NotechartsSubscreen = {
 		if IconButtonImView("update cache", "refresh", h, 0.5) then
 			self.game.selectController:updateCache(true)
 		end
-		just.offset(self.w - h * 2 - 36)
+		just.offset(w - h * 2 - 36)
 		if IconButtonImView("result", "info_outline", h, 0.5) then
 			self.screenView:result()
 		end
@@ -626,12 +607,10 @@ local NotechartsSubscreen = {
 		end
 		just.row(false)
 
-		getRect(self, Layout.column1row1row1)
-		local tf = gfx_util.transform(transform):translate(self.x, self.y)
-		love.graphics.replaceTransform(tf)
+		w, h = move(Layout.column1row1row1)
 
 		just.indent(36)
-		if IconButtonImView("open notechart page", "info_outline", self.h, 0.5) then
+		if IconButtonImView("open notechart page", "info_outline", h, 0.5) then
 			self.game.selectController:openWebNotechart()
 		end
 	end,
@@ -642,21 +621,19 @@ local CollectionsSubscreen = {
 	draw = function(self)
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-		local tf = gfx_util.transform(transform):translate(Layout.column1.x, Layout.footer.y)
-		love.graphics.replaceTransform(tf)
+		local w, h = move(Layout.column1, Layout.footer)
 
-		if TextButtonImView("calc top scores", "calc top scores", Layout.column1.w / 2, Layout.footer.h) then
+		if TextButtonImView("calc top scores", "calc top scores", w / 2, h) then
 			self.game.scoreModel:asyncCalculateTopScores()
 		end
 
-		local tf = gfx_util.transform(transform):translate(Layout.column3.x, Layout.footer.y)
-		love.graphics.replaceTransform(tf)
+		w, h = move(Layout.column3, Layout.footer)
 
 		just.row(true)
-		if TextButtonImView("notecharts", "notecharts", Layout.column3.w / 2, Layout.footer.h) then
+		if TextButtonImView("notecharts", "notecharts", w / 2, h) then
 			self.screenView:switchToNoteCharts()
 		end
-		if TextButtonImView("direct", "direct", Layout.column3.w / 2, Layout.footer.h) then
+		if TextButtonImView("direct", "direct", w / 2, h) then
 			self.screenView:switchToOsudirect()
 		end
 		just.row(false)
@@ -668,31 +645,28 @@ local OsudirectSubscreen = {
 	draw = function(self)
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-		local tf = gfx_util.transform(transform):translate(Layout.column3.x, Layout.footer.y)
-		love.graphics.replaceTransform(tf)
+		local w, h = move(Layout.column3, Layout.footer)
 
 		just.row(true)
-		if TextButtonImView("notecharts", "notecharts", Layout.column3.w / 2, Layout.footer.h) then
+		if TextButtonImView("notecharts", "notecharts", w / 2, h) then
 			self.screenView:switchToNoteCharts()
 		end
-		if TextButtonImView("collections", "collections", Layout.column3.w / 2, Layout.footer.h) then
+		if TextButtonImView("collections", "collections", w / 2, h) then
 			self.screenView:switchToCollections()
 		end
 		just.row(false)
 
-		local tf = gfx_util.transform(transform):translate(Layout.column2row2row1.x, Layout.column2row2row1.y)
-		love.graphics.replaceTransform(tf)
+		w, h = move(Layout.column2row2row1)
 
 		just.indent(36)
-		if TextButtonImView("download", "download", Layout.column2.w - 72, Layout.column2row2row1.h) then
+		if TextButtonImView("download", "download", w - 72, h) then
 			self.game.osudirectModel:downloadBeatmapSet(self.game.osudirectModel.beatmap)
 		end
 	end,
 }
 
 local Header = {draw = function(self)
-	local w, h = move(Layout.header)
-	love.graphics.translate(Layout.column1.x, 0)
+	local w, h = move(Layout.column1, Layout.header)
 
 	just.row(true)
 	LogoImView("logo", h, 0.5)

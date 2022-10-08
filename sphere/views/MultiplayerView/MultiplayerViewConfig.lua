@@ -39,8 +39,12 @@ local function getRect(out, r)
 	out.h = r.h
 end
 
-local function move(layout)
-	local x, y, w, h = getRect(nil, layout)
+local function move(layout_x, layout_y)
+	local _
+	local x, y, w, h = getRect(nil, layout_x)
+	if layout_y then
+		_, y, _, h = getRect(nil, layout_y)
+	end
 
 	local tf = gfx_util.transform(transform)
 	tf:translate(x, y)
@@ -56,20 +60,17 @@ local ScreenMenu = {draw = function(self)
 
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 
-	getRect(self, Layout.column3)
-	self.y = Layout.header.y
-	self.h = Layout.header.h
+	local w, h = move(Layout.column3, Layout.header)
 
-	love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-	if TextButtonImView("Leave", "Leave", 120, self.h) then
+	if TextButtonImView("Leave", "Leave", 120, h) then
 		multiplayerModel:leaveRoom()
 	end
 end}
 
 local Cells = {draw = function(self)
-	getRect(self, Layout.column2row1)
+	local w, h = move(Layout.column2row1)
 
 	local multiplayerModel = self.game.multiplayerModel
 
@@ -91,11 +92,9 @@ local Cells = {draw = function(self)
 		localOffset = noteChartItem.localOffset or 0
 	end
 
-	local w = (self.w - 44) / 4
-	local h = 50
-
-	local tf = gfx_util.transform(transform):translate(self.x, self.y + self.h - 118)
-	love.graphics.replaceTransform(tf)
+	love.graphics.translate(0, h - 118)
+	w = (w - 44) / 4
+	h = 50
 
 	love.graphics.setColor(1, 1, 1, 1)
 
@@ -144,10 +143,7 @@ local BackgroundBanner = {
 }
 
 local DownloadButton = {draw = function(self)
-	getRect(self, Layout.column2)
-	self.y = Layout.header.y
-	self.h = Layout.header.h
-	love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
+	local w, h = move(Layout.column2, Layout.header)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	local multiplayerModel = self.game.multiplayerModel
@@ -155,10 +151,10 @@ local DownloadButton = {draw = function(self)
 	if notechart.osuSetId and not multiplayerModel.noteChartItem and not multiplayerModel:isHost() then
 		local beatmap = multiplayerModel.downloadingBeatmap
 		if beatmap then
-			just.text(beatmap.status, self.w, true)
+			just.text(beatmap.status, w, true)
 		else
-			just.indent(self.w - 144)
-			if TextButtonImView("Download", "Download", 144, self.h) then
+			just.indent(w - 144)
+			if TextButtonImView("Download", "Download", 144, h) then
 				multiplayerModel:downloadNoteChart()
 			end
 		end
@@ -166,14 +162,14 @@ local DownloadButton = {draw = function(self)
 end}
 
 local Title = {draw = function(self)
-	getRect(self, Layout.column2row2)
-	love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x + 22, self.y))
+	local w, h = move(Layout.column2row2)
+	love.graphics.translate(22, 0)
 	local noteChartItem = self.game.selectModel.noteChartItem or self.game.multiplayerModel.notechart
 	if not noteChartItem or not noteChartItem.title then
 		return
 	end
-	TextCellImView(self.w, 52, "left", noteChartItem.artist, noteChartItem.title)
-	TextCellImView(self.w, 52, "left", noteChartItem.creator, noteChartItem.name)
+	TextCellImView(w, 52, "left", noteChartItem.artist, noteChartItem.title)
+	TextCellImView(w, 52, "left", noteChartItem.creator, noteChartItem.name)
 end}
 
 local ModifierIconGrid = ModifierIconGridView:new({
@@ -190,8 +186,7 @@ local ModifierIconGrid = ModifierIconGridView:new({
 })
 
 local Header = {draw = function(self)
-	local w, h = move(Layout.header)
-	love.graphics.translate(Layout.column1.x, 0)
+	local w, h = move(Layout.column1, Layout.header)
 
 	just.row(true)
 	LogoImView("logo", h, 0.5)
@@ -226,21 +221,17 @@ local noRoom = {
 }
 local noUser = {}
 local RoomInfo = {draw = function(self)
-	getRect(self, Layout.column2)
-	self.y = Layout.header.y
-	self.h = Layout.header.h
-	love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
+	local w, h = move(Layout.column2, Layout.header)
 
 	local multiplayerModel = self.game.multiplayerModel
 	local room = multiplayerModel.room or noRoom
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
-	gfx_util.printFrame(room.name, 22, 0, self.w, self.h, "left", "center")
+	gfx_util.printFrame(room.name, 22, 0, w, h, "left", "center")
 end}
 
 local RoomSettings = {draw = function(self)
-	getRect(self, Layout.column3)
-	love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
+	local w, h = move(Layout.column3)
 
 	local multiplayerModel = self.game.multiplayerModel
 	local room = multiplayerModel.room or noRoom
@@ -271,26 +262,26 @@ local RoomSettings = {draw = function(self)
 	just.sameline()
 	LabelImView("Ready", "Ready", 72)
 
-	love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
-	love.graphics.translate(36, self.h - 72 * 3)
+	w, h = move(Layout.column3)
+	love.graphics.translate(36, h - 72 * 3)
 
 	if isHost or room.isFreeNotechart then
-		if TextButtonImView("Select chart", "Select", self.w - 72, 72) then
+		if TextButtonImView("Select chart", "Select", w - 72, 72) then
 			self.screenView:changeScreen("selectView")
 		end
 	end
 	if isHost or room.isFreeModifiers then
-		if TextButtonImView("Modifiers", "Modifiers", self.w - 72, 72) then
+		if TextButtonImView("Modifiers", "Modifiers", w - 72, 72) then
 			self.game.gameView:setModal(require("sphere.views.ModifierView"))
 		end
 	end
 
-	love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
-	love.graphics.translate(36, self.h - 72)
+	w, h = move(Layout.column3)
+	love.graphics.translate(36, h - 72)
 	if isHost then
-		if not room.isPlaying and TextButtonImView("Start match", "Start match", self.w - 72, 72) then
+		if not room.isPlaying and TextButtonImView("Start match", "Start match", w - 72, 72) then
 			multiplayerModel:startMatch()
-		elseif room.isPlaying and TextButtonImView("Stop match", "Stop match", self.w - 72, 72) then
+		elseif room.isPlaying and TextButtonImView("Stop match", "Stop match", w - 72, 72) then
 			multiplayerModel:stopMatch()
 		end
 	end
@@ -306,16 +297,17 @@ local ChatWindow = {
 		love.graphics.setFont(font)
 		local lineHeight = font:getHeight()
 
-		getRect(self, Layout.footer)
-		love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x + _p, self.y + _p))
-		self.w, self.h = self.w - _p * 2, self.h - _p * 2 - lineHeight
+		local w, h = move(Layout.footer)
+		love.graphics.translate(_p, _p)
+		w = w - _p * 2
+		h = h - _p * 2 - lineHeight
 
-		just.clip(love.graphics.rectangle, "fill", 0, 0, self.w, self.h)
+		just.clip(love.graphics.rectangle, "fill", 0, 0, w, h)
 
 		local multiplayerModel = self.game.multiplayerModel
 		local roomMessages = multiplayerModel.roomMessages
 
-		local scroll = just.wheel_over(self, just.is_over(self.w, self.h))
+		local scroll = just.wheel_over(self, just.is_over(w, h))
 
 		self.scroll = self.scroll or 0
 		love.graphics.translate(0, -self.scroll)
@@ -331,7 +323,7 @@ local ChatWindow = {
 		just.clip()
 
 		local content = self.height
-		local overlap = math.max(content - self.h, 0)
+		local overlap = math.max(content - h, 0)
 		if overlap > 0 then
 			if scroll then
 				self.scroll = math.min(math.max(self.scroll - scroll * 50, 0), overlap)
@@ -341,11 +333,12 @@ local ChatWindow = {
 			end
 		end
 
-		getRect(self, Layout.footer)
-		love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x + _p, self.y + self.h - _p - lineHeight))
-		self.w, self.h = self.w - _p * 2, 50
+		w, h = move(Layout.footer)
+		love.graphics.translate(_p, h - _p - lineHeight)
+		w = w - _p * 2
+		h = 50
 
-		love.graphics.line(0, 0, self.w, 0)
+		love.graphics.line(0, 0, w, 0)
 
 		just.row(true)
 		just.text(">")

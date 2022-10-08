@@ -46,8 +46,12 @@ local function getRect(out, r)
 	out.h = r.h
 end
 
-local function move(layout)
-	local x, y, w, h = getRect(nil, layout)
+local function move(layout_x, layout_y)
+	local _
+	local x, y, w, h = getRect(nil, layout_x)
+	if layout_y then
+		_, y, _, h = getRect(nil, layout_y)
+	end
 
 	local tf = gfx_util.transform(transform)
 	tf:translate(x, y)
@@ -250,15 +254,13 @@ local ScoreList = ScoreListView:new({
 })
 
 local ScoreScrollBar = {draw = function(self)
-	getRect(self, Layout.column3row2)
-	self.x = self.x + self.w - 16
-	love.graphics.replaceTransform(gfx_util.transform(transform))
-	love.graphics.translate(self.x, self.y)
+	local w, h = move(Layout.column3row2)
+	love.graphics.translate(w - 16, 0)
 
 	local list = ScoreList
 	local count = #list.items - 1
 	local pos = (list.visualItemIndex - 1) / count
-	local newScroll = ScrollBarImView("slsb", pos, 16, self.h, count / list.rows)
+	local newScroll = ScrollBarImView("slsb", pos, 16, h, count / list.rows)
 	if newScroll then
 		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
 	end
@@ -267,14 +269,12 @@ end}
 local Title = {draw = function(self)
 	local noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry
 
-	getRect(self, Layout.title_middle)
-	love.graphics.replaceTransform(gfx_util.transform(transform))
-	love.graphics.translate(self.x + 22, self.y)
+	move(Layout.title_middle)
+	love.graphics.translate(22, 15)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 36))
 
-	love.graphics.translate(0, 15)
 	local artist_title = ("%s — %s"):format(noteChartDataEntry.artist, noteChartDataEntry.title)
 	local creator_name = ("%s — %s"):format(noteChartDataEntry.creator, noteChartDataEntry.name)
 	just.text(artist_title)
@@ -293,11 +293,10 @@ local Judgements = {draw = function(self)
 
 	local padding = 24
 
-	getRect(self, Layout.column1row2)
-	love.graphics.replaceTransform(gfx_util.transform(transform))
-	love.graphics.translate(self.x + padding, self.y + padding)
+	local w, h = move(Layout.column1row2)
+	love.graphics.translate(padding, padding)
 
-	local w = self.w - padding * 2
+	w = w - padding * 2
 
 	local counterName = self.game.configModel.configs.select.judgements
 	local counters = judgement.counters
@@ -329,8 +328,8 @@ local Judgements = {draw = function(self)
 		JudgementBarImView(w, lineHeight, notPerfect / count, "not perfect", notPerfect)
 	end
 
-	love.graphics.replaceTransform(gfx_util.transform(transform))
-	love.graphics.translate(self.x + padding, self.y - padding + self.h - lineHeight)
+	move(Layout.column1row2)
+	love.graphics.translate(padding, -padding + h - lineHeight)
 
 	JudgementBarImView(w, lineHeight, miss / count, "miss", miss)
 end}
@@ -367,15 +366,13 @@ local JudgementsAccuracy = {
 			return
 		end
 
-		getRect(self, Layout.column1row1)
-		local size = 1 / 3
-		self.x = self.x + self.w * 1 / 3
-		self.w = self.w * size
-		love.graphics.replaceTransform(gfx_util.transform(transform):translate(self.x, self.y))
+		local w, h = move(Layout.column1row1)
+		love.graphics.translate(w / 3, 0)
+		w = w / 3
 
 		love.graphics.setColor(1, 1, 1, 1)
 		love.graphics.setFont(spherefonts.get("Noto Sans Mono", 32))
-		LabelImView("j.acc", ("%3.2f%%"):format(judgements.accuracy(counter) * 100), self.h)
+		LabelImView("j.acc", ("%3.2f%%"):format(judgements.accuracy(counter) * 100), h)
 	end,
 }
 
@@ -419,31 +416,28 @@ local NotechartInfo = {draw = function(self)
 	local difficulty = show and scoreEngine.enps or scoreItem.difficulty
 	local inputMode = show and scoreEngine.inputMode or scoreItem.inputMode
 
-	getRect(self, Layout.title_left)
-	love.graphics.replaceTransform(gfx_util.transform(transform))
-	self.x = self.x + 22
-	love.graphics.translate(self.x, self.y + 15)
+	local w, h = move(Layout.title_left)
+	love.graphics.translate(22, 15)
 
-	self.w = self.w - 44
+	w = w - 44
 	local wr = 0.70
 
-	TextCellImView(self.w * (1 - wr), 55, "right", "notes", noteChartItem.noteCount)
+	TextCellImView(w * (1 - wr), 55, "right", "notes", noteChartItem.noteCount)
 	just.sameline()
-	TextCellImView(self.w * wr, 55, "right", "duration",
+	TextCellImView(w * wr, 55, "right", "duration",
 		(not show or length == baseLength) and time_util.format(baseLength) or
 		("%s→%s"):format(time_util.format(baseLength), time_util.format(length))
 	)
 
-	TextCellImView(self.w * (1 - wr), 55, "right", "level", noteChartItem.level)
+	TextCellImView(w * (1 - wr), 55, "right", "level", noteChartItem.level)
 	just.sameline()
-	TextCellImView(self.w * wr, 55, "right", "bpm",
+	TextCellImView(w * wr, 55, "right", "bpm",
 		(not show or bpm == baseBpm) and math.floor(baseBpm) or
 		("%d→%d"):format(baseBpm, bpm)
 	)
 
-	getRect(self, Layout.title_sub)
-	love.graphics.replaceTransform(gfx_util.transform(transform))
-	love.graphics.translate(self.x, self.y + 8)
+	w, h = move(Layout.title_sub)
+	love.graphics.translate(0, 8)
 
 	local font = spherefonts.get("Noto Sans Mono", 36)
 	font:setFallbacks(spherefonts.get("Noto Sans", 36))
@@ -472,12 +466,10 @@ local NotechartInfo = {draw = function(self)
 		if _h then
 			text = _h.notes .. "hp"
 		end
-		just.text(text, self.w - 72, true)
+		just.text(text, w - 72, true)
 	end
 
-	getRect(self, Layout.middle)
-	love.graphics.replaceTransform(gfx_util.transform(transform))
-	love.graphics.translate(self.x, self.y)
+	w, h = move(Layout.middle)
 
 	local score = not show and scoreItem.score or
 		erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2))) * 10000
@@ -517,10 +509,9 @@ local NotechartInfo = {draw = function(self)
 		deltaRating = Format.difficulty(deltaRating)
 	end
 
-	local w = self.w - 42 * 2
-
-	love.graphics.replaceTransform(gfx_util.transform(transform))
-	love.graphics.translate(self.x + 42, self.y + 5)
+	w, h = move(Layout.middle)
+	love.graphics.translate(42, 5)
+	w = w - 42 * 2
 
 	local a, b = 6, 28
 	-------------------------------
@@ -616,13 +607,10 @@ local NotechartInfo = {draw = function(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans Mono", 40))
 	just.text(textDifficulty, w, true)
 
-	getRect(self, Layout.graphs_sup_left)
-	love.graphics.replaceTransform(gfx_util.transform(transform))
-	self.x = self.x + 22
-	love.graphics.translate(self.x, self.y)
+	w, h = move(Layout.graphs_sup_left)
+	love.graphics.translate(22, 0)
 
-	self.w = self.w - 44
-	local w = self.w / 5
+	w = (w - 44) / 5
 
 	just.row(true)
 
@@ -670,9 +658,7 @@ local ModifierIconGrid = ModifierIconGridView:new({
 })
 
 local BottomScreenMenu = {draw = function(self)
-	getRect(self, Layout.title_right)
-	local tf = gfx_util.transform(transform):translate(self.x, self.y)
-	love.graphics.replaceTransform(tf)
+	local w, h = move(Layout.title_right)
 
 	love.graphics.translate(0, 72 / 2)
 	if IconButtonImView("back", "clear", 72, 0.618) then
@@ -685,18 +671,18 @@ local BottomScreenMenu = {draw = function(self)
 	local scoreEngine = self.game.rhythmModel.scoreEngine
 	local scoreEntry = scoreEngine.scoreEntry
 
-	getRect(self, Layout.graphs_sup_right)
-	local tf = gfx_util.transform(transform):translate(self.x + 55, self.y)
-	love.graphics.replaceTransform(tf)
+	w, h = move(Layout.graphs_sup_right)
+	love.graphics.translate(55, 0)
+
 	just.row(true)
-	if TextButtonImView("retry", "retry", 72 * 1.5, self.h) then
+	if TextButtonImView("retry", "retry", 72 * 1.5, h) then
 		self.screenView:play("retry")
 	end
-	if TextButtonImView("replay", "watch replay", 72 * 3, self.h) then
+	if TextButtonImView("replay", "watch replay", 72 * 3, h) then
 		self.screenView:play("replay")
 	end
 	if scoreItem and scoreEntry and scoreItem.id == scoreEntry.id and not scoreItem.file then
-		if TextButtonImView("submit", "resubmit", 72 * 2, self.h) then
+		if TextButtonImView("submit", "resubmit", 72 * 2, h) then
 			local noteChartModel = self.game.noteChartModel
 			self.game.onlineModel.onlineScoreManager:submit(
 				noteChartModel.noteChartEntry,
