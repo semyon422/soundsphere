@@ -2,7 +2,7 @@ local BackgroundView = require("sphere.views.BackgroundView")
 local ValueView = require("sphere.views.ValueView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
 
-local _transform = require("gfx_util").transform
+local gfx_util = require("gfx_util")
 local just = require("just")
 local spherefonts		= require("sphere.assets.fonts")
 
@@ -22,22 +22,22 @@ local BackgroundBlurSwitch = GaussianBlurView:new({
 	blur = {key = "game.configModel.configs.settings.graphics.blur.gameplay"}
 })
 
-local Background = BackgroundView:new({
-	transform = transform,
-	x = 0,
-	y = 0,
-	w = 1920,
-	h = 1080,
-	parallax = 0.01,
-	dim = {key = "game.configModel.configs.settings.graphics.dim.gameplay"},
-})
+local Background = {
+	draw = function(self)
+		love.graphics.replaceTransform(gfx_util.transform(transform))
+
+		local dim = self.game.configModel.configs.settings.graphics.dim.gameplay
+		BackgroundView.game = self.game
+		BackgroundView:draw(1920, 1080, dim, 0)
+	end
+}
 
 local BottomScreenMenu = {
 	subscreen = "pause",
 	draw = function(self)
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-		local tf = _transform(transform):translate(279, 991)
+		local tf = gfx_util.transform(transform):translate(279, 991)
 		love.graphics.replaceTransform(tf)
 
 		local w, h = 227, 89

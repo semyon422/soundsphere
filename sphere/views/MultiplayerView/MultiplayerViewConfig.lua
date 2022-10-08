@@ -113,21 +113,17 @@ local Cells = {draw = function(self)
 	just.row(false)
 end}
 
-local Background = BackgroundView:new({
-	transform = transform,
+local Background = {
 	draw = function(self)
-		self.x = Layout.x or 0
-		self.y = Layout.y or 0
-		self.w = Layout.w or 0
-		self.h = Layout.h or 0
-		self.__index.draw(self)
-	end,
-	parallax = 0.01,
-	dim = {key = "game.configModel.configs.settings.graphics.dim.select"},
-})
+		love.graphics.replaceTransform(gfx_util.transform(transform))
 
-local BackgroundBanner = BackgroundView:new({
-	transform = transform,
+		local dim = self.game.configModel.configs.settings.graphics.dim.select
+		BackgroundView.game = self.game
+		BackgroundView:draw(1920, 1080, dim, 0.01)
+	end
+}
+
+local BackgroundBanner = {
 	load = function(self)
 		self.gradient = gfx_util.newGradient(
 			"vertical",
@@ -136,21 +132,16 @@ local BackgroundBanner = BackgroundView:new({
 		)
 	end,
 	draw = function(self)
-		love.graphics.replaceTransform(gfx_util.transform(transform))
-		love.graphics.setColor(1, 1, 1, 1)
-		local x, y, w, h = getRect(nil, Layout.column2row1)
-		getRect(self, Layout.column2row1)
+		local w, h = move(Layout.column2row1)
 
-		just.clip(love.graphics.rectangle, "fill", x, y, w, h, 36)
-		self.__index.draw(self)
+		just.clip(love.graphics.rectangle, "fill", 0, 0, w, h, 36)
 		love.graphics.setColor(1, 1, 1, 1)
-		love.graphics.replaceTransform(gfx_util.transform(transform))
-		love.graphics.draw(self.gradient, x, y, 0, w, h)
+		BackgroundView.game = self.game
+		BackgroundView:draw(w, h, 0, 0)
+		love.graphics.draw(self.gradient, 0, 0, 0, w, h)
 		just.clip()
 	end,
-	parallax = 0,
-	dim = {value = 0},
-})
+}
 
 local DownloadButton = {draw = function(self)
 	getRect(self, Layout.column2)

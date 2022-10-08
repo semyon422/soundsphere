@@ -8,6 +8,7 @@ local IconButtonImView = require("sphere.imviews.IconButtonImView")
 local TextButtonImView = require("sphere.imviews.TextButtonImView")
 local CheckboxImView = require("sphere.imviews.CheckboxImView")
 local LabelImView = require("sphere.imviews.LabelImView")
+local TextInputImView = require("sphere.imviews.TextInputImView")
 local BackgroundView = require("sphere.views.BackgroundView")
 local ValueView = require("sphere.views.ValueView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
@@ -45,8 +46,12 @@ local function getRect(out, r)
 	out.h = r.h
 end
 
-local function move(layout)
-	local x, y, w, h = getRect(nil, layout)
+local function move(layout_x, layout_y)
+	local _
+	local x, y, w, h = getRect(nil, layout_x)
+	if layout_y then
+		_, y, _, h = getRect(nil, layout_y)
+	end
 
 	local tf = gfx_util.transform(transform)
 	tf:translate(x, y)
@@ -324,29 +329,19 @@ local BackgroundBlurSwitch = GaussianBlurView:new({
 	blur = {key = "game.configModel.configs.settings.graphics.blur.select"}
 })
 
-local Background = BackgroundView:new({
-	transform = transform,
+local Background = {
 	draw = function(self)
-		self.x = Layout.x or 0
-		self.y = Layout.y or 0
-		self.w = Layout.w or 0
-		self.h = Layout.h or 0
-		self.__index.draw(self)
-	end,
-	parallax = 0.01,
-	dim = {key = "game.configModel.configs.settings.graphics.dim.select"},
-})
+		local w, h = move(Layout)
 
-local BackgroundBanner = BackgroundView:new({
+		local dim = self.game.configModel.configs.settings.graphics.dim.select
+		BackgroundView.game = self.game
+		BackgroundView:draw(w, h, dim, 0.01)
+	end,
+}
+
+local BackgroundBanner = {
 	subscreen = "notecharts",
-	transform = transform,
 	load = function(self)
-		self.stencilFunction = function()
-			love.graphics.replaceTransform(gfx_util.transform(transform))
-			love.graphics.setColor(1, 1, 1, 1)
-			local x, y, w, h = getRect(nil, Layout.column2row1)
-			love.graphics.rectangle("fill", x, y, w, h, 36)
-		end
 		self.gradient = gfx_util.newGradient(
 			"vertical",
 			{0, 0, 0, 0},
@@ -354,104 +349,72 @@ local BackgroundBanner = BackgroundView:new({
 		)
 	end,
 	draw = function(self)
-		love.graphics.replaceTransform(gfx_util.transform(transform))
-		love.graphics.setColor(1, 1, 1, 1)
-		local x, y, w, h = getRect(nil, Layout.column2row1)
-		getRect(self, Layout.column2row1)
+		local w, h = move(Layout.column2row1)
 
-		just.clip(love.graphics.rectangle, "fill", x, y, w, h, 36)
-		self.__index.draw(self)
+		just.clip(love.graphics.rectangle, "fill", 0, 0, w, h, 36)
 		love.graphics.setColor(1, 1, 1, 1)
-		love.graphics.replaceTransform(gfx_util.transform(transform))
-		love.graphics.draw(self.gradient, x, y, 0, w, h)
+		BackgroundView.game = self.game
+		BackgroundView:draw(w, h, 0, 0)
+		love.graphics.draw(self.gradient, 0, 0, 0, w, h)
 		just.clip()
 	end,
-	parallax = 0,
-	dim = {value = 0},
-})
+}
 
-local SearchField = SearchFieldView:new({
+local SearchField = {
 	subscreen = "notecharts",
-	transform = transform,
 	draw = function(self)
-		getRect(self, Layout.column3)
-		self.w = self.w / 2
-		self.y = Layout.header.y + 17
-		self.h = Layout.header.h - 34
-		self.__index.draw(self)
-	end,
-	text = {
-		x = 27,
-		baseline = 35,
-		limit = math.huge,
-		align = "left",
-		font = {"Noto Sans", 20},
-	},
-	placeholder = "Filter...",
-	getText = function(self)
-		return self.game.searchModel.filterString
-	end,
-	setText = function(self, text)
-		self.game.searchModel:setSearchString("filter", text)
-	end,
-	update = function(self)
 		if not just.focused_id then
-			just.focus(self)
+			just.focus("SearchField")
+		end
+		local padding = 15
+		love.graphics.setFont(spherefonts.get("Noto Sans", 20))
+
+		local w, h = move(Layout.column3, Layout.header)
+		love.graphics.translate(0, padding)
+
+		local delAll = love.keyboard.isDown("lctrl") and love.keyboard.isDown("backspace")
+
+		local text = self.game.searchModel.filterString
+		local changed, text = TextInputImView("SearchField", {text, "Filter..."}, nil, w / 2, h - padding * 2)
+		if changed == "text" then
+			if delAll then text = "" end
+			self.game.searchModel:setSearchString("filter", text)
+		end
+
+		w, h = move(Layout.column3, Layout.header)
+		love.graphics.translate(w / 2, padding)
+
+		local text = self.game.searchModel.lampString
+		local changed, text = TextInputImView("SearchFieldLamp", {text, "Lamp..."}, nil, w / 2, h - padding * 2)
+		if changed == "text" then
+			if delAll then text = "" end
+			self.game.searchModel:setSearchString("lamp", text)
 		end
 	end,
-})
+}
 
-local SearchFieldLamp = SearchFieldView:new({
-	subscreen = "notecharts",
-	transform = transform,
-	draw = function(self)
-		getRect(self, Layout.column3)
-		self.x = self.x + self.w / 2
-		self.w = self.w / 2
-		self.y = Layout.header.y + 17
-		self.h = Layout.header.h - 34
-		self.__index.draw(self)
-	end,
-	text = {
-		x = 27,
-		baseline = 35,
-		limit = math.huge,
-		align = "left",
-		font = {"Noto Sans", 20},
-	},
-	placeholder = "Lamp...",
-	getText = function(self)
-		return self.game.searchModel.lampString
-	end,
-	setText = function(self, text)
-		self.game.searchModel:setSearchString("lamp", text)
-	end,
-})
-
-local OsudirectSearchField = SearchFieldView:new({
+local OsudirectSearchField = {
 	subscreen = "osudirect",
-	transform = transform,
 	draw = function(self)
-		getRect(self, Layout.column3)
-		self.w = self.w
-		self.y = Layout.header.y + 17
-		self.h = Layout.header.h - 34
-		self.__index.draw(self)
+		if not just.focused_id then
+			just.focus("OsudirectSearchField")
+		end
+		local padding = 15
+		love.graphics.setFont(spherefonts.get("Noto Sans", 20))
+
+		local w, h = move(Layout.column3, Layout.header)
+		love.graphics.translate(0, padding)
+
+		local delAll = love.keyboard.isDown("lctrl") and love.keyboard.isDown("backspace")
+
+		local text = self.game.osudirectModel.searchString
+		local changed, text = TextInputImView("OsudirectSearchField", {text, "Search..."}, nil, w, h - padding * 2)
+		if changed == "text" then
+			if delAll then text = "" end
+			self.game.osudirectModel:setSearchString(text)
+		end
 	end,
-	text = {
-		x = 27,
-		baseline = 35,
-		limit = 454,
-		align = "left",
-		font = {"Noto Sans", 20},
-	},
-	getText = function(self)
-		return self.game.osudirectModel.searchString
-	end,
-	setText = function(self, text)
-		self.game.osudirectModel:setSearchString(text)
-	end,
-})
+}
 
 local SortDropdown = SortDropdownView:new({
 	subscreen = "notecharts",
@@ -764,7 +727,6 @@ local SelectViewConfig = {
 	Cells,
 	Cache,
 	SearchField,
-	SearchFieldLamp,
 	OsudirectSearchField,
 	SortDropdown,
 	NotechartFilterDropdown,

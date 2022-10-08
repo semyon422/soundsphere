@@ -15,14 +15,19 @@ SearchModel.setSearchString = function(self, searchMode, text)
 	else
 		self:setLampString(text)
 	end
-	self.stateCounter = self.stateCounter + 1
 end
 
 SearchModel.setFilterString = function(self, text)
+	if text ~= self.filterString then
+		self.stateCounter = self.stateCounter + 1
+	end
 	self.filterString = text
 end
 
 SearchModel.setLampString = function(self, text)
+	if text ~= self.lampString then
+		self.stateCounter = self.stateCounter + 1
+	end
 	self.lampString = text
 end
 

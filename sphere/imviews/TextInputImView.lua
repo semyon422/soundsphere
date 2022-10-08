@@ -24,6 +24,12 @@ return function(id, text, index, w, h)
 	love.graphics.rectangle("fill", x, x, w - x * 2, h * size, r)
 
 	love.graphics.translate(r, (h - lh) / 2)
+
+	local placeholder = ""
+	if type(text) == "table" then
+		text, placeholder = unpack(text)
+	end
+
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local changed, left, right
@@ -32,13 +38,21 @@ return function(id, text, index, w, h)
 			just.focus()
 		end
 		changed, text, index, left, right = just.textinput(text, index)
-		just.text(left)
+		local offset = just.text(left)
 		just.sameline()
-		love.graphics.line(1, lh * 0.15, 1, lh * 0.85)
 		just.text(right)
+		just.sameline()
+		just.offset(offset)
+		love.graphics.line(1, lh * 0.15, 1, lh * 0.85)
 	else
 		index = utf8.len(text) + 1
 		just.text(text)
+		just.sameline()
+	end
+
+	if not changed and text == "" then
+		love.graphics.setColor(1, 1, 1, 0.5)
+		just.text(placeholder)
 	end
 
 	just.pop()

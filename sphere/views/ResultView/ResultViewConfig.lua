@@ -62,15 +62,15 @@ local BackgroundBlurSwitch = GaussianBlurView:new({
 	blur = {key = "game.configModel.configs.settings.graphics.blur.result"}
 })
 
-local Background = BackgroundView:new({
-	transform = transform,
-	x = 0,
-	y = 0,
-	w = 1920,
-	h = 1080,
-	parallax = 0.01,
-	dim = {key = "game.configModel.configs.settings.graphics.dim.result"},
-})
+local Background = {
+	draw = function(self)
+		love.graphics.replaceTransform(gfx_util.transform(transform))
+
+		local dim = self.game.configModel.configs.settings.graphics.dim.result
+		BackgroundView.game = self.game
+		BackgroundView:draw(1920, 1080, dim, 0.01)
+	end
+}
 
 local drawGraph = function(self)
 	getRect(self, Layout.graphs)

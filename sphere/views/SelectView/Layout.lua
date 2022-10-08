@@ -63,6 +63,7 @@ local function drawFrame(rect)
 end
 
 return {
+	x = 0, y = 0, w = 0, h = 0,
 	header = {},
 	footer = {},
 	subheader = {},
@@ -92,7 +93,7 @@ return {
 		local _xw, _yh = love.graphics.inverseTransformPoint(width, height)
 		local _w, _h = _xw - _x, _yh - _y
 
-		self.x, self.x = _x, _y
+		self.x, self.y = _x, _y
 		self.w, self.h = _w, _h
 
 		local x_int = 24
