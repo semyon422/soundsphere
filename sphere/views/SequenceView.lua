@@ -5,7 +5,7 @@ local SequenceView = Class:new()
 local function getViews(views, out)
 	out = out or {}
 	for _, view in ipairs(views) do
-		if #view == 0 then
+		if #view == 0 or type(view[1]) ~= "table" then
 			table.insert(out, view)
 		else
 			getViews(view, out)

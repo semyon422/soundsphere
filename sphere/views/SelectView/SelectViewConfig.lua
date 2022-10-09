@@ -33,34 +33,51 @@ local BarCellImView = require("sphere.imviews.BarCellImView")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
 local ScrollBarImView = require("sphere.imviews.ScrollBarImView")
+local RoundedRectangle = require("sphere.views.RoundedRectangle")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
-local function getRect(out, r)
+local function getRect(out, r1, r2)
 	if not out then
-		return r.x, r.y, r.w, r.h
+		return unpack(r1)
 	end
-	out.x = r.x
-	out.y = r.y
-	out.w = r.w
-	out.h = r.h
-end
-
-local function move(layout_x, layout_y)
-	local _
-	local x, y, w, h = getRect(nil, layout_x)
-	if layout_y then
-		_, y, _, h = getRect(nil, layout_y)
+	out.x = r1[1]
+	out.y = r1[2]
+	out.w = r1[3]
+	out.h = r1[4]
+	if r2 then
+		out.y = r2[2]
+		out.h = r2[4]
 	end
-
-	local tf = gfx_util.transform(transform)
-	tf:translate(x, y)
-	love.graphics.replaceTransform(tf)
-
-	return w, h
 end
 
 local Layout = require("sphere.views.SelectView.Layout")
+
+local function drawFrameRect(w, h, _r)
+	local r, g, b, a = love.graphics.getColor()
+	love.graphics.setColor(0, 0, 0, 0.8)
+	love.graphics.rectangle("fill", 0, 0, w, h, _r or 36)
+	love.graphics.setColor(r, g, b, a)
+end
+
+local function drawFrameRect2(w, h, _r)
+	local r, g, b, a = love.graphics.getColor()
+	love.graphics.setColor(0.4, 0.4, 0.4, 0.7)
+	RoundedRectangle("fill", 0, 0, w, h, _r or 36)
+	love.graphics.setColor(r, g, b, a)
+end
+
+local Frames = {draw = function(self)
+	local w, h = Layout:move("base")
+	love.graphics.setColor(1, 1, 1, 0.2)
+	love.graphics.rectangle("fill", 0, 0, w, h)
+
+	local w, h = Layout:move("base", "header")
+	drawFrameRect(w, h, 0)
+
+	local w, h = Layout:move("base", "footer")
+	drawFrameRect(w, h, 0)
+end}
 
 local invertShader, baseShader, inFrame
 local SelectFrame = function()
@@ -93,7 +110,7 @@ local SelectFrame = function()
 	local tf = gfx_util.transform(transform)
 	love.graphics.replaceTransform(tf)
 
-	local x, y, w, h = getRect(nil, Layout.column3)
+	local x, y, w, h = unpack(Layout.column3)
 	h = h / 11
 	y = y + 5 * h
 
@@ -118,7 +135,8 @@ end
 local Cache = {
 	subscreen = "collections",
 	draw = function(self)
-		local w, h = move(Layout.column2row2row1)
+		local w, h = Layout:move("column2row2row1")
+		drawFrameRect(w, h)
 
 		love.graphics.translate(h / 2, 0)
 
@@ -130,14 +148,17 @@ local Cache = {
 local OsudirectList = {
 	subscreen = "osudirect",
 	draw = function(self)
+		local w, h = Layout:move("column3")
+		drawFrameRect(w, h)
+
 		SelectFrame()
-		local w, h = move(Layout.column3)
+		local w, h = Layout:move("column3")
 
 		OsudirectListView.game = self.game
 		OsudirectListView:draw(w, h)
 		SelectFrame()
 
-		local w, h = move(Layout.column3)
+		local w, h = Layout:move("column3")
 		love.graphics.translate(w - 16, 0)
 
 		local list = OsudirectListView
@@ -153,7 +174,14 @@ local OsudirectList = {
 local OsudirectDifficultiesList = {
 	subscreen = "osudirect",
 	draw = function(self)
-		local w, h = move(Layout.column2row2row2)
+		local w, h = Layout:move("column2row2")
+		drawFrameRect(w, h)
+
+		local w, h = Layout:move("column2row2row1")
+		drawFrameRect2(w, h)
+
+		local w, h = Layout:move("column2row2row2")
+
 		OsudirectDifficultiesListView.game = self.game
 		OsudirectDifficultiesListView:draw(w, h)
 	end,
@@ -162,7 +190,9 @@ local OsudirectDifficultiesList = {
 local OsudirectProcessingList = {
 	subscreen = "osudirect",
 	draw = function(self)
-		local w, h = move(Layout.column1)
+		local w, h = Layout:move("column1")
+		drawFrameRect(w, h)
+
 		OsudirectProcessingListView.game = self.game
 		OsudirectProcessingListView:draw(w, h)
 	end,
@@ -171,7 +201,13 @@ local OsudirectProcessingList = {
 local ScoreList = {
 	subscreen = "notecharts",
 	draw = function(self)
-		local w, h = move(Layout.column1row1row2)
+		local w, h = Layout:move("column1row1")
+		drawFrameRect(w, h)
+
+		local w, h = Layout:move("column1row1row1")
+		drawFrameRect2(w, h)
+
+		local w, h = Layout:move("column1row1row2")
 
 		ScoreListView.game = self.game
 		ScoreListView:draw(w, h)
@@ -191,14 +227,17 @@ local ScoreList = {
 local CollectionList = {
 	subscreen = "collections",
 	draw = function(self)
+		local w, h = Layout:move("column3")
+		drawFrameRect(w, h)
+
 		SelectFrame()
-		local w, h = move(Layout.column3)
+		local w, h = Layout:move("column3")
 
 		CollectionListView.game = self.game
 		CollectionListView:draw(w, h)
 		SelectFrame()
 
-		local w, h = move(Layout.column3)
+		local w, h = Layout:move("column3")
 		love.graphics.translate(w - 16, 0)
 
 		local list = CollectionListView
@@ -214,14 +253,18 @@ local CollectionList = {
 local NoteChartSetList = {
 	subscreen = "notecharts",
 	draw = function(self)
+		local w, h = Layout:move("column3")
+		love.graphics.setColor(0, 0, 0, 0.8)
+		love.graphics.rectangle("fill", 0, 0, w, h, 36)
+
 		SelectFrame()
-		local w, h = move(Layout.column3)
+		local w, h = Layout:move("column3")
 
 		NoteChartSetListView.game = self.game
 		NoteChartSetListView:draw(w, h)
 		SelectFrame()
 
-		local w, h = move(Layout.column3)
+		local w, h = Layout:move("column3")
 		love.graphics.translate(w - 16, 0)
 
 		local list = NoteChartSetListView
@@ -237,7 +280,13 @@ local NoteChartSetList = {
 local NoteChartList = {
 	subscreen = "notecharts",
 	draw = function(self)
-		local w, h = move(Layout.column2row2row2)
+		local w, h = Layout:move("column2row2")
+		drawFrameRect(w, h)
+
+		local w, h = Layout:move("column2row2row1")
+		drawFrameRect2(w, h)
+
+		local w, h = Layout:move("column2row2row2")
 
 		love.graphics.setColor(1, 1, 1, 0.8)
 		love.graphics.polygon("fill",
@@ -256,7 +305,7 @@ local Cells = {draw = function(self)
 		return
 	end
 
-	local w, h = move(Layout.column2row1)
+	local w, h = Layout:move("column2row1")
 
 	local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
 	local noteChartItem = self.game.selectModel.noteChartItem
@@ -310,7 +359,9 @@ local Cells = {draw = function(self)
 	TextCellImView(2 * w, h, "right", "local offset", localOffset * 1000)
 	just.row(false)
 
-	w, h = move(Layout.column1row2)
+	w, h = Layout:move("column1row2")
+	drawFrameRect(w, h)
+
 	love.graphics.translate(w / 2, 6)
 	w = (w - 44) / 4
 	h = 50
@@ -331,7 +382,7 @@ local BackgroundBlurSwitch = GaussianBlurView:new({
 
 local Background = {
 	draw = function(self)
-		local w, h = move(Layout)
+		local w, h = Layout:move("base")
 
 		local dim = self.game.configModel.configs.settings.graphics.dim.select
 		BackgroundView.game = self.game
@@ -349,12 +400,13 @@ local BackgroundBanner = {
 		)
 	end,
 	draw = function(self)
-		local w, h = move(Layout.column2row1)
+		local w, h = Layout:move("column2row1")
+		drawFrameRect(w, h)
 
 		just.clip(love.graphics.rectangle, "fill", 0, 0, w, h, 36)
-		love.graphics.setColor(1, 1, 1, 1)
 		BackgroundView.game = self.game
 		BackgroundView:draw(w, h, 0, 0)
+		love.graphics.setColor(1, 1, 1, 1)
 		love.graphics.draw(self.gradient, 0, 0, 0, w, h)
 		just.clip()
 	end,
@@ -369,7 +421,7 @@ local SearchField = {
 		local padding = 15
 		love.graphics.setFont(spherefonts.get("Noto Sans", 20))
 
-		local w, h = move(Layout.column3, Layout.header)
+		local w, h = Layout:move("column3", "header")
 		love.graphics.translate(0, padding)
 
 		local delAll = love.keyboard.isDown("lctrl") and love.keyboard.isDown("backspace")
@@ -381,7 +433,7 @@ local SearchField = {
 			self.game.searchModel:setSearchString("filter", text)
 		end
 
-		w, h = move(Layout.column3, Layout.header)
+		w, h = Layout:move("column3", "header")
 		love.graphics.translate(w / 2, padding)
 
 		local text = self.game.searchModel.lampString
@@ -402,7 +454,7 @@ local OsudirectSearchField = {
 		local padding = 15
 		love.graphics.setFont(spherefonts.get("Noto Sans", 20))
 
-		local w, h = move(Layout.column3, Layout.header)
+		local w, h = Layout:move("column3", "header")
 		love.graphics.translate(0, padding)
 
 		local delAll = love.keyboard.isDown("lctrl") and love.keyboard.isDown("backspace")
@@ -420,11 +472,11 @@ local SortDropdown = SortDropdownView:new({
 	subscreen = "notecharts",
 	transform = transform,
 	draw = function(self)
-		getRect(self, Layout.column2)
+		getRect(self, Layout.column2, Layout.header)
 		self.x = self.x + self.w * 2 / 3
 		self.w = self.w / 3
-		self.y = Layout.header.y + 17
-		self.h = Layout.header.h - 34
+		self.y = self.y + 17
+		self.h = self.h - 34
 		self.__index.draw(self)
 	end,
 })
@@ -475,7 +527,7 @@ local ScoreSourceDropdown = ScoreSourceDropdownView:new({
 local GroupCheckbox = {
 	subscreen = "notecharts",
 	draw = function(self)
-		local w, h = move(Layout.column2, Layout.header)
+		local w, h = Layout:move("column2", "header")
 		love.graphics.translate(w / 3, 0)
 		w = w / 3
 
@@ -494,6 +546,8 @@ local ModifierIconGrid = ModifierIconGridView:new({
 	subscreen = "notecharts",
 	transform = transform,
 	draw = function(self)
+		local w, h = Layout:move("column1row3")
+		drawFrameRect(w, h)
 		getRect(self, Layout.column1row3)
 		self.y = self.y + 4
 		self.x = self.x + 21
@@ -534,7 +588,7 @@ local UpdateStatus = ValueView:new({
 })
 
 local SessionTime = {draw = function(self)
-	local w, h = move(Layout.column2, Layout.header)
+	local w, h = Layout:move("column2", "header")
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
 	just.indent(10)
@@ -544,7 +598,7 @@ end}
 local NotechartsSubscreen = {
 	subscreen = "notecharts",
 	draw = function(self)
-		local _, h = move(Layout.column1, Layout.footer)
+		local _, h = Layout:move("column1", "footer")
 		local w = h * 1.5
 
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
@@ -577,7 +631,7 @@ local NotechartsSubscreen = {
 		end
 		just.row(false)
 
-		w, h = move(Layout.column3, Layout.footer)
+		w, h = Layout:move("column3", "footer")
 
 		just.row(true)
 		if TextButtonImView("collections", "collections", w / 2, h) then
@@ -588,7 +642,7 @@ local NotechartsSubscreen = {
 		end
 		just.row(false)
 
-		w, h = move(Layout.column2row2row1)
+		w, h = Layout:move("column2row2row1")
 
 		just.row(true)
 		just.indent(36)
@@ -607,7 +661,7 @@ local NotechartsSubscreen = {
 		end
 		just.row(false)
 
-		w, h = move(Layout.column1row1row1)
+		w, h = Layout:move("column1row1row1")
 
 		just.indent(36)
 		if IconButtonImView("open notechart page", "info_outline", h, 0.5) then
@@ -621,13 +675,13 @@ local CollectionsSubscreen = {
 	draw = function(self)
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-		local w, h = move(Layout.column1, Layout.footer)
+		local w, h = Layout:move("column1", "footer")
 
 		if TextButtonImView("calc top scores", "calc top scores", w / 2, h) then
 			self.game.scoreModel:asyncCalculateTopScores()
 		end
 
-		w, h = move(Layout.column3, Layout.footer)
+		w, h = Layout:move("column3", "footer")
 
 		just.row(true)
 		if TextButtonImView("notecharts", "notecharts", w / 2, h) then
@@ -645,7 +699,7 @@ local OsudirectSubscreen = {
 	draw = function(self)
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-		local w, h = move(Layout.column3, Layout.footer)
+		local w, h = Layout:move("column3", "footer")
 
 		just.row(true)
 		if TextButtonImView("notecharts", "notecharts", w / 2, h) then
@@ -656,7 +710,7 @@ local OsudirectSubscreen = {
 		end
 		just.row(false)
 
-		w, h = move(Layout.column2row2row1)
+		w, h = Layout:move("column2row2row1")
 
 		just.indent(36)
 		if TextButtonImView("download", "download", w - 72, h) then
@@ -666,7 +720,7 @@ local OsudirectSubscreen = {
 }
 
 local Header = {draw = function(self)
-	local w, h = move(Layout.column1, Layout.header)
+	local w, h = Layout:move("column1", "header")
 
 	just.row(true)
 	LogoImView("logo", h, 0.5)
@@ -679,19 +733,18 @@ end}
 local UserInfo = UserInfoView:new({
 	transform = transform,
 	draw = function(self)
-		getRect(self, Layout.column1)
-		self.x = self.x + self.w - Layout.header.h
-		self.y = 0
-		self.h = Layout.header.h
+		getRect(self, Layout.column1, Layout.header)
+		self.x = self.x + self.w - self.h
 		self.__index.draw(self)
 	end,
 })
 
 local SelectViewConfig = {
+	Layout,
 	BackgroundBlurSwitch,
 	Background,
 	BackgroundBlurSwitch,
-	Layout,
+	Frames,
 	BackgroundBanner,
 	NoteChartSetList,
 	OsudirectList,
