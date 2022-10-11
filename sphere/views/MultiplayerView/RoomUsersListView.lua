@@ -4,20 +4,11 @@ local TextCellImView = require("sphere.imviews.TextCellImView")
 local LabelImView = require("sphere.imviews.LabelImView")
 local Format = require("sphere.views.Format")
 local TextButtonImView = require("sphere.imviews.TextButtonImView")
-local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
 local spherefonts		= require("sphere.assets.fonts")
 
 local RoomUsersListView = ListView:new()
 
 RoomUsersListView.rows = 9
-
-RoomUsersListView.load = function(self)
-	self.modifierIconGrid = ModifierIconGridView:new()
-
-	self.modifierIconGrid.game = self.game
-	self.modifierIconGrid.x = 0
-	self.modifierIconGrid.y = 0
-end
 
 RoomUsersListView.reloadItems = function(self)
 	self.items = self.game.multiplayerModel.roomUsers

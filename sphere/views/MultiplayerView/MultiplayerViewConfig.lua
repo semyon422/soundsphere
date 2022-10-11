@@ -11,7 +11,6 @@ local LogoImView = require("sphere.imviews.LogoImView")
 local RoomUsersListView = require("sphere.views.MultiplayerView.RoomUsersListView")
 
 local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
-local ScoreListView	= require("sphere.views.ResultView.ScoreListView")
 local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
 local MatchPlayersView	= require("sphere.views.GameplayView.MatchPlayersView")
 local TextCellImView = require("sphere.imviews.TextCellImView")
@@ -21,46 +20,52 @@ local TextButtonImView = require("sphere.imviews.TextButtonImView")
 local CheckboxImView = require("sphere.imviews.CheckboxImView")
 local LabelImView = require("sphere.imviews.LabelImView")
 local JudgementBarImView = require("sphere.imviews.JudgementBarImView")
-local JudgementsDropdownView = require("sphere.views.ResultView.JudgementsDropdownView")
 local Format = require("sphere.views.Format")
+local RoundedRectangle = require("sphere.views.RoundedRectangle")
 
 local inspect = require("inspect")
 local time_util = require("time_util")
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
-local transformLeft = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
-
-local function getRect(out, r)
-	if not out then
-		return r.x, r.y, r.w, r.h
-	end
-	out.x = r.x
-	out.y = r.y
-	out.w = r.w
-	out.h = r.h
-end
-
-local function move(layout_x, layout_y)
-	local _
-	local x, y, w, h = getRect(nil, layout_x)
-	if layout_y then
-		_, y, _, h = getRect(nil, layout_y)
-	end
-
-	local tf = gfx_util.transform(transform)
-	tf:translate(x, y)
-	love.graphics.replaceTransform(tf)
-
-	return w, h
-end
 
 local Layout = require("sphere.views.MultiplayerView.Layout")
+
+local function drawFrameRect(w, h, _r)
+	local r, g, b, a = love.graphics.getColor()
+	love.graphics.setColor(0, 0, 0, 0.8)
+	love.graphics.rectangle("fill", 0, 0, w, h, _r or 36)
+	love.graphics.setColor(r, g, b, a)
+end
+
+local Frames = {draw = function(self)
+	local w, h = Layout:move("base")
+	love.graphics.setColor(1, 1, 1, 0.2)
+	love.graphics.rectangle("fill", 0, 0, w, h)
+
+	local w, h = Layout:move("base", "header")
+	drawFrameRect(w, h, 0)
+
+	local w, h = Layout:move("base", "footer")
+	drawFrameRect(w, h, 0)
+
+	drawFrameRect(Layout:move("column3"))
+	drawFrameRect(Layout:move("column1"))
+	drawFrameRect(Layout:move("column2row1"))
+
+	love.graphics.setColor(0, 0, 0, 0.9)
+	w, h = Layout:move("column2row2")
+	RoundedRectangle("fill", 0, -1, w, h + 1, 36, false, false, 2)
+
+	love.graphics.setColor(0, 0, 0, 0.8)
+	w, h = Layout:move("column2row3")
+	RoundedRectangle("fill", 0, 0, w, h, 36, false, false, 2)
+end}
 
 local ScreenMenu = {draw = function(self)
 	local multiplayerModel = self.game.multiplayerModel
 
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 
-	local w, h = move(Layout.column3, Layout.header)
+	local w, h = Layout:move("column3", "header")
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
@@ -70,7 +75,7 @@ local ScreenMenu = {draw = function(self)
 end}
 
 local Cells = {draw = function(self)
-	local w, h = move(Layout.column2row1)
+	local w, h = Layout:move("column2row1")
 
 	local multiplayerModel = self.game.multiplayerModel
 
@@ -131,7 +136,7 @@ local BackgroundBanner = {
 		)
 	end,
 	draw = function(self)
-		local w, h = move(Layout.column2row1)
+		local w, h = Layout:move("column2row1")
 
 		just.clip(love.graphics.rectangle, "fill", 0, 0, w, h, 36)
 		love.graphics.setColor(1, 1, 1, 1)
@@ -143,7 +148,7 @@ local BackgroundBanner = {
 }
 
 local DownloadButton = {draw = function(self)
-	local w, h = move(Layout.column2, Layout.header)
+	local w, h = Layout:move("column2", "header")
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	local multiplayerModel = self.game.multiplayerModel
@@ -162,7 +167,7 @@ local DownloadButton = {draw = function(self)
 end}
 
 local Title = {draw = function(self)
-	local w, h = move(Layout.column2row2)
+	local w, h = Layout:move("column2row2")
 	love.graphics.translate(22, 0)
 	local noteChartItem = self.game.selectModel.noteChartItem or self.game.multiplayerModel.notechart
 	if not noteChartItem or not noteChartItem.title then
@@ -172,23 +177,30 @@ local Title = {draw = function(self)
 	TextCellImView(w, 52, "left", noteChartItem.creator, noteChartItem.name)
 end}
 
-local ModifierIconGrid = ModifierIconGridView:new({
-	transform = transform,
+local ModifierIconGrid = {
 	draw = function(self)
-		getRect(self, Layout.column2row3)
-		self.y = self.y + 4
-		self.x = self.x + 21
-		self.w = self.w - 21 * 2
-		self.size = (self.h - 8)
-		self.__index.draw(self)
+		local w, h = Layout:move("column2row3")
+		-- drawFrameRect(w, h)
+		love.graphics.translate(21, 4)
+
+		local modifierModel = self.game.modifierModel
+
+		ModifierIconGridView.game = self.game
+		ModifierIconGridView:draw(modifierModel.config, w - 42, h, h - 8)
 	end,
-	config = "game.modifierModel.config"
-})
+}
 
 local Header = {draw = function(self)
-	local w, h = move(Layout.column1, Layout.header)
+	local w, h = Layout:move("column1", "header")
 
+	local username = self.game.configModel.configs.online.user.name
+	local session = self.game.configModel.configs.online.session
 	just.row(true)
+	if UserInfoView:draw(w, h, username, session and session.active) then
+		self.game.gameView:setModal(require("sphere.views.OnlineView"))
+	end
+	just.offset(0)
+
 	LogoImView("logo", h, 0.5)
 	if IconButtonImView("quit game", "clear", h, 0.5) then
 		love.event.quit()
@@ -196,20 +208,9 @@ local Header = {draw = function(self)
 	just.row(false)
 end}
 
-local UserInfo = UserInfoView:new({
-	transform = transform,
-	draw = function(self)
-		getRect(self, Layout.column1)
-		self.x = self.x + self.w - Layout.header.h
-		self.y = 0
-		self.h = Layout.header.h
-		self.__index.draw(self)
-	end,
-})
-
 local RoomUsersList = {
 	draw = function(self)
-		local w, h = move(Layout.column1)
+		local w, h = Layout:move("column1")
 
 		RoomUsersListView.game = self.game
 		RoomUsersListView:draw(w, h)
@@ -221,7 +222,7 @@ local noRoom = {
 }
 local noUser = {}
 local RoomInfo = {draw = function(self)
-	local w, h = move(Layout.column2, Layout.header)
+	local w, h = Layout:move("column2", "header")
 
 	local multiplayerModel = self.game.multiplayerModel
 	local room = multiplayerModel.room or noRoom
@@ -231,7 +232,7 @@ local RoomInfo = {draw = function(self)
 end}
 
 local RoomSettings = {draw = function(self)
-	local w, h = move(Layout.column3)
+	local w, h = Layout:move("column3")
 
 	local multiplayerModel = self.game.multiplayerModel
 	local room = multiplayerModel.room or noRoom
@@ -262,7 +263,7 @@ local RoomSettings = {draw = function(self)
 	just.sameline()
 	LabelImView("Ready", "Ready", 72)
 
-	w, h = move(Layout.column3)
+	w, h = Layout:move("column3")
 	love.graphics.translate(36, h - 72 * 3)
 
 	if isHost or room.isFreeNotechart then
@@ -276,7 +277,7 @@ local RoomSettings = {draw = function(self)
 		end
 	end
 
-	w, h = move(Layout.column3)
+	w, h = Layout:move("column3")
 	love.graphics.translate(36, h - 72)
 	if isHost then
 		if not room.isPlaying and TextButtonImView("Start match", "Start match", w - 72, 72) then
@@ -297,7 +298,7 @@ local ChatWindow = {
 		love.graphics.setFont(font)
 		local lineHeight = font:getHeight()
 
-		local w, h = move(Layout.footer)
+		local w, h = Layout:move("footer")
 		love.graphics.translate(_p, _p)
 		w = w - _p * 2
 		h = h - _p * 2 - lineHeight
@@ -333,7 +334,7 @@ local ChatWindow = {
 			end
 		end
 
-		w, h = move(Layout.footer)
+		w, h = Layout:move("footer")
 		love.graphics.translate(_p, h - _p - lineHeight)
 		w = w - _p * 2
 		h = 50
@@ -362,8 +363,9 @@ local ChatWindow = {
 }
 
 return {
-	Background,
 	Layout,
+	Background,
+	Frames,
 	BackgroundBanner,
 	DownloadButton,
 	Cells,
@@ -371,7 +373,6 @@ return {
 	ScreenMenu,
 	Title,
 	Header,
-	UserInfo,
 	RoomInfo,
 	RoomSettings,
 	RoomUsersList,

@@ -9,8 +9,8 @@ local TextButtonImView = require("sphere.imviews.TextButtonImView")
 local CheckboxImView = require("sphere.imviews.CheckboxImView")
 local LabelImView = require("sphere.imviews.LabelImView")
 local TextInputImView = require("sphere.imviews.TextInputImView")
+local SpoilerListImView = require("sphere.imviews.SpoilerListImView")
 local BackgroundView = require("sphere.views.BackgroundView")
-local ValueView = require("sphere.views.ValueView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
 local UserInfoView = require("sphere.views.UserInfoView")
 local LogoImView = require("sphere.imviews.LogoImView")
@@ -18,11 +18,6 @@ local ScoreListView	= require("sphere.views.SelectView.ScoreListView")
 
 local NoteChartSetListView = require("sphere.views.SelectView.NoteChartSetListView")
 local NoteChartListView = require("sphere.views.SelectView.NoteChartListView")
-local SearchFieldView = require("sphere.views.SelectView.SearchFieldView")
-local SortDropdownView = require("sphere.views.SelectView.SortDropdownView")
-local NotechartFilterDropdownView = require("sphere.views.SelectView.NotechartFilterDropdownView")
-local ScoreFilterDropdownView = require("sphere.views.SelectView.ScoreFilterDropdownView")
-local ScoreSourceDropdownView = require("sphere.views.SelectView.ScoreSourceDropdownView")
 local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
 local CollectionListView = require("sphere.views.SelectView.CollectionListView")
 local OsudirectListView = require("sphere.views.SelectView.OsudirectListView")
@@ -34,22 +29,6 @@ local TextCellImView = require("sphere.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
 local ScrollBarImView = require("sphere.imviews.ScrollBarImView")
 local RoundedRectangle = require("sphere.views.RoundedRectangle")
-
-local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
-
-local function getRect(out, r1, r2)
-	if not out then
-		return unpack(r1)
-	end
-	out.x = r1[1]
-	out.y = r1[2]
-	out.w = r1[3]
-	out.h = r1[4]
-	if r2 then
-		out.y = r2[2]
-		out.h = r2[4]
-	end
-end
 
 local Layout = require("sphere.views.SelectView.Layout")
 
@@ -107,7 +86,7 @@ local SelectFrame = function()
 		}
 	]]
 
-	local tf = gfx_util.transform(transform)
+	local tf = gfx_util.transform(Layout.transform)
 	love.graphics.replaceTransform(tf)
 
 	local x, y, w, h = unpack(Layout.column3)
@@ -468,61 +447,79 @@ local OsudirectSearchField = {
 	end,
 }
 
-local SortDropdown = SortDropdownView:new({
+local SortDropdown = {
 	subscreen = "notecharts",
-	transform = transform,
 	draw = function(self)
-		getRect(self, Layout.column2, Layout.header)
-		self.x = self.x + self.w * 2 / 3
-		self.w = self.w / 3
-		self.y = self.y + 17
-		self.h = self.h - 34
-		self.__index.draw(self)
-	end,
-})
+		local w, h = Layout:move("column2", "header")
+		love.graphics.translate(w * 2 / 3, 15)
 
-local NotechartFilterDropdown = NotechartFilterDropdownView:new({
-	subscreen = "notecharts",
-	transform = transform,
-	closedBackgroundColor = {0, 0, 0, 0.8},
-	draw = function(self)
-		getRect(self, Layout.column3)
-		local size = 1 / 4
-		self.x = self.x + self.w * (1 - size) - 6 - 20
-		self.w = self.w * size
-		self.h = 55
-		self.y = self.y + (72 - self.h) / 2
-		self.__index.draw(self)
+		local sortModel = self.game.sortModel
+		local i = SpoilerListImView("SortDropdown", w / 3, h - 30, sortModel.names, sortModel.name)
+		if i then
+			self.game.selectModel:setSortFunction(sortModel:fromIndexValue(i), true)
+		end
 	end,
-})
+}
 
-local ScoreFilterDropdown = ScoreFilterDropdownView:new({
+local function filter_to_string(f)
+	return f.name
+end
+local NotechartFilterDropdown = {
 	subscreen = "notecharts",
-	transform = transform,
 	draw = function(self)
-		getRect(self, Layout.column1)
-		local size = 1 / 4
-		self.x = self.x + self.w * (1 - size) - 6 - 20
-		self.w = self.w * size
-		self.h = 55
-		self.y = self.y + (72 - self.h) / 2
-		self.__index.draw(self)
-	end,
-})
+		local w, h = Layout:move("column3")
 
-local ScoreSourceDropdown = ScoreSourceDropdownView:new({
-	subscreen = "notecharts",
-	transform = transform,
-	draw = function(self)
-		getRect(self, Layout.column1)
 		local size = 1 / 4
-		self.x = self.x + self.w * (3 / 4 - size) - 6 - 20
-		self.w = self.w * size
-		self.h = 55
-		self.y = self.y + (72 - self.h) / 2
-		self.__index.draw(self)
+		h = 60
+		love.graphics.translate(w * (1 - size) - 26, (72 - h) / 2)
+
+		local filters = self.game.configModel.configs.filters.notechart
+		local config = self.game.configModel.configs.select
+		local i = SpoilerListImView("NotechartFilterDropdown", w * size, h, filters, config.filterName, filter_to_string)
+		if i then
+			config.filterName = filters[i].name
+			self.game.selectModel:noDebouncePullNoteChartSet()
+		end
 	end,
-})
+}
+
+local ScoreFilterDropdown = {
+	subscreen = "notecharts",
+	draw = function(self)
+		local w, h = Layout:move("column1")
+
+		local size = 1 / 4
+		h = 60
+		love.graphics.translate(w * (1 - size) - 26, (72 - h) / 2)
+
+		local filters = self.game.configModel.configs.filters.score
+		local config = self.game.configModel.configs.select
+		local i = SpoilerListImView("ScoreFilterDropdown", w * size, h, filters, config.scoreFilterName, filter_to_string)
+		if i then
+			config.scoreFilterName = filters[i].name
+			self.game.selectModel:pullScore()
+		end
+	end,
+}
+
+local ScoreSourceDropdown = {
+	subscreen = "notecharts",
+	draw = function(self)
+		local w, h = Layout:move("column1")
+
+		local size = 1 / 4
+		h = 60
+		love.graphics.translate(w * (3 / 4 - size) - 26, (72 - h) / 2)
+
+		local sources = self.game.scoreLibraryModel.scoreSources
+		local config = self.game.configModel.configs.select
+		local i = SpoilerListImView("ScoreSourceDropdown", w * size, h, sources, config.scoreSourceName)
+		if i then
+			config.scoreSourceName = sources[i]
+			self.game.selectModel:updateScoreOnline()
+		end
+	end,
+}
 
 local GroupCheckbox = {
 	subscreen = "notecharts",
@@ -542,50 +539,31 @@ local GroupCheckbox = {
 	end,
 }
 
-local ModifierIconGrid = ModifierIconGridView:new({
+local ModifierIconGrid = {
 	subscreen = "notecharts",
-	transform = transform,
 	draw = function(self)
 		local w, h = Layout:move("column1row3")
 		drawFrameRect(w, h)
-		getRect(self, Layout.column1row3)
-		self.y = self.y + 4
-		self.x = self.x + 21
-		self.w = self.w - 21 * 2
-		self.size = (self.h - 8) / 2
-		self.__index.draw(self)
-	end,
-	config = "game.modifierModel.config"
-})
+		love.graphics.translate(21, 4)
 
-local StageInfoModifierIconGrid = ModifierIconGridView:new({
-	subscreen = "notecharts",
-	transform = transform,
-	draw = function(self)
-		getRect(self, Layout.column1row2)
-		self.y = self.y + 4
-		self.x = self.x + 21
-		self.w = self.w / 2 - 21 * 2
-		self.size = (self.h - 8) / 3
-		self.__index.draw(self)
-	end,
-	config = {
-		"game.selectModel.scoreItem.modifiers",
-		"game.selectModel.scoreItem.modifierset.encoded",
-	},
-	noModifier = true
-})
+		local modifierModel = self.game.modifierModel
 
-local UpdateStatus = ValueView:new({
-	transform = transform,
-	key = "game.updateModel.status",
-	x = 0,
-	baseline = 1070,
-	limit = 1920,
-	color = {1, 1, 1, 1},
-	font = {"Noto Sans Mono", 24},
-	align = "left",
-})
+		ModifierIconGridView.game = self.game
+		ModifierIconGridView:draw(modifierModel.config, w - 42, h, (h - 8) / 2)
+
+		w, h = Layout:move("column1row2")
+		love.graphics.translate(21, 4)
+
+		local scoreItem = self.game.selectModel.scoreItem
+		if not scoreItem then
+			return
+		end
+		local configModifier = scoreItem.modifiers or (scoreItem.modifierset and scoreItem.modifierset.encoded)
+
+		ModifierIconGridView.game = self.game
+		ModifierIconGridView:draw(configModifier, w / 2 - 42, h, (h - 8) / 3, true)
+	end,
+}
 
 local SessionTime = {draw = function(self)
 	local w, h = Layout:move("column2", "header")
@@ -722,22 +700,20 @@ local OsudirectSubscreen = {
 local Header = {draw = function(self)
 	local w, h = Layout:move("column1", "header")
 
+	local username = self.game.configModel.configs.online.user.name
+	local session = self.game.configModel.configs.online.session
 	just.row(true)
+	if UserInfoView:draw(w, h, username, session and session.active) then
+		self.game.gameView:setModal(require("sphere.views.OnlineView"))
+	end
+	just.offset(0)
+
 	LogoImView("logo", h, 0.5)
 	if IconButtonImView("quit game", "clear", h, 0.5) then
 		love.event.quit()
 	end
 	just.row(false)
 end}
-
-local UserInfo = UserInfoView:new({
-	transform = transform,
-	draw = function(self)
-		getRect(self, Layout.column1, Layout.header)
-		self.x = self.x + self.w - self.h
-		self.__index.draw(self)
-	end,
-})
 
 local SelectViewConfig = {
 	Layout,
@@ -761,16 +737,13 @@ local SelectViewConfig = {
 	ScoreSourceDropdown,
 	GroupCheckbox,
 	ModifierIconGrid,
-	StageInfoModifierIconGrid,
 	OsudirectDifficultiesList,
 	OsudirectProcessingList,
 	NotechartsSubscreen,
 	CollectionsSubscreen,
 	OsudirectSubscreen,
-	UpdateStatus,
 	SessionTime,
 	Header,
-	UserInfo,
 	require("sphere.views.DebugInfoViewConfig"),
 }
 

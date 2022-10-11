@@ -2,7 +2,6 @@ local just = require("just")
 local spherefonts		= require("sphere.assets.fonts")
 local gfx_util = require("gfx_util")
 
-local RectangleView = require("sphere.views.RectangleView")
 local BackgroundView = require("sphere.views.BackgroundView")
 local ValueView = require("sphere.views.ValueView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
@@ -17,10 +16,11 @@ local IconButtonImView = require("sphere.imviews.IconButtonImView")
 local TextButtonImView = require("sphere.imviews.TextButtonImView")
 local CheckboxImView = require("sphere.imviews.CheckboxImView")
 local LabelImView = require("sphere.imviews.LabelImView")
+local SpoilerListImView = require("sphere.imviews.SpoilerListImView")
 local JudgementBarImView = require("sphere.imviews.JudgementBarImView")
-local JudgementsDropdownView = require("sphere.views.ResultView.JudgementsDropdownView")
 local Format = require("sphere.views.Format")
 local ScrollBarImView = require("sphere.imviews.ScrollBarImView")
+local RoundedRectangle = require("sphere.views.RoundedRectangle")
 
 local inspect = require("inspect")
 local time_util = require("time_util")
@@ -37,30 +37,47 @@ local showLoadedScore = function(self)
 end
 
 local function getRect(out, r)
-	if not out then
-		return r.x, r.y, r.w, r.h
-	end
-	out.x = r.x
-	out.y = r.y
-	out.w = r.w
-	out.h = r.h
-end
-
-local function move(layout_x, layout_y)
-	local _
-	local x, y, w, h = getRect(nil, layout_x)
-	if layout_y then
-		_, y, _, h = getRect(nil, layout_y)
-	end
-
-	local tf = gfx_util.transform(transform)
-	tf:translate(x, y)
-	love.graphics.replaceTransform(tf)
-
-	return w, h
+	out.x = r[1]
+	out.y = r[2]
+	out.w = r[3]
+	out.h = r[4]
 end
 
 local Layout = require("sphere.views.ResultView.Layout")
+
+local function drawFrameRect(w, h, _r)
+	local r, g, b, a = love.graphics.getColor()
+	love.graphics.setColor(0, 0, 0, 0.8)
+	love.graphics.rectangle("fill", 0, 0, w, h, _r or 36)
+	love.graphics.setColor(r, g, b, a)
+end
+
+local function drawFrameRect2(w, h, _r)
+	local r, g, b, a = love.graphics.getColor()
+	love.graphics.setColor(0.4, 0.4, 0.4, 0.7)
+	RoundedRectangle("fill", 0, 0, w, h, _r or 36)
+	love.graphics.setColor(r, g, b, a)
+end
+
+local Frames = {draw = function(self)
+	local w, h = Layout:move("base")
+	love.graphics.setColor(1, 1, 1, 0.2)
+	love.graphics.rectangle("fill", 0, 0, w, h)
+
+	w, h = Layout:move("graphs")
+	drawFrameRect(w, h)
+
+	love.graphics.setColor(0.1, 0.1, 0.1, 0.8)
+
+	w, h = Layout:move("title_left")
+	RoundedRectangle("fill", 0, 0, w, h, 36, false, false, 3)
+
+	w, h = Layout:move("title_sub")
+	RoundedRectangle("fill", 0, 0, w, 72, 36, true, true, 2)
+
+	w, h = Layout:move("title_right")
+	RoundedRectangle("fill", 0, 0, w, h, 36, false, false, 1)
+end}
 
 local BackgroundBlurSwitch = GaussianBlurView:new({
 	blur = {key = "game.configModel.configs.settings.graphics.blur.result"}
@@ -236,7 +253,14 @@ local HpGraph = PointGraphView:new({
 local ScoreList = ScoreListView:new({
 	transform = transform,
 	draw = function(self)
-		local w, h = move(Layout.column3row2)
+		local w, h = Layout:move("column3")
+		drawFrameRect(w, h)
+		love.graphics.setColor(0.4, 0.4, 0.4, 0.7)
+		w, h = Layout:move("column3row1")
+		drawFrameRect2(w, h)
+		love.graphics.setColor(1, 1, 1, 1)
+
+		local w, h = Layout:move("column3row2")
 
 		ScoreListView.game = self.game
 		ScoreListView.screenView = self.screenView
@@ -254,7 +278,7 @@ local ScoreList = ScoreListView:new({
 })
 
 local ScoreScrollBar = {draw = function(self)
-	local w, h = move(Layout.column3row2)
+	local w, h = Layout:move("column3row2")
 	love.graphics.translate(w - 16, 0)
 
 	local list = ScoreList
@@ -269,7 +293,8 @@ end}
 local Title = {draw = function(self)
 	local noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry
 
-	move(Layout.title_middle)
+	local w, h = Layout:move("title_middle")
+	drawFrameRect(w, h)
 	love.graphics.translate(22, 15)
 
 	love.graphics.setColor(1, 1, 1, 1)
@@ -293,7 +318,14 @@ local Judgements = {draw = function(self)
 
 	local padding = 24
 
-	local w, h = move(Layout.column1row2)
+	local w, h = Layout:move("column1")
+	drawFrameRect(w, h)
+	love.graphics.setColor(0.4, 0.4, 0.4, 0.7)
+	w, h = Layout:move("column1row1")
+	drawFrameRect2(w, h)
+	love.graphics.setColor(1, 1, 1, 1)
+
+	local w, h = Layout:move("column1row2")
 	love.graphics.translate(padding, padding)
 
 	w = w - padding * 2
@@ -328,24 +360,40 @@ local Judgements = {draw = function(self)
 		JudgementBarImView(w, lineHeight, notPerfect / count, "not perfect", notPerfect)
 	end
 
-	move(Layout.column1row2)
+	Layout:move("column1row2")
 	love.graphics.translate(padding, -padding + h - lineHeight)
 
 	JudgementBarImView(w, lineHeight, miss / count, "miss", miss)
 end}
 
-local JudgementsDropdown = JudgementsDropdownView:new({
-	transform = transform,
+local JudgementsDropdown = {
 	draw = function(self)
-		getRect(self, Layout.column1row1)
+		local w, h = Layout:move("column1row1")
+		h = 60
+
 		local size = 1 / 3
-		self.x = self.x + self.w * (1 - size) - 6 - 20
-		self.w = self.w * size
-		self.h = 55
-		self.y = self.y + (72 - self.h) / 2
-		self.__index.draw(self)
+		love.graphics.translate(w * (1 - size) - 26, (72 - h) / 2)
+
+		local judgement = self.game.rhythmModel.scoreEngine.scoreSystem.judgement
+		if not judgement then
+			return
+		end
+
+		local items = {}
+		for k in pairs(judgement.judgementLists) do
+			table.insert(items, k)
+		end
+		table.sort(items)
+
+		local config = self.game.configModel.configs.select
+		local preview = config.judgements
+		love.graphics.setFont(spherefonts.get("Noto Sans", 20))
+		local i = SpoilerListImView("JudgementsDropdown", w * size, h, items, preview)
+		if i then
+			config.judgements = items[i]
+		end
 	end,
-})
+}
 
 local JudgementsAccuracy = {
 	draw = function(self)
@@ -366,7 +414,7 @@ local JudgementsAccuracy = {
 			return
 		end
 
-		local w, h = move(Layout.column1row1)
+		local w, h = Layout:move("column1row1")
 		love.graphics.translate(w / 3, 0)
 		w = w / 3
 
@@ -416,7 +464,7 @@ local NotechartInfo = {draw = function(self)
 	local difficulty = show and scoreEngine.enps or scoreItem.difficulty
 	local inputMode = show and scoreEngine.inputMode or scoreItem.inputMode
 
-	local w, h = move(Layout.title_left)
+	local w, h = Layout:move("title_left")
 	love.graphics.translate(22, 15)
 
 	w = w - 44
@@ -436,7 +484,7 @@ local NotechartInfo = {draw = function(self)
 		("%d→%d"):format(baseBpm, bpm)
 	)
 
-	w, h = move(Layout.title_sub)
+	w, h = Layout:move("title_sub")
 	love.graphics.translate(0, 8)
 
 	local font = spherefonts.get("Noto Sans Mono", 36)
@@ -469,7 +517,12 @@ local NotechartInfo = {draw = function(self)
 		just.text(text, w - 72, true)
 	end
 
-	w, h = move(Layout.middle)
+	w, h = Layout:move("middle")
+	drawFrameRect(w, h)
+	love.graphics.setColor(0.4, 0.4, 0.4, 0.3)
+	w, h = Layout:move("middle_sub")
+	RoundedRectangle("fill", 0, 0, w, 72, 36, false, false, 2)
+	love.graphics.setColor(1, 1, 1, 1)
 
 	local score = not show and scoreItem.score or
 		erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2))) * 10000
@@ -509,7 +562,7 @@ local NotechartInfo = {draw = function(self)
 		deltaRating = Format.difficulty(deltaRating)
 	end
 
-	w, h = move(Layout.middle)
+	w, h = Layout:move("middle")
 	love.graphics.translate(42, 5)
 	w = w - 42 * 2
 
@@ -607,7 +660,10 @@ local NotechartInfo = {draw = function(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans Mono", 40))
 	just.text(textDifficulty, w, true)
 
-	w, h = move(Layout.graphs_sup_left)
+	w, h = Layout:move("graphs_sup_left")
+	love.graphics.setColor(0, 0, 0, 0.8)
+	RoundedRectangle("fill", 0, 0, w, h, {36, h / 2, 36, h / 2}, false, true)
+	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.translate(22, 0)
 
 	w = (w - 44) / 5
@@ -641,24 +697,25 @@ local NotechartInfo = {draw = function(self)
 	just.row(false)
 end}
 
-local ModifierIconGrid = ModifierIconGridView:new({
-	transform = transform,
+local ModifierIconGrid = {
 	draw = function(self)
-		getRect(self, Layout.middle_sub)
-		self.x = self.x + 36
-		self.w = self.w - 72
-		self.size = self.h
-		self.__index.draw(self)
+		local w, h = Layout:move("middle_sub")
+		-- drawFrameRect(w, h)
+		love.graphics.translate(36, 0)
+
+		local modifierModel = self.game.modifierModel
+		local config = modifierModel.config
+		if not showLoadedScore(self) then
+			config = modifierModel.config
+		end
+
+		ModifierIconGridView.game = self.game
+		ModifierIconGridView:draw(config, w - 72, h, h, true)
 	end,
-	noModifier = true,
-	config = {
-		{"game.modifierModel.config", showLoadedScore},
-		"game.selectModel.scoreItem.modifiers"
-	},
-})
+}
 
 local BottomScreenMenu = {draw = function(self)
-	local w, h = move(Layout.title_right)
+	local w, h = Layout:move("title_right")
 
 	love.graphics.translate(0, 72 / 2)
 	if IconButtonImView("back", "clear", 72, 0.618) then
@@ -671,7 +728,10 @@ local BottomScreenMenu = {draw = function(self)
 	local scoreEngine = self.game.rhythmModel.scoreEngine
 	local scoreEntry = scoreEngine.scoreEntry
 
-	w, h = move(Layout.graphs_sup_right)
+	w, h = Layout:move("graphs_sup_right")
+	love.graphics.setColor(0, 0, 0, 0.8)
+	RoundedRectangle("fill", 0, 0, w, h, {h / 2, 36, h / 2, 36}, true, false)
+	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.translate(55, 0)
 
 	just.row(true)
@@ -748,10 +808,11 @@ local InspectScoreEntry = ValueView:new({
 })
 
 local NoteSkinViewConfig = {
+	Layout,
 	BackgroundBlurSwitch,
 	Background,
 	BackgroundBlurSwitch,
-	Layout,
+	Frames,
 	Title,
 	NotechartInfo,
 	Judgements,

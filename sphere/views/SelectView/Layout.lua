@@ -4,7 +4,7 @@ local Layout = require("sphere.views.Layout")
 
 local _Layout = Layout:new()
 
-_Layout.draw = function(self)
+function _Layout:draw()
 	local width, height = love.graphics.getDimensions()
 
 	love.graphics.replaceTransform(gfx_util.transform(self.transform))
