@@ -1,17 +1,10 @@
 
 local Class = require("Class")
-local inside = require("table_util").inside
+local gfx_util = require("gfx_util")
 
 local GaussianBlurView = Class:new()
 
-GaussianBlurView.load = function(self)
-	self:setSigma(0)
-	self.drawCanvas = love.graphics.newCanvas()
-	self.shaderCanvas = love.graphics.newCanvas()
-end
-
-GaussianBlurView.draw = function(self)
-	local blur = math.ceil(self.blur.value or inside(self, self.blur.key) or 0)
+GaussianBlurView.draw = function(self, blur)
 	if blur == 0 then
 		return
 	end
@@ -61,22 +54,13 @@ GaussianBlurView.setSigma = function(self, sigma)
 end
 
 GaussianBlurView.enable = function(self)
-	local width, height = love.graphics.getDimensions()
-
-	local drawCanvas = self.drawCanvas
-	local shaderCanvas = self.shaderCanvas
-	local cw, ch = shaderCanvas:getDimensions()
-	if cw ~= width or ch ~= height then
-		self.drawCanvas = love.graphics.newCanvas(width, height)
-		self.shaderCanvas = love.graphics.newCanvas(width, height)
-		drawCanvas = self.drawCanvas
-		shaderCanvas = self.shaderCanvas
-	end
+	self.drawCanvas = gfx_util.getCanvas(1)
+	self.shaderCanvas = gfx_util.getCanvas(2)
 
 	self.oldShader = love.graphics.getShader()
 	self.oldCanvas = love.graphics.getCanvas()
 
-	love.graphics.setCanvas(drawCanvas)
+	love.graphics.setCanvas(self.drawCanvas)
 	love.graphics.clear(0, 0, 0, 0)
 end
 

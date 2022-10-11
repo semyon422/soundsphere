@@ -1,7 +1,11 @@
 local just = require("just")
 local ScreenView = require("sphere.views.ScreenView")
 
+local Layout = require("sphere.views.SelectView.Layout")
 local SelectViewConfig = require("sphere.views.SelectView.SelectViewConfig")
+local NotechartsSubscreen = require("sphere.views.SelectView.NotechartsSubscreen")
+local CollectionsSubscreen = require("sphere.views.SelectView.CollectionsSubscreen")
+local OsudirectSubscreen = require("sphere.views.SelectView.OsudirectSubscreen")
 
 local SelectView = ScreenView:new()
 
@@ -10,7 +14,7 @@ SelectView.searchMode = "filter"
 
 SelectView.construct = function(self)
 	ScreenView.construct(self)
-	self.viewConfig = SelectViewConfig
+	self.viewConfig = {}
 end
 
 SelectView.load = function(self)
@@ -20,6 +24,9 @@ end
 
 SelectView.draw = function(self)
 	just.container("select container", true)
+
+	Layout:draw()
+	SelectViewConfig(self)
 
 	local kp = just.keypressed
 	if kp("f1") then self.gameView:setModal(require("sphere.views.ModifierView"))
@@ -31,15 +38,17 @@ SelectView.draw = function(self)
 		if kp("return") then self:play()
 		elseif kp("tab") then self:switchToCollections()
 		end
+		NotechartsSubscreen(self)
 	elseif self.subscreen == "collections" then
 		if kp("return") or kp("tab") then self:switchToNoteCharts()
 		end
+		CollectionsSubscreen(self)
 	elseif self.subscreen == "osudirect" then
 		if kp("escape") or kp("tab") then self:switchToCollections()
 		end
+		OsudirectSubscreen(self)
 	end
 
-	ScreenView.draw(self)
 	just.container()
 end
 
