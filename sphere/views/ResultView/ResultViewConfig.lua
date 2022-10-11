@@ -79,9 +79,9 @@ local Frames = {draw = function(self)
 	RoundedRectangle("fill", 0, 0, w, h, 36, false, false, 1)
 end}
 
-local BackgroundBlurSwitch = GaussianBlurView:new({
-	blur = {key = "game.configModel.configs.settings.graphics.blur.result"}
-})
+local BackgroundBlurSwitch = {draw = function(self)
+	GaussianBlurView:draw(self.game.configModel.configs.settings.graphics.blur.result)
+end}
 
 local Background = {
 	draw = function(self)

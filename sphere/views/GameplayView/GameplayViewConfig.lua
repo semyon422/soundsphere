@@ -18,9 +18,9 @@ local PlayfieldView = {
 	class = "PlayfieldView"
 }
 
-local BackgroundBlurSwitch = GaussianBlurView:new({
-	blur = {key = "game.configModel.configs.settings.graphics.blur.gameplay"}
-})
+local BackgroundBlurSwitch = {draw = function(self)
+	GaussianBlurView:draw(self.game.configModel.configs.settings.graphics.blur.gameplay)
+end}
 
 local Background = {
 	draw = function(self)
