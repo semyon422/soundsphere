@@ -19,15 +19,15 @@ local mod_lines = {
 	{-6 / 64, 24 / 64},
 }
 
-ModifierIconView.draw = function(self, size, shape, ...)
+ModifierIconView.draw = function(self, size, shape, str, substr)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	love.graphics.setLineStyle("smooth")
 	love.graphics.setLineWidth(size / 40)
 
 	self:drawSquareBorder(size, shapes[shape] or shapes.allArcs)
-	local lines = mod_lines[select("#", ...)] or mod_lines[1]
-	self:drawText(lines, size, ...)
+	local lines = mod_lines[substr and 2 or 1] or mod_lines[1]
+	self:drawText(lines, size, str, substr)
 end
 
 ModifierIconView.drawText = function(self, lines, size, ...)
