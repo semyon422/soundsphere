@@ -1,26 +1,42 @@
 
 local transform = require("gfx_util").transform
-local map				= require("math_util").map
-local Class				= require("Class")
-local inside = require("table_util").inside
+local map = require("math_util").map
+local gfx_util = require("gfx_util")
+local Class = require("Class")
 
 local PointGraphView = Class:new()
 
 PointGraphView.startTime = 0
 PointGraphView.endTime = 0
 
-PointGraphView.load = function(self)
-	self.drawnPoints = 0
-	self.drawnBackgroundPoints = 0
+local vertexformat = {
+    {"VertexPosition", "float", 2},
+    {"VertexColor", "byte", 4}
+}
 
+PointGraphView.load = function(self)
 	local noteChart = self.game.noteChartModel.noteChart
 	if noteChart then
 		self.startTime = noteChart.metaData:get("minTime")
 		self.endTime = noteChart.metaData:get("maxTime")
 	end
 
-	self.canvas = love.graphics.newCanvas()
-	self.backgroundCanvas = love.graphics.newCanvas()
+	self.drawnPoints = 0
+	self.vertices = {}
+	self.mesh = nil
+	self:chechMesh(1)
+end
+
+PointGraphView.chechMesh = function(self, i)
+	if not self.mesh then
+		self.mesh = love.graphics.newMesh(vertexformat, 1, "points", "dynamic")
+		return
+	end
+	local po2 = 2 ^ math.ceil(math.log(i) / math.log(2))
+	if po2 > self.mesh:getVertexCount() then
+		self.mesh = love.graphics.newMesh(vertexformat, po2, "points", "dynamic")
+		self.mesh:setVertices(self.vertices)
+	end
 end
 
 PointGraphView.draw = function(self)
@@ -28,83 +44,73 @@ PointGraphView.draw = function(self)
 		return
 	end
 
-	if self.background then
-		self:drawPoints("drawnBackgroundPoints", self.backgroundCanvas, self.backgroundColor, self.backgroundRadius)
-	end
-	self:drawPoints("drawnPoints", self.canvas, self.color, self.radius)
-
-	love.graphics.origin()
-	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.draw(self.backgroundCanvas, 0, 0)
-	love.graphics.draw(self.canvas, 0, 0)
-end
-
-PointGraphView.update = function(self, dt) end
-PointGraphView.unload = function(self) end
-
-PointGraphView.receive = function(self, event)
-	if event.name == "resize" then
-		self:reload()
-	end
-end
-
-PointGraphView.reload = function(self)
-	self:unload()
-	self:load()
-end
-
-PointGraphView.getPoints = function(self) return {} end
-
-PointGraphView.drawPoints = function(self, counter, canvas, color, radius)
-	local shader = love.graphics.getShader()
-	love.graphics.setShader()
-	love.graphics.setCanvas(canvas)
+	self:drawPoints(self.color)
 
 	local tf = transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 
+	self.mesh:setDrawRange(1, self.drawnPoints)
+	if self.backgroundRadius then
+		local shader = love.graphics.getShader()
+		gfx_util.setPixelColor(self.backgroundColor)
+		love.graphics.setPointSize(self.backgroundRadius)
+		love.graphics.draw(self.mesh)
+		love.graphics.setShader(shader)
+	end
+
+	love.graphics.setPointSize(self.radius)
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.draw(self.mesh)
+
+	love.graphics.setPointSize(1)
+end
+
+PointGraphView.receive = function(self, event)
+	if event.name == "resize" then
+		self:load()
+	end
+end
+
+PointGraphView.getPoints = function(self) return {} end
+
+PointGraphView.drawPoints = function(self, color)
 	local points = self:getPoints()
 	if points then
-		for i = self[counter] + 1, #points do
-			self:drawPoint(points[i], color, radius)
+		for i = self.drawnPoints + 1, #points do
+			self:drawPoint(i, points[i], color)
 		end
 	end
-	self[counter] = #points
-
-	love.graphics.setCanvas()
-	love.graphics.setShader(shader)
+	self.drawnPoints = #points
 end
 
 PointGraphView.getTime = function(self, point) return 0 end
 PointGraphView.getValue = function(self, point) return 0 end
 
-PointGraphView.drawPoint = function(self, point, color, radius)
+PointGraphView.drawPoint = function(self, i, point, color)
 	local time = self:getTime(point)
 	local value = self:getValue(point)
+	if not value then
+		return
+	end
 
 	if type(color) == "function" then
 		color = color(time, self.startTime, self.endTime, value)
 	end
-	love.graphics.setColor(color)
 
-	if self.point then
-		local x, y = self.point(time, self.startTime, self.endTime, value)
-		if not x then
-			return
-		end
-		x = math.min(math.max(x, 0), 1)
-		y = math.min(math.max(y, 0), 1)
-		local _x, _y = map(x, 0, 1, 0, self.w), map(y, 0, 1, 0, self.h)
-		love.graphics.rectangle("fill", _x - radius, _y - radius, radius * 2, radius * 2)
-	elseif self.line then
-		local x = self.line(time, self.startTime, self.endTime, value)
-		if not x then
-			return
-		end
-		x = math.min(math.max(x, 0), 1)
-		local _x = map(x, 0, 1, 0, self.w)
-		love.graphics.rectangle("fill", _x - radius, 0, radius * 2, self.h)
+	local x, y = self.point(time, self.startTime, self.endTime, value)
+	if not x then
+		return
 	end
+
+	x = math.min(math.max(x, 0), 1)
+	y = math.min(math.max(y, 0), 1)
+	local _x = map(x, 0, 1, 0, self.w)
+	local _y = map(y, 0, 1, 0, self.h)
+
+	self:chechMesh(i)
+	local vertex = {_x, _y, unpack(color)}
+	self.mesh:setVertex(i, vertex)
+	table.insert(self.vertices, vertex)
 end
 
 return PointGraphView

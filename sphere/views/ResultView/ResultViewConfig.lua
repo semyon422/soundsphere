@@ -106,7 +106,7 @@ end
 local ComboGraph = PointGraphView:new({
 	transform = transform,
 	draw = drawGraph,
-	radius = 1.5,
+	radius = 2,
 	color = {1, 1, 0.25, 1},
 	background = true,
 	backgroundColor = {0, 0, 0, 0.2},
@@ -133,16 +133,15 @@ local notPerfectColor = {1, 0.6, 0.4, 1}
 local HitGraph = PointGraphView:new({
 	transform = transform,
 	draw = drawGraph,
-	radius = 1.5,
+	radius = 2,
 	color = function(time, startTime, endTime, value)
 		if math.abs(value) <= 0.016 then
 			return perfectColor
 		end
 		return notPerfectColor
 	end,
-	background = true,
 	backgroundColor = {0, 0, 0, 0.2},
-	backgroundRadius = 4,
+	backgroundRadius = 6,
 	getPoints = function(self)
 		return self.game.rhythmModel.scoreEngine.scoreSystem.sequence
 	end,
@@ -150,42 +149,14 @@ local HitGraph = PointGraphView:new({
 		return point.base.currentTime
 	end,
 	getValue = function(self, point)
+		if point.base.isMiss then
+			return
+		end
 		return point.misc.deltaTime
 	end,
 	point = function(time, startTime, endTime, value)
-		if math.abs(value) > 0.12 then
-			return
-		end
 		local x = (time - startTime) / (endTime - startTime)
 		local y = value / 0.16 / 2 + 0.5
-		return x, y
-	end,
-	show = showLoadedScore
-})
-
-local EarlyLateMissGraph = PointGraphView:new({
-	transform = transform,
-	draw = drawGraph,
-	radius = 3,
-	color = {1, 0.2, 0.2, 1},
-	background = true,
-	backgroundColor = {1, 1, 1, 1},
-	backgroundRadius = 4,
-	getPoints = function(self)
-		return self.game.rhythmModel.scoreEngine.scoreSystem.sequence
-	end,
-	getTime = function(self, point)
-		return point.base.currentTime
-	end,
-	getValue = function(self, point)
-		return point.misc.deltaTime
-	end,
-	point = function(time, startTime, endTime, value)
-		if math.abs(value) <= 0.12 or math.abs(value) > 0.16 then
-			return
-		end
-		local x = (time - startTime) / (endTime - startTime)
-		local y = math.min(math.max(value, -0.16), 0.16) / 0.16 / 2 + 0.5
 		return x, y
 	end,
 	show = showLoadedScore
@@ -194,11 +165,10 @@ local EarlyLateMissGraph = PointGraphView:new({
 local MissGraph = PointGraphView:new({
 	transform = transform,
 	draw = drawGraph,
-	radius = 1,
-	color = {1, 0.6, 0.6, 1},
-	background = true,
-	backgroundColor = {1, 1, 1, 0},
-	backgroundRadius = 3,
+	radius = 4,
+	color = {1, 0.2, 0.2, 1},
+	backgroundColor = {1, 1, 1, 1},
+	backgroundRadius = 6,
 	getPoints = function(self)
 		return self.game.rhythmModel.scoreEngine.scoreSystem.sequence
 	end,
@@ -206,14 +176,15 @@ local MissGraph = PointGraphView:new({
 		return point.base.currentTime
 	end,
 	getValue = function(self, point)
-		return point.base.isMiss
-	end,
-	line = function(time, startTime, endTime, value)
-		if not value then
+		if not point.base.isMiss then
 			return
 		end
+		return point.misc.deltaTime
+	end,
+	point = function(time, startTime, endTime, value)
 		local x = (time - startTime) / (endTime - startTime)
-		return x
+		local y = value / 0.16 / 2 + 0.5
+		return x, y
 	end,
 	show = showLoadedScore
 })
@@ -221,7 +192,7 @@ local MissGraph = PointGraphView:new({
 local HpGraph = PointGraphView:new({
 	transform = transform,
 	draw = drawGraph,
-	radius = 1.5,
+	radius = 2,
 	color = {0.25, 1, 0.5, 1},
 	background = true,
 	backgroundColor = {0, 0, 0, 0.2},
@@ -821,11 +792,10 @@ local NoteSkinViewConfig = {
 	ModifierIconGrid,
 	ScoreList,
 	ScoreScrollBar,
-	MissGraph,
 	HitGraph,
 	ComboGraph,
 	HpGraph,
-	EarlyLateMissGraph,
+	MissGraph,
 	BottomScreenMenu,
 	MatchPlayers,
 	InspectScoreSystem,
