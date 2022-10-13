@@ -1,26 +1,14 @@
-
-local transform = require("gfx_util").transform
-local map = require("math_util").map
 local gfx_util = require("gfx_util")
 local Class = require("Class")
 
 local PointGraphView = Class:new()
-
-PointGraphView.startTime = 0
-PointGraphView.endTime = 0
 
 local vertexformat = {
     {"VertexPosition", "float", 2},
     {"VertexColor", "byte", 4}
 }
 
-PointGraphView.load = function(self)
-	local noteChart = self.game.noteChartModel.noteChart
-	if noteChart then
-		self.startTime = noteChart.metaData:get("minTime")
-		self.endTime = noteChart.metaData:get("maxTime")
-	end
-
+PointGraphView.reload = function(self)
 	self.drawnPoints = 0
 	self.vertices = {}
 	self.mesh = nil
@@ -39,76 +27,58 @@ PointGraphView.chechMesh = function(self, i)
 	end
 end
 
-PointGraphView.draw = function(self)
+PointGraphView.draw = function(self, w, h)
 	if self.show and not self.show(self) then
 		return
 	end
 
-	self:drawPoints(self.color)
+	local points = self.game.rhythmModel.scoreEngine.scoreSystem.sequence
+	if self.points ~= points then
+		self.points = points
+		points = self.points
+		self:reload()
+	end
+	if not self.points then
+		return
+	end
 
-	local tf = transform(self.transform):translate(self.x, self.y)
-	love.graphics.replaceTransform(tf)
+	for i = self.drawnPoints + 1, #points do
+		self:drawPoint(i, points[i])
+	end
+	self.drawnPoints = #points
 
 	self.mesh:setDrawRange(1, self.drawnPoints)
 	if self.backgroundRadius then
 		local shader = love.graphics.getShader()
 		gfx_util.setPixelColor(self.backgroundColor)
 		love.graphics.setPointSize(self.backgroundRadius)
-		love.graphics.draw(self.mesh)
+		love.graphics.draw(self.mesh, 0, 0, 0, w, h)
 		love.graphics.setShader(shader)
 	end
 
 	love.graphics.setPointSize(self.radius)
 	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.draw(self.mesh)
+	love.graphics.draw(self.mesh, 0, 0, 0, w, h)
 
 	love.graphics.setPointSize(1)
 end
 
-PointGraphView.receive = function(self, event)
-	if event.name == "resize" then
-		self:load()
-	end
-end
-
-PointGraphView.getPoints = function(self) return {} end
-
-PointGraphView.drawPoints = function(self, color)
-	local points = self:getPoints()
-	if points then
-		for i = self.drawnPoints + 1, #points do
-			self:drawPoint(i, points[i], color)
-		end
-	end
-	self.drawnPoints = #points
-end
-
-PointGraphView.getTime = function(self, point) return 0 end
-PointGraphView.getValue = function(self, point) return 0 end
-
-PointGraphView.drawPoint = function(self, i, point, color)
-	local time = self:getTime(point)
-	local value = self:getValue(point)
-	if not value then
+PointGraphView.drawPoint = function(self, i, point)
+	local y, r, g, b, a = self:point(point)
+	if not y then
 		return
 	end
 
-	if type(color) == "function" then
-		color = color(time, self.startTime, self.endTime, value)
-	end
-
-	local x, y = self.point(time, self.startTime, self.endTime, value)
-	if not x then
-		return
-	end
+	local timeEngine = self.game.rhythmModel.timeEngine
+	local startTime = timeEngine.minTime
+	local endTime = timeEngine.maxTime
+	local x = (point.base.currentTime - startTime) / (endTime - startTime)
 
 	x = math.min(math.max(x, 0), 1)
 	y = math.min(math.max(y, 0), 1)
-	local _x = map(x, 0, 1, 0, self.w)
-	local _y = map(y, 0, 1, 0, self.h)
 
 	self:chechMesh(i)
-	local vertex = {_x, _y, unpack(color)}
+	local vertex = {x, y, r, g, b, a}
 	self.mesh:setVertex(i, vertex)
 	table.insert(self.vertices, vertex)
 end

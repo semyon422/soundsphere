@@ -36,13 +36,6 @@ local showLoadedScore = function(self)
 	return scoreItem.id == scoreEntry.id
 end
 
-local function getRect(out, r)
-	out.x = r[1]
-	out.y = r[2]
-	out.w = r[3]
-	out.h = r[4]
-end
-
 local Layout = require("sphere.views.ResultView.Layout")
 
 local function drawFrameRect(w, h, _r)
@@ -59,7 +52,7 @@ local function drawFrameRect2(w, h, _r)
 	love.graphics.setColor(r, g, b, a)
 end
 
-local Frames = {draw = function(self)
+local function Frames(self)
 	local w, h = Layout:move("base")
 	love.graphics.setColor(1, 1, 1, 0.2)
 	love.graphics.rectangle("fill", 0, 0, w, h)
@@ -77,191 +70,148 @@ local Frames = {draw = function(self)
 
 	w, h = Layout:move("title_right")
 	RoundedRectangle("fill", 0, 0, w, h, 36, false, false, 1)
-end}
-
-local BackgroundBlurSwitch = {draw = function(self)
-	GaussianBlurView:draw(self.game.configModel.configs.settings.graphics.blur.result)
-end}
-
-local Background = {
-	draw = function(self)
-		love.graphics.replaceTransform(gfx_util.transform(transform))
-
-		local dim = self.game.configModel.configs.settings.graphics.dim.result
-		BackgroundView.game = self.game
-		BackgroundView:draw(1920, 1080, dim, 0.01)
-	end
-}
-
-local drawGraph = function(self)
-	getRect(self, Layout.graphs)
-	local padding = 18 * math.sqrt(2) / 2
-	self.x = self.x + padding
-	self.y = self.y + padding
-	self.w = self.w - padding * 2
-	self.h = self.h - padding * 2
-	self.__index.draw(self)
 end
 
-local ComboGraph = PointGraphView:new({
-	transform = transform,
+local function Background(self)
+	love.graphics.replaceTransform(gfx_util.transform(transform))
+
+	local dim = self.game.configModel.configs.settings.graphics.dim.result
+	BackgroundView.game = self.game
+	BackgroundView:draw(1920, 1080, dim, 0.01)
+end
+
+local drawGraph = function(self)
+	local w, h = Layout:move("graphs")
+	local padding = 18 * math.sqrt(2) / 2
+	love.graphics.translate(padding, padding)
+	w = w - padding * 2
+	h = h - padding * 2
+	self.__index.draw(self, w, h)
+end
+
+local _ComboGraph = PointGraphView:new({
 	draw = drawGraph,
 	radius = 2,
-	color = {1, 1, 0.25, 1},
-	background = true,
 	backgroundColor = {0, 0, 0, 0.2},
 	backgroundRadius = 4,
-	getPoints = function(self)
-		return self.game.rhythmModel.scoreEngine.scoreSystem.sequence
-	end,
-	getTime = function(self, point)
-		return point.base.currentTime
-	end,
-	getValue = function(self, point)
-		return point.base.combo / point.base.noteCount
-	end,
-	point = function(time, startTime, endTime, value)
-		local x = (time - startTime) / (endTime - startTime)
-		local y = 1 - value
-		return x, y
+	point = function(self, point)
+		local y = 1 - point.base.combo / point.base.noteCount
+		return y, 1, 1, 0.25, 1
 	end,
 	show = showLoadedScore
 })
+local function ComboGraph(self)
+	_ComboGraph.game = self.game
+	_ComboGraph:draw()
+end
 
 local perfectColor = {1, 1, 1, 1}
 local notPerfectColor = {1, 0.6, 0.4, 1}
-local HitGraph = PointGraphView:new({
-	transform = transform,
+local _HitGraph = PointGraphView:new({
 	draw = drawGraph,
 	radius = 2,
-	color = function(time, startTime, endTime, value)
-		if math.abs(value) <= 0.016 then
-			return perfectColor
-		end
-		return notPerfectColor
-	end,
 	backgroundColor = {0, 0, 0, 0.2},
 	backgroundRadius = 6,
-	getPoints = function(self)
-		return self.game.rhythmModel.scoreEngine.scoreSystem.sequence
-	end,
-	getTime = function(self, point)
-		return point.base.currentTime
-	end,
-	getValue = function(self, point)
+	point = function(self, point)
 		if point.base.isMiss then
 			return
 		end
-		return point.misc.deltaTime
-	end,
-	point = function(time, startTime, endTime, value)
-		local x = (time - startTime) / (endTime - startTime)
-		local y = value / 0.16 / 2 + 0.5
-		return x, y
+		local color = notPerfectColor
+		if math.abs(point.misc.deltaTime) <= 0.016 then
+			color = perfectColor
+		end
+
+		local y = point.misc.deltaTime / 0.16 / 2 + 0.5
+		return y, unpack(color)
 	end,
 	show = showLoadedScore
 })
+local function HitGraph(self)
+	_HitGraph.game = self.game
+	_HitGraph:draw()
+end
 
-local MissGraph = PointGraphView:new({
-	transform = transform,
+local _MissGraph = PointGraphView:new({
 	draw = drawGraph,
 	radius = 4,
-	color = {1, 0.2, 0.2, 1},
 	backgroundColor = {1, 1, 1, 1},
 	backgroundRadius = 6,
-	getPoints = function(self)
-		return self.game.rhythmModel.scoreEngine.scoreSystem.sequence
-	end,
-	getTime = function(self, point)
-		return point.base.currentTime
-	end,
-	getValue = function(self, point)
+	point = function(self, point)
 		if not point.base.isMiss then
 			return
 		end
-		return point.misc.deltaTime
-	end,
-	point = function(time, startTime, endTime, value)
-		local x = (time - startTime) / (endTime - startTime)
-		local y = value / 0.16 / 2 + 0.5
-		return x, y
+		local y = point.misc.deltaTime / 0.16 / 2 + 0.5
+		return y, 1, 0.2, 0.2, 1
 	end,
 	show = showLoadedScore
 })
+local function MissGraph(self)
+	_MissGraph.game = self.game
+	_MissGraph:draw()
+end
 
-local HpGraph = PointGraphView:new({
-	transform = transform,
+local _HpGraph = PointGraphView:new({
 	draw = drawGraph,
 	radius = 2,
-	color = {0.25, 1, 0.5, 1},
-	background = true,
 	backgroundColor = {0, 0, 0, 0.2},
 	backgroundRadius = 4,
-	getPoints = function(self)
-		return self.game.rhythmModel.scoreEngine.scoreSystem.sequence
-	end,
-	getTime = function(self, point)
-		return point.base.currentTime
-	end,
-	getValue = function(self, point)
+	point = function(self, point)
+		local value = 0
 		local _hp = self.game.rhythmModel.scoreEngine.scoreSystem.hp
 		local hp = point.hp
 		for _, h in ipairs(hp) do
 			if h.value > 0 then
-				return h.value / _hp.max
+				value = h.value / _hp.max
+				break
 			end
 		end
-		return 0
-	end,
-	point = function(time, startTime, endTime, value)
-		local x = (time - startTime) / (endTime - startTime)
-		local y = 1 - value
-		return x, y
+
+		return 1 - value, 0.25, 1, 0.5, 1
 	end,
 	show = showLoadedScore
 })
+local function HpGraph(self)
+	_HpGraph.game = self.game
+	_HpGraph:draw()
+end
 
-local ScoreList = ScoreListView:new({
-	transform = transform,
-	draw = function(self)
-		local w, h = Layout:move("column3")
-		drawFrameRect(w, h)
-		love.graphics.setColor(0.4, 0.4, 0.4, 0.7)
-		w, h = Layout:move("column3row1")
-		drawFrameRect2(w, h)
-		love.graphics.setColor(1, 1, 1, 1)
+local function ScoreList(self)
+	local w, h = Layout:move("column3")
+	drawFrameRect(w, h)
+	love.graphics.setColor(0.4, 0.4, 0.4, 0.7)
+	w, h = Layout:move("column3row1")
+	drawFrameRect2(w, h)
+	love.graphics.setColor(1, 1, 1, 1)
 
-		local w, h = Layout:move("column3row2")
+	w, h = Layout:move("column3row2")
 
-		ScoreListView.game = self.game
-		ScoreListView.screenView = self.screenView
-		ScoreListView:draw(w, h)
+	ScoreListView.game = self.game
+	ScoreListView.screenView = self
+	ScoreListView:draw(w, h)
 
-		love.graphics.setColor(1, 1, 1, 0.8)
-		h = h / ScoreListView.rows
-		local c = math.floor(ScoreListView.rows / 2)
-		love.graphics.polygon("fill",
-			0, h * (c + 0.2) + (72 - h) / 2,
-			h / 2 * 0.6, h * (c + 0.5) + (72 - h) / 2,
-			0, h * (c + 0.8) + (72 - h) / 2
-		)
-	end,
-})
+	love.graphics.setColor(1, 1, 1, 0.8)
+	h = h / ScoreListView.rows
+	local c = math.floor(ScoreListView.rows / 2)
+	love.graphics.polygon("fill",
+		0, h * (c + 0.2) + (72 - h) / 2,
+		h / 2 * 0.6, h * (c + 0.5) + (72 - h) / 2,
+		0, h * (c + 0.8) + (72 - h) / 2
+	)
 
-local ScoreScrollBar = {draw = function(self)
-	local w, h = Layout:move("column3row2")
+
+	w, h = Layout:move("column3row2")
 	love.graphics.translate(w - 16, 0)
 
-	local list = ScoreList
+	local list = ScoreListView
 	local count = #list.items - 1
 	local pos = (list.visualItemIndex - 1) / count
 	local newScroll = ScrollBarImView("slsb", pos, 16, h, count / list.rows)
 	if newScroll then
 		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
 	end
-end}
+end
 
-local Title = {draw = function(self)
+local function Title(self)
 	local noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry
 
 	local w, h = Layout:move("title_middle")
@@ -275,9 +225,9 @@ local Title = {draw = function(self)
 	local creator_name = ("%s — %s"):format(noteChartDataEntry.creator, noteChartDataEntry.name)
 	just.text(artist_title)
 	just.text(creator_name)
-end}
+end
 
-local Judgements = {draw = function(self)
+local function Judgements(self)
 	local show = showLoadedScore(self)
 	local scoreEngine = self.game.rhythmModel.scoreEngine
 	local scoreItem = self.game.selectModel.scoreItem
@@ -335,67 +285,63 @@ local Judgements = {draw = function(self)
 	love.graphics.translate(padding, -padding + h - lineHeight)
 
 	JudgementBarImView(w, lineHeight, miss / count, "miss", miss)
-end}
+end
 
-local JudgementsDropdown = {
-	draw = function(self)
-		local w, h = Layout:move("column1row1")
-		h = 60
+local function JudgementsDropdown(self)
+	local w, h = Layout:move("column1row1")
+	h = 60
 
-		local size = 1 / 3
-		love.graphics.translate(w * (1 - size) - 26, (72 - h) / 2)
+	local size = 1 / 3
+	love.graphics.translate(w * (1 - size) - 26, (72 - h) / 2)
 
-		local judgement = self.game.rhythmModel.scoreEngine.scoreSystem.judgement
-		if not judgement then
-			return
-		end
+	local judgement = self.game.rhythmModel.scoreEngine.scoreSystem.judgement
+	if not judgement then
+		return
+	end
 
-		local items = {}
-		for k in pairs(judgement.judgementLists) do
-			table.insert(items, k)
-		end
-		table.sort(items)
+	local items = {}
+	for k in pairs(judgement.judgementLists) do
+		table.insert(items, k)
+	end
+	table.sort(items)
 
-		local config = self.game.configModel.configs.select
-		local preview = config.judgements
-		love.graphics.setFont(spherefonts.get("Noto Sans", 20))
-		local i = SpoilerListImView("JudgementsDropdown", w * size, h, items, preview)
-		if i then
-			config.judgements = items[i]
-		end
-	end,
-}
+	local config = self.game.configModel.configs.select
+	local preview = config.judgements
+	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
+	local i = SpoilerListImView("JudgementsDropdown", w * size, h, items, preview)
+	if i then
+		config.judgements = items[i]
+	end
+end
 
-local JudgementsAccuracy = {
-	draw = function(self)
-		local show = showLoadedScore(self)
-		local scoreEngine = self.game.rhythmModel.scoreEngine
-		local scoreItem = self.game.selectModel.scoreItem
-		local judgement = scoreEngine.scoreSystem.judgement
+local function JudgementsAccuracy(self)
+	local show = showLoadedScore(self)
+	local scoreEngine = self.game.rhythmModel.scoreEngine
+	local scoreItem = self.game.selectModel.scoreItem
+	local judgement = scoreEngine.scoreSystem.judgement
 
-		if not show or not judgement or not scoreItem then
-			return
-		end
+	if not show or not judgement or not scoreItem then
+		return
+	end
 
-		local counterName = self.game.configModel.configs.select.judgements
-		local counter = judgement.counters[counterName]
-		local judgements = judgement.judgements[counterName]
+	local counterName = self.game.configModel.configs.select.judgements
+	local counter = judgement.counters[counterName]
+	local judgements = judgement.judgements[counterName]
 
-		if not judgements.accuracy then
-			return
-		end
+	if not judgements.accuracy then
+		return
+	end
 
-		local w, h = Layout:move("column1row1")
-		love.graphics.translate(w / 3, 0)
-		w = w / 3
+	local w, h = Layout:move("column1row1")
+	love.graphics.translate(w / 3, 0)
+	w = w / 3
 
-		love.graphics.setColor(1, 1, 1, 1)
-		love.graphics.setFont(spherefonts.get("Noto Sans Mono", 32))
-		LabelImView("j.acc", ("%3.2f%%"):format(judgements.accuracy(counter) * 100), h)
-	end,
-}
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.setFont(spherefonts.get("Noto Sans Mono", 32))
+	LabelImView("j.acc", ("%3.2f%%"):format(judgements.accuracy(counter) * 100), h)
+end
 
-local NotechartInfo = {draw = function(self)
+local function NotechartInfo(self)
 	local erfunc = require("libchart.erfunc")
 	local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 	local normalscore = self.game.rhythmModel.scoreEngine.scoreSystem.normalscore
@@ -666,31 +612,29 @@ local NotechartInfo = {draw = function(self)
 	end
 
 	just.row(false)
-end}
+end
 
-local ModifierIconGrid = {
-	draw = function(self)
-		local w, h = Layout:move("middle_sub")
-		-- drawFrameRect(w, h)
-		love.graphics.translate(36, 0)
+local function ModifierIconGrid(self)
+	local w, h = Layout:move("middle_sub")
+	-- drawFrameRect(w, h)
+	love.graphics.translate(36, 0)
 
-		local modifierModel = self.game.modifierModel
-		local config = modifierModel.config
-		if not showLoadedScore(self) then
-			config = modifierModel.config
-		end
+	local modifierModel = self.game.modifierModel
+	local config = modifierModel.config
+	if not showLoadedScore(self) then
+		config = modifierModel.config
+	end
 
-		ModifierIconGridView.game = self.game
-		ModifierIconGridView:draw(config, w - 72, h, h, true)
-	end,
-}
+	ModifierIconGridView.game = self.game
+	ModifierIconGridView:draw(config, w - 72, h, h, true)
+end
 
-local BottomScreenMenu = {draw = function(self)
+local function BottomScreenMenu(self)
 	local w, h = Layout:move("title_right")
 
 	love.graphics.translate(0, 72 / 2)
 	if IconButtonImView("back", "clear", 72, 0.618) then
-		self.screenView:changeScreen("selectView")
+		self:changeScreen("selectView")
 	end
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
@@ -707,10 +651,10 @@ local BottomScreenMenu = {draw = function(self)
 
 	just.row(true)
 	if TextButtonImView("retry", "retry", 72 * 1.5, h) then
-		self.screenView:play("retry")
+		self:play("retry")
 	end
 	if TextButtonImView("replay", "watch replay", 72 * 3, h) then
-		self.screenView:play("replay")
+		self:play("replay")
 	end
 	if scoreItem and scoreEntry and scoreItem.id == scoreEntry.id and not scoreItem.file then
 		if TextButtonImView("submit", "resubmit", 72 * 2, h) then
@@ -723,15 +667,13 @@ local BottomScreenMenu = {draw = function(self)
 		end
 	end
 	just.row(false)
-end}
+end
 
-local MatchPlayers = MatchPlayersView:new({
-	transform = transformLeft,
-	key = "game.multiplayerModel.roomUsers",
-	x = 20,
-	y = 540,
-	font = {"Noto Sans Mono", 24},
-})
+local function MatchPlayers(self)
+	Layout:move("column1")
+	MatchPlayersView.game = self.game
+	MatchPlayersView:draw()
+end
 
 local InspectScoreSystem = ValueView:new({
 	subscreen = "scoreSystemDebug",
@@ -778,30 +720,25 @@ local InspectScoreEntry = ValueView:new({
 	color = {1, 1, 1, 1}
 })
 
-local NoteSkinViewConfig = {
-	Layout,
-	BackgroundBlurSwitch,
-	Background,
-	BackgroundBlurSwitch,
-	Frames,
-	Title,
-	NotechartInfo,
-	Judgements,
-	JudgementsDropdown,
-	JudgementsAccuracy,
-	ModifierIconGrid,
-	ScoreList,
-	ScoreScrollBar,
-	HitGraph,
-	ComboGraph,
-	HpGraph,
-	MissGraph,
-	BottomScreenMenu,
-	MatchPlayers,
-	InspectScoreSystem,
-	InspectCounters,
-	InspectScoreEntry,
-	require("sphere.views.DebugInfoViewConfig"),
-}
-
-return NoteSkinViewConfig
+return function(self)
+	GaussianBlurView:draw(self.game.configModel.configs.settings.graphics.blur.result)
+	Background(self)
+	GaussianBlurView:draw(self.game.configModel.configs.settings.graphics.blur.result)
+	Frames(self)
+	Title(self)
+	NotechartInfo(self)
+	Judgements(self)
+	JudgementsDropdown(self)
+	JudgementsAccuracy(self)
+	ModifierIconGrid(self)
+	ScoreList(self)
+	HitGraph(self)
+	ComboGraph(self)
+	HpGraph(self)
+	MissGraph(self)
+	BottomScreenMenu(self)
+	MatchPlayers(self)
+	-- InspectScoreSystem:draw()
+	-- InspectCounters:draw()
+	-- InspectScoreEntry:draw()
+end

@@ -483,14 +483,18 @@ PlayfieldVsrg.addHitError = function(self, object)
 	return self:add(HitErrorView:new(object))
 end
 
-PlayfieldVsrg.addMatchPlayers = function(self, object)
-	if not object then
-		return
+PlayfieldVsrg.addMatchPlayers = function(self)
+	local object = {}
+	object.transform = self:newTransform(1920, 1080, "left")
+	object.draw = function(self)
+		local gfx_util = require("gfx_util")
+		love.graphics.replaceTransform(gfx_util.transform(self.transform))
+		love.graphics.translate(20, 540)
+		MatchPlayersView.game = self.game
+		MatchPlayersView:draw()
 	end
-	object.transform = object.transform or self:newTransform(1920, 1080, "left")
-	object.key = "game.multiplayerModel.roomUsers"
 
-	return self:add(MatchPlayersView:new(object))
+	return self:add(object)
 end
 
 return PlayfieldVsrg

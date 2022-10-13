@@ -1,7 +1,5 @@
 local Class = require("Class")
-local transform = require("gfx_util").transform
 local spherefonts = require("sphere.assets.fonts")
-local inside = require("table_util").inside
 local erfunc = require("libchart.erfunc")
 local just = require("just")
 local Format = require("sphere.views.Format")
@@ -9,8 +7,7 @@ local Format = require("sphere.views.Format")
 local MatchPlayersView = Class:new()
 
 MatchPlayersView.draw = function(self)
-	local users = inside(self, self.key)
-
+	local users = self.game.multiplayerModel.roomUsers
 	local window = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 
 	local scores = {}
@@ -35,14 +32,10 @@ MatchPlayersView.draw = function(self)
 		end
 	end
 
-	local tf = transform(self.transform)
-	love.graphics.replaceTransform(tf)
-
 	love.graphics.setColor(1, 1, 1, 1)
-	local font = spherefonts.get(unpack(self.font))
+	local font = spherefonts.get("Noto Sans Mono", 24)
 	love.graphics.setFont(font)
 
-	love.graphics.translate(self.x, self.y)
 	for i, score in ipairs(scores) do
 		local twidth = 300
 		local theight = font:getHeight() * 2

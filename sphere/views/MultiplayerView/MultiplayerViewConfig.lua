@@ -2,28 +2,20 @@ local just = require("just")
 local spherefonts		= require("sphere.assets.fonts")
 local gfx_util = require("gfx_util")
 
-local RectangleView = require("sphere.views.RectangleView")
 local BackgroundView = require("sphere.views.BackgroundView")
-local ValueView = require("sphere.views.ValueView")
-local GaussianBlurView = require("sphere.views.GaussianBlurView")
 local UserInfoView = require("sphere.views.UserInfoView")
 local LogoImView = require("sphere.imviews.LogoImView")
 local RoomUsersListView = require("sphere.views.MultiplayerView.RoomUsersListView")
 
-local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
 local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
-local MatchPlayersView	= require("sphere.views.GameplayView.MatchPlayersView")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 local BarCellImView = require("sphere.imviews.BarCellImView")
 local IconButtonImView = require("sphere.imviews.IconButtonImView")
 local TextButtonImView = require("sphere.imviews.TextButtonImView")
 local CheckboxImView = require("sphere.imviews.CheckboxImView")
 local LabelImView = require("sphere.imviews.LabelImView")
-local JudgementBarImView = require("sphere.imviews.JudgementBarImView")
-local Format = require("sphere.views.Format")
 local RoundedRectangle = require("sphere.views.RoundedRectangle")
 
-local inspect = require("inspect")
 local time_util = require("time_util")
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 

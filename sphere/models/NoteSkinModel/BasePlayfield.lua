@@ -83,12 +83,7 @@ BasePlayfield.addBaseHitError = function(self)
 end
 
 BasePlayfield.addBaseMatchPlayers = function(self)
-	return self:addMatchPlayers({
-		transform = self:newTransform(1920, 1080, "left"),
-		x = 20,
-		y = 540,
-		font = {"Noto Sans Mono", 24},
-	})
+	return self:addMatchPlayers()
 end
 
 BasePlayfield.addBaseElements = function(self, elements)

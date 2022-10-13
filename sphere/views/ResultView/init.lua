@@ -2,13 +2,14 @@ local ScreenView = require("sphere.views.ScreenView")
 local thread = require("thread")
 local just = require("just")
 
+local Layout = require("sphere.views.ResultView.Layout")
 local ResultViewConfig = require("sphere.views.ResultView.ResultViewConfig")
 
 local ResultView = ScreenView:new()
 
 ResultView.construct = function(self)
 	ScreenView.construct(self)
-	self.viewConfig = ResultViewConfig
+	self.viewConfig = {}
 end
 
 local loading
@@ -45,12 +46,9 @@ ResultView.draw = function(self)
 	elseif kp("f4") then self.subscreen = "scoreEntryDebug"
 	end
 
-	ScreenView.draw(self)
+	Layout:draw()
+	ResultViewConfig(self)
 	just.container()
-end
-
-ResultView.unload = function(self)
-	ScreenView.unload(self)
 end
 
 ResultView.reload = function(self)
