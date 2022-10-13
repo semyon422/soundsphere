@@ -1,13 +1,14 @@
 local ScreenView = require("sphere.views.ScreenView")
 local just = require("just")
 
+local Layout = require("sphere.views.MultiplayerView.Layout")
 local MultiplayerViewConfig = require("sphere.views.MultiplayerView.MultiplayerViewConfig")
 
 local MultiplayerView = ScreenView:new()
 
 MultiplayerView.construct = function(self)
 	ScreenView.construct(self)
-	self.viewConfig = MultiplayerViewConfig
+	self.viewConfig = {}
 end
 
 MultiplayerView.load = function(self)
@@ -17,7 +18,8 @@ end
 
 MultiplayerView.draw = function(self)
 	just.container("screen container", true)
-	ScreenView.draw(self)
+	Layout:draw()
+	MultiplayerViewConfig(self)
 	just.container()
 end
 

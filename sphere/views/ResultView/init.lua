@@ -28,7 +28,6 @@ ResultView.load = thread.coro(function(self)
 			self:reload()
 		end
 	end
-	self.subscreen = ""
 	loading = false
 end)
 
@@ -40,10 +39,6 @@ ResultView.draw = function(self)
 	elseif kp("down") then self.game.selectModel:scrollScore(1)
 	elseif kp("escape") then self:quit()
 	elseif kp("return") then self:loadScore()
-	elseif kp("f1") then self.subscreen = "debug"
-	elseif kp("f2") then self.subscreen = "scoreSystemDebug"
-	elseif kp("f3") then self.subscreen = "countersDebug"
-	elseif kp("f4") then self.subscreen = "scoreEntryDebug"
 	end
 
 	Layout:draw()

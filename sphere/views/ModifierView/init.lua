@@ -9,16 +9,7 @@ return ModalImView(function(self)
 		return true
 	end
 
-	for _, object in ipairs(ModifierViewConfig) do
-		object.game = self.game
-		object:draw()
-	end
-
-	just.container("modifier keyboard", true)
-	if not just.keyboard_over() then
-		just.container()
-		return
-	end
+	ModifierViewConfig(self)
 
 	local kp = just.keypressed
 
@@ -41,8 +32,6 @@ return ModalImView(function(self)
 		end
 	end
 	if kp("f1") then close = true end
-
-	just.container()
 
 	return close
 end)

@@ -24,8 +24,6 @@ local RoundedRectangle = require("sphere.views.RoundedRectangle")
 
 local inspect = require("inspect")
 local time_util = require("time_util")
-local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
-local transformLeft = {0, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local showLoadedScore = function(self)
 	local scoreEntry = self.game.rhythmModel.scoreEngine.scoreEntry
@@ -73,11 +71,11 @@ local function Frames(self)
 end
 
 local function Background(self)
-	love.graphics.replaceTransform(gfx_util.transform(transform))
+	local w, h = Layout:move("base")
 
 	local dim = self.game.configModel.configs.settings.graphics.dim.result
 	BackgroundView.game = self.game
-	BackgroundView:draw(1920, 1080, dim, 0.01)
+	BackgroundView:draw(w, h, dim, 0.01)
 end
 
 local drawGraph = function(self)
@@ -675,51 +673,6 @@ local function MatchPlayers(self)
 	MatchPlayersView:draw()
 end
 
-local InspectScoreSystem = ValueView:new({
-	subscreen = "scoreSystemDebug",
-	transform = transformLeft,
-	key = "game.rhythmModel.scoreEngine.scoreSystem.slice",
-	format = function(...)
-		return inspect(...)
-	end,
-	x = 0,
-	baseline = 20,
-	limit = 1920,
-	font = {"Noto Sans Mono", 14},
-	align = "left",
-	color = {1, 1, 1, 1}
-})
-
-local InspectCounters = ValueView:new({
-	subscreen = "countersDebug",
-	transform = transformLeft,
-	key = "game.rhythmModel.scoreEngine.scoreSystem.judgement.counters",
-	format = function(...)
-		return inspect(...)
-	end,
-	x = 0,
-	baseline = 20,
-	limit = 1920,
-	font = {"Noto Sans Mono", 14},
-	align = "left",
-	color = {1, 1, 1, 1}
-})
-
-local InspectScoreEntry = ValueView:new({
-	subscreen = "scoreEntryDebug",
-	transform = transformLeft,
-	key = "game.selectModel.scoreItem",
-	format = function(...)
-		return inspect(...)
-	end,
-	x = 0,
-	baseline = 20,
-	limit = 1920,
-	font = {"Noto Sans Mono", 14},
-	align = "left",
-	color = {1, 1, 1, 1}
-})
-
 return function(self)
 	GaussianBlurView:draw(self.game.configModel.configs.settings.graphics.blur.result)
 	Background(self)
@@ -738,7 +691,4 @@ return function(self)
 	MissGraph(self)
 	BottomScreenMenu(self)
 	MatchPlayers(self)
-	-- InspectScoreSystem:draw()
-	-- InspectCounters:draw()
-	-- InspectScoreEntry:draw()
 end

@@ -1,4 +1,7 @@
-local GameplayViewConfig = require("sphere.views.GameplayView.GameplayViewConfig")
+local Layout = require("sphere.views.GameplayView.Layout")
+local Background = require("sphere.views.GameplayView.Background")
+local Foreground = require("sphere.views.GameplayView.Foreground")
+local PauseSubscreen = require("sphere.views.GameplayView.PauseSubscreen")
 local ScreenView = require("sphere.views.ScreenView")
 local just = require("just")
 
@@ -6,7 +9,7 @@ local GameplayView = ScreenView:new()
 
 GameplayView.construct = function(self)
 	ScreenView.construct(self)
-	self.viewConfig = GameplayViewConfig
+	self.viewConfig = {}
 end
 
 GameplayView.load = function(self)
@@ -14,13 +17,7 @@ GameplayView.load = function(self)
 	self.game.gameplayController:load()
 
 	local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
-	for i, config in ipairs(self.viewConfig) do
-		if config.class == "PlayfieldView" then
-			self.playfieldViewConfig = self.viewConfig[i]
-			self.playfieldViewConfigIndex = i
-			self.viewConfig[i] = noteSkin.playField
-		end
-	end
+	self.viewConfig = noteSkin.playField
 
 	self.subscreen = ""
 	self.failed = false
@@ -31,7 +28,6 @@ GameplayView.unload = function(self)
 	self.game.gameplayController:unload()
 	self.game.rhythmModel.observable:remove(self.sequenceView)
 	ScreenView.unload(self)
-	self.viewConfig[self.playfieldViewConfigIndex] = self.playfieldViewConfig
 end
 
 GameplayView.retry = function(self)
@@ -45,7 +41,13 @@ GameplayView.draw = function(self)
 	self:keypressed()
 	self:keyreleased()
 
+	Layout:draw()
+	Background(self)
 	ScreenView.draw(self)
+	Foreground(self)
+	if self.subscreen == "pause" then
+		PauseSubscreen(self)
+	end
 	just.container()
 
 	local state = self.game.rhythmModel.pauseManager.state

@@ -7,67 +7,38 @@ local ScrollBarImView = require("sphere.imviews.ScrollBarImView")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
-local Frames = {draw = function()
-	local width, height = love.graphics.getDimensions()
-	love.graphics.origin()
-
+local function Frames(self)
 	love.graphics.replaceTransform(gfx_util.transform(transform))
-
-	local _x, _y = love.graphics.inverseTransformPoint(0, 0)
-	local _xw, _yh = love.graphics.inverseTransformPoint(width, height)
-	local _w, _h = _xw - _x, _yh - _y
-
-	local x_int = 24
-	local y_int = 55
-
-	-- local x1, w1 = gfx_util.layout(0, 1920, {24, -1/3, -1/3, -1/3, 24})
-
-	local y0, h0 = gfx_util.layout(0, 1080, {89, y_int, -1, y_int, 89})
 
 	love.graphics.setColor(0, 0, 0, 0.8)
 	local x, y, w, h = 279, 144, 1362, 792
-	love.graphics.rectangle("fill", x, y, w, h, 36)
+	love.graphics.translate(x, y)
+	love.graphics.rectangle("fill", 0, 0, w, h, 36)
 
 	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.rectangle("line", x, y, w, h, 36)
-end}
-
-local ContainerBegin = {draw = function(self)
-	love.graphics.replaceTransform(gfx_util.transform(transform))
-
-	local x, y, w, h = 279, 144, 1362, 792
-	love.graphics.translate(x, y)
+	love.graphics.rectangle("line", 0, 0, w, h, 36)
 
 	local window_id = "modifiers window"
 	local over = just.is_over(w, h)
-	just.container(window_id, over)
 	just.button(window_id, over)
 	just.wheel_over(window_id, over)
+end
 
-	if just.keypressed("escape") then
-		self.game.gameView.modifierView:toggle(false)
-	end
-end}
-
-local ContainerEnd = {draw = function(self)
-	just.container()
-end}
-
-local AvailableModifierList = {draw = function(self)
+local function AvailableModifierList(self)
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(279, 144)
 	AvailableModifierListView.game = self.game
 	AvailableModifierListView:draw(454, 792)
-end}
+end
 
-local ModifierList = {draw = function(self)
+local function ModifierList(self)
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(733, 144)
 	ModifierListView.game = self.game
 	ModifierListView:draw(454, 792)
-end}
+end
 
-local AvailableModifierScrollBar = {draw = function(self)
+local function AvailableModifierScrollBar(self)
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(279, 144)
 
@@ -78,25 +49,21 @@ local AvailableModifierScrollBar = {draw = function(self)
 	if newScroll then
 		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
 	end
-end}
+end
 
-local Rectangle = {draw = function()
+local function Rectangle(self)
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.rectangle("fill", 733, 504, 4, 72)
 	love.graphics.rectangle("fill", 279, 504, 4, 72)
 	love.graphics.circle("fill", 755, 504, 4)
 	love.graphics.circle("line", 755, 504, 4)
-end}
+end
 
-local ModifierViewConfig = {
-	Frames,
-	ContainerBegin,
-	AvailableModifierList,
-	ModifierList,
-	AvailableModifierScrollBar,
-	Rectangle,
-	ContainerEnd,
-}
-
-return ModifierViewConfig
+return function(self)
+	Frames(self)
+	AvailableModifierList(self)
+	ModifierList(self)
+	AvailableModifierScrollBar(self)
+	Rectangle(self)
+end
