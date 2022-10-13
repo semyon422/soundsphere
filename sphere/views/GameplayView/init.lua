@@ -3,13 +3,13 @@ local Background = require("sphere.views.GameplayView.Background")
 local Foreground = require("sphere.views.GameplayView.Foreground")
 local PauseSubscreen = require("sphere.views.GameplayView.PauseSubscreen")
 local ScreenView = require("sphere.views.ScreenView")
+local SequenceView = require("sphere.views.SequenceView")
 local just = require("just")
 
 local GameplayView = ScreenView:new()
 
 GameplayView.construct = function(self)
-	ScreenView.construct(self)
-	self.viewConfig = {}
+	self.sequenceView = SequenceView:new()
 end
 
 GameplayView.load = function(self)
@@ -21,13 +21,19 @@ GameplayView.load = function(self)
 
 	self.subscreen = ""
 	self.failed = false
-	ScreenView.load(self)
+
+	local sequenceView = self.sequenceView
+
+	sequenceView.game = self.game
+	sequenceView.screenView = self
+	sequenceView:setSequenceConfig(self.viewConfig)
+	sequenceView:load()
 end
 
 GameplayView.unload = function(self)
 	self.game.gameplayController:unload()
 	self.game.rhythmModel.observable:remove(self.sequenceView)
-	ScreenView.unload(self)
+	self.sequenceView:unload()
 end
 
 GameplayView.retry = function(self)
@@ -43,7 +49,7 @@ GameplayView.draw = function(self)
 
 	Layout:draw()
 	Background(self)
-	ScreenView.draw(self)
+	self.sequenceView:draw()
 	Foreground(self)
 	if self.subscreen == "pause" then
 		PauseSubscreen(self)
@@ -100,12 +106,12 @@ GameplayView.update = function(self, dt)
 		self:quit()
 	end
 
-	ScreenView.update(self, dt)
+	self.sequenceView:update(dt)
 end
 
 GameplayView.receive = function(self, event)
 	self.game.gameplayController:receive(event)
-	ScreenView.receive(self, event)
+	self.sequenceView:receive(event)
 end
 
 GameplayView.quit = function(self)

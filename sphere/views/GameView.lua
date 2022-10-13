@@ -30,13 +30,19 @@ GameView._setView = function(self, view)
 end
 
 GameView.setView = function(self, view, noTransition)
+	if self.isChangingScreen then
+		return
+	end
+	self.isChangingScreen = true
 	view.gameView = self
 	if noTransition then
+		self.isChangingScreen = false
 		return self:_setView(view)
 	end
 	self.fadeTransition:transitIn(function()
 		self:_setView(view)
 		self.fadeTransition:transitOut()
+		self.isChangingScreen = false
 	end)
 end
 
@@ -80,11 +86,11 @@ GameView.draw = function(self)
 end
 
 GameView.receive = function(self, event)
+	self.frameTimeView:receive(event)
 	if not self.view then
 		return
 	end
 	self.view:receive(event)
-	self.frameTimeView:receive(event)
 end
 
 GameView.setContextMenu = function(self, f, width)

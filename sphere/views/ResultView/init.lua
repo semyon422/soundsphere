@@ -7,25 +7,18 @@ local ResultViewConfig = require("sphere.views.ResultView.ResultViewConfig")
 
 local ResultView = ScreenView:new()
 
-ResultView.construct = function(self)
-	ScreenView.construct(self)
-	self.viewConfig = {}
-end
-
 local loading
 ResultView.load = thread.coro(function(self)
 	if loading then
 		return
 	end
 	loading = true
-	ScreenView.load(self)
 	if self.prevView == self.game.selectView then
 		self.game.resultController:load()
 		local selectModel = self.game.selectModel
 		local scoreItem = selectModel.scoreItem
 		if scoreItem then
 			self.game.resultController:replayNoteChartAsync("result", scoreItem)
-			self:reload()
 		end
 	end
 	loading = false
@@ -46,12 +39,6 @@ ResultView.draw = function(self)
 	just.container()
 end
 
-ResultView.reload = function(self)
-	ScreenView.unload(self)
-	ScreenView.load(self)
-	self.sequenceView.abortIterating = false
-end
-
 ResultView.loadScore = thread.coro(function(self, itemIndex)
 	if loading then
 		return
@@ -62,7 +49,6 @@ ResultView.loadScore = thread.coro(function(self, itemIndex)
 		scoreEntry = self.game.scoreLibraryModel.items[itemIndex]
 	end
 	self.game.resultController:replayNoteChartAsync("result", scoreEntry)
-	self:reload()
 	if itemIndex then
 		self.game.selectModel:scrollScore(nil, itemIndex)
 	end

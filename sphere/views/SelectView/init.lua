@@ -12,14 +12,8 @@ local SelectView = ScreenView:new()
 SelectView.subscreen = "notecharts"
 SelectView.searchMode = "filter"
 
-SelectView.construct = function(self)
-	ScreenView.construct(self)
-	self.viewConfig = {}
-end
-
 SelectView.load = function(self)
 	self.game.selectController:load()
-	ScreenView.load(self)
 end
 
 SelectView.draw = function(self)
@@ -54,13 +48,10 @@ end
 
 SelectView.unload = function(self)
 	self.game.selectController:unload()
-	ScreenView.unload(self)
 end
 
 SelectView.update = function(self, dt)
 	self.game.selectController:update(dt)
-
-	ScreenView.update(self, dt)
 end
 
 SelectView.play = function(self)
