@@ -3,10 +3,7 @@ local gfx_util = require("gfx_util")
 
 local size = 0.75
 return function(id, text, w, h)
-	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-	local over = 0 <= mx and mx <= w and 0 <= my and my <= h
-
-	local changed, active, hovered = just.button(id, over)
+	local changed, active, hovered = just.button(id, just.is_over(w, h))
 
 	local r = h * size / 2
 	local x = h * (1 - size) / 2

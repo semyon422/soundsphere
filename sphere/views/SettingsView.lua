@@ -252,6 +252,9 @@ drawSection.misc = function(self)
 	m.muteOnUnfocus = imgui.checkbox("muteOnUnfocus", m.muteOnUnfocus, "mute on unfocus")
 	m.showNonManiaCharts = imgui.checkbox("showNonManiaCharts", m.showNonManiaCharts, "show non-mania charts")
 	m.showFPS = imgui.checkbox("showFPS", m.showFPS, "show FPS")
+	if imgui.button("error button", "error") then
+		error("error")
+	end
 
 	just.indent(8)
 	just.text("Commit: " .. version.commit)

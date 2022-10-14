@@ -47,15 +47,7 @@ elseif jit.os == "Linux" then
 	pkg.addc("bin/linux64")
 end
 
-local utf8validate = require("utf8validate")
-local inspect = require("inspect")
-local errhand = love.errhand
-function love.errhand(msg)
-	if type(msg) ~= "string" then
-		msg = inspect(msg)
-	end
-	return errhand(utf8validate(msg))
-end
+love.errhand = require("errhand")
 
 local physfs = require("physfs")
 physfs.setWriteDir(root)
