@@ -1,29 +1,12 @@
 local Class = require("Class")
 local tween = require("tween")
+local gfx_util = require("gfx_util")
 
 local FadeTransition = Class:new()
-
-FadeTransition.shaderText = [[
-	extern number alpha;
-	vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ){
-		vec4 pixel = Texel(texture, texture_coords);
-		return pixel * color * alpha;
-	}
-]]
 
 FadeTransition.transiting = false
 FadeTransition.alpha = 1
 FadeTransition.phase = 0
-
-FadeTransition.checkShader = function(self)
-	if not love.graphics then
-		return
-	end
-	if not self.shader then
-		self.shader = love.graphics.newShader(self.shaderText)
-	end
-	return true
-end
 
 FadeTransition.transitIn = function(self, callback)
 	if self.transiting then
@@ -62,20 +45,27 @@ FadeTransition.update = function(self, dt)
 end
 
 FadeTransition.drawBefore = function(self)
-	if not self.transiting or not self:checkShader() then
+	if not self.transiting then
 		return
 	end
 
-	love.graphics.setShader(self.shader)
-	self.shader:send("alpha", self.alpha)
+	love.graphics.setCanvas({gfx_util.getCanvas("FadeTransition"), stencil = true})
+	love.graphics.clear()
+
+	self.isCanvasSet = true
 end
 
 FadeTransition.drawAfter = function(self)
-	if not self.transiting or not self:checkShader() then
+	if not self.isCanvasSet then
 		return
 	end
 
-	love.graphics.setShader()
+	love.graphics.setCanvas()
+	love.graphics.origin()
+	love.graphics.setColor(1, 1, 1, self.alpha)
+	love.graphics.draw(gfx_util.getCanvas("FadeTransition"))
+
+	self.isCanvasSet = false
 end
 
 return FadeTransition
