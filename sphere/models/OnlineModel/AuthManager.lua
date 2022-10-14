@@ -4,14 +4,28 @@ local inspect = require("inspect")
 
 local AuthManager = Class:new()
 
+AuthManager.checkUserAsync = function(self)
+	local webApi = self.webApi
+	local api = webApi.api
+	local config = self.config
+
+	webApi.token = config.token
+	if not config.session.user_id then
+		return
+	end
+
+	print("GET " .. api.users[config.session.user_id])
+	local user = api.users[config.session.user_id]:get()
+	config.user = user or {}
+end
+AuthManager.checkUser = thread.coro(AuthManager.checkUserAsync)
+
 AuthManager.checkSessionAsync = function(self)
 	local webApi = self.webApi
 	local api = webApi.api
 	local config = self.config
 
 	webApi.token = config.token
-
-	config.session = {}
 
 	print("check session")
 	print("GET " .. api.auth.check)
@@ -23,13 +37,7 @@ AuthManager.checkSessionAsync = function(self)
 	print(inspect(response))
 	config.session = response.session or {}
 
-	if not config.session.user_id then
-		return
-	end
-
-	print("GET " .. api.users[config.session.user_id])
-	local user = api.users[config.session.user_id]:get()
-	config.user = user or {}
+	self:checkUserAsync()
 end
 AuthManager.checkSession = thread.coro(AuthManager.checkSessionAsync)
 
@@ -47,9 +55,18 @@ AuthManager.updateSessionAsync = function(self)
 		print(code, headers)
 		return
 	end
-	print(inspect(response))
-	config.session = response.session or {}
-	config.token = response.token or ""
+
+	if code ~= 200 then
+		print(code, response.message)
+		return
+	end
+
+	config.session = response.session
+	config.token = response.token
+
+	print("updated")
+
+	self:checkUserAsync()
 end
 AuthManager.updateSession = thread.coro(AuthManager.updateSessionAsync)
 
@@ -64,7 +81,6 @@ AuthManager.quickGetKeyAsync = function(self)
 		print(code, headers)
 		return
 	end
-	print(inspect(response))
 
 	config.quick_login_key = response.key
 	local url = api.html.auth.quick .. "?method=POST&key=" .. response.key
@@ -86,7 +102,6 @@ AuthManager.quickGetTokenAsync = function(self)
 		print(code, headers)
 		return
 	end
-	print(inspect(response))
 
 	if code ~= 200 then
 		print(response.message)
@@ -97,8 +112,10 @@ AuthManager.quickGetTokenAsync = function(self)
 	end
 
 	config.quick_login_key = ""
-	config.token = response.token
-	self:checkSessionAsync()
+	config.token = response.token or ""
+	config.session = response.session or {}
+
+	self:checkUserAsync()
 end
 AuthManager.quickGetToken = thread.coro(AuthManager.quickGetTokenAsync)
 
@@ -130,25 +147,31 @@ AuthManager.loginAsync = function(self, email, password)
 	end
 
 	if code ~= 200 then
-		print(response.message)
+		print(code, response.message)
 		return
 	end
 
-	print(inspect(response))
-	config.token = response.token or ""
-	self:checkSessionAsync()
+	config.token = response.token
+	config.session = response.session
+
+	self:checkUserAsync()
 end
 AuthManager.login = thread.coro(AuthManager.loginAsync)
 
-AuthManager.logout = function(self)
+AuthManager.logoutAsync = function(self)
 	local webApi = self.webApi
+	local api = webApi.api
 	local config = self.config
-
-	webApi.token = ""
 
 	config.session = {}
 	config.user = {}
 	config.token = ""
+
+	webApi.token = config.token
+
+	print("POST " .. api.auth.logout)
+	api.auth.update:post()
 end
+AuthManager.logout = thread.coro(AuthManager.logoutAsync)
 
 return AuthManager

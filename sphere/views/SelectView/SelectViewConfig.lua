@@ -49,7 +49,7 @@ local function Header(self)
 	local username = self.game.configModel.configs.online.user.name
 	local session = self.game.configModel.configs.online.session
 	just.row(true)
-	if UserInfoView:draw(w, h, username, session and session.active) then
+	if UserInfoView:draw(w, h, username, session and next(session)) then
 		self.game.gameView:setModal(require("sphere.views.OnlineView"))
 	end
 	just.offset(0)

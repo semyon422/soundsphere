@@ -34,17 +34,21 @@ return ModalImView(function(self)
 	just.button(window_id, over)
 	just.wheel_over(window_id, over)
 
-	local active = self.game.configModel.configs.online.session.active
+	local active = next(self.game.configModel.configs.online.session)
 	if active then
 		imgui.text("You are logged in")
-	end
-	email = imgui.input("Email", email, "Email")
-	password = imgui.input("Password", password, "Password")
-	if imgui.button("Login", "Login") then
-		self.game.onlineModel.authManager:login(email, password)
-	end
-	if imgui.button("Quick login", "Quick login using browser") then
-		self.game.onlineModel.authManager:quickLogin()
+		if active and imgui.button("logout", "Logout") then
+			self.game.onlineModel.authManager:logout()
+		end
+	else
+		email = imgui.input("Email", email, "Email")
+		password = imgui.input("Password", password, "Password")
+		if imgui.button("Login", "Login") then
+			self.game.onlineModel.authManager:login(email, password)
+		end
+		if imgui.button("Quick login", "Quick login using browser") then
+			self.game.onlineModel.authManager:quickLogin()
+		end
 	end
 
 	just.container()
