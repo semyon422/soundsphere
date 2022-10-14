@@ -8,7 +8,6 @@ local LuaMidi = require("luamidi")
 local loop = Observable:new()
 
 loop.fpslimit = 240
-loop.tpslimit = 240
 loop.time = 0
 loop.dt = 0
 loop.eventTime = 0
@@ -155,8 +154,10 @@ loop.run = function()
 		local timingsSleep = love.timer.getTime()
 		loop.timings.draw = timingsSleep - timingsDraw
 
-		fpsLimitTime = math.max(fpsLimitTime + 1 / loop.fpslimit, frameEndTime)
-		love.timer.sleep(fpsLimitTime - frameEndTime)
+		if loop.fpslimit > 0 then
+			fpsLimitTime = math.max(fpsLimitTime + 1 / loop.fpslimit, frameEndTime)
+			love.timer.sleep(fpsLimitTime - frameEndTime)
+		end
 	end
 end
 
