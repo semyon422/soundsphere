@@ -2,11 +2,11 @@ local gfx_util = require("gfx_util")
 
 local Layout = require("sphere.views.SelectView.Layout")
 
-local invertShader, baseShader, inFrame
+local invertShader, baseShader, baseCanvas, inFrame
 return function()
 	if inFrame then
 		love.graphics.setShader(baseShader)
-		love.graphics.setCanvas()
+		love.graphics.setCanvas({baseCanvas, stencil = true})
 		love.graphics.setColor(1, 1, 1, 1)
 		love.graphics.origin()
 		love.graphics.setBlendMode("alpha", "premultiplied")
@@ -34,6 +34,9 @@ return function()
 	love.graphics.push()
 	love.graphics.origin()
 
+	baseShader = love.graphics.getShader()
+	baseCanvas = love.graphics.getCanvas()
+
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setCanvas({gfx_util.getCanvas(1), stencil = true})
 	love.graphics.clear()
@@ -46,7 +49,6 @@ return function()
 	love.graphics.rectangle("fill", 0, 0, w, h, h / 2)
 	love.graphics.setColor(1, 1, 1, 1)
 
-	baseShader = love.graphics.getShader()
 	love.graphics.setShader(invertShader)
 
 	local _x, _y = love.graphics.transformPoint(0, 0)
