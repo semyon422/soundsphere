@@ -70,7 +70,7 @@ return {
 		cursor = "circle",
 		dim = {
 			gameplay = 0.8,
-			result = 0.8,
+			result = 0,
 			select = 0
 		},
 		dwmflush = false,
