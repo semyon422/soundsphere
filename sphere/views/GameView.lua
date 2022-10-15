@@ -2,6 +2,7 @@ local just = require("just")
 local Class = require("Class")
 local FadeTransition = require("sphere.views.FadeTransition")
 local FrameTimeView = require("sphere.views.FrameTimeView")
+local AsyncTasksView = require("sphere.views.AsyncTasksView")
 local TextTooltipImView = require("sphere.imviews.TextTooltipImView")
 local ContextMenuImView = require("sphere.imviews.ContextMenuImView")
 
@@ -83,6 +84,13 @@ GameView.draw = function(self)
 
 	self.fadeTransition:drawAfter()
 	self.frameTimeView:draw()
+
+	local settings = self.game.configModel.configs.settings
+	local showTasks = settings.miscellaneous.showTasks
+
+	if showTasks then
+		AsyncTasksView()
+	end
 end
 
 GameView.receive = function(self, event)

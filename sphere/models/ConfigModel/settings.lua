@@ -137,6 +137,7 @@ return {
 		autoUpdate = true,
 		muteOnUnfocus = false,
 		showNonManiaCharts = false,
-		showFPS = false
+		showFPS = false,
+		showTasks = false,
 	}
 }

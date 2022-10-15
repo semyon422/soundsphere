@@ -252,6 +252,7 @@ drawSection.misc = function(self)
 	m.muteOnUnfocus = imgui.checkbox("muteOnUnfocus", m.muteOnUnfocus, "mute on unfocus")
 	m.showNonManiaCharts = imgui.checkbox("showNonManiaCharts", m.showNonManiaCharts, "show non-mania charts")
 	m.showFPS = imgui.checkbox("showFPS", m.showFPS, "show FPS")
+	m.showTasks = imgui.checkbox("showTasks", m.showTasks, "show tasks")
 	if imgui.button("error button", "error") then
 		error("error")
 	end

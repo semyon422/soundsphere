@@ -38,6 +38,35 @@ local function getinportcount()
 	return hasMidi and LuaMidi.getinportcount() or 0
 end
 
+loop.quitting = false
+loop.quittingLoop = function()
+	love.event.pump()
+
+	for name, a, b, c, d, e, f in love.event.poll() do
+		if name == "quit" then
+			loop:send({name = "quit"})
+			return 0
+		end
+	end
+
+	thread.update()
+	delay.update()
+
+	if thread.current == 0 then
+		loop:send({name = "quit"})
+		return 0
+	end
+
+	if love.graphics and love.graphics.isActive() then
+		love.graphics.clear(love.graphics.getBackgroundColor())
+		love.graphics.setColor(1, 1, 1, 1)
+		love.graphics.printf("waiting for " .. thread.current .. " coroutines", 0, 0, 1000, "left")
+		love.graphics.present()
+	end
+
+	love.timer.sleep(0.1)
+end
+
 local framestarted = {name = "framestarted"}
 loop.run = function()
 	love.math.setRandomSeed(os.time())
@@ -52,6 +81,10 @@ loop.run = function()
 	hasMidi = LuaMidi.getinportcount() > 0
 
 	return function()
+		if loop.quitting then
+			return loop.quittingLoop()
+		end
+
 		if loop.asynckey and asynckey.start then
 			asynckey.start()
 		end
@@ -178,7 +211,7 @@ loop.callbacks = {
 	"mousereleased",
 	"wheelmoved",
 	"resize",
-	"quit",
+	-- "quit",
 	"filedropped",
 	"directorydropped",
 	"focus",
@@ -201,6 +234,11 @@ loop.init = function()
 			e.time = clampEventTime(loop.eventTime)
 			return loop:send(e)
 		end
+	end
+	love.quit = function(...)
+		print("Quitting")
+		loop.quitting = true
+		return true
 	end
 end
 

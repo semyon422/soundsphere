@@ -36,6 +36,10 @@ AuthManager.checkSessionAsync = function(self)
 	end
 	print(inspect(response))
 	config.session = response.session or {}
+	if not config.session.active then
+		config.session = {}
+		config.token = ""
+	end
 
 	self:checkUserAsync()
 end
