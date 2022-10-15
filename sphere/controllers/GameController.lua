@@ -33,7 +33,6 @@ local MainLog					= require("sphere.MainLog")
 local ReplayModel		= require("sphere.models.ReplayModel")
 
 local MountController			= require("sphere.controllers.MountController")
-local OnlineController			= require("sphere.controllers.OnlineController")
 local SelectController			= require("sphere.controllers.SelectController")
 local GameplayController		= require("sphere.controllers.GameplayController")
 local FastplayController		= require("sphere.controllers.FastplayController")
@@ -53,7 +52,6 @@ GameController.baseVsync = 1
 
 GameController.construct = function(self)
 	self.mountController = MountController:new()
-	self.onlineController = OnlineController:new()
 	self.selectController = SelectController:new()
 	self.gameplayController = GameplayController:new()
 	self.fastplayController = FastplayController:new()
@@ -150,7 +148,9 @@ GameController.load = function(self)
 	self.previewModel:load()
 
 	self.multiplayerController:load()
-	self.onlineController:load()
+
+	self.onlineModel.authManager:checkSession()
+	self.multiplayerModel:connect()
 
 	self.gameView:load()
 end
@@ -185,7 +185,6 @@ GameController.update = function(self, dt)
 	self.backgroundModel:update(dt)
 
 	self.multiplayerController:update()
-	self.onlineController:update()
 	self.osudirectModel:update()
 
 	self.fpsLimiter:update()

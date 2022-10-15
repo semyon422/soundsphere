@@ -1,4 +1,5 @@
-local Class					= require("Class")
+local Class = require("Class")
+local thread = require("thread")
 
 local SelectController = Class:new()
 
@@ -62,7 +63,23 @@ SelectController.update = function(self, dt)
 		self.game.multiplayerModel:pushModifiers()
 		self:applyTimeRate()
 	end
+
+	local configModel = self.game.configModel
+	if #configModel.configs.online.token == 0 then
+		return
+	end
+
+	local time = love.timer.getTime()
+	if not self.startTime or time - self.startTime > 600 then
+		self:updateSession()
+		self.startTime = time
+	end
 end
+
+SelectController.updateSession = thread.coro(function(self)
+	self.game.onlineModel.authManager:updateSessionAsync()
+	self.game.configModel:write("online")
+end)
 
 SelectController.openDirectory = function(self)
 	local noteChartItem = self.game.selectModel.noteChartItem
