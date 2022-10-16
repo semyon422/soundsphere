@@ -1,5 +1,5 @@
 local Class = require("Class")
-local tween = require("tween")
+local flux = require("flux")
 
 local PauseManager = Class:new()
 
@@ -19,12 +19,6 @@ PauseManager.setPauseTimes = function(self, config)
 end
 
 PauseManager.update = function(self, dt)
-	if self.progressTween then
-		self.progressTween:update(dt)
-	else
-		self.progress = 0
-	end
-
 	self:updateState()
 
 	if self.progress == 1 then
@@ -68,14 +62,16 @@ end
 
 PauseManager.startProgress = function(self, time)
 	self.progress = 0
+	if self.tween then
+		self.tween:stop()
+	end
 	if not time then
-		self.progressTween = nil
 		return
 	elseif time == 0 then
 		self.progress = 1
 		return self:updateState()
 	end
-	self.progressTween = tween.new(time, self, {progress = 1}, "linear")
+	self.tween = flux.to(self, time, {progress = 1}):ease("linear")
 end
 
 PauseManager.play = function(self)

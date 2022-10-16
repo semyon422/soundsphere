@@ -1,5 +1,5 @@
 local just = require("just")
-local tween = require("tween")
+local flux = require("flux")
 local Class = require("Class")
 
 local ListView = Class:new()
@@ -24,19 +24,11 @@ end
 ListView.draw = function(self, w, h)
 	local itemIndex = assert(self:getItemIndex())
 	if self.itemIndex ~= itemIndex then
-		self.scrollTween = tween.new(
-			0.1,
-			self,
-			{visualItemIndex = itemIndex},
-			"linear"
-		)
+		if self.tween then
+			self.tween:stop()
+		end
+		self.tween = flux.to(self, 0.1, {visualItemIndex = itemIndex}):ease("linear")
 		self.itemIndex = itemIndex
-	end
-	if self.visualItemIndex == self.itemIndex then
-		self.scrollTween = nil
-	end
-	if self.scrollTween then
-		self.scrollTween:update(math.min(love.timer.getDelta(), 1 / 60))
 	end
 
 	local stateCounter = self.stateCounter

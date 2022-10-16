@@ -1,7 +1,7 @@
 local Class				= require("Class")
 local Observable		= require("Observable")
 local NoteDrawer		= require("sphere.models.RhythmModel.GraphicEngine.NoteDrawer")
-local tween = require("tween")
+local flux = require("flux")
 
 local GraphicEngine = Class:new()
 
@@ -20,9 +20,6 @@ GraphicEngine.load = function(self)
 end
 
 GraphicEngine.update = function(self, dt)
-	if self.visualTimeRateTween and self.updateTween then
-		self.visualTimeRateTween:update(dt)
-	end
 	for _, noteDrawer in ipairs(self.noteDrawers) do
 		noteDrawer:update()
 	end
@@ -42,12 +39,13 @@ GraphicEngine.increaseVisualTimeRate = function(self, delta)
 end
 
 GraphicEngine.setVisualTimeRate = function(self, visualTimeRate)
+	if self.tween then
+		self.tween:stop()
+	end
 	if visualTimeRate * self.visualTimeRate < 0 then
 		self.visualTimeRate = visualTimeRate
-		self.updateTween = false
 	else
-		self.updateTween = true
-		self.visualTimeRateTween = tween.new(0.25, self, {visualTimeRate = visualTimeRate}, "inOutQuad")
+		self.tween = flux.to(self, 0.25, {visualTimeRate = visualTimeRate}):ease("quadinout")
 	end
 end
 

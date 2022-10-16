@@ -1,6 +1,5 @@
 local Class				= require("Class")
 local Observable		= require("Observable")
-local tween				= require("tween")
 local TimeManager		= require("sphere.models.RhythmModel.TimeEngine.TimeManager")
 
 local TimeEngine = Class:new()
@@ -75,12 +74,8 @@ TimeEngine.sync = function(self, event)
 	timer.eventTime = event.time
 	timer.eventDelta = event.dt
 
-	if self.timeRateTween then
-		self.timeRateTween:update(event.dt)
+	if self.timeRate ~= self.targetTimeRate then
 		timer:setRate(self.timeRate)
-		if timer.rate == self.targetTimeRate then
-			self.timeRateTween = nil
-		end
 	end
 
 	timer:update()
@@ -141,12 +136,8 @@ TimeEngine.play = function(self)
 	self.timer:play()
 end
 
-TimeEngine.setTimeRate = function(self, timeRate, needTween)
+TimeEngine.setTimeRate = function(self, timeRate)
 	self.targetTimeRate = timeRate
-	if needTween then
-		self.timeRateTween = tween.new(0.25, self, {timeRate = timeRate}, "inOutQuad")
-		return
-	end
 	self.timeRate = timeRate
 	self.timer:setRate(timeRate)
 end

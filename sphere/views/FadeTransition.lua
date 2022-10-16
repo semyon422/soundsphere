@@ -1,5 +1,5 @@
 local Class = require("Class")
-local tween = require("tween")
+local flux = require("flux")
 local gfx_util = require("gfx_util")
 
 local FadeTransition = Class:new()
@@ -15,7 +15,7 @@ FadeTransition.transitIn = function(self, callback)
 	self.callback = callback
 	self.transiting = true
 	self.phase = 1
-	self.tween = tween.new(0.2, self, {alpha = 0}, "inOutQuad")
+	flux.to(self, 0.2, {alpha = 0}):ease("quadinout")
 end
 
 FadeTransition.transitOut = function(self)
@@ -23,15 +23,13 @@ FadeTransition.transitOut = function(self)
 		return
 	end
 	self.phase = 2
-	self.tween = tween.new(0.2, self, {alpha = 1}, "inOutQuad")
+	flux.to(self, 0.2, {alpha = 1}):ease("quadinout")
 end
 
 FadeTransition.update = function(self, dt)
 	if not self.transiting then
 		return
 	end
-
-	self.tween:update(math.min(dt, 1 / 60))
 
 	if self.phase == 1 then
 		if self.alpha == 0 then

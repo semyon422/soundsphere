@@ -4,6 +4,7 @@ local delay = require("delay")
 local asynckey = require("asynckey")
 local just = require("just")
 local LuaMidi = require("luamidi")
+local flux = require("flux")
 
 local loop = Observable:new()
 
@@ -164,6 +165,7 @@ loop.run = function()
 
 		thread.update()
 		delay.update()
+		flux.update(loop.dt)
 		love.update(loop.dt)
 
 		local timingsDraw = love.timer.getTime()

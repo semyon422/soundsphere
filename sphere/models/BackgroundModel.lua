@@ -1,7 +1,7 @@
 local Class = require("Class")
 local thread = require("thread")
 local gfx_util = require("gfx_util")
-local tween				= require("tween")
+local flux				= require("flux")
 local delay				= require("delay")
 
 local BackgroundModel = Class:new()
@@ -25,17 +25,12 @@ BackgroundModel.setBackgroundPath = function(self, path)
 end
 
 BackgroundModel.update = function(self, dt)
-	if self.alphaTween then
-		self.alphaTween:update(dt)
-	end
-
 	if #self.images > 1 then
 		if self.alpha == 1 then
 			table.remove(self.images, 1)
 			self.alpha = 0
-			self.alphaTween = nil
 		elseif self.alpha == 0 then
-			self.alphaTween = tween.new(0.25, self, {alpha = 1}, "inOutQuad")
+			flux.to(self, 0.25, {alpha = 1}):ease("quadinout")
 		end
 	end
 end
