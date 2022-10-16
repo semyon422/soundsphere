@@ -16,77 +16,107 @@ NoteSkinModel.load = function(self)
 	self.inputMode = ""
 	self.noteSkins = {}
 	self.files = {}
-	self.filesMap = {}
 	self.foundNoteSkins = {}
+	self.tree = {}
 	self.config = self.game.configModel.configs.settings
-	self:lookup(self.path)
+	self:lookupTree(self.path, self.tree)
+	self:lookupSkins(self.tree)
 	self:loadNoteSkins()
 end
 
-NoteSkinModel.lookup = function(self, directoryPath)
-	local items = love.filesystem.getDirectoryItems(directoryPath)
+local function combinePath(...)
+	local t = {}
+	for i = 1, select("#", ...) do
+		table.insert(t, (select(i, ...)))  -- skips nils
+	end
+	return table.concat(t, "/")
+end
 
-	for _, itemName in ipairs(items) do
-		local path = directoryPath .. "/" .. itemName
-		local info = love.filesystem.getInfo(path)
-		if info and info.type == "file" then
-			if itemName:lower():find("^.-skin%.%a-$") then
-				table.insert(self.foundNoteSkins, {path, directoryPath, itemName})
-			end
-			self.filesMap[path] = true
-		elseif info and info.type == "directory" and itemName ~= "__MACOSX" then
-			self:lookup(path)
+NoteSkinModel.treeToList = function(self, tree, list, prefix)
+	for _, item in ipairs(tree) do
+		if type(item) == "string" then
+			table.insert(list, combinePath(prefix, item))
+		elseif type(item) == "table" then
+			self:treeToList(item, list, combinePath(prefix, item.name))
 		end
 	end
+end
+
+NoteSkinModel.lookupTree = function(self, directoryPath, tree)
+	local items = love.filesystem.getDirectoryItems(directoryPath)
+
+	for _, name in ipairs(items) do
+		local path = directoryPath .. "/" .. name
+		local info = love.filesystem.getInfo(path)
+		if info and info.type == "file" then
+			table.insert(tree, name)
+		elseif info and info.type == "directory" and name ~= "__MACOSX" then
+			local dir = {name = name}
+			table.insert(tree, dir)
+			self:lookupTree(path, dir)
+		end
+	end
+end
+
+NoteSkinModel.lookupSkins = function(self, tree, prefix)
+	local found = false
+	for _, item in ipairs(tree) do
+		if type(item) == "string" and item:lower():find("^.-skin%.%a-$") then
+			table.insert(self.foundNoteSkins, {prefix, item})
+			found = true
+		end
+	end
+
+	for _, item in ipairs(tree) do
+		if type(item) == "table" then
+			self:lookupSkins(item, combinePath(prefix, item.name))
+		end
+	end
+
+	if not found then
+		return
+	end
+
+	local list = {}
+	self:treeToList(tree, list)
+	table.sort(list)
+
+	self.files[tostring(prefix)] = list
 end
 
 NoteSkinModel.loadNoteSkins = function(self)
-	local files = self.files
 	for _, paths in ipairs(self.foundNoteSkins) do
-		local path, directoryPath, itemName = unpack(paths)
-		files[directoryPath] = files[directoryPath] or {}
-		local dfiles = files[directoryPath]
-		for fpath in pairs(self.filesMap) do
-			if fpath:find(directoryPath, 1, true) then
-				table.insert(dfiles, fpath:sub(#directoryPath + 2))
-			end
+		self:loadNoteSkin(paths[1], paths[2])
+	end
+end
+
+NoteSkinModel.loadNoteSkin = function(self, prefix, name)
+	if name:lower():find("^.+%.lua$") then
+		table.insert(self.noteSkins, self:loadLua(prefix, name))
+	elseif name:lower():find("^.+%.ini$") then
+		for _, noteSkin in ipairs(self:loadOsu(prefix, name)) do
+			table.insert(self.noteSkins, noteSkin)
 		end
-		table.sort(dfiles)
-		self:loadNoteSkin(path, directoryPath, itemName)
 	end
 end
 
-NoteSkinModel.addNoteSkins = function(self, noteSkins)
-	for _, noteSkin in ipairs(noteSkins) do
-		table.insert(self.noteSkins, noteSkin)
-	end
-end
-
-NoteSkinModel.loadNoteSkin = function(self, path, directoryPath, itemName)
-	local noteSkin
-	if path:lower():find("^.+%.lua$") then
-		noteSkin = self:loadLua(path, directoryPath, itemName)
-	elseif path:lower():find("^.+%.ini$") then
-		return self:addNoteSkins(self:loadOsu(path, directoryPath, itemName))
-	end
-	table.insert(self.noteSkins, noteSkin)
-end
-
-NoteSkinModel.loadLua = function(self, path, directoryPath, fileName)
+NoteSkinModel.loadLua = function(self, prefix, name)
+	local path = combinePath(self.path, prefix, name)
 	local noteSkin = assert(love.filesystem.load(path))(path)
 
 	noteSkin.path = path
-	noteSkin.directoryPath = directoryPath
-	noteSkin.fileName = fileName
+	noteSkin.directoryPath = combinePath(self.path, prefix)
+	noteSkin.fileName = name
 	noteSkin.inputMode = ncdk.InputMode:new():setString(noteSkin.inputMode)
 	if type(noteSkin.playField) == "string" then
-		noteSkin.playField = love.filesystem.load(directoryPath .. "/" .. noteSkin.playField)()
+		noteSkin.playField = love.filesystem.load(combinePath(self.path, prefix, name))()
 	end
 
 	return noteSkin
 end
 
-NoteSkinModel.loadOsu = function(self, path, directoryPath, fileName)
+NoteSkinModel.loadOsu = function(self, prefix, name)
+	local path = combinePath(self.path, prefix, name)
 	local noteSkins = {}
 
 	local content = love.filesystem.read(path)
@@ -97,10 +127,10 @@ NoteSkinModel.loadOsu = function(self, path, directoryPath, fileName)
 		local keys = tonumber(mania.Keys)
 		if keys then
 			local noteSkin = OsuNoteSkin:new()
-			noteSkin.files = self.files[directoryPath]
+			noteSkin.files = self.files[tostring(prefix)]
 			noteSkin.path = path
-			noteSkin.directoryPath = directoryPath
-			noteSkin.fileName = fileName
+			noteSkin.directoryPath = combinePath(self.path, prefix)
+			noteSkin.fileName = name
 			noteSkin.skinini = skinini
 			noteSkin:setKeys(keys)
 			noteSkin.inputMode = ncdk.InputMode:new():setString(keys .. "key")
