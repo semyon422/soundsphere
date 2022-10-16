@@ -21,7 +21,9 @@ NoteSkinModel.load = function(self)
 	self.config = self.game.configModel.configs.settings
 	self:lookupTree(self.path, self.tree)
 	self:lookupSkins(self.tree)
+	-- local t = love.timer.getTime()
 	self:loadNoteSkins()
+	-- print("T", love.timer.getTime() - t)
 end
 
 local function combinePath(...)
@@ -123,11 +125,13 @@ NoteSkinModel.loadOsu = function(self, prefix, name)
 	content = utf8validate(content)
 	local skinini = OsuNoteSkin:parseSkinIni(content)
 
+	local files = OsuNoteSkin:processFiles(self.files[tostring(prefix)])
+
 	for i, mania in ipairs(skinini.Mania) do
 		local keys = tonumber(mania.Keys)
 		if keys then
 			local noteSkin = OsuNoteSkin:new()
-			noteSkin.files = self.files[tostring(prefix)]
+			noteSkin.files = files
 			noteSkin.path = path
 			noteSkin.directoryPath = combinePath(self.path, prefix)
 			noteSkin.fileName = name

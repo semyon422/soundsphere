@@ -437,31 +437,23 @@ local chars = {
 	percent = "%",
 }
 OsuNoteSkin.findCharFiles = function(self, prefix)
-	local images = {}
 	prefix = prefix:gsub("\\", "/"):lower()
-	for _, file in pairs(self.files) do
-		if file:lower():find(prefix, 1, true) == 1 then
-			local rest = file:sub(#prefix + 1)
-			local format = rest:match("^.*%.([^%.]+)$")
-			if supportedImageFormats[format] then
-				rest = rest:sub(1, -#format - 2)
-				if rest:find("^-.+@%dx$") then
-					local char, dpi = rest:match("^-(.+)@(%d)x$")
-					dpi = tonumber(dpi)
-					char = chars[char] or char
-					images[dpi] = images[dpi] or {}
-					images[dpi][char] = file
-				elseif rest:find("^-.+$") then
-					local char = rest:match("^-(.+)$")
-					char = chars[char] or char
-					images[1] = images[1] or {}
-					images[1][char] = file
-				end
-			end
+	local files = self.files[prefix:gsub("\\", "/"):lower()]
+	if not files then
+		return
+	end
+
+	local images = {}
+	for _, file in ipairs(files) do
+		if file.char then
+			local dpi = file.dpi or 1
+			local char = chars[file.char] or file.char
+			images[dpi] = images[dpi] or {}
+			images[dpi][char] = file.path
 		end
 	end
-	local files = self:getMaxResolution(images)
-	return files
+
+	return (self:getMaxResolution(images))
 end
 
 OsuNoteSkin.addCombo = function(self)
@@ -563,30 +555,23 @@ OsuNoteSkin.findImage = function(self, value, preferFrame)
 	if not value then
 		return
 	end
-	value = value:gsub("\\", "/"):lower()
+
+	local files = self.files[value:gsub("\\", "/"):lower()]
+	if not files then
+		return
+	end
+
 	local single = {}
 	local frame = {}
-	for _, file in pairs(self.files) do
-		if file:lower():find(value, 1, true) == 1 then
-			local trueValue = file:sub(1, #value)
-			local rest = file:sub(#trueValue + 1)
-			local format = rest:match("^.*%.([^%.]+)$")
-			if supportedImageFormats[format] then
-				rest = rest:sub(1, -#format - 2)
-				if rest == "" then
-					single[1] = file
-				elseif rest:find("^@%d+x$") then
-					local dpi = tonumber(rest:find("^@(%d+)x$"))
-					single[dpi] = file
-				elseif rest:find("^-0$") then
-					frame[1] = file
-				elseif rest:find("^-0@%d+x$") then
-					local dpi = tonumber(rest:find("^-0@(%d+)x$"))
-					frame[dpi] = file
-				end
-			end
+	for _, file in ipairs(files) do
+		local dpi = file.dpi or 1
+		if not file.frame then
+			single[dpi] = file.path
+		elseif file.frame == 0 then
+			frame[dpi] = file.path
 		end
 	end
+
 	local file
 	if preferFrame and next(frame) then
 		file = self:getMaxResolution(frame)
@@ -602,38 +587,28 @@ OsuNoteSkin.findAnimation = function(self, value)
 	if not value then
 		return
 	end
+
 	value = value:gsub("\\", "/"):lower()
+	local files = self.files[value]
+	if not files then
+		return
+	end
 
 	local singles = {}
 	local frames = {}
 	local framesPath = {}
-	for _, file in pairs(self.files) do
-		if file:lower():find(value, 1, true) == 1 then
-			local trueValue = file:sub(1, #value)
-			local rest = file:sub(#trueValue + 1)
-			local format = rest:match("^.*%.([^%.]+)$")
-			if supportedImageFormats[format] then
-				rest = rest:sub(1, -#format - 2)
-				if rest == "" then
-					singles[1] = file
-				elseif rest:find("^@%d+x$") then
-					local dpi = tonumber(rest:find("^@(%d+)x$"))
-					singles[dpi] = file
-				elseif rest:find("^-%d+$") then
-					local frame = tonumber(rest:match("^-(%d+)$"))
-					frames[1] = frames[1] or {}
-					table.insert(frames[1], frame)
-					framesPath[1] = trueValue .. "-%d." .. format
-				elseif rest:find("^-%d+@%d+x$") then
-					local frame, dpi = rest:match("^-(%d+)@(%d+)x$")
-					frame, dpi = tonumber(frame), tonumber(dpi)
-					frames[dpi] = frames[dpi] or {}
-					table.insert(frames[dpi], frame)
-					framesPath[dpi] = trueValue .. "-%d@" .. dpi .. "x." .. format
-				end
-			end
+	for _, file in ipairs(files) do
+		local trueValue = file.path:sub(1, #value)
+		local dpi = file.dpi or 1
+		if not file.frame then
+			singles[dpi] = file.path
+		elseif file.frame then
+			frames[dpi] = frames[dpi] or {}
+			table.insert(frames[dpi], file.frame)
+			framesPath[dpi] = trueValue .. "-%d" .. (dpi > 1 and "@" .. dpi .. "x" or "") .. "." .. file.ext
 		end
 	end
+
 	if not next(frames) then
 		local file = self:getMaxResolution(singles)
 		return file
@@ -763,6 +738,35 @@ OsuNoteSkin.setKeys = function(self, keys)
 			return
 		end
 	end
+end
+
+OsuNoteSkin.processFiles = function(self, files)
+	local _files = {}
+
+	for _, file in ipairs(files) do
+		local key1, ext = file:lower():match("^(.+)%.(.-)$")
+		if supportedImageFormats[ext] then
+			local key2, dpi = key1:match("^(.+)@(%d+)x$")
+			key2 = key2 or key1
+
+			local key3, frame = key2:match("^(.+)-(.-)$")
+			if not (tonumber(frame) or chars[frame]) then
+				key3, frame = key2, nil
+			end
+			key3 = key3 or key2
+
+			_files[key3] = _files[key3] or {}
+			table.insert(_files[key3], {
+				path = file,
+				char = frame,
+				frame = tonumber(frame),
+				dpi = tonumber(dpi),
+				ext = ext,
+			})
+		end
+	end
+
+	return _files
 end
 
 OsuNoteSkin.parseSkinIni = function(self, content)
