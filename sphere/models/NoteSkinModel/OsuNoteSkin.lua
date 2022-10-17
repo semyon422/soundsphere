@@ -279,11 +279,8 @@ OsuNoteSkin.load = function(self)
 		color = mania.ColourColumnLine,
 	})
 
-	local keysUnderNotes = mania.KeysUnderNotes == 1
-
-	if not keysUnderNotes then
-		playfield:addNotes()
-	end
+	self:addStages()
+	self:addHpBar()
 
 	local pressed, released = self:getDefaultKeyImages()
 	local stageLight = {}
@@ -294,12 +291,6 @@ OsuNoteSkin.load = function(self)
 		released[i] = self:findImage(mania[ki]) or self:findImage(released[i])
 		stageLight[i] = {stageLightImage, stageLightRange}
 	end
-	playfield:addKeyImages({
-		sy = 480 / 768,
-		padding = 0,
-		pressed = pressed,
-		released = released,
-	})
 	if stageLightImage then
 		playfield:addKeyImageAnimations({
 			sy = 480 / 768,
@@ -309,8 +300,17 @@ OsuNoteSkin.load = function(self)
 		})
 	end
 
-	self:addStages()
-	self:addHpBar()
+	local keysUnderNotes = mania.KeysUnderNotes == 1
+	if not keysUnderNotes then
+		playfield:addNotes()
+	end
+
+	playfield:addKeyImages({
+		sy = 480 / 768,
+		padding = 0,
+		pressed = pressed,
+		released = released,
+	})
 
 	if keysUnderNotes then
 		playfield:addNotes()
