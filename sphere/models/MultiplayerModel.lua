@@ -308,12 +308,13 @@ MultiplayerModel.update = function(self)
 end
 
 MultiplayerModel.downloadNoteChart = function(self)
-	if self.downloadingBeatmap then
+	local setId = self.notechart.osuSetId
+	if self.downloadingBeatmap or not setId then
 		return
 	end
 
 	self.downloadingBeatmap = {
-		setId = self.notechart.osuSetId,
+		setId = setId,
 		status = "",
 	}
 	self.game.osudirectModel:downloadBeatmapSet(self.downloadingBeatmap, function()

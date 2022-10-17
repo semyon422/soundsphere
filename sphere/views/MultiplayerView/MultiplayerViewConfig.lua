@@ -134,18 +134,21 @@ end
 local function DownloadButton(self)
 	local w, h = Layout:move("column2", "header")
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
+	love.graphics.setColor(1, 1, 1, 1)
 
 	local multiplayerModel = self.game.multiplayerModel
 	local notechart = multiplayerModel.notechart
-	if notechart.osuSetId and not multiplayerModel.noteChartItem and not multiplayerModel:isHost() then
-		local beatmap = multiplayerModel.downloadingBeatmap
-		if beatmap then
-			just.text(beatmap.status, w, true)
-		else
-			just.indent(w - 144)
-			if TextButtonImView("Download", "Download", 144, h) then
-				multiplayerModel:downloadNoteChart()
-			end
+	if not notechart.osuSetId then
+		return
+	end
+	local beatmap = multiplayerModel.downloadingBeatmap
+	if beatmap then
+		just.indent(w / 2)
+		LabelImView("beatmap status", beatmap.status, h)
+	else
+		just.indent(w / 2)
+		if TextButtonImView("Download", multiplayerModel.noteChartItem and "Redownload" or "Download", 144, h) then
+			multiplayerModel:downloadNoteChart()
 		end
 	end
 end
