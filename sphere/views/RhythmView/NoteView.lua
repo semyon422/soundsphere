@@ -43,8 +43,6 @@ end
 
 NoteView.draw = function(self) end
 
-NoteView.update = function(self) end
-
 NoteView.isVisible = function(self)
 	return true
 end

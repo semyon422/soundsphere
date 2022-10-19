@@ -75,7 +75,7 @@ local colors = {
 NoteSkinVsrg.colors = colors
 
 NoteSkinVsrg.color = function(timeState, noteView)
-	local logicalState = noteView.logicalState
+	local logicalState = noteView.graphicalNote.logicalNote.state
 	if logicalState == "clear" or logicalState == "skipped" then
 		return colors.clear
 	elseif logicalState == "missed" then

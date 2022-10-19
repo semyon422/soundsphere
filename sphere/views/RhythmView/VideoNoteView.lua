@@ -4,7 +4,6 @@ local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader
 
 local VideoNoteView = NoteView:new()
 
-VideoNoteView.draw = ImageNoteView.draw
 VideoNoteView.getTransformParams = ImageNoteView.getTransformParams
 
 VideoNoteView.construct = function(self)
@@ -23,18 +22,17 @@ VideoNoteView.construct = function(self)
 	self.drawable = resource.image
 end
 
-VideoNoteView.update = function(self, dt)
+VideoNoteView.draw = function(self)
 	local video = self.video
 	if not video then
 		return
 	end
 
-	self.timeState = self.graphicalNote.timeState
-	self.logicalState = self.graphicalNote.logicalNote.state
-	self.headView.timeState = self.graphicalNote.startTimeState or self.graphicalNote.timeState
 	local timer = self.graphicalNote.timeEngine.timer
 
 	video:play(timer:getTime())
+
+	ImageNoteView.draw(self)
 end
 
 return VideoNoteView

@@ -13,12 +13,6 @@ ImageNoteView.construct = function(self)
 	self.drawable = NoteChartResourceLoader.resources[path]
 end
 
-ImageNoteView.update = function(self)
-	self.timeState = self.graphicalNote.timeState
-	self.logicalState = self.graphicalNote.logicalNote.state
-	self.headView.timeState = self.graphicalNote.startTimeState or self.graphicalNote.timeState
-end
-
 ImageNoteView.draw = function(self)
 	local drawable = self.drawable
 	if not drawable then

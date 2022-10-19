@@ -7,12 +7,6 @@ ShortNoteView.construct = function(self)
 	self.headView = self:newNotePartView("Head")
 end
 
-ShortNoteView.update = function(self)
-	self.timeState = self.graphicalNote.timeState
-	self.logicalState = self.graphicalNote.logicalNote.state
-	self.headView.timeState = self.graphicalNote.startTimeState or self.graphicalNote.timeState
-end
-
 ShortNoteView.draw = function(self)
 	local spriteBatch = self.headView:getSpriteBatch()
 	if not spriteBatch then

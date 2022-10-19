@@ -10,16 +10,6 @@ LongNoteView.construct = function(self)
 	self.tailView = self:newNotePartView("Tail")
 end
 
-LongNoteView.update = function(self)
-	self.startTimeState = self.graphicalNote.startTimeState
-	self.endTimeState = self.graphicalNote.endTimeState
-	self.logicalState = self.graphicalNote.logicalNote.state
-
-	self.headView.timeState = self.startTimeState
-	self.bodyView.timeState = self.startTimeState
-	self.tailView.timeState = self.startTimeState
-end
-
 LongNoteView.draw = function(self)
 	local headView = self.headView
 	local bodyView = self.bodyView
@@ -72,7 +62,7 @@ LongNoteView.getHeadTransformParams = ShortNoteView.getTransformParams
 
 LongNoteView.getTailTransformParams = function(self)
 	local tw = self.tailView
-	local ets = self.endTimeState
+	local ets = self.graphicalNote.endTimeState
 	local w, h = tw:getDimensions()
 	local nw, nh = tw:get("w", ets), tw:get("h", ets)
 	local sx = nw and nw / w or tw:get("sx", ets) or 1
@@ -94,8 +84,8 @@ LongNoteView.getBodyTransformParams = function(self)
 	local tw = self.tailView
 	local bw = self.bodyView
 
-	local sts = self.startTimeState
-	local ets = self.endTimeState
+	local sts = self.graphicalNote.startTimeState
+	local ets = self.graphicalNote.endTimeState
 
 	local dx = hw:get("x", sts) - tw:get("x", ets)
 	local dy = hw:get("y", sts) - tw:get("y", ets)

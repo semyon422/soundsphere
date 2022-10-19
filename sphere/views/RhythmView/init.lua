@@ -46,12 +46,6 @@ RhythmView.receive = function(self, event)
 	end
 end
 
-RhythmView.update = function(self, dt)
-	for _, noteView in pairs(self.noteViews) do
-		noteView:update(dt)
-	end
-end
-
 RhythmView.draw = function(self)
 	love.graphics.origin()
 	love.graphics.setColor(1, 1, 1, 1)
