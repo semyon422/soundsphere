@@ -8,7 +8,8 @@ NotePartView.getTimeState = function(self)
 end
 
 NotePartView.get = function(self, key, timeState)
-	return self.noteView.noteSkin:get(self.noteView, self.name, key, timeState or self:getTimeState())
+	local noteSkin = self.noteView.rhythmView.game.rhythmModel.graphicEngine.noteSkin
+	return noteSkin:get(self.noteView, self.name, key, timeState or self:getTimeState())
 end
 
 NotePartView.getSpriteBatch = function(self, key, timeState)
@@ -24,7 +25,7 @@ NotePartView.getDimensions = function(self, key, timeState)
 end
 
 NotePartView.getColor = function(self)
-	local noteSkin = self.noteView.noteSkin
+	local noteSkin = self.noteView.rhythmView.game.rhythmModel.graphicEngine.noteSkin
 	local color = noteSkin:get(self.noteView, self.name, "color", self:getTimeState())
 	local imageName, frame = noteSkin:get(self.noteView, self.name, "image", self:getTimeState())
 	local image = noteSkin.images[imageName]

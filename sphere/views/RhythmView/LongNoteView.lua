@@ -1,19 +1,11 @@
-local NoteView = require("sphere.views.RhythmView.NoteView")
 local ShortNoteView = require("sphere.views.RhythmView.ShortNoteView")
 
-local LongNoteView = NoteView:new()
-
-LongNoteView.construct = function(self)
-	NoteView.construct(self)
-	self.headView = self:newNotePartView("Head")
-	self.bodyView = self:newNotePartView("Body")
-	self.tailView = self:newNotePartView("Tail")
-end
+local LongNoteView = ShortNoteView:new()
 
 LongNoteView.draw = function(self)
-	local headView = self.headView
-	local bodyView = self.bodyView
-	local tailView = self.tailView
+	local headView = self:getNotePart("Head")
+	local bodyView = self:getNotePart("Body")
+	local tailView = self:getNotePart("Tail")
 
 	local headSpriteBatch = headView:getSpriteBatch()
 	local bodySpriteBatch = bodyView:getSpriteBatch()
@@ -34,8 +26,8 @@ LongNoteView.draw = function(self)
 end
 
 LongNoteView.fillChords = function(self, chords, column)
-	local startNoteData = self.startNoteData
-	local endNoteData = self.endNoteData
+	local startNoteData = self.graphicalNote.startNoteData
+	local endNoteData = self.graphicalNote.endNoteData
 
 	if startNoteData then
 		local time = startNoteData.timePoint.absoluteTime
@@ -43,7 +35,6 @@ LongNoteView.fillChords = function(self, chords, column)
 		local chord = chords[time]
 
 		chord[column] = startNoteData.noteType
-		self.startChord = chord
 	end
 
 	if endNoteData then
@@ -52,16 +43,13 @@ LongNoteView.fillChords = function(self, chords, column)
 		local chord = chords[time]
 
 		chord[column] = endNoteData.noteType
-		self.endChord = chord
 	end
 end
 
-LongNoteView.isVisible = ShortNoteView.isVisible
-
-LongNoteView.getHeadTransformParams = ShortNoteView.getTransformParams
+LongNoteView.getHeadTransformParams = LongNoteView.getTransformParams
 
 LongNoteView.getTailTransformParams = function(self)
-	local tw = self.tailView
+	local tw = self:getNotePart("Tail")
 	local ets = self.graphicalNote.endTimeState
 	local w, h = tw:getDimensions()
 	local nw, nh = tw:get("w", ets), tw:get("h", ets)
@@ -80,9 +68,9 @@ LongNoteView.getTailTransformParams = function(self)
 end
 
 LongNoteView.getBodyTransformParams = function(self)
-	local hw = self.headView
-	local tw = self.tailView
-	local bw = self.bodyView
+	local hw = self:getNotePart("Head")
+	local tw = self:getNotePart("Tail")
+	local bw = self:getNotePart("Body")
 
 	local sts = self.graphicalNote.startTimeState
 	local ets = self.graphicalNote.endTimeState

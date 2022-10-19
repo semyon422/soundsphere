@@ -2,33 +2,28 @@ local NoteView = require("sphere.views.RhythmView.NoteView")
 
 local ShortNoteView = NoteView:new()
 
-ShortNoteView.construct = function(self)
-	NoteView.construct(self)
-	self.headView = self:newNotePartView("Head")
-end
-
 ShortNoteView.draw = function(self)
-	local spriteBatch = self.headView:getSpriteBatch()
+	local headView = self:getNotePart("Head")
+	local spriteBatch = headView:getSpriteBatch()
 	if not spriteBatch then
 		return
 	end
-	spriteBatch:setColor(self.headView:getColor())
-	spriteBatch:add(self:getDraw(self.headView:getQuad(), self:getTransformParams()))
+	spriteBatch:setColor(headView:getColor())
+	spriteBatch:add(self:getDraw(headView:getQuad(), self:getTransformParams()))
 end
 
 ShortNoteView.fillChords = function(self, chords, column)
-	local startNoteData = self.startNoteData
+	local startNoteData = self.graphicalNote.startNoteData
 
 	local time = startNoteData.timePoint.absoluteTime
 	chords[time] = chords[time] or {}
 	local chord = chords[time]
 
 	chord[column] = startNoteData.noteType
-	self.startChord = chord
 end
 
 ShortNoteView.isVisible = function(self)
-	local color = self.headView:getColor()
+	local color = self:getNotePart("Head"):getColor()
 	if not color then
 		return
 	end
@@ -36,7 +31,7 @@ ShortNoteView.isVisible = function(self)
 end
 
 ShortNoteView.getTransformParams = function(self)
-	local hw = self.headView
+	local hw = self:getNotePart("Head")
 	local w, h = hw:getDimensions()
 	local nw, nh = hw:get("w"), hw:get("h")
 	local sx = nw and nw / w or hw:get("sx") or 1

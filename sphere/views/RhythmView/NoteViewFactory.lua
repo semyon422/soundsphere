@@ -30,23 +30,22 @@ NoteViewFactory.notes = {
 	},
 }
 
-NoteViewFactory.mode = "default"
+local function getNoteView(noteView, noteType)
+	noteView.noteType = noteType
+	return noteView
+end
 
 NoteViewFactory.getNoteView = function(self, graphicalNote)
-	local noteView = {graphicalNote = graphicalNote}
 	local noteData = graphicalNote.startNoteData
-	noteView.startNoteData = graphicalNote.startNoteData
-	noteView.endNoteData = graphicalNote.endNoteData
 
-	local notes = self.notes[self.mode]
+	local notes = self.notes[self.mode or "default"]
 	local config = notes[noteData.noteType]
 	if not config then
 		return
 	end
 
 	if type(config) == "table" then
-		noteView.noteType = config[1]
-		return config[2]:new(noteView)
+		return getNoteView(config[2], config[1])
 	end
 
 	local fileType
@@ -54,12 +53,10 @@ NoteViewFactory.getNoteView = function(self, graphicalNote)
 	if images then
 		fileType = FileFinder:getType(images)
 	end
-	if fileType == "image" and self.imageBgaEnabled then
-		noteView.noteType = "ImageNote"
-		return ImageNoteView:new(noteView)
-	elseif fileType == "video" and self.videoBgaEnabled then
-		noteView.noteType = "VideoNote"
-		return VideoNoteView:new(noteView)
+	if fileType == "image" and self.bga.image then
+		return getNoteView(ImageNoteView, "ImageNote")
+	elseif fileType == "video" and self.bga.video then
+		return getNoteView(VideoNoteView, "VideoNote")
 	end
 end
 

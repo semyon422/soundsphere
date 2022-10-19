@@ -16,7 +16,7 @@ NoteSkin.check = function(self, note)
 end
 
 NoteSkin.get = function(self, noteView, part, key, timeState)
-	local noteData = noteView.startNoteData
+	local noteData = noteView.graphicalNote.startNoteData
 	local noteType = noteView.noteType
 	local column = self.inputs[noteData.inputType .. noteData.inputIndex]
 

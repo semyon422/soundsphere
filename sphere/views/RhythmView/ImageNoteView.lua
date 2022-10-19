@@ -4,13 +4,8 @@ local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader
 
 local ImageNoteView = NoteView:new()
 
-ImageNoteView.construct = function(self)
-	NoteView.construct(self)
-	self.headView = self:newNotePartView("Head")
-end
-
 ImageNoteView.getDrawable = function(self)
-	local images = self.startNoteData.images
+	local images = self.graphicalNote.startNoteData.images
 	local path = NoteChartResourceLoader.aliases[images[1][1]]
 	return NoteChartResourceLoader.resources[path]
 end
@@ -24,12 +19,12 @@ ImageNoteView.draw = function(self)
 	local tf = transform(self.rhythmView.transform)
 	love.graphics.replaceTransform(tf)
 
-	love.graphics.setColor(self.headView:getColor())
+	love.graphics.setColor(self:getNotePart("Head"):getColor())
 	love.graphics.draw(drawable, self:getTransformParams())
 end
 
 ImageNoteView.getTransformParams = function(self)
-	local hw = self.headView
+	local hw = self:getNotePart("Head")
 	local w, h = self:getDrawable():getDimensions()
 	local nw, nh = hw:get("w"), hw:get("h")
 	local sx = nw and nw / w or hw:get("sx") or 1

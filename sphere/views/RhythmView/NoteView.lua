@@ -7,14 +7,18 @@ NoteView.construct = function(self)
 	self.startChord = {}
 	self.endChord = {}
 	self.middleChord = {}
-	self.middleChordFixed = false
 end
 
-NoteView.newNotePartView = function(self, part)
-	return NotePartView:new({
+NoteView.getNotePart = function(self, name)
+	local part = self[name]
+	if part then
+		return part
+	end
+	self[name] = NotePartView:new({
 		noteView = self,
-		name = part,
+		name = name,
 	})
+	return self[name]
 end
 
 NoteView.getDraw = function(self, quad, ...)
@@ -22,23 +26,6 @@ NoteView.getDraw = function(self, quad, ...)
 		return quad, ...
 	end
 	return ...
-end
-
-NoteView.updateMiddleChord = function(self)
-	if self.middleChordFixed then
-		return
-	end
-
-	local startChord = self.startChord
-	local endChord = self.endChord
-	local middleChord = self.middleChord
-	for i = 1, self.noteSkin.inputsCount do
-		middleChord[i] = nil
-		if startChord[i] == "LongNoteStart" and endChord[i] == "LongNoteEnd" then
-			middleChord[i] = startChord[i]
-		end
-	end
-	self.middleChordFixed = true
 end
 
 NoteView.draw = function(self) end

@@ -5,81 +5,64 @@ local gfx_util = require("gfx_util")
 local RhythmView = Class:new()
 
 RhythmView.load = function(self)
-	local bga = self.game.configModel.configs.settings.gameplay.bga
-
-	self.noteViews = {}
-
 	local noteViewFactory = NoteViewFactory:new()
-	noteViewFactory.videoBgaEnabled = bga.video
-	noteViewFactory.imageBgaEnabled = bga.image
-	if self.mode then
-		noteViewFactory.mode = self.mode
-	end
+	noteViewFactory.bga = self.game.configModel.configs.settings.gameplay.bga
+	noteViewFactory.mode = self.mode
 	self.noteViewFactory = noteViewFactory
 
 	self.textures = {}
 	self.quads = {}
 	self.spriteBatches = {}
 	self:loadImages()
-end
 
-RhythmView.receive = function(self, event)
-	if event.name == "GraphicalNoteState" then
-		local noteViews = self.noteViews
-		local note = event.note
-		if note.activated then
-			local noteView = self.noteViewFactory:getNoteView(note)
-			if not noteView then
-				return
-			end
-			noteView.graphicEngine = self.game.rhythmModel.graphicEngine
-			noteView.noteSkin = noteView.graphicEngine.noteSkin
-			noteView.rhythmView = self
-			noteViews[note] = noteView
-		else
-			local graphicalNote = noteViews[note]
-			if not graphicalNote then
-				return
-			end
-			noteViews[note] = nil
-		end
-	end
+	self.chords = {}
 end
 
 RhythmView.draw = function(self)
-	love.graphics.origin()
-	love.graphics.setColor(1, 1, 1, 1)
-	local noteViews = {}
-	for _, noteView in pairs(self.noteViews) do
-		table.insert(noteViews, noteView)
-	end
-	table.sort(noteViews, function(a, b)
-		return a.startNoteData.timePoint > b.startNoteData.timePoint
-	end)
-
-	local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
+	local graphicEngine = self.game.rhythmModel.graphicEngine
+	local noteSkin = graphicEngine.noteSkin
 	local inputsCount = noteSkin.inputsCount
 	local inputs = noteSkin.inputs
 
 	local chords = {}
-	for _, noteView in ipairs(noteViews) do
-		local startNoteData = noteView.startNoteData
+	self.chords = chords
 
-		local column = inputs[startNoteData.inputType .. startNoteData.inputIndex]
-		if column and column <= inputsCount and noteView:isVisible() then
-			if noteView.fillChords then
-				noteView:fillChords(chords, column)
+	for _, noteDrawer in ipairs(graphicEngine.noteDrawers) do
+		for i = noteDrawer.endNoteIndex, noteDrawer.startNoteIndex, -1 do
+			local note = noteDrawer.noteData[i]
+
+			local noteView = self.noteViewFactory:getNoteView(note)
+			if noteView then
+				noteView.rhythmView = self
+				noteView.graphicalNote = note
+				local startNoteData = note.startNoteData
+
+				local column = inputs[startNoteData.inputType .. startNoteData.inputIndex]
+				if column and column <= inputsCount and noteView:isVisible() then
+					if noteView.fillChords then
+						noteView:fillChords(chords, column)
+					end
+				end
 			end
 		end
 	end
 
-	for _, noteView in ipairs(noteViews) do
-		noteView:updateMiddleChord()
-		noteView:draw()
+	for _, noteDrawer in ipairs(graphicEngine.noteDrawers) do
+		for i = noteDrawer.startNoteIndex, noteDrawer.endNoteIndex do
+			local note = noteDrawer.noteData[i]
+
+			local noteView = self.noteViewFactory:getNoteView(note)
+			if noteView then
+				noteView.rhythmView = self
+				noteView.graphicalNote = note
+				noteView:draw()
+			end
+		end
 	end
 
 	local tf = gfx_util.transform(self.transform)
 	love.graphics.replaceTransform(tf)
+	love.graphics.setColor(1, 1, 1, 1)
 
 	local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
 	local blendModes = noteSkin.blendModes
