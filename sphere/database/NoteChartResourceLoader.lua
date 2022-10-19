@@ -94,8 +94,12 @@ NoteChartResourceLoader.load = function(self, chartPath, noteChart, callback)
 	self.aliases = {}
 
 	local loaded = {}
-	for path in pairs(resources.loaded) do
+	for path, resource in pairs(resources.loaded) do
 		table.insert(loaded, path)
+		local mt = getmetatable(resource)
+		if mt and mt.__index == Video then
+			resource:rewind()
+		end
 	end
 
 	if noteChartType == "bms" then

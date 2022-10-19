@@ -21,8 +21,6 @@ VideoNoteView.construct = function(self)
 
 	self.video = resource
 	self.drawable = resource.image
-
-	resource:rewind()
 end
 
 VideoNoteView.update = function(self, dt)
