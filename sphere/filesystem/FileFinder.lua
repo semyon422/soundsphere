@@ -62,13 +62,14 @@ FileFinder.getFileList = function(self, path)
 	return fileLists[path]
 end
 
-FileFinder.findFile = function(self, fullFileName)
+FileFinder.findFile = function(self, fullFileName, _fileType)
 	if not fullFileName then
 		return
 	end
 
 	fullFileName = fullFileName:gsub("\\", "/")
 	local fileName, fileType = removeExtension(fullFileName)
+	fileType = fileType or _fileType
 
 	if not fileType then
 		return

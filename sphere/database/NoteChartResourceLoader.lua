@@ -100,9 +100,14 @@ NoteChartResourceLoader.load = function(self, chartPath, noteChart, callback)
 
 	if noteChartType == "bms" then
 		local newResources = {}
-		for _, name, sequence in noteChart:getResourceIterator() do
+		for fileType, name, sequence in noteChart:getResourceIterator() do
 			for _, path in ipairs(sequence) do
-				local filePath = FileFinder:findFile(path)
+				local filePath
+				if fileType == "sound" then
+					filePath = FileFinder:findFile(path, "audio")
+				elseif fileType == "image" then
+					filePath = FileFinder:findFile(path, "image") or FileFinder:findFile(path, "video")
+				end
 				if filePath then
 					table.insert(newResources, filePath)
 					self.aliases[name] = filePath
