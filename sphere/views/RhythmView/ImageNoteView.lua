@@ -7,14 +7,16 @@ local ImageNoteView = NoteView:new()
 ImageNoteView.construct = function(self)
 	NoteView.construct(self)
 	self.headView = self:newNotePartView("Head")
+end
 
+ImageNoteView.getDrawable = function(self)
 	local images = self.startNoteData.images
 	local path = NoteChartResourceLoader.aliases[images[1][1]]
-	self.drawable = NoteChartResourceLoader.resources[path]
+	return NoteChartResourceLoader.resources[path]
 end
 
 ImageNoteView.draw = function(self)
-	local drawable = self.drawable
+	local drawable = self:getDrawable()
 	if not drawable then
 		return
 	end
@@ -28,7 +30,7 @@ end
 
 ImageNoteView.getTransformParams = function(self)
 	local hw = self.headView
-	local w, h = self.drawable:getDimensions()
+	local w, h = self:getDrawable():getDimensions()
 	local nw, nh = hw:get("w"), hw:get("h")
 	local sx = nw and nw / w or hw:get("sx") or 1
 	local sy = nh and nh / h or hw:get("sy") or 1
