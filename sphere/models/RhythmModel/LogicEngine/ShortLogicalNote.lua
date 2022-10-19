@@ -73,6 +73,13 @@ ShortLogicalNote.switchState = function(self, newState)
 	scoreEvent.minTime = self.scoreEngine.minTime
 	scoreEvent.maxTime = self.scoreEngine.maxTime
 	self:sendScore(scoreEvent)
+
+	if not self.pressedTime and newState == "passed" then
+		self.pressedTime = currentTime
+	end
+	if self.pressedTime and newState ~= "passed" then
+		self.pressedTime = nil
+	end
 end
 
 ShortLogicalNote.processAuto = function(self)

@@ -354,10 +354,11 @@ NoteSkinVsrg.setLighting = function(self, params)
 		r = 0,
 		color = function() return colors.clear end,
 		image = function(timeState, noteView)
-			if not noteView.startTime then
+			local pressedTime = noteView.graphicalNote.logicalNote.pressedTime
+			if not pressedTime then
 				return
 			end
-			local deltaTime = timeState.currentTime - noteView.startTime
+			local deltaTime = timeState.currentTime - pressedTime
 			if not params.long and deltaTime >= params.frames / params.rate then
 				return
 			end

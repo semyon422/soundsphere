@@ -173,6 +173,13 @@ LongLogicalNote.switchState = function(self, newState, reachableNote)
 	scoreEvent.minTime = self.scoreEngine.minTime
 	scoreEvent.maxTime = self.scoreEngine.maxTime
 	self:sendScore(scoreEvent)
+
+	if not self.pressedTime and (newState == "startPassedPressed" or newState == "startMissedPressed") then
+		self.pressedTime = currentTime
+	end
+	if self.pressedTime and newState ~= "startPassedPressed" and newState ~= "startMissedPressed" then
+		self.pressedTime = nil
+	end
 end
 
 LongLogicalNote.processAuto = function(self)

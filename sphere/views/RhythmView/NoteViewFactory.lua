@@ -2,7 +2,6 @@ local Class					= require("Class")
 local FileFinder			= require("sphere.filesystem.FileFinder")
 local ShortNoteView	= require("sphere.views.RhythmView.ShortNoteView")
 local LongNoteView		= require("sphere.views.RhythmView.LongNoteView")
-local LightingNoteView		= require("sphere.views.RhythmView.LightingNoteView")
 local ImageNoteView				= require("sphere.views.RhythmView.ImageNoteView")
 local VideoNoteView				= require("sphere.views.RhythmView.VideoNoteView")
 
@@ -22,9 +21,9 @@ NoteViewFactory.notes = {
 		LaserNoteStart = {"LongNoteAnimation", ShortNoteView},
 	},
 	lighting = {
-		ShortNote = {"ShortNoteLighting", LightingNoteView},
-		LongNoteStart = {"LongNoteLighting", LightingNoteView},
-		LaserNoteStart = {"LongNoteLighting", LightingNoteView},
+		ShortNote = {"ShortNoteLighting", ShortNoteView},
+		LongNoteStart = {"LongNoteLighting", ShortNoteView},
+		LaserNoteStart = {"LongNoteLighting", ShortNoteView},
 	},
 	bga = {
 		ImageNote = true,
