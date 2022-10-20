@@ -77,7 +77,6 @@ NoteDrawer.update = function(self)
 			note:update()
 			if not note:willDrawBeforeStart() and note.index == self.startNoteIndex - 1 then
 				self.startNoteIndex = self.startNoteIndex - 1
-				note:activate()
 			else
 				break
 			end
@@ -92,7 +91,6 @@ NoteDrawer.update = function(self)
 			note:update()
 			if not note:willDrawAfterEnd() and note.index == self.endNoteIndex + 1 then
 				self.endNoteIndex = self.endNoteIndex + 1
-				note:activate()
 			else
 				break
 			end
@@ -108,7 +106,6 @@ NoteDrawer.update = function(self)
 	for i = self.startNoteIndex, self.endNoteIndex do
 		note = noteData[i]
 		if note:willDrawBeforeStart() then
-			note:deactivate()
 			self.startNoteIndex = self.startNoteIndex + 1
 		else
 			break
@@ -118,17 +115,10 @@ NoteDrawer.update = function(self)
 	for i = self.endNoteIndex, self.startNoteIndex, -1 do
 		note = noteData[i]
 		if note:willDrawAfterEnd() then
-			note:deactivate()
 			self.endNoteIndex = self.endNoteIndex - 1
 		else
 			break
 		end
-	end
-end
-
-NoteDrawer.unload = function(self)
-	for currentNoteIndex = self.startNoteIndex, self.endNoteIndex do
-		self.noteData[currentNoteIndex]:deactivate()
 	end
 end
 

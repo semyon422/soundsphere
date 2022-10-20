@@ -1,13 +1,10 @@
 local Class				= require("Class")
-local Observable		= require("Observable")
 local NoteDrawer		= require("sphere.models.RhythmModel.GraphicEngine.NoteDrawer")
 local flux = require("flux")
 
 local GraphicEngine = Class:new()
 
 GraphicEngine.construct = function(self)
-	self.observable = Observable:new()
-
 	self.noteDrawers = {}
 	self.scaleSpeed = false
 	self.loaded = false
@@ -59,9 +56,6 @@ end
 
 GraphicEngine.unload = function(self)
 	self.loaded = false
-	for _, noteDrawer in ipairs(self.noteDrawers) do
-		noteDrawer:unload()
-	end
 	self.noteDrawers = {}
 end
 

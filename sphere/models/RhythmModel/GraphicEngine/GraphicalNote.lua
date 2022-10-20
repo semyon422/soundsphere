@@ -48,20 +48,4 @@ GraphicalNote.willDrawAfterEnd = function(self)
 	return self:whereWillDraw() == 1
 end
 
-GraphicalNote.activate = function(self)
-	self.activated = true
-	self:sendState()
-end
-
-GraphicalNote.deactivate = function(self)
-	self.activated = false
-	self:sendState()
-end
-
-local event = {name = "GraphicalNoteState"}
-GraphicalNote.sendState = function(self)
-	event.note = self
-	return self.graphicEngine.observable:send(event)
-end
-
 return GraphicalNote
