@@ -1,4 +1,5 @@
 local Class = require("Class")
+local NoteSkinData = require("sphere.models.NoteSkinModel.NoteSkinData")
 
 local NoteSkin = Class:new()
 
@@ -8,6 +9,13 @@ NoteSkin.construct = function(self)
 	self.textures = {}
 	self.images = {}
 	self.blendModes = {}
+
+	self.data = NoteSkinData:new()
+	self.data.noteSkin = self
+end
+
+NoteSkin.loadData = function(self)
+	self.data:load()
 end
 
 NoteSkin.check = function(self, note)

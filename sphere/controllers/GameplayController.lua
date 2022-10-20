@@ -9,7 +9,6 @@ GameplayController.load = function(self)
 	local rhythmModel = self.game.rhythmModel
 	local noteChartModel = self.game.noteChartModel
 	local noteSkinModel = self.game.noteSkinModel
-	local inputModel = self.game.inputModel
 	local configModel = self.game.configModel
 	local modifierModel = self.game.modifierModel
 	local difficultyModel = self.game.difficultyModel
@@ -22,6 +21,7 @@ GameplayController.load = function(self)
 	self.game.modifierModel.noteChart = noteChart
 
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
+	noteSkin:loadData()
 
 	local config = configModel.configs.settings
 

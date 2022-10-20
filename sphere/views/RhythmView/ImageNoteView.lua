@@ -1,4 +1,3 @@
-local transform = require("gfx_util").transform
 local NoteView = require("sphere.views.RhythmView.NoteView")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 
@@ -15,9 +14,6 @@ ImageNoteView.draw = function(self)
 	if not drawable then
 		return
 	end
-
-	local tf = transform(self.rhythmView.transform)
-	love.graphics.replaceTransform(tf)
 
 	love.graphics.setColor(self:getNotePart("Head"):getColor())
 	love.graphics.draw(drawable, self:getTransformParams())
