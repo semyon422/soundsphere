@@ -14,22 +14,22 @@ RhythmView.draw = function(self)
 	NoteViewFactory.bga = self.game.configModel.configs.settings.gameplay.bga
 	NoteViewFactory.mode = self.mode
 
-	self.chords = {}
+	local chords = {}
 	for _, noteDrawer in ipairs(graphicEngine.noteDrawers) do
 		for i = noteDrawer.endNoteIndex, noteDrawer.startNoteIndex, -1 do
 			local note = noteDrawer.noteData[i]
 
 			local noteView = NoteViewFactory:getNoteView(note)
 			if noteView then
-				noteView.rhythmView = self
 				noteView.noteSkin = noteSkin
 				noteView.graphicalNote = note
 				local startNoteData = note.startNoteData
 
 				local column = inputs[startNoteData.inputType .. startNoteData.inputIndex]
-				if column and column <= inputsCount and noteView:isVisible() then
+				if column and column <= inputsCount then
+				-- if column and column <= inputsCount and noteView:isVisible() then
 					if noteView.fillChords then
-						noteView:fillChords(self.chords, column)
+						noteView:fillChords(chords, column)
 					end
 				end
 			end
@@ -45,7 +45,7 @@ RhythmView.draw = function(self)
 
 			local noteView = NoteViewFactory:getNoteView(note)
 			if noteView then
-				noteView.rhythmView = self
+				noteView.chords = chords
 				noteView.noteSkin = noteSkin
 				noteView.graphicalNote = note
 				noteView:draw()
