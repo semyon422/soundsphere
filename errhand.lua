@@ -88,6 +88,7 @@ return function(msg)
 	message = utf8validate(msg)
 	trace = debug.traceback()
 
+	print(message .. "\n" .. trace)
 	love.filesystem.write("userdata/lasterror.txt", message .. "\n" .. trace)
 
 	love.graphics.reset()
