@@ -53,8 +53,9 @@ NoteHandler.loadNoteData = function(self)
 end
 
 NoteHandler.updateRange = function(self)
-	for i = self.startNoteIndex, #self.noteData do
-		local logicalNote = self.noteData[i]
+	local noteData = self.noteData
+	for i = self.startNoteIndex, #noteData do
+		local logicalNote = noteData[i]
 		if not logicalNote.ended then
 			self.startNoteIndex = i
 			break
@@ -62,23 +63,24 @@ NoteHandler.updateRange = function(self)
 	end
 
 	local eventTime = self.logicEngine:getEventTime()
-	for i = self.endNoteIndex, #self.noteData do
-		local logicalNote = self.noteData[i]
+	for i = self.endNoteIndex, #noteData do
+		local logicalNote = noteData[i]
 		if not logicalNote.ended and logicalNote:getNoteTime() >= eventTime then
 			self.endNoteIndex = i
 			break
 		end
-		if i == #self.noteData then
-			self.endNoteIndex = #self.noteData
+		if i == #noteData then
+			self.endNoteIndex = #noteData
 		end
 	end
 end
 
 NoteHandler.getCurrentNote = function(self)
+	local noteData = self.noteData
 	self:updateRange()
 
 	for i = self.startNoteIndex, self.endNoteIndex do
-		local logicalNote = self.noteData[i]
+		local logicalNote = noteData[i]
 		if not logicalNote.ended and logicalNote.state ~= "clear" then
 			return logicalNote
 		end
@@ -86,7 +88,7 @@ NoteHandler.getCurrentNote = function(self)
 
 	local timings = self.logicEngine.timings
 	if not timings.nearest then
-		local logicalNote = self.noteData[self.startNoteIndex]
+		local logicalNote = noteData[self.startNoteIndex]
 		return not logicalNote.ended and logicalNote
 	end
 
@@ -95,7 +97,7 @@ NoteHandler.getCurrentNote = function(self)
 	local nearestIndex
 	local nearestTime = math.huge
 	for i = self.startNoteIndex, self.endNoteIndex do
-		local logicalNote = self.noteData[i]
+		local logicalNote = noteData[i]
 		local noteTime = logicalNote:getNoteTime()
 		local time = math.abs(noteTime - eventTime)
 		if not logicalNote.ended and time < nearestTime then
@@ -104,7 +106,7 @@ NoteHandler.getCurrentNote = function(self)
 		end
 	end
 
-	return self.noteData[nearestIndex]
+	return noteData[nearestIndex]
 end
 
 NoteHandler.update = function(self)

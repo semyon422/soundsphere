@@ -71,36 +71,28 @@ NoteDrawer.update = function(self)
 	local noteData = self.noteData
 	local note
 
-	for currentNoteIndex = self.startNoteIndex, 0, -1 do
-		note = noteData[currentNoteIndex - 1]
-		if note then
-			note:update()
-			if not note:willDrawBeforeStart() and note.index == self.startNoteIndex - 1 then
-				self.startNoteIndex = self.startNoteIndex - 1
-			else
-				break
-			end
-		else
-			break
-		end
-	end
-
-	for currentNoteIndex = self.endNoteIndex, #noteData, 1 do
-		note = noteData[currentNoteIndex + 1]
-		if note then
-			note:update()
-			if not note:willDrawAfterEnd() and note.index == self.endNoteIndex + 1 then
-				self.endNoteIndex = self.endNoteIndex + 1
-			else
-				break
-			end
-		else
-			break
-		end
-	end
-
 	for i = self.startNoteIndex, self.endNoteIndex do
 		noteData[i]:update()
+	end
+
+	for i = self.startNoteIndex, 2, -1 do
+		note = noteData[i - 1]
+		note:update()
+		if not note:willDrawBeforeStart() and i == self.startNoteIndex then
+			self.startNoteIndex = self.startNoteIndex - 1
+		else
+			break
+		end
+	end
+
+	for i = self.endNoteIndex, #noteData - 1, 1 do
+		note = noteData[i + 1]
+		note:update()
+		if not note:willDrawAfterEnd() and i == self.endNoteIndex then
+			self.endNoteIndex = self.endNoteIndex + 1
+		else
+			break
+		end
 	end
 
 	for i = self.startNoteIndex, self.endNoteIndex do
