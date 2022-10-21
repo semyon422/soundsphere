@@ -497,4 +497,59 @@ PlayfieldVsrg.addMatchPlayers = function(self)
 	return self:add(object)
 end
 
+PlayfieldVsrg.addLaneCovers = function(self, covers)
+	if not covers then
+		return
+	end
+	if covers.top.enabled then
+		self:addLaneCover({
+			position = covers.top.position,
+			size = covers.top.size,
+			isBottom = false,
+		})
+	end
+	if covers.bottom.enabled then
+		self:addLaneCover({
+			position = covers.bottom.position,
+			size = covers.bottom.size,
+			isBottom = true,
+		})
+	end
+end
+
+PlayfieldVsrg.addLaneCover = function(self, object)
+	local noteskin = self.noteskin
+	local unit = noteskin.unit
+	if not unit then
+		return
+	end
+
+	local gfx_util = require("gfx_util")
+
+	object = object or {}
+	object.transform = self:newNoteskinTransform()
+	object.mesh = gfx_util.newGradient("vertical", {0, 0, 0, 1}, {0, 0, 0, 0})
+
+	object.position = object.position or unit / 2
+	object.size = object.size or 20
+
+	object.draw = function(self)
+		love.graphics.replaceTransform(gfx_util.transform(self.transform))
+		love.graphics.translate(noteskin.baseOffset, 0)
+		love.graphics.setColor(0, 0, 0, 1)
+
+		local p, g = self.position, self.size
+
+		if not self.isBottom then
+			love.graphics.rectangle("fill", 0, 0, noteskin.fullWidth, p - g)
+			love.graphics.draw(self.mesh, 0, p - g, 0, noteskin.fullWidth, g)
+		else
+			love.graphics.draw(self.mesh, 0, p + g, 0, noteskin.fullWidth, -g)
+			love.graphics.rectangle("fill", 0, p + g, noteskin.fullWidth, unit - p + g)
+		end
+	end
+
+	return self:add(object)
+end
+
 return PlayfieldVsrg

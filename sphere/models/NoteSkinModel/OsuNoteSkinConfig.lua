@@ -12,6 +12,18 @@ config.data = --[[data]] {
 	HitErrorPosition = 465,
 	UpsideDown = false,
 	Barline = true,
+	covers = {
+		top = {
+			enabled = false,
+			position = 240,
+			size = 48,
+		},
+		bottom = {
+			enabled = false,
+			position = 240,
+			size = 48,
+		},
+	},
 } --[[/data]]
 
 function config:draw(w, h)
@@ -25,6 +37,18 @@ function config:draw(w, h)
 	data.HitErrorPosition = imgui.slider1("HitErrorPosition", data.HitErrorPosition, "%d", 0, 480, 1, "Hit Error Position")
 	data.UpsideDown = imgui.checkbox("UpsideDown", data.UpsideDown, "Upside Down")
 	data.Barline = imgui.checkbox("Barline", data.Barline, "Barline")
+
+	imgui.separator()
+	local cover = data.covers.top
+	cover.enabled = imgui.checkbox("covers.top.enabled", cover.enabled, "Top lane cover")
+	cover.position = imgui.slider1("covers.top.position", cover.position, "%d", 0, 480, 1, "Position")
+	cover.size = imgui.slider1("covers.top.size", cover.size, "%d", 0, 480, 1, "Size")
+
+	imgui.separator()
+	cover = data.covers.bottom
+	cover.enabled = imgui.checkbox("covers.bottom.enabled", cover.enabled, "Bottom lane cover")
+	cover.position = imgui.slider1("covers.bottom.position", cover.position, "%d", 0, 480, 1, "Position")
+	cover.size = imgui.slider1("covers.bottom.size", cover.size, "%d", 0, 480, 1, "Size")
 
 	imgui.separator()
 	self:drawAfter()

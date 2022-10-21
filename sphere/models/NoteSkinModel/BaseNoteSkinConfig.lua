@@ -11,7 +11,19 @@ config.data = --[[data]] {
 	hitposition = 450,
 	measureLine = true,
 	judgementLineHeight = 4,
-	upscroll = false
+	upscroll = false,
+	covers = {
+		top = {
+			enabled = false,
+			position = 240,
+			size = 48,
+		},
+		bottom = {
+			enabled = false,
+			position = 240,
+			size = 48,
+		},
+	},
 } --[[/data]]
 
 function config:draw(w, h)
@@ -24,6 +36,18 @@ function config:draw(w, h)
 	data.judgementLineHeight = imgui.slider1("jlh", data.judgementLineHeight, "%d", 0, 16, 1, "J. line height")
 	data.upscroll = imgui.checkbox("upscroll", data.upscroll, "Upscroll")
 	data.measureLine = imgui.checkbox("measureLine", data.measureLine, "Measure line")
+
+	imgui.separator()
+	local cover = data.covers.top
+	cover.enabled = imgui.checkbox("covers.top.enabled", cover.enabled, "Top lane cover")
+	cover.position = imgui.slider1("covers.top.position", cover.position, "%d", 0, 480, 1, "Position")
+	cover.size = imgui.slider1("covers.top.size", cover.size, "%d", 0, 480, 1, "Size")
+
+	imgui.separator()
+	cover = data.covers.bottom
+	cover.enabled = imgui.checkbox("covers.bottom.enabled", cover.enabled, "Bottom lane cover")
+	cover.position = imgui.slider1("covers.bottom.position", cover.position, "%d", 0, 480, 1, "Position")
+	cover.size = imgui.slider1("covers.bottom.size", cover.size, "%d", 0, 480, 1, "Size")
 
 	imgui.separator()
 	self:drawAfter()

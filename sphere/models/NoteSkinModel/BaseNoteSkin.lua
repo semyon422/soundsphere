@@ -157,6 +157,7 @@ BaseNoteSkin.load = function(self)
 		released = keyImage,
 	})
 	playfield:addGuidelines(guidelines)
+	playfield:addLaneCovers(config.data.covers)
 	playfield:disableCamera()
 	playfield:addBaseElements()
 end

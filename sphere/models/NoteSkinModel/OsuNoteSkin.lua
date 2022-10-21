@@ -303,6 +303,7 @@ OsuNoteSkin.load = function(self)
 	local keysUnderNotes = mania.KeysUnderNotes == 1
 	if not keysUnderNotes then
 		playfield:addNotes()
+		playfield:addLaneCovers(config.data.covers)
 	end
 
 	playfield:addKeyImages({
@@ -314,15 +315,16 @@ OsuNoteSkin.load = function(self)
 
 	if keysUnderNotes then
 		playfield:addNotes()
+		playfield:addLaneCovers(config.data.covers)
 	end
 
 	playfield:addLightings()
 
+	playfield:disableCamera()
+
 	self:addCombo()
 	self:addScore()
 	self:addAccuracy()
-
-	playfield:disableCamera()
 
 	self:addJudgements()
 
