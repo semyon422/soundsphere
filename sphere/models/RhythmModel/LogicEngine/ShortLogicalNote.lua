@@ -7,8 +7,6 @@ ShortLogicalNote.noteClass = "ShortLogicalNote"
 ShortLogicalNote.construct = function(self)
 	self.startNoteData = self.noteData
 	self.noteData = nil
-
-	self.keyBind = self.startNoteData.inputType .. self.startNoteData.inputIndex
 	self.state = "clear"
 end
 

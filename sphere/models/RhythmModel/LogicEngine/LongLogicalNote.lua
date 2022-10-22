@@ -1,5 +1,4 @@
 local LogicalNote = require("sphere.models.RhythmModel.LogicEngine.LogicalNote")
-local ShortLogicalNote = require("sphere.models.RhythmModel.LogicEngine.ShortLogicalNote")
 
 local LongLogicalNote = LogicalNote:new()
 
@@ -9,8 +8,6 @@ LongLogicalNote.construct = function(self)
 	self.startNoteData = self.noteData
 	self.endNoteData = self.noteData.endNoteData
 	self.noteData = nil
-
-	self.keyBind = self.startNoteData.inputType .. self.startNoteData.inputIndex
 	self.state = "clear"
 end
 
@@ -98,14 +95,7 @@ LongLogicalNote.tryNextNote = function(self)
 		return
 	end
 
-	local eventTime = self:getEventTime()
-	local timeRate = math.abs(self.timeEngine.timeRate)
-
-	local lastTime = self:getLastTimeFromConfig(self.logicEngine.timings.LongNoteEnd)
-	local time = self:getNoteTime("end") + lastTime * timeRate
-	local currentTime = math.min(eventTime, time)
-
-	if nextNote:isReachable(currentTime) then
+	if nextNote:isReachable(self:getEventTime()) then
 		self:switchState("endMissed", nextNote)
 		return self:next()
 	end
@@ -147,18 +137,20 @@ LongLogicalNote.switchState = function(self, newState, reachableNote)
 		local time = noteTime + lastTime * timeRate
 
 		currentTime = math.min(eventTime, time)
-		deltaTime = currentTime == time and lastTime or (currentTime - self:getNoteTime("start")) / timeRate
+		deltaTime = currentTime == time and lastTime or (currentTime - noteTime) / timeRate
 	else
+		local noteTime = self:getNoteTime("end")
 		local lastTime = self:getLastTimeFromConfig(timings.LongNoteEnd)
-		local time = self:getNoteTime("end") + lastTime * timeRate
+		local time = noteTime + lastTime * timeRate
+
 		currentTime = math.min(eventTime, time)
-		deltaTime = currentTime == time and lastTime or (currentTime - self:getNoteTime("end")) / timeRate
+		deltaTime = currentTime == time and lastTime or (currentTime - noteTime) / timeRate
 	end
 
 	if reachableNote then
-		currentTime = math.min(currentTime, reachableNote:getNoteTime("start") + self:getFirstTimeFromConfig(timings.ShortNote) * timeRate)
+		local time = reachableNote:getNoteTime("start") + self:getFirstTimeFromConfig(timings.ShortNote) * timeRate
+		currentTime = math.min(currentTime, time)
 		deltaTime = self:getLastTimeFromConfig(timings.LongNoteEnd)
-		-- currentTime = self:getNoteTime("end") + self:getLastTimeFromConfig(timings.LongNoteEnd) * timeRate
 	end
 
 	scoreEvent.noteIndex = self.index
