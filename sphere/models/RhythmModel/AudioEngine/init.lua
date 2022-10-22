@@ -46,29 +46,12 @@ AudioEngine.unload = function(self)
 	self.loaded = false
 end
 
-AudioEngine.receive = function(self, event)
-	if not self.loaded or event.name ~= "LogicalNoteState" or event.key ~= "keyState" then
+AudioEngine.playNote = function(self, noteData, isBackground)
+	if not self.loaded or not noteData or not noteData.sounds then
 		return
 	end
 
-	local noteData
-	local note = event.note
-	if note.noteClass == "ShortLogicalNote" and event.value then
-		noteData = note.startNoteData
-	elseif note.noteClass == "LongLogicalNote" then
-		if event.value then
-			noteData = note.startNoteData
-		else
-			noteData = note.endNoteData
-		end
-	end
-
-	if not noteData or not noteData.sounds then
-		return
-	end
-	local layer = note.autoplay and "background" or "foreground"
-
-	self:playAudio(noteData.sounds, note.autoplay, noteData.stream, noteData.timePoint.absoluteTime)
+	self:playAudio(noteData.sounds, isBackground, noteData.stream, noteData.timePoint.absoluteTime)
 end
 
 AudioEngine.playAudio = function(self, sounds, isBackground, stream, offset)

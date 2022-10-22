@@ -34,6 +34,11 @@ logicEngine.timings = {
 	}
 }
 
+local auto_mt = {}
+local function auto(n)
+	return setmetatable({n}, auto_mt)
+end
+
 local function test(notes, events, states)
 	local noteChart = NoteChart:new()
 
@@ -54,7 +59,11 @@ local function test(notes, events, states)
 	end
 
 	for _, time in ipairs(notes) do
-		if type(time) == "number" then
+		local isAuto = type(time) == "table" and getmetatable(time) == auto_mt
+		if type(time) == "number" or isAuto then
+			if isAuto then
+				time = time[1]
+			end
 			local timePoint = layerData:getTimePoint(time, -1)
 
 			local noteData = NoteData:new(timePoint)
@@ -62,6 +71,9 @@ local function test(notes, events, states)
 			noteData.inputIndex = 1
 
 			noteData.noteType = "ShortNote"
+			if isAuto then
+				noteData.noteType = "SoundNote"
+			end
 
 			layerData:addNoteData(noteData)
 		elseif type(time) == "table" then
@@ -269,6 +281,15 @@ local function testmsn()
 			{1.2, "clear", "missed", 2},
 			{2.2, "clear", "missed", 3},
 			{3, "clear", "passed", 4},
+		}
+	)
+
+	test(
+		{0, auto(0.025), 0.05},
+		{{0, "pp"}},
+		{
+			{0, "clear", "passed", 1},
+			{0, "clear", "passed", 3},
 		}
 	)
 end

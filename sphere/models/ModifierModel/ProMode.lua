@@ -47,17 +47,13 @@ ProMode.receive = function(self, config, event)
 			) and
 			not currentNote.ended and
 			currentNote:isReachable(logicEngine:getEventTime()) and
-			not currentNote.autoplay and
-			(
-				currentNote.startNoteData.noteType == "ShortNote" or
-				currentNote.startNoteData.noteType == "LongNoteStart"
-			)
+			currentNote.isPlayable
 		then
 			nearestNote = currentNote
 		end
 	end
 	if nearestNote then
-		nearestNote:switchAutoplay(true)
+		nearestNote.isPlayable = false
 	end
 end
 

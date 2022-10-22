@@ -19,7 +19,7 @@ LongLogicalNote.update = function(self)
 		return
 	end
 
-	if self.autoplay or self.logicEngine.autoplay then
+	if not self.isPlayable or self.logicEngine.autoplay then
 		return self:processAuto()
 	end
 
@@ -113,7 +113,7 @@ end
 
 LongLogicalNote.getNoteTime = function(self, side)
 	local offset = 0
-	if self.playable then
+	if self.isPlayable then
 		offset = self.timeEngine.inputOffset
 	end
 	if not side or side == "start" then
@@ -132,7 +132,7 @@ LongLogicalNote.switchState = function(self, newState, reachableNote)
 	local oldState = self.state
 	self.state = newState
 
-	if not self.playable then
+	if not self.isScorable then
 		return
 	end
 
@@ -191,7 +191,7 @@ LongLogicalNote.processAuto = function(self)
 	local nextNote = self:getNextPlayable()
 	if deltaStartTime >= 0 and not self.keyState then
 		self.keyState = true
-		self:sendState("keyState")
+		self:playSound(self.startNoteData)
 
 		self.eventTime = self:getNoteTime("start")
 		self:processTimeState("exactly", "too early")
@@ -199,7 +199,7 @@ LongLogicalNote.processAuto = function(self)
 	end
 	if deltaEndTime >= 0 and self.keyState or nextNote and nextNote:isHere() then
 		self.keyState = false
-		self:sendState("keyState")
+		self:playSound(self.endNoteData)
 
 		self.eventTime = self:getNoteTime("end")
 		self:processTimeState("too late", "exactly")

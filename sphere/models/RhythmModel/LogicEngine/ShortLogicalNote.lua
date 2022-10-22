@@ -17,7 +17,7 @@ ShortLogicalNote.update = function(self)
 		return
 	end
 
-	if self.autoplay or self.logicEngine.autoplay then
+	if not self.isPlayable or self.logicEngine.autoplay then
 		return self:processAuto()
 	end
 
@@ -47,7 +47,7 @@ ShortLogicalNote.switchState = function(self, newState)
 	local oldState = self.state
 	self.state = newState
 
-	if not self.playable then
+	if not self.isScorable then
 		return
 	end
 
@@ -88,7 +88,7 @@ ShortLogicalNote.processAuto = function(self)
 	end
 
 	self.keyState = true
-	self:sendState("keyState")
+	self:playSound(self.startNoteData)
 
 	self.eventTime = self:getNoteTime()
 	self:processTimeState("exactly")

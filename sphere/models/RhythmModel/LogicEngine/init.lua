@@ -1,13 +1,7 @@
 local Class				= require("Class")
-local Observable		= require("Observable")
 local NoteHandler		= require("sphere.models.RhythmModel.LogicEngine.NoteHandler")
 
 local LogicEngine = Class:new()
-
-LogicEngine.construct = function(self)
-	self.observable = Observable:new()
-	self.noteHandlers = {}
-end
 
 LogicEngine.load = function(self)
 	self.sharedLogicalNotes = {}
@@ -21,13 +15,8 @@ LogicEngine.update = function(self)
 end
 
 LogicEngine.unload = function(self)
-	self:unloadNoteHandlers()
 	self.autoplay = false
 	self.promode = false
-end
-
-LogicEngine.send = function(self, event)
-	return self.observable:send(event)
 end
 
 LogicEngine.getEventTime = function(self)
@@ -72,13 +61,6 @@ LogicEngine.updateNoteHandlers = function(self)
 	for _, noteHandler in ipairs(self.noteHandlers) do
 		noteHandler:update()
 	end
-end
-
-LogicEngine.unloadNoteHandlers = function(self)
-	for _, noteHandler in ipairs(self.noteHandlers) do
-		noteHandler:unload()
-	end
-	self.noteHandlers = {}
 end
 
 return LogicEngine

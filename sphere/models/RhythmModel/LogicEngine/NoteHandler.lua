@@ -7,15 +7,12 @@ NoteHandler.load = function(self)
 	self:loadNoteData()
 end
 
-NoteHandler.unload = function(self) end
-
 NoteHandler.loadNoteData = function(self)
 	self.noteData = {}
-	local notesCount = self.logicEngine.notesCount
 
 	local logicEngine = self.logicEngine
-	local scoreEngine = self.logicEngine.rhythmModel.scoreEngine
-	local timeEngine = self.logicEngine.rhythmModel.timeEngine
+	local notesCount = logicEngine.notesCount
+	local rhythmModel = logicEngine.rhythmModel
 	for layerDataIndex in logicEngine.noteChart:getLayerDataIndexIterator() do
 		local layerData = logicEngine.noteChart:requireLayerData(layerDataIndex)
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
@@ -27,9 +24,10 @@ NoteHandler.loadNoteData = function(self)
 				if logicalNote then
 					logicalNote.noteHandler = self
 					logicalNote.logicEngine = logicEngine
-					logicalNote.scoreEngine = scoreEngine
-					logicalNote.timeEngine = timeEngine
-					if logicalNote.playable then
+					logicalNote.scoreEngine = rhythmModel.scoreEngine
+					logicalNote.timeEngine = rhythmModel.timeEngine
+					logicalNote.audioEngine = rhythmModel.audioEngine
+					if logicalNote.isPlayable then
 						notesCount[logicalNote.noteClass] = (notesCount[logicalNote.noteClass] or 0) + 1
 					end
 					table.insert(self.noteData, logicalNote)
@@ -50,6 +48,8 @@ NoteHandler.loadNoteData = function(self)
 
 	self.startNoteIndex = 1
 	self.endNoteIndex = 1
+
+	self.keyBind = self.inputType .. self.inputIndex
 end
 
 NoteHandler.updateRange = function(self)
@@ -59,6 +59,9 @@ NoteHandler.updateRange = function(self)
 		if not logicalNote.ended then
 			self.startNoteIndex = i
 			break
+		end
+		if i == #noteData then
+			self.startNoteIndex = #noteData + 1
 		end
 	end
 
@@ -80,16 +83,23 @@ NoteHandler.getCurrentNote = function(self)
 	self:updateRange()
 
 	for i = self.startNoteIndex, self.endNoteIndex do
-		local logicalNote = noteData[i]
-		if not logicalNote.ended and logicalNote.state ~= "clear" then
-			return logicalNote
+		local note = noteData[i]
+		if not note.ended and note.state ~= "clear" then
+			return note
 		end
 	end
 
 	local timings = self.logicEngine.timings
 	if not timings.nearest then
-		local logicalNote = noteData[self.startNoteIndex]
-		return not logicalNote.ended and logicalNote
+		local note
+		for i = self.startNoteIndex, self.endNoteIndex do
+			local _note = noteData[i]
+			if not _note.ended and _note.isPlayable then
+				note = _note
+				break
+			end
+		end
+		return note
 	end
 
 	local eventTime = self.logicEngine:getEventTime()
@@ -97,10 +107,10 @@ NoteHandler.getCurrentNote = function(self)
 	local nearestIndex
 	local nearestTime = math.huge
 	for i = self.startNoteIndex, self.endNoteIndex do
-		local logicalNote = noteData[i]
-		local noteTime = logicalNote:getNoteTime()
+		local note = noteData[i]
+		local noteTime = note:getNoteTime()
 		local time = math.abs(noteTime - eventTime)
-		if not logicalNote.ended and time < nearestTime then
+		if not note.ended and note.isPlayable and time < nearestTime then
 			nearestTime = time
 			nearestIndex = i
 		end
@@ -117,10 +127,27 @@ NoteHandler.update = function(self)
 end
 
 NoteHandler.receive = function(self, event)
+	if self.logicEngine.autoplay then
+		return
+	end
+
 	self:update()
-	local currentNote = self:getCurrentNote()
-	if not currentNote then return end
-	currentNote:receive(event)
+	local note = self:getCurrentNote()
+	if not note then return end
+
+	local key = event and event[1]
+	if key ~= self.keyBind then
+		return
+	end
+
+	if event.name == "keypressed" then
+		note.keyState = true
+		note:playSound(note.startNoteData)
+	elseif event.name == "keyreleased" then
+		note.keyState = false
+		note:playSound(note.endNoteData)
+	end
+	note:update()
 end
 
 return NoteHandler

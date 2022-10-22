@@ -39,8 +39,9 @@ LogicalNote.sendScore = function(self, event)
 	self.scoreEngine.scoreSystem:receive(event)
 end
 
-LogicalNote.switchAutoplay = function(self, value)
-	self.autoplay = value
+LogicalNote.playSound = function(self, noteData)
+	if not self.audioEngine then return end
+	self.audioEngine:playNote(noteData, not self.isPlayable)
 end
 
 LogicalNote.getNext = function(self)
@@ -53,7 +54,7 @@ LogicalNote.getNextPlayable = function(self)
 	end
 
 	local nextNote = self:getNext()
-	while nextNote and nextNote.startNoteData.noteType == "SoundNote" do
+	while nextNote and not nextNote.isPlayable do
 		nextNote = nextNote:getNext()
 	end
 
@@ -70,7 +71,7 @@ end
 
 LogicalNote.getNoteTime = function(self)
 	local offset = 0
-	if self.playable then
+	if self.isPlayable then
 		offset = self.timeEngine.inputOffset
 	end
 	return self.startNoteData.timePoint.absoluteTime + offset
@@ -90,40 +91,5 @@ LogicalNote.getEventTime = function(self)
 end
 
 LogicalNote.update = function(self) end
-
-local event = {name = "LogicalNoteState"}
-LogicalNote.sendState = function(self, key)
-	event.note = self
-	event.key = key
-	event.value = self[key]
-	return self.logicEngine:send(event)
-end
-
-LogicalNote.receive = function(self, event)
-	if self.logicEngine.autoplay then
-		return
-	end
-
-	if self.autoplay then
-		local nextNote = self:getNextPlayable()
-		if nextNote then
-			return nextNote:receive(event)
-		end
-		return
-	end
-
-	local key = event and event[1]
-	if key ~= self.keyBind then
-		return
-	end
-
-	if event.name == "keypressed" then
-		self.keyState = true
-	elseif event.name == "keyreleased" then
-		self.keyState = false
-	end
-	self:sendState("keyState")
-	self:update()
-end
 
 return LogicalNote

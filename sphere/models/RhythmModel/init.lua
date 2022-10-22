@@ -29,7 +29,7 @@ RhythmModel.construct = function(self)
 	self.graphicEngine.rhythmModel = self
 	self.observable.rhythmModel = self
 
-	self.logicEngine.observable:add(self.audioEngine)
+	-- self.logicEngine.observable:add(self.audioEngine)
 
 	self.inputManager.observable:add(self.logicEngine)
 	self.inputManager.observable:add(self.observable)
