@@ -9,16 +9,16 @@ NoteView.construct = function(self)
 	self.middleChord = {}
 end
 
+local noteParts = {}
+
 NoteView.getNotePart = function(self, name)
-	local part = self[name]
-	if part then
-		return part
+	local part = noteParts[name]
+	if not part then
+		part = NotePartView:new({name = name})
+		noteParts[name] = part
 	end
-	self[name] = NotePartView:new({
-		noteView = self,
-		name = name,
-	})
-	return self[name]
+	part.noteView = self
+	return part
 end
 
 NoteView.getDraw = function(self, quad, ...)
