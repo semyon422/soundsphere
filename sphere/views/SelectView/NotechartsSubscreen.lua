@@ -338,16 +338,10 @@ local function NotechartsSubscreen(self)
 		gameView:setModal(require("sphere.views.ModifierView"))
 	end
 	if TextButtonImView("noteskins", "skins", w, h) then
-		self.game.selectController:resetModifiedNoteChart()
-		if self.game.noteChartModel.noteChart then
-			gameView:setModal(require("sphere.views.NoteSkinView"))
-		end
+		gameView:setModal(require("sphere.views.NoteSkinView"))
 	end
 	if TextButtonImView("input", "input", w, h) then
-		self.game.selectController:resetModifiedNoteChart()
-		if self.game.noteChartModel.noteChart then
-			gameView:setModal(require("sphere.views.InputView"))
-		end
+		gameView:setModal(require("sphere.views.InputView"))
 	end
 	if TextButtonImView("multi", "multi", w, h) then
 		gameView:setModal(require("sphere.views.LobbyView"))

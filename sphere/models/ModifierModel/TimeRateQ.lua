@@ -27,6 +27,10 @@ TimeRateQ.getSubString = function(self, config)
     end
 end
 
+TimeRateQ.applyMeta = function(self, config, state)
+	state.timeRate = state.timeRate * 2 ^ (0.1 * config.value)
+end
+
 -- https://github.com/Quaver/Quaver/issues/666
 TimeRateQ.apply = function(self, config)
 	self.game.rhythmModel.timeEngine:createTimeRateHandler().timeRate = 2 ^ (0.1 * config.value)

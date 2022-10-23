@@ -1,5 +1,6 @@
 local NoteData	= require("ncdk.NoteData")
 local Modifier	= require("sphere.models.ModifierModel.Modifier")
+local MultiOverPlay	= require("sphere.models.ModifierModel.MultiOverPlay")
 
 local MultiplePlay = Modifier:new()
 
@@ -23,6 +24,8 @@ end
 MultiplePlay.getSubString = function(self, config)
 	return "P"
 end
+
+MultiplePlay.applyMeta = MultiOverPlay.applyMeta
 
 MultiplePlay.apply = function(self, config)
 	local noteChart = self.game.noteChartModel.noteChart

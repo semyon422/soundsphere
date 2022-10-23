@@ -1,5 +1,6 @@
 local Class = require("Class")
 local thread = require("thread")
+local InputMode = require("ncdk.InputMode")
 
 local SelectController = Class:new()
 
@@ -15,14 +16,20 @@ SelectController.load = function(self)
 	selectModel:load()
 	previewModel:load()
 
-	self:applyTimeRate()
+	self:applyModifierMeta()
 end
 
-SelectController.applyTimeRate = function(self)
-	local timeEngine = self.game.rhythmModel.timeEngine
-	timeEngine:resetTimeRateHandlers()
-	self.game.modifierModel:apply("TimeEngineModifier")
-	timeEngine:getBaseTimeRate()
+SelectController.applyModifierMeta = function(self)
+	local state = {}
+	state.timeRate = 1
+	state.inputMode = InputMode:new()
+
+	local item = self.game.selectModel.noteChartItem
+	if item then
+		state.inputMode:setString(item.inputMode)
+	end
+
+	self.game.modifierModel:applyMeta(state)
 end
 
 SelectController.unload = function(self)
@@ -49,6 +56,7 @@ SelectController.update = function(self, dt)
 		end
 		self.game.backgroundModel:setBackgroundPath(bgPath)
 		self.game.previewModel:setAudioPathPreview(audioPath, previewTime)
+		self:applyModifierMeta()
 	end
 
 	local osudirectModel = self.game.osudirectModel
@@ -61,7 +69,7 @@ SelectController.update = function(self, dt)
 
 	if self.game.modifierModel:isChanged() then
 		self.game.multiplayerModel:pushModifiers()
-		self:applyTimeRate()
+		self:applyModifierMeta()
 	end
 
 	local configModel = self.game.configModel
@@ -126,20 +134,6 @@ SelectController.updateCacheCollection = function(self, path, force)
 	else
 		cacheModel:stopUpdate()
 	end
-end
-
-SelectController.resetModifiedNoteChart = function(self)
-	local noteChartModel = self.game.noteChartModel
-	local modifierModel = self.game.modifierModel
-
-	noteChartModel:load()
-	local noteChart = noteChartModel:loadNoteChart()
-	if not noteChart then
-		return
-	end
-
-	modifierModel.noteChart = noteChart
-	modifierModel:apply("NoteChartModifier")
 end
 
 return SelectController

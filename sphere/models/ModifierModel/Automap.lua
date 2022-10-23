@@ -27,6 +27,15 @@ Automap.getSubString = function(self, config)
 	return config.value
 end
 
+Automap.applyMeta = function(self, config, state)
+	local columnCount = math.floor(state.inputMode:getInputCount("key"))
+	if config.value == columnCount or columnCount == 0 then
+		return
+	end
+
+	state.inputMode:setInputCount("key", config.value)
+end
+
 Automap.apply = function(self, config)
 	local noteChart = self.game.noteChartModel.noteChart
 	self.noteChart = noteChart

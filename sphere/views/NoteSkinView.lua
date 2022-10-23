@@ -24,10 +24,13 @@ return ModalImView(function(self)
 		return true
 	end
 
-	local noteChart = self.game.noteChartModel.noteChart
-	selectedNoteSkin = self.game.noteSkinModel:getNoteSkin(noteChart.inputMode)
+	local inputMode = self.game.modifierModel.state.inputMode
+	selectedNoteSkin = self.game.noteSkinModel:getNoteSkin(inputMode)
+	if not selectedNoteSkin then
+		return true
+	end
 
-	local items = self.game.noteSkinModel:getNoteSkins(noteChart.inputMode)
+	local items = self.game.noteSkinModel:getNoteSkins(inputMode)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 

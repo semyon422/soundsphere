@@ -28,6 +28,10 @@ TimeRateX.getSubString = function(self, config)
 	end
 end
 
+TimeRateX.applyMeta = function(self, config, state)
+	state.timeRate = state.timeRate * config.value
+end
+
 TimeRateX.apply = function(self, config)
 	self.game.rhythmModel.timeEngine:createTimeRateHandler().timeRate = config.value
 	self.game.rhythmModel.timeEngine:resetTimeRate()

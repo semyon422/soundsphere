@@ -1,4 +1,5 @@
 local Modifier	= require("sphere.models.ModifierModel.Modifier")
+local Alternate	= require("sphere.models.ModifierModel.Alternate")
 
 local Alternate2 = Modifier:new()
 
@@ -20,6 +21,8 @@ end
 Alternate2.getSubString = function(self, config)
 	return "2" .. config.value:sub(1, 1):upper()
 end
+
+Alternate2.applyMeta = Alternate.applyMeta
 
 Alternate2.apply = function(self, config)
 	local noteChart = self.game.noteChartModel.noteChart

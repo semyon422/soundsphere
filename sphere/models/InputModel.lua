@@ -3,6 +3,7 @@ local Class = require("Class")
 local InputModel = Class:new()
 
 InputModel.inputMode = ""
+InputModel.inputs = {}
 InputModel.devices = {
 	"keyboard",
 	"gamepad",

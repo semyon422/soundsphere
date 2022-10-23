@@ -21,6 +21,22 @@ Alternate.getSubString = function(self, config)
 	return config.value:sub(1, 1):upper()
 end
 
+Alternate.applyMeta = function(self, config, state)
+	local inputCounts = {}
+	for inputType, inputCount in pairs(state.inputMode.data) do
+		if inputCount > 0 then
+			inputCounts[inputType] = inputCount
+		end
+	end
+
+	local inputType = config.value
+	if not inputCounts[inputType] then
+		return
+	end
+
+	state.inputMode:setInputCount(inputType, inputCounts[inputType] * 2)
+end
+
 Alternate.apply = function(self, config)
 	local noteChart = self.game.noteChartModel.noteChart
 

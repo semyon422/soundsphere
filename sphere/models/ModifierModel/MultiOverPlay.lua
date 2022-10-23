@@ -24,6 +24,23 @@ MultiOverPlay.getSubString = function(self, config)
 	return "OP"
 end
 
+MultiOverPlay.applyMeta = function(self, config, state)
+	local inputCounts = {}
+	for inputType, inputCount in pairs(state.inputMode.data) do
+		if inputCount > 0 then
+			inputCounts[inputType] = inputCount
+		end
+	end
+
+	local value = config.value
+	if config.old then
+		value = value + 1
+	end
+	for inputType, inputCount in pairs(inputCounts) do
+		state.inputMode:setInputCount(inputType, inputCount * value)
+	end
+end
+
 MultiOverPlay.apply = function(self, config)
 	local noteChart = self.game.noteChartModel.noteChart
 	local value = config.value

@@ -1,4 +1,5 @@
 local Class			= require("Class")
+local InputMode			= require("ncdk.InputMode")
 
 local AutoPlay		= require("sphere.models.ModifierModel.AutoPlay")
 local ProMode		= require("sphere.models.ModifierModel.ProMode")
@@ -120,6 +121,10 @@ ModifierModel.setConfig = function(self, config)
 	self.config = config
 	self.modifierItemIndex = math.min(math.max(self.modifierItemIndex or (#config + 1), 1), #config + 1)
 	self.changed = true
+	self.state = {
+		timeRate = 1,
+		inputMode = InputMode:new(),
+	}
 end
 
 ModifierModel.scrollAvailableModifier = function(self, direction)
@@ -261,6 +266,16 @@ ModifierModel.apply = function(self, modifierType)
 		if modifier and modifier.type == modifierType then
 			modifier.game = self.game
 			modifier:apply(modifierConfig)
+		end
+	end
+end
+
+ModifierModel.applyMeta = function(self, state)
+	self.state = state
+	for _, modifierConfig in ipairs(self.config) do
+		local modifier = self:getModifier(modifierConfig)
+		if modifier then
+			modifier:applyMeta(modifierConfig, state)
 		end
 	end
 end

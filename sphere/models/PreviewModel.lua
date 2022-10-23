@@ -42,10 +42,10 @@ PreviewModel.update = function(self)
 		self.volume = volume
 	end
 
-	local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
-	if self.pitch ~= baseTimeRate then
-		audio:setPitch(baseTimeRate)
-		self.pitch = baseTimeRate
+	local timeRate = self.game.modifierModel.state.timeRate
+	if self.pitch ~= timeRate then
+		audio:setPitch(timeRate)
+		self.pitch = timeRate
 	end
 end
 
@@ -107,12 +107,12 @@ PreviewModel.loadPreview = function(self)
 	self.path = path
 	self.position = position
 
-	local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
+	local timeRate = self.game.modifierModel.state.timeRate
 	local volumeConfig = self.game.configModel.configs.settings.audio.volume
 	local volume = volumeConfig.master * volumeConfig.music
 	audio:seek(position or 0)
 	audio:setVolume(volume)
-	audio:setPitch(baseTimeRate)
+	audio:setPitch(timeRate)
 	audio:play()
 	self.volume = volume
 end

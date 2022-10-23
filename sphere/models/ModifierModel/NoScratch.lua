@@ -18,6 +18,13 @@ NoScratch.getString = function(self, config)
 	return Modifier.getString(self)
 end
 
+NoScratch.applyMeta = function(self, config, state)
+	if not config.value then
+		return
+	end
+	state.inputMode:setInputCount("scratch", nil)
+end
+
 NoScratch.apply = function(self, config)
 	if not config.value then
 		return

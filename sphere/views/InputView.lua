@@ -22,10 +22,13 @@ return ModalImView(function(self)
 		return true
 	end
 
-	local noteChart = self.game.noteChartModel.noteChart
-	local inputMode = noteChart.inputMode:getString()
+	local inputMode = self.game.modifierModel.state.inputMode:getString()
 	local inputs = self.game.inputModel:getInputs(inputMode)
 	local devices = self.game.inputModel.devices
+
+	if #inputs == 0 then
+		return true
+	end
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
