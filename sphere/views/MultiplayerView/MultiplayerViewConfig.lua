@@ -66,7 +66,7 @@ local function Cells(self)
 
 	local multiplayerModel = self.game.multiplayerModel
 
-	local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
+	local baseTimeRate = self.game.modifierModel.state.timeRate
 	local noteChartItem = self.game.selectModel.noteChartItem or multiplayerModel.notechart
 
 	local bpm = 0

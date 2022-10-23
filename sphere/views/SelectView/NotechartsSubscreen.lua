@@ -102,7 +102,7 @@ end
 local function Cells(self)
 	local w, h = Layout:move("column2row1")
 
-	local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
+	local baseTimeRate = self.game.modifierModel.state.timeRate
 	local noteChartItem = self.game.selectModel.noteChartItem
 	local scoreItem = self.game.selectModel.scoreItem
 

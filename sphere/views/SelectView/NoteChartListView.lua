@@ -34,7 +34,7 @@ NoteChartListView.drawItem = function(self, i, w, h)
 
 	just.indent(18)
 
-	local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
+	local baseTimeRate = self.game.modifierModel.state.timeRate
 
 	local difficulty = Format.difficulty((item.difficulty or 0) * baseTimeRate)
 	local inputMode = item.inputMode
