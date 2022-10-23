@@ -6,6 +6,8 @@ local FileFinder	= require("sphere.filesystem.FileFinder")
 local GameplayController = Class:new()
 
 GameplayController.load = function(self)
+	self.loaded = true
+
 	local rhythmModel = self.game.rhythmModel
 	local noteChartModel = self.game.noteChartModel
 	local noteSkinModel = self.game.noteSkinModel
@@ -64,6 +66,9 @@ GameplayController.load = function(self)
 
 	NoteChartResourceLoader.game = self.game
 	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChart, function()
+		if not self.loaded then
+			return
+		end
 		self:play()
 	end)
 
@@ -89,6 +94,8 @@ GameplayController.getImporterSettings = function(self)
 end
 
 GameplayController.unload = function(self)
+	self.loaded = false
+
 	self.game.discordModel:setPresence({})
 	self:skip()
 
