@@ -365,17 +365,17 @@ local function NotechartInfo(self)
 		return
 	end
 
-	local baseTimeRate = self.game.rhythmModel.timeEngine.baseTimeRate
-
 	local show = showLoadedScore(self)
+
+	local baseTimeRate = show and self.game.modifierModel.state.timeRate or scoreItem.timeRate
 
 	local baseBpm = noteChartItem.bpm
 	local baseLength = noteChartItem.length
 	local baseDifficulty = noteChartItem.difficulty
 	local baseInputMode = noteChartItem.inputMode
 
-	local bpm = scoreEngine.bpm
-	local length = scoreEngine.length
+	local bpm = show and scoreEngine.bpm or baseBpm * baseTimeRate
+	local length = show and scoreEngine.length or baseLength / baseTimeRate
 	local difficulty = show and scoreEngine.enps or scoreItem.difficulty
 	local inputMode = show and scoreEngine.inputMode or scoreItem.inputMode
 
@@ -388,14 +388,14 @@ local function NotechartInfo(self)
 	TextCellImView(w * (1 - wr), 55, "right", "notes", noteChartItem.noteCount)
 	just.sameline()
 	TextCellImView(w * wr, 55, "right", "duration",
-		(not show or length == baseLength) and time_util.format(baseLength) or
+		length == baseLength and time_util.format(baseLength) or
 		("%s→%s"):format(time_util.format(baseLength), time_util.format(length))
 	)
 
 	TextCellImView(w * (1 - wr), 55, "right", "level", noteChartItem.level)
 	just.sameline()
 	TextCellImView(w * wr, 55, "right", "bpm",
-		(not show or bpm == baseBpm) and math.floor(baseBpm) or
+		bpm == baseBpm and math.floor(baseBpm) or
 		("%d→%d"):format(baseBpm, bpm)
 	)
 
@@ -618,9 +618,10 @@ local function ModifierIconGrid(self)
 	love.graphics.translate(36, 0)
 
 	local modifierModel = self.game.modifierModel
+	local selectModel = self.game.selectModel
 	local config = modifierModel.config
-	if not showLoadedScore(self) then
-		config = modifierModel.config
+	if not showLoadedScore(self) and selectModel.scoreItem then
+		config = selectModel.scoreItem.modifiers
 	end
 
 	ModifierIconGridView.game = self.game
