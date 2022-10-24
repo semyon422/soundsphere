@@ -1,5 +1,6 @@
 function love.conf(t)
 	t.identity = nil
+	t.appendidentity = true
 	t.console = true
 	t.accelerometerjoystick = true
 	t.gammacorrect = false
