@@ -25,9 +25,17 @@ ModifierListView.drawItem = function(self, i, w, h)
 	local item = self.items[i]
 	local w2 = w / 2
 
-	if just.button(tostring(item) .. "1", just.is_over(w2, h), 2) then
+	local changed, active, hovered = just.button(tostring(item) .. "1", just.is_over(w2, h), 2)
+	if changed then
 		self.game.modifierModel:remove(item)
 	end
+
+	if hovered then
+		local alpha = active and 0.2 or 0.1
+		love.graphics.setColor(1, 1, 1, alpha)
+		love.graphics.rectangle("fill", 0, 0, w, h)
+	end
+	love.graphics.setColor(1, 1, 1, 1)
 
 	just.row(true)
 	just.indent(44)
