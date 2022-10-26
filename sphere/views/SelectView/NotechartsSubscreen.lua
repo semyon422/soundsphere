@@ -351,6 +351,10 @@ local function NotechartsSubscreen(self)
 	w, h = Layout:move("column3", "footer")
 
 	just.row(true)
+	just.indent(-h)
+	if TextButtonImView("pause music", "pause", h, h) then
+		self.game.previewModel:stop()
+	end
 	if TextButtonImView("collections", "collections", w / 2, h) then
 		self:switchToCollections()
 	end
