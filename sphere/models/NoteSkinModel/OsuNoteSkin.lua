@@ -466,9 +466,9 @@ OsuNoteSkin.addJudgements = function(self, od)
 			if rate ~= -1 then
 				judgement.rate = rate
 			elseif range then
-				judgement.rate = 1 / (range[2] - range[1] + 1)
+				judgement.rate = range[2] - range[1] + 1
 			else
-				judgement.rate = 1
+				judgement.rate = 60
 			end
 			table.insert(judgements, judgement)
 		end
