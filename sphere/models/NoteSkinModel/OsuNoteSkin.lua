@@ -313,6 +313,7 @@ OsuNoteSkin.load = function(self)
 		h = guidelinesHeight,
 		image = {},
 		color = mania.ColourColumnLine,
+		both = true,
 	})
 
 	if not SplitStages then

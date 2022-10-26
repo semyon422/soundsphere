@@ -410,6 +410,22 @@ PlayfieldVsrg.addColumnsBackground = function(self, object)
 	}))
 end
 
+local function getGuidelineX(bw, noteskin, i, inputs)
+	if bw < 0 then
+		if i <= inputs then
+			return noteskin.columns[i]
+		else
+			return noteskin.columns[inputs] + noteskin.width[inputs] + noteskin.space[i]
+		end
+	elseif bw > 0 then
+		if i <= inputs then
+			return noteskin.columns[i] - noteskin.space[i]
+		else
+			return noteskin.columns[inputs] + noteskin.width[inputs]
+		end
+	end
+end
+
 PlayfieldVsrg.addGuidelines = function(self, object)
 	if not object then
 		return
@@ -425,36 +441,31 @@ PlayfieldVsrg.addGuidelines = function(self, object)
 		local by = object.y and object.y[i]
 
 		if bw and bh and by and bw ~= 0 and bh ~= 0 then
-			local x
-			if bw > 0 then
-				if i <= inputs then
-					x = noteskin.columns[i] - noteskin.space[i]
-				else
-					x = noteskin.columns[inputs] + noteskin.width[inputs]
-				end
-			elseif bw < 0 then
-				if i <= inputs then
-					x = noteskin.columns[i]
-				else
-					x = noteskin.columns[inputs] + noteskin.width[inputs] + noteskin.space[i]
-				end
-			end
-
 			local color = object.color and object.color[i]
 			if color and type(color) == "number" then
 				color = object.color
 			end
 
-			local view = ImageView:new({
-				x = x,
+			self:add(ImageView:new({
+				x = getGuidelineX(bw, noteskin, i, inputs),
 				y = by,
 				w = bw,
 				h = bh,
 				transform = object.transform,
 				image = object.image[i],
 				color = color,
-			})
-			self:add(view)
+			}))
+			if object.both and noteskin.space[i] ~= 0 then
+				self:add(ImageView:new({
+					x = getGuidelineX(-bw, noteskin, i, inputs),
+					y = by,
+					w = bw,
+					h = bh,
+					transform = object.transform,
+					image = object.image[i],
+					color = color,
+				}))
+			end
 		end
 	end
 end
