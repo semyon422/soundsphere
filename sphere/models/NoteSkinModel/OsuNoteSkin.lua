@@ -449,10 +449,6 @@ local defaultJudgements = {
 OsuNoteSkin.addJudgements = function(self, od)
 	local mania = self.mania
 	local rate = tonumber(self.skinini.AnimationFramerate) or -1
-	local position = mania.ScorePosition
-	if self.upscroll then
-		position = 480 - position
-	end
 
 	local judgements = {}
 	for i, jd in ipairs(defaultJudgements) do
@@ -468,11 +464,17 @@ OsuNoteSkin.addJudgements = function(self, od)
 			elseif range then
 				judgement.rate = range[2] - range[1] + 1
 			else
-				judgement.rate = 60
+				judgement.rate = 1
 			end
 			table.insert(judgements, judgement)
 		end
 	end
+
+	local position = mania.ScorePosition
+	if self.upscroll then
+		position = 480 - position
+	end
+
 	self.playField:addJudgement({
 		x = 0, y = position, ox = 0.5, oy = 0.5,
 		scale = 480 / 768,
