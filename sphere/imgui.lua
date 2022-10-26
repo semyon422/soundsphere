@@ -77,7 +77,12 @@ function imgui.checkbox(id, v, label)
 end
 
 function imgui.combo(id, v, values, format, label)
-	local fv = format and format(v) or v
+	local fv = v
+	if type(format) == "function" then
+		fv = format(v)
+	elseif type(format) == "string" then
+		fv = format:format(v)
+	end
 	if SpoilerImView(id, _w, _h, fv) then
 		for i, _v in ipairs(values) do
 			local dv = format and format(_v) or _v

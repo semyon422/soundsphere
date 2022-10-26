@@ -446,20 +446,29 @@ PlayfieldVsrg.addGuidelines = function(self, object)
 				color = object.color
 			end
 
+			local lbw = bw
+			if object.mode == "symmetric" and i > inputs / 2 + 1 then
+				lbw = -bw
+			end
+
 			self:add(ImageView:new({
 				x = getGuidelineX(bw, noteskin, i, inputs),
 				y = by,
-				w = bw,
+				w = lbw,
 				h = bh,
 				transform = object.transform,
 				image = object.image[i],
 				color = color,
 			}))
 			if object.both and noteskin.space[i] ~= 0 then
+				local rbw = bw
+				if object.mode == "symmetric" and i > inputs / 2 then
+					rbw = -bw
+				end
 				self:add(ImageView:new({
 					x = getGuidelineX(-bw, noteskin, i, inputs),
 					y = by,
-					w = bw,
+					w = rbw,
 					h = bh,
 					transform = object.transform,
 					image = object.image[i],

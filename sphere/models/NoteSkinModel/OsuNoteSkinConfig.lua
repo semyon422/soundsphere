@@ -13,6 +13,7 @@ config.data = --[[data]] {
 	UpsideDown = false,
 	SplitStages = true,
 	Barline = true,
+	ColumnLineMode = "default",
 	covers = {
 		top = {
 			enabled = false,
@@ -39,6 +40,7 @@ function config:draw(w, h)
 	data.UpsideDown = imgui.checkbox("UpsideDown", data.UpsideDown, "Upside Down")
 	data.SplitStages = imgui.checkbox("SplitStages", data.SplitStages, "SplitStages")
 	data.Barline = imgui.checkbox("Barline", data.Barline, "Barline")
+	data.ColumnLineMode = imgui.combo("ColumnLineMode", data.ColumnLineMode, {"default", "symmetric"}, nil, "Column Line Mode")
 
 	imgui.separator()
 	local cover = data.covers.top

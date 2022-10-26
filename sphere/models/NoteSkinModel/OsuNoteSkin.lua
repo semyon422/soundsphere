@@ -71,15 +71,12 @@ OsuNoteSkin.load = function(self)
 		config:set("HitPosition", mania.HitPosition)
 		config:set("ScorePosition", mania.ScorePosition)
 		config:set("ComboPosition", mania.ComboPosition)
-		config:set("OverallDifficulty", mania.OverallDifficulty or 5)
 		config:set("UpsideDown", mania.UpsideDown == 1)
 		config:set("SplitStages", mania.SplitStages == 1)
-		config:set("Barline", true)
 	else
 		mania.HitPosition = config:get("HitPosition")
 		mania.ScorePosition = config:get("ScorePosition")
 		mania.ComboPosition = config:get("ComboPosition")
-		mania.OverallDifficulty = config:get("OverallDifficulty")
 		mania.UpsideDown = config:get("UpsideDown") and 1 or 0
 		mania.SplitStages = config:get("SplitStages") and 1 or 0
 	end
@@ -314,6 +311,7 @@ OsuNoteSkin.load = function(self)
 		image = {},
 		color = mania.ColourColumnLine,
 		both = true,
+		mode = config:get("ColumnLineMode"),
 	})
 
 	if not SplitStages then
@@ -381,7 +379,7 @@ OsuNoteSkin.load = function(self)
 	self:addScore()
 	self:addAccuracy()
 
-	self:addJudgements()
+	self:addJudgements(config:get("OverallDifficulty"))
 
 	local h = 14
 	BasePlayfield.addHitError(playfield, {
@@ -444,10 +442,9 @@ local defaultJudgements = {
 	{"300g", "Hit300g", "mania-hit300g"},
 }
 
-OsuNoteSkin.addJudgements = function(self)
+OsuNoteSkin.addJudgements = function(self, od)
 	local mania = self.mania
 	local rate = tonumber(self.skinini.AnimationFramerate) or -1
-	local od = tonumber(mania.OverallDifficulty) or 5
 	local position = mania.ScorePosition
 	if self.upscroll then
 		position = 480 - position
@@ -883,7 +880,7 @@ OsuNoteSkin.getDefaultManiaSection = function(self, keys)
 	mania.ColumnRight = 19
 	mania.ColumnSpacing = tovalues(0, keys - 1)
 	mania.ColumnWidth = tovalues(30, keys)
-	mania.ColumnLineWidth = tovalues(2, keys + 1)
+	mania.ColumnLineWidth = tovalues(10, keys + 1)
 	mania.BarlineHeight = 1.2
 	mania.LightingNWidth = tovalues(0, keys)
 	mania.LightingLWidth = tovalues(0, keys)
