@@ -448,7 +448,7 @@ local defaultJudgements = {
 
 OsuNoteSkin.addJudgements = function(self, od)
 	local mania = self.mania
-	local rate = tonumber(self.skinini.AnimationFramerate) or -1
+	local rate = tonumber(self.skinini.General.AnimationFramerate) or -1
 
 	local judgements = {}
 	for i, jd in ipairs(defaultJudgements) do
