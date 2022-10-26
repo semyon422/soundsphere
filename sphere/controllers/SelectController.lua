@@ -97,6 +97,9 @@ SelectController.openDirectory = function(self)
 	local path = noteChartItem.path:match("^(.+)/.-$")
 
 	local realDirectory = love.filesystem.getRealDirectory(path)
+	if not realDirectory then
+		return
+	end
 
 	local realPath
 	if self.game.mountModel:isMountPath(realDirectory) then
