@@ -94,8 +94,13 @@ OsuNoteSkin.load = function(self)
 	end
 	self:setInput(keys)
 
+	local SplitStages = mania.SplitStages == 1
+
 	local space = mania.ColumnSpacing
 	if #space == keysCount - 1 then
+		if SplitStages then
+			space[math.floor(keysCount / 2)] = mania.StageSeparation
+		end
 		table.insert(space, 1, 0)
 		table.insert(space, 0)
 	else
@@ -264,22 +269,45 @@ OsuNoteSkin.load = function(self)
 	})
 
 	local guidelines = mania.ColumnLineWidth
+	local guidelinesW = {}
 	local guidelinesHeight = {}
 	local guidelinesY = {}
 	for i = 1, keysCount + 1 do
-		guidelines[i] = (guidelines[i] or 2) * 480 / 768
+		guidelinesW[i] = (guidelines[i] or 2) * 480 / 768
 		guidelinesHeight[i] = self.hitposition
 		guidelinesY[i] = 0
 	end
 	playfield:addGuidelines({
 		y = guidelinesY,
-		w = guidelines,
+		w = guidelinesW,
 		h = guidelinesHeight,
 		image = {},
 		color = mania.ColourColumnLine,
 	})
 
-	self:addStages()
+	local columns = self.columns
+	local width = self.width
+	local inputsCount = self.inputsCount
+	if not SplitStages then
+		self:addStages(
+			columns[1],
+			columns[inputsCount] + width[inputsCount] + space[inputsCount + 1],
+			self.fullWidth
+		)
+	else
+		local inputsCount2 = math.floor(inputsCount / 2)
+		self:addStages(
+			columns[1],
+			columns[inputsCount2] + width[inputsCount2],
+			(self.fullWidth - mania.StageSeparation) / 2
+		)
+		self:addStages(
+			columns[inputsCount2] + width[inputsCount2] + space[inputsCount2 + 1],
+			columns[inputsCount] + width[inputsCount],
+			(self.fullWidth - mania.StageSeparation) / 2
+		)
+	end
+
 	self:addHpBar()
 
 	local pressed, released = self:getDefaultKeyImages()
@@ -631,13 +659,14 @@ OsuNoteSkin.findAnimation = function(self, value)
 	return framesPath[dpi], {startFrame, endFrame}
 end
 
-OsuNoteSkin.addStages = function(self)
+OsuNoteSkin.addStages = function(self, xl, xr, w)
 	local mania = self.mania
 	local playfield = self.playField
+
 	local stageLeft = self:findImage(mania.StageLeft) or self:findImage("mania-stage-left")
 	if stageLeft then
 		playfield:add(ImageView:new({
-			x = self.columns[1] - self.space[1],
+			x = xl,
 			y = 480,
 			sx = 480 / 768,
 			sy = 480 / 768,
@@ -651,7 +680,7 @@ OsuNoteSkin.addStages = function(self)
 	local stageRight = self:findImage(mania.StageRight) or self:findImage("mania-stage-right")
 	if stageRight then
 		playfield:add(ImageView:new({
-			x = self.columns[self.inputsCount] + self.width[self.inputsCount] + self.space[self.inputsCount + 1],
+			x = xr,
 			y = 480,
 			sx = 480 / 768,
 			sy = 480 / 768,
@@ -664,9 +693,9 @@ OsuNoteSkin.addStages = function(self)
 	local stageHint = self:findImage(mania.StageHint) or self:findImage("mania-stage-hint")
 	if stageHint then
 		playfield:add(ImageView:new({
-			x = self.columns[1] - self.space[1],
+			x = xl,
 			y = self.hitposition,
-			w = self.fullWidth,
+			w = w,
 			sy = 1,
 			oy = 0.5,
 			transform = playfield:newNoteskinTransform(),
@@ -840,7 +869,7 @@ OsuNoteSkin.getDefaultManiaSection = function(self, keys)
 	mania.LightFramePerSecond = 60
 	mania.SpecialStyle = 0
 	mania.ComboBurstStyle = 1
-	mania.SplitStages = 0
+	mania.SplitStages = keys >= 10 and 1 or 0
 	mania.StageSeparation = 40
 	mania.SeparateScore = 1
 	mania.KeysUnderNotes = 0
