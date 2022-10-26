@@ -11,6 +11,7 @@ config.data = --[[data]] {
 	OverallDifficulty = 5,
 	HitErrorPosition = 465,
 	UpsideDown = false,
+	SplitStages = true,
 	Barline = true,
 	covers = {
 		top = {
@@ -36,6 +37,7 @@ function config:draw(w, h)
 	data.OverallDifficulty = imgui.slider1("OverallDifficulty", data.OverallDifficulty, "%d", 0, 10, 1, "Overall Difficulty")
 	data.HitErrorPosition = imgui.slider1("HitErrorPosition", data.HitErrorPosition, "%d", 0, 480, 1, "Hit Error Position")
 	data.UpsideDown = imgui.checkbox("UpsideDown", data.UpsideDown, "Upside Down")
+	data.SplitStages = imgui.checkbox("SplitStages", data.SplitStages, "SplitStages")
 	data.Barline = imgui.checkbox("Barline", data.Barline, "Barline")
 
 	imgui.separator()

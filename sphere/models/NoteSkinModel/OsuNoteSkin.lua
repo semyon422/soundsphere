@@ -73,6 +73,7 @@ OsuNoteSkin.load = function(self)
 		config:set("ComboPosition", mania.ComboPosition)
 		config:set("OverallDifficulty", mania.OverallDifficulty or 5)
 		config:set("UpsideDown", mania.UpsideDown == 1)
+		config:set("SplitStages", mania.SplitStages == 1)
 		config:set("Barline", true)
 	else
 		mania.HitPosition = config:get("HitPosition")
@@ -80,6 +81,7 @@ OsuNoteSkin.load = function(self)
 		mania.ComboPosition = config:get("ComboPosition")
 		mania.OverallDifficulty = config:get("OverallDifficulty")
 		mania.UpsideDown = config:get("UpsideDown") and 1 or 0
+		mania.SplitStages = config:get("SplitStages") and 1 or 0
 	end
 
 	self.name = skinini.General.Name
