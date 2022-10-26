@@ -277,6 +277,7 @@ OsuNoteSkin.load = function(self)
 			self:addMeasureLine({
 				x = columns[ninputs2] + width[ninputs2] + space[ninputs2 + 1],
 				w = widthRight,
+				h = mania.BarlineHeight,
 				color = mania.ColourBarline,
 				image = "pixel"
 			}, 2)
