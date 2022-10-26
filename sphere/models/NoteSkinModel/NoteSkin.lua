@@ -20,13 +20,28 @@ end
 
 NoteSkin.check = function(self, note)
 	local noteData = note.startNoteData
-	return self.inputs[noteData.inputType .. noteData.inputIndex] and self.notes[note.noteType]
+	return self.notes[note.noteType] and self.inputs[noteData.inputType .. noteData.inputIndex]
+end
+
+NoteSkin.getColumn = function(self, input, index)
+	local inputs = self.inputs
+	index = index or 1
+
+	local c = 0
+	for i = 1, #inputs do
+		if inputs[i] == input then
+			c = c + 1
+			if c == index then
+				return i
+			end
+		end
+	end
 end
 
 NoteSkin.get = function(self, noteView, part, key, timeState)
 	local noteData = noteView.graphicalNote.startNoteData
 	local noteType = noteView.noteType
-	local column = self.inputs[noteData.inputType .. noteData.inputIndex]
+	local column = self:getColumn(noteData.inputType .. noteData.inputIndex, noteView.index)
 
 	local value =
 		self.notes[noteType] and

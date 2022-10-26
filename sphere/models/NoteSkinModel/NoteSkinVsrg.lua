@@ -54,7 +54,7 @@ end
 
 NoteSkinVsrg.setInput = function(self, columns)
 	for i, input in ipairs(columns) do
-		columns[input] = i
+		columns[input] = 1
 	end
 	self.inputs = columns
 	self.inputsCount = #columns
@@ -303,19 +303,21 @@ NoteSkinVsrg.addBga = function(self, params)
 	end
 end
 
-NoteSkinVsrg.setInputListIndex = function(self, input)
+NoteSkinVsrg.setInputListIndex = function(self, input, index)
 	local inputs = self.inputs
-	local i = inputs[input]
+	index = index or 1
+
+	local i = self:getColumn(input, index)
 	if not i then
 		i = #inputs + 1
 		inputs[i] = input
-		inputs[input] = i
+		inputs[input] = math.max(inputs[input] or 1, index)
 	end
 	return i
 end
 
-NoteSkinVsrg.addImageNote = function(self, head, input, params)
-	local i = self:setInputListIndex(input)
+NoteSkinVsrg.addImageNote = function(self, head, input, params, index)
+	local i = self:setInputListIndex(input, index)
 
 	head.x[i] = params.x or 0
 	head.y[i] = params.y or 0
@@ -324,12 +326,12 @@ NoteSkinVsrg.addImageNote = function(self, head, input, params)
 	head.color[i] = params.color or colors.clear
 end
 
-NoteSkinVsrg.addMeasureLine = function(self, params)
-	local i = self:setInputListIndex("measure1")
+NoteSkinVsrg.addMeasureLine = function(self, params, index)
+	local i = self:setInputListIndex("measure1", index)
 
 	local Head = self.notes.LongNote.Head
-	Head.x[i] = self.baseOffset
-	Head.w[i] = self.fullWidth
+	Head.x[i] = params.x or self.baseOffset
+	Head.w[i] = params.w or self.fullWidth
 	Head.h[i] = params.h
 	Head.ox[i] = 0
 	Head.oy[i] = 1

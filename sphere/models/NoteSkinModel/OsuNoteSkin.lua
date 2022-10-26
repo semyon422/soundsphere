@@ -94,7 +94,7 @@ OsuNoteSkin.load = function(self)
 	end
 	self:setInput(keys)
 
-	local SplitStages = mania.SplitStages == 1
+	local SplitStages = mania.SplitStages == 1 and keysCount > 1
 
 	local space = mania.ColumnSpacing
 	if #space == keysCount - 1 then
@@ -115,6 +115,11 @@ OsuNoteSkin.load = function(self)
 		space = space,
 		upscroll = mania.UpsideDown == 1,
 	})
+
+	local columns = self.columns
+	local width = self.width
+	local ninputs = self.inputsCount
+	local ninputs2 = math.floor(ninputs / 2)
 
 	local textures = {}
 	local images = {}
@@ -246,12 +251,34 @@ OsuNoteSkin.load = function(self)
 	self:setShortNote({
 		image = ltail,
 	}, "SoundNote")
+
+	local widthLeft, widthRight
+	if SplitStages then
+		widthLeft = columns[ninputs2] - columns[1] + width[ninputs2]
+		widthRight = columns[ninputs] - columns[ninputs2 + 1] + width[ninputs]
+	end
 	if config:get("Barline") then
-		self:addMeasureLine({
-			h = mania.BarlineHeight,
-			color = mania.ColourBarline,
-			image = "pixel"
-		})
+		if not SplitStages then
+			self:addMeasureLine({
+				h = mania.BarlineHeight,
+				color = mania.ColourBarline,
+				image = "pixel"
+			})
+		else
+			self:addMeasureLine({
+				x = columns[1],
+				w = widthLeft,
+				h = mania.BarlineHeight,
+				color = mania.ColourBarline,
+				image = "pixel"
+			}, 1)
+			self:addMeasureLine({
+				x = columns[ninputs2] + width[ninputs2] + space[ninputs2 + 1],
+				w = widthRight,
+				color = mania.ColourBarline,
+				image = "pixel"
+			}, 2)
+		end
 	end
 
 	local playfield = PlayfieldVsrg:new({
@@ -285,26 +312,22 @@ OsuNoteSkin.load = function(self)
 		color = mania.ColourColumnLine,
 	})
 
-	local columns = self.columns
-	local width = self.width
-	local inputsCount = self.inputsCount
 	if not SplitStages then
 		self:addStages(
 			columns[1],
-			columns[inputsCount] + width[inputsCount] + space[inputsCount + 1],
+			columns[ninputs] + width[ninputs] + space[ninputs + 1],
 			self.fullWidth
 		)
 	else
-		local inputsCount2 = math.floor(inputsCount / 2)
 		self:addStages(
 			columns[1],
-			columns[inputsCount2] + width[inputsCount2],
-			(self.fullWidth - mania.StageSeparation) / 2
+			columns[ninputs2] + width[ninputs2],
+			widthLeft
 		)
 		self:addStages(
-			columns[inputsCount2] + width[inputsCount2] + space[inputsCount2 + 1],
-			columns[inputsCount] + width[inputsCount],
-			(self.fullWidth - mania.StageSeparation) / 2
+			columns[ninputs2] + width[ninputs2] + space[ninputs2 + 1],
+			columns[ninputs] + width[ninputs],
+			widthRight
 		)
 	end
 

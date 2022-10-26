@@ -10,7 +10,6 @@ RhythmView.draw = function(self)
 	local inputsCount = noteSkin.inputsCount
 	local inputs = noteSkin.inputs
 
-
 	NoteViewFactory.bga = self.game.configModel.configs.settings.gameplay.bga
 	NoteViewFactory.mode = self.mode
 
@@ -21,6 +20,7 @@ RhythmView.draw = function(self)
 
 			local noteView = NoteViewFactory:getNoteView(note)
 			if noteView then
+				noteView.index = 1
 				noteView.noteSkin = noteSkin
 				noteView.graphicalNote = note
 				local startNoteData = note.startNoteData
@@ -43,12 +43,15 @@ RhythmView.draw = function(self)
 		for i = noteDrawer.startNoteIndex, noteDrawer.endNoteIndex do
 			local note = noteDrawer.noteData[i]
 
-			local noteView = NoteViewFactory:getNoteView(note)
-			if noteView then
-				noteView.chords = chords
-				noteView.noteSkin = noteSkin
-				noteView.graphicalNote = note
-				noteView:draw()
+			for j = 1, noteSkin:check(note) or 0 do
+				local noteView = NoteViewFactory:getNoteView(note)
+				if noteView then
+					noteView.index = j
+					noteView.chords = chords
+					noteView.noteSkin = noteSkin
+					noteView.graphicalNote = note
+					noteView:draw()
+				end
 			end
 		end
 	end
