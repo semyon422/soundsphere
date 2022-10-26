@@ -442,7 +442,7 @@ PlayfieldVsrg.addGuidelines = function(self, object)
 
 		if bw and bh and by and bw ~= 0 and bh ~= 0 then
 			local color = object.color and object.color[i]
-			if color and type(color) == "number" then
+			if not color or type(color) == "number" then
 				color = object.color
 			end
 
