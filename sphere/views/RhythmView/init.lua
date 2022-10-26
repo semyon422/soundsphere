@@ -25,7 +25,7 @@ RhythmView.draw = function(self)
 				noteView.graphicalNote = note
 				local startNoteData = note.startNoteData
 
-				local column = inputs[startNoteData.inputType .. startNoteData.inputIndex]
+				local column = noteSkin:getColumn(startNoteData.inputType .. startNoteData.inputIndex)
 				if column and column <= inputsCount then
 				-- if column and column <= inputsCount and noteView:isVisible() then
 					if noteView.fillChords then
