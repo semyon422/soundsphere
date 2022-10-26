@@ -4,14 +4,10 @@ local imgui = require("sphere.imgui")
 local config = JustConfig:new()
 
 config.data = --[[data]] {
+	mania = {},
 	autosave = false,
-	HitPosition = 240,
-	ScorePosition = 240,
-	ComboPosition = 240,
 	OverallDifficulty = 5,
 	HitErrorPosition = 465,
-	UpsideDown = false,
-	SplitStages = true,
 	Barline = true,
 	ColumnLineMode = "default",
 	covers = {
@@ -28,17 +24,30 @@ config.data = --[[data]] {
 	},
 } --[[/data]]
 
+function config:init()
+	local _mania = self.mania
+	local mania = self.data.mania
+	mania.HitPosition = _mania.HitPosition
+	mania.ScorePosition = _mania.ScorePosition
+	mania.ComboPosition = _mania.ComboPosition
+	mania.UpsideDown = _mania.UpsideDown
+	mania.SplitStages = _mania.SplitStages
+end
+
 function config:draw(w, h)
 	local data = self.data
+	local mania = data.mania
 
 	imgui.setSize(w, h, w / 2, 55)
-	data.HitPosition = imgui.slider1("HitPosition", data.HitPosition, "%d", 240, 480, 1, "Hit Position")
-	data.ScorePosition = imgui.slider1("ScorePosition", data.ScorePosition, "%d", 0, 480, 1, "Score Position")
-	data.ComboPosition = imgui.slider1("ComboPosition", data.ComboPosition, "%d", 0, 480, 1, "Combo Position")
+	mania.HitPosition = imgui.slider1("HitPosition", mania.HitPosition, "%d", 240, 480, 1, "Hit Position")
+	mania.ScorePosition = imgui.slider1("ScorePosition", mania.ScorePosition, "%d", 0, 480, 1, "Score Position")
+	mania.ComboPosition = imgui.slider1("ComboPosition", mania.ComboPosition, "%d", 0, 480, 1, "Combo Position")
+	mania.UpsideDown = imgui.checkbox("UpsideDown", mania.UpsideDown, "Upside Down")
+	mania.SplitStages = imgui.checkbox("SplitStages", mania.SplitStages, "SplitStages")
+
+	imgui.separator()
 	data.OverallDifficulty = imgui.slider1("OverallDifficulty", data.OverallDifficulty, "%d", 0, 10, 1, "Overall Difficulty")
 	data.HitErrorPosition = imgui.slider1("HitErrorPosition", data.HitErrorPosition, "%d", 0, 480, 1, "Hit Error Position")
-	data.UpsideDown = imgui.checkbox("UpsideDown", data.UpsideDown, "Upside Down")
-	data.SplitStages = imgui.checkbox("SplitStages", data.SplitStages, "SplitStages")
 	data.Barline = imgui.checkbox("Barline", data.Barline, "Barline")
 	data.ColumnLineMode = imgui.combo("ColumnLineMode", data.ColumnLineMode, {"default", "symmetric"}, nil, "Column Line Mode")
 

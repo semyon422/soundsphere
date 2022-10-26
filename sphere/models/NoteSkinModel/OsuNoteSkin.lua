@@ -36,6 +36,16 @@ local fixColor = function(t)
 	return t
 end
 
+local function fillTable(src, dst)
+	for k, v in pairs(src) do
+		if type(v) ~= "table" then
+			dst[k] = v
+		elseif type(dst[k]) == "table" then
+			fillTable(v, dst[k])
+		end
+	end
+end
+
 local configPath = "sphere/models/NoteSkinModel/OsuNoteSkinConfig.lua"
 OsuNoteSkin.load = function(self)
 	OsuNoteSkin.configContent = OsuNoteSkin.configContent or love.filesystem.read(configPath)
@@ -67,18 +77,12 @@ OsuNoteSkin.load = function(self)
 	)
 	self.config = config
 	config.skinIniPath = self.path
+	config.mania = mania
+
 	if not exists then
-		config:set("HitPosition", mania.HitPosition)
-		config:set("ScorePosition", mania.ScorePosition)
-		config:set("ComboPosition", mania.ComboPosition)
-		config:set("UpsideDown", mania.UpsideDown == 1)
-		config:set("SplitStages", mania.SplitStages == 1)
-	else
-		mania.HitPosition = config:get("HitPosition")
-		mania.ScorePosition = config:get("ScorePosition")
-		mania.ComboPosition = config:get("ComboPosition")
-		mania.UpsideDown = config:get("UpsideDown") and 1 or 0
-		mania.SplitStages = config:get("SplitStages") and 1 or 0
+		config:init()
+	elseif config.data.mania then
+		fillTable(config.data.mania, mania)
 	end
 
 	self.name = skinini.General.Name

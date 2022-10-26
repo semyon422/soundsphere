@@ -67,12 +67,19 @@ function imgui.slider1(id, v, format, a, b, c, label)
 end
 
 function imgui.checkbox(id, v, label)
+	local isNumber = type(v) == "number"
+	if isNumber then
+		v = v == 1
+	end
 	if CheckboxImView(id, v, _h) then
 		v = not v
 	end
 	just.sameline()
 	just.indent(8)
 	LabelImView(id, label, _h)
+	if isNumber then
+		v = v and 1 or 0
+	end
 	return v
 end
 

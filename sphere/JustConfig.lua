@@ -13,6 +13,8 @@ function JustConfig:set(key, ...)
 	self.data[key] = ...
 end
 
+function JustConfig:init() end
+
 function JustConfig:draw(w, h) end
 
 function JustConfig:drawAfter()
