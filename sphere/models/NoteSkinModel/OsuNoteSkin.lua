@@ -360,10 +360,19 @@ OsuNoteSkin.load = function(self)
 		})
 	end
 
+	local function addNotes()
+		playfield:addNotes()
+		if not SplitStages then
+			playfield:addLaneCovers(config.data.covers)
+		else
+			playfield:addLaneCovers(config.data.covers, columns[1], widthLeft)
+			playfield:addLaneCovers(config.data.covers, columns[ninputs2] + width[ninputs2] + space[ninputs2 + 1], widthRight)
+		end
+	end
+
 	local keysUnderNotes = mania.KeysUnderNotes == 1
 	if not keysUnderNotes then
-		playfield:addNotes()
-		playfield:addLaneCovers(config.data.covers)
+		addNotes()
 	end
 
 	playfield:addKeyImages({
@@ -374,8 +383,7 @@ OsuNoteSkin.load = function(self)
 	})
 
 	if keysUnderNotes then
-		playfield:addNotes()
-		playfield:addLaneCovers(config.data.covers)
+		addNotes()
 	end
 
 	playfield:addLightings()
