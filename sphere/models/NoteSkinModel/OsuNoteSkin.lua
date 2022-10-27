@@ -46,6 +46,23 @@ local function fillTable(src, dst)
 	end
 end
 
+local function copyDefaults(src, dst)
+	for k, default in pairs(src) do
+		local v = dst[k]
+		if not v then
+			dst[k] = default
+		elseif type(default) == "table" then
+			local arr = toarray(v)
+			if k:find("Colour") then
+				fixColor(arr)
+			end
+			dst[k] = fromDefault(arr, default)
+		elseif type(default) == "number" then
+			dst[k] = tonumber(dst[k]) or default
+		end
+	end
+end
+
 local configPath = "sphere/models/NoteSkinModel/OsuNoteSkinConfig.lua"
 OsuNoteSkin.load = function(self)
 	OsuNoteSkin.configContent = OsuNoteSkin.configContent or love.filesystem.read(configPath)
@@ -54,22 +71,8 @@ OsuNoteSkin.load = function(self)
 
 	local mania = self.mania
 	local keysCount = tonumber(mania.Keys)
-	local defaultMania = self:getDefaultManiaSection(keysCount)
 
-	for k, default in pairs(defaultMania) do
-		local v = mania[k]
-		if not v then
-			mania[k] = default
-		elseif type(default) == "table" then
-			local arr = toarray(v)
-			if k:find("Colour") then
-				fixColor(arr)
-			end
-			mania[k] = fromDefault(arr, default)
-		elseif type(default) == "number" then
-			mania[k] = tonumber(mania[k]) or default
-		end
-	end
+	copyDefaults(self:getDefaultManiaSection(keysCount), mania)
 	self:fixManiaValues()
 
 	local config, exists = JustConfig:new({defaultContent = self.configContent}):fromFile(
@@ -448,7 +451,7 @@ local defaultJudgements = {
 
 OsuNoteSkin.addJudgements = function(self, od)
 	local mania = self.mania
-	local rate = tonumber(self.skinini.General.AnimationFramerate) or -1
+	local rate = self.skinini.General.AnimationFramerate
 
 	local judgements = {}
 	for i, jd in ipairs(defaultJudgements) do
@@ -459,7 +462,7 @@ OsuNoteSkin.addJudgements = function(self, od)
 		end
 		if path then
 			local judgement = {name, path, range}
-			if rate ~= -1 then
+			if rate > 0 then
 				judgement.rate = rate
 			elseif range then
 				judgement.rate = range[2] - range[1] + 1
@@ -518,7 +521,7 @@ end
 
 OsuNoteSkin.addCombo = function(self)
 	local fonts = self.skinini.Fonts
-	local files = self:findCharFiles(fonts.ComboPrefix or "score")
+	local files = self:findCharFiles(fonts.ComboPrefix)
 	local position = self.mania.ComboPosition
 	if self.upscroll then
 		position = 480 - position
@@ -530,20 +533,20 @@ OsuNoteSkin.addCombo = function(self)
 		oy = 0.5,
 		align = "center",
 		scale = 480 / 768,
-		overlap = tonumber(fonts.ComboOverlap) or 0,
+		overlap = fonts.ComboOverlap,
 		files = files,
 	}))
 end
 
 OsuNoteSkin.addScore = function(self)
 	local fonts = self.skinini.Fonts
-	local files = self:findCharFiles(fonts.ScorePrefix or "score")
+	local files = self:findCharFiles(fonts.ScorePrefix)
 	self.scoreConfig = ImageValueView:new({
 		transform = self.playField:newTransform(1024, 768, "right"),
 		x = 1024,
 		y = 0,
 		align = "right",
-		overlap = tonumber(fonts.ScoreOverlap) or 0,
+		overlap = fonts.ScoreOverlap,
 		files = files,
 	})
 	self.playField:addScore(self.scoreConfig)
@@ -551,7 +554,7 @@ end
 
 OsuNoteSkin.addAccuracy = function(self)
 	local fonts = self.skinini.Fonts
-	local files = self:findCharFiles(fonts.ScorePrefix or "score")
+	local files = self:findCharFiles(fonts.ScorePrefix)
 	local scoreConfig = self.scoreConfig
 	self.playField:addAccuracy(ImageValueView:new({
 		transform = self.playField:newTransform(1024, 768, "right"),
@@ -560,7 +563,7 @@ OsuNoteSkin.addAccuracy = function(self)
 		scale = 0.6,
 		align = "right",
 		format = "%0.2f%%",
-		overlap = tonumber(fonts.ScoreOverlap) or 0,
+		overlap = fonts.ScoreOverlap,
 		files = files,
 		beforeDraw = function(self)
 			self.y = scoreConfig.height
@@ -856,6 +859,10 @@ OsuNoteSkin.parseSkinIni = function(self, content)
 			end
 		end
 	end
+
+	copyDefaults(self:getDefaultGeneralSection(), skinini.General)
+	copyDefaults(self:getDefaultFontsSection(), skinini.Fonts)
+
 	local skinnedKeys = {}
 	for i, mania in ipairs(skinini.Mania) do
 		local keys = tonumber(mania.Keys)
@@ -879,8 +886,47 @@ local tovalues = function(value, count)
 	return t
 end
 
+OsuNoteSkin.getDefaultGeneralSection = function(self)
+	local general = {}
+
+	general.Name = "Unknown"
+	general.Author = ""
+	general.SliderBallFlip = 0
+	general.CursorRotate = 1
+	general.CursorExpand = 1
+	general.CursorCentre = 1
+	general.SliderBallFrames = 10
+	general.HitCircleOverlayAboveNumber = 1
+	general.SpinnerFrequencyModulate = 1
+	general.LayeredHitSounds = 1
+	general.SpinnerFadePlayfield = 0
+	general.SpinnerNoBlink = 0
+	general.AllowSliderBallTint = 0
+	general.AnimationFramerate = -1
+	general.CursorTrailRotate = 0
+	general.CustomComboBurstSounds = {}
+	general.ComboBurstRandom = 0
+	general.SliderStyle = 2
+
+	return general
+end
+
+OsuNoteSkin.getDefaultFontsSection = function(self)
+	local fonts = {}
+
+	fonts.HitCirclePrefix = "default"
+	fonts.ScorePrefix = "score"
+	fonts.ComboPrefix = "score"
+	fonts.HitCircleOverlap = -2
+	fonts.ScoreOverlap = 0
+	fonts.ComboOverlap = 0
+
+	return fonts
+end
+
 OsuNoteSkin.getDefaultManiaSection = function(self, keys)
 	local mania = {}
+
 	mania.Keys = keys
 	mania.ColumnStart = 136
 	mania.ColumnRight = 19
