@@ -16,7 +16,8 @@ local loadOjm = thread.async(function(path)
 	local soundDatas = {}
 
 	for sampleIndex, sampleData in pairs(ojm.samples) do
-		soundDatas[sampleIndex] = audio.newSoundData(love.filesystem.newFileData(sampleData, sampleIndex))
+		local fd = love.filesystem.newFileData(sampleData, sampleIndex)
+		soundDatas[sampleIndex] = audio.newSoundData(fd:getFFIPointer(), fd:getSize())
 	end
 
 	return soundDatas
