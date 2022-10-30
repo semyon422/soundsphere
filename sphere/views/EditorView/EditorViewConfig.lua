@@ -1,6 +1,7 @@
 local just = require("just")
 local spherefonts		= require("sphere.assets.fonts")
 local gfx_util = require("gfx_util")
+local math_util = require("math_util")
 
 local BackgroundView = require("sphere.views.BackgroundView")
 local UserInfoView = require("sphere.views.UserInfoView")
@@ -11,6 +12,7 @@ local BarCellImView = require("sphere.imviews.BarCellImView")
 local IconButtonImView = require("sphere.imviews.IconButtonImView")
 local TextButtonImView = require("sphere.imviews.TextButtonImView")
 local CheckboxImView = require("sphere.imviews.CheckboxImView")
+local SliderImView = require("sphere.imviews.SliderImView")
 local LabelImView = require("sphere.imviews.LabelImView")
 local RoundedRectangle = require("sphere.views.RoundedRectangle")
 
@@ -68,9 +70,28 @@ local function Header(self)
 	just.row(false)
 end
 
+local function Controls(self)
+	local w, h = Layout:move("base", "header")
+	love.graphics.translate(0, h)
+
+	just.row(true)
+
+	local timeEngine = self.game.rhythmModel.timeEngine
+
+	local currentTime = timeEngine.currentTime
+	local normTime = math_util.map(currentTime, timeEngine.minTime, timeEngine.maxTime, 0, 1)
+	local value = SliderImView("playback scroll", normTime, w, h / 2, "qwe")
+	if value then
+		local time = math_util.map(value, 0, 1, timeEngine.minTime, timeEngine.maxTime)
+		timeEngine:setPosition(time)
+	end
+	just.row(false)
+end
+
 return function(self)
-	Background(self)
+	-- Background(self)
 	Frames(self)
 	ScreenMenu(self)
+	Controls(self)
 	Header(self)
 end

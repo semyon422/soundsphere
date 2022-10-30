@@ -56,6 +56,12 @@ NoteDrawer.updateCurrentTime = function(self)
 		nextVelocityData = spaceData:getVelocityData(self.currentVelocityDataIndex + 1)
 	end
 
+	local prevVelocityData = spaceData:getVelocityData(self.currentVelocityDataIndex - 1)
+	while prevVelocityData and prevVelocityData.timePoint > timePoint do
+		self.currentVelocityDataIndex = self.currentVelocityDataIndex - 1
+		prevVelocityData = spaceData:getVelocityData(self.currentVelocityDataIndex - 1)
+	end
+
 	timePoint.velocityData = spaceData:getVelocityData(self.currentVelocityDataIndex)
 	timePoint:computeZeroClearVisualTime()
 end
