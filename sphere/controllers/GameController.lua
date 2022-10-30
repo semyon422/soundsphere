@@ -45,6 +45,7 @@ local SelectView = require("sphere.views.SelectView")
 local ResultView = require("sphere.views.ResultView")
 local GameplayView = require("sphere.views.GameplayView")
 local MultiplayerView = require("sphere.views.MultiplayerView")
+local EditorView = require("sphere.views.EditorView")
 
 local GameController = Class:new()
 
@@ -64,6 +65,7 @@ GameController.construct = function(self)
 	self.resultView = ResultView:new()
 	self.gameplayView = GameplayView:new()
 	self.multiplayerView = MultiplayerView:new()
+	self.editorView = EditorView:new()
 
 	self.configModel = ConfigModel:new()
 	self.notificationModel = NotificationModel:new()

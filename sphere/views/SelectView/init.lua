@@ -74,6 +74,13 @@ SelectView.result = function(self)
 	end
 end
 
+SelectView.edit = function(self)
+	if not self.game.selectModel:notechartExists() then
+		return
+	end
+	self:changeScreen("editorView")
+end
+
 SelectView.switchToNoteCharts = function(self)
 	self.subscreen = "notecharts"
 	self.searchMode = "filter"

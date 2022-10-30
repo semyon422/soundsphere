@@ -218,6 +218,13 @@ local function SearchField(self)
 		if delAll then text = "" end
 		self.game.searchModel:setSearchString("lamp", text)
 	end
+
+	w, h = Layout:move("column3", "header")
+	love.graphics.translate(w + h / 2, 0)
+
+	if IconButtonImView("edit", "create", h, 0.5) then
+		self:edit()
+	end
 end
 
 local function SortDropdown(self)
