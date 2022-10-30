@@ -55,31 +55,34 @@ end
 
 LongGraphicalNote.getFakeStartTime = function(self)
 	local startTime = self.startNoteData.timePoint.absoluteTime
-	if self.logicalNote.state == "startPassedPressed" then
-		local timePoint = self.noteDrawer.currentTimePoint
-		local offsetSum = self.timeEngine.visualOffset - self.timeEngine.inputOffset
-		local velocityData = self.startNoteData.timePoint.velocityData
-
-		local deltaZeroClearVisualStartTime
-			= timePoint.zeroClearVisualTime
-			- velocityData.timePoint.zeroClearVisualTime
-			- offsetSum / self.noteDrawer.globalSpeed
-
-		local deltaZeroClearVisualEndTime
-			= self.endNoteData.timePoint.zeroClearVisualTime
-			- velocityData.timePoint.zeroClearVisualTime
-
-		--[[
-			fakeVisualStartTimeLimit is derived
-			from (fakeVisualStartTime == currentTime == currentVisualTime)
-			as fakeStartTime
-		]]
-		local startTimeLimit = deltaZeroClearVisualStartTime / velocityData.currentSpeed + velocityData.timePoint.absoluteTime
-		local endTimeLimit = deltaZeroClearVisualEndTime / velocityData.currentSpeed + velocityData.timePoint.absoluteTime
-
-		self.fakeStartTime = math.min(startTimeLimit > startTime and startTimeLimit or startTime, endTimeLimit)
+	local logicalNote = self.logicalNote
+	if not logicalNote or logicalNote.state ~= "startPassedPressed" then
+		return self.fakeStartTime or startTime
 	end
-	return self.fakeStartTime or startTime
+
+	local timePoint = self.noteDrawer.currentTimePoint
+	local offsetSum = self.timeEngine.visualOffset - self.timeEngine.inputOffset
+	local velocityData = self.startNoteData.timePoint.velocityData
+
+	local deltaZeroClearVisualStartTime
+		= timePoint.zeroClearVisualTime
+		- velocityData.timePoint.zeroClearVisualTime
+		- offsetSum / self.noteDrawer.globalSpeed
+
+	local deltaZeroClearVisualEndTime
+		= self.endNoteData.timePoint.zeroClearVisualTime
+		- velocityData.timePoint.zeroClearVisualTime
+
+	--[[
+		fakeVisualStartTimeLimit is derived
+		from (fakeVisualStartTime == currentTime == currentVisualTime)
+		as fakeStartTime
+	]]
+	local startTimeLimit = deltaZeroClearVisualStartTime / velocityData.currentSpeed + velocityData.timePoint.absoluteTime
+	local endTimeLimit = deltaZeroClearVisualEndTime / velocityData.currentSpeed + velocityData.timePoint.absoluteTime
+
+	self.fakeStartTime = math.min(startTimeLimit > startTime and startTimeLimit or startTime, endTimeLimit)
+	return self.fakeStartTime
 end
 
 LongGraphicalNote.getFakeVisualStartTime = function(self)

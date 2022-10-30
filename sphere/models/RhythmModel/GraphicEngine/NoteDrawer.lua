@@ -20,8 +20,7 @@ NoteDrawer.load = function(self)
 				graphicalNote.noteDrawer = self
 				graphicalNote.graphicEngine = graphicEngine
 				graphicalNote.timeEngine = timeEngine
-				graphicalNote.noteSkin = graphicEngine.noteSkin
-				graphicalNote:init()
+				graphicalNote.logicalNote = graphicEngine:getLogicalNote(graphicalNote.startNoteData)
 				if graphicEngine.noteSkin:check(graphicalNote) then
 					table.insert(self.noteData, graphicalNote)
 				end

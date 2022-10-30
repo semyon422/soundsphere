@@ -156,6 +156,7 @@ end
 
 RhythmModel.setNoteSkin = function(self, noteSkin)
 	self.graphicEngine.noteSkin = noteSkin
+	self.graphicEngine.range = noteSkin.range
 end
 
 RhythmModel.setVolume = function(self, volume)

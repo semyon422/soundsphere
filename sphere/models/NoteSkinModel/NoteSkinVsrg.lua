@@ -75,7 +75,7 @@ local colors = {
 NoteSkinVsrg.colors = colors
 
 NoteSkinVsrg.color = function(timeState, noteView)
-	local logicalState = noteView.graphicalNote.logicalNote.state
+	local logicalState = noteView.graphicalNote:getLogicalState()
 	if logicalState == "clear" or logicalState == "skipped" then
 		return colors.clear
 	elseif logicalState == "missed" then
@@ -356,7 +356,7 @@ NoteSkinVsrg.setLighting = function(self, params)
 		r = 0,
 		color = function() return colors.clear end,
 		image = function(timeState, noteView)
-			local pressedTime = noteView.graphicalNote.logicalNote.pressedTime
+			local pressedTime = noteView.graphicalNote:getPressedTime()
 			if not pressedTime then
 				return
 			end
