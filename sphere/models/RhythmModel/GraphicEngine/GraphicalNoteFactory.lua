@@ -6,7 +6,7 @@ local ImageNote				= require("sphere.models.RhythmModel.GraphicEngine.ImageNote"
 local GraphicalNoteFactory = {}
 
 GraphicalNoteFactory.getNote = function(self, noteData)
-	local graphicalNote = {noteData = noteData}
+	local graphicalNote = {startNoteData = noteData}
 
 	if noteData.noteType == "ShortNote" then
 		graphicalNote.noteType = "ShortNote"

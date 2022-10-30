@@ -2,13 +2,8 @@ local GraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.Graphical
 
 local ImageNote = GraphicalNote:new()
 
-ImageNote.construct = function(self)
-	self.startNoteData = self.noteData
-	self.noteData = nil
-end
-
 ImageNote.willDrawBeforeStart = function(self)
-	local nextNote = self:getNext(1)
+	local nextNote = self.nextNote
 	return nextNote and not nextNote:willDrawAfterEnd()
 end
 

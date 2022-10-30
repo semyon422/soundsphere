@@ -16,7 +16,7 @@ RhythmView.draw = function(self)
 	local chords = {}
 	for _, noteDrawer in ipairs(graphicEngine.noteDrawers) do
 		for i = noteDrawer.endNoteIndex, noteDrawer.startNoteIndex, -1 do
-			local note = noteDrawer.noteData[i]
+			local note = noteDrawer.notes[i]
 
 			local noteView = NoteViewFactory:getNoteView(note)
 			if noteView then
@@ -41,7 +41,7 @@ RhythmView.draw = function(self)
 
 	for _, noteDrawer in ipairs(graphicEngine.noteDrawers) do
 		for i = noteDrawer.startNoteIndex, noteDrawer.endNoteIndex do
-			local note = noteDrawer.noteData[i]
+			local note = noteDrawer.notes[i]
 
 			for j = 1, noteSkin:check(note) or 0 do
 				local noteView = NoteViewFactory:getNoteView(note)

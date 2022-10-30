@@ -2,18 +2,7 @@ local Class = require("Class")
 
 local GraphicalNote = Class:new()
 
-GraphicalNote.update = function(self)
-	self:computeVisualTime()
-	self:computeTimeState()
-end
-
-GraphicalNote.computeVisualTime = function(self) end
-
-GraphicalNote.computeTimeState = function(self) end
-
-GraphicalNote.getNext = function(self, offset)
-	return self.noteDrawer.noteData[self.index + offset]
-end
+GraphicalNote.update = function(self) end
 
 GraphicalNote.getLogicalState = function(self)
 	local logicalNote = self.logicalNote

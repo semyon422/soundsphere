@@ -3,8 +3,7 @@ local Class = require("Class")
 local NotePartView = Class:new()
 
 NotePartView.getTimeState = function(self)
-	local graphicalNote = self.noteView.graphicalNote
-	return graphicalNote.startTimeState or graphicalNote.timeState
+	return self.noteView.graphicalNote.startTimeState
 end
 
 NotePartView.get = function(self, key, timeState)

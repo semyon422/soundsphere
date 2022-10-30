@@ -3,17 +3,13 @@ local GraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.Graphical
 local LongGraphicalNote = GraphicalNote:new()
 
 LongGraphicalNote.construct = function(self)
-	self.startNoteData = self.noteData
-	self.endNoteData = self.noteData.endNoteData
-	self.noteData = nil
+	self.endNoteData = self.startNoteData.endNoteData
 end
 
-LongGraphicalNote.computeVisualTime = function(self)
-	self.startNoteData.timePoint:computeVisualTime(self.noteDrawer.currentTimePoint)
-	self.endNoteData.timePoint:computeVisualTime(self.noteDrawer.currentTimePoint)
-end
+LongGraphicalNote.update = function(self)
+	self.startNoteData.timePoint:computeVisualTime(self.currentTimePoint)
+	self.endNoteData.timePoint:computeVisualTime(self.currentTimePoint)
 
-LongGraphicalNote.computeTimeState = function(self)
 	self.startTimeState = self.startTimeState or {}
 	local startTimeState = self.startTimeState
 
@@ -60,14 +56,14 @@ LongGraphicalNote.getFakeStartTime = function(self)
 		return self.fakeStartTime or startTime
 	end
 
-	local timePoint = self.noteDrawer.currentTimePoint
+	local timePoint = self.currentTimePoint
 	local offsetSum = self.timeEngine.visualOffset - self.timeEngine.inputOffset
 	local velocityData = self.startNoteData.timePoint.velocityData
 
 	local deltaZeroClearVisualStartTime
 		= timePoint.zeroClearVisualTime
 		- velocityData.timePoint.zeroClearVisualTime
-		- offsetSum / self.noteDrawer.globalSpeed
+		- offsetSum / timePoint.velocityData.globalSpeed
 
 	local deltaZeroClearVisualEndTime
 		= self.endNoteData.timePoint.zeroClearVisualTime
@@ -86,7 +82,7 @@ LongGraphicalNote.getFakeStartTime = function(self)
 end
 
 LongGraphicalNote.getFakeVisualStartTime = function(self)
-	local timePoint = self.noteDrawer.currentTimePoint
+	local timePoint = self.currentTimePoint
 
 	local velocityData = self.startNoteData.timePoint.velocityData
 	local fakeStartTime = self:getFakeStartTime()
@@ -98,7 +94,7 @@ LongGraphicalNote.getFakeVisualStartTime = function(self)
 
 	local fakeVisualStartTime
 		= (fakeVisualClearStartTime - timePoint.zeroClearVisualTime)
-		* self.noteDrawer.globalSpeed
+		* timePoint.velocityData.globalSpeed
 		+ timePoint.absoluteTime
 
 	return fakeVisualStartTime
