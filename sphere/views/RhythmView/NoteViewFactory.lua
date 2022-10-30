@@ -1,5 +1,4 @@
 local Class					= require("Class")
-local FileFinder			= require("sphere.filesystem.FileFinder")
 local ShortNoteView	= require("sphere.views.RhythmView.ShortNoteView")
 local LongNoteView		= require("sphere.views.RhythmView.LongNoteView")
 local ImageNoteView				= require("sphere.views.RhythmView.ImageNoteView")
@@ -11,22 +10,21 @@ NoteViewFactory.notes = {
 	default = {
 		ShortNote = {"ShortNote", ShortNoteView},
 		SoundNote = {"SoundNote", ShortNoteView},
-		LongNoteStart = {"LongNote", LongNoteView},
-		LaserNoteStart = {"LongNote", LongNoteView},
-		LineNoteStart = {"LongNote", LongNoteView},
+		LongNote = {"LongNote", LongNoteView},
 	},
 	animation = {
 		ShortNote = {"ShortNoteAnimation", ShortNoteView},
-		LongNoteStart = {"LongNoteAnimation", ShortNoteView},
-		LaserNoteStart = {"LongNoteAnimation", ShortNoteView},
+		LongNote = {"LongNoteAnimation", ShortNoteView},
+		LaserNote = {"LongNoteAnimation", ShortNoteView},
 	},
 	lighting = {
 		ShortNote = {"ShortNoteLighting", ShortNoteView},
-		LongNoteStart = {"LongNoteLighting", ShortNoteView},
-		LaserNoteStart = {"LongNoteLighting", ShortNoteView},
+		LongNote = {"LongNoteLighting", ShortNoteView},
+		LaserNote = {"LongNoteLighting", ShortNoteView},
 	},
 	bga = {
-		ImageNote = true,
+		ImageNote = {"ImageNote", ImageNoteView},
+		VideoNote = {"VideoNote", VideoNoteView},
 	},
 }
 
@@ -36,27 +34,10 @@ local function getNoteView(noteView, noteType)
 end
 
 NoteViewFactory.getNoteView = function(self, graphicalNote)
-	local noteData = graphicalNote.startNoteData
-
 	local notes = self.notes[self.mode or "default"]
-	local config = notes[noteData.noteType]
-	if not config then
-		return
-	end
-
-	if type(config) == "table" then
+	local config = notes[graphicalNote.noteType]
+	if config then
 		return getNoteView(config[2], config[1])
-	end
-
-	local fileType
-	local images = noteData.images[1] and noteData.images[1][1]
-	if images then
-		fileType = FileFinder:getType(images)
-	end
-	if fileType == "image" and self.bga.image then
-		return getNoteView(ImageNoteView, "ImageNote")
-	elseif fileType == "video" and self.bga.video then
-		return getNoteView(VideoNoteView, "VideoNote")
 	end
 end
 
