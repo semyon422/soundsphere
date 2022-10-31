@@ -8,6 +8,7 @@ userdata/export
 userdata/replays
 userdata/screenshots
 userdata/hitsounds
+userdata/testcharts
 !userdata/hitsounds/midi
 
 userdata/charts.db

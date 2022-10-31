@@ -48,6 +48,8 @@ local GameplayView = require("sphere.views.GameplayView")
 local MultiplayerView = require("sphere.views.MultiplayerView")
 local EditorView = require("sphere.views.EditorView")
 
+local NoteChartTests = require("sphere.NoteChartTests")
+
 local GameController = Class:new()
 
 GameController.baseVsync = 1
@@ -157,6 +159,8 @@ GameController.load = function(self)
 	self.multiplayerModel:connect()
 
 	self.gameView:load()
+
+	NoteChartTests()
 end
 
 GameController.resetGameplayConfigs = function(self)
