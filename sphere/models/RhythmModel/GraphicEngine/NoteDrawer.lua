@@ -10,7 +10,7 @@ NoteDrawer.load = function(self)
 
 	self.currentTimePoint = self.layerData:getTimePoint()
 	self.currentTimePoint.zeroClearVisualTime = 0
-	self.currentVelocityDataIndex = 1
+	self.velocityIndex = 1
 
 	self.notes = {}
 	for noteDataIndex = 1, self.layerData:getNoteDataCount() do
@@ -50,19 +50,19 @@ NoteDrawer.updateCurrentTime = function(self)
 
 	local spaceData = self.layerData.spaceData
 
-	local nextVelocityData = spaceData:getVelocityData(self.currentVelocityDataIndex + 1)
+	local nextVelocityData = spaceData:getVelocityData(self.velocityIndex + 1)
 	while nextVelocityData and nextVelocityData.timePoint <= timePoint do
-		self.currentVelocityDataIndex = self.currentVelocityDataIndex + 1
-		nextVelocityData = spaceData:getVelocityData(self.currentVelocityDataIndex + 1)
+		self.velocityIndex = self.velocityIndex + 1
+		nextVelocityData = spaceData:getVelocityData(self.velocityIndex + 1)
 	end
 
-	local prevVelocityData = spaceData:getVelocityData(self.currentVelocityDataIndex - 1)
-	while prevVelocityData and prevVelocityData.timePoint > timePoint do
-		self.currentVelocityDataIndex = self.currentVelocityDataIndex - 1
-		prevVelocityData = spaceData:getVelocityData(self.currentVelocityDataIndex - 1)
+	local velocityData = spaceData:getVelocityData(self.velocityIndex)
+	while self.velocityIndex > 1 and velocityData and velocityData.timePoint > timePoint do
+		self.velocityIndex = self.velocityIndex - 1
+		velocityData = spaceData:getVelocityData(self.velocityIndex)
 	end
 
-	timePoint.velocityData = spaceData:getVelocityData(self.currentVelocityDataIndex)
+	timePoint.velocityData = velocityData
 	timePoint:computeZeroClearVisualTime()
 end
 
