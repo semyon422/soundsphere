@@ -59,10 +59,6 @@ GraphicEngine.unload = function(self)
 	self.noteDrawers = {}
 end
 
-GraphicEngine.getLogicalNote = function(self, noteData)
-	return self.rhythmModel.logicEngine.sharedLogicalNotes[noteData]
-end
-
 GraphicEngine.getNoteDrawer = function(self, layerIndex, inputType, inputIndex)
 	return NoteDrawer:new({
 		layerIndex = layerIndex,

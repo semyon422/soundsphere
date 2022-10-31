@@ -74,7 +74,7 @@ local function Controls(self)
 	local w, h = Layout:move("base", "header")
 	love.graphics.translate(0, h)
 
-	just.row(true)
+	-- just.row(true)
 
 	local timeEngine = self.game.rhythmModel.timeEngine
 
@@ -85,7 +85,17 @@ local function Controls(self)
 		local time = math_util.map(value, 0, 1, timeEngine.minTime, timeEngine.maxTime)
 		timeEngine:setPosition(time)
 	end
-	just.row(false)
+
+	if TextButtonImView("play", "play", 100, 55, "center") then
+		self.game.rhythmModel.timeEngine:play()
+		self.game.rhythmModel.audioEngine:play()
+	end
+	if TextButtonImView("pause", "pause", 100, 55, "center") then
+		self.game.rhythmModel.timeEngine:pause()
+		self.game.rhythmModel.audioEngine:pause()
+	end
+
+	-- just.row(false)
 end
 
 return function(self)

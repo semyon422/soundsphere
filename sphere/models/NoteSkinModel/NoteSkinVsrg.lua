@@ -128,8 +128,12 @@ local function getFrame(a, deltaTime)
 	return math.floor(deltaTime * a.rate) % a.frames * (a.range[2] - a.range[1]) / (a.frames - 1) + a.range[1]
 end
 
+NoteSkinVsrg.getTimePosition = function(self, time)
+	return self.hitposition + self.unit * time
+end
+
 NoteSkinVsrg.getPosition = function(self, timeState)
-	return self.hitposition + self.unit * (timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
+	return self:getTimePosition(timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
 end
 
 NoteSkinVsrg.setShortNote = function(self, params, noteType)

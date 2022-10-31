@@ -6,11 +6,15 @@ local NoteDrawer = Class:new()
 NoteDrawer.load = function(self)
 	local graphicEngine = self.graphicEngine
 	local timeEngine = graphicEngine.rhythmModel.timeEngine
+	local logicEngine = graphicEngine.rhythmModel.logicEngine
 	self.layerData = graphicEngine.noteChart:requireLayerData(self.layerIndex)
 
 	self.currentTimePoint = self.layerData:getTimePoint()
 	self.currentTimePoint.zeroClearVisualTime = 0
 	self.velocityIndex = 1
+	self.tempoIndex = 1
+
+	local sharedLogicalNotes = logicEngine.sharedLogicalNotes or {}
 
 	self.notes = {}
 	for noteDataIndex = 1, self.layerData:getNoteDataCount() do
@@ -23,7 +27,7 @@ NoteDrawer.load = function(self)
 				graphicalNote.currentTimePoint = self.currentTimePoint
 				graphicalNote.graphicEngine = graphicEngine
 				graphicalNote.timeEngine = timeEngine
-				graphicalNote.logicalNote = graphicEngine:getLogicalNote(graphicalNote.startNoteData)
+				graphicalNote.logicalNote = sharedLogicalNotes[noteData]
 				if graphicEngine.noteSkin:check(graphicalNote) then
 					table.insert(self.notes, graphicalNote)
 				end
@@ -48,21 +52,34 @@ NoteDrawer.updateCurrentTime = function(self)
 	local timePoint = self.currentTimePoint
 	timePoint.absoluteTime = timeEngine.currentVisualTime - timeEngine.inputOffset
 
-	local spaceData = self.layerData.spaceData
+	local layerData = self.layerData
 
-	local nextVelocityData = spaceData:getVelocityData(self.velocityIndex + 1)
+	local nextVelocityData = layerData:getVelocityData(self.velocityIndex + 1)
 	while nextVelocityData and nextVelocityData.timePoint <= timePoint do
 		self.velocityIndex = self.velocityIndex + 1
-		nextVelocityData = spaceData:getVelocityData(self.velocityIndex + 1)
+		nextVelocityData = layerData:getVelocityData(self.velocityIndex + 1)
 	end
 
-	local velocityData = spaceData:getVelocityData(self.velocityIndex)
+	local velocityData = layerData:getVelocityData(self.velocityIndex)
 	while self.velocityIndex > 1 and velocityData and velocityData.timePoint > timePoint do
 		self.velocityIndex = self.velocityIndex - 1
-		velocityData = spaceData:getVelocityData(self.velocityIndex)
+		velocityData = layerData:getVelocityData(self.velocityIndex)
 	end
 
+	-- local nextTempoData = layerData:getVelocityData(self.tempoIndex + 1)
+	-- while nextTempoData and nextTempoData.timePoint <= timePoint do
+	-- 	self.velocityIndex = self.velocityIndex + 1
+	-- 	nextTempoData = layerData:getVelocityData(self.tempoIndex + 1)
+	-- end
+
+	-- local tempoData = layerData:getVelocityData(self.tempoIndex)
+	-- while self.velocityIndex > 1 and tempoData and tempoData.timePoint > timePoint do
+	-- 	self.velocityIndex = self.velocityIndex - 1
+	-- 	tempoData = layerData:getVelocityData(self.tempoIndex)
+	-- end
+
 	timePoint.velocityData = velocityData
+	-- timePoint.tempoData = tempoData
 	timePoint:computeZeroClearVisualTime()
 end
 

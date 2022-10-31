@@ -8,6 +8,7 @@ local SequenceView = require("sphere.views.SequenceView")
 
 local Layout = require("sphere.views.EditorView.Layout")
 local EditorViewConfig = require("sphere.views.EditorView.EditorViewConfig")
+local SnapGridView = require("sphere.views.EditorView.SnapGridView")
 
 local EditorView = ScreenView:new()
 
@@ -27,8 +28,9 @@ EditorView.load = thread.coro(function(self)
 	local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
 	self.viewConfig = noteSkin.playField
 
-	self.subscreen = ""
-	self.failed = false
+	self.snapGridView = SnapGridView:new()
+	self.snapGridView.game = self.game
+	self.snapGridView.transform = noteSkin.playField:newNoteskinTransform()
 
 	local sequenceView = self.sequenceView
 
@@ -59,6 +61,7 @@ EditorView.draw = function(self)
 
 	Layout:draw()
 	EditorViewConfig(self)
+	self.snapGridView:draw()
 	self.sequenceView:draw()
 	just.container()
 end

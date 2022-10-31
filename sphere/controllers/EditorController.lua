@@ -35,8 +35,8 @@ EditorController.load = function(self)
 	rhythmModel:setPauseTimes(config.gameplay.time)
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel:setNoteSkin(noteSkin)
-	rhythmModel.inputManager:setInputMode(noteChart.inputMode:getString())
 
+	rhythmModel.hasLogic = false
 	rhythmModel:load()
 
 	local scoreEngine = rhythmModel.scoreEngine
@@ -93,8 +93,7 @@ EditorController.unload = function(self)
 	local rhythmModel = self.game.rhythmModel
 	rhythmModel:unloadAllEngines()
 	rhythmModel:unload()
-	rhythmModel.inputManager:setMode("external")
-	self.game.replayModel:setMode("record")
+	rhythmModel.hasLogic = true
 
 	local graphics = self.game.configModel.configs.settings.graphics
 	local flags = graphics.mode.flags
