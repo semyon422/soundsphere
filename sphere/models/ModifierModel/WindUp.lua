@@ -32,8 +32,8 @@ WindUp.update = function(self, config)
 	end
 
 	local timeEngine = self.game.rhythmModel.timeEngine
-	local startTime = timeEngine.noteChart.metaData:get("minTime")
-	local endTime = timeEngine.noteChart.metaData:get("maxTime")
+	local startTime = timeEngine.noteChart.metaData.minTime
+	local endTime = timeEngine.noteChart.metaData.maxTime
 	local currentTime = timeEngine.currentTime
 
 	if not timeEngine.timer.isPlaying then

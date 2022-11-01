@@ -27,8 +27,8 @@ ScoreEngine.load = function(self)
 	self.pausesCount = 0
 	self.paused = false
 
-	self.minTime = self.noteChart.metaData:get("minTime")
-	self.maxTime = self.noteChart.metaData:get("maxTime")
+	self.minTime = self.noteChart.metaData.minTime
+	self.maxTime = self.noteChart.metaData.maxTime
 end
 
 ScoreEngine.update = function(self)

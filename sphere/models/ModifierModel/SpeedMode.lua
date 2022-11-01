@@ -63,8 +63,8 @@ end
 SpeedMode.apply = function(self, config)
 	local noteChart = self.game.noteChartModel.noteChart
 
-	local minTime = noteChart.metaData:get("minTime")
-	local maxTime = noteChart.metaData:get("maxTime")
+	local minTime = noteChart.metaData.minTime
+	local maxTime = noteChart.metaData.maxTime
 
 	local lastTime = minTime
 	local durations = {}

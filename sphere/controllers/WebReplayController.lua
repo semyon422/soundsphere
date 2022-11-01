@@ -25,7 +25,7 @@ WebReplayController.POST = function(self)
 	local params = self.params
 
 	local noteChart = WebNoteChartController.getNoteCharts(params.notechart)[1]
-	local noteChartDataEntry = noteChart.metaData:getTable()
+	local noteChartDataEntry = noteChart.metaData
 
 	local replay = WebReplayController.getReplay(params.replay)
 

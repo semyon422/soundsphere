@@ -33,8 +33,8 @@ TimeEngine.load = function(self)
 	self:loadTimePoints()
 	self:resetTimeRateHandlers()
 
-	self.minTime = self.noteChart.metaData:get("minTime")
-	self.maxTime = self.noteChart.metaData:get("maxTime")
+	self.minTime = self.noteChart.metaData.minTime
+	self.maxTime = self.noteChart.metaData.maxTime
 end
 
 TimeEngine.updateTimeToPrepare = function(self)

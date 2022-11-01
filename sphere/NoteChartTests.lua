@@ -17,7 +17,7 @@ end
 local function export(noteChart)
 	local nce = NoteChartExporter:new()
 	nce.noteChart = noteChart
-	nce.noteChartDataEntry = noteChart.metaData:getTable()
+	nce.noteChartDataEntry = noteChart.metaData
 
 	return nce:export()
 end
