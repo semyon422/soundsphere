@@ -15,18 +15,15 @@ SwapModifier.apply = function(self, config)
 	local map = self:getMap(config)
 
 	local noteChart = self.game.noteChartModel.noteChart
-	local layerDataSequence = noteChart.layerDataSequence
 
-	for layerIndex in noteChart:getLayerDataIndexIterator() do
-		local layerData = noteChart:requireLayerData(layerIndex)
-
+	for _, layerData in noteChart:getLayerDataIterator() do
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 			local submap = map[noteData.inputType]
 			if submap and submap[noteData.inputIndex] then
-				layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, -1)
+				noteChart:increaseInputCount(noteData.inputType, noteData.inputIndex, -1)
 				noteData.inputIndex = submap[noteData.inputIndex]
-				layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, 1)
+				noteChart:increaseInputCount(noteData.inputType, noteData.inputIndex, 1)
 			end
 		end
 	end

@@ -27,9 +27,7 @@ end
 SpeedMode.applySpeed = function(self, speed)
 	local noteChart = self.game.noteChartModel.noteChart
 
-	for layerIndex in noteChart:getLayerDataIndexIterator() do
-		local layerData = noteChart:requireLayerData(layerIndex)
-
+	for _, layerData in noteChart:getLayerDataIterator() do
 		local velocityDataSequence = layerData.spaceData.velocityDataSequence
 		for velocityDataIndex = 1, velocityDataSequence:getVelocityDataCount() do
 			local velocityData = velocityDataSequence:getVelocityData(velocityDataIndex)
@@ -44,9 +42,7 @@ end
 SpeedMode.applyConstant = function(self)
 	local noteChart = self.game.noteChartModel.noteChart
 
-	for layerIndex in noteChart:getLayerDataIndexIterator() do
-		local layerData = noteChart:requireLayerData(layerIndex)
-
+	for _, layerData in noteChart:getLayerDataIterator() do
 		local velocityDataSequence = layerData.spaceData.velocityDataSequence
 		for velocityDataIndex = 1, velocityDataSequence:getVelocityDataCount() do
 			local velocityData = velocityDataSequence:getVelocityData(velocityDataIndex)
@@ -69,9 +65,7 @@ SpeedMode.apply = function(self, config)
 	local lastTime = minTime
 	local durations = {}
 
-	for layerIndex in noteChart:getLayerDataIndexIterator() do
-		local layerData = noteChart:requireLayerData(layerIndex)
-
+	for _, layerData in noteChart:getLayerDataIterator() do
 		local velocityDataSequence = layerData.spaceData.velocityDataSequence
 		for velocityDataIndex = 1, velocityDataSequence:getVelocityDataCount() do
 			local velocityData = velocityDataSequence:getVelocityData(velocityDataIndex)

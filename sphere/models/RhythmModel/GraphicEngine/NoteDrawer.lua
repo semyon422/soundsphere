@@ -7,7 +7,7 @@ NoteDrawer.load = function(self)
 	local graphicEngine = self.graphicEngine
 	local timeEngine = graphicEngine.rhythmModel.timeEngine
 	local logicEngine = graphicEngine.rhythmModel.logicEngine
-	self.layerData = graphicEngine.noteChart:requireLayerData(self.layerIndex)
+	self.layerData = graphicEngine.noteChart:getLayerData(self.layerIndex)
 
 	self.currentTimePoint = self.layerData:getTimePoint()
 	self.currentTimePoint.zeroClearVisualTime = 0

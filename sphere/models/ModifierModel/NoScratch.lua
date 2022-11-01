@@ -31,24 +31,21 @@ NoScratch.apply = function(self, config)
 	end
 
 	local noteChart = self.game.noteChartModel.noteChart
-	local layerDataSequence = noteChart.layerDataSequence
 
 	noteChart.inputMode.scratch = nil
 
-	for layerIndex in noteChart:getLayerDataIndexIterator() do
-		local layerData = noteChart:requireLayerData(layerIndex)
-
+	for _, layerData in noteChart:getLayerDataIterator() do
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 
 			if noteData.inputType == "scratch" then
-				layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, -1)
+				noteChart:increaseInputCount(noteData.inputType, noteData.inputIndex, -1)
 
 				noteData.noteType = "SoundNote"
 				noteData.inputType = "auto"
 				noteData.inputIndex = 0
 
-				layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, 1)
+				noteChart:increaseInputCount(noteData.inputType, noteData.inputIndex, 1)
 			end
 		end
 	end

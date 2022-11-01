@@ -10,9 +10,7 @@ DifficultyModel.getDifficulty = function(self, noteChart)
 	local longNoteCount = 0
 	local minTime = math.huge
 	local maxTime = -math.huge
-	for layerIndex in noteChart:getLayerDataIndexIterator() do
-		local layerData = noteChart:requireLayerData(layerIndex)
-
+	for _, layerData in noteChart:getLayerDataIterator() do
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 

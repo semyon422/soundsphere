@@ -13,8 +13,7 @@ NoteHandler.loadNoteData = function(self)
 	local logicEngine = self.logicEngine
 	local notesCount = logicEngine.notesCount
 	local rhythmModel = logicEngine.rhythmModel
-	for layerDataIndex in logicEngine.noteChart:getLayerDataIndexIterator() do
-		local layerData = logicEngine.noteChart:requireLayerData(layerDataIndex)
+	for _, layerData in logicEngine.noteChart:getLayerDataIterator() do
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 

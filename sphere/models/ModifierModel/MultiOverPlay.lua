@@ -49,7 +49,7 @@ MultiOverPlay.apply = function(self, config)
 	end
 
 	local inputCounts = {}
-	for inputType, inputIndex in noteChart:getInputIteraator() do
+	for inputType, inputIndex in noteChart:getInputIterator() do
 		if not inputCounts[inputType] then
 			local inputCount = noteChart.inputMode[inputType]
 			if inputCount then
@@ -58,19 +58,15 @@ MultiOverPlay.apply = function(self, config)
 		end
 	end
 
-	local layerDataSequence = noteChart.layerDataSequence
-
-	for layerIndex in noteChart:getLayerDataIndexIterator() do
-		local layerData = noteChart:requireLayerData(layerIndex)
-
+	for _, layerData in noteChart:getLayerDataIterator() do
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 			local inputCount = inputCounts[noteData.inputType]
             if inputCount then
                 local inputIndex = noteData.inputIndex
                 local newInputIndex = (inputIndex - 1) * value + 1
-				layerDataSequence:increaseInputCount(noteData.inputType, inputIndex, -1)
-				layerDataSequence:increaseInputCount(noteData.inputType, newInputIndex, 1)
+				noteChart:increaseInputCount(noteData.inputType, inputIndex, -1)
+				noteChart:increaseInputCount(noteData.inputType, newInputIndex, 1)
 				noteData.inputIndex = newInputIndex
 				for i = 1, value - 1 do
 					newInputIndex = newInputIndex + i
@@ -84,7 +80,7 @@ MultiOverPlay.apply = function(self, config)
 					newNoteData.sounds = noteData.sounds
 
 					layerData:addNoteData(newNoteData)
-					layerDataSequence:increaseInputCount(noteData.inputType, newInputIndex, 1)
+					noteChart:increaseInputCount(noteData.inputType, newInputIndex, 1)
 				end
 			end
 		end

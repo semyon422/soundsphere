@@ -28,7 +28,7 @@ Alternate2.apply = function(self, config)
 	local noteChart = self.game.noteChartModel.noteChart
 
 	local inputCounts = {}
-	for inputType, inputIndex in noteChart:getInputIteraator() do
+	for inputType, inputIndex in noteChart:getInputIterator() do
 		if not inputCounts[inputType] then
 			local inputCount = noteChart.inputMode[inputType]
 			if inputCount then
@@ -42,12 +42,9 @@ Alternate2.apply = function(self, config)
 		return
 	end
 
-	local layerDataSequence = noteChart.layerDataSequence
 	local inputAlternate = {}
 
-	for layerIndex in noteChart:getLayerDataIndexIterator() do
-		local layerData = noteChart:requireLayerData(layerIndex)
-
+	for _, layerData in noteChart:getLayerDataIterator() do
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 			local inputCount = inputCounts[noteData.inputType]
@@ -74,8 +71,8 @@ Alternate2.apply = function(self, config)
                 newInputIndex = (inputIndex - 1) * 2 + plusColumn
                 inputAlternate[inputIndex] = state
 
-				layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, -1)
-				layerDataSequence:increaseInputCount(noteData.inputType, newInputIndex, 1)
+				noteChart:increaseInputCount(noteData.inputType, noteData.inputIndex, -1)
+				noteChart:increaseInputCount(noteData.inputType, newInputIndex, 1)
 				noteData.inputIndex = newInputIndex
 			end
 		end

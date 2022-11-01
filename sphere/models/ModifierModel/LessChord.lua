@@ -33,12 +33,9 @@ LessChord.apply = function(self, config)
 	end
 
 	local noteChart = self.game.noteChartModel.noteChart
-	local layerDataSequence = noteChart.layerDataSequence
 	local inputCount = noteChart.inputMode.key
 
-	for layerIndex in noteChart:getLayerDataIndexIterator() do
-		local layerData = noteChart:requireLayerData(layerIndex)
-
+	for _, layerData in noteChart:getLayerDataIterator() do
 		local chords = {}
 		local noteDatas = {}
 		local columnSizes = {}
@@ -100,13 +97,13 @@ LessChord.apply = function(self, config)
 							futureChord.columnSizes[noteData.inputIndex] = futureChord.columnSizes[noteData.inputIndex] - 1
 						end
 
-						layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, -1)
+						noteChart:increaseInputCount(noteData.inputType, noteData.inputIndex, -1)
 
 						noteData.noteType = "SoundNote"
 						noteData.inputType = "auto"
 						noteData.inputIndex = 0
 
-						layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, 1)
+						noteChart:increaseInputCount(noteData.inputType, noteData.inputIndex, 1)
 					end
 				end
 			end

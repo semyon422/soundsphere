@@ -28,7 +28,7 @@ Shift.getMap = function(self, config)
 	local noteChart = self.game.noteChartModel.noteChart
 
 	local inputCounts = {}
-	for inputType, inputIndex in noteChart:getInputIteraator() do
+	for inputType, inputIndex in noteChart:getInputIterator() do
 		if not inputCounts[inputType] then
 			local inputCount = noteChart.inputMode[inputType]
 			if inputCount then

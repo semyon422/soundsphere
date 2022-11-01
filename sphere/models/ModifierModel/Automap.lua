@@ -65,8 +65,7 @@ Automap.applyAutomap = function(self)
 	local noteDatas = {}
 	self.noteDatas = noteDatas
 
-	for layerIndex in noteChart:getLayerDataIndexIterator() do
-		local layerData = noteChart:requireLayerData(layerIndex)
+	for _, layerData in noteChart:getLayerDataIterator() do
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
 			if
@@ -105,11 +104,11 @@ Automap.applyAutomap = function(self)
 		tNoteDatas[i] = tNoteData
 	end
 
-	noteChart.layerDataSequence.inputCount["key"] = {}
+	noteChart.inputCount.key = {}
 end
 
 Automap.processUpscaler = function(self)
-	local layerDataSequence = self.noteChart.layerDataSequence
+	local noteChart = self.noteChart
 
 	local targetMode = self.targetMode
 	local columnCount = self.columnCount
@@ -136,10 +135,10 @@ Automap.processUpscaler = function(self)
 	for i = 1, #notes do
 		local tNoteData = notes[i]
 		tNoteData.noteData.inputIndex = tNoteData.columnIndex
-		layerDataSequence:increaseInputCount(tNoteData.noteData.inputType, tNoteData.noteData.inputIndex, 1)
+		noteChart:increaseInputCount(tNoteData.noteData.inputType, tNoteData.noteData.inputIndex, 1)
 		if tNoteData.long then
 			tNoteData.noteData.endNoteData.inputIndex = tNoteData.columnIndex
-			layerDataSequence:increaseInputCount(tNoteData.noteData.inputType, tNoteData.noteData.endNoteData.inputIndex, 1)
+			noteChart:increaseInputCount(tNoteData.noteData.inputType, tNoteData.noteData.endNoteData.inputIndex, 1)
 		end
 	end
 
@@ -175,7 +174,7 @@ Automap.getUpscalerNotes = function(self)
 end
 
 Automap.processReductor = function(self)
-	local layerDataSequence = self.noteChart.layerDataSequence
+	local noteChart = self.noteChart
 
 	local targetMode = self.targetMode
 	local columnCount = self.columnCount
@@ -192,7 +191,7 @@ Automap.processReductor = function(self)
 	local reductor = Reductor:new()
 	local notes = reductor:process(self.tNoteDatas, columnCount, targetMode)
 
-	if self.noteChart:requireLayerData(1).timeData.mode == "measure" then
+	if self.noteChart:getLayerData(1).timeData.mode == "measure" then
 		for _, tNoteData in ipairs(self.tNoteDatas) do
 			tNoteData.endTime = tNoteData.startTime
 		end
@@ -202,15 +201,15 @@ Automap.processReductor = function(self)
 		local tNoteData = notes[i]
 		tNoteDatasMap[tNoteData] = nil
 		tNoteData.noteData.inputIndex = tNoteData.columnIndex
-		layerDataSequence:increaseInputCount(tNoteData.noteData.inputType, tNoteData.noteData.inputIndex, 1)
+		noteChart:increaseInputCount(tNoteData.noteData.inputType, tNoteData.noteData.inputIndex, 1)
 		if tNoteData.long and tNoteData.startTime == tNoteData.endTime then
 			tNoteData.noteData.noteType = "ShortNote"
 			tNoteData.noteData.endNoteData.noteType = "Ignore"
 		end
 		if tNoteData.long and tNoteData.startTime ~= tNoteData.endTime then
 			tNoteData.noteData.endNoteData.inputIndex = tNoteData.columnIndex
-			layerDataSequence:increaseInputCount(tNoteData.noteData.inputType, tNoteData.noteData.endNoteData.inputIndex, 1)
-			local timePoint = self.noteChart:requireLayerData(1):getTimePoint(
+			noteChart:increaseInputCount(tNoteData.noteData.inputType, tNoteData.noteData.endNoteData.inputIndex, 1)
+			local timePoint = self.noteChart:getLayerData(1):getTimePoint(
 				tNoteData.endTime / 1000,
 				tNoteData.noteData.endNoteData.timePoint.side
 			)
@@ -224,7 +223,7 @@ Automap.processReductor = function(self)
 		noteData.noteType = "SoundNote"
 		noteData.inputType = "auto"
 		noteData.inputIndex = 0
-		layerDataSequence:increaseInputCount(noteData.inputType, noteData.inputIndex, 1)
+		noteChart:increaseInputCount(noteData.inputType, noteData.inputIndex, 1)
 
 		if tNoteData.long then
 			tNoteData.noteData.endNoteData.noteType = "Ignore"
