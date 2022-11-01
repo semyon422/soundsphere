@@ -86,7 +86,7 @@ drawSection.gameplay = function(self)
 	local g = settings.gameplay
 	local i = settings.input
 
-	g.speed = imgui.slider1("speed", g.speed, "%0.2f", 0, 3, 0.05, "play speed")
+	g.speed = imgui.slider1("speed", g.speed, "%0.2f", 0, 3, 0.01, "play speed")
 
 	if TextButtonImView2("open timings", "timings", _w / 2, _h) then
 		self.game.gameView:setModal(TimingsModalView)
