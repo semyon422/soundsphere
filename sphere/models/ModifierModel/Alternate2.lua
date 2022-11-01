@@ -30,8 +30,8 @@ Alternate2.apply = function(self, config)
 	local inputCounts = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do
 		if not inputCounts[inputType] then
-			local inputCount = noteChart.inputMode:getInputCount(inputType)
-			if inputCount > 0 then
+			local inputCount = noteChart.inputMode[inputType]
+			if inputCount then
 				inputCounts[inputType] = inputCount
 			end
 		end
@@ -81,7 +81,7 @@ Alternate2.apply = function(self, config)
 		end
 	end
 
-	noteChart.inputMode:setInputCount(inputType, inputCounts[inputType] * 2)
+	noteChart.inputMode[inputType] = inputCounts[inputType] * 2
 
 	noteChart:compute()
 end

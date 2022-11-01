@@ -28,12 +28,12 @@ Automap.getSubString = function(self, config)
 end
 
 Automap.applyMeta = function(self, config, state)
-	local columnCount = math.floor(state.inputMode:getInputCount("key"))
-	if config.value == columnCount or columnCount == 0 then
+	local columnCount = state.inputMode.key
+	if not columnCount or config.value == columnCount then
 		return
 	end
 
-	state.inputMode:setInputCount("key", config.value)
+	state.inputMode.key = config.value
 end
 
 Automap.apply = function(self, config)
@@ -42,7 +42,7 @@ Automap.apply = function(self, config)
 
 	self.old = config.old
 	self.targetMode = config.value
-	self.columnCount = math.floor(self.noteChart.inputMode:getInputCount("key"))
+	self.columnCount = self.noteChart.inputMode.key
 
 	if self.targetMode == self.columnCount or self.columnCount == 0 then
 		return
@@ -143,7 +143,7 @@ Automap.processUpscaler = function(self)
 		end
 	end
 
-	self.noteChart.inputMode:setInputCount("key", targetMode)
+	self.noteChart.inputMode.key = targetMode
 end
 
 Automap.getOldUpscalerNotes = function(self)
@@ -231,7 +231,7 @@ Automap.processReductor = function(self)
 		end
 	end
 
-	self.noteChart.inputMode:setInputCount("key", targetMode)
+	self.noteChart.inputMode.key = targetMode
 end
 
 return Automap

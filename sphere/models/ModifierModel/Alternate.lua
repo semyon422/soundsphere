@@ -23,7 +23,7 @@ end
 
 Alternate.applyMeta = function(self, config, state)
 	local inputCounts = {}
-	for inputType, inputCount in pairs(state.inputMode.data) do
+	for inputType, inputCount in pairs(state.inputMode) do
 		if inputCount > 0 then
 			inputCounts[inputType] = inputCount
 		end
@@ -34,7 +34,7 @@ Alternate.applyMeta = function(self, config, state)
 		return
 	end
 
-	state.inputMode:setInputCount(inputType, inputCounts[inputType] * 2)
+	state.inputMode[inputType] = inputCounts[inputType] * 2
 end
 
 Alternate.apply = function(self, config)
@@ -43,8 +43,8 @@ Alternate.apply = function(self, config)
 	local inputCounts = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do
 		if not inputCounts[inputType] then
-			local inputCount = noteChart.inputMode:getInputCount(inputType)
-			if inputCount > 0 then
+			local inputCount = noteChart.inputMode[inputType]
+			if inputCount then
 				inputCounts[inputType] = inputCount
 			end
 		end
@@ -84,7 +84,7 @@ Alternate.apply = function(self, config)
 		end
 	end
 
-	noteChart.inputMode:setInputCount(inputType, inputCounts[inputType] * 2)
+	noteChart.inputMode[inputType] = inputCounts[inputType] * 2
 
 	noteChart:compute()
 end

@@ -26,7 +26,7 @@ SelectController.applyModifierMeta = function(self)
 
 	local item = self.game.selectModel.noteChartItem
 	if item then
-		state.inputMode:setString(item.inputMode)
+		state.inputMode:set(item.inputMode)
 	end
 
 	self.game.modifierModel:applyMeta(state)

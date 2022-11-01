@@ -45,7 +45,7 @@ local function test(notes, events, states)
 	local layerData = noteChart.layerDataSequence:requireLayerData(1)
 	layerData:setTimeMode("absolute")
 
-	noteChart.inputMode:setInputCount("key", 1)
+	noteChart.inputMode.key = 1
 
 	do
 		local timePoint = layerData:getTimePoint(

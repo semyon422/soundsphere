@@ -43,7 +43,7 @@ Replay.toString = function(self)
 	return json.encode({
 		hash = self.noteChartDataEntry.hash,
 		index = self.noteChartDataEntry.index,
-		inputMode = self.inputMode:getString(),
+		inputMode = tostring(self.inputMode),
 		modifiers = self.modifierTable,
 		player = "Player",
 		time = os.time(),
@@ -69,7 +69,7 @@ Replay.fromString = function(self, s)
 		return self
 	end
 
-	local inputMode = InputMode:new():setString(object.inputMode)
+	local inputMode = InputMode:new(object.inputMode)
 	self.events = self.replayNanoChart:decode(object.events, object.size, inputMode)
 
 	local timings = self.timings

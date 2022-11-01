@@ -37,8 +37,8 @@ MultiplePlay.apply = function(self, config)
 	local inputCounts = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do
 		if not inputCounts[inputType] then
-			local inputCount = noteChart.inputMode:getInputCount(inputType)
-			if inputCount > 0 then
+			local inputCount = noteChart.inputMode[inputType]
+			if inputCount then
 				inputCounts[inputType] = inputCount
 			end
 		end
@@ -72,7 +72,7 @@ MultiplePlay.apply = function(self, config)
 	end
 
 	for inputType, inputCount in pairs(inputCounts) do
-		noteChart.inputMode:setInputCount(inputType, inputCount * value)
+		noteChart.inputMode[inputType] = inputCount * value
 	end
 
 	noteChart:compute()

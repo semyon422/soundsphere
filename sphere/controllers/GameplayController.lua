@@ -36,7 +36,7 @@ GameplayController.load = function(self)
 	rhythmModel:setPauseTimes(config.gameplay.time)
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel:setNoteSkin(noteSkin)
-	rhythmModel.inputManager:setInputMode(noteChart.inputMode:getString())
+	rhythmModel.inputManager:setInputMode(tostring(noteChart.inputMode))
 
 	rhythmModel:load()
 

@@ -14,7 +14,7 @@ end
 ReplayNanoChart.getInputMap = function(self, inputMode)
 	local inputs = {}
 
-	for inputType, inputCount in pairs(inputMode.data) do
+	for inputType, inputCount in pairs(inputMode) do
 		inputs[#inputs + 1] = {inputType, inputCount}
 	end
 

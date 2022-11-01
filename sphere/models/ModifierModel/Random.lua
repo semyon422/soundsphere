@@ -27,7 +27,7 @@ Random.getMap = function(self, config)
 
 	local inputs = {}
 	for inputType, inputIndex in noteChart:getInputIteraator() do
-		if noteChart.inputMode:getInputCount(inputType) > 0 then
+		if noteChart.inputMode[inputType] then
 			inputs[inputType] = inputs[inputType] or {}
 			inputs[inputType][#inputs[inputType] + 1] = inputIndex
 		end
@@ -35,7 +35,7 @@ Random.getMap = function(self, config)
 
 	local filteredInputs = {}
 	for inputType, subInputs in pairs(inputs) do
-		local inputCount = noteChart.inputMode:getInputCount(inputType)
+		local inputCount = noteChart.inputMode[inputType]
 		filteredInputs[inputType] = {}
 		local filteredSubInputs = filteredInputs[inputType]
 

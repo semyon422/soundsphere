@@ -22,7 +22,7 @@ return ModalImView(function(self)
 		return true
 	end
 
-	local inputMode = self.game.modifierModel.state.inputMode:getString()
+	local inputMode = tostring(self.game.modifierModel.state.inputMode)
 	local inputs = self.game.inputModel:getInputs(inputMode)
 	local devices = self.game.inputModel.devices
 

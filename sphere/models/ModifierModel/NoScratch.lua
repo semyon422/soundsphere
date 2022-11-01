@@ -22,7 +22,7 @@ NoScratch.applyMeta = function(self, config, state)
 	if not config.value then
 		return
 	end
-	state.inputMode:setInputCount("scratch", nil)
+	state.inputMode.scratch = nil
 end
 
 NoScratch.apply = function(self, config)
@@ -33,7 +33,7 @@ NoScratch.apply = function(self, config)
 	local noteChart = self.game.noteChartModel.noteChart
 	local layerDataSequence = noteChart.layerDataSequence
 
-	noteChart.inputMode:setInputCount("scratch", nil)
+	noteChart.inputMode.scratch = nil
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)

@@ -109,7 +109,7 @@ NoteSkinModel.loadLua = function(self, prefix, name)
 	noteSkin.path = path
 	noteSkin.directoryPath = combinePath(self.path, prefix)
 	noteSkin.fileName = name
-	noteSkin.inputMode = ncdk.InputMode:new():setString(noteSkin.inputMode)
+	noteSkin.inputMode = ncdk.InputMode:new(noteSkin.inputMode)
 	if type(noteSkin.playField) == "string" then
 		noteSkin.playField = love.filesystem.load(combinePath(self.path, prefix, name))()
 	end
@@ -137,7 +137,7 @@ NoteSkinModel.loadOsu = function(self, prefix, name)
 			noteSkin.fileName = name
 			noteSkin.skinini = skinini
 			noteSkin:setKeys(keys)
-			noteSkin.inputMode = ncdk.InputMode:new():setString(keys .. "key")
+			noteSkin.inputMode = ncdk.InputMode:new({key = keys})
 			local status, err = xpcall(noteSkin.load, debug.traceback, noteSkin)
 			if status then
 				table.insert(noteSkins, noteSkin)
@@ -161,9 +161,9 @@ end
 NoteSkinModel.getNoteSkins = function(self, inputMode)
 	local stringInputMode = inputMode
 	if type(inputMode) == "string" then
-		inputMode = ncdk.InputMode:new():setString(inputMode)
+		inputMode = ncdk.InputMode:new(inputMode)
 	else
-		stringInputMode = inputMode:getString()
+		stringInputMode = tostring(inputMode)
 	end
 	if self.inputMode == stringInputMode then
 		return self.items
@@ -184,17 +184,16 @@ NoteSkinModel.getNoteSkins = function(self, inputMode)
 end
 
 NoteSkinModel.setDefaultNoteSkin = function(self, noteSkin)
-	local inputMode = noteSkin.inputMode:getString()
-	self.config.gameplay["noteskin" .. inputMode] = noteSkin.path
+	self.config.gameplay["noteskin" .. noteSkin.inputMode] = noteSkin.path
 end
 
 NoteSkinModel.getNoteSkin = function(self, inputMode)
 	if type(inputMode) == "string" then
-		inputMode = ncdk.InputMode:new():setString(inputMode)
+		inputMode = ncdk.InputMode:new(inputMode)
 	end
 
 	local list = self:getNoteSkins(inputMode)
-	local configValue = self.config.gameplay["noteskin" .. inputMode:getString()]
+	local configValue = self.config.gameplay["noteskin" .. inputMode]
 
 	if configValue then
 		for _, noteSkin in ipairs(list) do

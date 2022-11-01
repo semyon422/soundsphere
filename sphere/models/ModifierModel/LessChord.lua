@@ -34,7 +34,7 @@ LessChord.apply = function(self, config)
 
 	local noteChart = self.game.noteChartModel.noteChart
 	local layerDataSequence = noteChart.layerDataSequence
-	local inputCount = noteChart.inputMode:getInputCount("key")
+	local inputCount = noteChart.inputMode.key
 
 	for layerIndex in noteChart:getLayerDataIndexIterator() do
 		local layerData = noteChart:requireLayerData(layerIndex)
