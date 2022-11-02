@@ -34,20 +34,12 @@ MultiplePlay.apply = function(self, config)
 		value = value + 1
 	end
 
-	local inputCounts = {}
-	for inputType, inputIndex in noteChart:getInputIterator() do
-		if not inputCounts[inputType] then
-			local inputCount = noteChart.inputMode[inputType]
-			if inputCount then
-				inputCounts[inputType] = inputCount
-			end
-		end
-	end
+	local inputMode = noteChart.inputMode
 
 	for _, layerData in noteChart:getLayerDataIterator() do
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
-			local inputCount = inputCounts[noteData.inputType]
+			local inputCount = inputMode[noteData.inputType]
 			if inputCount then
 				for i = 1, value - 1 do
 					local newInputIndex = noteData.inputIndex + inputCount * i
@@ -67,8 +59,8 @@ MultiplePlay.apply = function(self, config)
 		end
 	end
 
-	for inputType, inputCount in pairs(inputCounts) do
-		noteChart.inputMode[inputType] = inputCount * value
+	for inputType, inputCount in pairs(inputMode) do
+		inputMode[inputType] = inputCount * value
 	end
 
 	noteChart:compute()

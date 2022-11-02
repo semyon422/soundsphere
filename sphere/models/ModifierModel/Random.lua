@@ -25,11 +25,14 @@ Random.getMap = function(self, config)
 	local noteChart = self.game.noteChartModel.noteChart
 	local value = config.value
 
+	local inputMode = noteChart.inputMode
+
 	local inputs = {}
-	for inputType, inputIndex in noteChart:getInputIterator() do
-		if noteChart.inputMode[inputType] then
-			inputs[inputType] = inputs[inputType] or {}
-			inputs[inputType][#inputs[inputType] + 1] = inputIndex
+	for inputType, inputCount in pairs(inputMode) do
+		inputs[inputType] = inputs[inputType] or {}
+		local t = inputs[inputType]
+		for i = 1, inputCount do
+			t[i] = i
 		end
 	end
 

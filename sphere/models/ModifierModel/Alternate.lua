@@ -22,36 +22,21 @@ Alternate.getSubString = function(self, config)
 end
 
 Alternate.applyMeta = function(self, config, state)
-	local inputCounts = {}
-	for inputType, inputCount in pairs(state.inputMode) do
-		if inputCount > 0 then
-			inputCounts[inputType] = inputCount
-		end
-	end
-
 	local inputType = config.value
-	if not inputCounts[inputType] then
+	local inputMode = state.inputMode
+	if not inputMode[inputType] then
 		return
 	end
-
-	state.inputMode[inputType] = inputCounts[inputType] * 2
+	inputMode[inputType] = inputMode[inputType] * 2
 end
 
 Alternate.apply = function(self, config)
 	local noteChart = self.game.noteChartModel.noteChart
 
-	local inputCounts = {}
-	for inputType, inputIndex in noteChart:getInputIterator() do
-		if not inputCounts[inputType] then
-			local inputCount = noteChart.inputMode[inputType]
-			if inputCount then
-				inputCounts[inputType] = inputCount
-			end
-		end
-	end
+	local inputMode = noteChart.inputMode
 
 	local inputType = config.value
-	if not inputCounts[inputType] then
+	if not inputMode[inputType] then
 		return
 	end
 
@@ -60,9 +45,9 @@ Alternate.apply = function(self, config)
 	for _, layerData in noteChart:getLayerDataIterator() do
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
-			local inputCount = inputCounts[noteData.inputType]
 			local inputIndex = noteData.inputIndex
-			if inputCount and noteData.inputType == inputType and (noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart") then
+			local isStartNote = noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart"
+			if noteData.inputType == inputType and isStartNote then
 				inputAlternate[inputIndex] = inputAlternate[inputIndex] or 0
 
 				local newInputIndex
@@ -81,7 +66,7 @@ Alternate.apply = function(self, config)
 		end
 	end
 
-	noteChart.inputMode[inputType] = inputCounts[inputType] * 2
+	inputMode[inputType] = inputMode[inputType] * 2
 
 	noteChart:compute()
 end

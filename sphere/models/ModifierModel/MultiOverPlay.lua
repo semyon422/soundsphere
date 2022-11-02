@@ -25,19 +25,14 @@ MultiOverPlay.getSubString = function(self, config)
 end
 
 MultiOverPlay.applyMeta = function(self, config, state)
-	local inputCounts = {}
-	for inputType, inputCount in pairs(state.inputMode) do
-		if inputCount > 0 then
-			inputCounts[inputType] = inputCount
-		end
-	end
+	local inputMode = state.inputMode
 
 	local value = config.value
 	if config.old then
 		value = value + 1
 	end
-	for inputType, inputCount in pairs(inputCounts) do
-		state.inputMode[inputType] = inputCount * value
+	for inputType, inputCount in pairs(inputMode) do
+		inputMode[inputType] = inputCount * value
 	end
 end
 
@@ -48,21 +43,12 @@ MultiOverPlay.apply = function(self, config)
 		value = value + 1
 	end
 
-	local inputCounts = {}
-	for inputType, inputIndex in noteChart:getInputIterator() do
-		if not inputCounts[inputType] then
-			local inputCount = noteChart.inputMode[inputType]
-			if inputCount then
-				inputCounts[inputType] = inputCount
-			end
-		end
-	end
+	local inputMode = noteChart.inputMode
 
 	for _, layerData in noteChart:getLayerDataIterator() do
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
-			local inputCount = inputCounts[noteData.inputType]
-            if inputCount then
+            if inputMode[noteData.inputType] then
                 local inputIndex = noteData.inputIndex
                 local newInputIndex = (inputIndex - 1) * value + 1
 				noteChart:increaseInputCount(noteData.inputType, inputIndex, -1)
@@ -86,8 +72,8 @@ MultiOverPlay.apply = function(self, config)
 		end
 	end
 
-	for inputType, inputCount in pairs(inputCounts) do
-		noteChart.inputMode[inputType] = inputCount * value
+	for inputType, inputCount in pairs(inputMode) do
+		inputMode[inputType] = inputCount * value
 	end
 
 	noteChart:compute()

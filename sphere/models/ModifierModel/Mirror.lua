@@ -24,20 +24,12 @@ end
 Mirror.getMap = function(self, config)
 	local noteChart = self.game.noteChartModel.noteChart
 
-	local inputCounts = {}
-	for inputType, inputIndex in noteChart:getInputIterator() do
-		if not inputCounts[inputType] then
-			local inputCount = noteChart.inputMode[inputType]
-			if inputCount then
-				inputCounts[inputType] = inputCount
-			end
-		end
-	end
+	local inputMode = noteChart.inputMode
 
 	local map = {}
 
 	local value = config.value
-	for inputType, inputCount in pairs(inputCounts) do
+	for inputType, inputCount in pairs(inputMode) do
 		map[inputType] = {}
 		local submap = map[inputType]
 		local halfFloor = math.floor(inputCount / 2)
