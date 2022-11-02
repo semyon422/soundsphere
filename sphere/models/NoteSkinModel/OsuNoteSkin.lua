@@ -249,9 +249,9 @@ OsuNoteSkin.load = function(self)
 			return -h / w * width
 		end
 		self.notes.LongNote.Tail.oy[i] = 0
-		self.notes.LongNote.Body.y = function(...)
-			local w, h = self:getDimensions(lhead[i])
-			return self:getPosition(...) - h / w * width / 2
+		self.notes.LongNote.Body.y = function(timeState, noteView, column)
+			local w, h = self:getDimensions(lhead[column])
+			return self:getPosition(timeState, noteView, column) - h / w * width / 2
 		end
 	end
 	self:setShortNote({
