@@ -92,7 +92,9 @@ end
 
 NoteSkin.getDimensions = function(self, imageName)
 	local image = self.images[imageName]
-	if image[2] then
+	if not image then
+		return 1, 1
+	elseif image[2] then
 		return image[2][3], image[2][4]
 	elseif image[3] then
 		return image[3][1], image[3][2]
