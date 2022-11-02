@@ -28,10 +28,9 @@ SpeedMode.applySpeed = function(self, speed)
 	local noteChart = self.game.noteChartModel.noteChart
 
 	for _, layerData in noteChart:getLayerDataIterator() do
-		local velocityDataSequence = layerData.spaceData.velocityDataSequence
-		for velocityDataIndex = 1, velocityDataSequence:getVelocityDataCount() do
-			local velocityData = velocityDataSequence:getVelocityData(velocityDataIndex)
-
+		local spaceData = layerData.spaceData
+		for velocityDataIndex = 1, spaceData:getVelocityDataCount() do
+			local velocityData = spaceData:getVelocityData(velocityDataIndex)
 			velocityData.currentSpeed = velocityData.currentSpeed / speed
 		end
 	end
@@ -43,9 +42,9 @@ SpeedMode.applyConstant = function(self)
 	local noteChart = self.game.noteChartModel.noteChart
 
 	for _, layerData in noteChart:getLayerDataIterator() do
-		local velocityDataSequence = layerData.spaceData.velocityDataSequence
-		for velocityDataIndex = 1, velocityDataSequence:getVelocityDataCount() do
-			local velocityData = velocityDataSequence:getVelocityData(velocityDataIndex)
+		local spaceData = layerData.spaceData
+		for velocityDataIndex = 1, spaceData:getVelocityDataCount() do
+			local velocityData = spaceData:getVelocityData(velocityDataIndex)
 
 			velocityData.currentSpeed = 1
 			velocityData.localSpeed = 1
@@ -66,10 +65,10 @@ SpeedMode.apply = function(self, config)
 	local durations = {}
 
 	for _, layerData in noteChart:getLayerDataIterator() do
-		local velocityDataSequence = layerData.spaceData.velocityDataSequence
-		for velocityDataIndex = 1, velocityDataSequence:getVelocityDataCount() do
-			local velocityData = velocityDataSequence:getVelocityData(velocityDataIndex)
-			local nextVelocityData = velocityDataSequence:getVelocityData(velocityDataIndex + 1)
+		local spaceData = layerData.spaceData
+		for velocityDataIndex = 1, spaceData:getVelocityDataCount() do
+			local velocityData = spaceData:getVelocityData(velocityDataIndex)
+			local nextVelocityData = spaceData:getVelocityData(velocityDataIndex + 1)
 
 			local startTime = lastTime
 			local endTime
