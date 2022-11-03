@@ -1,4 +1,5 @@
-local Class					= require("Class")
+local Class = require("Class")
+local TimePoint = require("ncdk.TimePoint")
 local GraphicalNoteFactory	= require("sphere.models.RhythmModel.GraphicEngine.GraphicalNoteFactory")
 
 local NoteDrawer = Class:new()
@@ -9,7 +10,8 @@ NoteDrawer.load = function(self)
 	local logicEngine = graphicEngine.rhythmModel.logicEngine
 	self.layerData = graphicEngine.noteChart:getLayerData(self.layerIndex)
 
-	self.currentTimePoint = self.layerData:getTimePoint()
+	self.currentTimePoint = TimePoint:new()
+	self.currentTimePoint.size = -1
 	self.currentTimePoint.zeroClearVisualTime = 0
 	self.velocityIndex = 1
 	self.tempoIndex = 1
