@@ -25,7 +25,7 @@ VideoNoteView.draw = function(self)
 	end
 
 	local timer = self.graphicalNote.timeEngine.timer
-	video:play(timer:getTime())
+	video:play(timer:getTime() - self.graphicalNote.startNoteData.timePoint.absoluteTime)
 
 	ImageNoteView.draw(self)
 end
