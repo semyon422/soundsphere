@@ -191,7 +191,7 @@ Automap.processReductor = function(self)
 	local reductor = Reductor:new()
 	local notes = reductor:process(self.tNoteDatas, columnCount, targetMode)
 
-	if self.noteChart:getLayerData(1).timeData.mode == "measure" then
+	if self.noteChart:getLayerData(1).mode == "measure" then
 		for _, tNoteData in ipairs(self.tNoteDatas) do
 			tNoteData.endTime = tNoteData.startTime
 		end

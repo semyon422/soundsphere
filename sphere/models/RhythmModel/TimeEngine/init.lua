@@ -147,7 +147,7 @@ TimeEngine.loadTimePoints = function(self)
 
 	local noteChart = self.noteChart
 	for _, layerData in noteChart:getLayerDataIterator() do
-		local timePointList = layerData.timeData.timePointList
+		local timePointList = layerData.timePointList
 		for timePointIndex = 1, #timePointList do
 			local timePoint = timePointList[timePointIndex]
 			absoluteTimes[timePoint.absoluteTime] = true
