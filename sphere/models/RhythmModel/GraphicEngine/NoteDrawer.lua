@@ -11,7 +11,7 @@ NoteDrawer.load = function(self)
 	self.layerData = graphicEngine.noteChart:getLayerData(self.layerIndex)
 
 	self.currentTimePoint = TimePoint:new()
-	self.currentTimePoint.size = -1
+	self.currentTimePoint.side = -1
 	self.currentTimePoint.zeroClearVisualTime = 0
 	self.velocityIndex = 1
 	self.tempoIndex = 1
