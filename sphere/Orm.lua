@@ -113,7 +113,7 @@ function Orm:select(table_name, conditions, ...)
 end
 
 function Orm:update(table_name, values, conditions, ...)
-	local table_info = self:table_info(table_name)
+	local table_info = assert(self:table_info(table_name), "no such table: " .. table_name)
 
 	local assigns = {}
 	for _, column in ipairs(table_info) do
@@ -136,7 +136,11 @@ function Orm:update(table_name, values, conditions, ...)
 		end
 	end
 
-	self:query(("UPDATE %s SET %s WHERE %s"):format(
+	if not conditions then
+		return self:query(("UPDATE %s SET %s"):format(escape_identifier(table_name), table.concat(assigns, ", ")))
+	end
+
+	return self:query(("UPDATE %s SET %s WHERE %s"):format(
 		escape_identifier(table_name), table.concat(assigns, ", "), conditions
 	), ...)
 end
@@ -148,7 +152,7 @@ function Orm:delete(table_name, conditions, ...)
 end
 
 function Orm:insert(table_name, values, ignore)
-	local table_info = self:table_info(table_name)
+	local table_info = assert(self:table_info(table_name), "no such table: " .. table_name)
 
 	local count = 0
 	local query_keys = {}
@@ -167,10 +171,10 @@ function Orm:insert(table_name, values, ignore)
 	end
 
 	local pattern = ("(%s)"):format(("?, "):rep(count - 1) .. "?")
-	query_keys = ("(%s)"):format(table.concat(query_keys, ", "))
+	local keys = ("(%s)"):format(table.concat(query_keys, ", "))
 
 	local stmt = self:stmt(("INSERT%s INTO %s %s VALUES %s RETURNING *"):format(
-		ignore and " OR IGNORE" or "", escape_identifier(table_name), query_keys, pattern
+		ignore and " OR IGNORE" or "", escape_identifier(table_name), keys, pattern
 	), unpack(query_values, 1, count))
 
 	local row, colnames = stmt:step({}, {})
