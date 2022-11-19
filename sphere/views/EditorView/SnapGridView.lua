@@ -20,14 +20,14 @@ SnapGridView.construct = function(self)
 	ld:getTempoData(Fraction(1), 60)
 	ld:getTempoData(Fraction(3.5, 10, true), 120)
 
-	ld:getStopData(Fraction(5), Fraction(1))
+	ld:getStopData(Fraction(5), Fraction(4))
 
-	ld:getVelocityData(ld:getTimePoint(Fraction(0.5, 10, true), -1), 1)
-	ld:getVelocityData(ld:getTimePoint(Fraction(4.5, 10, true), -1), 2)
-	ld:getVelocityData(ld:getTimePoint(Fraction(5, 4), -1), 0)
-	ld:getVelocityData(ld:getTimePoint(Fraction(6, 4), -1), 1)
+	ld:getVelocityData(Fraction(0.5, 10, true), -1, 1)
+	ld:getVelocityData(Fraction(4.5, 10, true), -1, 2)
+	ld:getVelocityData(Fraction(5, 4), -1, 0)
+	ld:getVelocityData(Fraction(6, 4), -1, 1)
 
-	ld:getExpandData(ld:getTimePoint(Fraction(2)), Fraction(1))
+	ld:getExpandData(Fraction(2), -1, Fraction(1))
 end
 
 local pixelsPerBeat = 40
@@ -93,7 +93,7 @@ SnapGridView.draw = function(self)
 	end)
 
 	self:drawRangeTracker(ld.stopDatasRange, x, function(object)
-		return "stop " .. object:getDuration() .. " beats"
+		return "stop " .. object.duration:tonumber() .. " beats"
 	end)
 
 	self:drawRangeTracker(ld.velocityDatasRange, x, function(object)

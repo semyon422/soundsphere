@@ -47,17 +47,6 @@ local function test(notes, events, states)
 
 	noteChart.inputMode.key = 1
 
-	do
-		local timePoint = layerData:getTimePoint(
-			0, -- absoluteTime in absolute mode
-			-1 -- side, doesn't affect anything in absolute mode
-		)
-
-		local velocityData = VelocityData:new(timePoint)
-		velocityData.currentVelocity = 1
-		layerData:addVelocityData(velocityData)
-	end
-
 	for _, time in ipairs(notes) do
 		local isAuto = type(time) == "table" and getmetatable(time) == auto_mt
 		if type(time) == "number" or isAuto then
