@@ -87,7 +87,7 @@ GaussianBlurView.disable = function(self)
 	direction[1] = 0
 	direction[2] = 1 / height
 	shader:send("direction", direction)
-	love.graphics.setCanvas(oldCanvas)
+	love.graphics.setCanvas({oldCanvas, stencil = true})
 	love.graphics.draw(shaderCanvas, 0, 0)
 	love.graphics.setShader(oldShader)
 end
