@@ -13,9 +13,10 @@ SnapGridView.construct = function(self)
 	self.layerData = ld
 
 	ld:setTimeMode("measure")
+	ld:setSignatureMode("short")
 	ld:setRange(Fraction(0), Fraction(10))
 
-	ld:setSignature(2, Fraction(3))
+	ld:getSignatureData(2, Fraction(3))
 
 	ld:getTempoData(Fraction(1), 60)
 	ld:getTempoData(Fraction(3.5, 10, true), 120)
