@@ -12,7 +12,7 @@ NoteDrawer.load = function(self)
 
 	self.currentTimePoint = TimePoint:new()
 	self.currentTimePoint.side = -1
-	self.currentTimePoint.zeroClearVisualTime = 0
+	self.currentTimePoint.visualTime = 0
 	self.velocityIndex = 1
 	self.tempoIndex = 1
 
@@ -38,7 +38,7 @@ NoteDrawer.load = function(self)
 	end
 
 	table.sort(self.notes, function(a, b)
-		return a.startNoteData.timePoint.zeroClearVisualTime < b.startNoteData.timePoint.zeroClearVisualTime
+		return a.startNoteData.timePoint.visualTime < b.startNoteData.timePoint.visualTime
 	end)
 
 	for index, graphicalNote in ipairs(self.notes) do
@@ -68,21 +68,8 @@ NoteDrawer.updateCurrentTime = function(self)
 		velocityData = layerData:getVelocityData(self.velocityIndex)
 	end
 
-	-- local nextTempoData = layerData:getVelocityData(self.tempoIndex + 1)
-	-- while nextTempoData and nextTempoData.timePoint <= timePoint do
-	-- 	self.velocityIndex = self.velocityIndex + 1
-	-- 	nextTempoData = layerData:getVelocityData(self.tempoIndex + 1)
-	-- end
-
-	-- local tempoData = layerData:getVelocityData(self.tempoIndex)
-	-- while self.velocityIndex > 1 and tempoData and tempoData.timePoint > timePoint do
-	-- 	self.velocityIndex = self.velocityIndex - 1
-	-- 	tempoData = layerData:getVelocityData(self.tempoIndex)
-	-- end
-
 	timePoint.velocityData = velocityData
-	-- timePoint.tempoData = tempoData
-	timePoint:computeZeroClearVisualTime()
+	timePoint:computeVisualTime()
 end
 
 NoteDrawer.update = function(self)

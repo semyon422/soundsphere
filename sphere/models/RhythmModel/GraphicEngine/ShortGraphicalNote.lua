@@ -3,7 +3,8 @@ local GraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.Graphical
 local ShortGraphicalNote = GraphicalNote:new()
 
 ShortGraphicalNote.update = function(self)
-	self.startNoteData.timePoint:computeVisualTime(self.currentTimePoint)
+	local timePoint = self.startNoteData.timePoint
+	local visualTime = timePoint:getVisualTime(self.currentTimePoint)
 
 	self.startTimeState = self.startTimeState or {}
 	local startTimeState = self.startTimeState
@@ -11,11 +12,11 @@ ShortGraphicalNote.update = function(self)
 	local currentTime = self.timeEngine.currentVisualTime
 
 	startTimeState.currentTime = currentTime
-	startTimeState.absoluteTime = self.startNoteData.timePoint.absoluteTime
-	startTimeState.currentVisualTime = self.startNoteData.timePoint.currentVisualTime
+	startTimeState.absoluteTime = timePoint.absoluteTime
+	startTimeState.currentVisualTime = visualTime
 
-	startTimeState.absoluteDeltaTime = currentTime - self.startNoteData.timePoint.absoluteTime
-	startTimeState.visualDeltaTime = currentTime - (self.startNoteData.timePoint.currentVisualTime + self.timeEngine.visualOffset)
+	startTimeState.absoluteDeltaTime = currentTime - timePoint.absoluteTime
+	startTimeState.visualDeltaTime = currentTime - (visualTime + self.timeEngine.visualOffset)
 	startTimeState.scaledVisualDeltaTime = startTimeState.visualDeltaTime * self.graphicEngine:getVisualTimeRate()
 end
 

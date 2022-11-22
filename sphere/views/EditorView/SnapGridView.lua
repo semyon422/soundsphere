@@ -125,14 +125,14 @@ SnapGridView.draw = function(self)
 
 	for time = ld.startTime:floor(), ld.endTime:floor() - 1 do
 		local timePoint = ld:getDynamicTimePoint(Fraction(time), -1)
-		local y = timePoint.zeroClearVisualTime * pixelsPerBeat
+		local y = timePoint.visualTime * pixelsPerBeat
 
 		love.graphics.line(x, y, x + 40, y)
 
 		local signature = ld:getSignature(time):floor()
 		for i = 2, signature do
 			timePoint = ld:getDynamicTimePoint(Fraction(time * signature + i - 1, signature), -1)
-			local _y = timePoint.zeroClearVisualTime * pixelsPerBeat
+			local _y = timePoint.visualTime * pixelsPerBeat
 			love.graphics.line(x, _y, x + 10, _y)
 		end
 	end
