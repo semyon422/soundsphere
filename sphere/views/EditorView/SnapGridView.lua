@@ -57,9 +57,25 @@ SnapGridView.drawRangeTracker = function(self, rangeTracker, x, format)
 	end
 end
 
+SnapGridView.drawComputedGrid = function(self, x, field)
+	local ld = self.layerData
+	for time = ld.startTime:floor(), ld.endTime:floor() - 1 do
+		local timePoint = ld:getDynamicTimePoint(Fraction(time), -1)
+		local y = timePoint[field] * pixelsPerBeat
+
+		love.graphics.line(x, y, x + 40, y)
+
+		local signature = ld:getSignature(time):floor()
+		for i = 2, signature do
+			timePoint = ld:getDynamicTimePoint(Fraction(time * signature + i - 1, signature), -1)
+			local _y = timePoint[field] * pixelsPerBeat
+			love.graphics.line(x, _y, x + 10, _y)
+		end
+	end
+end
+
 SnapGridView.draw = function(self)
 	local graphicEngine = self.game.rhythmModel.graphicEngine
-	local noteSkin = graphicEngine.noteSkin
 
 	local w, h = Layout:move("base")
 	love.graphics.setColor(1, 1, 1, 1)
@@ -105,37 +121,27 @@ SnapGridView.draw = function(self)
 		return "expand into " .. object.duration:tonumber() .. " beats"
 	end)
 
-	x = x + 120
+	local _, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+	local t = my / pixelsPerBeat
+	local dtp = ld:getDynamicTimePointAbsolute(t, -1, 192)
 
-	for time = ld.startTime:floor(), ld.endTime:floor() - 1 do
-		local timePoint = ld:getDynamicTimePoint(Fraction(time), -1)
-		local y = timePoint.absoluteTime * pixelsPerBeat
-
-		love.graphics.line(x, y, x + 40, y)
-
-		local signature = ld:getSignature(time):floor()
-		for i = 2, signature do
-			timePoint = ld:getDynamicTimePoint(Fraction(time * signature + i - 1, signature), -1)
-			local _y = timePoint.absoluteTime * pixelsPerBeat
-			love.graphics.line(x, _y, x + 10, _y)
-		end
+	x = x + 40
+	local measureIndex = dtp.measureTime:floor()
+	local offset = measureOffsets[measureIndex]
+	if offset then
+		local signature = ld:getSignature(measureIndex):tonumber()
+		local y = offset + (dtp.measureTime:tonumber() - measureIndex) * pixelsPerBeat * signature
+		love.graphics.circle("fill", x, y, 4)
 	end
 
 	x = x + 80
+	self:drawComputedGrid(x, "absoluteTime")
+	love.graphics.circle("fill", x, my, 4)
 
-	for time = ld.startTime:floor(), ld.endTime:floor() - 1 do
-		local timePoint = ld:getDynamicTimePoint(Fraction(time), -1)
-		local y = timePoint.visualTime * pixelsPerBeat
-
-		love.graphics.line(x, y, x + 40, y)
-
-		local signature = ld:getSignature(time):floor()
-		for i = 2, signature do
-			timePoint = ld:getDynamicTimePoint(Fraction(time * signature + i - 1, signature), -1)
-			local _y = timePoint.visualTime * pixelsPerBeat
-			love.graphics.line(x, _y, x + 10, _y)
-		end
-	end
+	x = x + 80
+	self:drawComputedGrid(x, "visualTime")
+	local dtp = ld:getDynamicTimePointAbsolute(t, -1, 192)
+	love.graphics.circle("fill", x, dtp.visualTime * pixelsPerBeat, 4)
 end
 
 return SnapGridView
