@@ -17,6 +17,7 @@ local TextButtonImView = require("sphere.imviews.TextButtonImView")
 local CheckboxImView = require("sphere.imviews.CheckboxImView")
 local LabelImView = require("sphere.imviews.LabelImView")
 local SpoilerListImView = require("sphere.imviews.SpoilerListImView")
+local SpoilerImView = require("sphere.imviews.SpoilerImView")
 local JudgementBarImView = require("sphere.imviews.JudgementBarImView")
 local Format = require("sphere.views.Format")
 local ScrollBarImView = require("sphere.imviews.ScrollBarImView")
@@ -285,11 +286,38 @@ local function Judgements(self)
 	JudgementBarImView(w, lineHeight, miss / count, "miss", miss)
 end
 
+local selectorState = {}
+local function JudgementSelector(item, w, h)
+	local name = item[1]
+	if not item[2] then
+		return TextButtonImView(name .. "judgement", name, w, h, "center") and name
+	end
+	selectorState[name] = selectorState[name] or item[2]
+	local v = selectorState[name]
+
+	local text = name:format(selectorState[name])
+
+	local ret
+	just.row(true)
+	if TextButtonImView(name .. "judgement", text, w - h * 2, h, "center") then
+		ret = text
+	end
+	if TextButtonImView(name .. "judgement<", "<", h, h, "center") and v > item[2]then
+		selectorState[name] = v - 1
+	end
+	if TextButtonImView(name .. "judgement>", ">", h, h, "center") and v < item[3]then
+		selectorState[name] = v + 1
+	end
+	just.row(false)
+
+	return ret
+end
+
 local function JudgementsDropdown(self)
 	local w, h = Layout:move("column1row1")
 	h = 60
 
-	local size = 1 / 3
+	local size = 1 / 2
 	love.graphics.translate(w * (1 - size) - 26, (72 - h) / 2)
 
 	local judgement = self.game.rhythmModel.scoreEngine.scoreSystem.judgement
@@ -297,18 +325,25 @@ local function JudgementsDropdown(self)
 		return
 	end
 
-	local items = {}
-	for k in pairs(judgement.judgementLists) do
-		table.insert(items, k)
-	end
-	table.sort(items)
+	local items = judgement.judgementSelectors
 
 	local config = self.game.configModel.configs.select
 	local preview = config.judgements
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
-	local i = SpoilerListImView("JudgementsDropdown", w * size, h, items, preview)
-	if i then
-		config.judgements = items[i]
+
+	local s = 0.75
+	if SpoilerImView("JudgementsDropdown", w * size, h, preview) then
+		love.graphics.setColor(0, 0, 0, 1)
+		love.graphics.rectangle("fill", 0, 0, w, h * s * #items)
+		love.graphics.setColor(1, 1, 1, 1)
+		for i, item in ipairs(items) do
+			local v = JudgementSelector(item, w * size - h * (1 - s), h * s)
+			if v then
+				config.judgements = v
+				just.focus()
+			end
+		end
+		SpoilerImView()
 	end
 end
 
@@ -331,8 +366,7 @@ local function JudgementsAccuracy(self)
 	end
 
 	local w, h = Layout:move("column1row1")
-	love.graphics.translate(w / 3, 0)
-	w = w / 3
+	love.graphics.translate(36, 0)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans Mono", 32))
@@ -681,9 +715,6 @@ return function(self)
 	Frames(self)
 	Title(self)
 	NotechartInfo(self)
-	Judgements(self)
-	JudgementsDropdown(self)
-	JudgementsAccuracy(self)
 	ModifierIconGrid(self)
 	ScoreList(self)
 	HitGraph(self)
@@ -692,4 +723,7 @@ return function(self)
 	MissGraph(self)
 	BottomScreenMenu(self)
 	MatchPlayers(self)
+	Judgements(self)
+	JudgementsDropdown(self)
+	JudgementsAccuracy(self)
 end

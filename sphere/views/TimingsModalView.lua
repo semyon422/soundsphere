@@ -12,6 +12,7 @@ local _transform = require("gfx_util").transform
 local round = require("math_util").round
 local map = require("math_util").map
 local spherefonts = require("sphere.assets.fonts")
+local imgui = require("sphere.imgui")
 local table_util = require("table_util")
 
 local _timings = require("sphere.models.RhythmModel.ScoreEngine.timings")
@@ -19,6 +20,7 @@ local _timings = require("sphere.models.RhythmModel.ScoreEngine.timings")
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local function intButtons(id, v, w, h)
+	local _v = v
 	local mod = love.keyboard.isScancodeDown("lshift", "rshift")
 	if not mod then
 		if TextButtonImView2(id .. "-1", "-1", w / 4, h) then v = v - 1 end
@@ -30,7 +32,10 @@ local function intButtons(id, v, w, h)
 		if TextButtonImView2(id .. "-100", "-100", w / 4, h) then v = v - 100 end
 		if TextButtonImView2(id .. "+100", "+100", w / 4, h) then v = v + 100 end
 	end
-	return math.floor(v)
+	if v ~= _v then
+		return math.floor(v)
+	end
+	return v
 end
 
 local function intButtonsMs(id, v, w, h)
@@ -51,6 +56,7 @@ local function drawTimings(t, name, id, norm, mins, w, h)
 end
 
 local osuOD = 0
+local etternaJudgement = 1
 
 return ModalImView(function(self)
 	if not self then
@@ -98,12 +104,18 @@ return ModalImView(function(self)
 		self.game:resetGameplayConfigs()
 		osuOD = (osuOD + 1) % 11
 	end
+	if TextButtonImView2("etterna timings", "J" .. etternaJudgement, 150, _h2) then
+		gameplay.timings = table_util.deepcopy(_timings.etterna(etternaJudgement))
+		self.game:resetGameplayConfigs()
+		etternaJudgement = etternaJudgement % 9 + 1
+	end
 	just.row(false)
 
 	local timings = gameplay.timings
 
 	just.indent(10)
 	just.text("Current preset: " .. _timings.getName(timings))
+	timings.nearest = imgui.checkbox("nearest", timings.nearest, "nearest input")
 
 	local maxt = 0
 	for _, t in pairs(timings) do

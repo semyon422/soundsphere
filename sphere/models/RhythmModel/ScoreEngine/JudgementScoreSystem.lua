@@ -23,6 +23,12 @@ JudgementScoreSystem.judgementLists = {
 	},
 }
 
+JudgementScoreSystem.judgementSelectors = {
+	{"soundsphere"},
+	{"osuOD%d", 0, 10},
+	{"etternaJ%d", 1, 9},
+}
+
 local function osuAccuracy(c)
 	local total = c["0"] + c["50"] + c["100"] + c["200"] + c["300"] + c["300g"]
 	return (c["50"] * 50 + c["100"] * 100 + c["200"] * 200 + (c["300"] + c["300g"]) * 300) / (total * 300)
@@ -73,6 +79,50 @@ for od = 0, 10 do
 		"100",
 		"50",
 		"0",
+	}
+end
+
+local etterna = require("sphere.models.RhythmModel.ScoreEngine.etterna")
+for judge = 1, #etterna do
+	local d = etterna[judge]
+	local marv = d[1]
+	local perf = d[2]
+	local great = d[3]
+	local good = d[4]
+	local bad = d[5]
+	local judgements = {
+		-bad,
+		"Bad",
+		-good,
+		"Good",
+		-great,
+		"Great",
+		-perf,
+		"Perfect",
+		-marv,
+		"Marvelous",
+		marv,
+		"Perfect",
+		perf,
+		"Great",
+		great,
+		"Good",
+		good,
+		"Bad",
+		bad,
+	}
+	for i = 1, #judgements do
+		if type(judgements[i]) == "number" then
+			judgements[i] = judgements[i] / 1000
+		end
+	end
+	JudgementScoreSystem.judgements["etternaJ" .. judge] = judgements
+	JudgementScoreSystem.judgementLists["etternaJ" .. judge] = {
+		"Marvelous",
+		"Perfect",
+		"Great",
+		"Good",
+		"Bad",
 	}
 end
 
