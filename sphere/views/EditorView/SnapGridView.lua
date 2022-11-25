@@ -1,6 +1,7 @@
 local Class = require("Class")
 local gfx_util = require("gfx_util")
 local spherefonts = require("sphere.assets.fonts")
+local just = require("just")
 local DynamicLayerData = require("ncdk.DynamicLayerData")
 local Fraction = require("ncdk.Fraction")
 
@@ -29,6 +30,8 @@ SnapGridView.construct = function(self)
 	ld:getVelocityData(Fraction(6, 4), -1, 1)
 
 	ld:getExpandData(Fraction(2), -1, Fraction(1))
+
+	self.currentTime = 0
 end
 
 local pixelsPerBeat = 40
@@ -76,6 +79,7 @@ SnapGridView.drawComputedGrid = function(self, field)
 	end
 end
 
+local prevMouseY = 0
 SnapGridView.draw = function(self)
 	local w, h = Layout:move("base")
 	love.graphics.setColor(1, 1, 1, 1)
@@ -95,7 +99,15 @@ SnapGridView.draw = function(self)
 	end
 
 	local _, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-	local t = my / pixelsPerBeat
+	my = 1080 - my
+
+	local _, active = just.button("scale drag", true)
+	if active then
+		self.currentTime = self.currentTime + (my - prevMouseY) / pixelsPerBeat
+	end
+	prevMouseY = my
+
+	local t = self.currentTime
 	local dtp = ld:getDynamicTimePointAbsolute(t, -1, 192)
 
 	local measureOffset = dtp.measureTime:floor()
@@ -139,7 +151,7 @@ SnapGridView.draw = function(self)
 
 	love.graphics.translate(80, 0)
 	love.graphics.push()
-	love.graphics.translate(0, h / 2 - my)
+	love.graphics.translate(0, h / 2 - self.currentTime * pixelsPerBeat)
 	self:drawComputedGrid("absoluteTime")
 	love.graphics.pop()
 	love.graphics.circle("fill", 0, h / 2, 4)
