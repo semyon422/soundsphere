@@ -1,6 +1,6 @@
 local Class = require("Class")
 local gfx_util = require("gfx_util")
-local spherefonts		= require("sphere.assets.fonts")
+local spherefonts = require("sphere.assets.fonts")
 local DynamicLayerData = require("ncdk.DynamicLayerData")
 local Fraction = require("ncdk.Fraction")
 
@@ -59,8 +59,9 @@ end
 
 SnapGridView.drawComputedGrid = function(self, field)
 	local ld = self.layerData
-	for time = ld.startTime:floor(), ld.endTime:floor() - 1 do
+	for time = ld.startTime:ceil(), ld.endTime:floor() do
 		local timePoint = ld:getDynamicTimePoint(Fraction(time), -1)
+		if not timePoint then break end
 		local y = timePoint[field] * pixelsPerBeat
 
 		love.graphics.line(0, y, 40, y)
@@ -68,6 +69,7 @@ SnapGridView.drawComputedGrid = function(self, field)
 		local signature = ld:getSignature(time):floor()
 		for i = 2, signature do
 			timePoint = ld:getDynamicTimePoint(Fraction(time * signature + i - 1, signature), -1)
+			if not timePoint then break end
 			local _y = timePoint[field] * pixelsPerBeat
 			love.graphics.line(0, _y, 10, _y)
 		end
@@ -151,6 +153,10 @@ SnapGridView.draw = function(self)
 	self:drawComputedGrid("visualTime")
 	love.graphics.pop()
 	love.graphics.circle("fill", 0, h / 2, 4)
+
+	if ld.startTime:tonumber() ~= measureOffset - 5 then
+		ld:setRange(Fraction(measureOffset - 5), Fraction(measureOffset + 5))
+	end
 end
 
 return SnapGridView

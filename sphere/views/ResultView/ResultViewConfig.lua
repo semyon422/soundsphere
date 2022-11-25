@@ -302,10 +302,10 @@ local function JudgementSelector(item, w, h)
 	if TextButtonImView(name .. "judgement", text, w - h * 2, h, "center") then
 		ret = text
 	end
-	if TextButtonImView(name .. "judgement<", "<", h, h, "center") and v > item[2]then
+	if TextButtonImView(name .. "judgement<", "<", h, h, "center") and v > item[2] then
 		selectorState[name] = v - 1
 	end
-	if TextButtonImView(name .. "judgement>", ">", h, h, "center") and v < item[3]then
+	if TextButtonImView(name .. "judgement>", ">", h, h, "center") and v < item[3] then
 		selectorState[name] = v + 1
 	end
 	just.row(false)
