@@ -99,16 +99,18 @@ SnapGridView.draw = function(self)
 	end
 
 	local _, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-	my = 1080 - my
+	my = h - my
 
-	local _, active = just.button("scale drag", true)
-	if active then
+	just.button("scale drag", just.is_over(240, h))
+	if just.active_id == "scale drag" then
 		self.currentTime = self.currentTime + (my - prevMouseY) / pixelsPerBeat
 	end
 	prevMouseY = my
 
 	local t = self.currentTime
-	local dtp = ld:getDynamicTimePointAbsolute(t, -1, 192)
+
+	local dtp
+	dtp = ld:getDynamicTimePointAbsolute(t, 192, -1)
 
 	local measureOffset = dtp.measureTime:floor()
 	local offset = measureOffsets[measureOffset]
@@ -156,7 +158,7 @@ SnapGridView.draw = function(self)
 	love.graphics.pop()
 	love.graphics.circle("fill", 0, h / 2, 4)
 
-	local dtp = ld:getDynamicTimePointAbsolute(t, -1, 192)
+	dtp = ld:getDynamicTimePointAbsolute(t, 192, -1)
 	local y = dtp.visualTime * pixelsPerBeat
 
 	love.graphics.translate(80, 0)
@@ -166,8 +168,9 @@ SnapGridView.draw = function(self)
 	love.graphics.pop()
 	love.graphics.circle("fill", 0, h / 2, 4)
 
-	if ld.startTime:tonumber() ~= measureOffset - 5 then
-		ld:setRange(Fraction(measureOffset - 5), Fraction(measureOffset + 5))
+	local delta = 2
+	if ld.startTime:tonumber() ~= measureOffset - delta then
+		ld:setRange(Fraction(measureOffset - delta), Fraction(measureOffset + delta))
 	end
 end
 
