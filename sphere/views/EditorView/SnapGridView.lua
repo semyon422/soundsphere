@@ -31,7 +31,9 @@ SnapGridView.construct = function(self)
 
 	ld:getExpandData(Fraction(2), -1, Fraction(1))
 
-	self.currentTime = 0
+	self.beatTime = 0
+	self.absoluteTime = 0
+	self.visualTime = 0
 end
 
 local function getTimePointText(timePoint)
@@ -47,24 +49,18 @@ local function getTimePointText(timePoint)
 end
 
 local pixelsPerBeat = 40
-SnapGridView.drawRangeTracker = function(self, rangeTracker)
+SnapGridView.drawTimingObjects = function(self)
+	local rangeTracker = self.layerData.timePointsRange
 	local object = rangeTracker.startObject
 	if not object then
 		return
 	end
 
-	local ld = self.layerData
-	local measureOffsets = self.measureOffsets
-
 	local endObject = rangeTracker.endObject
 	while object and object <= endObject do
-		local time = rangeTracker:getObjectTime(object)
-		local measureOffset = time:floor()
-		local offset = measureOffsets[measureOffset]
 		local text = getTimePointText(object)
-		if offset and text then
-			local signature = ld:getSignature(measureOffset):tonumber()
-			local y = offset + (time:tonumber() - measureOffset) * pixelsPerBeat * signature
+		if text then
+			local y = (object.beatTime - self.beatTime) * pixelsPerBeat
 			love.graphics.line(0, y, 10, y)
 			gfx_util.printFrame(text, -500, y - 25, 490, 50, "right", "center")
 		end
@@ -73,12 +69,12 @@ SnapGridView.drawRangeTracker = function(self, rangeTracker)
 	end
 end
 
-SnapGridView.drawComputedGrid = function(self, field)
+SnapGridView.drawComputedGrid = function(self, field, currentTime)
 	local ld = self.layerData
 	for time = ld.startTime:ceil(), ld.endTime:floor() do
 		local timePoint = ld:getDynamicTimePoint(Fraction(time), -1)
 		if not timePoint then break end
-		local y = timePoint[field] * pixelsPerBeat
+		local y = (timePoint[field] - currentTime) * pixelsPerBeat
 
 		love.graphics.line(0, y, 40, y)
 
@@ -86,7 +82,7 @@ SnapGridView.drawComputedGrid = function(self, field)
 		for i = 2, signature do
 			timePoint = ld:getDynamicTimePoint(Fraction(time * signature + i - 1, signature), -1)
 			if not timePoint then break end
-			local _y = timePoint[field] * pixelsPerBeat
+			local _y = (timePoint[field] - currentTime) * pixelsPerBeat
 			love.graphics.line(0, _y, 10, _y)
 		end
 	end
@@ -100,69 +96,40 @@ SnapGridView.draw = function(self)
 
 	love.graphics.translate(w / 5, 0)
 
-	local ld = self.layerData
-
-	local measureOffsets = {}
-	self.measureOffsets = measureOffsets
-
-	local offset = 0
-	for time = ld.startTime:floor(), ld.endTime:ceil() do
-		measureOffsets[time] = offset
-		offset = offset + pixelsPerBeat * ld:getSignature(time):tonumber()
-	end
-
 	local _, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	my = h - my
 
 	just.button("scale drag", just.is_over(240, h))
 	if just.active_id == "scale drag" then
-		self.currentTime = self.currentTime + (my - prevMouseY) / pixelsPerBeat
+		self.absoluteTime = self.absoluteTime + (my - prevMouseY) / pixelsPerBeat
 	end
 	prevMouseY = my
 
-	local t = self.currentTime
+	local t = self.absoluteTime
 
-	local dtp
-	dtp = ld:getDynamicTimePointAbsolute(t, 192, -1)
+	local ld = self.layerData
+	local dtp = ld:getDynamicTimePointAbsolute(t, 192, -1)
+	self.visualTime = dtp.visualTime
+	self.beatTime = dtp.beatTime
 
 	local measureOffset = dtp.measureTime:floor()
-	local signature = ld:getSignature(measureOffset):tonumber()
-	local y = measureOffsets[measureOffset] + (dtp.measureTime:tonumber() - measureOffset) * pixelsPerBeat * signature
-	love.graphics.circle("fill", 0, h / 2, 4)
 
 	love.graphics.push()
-	love.graphics.translate(0, h / 2 - y)
-	for time = ld.startTime:floor(), ld.endTime:ceil() do
-		local _y = measureOffsets[time]
-		local signature = ld:getSignature(time):tonumber()
-
-		love.graphics.line(0, _y, 40, _y)
-
-		for i = 2, signature do
-			local __y = _y + (i - 1) * pixelsPerBeat
-			love.graphics.line(0, __y, 10, __y)
-		end
-	end
+	love.graphics.translate(0, h / 2)
+	love.graphics.line(0, 0, 240, 0)
 
 	love.graphics.translate(-40, 0)
-	self:drawRangeTracker(ld.timePointsRange)
-	love.graphics.pop()
+	self:drawTimingObjects()
+	love.graphics.translate(40, 0)
+	self:drawComputedGrid("beatTime", self.beatTime)
 
 	love.graphics.translate(80, 0)
-	love.graphics.push()
-	love.graphics.translate(0, h / 2 - self.currentTime * pixelsPerBeat)
-	self:drawComputedGrid("absoluteTime")
-	love.graphics.pop()
-	love.graphics.circle("fill", 0, h / 2, 4)
-
-	dtp = ld:getDynamicTimePointAbsolute(t, 192, -1)
+	self:drawComputedGrid("absoluteTime", self.absoluteTime)
 
 	love.graphics.translate(80, 0)
-	love.graphics.push()
-	love.graphics.translate(0, h / 2 - dtp.visualTime * pixelsPerBeat)
-	self:drawComputedGrid("visualTime")
+	self:drawComputedGrid("visualTime", self.visualTime)
+
 	love.graphics.pop()
-	love.graphics.circle("fill", 0, h / 2, 4)
 
 	local delta = 2
 	if ld.startTime:tonumber() ~= measureOffset - delta then
