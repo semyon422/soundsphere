@@ -55,7 +55,7 @@ local function Background(self)
 
 	local dim = self.game.configModel.configs.settings.graphics.dim.select
 	BackgroundView.game = self.game
-	BackgroundView:draw(w, h, dim, 0.01)
+	BackgroundView:draw(w, h, 0.8, 0.01)
 end
 
 local function Header(self)
@@ -99,9 +99,9 @@ local function Controls(self)
 end
 
 return function(self)
-	-- Background(self)
-	Frames(self)
-	ScreenMenu(self)
-	Controls(self)
-	Header(self)
+	Background(self)
+	-- Frames(self)
+	-- ScreenMenu(self)
+	-- Controls(self)
+	-- Header(self)
 end

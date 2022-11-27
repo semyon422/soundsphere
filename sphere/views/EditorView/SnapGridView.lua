@@ -4,6 +4,7 @@ local spherefonts = require("sphere.assets.fonts")
 local just = require("just")
 local DynamicLayerData = require("ncdk.DynamicLayerData")
 local Fraction = require("ncdk.Fraction")
+local SpoilerListImView = require("sphere.imviews.SpoilerListImView")
 
 local Layout = require("sphere.views.EditorView.Layout")
 
@@ -34,6 +35,8 @@ SnapGridView.construct = function(self)
 	self.beatTime = 0
 	self.absoluteTime = 0
 	self.visualTime = 0
+
+	self.snap = 1
 end
 
 local function getTimePointText(timePoint)
@@ -49,7 +52,7 @@ local function getTimePointText(timePoint)
 end
 
 local pixelsPerBeat = 40
-SnapGridView.drawTimingObjects = function(self)
+SnapGridView.drawTimingObjects = function(self, field, currentTime)
 	local rangeTracker = self.layerData.timePointsRange
 	local object = rangeTracker.startObject
 	if not object then
@@ -60,7 +63,7 @@ SnapGridView.drawTimingObjects = function(self)
 	while object and object <= endObject do
 		local text = getTimePointText(object)
 		if text then
-			local y = (object.beatTime - self.beatTime) * pixelsPerBeat
+			local y = (object[field] - currentTime) * pixelsPerBeat
 			love.graphics.line(0, y, 10, y)
 			gfx_util.printFrame(text, -500, y - 25, 490, 50, "right", "center")
 		end
@@ -71,21 +74,36 @@ end
 
 SnapGridView.drawComputedGrid = function(self, field, currentTime)
 	local ld = self.layerData
+	local snap = self.snap
+
 	for time = ld.startTime:ceil(), ld.endTime:floor() do
-		local timePoint = ld:getDynamicTimePoint(Fraction(time), -1)
-		if not timePoint then break end
-		local y = (timePoint[field] - currentTime) * pixelsPerBeat
-
-		love.graphics.line(0, y, 40, y)
-
 		local signature = ld:getSignature(time):floor()
-		for i = 2, signature do
-			timePoint = ld:getDynamicTimePoint(Fraction(time * signature + i - 1, signature), -1)
-			if not timePoint then break end
-			local _y = (timePoint[field] - currentTime) * pixelsPerBeat
-			love.graphics.line(0, _y, 10, _y)
+		for i = 1, signature do
+			local beat = time * signature + i - 1
+			for j = 1, snap do
+				local f = Fraction(beat * snap + j - 1, signature * snap)
+				local timePoint = ld:getDynamicTimePoint(f, -1)
+				if not timePoint then break end
+				local y = (timePoint[field] - currentTime) * pixelsPerBeat
+				local w
+				if i == 1 and j == 1 then w = 40
+				elseif j == 1 then w = 10
+				else w = 2
+				end
+				love.graphics.line(0, y, w, y)
+			end
 		end
 	end
+end
+
+local snaps = {1, 2, 3, 4, 5, 6, 7, 8}
+SnapGridView.drawUI = function(self)
+	just.push()
+	local _, snap = SpoilerListImView("snap select", 100, 55, snaps, self.snap)
+	if snap then
+		self.snap = snap
+	end
+	just.pop()
 end
 
 local prevMouseY = 0
@@ -93,6 +111,8 @@ SnapGridView.draw = function(self)
 	local w, h = Layout:move("base")
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
+
+	self:drawUI()
 
 	love.graphics.translate(w / 5, 0)
 
@@ -119,7 +139,7 @@ SnapGridView.draw = function(self)
 	love.graphics.line(0, 0, 240, 0)
 
 	love.graphics.translate(-40, 0)
-	self:drawTimingObjects()
+	self:drawTimingObjects("beatTime", self.beatTime)
 	love.graphics.translate(40, 0)
 	self:drawComputedGrid("beatTime", self.beatTime)
 

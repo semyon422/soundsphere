@@ -23,33 +23,33 @@ EditorView.load = thread.coro(function(self)
 	end
 	loading = true
 
-	self.game.editorController:load()
+	-- self.game.editorController:load()
 
-	local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
-	self.viewConfig = noteSkin.playField
+	-- local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
+	-- self.viewConfig = noteSkin.playField
 
 	self.snapGridView = SnapGridView:new()
 	self.snapGridView.game = self.game
-	self.snapGridView.transform = noteSkin.playField:newNoteskinTransform()
+	-- self.snapGridView.transform = noteSkin.playField:newNoteskinTransform()
 
 	local sequenceView = self.sequenceView
 
-	sequenceView.game = self.game
-	sequenceView.screenView = self
-	sequenceView:setSequenceConfig(self.viewConfig)
-	sequenceView:load()
+	-- sequenceView.game = self.game
+	-- sequenceView.screenView = self
+	-- sequenceView:setSequenceConfig(self.viewConfig)
+	-- sequenceView:load()
 
 	loading = false
 end)
 
 EditorView.update = function(self, dt)
-	self.game.editorController:update()
-	self.sequenceView:update(dt)
+	-- self.game.editorController:update()
+	-- self.sequenceView:update(dt)
 end
 
 EditorView.receive = function(self, event)
-	self.game.editorController:receive(event)
-	self.sequenceView:receive(event)
+	-- self.game.editorController:receive(event)
+	-- self.sequenceView:receive(event)
 end
 
 EditorView.draw = function(self)
@@ -62,7 +62,7 @@ EditorView.draw = function(self)
 	Layout:draw()
 	EditorViewConfig(self)
 	self.snapGridView:draw()
-	self.sequenceView:draw()
+	-- self.sequenceView:draw()
 	just.container()
 end
 
@@ -71,8 +71,8 @@ EditorView.quit = function(self)
 end
 
 EditorView.unload = function(self)
-	self.game.editorController:unload()
-	self.sequenceView:unload()
+	-- self.game.editorController:unload()
+	-- self.sequenceView:unload()
 end
 
 return EditorView
