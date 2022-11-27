@@ -34,8 +34,20 @@ SnapGridView.construct = function(self)
 	self.currentTime = 0
 end
 
+local function getTimePointText(timePoint)
+	if timePoint._tempoData then
+		return timePoint._tempoData.tempo .. " bpm"
+	elseif timePoint._stopData then
+		return "stop " .. timePoint._stopData.duration:tonumber() .. " beats"
+	elseif timePoint._velocityData then
+		return timePoint._velocityData.currentSpeed .. "x"
+	elseif timePoint._expandData then
+		return "expand into " .. timePoint._expandData.duration:tonumber() .. " beats"
+	end
+end
+
 local pixelsPerBeat = 40
-SnapGridView.drawRangeTracker = function(self, rangeTracker, format)
+SnapGridView.drawRangeTracker = function(self, rangeTracker)
 	local object = rangeTracker.startObject
 	if not object then
 		return
@@ -49,11 +61,12 @@ SnapGridView.drawRangeTracker = function(self, rangeTracker, format)
 		local time = rangeTracker:getObjectTime(object)
 		local measureOffset = time:floor()
 		local offset = measureOffsets[measureOffset]
-		if offset then
+		local text = getTimePointText(object)
+		if offset and text then
 			local signature = ld:getSignature(measureOffset):tonumber()
 			local y = offset + (time:tonumber() - measureOffset) * pixelsPerBeat * signature
 			love.graphics.line(0, y, 10, y)
-			gfx_util.printFrame(format(object), -500, y - 25, 490, 50, "right", "center")
+			gfx_util.printFrame(text, -500, y - 25, 490, 50, "right", "center")
 		end
 
 		object = object.next
@@ -113,43 +126,27 @@ SnapGridView.draw = function(self)
 	dtp = ld:getDynamicTimePointAbsolute(t, 192, -1)
 
 	local measureOffset = dtp.measureTime:floor()
-	local offset = measureOffsets[measureOffset]
-	if offset then
-		local signature = ld:getSignature(measureOffset):tonumber()
-		local y = offset + (dtp.measureTime:tonumber() - measureOffset) * pixelsPerBeat * signature
-		love.graphics.circle("fill", 0, h / 2, 4)
+	local signature = ld:getSignature(measureOffset):tonumber()
+	local y = measureOffsets[measureOffset] + (dtp.measureTime:tonumber() - measureOffset) * pixelsPerBeat * signature
+	love.graphics.circle("fill", 0, h / 2, 4)
 
-		love.graphics.push()
-		love.graphics.translate(0, h / 2 - y)
-		for time = ld.startTime:floor(), ld.endTime:ceil() do
-			local _y = measureOffsets[time]
-			local signature = ld:getSignature(time):tonumber()
+	love.graphics.push()
+	love.graphics.translate(0, h / 2 - y)
+	for time = ld.startTime:floor(), ld.endTime:ceil() do
+		local _y = measureOffsets[time]
+		local signature = ld:getSignature(time):tonumber()
 
-			love.graphics.line(0, _y, 40, _y)
+		love.graphics.line(0, _y, 40, _y)
 
-			for i = 2, signature do
-				local __y = _y + (i - 1) * pixelsPerBeat
-				love.graphics.line(0, __y, 10, __y)
-			end
+		for i = 2, signature do
+			local __y = _y + (i - 1) * pixelsPerBeat
+			love.graphics.line(0, __y, 10, __y)
 		end
-
-		love.graphics.translate(-40, 0)
-		self:drawRangeTracker(ld.tempoDatasRange, function(object)
-			return object.tempo .. " bpm"
-		end)
-		self:drawRangeTracker(ld.stopDatasRange, function(object)
-			return "stop " .. object.duration:tonumber() .. " beats"
-		end)
-		self:drawRangeTracker(ld.velocityDatasRange, function(object)
-			return object.currentSpeed .. "x"
-		end)
-		self:drawRangeTracker(ld.expandDatasRange, function(object)
-			return "expand into " .. object.duration:tonumber() .. " beats"
-		end)
-		love.graphics.translate(40, 0)
-
-		love.graphics.pop()
 	end
+
+	love.graphics.translate(-40, 0)
+	self:drawRangeTracker(ld.timePointsRange)
+	love.graphics.pop()
 
 	love.graphics.translate(80, 0)
 	love.graphics.push()
@@ -159,11 +156,10 @@ SnapGridView.draw = function(self)
 	love.graphics.circle("fill", 0, h / 2, 4)
 
 	dtp = ld:getDynamicTimePointAbsolute(t, 192, -1)
-	local y = dtp.visualTime * pixelsPerBeat
 
 	love.graphics.translate(80, 0)
 	love.graphics.push()
-	love.graphics.translate(0, h / 2 - y)
+	love.graphics.translate(0, h / 2 - dtp.visualTime * pixelsPerBeat)
 	self:drawComputedGrid("visualTime")
 	love.graphics.pop()
 	love.graphics.circle("fill", 0, h / 2, 4)
