@@ -19,6 +19,7 @@ SnapGridView.construct = function(self)
 	ld:setRange(Fraction(0), Fraction(10))
 
 	ld:getSignatureData(2, Fraction(3))
+	ld:getSignatureData(3, Fraction(34, 10))
 
 	ld:getTempoData(Fraction(1), 60)
 	ld:getTempoData(Fraction(3.5, 10, true), 120)
@@ -77,20 +78,22 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime)
 	local snap = self.snap
 
 	for time = ld.startTime:ceil(), ld.endTime:floor() do
-		local signature = ld:getSignature(time):floor()
-		for i = 1, signature do
-			local beat = time * signature + i - 1
+		local signature = ld:getSignature(time)
+		local _signature = signature:ceil()
+		for i = 1, _signature do
 			for j = 1, snap do
-				local f = Fraction(beat * snap + j - 1, signature * snap)
-				local timePoint = ld:getDynamicTimePoint(f, -1)
-				if not timePoint then break end
-				local y = (timePoint[field] - currentTime) * pixelsPerBeat
-				local w
-				if i == 1 and j == 1 then w = 40
-				elseif j == 1 then w = 10
-				else w = 2
+				local f = Fraction((i - 1) * snap + j - 1, signature * snap)
+				if f:tonumber() < 1 then
+					local timePoint = ld:getDynamicTimePoint(f + time, -1)
+					if not timePoint then break end
+					local y = (timePoint[field] - currentTime) * pixelsPerBeat
+					local w
+					if i == 1 and j == 1 then w = 40
+					elseif j == 1 then w = 10
+					else w = 2
+					end
+					love.graphics.line(0, y, w, y)
 				end
-				love.graphics.line(0, y, w, y)
 			end
 		end
 	end
