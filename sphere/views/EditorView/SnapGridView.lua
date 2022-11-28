@@ -119,7 +119,8 @@ SnapGridView.draw = function(self)
 	local _, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	my = h - my
 
-	just.button("scale drag", just.is_over(240, h))
+	local over = just.is_over(240, h)
+	just.button("scale drag", over)
 	if just.active_id == "scale drag" then
 		self.absoluteTime = self.absoluteTime + (my - prevMouseY) / pixelsPerBeat
 	end
@@ -154,6 +155,54 @@ SnapGridView.draw = function(self)
 	local delta = 2
 	if ld.startTime:tonumber() ~= measureOffset - delta then
 		ld:setRange(Fraction(measureOffset - delta), Fraction(measureOffset + delta))
+	end
+
+	local scroll = just.wheel_over("scale scroll", over)
+	scroll = scroll and -scroll
+	if just.keypressed("right") then
+		scroll = 1
+	elseif just.keypressed("left") then
+		scroll = -1
+	end
+
+	if scroll then
+		dtp = ld:getDynamicTimePointAbsolute(t, 192, -1)
+		local signature = ld:getSignature(measureOffset)
+		local sigSnap = signature * self.snap
+
+		local targetMeasureOffset
+		if scroll == -1 then
+			targetMeasureOffset = dtp.measureTime:ceil() - 1
+		else
+			targetMeasureOffset = (dtp.measureTime + Fraction(1) / sigSnap):floor()
+		end
+		signature = ld:getSignature(targetMeasureOffset)
+		sigSnap = signature * self.snap
+
+		local measureTime
+		if measureOffset ~= targetMeasureOffset then
+			if scroll == -1 then
+				measureTime = Fraction(sigSnap:ceil() - 1) / sigSnap + targetMeasureOffset
+			else
+				measureTime = Fraction(targetMeasureOffset)
+			end
+		else
+			local snapTime = (dtp.measureTime - measureOffset) * sigSnap
+
+			local targetSnapTime
+			if scroll == -1 then
+				targetSnapTime = snapTime:ceil() - 1
+			else
+				targetSnapTime = snapTime:floor() + 1
+			end
+
+			measureTime = Fraction(targetSnapTime) / sigSnap + measureOffset
+		end
+
+		dtp = ld:getDynamicTimePoint(measureTime)
+		self.absoluteTime = dtp.absoluteTime
+		self.visualTime = dtp.visualTime
+		self.beatTime = dtp.beatTime
 	end
 end
 
