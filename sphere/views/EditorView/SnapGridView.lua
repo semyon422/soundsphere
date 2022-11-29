@@ -4,7 +4,7 @@ local spherefonts = require("sphere.assets.fonts")
 local just = require("just")
 local DynamicLayerData = require("ncdk.DynamicLayerData")
 local Fraction = require("ncdk.Fraction")
-local SpoilerListImView = require("sphere.imviews.SpoilerListImView")
+local imgui = require("sphere.imgui")
 
 local Layout = require("sphere.views.EditorView.Layout")
 
@@ -38,6 +38,9 @@ SnapGridView.construct = function(self)
 	self.visualTime = 0
 
 	self.snap = 1
+
+	self.pixelsPerBeat = 40
+	self.pixelsPerSecond = 40
 end
 
 local function getTimePointText(timePoint)
@@ -52,8 +55,7 @@ local function getTimePointText(timePoint)
 	end
 end
 
-local pixelsPerBeat = 40
-SnapGridView.drawTimingObjects = function(self, field, currentTime)
+SnapGridView.drawTimingObjects = function(self, field, currentTime, pixels)
 	local rangeTracker = self.layerData.timePointsRange
 	local object = rangeTracker.startObject
 	if not object then
@@ -64,7 +66,7 @@ SnapGridView.drawTimingObjects = function(self, field, currentTime)
 	while object and object <= endObject do
 		local text = getTimePointText(object)
 		if text then
-			local y = (object[field] - currentTime) * pixelsPerBeat
+			local y = (object[field] - currentTime) * pixels
 			love.graphics.line(0, y, 10, y)
 			gfx_util.printFrame(text, -500, y - 25, 490, 50, "right", "center")
 		end
@@ -73,7 +75,7 @@ SnapGridView.drawTimingObjects = function(self, field, currentTime)
 	end
 end
 
-SnapGridView.drawComputedGrid = function(self, field, currentTime)
+SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels)
 	local ld = self.layerData
 	local snap = self.snap
 
@@ -86,7 +88,7 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime)
 				if f:tonumber() < 1 then
 					local timePoint = ld:getDynamicTimePoint(f + time, -1)
 					if not timePoint then break end
-					local y = (timePoint[field] - currentTime) * pixelsPerBeat
+					local y = (timePoint[field] - currentTime) * pixels
 					local w
 					if i == 1 and j == 1 then w = 40
 					elseif j == 1 then w = 10
@@ -99,13 +101,14 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime)
 	end
 end
 
-local snaps = {1, 2, 3, 4, 5, 6, 7, 8}
-SnapGridView.drawUI = function(self)
+SnapGridView.drawUI = function(self, w, h)
 	just.push()
-	local _, snap = SpoilerListImView("snap select", 100, 55, snaps, self.snap)
-	if snap then
-		self.snap = snap
-	end
+
+	imgui.setSize(w, h, 200, 55)
+	self.snap = imgui.slider1("snap select", self.snap, "%d", 1, 16, 1, "snap")
+	self.pixelsPerBeat = imgui.slider1("beat pixels", self.pixelsPerBeat, "%d", 10, 1000, 10, "pixels per beat")
+	self.pixelsPerSecond = imgui.slider1("second pixels", self.pixelsPerSecond, "%d", 10, 1000, 10, "pixels per second")
+
 	just.pop()
 end
 
@@ -115,7 +118,7 @@ SnapGridView.draw = function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-	self:drawUI()
+	self:drawUI(w, h)
 
 	love.graphics.translate(w / 5, 0)
 
@@ -125,7 +128,7 @@ SnapGridView.draw = function(self)
 	local over = just.is_over(240, h)
 	just.button("scale drag", over)
 	if just.active_id == "scale drag" then
-		self.absoluteTime = self.absoluteTime + (my - prevMouseY) / pixelsPerBeat
+		self.absoluteTime = self.absoluteTime + (my - prevMouseY) / self.pixelsPerBeat
 	end
 	prevMouseY = my
 
@@ -143,15 +146,15 @@ SnapGridView.draw = function(self)
 	love.graphics.line(0, 0, 240, 0)
 
 	love.graphics.translate(-40, 0)
-	self:drawTimingObjects("beatTime", self.beatTime)
+	self:drawTimingObjects("beatTime", self.beatTime, self.pixelsPerBeat)
 	love.graphics.translate(40, 0)
-	self:drawComputedGrid("beatTime", self.beatTime)
+	self:drawComputedGrid("beatTime", self.beatTime, self.pixelsPerBeat)
 
 	love.graphics.translate(80, 0)
-	self:drawComputedGrid("absoluteTime", self.absoluteTime)
+	self:drawComputedGrid("absoluteTime", self.absoluteTime, self.pixelsPerSecond)
 
 	love.graphics.translate(80, 0)
-	self:drawComputedGrid("visualTime", self.visualTime)
+	self:drawComputedGrid("visualTime", self.visualTime, self.pixelsPerSecond)
 
 	love.graphics.pop()
 
