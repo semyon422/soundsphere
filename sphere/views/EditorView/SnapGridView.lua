@@ -75,6 +75,37 @@ SnapGridView.drawTimingObjects = function(self, field, currentTime, pixels)
 	end
 end
 
+local colors = {
+	white = {1, 1, 1},
+	red = {1, 0, 0},
+	blue = {0, 0, 1},
+	green = {0, 1, 0},
+	yellow = {1, 1, 0},
+	violet = {1, 0, 1},
+}
+
+local snaps = {
+	[1] = colors.white,
+	[2] = colors.red,
+	[3] = colors.violet,
+	[4] = colors.blue,
+	[5] = colors.yellow,
+	[6] = colors.violet,
+	[7] = colors.yellow,
+	[8] = colors.green,
+}
+
+local function getSnapColor(j, snap)
+	for i = 1, 16 do
+		if snap % i == 0 then
+			if (j - 1) % (snap / i) == 0 then
+				return snaps[i] or colors.white
+			end
+		end
+	end
+	return colors.white
+end
+
 SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels)
 	local ld = self.layerData
 	local snap = self.snap
@@ -89,16 +120,18 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels)
 					local timePoint = ld:getDynamicTimePoint(f + time, -1)
 					if not timePoint then break end
 					local y = (timePoint[field] - currentTime) * pixels
-					local w
-					if i == 1 and j == 1 then w = 40
-					elseif j == 1 then w = 10
-					else w = 2
+
+					local w = 30
+					if i == 1 and j == 1 then
+						w = 60
 					end
+					love.graphics.setColor(getSnapColor(j, snap))
 					love.graphics.line(0, y, w, y)
 				end
 			end
 		end
 	end
+	love.graphics.setColor(1, 1, 1, 1)
 end
 
 SnapGridView.drawUI = function(self, w, h)
