@@ -31,6 +31,7 @@ local OsudirectModel		= require("sphere.models.OsudirectModel")
 local MultiplayerModel		= require("sphere.models.MultiplayerModel")
 local MainLog					= require("sphere.MainLog")
 local ReplayModel		= require("sphere.models.ReplayModel")
+local EditorModel		= require("sphere.models.EditorModel")
 
 local MountController			= require("sphere.controllers.MountController")
 local SelectController			= require("sphere.controllers.SelectController")
@@ -102,6 +103,7 @@ GameController.construct = function(self)
 	self.osudirectModel = OsudirectModel:new()
 	self.multiplayerModel = MultiplayerModel:new()
 	self.replayModel = ReplayModel:new()
+	self.editorModel = EditorModel:new()
 
 	for k, v in pairs(self) do
 		v.game = self
@@ -152,6 +154,7 @@ GameController.load = function(self)
 	self.collectionModel:load()
 	self.selectModel:load()
 	self.previewModel:load()
+	self.editorModel:load()
 
 	self.multiplayerController:load()
 

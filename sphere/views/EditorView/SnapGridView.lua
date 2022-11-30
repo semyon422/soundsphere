@@ -2,7 +2,6 @@ local Class = require("Class")
 local gfx_util = require("gfx_util")
 local spherefonts = require("sphere.assets.fonts")
 local just = require("just")
-local DynamicLayerData = require("ncdk.DynamicLayerData")
 local Fraction = require("ncdk.Fraction")
 local imgui = require("sphere.imgui")
 
@@ -11,34 +10,6 @@ local Layout = require("sphere.views.EditorView.Layout")
 local SnapGridView = Class:new()
 
 SnapGridView.construct = function(self)
-	local ld = DynamicLayerData:new()
-	self.layerData = ld
-
-	ld:setTimeMode("measure")
-	ld:setSignatureMode("short")
-	ld:setRange(Fraction(0), Fraction(10))
-
-	ld:getSignatureData(2, Fraction(3))
-	ld:getSignatureData(3, Fraction(34, 10))
-
-	ld:getTempoData(Fraction(1), 60)
-	ld:getTempoData(Fraction(3.5, 10, true), 120)
-
-	ld:getStopData(Fraction(5), Fraction(4))
-
-	ld:getVelocityData(Fraction(0.5, 10, true), -1, 1)
-	ld:getVelocityData(Fraction(4.5, 10, true), -1, 2)
-	ld:getVelocityData(Fraction(5, 4), -1, 0)
-	ld:getVelocityData(Fraction(6, 4), -1, 1)
-
-	ld:getExpandData(Fraction(2), -1, Fraction(1))
-
-	self.beatTime = 0
-	self.absoluteTime = 0
-	self.visualTime = 0
-
-	self.snap = 1
-
 	self.pixelsPerBeat = 40
 	self.pixelsPerSecond = 40
 end
@@ -56,7 +27,7 @@ local function getTimePointText(timePoint)
 end
 
 SnapGridView.drawTimingObjects = function(self, field, currentTime, pixels)
-	local rangeTracker = self.layerData.timePointsRange
+	local rangeTracker = self.game.editorModel.layerData.timePointsRange
 	local object = rangeTracker.startObject
 	if not object then
 		return
@@ -95,20 +66,10 @@ local snaps = {
 	[8] = colors.green,
 }
 
-local function getSnapColor(j, snap)
-	for i = 1, 16 do
-		if snap % i == 0 then
-			if (j - 1) % (snap / i) == 0 then
-				return snaps[i] or colors.white
-			end
-		end
-	end
-	return colors.white
-end
-
 SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels)
-	local ld = self.layerData
-	local snap = self.snap
+	local editorModel = self.game.editorModel
+	local ld = editorModel.layerData
+	local snap = editorModel.snap
 
 	for time = ld.startTime:ceil(), ld.endTime:floor() do
 		local signature = ld:getSignature(time)
@@ -125,7 +86,7 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels)
 					if i == 1 and j == 1 then
 						w = 60
 					end
-					love.graphics.setColor(getSnapColor(j, snap))
+					love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
 					love.graphics.line(0, y, w, y)
 				end
 			end
@@ -135,12 +96,18 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels)
 end
 
 SnapGridView.drawUI = function(self, w, h)
+	local editorModel = self.game.editorModel
+
 	just.push()
 
 	imgui.setSize(w, h, 200, 55)
-	self.snap = imgui.slider1("snap select", self.snap, "%d", 1, 16, 1, "snap")
+	editorModel.snap = imgui.slider1("snap select", editorModel.snap, "%d", 1, 16, 1, "snap")
 	self.pixelsPerBeat = imgui.slider1("beat pixels", self.pixelsPerBeat, "%d", 10, 1000, 10, "pixels per beat")
 	self.pixelsPerSecond = imgui.slider1("second pixels", self.pixelsPerSecond, "%d", 10, 1000, 10, "pixels per second")
+
+	if imgui.button("add object", "add") then
+		self.game.gameView:setModal(require("sphere.views.EditorView.AddTimingObjectView"))
+	end
 
 	just.pop()
 end
@@ -163,6 +130,8 @@ end
 
 local prevMouseY = 0
 SnapGridView.draw = function(self)
+	local editorModel = self.game.editorModel
+
 	local w, h = Layout:move("base")
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
@@ -171,33 +140,22 @@ SnapGridView.draw = function(self)
 
 	love.graphics.translate(w / 5, 0)
 
-	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime, 192, -1)
-	self.visualTime = dtp.visualTime
-	self.beatTime = dtp.beatTime
-	local measureOffset = dtp.measureTime:floor()
-
 	love.graphics.push()
 	love.graphics.translate(0, h / 2)
 	love.graphics.line(0, 0, 240, 0)
 
 	love.graphics.translate(-40, 0)
-	self:drawTimingObjects("beatTime", self.beatTime, self.pixelsPerBeat)
+	self:drawTimingObjects("beatTime", editorModel.beatTime, self.pixelsPerBeat)
 	love.graphics.translate(40, 0)
-	self:drawComputedGrid("beatTime", self.beatTime, self.pixelsPerBeat)
+	self:drawComputedGrid("beatTime", editorModel.beatTime, self.pixelsPerBeat)
 
 	love.graphics.translate(80, 0)
-	self:drawComputedGrid("absoluteTime", self.absoluteTime, self.pixelsPerSecond)
+	self:drawComputedGrid("absoluteTime", editorModel.absoluteTime, self.pixelsPerSecond)
 
 	love.graphics.translate(80, 0)
-	self:drawComputedGrid("visualTime", self.visualTime, self.pixelsPerSecond)
+	self:drawComputedGrid("visualTime", editorModel.visualTime, self.pixelsPerSecond)
 
 	love.graphics.pop()
-
-	local delta = 2
-	if ld.startTime:tonumber() ~= measureOffset - delta then
-		ld:setRange(Fraction(measureOffset - delta), Fraction(measureOffset + delta))
-	end
 
 	local _, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	my = h - my
@@ -206,7 +164,7 @@ SnapGridView.draw = function(self)
 	just.row(true)
 	local pixels = drag("drag1", 80, h) and self.pixelsPerBeat or drag("drag2", 160, h) and self.pixelsPerSecond
 	if pixels then
-		self.absoluteTime = self.absoluteTime + (my - prevMouseY) / pixels
+		editorModel:scrollSeconds((my - prevMouseY) / pixels)
 	end
 	just.row(false)
 	just.pop()
@@ -222,43 +180,7 @@ SnapGridView.draw = function(self)
 	end
 
 	if scroll then
-		dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime, 192, -1)
-		local signature = ld:getSignature(measureOffset)
-		local sigSnap = signature * self.snap
-
-		local targetMeasureOffset
-		if scroll == -1 then
-			targetMeasureOffset = dtp.measureTime:ceil() - 1
-		else
-			targetMeasureOffset = (dtp.measureTime + Fraction(1) / sigSnap):floor()
-		end
-		signature = ld:getSignature(targetMeasureOffset)
-		sigSnap = signature * self.snap
-
-		local measureTime
-		if measureOffset ~= targetMeasureOffset then
-			if scroll == -1 then
-				measureTime = Fraction(sigSnap:ceil() - 1) / sigSnap + targetMeasureOffset
-			else
-				measureTime = Fraction(targetMeasureOffset)
-			end
-		else
-			local snapTime = (dtp.measureTime - measureOffset) * sigSnap
-
-			local targetSnapTime
-			if scroll == -1 then
-				targetSnapTime = snapTime:ceil() - 1
-			else
-				targetSnapTime = snapTime:floor() + 1
-			end
-
-			measureTime = Fraction(targetSnapTime) / sigSnap + measureOffset
-		end
-
-		dtp = ld:getDynamicTimePoint(measureTime)
-		self.absoluteTime = dtp.absoluteTime
-		self.visualTime = dtp.visualTime
-		self.beatTime = dtp.beatTime
+		editorModel:scrollSnaps(scroll)
 	end
 end
 
