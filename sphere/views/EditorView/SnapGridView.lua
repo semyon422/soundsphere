@@ -145,6 +145,22 @@ SnapGridView.drawUI = function(self, w, h)
 	just.pop()
 end
 
+local function drag(id, w, h)
+	local over = just.is_over(w, h)
+	local _, active, hovered = just.button(id, over)
+
+	if hovered then
+		local alpha = active and 0.2 or 0.1
+		love.graphics.setColor(1, 1, 1, alpha)
+		love.graphics.rectangle("fill", 0, 0, w, h)
+	end
+	love.graphics.setColor(1, 1, 1, 1)
+
+	just.next(w, h)
+
+	return just.active_id == id
+end
+
 local prevMouseY = 0
 SnapGridView.draw = function(self)
 	local w, h = Layout:move("base")
@@ -155,23 +171,10 @@ SnapGridView.draw = function(self)
 
 	love.graphics.translate(w / 5, 0)
 
-	local _, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-	my = h - my
-
-	local over = just.is_over(240, h)
-	just.button("scale drag", over)
-	if just.active_id == "scale drag" then
-		self.absoluteTime = self.absoluteTime + (my - prevMouseY) / self.pixelsPerBeat
-	end
-	prevMouseY = my
-
-	local t = self.absoluteTime
-
 	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(t, 192, -1)
+	local dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime, 192, -1)
 	self.visualTime = dtp.visualTime
 	self.beatTime = dtp.beatTime
-
 	local measureOffset = dtp.measureTime:floor()
 
 	love.graphics.push()
@@ -196,7 +199,21 @@ SnapGridView.draw = function(self)
 		ld:setRange(Fraction(measureOffset - delta), Fraction(measureOffset + delta))
 	end
 
-	local scroll = just.wheel_over("scale scroll", over)
+	local _, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+	my = h - my
+
+	just.push()
+	just.row(true)
+	local pixels = drag("drag1", 80, h) and self.pixelsPerBeat or drag("drag2", 160, h) and self.pixelsPerSecond
+	if pixels then
+		self.absoluteTime = self.absoluteTime + (my - prevMouseY) / pixels
+	end
+	just.row(false)
+	just.pop()
+
+	prevMouseY = my
+
+	local scroll = just.wheel_over("scale scroll", just.is_over(240, h))
 	scroll = scroll and -scroll
 	if just.keypressed("right") then
 		scroll = 1
@@ -205,7 +222,7 @@ SnapGridView.draw = function(self)
 	end
 
 	if scroll then
-		dtp = ld:getDynamicTimePointAbsolute(t, 192, -1)
+		dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime, 192, -1)
 		local signature = ld:getSignature(measureOffset)
 		local sigSnap = signature * self.snap
 
