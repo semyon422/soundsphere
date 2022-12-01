@@ -109,6 +109,19 @@ SnapGridView.drawUI = function(self, w, h)
 		self.game.gameView:setModal(require("sphere.views.EditorView.AddTimingObjectView"))
 	end
 
+	local dtp = editorModel:getDynamicTimePoint()
+
+	just.text(tostring(dtp))
+
+	just.row(true)
+	if imgui.button("prev tp", "prev") and dtp.prev then
+		editorModel:scrollTimePoint(dtp.prev)
+	end
+	if imgui.button("next tp", "next") and dtp.next then
+		editorModel:scrollTimePoint(dtp.next)
+	end
+	just.row(false)
+
 	just.pop()
 end
 

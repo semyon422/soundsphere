@@ -30,6 +30,8 @@ EditorModel.load = function(self)
 	self.beatTime = 0
 	self.absoluteTime = 0
 	self.visualTime = 0
+	self.side = -1
+	self.visualSide = -1
 
 	self.snap = 1
 
@@ -61,6 +63,11 @@ EditorModel.updateRange = function(self)
 	end
 end
 
+EditorModel.getDynamicTimePoint = function(self)
+	local ld = self.layerData
+	return ld:getDynamicTimePointAbsolute(self.absoluteTime, 192, self.side, self.visualSide)
+end
+
 EditorModel.scrollSeconds = function(self, delta)
 	self.absoluteTime = self.absoluteTime + delta
 
@@ -68,6 +75,18 @@ EditorModel.scrollSeconds = function(self, delta)
 	local dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime, 192, -1)
 	self.visualTime = dtp.visualTime
 	self.beatTime = dtp.beatTime
+	self.side = -1
+	self.visualSide = -1
+
+	self:updateRange()
+end
+
+EditorModel.scrollTimePoint = function(self, timePoint)
+	self.absoluteTime = timePoint.absoluteTime
+	self.visualTime = timePoint.visualTime
+	self.beatTime = timePoint.beatTime
+	self.side = timePoint.side
+	self.visualSide = timePoint.visualSide
 
 	self:updateRange()
 end
@@ -113,6 +132,8 @@ EditorModel.scrollSnaps = function(self, delta)
 	self.absoluteTime = dtp.absoluteTime
 	self.visualTime = dtp.visualTime
 	self.beatTime = dtp.beatTime
+	self.side = -1
+	self.visualSide = -1
 
 	self:updateRange()
 end
