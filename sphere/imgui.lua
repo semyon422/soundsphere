@@ -24,13 +24,25 @@ function imgui.separator()
 	just.emptyline(8)
 end
 
+function imgui.indent(size)
+	just.indent(size or 8)
+end
+
+function imgui.unindent(size)
+	just.indent(-(size or 8))
+end
+
 function imgui.label(id, label)
-	just.indent(8)
-	LabelImView(id .. "label", label, _h)
+	if not label then
+		just.next()
+		return
+	end
+	imgui.indent()
+	LabelImView(id, label, _h)
 end
 
 function imgui.text(text)
-	just.indent(8)
+	imgui.indent()
 	just.text(text)
 end
 
@@ -43,8 +55,7 @@ function imgui.slider(id, v, a, b, displayValue, label)
 	local _v = math_util.map(v, a, b, 0, 1)
 	_v = SliderImView(id, _v, _w, _h, displayValue) or _v
 	just.sameline()
-	just.indent(8)
-	LabelImView(id .. "label", label, _h)
+	imgui.label(id .. "label", label)
 	return math_util.map(_v, 0, 1, a, b)
 end
 
@@ -57,8 +68,7 @@ function imgui.slider1(id, v, format, a, b, c, label)
 	local _v = math_util.map(v, a, b, 0, 1)
 	_v = SliderImView(id, _v, _w, _h, format:format(v)) or _v
 	just.sameline()
-	just.indent(8)
-	LabelImView(id .. "label", label, _h)
+	imgui.label(id .. "label", label)
 
 	v = math_util.map(_v, 0, 1, a, b)
 	v = math_util.round(v, c)
@@ -75,8 +85,7 @@ function imgui.checkbox(id, v, label)
 		v = not v
 	end
 	just.sameline()
-	just.indent(8)
-	LabelImView(id, label, _h)
+	imgui.label(id, label)
 	if isNumber then
 		v = v and 1 or 0
 	end
@@ -101,8 +110,7 @@ function imgui.combo(id, v, values, format, label)
 		SpoilerImView()
 	end
 	just.sameline()
-	just.indent(8)
-	LabelImView(id .. "label", label, _h)
+	imgui.label(id .. "label", label)
 	return v
 end
 
@@ -118,8 +126,7 @@ function imgui.list(id, v, values, height, format, label)
 	end
 	scrolls[id] = ListImView()
 	just.sameline()
-	just.indent(8)
-	LabelImView(id .. "label", label, _h)
+	imgui.label(id .. "label", label)
 	return v
 end
 
@@ -134,8 +141,7 @@ function imgui.intButtons(id, v, s, label)
 			v = v + (button == 1 and 1 or -1) * d
 		end
 	end
-	just.indent(8)
-	LabelImView(id .. "label", label, _h)
+	imgui.label(id .. "label", label)
 	just.row(false)
 	return math.floor(v)
 end
@@ -148,8 +154,7 @@ function imgui.hotkey(id, key, label)
 	local _
 	_, key = HotkeyImView(id, "keyboard", key, _w, _h)
 	just.sameline()
-	just.indent(8)
-	LabelImView(id .. "label", label, _h)
+	imgui.label(id .. "label", label)
 	return key
 end
 
@@ -157,7 +162,7 @@ function imgui.input(id, text, label)
 	local _
 	_, text = TextInputImView(id, text, nil, _w, _h)
 	just.sameline()
-	LabelImView(id .. "label", label, _h)
+	imgui.label(id .. "label", label)
 	return text
 end
 
