@@ -72,7 +72,7 @@ RoomUsersListView.drawItem = function(self, i, w, h)
 	just.offset(w / 2)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 18))
 	LabelImView(user, description, h)
-	just.row(false)
+	just.row()
 
 	if not multiplayerModel:isHost() or room.hostPeerId == user.peerId then
 		return

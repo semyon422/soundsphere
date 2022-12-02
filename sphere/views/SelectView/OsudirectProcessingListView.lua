@@ -18,7 +18,7 @@ OsudirectProcessingListView.drawItem = function(self, i, w, h)
 	TextCellImView(w - 88, h, "right", item.status, "")
 	just.indent(88 - w)
 	TextCellImView(math.huge, h, "left", item.artist, item.title)
-	just.row(false)
+	just.row()
 end
 
 return OsudirectProcessingListView

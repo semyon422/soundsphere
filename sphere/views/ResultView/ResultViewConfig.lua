@@ -308,7 +308,7 @@ local function JudgementSelector(item, w, h)
 	if TextButtonImView(name .. "judgement>", ">", h, h, "center") and v < item[3] then
 		selectorState[name] = v + 1
 	end
-	just.row(false)
+	just.row()
 
 	return ret
 end
@@ -643,7 +643,7 @@ local function NotechartInfo(self)
 		TextCellImView(w, 55, "right", "max error", ("%d"):format(scoreEngine.scoreSystem.misc.maxDeltaTime * 1000))
 	end
 
-	just.row(false)
+	just.row()
 end
 
 local function ModifierIconGrid(self)
@@ -699,7 +699,7 @@ local function BottomScreenMenu(self)
 			)
 		end
 	end
-	just.row(false)
+	just.row()
 end
 
 local function MatchPlayers(self)

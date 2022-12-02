@@ -57,7 +57,7 @@ AvailableModifierListView.drawItem = function(self, i, w, h)
 		love.graphics.setFont(spherefonts.get("Noto Sans", 16))
 		gfx_util.printFrame(text, 0, 0, w - 22, h / 4, "right", "center")
 	end
-	just.row(false)
+	just.row()
 end
 
 return AvailableModifierListView

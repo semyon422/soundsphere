@@ -101,7 +101,7 @@ local function Cells(self)
 	just.indent(22)
 	BarCellImView(2 * w, h, "right", "long notes", longNoteRatio)
 	TextCellImView(2 * w, h, "right", "local offset", localOffset * 1000)
-	just.row(false)
+	just.row()
 end
 
 local function Background(self)
@@ -190,7 +190,7 @@ local function Header(self)
 	if IconButtonImView("quit game", "clear", h, 0.5) then
 		love.event.quit()
 	end
-	just.row(false)
+	just.row()
 end
 
 local function RoomUsersList(self)
@@ -334,7 +334,7 @@ local function ChatWindow(self)
 	just.text(left)
 	love.graphics.line(0, 0, 0, lineHeight)
 	just.text(right)
-	just.row(false)
+	just.row()
 
 	if changed then
 		chat.scroll = overlap

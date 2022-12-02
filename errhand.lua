@@ -38,7 +38,7 @@ local function draw()
 	if imgui.button("error", "error") then
 		error(message .. "\n" .. trace)
 	end
-	just.row(false)
+	just.row()
 
 	ContainerImView("error container", w, h - (just.height - h0), _h, scrollY)
 	just.indent(10)

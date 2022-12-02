@@ -58,7 +58,7 @@ local function Header(self)
 	if IconButtonImView("quit game", "clear", h, 0.5) then
 		love.event.quit()
 	end
-	just.row(false)
+	just.row()
 
 	local w, h = Layout:move("column2", "header")
 

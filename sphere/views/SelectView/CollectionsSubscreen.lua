@@ -63,7 +63,7 @@ local function CollectionsSubscreen(self)
 	if TextButtonImView("direct", "direct", w / 2, h) then
 		self:switchToOsudirect()
 	end
-	just.row(false)
+	just.row()
 end
 
 return function(self)

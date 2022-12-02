@@ -106,7 +106,7 @@ return ModalImView(function(self)
 					just.focus()
 				end
 			end
-			just.row(false)
+			just.row()
 			love.graphics.setColor(1, 1, 1, 0.2)
 			love.graphics.line(0, 0, w, 0)
 			love.graphics.setColor(1, 1, 1, 1)

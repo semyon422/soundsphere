@@ -52,7 +52,7 @@ local function drawTimings(t, name, id, norm, mins, w, h)
 	JudgementBarImView(w / 4, h, -t[1] / norm, name, t[1] * 1000, true)
 	JudgementBarImView(w / 4, h, t[2] / norm, name, t[2] * 1000)
 	t[2] = math.min(math.max(intButtonsMs(id .. 2, t[2], w / 4, h), min2), 1)
-	just.row(false)
+	just.row()
 end
 
 local osuOD = 0
@@ -109,7 +109,7 @@ return ModalImView(function(self)
 		self.game:resetGameplayConfigs()
 		etternaJudgement = etternaJudgement % 9 + 1
 	end
-	just.row(false)
+	just.row()
 
 	local timings = gameplay.timings
 

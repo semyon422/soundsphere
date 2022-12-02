@@ -77,7 +77,7 @@ function drawTabs()
 			scrollY = 0
 		end
 	end
-	just.row(false)
+	just.row()
 	love.graphics.line(0, 0, w, 0)
 end
 

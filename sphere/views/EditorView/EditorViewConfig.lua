@@ -67,7 +67,7 @@ local function Header(self)
 	if IconButtonImView("quit game", "clear", h, 0.5) then
 		-- love.event.quit()
 	end
-	just.row(false)
+	just.row()
 end
 
 local function Controls(self)
@@ -95,7 +95,7 @@ local function Controls(self)
 		self.game.rhythmModel.audioEngine:pause()
 	end
 
-	-- just.row(false)
+	-- just.row()
 end
 
 return function(self)

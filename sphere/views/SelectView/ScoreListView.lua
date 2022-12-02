@@ -42,7 +42,7 @@ ScoreListView.drawItem = function(self, i, w, h)
 	if just.mouse_over(i .. "b", just.is_over(-w * 2, h), "mouse") then
 		self.game.gameView.tooltip = os.date("%c", item.time)
 	end
-	just.row(false)
+	just.row()
 end
 
 ScoreListView.drawItemOnline = function(self, i, w, h)
@@ -63,7 +63,7 @@ ScoreListView.drawItemOnline = function(self, i, w, h)
 	if just.mouse_over(i .. "b", just.is_over(-w * 3, h), "mouse") then
 		self.game.gameView.tooltip = os.date("%c", item.time)
 	end
-	just.row(false)
+	just.row()
 end
 
 return ScoreListView

@@ -13,6 +13,8 @@ return function(id, text, index, w, h)
 	end
 
 	just.push()
+	just.origin()
+	just.row(true)
 
 	local r = h * size / 2
 	local x = h * (1 - size) / 2
@@ -39,15 +41,12 @@ return function(id, text, index, w, h)
 		end
 		changed, text, index, left, right = just.textinput(text, index)
 		just.text(left)
-		just.sameline()
 		local offset = just.text(right)
-		just.sameline()
 		just.indent(-offset)
 		love.graphics.line(1, lh * 0.15, 1, lh * 0.85)
 	else
 		index = utf8.len(text) + 1
 		just.text(text)
-		just.sameline()
 	end
 
 	if not changed and text == "" then

@@ -22,7 +22,7 @@ local function BottomScreenMenu(self)
 	if TextButtonImView("quit", "quit", w, h) then
 		self:quit()
 	end
-	just.row(false)
+	just.row()
 end
 
 local function Text(self)

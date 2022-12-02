@@ -152,7 +152,7 @@ local function Cells(self)
 	just.indent(22)
 	BarCellImView(2 * w, h, "right", "long notes", longNoteRatio)
 	TextCellImView(2 * w, h, "right", "local offset", localOffset * 1000)
-	just.row(false)
+	just.row()
 
 	w, h = Layout:move("column1row2")
 	drawFrameRect(w, h)
@@ -168,7 +168,7 @@ local function Cells(self)
 	just.row(true)
 	TextCellImView(w, h, "right", "difficulty", Format.difficulty(difficulty))
 	TextCellImView(w, h, "right", "miss count", ("%d"):format(missCount))
-	just.row(false)
+	just.row()
 end
 
 local bannerGradient
@@ -353,7 +353,7 @@ local function NotechartsSubscreen(self)
 	if TextButtonImView("multi", "multi", w, h) then
 		gameView:setModal(require("sphere.views.LobbyView"))
 	end
-	just.row(false)
+	just.row()
 
 	w, h = Layout:move("column3", "footer")
 
@@ -368,7 +368,7 @@ local function NotechartsSubscreen(self)
 	if TextButtonImView("direct", "direct", w / 2, h) then
 		self:switchToOsudirect()
 	end
-	just.row(false)
+	just.row()
 
 	w, h = Layout:move("column2row2row1")
 
@@ -387,7 +387,7 @@ local function NotechartsSubscreen(self)
 	if IconButtonImView("play", "keyboard_arrow_right", h, 0.5) then
 		self:play()
 	end
-	just.row(false)
+	just.row()
 
 	w, h = Layout:move("column1row1row1")
 

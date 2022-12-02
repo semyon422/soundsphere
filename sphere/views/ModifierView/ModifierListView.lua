@@ -97,7 +97,7 @@ ModifierListView.drawItem = function(self, i, w, h)
 		end
 		StepperView:draw(w2, h, value, count)
 	end
-	just.row(false)
+	just.row()
 end
 
 return ModifierListView

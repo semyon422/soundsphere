@@ -43,40 +43,37 @@ return ModalImView(function(self)
 
 	imgui.setSize(w, h, 110, 55)
 
+	just.row(true)
 	tempo = imgui.input("tempo input", tempo, "tempo")
-	just.sameline()
 	if imgui.button("add tempo button", "add") then
 		ld:getTempoData(dtp.measureTime, tonumber(tempo))
 	end
 
+	just.row(true)
 	stop[1] = imgui.input("stop n input", stop[1])
-	just.sameline()
 	imgui.unindent()
 	imgui.label("/ label", "/")
-	just.sameline()
 	stop[2] = imgui.input("stop d input", stop[2], "stop")
-	just.sameline()
 	if imgui.button("add stop button", "add") then
 		ld:getStopData(dtp.measureTime, Fraction(tonumber(stop[1]), tonumber(stop[2])))
 	end
 
+	just.row(true)
 	velocity = imgui.input("velocity input", velocity, "velocity")
-	just.sameline()
 	if imgui.button("add velocity button", "add") then
 		ld:getVelocityData(dtp.measureTime, dtp.side, tonumber(velocity))
 	end
 
+	just.row(true)
 	expand[1] = imgui.input("expand n input", expand[1])
-	just.sameline()
 	imgui.unindent()
 	imgui.label("/ label", "/")
-	just.sameline()
 	expand[2] = imgui.input("expand d input", expand[2], "expand")
-	just.sameline()
 	if imgui.button("add expand button", "add") then
 		ld:getExpandData(dtp.measureTime, dtp.side, Fraction(tonumber(expand[1]), tonumber(expand[2])))
 	end
 
+	just.row()
 	imgui.setSize(w, h, w / 2, 55)
 
 	if dtp._tempoData then

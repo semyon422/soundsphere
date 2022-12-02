@@ -98,7 +98,7 @@ local function OsudirectSubscreen(self)
 	if TextButtonImView("collections", "collections", w / 2, h) then
 		self:switchToCollections()
 	end
-	just.row(false)
+	just.row()
 
 	w, h = Layout:move("column2row2row1")
 

@@ -142,7 +142,7 @@ function imgui.intButtons(id, v, s, label)
 		end
 	end
 	imgui.label(id .. "label", label)
-	just.row(false)
+	just.row()
 	return math.floor(v)
 end
 

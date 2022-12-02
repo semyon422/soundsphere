@@ -52,7 +52,7 @@ return ModalImView(function(self)
 			currentDevice = device
 		end
 	end
-	just.row(false)
+	just.row()
 	love.graphics.line(0, 0, w, 0)
 
 	ContainerImView(window_id, w, h - _h, _h * 2, scrollY)

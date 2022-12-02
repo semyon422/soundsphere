@@ -130,7 +130,7 @@ SnapGridView.drawUI = function(self, w, h)
 	if imgui.button("next tp", "next") and dtp.next then
 		editorModel:scrollTimePoint(dtp.next)
 	end
-	just.row(false)
+	just.row()
 
 	just.pop()
 end
@@ -189,7 +189,7 @@ SnapGridView.draw = function(self)
 	if pixels then
 		editorModel:scrollSeconds((my - prevMouseY) / pixels)
 	end
-	just.row(false)
+	just.row()
 	just.pop()
 
 	prevMouseY = my
