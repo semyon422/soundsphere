@@ -38,11 +38,11 @@ return function(id, text, index, w, h)
 			just.focus()
 		end
 		changed, text, index, left, right = just.textinput(text, index)
-		local offset = just.text(left)
+		just.text(left)
 		just.sameline()
-		just.text(right)
+		local offset = just.text(right)
 		just.sameline()
-		just.offset(offset)
+		just.indent(-offset)
 		love.graphics.line(1, lh * 0.15, 1, lh * 0.85)
 	else
 		index = utf8.len(text) + 1
