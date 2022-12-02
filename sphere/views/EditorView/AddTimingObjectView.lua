@@ -5,16 +5,20 @@ local imgui = require("sphere.imgui")
 local spherefonts = require("sphere.assets.fonts")
 local _transform = require("gfx_util").transform
 local just = require("just")
+local Fraction = require("ncdk.Fraction")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local scrollY = 0
-local w, h = 400, 1080 / 2
+local w, h = 512, 1080 / 2
 local _w, _h = w / 2, 55
 local r = 8
 local window_id = "AddTimingObjectView"
 
-local tempo = 60
+local tempo = "60"
+local stop = {"0", "1"}
+local velocity = "1"
+local expand = {"0", "1"}
 return ModalImView(function(self)
 	if not self then
 		return true
@@ -37,15 +41,70 @@ return ModalImView(function(self)
 
 	local dtp = editorModel:getDynamicTimePoint()
 
-	tempo = imgui.slider1("add tempo slider", tempo, "%d bpm", 10, 1000, 10, "tempo")
-	if imgui.button("add tempo button", "add tempo") then
-		ld:getTempoData(dtp.measureTime, tempo)
+	imgui.setSize(w, h, 110, 55)
+
+	tempo = imgui.input("tempo input", tempo, "tempo")
+	just.sameline()
+	if imgui.button("add tempo button", "add") then
+		ld:getTempoData(dtp.measureTime, tonumber(tempo))
 	end
 
+	stop[1] = imgui.input("stop n input", stop[1])
+	just.sameline()
+	imgui.unindent()
+	imgui.label("/ label", "/")
+	just.sameline()
+	stop[2] = imgui.input("stop d input", stop[2], "stop")
+	just.sameline()
+	if imgui.button("add stop button", "add") then
+		ld:getStopData(dtp.measureTime, Fraction(tonumber(stop[1]), tonumber(stop[2])))
+	end
+
+	velocity = imgui.input("velocity input", velocity, "velocity")
+	just.sameline()
+	if imgui.button("add velocity button", "add") then
+		ld:getVelocityData(dtp.measureTime, dtp.side, tonumber(velocity))
+	end
+
+	expand[1] = imgui.input("expand n input", expand[1])
+	just.sameline()
+	imgui.unindent()
+	imgui.label("/ label", "/")
+	just.sameline()
+	expand[2] = imgui.input("expand d input", expand[2], "expand")
+	just.sameline()
+	if imgui.button("add expand button", "add") then
+		ld:getExpandData(dtp.measureTime, dtp.side, Fraction(tonumber(expand[1]), tonumber(expand[2])))
+	end
+
+	imgui.setSize(w, h, w / 2, 55)
+
 	if dtp._tempoData then
-		just.text("Tempo: " .. dtp._tempoData.tempo)
-		if imgui.button("remove tempo button", "remove tempo") then
+		imgui.label("tempo label", "Tempo: " .. dtp._tempoData.tempo .. " bpm")
+		just.sameline()
+		if imgui.button("remove tempo button", "remove") then
 			ld:removeTempoData(dtp.measureTime)
+		end
+	end
+	if dtp._stopData then
+		imgui.label("stop label", "Stop: " .. dtp._stopData.duration .. " beats")
+		just.sameline()
+		if imgui.button("remove stop button", "remove") then
+			ld:removeStopData(dtp.measureTime)
+		end
+	end
+	if dtp._velocityData then
+		imgui.label("velocity label", "Velocity: " .. dtp._velocityData.currentSpeed .. " x")
+		just.sameline()
+		if imgui.button("remove velocity button", "remove") then
+			ld:removeVelocityData(dtp.measureTime, dtp.side)
+		end
+	end
+	if dtp._expandData then
+		imgui.label("expand label", "Expand: " .. dtp._expandData.duration .. " beats")
+		just.sameline()
+		if imgui.button("remove expand button", "remove") then
+			ld:removeExpandData(dtp.measureTime, dtp.side)
 		end
 	end
 
