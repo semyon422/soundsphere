@@ -18,11 +18,11 @@ local function getTimePointText(timePoint)
 	if timePoint._tempoData then
 		return timePoint._tempoData.tempo .. " bpm"
 	elseif timePoint._stopData then
-		return "stop " .. timePoint._stopData.duration:tonumber() .. " beats"
+		return "stop " .. tostring(timePoint._stopData.duration) .. " beats"
 	elseif timePoint._velocityData then
 		return timePoint._velocityData.currentSpeed .. "x"
 	elseif timePoint._expandData then
-		return "expand into " .. timePoint._expandData.duration:tonumber() .. " beats"
+		return "expand into " .. tostring(timePoint._expandData.duration) .. " beats"
 	end
 end
 
@@ -111,7 +111,17 @@ SnapGridView.drawUI = function(self, w, h)
 
 	local dtp = editorModel:getDynamicTimePoint()
 
-	just.text(tostring(dtp))
+	local ld = editorModel.layerData
+	local measureOffset = dtp.measureTime:floor()
+	local signature = ld:getSignature(measureOffset)
+	local snap = editorModel.snap
+
+	local beatTime = (dtp.measureTime - measureOffset) * signature
+	local snapTime = (beatTime - beatTime:floor()) * snap
+
+	just.text("time point: " .. tostring(dtp))
+	just.text("beat: " .. tostring(beatTime))
+	just.text("snap: " .. tostring(snapTime))
 
 	just.row(true)
 	if imgui.button("prev tp", "prev") and dtp.prev then
