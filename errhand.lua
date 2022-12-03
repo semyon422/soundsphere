@@ -1,8 +1,7 @@
 local inspect = require("inspect")
 local utf8validate = require("utf8validate")
 local just = require("just")
-local imgui = require("sphere.imgui")
-local ContainerImView = require("sphere.imviews.ContainerImView")
+local imgui = require("imgui")
 local errhand = love.errhand
 
 local message = ""
@@ -40,10 +39,10 @@ local function draw()
 	end
 	just.row()
 
-	ContainerImView("error container", w, h - (just.height - h0), _h, scrollY)
+	imgui.Container("error container", w, h - (just.height - h0), _h, scrollY)
 	just.indent(10)
 	just.text(message .. "\n" .. trace, w - _h)
-	scrollY = ContainerImView()
+	scrollY = imgui.Container()
 end
 
 local handlers = {}

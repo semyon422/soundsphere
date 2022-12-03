@@ -1,10 +1,10 @@
 local just = require("just")
 local spherefonts = require("sphere.assets.fonts")
+local icons = require("sphere.assets.icons")
 local time_util = require("time_util")
 local loop = require("loop")
+local imgui = require("imgui")
 
-local IconButtonImView = require("sphere.imviews.IconButtonImView")
-local LabelImView = require("sphere.imviews.LabelImView")
 local BackgroundView = require("sphere.views.BackgroundView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
 local UserInfoView = require("sphere.views.UserInfoView")
@@ -55,7 +55,7 @@ local function Header(self)
 	just.offset(0)
 
 	LogoImView("logo", h, 0.5)
-	if IconButtonImView("quit game", "clear", h, 0.5) then
+	if imgui.IconOnlyButton("quit game", icons("clear"), h, 0.5) then
 		love.event.quit()
 	end
 	just.row()
@@ -64,7 +64,7 @@ local function Header(self)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
 	just.indent(10)
-	LabelImView("SessionTime", time_util.format(loop.time - loop.startTime), h)
+	imgui.Label("SessionTime", time_util.format(loop.time - loop.startTime), h)
 end
 
 return function(self)

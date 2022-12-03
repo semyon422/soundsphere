@@ -3,7 +3,7 @@ local gfx_util = require("gfx_util")
 local spherefonts = require("sphere.assets.fonts")
 local just = require("just")
 local Fraction = require("ncdk.Fraction")
-local imgui = require("sphere.imgui")
+local imgui = require("imgui")
 
 local Layout = require("sphere.views.EditorView.Layout")
 

@@ -1,22 +1,11 @@
 local just = require("just")
-local spherefonts		= require("sphere.assets.fonts")
-local gfx_util = require("gfx_util")
+local spherefonts = require("sphere.assets.fonts")
+local icons = require("sphere.assets.icons")
 local math_util = require("math_util")
+local imgui = require("imgui")
 
 local BackgroundView = require("sphere.views.BackgroundView")
-local UserInfoView = require("sphere.views.UserInfoView")
 local LogoImView = require("sphere.imviews.LogoImView")
-
-local TextCellImView = require("sphere.imviews.TextCellImView")
-local BarCellImView = require("sphere.imviews.BarCellImView")
-local IconButtonImView = require("sphere.imviews.IconButtonImView")
-local TextButtonImView = require("sphere.imviews.TextButtonImView")
-local CheckboxImView = require("sphere.imviews.CheckboxImView")
-local SliderImView = require("sphere.imviews.SliderImView")
-local LabelImView = require("sphere.imviews.LabelImView")
-local RoundedRectangle = require("sphere.views.RoundedRectangle")
-
-local time_util = require("time_util")
 
 local Layout = require("sphere.views.EditorView.Layout")
 
@@ -46,7 +35,7 @@ end
 local function ScreenMenu(self)
 	local w, h = Layout:move("column3", "header")
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
-	-- if TextButtonImView("Leave", "Leave", 120, h) then
+	-- if imgui.TextOnlyButton("Leave", "Leave", 120, h) then
 	-- end
 end
 
@@ -64,7 +53,7 @@ local function Header(self)
 	just.row(true)
 
 	LogoImView("logo", h, 0.5)
-	if IconButtonImView("quit game", "clear", h, 0.5) then
+	if imgui.IconOnlyButton("quit game", icons("clear"), h, 0.5) then
 		-- love.event.quit()
 	end
 	just.row()
@@ -80,17 +69,17 @@ local function Controls(self)
 
 	local currentTime = timeEngine.currentTime
 	local normTime = math_util.map(currentTime, timeEngine.minTime, timeEngine.maxTime, 0, 1)
-	local value = SliderImView("playback scroll", normTime, w, h / 2, "qwe")
+	local value = imgui.Slider("playback scroll", normTime, w, h / 2, "qwe")
 	if value then
 		local time = math_util.map(value, 0, 1, timeEngine.minTime, timeEngine.maxTime)
 		timeEngine:setPosition(time)
 	end
 
-	if TextButtonImView("play", "play", 100, 55, "center") then
+	if imgui.TextOnlyButton("play", "play", 100, 55, "center") then
 		self.game.rhythmModel.timeEngine:play()
 		self.game.rhythmModel.audioEngine:play()
 	end
-	if TextButtonImView("pause", "pause", 100, 55, "center") then
+	if imgui.TextOnlyButton("pause", "pause", 100, 55, "center") then
 		self.game.rhythmModel.timeEngine:pause()
 		self.game.rhythmModel.audioEngine:pause()
 	end

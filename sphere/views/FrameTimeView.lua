@@ -3,7 +3,7 @@ local Profiler = require("Profiler")
 local spherefonts = require("sphere.assets.fonts")
 local loop = require("loop")
 local just = require("just")
-local TextButtonImView = require("sphere.imviews.TextButtonImView")
+local imgui = require("imgui")
 
 local FrameTimeView = Class:new()
 
@@ -178,7 +178,7 @@ FrameTimeView.drawFPS = function(self)
 	if self.profiler then
 		action = "disable"
 	end
-	if TextButtonImView("switch profiler", action .. " profiler", 200, 60) then
+	if imgui.TextOnlyButton("switch profiler", action .. " profiler", 200, 60) then
 		if self.profiler then
 			Profiler:stop()
 		else

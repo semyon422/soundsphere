@@ -1,11 +1,6 @@
 local just = require("just")
-local LabelImView = require("sphere.imviews.LabelImView")
-local HotkeyImView = require("sphere.imviews.HotkeyImView")
-local TextButtonImView = require("sphere.imviews.TextButtonImView")
-local TextButtonImView2 = require("sphere.imviews.TextButtonImView2")
+local imgui = require("imgui")
 local ModalImView = require("sphere.imviews.ModalImView")
-local ContainerImView = require("sphere.imviews.ContainerImView")
-local ListImView = require("sphere.imviews.ListImView")
 local _transform = require("gfx_util").transform
 local spherefonts = require("sphere.assets.fonts")
 
@@ -39,20 +34,20 @@ return ModalImView(function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	just.push()
-	ContainerImView(window_id, w, h, _h * 2, scrollY)
+	imgui.Container(window_id, w, h, _h * 2, scrollY)
 
-	ListImView("mount points", w, h / 2, _h, scrollYlist)
+	imgui.List("mount points", w, h / 2, _h, scrollYlist)
 	for i = 1, #items do
 		local item = items[i]
 		local name = item[2]
 		if selectedItem == item then
 			name = "> " .. name
 		end
-		if TextButtonImView("mount item" .. i, name, w, _h, "left") then
+		if imgui.TextOnlyButton("mount item" .. i, name, w, _h, "left") then
 			selectedItem = item
 		end
 	end
-	scrollYlist = ListImView()
+	scrollYlist = imgui.List()
 
 	if selectedItem then
 		just.indent(8)
@@ -61,11 +56,11 @@ return ModalImView(function(self)
 		just.text("Real path: ")
 		just.indent(8)
 		just.text(selectedItem[1], w)
-		if TextButtonImView2("open dir", "Open", 200, _h) then
+		if imgui.TextButton("open dir", "Open", 200, _h) then
 			love.system.openURL(selectedItem[1])
 		end
 		just.sameline()
-		if TextButtonImView2("remove dir", "Remove", 200, _h) then
+		if imgui.TextButton("remove dir", "Remove", 200, _h) then
 			for i = 1, #items do
 				if items[i] == selectedItem then
 					table.remove(items, i)
@@ -76,7 +71,7 @@ return ModalImView(function(self)
 		end
 	end
 
-	scrollY = ContainerImView()
+	scrollY = imgui.Container()
 	just.pop()
 
 	love.graphics.setColor(1, 1, 1, 1)

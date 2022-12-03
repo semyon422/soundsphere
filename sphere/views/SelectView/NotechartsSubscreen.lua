@@ -1,14 +1,10 @@
 local just = require("just")
 local spherefonts = require("sphere.assets.fonts")
+local icons = require("sphere.assets.icons")
 local gfx_util = require("gfx_util")
 local time_util = require("time_util")
+local imgui = require("imgui")
 
-local IconButtonImView = require("sphere.imviews.IconButtonImView")
-local TextButtonImView = require("sphere.imviews.TextButtonImView")
-local CheckboxImView = require("sphere.imviews.CheckboxImView")
-local LabelImView = require("sphere.imviews.LabelImView")
-local TextInputImView = require("sphere.imviews.TextInputImView")
-local SpoilerListImView = require("sphere.imviews.SpoilerListImView")
 local BackgroundView = require("sphere.views.BackgroundView")
 local ScoreListView	= require("sphere.views.SelectView.ScoreListView")
 
@@ -18,7 +14,6 @@ local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridVi
 local BarCellImView = require("sphere.imviews.BarCellImView")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
-local ScrollBarImView = require("sphere.imviews.ScrollBarImView")
 local RoundedRectangle = require("sphere.views.RoundedRectangle")
 
 local Layout = require("sphere.views.SelectView.Layout")
@@ -55,7 +50,7 @@ local function ScoreList(self)
 	local list = ScoreListView
 	local count = #list.items - 1
 	local pos = (list.visualItemIndex - 1) / count
-	local newScroll = ScrollBarImView("score_sb", pos, 16, h, count / list.rows)
+	local newScroll = imgui.ScrollBar("score_sb", pos, 16, h, count / list.rows)
 	if newScroll then
 		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
 	end
@@ -76,7 +71,7 @@ local function NoteChartSetList(self)
 	local list = NoteChartSetListView
 	local count = #list.items - 1
 	local pos = (list.visualItemIndex - 1) / count
-	local newScroll = ScrollBarImView("ncs_sb", pos, 16, h, count / list.rows)
+	local newScroll = imgui.ScrollBar("ncs_sb", pos, 16, h, count / list.rows)
 	if newScroll then
 		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
 	end
@@ -203,7 +198,7 @@ local function SearchField(self)
 	local delAll = love.keyboard.isDown("lctrl") and love.keyboard.isDown("backspace")
 
 	local text = self.game.searchModel.filterString
-	local changed, text = TextInputImView("SearchField", {text, "Filter..."}, nil, w / 2, h - padding * 2)
+	local changed, text = imgui.TextInput("SearchField", {text, "Filter..."}, nil, w / 2, h - padding * 2)
 	if changed == "text" then
 		if delAll then text = "" end
 		self.game.searchModel:setSearchString("filter", text)
@@ -213,7 +208,7 @@ local function SearchField(self)
 	love.graphics.translate(w / 2, padding)
 
 	local text = self.game.searchModel.lampString
-	local changed, text = TextInputImView("SearchFieldLamp", {text, "Lamp..."}, nil, w / 2, h - padding * 2)
+	local changed, text = imgui.TextInput("SearchFieldLamp", {text, "Lamp..."}, nil, w / 2, h - padding * 2)
 	if changed == "text" then
 		if delAll then text = "" end
 		self.game.searchModel:setSearchString("lamp", text)
@@ -222,7 +217,7 @@ local function SearchField(self)
 	w, h = Layout:move("column3", "header")
 	love.graphics.translate(w + h / 2, 0)
 
-	if IconButtonImView("edit", "create", h, 0.5) then
+	if imgui.IconOnlyButton("edit", icons("create"), h, 0.5) then
 		self:edit()
 	end
 end
@@ -232,7 +227,7 @@ local function SortDropdown(self)
 	love.graphics.translate(w * 2 / 3, 15)
 
 	local sortModel = self.game.sortModel
-	local i = SpoilerListImView("SortDropdown", w / 3, h - 30, sortModel.names, sortModel.name)
+	local i = imgui.SpoilerList("SortDropdown", w / 3, h - 30, sortModel.names, sortModel.name)
 	if i then
 		self.game.selectModel:setSortFunction(sortModel:fromIndexValue(i), true)
 	end
@@ -250,7 +245,7 @@ local function NotechartFilterDropdown(self)
 
 	local filters = self.game.configModel.configs.filters.notechart
 	local config = self.game.configModel.configs.select
-	local i = SpoilerListImView("NotechartFilterDropdown", w * size, h, filters, config.filterName, filter_to_string)
+	local i = imgui.SpoilerList("NotechartFilterDropdown", w * size, h, filters, config.filterName, filter_to_string)
 	if i then
 		config.filterName = filters[i].name
 		self.game.selectModel:noDebouncePullNoteChartSet()
@@ -266,7 +261,7 @@ local function ScoreFilterDropdown(self)
 
 	local filters = self.game.configModel.configs.filters.score
 	local config = self.game.configModel.configs.select
-	local i = SpoilerListImView("ScoreFilterDropdown", w * size, h, filters, config.scoreFilterName, filter_to_string)
+	local i = imgui.SpoilerList("ScoreFilterDropdown", w * size, h, filters, config.scoreFilterName, filter_to_string)
 	if i then
 		config.scoreFilterName = filters[i].name
 		self.game.selectModel:pullScore()
@@ -282,7 +277,7 @@ local function ScoreSourceDropdown(self)
 
 	local sources = self.game.scoreLibraryModel.scoreSources
 	local config = self.game.configModel.configs.select
-	local i = SpoilerListImView("ScoreSourceDropdown", w * size, h, sources, config.scoreSourceName)
+	local i = imgui.SpoilerList("ScoreSourceDropdown", w * size, h, sources, config.scoreSourceName)
 	if i then
 		config.scoreSourceName = sources[i]
 		self.game.selectModel:updateScoreOnline()
@@ -291,17 +286,17 @@ end
 
 local function GroupCheckbox(self)
 	local w, h = Layout:move("column2", "header")
-	love.graphics.translate(w / 3, 0)
 	w = w / 3
 
+	love.graphics.translate(w, h / 6)
 	local collapse = self.game.noteChartSetLibraryModel.collapse
-	if CheckboxImView(self, collapse, h, 0.4) then
+	if imgui.Checkbox(self, collapse, h * 2 / 3, 0.4) then
 		self.game.selectModel:changeCollapse()
 	end
 	just.sameline()
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
-	LabelImView(self, "group", h)
+	imgui.Label(self, "group", h * 2 / 3)
 end
 
 local function ModifierIconGrid(self)
@@ -335,22 +330,22 @@ local function NotechartsSubscreen(self)
 
 	local gameView = self.game.gameView
 	just.row(true)
-	if IconButtonImView("settings", "settings", h, 0.5) then
+	if imgui.IconOnlyButton("settings", icons("settings"), h, 0.5) then
 		gameView:setModal(require("sphere.views.SettingsView"))
 	end
-	if IconButtonImView("mounts", "folder_open", h, 0.5) then
+	if imgui.IconOnlyButton("mounts", icons("folder_open"), h, 0.5) then
 		gameView:setModal(require("sphere.views.MountsView"))
 	end
-	if TextButtonImView("modifiers", "mods", w, h) then
+	if imgui.TextOnlyButton("modifiers", "mods", w, h) then
 		gameView:setModal(require("sphere.views.ModifierView"))
 	end
-	if TextButtonImView("noteskins", "skins", w, h) then
+	if imgui.TextOnlyButton("noteskins", "skins", w, h) then
 		gameView:setModal(require("sphere.views.NoteSkinView"))
 	end
-	if TextButtonImView("input", "input", w, h) then
+	if imgui.TextOnlyButton("input", "input", w, h) then
 		gameView:setModal(require("sphere.views.InputView"))
 	end
-	if TextButtonImView("multi", "multi", w, h) then
+	if imgui.TextOnlyButton("multi", "multi", w, h) then
 		gameView:setModal(require("sphere.views.LobbyView"))
 	end
 	just.row()
@@ -359,13 +354,13 @@ local function NotechartsSubscreen(self)
 
 	just.row(true)
 	just.indent(-h)
-	if TextButtonImView("pause music", "pause", h, h) then
+	if imgui.TextOnlyButton("pause music", "pause", h, h) then
 		self.game.previewModel:stop()
 	end
-	if TextButtonImView("collections", "collections", w / 2, h) then
+	if imgui.TextOnlyButton("collections", "collections", w / 2, h) then
 		self:switchToCollections()
 	end
-	if TextButtonImView("direct", "direct", w / 2, h) then
+	if imgui.TextOnlyButton("direct", "direct", w / 2, h) then
 		self:switchToOsudirect()
 	end
 	just.row()
@@ -374,17 +369,17 @@ local function NotechartsSubscreen(self)
 
 	just.row(true)
 	just.indent(36)
-	if IconButtonImView("open directory", "folder_open", h, 0.5) then
+	if imgui.IconOnlyButton("open directory", icons("folder_open"), h, 0.5) then
 		self.game.selectController:openDirectory()
 	end
-	if IconButtonImView("update cache", "refresh", h, 0.5) then
+	if imgui.IconOnlyButton("update cache", icons("refresh"), h, 0.5) then
 		self.game.selectController:updateCache(true)
 	end
 	just.offset(w - h * 2 - 36)
-	if IconButtonImView("result", "info_outline", h, 0.5) then
+	if imgui.IconOnlyButton("result", icons("info_outline"), h, 0.5) then
 		self:result()
 	end
-	if IconButtonImView("play", "keyboard_arrow_right", h, 0.5) then
+	if imgui.IconOnlyButton("play", icons("keyboard_arrow_right"), h, 0.5) then
 		self:play()
 	end
 	just.row()
@@ -392,7 +387,7 @@ local function NotechartsSubscreen(self)
 	w, h = Layout:move("column1row1row1")
 
 	just.indent(36)
-	if IconButtonImView("open notechart page", "info_outline", h, 0.5) then
+	if imgui.IconOnlyButton("open notechart page", icons("info_outline"), h, 0.5) then
 		self.game.selectController:openWebNotechart()
 	end
 end

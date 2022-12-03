@@ -1,14 +1,10 @@
 local just = require("just")
-local TextButtonImView = require("sphere.imviews.TextButtonImView")
-local TextButtonImView2 = require("sphere.imviews.TextButtonImView2")
-local ContainerImView = require("sphere.imviews.ContainerImView")
+local imgui = require("imgui")
 local ModalImView = require("sphere.imviews.ModalImView")
 local TimingsModalView = require("sphere.views.TimingsModalView")
 local _transform = require("gfx_util").transform
-local round = require("math_util").round
 local spherefonts = require("sphere.assets.fonts")
 local version = require("version")
-local imgui = require("sphere.imgui")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -51,13 +47,13 @@ local function draw(self)
 	just.push()
 
 	drawTabs()
-	ContainerImView(window_id, w, h - _h, _h * 2, scrollY)
+	imgui.Container(window_id, w, h - _h, _h * 2, scrollY)
 
 	just.emptyline(8)
 	drawSection[currentSection](self)
 	just.emptyline(8)
 
-	scrollY = ContainerImView()
+	scrollY = imgui.Container()
 	just.pop()
 
 	love.graphics.setColor(1, 1, 1, 1)
@@ -72,13 +68,17 @@ function drawTabs()
 			love.graphics.rectangle("fill", 0, 0, w / #sections, _h)
 		end
 		love.graphics.setColor(1, 1, 1, 1)
-		if TextButtonImView("section " .. section, section, w / #sections, _h) then
+		if imgui.TextOnlyButton("section " .. section, section, w / #sections, _h) then
 			currentSection = section
 			scrollY = 0
 		end
 	end
 	just.row()
 	love.graphics.line(0, 0, w, 0)
+end
+
+local function intButtonsMs(id, v, label)
+	return imgui.intButtons(id, v * 1000, 1, label) / 1000
 end
 
 drawSection.gameplay = function(self)
@@ -88,7 +88,7 @@ drawSection.gameplay = function(self)
 
 	g.speed = imgui.slider1("speed", g.speed, "%0.2f", 0, 3, 0.01, "play speed")
 
-	if TextButtonImView2("open timings", "timings", _w / 2, _h) then
+	if imgui.TextButton("open timings", "timings", _w / 2, _h) then
 		self.game.gameView:setModal(TimingsModalView)
 	end
 	just.sameline()
@@ -99,12 +99,12 @@ drawSection.gameplay = function(self)
 	g.longNoteShortening = imgui.slider1(
 		"shortening", g.longNoteShortening * 1000, "%dms", -300, 0, 10,
 		"visual LN shortening") / 1000
-	g.offset.input = imgui.intButtonsMs("input offset", g.offset.input, "input offset")
-	g.offset.visual = imgui.intButtonsMs("visual offset", g.offset.visual, "visual offset")
+	g.offset.input = intButtonsMs("input offset", g.offset.input, "input offset")
+	g.offset.visual = intButtonsMs("visual offset", g.offset.visual, "visual offset")
 	g.offsetScale.input = imgui.checkbox("offsetScale.input", g.offsetScale.input, "input offset * time rate")
 	g.offsetScale.visual = imgui.checkbox("offsetScale.visual", g.offsetScale.visual, "visual offset * time rate")
 	g.lastMeanValues = imgui.intButtons("lastMeanValues", g.lastMeanValues, 1, "last mean values")
-	g.ratingHitTimingWindow = imgui.intButtonsMs("ratingHitTimingWindow", g.ratingHitTimingWindow, "rating hit timing window")
+	g.ratingHitTimingWindow = intButtonsMs("ratingHitTimingWindow", g.ratingHitTimingWindow, "rating hit timing window")
 
 	imgui.separator()
 	just.indent(10)

@@ -1,6 +1,8 @@
 local just = require("just")
-local spherefonts		= require("sphere.assets.fonts")
+local spherefonts = require("sphere.assets.fonts")
+local icons = require("sphere.assets.icons")
 local gfx_util = require("gfx_util")
+local imgui = require("imgui")
 
 local BackgroundView = require("sphere.views.BackgroundView")
 local UserInfoView = require("sphere.views.UserInfoView")
@@ -10,10 +12,6 @@ local RoomUsersListView = require("sphere.views.MultiplayerView.RoomUsersListVie
 local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 local BarCellImView = require("sphere.imviews.BarCellImView")
-local IconButtonImView = require("sphere.imviews.IconButtonImView")
-local TextButtonImView = require("sphere.imviews.TextButtonImView")
-local CheckboxImView = require("sphere.imviews.CheckboxImView")
-local LabelImView = require("sphere.imviews.LabelImView")
 local RoundedRectangle = require("sphere.views.RoundedRectangle")
 
 local time_util = require("time_util")
@@ -56,7 +54,7 @@ local function ScreenMenu(self)
 
 	local w, h = Layout:move("column3", "header")
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
-	if TextButtonImView("Leave", "Leave", 120, h) then
+	if imgui.TextOnlyButton("Leave", "Leave", 120, h) then
 		multiplayerModel:leaveRoom()
 	end
 end
@@ -144,10 +142,10 @@ local function DownloadButton(self)
 	local beatmap = multiplayerModel.downloadingBeatmap
 	if beatmap then
 		just.indent(w / 2)
-		LabelImView("beatmap status", beatmap.status, h)
+		imgui.Label("beatmap status", beatmap.status, h)
 	else
 		just.indent(w / 2)
-		if TextButtonImView("Download", multiplayerModel.noteChartItem and "Redownload" or "Download", 144, h) then
+		if imgui.TextOnlyButton("Download", multiplayerModel.noteChartItem and "Redownload" or "Download", 144, h) then
 			multiplayerModel:downloadNoteChart()
 		end
 	end
@@ -187,7 +185,7 @@ local function Header(self)
 	just.offset(0)
 
 	LogoImView("logo", h, 0.5)
-	if IconButtonImView("quit game", "clear", h, 0.5) then
+	if imgui.IconOnlyButton("quit game", icons("clear"), h, 0.5) then
 		love.event.quit()
 	end
 	just.row()
@@ -225,37 +223,37 @@ local function RoomSettings(self)
 
 	local isHost = multiplayerModel:isHost()
 	if isHost then
-		if CheckboxImView("Free chart", room.isFreeNotechart, 72, 0.5) then
+		if imgui.Checkbox("Free chart", room.isFreeNotechart, 72, 0.5) then
 			multiplayerModel:setFreeNotechart(not room.isFreeNotechart)
 		end
 		just.sameline()
-		LabelImView("Free chart", "Free chart", 72)
+		imgui.Label("Free chart", "Free chart", 72)
 
-		if CheckboxImView("Free mods", room.isFreeModifiers, 72, 0.5) then
+		if imgui.Checkbox("Free mods", room.isFreeModifiers, 72, 0.5) then
 			multiplayerModel:setFreeModifiers(not room.isFreeModifiers)
 		end
 		just.sameline()
-		LabelImView("Free mods", "Free mods", 72)
+		imgui.Label("Free mods", "Free mods", 72)
 
 		just.emptyline(36)
 	end
 
-	if CheckboxImView("Ready", user.isReady, 72, 0.5) then
+	if imgui.Checkbox("Ready", user.isReady, 72, 0.5) then
 		multiplayerModel:switchReady()
 	end
 	just.sameline()
-	LabelImView("Ready", "Ready", 72)
+	imgui.Label("Ready", "Ready", 72)
 
 	w, h = Layout:move("column3")
 	love.graphics.translate(36, h - 72 * 3)
 
 	if isHost or room.isFreeNotechart then
-		if TextButtonImView("Select chart", "Select", w - 72, 72) then
+		if imgui.TextOnlyButton("Select chart", "Select", w - 72, 72) then
 			self.screenView:changeScreen("selectView")
 		end
 	end
 	if isHost or room.isFreeModifiers then
-		if TextButtonImView("Modifiers", "Modifiers", w - 72, 72) then
+		if imgui.TextOnlyButton("Modifiers", "Modifiers", w - 72, 72) then
 			self.game.gameView:setModal(require("sphere.views.ModifierView"))
 		end
 	end
@@ -263,9 +261,9 @@ local function RoomSettings(self)
 	w, h = Layout:move("column3")
 	love.graphics.translate(36, h - 72)
 	if isHost then
-		if not room.isPlaying and TextButtonImView("Start match", "Start match", w - 72, 72) then
+		if not room.isPlaying and imgui.TextOnlyButton("Start match", "Start match", w - 72, 72) then
 			multiplayerModel:startMatch()
-		elseif room.isPlaying and TextButtonImView("Stop match", "Stop match", w - 72, 72) then
+		elseif room.isPlaying and imgui.TextOnlyButton("Stop match", "Stop match", w - 72, 72) then
 			multiplayerModel:stopMatch()
 		end
 	end

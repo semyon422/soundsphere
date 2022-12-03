@@ -1,5 +1,5 @@
 local JustConfig = require("sphere.JustConfig")
-local imgui = require("sphere.imgui")
+local imgui = require("imgui")
 
 local config = JustConfig:new()
 

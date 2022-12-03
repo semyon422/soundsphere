@@ -2,7 +2,7 @@ local just = require("just")
 local ModalImView = require("sphere.imviews.ModalImView")
 local _transform = require("gfx_util").transform
 local spherefonts = require("sphere.assets.fonts")
-local imgui = require("sphere.imgui")
+local imgui = require("imgui")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 

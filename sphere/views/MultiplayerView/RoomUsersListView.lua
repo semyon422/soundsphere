@@ -1,10 +1,7 @@
 local ListView = require("sphere.views.ListView")
 local just = require("just")
-local TextCellImView = require("sphere.imviews.TextCellImView")
-local LabelImView = require("sphere.imviews.LabelImView")
-local Format = require("sphere.views.Format")
-local TextButtonImView = require("sphere.imviews.TextButtonImView")
-local spherefonts		= require("sphere.assets.fonts")
+local imgui = require("imgui")
+local spherefonts = require("sphere.assets.fonts")
 
 local RoomUsersListView = ListView:new()
 
@@ -68,10 +65,10 @@ RoomUsersListView.drawItem = function(self, i, w, h)
 	just.row(true)
 	just.indent(18)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
-	LabelImView(user, name, h)
+	imgui.Label(user, name, h)
 	just.offset(w / 2)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 18))
-	LabelImView(user, description, h)
+	imgui.Label(user, description, h)
 	just.row()
 
 	if not multiplayerModel:isHost() or room.hostPeerId == user.peerId then
@@ -86,15 +83,15 @@ RoomUsersListView.drawItem = function(self, i, w, h)
 			just.indent(10)
 			just.text(user.name)
 			love.graphics.line(0, 0, 200, 0)
-			if TextButtonImView("Kick", "Kick", width, 55) then
+			if imgui.TextOnlyButton("Kick", "Kick", width, 55) then
 				multiplayerModel:kickUser(user.peerId)
 				close = true
 			end
-			if TextButtonImView("Give host", "Give host", width, 55) then
+			if imgui.TextOnlyButton("Give host", "Give host", width, 55) then
 				multiplayerModel:setHost(user.peerId)
 				close = true
 			end
-			if TextButtonImView("Close", "Close", width, 55) then
+			if imgui.TextOnlyButton("Close", "Close", width, 55) then
 				close = true
 			end
 			return close

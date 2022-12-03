@@ -1,9 +1,6 @@
 local just = require("just")
-local LabelImView = require("sphere.imviews.LabelImView")
-local HotkeyImView = require("sphere.imviews.HotkeyImView")
-local TextButtonImView = require("sphere.imviews.TextButtonImView")
+local imgui = require("imgui")
 local ModalImView = require("sphere.imviews.ModalImView")
-local ContainerImView = require("sphere.imviews.ContainerImView")
 local _transform = require("gfx_util").transform
 local spherefonts = require("sphere.assets.fonts")
 
@@ -48,21 +45,21 @@ return ModalImView(function(self)
 			love.graphics.rectangle("fill", 0, 0, w / #devices, _h)
 		end
 		love.graphics.setColor(1, 1, 1, 1)
-		if TextButtonImView("InputView " .. device, device, w / #devices, _h) then
+		if imgui.TextOnlyButton("InputView " .. device, device, w / #devices, _h) then
 			currentDevice = device
 		end
 	end
 	just.row()
 	love.graphics.line(0, 0, w, 0)
 
-	ContainerImView(window_id, w, h - _h, _h * 2, scrollY)
+	imgui.Container(window_id, w, h - _h, _h * 2, scrollY)
 
 	just.emptyline(8)
 	for i = 1, #inputs do
 		local hotkey_id = "input hotkey" .. i
 		local virtualKey = inputs[i]
 		local key = self.game.inputModel:getKey(inputMode, virtualKey, currentDevice)
-		local changed, key = HotkeyImView(hotkey_id, currentDevice, key, _w, _h)
+		local changed, key = imgui.Hotkey(hotkey_id, currentDevice, key, _w, _h)
 		if changed then
 			self.game.inputModel:setKey(inputMode, virtualKey, currentDevice, key)
 			if i + 1 <= #inputs then
@@ -71,11 +68,11 @@ return ModalImView(function(self)
 		end
 		just.sameline()
 		just.indent(8)
-		LabelImView(hotkey_id, virtualKey, _h)
+		imgui.Label(hotkey_id, virtualKey, _h)
 	end
 	just.emptyline(8)
 
-	scrollY = ContainerImView()
+	scrollY = imgui.Container()
 	just.pop()
 
 	love.graphics.setColor(1, 1, 1, 1)

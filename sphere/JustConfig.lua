@@ -1,7 +1,7 @@
 local serpent = require("serpent")
 local Class = require("Class")
 local just = require("just")
-local imgui = require("sphere.imgui")
+local imgui = require("imgui")
 
 local JustConfig = Class:new()
 

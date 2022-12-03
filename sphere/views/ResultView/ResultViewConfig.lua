@@ -1,9 +1,9 @@
 local just = require("just")
-local spherefonts		= require("sphere.assets.fonts")
-local gfx_util = require("gfx_util")
+local spherefonts = require("sphere.assets.fonts")
+local icons = require("sphere.assets.icons")
+local imgui = require("imgui")
 
 local BackgroundView = require("sphere.views.BackgroundView")
-local ValueView = require("sphere.views.ValueView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
 
 local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
@@ -11,16 +11,7 @@ local ScoreListView	= require("sphere.views.ResultView.ScoreListView")
 local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
 local MatchPlayersView	= require("sphere.views.GameplayView.MatchPlayersView")
 local TextCellImView = require("sphere.imviews.TextCellImView")
-local BarCellImView = require("sphere.imviews.BarCellImView")
-local IconButtonImView = require("sphere.imviews.IconButtonImView")
-local TextButtonImView = require("sphere.imviews.TextButtonImView")
-local CheckboxImView = require("sphere.imviews.CheckboxImView")
-local LabelImView = require("sphere.imviews.LabelImView")
-local SpoilerListImView = require("sphere.imviews.SpoilerListImView")
-local SpoilerImView = require("sphere.imviews.SpoilerImView")
-local JudgementBarImView = require("sphere.imviews.JudgementBarImView")
 local Format = require("sphere.views.Format")
-local ScrollBarImView = require("sphere.imviews.ScrollBarImView")
 local RoundedRectangle = require("sphere.views.RoundedRectangle")
 
 local inspect = require("inspect")
@@ -204,7 +195,7 @@ local function ScoreList(self)
 	local list = ScoreListView
 	local count = #list.items - 1
 	local pos = (list.visualItemIndex - 1) / count
-	local newScroll = ScrollBarImView("slsb", pos, 16, h, count / list.rows)
+	local newScroll = imgui.ScrollBar("slsb", pos, 16, h, count / list.rows)
 	if newScroll then
 		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
 	end
@@ -271,26 +262,26 @@ local function Judgements(self)
 
 	if show then
 		for _, name in ipairs(judgementLists[counterName]) do
-			JudgementBarImView(w, lineHeight, counters[counterName][name] / count, name, counters[counterName][name])
+			imgui.ValueBar(w, lineHeight, counters[counterName][name] / count, name, counters[counterName][name])
 			just.emptyline(interval)
 		end
 	else
-		JudgementBarImView(w, lineHeight, perfect / count, "perfect", perfect)
+		imgui.ValueBar(w, lineHeight, perfect / count, "perfect", perfect)
 		just.emptyline(interval)
-		JudgementBarImView(w, lineHeight, notPerfect / count, "not perfect", notPerfect)
+		imgui.ValueBar(w, lineHeight, notPerfect / count, "not perfect", notPerfect)
 	end
 
 	Layout:move("column1row2")
 	love.graphics.translate(padding, -padding + h - lineHeight)
 
-	JudgementBarImView(w, lineHeight, miss / count, "miss", miss)
+	imgui.ValueBar(w, lineHeight, miss / count, "miss", miss)
 end
 
 local selectorState = {}
 local function JudgementSelector(item, w, h)
 	local name = item[1]
 	if not item[2] then
-		return TextButtonImView(name .. "judgement", name, w, h, "center") and name
+		return imgui.TextOnlyButton(name .. "judgement", name, w, h, "center") and name
 	end
 	selectorState[name] = selectorState[name] or item[2]
 	local v = selectorState[name]
@@ -299,13 +290,13 @@ local function JudgementSelector(item, w, h)
 
 	local ret
 	just.row(true)
-	if TextButtonImView(name .. "judgement", text, w - h * 2, h, "center") then
+	if imgui.TextOnlyButton(name .. "judgement", text, w - h * 2, h, "center") then
 		ret = text
 	end
-	if TextButtonImView(name .. "judgement<", "<", h, h, "center") and v > item[2] then
+	if imgui.TextOnlyButton(name .. "judgement<", "<", h, h, "center") and v > item[2] then
 		selectorState[name] = v - 1
 	end
-	if TextButtonImView(name .. "judgement>", ">", h, h, "center") and v < item[3] then
+	if imgui.TextOnlyButton(name .. "judgement>", ">", h, h, "center") and v < item[3] then
 		selectorState[name] = v + 1
 	end
 	just.row()
@@ -332,7 +323,7 @@ local function JudgementsDropdown(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
 
 	local s = 0.75
-	if SpoilerImView("JudgementsDropdown", w * size, h, preview) then
+	if imgui.Spoiler("JudgementsDropdown", w * size, h, preview) then
 		love.graphics.setColor(0, 0, 0, 1)
 		love.graphics.rectangle("fill", 0, 0, w, h * s * #items)
 		love.graphics.setColor(1, 1, 1, 1)
@@ -343,7 +334,7 @@ local function JudgementsDropdown(self)
 				just.focus()
 			end
 		end
-		SpoilerImView()
+		imgui.Spoiler()
 	end
 end
 
@@ -370,7 +361,7 @@ local function JudgementsAccuracy(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans Mono", 32))
-	LabelImView("j.acc", ("%3.2f%%"):format(judgements.accuracy(counter) * 100), h)
+	imgui.Label("j.acc", ("%3.2f%%"):format(judgements.accuracy(counter) * 100), h)
 end
 
 local function NotechartInfo(self)
@@ -666,7 +657,7 @@ local function BottomScreenMenu(self)
 	local w, h = Layout:move("title_right")
 
 	love.graphics.translate(0, 72 / 2)
-	if IconButtonImView("back", "clear", 72, 0.618) then
+	if imgui.IconOnlyButton("back", icons("clear"), 72, 0.618) then
 		self:changeScreen("selectView")
 	end
 
@@ -683,14 +674,14 @@ local function BottomScreenMenu(self)
 	love.graphics.translate(55, 0)
 
 	just.row(true)
-	if TextButtonImView("retry", "retry", 72 * 1.5, h) then
+	if imgui.TextOnlyButton("retry", "retry", 72 * 1.5, h) then
 		self:play("retry")
 	end
-	if TextButtonImView("replay", "watch replay", 72 * 3, h) then
+	if imgui.TextOnlyButton("replay", "watch replay", 72 * 3, h) then
 		self:play("replay")
 	end
 	if scoreItem and scoreEntry and scoreItem.id == scoreEntry.id and not scoreItem.file then
-		if TextButtonImView("submit", "resubmit", 72 * 2, h) then
+		if imgui.TextOnlyButton("submit", "resubmit", 72 * 2, h) then
 			local noteChartModel = self.game.noteChartModel
 			self.game.onlineModel.onlineScoreManager:submit(
 				noteChartModel.noteChartEntry,

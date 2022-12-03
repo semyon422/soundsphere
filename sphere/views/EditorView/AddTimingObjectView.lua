@@ -1,11 +1,9 @@
-local ModalImView = require("sphere.imviews.ModalImView")
-local ContainerImView = require("sphere.imviews.ContainerImView")
-local TextButtonImView = require("sphere.imviews.TextButtonImView")
-local imgui = require("sphere.imgui")
+local imgui = require("imgui")
 local spherefonts = require("sphere.assets.fonts")
 local _transform = require("gfx_util").transform
 local just = require("just")
 local Fraction = require("ncdk.Fraction")
+local ModalImView = require("sphere.imviews.ModalImView")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -37,7 +35,7 @@ return ModalImView(function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	just.push()
-	ContainerImView(window_id, w, h, _h * 2, scrollY)
+	imgui.Container(window_id, w, h, _h * 2, scrollY)
 
 	local dtp = editorModel:getDynamicTimePoint()
 
@@ -105,7 +103,7 @@ return ModalImView(function(self)
 		end
 	end
 
-	scrollY = ContainerImView()
+	scrollY = imgui.Container()
 	just.pop()
 
 	love.graphics.setColor(1, 1, 1, 1)

@@ -38,4 +38,12 @@ icons.add = path .. "ic_add_white_48dp.png"
 icons.apps = path .. "ic_apps_white_48dp.png"
 icons.arrow_back = path .. "ic_arrow_back_white_48dp.png"
 
+local images = {}
+setmetatable(icons, {__call = function(t, name)
+	if not images[name] then
+		images[name] = love.graphics.newImage(icons[name])
+	end
+	return images[name]
+end})
+
 return icons

@@ -1,9 +1,9 @@
 local just = require("just")
 local gfx_util = require("gfx_util")
+local imgui = require("imgui")
 
 local AvailableModifierListView = require("sphere.views.ModifierView.AvailableModifierListView")
 local ModifierListView = require("sphere.views.ModifierView.ModifierListView")
-local ScrollBarImView = require("sphere.imviews.ScrollBarImView")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -45,7 +45,7 @@ local function AvailableModifierScrollBar(self)
 	local list = AvailableModifierListView
 	local count = #list.items - 1
 	local pos = (list.visualItemIndex - 1) / count
-	local newScroll = ScrollBarImView("amsb", pos, 16, 792, count / list.rows)
+	local newScroll = imgui.ScrollBar("amsb", pos, 16, 792, count / list.rows)
 	if newScroll then
 		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
 	end

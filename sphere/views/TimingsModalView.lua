@@ -1,18 +1,8 @@
 local just = require("just")
-local LabelImView = require("sphere.imviews.LabelImView")
-local TextButtonImView = require("sphere.imviews.TextButtonImView")
-local TextButtonImView2 = require("sphere.imviews.TextButtonImView2")
-local TextInputImView = require("sphere.imviews.TextInputImView")
-local SpoilerImView = require("sphere.imviews.SpoilerImView")
-local SliderImView = require("sphere.imviews.SliderImView")
-local CheckboxImView = require("sphere.imviews.CheckboxImView")
-local JudgementBarImView = require("sphere.imviews.JudgementBarImView")
+local imgui = require("imgui")
 local ModalImView = require("sphere.imviews.ModalImView")
 local _transform = require("gfx_util").transform
-local round = require("math_util").round
-local map = require("math_util").map
 local spherefonts = require("sphere.assets.fonts")
-local imgui = require("sphere.imgui")
 local table_util = require("table_util")
 
 local _timings = require("sphere.models.RhythmModel.ScoreEngine.timings")
@@ -23,14 +13,14 @@ local function intButtons(id, v, w, h)
 	local _v = v
 	local mod = love.keyboard.isScancodeDown("lshift", "rshift")
 	if not mod then
-		if TextButtonImView2(id .. "-1", "-1", w / 4, h) then v = v - 1 end
-		if TextButtonImView2(id .. "+1", "+1", w / 4, h) then v = v + 1 end
+		if imgui.TextButton(id .. "-1", "-1", w / 4, h) then v = v - 1 end
+		if imgui.TextButton(id .. "+1", "+1", w / 4, h) then v = v + 1 end
 	end
-	if TextButtonImView2(id .. "-10", "-10", w / 4, h) then v = v - 10 end
-	if TextButtonImView2(id .. "+10", "+10", w / 4, h) then v = v + 10 end
+	if imgui.TextButton(id .. "-10", "-10", w / 4, h) then v = v - 10 end
+	if imgui.TextButton(id .. "+10", "+10", w / 4, h) then v = v + 10 end
 	if mod then
-		if TextButtonImView2(id .. "-100", "-100", w / 4, h) then v = v - 100 end
-		if TextButtonImView2(id .. "+100", "+100", w / 4, h) then v = v + 100 end
+		if imgui.TextButton(id .. "-100", "-100", w / 4, h) then v = v - 100 end
+		if imgui.TextButton(id .. "+100", "+100", w / 4, h) then v = v + 100 end
 	end
 	if v ~= _v then
 		return math.floor(v)
@@ -49,8 +39,8 @@ local function drawTimings(t, name, id, norm, mins, w, h)
 	end
 	just.row(true)
 	t[1] = math.min(math.max(intButtonsMs(id .. 1, t[1], w / 4, h), -1), min1)
-	JudgementBarImView(w / 4, h, -t[1] / norm, name, t[1] * 1000, true)
-	JudgementBarImView(w / 4, h, t[2] / norm, name, t[2] * 1000)
+	imgui.ValueBar(w / 4, h, -t[1] / norm, name, t[1] * 1000, true)
+	imgui.ValueBar(w / 4, h, t[2] / norm, name, t[2] * 1000)
 	t[2] = math.min(math.max(intButtonsMs(id .. 2, t[2], w / 4, h), min2), 1)
 	just.row()
 end
@@ -90,21 +80,21 @@ return ModalImView(function(self)
 
 	just.row(true)
 	just.indent(10)
-	LabelImView("presets label", "Timings presets:", _h2)
-	if TextButtonImView2("default timings", "soundsphere", 200, _h2) then
+	imgui.Label("presets label", "Timings presets:", _h2)
+	if imgui.TextButton("default timings", "soundsphere", 200, _h2) then
 		gameplay.timings = table_util.deepcopy(_timings.soundsphere)
 		self.game:resetGameplayConfigs()
 	end
-	if TextButtonImView2("lr2 timings", "LR2", 100, _h2) then
+	if imgui.TextButton("lr2 timings", "LR2", 100, _h2) then
 		gameplay.timings = table_util.deepcopy(_timings.lr2)
 		self.game:resetGameplayConfigs()
 	end
-	if TextButtonImView2("osu timings", "osu OD" .. osuOD, 150, _h2) then
+	if imgui.TextButton("osu timings", "osu OD" .. osuOD, 150, _h2) then
 		gameplay.timings = table_util.deepcopy(_timings.osu(osuOD))
 		self.game:resetGameplayConfigs()
 		osuOD = (osuOD + 1) % 11
 	end
-	if TextButtonImView2("etterna timings", "J" .. etternaJudgement, 150, _h2) then
+	if imgui.TextButton("etterna timings", "J" .. etternaJudgement, 150, _h2) then
 		gameplay.timings = table_util.deepcopy(_timings.etterna(etternaJudgement))
 		self.game:resetGameplayConfigs()
 		etternaJudgement = etternaJudgement % 9 + 1
