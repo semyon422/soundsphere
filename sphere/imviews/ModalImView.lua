@@ -1,11 +1,15 @@
 local just = require("just")
 
+local quit = false
 local function _draw(f, self)
 	just.keyboard_over()
-	if self and just.keypressed("escape") then
+	if quit then
+		quit = false
 		return f()
 	end
-	return f(self)
+	local ret = f(self)
+	quit = self and just.keypressed("escape")
+	return ret
 end
 
 return function(draw)
