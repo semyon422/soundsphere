@@ -7,10 +7,13 @@ local ImageValueView = Class:new()
 
 ImageValueView.load = function(self)
 	local images = {}
+	self.images = images
+	if not self.files then
+		return
+	end
 	for char, path in pairs(self.files) do
 		images[char] = love.graphics.newImage(FileFinder:findFile(path))
 	end
-	self.images = images
 end
 
 ImageValueView.getDimensions = function(self, value)
