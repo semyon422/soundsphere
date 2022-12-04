@@ -2,7 +2,7 @@ local just = require("just")
 
 local quit = false
 local function _draw(f, self)
-	just.keyboard_over()
+	just.key_over()
 	if quit then
 		quit = false
 		return f()

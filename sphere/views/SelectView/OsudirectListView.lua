@@ -22,7 +22,7 @@ end
 OsudirectListView.draw = function(self, ...)
 	ListView.draw(self, ...)
 
-	if not just.keyboard_over() then
+	if not just.key_over() then
 		return
 	end
 

@@ -68,7 +68,7 @@ SearchFieldView.draw = function(self)
 		self.text.align
 	)
 
-	if not (just.keyboard_over() and focused) then
+	if not (just.key_over() and focused) then
 		return
 	end
 

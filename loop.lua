@@ -22,11 +22,6 @@ loop.timings = {
 	draw = 0,
 }
 
-loop.midistate = {}
-loop.keystate = {}
-loop.gamepadstate = {}
-loop.joystickstate = {}
-
 local dwmapi
 if love.system.getOS() == "Windows" then
 	local ffi = require("ffi")
@@ -108,10 +103,8 @@ loop.run = function()
 					loop.eventTime = event.time
 					if event.state then
 						love.keypressed(event.key, event.key)
-						loop.keystate[event.key] = true
 					else
 						love.keyreleased(event.key, event.key)
-						loop.keystate[event.key] = nil
 					end
 				end
 			else
@@ -128,19 +121,6 @@ loop.run = function()
 				end
 			end
 			if not asynckeyWorking or name ~= "keypressed" and name ~= "keyreleased" then
-				if name == "keypressed" then
-					loop.keystate[b] = true
-				elseif name == "keyreleased" then
-					loop.keystate[b] = nil
-				elseif name == "gamepadpressed" then
-					loop.gamepadstate[b] = true
-				elseif name == "gamepadreleased" then
-					loop.gamepadstate[b] = nil
-				elseif name == "joystickpressed" then
-					loop.joystickstate[b] = true
-				elseif name == "joystickreleased" then
-					loop.joystickstate[b] = nil
-				end
 				love.handlers[name](a, b, c, d, e, f)
 			end
 		end
@@ -151,10 +131,8 @@ loop.run = function()
 			while a do
 				if a == 144 and c ~= 0 then
 					love.midipressed(b, c, d)
-					loop.midistate[b] = true
 				elseif a == 128 or c == 0 then
 					love.midireleased(b, c, d)
-					loop.midistate[b] = nil
 				end
 				a, b, c, d = LuaMidi.getMessage(i)
 			end
