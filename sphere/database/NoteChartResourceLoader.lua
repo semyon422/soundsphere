@@ -1,10 +1,17 @@
 local audio			= require("audio")
-local video			= require("video")
 local Video			= require("sphere.database.Video")
 local thread	= require("thread")
 local JamLoader		= require("sphere.database.JamLoader")
 local FileFinder	= require("sphere.filesystem.FileFinder")
 local table_util = require("table_util")
+
+local video
+local ok, ret = pcall(require, "video")
+if ok then
+	video = ret
+else
+	print(ret)
+end
 
 local _newSoundDataAsync = thread.async(function(path, sample_gain)
 	local fileData = love.filesystem.newFileData(path)
@@ -133,7 +140,7 @@ NoteChartResourceLoader.loadResource = function(self, path)
 		resources.loaded[path] = newSoundDataAsync(path, self.sample_gain)
 	elseif fileType == "image" then
 		resources.loaded[path] = newImageAsync(path)
-	elseif fileType == "video" then
+	elseif fileType == "video" and video then
 		resources.loaded[path] = newVideoAsync(path)
 	elseif path:lower():find("%.ojm$") then
 		local soundDatas = JamLoader:loadAsync(path)
