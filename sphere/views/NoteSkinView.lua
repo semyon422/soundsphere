@@ -42,7 +42,7 @@ return ModalImView(function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	just.push()
-	imgui.Container(window_id, w, h, _h * 2, scrollY)
+	imgui.Container(window_id, w, h, _h / 3, _h * 2, scrollY)
 
 	local itemHeight = 44
 	for i = 1, #items do
@@ -79,7 +79,7 @@ return ModalImView(function(self)
 		love.graphics.setColor(1, 1, 1, 1)
 
 		just.push()
-		imgui.Container(window_id .. "skin", w, h, _h * 2, scrollYconfig)
+		imgui.Container(window_id .. "skin", w, h, _h / 3, _h * 2, scrollYconfig)
 
 		selectedNoteSkin.config:draw(w, h)
 		scrollYconfig = imgui.Container()

@@ -39,7 +39,7 @@ local function draw()
 	end
 	just.row()
 
-	imgui.Container("error container", w, h - (just.height - h0), _h, scrollY)
+	imgui.Container("error container", w, h - (just.height - h0), _h / 3, _h, scrollY)
 	just.indent(10)
 	just.text(message .. "\n" .. trace, w - _h)
 	scrollY = imgui.Container()

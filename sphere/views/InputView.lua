@@ -52,7 +52,7 @@ return ModalImView(function(self)
 	just.row()
 	love.graphics.line(0, 0, w, 0)
 
-	imgui.Container(window_id, w, h - _h, _h * 2, scrollY)
+	imgui.Container(window_id, w, h - _h, _h / 3, _h * 2, scrollY)
 
 	just.emptyline(8)
 	for i = 1, #inputs do

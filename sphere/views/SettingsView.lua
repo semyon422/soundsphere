@@ -47,7 +47,7 @@ local function draw(self)
 	just.push()
 
 	drawTabs()
-	imgui.Container(window_id, w, h - _h, _h * 2, scrollY)
+	imgui.Container(window_id, w, h - _h, _h / 3, _h * 2, scrollY)
 
 	just.emptyline(8)
 	drawSection[currentSection](self)

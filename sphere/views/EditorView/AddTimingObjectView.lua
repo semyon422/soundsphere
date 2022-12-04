@@ -35,7 +35,7 @@ return ModalImView(function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	just.push()
-	imgui.Container(window_id, w, h, _h * 2, scrollY)
+	imgui.Container(window_id, w, h, _h / 3, _h * 2, scrollY)
 
 	local dtp = editorModel:getDynamicTimePoint()
 

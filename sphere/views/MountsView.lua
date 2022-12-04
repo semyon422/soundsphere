@@ -34,9 +34,9 @@ return ModalImView(function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	just.push()
-	imgui.Container(window_id, w, h, _h * 2, scrollY)
+	imgui.Container(window_id, w, h, _h / 3, _h * 2, scrollY)
 
-	imgui.List("mount points", w, h / 2, _h, scrollYlist)
+	imgui.List("mount points", w, h / 3, _h / 2, _h, scrollYlist)
 	for i = 1, #items do
 		local item = items[i]
 		local name = item[2]
