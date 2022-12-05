@@ -233,25 +233,32 @@ OsuNoteSkin.load = function(self)
 		body = lbody,
 		tail = ltail,
 	})
+
+	local smallestWidth = self.width[1]
 	for i = 1, keysCount do
-		local wfnhs = mania.WidthForNoteHeightScale
-		local width = wfnhs and wfnhs ~= 0 and wfnhs or self.width[i]
+		if self.width[i] < smallestWidth then
+			smallestWidth = self.width[i]
+		end
+	end
+	local wfnhs = mania.WidthForNoteHeightScale
+	smallestWidth = wfnhs and wfnhs ~= 0 and wfnhs or smallestWidth
+	for i = 1, keysCount do
 		self.notes.ShortNote.Head.h[i] = function()
 			local w, h = self:getDimensions(shead[i])
-			return h / w * width
+			return h / w * smallestWidth
 		end
 		self.notes.LongNote.Head.h[i] = function()
 			local w, h = self:getDimensions(lhead[i])
-			return h / w * width
+			return h / w * smallestWidth
 		end
 		self.notes.LongNote.Tail.h[i] = function()
 			local w, h = self:getDimensions(ltail[i])
-			return -h / w * width
+			return -h / w * smallestWidth
 		end
 		self.notes.LongNote.Tail.oy[i] = 0
 		self.notes.LongNote.Body.y = function(timeState, noteView, column)
 			local w, h = self:getDimensions(lhead[column])
-			return self:getPosition(timeState, noteView, column) - h / w * width / 2
+			return self:getPosition(timeState, noteView, column) - h / w * smallestWidth / 2
 		end
 	end
 	self:setShortNote({
