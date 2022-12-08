@@ -392,7 +392,7 @@ local function NotechartInfo(self)
 
 	local show = showLoadedScore(self)
 
-	local baseTimeRate = show and self.game.modifierModel.state.timeRate or scoreItem.timeRate
+	local baseTimeRate = show and self.game.rhythmModel.scoreEngine.baseTimeRate or scoreItem.timeRate
 
 	local baseBpm = noteChartItem.bpm
 	local baseLength = noteChartItem.length
