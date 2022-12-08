@@ -5,7 +5,15 @@ local LongGraphicalNote = GraphicalNote:new()
 
 LongGraphicalNote.construct = function(self)
 	self.endNoteData = self.startNoteData.endNoteData
-	self.fakeStartTimePoint = TimePoint:new()
+
+	local timePoint = self.startNoteData.timePoint
+	local fakeTimePoint = TimePoint:new()
+	fakeTimePoint.absoluteTime = timePoint.absoluteTime
+	fakeTimePoint.visualTime = timePoint.visualTime
+	fakeTimePoint.velocityData = timePoint.velocityData
+	fakeTimePoint.tempoData = timePoint.tempoData
+	fakeTimePoint.index = timePoint.index
+	self.fakeStartTimePoint = fakeTimePoint
 end
 
 LongGraphicalNote.update = function(self)
@@ -53,48 +61,27 @@ LongGraphicalNote.update = function(self)
 	startTimeState.endTimeState = endTimeState
 end
 
-LongGraphicalNote.getFakeStartTime = function(self)
-	local startTime = self.startNoteData.timePoint.absoluteTime
+LongGraphicalNote.getFakeVisualStartTime = function(self)
 	local logicalNote = self.logicalNote
+	local currentTimePoint = self.currentTimePoint
 	if not logicalNote or logicalNote.state ~= "startPassedPressed" then
-		return self.fakeStartTime or startTime
+		return self.startNoteData.timePoint:getVisualTime(currentTimePoint)
 	end
 
-	local timePoint = self.currentTimePoint
+	local fakeTimePoint = self.fakeStartTimePoint
 	local offsetSum = self.timeEngine.visualOffset - self.timeEngine.inputOffset
-	local velocityData = self.startNoteData.timePoint.velocityData
 
-	local deltaZeroClearVisualStartTime
-		= timePoint.visualTime
-		- velocityData.timePoint.visualTime
-		- offsetSum / timePoint.velocityData.globalSpeed
+	local globalSpeed = currentTimePoint.velocityData and currentTimePoint.velocityData.globalSpeed or 1
+	fakeTimePoint.visualTime = currentTimePoint.visualTime - offsetSum / globalSpeed
+	fakeTimePoint.index = self.layerData:interpolateTimePointVisual(fakeTimePoint.index, fakeTimePoint)
 
-	local deltaZeroClearVisualEndTime
-		= self.endNoteData.timePoint.visualTime
-		- velocityData.timePoint.visualTime
+	local fakeStartTime = fakeTimePoint.absoluteTime
+	fakeStartTime = math.max(fakeStartTime, self.startNoteData.timePoint.absoluteTime)
+	fakeStartTime = math.min(fakeStartTime, self.endNoteData.timePoint.absoluteTime)
+	fakeTimePoint.absoluteTime = fakeStartTime
+	fakeTimePoint.index = self.layerData:interpolateTimePointAbsolute(fakeTimePoint.index, fakeTimePoint)
 
-	--[[
-		fakeVisualStartTimeLimit is derived
-		from (fakeVisualStartTime == currentTime == currentVisualTime)
-		as fakeStartTime
-	]]
-	local startTimeLimit = deltaZeroClearVisualStartTime
-	local endTimeLimit = deltaZeroClearVisualEndTime
-	startTime = (startTime - velocityData.timePoint.absoluteTime) * velocityData.currentSpeed
-
-	self.fakeStartTime = math.min(startTimeLimit > startTime and startTimeLimit or startTime, endTimeLimit)
-	self.fakeStartTime = self.fakeStartTime / velocityData.currentSpeed + velocityData.timePoint.absoluteTime
-	return self.fakeStartTime
-end
-
-LongGraphicalNote.getFakeVisualStartTime = function(self)
-	local timePoint = self.fakeStartTimePoint
-
-	timePoint.velocityData = self.startNoteData.timePoint.velocityData
-	timePoint.absoluteTime = self:getFakeStartTime()
-	timePoint:computeVisualTime()
-
-	return timePoint:getVisualTime(self.currentTimePoint)
+	return fakeTimePoint:getVisualTime(self.currentTimePoint)
 end
 
 LongGraphicalNote.whereWillDraw = function(self)

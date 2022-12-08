@@ -8,19 +8,18 @@ NoteDrawer.load = function(self)
 	local graphicEngine = self.graphicEngine
 	local timeEngine = graphicEngine.rhythmModel.timeEngine
 	local logicEngine = graphicEngine.rhythmModel.logicEngine
-	self.layerData = graphicEngine.noteChart:getLayerData(self.layerIndex)
 
+	local layerData = self.layerData
+
+	self.currentTimePointIndex = 1
 	self.currentTimePoint = TimePoint:new()
-	self.currentTimePoint.side = -1
 	self.currentTimePoint.visualTime = 0
-	self.velocityIndex = 1
-	self.tempoIndex = 1
 
 	local sharedLogicalNotes = logicEngine.sharedLogicalNotes or {}
 
 	self.notes = {}
-	for noteDataIndex = 1, self.layerData:getNoteDataCount() do
-		local noteData = self.layerData:getNoteData(noteDataIndex)
+	for noteDataIndex = 1, layerData:getNoteDataCount() do
+		local noteData = layerData:getNoteData(noteDataIndex)
 
 		if noteData.inputType == self.inputType and noteData.inputIndex == self.inputIndex then
 			local graphicalNote = GraphicalNoteFactory:getNote(noteData)
@@ -29,6 +28,7 @@ NoteDrawer.load = function(self)
 				graphicalNote.currentTimePoint = self.currentTimePoint
 				graphicalNote.graphicEngine = graphicEngine
 				graphicalNote.timeEngine = timeEngine
+				graphicalNote.layerData = layerData
 				graphicalNote.logicalNote = sharedLogicalNotes[noteData]
 				if graphicEngine.noteSkin:check(graphicalNote) then
 					table.insert(self.notes, graphicalNote)
@@ -53,23 +53,7 @@ NoteDrawer.updateCurrentTime = function(self)
 	local timeEngine = self.graphicEngine.rhythmModel.timeEngine
 	local timePoint = self.currentTimePoint
 	timePoint.absoluteTime = timeEngine.currentVisualTime - timeEngine.inputOffset
-
-	local layerData = self.layerData
-
-	local nextVelocityData = layerData:getVelocityData(self.velocityIndex + 1)
-	while nextVelocityData and nextVelocityData.timePoint <= timePoint do
-		self.velocityIndex = self.velocityIndex + 1
-		nextVelocityData = layerData:getVelocityData(self.velocityIndex + 1)
-	end
-
-	local velocityData = layerData:getVelocityData(self.velocityIndex)
-	while self.velocityIndex > 1 and velocityData and velocityData.timePoint > timePoint do
-		self.velocityIndex = self.velocityIndex - 1
-		velocityData = layerData:getVelocityData(self.velocityIndex)
-	end
-
-	timePoint.velocityData = velocityData
-	timePoint:computeVisualTime()
+	self.currentTimePointIndex = self.layerData:interpolateTimePointAbsolute(self.currentTimePointIndex, timePoint)
 end
 
 NoteDrawer.update = function(self)

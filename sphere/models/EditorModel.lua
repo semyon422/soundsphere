@@ -10,6 +10,7 @@ EditorModel.load = function(self)
 
 	ld:setTimeMode("measure")
 	ld:setSignatureMode("short")
+	-- ld:setPrimaryTempo(60)
 	ld:setRange(Fraction(0), Fraction(10))
 
 	ld:getSignatureData(2, Fraction(3))

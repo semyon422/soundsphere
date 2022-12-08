@@ -41,6 +41,7 @@ SpeedMode.applyConstant = function(self)
 	local noteChart = self.game.noteChartModel.noteChart
 
 	for _, layerData in noteChart:getLayerDataIterator() do
+		layerData:setPrimaryTempo(0)
 		for velocityDataIndex = 1, layerData:getVelocityDataCount() do
 			local velocityData = layerData:getVelocityData(velocityDataIndex)
 

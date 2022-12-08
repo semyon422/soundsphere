@@ -66,7 +66,7 @@ GraphicEngine.loadNoteDrawers = function(self)
 		if not layerData.invisible then
 			for inputType, inputIndex in self.noteChart:getInputIterator() do
 				local noteDrawer = NoteDrawer:new({
-					layerIndex = i,
+					layerData = layerData,
 					inputType = inputType,
 					inputIndex = inputIndex,
 					graphicEngine = self
