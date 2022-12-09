@@ -317,6 +317,7 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 	end
 	for i = 1, noteskin.inputsCount do
 		local pressed, hold, released
+		local color = object.color and object.color[i]
 		if object.pressed and object.pressed[i] then
 			pressed = ImageAnimationView:new({
 				x = noteskin.columns[i],
@@ -330,6 +331,7 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 				range = object.pressed[i][2],
 				quad = object.pressed[i][3],
 				rate = object.rate,
+				color = color,
 			})
 		end
 		if object.hold and object.hold[i] then
@@ -345,6 +347,7 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 				range = object.hold[i][2],
 				quad = object.hold[i][3],
 				rate = object.rate,
+				color = color,
 			})
 		end
 		if object.released and object.released[i] then
@@ -360,6 +363,7 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 				range = object.released[i][2],
 				quad = object.released[i][3],
 				rate = object.rate,
+				color = color,
 			})
 		end
 		local inputType, inputIndex = noteskin.inputs[i]:match("^(.-)(%d+)$")

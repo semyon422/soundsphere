@@ -351,19 +351,22 @@ OsuNoteSkin.load = function(self)
 
 	local pressed, released = self:getDefaultKeyImages()
 	local stageLight = {}
+	local stageLightColor = {}
 	local stageLightImage, stageLightRange = self:findAnimation("mania-stage-light")
 	for i = 1, keysCount do
 		local ki = "KeyImage" .. (i - 1)
 		pressed[i] = self:findImage(mania[ki .. "D"]) or self:findImage(pressed[i])
 		released[i] = self:findImage(mania[ki]) or self:findImage(released[i])
 		stageLight[i] = {stageLightImage, stageLightRange}
+		stageLightColor[i] = mania["ColourLight" .. i]
 	end
 	if stageLightImage then
 		playfield:addKeyImageAnimations({
 			sy = 480 / 768,
 			padding = 480 - mania.LightPosition,
-			hold = stageLight,
 			rate = mania.LightFramePerSecond,
+			hold = stageLight,
+			color = stageLightColor,
 		})
 	end
 
