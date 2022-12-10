@@ -17,6 +17,7 @@ local tempo = "60"
 local stop = {"0", "1"}
 local velocity = "1"
 local expand = {"0", "1"}
+local signature = {"0", "1"}
 return ModalImView(function(self)
 	if not self then
 		return true
@@ -71,6 +72,15 @@ return ModalImView(function(self)
 		ld:getExpandData(dtp.measureTime, dtp.side, Fraction(tonumber(expand[1]), tonumber(expand[2])))
 	end
 
+	just.row(true)
+	signature[1] = imgui.input("signature n input", signature[1])
+	imgui.unindent()
+	imgui.label("/ label", "/")
+	signature[2] = imgui.input("signature d input", signature[2], "signature")
+	if imgui.button("add signature button", "add") then
+		ld:getSignatureData(dtp.measureTime:floor(), Fraction(tonumber(signature[1]), tonumber(signature[2])))
+	end
+
 	just.row()
 	imgui.setSize(w, h, w / 2, 55)
 
@@ -100,6 +110,14 @@ return ModalImView(function(self)
 		just.sameline()
 		if imgui.button("remove expand button", "remove") then
 			ld:removeExpandData(dtp.measureTime, dtp.side)
+		end
+	end
+
+	if dtp._signatureData then
+		imgui.label("signature label", "Signature: " .. dtp._signatureData.signature .. " beats")
+		just.sameline()
+		if imgui.button("remove signature button", "remove") then
+			ld:removeSignatureData(dtp.measureTime:floor())
 		end
 	end
 

@@ -17,6 +17,8 @@ end
 local function getTimePointText(timePoint)
 	if timePoint._tempoData then
 		return timePoint._tempoData.tempo .. " bpm"
+	elseif timePoint._signatureData then
+		return "signature " .. tostring(timePoint._signatureData.signature) .. " beats"
 	elseif timePoint._stopData then
 		return "stop " .. tostring(timePoint._stopData.duration) .. " beats"
 	elseif timePoint._velocityData then
@@ -95,8 +97,11 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels)
 	love.graphics.setColor(1, 1, 1, 1)
 end
 
+local primaryTempo = "60"
+local defaultSignature = {"4", "1"}
 SnapGridView.drawUI = function(self, w, h)
 	local editorModel = self.game.editorModel
+	local ld = editorModel.layerData
 
 	just.push()
 
@@ -109,9 +114,44 @@ SnapGridView.drawUI = function(self, w, h)
 		self.game.gameView:setModal(require("sphere.views.EditorView.AddTimingObjectView"))
 	end
 
+	just.row(true)
+	primaryTempo = imgui.input("primaryTempo input", primaryTempo, "primary tempo")
+	if imgui.button("set primaryTempo button", "set") then
+		ld:setPrimaryTempo(tonumber(primaryTempo))
+	end
+	if imgui.button("unset primaryTempo button", "unset") then
+		ld:setPrimaryTempo(0)
+	end
+	just.row()
+
+	just.row(true)
+	imgui.label("set signature mode", "signature mode")
+	if imgui.button("set short signature button", "short") then
+		ld:setSignatureMode("short")
+	end
+	if imgui.button("set long signature button", "long") then
+		ld:setSignatureMode("long")
+	end
+	just.row()
+
+	imgui.setSize(w, h, 100, 55)
+	just.row(true)
+	defaultSignature[1] = imgui.input("defsig n input", defaultSignature[1])
+	imgui.unindent()
+	imgui.label("/ label", "/")
+	defaultSignature[2] = imgui.input("defsig d input", defaultSignature[2], "default signature")
+	if imgui.button("set defsig button", "set") then
+		ld:setDefaultSignature(Fraction(tonumber(defaultSignature[1]), tonumber(defaultSignature[2])))
+	end
+	just.row(false)
+	imgui.setSize(w, h, 200, 55)
+
+	just.text("primary tempo: " .. ld.primaryTempo)
+	just.text("signature mode: " .. ld.signatureMode)
+	just.text("default signature: " .. ld.defaultSignature)
+
 	local dtp = editorModel:getDynamicTimePoint()
 
-	local ld = editorModel.layerData
 	local measureOffset = dtp.measureTime:floor()
 	local signature = ld:getSignature(measureOffset)
 	local snap = editorModel.snap
@@ -161,7 +201,7 @@ SnapGridView.draw = function(self)
 
 	self:drawUI(w, h)
 
-	love.graphics.translate(w / 5, 0)
+	love.graphics.translate(w / 3, 0)
 
 	love.graphics.push()
 	love.graphics.translate(0, h / 2)
