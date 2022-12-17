@@ -4,7 +4,7 @@ local Fraction = require("ncdk.Fraction")
 
 local EditorModel = Class:new()
 
-EditorModel.load = function(self)
+EditorModel.load1 = function(self)
 	local ld = DynamicLayerData:new()
 	self.layerData = ld
 
@@ -39,6 +39,30 @@ EditorModel.load = function(self)
 	self:updateRange()
 end
 
+EditorModel.load = function(self)
+	local ld = DynamicLayerData:new()
+	self.layerData = ld
+
+	ld:setTimeMode("interval")
+	ld:setSignatureMode("short")
+	ld:setRange(0, 30)
+
+	ld:getIntervalData(1, 5)
+	ld:getIntervalData(6, 7)
+	ld:getIntervalData(10, 2)
+	ld:getIntervalData(15, 1)
+
+	self.beatTime = 0
+	self.absoluteTime = 0
+	self.visualTime = 0
+	self.side = -1
+	self.visualSide = -1
+
+	self.snap = 1
+
+	self:updateRange()
+end
+
 EditorModel.getSnap = function(self, j)
 	local snap = self.snap
 	local k
@@ -55,6 +79,14 @@ end
 
 EditorModel.updateRange = function(self)
 	local ld = self.layerData
+	if ld.mode == "interval" then
+		local delta = 10
+		if ld.startTime ~= self.absoluteTime - delta then
+			ld:setRange(self.absoluteTime - delta, self.absoluteTime + delta)
+		end
+		return
+	end
+
 	local dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime, 192, -1)
 	local measureOffset = dtp.measureTime:floor()
 

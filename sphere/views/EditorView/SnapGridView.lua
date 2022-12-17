@@ -3,6 +3,7 @@ local gfx_util = require("gfx_util")
 local spherefonts = require("sphere.assets.fonts")
 local just = require("just")
 local Fraction = require("ncdk.Fraction")
+local IntervalTime = require("ncdk.IntervalTime")
 local imgui = require("imgui")
 
 local Layout = require("sphere.views.EditorView.Layout")
@@ -25,13 +26,15 @@ local function getTimePointText(timePoint)
 		return timePoint._velocityData.currentSpeed .. "x"
 	elseif timePoint._expandData then
 		return "expand into " .. tostring(timePoint._expandData.duration) .. " beats"
+	elseif timePoint._intervalData then
+		return timePoint._intervalData.intervals .. " intervals"
 	end
 end
 
 SnapGridView.drawTimingObjects = function(self, field, currentTime, pixels)
 	local rangeTracker = self.game.editorModel.layerData.timePointsRange
 	local object = rangeTracker.startObject
-	if not object then
+	if not object or not currentTime then
 		return
 	end
 
@@ -73,24 +76,55 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels)
 	local ld = editorModel.layerData
 	local snap = editorModel.snap
 
-	for time = ld.startTime:ceil(), ld.endTime:floor() do
-		local signature = ld:getSignature(time)
-		local _signature = signature:ceil()
-		for i = 1, _signature do
-			for j = 1, snap do
-				local f = Fraction((i - 1) * snap + j - 1, signature * snap)
-				if f:tonumber() < 1 then
-					local timePoint = ld:getDynamicTimePoint(f + time, -1)
-					if not timePoint then break end
-					local y = (timePoint[field] - currentTime) * pixels
+	if ld.mode == "measure" then
+		for time = ld.startTime:ceil(), ld.endTime:floor() do
+			local signature = ld:getSignature(time)
+			local _signature = signature:ceil()
+			for i = 1, _signature do
+				for j = 1, snap do
+					local f = Fraction((i - 1) * snap + j - 1, signature * snap)
+					if f:tonumber() < 1 then
+						local timePoint = ld:getDynamicTimePoint(f + time, -1)
+						if not timePoint then break end
+						local y = (timePoint[field] - currentTime) * pixels
 
-					local w = 30
-					if i == 1 and j == 1 then
-						w = 60
+						local w = 30
+						if i == 1 and j == 1 then
+							w = 60
+						end
+						love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
+						love.graphics.line(0, y, w, y)
 					end
-					love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
-					love.graphics.line(0, y, w, y)
 				end
+			end
+		end
+	elseif ld.mode == "interval" then
+		local timePoint = ld:getDynamicTimePointAbsolute(ld.startTime, 192)
+		local startIntervalData = timePoint.intervalTime.intervalData
+		local startTime = timePoint.intervalTime.time:floor()
+		timePoint = ld:getDynamicTimePointAbsolute(ld.endTime, 192)
+		local endIntervalData = timePoint.intervalTime.intervalData
+		local endTime = timePoint.intervalTime.time:floor()
+
+		while startIntervalData and startIntervalData < endIntervalData or startIntervalData == endIntervalData and startTime <= endTime do
+			for j = 1, snap do
+				local time = Fraction(j - 1, snap) + startTime
+				timePoint = ld:getDynamicTimePoint(IntervalTime:new(startIntervalData, time))
+				if not timePoint then break end
+				local y = (timePoint[field] - currentTime) * pixels
+
+				local w = 30
+				if startTime == 0 and j == 1 then
+					w = 60
+				end
+				love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
+				love.graphics.line(0, y, w, y)
+			end
+
+			startTime = startTime + 1
+			if startTime == startIntervalData.intervals and startIntervalData.next then
+				startIntervalData = startIntervalData.next
+				startTime = 0
 			end
 		end
 	end
@@ -152,16 +186,19 @@ SnapGridView.drawUI = function(self, w, h)
 
 	local dtp = editorModel:getDynamicTimePoint()
 
-	local measureOffset = dtp.measureTime:floor()
-	local signature = ld:getSignature(measureOffset)
-	local snap = editorModel.snap
-
-	local beatTime = (dtp.measureTime - measureOffset) * signature
-	local snapTime = (beatTime - beatTime:floor()) * snap
-
 	just.text("time point: " .. tostring(dtp))
-	just.text("beat: " .. tostring(beatTime))
-	just.text("snap: " .. tostring(snapTime))
+
+	if ld.mode == "measure" then
+		local measureOffset = dtp.measureTime:floor()
+		local signature = ld:getSignature(measureOffset)
+		local snap = editorModel.snap
+
+		local beatTime = (dtp.measureTime - measureOffset) * signature
+		local snapTime = (beatTime - beatTime:floor()) * snap
+
+		just.text("beat: " .. tostring(beatTime))
+		just.text("snap: " .. tostring(snapTime))
+	end
 
 	just.row(true)
 	if imgui.button("prev tp", "prev") and dtp.prev then
@@ -194,6 +231,7 @@ end
 local prevMouseY = 0
 SnapGridView.draw = function(self)
 	local editorModel = self.game.editorModel
+	local ld = editorModel.layerData
 
 	local w, h = Layout:move("base")
 	love.graphics.setColor(1, 1, 1, 1)
@@ -208,7 +246,11 @@ SnapGridView.draw = function(self)
 	love.graphics.line(0, 0, 240, 0)
 
 	love.graphics.translate(-40, 0)
-	self:drawTimingObjects("beatTime", editorModel.beatTime, self.pixelsPerBeat)
+	if ld.mode == "measure" then
+		self:drawTimingObjects("beatTime", editorModel.beatTime, self.pixelsPerBeat)
+	elseif ld.mode == "interval" then
+		self:drawTimingObjects("absoluteTime", editorModel.absoluteTime, self.pixelsPerSecond)
+	end
 	love.graphics.translate(40, 0)
 	self:drawComputedGrid("beatTime", editorModel.beatTime, self.pixelsPerBeat)
 
