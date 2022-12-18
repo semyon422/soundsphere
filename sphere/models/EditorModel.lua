@@ -37,7 +37,7 @@ EditorModel.load1 = function(self)
 
 	self.snap = 1
 
-	self:updateRange()
+	self:scrollSeconds(0)
 end
 
 EditorModel.load = function(self)
@@ -48,10 +48,14 @@ EditorModel.load = function(self)
 	ld:setSignatureMode("short")
 	ld:setRange(0, 30)
 
-	ld:getIntervalData(1, 5)
-	ld:getIntervalData(6, 7)
-	ld:getIntervalData(10, 2)
+	local id1 = ld:getIntervalData(1, 5)
+	local id2 = ld:getIntervalData(6, 7)
+	local id3 = ld:getIntervalData(10, 2)
 	ld:getIntervalData(15, 1)
+
+	-- ld:getVelocityData(IntervalTime:new(id1, Fraction(0)), -1, 0.5)
+	-- ld:getVelocityData(IntervalTime:new(id2, Fraction(3)), -1, 2)
+	-- ld:getVelocityData(IntervalTime:new(id3, Fraction(1)), -1, 1)
 
 	self.beatTime = 0
 	self.absoluteTime = 0
@@ -61,7 +65,7 @@ EditorModel.load = function(self)
 
 	self.snap = 1
 
-	self:updateRange()
+	self:scrollSeconds(0)
 end
 
 EditorModel.getSnap = function(self, j)

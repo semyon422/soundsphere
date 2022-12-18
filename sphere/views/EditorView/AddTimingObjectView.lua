@@ -45,7 +45,7 @@ return ModalImView(function(self)
 	just.row(true)
 	tempo = imgui.input("tempo input", tempo, "tempo")
 	if imgui.button("add tempo button", "add") then
-		ld:getTempoData(dtp.measureTime, tonumber(tempo))
+		ld:getTempoData(dtp:getTime(), tonumber(tempo))
 	end
 
 	just.row(true)
@@ -54,13 +54,13 @@ return ModalImView(function(self)
 	imgui.label("/ label", "/")
 	stop[2] = imgui.input("stop d input", stop[2], "stop")
 	if imgui.button("add stop button", "add") then
-		ld:getStopData(dtp.measureTime, Fraction(tonumber(stop[1]), tonumber(stop[2])))
+		ld:getStopData(dtp:getTime(), Fraction(tonumber(stop[1]), tonumber(stop[2])))
 	end
 
 	just.row(true)
 	velocity = imgui.input("velocity input", velocity, "velocity")
 	if imgui.button("add velocity button", "add") then
-		ld:getVelocityData(dtp.measureTime, dtp.side, tonumber(velocity))
+		ld:getVelocityData(dtp:getTime(), dtp.side, tonumber(velocity))
 	end
 
 	just.row(true)
@@ -69,16 +69,28 @@ return ModalImView(function(self)
 	imgui.label("/ label", "/")
 	expand[2] = imgui.input("expand d input", expand[2], "expand")
 	if imgui.button("add expand button", "add") then
-		ld:getExpandData(dtp.measureTime, dtp.side, Fraction(tonumber(expand[1]), tonumber(expand[2])))
+		ld:getExpandData(dtp:getTime(), dtp.side, Fraction(tonumber(expand[1]), tonumber(expand[2])))
 	end
 
-	just.row(true)
-	signature[1] = imgui.input("signature n input", signature[1])
-	imgui.unindent()
-	imgui.label("/ label", "/")
-	signature[2] = imgui.input("signature d input", signature[2], "signature")
-	if imgui.button("add signature button", "add") then
-		ld:getSignatureData(dtp.measureTime:floor(), Fraction(tonumber(signature[1]), tonumber(signature[2])))
+	if ld.mode == "measure" then
+		just.row(true)
+		signature[1] = imgui.input("signature n input", signature[1])
+		imgui.unindent()
+		imgui.label("/ label", "/")
+		signature[2] = imgui.input("signature d input", signature[2], "signature")
+		if imgui.button("add signature button", "add") then
+			ld:getSignatureData(dtp.measureTime:floor(), Fraction(tonumber(signature[1]), tonumber(signature[2])))
+		end
+	end
+
+	if ld.mode == "interval" then
+		just.row(true)
+		-- if imgui.button("add interval button", "add interval") then
+		-- 	ld:getIntervalData(dtp.absoluteTime, 10)
+		-- end
+		if imgui.button("split interval button", "split interval") then
+			ld:splitIntervalData(dtp)
+		end
 	end
 
 	just.row()
