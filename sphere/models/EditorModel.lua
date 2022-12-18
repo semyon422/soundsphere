@@ -1,6 +1,7 @@
 local Class = require("Class")
 local DynamicLayerData = require("ncdk.DynamicLayerData")
 local Fraction = require("ncdk.Fraction")
+local IntervalTime = require("ncdk.IntervalTime")
 
 local EditorModel = Class:new()
 
@@ -87,7 +88,7 @@ EditorModel.updateRange = function(self)
 		return
 	end
 
-	local dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime, 192, -1)
+	local dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime, 192)
 	local measureOffset = dtp.measureTime:floor()
 
 	local delta = 2
@@ -101,19 +102,6 @@ EditorModel.getDynamicTimePoint = function(self)
 	return ld:getDynamicTimePointAbsolute(self.absoluteTime, 192, self.side, self.visualSide)
 end
 
-EditorModel.scrollSeconds = function(self, delta)
-	self.absoluteTime = self.absoluteTime + delta
-
-	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime, 192, -1)
-	self.visualTime = dtp.visualTime
-	self.beatTime = dtp.beatTime
-	self.side = -1
-	self.visualSide = -1
-
-	self:updateRange()
-end
-
 EditorModel.scrollTimePoint = function(self, timePoint)
 	self.absoluteTime = timePoint.absoluteTime
 	self.visualTime = timePoint.visualTime
@@ -124,9 +112,52 @@ EditorModel.scrollTimePoint = function(self, timePoint)
 	self:updateRange()
 end
 
+EditorModel.scrollSeconds = function(self, delta)
+	local ld = self.layerData
+	local dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime + delta, 192)
+	self:scrollTimePoint(dtp)
+end
+
 EditorModel.scrollSnaps = function(self, delta)
 	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime, 192, -1)
+	local time
+	if ld.mode == "interval" then
+		time = self:scrollSnapsInterval(delta)
+	elseif ld.mode == "measure" then
+		time = self:scrollSnapsMeasure(delta)
+	end
+	self:scrollTimePoint(ld:getDynamicTimePoint(time))
+end
+
+EditorModel.scrollSnapsInterval = function(self, delta)
+	local ld = self.layerData
+	local dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime, 192)
+
+	local snap = self.snap
+	local snapTime = dtp.intervalTime.time * snap
+
+	local targetSnapTime
+	if delta == -1 then
+		targetSnapTime = snapTime:ceil() - 1
+	else
+		targetSnapTime = snapTime:floor() + 1
+	end
+
+	local intervalData = dtp.intervalData
+	if intervalData.next and targetSnapTime >= intervalData.intervals * snap then
+		intervalData = intervalData.next
+		targetSnapTime = 0
+	elseif intervalData.prev and targetSnapTime < 0 then
+		intervalData = intervalData.prev
+		targetSnapTime = intervalData.intervals * snap - 1
+	end
+
+	return IntervalTime:new(intervalData, Fraction(targetSnapTime, snap))
+end
+
+EditorModel.scrollSnapsMeasure = function(self, delta)
+	local ld = self.layerData
+	local dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime, 192)
 
 	local measureOffset = dtp.measureTime:floor()
 	local signature = ld:getSignature(measureOffset)
@@ -141,34 +172,23 @@ EditorModel.scrollSnaps = function(self, delta)
 	signature = ld:getSignature(targetMeasureOffset)
 	sigSnap = signature * self.snap
 
-	local measureTime
 	if measureOffset ~= targetMeasureOffset then
 		if delta == -1 then
-			measureTime = Fraction(sigSnap:ceil() - 1) / sigSnap + targetMeasureOffset
-		else
-			measureTime = Fraction(targetMeasureOffset)
+			return Fraction(sigSnap:ceil() - 1) / sigSnap + targetMeasureOffset
 		end
-	else
-		local snapTime = (dtp.measureTime - measureOffset) * sigSnap
-
-		local targetSnapTime
-		if delta == -1 then
-			targetSnapTime = snapTime:ceil() - 1
-		else
-			targetSnapTime = snapTime:floor() + 1
-		end
-
-		measureTime = Fraction(targetSnapTime) / sigSnap + measureOffset
+		return Fraction(targetMeasureOffset)
 	end
 
-	dtp = ld:getDynamicTimePoint(measureTime)
-	self.absoluteTime = dtp.absoluteTime
-	self.visualTime = dtp.visualTime
-	self.beatTime = dtp.beatTime
-	self.side = -1
-	self.visualSide = -1
+	local snapTime = (dtp.measureTime - measureOffset) * sigSnap
 
-	self:updateRange()
+	local targetSnapTime
+	if delta == -1 then
+		targetSnapTime = snapTime:ceil() - 1
+	else
+		targetSnapTime = snapTime:floor() + 1
+	end
+
+	return Fraction(targetSnapTime) / sigSnap + measureOffset
 end
 
 return EditorModel
