@@ -29,7 +29,7 @@ return ModalImView(function(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	love.graphics.replaceTransform(_transform(transform))
-	love.graphics.translate((1920 - w) / 2, (1080 - h) / 2)
+	love.graphics.translate(1920 / 2, (1080 - h) / 2)
 
 	love.graphics.setColor(0, 0, 0, 0.8)
 	love.graphics.rectangle("fill", 0, 0, w, h, r)
@@ -85,11 +85,11 @@ return ModalImView(function(self)
 
 	if ld.mode == "interval" then
 		just.row(true)
-		-- if imgui.button("add interval button", "add interval") then
-		-- 	ld:getIntervalData(dtp.absoluteTime, 10)
-		-- end
 		if imgui.button("split interval button", "split interval") then
-			ld:splitIntervalData(dtp)
+			ld:splitInterval(dtp)
+		end
+		if dtp._intervalData and imgui.button("merge interval button", "merge interval") then
+			ld:mergeInterval(dtp)
 		end
 	end
 
