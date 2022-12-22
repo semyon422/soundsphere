@@ -12,6 +12,7 @@ local w, h = 512, 1080 / 2
 local _w, _h = w / 2, 55
 local r = 8
 local window_id = "AddTimingObjectView"
+local grabbedIntervalData = false
 
 local tempo = "60"
 local stop = {"0", "1"}
@@ -40,22 +41,63 @@ return ModalImView(function(self)
 
 	local dtp = editorModel:getDynamicTimePoint()
 
-	imgui.setSize(w, h, 110, 55)
+	if ld.mode == "measure" then
+		imgui.setSize(w, h, 110, 55)
 
-	just.row(true)
-	tempo = imgui.input("tempo input", tempo, "tempo")
-	if imgui.button("add tempo button", "add") then
-		ld:getTempoData(dtp:getTime(), tonumber(tempo))
+		just.row(true)
+		tempo = imgui.input("tempo input", tempo, "tempo")
+		if imgui.button("add tempo button", "add") then
+			ld:getTempoData(dtp:getTime(), tonumber(tempo))
+		end
+
+		just.row(true)
+		stop[1] = imgui.input("stop n input", stop[1])
+		imgui.unindent()
+		imgui.label("/ label", "/")
+		stop[2] = imgui.input("stop d input", stop[2], "stop")
+		if imgui.button("add stop button", "add") then
+			ld:getStopData(dtp:getTime(), Fraction(tonumber(stop[1]), tonumber(stop[2])))
+		end
+
+		just.row(true)
+		signature[1] = imgui.input("signature n input", signature[1])
+		imgui.unindent()
+		imgui.label("/ label", "/")
+		signature[2] = imgui.input("signature d input", signature[2], "signature")
+		if imgui.button("add signature button", "add") then
+			ld:getSignatureData(dtp.measureTime:floor(), Fraction(tonumber(signature[1]), tonumber(signature[2])))
+		end
+	elseif ld.mode == "interval" then
+		imgui.setSize(w, h, w / 2, 55)
+
+		local intervalData = dtp._intervalData
+
+		if not grabbedIntervalData then
+			if not intervalData and imgui.button("split interval button", "split interval") then
+				ld:splitInterval(dtp)
+			end
+			if intervalData then
+				if imgui.button("merge interval button", "merge interval") then
+					ld:mergeInterval(dtp)
+				end
+				local intervals = imgui.intButtons("update interval", intervalData.intervals, 2, "intervals")
+				if intervals ~= intervalData.intervals then
+					ld:updateInterval(intervalData, intervals)
+				end
+			end
+			if intervalData and imgui.button("grab interval button", "grab interval") then
+				grabbedIntervalData = intervalData
+			end
+		else
+			if imgui.button("drop interval button", "drop interval") then
+				grabbedIntervalData = nil
+			else
+				ld:moveInterval(grabbedIntervalData, dtp.absoluteTime)
+			end
+		end
 	end
 
-	just.row(true)
-	stop[1] = imgui.input("stop n input", stop[1])
-	imgui.unindent()
-	imgui.label("/ label", "/")
-	stop[2] = imgui.input("stop d input", stop[2], "stop")
-	if imgui.button("add stop button", "add") then
-		ld:getStopData(dtp:getTime(), Fraction(tonumber(stop[1]), tonumber(stop[2])))
-	end
+	imgui.separator()
 
 	just.row(true)
 	velocity = imgui.input("velocity input", velocity, "velocity")
@@ -72,28 +114,9 @@ return ModalImView(function(self)
 		ld:getExpandData(dtp:getTime(), dtp.side, Fraction(tonumber(expand[1]), tonumber(expand[2])))
 	end
 
-	if ld.mode == "measure" then
-		just.row(true)
-		signature[1] = imgui.input("signature n input", signature[1])
-		imgui.unindent()
-		imgui.label("/ label", "/")
-		signature[2] = imgui.input("signature d input", signature[2], "signature")
-		if imgui.button("add signature button", "add") then
-			ld:getSignatureData(dtp.measureTime:floor(), Fraction(tonumber(signature[1]), tonumber(signature[2])))
-		end
-	end
-
-	if ld.mode == "interval" then
-		just.row(true)
-		if imgui.button("split interval button", "split interval") then
-			ld:splitInterval(dtp)
-		end
-		if dtp._intervalData and imgui.button("merge interval button", "merge interval") then
-			ld:mergeInterval(dtp)
-		end
-	end
-
 	just.row()
+
+	-- just.row()
 	imgui.setSize(w, h, w / 2, 55)
 
 	if dtp._tempoData then
