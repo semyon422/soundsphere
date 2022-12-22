@@ -36,6 +36,7 @@ EditorModel.load1 = function(self)
 	self.visualSide = -1
 
 	self.snap = 1
+	self.speed = 1
 
 	self:scrollSeconds(0)
 end
@@ -48,14 +49,17 @@ EditorModel.load = function(self)
 	ld:setSignatureMode("short")
 	ld:setRange(0, 30)
 
-	local id1 = ld:getIntervalData(1, 5)
-	local id2 = ld:getIntervalData(6, 7)
-	local id3 = ld:getIntervalData(10, 2)
-	ld:getIntervalData(15, 1)
+	local id1 = ld:getIntervalData(0, 10)
+	local id2 = ld:getIntervalData(1, 1)
 
 	-- ld:getVelocityData(IntervalTime:new(id1, Fraction(0)), -1, 0.5)
 	-- ld:getVelocityData(IntervalTime:new(id2, Fraction(3)), -1, 2)
 	-- ld:getVelocityData(IntervalTime:new(id3, Fraction(1)), -1, 1)
+
+	ld:getNoteData(ld:getTimePoint(IntervalTime:new(id1, Fraction(0))), "key", 1)
+	ld:getNoteData(ld:getTimePoint(IntervalTime:new(id1, Fraction(1))), "key", 2)
+	ld:getNoteData(ld:getTimePoint(IntervalTime:new(id1, Fraction(2))), "key", 3)
+	ld:getNoteData(ld:getTimePoint(IntervalTime:new(id1, Fraction(3))), "key", 4)
 
 	self.beatTime = 0
 	self.absoluteTime = 0
@@ -64,6 +68,7 @@ EditorModel.load = function(self)
 	self.visualSide = -1
 
 	self.snap = 1
+	self.speed = 1
 
 	self:scrollSeconds(0)
 end
@@ -85,7 +90,7 @@ end
 EditorModel.updateRange = function(self)
 	local ld = self.layerData
 	if ld.mode == "interval" then
-		local delta = 10
+		local delta = 1 / self.speed
 		if ld.startTime ~= self.absoluteTime - delta then
 			ld:setRange(self.absoluteTime - delta, self.absoluteTime + delta)
 		end

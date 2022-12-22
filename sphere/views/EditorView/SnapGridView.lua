@@ -10,11 +10,6 @@ local Layout = require("sphere.views.EditorView.Layout")
 
 local SnapGridView = Class:new()
 
-SnapGridView.construct = function(self)
-	self.pixelsPerBeat = 40
-	self.pixelsPerSecond = 40
-end
-
 local function getTimePointText(timePoint)
 	if timePoint._tempoData then
 		return timePoint._tempoData.tempo .. " bpm"
@@ -33,21 +28,21 @@ end
 
 SnapGridView.drawTimingObjects = function(self, field, currentTime, pixels)
 	local rangeTracker = self.game.editorModel.layerData.timePointsRange
-	local object = rangeTracker.startObject
-	if not object or not currentTime then
+	local timePoint = rangeTracker.startObject
+	if not timePoint or not currentTime then
 		return
 	end
 
-	local endObject = rangeTracker.endObject
-	while object and object <= endObject do
-		local text = getTimePointText(object)
+	local endTimePoint = rangeTracker.endObject
+	while timePoint and timePoint <= endTimePoint do
+		local text = getTimePointText(timePoint)
 		if text then
-			local y = (object[field] - currentTime) * pixels
+			local y = (timePoint[field] - currentTime) * pixels
 			love.graphics.line(0, y, 10, y)
 			gfx_util.printFrame(text, -500, y - 25, 490, 50, "right", "center")
 		end
 
-		object = object.next
+		timePoint = timePoint.next
 	end
 end
 
@@ -71,7 +66,7 @@ local snaps = {
 	[8] = colors.green,
 }
 
-SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels)
+SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels, w1, w2)
 	local editorModel = self.game.editorModel
 	local ld = editorModel.layerData
 	local snap = editorModel.snap
@@ -88,9 +83,9 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels)
 						if not timePoint then break end
 						local y = (timePoint[field] - currentTime) * pixels
 
-						local w = 30
+						local w = w1 or 30
 						if i == 1 and j == 1 then
-							w = 60
+							w = w2 or w1 or 60
 						end
 						love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
 						love.graphics.line(0, y, w, y)
@@ -113,9 +108,9 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels)
 				if not timePoint then break end
 				local y = (timePoint[field] - currentTime) * pixels
 
-				local w = 30
+				local w = w1 or 30
 				if startTime == 0 and j == 1 then
-					w = 60
+					w = w2 or w1 or 60
 				end
 				love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
 				love.graphics.line(0, y, w, y)
@@ -141,8 +136,11 @@ SnapGridView.drawUI = function(self, w, h)
 
 	imgui.setSize(w, h, 200, 55)
 	editorModel.snap = imgui.slider1("snap select", editorModel.snap, "%d", 1, 16, 1, "snap")
-	self.pixelsPerBeat = imgui.slider1("beat pixels", self.pixelsPerBeat, "%d", 10, 1000, 10, "pixels per beat")
-	self.pixelsPerSecond = imgui.slider1("second pixels", self.pixelsPerSecond, "%d", 10, 1000, 10, "pixels per second")
+	local speed = imgui.slider1("second pixels", h * editorModel.speed, "%d", 10, h, 10, "pixels per second") / h
+	if speed ~= editorModel.speed then
+		editorModel.speed = speed
+		editorModel:updateRange()
+	end
 
 	if imgui.button("add object", "add") then
 		self.game.gameView:setModal(require("sphere.views.EditorView.AddTimingObjectView"))
@@ -212,6 +210,33 @@ SnapGridView.drawUI = function(self, w, h)
 	just.pop()
 end
 
+SnapGridView.drawNotes = function(self, pixels, width)
+	local editorModel = self.game.editorModel
+	local ld = editorModel.layerData
+
+	local rangeTracker = self.game.editorModel.layerData.timePointsRange
+	local timePoint = rangeTracker.startObject
+	if not timePoint then
+		return
+	end
+
+	local currentTime = editorModel.absoluteTime
+
+	local endTimePoint = rangeTracker.endObject
+	while timePoint and timePoint <= endTimePoint do
+		local noteDatas = timePoint.noteDatas
+		if noteDatas then
+			for _, noteData in ipairs(noteDatas) do
+				local y = (timePoint.absoluteTime - currentTime) * pixels
+				local x = (noteData.inputIndex - 1) * width / 4
+				love.graphics.rectangle("fill", x, y, width / 4, width / 8)
+			end
+		end
+
+		timePoint = timePoint.next
+	end
+end
+
 local function drag(id, w, h)
 	local over = just.is_over(w, h)
 	local _, active, hovered = just.button(id, over)
@@ -245,21 +270,34 @@ SnapGridView.draw = function(self)
 	love.graphics.translate(0, h / 2)
 	love.graphics.line(0, 0, 240, 0)
 
+	local speed = h * editorModel.speed
+
 	love.graphics.translate(-40, 0)
 	if ld.mode == "measure" then
-		self:drawTimingObjects("beatTime", editorModel.beatTime, self.pixelsPerBeat)
+		self:drawTimingObjects("beatTime", editorModel.beatTime, speed)
 	elseif ld.mode == "interval" then
-		self:drawTimingObjects("absoluteTime", editorModel.absoluteTime, self.pixelsPerSecond)
+		self:drawTimingObjects("absoluteTime", editorModel.absoluteTime, speed)
 	end
 	love.graphics.translate(40, 0)
-	self:drawComputedGrid("beatTime", editorModel.beatTime, self.pixelsPerBeat)
+	self:drawComputedGrid("beatTime", editorModel.beatTime, speed)
 
 	love.graphics.translate(80, 0)
-	self:drawComputedGrid("absoluteTime", editorModel.absoluteTime, self.pixelsPerSecond)
+	self:drawComputedGrid("absoluteTime", editorModel.absoluteTime, speed)
 
 	love.graphics.translate(80, 0)
-	self:drawComputedGrid("visualTime", editorModel.visualTime, self.pixelsPerSecond)
+	self:drawComputedGrid("visualTime", editorModel.visualTime, speed)
 
+	love.graphics.pop()
+
+	love.graphics.push()
+	love.graphics.translate(300, 0)
+	for i = 0, 4 do
+		love.graphics.line(i * 80, 0, i * 80, h)
+	end
+	love.graphics.translate(0, h / 2)
+	love.graphics.line(0, 0, 320, 0)
+	self:drawComputedGrid("absoluteTime", editorModel.absoluteTime, speed, 320, 320)
+	self:drawNotes(speed, 320)
 	love.graphics.pop()
 
 	local _, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
@@ -267,7 +305,7 @@ SnapGridView.draw = function(self)
 
 	just.push()
 	just.row(true)
-	local pixels = drag("drag1", 80, h) and self.pixelsPerBeat or drag("drag2", 160, h) and self.pixelsPerSecond
+	local pixels = drag("drag1", 240, h) and speed
 	if pixels then
 		editorModel:scrollSeconds((my - prevMouseY) / pixels)
 	end
