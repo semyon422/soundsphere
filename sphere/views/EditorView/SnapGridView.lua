@@ -229,7 +229,14 @@ SnapGridView.drawNotes = function(self, pixels, width)
 			for _, noteData in ipairs(noteDatas) do
 				local y = (timePoint.absoluteTime - currentTime) * pixels
 				local x = (noteData.inputIndex - 1) * width / 4
-				love.graphics.rectangle("fill", x, y, width / 4, width / 8)
+				local h = (pixels > 0 and 1 or -1) * width / 16
+				just.push()
+				love.graphics.translate(x, y)
+				love.graphics.rectangle("fill", 0, 0, width / 4, h)
+				if just.button("remove note" .. tostring(noteData), just.is_over(width / 4, h), 2) then
+					ld:removeNoteData(noteData)
+				end
+				just.pop()
 			end
 		end
 
@@ -270,7 +277,7 @@ SnapGridView.draw = function(self)
 	love.graphics.translate(0, h / 2)
 	love.graphics.line(0, 0, 240, 0)
 
-	local speed = h * editorModel.speed
+	local speed = -h * editorModel.speed
 
 	love.graphics.translate(-40, 0)
 	if ld.mode == "measure" then
@@ -291,17 +298,35 @@ SnapGridView.draw = function(self)
 
 	love.graphics.push()
 	love.graphics.translate(300, 0)
-	for i = 0, 4 do
-		love.graphics.line(i * 80, 0, i * 80, h)
+	local _mx, _my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+	local my = h - _my
+
+	local over = just.is_over(320, h)
+	local t = editorModel.absoluteTime - (my - h / 2) / speed
+	if over then
+		love.graphics.rectangle("fill", _mx, _my, 80, -20)
 	end
+
+	if just.button("add note", over, 1) then
+		editorModel:addNote(t, "key", 1)
+	end
+
+	love.graphics.push()
+	for i = 1, 4 do
+		love.graphics.line(0, 0, 0, h)
+		if just.button("add note" .. i, just.is_over(80, h), 1) then
+			editorModel:addNote(t, "key", i)
+		end
+		love.graphics.translate(80, 0)
+	end
+	love.graphics.line(0, 0, 0, h)
+	love.graphics.pop()
+
 	love.graphics.translate(0, h / 2)
 	love.graphics.line(0, 0, 320, 0)
 	self:drawComputedGrid("absoluteTime", editorModel.absoluteTime, speed, 320, 320)
 	self:drawNotes(speed, 320)
 	love.graphics.pop()
-
-	local _, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-	my = h - my
 
 	just.push()
 	just.row(true)

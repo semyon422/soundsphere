@@ -111,6 +111,12 @@ EditorModel.getDynamicTimePoint = function(self)
 	return ld:getDynamicTimePointAbsolute(self.absoluteTime, 192, self.side, self.visualSide)
 end
 
+EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
+	local ld = self.layerData
+	local dtp = ld:getDynamicTimePointAbsolute(absoluteTime, self.snap)
+	ld:getNoteData(dtp, inputType, inputIndex)
+end
+
 EditorModel.scrollTimePoint = function(self, timePoint)
 	self.absoluteTime = timePoint.absoluteTime
 	self.visualTime = timePoint.visualTime
