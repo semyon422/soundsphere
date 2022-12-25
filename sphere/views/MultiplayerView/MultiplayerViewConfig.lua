@@ -221,35 +221,36 @@ local function RoomSettings(self)
 
 	love.graphics.translate(0, 36)
 
+	local _h = 55
 	local isHost = multiplayerModel:isHost()
 	if isHost then
-		if imgui.Checkbox("Free chart", room.isFreeNotechart, 72, 0.5) then
+		if imgui.Checkbox("Free chart", room.isFreeNotechart, _h) then
 			multiplayerModel:setFreeNotechart(not room.isFreeNotechart)
 		end
 		just.sameline()
-		imgui.Label("Free chart", "Free chart", 72)
+		imgui.Label("Free chart", "Free chart", _h)
 
-		if imgui.Checkbox("Free mods", room.isFreeModifiers, 72, 0.5) then
+		if imgui.Checkbox("Free mods", room.isFreeModifiers, _h) then
 			multiplayerModel:setFreeModifiers(not room.isFreeModifiers)
 		end
 		just.sameline()
-		imgui.Label("Free mods", "Free mods", 72)
+		imgui.Label("Free mods", "Free mods", _h)
 
 		just.emptyline(36)
 	end
 
-	if imgui.Checkbox("Ready", user.isReady, 72, 0.5) then
+	if imgui.Checkbox("Ready", user.isReady, _h) then
 		multiplayerModel:switchReady()
 	end
 	just.sameline()
-	imgui.Label("Ready", "Ready", 72)
+	imgui.Label("Ready", "Ready", _h)
 
 	w, h = Layout:move("column3")
 	love.graphics.translate(36, h - 72 * 3)
 
 	if isHost or room.isFreeNotechart then
 		if imgui.TextOnlyButton("Select chart", "Select", w - 72, 72) then
-			self.screenView:changeScreen("selectView")
+			self:changeScreen("selectView")
 		end
 	end
 	if isHost or room.isFreeModifiers then
