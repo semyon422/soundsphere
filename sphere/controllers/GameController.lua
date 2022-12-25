@@ -154,7 +154,7 @@ GameController.load = function(self)
 	self.collectionModel:load()
 	self.selectModel:load()
 	self.previewModel:load()
-	self.editorModel:load()
+	-- self.editorModel:load()
 
 	self.multiplayerController:load()
 

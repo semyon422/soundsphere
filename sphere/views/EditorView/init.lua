@@ -23,6 +23,8 @@ EditorView.load = thread.coro(function(self)
 	end
 	loading = true
 
+	self.game.editorModel:load()
+
 	-- self.game.editorController:load()
 
 	-- local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
