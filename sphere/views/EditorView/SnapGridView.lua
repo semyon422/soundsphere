@@ -3,7 +3,6 @@ local gfx_util = require("gfx_util")
 local spherefonts = require("sphere.assets.fonts")
 local just = require("just")
 local Fraction = require("ncdk.Fraction")
-local IntervalTime = require("ncdk.IntervalTime")
 local imgui = require("imgui")
 
 local Layout = require("sphere.views.EditorView.Layout")
@@ -71,6 +70,10 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels, w1, w
 	local ld = editorModel.layerData
 	local snap = editorModel.snap
 
+	if not currentTime then
+		return
+	end
+
 	if ld.mode == "measure" then
 		for time = ld.startTime:ceil(), ld.endTime:floor() do
 			local signature = ld:getSignature(time)
@@ -94,18 +97,18 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels, w1, w
 			end
 		end
 	elseif ld.mode == "interval" then
-		local timePoint = ld:getDynamicTimePointAbsolute(ld.startTime, 192)
-		local startIntervalData = timePoint.intervalTime.intervalData
-		local startTime = timePoint.intervalTime.time:floor()
-		timePoint = ld:getDynamicTimePointAbsolute(ld.endTime, 192)
-		local endIntervalData = timePoint.intervalTime.intervalData
-		local endTime = timePoint.intervalTime.time:floor()
+		local timePoint = ld:getDynamicTimePointAbsolute(192, ld.startTime)
+		local startIntervalData = timePoint.intervalData
+		local startTime = timePoint.time:floor()
+		timePoint = ld:getDynamicTimePointAbsolute(192, ld.endTime)
+		local endIntervalData = timePoint.intervalData
+		local endTime = timePoint.time:floor()
 
 		while startIntervalData and startIntervalData < endIntervalData or startIntervalData == endIntervalData and startTime <= endTime do
 			for j = 1, snap do
 				local time = Fraction(j - 1, snap) + startTime
-				timePoint = ld:getDynamicTimePoint(IntervalTime:new(startIntervalData, time))
-				if not timePoint then break end
+				timePoint = ld:getDynamicTimePoint(startIntervalData, time)
+				if not timePoint or not timePoint[field] then break end
 				local y = (timePoint[field] - currentTime) * pixels
 
 				local w = w1 or 30

@@ -1,7 +1,6 @@
 local Class = require("Class")
 local DynamicLayerData = require("ncdk.DynamicLayerData")
 local Fraction = require("ncdk.Fraction")
-local IntervalTime = require("ncdk.IntervalTime")
 
 local EditorModel = Class:new()
 
@@ -52,14 +51,14 @@ EditorModel.load = function(self)
 	local id1 = ld:getIntervalData(0, 10)
 	local id2 = ld:getIntervalData(1, 1)
 
-	-- ld:getVelocityData(IntervalTime:new(id1, Fraction(0)), -1, 0.5)
-	-- ld:getVelocityData(IntervalTime:new(id2, Fraction(3)), -1, 2)
-	-- ld:getVelocityData(IntervalTime:new(id3, Fraction(1)), -1, 1)
+	-- ld:getVelocityData(id1, Fraction(0), -1, 0.5)
+	-- ld:getVelocityData(id2, Fraction(3), -1, 2)
+	-- ld:getVelocityData(id3, Fraction(1), -1, 1)
 
-	ld:getNoteData(ld:getTimePoint(IntervalTime:new(id1, Fraction(0))), "key", 1)
-	ld:getNoteData(ld:getTimePoint(IntervalTime:new(id1, Fraction(1))), "key", 2)
-	ld:getNoteData(ld:getTimePoint(IntervalTime:new(id1, Fraction(2))), "key", 3)
-	ld:getNoteData(ld:getTimePoint(IntervalTime:new(id1, Fraction(3))), "key", 4)
+	ld:getNoteData(ld:getTimePoint(id1, Fraction(0)), "key", 1)
+	ld:getNoteData(ld:getTimePoint(id1, Fraction(1)), "key", 2)
+	ld:getNoteData(ld:getTimePoint(id1, Fraction(2)), "key", 3)
+	ld:getNoteData(ld:getTimePoint(id1, Fraction(3)), "key", 4)
 
 	self.beatTime = 0
 	self.absoluteTime = 0
@@ -97,7 +96,7 @@ EditorModel.updateRange = function(self)
 		return
 	end
 
-	local dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime, 192)
+	local dtp = ld:getDynamicTimePointAbsolute(192, self.absoluteTime)
 	local measureOffset = dtp.measureTime:floor()
 
 	local delta = 2
@@ -108,12 +107,12 @@ end
 
 EditorModel.getDynamicTimePoint = function(self)
 	local ld = self.layerData
-	return ld:getDynamicTimePointAbsolute(self.absoluteTime, 192, self.side, self.visualSide)
+	return ld:getDynamicTimePointAbsolute(192, self.absoluteTime, self.side, self.visualSide)
 end
 
 EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
 	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(absoluteTime, self.snap)
+	local dtp = ld:getDynamicTimePointAbsolute(self.snap, absoluteTime)
 	ld:getNoteData(dtp, inputType, inputIndex)
 end
 
@@ -129,27 +128,25 @@ end
 
 EditorModel.scrollSeconds = function(self, delta)
 	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime + delta, 192)
+	local dtp = ld:getDynamicTimePointAbsolute(192, self.absoluteTime + delta)
 	self:scrollTimePoint(dtp)
 end
 
 EditorModel.scrollSnaps = function(self, delta)
 	local ld = self.layerData
-	local time
 	if ld.mode == "interval" then
-		time = self:scrollSnapsInterval(delta)
+		self:scrollTimePoint(ld:getDynamicTimePoint(self:scrollSnapsInterval(delta)))
 	elseif ld.mode == "measure" then
-		time = self:scrollSnapsMeasure(delta)
+		self:scrollTimePoint(ld:getDynamicTimePoint(self:scrollSnapsMeasure(delta)))
 	end
-	self:scrollTimePoint(ld:getDynamicTimePoint(time))
 end
 
 EditorModel.scrollSnapsInterval = function(self, delta)
 	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime, 192)
+	local dtp = ld:getDynamicTimePointAbsolute(192, self.absoluteTime)
 
 	local snap = self.snap
-	local snapTime = dtp.intervalTime.time * snap
+	local snapTime = dtp.time * snap
 
 	local targetSnapTime
 	if delta == -1 then
@@ -167,12 +164,12 @@ EditorModel.scrollSnapsInterval = function(self, delta)
 		targetSnapTime = intervalData.intervals * snap - 1
 	end
 
-	return IntervalTime:new(intervalData, Fraction(targetSnapTime, snap))
+	return intervalData, Fraction(targetSnapTime, snap)
 end
 
 EditorModel.scrollSnapsMeasure = function(self, delta)
 	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(self.absoluteTime, 192)
+	local dtp = ld:getDynamicTimePointAbsolute(192, self.absoluteTime)
 
 	local measureOffset = dtp.measureTime:floor()
 	local signature = ld:getSignature(measureOffset)
