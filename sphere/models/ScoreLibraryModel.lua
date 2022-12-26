@@ -20,11 +20,11 @@ ScoreLibraryModel.clear = function(self)
 end
 
 ScoreLibraryModel.setHash = function(self, hash)
-	self.hash = hash
+	self.hash = hash or ""
 end
 
 ScoreLibraryModel.setIndex = function(self, index)
-	self.index = index
+	self.index = index or 1
 end
 
 ScoreLibraryModel.filterScores = function(self, scores)
