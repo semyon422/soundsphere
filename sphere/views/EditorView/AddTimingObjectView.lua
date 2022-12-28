@@ -99,10 +99,11 @@ return ModalImView(function(self)
 
 	imgui.separator()
 
+	imgui.setSize(w, h, 110, 55)
 	just.row(true)
 	velocity = imgui.input("velocity input", velocity, "velocity")
 	if imgui.button("add velocity button", "add") then
-		ld:getVelocityData(dtp:getTime(), dtp.side, tonumber(velocity))
+		ld:getVelocityData(dtp, tonumber(velocity))
 	end
 
 	just.row(true)
@@ -111,7 +112,7 @@ return ModalImView(function(self)
 	imgui.label("/ label", "/")
 	expand[2] = imgui.input("expand d input", expand[2], "expand")
 	if imgui.button("add expand button", "add") then
-		ld:getExpandData(dtp:getTime(), dtp.side, Fraction(tonumber(expand[1]), tonumber(expand[2])))
+		ld:getExpandData(dtp, Fraction(tonumber(expand[1]), tonumber(expand[2])))
 	end
 
 	just.row()
@@ -137,14 +138,14 @@ return ModalImView(function(self)
 		imgui.label("velocity label", "Velocity: " .. dtp._velocityData.currentSpeed .. " x")
 		just.sameline()
 		if imgui.button("remove velocity button", "remove") then
-			ld:removeVelocityData(dtp.measureTime, dtp.side)
+			ld:removeVelocityData(dtp)
 		end
 	end
 	if dtp._expandData then
 		imgui.label("expand label", "Expand: " .. dtp._expandData.duration .. " beats")
 		just.sameline()
 		if imgui.button("remove expand button", "remove") then
-			ld:removeExpandData(dtp.measureTime, dtp.side)
+			ld:removeExpandData(dtp)
 		end
 	end
 

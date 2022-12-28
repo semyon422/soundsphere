@@ -223,7 +223,7 @@ SnapGridView.drawNotes = function(self, pixels, width)
 		return
 	end
 
-	local currentTime = editorModel.absoluteTime
+	local currentTime = editorModel.timePoint.absoluteTime
 
 	local endTimePoint = rangeTracker.endObject
 	while timePoint and timePoint <= endTimePoint do
@@ -282,20 +282,21 @@ SnapGridView.draw = function(self)
 
 	local speed = -h * editorModel.speed
 
+	local editorTimePoint = editorModel.timePoint
 	love.graphics.translate(-40, 0)
 	if ld.mode == "measure" then
-		self:drawTimingObjects("beatTime", editorModel.beatTime, speed)
+		self:drawTimingObjects("beatTime", editorTimePoint.beatTime, speed)
 	elseif ld.mode == "interval" then
-		self:drawTimingObjects("absoluteTime", editorModel.absoluteTime, speed)
+		self:drawTimingObjects("absoluteTime", editorTimePoint.absoluteTime, speed)
 	end
 	love.graphics.translate(40, 0)
-	self:drawComputedGrid("beatTime", editorModel.beatTime, speed)
+	self:drawComputedGrid("beatTime", editorTimePoint.beatTime, speed)
 
 	love.graphics.translate(80, 0)
-	self:drawComputedGrid("absoluteTime", editorModel.absoluteTime, speed)
+	self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime, speed)
 
 	love.graphics.translate(80, 0)
-	self:drawComputedGrid("visualTime", editorModel.visualTime, speed)
+	self:drawComputedGrid("visualTime", editorTimePoint.visualTime, speed)
 
 	love.graphics.pop()
 
@@ -305,7 +306,7 @@ SnapGridView.draw = function(self)
 	local my = h - _my
 
 	local over = just.is_over(320, h)
-	local t = editorModel.absoluteTime - (my - h / 2) / speed
+	local t = editorTimePoint.absoluteTime - (my - h / 2) / speed
 	if over then
 		love.graphics.rectangle("fill", _mx, _my, 80, -20)
 	end
@@ -327,7 +328,7 @@ SnapGridView.draw = function(self)
 
 	love.graphics.translate(0, h / 2)
 	love.graphics.line(0, 0, 320, 0)
-	self:drawComputedGrid("absoluteTime", editorModel.absoluteTime, speed, 320, 320)
+	self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime, speed, 320, 320)
 	self:drawNotes(speed, 320)
 	love.graphics.pop()
 

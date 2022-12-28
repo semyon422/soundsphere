@@ -21,18 +21,16 @@ EditorModel.load1 = function(self)
 
 	ld:getStopData(Fraction(5), Fraction(4))
 
-	ld:getVelocityData(Fraction(0.5, 10, true), -1, 1)
-	ld:getVelocityData(Fraction(4.5, 10, true), -1, 2)
-	ld:getVelocityData(Fraction(5, 4), -1, 0)
-	ld:getVelocityData(Fraction(6, 4), -1, 1)
+	ld:getVelocityData(ld:getTimePoint(Fraction(0.5, 10, true)), 1)
+	ld:getVelocityData(ld:getTimePoint(Fraction(4.5, 10, true)), 2)
+	ld:getVelocityData(ld:getTimePoint(Fraction(5, 4)), 0)
+	ld:getVelocityData(ld:getTimePoint(Fraction(6, 4)), 1)
 
-	ld:getExpandData(Fraction(2), -1, Fraction(1))
+	ld:getExpandData(ld:getTimePoint(Fraction(2), 0, 1), Fraction(1))
 
-	self.beatTime = 0
-	self.absoluteTime = 0
-	self.visualTime = 0
-	self.side = -1
-	self.visualSide = -1
+	self.timePoint = ld:newTimePoint()
+	self.timePoint:setTime(ld:getDynamicTimePointAbsolute(192, 0))
+	self.timePoint.absoluteTime = 0
 
 	self.snap = 1
 	self.speed = 1
@@ -51,20 +49,18 @@ EditorModel.load = function(self)
 	local id1 = ld:getIntervalData(0, 10)
 	local id2 = ld:getIntervalData(1, 1)
 
-	-- ld:getVelocityData(id1, Fraction(0), -1, 0.5)
-	-- ld:getVelocityData(id2, Fraction(3), -1, 2)
-	-- ld:getVelocityData(id3, Fraction(1), -1, 1)
+	-- ld:getVelocityData(ld:getTimePoint(id1, Fraction(0)), 0.5)
+	-- ld:getVelocityData(ld:getTimePoint(id2, Fraction(3)), 2)
+	-- ld:getVelocityData(ld:getTimePoint(id3, Fraction(1)), 1)
 
 	ld:getNoteData(ld:getTimePoint(id1, Fraction(0)), "key", 1)
 	ld:getNoteData(ld:getTimePoint(id1, Fraction(1)), "key", 2)
 	ld:getNoteData(ld:getTimePoint(id1, Fraction(2)), "key", 3)
 	ld:getNoteData(ld:getTimePoint(id1, Fraction(3)), "key", 4)
 
-	self.beatTime = 0
-	self.absoluteTime = 0
-	self.visualTime = 0
-	self.side = -1
-	self.visualSide = -1
+	self.timePoint = ld:newTimePoint()
+	self.timePoint:setTime(ld:getDynamicTimePointAbsolute(192, 0))
+	self.timePoint.absoluteTime = 0
 
 	self.snap = 1
 	self.speed = 1
@@ -87,16 +83,18 @@ EditorModel.getSnap = function(self, j)
 end
 
 EditorModel.updateRange = function(self)
+	local absoluteTime = self.timePoint.absoluteTime
+
 	local ld = self.layerData
 	if ld.mode == "interval" then
 		local delta = 1 / self.speed
-		if ld.startTime ~= self.absoluteTime - delta then
-			ld:setRange(self.absoluteTime - delta, self.absoluteTime + delta)
+		if ld.startTime ~= absoluteTime - delta then
+			ld:setRange(absoluteTime - delta, absoluteTime + delta)
 		end
 		return
 	end
 
-	local dtp = ld:getDynamicTimePointAbsolute(192, self.absoluteTime)
+	local dtp = ld:getDynamicTimePointAbsolute(192, absoluteTime)
 	local measureOffset = dtp.measureTime:floor()
 
 	local delta = 2
@@ -107,7 +105,7 @@ end
 
 EditorModel.getDynamicTimePoint = function(self)
 	local ld = self.layerData
-	return ld:getDynamicTimePointAbsolute(192, self.absoluteTime, self.side, self.visualSide)
+	return ld:getDynamicTimePointAbsolute(192, self.timePoint.absoluteTime, self.timePoint.visualSide)
 end
 
 EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
@@ -117,18 +115,18 @@ EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
 end
 
 EditorModel.scrollTimePoint = function(self, timePoint)
-	self.absoluteTime = timePoint.absoluteTime
-	self.visualTime = timePoint.visualTime
-	self.beatTime = timePoint.beatTime
-	self.side = timePoint.side
-	self.visualSide = timePoint.visualSide
+	local t = self.timePoint
+	t.absoluteTime = timePoint.absoluteTime
+	t.visualTime = timePoint.visualTime
+	t.beatTime = timePoint.beatTime
+	t:setTime(timePoint:getTime())
 
 	self:updateRange()
 end
 
 EditorModel.scrollSeconds = function(self, delta)
 	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(192, self.absoluteTime + delta)
+	local dtp = ld:getDynamicTimePointAbsolute(192, self.timePoint.absoluteTime + delta)
 	self:scrollTimePoint(dtp)
 end
 
@@ -143,7 +141,7 @@ end
 
 EditorModel.scrollSnapsInterval = function(self, delta)
 	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(192, self.absoluteTime)
+	local dtp = ld:getDynamicTimePointAbsolute(192, self.timePoint.absoluteTime)
 
 	local snap = self.snap
 	local snapTime = dtp.time * snap
@@ -169,7 +167,7 @@ end
 
 EditorModel.scrollSnapsMeasure = function(self, delta)
 	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(192, self.absoluteTime)
+	local dtp = ld:getDynamicTimePointAbsolute(192, self.timePoint.absoluteTime)
 
 	local measureOffset = dtp.measureTime:floor()
 	local signature = ld:getSignature(measureOffset)
