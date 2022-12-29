@@ -1,5 +1,4 @@
 local Class = require("Class")
-local TimePoint = require("ncdk.TimePoint")
 local GraphicalNoteFactory	= require("sphere.models.RhythmModel.GraphicEngine.GraphicalNoteFactory")
 
 local NoteDrawer = Class:new()
@@ -12,12 +11,12 @@ NoteDrawer.load = function(self)
 	local layerData = self.layerData
 
 	self.currentTimePointIndex = 1
-	self.currentTimePoint = TimePoint:new()
-	self.currentTimePoint.visualTime = 0
+	self.currentTimePoint = layerData:newTimePoint()
 
 	local sharedLogicalNotes = logicEngine.sharedLogicalNotes or {}
 
 	self.notes = {}
+	local notes = self.notes
 	for noteDataIndex = 1, layerData:getNoteDataCount() do
 		local noteData = layerData:getNoteData(noteDataIndex)
 
@@ -31,18 +30,19 @@ NoteDrawer.load = function(self)
 				graphicalNote.layerData = layerData
 				graphicalNote.logicalNote = sharedLogicalNotes[noteData]
 				if graphicEngine.noteSkin:check(graphicalNote) then
-					table.insert(self.notes, graphicalNote)
+					table.insert(notes, graphicalNote)
 				end
 			end
 		end
 	end
 
-	table.sort(self.notes, function(a, b)
-		return a.startNoteData.timePoint.visualTime < b.startNoteData.timePoint.visualTime
-	end)
-
-	for index, graphicalNote in ipairs(self.notes) do
-		graphicalNote.nextNote = self.notes[index + 1]
+	if notes[1] then
+		table.sort(notes, function(a, b)
+			return a.startNoteData.timePoint:compare(b.startNoteData.timePoint, "visual")
+		end)
+		for index, graphicalNote in ipairs(notes) do
+			graphicalNote.nextNote = notes[index + 1]
+		end
 	end
 
 	self.startNoteIndex = 1
