@@ -91,7 +91,10 @@ end
 NoteChartResourceLoader.load = function(self, chartPath, noteChart, callback)
 	local noteChartType = NoteChartTypeMap[noteChart.type]
 
-	local sample_gain = self.game.configModel.configs.settings.audio.sampleGain
+	local settings = self.game.configModel.configs.settings
+	local sample_gain = settings.audio.sampleGain
+	local bga_image = settings.gameplay.bga.image
+	local bga_video = settings.gameplay.bga.video
 	if self.sample_gain ~= sample_gain then
 		self:unloadAudio()
 		self.sample_gain = sample_gain
@@ -117,7 +120,12 @@ NoteChartResourceLoader.load = function(self, chartPath, noteChart, callback)
 				if fileType == "sound" then
 					filePath = FileFinder:findFile(path, "audio")
 				elseif fileType == "image" then
-					filePath = FileFinder:findFile(path, "image") or FileFinder:findFile(path, "video")
+					if bga_image then
+						filePath = FileFinder:findFile(path, "image")
+					end
+					if bga_video and not filePath then
+						filePath = FileFinder:findFile(path, "video")
+					end
 				end
 				if filePath then
 					table.insert(newResources, filePath)
