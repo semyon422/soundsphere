@@ -26,13 +26,13 @@ local function getTimePointText(timePoint)
 end
 
 SnapGridView.drawTimingObjects = function(self, field, currentTime, pixels)
-	local rangeTracker = self.game.editorModel.layerData.timePointsRange
-	local timePoint = rangeTracker.startObject
+	local rangeTracker = self.game.editorModel.layerData.ranges.timePoint
+	local timePoint = rangeTracker.head
 	if not timePoint or not currentTime then
 		return
 	end
 
-	local endTimePoint = rangeTracker.endObject
+	local endTimePoint = rangeTracker.tail
 	while timePoint and timePoint <= endTimePoint do
 		local text = getTimePointText(timePoint)
 		if text then
@@ -217,15 +217,15 @@ SnapGridView.drawNotes = function(self, pixels, width)
 	local editorModel = self.game.editorModel
 	local ld = editorModel.layerData
 
-	local rangeTracker = self.game.editorModel.layerData.timePointsRange
-	local timePoint = rangeTracker.startObject
+	local rangeTracker = self.game.editorModel.layerData.ranges.timePoint
+	local timePoint = rangeTracker.head
 	if not timePoint then
 		return
 	end
 
 	local currentTime = editorModel.timePoint.absoluteTime
 
-	local endTimePoint = rangeTracker.endObject
+	local endTimePoint = rangeTracker.tail
 	while timePoint and timePoint <= endTimePoint do
 		local noteDatas = timePoint.noteDatas
 		if noteDatas then

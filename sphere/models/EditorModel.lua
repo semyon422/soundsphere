@@ -38,7 +38,7 @@ EditorModel.load1 = function(self)
 	self:scrollSeconds(0)
 end
 
-EditorModel.load = function(self)
+EditorModel.load2 = function(self)
 	local ld = DynamicLayerData:new()
 	self.layerData = ld
 
@@ -57,6 +57,23 @@ EditorModel.load = function(self)
 	ld:getNoteData(ld:getTimePoint(id1, Fraction(1)), "key", 2)
 	ld:getNoteData(ld:getTimePoint(id1, Fraction(2)), "key", 3)
 	ld:getNoteData(ld:getTimePoint(id1, Fraction(3)), "key", 4)
+
+	self.timePoint = ld:newTimePoint()
+	self.timePoint:setTime(ld:getDynamicTimePointAbsolute(192, 0))
+	self.timePoint.absoluteTime = 0
+
+	self.snap = 1
+	self.speed = 1
+
+	self:scrollSeconds(0)
+end
+
+EditorModel.load = function(self)
+	local nc = self.game.noteChartModel.noteChart
+
+	local ld = nc:getLayerData(1)
+	ld = DynamicLayerData:new(ld)
+	self.layerData = ld
 
 	self.timePoint = ld:newTimePoint()
 	self.timePoint:setTime(ld:getDynamicTimePointAbsolute(192, 0))
