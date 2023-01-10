@@ -1,16 +1,23 @@
 local Class = require("Class")
+local NoteChartExporter = require("sph.NoteChartExporter")
 
 local EditorController = Class:new()
 
 EditorController.load = function(self)
-	local noteChartModel = self.game.noteChartModel
-	local modifierModel = self.game.modifierModel
-
-	noteChartModel:load()
-	noteChartModel:loadNoteChart()
-	modifierModel:apply("NoteChartModifier")
-
+	self.game.noteChartModel:loadNoteChart()
 	self.game.editorModel:load()
+end
+
+EditorController.save = function(self)
+	local noteChartModel = self.game.noteChartModel
+
+	self.game.editorModel:save()
+
+	local exp = NoteChartExporter:new()
+	exp.noteChart = noteChartModel.noteChart
+
+	print(noteChartModel.noteChartEntry.path)
+	love.filesystem.write(noteChartModel.noteChartEntry.path, exp:export())
 end
 
 return EditorController

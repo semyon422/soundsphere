@@ -85,6 +85,11 @@ EditorModel.load = function(self)
 	self:scrollSeconds(0)
 end
 
+EditorModel.save = function(self)
+	local nc = self.game.noteChartModel.noteChart
+	self.layerData:save(nc:getLayerData(1))
+end
+
 EditorModel.getSnap = function(self, j)
 	local snap = self.snap
 	local k
@@ -128,7 +133,8 @@ end
 EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
 	local ld = self.layerData
 	local dtp = ld:getDynamicTimePointAbsolute(self.snap, absoluteTime)
-	ld:getNoteData(dtp, inputType, inputIndex)
+	local noteData = ld:getNoteData(dtp, inputType, inputIndex)
+	noteData.noteType = "ShortNote"
 end
 
 EditorModel.scrollTimePoint = function(self, timePoint)
