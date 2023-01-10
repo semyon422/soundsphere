@@ -21,7 +21,7 @@ local function getTimePointText(timePoint)
 	elseif timePoint._expandData then
 		return "expand into " .. tostring(timePoint._expandData.duration) .. " beats"
 	elseif timePoint._intervalData then
-		return timePoint._intervalData.intervals .. " intervals"
+		return timePoint._intervalData.beats .. " beats"
 	end
 end
 
@@ -98,32 +98,34 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels, w1, w
 		end
 	elseif ld.mode == "interval" then
 		local timePoint = ld:getDynamicTimePointAbsolute(192, ld.startTime)
-		local startIntervalData = timePoint.intervalData
-		local startTime = timePoint.time:floor()
+		local intervalData = timePoint.intervalData
+		local time = timePoint.time
 		timePoint = ld:getDynamicTimePointAbsolute(192, ld.endTime)
 		local endIntervalData = timePoint.intervalData
-		local endTime = timePoint.time:floor()
+		local endTime = timePoint.time
 
-		while startIntervalData and startIntervalData < endIntervalData or startIntervalData == endIntervalData and startTime <= endTime do
-			for j = 1, snap do
-				local time = Fraction(j - 1, snap) + startTime
-				timePoint = ld:getDynamicTimePoint(startIntervalData, time)
-				if not timePoint or not timePoint[field] then break end
-				local y = (timePoint[field] - currentTime) * pixels
+		time = Fraction((time * snap):ceil(), snap)
+		endTime = Fraction((endTime * snap):floor(), snap)
 
-				local w = w1 or 30
-				if startTime == 0 and j == 1 then
-					w = w2 or w1 or 60
-				end
-				love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
-				love.graphics.line(0, y, w, y)
+		while intervalData and intervalData < endIntervalData or intervalData == endIntervalData and time <= endTime do
+			if intervalData.next and time - intervalData.start >= intervalData.beats then
+				intervalData = intervalData.next
+				time = Fraction((intervalData.start * snap):ceil(), snap)
 			end
 
-			startTime = startTime + 1
-			if startTime == startIntervalData.intervals and startIntervalData.next then
-				startIntervalData = startIntervalData.next
-				startTime = 0
+			timePoint = ld:getDynamicTimePoint(intervalData, time)
+			if not timePoint or not timePoint[field] then break end
+			local y = (timePoint[field] - currentTime) * pixels
+
+			local j = time[1] % time[2] + 1
+			local w = w1 or 30
+			if time == 0 and j == 1 then
+				w = w2 or w1 or 60
 			end
+			love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
+			love.graphics.line(0, y, w, y)
+
+			time = time + Fraction(1, snap)
 		end
 	end
 	love.graphics.setColor(1, 1, 1, 1)

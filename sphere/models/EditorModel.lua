@@ -46,8 +46,8 @@ EditorModel.load2 = function(self)
 	ld:setSignatureMode("short")
 	ld:setRange(0, 30)
 
-	local id1 = ld:getIntervalData(0, 10)
-	local id2 = ld:getIntervalData(1, 1)
+	local id1 = ld:getIntervalData(0, Fraction(10))
+	local id2 = ld:getIntervalData(1, Fraction(1))
 
 	-- ld:getVelocityData(ld:getTimePoint(id1, Fraction(0)), 0.5)
 	-- ld:getVelocityData(ld:getTimePoint(id2, Fraction(3)), 2)
@@ -177,12 +177,12 @@ EditorModel.scrollSnapsInterval = function(self, delta)
 	end
 
 	local intervalData = dtp.intervalData
-	if intervalData.next and targetSnapTime >= intervalData.intervals * snap then
+	if intervalData.next and targetSnapTime >= snap * (intervalData.beats + intervalData.start) then
 		intervalData = intervalData.next
-		targetSnapTime = 0
+		targetSnapTime = intervalData.start * snap
 	elseif intervalData.prev and targetSnapTime < 0 then
 		intervalData = intervalData.prev
-		targetSnapTime = intervalData.intervals * snap - 1
+		targetSnapTime = snap * (intervalData.beats + intervalData.start) - 1
 	end
 
 	return intervalData, Fraction(targetSnapTime, snap)

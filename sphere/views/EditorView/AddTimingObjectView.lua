@@ -80,9 +80,10 @@ return ModalImView(function(self)
 				if imgui.button("merge interval button", "merge interval") then
 					ld:mergeInterval(dtp)
 				end
-				local intervals = imgui.intButtons("update interval", intervalData.intervals, 2, "intervals")
-				if intervals ~= intervalData.intervals then
-					ld:updateInterval(intervalData, intervals)
+				imgui.label("intervals lbl", tostring(intervalData.beats) .. " beats")
+				local inc = imgui.intButtons("update interval", nil, 2, "change beats")
+				if inc ~= 0 then
+					ld:updateInterval(intervalData, intervalData.beats + inc)
 				end
 			end
 			if intervalData and imgui.button("grab interval button", "grab interval") then
