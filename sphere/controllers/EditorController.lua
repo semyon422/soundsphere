@@ -16,7 +16,6 @@ EditorController.save = function(self)
 	local exp = NoteChartExporter:new()
 	exp.noteChart = noteChartModel.noteChart
 
-	print(noteChartModel.noteChartEntry.path)
 	love.filesystem.write(noteChartModel.noteChartEntry.path, exp:export())
 end
 

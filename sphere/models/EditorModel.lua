@@ -134,7 +134,9 @@ EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
 	local ld = self.layerData
 	local dtp = ld:getDynamicTimePointAbsolute(self.snap, absoluteTime)
 	local noteData = ld:getNoteData(dtp, inputType, inputIndex)
-	noteData.noteType = "ShortNote"
+	if noteData then
+		noteData.noteType = "ShortNote"
+	end
 end
 
 EditorModel.scrollTimePoint = function(self, timePoint)
@@ -177,12 +179,25 @@ EditorModel.scrollSnapsInterval = function(self, delta)
 	end
 
 	local intervalData = dtp.intervalData
-	if intervalData.next and targetSnapTime >= snap * (intervalData.beats + intervalData.start) then
+	-- if intervalData.next and targetSnapTime >= snap * intervalData:_end() then
+	-- 	intervalData = intervalData.next
+	-- 	targetSnapTime = intervalData.start * snap
+	-- elseif intervalData.prev and dtp.time > intervalData.start and targetSnapTime < snap * intervalData.start then
+	-- 	targetSnapTime = intervalData.start * snap
+	-- elseif intervalData.prev and dtp.time == intervalData.start and targetSnapTime < snap * intervalData.start then
+	-- 	intervalData = intervalData.prev
+	-- 	targetSnapTime = (intervalData:_end() * snap):ceil() - 1
+	-- end
+
+	if intervalData.next and targetSnapTime == snap * intervalData:_end() then
 		intervalData = intervalData.next
 		targetSnapTime = intervalData.start * snap
-	elseif intervalData.prev and targetSnapTime < 0 then
+	elseif intervalData.next and targetSnapTime > snap * intervalData:_end() then
+		intervalData = intervalData.next
+		targetSnapTime = (intervalData.start * snap):floor() + 1
+	elseif intervalData.prev and targetSnapTime < snap * intervalData.start then
 		intervalData = intervalData.prev
-		targetSnapTime = snap * (intervalData.beats + intervalData.start) - 1
+		targetSnapTime = (intervalData:_end() * snap):ceil() - 1
 	end
 
 	return intervalData, Fraction(targetSnapTime, snap)
