@@ -94,11 +94,9 @@ EditorModel.getSnap = function(self, j)
 	local snap = self.snap
 	local k
 	for i = 1, 16 do
-		if snap % i == 0 then
-			if (j - 1) % (snap / i) == 0 then
-				k = i
-				break
-			end
+		if snap % i == 0 and j % (snap / i) == 0 then
+			k = i
+			break
 		end
 	end
 	return k

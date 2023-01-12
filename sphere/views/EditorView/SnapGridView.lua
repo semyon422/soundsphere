@@ -117,9 +117,9 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels, w1, w
 			if not timePoint or not timePoint[field] then break end
 			local y = (timePoint[field] - currentTime) * pixels
 
-			local j = time[1] % time[2] + 1
+			local j = snap * (time % 1)
 			local w = w1 or 30
-			if time == 0 and j == 1 then
+			if time == 0 and j == 0 then
 				w = w2 or w1 or 60
 			end
 			love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
