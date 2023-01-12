@@ -4,72 +4,9 @@ local Fraction = require("ncdk.Fraction")
 
 local EditorModel = Class:new()
 
-EditorModel.load1 = function(self)
-	local ld = DynamicLayerData:new()
-	self.layerData = ld
-
-	ld:setTimeMode("measure")
-	ld:setSignatureMode("short")
-	-- ld:setPrimaryTempo(60)
-	ld:setRange(Fraction(0), Fraction(10))
-
-	ld:getSignatureData(2, Fraction(3))
-	ld:getSignatureData(3, Fraction(34, 10))
-
-	ld:getTempoData(Fraction(1), 60)
-	ld:getTempoData(Fraction(3.5, 10, true), 120)
-
-	ld:getStopData(Fraction(5), Fraction(4))
-
-	ld:getVelocityData(ld:getTimePoint(Fraction(0.5, 10, true)), 1)
-	ld:getVelocityData(ld:getTimePoint(Fraction(4.5, 10, true)), 2)
-	ld:getVelocityData(ld:getTimePoint(Fraction(5, 4)), 0)
-	ld:getVelocityData(ld:getTimePoint(Fraction(6, 4)), 1)
-
-	ld:getExpandData(ld:getTimePoint(Fraction(2), 0, 1), Fraction(1))
-
-	self.timePoint = ld:newTimePoint()
-	self.timePoint:setTime(ld:getDynamicTimePointAbsolute(192, 0))
-	self.timePoint.absoluteTime = 0
-
-	self.snap = 1
-	self.speed = 1
-
-	self:scrollSeconds(0)
-end
-
-EditorModel.load2 = function(self)
-	local ld = DynamicLayerData:new()
-	self.layerData = ld
-
-	ld:setTimeMode("interval")
-	ld:setSignatureMode("short")
-	ld:setRange(0, 30)
-
-	local id1 = ld:getIntervalData(0, Fraction(10))
-	local id2 = ld:getIntervalData(1, Fraction(1))
-
-	-- ld:getVelocityData(ld:getTimePoint(id1, Fraction(0)), 0.5)
-	-- ld:getVelocityData(ld:getTimePoint(id2, Fraction(3)), 2)
-	-- ld:getVelocityData(ld:getTimePoint(id3, Fraction(1)), 1)
-
-	ld:getNoteData(ld:getTimePoint(id1, Fraction(0)), "key", 1)
-	ld:getNoteData(ld:getTimePoint(id1, Fraction(1)), "key", 2)
-	ld:getNoteData(ld:getTimePoint(id1, Fraction(2)), "key", 3)
-	ld:getNoteData(ld:getTimePoint(id1, Fraction(3)), "key", 4)
-
-	self.timePoint = ld:newTimePoint()
-	self.timePoint:setTime(ld:getDynamicTimePointAbsolute(192, 0))
-	self.timePoint.absoluteTime = 0
-
-	self.snap = 1
-	self.speed = 1
-
-	self:scrollSeconds(0)
-end
-
 EditorModel.load = function(self)
-	local nc = self.game.noteChartModel.noteChart
+	local noteChartModel = self.game.noteChartModel
+	local nc = noteChartModel.noteChart
 
 	local ld = nc:getLayerData(1)
 	ld = DynamicLayerData:new(ld)
@@ -77,6 +14,10 @@ EditorModel.load = function(self)
 
 	self.columns = nc.inputMode:getColumns()
 	self.inputMap = nc.inputMode:getInputMap()
+
+	local directory = noteChartModel.noteChartEntry.path:match("^(.+)/.-$")
+	self.soundData = love.sound.newSoundData(directory .. "/" .. nc.metaData.audioPath)
+	self.audio = love.audio.newSource(self.soundData)
 
 	self.timePoint = ld:newTimePoint()
 	self.timePoint:setTime(ld:getDynamicTimePointAbsolute(192, 0))
