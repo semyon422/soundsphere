@@ -9,23 +9,31 @@ local Layout = require("sphere.views.EditorView.Layout")
 
 local SnapGridView = Class:new()
 
-local function getTimePointText(timePoint)
+local function getTimingText(timePoint)
+	local out = {}
 	if timePoint._tempoData then
-		return timePoint._tempoData.tempo .. " bpm"
+		table.insert(out, timePoint._tempoData.tempo .. " bpm")
 	elseif timePoint._signatureData then
-		return "signature " .. tostring(timePoint._signatureData.signature) .. " beats"
+		table.insert(out, "signature " .. tostring(timePoint._signatureData.signature) .. " beats")
 	elseif timePoint._stopData then
-		return "stop " .. tostring(timePoint._stopData.duration) .. " beats"
-	elseif timePoint._velocityData then
-		return timePoint._velocityData.currentSpeed .. "x"
-	elseif timePoint._expandData then
-		return "expand into " .. tostring(timePoint._expandData.duration) .. " beats"
+		table.insert(out, "stop " .. tostring(timePoint._stopData.duration) .. " beats")
 	elseif timePoint._intervalData then
-		return timePoint._intervalData.beats .. " beats"
+		table.insert(out, timePoint.absoluteTime)
 	end
+	return table.concat(out, ", ")
 end
 
-SnapGridView.drawTimingObjects = function(self, field, currentTime, pixels)
+local function getVelocityText(timePoint)
+	local out = {}
+	if timePoint._velocityData then
+		table.insert(out, timePoint._velocityData.currentSpeed .. "x")
+	elseif timePoint._expandData then
+		table.insert(out, "expand " .. tostring(timePoint._expandData.duration) .. " beats")
+	end
+	return table.concat(out, ", ")
+end
+
+SnapGridView.drawTimingObjects = function(self, field, currentTime, w, h, align, getText)
 	local rangeTracker = self.game.editorModel.layerData.ranges.timePoint
 	local timePoint = rangeTracker.head
 	if not timePoint or not currentTime then
@@ -34,11 +42,10 @@ SnapGridView.drawTimingObjects = function(self, field, currentTime, pixels)
 
 	local endTimePoint = rangeTracker.tail
 	while timePoint and timePoint <= endTimePoint do
-		local text = getTimePointText(timePoint)
+		local text = getText(timePoint)
 		if text then
-			local y = (timePoint[field] - currentTime) * pixels
-			love.graphics.line(0, y, 10, y)
-			gfx_util.printFrame(text, -500, y - 25, 490, 50, "right", "center")
+			local y = (timePoint[field] - currentTime) * self.speed
+			gfx_util.printFrame(text, 0, y - h / 2, w, h, align, "center")
 		end
 
 		timePoint = timePoint.next
@@ -65,7 +72,7 @@ local snaps = {
 	[8] = colors.green,
 }
 
-SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels, w1, w2)
+SnapGridView.drawComputedGrid = function(self, field, currentTime, w1, w2)
 	local editorModel = self.game.editorModel
 	local ld = editorModel.layerData
 	local snap = editorModel.snap
@@ -84,7 +91,7 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels, w1, w
 					if f:tonumber() < 1 then
 						local timePoint = ld:getDynamicTimePoint(f + time, -1)
 						if not timePoint then break end
-						local y = (timePoint[field] - currentTime) * pixels
+						local y = (timePoint[field] - currentTime) * self.speed
 
 						local w = w1 or 30
 						if i == 1 and j == 1 then
@@ -115,7 +122,7 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, pixels, w1, w
 
 			timePoint = ld:getDynamicTimePoint(intervalData, time)
 			if not timePoint or not timePoint[field] then break end
-			local y = (timePoint[field] - currentTime) * pixels
+			local y = (timePoint[field] - currentTime) * self.speed
 
 			local j = snap * (time % 1)
 			local w = w1 or 30
@@ -137,11 +144,13 @@ SnapGridView.drawUI = function(self, w, h)
 	local editorModel = self.game.editorModel
 	local ld = editorModel.layerData
 
+	local dtp = editorModel:getDynamicTimePoint()
+
 	just.push()
 
 	imgui.setSize(w, h, 200, 55)
 	editorModel.snap = imgui.slider1("snap select", editorModel.snap, "%d", 1, 16, 1, "snap")
-	local speed = imgui.slider1("second pixels", h * editorModel.speed, "%d", 10, h, 10, "pixels per second") / h
+	local speed = imgui.slider1("second pixels", 100 * editorModel.speed, "%d", 10, 1000, 10, "scale") / 100
 	if speed ~= editorModel.speed then
 		editorModel.speed = speed
 		editorModel:updateRange()
@@ -151,47 +160,43 @@ SnapGridView.drawUI = function(self, w, h)
 		self.game.gameView:setModal(require("sphere.views.EditorView.AddTimingObjectView"))
 	end
 
-	just.row(true)
-	primaryTempo = imgui.input("primaryTempo input", primaryTempo, "primary tempo")
-	if imgui.button("set primaryTempo button", "set") then
-		ld:setPrimaryTempo(tonumber(primaryTempo))
-	end
-	if imgui.button("unset primaryTempo button", "unset") then
-		ld:setPrimaryTempo(0)
-	end
-	just.row()
-
-	just.row(true)
-	imgui.label("set signature mode", "signature mode")
-	if imgui.button("set short signature button", "short") then
-		ld:setSignatureMode("short")
-	end
-	if imgui.button("set long signature button", "long") then
-		ld:setSignatureMode("long")
-	end
-	just.row()
-
-	imgui.setSize(w, h, 100, 55)
-	just.row(true)
-	defaultSignature[1] = imgui.input("defsig n input", defaultSignature[1])
-	imgui.unindent()
-	imgui.label("/ label", "/")
-	defaultSignature[2] = imgui.input("defsig d input", defaultSignature[2], "default signature")
-	if imgui.button("set defsig button", "set") then
-		ld:setDefaultSignature(Fraction(tonumber(defaultSignature[1]), tonumber(defaultSignature[2])))
-	end
-	just.row(false)
-	imgui.setSize(w, h, 200, 55)
-
-	just.text("primary tempo: " .. ld.primaryTempo)
-	just.text("signature mode: " .. ld.signatureMode)
-	just.text("default signature: " .. ld.defaultSignature)
-
-	local dtp = editorModel:getDynamicTimePoint()
-
-	just.text("time point: " .. tostring(dtp))
-
 	if ld.mode == "measure" then
+		just.row(true)
+		primaryTempo = imgui.input("primaryTempo input", primaryTempo, "primary tempo")
+		if imgui.button("set primaryTempo button", "set") then
+			ld:setPrimaryTempo(tonumber(primaryTempo))
+		end
+		if imgui.button("unset primaryTempo button", "unset") then
+			ld:setPrimaryTempo(0)
+		end
+		just.row()
+
+		just.row(true)
+		imgui.label("set signature mode", "signature mode")
+		if imgui.button("set short signature button", "short") then
+			ld:setSignatureMode("short")
+		end
+		if imgui.button("set long signature button", "long") then
+			ld:setSignatureMode("long")
+		end
+		just.row()
+
+		imgui.setSize(w, h, 100, 55)
+		just.row(true)
+		defaultSignature[1] = imgui.input("defsig n input", defaultSignature[1])
+		imgui.unindent()
+		imgui.label("/ label", "/")
+		defaultSignature[2] = imgui.input("defsig d input", defaultSignature[2], "default signature")
+		if imgui.button("set defsig button", "set") then
+			ld:setDefaultSignature(Fraction(tonumber(defaultSignature[1]), tonumber(defaultSignature[2])))
+		end
+		just.row(false)
+		imgui.setSize(w, h, 200, 55)
+
+		just.text("primary tempo: " .. ld.primaryTempo)
+		just.text("signature mode: " .. ld.signatureMode)
+		just.text("default signature: " .. ld.defaultSignature)
+
 		local measureOffset = dtp.measureTime:floor()
 		local signature = ld:getSignature(measureOffset)
 		local snap = editorModel.snap
@@ -202,6 +207,8 @@ SnapGridView.drawUI = function(self, w, h)
 		just.text("beat: " .. tostring(beatTime))
 		just.text("snap: " .. tostring(snapTime))
 	end
+
+	just.text("time point: " .. tostring(dtp))
 
 	just.row(true)
 	if imgui.button("prev tp", "prev") and dtp.prev then
@@ -280,34 +287,34 @@ SnapGridView.draw = function(self)
 
 	self:drawUI(w, h)
 
-	love.graphics.translate(w / 3, 0)
-
-	love.graphics.push()
-	love.graphics.translate(0, h / 2)
-	love.graphics.line(0, 0, 240, 0)
-
 	local speed = -h * editorModel.speed
+	self.speed = speed
 
 	local editorTimePoint = editorModel.timePoint
-	love.graphics.translate(-40, 0)
-	if ld.mode == "measure" then
-		self:drawTimingObjects("beatTime", editorTimePoint.beatTime, speed)
-	elseif ld.mode == "interval" then
-		self:drawTimingObjects("absoluteTime", editorTimePoint.absoluteTime, speed)
-	end
-	love.graphics.translate(40, 0)
-	self:drawComputedGrid("beatTime", editorTimePoint.beatTime, speed)
 
-	love.graphics.translate(80, 0)
-	self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime, speed)
+	love.graphics.translate(w / 3, 0)
 
-	love.graphics.translate(80, 0)
-	self:drawComputedGrid("visualTime", editorTimePoint.visualTime, speed)
+	-- love.graphics.push()
+	-- love.graphics.translate(0, h / 2)
+	-- love.graphics.line(0, 0, 240, 0)
+	-- love.graphics.translate(-40, 0)
+	-- if ld.mode == "measure" then
+	-- 	self:drawTimingObjects("beatTime", editorTimePoint.beatTime, -500, 50, "right", getTimingText)
+	-- elseif ld.mode == "interval" then
+	-- 	self:drawTimingObjects("absoluteTime", editorTimePoint.absoluteTime, -500, 50, "right", getTimingText)
+	-- end
+	-- love.graphics.translate(40, 0)
+	-- self:drawComputedGrid("beatTime", editorTimePoint.beatTime)
 
-	love.graphics.pop()
+	-- love.graphics.translate(80, 0)
+	-- self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime)
+
+	-- love.graphics.translate(80, 0)
+	-- self:drawComputedGrid("visualTime", editorTimePoint.visualTime)
+
+	-- love.graphics.pop()
 
 	love.graphics.push()
-	love.graphics.translate(300, 0)
 	local _mx, _my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local my = h - _my
 
@@ -315,10 +322,6 @@ SnapGridView.draw = function(self)
 	local t = editorTimePoint.absoluteTime - (my - h / 2) / speed
 	if over then
 		love.graphics.rectangle("fill", _mx, _my, 80, -20)
-	end
-
-	if just.button("add note", over, 1) then
-		editorModel:addNote(t, "key", 1)
 	end
 
 	love.graphics.push()
@@ -332,25 +335,24 @@ SnapGridView.draw = function(self)
 	love.graphics.line(0, 0, 0, h)
 	love.graphics.pop()
 
-	love.graphics.translate(0, h / 2)
-	love.graphics.line(0, 0, 320, 0)
-	self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime, speed, 320, 320)
-	self:drawNotes(speed, 320)
-	love.graphics.pop()
-
 	just.push()
-	just.row(true)
-	local pixels = drag("drag1", 240, h) and speed
-	if pixels then
-		editorModel:scrollSeconds((my - prevMouseY) / pixels)
+	love.graphics.translate(-40, 0)
+	if drag("drag1", 40, h) then
+		editorModel:scrollSeconds((my - prevMouseY) / speed)
 	end
-	just.row()
 	just.pop()
+
+	love.graphics.translate(0, h / 2)
+	love.graphics.line(-40, 0, 360, 0)
+	self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime, 320, 320)
+	self:drawNotes(speed, 320)
+	love.graphics.translate(340, 0)
+	self:drawTimingObjects("absoluteTime", editorTimePoint.absoluteTime, 500, 50, "left", getVelocityText)
+	love.graphics.pop()
 
 	prevMouseY = my
 
 	local scroll = just.wheel_over("scale scroll", just.is_over(240, h))
-	scroll = scroll and -scroll
 	if just.keypressed("right") then
 		scroll = 1
 	elseif just.keypressed("left") then
@@ -358,7 +360,13 @@ SnapGridView.draw = function(self)
 	end
 
 	if scroll then
-		editorModel:scrollSnaps(scroll)
+		if love.keyboard.isDown("lshift") then
+			editorModel.snap = math.min(math.max(editorModel.snap + scroll, 1), 16)
+		elseif love.keyboard.isDown("lctrl") then
+			editorModel.speed = math.min(math.max(editorModel.speed * 100 + scroll * 10, 10), 1000) / 100
+		else
+			editorModel:scrollSnaps(scroll)
+		end
 	end
 end
 
