@@ -75,6 +75,9 @@ EditorModel.load = function(self)
 	ld = DynamicLayerData:new(ld)
 	self.layerData = ld
 
+	self.columns = nc.inputMode:getColumns()
+	self.inputMap = nc.inputMode:getInputMap()
+
 	self.timePoint = ld:newTimePoint()
 	self.timePoint:setTime(ld:getDynamicTimePointAbsolute(192, 0))
 	self.timePoint.absoluteTime = 0

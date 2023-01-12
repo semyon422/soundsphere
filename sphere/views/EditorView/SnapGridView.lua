@@ -9,6 +9,8 @@ local Layout = require("sphere.views.EditorView.Layout")
 
 local SnapGridView = Class:new()
 
+SnapGridView.hitPosition = 0.75
+
 local function getTimingText(timePoint)
 	local out = {}
 	if timePoint._tempoData then
@@ -226,15 +228,44 @@ SnapGridView.drawUI = function(self, w, h)
 	just.pop()
 end
 
-SnapGridView.drawNotes = function(self, pixels, width)
+SnapGridView.drawNotes = function(self, _w)
 	local editorModel = self.game.editorModel
 	local ld = editorModel.layerData
+	local speed = self.speed
+	local columns = editorModel.columns
 
 	local rangeTracker = self.game.editorModel.layerData.ranges.timePoint
 	local timePoint = rangeTracker.head
 	if not timePoint then
 		return
 	end
+
+	local nw = _w / columns
+	local nh = nw / 4 * (speed > 0 and 1 or -1)
+
+	local _h = -self.speed / editorModel.speed
+
+	just.push()
+	love.graphics.translate(0, -_h * self.hitPosition)
+
+	local _mx, _my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+	local my = self.hitPosition - _my / _h
+
+	local over = just.is_over(_w, _h)
+	if over then
+		love.graphics.rectangle("fill", _mx - nw / 2, _my, nw, nh)
+	end
+
+	local t = editorModel.timePoint.absoluteTime + my / editorModel.speed
+	for i = 1, columns do
+		love.graphics.line(0, 0, 0, _h)
+		if just.button("add note" .. i, just.is_over(nw, _h), 1) then
+			editorModel:addNote(t, "key", i)
+		end
+		love.graphics.translate(nw, 0)
+	end
+	love.graphics.line(0, 0, 0, _h)
+	just.pop()
 
 	local currentTime = editorModel.timePoint.absoluteTime
 
@@ -243,13 +274,12 @@ SnapGridView.drawNotes = function(self, pixels, width)
 		local noteDatas = timePoint.noteDatas
 		if noteDatas then
 			for _, noteData in ipairs(noteDatas) do
-				local y = (timePoint.absoluteTime - currentTime) * pixels
-				local x = (noteData.inputIndex - 1) * width / 4
-				local h = (pixels > 0 and 1 or -1) * width / 16
+				local y = (timePoint.absoluteTime - currentTime) * speed
+				local x = (noteData.inputIndex - 1) * nw
 				just.push()
 				love.graphics.translate(x, y)
-				love.graphics.rectangle("fill", 0, 0, width / 4, h)
-				if just.button("remove note" .. tostring(noteData), just.is_over(width / 4, h), 2) then
+				love.graphics.rectangle("fill", 0, 0, nw, nh)
+				if just.button("remove note" .. tostring(noteData), just.is_over(nw, nh), 2) then
 					ld:removeNoteData(noteData)
 				end
 				just.pop()
@@ -316,41 +346,22 @@ SnapGridView.draw = function(self)
 
 	love.graphics.push()
 	local _mx, _my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-	local my = h - _my
-
-	local over = just.is_over(320, h)
-	local t = editorTimePoint.absoluteTime - (my - h / 2) / speed
-	if over then
-		love.graphics.rectangle("fill", _mx, _my, 80, -20)
-	end
-
-	love.graphics.push()
-	for i = 1, 4 do
-		love.graphics.line(0, 0, 0, h)
-		if just.button("add note" .. i, just.is_over(80, h), 1) then
-			editorModel:addNote(t, "key", i)
-		end
-		love.graphics.translate(80, 0)
-	end
-	love.graphics.line(0, 0, 0, h)
-	love.graphics.pop()
 
 	just.push()
 	love.graphics.translate(-40, 0)
 	if drag("drag1", 40, h) then
-		editorModel:scrollSeconds((my - prevMouseY) / speed)
+		editorModel:scrollSeconds(-(_my - prevMouseY) / speed)
 	end
+	prevMouseY = _my
 	just.pop()
 
-	love.graphics.translate(0, h / 2)
+	love.graphics.translate(0, h * self.hitPosition)
 	love.graphics.line(-40, 0, 360, 0)
 	self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime, 320, 320)
-	self:drawNotes(speed, 320)
+	self:drawNotes(320)
 	love.graphics.translate(340, 0)
 	self:drawTimingObjects("absoluteTime", editorTimePoint.absoluteTime, 500, 50, "left", getVelocityText)
 	love.graphics.pop()
-
-	prevMouseY = my
 
 	local scroll = just.wheel_over("scale scroll", just.is_over(240, h))
 	if just.keypressed("right") then
