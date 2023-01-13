@@ -67,35 +67,6 @@ return ModalImView(function(self)
 		if imgui.button("add signature button", "add") then
 			ld:getSignatureData(dtp.measureTime:floor(), Fraction(tonumber(signature[1]), tonumber(signature[2])))
 		end
-	elseif ld.mode == "interval" then
-		imgui.setSize(w, h, w / 2, 55)
-
-		local intervalData = dtp._intervalData
-
-		if not grabbedIntervalData then
-			if not intervalData and imgui.button("split interval button", "split interval") then
-				ld:splitInterval(dtp)
-			end
-			if intervalData then
-				if imgui.button("merge interval button", "merge interval") then
-					ld:mergeInterval(dtp)
-				end
-				imgui.label("intervals lbl", tostring(intervalData.beats) .. " beats")
-				local inc = imgui.intButtons("update interval", nil, 2, "change beats")
-				if inc ~= 0 then
-					ld:updateInterval(intervalData, intervalData.beats + inc)
-				end
-			end
-			if intervalData and imgui.button("grab interval button", "grab interval") then
-				grabbedIntervalData = intervalData
-			end
-		else
-			if imgui.button("drop interval button", "drop interval") then
-				grabbedIntervalData = nil
-			else
-				ld:moveInterval(grabbedIntervalData, dtp.absoluteTime)
-			end
-		end
 	end
 
 	imgui.separator()

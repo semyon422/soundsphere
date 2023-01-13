@@ -42,6 +42,26 @@ EditorModel.setLogSpeed = function(self, logSpeed)
 	self.speed = 2 ^ (logSpeed / 10)
 end
 
+EditorModel.grabIntervalData = function(self)
+	local dtp = self:getDynamicTimePoint()
+	local intervalData = dtp._intervalData
+	if not intervalData then
+		return
+	end
+	self.grabbedIntervalData = intervalData
+end
+
+EditorModel.dropIntervalData = function(self)
+	self.grabbedIntervalData = nil
+end
+
+EditorModel.update = function(self)
+	local dtp = self:getDynamicTimePoint()
+	if self.grabbedIntervalData then
+		self.layerData:moveInterval(self.grabbedIntervalData, dtp.absoluteTime)
+	end
+end
+
 EditorModel.getSnap = function(self, j)
 	local snap = self.snap
 	local k
@@ -90,6 +110,10 @@ EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
 end
 
 EditorModel.scrollTimePoint = function(self, timePoint)
+	if not timePoint then
+		return
+	end
+
 	local t = self.timePoint
 	t.absoluteTime = timePoint.absoluteTime
 	t.visualTime = timePoint.visualTime

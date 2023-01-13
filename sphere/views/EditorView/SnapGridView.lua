@@ -11,6 +11,9 @@ local Layout = require("sphere.views.EditorView.Layout")
 local SnapGridView = Class:new()
 
 SnapGridView.hitPosition = 0.75
+SnapGridView.waveformEnabled = true
+SnapGridView.notesEnabled = true
+SnapGridView.timingEnabled = true
 
 local function getTimingText(timePoint)
 	local out = {}
@@ -213,15 +216,11 @@ SnapGridView.drawUI = function(self, w, h)
 	end
 
 	just.text("time point: " .. tostring(dtp))
+	just.text("time: " .. dtp.absoluteTime)
 
-	just.row(true)
-	if imgui.button("prev tp", "prev") and dtp.prev then
-		editorModel:scrollTimePoint(dtp.prev)
-	end
-	if imgui.button("next tp", "next") and dtp.next then
-		editorModel:scrollTimePoint(dtp.next)
-	end
-	just.row()
+	self.waveformEnabled = imgui.checkbox("waveformEnabled", self.waveformEnabled, "waveform")
+	self.notesEnabled = imgui.checkbox("notesEnabled", self.notesEnabled, "notes")
+	self.timingEnabled = imgui.checkbox("timingEnabled", self.timingEnabled, "timing")
 
 	if imgui.button("save btn", "save") then
 		self.game.editorController:save()
@@ -298,6 +297,37 @@ SnapGridView.drawWaveform = function(self, _w, h)
 	love.graphics.pop()
 end
 
+SnapGridView.drawTimings = function(self, _w, _h)
+	local editorModel = self.game.editorModel
+	local ld = editorModel.layerData
+	local editorTimePoint = editorModel.timePoint
+
+	if ld.mode ~= "interval" then
+		return
+	end
+
+	local rangeTracker = self.game.editorModel.layerData.ranges.timePoint
+	local timePoint = rangeTracker.head
+	if not timePoint then
+		return
+	end
+
+	love.graphics.push("all")
+	love.graphics.setColor(1, 0.8, 0.2)
+	love.graphics.setLineWidth(8)
+	local endTimePoint = rangeTracker.tail
+	while timePoint and timePoint <= endTimePoint do
+		local intervalData = timePoint._intervalData
+		if intervalData then
+			local y = (timePoint.absoluteTime - editorTimePoint.absoluteTime) * self.pixelSpeed
+			love.graphics.line(0, y, _w, y)
+		end
+
+		timePoint = timePoint.next
+	end
+	love.graphics.pop()
+end
+
 SnapGridView.drawNotes = function(self, _w, _h)
 	local editorModel = self.game.editorModel
 	local ld = editorModel.layerData
@@ -368,8 +398,6 @@ local function drag(id, w, h)
 	end
 	love.graphics.setColor(1, 1, 1, 1)
 
-	just.next(w, h)
-
 	return just.active_id == id
 end
 
@@ -382,6 +410,9 @@ SnapGridView.draw = function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
+	local lineHeight = 55
+	imgui.setSize(w, h, 200, lineHeight)
+
 	self:drawUI(w, h)
 
 	local pixelSpeed = -h * editorModel.speed
@@ -390,6 +421,7 @@ SnapGridView.draw = function(self)
 	local editorTimePoint = editorModel.timePoint
 
 	love.graphics.translate(w / 3, 0)
+	local width = 320
 
 	-- love.graphics.push()
 	-- love.graphics.translate(0, h / 2)
@@ -414,22 +446,66 @@ SnapGridView.draw = function(self)
 	love.graphics.push()
 	local _mx, _my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 
+	love.graphics.translate(0, h * self.hitPosition)
+
+	love.graphics.setLineWidth(8)
+	love.graphics.line(-40, 0, width + 40, 0)
+	love.graphics.setLineWidth(1)
+
 	just.push()
-	love.graphics.translate(-40, 0)
-	if drag("drag1", 40, h) then
+	love.graphics.translate(-200, -lineHeight)
+	local dtp = editorModel:getDynamicTimePoint()
+	if imgui.button("next tp", "next") and dtp.next then
+		editorModel:scrollTimePoint(dtp.next)
+	end
+	if imgui.button("prev tp", "prev") and dtp.prev then
+		editorModel:scrollTimePoint(dtp.prev)
+	end
+
+	local intervalData = dtp._intervalData
+	local grabbedIntervalData = editorModel.grabbedIntervalData
+	if not grabbedIntervalData then
+		if not intervalData and imgui.button("split interval button", "split interval") then
+			ld:splitInterval(dtp)
+		end
+		if intervalData then
+			if imgui.button("merge interval button", "merge") then
+				ld:mergeInterval(dtp)
+			end
+			local inc = imgui.intButtons("update interval", nil, 1)
+			if inc ~= 0 then
+				ld:updateInterval(intervalData, intervalData.beats + inc)
+			end
+		end
+		if intervalData and imgui.button("grab interval button", "grab") then
+			editorModel:grabIntervalData(intervalData)
+		end
+	else
+		if imgui.button("drop interval button", "drop") then
+			editorModel:dropIntervalData()
+		end
+	end
+	just.pop()
+
+	self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime, width, width)
+	if self.notesEnabled then
+		self:drawNotes(width, h)
+	end
+	if self.waveformEnabled then
+		self:drawWaveform(width, h)
+	end
+	if self.timingEnabled then
+		self:drawTimings(width, h)
+	end
+
+	love.graphics.translate(width + 40, 0)
+	self:drawTimingObjects("absoluteTime", editorTimePoint.absoluteTime, 500, 50, "left", getVelocityText)
+	love.graphics.pop()
+
+	if love.keyboard.isDown("lalt") and drag("drag1", width, h) then
 		editorModel:scrollSeconds(-(_my - prevMouseY) / pixelSpeed)
 	end
 	prevMouseY = _my
-	just.pop()
-
-	love.graphics.translate(0, h * self.hitPosition)
-	love.graphics.line(-40, 0, 360, 0)
-	self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime, 320, 320)
-	self:drawNotes(320, h)
-	self:drawWaveform(320, h)
-	love.graphics.translate(340, 0)
-	self:drawTimingObjects("absoluteTime", editorTimePoint.absoluteTime, 500, 50, "left", getVelocityText)
-	love.graphics.pop()
 
 	local scroll = just.wheel_over("scale scroll", just.is_over(240, h))
 	if just.keypressed("right") then

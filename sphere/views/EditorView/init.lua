@@ -23,7 +23,9 @@ EditorView.load = thread.coro(function(self)
 	loading = false
 end)
 
-EditorView.update = function(self, dt) end
+EditorView.update = function(self, dt)
+	self.game.editorModel:update()
+end
 
 EditorView.receive = function(self, event) end
 
