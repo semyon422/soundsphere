@@ -47,7 +47,7 @@ SnapGridView.drawTimingObjects = function(self, field, currentTime, w, h, align,
 	while timePoint and timePoint <= endTimePoint do
 		local text = getText(timePoint)
 		if text then
-			local y = (timePoint[field] - currentTime) * self.speed
+			local y = (timePoint[field] - currentTime) * self.pixelSpeed
 			gfx_util.printFrame(text, 0, y - h / 2, w, h, align, "center")
 		end
 
@@ -94,7 +94,7 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, w1, w2)
 					if f:tonumber() < 1 then
 						local timePoint = ld:getDynamicTimePoint(f + time, -1)
 						if not timePoint then break end
-						local y = (timePoint[field] - currentTime) * self.speed
+						local y = (timePoint[field] - currentTime) * self.pixelSpeed
 
 						local w = w1 or 30
 						if i == 1 and j == 0 then
@@ -125,7 +125,7 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, w1, w2)
 
 			timePoint = ld:getDynamicTimePoint(intervalData, time)
 			if not timePoint or not timePoint[field] then break end
-			local y = (timePoint[field] - currentTime) * self.speed
+			local y = (timePoint[field] - currentTime) * self.pixelSpeed
 
 			local j = snap * (time % 1)
 			local w = w1 or 30
@@ -153,9 +153,10 @@ SnapGridView.drawUI = function(self, w, h)
 
 	imgui.setSize(w, h, 200, 55)
 	editorModel.snap = imgui.slider1("snap select", editorModel.snap, "%d", 1, 16, 1, "snap")
-	local speed = imgui.slider1("second pixels", 100 * editorModel.speed, "%d", 10, 10000, 10, "scale") / 100
-	if speed ~= editorModel.speed then
-		editorModel.speed = speed
+
+	local logSpeed = imgui.slider1("editor speed", editorModel:getLogSpeed(), "%d", -30, 30, 1, "speed")
+	if logSpeed ~= editorModel:getLogSpeed() then
+		editorModel:setLogSpeed(logSpeed)
 		editorModel:updateRange()
 	end
 
@@ -238,7 +239,7 @@ SnapGridView.drawWaveform = function(self, _w, h)
 	local sampleCount = soundData:getSampleCount()
 	local channelCount = soundData:getChannelCount()
 	local points = math.floor(h)
-	local samples = math.floor(points * sampleRate / math.abs(self.speed))
+	local samples = math.floor(points * sampleRate / math.abs(self.pixelSpeed))
 
 	local sampleOffset = math.floor(editorModel.timePoint.absoluteTime * sampleRate)
 
@@ -297,10 +298,10 @@ SnapGridView.drawWaveform = function(self, _w, h)
 	love.graphics.pop()
 end
 
-SnapGridView.drawNotes = function(self, _w)
+SnapGridView.drawNotes = function(self, _w, _h)
 	local editorModel = self.game.editorModel
 	local ld = editorModel.layerData
-	local speed = self.speed
+	local pixelSpeed = self.pixelSpeed
 	local columns = editorModel.columns
 
 	local rangeTracker = self.game.editorModel.layerData.ranges.timePoint
@@ -310,22 +311,19 @@ SnapGridView.drawNotes = function(self, _w)
 	end
 
 	local nw = _w / columns
-	local nh = nw / 4 * (speed > 0 and 1 or -1)
-
-	local _h = -self.speed / editorModel.speed
+	local nh = nw / 4 * (pixelSpeed > 0 and 1 or -1)
 
 	just.push()
 	love.graphics.translate(0, -_h * self.hitPosition)
 
 	local _mx, _my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-	local my = self.hitPosition - _my / _h
 
 	local over = just.is_over(_w, _h)
 	if over then
 		love.graphics.rectangle("fill", _mx - nw / 2, _my, nw, nh)
 	end
 
-	local t = editorModel.timePoint.absoluteTime + my / editorModel.speed
+	local t = editorModel.timePoint.absoluteTime - (_h * self.hitPosition - _my) / pixelSpeed
 	for i = 1, columns do
 		love.graphics.line(0, 0, 0, _h)
 		if just.button("add note" .. i, just.is_over(nw, _h), 1) then
@@ -343,7 +341,7 @@ SnapGridView.drawNotes = function(self, _w)
 		local noteDatas = timePoint.noteDatas
 		if noteDatas then
 			for _, noteData in ipairs(noteDatas) do
-				local y = (timePoint.absoluteTime - currentTime) * speed
+				local y = (timePoint.absoluteTime - currentTime) * pixelSpeed
 				local x = (noteData.inputIndex - 1) * nw
 				just.push()
 				love.graphics.translate(x, y)
@@ -386,8 +384,8 @@ SnapGridView.draw = function(self)
 
 	self:drawUI(w, h)
 
-	local speed = -h * editorModel.speed
-	self.speed = speed
+	local pixelSpeed = -h * editorModel.speed
+	self.pixelSpeed = pixelSpeed
 
 	local editorTimePoint = editorModel.timePoint
 
@@ -419,7 +417,7 @@ SnapGridView.draw = function(self)
 	just.push()
 	love.graphics.translate(-40, 0)
 	if drag("drag1", 40, h) then
-		editorModel:scrollSeconds(-(_my - prevMouseY) / speed)
+		editorModel:scrollSeconds(-(_my - prevMouseY) / pixelSpeed)
 	end
 	prevMouseY = _my
 	just.pop()
@@ -427,7 +425,7 @@ SnapGridView.draw = function(self)
 	love.graphics.translate(0, h * self.hitPosition)
 	love.graphics.line(-40, 0, 360, 0)
 	self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime, 320, 320)
-	self:drawNotes(320)
+	self:drawNotes(320, h)
 	self:drawWaveform(320, h)
 	love.graphics.translate(340, 0)
 	self:drawTimingObjects("absoluteTime", editorTimePoint.absoluteTime, 500, 50, "left", getVelocityText)
@@ -444,7 +442,8 @@ SnapGridView.draw = function(self)
 		if love.keyboard.isDown("lshift") then
 			editorModel.snap = math.min(math.max(editorModel.snap + scroll, 1), 16)
 		elseif love.keyboard.isDown("lctrl") then
-			editorModel.speed = math.min(math.max(editorModel.speed * 100 + scroll * 10, 10), 1000) / 100
+			editorModel:setLogSpeed(editorModel:getLogSpeed() + scroll)
+			editorModel:updateRange()
 		else
 			editorModel:scrollSnaps(scroll)
 		end

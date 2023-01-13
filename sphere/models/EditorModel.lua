@@ -34,6 +34,14 @@ EditorModel.save = function(self)
 	self.layerData:save(nc:getLayerData(1))
 end
 
+EditorModel.getLogSpeed = function(self)
+	return math.floor(10 * math.log(self.speed) / math.log(2) + 0.5)
+end
+
+EditorModel.setLogSpeed = function(self, logSpeed)
+	self.speed = 2 ^ (logSpeed / 10)
+end
+
 EditorModel.getSnap = function(self, j)
 	local snap = self.snap
 	local k
