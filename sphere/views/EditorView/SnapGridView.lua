@@ -1,5 +1,6 @@
 local Class = require("Class")
 local gfx_util = require("gfx_util")
+local math_util = require("math_util")
 local spherefonts = require("sphere.assets.fonts")
 local just = require("just")
 local Fraction = require("ncdk.Fraction")
@@ -152,7 +153,7 @@ SnapGridView.drawUI = function(self, w, h)
 
 	imgui.setSize(w, h, 200, 55)
 	editorModel.snap = imgui.slider1("snap select", editorModel.snap, "%d", 1, 16, 1, "snap")
-	local speed = imgui.slider1("second pixels", 100 * editorModel.speed, "%d", 10, 1000, 10, "scale") / 100
+	local speed = imgui.slider1("second pixels", 100 * editorModel.speed, "%d", 10, 10000, 10, "scale") / 100
 	if speed ~= editorModel.speed then
 		editorModel.speed = speed
 		editorModel:updateRange()
@@ -228,75 +229,75 @@ SnapGridView.drawUI = function(self, w, h)
 	just.pop()
 end
 
-local function maxabs(...)
-	local sv = ...
-	local absv = math.abs(sv)
-	for i = 2, select("#", ...) do
-		local v = select(i, ...)
-		if math.abs(v) > absv then
-			absv = math.abs(v)
-			sv = v
-		end
-	end
-	return sv
-end
-
-local maxPointDensity = 1
-SnapGridView.drawWaveform2 = function(self, _w)
+local waveformLine = {}
+SnapGridView.drawWaveform = function(self, _w, h)
 	local editorModel = self.game.editorModel
-	local ld = editorModel.layerData
-	local speed = editorModel.speed
 	local soundData = editorModel.soundData
 
 	local sampleRate = soundData:getSampleRate()
 	local sampleCount = soundData:getSampleCount()
 	local channelCount = soundData:getChannelCount()
-	local samples = math.floor(sampleRate * 1 / speed)
-
-	local sampleOffset = math.floor(editorModel.timePoint.absoluteTime * sampleRate)
-	local prevY
-	local sample = 0
-
-	local drawCount = 0
-	for i = -samples, samples do
-		local sampleTime = (sampleOffset + i) * channelCount
-		if sampleTime >= 0 and sampleTime < sampleCount * channelCount then
-			local y = math.floor(i / samples * self.speed / editorModel.speed * maxPointDensity) / maxPointDensity
-			if y ~= prevY then
-				love.graphics.line(400, y, 400 + sample * 100, y)
-				-- love.graphics.rectangle("fill", 400, y, sample * 100, 1)
-				drawCount = drawCount + 1
-				sample = 0
-				prevY = y
-			end
-			sample = maxabs(sample, soundData:getSample(sampleTime))
-		end
-	end
-	print(drawCount)
-end
-SnapGridView.drawWaveform = function(self, _w)
-	local editorModel = self.game.editorModel
-	local ld = editorModel.layerData
-	local speed = editorModel.speed
-	local soundData = editorModel.soundData
-
-	local sampleRate = soundData:getSampleRate()
-	local sampleCount = soundData:getSampleCount()
-	local channelCount = soundData:getChannelCount()
-	local samples = 1000
+	local points = math.floor(h)
+	local samples = math.floor(points * sampleRate / math.abs(self.speed))
 
 	local sampleOffset = math.floor(editorModel.timePoint.absoluteTime * sampleRate)
 
-	for i = -samples, samples - 1 do
-		for j = 0, channelCount - 1 do
-			local sampleTime = (sampleOffset + i) * channelCount + j
-			if sampleTime >= 0 and sampleTime < sampleCount * channelCount then
-				local y = -i
-				local sample = soundData:getSample(sampleTime)
-				love.graphics.points(j * _w + sample * _w / 2, y)
+	love.graphics.push("all")
+	love.graphics.setLineJoin("none")
+
+	local t = love.timer.getTime()
+
+	for j = 0, channelCount - 1 do
+		local i = -samples
+		local c = 0
+		for k = 0, 2 * points - 1 do
+			local max, min
+
+			local _point = math.floor(math_util.map(i, -samples, samples - 1, 0, 2 * points - 1))
+			while k == _point do
+				local sampleTime = (sampleOffset + i) * channelCount + j
+				if sampleTime >= 0 and sampleTime < sampleCount * channelCount then
+					local sample = soundData:getSample(sampleTime)
+					if sample >= 0 then
+						max = math.max(max or 0, sample)
+					else
+						min = math.min(min or 0, sample)
+					end
+				end
+				i = i + 1
+				_point = math.floor(math_util.map(i, -samples, samples - 1, 0, 2 * points - 1))
+			end
+
+			local y = math.floor(-(k - points))
+
+			local x1, x2 = (min or 0) * _w / 2, (max or 0) * _w / 2
+			if min and max then
+				waveformLine[c + 1] = x1
+				waveformLine[c + 2] = y
+				waveformLine[c + 3] = x2
+				waveformLine[c + 4] = y
+				c = c + 4
+			elseif min then
+				waveformLine[c + 1] = x1
+				waveformLine[c + 2] = y
+				c = c + 2
+			elseif max then
+				waveformLine[c + 1] = x2
+				waveformLine[c + 2] = y
+				c = c + 2
 			end
 		end
+		for k = c + 1, 8 * points do
+			waveformLine[k] = nil
+		end
+		if #waveformLine >= 4 then
+			love.graphics.line(waveformLine)
+		end
+
+		love.graphics.translate(_w, 0)
 	end
+	print(love.timer.getTime() - t)
+	love.graphics.pop()
 end
 
 SnapGridView.drawNotes = function(self, _w)
@@ -430,7 +431,7 @@ SnapGridView.draw = function(self)
 	love.graphics.line(-40, 0, 360, 0)
 	self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime, 320, 320)
 	self:drawNotes(320)
-	self:drawWaveform(320)
+	self:drawWaveform(320, h)
 	love.graphics.translate(340, 0)
 	self:drawTimingObjects("absoluteTime", editorTimePoint.absoluteTime, 500, 50, "left", getVelocityText)
 	love.graphics.pop()
