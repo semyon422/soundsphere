@@ -245,8 +245,6 @@ SnapGridView.drawWaveform = function(self, _w, h)
 	love.graphics.push("all")
 	love.graphics.setLineJoin("none")
 
-	local t = love.timer.getTime()
-
 	for j = 0, channelCount - 1 do
 		local i = -samples
 		local c = 0
@@ -296,7 +294,6 @@ SnapGridView.drawWaveform = function(self, _w, h)
 
 		love.graphics.translate(_w, 0)
 	end
-	print(love.timer.getTime() - t)
 	love.graphics.pop()
 end
 
