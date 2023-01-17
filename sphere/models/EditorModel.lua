@@ -17,7 +17,6 @@ EditorModel.load = function(self)
 
 	local directory = noteChartModel.noteChartEntry.path:match("^(.+)/.-$")
 	self.soundData = love.sound.newSoundData(directory .. "/" .. nc.metaData.audioPath)
-	self.audio = love.audio.newSource(self.soundData)
 
 	self.timePoint = ld:newTimePoint()
 	self.timePoint:setTime(ld:getDynamicTimePointAbsolute(192, 0))

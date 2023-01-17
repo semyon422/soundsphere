@@ -6,6 +6,7 @@ local EditorController = Class:new()
 EditorController.load = function(self)
 	self.game.noteChartModel:loadNoteChart()
 	self.game.editorModel:load()
+	self.game.previewModel:stop()
 end
 
 EditorController.save = function(self)
