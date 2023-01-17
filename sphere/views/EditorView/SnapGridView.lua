@@ -5,6 +5,7 @@ local spherefonts = require("sphere.assets.fonts")
 local just = require("just")
 local Fraction = require("ncdk.Fraction")
 local imgui = require("imgui")
+local ffi = require("ffi")
 
 local Layout = require("sphere.views.EditorView.Layout")
 
@@ -229,23 +230,30 @@ SnapGridView.drawUI = function(self, w, h)
 	just.pop()
 end
 
-local waveformLine = {}
-SnapGridView.drawWaveform = function(self, _w, h)
+local waveformLines = {}
+local waveformKey
+SnapGridView.loadWaveform = function(self, w, h)
 	local editorModel = self.game.editorModel
 	local soundData = editorModel.soundData
 
 	local sampleRate = soundData:getSampleRate()
 	local sampleCount = soundData:getSampleCount()
 	local channelCount = soundData:getChannelCount()
+
 	local points = math.floor(h)
 	local samples = math.floor(points * sampleRate / math.abs(self.pixelSpeed))
 
 	local sampleOffset = math.floor(editorModel.timePoint.absoluteTime * sampleRate)
 
-	love.graphics.push("all")
-	love.graphics.setLineJoin("none")
+	local _waveformKey = sampleOffset .. "/" .. samples
+	if waveformKey == _waveformKey then
+		return
+	end
+	waveformKey = _waveformKey
 
 	for j = 0, channelCount - 1 do
+		waveformLines[j] = waveformLines[j] or {}
+		local waveformLine = waveformLines[j]
 		local i = -samples
 		local c = 0
 		for k = 0, 2 * points - 1 do
@@ -268,7 +276,7 @@ SnapGridView.drawWaveform = function(self, _w, h)
 
 			local y = math.floor(-(k - points))
 
-			local x1, x2 = (min or 0) * _w / 2, (max or 0) * _w / 2
+			local x1, x2 = (min or 0) * w / 2, (max or 0) * w / 2
 			if min and max then
 				waveformLine[c + 1] = x1
 				waveformLine[c + 2] = y
@@ -288,12 +296,28 @@ SnapGridView.drawWaveform = function(self, _w, h)
 		for k = c + 1, 8 * points do
 			waveformLine[k] = nil
 		end
+	end
+end
+
+SnapGridView.drawWaveform = function(self, _w, h)
+	local editorModel = self.game.editorModel
+	local soundData = editorModel.soundData
+
+	local channelCount = soundData:getChannelCount()
+
+	self:loadWaveform(_w, h)
+
+	love.graphics.push("all")
+	love.graphics.setLineJoin("none")
+
+	for j = 0, channelCount - 1 do
+		local waveformLine = waveformLines[j]
 		if #waveformLine >= 4 then
 			love.graphics.line(waveformLine)
 		end
-
 		love.graphics.translate(_w, 0)
 	end
+
 	love.graphics.pop()
 end
 
