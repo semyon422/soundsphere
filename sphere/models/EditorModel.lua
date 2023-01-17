@@ -122,10 +122,14 @@ EditorModel.scrollTimePoint = function(self, timePoint)
 	self:updateRange()
 end
 
-EditorModel.scrollSeconds = function(self, delta)
+EditorModel.scrollSeconds = function(self, absoluteTime)
 	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(192, self.timePoint.absoluteTime + delta)
+	local dtp = ld:getDynamicTimePointAbsolute(192, absoluteTime)
 	self:scrollTimePoint(dtp)
+end
+
+EditorModel.scrollSecondsDelta = function(self, delta)
+	self:scrollSeconds(self.timePoint.absoluteTime + delta)
 end
 
 EditorModel.scrollSnaps = function(self, delta)

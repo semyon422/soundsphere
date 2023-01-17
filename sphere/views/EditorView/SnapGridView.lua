@@ -5,7 +5,6 @@ local spherefonts = require("sphere.assets.fonts")
 local just = require("just")
 local Fraction = require("ncdk.Fraction")
 local imgui = require("imgui")
-local ffi = require("ffi")
 
 local Layout = require("sphere.views.EditorView.Layout")
 
@@ -158,7 +157,7 @@ SnapGridView.drawUI = function(self, w, h)
 	imgui.setSize(w, h, 200, 55)
 	editorModel.snap = imgui.slider1("snap select", editorModel.snap, "%d", 1, 16, 1, "snap")
 
-	local logSpeed = imgui.slider1("editor speed", editorModel:getLogSpeed(), "%d", -30, 30, 1, "speed")
+	local logSpeed = imgui.slider1("editor speed", editorModel:getLogSpeed(), "%d", -30, 50, 1, "speed")
 	if logSpeed ~= editorModel:getLogSpeed() then
 		editorModel:setLogSpeed(logSpeed)
 		editorModel:updateRange()
@@ -527,16 +526,31 @@ SnapGridView.draw = function(self)
 	love.graphics.pop()
 
 	if love.keyboard.isDown("lalt") and drag("drag1", width, h) then
-		editorModel:scrollSeconds(-(_my - prevMouseY) / pixelSpeed)
+		editorModel:scrollSecondsDelta(-(_my - prevMouseY) / pixelSpeed)
 	end
 	prevMouseY = _my
 
-	local scroll = just.wheel_over("scale scroll", just.is_over(240, h))
+	local scroll = just.wheel_over("scale scroll", just.is_over(width, h))
 	if just.keypressed("right") then
 		scroll = 1
 	elseif just.keypressed("left") then
 		scroll = -1
 	end
+
+	love.graphics.push()
+	Layout:move("base")
+	love.graphics.translate(w - 20, 0)
+	if ld.mode == "interval" then
+		local visibleLength = 2 / editorModel.speed
+		local fullLength = ld.ranges.timePoint.last.absoluteTime - ld.ranges.timePoint.first.absoluteTime
+
+		local pos = (fullLength - editorTimePoint.absoluteTime + ld.ranges.timePoint.first.absoluteTime) / fullLength
+		local newScroll = imgui.ScrollBar("chart scrollbar", pos, 20, h, fullLength / visibleLength)
+		if newScroll then
+			editorModel:scrollSeconds((1 - newScroll) * fullLength + ld.ranges.timePoint.first.absoluteTime)
+		end
+	end
+	love.graphics.pop()
 
 	if scroll then
 		if love.keyboard.isDown("lshift") then
