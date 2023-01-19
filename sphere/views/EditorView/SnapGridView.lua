@@ -121,9 +121,9 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, w1, w2)
 		endTime = Fraction((endTime * snap):floor(), snap)
 
 		while intervalData and intervalData < endIntervalData or intervalData == endIntervalData and time <= endTime do
-			if intervalData.next and time - intervalData.start >= intervalData.beats then
+			if intervalData.next and time >= intervalData:_end() then
+				time = time - intervalData.beats
 				intervalData = intervalData.next
-				time = Fraction((intervalData.start * snap):ceil(), snap)
 			end
 
 			timePoint = ld:getDynamicTimePoint(intervalData, time)
