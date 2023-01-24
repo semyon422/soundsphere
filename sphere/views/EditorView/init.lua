@@ -27,7 +27,9 @@ EditorView.update = function(self, dt)
 	self.game.editorModel:update()
 end
 
-EditorView.receive = function(self, event) end
+EditorView.receive = function(self, event)
+	self.game.editorController:receive(event)
+end
 
 EditorView.draw = function(self)
 	just.container("screen container", true)

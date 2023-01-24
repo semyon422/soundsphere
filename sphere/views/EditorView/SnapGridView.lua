@@ -225,6 +225,12 @@ SnapGridView.drawUI = function(self, w, h)
 	if imgui.button("save btn", "save") then
 		self.game.editorController:save()
 	end
+	if imgui.button("play btn", "play") then
+		self.game.editorModel:play()
+	end
+	if imgui.button("pause btn", "pause") then
+		self.game.editorModel:pause()
+	end
 
 	just.pop()
 end

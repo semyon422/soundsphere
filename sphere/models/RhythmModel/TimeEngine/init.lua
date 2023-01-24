@@ -33,8 +33,11 @@ TimeEngine.load = function(self)
 	self:loadTimePoints()
 	self:resetTimeRateHandlers()
 
-	self.minTime = self.noteChart.metaData.minTime
-	self.maxTime = self.noteChart.metaData.maxTime
+
+	if self.noteChart then
+		self.minTime = self.noteChart.metaData.minTime
+		self.maxTime = self.noteChart.metaData.maxTime
+	end
 end
 
 TimeEngine.updateTimeToPrepare = function(self)
@@ -146,6 +149,9 @@ TimeEngine.loadTimePoints = function(self)
 	local absoluteTimes = {}
 
 	local noteChart = self.noteChart
+	if not noteChart then
+		return
+	end
 	for _, layerData in noteChart:getLayerDataIterator() do
 		local timePointList = layerData.timePointList
 		for timePointIndex = 1, #timePointList do

@@ -1,8 +1,20 @@
 local Class = require("Class")
 local DynamicLayerData = require("ncdk.DynamicLayerData")
 local Fraction = require("ncdk.Fraction")
+local AudioManager = require("sphere.models.EditorModel.AudioManager")
+local NoteChartResourceLoader = require("sphere.database.NoteChartResourceLoader")
+local audio = require("audio")
+local AudioEngine		= require("sphere.models.RhythmModel.AudioEngine")
+local TimeEngine		= require("sphere.models.RhythmModel.TimeEngine")
 
 local EditorModel = Class:new()
+
+EditorModel.construct = function(self)
+	self.timeEngine = TimeEngine:new()
+	self.audioEngine = AudioEngine:new()
+	self.timeEngine.rhythmModel = self
+	self.audioEngine.rhythmModel = self
+end
 
 EditorModel.load = function(self)
 	local noteChartModel = self.game.noteChartModel
@@ -25,12 +37,53 @@ EditorModel.load = function(self)
 	self.snap = 1
 	self.speed = 1
 
-	self:scrollSeconds(0)
+	local timeEngine = self.timeEngine
+	timeEngine:load()
+	timeEngine:updateTimeToPrepare()
+
+	self.audioManager = AudioManager:new()
+
+	self:scrollSeconds(timeEngine.timer:getTime())
+end
+
+EditorModel.loadResources = function(self)
+	local nc = self.game.noteChartModel.noteChart
+
+	for _, layerData in nc:getLayerDataIterator() do
+		for noteDataIndex = 1, layerData:getNoteDataCount() do
+			local noteData = layerData:getNoteData(noteDataIndex)
+			if noteData.sounds then
+				for _, s in ipairs(noteData.sounds) do
+					local path = NoteChartResourceLoader.aliases[s[1]]
+					local soundData = NoteChartResourceLoader.resources[path]
+					if soundData then
+						local _audio = audio:newAudio(soundData)
+						self.audioManager:insert({
+							offset = noteData.timePoint.absoluteTime,
+							duration = _audio:getLength()
+						})
+					end
+				end
+			end
+		end
+	end
+
+	for _, s in ipairs(self.audioManager:getCurrentSources()) do
+		print(s.offset, s.duration)
+	end
 end
 
 EditorModel.save = function(self)
 	local nc = self.game.noteChartModel.noteChart
 	self.layerData:save(nc:getLayerData(1))
+end
+
+EditorModel.play = function(self)
+	self.timeEngine:play()
+end
+
+EditorModel.pause = function(self)
+	self.timeEngine:pause()
 end
 
 EditorModel.getLogSpeed = function(self)
@@ -58,6 +111,15 @@ EditorModel.update = function(self)
 	local dtp = self:getDynamicTimePoint()
 	if self.grabbedIntervalData then
 		self.layerData:moveInterval(self.grabbedIntervalData, dtp.absoluteTime)
+	end
+	local time = self.timeEngine.timer:getTime()
+	self:scrollSeconds(time)
+	self.audioManager:setTime(time)
+end
+
+EditorModel.receive = function(self, event)
+	if event.name == "framestarted" then
+		self.timeEngine:sync(event)
 	end
 end
 
@@ -118,6 +180,13 @@ EditorModel.scrollTimePoint = function(self, timePoint)
 	t.visualTime = timePoint.visualTime
 	t.beatTime = timePoint.beatTime
 	t:setTime(timePoint:getTime())
+
+	local timer = self.timeEngine.timer
+	local audioEngine = self.audioEngine
+
+	audioEngine:setPosition(timePoint.absoluteTime)
+	timer:setPosition(timePoint.absoluteTime)
+	timer:adjustTime(true)
 
 	self:updateRange()
 end

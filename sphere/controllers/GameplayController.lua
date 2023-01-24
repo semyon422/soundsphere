@@ -1,5 +1,4 @@
 local Class						= require("Class")
-local audio						= require("audio")
 local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 local FileFinder	= require("sphere.filesystem.FileFinder")
 
