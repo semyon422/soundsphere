@@ -4,16 +4,14 @@ local Fraction = require("ncdk.Fraction")
 local AudioManager = require("sphere.models.EditorModel.AudioManager")
 local NoteChartResourceLoader = require("sphere.database.NoteChartResourceLoader")
 local audio = require("audio")
-local AudioEngine		= require("sphere.models.RhythmModel.AudioEngine")
-local TimeEngine		= require("sphere.models.RhythmModel.TimeEngine")
+local TimeManager = require("sphere.models.EditorModel.TimeManager")
 
 local EditorModel = Class:new()
 
 EditorModel.construct = function(self)
-	self.timeEngine = TimeEngine:new()
-	self.audioEngine = AudioEngine:new()
-	self.timeEngine.rhythmModel = self
-	self.audioEngine.rhythmModel = self
+	self.timer = TimeManager:new()
+	self.audioManager = AudioManager:new()
+	self.timer.audioManager = self.audioManager
 end
 
 EditorModel.load = function(self)
@@ -37,13 +35,7 @@ EditorModel.load = function(self)
 	self.snap = 1
 	self.speed = 1
 
-	local timeEngine = self.timeEngine
-	timeEngine:load()
-	timeEngine:updateTimeToPrepare()
-
-	self.audioManager = AudioManager:new()
-
-	self:scrollSeconds(timeEngine.timer:getTime())
+	self:scrollSeconds(self.timer:getTime())
 end
 
 EditorModel.loadResources = function(self)
@@ -60,7 +52,9 @@ EditorModel.loadResources = function(self)
 						local _audio = audio:newAudio(soundData)
 						self.audioManager:insert({
 							offset = noteData.timePoint.absoluteTime,
-							duration = _audio:getLength()
+							duration = _audio:getLength(),
+							soundData = soundData,
+							audio = _audio,
 						})
 					end
 				end
@@ -79,11 +73,13 @@ EditorModel.save = function(self)
 end
 
 EditorModel.play = function(self)
-	self.timeEngine:play()
+	self.timer:play()
+	self.audioManager:play()
 end
 
 EditorModel.pause = function(self)
-	self.timeEngine:pause()
+	self.timer:pause()
+	self.audioManager:pause()
 end
 
 EditorModel.getLogSpeed = function(self)
@@ -112,14 +108,17 @@ EditorModel.update = function(self)
 	if self.grabbedIntervalData then
 		self.layerData:moveInterval(self.grabbedIntervalData, dtp.absoluteTime)
 	end
-	local time = self.timeEngine.timer:getTime()
-	self:scrollSeconds(time)
-	self.audioManager:setTime(time)
+	local time = self.timer:getTime()
+	self.audioManager:update()
+	self:scrollSeconds(time, true)
 end
 
 EditorModel.receive = function(self, event)
 	if event.name == "framestarted" then
-		self.timeEngine:sync(event)
+		local timer = self.timer
+		timer.eventTime = event.time
+		timer.eventDelta = event.dt
+		timer:update()
 	end
 end
 
@@ -170,7 +169,7 @@ EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
 	end
 end
 
-EditorModel.scrollTimePoint = function(self, timePoint)
+EditorModel.scrollTimePoint = function(self, timePoint, notForceAudio)
 	if not timePoint then
 		return
 	end
@@ -181,20 +180,23 @@ EditorModel.scrollTimePoint = function(self, timePoint)
 	t.beatTime = timePoint.beatTime
 	t:setTime(timePoint:getTime())
 
-	local timer = self.timeEngine.timer
-	local audioEngine = self.audioEngine
+	local timer = self.timer
+	local audioManager = self.audioManager
 
-	audioEngine:setPosition(timePoint.absoluteTime)
+	audioManager:setTime(timePoint.absoluteTime)
+	if not notForceAudio then
+		audioManager:setPosition()
+	end
 	timer:setPosition(timePoint.absoluteTime)
 	timer:adjustTime(true)
 
 	self:updateRange()
 end
 
-EditorModel.scrollSeconds = function(self, absoluteTime)
+EditorModel.scrollSeconds = function(self, absoluteTime, notForceAudio)
 	local ld = self.layerData
 	local dtp = ld:getDynamicTimePointAbsolute(192, absoluteTime)
-	self:scrollTimePoint(dtp)
+	self:scrollTimePoint(dtp, notForceAudio)
 end
 
 EditorModel.scrollSecondsDelta = function(self, delta)
