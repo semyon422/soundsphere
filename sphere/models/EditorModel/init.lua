@@ -12,6 +12,7 @@ EditorModel.construct = function(self)
 	self.timer = TimeManager:new()
 	self.audioManager = AudioManager:new()
 	self.timer.audioManager = self.audioManager
+	self.audioManager.timer = self.timer
 end
 
 EditorModel.load = function(self)
@@ -26,7 +27,7 @@ EditorModel.load = function(self)
 	self.inputMap = nc.inputMode:getInputMap()
 
 	local directory = noteChartModel.noteChartEntry.path:match("^(.+)/.-$")
-	self.soundData = love.sound.newSoundData(directory .. "/" .. nc.metaData.audioPath)
+	-- self.soundData = love.sound.newSoundData(directory .. "/" .. nc.metaData.audioPath)
 
 	self.timePoint = ld:newTimePoint()
 	self.timePoint:setTime(ld:getDynamicTimePointAbsolute(192, 0))
@@ -55,6 +56,7 @@ EditorModel.loadResources = function(self)
 							duration = _audio:getLength(),
 							soundData = soundData,
 							audio = _audio,
+							name = s[1],
 						})
 					end
 				end
@@ -62,9 +64,7 @@ EditorModel.loadResources = function(self)
 		end
 	end
 
-	for _, s in ipairs(self.audioManager:getCurrentSources()) do
-		print(s.offset, s.duration)
-	end
+	print("loaded")
 end
 
 EditorModel.save = function(self)
@@ -104,13 +104,12 @@ EditorModel.dropIntervalData = function(self)
 end
 
 EditorModel.update = function(self)
-	local dtp = self:getDynamicTimePoint()
+	local dtp = self.layerData:getDynamicTimePointAbsolute(192, self.timer:getTime())
 	if self.grabbedIntervalData then
 		self.layerData:moveInterval(self.grabbedIntervalData, dtp.absoluteTime)
 	end
-	local time = self.timer:getTime()
 	self.audioManager:update()
-	self:scrollSeconds(time, true)
+	self:_scrollTimePoint(dtp)
 end
 
 EditorModel.receive = function(self, event)
@@ -169,7 +168,7 @@ EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
 	end
 end
 
-EditorModel.scrollTimePoint = function(self, timePoint, notForceAudio)
+EditorModel._scrollTimePoint = function(self, timePoint)
 	if not timePoint then
 		return
 	end
@@ -180,23 +179,28 @@ EditorModel.scrollTimePoint = function(self, timePoint, notForceAudio)
 	t.beatTime = timePoint.beatTime
 	t:setTime(timePoint:getTime())
 
-	local timer = self.timer
-	local audioManager = self.audioManager
-
-	audioManager:setTime(timePoint.absoluteTime)
-	if not notForceAudio then
-		audioManager:setPosition()
-	end
-	timer:setPosition(timePoint.absoluteTime)
-	timer:adjustTime(true)
-
 	self:updateRange()
 end
 
-EditorModel.scrollSeconds = function(self, absoluteTime, notForceAudio)
+EditorModel.scrollTimePoint = function(self, timePoint)
+	if not timePoint then
+		return
+	end
+
+	self:_scrollTimePoint(timePoint)
+
+	local timer = self.timer
+	timer:setPosition(timePoint.absoluteTime)
+
+	local audioManager = self.audioManager
+	audioManager:update(true)
+	timer:adjustTime(true)
+end
+
+EditorModel.scrollSeconds = function(self, absoluteTime)
 	local ld = self.layerData
 	local dtp = ld:getDynamicTimePointAbsolute(192, absoluteTime)
-	self:scrollTimePoint(dtp, notForceAudio)
+	self:scrollTimePoint(dtp)
 end
 
 EditorModel.scrollSecondsDelta = function(self, delta)

@@ -11,7 +11,7 @@ TimeManager.getAbsoluteDelta = function(self)
 end
 
 TimeManager.getAdjustTime = function(self)
-	return self.audioManager:getPosition()
+	-- return self.audioManager:getPosition()
 end
 
 return TimeManager

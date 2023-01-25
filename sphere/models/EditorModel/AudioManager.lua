@@ -9,11 +9,35 @@ AudioManager.construct = function(self)
 	self.intervals = {}
 end
 
-AudioManager.update = function(self)
-	for _source in pairs(self.sources) do
-		local source = _source.audio
-		if not source:isPlaying() then
-			self.sources[_source] = nil
+AudioManager.update = function(self, force)
+	local time = self.timer:getTime()
+	if time == self.time then
+		return
+	end
+
+	local isPlaying = self.timer.isPlaying
+	local forcePosition = time < self.time or not isPlaying or force
+	self.time = time
+
+	local sources = self:getCurrentSources()
+	for source in pairs(sources) do
+		if not self.sources[source] then
+			self.sources[source] = source
+		end
+		if isPlaying then
+			source.audio:play()
+		end
+	end
+	for source in pairs(self.sources) do
+		if not sources[source] then
+			sources[source] = nil
+			source.audio:stop()
+			self.sources[source] = nil
+		end
+	end
+	if forcePosition then
+		for source in pairs(self.sources) do
+			source.audio:setPosition(time - source.offset)
 		end
 	end
 end
@@ -31,7 +55,7 @@ AudioManager.getPosition = function(self)
 		local pos = source:getPosition()
 		if source:isPlaying() then
 			local _length = source:getLength()
-			position = position + (source.offset + pos) * _length
+			position = position + (_source.offset + pos) * _length
 			length = length + _length
 		end
 	end
@@ -44,52 +68,15 @@ AudioManager.getPosition = function(self)
 end
 
 AudioManager.play = function(self)
+	local time = self.timer:getTime()
 	for source in pairs(self.sources) do
-		source.audio:setPosition(self.time - source.offset)
-	end
-end
-
-AudioManager.setPosition = function(self)
-	for source in pairs(self.sources) do
-		source.audio:setPosition(self.time - source.offset)
+		source.audio:setPosition(time - source.offset)
 	end
 end
 
 AudioManager.pause = function(self)
 	for source in pairs(self.sources) do
 		source.audio:pause()
-	end
-end
-
-AudioManager.setTime = function(self, time)
-	if time == self.time then
-		return
-	end
-
-	local forcePosition = time < self.time
-	self.time = time
-
-	local sources = self:getCurrentSources()
-
-	for source in pairs(sources) do
-		if not self.sources[source] then
-			self.sources[source] = source
-			source.audio:play()
-			if forcePosition then
-				source:setPosition(time - source.offset)
-			end
-		end
-	end
-	for source in pairs(self.sources) do
-		if not sources[source] then
-			sources[source] = nil
-			source.audio:stop()
-		end
-	end
-	for source in pairs(self.sources) do
-		if time < source.offset or time >= source.offset + source.duration then
-			self.sources[source] = nil
-		end
 	end
 end
 

@@ -21,6 +21,21 @@ EditorController.load = function(self)
 	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChartModel.noteChart, function()
 		self.game.editorModel:loadResources()
 	end)
+
+	local graphics = self.game.configModel.configs.settings.graphics
+	local flags = graphics.mode.flags
+	if graphics.vsyncOnSelect then
+		self.game.baseVsync = flags.vsync ~= 0 and flags.vsync or 1
+		flags.vsync = 0
+	end
+end
+
+EditorController.unload = function(self)
+	local graphics = self.game.configModel.configs.settings.graphics
+	local flags = graphics.mode.flags
+	if graphics.vsyncOnSelect and flags.vsync == 0 then
+		flags.vsync = self.game.baseVsync
+	end
 end
 
 EditorController.save = function(self)

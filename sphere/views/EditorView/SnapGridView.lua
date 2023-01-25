@@ -232,6 +232,11 @@ SnapGridView.drawUI = function(self, w, h)
 		self.game.editorModel:pause()
 	end
 
+	imgui.text("playing:")
+	for source in pairs(self.game.editorModel.audioManager.sources) do
+		imgui.text(("%s+%s - %s"):format(source.offset, source.duration, source.name))
+	end
+
 	just.pop()
 end
 
@@ -307,6 +312,9 @@ end
 SnapGridView.drawWaveform = function(self, _w, h)
 	local editorModel = self.game.editorModel
 	local soundData = editorModel.soundData
+	if not soundData then
+		return
+	end
 
 	local channelCount = soundData:getChannelCount()
 
