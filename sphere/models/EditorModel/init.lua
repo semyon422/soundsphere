@@ -117,7 +117,9 @@ EditorModel.update = function(self)
 		self.layerData:moveInterval(self.grabbedIntervalData, dtp.absoluteTime)
 	end
 	self.audioManager:update()
-	self:_scrollTimePoint(dtp)
+	if self.timer.isPlaying then
+		self:_scrollTimePoint(dtp)
+	end
 end
 
 EditorModel.receive = function(self, event)

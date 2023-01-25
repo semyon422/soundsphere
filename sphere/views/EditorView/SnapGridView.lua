@@ -558,6 +558,14 @@ SnapGridView.draw = function(self)
 		scroll = -1
 	end
 
+	if just.keypressed("space") then
+		if editorModel.timer.isPlaying then
+			editorModel:pause()
+		else
+			editorModel:play()
+		end
+	end
+
 	love.graphics.push()
 	Layout:move("base")
 	love.graphics.translate(w - 20, 0)
