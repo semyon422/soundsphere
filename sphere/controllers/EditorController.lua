@@ -7,6 +7,7 @@ local EditorController = Class:new()
 
 EditorController.load = function(self)
 	local noteChartModel = self.game.noteChartModel
+	noteChartModel:load()
 	noteChartModel:loadNoteChart()
 
 	self.game.editorModel:load()
@@ -31,6 +32,8 @@ EditorController.load = function(self)
 end
 
 EditorController.unload = function(self)
+	self.game.editorModel:unload()
+
 	local graphics = self.game.configModel.configs.settings.graphics
 	local flags = graphics.mode.flags
 	if graphics.vsyncOnSelect and flags.vsync == 0 then

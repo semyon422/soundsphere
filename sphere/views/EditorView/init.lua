@@ -48,6 +48,8 @@ EditorView.quit = function(self)
 	self:changeScreen("selectView")
 end
 
-EditorView.unload = function(self) end
+EditorView.unload = function(self)
+	self.game.editorController:unload()
+end
 
 return EditorView

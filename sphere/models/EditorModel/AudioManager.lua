@@ -4,7 +4,7 @@ local AudioManager = Class:new()
 
 AudioManager.time = 0
 
-AudioManager.construct = function(self)
+AudioManager.load = function(self)
 	self.sources = {}
 	self.intervals = {}
 end
@@ -40,10 +40,6 @@ AudioManager.update = function(self, force)
 			source.audio:setPosition(time - source.offset)
 		end
 	end
-end
-
-AudioManager.unload = function(self)
-	-- self.container:release()
 end
 
 AudioManager.getPosition = function(self)

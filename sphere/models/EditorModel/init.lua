@@ -41,12 +41,16 @@ EditorModel.load = function(self)
 	self.firstTime = ld.ranges.timePoint.first.absoluteTime
 	self.lastTime = ld.ranges.timePoint.last.absoluteTime
 
+	self.timer:reset()
+	self.audioManager:load()
+
 	self:scrollSeconds(self.timer:getTime())
 end
 
 EditorModel.loadResources = function(self)
 	local nc = self.game.noteChartModel.noteChart
 
+	self.sources = {}
 	for _, layerData in nc:getLayerDataIterator() do
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
@@ -65,6 +69,7 @@ EditorModel.loadResources = function(self)
 							audio = _audio,
 							name = s[1],
 						})
+						table.insert(self.sources, _audio)
 						self.lastTime = math.max(self.lastTime, offset + duration)
 					end
 				end
@@ -73,6 +78,12 @@ EditorModel.loadResources = function(self)
 	end
 
 	print("loaded")
+end
+
+EditorModel.unload = function(self)
+	for _, _audio in ipairs(self.sources) do
+		_audio:release()
+	end
 end
 
 EditorModel.save = function(self)
