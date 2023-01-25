@@ -29,6 +29,7 @@ EditorModel.load = function(self)
 	local audioPath = noteChartModel.noteChartEntry.path:match("^(.+)/.-$") .. "/" .. nc.metaData.audioPath
 	if love.filesystem.getInfo(audioPath, "file") then
 		self.soundData = love.sound.newSoundData(audioPath)
+		self.soundDataOffset = 0
 	end
 
 	self.timePoint = ld:newTimePoint()
@@ -54,13 +55,16 @@ EditorModel.loadResources = function(self)
 	for _, layerData in nc:getLayerDataIterator() do
 		for noteDataIndex = 1, layerData:getNoteDataCount() do
 			local noteData = layerData:getNoteData(noteDataIndex)
+			local offset = noteData.timePoint.absoluteTime
+			if noteData.stream then
+				self.soundDataOffset = offset
+			end
 			if noteData.sounds then
 				for _, s in ipairs(noteData.sounds) do
 					local path = NoteChartResourceLoader.aliases[s[1]]
 					local soundData = NoteChartResourceLoader.resources[path]
 					if soundData then
 						local _audio = audio:newAudio(soundData)
-						local offset = noteData.timePoint.absoluteTime
 						local duration = _audio:getLength()
 						self.audioManager:insert({
 							offset = noteData.timePoint.absoluteTime,

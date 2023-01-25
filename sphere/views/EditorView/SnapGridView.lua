@@ -253,7 +253,7 @@ SnapGridView.loadWaveform = function(self, w, h)
 	local points = math.floor(h)
 	local samples = math.floor(points * sampleRate / math.abs(self.pixelSpeed))
 
-	local sampleOffset = math.floor(editorModel.timePoint.absoluteTime * sampleRate)
+	local sampleOffset = math.floor((editorModel.timePoint.absoluteTime - editorModel.soundDataOffset) * sampleRate)
 
 	local _waveformKey = sampleOffset .. "/" .. samples
 	if waveformKey == _waveformKey then
