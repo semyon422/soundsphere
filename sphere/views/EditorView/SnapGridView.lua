@@ -541,6 +541,13 @@ SnapGridView.draw = function(self)
 
 	if love.keyboard.isDown("lalt") and drag("drag1", width, h) then
 		editorModel:scrollSecondsDelta(-(_my - prevMouseY) / pixelSpeed)
+		if editorModel.timer.isPlaying then
+			editorModel:pause()
+			self.dragging = true
+		end
+	elseif self.dragging then
+		editorModel:play()
+		self.dragging = false
 	end
 	prevMouseY = _my
 
@@ -556,12 +563,12 @@ SnapGridView.draw = function(self)
 	love.graphics.translate(w - 20, 0)
 	if ld.mode == "interval" then
 		local visibleLength = 2 / editorModel.speed
-		local fullLength = ld.ranges.timePoint.last.absoluteTime - ld.ranges.timePoint.first.absoluteTime
+		local fullLength = editorModel.lastTime - editorModel.firstTime
 
-		local pos = (fullLength - editorTimePoint.absoluteTime + ld.ranges.timePoint.first.absoluteTime) / fullLength
+		local pos = (fullLength - editorTimePoint.absoluteTime + editorModel.firstTime) / fullLength
 		local newScroll = imgui.ScrollBar("chart scrollbar", pos, 20, h, fullLength / visibleLength)
 		if newScroll then
-			editorModel:scrollSeconds((1 - newScroll) * fullLength + ld.ranges.timePoint.first.absoluteTime)
+			editorModel:scrollSeconds((1 - newScroll) * fullLength + editorModel.firstTime)
 		end
 	end
 	love.graphics.pop()

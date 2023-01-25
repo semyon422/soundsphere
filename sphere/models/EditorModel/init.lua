@@ -26,8 +26,10 @@ EditorModel.load = function(self)
 	self.columns = nc.inputMode:getColumns()
 	self.inputMap = nc.inputMode:getInputMap()
 
-	local directory = noteChartModel.noteChartEntry.path:match("^(.+)/.-$")
-	-- self.soundData = love.sound.newSoundData(directory .. "/" .. nc.metaData.audioPath)
+	local audioPath = noteChartModel.noteChartEntry.path:match("^(.+)/.-$") .. "/" .. nc.metaData.audioPath
+	if love.filesystem.getInfo(audioPath, "file") then
+		self.soundData = love.sound.newSoundData(audioPath)
+	end
 
 	self.timePoint = ld:newTimePoint()
 	self.timePoint:setTime(ld:getDynamicTimePointAbsolute(192, 0))
@@ -35,6 +37,9 @@ EditorModel.load = function(self)
 
 	self.snap = 1
 	self.speed = 1
+
+	self.firstTime = ld.ranges.timePoint.first.absoluteTime
+	self.lastTime = ld.ranges.timePoint.last.absoluteTime
 
 	self:scrollSeconds(self.timer:getTime())
 end
@@ -51,13 +56,16 @@ EditorModel.loadResources = function(self)
 					local soundData = NoteChartResourceLoader.resources[path]
 					if soundData then
 						local _audio = audio:newAudio(soundData)
+						local offset = noteData.timePoint.absoluteTime
+						local duration = _audio:getLength()
 						self.audioManager:insert({
 							offset = noteData.timePoint.absoluteTime,
-							duration = _audio:getLength(),
+							duration = duration,
 							soundData = soundData,
 							audio = _audio,
 							name = s[1],
 						})
+						self.lastTime = math.max(self.lastTime, offset + duration)
 					end
 				end
 			end

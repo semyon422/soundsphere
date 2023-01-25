@@ -14,10 +14,10 @@ AudioManager.update = function(self, force)
 	if time == self.time then
 		return
 	end
+	self.time = time
 
 	local isPlaying = self.timer.isPlaying
-	local forcePosition = time < self.time or not isPlaying or force
-	self.time = time
+	local forcePosition = not isPlaying or force
 
 	local sources = self:getCurrentSources()
 	for source in pairs(sources) do
