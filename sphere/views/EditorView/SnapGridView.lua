@@ -365,9 +365,7 @@ SnapGridView.drawNotes = function(self, _w, _h)
 	local pixelSpeed = self.pixelSpeed
 	local columns = editorModel.columns
 
-	local rangeTracker = self.game.editorModel.layerData.ranges.timePoint
-	local timePoint = rangeTracker.head
-	if not timePoint then
+	if not ld.ranges.timePoint.head then
 		return
 	end
 
@@ -397,12 +395,11 @@ SnapGridView.drawNotes = function(self, _w, _h)
 
 	local currentTime = editorModel.timePoint.absoluteTime
 
-	local endTimePoint = rangeTracker.tail
-	while timePoint and timePoint <= endTimePoint do
-		local noteDatas = timePoint.noteDatas
-		if noteDatas then
-			for _, noteData in ipairs(noteDatas) do
-				local y = (timePoint.absoluteTime - currentTime) * pixelSpeed
+	for _, r in pairs(ld.ranges.note) do
+		for _, range in pairs(r) do
+			local noteData = range.head
+			while noteData and noteData <= range.tail do
+				local y = (noteData.timePoint.absoluteTime - currentTime) * pixelSpeed
 				local x = (noteData.inputIndex - 1) * nw
 				just.push()
 				love.graphics.translate(x, y)
@@ -411,10 +408,10 @@ SnapGridView.drawNotes = function(self, _w, _h)
 					ld:removeNoteData(noteData)
 				end
 				just.pop()
+
+				noteData = noteData.next
 			end
 		end
-
-		timePoint = timePoint.next
 	end
 end
 
