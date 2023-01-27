@@ -1,0 +1,2 @@
+#!/bin/bash
+cloc --exclude-dir=bin,3rd-deps,tree,share --include-lang=lua .
