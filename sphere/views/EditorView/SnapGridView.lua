@@ -11,6 +11,7 @@ local Layout = require("sphere.views.EditorView.Layout")
 local SnapGridView = Class:new()
 
 SnapGridView.hitPosition = 0.75
+SnapGridView.laneWidth = 80
 SnapGridView.waveformEnabled = true
 SnapGridView.notesEnabled = true
 SnapGridView.timingEnabled = true
@@ -163,10 +164,6 @@ SnapGridView.drawUI = function(self, w, h)
 		editorModel:updateRange()
 	end
 
-	if imgui.button("add object", "add") then
-		self.game.gameView:setModal(require("sphere.views.EditorView.AddTimingObjectView"))
-	end
-
 	if ld.mode == "measure" then
 		just.row(true)
 		primaryTempo = imgui.input("primaryTempo input", primaryTempo, "primary tempo")
@@ -215,27 +212,24 @@ SnapGridView.drawUI = function(self, w, h)
 		just.text("snap: " .. tostring(snapTime))
 	end
 
-	just.text("time point: " .. tostring(dtp))
-	just.text("time: " .. dtp.absoluteTime)
-
+	self.laneWidth = imgui.slider1("laneWidth", self.laneWidth, "%d", 10, 200, 10, "lane width")
 	self.waveformEnabled = imgui.checkbox("waveformEnabled", self.waveformEnabled, "waveform")
 	self.notesEnabled = imgui.checkbox("notesEnabled", self.notesEnabled, "notes")
 	self.timingEnabled = imgui.checkbox("timingEnabled", self.timingEnabled, "timing")
 
+	if imgui.button("add object", "add") then
+		self.game.gameView:setModal(require("sphere.views.EditorView.AddTimingObjectView"))
+	end
+
 	if imgui.button("save btn", "save") then
 		self.game.editorController:save()
 	end
-	if imgui.button("play btn", "play") then
-		self.game.editorModel:play()
-	end
-	if imgui.button("pause btn", "pause") then
-		self.game.editorModel:pause()
-	end
 
-	imgui.text("playing:")
-	for source in pairs(self.game.editorModel.audioManager.sources) do
-		imgui.text(("%s+%s - %s"):format(source.offset, source.duration, source.name))
+	local playing = 0
+	for _ in pairs(self.game.editorModel.audioManager.sources) do
+		playing = playing + 1
 	end
+	imgui.text("playing sounds: " .. playing)
 
 	just.pop()
 end
@@ -458,27 +452,7 @@ SnapGridView.draw = function(self)
 	local editorTimePoint = editorModel.timePoint
 
 	love.graphics.translate(w / 3, 0)
-	local width = 320
-
-	-- love.graphics.push()
-	-- love.graphics.translate(0, h / 2)
-	-- love.graphics.line(0, 0, 240, 0)
-	-- love.graphics.translate(-40, 0)
-	-- if ld.mode == "measure" then
-	-- 	self:drawTimingObjects("beatTime", editorTimePoint.beatTime, -500, 50, "right", getTimingText)
-	-- elseif ld.mode == "interval" then
-	-- 	self:drawTimingObjects("absoluteTime", editorTimePoint.absoluteTime, -500, 50, "right", getTimingText)
-	-- end
-	-- love.graphics.translate(40, 0)
-	-- self:drawComputedGrid("beatTime", editorTimePoint.beatTime)
-
-	-- love.graphics.translate(80, 0)
-	-- self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime)
-
-	-- love.graphics.translate(80, 0)
-	-- self:drawComputedGrid("visualTime", editorTimePoint.visualTime)
-
-	-- love.graphics.pop()
+	local width = self.laneWidth * editorModel.columns
 
 	love.graphics.push()
 	local _mx, _my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
@@ -557,29 +531,6 @@ SnapGridView.draw = function(self)
 	elseif just.keypressed("left") then
 		scroll = -1
 	end
-
-	if just.keypressed("space") then
-		if editorModel.timer.isPlaying then
-			editorModel:pause()
-		else
-			editorModel:play()
-		end
-	end
-
-	love.graphics.push()
-	Layout:move("base")
-	love.graphics.translate(w - 20, 0)
-	if ld.mode == "interval" then
-		local visibleLength = 2 / editorModel.speed
-		local fullLength = editorModel.lastTime - editorModel.firstTime
-
-		local pos = (fullLength - editorTimePoint.absoluteTime + editorModel.firstTime) / fullLength
-		local newScroll = imgui.ScrollBar("chart scrollbar", pos, 20, h, fullLength / visibleLength)
-		if newScroll then
-			editorModel:scrollSeconds((1 - newScroll) * fullLength + editorModel.firstTime)
-		end
-	end
-	love.graphics.pop()
 
 	if scroll then
 		if love.keyboard.isDown("lshift") then

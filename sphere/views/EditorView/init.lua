@@ -5,6 +5,7 @@ local just = require("just")
 local Layout = require("sphere.views.EditorView.Layout")
 local EditorViewConfig = require("sphere.views.EditorView.EditorViewConfig")
 local SnapGridView = require("sphere.views.EditorView.SnapGridView")
+local Footer = require("sphere.views.EditorView.Footer")
 
 local EditorView = ScreenView:new()
 
@@ -41,6 +42,7 @@ EditorView.draw = function(self)
 	Layout:draw()
 	EditorViewConfig(self)
 	self.snapGridView:draw()
+	Footer(self)
 	just.container()
 end
 
