@@ -45,7 +45,7 @@ LogicalNote.playSound = function(self, noteData)
 end
 
 LogicalNote.getNext = function(self)
-	return self.noteHandler.noteData[self.index + 1]
+	return self.noteHandler.notes[self.index + 1]
 end
 
 LogicalNote.getNextPlayable = function(self)

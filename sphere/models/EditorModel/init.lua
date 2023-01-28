@@ -52,9 +52,9 @@ EditorModel.loadResources = function(self)
 	local nc = self.game.noteChartModel.noteChart
 
 	self.sources = {}
-	for _, layerData in nc:getLayerDataIterator() do
-		for noteDataIndex = 1, layerData:getNoteDataCount() do
-			local noteData = layerData:getNoteData(noteDataIndex)
+
+	for noteDatas in nc:getInputIterator() do
+		for _, noteData in ipairs(noteDatas) do
 			local offset = noteData.timePoint.absoluteTime
 			if noteData.stream then
 				self.soundDataOffset = offset

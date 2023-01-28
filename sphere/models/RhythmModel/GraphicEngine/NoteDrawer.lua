@@ -17,21 +17,18 @@ NoteDrawer.load = function(self)
 
 	self.notes = {}
 	local notes = self.notes
-	for noteDataIndex = 1, layerData:getNoteDataCount() do
-		local noteData = layerData:getNoteData(noteDataIndex)
 
-		if noteData.inputType == self.inputType and noteData.inputIndex == self.inputIndex then
-			local graphicalNote = GraphicalNoteFactory:getNote(noteData)
-
-			if graphicalNote then
-				graphicalNote.currentTimePoint = self.currentTimePoint
-				graphicalNote.graphicEngine = graphicEngine
-				graphicalNote.timeEngine = timeEngine
-				graphicalNote.layerData = layerData
-				graphicalNote.logicalNote = sharedLogicalNotes[noteData]
-				if graphicEngine.noteSkin:check(graphicalNote) then
-					table.insert(notes, graphicalNote)
-				end
+	for _, noteData in ipairs(self.noteDatas) do
+		local graphicalNote = GraphicalNoteFactory:getNote(noteData)
+		if graphicalNote then
+			graphicalNote.currentTimePoint = self.currentTimePoint
+			graphicalNote.graphicEngine = graphicEngine
+			graphicalNote.timeEngine = timeEngine
+			graphicalNote.layerData = layerData
+			graphicalNote.logicalNote = sharedLogicalNotes[noteData]
+			graphicalNote.input = self.inputType .. self.inputIndex
+			if graphicEngine.noteSkin:check(graphicalNote) then
+				table.insert(notes, graphicalNote)
 			end
 		end
 	end

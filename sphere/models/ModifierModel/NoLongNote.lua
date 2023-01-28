@@ -25,10 +25,8 @@ NoLongNote.apply = function(self, config)
 
 	local noteChart = self.game.noteChartModel.noteChart
 
-	for _, layerData in noteChart:getLayerDataIterator() do
-		for noteDataIndex = 1, layerData:getNoteDataCount() do
-			local noteData = layerData:getNoteData(noteDataIndex)
-
+	for noteDatas in noteChart:getInputIterator() do
+		for _, noteData in ipairs(noteDatas) do
 			if noteData.noteType == "LongNoteStart" or noteData.noteType == "LaserNoteStart" then
 				noteData.noteType = "ShortNote"
 			elseif noteData.noteType == "LongNoteEnd" or noteData.noteType == "LaserNoteEnd" then

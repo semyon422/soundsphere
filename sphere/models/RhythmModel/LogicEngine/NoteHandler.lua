@@ -8,40 +8,34 @@ NoteHandler.load = function(self)
 end
 
 NoteHandler.loadNoteData = function(self)
-	self.noteData = {}
+	self.notes = {}
 
 	local logicEngine = self.logicEngine
 	local notesCount = logicEngine.notesCount
 	local rhythmModel = logicEngine.rhythmModel
-	for _, layerData in logicEngine.noteChart:getLayerDataIterator() do
-		for noteDataIndex = 1, layerData:getNoteDataCount() do
-			local noteData = layerData:getNoteData(noteDataIndex)
 
-			if noteData.inputType == self.inputType and noteData.inputIndex == self.inputIndex then
-				local logicalNote = LogicalNoteFactory:getNote(noteData)
-
-				if logicalNote then
-					logicalNote.noteHandler = self
-					logicalNote.logicEngine = logicEngine
-					logicalNote.scoreEngine = rhythmModel.scoreEngine
-					logicalNote.timeEngine = rhythmModel.timeEngine
-					logicalNote.audioEngine = rhythmModel.audioEngine
-					if logicalNote.isPlayable then
-						notesCount[logicalNote.noteClass] = (notesCount[logicalNote.noteClass] or 0) + 1
-					end
-					table.insert(self.noteData, logicalNote)
-
-					logicEngine.sharedLogicalNotes[noteData] = logicalNote
-				end
+	for _, noteData in ipairs(self.noteDatas) do
+		local logicalNote = LogicalNoteFactory:getNote(noteData)
+		if logicalNote then
+			logicalNote.noteHandler = self
+			logicalNote.logicEngine = logicEngine
+			logicalNote.scoreEngine = rhythmModel.scoreEngine
+			logicalNote.timeEngine = rhythmModel.timeEngine
+			logicalNote.audioEngine = rhythmModel.audioEngine
+			if logicalNote.isPlayable then
+				notesCount[logicalNote.noteClass] = (notesCount[logicalNote.noteClass] or 0) + 1
 			end
+			table.insert(self.notes, logicalNote)
+
+			logicEngine.sharedLogicalNotes[noteData] = logicalNote
 		end
 	end
 
-	table.sort(self.noteData, function(a, b)
+	table.sort(self.notes, function(a, b)
 		return a.startNoteData.timePoint < b.startNoteData.timePoint
 	end)
 
-	for index, logicalNote in ipairs(self.noteData) do
+	for index, logicalNote in ipairs(self.notes) do
 		logicalNote.index = index
 	end
 
@@ -52,37 +46,37 @@ NoteHandler.loadNoteData = function(self)
 end
 
 NoteHandler.updateRange = function(self)
-	local noteData = self.noteData
-	for i = self.startNoteIndex, #noteData do
-		local logicalNote = noteData[i]
+	local notes = self.notes
+	for i = self.startNoteIndex, #notes do
+		local logicalNote = notes[i]
 		if not logicalNote.ended then
 			self.startNoteIndex = i
 			break
 		end
-		if i == #noteData then
-			self.startNoteIndex = #noteData + 1
+		if i == #notes then
+			self.startNoteIndex = #notes + 1
 		end
 	end
 
 	local eventTime = self.logicEngine:getEventTime()
-	for i = self.endNoteIndex, #noteData do
-		local logicalNote = noteData[i]
+	for i = self.endNoteIndex, #notes do
+		local logicalNote = notes[i]
 		if not logicalNote.ended and logicalNote:getNoteTime() >= eventTime then
 			self.endNoteIndex = i
 			break
 		end
-		if i == #noteData then
-			self.endNoteIndex = #noteData
+		if i == #notes then
+			self.endNoteIndex = #notes
 		end
 	end
 end
 
 NoteHandler.getCurrentNote = function(self)
-	local noteData = self.noteData
+	local notes = self.notes
 	self:updateRange()
 
 	for i = self.startNoteIndex, self.endNoteIndex do
-		local note = noteData[i]
+		local note = notes[i]
 		if not note.ended and note.state ~= "clear" then
 			return note
 		end
@@ -92,7 +86,7 @@ NoteHandler.getCurrentNote = function(self)
 	if not timings.nearest then
 		local note
 		for i = self.startNoteIndex, self.endNoteIndex do
-			local _note = noteData[i]
+			local _note = notes[i]
 			if not _note.ended and _note.isPlayable then
 				note = _note
 				break
@@ -106,7 +100,7 @@ NoteHandler.getCurrentNote = function(self)
 	local nearestIndex
 	local nearestTime = math.huge
 	for i = self.startNoteIndex, self.endNoteIndex do
-		local note = noteData[i]
+		local note = notes[i]
 		local noteTime = note:getNoteTime()
 		local time = math.abs(noteTime - eventTime)
 		if not note.ended and note.isPlayable and time < nearestTime then
@@ -115,13 +109,13 @@ NoteHandler.getCurrentNote = function(self)
 		end
 	end
 
-	return noteData[nearestIndex]
+	return notes[nearestIndex]
 end
 
 NoteHandler.update = function(self)
 	self:updateRange()
 	for i = self.startNoteIndex, self.endNoteIndex do
-		self.noteData[i]:update()
+		self.notes[i]:update()
 	end
 end
 

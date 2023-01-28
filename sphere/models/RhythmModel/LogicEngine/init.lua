@@ -35,22 +35,17 @@ LogicEngine.receive = function(self, event)
 	self.eventTime = nil
 end
 
-LogicEngine.getNoteHandler = function(self, inputType, inputIndex)
-	return NoteHandler:new({
-		inputType = inputType,
-		inputIndex = inputIndex,
-		logicEngine = self
-	})
-end
-
 LogicEngine.loadNoteHandlers = function(self)
 	self.noteHandlers = {}
-	for inputType, inputIndex in self.noteChart:getInputIterator() do
-		local noteHandler = self:getNoteHandler(inputType, inputIndex)
-		if noteHandler then
-			table.insert(self.noteHandlers, noteHandler)
-			noteHandler:load()
-		end
+	for noteDatas, inputType, inputIndex in self.noteChart:getInputIterator() do
+		local noteHandler = NoteHandler:new({
+			noteDatas = noteDatas,
+			inputType = inputType,
+			inputIndex = inputIndex,
+			logicEngine = self
+		})
+		table.insert(self.noteHandlers, noteHandler)
+		noteHandler:load()
 	end
 end
 

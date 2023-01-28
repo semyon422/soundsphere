@@ -56,31 +56,25 @@ local function test(notes, events, states)
 			local timePoint = layerData:getTimePoint(time, -1)
 
 			local noteData = NoteData:new(timePoint)
-			noteData.inputType = "key"
-			noteData.inputIndex = 1
 
 			noteData.noteType = "ShortNote"
 			if isAuto then
 				noteData.noteType = "SoundNote"
 			end
 
-			layerData:addNoteData(noteData)
+			layerData:addNoteData(noteData, "key", 1)
 		elseif type(time) == "table" then
 			local timePoint = layerData:getTimePoint(time[1], -1)
 
 			local startNoteData = NoteData:new(timePoint)
-			startNoteData.inputType = "key"
-			startNoteData.inputIndex = 1
 			startNoteData.noteType = "LongNoteStart"
-			layerData:addNoteData(startNoteData)
+			layerData:addNoteData(startNoteData, "key", 1)
 
 			timePoint = layerData:getTimePoint(time[2], -1)
 
 			local endNoteData = NoteData:new(timePoint)
-			endNoteData.inputType = "key"
-			endNoteData.inputIndex = 1
 			endNoteData.noteType = "LongNoteEnd"
-			layerData:addNoteData(endNoteData)
+			layerData:addNoteData(endNoteData, "key", 1)
 
 			startNoteData.endNoteData = endNoteData
 			endNoteData.startNoteData = startNoteData

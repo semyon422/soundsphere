@@ -62,19 +62,16 @@ end
 GraphicEngine.loadNoteDrawers = function(self)
 	assert(not self.loaded)
 	self.loaded = true
-	for i, layerData in self.noteChart:getLayerDataIterator() do
-		if not layerData.invisible then
-			for inputType, inputIndex in self.noteChart:getInputIterator() do
-				local noteDrawer = NoteDrawer:new({
-					layerData = layerData,
-					inputType = inputType,
-					inputIndex = inputIndex,
-					graphicEngine = self
-				})
-				noteDrawer:load()
-				table.insert(self.noteDrawers, noteDrawer)
-			end
-		end
+	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
+		local noteDrawer = NoteDrawer:new({
+			layerData = self.noteChart.layerDatas[layerDataIndex],
+			noteDatas = noteDatas,
+			inputType = inputType,
+			inputIndex = inputIndex,
+			graphicEngine = self
+		})
+		noteDrawer:load()
+		table.insert(self.noteDrawers, noteDrawer)
 	end
 end
 

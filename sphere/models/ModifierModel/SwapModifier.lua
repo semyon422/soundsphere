@@ -17,13 +17,14 @@ SwapModifier.apply = function(self, config)
 	local noteChart = self.game.noteChartModel.noteChart
 
 	for _, layerData in noteChart:getLayerDataIterator() do
-		for noteDataIndex = 1, layerData:getNoteDataCount() do
-			local noteData = layerData:getNoteData(noteDataIndex)
-			local submap = map[noteData.inputType]
-			if submap and submap[noteData.inputIndex] then
-				noteChart:increaseInputCount(noteData.inputType, noteData.inputIndex, -1)
-				noteData.inputIndex = submap[noteData.inputIndex]
-				noteChart:increaseInputCount(noteData.inputType, noteData.inputIndex, 1)
+		for inputType, r in pairs(layerData.noteDatas) do
+			local submap = map[inputType]
+			if submap then
+				local _r = {}
+				for old, new in pairs(submap) do
+					_r[new] = r[old]
+				end
+				layerData.noteDatas[inputType] = _r
 			end
 		end
 	end

@@ -396,11 +396,11 @@ SnapGridView.drawNotes = function(self, _w, _h)
 	local currentTime = editorModel.timePoint.absoluteTime
 
 	for _, r in pairs(ld.ranges.note) do
-		for _, range in pairs(r) do
+		for inputIndex, range in pairs(r) do
 			local noteData = range.head
 			while noteData and noteData <= range.tail do
 				local y = (noteData.timePoint.absoluteTime - currentTime) * pixelSpeed
-				local x = (noteData.inputIndex - 1) * nw
+				local x = (inputIndex - 1) * nw
 				just.push()
 				love.graphics.translate(x, y)
 				love.graphics.rectangle("fill", 0, 0, nw, nh)

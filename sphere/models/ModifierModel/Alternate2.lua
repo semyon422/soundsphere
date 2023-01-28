@@ -37,36 +37,39 @@ Alternate2.apply = function(self, config)
 	local inputAlternate = {}
 
 	for _, layerData in noteChart:getLayerDataIterator() do
-		for noteDataIndex = 1, layerData:getNoteDataCount() do
-			local noteData = layerData:getNoteData(noteDataIndex)
-			local inputIndex = noteData.inputIndex
-			local isStartNote = noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart"
-			if noteData.inputType == inputType and isStartNote then
-				inputAlternate[inputIndex] = inputAlternate[inputIndex] or 0
+		if layerData.noteData[inputType] then
+			local notes = {}
+			for inputIndex, noteDatas in pairs(layerData.noteData[inputType]) do
+				local newInputIndex = inputIndex
+				for _, noteData in ipairs(noteDatas) do
+					local isStartNote = noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart"
+					if isStartNote then
+						inputAlternate[inputIndex] = inputAlternate[inputIndex] or 0
 
-                local state = inputAlternate[inputIndex]
-                local plusColumn
-				local newInputIndex
-				if state == 0 then
-                    plusColumn = 1
-					state = 1
-				elseif state == 1 then
-                    plusColumn = 1
-					state = 2
-				elseif state == 2 then
-                    plusColumn = 2
-					state = 3
-				elseif state == 3 then
-                    plusColumn = 2
-					state = 0
+						local state = inputAlternate[inputIndex]
+						local plusColumn
+						if state == 0 then
+							plusColumn = 1
+							state = 1
+						elseif state == 1 then
+							plusColumn = 1
+							state = 2
+						elseif state == 2 then
+							plusColumn = 2
+							state = 3
+						elseif state == 3 then
+							plusColumn = 2
+							state = 0
+						end
+						newInputIndex = (inputIndex - 1) * 2 + plusColumn
+						inputAlternate[inputIndex] = state
+					end
+
+					notes[newInputIndex] = notes[newInputIndex] or {}
+					table.insert(notes[newInputIndex], noteData)
 				end
-                newInputIndex = (inputIndex - 1) * 2 + plusColumn
-                inputAlternate[inputIndex] = state
-
-				noteChart:increaseInputCount(noteData.inputType, noteData.inputIndex, -1)
-				noteChart:increaseInputCount(noteData.inputType, newInputIndex, 1)
-				noteData.inputIndex = newInputIndex
 			end
+			layerData.noteData[inputType] = notes
 		end
 	end
 

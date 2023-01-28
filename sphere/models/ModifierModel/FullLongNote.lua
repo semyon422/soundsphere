@@ -23,54 +23,55 @@ end
 
 FullLongNote.apply = function(self, config)
 	local noteChart = self.game.noteChartModel.noteChart
-	self.noteDatas = {}
-	self.noteDataLayers = {}
+	self.notes = {}
 
-	for _, layerData in noteChart:getLayerDataIterator() do
-		for noteDataIndex = 1, layerData:getNoteDataCount() do
-			local noteData = layerData:getNoteData(noteDataIndex)
+	for noteDatas, inputType, inputIndex, layerDataIndex in noteChart:getInputIterator() do
+		for _, noteData in ipairs(noteDatas) do
 			if
 				noteData.noteType == "ShortNote" or
 				noteData.noteType == "LongNoteStart" or
 				noteData.noteType == "LongNoteEnd"
 			then
-				self.noteDatas[#self.noteDatas + 1] = noteData
-				self.noteDataLayers[noteData] = layerData
+				table.insert(self.notes, {
+					noteData = noteData,
+					inputType = inputType,
+					inputIndex = inputIndex,
+					layerDataIndex = layerDataIndex,
+				})
 			end
 		end
 	end
 
-	table.sort(self.noteDatas, function(noteData1, noteData2)
-		return noteData1.timePoint < noteData2.timePoint
+	table.sort(self.notes, function(a, b)
+		return a.noteData.timePoint < b.noteData.timePoint
 	end)
 
 	self.level = config.value
 
-	local noteDatas = self.noteDatas
-	for i = 1, #noteDatas do
-		self:processNoteData(i, noteDatas[i])
+	local notes = self.notes
+	for i = 1, #notes do
+		self:processNoteData(i)
 	end
 
 	noteChart:compute()
 end
 
-FullLongNote.processNoteData = function(self, noteDataIndex, noteData)
-	if noteData.noteType ~= "ShortNote" then
+FullLongNote.processNoteData = function(self, noteDataIndex)
+	local notes = self.notes
+	local n = notes[noteDataIndex]
+	if n.noteType ~= "ShortNote" then
 		return
 	end
 
 	local timePoints = {}
-	local noteDatas = self.noteDatas
-	local nNoteData
-	for i = noteDataIndex, #noteDatas do
-		local cNoteData = noteDatas[i]
-		timePoints[cNoteData.timePoint] = true
+	local _n
+	for i = noteDataIndex + 1, #notes do
+		_n = notes[i]
+		timePoints[_n.noteData.timePoint] = true
 		if
-			cNoteData.inputType == noteData.inputType and
-			cNoteData.inputIndex == noteData.inputIndex and
-			cNoteData ~= noteData
+			_n.inputType == n.inputType and
+			_n.inputIndex == n.inputIndex
 		then
-			nNoteData = cNoteData
 			break
 		end
 	end
@@ -80,24 +81,24 @@ FullLongNote.processNoteData = function(self, noteDataIndex, noteData)
 		table.insert(timePointList, timePoint)
 	end
 	table.sort(timePointList)
-	timePointList = self:cleanTimePointList(timePointList, nNoteData)
-	if timePointList[1] == noteData.timePoint then
+	timePointList = self:cleanTimePointList(timePointList, _n)
+	if timePointList[1] == n.timePoint then
 		table.remove(timePointList, 1)
 	end
 
 	local endTimePoint
 	local level = self.level
 	if level >= 3 and #timePointList >= 2 then
-		if not nNoteData then
+		if not _n then
 			endTimePoint = timePointList[#timePointList]
 		else
 			endTimePoint = timePointList[#timePointList - 1]
 		end
 	elseif level >= 2 and #timePointList >= 3 then
 		endTimePoint = timePointList[math.ceil(#timePointList / 2)]
-	elseif level >= 1 and #timePointList >= 2 and (not nNoteData or nNoteData.timePoint ~= timePointList[2]) then
+	elseif level >= 1 and #timePointList >= 2 and (not _n or _n.timePoint ~= timePointList[2]) then
 		endTimePoint = timePointList[2]
-	elseif level >= 0 and #timePointList >= 1 and (not nNoteData or nNoteData.timePoint ~= timePointList[1]) then
+	elseif level >= 0 and #timePointList >= 1 and (not _n or _n.timePoint ~= timePointList[1]) then
 		endTimePoint = timePointList[1]
 	end
 
@@ -105,20 +106,18 @@ FullLongNote.processNoteData = function(self, noteDataIndex, noteData)
 		return
 	end
 
-	noteData.noteType = "LongNoteStart"
+	n.noteType = "LongNoteStart"
 
 	local endNoteData = NoteData:new(endTimePoint)
-	endNoteData.inputType = noteData.inputType
-	endNoteData.inputIndex = noteData.inputIndex
 	endNoteData.noteType = "LongNoteEnd"
 
-	endNoteData.startNoteData = noteData
-	noteData.endNoteData = endNoteData
+	endNoteData.startNoteData = n
+	n.endNoteData = endNoteData
 
-	self.noteDataLayers[noteData]:addNoteData(endNoteData)
+	self.noteDataLayers[n]:addNoteData(endNoteData, n.inputType, n.inputIndex)
 end
 
-FullLongNote.cleanTimePointList = function(self, timePointList, nNoteData)
+FullLongNote.cleanTimePointList = function(self, timePointList, _n)
 	local out = {}
 	out[#out + 1] = timePointList[1]
 
@@ -128,8 +127,8 @@ FullLongNote.cleanTimePointList = function(self, timePointList, nNoteData)
 		end
 	end
 
-	if nNoteData and nNoteData.timePoint.absoluteTime - out[#out].absoluteTime < 0.005 then
-		out[#out] = nNoteData.timePoint
+	if _n and _n.noteData.timePoint.absoluteTime - out[#out].absoluteTime < 0.005 then
+		out[#out] = _n.noteData.timePoint
 	end
 
 	return out

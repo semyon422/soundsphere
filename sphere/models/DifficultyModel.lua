@@ -10,29 +10,29 @@ DifficultyModel.getDifficulty = function(self, noteChart)
 	local longNoteCount = 0
 	local minTime = math.huge
 	local maxTime = -math.huge
-	for _, layerData in noteChart:getLayerDataIterator() do
-		for noteDataIndex = 1, layerData:getNoteDataCount() do
-			local noteData = layerData:getNoteData(noteDataIndex)
-
+	for noteDatas, inputType, inputIndex, layerDataIndex in noteChart:getInputIterator() do
+		for _, noteData in ipairs(noteDatas) do
+			local st = noteData.timePoint.absoluteTime
 			if
 				noteData.noteType == "ShortNote" or
 				noteData.noteType == "LongNoteStart" or
 				noteData.noteType == "LaserNoteStart"
 			then
 				notes[#notes + 1] = {
-					time = noteData.timePoint.absoluteTime,
-					input = noteData.inputType .. noteData.inputIndex,
+					time = st,
+					input = inputType .. inputIndex,
 				}
 
-				minTime = math.min(minTime, noteData.timePoint.absoluteTime)
-				maxTime = math.max(maxTime, noteData.timePoint.absoluteTime)
+				minTime = math.min(minTime, st)
+				maxTime = math.max(maxTime, st)
 			end
 
 			if noteData.noteType == "LongNoteStart" then
+				local et = noteData.endNoteData.timePoint.absoluteTime
 				longNoteCount = longNoteCount + 1
-				minTime = math.min(minTime, noteData.endNoteData.timePoint.absoluteTime)
-				maxTime = math.max(maxTime, noteData.endNoteData.timePoint.absoluteTime)
-				longAreaSum = longAreaSum + noteData.endNoteData.timePoint.absoluteTime - noteData.timePoint.absoluteTime
+				minTime = math.min(minTime, et)
+				maxTime = math.max(maxTime, et)
+				longAreaSum = longAreaSum + et - st
 			end
 		end
 	end
@@ -41,34 +41,6 @@ DifficultyModel.getDifficulty = function(self, noteChart)
 	local enpsValue, aStrain, generalizedKeymode, strains = enps.getEnps(notes)
 	local longArea = longAreaSum / (maxTime - minTime) / generalizedKeymode
 	local longRatio = longNoteCount / #notes
-
-	local highSum = 0
-	local highCount = 0
-	local lowSum = 0
-	local lowCount = 0
-	for i = 1, #strains do
-		local strain = strains[i]
-		if strain >= aStrain then
-			highSum = highSum + strain
-			highCount = highCount + 1
-		else
-			lowSum = lowSum + strain
-			lowCount = lowCount + 1
-		end
-	end
-
-	local high = 0
-	local low = 0
-	if highSum > 0 then
-		high = highSum / highCount * generalizedKeymode
-	end
-	if lowSum > 0 then
-		low = lowSum / lowCount * generalizedKeymode
-	end
-	-- print("enps: " .. math.floor(enpsValue * 100) / 100)
-	-- print("low enps: " .. math.floor(low * 100) / 100 .. ", " .. math.floor(low / enpsValue * 100) / 100 .. ", " .. math.floor(low / enpsValue * 100) - 100 .. "%")
-	-- print("high enps: " .. math.floor(high * 100) / 100 .. ", " .. math.floor(high / enpsValue * 100) / 100 .. ", " .. math.floor(high / enpsValue * 100) - 100 .. "%")
-	-- print("high/all: " .. math.floor(highCount / (lowCount + highCount) * 100) / 100)
 
 	return enpsValue, longRatio, longArea
 end

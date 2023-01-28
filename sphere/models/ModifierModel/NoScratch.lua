@@ -35,18 +35,13 @@ NoScratch.apply = function(self, config)
 	noteChart.inputMode.scratch = nil
 
 	for _, layerData in noteChart:getLayerDataIterator() do
-		for noteDataIndex = 1, layerData:getNoteDataCount() do
-			local noteData = layerData:getNoteData(noteDataIndex)
-
-			if noteData.inputType == "scratch" then
-				noteChart:increaseInputCount(noteData.inputType, noteData.inputIndex, -1)
-
-				noteData.noteType = "SoundNote"
-				noteData.inputType = "auto"
-				noteData.inputIndex = 0
-
-				noteChart:increaseInputCount(noteData.inputType, noteData.inputIndex, 1)
+		if layerData.noteDatas.scratch then
+			for _, noteDatas in ipairs(layerData.noteDatas.scratch) do
+				for _, noteData in ipairs(noteDatas) do
+					layerData:addNoteData(noteData, "auto", 0)
+				end
 			end
+			layerData.noteDatas.scratch = nil
 		end
 	end
 end
