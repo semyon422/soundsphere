@@ -395,7 +395,7 @@ SnapGridView.drawNotes = function(self, _w, _h)
 
 	local currentTime = editorModel.timePoint.absoluteTime
 
-	for _, r in pairs(ld.ranges.note) do
+	for inputType, r in pairs(ld.ranges.note) do
 		for inputIndex, range in pairs(r) do
 			local noteData = range.head
 			while noteData and noteData <= range.tail do
@@ -404,12 +404,14 @@ SnapGridView.drawNotes = function(self, _w, _h)
 				just.push()
 				love.graphics.translate(x, y)
 				love.graphics.rectangle("fill", 0, 0, nw, nh)
+
+				local nextNoteData = noteData.next
 				if just.button("remove note" .. tostring(noteData), just.is_over(nw, nh), 2) then
-					ld:removeNoteData(noteData)
+					ld:removeNoteData(noteData, inputType, inputIndex)
 				end
 				just.pop()
 
-				noteData = noteData.next
+				noteData = nextNoteData
 			end
 		end
 	end
