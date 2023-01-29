@@ -64,11 +64,11 @@ end
 LongGraphicalNote.getFakeVisualStartTime = function(self)
 	local logicalNote = self.logicalNote
 	local currentTimePoint = self.currentTimePoint
+	local fakeTimePoint = self.fakeStartTimePoint
 	if not logicalNote or logicalNote.state ~= "startPassedPressed" then
-		return self.startNoteData.timePoint:getVisualTime(currentTimePoint)
+		return fakeTimePoint:getVisualTime(currentTimePoint)
 	end
 
-	local fakeTimePoint = self.fakeStartTimePoint
 	local offsetSum = self.timeEngine.visualOffset - self.timeEngine.inputOffset
 
 	local globalSpeed = currentTimePoint.velocityData and currentTimePoint.velocityData.globalSpeed or 1
