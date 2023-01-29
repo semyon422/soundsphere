@@ -173,6 +173,7 @@ Automap.processReductor = function(self)
 
 	local tNoteDatasMap = {}
 	for _, tNoteData in ipairs(self.tNoteDatas) do
+		tNoteData.endTime = tNoteData.startTime
 		tNoteDatasMap[tNoteData] = true
 	end
 

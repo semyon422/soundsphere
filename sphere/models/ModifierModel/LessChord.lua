@@ -37,9 +37,10 @@ LessChord.apply = function(self, config)
 
 	for _, layerData in noteChart:getLayerDataIterator() do
 		local chords = {}
+		local singles = {}
 		local noteDatas = {}
 		local columnSizes = {}
-		for i = 0, inputCount do
+		for i = 1, inputCount do
 			columnSizes[i] = 0
 		end
 
@@ -55,9 +56,10 @@ LessChord.apply = function(self, config)
 			end
 			layerData.noteDatas.key = {}
 		end
+		table.sort(notes, function(a, b) return a.noteData < b.noteData end)
 
 		for _, note in ipairs(notes) do
-			local noteData = notes.noteData
+			local noteData = note.noteData
 			local index = note.inputIndex
 			local time = noteData.timePoint.absoluteTime
 
@@ -67,17 +69,24 @@ LessChord.apply = function(self, config)
 					table.insert(chords[time].notes, note)
 					chords[time].columnSizes = {unpack(columnSizes)}
 				else
+					singles[time] = note
+
 					if noteDatas[time] then
 						chords[time] = {
 							time = time,
 							notes = {noteDatas[time], note},
 							columnSizes = {unpack(columnSizes)}
 						}
+						singles[time] = nil
 					end
 
 					noteDatas[time] = note
 				end
 			end
+		end
+
+		for _, note in pairs(singles) do
+			layerData:addNoteData(note.noteData, "key", note.inputIndex)
 		end
 
 		local sortedChords = {}
@@ -108,15 +117,21 @@ LessChord.apply = function(self, config)
 							futureChord.columnSizes[note.inputIndex] = futureChord.columnSizes[note.inputIndex] - 1
 						end
 
-						note.noteType = "SoundNote"
+						note.noteData.noteType = "SoundNote"
 						layerData:addNoteData(note.noteData, "auto", 0)
 					else
 						layerData:addNoteData(note.noteData, "key", note.inputIndex)
 					end
 				end
+			else
+				for _, note in pairs(chord.notes) do
+					layerData:addNoteData(note.noteData, "key", note.inputIndex)
+				end
 			end
 		end
 	end
+
+	noteChart:compute()
 end
 
 return LessChord

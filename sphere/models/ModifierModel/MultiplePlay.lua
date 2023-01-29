@@ -36,22 +36,28 @@ MultiplePlay.apply = function(self, config)
 
 	local inputMode = noteChart.inputMode
 
-	for noteDatas, inputType, inputIndex, layerDataIndex in noteChart:getInputIterator() do
-		local layerData = noteChart.layerDatas[layerDataIndex]
-		for _, noteData in ipairs(noteDatas) do
+	for _, layerData in noteChart:getLayerDataIterator() do
+		for inputType, r in pairs(layerData.noteDatas) do
 			local inputCount = inputMode[inputType]
 			if inputCount then
-				for i = 1, value - 1 do
-					local newInputIndex = inputIndex + inputCount * i
+				local _r = {}
+				for inputIndex, noteDatas in pairs(r) do
+					for _, noteData in ipairs(noteDatas) do
+						for i = 1, value do
+							local newInputIndex = inputIndex + inputCount * (i - 1)
+							_r[newInputIndex] = _r[newInputIndex] or {}
 
-					local newNoteData = NoteData:new(noteData.timePoint)
+							local newNoteData = NoteData:new(noteData.timePoint)
 
-					newNoteData.endNoteData = noteData.endNoteData
-					newNoteData.noteType = noteData.noteType
-					newNoteData.sounds = noteData.sounds
+							newNoteData.endNoteData = noteData.endNoteData  -- fix wrong reference
+							newNoteData.noteType = noteData.noteType
+							newNoteData.sounds = noteData.sounds
 
-					layerData:addNoteData(newNoteData, inputType, newInputIndex)
+							table.insert(_r[newInputIndex], newNoteData)
+						end
+					end
 				end
+				layerData.noteDatas[inputType] = _r
 			end
 		end
 	end

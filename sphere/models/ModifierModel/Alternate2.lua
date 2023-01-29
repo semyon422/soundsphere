@@ -37,9 +37,9 @@ Alternate2.apply = function(self, config)
 	local inputAlternate = {}
 
 	for _, layerData in noteChart:getLayerDataIterator() do
-		if layerData.noteData[inputType] then
+		if layerData.noteDatas[inputType] then
 			local notes = {}
-			for inputIndex, noteDatas in pairs(layerData.noteData[inputType]) do
+			for inputIndex, noteDatas in pairs(layerData.noteDatas[inputType]) do
 				local newInputIndex = inputIndex
 				for _, noteData in ipairs(noteDatas) do
 					local isStartNote = noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart"
@@ -69,7 +69,7 @@ Alternate2.apply = function(self, config)
 					table.insert(notes[newInputIndex], noteData)
 				end
 			end
-			layerData.noteData[inputType] = notes
+			layerData.noteDatas[inputType] = notes
 		end
 	end
 
