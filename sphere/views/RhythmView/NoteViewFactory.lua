@@ -32,8 +32,8 @@ for _, c in pairs(notes) do
 	end
 end
 
-NoteViewFactory.getNoteView = function(self, graphicalNote)
-	return notes[self.mode or "default"][graphicalNote.noteType]
+NoteViewFactory.getNoteView = function(self, graphicalNote, mode)
+	return notes[mode][graphicalNote.noteType]
 end
 
 return NoteViewFactory

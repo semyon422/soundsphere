@@ -4,56 +4,70 @@ local gfx_util = require("gfx_util")
 
 local RhythmView = Class:new()
 
-RhythmView.draw = function(self)
-	local graphicEngine = self.game.rhythmModel.graphicEngine
-	local noteSkin = self.game.noteSkinModel.noteSkin
-	local inputsCount = noteSkin.inputsCount
+RhythmView.mode = "default"
 
-	NoteViewFactory.bga = self.game.configModel.configs.settings.gameplay.bga
-	NoteViewFactory.mode = self.mode
-
-	local chords = {}
-	for _, noteDrawer in ipairs(graphicEngine.noteDrawers) do
+RhythmView.fillChords = function(self)
+	for _, noteDrawer in ipairs(self.game.rhythmModel.graphicEngine.noteDrawers) do
 		for i = noteDrawer.endNoteIndex, noteDrawer.startNoteIndex, -1 do
-			local note = noteDrawer.notes[i]
+			self:fillChord(noteDrawer.notes[i])
+		end
+	end
+end
 
-			local noteView = NoteViewFactory:getNoteView(note)
-			if noteView then
-				noteView.index = 1
-				noteView.noteSkin = noteSkin
-				noteView.graphicalNote = note
+RhythmView.drawNotes = function(self)
+	for _, noteDrawer in ipairs(self.game.rhythmModel.graphicEngine.noteDrawers) do
+		for i = noteDrawer.startNoteIndex, noteDrawer.endNoteIndex do
+			self:drawNote(noteDrawer.notes[i])
+		end
+	end
+end
 
-				local column = noteSkin:getColumn(note.input)
-				if column and column <= inputsCount then
-				-- if column and column <= inputsCount and noteView:isVisible() then
-					if noteView.fillChords then
-						noteView:fillChords(chords, column)
-					end
-				end
+RhythmView.fillChord = function(self, note)
+	local noteSkin = self.game.noteSkinModel.noteSkin
+
+	local noteView = NoteViewFactory:getNoteView(note, self.mode)
+	if noteView then
+		noteView.index = 1
+		noteView.noteSkin = noteSkin
+		noteView.graphicalNote = note
+
+		local column = noteSkin:getColumn(note.input)
+		if column and column <= noteSkin.inputsCount then
+		-- if column and column <= inputsCount and noteView:isVisible() then
+			if noteView.fillChords then
+				noteView:fillChords(self.chords, column)
 			end
 		end
 	end
+end
 
+RhythmView.drawNote = function(self, note)
+	local noteSkin = self.game.noteSkinModel.noteSkin
+
+	for j = 1, noteSkin:check(note) or 0 do
+		local noteView = NoteViewFactory:getNoteView(note, self.mode)
+		if noteView then
+			noteView.index = j
+			noteView.chords = self.chords
+			noteView.noteSkin = noteSkin
+			noteView.graphicalNote = note
+			noteView:draw()
+		end
+	end
+end
+
+RhythmView.draw = function(self)
 	love.graphics.replaceTransform(gfx_util.transform(self.transform))
 	love.graphics.setColor(1, 1, 1, 1)
 
-	for _, noteDrawer in ipairs(graphicEngine.noteDrawers) do
-		for i = noteDrawer.startNoteIndex, noteDrawer.endNoteIndex do
-			local note = noteDrawer.notes[i]
-
-			for j = 1, noteSkin:check(note) or 0 do
-				local noteView = NoteViewFactory:getNoteView(note)
-				if noteView then
-					noteView.index = j
-					noteView.chords = chords
-					noteView.noteSkin = noteSkin
-					noteView.graphicalNote = note
-					noteView:draw()
-				end
-			end
-		end
+	self.chords = {}
+	if self.mode == "default" then
+		self:fillChords()
 	end
 
+	self:drawNotes()
+
+	local noteSkin = self.game.noteSkinModel.noteSkin
 	local blendModes = noteSkin.blendModes
 	local spriteBatches = noteSkin.data.spriteBatches
 	for _, spriteBatch in ipairs(spriteBatches) do
