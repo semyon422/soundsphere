@@ -6,9 +6,8 @@ local RhythmView = Class:new()
 
 RhythmView.draw = function(self)
 	local graphicEngine = self.game.rhythmModel.graphicEngine
-	local noteSkin = graphicEngine.noteSkin
+	local noteSkin = self.game.noteSkinModel.noteSkin
 	local inputsCount = noteSkin.inputsCount
-	local inputs = noteSkin.inputs
 
 	NoteViewFactory.bga = self.game.configModel.configs.settings.gameplay.bga
 	NoteViewFactory.mode = self.mode

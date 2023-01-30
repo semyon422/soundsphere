@@ -27,9 +27,7 @@ NoteDrawer.load = function(self)
 			graphicalNote.layerData = layerData
 			graphicalNote.logicalNote = sharedLogicalNotes[noteData]
 			graphicalNote.input = self.inputType .. self.inputIndex
-			if graphicEngine.noteSkin:check(graphicalNote) then
-				table.insert(notes, graphicalNote)
-			end
+			table.insert(notes, graphicalNote)
 		end
 	end
 

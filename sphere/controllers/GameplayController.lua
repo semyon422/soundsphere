@@ -34,7 +34,7 @@ GameplayController.load = function(self)
 	rhythmModel:setVisualTimeRateScale(config.gameplay.scaleSpeed)
 	rhythmModel:setPauseTimes(config.gameplay.time)
 	rhythmModel:setNoteChart(noteChart)
-	rhythmModel:setNoteSkin(noteSkin)
+	rhythmModel:setDrawRange(noteSkin.range)
 	rhythmModel.inputManager:setInputMode(tostring(noteChart.inputMode))
 
 	rhythmModel:load()

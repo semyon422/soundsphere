@@ -198,6 +198,7 @@ NoteSkinModel.getNoteSkin = function(self, inputMode)
 	if configValue then
 		for _, noteSkin in ipairs(list) do
 			if noteSkin.path == configValue then
+				self.noteSkin = noteSkin
 				return noteSkin
 			end
 		end
@@ -207,6 +208,7 @@ NoteSkinModel.getNoteSkin = function(self, inputMode)
 		self:setDefaultNoteSkin(list[1])
 	end
 
+	self.noteSkin = list[1]
 	return list[1]
 end
 

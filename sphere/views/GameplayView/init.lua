@@ -16,7 +16,7 @@ GameplayView.load = function(self)
 	self.game.rhythmModel.observable:add(self.sequenceView)
 	self.game.gameplayController:load()
 
-	local noteSkin = self.game.rhythmModel.graphicEngine.noteSkin
+	local noteSkin = self.game.noteSkinModel.noteSkin
 	self.viewConfig = noteSkin.playField
 
 	self.subscreen = ""

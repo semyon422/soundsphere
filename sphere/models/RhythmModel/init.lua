@@ -154,9 +154,8 @@ RhythmModel.setNoteChart = function(self, noteChart)
 	self.graphicEngine.noteChart = noteChart
 end
 
-RhythmModel.setNoteSkin = function(self, noteSkin)
-	self.graphicEngine.noteSkin = noteSkin
-	self.graphicEngine.range = noteSkin.range
+RhythmModel.setDrawRange = function(self, range)
+	self.graphicEngine.range = range
 end
 
 RhythmModel.setVolume = function(self, volume)
