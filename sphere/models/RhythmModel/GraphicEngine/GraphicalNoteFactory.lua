@@ -5,37 +5,38 @@ local ImageNote				= require("sphere.models.RhythmModel.GraphicEngine.ImageNote"
 
 local GraphicalNoteFactory = {}
 
-GraphicalNoteFactory.getNote = function(self, noteData)
-	local graphicalNote = {startNoteData = noteData}
-
-	if noteData.noteType == "ShortNote" then
-		graphicalNote.noteType = "ShortNote"
-		return ShortGraphicalNote:new(graphicalNote)
-	elseif noteData.noteType == "LongNoteStart" then
-		graphicalNote.noteType = "LongNote"
-		return LongGraphicalNote:new(graphicalNote)
-	elseif noteData.noteType == "LaserNoteStart" then
-		graphicalNote.noteType = "LongNote"
-		return LongGraphicalNote:new(graphicalNote)
-	elseif noteData.noteType == "LineNoteStart" then
-		graphicalNote.noteType = "LongNote"
-		return LongGraphicalNote:new(graphicalNote)
-	elseif noteData.noteType == "SoundNote" then
-		graphicalNote.noteType = "SoundNote"
-		return ShortGraphicalNote:new(graphicalNote)
-	elseif noteData.noteType == "ImageNote" then
-		local fileType
-		local images = noteData.images[1] and noteData.images[1][1]
-		if images then
-			fileType = FileFinder:getType(images)
-		end
-		if fileType == "image" then
-			graphicalNote.noteType = "ImageNote"
-		elseif fileType == "video" then
-			graphicalNote.noteType = "VideoNote"
-		end
-		return ImageNote:new(graphicalNote)
+local function getImageNoteType(noteData)
+	local image = noteData.images[1] and noteData.images[1][1]
+	if image and FileFinder:getType(image) == "video" then
+		return "VideoNote"
 	end
+	return "ImageNote"
+end
+
+local notes = {
+	ShortNote = {ShortGraphicalNote, "ShortNote"},
+	LongNoteStart = {LongGraphicalNote, "LongNote"},
+	LaserNoteStart = {LongGraphicalNote, "LongNote"},
+	LineNoteStart = {LongGraphicalNote, "LongNote"},
+	SoundNote = {ShortGraphicalNote, "SoundNote"},
+	ImageNote = {ImageNote, getImageNoteType},
+}
+
+GraphicalNoteFactory.getNote = function(self, noteData)
+	local classAndType = notes[noteData.noteType]
+	if not classAndType then
+		return
+	end
+
+	local noteType = classAndType[2]
+	if type(noteType) == "function" then
+		noteType = noteType(noteData)
+	end
+
+	return classAndType[1]:new({
+		noteType = noteType,
+		startNoteData = noteData,
+	})
 end
 
 return GraphicalNoteFactory
