@@ -68,9 +68,7 @@ ShortLogicalNote.switchState = function(self, newState)
 	scoreEvent.notesCount = self.logicEngine.notesCount
 	scoreEvent.oldState = oldState
 	scoreEvent.newState = newState
-	scoreEvent.minTime = self.scoreEngine.minTime
-	scoreEvent.maxTime = self.scoreEngine.maxTime
-	self:sendScore(scoreEvent)
+	self.logicEngine:sendScore(scoreEvent)
 
 	if not self.pressedTime and newState == "passed" then
 		self.pressedTime = currentTime
@@ -86,7 +84,7 @@ ShortLogicalNote.processAuto = function(self)
 	end
 
 	self.keyState = true
-	self:playSound(self.startNoteData)
+	self.logicEngine:playSound(self.startNoteData, not self.isPlayable)
 
 	self.eventTime = self:getNoteTime()
 	self:processTimeState("exactly")

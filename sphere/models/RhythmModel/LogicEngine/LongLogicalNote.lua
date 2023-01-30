@@ -162,9 +162,7 @@ LongLogicalNote.switchState = function(self, newState, reachableNote)
 	scoreEvent.notesCount = self.logicEngine.notesCount
 	scoreEvent.oldState = oldState
 	scoreEvent.newState = newState
-	scoreEvent.minTime = self.scoreEngine.minTime
-	scoreEvent.maxTime = self.scoreEngine.maxTime
-	self:sendScore(scoreEvent)
+	self.logicEngine:sendScore(scoreEvent)
 
 	if not self.pressedTime and (newState == "startPassedPressed" or newState == "startMissedPressed") then
 		self.pressedTime = currentTime
@@ -183,7 +181,7 @@ LongLogicalNote.processAuto = function(self)
 	local nextNote = self:getNextPlayable()
 	if deltaStartTime >= 0 and not self.keyState then
 		self.keyState = true
-		self:playSound(self.startNoteData)
+		self.logicEngine:playSound(self.startNoteData, not self.isPlayable)
 
 		self.eventTime = self:getNoteTime("start")
 		self:processTimeState("exactly", "too early")
@@ -191,7 +189,7 @@ LongLogicalNote.processAuto = function(self)
 	end
 	if deltaEndTime >= 0 and self.keyState or nextNote and nextNote:isHere() then
 		self.keyState = false
-		self:playSound(self.endNoteData)
+		self.logicEngine:playSound(self.endNoteData, not self.isPlayable)
 
 		self.eventTime = self:getNoteTime("end")
 		self:processTimeState("too late", "exactly")

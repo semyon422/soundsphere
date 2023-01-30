@@ -16,7 +16,6 @@ BaseScoreSystem.construct = function(self)
 	self.maxCombo = 0
 	self.currentTime = 0
 	self.timeRate = 0
-	self.progress = 0
 
 	self.isMiss = false
 	self.isLongNoteComboBreak = false
@@ -51,10 +50,6 @@ BaseScoreSystem.success = function(self)
 	self.hitCount = self.hitCount + 1
 	self.combo = self.combo + 1
 	self.maxCombo = math.max(self.maxCombo, self.combo)
-
-	if self.currentTime < math.huge then
-		self.progress = map(self.currentTime, self.scoreEngine.minTime, self.scoreEngine.maxTime, 0, 1)
-	end
 end
 
 BaseScoreSystem.breakCombo = function(self)

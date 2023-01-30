@@ -23,6 +23,15 @@ LogicEngine.getEventTime = function(self)
 	return self.eventTime or self.rhythmModel.timeEngine.currentTime
 end
 
+LogicEngine.sendScore = function(self, event)
+	self.rhythmModel.scoreEngine.scoreSystem:receive(event)
+end
+
+LogicEngine.playSound = function(self, noteData, isBackground)
+	if not self.rhythmModel.audioEngine then return end
+	self.rhythmModel.audioEngine:playNote(noteData, isBackground)
+end
+
 LogicEngine.receive = function(self, event)
 	if not event.virtual or self.promode then
 		return
@@ -40,8 +49,7 @@ LogicEngine.loadNoteHandlers = function(self)
 	for noteDatas, inputType, inputIndex in self.noteChart:getInputIterator() do
 		local noteHandler = NoteHandler:new({
 			noteDatas = noteDatas,
-			inputType = inputType,
-			inputIndex = inputIndex,
+			keyBind = inputType .. inputIndex,
 			logicEngine = self
 		})
 		table.insert(self.noteHandlers, noteHandler)

@@ -19,9 +19,7 @@ NoteHandler.loadNoteData = function(self)
 		if logicalNote then
 			logicalNote.noteHandler = self
 			logicalNote.logicEngine = logicEngine
-			logicalNote.scoreEngine = rhythmModel.scoreEngine
 			logicalNote.timeEngine = rhythmModel.timeEngine
-			logicalNote.audioEngine = rhythmModel.audioEngine
 			if logicalNote.isPlayable then
 				notesCount[logicalNote.noteClass] = (notesCount[logicalNote.noteClass] or 0) + 1
 			end
@@ -41,8 +39,6 @@ NoteHandler.loadNoteData = function(self)
 
 	self.startNoteIndex = 1
 	self.endNoteIndex = 1
-
-	self.keyBind = self.inputType .. self.inputIndex
 end
 
 NoteHandler.updateRange = function(self)
@@ -135,10 +131,10 @@ NoteHandler.receive = function(self, event)
 
 	if event.name == "keypressed" then
 		note.keyState = true
-		note:playSound(note.startNoteData)
+		self.logicEngine:playSound(note.startNoteData)
 	elseif event.name == "keyreleased" then
 		note.keyState = false
-		note:playSound(note.endNoteData)
+		self.logicEngine:playSound(note.endNoteData)
 	end
 	note:update()
 end

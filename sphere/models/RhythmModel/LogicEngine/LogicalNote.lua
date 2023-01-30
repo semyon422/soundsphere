@@ -35,15 +35,6 @@ LogicalNote.switchState = function(self, name)
 	self.state = name
 end
 
-LogicalNote.sendScore = function(self, event)
-	self.scoreEngine.scoreSystem:receive(event)
-end
-
-LogicalNote.playSound = function(self, noteData)
-	if not self.audioEngine then return end
-	self.audioEngine:playNote(noteData, not self.isPlayable)
-end
-
 LogicalNote.getNext = function(self)
 	return self.noteHandler.notes[self.index + 1]
 end
