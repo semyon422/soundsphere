@@ -5,6 +5,7 @@ local just = require("just")
 local Layout = require("sphere.views.EditorView.Layout")
 local EditorViewConfig = require("sphere.views.EditorView.EditorViewConfig")
 local SnapGridView = require("sphere.views.EditorView.SnapGridView")
+local EditorRhythmView = require("sphere.views.EditorView.EditorRhythmView")
 local Footer = require("sphere.views.EditorView.Footer")
 
 local EditorView = ScreenView:new()
@@ -20,6 +21,10 @@ EditorView.load = thread.coro(function(self)
 
 	self.snapGridView = SnapGridView:new()
 	self.snapGridView.game = self.game
+
+	self.editorRhythmView = EditorRhythmView:new()
+	self.editorRhythmView.game = self.game
+	self.editorRhythmView.transform = self.game.noteSkinModel.noteSkin.playField:newNoteskinTransform()
 
 	loading = false
 end)
@@ -42,6 +47,7 @@ EditorView.draw = function(self)
 	Layout:draw()
 	EditorViewConfig(self)
 	self.snapGridView:draw()
+	self.editorRhythmView:draw()
 	Footer(self)
 	just.container()
 end

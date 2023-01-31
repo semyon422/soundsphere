@@ -8,7 +8,7 @@ ImageNote.willDrawBeforeStart = function(self)
 end
 
 ImageNote.willDrawAfterEnd = function(self)
-	return self.timeEngine.currentVisualTime < self.startNoteData.timePoint.absoluteTime
+	return self.graphicEngine:getCurrentTime() < self.startNoteData.timePoint.absoluteTime
 end
 
 return ImageNote

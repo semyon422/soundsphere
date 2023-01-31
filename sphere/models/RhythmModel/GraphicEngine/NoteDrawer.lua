@@ -5,7 +5,6 @@ local NoteDrawer = Class:new()
 
 NoteDrawer.load = function(self)
 	local graphicEngine = self.graphicEngine
-	local timeEngine = graphicEngine.rhythmModel.timeEngine
 	local logicEngine = graphicEngine.rhythmModel.logicEngine
 
 	local layerData = self.layerData
@@ -23,7 +22,6 @@ NoteDrawer.load = function(self)
 		if graphicalNote then
 			graphicalNote.currentTimePoint = self.currentTimePoint
 			graphicalNote.graphicEngine = graphicEngine
-			graphicalNote.timeEngine = timeEngine
 			graphicalNote.layerData = layerData
 			graphicalNote.logicalNote = sharedLogicalNotes[noteData]
 			graphicalNote.input = self.inputType .. self.inputIndex
@@ -45,9 +43,9 @@ NoteDrawer.load = function(self)
 end
 
 NoteDrawer.updateCurrentTime = function(self)
-	local timeEngine = self.graphicEngine.rhythmModel.timeEngine
+	local graphicEngine = self.graphicEngine
 	local timePoint = self.currentTimePoint
-	timePoint.absoluteTime = timeEngine.currentVisualTime - timeEngine.inputOffset
+	timePoint.absoluteTime = graphicEngine:getCurrentTime() - graphicEngine:getInputOffset()
 	self.currentTimePointIndex = self.layerData:interpolateTimePointAbsolute(self.currentTimePointIndex, timePoint)
 end
 

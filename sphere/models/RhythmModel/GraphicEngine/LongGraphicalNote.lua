@@ -25,8 +25,8 @@ LongGraphicalNote.update = function(self)
 	self.startTimeState = self.startTimeState or {}
 	local startTimeState = self.startTimeState
 
-	local currentTime = self.timeEngine.currentVisualTime
-	local visualOffset = self.timeEngine.visualOffset
+	local currentTime = self.graphicEngine:getCurrentTime()
+	local visualOffset = self.graphicEngine:getVisualOffset()
 	local visualTimeRate = self.graphicEngine:getVisualTimeRate()
 
 	startTimeState.currentTime = currentTime
@@ -69,7 +69,7 @@ LongGraphicalNote.getFakeVisualStartTime = function(self)
 		return fakeTimePoint:getVisualTime(currentTimePoint)
 	end
 
-	local offsetSum = self.timeEngine.visualOffset - self.timeEngine.inputOffset
+	local offsetSum = self.graphicEngine:getVisualOffset() - self.graphicEngine:getInputOffset()
 
 	local globalSpeed = currentTimePoint.velocityData and currentTimePoint.velocityData.globalSpeed or 1
 	fakeTimePoint.visualTime = currentTimePoint.visualTime - offsetSum / globalSpeed

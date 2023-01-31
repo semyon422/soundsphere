@@ -202,6 +202,7 @@ EditorModel._scrollTimePoint = function(self, timePoint)
 	t.absoluteTime = timePoint.absoluteTime
 	t.visualTime = timePoint.visualTime
 	t.beatTime = timePoint.beatTime
+	t.visualSection = timePoint.visualSection
 	t:setTime(timePoint:getTime())
 
 	self:updateRange()

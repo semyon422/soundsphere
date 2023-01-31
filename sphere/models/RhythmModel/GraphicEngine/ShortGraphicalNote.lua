@@ -9,14 +9,14 @@ ShortGraphicalNote.update = function(self)
 	self.startTimeState = self.startTimeState or {}
 	local startTimeState = self.startTimeState
 
-	local currentTime = self.timeEngine.currentVisualTime
+	local currentTime = self.graphicEngine:getCurrentTime()
 
 	startTimeState.currentTime = currentTime
 	startTimeState.absoluteTime = timePoint.absoluteTime
 	startTimeState.currentVisualTime = visualTime
 
 	startTimeState.absoluteDeltaTime = currentTime - timePoint.absoluteTime
-	startTimeState.visualDeltaTime = currentTime - (visualTime + self.timeEngine.visualOffset)
+	startTimeState.visualDeltaTime = currentTime - (visualTime + self.graphicEngine:getVisualOffset())
 	startTimeState.scaledVisualDeltaTime = startTimeState.visualDeltaTime * self.graphicEngine:getVisualTimeRate()
 end
 

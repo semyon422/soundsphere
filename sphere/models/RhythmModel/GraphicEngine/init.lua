@@ -54,6 +54,18 @@ GraphicEngine.getVisualTimeRate = function(self)
 	return visualTimeRate
 end
 
+GraphicEngine.getCurrentTime = function(self)
+	return self.rhythmModel.timeEngine.currentVisualTime
+end
+
+GraphicEngine.getInputOffset = function(self)
+	return self.rhythmModel.timeEngine.inputOffset
+end
+
+GraphicEngine.getVisualOffset = function(self)
+	return self.rhythmModel.timeEngine.visualOffset
+end
+
 GraphicEngine.unload = function(self)
 	self.loaded = false
 	self.noteDrawers = {}

@@ -10,6 +10,9 @@ EditorController.load = function(self)
 	noteChartModel:load()
 	noteChartModel:loadNoteChart()
 
+	local noteSkin = self.game.noteSkinModel:getNoteSkin(noteChartModel.noteChart.inputMode)
+	noteSkin:loadData()
+
 	self.game.editorModel:load()
 	self.game.previewModel:stop()
 
