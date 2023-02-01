@@ -18,6 +18,7 @@ EditorController.load = function(self)
 
 	FileFinder:reset()
 	FileFinder:addPath(noteChartModel.noteChartEntry.path:match("^(.+)/.-$"))
+	FileFinder:addPath(noteSkin.directoryPath)
 	FileFinder:addPath("userdata/hitsounds")
 	FileFinder:addPath("userdata/hitsounds/midi")
 

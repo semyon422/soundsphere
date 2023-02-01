@@ -5,10 +5,14 @@ local just = require("just")
 local Layout = require("sphere.views.EditorView.Layout")
 local EditorViewConfig = require("sphere.views.EditorView.EditorViewConfig")
 local SnapGridView = require("sphere.views.EditorView.SnapGridView")
-local EditorRhythmView = require("sphere.views.EditorView.EditorRhythmView")
+local SequenceView = require("sphere.views.SequenceView")
 local Footer = require("sphere.views.EditorView.Footer")
 
 local EditorView = ScreenView:new()
+
+EditorView.construct = function(self)
+	self.sequenceView = SequenceView:new()
+end
 
 local loading
 EditorView.load = thread.coro(function(self)
@@ -22,19 +26,23 @@ EditorView.load = thread.coro(function(self)
 	self.snapGridView = SnapGridView:new()
 	self.snapGridView.game = self.game
 
-	self.editorRhythmView = EditorRhythmView:new()
-	self.editorRhythmView.game = self.game
-	self.editorRhythmView.transform = self.game.noteSkinModel.noteSkin.playField:newNoteskinTransform()
+	local sequenceView = self.sequenceView
+
+	sequenceView.game = self.game
+	sequenceView.subscreen = "editor"
+	sequenceView:setSequenceConfig(self.game.noteSkinModel.noteSkin.playField)
+	sequenceView:load()
 
 	loading = false
 end)
 
 EditorView.update = function(self, dt)
-	self.game.editorModel:update()
+	self.sequenceView:update(dt)
 end
 
 EditorView.receive = function(self, event)
 	self.game.editorController:receive(event)
+	self.sequenceView:receive(event)
 end
 
 EditorView.draw = function(self)
@@ -47,7 +55,7 @@ EditorView.draw = function(self)
 	Layout:draw()
 	EditorViewConfig(self)
 	self.snapGridView:draw()
-	self.editorRhythmView:draw()
+	self.sequenceView:draw()
 	Footer(self)
 	just.container()
 end
@@ -58,6 +66,7 @@ end
 
 EditorView.unload = function(self)
 	self.game.editorController:unload()
+	self.sequenceView:unload()
 end
 
 return EditorView

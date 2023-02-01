@@ -4,7 +4,7 @@ local inside = require("table_util").inside
 local JudgementView = Class:new()
 
 JudgementView.load = function(self)
-	local judgementTable = inside(self, self.key)
+	local judgementTable = inside(self, self.key) or {}
 	local counters = {}
 	self.counters = counters
 	for name in pairs(self.judgements) do

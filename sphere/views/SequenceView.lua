@@ -50,7 +50,7 @@ SequenceView.callMethod = function(self, method, ...)
 		return
 	end
 	self.iterating = true
-	local subscreen = self.screenView and self.screenView.subscreen
+	local subscreen = self.subscreen
 	for _, view in ipairs(self.views) do
 		if view[method] and not view.hidden and (not view.subscreen or subscreen == view.subscreen) then
 			view[method](view, ...)
@@ -70,7 +70,6 @@ SequenceView.update = function(self, dt)
 end
 
 SequenceView.draw = function(self)
-	self:callMethod("beforeDraw")
 	self:callMethod("draw")
 end
 

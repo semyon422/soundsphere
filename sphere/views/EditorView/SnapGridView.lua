@@ -439,6 +439,7 @@ SnapGridView.draw = function(self)
 	local w, h = Layout:move("base")
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
+	love.graphics.setLineStyle("smooth")
 
 	local lineHeight = 55
 	imgui.setSize(w, h, 200, lineHeight)

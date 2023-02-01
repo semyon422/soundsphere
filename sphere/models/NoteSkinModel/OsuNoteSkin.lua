@@ -583,8 +583,9 @@ OsuNoteSkin.addAccuracy = function(self)
 		format = "%0.2f%%",
 		overlap = fonts.ScoreOverlap,
 		files = files,
-		beforeDraw = function(self)
+		draw = function(self)
 			self.y = scoreConfig.height
+			ImageValueView.draw(self)
 		end,
 	}))
 end

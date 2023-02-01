@@ -6,6 +6,7 @@ local ImageView = require("sphere.views.ImageView")
 local CameraView = require("sphere.views.CameraView")
 local ImageAnimationView = require("sphere.views.ImageAnimationView")
 
+local EditorRhythmView = require("sphere.views.EditorView.EditorRhythmView")
 local RhythmView = require("sphere.views.RhythmView")
 local ProgressView	= require("sphere.views.GameplayView.ProgressView")
 local HitErrorView = require("sphere.views.GameplayView.HitErrorView")
@@ -96,23 +97,37 @@ PlayfieldVsrg.addImageView = function(self, object)
 end
 
 PlayfieldVsrg.addNotes = function(self, object)
-	return self:addRhythmView(object or {})
+	object = object or {}
+	if not object.transform then
+		object.transform = self:newNoteskinTransform()
+	end
+
+	self:add(EditorRhythmView:new({
+		transform = object.transform,
+		subscreen = "editor",
+	}))
+
+	object.subscreen = "gameplay"
+	return self:addRhythmView(object)
 end
 
 PlayfieldVsrg.addLightings = function(self, object)
 	object = object or {}
 	object.mode = "lighting"
+	object.subscreen = "gameplay"
 	return self:addRhythmView(object)
 end
 
 PlayfieldVsrg.addBga = function(self, object)
 	object = object or {}
 	object.mode = "bga"
+	object.subscreen = "gameplay"
 	return self:addRhythmView(object)
 end
 
 PlayfieldVsrg.addProgressBar = function(self, object)
 	object = object or {}
+	object.subscreen = "gameplay"
 	if not getmetatable(object) then
 		object = ProgressView:new(object)
 	end
@@ -125,6 +140,7 @@ end
 
 PlayfieldVsrg.addHpBar = function(self, object)
 	object = object or {}
+	object.subscreen = "gameplay"
 	if not getmetatable(object) then
 		object = ProgressView:new(object)
 	end
@@ -143,6 +159,7 @@ end
 
 PlayfieldVsrg.addScore = function(self, object)
 	object = object or {}
+	object.subscreen = "gameplay"
 	if not getmetatable(object) then
 		object = ValueView:new(object)
 	end
@@ -161,6 +178,7 @@ end
 
 PlayfieldVsrg.addAccuracy = function(self, object)
 	object = object or {}
+	object.subscreen = "gameplay"
 	if not getmetatable(object) then
 		object = ValueView:new(object)
 	end
@@ -173,6 +191,7 @@ end
 
 PlayfieldVsrg.addCombo = function(self, object)
 	object = object or {}
+	object.subscreen = "gameplay"
 	if not getmetatable(object) then
 		object = ValueView:new(object)
 	end
@@ -183,10 +202,10 @@ PlayfieldVsrg.addCombo = function(self, object)
 end
 
 PlayfieldVsrg.addJudgement = function(self, object)
-	local judgements = {}
 	if not object.transform then
 		object.transform = self:newLaneCenterTransform(1080)
 	end
+	local judgements = {}
 	for _, judgement in ipairs(object.judgements) do
 		local config = ImageAnimationView:new({
 			x = object.x, y = object.y,
@@ -208,15 +227,16 @@ PlayfieldVsrg.addJudgement = function(self, object)
 	end
 	return self:add(JudgementView:new({
 		key = key,
-		judgements = judgements
+		judgements = judgements,
+		subscreen = "gameplay",
 	}))
 end
 
 PlayfieldVsrg.addDeltaTimeJudgement = function(self, object)
-	local judgements = {}
 	if not object.transform then
 		object.transform = self:newLaneCenterTransform(1080)
 	end
+	local judgements = {}
 	for i, judgement in ipairs(object.judgements) do
 		if type(judgement) == "string" then
 			judgement = {judgement}
@@ -240,7 +260,8 @@ PlayfieldVsrg.addDeltaTimeJudgement = function(self, object)
 		end
 	end
 	return self:add(DeltaTimeJudgementView:new({
-		judgements = judgements
+		judgements = judgements,
+		subscreen = "gameplay",
 	}))
 end
 
@@ -276,9 +297,8 @@ PlayfieldVsrg.addKeyImages = function(self, object)
 				image = object.released[i],
 			})
 		end
-		local inputType, inputIndex = noteskin.inputs[i]:match("^(.-)(%d+)$")
 		local key = InputView:new({
-			inputType = inputType, inputIndex = tonumber(inputIndex),
+			input = noteskin.inputs[i],
 			pressed = pressed,
 			released = released,
 		})
@@ -366,9 +386,8 @@ PlayfieldVsrg.addKeyImageAnimations = function(self, object)
 				color = color,
 			})
 		end
-		local inputType, inputIndex = noteskin.inputs[i]:match("^(.-)(%d+)$")
 		local key = InputAnimationView:new({
-			inputType = inputType, inputIndex = tonumber(inputIndex),
+			input = noteskin.inputs[i],
 			pressed = pressed,
 			hold = hold,
 			released = released,
@@ -490,6 +509,7 @@ PlayfieldVsrg.addHitError = function(self, object)
 	if not object then
 		return
 	end
+	object.subscreen = "gameplay"
 	object.transform = object.transform or self:newLaneCenterTransform(1080)
 	object.count = object.count or 1
 	object.key = "game.rhythmModel.scoreEngine.scoreSystem.sequence"
@@ -509,6 +529,7 @@ end
 
 PlayfieldVsrg.addMatchPlayers = function(self)
 	local object = {}
+	object.subscreen = "gameplay"
 	object.transform = self:newTransform(1920, 1080, "left")
 	object.draw = function(self)
 		local gfx_util = require("gfx_util")

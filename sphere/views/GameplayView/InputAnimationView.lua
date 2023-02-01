@@ -4,7 +4,7 @@ local InputAnimationView = Class:new()
 
 InputAnimationView.receive = function(self, event)
 	local key = event and event[1]
-	if key == self.inputType .. self.inputIndex then
+	if key == self.input then
 		if event.name == "keypressed" then
 			-- if self.released then
 			-- 	self.released:setTime(math.huge)

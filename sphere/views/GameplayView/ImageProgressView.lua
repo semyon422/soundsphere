@@ -8,8 +8,7 @@ ImageProgressView.load = function(self)
 	ImageView.load(self)
 
 	self.w, self.h = self.imageObject:getDimensions()
-	local rx, ry, rw, rh = self:getRectangle()
-	self.quad = love.graphics.newQuad(rx - self.x, ry - self.y, rw, rh, self.imageObject)
+	self.quad = love.graphics.newQuad(0, 0, 1, 1, self.imageObject)
 end
 
 ImageProgressView.draw = function(self)

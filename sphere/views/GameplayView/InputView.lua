@@ -14,7 +14,7 @@ InputView.receive = function(self, event)
 	end
 
 	local key = event and event[1]
-	if key == self.inputType .. self.inputIndex then
+	if key == self.input then
 		if event.name == "keypressed" then
 			self:switchPressed(true)
 		elseif event.name == "keyreleased" then
