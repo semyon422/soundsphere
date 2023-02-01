@@ -37,6 +37,7 @@ EditorView.load = thread.coro(function(self)
 end)
 
 EditorView.update = function(self, dt)
+	self.game.editorModel:update()
 	self.sequenceView:update(dt)
 end
 
