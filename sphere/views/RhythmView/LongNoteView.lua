@@ -13,7 +13,9 @@ LongNoteView.draw = function(self)
 
 	if bodySpriteBatch then
 		bodySpriteBatch:setColor(bodyView:getColor())
-		bodySpriteBatch:add(self:getDraw(bodyView:getQuad(), self:getBodyTransformParams()))
+
+		self.bodyQuad = self.bodyQuad or love.graphics.newQuad(0, 0, 1, 1, 1, 1)
+		bodySpriteBatch:add(self.bodyQuad, self:getBodyTransformParams())
 	end
 	if tailSpriteBatch then
 		tailSpriteBatch:setColor(tailView:getColor())
@@ -80,8 +82,13 @@ LongNoteView.getBodyTransformParams = function(self)
 
 	local w, h = bw:getDimensions()
 	local nw, nh = bw:get("w"), bw:get("h")
-	local sx = nw and (dx + nw) / w or bw:get("sx") or 1
-	local sy = nh and (dy + nh) / h or bw:get("sy") or 1
+
+	local sx = nw and nw / w or bw:get("sx") or 1
+	-- local sy = nh and nh / h or bw:get("sy") or 1
+	local sy = sx
+
+	self.bodyQuad:setViewport(0, 0, w, dy / sy, w, h)
+
 	local ox = (bw:get("ox") or 0) * w
 	local oy = (bw:get("oy") or 0) * h
 	return

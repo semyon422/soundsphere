@@ -14,9 +14,14 @@ NoteSkinData.loadTexture = function(self, key, path)
 	local textures = self.textures
 	local spriteBatches = self.spriteBatches
 
-	local status, err = pcall(love.graphics.newImage, self.noteSkin.directoryPath .. "/" .. path)
+	local status, texture = pcall(love.image.newImageData, self.noteSkin.directoryPath .. "/" .. path)
+	if status then
+		texture = love.graphics.newImage(gfx_util.limitImageData(texture))
+	else
+		texture = gfx_util.newPixel(1, 1, 1, 1)
+	end
+	texture:setWrap("repeat", "repeat")
 
-	local texture = status and err or gfx_util.newPixel(1, 1, 1, 1)
 	local spriteBatch = love.graphics.newSpriteBatch(texture, 1000)
 
 	textures[key] = textures[key] or {}
