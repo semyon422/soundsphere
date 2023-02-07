@@ -38,6 +38,7 @@ NoScratch.apply = function(self, config)
 		if layerData.noteDatas.scratch then
 			for _, noteDatas in ipairs(layerData.noteDatas.scratch) do
 				for _, noteData in ipairs(noteDatas) do
+					noteData.noteType = "SoundNote"
 					layerData:addNoteData(noteData, "auto", 0)
 				end
 			end
