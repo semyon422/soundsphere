@@ -183,6 +183,15 @@ Automap.processReductor = function(self)
 	local reductor = Reductor:new()
 	local notes = reductor:process(self.tNoteDatas, columnCount, targetMode)
 
+	-- currently Automap only absolute time mode
+	-- reducting long notes requires creating new time points
+	-- time point interpolating is not fully inplemented in LayerData
+	if self.noteChart:getLayerData(1).mode ~= "absolute" then
+		for _, tNoteData in ipairs(self.tNoteDatas) do
+			tNoteData.endTime = tNoteData.startTime
+		end
+	end
+
 	for i = 1, #notes do
 		local n = notes[i]
 		tNoteDatasMap[n] = nil
