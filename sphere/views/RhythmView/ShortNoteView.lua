@@ -1,4 +1,5 @@
 local NoteView = require("sphere.views.RhythmView.NoteView")
+local just = require("just")
 
 local ShortNoteView = NoteView:new()
 
@@ -10,6 +11,20 @@ ShortNoteView.draw = function(self)
 	end
 	spriteBatch:setColor(headView:getColor())
 	spriteBatch:add(self:getDraw(headView:getQuad(), self:getTransformParams()))
+
+	love.graphics.push()
+	local hw = self:getNotePart("Head")
+	love.graphics.translate(hw:get("x"), hw:get("y"))
+
+	local w, h = hw:get("w") or 0, hw:get("h") or 0
+	love.graphics.translate(-(hw:get("ox") or 0) * w, -(hw:get("oy") or 0) * h)
+
+	local noteData = self.graphicalNote.startNoteData
+	local changed, active, hovered = just.button(noteData, just.is_over(w, h), 2)
+	if changed then
+		self.rhythmView:pressNote(noteData, self.graphicalNote.inputType, self.graphicalNote.inputIndex)
+	end
+	love.graphics.pop()
 end
 
 ShortNoteView.fillChords = function(self, chords, column)

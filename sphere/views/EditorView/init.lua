@@ -7,6 +7,7 @@ local EditorViewConfig = require("sphere.views.EditorView.EditorViewConfig")
 local SnapGridView = require("sphere.views.EditorView.SnapGridView")
 local SequenceView = require("sphere.views.SequenceView")
 local Footer = require("sphere.views.EditorView.Footer")
+local WaveformView = require("sphere.views.EditorView.WaveformView")
 
 local EditorView = ScreenView:new()
 
@@ -29,6 +30,7 @@ EditorView.load = thread.coro(function(self)
 	self.snapGridView = SnapGridView:new()
 	self.snapGridView.game = self.game
 	self.snapGridView.transform = playfield:newNoteskinTransform()
+	self.transform = playfield:newNoteskinTransform()
 
 	local sequenceView = self.sequenceView
 
@@ -61,6 +63,7 @@ EditorView.draw = function(self)
 	EditorViewConfig(self)
 	self.sequenceView:draw()
 	self.snapGridView:draw()
+	WaveformView(self)
 	Footer(self)
 	just.container()
 end

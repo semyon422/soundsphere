@@ -266,103 +266,6 @@ SnapGridView.drawUI = function(self, w, h)
 	just.pop()
 end
 
-local waveformLines = {}
-local waveformKey
-SnapGridView.loadWaveform = function(self, w, h)
-	local editorModel = self.game.editorModel
-	local soundData = editorModel.soundData
-	local noteSkin = self.game.noteSkinModel.noteSkin
-
-	local sampleRate = soundData:getSampleRate()
-	local sampleCount = soundData:getSampleCount()
-	local channelCount = soundData:getChannelCount()
-
-	local points = math.floor(h)
-	local samples = math.floor(points * sampleRate / math.abs(noteSkin.unit * editorModel.speed))
-
-	local sampleOffset = math.floor((editorModel.timePoint.absoluteTime - editorModel.soundDataOffset) * sampleRate)
-
-	local _waveformKey = sampleOffset .. "/" .. samples
-	if waveformKey == _waveformKey then
-		return
-	end
-	waveformKey = _waveformKey
-
-	for j = 0, channelCount - 1 do
-		waveformLines[j] = waveformLines[j] or {}
-		local waveformLine = waveformLines[j]
-		local i = -samples
-		local c = 0
-		for k = 0, 2 * points - 1 do
-			local max, min
-
-			local _point = math.floor(math_util.map(i, -samples, samples - 1, 0, 2 * points - 1))
-			while k == _point do
-				local sampleTime = (sampleOffset + i) * channelCount + j
-				if sampleTime >= 0 and sampleTime < sampleCount * channelCount then
-					local sample = soundData:getSample(sampleTime)
-					if sample >= 0 then
-						max = math.max(max or 0, sample)
-					else
-						min = math.min(min or 0, sample)
-					end
-				end
-				i = i + 1
-				_point = math.floor(math_util.map(i, -samples, samples - 1, 0, 2 * points - 1))
-			end
-
-			local y = math.floor(-(k - points))
-
-			local x1, x2 = (min or 0) * w / 2, (max or 0) * w / 2
-			if min and max then
-				waveformLine[c + 1] = x1
-				waveformLine[c + 2] = y
-				waveformLine[c + 3] = x2
-				waveformLine[c + 4] = y
-				c = c + 4
-			elseif min then
-				waveformLine[c + 1] = x1
-				waveformLine[c + 2] = y
-				c = c + 2
-			elseif max then
-				waveformLine[c + 1] = x2
-				waveformLine[c + 2] = y
-				c = c + 2
-			end
-		end
-		for k = c + 1, 8 * points do
-			waveformLine[k] = nil
-		end
-	end
-end
-
-SnapGridView.drawWaveform = function(self, _w, h)
-	local editorModel = self.game.editorModel
-	local noteSkin = self.game.noteSkinModel.noteSkin
-	local soundData = editorModel.soundData
-	if not soundData then
-		return
-	end
-
-	local channelCount = soundData:getChannelCount()
-
-	self:loadWaveform(_w, h)
-
-	love.graphics.push("all")
-	love.graphics.setLineJoin("none")
-	love.graphics.translate(0, noteSkin.hitposition)
-
-	for j = 0, channelCount - 1 do
-		local waveformLine = waveformLines[j]
-		if #waveformLine >= 4 then
-			love.graphics.line(waveformLine)
-		end
-		love.graphics.translate(_w, 0)
-	end
-
-	love.graphics.pop()
-end
-
 SnapGridView.drawTimings = function(self, _w, _h)
 	local editorModel = self.game.editorModel
 	local ld = editorModel.layerData
@@ -393,61 +296,6 @@ SnapGridView.drawTimings = function(self, _w, _h)
 		timePoint = timePoint.next
 	end
 	love.graphics.pop()
-end
-
-SnapGridView.drawNotes = function(self, _w, _h)
-	local editorModel = self.game.editorModel
-	local ld = editorModel.layerData
-	local columns = editorModel.columns
-	local noteSkin = self.game.noteSkinModel.noteSkin
-
-	if not ld.ranges.timePoint.head then
-		return
-	end
-
-	local nw = _w / columns
-	local nh = nw / 4
-
-	just.push()
-
-	local _mx, _my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-
-	local over = just.is_over(_w, _h)
-	if over then
-		love.graphics.rectangle("fill", _mx - nw / 2, _my - nh / 2, nw, nh)
-	end
-
-	local t = editorModel.timePoint.absoluteTime - noteSkin:getInverseTimePosition(_my)
-	for i = 1, columns do
-		if just.button("add note" .. i, just.is_over(nw, _h), 1) then
-			editorModel:addNote(t, "key", i)
-		end
-		love.graphics.translate(nw, 0)
-	end
-	just.pop()
-
-	local currentTime = editorModel.timePoint.absoluteTime
-
-	-- for inputType, r in pairs(ld.ranges.note) do
-	-- 	for inputIndex, range in pairs(r) do
-	-- 		local noteData = range.head
-	-- 		while noteData and noteData <= range.tail do
-	-- 			local y = (noteData.timePoint.absoluteTime - currentTime) * pixelSpeed
-	-- 			local x = (inputIndex - 1) * nw
-	-- 			just.push()
-	-- 			love.graphics.translate(x, y)
-	-- 			love.graphics.rectangle("fill", 0, 0, nw, nh)
-
-	-- 			local nextNoteData = noteData.next
-	-- 			if just.button("remove note" .. tostring(noteData), just.is_over(nw, nh), 2) then
-	-- 				ld:removeNoteData(noteData, inputType, inputIndex)
-	-- 			end
-	-- 			just.pop()
-
-	-- 			noteData = nextNoteData
-	-- 		end
-	-- 	end
-	-- end
 end
 
 local function drag(id, w, h)
@@ -490,10 +338,10 @@ SnapGridView.draw = function(self)
 	love.graphics.push()
 	self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime, width, width)
 	if self.notesEnabled then
-		self:drawNotes(width, h)
+		-- self:drawNotes(width, h)
 	end
 	if self.waveformEnabled then
-		self:drawWaveform(width, h)
+		-- self:drawWaveform(width, h)
 	end
 	if self.timingEnabled then
 		self:drawTimings(width, h)

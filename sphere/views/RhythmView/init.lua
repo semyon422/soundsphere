@@ -51,10 +51,13 @@ RhythmView.drawNote = function(self, note)
 			noteView.chords = self.chords
 			noteView.noteSkin = noteSkin
 			noteView.graphicalNote = note
+			noteView.rhythmView = self
 			noteView:draw()
 		end
 	end
 end
+
+RhythmView.pressNote = function(self, noteData) end
 
 RhythmView.draw = function(self)
 	love.graphics.replaceTransform(gfx_util.transform(self.transform))
