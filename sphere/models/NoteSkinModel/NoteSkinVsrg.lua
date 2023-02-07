@@ -132,6 +132,10 @@ NoteSkinVsrg.getTimePosition = function(self, time)
 	return self.hitposition + self.unit * time
 end
 
+NoteSkinVsrg.getInverseTimePosition = function(self, pos)
+	return (pos - self.hitposition) / self.unit
+end
+
 NoteSkinVsrg.getPosition = function(self, timeState)
 	return self:getTimePosition(timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
 end

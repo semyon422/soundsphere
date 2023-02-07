@@ -23,14 +23,18 @@ EditorView.load = thread.coro(function(self)
 
 	self.game.editorController:load()
 
+	local noteSkin = self.game.noteSkinModel.noteSkin
+	local playfield = noteSkin.playField
+
 	self.snapGridView = SnapGridView:new()
 	self.snapGridView.game = self.game
+	self.snapGridView.transform = playfield:newNoteskinTransform()
 
 	local sequenceView = self.sequenceView
 
 	sequenceView.game = self.game
 	sequenceView.subscreen = "editor"
-	sequenceView:setSequenceConfig(self.game.noteSkinModel.noteSkin.playField)
+	sequenceView:setSequenceConfig(playfield)
 	sequenceView:load()
 
 	loading = false
@@ -55,8 +59,8 @@ EditorView.draw = function(self)
 
 	Layout:draw()
 	EditorViewConfig(self)
-	self.snapGridView:draw()
 	self.sequenceView:draw()
+	self.snapGridView:draw()
 	Footer(self)
 	just.container()
 end

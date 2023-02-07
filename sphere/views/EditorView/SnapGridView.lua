@@ -10,8 +10,6 @@ local Layout = require("sphere.views.EditorView.Layout")
 
 local SnapGridView = Class:new()
 
-SnapGridView.hitPosition = 0.75
-SnapGridView.laneWidth = 80
 SnapGridView.waveformEnabled = true
 SnapGridView.notesEnabled = true
 SnapGridView.timingEnabled = true
@@ -41,7 +39,9 @@ local function getVelocityText(timePoint)
 end
 
 SnapGridView.drawTimingObjects = function(self, field, currentTime, w, h, align, getText)
-	local rangeTracker = self.game.editorModel.layerData.ranges.timePoint
+	local editorModel = self.game.editorModel
+	local rangeTracker = editorModel.layerData.ranges.timePoint
+	local noteSkin = self.game.noteSkinModel.noteSkin
 	local timePoint = rangeTracker.head
 	if not timePoint or not currentTime then
 		return
@@ -51,7 +51,7 @@ SnapGridView.drawTimingObjects = function(self, field, currentTime, w, h, align,
 	while timePoint and timePoint <= endTimePoint do
 		local text = getText(timePoint)
 		if text then
-			local y = (timePoint[field] - currentTime) * self.pixelSpeed
+			local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editorModel.speed)
 			gfx_util.printFrame(text, 0, y - h / 2, w, h, align, "center")
 		end
 
@@ -83,6 +83,7 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, w1, w2)
 	local editorModel = self.game.editorModel
 	local ld = editorModel.layerData
 	local snap = editorModel.snap
+	local noteSkin = self.game.noteSkinModel.noteSkin
 
 	if not currentTime then
 		return
@@ -98,7 +99,7 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, w1, w2)
 					if f:tonumber() < 1 then
 						local timePoint = ld:getDynamicTimePoint(f + time, -1)
 						if not timePoint then break end
-						local y = (timePoint[field] - currentTime) * self.pixelSpeed
+						local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editorModel.speed)
 
 						local w = w1 or 30
 						if i == 1 and j == 0 then
@@ -129,7 +130,7 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, w1, w2)
 
 			timePoint = ld:getDynamicTimePoint(intervalData, time)
 			if not timePoint or not timePoint[field] then break end
-			local y = (timePoint[field] - currentTime) * self.pixelSpeed
+			local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editorModel.speed)
 
 			local j = snap * (time % 1)
 			local w = w1 or 30
@@ -212,7 +213,6 @@ SnapGridView.drawUI = function(self, w, h)
 		just.text("snap: " .. tostring(snapTime))
 	end
 
-	self.laneWidth = imgui.slider1("laneWidth", self.laneWidth, "%d", 10, 200, 10, "lane width")
 	self.waveformEnabled = imgui.checkbox("waveformEnabled", self.waveformEnabled, "waveform")
 	self.notesEnabled = imgui.checkbox("notesEnabled", self.notesEnabled, "notes")
 	self.timingEnabled = imgui.checkbox("timingEnabled", self.timingEnabled, "timing")
@@ -231,6 +231,38 @@ SnapGridView.drawUI = function(self, w, h)
 	end
 	imgui.text("playing sounds: " .. playing)
 
+	local dtp = editorModel:getDynamicTimePoint()
+	if imgui.button("next tp", "next") and dtp.next then
+		editorModel:scrollTimePoint(dtp.next)
+	end
+	if imgui.button("prev tp", "prev") and dtp.prev then
+		editorModel:scrollTimePoint(dtp.prev)
+	end
+
+	local intervalData = dtp._intervalData
+	local grabbedIntervalData = editorModel.grabbedIntervalData
+	if not grabbedIntervalData then
+		if not intervalData and imgui.button("split interval button", "split interval") then
+			ld:splitInterval(dtp)
+		end
+		if intervalData then
+			if imgui.button("merge interval button", "merge") then
+				ld:mergeInterval(dtp)
+			end
+			local inc = imgui.intButtons("update interval", nil, 1)
+			if inc ~= 0 then
+				ld:updateInterval(intervalData, intervalData.beats + inc)
+			end
+		end
+		if intervalData and imgui.button("grab interval button", "grab") then
+			editorModel:grabIntervalData(intervalData)
+		end
+	else
+		if imgui.button("drop interval button", "drop") then
+			editorModel:dropIntervalData()
+		end
+	end
+
 	just.pop()
 end
 
@@ -239,13 +271,14 @@ local waveformKey
 SnapGridView.loadWaveform = function(self, w, h)
 	local editorModel = self.game.editorModel
 	local soundData = editorModel.soundData
+	local noteSkin = self.game.noteSkinModel.noteSkin
 
 	local sampleRate = soundData:getSampleRate()
 	local sampleCount = soundData:getSampleCount()
 	local channelCount = soundData:getChannelCount()
 
 	local points = math.floor(h)
-	local samples = math.floor(points * sampleRate / math.abs(self.pixelSpeed))
+	local samples = math.floor(points * sampleRate / math.abs(noteSkin.unit * editorModel.speed))
 
 	local sampleOffset = math.floor((editorModel.timePoint.absoluteTime - editorModel.soundDataOffset) * sampleRate)
 
@@ -305,6 +338,7 @@ end
 
 SnapGridView.drawWaveform = function(self, _w, h)
 	local editorModel = self.game.editorModel
+	local noteSkin = self.game.noteSkinModel.noteSkin
 	local soundData = editorModel.soundData
 	if not soundData then
 		return
@@ -316,6 +350,7 @@ SnapGridView.drawWaveform = function(self, _w, h)
 
 	love.graphics.push("all")
 	love.graphics.setLineJoin("none")
+	love.graphics.translate(0, noteSkin.hitposition)
 
 	for j = 0, channelCount - 1 do
 		local waveformLine = waveformLines[j]
@@ -332,6 +367,7 @@ SnapGridView.drawTimings = function(self, _w, _h)
 	local editorModel = self.game.editorModel
 	local ld = editorModel.layerData
 	local editorTimePoint = editorModel.timePoint
+	local noteSkin = self.game.noteSkinModel.noteSkin
 
 	if ld.mode ~= "interval" then
 		return
@@ -345,12 +381,12 @@ SnapGridView.drawTimings = function(self, _w, _h)
 
 	love.graphics.push("all")
 	love.graphics.setColor(1, 0.8, 0.2)
-	love.graphics.setLineWidth(8)
+	love.graphics.setLineWidth(4)
 	local endTimePoint = rangeTracker.tail
 	while timePoint and timePoint <= endTimePoint do
 		local intervalData = timePoint._intervalData
 		if intervalData then
-			local y = (timePoint.absoluteTime - editorTimePoint.absoluteTime) * self.pixelSpeed
+			local y = noteSkin:getTimePosition((editorTimePoint.absoluteTime - timePoint.absoluteTime) * editorModel.speed)
 			love.graphics.line(0, y, _w, y)
 		end
 
@@ -362,59 +398,56 @@ end
 SnapGridView.drawNotes = function(self, _w, _h)
 	local editorModel = self.game.editorModel
 	local ld = editorModel.layerData
-	local pixelSpeed = self.pixelSpeed
 	local columns = editorModel.columns
+	local noteSkin = self.game.noteSkinModel.noteSkin
 
 	if not ld.ranges.timePoint.head then
 		return
 	end
 
 	local nw = _w / columns
-	local nh = nw / 4 * (pixelSpeed > 0 and 1 or -1)
+	local nh = nw / 4
 
 	just.push()
-	love.graphics.translate(0, -_h * self.hitPosition)
 
 	local _mx, _my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 
 	local over = just.is_over(_w, _h)
 	if over then
-		love.graphics.rectangle("fill", _mx - nw / 2, _my, nw, nh)
+		love.graphics.rectangle("fill", _mx - nw / 2, _my - nh / 2, nw, nh)
 	end
 
-	local t = editorModel.timePoint.absoluteTime - (_h * self.hitPosition - _my) / pixelSpeed
+	local t = editorModel.timePoint.absoluteTime - noteSkin:getInverseTimePosition(_my)
 	for i = 1, columns do
-		love.graphics.line(0, 0, 0, _h)
 		if just.button("add note" .. i, just.is_over(nw, _h), 1) then
 			editorModel:addNote(t, "key", i)
 		end
 		love.graphics.translate(nw, 0)
 	end
-	love.graphics.line(0, 0, 0, _h)
 	just.pop()
 
 	local currentTime = editorModel.timePoint.absoluteTime
 
-	for inputType, r in pairs(ld.ranges.note) do
-		for inputIndex, range in pairs(r) do
-			local noteData = range.head
-			while noteData and noteData <= range.tail do
-				local y = (noteData.timePoint.absoluteTime - currentTime) * pixelSpeed
-				local x = (inputIndex - 1) * nw
-				just.push()
-				love.graphics.translate(x, y)
-				love.graphics.rectangle("fill", 0, 0, nw, nh)
+	-- for inputType, r in pairs(ld.ranges.note) do
+	-- 	for inputIndex, range in pairs(r) do
+	-- 		local noteData = range.head
+	-- 		while noteData and noteData <= range.tail do
+	-- 			local y = (noteData.timePoint.absoluteTime - currentTime) * pixelSpeed
+	-- 			local x = (inputIndex - 1) * nw
+	-- 			just.push()
+	-- 			love.graphics.translate(x, y)
+	-- 			love.graphics.rectangle("fill", 0, 0, nw, nh)
 
-				local nextNoteData = noteData.next
-				if just.button("remove note" .. tostring(noteData), just.is_over(nw, nh), 2) then
-					ld:removeNoteData(noteData, inputType, inputIndex)
-				end
-				just.pop()
+	-- 			local nextNoteData = noteData.next
+	-- 			if just.button("remove note" .. tostring(noteData), just.is_over(nw, nh), 2) then
+	-- 				ld:removeNoteData(noteData, inputType, inputIndex)
+	-- 			end
+	-- 			just.pop()
 
-				noteData = nextNoteData
-			end
-		end
-	end
+	-- 			noteData = nextNoteData
+	-- 		end
+	-- 	end
+	-- end
 end
 
 local function drag(id, w, h)
@@ -435,6 +468,7 @@ local prevMouseY = 0
 SnapGridView.draw = function(self)
 	local editorModel = self.game.editorModel
 	local ld = editorModel.layerData
+	local noteSkin = self.game.noteSkinModel.noteSkin
 
 	local w, h = Layout:move("base")
 	love.graphics.setColor(1, 1, 1, 1)
@@ -446,58 +480,14 @@ SnapGridView.draw = function(self)
 
 	self:drawUI(w, h)
 
-	local pixelSpeed = -h * editorModel.speed
-	self.pixelSpeed = pixelSpeed
-
 	local editorTimePoint = editorModel.timePoint
 
-	love.graphics.translate(w / 3, 0)
-	local width = self.laneWidth * editorModel.columns
-
-	love.graphics.push()
+	love.graphics.replaceTransform(gfx_util.transform(self.transform))
+	love.graphics.translate(noteSkin.baseOffset, 0)
+	local width = noteSkin.fullWidth
 	local _mx, _my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 
-	love.graphics.translate(0, h * self.hitPosition)
-
-	love.graphics.setLineWidth(8)
-	love.graphics.line(-40, 0, width + 40, 0)
-	love.graphics.setLineWidth(1)
-
-	just.push()
-	love.graphics.translate(-200, -lineHeight)
-	local dtp = editorModel:getDynamicTimePoint()
-	if imgui.button("next tp", "next") and dtp.next then
-		editorModel:scrollTimePoint(dtp.next)
-	end
-	if imgui.button("prev tp", "prev") and dtp.prev then
-		editorModel:scrollTimePoint(dtp.prev)
-	end
-
-	local intervalData = dtp._intervalData
-	local grabbedIntervalData = editorModel.grabbedIntervalData
-	if not grabbedIntervalData then
-		if not intervalData and imgui.button("split interval button", "split interval") then
-			ld:splitInterval(dtp)
-		end
-		if intervalData then
-			if imgui.button("merge interval button", "merge") then
-				ld:mergeInterval(dtp)
-			end
-			local inc = imgui.intButtons("update interval", nil, 1)
-			if inc ~= 0 then
-				ld:updateInterval(intervalData, intervalData.beats + inc)
-			end
-		end
-		if intervalData and imgui.button("grab interval button", "grab") then
-			editorModel:grabIntervalData(intervalData)
-		end
-	else
-		if imgui.button("drop interval button", "drop") then
-			editorModel:dropIntervalData()
-		end
-	end
-	just.pop()
-
+	love.graphics.push()
 	self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime, width, width)
 	if self.notesEnabled then
 		self:drawNotes(width, h)
@@ -514,7 +504,9 @@ SnapGridView.draw = function(self)
 	love.graphics.pop()
 
 	if love.keyboard.isDown("lalt") and drag("drag1", width, h) then
-		editorModel:scrollSecondsDelta(-(_my - prevMouseY) / pixelSpeed)
+		local a = noteSkin:getInverseTimePosition(_my)
+		local b = noteSkin:getInverseTimePosition(prevMouseY)
+		editorModel:scrollSecondsDelta(a - b)
 		if editorModel.timer.isPlaying then
 			editorModel:pause()
 			self.dragging = true
