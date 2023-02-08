@@ -5,6 +5,7 @@ local AudioManager = require("sphere.models.EditorModel.AudioManager")
 local NoteChartResourceLoader = require("sphere.database.NoteChartResourceLoader")
 local audio = require("audio")
 local TimeManager = require("sphere.models.EditorModel.TimeManager")
+local GraphicEngine = require("sphere.models.EditorModel.GraphicEngine")
 
 local EditorModel = Class:new()
 
@@ -13,6 +14,8 @@ EditorModel.construct = function(self)
 	self.audioManager = AudioManager:new()
 	self.timer.audioManager = self.audioManager
 	self.audioManager.timer = self.timer
+	self.graphicEngine = GraphicEngine:new()
+	self.graphicEngine.editorModel = self
 end
 
 EditorModel.load = function(self)
@@ -127,6 +130,7 @@ EditorModel.dropIntervalData = function(self)
 end
 
 EditorModel.update = function(self)
+	self.graphicEngine:update()
 	local dtp = self.layerData:getDynamicTimePointAbsolute(192, self.timer:getTime())
 	if self.grabbedIntervalData then
 		self.layerData:moveInterval(self.grabbedIntervalData, dtp.absoluteTime)

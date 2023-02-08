@@ -1,32 +1,8 @@
 local RhythmView = require("sphere.views.RhythmView")
-local GraphicalNoteFactory = require("sphere.models.RhythmModel.GraphicEngine.GraphicalNoteFactory")
 local just = require("just")
 local gfx_util = require("gfx_util")
 
 local EditorRhythmView = RhythmView:new()
-
-EditorRhythmView.longNoteShortening = 0
-
-EditorRhythmView.getCurrentTime = function(self)
-	return self.game.editorModel.timePoint.absoluteTime
-end
-
-EditorRhythmView.getInputOffset = function(self)
-	return 0
-end
-
-EditorRhythmView.getVisualOffset = function(self)
-	return 0
-end
-
-EditorRhythmView.getVisualTimeRate = function(self)
-	return self.game.editorModel.speed
-end
-
-EditorRhythmView.pressNote = function(self, noteData, inputType, inputIndex)
-	local layerData = self.game.editorModel.layerData
-	layerData:removeNoteData(noteData, inputType, inputIndex)
-end
 
 EditorRhythmView.draw = function(self)
 	local editorModel = self.game.editorModel
@@ -56,55 +32,29 @@ EditorRhythmView.draw = function(self)
 	end
 	just.pop()
 
+	for _, graphicalNote in ipairs(editorModel.graphicEngine.notes) do
+		graphicalNote:update()
+		if just.button(graphicalNote, graphicalNote.over, 2) then
+			ld:removeNoteData(graphicalNote.startNoteData, graphicalNote.inputType, graphicalNote.inputIndex)
+		end
+	end
+
 	RhythmView.draw(self)
 end
 
 EditorRhythmView.fillChords = function(self)
 	local editorModel = self.game.editorModel
-	local layerData = editorModel.layerData
-
-	for inputType, r in pairs(layerData.ranges.note) do
-		for inputIndex, range in pairs(r) do
-			local noteData = range.head
-			while noteData and noteData <= range.tail do
-				local graphicalNote = GraphicalNoteFactory:getNote(noteData)
-				if graphicalNote then
-					graphicalNote.currentTimePoint = editorModel.timePoint
-					graphicalNote.graphicEngine = self
-					graphicalNote.layerData = layerData
-					graphicalNote.input = inputType .. inputIndex
-					graphicalNote:update()
-					self:fillChord(graphicalNote)
-				end
-				noteData = noteData.next
-			end
-		end
+	for _, graphicalNote in ipairs(editorModel.graphicEngine.notes) do
+		graphicalNote:update()
+		self:fillChord(graphicalNote)
 	end
 end
 
 EditorRhythmView.drawNotes = function(self)
 	local editorModel = self.game.editorModel
-	local layerData = editorModel.layerData
-
-	for inputType, r in pairs(layerData.ranges.note) do
-		for inputIndex, range in pairs(r) do
-			local noteData = range.head
-			while noteData and noteData <= range.tail do
-				local nextNote = noteData.next
-				local graphicalNote = GraphicalNoteFactory:getNote(noteData)
-				if graphicalNote then
-					graphicalNote.currentTimePoint = editorModel.timePoint
-					graphicalNote.graphicEngine = self
-					graphicalNote.layerData = layerData
-					graphicalNote.input = inputType .. inputIndex
-					graphicalNote.inputType = inputType
-					graphicalNote.inputIndex = inputIndex
-					graphicalNote:update()
-					self:drawNote(graphicalNote)
-				end
-				noteData = nextNote
-			end
-		end
+	for _, graphicalNote in ipairs(editorModel.graphicEngine.notes) do
+		graphicalNote:update()
+		self:drawNote(graphicalNote)
 	end
 end
 
