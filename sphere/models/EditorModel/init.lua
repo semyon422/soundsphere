@@ -116,6 +116,12 @@ EditorModel.setLogSpeed = function(self, logSpeed)
 	self.speed = 2 ^ (logSpeed / 10)
 end
 
+EditorModel.getMouseTime = function(self)
+	local _mx, _my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+	local noteSkin = self.game.noteSkinModel.noteSkin
+	return (self.timePoint.absoluteTime - noteSkin:getInverseTimePosition(_my) / self.speed)
+end
+
 EditorModel.grabIntervalData = function(self)
 	local dtp = self:getDynamicTimePoint()
 	local intervalData = dtp._intervalData
@@ -129,8 +135,31 @@ EditorModel.dropIntervalData = function(self)
 	self.grabbedIntervalData = nil
 end
 
+EditorModel.grabNote = function(self, note)
+	local ld = self.layerData
+	self.grabbedNote = note
+	ld:removeNoteData(note.startNoteData, note.inputType, note.inputIndex)
+end
+
+EditorModel.dropNote = function(self)
+	local ld = self.layerData
+	local note = self.grabbedNote
+	local dtp = ld:getDynamicTimePointAbsolute(self.snap, self:getMouseTime())
+	note.startNoteData.timePoint = ld:checkTimePoint(dtp)
+	ld:addNoteData(note.startNoteData, note.inputType, note.inputIndex)
+	self.grabbedNote = nil
+end
+
+EditorModel.removeNote = function(self, graphicalNote)
+	self.layerData:removeNoteData(graphicalNote.startNoteData, graphicalNote.inputType, graphicalNote.inputIndex)
+end
+
 EditorModel.update = function(self)
+	if self.grabbedNote then
+		self.grabbedNote.startNoteData.timePoint = self.layerData:getDynamicTimePointAbsolute(192, self:getMouseTime())
+	end
 	self.graphicEngine:update()
+
 	local dtp = self.layerData:getDynamicTimePointAbsolute(192, self.timer:getTime())
 	if self.grabbedIntervalData then
 		self.layerData:moveInterval(self.grabbedIntervalData, dtp.absoluteTime)

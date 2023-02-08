@@ -1,6 +1,7 @@
 local ScreenView = require("sphere.views.ScreenView")
 local thread = require("thread")
 local just = require("just")
+local gfx_util = require("gfx_util")
 
 local Layout = require("sphere.views.EditorView.Layout")
 local EditorViewConfig = require("sphere.views.EditorView.EditorViewConfig")
@@ -43,6 +44,7 @@ EditorView.load = thread.coro(function(self)
 end)
 
 EditorView.update = function(self, dt)
+	love.graphics.replaceTransform(gfx_util.transform(self.transform))
 	self.game.editorModel:update()
 	self.sequenceView:update(dt)
 end

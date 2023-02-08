@@ -39,25 +39,29 @@ GraphicEngine.update = function(self)
 		for inputIndex, range in pairs(r) do
 			local noteData = range.head
 			while noteData and noteData <= range.tail do
-				local graphicalNote = notesMap[noteData]
+				local note = notesMap[noteData]
 				local isNew = false
-				if not graphicalNote then
-					graphicalNote = GraphicalNoteFactory:getNote(noteData)
+				if not note then
+					note = GraphicalNoteFactory:getNote(noteData)
 					isNew = true
 				end
-				if graphicalNote and isNew then
-					graphicalNote.currentTimePoint = editorModel.timePoint
-					graphicalNote.graphicEngine = self
-					graphicalNote.layerData = layerData
-					graphicalNote.input = inputType .. inputIndex
-					graphicalNote.inputType = inputType
-					graphicalNote.inputIndex = inputIndex
-					graphicalNote:update()
+				if note and isNew then
+					note.currentTimePoint = editorModel.timePoint
+					note.graphicEngine = self
+					note.layerData = layerData
+					note.input = inputType .. inputIndex
+					note.inputType = inputType
+					note.inputIndex = inputIndex
 				end
-				table.insert(newNotes, graphicalNote)
+				table.insert(newNotes, note)
 				noteData = noteData.next
 			end
 		end
+	end
+
+	table.insert(newNotes, editorModel.grabbedNote)
+	for _, note in ipairs(newNotes) do
+		note:update()
 	end
 
 	self.notes = newNotes
