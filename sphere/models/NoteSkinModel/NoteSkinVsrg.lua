@@ -140,6 +140,19 @@ NoteSkinVsrg.getPosition = function(self, timeState)
 	return self:getTimePosition(timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
 end
 
+NoteSkinVsrg.getInverseColumnPosition = function(self, mx)
+	for i = 1, self.inputsCount do
+		local Head = self.notes.ShortNote.Head
+		local x, w = Head.x[i], Head.w[i]
+		if w < 0 then
+			x, w = x + w, -w
+		end
+		if x <= mx and mx < x + w then
+			return i
+		end
+	end
+end
+
 NoteSkinVsrg.setShortNote = function(self, params, noteType)
 	local h = params.h or 0
 	local height = {}

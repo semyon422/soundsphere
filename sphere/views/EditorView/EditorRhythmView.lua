@@ -7,29 +7,23 @@ local EditorRhythmView = RhythmView:new()
 EditorRhythmView.draw = function(self)
 	local editorModel = self.game.editorModel
 	local ld = editorModel.layerData
-	local columns = editorModel.columns
 	local noteSkin = self.game.noteSkinModel.noteSkin
 
 	if not ld.ranges.timePoint.head then
 		return
 	end
 
-	local nw = noteSkin.fullWidth / columns
-
-	just.push()
-
 	love.graphics.replaceTransform(gfx_util.transform(self.transform))
-	love.graphics.translate(noteSkin.baseOffset, 0)
 
 	local t = editorModel:getMouseTime()
-	for i = 1, columns do
-		local over = just.mouse_over("add note" .. i, just.is_over(nw, noteSkin.unit), "mouse")
+	for i = 1, noteSkin.inputsCount do
+		local Head = noteSkin.notes.ShortNote.Head
+		local over = just.is_over(Head.w[i], noteSkin.unit, Head.x[i], 0)
+		over = just.mouse_over("add note" .. i, over, "mouse")
 		if over and just.mousepressed(1) then
 			editorModel:addNote(t, "key", i)
 		end
-		love.graphics.translate(nw, 0)
 	end
-	just.pop()
 
 	RhythmView.draw(self)
 

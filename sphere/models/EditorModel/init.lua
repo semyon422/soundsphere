@@ -4,6 +4,7 @@ local Fraction = require("ncdk.Fraction")
 local AudioManager = require("sphere.models.EditorModel.AudioManager")
 local NoteChartResourceLoader = require("sphere.database.NoteChartResourceLoader")
 local audio = require("audio")
+local just = require("just")
 local TimeManager = require("sphere.models.EditorModel.TimeManager")
 local GraphicEngine = require("sphere.models.EditorModel.GraphicEngine")
 
@@ -117,9 +118,15 @@ EditorModel.setLogSpeed = function(self, logSpeed)
 end
 
 EditorModel.getMouseTime = function(self)
-	local _mx, _my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local noteSkin = self.game.noteSkinModel.noteSkin
-	return (self.timePoint.absoluteTime - noteSkin:getInverseTimePosition(_my) / self.speed)
+	return (self.timePoint.absoluteTime - noteSkin:getInverseTimePosition(my) / self.speed)
+end
+
+EditorModel.getColumnOver = function(self)
+	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+	local noteSkin = self.game.noteSkinModel.noteSkin
+	return noteSkin:getInverseColumnPosition(mx)
 end
 
 EditorModel.grabIntervalData = function(self)
@@ -155,8 +162,16 @@ EditorModel.removeNote = function(self, graphicalNote)
 end
 
 EditorModel.update = function(self)
-	if self.grabbedNote then
-		self.grabbedNote.startNoteData.timePoint = self.layerData:getDynamicTimePointAbsolute(192, self:getMouseTime())
+	local grabbedNote = self.grabbedNote
+	if grabbedNote then
+		grabbedNote.startNoteData.timePoint = self.layerData:getDynamicTimePointAbsolute(192, self:getMouseTime())
+		local column = self:getColumnOver()
+		if column then
+			local inputType, inputIndex = unpack(self.inputMap[column])
+			grabbedNote.inputType = inputType
+			grabbedNote.inputIndex = inputIndex
+			grabbedNote.input = inputType .. inputIndex
+		end
 	end
 	self.graphicEngine:update()
 
