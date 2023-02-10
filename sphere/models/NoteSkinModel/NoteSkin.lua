@@ -19,7 +19,7 @@ NoteSkin.loadData = function(self)
 end
 
 NoteSkin.check = function(self, note)
-	return self.notes[note.noteType] and self.inputs[note.input]
+	return self.notes[note.noteType] and self.inputs[note.inputType .. note.inputIndex]
 end
 
 NoteSkin.getColumn = function(self, input, index)
@@ -40,7 +40,7 @@ end
 NoteSkin.get = function(self, noteView, part, key, timeState)
 	local note = noteView.graphicalNote
 	local noteType = noteView.noteType
-	local column = self:getColumn(note.input, noteView.index)
+	local column = self:getColumn(note.inputType .. note.inputIndex, noteView.index)
 
 	local value =
 		self.notes[noteType] and

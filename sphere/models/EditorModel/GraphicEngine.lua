@@ -49,7 +49,6 @@ GraphicEngine.update = function(self)
 					note.currentTimePoint = editorModel.timePoint
 					note.graphicEngine = self
 					note.layerData = layerData
-					note.input = inputType .. inputIndex
 					note.inputType = inputType
 					note.inputIndex = inputIndex
 				end

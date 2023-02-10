@@ -24,7 +24,8 @@ NoteDrawer.load = function(self)
 			graphicalNote.graphicEngine = graphicEngine
 			graphicalNote.layerData = layerData
 			graphicalNote.logicalNote = sharedLogicalNotes[noteData]
-			graphicalNote.input = self.inputType .. self.inputIndex
+			graphicalNote.inputType = self.inputType
+			graphicalNote.inputIndex = self.inputIndex
 			table.insert(notes, graphicalNote)
 		end
 	end

@@ -170,7 +170,6 @@ EditorModel.update = function(self)
 			local inputType, inputIndex = unpack(self.inputMap[column])
 			grabbedNote.inputType = inputType
 			grabbedNote.inputIndex = inputIndex
-			grabbedNote.input = inputType .. inputIndex
 		end
 	end
 	self.graphicEngine:update()
