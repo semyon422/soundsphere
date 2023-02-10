@@ -4,11 +4,13 @@ local Fraction = require("ncdk.Fraction")
 local AudioManager = require("sphere.models.EditorModel.AudioManager")
 local NoteChartResourceLoader = require("sphere.database.NoteChartResourceLoader")
 local audio = require("audio")
-local just = require("just")
 local TimeManager = require("sphere.models.EditorModel.TimeManager")
 local GraphicEngine = require("sphere.models.EditorModel.GraphicEngine")
 
 local EditorModel = Class:new()
+
+EditorModel.tools = {"Select", "ShortNote", "LongNote", "SoundNote"}
+EditorModel.tool = "LongNote"
 
 EditorModel.construct = function(self)
 	self.timer = TimeManager:new()
@@ -142,29 +144,120 @@ EditorModel.dropIntervalData = function(self)
 	self.grabbedIntervalData = nil
 end
 
-EditorModel.grabNote = function(self, note)
-	local ld = self.layerData
+EditorModel.grabNote = function(self, note, part)
 	self.grabbedNote = note
-	ld:removeNoteData(note.startNoteData, note.inputType, note.inputIndex)
+	self.grabbedNotePart = part
+	self:removeNote(note)
+
+	local t = self:getMouseTime()
+	if note.noteType == "ShortNote" then
+		self.grabbedDeltaTime = t - note.startNoteData.timePoint.absoluteTime
+		note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
+	elseif note.noteType == "LongNote" then
+		if self.grabbedNotePart == "head" then
+			self.grabbedDeltaTime = t - note.startNoteData.timePoint.absoluteTime
+			note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
+		elseif self.grabbedNotePart == "tail" then
+			self.grabbedDeltaTime = t - note.endNoteData.timePoint.absoluteTime
+			note.endNoteData.timePoint = note.endNoteData.timePoint:clone()
+		elseif self.grabbedNotePart == "body" then
+			self.grabbedDeltaTime = {
+				t - note.startNoteData.timePoint.absoluteTime,
+				t - note.endNoteData.timePoint.absoluteTime,
+			}
+			note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
+			note.endNoteData.timePoint = note.endNoteData.timePoint:clone()
+		end
+	end
 end
 
 EditorModel.dropNote = function(self)
 	local ld = self.layerData
 	local note = self.grabbedNote
-	local dtp = ld:getDynamicTimePointAbsolute(self.snap, self:getMouseTime())
-	note.startNoteData.timePoint = ld:checkTimePoint(dtp)
-	ld:addNoteData(note.startNoteData, note.inputType, note.inputIndex)
+
+	local time = self:getMouseTime()
+	if note.noteType == "ShortNote" then
+		local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - self.grabbedDeltaTime)
+		note.startNoteData.timePoint = ld:checkTimePoint(dtp)
+	elseif note.noteType == "LongNote" then
+		if self.grabbedNotePart == "head" then
+			local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - self.grabbedDeltaTime)
+			note.startNoteData.timePoint = ld:checkTimePoint(dtp)
+		elseif self.grabbedNotePart == "tail" then
+			local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - self.grabbedDeltaTime)
+			note.endNoteData.timePoint = ld:checkTimePoint(dtp)
+		elseif self.grabbedNotePart == "body" then
+			local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - self.grabbedDeltaTime[1])
+			note.startNoteData.timePoint = ld:checkTimePoint(dtp)
+			local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - self.grabbedDeltaTime[2])
+			note.endNoteData.timePoint = ld:checkTimePoint(dtp)
+		end
+	end
+
+	self:_addNote(note)
 	self.grabbedNote = nil
+	self.grabbedNotePart = nil
+	self.grabbedTime = nil
 end
 
-EditorModel.removeNote = function(self, graphicalNote)
-	self.layerData:removeNoteData(graphicalNote.startNoteData, graphicalNote.inputType, graphicalNote.inputIndex)
+EditorModel.removeNote = function(self, note)
+	local ld = self.layerData
+	ld:removeNoteData(note.startNoteData, note.inputType, note.inputIndex)
+	if note.endNoteData then
+		ld:removeNoteData(note.endNoteData, note.inputType, note.inputIndex)
+	end
+end
+
+EditorModel._addNote = function(self, note)
+	local ld = self.layerData
+	ld:addNoteData(note.startNoteData, note.inputType, note.inputIndex)
+	if note.endNoteData then
+		ld:addNoteData(note.endNoteData, note.inputType, note.inputIndex)
+	end
+end
+
+EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
+	local ld = self.layerData
+	if self.tool == "ShortNote" then
+		local dtp = ld:getDynamicTimePointAbsolute(self.snap, absoluteTime)
+		local noteData = ld:getNoteData(dtp, inputType, inputIndex)
+		if noteData then
+			noteData.noteType = "ShortNote"
+		end
+	elseif self.tool == "LongNote" then
+		local dtp = ld:getDynamicTimePointAbsolute(self.snap, absoluteTime)
+		local startNoteData = ld:getNoteData(dtp, inputType, inputIndex)
+		if not startNoteData then
+			return
+		end
+		local tp = ld:getTimePoint(self:getNextSnapIntervalTime(startNoteData.timePoint.absoluteTime, 1))
+		local endNoteData = ld:getNoteData(tp, inputType, inputIndex)
+		endNoteData.startNoteData = startNoteData
+		startNoteData.endNoteData = endNoteData
+
+		startNoteData.noteType = "LongNoteStart"
+		endNoteData.noteType = "LongNoteEnd"
+	end
 end
 
 EditorModel.update = function(self)
+	local ld = self.layerData
+
 	local grabbedNote = self.grabbedNote
 	if grabbedNote then
-		grabbedNote.startNoteData.timePoint = self.layerData:getDynamicTimePointAbsolute(192, self:getMouseTime())
+		local time = self:getMouseTime()
+		if grabbedNote.noteType == "ShortNote" then
+			ld:getDynamicTimePointAbsolute(192, time - self.grabbedDeltaTime):clone(grabbedNote.startNoteData.timePoint)
+		elseif grabbedNote.noteType == "LongNote" then
+			if self.grabbedNotePart == "head" then
+				ld:getDynamicTimePointAbsolute(192, time - self.grabbedDeltaTime):clone(grabbedNote.startNoteData.timePoint)
+			elseif self.grabbedNotePart == "tail" then
+				ld:getDynamicTimePointAbsolute(192, time - self.grabbedDeltaTime):clone(grabbedNote.endNoteData.timePoint)
+			elseif self.grabbedNotePart == "body" then
+				ld:getDynamicTimePointAbsolute(192, time - self.grabbedDeltaTime[1]):clone(grabbedNote.startNoteData.timePoint)
+				ld:getDynamicTimePointAbsolute(192, time - self.grabbedDeltaTime[2]):clone(grabbedNote.endNoteData.timePoint)
+			end
+		end
 		local column = self:getColumnOver()
 		if column then
 			local inputType, inputIndex = unpack(self.inputMap[column])
@@ -174,9 +267,9 @@ EditorModel.update = function(self)
 	end
 	self.graphicEngine:update()
 
-	local dtp = self.layerData:getDynamicTimePointAbsolute(192, self.timer:getTime())
+	local dtp = ld:getDynamicTimePointAbsolute(192, self.timer:getTime())
 	if self.grabbedIntervalData then
-		self.layerData:moveInterval(self.grabbedIntervalData, dtp.absoluteTime)
+		ld:moveInterval(self.grabbedIntervalData, dtp.absoluteTime)
 	end
 	self.audioManager:update()
 	if self.timer.isPlaying then
@@ -231,15 +324,6 @@ EditorModel.getDynamicTimePoint = function(self)
 	return ld:getDynamicTimePointAbsolute(192, self.timePoint.absoluteTime, self.timePoint.visualSide)
 end
 
-EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
-	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(self.snap, absoluteTime)
-	local noteData = ld:getNoteData(dtp, inputType, inputIndex)
-	if noteData then
-		noteData.noteType = "ShortNote"
-	end
-end
-
 EditorModel._scrollTimePoint = function(self, timePoint)
 	if not timePoint then
 		return
@@ -289,9 +373,9 @@ EditorModel.scrollSnaps = function(self, delta)
 	end
 end
 
-EditorModel.scrollSnapsInterval = function(self, delta)
+EditorModel.getNextSnapIntervalTime = function(self, absoluteTime, delta)
 	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(192, self.timePoint.absoluteTime)
+	local dtp = ld:getDynamicTimePointAbsolute(192, absoluteTime)
 
 	local snap = self.snap
 	local snapTime = dtp.time * snap
@@ -326,6 +410,10 @@ EditorModel.scrollSnapsInterval = function(self, delta)
 	end
 
 	return intervalData, Fraction(targetSnapTime, snap)
+end
+
+EditorModel.scrollSnapsInterval = function(self, delta)
+	return self:getNextSnapIntervalTime(self.timePoint.absoluteTime, delta)
 end
 
 EditorModel.scrollSnapsMeasure = function(self, delta)

@@ -1,4 +1,6 @@
 local ShortNoteView = require("sphere.views.RhythmView.ShortNoteView")
+local math_util = require("math_util")
+local gfx_util = require("gfx_util")
 
 local LongNoteView = ShortNoteView:new()
 
@@ -25,6 +27,27 @@ LongNoteView.draw = function(self)
 		headSpriteBatch:setColor(headView:getColor())
 		headSpriteBatch:add(self:getDraw(headView:getQuad(), self:getHeadTransformParams()))
 	end
+
+	local hw = self:getNotePart("Head")
+	local tw = self:getNotePart("Tail")
+	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+
+	local tf = gfx_util.transform(self:getHeadTransformParams())
+	local x, y = tf:inverseTransformPoint(mx, my)
+	local w, h = hw:getDimensions()
+	self.graphicalNote.headOver = math_util.belong(x, 0, w) and math_util.belong(y, 0, h)
+
+	local tf = gfx_util.transform(self:getTailTransformParams())
+	local x, y = tf:inverseTransformPoint(mx, my)
+	local w, h = tw:getDimensions()
+	self.graphicalNote.tailOver = math_util.belong(x, 0, w) and math_util.belong(y, 0, h)
+
+	local tf = gfx_util.transform(self:getBodyTransformParams())
+	local x, y = tf:inverseTransformPoint(mx, my)
+	local _, _, w, h = self.bodyQuad:getViewport()
+	self.graphicalNote.bodyOver = math_util.belong(x, 0, w) and math_util.belong(y, 0, h)
+
+	self.graphicalNote.over = self.graphicalNote.headOver or self.graphicalNote.tailOver or self.graphicalNote.bodyOver
 end
 
 LongNoteView.fillChords = function(self, chords, column)

@@ -6,17 +6,28 @@ local LongGraphicalNote = GraphicalNote:new()
 LongGraphicalNote.construct = function(self)
 	self.endNoteData = self.startNoteData.endNoteData
 
+	self.fakeStartTimePoint = TimePoint:new()
+	self:checkFakeStartTimePoint()
+end
+
+LongGraphicalNote.checkFakeStartTimePoint = function(self)
 	local timePoint = self.startNoteData.timePoint
-	local fakeTimePoint = TimePoint:new()
+	if self.baseStartTime == timePoint.absoluteTime then
+		return
+	end
+	self.baseStartTime = timePoint.absoluteTime
+
+	local fakeTimePoint = self.fakeStartTimePoint
 	fakeTimePoint.absoluteTime = timePoint.absoluteTime
 	fakeTimePoint.visualTime = timePoint.visualTime
 	fakeTimePoint.velocityData = timePoint.velocityData
 	fakeTimePoint.tempoData = timePoint.tempoData
 	fakeTimePoint.index = timePoint.index
-	self.fakeStartTimePoint = fakeTimePoint
 end
 
 LongGraphicalNote.update = function(self)
+	self:checkFakeStartTimePoint()
+
 	local startTimePoint = self.startNoteData.timePoint
 	local endTimePoint = self.endNoteData.timePoint
 	local startVisualTime = startTimePoint:getVisualTime(self.currentTimePoint)
