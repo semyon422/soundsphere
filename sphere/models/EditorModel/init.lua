@@ -292,6 +292,9 @@ end
 
 EditorModel.getSnap = function(self, j)
 	local snap = self.snap
+	if type(j) == "table" then
+		j, snap = 16 * j, 16
+	end
 	local k
 	for i = 1, 16 do
 		if snap % i == 0 and j % (snap / i) == 0 then

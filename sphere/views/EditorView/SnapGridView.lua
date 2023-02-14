@@ -292,7 +292,7 @@ SnapGridView.drawTimings = function(self, _w, _h)
 		if intervalData then
 			love.graphics.setColor(1, 0.8, 0.2)
 		elseif measureData then
-			love.graphics.setColor(1, 1, 1, 1)
+			love.graphics.setColor(snaps[editorModel:getSnap(timePoint:getBeatModulo())] or colors.white)
 		end
 
 		if intervalData or measureData then
