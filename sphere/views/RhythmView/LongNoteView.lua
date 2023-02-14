@@ -13,10 +13,9 @@ LongNoteView.draw = function(self)
 	local bodySpriteBatch = bodyView:getSpriteBatch()
 	local tailSpriteBatch = tailView:getSpriteBatch()
 
+	self.bodyQuad = self.bodyQuad or love.graphics.newQuad(0, 0, 1, 1, 1, 1)
 	if bodySpriteBatch then
 		bodySpriteBatch:setColor(bodyView:getColor())
-
-		self.bodyQuad = self.bodyQuad or love.graphics.newQuad(0, 0, 1, 1, 1, 1)
 		bodySpriteBatch:add(self.bodyQuad, self:getBodyTransformParams())
 	end
 	if tailSpriteBatch then

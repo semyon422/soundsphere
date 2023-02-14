@@ -10,7 +10,7 @@ local GraphicEngine = require("sphere.models.EditorModel.GraphicEngine")
 local EditorModel = Class:new()
 
 EditorModel.tools = {"Select", "ShortNote", "LongNote", "SoundNote"}
-EditorModel.tool = "LongNote"
+EditorModel.tool = "ShortNote"
 
 EditorModel.construct = function(self)
 	self.timer = TimeManager:new()
@@ -230,13 +230,17 @@ EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
 		if not startNoteData then
 			return
 		end
+		startNoteData.noteType = "LongNoteStart"
+
 		local tp = ld:getTimePoint(self:getNextSnapIntervalTime(startNoteData.timePoint.absoluteTime, 1))
 		local endNoteData = ld:getNoteData(tp, inputType, inputIndex)
+		if not endNoteData then
+			return
+		end
+		endNoteData.noteType = "LongNoteEnd"
+
 		endNoteData.startNoteData = startNoteData
 		startNoteData.endNoteData = endNoteData
-
-		startNoteData.noteType = "LongNoteStart"
-		endNoteData.noteType = "LongNoteEnd"
 	end
 end
 

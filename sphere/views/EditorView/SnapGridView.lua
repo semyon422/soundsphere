@@ -79,7 +79,7 @@ local snaps = {
 	[8] = colors.green,
 }
 
-SnapGridView.drawComputedGrid = function(self, field, currentTime, w1, w2)
+SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 	local editorModel = self.game.editorModel
 	local ld = editorModel.layerData
 	local snap = editorModel.snap
@@ -100,13 +100,8 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, w1, w2)
 						local timePoint = ld:getDynamicTimePoint(f + time, -1)
 						if not timePoint then break end
 						local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editorModel.speed)
-
-						local w = w1 or 30
-						if i == 1 and j == 0 then
-							w = w2 or w1 or 60
-						end
 						love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
-						love.graphics.line(0, y, w, y)
+						love.graphics.line(0, y, width, y)
 					end
 				end
 			end
@@ -114,6 +109,7 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, w1, w2)
 	elseif ld.mode == "interval" then
 		local timePoint = ld:getDynamicTimePointAbsolute(192, ld.startTime)
 		local intervalData = timePoint.intervalData
+		local measureData = timePoint.measureData
 		local time = timePoint.time
 		timePoint = ld:getDynamicTimePointAbsolute(192, ld.endTime)
 		local endIntervalData = timePoint.intervalData
@@ -123,24 +119,27 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, w1, w2)
 		endTime = Fraction((endTime * snap):floor(), snap)
 
 		while intervalData and intervalData < endIntervalData or intervalData == endIntervalData and time <= endTime do
-			if intervalData.next and time >= intervalData:_end() then
-				time = time - intervalData.beats
-				intervalData = intervalData.next
-			end
-
 			timePoint = ld:getDynamicTimePoint(intervalData, time)
 			if not timePoint or not timePoint[field] then break end
-			local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editorModel.speed)
 
-			local j = snap * (time % 1)
-			local w = w1 or 30
-			if time == 0 and j == 0 then
-				w = w2 or w1 or 60
+			local drawNothing
+			if measureData ~= timePoint.measureData then
+				measureData = timePoint.measureData
+				intervalData, time = measureData.timePoint:add(-measureData.start + Fraction(1, snap))
+				timePoint = ld:getDynamicTimePoint(intervalData, time)
+				drawNothing = timePoint.measureData ~= measureData
+				if not timePoint or not timePoint[field] then break end
 			end
-			love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
-			love.graphics.line(0, y, w, y)
 
-			time = time + Fraction(1, snap)
+			if not drawNothing then
+				local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editorModel.speed)
+
+				local j = snap * timePoint:getBeatModulo()
+				love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
+				love.graphics.line(0, y, width, y)
+			end
+
+			intervalData, time = timePoint:add(Fraction(1, snap))
 		end
 	end
 	love.graphics.setColor(1, 1, 1, 1)
@@ -288,7 +287,15 @@ SnapGridView.drawTimings = function(self, _w, _h)
 	local endTimePoint = rangeTracker.tail
 	while timePoint and timePoint <= endTimePoint do
 		local intervalData = timePoint._intervalData
+		local measureData = timePoint._measureData
+
 		if intervalData then
+			love.graphics.setColor(1, 0.8, 0.2)
+		elseif measureData then
+			love.graphics.setColor(1, 1, 1, 1)
+		end
+
+		if intervalData or measureData then
 			local y = noteSkin:getTimePosition((editorTimePoint.absoluteTime - timePoint.absoluteTime) * editorModel.speed)
 			love.graphics.line(0, y, _w, y)
 		end
@@ -336,7 +343,7 @@ SnapGridView.draw = function(self)
 	local _mx, _my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 
 	love.graphics.push()
-	self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime, width, width)
+	self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime, width)
 	if self.notesEnabled then
 		-- self:drawNotes(width, h)
 	end
