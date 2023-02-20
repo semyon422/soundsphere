@@ -1,6 +1,7 @@
 local NoteView = require("sphere.views.RhythmView.NoteView")
 local math_util = require("math_util")
 local gfx_util = require("gfx_util")
+local just = require("just")
 
 local ShortNoteView = NoteView:new()
 
@@ -14,14 +15,38 @@ ShortNoteView.draw = function(self)
 	spriteBatch:add(self:getDraw(headView:getQuad(), self:getTransformParams()))
 
 	local hw = self:getNotePart("Head")
+	local w, h = hw:getDimensions()
 
 	local tf = gfx_util.transform(self:getTransformParams())
 
 	-- (S*N)^(1)*M = N^-1*S^-1*M
-	local x, y = tf:inverseTransformPoint(love.graphics.inverseTransformPoint(love.mouse.getPosition()))
+	-- local x, y = tf:inverseTransformPoint(love.graphics.inverseTransformPoint(love.mouse.getPosition()))
+
+	-- self.graphicalNote.over = math_util.belong(x, 0, w) and math_util.belong(y, 0, h)
+
+	love.graphics.push()
+	love.graphics.applyTransform(tf)
+	self.graphicalNote.over = just.is_over(w, h)
+	self.graphicalNote.selecting = just.is_selected(w, h)
+	-- self.graphicalNote.selected = self.graphicalNote.selected or just.is_selected(w, h)
+	love.graphics.pop()
+end
+
+ShortNoteView.drawSelected = function(self)
+	local hw = self:getNotePart("Head")
 	local w, h = hw:getDimensions()
 
-	self.graphicalNote.over = math_util.belong(x, 0, w) and math_util.belong(y, 0, h)
+	love.graphics.push("all")
+	local tf = gfx_util.transform(self:getTransformParams())
+
+	local x, y = tf:transformPoint(0, 0)
+	local _w, _h = tf:transformPoint(w, h)
+	love.graphics.pop()
+
+	love.graphics.setColor(1, 1, 1, 0.2)
+	love.graphics.rectangle("fill", x, y, _w - x, _h - y)
+	love.graphics.setColor(1, 1, 1)
+	love.graphics.rectangle("line", x, y, _w - x, _h - y)
 end
 
 ShortNoteView.fillChords = function(self, chords, column)

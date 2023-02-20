@@ -6,11 +6,12 @@ local NoteChartResourceLoader = require("sphere.database.NoteChartResourceLoader
 local audio = require("audio")
 local TimeManager = require("sphere.models.EditorModel.TimeManager")
 local GraphicEngine = require("sphere.models.EditorModel.GraphicEngine")
+local just = require("just")
 
 local EditorModel = Class:new()
 
 EditorModel.tools = {"Select", "ShortNote", "LongNote", "SoundNote"}
-EditorModel.tool = "ShortNote"
+EditorModel.tool = "Select"
 
 EditorModel.construct = function(self)
 	self.timer = TimeManager:new()
@@ -244,7 +245,21 @@ EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
 	end
 end
 
+EditorModel.selectStart = function(self)
+	self.graphicEngine:unselectNotes()
+	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+	self.selectRect = {mx, my, mx, my}
+	self.selectStartTime = self:getMouseTime()
+	just.select(mx, my, mx, my)
+end
+
+EditorModel.selectEnd = function(self)
+	self.selectRect = nil
+	just.select()
+end
+
 EditorModel.update = function(self)
+	local noteSkin = self.game.noteSkinModel.noteSkin
 	local ld = self.layerData
 
 	local grabbedNote = self.grabbedNote
@@ -270,6 +285,15 @@ EditorModel.update = function(self)
 		end
 	end
 	self.graphicEngine:update()
+
+	if self.selectRect then
+		local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+		self.selectRect[2] = noteSkin:getTimePosition(self.timer:getTime() - self.selectStartTime) * self.speed
+		self.selectRect[3] = mx
+		self.selectRect[4] = my
+		self.graphicEngine:updateSelectedNotes()
+		just.select(self.selectRect[1], self.selectRect[2], mx, my)
+	end
 
 	local dtp = ld:getDynamicTimePointAbsolute(192, self.timer:getTime())
 	if self.grabbedIntervalData then

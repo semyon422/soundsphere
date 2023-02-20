@@ -238,6 +238,8 @@ SnapGridView.drawUI = function(self, w, h)
 		editorModel:scrollTimePoint(dtp.prev)
 	end
 
+	editorModel.tool = imgui.combo("tool select", editorModel.tool, editorModel.tools, nil, "tool")
+
 	local intervalData = dtp._intervalData
 	local grabbedIntervalData = editorModel.grabbedIntervalData
 	if not grabbedIntervalData then

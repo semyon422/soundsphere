@@ -6,18 +6,10 @@ local RhythmView = Class:new()
 
 RhythmView.mode = "default"
 
-RhythmView.fillChords = function(self)
-	for _, noteDrawer in ipairs(self.game.rhythmModel.graphicEngine.noteDrawers) do
-		for i = noteDrawer.endNoteIndex, noteDrawer.startNoteIndex, -1 do
-			self:fillChord(noteDrawer.notes[i])
-		end
-	end
-end
-
-RhythmView.drawNotes = function(self)
+RhythmView.processNotes = function(self, f)
 	for _, noteDrawer in ipairs(self.game.rhythmModel.graphicEngine.noteDrawers) do
 		for i = noteDrawer.startNoteIndex, noteDrawer.endNoteIndex do
-			self:drawNote(noteDrawer.notes[i])
+			f(self, noteDrawer.notes[i])
 		end
 	end
 end
@@ -57,6 +49,23 @@ RhythmView.drawNote = function(self, note)
 	end
 end
 
+RhythmView.drawSelected = function(self, note)
+	local noteSkin = self.game.noteSkinModel.noteSkin
+
+	for j = 1, noteSkin:check(note) or 0 do
+		local noteView = NoteViewFactory:getNoteView(note, self.mode)
+		-- if noteView and noteView.drawSelected then
+		if noteView and noteView.drawSelected and note.selected then
+			noteView.index = j
+			noteView.chords = self.chords
+			noteView.noteSkin = noteSkin
+			noteView.graphicalNote = note
+			noteView.rhythmView = self
+			noteView:drawSelected()
+		end
+	end
+end
+
 RhythmView.pressNote = function(self, noteData) end
 
 RhythmView.draw = function(self)
@@ -65,10 +74,10 @@ RhythmView.draw = function(self)
 
 	self.chords = {}
 	if self.mode == "default" then
-		self:fillChords()
+		self:processNotes(self.fillChord)
 	end
 
-	self:drawNotes()
+	self:processNotes(self.drawNote)
 
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	local blendModes = noteSkin.blendModes
@@ -85,6 +94,8 @@ RhythmView.draw = function(self)
 			love.graphics.setBlendMode("alpha")
 		end
 	end
+
+	self:processNotes(self.drawSelected)
 end
 
 return RhythmView
