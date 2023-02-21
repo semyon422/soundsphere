@@ -70,8 +70,11 @@ Random.getMap = function(self, config)
 		end
 
 		map[inputType] = {}
-
 		local submap = map[inputType]
+		for i = 1, inputMode[inputType] do
+			submap[i] = i
+		end
+
 		for i = 1, #subInputs do
 			local index = math.random(1, #availableIndices)
 			submap[subInputs[i]] = availableIndices[index]
