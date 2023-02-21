@@ -38,12 +38,28 @@ GraphicEngine.selectEnd = function(self)
 	self.selecting = false
 end
 
-GraphicEngine.selectNote = function(self, note)
-	if note.selected then
+GraphicEngine.selectNote = function(self, note, keepOthers)
+	if not note.selected then
+		if not keepOthers then
+			for _, _note in ipairs(self.notes) do
+				_note.selected = false
+			end
+			self.selectedNotes = {}
+		end
+		note.selected = true
+		table.insert(self.selectedNotes, note)
 		return
 	end
-	note.selected = true
-	table.insert(self.selectedNotes, note)
+	if not keepOthers then
+		return
+	end
+	note.selected = false
+	for i, _note in ipairs(self.selectedNotes) do
+		if note == _note then
+			table.remove(self.selectedNotes, i)
+			break
+		end
+	end
 end
 
 GraphicEngine.update = function(self)

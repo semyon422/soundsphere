@@ -147,7 +147,7 @@ EditorModel.dropIntervalData = function(self)
 end
 
 EditorModel.selectNote = function(self, note)
-	self.graphicEngine:selectNote(note)
+	self.graphicEngine:selectNote(note, love.keyboard.isDown("lctrl"))
 end
 
 EditorModel.grabNotes = function(self, part)
