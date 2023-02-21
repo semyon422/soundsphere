@@ -38,6 +38,14 @@ GraphicEngine.selectEnd = function(self)
 	self.selecting = false
 end
 
+GraphicEngine.selectNote = function(self, note)
+	if note.selected then
+		return
+	end
+	note.selected = true
+	table.insert(self.selectedNotes, note)
+end
+
 GraphicEngine.update = function(self)
 	local editorModel = self.editorModel
 	local layerData = editorModel.layerData
@@ -100,7 +108,9 @@ GraphicEngine.update = function(self)
 		end
 	end
 
-	table.insert(newNotes, editorModel.grabbedNote)
+	for _, note in ipairs(editorModel.grabbedNotes) do
+		table.insert(newNotes, note)
+	end
 	for _, note in ipairs(newNotes) do
 		note:update()
 	end

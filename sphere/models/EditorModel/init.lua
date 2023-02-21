@@ -20,6 +20,7 @@ EditorModel.construct = function(self)
 	self.audioManager.timer = self.timer
 	self.graphicEngine = GraphicEngine:new()
 	self.graphicEngine.editorModel = self
+	self.grabbedNotes = {}
 end
 
 EditorModel.load = function(self)
@@ -145,60 +146,74 @@ EditorModel.dropIntervalData = function(self)
 	self.grabbedIntervalData = nil
 end
 
-EditorModel.grabNote = function(self, note, part)
-	self.grabbedNote = note
-	self.grabbedNotePart = part
-	self:removeNote(note)
+EditorModel.selectNote = function(self, note)
+	self.graphicEngine:selectNote(note)
+end
 
+EditorModel.grabNotes = function(self, part)
+	local noteSkin = self.game.noteSkinModel.noteSkin
+
+	self.grabbedNotes = {}
+
+	local column = self:getColumnOver()
 	local t = self:getMouseTime()
-	if note.noteType == "ShortNote" then
-		self.grabbedDeltaTime = t - note.startNoteData.timePoint.absoluteTime
-		note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
-	elseif note.noteType == "LongNote" then
-		if self.grabbedNotePart == "head" then
-			self.grabbedDeltaTime = t - note.startNoteData.timePoint.absoluteTime
+	for _, note in ipairs(self.graphicEngine.selectedNotes) do
+		table.insert(self.grabbedNotes, note)
+		self:removeNote(note)
+
+		note.grabbedPart = part
+
+		local _column = noteSkin:getInputColumn(note.inputType, note.inputIndex)
+		note.grabbedDeltaColumn = column - _column
+
+		if note.noteType == "ShortNote" then
+			note.grabbedDeltaTime = t - note.startNoteData.timePoint.absoluteTime
 			note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
-		elseif self.grabbedNotePart == "tail" then
-			self.grabbedDeltaTime = t - note.endNoteData.timePoint.absoluteTime
-			note.endNoteData.timePoint = note.endNoteData.timePoint:clone()
-		elseif self.grabbedNotePart == "body" then
-			self.grabbedDeltaTime = {
-				t - note.startNoteData.timePoint.absoluteTime,
-				t - note.endNoteData.timePoint.absoluteTime,
-			}
-			note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
-			note.endNoteData.timePoint = note.endNoteData.timePoint:clone()
+		elseif note.noteType == "LongNote" then
+			if part == "head" then
+				note.grabbedDeltaTime = t - note.startNoteData.timePoint.absoluteTime
+				note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
+			elseif part == "tail" then
+				note.grabbedDeltaTime = t - note.endNoteData.timePoint.absoluteTime
+				note.endNoteData.timePoint = note.endNoteData.timePoint:clone()
+			elseif part == "body" then
+				note.grabbedDeltaTime = {
+					t - note.startNoteData.timePoint.absoluteTime,
+					t - note.endNoteData.timePoint.absoluteTime,
+				}
+				note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
+				note.endNoteData.timePoint = note.endNoteData.timePoint:clone()
+			end
 		end
 	end
 end
 
-EditorModel.dropNote = function(self)
+EditorModel.dropNotes = function(self)
 	local ld = self.layerData
-	local note = self.grabbedNote
 
 	local time = self:getMouseTime()
-	if note.noteType == "ShortNote" then
-		local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - self.grabbedDeltaTime)
-		note.startNoteData.timePoint = ld:checkTimePoint(dtp)
-	elseif note.noteType == "LongNote" then
-		if self.grabbedNotePart == "head" then
-			local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - self.grabbedDeltaTime)
+	for _, note in ipairs(self.grabbedNotes) do
+		if note.noteType == "ShortNote" then
+			local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - note.grabbedDeltaTime)
 			note.startNoteData.timePoint = ld:checkTimePoint(dtp)
-		elseif self.grabbedNotePart == "tail" then
-			local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - self.grabbedDeltaTime)
-			note.endNoteData.timePoint = ld:checkTimePoint(dtp)
-		elseif self.grabbedNotePart == "body" then
-			local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - self.grabbedDeltaTime[1])
-			note.startNoteData.timePoint = ld:checkTimePoint(dtp)
-			local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - self.grabbedDeltaTime[2])
-			note.endNoteData.timePoint = ld:checkTimePoint(dtp)
+		elseif note.noteType == "LongNote" then
+			if note.grabbedPart == "head" then
+				local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - note.grabbedDeltaTime)
+				note.startNoteData.timePoint = ld:checkTimePoint(dtp)
+			elseif note.grabbedPart == "tail" then
+				local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - note.grabbedDeltaTime)
+				note.endNoteData.timePoint = ld:checkTimePoint(dtp)
+			elseif note.grabbedPart == "body" then
+				local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - note.grabbedDeltaTime[1])
+				note.startNoteData.timePoint = ld:checkTimePoint(dtp)
+				local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - note.grabbedDeltaTime[2])
+				note.endNoteData.timePoint = ld:checkTimePoint(dtp)
+			end
 		end
-	end
 
-	self:_addNote(note)
-	self.grabbedNote = nil
-	self.grabbedNotePart = nil
-	self.grabbedTime = nil
+		self:_addNote(note)
+	end
+	self.grabbedNotes = {}
 end
 
 EditorModel.removeNote = function(self, note)
@@ -263,26 +278,26 @@ EditorModel.update = function(self)
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	local ld = self.layerData
 
-	local grabbedNote = self.grabbedNote
-	if grabbedNote then
+	for _, note in ipairs(self.grabbedNotes) do
 		local time = self:getMouseTime()
-		if grabbedNote.noteType == "ShortNote" then
-			ld:getDynamicTimePointAbsolute(192, time - self.grabbedDeltaTime):clone(grabbedNote.startNoteData.timePoint)
-		elseif grabbedNote.noteType == "LongNote" then
-			if self.grabbedNotePart == "head" then
-				ld:getDynamicTimePointAbsolute(192, time - self.grabbedDeltaTime):clone(grabbedNote.startNoteData.timePoint)
-			elseif self.grabbedNotePart == "tail" then
-				ld:getDynamicTimePointAbsolute(192, time - self.grabbedDeltaTime):clone(grabbedNote.endNoteData.timePoint)
-			elseif self.grabbedNotePart == "body" then
-				ld:getDynamicTimePointAbsolute(192, time - self.grabbedDeltaTime[1]):clone(grabbedNote.startNoteData.timePoint)
-				ld:getDynamicTimePointAbsolute(192, time - self.grabbedDeltaTime[2]):clone(grabbedNote.endNoteData.timePoint)
+		if note.noteType == "ShortNote" then
+			ld:getDynamicTimePointAbsolute(192, time - note.grabbedDeltaTime):clone(note.startNoteData.timePoint)
+		elseif note.noteType == "LongNote" then
+			if note.grabbedPart == "head" then
+				ld:getDynamicTimePointAbsolute(192, time - note.grabbedDeltaTime):clone(note.startNoteData.timePoint)
+			elseif note.grabbedPart == "tail" then
+				ld:getDynamicTimePointAbsolute(192, time - note.grabbedDeltaTime):clone(note.endNoteData.timePoint)
+			elseif note.grabbedPart == "body" then
+				ld:getDynamicTimePointAbsolute(192, time - note.grabbedDeltaTime[1]):clone(note.startNoteData.timePoint)
+				ld:getDynamicTimePointAbsolute(192, time - note.grabbedDeltaTime[2]):clone(note.endNoteData.timePoint)
 			end
 		end
 		local column = self:getColumnOver()
 		if column then
-			local inputType, inputIndex = unpack(self.inputMap[column])
-			grabbedNote.inputType = inputType
-			grabbedNote.inputIndex = inputIndex
+			column = column - note.grabbedDeltaColumn
+			local inputType, inputIndex = noteSkin:getColumnInput(column, true)
+			note.inputType = inputType
+			note.inputIndex = inputIndex
 		end
 	end
 	self.graphicEngine:update()

@@ -11,7 +11,8 @@ EditorRhythmView.processNote = function(self, note)
 		local over = just.mouse_over(note, note.over, "mouse")
 		if over then
 			if just.mousepressed(1) then
-				editorModel:grabNote(note)
+				editorModel:selectNote(note)
+				editorModel:grabNotes("body")
 			elseif just.mousepressed(2) then
 				editorModel:removeNote(note)
 			end
@@ -22,11 +23,14 @@ EditorRhythmView.processNote = function(self, note)
 		local tailOver = just.mouse_over(tostring(note) .. "tail", note.tailOver, "mouse")
 		if just.mousepressed(1) then
 			if bodyOver then
-				editorModel:grabNote(note, "body")
+				editorModel:selectNote(note)
+				editorModel:grabNotes("body")
 			elseif headOver then
-				editorModel:grabNote(note, "head")
+				editorModel:selectNote(note)
+				editorModel:grabNotes("head")
 			elseif tailOver then
-				editorModel:grabNote(note, "tail")
+				editorModel:selectNote(note)
+				editorModel:grabNotes("tail")
 			end
 		end
 		if (bodyOver or headOver or tailOver) and just.mousepressed(2) then
@@ -80,8 +84,8 @@ EditorRhythmView.draw = function(self)
 		self:processNote(note)
 	end
 	if just.mousereleased(1) then
-		if editorModel.grabbedNote then
-			editorModel:dropNote()
+		if next(editorModel.grabbedNotes) then
+			editorModel:dropNotes()
 		end
 		if editorModel.selectRect then
 			editorModel:selectEnd()

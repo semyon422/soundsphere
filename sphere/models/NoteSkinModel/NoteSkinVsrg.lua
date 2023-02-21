@@ -60,6 +60,29 @@ NoteSkinVsrg.setInput = function(self, columns)
 	self.inputsCount = #columns
 end
 
+NoteSkinVsrg.getInputColumn = function(self, inputType, inputIndex)
+	local input = inputType
+	if inputIndex then
+		input = inputType .. inputIndex
+	end
+	for i = 1, self.inputsCount do
+		if self.inputs[i] == input then
+			return i
+		end
+	end
+end
+
+NoteSkinVsrg.getColumnInput = function(self, column, split)
+	column = (column - 1) % self.inputsCount + 1
+	local input = self.inputs[column]
+	if not split then
+		return input
+	end
+
+	local inputType, inputIndex = input:match("^(.-)(%d+)$")
+	return inputType, tonumber(inputIndex)
+end
+
 local colors = {
 	transparent = {1, 1, 1, 0},
 	clear = {1, 1, 1, 1},
