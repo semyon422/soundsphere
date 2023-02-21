@@ -246,7 +246,7 @@ EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
 end
 
 EditorModel.selectStart = function(self)
-	self.graphicEngine:unselectNotes()
+	self.graphicEngine:selectStart()
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	self.selectRect = {mx, my, mx, my}
 	self.selectStartTime = self:getMouseTime()
@@ -254,6 +254,7 @@ EditorModel.selectStart = function(self)
 end
 
 EditorModel.selectEnd = function(self)
+	self.graphicEngine:selectEnd()
 	self.selectRect = nil
 	just.select()
 end
@@ -291,7 +292,6 @@ EditorModel.update = function(self)
 		self.selectRect[2] = noteSkin:getTimePosition(self.timer:getTime() - self.selectStartTime) * self.speed
 		self.selectRect[3] = mx
 		self.selectRect[4] = my
-		self.graphicEngine:updateSelectedNotes()
 		just.select(self.selectRect[1], self.selectRect[2], mx, my)
 	end
 

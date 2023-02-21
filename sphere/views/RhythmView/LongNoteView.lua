@@ -1,6 +1,6 @@
 local ShortNoteView = require("sphere.views.RhythmView.ShortNoteView")
-local math_util = require("math_util")
 local gfx_util = require("gfx_util")
+local just = require("just")
 
 local LongNoteView = ShortNoteView:new()
 
@@ -29,24 +29,59 @@ LongNoteView.draw = function(self)
 
 	local hw = self:getNotePart("Head")
 	local tw = self:getNotePart("Tail")
-	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+
+	local note = self.graphicalNote
 
 	local tf = gfx_util.transform(self:getHeadTransformParams())
-	local x, y = tf:inverseTransformPoint(mx, my)
 	local w, h = hw:getDimensions()
-	self.graphicalNote.headOver = math_util.belong(x, 0, w) and math_util.belong(y, 0, h)
+	love.graphics.push()
+	love.graphics.applyTransform(tf)
+	note.headOver = just.is_over(w, h)
+	note.headSelecting = just.is_selected(w, h)
+	love.graphics.pop()
 
 	local tf = gfx_util.transform(self:getTailTransformParams())
-	local x, y = tf:inverseTransformPoint(mx, my)
 	local w, h = tw:getDimensions()
-	self.graphicalNote.tailOver = math_util.belong(x, 0, w) and math_util.belong(y, 0, h)
+	love.graphics.push()
+	love.graphics.applyTransform(tf)
+	note.tailOver = just.is_over(w, h)
+	note.tailSelecting = just.is_selected(w, h)
+	love.graphics.pop()
 
 	local tf = gfx_util.transform(self:getBodyTransformParams())
-	local x, y = tf:inverseTransformPoint(mx, my)
 	local _, _, w, h = self.bodyQuad:getViewport()
-	self.graphicalNote.bodyOver = math_util.belong(x, 0, w) and math_util.belong(y, 0, h)
+	love.graphics.push()
+	love.graphics.applyTransform(tf)
+	note.bodyOver = just.is_over(w, h)
+	note.bodySelecting = just.is_selected(w, h)
+	love.graphics.pop()
 
-	self.graphicalNote.over = self.graphicalNote.headOver or self.graphicalNote.tailOver or self.graphicalNote.bodyOver
+	self.graphicalNote.over = note.headOver or note.tailOver or note.bodyOver
+	self.graphicalNote.selecting = note.headSelecting or note.tailSelecting or note.bodySelecting
+end
+
+LongNoteView.drawSelected = function(self)
+	local hw = self:getNotePart("Head")
+	local w, h = hw:getDimensions()
+
+	local tf = gfx_util.transform(self:getTransformParams())
+	local x, y = tf:transformPoint(0, 0)
+	local _w, _h = tf:transformPoint(w, h)
+
+	local tw = self:getNotePart("Tail")
+	local w, h = tw:getDimensions()
+
+	local tf = gfx_util.transform(self:getTailTransformParams())
+	local x1, y1 = tf:transformPoint(0, 0)
+	local _w1, _h1 = tf:transformPoint(w, h)
+
+	local ymin = math.min(y, _h, y1, _h1)
+	local ymax = math.max(y, _h, y1, _h1)
+
+	love.graphics.setColor(1, 1, 1, 0.2)
+	love.graphics.rectangle("fill", x, ymin, _w - x, ymax - ymin)
+	love.graphics.setColor(1, 1, 1)
+	love.graphics.rectangle("line", x, ymin, _w - x, ymax - ymin)
 end
 
 LongNoteView.fillChords = function(self, chords, column)

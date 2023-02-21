@@ -28,7 +28,6 @@ ShortNoteView.draw = function(self)
 	love.graphics.applyTransform(tf)
 	self.graphicalNote.over = just.is_over(w, h)
 	self.graphicalNote.selecting = just.is_selected(w, h)
-	-- self.graphicalNote.selected = self.graphicalNote.selected or just.is_selected(w, h)
 	love.graphics.pop()
 end
 
@@ -36,12 +35,9 @@ ShortNoteView.drawSelected = function(self)
 	local hw = self:getNotePart("Head")
 	local w, h = hw:getDimensions()
 
-	love.graphics.push("all")
 	local tf = gfx_util.transform(self:getTransformParams())
-
 	local x, y = tf:transformPoint(0, 0)
 	local _w, _h = tf:transformPoint(w, h)
-	love.graphics.pop()
 
 	love.graphics.setColor(1, 1, 1, 0.2)
 	love.graphics.rectangle("fill", x, y, _w - x, _h - y)

@@ -26,17 +26,16 @@ GraphicEngine.getVisualTimeRate = function(self)
 	return self.editorModel.speed
 end
 
-GraphicEngine.unselectNotes = function(self)
+GraphicEngine.selectStart = function(self)
 	for _, note in ipairs(self.notes) do
 		note.selected = false
 	end
 	self.selectedNotes = {}
+	self.selecting = true
 end
 
-GraphicEngine.updateSelectedNotes = function(self)
-	for _, note in ipairs(self.notes) do
-		note.selected = note.selecting
-	end
+GraphicEngine.selectEnd = function(self)
+	self.selecting = false
 end
 
 GraphicEngine.update = function(self)
@@ -54,14 +53,26 @@ GraphicEngine.update = function(self)
 		notesMap[note.startNoteData] = note
 		if note.selecting then
 			selectedNotesMap[note.startNoteData] = note
+		elseif self.selecting then
+			note.selected = false
+			selectedNotesMap[note.startNoteData] = nil
+		end
+	end
+
+	if self.selecting then
+		for _, note in ipairs(self.notes) do
+			note.selected = note.selecting
+			if not note.selected then
+				selectedNotesMap[note.startNoteData] = nil
+			end
 		end
 	end
 
 	local newSelectedNotes = {}
+	self.selectedNotes = newSelectedNotes
 	for _, note in pairs(selectedNotesMap) do
 		table.insert(newSelectedNotes, note)
 	end
-	self.selectedNotes = newSelectedNotes
 
 	local newNotes = {}
 	self.notes = newNotes
