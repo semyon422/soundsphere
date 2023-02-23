@@ -363,7 +363,7 @@ SnapGridView.draw = function(self)
 	if love.keyboard.isDown("lalt") and drag("drag1", width, h) then
 		local a = noteSkin:getInverseTimePosition(_my)
 		local b = noteSkin:getInverseTimePosition(prevMouseY)
-		editorModel:scrollSecondsDelta(a - b)
+		editorModel:scrollSecondsDelta((a - b) / editorModel.speed)
 		if editorModel.timer.isPlaying then
 			editorModel:pause()
 			self.dragging = true
