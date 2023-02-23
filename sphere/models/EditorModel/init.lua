@@ -92,6 +92,19 @@ EditorModel.loadResources = function(self)
 	print("loaded")
 end
 
+EditorModel.getDtpAbsolute = function(self, time, snapped)
+	local ld = self.layerData
+
+	local snap = self.snap
+	if ld.mode == "measure" then
+		local dtp = ld:getDynamicTimePointAbsolute(192, time)
+		local measureOffset = dtp.measureTime:floor()
+		snap = ld:getSignature(measureOffset) * snap
+	end
+
+	return ld:getDynamicTimePointAbsolute(snapped and snap or 192, time)
+end
+
 EditorModel.unload = function(self)
 	for _, _audio in ipairs(self.sources) do
 		_audio:release()
@@ -158,31 +171,33 @@ EditorModel.grabNotes = function(self, part)
 	local column = self:getColumnOver()
 	local t = self:getMouseTime()
 	for _, note in ipairs(self.graphicEngine.selectedNotes) do
-		table.insert(self.grabbedNotes, note)
-		self:removeNote(note)
-
-		note.grabbedPart = part
-
 		local _column = noteSkin:getInputColumn(note.inputType, note.inputIndex)
-		note.grabbedDeltaColumn = column - _column
+		if _column then
+			table.insert(self.grabbedNotes, note)
+			self:removeNote(note)
 
-		if note.noteType == "ShortNote" then
-			note.grabbedDeltaTime = t - note.startNoteData.timePoint.absoluteTime
-			note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
-		elseif note.noteType == "LongNote" then
-			if part == "head" then
+			note.grabbedPart = part
+
+			note.grabbedDeltaColumn = column - _column
+
+			if note.noteType == "ShortNote" then
 				note.grabbedDeltaTime = t - note.startNoteData.timePoint.absoluteTime
 				note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
-			elseif part == "tail" then
-				note.grabbedDeltaTime = t - note.endNoteData.timePoint.absoluteTime
-				note.endNoteData.timePoint = note.endNoteData.timePoint:clone()
-			elseif part == "body" then
-				note.grabbedDeltaTime = {
-					t - note.startNoteData.timePoint.absoluteTime,
-					t - note.endNoteData.timePoint.absoluteTime,
-				}
-				note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
-				note.endNoteData.timePoint = note.endNoteData.timePoint:clone()
+			elseif note.noteType == "LongNote" then
+				if part == "head" then
+					note.grabbedDeltaTime = t - note.startNoteData.timePoint.absoluteTime
+					note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
+				elseif part == "tail" then
+					note.grabbedDeltaTime = t - note.endNoteData.timePoint.absoluteTime
+					note.endNoteData.timePoint = note.endNoteData.timePoint:clone()
+				elseif part == "body" then
+					note.grabbedDeltaTime = {
+						t - note.startNoteData.timePoint.absoluteTime,
+						t - note.endNoteData.timePoint.absoluteTime,
+					}
+					note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
+					note.endNoteData.timePoint = note.endNoteData.timePoint:clone()
+				end
 			end
 		end
 	end
@@ -194,19 +209,19 @@ EditorModel.dropNotes = function(self)
 	local time = self:getMouseTime()
 	for _, note in ipairs(self.grabbedNotes) do
 		if note.noteType == "ShortNote" then
-			local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - note.grabbedDeltaTime)
+			local dtp = self:getDtpAbsolute(time - note.grabbedDeltaTime, true)
 			note.startNoteData.timePoint = ld:checkTimePoint(dtp)
 		elseif note.noteType == "LongNote" then
 			if note.grabbedPart == "head" then
-				local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - note.grabbedDeltaTime)
+				local dtp = self:getDtpAbsolute(time - note.grabbedDeltaTime, true)
 				note.startNoteData.timePoint = ld:checkTimePoint(dtp)
 			elseif note.grabbedPart == "tail" then
-				local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - note.grabbedDeltaTime)
+				local dtp = self:getDtpAbsolute(time - note.grabbedDeltaTime, true)
 				note.endNoteData.timePoint = ld:checkTimePoint(dtp)
 			elseif note.grabbedPart == "body" then
-				local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - note.grabbedDeltaTime[1])
+				local dtp = self:getDtpAbsolute(time - note.grabbedDeltaTime[1], true)
 				note.startNoteData.timePoint = ld:checkTimePoint(dtp)
-				local dtp = ld:getDynamicTimePointAbsolute(self.snap, time - note.grabbedDeltaTime[2])
+				local dtp = self:getDtpAbsolute(time - note.grabbedDeltaTime[2], true)
 				note.endNoteData.timePoint = ld:checkTimePoint(dtp)
 			end
 		end
@@ -235,13 +250,13 @@ end
 EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
 	local ld = self.layerData
 	if self.tool == "ShortNote" then
-		local dtp = ld:getDynamicTimePointAbsolute(self.snap, absoluteTime)
+		local dtp = self:getDtpAbsolute(absoluteTime, true)
 		local noteData = ld:getNoteData(dtp, inputType, inputIndex)
 		if noteData then
 			noteData.noteType = "ShortNote"
 		end
 	elseif self.tool == "LongNote" then
-		local dtp = ld:getDynamicTimePointAbsolute(self.snap, absoluteTime)
+		local dtp = self:getDtpAbsolute(absoluteTime, true)
 		local startNoteData = ld:getNoteData(dtp, inputType, inputIndex)
 		if not startNoteData then
 			return
@@ -281,15 +296,15 @@ EditorModel.update = function(self)
 	for _, note in ipairs(self.grabbedNotes) do
 		local time = self:getMouseTime()
 		if note.noteType == "ShortNote" then
-			ld:getDynamicTimePointAbsolute(192, time - note.grabbedDeltaTime):clone(note.startNoteData.timePoint)
+			self:getDtpAbsolute(time - note.grabbedDeltaTime):clone(note.startNoteData.timePoint)
 		elseif note.noteType == "LongNote" then
 			if note.grabbedPart == "head" then
-				ld:getDynamicTimePointAbsolute(192, time - note.grabbedDeltaTime):clone(note.startNoteData.timePoint)
+				self:getDtpAbsolute(time - note.grabbedDeltaTime):clone(note.startNoteData.timePoint)
 			elseif note.grabbedPart == "tail" then
-				ld:getDynamicTimePointAbsolute(192, time - note.grabbedDeltaTime):clone(note.endNoteData.timePoint)
+				self:getDtpAbsolute(time - note.grabbedDeltaTime):clone(note.endNoteData.timePoint)
 			elseif note.grabbedPart == "body" then
-				ld:getDynamicTimePointAbsolute(192, time - note.grabbedDeltaTime[1]):clone(note.startNoteData.timePoint)
-				ld:getDynamicTimePointAbsolute(192, time - note.grabbedDeltaTime[2]):clone(note.endNoteData.timePoint)
+				self:getDtpAbsolute(time - note.grabbedDeltaTime[1]):clone(note.startNoteData.timePoint)
+				self:getDtpAbsolute(time - note.grabbedDeltaTime[2]):clone(note.endNoteData.timePoint)
 			end
 		end
 		local column = self:getColumnOver()
@@ -304,13 +319,13 @@ EditorModel.update = function(self)
 
 	if self.selectRect then
 		local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-		self.selectRect[2] = noteSkin:getTimePosition(self.timer:getTime() - self.selectStartTime) * self.speed
+		self.selectRect[2] = noteSkin:getTimePosition((self.timer:getTime() - self.selectStartTime) * self.speed)
 		self.selectRect[3] = mx
 		self.selectRect[4] = my
 		just.select(self.selectRect[1], self.selectRect[2], mx, my)
 	end
 
-	local dtp = ld:getDynamicTimePointAbsolute(192, self.timer:getTime())
+	local dtp = self:getDtpAbsolute(self.timer:getTime())
 	if self.grabbedIntervalData then
 		ld:moveInterval(self.grabbedIntervalData, dtp.absoluteTime)
 	end
@@ -356,7 +371,7 @@ EditorModel.updateRange = function(self)
 		return
 	end
 
-	local dtp = ld:getDynamicTimePointAbsolute(192, absoluteTime)
+	local dtp = self:getDtpAbsolute(absoluteTime)
 	local measureOffset = dtp.measureTime:floor()
 
 	local delta = 2
@@ -401,8 +416,7 @@ EditorModel.scrollTimePoint = function(self, timePoint)
 end
 
 EditorModel.scrollSeconds = function(self, absoluteTime)
-	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(192, absoluteTime)
+	local dtp = self:getDtpAbsolute(absoluteTime)
 	self:scrollTimePoint(dtp)
 end
 
@@ -420,8 +434,7 @@ EditorModel.scrollSnaps = function(self, delta)
 end
 
 EditorModel.getNextSnapIntervalTime = function(self, absoluteTime, delta)
-	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(192, absoluteTime)
+	local dtp = self:getDtpAbsolute(absoluteTime)
 
 	local snap = self.snap
 	local snapTime = dtp.time * snap
@@ -464,7 +477,7 @@ end
 
 EditorModel.scrollSnapsMeasure = function(self, delta)
 	local ld = self.layerData
-	local dtp = ld:getDynamicTimePointAbsolute(192, self.timePoint.absoluteTime)
+	local dtp = self:getDtpAbsolute(self.timePoint.absoluteTime)
 
 	local measureOffset = dtp.measureTime:floor()
 	local signature = ld:getSignature(measureOffset)
