@@ -53,7 +53,9 @@ EditorController.save = function(self)
 	local exp = NoteChartExporter:new()
 	exp.noteChart = noteChartModel.noteChart
 
-	love.filesystem.write(noteChartModel.noteChartEntry.path, exp:export())
+	local path = noteChartModel.noteChartEntry.path:gsub(".sph$", "") .. ".sph"
+
+	love.filesystem.write(path, exp:export())
 end
 
 EditorController.receive = function(self, event)
