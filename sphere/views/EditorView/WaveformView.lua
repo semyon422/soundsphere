@@ -109,8 +109,12 @@ local function loadWaveform(self, w, h)
 		local newPointStart, newPointEnd = pointOffset - points, pointOffset + points - 1
 		if math_util.intersect1(pointStart, pointEnd, newPointStart, newPointEnd) then
 			adjustPoints(self, pointStart, newPointStart, points * 2, samplesPerPoint, channelCount)
+		else
+			renderedPointOffset = false
 		end
-	else
+	end
+
+	if not renderedPointOffset then
 		for j = 0, channelCount - 1 do
 			waveformPoints[j] = getPointList(self, points * 2, pointOffset - points, samplesPerPoint, j)
 		end
