@@ -148,6 +148,11 @@ return function(self)
 		return
 	end
 
+	local waveform = self.game.configModel.configs.settings.editor.waveform
+	if waveform.opacity == 0 or waveform.scale == 0 then
+		return
+	end
+
 	local channelCount = soundData:getChannelCount()
 
 	local noteSkin = self.game.noteSkinModel.noteSkin
@@ -155,6 +160,9 @@ return function(self)
 
 	love.graphics.push("all")
 	love.graphics.setLineJoin("none")
+	love.graphics.setLineStyle("smooth")
+	love.graphics.setLineWidth(1)
+	love.graphics.setColor(1, 1, 1, waveform.opacity)
 
 	love.graphics.replaceTransform(gfx_util.transform(self.transform))
 	love.graphics.translate(noteSkin.baseOffset, noteSkin.hitposition)
@@ -163,7 +171,10 @@ return function(self)
 	for j = 0, channelCount - 1 do
 		local waveformLine = waveformLines[j]
 		if #waveformLine >= 4 then
+			love.graphics.push()
+			love.graphics.scale(waveform.scale, 1)
 			love.graphics.line(waveformLine)
+			love.graphics.pop()
 		end
 		love.graphics.translate(noteSkin.fullWidth, 0)
 	end

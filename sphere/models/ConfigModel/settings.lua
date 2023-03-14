@@ -14,6 +14,12 @@ return {
 			music = 1
 		}
 	},
+	editor = {
+		waveform = {
+			opacity = 0.5,
+			scale = 0.5
+		},
+	},
 	gameplay = {
 		bga = {
 			image = false,
