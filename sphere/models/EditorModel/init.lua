@@ -57,6 +57,8 @@ EditorModel.load = function(self)
 	self.lastTime = ld.ranges.timePoint.last.absoluteTime
 
 	self.timer:reset()
+
+	self.audioManager.volume = self.game.configModel.configs.settings.audio.volume
 	self.audioManager:load()
 
 	self:scrollSeconds(self.timer:getTime())
@@ -86,6 +88,7 @@ EditorModel.loadResources = function(self)
 							soundData = soundData,
 							audio = _audio,
 							name = s[1],
+							isStream = noteData.stream,
 						})
 						table.insert(self.sources, _audio)
 						self.lastTime = math.max(self.lastTime, offset + duration)

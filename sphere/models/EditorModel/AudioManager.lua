@@ -26,6 +26,11 @@ AudioManager.update = function(self, force)
 		end
 		if isPlaying then
 			source.audio:play()
+			if source.isStream then
+				source.audio:setVolume(self.volume.master * self.volume.music)
+			else
+				source.audio:setVolume(self.volume.master * self.volume.effects)
+			end
 		end
 	end
 	for source in pairs(self.sources) do
