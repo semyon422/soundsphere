@@ -10,10 +10,6 @@ local Layout = require("sphere.views.EditorView.Layout")
 
 local SnapGridView = Class:new()
 
-SnapGridView.waveformEnabled = true
-SnapGridView.notesEnabled = true
-SnapGridView.timingEnabled = true
-
 local function getTimingText(timePoint)
 	local out = {}
 	if timePoint._tempoData then
@@ -212,10 +208,6 @@ SnapGridView.drawUI = function(self, w, h)
 		just.text("snap: " .. tostring(snapTime))
 	end
 
-	self.waveformEnabled = imgui.checkbox("waveformEnabled", self.waveformEnabled, "waveform")
-	self.notesEnabled = imgui.checkbox("notesEnabled", self.notesEnabled, "notes")
-	self.timingEnabled = imgui.checkbox("timingEnabled", self.timingEnabled, "timing")
-
 	if imgui.button("add object", "add") then
 		self.game.gameView:setModal(require("sphere.views.EditorView.AddTimingObjectView"))
 	end
@@ -346,15 +338,7 @@ SnapGridView.draw = function(self)
 
 	love.graphics.push()
 	self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime, width)
-	if self.notesEnabled then
-		-- self:drawNotes(width, h)
-	end
-	if self.waveformEnabled then
-		-- self:drawWaveform(width, h)
-	end
-	if self.timingEnabled then
-		self:drawTimings(width, h)
-	end
+	self:drawTimings(width, h)
 
 	love.graphics.translate(width + 40, 0)
 	self:drawTimingObjects("absoluteTime", editorTimePoint.absoluteTime, 500, 50, "left", getVelocityText)
