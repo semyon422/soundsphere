@@ -62,6 +62,18 @@ return function(layerData)
 	end
 	newLayerData.noteDatas = layerData.noteDatas
 
+	for _, velocityData in ipairs(layerData.velocityDatas) do
+		velocityData.timePoint = timePointMap[velocityData.timePoint]
+		velocityData.timePoint._velocityData = velocityData
+	end
+	newLayerData.velocityDatas = layerData.velocityDatas
+
+	for _, expandData in ipairs(layerData.expandDatas) do
+		expandData.timePoint = timePointMap[expandData.timePoint]
+		expandData.timePoint._expandData = expandData
+	end
+	newLayerData.expandDatas = layerData.expandDatas
+
 	newLayerData:compute()
 
 	return newLayerData
