@@ -40,10 +40,12 @@ EditorModel.load = function(self)
 	self.columns = nc.inputMode:getColumns()
 	self.inputMap = nc.inputMode:getInputMap()
 
+	self.soundData = nil
+	self.soundDataOffset = 0
+
 	local audioPath = noteChartModel.noteChartEntry.path:match("^(.+)/.-$") .. "/" .. nc.metaData.audioPath
 	if love.filesystem.getInfo(audioPath, "file") then
 		self.soundData = love.sound.newSoundData(audioPath)
-		self.soundDataOffset = 0
 	end
 
 	self.timePoint = ld:newTimePoint()
