@@ -42,8 +42,8 @@ Screenshot.receive = function(self, event)
 	end
 
 	local settings = self.game.configModel.configs.settings
-	if event[1] == settings.input.screenshotCapture then
-		self.needOpen = love.keyboard.isDown(settings.input.screenshotOpen)
+	if event[1] == settings.input.screenshot.capture then
+		self.needOpen = love.keyboard.isDown(settings.input.screenshot.open)
 		self:capture()
 	end
 end
