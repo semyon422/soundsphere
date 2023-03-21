@@ -123,8 +123,8 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 				measureData = timePoint.measureData
 				intervalData, time = measureData.timePoint:add(-measureData.start + Fraction(1, snap))
 				timePoint = ld:getDynamicTimePoint(intervalData, time)
-				drawNothing = timePoint.measureData ~= measureData
 				if not timePoint or not timePoint[field] then break end
+				drawNothing = timePoint.measureData ~= measureData
 			end
 
 			if not drawNothing then
