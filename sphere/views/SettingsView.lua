@@ -26,7 +26,6 @@ local r = 8
 
 local window_id = "settings window"
 
-local drawTabs
 local drawSection = {}
 
 local function draw(self)
@@ -47,10 +46,9 @@ local function draw(self)
 
 	just.push()
 
-	drawTabs()
+	currentSection = imgui.tabs("settings tabs", currentSection, sections)
 	imgui.Container(window_id, w, h - _h, _h / 3, _h * 2, scrollY)
 
-	just.emptyline(8)
 	drawSection[currentSection](self)
 	just.emptyline(8)
 
@@ -59,23 +57,6 @@ local function draw(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.rectangle("line", 0, 0, w, h, r)
-end
-
-function drawTabs()
-	just.row(true)
-	for _, section in ipairs(sections) do
-		if section == currentSection then
-			love.graphics.setColor(1, 1, 1, 0.1)
-			love.graphics.rectangle("fill", 0, 0, w / #sections, _h)
-		end
-		love.graphics.setColor(1, 1, 1, 1)
-		if imgui.TextOnlyButton("section " .. section, section, w / #sections, _h) then
-			currentSection = section
-			scrollY = 0
-		end
-	end
-	just.row()
-	love.graphics.line(0, 0, w, 0)
 end
 
 local function intButtonsMs(id, v, label)
