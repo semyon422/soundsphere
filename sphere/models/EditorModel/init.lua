@@ -14,6 +14,8 @@ local EditorModel = Class:new()
 EditorModel.tools = {"Select", "ShortNote", "LongNote", "SoundNote"}
 EditorModel.tool = "Select"
 
+EditorModel.lockSnap = true
+
 EditorModel.construct = function(self)
 	self.timer = TimeManager:new()
 	self.audioManager = AudioManager:new()
@@ -191,23 +193,25 @@ EditorModel.grabNotes = function(self, part)
 
 			note.grabbedDeltaColumn = column - _column
 
-			if note.noteType == "ShortNote" then
-				note.grabbedDeltaTime = t - note.startNoteData.timePoint.absoluteTime
-				note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
-			elseif note.noteType == "LongNote" then
-				if part == "head" then
+			if not self.lockSnap then
+				if note.noteType == "ShortNote" then
 					note.grabbedDeltaTime = t - note.startNoteData.timePoint.absoluteTime
 					note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
-				elseif part == "tail" then
-					note.grabbedDeltaTime = t - note.endNoteData.timePoint.absoluteTime
-					note.endNoteData.timePoint = note.endNoteData.timePoint:clone()
-				elseif part == "body" then
-					note.grabbedDeltaTime = {
-						t - note.startNoteData.timePoint.absoluteTime,
-						t - note.endNoteData.timePoint.absoluteTime,
-					}
-					note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
-					note.endNoteData.timePoint = note.endNoteData.timePoint:clone()
+				elseif note.noteType == "LongNote" then
+					if part == "head" then
+						note.grabbedDeltaTime = t - note.startNoteData.timePoint.absoluteTime
+						note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
+					elseif part == "tail" then
+						note.grabbedDeltaTime = t - note.endNoteData.timePoint.absoluteTime
+						note.endNoteData.timePoint = note.endNoteData.timePoint:clone()
+					elseif part == "body" then
+						note.grabbedDeltaTime = {
+							t - note.startNoteData.timePoint.absoluteTime,
+							t - note.endNoteData.timePoint.absoluteTime,
+						}
+						note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
+						note.endNoteData.timePoint = note.endNoteData.timePoint:clone()
+					end
 				end
 			end
 		end
@@ -216,9 +220,18 @@ end
 
 EditorModel.dropNotes = function(self)
 	local ld = self.layerData
+	local grabbedNotes = self.grabbedNotes
+	self.grabbedNotes = {}
+
+	if self.lockSnap then
+		for _, note in ipairs(grabbedNotes) do
+			self:_addNote(note)
+		end
+		return
+	end
 
 	local time = self:getMouseTime()
-	for _, note in ipairs(self.grabbedNotes) do
+	for _, note in ipairs(grabbedNotes) do
 		if note.noteType == "ShortNote" then
 			local dtp = self:getDtpAbsolute(time - note.grabbedDeltaTime, true)
 			note.startNoteData.timePoint = ld:checkTimePoint(dtp)
@@ -239,7 +252,6 @@ EditorModel.dropNotes = function(self)
 
 		self:_addNote(note)
 	end
-	self.grabbedNotes = {}
 end
 
 EditorModel.removeNote = function(self, note)
@@ -306,16 +318,18 @@ EditorModel.update = function(self)
 
 	for _, note in ipairs(self.grabbedNotes) do
 		local time = self:getMouseTime()
-		if note.noteType == "ShortNote" then
-			self:getDtpAbsolute(time - note.grabbedDeltaTime):clone(note.startNoteData.timePoint)
-		elseif note.noteType == "LongNote" then
-			if note.grabbedPart == "head" then
+		if not self.lockSnap then
+			if note.noteType == "ShortNote" then
 				self:getDtpAbsolute(time - note.grabbedDeltaTime):clone(note.startNoteData.timePoint)
-			elseif note.grabbedPart == "tail" then
-				self:getDtpAbsolute(time - note.grabbedDeltaTime):clone(note.endNoteData.timePoint)
-			elseif note.grabbedPart == "body" then
-				self:getDtpAbsolute(time - note.grabbedDeltaTime[1]):clone(note.startNoteData.timePoint)
-				self:getDtpAbsolute(time - note.grabbedDeltaTime[2]):clone(note.endNoteData.timePoint)
+			elseif note.noteType == "LongNote" then
+				if note.grabbedPart == "head" then
+					self:getDtpAbsolute(time - note.grabbedDeltaTime):clone(note.startNoteData.timePoint)
+				elseif note.grabbedPart == "tail" then
+					self:getDtpAbsolute(time - note.grabbedDeltaTime):clone(note.endNoteData.timePoint)
+				elseif note.grabbedPart == "body" then
+					self:getDtpAbsolute(time - note.grabbedDeltaTime[1]):clone(note.startNoteData.timePoint)
+					self:getDtpAbsolute(time - note.grabbedDeltaTime[2]):clone(note.endNoteData.timePoint)
+				end
 			end
 		end
 		local column = self:getColumnOver()

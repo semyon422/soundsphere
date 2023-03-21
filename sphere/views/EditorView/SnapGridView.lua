@@ -160,6 +160,8 @@ SnapGridView.drawUI = function(self, w, h)
 		editorModel:updateRange()
 	end
 
+	editorModel.lockSnap = imgui.checkbox("lock snap", editorModel.lockSnap, "locks snap")
+
 	if ld.mode == "measure" then
 		just.row(true)
 		primaryTempo = imgui.input("primaryTempo input", primaryTempo, "primary tempo")
