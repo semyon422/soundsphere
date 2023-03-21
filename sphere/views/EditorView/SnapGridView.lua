@@ -141,126 +141,6 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 	love.graphics.setColor(1, 1, 1, 1)
 end
 
-local primaryTempo = "60"
-local defaultSignature = {"4", "1"}
-SnapGridView.drawUI = function(self, w, h)
-	local editorModel = self.game.editorModel
-	local ld = editorModel.layerData
-
-	local dtp = editorModel:getDynamicTimePoint()
-
-	just.push()
-
-	imgui.setSize(w, h, 200, 55)
-	editorModel.snap = imgui.slider1("snap select", editorModel.snap, "%d", 1, 16, 1, "snap")
-
-	local logSpeed = imgui.slider1("editor speed", editorModel:getLogSpeed(), "%d", -30, 50, 1, "speed")
-	if logSpeed ~= editorModel:getLogSpeed() then
-		editorModel:setLogSpeed(logSpeed)
-		editorModel:updateRange()
-	end
-
-	editorModel.lockSnap = imgui.checkbox("lock snap", editorModel.lockSnap, "locks snap")
-
-	if ld.mode == "measure" then
-		just.row(true)
-		primaryTempo = imgui.input("primaryTempo input", primaryTempo, "primary tempo")
-		if imgui.button("set primaryTempo button", "set") then
-			ld:setPrimaryTempo(tonumber(primaryTempo))
-		end
-		if imgui.button("unset primaryTempo button", "unset") then
-			ld:setPrimaryTempo(0)
-		end
-		just.row()
-
-		just.row(true)
-		imgui.label("set signature mode", "signature mode")
-		if imgui.button("set short signature button", "short") then
-			ld:setSignatureMode("short")
-		end
-		if imgui.button("set long signature button", "long") then
-			ld:setSignatureMode("long")
-		end
-		just.row()
-
-		imgui.setSize(w, h, 100, 55)
-		just.row(true)
-		defaultSignature[1] = imgui.input("defsig n input", defaultSignature[1])
-		imgui.unindent()
-		imgui.label("/ label", "/")
-		defaultSignature[2] = imgui.input("defsig d input", defaultSignature[2], "default signature")
-		if imgui.button("set defsig button", "set") then
-			ld:setDefaultSignature(Fraction(tonumber(defaultSignature[1]), tonumber(defaultSignature[2])))
-		end
-		just.row(false)
-		imgui.setSize(w, h, 200, 55)
-
-		just.text("primary tempo: " .. ld.primaryTempo)
-		just.text("signature mode: " .. ld.signatureMode)
-		just.text("default signature: " .. ld.defaultSignature)
-
-		local measureOffset = dtp.measureTime:floor()
-		local signature = ld:getSignature(measureOffset)
-		local snap = editorModel.snap
-
-		local beatTime = (dtp.measureTime - measureOffset) * signature
-		local snapTime = (beatTime - beatTime:floor()) * snap
-
-		just.text("beat: " .. tostring(beatTime))
-		just.text("snap: " .. tostring(snapTime))
-	end
-
-	if imgui.button("add object", "add") then
-		self.game.gameView:setModal(require("sphere.views.EditorView.AddTimingObjectView"))
-	end
-
-	if imgui.button("save btn", "save") then
-		self.game.editorController:save()
-	end
-
-	local playing = 0
-	for _ in pairs(self.game.editorModel.audioManager.sources) do
-		playing = playing + 1
-	end
-	imgui.text("playing sounds: " .. playing)
-
-	local dtp = editorModel:getDynamicTimePoint()
-	if imgui.button("next tp", "next") and dtp.next then
-		editorModel:scrollTimePoint(dtp.next)
-	end
-	if imgui.button("prev tp", "prev") and dtp.prev then
-		editorModel:scrollTimePoint(dtp.prev)
-	end
-
-	editorModel.tool = imgui.combo("tool select", editorModel.tool, editorModel.tools, nil, "tool")
-
-	local intervalData = dtp._intervalData
-	local grabbedIntervalData = editorModel.grabbedIntervalData
-	if not grabbedIntervalData then
-		if not intervalData and imgui.button("split interval button", "split interval") then
-			ld:splitInterval(dtp)
-		end
-		if intervalData then
-			if imgui.button("merge interval button", "merge") then
-				ld:mergeInterval(dtp)
-			end
-			local inc = imgui.intButtons("update interval", nil, 1)
-			if inc ~= 0 then
-				ld:updateInterval(intervalData, intervalData.beats + inc)
-			end
-		end
-		if intervalData and imgui.button("grab interval button", "grab") then
-			editorModel:grabIntervalData(intervalData)
-		end
-	else
-		if imgui.button("drop interval button", "drop") then
-			editorModel:dropIntervalData()
-		end
-	end
-
-	just.pop()
-end
-
 SnapGridView.drawTimings = function(self, _w, _h)
 	local editorModel = self.game.editorModel
 	local ld = editorModel.layerData
@@ -328,8 +208,6 @@ SnapGridView.draw = function(self)
 
 	local lineHeight = 55
 	imgui.setSize(w, h, 200, lineHeight)
-
-	self:drawUI(w, h)
 
 	local editorTimePoint = editorModel.timePoint
 

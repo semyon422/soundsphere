@@ -5,6 +5,7 @@ local gfx_util = require("gfx_util")
 
 local Layout = require("sphere.views.EditorView.Layout")
 local EditorViewConfig = require("sphere.views.EditorView.EditorViewConfig")
+local EditorViewOverlay = require("sphere.views.EditorView.EditorViewOverlay")
 local SnapGridView = require("sphere.views.EditorView.SnapGridView")
 local SequenceView = require("sphere.views.SequenceView")
 local Footer = require("sphere.views.EditorView.Footer")
@@ -67,6 +68,8 @@ EditorView.draw = function(self)
 	self.snapGridView:draw()
 	WaveformView(self)
 	Footer(self)
+	EditorViewOverlay(self)
+
 	just.container()
 end
 
