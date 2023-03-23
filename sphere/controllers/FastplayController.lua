@@ -50,6 +50,7 @@ FastplayController.load = function(self)
 		dt = 0,
 	})
 	rhythmModel:loadLogicEngines()
+	self.game.replayModel:load()
 end
 
 FastplayController.unload = function(self)

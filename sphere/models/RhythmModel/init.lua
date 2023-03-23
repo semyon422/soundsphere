@@ -82,7 +82,6 @@ RhythmModel.loadAllEngines = function(self)
 
 	logicEngine:load()
 	graphicEngine:load()
-	replayModel:load()
 
 	self.pauseManager:load()
 end
@@ -102,7 +101,6 @@ RhythmModel.loadLogicEngines = function(self)
 
 	scoreEngine:load()
 	logicEngine:load()
-	replayModel:load()
 end
 
 RhythmModel.unloadAllEngines = function(self)
@@ -136,7 +134,6 @@ RhythmModel.receive = function(self, event)
 end
 
 RhythmModel.update = function(self, dt)
-	self.game.replayModel:update()
 	self.logicEngine:update()
 	self.audioEngine:update()
 	self.scoreEngine:update()

@@ -54,6 +54,7 @@ GameplayController.load = function(self)
 	})
 	assert(self.game.modifierModel.config)
 	rhythmModel:loadAllEngines()
+	self.game.replayModel:load()
 
 	self.game.timeController:updateOffsets()
 
@@ -119,6 +120,7 @@ GameplayController.unload = function(self)
 end
 
 GameplayController.update = function(self, dt)
+	self.game.replayModel:update()
 	self.game.rhythmModel:update(dt)
 end
 
@@ -168,15 +170,21 @@ GameplayController.receive = function(self, event)
 end
 
 GameplayController.retry = function(self)
-	self.game.rhythmModel.inputManager:setMode("external")
+	local rhythmModel = self.game.rhythmModel
+
+	rhythmModel.inputManager:setMode("external")
 	self.game.replayModel:setMode("record")
 
-	self.game.rhythmModel.prohibitSavingScore = true
-
-	self:unload()
-	self:load()
-
-	self.game.rhythmModel.prohibitSavingScore = false
+	rhythmModel:unloadAllEngines()
+	rhythmModel:unload()
+	rhythmModel:load()
+	rhythmModel.timeEngine:sync({
+		time = love.timer.getTime(),
+		delta = 0,
+	})
+	rhythmModel:loadAllEngines()
+	self.game.replayModel:load()
+	self:play()
 end
 
 GameplayController.pause = function(self)
