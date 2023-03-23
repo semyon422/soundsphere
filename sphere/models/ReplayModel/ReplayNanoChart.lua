@@ -55,14 +55,14 @@ ReplayNanoChart.encode = function(self, events, inputMode)
 	end
 
 	local content = self.nanoChart:encode(emptyHash, inputs, notes)
-	local compressedContent = zlib.compress(content)
+	local compressedContent = zlib.compress_s(content)
 	return mime.b64(compressedContent), #content
 end
 
 ReplayNanoChart.decode = function(self, content, size, inputMode)
 	local inputMap, reversedInputMap, inputs = self:getInputMap(inputMode)
 
-	local uncompressedContent = zlib.uncompress(mime.unb64(content), nil, size)
+	local uncompressedContent = zlib.uncompress_s(mime.unb64(content), size)
 	local version, hash, inputs, notes = self.nanoChart:decode(uncompressedContent)
 	local events = {}
 	for _, note in ipairs(notes) do
