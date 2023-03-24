@@ -24,22 +24,17 @@ local function BottomScreenMenu(self)
 	just.row()
 end
 
-local function Text(self)
-	local w, h = Layout:move("header")
-
-	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.setFont(spherefonts.get("Noto Sans", 36))
-	gfx_util.printFrame("pause", h, 0, w, h, "left", "center")
-
-	if self.game.rhythmModel.scoreEngine.scoreSystem.hp:isFailed() then
-		w, h = Layout:move("base")
-		love.graphics.setColor(1, 1, 1, 0.25)
-		love.graphics.setFont(spherefonts.get("Noto Sans", 240))
-		gfx_util.printFrame("failed", 0, 0, w, h, "center", "center")
+local function FailedText(self)
+	if not self.game.rhythmModel.scoreEngine.scoreSystem.hp:isFailed() then
+		return
 	end
+	local w, h = Layout:move("base")
+	love.graphics.setColor(1, 1, 1, 0.25)
+	love.graphics.setFont(spherefonts.get("Noto Sans", 240))
+	gfx_util.printFrame("failed", 0, 0, w, h, "center", "center")
 end
 
 return function(self)
 	BottomScreenMenu(self)
-	Text(self)
+	FailedText(self)
 end

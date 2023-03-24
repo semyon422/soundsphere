@@ -145,5 +145,6 @@ return {
 		showNonManiaCharts = false,
 		showFPS = false,
 		showTasks = false,
+		showDebugMenu = false,
 	}
 }

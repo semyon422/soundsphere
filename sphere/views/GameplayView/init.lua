@@ -47,10 +47,10 @@ GameplayView.draw = function(self)
 	Layout:draw()
 	Background(self)
 	self.sequenceView:draw()
-	Foreground(self)
 	if self.subscreen == "pause" then
 		PauseSubscreen(self)
 	end
+	Foreground(self)
 	just.container()
 
 	local state = self.game.rhythmModel.pauseManager.state
