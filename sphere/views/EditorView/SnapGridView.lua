@@ -104,14 +104,15 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 		end
 	elseif ld.mode == "interval" then
 		local timePoint = ld:getDynamicTimePointAbsolute(192, ld.startTime)
-		local intervalData = timePoint.intervalData
 		local measureData = timePoint.measureData
+
+		local intervalData = timePoint.intervalData
 		local time = timePoint.time
+		intervalData, time = timePoint:add(Fraction((time * snap):ceil() + 1, snap) - time)
+
 		timePoint = ld:getDynamicTimePointAbsolute(192, ld.endTime)
 		local endIntervalData = timePoint.intervalData
 		local endTime = timePoint.time
-
-		time = Fraction((time * snap):ceil(), snap)
 		endTime = Fraction((endTime * snap):floor(), snap)
 
 		while intervalData and intervalData < endIntervalData or intervalData == endIntervalData and time <= endTime do
