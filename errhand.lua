@@ -90,9 +90,13 @@ return function(msg)
 	print(message .. "\n" .. trace)
 	love.filesystem.write("userdata/lasterror.txt", message .. "\n" .. trace)
 
-	love.graphics.reset()
-	love.window.setVSync(1)
-	just.reset()
+	if love.graphics and love.graphics.isActive() then
+		love.graphics.reset()
+		love.window.setVSync(1)
+		just.reset()
+	else
+		love.window.setMode(800, 600)
+	end
 
 	return function()
 		local status, err = pcall(run)
