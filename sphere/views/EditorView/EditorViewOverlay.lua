@@ -41,6 +41,8 @@ function tabs.timings(self)
 
 	local dtp = editorModel:getDynamicTimePoint()
 
+	imgui.text(tostring(dtp))
+
 	if imgui.button("prev tp", "<") and dtp.prev then
 		editorModel:scrollTimePoint(dtp.prev)
 	end
