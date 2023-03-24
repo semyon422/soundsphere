@@ -5,6 +5,7 @@ local TimingsModalView = require("sphere.views.TimingsModalView")
 local _transform = require("gfx_util").transform
 local spherefonts = require("sphere.assets.fonts")
 local version = require("version")
+local bass = require("audio.bass")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -215,6 +216,22 @@ drawSection.audio = function(self)
 		"mode.secondary", mode.secondary, {"bass_sample", "bass_fx_tempo"}, formatModes, "secondary audio mode")
 
 	a.midi.constantVolume = imgui.checkbox("midi.constantVolume", a.midi.constantVolume, "midi constant volume")
+
+	imgui.separator()
+
+	local bassInfo = bass.getInfo()
+	imgui.text("Latency: " .. bassInfo.latency .. "ms")
+	a.device.period = imgui.slider1("d.period", a.device.period, "%d", 1, 50, 1, "update period")
+	a.device.buffer = imgui.slider1("d.buffer", a.device.buffer, "%d", 1, 50, 1, "buffer length")
+	just.sameline()
+	imgui.indent()
+	imgui.url("dev buffer link", "link", "https://www.un4seen.com/doc/#bass/BASS_CONFIG_DEV_BUFFER.html", true)
+
+	if imgui.button("apply device", "apply") then
+		bass.setDevicePeriod(a.device.period)
+		bass.setDeviceBuffer(a.device.buffer)
+		bass.reinit()
+	end
 end
 
 drawSection.input = function(self)

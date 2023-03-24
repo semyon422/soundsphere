@@ -49,6 +49,8 @@ local GameplayView = require("sphere.views.GameplayView")
 local MultiplayerView = require("sphere.views.MultiplayerView")
 local EditorView = require("sphere.views.EditorView")
 
+local bass = require("audio.bass")
+
 local NoteChartTests = require("sphere.NoteChartTests")
 
 local GameController = Class:new()
@@ -162,6 +164,11 @@ GameController.load = function(self)
 	self.multiplayerModel:connect()
 
 	self.gameView:load()
+
+	local device = self.configModel.configs.settings.audio.device
+	bass.setDevicePeriod(device.period)
+	bass.setDeviceBuffer(device.buffer)
+	bass.init()
 
 	NoteChartTests()
 end
