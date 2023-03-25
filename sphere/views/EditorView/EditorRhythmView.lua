@@ -43,6 +43,7 @@ EditorRhythmView.draw = function(self)
 	local editorModel = self.game.editorModel
 	local ld = editorModel.layerData
 	local noteSkin = self.game.noteSkinModel.noteSkin
+	local editor = self.game.configModel.configs.settings.editor
 
 	if not ld.ranges.timePoint.head then
 		return
@@ -52,7 +53,7 @@ EditorRhythmView.draw = function(self)
 
 	local t = editorModel:getMouseTime()
 
-	if editorModel.tool == "ShortNote" or editorModel.tool == "LongNote" then
+	if editor.tool == "ShortNote" or editor.tool == "LongNote" then
 		for i = 1, noteSkin.inputsCount do
 			local Head = noteSkin.notes.ShortNote.Head
 			local over = just.is_over(Head.w[i], noteSkin.unit, Head.x[i], 0)
@@ -61,7 +62,7 @@ EditorRhythmView.draw = function(self)
 				editorModel:addNote(t, "key", i)
 			end
 		end
-	elseif editorModel.tool == "Select" then
+	elseif editor.tool == "Select" then
 		local over = just.mouse_over("editor select", true, "mouse")
 		if over and just.mousepressed(1) then
 			editorModel:selectStart()

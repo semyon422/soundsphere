@@ -19,6 +19,11 @@ return {
 		}
 	},
 	editor = {
+		speed = 1,
+		snap = 1,
+		lockSnap = true,
+		showTimings = true,
+		tool = "Select",
 		waveform = {
 			opacity = 0.5,
 			scale = 0.5

@@ -23,7 +23,8 @@ GraphicEngine.getVisualOffset = function(self)
 end
 
 GraphicEngine.getVisualTimeRate = function(self)
-	return self.editorModel.speed
+	local editor = self.editorModel.game.configModel.configs.settings.editor
+	return editor.speed
 end
 
 GraphicEngine.selectStart = function(self)

@@ -38,6 +38,7 @@ SnapGridView.drawTimingObjects = function(self, field, currentTime, w, h, align,
 	local editorModel = self.game.editorModel
 	local rangeTracker = editorModel.layerData.ranges.timePoint
 	local noteSkin = self.game.noteSkinModel.noteSkin
+	local editor = self.game.configModel.configs.settings.editor
 	local timePoint = rangeTracker.head
 	if not timePoint or not currentTime then
 		return
@@ -47,7 +48,7 @@ SnapGridView.drawTimingObjects = function(self, field, currentTime, w, h, align,
 	while timePoint and timePoint <= endTimePoint do
 		local text = getText(timePoint)
 		if text then
-			local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editorModel.speed)
+			local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editor.speed)
 			gfx_util.printFrame(text, 0, y - h / 2, w, h, align, "center")
 		end
 
@@ -77,8 +78,9 @@ local snaps = {
 
 SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 	local editorModel = self.game.editorModel
+	local editor = self.game.configModel.configs.settings.editor
 	local ld = editorModel.layerData
-	local snap = editorModel.snap
+	local snap = editor.snap
 	local noteSkin = self.game.noteSkinModel.noteSkin
 
 	if not currentTime then
@@ -95,7 +97,7 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 					if f:tonumber() < 1 then
 						local timePoint = ld:getDynamicTimePoint(f + time, -1)
 						if not timePoint then break end
-						local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editorModel.speed)
+						local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editor.speed)
 						love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
 						love.graphics.line(0, y, width, y)
 					end
@@ -129,7 +131,7 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 			end
 
 			if not drawNothing then
-				local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editorModel.speed)
+				local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editor.speed)
 
 				local j = snap * timePoint:getBeatModulo()
 				love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
@@ -147,6 +149,7 @@ SnapGridView.drawTimings = function(self, _w, _h)
 	local ld = editorModel.layerData
 	local editorTimePoint = editorModel.timePoint
 	local noteSkin = self.game.noteSkinModel.noteSkin
+	local editor = self.game.configModel.configs.settings.editor
 
 	if ld.mode ~= "interval" then
 		return
@@ -173,7 +176,7 @@ SnapGridView.drawTimings = function(self, _w, _h)
 		end
 
 		if intervalData or measureData then
-			local y = noteSkin:getTimePosition((editorTimePoint.absoluteTime - timePoint.absoluteTime) * editorModel.speed)
+			local y = noteSkin:getTimePosition((editorTimePoint.absoluteTime - timePoint.absoluteTime) * editor.speed)
 			love.graphics.line(0, y, _w, y)
 		end
 
@@ -199,8 +202,8 @@ end
 local prevMouseY = 0
 SnapGridView.draw = function(self)
 	local editorModel = self.game.editorModel
-	local ld = editorModel.layerData
 	local noteSkin = self.game.noteSkinModel.noteSkin
+	local editor = self.game.configModel.configs.settings.editor
 
 	local w, h = Layout:move("base")
 	love.graphics.setColor(1, 1, 1, 1)
@@ -219,7 +222,10 @@ SnapGridView.draw = function(self)
 
 	love.graphics.push()
 	self:drawComputedGrid("absoluteTime", editorTimePoint.absoluteTime, width)
-	self:drawTimings(width, h)
+
+	if editor.showTimings then
+		self:drawTimings(width, h)
+	end
 
 	love.graphics.translate(width + 40, 0)
 	self:drawTimingObjects("absoluteTime", editorTimePoint.absoluteTime, 500, 50, "left", getVelocityText)
@@ -228,7 +234,7 @@ SnapGridView.draw = function(self)
 	if love.keyboard.isDown("lalt") and drag("drag1", width, h) then
 		local a = noteSkin:getInverseTimePosition(_my)
 		local b = noteSkin:getInverseTimePosition(prevMouseY)
-		editorModel:scrollSecondsDelta((a - b) / editorModel.speed)
+		editorModel:scrollSecondsDelta((a - b) / editor.speed)
 		if editorModel.timer.isPlaying then
 			editorModel:pause()
 			self.dragging = true
@@ -248,7 +254,7 @@ SnapGridView.draw = function(self)
 
 	if scroll then
 		if love.keyboard.isDown("lshift") then
-			editorModel.snap = math.min(math.max(editorModel.snap + scroll, 1), 16)
+			editor.snap = math.min(math.max(editor.snap + scroll, 1), 16)
 		elseif love.keyboard.isDown("lctrl") then
 			editorModel:setLogSpeed(editorModel:getLogSpeed() + scroll)
 			editorModel:updateRange()

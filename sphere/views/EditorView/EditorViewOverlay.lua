@@ -37,6 +37,7 @@ local defaultSignature = {"4", "1"}
 
 function tabs.timings(self)
 	local editorModel = self.game.editorModel
+	local editor = self.game.configModel.configs.settings.editor
 	local ld = editorModel.layerData
 
 	local dtp = editorModel:getDynamicTimePoint()
@@ -53,6 +54,8 @@ function tabs.timings(self)
 	if imgui.button("next tp", ">") and dtp.next then
 		editorModel:scrollTimePoint(dtp.next)
 	end
+
+	editor.showTimings = imgui.checkbox("show timings", editor.showTimings, "show timings")
 
 	local intervalData = dtp._intervalData
 	local grabbedIntervalData = editorModel.grabbedIntervalData
@@ -116,7 +119,7 @@ function tabs.timings(self)
 
 		local measureOffset = dtp.measureTime:floor()
 		local _signature = ld:getSignature(measureOffset)
-		local snap = editorModel.snap
+		local snap = editor.snap
 
 		local beatTime = (dtp.measureTime - measureOffset) * _signature
 		local snapTime = (beatTime - beatTime:floor()) * snap
@@ -206,20 +209,26 @@ function tabs.timings(self)
 			ld:removeSignatureData(dtp.measureTime:floor())
 		end
 	end
+
+	imgui.separator()
+	imgui.text("waveform")
+	local wf = self.game.configModel.configs.settings.editor.waveform
+	wf.opacity = imgui.slider1("wf.opacity", wf.opacity, "%0.2f", 0, 1, 0.01, "opacity")
+	wf.scale = imgui.slider1("wf.scale", wf.scale, "%0.2f", 0, 1, 0.01, "scale")
 end
 
 function tabs.notes(self)
 	local editorModel = self.game.editorModel
+	local editor = self.game.configModel.configs.settings.editor
 
 	local logSpeed = imgui.slider1("editor speed", editorModel:getLogSpeed(), "%d", -30, 50, 1, "speed")
 	if logSpeed ~= editorModel:getLogSpeed() then
 		editorModel:setLogSpeed(logSpeed)
 		editorModel:updateRange()
 	end
-	editorModel.snap = imgui.slider1("snap select", editorModel.snap, "%d", 1, 16, 1, "snap")
-	editorModel.lockSnap = imgui.checkbox("lock snap", editorModel.lockSnap, "lock snap")
-
-	editorModel.tool = imgui.list("tool select", editorModel.tool, editorModel.tools, 200, nil, "tool")
+	editor.snap = imgui.slider1("snap select", editor.snap, "%d", 1, 16, 1, "snap")
+	editor.lockSnap = imgui.checkbox("lock snap", editor.lockSnap, "lock snap")
+	editor.tool = imgui.list("tool select", editor.tool, editorModel.tools, 200, nil, "tool")
 end
 
 return function(self)

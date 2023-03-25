@@ -12,9 +12,6 @@ local ConvertAbsoluteToInterval = require("sphere.models.EditorModel.ConvertAbso
 local EditorModel = Class:new()
 
 EditorModel.tools = {"Select", "ShortNote", "LongNote", "SoundNote"}
-EditorModel.tool = "Select"
-
-EditorModel.lockSnap = true
 
 EditorModel.construct = function(self)
 	self.timer = TimeManager:new()
@@ -29,6 +26,8 @@ end
 EditorModel.load = function(self)
 	local noteChartModel = self.game.noteChartModel
 	local nc = noteChartModel.noteChart
+
+	self:fixSettings()
 
 	local ld = nc:getLayerData(1)
 
@@ -54,9 +53,6 @@ EditorModel.load = function(self)
 	self.timePoint:setTime(ld:getDynamicTimePointAbsolute(192, 0))
 	self.timePoint.absoluteTime = 0
 
-	self.snap = 1
-	self.speed = 1
-
 	self.firstTime = ld.ranges.timePoint.first.absoluteTime
 	self.lastTime = ld.ranges.timePoint.last.absoluteTime
 
@@ -66,6 +62,14 @@ EditorModel.load = function(self)
 	self.audioManager:load()
 
 	self:scrollSeconds(self.timer:getTime())
+end
+
+EditorModel.fixSettings = function(self)
+	local editor = self.game.configModel.configs.settings.editor
+	if editor.speed <= 0 then
+		editor.speed = 1
+	end
+	editor.snap = math.min(math.max(editor.snap, 1), 16)
 end
 
 EditorModel.loadResources = function(self)
@@ -107,8 +111,9 @@ end
 
 EditorModel.getDtpAbsolute = function(self, time, snapped)
 	local ld = self.layerData
+	local editor = self.game.configModel.configs.settings.editor
 
-	local snap = self.snap
+	local snap = editor.snap
 	if ld.mode == "measure" then
 		local dtp = ld:getDynamicTimePointAbsolute(192, time)
 		local measureOffset = dtp.measureTime:floor()
@@ -140,17 +145,20 @@ EditorModel.pause = function(self)
 end
 
 EditorModel.getLogSpeed = function(self)
-	return math.floor(10 * math.log(self.speed) / math.log(2) + 0.5)
+	local editor = self.game.configModel.configs.settings.editor
+	return math.floor(10 * math.log(editor.speed) / math.log(2) + 0.5)
 end
 
 EditorModel.setLogSpeed = function(self, logSpeed)
-	self.speed = 2 ^ (logSpeed / 10)
+	local editor = self.game.configModel.configs.settings.editor
+	editor.speed = 2 ^ (logSpeed / 10)
 end
 
 EditorModel.getMouseTime = function(self)
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local noteSkin = self.game.noteSkinModel.noteSkin
-	return (self.timePoint.absoluteTime - noteSkin:getInverseTimePosition(my) / self.speed)
+	local editor = self.game.configModel.configs.settings.editor
+	return (self.timePoint.absoluteTime - noteSkin:getInverseTimePosition(my) / editor.speed)
 end
 
 EditorModel.getColumnOver = function(self)
@@ -271,14 +279,15 @@ EditorModel._addNote = function(self, note)
 end
 
 EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
+	local editor = self.game.configModel.configs.settings.editor
 	local ld = self.layerData
-	if self.tool == "ShortNote" then
+	if editor.tool == "ShortNote" then
 		local dtp = self:getDtpAbsolute(absoluteTime, true)
 		local noteData = ld:getNoteData(dtp, inputType, inputIndex)
 		if noteData then
 			noteData.noteType = "ShortNote"
 		end
-	elseif self.tool == "LongNote" then
+	elseif editor.tool == "LongNote" then
 		local dtp = self:getDtpAbsolute(absoluteTime, true)
 		local startNoteData = ld:getNoteData(dtp, inputType, inputIndex)
 		if not startNoteData then
@@ -313,6 +322,7 @@ EditorModel.selectEnd = function(self)
 end
 
 EditorModel.update = function(self)
+	local editor = self.game.configModel.configs.settings.editor
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	local ld = self.layerData
 
@@ -344,7 +354,7 @@ EditorModel.update = function(self)
 
 	if self.selectRect then
 		local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-		self.selectRect[2] = noteSkin:getTimePosition((self.timer:getTime() - self.selectStartTime) * self.speed)
+		self.selectRect[2] = noteSkin:getTimePosition((self.timer:getTime() - self.selectStartTime) * editor.speed)
 		self.selectRect[3] = mx
 		self.selectRect[4] = my
 		just.select(self.selectRect[1], self.selectRect[2], mx, my)
@@ -370,7 +380,8 @@ EditorModel.receive = function(self, event)
 end
 
 EditorModel.getSnap = function(self, j)
-	local snap = self.snap
+	local editor = self.game.configModel.configs.settings.editor
+	local snap = editor.snap
 	if type(j) == "table" then
 		j, snap = 16 * j, 16
 	end
@@ -385,11 +396,12 @@ EditorModel.getSnap = function(self, j)
 end
 
 EditorModel.updateRange = function(self)
+	local editor = self.game.configModel.configs.settings.editor
 	local absoluteTime = self.timePoint.absoluteTime
 
 	local ld = self.layerData
 	if ld.mode == "interval" then
-		local delta = 1 / self.speed
+		local delta = 1 / editor.speed
 		if ld.startTime ~= absoluteTime - delta then
 			ld:setRange(absoluteTime - delta, absoluteTime + delta)
 		end
@@ -459,9 +471,10 @@ EditorModel.scrollSnaps = function(self, delta)
 end
 
 EditorModel.getNextSnapIntervalTime = function(self, absoluteTime, delta)
+	local editor = self.game.configModel.configs.settings.editor
 	local dtp = self:getDtpAbsolute(absoluteTime)
 
-	local snap = self.snap
+	local snap = editor.snap
 	local snapTime = dtp.time * snap
 
 	local targetSnapTime
@@ -502,11 +515,12 @@ end
 
 EditorModel.scrollSnapsMeasure = function(self, delta)
 	local ld = self.layerData
+	local editor = self.game.configModel.configs.settings.editor
 	local dtp = self:getDtpAbsolute(self.timePoint.absoluteTime)
 
 	local measureOffset = dtp.measureTime:floor()
 	local signature = ld:getSignature(measureOffset)
-	local sigSnap = signature * self.snap
+	local sigSnap = signature * editor.snap
 
 	local targetMeasureOffset
 	if delta == -1 then
@@ -515,7 +529,7 @@ EditorModel.scrollSnapsMeasure = function(self, delta)
 		targetMeasureOffset = (dtp.measureTime + Fraction(1) / sigSnap):floor()
 	end
 	signature = ld:getSignature(targetMeasureOffset)
-	sigSnap = signature * self.snap
+	sigSnap = signature * editor.snap
 
 	if measureOffset ~= targetMeasureOffset then
 		if delta == -1 then

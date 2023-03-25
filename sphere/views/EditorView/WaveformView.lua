@@ -81,13 +81,14 @@ local function loadWaveform(self, w, h)
 	local editorModel = self.game.editorModel
 	local soundData = editorModel.soundData
 	local noteSkin = self.game.noteSkinModel.noteSkin
+	local editor = self.game.configModel.configs.settings.editor
 
 	local sampleRate = soundData:getSampleRate()
 	local channelCount = soundData:getChannelCount()
 
 	local points = math.floor(h)
 
-	local samplesPerPoint = sampleRate / math.abs(noteSkin.unit * editorModel.speed)
+	local samplesPerPoint = sampleRate / math.abs(noteSkin.unit * editor.speed)
 
 	local sampleOffset = math.floor((editorModel.timePoint.absoluteTime - editorModel.soundDataOffset) * sampleRate)
 	local pointOffset = math.floor(sampleOffset / samplesPerPoint)

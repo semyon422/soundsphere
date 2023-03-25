@@ -14,7 +14,6 @@ local sections = {
 	"graphics",
 	"audio",
 	"input",
-	"editor",
 	"misc",
 }
 local currentSection = sections[1]
@@ -241,17 +240,6 @@ drawSection.input = function(self)
 	i.selectRandom = imgui.hotkey("selectRandom", i.selectRandom, "select random")
 	i.screenshot.capture = imgui.hotkey("screenshot.capture", i.screenshot.capture, "capture screenshot")
 	i.screenshot.open = imgui.hotkey("screenshot.open", i.screenshot.open, "open screenshot")
-end
-
-drawSection.editor = function(self)
-	local settings = self.game.configModel.configs.settings
-	local e = settings.editor
-
-	just.indent(10)
-	just.text("waveform")
-	local wf = e.waveform
-	wf.opacity = imgui.slider1("wf.opacity", wf.opacity, "%0.2f", 0, 1, 0.01, "opacity")
-	wf.scale = imgui.slider1("wf.scale", wf.scale, "%0.2f", 0, 1, 0.01, "scale")
 end
 
 drawSection.misc = function(self)
