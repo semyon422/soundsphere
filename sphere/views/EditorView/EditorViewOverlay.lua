@@ -64,9 +64,10 @@ function tabs.timings(self)
 			if imgui.button("merge interval button", "merge") then
 				ld:mergeInterval(dtp)
 			end
-			local inc = imgui.intButtons("update interval", nil, 1)
-			if inc ~= 0 then
-				ld:updateInterval(intervalData, intervalData.beats + inc)
+			local beats = intervalData.beats
+			local newBeats = imgui.intButtons("update interval", beats, 1, "beats")
+			if beats ~= newBeats then
+				ld:updateInterval(intervalData, newBeats)
 			end
 		end
 		if intervalData and imgui.button("grab interval button", "grab") then
