@@ -21,11 +21,13 @@ return function(layerData)
 			local beatsFull = (td.timePoint.absoluteTime - ptd.timePoint.absoluteTime) / beatDuraion
 			local beatsNote = (ptp.absoluteTime - ptd.timePoint.absoluteTime) / beatDuraion
 			local beats = math.max(math.floor(beatsFull), beatsNote)
+			local intBeats = math.floor(beats)
 
-			intervalData.beats = math.max(math.floor(beats), 1)
+			intervalData.beats = math.max(intBeats, 1)
 
 			local time = ptd.timePoint.absoluteTime + beatDuraion * beats
 			if time ~= ptd.timePoint.absoluteTime then
+				intervalData.beats = intBeats
 				local start = Fraction:new(beats, 16, false) % 1
 				intervalData = newLayerData:insertIntervalData(time, 1, start)
 				if beats == beatsNote then
