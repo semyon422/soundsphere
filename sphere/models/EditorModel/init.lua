@@ -8,6 +8,7 @@ local TimeManager = require("sphere.models.EditorModel.TimeManager")
 local GraphicEngine = require("sphere.models.EditorModel.GraphicEngine")
 local just = require("just")
 local ConvertAbsoluteToInterval = require("sphere.models.EditorModel.ConvertAbsoluteToInterval")
+local ConvertTests = require("sphere.models.EditorModel.ConvertTests")
 
 local EditorModel = Class:new()
 

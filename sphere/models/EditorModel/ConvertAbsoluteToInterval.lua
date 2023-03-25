@@ -5,58 +5,98 @@ return function(layerData)
 	local newLayerData = LayerData:new()
 	newLayerData:setTimeMode("interval")
 
-	local ptd = layerData.tempoDatas[1]
-	local ptp = layerData.timePointList[1]
-
-	local intervalData = newLayerData:insertIntervalData(ptd.timePoint.absoluteTime, 1)
-
-	local timePointMap = {}
-
-	for _, tp in ipairs(layerData.timePointList) do
-		local td = tp.tempoData
-
-		if ptd ~= td then
-			local beatDuraion = ptd:getBeatDuration()
-
-			local beatsFull = (td.timePoint.absoluteTime - ptd.timePoint.absoluteTime) / beatDuraion
-			local beatsNote = (ptp.absoluteTime - ptd.timePoint.absoluteTime) / beatDuraion
-			local beats = math.max(math.floor(beatsFull), beatsNote)
-			local intBeats = math.floor(beats)
-
-			intervalData.beats = math.max(intBeats, 1)
-
-			local time = ptd.timePoint.absoluteTime + beatDuraion * beats
-			if time ~= ptd.timePoint.absoluteTime then
-				intervalData.beats = intBeats
-				local start = Fraction:new(beats, 16, false) % 1
-				intervalData = newLayerData:insertIntervalData(time, 1, start)
-				if beats == beatsNote then
-					timePointMap[ptp].intervalData = intervalData
-					timePointMap[ptp].time = start
-				end
-			end
-			if time ~= td.timePoint.absoluteTime then
-				intervalData = newLayerData:insertIntervalData(td.timePoint.absoluteTime, 1)
-			end
-
-			ptd = td
-		end
-
-		local dt = tp.absoluteTime - td.timePoint.absoluteTime
-		local time = Fraction:new(dt / td:getBeatDuration(), 16, false)
-
-		local newTp = newLayerData:getTimePoint(intervalData, time, tp.visualSide)
-		timePointMap[tp] = newTp
-
-		ptp = tp
+	for i = 1, #layerData.tempoDatas do
+		local td = layerData.tempoDatas[i]
+		td.prev = layerData.tempoDatas[i - 1]
+		td.next = layerData.tempoDatas[i + 1]
 	end
 
-	local beatDuraion = ptd:getBeatDuration()
-	local beats = math.ceil((ptp.absoluteTime - ptd.timePoint.absoluteTime) / beatDuraion)
+	local intervalsMap = {}
+	for _, tp in ipairs(layerData.timePointList) do
+		local td = tp.tempoData
+		intervalsMap[td] = intervalsMap[td] or {tempoData = td}
+		table.insert(intervalsMap[td], tp)
+	end
+	local intervals = {}
+	for _, interval in pairs(intervalsMap) do
+		table.insert(intervals, interval)
+	end
+	table.sort(intervals, function(a, b)
+		return a.tempoData < b.tempoData
+	end)
+
+	local timePointMap = {}
+	local intervalData
+	for i, interval in ipairs(intervals) do
+		local td = interval.tempoData
+		table.sort(interval)
+
+		local is_same = interval[#interval].absoluteTime == td.timePoint.absoluteTime
+		interval.beats = 1
+		if not is_same and i < #intervals then
+			local _interval = {}
+			local next_interval = intervals[i + 1]
+			local next_td = next_interval.tempoData
+			local idt = next_td.timePoint.absoluteTime - td.timePoint.absoluteTime
+			local beats = idt / td:getBeatDuration()
+			local next_td_time = Fraction:new(beats, 16, false)
+			local _time = next_td_time - Fraction(1, 16)
+			_interval.beats = math.floor(beats)
+			if _time:tonumber() <= 0 then
+				_interval.beats = 1
+			end
+			for j, tp in ipairs(interval) do
+				local dt = tp.absoluteTime - td.timePoint.absoluteTime
+				local time = Fraction:new(dt / td:getBeatDuration(), 16, false)
+				if time == next_td_time and time[1] ~= 0 then
+					table.insert(next_interval, tp)
+				else
+					table.insert(_interval, tp)
+				end
+			end
+			interval = _interval
+		end
+		table.sort(interval)
+
+		is_same = interval[#interval].absoluteTime == td.timePoint.absoluteTime
+		if is_same then
+			interval.beats = 1
+		end
+
+		intervalData = newLayerData:insertIntervalData(td.timePoint.absoluteTime, interval.beats)
+
+		for j, tp in ipairs(interval) do
+			local dt = tp.absoluteTime - td.timePoint.absoluteTime
+			local time = Fraction:new(dt / td:getBeatDuration(), 16, false)
+
+			if #interval > 1 and dt > 0 and i < #intervals and j == #interval then
+				local next_interval = intervals[i + 1]
+				local next_td = next_interval.tempoData
+				local idt = next_td.timePoint.absoluteTime - td.timePoint.absoluteTime
+				local beats = idt / td:getBeatDuration()
+				local next_td_time = Fraction:new(beats, 16, false)
+				local _time = next_td_time - Fraction(1, 16)
+				local t = td.timePoint.absoluteTime + _time:tonumber() * td:getBeatDuration()
+				if _time:tonumber() > 0 then
+					local id = newLayerData:insertIntervalData(t, 1, _time % 1)
+					if time == _time then
+						intervalData = id
+						time = Fraction(0)
+					end
+				end
+			end
+
+			timePointMap[tp] = newLayerData:getTimePoint(intervalData, time, tp.visualSide)
+		end
+	end
+
+	local lastInterval = intervals[#intervals]
+	local beatDuraion = lastInterval.tempoData:getBeatDuration()
+	local beats = math.ceil((lastInterval[#lastInterval].absoluteTime - lastInterval.tempoData.timePoint.absoluteTime) / beatDuraion)
 
 	if beats > 0 then
 		intervalData.beats = beats
-		local time = ptd.timePoint.absoluteTime + beatDuraion * beats
+		local time = lastInterval.tempoData.timePoint.absoluteTime + beatDuraion * beats
 		intervalData = newLayerData:insertIntervalData(time, 1)
 	end
 
@@ -83,5 +123,5 @@ return function(layerData)
 
 	newLayerData:compute()
 
-	return newLayerData
+	return newLayerData, timePointMap
 end
