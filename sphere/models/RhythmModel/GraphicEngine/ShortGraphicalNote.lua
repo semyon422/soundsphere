@@ -17,6 +17,7 @@ ShortGraphicalNote.update = function(self)
 
 	startTimeState.absoluteDeltaTime = currentTime - timePoint.absoluteTime
 	startTimeState.visualDeltaTime = currentTime - (visualTime + self.graphicEngine:getVisualOffset())
+	startTimeState.scaledAbsoluteDeltaTime = startTimeState.absoluteDeltaTime * self.graphicEngine:getVisualTimeRate()
 	startTimeState.scaledVisualDeltaTime = startTimeState.visualDeltaTime * self.graphicEngine:getVisualTimeRate()
 end
 

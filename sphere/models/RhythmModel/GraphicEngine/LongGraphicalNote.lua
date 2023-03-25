@@ -46,6 +46,7 @@ LongGraphicalNote.update = function(self)
 	startTimeState.currentVisualTime = startVisualTime
 	startTimeState.absoluteDeltaTime = currentTime - startTimePoint.absoluteTime
 	startTimeState.visualDeltaTime = currentTime - (startVisualTime + visualOffset)
+	startTimeState.scaledAbsoluteDeltaTime = startTimeState.absoluteDeltaTime * visualTimeRate
 	startTimeState.scaledVisualDeltaTime = startTimeState.visualDeltaTime * visualTimeRate
 
 	startTimeState.fakeCurrentVisualTime = self:getFakeVisualStartTime()
@@ -61,6 +62,7 @@ LongGraphicalNote.update = function(self)
 	endTimeState.currentVisualTime = endVisualTime
 	endTimeState.absoluteDeltaTime = currentTime - endTimePoint.absoluteTime
 	endTimeState.visualDeltaTime = currentTime - (endVisualTime + visualOffset)
+	endTimeState.scaledAbsoluteDeltaTime = endTimeState.absoluteDeltaTime * visualTimeRate
 	endTimeState.scaledVisualDeltaTime = endTimeState.visualDeltaTime * visualTimeRate
 
 	local longNoteShortening = self.graphicEngine.longNoteShortening
