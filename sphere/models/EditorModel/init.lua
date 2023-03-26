@@ -188,6 +188,7 @@ end
 
 EditorModel.grabNotes = function(self, part)
 	local noteSkin = self.game.noteSkinModel.noteSkin
+	local editor = self.game.configModel.configs.settings.editor
 
 	self.grabbedNotes = {}
 
@@ -203,7 +204,7 @@ EditorModel.grabNotes = function(self, part)
 
 			note.grabbedDeltaColumn = column - _column
 
-			if not self.lockSnap then
+			if not editor.lockSnap then
 				if note.noteType == "ShortNote" then
 					note.grabbedDeltaTime = t - note.startNoteData.timePoint.absoluteTime
 					note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
@@ -229,11 +230,12 @@ EditorModel.grabNotes = function(self, part)
 end
 
 EditorModel.dropNotes = function(self)
+	local editor = self.game.configModel.configs.settings.editor
 	local ld = self.layerData
 	local grabbedNotes = self.grabbedNotes
 	self.grabbedNotes = {}
 
-	if self.lockSnap then
+	if editor.lockSnap then
 		for _, note in ipairs(grabbedNotes) do
 			self:_addNote(note)
 		end
@@ -330,7 +332,7 @@ EditorModel.update = function(self)
 
 	for _, note in ipairs(self.grabbedNotes) do
 		local time = self:getMouseTime()
-		if not self.lockSnap then
+		if not editor.lockSnap then
 			if note.noteType == "ShortNote" then
 				self:getDtpAbsolute(time - note.grabbedDeltaTime):clone(note.startNoteData.timePoint)
 			elseif note.noteType == "LongNote" then
