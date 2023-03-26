@@ -351,7 +351,6 @@ EditorModel.update = function(self)
 			note.inputIndex = inputIndex
 		end
 	end
-	self.graphicEngine:update()
 
 	if self.selectRect then
 		local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
@@ -369,6 +368,8 @@ EditorModel.update = function(self)
 	if self.timer.isPlaying then
 		self:_scrollTimePoint(dtp)
 	end
+
+	self.graphicEngine:update()
 end
 
 EditorModel.receive = function(self, event)
