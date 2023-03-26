@@ -216,10 +216,6 @@ local function SearchField(self)
 
 	w, h = Layout:move("column3", "header")
 	love.graphics.translate(w + h / 2, 0)
-
-	if imgui.IconOnlyButton("edit", icons("create"), h, 0.5) then
-		self:edit()
-	end
 end
 
 local function SortDropdown(self)
@@ -367,6 +363,16 @@ local function NotechartsSubscreen(self)
 
 	w, h = Layout:move("column2row2row1")
 
+	local fullWidth = w - 72
+	local num_buttons = 5
+
+	local y_offset = 0
+	if h * num_buttons > fullWidth then
+		y_offset = (h - fullWidth / num_buttons) / 2
+		h = fullWidth / num_buttons
+	end
+
+	just.emptyline(y_offset)
 	just.row(true)
 	just.indent(36)
 	if imgui.IconOnlyButton("open directory", icons("folder_open"), h, 0.5) then
@@ -375,7 +381,10 @@ local function NotechartsSubscreen(self)
 	if imgui.IconOnlyButton("update cache", icons("refresh"), h, 0.5) then
 		self.game.selectController:updateCache(true)
 	end
-	just.offset(w - h * 2 - 36)
+	just.offset(w - h * 3 - 36)
+	if imgui.IconOnlyButton("editor button", icons("create"), h, 0.5) then
+		self:edit()
+	end
 	if imgui.IconOnlyButton("result", icons("info_outline"), h, 0.5) then
 		self:result()
 	end
