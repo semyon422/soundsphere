@@ -28,9 +28,23 @@ function tabs.info(self)
 	imgui.text("playing sounds: " .. playing)
 	imgui.text("offsync: " .. to_ms(editorModel.timer:getAudioOffsync() or 0))
 
+	local settings = self.game.configModel.configs.settings
+	local a = settings.audio
+	local v = a.volume
+	v.master = imgui.slider1("v.master", v.master, "%0.2f", 0, 1, 0.01, "master volume")
+	v.music = imgui.slider1("v.music", v.music, "%0.2f", 0, 1, 0.01, "music volume")
+	v.effects = imgui.slider1("v.effects", v.effects, "%0.2f", 0, 1, 0.01, "effects volume")
+
 	if imgui.button("save btn", "save") then
 		self.game.editorController:save()
 	end
+
+	love.graphics.push("all")
+	love.graphics.setColor(1, 1, 1, 0.75)
+	love.graphics.setFont(spherefonts.get("Noto Sans", 36))
+	imgui.text("The editor")
+	imgui.text("is in development")
+	love.graphics.pop()
 end
 
 local tempo = "60"
