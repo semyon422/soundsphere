@@ -25,6 +25,7 @@ AudioManager.update = function(self, force)
 			self.sources[source] = source
 		end
 		if isPlaying then
+			source.audio:setRate(self.timer.rate)
 			if source.isStream then
 				source.audio:setVolume(self.volume.master * self.volume.music * source.volume)
 			else
@@ -44,6 +45,23 @@ AudioManager.update = function(self, force)
 		for source in pairs(self.sources) do
 			source.audio:setPosition(time - source.offset)
 		end
+	end
+end
+
+AudioManager.setVolume = function(self)
+	for _source in pairs(self.sources) do
+		local source = _source.audio
+		if source.isStream then
+			source.audio:setVolume(self.volume.master * self.volume.music * source.volume)
+		else
+			source.audio:setVolume(self.volume.master * self.volume.effects * source.volume)
+		end
+	end
+end
+
+AudioManager.setRate = function(self, rate)
+	for _source in pairs(self.sources) do
+		_source.audio:setRate(rate)
 	end
 end
 

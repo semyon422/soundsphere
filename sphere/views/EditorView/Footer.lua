@@ -41,5 +41,10 @@ return function(self)
 		editorModel:scrollSeconds(newTime * fullLength + editorModel.firstTime)
 	end
 
+	local newRate = imgui.Slider("rate slider", editorModel.timer.rate, w / 6, h, ("%0.2fx"):format(editorModel.timer.rate))
+	if newRate then
+		editorModel.timer:setRate(math.min(math.max(newRate, 0.25), 1))
+	end
+
 	just.row()
 end
