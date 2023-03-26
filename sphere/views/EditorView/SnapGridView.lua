@@ -87,6 +87,8 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 		return
 	end
 
+	love.graphics.setLineWidth(1)
+
 	if ld.mode == "measure" then
 		for time = ld.startTime:ceil(), ld.endTime:floor() do
 			local signature = ld:getSignature(time)
