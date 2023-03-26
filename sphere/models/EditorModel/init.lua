@@ -30,6 +30,8 @@ EditorModel.load = function(self)
 
 	self:fixSettings()
 
+	self.resourcesLoaded = false
+
 	local ld = nc:getLayerData(1)
 
 	if ld.mode == "absolute" then
@@ -108,7 +110,7 @@ EditorModel.loadResources = function(self)
 		end
 	end
 
-	print("loaded")
+	self.resourcesLoaded = true
 end
 
 EditorModel.getDtpAbsolute = function(self, time, snapped)

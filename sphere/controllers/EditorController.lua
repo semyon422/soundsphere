@@ -7,13 +7,15 @@ local EditorController = Class:new()
 
 EditorController.load = function(self)
 	local noteChartModel = self.game.noteChartModel
+	local editorModel = self.game.editorModel
+
 	noteChartModel:load()
 	noteChartModel:loadNoteChart()
 
 	local noteSkin = self.game.noteSkinModel:getNoteSkin(noteChartModel.noteChart.inputMode)
 	noteSkin:loadData()
 
-	self.game.editorModel:load()
+	editorModel:load()
 	self.game.previewModel:stop()
 
 	FileFinder:reset()
@@ -24,7 +26,7 @@ EditorController.load = function(self)
 
 	NoteChartResourceLoader.game = self.game
 	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChartModel.noteChart, function()
-		self.game.editorModel:loadResources()
+		editorModel:loadResources()
 	end)
 
 	local graphics = self.game.configModel.configs.settings.graphics

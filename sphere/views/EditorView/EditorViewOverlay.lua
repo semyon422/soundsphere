@@ -2,6 +2,7 @@ local just = require("just")
 local spherefonts = require("sphere.assets.fonts")
 local imgui = require("imgui")
 local Fraction = require("ncdk.Fraction")
+local gfx_util = require("gfx_util")
 
 local Layout = require("sphere.views.EditorView.Layout")
 
@@ -35,6 +36,13 @@ function tabs.info(self)
 	v.music = imgui.slider1("v.music", v.music, "%0.2f", 0, 1, 0.01, "music volume")
 	v.effects = imgui.slider1("v.effects", v.effects, "%0.2f", 0, 1, 0.01, "effects volume")
 
+	imgui.separator()
+	imgui.text("waveform")
+	local wf = self.game.configModel.configs.settings.editor.waveform
+	wf.opacity = imgui.slider1("wf.opacity", wf.opacity, "%0.2f", 0, 1, 0.01, "opacity")
+	wf.scale = imgui.slider1("wf.scale", wf.scale, "%0.2f", 0, 1, 0.01, "scale")
+	imgui.separator()
+
 	if imgui.button("save btn", "save") then
 		self.game.editorController:save()
 	end
@@ -63,11 +71,6 @@ function tabs.timings(self)
 
 	local dtp = editorModel:getDynamicTimePoint()
 
-	imgui.text(tostring(dtp))
-	imgui.text("at: " .. dtp.absoluteTime)
-	imgui.text("vt: " .. dtp.visualTime)
-	imgui.text("vs: " .. dtp.visualSide)
-
 	if imgui.button("prev tp", "<") and dtp.prev then
 		editorModel:scrollTimePoint(dtp.prev)
 	end
@@ -75,31 +78,35 @@ function tabs.timings(self)
 	if imgui.button("next tp", ">") and dtp.next then
 		editorModel:scrollTimePoint(dtp.next)
 	end
+	just.sameline()
+	imgui.label("dtp label", tostring(dtp))
 
 	editor.showTimings = imgui.checkbox("show timings", editor.showTimings, "show timings")
 
-	local intervalData = dtp._intervalData
-	local grabbedIntervalData = editorModel.grabbedIntervalData
-	if not grabbedIntervalData then
-		if not intervalData and imgui.button("split interval button", "split interval") then
-			ld:splitInterval(dtp)
-		end
-		if intervalData then
-			if imgui.button("merge interval button", "merge") then
-				ld:mergeInterval(dtp)
+	if ld.mode == "interval" then
+		local intervalData = dtp._intervalData
+		local grabbedIntervalData = editorModel.grabbedIntervalData
+		if not grabbedIntervalData then
+			if not intervalData and imgui.button("split interval button", "split interval") then
+				ld:splitInterval(dtp)
 			end
-			local beats = intervalData.beats
-			local newBeats = imgui.intButtons("update interval", beats, 1, "beats")
-			if beats ~= newBeats then
-				ld:updateInterval(intervalData, newBeats)
+			if intervalData then
+				if imgui.button("merge interval button", "merge") then
+					ld:mergeInterval(dtp)
+				end
+				local beats = intervalData.beats
+				local newBeats = imgui.intButtons("update interval", beats, 1, "beats")
+				if beats ~= newBeats then
+					ld:updateInterval(intervalData, newBeats)
+				end
 			end
-		end
-		if intervalData and imgui.button("grab interval button", "grab") then
-			editorModel:grabIntervalData(intervalData)
-		end
-	else
-		if imgui.button("drop interval button", "drop") then
-			editorModel:dropIntervalData()
+			if intervalData and imgui.button("grab interval button", "grab") then
+				editorModel:grabIntervalData(intervalData)
+			end
+		else
+			if imgui.button("drop interval button", "drop") then
+				editorModel:dropIntervalData()
+			end
 		end
 	end
 
@@ -230,12 +237,6 @@ function tabs.timings(self)
 			ld:removeSignatureData(dtp.measureTime:floor())
 		end
 	end
-
-	imgui.separator()
-	imgui.text("waveform")
-	local wf = self.game.configModel.configs.settings.editor.waveform
-	wf.opacity = imgui.slider1("wf.opacity", wf.opacity, "%0.2f", 0, 1, 0.01, "opacity")
-	wf.scale = imgui.slider1("wf.scale", wf.scale, "%0.2f", 0, 1, 0.01, "scale")
 end
 
 function tabs.notes(self)
@@ -253,6 +254,7 @@ function tabs.notes(self)
 end
 
 return function(self)
+	local editorModel = self.game.editorModel
 	local w, h = Layout:move("base")
 
 	love.graphics.setColor(1, 1, 1, 1)
@@ -266,4 +268,11 @@ return function(self)
 	currentTab = imgui.tabs("editor overlay tabs", currentTab, tabsList)
 	love.graphics.setColor(1, 1, 1, 1)
 	tabs[currentTab](self)
+
+	if not editorModel.resourcesLoaded then
+		w, h = Layout:move("base")
+		love.graphics.setColor(1, 1, 1, 0.5)
+		love.graphics.setFont(spherefonts.get("Noto Sans", 160))
+		gfx_util.printFrame("loading", 0, 0, w, h, "center", "center")
+	end
 end
