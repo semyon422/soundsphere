@@ -37,8 +37,18 @@ return function(self)
 	local fullLength = editorModel.lastTime - editorModel.firstTime
 	local pos = (editorTimePoint.absoluteTime - editorModel.firstTime) / fullLength
 	local newTime = imgui.Slider("time slider", pos, w / 4, h, time_util.format(editorTimePoint.absoluteTime, 3))
-	if newTime then
-		editorModel:scrollSeconds(newTime * fullLength + editorModel.firstTime)
+
+	if just.active_id == "time slider" then
+		if newTime then
+			editorModel:scrollSeconds(newTime * fullLength + editorModel.firstTime)
+		end
+		if editorModel.timer.isPlaying then
+			editorModel:pause()
+			editorModel.dragging = true
+		end
+	elseif editorModel.dragging then
+		editorModel:play()
+		editorModel.dragging = false
 	end
 
 	local newRate = imgui.Slider("rate slider", editorModel.timer.rate, w / 6, h, ("%0.2fx"):format(editorModel.timer.rate))
