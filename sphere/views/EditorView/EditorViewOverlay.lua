@@ -14,12 +14,19 @@ local currentTab = tabsList[1]
 
 local tabs = {}
 
+local function to_ms(t)
+	return math.floor(t * 1000) .. "ms"
+end
+
 function tabs.info(self)
+	local editorModel = self.game.editorModel
+
 	local playing = 0
 	for _ in pairs(self.game.editorModel.audioManager.sources) do
 		playing = playing + 1
 	end
 	imgui.text("playing sounds: " .. playing)
+	imgui.text("offsync: " .. to_ms(editorModel.timer:getAudioOffsync() or 0))
 
 	if imgui.button("save btn", "save") then
 		self.game.editorController:save()

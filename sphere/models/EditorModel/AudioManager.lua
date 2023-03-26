@@ -26,9 +26,9 @@ AudioManager.update = function(self, force)
 		end
 		if isPlaying then
 			if source.isStream then
-				source.audio:setVolume(self.volume.master * self.volume.music)
+				source.audio:setVolume(self.volume.master * self.volume.music * source.volume)
 			else
-				source.audio:setVolume(self.volume.master * self.volume.effects)
+				source.audio:setVolume(self.volume.master * self.volume.effects * source.volume)
 			end
 			source.audio:play()
 		end
@@ -54,7 +54,7 @@ AudioManager.getPosition = function(self)
 	for _source in pairs(self.sources) do
 		local source = _source.audio
 		local pos = source:getPosition()
-		if source:isPlaying() then
+		if _source.isStream and source:isPlaying() then
 			local _length = source:getLength()
 			position = position + (_source.offset + pos) * _length
 			length = length + _length

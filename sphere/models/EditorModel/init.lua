@@ -97,6 +97,7 @@ EditorModel.loadResources = function(self)
 							soundData = soundData,
 							audio = _audio,
 							name = s[1],
+							volume = s[2],
 							isStream = noteData.stream,
 						})
 						table.insert(self.sources, _audio)
