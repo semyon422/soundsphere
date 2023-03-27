@@ -8,6 +8,7 @@ local Layout = require("sphere.views.EditorView.Layout")
 
 local tabsList = {
 	"info",
+	"audio",
 	"timings",
 	"notes",
 }
@@ -20,6 +21,38 @@ local function to_ms(t)
 end
 
 function tabs.info(self)
+	local md = self.game.noteChartModel.noteChart.metaData
+
+	imgui.setSize(400, 1080, 400, 55)
+	imgui.text("Chart info")
+	md.title = imgui.input("title input", md.title, "title")
+	md.artist = imgui.input("artist input", md.artist, "artist")
+	md.source = imgui.input("source input", md.source, "source")
+	md.tags = imgui.input("tags input", md.tags, "tags")
+	md.name = imgui.input("name input", md.name, "name")
+	md.creator = imgui.input("creator input", md.creator, "creator")
+	md.level = imgui.input("level input", md.level, "level")
+	md.audioPath = imgui.input("audioPath input", md.audioPath, "audioPath")
+	md.stagePath = imgui.input("stagePath input", md.stagePath, "stagePath")
+	md.previewTime = imgui.input("previewTime input", md.previewTime, "previewTime")
+	md.bpm = imgui.input("bpm input", md.bpm, "bpm")
+	md.inputMode = imgui.input("inputMode input", md.inputMode, "inputMode")
+
+	imgui.separator()
+
+	if imgui.button("save btn", "save") then
+		self.game.editorController:save()
+	end
+
+	love.graphics.push("all")
+	love.graphics.setColor(1, 1, 1, 0.75)
+	love.graphics.setFont(spherefonts.get("Noto Sans", 36))
+	imgui.text("The editor")
+	imgui.text("is in development")
+	love.graphics.pop()
+end
+
+function tabs.audio(self)
 	local editorModel = self.game.editorModel
 
 	local playing = 0
@@ -41,18 +74,6 @@ function tabs.info(self)
 	local wf = self.game.configModel.configs.settings.editor.waveform
 	wf.opacity = imgui.slider1("wf.opacity", wf.opacity, "%0.2f", 0, 1, 0.01, "opacity")
 	wf.scale = imgui.slider1("wf.scale", wf.scale, "%0.2f", 0, 1, 0.01, "scale")
-	imgui.separator()
-
-	if imgui.button("save btn", "save") then
-		self.game.editorController:save()
-	end
-
-	love.graphics.push("all")
-	love.graphics.setColor(1, 1, 1, 0.75)
-	love.graphics.setFont(spherefonts.get("Noto Sans", 36))
-	imgui.text("The editor")
-	imgui.text("is in development")
-	love.graphics.pop()
 end
 
 local tempo = "60"
@@ -267,6 +288,7 @@ return function(self)
 
 	currentTab = imgui.tabs("editor overlay tabs", currentTab, tabsList)
 	love.graphics.setColor(1, 1, 1, 1)
+	imgui.setSize(400, h, 200, lineHeight)
 	tabs[currentTab](self)
 
 	if not editorModel.resourcesLoaded then
