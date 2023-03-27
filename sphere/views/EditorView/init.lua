@@ -9,6 +9,7 @@ local EditorViewOverlay = require("sphere.views.EditorView.EditorViewOverlay")
 local SnapGridView = require("sphere.views.EditorView.SnapGridView")
 local SequenceView = require("sphere.views.SequenceView")
 local Footer = require("sphere.views.EditorView.Footer")
+local Foreground = require("sphere.views.EditorView.Foreground")
 local WaveformView = require("sphere.views.EditorView.WaveformView")
 
 local EditorView = ScreenView:new()
@@ -69,6 +70,7 @@ EditorView.draw = function(self)
 	WaveformView(self)
 	Footer(self)
 	EditorViewOverlay(self)
+	Foreground(self)
 
 	just.container()
 end
