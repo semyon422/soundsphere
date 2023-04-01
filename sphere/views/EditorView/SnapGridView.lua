@@ -202,10 +202,6 @@ local function drag(id, w, h)
 end
 
 local function drawMouse(self)
-	if not love.keyboard.isDown("lalt") then
-		return
-	end
-
 	local editorModel = self.game.editorModel
 	local dt = editorModel:getMouseTime() - editorModel.timePoint.absoluteTime
 
@@ -230,6 +226,7 @@ local function drawMouse(self)
 end
 
 local prevMouseY = 0
+local speedOrig
 SnapGridView.draw = function(self)
 	local editorModel = self.game.editorModel
 	local noteSkin = self.game.noteSkinModel.noteSkin
@@ -261,10 +258,19 @@ SnapGridView.draw = function(self)
 	self:drawTimingObjects("absoluteTime", editorTimePoint.absoluteTime, 500, 50, "left", getVelocityText)
 	love.graphics.pop()
 
-	if love.keyboard.isDown("lalt") then
+	local lalt, lshift, lctrl = love.keyboard.isDown("lalt"), love.keyboard.isDown("lshift"), love.keyboard.isDown("lctrl")
+
+	if lalt and not speedOrig then
+		speedOrig = editor.speed
+		editor.speed = 1000 / noteSkin.unit * 10
+	elseif not lalt and speedOrig then
+		editor.speed = speedOrig
+		speedOrig = nil
+	end
+	if lalt or lshift or lctrl then
 		drawMouse(self)
 	end
-	if love.keyboard.isDown("lalt") and drag("drag1", width, h) then
+	if (lalt or lshift or lctrl) and drag("drag1", width, h) then
 		local a = noteSkin:getInverseTimePosition(_my)
 		local b = noteSkin:getInverseTimePosition(prevMouseY)
 		editorModel:scrollSecondsDelta((a - b) / editor.speed)
@@ -272,7 +278,6 @@ SnapGridView.draw = function(self)
 			editorModel:pause()
 			self.dragging = true
 		end
-		drawMouse(self)
 	elseif self.dragging then
 		editorModel:play()
 		self.dragging = false
@@ -287,9 +292,9 @@ SnapGridView.draw = function(self)
 	end
 
 	if scroll then
-		if love.keyboard.isDown("lshift") then
+		if lshift then
 			editor.snap = math.min(math.max(editor.snap + scroll, 1), 16)
-		elseif love.keyboard.isDown("lctrl") then
+		elseif lctrl then
 			editorModel:setLogSpeed(editorModel:getLogSpeed() + scroll)
 			editorModel:updateRange()
 		else
