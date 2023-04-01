@@ -188,6 +188,27 @@ drawSection.graphics = function(self)
 	p.camera = imgui.checkbox("p.camera", p.camera, "enable camera")
 	p.rx = imgui.checkbox("p.rx", p.rx, "allow rotate x")
 	p.ry = imgui.checkbox("p.ry", p.ry, "allow rotate y")
+
+	imgui.separator()
+	imgui.text("Renderer")
+
+	local name, version, vendor, device = love.graphics.getRendererInfo()
+	imgui.text("name:")
+	just.sameline()
+	just.offset(120)
+	just.text(name)
+	imgui.text("version:")
+	just.sameline()
+	just.offset(120)
+	just.text(version)
+	imgui.text("vendor:")
+	just.sameline()
+	just.offset(120)
+	just.text(vendor)
+	imgui.text("device:")
+	just.sameline()
+	just.offset(120)
+	just.text(device)
 end
 
 local _formatModes = {
