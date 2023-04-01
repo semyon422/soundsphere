@@ -201,6 +201,34 @@ local function drag(id, w, h)
 	return just.active_id == id
 end
 
+local function drawMouse(self)
+	if not love.keyboard.isDown("lalt") then
+		return
+	end
+
+	local editorModel = self.game.editorModel
+	local dt = editorModel:getMouseTime() - editorModel.timePoint.absoluteTime
+
+	love.graphics.push()
+	local w, h = Layout:move("base")
+
+	local x, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+
+	local font = spherefonts.get("Noto Sans", 24)
+	love.graphics.setFont(font)
+	local text = ("%3.1fms"):format(dt * 1000)
+	local width = font:getWidth(text)
+	local height = font:getHeight() * font:getLineHeight()
+
+	local padding = 20
+	love.graphics.setColor(0, 0, 0, 0.75)
+	love.graphics.rectangle("fill", x, y, width + padding * 2, height)
+
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.printf(("%3.1fms"):format(dt * 1000), x + padding, y, width, "left")
+	love.graphics.pop()
+end
+
 local prevMouseY = 0
 SnapGridView.draw = function(self)
 	local editorModel = self.game.editorModel
@@ -233,6 +261,9 @@ SnapGridView.draw = function(self)
 	self:drawTimingObjects("absoluteTime", editorTimePoint.absoluteTime, 500, 50, "left", getVelocityText)
 	love.graphics.pop()
 
+	if love.keyboard.isDown("lalt") then
+		drawMouse(self)
+	end
 	if love.keyboard.isDown("lalt") and drag("drag1", width, h) then
 		local a = noteSkin:getInverseTimePosition(_my)
 		local b = noteSkin:getInverseTimePosition(prevMouseY)
@@ -241,6 +272,7 @@ SnapGridView.draw = function(self)
 			editorModel:pause()
 			self.dragging = true
 		end
+		drawMouse(self)
 	elseif self.dragging then
 		editorModel:play()
 		self.dragging = false
