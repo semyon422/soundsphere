@@ -27,6 +27,7 @@ end
 EditorModel.load = function(self)
 	local noteChartModel = self.game.noteChartModel
 	local nc = noteChartModel.noteChart
+	local editor = self.game.configModel.configs.settings.editor
 
 	self:fixSettings()
 
@@ -60,6 +61,7 @@ EditorModel.load = function(self)
 	self.lastTime = ld.ranges.timePoint.last.absoluteTime
 
 	self.timer:reset()
+	self.timer:setPosition(editor.time)
 
 	self.audioManager.volume = self.game.configModel.configs.settings.audio.volume
 	self.audioManager:load()
@@ -376,6 +378,8 @@ EditorModel.update = function(self)
 	end
 
 	self.graphicEngine:update()
+
+	editor.time = self.timer:getTime()
 end
 
 EditorModel.receive = function(self, event)

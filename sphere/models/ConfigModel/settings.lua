@@ -23,6 +23,7 @@ return {
 		snap = 1,
 		lockSnap = true,
 		showTimings = true,
+		time = 0,
 		tool = "Select",
 		waveform = {
 			opacity = 0.5,
