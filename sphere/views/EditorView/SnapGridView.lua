@@ -76,12 +76,36 @@ local snaps = {
 	[8] = colors.green,
 }
 
+SnapGridView.drawSnap = function(self, timePoint, field, currentTime, width)
+	local editorModel = self.game.editorModel
+	local noteSkin = self.game.noteSkinModel.noteSkin
+	local editor = self.game.configModel.configs.settings.editor
+
+	local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editor.speed)
+
+	love.graphics.push("all")
+	love.graphics.translate(0, y)
+
+	local changed, active, hovered = just.button(
+		tostring(timePoint),
+		just.is_over(12, 12, -6, -6) or just.is_over(12, 12, -6 + width, -6)
+	)
+	if hovered then
+		love.graphics.setLineWidth(4)
+	end
+	if changed then
+		editorModel:scrollTimePoint(timePoint)
+	end
+
+	love.graphics.line(0, 0, width, 0)
+	love.graphics.pop()
+end
+
 SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 	local editorModel = self.game.editorModel
 	local editor = self.game.configModel.configs.settings.editor
 	local ld = editorModel.layerData
 	local snap = editor.snap
-	local noteSkin = self.game.noteSkinModel.noteSkin
 
 	if not currentTime then
 		return
@@ -99,9 +123,8 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 					if f:tonumber() < 1 then
 						local timePoint = ld:getDynamicTimePoint(f + time, -1)
 						if not timePoint then break end
-						local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editor.speed)
 						love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
-						love.graphics.line(0, y, width, y)
+						self:drawSnap(timePoint, field, currentTime, width)
 					end
 				end
 			end
@@ -133,11 +156,9 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 			end
 
 			if not drawNothing then
-				local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editor.speed)
-
 				local j = snap * timePoint:getBeatModulo()
 				love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
-				love.graphics.line(0, y, width, y)
+				self:drawSnap(timePoint, field, currentTime, width)
 			end
 
 			intervalData, time = timePoint:add(Fraction(1, snap))
