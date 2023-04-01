@@ -40,6 +40,13 @@ GraphicEngine.selectEnd = function(self)
 end
 
 GraphicEngine.selectNote = function(self, note, keepOthers)
+	if not note then
+		for _, _note in ipairs(self.notes) do
+			_note.selected = false
+		end
+		self.selectedNotes = {}
+		return
+	end
 	if not note.selected then
 		if not keepOthers then
 			for _, _note in ipairs(self.notes) do

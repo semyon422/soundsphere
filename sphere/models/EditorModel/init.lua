@@ -287,6 +287,7 @@ end
 EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
 	local editor = self.game.configModel.configs.settings.editor
 	local ld = self.layerData
+	self.graphicEngine:selectNote()
 	if editor.tool == "ShortNote" then
 		local dtp = self:getDtpAbsolute(absoluteTime, true)
 		local noteData = ld:getNoteData(dtp, inputType, inputIndex)
