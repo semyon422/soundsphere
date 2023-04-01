@@ -319,6 +319,9 @@ SnapGridView.draw = function(self)
 			editorModel:setLogSpeed(editorModel:getLogSpeed() + scroll)
 			editorModel:updateRange()
 		else
+			if editorModel.timer.isPlaying and scroll < 0 then
+				editorModel:scrollSnaps(scroll)
+			end
 			editorModel:scrollSnaps(scroll)
 		end
 	end
