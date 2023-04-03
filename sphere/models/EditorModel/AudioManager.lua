@@ -11,7 +11,7 @@ end
 
 AudioManager.update = function(self, force)
 	local time = self.timer:getTime()
-	if time == self.time then
+	if time == self.time and not force then
 		return
 	end
 	self.time = time

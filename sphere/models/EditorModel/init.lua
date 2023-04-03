@@ -112,6 +112,8 @@ EditorModel.loadResources = function(self)
 		end
 	end
 
+	self.audioManager:update(true)
+
 	self.resourcesLoaded = true
 end
 
