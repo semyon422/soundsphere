@@ -192,6 +192,68 @@ EditorModel.selectNote = function(self, note)
 	self.graphicEngine:selectNote(note, love.keyboard.isDown("lctrl"))
 end
 
+EditorModel.copyNotes = function(self, cut)
+	local noteSkin = self.game.noteSkinModel.noteSkin
+
+	self.copiedNotes = {}
+	local copyTimePoint
+
+	for _, note in ipairs(self.graphicEngine.selectedNotes) do
+		local _column = noteSkin:getInputColumn(note.inputType, note.inputIndex)
+		if _column then
+			if not copyTimePoint or note.startNoteData.timePoint < copyTimePoint then
+				copyTimePoint = note.startNoteData.timePoint
+			end
+			table.insert(self.copiedNotes, note)
+			if cut then
+				self:removeNote(note)
+			end
+		end
+	end
+
+	for _, note in ipairs(self.copiedNotes) do
+		note.deltaTime = note.startNoteData.timePoint:sub(copyTimePoint)
+	end
+end
+
+EditorModel.deleteNotes = function(self)
+	local c = 0
+	local noteSkin = self.game.noteSkinModel.noteSkin
+	for _, note in ipairs(self.graphicEngine.selectedNotes) do
+		local _column = noteSkin:getInputColumn(note.inputType, note.inputIndex)
+		if _column then
+			self:removeNote(note)
+			c = c + 1
+		end
+	end
+	return c
+end
+
+EditorModel.pasteNotes = function(self)
+	local ld = self.layerData
+	local copiedNotes = self.copiedNotes
+	if not copiedNotes then
+		return
+	end
+
+	local _dtp = self:getDynamicTimePoint()
+	for _, note in ipairs(copiedNotes) do
+		local dtp = ld:getTimePoint(_dtp:add(note.deltaTime))
+		note.startNoteData = note.startNoteData:clone()
+		note.startNoteData.timePoint = ld:checkTimePoint(dtp)
+		if note.endNoteData then
+			local dtp = ld:getTimePoint(_dtp:add(note.deltaTime))
+			note.endNoteData = note.endNoteData:clone()
+			note.endNoteData.timePoint = ld:checkTimePoint(dtp)
+
+			note.endNoteData.startNoteData = note.startNoteData
+			note.startNoteData.endNoteData = note.endNoteData
+		end
+
+		self:_addNote(note)
+	end
+end
+
 EditorModel.grabNotes = function(self, part)
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	local editor = self.game.configModel.configs.settings.editor
