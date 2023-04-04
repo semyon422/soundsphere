@@ -31,7 +31,7 @@ do
 	local ild, tpm = ConvertAbsoluteToInterval(ld)
 
 	assert(#ild.intervalDatas == 4)
-	assert(ild.intervalDatas[1].beats == 4)
+	assert(ild.intervalDatas[1].beats == 3)
 	assert(ild.intervalDatas[2].beats == 1)
 	assert(ild.intervalDatas[3].beats == 4)
 	assert(ild.intervalDatas[4].beats == 1)
@@ -231,34 +231,6 @@ do
 	assert(tpm[tp2].intervalData == ild.intervalDatas[1])
 end
 
--- do
--- 	local nc = NoteChart:new()
--- 	local ld = nc:getLayerData(1)
--- 	ld:setTimeMode("absolute")
--- 	ld:setSignatureMode("long")
--- 	ld:setPrimaryTempo(60)
-
--- 	ld:insertTempoData(0, 60)
--- 	ld:insertTempoData(1/16+0.002, 120)
-
--- 	local tp0 = ld:getTimePoint(0)
--- 	local tp1 = ld:getTimePoint(1/16+0.002)
--- 	local tp2 = ld:getTimePoint(1/16+0.001)
-
--- 	nc:compute()
-
--- 	local ild, tpm = ConvertAbsoluteToInterval(ld)
-
--- 	assert(#ild.intervalDatas == 2)
--- 	assert(#ild.timePointList == 2)
-
--- 	assert(ild.intervalDatas[1].beats == 1)
--- 	assert(ild.intervalDatas[2].beats == 1)
--- 	assert(ild.intervalDatas[1]:start() == F(0))
--- 	assert(ild.intervalDatas[2]:start() == F(0))
--- end
-
-
 do
 	local nc = NoteChart:new()
 	local ld = nc:getLayerData(1)
@@ -284,7 +256,31 @@ do
 	assert(ild.intervalDatas[2].beats == 1)
 	assert(ild.intervalDatas[1]:start() == F(0))
 	assert(ild.intervalDatas[2]:start() == F(0))
+end
 
-	-- assert(tpm[tp2].intervalData == ild.intervalDatas[1])
+do
+	local nc = NoteChart:new()
+	local ld = nc:getLayerData(1)
+	ld:setTimeMode("absolute")
+	ld:setSignatureMode("long")
+	ld:setPrimaryTempo(60)
+
+	ld:insertTempoData(0.146, 60000 / 788.39252234492)
+	ld:insertTempoData(22.221, 60000 / 689.48892265437)
+	ld:insertTempoData(44.285, 60000 / 689.75422887858)
+
+	local tp0 = ld:getTimePoint(42.906)
+	local tp1 = ld:getTimePoint(0.935)
+
+	nc:compute()
+
+	local ild, tpm = ConvertAbsoluteToInterval(ld)
+
+	assert(#ild.intervalDatas == 5)
+	assert(ild.intervalDatas[1].beats == 27)
+	assert(ild.intervalDatas[2].beats == 1)
+	assert(ild.intervalDatas[3].beats == 31)
+	assert(ild.intervalDatas[4].beats == 1)
+	assert(ild.intervalDatas[5].beats == 1)
 end
 

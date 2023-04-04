@@ -41,7 +41,7 @@ return function(layerData)
 			local beats = idt / td:getBeatDuration()
 			local next_td_time = Fraction:new(beats, 16, false)
 			local _time = next_td_time - Fraction(1, 16)
-			_interval.beats = math.floor(beats)
+			_interval.beats = _time:floor()
 			if _time:tonumber() <= 0 then
 				_interval.beats = 1
 			end
