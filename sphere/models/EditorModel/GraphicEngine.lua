@@ -8,6 +8,13 @@ GraphicEngine.construct = function(self)
 	self.selectedNotes = {}
 end
 
+GraphicEngine.reset = function(self)
+	self:selectEnd()
+	self:selectNote()
+	self.notes = {}
+	self.selectedNotes = {}
+end
+
 GraphicEngine.longNoteShortening = 0
 
 GraphicEngine.getCurrentTime = function(self)

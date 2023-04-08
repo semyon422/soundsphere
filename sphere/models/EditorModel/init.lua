@@ -8,6 +8,7 @@ local TimeManager = require("sphere.models.EditorModel.TimeManager")
 local GraphicEngine = require("sphere.models.EditorModel.GraphicEngine")
 local just = require("just")
 local ConvertAbsoluteToInterval = require("sphere.models.EditorModel.ConvertAbsoluteToInterval")
+local Changes = require("Changes")
 local ConvertTests = require("sphere.models.EditorModel.ConvertTests")
 
 local EditorModel = Class:new()
@@ -41,6 +42,8 @@ EditorModel.load = function(self)
 
 	ld = DynamicLayerData:new(ld)
 	self.layerData = ld
+	self.changes = Changes:new()
+	ld:syncChanges(self.changes:get())
 
 	self.columns = nc.inputMode:getColumns()
 	self.inputMap = nc.inputMode:getInputMap()
@@ -75,6 +78,24 @@ EditorModel.fixSettings = function(self)
 		editor.speed = 1
 	end
 	editor.snap = math.min(math.max(editor.snap, 1), 16)
+end
+
+EditorModel.undo = function(self)
+	for i in self.changes:undo() do
+		self.layerData:syncChanges(i - 1)
+		print("undo i", i - 1)
+	end
+	self.graphicEngine:reset()
+	print("undo", self.changes)
+end
+
+EditorModel.redo = function(self)
+	for i in self.changes:redo() do
+		self.layerData:syncChanges(i)
+		print("redo i", i)
+	end
+	self.graphicEngine:reset()
+	print("redo", self.changes)
 end
 
 EditorModel.loadResources = function(self)
@@ -193,6 +214,9 @@ EditorModel.selectNote = function(self, note)
 end
 
 EditorModel.copyNotes = function(self, cut)
+	if cut then
+		self:startChange()
+	end
 	local noteSkin = self.game.noteSkinModel.noteSkin
 
 	self.copiedNotes = {}
@@ -206,7 +230,7 @@ EditorModel.copyNotes = function(self, cut)
 			end
 			table.insert(self.copiedNotes, note)
 			if cut then
-				self:removeNote(note)
+				self:_removeNote(note)
 			end
 		end
 	end
@@ -214,18 +238,23 @@ EditorModel.copyNotes = function(self, cut)
 	for _, note in ipairs(self.copiedNotes) do
 		note.deltaTime = note.startNoteData.timePoint:sub(copyTimePoint)
 	end
+	if cut then
+		self:nextChange()
+	end
 end
 
 EditorModel.deleteNotes = function(self)
+	self:startChange()
 	local c = 0
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	for _, note in ipairs(self.graphicEngine.selectedNotes) do
 		local _column = noteSkin:getInputColumn(note.inputType, note.inputIndex)
 		if _column then
-			self:removeNote(note)
+			self:_removeNote(note)
 			c = c + 1
 		end
 	end
+	self:nextChange()
 	return c
 end
 
@@ -236,6 +265,7 @@ EditorModel.pasteNotes = function(self)
 		return
 	end
 
+	self:startChange()
 	local _dtp = self:getDynamicTimePoint()
 	for _, note in ipairs(copiedNotes) do
 		local dtp = ld:getTimePoint(_dtp:add(note.deltaTime))
@@ -252,6 +282,7 @@ EditorModel.pasteNotes = function(self)
 
 		self:_addNote(note)
 	end
+	self:nextChange()
 end
 
 EditorModel.grabNotes = function(self, part)
@@ -260,13 +291,14 @@ EditorModel.grabNotes = function(self, part)
 
 	self.grabbedNotes = {}
 
+	self:startChange()
 	local column = self:getColumnOver()
 	local t = self:getMouseTime()
 	for _, note in ipairs(self.graphicEngine.selectedNotes) do
 		local _column = noteSkin:getInputColumn(note.inputType, note.inputIndex)
 		if _column then
 			table.insert(self.grabbedNotes, note)
-			self:removeNote(note)
+			self:_removeNote(note)
 
 			note.grabbedPart = part
 
@@ -307,6 +339,7 @@ EditorModel.dropNotes = function(self)
 		for _, note in ipairs(grabbedNotes) do
 			self:_addNote(note)
 		end
+		self:nextChange()
 		return
 	end
 
@@ -332,14 +365,22 @@ EditorModel.dropNotes = function(self)
 
 		self:_addNote(note)
 	end
+	self:nextChange()
 end
 
-EditorModel.removeNote = function(self, note)
+EditorModel._removeNote = function(self, note)
 	local ld = self.layerData
 	ld:removeNoteData(note.startNoteData, note.inputType, note.inputIndex)
 	if note.endNoteData then
 		ld:removeNoteData(note.endNoteData, note.inputType, note.inputIndex)
 	end
+	self:increaseChange()
+end
+
+EditorModel.removeNote = function(self, note)
+	self:startChange()
+	self:_removeNote(note)
+	self:nextChange()
 end
 
 EditorModel._addNote = function(self, note)
@@ -348,9 +389,11 @@ EditorModel._addNote = function(self, note)
 	if note.endNoteData then
 		ld:addNoteData(note.endNoteData, note.inputType, note.inputIndex)
 	end
+	self:increaseChange()
 end
 
 EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
+	self:startChange()
 	local editor = self.game.configModel.configs.settings.editor
 	local ld = self.layerData
 	self.graphicEngine:selectNote()
@@ -378,6 +421,24 @@ EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
 		endNoteData.startNoteData = startNoteData
 		startNoteData.endNoteData = endNoteData
 	end
+	self:increaseChange()
+	self:nextChange()
+end
+
+EditorModel.startChange = function(self)
+	self.changes:reset()
+	self.layerData:resetRedos()
+end
+
+EditorModel.increaseChange = function(self)
+	local i = self.changes:add()
+	self.layerData:syncChanges(i)
+	print("add", i)
+end
+
+EditorModel.nextChange = function(self)
+	self.changes:next()
+	print("next", self.changes)
 end
 
 EditorModel.selectStart = function(self)

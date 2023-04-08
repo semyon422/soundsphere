@@ -24,6 +24,12 @@ local function Hotkeys(self)
 		elseif kp("v") then
 			editorModel:pasteNotes()
 			notificationModel:notify("paste " .. #editorModel.copiedNotes .. " notes")
+		elseif kp("z") then
+			editorModel:undo()
+			notificationModel:notify("undo")
+		elseif kp("y") then
+			editorModel:redo()
+			notificationModel:notify("redo")
 		end
 	end
 
