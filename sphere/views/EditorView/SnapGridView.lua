@@ -291,7 +291,7 @@ SnapGridView.draw = function(self)
 	if lalt or lshift or lctrl then
 		drawMouse(self)
 	end
-	if (lalt or lshift or lctrl) and drag("drag1", width, h) then
+	if (lalt or lshift) and drag("drag1", width, h) then
 		local a = noteSkin:getInverseTimePosition(_my)
 		local b = noteSkin:getInverseTimePosition(prevMouseY)
 		editorModel:scrollSecondsDelta((a - b) / editor.speed)
