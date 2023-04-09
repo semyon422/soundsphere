@@ -166,6 +166,12 @@ GameController.load = function(self)
 	self.gameView:load()
 
 	local device = self.configModel.configs.settings.audio.device
+	if device.period == 0 then
+		device.period = bass.default_dev_period
+	end
+	if device.buffer == 0 then
+		device.buffer = bass.default_dev_buffer
+	end
 	bass.setDevicePeriod(device.period)
 	bass.setDeviceBuffer(device.buffer)
 	bass.init()

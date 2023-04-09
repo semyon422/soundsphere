@@ -1,8 +1,8 @@
 return {
 	audio = {
-		device = {
-			period = 10,
-			buffer = 20,
+		device = {  -- use default
+			period = 0,
+			buffer = 0,
 		},
 		midi = {
 			constantVolume = false

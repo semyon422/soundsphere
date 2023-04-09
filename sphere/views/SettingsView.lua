@@ -252,6 +252,14 @@ drawSection.audio = function(self)
 		bass.setDeviceBuffer(a.device.buffer)
 		bass.reinit()
 	end
+	just.sameline()
+	if imgui.button("reset device", "reset") then
+		a.device.period = bass.default_dev_period
+		a.device.buffer = bass.default_dev_buffer
+		bass.setDevicePeriod(a.device.period)
+		bass.setDeviceBuffer(a.device.buffer)
+		bass.reinit()
+	end
 end
 
 drawSection.input = function(self)
