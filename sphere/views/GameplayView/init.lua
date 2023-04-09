@@ -130,10 +130,8 @@ GameplayView.keypressed = function(self)
 	elseif kp(input.offset.increase) then timeController:increaseLocalOffset(0.001)
 	elseif kp(input.timeRate.decrease) then timeController:increaseTimeRate(-0.05)
 	elseif kp(input.timeRate.increase) then timeController:increaseTimeRate(0.05)
-	-- elseif scancode == input.timeRate.invert then timeController:invertTimeRate()
-	elseif kp(input.playSpeed.decrease) then timeController:increasePlaySpeed(-0.05)
-	elseif kp(input.playSpeed.increase) then timeController:increasePlaySpeed(0.05)
-	elseif kp(input.playSpeed.invert) then timeController:invertPlaySpeed()
+	elseif kp(input.playSpeed.decrease) then timeController:increasePlaySpeed(-1)
+	elseif kp(input.playSpeed.increase) then timeController:increasePlaySpeed(1)
 	end
 
 	local gameplayController = self.game.gameplayController

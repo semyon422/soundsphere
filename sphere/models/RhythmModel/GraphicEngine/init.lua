@@ -22,20 +22,11 @@ GraphicEngine.update = function(self, dt)
 	end
 end
 
-GraphicEngine.increaseVisualTimeRate = function(self, delta)
-	local target = self.targetVisualTimeRate
-	local newTarget = math.floor((target + delta) / delta + 0.5) * delta
-
-	if math.abs(newTarget) > 0.001 then
-		self.targetVisualTimeRate = newTarget
-		self:setVisualTimeRate(self.targetVisualTimeRate)
-	else
-		self.targetVisualTimeRate = 0
-		self:setVisualTimeRate(self.targetVisualTimeRate)
-	end
-end
-
 GraphicEngine.setVisualTimeRate = function(self, visualTimeRate)
+	if math.abs(visualTimeRate) <= 0.001 then
+		visualTimeRate = 0
+	end
+	self.targetVisualTimeRate = visualTimeRate
 	if self.tween then
 		self.tween:stop()
 	end

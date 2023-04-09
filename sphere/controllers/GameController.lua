@@ -32,6 +32,7 @@ local MultiplayerModel		= require("sphere.models.MultiplayerModel")
 local MainLog					= require("sphere.MainLog")
 local ReplayModel		= require("sphere.models.ReplayModel")
 local EditorModel		= require("sphere.models.EditorModel")
+local SpeedModel		= require("sphere.models.SpeedModel")
 
 local MountController			= require("sphere.controllers.MountController")
 local SelectController			= require("sphere.controllers.SelectController")
@@ -106,6 +107,7 @@ GameController.construct = function(self)
 	self.multiplayerModel = MultiplayerModel:new()
 	self.replayModel = ReplayModel:new()
 	self.editorModel = EditorModel:new()
+	self.speedModel = SpeedModel:new()
 
 	for k, v in pairs(self) do
 		v.game = self

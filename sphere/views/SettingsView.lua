@@ -70,7 +70,14 @@ drawSection.gameplay = function(self)
 	local g = settings.gameplay
 	local i = settings.input
 
-	g.speed = imgui.slider1("speed", g.speed, "%0.2f", 0, 3, 0.01, "play speed")
+	local speedModel = self.game.speedModel
+
+	local speedRange = speedModel.range[g.speedType]
+	local speedFormat = speedModel.format[g.speedType]
+	local newSpeed = imgui.slider1("speed", speedModel:get(), speedFormat, speedRange[1], speedRange[2], speedRange[3], "play speed")
+	speedModel:set(newSpeed)
+
+	g.speedType = imgui.combo("speedType", g.speedType, speedModel.types, nil, "speed type")
 
 	if imgui.TextButton("open timings", "timings", _w / 2, _h) then
 		self.game.gameView:setModal(TimingsModalView)
@@ -127,7 +134,6 @@ drawSection.gameplay = function(self)
 	just.text("play speed")
 	i.playSpeed.decrease = imgui.hotkey("playSpeed.decrease", i.playSpeed.decrease, "decrease")
 	i.playSpeed.increase = imgui.hotkey("playSpeed.increase", i.playSpeed.increase, "increase")
-	i.playSpeed.invert = imgui.hotkey("playSpeed.invert", i.playSpeed.invert, "invert ")
 
 	imgui.separator()
 	just.indent(10)

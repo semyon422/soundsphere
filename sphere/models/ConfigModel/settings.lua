@@ -52,6 +52,7 @@ return {
 		actionOnFail = "none",
 		ratingHitTimingWindow = 0.032,
 		scaleSpeed = false,
+		speedType = "default",
 		speed = 1,
 		time = {
 			pausePlay = 0.5,
@@ -133,8 +134,7 @@ return {
 		},
 		playSpeed = {
 			decrease = "f3",
-			increase = "f4",
-			invert = "f2"
+			increase = "f4"
 		},
 		quickRestart = "`",
 		screenshot = {
@@ -145,8 +145,7 @@ return {
 		skipIntro = "space",
 		timeRate = {
 			decrease = "f5",
-			increase = "f6",
-			invert = "f7"
+			increase = "f6"
 		}
 	},
 	miscellaneous = {

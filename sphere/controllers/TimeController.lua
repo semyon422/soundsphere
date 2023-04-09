@@ -40,30 +40,13 @@ TimeController.increaseTimeRate = function(self, delta)
 	self.game.notificationModel:notify("rate: " .. timeEngine.timeRate)
 end
 
--- TimeController.invertTimeRate = function(self)
--- 	if self.game.multiplayerModel.isPlaying then return end
--- 	local rhythmModel = self.game.rhythmModel
--- 	local timeEngine = rhythmModel.timeEngine
--- 	timeEngine:setTimeRate(-timeEngine.timeRate)
--- 	rhythmModel.prohibitSavingScore = true
--- 	self.game.notificationModel:notify("rate: " .. timeEngine.timeRate)
--- end
-
 TimeController.increasePlaySpeed = function(self, delta)
-	local gameplay = self.game.configModel.configs.settings.gameplay
-	local rhythmModel = self.game.rhythmModel
-	local graphicEngine = rhythmModel.graphicEngine
-	graphicEngine:increaseVisualTimeRate(delta)
-	gameplay.speed = graphicEngine.targetVisualTimeRate
-	self.game.notificationModel:notify("scroll speed: " .. graphicEngine.targetVisualTimeRate)
-end
+	local speedModel = self.game.speedModel
+	speedModel:increase(delta)
 
-TimeController.invertPlaySpeed = function(self)
-	local rhythmModel = self.game.rhythmModel
-	local graphicEngine = rhythmModel.graphicEngine
-	graphicEngine.targetVisualTimeRate = -graphicEngine.targetVisualTimeRate
-	graphicEngine:setVisualTimeRate(graphicEngine.targetVisualTimeRate)
-	self.game.notificationModel:notify("scroll speed: " .. graphicEngine.targetVisualTimeRate)
+	local gameplay = self.game.configModel.configs.settings.gameplay
+	self.game.rhythmModel.graphicEngine:setVisualTimeRate(gameplay.speed)
+	self.game.notificationModel:notify("scroll speed: " .. speedModel.format[gameplay.speedType]:format(speedModel:get()))
 end
 
 TimeController.increaseLocalOffset = function(self, delta)
