@@ -142,7 +142,7 @@ LongNoteView.getBodyTransformParams = function(self)
 
 	local sx = nw and nw / w or bw:get("sx") or 1
 	-- local sy = nh and nh / h or bw:get("sy") or 1
-	local sy = sx
+	local sy = 1 / 1.6
 
 	self.bodyQuad:setViewport(0, 0, w, dy / sy, w, h)
 
