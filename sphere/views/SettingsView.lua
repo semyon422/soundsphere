@@ -16,9 +16,9 @@ local sections = {
 	"input",
 	"misc",
 }
-local currentSection = sections[1]
+local section = sections[1]
 
-local scrollY = 0
+local scrollY = {}
 
 local w, h = 768, 1080 / 2
 local _w, _h = w / 2, 55
@@ -46,13 +46,15 @@ local function draw(self)
 
 	just.push()
 
-	currentSection = imgui.tabs("settings tabs", currentSection, sections)
-	imgui.Container(window_id, w, h - _h, _h / 3, _h * 2, scrollY)
+	section = imgui.tabs("settings tabs", section, sections)
 
-	drawSection[currentSection](self)
+	scrollY[section] = scrollY[section] or 0
+	imgui.Container(window_id, w, h - _h, _h / 3, _h * 2, scrollY[section])
+
+	drawSection[section](self)
 	just.emptyline(8)
 
-	scrollY = imgui.Container()
+	scrollY[section] = imgui.Container()
 	just.pop()
 
 	love.graphics.setColor(1, 1, 1, 1)
