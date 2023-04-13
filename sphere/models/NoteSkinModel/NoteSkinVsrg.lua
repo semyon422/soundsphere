@@ -302,7 +302,8 @@ NoteSkinVsrg.setLongNote = function(self, params)
 		ox = {},
 		oy = {},
 		color = color,
-		image = body
+		image = body,
+		scale = params.scale
 	}
 
 	self.notes.LongNote = {

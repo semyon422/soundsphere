@@ -232,6 +232,7 @@ OsuNoteSkin.load = function(self)
 		head = lhead,
 		body = lbody,
 		tail = ltail,
+		scale = 1 / 1.6,
 	})
 
 	local smallestWidth = self.width[1]
