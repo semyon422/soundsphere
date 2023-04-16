@@ -164,6 +164,9 @@ EditorModel.save = function(self)
 end
 
 EditorModel.play = function(self)
+	if self.grabbedIntervalData then
+		return
+	end
 	self.timer:play()
 	self.audioManager:play()
 end
@@ -599,6 +602,9 @@ EditorModel.scrollSecondsDelta = function(self, delta)
 end
 
 EditorModel.scrollSnaps = function(self, delta)
+	if self.grabbedIntervalData then
+		return
+	end
 	local ld = self.layerData
 	if ld.mode == "interval" then
 		self:scrollTimePoint(ld:getDynamicTimePoint(self:scrollSnapsInterval(delta)))
