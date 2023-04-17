@@ -185,7 +185,7 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 	end
 	print(("Extracted to: %s"):format(extractPath))
 
-	beatmap.status = "Cacheing"
+	beatmap.status = "Caching"
 
 	local c = coroutine.running()
 	self.game.cacheModel:startUpdate(extractPath, true, function()
