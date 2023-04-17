@@ -160,6 +160,9 @@ NoteSkinVsrg.getInverseTimePosition = function(self, pos)
 end
 
 NoteSkinVsrg.getPosition = function(self, timeState)
+	if self.editor then
+		return self:getTimePosition(timeState.scaledAbsoluteDeltaTime)
+	end
 	return self:getTimePosition(timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
 end
 
