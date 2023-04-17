@@ -30,11 +30,10 @@ do
 
 	local ild, tpm = ConvertAbsoluteToInterval(ld)
 
-	assert(#ild.intervalDatas == 4)
-	assert(ild.intervalDatas[1].beats == 3)
-	assert(ild.intervalDatas[2].beats == 1)
-	assert(ild.intervalDatas[3].beats == 4)
-	assert(ild.intervalDatas[4].beats == 1)
+	assert(#ild.intervalDatas == 3)
+	assert(ild.intervalDatas[1].beats == 4)
+	assert(ild.intervalDatas[2].beats == 4)
+	assert(ild.intervalDatas[3].beats == 1)
 
 	assert(tpm[tp3].time == F(0.5))
 end
@@ -81,7 +80,7 @@ do
 
 	local ild, tpm = ConvertAbsoluteToInterval(ld)
 
-	assert(#ild.intervalDatas == 3)  -- 0, 3.25, 3.5
+	assert(#ild.intervalDatas == 3)
 	assert(ild.intervalDatas[1].beats == 3)
 	assert(ild.intervalDatas[2].beats == 1)
 	assert(ild.intervalDatas[3].beats == 1)
@@ -189,15 +188,15 @@ do
 
 	local ild, tpm = ConvertAbsoluteToInterval(ld)
 
-	assert(#ild.intervalDatas == 3)
-	assert(#ild.timePointList == 3)
+	assert(#ild.intervalDatas == 2)
+	assert(#ild.timePointList == 2)
 
-	assert(ild.intervalDatas[1].beats == 0)
-	assert(ild.intervalDatas[2].beats == 1)
-	assert(ild.intervalDatas[3].beats == 1)
 	assert(ild.intervalDatas[1]:start() == F(0))
-	assert(ild.intervalDatas[2]:start() == F(1-1/16))
-	assert(ild.intervalDatas[3]:start() == F(0))
+	assert(ild.intervalDatas[2]:start() == F(0))
+	print(ild.intervalDatas[1].beats)
+	print(ild.intervalDatas[2].beats)
+	assert(ild.intervalDatas[1].beats == 1)
+	assert(ild.intervalDatas[2].beats == 1)
 
 	assert(tpm[tp2].intervalData == ild.intervalDatas[1])
 end
@@ -276,11 +275,9 @@ do
 
 	local ild, tpm = ConvertAbsoluteToInterval(ld)
 
-	assert(#ild.intervalDatas == 5)
-	assert(ild.intervalDatas[1].beats == 27)
-	assert(ild.intervalDatas[2].beats == 1)
-	assert(ild.intervalDatas[3].beats == 31)
-	assert(ild.intervalDatas[4].beats == 1)
-	assert(ild.intervalDatas[5].beats == 1)
+	assert(#ild.intervalDatas == 3)
+	assert(ild.intervalDatas[1].beats == 28)
+	assert(ild.intervalDatas[2].beats == 32)
+	assert(ild.intervalDatas[3].beats == 1)
 end
 
