@@ -191,12 +191,10 @@ do
 	assert(#ild.intervalDatas == 2)
 	assert(#ild.timePointList == 2)
 
-	assert(ild.intervalDatas[1]:start() == F(0))
-	assert(ild.intervalDatas[2]:start() == F(0))
-	print(ild.intervalDatas[1].beats)
-	print(ild.intervalDatas[2].beats)
 	assert(ild.intervalDatas[1].beats == 1)
 	assert(ild.intervalDatas[2].beats == 1)
+	assert(ild.intervalDatas[1]:start() == F(0))
+	assert(ild.intervalDatas[2]:start() == F(0))
 
 	assert(tpm[tp2].intervalData == ild.intervalDatas[1])
 end
