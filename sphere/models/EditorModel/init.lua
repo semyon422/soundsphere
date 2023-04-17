@@ -107,7 +107,8 @@ EditorModel.loadResources = function(self)
 		for _, noteData in ipairs(noteDatas) do
 			local offset = noteData.timePoint.absoluteTime
 			if noteData.stream then
-				self.soundDataOffset = offset
+				self.soundDataOffset = noteData.streamOffset or 0
+				offset = noteData.streamOffset or 0
 			end
 			if noteData.sounds then
 				for _, s in ipairs(noteData.sounds) do
@@ -117,7 +118,7 @@ EditorModel.loadResources = function(self)
 						local _audio = audio:newAudio(soundData)
 						local duration = _audio:getLength()
 						self.audioManager:insert({
-							offset = noteData.timePoint.absoluteTime,
+							offset = offset,
 							duration = duration,
 							soundData = soundData,
 							audio = _audio,
