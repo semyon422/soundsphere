@@ -159,7 +159,7 @@ EditorModel.genDensityGraph = function(self)
 	end
 	table.sort(notes)
 
-	local pointsCount = math.floor(#notes / 10)
+	local pointsCount = math.floor(self.lastTime - self.firstTime) * 2
 
 	self.densityGraph = {}
 	local points = self.densityGraph
