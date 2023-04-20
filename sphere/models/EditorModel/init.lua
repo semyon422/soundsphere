@@ -25,6 +25,7 @@ EditorModel.construct = function(self)
 	self.graphicEngine.editorModel = self
 	self.grabbedNotes = {}
 	self.densityGraph = {}
+	self.intervalDatasGraph = {n = 0}
 end
 
 EditorModel.load = function(self)
@@ -137,6 +138,7 @@ EditorModel.loadResources = function(self)
 	end
 
 	self:genDensityGraph()
+	self:genIntervalDatasGraph()
 
 	self.audioManager:update(true)
 
@@ -175,6 +177,31 @@ EditorModel.genDensityGraph = function(self)
 
 	for i = 0, pointsCount do
 		points[i] = points[i] / maxValue
+	end
+end
+
+EditorModel.genIntervalDatasGraph = function(self)
+	local ld = self.layerData
+
+	local intervalDatas = ld.ranges.interval
+
+	local offsets = {}
+	local id = intervalDatas.first
+	while id and id <= intervalDatas.last do
+		table.insert(offsets, id.timePoint.absoluteTime)
+		id = id.next
+	end
+	table.sort(offsets)
+
+	local pointsCount = 2000
+
+	self.intervalDatasGraph = {n = pointsCount}
+	local points = self.intervalDatasGraph
+
+	for _, time in ipairs(offsets) do
+		local pos = math_util.map(time, self.firstTime, self.lastTime, 0, pointsCount)
+		local i = math.floor(pos + 0.5)
+		points[i] = true
 	end
 end
 

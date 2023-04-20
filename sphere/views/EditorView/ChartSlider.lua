@@ -11,23 +11,44 @@ local function getPosition(w, h)
 	return math.min(math.max(value, 0), 1)
 end
 
-local function Slider(id, value, w, h, displayValue, points)
+return function(self, w, h)
+	love.graphics.setColor(0, 0, 0, 0.8)
+	theme.rectangle(w, h)
+	love.graphics.setColor(1, 1, 1, 1)
+
+	local editorModel = self.game.editorModel
+	local editorTimePoint = editorModel.timePoint
+
+	local fullLength = editorModel.lastTime - editorModel.firstTime
+	local value = (editorTimePoint.absoluteTime - editorModel.firstTime) / fullLength
+
+	local densityPoints = self.game.editorModel.densityGraph
+	local intervalPoints = self.game.editorModel.intervalDatasGraph
+	local displayValue = time_util.format(editorTimePoint.absoluteTime, 3)
+
 	local over = just.is_over(w, h)
 	local pos = getPosition(w, h)
 
-	local new_value, active, hovered = just.slider(id, over, pos, value)
+	local new_value, active, hovered = just.slider("time slider", over, pos, value)
 
 	theme.setColor(active, hovered)
 	theme.rectangle(w, h)
-
-	love.graphics.setColor(0.66, 0.66, 0.66, 1)
 	local pad = h * (1 - theme.size) / 2
 	local _h = h - 2 * pad
 
-	for i = 0, #points - 1 do
-		local x = math_util.map(i, 0, #points, h / 2, w - h / 2)
-		local x2 = math_util.map(i + 1, 0, #points, h / 2, w - h / 2)
-		love.graphics.line(x, (1 - points[i]) * _h + pad, x2, (1 - points[i + 1]) * _h + pad)
+	love.graphics.setColor(1, 1, 0.1, 1)
+	for i = 0, intervalPoints.n do
+		if intervalPoints[i] then
+			local x = math_util.map(i, 0, intervalPoints.n, h / 2, w - h / 2)
+			love.graphics.line(x, pad, x, _h + pad)
+		end
+	end
+
+	love.graphics.setColor(0.66, 0.66, 0.66, 1)
+	for i = 0, #densityPoints - 1 do
+		local x = math_util.map(i, 0, #densityPoints, h / 2, w - h / 2)
+		local x2 = math_util.map(i + 1, 0, #densityPoints, h / 2, w - h / 2)
+		love.graphics.line(x, (1 - densityPoints[i]) * _h + pad, x2, (1 - densityPoints[i + 1]) * _h + pad)
 	end
 
 	local x = math_util.map(math.min(math.max(value, 0), 1), 0, 1, h / 2, w - h / 2)
@@ -47,26 +68,9 @@ local function Slider(id, value, w, h, displayValue, points)
 
 	just.next(w, h)
 
-	return new_value
-end
-
-return function(self, w, h)
-	love.graphics.setColor(0, 0, 0, 0.8)
-	love.graphics.rectangle("fill", 0, 0, w, h)
-	love.graphics.setColor(1, 1, 1, 1)
-
-	local editorModel = self.game.editorModel
-	local editorTimePoint = editorModel.timePoint
-
-	local fullLength = editorModel.lastTime - editorModel.firstTime
-	local pos = (editorTimePoint.absoluteTime - editorModel.firstTime) / fullLength
-
-	local points = self.game.editorModel.densityGraph
-	local newPos = Slider("time slider", pos, w, h, time_util.format(editorTimePoint.absoluteTime, 3), points)
-
 	if just.active_id == "time slider" then
-		if newPos then
-			editorModel:scrollSeconds(newPos * fullLength + editorModel.firstTime)
+		if new_value then
+			editorModel:scrollSeconds(new_value * fullLength + editorModel.firstTime)
 		end
 		if editorModel.timer.isPlaying then
 			editorModel:pause()
