@@ -21,7 +21,7 @@ function _Layout:draw()
 	local x0, w0 = gfx_util.layout(_x, _w, {-1})
 	local x1, w1 = gfx_util.layout(_x, _w, {y_int, -1/2, x_int, -1/3, x_int, -(1 - 1/2 - 1/3), y_int})
 
-	local y0, h0 = gfx_util.layout(0, 1080, {89, y_int, -1, y_int, 55})
+	local y0, h0 = gfx_util.layout(0, 1080, {89, y_int, -1, y_int, 89})
 
 	self:pack("header", x0[1], y0[1], w0[1], h0[1])
 	self:pack("footer", x0[1], y0[5], w0[1], h0[5])

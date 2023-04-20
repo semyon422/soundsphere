@@ -10,6 +10,7 @@ local just = require("just")
 local ConvertAbsoluteToInterval = require("sphere.models.EditorModel.ConvertAbsoluteToInterval")
 local Changes = require("Changes")
 local ConvertTests = require("sphere.models.EditorModel.ConvertTests")
+local math_util = require("math_util")
 
 local EditorModel = Class:new()
 
@@ -23,6 +24,7 @@ EditorModel.construct = function(self)
 	self.graphicEngine = GraphicEngine:new()
 	self.graphicEngine.editorModel = self
 	self.grabbedNotes = {}
+	self.densityGraph = {}
 end
 
 EditorModel.load = function(self)
@@ -134,9 +136,46 @@ EditorModel.loadResources = function(self)
 		end
 	end
 
+	self:genDensityGraph()
+
 	self.audioManager:update(true)
 
 	self.resourcesLoaded = true
+end
+
+EditorModel.genDensityGraph = function(self)
+	local nc = self.game.noteChartModel.noteChart
+
+	local notes = {}
+	for noteDatas in nc:getInputIterator() do
+		for _, noteData in ipairs(noteDatas) do
+			local offset = noteData.timePoint.absoluteTime
+			if noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart" then
+				table.insert(notes, offset)
+			end
+		end
+	end
+	table.sort(notes)
+
+	local pointsCount = math.floor(#notes / 10)
+
+	self.densityGraph = {}
+	local points = self.densityGraph
+	for i = 0, pointsCount do
+		points[i] = 0
+	end
+
+	local maxValue = 0
+	for _, time in ipairs(notes) do
+		local pos = math_util.map(time, self.firstTime, self.lastTime, 0, pointsCount)
+		local i = math.floor(pos + 0.5)
+		points[i] = points[i] + 1
+		maxValue = math.max(maxValue, points[i])
+	end
+
+	for i = 0, pointsCount do
+		points[i] = points[i] / maxValue
+	end
 end
 
 EditorModel.getDtpAbsolute = function(self, time, snapped)
