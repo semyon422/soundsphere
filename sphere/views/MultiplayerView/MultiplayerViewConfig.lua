@@ -73,6 +73,7 @@ local function Cells(self)
 	local level = 0
 	local longNoteRatio = 0
 	local localOffset = 0
+	local format = ""
 	if noteChartItem then
 		bpm = (noteChartItem.bpm or 0) * baseTimeRate
 		length = (noteChartItem.length or 0) / baseTimeRate
@@ -80,6 +81,7 @@ local function Cells(self)
 		level = noteChartItem.level or 0
 		longNoteRatio = noteChartItem.longNoteRatio or 0
 		localOffset = noteChartItem.localOffset or 0
+		format = noteChartItem.format or ""
 	end
 
 	love.graphics.translate(0, h - 118)
@@ -98,7 +100,8 @@ local function Cells(self)
 	just.row(true)
 	just.indent(22)
 	BarCellImView(2 * w, h, "right", "long notes", longNoteRatio)
-	TextCellImView(2 * w, h, "right", "local offset", localOffset * 1000)
+	TextCellImView(w, h, "right", "offset", localOffset * 1000)
+	TextCellImView(w, h, "right", "format", format)
 	just.row()
 end
 
