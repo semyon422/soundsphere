@@ -13,6 +13,7 @@ local Layout = require("sphere.views.EditorView.Layout")
 
 return function(self)
 	local editorModel = self.game.editorModel
+	local editorTimePoint = editorModel.timePoint
 
 	local w, h = Layout:move("footer")
 	love.graphics.setColor(1, 1, 1, 1)
@@ -26,7 +27,7 @@ return function(self)
 	just.row(true)
 
 	local play_pause = editorModel.timer.isPlaying and "pause" or "play"
-	local button_pressed = imgui.TextButton("play/pause", play_pause, 100, lineHeight)
+	local button_pressed = imgui.TextButton("play/pause", play_pause, 110, lineHeight)
 	local key_pressed = just.keypressed("space")
 	if button_pressed or key_pressed then
 		if editorModel.timer.isPlaying then
@@ -35,6 +36,8 @@ return function(self)
 			editorModel:play()
 		end
 	end
+
+	imgui.TextButton(nil, time_util.format(editorTimePoint.absoluteTime, 3), 220, lineHeight)
 
 	local newRate = imgui.Slider("rate slider", editorModel.timer.rate, w / 6, lineHeight, ("%0.2fx"):format(editorModel.timer.rate))
 	if newRate then
