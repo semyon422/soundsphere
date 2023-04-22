@@ -3,9 +3,9 @@ return {
 	update = "",
 	multiplayer = "",
 	osu = {
-		assets = "",
-		storage = "",
-		static = "",
-		web = "",
+		background = "",
+		preview = "",
+		download = "",
+		search = "",
 	},
 }
