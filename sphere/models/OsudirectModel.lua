@@ -1,18 +1,41 @@
 local Class = require("Class")
-local osudirect = require("libchart.osudirect")
 local extractAsync = require("sphere.filesystem.extract")
 local downloadAsync = require("sphere.filesystem.download")
 local thread = require("thread")
 local delay = require("delay")
-local socket_url = require("socket.url")
+local http_util = require("http_util")
+local json = require("json")
 
 local OsudirectModel = Class:new()
+
+OsudirectModel.rankedStatuses = {
+	{-3, "any"},
+	{-2, "graveyard"},
+	{-1, "wip"},
+	{0, "pending"},
+	{1, "ranked"},
+	{3, "qualified"},
+	{4, "loved"},
+}
+OsudirectModel.rankedStatusesMap = {}
+for i, d in ipairs(OsudirectModel.rankedStatuses) do
+	OsudirectModel.rankedStatuses[i] = d[2]
+	OsudirectModel.rankedStatusesMap[d[2]] = d[1]
+end
 
 OsudirectModel.load = function(self)
 	self.statusBeatmap = {title = "LOADING", artist = ""}
 	self.items = {self.statusBeatmap}
 	self.processing = {}
 	self.page = 1
+	self.rankedStatus = "ranked"
+end
+
+OsudirectModel.setRankedStatus = function(self, status)
+	self.rankedStatus = status
+	self.page = 1
+	self.items = {self.statusBeatmap}
+	self:searchNoDebounce()
 end
 
 OsudirectModel.update = function(self)
@@ -95,13 +118,51 @@ end
 
 OsudirectModel.searchRequest = function(self, searchString, page)
 	local config = self.game.configModel.configs.urls.osu
-	local url = socket_url.absolute(config.web, osudirect.search(searchString, nil, page - 1))
+	local url = config.search .. "?" .. http_util.encode_query_string({
+		query = searchString,
+		mode = 3,
+		offset = (page - 1) * 100,
+		status = self.rankedStatusesMap[self.rankedStatus],
+		amount = 100,
+	})
 	print("GET " .. url)
 	local body = requestAsync(url)
 	if not body then
 		return
 	end
-	return osudirect.parse(body)
+
+	local status, err = pcall(json.decode, body)
+	if not status then
+		return {}
+	end
+
+	local beatmaps = {}
+	for _, set in ipairs(err) do
+		local beatmap = {}
+		beatmap.artist = set.Artist
+		beatmap.title = set.Title
+		beatmap.creator = set.Creator
+		beatmap.setId = set.SetID
+
+		beatmap.difficulties = {}
+		for i, diff in ipairs(set.ChildrenBeatmaps) do
+			table.insert(beatmap.difficulties, {
+				name = diff.DiffName,
+				sr = diff.DifficultyRating,
+				bpm = diff.BPM,
+				cs = diff.CS,
+				length = diff.TotalLength,
+				beatmap = beatmap,
+			})
+		end
+		table.sort(beatmap.difficulties, function(a, b)
+			return a.sr < b.sr
+		end)
+
+		table.insert(beatmaps, beatmap)
+	end
+
+	return beatmaps
 end
 
 OsudirectModel.searchNext = function(self)
@@ -132,12 +193,12 @@ end
 
 OsudirectModel.getBackgroundUrl = function(self)
 	local config = self.game.configModel.configs.urls.osu
-	return socket_url.absolute(config.assets, osudirect.cover(self.beatmap.setId, true))
+	return config.background:format(self.beatmap.setId)
 end
 
 OsudirectModel.getPreviewUrl = function(self)
 	local config = self.game.configModel.configs.urls.osu
-	return socket_url.absolute(config.static, osudirect.preview(self.beatmap.setId))
+	return config.preview:format(self.beatmap.setId)
 end
 
 OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback)
@@ -152,7 +213,7 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 	local saveDir = "userdata/charts/downloads"
 
 	local setId = beatmap.setId
-	local url = socket_url.absolute(config.storage, osudirect.download(setId))
+	local url = config.download:format(setId)
 	beatmap.url = url
 
 	print(("Downloading: %s"):format(url))

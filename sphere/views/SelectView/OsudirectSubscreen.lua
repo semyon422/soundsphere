@@ -84,6 +84,19 @@ local function OsudirectSearchField(self)
 	end
 end
 
+local function OsudirectRankedStatus(self)
+	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
+
+	local w, h = Layout:move("column2", "header")
+	love.graphics.translate(w * 2 / 3, 15)
+
+	local osudirectModel = self.game.osudirectModel
+	local statusIndex = imgui.SpoilerList("RankedStatusDropdown", w / 3, h - 30, osudirectModel.rankedStatuses, osudirectModel.rankedStatus)
+	if statusIndex then
+		osudirectModel:setRankedStatus(osudirectModel.rankedStatuses[statusIndex])
+	end
+end
+
 local function OsudirectSubscreen(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
@@ -109,6 +122,7 @@ end
 return function(self)
 	OsudirectList(self)
 	OsudirectSearchField(self)
+	OsudirectRankedStatus(self)
 	OsudirectDifficultiesList(self)
 	OsudirectProcessingList(self)
 	OsudirectSubscreen(self)
