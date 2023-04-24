@@ -8,6 +8,7 @@ local TimeManager = require("sphere.models.EditorModel.TimeManager")
 local GraphicEngine = require("sphere.models.EditorModel.GraphicEngine")
 local just = require("just")
 local ConvertAbsoluteToInterval = require("sphere.models.EditorModel.ConvertAbsoluteToInterval")
+local ConvertMeasureToInterval = require("sphere.models.EditorModel.ConvertMeasureToInterval")
 local Changes = require("Changes")
 local ConvertTests = require("sphere.models.EditorModel.ConvertTests")
 local math_util = require("math_util")
@@ -43,6 +44,8 @@ EditorModel.load = function(self)
 
 	if ld.mode == "absolute" then
 		ld = ConvertAbsoluteToInterval(ld)
+	elseif ld.mode == "measure" then
+		ld = ConvertMeasureToInterval(ld)
 	end
 
 	ld = DynamicLayerData:new(ld)

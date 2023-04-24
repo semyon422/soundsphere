@@ -1,4 +1,5 @@
 local ConvertAbsoluteToInterval = require("sphere.models.EditorModel.ConvertAbsoluteToInterval")
+local ConvertMeasureToInterval = require("sphere.models.EditorModel.ConvertMeasureToInterval")
 local NoteChart = require("ncdk.NoteChart")
 local Fraction = require("ncdk.Fraction")
 
@@ -279,3 +280,108 @@ do
 	assert(ild.intervalDatas[3].beats == 1)
 end
 
+--------------------------------------------------------------------------------
+
+do
+	local nc = NoteChart:new()
+	local ld = nc:getLayerData(1)
+	ld:setTimeMode("measure")
+	ld:setSignatureMode("long")
+	ld:setPrimaryTempo(60)
+
+	ld:insertTempoData(F(0), 60)
+	ld:insertTempoData(F(1), 120)
+
+	local tp0 = ld:getTimePoint(F(0))
+	local tp1 = ld:getTimePoint(F(1))
+	local tp2 = ld:getTimePoint(F(2))
+	local tp3 = ld:getTimePoint(F(0.5))
+
+	nc:compute()
+
+	assert(tp0.absoluteTime == 0)
+	assert(tp1.absoluteTime == 4)
+	assert(tp2.absoluteTime == 6)
+	assert(tp3.absoluteTime == 2)
+
+	local ild, tpm = ConvertMeasureToInterval(ld)
+
+	assert(#ild.intervalDatas == 3)
+	assert(ild.intervalDatas[1].beats == 4)
+	assert(ild.intervalDatas[2].beats == 4)
+	assert(ild.intervalDatas[3].beats == 1)
+
+	assert(tpm[tp3].time == F(2))
+end
+
+do
+	local nc = NoteChart:new()
+	local ld = nc:getLayerData(1)
+	ld:setTimeMode("measure")
+	ld:setSignatureMode("long")
+	ld:setPrimaryTempo(60)
+
+	ld:insertTempoData(F(0), 60)
+	ld:insertTempoData(F(1), 120)
+
+	ld:setSignature(0, F(9/8))
+	ld:setSignature(1, F(1))
+
+	local tp0 = ld:getTimePoint(F(0))
+	local tp1 = ld:getTimePoint(F(1))
+	local tp2 = ld:getTimePoint(F(2))
+	local tp3 = ld:getTimePoint(F(0.5))
+
+	nc:compute()
+
+	assert(tp0.absoluteTime == 0)
+	assert(tp1.absoluteTime == 9 / 8)
+	assert(tp2.absoluteTime == 9 / 8 + 0.5)
+	assert(tp3.absoluteTime == 9 / 16)
+
+	local ild, tpm = ConvertMeasureToInterval(ld)
+
+	assert(#ild.intervalDatas == 3)
+	assert(ild.intervalDatas[1].beats == 1)
+	assert(ild.intervalDatas[2].beats == 1)
+	assert(ild.intervalDatas[3].beats == 1)
+
+	assert(tpm[tp3].time == F(9/16))
+end
+
+do
+	local nc = NoteChart:new()
+	local ld = nc:getLayerData(1)
+	ld:setTimeMode("measure")
+	ld:setSignatureMode("long")
+	ld:setPrimaryTempo(60)
+
+	ld:insertTempoData(F(0), 60)
+	ld:insertTempoData(F(1), 120)
+
+	ld:insertStopData(F(0.5), F(1))
+
+	local tp0 = ld:getTimePoint(F(0))
+	local tp1 = ld:getTimePoint(F(1))
+	local tp2 = ld:getTimePoint(F(2))
+	local tp3 = ld:getTimePoint(F(0.5))
+	local tp4 = ld:getTimePoint(F(0.5), 1)
+
+	nc:compute()
+
+	assert(tp0.absoluteTime == 0)
+	assert(tp1.absoluteTime == 5)
+	assert(tp2.absoluteTime == 7)
+	assert(tp3.absoluteTime == 2)
+	assert(tp4.absoluteTime == 3)
+
+	local ild, tpm = ConvertMeasureToInterval(ld)
+
+	assert(#ild.intervalDatas == 3)
+	assert(ild.intervalDatas[1].beats == 5)
+	assert(ild.intervalDatas[2].beats == 4)
+	assert(ild.intervalDatas[3].beats == 1)
+
+	assert(tpm[tp3].time == F(2))
+	assert(tpm[tp4].time == F(3))
+end
