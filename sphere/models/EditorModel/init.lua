@@ -213,15 +213,7 @@ end
 EditorModel.getDtpAbsolute = function(self, time, snapped)
 	local ld = self.layerData
 	local editor = self.game.configModel.configs.settings.editor
-
-	local snap = editor.snap
-	if ld.mode == "measure" then
-		local dtp = ld:getDynamicTimePointAbsolute(192, time)
-		local measureOffset = dtp.measureTime:floor()
-		snap = ld:getSignature(measureOffset) * snap
-	end
-
-	return ld:getDynamicTimePointAbsolute(snapped and snap or 192, time)
+	return ld:getDynamicTimePointAbsolute(snapped and editor.snap or 192, time)
 end
 
 EditorModel.unload = function(self)
@@ -612,20 +604,9 @@ EditorModel.updateRange = function(self)
 	local absoluteTime = self.timePoint.absoluteTime
 
 	local ld = self.layerData
-	if ld.mode == "interval" then
-		local delta = 1 / editor.speed
-		if ld.startTime ~= absoluteTime - delta then
-			ld:setRange(absoluteTime - delta, absoluteTime + delta)
-		end
-		return
-	end
-
-	local dtp = self:getDtpAbsolute(absoluteTime)
-	local measureOffset = dtp.measureTime:floor()
-
-	local delta = 2
-	if ld.startTime:tonumber() ~= measureOffset - delta then
-		ld:setRange(Fraction(measureOffset - delta), Fraction(measureOffset + delta))
+	local delta = 1 / editor.speed
+	if ld.startTime ~= absoluteTime - delta then
+		ld:setRange(absoluteTime - delta, absoluteTime + delta)
 	end
 end
 
@@ -678,11 +659,7 @@ EditorModel.scrollSnaps = function(self, delta)
 		return
 	end
 	local ld = self.layerData
-	if ld.mode == "interval" then
-		self:scrollTimePoint(ld:getDynamicTimePoint(self:scrollSnapsInterval(delta)))
-	elseif ld.mode == "measure" then
-		self:scrollTimePoint(ld:getDynamicTimePoint(self:scrollSnapsMeasure(delta)))
-	end
+	self:scrollTimePoint(ld:getDynamicTimePoint(self:scrollSnapsInterval(delta)))
 end
 
 EditorModel.getNextSnapIntervalTime = function(self, absoluteTime, delta)

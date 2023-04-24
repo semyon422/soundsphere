@@ -68,14 +68,8 @@ function tabs.audio(self)
 	wf.scale = imgui.slider1("wf.scale", wf.scale, "%0.2f", 0, 1, 0.01, "scale")
 end
 
-local tempo = "60"
-local stop = {"0", "1"}
 local velocity = "1"
 local expand = {"0", "1"}
-local signature = {"0", "1"}
-
-local primaryTempo = "60"
-local defaultSignature = {"4", "1"}
 
 function tabs.timings(self)
 	local editorModel = self.game.editorModel
@@ -96,104 +90,30 @@ function tabs.timings(self)
 
 	editor.showTimings = imgui.checkbox("show timings", editor.showTimings, "show timings")
 
-	if ld.mode == "interval" then
-		local intervalData = dtp._intervalData
-		local grabbedIntervalData = editorModel.grabbedIntervalData
-		if not grabbedIntervalData then
-			if not intervalData then
-				if imgui.button("split button", "split") then
-					ld:splitInterval(dtp)
-				end
-			elseif imgui.button("grab interval button", "grab") then
-				editorModel:grabIntervalData()
+	local intervalData = dtp._intervalData
+	local grabbedIntervalData = editorModel.grabbedIntervalData
+	if not grabbedIntervalData then
+		if not intervalData then
+			if imgui.button("split button", "split") then
+				ld:splitInterval(dtp)
 			end
-		else
-			if imgui.button("drop interval button", "drop") then
-				editorModel:dropIntervalData()
-			end
+		elseif imgui.button("grab interval button", "grab") then
+			editorModel:grabIntervalData()
 		end
-		if intervalData and not grabbedIntervalData then
-			just.sameline()
-			if imgui.button("merge interval button", "merge") then
-				ld:mergeInterval(dtp)
-			end
-			local beats = intervalData.beats
-			local newBeats = imgui.intButtons("update interval", beats, 1, "beats")
-			if beats ~= newBeats then
-				ld:updateInterval(intervalData, newBeats)
-			end
+	else
+		if imgui.button("drop interval button", "drop") then
+			editorModel:dropIntervalData()
 		end
 	end
-
-	if ld.mode == "measure" then
-		just.row(true)
-		primaryTempo = imgui.input("primaryTempo input", primaryTempo, "primary tempo")
-		if imgui.button("set primaryTempo button", "set") then
-			ld:setPrimaryTempo(tonumber(primaryTempo))
+	if intervalData and not grabbedIntervalData then
+		just.sameline()
+		if imgui.button("merge interval button", "merge") then
+			ld:mergeInterval(dtp)
 		end
-		if imgui.button("unset primaryTempo button", "unset") then
-			ld:setPrimaryTempo(0)
-		end
-		just.row()
-
-		just.row(true)
-		imgui.label("set signature mode", "signature mode")
-		if imgui.button("set short signature button", "short") then
-			ld:setSignatureMode("short")
-		end
-		if imgui.button("set long signature button", "long") then
-			ld:setSignatureMode("long")
-		end
-		just.row()
-
-		just.row(true)
-		defaultSignature[1] = imgui.input("defsig n input", defaultSignature[1])
-		imgui.unindent()
-		imgui.label("/ label", "/")
-		defaultSignature[2] = imgui.input("defsig d input", defaultSignature[2], "default signature")
-		if imgui.button("set defsig button", "set") then
-			ld:setDefaultSignature(Fraction(tonumber(defaultSignature[1]), tonumber(defaultSignature[2])))
-		end
-		just.row(false)
-
-		just.text("primary tempo: " .. ld.primaryTempo)
-		just.text("signature mode: " .. ld.signatureMode)
-		just.text("default signature: " .. ld.defaultSignature)
-
-		local measureOffset = dtp.measureTime:floor()
-		local _signature = ld:getSignature(measureOffset)
-		local snap = editor.snap
-
-		local beatTime = (dtp.measureTime - measureOffset) * _signature
-		local snapTime = (beatTime - beatTime:floor()) * snap
-
-		just.text("beat: " .. tostring(beatTime))
-		just.text("snap: " .. tostring(snapTime))
-
-		just.row(true)
-		tempo = imgui.input("tempo input", tempo, "tempo")
-		if imgui.button("add tempo button", "add") then
-			ld:getTempoData(dtp:getTime(), tonumber(tempo))
-		end
-
-		imgui.separator()
-
-		just.row(true)
-		stop[1] = imgui.input("stop n input", stop[1])
-		imgui.unindent()
-		imgui.label("/ label", "/")
-		stop[2] = imgui.input("stop d input", stop[2], "stop")
-		if imgui.button("add stop button", "add") then
-			ld:getStopData(dtp:getTime(), Fraction(tonumber(stop[1]), tonumber(stop[2])))
-		end
-
-		just.row(true)
-		signature[1] = imgui.input("signature n input", signature[1])
-		imgui.unindent()
-		imgui.label("/ label", "/")
-		signature[2] = imgui.input("signature d input", signature[2], "signature")
-		if imgui.button("add signature button", "add") then
-			ld:getSignatureData(dtp.measureTime:floor(), Fraction(tonumber(signature[1]), tonumber(signature[2])))
+		local beats = intervalData.beats
+		local newBeats = imgui.intButtons("update interval", beats, 1, "beats")
+		if beats ~= newBeats then
+			ld:updateInterval(intervalData, newBeats)
 		end
 	end
 
@@ -216,20 +136,6 @@ function tabs.timings(self)
 
 	just.row()
 
-	if dtp._tempoData then
-		imgui.label("tempo label", "Tempo: " .. dtp._tempoData.tempo .. " bpm")
-		just.sameline()
-		if imgui.button("remove tempo button", "remove") then
-			ld:removeTempoData(dtp.measureTime)
-		end
-	end
-	if dtp._stopData then
-		imgui.label("stop label", "Stop: " .. dtp._stopData.duration .. " beats")
-		just.sameline()
-		if imgui.button("remove stop button", "remove") then
-			ld:removeStopData(dtp.measureTime)
-		end
-	end
 	if dtp._velocityData then
 		imgui.label("velocity label", "Velocity: " .. dtp._velocityData.currentSpeed .. " x")
 		just.sameline()
@@ -242,14 +148,6 @@ function tabs.timings(self)
 		just.sameline()
 		if imgui.button("remove expand button", "remove") then
 			ld:removeExpandData(dtp)
-		end
-	end
-
-	if dtp._signatureData then
-		imgui.label("signature label", "Signature: " .. dtp._signatureData.signature .. " beats")
-		just.sameline()
-		if imgui.button("remove signature button", "remove") then
-			ld:removeSignatureData(dtp.measureTime:floor())
 		end
 	end
 end
