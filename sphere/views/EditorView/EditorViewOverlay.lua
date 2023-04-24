@@ -6,14 +6,6 @@ local gfx_util = require("gfx_util")
 
 local Layout = require("sphere.views.EditorView.Layout")
 
-local tabsList = {
-	"info",
-	"audio",
-	"timings",
-	"notes",
-}
-local currentTab = tabsList[1]
-
 local tabs = {}
 
 local function to_ms(t)
@@ -108,25 +100,27 @@ function tabs.timings(self)
 		local intervalData = dtp._intervalData
 		local grabbedIntervalData = editorModel.grabbedIntervalData
 		if not grabbedIntervalData then
-			if not intervalData and imgui.button("split interval button", "split interval") then
-				ld:splitInterval(dtp)
-			end
-			if intervalData then
-				if imgui.button("merge interval button", "merge") then
-					ld:mergeInterval(dtp)
+			if not intervalData then
+				if imgui.button("split button", "split") then
+					ld:splitInterval(dtp)
 				end
-				local beats = intervalData.beats
-				local newBeats = imgui.intButtons("update interval", beats, 1, "beats")
-				if beats ~= newBeats then
-					ld:updateInterval(intervalData, newBeats)
-				end
-			end
-			if intervalData and imgui.button("grab interval button", "grab") then
-				editorModel:grabIntervalData(intervalData)
+			elseif imgui.button("grab interval button", "grab") then
+				editorModel:grabIntervalData()
 			end
 		else
 			if imgui.button("drop interval button", "drop") then
 				editorModel:dropIntervalData()
+			end
+		end
+		if intervalData and not grabbedIntervalData then
+			just.sameline()
+			if imgui.button("merge interval button", "merge") then
+				ld:mergeInterval(dtp)
+			end
+			local beats = intervalData.beats
+			local newBeats = imgui.intButtons("update interval", beats, 1, "beats")
+			if beats ~= newBeats then
+				ld:updateInterval(intervalData, newBeats)
 			end
 		end
 	end
@@ -286,10 +280,10 @@ return function(self)
 	imgui.setSize(400, h, 200, lineHeight)
 	love.graphics.setColor(1, 1, 1, 1)
 
-	currentTab = imgui.tabs("editor overlay tabs", currentTab, tabsList)
+	editorModel.state = imgui.tabs("editor overlay tabs", editorModel.state, editorModel.states)
 	love.graphics.setColor(1, 1, 1, 1)
 	imgui.setSize(400, h, 200, lineHeight)
-	tabs[currentTab](self)
+	tabs[editorModel.state](self)
 
 	if not editorModel.resourcesLoaded then
 		w, h = Layout:move("base")

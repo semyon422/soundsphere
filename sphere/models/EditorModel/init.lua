@@ -15,6 +15,7 @@ local math_util = require("math_util")
 local EditorModel = Class:new()
 
 EditorModel.tools = {"Select", "ShortNote", "LongNote", "SoundNote"}
+EditorModel.states = {"info", "audio", "timings", "notes"}
 
 EditorModel.construct = function(self)
 	self.timer = TimeManager:new()
@@ -26,6 +27,7 @@ EditorModel.construct = function(self)
 	self.grabbedNotes = {}
 	self.densityGraph = {}
 	self.intervalDatasGraph = {n = 0}
+	self.state = self.states[1]
 end
 
 EditorModel.load = function(self)

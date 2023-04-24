@@ -53,33 +53,38 @@ EditorRhythmView.draw = function(self)
 
 	local t = editorModel:getMouseTime()
 
-	if editor.tool == "ShortNote" or editor.tool == "LongNote" then
-		for i = 1, noteSkin.inputsCount do
-			local Head = noteSkin.notes.ShortNote.Head
-			local over = just.is_over(Head.w[i], noteSkin.unit, Head.x[i], 0)
-			over = just.mouse_over("add note" .. i, over, "mouse")
+	if editorModel.state == "notes" then
+		if editor.tool == "ShortNote" or editor.tool == "LongNote" then
+			for i = 1, noteSkin.inputsCount do
+				local Head = noteSkin.notes.ShortNote.Head
+				local over = just.is_over(Head.w[i], noteSkin.unit, Head.x[i], 0)
+				over = just.mouse_over("add note" .. i, over, "mouse")
+				if over and just.mousepressed(1) then
+					editorModel:addNote(t, "key", i)
+				end
+			end
+		elseif editor.tool == "Select" then
+			local over = just.mouse_over("editor select", true, "mouse")
 			if over and just.mousepressed(1) then
-				editorModel:addNote(t, "key", i)
+				editorModel:selectStart()
 			end
 		end
-	elseif editor.tool == "Select" then
-		local over = just.mouse_over("editor select", true, "mouse")
-		if over and just.mousepressed(1) then
-			editorModel:selectStart()
+		if editorModel.selectRect then
+			local x, y, x1, y1 = unpack(editorModel.selectRect)
+			love.graphics.push("all")
+			love.graphics.setColor(1, 1, 1, 1)
+			love.graphics.rectangle("line", x, y, x1 - x, y1 - y)
+			love.graphics.setColor(1, 1, 1, 0.2)
+			love.graphics.rectangle("fill", x, y, x1 - x, y1 - y)
+			love.graphics.pop()
 		end
-	end
-
-	if editorModel.selectRect then
-		local x, y, x1, y1 = unpack(editorModel.selectRect)
-		love.graphics.push("all")
-		love.graphics.setColor(1, 1, 1, 1)
-		love.graphics.rectangle("line", x, y, x1 - x, y1 - y)
-		love.graphics.setColor(1, 1, 1, 0.2)
-		love.graphics.rectangle("fill", x, y, x1 - x, y1 - y)
-		love.graphics.pop()
 	end
 
 	RhythmView.draw(self)
+
+	if editorModel.state ~= "notes" then
+		return
+	end
 
 	for _, note in ipairs(editorModel.graphicEngine.notes) do
 		self:processNote(note)
