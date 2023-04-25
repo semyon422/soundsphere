@@ -141,16 +141,29 @@ LongNoteView.getBodyTransformParams = function(self)
 	local nw, nh = bw:get("w"), bw:get("h")
 
 	local sx = nw and nw / w or bw:get("sx") or 1
-	-- local sy = nh and nh / h or bw:get("sy") or 1
-	local sy = bw:get("scale") or sx
+	-- local sx = nw and (dx + nw) / w or bw:get("sx") or 1
 
-	self.bodyQuad:setViewport(0, 0, w, dy / sy, w, h)
+	local style = bw:get("style")
+	local sy = bw:get("scale") or sx  -- "cascade_top"
+	if style == "stretch" then
+		sy = nh and (dy + nh) / h or bw:get("sy") or 1
+	end
+
+	local height = dy / sy
+
+	local y = bw:get("y", ets)
+	if style == "cascade_bottom" then
+		y = bw:get("y", sts)
+		height = -height
+	end
+
+	self.bodyQuad:setViewport(0, 0, w, height, w, h)
 
 	local ox = (bw:get("ox") or 0) * w
 	local oy = (bw:get("oy") or 0) * h
 	return
 		bw:get("x", ets),
-		bw:get("y", ets),
+		y,
 		0,
 		sx,
 		sy,

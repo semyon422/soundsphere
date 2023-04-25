@@ -63,6 +63,12 @@ local function copyDefaults(src, dst)
 	end
 end
 
+local bodyStyles = {
+	[0] = "stretch",
+	"cascade_top",
+	"cascade_bottom",
+}
+
 local configPath = "sphere/models/NoteSkinModel/OsuNoteSkinConfig.lua"
 OsuNoteSkin.load = function(self)
 	OsuNoteSkin.configContent = OsuNoteSkin.configContent or love.filesystem.read(configPath)
@@ -72,7 +78,11 @@ OsuNoteSkin.load = function(self)
 	local mania = self.mania
 	local keysCount = tonumber(mania.Keys)
 
-	copyDefaults(self:getDefaultManiaSection(keysCount), mania)
+	local baseMania = {}
+	fillTable(mania, baseMania)
+
+	local defaultMania = self:getDefaultManiaSection(keysCount)
+	copyDefaults(defaultMania, mania)
 	self:fixManiaValues()
 
 	local config, exists = JustConfig:new({defaultContent = self.configContent}):fromFile(
@@ -217,21 +227,29 @@ OsuNoteSkin.load = function(self)
 	local lhead = {}
 	local lbody = {}
 	local ltail = {}
+	local lstyle = {}
 	for i = 1, keysCount do
-		lhead[i] = "NoteImage" .. (i - 1) .. "H"
-		lbody[i] = "NoteImage" .. (i - 1) .. "L"
-		ltail[i] = "NoteImage" .. (i - 1) .. "T"
+		local _i = i - 1
+		lhead[i] = "NoteImage" .. _i .. "H"
+		lbody[i] = "NoteImage" .. _i .. "L"
+		ltail[i] = "NoteImage" .. _i .. "T"
 		if not images[lhead[i]] then
 			lhead[i] = shead[i]
 		end
 		if not images[ltail[i]] then
 			ltail[i] = lhead[i]
 		end
+
+		local bskey = "NoteBodyStyle" .. _i
+		local styleIndex = baseMania[bskey] and mania[bskey] or mania.NoteBodyStyle
+		local style = bodyStyles[styleIndex] or bodyStyles[defaultMania.NoteBodyStyle]
+		lstyle[i] = style
 	end
 	self:setLongNote({
 		head = lhead,
 		body = lbody,
 		tail = ltail,
+		style = lstyle,
 		scale = 1 / 1.6,
 	})
 

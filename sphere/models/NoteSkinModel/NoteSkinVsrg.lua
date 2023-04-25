@@ -250,6 +250,13 @@ NoteSkinVsrg.setLongNote = function(self, params)
 			head[i] = params.head
 		end
 	end
+	local style = params.style
+	if type(params.style) ~= "table" then
+		style = {}
+		for i = 1, self.inputsCount do
+			style[i] = params.style
+		end
+	end
 
 	local color = {}
 	for i = 1, self.inputsCount do
@@ -306,7 +313,8 @@ NoteSkinVsrg.setLongNote = function(self, params)
 		oy = {},
 		color = color,
 		image = body,
-		scale = params.scale
+		scale = params.scale,
+		style = style,
 	}
 
 	self.notes.LongNote = {
