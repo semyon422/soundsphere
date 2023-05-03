@@ -45,10 +45,10 @@ return function(layerData)
 			local idt_new = next_td_time:floor() * td:getBeatDuration()
 			local _time = next_td_time - Fraction(1, 16)
 			_interval.beats = next_td_time:floor()
-			if math.abs(idt_new - idt) > timingMatchWindow then
-				_interval.beats = _time:floor()
-			elseif _time:tonumber() <= 0 then
+			if _time:tonumber() <= 0 then
 				_interval.beats = 1
+			elseif math.abs(idt_new - idt) > timingMatchWindow then
+				_interval.beats = _time:floor()
 			end
 			for j, tp in ipairs(interval) do
 				local dt = tp.absoluteTime - td.timePoint.absoluteTime
