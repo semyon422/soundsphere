@@ -1,7 +1,7 @@
 local LayerData = require("ncdk.LayerData")
 local Fraction = require("ncdk.Fraction")
 
-local timingMatchWindow = 0.0025
+local timingMatchWindow = 0.005  -- 0.005s for 60 bpm, 0.0025 for 120 bpm, etc
 
 return function(layerData)
 	local newLayerData = LayerData:new()
@@ -47,7 +47,7 @@ return function(layerData)
 			_interval.beats = next_td_time:floor()
 			if _time:tonumber() <= 0 then
 				_interval.beats = 1
-			elseif math.abs(idt_new - idt) > timingMatchWindow then
+			elseif math.abs(idt_new - idt) > timingMatchWindow * td:getBeatDuration() then
 				_interval.beats = _time:floor()
 			end
 			for j, tp in ipairs(interval) do
@@ -83,7 +83,7 @@ return function(layerData)
 				local idt_new = next_td_time:floor() * td:getBeatDuration()
 				local _time = next_td_time - Fraction(1, 16)
 				local t = td.timePoint.absoluteTime + _time:tonumber() * td:getBeatDuration()
-				if _time:tonumber() > 0 and math.abs(idt_new - idt) > timingMatchWindow then
+				if _time:tonumber() > 0 and math.abs(idt_new - idt) > timingMatchWindow * td:getBeatDuration() then
 					local id = newLayerData:insertIntervalData(t, 1, _time % 1)
 					if time == _time then
 						intervalData = id

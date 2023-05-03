@@ -280,7 +280,6 @@ do
 	assert(ild.intervalDatas[3].beats == 1)
 end
 
-
 do
 	local nc = NoteChart:new()
 	local ld = nc:getLayerData(1)
@@ -294,6 +293,23 @@ do
 	ld:insertTempoData(0.03, 60)
 
 	local tp0 = ld:getTimePoint(0.005)
+
+	nc:compute()
+
+	local ild, tpm = ConvertAbsoluteToInterval(ld)
+end
+
+do
+	local nc = NoteChart:new()
+	local ld = nc:getLayerData(1)
+	ld:setTimeMode("absolute")
+	ld:setSignatureMode("long")
+	ld:setPrimaryTempo(60)
+
+	ld:insertTempoData(91.633, 60 / 0.006)
+	ld:insertTempoData(91.633 + 0.002, 60)
+
+	local tp0 = ld:getTimePoint(91.633 + 0.001)
 
 	nc:compute()
 
