@@ -114,23 +114,27 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 
 	love.graphics.setLineWidth(1)
 
-	local timePoint = ld:getDynamicTimePointAbsolute(192, ld.startTime)
+	local timePoint = ld.ranges.timePoint.head
 	local measureData = timePoint.measureData
 
 	local intervalData = timePoint.intervalData
 	local time = timePoint.time
 	intervalData, time = timePoint:add(Fraction((time * snap):ceil() + 1, snap) - time)
 
-	timePoint = ld:getDynamicTimePointAbsolute(192, ld.endTime)
+	timePoint = ld.ranges.timePoint.tail
 	local endIntervalData = timePoint.intervalData
 	local endTime = timePoint.time
 	endTime = Fraction((endTime * snap):floor(), snap)
 
+	ld.ranges.timePoint.current = ld.ranges.timePoint.head
+	timePoint = ld:getDynamicTimePoint(intervalData, time)
+
 	while intervalData and intervalData < endIntervalData or intervalData == endIntervalData and time <= endTime do
-		timePoint = ld:getDynamicTimePoint(intervalData, time)
+		timePoint = timePoint or ld:getDynamicTimePoint(intervalData, time)
 		if not timePoint or not timePoint[field] then break end
 
-		local drawNothing
+		local drawNothing, skipInterval
+
 		if measureData ~= timePoint.measureData then
 			measureData = timePoint.measureData
 			intervalData, time = measureData.timePoint:add(-measureData.start + Fraction(1, snap))
@@ -139,13 +143,27 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 			drawNothing = timePoint.measureData ~= measureData
 		end
 
+		if not drawNothing and intervalData.prev then
+			local dt = intervalData.timePoint.absoluteTime - intervalData.prev.timePoint.absoluteTime
+			if dt < 0.01 then
+				drawNothing = true
+				skipInterval = true
+			end
+		end
+
 		if not drawNothing then
 			local j = snap * timePoint:getBeatModulo()
 			love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
 			self:drawSnap(timePoint, field, currentTime, width)
 		end
 
-		intervalData, time = timePoint:add(Fraction(1, snap))
+		if skipInterval then
+			intervalData, time = intervalData.next, intervalData:start()
+			timePoint = intervalData.timePoint
+		else
+			intervalData, time = timePoint:add(Fraction(1, snap))
+			timePoint = nil
+		end
 	end
 
 	love.graphics.setColor(1, 1, 1, 1)
