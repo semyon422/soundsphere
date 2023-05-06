@@ -263,12 +263,7 @@ EditorModel.getColumnOver = function(self)
 end
 
 EditorModel.grabIntervalData = function(self)
-	local dtp = self:getDynamicTimePoint()
-	local intervalData = dtp._intervalData
-	if not intervalData then
-		return
-	end
-	self.grabbedIntervalData = intervalData
+	self.grabbedIntervalData = self.timePoint._intervalData
 end
 
 EditorModel.dropIntervalData = function(self)
@@ -302,7 +297,10 @@ EditorModel.copyNotes = function(self, cut)
 	end
 
 	for _, note in ipairs(self.copiedNotes) do
-		note.deltaTime = note.startNoteData.timePoint:sub(copyTimePoint)
+		note.deltaStartTime = note.startNoteData.timePoint:sub(copyTimePoint)
+		if note.endNoteData then
+			note.deltaEndTime = note.endNoteData.timePoint:sub(copyTimePoint)
+		end
 	end
 	if cut then
 		self:nextChange()
@@ -332,15 +330,13 @@ EditorModel.pasteNotes = function(self)
 	end
 
 	self:startChange()
-	local _dtp = self:getDynamicTimePoint()
+	local timePoint = self.timePoint
 	for _, note in ipairs(copiedNotes) do
-		local dtp = ld:getTimePoint(_dtp:add(note.deltaTime))
 		note.startNoteData = note.startNoteData:clone()
-		note.startNoteData.timePoint = ld:checkTimePoint(dtp)
+		note.startNoteData.timePoint = ld:getTimePoint(timePoint:add(note.deltaStartTime))
 		if note.endNoteData then
-			local dtp = ld:getTimePoint(_dtp:add(note.deltaTime))
 			note.endNoteData = note.endNoteData:clone()
-			note.endNoteData.timePoint = ld:checkTimePoint(dtp)
+			note.endNoteData.timePoint = ld:getTimePoint(timePoint:add(note.deltaEndTime))
 
 			note.endNoteData.startNoteData = note.startNoteData
 			note.startNoteData.endNoteData = note.endNoteData
@@ -367,7 +363,6 @@ EditorModel.grabNotes = function(self, part)
 			self:_removeNote(note)
 
 			note.grabbedPart = part
-
 			note.grabbedDeltaColumn = column - _column
 
 			if not editor.lockSnap then
@@ -614,11 +609,7 @@ EditorModel._scrollTimePoint = function(self, timePoint)
 		return
 	end
 
-	local t = self.timePoint
-	t.absoluteTime = timePoint.absoluteTime
-	t.visualTime = timePoint.visualTime
-	t.visualSection = timePoint.visualSection
-	t:setTime(timePoint:getTime())
+	timePoint:clone(self.timePoint)
 
 	self:updateRange()
 end
