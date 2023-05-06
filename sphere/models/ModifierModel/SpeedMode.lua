@@ -24,14 +24,11 @@ SpeedMode.getSubString = function(self, config)
 	return "MOD"
 end
 
-SpeedMode.applySpeed = function(self, speed)
+SpeedMode.applyTempo = function(self, tempo)
 	local noteChart = self.game.noteChartModel.noteChart
 
 	for _, layerData in noteChart:getLayerDataIterator() do
-		for velocityDataIndex = 1, layerData:getVelocityDataCount() do
-			local velocityData = layerData:getVelocityData(velocityDataIndex)
-			velocityData.currentSpeed = velocityData.currentSpeed / speed
-		end
+		layerData:setPrimaryTempo(tempo)
 	end
 
 	noteChart:compute()
@@ -55,6 +52,13 @@ SpeedMode.applyConstant = function(self)
 end
 
 SpeedMode.apply = function(self, config)
+	local mode = config.value
+	if mode == "x" then
+		return
+	elseif mode == "constant" then
+		self:applyConstant()
+	end
+
 	local noteChart = self.game.noteChartModel.noteChart
 
 	local minTime = noteChart.metaData.minTime
@@ -64,53 +68,46 @@ SpeedMode.apply = function(self, config)
 	local durations = {}
 
 	for _, layerData in noteChart:getLayerDataIterator() do
-		for velocityDataIndex = 1, layerData:getVelocityDataCount() do
-			local velocityData = layerData:getVelocityData(velocityDataIndex)
-			local nextVelocityData = layerData:getVelocityData(velocityDataIndex + 1)
+		for tempoDataIndex = 1, layerData:getTempoDataCount() do
+			local tempoData = layerData:getTempoData(tempoDataIndex)
+			local nextTempoData = layerData:getTempoData(tempoDataIndex + 1)
 
 			local startTime = lastTime
 			local endTime
-			if not nextVelocityData then
+			if not nextTempoData then
 				endTime = maxTime
 			else
-				endTime = math.min(maxTime, nextVelocityData.timePoint.absoluteTime)
+				endTime = math.min(maxTime, nextTempoData.timePoint.absoluteTime)
 			end
 			lastTime = endTime
 
-			local speed = velocityData.currentSpeed
-			if speed ~= 0 then
-				durations[speed] = (durations[speed] or 0) + endTime - startTime
-			end
+			local tempo = tempoData.tempo
+			durations[tempo] = (durations[tempo] or 0) + endTime - startTime
 		end
 	end
 
 	local longestDuration = 0
 	local average, minimum, maximum = 1, 1, 1
 
-	for speed, duration in pairs(durations) do
+	for tempo, duration in pairs(durations) do
 		if duration > longestDuration then
 			longestDuration = duration
-			average = speed
+			average = tempo
 		end
-		if not minimum or speed < minimum then
-			minimum = speed
+		if not minimum or tempo < minimum then
+			minimum = tempo
 		end
-		if not maximum or speed > maximum then
-			maximum = speed
+		if not maximum or tempo > maximum then
+			maximum = tempo
 		end
 	end
 
-	local mode = config.value
 	if mode == "average" then
-		self:applySpeed(average)
-	elseif mode == "x" then
-		return
-	elseif mode == "constant" then
-		self:applyConstant()
+		self:applyTempo(average)
 	elseif mode == "minimum" then
-		self:applySpeed(minimum)
+		self:applyTempo(minimum)
 	elseif mode == "maximum" then
-		self:applySpeed(maximum)
+		self:applyTempo(maximum)
 	end
 end
 
