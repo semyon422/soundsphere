@@ -65,7 +65,6 @@ EditorModel.load = function(self)
 	end
 
 	self.timePoint = ld:newTimePoint()
-	self.timePoint:setTime(ld:getDynamicTimePointAbsolute(192, 0))
 	self.timePoint.absoluteTime = 0
 
 	self.firstTime = ld.ranges.timePoint.first.absoluteTime
@@ -478,7 +477,7 @@ EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
 		end
 		startNoteData.noteType = "LongNoteStart"
 
-		local tp = ld:getTimePoint(self:getNextSnapIntervalTime(startNoteData.timePoint.absoluteTime, 1))
+		local tp = ld:getTimePoint(self:getNextSnapIntervalTime(startNoteData.timePoint, 1))
 		local endNoteData = ld:getNoteData(tp, inputType, inputIndex)
 		if not endNoteData then
 			return
@@ -610,11 +609,6 @@ EditorModel.updateRange = function(self)
 	end
 end
 
-EditorModel.getDynamicTimePoint = function(self)
-	local ld = self.layerData
-	return ld:getDynamicTimePointAbsolute(192, self.timePoint.absoluteTime, self.timePoint.visualSide)
-end
-
 EditorModel._scrollTimePoint = function(self, timePoint)
 	if not timePoint then
 		return
@@ -623,7 +617,6 @@ EditorModel._scrollTimePoint = function(self, timePoint)
 	local t = self.timePoint
 	t.absoluteTime = timePoint.absoluteTime
 	t.visualTime = timePoint.visualTime
-	t.beatTime = timePoint.beatTime
 	t.visualSection = timePoint.visualSection
 	t:setTime(timePoint:getTime())
 
@@ -662,12 +655,11 @@ EditorModel.scrollSnaps = function(self, delta)
 	self:scrollTimePoint(ld:getDynamicTimePoint(self:scrollSnapsInterval(delta)))
 end
 
-EditorModel.getNextSnapIntervalTime = function(self, absoluteTime, delta)
+EditorModel.getNextSnapIntervalTime = function(self, timePoint, delta)
 	local editor = self.game.configModel.configs.settings.editor
-	local dtp = self:getDtpAbsolute(absoluteTime)
 
 	local snap = editor.snap
-	local snapTime = dtp.time * snap
+	local snapTime = timePoint.time * snap
 
 	local targetSnapTime
 	if delta == -1 then
@@ -676,7 +668,7 @@ EditorModel.getNextSnapIntervalTime = function(self, absoluteTime, delta)
 		targetSnapTime = snapTime:floor() + 1
 	end
 
-	local intervalData = dtp.intervalData
+	local intervalData = timePoint.intervalData
 	-- if intervalData.next and targetSnapTime >= snap * intervalData:_end() then
 	-- 	intervalData = intervalData.next
 	-- 	targetSnapTime = intervalData:start() * snap
@@ -702,44 +694,7 @@ EditorModel.getNextSnapIntervalTime = function(self, absoluteTime, delta)
 end
 
 EditorModel.scrollSnapsInterval = function(self, delta)
-	return self:getNextSnapIntervalTime(self.timePoint.absoluteTime, delta)
-end
-
-EditorModel.scrollSnapsMeasure = function(self, delta)
-	local ld = self.layerData
-	local editor = self.game.configModel.configs.settings.editor
-	local dtp = self:getDtpAbsolute(self.timePoint.absoluteTime)
-
-	local measureOffset = dtp.measureTime:floor()
-	local signature = ld:getSignature(measureOffset)
-	local sigSnap = signature * editor.snap
-
-	local targetMeasureOffset
-	if delta == -1 then
-		targetMeasureOffset = dtp.measureTime:ceil() - 1
-	else
-		targetMeasureOffset = (dtp.measureTime + Fraction(1) / sigSnap):floor()
-	end
-	signature = ld:getSignature(targetMeasureOffset)
-	sigSnap = signature * editor.snap
-
-	if measureOffset ~= targetMeasureOffset then
-		if delta == -1 then
-			return Fraction(sigSnap:ceil() - 1) / sigSnap + targetMeasureOffset
-		end
-		return Fraction(targetMeasureOffset)
-	end
-
-	local snapTime = (dtp.measureTime - measureOffset) * sigSnap
-
-	local targetSnapTime
-	if delta == -1 then
-		targetSnapTime = snapTime:ceil() - 1
-	else
-		targetSnapTime = snapTime:floor() + 1
-	end
-
-	return Fraction(targetSnapTime) / sigSnap + measureOffset
+	return self:getNextSnapIntervalTime(self.timePoint, delta)
 end
 
 return EditorModel
