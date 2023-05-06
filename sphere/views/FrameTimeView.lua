@@ -171,6 +171,22 @@ FrameTimeView.drawFPS = function(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(self.font)
+
+	love.graphics.origin()
+	love.graphics.translate(0, 100)
+	love.graphics.setColor(0, 0, 0, 0.75)
+	love.graphics.rectangle("fill", 0, 0, 200, 200)
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.setFont(self.smallFont)
+	just.push()
+	just.text("drawcalls: " .. loop.stats.drawcalls)
+	just.text("canvasswitches: " .. loop.stats.canvasswitches)
+	just.text("texturememory: " .. math.floor(loop.stats.texturememory / 1e6) .. "MB")
+	just.text("images: " .. loop.stats.images)
+	just.text("canvases: " .. loop.stats.canvases)
+	just.text("fonts: " .. loop.stats.fonts)
+	just.pop()
+
 	love.graphics.origin()
 	love.graphics.translate((self.width - 200) / 2, 0)
 
