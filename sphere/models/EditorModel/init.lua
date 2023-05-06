@@ -643,7 +643,7 @@ EditorModel.scrollSnaps = function(self, delta)
 		return
 	end
 	local ld = self.layerData
-	self:scrollTimePoint(ld:getDynamicTimePoint(self:scrollSnapsInterval(delta)))
+	self:scrollTimePoint(ld:getDynamicTimePoint(self:getNextSnapIntervalTime(self.timePoint, delta)))
 end
 
 EditorModel.getNextSnapIntervalTime = function(self, timePoint, delta)
@@ -682,10 +682,6 @@ EditorModel.getNextSnapIntervalTime = function(self, timePoint, delta)
 	end
 
 	return intervalData, Fraction(targetSnapTime, snap)
-end
-
-EditorModel.scrollSnapsInterval = function(self, delta)
-	return self:getNextSnapIntervalTime(self.timePoint, delta)
 end
 
 return EditorModel
