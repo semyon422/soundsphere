@@ -65,7 +65,7 @@ EditorModel.load = function(self)
 	end
 
 	self.timePoint = ld:newTimePoint()
-	self.timePoint.absoluteTime = 0
+	ld:getDynamicTimePointAbsolute(192, 0):clone(self.timePoint)
 
 	self.firstTime = ld.ranges.timePoint.first.absoluteTime
 	self.lastTime = ld.ranges.timePoint.last.absoluteTime
@@ -209,10 +209,10 @@ EditorModel.genIntervalDatasGraph = function(self)
 	end
 end
 
-EditorModel.getDtpAbsolute = function(self, time, snapped)
+EditorModel.getDtpAbsolute = function(self, time, snapped, startTimePoint)
 	local ld = self.layerData
 	local editor = self.game.configModel.configs.settings.editor
-	return ld:getDynamicTimePointAbsolute(snapped and editor.snap or 192, time)
+	return ld:getDynamicTimePointAbsolute(snapped and editor.snap or 192, time, nil, startTimePoint)
 end
 
 EditorModel.unload = function(self)
@@ -630,8 +630,9 @@ EditorModel.scrollTimePoint = function(self, timePoint)
 end
 
 EditorModel.scrollSeconds = function(self, absoluteTime)
-	local dtp = self:getDtpAbsolute(absoluteTime)
-	self:scrollTimePoint(dtp)
+	-- to be sure self.timePoint is not returned, pass .prev or .next
+	local timePoint, steps = self:getDtpAbsolute(absoluteTime, nil, self.timePoint.prev or self.timePoint.next)
+	self:scrollTimePoint(timePoint)
 end
 
 EditorModel.scrollSecondsDelta = function(self, delta)
