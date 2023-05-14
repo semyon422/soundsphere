@@ -115,7 +115,7 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 	love.graphics.setLineWidth(1)
 
 	local timePoint = ld.ranges.timePoint.head
-	local measureData = timePoint.measureData
+	local measureData
 
 	local intervalData = timePoint.intervalData
 	local time = timePoint.time
@@ -137,10 +137,13 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 
 		if measureData ~= timePoint.measureData then
 			measureData = timePoint.measureData
-			intervalData, time = measureData.timePoint:add(-measureData.start + Fraction(1, snap))
+			local delta = -(time % 1) + measureData.timePoint.time % 1 - measureData.start
+			while delta[1] < 0 do
+				delta = delta + Fraction(1, snap)
+			end
+			intervalData, time = timePoint:add(delta)
 			timePoint = ld:getDynamicTimePoint(intervalData, time)
 			if not timePoint or not timePoint[field] then break end
-			drawNothing = timePoint.measureData ~= measureData
 		end
 
 		if not drawNothing and intervalData.prev then
