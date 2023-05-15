@@ -86,7 +86,7 @@ end
 local empty = {}
 OsudirectModel.getDifficulties = function(self)
 	local beatmap = self.beatmap
-	return beatmap and beatmap.difficulties or empty
+	return beatmap and beatmap.beatmaps or empty
 end
 
 local requestAsync = thread.async(function(url)
@@ -136,33 +136,13 @@ OsudirectModel.searchRequest = function(self, searchString, page)
 		return {}
 	end
 
-	local beatmaps = {}
 	for _, set in ipairs(err) do
-		local beatmap = {}
-		beatmap.artist = set.Artist
-		beatmap.title = set.Title
-		beatmap.creator = set.Creator
-		beatmap.setId = set.SetID
-
-		beatmap.difficulties = {}
-		for i, diff in ipairs(set.ChildrenBeatmaps) do
-			table.insert(beatmap.difficulties, {
-				name = diff.DiffName,
-				sr = diff.DifficultyRating,
-				bpm = diff.BPM,
-				cs = diff.CS,
-				length = diff.TotalLength,
-				beatmap = beatmap,
-			})
+		for i, diff in ipairs(set.beatmaps) do
+			diff.beatmapset = set
 		end
-		table.sort(beatmap.difficulties, function(a, b)
-			return a.sr < b.sr
-		end)
-
-		table.insert(beatmaps, beatmap)
 	end
 
-	return beatmaps
+	return err
 end
 
 OsudirectModel.searchNext = function(self)
@@ -193,12 +173,12 @@ end
 
 OsudirectModel.getBackgroundUrl = function(self)
 	local config = self.game.configModel.configs.urls.osu
-	return config.background:format(self.beatmap.setId)
+	return config.background:format(self.beatmap.id)
 end
 
 OsudirectModel.getPreviewUrl = function(self)
 	local config = self.game.configModel.configs.urls.osu
-	return config.preview:format(self.beatmap.setId)
+	return config.preview:format(self.beatmap.id)
 end
 
 OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback)
@@ -212,8 +192,7 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 
 	local saveDir = "userdata/charts/downloads"
 
-	local setId = beatmap.setId
-	local url = config.download:format(setId)
+	local url = config.download:format(beatmap.id)
 	beatmap.url = url
 
 	print(("Downloading: %s"):format(url))

@@ -18,7 +18,7 @@ OsudirectDifficultiesListView.drawItem = function(self, i, w, h)
 	local item = self.items[i]
 
 	just.indent(22)
-	TextCellImView(math.huge, h, "left", item.beatmap.creator, item.name)
+	TextCellImView(math.huge, h, "left", item.beatmapset.creator, item.version)
 end
 
 return OsudirectDifficultiesListView
