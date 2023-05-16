@@ -45,11 +45,13 @@ SnapGridView.drawTimingObjects = function(self, field, currentTime, w, h, align,
 	end
 
 	local endTimePoint = rangeTracker.tail
+	local t
 	while timePoint and timePoint <= endTimePoint do
 		local text = getText(timePoint)
-		if text then
+		if text and not t or timePoint.absoluteTime - t >= 0.01 then
 			local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editor.speed)
 			gfx_util.printFrame(text, 0, y - h / 2, w, h, align, "center")
+			t = timePoint.absoluteTime
 		end
 
 		timePoint = timePoint.next
