@@ -15,6 +15,12 @@ pkg.add("ncdk")
 pkg.add("chartbase")
 pkg.add("libchart")
 
+local reqprof = require("reqprof")
+if love.filesystem.getInfo("reqprof", "file") then
+	reqprof.replace_loader()
+end
+reqprof.blacklist = {"3rd-deps"}
+
 local ffi = require("ffi")
 
 local source = love.filesystem.getSource()

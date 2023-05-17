@@ -5,6 +5,7 @@ local asynckey = require("asynckey")
 local just = require("just")
 local LuaMidi = require("luamidi")
 local flux = require("flux")
+local reqprof = require("reqprof")
 
 local loop = Observable:new()
 
@@ -80,6 +81,8 @@ loop.run = function()
 		if loop.quitting then
 			return loop.quittingLoop()
 		end
+
+		reqprof.start()
 
 		if loop.asynckey and asynckey.start then
 			asynckey.start()

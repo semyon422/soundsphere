@@ -1,9 +1,9 @@
 local Class = require("Class")
-local Profiler = require("Profiler")
 local spherefonts = require("sphere.assets.fonts")
 local loop = require("loop")
 local just = require("just")
 local imgui = require("imgui")
+local reqprof = require("reqprof")
 
 local FrameTimeView = Class:new()
 
@@ -196,11 +196,15 @@ FrameTimeView.drawFPS = function(self)
 	end
 	if imgui.TextOnlyButton("switch profiler", action .. " profiler", 200, 60) then
 		if self.profiler then
-			Profiler:stop()
+			reqprof.disable()
 		else
-			Profiler:start()
+			reqprof.enable()
 		end
 		self.profiler = not self.profiler
+	end
+	just.sameline()
+	if imgui.TextOnlyButton("reqprof.print()", "reqprof.print()", 200, 60) then
+		reqprof.print()
 	end
 end
 
