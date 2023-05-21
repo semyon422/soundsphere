@@ -46,7 +46,7 @@ end
 local function Header(self)
 	local w, h = Layout:move("column1", "header")
 
-	local username = self.game.configModel.configs.online.user.name
+	local username = self.game.configModel.configs.online.user.name or "Not logged in"
 	local session = self.game.configModel.configs.online.session
 	just.row(true)
 	if UserInfoView:draw(w, h, username, session and next(session)) then
