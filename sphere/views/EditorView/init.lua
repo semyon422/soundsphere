@@ -11,6 +11,8 @@ local SequenceView = require("sphere.views.SequenceView")
 local Footer = require("sphere.views.EditorView.Footer")
 local Foreground = require("sphere.views.EditorView.Foreground")
 local WaveformView = require("sphere.views.EditorView.WaveformView")
+local OnsetsView = require("sphere.views.EditorView.OnsetsView")
+local OnsetsDistView = require("sphere.views.EditorView.OnsetsDistView")
 
 local EditorView = ScreenView:new()
 

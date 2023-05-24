@@ -12,6 +12,7 @@ local ConvertMeasureToInterval = require("sphere.models.EditorModel.ConvertMeasu
 local Changes = require("Changes")
 local ConvertTests = require("sphere.models.EditorModel.ConvertTests")
 local math_util = require("math_util")
+local ProcessOnsets = require("sphere.models.EditorModel.ProcessOnsets")
 
 local EditorModel = Class:new()
 
@@ -57,6 +58,8 @@ EditorModel.load = function(self)
 	self.inputMap = nc.inputMode:getInputMap()
 
 	self.soundData = nil
+	self.onsets = nil
+	self.onsetsDeltaDist = nil
 	self.soundDataOffset = 0
 
 	local audioPath = noteChartModel.noteChartEntry.path:match("^(.+)/.-$") .. "/" .. nc.metaData.audioPath
@@ -78,6 +81,8 @@ EditorModel.load = function(self)
 
 	self:scrollSeconds(self.timer:getTime())
 end
+
+EditorModel.processOnsets = ProcessOnsets
 
 EditorModel.fixSettings = function(self)
 	local editor = self.game.configModel.configs.settings.editor
