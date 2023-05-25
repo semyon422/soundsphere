@@ -71,6 +71,8 @@ return thread.async(function(url, saveDir, fallbackName)
 		return nil, status_line
 	end
 
+	name = name:gsub('[/\\?%*:|"<>]', "_")
+
 	require("love.filesystem")
 	local ok, err = love.filesystem.write(saveDir .. "/" .. name, table.concat(t))
 	if not ok then
