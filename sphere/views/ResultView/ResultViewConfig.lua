@@ -420,8 +420,8 @@ local function NotechartInfo(self)
 	TextCellImView(w * (1 - wr), 55, "right", "level", noteChartItem.level)
 	just.sameline()
 	TextCellImView(w * wr, 55, "right", "bpm",
-		bpm == baseBpm and math.floor(baseBpm) or
-		("%d→%d"):format(baseBpm, bpm)
+		bpm == baseBpm and math.floor(baseBpm + 0.5) or
+		("%d→%d"):format(math.floor(baseBpm + 0.5), math.floor(bpm + 0.5))
 	)
 
 	w, h = Layout:move("title_sub")

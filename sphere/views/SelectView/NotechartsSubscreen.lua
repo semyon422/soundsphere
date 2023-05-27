@@ -140,7 +140,7 @@ local function Cells(self)
 
 	just.row(true)
 	just.indent(22)
-	TextCellImView(w, h, "right", "bpm", ("%d"):format(bpm))
+	TextCellImView(w, h, "right", "bpm", math.floor(bpm + 0.5))
 	TextCellImView(w, h, "right", "duration", time_util.format(length))
 	TextCellImView(w, h, "right", "notes", noteCount)
 	TextCellImView(w, h, "right", "level", level)
@@ -160,12 +160,12 @@ local function Cells(self)
 	h = 50
 
 	just.row(true)
-	TextCellImView(w, h, "right", "score", ("%d"):format(score))
+	TextCellImView(w, h, "right", "score", math.floor(score))
 	TextCellImView(w, h, "right", "accuracy", Format.accuracy(accuracy))
 
 	just.row(true)
 	TextCellImView(w, h, "right", "difficulty", Format.difficulty(difficulty))
-	TextCellImView(w, h, "right", "miss count", ("%d"):format(missCount))
+	TextCellImView(w, h, "right", "miss count", missCount)
 	just.row()
 end
 
