@@ -33,6 +33,10 @@ local function draw()
 		love.filesystem.remove("userdata/files.lua")
 		love.event.quit("restart")
 	end
+	if imgui.button("vscode", "open in vscode") then
+		os.execute("code -g " .. message:match("^([^:]-:%d+)"))
+		love.event.quit()
+	end
 	just.offset(w - 70)
 	if imgui.button("error", "error") then
 		error(message .. "\n" .. trace)
