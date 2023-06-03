@@ -32,29 +32,35 @@ LongNoteView.draw = function(self)
 
 	local note = self.graphicalNote
 
-	local tf = gfx_util.transform(self:getHeadTransformParams())
-	local w, h = hw:getDimensions()
-	love.graphics.push()
-	love.graphics.applyTransform(tf)
-	note.headOver = just.is_over(w, h)
-	note.headSelecting = just.is_selected(w, h)
-	love.graphics.pop()
+	if headSpriteBatch then
+		local tf = gfx_util.transform(self:getHeadTransformParams())
+		local w, h = hw:getDimensions()
+		love.graphics.push()
+		love.graphics.applyTransform(tf)
+		note.headOver = just.is_over(w, h)
+		note.headSelecting = just.is_selected(w, h)
+		love.graphics.pop()
+	end
 
-	local tf = gfx_util.transform(self:getTailTransformParams())
-	local w, h = tw:getDimensions()
-	love.graphics.push()
-	love.graphics.applyTransform(tf)
-	note.tailOver = just.is_over(w, h)
-	note.tailSelecting = just.is_selected(w, h)
-	love.graphics.pop()
+	if tailSpriteBatch then
+		local tf = gfx_util.transform(self:getTailTransformParams())
+		local w, h = tw:getDimensions()
+		love.graphics.push()
+		love.graphics.applyTransform(tf)
+		note.tailOver = just.is_over(w, h)
+		note.tailSelecting = just.is_selected(w, h)
+		love.graphics.pop()
+	end
 
-	local tf = gfx_util.transform(self:getBodyTransformParams())
-	local _, _, w, h = self.bodyQuad:getViewport()
-	love.graphics.push()
-	love.graphics.applyTransform(tf)
-	note.bodyOver = just.is_over(w, h)
-	note.bodySelecting = just.is_selected(w, h)
-	love.graphics.pop()
+	if bodySpriteBatch then
+		local tf = gfx_util.transform(self:getBodyTransformParams())
+		local _, _, w, h = self.bodyQuad:getViewport()
+		love.graphics.push()
+		love.graphics.applyTransform(tf)
+		note.bodyOver = just.is_over(w, h)
+		note.bodySelecting = just.is_selected(w, h)
+		love.graphics.pop()
+	end
 
 	self.graphicalNote.over = note.headOver or note.tailOver or note.bodyOver
 	self.graphicalNote.selecting = note.headSelecting or note.tailSelecting or note.bodySelecting
