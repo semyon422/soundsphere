@@ -425,9 +425,17 @@ EditorModel.dropNotes = function(self)
 			if note.grabbedPart == "head" then
 				local dtp = self:getDtpAbsolute(time - note.grabbedDeltaTime, true)
 				note.startNoteData.timePoint = ld:checkTimePoint(dtp)
+				if note.startNoteData.timePoint == note.endNoteData.timePoint then
+					local tp = ld:getTimePoint(self:getNextSnapIntervalTime(note.startNoteData.timePoint, -1))
+					note.startNoteData.timePoint = tp
+				end
 			elseif note.grabbedPart == "tail" then
 				local dtp = self:getDtpAbsolute(time - note.grabbedDeltaTime, true)
 				note.endNoteData.timePoint = ld:checkTimePoint(dtp)
+				if note.startNoteData.timePoint == note.endNoteData.timePoint then
+					local tp = ld:getTimePoint(self:getNextSnapIntervalTime(note.startNoteData.timePoint, 1))
+					note.endNoteData.timePoint = tp
+				end
 			elseif note.grabbedPart == "body" then
 				local dtp = self:getDtpAbsolute(time - note.grabbedDeltaTime[1], true)
 				note.startNoteData.timePoint = ld:checkTimePoint(dtp)
@@ -493,6 +501,10 @@ EditorModel.addNote = function(self, absoluteTime, inputType, inputIndex)
 
 		endNoteData.startNoteData = startNoteData
 		startNoteData.endNoteData = endNoteData
+
+		local note = self.graphicEngine:newNote(startNoteData, self, inputType, inputIndex)
+		self:selectNote(note)
+		self:grabNotes("tail")
 	end
 	self:increaseChange()
 	self:nextChange()

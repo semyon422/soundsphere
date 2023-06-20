@@ -77,6 +77,23 @@ GraphicEngine.selectNote = function(self, note, keepOthers)
 	end
 end
 
+GraphicEngine.newNote = function(self, noteData, editorModel, inputType, inputIndex)
+	local note
+	local isNew = false
+	if not note then
+		note = GraphicalNoteFactory:getNote(noteData)
+		isNew = true
+	end
+	if note and isNew then
+		note.currentTimePoint = editorModel.timePoint
+		note.graphicEngine = self
+		note.layerData = editorModel.layerData
+		note.inputType = inputType
+		note.inputIndex = inputIndex
+	end
+	return note
+end
+
 GraphicEngine.update = function(self)
 	local editorModel = self.editorModel
 	local layerData = editorModel.layerData
@@ -120,19 +137,9 @@ GraphicEngine.update = function(self)
 		for inputIndex, range in pairs(r) do
 			local noteData = range.head
 			while noteData and noteData <= range.tail do
-				local note = notesMap[noteData] or selectedNotesMap[noteData]
-				local isNew = false
-				if not note then
-					note = GraphicalNoteFactory:getNote(noteData)
-					isNew = true
-				end
-				if note and isNew then
-					note.currentTimePoint = editorModel.timePoint
-					note.graphicEngine = self
-					note.layerData = layerData
-					note.inputType = inputType
-					note.inputIndex = inputIndex
-				end
+				local note = notesMap[noteData] or
+					selectedNotesMap[noteData] or
+					self:newNote(noteData, editorModel, inputType, inputIndex)
 				table.insert(newNotes, note)
 				noteData = noteData.next
 			end
