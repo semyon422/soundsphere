@@ -32,15 +32,6 @@ local function CollectionList(self)
 	CollectionListView.game = self.game
 	CollectionListView:draw(w, h)
 	SelectFrame()
-
-	love.graphics.translate(w - 16, 0)
-
-	local list = CollectionListView
-	local count = #list.items - 1
-	local pos = (list.visualItemIndex - 1) / count
-	if newScroll then
-		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
-	end
 end
 
 local function CollectionsSubscreen(self)
