@@ -160,6 +160,7 @@ function tabs.timings(self)
 	end
 end
 
+local qwerty = "qwerty"
 function tabs.notes(self)
 	local editorModel = self.game.editorModel
 	local editor = self.game.configModel.configs.settings.editor
@@ -171,7 +172,14 @@ function tabs.notes(self)
 	end
 	editor.snap = imgui.slider1("snap select", editor.snap, "%d", 1, 16, 1, "snap")
 	editor.lockSnap = imgui.checkbox("lock snap", editor.lockSnap, "lock snap")
-	editor.tool = imgui.list("tool select", editor.tool, editorModel.tools, 200, nil, "tool")
+	editor.tool = imgui.combo("tool select", editor.tool, editorModel.tools, nil, "tool")
+	imgui.text("Use qwer to select tool")
+
+	for i = 1, #editorModel.tools do
+		if just.keypressed(qwerty:sub(i, i)) then
+			editor.tool = editorModel.tools[i]
+		end
+	end
 end
 
 return function(self)
