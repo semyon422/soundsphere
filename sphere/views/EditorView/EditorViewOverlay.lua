@@ -35,6 +35,10 @@ function tabs.info(self)
 	if imgui.button("save btn", "save") then
 		self.game.editorController:save()
 	end
+	just.sameline()
+	if imgui.button("save to osu btn", "save to osu") then
+		self.game.editorController:saveToOsu()
+	end
 
 	love.graphics.push("all")
 	love.graphics.setColor(1, 1, 1, 0.75)

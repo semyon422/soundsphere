@@ -1,5 +1,6 @@
 local Class = require("Class")
 local NoteChartExporter = require("sph.NoteChartExporter")
+local OsuNoteChartExporter = require("osu.NoteChartExporter")
 local NoteChartResourceLoader = require("sphere.database.NoteChartResourceLoader")
 local FileFinder = require("sphere.filesystem.FileFinder")
 
@@ -57,6 +58,22 @@ EditorController.save = function(self)
 	exp.noteChart = noteChartModel.noteChart
 
 	local path = noteChartModel.noteChartEntry.path:gsub(".sph$", "") .. ".sph"
+
+	love.filesystem.write(path, exp:export())
+end
+
+EditorController.saveToOsu = function(self)
+	local noteChartModel = self.game.noteChartModel
+
+	self.game.editorModel:save()
+
+	local exp = OsuNoteChartExporter:new()
+	exp.noteChart = noteChartModel.noteChart
+	exp.noteChartEntry = self.game.noteChartModel.noteChartEntry
+	exp.noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry
+
+	local path = noteChartModel.noteChartEntry.path
+	path = path:gsub(".osu$", ""):gsub(".sph$", "") .. ".sph.osu"
 
 	love.filesystem.write(path, exp:export())
 end
