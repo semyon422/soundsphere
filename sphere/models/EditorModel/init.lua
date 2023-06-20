@@ -373,9 +373,9 @@ EditorModel.grabNotes = function(self, part)
 			note.startNoteData = note.startNoteData:clone()
 			if note.endNoteData then
 				note.endNoteData = note.endNoteData:clone()
+				note.startNoteData.endNoteData = note.endNoteData
+				note.endNoteData.startNoteData = note.startNoteData
 			end
-			note.startNoteData.endNoteData = note.endNoteData
-			note.endNoteData.startNoteData = note.startNoteData
 
 			if not editor.lockSnap then
 				if note.noteType == "ShortNote" then
