@@ -29,7 +29,6 @@ local UpdateModel		= require("sphere.models.UpdateModel")
 local RhythmModel		= require("sphere.models.RhythmModel")
 local OsudirectModel		= require("sphere.models.OsudirectModel")
 local MultiplayerModel		= require("sphere.models.MultiplayerModel")
-local MainLog					= require("sphere.MainLog")
 local ReplayModel		= require("sphere.models.ReplayModel")
 local EditorModel		= require("sphere.models.EditorModel")
 local SpeedModel		= require("sphere.models.SpeedModel")
@@ -117,8 +116,6 @@ end
 GameController.load = function(self)
 	local configModel = self.configModel
 	local rhythmModel = self.rhythmModel
-
-	MainLog:write("trace", "starting game")
 
 	self.directoryManager:createDirectories()
 	configModel:read(
