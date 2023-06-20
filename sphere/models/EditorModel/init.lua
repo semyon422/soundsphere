@@ -370,6 +370,13 @@ EditorModel.grabNotes = function(self, part)
 			note.grabbedPart = part
 			note.grabbedDeltaColumn = column - _column
 
+			note.startNoteData = note.startNoteData:clone()
+			if note.endNoteData then
+				note.endNoteData = note.endNoteData:clone()
+			end
+			note.startNoteData.endNoteData = note.endNoteData
+			note.endNoteData.startNoteData = note.startNoteData
+
 			if not editor.lockSnap then
 				if note.noteType == "ShortNote" then
 					note.grabbedDeltaTime = t - note.startNoteData.timePoint.absoluteTime
@@ -499,7 +506,7 @@ end
 EditorModel.increaseChange = function(self)
 	local i = self.changes:add()
 	self.layerData:syncChanges(i)
-	print("add", i)
+	print("add i", i)
 end
 
 EditorModel.nextChange = function(self)
