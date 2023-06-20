@@ -15,6 +15,58 @@ do
 	ld:setPrimaryTempo(60)
 
 	ld:insertTempoData(0, 60)
+
+	local tp0 = ld:getTimePoint(0)
+	local tp1 = ld:getTimePoint(4)
+
+	nc:compute()
+
+	assert(tp0.absoluteTime == 0)
+	assert(tp1.absoluteTime == 4)
+
+	local ild, tpm = ConvertAbsoluteToInterval(ld)
+
+	assert(#ild.intervalDatas == 2)
+	assert(ild.intervalDatas[1].beats == 4)
+	assert(ild.intervalDatas[2].beats == 1)
+
+	assert(tpm[tp1].time == F(0))
+end
+
+do
+	local nc = NoteChart:new()
+	local ld = nc:getLayerData(1)
+	ld:setTimeMode("absolute")
+	ld:setSignatureMode("long")
+	ld:setPrimaryTempo(60)
+
+	ld:insertTempoData(0, 60)
+
+	local tp0 = ld:getTimePoint(0)
+	local tp1 = ld:getTimePoint(3.5)
+
+	nc:compute()
+
+	assert(tp0.absoluteTime == 0)
+	assert(tp1.absoluteTime == 3.5)
+
+	local ild, tpm = ConvertAbsoluteToInterval(ld)
+
+	assert(#ild.intervalDatas == 2)
+	assert(ild.intervalDatas[1].beats == 4)
+	assert(ild.intervalDatas[2].beats == 1)
+
+	assert(tpm[tp1].time == F(3.5))
+end
+
+do
+	local nc = NoteChart:new()
+	local ld = nc:getLayerData(1)
+	ld:setTimeMode("absolute")
+	ld:setSignatureMode("long")
+	ld:setPrimaryTempo(60)
+
+	ld:insertTempoData(0, 60)
 	ld:insertTempoData(4, 120)
 
 	local tp0 = ld:getTimePoint(0)
