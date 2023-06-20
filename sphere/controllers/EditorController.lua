@@ -80,6 +80,27 @@ end
 
 EditorController.receive = function(self, event)
 	self.game.editorModel:receive(event)
+	if event.name == "filedropped" then
+		return self:filedropped(event[1])
+	end
+end
+
+local exts = {
+	mp3 = true,
+	ogg = true,
+}
+EditorController.filedropped = function(self, file)
+	local path = file:getFilename():gsub("\\", "/")
+
+	local _name, ext = path:match("^(.+)%.(.-)$")
+	if not exts[ext] then
+		return
+	end
+
+	local audioName = _name:match("^.+/(.-)$")
+	local chartSetPath = "userdata/charts/editor/" .. os.time() .. " " .. audioName
+
+	love.filesystem.write(chartSetPath .. "/" .. audioName .. "." .. ext, file:read())
 end
 
 return EditorController

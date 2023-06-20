@@ -16,6 +16,10 @@ SelectView.load = function(self)
 	self.game.selectController:load()
 end
 
+SelectView.receive = function(self, event)
+	self.game.selectController:receive(event)
+end
+
 SelectView.draw = function(self)
 	just.container("select container", true)
 

@@ -1,6 +1,7 @@
 local Class = require("Class")
 local thread = require("thread")
 local InputMode = require("ncdk.InputMode")
+local SPH = require("sph.SPH")
 
 local SelectController = Class:new()
 
@@ -137,6 +138,36 @@ SelectController.updateCacheCollection = function(self, path, force)
 	else
 		cacheModel:stopUpdate()
 	end
+end
+
+SelectController.receive = function(self, event)
+	if event.name == "filedropped" then
+		return self:filedropped(event[1])
+	end
+end
+
+local exts = {
+	mp3 = true,
+	ogg = true,
+}
+SelectController.filedropped = function(self, file)
+	local path = file:getFilename():gsub("\\", "/")
+
+	local _name, ext = path:match("^(.+)%.(.-)$")
+	if not exts[ext] then
+		return
+	end
+
+	local audioName = _name:match("^.+/(.-)$")
+	local chartSetPath = "userdata/charts/editor/" .. os.time() .. " " .. audioName
+
+	love.filesystem.createDirectory(chartSetPath)
+	assert(love.filesystem.write(chartSetPath .. "/" .. audioName .. "." .. ext, file:read()))
+	assert(love.filesystem.write(chartSetPath .. "/" .. audioName .. ".sph", SPH:getDefault({
+		audio = audioName .. "." .. ext
+	})))
+
+	self.game.cacheModel:startUpdate(chartSetPath, true)
 end
 
 return SelectController
