@@ -95,7 +95,7 @@ function tabs.timings(self)
 	editor.showTimings = imgui.checkbox("show timings", editor.showTimings, "show timings")
 
 	if imgui.button("ncbt", "detect tempo and offset") then
-		editorModel:processOnsets()
+		editorModel:detectTempoOffset()
 	end
 
 	local intervalData = dtp._intervalData

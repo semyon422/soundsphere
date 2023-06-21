@@ -82,7 +82,7 @@ EditorModel.load = function(self)
 	self:scrollSeconds(self.timer:getTime())
 end
 
-EditorModel.processOnsets = ProcessOnsets
+EditorModel.detectTempoOffset = ProcessOnsets
 
 EditorModel.fixSettings = function(self)
 	local editor = self.game.configModel.configs.settings.editor
