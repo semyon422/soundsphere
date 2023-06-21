@@ -109,7 +109,7 @@ function tabs.timings(self)
 	if not grabbedIntervalData then
 		if not intervalData then
 			if imgui.button("split button", "split") then
-				ld:splitInterval(dtp)
+				ld:splitInterval(ld:getTimePoint(dtp:getTime()))
 			end
 		elseif imgui.button("grab interval button", "grab") then
 			editorModel:grabIntervalData()
@@ -122,7 +122,8 @@ function tabs.timings(self)
 	if intervalData and not grabbedIntervalData then
 		just.sameline()
 		if imgui.button("merge interval button", "merge") then
-			ld:mergeInterval(dtp)
+			ld:mergeInterval(intervalData.timePoint)
+			editorModel:scrollSecondsDelta(0)
 		end
 		local beats = intervalData.beats
 		local newBeats = imgui.intButtons("update interval", beats, 1, "beats")
