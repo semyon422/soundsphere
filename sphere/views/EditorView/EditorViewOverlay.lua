@@ -97,6 +97,9 @@ function tabs.timings(self)
 	if imgui.button("ncbt", "detect tempo and offset") then
 		editorModel:detectTempoOffset()
 	end
+	if editorModel.tempo and imgui.button("ncbt", "detect tempo and offset") then
+		editorModel:applyTempoOffset()
+	end
 
 	local intervalData = dtp._intervalData
 	local grabbedIntervalData = editorModel.grabbedIntervalData

@@ -32,15 +32,4 @@ return function(self)  -- self is EditorModel
 	for k, v in pairs(out) do
 		self[k] = v
 	end
-
-	local ld = self.layerData
-	ld:init()
-	ld:syncChanges(self.changes:get())
-
-	local beatDuration = 60 / out.tempo
-	local beats = math.floor((self.soundData:getDuration() - out.offset) / beatDuration)
-	local lastOffset = beats * beatDuration + out.offset
-
-	ld:getIntervalData(out.offset, beats)
-	ld:getIntervalData(lastOffset, 1)
 end

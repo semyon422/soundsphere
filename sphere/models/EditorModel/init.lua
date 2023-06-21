@@ -84,6 +84,23 @@ end
 
 EditorModel.detectTempoOffset = ProcessOnsets
 
+EditorModel.applyTempoOffset = function(self)
+	if not self.tempo then
+		return
+	end
+
+	local ld = self.layerData
+	ld:init()
+	ld:syncChanges(self.changes:get())
+
+	local beatDuration = 60 / self.tempo
+	local beats = math.floor((self.soundData:getDuration() - self.offset) / beatDuration)
+	local lastOffset = beats * beatDuration + self.offset
+
+	ld:getIntervalData(self.offset, beats)
+	ld:getIntervalData(lastOffset, 1)
+end
+
 EditorModel.fixSettings = function(self)
 	local editor = self.game.configModel.configs.settings.editor
 	if editor.speed <= 0 then
