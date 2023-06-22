@@ -600,8 +600,10 @@ EditorModel.update = function(self)
 		ld:moveInterval(self.grabbedIntervalData, dtp.absoluteTime)
 	end
 	self.audioManager:update()
+
+	dtp:clone(self.timePoint)
 	if self.timer.isPlaying then
-		self:_scrollTimePoint(dtp)
+		self:updateRange()
 	end
 
 	self.graphicEngine:update()
