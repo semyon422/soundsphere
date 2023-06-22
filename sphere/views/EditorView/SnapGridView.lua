@@ -116,19 +116,19 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 
 	love.graphics.setLineWidth(1)
 
-	local timePoint = ld.ranges.timePoint.head
+	local range = 1 / editor.speed
+	local timePoint = ld:getDynamicTimePointAbsolute(1, currentTime - range)
 	local measureData
 
 	local intervalData = timePoint.intervalData
 	local time = timePoint.time
 	intervalData, time = timePoint:add(Fraction((time * snap):ceil() + 1, snap) - time)
 
-	timePoint = ld.ranges.timePoint.tail
+	timePoint = ld:getDynamicTimePointAbsolute(1, currentTime + range)
 	local endIntervalData = timePoint.intervalData
 	local endTime = timePoint.time
 	endTime = Fraction((endTime * snap):floor(), snap)
 
-	ld.ranges.timePoint.current = ld.ranges.timePoint.head
 	timePoint = ld:getDynamicTimePoint(intervalData, time)
 
 	while intervalData and intervalData < endIntervalData or intervalData == endIntervalData and time <= endTime do
