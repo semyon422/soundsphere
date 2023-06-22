@@ -6,7 +6,7 @@ return function(self)  -- self is EditorModel
 		return
 	end
 
-	local onsets = ncbt.onsets(self.soundData)
+	local onsets = ncbt.onsets(self.mainAudio.soundData)
 
 	local tree = rbtree.new()
 	for _, time in ipairs(onsets) do

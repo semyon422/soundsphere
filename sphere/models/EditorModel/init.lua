@@ -1,18 +1,15 @@
 local Class = require("Class")
-local DynamicLayerData = require("ncdk.DynamicLayerData")
 local Fraction = require("ncdk.Fraction")
 local AudioManager = require("sphere.models.EditorModel.AudioManager")
-local NoteChartResourceLoader = require("sphere.database.NoteChartResourceLoader")
-local audio = require("audio")
 local TimeManager = require("sphere.models.EditorModel.TimeManager")
 local GraphicEngine = require("sphere.models.EditorModel.GraphicEngine")
 local just = require("just")
-local ConvertAbsoluteToInterval = require("sphere.models.EditorModel.ConvertAbsoluteToInterval")
-local ConvertMeasureToInterval = require("sphere.models.EditorModel.ConvertMeasureToInterval")
 local Changes = require("Changes")
-local ConvertTests = require("sphere.models.EditorModel.ConvertTests")
-local math_util = require("math_util")
-local ProcessOnsets = require("sphere.models.EditorModel.ProcessOnsets")
+local NoteChartLoader = require("sphere.models.EditorModel.NoteChartLoader")
+local MainAudio = require("sphere.models.EditorModel.MainAudio")
+local NcbtContext = require("sphere.models.EditorModel.NcbtContext")
+local IntervalManager = require("sphere.models.EditorModel.IntervalManager")
+local GraphsGenerator = require("sphere.models.EditorModel.GraphsGenerator")
 
 local EditorModel = Class:new()
 
@@ -20,6 +17,11 @@ EditorModel.tools = {"Select", "ShortNote", "LongNote", "SoundNote"}
 EditorModel.states = {"info", "audio", "timings", "notes"}
 
 EditorModel.construct = function(self)
+	self.noteChartLoader = NoteChartLoader:new()
+	self.mainAudio = MainAudio:new()
+	self.ncbtContext = NcbtContext:new()
+	self.intervalManager = IntervalManager:new()
+	self.graphsGenerator = GraphsGenerator:new()
 	self.timer = TimeManager:new()
 	self.audioManager = AudioManager:new()
 	self.timer.audioManager = self.audioManager
@@ -27,8 +29,6 @@ EditorModel.construct = function(self)
 	self.graphicEngine = GraphicEngine:new()
 	self.graphicEngine.editorModel = self
 	self.grabbedNotes = {}
-	self.densityGraph = {}
-	self.intervalDatasGraph = {n = 0}
 	self.state = self.states[1]
 end
 
@@ -37,35 +37,26 @@ EditorModel.load = function(self)
 	local nc = noteChartModel.noteChart
 	local editor = self.game.configModel.configs.settings.editor
 
-	self:fixSettings()
+	self.layerData = self.noteChartLoader:load(nc)
+	local ld = self.layerData
 
-	self.resourcesLoaded = false
+	self.intervalManager.layerData = ld
 
-	local ld = nc:getLayerData(1)
-
-	if ld.mode == "absolute" then
-		ld = ConvertAbsoluteToInterval(ld)
-	elseif ld.mode == "measure" then
-		ld = ConvertMeasureToInterval(ld)
-	end
-
-	ld = DynamicLayerData:new(ld)
-	self.layerData = ld
 	self.changes = Changes:new()
 	ld:syncChanges(self.changes:get())
+
+	self:fixSettings()
+
+	self.graphsGenerator:load()
+
+	self.resourcesLoaded = false
 
 	self.columns = nc.inputMode:getColumns()
 	self.inputMap = nc.inputMode:getInputMap()
 
-	self.soundData = nil
-	self.onsets = nil
-	self.onsetsDeltaDist = nil
-	self.soundDataOffset = 0
-
 	local audioPath = noteChartModel.noteChartEntry.path:match("^(.+)/.-$") .. "/" .. nc.metaData.audioPath
-	if love.filesystem.getInfo(audioPath, "file") then
-		self.soundData = love.sound.newSoundData(audioPath)
-	end
+	self.mainAudio:load(audioPath)
+	self.mainAudio:findOffset(nc)
 
 	self.timePoint = ld:newTimePoint()
 	ld:getDynamicTimePointAbsolute(192, 0):clone(self.timePoint)
@@ -82,23 +73,14 @@ EditorModel.load = function(self)
 	self:scrollSeconds(self.timer:getTime())
 end
 
-EditorModel.detectTempoOffset = ProcessOnsets
+EditorModel.detectTempoOffset = function(self)
+	if self.mainAudio.soundData then
+		self.ncbtContext:detect(self.mainAudio.soundData)
+	end
+end
 
 EditorModel.applyTempoOffset = function(self)
-	if not self.tempo then
-		return
-	end
-
-	local ld = self.layerData
-	ld:init()
-	ld:syncChanges(self.changes:get())
-
-	local beatDuration = 60 / self.tempo
-	local beats = math.floor((self.soundData:getDuration() - self.offset) / beatDuration)
-	local lastOffset = beats * beatDuration + self.offset
-
-	ld:getIntervalData(self.offset, beats)
-	ld:getIntervalData(lastOffset, 1)
+	self.ncbtContext:apply(self.layerData)
 end
 
 EditorModel.fixSettings = function(self)
@@ -128,107 +110,18 @@ EditorModel.redo = function(self)
 end
 
 EditorModel.loadResources = function(self)
-	local nc = self.game.noteChartModel.noteChart
+	local noteChart = self.game.noteChartModel.noteChart
 
-	self.sources = {}
+	self.audioManager:loadResources(noteChart)
+	self.firstTime = self.audioManager.firstTime
+	self.lastTime = self.audioManager.lastTime
 
-	for noteDatas in nc:getInputIterator() do
-		for _, noteData in ipairs(noteDatas) do
-			local offset = noteData.timePoint.absoluteTime
-			if noteData.stream then
-				self.soundDataOffset = noteData.streamOffset or 0
-				offset = noteData.streamOffset or 0
-			end
-			if noteData.sounds then
-				for _, s in ipairs(noteData.sounds) do
-					local path = NoteChartResourceLoader.aliases[s[1]]
-					local soundData = NoteChartResourceLoader.resources[path]
-					if soundData then
-						local _audio = audio:newAudio(soundData)
-						local duration = _audio:getLength()
-						self.audioManager:insert({
-							offset = offset,
-							duration = duration,
-							soundData = soundData,
-							audio = _audio,
-							name = s[1],
-							volume = s[2],
-							isStream = noteData.stream,
-						})
-						table.insert(self.sources, _audio)
-						self.lastTime = math.max(self.lastTime, offset + duration)
-					end
-				end
-			end
-		end
-	end
-
-	self:genDensityGraph()
-	self:genIntervalDatasGraph()
+	self.graphsGenerator:genDensityGraph(noteChart, self.firstTime, self.lastTime)
+	self.graphsGenerator:genIntervalDatasGraph(self.layerData, self.firstTime, self.lastTime)
 
 	self.audioManager:update(true)
 
 	self.resourcesLoaded = true
-end
-
-EditorModel.genDensityGraph = function(self)
-	local nc = self.game.noteChartModel.noteChart
-
-	local notes = {}
-	for noteDatas in nc:getInputIterator() do
-		for _, noteData in ipairs(noteDatas) do
-			local offset = noteData.timePoint.absoluteTime
-			if noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart" then
-				table.insert(notes, offset)
-			end
-		end
-	end
-	table.sort(notes)
-
-	local pointsCount = math.floor(self.lastTime - self.firstTime) * 2
-
-	self.densityGraph = {}
-	local points = self.densityGraph
-	for i = 0, pointsCount do
-		points[i] = 0
-	end
-
-	local maxValue = 0
-	for _, time in ipairs(notes) do
-		local pos = math_util.map(time, self.firstTime, self.lastTime, 0, pointsCount)
-		local i = math.floor(pos + 0.5)
-		points[i] = points[i] + 1
-		maxValue = math.max(maxValue, points[i])
-	end
-
-	for i = 0, pointsCount do
-		points[i] = points[i] / maxValue
-	end
-end
-
-EditorModel.genIntervalDatasGraph = function(self)
-	local ld = self.layerData
-
-	local intervalDatas = ld.ranges.interval
-
-	local offsets = {}
-	local id = intervalDatas.first
-	while id and id <= intervalDatas.last do
-		table.insert(offsets, id.timePoint.absoluteTime)
-		id = id.next
-	end
-	table.sort(offsets)
-
-	local pointsCount = 2000
-
-	self.intervalDatasGraph = {n = pointsCount}
-	local points = self.intervalDatasGraph
-
-	for _, time in ipairs(offsets) do
-		local pos = math_util.map(time, self.firstTime, self.lastTime, 0, pointsCount)
-		local i = math.floor(pos + 0.5)
-		points[i] = true
-	end
 end
 
 EditorModel.getDtpAbsolute = function(self, time, snapped)
@@ -237,19 +130,14 @@ EditorModel.getDtpAbsolute = function(self, time, snapped)
 	return ld:getDynamicTimePointAbsolute(snapped and editor.snap or 192, time)
 end
 
-EditorModel.unload = function(self)
-	for _, _audio in ipairs(self.sources) do
-		_audio:release()
-	end
-end
+EditorModel.unload = function(self) end
 
 EditorModel.save = function(self)
-	local nc = self.game.noteChartModel.noteChart
-	self.layerData:save(nc:getLayerData(1))
+	self.noteChartLoader:save()
 end
 
 EditorModel.play = function(self)
-	if self.grabbedIntervalData then
+	if self.intervalManager:isGrabbed() then
 		return
 	end
 	self.timer:play()
@@ -282,14 +170,6 @@ EditorModel.getColumnOver = function(self)
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	return noteSkin:getInverseColumnPosition(mx)
-end
-
-EditorModel.grabIntervalData = function(self)
-	self.grabbedIntervalData = self.timePoint._intervalData
-end
-
-EditorModel.dropIntervalData = function(self)
-	self.grabbedIntervalData = nil
 end
 
 EditorModel.selectNote = function(self, note)
@@ -596,8 +476,8 @@ EditorModel.update = function(self)
 	end
 
 	local dtp = self:getDtpAbsolute(self.timer:getTime())
-	if self.grabbedIntervalData then
-		ld:moveInterval(self.grabbedIntervalData, dtp.absoluteTime)
+	if self.intervalManager.grabbedIntervalData then
+		self.intervalManager:moveGrabbed(dtp.absoluteTime)
 	end
 	self.audioManager:update()
 
@@ -682,7 +562,7 @@ EditorModel.scrollSecondsDelta = function(self, delta)
 end
 
 EditorModel.scrollSnaps = function(self, delta)
-	if self.grabbedIntervalData then
+	if self.intervalManager:isGrabbed() then
 		return
 	end
 	local ld = self.layerData

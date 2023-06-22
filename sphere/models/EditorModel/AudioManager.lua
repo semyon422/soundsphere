@@ -1,4 +1,6 @@
 local Class = require("Class")
+local audio = require("audio")
+local NoteChartResourceLoader = require("sphere.database.NoteChartResourceLoader")
 
 local AudioManager = Class:new()
 
@@ -7,6 +9,9 @@ AudioManager.time = 0
 AudioManager.load = function(self)
 	self.sources = {}
 	self.intervals = {}
+
+	self.firstTime = 0
+	self.lastTime = 0
 end
 
 AudioManager.update = function(self, force)
@@ -130,6 +135,35 @@ AudioManager.remove = function(self, source)
 	for i = math.floor(source.offset), math.ceil(source.offset + source.duration) - 1 do
 		intervals[i] = intervals[i] or {}
 		intervals[i][source] = nil
+	end
+end
+
+AudioManager.loadResources = function(self, noteChart)
+	for noteDatas in noteChart:getInputIterator() do
+		for _, noteData in ipairs(noteDatas) do
+			local offset = noteData.timePoint.absoluteTime
+			if noteData.sounds then
+				for _, s in ipairs(noteData.sounds) do
+					local path = NoteChartResourceLoader.aliases[s[1]]
+					local soundData = NoteChartResourceLoader.resources[path]
+					if soundData then
+						local _audio = audio:newAudio(soundData)
+						local duration = _audio:getLength()
+						self:insert({
+							offset = offset,
+							duration = duration,
+							soundData = soundData,
+							audio = _audio,
+							name = s[1],
+							volume = s[2],
+							isStream = noteData.stream,
+						})
+						self.firstTime = math.min(self.firstTime, offset)
+						self.lastTime = math.max(self.lastTime, offset + duration)
+					end
+				end
+			end
+		end
 	end
 end
 

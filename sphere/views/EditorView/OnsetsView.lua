@@ -3,12 +3,13 @@ local gfx_util = require("gfx_util")
 return function(self)
 	local editor = self.game.configModel.configs.settings.editor
 	local editorModel = self.game.editorModel
-	local onsets = editorModel.onsets
+	local ncbtContext = editorModel.ncbtContext
+	local onsets = ncbtContext.onsets
 	if not onsets then
 		return
 	end
 
-	local time = editorModel.timePoint.absoluteTime - editorModel.soundDataOffset
+	local time = editorModel.timePoint.absoluteTime - editorModel.mainAudio.offset
 
 	local a, b = onsets:findsub(time - 1 / editor.speed)
 	local node = a or b

@@ -1,7 +1,7 @@
 return function(self)
-	local editorModel = self.game.editorModel
-	local onsetsDeltaDist = editorModel.onsetsDeltaDist
-	if not onsetsDeltaDist or not editorModel.bins then
+	local ncbtContext = self.game.editorModel.ncbtContext
+	local onsetsDeltaDist = ncbtContext.onsetsDeltaDist
+	if not onsetsDeltaDist or not ncbtContext.bins then
 		return
 	end
 
@@ -15,9 +15,9 @@ return function(self)
 		love.graphics.line(obj.t * w, y, obj.t * w, y + obj.v * h / 10)
 	end
 
-	for i = 0, editorModel.binsSize - 1 do
-		local v = editorModel.bins[i]
-		local x = i / editorModel.binsSize
+	for i = 0, ncbtContext.binsSize - 1 do
+		local v = ncbtContext.bins[i]
+		local x = i / ncbtContext.binsSize
 		love.graphics.line(x * w, 0, x * w, v * h / 10)
 	end
 end

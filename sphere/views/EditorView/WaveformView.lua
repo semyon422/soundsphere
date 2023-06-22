@@ -3,7 +3,7 @@ local gfx_util = require("gfx_util")
 
 local function getPointList(self, points, pointOffset, samplesPerPoint, channel)
 	local editorModel = self.game.editorModel
-	local soundData = editorModel.soundData
+	local soundData = editorModel.mainAudio.soundData
 
 	local sampleCount = soundData:getSampleCount()
 	local channelCount = soundData:getChannelCount()
@@ -79,7 +79,7 @@ end
 
 local function loadWaveform(self, w, h)
 	local editorModel = self.game.editorModel
-	local soundData = editorModel.soundData
+	local soundData = editorModel.mainAudio.soundData
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	local editor = self.game.configModel.configs.settings.editor
 
@@ -90,7 +90,7 @@ local function loadWaveform(self, w, h)
 
 	local samplesPerPoint = sampleRate / math.abs(noteSkin.unit * editor.speed)
 
-	local sampleOffset = math.floor((editorModel.timePoint.absoluteTime - editorModel.soundDataOffset) * sampleRate)
+	local sampleOffset = math.floor((editorModel.timePoint.absoluteTime - editorModel.mainAudio.offset) * sampleRate)
 	local pointOffset = math.floor(sampleOffset / samplesPerPoint)
 	pointDrawDelta = sampleOffset / samplesPerPoint - pointOffset
 
@@ -148,7 +148,7 @@ end
 
 return function(self)
 	local editorModel = self.game.editorModel
-	local soundData = editorModel.soundData
+	local soundData = editorModel.mainAudio.soundData
 	if not soundData then
 		return
 	end

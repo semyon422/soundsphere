@@ -97,7 +97,7 @@ function tabs.timings(self)
 	if imgui.button("ncbt", "detect tempo and offset") then
 		editorModel:detectTempoOffset()
 	end
-	if editorModel.tempo then
+	if editorModel.ncbtContext.tempo then
 		just.sameline()
 		if imgui.button("ncbt apply", "apply") then
 			editorModel:applyTempoOffset()
@@ -105,30 +105,30 @@ function tabs.timings(self)
 	end
 
 	local intervalData = dtp._intervalData
-	local grabbedIntervalData = editorModel.grabbedIntervalData
-	if not grabbedIntervalData then
+	local intervalManager = editorModel.intervalManager
+	if not intervalManager:isGrabbed() then
 		if not intervalData then
 			if imgui.button("split button", "split") then
-				ld:splitInterval(ld:getTimePoint(dtp:getTime()))
+				intervalManager:split(dtp)
 			end
 		elseif imgui.button("grab interval button", "grab") then
-			editorModel:grabIntervalData()
+			intervalManager:grab(intervalData)
 		end
 	else
 		if imgui.button("drop interval button", "drop") then
-			editorModel:dropIntervalData()
+			intervalManager:drop()
 		end
 	end
-	if intervalData and not grabbedIntervalData then
+	if intervalData and not intervalManager:isGrabbed() then
 		just.sameline()
 		if imgui.button("merge interval button", "merge") then
-			ld:mergeInterval(intervalData.timePoint)
+			intervalManager:merge(intervalData.timePoint)
 			editorModel:scrollSecondsDelta(0)
 		end
 		local beats = intervalData.beats
 		local newBeats = imgui.intButtons("update interval", beats, 1, "beats")
 		if beats ~= newBeats then
-			ld:updateInterval(intervalData, newBeats)
+			intervalManager:merge(intervalData, newBeats)
 		end
 	end
 

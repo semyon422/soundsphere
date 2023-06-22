@@ -22,8 +22,8 @@ return function(self, w, h)
 	local fullLength = editorModel.lastTime - editorModel.firstTime
 	local value = (editorTimePoint.absoluteTime - editorModel.firstTime) / fullLength
 
-	local densityPoints = self.game.editorModel.densityGraph
-	local intervalPoints = self.game.editorModel.intervalDatasGraph
+	local densityPoints = editorModel.graphsGenerator.densityGraph
+	local intervalPoints = editorModel.graphsGenerator.intervalDatasGraph
 
 	local over = just.is_over(w, h)
 	local pos = getPosition(w, h)
