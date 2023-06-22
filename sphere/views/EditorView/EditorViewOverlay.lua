@@ -128,7 +128,7 @@ function tabs.timings(self)
 		local beats = intervalData.beats
 		local newBeats = imgui.intButtons("update interval", beats, 1, "beats")
 		if beats ~= newBeats then
-			intervalManager:merge(intervalData, newBeats)
+			intervalManager:update(intervalData, newBeats)
 		end
 	end
 
