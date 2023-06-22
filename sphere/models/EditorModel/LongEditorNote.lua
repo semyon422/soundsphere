@@ -6,7 +6,7 @@ LongEditorNote.create = function(self, absoluteTime)
 	local editorModel = self.editorModel
 	local ld = editorModel.layerData
 
-	local dtp = editorModel:getDtpAbsolute(absoluteTime, true)
+	local dtp = editorModel:getDtpAbsolute(absoluteTime)
 	local startNoteData = ld:getNoteData(dtp, self.inputType, self.inputIndex)
 	if not startNoteData then
 		return
@@ -64,23 +64,23 @@ LongEditorNote.drop = function(self, t)
 	local editorModel = self.editorModel
 	local ld = editorModel.layerData
 	if self.grabbedPart == "head" then
-		local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime, true)
+		local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime)
 		self.startNoteData.timePoint = ld:checkTimePoint(dtp)
 		if self.startNoteData.timePoint == self.endNoteData.timePoint then
 			local tp = ld:getTimePoint(editorModel:getNextSnapIntervalTime(self.startNoteData.timePoint, -1))
 			self.startNoteData.timePoint = tp
 		end
 	elseif self.grabbedPart == "tail" then
-		local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime, true)
+		local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime)
 		self.endNoteData.timePoint = ld:checkTimePoint(dtp)
 		if self.startNoteData.timePoint == self.endNoteData.timePoint then
 			local tp = ld:getTimePoint(editorModel:getNextSnapIntervalTime(self.startNoteData.timePoint, 1))
 			self.endNoteData.timePoint = tp
 		end
 	elseif self.grabbedPart == "body" then
-		local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime[1], true)
+		local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime[1])
 		self.startNoteData.timePoint = ld:checkTimePoint(dtp)
-		local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime[2], true)
+		local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime[2])
 		self.endNoteData.timePoint = ld:checkTimePoint(dtp)
 	end
 end

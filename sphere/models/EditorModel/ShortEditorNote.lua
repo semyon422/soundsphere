@@ -6,7 +6,7 @@ ShortEditorNote.create = function(self, absoluteTime)
 	local editorModel = self.editorModel
 	local ld = editorModel.layerData
 
-	local dtp = editorModel:getDtpAbsolute(absoluteTime, true)
+	local dtp = editorModel:getDtpAbsolute(absoluteTime)
 	local noteData = ld:getNoteData(dtp, self.inputType, self.inputIndex)
 	if not noteData then
 		return
@@ -36,7 +36,7 @@ end
 ShortEditorNote.drop = function(self, t)
 	local editorModel = self.editorModel
 	local ld = editorModel.layerData
-	local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime, true)
+	local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime)
 	self.startNoteData.timePoint = ld:checkTimePoint(dtp)
 end
 

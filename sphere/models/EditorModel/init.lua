@@ -68,7 +68,7 @@ EditorModel.load = function(self)
 	self.mainAudio:findOffset(nc)
 
 	self.timePoint = ld:newTimePoint()
-	ld:getDynamicTimePointAbsolute(192, 0):clone(self.timePoint)
+	self:getDtpAbsolute(0):clone(self.timePoint)
 
 	self.firstTime = ld.ranges.timePoint.first.absoluteTime
 	self.lastTime = ld.ranges.timePoint.last.absoluteTime
@@ -123,10 +123,10 @@ EditorModel.loadResources = function(self)
 	self.resourcesLoaded = true
 end
 
-EditorModel.getDtpAbsolute = function(self, time, snapped)
+EditorModel.getDtpAbsolute = function(self, time)
 	local ld = self.layerData
 	local editor = self.game.configModel.configs.settings.editor
-	return ld:getDynamicTimePointAbsolute(snapped and editor.snap or 192, time)
+	return ld:getDynamicTimePointAbsolute(editor.snap, time)
 end
 
 EditorModel.unload = function(self)
