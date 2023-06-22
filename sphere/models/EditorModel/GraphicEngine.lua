@@ -1,5 +1,5 @@
 local Class = require("Class")
-local GraphicalNoteFactory = require("sphere.models.RhythmModel.GraphicEngine.GraphicalNoteFactory")
+local EditorNoteFactory = require("sphere.models.EditorModel.EditorNoteFactory")
 
 local GraphicEngine = Class:new()
 
@@ -78,19 +78,16 @@ GraphicEngine.selectNote = function(self, note, keepOthers)
 end
 
 GraphicEngine.newNote = function(self, noteData, editorModel, inputType, inputIndex)
-	local note
-	local isNew = false
+	local note = EditorNoteFactory:getNote(noteData)
 	if not note then
-		note = GraphicalNoteFactory:getNote(noteData)
-		isNew = true
+		return
 	end
-	if note and isNew then
-		note.currentTimePoint = editorModel.timePoint
-		note.graphicEngine = self
-		note.layerData = editorModel.layerData
-		note.inputType = inputType
-		note.inputIndex = inputIndex
-	end
+	note.editorModel = editorModel
+	note.currentTimePoint = editorModel.timePoint
+	note.graphicEngine = self
+	note.layerData = editorModel.layerData
+	note.inputType = inputType
+	note.inputIndex = inputIndex
 	return note
 end
 
@@ -146,7 +143,7 @@ GraphicEngine.update = function(self)
 		end
 	end
 
-	for _, note in ipairs(editorModel.grabbedNotes) do
+	for _, note in ipairs(editorModel.noteManager.grabbedNotes) do
 		table.insert(newNotes, note)
 	end
 	for _, note in ipairs(newNotes) do

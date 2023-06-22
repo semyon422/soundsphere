@@ -6,6 +6,7 @@ local Layout = require("sphere.views.EditorView.Layout")
 
 local function Hotkeys(self)
 	local editorModel = self.game.editorModel
+	local noteManager = editorModel.noteManager
 	local notificationModel = self.game.notificationModel
 
 	local lctrl = love.keyboard.isDown("lctrl")
@@ -16,14 +17,14 @@ local function Hotkeys(self)
 			self.game.editorController:save()
 			notificationModel:notify("saved")
 		elseif kp("c") then
-			editorModel:copyNotes()
-			notificationModel:notify("copy " .. #editorModel.copiedNotes .. " notes")
+			noteManager:copyNotes()
+			notificationModel:notify("copy " .. #noteManager.copiedNotes .. " notes")
 		elseif kp("x") then
-			editorModel:copyNotes(true)
-			notificationModel:notify("cut " .. #editorModel.copiedNotes .. " notes")
+			noteManager:copyNotes(true)
+			notificationModel:notify("cut " .. #noteManager.copiedNotes .. " notes")
 		elseif kp("v") then
-			editorModel:pasteNotes()
-			notificationModel:notify("paste " .. #editorModel.copiedNotes .. " notes")
+			noteManager:pasteNotes()
+			notificationModel:notify("paste " .. #noteManager.copiedNotes .. " notes")
 		elseif kp("z") then
 			editorModel:undo()
 			notificationModel:notify("undo")
@@ -34,7 +35,7 @@ local function Hotkeys(self)
 	end
 
 	if kp("delete") then
-		local deleted = editorModel:deleteNotes()
+		local deleted = noteManager:deleteNotes()
 		notificationModel:notify("delete " .. deleted .. " notes")
 	end
 end

@@ -4,10 +4,7 @@ local TimePoint = require("ncdk.TimePoint")
 local LongGraphicalNote = GraphicalNote:new()
 
 LongGraphicalNote.construct = function(self)
-	self.endNoteData = self.startNoteData.endNoteData
-
 	self.fakeStartTimePoint = TimePoint:new()
-	self:checkFakeStartTimePoint()
 end
 
 LongGraphicalNote.checkFakeStartTimePoint = function(self)
@@ -27,6 +24,8 @@ end
 
 LongGraphicalNote.update = function(self)
 	self:checkFakeStartTimePoint()
+
+	self.endNoteData = self.startNoteData.endNoteData
 
 	local startTimePoint = self.startNoteData.timePoint
 	local endTimePoint = self.endNoteData.timePoint
