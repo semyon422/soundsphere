@@ -129,7 +129,9 @@ EditorModel.getDtpAbsolute = function(self, time, snapped)
 	return ld:getDynamicTimePointAbsolute(snapped and editor.snap or 192, time)
 end
 
-EditorModel.unload = function(self) end
+EditorModel.unload = function(self)
+	self.audioManager:unload()
+end
 
 EditorModel.save = function(self)
 	self.noteChartLoader:save()

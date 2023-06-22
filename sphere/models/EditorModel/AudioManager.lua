@@ -14,6 +14,13 @@ AudioManager.load = function(self)
 	self.lastTime = 0
 end
 
+AudioManager.unload = function(self)
+	for source in pairs(self.sources) do
+		source.audio:stop()
+		source.audio:release()
+	end
+end
+
 AudioManager.update = function(self, force)
 	local time = self.timer:getTime()
 	if time == self.time and not force then
