@@ -6,10 +6,8 @@ local DynamicLayerData = require("ncdk.DynamicLayerData")
 
 local NoteChartLoader = Class:new()
 
-NoteChartLoader.load = function(self, noteChart)
-	self.noteChart = noteChart
-
-	local ld = noteChart:getLayerData(1)
+NoteChartLoader.load = function(self)
+	local ld = self.editorModel.noteChart:getLayerData(1)
 
 	if ld.mode == "absolute" then
 		ld = ConvertAbsoluteToInterval(ld)
@@ -18,13 +16,12 @@ NoteChartLoader.load = function(self, noteChart)
 	end
 
 	ld = DynamicLayerData:new(ld)
-	self.layerData = ld
 
 	return ld
 end
 
 NoteChartLoader.save = function(self)
-	self.layerData:save(self.noteChart:getLayerData(1))
+	self.editorModel.layerData:save(self.editorModel.noteChart:getLayerData(1))
 end
 
 return NoteChartLoader

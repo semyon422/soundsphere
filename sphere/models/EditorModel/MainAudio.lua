@@ -11,8 +11,8 @@ MainAudio.load = function(self, path)
 	end
 end
 
-MainAudio.findOffset = function(self, noteChart)
-	for noteDatas in noteChart:getInputIterator() do
+MainAudio.findOffset = function(self)
+	for noteDatas in self.editorModel.noteChart:getInputIterator() do
 		for _, noteData in ipairs(noteDatas) do
 			if noteData.stream and noteData.streamOffset then
 				self.offset = noteData.streamOffset

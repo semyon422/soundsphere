@@ -39,11 +39,9 @@ EditorModel.construct = function(self)
 end
 
 EditorModel.load = function(self)
-	local noteChartModel = self.game.noteChartModel
-	local nc = noteChartModel.noteChart
 	local editor = self:getSettings()
 
-	self.layerData = self.noteChartLoader:load(nc)
+	self.layerData = self.noteChartLoader:load()
 	local ld = self.layerData
 
 	self.changes = Changes:new()
@@ -53,9 +51,8 @@ EditorModel.load = function(self)
 
 	self.resourcesLoaded = false
 
-	local audioPath = noteChartModel.noteChartEntry.path:match("^(.+)/.-$") .. "/" .. nc.metaData.audioPath
-	self.mainAudio:load(audioPath)
-	self.mainAudio:findOffset(nc)
+	self.mainAudio:load(self.audioPath)
+	self.mainAudio:findOffset()
 
 	self.timePoint = ld:newTimePoint()
 	self:getDtpAbsolute(0):clone(self.timePoint)
@@ -82,10 +79,6 @@ EditorModel.applyTempoOffset = function(self)
 	self.ncbtContext:apply(self.layerData)
 end
 
-EditorModel.getNoteSkin = function(self)
-	return self.game.noteSkinModel.noteSkin
-end
-
 EditorModel.getSettings = function(self)
 	local editor = self.game.configModel.configs.settings.editor
 	if editor.speed <= 0 then
@@ -104,7 +97,7 @@ EditorModel.redo = function(self)
 end
 
 EditorModel.loadResources = function(self)
-	local noteChart = self.game.noteChartModel.noteChart
+	local noteChart = self.noteChart
 
 	self.audioManager:loadResources(noteChart)
 	self.firstTime = self.audioManager.firstTime
@@ -157,7 +150,7 @@ end
 
 EditorModel.getMouseTime = function(self)
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-	local noteSkin = self:getNoteSkin()
+	local noteSkin = self.noteSkin
 	local editor = self:getSettings()
 	return (self.timePoint.absoluteTime - noteSkin:getInverseTimePosition(my) / editor.speed)
 end
@@ -182,7 +175,7 @@ end
 
 EditorModel.update = function(self)
 	local editor = self:getSettings()
-	local noteSkin = self:getNoteSkin()
+	local noteSkin = self.noteSkin
 
 	local time = self.timer:getTime()
 	editor.time = time

@@ -12,12 +12,17 @@ EditorController.load = function(self)
 
 	noteChartModel:load()
 	noteChartModel:loadNoteChart()
+	local noteChart = noteChartModel.noteChart
 
-	local noteSkin = self.game.noteSkinModel:getNoteSkin(noteChartModel.noteChart.inputMode)
+	local noteSkin = self.game.noteSkinModel:getNoteSkin(noteChart.inputMode)
 	noteSkin:loadData()
 	noteSkin.editor = true
 
+	editorModel.noteSkin = noteSkin
+	editorModel.noteChart = noteChart
+	editorModel.audioPath = noteChartModel.noteChartEntry.path:match("^(.+)/.-$") .. "/" .. noteChart.metaData.audioPath
 	editorModel:load()
+
 	self.game.previewModel:stop()
 
 	FileFinder:reset()

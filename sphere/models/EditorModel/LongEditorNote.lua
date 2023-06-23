@@ -14,7 +14,7 @@ LongEditorNote.create = function(self, absoluteTime)
 	startNoteData.noteType = "LongNoteStart"
 	self.startNoteData = startNoteData
 
-	local tp = ld:getTimePoint(editorModel:getNextSnapIntervalTime(startNoteData.timePoint, 1))
+	local tp = ld:getTimePoint(editorModel.scroller:getNextSnapIntervalTime(startNoteData.timePoint, 1))
 	local endNoteData = ld:getNoteData(tp, self.inputType, self.inputIndex)
 	if not endNoteData then
 		return
@@ -67,14 +67,14 @@ LongEditorNote.drop = function(self, t)
 		local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime)
 		self.startNoteData.timePoint = ld:checkTimePoint(dtp)
 		if self.startNoteData.timePoint == self.endNoteData.timePoint then
-			local tp = ld:getTimePoint(editorModel:getNextSnapIntervalTime(self.startNoteData.timePoint, -1))
+			local tp = ld:getTimePoint(editorModel.scroller:getNextSnapIntervalTime(self.startNoteData.timePoint, -1))
 			self.startNoteData.timePoint = tp
 		end
 	elseif self.grabbedPart == "tail" then
 		local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime)
 		self.endNoteData.timePoint = ld:checkTimePoint(dtp)
 		if self.startNoteData.timePoint == self.endNoteData.timePoint then
-			local tp = ld:getTimePoint(editorModel:getNextSnapIntervalTime(self.startNoteData.timePoint, 1))
+			local tp = ld:getTimePoint(editorModel.scroller:getNextSnapIntervalTime(self.startNoteData.timePoint, 1))
 			self.endNoteData.timePoint = tp
 		end
 	elseif self.grabbedPart == "body" then

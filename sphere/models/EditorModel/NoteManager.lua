@@ -9,13 +9,13 @@ end
 
 NoteManager.getColumnOver = function(self)
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-	local noteSkin = self.editorModel:getNoteSkin()
+	local noteSkin = self.editorModel.noteSkin
 	return noteSkin:getInverseColumnPosition(mx)
 end
 
 NoteManager.update = function(self)
 	local editor = self.editorModel:getSettings()
-	local noteSkin = self.editorModel:getNoteSkin()
+	local noteSkin = self.editorModel.noteSkin
 
 	for _, note in ipairs(self.grabbedNotes) do
 		local time = self.editorModel:getMouseTime()
@@ -36,7 +36,7 @@ NoteManager.copyNotes = function(self, cut)
 	if cut then
 		self.editorModel.editorChanges:reset()
 	end
-	-- local noteSkin = self.editorModel:getNoteSkin()
+	-- local noteSkin = self.editorModel.noteSkin
 
 	self.copiedNotes = {}
 	local copyTimePoint
@@ -65,7 +65,7 @@ end
 NoteManager.deleteNotes = function(self)
 	self.editorModel.editorChanges:reset()
 	local c = 0
-	-- local noteSkin = self.editorModel:getNoteSkin()
+	-- local noteSkin = self.editorModel.noteSkin
 	for _, note in ipairs(self.editorModel.graphicEngine.selectedNotes) do
 		-- local _column = noteSkin:getInputColumn(note.inputType, note.inputIndex)
 		-- if _column then
@@ -93,7 +93,7 @@ NoteManager.pasteNotes = function(self)
 end
 
 NoteManager.grabNotes = function(self, part, mouseTime)
-	local noteSkin = self.editorModel:getNoteSkin()
+	local noteSkin = self.editorModel.noteSkin
 	local editor = self.editorModel:getSettings()
 
 	self.grabbedNotes = {}
