@@ -22,13 +22,13 @@ AudioManager.unload = function(self)
 end
 
 AudioManager.update = function(self, force)
-	local time = self.timer:getTime()
+	local time = self.editorModel.timer:getTime()
 	if time == self.time and not force then
 		return
 	end
 	self.time = time
 
-	local isPlaying = self.timer.isPlaying
+	local isPlaying = self.editorModel.timer.isPlaying
 	local forcePosition = not isPlaying or force
 
 	local sources = self:getCurrentSources()
@@ -37,7 +37,7 @@ AudioManager.update = function(self, force)
 			self.sources[source] = source
 		end
 		if isPlaying then
-			source.audio:setRate(self.timer.rate)
+			source.audio:setRate(self.editorModel.timer.rate)
 			if source.isStream then
 				source.audio:setVolume(self.volume.master * self.volume.music * source.volume)
 			else
@@ -99,7 +99,7 @@ AudioManager.getPosition = function(self)
 end
 
 AudioManager.play = function(self)
-	local time = self.timer:getTime()
+	local time = self.editorModel.timer:getTime()
 	for source in pairs(self.sources) do
 		source.audio:setPosition(time - source.offset)
 	end

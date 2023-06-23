@@ -97,7 +97,7 @@ SnapGridView.drawSnap = function(self, timePoint, field, currentTime, width)
 		love.graphics.setLineWidth(4)
 	end
 	if changed then
-		editorModel:scrollTimePoint(timePoint)
+		editorModel.scroller:scrollTimePoint(timePoint)
 	end
 
 	love.graphics.line(0, 0, width, 0)
@@ -296,7 +296,7 @@ SnapGridView.draw = function(self)
 	if (lalt or lshift) and drag("drag1", width, h) then
 		local a = noteSkin:getInverseTimePosition(_my)
 		local b = noteSkin:getInverseTimePosition(prevMouseY)
-		editorModel:scrollSecondsDelta((a - b) / editor.speed)
+		editorModel.scroller:scrollSecondsDelta((a - b) / editor.speed)
 		if editorModel.timer.isPlaying then
 			editorModel:pause()
 			self.dragging = true
@@ -322,9 +322,9 @@ SnapGridView.draw = function(self)
 			editorModel:updateRange()
 		else
 			if editorModel.timer.isPlaying and scroll < 0 then
-				editorModel:scrollSnaps(scroll)
+				editorModel.scroller:scrollSnaps(scroll)
 			end
-			editorModel:scrollSnaps(scroll)
+			editorModel.scroller:scrollSnaps(scroll)
 		end
 	end
 end

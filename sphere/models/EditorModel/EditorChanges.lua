@@ -9,30 +9,30 @@ end
 
 EditorChanges.undo = function(self)
 	for i in self.changes:undo() do
-		self.layerData:syncChanges(i - 1)
+		self.editorModel.layerData:syncChanges(i - 1)
 		print("undo i", i - 1)
 	end
-	self.graphicEngine:reset()
+	self.editorModel.graphicEngine:reset()
 	print("undo", self.changes)
 end
 
 EditorChanges.redo = function(self)
 	for i in self.changes:redo() do
-		self.layerData:syncChanges(i)
+		self.editorModel.layerData:syncChanges(i)
 		print("redo i", i)
 	end
-	self.graphicEngine:reset()
+	self.editorModel.graphicEngine:reset()
 	print("redo", self.changes)
 end
 
 EditorChanges.reset = function(self)
 	self.changes:reset()
-	self.layerData:resetRedos()
+	self.editorModel.layerData:resetRedos()
 end
 
 EditorChanges.add = function(self)
 	local i = self.changes:add()
-	self.layerData:syncChanges(i)
+	self.editorModel.layerData:syncChanges(i)
 	print("add i", i)
 end
 

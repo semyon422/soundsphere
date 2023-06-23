@@ -12,6 +12,7 @@ local IntervalManager = require("sphere.models.EditorModel.IntervalManager")
 local GraphsGenerator = require("sphere.models.EditorModel.GraphsGenerator")
 local EditorChanges = require("sphere.models.EditorModel.EditorChanges")
 local NoteManager = require("sphere.models.EditorModel.NoteManager")
+local Scroller = require("sphere.models.EditorModel.Scroller")
 
 local EditorModel = Class:new()
 
@@ -28,40 +29,29 @@ EditorModel.construct = function(self)
 	self.timer = TimeManager:new()
 	self.audioManager = AudioManager:new()
 	self.noteManager = NoteManager:new()
-	self.timer.audioManager = self.audioManager
-	self.audioManager.timer = self.timer
 	self.graphicEngine = GraphicEngine:new()
-	self.graphicEngine.editorModel = self
-	self.editorChanges.graphicEngine = self.graphicEngine
-	self.noteManager.editorChanges = self.editorChanges
-	self.noteManager.graphicEngine = self.graphicEngine
+	self.scroller = Scroller:new()
+
+	for _, v in pairs(self) do
+		v.editorModel = self
+	end
 	self.state = self.states[1]
 end
 
 EditorModel.load = function(self)
 	local noteChartModel = self.game.noteChartModel
 	local nc = noteChartModel.noteChart
-	local editor = self.game.configModel.configs.settings.editor
+	local editor = self:getSettings()
 
 	self.layerData = self.noteChartLoader:load(nc)
 	local ld = self.layerData
 
-	self.intervalManager.layerData = ld
-	self.editorChanges.layerData = ld
-	self.noteManager.layerData = ld
-	self.noteManager.game = self.game
-
 	self.changes = Changes:new()
 	ld:syncChanges(self.changes:get())
-
-	self:fixSettings()
 
 	self.graphsGenerator:load()
 
 	self.resourcesLoaded = false
-
-	self.columns = nc.inputMode:getColumns()
-	self.inputMap = nc.inputMode:getInputMap()
 
 	local audioPath = noteChartModel.noteChartEntry.path:match("^(.+)/.-$") .. "/" .. nc.metaData.audioPath
 	self.mainAudio:load(audioPath)
@@ -79,7 +69,7 @@ EditorModel.load = function(self)
 	self.audioManager.volume = self.game.configModel.configs.settings.audio.volume
 	self.audioManager:load()
 
-	self:scrollSeconds(self.timer:getTime())
+	self.scroller:scrollSeconds(self.timer:getTime())
 end
 
 EditorModel.detectTempoOffset = function(self)
@@ -92,12 +82,17 @@ EditorModel.applyTempoOffset = function(self)
 	self.ncbtContext:apply(self.layerData)
 end
 
-EditorModel.fixSettings = function(self)
+EditorModel.getNoteSkin = function(self)
+	return self.game.noteSkinModel.noteSkin
+end
+
+EditorModel.getSettings = function(self)
 	local editor = self.game.configModel.configs.settings.editor
 	if editor.speed <= 0 then
 		editor.speed = 1
 	end
 	editor.snap = math.min(math.max(editor.snap, 1), 16)
+	return editor
 end
 
 EditorModel.undo = function(self)
@@ -125,7 +120,7 @@ end
 
 EditorModel.getDtpAbsolute = function(self, time)
 	local ld = self.layerData
-	local editor = self.game.configModel.configs.settings.editor
+	local editor = self:getSettings()
 	return ld:getDynamicTimePointAbsolute(editor.snap, time)
 end
 
@@ -151,19 +146,19 @@ EditorModel.pause = function(self)
 end
 
 EditorModel.getLogSpeed = function(self)
-	local editor = self.game.configModel.configs.settings.editor
+	local editor = self:getSettings()
 	return math.floor(10 * math.log(editor.speed) / math.log(2) + 0.5)
 end
 
 EditorModel.setLogSpeed = function(self, logSpeed)
-	local editor = self.game.configModel.configs.settings.editor
+	local editor = self:getSettings()
 	editor.speed = 2 ^ (logSpeed / 10)
 end
 
 EditorModel.getMouseTime = function(self)
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-	local noteSkin = self.game.noteSkinModel.noteSkin
-	local editor = self.game.configModel.configs.settings.editor
+	local noteSkin = self:getNoteSkin()
+	local editor = self:getSettings()
 	return (self.timePoint.absoluteTime - noteSkin:getInverseTimePosition(my) / editor.speed)
 end
 
@@ -186,8 +181,8 @@ EditorModel.selectEnd = function(self)
 end
 
 EditorModel.update = function(self)
-	local editor = self.game.configModel.configs.settings.editor
-	local noteSkin = self.game.noteSkinModel.noteSkin
+	local editor = self:getSettings()
+	local noteSkin = self:getNoteSkin()
 
 	local time = self.timer:getTime()
 	editor.time = time
@@ -210,7 +205,7 @@ EditorModel.update = function(self)
 
 	dtp:clone(self.timePoint)
 	if self.timer.isPlaying then
-		self:updateRange()
+		self.scroller:updateRange()
 	end
 
 	self.graphicEngine:update()
@@ -226,7 +221,7 @@ EditorModel.receive = function(self, event)
 end
 
 EditorModel.getSnap = function(self, j)
-	local editor = self.game.configModel.configs.settings.editor
+	local editor = self:getSettings()
 	local snap = editor.snap
 	if type(j) == "table" then
 		j, snap = 16 * j, 16
@@ -239,97 +234,6 @@ EditorModel.getSnap = function(self, j)
 		end
 	end
 	return k
-end
-
-EditorModel.updateRange = function(self)
-	local editor = self.game.configModel.configs.settings.editor
-	local absoluteTime = self.timePoint.absoluteTime
-
-	local ld = self.layerData
-	local delta = 1 / editor.speed
-	if ld.startTime ~= absoluteTime - delta then
-		ld:setRange(absoluteTime - delta, absoluteTime + delta)
-	end
-end
-
-EditorModel._scrollTimePoint = function(self, timePoint)
-	if not timePoint then
-		return
-	end
-
-	timePoint:clone(self.timePoint)
-
-	self:updateRange()
-end
-
-EditorModel.scrollTimePoint = function(self, timePoint)
-	if not timePoint then
-		return
-	end
-
-	self:_scrollTimePoint(timePoint)
-
-	local timer = self.timer
-	timer:setPosition(timePoint.absoluteTime)
-
-	local audioManager = self.audioManager
-	audioManager:update(true)
-	timer:adjustTime(true)
-end
-
-EditorModel.scrollSeconds = function(self, absoluteTime)
-	local timePoint = self:getDtpAbsolute(absoluteTime)
-	self:scrollTimePoint(timePoint)
-end
-
-EditorModel.scrollSecondsDelta = function(self, delta)
-	self:scrollSeconds(self.timePoint.absoluteTime + delta)
-end
-
-EditorModel.scrollSnaps = function(self, delta)
-	if self.intervalManager:isGrabbed() then
-		return
-	end
-	local ld = self.layerData
-	self:scrollTimePoint(ld:getDynamicTimePoint(self:getNextSnapIntervalTime(self.timePoint, delta)))
-end
-
-EditorModel.getNextSnapIntervalTime = function(self, timePoint, delta)
-	local editor = self.game.configModel.configs.settings.editor
-
-	local snap = editor.snap
-	local snapTime = timePoint.time * snap
-
-	local targetSnapTime
-	if delta == -1 then
-		targetSnapTime = snapTime:ceil() - 1
-	else
-		targetSnapTime = snapTime:floor() + 1
-	end
-
-	local intervalData = timePoint.intervalData
-	-- if intervalData.next and targetSnapTime >= snap * intervalData:_end() then
-	-- 	intervalData = intervalData.next
-	-- 	targetSnapTime = intervalData:start() * snap
-	-- elseif intervalData.prev and dtp.time > intervalData:start() and targetSnapTime < snap * intervalData:start() then
-	-- 	targetSnapTime = intervalData:start() * snap
-	-- elseif intervalData.prev and dtp.time == intervalData:start() and targetSnapTime < snap * intervalData:start() then
-	-- 	intervalData = intervalData.prev
-	-- 	targetSnapTime = (intervalData:_end() * snap):ceil() - 1
-	-- end
-
-	if intervalData.next and targetSnapTime == snap * intervalData:_end() then
-		intervalData = intervalData.next
-		targetSnapTime = intervalData:start() * snap
-	elseif intervalData.next and targetSnapTime > snap * intervalData:_end() then
-		intervalData = intervalData.next
-		targetSnapTime = (intervalData:start() * snap):floor() + 1
-	elseif intervalData.prev and targetSnapTime < snap * intervalData:start() then
-		intervalData = intervalData.prev
-		targetSnapTime = (intervalData:_end() * snap):ceil() - 1
-	end
-
-	return intervalData, Fraction(targetSnapTime, snap)
 end
 
 return EditorModel
