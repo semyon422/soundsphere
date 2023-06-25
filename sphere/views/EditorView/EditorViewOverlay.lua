@@ -83,11 +83,11 @@ function tabs.timings(self)
 	local dtp = editorModel.timePoint
 
 	if imgui.button("prev tp", "<") and dtp.prev then
-		editorModel:scrollTimePoint(dtp.prev)
+		editorModel.scroller:scrollTimePoint(dtp.prev)
 	end
 	just.sameline()
 	if imgui.button("next tp", ">") and dtp.next then
-		editorModel:scrollTimePoint(dtp.next)
+		editorModel.scroller:scrollTimePoint(dtp.next)
 	end
 	just.sameline()
 	imgui.label("dtp label", tostring(dtp))
@@ -123,7 +123,7 @@ function tabs.timings(self)
 		just.sameline()
 		if imgui.button("merge interval button", "merge") then
 			intervalManager:merge(intervalData.timePoint)
-			editorModel:scrollSecondsDelta(0)
+			editorModel.scroller:scrollSecondsDelta(0)
 		end
 		local beats = intervalData.beats
 		local newBeats = imgui.intButtons("update interval", beats, 1, "beats")

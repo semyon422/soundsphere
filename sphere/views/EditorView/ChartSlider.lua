@@ -59,7 +59,7 @@ return function(self, w, h)
 
 	if just.active_id == "time slider" then
 		if new_value then
-			editorModel:scrollSeconds(new_value * fullLength + editorModel.firstTime)
+			editorModel.scroller:scrollSeconds(new_value * fullLength + editorModel.firstTime)
 		end
 		if editorModel.timer.isPlaying then
 			editorModel:pause()
