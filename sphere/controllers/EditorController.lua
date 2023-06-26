@@ -37,7 +37,7 @@ EditorController.load = function(self)
 	local graphics = self.configModel.configs.settings.graphics
 	local flags = graphics.mode.flags
 	if graphics.vsyncOnSelect then
-		self.game.baseVsync = flags.vsync ~= 0 and flags.vsync or 1
+		self.windowModel.baseVsync = flags.vsync ~= 0 and flags.vsync or 1
 		flags.vsync = 0
 	end
 end
@@ -48,7 +48,7 @@ EditorController.unload = function(self)
 	local graphics = self.configModel.configs.settings.graphics
 	local flags = graphics.mode.flags
 	if graphics.vsyncOnSelect and flags.vsync == 0 then
-		flags.vsync = self.game.baseVsync
+		flags.vsync = self.windowModel.baseVsync
 	end
 end
 

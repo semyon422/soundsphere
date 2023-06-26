@@ -45,7 +45,7 @@ SelectController.update = function(self, dt)
 	local graphics = self.configModel.configs.settings.graphics
 	local flags = graphics.mode.flags
 	if graphics.vsyncOnSelect and flags.vsync == 0 then
-		flags.vsync = self.game.baseVsync
+		flags.vsync = self.windowModel.baseVsync
 	end
 
 	local noteChartItem = self.selectModel.noteChartItem

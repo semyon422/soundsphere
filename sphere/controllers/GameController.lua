@@ -52,8 +52,6 @@ local EditorView = require("sphere.views.EditorView")
 
 local GameController = Class:new()
 
-GameController.baseVsync = 1
-
 local injects = {}
 local function dinject(t, k, v)
 	local T = getmetatable(t).__index
@@ -83,6 +81,7 @@ local deps = {
 		"previewModel",
 		"configModel",
 		"resourceModel",
+		"windowModel",
 	},
 	fastplayController = {
 		"rhythmModel",
@@ -107,6 +106,7 @@ local deps = {
 		"onlineModel",
 		"selectModel",
 		"resourceModel",
+		"windowModel",
 	},
 	mountController = {
 		"mountModel",
@@ -142,6 +142,7 @@ local deps = {
 		"mountModel",
 		"cacheModel",
 		"osudirectModel",
+		"windowModel",
 	},
 	timeController = {
 		"rhythmModel",

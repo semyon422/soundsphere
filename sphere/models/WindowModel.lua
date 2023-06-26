@@ -4,6 +4,8 @@ local loop = require("loop")
 
 local WindowModel = Class:new()
 
+WindowModel.baseVsync = 1
+
 local function getDimensions(mode)
 	local flags = mode.flags
 	if flags.fullscreen then
