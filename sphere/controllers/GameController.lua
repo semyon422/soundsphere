@@ -31,6 +31,7 @@ local ReplayModel		= require("sphere.models.ReplayModel")
 local EditorModel		= require("sphere.models.EditorModel")
 local SpeedModel		= require("sphere.models.SpeedModel")
 local ScreenshotModel		= require("sphere.models.ScreenshotModel")
+local AudioModel		= require("sphere.models.AudioModel")
 
 local MountController			= require("sphere.controllers.MountController")
 local SelectController			= require("sphere.controllers.SelectController")
@@ -47,10 +48,6 @@ local ResultView = require("sphere.views.ResultView")
 local GameplayView = require("sphere.views.GameplayView")
 local MultiplayerView = require("sphere.views.MultiplayerView")
 local EditorView = require("sphere.views.EditorView")
-
-local bass = require("audio.bass")
-
-local NoteChartTests = require("sphere.NoteChartTests")
 
 local GameController = Class:new()
 
@@ -202,6 +199,7 @@ GameController.construct = function(self)
 	self.replayModel = ReplayModel:new()
 	self.editorModel = EditorModel:new()
 	self.speedModel = SpeedModel:new()
+	self.audioModel = AudioModel:new()
 
 	for k, v in pairs(self) do
 		v.game = self
@@ -254,6 +252,7 @@ GameController.load = function(self)
 	self.collectionModel:load()
 	self.selectModel:load()
 	self.previewModel:load()
+	self.audioModel:load()
 
 	self.multiplayerController:load()
 
@@ -261,19 +260,6 @@ GameController.load = function(self)
 	self.multiplayerModel:connect()
 
 	self.gameView:load()
-
-	local device = self.configModel.configs.settings.audio.device
-	if device.period == 0 then
-		device.period = bass.default_dev_period
-	end
-	if device.buffer == 0 then
-		device.buffer = bass.default_dev_buffer
-	end
-	bass.setDevicePeriod(device.period)
-	bass.setDeviceBuffer(device.buffer)
-	bass.init()
-
-	NoteChartTests()
 end
 
 GameController.resetGameplayConfigs = function(self)
