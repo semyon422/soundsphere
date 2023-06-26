@@ -1,7 +1,6 @@
 local Class = require("Class")
 local NoteChartExporter = require("sph.NoteChartExporter")
 local OsuNoteChartExporter = require("osu.NoteChartExporter")
-local NoteChartResourceLoader = require("sphere.database.NoteChartResourceLoader")
 local FileFinder = require("sphere.filesystem.FileFinder")
 
 local EditorController = Class:new()
@@ -31,8 +30,7 @@ EditorController.load = function(self)
 	FileFinder:addPath("userdata/hitsounds")
 	FileFinder:addPath("userdata/hitsounds/midi")
 
-	NoteChartResourceLoader.game = self.game
-	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChartModel.noteChart, function()
+	self.resourceModel:load(noteChartModel.noteChartEntry.path, noteChartModel.noteChart, function()
 		editorModel:loadResources()
 	end)
 

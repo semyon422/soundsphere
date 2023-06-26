@@ -1,6 +1,5 @@
 local Class = require("Class")
 local audio = require("audio")
-local NoteChartResourceLoader = require("sphere.database.NoteChartResourceLoader")
 
 local AudioManager = Class:new()
 
@@ -151,8 +150,8 @@ AudioManager.loadResources = function(self, noteChart)
 			local offset = noteData.timePoint.absoluteTime
 			if noteData.sounds then
 				for _, s in ipairs(noteData.sounds) do
-					local path = NoteChartResourceLoader.aliases[s[1]]
-					local soundData = NoteChartResourceLoader.resources[path]
+					local path = self.editorModel.game.resourceModel.aliases[s[1]]
+					local soundData = self.editorModel.game.resourceModel.resources[path]
 					if soundData then
 						local _audio = audio:newAudio(soundData)
 						local duration = _audio:getLength()

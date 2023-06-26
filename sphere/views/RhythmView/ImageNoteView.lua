@@ -1,12 +1,12 @@
 local NoteView = require("sphere.views.RhythmView.NoteView")
-local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 
 local ImageNoteView = NoteView:new()
 
 ImageNoteView.getDrawable = function(self)
 	local images = self.graphicalNote.startNoteData.images
-	local path = NoteChartResourceLoader.aliases[images[1][1]]
-	return NoteChartResourceLoader.resources[path]
+	local resourceModel = self.graphicalNote.graphicEngine.rhythmModel.game.resourceModel
+	local path = resourceModel.aliases[images[1][1]]
+	return resourceModel.resources[path]
 end
 
 ImageNoteView.draw = function(self)

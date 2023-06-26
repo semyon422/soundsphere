@@ -2,7 +2,6 @@ local _audio		= require("audio")
 local AudioContainer	= require("audio.Container")
 local Class				= require("Class")
 local Observable		= require("Observable")
-local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 
 local AudioEngine = Class:new()
 
@@ -56,8 +55,8 @@ end
 
 AudioEngine.playAudio = function(self, sounds, isBackground, stream, offset)
 	local currentTime = self.rhythmModel.timeEngine.currentTime
-	local aliases = NoteChartResourceLoader.aliases
-	local resources = NoteChartResourceLoader.resources
+	local aliases = self.rhythmModel.game.resourceModel.aliases
+	local resources = self.rhythmModel.game.resourceModel.resources
 	for i = 1, #sounds do
 		local mode = stream and self.mode.primary or self.mode.secondary
 

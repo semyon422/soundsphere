@@ -1,3 +1,4 @@
+local Class = require("Class")
 local audio			= require("audio")
 local Video			= require("sphere.database.Video")
 local thread	= require("thread")
@@ -65,17 +66,18 @@ local function newVideoAsync(path)
 	return v
 end
 
-local NoteChartResourceLoader = {}
+local ResourceModel = Class:new()
 
-NoteChartResourceLoader.sample_gain = 0
-NoteChartResourceLoader.aliases = {}
-
-local resources = {
-	loaded = {},
-	loading = {},
-	not_loaded = {},
-}
-NoteChartResourceLoader.resources = resources.loaded
+ResourceModel.construct = function(self)
+	self.all_resources = {
+		loaded = {},
+		loading = {},
+		not_loaded = {},
+	}
+	self.resources = self.all_resources.loaded
+	self.sample_gain = 0
+	self.aliases = {}
+end
 
 local NoteChartTypes = {
 	bms = {"bms", "osu", "quaver", "ksm", "sm", "midi"},
@@ -88,7 +90,7 @@ for t, list in pairs(NoteChartTypes) do
 	end
 end
 
-NoteChartResourceLoader.load = function(self, chartPath, noteChart, callback)
+ResourceModel.load = function(self, chartPath, noteChart, callback)
 	local noteChartType = NoteChartTypeMap[noteChart.type]
 
 	local settings = self.game.configModel.configs.settings
@@ -104,7 +106,7 @@ NoteChartResourceLoader.load = function(self, chartPath, noteChart, callback)
 	self.aliases = {}
 
 	local loaded = {}
-	for path, resource in pairs(resources.loaded) do
+	for path, resource in pairs(self.all_resources.loaded) do
 		table.insert(loaded, path)
 		local mt = getmetatable(resource)
 		if mt and mt.__index == Video then
@@ -142,83 +144,83 @@ NoteChartResourceLoader.load = function(self, chartPath, noteChart, callback)
 	self:process()
 end
 
-NoteChartResourceLoader.loadResource = function(self, path)
+ResourceModel.loadResource = function(self, path)
 	local fileType = FileFinder:getType(path)
 	if fileType == "audio" then
-		resources.loaded[path] = newSoundDataAsync(path, self.sample_gain)
+		self.all_resources.loaded[path] = newSoundDataAsync(path, self.sample_gain)
 	elseif fileType == "image" then
-		resources.loaded[path] = newImageAsync(path)
+		self.all_resources.loaded[path] = newImageAsync(path)
 	elseif fileType == "video" and video then
-		resources.loaded[path] = newVideoAsync(path)
+		self.all_resources.loaded[path] = newVideoAsync(path)
 	elseif path:lower():find("%.ojm$") then
 		local soundDatas = JamLoader:loadAsync(path)
 		if soundDatas then
 			for name, soundData in pairs(soundDatas) do
 				self.aliases[name] = path .. ":" .. name
-				resources.loaded[path .. ":" .. name] = soundData
+				self.all_resources.loaded[path .. ":" .. name] = soundData
 			end
 		end
 	end
 end
 
-NoteChartResourceLoader.loadOJM = function(self, loaded, ojmPath)
+ResourceModel.loadOJM = function(self, loaded, ojmPath)
 	for _, path in ipairs(loaded) do
 		if not path:find(ojmPath, 1, true) then
-			resources.loaded[path]:release()
-			resources.loaded[path] = nil
+			self.all_resources.loaded[path]:release()
+			self.all_resources.loaded[path] = nil
 		end
 	end
 
-	resources.not_loaded = {[ojmPath] = true}
+	self.all_resources.not_loaded = {[ojmPath] = true}
 end
 
-NoteChartResourceLoader.loadResources = function(self, loaded, newResources)
+ResourceModel.loadResources = function(self, loaded, newResources)
 	local new, old, all = table_util.array_update(newResources, loaded)
 
 	for _, path in ipairs(old) do
-		resources.loaded[path]:release()
-		resources.loaded[path] = nil
+		self.all_resources.loaded[path]:release()
+		self.all_resources.loaded[path] = nil
 	end
 
-	resources.not_loaded = {}
+	self.all_resources.not_loaded = {}
 	for _, path in ipairs(new) do
-		resources.not_loaded[path] = true
+		self.all_resources.not_loaded[path] = true
 	end
 end
 
 local isProcessing = false
-NoteChartResourceLoader.process = thread.coro(function(self)
+ResourceModel.process = thread.coro(function(self)
 	if isProcessing then
 		return
 	end
 	isProcessing = true
 
-	local path = next(resources.not_loaded)
+	local path = next(self.all_resources.not_loaded)
 	while path do
-		resources.not_loaded[path] = nil
-		resources.loading[path] = true
+		self.all_resources.not_loaded[path] = nil
+		self.all_resources.loading[path] = true
 
 		self:loadResource(path)
 
-		resources.loading[path] = nil
+		self.all_resources.loading[path] = nil
 
-		path = next(resources.not_loaded)
+		path = next(self.all_resources.not_loaded)
 	end
 	self.callback()
 
 	isProcessing = false
 end)
 
-NoteChartResourceLoader.unloadAudio = function(self)
-	local path = next(resources.loaded)
+ResourceModel.unloadAudio = function(self)
+	local path = next(self.all_resources.loaded)
 	while path do
 		local fileType = FileFinder:getType(path)
 		if not fileType or fileType == "audio" then
-			resources.loaded[path]:release()
-			resources.loaded[path] = nil
+			self.all_resources.loaded[path]:release()
+			self.all_resources.loaded[path] = nil
 		end
-		path = next(resources.loaded)
+		path = next(self.all_resources.loaded)
 	end
 end
 
-return NoteChartResourceLoader
+return ResourceModel

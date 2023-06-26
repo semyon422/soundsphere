@@ -1,5 +1,4 @@
 local Class						= require("Class")
-local NoteChartResourceLoader	= require("sphere.database.NoteChartResourceLoader")
 local FileFinder	= require("sphere.filesystem.FileFinder")
 
 local GameplayController = Class:new()
@@ -64,8 +63,7 @@ GameplayController.load = function(self)
 	FileFinder:addPath("userdata/hitsounds")
 	FileFinder:addPath("userdata/hitsounds/midi")
 
-	NoteChartResourceLoader.game = self.game
-	NoteChartResourceLoader:load(noteChartModel.noteChartEntry.path, noteChart, function()
+	self.resourceModel:load(noteChartModel.noteChartEntry.path, noteChart, function()
 		if not self.loaded then
 			return
 		end

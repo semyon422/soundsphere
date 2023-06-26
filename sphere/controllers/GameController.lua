@@ -32,6 +32,7 @@ local EditorModel		= require("sphere.models.EditorModel")
 local SpeedModel		= require("sphere.models.SpeedModel")
 local ScreenshotModel		= require("sphere.models.ScreenshotModel")
 local AudioModel		= require("sphere.models.AudioModel")
+local ResourceModel		= require("sphere.models.ResourceModel")
 
 local MountController			= require("sphere.controllers.MountController")
 local SelectController			= require("sphere.controllers.SelectController")
@@ -81,6 +82,7 @@ local deps = {
 		"noteSkinModel",
 		"previewModel",
 		"configModel",
+		"resourceModel",
 	},
 	fastplayController = {
 		"rhythmModel",
@@ -104,6 +106,7 @@ local deps = {
 		"scoreModel",
 		"onlineModel",
 		"selectModel",
+		"resourceModel",
 	},
 	mountController = {
 		"mountModel",
@@ -200,6 +203,7 @@ GameController.construct = function(self)
 	self.editorModel = EditorModel:new()
 	self.speedModel = SpeedModel:new()
 	self.audioModel = AudioModel:new()
+	self.resourceModel = ResourceModel:new()
 
 	for k, v in pairs(self) do
 		v.game = self
