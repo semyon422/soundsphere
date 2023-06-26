@@ -175,7 +175,7 @@ function tabs.notes(self)
 	local logSpeed = imgui.slider1("editor speed", editorModel:getLogSpeed(), "%d", -30, 50, 1, "speed")
 	if logSpeed ~= editorModel:getLogSpeed() then
 		editorModel:setLogSpeed(logSpeed)
-		editorModel:updateRange()
+		editorModel.scroller:updateRange()
 	end
 	editor.snap = imgui.slider1("snap select", editor.snap, "%d", 1, 16, 1, "snap")
 	editor.lockSnap = imgui.checkbox("lock snap", editor.lockSnap, "lock snap")

@@ -319,7 +319,7 @@ SnapGridView.draw = function(self)
 			editor.snap = math.min(math.max(editor.snap + scroll, 1), 16)
 		elseif lctrl then
 			editorModel:setLogSpeed(editorModel:getLogSpeed() + scroll)
-			editorModel:updateRange()
+			editorModel.scroller:updateRange()
 		else
 			if editorModel.timer.isPlaying and scroll < 0 then
 				editorModel.scroller:scrollSnaps(scroll)
