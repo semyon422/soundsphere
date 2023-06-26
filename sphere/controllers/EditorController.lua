@@ -7,14 +7,14 @@ local FileFinder = require("sphere.filesystem.FileFinder")
 local EditorController = Class:new()
 
 EditorController.load = function(self)
-	local noteChartModel = self.game.noteChartModel
-	local editorModel = self.game.editorModel
+	local noteChartModel = self.noteChartModel
+	local editorModel = self.editorModel
 
 	noteChartModel:load()
 	noteChartModel:loadNoteChart()
 	local noteChart = noteChartModel.noteChart
 
-	local noteSkin = self.game.noteSkinModel:getNoteSkin(noteChart.inputMode)
+	local noteSkin = self.noteSkinModel:getNoteSkin(noteChart.inputMode)
 	noteSkin:loadData()
 	noteSkin.editor = true
 
@@ -23,7 +23,7 @@ EditorController.load = function(self)
 	editorModel.audioPath = noteChartModel.noteChartEntry.path:match("^(.+)/.-$") .. "/" .. noteChart.metaData.audioPath
 	editorModel:load()
 
-	self.game.previewModel:stop()
+	self.previewModel:stop()
 
 	FileFinder:reset()
 	FileFinder:addPath(noteChartModel.noteChartEntry.path:match("^(.+)/.-$"))
@@ -36,7 +36,7 @@ EditorController.load = function(self)
 		editorModel:loadResources()
 	end)
 
-	local graphics = self.game.configModel.configs.settings.graphics
+	local graphics = self.configModel.configs.settings.graphics
 	local flags = graphics.mode.flags
 	if graphics.vsyncOnSelect then
 		self.game.baseVsync = flags.vsync ~= 0 and flags.vsync or 1
@@ -45,9 +45,9 @@ EditorController.load = function(self)
 end
 
 EditorController.unload = function(self)
-	self.game.editorModel:unload()
+	self.editorModel:unload()
 
-	local graphics = self.game.configModel.configs.settings.graphics
+	local graphics = self.configModel.configs.settings.graphics
 	local flags = graphics.mode.flags
 	if graphics.vsyncOnSelect and flags.vsync == 0 then
 		flags.vsync = self.game.baseVsync
@@ -55,9 +55,9 @@ EditorController.unload = function(self)
 end
 
 EditorController.save = function(self)
-	local noteChartModel = self.game.noteChartModel
+	local noteChartModel = self.noteChartModel
 
-	self.game.editorModel:save()
+	self.editorModel:save()
 
 	local exp = NoteChartExporter:new()
 	exp.noteChart = noteChartModel.noteChart
@@ -68,14 +68,14 @@ EditorController.save = function(self)
 end
 
 EditorController.saveToOsu = function(self)
-	local noteChartModel = self.game.noteChartModel
+	local noteChartModel = self.noteChartModel
 
-	self.game.editorModel:save()
+	self.editorModel:save()
 
 	local exp = OsuNoteChartExporter:new()
 	exp.noteChart = noteChartModel.noteChart
-	exp.noteChartEntry = self.game.noteChartModel.noteChartEntry
-	exp.noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry
+	exp.noteChartEntry = self.noteChartModel.noteChartEntry
+	exp.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
 
 	local path = noteChartModel.noteChartEntry.path
 	path = path:gsub(".osu$", ""):gsub(".sph$", "") .. ".sph.osu"
@@ -84,7 +84,7 @@ EditorController.saveToOsu = function(self)
 end
 
 EditorController.receive = function(self, event)
-	self.game.editorModel:receive(event)
+	self.editorModel:receive(event)
 	if event.name == "filedropped" then
 		return self:filedropped(event[1])
 	end

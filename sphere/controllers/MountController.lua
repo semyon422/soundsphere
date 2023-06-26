@@ -14,12 +14,12 @@ end
 
 MountController.directorydropped = function(self, path)
 	path = path:gsub("\\", "/")
-	local mountModel = self.game.mountModel
+	local mountModel = self.mountModel
 	if not mountModel:isAdded(path) then
-		self.game.mountModel:addPath(path)
+		self.mountModel:addPath(path)
 	end
-	self.game.mountModel:mount(path)
-	self.game.configModel:write("mount")
+	self.mountModel:mount(path)
+	self.configModel:write("mount")
 end
 
 MountController.filedropped = thread.coro(function(self, file)
@@ -38,7 +38,7 @@ MountController.filedropped = thread.coro(function(self, file)
 	end
 	print("Extracted")
 
-	self.game.cacheModel:startUpdate(extractPath, true)
+	self.cacheModel:startUpdate(extractPath, true)
 end)
 
 return MountController

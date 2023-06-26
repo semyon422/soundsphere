@@ -6,9 +6,9 @@ local SPH = require("sph.SPH")
 local SelectController = Class:new()
 
 SelectController.load = function(self)
-	local noteChartModel = self.game.noteChartModel
-	local selectModel = self.game.selectModel
-	local previewModel = self.game.previewModel
+	local noteChartModel = self.noteChartModel
+	local selectModel = self.selectModel
+	local previewModel = self.previewModel
 
 	self.game:writeConfigs()
 	self.game:resetGameplayConfigs()
@@ -25,55 +25,55 @@ SelectController.applyModifierMeta = function(self)
 	state.timeRate = 1
 	state.inputMode = InputMode:new()
 
-	local item = self.game.selectModel.noteChartItem
+	local item = self.selectModel.noteChartItem
 	if item then
 		state.inputMode:set(item.inputMode)
 	end
 
-	self.game.modifierModel:applyMeta(state)
+	self.modifierModel:applyMeta(state)
 end
 
 SelectController.unload = function(self)
-	self.game.noteSkinModel:load()
+	self.noteSkinModel:load()
 	self.game:writeConfigs()
 end
 
 SelectController.update = function(self, dt)
-	self.game.previewModel:update(dt)
-	self.game.selectModel:update()
+	self.previewModel:update(dt)
+	self.selectModel:update()
 
-	local graphics = self.game.configModel.configs.settings.graphics
+	local graphics = self.configModel.configs.settings.graphics
 	local flags = graphics.mode.flags
 	if graphics.vsyncOnSelect and flags.vsync == 0 then
 		flags.vsync = self.game.baseVsync
 	end
 
-	local noteChartItem = self.game.selectModel.noteChartItem
-	if self.game.selectModel:isChanged() then
+	local noteChartItem = self.selectModel.noteChartItem
+	if self.selectModel:isChanged() then
 		local bgPath, audioPath, previewTime
 		if noteChartItem then
 			bgPath = noteChartItem:getBackgroundPath()
 			audioPath, previewTime = noteChartItem:getAudioPathPreview()
 		end
-		self.game.backgroundModel:setBackgroundPath(bgPath)
-		self.game.previewModel:setAudioPathPreview(audioPath, previewTime)
+		self.backgroundModel:setBackgroundPath(bgPath)
+		self.previewModel:setAudioPathPreview(audioPath, previewTime)
 		self:applyModifierMeta()
 	end
 
-	local osudirectModel = self.game.osudirectModel
+	local osudirectModel = self.osudirectModel
 	if osudirectModel:isChanged() then
 		local backgroundUrl = osudirectModel:getBackgroundUrl()
 		local previewUrl = osudirectModel:getPreviewUrl()
-		self.game.backgroundModel:loadBackgroundDebounce(backgroundUrl)
-		self.game.previewModel:loadPreviewDebounce(previewUrl)
+		self.backgroundModel:loadBackgroundDebounce(backgroundUrl)
+		self.previewModel:loadPreviewDebounce(previewUrl)
 	end
 
-	if self.game.modifierModel:isChanged() then
-		self.game.multiplayerModel:pushModifiers()
+	if self.modifierModel:isChanged() then
+		self.multiplayerModel:pushModifiers()
 		self:applyModifierMeta()
 	end
 
-	local configModel = self.game.configModel
+	local configModel = self.configModel
 	if #configModel.configs.online.token == 0 then
 		return
 	end
@@ -86,12 +86,12 @@ SelectController.update = function(self, dt)
 end
 
 SelectController.updateSession = thread.coro(function(self)
-	self.game.onlineModel.authManager:updateSessionAsync()
-	self.game.configModel:write("online")
+	self.onlineModel.authManager:updateSessionAsync()
+	self.configModel:write("online")
 end)
 
 SelectController.openDirectory = function(self)
-	local noteChartItem = self.game.selectModel.noteChartItem
+	local noteChartItem = self.selectModel.noteChartItem
 	if not noteChartItem then
 		return
 	end
@@ -103,8 +103,8 @@ SelectController.openDirectory = function(self)
 	end
 
 	local realPath
-	if self.game.mountModel:isMountPath(realDirectory) then
-		realPath = self.game.mountModel:getRealPath(path)
+	if self.mountModel:isMountPath(realDirectory) then
+		realPath = self.mountModel:getRealPath(path)
 	else
 		realPath = realDirectory .. "/" .. path
 	end
@@ -112,26 +112,26 @@ SelectController.openDirectory = function(self)
 end
 
 SelectController.openWebNotechart = function(self)
-	local noteChartItem = self.game.selectModel.noteChartItem
+	local noteChartItem = self.selectModel.noteChartItem
 	if not noteChartItem then
 		return
 	end
 
 	local hash, index = noteChartItem.hash, noteChartItem.index
-	self.game.onlineModel.onlineNotechartManager:openWebNotechart(hash, index)
+	self.onlineModel.onlineNotechartManager:openWebNotechart(hash, index)
 end
 
 SelectController.updateCache = function(self, force)
-	local noteChartItem = self.game.selectModel.noteChartItem
+	local noteChartItem = self.selectModel.noteChartItem
 	if not noteChartItem then
 		return
 	end
 	local path = noteChartItem.path:match("^(.+)/.-$")
-	self.game.cacheModel:startUpdate(path, force)
+	self.cacheModel:startUpdate(path, force)
 end
 
 SelectController.updateCacheCollection = function(self, path, force)
-	local cacheModel = self.game.cacheModel
+	local cacheModel = self.cacheModel
 	local state = cacheModel.shared.state
 	if state == 0 or state == 3 then
 		cacheModel:startUpdate(path, force)
@@ -167,7 +167,7 @@ SelectController.filedropped = function(self, file)
 		audio = audioName .. "." .. ext
 	})))
 
-	self.game.cacheModel:startUpdate(chartSetPath, true)
+	self.cacheModel:startUpdate(chartSetPath, true)
 end
 
 return SelectController

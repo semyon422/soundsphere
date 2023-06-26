@@ -57,6 +57,103 @@ local GameController = Class:new()
 
 GameController.baseVsync = 1
 
+local injects = {}
+local function dinject(t, k, v)
+	local T = getmetatable(t).__index
+	local V = getmetatable(v).__index
+
+	local Tn, Vn
+	for mod, M in pairs(package.loaded) do
+		if M == T then
+			Tn = mod
+		elseif M == V then
+			Vn = mod
+		end
+	end
+
+	table.insert(injects, {Tn, Vn})
+
+	print(Tn, Vn)
+
+	t[k] = v
+end
+
+local deps = {
+	editorController = {
+		"noteChartModel",
+		"editorModel",
+		"noteSkinModel",
+		"previewModel",
+		"configModel",
+	},
+	fastplayController = {
+		"rhythmModel",
+		"replayModel",
+		"modifierModel",
+		"noteChartModel",
+		"difficultyModel",
+	},
+	gameplayController = {
+		"rhythmModel",
+		"noteChartModel",
+		"noteSkinModel",
+		"configModel",
+		"modifierModel",
+		"difficultyModel",
+		"replayModel",
+		"timeController",
+		"multiplayerModel",
+		"previewModel",
+		"discordModel",
+		"scoreModel",
+		"onlineModel",
+		"selectModel",
+	},
+	mountController = {
+		"mountModel",
+		"configModel",
+		"cacheModel",
+	},
+	multiplayerController = {
+		"multiplayerModel",
+		"modifierModel",
+		"configModel",
+		"selectModel",
+		"noteChartSetLibraryModel",
+	},
+	resultController = {
+		"selectModel",
+		"replayModel",
+		"rhythmModel",
+		"modifierModel",
+		"onlineModel",
+		"configModel",
+		"fastplayController",
+	},
+	selectController = {
+		"noteChartModel",
+		"selectModel",
+		"previewModel",
+		"modifierModel",
+		"noteSkinModel",
+		"configModel",
+		"backgroundModel",
+		"multiplayerModel",
+		"onlineModel",
+		"mountModel",
+		"cacheModel",
+		"osudirectModel",
+	},
+	timeController = {
+		"rhythmModel",
+		"noteChartModel",
+		"configModel",
+		"multiplayerModel",
+		"notificationModel",
+		"speedModel",
+	},
+}
+
 GameController.construct = function(self)
 	self.mountController = MountController:new()
 	self.selectController = SelectController:new()
@@ -110,6 +207,12 @@ GameController.construct = function(self)
 
 	for k, v in pairs(self) do
 		v.game = self
+	end
+
+	for k, w in pairs(deps) do
+		for _, v in ipairs(w) do
+			dinject(self[k], v, self[v])
+		end
 	end
 end
 

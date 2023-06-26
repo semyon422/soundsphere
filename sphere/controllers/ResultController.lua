@@ -19,27 +19,27 @@ ResultController.oldTimings = {
 }
 
 ResultController.load = function(self)
-	local selectModel = self.game.selectModel
+	local selectModel = self.selectModel
 	local scoreItemIndex = selectModel.scoreItemIndex
 	local scoreItem = selectModel.scoreItem
 	if not scoreItem then
 		return
 	end
 
-	self.game.selectModel:scrollScore(nil, scoreItemIndex)
+	self.selectModel:scrollScore(nil, scoreItemIndex)
 end
 
 local readAsync = thread.async(function(...) return love.filesystem.read(...) end)
 
 ResultController.replayNoteChartAsync = function(self, mode, scoreEntry)
-	if not self.game.selectModel:notechartExists() then
+	if not self.selectModel:notechartExists() then
 		return
 	end
 
-	local replayModel = self.game.replayModel
-	local rhythmModel = self.game.rhythmModel
-	local modifierModel = self.game.modifierModel
-	local webApi = self.game.onlineModel.webApi
+	local replayModel = self.replayModel
+	local rhythmModel = self.rhythmModel
+	local modifierModel = self.modifierModel
+	local webApi = self.onlineModel.webApi
 
 	local content
 	if scoreEntry.file then
@@ -61,25 +61,25 @@ ResultController.replayNoteChartAsync = function(self, mode, scoreEntry)
 			rhythmModel.timings = self.oldTimings
 		end
 		rhythmModel.scoreEngine.scoreEntry = scoreEntry
-		self.game.replayModel.replay = replay
+		self.replayModel.replay = replay
 		rhythmModel.inputManager:setMode("internal")
-		self.game.replayModel:setMode("replay")
+		self.replayModel:setMode("replay")
 	elseif mode == "retry" then
 		rhythmModel.inputManager:setMode("external")
-		self.game.replayModel:setMode("record")
+		self.replayModel:setMode("record")
 	end
 
 	if mode ~= "result" then
 		return
 	end
 
-	self.game.fastplayController:play()
+	self.fastplayController:play()
 
 	rhythmModel.scoreEngine.scoreEntry = scoreEntry
-	local config = self.game.configModel.configs.select
+	local config = self.configModel.configs.select
 	config.scoreEntryId = scoreEntry.id
 	rhythmModel.inputManager:setMode("external")
-	self.game.replayModel:setMode("record")
+	self.replayModel:setMode("record")
 
 	return true
 end

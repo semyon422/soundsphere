@@ -5,15 +5,15 @@ local remote = require("remote")
 local MultiplayerController = Class:new()
 
 MultiplayerController.load = function(self)
-	local mpModel = self.game.multiplayerModel
+	local mpModel = self.multiplayerModel
 	mpModel.handlers = {
 		set = function(peer, key, value)
 			mpModel[key] = value
 			if key == "notechart" then
 				self:findNotechart()
 			elseif key == "modifiers" and not mpModel:isHost() then
-				self.game.modifierModel:setConfig(value)
-				self.game.configModel.configs.modifier = value
+				self.modifierModel:setConfig(value)
+				self.configModel.configs.modifier = value
 				mpModel.modifiers = table_util.deepcopy(value)
 			elseif key == "roomUsers" then
 				for _, user in ipairs(value) do
@@ -30,11 +30,11 @@ MultiplayerController.load = function(self)
 			end
 			if not mpModel.room.isFreeModifiers then
 				local modifiers = table_util.deepcopy(mpModel.modifiers)
-				self.game.modifierModel:setConfig(modifiers)
-				self.game.configModel.configs.modifier = modifiers
+				self.modifierModel:setConfig(modifiers)
+				self.configModel.configs.modifier = modifiers
 			end
 			if not mpModel.room.isFreeNotechart then
-				self.game.selectModel:setConfig(mpModel.noteChartItem)
+				self.selectModel:setConfig(mpModel.noteChartItem)
 			end
 			mpModel:setIsPlaying(true)
 		end,
@@ -51,11 +51,11 @@ MultiplayerController.load = function(self)
 end
 
 MultiplayerController.findNotechart = remote.wrap(function(self)
-	local mpModel = self.game.multiplayerModel
-	self.game.noteChartSetLibraryModel:findNotechart(mpModel.notechart.hash or "", mpModel.notechart.index or 0)
-	local items = self.game.noteChartSetLibraryModel.items
+	local mpModel = self.multiplayerModel
+	self.noteChartSetLibraryModel:findNotechart(mpModel.notechart.hash or "", mpModel.notechart.index or 0)
+	local items = self.noteChartSetLibraryModel.items
 
-	local selectModel = self.game.selectModel
+	local selectModel = self.selectModel
 
 	mpModel.downloadingBeatmap = nil
 	local item = items[1]
@@ -81,11 +81,11 @@ MultiplayerController.findNotechart = remote.wrap(function(self)
 end)
 
 MultiplayerController.unload = function(self)
-	self.game.multiplayerModel:unload()
+	self.multiplayerModel:unload()
 end
 
 MultiplayerController.update = function(self)
-	self.game.multiplayerModel:update()
+	self.multiplayerModel:update()
 end
 
 return MultiplayerController
