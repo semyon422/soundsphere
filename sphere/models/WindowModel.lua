@@ -1,7 +1,8 @@
-local Class	= require("Class")
+local Class = require("Class")
 local cursor = require("sphere.cursor")
+local loop = require("loop")
 
-local WindowManager = Class:new()
+local WindowModel = Class:new()
 
 local function getDimensions(mode)
 	local flags = mode.flags
@@ -12,7 +13,7 @@ local function getDimensions(mode)
 	end
 end
 
-WindowManager.load = function(self)
+WindowModel.load = function(self)
 	self.graphics = self.game.configModel.configs.settings.graphics
 	self.mode = self.graphics.mode
 	local mode = self.mode
@@ -34,7 +35,7 @@ WindowManager.load = function(self)
 	self:setCursor()
 end
 
-WindowManager.update = function(self)
+WindowModel.update = function(self)
 	local flags = self.mode.flags
 	local graphics = self.graphics
 	if self.vsync ~= flags.vsync then
@@ -50,9 +51,15 @@ WindowManager.update = function(self)
 		self.cursor = graphics.cursor
 		self:setCursor()
 	end
+
+	local settings = self.game.configModel.configs.settings
+	loop.fpslimit = settings.graphics.fps
+	loop.asynckey = settings.graphics.asynckey
+	loop.dwmflush = settings.graphics.dwmflush
+	loop.imguiShowDemoWindow = settings.miscellaneous.imguiShowDemoWindow
 end
 
-WindowManager.receive = function(self, event)
+WindowModel.receive = function(self, event)
 	if event.name == "keypressed" and event[1] == "f10" then
 		local mode = self.mode
 		local flags = mode.flags
@@ -68,7 +75,7 @@ WindowManager.receive = function(self, event)
 	end
 end
 
-WindowManager.setCursor = function(self)
+WindowModel.setCursor = function(self)
 	if self.cursor == "circle" then
 		cursor:setCircleCursor()
 	elseif self.cursor == "arrow" then
@@ -78,7 +85,7 @@ WindowManager.setCursor = function(self)
 	end
 end
 
-WindowManager.setFullscreen = function(self, fullscreen, fullscreentype)
+WindowModel.setFullscreen = function(self, fullscreen, fullscreentype)
 	local mode = self.mode
 	local width, height
 	if self.fullscreen then
@@ -93,7 +100,7 @@ WindowManager.setFullscreen = function(self, fullscreen, fullscreentype)
 end
 
 local icon_path = "resources/icon.png"
-WindowManager.setIcon = function(self)
+WindowModel.setIcon = function(self)
 	local info = love.filesystem.getInfo(icon_path)
 	if info then
 		local imageData = love.image.newImageData(icon_path)
@@ -101,4 +108,4 @@ WindowManager.setIcon = function(self)
 	end
 end
 
-return WindowManager
+return WindowModel

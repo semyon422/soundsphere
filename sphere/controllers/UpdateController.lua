@@ -1,7 +1,7 @@
 local Class = require("Class")
 local UpdateModel = require("sphere.models.UpdateModel")
 local ConfigModel = require("sphere.models.ConfigModel")
-local WindowManager = require("sphere.window.WindowManager")
+local WindowModel = require("sphere.models.WindowModel")
 local thread = require("thread")
 local delay = require("delay")
 
@@ -10,7 +10,7 @@ local UpdateController = Class:new()
 UpdateController.construct = function(self)
 	self.updateModel = UpdateModel:new()
 	self.configModel = ConfigModel:new()
-	self.windowManager = WindowManager:new()
+	self.windowModel = WindowModel:new()
 
 	for k, v in pairs(self) do
 		v.game = self
@@ -33,12 +33,12 @@ UpdateController.updateAsync = function(self)
 		return
 	end
 
-	self.windowManager:load()
+	self.windowModel:load()
 
 	function love.update()
 		thread.update()
 		delay.update()
-		self.windowManager:update()
+		self.windowModel:update()
 	end
 
 	function love.draw()
