@@ -1,4 +1,5 @@
 local thread = require("thread")
+local path_util = require("path_util")
 thread.shared.download = {}
 
 return thread.async(function(url, saveDir, fallbackName)
@@ -71,7 +72,7 @@ return thread.async(function(url, saveDir, fallbackName)
 		return nil, status_line
 	end
 
-	name = name:gsub('[/\\?%*:|"<>]', "_")
+	name = path_util.fix_illegal(name)
 
 	require("love.filesystem")
 	local ok, err = love.filesystem.write(saveDir .. "/" .. name, table.concat(t))
