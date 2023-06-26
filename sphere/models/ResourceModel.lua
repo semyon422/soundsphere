@@ -2,7 +2,6 @@ local Class = require("Class")
 local audio			= require("audio")
 local Video			= require("sphere.database.Video")
 local thread	= require("thread")
-local JamLoader		= require("sphere.database.JamLoader")
 local FileFinder	= require("sphere.filesystem.FileFinder")
 local table_util = require("table_util")
 
@@ -64,6 +63,37 @@ local function newVideoAsync(path)
 	v.image = love.graphics.newImage(v.imageData)
 
 	return v
+end
+
+local loadOjm = thread.async(function(path)
+	local audio = require("audio")
+	local OJM = require("o2jam.OJM")
+
+	local fileData, err = love.filesystem.newFileData(path)
+	if not fileData then
+		return false, err
+	end
+
+	local ojm = OJM:new(fileData:getFFIPointer(), fileData:getSize())
+	local soundDatas = {}
+
+	for sampleIndex, sampleData in pairs(ojm.samples) do
+		local fd = love.filesystem.newFileData(sampleData, sampleIndex)
+		soundDatas[sampleIndex] = audio.newSoundData(fd:getFFIPointer(), fd:getSize())
+	end
+
+	return soundDatas
+end)
+
+local loadOjmAsync = function(path)
+	local soundDatas = loadOjm(path)
+	if not soundDatas then
+		return
+	end
+	for _, soundData in pairs(soundDatas) do
+		setmetatable(soundData, {__index = audio.SoundData})
+	end
+	return soundDatas
 end
 
 local ResourceModel = Class:new()
@@ -153,7 +183,7 @@ ResourceModel.loadResource = function(self, path)
 	elseif fileType == "video" and video then
 		self.all_resources.loaded[path] = newVideoAsync(path)
 	elseif path:lower():find("%.ojm$") then
-		local soundDatas = JamLoader:loadAsync(path)
+		local soundDatas = loadOjmAsync(path)
 		if soundDatas then
 			for name, soundData in pairs(soundDatas) do
 				self.aliases[name] = path .. ":" .. name
