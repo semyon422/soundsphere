@@ -222,18 +222,18 @@ GameController.load = function(self)
 	local rhythmModel = self.rhythmModel
 
 	self.directoryManager:createDirectories()
-	configModel:read(
-		"settings",
-		"select",
-		"modifier",
-		"input",
-		"mount",
-		"online",
-		"urls",
-		"judgements",
-		"filters",
-		"files"
-	)
+
+	configModel:open("settings", true)
+	configModel:open("select", true)
+	configModel:open("modifier", true)
+	configModel:open("input", true)
+	configModel:open("mount", true)
+	configModel:open("online", true)
+	configModel:open("urls")
+	configModel:open("judgements")
+	configModel:open("filters")
+	configModel:open("files")
+	configModel:read()
 
 	rhythmModel.timings = configModel.configs.settings.gameplay.timings
 	rhythmModel.judgements = configModel.configs.judgements
@@ -272,23 +272,12 @@ GameController.resetGameplayConfigs = function(self)
 	self.rhythmModel.timings = self.configModel.configs.settings.gameplay.timings
 end
 
-GameController.writeConfigs = function(self)
-	self.configModel:write(
-		"settings",
-		"select",
-		"modifier",
-		"input",
-		"mount",
-		"online"
-	)
-end
-
 GameController.unload = function(self)
 	self.gameView:unload()
 	self.discordModel:unload()
 	self.mountModel:unload()
 	self.multiplayerController:unload()
-	self:writeConfigs()
+	self.configModel:write()
 end
 
 GameController.update = function(self, dt)

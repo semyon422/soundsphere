@@ -8,33 +8,33 @@ ConfigModel.configModelPath = "sphere/models/ConfigModel"
 
 ConfigModel.construct = function(self)
 	self.configs = {}
-	self.paths = {}
-	self.notWritable = {}
+	self.openedConfigs = {}
 end
 
-local function copyTable(from, to)
-	for key, value in pairs(from) do
-		if type(value) == "table" then
-			if type(to[key]) ~= "table" then
-				to[key] = {}
+ConfigModel.open = function(self, name, mode)
+	self.openedConfigs[name] = mode == true
+end
+
+local function copyTable(src, dst)
+	for k, v in pairs(src) do
+		if type(v) == "table" then
+			if type(dst[k]) ~= "table" then
+				dst[k] = {}
 			end
-			copyTable(value, to[key])
+			copyTable(v, dst[k])
 		else
-			to[key] = value
+			dst[k] = v
 		end
 	end
 end
 
 ConfigModel._read = function(self, name)
 	local configs = self.configs
-	local paths = self.paths
+	configs[name] = {}
+	local config = configs[name]
 
 	local path = self.userdataPath .. "/" .. name .. ".lua"
 	local defaultPath = self.configModelPath .. "/" .. name .. ".lua"
-
-	paths[name] = path
-	configs[name] = {}
-	local config = configs[name]
 
 	if defaultPath then
 		copyTable(self:readFile(defaultPath), config)
@@ -44,29 +44,27 @@ ConfigModel._read = function(self, name)
 	if type(c) == "table" then
 		copyTable(c, config)
 	elseif type(c) == "function" then
-		self.notWritable[name] = true
 		c(config)
 	end
 end
 
-ConfigModel.read = function(self, ...)
-	for i = 1, select("#", ...) do
-		self:_read(select(i, ...))
+ConfigModel.read = function(self)
+	for name in pairs(self.openedConfigs) do
+		self:_read(name)
 	end
 end
 
 ConfigModel._write = function(self, name)
-	if self.notWritable[name] then
-		return
-	end
 	local config = assert(self.configs[name])
-	local path = self.paths[name]
+	local path = self.userdataPath .. "/" .. name .. ".lua"
 	return self:writeFile(path, config)
 end
 
-ConfigModel.write = function(self, ...)
-	for i = 1, select("#", ...) do
-		self:_write(select(i, ...))
+ConfigModel.write = function(self)
+	for name, writable in pairs(self.openedConfigs) do
+		if writable then
+			self:_write(name)
+		end
 	end
 end
 

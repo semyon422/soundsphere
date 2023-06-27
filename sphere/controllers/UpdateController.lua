@@ -21,7 +21,10 @@ UpdateController.updateAsync = function(self)
 	local updateModel = self.updateModel
 	local configModel = self.configModel
 
-	configModel:read("settings", "urls", "files")
+	configModel:open("settings")
+	configModel:open("urls")
+	configModel:open("files", true)
+	configModel:read()
 
 	local configs = configModel.configs
 

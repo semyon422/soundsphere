@@ -176,7 +176,7 @@ UpdateModel.updateFilesAsync = function(self)
 		client_filelist[k] = v
 	end
 
-	configModel:write("files")
+	configModel:write()
 
 	return count > 0
 end

@@ -10,7 +10,7 @@ SelectController.load = function(self)
 	local selectModel = self.selectModel
 	local previewModel = self.previewModel
 
-	self.game:writeConfigs()
+	self.configModel:write()
 	self.game:resetGameplayConfigs()
 
 	noteChartModel:load()
@@ -35,7 +35,7 @@ end
 
 SelectController.unload = function(self)
 	self.noteSkinModel:load()
-	self.game:writeConfigs()
+	self.configModel:write()
 end
 
 SelectController.update = function(self, dt)
