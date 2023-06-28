@@ -23,7 +23,7 @@ NoLongNote.apply = function(self, config)
 		return
 	end
 
-	local noteChart = self.game.noteChartModel.noteChart
+	local noteChart = self.noteChart
 
 	for noteDatas in noteChart:getInputIterator() do
 		for _, noteData in ipairs(noteDatas) do

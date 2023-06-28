@@ -30,7 +30,7 @@ NoScratch.apply = function(self, config)
 		return
 	end
 
-	local noteChart = self.game.noteChartModel.noteChart
+	local noteChart = self.noteChart
 
 	noteChart.inputMode.scratch = nil
 

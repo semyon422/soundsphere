@@ -31,7 +31,7 @@ Alternate.applyMeta = function(self, config, state)
 end
 
 Alternate.apply = function(self, config)
-	local noteChart = self.game.noteChartModel.noteChart
+	local noteChart = self.noteChart
 
 	local inputMode = noteChart.inputMode
 

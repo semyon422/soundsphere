@@ -37,9 +37,6 @@ Automap.applyMeta = function(self, config, state)
 end
 
 Automap.apply = function(self, config)
-	local noteChart = self.game.noteChartModel.noteChart
-	self.noteChart = noteChart
-
 	self.old = config.old
 	self.targetMode = config.value
 	self.columnCount = self.noteChart.inputMode.key
@@ -55,17 +52,14 @@ Automap.apply = function(self, config)
 		self:processUpscaler()
 	end
 
-	noteChart:compute()
+	self.noteChart:compute()
 end
 
 Automap.applyAutomap = function(self)
-	local noteChart = self.game.noteChartModel.noteChart
-	self.noteChart = noteChart
-
 	local tNoteDatas = {}
 	self.tNoteDatas = tNoteDatas
 
-	for noteDatas, inputType, inputIndex, layerDataIndex in noteChart:getInputIterator() do
+	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
 		for _, noteData in ipairs(noteDatas) do
 			if inputType == "key" and (noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart") then
 				local n = {}
@@ -93,7 +87,7 @@ Automap.applyAutomap = function(self)
 		return noteData1.startTime < noteData2.startTime
 	end)
 
-	for _, layerData in noteChart:getLayerDataIterator() do
+	for _, layerData in self.noteChart:getLayerDataIterator() do
 		layerData.noteDatas.key = {}
 	end
 end

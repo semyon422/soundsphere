@@ -14,7 +14,7 @@ SwapModifier.apply = function(self, config)
 
 	local map = self:getMap(config)
 
-	local noteChart = self.game.noteChartModel.noteChart
+	local noteChart = self.noteChart
 
 	for _, layerData in noteChart:getLayerDataIterator() do
 		for inputType, r in pairs(layerData.noteDatas) do

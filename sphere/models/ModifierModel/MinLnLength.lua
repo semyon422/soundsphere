@@ -23,7 +23,7 @@ end
 
 MinLnLength.apply = function(self, config)
 	local duration = config.value
-	local noteChart = self.game.noteChartModel.noteChart
+	local noteChart = self.noteChart
 
 	for noteDatas in noteChart:getInputIterator() do
 		for _, noteData in ipairs(noteDatas) do

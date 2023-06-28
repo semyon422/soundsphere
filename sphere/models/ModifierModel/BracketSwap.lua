@@ -24,9 +24,7 @@ BracketSwap.hardcodedMaps = {
 }
 
 BracketSwap.getMap = function(self, config)
-	local noteChart = self.game.noteChartModel.noteChart
-
-	local keyCount = noteChart.inputMode.key
+	local keyCount = self.noteChart.inputMode.key
 
 	if keyCount <= 5 then
 		return {key = self.hardcodedMaps[keyCount]}

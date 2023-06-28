@@ -25,7 +25,7 @@ end
 Alternate2.applyMeta = Alternate.applyMeta
 
 Alternate2.apply = function(self, config)
-	local noteChart = self.game.noteChartModel.noteChart
+	local noteChart = self.noteChart
 
 	local inputMode = noteChart.inputMode
 

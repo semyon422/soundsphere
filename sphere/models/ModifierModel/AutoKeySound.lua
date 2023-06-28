@@ -24,7 +24,7 @@ AutoKeySound.apply = function(self, config)
 		return
 	end
 
-	local noteChart = self.game.noteChartModel.noteChart
+	local noteChart = self.noteChart
 
 	for noteDatas, inputType, inputIndex, layerDataIndex in noteChart:getInputIterator() do
 		local layerData = noteChart.layerDatas[layerDataIndex]

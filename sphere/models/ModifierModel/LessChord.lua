@@ -32,7 +32,7 @@ LessChord.apply = function(self, config)
 		configVal = tonumber(config.value)
 	end
 
-	local noteChart = self.game.noteChartModel.noteChart
+	local noteChart = self.noteChart
 	local inputCount = noteChart.inputMode.key
 
 	for _, layerData in noteChart:getLayerDataIterator() do

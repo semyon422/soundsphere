@@ -22,10 +22,9 @@ FullLongNote.getSubString = function(self, config)
 end
 
 FullLongNote.apply = function(self, config)
-	local noteChart = self.game.noteChartModel.noteChart
 	self.notes = {}
 
-	for noteDatas, inputType, inputIndex, layerDataIndex in noteChart:getInputIterator() do
+	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
 		for _, noteData in ipairs(noteDatas) do
 			if
 				noteData.noteType == "ShortNote" or
@@ -53,7 +52,7 @@ FullLongNote.apply = function(self, config)
 		self:processNoteData(i)
 	end
 
-	noteChart:compute()
+	self.noteChart:compute()
 end
 
 FullLongNote.processNoteData = function(self, noteDataIndex)
@@ -114,7 +113,7 @@ FullLongNote.processNoteData = function(self, noteDataIndex)
 	endNoteData.startNoteData = n.noteData
 	n.noteData.endNoteData = endNoteData
 
-	local noteChart = self.game.noteChartModel.noteChart
+	local noteChart = self.noteChart
 	noteChart.layerDatas[n.layerDataIndex]:addNoteData(endNoteData, n.inputType, n.inputIndex)
 end
 

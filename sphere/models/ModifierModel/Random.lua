@@ -22,7 +22,7 @@ Random.getSubString = function(self, config)
 end
 
 Random.getMap = function(self, config)
-	local noteChart = self.game.noteChartModel.noteChart
+	local noteChart = self.noteChart
 	local value = config.value
 
 	local inputMode = noteChart.inputMode

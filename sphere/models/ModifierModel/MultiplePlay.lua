@@ -28,7 +28,7 @@ end
 MultiplePlay.applyMeta = MultiOverPlay.applyMeta
 
 MultiplePlay.apply = function(self, config)
-	local noteChart = self.game.noteChartModel.noteChart
+	local noteChart = self.noteChart
 	local value = config.value
 	if config.old then
 		value = value + 1

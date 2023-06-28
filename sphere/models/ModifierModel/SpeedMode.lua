@@ -25,7 +25,7 @@ SpeedMode.getSubString = function(self, config)
 end
 
 SpeedMode.applyTempo = function(self, tempo)
-	local noteChart = self.game.noteChartModel.noteChart
+	local noteChart = self.noteChart
 
 	for _, layerData in noteChart:getLayerDataIterator() do
 		layerData:setPrimaryTempo(tempo)
@@ -35,7 +35,7 @@ SpeedMode.applyTempo = function(self, tempo)
 end
 
 SpeedMode.applyConstant = function(self)
-	local noteChart = self.game.noteChartModel.noteChart
+	local noteChart = self.noteChart
 
 	for _, layerData in noteChart:getLayerDataIterator() do
 		layerData:setPrimaryTempo(0)
@@ -59,7 +59,7 @@ SpeedMode.apply = function(self, config)
 		self:applyConstant()
 	end
 
-	local noteChart = self.game.noteChartModel.noteChart
+	local noteChart = self.noteChart
 
 	local minTime = noteChart.metaData.minTime
 	local maxTime = noteChart.metaData.maxTime

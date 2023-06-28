@@ -265,6 +265,7 @@ ModifierModel.apply = function(self, modifierType)
 		local modifier = self:getModifier(modifierConfig)
 		if modifier and modifier.type == modifierType then
 			modifier.game = self.game
+			modifier.noteChart = self.game.noteChartModel.noteChart
 			modifier:apply(modifierConfig)
 		end
 	end
