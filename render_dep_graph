@@ -1,0 +1,18 @@
+#!/bin/luajit
+local deps = require("sphere.deps")
+
+local buf = {}
+table.insert(buf, "digraph {")
+table.insert(buf, "overlap=prism")
+for k, w in pairs(deps) do
+	for _, v in ipairs(w) do
+		if v ~= "configModel" then
+			table.insert(buf, ("%s -> %s"):format(k, v))
+		end
+	end
+end
+table.insert(buf, "}")
+
+local p = assert(io.popen("sfdp -Tpng -o graph.png", "w"))
+p:write(table.concat(buf, "\n"))
+p:close()
