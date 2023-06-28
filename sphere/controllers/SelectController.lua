@@ -11,7 +11,7 @@ SelectController.load = function(self)
 	local previewModel = self.previewModel
 
 	self.configModel:write()
-	self.game:resetGameplayConfigs()
+	self.modifierModel:setConfig(self.configModel.configs.modifier)
 
 	noteChartModel:load()
 	selectModel:load()

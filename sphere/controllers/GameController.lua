@@ -267,11 +267,6 @@ GameController.load = function(self)
 	self.gameView:load()
 end
 
-GameController.resetGameplayConfigs = function(self)
-	self.modifierModel:setConfig(self.configModel.configs.modifier)
-	self.rhythmModel.timings = self.configModel.configs.settings.gameplay.timings
-end
-
 GameController.unload = function(self)
 	self.gameView:unload()
 	self.discordModel:unload()

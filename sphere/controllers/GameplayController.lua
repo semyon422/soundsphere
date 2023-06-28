@@ -36,6 +36,8 @@ GameplayController.load = function(self)
 	rhythmModel:setDrawRange(noteSkin.range)
 	rhythmModel.inputManager:setInputMode(tostring(noteChart.inputMode))
 
+	rhythmModel.timings = config.gameplay.timings
+
 	rhythmModel:load()
 
 	local scoreEngine = rhythmModel.scoreEngine
@@ -72,7 +74,7 @@ GameplayController.load = function(self)
 
 	love.mouse.setVisible(false)
 
-	local graphics = self.configModel.configs.settings.graphics
+	local graphics = config.graphics
 	local flags = graphics.mode.flags
 	if graphics.vsyncOnSelect then
 		self.windowModel.baseVsync = flags.vsync ~= 0 and flags.vsync or 1
