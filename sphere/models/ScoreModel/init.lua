@@ -14,7 +14,7 @@ ScoreModel.unload = function(self)
 end
 
 ScoreModel.transformScoreEntry = function(self, score)
-	local window = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
+	local window = self.configModel.configs.settings.gameplay.ratingHitTimingWindow
 	local s = erfunc.erf(window / (score.accuracy * math.sqrt(2)))
 	score.rating = score.difficulty * s
 	score.score = s * 10000

@@ -56,7 +56,7 @@ InputManager.receive = function(self, event)
 		return self:send(event)
 	end
 
-	local virtualKey, state = self.rhythmModel.game.inputModel:transformEvent(self.inputMode, event)
+	local virtualKey, state = self.rhythmModel.inputModel:transformEvent(self.inputMode, event)
 	if not virtualKey then return end
 
 	self:setState(virtualKey, state)

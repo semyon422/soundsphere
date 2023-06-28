@@ -74,6 +74,9 @@ local function dinject(t, k, v)
 end
 
 local deps = {
+
+	-- controllers
+
 	editorController = {
 		"noteChartModel",
 		"editorModel",
@@ -152,9 +155,102 @@ local deps = {
 		"notificationModel",
 		"speedModel",
 	},
+
+	-- models
+
+	audioModel = {"configModel"},
+	backgroundModel = {"configModel"},
+	configModel = {},
+	cacheModel = {"configModel"},
+	collectionModel = {"configModel"},
+	discordModel = {},
+	difficultyModel = {},
+	editorModel = {
+		"configModel",
+		"resourceModel",
+	},
+	notificationModel = {},
+	windowModel = {"configModel"},
+	mountModel = {"configModel"},
+	screenshotModel = {"configModel"},
+	themeModel = {"configModel"},
+	scoreModel = {"configModel"},
+	onlineModel = {"configModel"},
+	modifierModel = {
+		"configModel",
+		"game",
+	},
+	noteSkinModel = {"configModel"},
+	noteChartModel = {
+		"configModel",
+		"scoreModel",
+	},
+	inputModel = {"configModel"},
+	noteChartSetLibraryModel = {
+		"searchModel",
+		"sortModel",
+	},
+	noteChartLibraryModel = {},
+	scoreLibraryModel = {
+		"configModel",
+		"onlineModel",
+		"scoreModel",
+	},
+	sortModel = {},
+	searchModel = {"configModel"},
+	selectModel = {
+		"configModel",
+		"searchModel",
+		"sortModel",
+		"noteChartSetLibraryModel",
+		"noteChartLibraryModel",
+		"scoreLibraryModel",
+		"collectionModel",
+	},
+	previewModel = {
+		"configModel",
+		"modifierModel",
+	},
+	updateModel = {"configModel"},
+	rhythmModel = {
+		"replayModel",
+		"modifierModel",
+		"inputModel",
+		"resourceModel",
+	},
+	osudirectModel = {
+		"configModel",
+		"cacheModel",
+	},
+	multiplayerModel = {
+		"rhythmModel",
+		"configModel",
+		"modifierModel",
+		"selectModel",
+		"onlineModel",
+		"osudirectModel",
+	},
+	replayModel = {
+		"rhythmModel",
+		"noteChartModel",
+		"modifierModel",
+	},
+	speedModel = {"configModel"},
+	resourceModel = {"configModel"},
+
+	-- views
+
+	gameView = {"game"},
+	selectView = {"game"},
+	resultView = {"game"},
+	gameplayView = {"game"},
+	multiplayerView = {"game"},
+	editorView = {"game"},
 }
 
 GameController.construct = function(self)
+	self.game = self
+
 	self.mountController = MountController:new()
 	self.selectController = SelectController:new()
 	self.gameplayController = GameplayController:new()
@@ -171,12 +267,13 @@ GameController.construct = function(self)
 	self.multiplayerView = MultiplayerView:new()
 	self.editorView = EditorView:new()
 
+	self.directoryManager = DirectoryManager:new()
+
 	self.configModel = ConfigModel:new()
 	self.notificationModel = NotificationModel:new()
 	self.windowModel = WindowModel:new()
 	self.mountModel = MountModel:new()
 	self.screenshotModel = ScreenshotModel:new()
-	self.directoryManager = DirectoryManager:new()
 	self.themeModel = ThemeModel:new()
 	self.scoreModel = ScoreModel:new()
 	self.onlineModel = OnlineModel:new()
@@ -206,9 +303,9 @@ GameController.construct = function(self)
 	self.audioModel = AudioModel:new()
 	self.resourceModel = ResourceModel:new()
 
-	for k, v in pairs(self) do
-		v.game = self
-	end
+	-- for k, v in pairs(self) do
+	-- 	v.game = self
+	-- end
 
 	for k, w in pairs(deps) do
 		for _, v in ipairs(w) do

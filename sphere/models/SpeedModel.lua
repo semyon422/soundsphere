@@ -21,7 +21,7 @@ SpeedModel.format = {
 local osuFactor = 7 / 96
 
 SpeedModel.get = function(self)
-	local gameplay = self.game.configModel.configs.settings.gameplay
+	local gameplay = self.configModel.configs.settings.gameplay
 	local speed = gameplay.speed
 	local speedType = gameplay.speedType
 
@@ -34,7 +34,7 @@ SpeedModel.get = function(self)
 end
 
 SpeedModel.set = function(self, newSpeed)
-	local gameplay = self.game.configModel.configs.settings.gameplay
+	local gameplay = self.configModel.configs.settings.gameplay
 	local speedType = gameplay.speedType
 
 	local range = self.range[speedType]
@@ -49,7 +49,7 @@ SpeedModel.set = function(self, newSpeed)
 end
 
 SpeedModel.increase = function(self, delta)
-	local gameplay = self.game.configModel.configs.settings.gameplay
+	local gameplay = self.configModel.configs.settings.gameplay
 	local speed = gameplay.speed
 
 	if gameplay.speedType == "osu" then

@@ -13,7 +13,7 @@ for i = 1, #ignoredNames do
 end
 
 CollectionModel.load = function(self)
-	self.config = self.game.configModel.configs.select
+	self.config = self.configModel.configs.select
 	local collectionPath = self.config.collection
 	local basePath = self.basePath
 

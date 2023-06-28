@@ -19,7 +19,7 @@ ReplayModel.load = function(self)
 	elseif self.mode == "replay" then
 		self.replay:reset()
 	end
-	self.replay.timeEngine = self.game.rhythmModel.timeEngine
+	self.replay.timeEngine = self.rhythmModel.timeEngine
 	self.currentTime = -math.huge
 end
 
@@ -46,7 +46,7 @@ ReplayModel.update = function(self)
 		end
 
 		nextEvent.baseTime = nextEvent.baseTime or nextEvent.time
-		nextEvent.time = nextEvent.baseTime + self.game.rhythmModel.timeEngine.inputOffset
+		nextEvent.time = nextEvent.baseTime + self.rhythmModel.timeEngine.inputOffset
 		if self.currentTime >= nextEvent.time then
 			self:send(nextEvent)
 			replay:step()
@@ -57,9 +57,9 @@ end
 
 ReplayModel.saveReplay = function(self)
 	local replay = self.replay
-	replay.noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry
-	replay.inputMode = self.game.noteChartModel.noteChart.inputMode
-	replay.modifierTable = self.game.modifierModel.config
+	replay.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
+	replay.inputMode = self.noteChartModel.noteChart.inputMode
+	replay.modifierTable = self.modifierModel.config
 	replay.timings = self.timings
 
 	local replayString = replay:toString()

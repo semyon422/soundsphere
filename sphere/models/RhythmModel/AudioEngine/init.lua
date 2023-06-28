@@ -55,8 +55,8 @@ end
 
 AudioEngine.playAudio = function(self, sounds, isBackground, stream, offset)
 	local currentTime = self.rhythmModel.timeEngine.currentTime
-	local aliases = self.rhythmModel.game.resourceModel.aliases
-	local resources = self.rhythmModel.game.resourceModel.resources
+	local aliases = self.rhythmModel.resourceModel.aliases
+	local resources = self.rhythmModel.resourceModel.resources
 	for i = 1, #sounds do
 		local mode = stream and self.mode.primary or self.mode.secondary
 

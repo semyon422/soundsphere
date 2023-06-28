@@ -23,7 +23,7 @@ OnlineModel.load = function(self)
 	onlineScoreManager.onlineModel = self
 	onlineNotechartManager.onlineModel = self
 
-	local configs = self.game.configModel.configs
+	local configs = self.configModel.configs
 	webApi.token = configs.online.token
 	webApi.host = configs.urls.host
 	webApi:load()

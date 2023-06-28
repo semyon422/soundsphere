@@ -95,7 +95,7 @@ UpdateModel.setStatus = function(self, status)
 end
 
 UpdateModel.updateFilesAsync = function(self)
-	local configModel = self.game.configModel
+	local configModel = self.configModel
 	local configs = configModel.configs
 	self:setStatus("Checking for updates...")
 

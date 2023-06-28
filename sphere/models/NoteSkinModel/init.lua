@@ -18,7 +18,7 @@ NoteSkinModel.load = function(self)
 	self.files = {}
 	self.foundNoteSkins = {}
 	self.tree = {}
-	self.config = self.game.configModel.configs.settings
+	self.config = self.configModel.configs.settings
 	self:lookupTree(self.path, self.tree)
 	self:lookupSkins(self.tree)
 	-- local t = love.timer.getTime()

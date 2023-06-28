@@ -99,7 +99,7 @@ ModifierModel.construct = function(self)
 end
 
 ModifierModel.load = function(self)
-	self:setConfig(self.game.configModel.configs.modifier)
+	self:setConfig(self.configModel.configs.modifier)
 
 	self.availableModifierItemIndex = 1
 

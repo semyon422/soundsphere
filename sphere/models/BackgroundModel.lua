@@ -9,7 +9,7 @@ local BackgroundModel = Class:new()
 BackgroundModel.alpha = 0
 
 BackgroundModel.load = function(self)
-	self.config = self.game.configModel.configs.select
+	self.config = self.configModel.configs.select
 	self.noteChartDataEntryId = 0
 	self.path = ""
 

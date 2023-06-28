@@ -21,7 +21,7 @@ PreviewModel.setAudioPathPreview = function(self, audioPath, previewTime)
 end
 
 PreviewModel.update = function(self)
-	local settings = self.game.configModel.configs.settings
+	local settings = self.configModel.configs.settings
 	local muteOnUnfocus = settings.miscellaneous.muteOnUnfocus
 
 	local audio = self.audio
@@ -42,7 +42,7 @@ PreviewModel.update = function(self)
 		self.volume = volume
 	end
 
-	local timeRate = self.game.modifierModel.state.timeRate
+	local timeRate = self.modifierModel.state.timeRate
 	if self.pitch ~= timeRate then
 		audio:setPitch(timeRate)
 		self.pitch = timeRate
@@ -107,8 +107,8 @@ PreviewModel.loadPreview = function(self)
 	self.path = path
 	self.position = position
 
-	local timeRate = self.game.modifierModel.state.timeRate
-	local volumeConfig = self.game.configModel.configs.settings.audio.volume
+	local timeRate = self.modifierModel.state.timeRate
+	local volumeConfig = self.configModel.configs.settings.audio.volume
 	local volume = volumeConfig.master * volumeConfig.music
 	audio:seek(position or 0)
 	audio:setVolume(volume)

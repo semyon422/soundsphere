@@ -12,9 +12,8 @@ UpdateController.construct = function(self)
 	self.configModel = ConfigModel:new()
 	self.windowModel = WindowModel:new()
 
-	for k, v in pairs(self) do
-		v.game = self
-	end
+	self.updateModel.configModel = self.configModel
+	self.windowModel.configModel = self.configModel
 end
 
 UpdateController.updateAsync = function(self)

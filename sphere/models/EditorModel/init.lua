@@ -63,7 +63,7 @@ EditorModel.load = function(self)
 	self.timer:reset()
 	self.timer:setPosition(editor.time)
 
-	self.audioManager.volume = self.game.configModel.configs.settings.audio.volume
+	self.audioManager.volume = self.configModel.configs.settings.audio.volume
 	self.audioManager:load()
 
 	self.scroller:scrollSeconds(self.timer:getTime())
@@ -80,7 +80,7 @@ EditorModel.applyTempoOffset = function(self)
 end
 
 EditorModel.getSettings = function(self)
-	local editor = self.game.configModel.configs.settings.editor
+	local editor = self.configModel.configs.settings.editor
 	if editor.speed <= 0 then
 		editor.speed = 1
 	end

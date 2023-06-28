@@ -28,8 +28,8 @@ ScoreLibraryModel.setIndex = function(self, index)
 end
 
 ScoreLibraryModel.filterScores = function(self, scores)
-	local filters = self.game.configModel.configs.filters.score
-	local select = self.game.configModel.configs.select
+	local filters = self.configModel.configs.filters.score
+	local select = self.configModel.configs.select
 	local index
 	for i, filter in ipairs(filters) do
 		if filter.name == select.scoreFilterName then
@@ -55,7 +55,7 @@ ScoreLibraryModel.updateItemsAsync = function(self)
 	local hash_index = self.hash .. self.index
 	self.items = {}
 
-	local select = self.game.configModel.configs.select
+	local select = self.configModel.configs.select
 	if select.scoreSourceName == "online" then
 		self:updateItemsOnline()
 	else
@@ -70,7 +70,7 @@ end
 ScoreLibraryModel.updateItems = thread.coro(ScoreLibraryModel.updateItemsAsync)
 
 ScoreLibraryModel.updateItemsOnline = function(self)
-	local api = self.game.onlineModel.webApi.api
+	local api = self.onlineModel.webApi.api
 
 	print("GET " .. api.notecharts)
 	local notecharts = api.notecharts:get({
@@ -98,7 +98,7 @@ ScoreLibraryModel.updateItemsOnline = function(self)
 end
 
 ScoreLibraryModel.updateItemsLocal = function(self)
-	local scoreEntries = self.game.scoreModel:getScoreEntries(
+	local scoreEntries = self.scoreModel:getScoreEntries(
 		self.hash,
 		self.index
 	)

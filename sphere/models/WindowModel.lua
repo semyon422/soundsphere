@@ -16,7 +16,7 @@ local function getDimensions(mode)
 end
 
 WindowModel.load = function(self)
-	self.graphics = self.game.configModel.configs.settings.graphics
+	self.graphics = self.configModel.configs.settings.graphics
 	self.mode = self.graphics.mode
 	local mode = self.mode
 	local flags = mode.flags
@@ -54,7 +54,7 @@ WindowModel.update = function(self)
 		self:setCursor()
 	end
 
-	local settings = self.game.configModel.configs.settings
+	local settings = self.configModel.configs.settings
 	loop.fpslimit = settings.graphics.fps
 	loop.asynckey = settings.graphics.asynckey
 	loop.dwmflush = settings.graphics.dwmflush

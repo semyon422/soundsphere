@@ -117,7 +117,7 @@ OsudirectModel.search = function(self)
 end
 
 OsudirectModel.searchRequest = function(self, searchString, page)
-	local config = self.game.configModel.configs.urls.osu
+	local config = self.configModel.configs.urls.osu
 	local url = config.search .. "?" .. http_util.encode_query_string({
 		query = searchString,
 		mode = 3,
@@ -172,12 +172,12 @@ OsudirectModel.searchNext = function(self)
 end
 
 OsudirectModel.getBackgroundUrl = function(self)
-	local config = self.game.configModel.configs.urls.osu
+	local config = self.configModel.configs.urls.osu
 	return config.background:format(self.beatmap.id)
 end
 
 OsudirectModel.getPreviewUrl = function(self)
-	local config = self.game.configModel.configs.urls.osu
+	local config = self.configModel.configs.urls.osu
 	return config.preview:format(self.beatmap.id)
 end
 
@@ -188,7 +188,7 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 
 	table.insert(self.processing, 1, beatmap)
 
-	local config = self.game.configModel.configs.urls.osu
+	local config = self.configModel.configs.urls.osu
 
 	local saveDir = "userdata/charts/downloads"
 
@@ -228,7 +228,7 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 	beatmap.status = "Caching"
 
 	local c = coroutine.running()
-	self.game.cacheModel:startUpdate(extractPath, true, function()
+	self.cacheModel:startUpdate(extractPath, true, function()
 		coroutine.resume(c)
 	end)
 	coroutine.yield()

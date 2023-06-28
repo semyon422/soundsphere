@@ -123,7 +123,7 @@ end
 ResourceModel.load = function(self, chartPath, noteChart, callback)
 	local noteChartType = NoteChartTypeMap[noteChart.type]
 
-	local settings = self.game.configModel.configs.settings
+	local settings = self.configModel.configs.settings
 	local sample_gain = settings.audio.sampleGain
 	local bga_image = settings.gameplay.bga.image
 	local bga_video = settings.gameplay.bga.video

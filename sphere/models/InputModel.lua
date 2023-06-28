@@ -31,7 +31,7 @@ InputModel.transformEvent = function(self, inputMode, event)
 		key = event[1]
 	end
 
-	local config = self.game.configModel.configs.input
+	local config = self.configModel.configs.input
 	local inputConfig = config[inputMode]
 	local deviceConfig = inputConfig and inputConfig[device]
 
@@ -65,7 +65,7 @@ InputModel.setKey = function(self, inputMode, virtualKey, device, key)
 		key = tonumber(key)
 	end
 
-	local config = self.game.configModel.configs.input
+	local config = self.configModel.configs.input
 
 	config[inputMode] = config[inputMode] or {}
 	local inputConfig = config[inputMode]
@@ -79,7 +79,7 @@ end
 InputModel.getKey = function(self, inputMode, virtualKey, device)
 	local inputs = self:getInputs(inputMode)
 
-	local config = self.game.configModel.configs.input
+	local config = self.configModel.configs.input
 	local inputConfig = config[inputMode]
 	local deviceConfig = inputConfig and inputConfig[device]
 	local key = deviceConfig and deviceConfig[inputs[virtualKey]]

@@ -43,7 +43,7 @@ MultiplayerModel.refresh = function(self)
 
 	self.roomUsers = peer.getRoomUsers() or {}
 
-	local scoreSystem = self.game.rhythmModel.scoreEngine.scoreSystem
+	local scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
 	if not scoreSystem.entry then
 		return
 	end
@@ -66,7 +66,7 @@ MultiplayerModel.connect = thread.coro(function(self)
 	end
 	self.status = "connecting"
 	connecting = true
-	local url = self.game.configModel.configs.urls.multiplayer
+	local url = self.configModel.configs.urls.multiplayer
 	local host, port = url:match("^(.+):(.-)$")
 	local ip = toipAsync(host or "")
 	local status, err = pcall(self.host.connect, self.host, ("%s:%s"):format(ip, port))
@@ -154,7 +154,7 @@ MultiplayerModel.createRoom = remote.wrap(function(self, name, password)
 		return
 	end
 	self.selectedRoom = nil
-	self.peer._setModifiers(self.game.modifierModel.config)
+	self.peer._setModifiers(self.modifierModel.config)
 	self:pushNotechart()
 end)
 
@@ -179,7 +179,7 @@ MultiplayerModel.pushModifiers = remote.wrap(function(self)
 	if not self.peer then
 		return
 	end
-	self.peer._setModifiers(self.game.modifierModel.config)
+	self.peer._setModifiers(self.modifierModel.config)
 end)
 
 local async_read = thread.async(function(...) return love.filesystem.read(...) end)
@@ -189,7 +189,7 @@ MultiplayerModel.pushNotechart = remote.wrap(function(self)
 		return
 	end
 
-	local nc = self.game.selectModel.noteChartItem
+	local nc = self.selectModel.noteChartItem
 	if not nc then
 		return
 	end
@@ -245,13 +245,13 @@ MultiplayerModel.pullNotechart = remote.wrap(function(self)
 end)
 
 MultiplayerModel.login = remote.wrap(function(self)
-	local api = self.game.onlineModel.webApi.api
+	local api = self.onlineModel.webApi.api
 
 	local key = self.peer.login()
 	if not key then
 		return
 	elseif key == "" then
-		local user = self.game.configModel.configs.online.user
+		local user = self.configModel.configs.online.user
 		local id, name = 0, "username"
 		if user and user.name then
 			id = user.id
@@ -317,7 +317,7 @@ MultiplayerModel.downloadNoteChart = function(self)
 		setId = setId,
 		status = "",
 	}
-	self.game.osudirectModel:downloadBeatmapSet(self.downloadingBeatmap, function()
+	self.osudirectModel:downloadBeatmapSet(self.downloadingBeatmap, function()
 		self.downloadingBeatmap.status = "done"
 		self:pullNotechart()
 	end)

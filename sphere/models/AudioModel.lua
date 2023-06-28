@@ -4,7 +4,7 @@ local bass = require("audio.bass")
 local AudioModel = Class:new()
 
 AudioModel.load = function(self)
-	local device = self.game.configModel.configs.settings.audio.device
+	local device = self.configModel.configs.settings.audio.device
 	if device.period == 0 then
 		device.period = bass.default_dev_period
 	end

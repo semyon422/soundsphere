@@ -150,8 +150,8 @@ AudioManager.loadResources = function(self, noteChart)
 			local offset = noteData.timePoint.absoluteTime
 			if noteData.sounds then
 				for _, s in ipairs(noteData.sounds) do
-					local path = self.editorModel.game.resourceModel.aliases[s[1]]
-					local soundData = self.editorModel.game.resourceModel.resources[path]
+					local path = self.editorModel.resourceModel.aliases[s[1]]
+					local soundData = self.editorModel.resourceModel.resources[path]
 					if soundData then
 						local _audio = audio:newAudio(soundData)
 						local duration = _audio:getLength()
