@@ -122,16 +122,16 @@ end
 
 GameplayView.keypressed = function(self)
 	local input = self.game.configModel.configs.settings.input
-	local timeController = self.game.timeController
+	local gameplayController = self.game.gameplayController
 
 	local kp = just.keypressed
-	if kp(input.skipIntro) then timeController:skipIntro()
-	elseif kp(input.offset.decrease) then timeController:increaseLocalOffset(-0.001)
-	elseif kp(input.offset.increase) then timeController:increaseLocalOffset(0.001)
-	-- elseif kp(input.timeRate.decrease) then timeController:increaseTimeRate(-0.05)
-	-- elseif kp(input.timeRate.increase) then timeController:increaseTimeRate(0.05)
-	elseif kp(input.playSpeed.decrease) then timeController:increasePlaySpeed(-1)
-	elseif kp(input.playSpeed.increase) then timeController:increasePlaySpeed(1)
+	if kp(input.skipIntro) then gameplayController:skipIntro()
+	elseif kp(input.offset.decrease) then gameplayController:increaseLocalOffset(-0.001)
+	elseif kp(input.offset.increase) then gameplayController:increaseLocalOffset(0.001)
+	-- elseif kp(input.timeRate.decrease) then gameplayController:increaseTimeRate(-0.05)
+	-- elseif kp(input.timeRate.increase) then gameplayController:increaseTimeRate(0.05)
+	elseif kp(input.playSpeed.decrease) then gameplayController:increasePlaySpeed(-1)
+	elseif kp(input.playSpeed.increase) then gameplayController:increasePlaySpeed(1)
 	end
 
 	local gameplayController = self.game.gameplayController

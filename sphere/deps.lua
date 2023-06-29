@@ -28,7 +28,6 @@ return {
 		"modifierModel",
 		"difficultyModel",
 		"replayModel",
-		"timeController",
 		"multiplayerModel",
 		"previewModel",
 		"discordModel",
@@ -36,6 +35,9 @@ return {
 		"onlineModel",
 		"resourceModel",
 		"windowModel",
+		"notificationModel",
+		"speedModel",
+		"cacheModel",
 	},
 	mountController = {
 		"mountModel",
@@ -72,14 +74,6 @@ return {
 		"cacheModel",
 		"osudirectModel",
 		"windowModel",
-	},
-	timeController = {
-		"rhythmModel",
-		"noteChartModel",
-		"configModel",
-		"notificationModel",
-		"speedModel",
-		"cacheModel",
 	},
 
 	-- models

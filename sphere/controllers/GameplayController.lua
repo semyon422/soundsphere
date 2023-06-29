@@ -57,7 +57,7 @@ GameplayController.load = function(self)
 	rhythmModel:loadAllEngines()
 	self.replayModel:load()
 
-	self.timeController:updateOffsets()
+	self:updateOffsets()
 
 	FileFinder:reset()
 	FileFinder:addPath(noteChartModel.noteChartEntry.path:match("^(.+)/.-$"))
@@ -264,6 +264,51 @@ GameplayController.skip = function(self)
 	rhythmModel.logicEngine:update()
 	rhythmModel.scoreEngine:update()
 	self.modifierModel:update()
+end
+
+GameplayController.skipIntro = function(self)
+	local rhythmModel = self.rhythmModel
+	local timeEngine = rhythmModel.timeEngine
+	if not timeEngine.timer.isPlaying then
+		return
+	end
+	timeEngine:skipIntro()
+end
+
+GameplayController.updateOffsets = function(self)
+	local rhythmModel = self.rhythmModel
+	local noteChartDataEntry = self.noteChartModel.noteChartDataEntry
+	local config = self.configModel.configs.settings
+
+	local localOffset = noteChartDataEntry.localOffset or 0
+	local baseTimeRate = rhythmModel.timeEngine:getBaseTimeRate()
+	local inputOffset = config.gameplay.offset.input + localOffset
+	local visualOffset = config.gameplay.offset.visual + localOffset
+	if config.gameplay.offsetScale.input then
+		inputOffset = inputOffset * baseTimeRate
+	end
+	if config.gameplay.offsetScale.visual then
+		visualOffset = visualOffset * baseTimeRate
+	end
+	rhythmModel:setInputOffset(inputOffset)
+	rhythmModel:setVisualOffset(visualOffset)
+end
+
+GameplayController.increasePlaySpeed = function(self, delta)
+	local speedModel = self.speedModel
+	speedModel:increase(delta)
+
+	local gameplay = self.configModel.configs.settings.gameplay
+	self.rhythmModel.graphicEngine:setVisualTimeRate(gameplay.speed)
+	self.notificationModel:notify("scroll speed: " .. speedModel.format[gameplay.speedType]:format(speedModel:get()))
+end
+
+GameplayController.increaseLocalOffset = function(self, delta)
+	local noteChartDataEntry = self.noteChartModel.noteChartDataEntry
+	noteChartDataEntry.localOffset = (noteChartDataEntry.localOffset or 0) + delta
+	self.cacheModel.chartRepo:updateNoteChartDataEntry(noteChartDataEntry)
+	self.notificationModel:notify("local offset: " .. noteChartDataEntry.localOffset * 1000 .. "ms")
+	self:updateOffsets()
 end
 
 return GameplayController
