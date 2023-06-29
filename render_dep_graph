@@ -1,13 +1,73 @@
 #!/bin/luajit
 local deps = require("sphere.deps")
 
+local exclude_nodes = {
+	"game",
+	"configModel",
+}
+for _, v in ipairs(exclude_nodes) do
+	exclude_nodes[v] = true
+end
+
+local function includes(t, v)
+	for _, _v in ipairs(t) do
+		if _v == v then
+			return true
+		end
+	end
+end
+
+local function get_above(name)
+	local out = {}
+	for k, v in pairs(deps) do
+		if includes(v, name) and not exclude_nodes[k] then
+			table.insert(out, k)
+		end
+	end
+	return out
+end
+
+local node_types = {}
+for k, list in pairs(deps) do
+	node_types[k] = node_types[k] or {}
+	if not exclude_nodes[k] then
+		local n = 0
+		for _, v in ipairs(list) do
+			if not exclude_nodes[v] then
+				n = n + 1
+			end
+		end
+		if n > 0 then
+			node_types[k]._out = true
+		end
+		if #get_above(k) > 0 then
+			node_types[k]._in = true
+		end
+	end
+end
+
+local function get_color(name)
+	local t = node_types[name] or {}
+	if t._in and t._out then
+		return "#eeeeee"
+	elseif t._in then
+		return "#ffffb4"
+	elseif t._out then
+		return "#b3b3ff"
+	end
+	return "#ffffff"
+end
+
 local buf = {}
 table.insert(buf, "digraph {")
 table.insert(buf, "overlap=prism")
 for k, w in pairs(deps) do
 	for _, v in ipairs(w) do
-		if v ~= "configModel" then
+		if not exclude_nodes[k] and not exclude_nodes[v] then
 			table.insert(buf, ("%s -> %s"):format(k, v))
+
+			table.insert(buf, ("%s [style=filled, fillcolor=%q]"):format(k, get_color(k)))
+			table.insert(buf, ("%s [style=filled, fillcolor=%q]"):format(v, get_color(v)))
 		end
 	end
 end
