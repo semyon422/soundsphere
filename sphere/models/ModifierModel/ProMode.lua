@@ -25,36 +25,4 @@ ProMode.apply = function(self, config)
 	self.rhythmModel.logicEngine.promode = true
 end
 
-ProMode.receive = function(self, config, event)
-	if not config.value then
-		return
-	end
-
-	if event.name ~= "keypressed" then
-		return
-	end
-
-	local logicEngine = self.rhythmModel.logicEngine
-
-	local nearestNote
-	for _, noteHandler in pairs(logicEngine.noteHandlers) do
-		local currentNote = noteHandler:getCurrentNote()
-		if
-			currentNote and
-			(
-				not nearestNote or
-				currentNote.startNoteData.timePoint.absoluteTime < nearestNote.startNoteData.timePoint.absoluteTime
-			) and
-			not currentNote.ended and
-			currentNote:isReachable(logicEngine:getEventTime()) and
-			currentNote.isPlayable
-		then
-			nearestNote = currentNote
-		end
-	end
-	if nearestNote then
-		nearestNote.isPlayable = false
-	end
-end
-
 return ProMode

@@ -33,8 +33,12 @@ LogicEngine.playSound = function(self, noteData, isBackground)
 end
 
 LogicEngine.receive = function(self, event)
-	if not event.virtual or self.promode then
+	if not event.virtual then
 		return
+	end
+
+	if self.promode then
+		return self:handlePromode()
 	end
 
 	self.eventTime = event.time
@@ -42,6 +46,27 @@ LogicEngine.receive = function(self, event)
 		noteHandler:receive(event)
 	end
 	self.eventTime = nil
+end
+
+LogicEngine.handlePromode = function(self)
+	local nearestNote
+	for _, noteHandler in pairs(self.noteHandlers) do
+		local currentNote = noteHandler:getCurrentNote()
+		if
+			currentNote and (
+				not nearestNote or
+				currentNote.startNoteData.timePoint.absoluteTime < nearestNote.startNoteData.timePoint.absoluteTime
+			) and
+			not currentNote.ended and
+			currentNote:isReachable(self:getEventTime()) and
+			currentNote.isPlayable
+		then
+			nearestNote = currentNote
+		end
+	end
+	if nearestNote then
+		nearestNote.isPlayable = false
+	end
 end
 
 LogicEngine.loadNoteHandlers = function(self)
