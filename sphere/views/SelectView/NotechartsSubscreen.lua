@@ -227,8 +227,9 @@ local function SortDropdown(self)
 
 	local sortModel = self.game.sortModel
 	local i = imgui.SpoilerList("SortDropdown", w / 3, h - 30, sortModel.names, sortModel.name)
-	if i then
-		self.game.selectModel:setSortFunction(sortModel:fromIndexValue(i), true)
+	local name = sortModel.names[i]
+	if name then
+		self.game.selectModel:setSortFunction(name, true)
 	end
 end
 

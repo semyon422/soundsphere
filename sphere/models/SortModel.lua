@@ -15,6 +15,7 @@ SortModel.getOrderBy = function(self)
 	return f[1], f[2]
 end
 
+-- 2nd value = isCollapseAllowed (group by setId)
 SortModel.sortItemsFunctions = {
 	id = {sort("id"), true},
 	title = {sort("title", "artist", "creator", "inputMode", "difficulty", "name", "id"), true},
@@ -27,23 +28,5 @@ SortModel.sortItemsFunctions = {
 
 SortModel.name = "title"
 SortModel.names = {"id", "title", "artist", "difficulty", "level", "length", "bpm"}
-
-SortModel.toIndexValue = function(self, name)
-	for i, currentName in ipairs(self.names) do
-		if name == currentName then
-			return i
-		end
-	end
-	return 1
-end
-
-SortModel.fromIndexValue = function(self, indexValue)
-	return self.names[math.min(math.max(indexValue, 1), #self.names)] or ""
-end
-
-SortModel.increase = function(self, delta)
-	local indexValue = self:toIndexValue(self.name)
-	self.name = self:fromIndexValue(indexValue + delta)
-end
 
 return SortModel

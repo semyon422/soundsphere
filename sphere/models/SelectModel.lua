@@ -76,11 +76,6 @@ SelectModel.setSortFunction = function(self, sortFunctionName, noDebounce)
 	self:debouncePullNoteChartSet()
 end
 
-SelectModel.scrollSortFunction = function(self, delta)
-	self.sortModel:increase(delta)
-	self:setSortFunction(self.sortModel.name)
-end
-
 SelectModel.changeCollapse = function(self)
 	if self.pullingNoteChartSet then
 		return

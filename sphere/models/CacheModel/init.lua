@@ -1,13 +1,11 @@
 local thread = require("thread")
 local Class = require("Class")
-local CacheManager = require("sphere.models.CacheModel.CacheManager")
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 local ChartRepo = require("sphere.models.CacheModel.ChartRepo")
 
 local CacheModel = Class:new()
 
 CacheModel.construct = function(self)
-	self.cacheManager = CacheManager:new()
 	self.tasks = {}
 end
 
