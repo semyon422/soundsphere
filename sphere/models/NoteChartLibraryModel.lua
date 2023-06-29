@@ -1,4 +1,3 @@
-local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 local LibraryModel = require("sphere.models.LibraryModel")
 
 local NoteChartLibraryModel = LibraryModel:extend()
@@ -55,18 +54,13 @@ NoteChartItem.__index = function(self, k)
 	if not model.slice then
 		return
 	end
-	local entry = CacheDatabase.noteChartItems[model.slice.offset + self.itemIndex - 1]
+	local entry = model.cacheModel.cacheDatabase.noteChartItems[model.slice.offset + self.itemIndex - 1]
 	if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "lamp" then
 		return entry[k]
 	end
-	local noteChart = CacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
-	local noteChartData = CacheDatabase:getCachedEntry("noteChartDatas", entry.noteChartDataId)
+	local noteChart = model.cacheModel.cacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
+	local noteChartData = model.cacheModel.cacheDatabase:getCachedEntry("noteChartDatas", entry.noteChartDataId)
 	return noteChartData and noteChartData[k] or noteChart and noteChart[k]
-end
-
-NoteChartLibraryModel.construct = function(self)
-	LibraryModel.construct(self)
-	self.entry = CacheDatabase.EntryStruct()
 end
 
 NoteChartLibraryModel.loadObject = function(self, itemIndex)
@@ -83,7 +77,7 @@ end
 
 NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
 	self.setId = setId
-	local slice = CacheDatabase.noteChartSlices[setId]
+	local slice = self.cacheModel.cacheDatabase.noteChartSlices[setId]
 	self.slice = slice
 	if not slice then
 		self.itemsCount = 0
@@ -97,13 +91,15 @@ NoteChartLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId
 		return 1
 	end
 
+	self.entry = self.entry or self.cacheModel.cacheDatabase.EntryStruct()
+
 	local entry = self.entry
 	entry.noteChartDataId = noteChartDataId
 	entry.noteChartId = noteChartId
 	entry.setId = noteChartSetId
 	local key = entry.key
 
-	return (CacheDatabase.entryKeyToLocalOffset[key] or 0) + 1
+	return (self.cacheModel.cacheDatabase.entryKeyToLocalOffset[key] or 0) + 1
 end
 
 return NoteChartLibraryModel

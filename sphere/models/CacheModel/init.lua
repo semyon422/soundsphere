@@ -10,13 +10,16 @@ CacheModel.construct = function(self)
 end
 
 CacheModel.load = function(self)
-	CacheDatabase:load()
 	thread.shared.cache = {
 		state = 0,
 		noteChartCount = 0,
 		cachePercent = 0,
 	}
 	self.shared = thread.shared.cache
+
+	self.cacheDatabase = CacheDatabase:new()
+	self.cacheDatabase:load()
+
 	self.chartRepo = ChartRepo:new()
 	self.chartRepo:load()
 end
@@ -32,7 +35,7 @@ end
 local isProcessing = false
 
 CacheModel.update = function(self)
-	CacheDatabase:update()
+	self.cacheDatabase:update()
 	if not isProcessing and #self.tasks > 0 then
 		self:process()
 	end

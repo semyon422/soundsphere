@@ -4,8 +4,9 @@ local Orm = require("sphere.Orm")
 local ObjectQuery = require("sphere.ObjectQuery")
 local ffi = require("ffi")
 local byte = require("byte")
+local Class = require("Class")
 
-local CacheDatabase = {}
+local CacheDatabase = Class:new()
 
 CacheDatabase.dbpath = "userdata/charts.db"
 
@@ -126,7 +127,8 @@ end
 local _asyncQueryAll = thread.async(function(queryParams)
 	local time = love.timer.getTime()
 	local ffi = require("ffi")
-	local self = require("sphere.models.CacheModel.CacheDatabase")
+	local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
+	local self = CacheDatabase:new()
 	self:load()
 	self.queryParams = queryParams
 	local status, err = pcall(self.queryAll, self)
@@ -169,7 +171,7 @@ CacheDatabase.asyncQueryAll = function(self)
 end
 
 CacheDatabase.queryNoteChartSets = function(self)
-	local params = CacheDatabase.queryParams
+	local params = self.queryParams
 
 	local objectQuery = ObjectQuery:new()
 
@@ -223,7 +225,7 @@ CacheDatabase.queryNoteChartSets = function(self)
 end
 
 CacheDatabase.queryNoteCharts = function(self)
-	local params = CacheDatabase.queryParams
+	local params = self.queryParams
 
 	local objectQuery = ObjectQuery:new()
 
@@ -302,7 +304,7 @@ CacheDatabase.queryNoteCharts = function(self)
 end
 
 CacheDatabase.reassignData = function(self)
-	if not CacheDatabase.queryParams.groupBy then
+	if not self.queryParams.groupBy then
 		return
 	end
 

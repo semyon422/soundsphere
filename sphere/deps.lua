@@ -121,8 +121,11 @@ return {
 	noteChartSetLibraryModel = {
 		"searchModel",
 		"sortModel",
+		"cacheModel",
 	},
-	noteChartLibraryModel = {},
+	noteChartLibraryModel = {
+		"cacheModel",
+	},
 	scoreLibraryModel = {
 		"configModel",
 		"onlineModel",
