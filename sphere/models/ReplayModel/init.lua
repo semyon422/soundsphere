@@ -2,7 +2,6 @@ local Class			= require("Class")
 local Observable	= require("Observable")
 local Replay		= require("sphere.models.ReplayModel.Replay")
 local md5			= require("md5")
-local thread = require("thread")
 
 local ReplayModel = Class:new()
 

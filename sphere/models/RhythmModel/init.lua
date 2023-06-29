@@ -64,7 +64,6 @@ end
 
 RhythmModel.loadAllEngines = function(self)
 	local modifierModel = self.modifierModel
-	local replayModel = self.replayModel
 	local timeEngine = self.timeEngine
 	local scoreEngine = self.scoreEngine
 	local audioEngine = self.audioEngine
@@ -88,7 +87,6 @@ end
 
 RhythmModel.loadLogicEngines = function(self)
 	local modifierModel = self.modifierModel
-	local replayModel = self.replayModel
 	local timeEngine = self.timeEngine
 	local scoreEngine = self.scoreEngine
 	local logicEngine = self.logicEngine
@@ -140,6 +138,12 @@ RhythmModel.update = function(self, dt)
 	self.graphicEngine:update(dt)
 	self.modifierModel:update()
 	self.pauseManager:update(dt)
+end
+
+RhythmModel.getResource = function(self, s)
+	local aliases = self.resourceModel.aliases
+	local resources = self.resourceModel.resources
+	return resources[aliases[s]]
 end
 
 RhythmModel.setNoteChart = function(self, noteChart)

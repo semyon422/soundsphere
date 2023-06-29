@@ -34,7 +34,6 @@ return {
 		"discordModel",
 		"scoreModel",
 		"onlineModel",
-		"selectModel",
 		"resourceModel",
 		"windowModel",
 	},
@@ -78,7 +77,6 @@ return {
 		"rhythmModel",
 		"noteChartModel",
 		"configModel",
-		"multiplayerModel",
 		"notificationModel",
 		"speedModel",
 		"cacheModel",
@@ -110,6 +108,8 @@ return {
 	modifierModel = {
 		"configModel",
 		"game",
+		"rhythmModel",
+		"noteChartModel",
 	},
 	noteSkinModel = {"configModel"},
 	noteChartModel = {

@@ -23,7 +23,7 @@ WindUp.apply = function(self, config)
 	if not config.value then
 		return
 	end
-	self.timeRateHandler = self.game.rhythmModel.timeEngine:createTimeRateHandler()
+	self.timeRateHandler = self.rhythmModel.timeEngine:createTimeRateHandler()
 end
 
 WindUp.update = function(self, config)
@@ -31,7 +31,7 @@ WindUp.update = function(self, config)
 		return
 	end
 
-	local timeEngine = self.game.rhythmModel.timeEngine
+	local timeEngine = self.rhythmModel.timeEngine
 	local startTime = timeEngine.noteChart.metaData.minTime
 	local endTime = timeEngine.noteChart.metaData.maxTime
 	local currentTime = timeEngine.currentTime

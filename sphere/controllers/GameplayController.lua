@@ -228,12 +228,9 @@ GameplayController.saveScore = function(self)
 	local rhythmModel = self.rhythmModel
 	local noteChartModel = self.noteChartModel
 	local modifierModel = self.modifierModel
-	local replayModel = self.replayModel
 	local scoreSystemEntry = rhythmModel.scoreEngine.scoreSystem.entry
 
-	replayModel.noteChartModel = noteChartModel
-	replayModel.modifierModel = modifierModel
-	local replayHash = replayModel:saveReplay()
+	local replayHash = self.replayModel:saveReplay()
 	local scoreEntry = self.scoreModel:insertScore(scoreSystemEntry, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
 
 	local base = rhythmModel.scoreEngine.scoreSystem.base
@@ -244,7 +241,6 @@ GameplayController.saveScore = function(self)
 	rhythmModel.scoreEngine.scoreEntry = scoreEntry
 	local config = self.configModel.configs.select
 	config.scoreEntryId = scoreEntry.id
-	self.selectModel:pullScore()
 end
 
 GameplayController.skip = function(self)

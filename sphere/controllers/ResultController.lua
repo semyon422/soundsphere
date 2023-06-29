@@ -19,6 +19,8 @@ ResultController.oldTimings = {
 }
 
 ResultController.load = function(self)
+	self.selectModel:pullScore()
+
 	local selectModel = self.selectModel
 	local scoreItemIndex = selectModel.scoreItemIndex
 	local scoreItem = selectModel.scoreItem

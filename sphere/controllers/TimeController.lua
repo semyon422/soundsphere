@@ -30,14 +30,14 @@ TimeController.updateOffsets = function(self)
 	rhythmModel:setVisualOffset(visualOffset)
 end
 
-TimeController.increaseTimeRate = function(self, delta)
-	if self.multiplayerModel.isPlaying then return end
-	local rhythmModel = self.rhythmModel
-	local timeEngine = rhythmModel.timeEngine
-	timeEngine:increaseTimeRate(delta)
-	rhythmModel.prohibitSavingScore = true
-	self.notificationModel:notify("rate: " .. timeEngine.timeRate)
-end
+-- TimeController.increaseTimeRate = function(self, delta)
+-- 	if self.multiplayerModel.isPlaying then return end
+-- 	local rhythmModel = self.rhythmModel
+-- 	local timeEngine = rhythmModel.timeEngine
+-- 	timeEngine:increaseTimeRate(delta)
+-- 	rhythmModel.prohibitSavingScore = true
+-- 	self.notificationModel:notify("rate: " .. timeEngine.timeRate)
+-- end
 
 TimeController.increasePlaySpeed = function(self, delta)
 	local speedModel = self.speedModel

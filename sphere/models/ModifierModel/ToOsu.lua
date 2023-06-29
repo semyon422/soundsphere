@@ -14,15 +14,15 @@ ToOsu.description = "Convert to osu format"
 
 ToOsu.apply = function(self, config)
 	local nce = NoteChartExporter:new()
-	nce.noteChart = self.game.noteChartModel.noteChart
-	nce.noteChartEntry = self.game.noteChartModel.noteChartEntry
-	nce.noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry
+	nce.noteChart = self.noteChartModel.noteChart
+	nce.noteChartEntry = self.noteChartModel.noteChartEntry
+	nce.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
 
-	if not self.game.noteChartModel.noteChartEntry then
+	if not self.noteChartModel.noteChartEntry then
 		return
 	end
 
-	local path = self.game.noteChartModel.noteChartEntry.path
+	local path = self.noteChartModel.noteChartEntry.path
 	path = path:find("^.+/.$") and path:match("^(.+)/.$") or path
 	local fileName = path:match("^.+/(.-)$"):match("^(.+)%..-$")
 

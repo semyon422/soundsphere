@@ -13,8 +13,8 @@ ResultView.load = thread.coro(function(self)
 		return
 	end
 	loading = true
+	self.game.resultController:load()
 	if self.prevView == self.game.selectView then
-		self.game.resultController:load()
 		local selectModel = self.game.selectModel
 		local scoreItem = selectModel.scoreItem
 		if scoreItem then

@@ -33,8 +33,8 @@ TimeRateX.applyMeta = function(self, config, state)
 end
 
 TimeRateX.apply = function(self, config)
-	self.game.rhythmModel.timeEngine:createTimeRateHandler().timeRate = config.value
-	self.game.rhythmModel.timeEngine:resetTimeRate()
+	self.rhythmModel.timeEngine:createTimeRateHandler().timeRate = config.value
+	self.rhythmModel.timeEngine:resetTimeRate()
 end
 
 return TimeRateX

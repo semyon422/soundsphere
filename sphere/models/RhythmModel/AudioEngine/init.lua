@@ -55,12 +55,10 @@ end
 
 AudioEngine.playAudio = function(self, sounds, isBackground, stream, offset)
 	local currentTime = self.rhythmModel.timeEngine.currentTime
-	local aliases = self.rhythmModel.resourceModel.aliases
-	local resources = self.rhythmModel.resourceModel.resources
 	for i = 1, #sounds do
 		local mode = stream and self.mode.primary or self.mode.secondary
 
-		local soundData = resources[aliases[sounds[i][1]]]
+		local soundData = self.rhythmModel:getResource(sounds[i][1])
 		local audio = _audio:newAudio(soundData, mode)
 
 		if audio then

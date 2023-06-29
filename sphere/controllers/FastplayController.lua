@@ -59,8 +59,4 @@ FastplayController.unload = function(self)
 	rhythmModel:unload()
 end
 
-FastplayController.receive = function(self, event)
-	self.rhythmModel:receive(event)
-end
-
 return FastplayController
