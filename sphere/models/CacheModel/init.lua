@@ -2,6 +2,7 @@ local thread = require("thread")
 local Class = require("Class")
 local CacheManager = require("sphere.models.CacheModel.CacheManager")
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
+local ChartRepo = require("sphere.models.CacheModel.ChartRepo")
 
 local CacheModel = Class:new()
 
@@ -18,6 +19,8 @@ CacheModel.load = function(self)
 		cachePercent = 0,
 	}
 	self.shared = thread.shared.cache
+	self.chartRepo = ChartRepo:new()
+	self.chartRepo:load()
 end
 
 CacheModel.startUpdate = function(self, path, force, callback)

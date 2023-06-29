@@ -81,6 +81,7 @@ return {
 		"multiplayerModel",
 		"notificationModel",
 		"speedModel",
+		"cacheModel",
 	},
 
 	-- models
@@ -89,7 +90,10 @@ return {
 	backgroundModel = {"configModel"},
 	configModel = {},
 	cacheModel = {"configModel"},
-	collectionModel = {"configModel"},
+	collectionModel = {
+		"configModel",
+		"cacheModel",
+	},
 	discordModel = {},
 	difficultyModel = {},
 	editorModel = {
@@ -111,6 +115,7 @@ return {
 	noteChartModel = {
 		"configModel",
 		"scoreModel",
+		"cacheModel",
 	},
 	inputModel = {"configModel"},
 	noteChartSetLibraryModel = {

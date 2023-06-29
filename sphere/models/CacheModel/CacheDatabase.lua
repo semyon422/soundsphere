@@ -4,7 +4,6 @@ local Orm = require("sphere.Orm")
 local ObjectQuery = require("sphere.ObjectQuery")
 local ffi = require("ffi")
 local byte = require("byte")
-local utf8 = require("utf8")
 
 local CacheDatabase = {}
 
@@ -56,14 +55,6 @@ CacheDatabase.unload = function(self)
 	return self.db:close()
 end
 
-CacheDatabase.begin = function(self)
-	return self.db:begin()
-end
-
-CacheDatabase.commit = function(self)
-	return self.db:commit()
-end
-
 CacheDatabase.attachScores = function(self)
 	self.db:exec("ATTACH 'userdata/scores.db' AS scores_db")
 end
@@ -82,76 +73,6 @@ CacheDatabase.update = function(self)
 	for _, entryCache in pairs(self.entryCaches) do
 		entryCache:update()
 	end
-end
-
-----------------------------------------------------------------
-
-CacheDatabase.insertNoteChartEntry = function(self, entry)
-	return self.db:insert("noteCharts", entry, true)
-end
-
-CacheDatabase.updateNoteChartEntry = function(self, entry)
-	return self.db:update("noteCharts", entry, "path = ?", entry.path)
-end
-
-CacheDatabase.selectNoteChartEntry = function(self, path)
-	return self.db:select("noteCharts", "path = ?", path)[1]
-end
-
-CacheDatabase.selectNoteChartEntryById = function(self, id)
-	return self.db:select("noteCharts", "id = ?", id)[1]
-end
-
-CacheDatabase.deleteNoteChartEntry = function(self, path)
-	return self.db:delete("noteCharts", "path = ?", path)
-end
-
-CacheDatabase.getNoteChartsAtSet = function(self, setId)
-	return self.db:select("noteCharts", "setId = ?", setId)
-end
-
-----------------------------------------------------------------
-
-CacheDatabase.insertNoteChartSetEntry = function(self, entry)
-	return self.db:insert("noteChartSets", entry, true)
-end
-
-CacheDatabase.updateNoteChartSetEntry = function(self, entry)
-	return self.db:update("noteChartSets", entry, "path = ?", entry.path)
-end
-
-CacheDatabase.selectNoteChartSetEntry = function(self, path)
-	return self.db:select("noteChartSets", "path = ?", path)[1]
-end
-
-CacheDatabase.selectNoteChartSetEntryById = function(self, id)
-	return self.db:select("noteChartSets", "id = ?", id)[1]
-end
-
-CacheDatabase.deleteNoteChartSetEntry = function(self, path)
-	return self.db:delete("noteChartSets", "path = ?", path)
-end
-
-CacheDatabase.selectNoteChartSets = function(self, path)
-	return self.db:select("noteChartSets", "substr(path, 1, ?) = ?", utf8.len(path), path)
-end
-
-----------------------------------------------------------------
-
-CacheDatabase.insertNoteChartDataEntry = function(self, entry)
-	return self.db:insert("noteChartDatas", entry, true)
-end
-
-CacheDatabase.updateNoteChartDataEntry = function(self, entry)
-	return self.db:update("noteChartDatas", entry, "hash = ? and `index` = ?", entry.hash, entry.index)
-end
-
-CacheDatabase.selectNoteCharDataEntry = function(self, hash, index)
-	return self.db:select("noteChartDatas", "hash = ? and `index` = ?", hash, index)[1]
-end
-
-CacheDatabase.selectNoteChartDataEntryById = function(self, id)
-	return self.db:select("noteChartDatas", "id = ?", id)[1]
 end
 
 ----------------------------------------------------------------

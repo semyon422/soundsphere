@@ -1,4 +1,4 @@
-local CacheDatabase				= require("sphere.models.CacheModel.CacheDatabase")
+local ChartRepo				= require("sphere.models.CacheModel.ChartRepo")
 local NoteChartFinder				= require("sphere.models.CacheModel.NoteChartFinder")
 local DifficultyModel			= require("sphere.models.DifficultyModel")
 local NoteChartDataEntryFactory	= require("notechart.NoteChartDataEntryFactory")
@@ -15,20 +15,22 @@ CacheManager.construct = function(self)
 	self.log.path = "userdata/cache.log"
 
 	self.state = 0
+
+	self.chartRepo = ChartRepo:new()
 end
 
 CacheManager.getNoteChartSetEntry = function(self, entry)
-	local oldEntry = CacheDatabase:selectNoteChartSetEntry(entry.path)
+	local oldEntry = self.chartRepo:selectNoteChartSetEntry(entry.path)
 
 	if oldEntry and oldEntry.lastModified == entry.lastModified then
 		return oldEntry
 	end
 
 	if not oldEntry then
-		entry = CacheDatabase:insertNoteChartSetEntry(entry)
+		entry = self.chartRepo:insertNoteChartSetEntry(entry)
 	else
 		oldEntry.lastModified = entry.lastModified
-		CacheDatabase:updateNoteChartSetEntry(entry)
+		self.chartRepo:updateNoteChartSetEntry(entry)
 		entry = oldEntry
 	end
 
@@ -36,35 +38,35 @@ CacheManager.getNoteChartSetEntry = function(self, entry)
 end
 
 CacheManager.setNoteChartEntry = function(self, entry, isOldEntry)
-	local oldEntry = isOldEntry and entry or CacheDatabase:selectNoteChartEntry(entry.path)
+	local oldEntry = isOldEntry and entry or self.chartRepo:selectNoteChartEntry(entry.path)
 
 	if not oldEntry then
-		CacheDatabase:insertNoteChartEntry(entry)
+		self.chartRepo:insertNoteChartEntry(entry)
 	else
-		CacheDatabase:updateNoteChartEntry(entry)
+		self.chartRepo:updateNoteChartEntry(entry)
 	end
 end
 
 CacheManager.setNoteChartDataEntry = function(self, entry)
-	local oldEntry = CacheDatabase:selectNoteCharDataEntry(entry.hash, entry.index)
+	local oldEntry = self.chartRepo:selectNoteCharDataEntry(entry.hash, entry.index)
 
 	if not oldEntry then
-		CacheDatabase:insertNoteChartDataEntry(entry)
+		self.chartRepo:insertNoteChartDataEntry(entry)
 	else
-		CacheDatabase:updateNoteChartDataEntry(entry)
+		self.chartRepo:updateNoteChartDataEntry(entry)
 	end
 end
 
 ----------------------------------------------------------------
 
 CacheManager.deleteNoteChartEntry = function(self, entry)
-	CacheDatabase:deleteNoteChartEntry(entry.path)
+	self.chartRepo:deleteNoteChartEntry(entry.path)
 end
 
 CacheManager.deleteNoteChartSetEntry = function(self, entry)
-	CacheDatabase:deleteNoteChartSetEntry(entry.path)
+	self.chartRepo:deleteNoteChartSetEntry(entry.path)
 
-	local noteChartsAtSet = CacheDatabase:getNoteChartsAtSet(entry.id)
+	local noteChartsAtSet = self.chartRepo:getNoteChartsAtSet(entry.id)
 	for i = 1, #noteChartsAtSet do
 		self:deleteNoteChartEntry(noteChartsAtSet[i])
 	end
@@ -87,8 +89,8 @@ CacheManager.checkProgress = function(self)
 	if self.noteChartSetCount >= self.countNext then
 		self.countNext = self.countNext + self.countDelta
 
-		CacheDatabase:commit()
-		CacheDatabase:begin()
+		self.chartRepo:commit()
+		self.chartRepo:begin()
 	end
 
 	local thread = require("thread")
@@ -108,15 +110,15 @@ end
 
 CacheManager.generateCacheFull = function(self, path, force)
 	local path = path or "userdata/charts"
-	CacheDatabase:load()
+	self.chartRepo:load()
 
 	self:resetProgress()
 	self.state = 1
 	self:checkProgress()
 
-	CacheDatabase:begin()
+	self.chartRepo:begin()
 	self:lookup(path, false)
-	CacheDatabase:commit()
+	self.chartRepo:commit()
 
 	self.state = 2
 	self:checkProgress()
@@ -148,7 +150,7 @@ CacheManager.lookup = function(self, directoryPath, recursive)
 end
 
 CacheManager.checkNoteChartSetEntry = function(self, path)
-	local entry = CacheDatabase:selectNoteChartSetEntry(path)
+	local entry = self.chartRepo:selectNoteChartSetEntry(path)
 	if not entry then
 		return true
 	end
@@ -169,7 +171,7 @@ CacheManager.processNoteChartSet = function(self, noteChartSetPath)
 	})
 	self.noteChartSetCount = self.noteChartSetCount + 1
 
-	local cachedEntries = CacheDatabase:getNoteChartsAtSet(noteChartSetEntry.id)
+	local cachedEntries = self.chartRepo:getNoteChartsAtSet(noteChartSetEntry.id)
 	for i = 1, #cachedEntries do
 		local info = love.filesystem.getInfo(cachedEntries[i].path)
 		if not info then
@@ -183,7 +185,7 @@ end
 CacheManager.processNoteChartEntries = function(self, noteChartPath, noteChartSetEntry)
 	local info = love.filesystem.getInfo(noteChartPath)
 	local lastModified = info.modtime
-	local entry = CacheDatabase:selectNoteChartEntry(noteChartPath)
+	local entry = self.chartRepo:selectNoteChartEntry(noteChartPath)
 
 	if entry then
 		if entry.lastModified ~= lastModified then
@@ -206,9 +208,9 @@ CacheManager.processNoteChartEntries = function(self, noteChartPath, noteChartSe
 end
 
 CacheManager.generate = function(self, path, force)
-	local entries = CacheDatabase:selectNoteChartSets(path)
+	local entries = self.chartRepo:selectNoteChartSets(path)
 
-	CacheDatabase:begin()
+	self.chartRepo:begin()
 	for i = 1, #entries do
 		local status, err = xpcall(function()
 			return self:processNoteChartDataEntries(entries[i], force)
@@ -221,19 +223,19 @@ CacheManager.generate = function(self, path, force)
 		end
 
 		if i % 100 == 0 then
-			CacheDatabase:commit()
-			CacheDatabase:begin()
+			self.chartRepo:commit()
+			self.chartRepo:begin()
 		end
 
 		self.cachePercent = (i - 1) / #entries * 100
 		self:checkProgress()
 
 		if self.needStop then
-			CacheDatabase:commit()
+			self.chartRepo:commit()
 			return
 		end
 	end
-	CacheDatabase:commit()
+	self.chartRepo:commit()
 end
 
 CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, force)
@@ -242,7 +244,7 @@ CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, for
 		return self:deleteNoteChartSetEntry(noteChartSetEntry)
 	end
 
-	local noteChartEntries = CacheDatabase:getNoteChartsAtSet(noteChartSetEntry.id)
+	local noteChartEntries = self.chartRepo:getNoteChartsAtSet(noteChartSetEntry.id)
 
 	local newNoteChartEntries = {}
 	for i = 1, #noteChartEntries do
@@ -274,7 +276,7 @@ CacheManager.processNoteChartDataEntries = function(self, noteChartSetEntry, for
 		local hash = fileHash[path]
 		noteChartEntry.hash = hash
 
-		if not force and CacheDatabase:selectNoteCharDataEntry(hash, 1) then
+		if not force and self.chartRepo:selectNoteCharDataEntry(hash, 1) then
 			self:setNoteChartEntry(noteChartEntry)
 		else
 			local entries, noteCharts = NoteChartDataEntryFactory:getEntries(path, content, hash, noteChartEntry)

@@ -1,5 +1,4 @@
 local Class = require("Class")
-local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 
 local TimeController = Class:new()
 
@@ -52,7 +51,7 @@ end
 TimeController.increaseLocalOffset = function(self, delta)
 	local noteChartDataEntry = self.noteChartModel.noteChartDataEntry
 	noteChartDataEntry.localOffset = (noteChartDataEntry.localOffset or 0) + delta
-	CacheDatabase:updateNoteChartDataEntry(noteChartDataEntry)
+	self.cacheModel.chartRepo:updateNoteChartDataEntry(noteChartDataEntry)
 	self.notificationModel:notify("local offset: " .. noteChartDataEntry.localOffset * 1000 .. "ms")
 	self:updateOffsets()
 end

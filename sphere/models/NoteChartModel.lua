@@ -1,13 +1,12 @@
 local Class = require("Class")
 local NoteChartFactory			= require("notechart.NoteChartFactory")
-local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 
 local NoteChartModel = Class:new()
 
 NoteChartModel.load = function(self)
 	local config = self.configModel.configs.select
 
-	self.noteChartSetEntry = CacheDatabase:selectNoteChartSetEntryById(config.noteChartSetEntryId)
+	self.noteChartSetEntry = self.cacheModel.chartRepo:selectNoteChartSetEntryById(config.noteChartSetEntryId)
 	if not self.noteChartSetEntry then
 		self.noteChartEntry = nil
 		self.noteChartDataEntry = nil
@@ -15,14 +14,14 @@ NoteChartModel.load = function(self)
 		return
 	end
 
-	self.noteChartEntry = CacheDatabase:selectNoteChartEntryById(config.noteChartEntryId)
+	self.noteChartEntry = self.cacheModel.chartRepo:selectNoteChartEntryById(config.noteChartEntryId)
 	if not self.noteChartEntry then
 		self.noteChartDataEntry = nil
 		self.scoreEntry = nil
 		return
 	end
 
-	self.noteChartDataEntry = CacheDatabase:selectNoteChartDataEntryById(config.noteChartDataEntryId)
+	self.noteChartDataEntry = self.cacheModel.chartRepo:selectNoteChartDataEntryById(config.noteChartDataEntryId)
 	self.scoreEntry = self.scoreModel:getScoreEntryById(config.scoreEntryId)
 end
 
