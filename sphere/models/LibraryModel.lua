@@ -1,14 +1,15 @@
-local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 local TimedCache = require("TimedCache")
 local Class = require("Class")
 
 local LibraryModel = Class:new()
 
 LibraryModel.construct = function(self)
-	self.items = {}
 	self.itemsCount = 0
 	self.itemsCache = TimedCache:new()
-	self.entry = CacheDatabase.EntryStruct()
+	self.itemsCache.loadObject = function(_, key)
+		return self:loadObject(key)
+	end
+
 	self.items = newproxy(true)
 
 	local mt = getmetatable(self.items)
@@ -16,19 +17,17 @@ LibraryModel.construct = function(self)
 		if i < 1 or i > self.itemsCount then
 			return
 		end
-		return self:getItemByIndex(i)
+		return self.itemsCache:getObject(i)
 	end
 	mt.__len = function()
 		return self.itemsCount
 	end
 end
 
+LibraryModel.loadObject = function(self, key) end
+
 LibraryModel.update = function(self)
 	self.itemsCache:update()
-end
-
-LibraryModel.getItemByIndex = function(self, itemIndex)
-	return self.itemsCache:getObject(itemIndex)
 end
 
 return LibraryModel

@@ -1,7 +1,7 @@
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 local LibraryModel = require("sphere.models.LibraryModel")
 
-local NoteChartLibraryModel = LibraryModel:new()
+local NoteChartLibraryModel = LibraryModel:extend()
 
 NoteChartLibraryModel.setId = 1
 
@@ -64,13 +64,16 @@ NoteChartItem.__index = function(self, k)
 	return noteChartData and noteChartData[k] or noteChart and noteChart[k]
 end
 
-NoteChartLibraryModel.load = function(self)
-	self.itemsCache.loadObject = function(_, itemIndex)
-		return setmetatable({
-			noteChartLibraryModel = self,
-			itemIndex = itemIndex,
-		}, NoteChartItem)
-	end
+NoteChartLibraryModel.construct = function(self)
+	LibraryModel.construct(self)
+	self.entry = CacheDatabase.EntryStruct()
+end
+
+NoteChartLibraryModel.loadObject = function(self, itemIndex)
+	return setmetatable({
+		noteChartLibraryModel = self,
+		itemIndex = itemIndex,
+	}, NoteChartItem)
 end
 
 NoteChartLibraryModel.clear = function(self)
