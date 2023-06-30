@@ -24,26 +24,15 @@ WindUp.apply = function(self, config)
 		return
 	end
 	self.timeRateHandler = self.rhythmModel.timeEngine:createTimeRateHandler()
-end
+	self.timeRateHandler.getTimeRate = function(self)
+		local timeEngine = self.timeEngine
+		local startTime = timeEngine.noteChart.metaData.minTime
+		local endTime = timeEngine.noteChart.metaData.maxTime
+		local currentTime = timeEngine.currentTime
 
-WindUp.update = function(self, config)
-	if not config.value then
-		return
+		local timeRate = map(currentTime, startTime, endTime, 0.75, 1.5)
+		return math.min(math.max(timeRate, 0.75), 1.5)
 	end
-
-	local timeEngine = self.rhythmModel.timeEngine
-	local startTime = timeEngine.noteChart.metaData.minTime
-	local endTime = timeEngine.noteChart.metaData.maxTime
-	local currentTime = timeEngine.currentTime
-
-	if not timeEngine.timer.isPlaying then
-		return
-	end
-
-	local timeRate = map(currentTime, startTime, endTime, 0.75, 1.5)
-	timeRate = math.min(math.max(timeRate, 0.75), 1.5)
-	self.timeRateHandler.timeRate = timeRate
-	timeEngine:resetTimeRate()
 end
 
 return WindUp

@@ -167,6 +167,17 @@ local function Cells(self)
 	TextCellImView(w, h, "right", "difficulty", Format.difficulty(difficulty))
 	TextCellImView(w, h, "right", "miss count", missCount)
 	just.row()
+
+	w, h = Layout:move("column2row1")
+	love.graphics.translate(0, h / 2 - 55)
+	if imgui.TextOnlyButton("play auto", "AP", 55, 55) then
+		self.game.rhythmModel:setAutoplay(true)
+		self:play()
+	end
+	if imgui.TextOnlyButton("play pro", "PM", 55, 55) then
+		self.game.rhythmModel:setPromode(true)
+		self:play()
+	end
 end
 
 local bannerGradient

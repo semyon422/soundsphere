@@ -34,7 +34,6 @@ end
 
 TimeRateX.apply = function(self, config)
 	self.rhythmModel.timeEngine:createTimeRateHandler().timeRate = config.value
-	self.rhythmModel.timeEngine:resetTimeRate()
 end
 
 return TimeRateX

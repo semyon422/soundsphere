@@ -1,8 +1,6 @@
 local Class			= require("Class")
 local InputMode			= require("ncdk.InputMode")
 
-local AutoPlay		= require("sphere.models.ModifierModel.AutoPlay")
-local ProMode		= require("sphere.models.ModifierModel.ProMode")
 local AutoKeySound	= require("sphere.models.ModifierModel.AutoKeySound")
 local SpeedMode		= require("sphere.models.ModifierModel.SpeedMode")
 local TimeRateQ		= require("sphere.models.ModifierModel.TimeRateQ")
@@ -27,8 +25,6 @@ local LessChord	= require("sphere.models.ModifierModel.LessChord")
 local ModifierModel = Class:new()
 
 local Modifiers = {
-	AutoPlay,
-	ProMode,
 	AutoKeySound,
 	SpeedMode,
 	TimeRateQ,
@@ -52,8 +48,8 @@ local Modifiers = {
 }
 
 local ModifierId = {
-	[AutoPlay] = 0,
-	[ProMode] = 1,
+	-- [AutoPlay] = 0,
+	-- [ProMode] = 1,
 	[AutoKeySound] = 2,
 	[SpeedMode] = 3,
 	[TimeRateQ] = 4,
@@ -79,8 +75,6 @@ local ModifierId = {
 }
 
 local OneUseModifiers = {
-	AutoPlay,
-	ProMode,
 	AutoKeySound,
 	SpeedMode,
 	TimeRateQ,
@@ -283,23 +277,23 @@ ModifierModel.applyMeta = function(self, state)
 	end
 end
 
-ModifierModel.update = function(self)
-	for _, modifierConfig in ipairs(self.config) do
-		local modifier = self:getModifier(modifierConfig)
-		if modifier then
-			modifier:update(modifierConfig)
-		end
-	end
-end
+-- ModifierModel.update = function(self)
+-- 	for _, modifierConfig in ipairs(self.config) do
+-- 		local modifier = self:getModifier(modifierConfig)
+-- 		if modifier then
+-- 			modifier:update(modifierConfig)
+-- 		end
+-- 	end
+-- end
 
-ModifierModel.receive = function(self, event)
-	for _, modifierConfig in ipairs(self.config) do
-		local modifier = self:getModifier(modifierConfig)
-		if modifier then
-			modifier:receive(modifierConfig, event)
-		end
-	end
-end
+-- ModifierModel.receive = function(self, event)
+-- 	for _, modifierConfig in ipairs(self.config) do
+-- 		local modifier = self:getModifier(modifierConfig)
+-- 		if modifier then
+-- 			modifier:receive(modifierConfig, event)
+-- 		end
+-- 	end
+-- end
 
 ModifierModel.getString = function(self, config)
 	config = config or self.config

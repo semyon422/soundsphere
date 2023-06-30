@@ -9,14 +9,12 @@ FastplayController.play = function(self)
 	local replayModel = self.replayModel
 	local timeEngine = rhythmModel.timeEngine
 
-	timeEngine:resetTimeRate()
 	timeEngine:play()
 	timeEngine.currentTime = math.huge
 	replayModel.currentTime = math.huge
 	replayModel:update()
 	rhythmModel.logicEngine:update()
 	rhythmModel.scoreEngine:update()
-	self.modifierModel:update()
 
 	self:unload()
 end

@@ -11,6 +11,8 @@ TimeEngine.construct = function(self)
 
 	self.timer = TimeManager:new()
 	self.timer.timeEngine = self
+
+	self.timeRateHandlers = {}
 end
 
 TimeEngine.currentTime = 0
@@ -19,7 +21,6 @@ TimeEngine.timeRate = 1
 TimeEngine.targetTimeRate = 1
 TimeEngine.inputOffset = 0
 TimeEngine.visualOffset = 0
-TimeEngine.baseTimeRate = 1
 
 TimeEngine.load = function(self)
 	self.startTime = -self.timeToPrepare
@@ -27,12 +28,10 @@ TimeEngine.load = function(self)
 	self.currentVisualTime = self.startTime
 	self.timeRate = 1
 	self.targetTimeRate = 1
-	self.baseTimeRate = 1
 
 	self.timer:reset()
 	self:loadTimePoints()
 	self:resetTimeRateHandlers()
-
 
 	if self.noteChart then
 		self.minTime = self.noteChart.metaData.minTime
@@ -49,7 +48,10 @@ TimeEngine.resetTimeRateHandlers = function(self)
 end
 
 TimeEngine.createTimeRateHandler = function(self)
-	local timeRateHandler = {timeRate = 1}
+	local timeRateHandler = {
+		timeRate = 1,
+		timeEngine = self,
+	}
 
 	local timeRateHandlers = self.timeRateHandlers
 	timeRateHandlers[#timeRateHandlers + 1] = timeRateHandler
@@ -57,21 +59,27 @@ TimeEngine.createTimeRateHandler = function(self)
 	return timeRateHandler
 end
 
-TimeEngine.getBaseTimeRate = function(self)
+TimeEngine.getBaseTimeRate = function(self, allowDynamic)
 	local timeRate = 1
 	local timeRateHandlers = self.timeRateHandlers
 	for i = 1, #timeRateHandlers do
-		timeRate = timeRate * timeRateHandlers[i].timeRate
+		local handler = timeRateHandlers[i]
+		local tr = handler.timeRate
+		if allowDynamic and handler.getTimeRate then
+			tr = handler:getTimeRate()
+		end
+		timeRate = timeRate * tr
 	end
-	self.baseTimeRate = timeRate
 	return timeRate
 end
 
 TimeEngine.resetTimeRate = function(self)
-	self:setTimeRate(self:getBaseTimeRate())
+	self:setTimeRate(self:getBaseTimeRate(true))
 end
 
 TimeEngine.sync = function(self, event)
+	self:resetTimeRate()
+
 	local timer = self.timer
 
 	timer.eventTime = event.time

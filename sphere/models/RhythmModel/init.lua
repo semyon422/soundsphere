@@ -76,9 +76,6 @@ RhythmModel.loadAllEngines = function(self)
 
 	scoreEngine:load()
 	audioEngine:load()
-
-	modifierModel:apply("LogicEngineModifier")
-
 	logicEngine:load()
 	graphicEngine:load()
 
@@ -94,9 +91,6 @@ RhythmModel.loadLogicEngines = function(self)
 	timeEngine:load()
 	modifierModel:apply("TimeEngineModifier")
 	timeEngine:updateTimeToPrepare()
-
-	modifierModel:apply("LogicEngineModifier")
-
 	scoreEngine:load()
 	logicEngine:load()
 end
@@ -127,7 +121,6 @@ RhythmModel.receive = function(self, event)
 		return
 	end
 
-	self.modifierModel:receive(event)
 	self.inputManager:receive(event)
 end
 
@@ -136,7 +129,6 @@ RhythmModel.update = function(self, dt)
 	self.audioEngine:update()
 	self.scoreEngine:update()
 	self.graphicEngine:update(dt)
-	self.modifierModel:update()
 	self.pauseManager:update(dt)
 end
 
@@ -144,6 +136,14 @@ RhythmModel.getResource = function(self, s)
 	local aliases = self.resourceModel.aliases
 	local resources = self.resourceModel.resources
 	return resources[aliases[s]]
+end
+
+RhythmModel.setAutoplay = function(self, autoplay)
+	self.logicEngine.autoplay = autoplay
+end
+
+RhythmModel.setPromode = function(self, promode)
+	self.logicEngine.promode = promode
 end
 
 RhythmModel.setNoteChart = function(self, noteChart)

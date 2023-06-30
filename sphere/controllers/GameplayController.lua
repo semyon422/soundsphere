@@ -256,14 +256,12 @@ GameplayController.skip = function(self)
 		rhythmModel.prohibitSavingScore = true
 	end
 
-	timeEngine:resetTimeRate()
 	timeEngine:play()
 	timeEngine.currentTime = math.huge
 	self.replayModel.currentTime = math.huge
 	self.replayModel:update()
 	rhythmModel.logicEngine:update()
 	rhythmModel.scoreEngine:update()
-	self.modifierModel:update()
 end
 
 GameplayController.skipIntro = function(self)
