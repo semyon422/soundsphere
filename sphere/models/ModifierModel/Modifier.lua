@@ -90,9 +90,8 @@ Modifier.setValue = function(self, config, value)
 end
 
 Modifier.applyMeta = function(self, modifierConfig, state) end
-
+Modifier.apply = function(self, modifierConfig, state) end
 Modifier.update = function(self) end
-
 Modifier.receive = function(self, event) end
 
 Modifier.checkValue = function(self, value)

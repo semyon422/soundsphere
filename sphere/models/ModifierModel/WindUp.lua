@@ -19,20 +19,11 @@ WindUp.getString = function(self, config)
 	return Modifier.getString(self)
 end
 
-WindUp.apply = function(self, config)
+WindUp.applyMeta = function(self, config, state)
 	if not config.value then
 		return
 	end
-	self.timeRateHandler = self.rhythmModel.timeEngine:createTimeRateHandler()
-	self.timeRateHandler.getTimeRate = function(self)
-		local timeEngine = self.timeEngine
-		local startTime = timeEngine.noteChart.metaData.minTime
-		local endTime = timeEngine.noteChart.metaData.maxTime
-		local currentTime = timeEngine.currentTime
-
-		local timeRate = map(currentTime, startTime, endTime, 0.75, 1.5)
-		return math.min(math.max(timeRate, 0.75), 1.5)
-	end
+	state.windUp = {0.75, 1.5}
 end
 
 return WindUp

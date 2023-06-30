@@ -17,14 +17,15 @@ GameplayController.load = function(self)
 
 	local noteChart = noteChartModel:loadNoteChart(self:getImporterSettings())
 	modifierModel:apply("NoteChartModifier")
-
-	self.modifierModel.noteChart = noteChart
+	modifierModel:apply("TimeEngineModifier")
 
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
 	noteSkin:loadData()
 
 	local config = configModel.configs.settings
 
+	rhythmModel:setTimeRate(modifierModel.state.timeRate)
+	rhythmModel:setWindUp(modifierModel.state.windUp)
 	rhythmModel:setVolume(config.audio.volume)
 	rhythmModel:setAudioMode(config.audio.mode)
 	rhythmModel:setLongNoteShortening(config.gameplay.longNoteShortening)
@@ -135,7 +136,7 @@ GameplayController.discordPlay = function(self)
 			noteChartDataEntry.title,
 			noteChartDataEntry.name
 		),
-		endTimestamp = math.floor(os.time() + (length - rhythmModel.timeEngine.currentTime) / rhythmModel.timeEngine:getBaseTimeRate())
+		endTimestamp = math.floor(os.time() + (length - rhythmModel.timeEngine.currentTime) / rhythmModel.timeEngine.baseTimeRate)
 	})
 end
 
@@ -217,6 +218,7 @@ GameplayController.hasResult = function(self)
 		not rhythmModel.prohibitSavingScore and
 		not rhythmModel.logicEngine.autoplay and
 		not rhythmModel.logicEngine.promode and
+		not rhythmModel.timeEngine.windUp and
 		timeEngine.currentTime >= timeEngine.minTime and
 		base.hitCount > 0 and
 		entry.accuracy > 0 and
@@ -279,7 +281,7 @@ GameplayController.updateOffsets = function(self)
 	local config = self.configModel.configs.settings
 
 	local localOffset = noteChartDataEntry.localOffset or 0
-	local baseTimeRate = rhythmModel.timeEngine:getBaseTimeRate()
+	local baseTimeRate = rhythmModel.timeEngine.baseTimeRate
 	local inputOffset = config.gameplay.offset.input + localOffset
 	local visualOffset = config.gameplay.offset.visual + localOffset
 	if config.gameplay.offsetScale.input then

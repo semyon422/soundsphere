@@ -27,12 +27,16 @@ FastplayController.load = function(self)
 	noteChartModel:load()
 
 	local noteChart = noteChartModel:loadNoteChart()
+
+	modifierModel:apply("NoteChartModifier")
+	modifierModel:apply("TimeEngineModifier")
+
+	rhythmModel:setTimeRate(modifierModel.state.timeRate)
+	rhythmModel:setWindUp(modifierModel.state.windUp)
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
 
 	rhythmModel:load()
-
-	modifierModel:apply("NoteChartModifier")
 
 	local scoreEngine = rhythmModel.scoreEngine
 

@@ -102,7 +102,6 @@ return {
 	modifierModel = {
 		"configModel",
 		"game",
-		"rhythmModel",
 		"noteChartModel",
 	},
 	noteSkinModel = {"configModel"},
@@ -143,7 +142,6 @@ return {
 	updateModel = {"configModel"},
 	rhythmModel = {
 		"replayModel",
-		"modifierModel",
 		"inputModel",
 		"resourceModel",
 	},

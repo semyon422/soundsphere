@@ -1,4 +1,5 @@
 local Class				= require("Class")
+local math_util				= require("math_util")
 local Observable		= require("Observable")
 local TimeManager		= require("sphere.models.RhythmModel.TimeEngine.TimeManager")
 
@@ -11,27 +12,29 @@ TimeEngine.construct = function(self)
 
 	self.timer = TimeManager:new()
 	self.timer.timeEngine = self
-
-	self.timeRateHandlers = {}
 end
 
+TimeEngine.startTime = 0
 TimeEngine.currentTime = 0
 TimeEngine.currentVisualTime = 0
 TimeEngine.timeRate = 1
 TimeEngine.targetTimeRate = 1
+TimeEngine.baseTimeRate = 1
 TimeEngine.inputOffset = 0
 TimeEngine.visualOffset = 0
+TimeEngine.windUp = nil
 
 TimeEngine.load = function(self)
-	self.startTime = -self.timeToPrepare
-	self.currentTime = self.startTime
-	self.currentVisualTime = self.startTime
-	self.timeRate = 1
-	self.targetTimeRate = 1
-
 	self.timer:reset()
+	self.timer:setRate(self.timeRate)
 	self:loadTimePoints()
-	self:resetTimeRateHandlers()
+
+	local t = -self.timeToPrepare * self.baseTimeRate
+	self.timer:setPosition(t)
+
+	self.startTime = t
+	self.currentTime = t
+	self.currentVisualTime = t
 
 	if self.noteChart then
 		self.minTime = self.noteChart.metaData.minTime
@@ -39,51 +42,15 @@ TimeEngine.load = function(self)
 	end
 end
 
-TimeEngine.updateTimeToPrepare = function(self)
-	self.timer:setPosition(-self.timeToPrepare * self:getBaseTimeRate())
-end
-
-TimeEngine.resetTimeRateHandlers = function(self)
-	self.timeRateHandlers = {}
-end
-
-TimeEngine.createTimeRateHandler = function(self)
-	local timeRateHandler = {
-		timeRate = 1,
-		timeEngine = self,
-	}
-
-	local timeRateHandlers = self.timeRateHandlers
-	timeRateHandlers[#timeRateHandlers + 1] = timeRateHandler
-
-	return timeRateHandler
-end
-
-TimeEngine.getBaseTimeRate = function(self, allowDynamic)
-	local timeRate = 1
-	local timeRateHandlers = self.timeRateHandlers
-	for i = 1, #timeRateHandlers do
-		local handler = timeRateHandlers[i]
-		local tr = handler.timeRate
-		if allowDynamic and handler.getTimeRate then
-			tr = handler:getTimeRate()
-		end
-		timeRate = timeRate * tr
-	end
-	return timeRate
-end
-
-TimeEngine.resetTimeRate = function(self)
-	self:setTimeRate(self:getBaseTimeRate(true))
-end
-
 TimeEngine.sync = function(self, event)
-	self:resetTimeRate()
-
 	local timer = self.timer
 
 	timer.eventTime = event.time
 	timer.eventDelta = event.dt
+
+	if self.windUp then
+		self:updateWindUp()
+	end
 
 	if self.timeRate ~= self.targetTimeRate then
 		timer:setRate(self.timeRate)
@@ -113,6 +80,18 @@ TimeEngine.skipIntro = function(self)
 	if self.currentTime < skipTime and self.timer.isPlaying then
 		self:setPosition(skipTime)
 	end
+end
+
+TimeEngine.updateWindUp = function(self)
+	local startTime = self.noteChart.metaData.minTime
+	local endTime = self.noteChart.metaData.maxTime
+	local currentTime = self.currentTime
+
+	local a, b = unpack(self.windUp)
+	local timeRate = math_util.map(currentTime, startTime, endTime, a, b)
+	timeRate = math.min(math.max(timeRate, a), b)
+
+	self:setTimeRate(timeRate * self.baseTimeRate)
 end
 
 TimeEngine.increaseTimeRate = function(self, delta)
@@ -145,6 +124,11 @@ end
 
 TimeEngine.play = function(self)
 	self.timer:play()
+end
+
+TimeEngine.setBaseTimeRate = function(self, timeRate)
+	self.baseTimeRate = timeRate
+	self:setTimeRate(timeRate)
 end
 
 TimeEngine.setTimeRate = function(self, timeRate)

@@ -15,7 +15,7 @@ ScoreEngine.load = function(self)
 	scoreSystem:load()
 
 	self.inputMode = tostring(self.noteChart.inputMode)
-	self.baseTimeRate = self.rhythmModel.timeEngine:getBaseTimeRate()
+	self.baseTimeRate = self.rhythmModel.timeEngine.baseTimeRate
 
 	self.enps = self.baseEnps * self.baseTimeRate
 

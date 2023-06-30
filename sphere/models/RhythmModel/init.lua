@@ -63,7 +63,6 @@ RhythmModel.unload = function(self)
 end
 
 RhythmModel.loadAllEngines = function(self)
-	local modifierModel = self.modifierModel
 	local timeEngine = self.timeEngine
 	local scoreEngine = self.scoreEngine
 	local audioEngine = self.audioEngine
@@ -71,9 +70,6 @@ RhythmModel.loadAllEngines = function(self)
 	local graphicEngine = self.graphicEngine
 
 	timeEngine:load()
-	modifierModel:apply("TimeEngineModifier")
-	timeEngine:updateTimeToPrepare()
-
 	scoreEngine:load()
 	audioEngine:load()
 	logicEngine:load()
@@ -83,14 +79,11 @@ RhythmModel.loadAllEngines = function(self)
 end
 
 RhythmModel.loadLogicEngines = function(self)
-	local modifierModel = self.modifierModel
 	local timeEngine = self.timeEngine
 	local scoreEngine = self.scoreEngine
 	local logicEngine = self.logicEngine
 
 	timeEngine:load()
-	modifierModel:apply("TimeEngineModifier")
-	timeEngine:updateTimeToPrepare()
 	scoreEngine:load()
 	logicEngine:load()
 end
@@ -136,6 +129,14 @@ RhythmModel.getResource = function(self, s)
 	local aliases = self.resourceModel.aliases
 	local resources = self.resourceModel.resources
 	return resources[aliases[s]]
+end
+
+RhythmModel.setWindUp = function(self, windUp)
+	self.timeEngine.windUp = windUp
+end
+
+RhythmModel.setTimeRate = function(self, timeRate)
+	self.timeEngine:setBaseTimeRate(timeRate)
 end
 
 RhythmModel.setAutoplay = function(self, autoplay)
