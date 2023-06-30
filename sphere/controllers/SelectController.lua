@@ -2,6 +2,7 @@ local Class = require("Class")
 local thread = require("thread")
 local InputMode = require("ncdk.InputMode")
 local SPH = require("sph.SPH")
+local NoteChartExporter = require("osu.NoteChartExporter")
 
 local SelectController = Class:new()
 
@@ -168,6 +169,30 @@ SelectController.filedropped = function(self, file)
 	})))
 
 	self.cacheModel:startUpdate(chartSetPath, true)
+end
+
+SelectController.exportToOsu = function(self)
+	local nce = NoteChartExporter:new()
+
+	local noteChartModel = self.noteChartModel
+	noteChartModel:load()
+	noteChartModel:loadNoteChart()
+
+	self.modifierModel:apply(noteChartModel.noteChart)
+
+	nce.noteChart = noteChartModel.noteChart
+	nce.noteChartEntry = noteChartModel.noteChartEntry
+	nce.noteChartDataEntry = noteChartModel.noteChartDataEntry
+
+	if not noteChartModel.noteChartEntry then
+		return
+	end
+
+	local path = noteChartModel.noteChartEntry.path
+	path = path:find("^.+/.$") and path:match("^(.+)/.$") or path
+	local fileName = path:match("^.+/(.-)$"):match("^(.+)%..-$")
+
+	return assert(love.filesystem.write(("userdata/export/%s.osu"):format(fileName), nce:export()))
 end
 
 return SelectController

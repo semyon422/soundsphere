@@ -16,8 +16,7 @@ GameplayController.load = function(self)
 	noteChartModel:load()
 
 	local noteChart = noteChartModel:loadNoteChart(self:getImporterSettings())
-	modifierModel:apply("NoteChartModifier")
-	modifierModel:apply("TimeEngineModifier")
+	modifierModel:apply(noteChart)
 
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
 	noteSkin:loadData()

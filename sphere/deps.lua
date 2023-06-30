@@ -101,8 +101,6 @@ return {
 	onlineModel = {"configModel"},
 	modifierModel = {
 		"configModel",
-		"game",
-		"noteChartModel",
 	},
 	noteSkinModel = {"configModel"},
 	noteChartModel = {

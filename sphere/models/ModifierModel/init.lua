@@ -19,7 +19,6 @@ local Mirror		= require("sphere.models.ModifierModel.Mirror")
 local Random		= require("sphere.models.ModifierModel.Random")
 local BracketSwap	= require("sphere.models.ModifierModel.BracketSwap")
 local FullLongNote	= require("sphere.models.ModifierModel.FullLongNote")
-local ToOsu			= require("sphere.models.ModifierModel.ToOsu")
 local LessChord	= require("sphere.models.ModifierModel.LessChord")
 
 local ModifierModel = Class:new()
@@ -44,7 +43,6 @@ local Modifiers = {
 	LessChord,
 	FullLongNote,
 	MinLnLength,
-	ToOsu,
 }
 
 local ModifierId = {
@@ -69,7 +67,7 @@ local ModifierId = {
 	[BracketSwap] = 18,
 	[FullLongNote] = 19,
 	[MinLnLength] = 20,
-	[ToOsu] = 21,
+	-- [ToOsu] = 21,
 	[Alternate2] = 22,
 	[LessChord] = 23,
 }
@@ -254,12 +252,11 @@ ModifierModel.increaseModifierValue = function(self, modifierConfig, delta)
 	self.changed = true
 end
 
-ModifierModel.apply = function(self, modifierType)
+ModifierModel.apply = function(self, noteChart)
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
-		if modifier and modifier.type == modifierType then
-			modifier.noteChartModel = self.game.noteChartModel
-			modifier.noteChart = self.game.noteChartModel.noteChart
+		if modifier then
+			modifier.noteChart = noteChart
 			modifier:apply(modifierConfig)
 		end
 	end
@@ -274,24 +271,6 @@ ModifierModel.applyMeta = function(self, state)
 		end
 	end
 end
-
--- ModifierModel.update = function(self)
--- 	for _, modifierConfig in ipairs(self.config) do
--- 		local modifier = self:getModifier(modifierConfig)
--- 		if modifier then
--- 			modifier:update(modifierConfig)
--- 		end
--- 	end
--- end
-
--- ModifierModel.receive = function(self, event)
--- 	for _, modifierConfig in ipairs(self.config) do
--- 		local modifier = self:getModifier(modifierConfig)
--- 		if modifier then
--- 			modifier:receive(modifierConfig, event)
--- 		end
--- 	end
--- end
 
 ModifierModel.getString = function(self, config)
 	config = config or self.config

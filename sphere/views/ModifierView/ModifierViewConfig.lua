@@ -51,6 +51,15 @@ local function AvailableModifierScrollBar(self)
 	end
 end
 
+local function Buttons(self)
+	love.graphics.replaceTransform(gfx_util.transform(transform))
+	love.graphics.translate(279 + 454 * 2, 144 + 72 * 10)
+
+	if imgui.TextButton("export to osu", "export to osu", 200, 72) then
+		self.game.selectController:exportToOsu()
+	end
+end
+
 local function Rectangle(self)
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.setColor(1, 1, 1, 1)
@@ -66,4 +75,5 @@ return function(self)
 	ModifierList(self)
 	AvailableModifierScrollBar(self)
 	Rectangle(self)
+	Buttons(self)
 end
