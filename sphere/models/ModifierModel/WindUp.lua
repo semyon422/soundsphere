@@ -41,6 +41,7 @@ WindUp.update = function(self, config)
 	end
 
 	local timeRate = map(currentTime, startTime, endTime, 0.75, 1.5)
+	timeRate = math.min(math.max(timeRate, 0.75), 1.5)
 	self.timeRateHandler.timeRate = timeRate
 	timeEngine:resetTimeRate()
 end
