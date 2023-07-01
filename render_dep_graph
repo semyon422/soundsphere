@@ -1,54 +1,60 @@
 #!/bin/luajit
 local deps = require("sphere.deps")
 
-local exclude_nodes = {
-	"game",
-	"configModel",
-}
-for _, v in ipairs(exclude_nodes) do
-	exclude_nodes[v] = true
-	deps[v] = nil
+local graph = {}
+for n, list in pairs(deps) do
+	for _, m in ipairs(list) do
+		table.insert(graph, {n, m})
+	end
 end
 
-for k, list in pairs(deps) do
-	for i = 1, #list do
-		if exclude_nodes[list[i]] then
-			table.remove(list, i)
+table.sort(graph, function(a, b)
+	if a[1] == b[1] then
+		return a[2] < b[2]
+	end
+	return a[1] < b[1]
+end)
+
+local function delete_node(n)
+	local i = 1
+	while i <= #graph do
+		local g = graph[i]
+		if g[1] == n or g[2] == n then
+			table.remove(graph, i)
+		else
+			i = i + 1
 		end
 	end
 end
 
-local function includes(t, v)
-	for _, _v in ipairs(t) do
-		if _v == v then
-			return true
+delete_node("game")
+
+local function get_rels()
+	local rels = {}
+	for _, g in ipairs(graph) do
+		local n, m = g[1], g[2]
+		rels[n] = rels[n] or {}
+		rels[m] = rels[m] or {}
+
+		rels[n]._out = true
+		rels[m]._in = true
+	end
+	return rels
+end
+
+for i = 1, 10 do
+	local rels = get_rels()
+	for n, d in pairs(rels) do
+		if d._in and not d._out then
+			delete_node(n)
 		end
 	end
 end
 
-local function get_above(name)
-	local out = {}
-	for k, v in pairs(deps) do
-		if includes(v, name) then
-			table.insert(out, k)
-		end
-	end
-	return out
-end
-
-local node_types = {}
-for k, list in pairs(deps) do
-	node_types[k] = node_types[k] or {}
-	if #list > 0 then
-		node_types[k]._out = true
-	end
-	if #get_above(k) > 0 then
-		node_types[k]._in = true
-	end
-end
+local rels = get_rels()
 
 local function get_color(name)
-	local t = node_types[name] or {}
+	local t = rels[name] or {}
 	if t._in and t._out then
 		return "#eeeeee"
 	elseif t._in then
@@ -62,17 +68,12 @@ end
 local buf = {}
 table.insert(buf, "digraph {")
 table.insert(buf, "overlap=prism")
-for k, w in pairs(deps) do
-	for _, v in ipairs(w) do
-		if not exclude_nodes[k] and not exclude_nodes[v] then
-			if #deps[k] > 0 and #deps[v] > 0 then
-				table.insert(buf, ("%s -> %s"):format(k, v))
+for _, g in ipairs(graph) do
+	local n, m = g[1], g[2]
+	table.insert(buf, ("%s -> %s"):format(n, m))
 
-				table.insert(buf, ("%s [style=filled, fillcolor=%q]"):format(k, get_color(k)))
-				table.insert(buf, ("%s [style=filled, fillcolor=%q]"):format(v, get_color(v)))
-			end
-		end
-	end
+	table.insert(buf, ("%s [style=filled, fillcolor=%q]"):format(n, get_color(n)))
+	table.insert(buf, ("%s [style=filled, fillcolor=%q]"):format(m, get_color(m)))
 end
 table.insert(buf, "}")
 
