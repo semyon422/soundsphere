@@ -13,6 +13,7 @@ GameplayController.load = function(self)
 	local configModel = self.configModel
 	local modifierModel = self.modifierModel
 	local difficultyModel = self.difficultyModel
+	local replayModel = self.replayModel
 
 	noteChartModel:load()
 
@@ -46,6 +47,9 @@ GameplayController.load = function(self)
 
 	rhythmModel.timings = config.gameplay.timings
 
+	replayModel.timings = rhythmModel.timings
+	rhythmModel.inputManager.observable:add(replayModel)
+
 	rhythmModel:load()
 
 	local scoreEngine = rhythmModel.scoreEngine
@@ -61,7 +65,6 @@ GameplayController.load = function(self)
 		time = love.timer.getTime(),
 		delta = 0,
 	})
-	assert(self.modifierModel.config)
 	rhythmModel:loadAllEngines()
 	self.replayModel:load()
 
@@ -267,7 +270,6 @@ GameplayController.skip = function(self)
 
 	timeEngine:play()
 	timeEngine.currentTime = math.huge
-	self.replayModel.currentTime = math.huge
 	self.replayModel:update()
 	rhythmModel.logicEngine:update()
 	rhythmModel.scoreEngine:update()

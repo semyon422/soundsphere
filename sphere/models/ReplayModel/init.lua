@@ -1,16 +1,11 @@
 local Class			= require("Class")
-local Observable	= require("Observable")
 local Replay		= require("sphere.models.ReplayModel.Replay")
 local md5			= require("md5")
 
 local ReplayModel = Class:new()
 
 ReplayModel.path = "userdata/replays"
-
-ReplayModel.construct = function(self)
-	self.observable = Observable:new()
-	self.mode = "record"
-end
+ReplayModel.mode = "record"
 
 ReplayModel.load = function(self)
 	if self.mode == "record" then
@@ -19,15 +14,10 @@ ReplayModel.load = function(self)
 		self.replay:reset()
 	end
 	self.replay.timeEngine = self.rhythmModel.timeEngine
-	self.currentTime = -math.huge
 end
 
 ReplayModel.setMode = function(self, mode)
 	self.mode = mode
-end
-
-ReplayModel.send = function(self, event)
-	return self.observable:send(event)
 end
 
 ReplayModel.receive = function(self, event)
@@ -44,10 +34,13 @@ ReplayModel.update = function(self)
 			return
 		end
 
+		local rhythmModel = self.rhythmModel
+		local timeEngine = rhythmModel.timeEngine
+
 		nextEvent.baseTime = nextEvent.baseTime or nextEvent.time
-		nextEvent.time = nextEvent.baseTime + self.rhythmModel.timeEngine.inputOffset
-		if self.currentTime >= nextEvent.time then
-			self:send(nextEvent)
+		nextEvent.time = nextEvent.baseTime + timeEngine.inputOffset
+		if timeEngine.currentTime >= nextEvent.time then
+			rhythmModel:receive(nextEvent)
 			replay:step()
 			return self:update()
 		end

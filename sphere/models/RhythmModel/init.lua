@@ -36,7 +36,6 @@ RhythmModel.construct = function(self)
 end
 
 RhythmModel.load = function(self)
-	local replayModel = self.replayModel
 	local scoreEngine = self.scoreEngine
 	local logicEngine = self.logicEngine
 
@@ -46,21 +45,11 @@ RhythmModel.load = function(self)
 	scoreEngine.settings = self.settings
 
 	logicEngine.timings = self.timings
-	replayModel.timings = self.timings
-
-	self.inputManager.observable:add(replayModel)
-	replayModel.observable:add(self.inputManager)
 
 	self.prohibitSavingScore = false
 end
 
-RhythmModel.unload = function(self)
-	local inputManager = self.inputManager
-	local replayModel = self.replayModel
-
-	inputManager.observable:remove(replayModel)
-	replayModel.observable:remove(inputManager)
-end
+RhythmModel.unload = function(self) end
 
 RhythmModel.loadAllEngines = function(self)
 	local timeEngine = self.timeEngine
@@ -110,7 +99,6 @@ end
 RhythmModel.receive = function(self, event)
 	if event.name == "framestarted" then
 		self.timeEngine:sync(event)
-		self.replayModel.currentTime = self.timeEngine.currentTime
 		return
 	end
 

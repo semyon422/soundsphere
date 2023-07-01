@@ -12,7 +12,6 @@ FastplayController.play = function(self)
 
 	timeEngine:play()
 	timeEngine.currentTime = math.huge
-	replayModel.currentTime = math.huge
 	replayModel:update()
 	rhythmModel.logicEngine:update()
 	rhythmModel.scoreEngine:update()
@@ -25,6 +24,7 @@ FastplayController.load = function(self)
 	local difficultyModel = self.difficultyModel
 	local rhythmModel = self.rhythmModel
 	local modifierModel = self.modifierModel
+	local replayModel = self.replayModel
 	noteChartModel:load()
 
 	local noteChart = noteChartModel:loadNoteChart()
@@ -41,6 +41,9 @@ FastplayController.load = function(self)
 	rhythmModel:setWindUp(modifierModel.state.windUp)
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel.noteChart = noteChart
+
+	replayModel.timings = rhythmModel.timings
+	rhythmModel.inputManager.observable:add(replayModel)
 
 	rhythmModel:load()
 

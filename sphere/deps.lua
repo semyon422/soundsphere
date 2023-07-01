@@ -139,7 +139,6 @@ return {
 	},
 	updateModel = {"configModel"},
 	rhythmModel = {
-		"replayModel",
 		"inputModel",
 		"resourceModel",
 	},
