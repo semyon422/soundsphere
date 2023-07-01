@@ -28,6 +28,7 @@ local function delete_node(n)
 end
 
 delete_node("game")
+delete_node("configModel")
 
 local function get_rels()
 	local rels = {}
@@ -42,7 +43,8 @@ local function get_rels()
 	return rels
 end
 
-for i = 1, 10 do
+for i = 1, 0 do
+-- for i = 1, 10 do
 	local rels = get_rels()
 	for n, d in pairs(rels) do
 		if d._in and not d._out then
