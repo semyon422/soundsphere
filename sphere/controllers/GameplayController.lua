@@ -1,5 +1,6 @@
-local Class						= require("Class")
-local FileFinder	= require("sphere.filesystem.FileFinder")
+local Class = require("Class")
+local FileFinder = require("sphere.filesystem.FileFinder")
+local InputMode = require("ncdk.InputMode")
 
 local GameplayController = Class:new()
 
@@ -16,6 +17,13 @@ GameplayController.load = function(self)
 	noteChartModel:load()
 
 	local noteChart = noteChartModel:loadNoteChart(self:getImporterSettings())
+
+	local state = {}
+	state.timeRate = 1
+	state.inputMode = InputMode:new()
+	state.inputMode:set(noteChart.inputMode)
+
+	modifierModel:applyMeta(state)
 	modifierModel:apply(noteChart)
 
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)

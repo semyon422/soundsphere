@@ -1,4 +1,5 @@
-local Class						= require("Class")
+local Class = require("Class")
+local InputMode = require("ncdk.InputMode")
 
 local FastplayController = Class:new()
 
@@ -28,6 +29,12 @@ FastplayController.load = function(self)
 
 	local noteChart = noteChartModel:loadNoteChart()
 
+	local state = {}
+	state.timeRate = 1
+	state.inputMode = InputMode:new()
+	state.inputMode:set(noteChart.inputMode)
+
+	modifierModel:applyMeta(state)
 	modifierModel:apply(noteChart)
 
 	rhythmModel:setTimeRate(modifierModel.state.timeRate)
