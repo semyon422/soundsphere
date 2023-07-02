@@ -109,7 +109,6 @@ GameplayController.unload = function(self)
 
 	local rhythmModel = self.rhythmModel
 	rhythmModel:unloadAllEngines()
-	rhythmModel:unload()
 	rhythmModel.inputManager:setMode("external")
 	self.replayModel:setMode("record")
 	love.mouse.setVisible(true)
@@ -178,7 +177,6 @@ GameplayController.retry = function(self)
 	self.replayModel:setMode("record")
 
 	rhythmModel:unloadAllEngines()
-	rhythmModel:unload()
 	rhythmModel:load()
 	rhythmModel.timeEngine:sync({
 		time = love.timer.getTime(),

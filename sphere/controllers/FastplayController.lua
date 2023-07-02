@@ -67,7 +67,6 @@ end
 FastplayController.unload = function(self)
 	local rhythmModel = self.rhythmModel
 	rhythmModel:unloadAllEngines()
-	rhythmModel:unload()
 end
 
 return FastplayController

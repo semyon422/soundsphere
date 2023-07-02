@@ -29,8 +29,6 @@ RhythmModel.construct = function(self)
 	self.graphicEngine.rhythmModel = self
 	self.observable.rhythmModel = self
 
-	-- self.logicEngine.observable:add(self.audioEngine)
-
 	self.inputManager.observable:add(self.logicEngine)
 	self.inputManager.observable:add(self.observable)
 end
@@ -39,7 +37,6 @@ RhythmModel.load = function(self)
 	local scoreEngine = self.scoreEngine
 	local logicEngine = self.logicEngine
 
-	scoreEngine.timings = self.timings
 	scoreEngine.judgements = self.judgements
 	scoreEngine.hp = self.hp
 	scoreEngine.settings = self.settings
@@ -47,32 +44,17 @@ RhythmModel.load = function(self)
 	logicEngine.timings = self.timings
 end
 
-RhythmModel.unload = function(self) end
-
 RhythmModel.loadAllEngines = function(self)
-	local timeEngine = self.timeEngine
-	local scoreEngine = self.scoreEngine
-	local audioEngine = self.audioEngine
-	local logicEngine = self.logicEngine
-	local graphicEngine = self.graphicEngine
-
-	timeEngine:load()
-	scoreEngine:load()
-	audioEngine:load()
-	logicEngine:load()
-	graphicEngine:load()
-
+	self:loadLogicEngines()
+	self.audioEngine:load()
+	self.graphicEngine:load()
 	self.pauseManager:load()
 end
 
 RhythmModel.loadLogicEngines = function(self)
-	local timeEngine = self.timeEngine
-	local scoreEngine = self.scoreEngine
-	local logicEngine = self.logicEngine
-
-	timeEngine:load()
-	scoreEngine:load()
-	logicEngine:load()
+	self.timeEngine:load()
+	self.scoreEngine:load()
+	self.logicEngine:load()
 end
 
 RhythmModel.unloadAllEngines = function(self)
