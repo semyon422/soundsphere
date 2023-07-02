@@ -51,25 +51,6 @@ local EditorView = require("sphere.views.EditorView")
 
 local GameController = Class:new()
 
-local injects = {}
-local function dinject(t, k, v)
-	local T = getmetatable(t).__index
-	local V = getmetatable(v).__index
-
-	local Tn, Vn
-	for mod, M in pairs(package.loaded) do
-		if M == T then
-			Tn = mod
-		elseif M == V then
-			Vn = mod
-		end
-	end
-
-	table.insert(injects, {Tn, Vn})
-
-	t[k] = v
-end
-
 local deps = require("sphere.deps")
 
 GameController.construct = function(self)
@@ -126,9 +107,9 @@ GameController.construct = function(self)
 	self.audioModel = AudioModel:new()
 	self.resourceModel = ResourceModel:new()
 
-	for k, w in pairs(deps) do
-		for _, v in ipairs(w) do
-			dinject(self[k], v, self[v])
+	for n, list in pairs(deps) do
+		for _, m in ipairs(list) do
+			self[n][m] = self[m]
 		end
 	end
 end
