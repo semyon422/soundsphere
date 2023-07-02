@@ -10,19 +10,16 @@ NoteChartModel.load = function(self)
 	if not self.noteChartSetEntry then
 		self.noteChartEntry = nil
 		self.noteChartDataEntry = nil
-		self.scoreEntry = nil
 		return
 	end
 
 	self.noteChartEntry = self.cacheModel.chartRepo:selectNoteChartEntryById(config.noteChartEntryId)
 	if not self.noteChartEntry then
 		self.noteChartDataEntry = nil
-		self.scoreEntry = nil
 		return
 	end
 
 	self.noteChartDataEntry = self.cacheModel.chartRepo:selectNoteChartDataEntryById(config.noteChartDataEntryId)
-	self.scoreEntry = self.scoreModel:getScoreEntryById(config.scoreEntryId)
 end
 
 NoteChartModel.loadNoteChart = function(self, settings)
@@ -56,10 +53,6 @@ NoteChartModel.loadNoteChart = function(self, settings)
 	self.noteChart = noteCharts[1]
 
 	return self.noteChart
-end
-
-NoteChartModel.unloadNoteChart = function(self)
-	self.noteChart = nil
 end
 
 return NoteChartModel

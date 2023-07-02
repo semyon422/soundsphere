@@ -105,7 +105,6 @@ return {
 	noteSkinModel = {"configModel"},
 	noteChartModel = {
 		"configModel",
-		"scoreModel",
 		"cacheModel",
 	},
 	inputModel = {"configModel"},
