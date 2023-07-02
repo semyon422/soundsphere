@@ -45,8 +45,6 @@ RhythmModel.load = function(self)
 	scoreEngine.settings = self.settings
 
 	logicEngine.timings = self.timings
-
-	self.prohibitSavingScore = false
 end
 
 RhythmModel.unload = function(self) end
@@ -117,6 +115,21 @@ RhythmModel.getResource = function(self, s)
 	local aliases = self.resourceModel.aliases
 	local resources = self.resourceModel.resources
 	return resources[aliases[s]]
+end
+
+RhythmModel.hasResult = function(self)
+	local timeEngine = self.timeEngine
+	local base = self.scoreEngine.scoreSystem.base
+	local entry = self.scoreEngine.scoreSystem.entry
+
+	return
+		not self.logicEngine.autoplay and
+		not self.logicEngine.promode and
+		not self.timeEngine.windUp and
+		timeEngine.currentTime >= timeEngine.minTime and
+		base.hitCount > 0 and
+		entry.accuracy > 0 and
+		entry.accuracy < math.huge
 end
 
 RhythmModel.setWindUp = function(self, windUp)

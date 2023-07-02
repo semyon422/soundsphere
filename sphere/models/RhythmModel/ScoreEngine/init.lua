@@ -21,9 +21,6 @@ ScoreEngine.load = function(self)
 
 	self.ratingDifficulty = self.enps * (1 + (self.longNoteRatio * (1 + self.longNoteArea)) * 0.25)
 
-	self.bpm = self.noteChartDataEntry.bpm * self.baseTimeRate
-	self.length = self.noteChartDataEntry.length / self.baseTimeRate
-
 	self.pausesCount = 0
 	self.paused = false
 

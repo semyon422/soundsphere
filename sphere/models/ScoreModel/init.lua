@@ -38,7 +38,7 @@ ScoreModel.getScoreEntryById = function(self, id)
 	return score and self:transformScoreEntry(score)
 end
 
-ScoreModel.insertScore = function(self, scoreSystemEntry, noteChartDataEntry, replayHash, modifierModel)
+ScoreModel.insertScore = function(self, scoreSystemEntry, noteChartDataEntry, replayHash, modifiers)
 	local score = ScoreDatabase:insertScore({
 		noteChartHash = noteChartDataEntry.hash,
 		noteChartIndex = noteChartDataEntry.index,
@@ -46,7 +46,7 @@ ScoreModel.insertScore = function(self, scoreSystemEntry, noteChartDataEntry, re
 		time = os.time(),
 		accuracy = scoreSystemEntry.accuracy,
 		maxCombo = scoreSystemEntry.maxCombo,
-		modifiers = modifierModel:encode(),
+		modifiers = modifiers,
 		replayHash = replayHash,
 		ratio = scoreSystemEntry.ratio,
 		perfect = scoreSystemEntry.perfect,

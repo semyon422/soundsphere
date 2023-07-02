@@ -1,5 +1,4 @@
 local Class				= require("Class")
-local Observable		= require("Observable")
 local json				= require("json")
 local ReplayNanoChart	= require("sphere.models.ReplayModel.ReplayNanoChart")
 local InputMode			= require("ncdk.InputMode")
@@ -8,7 +7,6 @@ local Replay = Class:new()
 
 Replay.construct = function(self)
 	self.replayNanoChart = ReplayNanoChart:new()
-	self.observable = Observable:new()
 	self.events = {}
 	self.eventOffset = 0
 end

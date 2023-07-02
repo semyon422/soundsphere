@@ -399,8 +399,8 @@ local function NotechartInfo(self)
 	local baseDifficulty = noteChartItem.difficulty
 	local baseInputMode = noteChartItem.inputMode
 
-	local bpm = show and scoreEngine.bpm or baseBpm * baseTimeRate
-	local length = show and scoreEngine.length or baseLength / baseTimeRate
+	local bpm = baseBpm * baseTimeRate
+	local length = baseLength / baseTimeRate
 	local difficulty = show and scoreEngine.enps or scoreItem.difficulty
 	local inputMode = show and scoreEngine.inputMode or scoreItem.inputMode
 

@@ -44,11 +44,7 @@ SelectController.update = function(self, dt)
 	self.previewModel:update(dt)
 	self.selectModel:update()
 
-	local graphics = self.configModel.configs.settings.graphics
-	local flags = graphics.mode.flags
-	if graphics.vsyncOnSelect and flags.vsync == 0 then
-		flags.vsync = self.windowModel.baseVsync
-	end
+	self.windowModel:setVsyncOnSelect(true)
 
 	local noteChartItem = self.selectModel.noteChartItem
 	if self.selectModel:isChanged() then
@@ -75,8 +71,7 @@ SelectController.update = function(self, dt)
 		self:applyModifierMeta()
 	end
 
-	local configModel = self.configModel
-	if #configModel.configs.online.token == 0 then
+	if #self.configModel.configs.online.token == 0 then
 		return
 	end
 

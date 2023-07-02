@@ -110,4 +110,18 @@ WindowModel.setIcon = function(self)
 	end
 end
 
+WindowModel.setVsyncOnSelect = function(self, enabled)
+	local graphics = self.configModel.configs.settings.graphics
+	if not graphics.vsyncOnSelect then
+		return
+	end
+	local flags = graphics.mode.flags
+	if not enabled then
+		self.baseVsync = flags.vsync ~= 0 and flags.vsync or 1
+		flags.vsync = 0
+	elseif flags.vsync == 0 then
+		flags.vsync = self.baseVsync
+	end
+end
+
 return WindowModel

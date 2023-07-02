@@ -47,7 +47,7 @@ GameplayController.load = function(self)
 
 	rhythmModel.timings = config.gameplay.timings
 
-	replayModel.timings = rhythmModel.timings
+	replayModel.timings = config.gameplay.timings
 	rhythmModel.inputManager.observable:add(replayModel)
 
 	rhythmModel:load()
@@ -59,14 +59,12 @@ GameplayController.load = function(self)
 	scoreEngine.longNoteRatio = longNoteRatio
 	scoreEngine.longNoteArea = longNoteArea
 
-	scoreEngine.noteChartDataEntry = noteChartModel.noteChartDataEntry
-
 	rhythmModel.timeEngine:sync({
 		time = love.timer.getTime(),
 		delta = 0,
 	})
 	rhythmModel:loadAllEngines()
-	self.replayModel:load()
+	replayModel:load()
 
 	self:updateOffsets()
 
@@ -85,12 +83,7 @@ GameplayController.load = function(self)
 
 	love.mouse.setVisible(false)
 
-	local graphics = config.graphics
-	local flags = graphics.mode.flags
-	if graphics.vsyncOnSelect then
-		self.windowModel.baseVsync = flags.vsync ~= 0 and flags.vsync or 1
-		flags.vsync = 0
-	end
+	self.windowModel:setVsyncOnSelect(false)
 
 	self.multiplayerModel:setIsPlaying(true)
 
@@ -121,11 +114,7 @@ GameplayController.unload = function(self)
 	self.replayModel:setMode("record")
 	love.mouse.setVisible(true)
 
-	local graphics = self.configModel.configs.settings.graphics
-	local flags = graphics.mode.flags
-	if graphics.vsyncOnSelect and flags.vsync == 0 then
-		flags.vsync = self.windowModel.baseVsync
-	end
+	self.windowModel:setVsyncOnSelect(true)
 
 	self.multiplayerModel:setIsPlaying(false)
 end
@@ -139,6 +128,8 @@ GameplayController.discordPlay = function(self)
 	local noteChartDataEntry = self.noteChartModel.noteChartDataEntry
 	local rhythmModel = self.rhythmModel
 	local length = math.min(noteChartDataEntry.length, 3600 * 24)
+
+	local timeEngine = rhythmModel.timeEngine
 	self.discordModel:setPresence({
 		state = "Playing",
 		details = ("%s - %s [%s]"):format(
@@ -146,7 +137,7 @@ GameplayController.discordPlay = function(self)
 			noteChartDataEntry.title,
 			noteChartDataEntry.name
 		),
-		endTimestamp = math.floor(os.time() + (length - rhythmModel.timeEngine.currentTime) / rhythmModel.timeEngine.baseTimeRate)
+		endTimestamp = math.floor(os.time() + (length - timeEngine.currentTime) / timeEngine.baseTimeRate)
 	})
 end
 
@@ -218,22 +209,7 @@ GameplayController.saveCamera = function(self, x, y, z, pitch, yaw)
 end
 
 GameplayController.hasResult = function(self)
-	local rhythmModel = self.rhythmModel
-	local replayModel = self.replayModel
-	local timeEngine = rhythmModel.timeEngine
-	local base = rhythmModel.scoreEngine.scoreSystem.base
-	local entry = rhythmModel.scoreEngine.scoreSystem.entry
-
-	return
-		not rhythmModel.prohibitSavingScore and
-		not rhythmModel.logicEngine.autoplay and
-		not rhythmModel.logicEngine.promode and
-		not rhythmModel.timeEngine.windUp and
-		timeEngine.currentTime >= timeEngine.minTime and
-		base.hitCount > 0 and
-		entry.accuracy > 0 and
-		entry.accuracy < math.huge and
-		replayModel.mode ~= "replay"
+	return self.rhythmModel:hasResult() and self.replayModel.mode ~= "replay"
 end
 
 GameplayController.saveScore = function(self)
@@ -243,7 +219,12 @@ GameplayController.saveScore = function(self)
 	local scoreSystemEntry = rhythmModel.scoreEngine.scoreSystem.entry
 
 	local replayHash = self.replayModel:saveReplay()
-	local scoreEntry = self.scoreModel:insertScore(scoreSystemEntry, noteChartModel.noteChartDataEntry, replayHash, modifierModel)
+	local scoreEntry = self.scoreModel:insertScore(
+		scoreSystemEntry,
+		noteChartModel.noteChartDataEntry,
+		replayHash,
+		modifierModel:encode()
+	)
 
 	local base = rhythmModel.scoreEngine.scoreSystem.base
 	if base.hitCount / base.noteCount >= 0.5 then
@@ -251,8 +232,8 @@ GameplayController.saveScore = function(self)
 	end
 
 	rhythmModel.scoreEngine.scoreEntry = scoreEntry
-	local config = self.configModel.configs.select
-	config.scoreEntryId = scoreEntry.id
+
+	self.configModel.configs.select.scoreEntryId = scoreEntry.id
 end
 
 GameplayController.skip = function(self)
@@ -262,12 +243,6 @@ GameplayController.skip = function(self)
 	self:update(0)
 
 	rhythmModel.audioEngine:unload()
-
-	local base = rhythmModel.scoreEngine.scoreSystem.base
-	if timeEngine.currentTime < timeEngine.minTime or base.hitCount == 0 then
-		rhythmModel.prohibitSavingScore = true
-	end
-
 	timeEngine:play()
 	timeEngine.currentTime = math.huge
 	self.replayModel:update()
@@ -276,12 +251,7 @@ GameplayController.skip = function(self)
 end
 
 GameplayController.skipIntro = function(self)
-	local rhythmModel = self.rhythmModel
-	local timeEngine = rhythmModel.timeEngine
-	if not timeEngine.timer.isPlaying then
-		return
-	end
-	timeEngine:skipIntro()
+	self.rhythmModel.timeEngine:skipIntro()
 end
 
 GameplayController.updateOffsets = function(self)
