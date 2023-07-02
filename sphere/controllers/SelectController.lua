@@ -32,6 +32,7 @@ SelectController.applyModifierMeta = function(self)
 	end
 
 	self.modifierModel:applyMeta(state)
+	self.previewModel:setPitch(state.timeRate)
 end
 
 SelectController.unload = function(self)

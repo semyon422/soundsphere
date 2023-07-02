@@ -10,6 +10,7 @@ PreviewModel.load = function(self)
 	self.previewTime = 0
 	self.volume = 0
 	self.pitch = 1
+	self.targetPitch = 1
 end
 
 PreviewModel.setAudioPathPreview = function(self, audioPath, previewTime)
@@ -42,11 +43,15 @@ PreviewModel.update = function(self)
 		self.volume = volume
 	end
 
-	local timeRate = self.modifierModel.state.timeRate
+	local timeRate = self.targetPitch
 	if self.pitch ~= timeRate then
 		audio:setPitch(timeRate)
 		self.pitch = timeRate
 	end
+end
+
+PreviewModel.setPitch = function(self, pitch)
+	self.targetPitch = pitch
 end
 
 PreviewModel.loadPreviewDebounce = function(self, audioPath, previewTime)
@@ -107,12 +112,11 @@ PreviewModel.loadPreview = function(self)
 	self.path = path
 	self.position = position
 
-	local timeRate = self.modifierModel.state.timeRate
 	local volumeConfig = self.configModel.configs.settings.audio.volume
 	local volume = volumeConfig.master * volumeConfig.music
 	audio:seek(position or 0)
 	audio:setVolume(volume)
-	audio:setPitch(timeRate)
+	audio:setPitch(self.pitch)
 	audio:play()
 	self.volume = volume
 end

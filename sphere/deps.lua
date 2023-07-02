@@ -135,7 +135,6 @@ return {
 	},
 	previewModel = {
 		"configModel",
-		"modifierModel",
 	},
 	updateModel = {"configModel"},
 	rhythmModel = {
