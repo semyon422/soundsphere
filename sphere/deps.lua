@@ -81,7 +81,7 @@ return {
 	audioModel = {"configModel"},
 	backgroundModel = {"configModel"},
 	configModel = {},
-	cacheModel = {"configModel"},
+	cacheModel = {},
 	collectionModel = {
 		"configModel",
 		"cacheModel",

@@ -4,7 +4,7 @@ local ImageNoteView = NoteView:new()
 
 ImageNoteView.getDrawable = function(self)
 	local images = self.graphicalNote.startNoteData.images
-	local resourceModel = self.graphicalNote.graphicEngine.rhythmModel.game.resourceModel
+	local resourceModel = self.graphicalNote.graphicEngine.rhythmModel.resourceModel
 	local path = resourceModel.aliases[images[1][1]]
 	return resourceModel.resources[path]
 end
