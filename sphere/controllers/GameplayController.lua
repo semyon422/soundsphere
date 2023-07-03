@@ -1,5 +1,6 @@
 local Class = require("Class")
 local FileFinder = require("sphere.filesystem.FileFinder")
+local math_util = require("math_util")
 local InputMode = require("ncdk.InputMode")
 
 local GameplayController = Class:new()
@@ -281,10 +282,10 @@ GameplayController.increasePlaySpeed = function(self, delta)
 end
 
 GameplayController.increaseLocalOffset = function(self, delta)
-	local noteChartDataEntry = self.noteChartModel.noteChartDataEntry
-	noteChartDataEntry.localOffset = (noteChartDataEntry.localOffset or 0) + delta
-	self.cacheModel.chartRepo:updateNoteChartDataEntry(noteChartDataEntry)
-	self.notificationModel:notify("local offset: " .. noteChartDataEntry.localOffset * 1000 .. "ms")
+	local entry = self.noteChartModel.noteChartDataEntry
+	entry.localOffset = math_util.round((entry.localOffset or 0) + delta, delta)
+	self.cacheModel.chartRepo:updateNoteChartDataEntry(entry)
+	self.notificationModel:notify("local offset: " .. entry.localOffset * 1000 .. "ms")
 	self:updateOffsets()
 end
 
