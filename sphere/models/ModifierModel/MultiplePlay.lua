@@ -15,9 +15,6 @@ MultiplePlay.range = {2, 4}
 MultiplePlay.description = "1 2 1 2 -> 13 24 13 24, doubles the input mode"
 
 MultiplePlay.getString = function(self, config)
-	if config.old then
-		return config.value + 1
-	end
 	return config.value
 end
 
@@ -30,9 +27,6 @@ MultiplePlay.applyMeta = MultiOverPlay.applyMeta
 MultiplePlay.apply = function(self, config)
 	local noteChart = self.noteChart
 	local value = config.value
-	if config.old then
-		value = value + 1
-	end
 
 	local inputMode = noteChart.inputMode
 

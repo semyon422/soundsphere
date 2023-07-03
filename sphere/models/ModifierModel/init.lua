@@ -316,21 +316,8 @@ ModifierModel.fixOldFormat = function(self, oldConfig)
 	for _, modifierConfig in ipairs(oldConfig) do
 		local modifier = self:getModifier(modifierConfig)
 		if modifier then
-			if modifierConfig.value == nil then
-				for k, v in pairs(modifierConfig) do
-					if k ~= "name" then
-						modifierConfig.value = v
-					end
-				end
-			end
-			if modifierConfig.value == nil then
-				modifierConfig.value = true
-			end
 			if type(modifierConfig.value) == "number" and type(modifier.defaultValue) == "string" then
 				modifierConfig.value = modifier:fromIndexValue(modifierConfig.value)
-			end
-			if oldConfig.old then
-				modifierConfig.old = true
 			end
 		end
 	end

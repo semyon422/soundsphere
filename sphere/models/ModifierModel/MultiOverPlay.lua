@@ -14,9 +14,6 @@ MultiOverPlay.range = {2, 4}
 MultiOverPlay.description = "1 2 1 2 -> 12 34 12 34, doubles the input mode"
 
 MultiOverPlay.getString = function(self, config)
-	if config.old then
-		return config.value + 1
-	end
 	return config.value
 end
 
@@ -28,9 +25,6 @@ MultiOverPlay.applyMeta = function(self, config, state)
 	local inputMode = state.inputMode
 
 	local value = config.value
-	if config.old then
-		value = value + 1
-	end
 	for inputType, inputCount in pairs(inputMode) do
 		inputMode[inputType] = inputCount * value
 	end
@@ -39,9 +33,6 @@ end
 MultiOverPlay.apply = function(self, config)
 	local noteChart = self.noteChart
 	local value = config.value
-	if config.old then
-		value = value + 1
-	end
 
 	local inputMode = noteChart.inputMode
 

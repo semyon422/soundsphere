@@ -50,9 +50,39 @@ ReplayConverter.convertTimings = function(self, object)
 	end
 end
 
+ReplayConverter.convertModifier = function(self, c, object)
+	if c.value == nil then
+		for k, v in pairs(c) do
+			if k ~= "name" then
+				c.value = v
+			end
+		end
+	end
+	if c.value == nil then
+		c.value = true
+		return
+	end
+
+	if not object.timings then
+		if c.name == "Automap" then
+			c.old = true
+		elseif c.name == "MultiOverPlay" then
+			c.value = c.value + 1
+		elseif c.name == "MultiplePlay" then
+			c.value = c.value + 1
+		end
+	end
+end
+
+ReplayConverter.convertModifiers = function(self, object)
+	for _, c in ipairs(object.modifiers) do
+		self:convertModifier(c, object)
+	end
+end
+
 ReplayConverter.convert = function(self, object)
-	if not object.timings and object.modifiers then
-		object.modifiers.old = true
+	if object.modifiers then
+		self:convertModifiers(object)
 	end
 
 	self:convertTimings(object)
