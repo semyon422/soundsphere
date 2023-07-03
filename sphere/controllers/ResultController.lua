@@ -3,21 +3,6 @@ local thread = require("thread")
 
 local ResultController = Class:new()
 
-ResultController.oldTimings = {
-	ShortNote = {
-		hit = {-0.12, 0.12},
-		miss = {-0.16, 0.12}
-	},
-	LongNoteStart = {
-		hit = {-0.12, 0.12},
-		miss = {-0.16, 0.12},
-	},
-	LongNoteEnd = {
-		hit = {-0.12, 0.12},
-		miss = {-0.16, 0.12}
-	}
-}
-
 ResultController.load = function(self)
 	self.selectModel:pullScore()
 
@@ -53,15 +38,11 @@ ResultController.replayNoteChartAsync = function(self, mode, scoreEntry)
 
 	if replay.modifiers then
 		modifierModel:setConfig(replay.modifiers)
-		modifierModel:fixOldFormat(replay.modifiers, not replay.timings)
+		modifierModel:fixOldFormat(replay.modifiers)
 	end
 
 	if mode == "replay" or mode == "result" then
-		if replay.timings then
-			rhythmModel.timings = replay.timings
-		else
-			rhythmModel.timings = self.oldTimings
-		end
+		rhythmModel.timings = replay.timings
 		rhythmModel.scoreEngine.scoreEntry = scoreEntry
 		self.replayModel.replay = replay
 		rhythmModel.inputManager:setMode("internal")

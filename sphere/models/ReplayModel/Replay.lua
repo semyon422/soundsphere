@@ -1,12 +1,14 @@
 local Class				= require("Class")
 local json				= require("json")
 local ReplayNanoChart	= require("sphere.models.ReplayModel.ReplayNanoChart")
+local ReplayConverter	= require("sphere.models.ReplayModel.ReplayConverter")
 local InputMode			= require("ncdk.InputMode")
 
 local Replay = Class:new()
 
 Replay.construct = function(self)
 	self.replayNanoChart = ReplayNanoChart:new()
+	self.replayConverter = ReplayConverter:new()
 	self.events = {}
 	self.eventOffset = 0
 end
@@ -55,6 +57,8 @@ end
 Replay.fromString = function(self, s)
 	local object = json.decode(s)
 
+	self.replayConverter:convert(object)
+
 	self.hash = object.hash
 	self.index = object.index
 	self.modifiers = object.modifiers
@@ -69,36 +73,6 @@ Replay.fromString = function(self, s)
 
 	local inputMode = InputMode:new(object.inputMode)
 	self.events = self.replayNanoChart:decode(object.events, object.size, inputMode)
-
-	local timings = self.timings
-	if not timings then
-		return self
-	end
-
-	if not timings.ShortNote then
-		timings.ShortNote = timings.ShortScoreNote
-		timings.LongNoteStart = {
-			hit = timings.LongScoreNote.startHit,
-			miss = timings.LongScoreNote.startMiss,
-		}
-		timings.LongNoteEnd = {
-			hit = timings.LongScoreNote.endHit,
-			miss = timings.LongScoreNote.endMiss,
-		}
-		timings.ShortScoreNote = nil
-		timings.LongScoreNote = nil
-	end
-	if not timings.LongNoteStart then
-		timings.LongNoteStart = {
-			hit = timings.LongNote.startHit,
-			miss = timings.LongNote.startMiss,
-		}
-		timings.LongNoteEnd = {
-			hit = timings.LongNote.endHit,
-			miss = timings.LongNote.endMiss,
-		}
-		timings.LongNote = nil
-	end
 
 	return self
 end
