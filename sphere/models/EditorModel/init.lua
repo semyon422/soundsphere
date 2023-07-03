@@ -39,6 +39,8 @@ EditorModel.construct = function(self)
 end
 
 EditorModel.load = function(self)
+	self.loaded = true
+
 	local editor = self:getSettings()
 
 	self.layerData = self.noteChartLoader:load()
@@ -97,6 +99,10 @@ EditorModel.redo = function(self)
 end
 
 EditorModel.loadResources = function(self)
+	if not self.loaded then
+		return
+	end
+
 	local noteChart = self.noteChart
 
 	self.audioManager:loadResources(noteChart)
@@ -118,6 +124,7 @@ EditorModel.getDtpAbsolute = function(self, time)
 end
 
 EditorModel.unload = function(self)
+	self.loaded = false
 	self.audioManager:unload()
 end
 

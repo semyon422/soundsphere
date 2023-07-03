@@ -8,13 +8,14 @@ AudioManager.time = 0
 AudioManager.load = function(self)
 	self.sources = {}
 	self.intervals = {}
+	self.allSources = {}
 
 	self.firstTime = 0
 	self.lastTime = 0
 end
 
 AudioManager.unload = function(self)
-	for source in pairs(self.sources) do
+	for source in pairs(self.allSources) do
 		source.audio:stop()
 		source.audio:release()
 	end
@@ -134,6 +135,7 @@ AudioManager.insert = function(self, source)
 		intervals[i] = intervals[i] or {}
 		intervals[i][source] = true
 	end
+	self.allSources[source] = true
 end
 
 AudioManager.remove = function(self, source)
@@ -142,6 +144,7 @@ AudioManager.remove = function(self, source)
 		intervals[i] = intervals[i] or {}
 		intervals[i][source] = nil
 	end
+	self.allSources[source] = nil
 end
 
 AudioManager.loadResources = function(self, noteChart)
