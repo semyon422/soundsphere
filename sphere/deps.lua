@@ -99,9 +99,7 @@ return {
 	themeModel = {"configModel"},
 	scoreModel = {"configModel"},
 	onlineModel = {"configModel"},
-	modifierModel = {
-		"configModel",
-	},
+	modifierModel = {},
 	noteSkinModel = {"configModel"},
 	noteChartModel = {
 		"configModel",

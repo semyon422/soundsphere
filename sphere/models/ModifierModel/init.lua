@@ -88,19 +88,7 @@ ModifierModel.construct = function(self)
 	self.modifierByName = {}
 	self.modifierById = {}
 	self:createModifiers()
-end
-
-ModifierModel.load = function(self)
-	self:setConfig(self.configModel.configs.modifier)
-
 	self.availableModifierItemIndex = 1
-
-	for _, modifierConfig in ipairs(self.config) do
-		local modifier = self:getModifier(modifierConfig)
-		if modifier then
-			modifier.added = true
-		end
-	end
 end
 
 ModifierModel.isChanged = function(self)
@@ -117,6 +105,12 @@ ModifierModel.setConfig = function(self, config)
 		timeRate = 1,
 		inputMode = InputMode:new(),
 	}
+	for _, modifierConfig in ipairs(self.config) do
+		local modifier = self:getModifier(modifierConfig)
+		if modifier then
+			modifier.added = true
+		end
+	end
 end
 
 ModifierModel.scrollAvailableModifier = function(self, direction)

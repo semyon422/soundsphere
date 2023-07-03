@@ -137,8 +137,9 @@ GameController.load = function(self)
 	rhythmModel.hp = configModel.configs.settings.gameplay.hp
 	rhythmModel.settings = configModel.configs.settings
 
+	self.modifierModel:setConfig(configModel.configs.modifier)
+
 	self.themeModel:load()
-	self.modifierModel:load()
 	self.mountModel:load()
 	self.windowModel:load()
 	self.scoreModel:load()
