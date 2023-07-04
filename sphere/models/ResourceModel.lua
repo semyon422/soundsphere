@@ -1,18 +1,9 @@
 local Class = require("Class")
 local audio			= require("audio")
-local Video			= require("sphere.database.Video")
--- local video2			= require("video.Video")
+local Video			= require("Video")
 local thread	= require("thread")
 local FileFinder	= require("sphere.filesystem.FileFinder")
 local table_util = require("table_util")
-
-local video
-local ok, ret = pcall(require, "video")
-if ok then
-	video = ret
-else
-	print(ret)
-end
 
 local _newSoundDataAsync = thread.async(function(path, sample_gain)
 	local fileData = love.filesystem.newFileData(path)
@@ -52,19 +43,7 @@ local function newVideoAsync(path)
 	local fileData = newFileDataAsync(path)
 	if not fileData then return end
 
-	local _v = video.open(fileData:getPointer(), fileData:getSize())
-	if not _v then
-		return
-	end
-	-- local _v = video2.open(fileData:getPointer(), fileData:getSize())
-
-	local v = setmetatable({}, {__index = Video})
-	v.video = _v
-	v.fileData = fileData
-	v.imageData = love.image.newImageData(_v:getDimensions())
-	v.image = love.graphics.newImage(v.imageData)
-
-	return v
+	return Video(fileData)
 end
 
 local loadOjm = thread.async(function(path)
@@ -187,7 +166,7 @@ ResourceModel.loadResource = function(self, path)
 		self.all_resources.loaded[path] = newSoundDataAsync(path, self.sample_gain)
 	elseif fileType == "image" then
 		self.all_resources.loaded[path] = newImageAsync(path)
-	elseif fileType == "video" and video then
+	elseif fileType == "video" then
 		self.all_resources.loaded[path] = newVideoAsync(path)
 	elseif path:lower():find("%.ojm$") then
 		local soundDatas = loadOjmAsync(path)
