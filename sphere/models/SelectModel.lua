@@ -86,6 +86,10 @@ SelectModel.changeCollapse = function(self)
 	self:debouncePullNoteChartSet()
 end
 
+SelectModel.setLock = function(self, locked)
+	self.locked = locked
+end
+
 SelectModel.update = function(self)
 	local stateCounter = self.searchModel.stateCounter
 	if self.searchStateCounter == stateCounter or self.pullingNoteChartSet then
@@ -188,6 +192,10 @@ SelectModel.scrollScore = function(self, direction, destination)
 end
 
 SelectModel.pullNoteChartSet = function(self, noUpdate, noPullNext)
+	if self.locked then
+		return
+	end
+
 	self.pullingNoteChartSet = true
 
 	if not noUpdate then

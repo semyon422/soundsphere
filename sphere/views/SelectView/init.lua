@@ -16,6 +16,18 @@ SelectView.load = function(self)
 	self.game.selectController:load()
 end
 
+SelectView.beginUnload = function(self)
+	self.game.selectController:beginUnload()
+end
+
+SelectView.unload = function(self)
+	self.game.selectController:unload()
+end
+
+SelectView.update = function(self, dt)
+	self.game.selectController:update(dt)
+end
+
 SelectView.receive = function(self, event)
 	self.game.selectController:receive(event)
 end
@@ -48,14 +60,6 @@ SelectView.draw = function(self)
 	end
 
 	just.container()
-end
-
-SelectView.unload = function(self)
-	self.game.selectController:unload()
-end
-
-SelectView.update = function(self, dt)
-	self.game.selectController:update(dt)
 end
 
 SelectView.play = function(self)

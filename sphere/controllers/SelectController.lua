@@ -19,6 +19,8 @@ SelectController.load = function(self)
 	previewModel:load()
 
 	self:applyModifierMeta()
+
+	self.selectModel:setLock(false)
 end
 
 SelectController.applyModifierMeta = function(self)
@@ -33,6 +35,10 @@ SelectController.applyModifierMeta = function(self)
 
 	self.modifierModel:applyMeta(state)
 	self.previewModel:setPitch(state.timeRate)
+end
+
+SelectController.beginUnload = function(self)
+	self.selectModel:setLock(true)
 end
 
 SelectController.unload = function(self)
