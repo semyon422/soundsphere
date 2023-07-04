@@ -19,6 +19,8 @@ return ModalImView(function(self)
 		return true
 	end
 
+	imgui.setSize(w, h, _w, _h)
+
 	local inputMode = tostring(self.game.modifierModel.state.inputMode)
 	local inputs = self.game.inputModel:getInputs(inputMode)
 	local devices = self.game.inputModel.devices
@@ -38,23 +40,10 @@ return ModalImView(function(self)
 
 	just.push()
 
-	just.row(true)
-	for _, device in ipairs(devices) do
-		if device == currentDevice then
-			love.graphics.setColor(1, 1, 1, 0.1)
-			love.graphics.rectangle("fill", 0, 0, w / #devices, _h)
-		end
-		love.graphics.setColor(1, 1, 1, 1)
-		if imgui.TextOnlyButton("InputView " .. device, device, w / #devices, _h) then
-			currentDevice = device
-		end
-	end
-	just.row()
-	love.graphics.line(0, 0, w, 0)
+	currentDevice = imgui.tabs("input tabs", currentDevice, devices)
 
 	imgui.Container(window_id, w, h - _h, _h / 3, _h * 2, scrollY)
 
-	just.emptyline(8)
 	for i = 1, #inputs do
 		local hotkey_id = "input hotkey" .. i
 		local virtualKey = inputs[i]
