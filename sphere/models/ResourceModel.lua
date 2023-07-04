@@ -1,6 +1,7 @@
 local Class = require("Class")
 local audio			= require("audio")
 local Video			= require("sphere.database.Video")
+-- local video2			= require("video.Video")
 local thread	= require("thread")
 local FileFinder	= require("sphere.filesystem.FileFinder")
 local table_util = require("table_util")
@@ -55,6 +56,7 @@ local function newVideoAsync(path)
 	if not _v then
 		return
 	end
+	-- local _v = video2.open(fileData:getPointer(), fileData:getSize())
 
 	local v = setmetatable({}, {__index = Video})
 	v.video = _v
@@ -120,6 +122,14 @@ for t, list in pairs(NoteChartTypes) do
 	end
 end
 
+ResourceModel.rewind = function(self)
+	for _, resource in pairs(self.all_resources.loaded) do
+		if resource.rewind then
+			resource:rewind()
+		end
+	end
+end
+
 ResourceModel.load = function(self, chartPath, noteChart, callback)
 	local noteChartType = NoteChartTypeMap[noteChart.type]
 
@@ -138,11 +148,8 @@ ResourceModel.load = function(self, chartPath, noteChart, callback)
 	local loaded = {}
 	for path, resource in pairs(self.all_resources.loaded) do
 		table.insert(loaded, path)
-		local mt = getmetatable(resource)
-		if mt and mt.__index == Video then
-			resource:rewind()
-		end
 	end
+	self:rewind()
 
 	if noteChartType == "bms" then
 		local newResources = {}

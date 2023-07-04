@@ -185,6 +185,7 @@ GameplayController.retry = function(self)
 	})
 	rhythmModel:loadAllEngines()
 	self.replayModel:load()
+	self.resourceModel:rewind()
 	self:play()
 end
 
