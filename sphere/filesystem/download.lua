@@ -1,11 +1,11 @@
 local thread = require("thread")
-local path_util = require("path_util")
 thread.shared.download = {}
 
 return thread.async(function(url, saveDir, fallbackName)
 	local https = require("ssl.https")
 	local ltn12 = require("ltn12")
 	local thread = require("thread")
+	local path_util = require("path_util")
 
 	local one, code, headers, status_line = https.request({
 		url = url,
