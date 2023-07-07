@@ -11,7 +11,15 @@ LessChord.defaultValue = "none"
 LessChord.range = {1, 8}
 LessChord.values = {"none", "-5", "-4", "-3", "2", "3", "4", "5"}
 
-LessChord.description = "Remove chords"
+LessChord.description = [[Stepper values are:
+none: no chords
+-5: every 5th chord kept
+-4: every 4th chord kept
+-3: every 3rd chord kept
+2: every 2nd chord removed
+3: every 3rd chord removed
+4: every 4th chord removed
+5: every 5th chord removed]]
 
 LessChord.getString = function(self, config)
 	return "LC"
