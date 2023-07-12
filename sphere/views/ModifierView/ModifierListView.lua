@@ -42,7 +42,9 @@ ModifierListView.drawItem = function(self, i, w, h)
 	TextCellImView(w2 - 44, 72, "left", "", item.name)
 
 	local modifier = self.game.modifierModel:getModifier(item)
-	if modifier.interfaceType == "toggle" then
+	if not modifier then
+		TextCellImView(w2 - 44, 72, "left", "", "Deleted modifier")
+	elseif modifier.interfaceType == "toggle" then
 		just.indent((w2 - h) / 2)
 		w2 = 72
 		local over = SwitchView:isOver(w2, h)

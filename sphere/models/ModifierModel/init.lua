@@ -211,7 +211,9 @@ ModifierModel.remove = function(self, modifierConfig)
 			return
 		end
 	end
-	modifier.added = false
+	if modifier then
+		modifier.added = false
+	end
 	self.changed = true
 end
 
