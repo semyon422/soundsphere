@@ -15,20 +15,20 @@ IntervalManager.isGrabbed = function(self)
 end
 
 IntervalManager.moveGrabbed = function(self, time)
-	self.layerData:moveInterval(self.grabbedIntervalData, time)
+	self.editorModel.layerData:moveInterval(self.grabbedIntervalData, time)
 end
 
 IntervalManager.split = function(self, timePoint)
-	local ld = self.layerData
+	local ld = self.editorModel.layerData
 	return ld:splitInterval(ld:getTimePoint(timePoint:getTime()))
 end
 
 IntervalManager.merge = function(self, timePoint)
-	self.layerData:mergeInterval(timePoint)
+	self.editorModel.layerData:mergeInterval(timePoint)
 end
 
 IntervalManager.update = function(self, intervalData, beats)
-	self.layerData:updateInterval(intervalData, beats)
+	self.editorModel.layerData:updateInterval(intervalData, beats)
 end
 
 return IntervalManager
