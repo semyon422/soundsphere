@@ -14,13 +14,13 @@ SelectController.load = function(self)
 	self.configModel:write()
 	self.modifierModel:setConfig(self.configModel.configs.modifier)
 
+	self.selectModel:setLock(false)
+
 	noteChartModel:load()
 	selectModel:load()
 	previewModel:load()
 
 	self:applyModifierMeta()
-
-	self.selectModel:setLock(false)
 end
 
 SelectController.applyModifierMeta = function(self)

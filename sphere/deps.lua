@@ -12,6 +12,7 @@ return {
 		"configModel",
 		"resourceModel",
 		"windowModel",
+		"cacheModel",
 	},
 	fastplayController = {
 		"rhythmModel",

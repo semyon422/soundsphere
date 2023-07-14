@@ -58,6 +58,8 @@ EditorController.save = function(self)
 	local path = noteChartModel.noteChartEntry.path:gsub(".sph$", "") .. ".sph"
 
 	love.filesystem.write(path, exp:export())
+
+	self.cacheModel:startUpdate(noteChartModel.noteChartEntry.path:match("^(.+)/.-$"))
 end
 
 EditorController.saveToOsu = function(self)
