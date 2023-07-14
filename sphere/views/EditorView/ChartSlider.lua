@@ -58,6 +58,7 @@ return function(self, w, h)
 	love.graphics.setColor(0.1, 0.6, 1, 1)
 	love.graphics.setLineWidth(4)
 	love.graphics.line(x, pad, x, _h + pad)
+	love.graphics.setLineWidth(1)
 
 	local x = math_util.map(math.min(math.max(value, 0), 1), 0, 1, a, b)
 	love.graphics.setColor(1, 1, 1, 1)
