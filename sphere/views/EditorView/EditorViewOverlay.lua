@@ -140,6 +140,8 @@ function tabs.timings(self)
 
 	imgui.separator()
 
+	do return end
+
 	just.row(true)
 	velocity = imgui.input("velocity input", velocity, "velocity")
 	if imgui.button("add velocity button", "add") then
