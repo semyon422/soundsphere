@@ -51,6 +51,7 @@ EditorController.save = function(self)
 	local noteChartModel = self.noteChartModel
 
 	self.editorModel:save()
+	self.editorModel:genGraphs()
 
 	local exp = NoteChartExporter:new()
 	exp.noteChart = noteChartModel.noteChart

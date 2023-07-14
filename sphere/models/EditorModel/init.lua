@@ -109,12 +109,16 @@ EditorModel.loadResources = function(self)
 	self.firstTime = self.audioManager.firstTime
 	self.lastTime = self.audioManager.lastTime
 
-	self.graphsGenerator:genDensityGraph(noteChart, self.firstTime, self.lastTime)
-	self.graphsGenerator:genIntervalDatasGraph(self.layerData, self.firstTime, self.lastTime)
+	self:genGraphs()
 
 	self.audioManager:update(true)
 
 	self.resourcesLoaded = true
+end
+
+EditorModel.genGraphs = function(self)
+	self.graphsGenerator:genDensityGraph(self.noteChart, self.firstTime, self.lastTime)
+	self.graphsGenerator:genIntervalDatasGraph(self.layerData, self.firstTime, self.lastTime)
 end
 
 EditorModel.getDtpAbsolute = function(self, time)
