@@ -25,6 +25,9 @@ local function Hotkeys(self)
 		elseif kp("v") then
 			noteManager:pasteNotes()
 			notificationModel:notify("paste " .. #noteManager.copiedNotes .. " notes")
+		elseif kp("h") then
+			noteManager:flipNotes()
+			notificationModel:notify("flip")
 		elseif kp("z") then
 			editorModel:undo()
 			notificationModel:notify("undo")

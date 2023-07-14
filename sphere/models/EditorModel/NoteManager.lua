@@ -184,4 +184,29 @@ NoteManager.addNote = function(self, absoluteTime, inputType, inputIndex)
 	editorModel.editorChanges:next()
 end
 
+NoteManager.flipNotes = function(self)
+	local editorModel = self.editorModel
+	local noteSkin = self.editorModel.noteSkin
+
+	editorModel.editorChanges:reset()
+
+	local notes = {}
+
+	for _, note in ipairs(editorModel.graphicEngine.selectedNotes) do
+		table.insert(notes, note)
+		self:_removeNote(note)
+	end
+
+	for _, note in ipairs(notes) do
+		local columns = noteSkin.inputsCount
+		local column = columns - noteSkin:getInputColumn(note.inputType, note.inputIndex) + 1
+		local inputType, inputIndex = noteSkin:getColumnInput(column, true)
+		note.inputType = inputType
+		note.inputIndex = inputIndex
+		self:_addNote(note)
+	end
+
+	editorModel.editorChanges:next()
+end
+
 return NoteManager
