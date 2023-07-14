@@ -307,7 +307,7 @@ SnapGridView.draw = function(self)
 	end
 	prevMouseY = _my
 
-	local scroll = just.wheel_over("scale scroll", just.is_over(width, h))
+	local scroll = just.wheel_over("scale scroll", true)
 	if just.keypressed("right") then
 		scroll = 1
 	elseif just.keypressed("left") then
