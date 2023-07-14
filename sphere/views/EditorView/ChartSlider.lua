@@ -36,22 +36,30 @@ return function(self, w, h)
 	local pad = h * (1 - theme.size) / 2
 	local _h = h - 2 * pad
 
+	local a, b = h / 2, w - h / 2
+
 	love.graphics.setColor(1, 1, 0.1, 0.7)
 	for i = 0, intervalPoints.n do
 		if intervalPoints[i] then
-			local x = math_util.map(i, 0, intervalPoints.n, h / 2, w - h / 2)
+			local x = math_util.map(i, 0, intervalPoints.n, a, b)
 			love.graphics.line(x, pad, x, _h + pad)
 		end
 	end
 
 	love.graphics.setColor(1, 1, 1, 1)
 	for i = 0, #densityPoints - 1 do
-		local x = math_util.map(i, 0, #densityPoints, h / 2, w - h / 2)
-		local x2 = math_util.map(i + 1, 0, #densityPoints, h / 2, w - h / 2)
+		local x = math_util.map(i, 0, #densityPoints, a, b)
+		local x2 = math_util.map(i + 1, 0, #densityPoints, a, b)
 		love.graphics.line(x, (1 - densityPoints[i]) * _h + pad, x2, (1 - densityPoints[i + 1]) * _h + pad)
 	end
 
-	local x = math_util.map(math.min(math.max(value, 0), 1), 0, 1, h / 2, w - h / 2)
+	local previewTime = self.game.noteChartModel.noteChart.metaData.previewTime
+	local x = math_util.map(previewTime, editorModel.firstTime, editorModel.lastTime, a, b)
+	love.graphics.setColor(0.1, 0.6, 1, 1)
+	love.graphics.setLineWidth(4)
+	love.graphics.line(x, pad, x, _h + pad)
+
+	local x = math_util.map(math.min(math.max(value, 0), 1), 0, 1, a, b)
 	love.graphics.setColor(1, 1, 1, 1)
 	theme.circle(h, x, h / 2)
 

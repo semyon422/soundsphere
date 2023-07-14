@@ -70,6 +70,12 @@ function tabs.audio(self)
 	local wf = self.game.configModel.configs.settings.editor.waveform
 	wf.opacity = imgui.slider1("wf.opacity", wf.opacity, "%0.2f", 0, 1, 0.01, "opacity")
 	wf.scale = imgui.slider1("wf.scale", wf.scale, "%0.2f", 0, 1, 0.01, "scale")
+
+	imgui.separator()
+	local md = self.game.noteChartModel.noteChart.metaData
+	if imgui.button("set as preview", "set this moment as a preview") then
+		md.previewTime = editorModel.timePoint.absoluteTime
+	end
 end
 
 local velocity = "1"
