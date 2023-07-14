@@ -72,7 +72,7 @@ local ModifierId = {
 	-- [ToOsu] = 21,
 	[Alternate2] = 22,
 	[LessChord] = 23,
-	[MaxChord] = 23,
+	[MaxChord] = 24,
 }
 
 local OneUseModifiers = {
