@@ -161,9 +161,10 @@ NoteManager.newNote = function(self, noteType, absoluteTime, inputType, inputInd
 end
 
 NoteManager.addNote = function(self, absoluteTime, inputType, inputIndex)
-	self.editorModel.editorChanges:reset()
-	local editor = self.editorModel:getSettings()
-	self.editorModel.graphicEngine:selectNote()
+	local editorModel = self.editorModel
+	editorModel.editorChanges:reset()
+	local editor = editorModel:getSettings()
+	editorModel.graphicEngine:selectNote()
 
 	local note
 	if editor.tool == "ShortNote" then
@@ -173,11 +174,14 @@ NoteManager.addNote = function(self, absoluteTime, inputType, inputIndex)
 	end
 
 	if note and editor.tool == "LongNote" then
-		self.editorModel.graphicEngine:selectNote(note)
-		self:grabNotes("tail", note.endNoteData.timePoint.absoluteTime)
+		editorModel.graphicEngine:selectNote(note)
+		self:grabNotes(
+			"tail",
+			editorModel:getMouseTime() + note.endNoteData.timePoint.absoluteTime - note.startNoteData.timePoint.absoluteTime
+		)
 	end
-	self.editorModel.editorChanges:add()
-	self.editorModel.editorChanges:next()
+	editorModel.editorChanges:add()
+	editorModel.editorChanges:next()
 end
 
 return NoteManager

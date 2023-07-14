@@ -55,15 +55,15 @@ EditorRhythmView.draw = function(self)
 
 	love.graphics.replaceTransform(gfx_util.transform(self.transform))
 
-	local t = editorModel:getMouseTime()
+	local Head = noteSkin.notes.ShortNote.Head
 
 	if editorModel.state == "notes" then
 		if editor.tool == "ShortNote" or editor.tool == "LongNote" then
 			for i = 1, noteSkin.inputsCount do
-				local Head = noteSkin.notes.ShortNote.Head
 				local over = just.is_over(Head.w[i], noteSkin.unit, Head.x[i], 0)
 				over = just.mouse_over("add note" .. i, over, "mouse")
 				if over and just.mousepressed(1) then
+					local t = editorModel:getMouseTime(Head.h[1] / 2)
 					noteManager:addNote(t, "key", i)
 				end
 			end
@@ -95,6 +95,7 @@ EditorRhythmView.draw = function(self)
 	end
 	if just.mousereleased(1) then
 		if next(editorModel.noteManager.grabbedNotes) then
+			local t = editorModel:getMouseTime()
 			noteManager:dropNotes(t)
 		end
 		if editorModel.selectRect then

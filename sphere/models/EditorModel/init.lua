@@ -155,11 +155,12 @@ EditorModel.setLogSpeed = function(self, logSpeed)
 	editor.speed = 2 ^ (logSpeed / 10)
 end
 
-EditorModel.getMouseTime = function(self)
+EditorModel.getMouseTime = function(self, dy)
+	dy = dy or 0
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local noteSkin = self.noteSkin
 	local editor = self:getSettings()
-	return (self.timePoint.absoluteTime - noteSkin:getInverseTimePosition(my) / editor.speed)
+	return (self.timePoint.absoluteTime - noteSkin:getInverseTimePosition(my + dy) / editor.speed)
 end
 
 EditorModel.selectNote = function(self, note)
