@@ -25,12 +25,13 @@ TimeEngine.visualOffset = 0
 TimeEngine.windUp = nil
 
 TimeEngine.load = function(self)
-	self.timer:reset()
+	self.timer:pause()
 	self.timer:setRate(self.timeRate)
+	self.timer.adjustRate = self.adjustRate
 	self:loadTimePoints()
 
 	local t = -self.timeToPrepare * self.baseTimeRate
-	self.timer:setPosition(t)
+	self.timer:setTime(t)
 
 	self.startTime = t
 	self.currentTime = t
@@ -46,7 +47,6 @@ TimeEngine.sync = function(self, event)
 	local timer = self.timer
 
 	timer.eventTime = event.time
-	timer.eventDelta = event.dt
 
 	if self.windUp then
 		self:updateWindUp()
@@ -56,7 +56,6 @@ TimeEngine.sync = function(self, event)
 		timer:setRate(self.timeRate)
 	end
 
-	timer:update()
 	self.currentTime = timer:getTime()
 
 	if not self.nextTimeIndex then
@@ -108,8 +107,7 @@ TimeEngine.setPosition = function(self, position)
 	local audioEngine = self.rhythmModel.audioEngine
 
 	audioEngine:setPosition(position)
-	timer:setPosition(position)
-	timer:adjustTime(true)
+	timer:setTime(position)
 	self.currentTime = timer:getTime()
 	self.currentVisualTime = self:getVisualTime()
 

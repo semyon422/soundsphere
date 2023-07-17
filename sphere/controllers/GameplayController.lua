@@ -33,6 +33,7 @@ GameplayController.load = function(self)
 
 	local config = configModel.configs.settings
 
+	rhythmModel:setAdjustRate(config.audio.adjustRate)
 	rhythmModel:setTimeRate(modifierModel.state.timeRate)
 	rhythmModel:setWindUp(modifierModel.state.windUp)
 	rhythmModel:setVolume(config.audio.volume)

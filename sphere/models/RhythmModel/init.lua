@@ -130,6 +130,10 @@ RhythmModel.setPromode = function(self, promode)
 	self.logicEngine.promode = promode
 end
 
+RhythmModel.setAdjustRate = function(self, adjustRate)
+	self.timeEngine.adjustRate = adjustRate
+end
+
 RhythmModel.setNoteChart = function(self, noteChart)
 	assert(noteChart)
 	self.noteChart = noteChart

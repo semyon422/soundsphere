@@ -42,6 +42,7 @@ EditorModel.load = function(self)
 	self.loaded = true
 
 	local editor = self:getSettings()
+	local audioSettings = self:getAudioSettings()
 
 	self.layerData = self.noteChartLoader:load()
 	local ld = self.layerData
@@ -62,8 +63,9 @@ EditorModel.load = function(self)
 	self.firstTime = ld.ranges.timePoint.first.absoluteTime
 	self.lastTime = ld.ranges.timePoint.last.absoluteTime
 
-	self.timer:reset()
-	self.timer:setPosition(editor.time)
+	self.timer:pause()
+	self.timer:setTime(editor.time)
+	self.timer.adjustRate = audioSettings.adjustRate
 
 	self.audioManager.volume = self.configModel.configs.settings.audio.volume
 	self.audioManager:load()
@@ -88,6 +90,10 @@ EditorModel.getSettings = function(self)
 	end
 	editor.snap = math.min(math.max(editor.snap, 1), 16)
 	return editor
+end
+
+EditorModel.getAudioSettings = function(self)
+	return self.configModel.configs.settings.audio
 end
 
 EditorModel.undo = function(self)
@@ -220,8 +226,6 @@ EditorModel.receive = function(self, event)
 	if event.name == "framestarted" then
 		local timer = self.timer
 		timer.eventTime = event.time
-		timer.eventDelta = event.dt
-		timer:update()
 	end
 end
 

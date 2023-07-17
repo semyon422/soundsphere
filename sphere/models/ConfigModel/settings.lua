@@ -1,5 +1,6 @@
 return {
 	audio = {
+		adjustRate = 0.1,
 		device = {  -- use default
 			period = 0,
 			buffer = 0,

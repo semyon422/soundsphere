@@ -148,6 +148,7 @@ AudioManager.remove = function(self, source)
 end
 
 AudioManager.loadResources = function(self, noteChart)
+	local audioSettings = self.editorModel:getAudioSettings()
 	for noteDatas in noteChart:getInputIterator() do
 		for _, noteData in ipairs(noteDatas) do
 			local offset = noteData.timePoint.absoluteTime
@@ -156,7 +157,8 @@ AudioManager.loadResources = function(self, noteChart)
 					local path = self.editorModel.resourceModel.aliases[s[1]]
 					local soundData = self.editorModel.resourceModel.resources[path]
 					if soundData then
-						local _audio = audio:newAudio(soundData)
+						local mode = noteData.stream and audioSettings.mode.primary or audioSettings.mode.secondary
+						local _audio = audio:newAudio(soundData, mode)
 						local duration = _audio:getLength()
 						self:insert({
 							offset = offset,

@@ -237,6 +237,8 @@ drawSection.audio = function(self)
 
 	a.sampleGain = imgui.slider1("sampleGain", a.sampleGain, "+%0.0fdB", 0, 100, 1, "gain with clipping")
 
+	a.adjustRate = imgui.slider1("a.adjustRate", a.adjustRate, "%0.2f", 0, 1, 0.01, "timer adjust rate")
+
 	local mode = a.mode
 	mode.primary = imgui.combo(
 		"mode.primary", mode.primary, {"bass_sample", "bass_fx_tempo"}, formatModes, "primary audio mode")
