@@ -19,6 +19,7 @@ AudioManager.unload = function(self)
 		source.audio:stop()
 		source.audio:release()
 	end
+	self:load()
 end
 
 AudioManager.update = function(self, force)
