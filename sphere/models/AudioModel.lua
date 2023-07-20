@@ -1,19 +1,19 @@
 local Class = require("Class")
-local bass = require("audio.bass")
+local audio = require("audio")
 
 local AudioModel = Class:new()
 
 AudioModel.load = function(self)
 	local device = self.configModel.configs.settings.audio.device
 	if device.period == 0 then
-		device.period = bass.default_dev_period
+		device.period = audio.default_dev_period
 	end
 	if device.buffer == 0 then
-		device.buffer = bass.default_dev_buffer
+		device.buffer = audio.default_dev_buffer
 	end
-	bass.setDevicePeriod(device.period)
-	bass.setDeviceBuffer(device.buffer)
-	bass.init()
+	audio.setDevicePeriod(device.period)
+	audio.setDeviceBuffer(device.buffer)
+	audio.init()
 end
 
 return AudioModel

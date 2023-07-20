@@ -59,7 +59,7 @@ AudioEngine.playAudio = function(self, sounds, isBackground, stream, offset)
 		local mode = stream and self.mode.primary or self.mode.secondary
 
 		local soundData = self.rhythmModel:getResource(sounds[i][1])
-		local audio = _audio:newAudio(soundData, mode)
+		local audio = _audio.newSource(soundData, mode)
 
 		if audio then
 			audio.offset = offset or currentTime

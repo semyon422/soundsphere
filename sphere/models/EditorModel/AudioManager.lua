@@ -159,7 +159,7 @@ AudioManager.loadResources = function(self, noteChart)
 					local soundData = self.editorModel.resourceModel.resources[path]
 					if soundData then
 						local mode = noteData.stream and audioSettings.mode.primary or audioSettings.mode.secondary
-						local _audio = audio:newAudio(soundData, mode)
+						local _audio = audio.newSource(soundData, mode)
 						local duration = _audio:getLength()
 						self:insert({
 							offset = offset,

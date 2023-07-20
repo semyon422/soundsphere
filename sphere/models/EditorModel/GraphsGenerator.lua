@@ -22,6 +22,10 @@ GraphsGenerator.genDensityGraph = function(self, noteChart, firstTime, lastTime)
 
 	local pointsCount = math.floor(lastTime - firstTime) * 2
 
+	if pointsCount == 0 then
+		return
+	end
+
 	self.densityGraph = {}
 	local points = self.densityGraph
 	for i = 0, pointsCount do

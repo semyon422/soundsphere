@@ -5,7 +5,7 @@ local TimingsModalView = require("sphere.views.TimingsModalView")
 local _transform = require("gfx_util").transform
 local spherefonts = require("sphere.assets.fonts")
 local version = require("version")
-local bass = require("audio.bass")
+local audio = require("audio")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -249,8 +249,8 @@ drawSection.audio = function(self)
 
 	imgui.separator()
 
-	local bassInfo = bass.getInfo()
-	imgui.text("Latency: " .. bassInfo.latency .. "ms")
+	local audioInfo = audio.getInfo()
+	imgui.text("Latency: " .. audioInfo.latency .. "ms")
 	a.device.period = imgui.slider1("d.period", a.device.period, "%dms", 1, 50, 1, "update period")
 	a.device.buffer = imgui.slider1("d.buffer", a.device.buffer, "%dms", 1, 50, 1, "buffer length")
 	just.sameline()
@@ -258,17 +258,17 @@ drawSection.audio = function(self)
 	imgui.url("dev buffer link", "link", "https://www.un4seen.com/doc/#bass/BASS_CONFIG_DEV_BUFFER.html", true)
 
 	if imgui.button("apply device", "apply") then
-		bass.setDevicePeriod(a.device.period)
-		bass.setDeviceBuffer(a.device.buffer)
-		bass.reinit()
+		audio.setDevicePeriod(a.device.period)
+		audio.setDeviceBuffer(a.device.buffer)
+		audio.reinit()
 	end
 	just.sameline()
 	if imgui.button("reset device", "reset") then
-		a.device.period = bass.default_dev_period
-		a.device.buffer = bass.default_dev_buffer
-		bass.setDevicePeriod(a.device.period)
-		bass.setDeviceBuffer(a.device.buffer)
-		bass.reinit()
+		a.device.period = audio.default_dev_period
+		a.device.buffer = audio.default_dev_buffer
+		audio.setDevicePeriod(a.device.period)
+		audio.setDeviceBuffer(a.device.buffer)
+		audio.reinit()
 	end
 end
 

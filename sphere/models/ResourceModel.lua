@@ -11,7 +11,10 @@ local _newSoundDataAsync = thread.async(function(path, sample_gain)
 		return
 	end
 	local audio = require("audio")
-	local soundData = audio.newSoundData(fileData:getFFIPointer(), fileData:getSize(), sample_gain)
+	local soundData = audio.newSoundData(fileData:getFFIPointer(), fileData:getSize())
+	if soundData then
+		soundData:amplify(sample_gain)
+	end
 	fileData:release()
 	return soundData
 end)
