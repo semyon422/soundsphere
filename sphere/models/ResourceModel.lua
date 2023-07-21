@@ -11,7 +11,7 @@ local _newSoundDataAsync = thread.async(function(path, sample_gain)
 		return
 	end
 	local audio = require("audio")
-	local soundData = audio.newSoundData(fileData:getFFIPointer(), fileData:getSize())
+	local soundData = audio.SoundData(fileData:getFFIPointer(), fileData:getSize())
 	if soundData then
 		soundData:amplify(sample_gain)
 	end
@@ -22,7 +22,7 @@ end)
 local function newSoundDataAsync(path, sample_gain)
 	local soundData = _newSoundDataAsync(path, sample_gain)
 	if not soundData then return end
-	return setmetatable(soundData, {__index = audio.SoundData})
+	return setmetatable(soundData, audio.SoundData)
 end
 
 local newImageDataAsync = thread.async(function(s)
@@ -63,7 +63,7 @@ local loadOjm = thread.async(function(path)
 
 	for sampleIndex, sampleData in pairs(ojm.samples) do
 		local fd = love.filesystem.newFileData(sampleData, sampleIndex)
-		soundDatas[sampleIndex] = audio.newSoundData(fd:getFFIPointer(), fd:getSize())
+		soundDatas[sampleIndex] = audio.SoundData(fd:getFFIPointer(), fd:getSize())
 	end
 
 	return soundDatas
