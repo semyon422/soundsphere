@@ -16,7 +16,8 @@ return {
 		volume = {
 			effects = 1,
 			master = 1,
-			music = 1
+			music = 1,
+			metronome = 1,
 		}
 	},
 	editor = {

@@ -13,6 +13,7 @@ local GraphsGenerator = require("sphere.models.EditorModel.GraphsGenerator")
 local EditorChanges = require("sphere.models.EditorModel.EditorChanges")
 local NoteManager = require("sphere.models.EditorModel.NoteManager")
 local Scroller = require("sphere.models.EditorModel.Scroller")
+local Metronome = require("sphere.models.EditorModel.Metronome")
 
 local EditorModel = Class:new()
 
@@ -31,6 +32,7 @@ EditorModel.construct = function(self)
 	self.noteManager = NoteManager:new()
 	self.graphicEngine = GraphicEngine:new()
 	self.scroller = Scroller:new()
+	self.metronome = Metronome:new()
 
 	for _, v in pairs(self) do
 		v.editorModel = self
@@ -69,6 +71,9 @@ EditorModel.load = function(self)
 
 	self.audioManager.volume = self.configModel.configs.settings.audio.volume
 	self.audioManager:load()
+
+	self.metronome.volume = self.configModel.configs.settings.audio.volume
+	self.metronome:load()
 
 	self.scroller:scrollSeconds(self.timer:getTime())
 end
@@ -136,6 +141,7 @@ end
 EditorModel.unload = function(self)
 	self.loaded = false
 	self.audioManager:unload()
+	self.metronome:unload()
 end
 
 EditorModel.save = function(self)
@@ -199,6 +205,7 @@ EditorModel.update = function(self)
 	editor.time = time
 
 	self.noteManager:update()
+	self.metronome:update()
 
 	if self.selectRect then
 		local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
@@ -220,6 +227,7 @@ EditorModel.update = function(self)
 	end
 
 	self.graphicEngine:update()
+
 end
 
 EditorModel.receive = function(self, event)

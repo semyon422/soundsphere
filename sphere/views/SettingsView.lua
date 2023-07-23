@@ -234,6 +234,7 @@ drawSection.audio = function(self)
 	v.master = imgui.slider1("v.master", v.master, "%0.2f", 0, 1, 0.01, "master volume")
 	v.music = imgui.slider1("v.music", v.music, "%0.2f", 0, 1, 0.01, "music volume")
 	v.effects = imgui.slider1("v.effects", v.effects, "%0.2f", 0, 1, 0.01, "effects volume")
+	v.metronome = imgui.slider1("v.metronome", v.metronome, "%0.2f", 0, 1, 0.01, "metronome volume")
 
 	a.sampleGain = imgui.slider1("sampleGain", a.sampleGain, "+%0.0fdB", 0, 100, 1, "gain with clipping")
 
