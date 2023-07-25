@@ -67,7 +67,7 @@ AudioEngine.playAudio = function(self, sounds, isBackground, stream, offset)
 			local shouldPlay = true
 			if self.forcePosition then
 				local p = currentTime - audio.offset
-				if p >= audio:getLength() then
+				if p >= audio:getDuration() then
 					shouldPlay = false
 				else
 					audio:setPosition(p)
