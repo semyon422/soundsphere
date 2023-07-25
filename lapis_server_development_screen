@@ -1,4 +1,0 @@
-#!/bin/bash
-. ./setpaths  #use source or . to execute the script in the context of the calling shell
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD/bin/linux64
-screen -dmS soundsphere-server lapis server development

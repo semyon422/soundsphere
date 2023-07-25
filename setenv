@@ -1,0 +1,30 @@
+#!/bin/bash
+
+[ -d /usr/local/openresty ] && OR_ROOT=/usr/local/openresty
+[ -d /opt/openresty ] && OR_ROOT=/opt/openresty
+[ -z "${OR_ROOT}" ] && echo "openresty not found" && exit 1
+
+TREE=$PWD/tree
+LJ_ROOT=$OR_ROOT/luajit
+
+PATH=$TREE/bin:$OR_ROOT/bin:$PATH
+LD_LIBRARY_PATH=$LJ_ROOT/lib
+
+LUA_PATH="./?.lua"
+LUA_PATH="$LUA_PATH;$LJ_ROOT/share/luajit-2.1.0-beta3/?.lua"
+LUA_PATH="$LUA_PATH;$TREE/share/lua/5.1/?.lua;$TREE/share/lua/5.1/?/init.lua"
+
+LUA_CPATH="./?.so"
+LUA_CPATH="$LUA_CPATH;$TREE/lib/lua/5.1/?.so"
+LUA_CPATH="$LUA_CPATH;$TREE/lib/lua/5.1/loadall.so"
+
+LUA_PATH="$LUA_PATH;$OR_ROOT/lualib/?.lua;$OR_ROOT/lualib/?/init.lua"
+LUA_CPATH="$LUA_CPATH;$OR_ROOT/lualib/?.so;"
+
+export TREE
+export OR_ROOT
+export LJ_ROOT
+export PATH
+export LUA_PATH
+export LUA_CPATH
+export LD_LIBRARY_PATH=$PWD

@@ -1,0 +1,14 @@
+#!/bin/bash
+. ./setenv
+
+LRVER=3.9.2
+
+wget http://luarocks.github.io/luarocks/releases/luarocks-$LRVER.tar.gz
+tar -zxvf luarocks-$LRVER.tar.gz
+rm luarocks-$LRVER.tar.gz
+cd luarocks-$LRVER
+./configure --prefix=$TREE --force-config --with-lua=$LJ_ROOT
+make
+make install
+cd ..
+rm -rf luarocks-$LRVER
