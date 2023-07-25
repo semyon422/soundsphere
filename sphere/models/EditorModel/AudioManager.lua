@@ -1,24 +1,64 @@
 local Class = require("Class")
 local audio = require("audio")
+local rbtree = require("rbtree")
+
+local Keyframe_mt = {}
+
+function Keyframe_mt.__eq(a, b)
+	return a.time == b.time
+end
+
+function Keyframe_mt.__lt(a, b)
+	return a.time < b.time
+end
+
+local function newKeyFrame(time)
+	return setmetatable({
+		time = time,
+		sources = {},
+	}, Keyframe_mt)
+end
 
 local AudioManager = Class:new()
 
 AudioManager.time = 0
 
-AudioManager.load = function(self)
-	self.sources = {}
-	self.intervals = {}
-	self.allSources = {}
+local function findsub(self, key)
+	local y
+	local x = self.root
+	while x and key ~= x.key.time do
+		y = x
+		if key < x.key.time then
+			x = x.left
+		else
+			x = x.right
+		end
+	end
+	return x, y
+end
 
+AudioManager.load = function(self)
+	self.tree = rbtree.new()
+	self.tree.findsub = findsub
+
+	self.sources = {}
 	self.firstTime = 0
 	self.lastTime = 0
 end
 
 AudioManager.unload = function(self)
-	for source in pairs(self.allSources) do
-		source.audio:stop()
-		source.audio:release()
+	local sources = {}
+	for _, key in self.tree:iter() do
+		for placedSource in pairs(key.sources) do
+			sources[placedSource] = sources
+		end
 	end
+
+	for placedSource in pairs(sources) do
+		placedSource.source:stop()
+		placedSource.source:release()
+	end
+
 	self:load()
 end
 
@@ -33,48 +73,46 @@ AudioManager.update = function(self, force)
 	local forcePosition = not isPlaying or force
 
 	local sources = self:getCurrentSources()
-	for source in pairs(sources) do
-		if not self.sources[source] then
-			self.sources[source] = source
+	for placedSource in pairs(sources) do
+		if not self.sources[placedSource] then
+			self.sources[placedSource] = placedSource
 		end
 		if isPlaying then
-			source.audio:setRate(self.editorModel.timer.rate)
-			if source.isStream then
-				source.audio:setVolume(self.volume.master * self.volume.music * source.volume)
+			placedSource.source:setRate(self.editorModel.timer.rate)
+			if placedSource.isStream then
+				placedSource.source:setVolume(self.volume.master * self.volume.music * placedSource.volume)
 			else
-				source.audio:setVolume(self.volume.master * self.volume.effects * source.volume)
+				placedSource.source:setVolume(self.volume.master * self.volume.effects * placedSource.volume)
 			end
-			source.audio:play()
+			placedSource.source:play()
 		end
 	end
-	for source in pairs(self.sources) do
-		if not sources[source] then
-			sources[source] = nil
-			source.audio:stop()
-			self.sources[source] = nil
+	for placedSource in pairs(self.sources) do
+		if not sources[placedSource] then
+			placedSource.source:stop()
+			self.sources[placedSource] = nil
 		end
 	end
 	if forcePosition then
-		for source in pairs(self.sources) do
-			source.audio:setPosition(time - source.offset)
+		for placedSource in pairs(self.sources) do
+			placedSource.source:setPosition(time - placedSource.offset)
 		end
 	end
 end
 
 AudioManager.setVolume = function(self)
-	for _source in pairs(self.sources) do
-		local source = _source.audio
-		if source.isStream then
-			source.audio:setVolume(self.volume.master * self.volume.music * source.volume)
+	for placedSource in pairs(self.sources) do
+		if placedSource.isStream then
+			placedSource.source:setVolume(self.volume.master * self.volume.music * placedSource.volume)
 		else
-			source.audio:setVolume(self.volume.master * self.volume.effects * source.volume)
+			placedSource.source:setVolume(self.volume.master * self.volume.effects * placedSource.volume)
 		end
 	end
 end
 
 AudioManager.setRate = function(self, rate)
-	for _source in pairs(self.sources) do
-		_source.audio:setRate(rate)
+	for placedSource in pairs(self.sources) do
+		placedSource.source:setRate(rate)
 	end
 end
 
@@ -82,12 +120,12 @@ AudioManager.getPosition = function(self)
 	local position = 0
 	local length = 0
 
-	for _source in pairs(self.sources) do
-		local source = _source.audio
+	for placedSource in pairs(self.sources) do
+		local source = placedSource.source
 		local pos = source:getPosition()
-		if _source.isStream and source:isPlaying() then
-			local _length = source:getLength()
-			position = position + (_source.offset + pos) * _length
+		if placedSource.isStream and source:isPlaying() then
+			local _length = source:getDuration()
+			position = position + (placedSource.offset + pos) * _length
 			length = length + _length
 		end
 	end
@@ -101,51 +139,73 @@ end
 
 AudioManager.play = function(self)
 	local time = self.editorModel.timer:getTime()
-	for source in pairs(self.sources) do
-		source.audio:setPosition(time - source.offset)
+	for placedSource in pairs(self.sources) do
+		placedSource.source:setPosition(time - placedSource.offset)
 	end
 end
 
 AudioManager.pause = function(self)
-	for source in pairs(self.sources) do
-		source.audio:pause()
+	for placedSource in pairs(self.sources) do
+		placedSource.source:pause()
 	end
 end
 
 AudioManager.getCurrentSources = function(self)
 	local time = self.time
-	local interval = self.intervals[math.floor(time)]
 
-	local sources = {}
-	if not interval then
-		return sources
+	local a, b = self.tree:findsub(time)
+	if a then
+		return a.key.sources
 	end
-	for source in pairs(interval) do
-		if source.offset <= time and source.offset + source.duration > time then
-			sources[source] = true
-			-- table.insert(sources, source)
-		end
+	if not b then
+		return {}
 	end
 
-	return sources
+	if b.key.time > time then
+		local prev = b:prev()
+		return prev and prev.key.sources or {}
+	end
+
+	return b.key.sources
 end
 
-AudioManager.insert = function(self, source)
-	local intervals = self.intervals
-	for i = math.floor(source.offset), math.ceil(source.offset + source.duration) - 1 do
-		intervals[i] = intervals[i] or {}
-		intervals[i][source] = true
+AudioManager.getNode = function(self, time)
+	local tree = self.tree
+	local n = tree:findsub(time)
+	if n then
+		return n
 	end
-	self.allSources[source] = true
+
+	n = tree:insert(newKeyFrame(time))
+
+	local l = n:prev()
+	if not l then
+		return n
+	end
+
+	for source in pairs(l.key.sources) do
+		n.key.sources[source] = true
+	end
+
+	return n
 end
 
-AudioManager.remove = function(self, source)
-	local intervals = self.intervals
-	for i = math.floor(source.offset), math.ceil(source.offset + source.duration) - 1 do
-		intervals[i] = intervals[i] or {}
-		intervals[i][source] = nil
+AudioManager.insert = function(self, placedSource)
+	local startTime, endTime = placedSource.offset, placedSource.offset + placedSource.duration
+
+	local a = self:getNode(startTime)
+	local b = self:getNode(endTime)
+
+	a.key.sources[placedSource] = true
+
+	local n = a:next()
+	while n and n.key < b.key do
+		n.key.sources[placedSource] = true
+		n = n:next()
 	end
-	self.allSources[source] = nil
+end
+
+AudioManager.remove = function(self, placedSource)
 end
 
 AudioManager.loadResources = function(self, noteChart)
@@ -159,13 +219,12 @@ AudioManager.loadResources = function(self, noteChart)
 					local soundData = self.editorModel.resourceModel.resources[path]
 					if soundData then
 						local mode = noteData.stream and audioSettings.mode.primary or audioSettings.mode.secondary
-						local _audio = audio.newSource(soundData, mode)
-						local duration = _audio:getLength()
+						local duration = soundData:getDuration()
 						self:insert({
 							offset = offset,
 							duration = duration,
 							soundData = soundData,
-							audio = _audio,
+							source = audio.newSource(soundData, mode),
 							name = s[1],
 							volume = s[2],
 							isStream = noteData.stream,
@@ -177,6 +236,8 @@ AudioManager.loadResources = function(self, noteChart)
 			end
 		end
 	end
+	-- self.firstTime = self.tree:min().key.time
+	-- self.lastTime = self.tree:max().key.time
 end
 
 return AudioManager
