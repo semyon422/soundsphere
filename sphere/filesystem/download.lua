@@ -2,12 +2,12 @@ local thread = require("thread")
 thread.shared.download = {}
 
 return thread.async(function(url, saveDir, fallbackName)
-	local https = require("ssl.https")
+	local http = require("http")
 	local ltn12 = require("ltn12")
 	local thread = require("thread")
 	local path_util = require("path_util")
 
-	local one, code, headers, status_line = https.request({
+	local one, code, headers, status_line = http.request({
 		url = url,
 		method = "HEAD",
 		sink = ltn12.sink.null(),
@@ -60,7 +60,7 @@ return thread.async(function(url, saveDir, fallbackName)
 		return true
 	end
 
-	one, code, _, status_line = https.request({
+	one, code, _, status_line = http.request({
 		url = url,
 		method = "GET",
 		sink = sink,

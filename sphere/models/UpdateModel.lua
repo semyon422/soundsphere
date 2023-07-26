@@ -34,15 +34,12 @@ local crossFiles = function(server, client)
 end
 
 local async_download = thread.async(function(url, path)
-	local https = require("ssl.https")
+	local http = require("http")
 	local socket_url = require("socket.url")
 
 	url = socket_url.build(socket_url.parse(url))
 
-	if url:find("^http://") then
-		https = require("socket.http")
-	end
-	local body, code = https.request(url)
+	local body, code = http.request(url)
 	if not body or not path then
 		return body, code
 	end

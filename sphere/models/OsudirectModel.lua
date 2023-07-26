@@ -90,8 +90,8 @@ OsudirectModel.getDifficulties = function(self)
 end
 
 local requestAsync = thread.async(function(url)
-	local https = require("ssl.https")
-	return https.request(url)
+	local http = require("http")
+	return http.request(url)
 end)
 
 OsudirectModel.searchDebounce = function(self)

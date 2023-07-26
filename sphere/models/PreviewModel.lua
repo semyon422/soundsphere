@@ -131,8 +131,8 @@ PreviewModel.stop = function(self)
 end
 
 local loadHttp = thread.async(function(url)
-	local https = require("ssl.https")
-	local body = https.request(url)
+	local http = require("http")
+	local body = http.request(url)
 	if not body then
 		return
 	end

@@ -32,7 +32,7 @@ WebApi.processResponse = function(level, body, ...)
 end
 
 WebApi.get = function(url, params)
-	local https = require("ssl.https")
+	local http = require("http")
 	local ltn12 = require("ltn12")
 
 	local http_util = require("http_util")
@@ -42,7 +42,7 @@ WebApi.get = function(url, params)
 	end
 
 	local t = {}
-	local one, code, headers = https.request({
+	local one, code, headers = http.request({
 		url = url,
 		method = "GET",
 		sink = ltn12.sink.table(t),
@@ -60,7 +60,7 @@ end
 
 WebApi.post = function(url, method, params, buffers)
 	local json = require("json")
-	local https = require("ssl.https")
+	local http = require("http")
 	local ltn12 = require("ltn12")
 	local http_util = require("http_util")
 
@@ -80,7 +80,7 @@ WebApi.post = function(url, method, params, buffers)
 	headers["Authorization"] = "Bearer " .. WebApi.token
 
 	local t = {}
-	local one, code, _headers = https.request({
+	local one, code, _headers = http.request({
 		url = url,
 		method = method,
 		sink = ltn12.sink.table(t),
