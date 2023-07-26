@@ -73,40 +73,40 @@ AudioManager.update = function(self, force)
 	local forcePosition = not isPlaying or force
 
 	local sources = self:getCurrentSources()
-	for placedSource in pairs(sources) do
-		if not self.sources[placedSource] then
-			self.sources[placedSource] = placedSource
-		end
-		if isPlaying then
-			placedSource.source:setRate(self.editorModel.timer.rate)
-			if placedSource.isStream then
-				placedSource.source:setVolume(self.volume.master * self.volume.music * placedSource.volume)
-			else
-				placedSource.source:setVolume(self.volume.master * self.volume.effects * placedSource.volume)
-			end
-			placedSource.source:play()
-		end
-	end
+
 	for placedSource in pairs(self.sources) do
 		if not sources[placedSource] then
 			placedSource.source:stop()
 			self.sources[placedSource] = nil
 		end
 	end
+
+	for placedSource in pairs(sources) do
+		if not self.sources[placedSource] then
+			self.sources[placedSource] = true
+		end
+		placedSource.source:setRate(self.editorModel.timer.rate)
+		local volume = placedSource.isStream and self.volume.music or self.volume.effects
+		placedSource.source:setVolume(self.volume.master * volume * placedSource.volume)
+	end
+
 	if forcePosition then
 		for placedSource in pairs(self.sources) do
 			placedSource.source:setPosition(time - placedSource.offset)
+		end
+	end
+
+	if isPlaying then
+		for placedSource in pairs(sources) do
+			placedSource.source:play()
 		end
 	end
 end
 
 AudioManager.setVolume = function(self)
 	for placedSource in pairs(self.sources) do
-		if placedSource.isStream then
-			placedSource.source:setVolume(self.volume.master * self.volume.music * placedSource.volume)
-		else
-			placedSource.source:setVolume(self.volume.master * self.volume.effects * placedSource.volume)
-		end
+		local volume = placedSource.isStream and self.volume.music or self.volume.effects
+		placedSource.source:setVolume(self.volume.master * volume * placedSource.volume)
 	end
 end
 
