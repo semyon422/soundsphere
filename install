@@ -1,3 +1,4 @@
 #!/bin/bash
 . ./setenv
 luarocks install lapis
+luarocks install luautf8

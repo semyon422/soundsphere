@@ -1,5 +1,4 @@
 local FastplayController = require("sphere.controllers.FastplayController")
-local ResultController = require("sphere.controllers.ResultController")
 local WebNoteChartController = require("sphere.controllers.WebNoteChartController")
 
 local Replay = require("sphere.models.ReplayModel.Replay")
@@ -7,6 +6,8 @@ local ReplayModel = require("sphere.models.ReplayModel")
 local ModifierModel = require("sphere.models.ModifierModel")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local RhythmModel = require("sphere.models.RhythmModel")
+
+local deps = require("sphere.deps")
 
 local WebReplayController = {}
 
@@ -45,8 +46,12 @@ WebReplayController.POST = function(self)
 	game.difficultyModel = difficultyModel
 	game.replayModel = replayModel
 
-	for k, v in pairs(game) do
-		v.game = game
+	for n, list in pairs(deps) do
+		for _, m in ipairs(list) do
+			if game[n] then
+				game[n][m] = game[m]
+			end
+		end
 	end
 
 	rhythmModel.judgements = {}
