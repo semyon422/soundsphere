@@ -253,4 +253,15 @@ EditorModel.getSnap = function(self, j)
 	return k
 end
 
+EditorModel.getTotalBeats = function(self)
+	local ld = self.layerData
+	local range = ld.ranges.interval
+
+	local a, b = range.first.timePoint, range.last.timePoint
+	local beats = b:sub(a)
+	local avgBeatDuration = (b.absoluteTime - a.absoluteTime) / beats
+
+	return beats, avgBeatDuration
+end
+
 return EditorModel

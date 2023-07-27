@@ -137,7 +137,14 @@ function tabs.timings(self)
 		if beats ~= newBeats then
 			intervalManager:update(intervalData, newBeats)
 		end
+		imgui.text("Tempo: " .. intervalData:getTempo() .. " bpm")
 	end
+
+	imgui.separator()
+
+	local totalBeats, avgBeatDuration = editorModel:getTotalBeats()
+	imgui.text("Total beats: " .. totalBeats .. "")
+	imgui.text("Average tempo: " .. 60 / avgBeatDuration .. " bpm")
 
 	imgui.separator()
 
