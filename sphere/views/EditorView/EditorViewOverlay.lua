@@ -67,6 +67,12 @@ function tabs.audio(self)
 	v.metronome = imgui.slider1("v.metronome", v.metronome, "%0.2f", 0, 1, 0.01, "metronome volume")
 
 	imgui.separator()
+	local mode = a.mode
+	imgui.text("audio modes")
+	imgui.text("primary: " .. mode.primary)
+	imgui.text("secondary: " .. mode.secondary)
+
+	imgui.separator()
 	imgui.text("waveform")
 	local wf = self.game.configModel.configs.settings.editor.waveform
 	wf.opacity = imgui.slider1("wf.opacity", wf.opacity, "%0.2f", 0, 1, 0.01, "opacity")
