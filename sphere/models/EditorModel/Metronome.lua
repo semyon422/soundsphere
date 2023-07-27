@@ -11,6 +11,7 @@ Metronome.load = function(self)
 	self.source = audio.newSource(self.soundData)
 
 	self.nextTime = math.huge
+	self.isNextBeat = false
 end
 
 Metronome.unload = function(self)
@@ -18,7 +19,7 @@ Metronome.unload = function(self)
 	self.soundData:release()
 end
 
-Metronome.getNextTime = function(self)
+Metronome.updateNextTime = function(self)
 	local editorModel = self.editorModel
 	local timePoint = editorModel.timePoint
 	local ld = editorModel.layerData
@@ -31,9 +32,9 @@ Metronome.getNextTime = function(self)
 	local id, t = editorModel.scroller:getNextSnapIntervalTime(timePoint, 1)
 
 	local nextTimePoint = ld:getDynamicTimePoint(id, t)
-	local nextTime = nextTimePoint:tonumber()
 
-	return nextTime
+	self.nextTime = nextTimePoint:tonumber()
+	self.isNextBeat = (nextTimePoint.time % 1):tonumber() == 0
 end
 
 Metronome.update = function(self)
@@ -44,10 +45,14 @@ Metronome.update = function(self)
 		local source = self.source
 		source:stop()
 		source:setVolume(self.volume.master * self.volume.metronome)
+		source:setRate(2099 / 2645)
+		if self.isNextBeat then
+			source:setRate(1)
+		end
 		source:play()
 	end
 
-	self.nextTime = self:getNextTime()
+	self:updateNextTime()
 end
 
 return Metronome
