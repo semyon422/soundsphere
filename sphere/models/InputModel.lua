@@ -12,11 +12,11 @@ InputModel.devices = {
 }
 
 InputModel.transformEvent = function(self, inputMode, event)
-	if not event.name:find("^.+pressed$") and not event.name:find("^.+released$") then
+	local device = event.name:match("^(.+)pressed$") or event.name:match("^(.+)released$")
+	if not device then
 		return
 	end
 
-	local device = event.name:match("^(.+)pressed$") or event.name:match("^(.+)released$")
 	if device == "key" then
 		device = "keyboard"
 	end
@@ -48,9 +48,6 @@ InputModel.transformEvent = function(self, inputMode, event)
 					break
 				end
 			end
-		elseif k == key then
-			_i = i
-			break
 		end
 	end
 
@@ -58,8 +55,9 @@ InputModel.transformEvent = function(self, inputMode, event)
 	return inputs[_i], state
 end
 
-InputModel.setKey = function(self, inputMode, virtualKey, device, key)
+InputModel.setKey = function(self, inputMode, virtualKey, device, key, index)
 	local inputs = self:getInputs(inputMode)
+	local n = inputs[virtualKey]
 
 	if device == "midi" then
 		key = tonumber(key)
@@ -73,22 +71,35 @@ InputModel.setKey = function(self, inputMode, virtualKey, device, key)
 	inputConfig[device] = inputConfig[device] or {}
 	local deviceConfig = inputConfig[device]
 
-	deviceConfig[inputs[virtualKey]] = key
+	if type(deviceConfig[n]) ~= "table" then
+		deviceConfig[n] = {}
+	end
+
+	deviceConfig[n][index] = key
 end
 
-InputModel.getKey = function(self, inputMode, virtualKey, device)
+InputModel.getKey = function(self, inputMode, virtualKey, device, index)
 	local inputs = self:getInputs(inputMode)
+	local n = inputs[virtualKey]
 
 	local config = self.configModel.configs.input
 	local inputConfig = config[inputMode]
-	local deviceConfig = inputConfig and inputConfig[device]
-	local key = deviceConfig and deviceConfig[inputs[virtualKey]]
-
-	if type(key) == "table" then
-		key = table.concat(key, ", ")
+	if not inputConfig then
+		return "none"
 	end
 
-	return key or "none"
+	local deviceConfig = inputConfig[device]
+	if not deviceConfig then
+		return "none"
+	end
+
+	local keys = deviceConfig[n]
+
+	if type(keys) ~= "table" then
+		return "none"
+	end
+
+	return keys[index] or "none"
 end
 
 InputModel.getInputs = function(self, inputMode)

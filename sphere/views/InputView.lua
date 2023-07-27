@@ -44,20 +44,23 @@ return ModalImView(function(self)
 
 	imgui.Container(window_id, w, h - _h, _h / 3, _h * 2, scrollY)
 
+	local inputIdPattern = "input hotkey %s %s"
 	for i = 1, #inputs do
-		local hotkey_id = "input hotkey" .. i
 		local virtualKey = inputs[i]
-		local key = self.game.inputModel:getKey(inputMode, virtualKey, currentDevice)
-		local changed, key = imgui.Hotkey(hotkey_id, currentDevice, key, _w, _h)
-		if changed then
-			self.game.inputModel:setKey(inputMode, virtualKey, currentDevice, key)
-			if i + 1 <= #inputs then
-				just.focus("input hotkey" .. (i + 1))
+		for j = 1, 2 do
+			local hotkey_id = inputIdPattern:format(i, j)
+			local key = self.game.inputModel:getKey(inputMode, virtualKey, currentDevice, j)
+			local changed, key = imgui.Hotkey(hotkey_id, currentDevice, key, _w / 2, _h)
+			if changed then
+				self.game.inputModel:setKey(inputMode, virtualKey, currentDevice, key, j)
+				if i + 1 <= #inputs then
+					just.focus(inputIdPattern:format(i + 1, j))
+				end
 			end
+			just.sameline()
 		end
-		just.sameline()
 		just.indent(8)
-		imgui.Label(hotkey_id, virtualKey, _h)
+		imgui.Label("input label" .. i, virtualKey, _h)
 	end
 	just.emptyline(8)
 
