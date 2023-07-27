@@ -13,6 +13,7 @@ return {
 			secondary = "bass_sample"
 		},
 		sampleGain = 0,
+		volumeType = "linear",
 		volume = {
 			effects = 1,
 			master = 1,

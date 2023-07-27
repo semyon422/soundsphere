@@ -61,10 +61,18 @@ function tabs.audio(self)
 	local settings = self.game.configModel.configs.settings
 	local a = settings.audio
 	local v = a.volume
-	v.master = imgui.slider1("v.master", v.master, "%0.2f", 0, 1, 0.01, "master volume")
-	v.music = imgui.slider1("v.music", v.music, "%0.2f", 0, 1, 0.01, "music volume")
-	v.effects = imgui.slider1("v.effects", v.effects, "%0.2f", 0, 1, 0.01, "effects volume")
-	v.metronome = imgui.slider1("v.metronome", v.metronome, "%0.2f", 0, 1, 0.01, "metronome volume")
+	if a.volumeType == "linear" then
+		v.master = imgui.slider1("v.master", v.master, "%0.2f", 0, 1, 0.01, "master")
+		v.music = imgui.slider1("v.music", v.music, "%0.2f", 0, 1, 0.01, "music")
+		v.effects = imgui.slider1("v.effects", v.effects, "%0.2f", 0, 1, 0.01, "effects")
+		v.metronome = imgui.slider1("v.metronome", v.metronome, "%0.2f", 0, 1, 0.01, "metronome")
+	elseif a.volumeType == "logarithmic" then
+		local logk = 20 / math.log(10)
+		v.master = imgui.logslider("v.master", v.master, "%ddB", -60, 0, 1, logk, "master")
+		v.music = imgui.logslider("v.music", v.music, "%ddB", -60, 0, 1, logk, "music")
+		v.effects = imgui.logslider("v.effects", v.effects, "%ddB", -60, 0, 1, logk, "effects")
+		v.metronome = imgui.logslider("v.metronome", v.metronome, "%ddB", -60, 0, 1, logk, "metronome")
+	end
 
 	imgui.separator()
 	local mode = a.mode
