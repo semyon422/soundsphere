@@ -58,7 +58,7 @@ AudioEngine.playAudio = function(self, sounds, isBackground, stream, offset)
 	for i = 1, #sounds do
 		local mode = stream and self.mode.primary or self.mode.secondary
 
-		local soundData = self.rhythmModel:getResource(sounds[i][1])
+		local soundData = self.rhythmModel.resourceModel:getResource(sounds[i][1])
 
 		if soundData then
 			local audio = _audio.newSource(soundData, mode)

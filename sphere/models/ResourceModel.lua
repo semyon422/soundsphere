@@ -182,6 +182,12 @@ ResourceModel.loadResource = function(self, path)
 	end
 end
 
+ResourceModel.getResource = function(self, s)
+	local aliases = self.aliases
+	local resources = self.resources
+	return resources[aliases[s]]
+end
+
 ResourceModel.loadOJM = function(self, loaded, ojmPath)
 	for _, path in ipairs(loaded) do
 		if not path:find(ojmPath, 1, true) then

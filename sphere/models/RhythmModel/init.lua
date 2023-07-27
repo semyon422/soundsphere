@@ -93,12 +93,6 @@ RhythmModel.update = function(self, dt)
 	self.pauseManager:update(dt)
 end
 
-RhythmModel.getResource = function(self, s)
-	local aliases = self.resourceModel.aliases
-	local resources = self.resourceModel.resources
-	return resources[aliases[s]]
-end
-
 RhythmModel.hasResult = function(self)
 	local timeEngine = self.timeEngine
 	local base = self.scoreEngine.scoreSystem.base
