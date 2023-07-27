@@ -23,23 +23,12 @@ local AudioManager = Class:new()
 
 AudioManager.time = 0
 
-local function findsub(self, key)
-	local y
-	local x = self.root
-	while x and key ~= x.key.time do
-		y = x
-		if key < x.key.time then
-			x = x.left
-		else
-			x = x.right
-		end
-	end
-	return x, y
+local function exTime(key)
+	return key.time
 end
 
 AudioManager.load = function(self)
 	self.tree = rbtree.new()
-	self.tree.findsub = findsub
 
 	self.sources = {}
 	self.firstTime = 0
@@ -153,7 +142,7 @@ end
 AudioManager.getCurrentSources = function(self)
 	local time = self.time
 
-	local a, b = self.tree:findsub(time)
+	local a, b = self.tree:findex(time, exTime)
 	if a then
 		return a.key.sources
 	end
@@ -171,7 +160,7 @@ end
 
 AudioManager.getNode = function(self, time)
 	local tree = self.tree
-	local n = tree:findsub(time)
+	local n = tree:findex(time, exTime)
 	if n then
 		return n
 	end

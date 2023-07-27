@@ -1,5 +1,9 @@
 local gfx_util = require("gfx_util")
 
+local function exTime(key)
+	return key.time
+end
+
 return function(self)
 	local editor = self.game.configModel.configs.settings.editor
 	local editorModel = self.game.editorModel
@@ -11,7 +15,7 @@ return function(self)
 
 	local time = editorModel.timePoint.absoluteTime - editorModel.mainAudio.offset
 
-	local a, b = onsets:findsub(time - 1 / editor.speed)
+	local a, b = onsets:findex(time - 1 / editor.speed, exTime)
 	local node = a or b
 
 	if not node then

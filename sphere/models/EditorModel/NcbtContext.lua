@@ -14,20 +14,6 @@ NcbtContext.load = function(self)
 	self.binsSize = nil
 end
 
-local function findsub(self, key)
-	local y
-	local x = self.root
-	while x and key ~= x.key.time do
-		y = x
-		if key < x.key.time then
-			x = x.left
-		else
-			x = x.right
-		end
-	end
-	return x, y
-end
-
 NcbtContext.detect = function(self, soundData)
 	self.duration = soundData:getDuration()
 
@@ -38,7 +24,6 @@ NcbtContext.detect = function(self, soundData)
 		tree:insert(time)
 	end
 	self.onsets = tree
-	tree.findsub = findsub
 
 	local out = ncbt.tempo_offset(onsets)
 
