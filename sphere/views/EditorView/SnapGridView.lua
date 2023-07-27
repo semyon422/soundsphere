@@ -286,9 +286,11 @@ SnapGridView.draw = function(self)
 	if lalt and not speedOrig then
 		speedOrig = editor.speed
 		editor.speed = 1000 / noteSkin.unit * 10
+		editorModel.scroller:updateRange()
 	elseif not lalt and speedOrig then
 		editor.speed = speedOrig
 		speedOrig = nil
+		editorModel.scroller:updateRange()
 	end
 	if lalt or lshift or lctrl then
 		drawMouse(self)
