@@ -79,8 +79,15 @@ MainAudio.update = function(self, force)
 	local isPlaying = self.editorModel.timer.isPlaying
 	local forcePosition = not isPlaying or force
 
-	if not self:isPlayable() then
+	local offset = self:getAudioOffset()
+
+	if time < offset then
 		source:stop()
+		return
+	end
+
+	-- substract 1 second because source can stop before (offset + duration)
+	if time >= offset + self.duration - 1 then
 		return
 	end
 
@@ -103,7 +110,7 @@ MainAudio.play = function(self)
 end
 
 MainAudio.pause = function(self)
-	if self.source and self:isPlayable() then
+	if self.source then
 		self.source:pause()
 	end
 end
