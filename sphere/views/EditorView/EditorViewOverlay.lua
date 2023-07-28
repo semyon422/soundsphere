@@ -131,8 +131,15 @@ function tabs.timings(self)
 		end
 	end
 
+	imgui.separator()
+
 	local intervalData = dtp._intervalData
 	local intervalManager = editorModel.intervalManager
+
+	if intervalData then
+		imgui.text("Tempo: " .. intervalData:getTempo() .. " bpm")
+	end
+
 	if not intervalManager:isGrabbed() then
 		if not intervalData then
 			if imgui.button("split button", "split") then
@@ -157,13 +164,12 @@ function tabs.timings(self)
 		if beats ~= newBeats then
 			intervalManager:update(intervalData, newBeats)
 		end
-		imgui.text("Tempo: " .. intervalData:getTempo() .. " bpm")
 	end
 
 	imgui.separator()
 
 	local totalBeats, avgBeatDuration = editorModel:getTotalBeats()
-	imgui.text("Total beats: " .. totalBeats .. "")
+	imgui.text("Total beats: " .. totalBeats)
 	imgui.text("Average tempo: " .. 60 / avgBeatDuration .. " bpm")
 
 	imgui.separator()
