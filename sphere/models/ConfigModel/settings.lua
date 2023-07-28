@@ -22,6 +22,7 @@ return {
 		}
 	},
 	editor = {
+		audioOffset = 0,
 		speed = 1,
 		snap = 1,
 		lockSnap = true,

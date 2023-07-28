@@ -92,40 +92,6 @@ AudioManager.update = function(self, force)
 	end
 end
 
-AudioManager.setVolume = function(self)
-	for placedSource in pairs(self.sources) do
-		local volume = placedSource.isStream and self.volume.music or self.volume.effects
-		placedSource.source:setVolume(self.volume.master * volume * placedSource.volume)
-	end
-end
-
-AudioManager.setRate = function(self, rate)
-	for placedSource in pairs(self.sources) do
-		placedSource.source:setRate(rate)
-	end
-end
-
-AudioManager.getPosition = function(self)
-	local position = 0
-	local length = 0
-
-	for placedSource in pairs(self.sources) do
-		local source = placedSource.source
-		local pos = source:getPosition()
-		if placedSource.isStream and source:isPlaying() then
-			local _length = source:getDuration()
-			position = position + (placedSource.offset + pos) * _length
-			length = length + _length
-		end
-	end
-
-	if length == 0 then
-		return nil
-	end
-
-	return position / length
-end
-
 AudioManager.play = function(self)
 	local time = self.editorModel.timer:getTime()
 	for placedSource in pairs(self.sources) do
@@ -195,6 +161,16 @@ AudioManager.insert = function(self, placedSource)
 end
 
 AudioManager.remove = function(self, placedSource)
+	local n = self:getNode(placedSource.offset)
+
+	while n and n.key.sources[placedSource] do
+		n.key.sources[placedSource] = nil
+		local _n = n
+		n = n:next()
+		if not next(_n.key.sources) then
+			self.tree:remove_node(_n)
+		end
+	end
 end
 
 AudioManager.loadResources = function(self, noteChart)
@@ -202,12 +178,11 @@ AudioManager.loadResources = function(self, noteChart)
 	for noteDatas in noteChart:getInputIterator() do
 		for _, noteData in ipairs(noteDatas) do
 			local offset = noteData.timePoint.absoluteTime
-			if noteData.sounds then
+			if noteData.sounds and not noteData.stream then
 				for _, s in ipairs(noteData.sounds) do
-					local path = self.editorModel.resourceModel.aliases[s[1]]
-					local soundData = self.editorModel.resourceModel.resources[path]
+					local soundData = self.editorModel.resourceModel:getResource(s[1])
 					if soundData then
-						local mode = noteData.stream and audioSettings.mode.primary or audioSettings.mode.secondary
+						local mode = audioSettings.mode.secondary
 						local duration = soundData:getDuration()
 						self:insert({
 							offset = offset,

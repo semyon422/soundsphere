@@ -52,7 +52,7 @@ function tabs.audio(self)
 	local editorModel = self.game.editorModel
 
 	local playing = 0
-	for _ in pairs(self.game.editorModel.audioManager.sources) do
+	for _ in pairs(editorModel.audioManager.sources) do
 		playing = playing + 1
 	end
 	imgui.text("playing sounds: " .. playing)
@@ -79,6 +79,11 @@ function tabs.audio(self)
 	imgui.text("audio modes")
 	imgui.text("primary: " .. mode.primary)
 	imgui.text("secondary: " .. mode.secondary)
+
+	imgui.separator()
+
+	local ed = settings.editor
+	ed.audioOffset = imgui.slider1("ed.audioOffset", ed.audioOffset * 1000, "%dms", -200, 200, 1, "main audio offset") / 1000
 
 	imgui.separator()
 	imgui.text("waveform")

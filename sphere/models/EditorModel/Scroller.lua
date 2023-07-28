@@ -31,11 +31,8 @@ Scroller.scrollTimePoint = function(self, timePoint)
 
 	self:_scrollTimePoint(timePoint)
 
-	local timer = self.editorModel.timer
-	timer:setTime(timePoint.absoluteTime)
-
-	local audioManager = self.editorModel.audioManager
-	audioManager:update(true)
+	local editorModel = self.editorModel
+	editorModel:setTime(timePoint.absoluteTime)
 end
 
 Scroller.scrollSeconds = function(self, absoluteTime)

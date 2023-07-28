@@ -1,8 +1,5 @@
 local just = require("just")
-local imgui = require("imgui")
-local time_util = require("time_util")
 local math_util = require("math_util")
-local gfx_util = require("gfx_util")
 local theme = require("imgui.theme")
 
 local function getPosition(w, h)
@@ -19,8 +16,9 @@ return function(self, w, h)
 	local editorModel = self.game.editorModel
 	local editorTimePoint = editorModel.timePoint
 
-	local fullLength = editorModel.lastTime - editorModel.firstTime
-	local value = (editorTimePoint.absoluteTime - editorModel.firstTime) / fullLength
+	local firstTime, lastTime = editorModel:getFirstLastTime()
+	local fullLength = lastTime - firstTime
+	local value = (editorTimePoint.absoluteTime - firstTime) / fullLength
 
 	local densityPoints = editorModel.graphsGenerator.densityGraph
 	local intervalPoints = editorModel.graphsGenerator.intervalDatasGraph
@@ -54,7 +52,7 @@ return function(self, w, h)
 	end
 
 	local previewTime = self.game.noteChartModel.noteChart.metaData.previewTime
-	local x = math_util.map(previewTime, editorModel.firstTime, editorModel.lastTime, a, b)
+	local x = math_util.map(previewTime, firstTime, lastTime, a, b)
 	love.graphics.setColor(0.1, 0.6, 1, 1)
 	love.graphics.setLineWidth(4)
 	love.graphics.line(x, pad, x, _h + pad)
@@ -68,7 +66,7 @@ return function(self, w, h)
 
 	if just.active_id == "time slider" then
 		if new_value then
-			editorModel.scroller:scrollSeconds(new_value * fullLength + editorModel.firstTime)
+			editorModel.scroller:scrollSeconds(new_value * fullLength + firstTime)
 		end
 		if editorModel.timer.isPlaying then
 			editorModel:pause()

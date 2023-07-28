@@ -56,23 +56,21 @@ EditorModel.load = function(self)
 
 	self.resourcesLoaded = false
 
-	self.mainAudio:load(self.audioPath)
-	self.mainAudio:findOffset()
-
 	self.timePoint = ld:newTimePoint()
 	self:getDtpAbsolute(0):clone(self.timePoint)
-
-	self.firstTime = ld.ranges.timePoint.first.absoluteTime
-	self.lastTime = ld.ranges.timePoint.last.absoluteTime
 
 	self.timer:pause()
 	self.timer:setTime(editor.time)
 	self.timer.adjustRate = audioSettings.adjustRate
 
-	self.audioManager.volume = self.configModel.configs.settings.audio.volume
+	local volume = self.configModel.configs.settings.audio.volume
+	self.audioManager.volume = volume
 	self.audioManager:load()
 
-	self.metronome.volume = self.configModel.configs.settings.audio.volume
+	self.mainAudio.volume = volume
+	self.mainAudio:load()
+
+	self.metronome.volume = volume
 	self.metronome:load()
 
 	self.scroller:scrollSeconds(self.timer:getTime())
@@ -109,6 +107,12 @@ EditorModel.redo = function(self)
 	self.editorChanges:redo()
 end
 
+EditorModel.setTime = function(self, time)
+	self.timer:setTime(time)
+	self.audioManager:update(true)
+	self.mainAudio:update(true)
+end
+
 EditorModel.loadResources = function(self)
 	if not self.loaded then
 		return
@@ -116,20 +120,39 @@ EditorModel.loadResources = function(self)
 
 	local noteChart = self.noteChart
 
+	self.mainAudio:loadResources(noteChart)
 	self.audioManager:loadResources(noteChart)
-	self.firstTime = self.audioManager.firstTime
-	self.lastTime = self.audioManager.lastTime
-
-	self:genGraphs()
 
 	self.audioManager:update(true)
+	self.mainAudio:update(true)
+
+	self:genGraphs()
 
 	self.resourcesLoaded = true
 end
 
+EditorModel.getFirstLastTime = function(self)
+	local audioManager = self.audioManager
+	local mainAudio = self.mainAudio
+	local ld = self.layerData
+
+	local firstTime = math.min(
+		audioManager.firstTime,
+		mainAudio.offset,
+		ld.ranges.timePoint.first.absoluteTime
+	)
+	local lastTime = math.max(
+		audioManager.lastTime,
+		mainAudio.offset + mainAudio.duration,
+		ld.ranges.timePoint.last.absoluteTime
+	)
+	return firstTime, lastTime
+end
+
 EditorModel.genGraphs = function(self)
-	self.graphsGenerator:genDensityGraph(self.noteChart, self.firstTime, self.lastTime)
-	self.graphsGenerator:genIntervalDatasGraph(self.layerData, self.firstTime, self.lastTime)
+	local a, b = self:getFirstLastTime()
+	self.graphsGenerator:genDensityGraph(self.noteChart, a, b)
+	self.graphsGenerator:genIntervalDatasGraph(self.layerData, a, b)
 end
 
 EditorModel.getDtpAbsolute = function(self, time)
@@ -141,6 +164,7 @@ end
 EditorModel.unload = function(self)
 	self.loaded = false
 	self.audioManager:unload()
+	self.mainAudio:unload()
 	self.metronome:unload()
 end
 
@@ -154,11 +178,13 @@ EditorModel.play = function(self)
 	end
 	self.timer:play()
 	self.audioManager:play()
+	self.mainAudio:play()
 end
 
 EditorModel.pause = function(self)
 	self.timer:pause()
 	self.audioManager:pause()
+	self.mainAudio:pause()
 end
 
 EditorModel.getLogSpeed = function(self)
@@ -220,6 +246,7 @@ EditorModel.update = function(self)
 		self.intervalManager:moveGrabbed(time)
 	end
 	self.audioManager:update()
+	self.mainAudio:update()
 
 	dtp:clone(self.timePoint)
 	if self.timer.isPlaying then
@@ -227,7 +254,6 @@ EditorModel.update = function(self)
 	end
 
 	self.graphicEngine:update()
-
 end
 
 EditorModel.receive = function(self, event)

@@ -7,7 +7,7 @@ TimeManager.getAbsoluteTime = function(self)
 end
 
 TimeManager.getAdjustTime = function(self)
-	return self.editorModel.audioManager:getPosition()
+	return self.editorModel.mainAudio:getPosition()
 end
 
 TimeManager.getAudioOffsync = function(self)
