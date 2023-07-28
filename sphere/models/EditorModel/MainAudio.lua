@@ -43,10 +43,9 @@ MainAudio.loadResources = function(self, noteChart)
 				self.offset = noteData.streamOffset or 0
 				local path = noteData.sounds[1][1]
 				local soundData = self.editorModel.resourceModel:getResource(path)
-				self.bassSoundData = soundData
 				if soundData then
+					self.soundData = soundData
 					self.duration = soundData:getDuration()
-					self.soundData = love.sound.newSoundData(self.editorModel.audioPath)
 					local mode = audioSettings.mode.primary
 					self.source = audio.newSource(soundData, mode)
 				end
