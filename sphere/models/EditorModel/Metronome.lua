@@ -45,10 +45,11 @@ Metronome.update = function(self)
 		local source = self.source
 		source:stop()
 		source:setVolume(self.volume.master * self.volume.metronome)
-		source:setRate(2099 / 2645)
-		if self.isNextBeat then
-			source:setRate(1)
-		end
+		-- source:setRate(2099 / 2645)
+		-- if self.isNextBeat then
+			-- source:setRate(1)
+		-- end
+		print("play")
 		source:play()
 	end
 
