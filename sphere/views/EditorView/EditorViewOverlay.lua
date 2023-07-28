@@ -136,8 +136,8 @@ function tabs.timings(self)
 	local intervalData = dtp._intervalData
 	local intervalManager = editorModel.intervalManager
 
-	if intervalData then
-		imgui.text("Tempo: " .. intervalData:getTempo() .. " bpm")
+	if dtp.intervalData then
+		imgui.text("Tempo: " .. dtp.intervalData:getTempo() .. " bpm")
 	end
 
 	if not intervalManager:isGrabbed() then
