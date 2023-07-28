@@ -84,6 +84,7 @@ function tabs.audio(self)
 
 	local ed = settings.editor
 	ed.audioOffset = imgui.slider1("ed.audioOffset", ed.audioOffset * 1000, "%dms", -200, 200, 1, "main audio offset") / 1000
+	ed.waveformOffset = imgui.slider1("ed.waveformOffset", ed.waveformOffset * 1000, "%dms", -200, 200, 1, "waveform offset") / 1000
 
 	imgui.separator()
 	imgui.text("waveform")

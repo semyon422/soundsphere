@@ -6,13 +6,17 @@ local MainAudio = Class:new()
 MainAudio.load = function(self)
 	self.soundData = nil
 	self.offset = 0
-	self.audioOffset = 0
 	self.duration = 0
 end
 
 MainAudio.getAudioOffset = function(self)
 	local editor = self.editorModel:getSettings()
 	return self.offset + editor.audioOffset
+end
+
+MainAudio.getWaveformOffset = function(self)
+	local editor = self.editorModel:getSettings()
+	return self.offset + editor.waveformOffset
 end
 
 MainAudio.unload = function(self)
