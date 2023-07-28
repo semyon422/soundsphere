@@ -49,7 +49,6 @@ Metronome.update = function(self)
 		-- if self.isNextBeat then
 			-- source:setRate(1)
 		-- end
-		print("play")
 		source:play()
 	end
 
