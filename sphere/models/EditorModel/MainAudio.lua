@@ -21,7 +21,7 @@ MainAudio.unload = function(self)
 		return
 	end
 	source:release()
-	source = nil
+	self.source = nil
 end
 
 MainAudio.getPosition = function(self)
