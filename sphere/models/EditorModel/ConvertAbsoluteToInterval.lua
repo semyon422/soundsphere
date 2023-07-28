@@ -109,6 +109,12 @@ return function(layerData)
 		end
 	end
 
+	if #newLayerData.intervalDatas == 1 then
+		local td = layerData.tempoDatas[1]
+		local beatDuration = td:getBeatDuration()
+		intervalData = newLayerData:insertIntervalData(td.timePoint.absoluteTime + beatDuration, 1)
+	end
+
 	for inputMode, r in pairs(layerData.noteDatas) do
 		for inputIndex, _noteDatas in pairs(r) do
 			for _, noteData in ipairs(_noteDatas) do
