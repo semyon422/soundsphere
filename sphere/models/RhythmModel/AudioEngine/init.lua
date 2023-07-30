@@ -1,25 +1,12 @@
 local _audio		= require("audio")
 local AudioContainer	= require("audio.Container")
 local Class				= require("Class")
-local Observable		= require("Observable")
 
 local AudioEngine = Class:new()
 
 AudioEngine.timeRate = 1
 
 AudioEngine.construct = function(self)
-	self.observable = Observable:new()
-
-	self.volume = {
-		master = 1,
-		music = 1,
-		effects = 1,
-	}
-	self.mode = {
-		primary = "bass_sample",
-		secondary = "bass_sample",
-	}
-
 	self.backgroundContainer = AudioContainer:new()
 	self.foregroundContainer = AudioContainer:new()
 end
@@ -37,6 +24,12 @@ AudioEngine.update = function(self)
 	self:updateTimeRate()
 	self.backgroundContainer:update()
 	self.foregroundContainer:update()
+end
+
+AudioEngine.receive = function(self, event)
+	if event.name == "LogicalNoteSound" then
+		self:playNote(event[1], event[2])
+	end
 end
 
 AudioEngine.unload = function(self)

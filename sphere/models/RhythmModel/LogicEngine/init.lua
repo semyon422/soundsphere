@@ -1,7 +1,12 @@
 local Class				= require("Class")
 local NoteHandler		= require("sphere.models.RhythmModel.LogicEngine.NoteHandler")
+local Observable = require("Observable")
 
 local LogicEngine = Class:new()
+
+LogicEngine.construct = function(self)
+	self.observable = Observable:new()
+end
 
 LogicEngine.load = function(self)
 	self.sharedLogicalNotes = {}
@@ -28,8 +33,10 @@ LogicEngine.sendScore = function(self, event)
 end
 
 LogicEngine.playSound = function(self, noteData, isBackground)
-	if not self.rhythmModel.audioEngine then return end
-	self.rhythmModel.audioEngine:playNote(noteData, isBackground)
+	self.observable:send({
+		name = "LogicalNoteSound",
+		noteData, isBackground
+	})
 end
 
 LogicEngine.receive = function(self, event)
