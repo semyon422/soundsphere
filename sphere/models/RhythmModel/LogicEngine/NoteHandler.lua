@@ -19,7 +19,6 @@ NoteHandler.loadNoteData = function(self)
 		if logicalNote then
 			logicalNote.noteHandler = self
 			logicalNote.logicEngine = logicEngine
-			logicalNote.timeEngine = rhythmModel.timeEngine
 			if logicalNote.isPlayable then
 				notesCount[logicalNote.noteClass] = (notesCount[logicalNote.noteClass] or 0) + 1
 			end

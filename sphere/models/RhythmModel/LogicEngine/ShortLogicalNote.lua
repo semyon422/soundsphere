@@ -50,7 +50,7 @@ ShortLogicalNote.switchState = function(self, newState)
 	end
 
 	local timings = self.logicEngine.timings
-	local timeRate = math.abs(self.timeEngine.timeRate)
+	local timeRate = math.abs(self.logicEngine:getTimeRate())
 	local eventTime = self:getEventTime()
 	local noteTime = self:getNoteTime()
 
@@ -64,7 +64,7 @@ ShortLogicalNote.switchState = function(self, newState)
 	scoreEvent.currentTime = currentTime
 	scoreEvent.deltaTime = deltaTime
 	scoreEvent.noteTime = self:getNoteTime()
-	scoreEvent.timeRate = self.timeEngine.timeRate
+	scoreEvent.timeRate = self.logicEngine:getTimeRate()
 	scoreEvent.notesCount = self.logicEngine.notesCount
 	scoreEvent.oldState = oldState
 	scoreEvent.newState = newState
@@ -92,7 +92,7 @@ ShortLogicalNote.processAuto = function(self)
 end
 
 ShortLogicalNote.getTimeState = function(self)
-	local deltaTime = (self:getEventTime() - self:getNoteTime()) / math.abs(self.timeEngine.timeRate)
+	local deltaTime = (self:getEventTime() - self:getNoteTime()) / math.abs(self.logicEngine:getTimeRate())
 	return self:getTimeStateFromConfig(self.logicEngine.timings.ShortNote, deltaTime)
 end
 

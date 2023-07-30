@@ -63,14 +63,13 @@ end
 LogicalNote.getNoteTime = function(self)
 	local offset = 0
 	if self.isPlayable then
-		offset = self.timeEngine.inputOffset
+		offset = self.logicEngine:getInputOffset()
 	end
 	return self.startNoteData.timePoint.absoluteTime + offset
 end
 
 LogicalNote.isHere = function(self)
-	return self:getNoteTime() <= self.timeEngine.currentTime
-	-- return self.startNoteData.timePoint.absoluteTime <= self:getEventTime()
+	return self:getNoteTime() <= self.logicEngine:getEventTime()
 end
 
 LogicalNote.isReachable = function(self)

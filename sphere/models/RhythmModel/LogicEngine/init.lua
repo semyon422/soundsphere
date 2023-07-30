@@ -16,6 +16,9 @@ LogicEngine.load = function(self)
 end
 
 LogicEngine.update = function(self)
+	if not self.rhythmModel.timeEngine.timer.isPlaying then
+		return
+	end
 	self:updateNoteHandlers()
 end
 
@@ -26,6 +29,14 @@ end
 
 LogicEngine.getEventTime = function(self)
 	return self.eventTime or self.rhythmModel.timeEngine.currentTime
+end
+
+LogicEngine.getTimeRate = function(self)
+	return self.timeRate or self.rhythmModel.timeEngine.timeRate
+end
+
+LogicEngine.getInputOffset = function(self)
+	return self.inputOffset or self.rhythmModel.timeEngine.inputOffset
 end
 
 LogicEngine.sendScore = function(self, event)
@@ -90,9 +101,6 @@ LogicEngine.loadNoteHandlers = function(self)
 end
 
 LogicEngine.updateNoteHandlers = function(self)
-	if not self.rhythmModel.timeEngine.timer.isPlaying then
-		return
-	end
 	for _, noteHandler in ipairs(self.noteHandlers) do
 		noteHandler:update()
 	end

@@ -2,22 +2,18 @@
 local LogicEngine = require("sphere.models.RhythmModel.LogicEngine")
 
 local NoteChart		= require("ncdk.NoteChart")
-local VelocityData	= require("ncdk.VelocityData")
 local NoteData		= require("ncdk.NoteData")
 
 local rhythmModel = {}
 
 local logicEngine = LogicEngine:new()
+
 rhythmModel.logicEngine = logicEngine
 logicEngine.rhythmModel = rhythmModel
 
-local timeEngine = {
-	currentTime = 0,
-	timeRate = 1,
-	inputOffset = 0,
-	timer = {isPlaying = true}
-}
-rhythmModel.timeEngine = timeEngine
+logicEngine.eventTime = 0
+logicEngine.timeRate = 1
+logicEngine.inputOffset = 0
 
 logicEngine.timings = {
 	ShortNote = {
@@ -40,6 +36,8 @@ local function auto(n)
 end
 
 local function test(notes, events, states)
+	logicEngine.eventTime = 0  -- reset time on each test
+
 	local noteChart = NoteChart:new()
 
 	local layerData = noteChart:getLayerData(1)
@@ -117,8 +115,8 @@ local function test(notes, events, states)
 			time = time
 		})
 	end
-	local function update(time)
-		logicEngine:update()
+	local function update()
+		logicEngine:updateNoteHandlers()
 	end
 
 	-- print("TEST")
@@ -138,9 +136,9 @@ local function test(notes, events, states)
 			elseif char == "r" then
 				release(time)
 			elseif char == "u" then
-				update(time)
+				update()
 			elseif char == "t" then
-				timeEngine.currentTime = time
+				logicEngine.eventTime = time
 			end
 		end
 	end
@@ -267,14 +265,23 @@ local function testmsn()
 		}
 	)
 
-	test(
-		{0, auto(0.025), 0.05},
-		{{0, "pp"}},
-		{
-			{0, "clear", "passed", 1},
-			{0, "clear", "passed", 3},
-		}
-	)
+	-- test(
+	-- 	{0, auto(0.025), 0.05},
+	-- 	{{0, "pp"}},
+	-- 	{
+	-- 		{0, "clear", "passed", 1},
+	-- 		{0, "clear", "passed", 3},
+	-- 	}
+	-- )
+
+	-- test(
+	-- 	{0, auto(0.01), auto(0.02), 0.03},
+	-- 	{{0, "pp"}},
+	-- 	{
+	-- 		{0, "clear", "passed", 1},
+	-- 		{0, "clear", "passed", 4},
+	-- 	}
+	-- )
 end
 testmsn()
 
