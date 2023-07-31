@@ -10,10 +10,6 @@ NormalscoreScoreSystem.load = function(self)
 end
 
 NormalscoreScoreSystem.after = function(self, event)
-	if math.abs(event.timeRate) == 0 then
-		return
-	end
-
 	local ns = self.normalscore
 
 	ns:update()

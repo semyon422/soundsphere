@@ -51,9 +51,9 @@ end
 
 GraphicEngine.getVisualTimeRate = function(self)
 	local timeRate = self.rhythmModel.timeEngine.timeRate
-	local visualTimeRate = self.visualTimeRate / math.abs(timeRate)
-	if self.scaleSpeed then
-		visualTimeRate = visualTimeRate * timeRate
+	local visualTimeRate = self.visualTimeRate
+	if not self.scaleSpeed then
+		visualTimeRate = visualTimeRate / timeRate
 	end
 	return visualTimeRate
 end

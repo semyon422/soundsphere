@@ -130,7 +130,7 @@ LongLogicalNote.switchState = function(self, newState, reachableNote)
 
 	local currentTime, deltaTime
 	local eventTime = self:getEventTime()
-	local timeRate = math.abs(self.logicEngine:getTimeRate())
+	local timeRate = self.logicEngine:getTimeRate()
 	if oldState == "clear" then
 		local noteTime = self:getNoteTime("start")
 		local lastTime = self:getLastTimeFromConfig(timings.LongNoteStart)
@@ -156,9 +156,7 @@ LongLogicalNote.switchState = function(self, newState, reachableNote)
 	scoreEvent.noteIndex = self.index
 	scoreEvent.currentTime = currentTime
 	scoreEvent.deltaTime = deltaTime
-	scoreEvent.noteStartTime = self:getNoteTime("start")
-	scoreEvent.noteEndTime = self:getNoteTime("end")
-	scoreEvent.timeRate = self.logicEngine:getTimeRate()
+	scoreEvent.timeRate = timeRate
 	scoreEvent.notesCount = self.logicEngine.notesCount
 	scoreEvent.oldState = oldState
 	scoreEvent.newState = newState
@@ -198,12 +196,12 @@ LongLogicalNote.processAuto = function(self)
 end
 
 LongLogicalNote.getStartTimeState = function(self)
-	local deltaTime = (self:getEventTime() - self:getNoteTime("start")) / math.abs(self.logicEngine:getTimeRate())
+	local deltaTime = (self:getEventTime() - self:getNoteTime("start")) / self.logicEngine:getTimeRate()
 	return self:getTimeStateFromConfig(self.logicEngine.timings.LongNoteStart, deltaTime)
 end
 
 LongLogicalNote.getEndTimeState = function(self)
-	local deltaTime = (self:getEventTime() - self:getNoteTime("end")) / math.abs(self.logicEngine:getTimeRate())
+	local deltaTime = (self:getEventTime() - self:getNoteTime("end")) / self.logicEngine:getTimeRate()
 	return self:getTimeStateFromConfig(self.logicEngine.timings.LongNoteEnd, deltaTime)
 end
 
