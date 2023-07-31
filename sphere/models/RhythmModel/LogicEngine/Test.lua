@@ -168,44 +168,44 @@ end
 
 -- 1 short note tests
 
-local function test1sn()
+local function test1sn(offset, rate)
 test(
 	{0},
-	{{-1, "p"}},
-	{{-1, "clear", "clear"}}
+	{{-1 * rate + offset, "p"}},
+	{{-1 * rate + offset, "clear", "clear"}}
 )
 
 test(
 	{0},
-	{{-0.15, "p"}},
-	{{-0.15, "clear", "missed"}}
+	{{-0.15 * rate + offset, "p"}},
+	{{-0.15 * rate + offset, "clear", "missed"}}
 )
 
 test(
 	{0},
-	{{0, "p"}},
-	{{0, "clear", "passed"}}
+	{{0 * rate + offset, "p"}},
+	{{0 * rate + offset, "clear", "passed"}}
 )
 
 test(
 	{0},
-	{{0.15, "p"}},
-	{{0.15, "clear", "missed"}}
+	{{0.15 * rate + offset, "p"}},
+	{{0.15 * rate + offset, "clear", "missed"}}
 )
 
 test(
 	{0},
-	{{0.25, "p"}},
-	{{0.2, "clear", "missed"}}
+	{{0.25 * rate + offset, "p"}},
+	{{0.2 * rate + offset, "clear", "missed"}}
 )
 
 test(
 	{0},
-	{{1, "tu"}},
-	{{0.2, "clear", "missed"}}
+	{{1 * rate + offset, "tu"}},
+	{{0.2 * rate + offset, "clear", "missed"}}
 )
 end
-test1sn()
+test1sn(0, 1)
 
 -- exact boundaries, not used in gameplay because of 0.1 + 0.2 ~= 0.3
 
@@ -516,7 +516,7 @@ test1mln()
 
 logicEngine.timings.nearest = true
 
-test1sn()
+test1sn(0, 1)
 test1sn_bounds()
 testmsn()
 
@@ -678,30 +678,27 @@ test(
 
 local function test1sn_inputoffset()
 logicEngine.inputOffset = 1
-test(
-	{0},
-	{{1, "p"}},
-	{{1, "clear", "passed"}}
-)
-test(
-	{0},
-	{{0.81, "p"}},
-	{{0.81, "clear", "missed"}}
-)
-test(
-	{0},
-	{{0.91, "p"}},
-	{{0.91, "clear", "passed"}}
-)
-test(
-	{0},
-	{{1.09, "p"}},
-	{{1.09, "clear", "passed"}}
-)
-test(
-	{0},
-	{{1.19, "p"}},
-	{{1.19, "clear", "missed"}}
-)
+test1sn(1, 1)
+logicEngine.inputOffset = 0
 end
 test1sn_inputoffset()
+
+-- 1 short note time rate tests
+
+local function test1sn_timerate()
+logicEngine.timeRate = 2
+test1sn(0, 2)
+logicEngine.timeRate = 1
+end
+test1sn_timerate()
+
+-- 1 short note time rate and input offset tests
+
+local function test1sn_timerate_offset()
+logicEngine.inputOffset = 1
+logicEngine.timeRate = 2
+test1sn(1, 2)
+logicEngine.inputOffset = 0
+logicEngine.timeRate = 1
+end
+test1sn_timerate_offset()
