@@ -207,6 +207,32 @@ test(
 end
 test1sn()
 
+-- exact boundaries, not used in gameplay because of 0.1 + 0.2 ~= 0.3
+
+local function test1sn_bounds()
+test(
+	{0},
+	{{-0.2, "p"}},
+	{{-0.2, "clear", "missed"}}
+)
+test(
+	{0},
+	{{-0.1, "p"}},
+	{{-0.1, "clear", "passed"}}
+)
+test(
+	{0},
+	{{0.1, "p"}},
+	{{0.1, "clear", "passed"}}
+)
+test(
+	{0},
+	{{0.2, "p"}},
+	{{0.2, "clear", "missed"}}
+)
+end
+test1sn_bounds()
+
 -- 2 short notes tests
 
 test(
@@ -491,6 +517,7 @@ test1mln()
 logicEngine.timings.nearest = true
 
 test1sn()
+test1sn_bounds()
 testmsn()
 
 -- 2 short notes tests
@@ -646,3 +673,35 @@ test(
 		{0.019, "clear", "passed", 1},
 	}
 )
+
+-- 1 short note input offset tests
+
+local function test1sn_inputoffset()
+logicEngine.inputOffset = 1
+test(
+	{0},
+	{{1, "p"}},
+	{{1, "clear", "passed"}}
+)
+test(
+	{0},
+	{{0.81, "p"}},
+	{{0.81, "clear", "missed"}}
+)
+test(
+	{0},
+	{{0.91, "p"}},
+	{{0.91, "clear", "passed"}}
+)
+test(
+	{0},
+	{{1.09, "p"}},
+	{{1.09, "clear", "passed"}}
+)
+test(
+	{0},
+	{{1.19, "p"}},
+	{{1.19, "clear", "missed"}}
+)
+end
+test1sn_inputoffset()
