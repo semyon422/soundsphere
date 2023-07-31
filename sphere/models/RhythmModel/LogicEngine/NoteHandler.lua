@@ -12,7 +12,6 @@ NoteHandler.loadNoteData = function(self)
 
 	local logicEngine = self.logicEngine
 	local notesCount = logicEngine.notesCount
-	local rhythmModel = logicEngine.rhythmModel
 
 	for _, noteData in ipairs(self.noteDatas) do
 		local logicalNote = LogicalNoteFactory:getNote(noteData)
@@ -114,27 +113,31 @@ NoteHandler.update = function(self)
 	end
 end
 
-NoteHandler.receive = function(self, event)
-	if self.logicEngine.autoplay then
-		return
+NoteHandler.handlePromode = function(self, note)
+	local isReachable = note:isReachable(self.logicEngine:getEventTime())
+	if not note.ended and note.isPlayable and isReachable then
+		note.isPlayable = false
 	end
+	note:update()
+end
 
+NoteHandler.setKeyState = function(self, state)
 	self:update()
+
 	local note = self:getCurrentNote()
 	if not note then return end
 
-	local key = event and event[1]
-	if key ~= self.keyBind then
-		return
+	if self.logicEngine.promode then
+		return self:handlePromode(note)
 	end
 
-	if event.name == "keypressed" then
-		note.keyState = true
+	note.keyState = state
+	if state then
 		self.logicEngine:playSound(note.startNoteData)
-	elseif event.name == "keyreleased" then
-		note.keyState = false
+	else
 		self.logicEngine:playSound(note.endNoteData)
 	end
+
 	note:update()
 end
 
