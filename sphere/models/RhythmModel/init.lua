@@ -88,7 +88,9 @@ RhythmModel.receive = function(self, event)
 end
 
 RhythmModel.update = function(self, dt)
-	self.logicEngine:update()
+	if self.timeEngine.timer.isPlaying then
+		self.logicEngine:update()
+	end
 	self.audioEngine:update()
 	self.scoreEngine:update()
 	self.graphicEngine:update(dt)
@@ -166,11 +168,11 @@ RhythmModel.setTimeToPrepare = function(self, timeToPrepare)
 end
 
 RhythmModel.setInputOffset = function(self, offset)
-	self.timeEngine.inputOffset = math.floor(offset * 1024) / 1024
+	self.logicEngine.inputOffset = math.floor(offset * 1024) / 1024
 end
 
 RhythmModel.setVisualOffset = function(self, offset)
-	self.timeEngine.visualOffset = offset
+	self.graphicEngine.visualOffset = offset
 end
 
 RhythmModel.setPauseTimes = function(self, ...)

@@ -4,19 +4,31 @@ local flux = require("flux")
 
 local GraphicEngine = Class:new()
 
-GraphicEngine.construct = function(self)
-	self.noteDrawers = {}
-	self.scaleSpeed = false
-	self.loaded = false
-end
+GraphicEngine.visualOffset = 0
+GraphicEngine.scaleSpeed = false
 
 GraphicEngine.load = function(self)
 	self.noteCount = 0
+	self.noteDrawers = {}
 
-	self:loadNoteDrawers()
+	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
+		local noteDrawer = NoteDrawer:new({
+			layerData = self.noteChart.layerDatas[layerDataIndex],
+			noteDatas = noteDatas,
+			inputType = inputType,
+			inputIndex = inputIndex,
+			graphicEngine = self
+		})
+		noteDrawer:load()
+		table.insert(self.noteDrawers, noteDrawer)
+	end
 end
 
-GraphicEngine.update = function(self, dt)
+GraphicEngine.unload = function(self)
+	self.noteDrawers = {}
+end
+
+GraphicEngine.update = function(self)
 	for _, noteDrawer in ipairs(self.noteDrawers) do
 		noteDrawer:update()
 	end
@@ -38,9 +50,10 @@ GraphicEngine.setVisualTimeRate = function(self, visualTimeRate)
 end
 
 GraphicEngine.getVisualTimeRate = function(self)
-	local visualTimeRate = self.visualTimeRate / math.abs(self.rhythmModel.timeEngine.timeRate)
+	local timeRate = self.rhythmModel.timeEngine.timeRate
+	local visualTimeRate = self.visualTimeRate / math.abs(timeRate)
 	if self.scaleSpeed then
-		visualTimeRate = visualTimeRate * self.rhythmModel.timeEngine.timeRate
+		visualTimeRate = visualTimeRate * timeRate
 	end
 	return visualTimeRate
 end
@@ -50,32 +63,11 @@ GraphicEngine.getCurrentTime = function(self)
 end
 
 GraphicEngine.getInputOffset = function(self)
-	return self.rhythmModel.timeEngine.inputOffset
+	return self.rhythmModel.logicEngine.inputOffset
 end
 
 GraphicEngine.getVisualOffset = function(self)
-	return self.rhythmModel.timeEngine.visualOffset
-end
-
-GraphicEngine.unload = function(self)
-	self.loaded = false
-	self.noteDrawers = {}
-end
-
-GraphicEngine.loadNoteDrawers = function(self)
-	assert(not self.loaded)
-	self.loaded = true
-	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
-		local noteDrawer = NoteDrawer:new({
-			layerData = self.noteChart.layerDatas[layerDataIndex],
-			noteDatas = noteDatas,
-			inputType = inputType,
-			inputIndex = inputIndex,
-			graphicEngine = self
-		})
-		noteDrawer:load()
-		table.insert(self.noteDrawers, noteDrawer)
-	end
+	return self.visualOffset
 end
 
 return GraphicEngine

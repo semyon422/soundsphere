@@ -4,35 +4,31 @@ local LogicalNoteFactory	= require("sphere.models.RhythmModel.LogicEngine.Logica
 local NoteHandler = Class:new()
 
 NoteHandler.load = function(self)
-	self:loadNoteData()
-end
-
-NoteHandler.loadNoteData = function(self)
 	self.notes = {}
+	local notes = self.notes
 
 	local logicEngine = self.logicEngine
 	local notesCount = logicEngine.notesCount
 
 	for _, noteData in ipairs(self.noteDatas) do
-		local logicalNote = LogicalNoteFactory:getNote(noteData)
-		if logicalNote then
-			logicalNote.noteHandler = self
-			logicalNote.logicEngine = logicEngine
-			if logicalNote.isPlayable then
-				notesCount[logicalNote.noteClass] = (notesCount[logicalNote.noteClass] or 0) + 1
+		local note = LogicalNoteFactory:getNote(noteData)
+		if note then
+			note.noteHandler = self
+			note.logicEngine = logicEngine
+			if note.isPlayable then
+				notesCount[note.noteClass] = (notesCount[note.noteClass] or 0) + 1
 			end
-			table.insert(self.notes, logicalNote)
-
-			logicEngine.sharedLogicalNotes[noteData] = logicalNote
+			table.insert(notes, note)
+			logicEngine.sharedLogicalNotes[noteData] = note
 		end
 	end
 
-	table.sort(self.notes, function(a, b)
+	table.sort(notes, function(a, b)
 		return a.startNoteData.timePoint < b.startNoteData.timePoint
 	end)
 
-	for index, logicalNote in ipairs(self.notes) do
-		logicalNote.index = index
+	for i, note in ipairs(notes) do
+		note.index = i
 	end
 
 	self.startNoteIndex = 1

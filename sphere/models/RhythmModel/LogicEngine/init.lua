@@ -4,6 +4,8 @@ local Observable = require("Observable")
 
 local LogicEngine = Class:new()
 
+LogicEngine.inputOffset = 0
+
 LogicEngine.construct = function(self)
 	self.observable = Observable:new()
 end
@@ -11,15 +13,16 @@ end
 LogicEngine.load = function(self)
 	self.sharedLogicalNotes = {}
 	self.notesCount = {}
+	self.noteHandlers = {}
 
-	self:loadNoteHandlers()
-end
-
-LogicEngine.update = function(self)
-	if not self.rhythmModel.timeEngine.timer.isPlaying then
-		return
+	for noteDatas, inputType, inputIndex in self.noteChart:getInputIterator() do
+		local noteHandler = NoteHandler:new({
+			noteDatas = noteDatas,
+			logicEngine = self
+		})
+		self.noteHandlers[inputType .. inputIndex] = noteHandler
+		noteHandler:load()
 	end
-	self:updateNoteHandlers()
 end
 
 LogicEngine.unload = function(self)
@@ -27,16 +30,29 @@ LogicEngine.unload = function(self)
 	self.promode = false
 end
 
-LogicEngine.getEventTime = function(self)
-	return self.eventTime or self.rhythmModel.timeEngine.currentTime
+LogicEngine.update = function(self)
+	for _, noteHandler in pairs(self.noteHandlers) do
+		noteHandler:update()
+	end
 end
 
-LogicEngine.getTimeRate = function(self)
-	return self.timeRate or self.rhythmModel.timeEngine.timeRate
+LogicEngine.receive = function(self, event)
+	if not event.virtual or self.autoplay then
+		return
+	end
+
+	local noteHandler = self.noteHandlers[event[1]]
+	if not noteHandler then
+		return
+	end
+
+	self.eventTime = event.time
+	noteHandler:setKeyState(event.name == "keypressed")
+	self.eventTime = nil
 end
 
-LogicEngine.getInputOffset = function(self)
-	return self.inputOffset or self.rhythmModel.timeEngine.inputOffset
+LogicEngine.getLogicalNote = function(self, noteData)
+	return self.sharedLogicalNotes[noteData]
 end
 
 LogicEngine.sendScore = function(self, event)
@@ -50,37 +66,16 @@ LogicEngine.playSound = function(self, noteData, isBackground)
 	})
 end
 
-LogicEngine.receive = function(self, event)
-	if not event.virtual or self.autoplay then
-		return
-	end
-
-	self.eventTime = event.time
-	for _, noteHandler in ipairs(self.noteHandlers) do
-		if event[1] == noteHandler.keyBind then
-			noteHandler:setKeyState(event.name == "keypressed")
-		end
-	end
-	self.eventTime = nil
+LogicEngine.getEventTime = function(self)
+	return self.eventTime or self.rhythmModel.timeEngine.currentTime
 end
 
-LogicEngine.loadNoteHandlers = function(self)
-	self.noteHandlers = {}
-	for noteDatas, inputType, inputIndex in self.noteChart:getInputIterator() do
-		local noteHandler = NoteHandler:new({
-			noteDatas = noteDatas,
-			keyBind = inputType .. inputIndex,
-			logicEngine = self
-		})
-		table.insert(self.noteHandlers, noteHandler)
-		noteHandler:load()
-	end
+LogicEngine.getTimeRate = function(self)
+	return self.timeRate or self.rhythmModel.timeEngine.timeRate
 end
 
-LogicEngine.updateNoteHandlers = function(self)
-	for _, noteHandler in ipairs(self.noteHandlers) do
-		noteHandler:update()
-	end
+LogicEngine.getInputOffset = function(self)
+	return self.inputOffset
 end
 
 return LogicEngine

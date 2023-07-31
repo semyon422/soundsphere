@@ -20,8 +20,6 @@ TimeEngine.currentVisualTime = 0
 TimeEngine.timeRate = 1
 TimeEngine.targetTimeRate = 1
 TimeEngine.baseTimeRate = 1
-TimeEngine.inputOffset = 0
-TimeEngine.visualOffset = 0
 TimeEngine.windUp = nil
 
 TimeEngine.load = function(self)

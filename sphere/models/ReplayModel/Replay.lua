@@ -22,7 +22,7 @@ Replay.receive = function(self, event)
 	events[#events + 1] = {
 		event[1],
 		name = event.name,
-		time = event.time - self.timeEngine.inputOffset,
+		time = event.time - self.logicEngine.inputOffset,
 	}
 end
 

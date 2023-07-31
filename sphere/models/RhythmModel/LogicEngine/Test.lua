@@ -116,7 +116,7 @@ local function test(notes, events, states)
 		})
 	end
 	local function update()
-		logicEngine:updateNoteHandlers()
+		logicEngine:update()
 	end
 
 	-- print("TEST")
