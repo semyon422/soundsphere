@@ -34,6 +34,7 @@
     "Lua.workspace.checkThirdParty": false,
     "Lua.diagnostics.disable": [
         "undefined-field",
-        "cast-local-type"
+        "cast-local-type",
+        "duplicate-set-field"
     ]
 }
