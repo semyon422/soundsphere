@@ -253,6 +253,8 @@ test(
 	}
 )
 
+-- many short notes
+
 local function testmsn()
 	test(
 		{0, 1, 2, 3},
@@ -265,23 +267,23 @@ local function testmsn()
 		}
 	)
 
-	-- test(
-	-- 	{0, auto(0.025), 0.05},
-	-- 	{{0, "pp"}},
-	-- 	{
-	-- 		{0, "clear", "passed", 1},
-	-- 		{0, "clear", "passed", 3},
-	-- 	}
-	-- )
+	test(
+		{0, auto(0.025), 0.05},
+		{{0, "pp"}},
+		{
+			{0, "clear", "passed", 1},
+			{0, "clear", "passed", 3},
+		}
+	)
 
-	-- test(
-	-- 	{0, auto(0.01), auto(0.02), 0.03},
-	-- 	{{0, "pp"}},
-	-- 	{
-	-- 		{0, "clear", "passed", 1},
-	-- 		{0, "clear", "passed", 4},
-	-- 	}
-	-- )
+	test(
+		{0, auto(0.01), auto(0.02), 0.03},
+		{{0, "pp"}},
+		{
+			{0, "clear", "passed", 1},
+			{0, "clear", "passed", 4},
+		}
+	)
 end
 testmsn()
 
@@ -460,7 +462,29 @@ test(
 end
 test1lnsn()
 
--- do return end
+-- many notes
+
+local function test1mln()
+test(
+	{{0, 0.001}, auto(0.025), 0.05},
+	{{0, "prp"}},
+	{
+		{0, "clear", "startPassedPressed", 1},
+		{0, "startPassedPressed", "endPassed", 1},
+		{0, "clear", "passed", 3},
+	}
+)
+test(
+	{{0, 0.001}, auto(0.01), auto(0.02), 0.05},
+	{{0, "prp"}},
+	{
+		{0, "clear", "startPassedPressed", 1},
+		{0, "startPassedPressed", "endPassed", 1},
+		{0, "clear", "passed", 4},
+	}
+)
+end
+test1mln()
 
 -- nearest logic
 
@@ -553,6 +577,7 @@ test(
 
 test1ln()
 test1lnsn()
+test1mln()
 
 test(
 	{{0, 0.1}, 0.1},
