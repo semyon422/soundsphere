@@ -12,17 +12,26 @@ end
 
 LogicEngine.load = function(self)
 	self.sharedLogicalNotes = {}
-	self.notesCount = {}
 	self.noteHandlers = {}
+	local notesCount = 0
 
 	for noteDatas, inputType, inputIndex in self.noteChart:getInputIterator() do
 		local noteHandler = NoteHandler:new({
 			noteDatas = noteDatas,
 			logicEngine = self
 		})
-		self.noteHandlers[inputType .. inputIndex] = noteHandler
+
 		noteHandler:load()
+		self.noteHandlers[inputType .. inputIndex] = noteHandler
+
+		for _, note in ipairs(noteHandler.notes) do
+			if note.isScorable then
+				notesCount = notesCount + 1
+			end
+		end
 	end
+
+	self.notesCount = notesCount
 end
 
 LogicEngine.unload = function(self)

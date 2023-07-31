@@ -85,7 +85,7 @@ local _ComboGraph = PointGraphView:new({
 	backgroundColor = {0, 0, 0, 0.2},
 	backgroundRadius = 4,
 	point = function(self, point)
-		local y = 1 - point.base.combo / point.base.noteCount
+		local y = 1 - point.base.combo / point.base.notesCount
 		return y, 1, 1, 0.25, 1
 	end,
 	show = showLoadedScore

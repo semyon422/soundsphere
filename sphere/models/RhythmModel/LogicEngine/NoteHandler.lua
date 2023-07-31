@@ -8,16 +8,12 @@ NoteHandler.load = function(self)
 	local notes = self.notes
 
 	local logicEngine = self.logicEngine
-	local notesCount = logicEngine.notesCount
 
 	for _, noteData in ipairs(self.noteDatas) do
 		local note = LogicalNoteFactory:getNote(noteData)
 		if note then
 			note.noteHandler = self
 			note.logicEngine = logicEngine
-			if note.isPlayable then
-				notesCount[note.noteClass] = (notesCount[note.noteClass] or 0) + 1
-			end
 			table.insert(notes, note)
 			logicEngine.sharedLogicalNotes[noteData] = note
 		end

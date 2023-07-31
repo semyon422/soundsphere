@@ -2,8 +2,6 @@ local LogicalNote = require("sphere.models.RhythmModel.LogicEngine.LogicalNote")
 
 local LongLogicalNote = LogicalNote:new()
 
-LongLogicalNote.noteClass = "LongLogicalNote"
-
 LongLogicalNote.construct = function(self)
 	self.startNoteData = self.noteData
 	self.endNoteData = self.noteData.endNoteData

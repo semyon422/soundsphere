@@ -10,7 +10,7 @@ BaseScoreSystem.construct = function(self)
 	self.missCount = 0
 	self.earlyHitCount = 0
 
-	self.noteCount = 0
+	self.notesCount = 0
 	self.combo = 0
 	self.maxCombo = 0
 	self.currentTime = 0
@@ -34,15 +34,7 @@ BaseScoreSystem.before = function(self, event)
 
 	self.timeRate =  math.abs(event.timeRate)
 
-	if self.noteCount ~= 0 then
-		return
-	end
-
-	local noteCount = 0
-	noteCount = noteCount + (event.notesCount["ShortLogicalNote"] or 0)
-	noteCount = noteCount + (event.notesCount["LongLogicalNote"] or 0)
-
-	self.noteCount = noteCount
+	self.notesCount = event.notesCount
 end
 
 BaseScoreSystem.success = function(self)

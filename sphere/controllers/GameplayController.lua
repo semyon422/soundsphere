@@ -228,7 +228,7 @@ GameplayController.saveScore = function(self)
 	)
 
 	local base = rhythmModel.scoreEngine.scoreSystem.base
-	if base.hitCount / base.noteCount >= 0.5 then
+	if base.hitCount / base.notesCount >= 0.5 then
 		self.onlineModel.onlineScoreManager:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
 	end
 
