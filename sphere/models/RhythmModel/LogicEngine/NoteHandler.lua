@@ -34,8 +34,8 @@ end
 NoteHandler.updateRange = function(self)
 	local notes = self.notes
 	for i = self.startNoteIndex, #notes do
-		local logicalNote = notes[i]
-		if not logicalNote.ended then
+		local note = notes[i]
+		if not note.ended then
 			self.startNoteIndex = i
 			break
 		end
@@ -46,8 +46,8 @@ NoteHandler.updateRange = function(self)
 
 	local eventTime = self.logicEngine:getEventTime()
 	for i = self.endNoteIndex, #notes do
-		local logicalNote = notes[i]
-		if not logicalNote.ended and logicalNote:getNoteTime() >= eventTime then
+		local note = notes[i]
+		if not note.ended and note.isPlayable and note:getNoteTime() >= eventTime then
 			self.endNoteIndex = i
 			break
 		end
@@ -57,6 +57,7 @@ NoteHandler.updateRange = function(self)
 	end
 end
 
+-- return current isPlayable note
 NoteHandler.getCurrentNote = function(self)
 	local notes = self.notes
 	self:updateRange()
