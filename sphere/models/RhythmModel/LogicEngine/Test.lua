@@ -1,5 +1,7 @@
 
 local LogicEngine = require("sphere.models.RhythmModel.LogicEngine")
+local GraphicEngine = require("sphere.models.RhythmModel.GraphicEngine")
+local table_util = require("table_util")
 
 local NoteChart		= require("ncdk.NoteChart")
 local NoteData		= require("ncdk.NoteData")
@@ -7,13 +9,22 @@ local NoteData		= require("ncdk.NoteData")
 local rhythmModel = {}
 
 local logicEngine = LogicEngine:new()
+local graphicEngine = GraphicEngine:new()
 
 rhythmModel.logicEngine = logicEngine
+rhythmModel.graphicEngine = graphicEngine
+
 logicEngine.rhythmModel = rhythmModel
+graphicEngine.rhythmModel = rhythmModel
 
 logicEngine.eventTime = 0
 logicEngine.timeRate = 1
 logicEngine.inputOffset = 0
+
+graphicEngine.range = {-2, 2}
+
+rhythmModel.timeEngine = logicEngine  -- use logic engine as time engine (timeRate)
+rhythmModel.timeEngine.currentVisualTime = 0
 
 logicEngine.timings = {
 	ShortNote = {
@@ -35,7 +46,7 @@ local function auto(n)
 	return setmetatable({n}, auto_mt)
 end
 
-local function test(notes, events, states)
+local function test(notes, events, states, graphicStates)
 	logicEngine.eventTime = 0  -- reset time on each test
 
 	local noteChart = NoteChart:new()
@@ -82,6 +93,7 @@ local function test(notes, events, states)
 	noteChart:compute()
 
 	logicEngine.noteChart = noteChart
+	graphicEngine.noteChart = noteChart
 
 	local newStates = {}
 	rhythmModel.scoreEngine = {
@@ -98,6 +110,11 @@ local function test(notes, events, states)
 	}
 
 	logicEngine:load()
+	graphicEngine:load()
+
+	graphicEngine.visualTimeRate = 1
+
+	local newGraphicStates = {}
 
 	local function press(time)
 		logicEngine:receive({
@@ -118,6 +135,22 @@ local function test(notes, events, states)
 	local function update()
 		logicEngine:update()
 	end
+	local function updateGraphics(time)
+		rhythmModel.timeEngine.currentVisualTime = time
+		graphicEngine:update()
+		local state = {}
+		table.insert(newGraphicStates, state)
+		for _, note in ipairs(graphicEngine.noteDrawers[1].notes) do
+			if note.endTimeState then
+				table.insert(state, {
+					-note.startTimeState.scaledFakeVisualDeltaTime + time,
+					-note.endTimeState.scaledFakeVisualDeltaTime + time,
+				})
+			else
+				table.insert(state, -note.startTimeState.scaledVisualDeltaTime + time)
+			end
+		end
+	end
 
 	-- print("TEST")
 
@@ -137,6 +170,8 @@ local function test(notes, events, states)
 				release(time)
 			elseif char == "u" then
 				update()
+			elseif char == "g" then
+				updateGraphics(time)
 			elseif char == "t" then
 				logicEngine.eventTime = time
 			end
@@ -156,6 +191,15 @@ local function test(notes, events, states)
 			assert(event.noteIndex == states[i][4])
 		end
 	end
+
+	if not graphicStates then
+		return
+	end
+
+	-- print(require("inspect")(graphicStates))
+	-- print(require("inspect")(newGraphicStates))
+
+	assert(table_util.deepequal(graphicStates, newGraphicStates))
 end
 
 --[[
@@ -702,3 +746,126 @@ logicEngine.inputOffset = 0
 logicEngine.timeRate = 1
 end
 test1sn_timerate_offset()
+
+-- graphics test
+
+test(
+	{0},
+	{{0, "pg"}},
+	{{0, "clear", "passed"}},
+	{{0}}
+)
+
+test(
+	{{0, 1}},
+	{{0, "pg"}, {1, "rg"}},
+	{
+		{0, "clear", "startPassedPressed"},
+		{1, "startPassedPressed", "endPassed"},
+	},
+	{
+		-- start/end scaledFakeVisualDeltaTime when g called
+		{{0, 1}},  -- array of notes when g called
+		{{1, 1}},
+	}
+)
+
+test(
+	{{0, 1}},
+	{{-0.05, "pg"}, {0.5, "g"}, {1.05, "g"}, {1.06, "rg"}},
+	{
+		{-0.05, "clear", "startPassedPressed"},
+		{1.06, "startPassedPressed", "endPassed"},
+	},
+	{
+		{{0, 1}},
+		{{0.5, 1}},
+		{{1, 1}},
+		{{1, 1}},
+	}
+)
+
+-- grg - fix this!
+test(
+	{{0, 1}},
+	{{0.05, "g"}, {0.06, "pg"}, {0.5, "grg"}, {0.6, "pg"}, {1, "rg"}},
+	{
+		{0.06, "clear", "startPassedPressed"},
+		{0.5, "startPassedPressed", "startMissed"},
+		{0.6, "startMissed", "startMissedPressed"},
+		{1, "startMissedPressed", "endMissedPassed"},
+	},
+	{
+		{{0, 1}},
+		{{0.06, 1}},
+		{{0.5, 1}},
+		{{0.5, 1}},
+		{{0.5, 1}},
+		{{0.5, 1}},
+	}
+)
+
+graphicEngine.visualOffset = 1
+
+test(
+	{0},
+	{{0, "pg"}},
+	{{0, "clear", "passed"}},
+	{{1}}
+)
+
+test(
+	{{0, 1}},
+	{{0, "pg"}, {1, "g"}, {1, "rg"}},
+	{
+		{0, "clear", "startPassedPressed"},
+		{1, "startPassedPressed", "endPassed"},
+	},
+	{
+		{{1, 2}},
+		{{1, 2}},
+		{{2, 2}},
+	}
+)
+
+test(
+	{{0, 2}},
+	{{0, "pg"}, {0.5, "g"}, {1.5, "g"}, {1.5, "rg"}},
+	{
+		{0, "clear", "startPassedPressed"},
+		{1.5, "startPassedPressed", "startMissed"},
+	},
+	{
+		{{1, 3}},
+		{{1, 3}},
+		{{1.5, 3}},
+		{{1.5, 3}},
+	}
+)
+
+graphicEngine.visualOffset = -1
+
+test(
+	{{0, 1}},
+	-- use 0.0625 because of floating point error
+	{{-2, "g"}, {-0.0625, "g"}, {-0.0625, "pg"}, {0.5, "g"}, {1, "rg"}},
+	{
+		{-0.0625, "clear", "startPassedPressed"},
+		{1, "startPassedPressed", "endPassed"},
+	},
+	{
+		{{-1, 0}},
+		{{-1, 0}},
+		{{-0.0625, 0}},
+		{{0, 0}},
+		{{0, 0}},
+	}
+)
+
+graphicEngine.visualOffset = 1
+
+--[[
+	TODO:
+	line 788
+	add tests for LN + SV + all offsets
+]]

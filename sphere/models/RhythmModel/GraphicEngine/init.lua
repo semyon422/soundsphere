@@ -5,6 +5,7 @@ local flux = require("flux")
 local GraphicEngine = Class:new()
 
 GraphicEngine.visualOffset = 0
+GraphicEngine.longNoteShortening = 0
 GraphicEngine.scaleSpeed = false
 
 GraphicEngine.load = function(self)

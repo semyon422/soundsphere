@@ -71,15 +71,12 @@ NoteHandler.getCurrentNote = function(self)
 
 	local timings = self.logicEngine.timings
 	if not timings.nearest then
-		local note
 		for i = self.startNoteIndex, self.endNoteIndex do
-			local _note = notes[i]
-			if not _note.ended and _note.isPlayable then
-				note = _note
-				break
+			local note = notes[i]
+			if not note.ended and note.isPlayable then
+				return note
 			end
 		end
-		return note
 	end
 
 	local eventTime = self.logicEngine:getEventTime()
@@ -125,11 +122,8 @@ NoteHandler.setKeyState = function(self, state)
 	end
 
 	note.keyState = state
-	if state then
-		self.logicEngine:playSound(note.startNoteData)
-	else
-		self.logicEngine:playSound(note.endNoteData)
-	end
+	local noteData = state and note.startNoteData or note.endNoteData
+	self.logicEngine:playSound(noteData)
 
 	note:update()
 end

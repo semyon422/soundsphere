@@ -76,7 +76,12 @@ end
 LongGraphicalNote.getFakeVisualStartTime = function(self)
 	local currentTimePoint = self.currentTimePoint
 	local fakeTimePoint = self.fakeStartTimePoint
-	if self:getLogicalState() ~= "startPassedPressed" then
+
+	local logicalState = self:getLogicalState()
+	if logicalState == "endPassed" then
+		return self.endNoteData.timePoint:getVisualTime(currentTimePoint)
+	end
+	if logicalState ~= "startPassedPressed" then
 		return fakeTimePoint:getVisualTime(currentTimePoint)
 	end
 
