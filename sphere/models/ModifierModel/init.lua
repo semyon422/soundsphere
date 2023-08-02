@@ -108,6 +108,9 @@ ModifierModel.setConfig = function(self, config)
 		timeRate = 1,
 		inputMode = InputMode:new(),
 	}
+	for _, modifier in pairs(self.modifierByName) do
+		modifier.added = false
+	end
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
 		if modifier then
