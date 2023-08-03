@@ -1,4 +1,4 @@
-local normalscore = require("libchart.normalscore2_2")
+local normalscore = require("libchart.normalscore3")
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 
 local NormalscoreScoreSystem = ScoreSystem:new()
@@ -13,9 +13,12 @@ NormalscoreScoreSystem.after = function(self, event)
 	local ns = self.normalscore
 
 	ns:update()
-	self.accuracy = ns.score
-	self.accuracyAdjusted = ns.score_adjusted
-	self.adjustRatio = ns.score_adjusted / ns.score
+
+	local score_not_adjusted = math.sqrt(ns.score ^ 2 + ns.mean ^ 2)
+
+	self.accuracy = score_not_adjusted
+	self.accuracyAdjusted = ns.score
+	self.adjustRatio = ns.score / score_not_adjusted
 
 	self.enps = self.scoreEngine.baseEnps * event.timeRate
 end
