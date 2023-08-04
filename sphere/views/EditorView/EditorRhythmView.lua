@@ -60,10 +60,13 @@ EditorRhythmView.draw = function(self)
 	if editorModel.state == "notes" then
 		if editor.tool == "ShortNote" or editor.tool == "LongNote" then
 			for i = 1, noteSkin.inputsCount do
-				local over = just.is_over(Head.w[i], noteSkin.unit, Head.x[i], 0)
+				local x = noteSkin:getValue(Head.x, i)
+				local w = noteSkin:getValue(Head.w, i)
+				local h = noteSkin:getValue(Head.h, 1)
+				local over = just.is_over(w, noteSkin.unit, x, 0)
 				over = just.mouse_over("add note" .. i, over, "mouse")
 				if over and just.mousepressed(1) then
-					local t = editorModel:getMouseTime(Head.h[1] / 2)
+					local t = editorModel:getMouseTime(h / 2)
 					noteManager:addNote(t, "key", i)
 				end
 			end

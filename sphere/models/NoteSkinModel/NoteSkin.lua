@@ -37,6 +37,16 @@ NoteSkin.getColumn = function(self, input, index)
 	end
 end
 
+NoteSkin.getValue = function(self, value, column, timeState, noteView)
+	if type(value) == "table" then
+		value = value[column]
+	end
+	if type(value) == "function" then
+		return value(timeState, noteView, column)  -- multiple values
+	end
+	return value
+end
+
 NoteSkin.get = function(self, noteView, part, key, timeState)
 	local note = noteView.graphicalNote
 	local noteType = noteView.noteType
@@ -47,14 +57,7 @@ NoteSkin.get = function(self, noteView, part, key, timeState)
 		self.notes[noteType][part] and
 		self.notes[noteType][part][key]
 
-	if type(value) == "table" then
-		value = value[column]
-	end
-	if type(value) == "function" then
-		return value(timeState, noteView, column)  -- multiple values
-	end
-
-	return value
+	return self:getValue(value, column, timeState, noteView)
 end
 
 NoteSkin.setTextures = function(self, textures)
