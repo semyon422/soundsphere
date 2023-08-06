@@ -173,15 +173,19 @@ NoteManager.addNote = function(self, absoluteTime, inputType, inputIndex)
 		note = self:newNote("LongNoteStart", absoluteTime, inputType, inputIndex)
 	end
 
-	if note and editor.tool == "LongNote" then
-		editorModel.graphicEngine:selectNote(note)
+	if not note then
+		return
+	end
+
+	editorModel.graphicEngine:selectNote(note)
+	if editor.tool == "ShortNote" then
+		self:grabNotes("head", editorModel:getMouseTime())
+	elseif editor.tool == "LongNote" then
 		self:grabNotes(
 			"tail",
 			editorModel:getMouseTime() + note.endNoteData.timePoint.absoluteTime - note.startNoteData.timePoint.absoluteTime
 		)
 	end
-	editorModel.editorChanges:add()
-	editorModel.editorChanges:next()
 end
 
 NoteManager.flipNotes = function(self)
