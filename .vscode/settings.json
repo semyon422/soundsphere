@@ -36,5 +36,6 @@
         "undefined-field",
         "cast-local-type",
         "duplicate-set-field"
-    ]
+    ],
+    "Lua.runtime.pathStrict": true
 }
