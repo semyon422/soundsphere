@@ -19,8 +19,9 @@ NoteHandler.load = function(self)
 		end
 	end
 
+	-- sort by absoluteTime because time points can have different types
 	table.sort(notes, function(a, b)
-		return a.startNoteData.timePoint < b.startNoteData.timePoint
+		return a.startNoteData.timePoint.absoluteTime < b.startNoteData.timePoint.absoluteTime
 	end)
 
 	for i, note in ipairs(notes) do
