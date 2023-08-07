@@ -13,24 +13,34 @@ end
 LogicEngine.load = function(self)
 	self.sharedLogicalNotes = {}
 	self.noteHandlers = {}
+
+	-- many layers can be here
+	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
+		local key = inputType .. inputIndex
+
+		local noteHandler = self.noteHandlers[key]
+		if not noteHandler then
+			noteHandler = NoteHandler:new({
+				noteDatas = {},
+				logicEngine = self
+			})
+			self.noteHandlers[key] = noteHandler
+		end
+
+		for _, noteData in ipairs(noteDatas) do
+			table.insert(noteHandler.noteDatas, noteData)
+		end
+	end
+
 	local notesCount = 0
-
-	for noteDatas, inputType, inputIndex in self.noteChart:getInputIterator() do
-		local noteHandler = NoteHandler:new({
-			noteDatas = noteDatas,
-			logicEngine = self
-		})
-
+	for _, noteHandler in pairs(self.noteHandlers) do
 		noteHandler:load()
-		self.noteHandlers[inputType .. inputIndex] = noteHandler
-
 		for _, note in ipairs(noteHandler.notes) do
 			if note.isScorable then
 				notesCount = notesCount + 1
 			end
 		end
 	end
-
 	self.notesCount = notesCount
 end
 
