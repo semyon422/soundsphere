@@ -283,6 +283,15 @@ drawSection.audio = function(self)
 		audio.setDeviceBuffer(a.device.buffer)
 		audio.reinit()
 	end
+
+	imgui.separator()
+	imgui.text("Audio devices:")
+
+	local bass = require("bass")
+	local devices = bass.getDevices()
+	for _, d in ipairs(devices) do
+		imgui.text(("%s - %s - %s - %s"):format(d.id, d.name, d.driver, d.flags))
+	end
 end
 
 drawSection.input = function(self)
