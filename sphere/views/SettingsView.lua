@@ -226,6 +226,10 @@ local _formatModes = {
 local function formatModes(mode)
 	return _formatModes[mode] or mode
 end
+local function deviceToString(d)
+	return d.driver or d.name
+	-- return ("%s - %s - %s - %s"):format(d.id, d.name, d.driver, d.flags)
+end
 drawSection.audio = function(self)
 	local settings = self.game.configModel.configs.settings
 	local a = settings.audio
@@ -290,7 +294,16 @@ drawSection.audio = function(self)
 	local bass = require("bass")
 	local devices = bass.getDevices()
 	for _, d in ipairs(devices) do
-		imgui.text(("%s - %s - %s - %s"):format(d.id, d.name, d.driver, d.flags))
+		local offset = imgui.text(("%s -"):format(d.id), 40, true)
+		just.sameline()
+		just.indent(10)
+		just.text(("%s - %s"):format(d.driver, d.name))
+		just.indent(offset + 10)
+		local s = ""
+		if d.enabled then s = s .. "enabled " end
+		if d.default then s = s .. "default " end
+		if d.init then s = s .. "init " end
+		imgui.text(s)
 	end
 end
 
