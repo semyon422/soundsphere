@@ -83,7 +83,6 @@ OsuNoteSkin.load = function(self)
 
 	local defaultMania = self:getDefaultManiaSection(keysCount)
 	copyDefaults(defaultMania, mania)
-	self:fixManiaValues()
 
 	local config, exists = JustConfig:new({defaultContent = self.configContent}):fromFile(
 		self.path:sub(1, -9) .. keysCount .. "key.config.lua"
@@ -91,6 +90,8 @@ OsuNoteSkin.load = function(self)
 	self.config = config
 	config.skinIniPath = self.path
 	config.mania = mania
+
+	self:fixManiaValues()
 
 	if not exists then
 		config:init()
@@ -1034,26 +1035,30 @@ OsuNoteSkin.getDefaultManiaSection = function(self, keys)
 end
 
 OsuNoteSkin.fixManiaValues = function(self)
+	if self.config.DisableFixes then
+		return
+	end
+
 	local mania = self.mania
 
-	do
-		local w = mania.ColumnLineWidth
-		for i = 1, #w do
-			local wi = w[i]
-			w[i] = wi > 0 and wi < 2 and 2 or wi
-		end
+	local clw = mania.ColumnLineWidth
+	for i = 1, #clw do
+		local wi = clw[i]
+		clw[i] = wi > 0 and wi < 2 and 2 or wi
 	end
-	do
-		local w = mania.ColumnWidth
-		for i = 1, #w do
-			w[i] = math.min(math.max(w[i], 5), 100)
-		end
+
+	local cw = mania.ColumnWidth
+	for i = 1, #cw do
+		cw[i] = math.min(math.max(cw[i], 5), 100)
 	end
+
 	for i = 1, mania.Keys - 1 do
 		mania.ColumnSpacing[i] = math.max(mania.ColumnSpacing[i], -mania.ColumnWidth[i + 1])
 	end
+
 	mania.StageSeparation = math.max(mania.StageSeparation, 5)
 	mania.HitPosition = math.min(math.max(mania.HitPosition, 240), 480)
+
 	if mania.LightFramePerSecond <= 0 then
 		mania.LightFramePerSecond = 24
 	end

@@ -6,6 +6,7 @@ local config = JustConfig:new()
 config.data = --[[data]] {
 	mania = {},
 	autosave = false,
+	DisableFixes = false,
 	OverallDifficulty = 5,
 	HitErrorPosition = 465,
 	Barline = true,
@@ -50,6 +51,7 @@ function config:draw(w, h)
 	data.HitErrorPosition = imgui.slider1("HitErrorPosition", data.HitErrorPosition, "%d", 0, 480, 1, "Hit Error Position")
 	data.Barline = imgui.checkbox("Barline", data.Barline, "Barline")
 	data.ColumnLineMode = imgui.combo("ColumnLineMode", data.ColumnLineMode, {"default", "symmetric"}, nil, "Column Line Mode")
+	data.DisableFixes = imgui.checkbox("DisableFixes", data.DisableFixes, "Disable Fixes")
 
 	imgui.separator()
 	local cover = data.covers.top
