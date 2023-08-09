@@ -1035,7 +1035,7 @@ OsuNoteSkin.getDefaultManiaSection = function(self, keys)
 end
 
 OsuNoteSkin.fixManiaValues = function(self)
-	if self.config.DisableFixes then
+	if self.config.data.DisableFixes then
 		return
 	end
 
