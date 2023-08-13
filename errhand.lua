@@ -2,6 +2,7 @@ local inspect = require("inspect")
 local utf8validate = require("utf8validate")
 local just = require("just")
 local imgui = require("imgui")
+local typecheck = require("typecheck")
 local errhand = love.errhand
 
 local message = ""
@@ -90,6 +91,9 @@ return function(msg)
 	end
 	message = utf8validate(msg)
 	trace = debug.traceback()
+
+	message = typecheck.fix_traceback(message)
+	trace = typecheck.fix_traceback(trace)
 
 	print(message .. "\n" .. trace)
 	love.filesystem.write("userdata/lasterror.txt", message .. "\n" .. trace)
