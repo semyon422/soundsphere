@@ -6,6 +6,7 @@ local _transform = require("gfx_util").transform
 local spherefonts = require("sphere.assets.fonts")
 local version = require("version")
 local audio = require("audio")
+local utf8validate = require("utf8validate")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -297,7 +298,8 @@ drawSection.audio = function(self)
 		local offset = imgui.text(("%s -"):format(d.id), 40, true)
 		just.sameline()
 		just.indent(10)
-		just.text(("%s - %s"):format(d.driver, d.name))
+		local driver, name = utf8validate(d.driver), utf8validate(d.name)
+		just.text(("%s - %s"):format(driver, name))
 		just.indent(offset + 10)
 		local s = ""
 		if d.enabled then s = s .. "enabled " end
