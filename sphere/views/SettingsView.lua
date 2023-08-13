@@ -298,8 +298,7 @@ drawSection.audio = function(self)
 		local offset = imgui.text(("%s -"):format(d.id), 40, true)
 		just.sameline()
 		just.indent(10)
-		local driver, name = utf8validate(d.driver), utf8validate(d.name)
-		just.text(("%s - %s"):format(driver, name))
+		just.text(utf8validate(("%s - %s"):format(d.driver, d.name)))
 		just.indent(offset + 10)
 		local s = ""
 		if d.enabled then s = s .. "enabled " end
