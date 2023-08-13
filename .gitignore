@@ -35,6 +35,7 @@ userdata/scores.db-journal
 moddedgame
 
 reqprof
+typecheck
 lapis/*
 tree
 logs

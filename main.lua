@@ -15,11 +15,24 @@ pkg.add("ncdk")
 pkg.add("chartbase")
 pkg.add("libchart")
 
+local deco = require("deco")
+deco.package_path = love.filesystem.getRequirePath()
+deco.read_file = love.filesystem.read
+deco.blacklist = {"3rd-deps"}
+
 local reqprof = require("reqprof")
 if love.filesystem.getInfo("reqprof", "file") then
-	reqprof.replace_loader()
+	deco.add(reqprof.ProfileDecorator())
+	print("enabled reqprof.ProfileDecorator")
 end
-reqprof.blacklist = {"3rd-deps"}
+
+local typecheck = require("typecheck")
+if love.filesystem.getInfo("typecheck", "file") then
+	deco.add(typecheck.TypeDecorator())
+	print("enabled typecheck.TypeDecorator")
+end
+
+deco.replace_loader()
 
 local ffi = require("ffi")
 
