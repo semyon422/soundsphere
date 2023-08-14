@@ -1,4 +1,4 @@
-local Class = require("Class")
+local class = require("class")
 
 local ScoreSystems = {
 	require("sphere.models.RhythmModel.ScoreEngine.BaseScoreSystem"),
@@ -9,15 +9,15 @@ local ScoreSystems = {
 	require("sphere.models.RhythmModel.ScoreEngine.EntryScoreSystem"),
 }
 
-local ScoreSystemContainer = Class:new()
+local ScoreSystemContainer = class()
 
-ScoreSystemContainer.load = function(self)
+function ScoreSystemContainer:load()
 	self.scoreSystems = {}
 	self.sequence = {}
 
 	local scoreSystems = self.scoreSystems
 	for _, ScoreSystem in ipairs(ScoreSystems) do
-		local scoreSystem = ScoreSystem:new()
+		local scoreSystem = ScoreSystem()
 		scoreSystem.container = self
 		scoreSystem.scoreEngine = self.scoreEngine
 
@@ -28,7 +28,7 @@ ScoreSystemContainer.load = function(self)
 	end
 end
 
-ScoreSystemContainer.getSlice = function(self)
+function ScoreSystemContainer:getSlice()
 	local slice = {}
 	for _, scoreSystem in ipairs(self.scoreSystems) do
 		slice[scoreSystem.name] = scoreSystem:getSlice()
@@ -36,7 +36,7 @@ ScoreSystemContainer.getSlice = function(self)
 	return slice
 end
 
-ScoreSystemContainer.receive = function(self, event)
+function ScoreSystemContainer:receive(event)
 	if event.name ~= "NoteState" or not event.currentTime then
 		return
 	end

@@ -1,13 +1,13 @@
-local Class = require("Class")
+local class = require("class")
 
-local SwitchView = Class:new()
+local SwitchView = class()
 
-SwitchView.isOver = function(self, w, h)
+function SwitchView:isOver(w, h)
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	return 0 <= mx and mx <= w and 0 <= my and my <= h
 end
 
-SwitchView.draw = function(self, w, h, value)
+function SwitchView:draw(w, h, value)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setLineStyle("smooth")
 	love.graphics.setLineWidth(1)

@@ -1,9 +1,9 @@
-local Class = require("Class")
+local class = require("class")
 local round = require("math_util").round
 
-local Modifier = Class:new()
+local Modifier = class()
 
-Modifier.getDefaultConfig = function(self)
+function Modifier:getDefaultConfig()
 	return {
 		name = self.name,
 		version = self.version,
@@ -18,12 +18,12 @@ Modifier.defaultValue = 0
 Modifier.range = {0, 1}
 Modifier.step = 1
 
-Modifier.encode = function(self, config)
+function Modifier:encode(config)
 	local version = config.version or 0
 	return ("%d,%s"):format(version, config.value)
 end
 
-Modifier.decode = function(self, configData)
+function Modifier:decode(configData)
 	local config = self:getDefaultConfig()
 	local version, value = configData:match("^(%d+),(.+)$")
 	config.version = tonumber(version)
@@ -31,7 +31,7 @@ Modifier.decode = function(self, configData)
 	return config
 end
 
-Modifier.decodeValue = function(self, s)
+function Modifier:decodeValue(s)
 	if type(self.defaultValue) == "boolean" then
 		return s == "true"
 	elseif type(self.defaultValue) == "number" then
@@ -40,20 +40,20 @@ Modifier.decodeValue = function(self, s)
 	return s
 end
 
-Modifier.getValue = function(self, config)
+function Modifier:getValue(config)
 	return config.value
 end
 
-Modifier.toNormValue = function(self, value)
+function Modifier:toNormValue(value)
 	return (value - self.range[1]) / (self.range[2] - self.range[1])
 end
 
-Modifier.fromNormValue = function(self, normValue)
+function Modifier:fromNormValue(normValue)
 	normValue = math.min(math.max(normValue, 0), 1)
 	return self.range[1] + round(normValue * (self.range[2] - self.range[1]), self.step)
 end
 
-Modifier.toIndexValue = function(self, value)
+function Modifier:toIndexValue(value)
 	if not self.values then
 		return round((value - self.range[1]) / self.step) + 1
 	end
@@ -65,7 +65,7 @@ Modifier.toIndexValue = function(self, value)
 	return 1
 end
 
-Modifier.fromIndexValue = function(self, indexValue)
+function Modifier:fromIndexValue(indexValue)
 	if not self.values then
 		return self.range[1] + (indexValue - 1) * self.step
 	end
@@ -73,14 +73,14 @@ Modifier.fromIndexValue = function(self, indexValue)
 	return self.values[indexValue] or ""
 end
 
-Modifier.getCount = function(self)
+function Modifier:getCount()
 	if not self.values then
 		return round((self.range[2] - self.range[1]) / self.step) + 1
 	end
 	return #self.values
 end
 
-Modifier.setValue = function(self, config, value)
+function Modifier:setValue(config, value)
 	local range = self.range
 	if type(self.defaultValue) == "number" then
 		config.value = math.min(math.max(round(value, self.step), range[1]), range[2])
@@ -89,23 +89,23 @@ Modifier.setValue = function(self, config, value)
 	config.value = value
 end
 
-Modifier.applyMeta = function(self, modifierConfig, state) end
-Modifier.apply = function(self, modifierConfig, state) end
-Modifier.update = function(self) end
-Modifier.receive = function(self, event) end
+function Modifier:applyMeta(modifierConfig, state) end
+function Modifier:apply(modifierConfig, state) end
+function Modifier:update() end
+function Modifier:receive(event) end
 
-Modifier.checkValue = function(self, value)
+function Modifier:checkValue(value)
 	-- local range = self.range
 	-- if value >= range[1] and value <= range[2] and value % 1 == 0 then
 	-- 	return true
 	-- end
 end
 
-Modifier.getString = function(self, config)
+function Modifier:getString(config)
 	return self.shortName or self.name
 end
 
-Modifier.getSubString = function(self, config)
+function Modifier:getSubString(config)
 	return nil
 end
 

@@ -1,33 +1,33 @@
-local Class = require("Class")
+local class = require("class")
 
-local IntervalManager = Class:new()
+local IntervalManager = class()
 
-IntervalManager.grab = function(self, intervalData)
+function IntervalManager:grab(intervalData)
 	self.grabbedIntervalData = intervalData
 end
 
-IntervalManager.drop = function(self)
+function IntervalManager:drop()
 	self.grabbedIntervalData = nil
 end
 
-IntervalManager.isGrabbed = function(self)
+function IntervalManager:isGrabbed()
 	return self.grabbedIntervalData
 end
 
-IntervalManager.moveGrabbed = function(self, time)
+function IntervalManager:moveGrabbed(time)
 	self.editorModel.layerData:moveInterval(self.grabbedIntervalData, time)
 end
 
-IntervalManager.split = function(self, timePoint)
+function IntervalManager:split(timePoint)
 	local ld = self.editorModel.layerData
 	return ld:splitInterval(ld:getTimePoint(timePoint:getTime()))
 end
 
-IntervalManager.merge = function(self, timePoint)
+function IntervalManager:merge(timePoint)
 	self.editorModel.layerData:mergeInterval(timePoint)
 end
 
-IntervalManager.update = function(self, intervalData, beats)
+function IntervalManager:update(intervalData, beats)
 	self.editorModel.layerData:updateInterval(intervalData, beats)
 end
 

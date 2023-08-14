@@ -1,19 +1,19 @@
-local Class = require("Class")
+local class = require("class")
 local WebApi = require("sphere.models.OnlineModel.WebApi")
 local AuthManager = require("sphere.models.OnlineModel.AuthManager")
 local OnlineScoreManager = require("sphere.models.OnlineModel.OnlineScoreManager")
 local OnlineNotechartManager = require("sphere.models.OnlineModel.OnlineNotechartManager")
 
-local OnlineModel = Class:new()
+local OnlineModel = class()
 
-OnlineModel.construct = function(self)
-	self.webApi = WebApi:new()
-	self.authManager = AuthManager:new()
-	self.onlineScoreManager = OnlineScoreManager:new()
-	self.onlineNotechartManager = OnlineNotechartManager:new()
+function OnlineModel:new()
+	self.webApi = WebApi()
+	self.authManager = AuthManager()
+	self.onlineScoreManager = OnlineScoreManager()
+	self.onlineNotechartManager = OnlineNotechartManager()
 end
 
-OnlineModel.load = function(self)
+function OnlineModel:load()
 	local webApi = self.webApi
 	local onlineScoreManager = self.onlineScoreManager
 	local onlineNotechartManager = self.onlineNotechartManager

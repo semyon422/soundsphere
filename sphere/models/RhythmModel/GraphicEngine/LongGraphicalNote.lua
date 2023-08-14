@@ -1,18 +1,16 @@
 local GraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.GraphicalNote")
 local TimePoint = require("ncdk.TimePoint")
 
-local LongGraphicalNote = GraphicalNote:new()
+local LongGraphicalNote = GraphicalNote + {}
 
-LongGraphicalNote.construct = function(self)
-	self.fakeStartTimePoint = TimePoint:new()
-end
-
-LongGraphicalNote.checkFakeStartTimePoint = function(self)
+function LongGraphicalNote:checkFakeStartTimePoint()
 	local timePoint = self.startNoteData.timePoint
 	if self.baseStartTime == timePoint.absoluteTime then
 		return
 	end
 	self.baseStartTime = timePoint.absoluteTime
+
+	self.fakeStartTimePoint = self.fakeStartTimePoint or TimePoint()
 
 	local fakeTimePoint = self.fakeStartTimePoint
 	fakeTimePoint.absoluteTime = timePoint.absoluteTime
@@ -22,7 +20,7 @@ LongGraphicalNote.checkFakeStartTimePoint = function(self)
 	fakeTimePoint.index = timePoint.index
 end
 
-LongGraphicalNote.update = function(self)
+function LongGraphicalNote:update()
 	self:checkFakeStartTimePoint()
 
 	self.endNoteData = self.startNoteData.endNoteData
@@ -73,7 +71,7 @@ LongGraphicalNote.update = function(self)
 	startTimeState.endTimeState = endTimeState
 end
 
-LongGraphicalNote.getFakeVisualStartTime = function(self)
+function LongGraphicalNote:getFakeVisualStartTime()
 	local currentTimePoint = self.currentTimePoint
 	local fakeTimePoint = self.fakeStartTimePoint
 
@@ -100,7 +98,7 @@ LongGraphicalNote.getFakeVisualStartTime = function(self)
 	return fakeTimePoint:getVisualTime(self.currentTimePoint)
 end
 
-LongGraphicalNote.whereWillDraw = function(self)
+function LongGraphicalNote:whereWillDraw()
 	local wwdStart = self:where(self.startTimeState.scaledVisualDeltaTime)
 	local wwdEnd = self:where(self.endTimeState.scaledVisualDeltaTime)
 

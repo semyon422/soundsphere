@@ -1,8 +1,8 @@
-local Class = require("Class")
+local class = require("class")
 local json = require("json")
 local thread = require("thread")
 
-local UpdateModel = Class:new()
+local UpdateModel = class()
 
 UpdateModel.status = ""
 
@@ -86,12 +86,12 @@ local async_crc32 = thread.async(function(...)
 	return require("crc32").hash(content)
 end)
 
-UpdateModel.setStatus = function(self, status)
+function UpdateModel:setStatus(status)
 	self.status = status
 	print(status)
 end
 
-UpdateModel.updateFilesAsync = function(self)
+function UpdateModel:updateFilesAsync()
 	local configModel = self.configModel
 	local configs = configModel.configs
 	self:setStatus("Checking for updates...")

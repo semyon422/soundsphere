@@ -1,7 +1,7 @@
 local gfx_util = require("gfx_util")
-local Class = require("Class")
+local class = require("class")
 
-local Layout = Class:new()
+local Layout = class()
 
 Layout.transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 

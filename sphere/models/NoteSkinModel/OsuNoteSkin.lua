@@ -6,9 +6,9 @@ local JustConfig = require("sphere.JustConfig")
 local ImageView = require("sphere.views.ImageView")
 local ImageValueView = require("sphere.views.ImageValueView")
 
-local ImageProgressView	= require("sphere.views.GameplayView.ImageProgressView")
+local ImageProgressView = require("sphere.views.GameplayView.ImageProgressView")
 
-local OsuNoteSkin = NoteSkinVsrg:new()
+local OsuNoteSkin = NoteSkinVsrg + {}
 
 local toarray = function(s)
 	if not s then
@@ -70,7 +70,7 @@ local bodyStyles = {
 }
 
 local configPath = "sphere/models/NoteSkinModel/OsuNoteSkinConfig.lua"
-OsuNoteSkin.load = function(self)
+function OsuNoteSkin:load()
 	OsuNoteSkin.configContent = OsuNoteSkin.configContent or love.filesystem.read(configPath)
 
 	local skinini = self.skinini
@@ -84,7 +84,7 @@ OsuNoteSkin.load = function(self)
 	local defaultMania = self:getDefaultManiaSection(keysCount)
 	copyDefaults(defaultMania, mania)
 
-	local config, exists = JustConfig:new({defaultContent = self.configContent}):fromFile(
+	local config, exists = JustConfig({defaultContent = self.configContent}):fromFile(
 		self.path:sub(1, -9) .. keysCount .. "key.config.lua"
 	)
 	self.config = config
@@ -315,9 +315,7 @@ OsuNoteSkin.load = function(self)
 		end
 	end
 
-	local playfield = PlayfieldVsrg:new({
-		noteskin = self
-	})
+	local playfield = PlayfieldVsrg(self)
 
 	playfield:enableCamera()
 
@@ -487,7 +485,7 @@ local defaultJudgements = {
 	{"300g", "Hit300g", "mania-hit300g"},
 }
 
-OsuNoteSkin.addJudgements = function(self, od)
+function OsuNoteSkin:addJudgements(od)
 	local mania = self.mania
 	local rate = self.skinini.General.AnimationFramerate
 
@@ -537,7 +535,7 @@ local chars = {
 	dot = ".",
 	percent = "%",
 }
-OsuNoteSkin.findCharFiles = function(self, prefix)
+function OsuNoteSkin:findCharFiles(prefix)
 	prefix = prefix:gsub("\\", "/"):lower()
 	local files = self.files[prefix:gsub("\\", "/"):lower()]
 	if not files then
@@ -557,14 +555,14 @@ OsuNoteSkin.findCharFiles = function(self, prefix)
 	return (self:getMaxResolution(images))
 end
 
-OsuNoteSkin.addCombo = function(self)
+function OsuNoteSkin:addCombo()
 	local fonts = self.skinini.Fonts
 	local files = self:findCharFiles(fonts.ComboPrefix)
 	local position = self.mania.ComboPosition
 	if self.upscroll then
 		position = 480 - position
 	end
-	self.playField:addCombo(ImageValueView:new({
+	self.playField:addCombo(ImageValueView({
 		transform = self.playField:newLaneCenterTransform(480),
 		x = 0,
 		y = position,
@@ -576,10 +574,10 @@ OsuNoteSkin.addCombo = function(self)
 	}))
 end
 
-OsuNoteSkin.addScore = function(self)
+function OsuNoteSkin:addScore()
 	local fonts = self.skinini.Fonts
 	local files = self:findCharFiles(fonts.ScorePrefix)
-	self.scoreConfig = ImageValueView:new({
+	self.scoreConfig = ImageValueView({
 		transform = self.playField:newTransform(1024, 768, "right"),
 		x = 1024,
 		y = 0,
@@ -590,11 +588,11 @@ OsuNoteSkin.addScore = function(self)
 	self.playField:addScore(self.scoreConfig)
 end
 
-OsuNoteSkin.addAccuracy = function(self)
+function OsuNoteSkin:addAccuracy()
 	local fonts = self.skinini.Fonts
 	local files = self:findCharFiles(fonts.ScorePrefix)
 	local scoreConfig = self.scoreConfig
-	self.playField:addAccuracy(ImageValueView:new({
+	self.playField:addAccuracy(ImageValueView({
 		transform = self.playField:newTransform(1024, 768, "right"),
 		x = 1024,
 		y = 0,
@@ -610,7 +608,7 @@ OsuNoteSkin.addAccuracy = function(self)
 	}))
 end
 
-OsuNoteSkin.getDefaultNoteImages = function(self)
+function OsuNoteSkin:getDefaultNoteImages()
 	local mania = self.mania
 	local keysCount = mania.Keys
 
@@ -626,7 +624,7 @@ OsuNoteSkin.getDefaultNoteImages = function(self)
 	return images
 end
 
-OsuNoteSkin.getDefaultKeyImages = function(self)
+function OsuNoteSkin:getDefaultKeyImages()
 	local mania = self.mania
 	local keysCount = mania.Keys
 
@@ -641,7 +639,7 @@ OsuNoteSkin.getDefaultKeyImages = function(self)
 	return pressed, released
 end
 
-OsuNoteSkin.getMaxResolution = function(self, images)
+function OsuNoteSkin:getMaxResolution(images)
 	local dpi = 0
 	local file
 	for k, v in pairs(images) do
@@ -653,7 +651,7 @@ OsuNoteSkin.getMaxResolution = function(self, images)
 	return file, dpi
 end
 
-OsuNoteSkin.findImage = function(self, value, preferFrame)
+function OsuNoteSkin:findImage(value, preferFrame)
 	if not value then
 		return
 	end
@@ -685,7 +683,7 @@ OsuNoteSkin.findImage = function(self, value, preferFrame)
 	return file
 end
 
-OsuNoteSkin.findAnimation = function(self, value)
+function OsuNoteSkin:findAnimation(value)
 	if not value then
 		return
 	end
@@ -731,13 +729,13 @@ OsuNoteSkin.findAnimation = function(self, value)
 	return framesPath[dpi], {startFrame, endFrame}
 end
 
-OsuNoteSkin.addStages = function(self, xl, xr, w)
+function OsuNoteSkin:addStages(xl, xr, w)
 	local mania = self.mania
 	local playfield = self.playField
 
 	local stageLeft = self:findImage(mania.StageLeft) or self:findImage("mania-stage-left")
 	if stageLeft then
-		playfield:add(ImageView:new({
+		playfield:add(ImageView({
 			x = xl,
 			y = 480,
 			sx = 480 / 768,
@@ -751,7 +749,7 @@ OsuNoteSkin.addStages = function(self, xl, xr, w)
 
 	local stageRight = self:findImage(mania.StageRight) or self:findImage("mania-stage-right")
 	if stageRight then
-		playfield:add(ImageView:new({
+		playfield:add(ImageView({
 			x = xr,
 			y = 480,
 			sx = 480 / 768,
@@ -764,7 +762,7 @@ OsuNoteSkin.addStages = function(self, xl, xr, w)
 
 	local stageHint = self:findImage(mania.StageHint) or self:findImage("mania-stage-hint")
 	if stageHint then
-		playfield:add(ImageView:new({
+		playfield:add(ImageView({
 			x = xl,
 			y = self.hitposition,
 			w = w,
@@ -777,7 +775,7 @@ OsuNoteSkin.addStages = function(self, xl, xr, w)
 
 	local stageBottom = self:findImage(mania.StageBottom) or self:findImage("mania-stage-bottom")
 	if stageBottom then
-		playfield:add(ImageView:new({
+		playfield:add(ImageView({
 			x = 0,
 			y = 480,
 			sx = 1,
@@ -790,7 +788,7 @@ OsuNoteSkin.addStages = function(self, xl, xr, w)
 	end
 end
 
-OsuNoteSkin.addHpBar = function(self)
+function OsuNoteSkin:addHpBar()
 	local mania = self.mania
 	local playfield = self.playField
 
@@ -798,7 +796,7 @@ OsuNoteSkin.addHpBar = function(self)
 
 	local scoreBarBg = self:findImage("scorebar-bg")
 	if scoreBarBg then
-		playfield:add(ImageView:new({
+		playfield:add(ImageView({
 			x = right + 1,
 			y = 480,
 			sx = 480 / 768 * 0.7,
@@ -820,7 +818,7 @@ OsuNoteSkin.addHpBar = function(self)
 			x = right + 8
 			y = 478
 		end
-		playfield:addHpBar(ImageProgressView:new({
+		playfield:addHpBar(ImageProgressView({
 			x = x,
 			y = y,
 			sx = 480 / 768 * 0.7,
@@ -834,7 +832,7 @@ OsuNoteSkin.addHpBar = function(self)
 	end
 end
 
-OsuNoteSkin.setKeys = function(self, keys)
+function OsuNoteSkin:setKeys(keys)
 	for _, mania in ipairs(self.skinini.Mania) do
 		if tonumber(mania.Keys) == keys then
 			self.mania = mania
@@ -843,7 +841,7 @@ OsuNoteSkin.setKeys = function(self, keys)
 	end
 end
 
-OsuNoteSkin.processFiles = function(self, files)
+function OsuNoteSkin:processFiles(files)
 	local _files = {}
 
 	for _, file in ipairs(files) do
@@ -872,7 +870,7 @@ OsuNoteSkin.processFiles = function(self, files)
 	return _files
 end
 
-OsuNoteSkin.parseSkinIni = function(self, content)
+function OsuNoteSkin:parseSkinIni(content)
 	local skinini = {}
 	skinini.General = skinini.General or {}
 	skinini.Colours = skinini.Colours or {}
@@ -925,7 +923,7 @@ local tovalues = function(value, count)
 	return t
 end
 
-OsuNoteSkin.getDefaultGeneralSection = function(self)
+function OsuNoteSkin:getDefaultGeneralSection()
 	local general = {}
 
 	general.Name = "Unknown"
@@ -950,7 +948,7 @@ OsuNoteSkin.getDefaultGeneralSection = function(self)
 	return general
 end
 
-OsuNoteSkin.getDefaultFontsSection = function(self)
+function OsuNoteSkin:getDefaultFontsSection()
 	local fonts = {}
 
 	fonts.HitCirclePrefix = "default"
@@ -963,7 +961,7 @@ OsuNoteSkin.getDefaultFontsSection = function(self)
 	return fonts
 end
 
-OsuNoteSkin.getDefaultManiaSection = function(self, keys)
+function OsuNoteSkin:getDefaultManiaSection(keys)
 	local mania = {}
 
 	mania.Keys = keys
@@ -1034,7 +1032,7 @@ OsuNoteSkin.getDefaultManiaSection = function(self, keys)
 	return mania
 end
 
-OsuNoteSkin.fixManiaValues = function(self)
+function OsuNoteSkin:fixManiaValues()
 	if self.config.data.DisableFixes then
 		return
 	end

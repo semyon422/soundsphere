@@ -1,7 +1,7 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 local NoteData = require("ncdk.NoteData")
 
-local MaxChord = Modifier:new()
+local MaxChord = Modifier + {}
 
 MaxChord.type = "NoteChartModifier"
 MaxChord.interfaceType = "slider"
@@ -14,11 +14,11 @@ MaxChord.step = 1
 
 MaxChord.description = "All chords will be <= modifier value"
 
-MaxChord.getString = function(self, config)
+function MaxChord:getString(config)
 	return "CH"
 end
 
-MaxChord.getSubString = function(self, config)
+function MaxChord:getSubString(config)
 	return config.value
 end
 
@@ -69,7 +69,7 @@ local function zeroes(size)
 	return t
 end
 
-MaxChord.apply = function(self, config)
+function MaxChord:apply(config)
 	local maxChord = config.value
 	local noteChart = self.noteChart
 
@@ -174,7 +174,7 @@ MaxChord.apply = function(self, config)
 			noteData.endNoteData.noteType = "Ignore"
 		end
 
-		local soundNoteData = NoteData:new(noteData.timePoint)
+		local soundNoteData = NoteData(noteData.timePoint)
 
 		soundNoteData.noteType = "SoundNote"
 		soundNoteData.sounds, noteData.sounds = noteData.sounds, {}

@@ -1,14 +1,14 @@
-local Class = require("Class")
+local class = require("class")
 local math_util = require("math_util")
 
-local GraphsGenerator = Class:new()
+local GraphsGenerator = class()
 
-GraphsGenerator.load = function(self)
+function GraphsGenerator:load()
 	self.densityGraph = {}
 	self.intervalDatasGraph = {n = 0}
 end
 
-GraphsGenerator.genDensityGraph = function(self, noteChart, firstTime, lastTime)
+function GraphsGenerator:genDensityGraph(noteChart, firstTime, lastTime)
 	local notes = {}
 	for noteDatas in noteChart:getInputIterator() do
 		for _, noteData in ipairs(noteDatas) do
@@ -45,7 +45,7 @@ GraphsGenerator.genDensityGraph = function(self, noteChart, firstTime, lastTime)
 	end
 end
 
-GraphsGenerator.genIntervalDatasGraph = function(self, layerData, firstTime, lastTime)
+function GraphsGenerator:genIntervalDatasGraph(layerData, firstTime, lastTime)
 	local intervalDatas = layerData.ranges.interval
 
 	local offsets = {}

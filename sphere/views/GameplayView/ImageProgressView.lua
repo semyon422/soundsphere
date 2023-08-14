@@ -1,17 +1,17 @@
 local transform = require("gfx_util").transform
-local ProgressView	= require("sphere.views.GameplayView.ProgressView")
-local ImageView	= require("sphere.views.ImageView")
+local ProgressView = require("sphere.views.GameplayView.ProgressView")
+local ImageView = require("sphere.views.ImageView")
 
-local ImageProgressView = ProgressView:new()
+local ImageProgressView = ProgressView + {}
 
-ImageProgressView.load = function(self)
+function ImageProgressView:load()
 	ImageView.load(self)
 
 	self.w, self.h = self.imageObject:getDimensions()
 	self.quad = love.graphics.newQuad(0, 0, 1, 1, self.imageObject)
 end
 
-ImageProgressView.draw = function(self)
+function ImageProgressView:draw()
 	local w, h = self.imageWidth, self.imageHeight
 
 	local cw, ch = self.w, self.h

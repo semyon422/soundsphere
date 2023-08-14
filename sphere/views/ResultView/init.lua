@@ -5,7 +5,7 @@ local just = require("just")
 local Layout = require("sphere.views.ResultView.Layout")
 local ResultViewConfig = require("sphere.views.ResultView.ResultViewConfig")
 
-local ResultView = ScreenView:new()
+local ResultView = ScreenView + {}
 
 local loading
 ResultView.load = thread.coro(function(self)
@@ -24,7 +24,7 @@ ResultView.load = thread.coro(function(self)
 	loading = false
 end)
 
-ResultView.draw = function(self)
+function ResultView:draw()
 	just.container("screen container", true)
 
 	local kp = just.keypressed
@@ -70,7 +70,7 @@ ResultView.play = thread.coro(function(self, mode)
 	playing = false
 end)
 
-ResultView.quit = function(self)
+function ResultView:quit()
 	if self.game.multiplayerModel.room then
 		return self:changeScreen("multiplayerView")
 	end

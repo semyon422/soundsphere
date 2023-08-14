@@ -1,24 +1,24 @@
 local cursor = {}
 
-cursor.setCircleCursor = function(self)
+function cursor:setCircleCursor()
 	if not self.circleCursor then
 		self:createCircle()
 	end
 	love.mouse.setCursor(self.circleCursor)
 end
 
-cursor.setArrowCursor = function(self)
+function cursor:setArrowCursor()
 	if not self.arrowCursor then
 		self:createArrow()
 	end
 	love.mouse.setCursor(self.arrowCursor)
 end
 
-cursor.setSystemCursor = function(self)
+function cursor:setSystemCursor()
 	love.mouse.setCursor()
 end
 
-cursor.createCircle = function(self)
+function cursor:createCircle()
 	local oldCanvas = love.graphics.getCanvas()
 	local canvas = love.graphics.newCanvas(32, 32)
 	love.graphics.setCanvas(canvas)
@@ -29,7 +29,7 @@ cursor.createCircle = function(self)
 	self.circleCursor = love.mouse.newCursor(canvas:newImageData(), 16, 16)
 end
 
-cursor.createArrow = function(self)
+function cursor:createArrow()
 	local oldCanvas = love.graphics.getCanvas()
 	local canvas = love.graphics.newCanvas(32, 32)
 	love.graphics.setCanvas(canvas)

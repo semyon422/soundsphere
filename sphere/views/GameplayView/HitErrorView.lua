@@ -1,12 +1,12 @@
 
 local transform = require("gfx_util").transform
-local map				= require("math_util").map
-local Class				= require("Class")
+local map = require("math_util").map
+local class = require("class")
 local inside = require("table_util").inside
 
-local HitErrorView = Class:new()
+local HitErrorView = class()
 
-HitErrorView.draw = function(self)
+function HitErrorView:draw()
 	if self.show and not self.show(self) then
 		return
 	end
@@ -33,7 +33,7 @@ HitErrorView.draw = function(self)
 	end
 end
 
-HitErrorView.drawBackground = function(self)
+function HitErrorView:drawBackground()
 	love.graphics.setColor(self.background.color)
 	love.graphics.rectangle(
 		"fill",
@@ -44,7 +44,7 @@ HitErrorView.drawBackground = function(self)
 	)
 end
 
-HitErrorView.drawOrigin = function(self)
+function HitErrorView:drawOrigin()
 	local origin = self.origin
 
 	love.graphics.setColor(origin.color)
@@ -57,7 +57,7 @@ HitErrorView.drawOrigin = function(self)
 	)
 end
 
-HitErrorView.drawPoint = function(self, point, fade)
+function HitErrorView:drawPoint(point, fade)
 	local color = self.color
 	local radius = self.radius
 

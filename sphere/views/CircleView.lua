@@ -1,16 +1,16 @@
 
-local Class = require("Class")
+local class = require("class")
 local transform = require("gfx_util").transform
 
-local CircleView = Class:new()
+local CircleView = class()
 
-CircleView.draw = function(self)
+function CircleView:draw()
 	for _, circle in ipairs(self.circles) do
 		self:drawCircle(circle)
 	end
 end
 
-CircleView.drawCircle = function(self, circle)
+function CircleView:drawCircle(circle)
 	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 

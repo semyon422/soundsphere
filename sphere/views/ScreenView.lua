@@ -1,17 +1,17 @@
-local Class = require("Class")
+local class = require("class")
 
-local ScreenView = Class:new()
+local ScreenView = class()
 
-ScreenView.changeScreen = function(self, screenName, noTransition)
+function ScreenView:changeScreen(screenName, noTransition)
 	self:beginUnload()
 	self.gameView:setView(self.game[screenName], noTransition)
 end
 
-ScreenView.load = function(self) end
-ScreenView.beginUnload = function(self) end
-ScreenView.unload = function(self) end
-ScreenView.receive = function(self, event) end
-ScreenView.update = function(self, dt) end
-ScreenView.draw = function(self) end
+function ScreenView:load() end
+function ScreenView:beginUnload() end
+function ScreenView:unload() end
+function ScreenView:receive(event) end
+function ScreenView:update(dt) end
+function ScreenView:draw() end
 
 return ScreenView

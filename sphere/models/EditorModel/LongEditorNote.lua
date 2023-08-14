@@ -1,8 +1,8 @@
 local LongGraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.LongGraphicalNote")
 
-local LongEditorNote = LongGraphicalNote:extend()
+local LongEditorNote = LongGraphicalNote + {}
 
-LongEditorNote.create = function(self, absoluteTime)
+function LongEditorNote:create(absoluteTime)
 	local editorModel = self.editorModel
 	local ld = editorModel.layerData
 
@@ -28,7 +28,7 @@ LongEditorNote.create = function(self, absoluteTime)
 	return self
 end
 
-LongEditorNote.grab = function(self, t, part, deltaColumn, lockSnap)
+function LongEditorNote:grab(t, part, deltaColumn, lockSnap)
 	local note = self
 
 	note.grabbedPart = part
@@ -60,7 +60,7 @@ LongEditorNote.grab = function(self, t, part, deltaColumn, lockSnap)
 	end
 end
 
-LongEditorNote.drop = function(self, t)
+function LongEditorNote:drop(t)
 	local editorModel = self.editorModel
 	local ld = editorModel.layerData
 	if self.grabbedPart == "head" then
@@ -85,7 +85,7 @@ LongEditorNote.drop = function(self, t)
 	end
 end
 
-LongEditorNote.updateGrabbed = function(self, t)
+function LongEditorNote:updateGrabbed(t)
 	local editorModel = self.editorModel
 	if self.grabbedPart == "head" then
 		editorModel:getDtpAbsolute(t - self.grabbedDeltaTime):clone(self.startNoteData.timePoint)
@@ -97,12 +97,12 @@ LongEditorNote.updateGrabbed = function(self, t)
 	end
 end
 
-LongEditorNote.copy = function(self, copyTimePoint)
+function LongEditorNote:copy(copyTimePoint)
 	self.deltaStartTime = self.startNoteData.timePoint:sub(copyTimePoint)
 	self.deltaEndTime = self.endNoteData.timePoint:sub(copyTimePoint)
 end
 
-LongEditorNote.paste = function(self, timePoint)
+function LongEditorNote:paste(timePoint)
 	local ld = self.editorModel.layerData
 
 	self.startNoteData = self.startNoteData:clone()
@@ -115,14 +115,14 @@ LongEditorNote.paste = function(self, timePoint)
 	self.startNoteData.endNoteData = self.endNoteData
 end
 
-LongEditorNote.remove = function(self)
+function LongEditorNote:remove()
 	local ld = self.editorModel.layerData
 
 	ld:removeNoteData(self.startNoteData, self.inputType, self.inputIndex)
 	ld:removeNoteData(self.endNoteData, self.inputType, self.inputIndex)
 end
 
-LongEditorNote.add = function(self)
+function LongEditorNote:add()
 	local ld = self.editorModel.layerData
 
 	ld:addNoteData(self.startNoteData, self.inputType, self.inputIndex)

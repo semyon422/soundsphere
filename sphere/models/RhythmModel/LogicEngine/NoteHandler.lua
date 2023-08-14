@@ -1,9 +1,9 @@
-local Class					= require("Class")
-local LogicalNoteFactory	= require("sphere.models.RhythmModel.LogicEngine.LogicalNoteFactory")
+local class = require("class")
+local LogicalNoteFactory = require("sphere.models.RhythmModel.LogicEngine.LogicalNoteFactory")
 
-local NoteHandler = Class:new()
+local NoteHandler = class()
 
-NoteHandler.load = function(self)
+function NoteHandler:load()
 	self.notes = {}
 	local notes = self.notes
 
@@ -32,7 +32,7 @@ NoteHandler.load = function(self)
 	self.endNoteIndex = 1
 end
 
-NoteHandler.updateRange = function(self)
+function NoteHandler:updateRange()
 	local notes = self.notes
 	for i = self.startNoteIndex, #notes do
 		local note = notes[i]
@@ -59,7 +59,7 @@ NoteHandler.updateRange = function(self)
 end
 
 -- return current isPlayable note
-NoteHandler.getCurrentNote = function(self)
+function NoteHandler:getCurrentNote()
 	local notes = self.notes
 	self:updateRange()
 
@@ -97,14 +97,14 @@ NoteHandler.getCurrentNote = function(self)
 	return notes[nearestIndex]
 end
 
-NoteHandler.update = function(self)
+function NoteHandler:update()
 	self:updateRange()
 	for i = self.startNoteIndex, self.endNoteIndex do
 		self.notes[i]:update()
 	end
 end
 
-NoteHandler.handlePromode = function(self, note)
+function NoteHandler:handlePromode(note)
 	local isReachable = note:isReachable(self.logicEngine:getEventTime())
 	if not note.ended and note.isPlayable and isReachable then
 		note.isPlayable = false
@@ -112,7 +112,7 @@ NoteHandler.handlePromode = function(self, note)
 	note:update()
 end
 
-NoteHandler.setKeyState = function(self, state)
+function NoteHandler:setKeyState(state)
 	self:update()
 
 	local note = self:getCurrentNote()

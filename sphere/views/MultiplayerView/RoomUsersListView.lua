@@ -3,15 +3,15 @@ local just = require("just")
 local imgui = require("imgui")
 local spherefonts = require("sphere.assets.fonts")
 
-local RoomUsersListView = ListView:new()
+local RoomUsersListView = ListView()
 
 RoomUsersListView.rows = 9
 
-RoomUsersListView.reloadItems = function(self)
+function RoomUsersListView:reloadItems()
 	self.items = self.game.multiplayerModel.roomUsers
 end
 
-RoomUsersListView.drawItem = function(self, i, w, h)
+function RoomUsersListView:drawItem(i, w, h)
 	local items = self.items
 	local user = items[i]
 

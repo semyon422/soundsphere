@@ -6,13 +6,13 @@ local ScreenView = require("sphere.views.ScreenView")
 local SequenceView = require("sphere.views.SequenceView")
 local just = require("just")
 
-local GameplayView = ScreenView:new()
+local GameplayView = ScreenView + {}
 
-GameplayView.construct = function(self)
-	self.sequenceView = SequenceView:new()
+function GameplayView:new()
+	self.sequenceView = SequenceView()
 end
 
-GameplayView.load = function(self)
+function GameplayView:load()
 	self.game.rhythmModel.observable:add(self.sequenceView)
 	self.game.gameplayController:load()
 
@@ -27,19 +27,19 @@ GameplayView.load = function(self)
 	sequenceView:load()
 end
 
-GameplayView.unload = function(self)
+function GameplayView:unload()
 	self.game.gameplayController:unload()
 	self.game.rhythmModel.observable:remove(self.sequenceView)
 	self.sequenceView:unload()
 end
 
-GameplayView.retry = function(self)
+function GameplayView:retry()
 	self.game.gameplayController:retry()
 	self.sequenceView:unload()
 	self.sequenceView:load()
 end
 
-GameplayView.draw = function(self)
+function GameplayView:draw()
 	just.container("screen container", true)
 	self:keypressed()
 	self:keyreleased()
@@ -67,7 +67,7 @@ GameplayView.draw = function(self)
 	end
 end
 
-GameplayView.update = function(self, dt)
+function GameplayView:update(dt)
 	self.game.gameplayController:update(dt)
 
 	local state = self.game.rhythmModel.pauseManager.state
@@ -106,12 +106,12 @@ GameplayView.update = function(self, dt)
 	self.sequenceView:update(dt)
 end
 
-GameplayView.receive = function(self, event)
+function GameplayView:receive(event)
 	self.game.gameplayController:receive(event)
 	self.sequenceView:receive(event)
 end
 
-GameplayView.quit = function(self)
+function GameplayView:quit()
 	if self.game.gameplayController:hasResult() then
 		return self:changeScreen("resultView")
 	elseif self.game.multiplayerModel.room then
@@ -120,7 +120,7 @@ GameplayView.quit = function(self)
 	return self:changeScreen("selectView")
 end
 
-GameplayView.keypressed = function(self)
+function GameplayView:keypressed()
 	local input = self.game.configModel.configs.settings.input
 	local gameplayController = self.game.gameplayController
 
@@ -153,7 +153,7 @@ GameplayView.keypressed = function(self)
 	end
 end
 
-GameplayView.keyreleased = function(self)
+function GameplayView:keyreleased()
 	local state = self.game.rhythmModel.pauseManager.state
 	local input = self.game.configModel.configs.settings.input
 	local gameplayController = self.game.gameplayController

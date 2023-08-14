@@ -1,15 +1,15 @@
 local thread = require("thread")
-local Class = require("Class")
+local class = require("class")
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 local ChartRepo = require("sphere.models.CacheModel.ChartRepo")
 
-local CacheModel = Class:new()
+local CacheModel = class()
 
-CacheModel.construct = function(self)
+function CacheModel:new()
 	self.tasks = {}
 end
 
-CacheModel.load = function(self)
+function CacheModel:load()
 	thread.shared.cache = {
 		state = 0,
 		noteChartCount = 0,
@@ -17,24 +17,24 @@ CacheModel.load = function(self)
 	}
 	self.shared = thread.shared.cache
 
-	self.cacheDatabase = CacheDatabase:new()
+	self.cacheDatabase = CacheDatabase()
 	self.cacheDatabase:load()
 
-	self.chartRepo = ChartRepo:new()
+	self.chartRepo = ChartRepo()
 	self.chartRepo:load()
 end
 
-CacheModel.startUpdate = function(self, path, force, callback)
+function CacheModel:startUpdate(path, force, callback)
 	table.insert(self.tasks, {path, force, callback})
 end
 
-CacheModel.stopUpdate = function(self)
+function CacheModel:stopUpdate()
 	self.shared.stop = true
 end
 
 local isProcessing = false
 
-CacheModel.update = function(self)
+function CacheModel:update()
 	self.cacheDatabase:update()
 	if not isProcessing and #self.tasks > 0 then
 		self:process()
@@ -43,7 +43,7 @@ end
 
 local updateCacheAsync = thread.async(function(path, force)
 	local CacheManager = require("sphere.models.CacheModel.CacheManager")
-	local cacheManager = CacheManager:new()
+	local cacheManager = CacheManager()
 	cacheManager:generateCacheFull(path, force)
 end)
 

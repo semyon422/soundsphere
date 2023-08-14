@@ -1,14 +1,14 @@
-local Class = require("Class")
+local class = require("class")
 local flux = require("flux")
 local gfx_util = require("gfx_util")
 
-local FadeTransition = Class:new()
+local FadeTransition = class()
 
 FadeTransition.transiting = false
 FadeTransition.alpha = 1
 FadeTransition.phase = 0
 
-FadeTransition.transitIn = function(self, callback)
+function FadeTransition:transitIn(callback)
 	if self.transiting then
 		return
 	end
@@ -18,7 +18,7 @@ FadeTransition.transitIn = function(self, callback)
 	flux.to(self, 0.2, {alpha = 0}):ease("quadinout")
 end
 
-FadeTransition.transitOut = function(self)
+function FadeTransition:transitOut()
 	if not self.transiting then
 		return
 	end
@@ -26,7 +26,7 @@ FadeTransition.transitOut = function(self)
 	flux.to(self, 0.2, {alpha = 1}):ease("quadinout")
 end
 
-FadeTransition.update = function(self, dt)
+function FadeTransition:update(dt)
 	if not self.transiting then
 		return
 	end
@@ -42,7 +42,7 @@ FadeTransition.update = function(self, dt)
 	end
 end
 
-FadeTransition.drawBefore = function(self)
+function FadeTransition:drawBefore()
 	if not self.transiting then
 		return
 	end
@@ -53,7 +53,7 @@ FadeTransition.drawBefore = function(self)
 	self.isCanvasSet = true
 end
 
-FadeTransition.drawAfter = function(self)
+function FadeTransition:drawAfter()
 	if not self.isCanvasSet then
 		return
 	end

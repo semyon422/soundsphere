@@ -1,16 +1,16 @@
 
-local Class = require("Class")
+local class = require("class")
 local transform = require("gfx_util").transform
 
-local RectangleView = Class:new()
+local RectangleView = class()
 
-RectangleView.draw = function(self)
+function RectangleView:draw()
 	for _, rectangle in ipairs(self.rectangles) do
 		self:drawRectangle(rectangle)
 	end
 end
 
-RectangleView.drawRectangle = function(self, rectangle)
+function RectangleView:drawRectangle(rectangle)
 	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 

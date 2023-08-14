@@ -1,6 +1,6 @@
-local Class = require("Class")
+local class = require("class")
 
-local ScreenshotModel = Class:new()
+local ScreenshotModel = class()
 
 local prefix = "userdata/screenshots/screenshot "
 local path_fmt = prefix .. "%s.png"
@@ -25,7 +25,7 @@ local function get_path()
 	return pathn_fmt:format(date, "?")
 end
 
-ScreenshotModel.capture = function(self, open)
+function ScreenshotModel:capture(open)
 	love.graphics.captureScreenshot(function(imageData)
 		local path = get_path()
 		local fileData = imageData:encode("png")
@@ -36,7 +36,7 @@ ScreenshotModel.capture = function(self, open)
 	end)
 end
 
-ScreenshotModel.receive = function(self, event)
+function ScreenshotModel:receive(event)
 	if event.name ~= "keypressed" then
 		return
 	end

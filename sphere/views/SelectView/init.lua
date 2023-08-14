@@ -7,32 +7,32 @@ local NotechartsSubscreen = require("sphere.views.SelectView.NotechartsSubscreen
 local CollectionsSubscreen = require("sphere.views.SelectView.CollectionsSubscreen")
 local OsudirectSubscreen = require("sphere.views.SelectView.OsudirectSubscreen")
 
-local SelectView = ScreenView:new()
+local SelectView = ScreenView + {}
 
 SelectView.subscreen = "notecharts"
 SelectView.searchMode = "filter"
 
-SelectView.load = function(self)
+function SelectView:load()
 	self.game.selectController:load()
 end
 
-SelectView.beginUnload = function(self)
+function SelectView:beginUnload()
 	self.game.selectController:beginUnload()
 end
 
-SelectView.unload = function(self)
+function SelectView:unload()
 	self.game.selectController:unload()
 end
 
-SelectView.update = function(self, dt)
+function SelectView:update(dt)
 	self.game.selectController:update(dt)
 end
 
-SelectView.receive = function(self, event)
+function SelectView:receive(event)
 	self.game.selectController:receive(event)
 end
 
-SelectView.draw = function(self)
+function SelectView:draw()
 	just.container("select container", true)
 
 	Layout:draw()
@@ -62,7 +62,7 @@ SelectView.draw = function(self)
 	just.container()
 end
 
-SelectView.play = function(self)
+function SelectView:play()
 	if not self.game.selectModel:notechartExists() then
 		return
 	end
@@ -76,43 +76,43 @@ SelectView.play = function(self)
 	self:changeScreen("gameplayView")
 end
 
-SelectView.result = function(self)
+function SelectView:result()
 	if self.game.selectModel:isPlayed() then
 		self:changeScreen("resultView")
 	end
 end
 
-SelectView.edit = function(self)
+function SelectView:edit()
 	if not self.game.selectModel:notechartExists() then
 		return
 	end
 	self:changeScreen("editorView")
 end
 
-SelectView.switchToNoteCharts = function(self)
+function SelectView:switchToNoteCharts()
 	self.subscreen = "notecharts"
 	self.searchMode = "filter"
 	self.game.selectModel:noDebouncePullNoteChartSet()
 	just.focus()
 end
 
-SelectView.switchToCollections = function(self)
+function SelectView:switchToCollections()
 	self.subscreen = "collections"
 	just.focus()
 end
 
-SelectView.switchToOsudirect = function(self)
+function SelectView:switchToOsudirect()
 	self.searchMode = "osudirect"
 	self.subscreen = "osudirect"
 	self.game.osudirectModel:searchNoDebounce()
 	just.focus()
 end
 
-SelectView.setSearchMode = function(self, searchMode)
+function SelectView:setSearchMode(searchMode)
 	self.searchMode = searchMode
 end
 
-SelectView.changeSearchMode = function(self)
+function SelectView:changeSearchMode()
 	if self.searchMode == "filter" then
 		self:setSearchMode("lamp")
 	else

@@ -1,8 +1,8 @@
-local Class = require("Class")
+local class = require("class")
 local socket_url = require("socket.url")
-local thread	= require("thread")
+local thread = require("thread")
 
-local OnlineNotechartManager = Class:new()
+local OnlineNotechartManager = class()
 
 OnlineNotechartManager.openWebNotechart = thread.coro(function(self, hash, index)
 	local api = self.webApi.api

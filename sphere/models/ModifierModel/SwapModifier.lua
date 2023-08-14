@@ -1,13 +1,13 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 
-local SwapModifier = Modifier:new()
+local SwapModifier = Modifier + {}
 
 SwapModifier.type = "NoteChartModifier"
 SwapModifier.interfaceType = "toggle"
 
 SwapModifier.name = "SwapModifier"
 
-SwapModifier.apply = function(self, config)
+function SwapModifier:apply(config)
 	if not config.value then
 		return
 	end

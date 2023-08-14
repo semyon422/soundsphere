@@ -1,11 +1,11 @@
 local discordrpc = require("discordRPC")
-local Class = require("Class")
+local class = require("class")
 
-local DiscordModel = Class:new()
+local DiscordModel = class()
 
 DiscordModel.appId = "594443609668059149"
 
-DiscordModel.load = function(self)
+function DiscordModel:load()
 	discordrpc.ready = function(userId, username, discriminator, avatar)
 		return self:ready(userId, username, discriminator, avatar)
 	end
@@ -30,11 +30,11 @@ DiscordModel.load = function(self)
 	self.nextUpdate = 0
 end
 
-DiscordModel.setPresence = function(self, presence)
+function DiscordModel:setPresence(presence)
 	self.presence = self:validatePresence(presence)
 end
 
-DiscordModel.validatePresence = function(self, presence)
+function DiscordModel:validatePresence(presence)
 	presence.state				= presence.state			and presence.state			:sub(1, 127)
 	presence.details			= presence.details			and presence.details		:sub(1, 127)
 	presence.startTimestamp		= presence.startTimestamp	--integer (52 bit, signed)
@@ -54,7 +54,7 @@ DiscordModel.validatePresence = function(self, presence)
 	return presence
 end
 
-DiscordModel.update = function(self)
+function DiscordModel:update()
 	if self.nextUpdate < love.timer.getTime() then
 		pcall(discordrpc.updatePresence, self.presence)
 		self.nextUpdate = love.timer.getTime() + 2
@@ -62,36 +62,36 @@ DiscordModel.update = function(self)
 	return discordrpc.runCallbacks()
 end
 
-DiscordModel.unload = function(self)
+function DiscordModel:unload()
 	return discordrpc.shutdown()
 end
 
-DiscordModel.ready = function(self, userId, username, discriminator, avatar)
+function DiscordModel:ready(userId, username, discriminator, avatar)
 	print(string.format("Discord: ready (%s, %s, %s, %s)", userId, username, discriminator, avatar))
 end
 
-DiscordModel.disconnected = function(self, errorCode, message)
+function DiscordModel:disconnected(errorCode, message)
 	print(string.format("Discord: disconnected (%d: %s)", errorCode, message))
 end
 
-DiscordModel.errored = function(self, errorCode, message)
+function DiscordModel:errored(errorCode, message)
 	print(string.format("Discord: error (%d: %s)", errorCode, message))
 end
 
-DiscordModel.joinGame = function(self, joinSecret)
+function DiscordModel:joinGame(joinSecret)
 	print(string.format("Discord: join (%s)", joinSecret))
 end
 
-DiscordModel.spectateGame = function(self, spectateSecret)
+function DiscordModel:spectateGame(spectateSecret)
 	print(string.format("Discord: spectate (%s)", spectateSecret))
 end
 
-DiscordModel.joinRequest = function(self, userId, username, discriminator, avatar)
+function DiscordModel:joinRequest(userId, username, discriminator, avatar)
 	print(string.format("Discord: join request (%s, %s, %s, %s)", userId, username, discriminator, avatar))
 	self:respond(userId, "yes")
 end
 
-DiscordModel.respond = function(self, userId, reply)
+function DiscordModel:respond(userId, reply)
 	discordrpc.respond(userId, "yes")
 end
 

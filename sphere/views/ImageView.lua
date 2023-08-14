@@ -1,10 +1,10 @@
 local gfx_util = require("gfx_util")
 local FileFinder = require("sphere.filesystem.FileFinder")
-local Class = require("Class")
+local class = require("class")
 
-local ImageView = Class:new()
+local ImageView = class()
 
-ImageView.load = function(self)
+function ImageView:load()
 	local path = FileFinder:findFile(self.image)
 	if path then
 		local status, image = pcall(love.graphics.newImage, path)
@@ -19,7 +19,7 @@ ImageView.load = function(self)
 	self.imageHeight = self.imageObject:getHeight()
 end
 
-ImageView.draw = function(self)
+function ImageView:draw()
 	local w, h = self.imageWidth, self.imageHeight
 
 	local cw, ch = self.w, self.h

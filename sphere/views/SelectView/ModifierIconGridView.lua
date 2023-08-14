@@ -1,9 +1,9 @@
-local Class = require("Class")
+local class = require("class")
 local ModifierIconView = require("sphere.views.ModifierView.ModifierIconView")
 
-local ModifierIconGridView = Class:new()
+local ModifierIconGridView = class()
 
-ModifierIconGridView.draw = function(self, configModifier, w, h, size, noModifier, growUp)
+function ModifierIconGridView:draw(configModifier, w, h, size, noModifier, growUp)
 	local modifierModel = self.game.modifierModel
 
 	if type(configModifier) == "string" then

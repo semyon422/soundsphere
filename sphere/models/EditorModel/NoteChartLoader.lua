@@ -1,12 +1,12 @@
-local Class = require("Class")
+local class = require("class")
 local ConvertAbsoluteToInterval = require("sphere.models.EditorModel.ConvertAbsoluteToInterval")
 local ConvertMeasureToInterval = require("sphere.models.EditorModel.ConvertMeasureToInterval")
 local ConvertTests = require("sphere.models.EditorModel.ConvertTests")
 local DynamicLayerData = require("ncdk.DynamicLayerData")
 
-local NoteChartLoader = Class:new()
+local NoteChartLoader = class()
 
-NoteChartLoader.load = function(self)
+function NoteChartLoader:load()
 	local ld = self.editorModel.noteChart:getLayerData(1)
 
 	if ld.mode == "absolute" then
@@ -15,12 +15,12 @@ NoteChartLoader.load = function(self)
 		ld = ConvertMeasureToInterval(ld)
 	end
 
-	ld = DynamicLayerData:new(ld)
+	ld = DynamicLayerData(ld)
 
 	return ld
 end
 
-NoteChartLoader.save = function(self)
+function NoteChartLoader:save()
 	self.editorModel.layerData:save(self.editorModel.noteChart:getLayerData(1))
 end
 

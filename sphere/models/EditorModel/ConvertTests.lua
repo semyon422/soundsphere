@@ -8,7 +8,7 @@ local function F(n)
 end
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("absolute")
 	ld:setSignatureMode("long")
@@ -34,7 +34,7 @@ do
 end
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("absolute")
 	ld:setSignatureMode("long")
@@ -60,7 +60,7 @@ do
 end
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("absolute")
 	ld:setSignatureMode("long")
@@ -92,7 +92,7 @@ do
 end
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("absolute")
 	ld:setSignatureMode("long")
@@ -116,7 +116,7 @@ do
 end
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("absolute")
 	ld:setSignatureMode("long")
@@ -143,7 +143,7 @@ do
 end
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("absolute")
 	ld:setSignatureMode("long")
@@ -170,7 +170,7 @@ do
 end
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("absolute")
 	ld:setSignatureMode("long")
@@ -195,7 +195,7 @@ do
 end
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("absolute")
 	ld:setSignatureMode("long")
@@ -224,7 +224,7 @@ do
 end
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("absolute")
 	ld:setSignatureMode("long")
@@ -253,7 +253,7 @@ do
 end
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("absolute")
 	ld:setSignatureMode("long")
@@ -282,7 +282,7 @@ do
 end
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("absolute")
 	ld:setSignatureMode("long")
@@ -309,7 +309,7 @@ do
 end
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("absolute")
 	ld:setSignatureMode("long")
@@ -333,7 +333,7 @@ do
 end
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("absolute")
 	ld:setSignatureMode("long")
@@ -352,7 +352,7 @@ do
 end
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("absolute")
 	ld:setSignatureMode("long")
@@ -371,7 +371,7 @@ end
 --------------------------------------------------------------------------------
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("measure")
 	ld:setSignatureMode("long")
@@ -403,7 +403,7 @@ do
 end
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("measure")
 	ld:setSignatureMode("long")
@@ -438,7 +438,7 @@ do
 end
 
 do
-	local nc = NoteChart:new()
+	local nc = NoteChart()
 	local ld = nc:getLayerData(1)
 	ld:setTimeMode("measure")
 	ld:setSignatureMode("long")

@@ -1,7 +1,7 @@
 local thread = require("thread")
-local Class = require("Class")
+local class = require("class")
 
-local ScoreLibraryModel = Class:new()
+local ScoreLibraryModel = class()
 
 ScoreLibraryModel.scoreSources = {
 	"local",
@@ -9,25 +9,25 @@ ScoreLibraryModel.scoreSources = {
 }
 ScoreLibraryModel.scoreSourceName = "local"
 
-ScoreLibraryModel.construct = function(self)
+function ScoreLibraryModel:new()
 	self.hash = ""
 	self.index = 1
 	self.items = {}
 end
 
-ScoreLibraryModel.clear = function(self)
+function ScoreLibraryModel:clear()
 	self.items = {}
 end
 
-ScoreLibraryModel.setHash = function(self, hash)
+function ScoreLibraryModel:setHash(hash)
 	self.hash = hash or ""
 end
 
-ScoreLibraryModel.setIndex = function(self, index)
+function ScoreLibraryModel:setIndex(index)
 	self.index = index or 1
 end
 
-ScoreLibraryModel.filterScores = function(self, scores)
+function ScoreLibraryModel:filterScores(scores)
 	local filters = self.configModel.configs.filters.score
 	local select = self.configModel.configs.select
 	local index
@@ -51,7 +51,7 @@ ScoreLibraryModel.filterScores = function(self, scores)
 	return newScores
 end
 
-ScoreLibraryModel.updateItemsAsync = function(self)
+function ScoreLibraryModel:updateItemsAsync()
 	local hash_index = self.hash .. self.index
 	self.items = {}
 
@@ -69,7 +69,7 @@ end
 
 ScoreLibraryModel.updateItems = thread.coro(ScoreLibraryModel.updateItemsAsync)
 
-ScoreLibraryModel.updateItemsOnline = function(self)
+function ScoreLibraryModel:updateItemsOnline()
 	local api = self.onlineModel.webApi.api
 
 	print("GET " .. api.notecharts)
@@ -97,7 +97,7 @@ ScoreLibraryModel.updateItemsOnline = function(self)
 	end
 end
 
-ScoreLibraryModel.updateItemsLocal = function(self)
+function ScoreLibraryModel:updateItemsLocal()
 	local scoreEntries = self.scoreModel:getScoreEntries(
 		self.hash,
 		self.index
@@ -113,7 +113,7 @@ ScoreLibraryModel.updateItemsLocal = function(self)
 	self.scoreSourceName = "local"
 end
 
-ScoreLibraryModel.getItemIndex = function(self, scoreEntryId)
+function ScoreLibraryModel:getItemIndex(scoreEntryId)
 	local items = self.items
 
 	if not items then
@@ -130,7 +130,7 @@ ScoreLibraryModel.getItemIndex = function(self, scoreEntryId)
 	return 1
 end
 
-ScoreLibraryModel.transformOnlineScore = function(self, score)
+function ScoreLibraryModel:transformOnlineScore(score)
 	local s = {
 		id = score.id,
 		noteChartHash = "",

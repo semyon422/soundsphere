@@ -35,7 +35,11 @@ local function draw()
 		love.event.quit("restart")
 	end
 	if imgui.button("vscode", "open in vscode") then
-		os.execute("code -g " .. message:match("^([^:]-:%d+)"))
+		local line = message:match("^[^\n]+")
+		local files = line:split(": ")
+		local last_file = files[#files - 1]
+		print("code -g " .. last_file)
+		os.execute("code -g " .. last_file)
 		love.event.quit()
 	end
 	just.offset(w - 70)
@@ -60,6 +64,7 @@ function handlers.keypressed(key, scancode)
 	end
 end
 
+---@return number|string?
 local function run()
 	love.event.pump()
 

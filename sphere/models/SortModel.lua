@@ -1,4 +1,4 @@
-local Class = require("Class")
+local class = require("class")
 
 local function sort(...)
 	local fields = {...}
@@ -8,9 +8,9 @@ local function sort(...)
 	return table.concat(fields, ",")
 end
 
-local SortModel = Class:new()
+local SortModel = class()
 
-SortModel.getOrderBy = function(self)
+function SortModel:getOrderBy()
 	local f = self.sortItemsFunctions[self.name]
 	return f[1], f[2]
 end

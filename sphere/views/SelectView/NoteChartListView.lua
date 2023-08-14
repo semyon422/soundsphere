@@ -3,24 +3,24 @@ local just = require("just")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
 
-local NoteChartListView = ListView:new()
+local NoteChartListView = ListView()
 
 NoteChartListView.rows = 5
 
-NoteChartListView.reloadItems = function(self)
+function NoteChartListView:reloadItems()
 	self.stateCounter = self.game.selectModel.noteChartStateCounter
 	self.items = self.game.noteChartLibraryModel.items
 end
 
-NoteChartListView.getItemIndex = function(self)
+function NoteChartListView:getItemIndex()
 	return self.game.selectModel.noteChartItemIndex
 end
 
-NoteChartListView.scroll = function(self, count)
+function NoteChartListView:scroll(count)
 	self.game.selectModel:scrollNoteChart(count)
 end
 
-NoteChartListView.draw = function(self, ...)
+function NoteChartListView:draw(...)
 	ListView.draw(self, ...)
 
 	if just.keypressed("up") then self:scroll(-1)
@@ -28,7 +28,7 @@ NoteChartListView.draw = function(self, ...)
 	end
 end
 
-NoteChartListView.drawItem = function(self, i, w, h)
+function NoteChartListView:drawItem(i, w, h)
 	local items = self.items
 	local item = items[i]
 

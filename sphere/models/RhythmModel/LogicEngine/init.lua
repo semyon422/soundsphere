@@ -1,16 +1,16 @@
-local Class				= require("Class")
-local NoteHandler		= require("sphere.models.RhythmModel.LogicEngine.NoteHandler")
+local class = require("class")
+local NoteHandler = require("sphere.models.RhythmModel.LogicEngine.NoteHandler")
 local Observable = require("Observable")
 
-local LogicEngine = Class:new()
+local LogicEngine = class()
 
 LogicEngine.inputOffset = 0
 
-LogicEngine.construct = function(self)
-	self.observable = Observable:new()
+function LogicEngine:new()
+	self.observable = Observable()
 end
 
-LogicEngine.load = function(self)
+function LogicEngine:load()
 	self.sharedLogicalNotes = {}
 	self.noteHandlers = {}
 
@@ -20,7 +20,7 @@ LogicEngine.load = function(self)
 
 		local noteHandler = self.noteHandlers[key]
 		if not noteHandler then
-			noteHandler = NoteHandler:new({
+			noteHandler = NoteHandler({
 				noteDatas = {},
 				logicEngine = self
 			})
@@ -44,18 +44,18 @@ LogicEngine.load = function(self)
 	self.notesCount = notesCount
 end
 
-LogicEngine.unload = function(self)
+function LogicEngine:unload()
 	self.autoplay = false
 	self.promode = false
 end
 
-LogicEngine.update = function(self)
+function LogicEngine:update()
 	for _, noteHandler in pairs(self.noteHandlers) do
 		noteHandler:update()
 	end
 end
 
-LogicEngine.receive = function(self, event)
+function LogicEngine:receive(event)
 	if not event.virtual or self.autoplay then
 		return
 	end
@@ -70,30 +70,30 @@ LogicEngine.receive = function(self, event)
 	self.eventTime = nil
 end
 
-LogicEngine.getLogicalNote = function(self, noteData)
+function LogicEngine:getLogicalNote(noteData)
 	return self.sharedLogicalNotes[noteData]
 end
 
-LogicEngine.sendScore = function(self, event)
+function LogicEngine:sendScore(event)
 	self.rhythmModel.scoreEngine.scoreSystem:receive(event)
 end
 
-LogicEngine.playSound = function(self, noteData, isBackground)
+function LogicEngine:playSound(noteData, isBackground)
 	self.observable:send({
 		name = "LogicalNoteSound",
 		noteData, isBackground
 	})
 end
 
-LogicEngine.getEventTime = function(self)
+function LogicEngine:getEventTime()
 	return self.eventTime or self.rhythmModel.timeEngine.currentTime
 end
 
-LogicEngine.getTimeRate = function(self)
+function LogicEngine:getTimeRate()
 	return self.timeRate or self.rhythmModel.timeEngine.timeRate
 end
 
-LogicEngine.getInputOffset = function(self)
+function LogicEngine:getInputOffset()
 	return self.inputOffset
 end
 

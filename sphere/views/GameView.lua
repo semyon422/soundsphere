@@ -1,19 +1,19 @@
 local just = require("just")
-local Class = require("Class")
+local class = require("class")
 local FadeTransition = require("sphere.views.FadeTransition")
 local FrameTimeView = require("sphere.views.FrameTimeView")
 local AsyncTasksView = require("sphere.views.AsyncTasksView")
 local TextTooltipImView = require("sphere.imviews.TextTooltipImView")
 local ContextMenuImView = require("sphere.imviews.ContextMenuImView")
 
-local GameView = Class:new()
+local GameView = class()
 
-GameView.construct = function(self)
-	self.fadeTransition = FadeTransition:new()
-	self.frameTimeView = FrameTimeView:new()
+function GameView:new()
+	self.fadeTransition = FadeTransition()
+	self.frameTimeView = FrameTimeView()
 end
 
-GameView.load = function(self)
+function GameView:load()
 	self.frameTimeView.game = self.game
 
 	self.frameTimeView:load()
@@ -21,7 +21,7 @@ GameView.load = function(self)
 	self:setView(self.game.selectView)
 end
 
-GameView._setView = function(self, view)
+function GameView:_setView(view)
 	if self.view then
 		self.view:unload()
 	end
@@ -30,7 +30,7 @@ GameView._setView = function(self, view)
 	self.view:load()
 end
 
-GameView.setView = function(self, view, noTransition)
+function GameView:setView(view, noTransition)
 	if self.isChangingScreen then
 		return
 	end
@@ -47,14 +47,14 @@ GameView.setView = function(self, view, noTransition)
 	end)
 end
 
-GameView.unload = function(self)
+function GameView:unload()
 	if not self.view then
 		return
 	end
 	self.view:unload()
 end
 
-GameView.update = function(self, dt)
+function GameView:update(dt)
 	self.fadeTransition:update(dt)
 	if not self.view then
 		return
@@ -62,7 +62,7 @@ GameView.update = function(self, dt)
 	self.view:update(dt)
 end
 
-GameView.draw = function(self)
+function GameView:draw()
 	if not self.view then
 		return
 	end
@@ -93,7 +93,7 @@ GameView.draw = function(self)
 	end
 end
 
-GameView.receive = function(self, event)
+function GameView:receive(event)
 	self.frameTimeView:receive(event)
 	if not self.view then
 		return
@@ -101,12 +101,12 @@ GameView.receive = function(self, event)
 	self.view:receive(event)
 end
 
-GameView.setContextMenu = function(self, f, width)
+function GameView:setContextMenu(f, width)
 	self.contextMenu = f
 	self.contextMenuWidth = width
 end
 
-GameView.setModal = function(self, f)
+function GameView:setModal(f)
 	local _f = self.modal
 	if not _f then
 		self.modal = f

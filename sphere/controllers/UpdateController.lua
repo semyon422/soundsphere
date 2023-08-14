@@ -1,22 +1,22 @@
-local Class = require("Class")
+local class = require("class")
 local UpdateModel = require("sphere.models.UpdateModel")
 local ConfigModel = require("sphere.models.ConfigModel")
 local WindowModel = require("sphere.models.WindowModel")
 local thread = require("thread")
 local delay = require("delay")
 
-local UpdateController = Class:new()
+local UpdateController = class()
 
-UpdateController.construct = function(self)
-	self.updateModel = UpdateModel:new()
-	self.configModel = ConfigModel:new()
-	self.windowModel = WindowModel:new()
+function UpdateController:new()
+	self.updateModel = UpdateModel()
+	self.configModel = ConfigModel()
+	self.windowModel = WindowModel()
 
 	self.updateModel.configModel = self.configModel
 	self.windowModel.configModel = self.configModel
 end
 
-UpdateController.updateAsync = function(self)
+function UpdateController:updateAsync()
 	local updateModel = self.updateModel
 	local configModel = self.configModel
 

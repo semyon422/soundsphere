@@ -5,23 +5,23 @@ local SwitchView = require("sphere.views.SwitchView")
 local SliderView = require("sphere.views.SliderView")
 local StepperView = require("sphere.views.StepperView")
 
-local ModifierListView = ListView:new()
+local ModifierListView = ListView()
 
 ModifierListView.rows = 11
 
-ModifierListView.reloadItems = function(self)
+function ModifierListView:reloadItems()
 	self.items = self.game.modifierModel.config
 end
 
-ModifierListView.getItemIndex = function(self)
+function ModifierListView:getItemIndex()
 	return self.game.modifierModel.modifierItemIndex
 end
 
-ModifierListView.scroll = function(self, count)
+function ModifierListView:scroll(count)
 	self.game.modifierModel:scrollModifier(count)
 end
 
-ModifierListView.drawItem = function(self, i, w, h)
+function ModifierListView:drawItem(i, w, h)
 	local item = self.items[i]
 	local w2 = w / 2
 

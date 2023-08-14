@@ -4,17 +4,17 @@ local Orm = require("sphere.Orm")
 local ObjectQuery = require("sphere.ObjectQuery")
 local ffi = require("ffi")
 local byte = require("byte")
-local Class = require("Class")
+local class = require("class")
 
-local CacheDatabase = Class:new()
+local CacheDatabase = class()
 
 CacheDatabase.dbpath = "userdata/charts.db"
 
-CacheDatabase.load = function(self)
+function CacheDatabase:load()
 	if self.loaded then
 		return
 	end
-	self.db = Orm:new()
+	self.db = Orm()
 	local db = self.db
 	db:open(self.dbpath)
 	db:exec(love.filesystem.read("sphere/models/CacheModel/database.sql"))
@@ -32,7 +32,7 @@ CacheDatabase.load = function(self)
 
 	local entryCaches = {}
 	for _, t in ipairs({"noteChartSets", "noteCharts", "noteChartDatas"}) do
-		entryCaches[t] = TimedCache:new()
+		entryCaches[t] = TimedCache()
 		entryCaches[t].timeout = 1
 		entryCaches[t].loadObject = function(_, id)
 			local status, entries = pcall(self.db.select, self.db, t, "id = ?", id)
@@ -47,7 +47,7 @@ CacheDatabase.load = function(self)
 	self.queryParams = {}
 end
 
-CacheDatabase.unload = function(self)
+function CacheDatabase:unload()
 	if not self.loaded then
 		return
 	end
@@ -56,21 +56,21 @@ CacheDatabase.unload = function(self)
 	return self.db:close()
 end
 
-CacheDatabase.attachScores = function(self)
+function CacheDatabase:attachScores()
 	self.db:exec("ATTACH 'userdata/scores.db' AS scores_db")
 end
 
-CacheDatabase.detachScores = function(self)
+function CacheDatabase:detachScores()
 	self.db:exec("DETACH scores_db")
 end
 
 ----------------------------------------------------------------
 
-CacheDatabase.getCachedEntry = function(self, t, id)
+function CacheDatabase:getCachedEntry(t, id)
 	return self.entryCaches[t]:getObject(id)
 end
 
-CacheDatabase.update = function(self)
+function CacheDatabase:update()
 	for _, entryCache in pairs(self.entryCaches) do
 		entryCache:update()
 	end
@@ -118,7 +118,7 @@ local function fillObject(object, row, colnames)
 	end
 end
 
-CacheDatabase.queryAll = function(self)
+function CacheDatabase:queryAll()
 	self:queryNoteChartSets()
 	self:queryNoteCharts()
 	self:reassignData()
@@ -128,7 +128,7 @@ local _asyncQueryAll = thread.async(function(queryParams)
 	local time = love.timer.getTime()
 	local ffi = require("ffi")
 	local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
-	local self = CacheDatabase:new()
+	local self = CacheDatabase()
 	self:load()
 	self.queryParams = queryParams
 	local status, err = pcall(self.queryAll, self)
@@ -150,7 +150,7 @@ local _asyncQueryAll = thread.async(function(queryParams)
 	return t
 end)
 
-CacheDatabase.asyncQueryAll = function(self)
+function CacheDatabase:asyncQueryAll()
 	local t = _asyncQueryAll(self.queryParams)
 	if not t then
 		return
@@ -170,10 +170,10 @@ CacheDatabase.asyncQueryAll = function(self)
 	ffi.copy(self.noteChartItems, t.noteChartItems, #t.noteChartItems)
 end
 
-CacheDatabase.queryNoteChartSets = function(self)
+function CacheDatabase:queryNoteChartSets()
 	local params = self.queryParams
 
-	local objectQuery = ObjectQuery:new()
+	local objectQuery = ObjectQuery()
 
 	objectQuery.db = self.db
 
@@ -224,10 +224,10 @@ CacheDatabase.queryNoteChartSets = function(self)
 	self.noteChartSetItemsCount = i
 end
 
-CacheDatabase.queryNoteCharts = function(self)
+function CacheDatabase:queryNoteCharts()
 	local params = self.queryParams
 
-	local objectQuery = ObjectQuery:new()
+	local objectQuery = ObjectQuery()
 
 	self:load()
 	objectQuery.db = self.db
@@ -303,7 +303,7 @@ CacheDatabase.queryNoteCharts = function(self)
 	self.noteChartItemsCount = i
 end
 
-CacheDatabase.reassignData = function(self)
+function CacheDatabase:reassignData()
 	if not self.queryParams.groupBy then
 		return
 	end

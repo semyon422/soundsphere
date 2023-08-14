@@ -1,14 +1,14 @@
-local Class = require("Class")
+local class = require("class")
 local thread = require("thread")
 local gfx_util = require("gfx_util")
-local flux				= require("flux")
-local delay				= require("delay")
+local flux = require("flux")
+local delay = require("delay")
 
-local BackgroundModel = Class:new()
+local BackgroundModel = class()
 
 BackgroundModel.alpha = 0
 
-BackgroundModel.load = function(self)
+function BackgroundModel:load()
 	self.config = self.configModel.configs.select
 	self.noteChartDataEntryId = 0
 	self.path = ""
@@ -17,14 +17,14 @@ BackgroundModel.load = function(self)
 	self.images = {self.emptyImage}
 end
 
-BackgroundModel.setBackgroundPath = function(self, path)
+function BackgroundModel:setBackgroundPath(path)
 	if self.path ~= path then
 		self.path = path
 		self:loadBackgroundDebounce()
 	end
 end
 
-BackgroundModel.update = function(self, dt)
+function BackgroundModel:update(dt)
 	if #self.images > 1 then
 		if self.alpha == 1 then
 			table.remove(self.images, 1)
@@ -35,7 +35,7 @@ BackgroundModel.update = function(self, dt)
 	end
 end
 
-BackgroundModel.setBackground = function(self, image)
+function BackgroundModel:setBackground(image)
 	local layer = math.min(#self.images + 1, 3)
 	self.images[layer] = image
 	if layer == 2 then
@@ -43,12 +43,12 @@ BackgroundModel.setBackground = function(self, image)
 	end
 end
 
-BackgroundModel.loadBackgroundDebounce = function(self, path)
+function BackgroundModel:loadBackgroundDebounce(path)
 	self.path = path or self.path
 	delay.debounce(self, "loadDebounce", 0.1, self.loadBackground, self)
 end
 
-BackgroundModel.loadBackground = function(self)
+function BackgroundModel:loadBackground()
 	local path = self.path
 	if not path then
 		return self:setBackground(self.emptyImage)
@@ -109,7 +109,7 @@ local loadOJN = thread.async(function(path)
 		return
 	end
 
-	local ojn = OJN:new(content)
+	local ojn = OJN(content)
 	if ojn.cover == "" then
 		return
 	end
@@ -137,7 +137,7 @@ local loadHttp = thread.async(function(url)
 	end
 end)
 
-BackgroundModel.loadImage = function(self, path, type)
+function BackgroundModel:loadImage(path, type)
 	local imageData
 	if type == "ojn" then
 		imageData = loadOJN(path)

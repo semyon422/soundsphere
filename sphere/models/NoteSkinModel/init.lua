@@ -1,18 +1,18 @@
-local Class			= require("Class")
-local ncdk			= require("ncdk")
-local OsuNoteSkin		= require("sphere.models.NoteSkinModel.OsuNoteSkin")
+local class = require("class")
+local ncdk = require("ncdk")
+local OsuNoteSkin = require("sphere.models.NoteSkinModel.OsuNoteSkin")
 local BaseNoteSkin = require("sphere.models.NoteSkinModel.BaseNoteSkin")
 local utf8validate = require("utf8validate")
 
-local NoteSkinModel = Class:new()
+local NoteSkinModel = class()
 
-NoteSkinModel.construct = function(self)
+function NoteSkinModel:new()
 	self.items = {}
 end
 
 NoteSkinModel.path = "userdata/skins"
 
-NoteSkinModel.load = function(self)
+function NoteSkinModel:load()
 	self.inputMode = ""
 	self.noteSkins = {}
 	self.files = {}
@@ -34,7 +34,7 @@ local function combinePath(...)
 	return table.concat(t, "/")
 end
 
-NoteSkinModel.treeToList = function(self, tree, list, prefix)
+function NoteSkinModel:treeToList(tree, list, prefix)
 	for _, item in ipairs(tree) do
 		if type(item) == "string" then
 			table.insert(list, combinePath(prefix, item))
@@ -44,7 +44,7 @@ NoteSkinModel.treeToList = function(self, tree, list, prefix)
 	end
 end
 
-NoteSkinModel.lookupTree = function(self, directoryPath, tree)
+function NoteSkinModel:lookupTree(directoryPath, tree)
 	local items = love.filesystem.getDirectoryItems(directoryPath)
 
 	for _, name in ipairs(items) do
@@ -60,7 +60,7 @@ NoteSkinModel.lookupTree = function(self, directoryPath, tree)
 	end
 end
 
-NoteSkinModel.lookupSkins = function(self, tree, prefix)
+function NoteSkinModel:lookupSkins(tree, prefix)
 	local found = false
 	for _, item in ipairs(tree) do
 		if type(item) == "string" and item:lower():find("^.-skin%.%a-$") then
@@ -86,13 +86,13 @@ NoteSkinModel.lookupSkins = function(self, tree, prefix)
 	self.files[tostring(prefix)] = list
 end
 
-NoteSkinModel.loadNoteSkins = function(self)
+function NoteSkinModel:loadNoteSkins()
 	for _, paths in ipairs(self.foundNoteSkins) do
 		self:loadNoteSkin(paths[1], paths[2])
 	end
 end
 
-NoteSkinModel.loadNoteSkin = function(self, prefix, name)
+function NoteSkinModel:loadNoteSkin(prefix, name)
 	if name:lower():find("^.+%.lua$") then
 		table.insert(self.noteSkins, self:loadLua(prefix, name))
 	elseif name:lower():find("^.+%.ini$") then
@@ -102,14 +102,14 @@ NoteSkinModel.loadNoteSkin = function(self, prefix, name)
 	end
 end
 
-NoteSkinModel.loadLua = function(self, prefix, name)
+function NoteSkinModel:loadLua(prefix, name)
 	local path = combinePath(self.path, prefix, name)
 	local noteSkin = assert(love.filesystem.load(path))(path)
 
 	noteSkin.path = path
 	noteSkin.directoryPath = combinePath(self.path, prefix)
 	noteSkin.fileName = name
-	noteSkin.inputMode = ncdk.InputMode:new(noteSkin.inputMode)
+	noteSkin.inputMode = ncdk.InputMode(noteSkin.inputMode)
 	if type(noteSkin.playField) == "string" then
 		noteSkin.playField = love.filesystem.load(combinePath(self.path, prefix, name))()
 	end
@@ -117,7 +117,7 @@ NoteSkinModel.loadLua = function(self, prefix, name)
 	return noteSkin
 end
 
-NoteSkinModel.loadOsu = function(self, prefix, name)
+function NoteSkinModel:loadOsu(prefix, name)
 	local path = combinePath(self.path, prefix, name)
 	local noteSkins = {}
 
@@ -130,14 +130,14 @@ NoteSkinModel.loadOsu = function(self, prefix, name)
 	for i, mania in ipairs(skinini.Mania) do
 		local keys = tonumber(mania.Keys)
 		if keys then
-			local noteSkin = OsuNoteSkin:new()
+			local noteSkin = OsuNoteSkin()
 			noteSkin.files = files
 			noteSkin.path = path
 			noteSkin.directoryPath = combinePath(self.path, prefix)
 			noteSkin.fileName = name
 			noteSkin.skinini = skinini
 			noteSkin:setKeys(keys)
-			noteSkin.inputMode = ncdk.InputMode:new({key = keys})
+			noteSkin.inputMode = ncdk.InputMode({key = keys})
 			local status, err = xpcall(noteSkin.load, debug.traceback, noteSkin)
 			if status then
 				table.insert(noteSkins, noteSkin)
@@ -150,18 +150,18 @@ NoteSkinModel.loadOsu = function(self, prefix, name)
 	return noteSkins
 end
 
-NoteSkinModel.getBaseNoteSkin = function(self, inputMode, stringInputMode)
-	local noteSkin = BaseNoteSkin:new()
+function NoteSkinModel:getBaseNoteSkin(inputMode, stringInputMode)
+	local noteSkin = BaseNoteSkin()
 	noteSkin.directoryPath = "resources"
 	noteSkin:setInputMode(inputMode, stringInputMode)
 	noteSkin:load()
 	return noteSkin
 end
 
-NoteSkinModel.getNoteSkins = function(self, inputMode)
+function NoteSkinModel:getNoteSkins(inputMode)
 	local stringInputMode = inputMode
 	if type(inputMode) == "string" then
-		inputMode = ncdk.InputMode:new(inputMode)
+		inputMode = ncdk.InputMode(inputMode)
 	else
 		stringInputMode = tostring(inputMode)
 	end
@@ -183,13 +183,13 @@ NoteSkinModel.getNoteSkins = function(self, inputMode)
 	return items
 end
 
-NoteSkinModel.setDefaultNoteSkin = function(self, noteSkin)
+function NoteSkinModel:setDefaultNoteSkin(noteSkin)
 	self.config.gameplay["noteskin" .. noteSkin.inputMode] = noteSkin.path
 end
 
-NoteSkinModel.getNoteSkin = function(self, inputMode)
+function NoteSkinModel:getNoteSkin(inputMode)
 	if type(inputMode) == "string" then
-		inputMode = ncdk.InputMode:new(inputMode)
+		inputMode = ncdk.InputMode(inputMode)
 	end
 
 	local list = self:getNoteSkins(inputMode)

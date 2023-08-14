@@ -7,7 +7,7 @@ local LuaMidi = require("luamidi")
 local flux = require("flux")
 local reqprof = require("reqprof")
 
-local loop = Observable:new()
+local loop = Observable()
 
 loop.fpslimit = 240
 loop.time = 0

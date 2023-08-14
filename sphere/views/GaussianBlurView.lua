@@ -1,10 +1,10 @@
 
-local Class = require("Class")
+local class = require("class")
 local gfx_util = require("gfx_util")
 
-local GaussianBlurView = Class:new()
+local GaussianBlurView = class()
 
-GaussianBlurView.draw = function(self, blur)
+function GaussianBlurView:draw(blur)
 	if blur == 0 then
 		return
 	end
@@ -21,7 +21,7 @@ GaussianBlurView.draw = function(self, blur)
 end
 
 -- https://github.com/vrld/moonshine/blob/master/gaussianblur.lua
-GaussianBlurView.createBlurShader = function(self)
+function GaussianBlurView:createBlurShader()
 	local sigma = self.sigma
 	sigma = sigma > 0 and sigma or 1
 	local range = math.max(1, math.floor(3 * sigma + 0.5))
@@ -46,14 +46,14 @@ GaussianBlurView.createBlurShader = function(self)
 	self.direction = {1, 1}
 end
 
-GaussianBlurView.setSigma = function(self, sigma)
+function GaussianBlurView:setSigma(sigma)
 	if sigma and self.sigma ~= sigma then
 		self.sigma = sigma
 		self:createBlurShader()
 	end
 end
 
-GaussianBlurView.enable = function(self)
+function GaussianBlurView:enable()
 	self.drawCanvas = gfx_util.getCanvas(1)
 	self.shaderCanvas = gfx_util.getCanvas(2)
 
@@ -64,7 +64,7 @@ GaussianBlurView.enable = function(self)
 	love.graphics.clear(0, 0, 0, 0)
 end
 
-GaussianBlurView.disable = function(self)
+function GaussianBlurView:disable()
 	local shader = self.shader
 	local direction = self.direction
 	local drawCanvas = self.drawCanvas

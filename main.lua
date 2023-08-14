@@ -28,6 +28,7 @@ end
 
 local typecheck = require("typecheck")
 if love.filesystem.getInfo("typecheck", "file") then
+	-- typecheck.strict = true
 	deco.add(typecheck.TypeDecorator())
 	deco.add(typecheck.ClassDecorator())
 	print("enabled typecheck.TypeDecorator")
@@ -96,7 +97,7 @@ end
 local thread = require("thread")
 thread.coro(function()
 	local UpdateController = require("sphere.controllers.UpdateController")
-	local updateController = UpdateController:new()
+	local updateController = UpdateController()
 	local needRestart = updateController:updateAsync()
 	if needRestart then
 		thread.unload()
@@ -114,7 +115,7 @@ thread.coro(function()
 	})
 
 	local GameController = require("sphere.controllers.GameController")
-	local game = GameController:new()
+	local game = GameController()
 
 	game:load()
 

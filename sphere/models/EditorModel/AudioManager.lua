@@ -1,4 +1,4 @@
-local Class = require("Class")
+local class = require("class")
 local audio = require("audio")
 local rbtree = require("rbtree")
 
@@ -19,7 +19,7 @@ local function newKeyFrame(time)
 	}, Keyframe_mt)
 end
 
-local AudioManager = Class:new()
+local AudioManager = class()
 
 AudioManager.time = 0
 
@@ -27,7 +27,7 @@ local function exTime(key)
 	return key.time
 end
 
-AudioManager.load = function(self)
+function AudioManager:load()
 	self.tree = rbtree.new()
 
 	self.sources = {}
@@ -35,7 +35,7 @@ AudioManager.load = function(self)
 	self.lastTime = 0
 end
 
-AudioManager.unload = function(self)
+function AudioManager:unload()
 	local sources = {}
 	for _, key in self.tree:iter() do
 		for placedSource in pairs(key.sources) do
@@ -51,7 +51,7 @@ AudioManager.unload = function(self)
 	self:load()
 end
 
-AudioManager.update = function(self, force)
+function AudioManager:update(force)
 	local time = self.editorModel.timer:getTime()
 	if time == self.time and not force then
 		return
@@ -92,20 +92,20 @@ AudioManager.update = function(self, force)
 	end
 end
 
-AudioManager.play = function(self)
+function AudioManager:play()
 	local time = self.editorModel.timer:getTime()
 	for placedSource in pairs(self.sources) do
 		placedSource.source:setPosition(time - placedSource.offset)
 	end
 end
 
-AudioManager.pause = function(self)
+function AudioManager:pause()
 	for placedSource in pairs(self.sources) do
 		placedSource.source:pause()
 	end
 end
 
-AudioManager.getCurrentSources = function(self)
+function AudioManager:getCurrentSources()
 	local time = self.time
 
 	local a, b = self.tree:findex(time, exTime)
@@ -124,7 +124,7 @@ AudioManager.getCurrentSources = function(self)
 	return b.key.sources
 end
 
-AudioManager.getNode = function(self, time)
+function AudioManager:getNode(time)
 	local tree = self.tree
 	local n = tree:findex(time, exTime)
 	if n then
@@ -145,7 +145,7 @@ AudioManager.getNode = function(self, time)
 	return n
 end
 
-AudioManager.insert = function(self, placedSource)
+function AudioManager:insert(placedSource)
 	local startTime, endTime = placedSource.offset, placedSource.offset + placedSource.duration
 
 	local a = self:getNode(startTime)
@@ -160,7 +160,7 @@ AudioManager.insert = function(self, placedSource)
 	end
 end
 
-AudioManager.remove = function(self, placedSource)
+function AudioManager:remove(placedSource)
 	local n = self:getNode(placedSource.offset)
 
 	while n and n.key.sources[placedSource] do
@@ -173,7 +173,7 @@ AudioManager.remove = function(self, placedSource)
 	end
 end
 
-AudioManager.loadResources = function(self, noteChart)
+function AudioManager:loadResources(noteChart)
 	local audioSettings = self.editorModel:getAudioSettings()
 	for noteDatas in noteChart:getInputIterator() do
 		for _, noteData in ipairs(noteDatas) do

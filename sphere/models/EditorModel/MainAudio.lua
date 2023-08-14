@@ -1,25 +1,25 @@
 local audio = require("audio")
-local Class = require("Class")
+local class = require("class")
 
-local MainAudio = Class:new()
+local MainAudio = class()
 
-MainAudio.load = function(self)
+function MainAudio:load()
 	self.soundData = nil
 	self.offset = 0
 	self.duration = 0
 end
 
-MainAudio.getAudioOffset = function(self)
+function MainAudio:getAudioOffset()
 	local editor = self.editorModel:getSettings()
 	return self.offset + editor.audioOffset
 end
 
-MainAudio.getWaveformOffset = function(self)
+function MainAudio:getWaveformOffset()
 	local editor = self.editorModel:getSettings()
 	return self.offset + editor.waveformOffset
 end
 
-MainAudio.unload = function(self)
+function MainAudio:unload()
 	local source = self.source
 	if not source then
 		return
@@ -28,7 +28,7 @@ MainAudio.unload = function(self)
 	self.source = nil
 end
 
-MainAudio.getPosition = function(self)
+function MainAudio:getPosition()
 	local source = self.source
 	if not source then
 		return
@@ -39,7 +39,7 @@ MainAudio.getPosition = function(self)
 	end
 end
 
-MainAudio.loadResources = function(self, noteChart)
+function MainAudio:loadResources(noteChart)
 	local audioSettings = self.editorModel:getAudioSettings()
 	for noteDatas in noteChart:getInputIterator() do
 		for _, noteData in ipairs(noteDatas) do
@@ -58,13 +58,13 @@ MainAudio.loadResources = function(self, noteChart)
 	end
 end
 
-MainAudio.isPlayable = function(self)
+function MainAudio:isPlayable()
 	local time = self.time
 	local offset = self:getAudioOffset()
 	return time >= offset and time < offset + self.duration
 end
 
-MainAudio.update = function(self, force)
+function MainAudio:update(force)
 	local source = self.source
 	if not source then
 		return
@@ -103,13 +103,13 @@ MainAudio.update = function(self, force)
 	end
 end
 
-MainAudio.play = function(self)
+function MainAudio:play()
 	if self.source and self:isPlayable() then
 		self.source:play()
 	end
 end
 
-MainAudio.pause = function(self)
+function MainAudio:pause()
 	if self.source then
 		self.source:pause()
 	end

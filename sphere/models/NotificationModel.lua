@@ -1,19 +1,19 @@
-local Class = require("Class")
+local class = require("class")
 
-local NotificationModel = Class:new()
+local NotificationModel = class()
 
-NotificationModel.construct = function(self)
+function NotificationModel:new()
 	self.message = ""
 	self.time = 0
 	self.delay = 1
 end
 
-NotificationModel.notify = function(self, message)
+function NotificationModel:notify(message)
 	self.message = message
 	self.time = love.timer.getTime()
 end
 
-NotificationModel.update = function(self)
+function NotificationModel:update()
 	if love.timer.getTime() > self.time + self.delay then
 		self.message = ""
 	end

@@ -1,15 +1,15 @@
-local Class				= require("Class")
+local class = require("class")
 local JudgementScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.JudgementScoreSystem")
 
-local DeltaTimeJudgementView = Class:new()
+local DeltaTimeJudgementView = class()
 
-DeltaTimeJudgementView.load = function(self)
+function DeltaTimeJudgementView:load()
 	self.deltaTime = 0
 	self.judgement = nil
 	self.judgementCounter = 0
 end
 
-DeltaTimeJudgementView.update = function(self)
+function DeltaTimeJudgementView:update()
 	local scoreSystem = self.game.rhythmModel.scoreEngine.scoreSystem
 
 	if scoreSystem.judgement.counter == self.judgementCounter then

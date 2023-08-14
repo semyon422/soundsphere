@@ -1,20 +1,25 @@
-local Class = require("Class")
+local class = require("class")
 
-local GraphicalNote = Class:new()
+local GraphicalNote = class()
 
-GraphicalNote.update = function(self) end
+function GraphicalNote:new(noteType, noteData)
+	self.noteType = noteType
+	self.startNoteData = noteData
+end
 
-GraphicalNote.getLogicalState = function(self)
+function GraphicalNote:update() end
+
+function GraphicalNote:getLogicalState()
 	local logicalNote = self.logicalNote
 	return logicalNote and logicalNote.state or "clear"
 end
 
-GraphicalNote.getPressedTime = function(self)
+function GraphicalNote:getPressedTime()
 	local logicalNote = self.logicalNote
 	return logicalNote and logicalNote.pressedTime
 end
 
-GraphicalNote.where = function(self, time)
+function GraphicalNote:where(time)
 	local rate = self.graphicEngine:getVisualTimeRate()
 	time = time * rate / math.abs(rate)
 	local range = self.graphicEngine.range
@@ -27,19 +32,19 @@ GraphicalNote.where = function(self, time)
 	end
 end
 
-GraphicalNote.whereWillDraw = function(self)
+function GraphicalNote:whereWillDraw()
 	return 0
 end
 
-GraphicalNote.willDraw = function(self)
+function GraphicalNote:willDraw()
 	return self:whereWillDraw() == 0
 end
 
-GraphicalNote.willDrawBeforeStart = function(self)
+function GraphicalNote:willDrawBeforeStart()
 	return self:whereWillDraw() == -1
 end
 
-GraphicalNote.willDrawAfterEnd = function(self)
+function GraphicalNote:willDrawAfterEnd()
 	return self:whereWillDraw() == 1
 end
 

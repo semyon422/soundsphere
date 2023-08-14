@@ -2,9 +2,9 @@ local ShortNoteView = require("sphere.views.RhythmView.ShortNoteView")
 local gfx_util = require("gfx_util")
 local just = require("just")
 
-local LongNoteView = ShortNoteView:new()
+local LongNoteView = ShortNoteView + {}
 
-LongNoteView.draw = function(self)
+function LongNoteView:draw()
 	local headView = self:getNotePart("Head")
 	local bodyView = self:getNotePart("Body")
 	local tailView = self:getNotePart("Tail")
@@ -66,7 +66,7 @@ LongNoteView.draw = function(self)
 	self.graphicalNote.selecting = note.headSelecting or note.tailSelecting or note.bodySelecting
 end
 
-LongNoteView.drawSelected = function(self)
+function LongNoteView:drawSelected()
 	local hw = self:getNotePart("Head")
 	local w, h = hw:getDimensions()
 
@@ -90,7 +90,7 @@ LongNoteView.drawSelected = function(self)
 	love.graphics.rectangle("line", x, ymin, _w - x, ymax - ymin)
 end
 
-LongNoteView.fillChords = function(self, chords, column)
+function LongNoteView:fillChords(chords, column)
 	local startNoteData = self.graphicalNote.startNoteData
 	local endNoteData = self.graphicalNote.endNoteData
 
@@ -113,7 +113,7 @@ end
 
 LongNoteView.getHeadTransformParams = LongNoteView.getTransformParams
 
-LongNoteView.getTailTransformParams = function(self)
+function LongNoteView:getTailTransformParams()
 	local tw = self:getNotePart("Tail")
 	local ets = self.graphicalNote.endTimeState
 	local w, h = tw:getDimensions()
@@ -132,7 +132,7 @@ LongNoteView.getTailTransformParams = function(self)
 		oy
 end
 
-LongNoteView.getBodyTransformParams = function(self)
+function LongNoteView:getBodyTransformParams()
 	local hw = self:getNotePart("Head")
 	local tw = self:getNotePart("Tail")
 	local bw = self:getNotePart("Body")

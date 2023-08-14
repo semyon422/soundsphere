@@ -1,8 +1,8 @@
 local GraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.GraphicalNote")
 
-local ShortGraphicalNote = GraphicalNote:new()
+local ShortGraphicalNote = GraphicalNote + {}
 
-ShortGraphicalNote.update = function(self)
+function ShortGraphicalNote:update()
 	local timePoint = self.startNoteData.timePoint
 	local visualTime = timePoint:getVisualTime(self.currentTimePoint)
 
@@ -21,7 +21,7 @@ ShortGraphicalNote.update = function(self)
 	startTimeState.scaledVisualDeltaTime = startTimeState.visualDeltaTime * self.graphicEngine:getVisualTimeRate()
 end
 
-ShortGraphicalNote.whereWillDraw = function(self)
+function ShortGraphicalNote:whereWillDraw()
 	return self:where(self.startTimeState.scaledVisualDeltaTime)
 end
 

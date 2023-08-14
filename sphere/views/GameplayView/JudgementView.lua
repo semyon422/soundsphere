@@ -1,9 +1,9 @@
-local Class				= require("Class")
+local class = require("class")
 local inside = require("table_util").inside
 
-local JudgementView = Class:new()
+local JudgementView = class()
 
-JudgementView.load = function(self)
+function JudgementView:load()
 	local judgementTable = inside(self, self.key) or {}
 	local counters = {}
 	self.counters = counters
@@ -13,7 +13,7 @@ JudgementView.load = function(self)
 	self.judgement = nil
 end
 
-JudgementView.update = function(self, dt)
+function JudgementView:update(dt)
 	local judgementTable = inside(self, self.key)
 
 	local counters = self.counters

@@ -1,10 +1,10 @@
-local Class = require("Class")
+local class = require("class")
 local ShortNoteView = require("sphere.views.RhythmView.ShortNoteView")
 local LongNoteView = require("sphere.views.RhythmView.LongNoteView")
 local ImageNoteView = require("sphere.views.RhythmView.ImageNoteView")
 local VideoNoteView = require("sphere.views.RhythmView.VideoNoteView")
 
-local NoteViewFactory = Class:new()
+local NoteViewFactory = class()
 
 local notes = {
 	default = {
@@ -28,11 +28,11 @@ local notes = {
 
 for _, c in pairs(notes) do
 	for k, v in pairs(c) do
-		c[k] = v[1]:new({noteType = v[2]})
+		c[k] = v[1](v[2])
 	end
 end
 
-NoteViewFactory.getNoteView = function(self, graphicalNote, mode)
+function NoteViewFactory:getNoteView(graphicalNote, mode)
 	return notes[mode][graphicalNote.noteType]
 end
 

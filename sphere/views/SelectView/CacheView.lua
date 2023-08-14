@@ -1,12 +1,12 @@
 
 local just = require("just")
-local Class = require("Class")
+local class = require("class")
 local gfx_util = require("gfx_util")
 local spherefonts = require("sphere.assets.fonts")
 
-local CacheView = Class:new()
+local CacheView = class()
 
-CacheView.draw = function(self, w, h)
+function CacheView:draw(w, h)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	local cacheModel = self.game.cacheModel

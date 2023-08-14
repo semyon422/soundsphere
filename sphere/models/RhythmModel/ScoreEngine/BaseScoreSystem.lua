@@ -1,11 +1,11 @@
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 local RingBuffer = require("RingBuffer")
 
-local BaseScoreSystem = ScoreSystem:new()
+local BaseScoreSystem = ScoreSystem + {}
 
 BaseScoreSystem.name = "base"
 
-BaseScoreSystem.construct = function(self)
+function BaseScoreSystem:new()
 	self.hitCount = 0
 	self.missCount = 0
 	self.earlyHitCount = 0
@@ -24,9 +24,9 @@ BaseScoreSystem.construct = function(self)
 	self.lastMean = 0
 end
 
-BaseScoreSystem.before = function(self, event)
+function BaseScoreSystem:before(event)
 	local gameplay = self.scoreEngine.settings.gameplay
-	self.meanRingBuffer = self.meanRingBuffer or RingBuffer:new({size = gameplay.lastMeanValues})
+	self.meanRingBuffer = self.meanRingBuffer or RingBuffer(gameplay.lastMeanValues)
 
 	self.currentTime = event.currentTime
 	self.isMiss = false
@@ -37,31 +37,31 @@ BaseScoreSystem.before = function(self, event)
 	self.notesCount = event.notesCount
 end
 
-BaseScoreSystem.success = function(self)
+function BaseScoreSystem:success()
 	self.hitCount = self.hitCount + 1
 	self.combo = self.combo + 1
 	self.maxCombo = math.max(self.maxCombo, self.combo)
 end
 
-BaseScoreSystem.breakCombo = function(self)
+function BaseScoreSystem:breakCombo()
 	self.combo = 0
 end
 
-BaseScoreSystem.breakComboLongNote = function(self)
+function BaseScoreSystem:breakComboLongNote()
 	self.combo = 0
 	self.isLongNoteComboBreak = true
 end
 
-BaseScoreSystem.miss = function(self)
+function BaseScoreSystem:miss()
 	self.missCount = self.missCount + 1
 	self.isMiss = true
 end
 
-BaseScoreSystem.earlyHit = function(self)
+function BaseScoreSystem:earlyHit()
 	self.earlyHitCount = self.earlyHitCount + 1
 end
 
-BaseScoreSystem.countLastMean = function(self, event)
+function BaseScoreSystem:countLastMean(event)
 	local rb = self.meanRingBuffer
 	rb:write(event.deltaTime)
 	local sum = 0

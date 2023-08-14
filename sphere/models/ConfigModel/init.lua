@@ -1,17 +1,17 @@
-local Class = require("Class")
+local class = require("class")
 local serpent = require("serpent")
 
-local ConfigModel = Class:new()
+local ConfigModel = class()
 
 ConfigModel.userdataPath = "userdata"
 ConfigModel.configModelPath = "sphere/models/ConfigModel"
 
-ConfigModel.construct = function(self)
+function ConfigModel:new()
 	self.configs = {}
 	self.openedConfigs = {}
 end
 
-ConfigModel.open = function(self, name, mode)
+function ConfigModel:open(name, mode)
 	self.openedConfigs[name] = mode == true
 end
 
@@ -28,7 +28,7 @@ local function copyTable(src, dst)
 	end
 end
 
-ConfigModel._read = function(self, name)
+function ConfigModel:_read(name)
 	local configs = self.configs
 	configs[name] = {}
 	local config = configs[name]
@@ -48,19 +48,19 @@ ConfigModel._read = function(self, name)
 	end
 end
 
-ConfigModel.read = function(self)
+function ConfigModel:read()
 	for name in pairs(self.openedConfigs) do
 		self:_read(name)
 	end
 end
 
-ConfigModel._write = function(self, name)
+function ConfigModel:_write(name)
 	local config = assert(self.configs[name])
 	local path = self.userdataPath .. "/" .. name .. ".lua"
 	return self:writeFile(path, config)
 end
 
-ConfigModel.write = function(self)
+function ConfigModel:write()
 	for name, writable in pairs(self.openedConfigs) do
 		if writable then
 			self:_write(name)
@@ -68,7 +68,7 @@ ConfigModel.write = function(self)
 	end
 end
 
-ConfigModel.readFile = function(self, path)
+function ConfigModel:readFile(path)
 	local info = love.filesystem.getInfo(path)
 	if not info or info.size == 0 then
 		return {}
@@ -84,7 +84,7 @@ local serpentOptions = {
 	numformat = "%.16g"
 }
 local serpentFormat = "return %s\n"
-ConfigModel.writeFile = function(self, path, config)
+function ConfigModel:writeFile(path, config)
 	return assert(love.filesystem.write(path, serpentFormat:format(serpent.block(config, serpentOptions))))
 end
 

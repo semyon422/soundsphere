@@ -1,11 +1,11 @@
-local Class = require("Class")
+local class = require("class")
 
-local ScoreSystem = Class:new()
+local ScoreSystem = class()
 
 ScoreSystem.notes = {}
-ScoreSystem.load = function(self) end
-ScoreSystem.before = function(self, event) end
-ScoreSystem.after = function(self, event) end
+function ScoreSystem:load() end
+function ScoreSystem:before(event) end
+function ScoreSystem:after(event) end
 
 local function handle(self, handler, event)
 	if type(handler) == "function" then
@@ -19,7 +19,7 @@ local function handle(self, handler, event)
 	end
 end
 
-ScoreSystem.receive = function(self, event)
+function ScoreSystem:receive(event)
 	if event.name ~= "NoteState" or not event.currentTime then
 		return
 	end
@@ -37,7 +37,7 @@ ScoreSystem.receive = function(self, event)
 	self:after(event)
 end
 
-ScoreSystem.getSlice = function(self)
+function ScoreSystem:getSlice()
 	local slice = {}
 	for k, v in pairs(self) do
 		local t = type(v)

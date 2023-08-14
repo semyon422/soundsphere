@@ -1,11 +1,11 @@
-local Class = require("Class")
+local class = require("class")
 local audio = require("audio")
 
-local Metronome = Class:new()
+local Metronome = class()
 
 local samplePath = "resources/metronome.ogg"
 
-Metronome.load = function(self)
+function Metronome:load()
 	self.fileData = love.filesystem.newFileData(samplePath)
 	self.soundData = audio.SoundData(self.fileData:getFFIPointer(), self.fileData:getSize())
 	self.source = audio.newSource(self.soundData)
@@ -14,12 +14,12 @@ Metronome.load = function(self)
 	self.isNextBeat = false
 end
 
-Metronome.unload = function(self)
+function Metronome:unload()
 	self.source:release()
 	self.soundData:release()
 end
 
-Metronome.updateNextTime = function(self)
+function Metronome:updateNextTime()
 	local editorModel = self.editorModel
 	local timePoint = editorModel.timePoint
 	local ld = editorModel.layerData
@@ -37,7 +37,7 @@ Metronome.updateNextTime = function(self)
 	self.isNextBeat = (nextTimePoint.time % 1):tonumber() == 0
 end
 
-Metronome.update = function(self)
+function Metronome:update()
 	local editorModel = self.editorModel
 
 	local currentTime = editorModel.timer:getTime()

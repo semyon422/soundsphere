@@ -1,8 +1,8 @@
 local PlayfieldVsrg = require("sphere.models.NoteSkinModel.PlayfieldVsrg")
 
-local BasePlayfield = PlayfieldVsrg:extend()
+local BasePlayfield = PlayfieldVsrg + {}
 
-BasePlayfield.addBaseProgressBar = function(self)
+function BasePlayfield:addBaseProgressBar()
 	return self:addProgressBar({
 		x = 0,
 		y = 1070,
@@ -15,7 +15,7 @@ BasePlayfield.addBaseProgressBar = function(self)
 	})
 end
 
-BasePlayfield.addBaseHpBar = function(self)
+function BasePlayfield:addBaseHpBar()
 	return self:addHpBar({
 		x = 0,
 		y = 0,
@@ -28,7 +28,7 @@ BasePlayfield.addBaseHpBar = function(self)
 	})
 end
 
-BasePlayfield.addBaseScore = function(self)
+function BasePlayfield:addBaseScore()
 	return self:addScore({
 		x = 0,
 		baseline = 52,
@@ -39,7 +39,7 @@ BasePlayfield.addBaseScore = function(self)
 	})
 end
 
-BasePlayfield.addBaseAccuracy = function(self)
+function BasePlayfield:addBaseAccuracy()
 	return self:addAccuracy({
 		x = 0,
 		baseline = 94,
@@ -50,7 +50,7 @@ BasePlayfield.addBaseAccuracy = function(self)
 	})
 end
 
-BasePlayfield.addBaseCombo = function(self)
+function BasePlayfield:addBaseCombo()
 	return self:addCombo({
 		x = -540,
 		baseline = 476,
@@ -62,7 +62,7 @@ BasePlayfield.addBaseCombo = function(self)
 	})
 end
 
-BasePlayfield.addBaseHitError = function(self)
+function BasePlayfield:addBaseHitError()
 	return self:addHitError({
 		transform = self:newLaneCenterTransform(1080),
 		x = 0,
@@ -82,11 +82,11 @@ BasePlayfield.addBaseHitError = function(self)
 	})
 end
 
-BasePlayfield.addBaseMatchPlayers = function(self)
+function BasePlayfield:addBaseMatchPlayers()
 	return self:addMatchPlayers()
 end
 
-BasePlayfield.addBaseElements = function(self, elements)
+function BasePlayfield:addBaseElements(elements)
 	if not elements then
 		self:addBaseProgressBar()
 		self:addBaseHpBar()

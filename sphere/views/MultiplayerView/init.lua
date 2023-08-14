@@ -4,20 +4,20 @@ local just = require("just")
 local Layout = require("sphere.views.MultiplayerView.Layout")
 local MultiplayerViewConfig = require("sphere.views.MultiplayerView.MultiplayerViewConfig")
 
-local MultiplayerView = ScreenView:new()
+local MultiplayerView = ScreenView + {}
 
-MultiplayerView.load = function(self)
+function MultiplayerView:load()
 	self.game.selectModel:setChanged()
 end
 
-MultiplayerView.draw = function(self)
+function MultiplayerView:draw()
 	just.container("screen container", true)
 	Layout:draw()
 	MultiplayerViewConfig(self)
 	just.container()
 end
 
-MultiplayerView.update = function(self, dt)
+function MultiplayerView:update(dt)
 	self.game.selectController:update(dt)
 
 	local multiplayerModel = self.game.multiplayerModel

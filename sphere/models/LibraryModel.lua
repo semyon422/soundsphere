@@ -1,11 +1,11 @@
 local TimedCache = require("TimedCache")
-local Class = require("Class")
+local class = require("class")
 
-local LibraryModel = Class:new()
+local LibraryModel = class()
 
-LibraryModel.construct = function(self)
+function LibraryModel:new()
 	self.itemsCount = 0
-	self.itemsCache = TimedCache:new()
+	self.itemsCache = TimedCache()
 	self.itemsCache.loadObject = function(_, key)
 		return self:loadObject(key)
 	end
@@ -24,9 +24,9 @@ LibraryModel.construct = function(self)
 	end
 end
 
-LibraryModel.loadObject = function(self, key) end
+function LibraryModel:loadObject(key) end
 
-LibraryModel.update = function(self)
+function LibraryModel:update()
 	self.itemsCache:update()
 end
 

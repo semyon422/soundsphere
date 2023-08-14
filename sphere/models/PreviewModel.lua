@@ -1,10 +1,10 @@
-local Class = require("Class")
+local class = require("class")
 local delay = require("delay")
 local thread = require("thread")
 
-local PreviewModel = Class:new()
+local PreviewModel = class()
 
-PreviewModel.load = function(self)
+function PreviewModel:load()
 	self.noteChartDataEntryId = 0
 	self.audioPath = ""
 	self.previewTime = 0
@@ -13,7 +13,7 @@ PreviewModel.load = function(self)
 	self.targetPitch = 1
 end
 
-PreviewModel.setAudioPathPreview = function(self, audioPath, previewTime)
+function PreviewModel:setAudioPathPreview(audioPath, previewTime)
 	if self.audioPath ~= audioPath or not self.audio then
 		self.audioPath = audioPath
 		self.previewTime = previewTime
@@ -21,7 +21,7 @@ PreviewModel.setAudioPathPreview = function(self, audioPath, previewTime)
 	end
 end
 
-PreviewModel.update = function(self)
+function PreviewModel:update()
 	local settings = self.configModel.configs.settings
 	local muteOnUnfocus = settings.miscellaneous.muteOnUnfocus
 
@@ -50,18 +50,18 @@ PreviewModel.update = function(self)
 	end
 end
 
-PreviewModel.setPitch = function(self, pitch)
+function PreviewModel:setPitch(pitch)
 	self.targetPitch = pitch
 end
 
-PreviewModel.loadPreviewDebounce = function(self, audioPath, previewTime)
+function PreviewModel:loadPreviewDebounce(audioPath, previewTime)
 	self.audioPath = audioPath or self.audioPath
 	self.previewTime = previewTime or self.previewTime
 	delay.debounce(self, "loadDebounce", 0.1, self.loadPreview, self)
 end
 
 local loadingPreview
-PreviewModel.loadPreview = function(self)
+function PreviewModel:loadPreview()
 	if loadingPreview then
 		return
 	end
@@ -121,7 +121,7 @@ PreviewModel.loadPreview = function(self)
 	self.volume = volume
 end
 
-PreviewModel.stop = function(self)
+function PreviewModel:stop()
 	if not self.audio then
 		return
 	end
@@ -163,7 +163,7 @@ local loadAudio = thread.async(function(path)
 	end
 end)
 
-PreviewModel.loadAudio = function(self, path, type)
+function PreviewModel:loadAudio(path, type)
 	local source
 	if type == "http" then
 		source = loadHttp(path)

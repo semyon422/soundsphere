@@ -1,8 +1,8 @@
-local Class = require("Class")
+local class = require("class")
 
-local StepperView = Class:new()
+local StepperView = class()
 
-StepperView.isOver = function(self, w, h)
+function StepperView:isOver(w, h)
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 
 	local inh = 0 <= my and my <= h
@@ -12,7 +12,7 @@ StepperView.isOver = function(self, w, h)
 		w - h <= mx and mx <= w and inh
 end
 
-StepperView.draw = function(self, w, h, value, count)
+function StepperView:draw(w, h, value, count)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local ty = h / 3

@@ -1,6 +1,6 @@
-local Class = require("Class")
+local class = require("class")
 
-local ReplayConverter = Class:new()
+local ReplayConverter = class()
 
 ReplayConverter.oldTimings = {
 	ShortNote = {
@@ -17,7 +17,7 @@ ReplayConverter.oldTimings = {
 	}
 }
 
-ReplayConverter.convertTimings = function(self, object)
+function ReplayConverter:convertTimings(object)
 	local timings = object.timings
 	if not timings then
 		object.timings = self.oldTimings
@@ -50,7 +50,7 @@ ReplayConverter.convertTimings = function(self, object)
 	end
 end
 
-ReplayConverter.convertModifier = function(self, c, object)
+function ReplayConverter:convertModifier(c, object)
 	if c.value == nil then
 		for k, v in pairs(c) do
 			if k ~= "name" then
@@ -74,13 +74,13 @@ ReplayConverter.convertModifier = function(self, c, object)
 	end
 end
 
-ReplayConverter.convertModifiers = function(self, object)
+function ReplayConverter:convertModifiers(object)
 	for _, c in ipairs(object.modifiers) do
 		self:convertModifier(c, object)
 	end
 end
 
-ReplayConverter.convert = function(self, object)
+function ReplayConverter:convert(object)
 	if object.modifiers then
 		self:convertModifiers(object)
 	end

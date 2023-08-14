@@ -1,14 +1,14 @@
-local Class = require("Class")
+local class = require("class")
 
-local InputView = Class:new()
+local InputView = class()
 
-InputView.load = function(self)
+function InputView:load()
 	if self.pressed then
 		self.pressed.hidden = true
 	end
 end
 
-InputView.receive = function(self, event)
+function InputView:receive(event)
 	if not event.virtual then
 		return
 	end
@@ -23,7 +23,7 @@ InputView.receive = function(self, event)
 	end
 end
 
-InputView.switchPressed = function(self, value)
+function InputView:switchPressed(value)
 	if self.pressed then
 		self.pressed.hidden = not value
 	end

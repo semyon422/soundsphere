@@ -1,19 +1,19 @@
-local Class				= require("Class")
-local NoteDrawer		= require("sphere.models.RhythmModel.GraphicEngine.NoteDrawer")
+local class = require("class")
+local NoteDrawer = require("sphere.models.RhythmModel.GraphicEngine.NoteDrawer")
 local flux = require("flux")
 
-local GraphicEngine = Class:new()
+local GraphicEngine = class()
 
 GraphicEngine.visualOffset = 0
 GraphicEngine.longNoteShortening = 0
 GraphicEngine.scaleSpeed = false
 
-GraphicEngine.load = function(self)
+function GraphicEngine:load()
 	self.noteCount = 0
 	self.noteDrawers = {}
 
 	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
-		local noteDrawer = NoteDrawer:new({
+		local noteDrawer = NoteDrawer({
 			layerData = self.noteChart.layerDatas[layerDataIndex],
 			noteDatas = noteDatas,
 			inputType = inputType,
@@ -25,17 +25,17 @@ GraphicEngine.load = function(self)
 	end
 end
 
-GraphicEngine.unload = function(self)
+function GraphicEngine:unload()
 	self.noteDrawers = {}
 end
 
-GraphicEngine.update = function(self)
+function GraphicEngine:update()
 	for _, noteDrawer in ipairs(self.noteDrawers) do
 		noteDrawer:update()
 	end
 end
 
-GraphicEngine.setVisualTimeRate = function(self, visualTimeRate)
+function GraphicEngine:setVisualTimeRate(visualTimeRate)
 	if math.abs(visualTimeRate) <= 0.001 then
 		visualTimeRate = 0
 	end
@@ -50,7 +50,7 @@ GraphicEngine.setVisualTimeRate = function(self, visualTimeRate)
 	end
 end
 
-GraphicEngine.getVisualTimeRate = function(self)
+function GraphicEngine:getVisualTimeRate()
 	local timeRate = self.rhythmModel.timeEngine.timeRate
 	local visualTimeRate = self.visualTimeRate
 	if not self.scaleSpeed then
@@ -59,15 +59,15 @@ GraphicEngine.getVisualTimeRate = function(self)
 	return visualTimeRate
 end
 
-GraphicEngine.getCurrentTime = function(self)
+function GraphicEngine:getCurrentTime()
 	return self.rhythmModel.timeEngine.currentVisualTime
 end
 
-GraphicEngine.getInputOffset = function(self)
+function GraphicEngine:getInputOffset()
 	return self.rhythmModel.logicEngine.inputOffset
 end
 
-GraphicEngine.getVisualOffset = function(self)
+function GraphicEngine:getVisualOffset()
 	return self.visualOffset
 end
 

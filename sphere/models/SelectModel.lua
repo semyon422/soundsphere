@@ -1,10 +1,10 @@
-local Class = require("Class")
+local class = require("class")
 local delay = require("delay")
 local thread = require("thread")
 
-local SelectModel = Class:new()
+local SelectModel = class()
 
-SelectModel.construct = function(self)
+function SelectModel:new()
 	self.noteChartSetItemIndex = 1
 	self.noteChartItemIndex = 1
 	self.scoreItemIndex = 1
@@ -13,7 +13,7 @@ end
 
 SelectModel.debounceTime = 0.5
 
-SelectModel.load = function(self)
+function SelectModel:load()
 	local config = self.configModel.configs.select
 	self.config = config
 
@@ -34,28 +34,28 @@ SelectModel.load = function(self)
 	self:noDebouncePullNoteChartSet()
 end
 
-SelectModel.isChanged = function(self)
+function SelectModel:isChanged()
 	local changed = self.changed
 	self.changed = false
 	return changed
 end
 
-SelectModel.setChanged = function(self)
+function SelectModel:setChanged()
 	self.changed = true
 end
 
-SelectModel.notechartExists = function(self)
+function SelectModel:notechartExists()
 	local noteChartItem = self.noteChartItem
 	if noteChartItem then
 		return love.filesystem.getInfo(noteChartItem.path)
 	end
 end
 
-SelectModel.isPlayed = function(self)
+function SelectModel:isPlayed()
 	return self:notechartExists() and self.scoreItem
 end
 
-SelectModel.debouncePullNoteChartSet = function(self, ...)
+function SelectModel:debouncePullNoteChartSet(...)
 	delay.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self, ...)
 end
 
@@ -63,7 +63,7 @@ SelectModel.noDebouncePullNoteChartSet = thread.coro(function(self, ...)
 	self:pullNoteChartSet(...)
 end)
 
-SelectModel.setSortFunction = function(self, sortFunctionName, noDebounce)
+function SelectModel:setSortFunction(sortFunctionName, noDebounce)
 	if self.pullingNoteChartSet then
 		return
 	end
@@ -76,7 +76,7 @@ SelectModel.setSortFunction = function(self, sortFunctionName, noDebounce)
 	self:debouncePullNoteChartSet()
 end
 
-SelectModel.changeCollapse = function(self)
+function SelectModel:changeCollapse()
 	if self.pullingNoteChartSet then
 		return
 	end
@@ -86,11 +86,11 @@ SelectModel.changeCollapse = function(self)
 	self:debouncePullNoteChartSet()
 end
 
-SelectModel.setLock = function(self, locked)
+function SelectModel:setLock(locked)
 	self.locked = locked
 end
 
-SelectModel.update = function(self)
+function SelectModel:update()
 	local stateCounter = self.searchModel.stateCounter
 	if self.searchStateCounter == stateCounter or self.pullingNoteChartSet then
 		return
@@ -101,7 +101,7 @@ SelectModel.update = function(self)
 	self:debouncePullNoteChartSet()
 end
 
-SelectModel.scrollCollection = function(self, direction, destination)
+function SelectModel:scrollCollection(direction, destination)
 	if self.pullingNoteChartSet then
 		return
 	end
@@ -123,7 +123,7 @@ SelectModel.scrollCollection = function(self, direction, destination)
 	self:debouncePullNoteChartSet(oldCollectionItem and oldCollectionItem.path == collectionItem.path)
 end
 
-SelectModel.scrollRandom = function(self)
+function SelectModel:scrollRandom()
 	local noteChartSetItems = self.noteChartSetLibraryModel.items
 
 	local destination = math.random(1, #noteChartSetItems)
@@ -131,13 +131,13 @@ SelectModel.scrollRandom = function(self)
 	self:scrollNoteChartSet(nil, destination)
 end
 
-SelectModel.setConfig = function(self, item)
+function SelectModel:setConfig(item)
 	self.config.noteChartSetEntryId = item.setId
 	self.config.noteChartEntryId = item.noteChartId
 	self.config.noteChartDataEntryId = item.noteChartDataId
 end
 
-SelectModel.scrollNoteChartSet = function(self, direction, destination)
+function SelectModel:scrollNoteChartSet(direction, destination)
 	local noteChartSetItems = self.noteChartSetLibraryModel.items
 
 	destination = math.min(math.max(destination or self.noteChartSetItemIndex + direction, 1), #noteChartSetItems)
@@ -155,7 +155,7 @@ SelectModel.scrollNoteChartSet = function(self, direction, destination)
 	self:pullNoteChart(oldNoteChartSetItem and oldNoteChartSetItem.setId == noteChartSetItem.setId)
 end
 
-SelectModel.scrollNoteChart = function(self, direction, destination)
+function SelectModel:scrollNoteChart(direction, destination)
 	local noteChartItems = self.noteChartLibraryModel.items
 
 	direction = direction or destination - self.noteChartItemIndex
@@ -176,7 +176,7 @@ SelectModel.scrollNoteChart = function(self, direction, destination)
 	self:pullScore()
 end
 
-SelectModel.scrollScore = function(self, direction, destination)
+function SelectModel:scrollScore(direction, destination)
 	local scoreItems = self.scoreLibraryModel.items
 
 	destination = math.min(math.max(destination or self.scoreItemIndex + direction, 1), #scoreItems)
@@ -191,7 +191,7 @@ SelectModel.scrollScore = function(self, direction, destination)
 	self.config.scoreEntryId = scoreItem.id
 end
 
-SelectModel.pullNoteChartSet = function(self, noUpdate, noPullNext)
+function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 	if self.locked then
 		return
 	end
@@ -239,7 +239,7 @@ SelectModel.pullNoteChartSet = function(self, noUpdate, noPullNext)
 	self.pullingNoteChartSet = false
 end
 
-SelectModel.pullNoteChart = function(self, noUpdate, noPullNext)
+function SelectModel:pullNoteChart(noUpdate, noPullNext)
 	local oldId = self.noteChartItem and self.noteChartItem.id
 
 	self.noteChartLibraryModel:setNoteChartSetId(self.config.noteChartSetEntryId)
@@ -275,14 +275,14 @@ SelectModel.pullNoteChart = function(self, noUpdate, noPullNext)
 	self.scoreLibraryModel:clear()
 end
 
-SelectModel.updateScoreOnlineAsync = function(self)
+function SelectModel:updateScoreOnlineAsync()
 	self.scoreLibraryModel:updateItemsAsync()
 	self:findScore()
 end
 
 SelectModel.updateScoreOnline = thread.coro(SelectModel.updateScoreOnlineAsync)
 
-SelectModel.findScore = function(self)
+function SelectModel:findScore()
 	local scoreItems = self.scoreLibraryModel.items
 	self.scoreItemIndex = self.scoreLibraryModel:getItemIndex(self.config.scoreEntryId) or 1
 
@@ -293,7 +293,7 @@ SelectModel.findScore = function(self)
 	end
 end
 
-SelectModel.pullScore = function(self, noUpdate)
+function SelectModel:pullScore(noUpdate)
 	local noteChartItems = self.noteChartLibraryModel.items
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
 

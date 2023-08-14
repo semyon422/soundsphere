@@ -6,7 +6,7 @@ local time_util = require("time_util")
 local imgui = require("imgui")
 
 local BackgroundView = require("sphere.views.BackgroundView")
-local ScoreListView	= require("sphere.views.SelectView.ScoreListView")
+local ScoreListView = require("sphere.views.SelectView.ScoreListView")
 
 local NoteChartSetListView = require("sphere.views.SelectView.NoteChartSetListView")
 local NoteChartListView = require("sphere.views.SelectView.NoteChartListView")

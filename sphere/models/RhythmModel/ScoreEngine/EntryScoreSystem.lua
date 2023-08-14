@@ -1,12 +1,12 @@
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 
-local EntryScoreSystem = ScoreSystem:new()
+local EntryScoreSystem = ScoreSystem + {}
 
 EntryScoreSystem.name = "entry"
 
-EntryScoreSystem.getSlice = function(self) end
+function EntryScoreSystem:getSlice() end
 
-EntryScoreSystem.after = function(self, event)
+function EntryScoreSystem:after(event)
 	local container = self.container
 
 	self.accuracy = container.normalscore.accuracyAdjusted

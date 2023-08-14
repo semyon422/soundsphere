@@ -1,13 +1,13 @@
-local math_util				= require("math_util")
-local Upscaler				= require("libchart.Upscaler")
-local NextUpscaler			= require("libchart.NextUpscaler")
-local Reductor				= require("libchart.Reductor")
-local BlockFinder			= require("libchart.BlockFinder")
-local NotePreprocessor		= require("libchart.NotePreprocessor")
-local Modifier				= require("sphere.models.ModifierModel.Modifier")
-local AutomapOldConfig		= require("sphere.models.ModifierModel.AutomapOldConfig")
+local math_util = require("math_util")
+local Upscaler = require("libchart.Upscaler")
+local NextUpscaler = require("libchart.NextUpscaler")
+local Reductor = require("libchart.Reductor")
+local BlockFinder = require("libchart.BlockFinder")
+local NotePreprocessor = require("libchart.NotePreprocessor")
+local Modifier = require("sphere.models.ModifierModel.Modifier")
+local AutomapOldConfig = require("sphere.models.ModifierModel.AutomapOldConfig")
 
-local Automap = Modifier:new()
+local Automap = Modifier + {}
 
 Automap.type = "NoteChartModifier"
 Automap.interfaceType = "slider"
@@ -19,15 +19,15 @@ Automap.range = {1, 26}
 
 Automap.description = "anyK to anyK conversion"
 
-Automap.getString = function(self, config)
+function Automap:getString(config)
 	return "AM"
 end
 
-Automap.getSubString = function(self, config)
+function Automap:getSubString(config)
 	return config.value
 end
 
-Automap.applyMeta = function(self, config, state)
+function Automap:applyMeta(config, state)
 	local columnCount = state.inputMode.key
 	if not columnCount or config.value == columnCount then
 		return
@@ -36,7 +36,7 @@ Automap.applyMeta = function(self, config, state)
 	state.inputMode.key = config.value
 end
 
-Automap.apply = function(self, config)
+function Automap:apply(config)
 	self.old = config.old
 	self.targetMode = config.value
 	self.columnCount = self.noteChart.inputMode.key
@@ -55,7 +55,7 @@ Automap.apply = function(self, config)
 	self.noteChart:compute()
 end
 
-Automap.applyAutomap = function(self)
+function Automap:applyAutomap()
 	local tNoteDatas = {}
 	self.tNoteDatas = tNoteDatas
 
@@ -92,7 +92,7 @@ Automap.applyAutomap = function(self)
 	end
 end
 
-Automap.processUpscaler = function(self)
+function Automap:processUpscaler()
 	local noteChart = self.noteChart
 
 	local targetMode = self.targetMode
@@ -101,7 +101,7 @@ Automap.processUpscaler = function(self)
 	NotePreprocessor.columnCount = columnCount
 	NotePreprocessor:process(self.tNoteDatas)
 
-	local bf = BlockFinder:new()
+	local bf = BlockFinder()
 	bf.noteData = self.tNoteDatas
 	bf.columnCount = columnCount
 	bf:process()
@@ -131,8 +131,8 @@ Automap.processUpscaler = function(self)
 	self.noteChart.inputMode.key = targetMode
 end
 
-Automap.getOldUpscalerNotes = function(self)
-	local am = Upscaler:new()
+function Automap:getOldUpscalerNotes()
+	local am = Upscaler()
 	am.columns = AutomapOldConfig[self.targetMode][self.columnCount]
 	am:load(self.targetMode)
 	local notes, blocks = am:process(self.nbs)
@@ -140,8 +140,8 @@ Automap.getOldUpscalerNotes = function(self)
 	return notes
 end
 
-Automap.getUpscalerNotes = function(self)
-	local am = NextUpscaler:new()
+function Automap:getUpscalerNotes()
+	local am = NextUpscaler()
 	am.targetMode = self.targetMode
 	am.columnCount = self.columnCount
 	am.notes = self.nbs
@@ -159,7 +159,7 @@ Automap.getUpscalerNotes = function(self)
 	return notes
 end
 
-Automap.processReductor = function(self)
+function Automap:processReductor()
 	local noteChart = self.noteChart
 
 	local targetMode = self.targetMode
@@ -174,7 +174,7 @@ Automap.processReductor = function(self)
 	NotePreprocessor.columnCount = columnCount
 	NotePreprocessor:process(self.tNoteDatas)
 
-	local reductor = Reductor:new()
+	local reductor = Reductor()
 	local notes = reductor:process(self.tNoteDatas, columnCount, targetMode)
 
 	-- currently Automap only absolute time mode

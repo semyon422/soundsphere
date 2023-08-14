@@ -2,24 +2,24 @@ local ListView = require("sphere.views.ListView")
 local just = require("just")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 
-local CollectionListView = ListView:new()
+local CollectionListView = ListView()
 
 CollectionListView.rows = 11
 
-CollectionListView.reloadItems = function(self)
+function CollectionListView:reloadItems()
 	self.items = self.game.collectionModel.items
     self.selectedCollection = self.game.selectModel.collectionItem
 end
 
-CollectionListView.getItemIndex = function(self)
+function CollectionListView:getItemIndex()
 	return self.game.selectModel.collectionItemIndex
 end
 
-CollectionListView.scroll = function(self, count)
+function CollectionListView:scroll(count)
 	self.game.selectModel:scrollCollection(count)
 end
 
-CollectionListView.draw = function(self, ...)
+function CollectionListView:draw(...)
 	ListView.draw(self, ...)
 
 	local kp = just.keypressed
@@ -32,7 +32,7 @@ CollectionListView.draw = function(self, ...)
 	end
 end
 
-CollectionListView.drawItem = function(self, i, w, h)
+function CollectionListView:drawItem(i, w, h)
 	local item = self.items[i]
 
 	TextCellImView(72, h, "right", "", item.count ~= 0 and item.count or "", true)

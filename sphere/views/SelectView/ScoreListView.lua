@@ -4,24 +4,24 @@ local TextCellImView = require("sphere.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
 local time_util = require("time_util")
 
-local ScoreListView = ListView:new()
+local ScoreListView = ListView()
 
 ScoreListView.rows = 5
 
-ScoreListView.reloadItems = function(self)
+function ScoreListView:reloadItems()
 	self.stateCounter = self.game.selectModel.scoreStateCounter
 	self.items = self.game.scoreLibraryModel.items
 end
 
-ScoreListView.getItemIndex = function(self)
+function ScoreListView:getItemIndex()
 	return self.game.selectModel.scoreItemIndex
 end
 
-ScoreListView.scroll = function(self, delta)
+function ScoreListView:scroll(delta)
 	self.game.selectModel:scrollScore(delta)
 end
 
-ScoreListView.drawItem = function(self, i, w, h)
+function ScoreListView:drawItem(i, w, h)
 	local scoreSourceName = self.game.scoreLibraryModel.scoreSourceName
 	if scoreSourceName == "online" then
 		return self:drawItemOnline(i, w, h)
@@ -45,7 +45,7 @@ ScoreListView.drawItem = function(self, i, w, h)
 	just.row()
 end
 
-ScoreListView.drawItemOnline = function(self, i, w, h)
+function ScoreListView:drawItemOnline(i, w, h)
 	local item = self.items[i]
 	w = (w - 44) / 7
 

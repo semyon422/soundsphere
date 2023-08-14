@@ -1,16 +1,16 @@
 
-local Class = require("Class")
+local class = require("class")
 local transform = require("gfx_util").transform
 
-local LineView = Class:new()
+local LineView = class()
 
-LineView.draw = function(self)
+function LineView:draw()
 	for _, line in ipairs(self.lines) do
 		self:drawLine(line)
 	end
 end
 
-LineView.drawLine = function(self, line)
+function LineView:drawLine(line)
 	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 

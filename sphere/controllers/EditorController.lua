@@ -1,11 +1,11 @@
-local Class = require("Class")
+local class = require("class")
 local NoteChartExporter = require("sph.NoteChartExporter")
 local OsuNoteChartExporter = require("osu.NoteChartExporter")
 local FileFinder = require("sphere.filesystem.FileFinder")
 
-local EditorController = Class:new()
+local EditorController = class()
 
-EditorController.load = function(self)
+function EditorController:load()
 	local noteChartModel = self.noteChartModel
 	local editorModel = self.editorModel
 
@@ -37,7 +37,7 @@ EditorController.load = function(self)
 	self.windowModel:setVsyncOnSelect(false)
 end
 
-EditorController.unload = function(self)
+function EditorController:unload()
 	self.editorModel:unload()
 
 	local graphics = self.configModel.configs.settings.graphics
@@ -47,13 +47,13 @@ EditorController.unload = function(self)
 	end
 end
 
-EditorController.save = function(self)
+function EditorController:save()
 	local noteChartModel = self.noteChartModel
 
 	self.editorModel:save()
 	self.editorModel:genGraphs()
 
-	local exp = NoteChartExporter:new()
+	local exp = NoteChartExporter()
 	exp.noteChart = noteChartModel.noteChart
 
 	local path = noteChartModel.noteChartEntry.path:gsub(".sph$", "") .. ".sph"
@@ -63,12 +63,12 @@ EditorController.save = function(self)
 	self.cacheModel:startUpdate(noteChartModel.noteChartEntry.path:match("^(.+)/.-$"))
 end
 
-EditorController.saveToOsu = function(self)
+function EditorController:saveToOsu()
 	local noteChartModel = self.noteChartModel
 
 	self.editorModel:save()
 
-	local exp = OsuNoteChartExporter:new()
+	local exp = OsuNoteChartExporter()
 	exp.noteChart = noteChartModel.noteChart
 	exp.noteChartEntry = self.noteChartModel.noteChartEntry
 	exp.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
@@ -79,7 +79,7 @@ EditorController.saveToOsu = function(self)
 	love.filesystem.write(path, exp:export())
 end
 
-EditorController.receive = function(self, event)
+function EditorController:receive(event)
 	self.editorModel:receive(event)
 	if event.name == "filedropped" then
 		return self:filedropped(event[1])
@@ -90,7 +90,7 @@ local exts = {
 	mp3 = true,
 	ogg = true,
 }
-EditorController.filedropped = function(self, file)
+function EditorController:filedropped(file)
 	local path = file:getFilename():gsub("\\", "/")
 
 	local _name, ext = path:match("^(.+)%.(.-)$")

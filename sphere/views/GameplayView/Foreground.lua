@@ -8,7 +8,7 @@ local ProgressView = require("sphere.views.GameplayView.ProgressView")
 
 local transformFull = {0, 0, 0, {1 / 1920, 0}, {0, 1 / 1080}, 0, 0, 0, 0}
 
-local PauseProgressBar = ProgressView:new({
+local PauseProgressBar = ProgressView({
 	x = 0, y = 0, w = 1920, h = 20,
 	color = {1, 1, 1, 1},
 	transform = transformFull,

@@ -1,44 +1,44 @@
-local _audio		= require("audio")
-local AudioContainer	= require("audio.Container")
-local Class				= require("Class")
+local _audio = require("audio")
+local AudioContainer = require("audio.Container")
+local class = require("class")
 
-local AudioEngine = Class:new()
+local AudioEngine = class()
 
 AudioEngine.timeRate = 1
 
-AudioEngine.construct = function(self)
-	self.backgroundContainer = AudioContainer:new()
-	self.foregroundContainer = AudioContainer:new()
+function AudioEngine:new()
+	self.backgroundContainer = AudioContainer()
+	self.foregroundContainer = AudioContainer()
 end
 
-AudioEngine.updateVolume = function(self)
+function AudioEngine:updateVolume()
 	self.backgroundContainer:setVolume(self.volume.master * self.volume.music)
 	self.foregroundContainer:setVolume(self.volume.master * self.volume.effects)
 end
 
-AudioEngine.load = function(self)
+function AudioEngine:load()
 	self.loaded = true
 end
 
-AudioEngine.update = function(self)
+function AudioEngine:update()
 	self:updateTimeRate()
 	self.backgroundContainer:update()
 	self.foregroundContainer:update()
 end
 
-AudioEngine.receive = function(self, event)
+function AudioEngine:receive(event)
 	if event.name == "LogicalNoteSound" then
 		self:playNote(event[1], event[2])
 	end
 end
 
-AudioEngine.unload = function(self)
+function AudioEngine:unload()
 	self.backgroundContainer:release()
 	self.foregroundContainer:release()
 	self.loaded = false
 end
 
-AudioEngine.playNote = function(self, noteData, isBackground)
+function AudioEngine:playNote(noteData, isBackground)
 	if not self.loaded or not noteData or not noteData.sounds then
 		return
 	end
@@ -46,7 +46,7 @@ AudioEngine.playNote = function(self, noteData, isBackground)
 	self:playAudio(noteData.sounds, isBackground, noteData.stream, noteData.timePoint.absoluteTime)
 end
 
-AudioEngine.playAudio = function(self, sounds, isBackground, stream, offset)
+function AudioEngine:playAudio(sounds, isBackground, stream, offset)
 	local currentTime = self.rhythmModel.timeEngine.currentTime
 	for i = 1, #sounds do
 		local mode = stream and self.mode.primary or self.mode.secondary
@@ -79,17 +79,17 @@ AudioEngine.playAudio = function(self, sounds, isBackground, stream, offset)
 	end
 end
 
-AudioEngine.play = function(self)
+function AudioEngine:play()
 	self.backgroundContainer:play()
 	self.foregroundContainer:play()
 end
 
-AudioEngine.pause = function(self)
+function AudioEngine:pause()
 	self.backgroundContainer:pause()
 	self.foregroundContainer:pause()
 end
 
-AudioEngine.updateTimeRate = function(self)
+function AudioEngine:updateTimeRate()
 	local timeRate = self.rhythmModel.timeEngine.timeRate
 	if self.timeRate == timeRate then
 		return
@@ -99,11 +99,11 @@ AudioEngine.updateTimeRate = function(self)
 	self.timeRate = timeRate
 end
 
-AudioEngine.getPosition = function(self)
+function AudioEngine:getPosition()
 	return self.backgroundContainer:getPosition()
 end
 
-AudioEngine.setPosition = function(self, position)
+function AudioEngine:setPosition(position)
 	self.backgroundContainer:setPosition(position)
 	self.foregroundContainer:setPosition(position)
 end

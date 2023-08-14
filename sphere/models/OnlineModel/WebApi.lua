@@ -1,9 +1,9 @@
-local Class = require("Class")
+local class = require("class")
 local thread = require("thread")
 local json = require("json")
 local socket_url = require("socket.url")
 
-local WebApi = Class:new()
+local WebApi = class()
 
 WebApi.token = ""
 
@@ -95,12 +95,12 @@ WebApi.post = function(url, method, params, buffers)
 	return table.concat(t), code, _headers
 end
 
-WebApi.newResource = function(self, url)
+function WebApi:newResource(url)
 	url = socket_url.absolute(self.host, url)
 	return setmetatable({__url = url}, self.resource_mt)
 end
 
-WebApi.load = function(self)
+function WebApi:load()
 	self.resource_mt = {
 		__index = function(t, k)
 			return rawget(t, k) or setmetatable({

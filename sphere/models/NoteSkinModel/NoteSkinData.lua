@@ -1,16 +1,16 @@
-local Class = require("Class")
+local class = require("class")
 local gfx_util = require("gfx_util")
 
-local NoteSkinData = Class:new()
+local NoteSkinData = class()
 
-NoteSkinData.load = function(self)
+function NoteSkinData:load()
 	self.textures = {}
 	self.quads = {}
 	self.spriteBatches = {}
 	self:loadImages()
 end
 
-NoteSkinData.loadTexture = function(self, key, path)
+function NoteSkinData:loadTexture(key, path)
 	local textures = self.textures
 	local spriteBatches = self.spriteBatches
 
@@ -32,7 +32,7 @@ NoteSkinData.loadTexture = function(self, key, path)
 	spriteBatches[spriteBatch] = key
 end
 
-NoteSkinData.loadImages = function(self)
+function NoteSkinData:loadImages()
 	for i, texture in ipairs(self.noteSkin.textures) do
 		local key, path = next(texture)
 		if type(path) == "string" then
@@ -76,12 +76,12 @@ NoteSkinData.loadImages = function(self)
 	end
 end
 
-NoteSkinData.getDimensions = function(self, note, part, key, timeState)
+function NoteSkinData:getDimensions(note, part, key, timeState)
 	local noteSkin = self.noteSkin
 	return noteSkin:getDimensions(noteSkin:get(note, part, key, timeState))
 end
 
-NoteSkinData.getSpriteBatch = function(self, note, part, key, timeState)
+function NoteSkinData:getSpriteBatch(note, part, key, timeState)
 	local noteSkin = self.noteSkin
 	local imageName, frame = noteSkin:get(note, part, key, timeState)
 	local image = noteSkin.images[imageName]
@@ -97,7 +97,7 @@ NoteSkinData.getSpriteBatch = function(self, note, part, key, timeState)
 	end
 end
 
-NoteSkinData.getQuad = function(self, note, part, key, timeState)
+function NoteSkinData:getQuad(note, part, key, timeState)
 	local noteSkin = self.noteSkin
 	local imageName, frame = noteSkin:get(note, part, key, timeState)
 	local quad = self.quads[imageName]

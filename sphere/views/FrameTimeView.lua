@@ -1,23 +1,23 @@
-local Class = require("Class")
+local class = require("class")
 local spherefonts = require("sphere.assets.fonts")
 local loop = require("loop")
 local just = require("just")
 local imgui = require("imgui")
 local reqprof = require("reqprof")
 
-local FrameTimeView = Class:new()
+local FrameTimeView = class()
 
 FrameTimeView.visible = false
 FrameTimeView.profiler = false
 FrameTimeView.scale = 1
 
-FrameTimeView.load = function(self)
+function FrameTimeView:load()
 	self.smallFont = spherefonts.get("Noto Sans Mono", 14)
 	self.font = spherefonts.get("Noto Sans Mono", 20)
 	self.largeFont = spherefonts.get("Noto Sans Mono", 40)
 end
 
-FrameTimeView.checkCanvas = function(self)
+function FrameTimeView:checkCanvas()
 	local w, h = love.graphics.getDimensions()
 	if self.width ~= w or self.height ~= h then
 		self.width = w
@@ -34,7 +34,7 @@ local colors = {
 	yellow = {1, 1, 0.25, 1}
 }
 
-FrameTimeView.drawSmall = function(self)
+function FrameTimeView:drawSmall()
 	local w, h = love.graphics.getDimensions()
 	love.graphics.origin()
 
@@ -62,7 +62,7 @@ FrameTimeView.drawSmall = function(self)
 	end
 end
 
-FrameTimeView.draw = function(self)
+function FrameTimeView:draw()
 	local settings = self.game.configModel.configs.settings
 	local showFPS = settings.miscellaneous.showFPS
 
@@ -116,7 +116,7 @@ FrameTimeView.draw = function(self)
 end
 
 local fps = {60, 120, 240, 480, 960}
-FrameTimeView.drawGrid = function(self)
+function FrameTimeView:drawGrid()
 	love.graphics.setLineStyle("rough")
 	love.graphics.setLineWidth(4)
 
@@ -135,7 +135,7 @@ FrameTimeView.drawGrid = function(self)
 	end
 end
 
-FrameTimeView.drawMouse = function(self)
+function FrameTimeView:drawMouse()
 	local x, y = love.mouse.getPosition()
 	local frameTime = -(y - self.height) / self.scale / 1000
 	local fpsValue = 1 / frameTime
@@ -155,7 +155,7 @@ local colorText = {
 	colors.yellow, "draw "
 }
 
-FrameTimeView.drawFPS = function(self)
+function FrameTimeView:drawFPS()
 	local frameTime = love.timer.getDelta()
 
 	love.graphics.setColor(0, 0, 0, 0.75)
@@ -208,7 +208,7 @@ FrameTimeView.drawFPS = function(self)
 	end
 end
 
-FrameTimeView.receive = function(self, event)
+function FrameTimeView:receive(event)
 	if not self.visible then
 		return
 	end
@@ -221,7 +221,7 @@ FrameTimeView.receive = function(self, event)
 	end
 end
 
-FrameTimeView.keypressed = function(self, key)
+function FrameTimeView:keypressed(key)
 	if key == "up" then
 		self.scale = self.scale * 2
 	elseif key == "down" then
@@ -229,7 +229,7 @@ FrameTimeView.keypressed = function(self, key)
 	end
 end
 
-FrameTimeView.wheelmoved = function(self, y)
+function FrameTimeView:wheelmoved(y)
 	if y == 1 then
 		self.scale = self.scale * 2
 	elseif y == -1 then

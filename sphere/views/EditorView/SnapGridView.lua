@@ -1,4 +1,4 @@
-local Class = require("Class")
+local class = require("class")
 local gfx_util = require("gfx_util")
 local math_util = require("math_util")
 local spherefonts = require("sphere.assets.fonts")
@@ -8,7 +8,7 @@ local imgui = require("imgui")
 
 local Layout = require("sphere.views.EditorView.Layout")
 
-local SnapGridView = Class:new()
+local SnapGridView = class()
 
 local function getTimingText(timePoint)
 	local out = {}
@@ -34,7 +34,7 @@ local function getVelocityText(timePoint)
 	return table.concat(out, ", ")
 end
 
-SnapGridView.drawTimingObjects = function(self, field, currentTime, w, h, align, getText)
+function SnapGridView:drawTimingObjects(field, currentTime, w, h, align, getText)
 	local editorModel = self.game.editorModel
 	local rangeTracker = editorModel.layerData.ranges.timePoint
 	local noteSkin = self.game.noteSkinModel.noteSkin
@@ -78,7 +78,7 @@ local snaps = {
 	[8] = colors.green,
 }
 
-SnapGridView.drawSnap = function(self, timePoint, field, currentTime, width)
+function SnapGridView:drawSnap(timePoint, field, currentTime, width)
 	local editorModel = self.game.editorModel
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	local editor = self.game.configModel.configs.settings.editor
@@ -104,7 +104,7 @@ SnapGridView.drawSnap = function(self, timePoint, field, currentTime, width)
 	love.graphics.pop()
 end
 
-SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
+function SnapGridView:drawComputedGrid(field, currentTime, width)
 	local editorModel = self.game.editorModel
 	local editor = self.game.configModel.configs.settings.editor
 	local ld = editorModel.layerData
@@ -174,7 +174,7 @@ SnapGridView.drawComputedGrid = function(self, field, currentTime, width)
 	love.graphics.setColor(1, 1, 1, 1)
 end
 
-SnapGridView.drawTimings = function(self, _w, _h)
+function SnapGridView:drawTimings(_w, _h)
 	local editorModel = self.game.editorModel
 	local editorTimePoint = editorModel.timePoint
 	local noteSkin = self.game.noteSkinModel.noteSkin
@@ -250,7 +250,7 @@ end
 
 local prevMouseY = 0
 local speedOrig
-SnapGridView.draw = function(self)
+function SnapGridView:draw()
 	local editorModel = self.game.editorModel
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	local editor = self.game.configModel.configs.settings.editor

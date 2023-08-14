@@ -1,6 +1,6 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 
-local TimeRateX = Modifier:new()
+local TimeRateX = Modifier + {}
 
 TimeRateX.type = "TimeEngineModifier"
 TimeRateX.interfaceType = "slider"
@@ -14,21 +14,21 @@ TimeRateX.step = 0.05
 
 TimeRateX.description = "Change the time rate"
 
-TimeRateX.getString = function(self, config)
+function TimeRateX:getString(config)
 	local value = config.value
     if value ~= 1 then
 		return math.floor(value) .. "."
 	end
 end
 
-TimeRateX.getSubString = function(self, config)
+function TimeRateX:getSubString(config)
 	local value = config.value
     if value ~= 1 then
 		return tostring(value - math.floor(value)):sub(3) .. "X"
 	end
 end
 
-TimeRateX.applyMeta = function(self, config, state)
+function TimeRateX:applyMeta(config, state)
 	state.timeRate = state.timeRate * config.value
 end
 

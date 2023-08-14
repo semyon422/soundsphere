@@ -1,12 +1,12 @@
 local LibraryModel = require("sphere.models.LibraryModel")
 
-local NoteChartSetLibraryModel = LibraryModel:extend()
+local NoteChartSetLibraryModel = LibraryModel + {}
 
 NoteChartSetLibraryModel.collapse = false
 
 local NoteChartSetItem = {}
 
-NoteChartSetItem.__index = function(self, k)
+function NoteChartSetItem:__index(k)
 	local model = self.noteChartSetLibraryModel
 	local entry = model.cacheModel.cacheDatabase.noteChartSetItems[self.itemIndex - 1]
 	if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "lamp" then
@@ -17,14 +17,14 @@ NoteChartSetItem.__index = function(self, k)
 	return noteChartData and noteChartData[k] or noteChart and noteChart[k]
 end
 
-NoteChartSetLibraryModel.loadObject = function(self, itemIndex)
+function NoteChartSetLibraryModel:loadObject(itemIndex)
 	return setmetatable({
 		noteChartSetLibraryModel = self,
 		itemIndex = itemIndex,
 	}, NoteChartSetItem)
 end
 
-NoteChartSetLibraryModel.updateItems = function(self)
+function NoteChartSetLibraryModel:updateItems()
 	local params = self.cacheModel.cacheDatabase.queryParams
 
 	local isCollapseAllowed
@@ -51,7 +51,7 @@ NoteChartSetLibraryModel.updateItems = function(self)
 	self.itemsCount = self.cacheModel.cacheDatabase.noteChartSetItemsCount
 end
 
-NoteChartSetLibraryModel.findNotechart = function(self, hash, index)
+function NoteChartSetLibraryModel:findNotechart(hash, index)
 	local params = self.cacheModel.cacheDatabase.queryParams
 
 	params.groupBy = nil
@@ -62,7 +62,7 @@ NoteChartSetLibraryModel.findNotechart = function(self, hash, index)
 	self.itemsCount = self.cacheModel.cacheDatabase.noteChartSetItemsCount
 end
 
-NoteChartSetLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId, noteChartSetId)
+function NoteChartSetLibraryModel:getItemIndex(noteChartDataId, noteChartId, noteChartSetId)
 	self.entry = self.entry or self.cacheModel.cacheDatabase.EntryStruct()
 
 	local entry = self.entry

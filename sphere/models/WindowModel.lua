@@ -1,8 +1,8 @@
-local Class = require("Class")
+local class = require("class")
 local cursor = require("sphere.cursor")
 local loop = require("loop")
 
-local WindowModel = Class:new()
+local WindowModel = class()
 
 WindowModel.baseVsync = 1
 
@@ -15,7 +15,7 @@ local function getDimensions(mode)
 	end
 end
 
-WindowModel.load = function(self)
+function WindowModel:load()
 	self.graphics = self.configModel.configs.settings.graphics
 	self.mode = self.graphics.mode
 	local mode = self.mode
@@ -37,7 +37,7 @@ WindowModel.load = function(self)
 	self:setCursor()
 end
 
-WindowModel.update = function(self)
+function WindowModel:update()
 	local flags = self.mode.flags
 	local graphics = self.graphics
 	if self.vsync ~= flags.vsync then
@@ -61,7 +61,7 @@ WindowModel.update = function(self)
 	loop.imguiShowDemoWindow = settings.miscellaneous.imguiShowDemoWindow
 end
 
-WindowModel.receive = function(self, event)
+function WindowModel:receive(event)
 	if event.name == "keypressed" and event[1] == "f10" then
 		local mode = self.mode
 		local flags = mode.flags
@@ -77,7 +77,7 @@ WindowModel.receive = function(self, event)
 	end
 end
 
-WindowModel.setCursor = function(self)
+function WindowModel:setCursor()
 	if self.cursor == "circle" then
 		cursor:setCircleCursor()
 	elseif self.cursor == "arrow" then
@@ -87,7 +87,7 @@ WindowModel.setCursor = function(self)
 	end
 end
 
-WindowModel.setFullscreen = function(self, fullscreen, fullscreentype)
+function WindowModel:setFullscreen(fullscreen, fullscreentype)
 	local mode = self.mode
 	local width, height
 	if self.fullscreen then
@@ -102,7 +102,7 @@ WindowModel.setFullscreen = function(self, fullscreen, fullscreentype)
 end
 
 local icon_path = "resources/icon.png"
-WindowModel.setIcon = function(self)
+function WindowModel:setIcon()
 	local info = love.filesystem.getInfo(icon_path)
 	if info then
 		local imageData = love.image.newImageData(icon_path)
@@ -110,7 +110,7 @@ WindowModel.setIcon = function(self)
 	end
 end
 
-WindowModel.setVsyncOnSelect = function(self, enabled)
+function WindowModel:setVsyncOnSelect(enabled)
 	local graphics = self.configModel.configs.settings.graphics
 	if not graphics.vsyncOnSelect then
 		return

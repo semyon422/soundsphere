@@ -1,21 +1,21 @@
 local gfx_util = require("gfx_util")
-local Class = require("Class")
+local class = require("class")
 
-local PointGraphView = Class:new()
+local PointGraphView = class()
 
 local vertexformat = {
     {"VertexPosition", "float", 2},
     {"VertexColor", "byte", 4}
 }
 
-PointGraphView.reload = function(self)
+function PointGraphView:reload()
 	self.drawnPoints = 0
 	self.vertices = {}
 	self.mesh = nil
 	self:chechMesh(1)
 end
 
-PointGraphView.chechMesh = function(self, i)
+function PointGraphView:chechMesh(i)
 	if not self.mesh then
 		self.mesh = love.graphics.newMesh(vertexformat, 1, "points", "dynamic")
 		return
@@ -27,7 +27,7 @@ PointGraphView.chechMesh = function(self, i)
 	end
 end
 
-PointGraphView.draw = function(self, w, h)
+function PointGraphView:draw(w, h)
 	if self.show and not self.show(self) then
 		return
 	end
@@ -63,7 +63,7 @@ PointGraphView.draw = function(self, w, h)
 	love.graphics.setPointSize(1)
 end
 
-PointGraphView.drawPoint = function(self, i, point)
+function PointGraphView:drawPoint(i, point)
 	local y, r, g, b, a = self:point(point)
 	if not y then
 		return

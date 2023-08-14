@@ -1,8 +1,8 @@
-local NoteData	= require("ncdk.NoteData")
-local Modifier	= require("sphere.models.ModifierModel.Modifier")
-local MultiOverPlay	= require("sphere.models.ModifierModel.MultiOverPlay")
+local NoteData = require("ncdk.NoteData")
+local Modifier = require("sphere.models.ModifierModel.Modifier")
+local MultiOverPlay = require("sphere.models.ModifierModel.MultiOverPlay")
 
-local MultiplePlay = Modifier:new()
+local MultiplePlay = Modifier + {}
 
 MultiplePlay.type = "NoteChartModifier"
 
@@ -14,17 +14,17 @@ MultiplePlay.range = {2, 4}
 
 MultiplePlay.description = "1 2 1 2 -> 13 24 13 24, doubles the input mode"
 
-MultiplePlay.getString = function(self, config)
+function MultiplePlay:getString(config)
 	return config.value
 end
 
-MultiplePlay.getSubString = function(self, config)
+function MultiplePlay:getSubString(config)
 	return "P"
 end
 
 MultiplePlay.applyMeta = MultiOverPlay.applyMeta
 
-MultiplePlay.apply = function(self, config)
+function MultiplePlay:apply(config)
 	local noteChart = self.noteChart
 	local value = config.value
 
@@ -41,7 +41,7 @@ MultiplePlay.apply = function(self, config)
 							local newInputIndex = inputIndex + inputCount * (i - 1)
 							_r[newInputIndex] = _r[newInputIndex] or {}
 
-							local newNoteData = NoteData:new(noteData.timePoint)
+							local newNoteData = NoteData(noteData.timePoint)
 
 							newNoteData.endNoteData = noteData.endNoteData  -- fix wrong reference
 							newNoteData.noteType = noteData.noteType

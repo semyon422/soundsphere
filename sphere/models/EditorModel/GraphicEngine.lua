@@ -1,14 +1,14 @@
-local Class = require("Class")
+local class = require("class")
 local EditorNoteFactory = require("sphere.models.EditorModel.EditorNoteFactory")
 
-local GraphicEngine = Class:new()
+local GraphicEngine = class()
 
-GraphicEngine.construct = function(self)
+function GraphicEngine:new()
 	self.notes = {}
 	self.selectedNotes = {}
 end
 
-GraphicEngine.reset = function(self)
+function GraphicEngine:reset()
 	self:selectEnd()
 	self:selectNote()
 	self.notes = {}
@@ -17,24 +17,24 @@ end
 
 GraphicEngine.longNoteShortening = 0
 
-GraphicEngine.getCurrentTime = function(self)
+function GraphicEngine:getCurrentTime()
 	return self.editorModel.timePoint.absoluteTime
 end
 
-GraphicEngine.getInputOffset = function(self)
+function GraphicEngine:getInputOffset()
 	return 0
 end
 
-GraphicEngine.getVisualOffset = function(self)
+function GraphicEngine:getVisualOffset()
 	return 0
 end
 
-GraphicEngine.getVisualTimeRate = function(self)
+function GraphicEngine:getVisualTimeRate()
 	local editor = self.editorModel.configModel.configs.settings.editor
 	return editor.speed
 end
 
-GraphicEngine.selectStart = function(self)
+function GraphicEngine:selectStart()
 	for _, note in ipairs(self.notes) do
 		note.selected = false
 	end
@@ -42,11 +42,11 @@ GraphicEngine.selectStart = function(self)
 	self.selecting = true
 end
 
-GraphicEngine.selectEnd = function(self)
+function GraphicEngine:selectEnd()
 	self.selecting = false
 end
 
-GraphicEngine.selectNote = function(self, note, keepOthers)
+function GraphicEngine:selectNote(note, keepOthers)
 	if not note then
 		for _, _note in ipairs(self.notes) do
 			_note.selected = false
@@ -77,7 +77,7 @@ GraphicEngine.selectNote = function(self, note, keepOthers)
 	end
 end
 
-GraphicEngine.newNote = function(self, noteData, editorModel, inputType, inputIndex)
+function GraphicEngine:newNote(noteData, editorModel, inputType, inputIndex)
 	local note = EditorNoteFactory:getNote(noteData)
 	if not note then
 		return
@@ -91,7 +91,7 @@ GraphicEngine.newNote = function(self, noteData, editorModel, inputType, inputIn
 	return note
 end
 
-GraphicEngine.update = function(self)
+function GraphicEngine:update()
 	local editorModel = self.editorModel
 	local layerData = editorModel.layerData
 

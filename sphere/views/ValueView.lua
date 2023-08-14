@@ -1,11 +1,11 @@
 local spherefonts = require("sphere.assets.fonts")
 local gfx_util = require("gfx_util")
 local inside = require("table_util").inside
-local Class = require("Class")
+local class = require("class")
 
-local ValueView = Class:new()
+local ValueView = class()
 
-ValueView.load = function(self)
+function ValueView:load()
 	local font = self.font
 	if font.filename then
 		font[1], font[2] = font.filename, font.size
@@ -13,7 +13,7 @@ ValueView.load = function(self)
 	self.fontObject = spherefonts.get(unpack(font))
 end
 
-ValueView.draw = function(self)
+function ValueView:draw()
 	local tf = gfx_util.transform(self.transform)
 	love.graphics.replaceTransform(tf)
 

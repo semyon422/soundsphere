@@ -1,10 +1,10 @@
 local rbtree = require("rbtree")
 local ncbt = require("ncbt")
-local Class = require("Class")
+local class = require("class")
 
-local NcbtContext = Class:new()
+local NcbtContext = class()
 
-NcbtContext.load = function(self)
+function NcbtContext:load()
 	self.onsets = nil
 
 	self.onsetsDeltaDist = nil
@@ -14,7 +14,7 @@ NcbtContext.load = function(self)
 	self.binsSize = nil
 end
 
-NcbtContext.detect = function(self, soundData)
+function NcbtContext:detect(soundData)
 	self.duration = soundData:getDuration()
 
 	local onsets = ncbt.onsets(soundData)
@@ -34,7 +34,7 @@ NcbtContext.detect = function(self, soundData)
 	self.binsSize = out.binsSize
 end
 
-NcbtContext.apply = function(self, layerData)
+function NcbtContext:apply(layerData)
 	if not self.tempo then
 		return
 	end

@@ -1,12 +1,12 @@
 local transform = require("gfx_util").transform
 local FileFinder = require("sphere.filesystem.FileFinder")
-local Class = require("Class")
+local class = require("class")
 local Animation = require("Animation")
 
-local ImageAnimationView = Class:new()
+local ImageAnimationView = class()
 
-ImageAnimationView.load = function(self)
-	local animation = Animation:new()
+function ImageAnimationView:load()
+	local animation = Animation()
 	animation.cycles = 1
 	animation.range = self.range or {0, 0}
 	animation.rate = self.rate
@@ -19,7 +19,7 @@ ImageAnimationView.load = function(self)
 	return self:loadImages()
 end
 
-ImageAnimationView.loadImages = function(self)
+function ImageAnimationView:loadImages()
 	local images = {}
 	local range = self.range
 	if not range then
@@ -32,7 +32,7 @@ ImageAnimationView.loadImages = function(self)
 	self.images = images
 end
 
-ImageAnimationView.loadQuads = function(self)
+function ImageAnimationView:loadQuads()
 	local image = love.graphics.newImage(FileFinder:findFile(self.image))
 	local w, h = image:getDimensions()
 	self.image = image
@@ -46,15 +46,15 @@ ImageAnimationView.loadQuads = function(self)
 	self.quads = quads
 end
 
-ImageAnimationView.setTime = function(self, time)
+function ImageAnimationView:setTime(time)
 	self.animation.time = time
 end
 
-ImageAnimationView.setCycles = function(self, cycles)
+function ImageAnimationView:setCycles(cycles)
 	self.animation.cycles = cycles
 end
 
-ImageAnimationView.draw = function(self)
+function ImageAnimationView:draw()
 	local animation = self.animation
 	if not animation.frame then
 		return
@@ -102,7 +102,7 @@ ImageAnimationView.draw = function(self)
 	)
 end
 
-ImageAnimationView.update = function(self, dt)
+function ImageAnimationView:update(dt)
 	self.animation:update(dt)
 end
 

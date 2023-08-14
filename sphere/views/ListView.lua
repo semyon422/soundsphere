@@ -1,27 +1,27 @@
 local just = require("just")
 local flux = require("flux")
-local Class = require("Class")
+local class = require("class")
 
-local ListView = Class:new()
+local ListView = class()
 
 ListView.targetItemIndex = 1
 ListView.itemIndex = 1
 ListView.visualItemIndex = 1
 
-ListView.reloadItems = function(self)
+function ListView:reloadItems()
 	self.stateCounter = 1
 	self.items = {}
 end
 
-ListView.scroll = function(self, delta)
+function ListView:scroll(delta)
 	self.targetItemIndex = math.min(math.max(self.targetItemIndex + delta, 1), #self.items)
 end
 
-ListView.getItemIndex = function(self)
+function ListView:getItemIndex()
 	return self.targetItemIndex
 end
 
-ListView.draw = function(self, w, h)
+function ListView:draw(w, h)
 	local itemIndex = assert(self:getItemIndex())
 	if self.itemIndex ~= itemIndex then
 		if self.tween then

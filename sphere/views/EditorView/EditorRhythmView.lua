@@ -2,9 +2,9 @@ local RhythmView = require("sphere.views.RhythmView")
 local just = require("just")
 local gfx_util = require("gfx_util")
 
-local EditorRhythmView = RhythmView:new()
+local EditorRhythmView = RhythmView + {}
 
-EditorRhythmView.processNote = function(self, note)
+function EditorRhythmView:processNote(note)
 	local editorModel = self.game.editorModel
 	local noteManager = editorModel.noteManager
 	local graphicEngine = editorModel.graphicEngine
@@ -42,7 +42,7 @@ EditorRhythmView.processNote = function(self, note)
 	end
 end
 
-EditorRhythmView.draw = function(self)
+function EditorRhythmView:draw()
 	local editorModel = self.game.editorModel
 	local noteManager = editorModel.noteManager
 	local ld = editorModel.layerData
@@ -107,7 +107,7 @@ EditorRhythmView.draw = function(self)
 	end
 end
 
-EditorRhythmView.processNotes = function(self, f)
+function EditorRhythmView:processNotes(f)
 	local editorModel = self.game.editorModel
 	for _, graphicalNote in ipairs(editorModel.graphicEngine.notes) do
 		f(self, graphicalNote)

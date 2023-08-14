@@ -1,10 +1,10 @@
-local Class = require("Class")
+local class = require("class")
 local table_util = require("table_util")
 local remote = require("remote")
 
-local MultiplayerController = Class:new()
+local MultiplayerController = class()
 
-MultiplayerController.load = function(self)
+function MultiplayerController:load()
 	local mpModel = self.multiplayerModel
 	mpModel.handlers = {
 		set = function(peer, key, value)
@@ -80,11 +80,11 @@ MultiplayerController.findNotechart = remote.wrap(function(self)
 	mpModel.peer.setNotechartFound(false)
 end)
 
-MultiplayerController.unload = function(self)
+function MultiplayerController:unload()
 	self.multiplayerModel:unload()
 end
 
-MultiplayerController.update = function(self)
+function MultiplayerController:update()
 	self.multiplayerModel:update()
 end
 

@@ -1,6 +1,6 @@
-local Class = require("Class")
+local class = require("class")
 
-local SequenceView = Class:new()
+local SequenceView = class()
 
 local function getViews(views, out)
 	out = out or {}
@@ -14,7 +14,7 @@ local function getViews(views, out)
 	return out
 end
 
-SequenceView.setSequenceConfig = function(self, config)
+function SequenceView:setSequenceConfig(config)
 	self.views = getViews(config)
 	self.viewById = {}
 	for _, view in ipairs(self.views) do
@@ -27,7 +27,7 @@ SequenceView.setSequenceConfig = function(self, config)
 	end
 end
 
-SequenceView.load = function(self)
+function SequenceView:load()
 	if self.iterating then
 		self.abortIterating = true
 	end
@@ -36,7 +36,7 @@ SequenceView.load = function(self)
 	end
 end
 
-SequenceView.unload = function(self)
+function SequenceView:unload()
 	if self.iterating then
 		self.abortIterating = true
 	end
@@ -45,7 +45,7 @@ SequenceView.unload = function(self)
 	end
 end
 
-SequenceView.callMethod = function(self, method, ...)
+function SequenceView:callMethod(method, ...)
 	if self.iterating then
 		return
 	end
@@ -61,15 +61,15 @@ SequenceView.callMethod = function(self, method, ...)
 	self.iterating = false
 end
 
-SequenceView.receive = function(self, event)
+function SequenceView:receive(event)
 	self:callMethod("receive", event)
 end
 
-SequenceView.update = function(self, dt)
+function SequenceView:update(dt)
 	self:callMethod("update", dt)
 end
 
-SequenceView.draw = function(self)
+function SequenceView:draw()
 	self:callMethod("draw")
 end
 

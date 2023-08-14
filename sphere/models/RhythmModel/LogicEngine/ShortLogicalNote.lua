@@ -1,14 +1,16 @@
 local LogicalNote = require("sphere.models.RhythmModel.LogicEngine.LogicalNote")
 
-local ShortLogicalNote = LogicalNote:new()
+local ShortLogicalNote = LogicalNote + {}
 
-ShortLogicalNote.construct = function(self)
-	self.startNoteData = self.noteData
+function ShortLogicalNote:new(noteData, isPlayable, isScorable)
+	self.startNoteData = noteData
+	self.isPlayable = isPlayable
+	self.isScorable = isScorable
 	self.noteData = nil
 	self.state = "clear"
 end
 
-ShortLogicalNote.update = function(self)
+function ShortLogicalNote:update()
 	if self.ended then
 		return
 	end
@@ -21,7 +23,7 @@ ShortLogicalNote.update = function(self)
 	self:processTimeState(timeState)
 end
 
-ShortLogicalNote.processTimeState = function(self, timeState)
+function ShortLogicalNote:processTimeState(timeState)
 	local keyState = self.keyState
 	if keyState and timeState == "too early" then
 		self:switchState("clear")
@@ -39,7 +41,7 @@ local scoreEvent = {
 	name = "NoteState",
 	noteType = "ShortNote",
 }
-ShortLogicalNote.switchState = function(self, newState)
+function ShortLogicalNote:switchState(newState)
 	local oldState = self.state
 	self.state = newState
 
@@ -75,7 +77,7 @@ ShortLogicalNote.switchState = function(self, newState)
 	end
 end
 
-ShortLogicalNote.processAuto = function(self)
+function ShortLogicalNote:processAuto()
 	if not self:isHere() then
 		return
 	end
@@ -88,12 +90,12 @@ ShortLogicalNote.processAuto = function(self)
 	self.eventTime = nil
 end
 
-ShortLogicalNote.getTimeState = function(self)
+function ShortLogicalNote:getTimeState()
 	local deltaTime = (self:getEventTime() - self:getNoteTime()) / self.logicEngine:getTimeRate()
 	return self:getTimeStateFromConfig(self.logicEngine.timings.ShortNote, deltaTime)
 end
 
-ShortLogicalNote.isReachable = function(self, _eventTime)
+function ShortLogicalNote:isReachable(_eventTime)
 	local eventTime = self.eventTime
 	self.eventTime = _eventTime
 	local isReachable = self:getTimeState() ~= "too early"

@@ -1,15 +1,17 @@
 local LogicalNote = require("sphere.models.RhythmModel.LogicEngine.LogicalNote")
 
-local LongLogicalNote = LogicalNote:new()
+local LongLogicalNote = LogicalNote + {}
 
-LongLogicalNote.construct = function(self)
-	self.startNoteData = self.noteData
-	self.endNoteData = self.noteData.endNoteData
+function LongLogicalNote:new(noteData, isPlayable, isScorable)
+	self.startNoteData = noteData
+	self.endNoteData = noteData.endNoteData
+	self.isPlayable = isPlayable
+	self.isScorable = isScorable
 	self.noteData = nil
 	self.state = "clear"
 end
 
-LongLogicalNote.update = function(self)
+function LongLogicalNote:update()
 	if self.ended then
 		return
 	end
@@ -23,7 +25,7 @@ LongLogicalNote.update = function(self)
 	self:processTimeState(startTimeState, endTimeState)
 end
 
-LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
+function LongLogicalNote:processTimeState(startTimeState, endTimeState)
 	local lastState = self.state
 
 	local keyState = self.keyState
@@ -87,7 +89,7 @@ LongLogicalNote.processTimeState = function(self, startTimeState, endTimeState)
 	self:tryNextNote()
 end
 
-LongLogicalNote.tryNextNote = function(self)
+function LongLogicalNote:tryNextNote()
 	local nextNote = self:getNextPlayable()
 	if not nextNote or self.state ~= "startMissed" then
 		return
@@ -99,7 +101,7 @@ LongLogicalNote.tryNextNote = function(self)
 	end
 end
 
-LongLogicalNote.getNoteTime = function(self, side)
+function LongLogicalNote:getNoteTime(side)
 	local offset = 0
 	if self.isPlayable then
 		offset = self.logicEngine:getInputOffset()
@@ -116,7 +118,7 @@ local scoreEvent = {
 	name = "NoteState",
 	noteType = "LongNote",
 }
-LongLogicalNote.switchState = function(self, newState, reachableNote)
+function LongLogicalNote:switchState(newState, reachableNote)
 	local oldState = self.state
 	self.state = newState
 
@@ -168,7 +170,7 @@ LongLogicalNote.switchState = function(self, newState, reachableNote)
 	end
 end
 
-LongLogicalNote.processAuto = function(self)
+function LongLogicalNote:processAuto()
 	local currentTime = self.logicEngine:getEventTime()
 
 	local deltaStartTime = currentTime - self:getNoteTime("start")
@@ -193,17 +195,17 @@ LongLogicalNote.processAuto = function(self)
 	end
 end
 
-LongLogicalNote.getStartTimeState = function(self)
+function LongLogicalNote:getStartTimeState()
 	local deltaTime = (self:getEventTime() - self:getNoteTime("start")) / self.logicEngine:getTimeRate()
 	return self:getTimeStateFromConfig(self.logicEngine.timings.LongNoteStart, deltaTime)
 end
 
-LongLogicalNote.getEndTimeState = function(self)
+function LongLogicalNote:getEndTimeState()
 	local deltaTime = (self:getEventTime() - self:getNoteTime("end")) / self.logicEngine:getTimeRate()
 	return self:getTimeStateFromConfig(self.logicEngine.timings.LongNoteEnd, deltaTime)
 end
 
-LongLogicalNote.isReachable = function(self, _eventTime)
+function LongLogicalNote:isReachable(_eventTime)
 	local eventTime = self.eventTime
 	self.eventTime = _eventTime
 	local isReachable = self:getStartTimeState() ~= "too early"

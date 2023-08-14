@@ -1,7 +1,7 @@
-local Class = require("Class")
-local spherefonts		= require("sphere.assets.fonts")
+local class = require("class")
+local spherefonts = require("sphere.assets.fonts")
 
-local ModifierIconView = Class:new()
+local ModifierIconView = class()
 
 local shapes = {
 	empty = {false, false, false, false, false, false, false, false},
@@ -19,7 +19,7 @@ local mod_lines = {
 	{-6 / 64, 24 / 64},
 }
 
-ModifierIconView.draw = function(self, size, shape, str, substr)
+function ModifierIconView:draw(size, shape, str, substr)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	love.graphics.setLineStyle("smooth")
@@ -30,7 +30,7 @@ ModifierIconView.draw = function(self, size, shape, str, substr)
 	self:drawText(lines, size, str, substr)
 end
 
-ModifierIconView.drawText = function(self, lines, size, ...)
+function ModifierIconView:drawText(lines, size, ...)
 	local fx = size / 8
 	local fy = size / 8
 	local fs = size * 3 / 4
@@ -42,7 +42,7 @@ ModifierIconView.drawText = function(self, lines, size, ...)
 	end
 end
 
-ModifierIconView.drawSquareBorder = function(self, size, shape)
+function ModifierIconView:drawSquareBorder(size, shape)
 	local fx = size / 8
 	local fy = size / 8
 	local fs = size * 3 / 4

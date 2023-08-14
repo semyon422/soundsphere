@@ -1,6 +1,6 @@
-local Modifier	= require("sphere.models.ModifierModel.Modifier")
+local Modifier = require("sphere.models.ModifierModel.Modifier")
 
-local Alternate = Modifier:new()
+local Alternate = Modifier + {}
 
 Alternate.type = "NoteChartModifier"
 Alternate.interfaceType = "stepper"
@@ -13,15 +13,15 @@ Alternate.values = {"key", "scratch"}
 
 Alternate.description = "1 1 1 1 -> 1 2 1 2, doubles the input mode"
 
-Alternate.getString = function(self, config)
+function Alternate:getString(config)
 	return "Alt"
 end
 
-Alternate.getSubString = function(self, config)
+function Alternate:getSubString(config)
 	return config.value:sub(1, 1):upper()
 end
 
-Alternate.applyMeta = function(self, config, state)
+function Alternate:applyMeta(config, state)
 	local inputType = config.value
 	local inputMode = state.inputMode
 	if not inputMode[inputType] then
@@ -30,7 +30,7 @@ Alternate.applyMeta = function(self, config, state)
 	inputMode[inputType] = inputMode[inputType] * 2
 end
 
-Alternate.apply = function(self, config)
+function Alternate:apply(config)
 	local noteChart = self.noteChart
 
 	local inputMode = noteChart.inputMode

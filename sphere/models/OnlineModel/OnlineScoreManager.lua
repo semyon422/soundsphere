@@ -1,8 +1,8 @@
-local thread	= require("thread")
-local Class			= require("Class")
+local thread = require("thread")
+local class = require("class")
 local inspect = require("inspect")
 
-local OnlineScoreManager = Class:new()
+local OnlineScoreManager = class()
 
 local async_read = thread.async(function(...) return love.filesystem.read(...) end)
 

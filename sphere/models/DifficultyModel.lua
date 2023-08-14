@@ -1,9 +1,9 @@
-local Class = require("Class")
+local class = require("class")
 local enps = require("libchart.enps")
 
-local DifficultyModel = Class:new()
+local DifficultyModel = class()
 
-DifficultyModel.getDifficulty = function(self, noteChart)
+function DifficultyModel:getDifficulty(noteChart)
 	local notes = {}
 
 	local longAreaSum = 0

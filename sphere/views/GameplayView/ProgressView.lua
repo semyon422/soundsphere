@@ -1,10 +1,10 @@
-local Class				= require("Class")
+local class = require("class")
 local transform = require("gfx_util").transform
-local map				= require("math_util").map
+local map = require("math_util").map
 
-local ProgressView = Class:new()
+local ProgressView = class()
 
-ProgressView.draw = function(self)
+function ProgressView:draw()
 	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 
@@ -14,12 +14,12 @@ ProgressView.draw = function(self)
 	love.graphics.rectangle("fill", x, y, w, h)
 end
 
-ProgressView.getMin = function(self) return 0 end
-ProgressView.getMax = function(self) return 1 end
-ProgressView.getStart = function(self) return 0 end
-ProgressView.getCurrent = function(self) return 0 end
+function ProgressView:getMin() return 0 end
+function ProgressView:getMax() return 1 end
+function ProgressView:getStart() return 0 end
+function ProgressView:getCurrent() return 0 end
 
-ProgressView.getRectangle = function(self)
+function ProgressView:getRectangle()
 	local direction = self.direction
 	local minTime = self:getMin()
 	local maxTime = self:getMax()

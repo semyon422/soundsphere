@@ -1,29 +1,29 @@
-local Class = require("Class")
+local class = require("class")
 
-local NotePartView = Class:new()
+local NotePartView = class()
 
-NotePartView.getTimeState = function(self)
+function NotePartView:getTimeState()
 	return self.noteView.graphicalNote.startTimeState
 end
 
-NotePartView.get = function(self, key, timeState)
+function NotePartView:get(key, timeState)
 	local noteSkin = self.noteView.noteSkin
 	return noteSkin:get(self.noteView, self.name, key, timeState or self:getTimeState())
 end
 
-NotePartView.getSpriteBatch = function(self, key, timeState)
+function NotePartView:getSpriteBatch(key, timeState)
 	return self.noteView.noteSkin.data:getSpriteBatch(self.noteView, self.name, key or "image", timeState or self:getTimeState())
 end
 
-NotePartView.getQuad = function(self, key, timeState)
+function NotePartView:getQuad(key, timeState)
 	return self.noteView.noteSkin.data:getQuad(self.noteView, self.name, key or "image", timeState or self:getTimeState())
 end
 
-NotePartView.getDimensions = function(self, key, timeState)
+function NotePartView:getDimensions(key, timeState)
 	return self.noteView.noteSkin.data:getDimensions(self.noteView, self.name, key or "image", timeState or self:getTimeState())
 end
 
-NotePartView.getColor = function(self)
+function NotePartView:getColor()
 	local noteSkin = self.noteView.noteSkin
 	local color = noteSkin:get(self.noteView, self.name, "color", self:getTimeState())
 	local imageName, frame = noteSkin:get(self.noteView, self.name, "image", self:getTimeState())

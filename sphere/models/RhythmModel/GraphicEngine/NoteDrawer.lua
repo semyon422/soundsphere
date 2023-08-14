@@ -1,9 +1,9 @@
-local Class = require("Class")
-local GraphicalNoteFactory	= require("sphere.models.RhythmModel.GraphicEngine.GraphicalNoteFactory")
+local class = require("class")
+local GraphicalNoteFactory = require("sphere.models.RhythmModel.GraphicEngine.GraphicalNoteFactory")
 
-local NoteDrawer = Class:new()
+local NoteDrawer = class()
 
-NoteDrawer.load = function(self)
+function NoteDrawer:load()
 	local graphicEngine = self.graphicEngine
 	local logicEngine = graphicEngine.rhythmModel.logicEngine
 
@@ -39,14 +39,14 @@ NoteDrawer.load = function(self)
 	self.endNoteIndex = 0
 end
 
-NoteDrawer.updateCurrentTime = function(self)
+function NoteDrawer:updateCurrentTime()
 	local graphicEngine = self.graphicEngine
 	local timePoint = self.currentTimePoint
 	timePoint.absoluteTime = graphicEngine:getCurrentTime() - graphicEngine:getInputOffset()
 	self.currentTimePointIndex = self.layerData:interpolateTimePointAbsolute(self.currentTimePointIndex, timePoint)
 end
 
-NoteDrawer.update = function(self)
+function NoteDrawer:update()
 	self:updateCurrentTime()
 
 	local notes = self.notes

@@ -20,7 +20,7 @@ WebNoteChartController.getNoteCharts = function(notechart)
 	return noteCharts
 end
 
-WebNoteChartController.POST = function(self)
+function WebNoteChartController:POST()
 	local noteCharts = WebNoteChartController.getNoteCharts(self.params.notechart)
 	if not noteCharts then
 		return {status = 404}

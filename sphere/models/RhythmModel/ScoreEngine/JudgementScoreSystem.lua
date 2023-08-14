@@ -1,6 +1,6 @@
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 
-local JudgementScoreSystem = ScoreSystem:new()
+local JudgementScoreSystem = ScoreSystem + {}
 
 JudgementScoreSystem.name = "judgement"
 
@@ -126,7 +126,7 @@ for judge = 1, #etterna do
 	}
 end
 
-JudgementScoreSystem.load = function(self)
+function JudgementScoreSystem:load()
 	self.counter = 0
 
 	for name, judgements in pairs(self.scoreEngine.judgements) do
@@ -163,7 +163,7 @@ JudgementScoreSystem.getJudgement = function(_, judgements, deltaTime)
 	end
 end
 
-JudgementScoreSystem.hit = function(self, event)
+function JudgementScoreSystem:hit(event)
 	local counters = self.counters
 	for name, judgements in pairs(self.judgements) do
 		local judgement = self:getJudgement(judgements, event.deltaTime)

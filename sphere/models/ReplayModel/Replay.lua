@@ -1,19 +1,19 @@
-local Class				= require("Class")
-local json				= require("json")
-local ReplayNanoChart	= require("sphere.models.ReplayModel.ReplayNanoChart")
-local ReplayConverter	= require("sphere.models.ReplayModel.ReplayConverter")
-local InputMode			= require("ncdk.InputMode")
+local class = require("class")
+local json = require("json")
+local ReplayNanoChart = require("sphere.models.ReplayModel.ReplayNanoChart")
+local ReplayConverter = require("sphere.models.ReplayModel.ReplayConverter")
+local InputMode = require("ncdk.InputMode")
 
-local Replay = Class:new()
+local Replay = class()
 
-Replay.construct = function(self)
-	self.replayNanoChart = ReplayNanoChart:new()
-	self.replayConverter = ReplayConverter:new()
+function Replay:new()
+	self.replayNanoChart = ReplayNanoChart()
+	self.replayConverter = ReplayConverter()
 	self.events = {}
 	self.eventOffset = 0
 end
 
-Replay.receive = function(self, event)
+function Replay:receive(event)
 	if not event.virtual then
 		return
 	end
@@ -26,19 +26,19 @@ Replay.receive = function(self, event)
 	}
 end
 
-Replay.reset = function(self)
+function Replay:reset()
 	self.eventOffset = 0
 end
 
-Replay.step = function(self)
+function Replay:step()
 	self.eventOffset = math.min(self.eventOffset + 1, #self.events)
 end
 
-Replay.getNextEvent = function(self)
+function Replay:getNextEvent()
 	return self.events[self.eventOffset + 1]
 end
 
-Replay.toString = function(self)
+function Replay:toString()
 	local content, size = self.replayNanoChart:encode(self.events, self.inputMode)
 	return json.encode({
 		hash = self.noteChartDataEntry.hash,
@@ -54,7 +54,7 @@ Replay.toString = function(self)
 	})
 end
 
-Replay.fromString = function(self, s)
+function Replay:fromString(s)
 	local object = json.decode(s)
 
 	self.replayConverter:convert(object)
@@ -71,7 +71,7 @@ Replay.fromString = function(self, s)
 		return self
 	end
 
-	local inputMode = InputMode:new(object.inputMode)
+	local inputMode = InputMode(object.inputMode)
 	self.events = self.replayNanoChart:decode(object.events, object.size, inputMode)
 
 	return self

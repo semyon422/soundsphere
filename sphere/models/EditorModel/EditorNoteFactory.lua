@@ -1,8 +1,8 @@
-local Class = require("Class")
+local class = require("class")
 local ShortEditorNote = require("sphere.models.EditorModel.ShortEditorNote")
 local LongEditorNote = require("sphere.models.EditorModel.LongEditorNote")
 
-local EditorNoteFactory = Class:new()
+local EditorNoteFactory = class()
 
 local notes = {
 	ShortNote = {ShortEditorNote, "ShortNote"},
@@ -12,27 +12,22 @@ local notes = {
 	SoundNote = {ShortEditorNote, "SoundNote"},
 }
 
-EditorNoteFactory.getNote = function(self, noteData)
+function EditorNoteFactory:getNote(noteData)
 	local classAndType = notes[noteData.noteType]
 	if not classAndType then
 		return
 	end
 
-	return classAndType[1]:new({
-		noteType = classAndType[2],
-		startNoteData = noteData,
-	})
+	return classAndType[1](classAndType[2], noteData)
 end
 
-EditorNoteFactory.newNote = function(self, noteType)
+function EditorNoteFactory:newNote(noteType)
 	local classAndType = notes[noteType]
 	if not classAndType then
 		return
 	end
 
-	return classAndType[1]:new({
-		noteType = classAndType[2],
-	})
+	return classAndType[1](classAndType[2], noteData)
 end
 
 return EditorNoteFactory

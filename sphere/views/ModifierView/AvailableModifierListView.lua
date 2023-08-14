@@ -3,23 +3,23 @@ local just = require("just")
 local gfx_util = require("gfx_util")
 local spherefonts = require("sphere.assets.fonts")
 
-local AvailableModifierListView = ListView:new()
+local AvailableModifierListView = ListView()
 
 AvailableModifierListView.rows = 11
 
-AvailableModifierListView.reloadItems = function(self)
+function AvailableModifierListView:reloadItems()
 	self.items = self.game.modifierModel.modifiers
 end
 
-AvailableModifierListView.getItemIndex = function(self)
+function AvailableModifierListView:getItemIndex()
 	return self.game.modifierModel.availableModifierItemIndex
 end
 
-AvailableModifierListView.scroll = function(self, count)
+function AvailableModifierListView:scroll(count)
 	self.game.modifierModel:scrollAvailableModifier(count)
 end
 
-AvailableModifierListView.drawItem = function(self, i, w, h)
+function AvailableModifierListView:drawItem(i, w, h)
 	local item = self.items[i]
 	local prevItem = self.items[i - 1]
 

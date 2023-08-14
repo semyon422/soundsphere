@@ -1,34 +1,34 @@
-local Class			= require("Class")
-local Observable	= require("Observable")
+local class = require("class")
+local Observable = require("Observable")
 
-local InputManager = Class:new()
+local InputManager = class()
 
 InputManager.mode = "external"
 
-InputManager.construct = function(self)
-	self.observable = Observable:new()
+function InputManager:new()
+	self.observable = Observable()
 end
 
-InputManager.setMode = function(self, mode)
+function InputManager:setMode(mode)
 	assert(mode == "external" or mode == "internal")
 	self.mode = mode
 end
 
-InputManager.send = function(self, event)
+function InputManager:send(event)
 	return self.observable:send(event)
 end
 
-InputManager.setInputMode = function(self, inputMode)
+function InputManager:setInputMode(inputMode)
 	self.inputMode = inputMode
 	self.state = {}
 	self.savedState = {}
 end
 
-InputManager.setState = function(self, virtualKey, state)
+function InputManager:setState(virtualKey, state)
 	self.state[virtualKey] = state
 end
 
-InputManager.loadState = function(self)
+function InputManager:loadState()
 	local currentTime = self.rhythmModel.timeEngine.currentTime
 	for virtualKey, state in pairs(self.state) do
 		if state ~= self.savedState[virtualKey] then
@@ -37,21 +37,21 @@ InputManager.loadState = function(self)
 	end
 end
 
-InputManager.saveState = function(self)
+function InputManager:saveState()
 	for virtualKey, state in pairs(self.state) do
 		self.savedState[virtualKey] = state
 	end
 end
 
 local virtualEvent = {virtual = true}
-InputManager.apply = function(self, virtualKey, state, time)
+function InputManager:apply(virtualKey, state, time)
 	virtualEvent.time = math.floor(time * 1024) / 1024
 	virtualEvent.name = state and "keypressed" or "keyreleased"
 	virtualEvent[1] = virtualKey
 	self:send(virtualEvent)
 end
 
-InputManager.receive = function(self, event)
+function InputManager:receive(event)
 	if event.virtual and self.mode == "internal" then
 		return self:send(event)
 	end

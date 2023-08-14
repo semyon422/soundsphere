@@ -1,9 +1,9 @@
-local Class = require("Class")
-local NoteChartFactory			= require("notechart.NoteChartFactory")
+local class = require("class")
+local NoteChartFactory = require("notechart.NoteChartFactory")
 
-local NoteChartModel = Class:new()
+local NoteChartModel = class()
 
-NoteChartModel.load = function(self)
+function NoteChartModel:load()
 	local config = self.configModel.configs.select
 
 	self.noteChartSetEntry = self.cacheModel.chartRepo:selectNoteChartSetEntryById(config.noteChartSetEntryId)
@@ -22,7 +22,7 @@ NoteChartModel.load = function(self)
 	self.noteChartDataEntry = self.cacheModel.chartRepo:selectNoteChartDataEntryById(config.noteChartDataEntryId)
 end
 
-NoteChartModel.loadNoteChart = function(self, settings)
+function NoteChartModel:loadNoteChart(settings)
 	local noteChartEntry = self.noteChartEntry
 	local noteChartDataEntry = self.noteChartDataEntry
 

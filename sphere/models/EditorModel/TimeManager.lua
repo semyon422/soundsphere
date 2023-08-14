@@ -1,16 +1,16 @@
 local Timer = require("Timer")
 
-local TimeManager = Timer:new()
+local TimeManager = Timer + {}
 
-TimeManager.getAbsoluteTime = function(self)
+function TimeManager:getAbsoluteTime()
 	return self.eventTime or 0
 end
 
-TimeManager.getAdjustTime = function(self)
+function TimeManager:getAdjustTime()
 	return self.editorModel.mainAudio:getPosition()
 end
 
-TimeManager.getAudioOffsync = function(self)
+function TimeManager:getAudioOffsync()
 	local audioTime = self:getAdjustTime()
 	local time = self:getTime()
 	if audioTime then

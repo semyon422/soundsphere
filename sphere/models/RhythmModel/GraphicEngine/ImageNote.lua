@@ -1,13 +1,13 @@
 local GraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.GraphicalNote")
 
-local ImageNote = GraphicalNote:new()
+local ImageNote = GraphicalNote + {}
 
-ImageNote.willDrawBeforeStart = function(self)
+function ImageNote:willDrawBeforeStart()
 	local nextNote = self.nextNote
 	return nextNote and not nextNote:willDrawAfterEnd()
 end
 
-ImageNote.willDrawAfterEnd = function(self)
+function ImageNote:willDrawAfterEnd()
 	return self.graphicEngine:getCurrentTime() < self.startNoteData.timePoint.absoluteTime
 end
 

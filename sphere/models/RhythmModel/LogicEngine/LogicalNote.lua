@@ -1,22 +1,22 @@
-local Class = require("Class")
+local class = require("class")
 
-local LogicalNote = Class:new()
+local LogicalNote = class()
 
 LogicalNote.state = ""
 
-LogicalNote.getTimeState = function(self)
+function LogicalNote:getTimeState()
 	return "none"
 end
 
-LogicalNote.getLastTimeFromConfig = function(self, config)
+function LogicalNote:getLastTimeFromConfig(config)
 	return math.max(config.hit[2], config.miss[2])
 end
 
-LogicalNote.getFirstTimeFromConfig = function(self, config)
+function LogicalNote:getFirstTimeFromConfig(config)
 	return math.min(config.hit[1], config.miss[1])
 end
 
-LogicalNote.getTimeStateFromConfig = function(self, config, deltaTime)
+function LogicalNote:getTimeStateFromConfig(config, deltaTime)
 	local hit, miss = config.hit, config.miss
 	if deltaTime >= hit[1] and deltaTime <= hit[2] then
 		return "exactly"
@@ -31,15 +31,15 @@ LogicalNote.getTimeStateFromConfig = function(self, config, deltaTime)
 	end
 end
 
-LogicalNote.switchState = function(self, name)
+function LogicalNote:switchState(name)
 	self.state = name
 end
 
-LogicalNote.getNext = function(self)
+function LogicalNote:getNext()
 	return self.noteHandler.notes[self.index + 1]
 end
 
-LogicalNote.getNextPlayable = function(self)
+function LogicalNote:getNextPlayable()
 	if self.nextPlayable then
 		return self.nextPlayable
 	end
@@ -56,11 +56,11 @@ LogicalNote.getNextPlayable = function(self)
 	return nextNote
 end
 
-LogicalNote.next = function(self)
+function LogicalNote:next()
 	self.ended = true
 end
 
-LogicalNote.getNoteTime = function(self)
+function LogicalNote:getNoteTime()
 	local offset = 0
 	if self.isPlayable then
 		offset = self.logicEngine:getInputOffset()
@@ -68,18 +68,18 @@ LogicalNote.getNoteTime = function(self)
 	return self.startNoteData.timePoint.absoluteTime + offset
 end
 
-LogicalNote.isHere = function(self)
+function LogicalNote:isHere()
 	return self:getNoteTime() <= self.logicEngine:getEventTime()
 end
 
-LogicalNote.isReachable = function(self)
+function LogicalNote:isReachable()
 	return true
 end
 
-LogicalNote.getEventTime = function(self)
+function LogicalNote:getEventTime()
 	return self.eventTime or self.logicEngine:getEventTime()
 end
 
-LogicalNote.update = function(self) end
+function LogicalNote:update() end
 
 return LogicalNote

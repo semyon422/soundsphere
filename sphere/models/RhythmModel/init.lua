@@ -1,25 +1,25 @@
-local Class				= require("Class")
-local Observable		= require("Observable")
-local ScoreEngine		= require("sphere.models.RhythmModel.ScoreEngine")
-local LogicEngine		= require("sphere.models.RhythmModel.LogicEngine")
-local GraphicEngine		= require("sphere.models.RhythmModel.GraphicEngine")
-local AudioEngine		= require("sphere.models.RhythmModel.AudioEngine")
-local TimeEngine		= require("sphere.models.RhythmModel.TimeEngine")
-local InputManager		= require("sphere.models.RhythmModel.InputManager")
-local PauseManager		= require("sphere.models.RhythmModel.PauseManager")
+local class = require("class")
+local Observable = require("Observable")
+local ScoreEngine = require("sphere.models.RhythmModel.ScoreEngine")
+local LogicEngine = require("sphere.models.RhythmModel.LogicEngine")
+local GraphicEngine = require("sphere.models.RhythmModel.GraphicEngine")
+local AudioEngine = require("sphere.models.RhythmModel.AudioEngine")
+local TimeEngine = require("sphere.models.RhythmModel.TimeEngine")
+local InputManager = require("sphere.models.RhythmModel.InputManager")
+local PauseManager = require("sphere.models.RhythmModel.PauseManager")
 require("sphere.models.RhythmModel.LogicEngine.Test")
 
-local RhythmModel = Class:new()
+local RhythmModel = class()
 
-RhythmModel.construct = function(self)
-	self.inputManager = InputManager:new()
-	self.pauseManager = PauseManager:new()
-	self.timeEngine = TimeEngine:new()
-	self.scoreEngine = ScoreEngine:new()
-	self.audioEngine = AudioEngine:new()
-	self.logicEngine = LogicEngine:new()
-	self.graphicEngine = GraphicEngine:new()
-	self.observable = Observable:new()
+function RhythmModel:new()
+	self.inputManager = InputManager()
+	self.pauseManager = PauseManager()
+	self.timeEngine = TimeEngine()
+	self.scoreEngine = ScoreEngine()
+	self.audioEngine = AudioEngine()
+	self.logicEngine = LogicEngine()
+	self.graphicEngine = GraphicEngine()
+	self.observable = Observable()
 	self.inputManager.rhythmModel = self
 	self.pauseManager.rhythmModel = self
 	self.timeEngine.rhythmModel = self
@@ -35,7 +35,7 @@ RhythmModel.construct = function(self)
 	self.logicEngine.observable:add(self.audioEngine)
 end
 
-RhythmModel.load = function(self)
+function RhythmModel:load()
 	local scoreEngine = self.scoreEngine
 	local logicEngine = self.logicEngine
 
@@ -46,20 +46,20 @@ RhythmModel.load = function(self)
 	logicEngine.timings = self.timings
 end
 
-RhythmModel.loadAllEngines = function(self)
+function RhythmModel:loadAllEngines()
 	self:loadLogicEngines()
 	self.audioEngine:load()
 	self.graphicEngine:load()
 	self.pauseManager:load()
 end
 
-RhythmModel.loadLogicEngines = function(self)
+function RhythmModel:loadLogicEngines()
 	self.timeEngine:load()
 	self.scoreEngine:load()
 	self.logicEngine:load()
 end
 
-RhythmModel.unloadAllEngines = function(self)
+function RhythmModel:unloadAllEngines()
 	self.audioEngine:unload()
 	self.logicEngine:unload()
 	self.graphicEngine:unload()
@@ -73,12 +73,12 @@ RhythmModel.unloadAllEngines = function(self)
 	end
 end
 
-RhythmModel.unloadLogicEngines = function(self)
+function RhythmModel:unloadLogicEngines()
 	self.scoreEngine:unload()
 	self.logicEngine:unload()
 end
 
-RhythmModel.receive = function(self, event)
+function RhythmModel:receive(event)
 	if event.name == "framestarted" then
 		self.timeEngine:sync(event)
 		return
@@ -87,7 +87,7 @@ RhythmModel.receive = function(self, event)
 	self.inputManager:receive(event)
 end
 
-RhythmModel.update = function(self, dt)
+function RhythmModel:update(dt)
 	if self.timeEngine.timer.isPlaying then
 		self.logicEngine:update()
 	end
@@ -97,7 +97,7 @@ RhythmModel.update = function(self, dt)
 	self.pauseManager:update(dt)
 end
 
-RhythmModel.hasResult = function(self)
+function RhythmModel:hasResult()
 	local timeEngine = self.timeEngine
 	local base = self.scoreEngine.scoreSystem.base
 	local entry = self.scoreEngine.scoreSystem.entry
@@ -112,27 +112,27 @@ RhythmModel.hasResult = function(self)
 		entry.accuracy < math.huge
 end
 
-RhythmModel.setWindUp = function(self, windUp)
+function RhythmModel:setWindUp(windUp)
 	self.timeEngine.windUp = windUp
 end
 
-RhythmModel.setTimeRate = function(self, timeRate)
+function RhythmModel:setTimeRate(timeRate)
 	self.timeEngine:setBaseTimeRate(timeRate)
 end
 
-RhythmModel.setAutoplay = function(self, autoplay)
+function RhythmModel:setAutoplay(autoplay)
 	self.logicEngine.autoplay = autoplay
 end
 
-RhythmModel.setPromode = function(self, promode)
+function RhythmModel:setPromode(promode)
 	self.logicEngine.promode = promode
 end
 
-RhythmModel.setAdjustRate = function(self, adjustRate)
+function RhythmModel:setAdjustRate(adjustRate)
 	self.timeEngine.adjustRate = adjustRate
 end
 
-RhythmModel.setNoteChart = function(self, noteChart)
+function RhythmModel:setNoteChart(noteChart)
 	assert(noteChart)
 	self.noteChart = noteChart
 	self.timeEngine.noteChart = noteChart
@@ -141,45 +141,45 @@ RhythmModel.setNoteChart = function(self, noteChart)
 	self.graphicEngine.noteChart = noteChart
 end
 
-RhythmModel.setDrawRange = function(self, range)
+function RhythmModel:setDrawRange(range)
 	self.graphicEngine.range = range
 end
 
-RhythmModel.setVolume = function(self, volume)
+function RhythmModel:setVolume(volume)
 	self.audioEngine.volume = volume
 	self.audioEngine:updateVolume()
 end
 
-RhythmModel.setAudioMode = function(self, mode)
+function RhythmModel:setAudioMode(mode)
 	self.audioEngine.mode = mode
 end
 
-RhythmModel.setVisualTimeRate = function(self, visualTimeRate)
+function RhythmModel:setVisualTimeRate(visualTimeRate)
 	self.graphicEngine.visualTimeRate = visualTimeRate
 	self.graphicEngine.targetVisualTimeRate = visualTimeRate
 end
 
-RhythmModel.setLongNoteShortening = function(self, longNoteShortening)
+function RhythmModel:setLongNoteShortening(longNoteShortening)
 	self.graphicEngine.longNoteShortening = longNoteShortening
 end
 
-RhythmModel.setTimeToPrepare = function(self, timeToPrepare)
+function RhythmModel:setTimeToPrepare(timeToPrepare)
 	self.timeEngine.timeToPrepare = timeToPrepare
 end
 
-RhythmModel.setInputOffset = function(self, offset)
+function RhythmModel:setInputOffset(offset)
 	self.logicEngine.inputOffset = math.floor(offset * 1024) / 1024
 end
 
-RhythmModel.setVisualOffset = function(self, offset)
+function RhythmModel:setVisualOffset(offset)
 	self.graphicEngine.visualOffset = offset
 end
 
-RhythmModel.setPauseTimes = function(self, ...)
+function RhythmModel:setPauseTimes(...)
 	self.pauseManager:setPauseTimes(...)
 end
 
-RhythmModel.setVisualTimeRateScale = function(self, scaleSpeed)
+function RhythmModel:setVisualTimeRateScale(scaleSpeed)
 	self.graphicEngine.scaleSpeed = scaleSpeed
 end
 

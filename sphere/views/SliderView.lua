@@ -1,20 +1,20 @@
-local map			= require("math_util").map
-local Class			= require("Class")
+local map = require("math_util").map
+local class = require("class")
 
-local SliderView = Class:new()
+local SliderView = class()
 
-SliderView.isOver = function(self, w, h)
+function SliderView:isOver(w, h)
 	local x, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	return 0 <= x and x <= w and 0 <= y and y <= h
 end
 
-SliderView.getPosition = function(self, w, h)
+function SliderView:getPosition(w, h)
 	local x, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local value = map(x, h / 2, w - h / 2, 0, 1)
 	return math.min(math.max(value, 0), 1)
 end
 
-SliderView.draw = function(self, w, h, value)
+function SliderView:draw(w, h, value)
 	local bh = h / 3
 
 	love.graphics.setColor(1, 1, 1, 1)

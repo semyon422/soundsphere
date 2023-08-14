@@ -1,6 +1,6 @@
-local Class = require("Class")
+local class = require("class")
 
-local DirectoryManager = Class:new()
+local DirectoryManager = class()
 
 local defaultDirectories = {
 	"userdata",
@@ -14,7 +14,7 @@ local defaultDirectories = {
 	"userdata/screenshots",
 }
 
-DirectoryManager.createDirectories = function(self)
+function DirectoryManager:createDirectories()
 	for _, path in ipairs(defaultDirectories) do
 		if not love.filesystem.getInfo(path) then
 			love.filesystem.createDirectory(path)

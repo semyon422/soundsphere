@@ -1,9 +1,9 @@
-local Class = require("Class")
+local class = require("class")
 local InputMode = require("ncdk.InputMode")
 
-local FastplayController = Class:new()
+local FastplayController = class()
 
-FastplayController.play = function(self)
+function FastplayController:play()
 	self:load()
 
 	local rhythmModel = self.rhythmModel
@@ -19,7 +19,7 @@ FastplayController.play = function(self)
 	self:unload()
 end
 
-FastplayController.load = function(self)
+function FastplayController:load()
 	local noteChartModel = self.noteChartModel
 	local difficultyModel = self.difficultyModel
 	local rhythmModel = self.rhythmModel
@@ -31,7 +31,7 @@ FastplayController.load = function(self)
 
 	local state = {}
 	state.timeRate = 1
-	state.inputMode = InputMode:new()
+	state.inputMode = InputMode()
 	state.inputMode:set(noteChart.inputMode)
 
 	modifierModel:applyMeta(state)
@@ -64,7 +64,7 @@ FastplayController.load = function(self)
 	self.replayModel:load()
 end
 
-FastplayController.unload = function(self)
+function FastplayController:unload()
 	local rhythmModel = self.rhythmModel
 	rhythmModel:unloadAllEngines()
 end

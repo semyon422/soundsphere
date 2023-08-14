@@ -2,11 +2,11 @@ local ListView = require("sphere.views.ListView")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 local just = require("just")
 
-local OsudirectListView = ListView:new()
+local OsudirectListView = ListView()
 
 OsudirectListView.rows = 11
 
-OsudirectListView.reloadItems = function(self)
+function OsudirectListView:reloadItems()
 	self.items = self.game.osudirectModel.items
 	if self.itemIndex > #self.items then
 		self.targetItemIndex = 1
@@ -14,12 +14,12 @@ OsudirectListView.reloadItems = function(self)
 	end
 end
 
-OsudirectListView.scroll = function(self, count)
+function OsudirectListView:scroll(count)
 	ListView.scroll(self, count)
 	self.game.osudirectModel:setBeatmap(self.items[self.targetItemIndex])
 end
 
-OsudirectListView.draw = function(self, ...)
+function OsudirectListView:draw(...)
 	ListView.draw(self, ...)
 
 	if not just.key_over() then
@@ -36,7 +36,7 @@ OsudirectListView.draw = function(self, ...)
 	end
 end
 
-OsudirectListView.drawItem = function(self, i, w, h)
+function OsudirectListView:drawItem(i, w, h)
 	local item = self.items[i]
 
 	just.indent(44)

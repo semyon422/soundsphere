@@ -1,12 +1,12 @@
 
 local just = require("just")
-local Class = require("Class")
-local spherefonts		= require("sphere.assets.fonts")
+local class = require("class")
+local spherefonts = require("sphere.assets.fonts")
 local gfx_util = require("gfx_util")
 
-local UserInfoView = Class:new()
+local UserInfoView = class()
 
-UserInfoView.draw = function(self, w, h, username, is_active)
+function UserInfoView:draw(w, h, username, is_active)
 	local changed, active, hovered = just.button(self, just.is_over(w, h))
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 26))

@@ -1,17 +1,17 @@
-local Class = require("Class")
+local class = require("class")
 local NanoChart = require("libchart.NanoChart")
 local json = require("json")
 local zlib = require("zlib")
 local mime = require("mime")
 
 
-local ReplayNanoChart = Class:new()
+local ReplayNanoChart = class()
 
-ReplayNanoChart.construct = function(self)
-	self.nanoChart = NanoChart:new()
+function ReplayNanoChart:new()
+	self.nanoChart = NanoChart()
 end
 
-ReplayNanoChart.getInputMap = function(self, inputMode)
+function ReplayNanoChart:getInputMap(inputMode)
 	local inputs = {}
 
 	for inputType, inputCount in pairs(inputMode) do
@@ -42,7 +42,7 @@ ReplayNanoChart.getInputMap = function(self, inputMode)
 end
 
 local emptyHash = string.char(0):rep(16)
-ReplayNanoChart.encode = function(self, events, inputMode)
+function ReplayNanoChart:encode(events, inputMode)
 	local inputMap, reversedInputMap, inputs = self:getInputMap(inputMode)
 
 	local notes = {}
@@ -59,7 +59,7 @@ ReplayNanoChart.encode = function(self, events, inputMode)
 	return mime.b64(compressedContent), #content
 end
 
-ReplayNanoChart.decode = function(self, content, size, inputMode)
+function ReplayNanoChart:decode(content, size, inputMode)
 	local inputMap, reversedInputMap, inputs = self:getInputMap(inputMode)
 
 	local uncompressedContent = zlib.uncompress_s(mime.unb64(content), size)

@@ -8,11 +8,11 @@ local defaultInfo = {
 	version = 4
 }
 
-ScoreDatabase.load = function(self)
+function ScoreDatabase:load()
 	if self.loaded then
 		return
 	end
-	self.db = Orm:new()
+	self.db = Orm()
 	local db = self.db
 	db:open(self.dbpath)
 	db:exec(love.filesystem.read("sphere/models/ScoreModel/database.sql"))
@@ -23,7 +23,7 @@ ScoreDatabase.load = function(self)
 	self.loaded = true
 end
 
-ScoreDatabase.unload = function(self)
+function ScoreDatabase:unload()
 	if not self.loaded then
 		return
 	end
@@ -31,27 +31,27 @@ ScoreDatabase.unload = function(self)
 	self.loaded = false
 end
 
-ScoreDatabase.selectAllScores = function(self)
+function ScoreDatabase:selectAllScores()
 	return self.db:select("scores")
 end
 
-ScoreDatabase.selectScore = function(self, id)
+function ScoreDatabase:selectScore(id)
 	return self.db:select("scores", "id = ?", id)[1]
 end
 
-ScoreDatabase.insertScore = function(self, score)
+function ScoreDatabase:insertScore(score)
 	return self.db:insert("scores", score, true)
 end
 
-ScoreDatabase.updateScore = function(self, score)
+function ScoreDatabase:updateScore(score)
 	return self.db:update("scores", score, "id = ?", score.id)
 end
 
-ScoreDatabase.getScoreEntries = function(self, hash, index)
+function ScoreDatabase:getScoreEntries(hash, index)
 	return self.db:select("scores", "noteChartHash = ? AND noteChartIndex = ?", hash, index)
 end
 
-ScoreDatabase.selectInfo = function(self)
+function ScoreDatabase:selectInfo()
 	local info = {}
 	local objects = self.db:select("info")
 	for _, object in ipairs(objects) do
@@ -60,21 +60,21 @@ ScoreDatabase.selectInfo = function(self)
 	return info
 end
 
-ScoreDatabase.insertInfo = function(self, key, value)
+function ScoreDatabase:insertInfo(key, value)
 	return self.db:insert("info", {key = key, value = value}, true)
 end
 
-ScoreDatabase.updateInfo = function(self, key, value)
+function ScoreDatabase:updateInfo(key, value)
 	return self.db:update("info", {key = key, value = value}, "key = ?", key)
 end
 
-ScoreDatabase.insertDefaultInfo = function(self)
+function ScoreDatabase:insertDefaultInfo()
 	for key, value in pairs(defaultInfo) do
 		self:insertInfo(key, value)
 	end
 end
 
-ScoreDatabase.updateSchema = function(self)
+function ScoreDatabase:updateSchema()
 	local info = self:selectInfo()
 
 	if info.version > defaultInfo.version then

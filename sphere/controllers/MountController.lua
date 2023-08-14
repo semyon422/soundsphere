@@ -1,10 +1,10 @@
-local Class = require("Class")
+local class = require("class")
 local extractAsync = require("sphere.filesystem.extract")
 local thread = require("thread")
 
-local MountController = Class:new()
+local MountController = class()
 
-MountController.receive = function(self, event)
+function MountController:receive(event)
 	if event.name == "directorydropped" then
 		return self:directorydropped(event[1])
 	elseif event.name == "filedropped" then
@@ -12,7 +12,7 @@ MountController.receive = function(self, event)
 	end
 end
 
-MountController.directorydropped = function(self, path)
+function MountController:directorydropped(path)
 	path = path:gsub("\\", "/")
 	local mountModel = self.mountModel
 	if not mountModel:isAdded(path) then

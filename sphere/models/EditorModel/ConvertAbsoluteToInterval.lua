@@ -4,7 +4,7 @@ local Fraction = require("ncdk.Fraction")
 local timingMatchWindow = 0.005  -- 0.005s for 60 bpm, 0.0025 for 120 bpm, etc
 
 return function(layerData)
-	local newLayerData = LayerData:new()
+	local newLayerData = LayerData()
 	newLayerData:setTimeMode("interval")
 
 	for i = 1, #layerData.tempoDatas do
@@ -41,7 +41,7 @@ return function(layerData)
 			local next_td = next_interval.tempoData
 			local idt = next_td.timePoint.absoluteTime - td.timePoint.absoluteTime
 			local beats = idt / td:getBeatDuration()
-			local next_td_time = Fraction:new(beats, 16, false)
+			local next_td_time = Fraction(beats, 16, false)
 			local idt_new = next_td_time:floor() * td:getBeatDuration()
 			local _time = next_td_time - Fraction(1, 16)
 			_interval.beats = next_td_time:floor()
@@ -52,7 +52,7 @@ return function(layerData)
 			end
 			for j, tp in ipairs(interval) do
 				local dt = tp.absoluteTime - td.timePoint.absoluteTime
-				local time = Fraction:new(dt / td:getBeatDuration(), 16, false)
+				local time = Fraction(dt / td:getBeatDuration(), 16, false)
 				if time == next_td_time and time[1] ~= 0 then
 					table.insert(next_interval, tp)
 				else
@@ -73,14 +73,14 @@ return function(layerData)
 		for j, tp in ipairs(interval) do
 			local dt = tp.absoluteTime - td.timePoint.absoluteTime
 			local beatDuraion = td:getBeatDuration()
-			local time = Fraction:new(dt / beatDuraion, 16, false)
+			local time = Fraction(dt / beatDuraion, 16, false)
 
 			if #interval > 1 and dt > 0 and i < #intervals and j == #interval then
 				local next_interval = intervals[i + 1]
 				local next_td = next_interval.tempoData
 				local idt = next_td.timePoint.absoluteTime - td.timePoint.absoluteTime
 				local beats = idt / beatDuraion
-				local next_td_time = Fraction:new(beats, 16, false)
+				local next_td_time = Fraction(beats, 16, false)
 				local idt_new = next_td_time:floor() * beatDuraion
 				local _time = next_td_time - Fraction(1, 16)
 				local t = td.timePoint.absoluteTime + _time:tonumber() * beatDuraion

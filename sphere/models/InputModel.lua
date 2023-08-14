@@ -1,6 +1,6 @@
-local Class = require("Class")
+local class = require("class")
 
-local InputModel = Class:new()
+local InputModel = class()
 
 InputModel.inputMode = ""
 InputModel.inputs = {}
@@ -11,7 +11,7 @@ InputModel.devices = {
 	"midi"
 }
 
-InputModel.transformEvent = function(self, inputMode, event)
+function InputModel:transformEvent(inputMode, event)
 	local device = event.name:match("^(.+)pressed$") or event.name:match("^(.+)released$")
 	if not device then
 		return
@@ -55,7 +55,7 @@ InputModel.transformEvent = function(self, inputMode, event)
 	return inputs[_i], state
 end
 
-InputModel.setKey = function(self, inputMode, virtualKey, device, key, index)
+function InputModel:setKey(inputMode, virtualKey, device, key, index)
 	local inputs = self:getInputs(inputMode)
 	local n = inputs[virtualKey]
 
@@ -78,7 +78,7 @@ InputModel.setKey = function(self, inputMode, virtualKey, device, key, index)
 	deviceConfig[n][index] = key
 end
 
-InputModel.getKey = function(self, inputMode, virtualKey, device, index)
+function InputModel:getKey(inputMode, virtualKey, device, index)
 	local inputs = self:getInputs(inputMode)
 	local n = inputs[virtualKey]
 
@@ -102,7 +102,7 @@ InputModel.getKey = function(self, inputMode, virtualKey, device, index)
 	return keys[index] or "none"
 end
 
-InputModel.getInputs = function(self, inputMode)
+function InputModel:getInputs(inputMode)
 	if inputMode == self.inputMode then
 		return self.inputs
 	end

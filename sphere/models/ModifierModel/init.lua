@@ -1,28 +1,28 @@
-local Class			= require("Class")
-local InputMode			= require("ncdk.InputMode")
+local class = require("class")
+local InputMode = require("ncdk.InputMode")
 
-local AutoKeySound	= require("sphere.models.ModifierModel.AutoKeySound")
-local SpeedMode		= require("sphere.models.ModifierModel.SpeedMode")
-local TimeRateQ		= require("sphere.models.ModifierModel.TimeRateQ")
-local TimeRateX		= require("sphere.models.ModifierModel.TimeRateX")
-local WindUp		= require("sphere.models.ModifierModel.WindUp")
-local NoScratch		= require("sphere.models.ModifierModel.NoScratch")
-local NoLongNote	= require("sphere.models.ModifierModel.NoLongNote")
-local Automap		= require("sphere.models.ModifierModel.Automap")
-local MultiplePlay	= require("sphere.models.ModifierModel.MultiplePlay")
-local MinLnLength	= require("sphere.models.ModifierModel.MinLnLength")
-local Alternate		= require("sphere.models.ModifierModel.Alternate")
-local Alternate2		= require("sphere.models.ModifierModel.Alternate2")
-local MultiOverPlay	= require("sphere.models.ModifierModel.MultiOverPlay")
-local Shift			= require("sphere.models.ModifierModel.Shift")
-local Mirror		= require("sphere.models.ModifierModel.Mirror")
-local Random		= require("sphere.models.ModifierModel.Random")
-local BracketSwap	= require("sphere.models.ModifierModel.BracketSwap")
-local FullLongNote	= require("sphere.models.ModifierModel.FullLongNote")
-local LessChord	= require("sphere.models.ModifierModel.LessChord")
-local MaxChord	= require("sphere.models.ModifierModel.MaxChord")
+local AutoKeySound = require("sphere.models.ModifierModel.AutoKeySound")
+local SpeedMode = require("sphere.models.ModifierModel.SpeedMode")
+local TimeRateQ = require("sphere.models.ModifierModel.TimeRateQ")
+local TimeRateX = require("sphere.models.ModifierModel.TimeRateX")
+local WindUp = require("sphere.models.ModifierModel.WindUp")
+local NoScratch = require("sphere.models.ModifierModel.NoScratch")
+local NoLongNote = require("sphere.models.ModifierModel.NoLongNote")
+local Automap = require("sphere.models.ModifierModel.Automap")
+local MultiplePlay = require("sphere.models.ModifierModel.MultiplePlay")
+local MinLnLength = require("sphere.models.ModifierModel.MinLnLength")
+local Alternate = require("sphere.models.ModifierModel.Alternate")
+local Alternate2 = require("sphere.models.ModifierModel.Alternate2")
+local MultiOverPlay = require("sphere.models.ModifierModel.MultiOverPlay")
+local Shift = require("sphere.models.ModifierModel.Shift")
+local Mirror = require("sphere.models.ModifierModel.Mirror")
+local Random = require("sphere.models.ModifierModel.Random")
+local BracketSwap = require("sphere.models.ModifierModel.BracketSwap")
+local FullLongNote = require("sphere.models.ModifierModel.FullLongNote")
+local LessChord = require("sphere.models.ModifierModel.LessChord")
+local MaxChord = require("sphere.models.ModifierModel.MaxChord")
 
-local ModifierModel = Class:new()
+local ModifierModel = class()
 
 local Modifiers = {
 	AutoKeySound,
@@ -85,7 +85,7 @@ local OneUseModifiers = {
 	NoLongNote,
 }
 
-ModifierModel.construct = function(self)
+function ModifierModel:new()
 	self.modifiers = {}
 	self.oneUseModifiers = {}
 	self.modifierByName = {}
@@ -94,19 +94,19 @@ ModifierModel.construct = function(self)
 	self.availableModifierItemIndex = 1
 end
 
-ModifierModel.isChanged = function(self)
+function ModifierModel:isChanged()
 	local changed = self.changed
 	self.changed = false
 	return changed
 end
 
-ModifierModel.setConfig = function(self, config)
+function ModifierModel:setConfig(config)
 	self.config = config
 	self.modifierItemIndex = math.min(math.max(self.modifierItemIndex or (#config + 1), 1), #config + 1)
 	self.changed = true
 	self.state = {
 		timeRate = 1,
-		inputMode = InputMode:new(),
+		inputMode = InputMode(),
 	}
 	for _, modifier in pairs(self.modifierByName) do
 		modifier.added = false
@@ -119,14 +119,14 @@ ModifierModel.setConfig = function(self, config)
 	end
 end
 
-ModifierModel.scrollAvailableModifier = function(self, direction)
+function ModifierModel:scrollAvailableModifier(direction)
 	if not self.modifiers[self.availableModifierItemIndex + direction] then
 		return
 	end
 	self.availableModifierItemIndex = self.availableModifierItemIndex + direction
 end
 
-ModifierModel.scrollModifier = function(self, direction)
+function ModifierModel:scrollModifier(direction)
 	local newModifierItemIndex = self.modifierItemIndex + direction
 	if not self.config[newModifierItemIndex] and not self.config[newModifierItemIndex - 1] then
 		return
@@ -134,11 +134,11 @@ ModifierModel.scrollModifier = function(self, direction)
 	self.modifierItemIndex = newModifierItemIndex
 end
 
-ModifierModel.createModifiers = function(self)
+function ModifierModel:createModifiers()
 	local modifierByName = self.modifierByName
 	local modifierById = self.modifierById
 	for _, Modifier in ipairs(Modifiers) do
-		local modifier = Modifier:new()
+		local modifier = Modifier + {}
 		modifier.modifierModel = self
 		modifier.id = ModifierId[Modifier]
 		modifierByName[modifier.name] = modifier
@@ -151,14 +151,14 @@ ModifierModel.createModifiers = function(self)
 	end
 end
 
-ModifierModel.getModifier = function(self, modifierConfig)
+function ModifierModel:getModifier(modifierConfig)
 	if type(modifierConfig) == "number" then
 		return self.modifierById[modifierConfig]
 	end
 	return self.modifierByName[modifierConfig.name]
 end
 
-ModifierModel.isOneUseModifier = function(self, Modifier)
+function ModifierModel:isOneUseModifier(Modifier)
 	for _, OneUseModifier in ipairs(OneUseModifiers) do
 		if Modifier == OneUseModifier then
 			return true
@@ -166,7 +166,7 @@ ModifierModel.isOneUseModifier = function(self, Modifier)
 	end
 end
 
-ModifierModel.getMinimalModifierIndex = function(self, modifier)
+function ModifierModel:getMinimalModifierIndex(modifier)
 	local index = 1
 	for _, oneUseModifier in ipairs(self.oneUseModifiers) do
 		if oneUseModifier.added then
@@ -179,7 +179,7 @@ ModifierModel.getMinimalModifierIndex = function(self, modifier)
 	return index
 end
 
-ModifierModel.add = function(self, modifier)
+function ModifierModel:add(modifier)
 	modifier = modifier or self.modifiers[self.availableModifierItemIndex]
 	local modifierConfig = modifier:getDefaultConfig()
 	local config = self.config
@@ -197,7 +197,7 @@ ModifierModel.add = function(self, modifier)
 	self.changed = true
 end
 
-ModifierModel.remove = function(self, modifierConfig)
+function ModifierModel:remove(modifierConfig)
 	modifierConfig = modifierConfig or self.config[self.modifierItemIndex]
 	if not modifierConfig then
 		return
@@ -223,7 +223,7 @@ ModifierModel.remove = function(self, modifierConfig)
 	self.changed = true
 end
 
-ModifierModel.setModifierValue = function(self, modifierConfig, value)
+function ModifierModel:setModifierValue(modifierConfig, value)
 	modifierConfig = modifierConfig or self.config[self.modifierItemIndex]
 	if not modifierConfig then
 		return
@@ -233,7 +233,7 @@ ModifierModel.setModifierValue = function(self, modifierConfig, value)
 	self.changed = true
 end
 
-ModifierModel.increaseModifierValue = function(self, modifierConfig, delta)
+function ModifierModel:increaseModifierValue(modifierConfig, delta)
 	modifierConfig = modifierConfig or self.config[self.modifierItemIndex]
 	if not modifierConfig then
 		return
@@ -254,7 +254,7 @@ ModifierModel.increaseModifierValue = function(self, modifierConfig, delta)
 	self.changed = true
 end
 
-ModifierModel.apply = function(self, noteChart)
+function ModifierModel:apply(noteChart)
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
 		if modifier then
@@ -264,7 +264,7 @@ ModifierModel.apply = function(self, noteChart)
 	end
 end
 
-ModifierModel.applyMeta = function(self, state)
+function ModifierModel:applyMeta(state)
 	self.state = state
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
@@ -274,7 +274,7 @@ ModifierModel.applyMeta = function(self, state)
 	end
 end
 
-ModifierModel.getString = function(self, config)
+function ModifierModel:getString(config)
 	config = config or self.config
 	local t = {}
 	for _, modifierConfig in ipairs(config) do
@@ -291,7 +291,7 @@ ModifierModel.getString = function(self, config)
 	return table.concat(t, " ")
 end
 
-ModifierModel.encode = function(self, config)
+function ModifierModel:encode(config)
 	config = config or self.config
 	local t = {}
 	for _, modifierConfig in ipairs(config) do
@@ -303,7 +303,7 @@ ModifierModel.encode = function(self, config)
 	return table.concat(t, ";")
 end
 
-ModifierModel.decode = function(self, encodedConfig)
+function ModifierModel:decode(encodedConfig)
 	local config = {}
 	for modifierId, modifierData in encodedConfig:gmatch("(%d+):([^;]+)") do
 		local modifier = self:getModifier(tonumber(modifierId))
@@ -314,7 +314,7 @@ ModifierModel.decode = function(self, encodedConfig)
 	return config
 end
 
-ModifierModel.fixOldFormat = function(self, oldConfig)
+function ModifierModel:fixOldFormat(oldConfig)
 	for _, modifierConfig in ipairs(oldConfig) do
 		local modifier = self:getModifier(modifierConfig)
 		if modifier then

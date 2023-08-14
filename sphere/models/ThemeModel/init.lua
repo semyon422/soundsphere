@@ -1,22 +1,22 @@
-local Class = require("Class")
+local class = require("class")
 
-local ThemeModel = Class:new()
+local ThemeModel = class()
 
 ThemeModel.path = "userdata/themes"
 
-ThemeModel.load = function(self)
+function ThemeModel:load()
 	self.themes = {}
 	self.config = self.configModel.configs.settings
 	-- return self:lookup(self.path)
 end
 
-ThemeModel.lookup = function(self, directoryPath)
+function ThemeModel:lookup(directoryPath)
 	for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
 		local path = directoryPath .. "/" .. itemName
 		local info = love.filesystem.getInfo(path)
 		if info.type == "directory" or info.type == "symlink" then
 			local UserTheme = require(path:gsub("/", "."))
-			local userTheme = UserTheme:new()
+			local userTheme = UserTheme()
 			userTheme.path = path
 			userTheme:load()
 
@@ -26,16 +26,16 @@ ThemeModel.lookup = function(self, directoryPath)
 	end
 end
 
-ThemeModel.getThemes = function(self)
+function ThemeModel:getThemes()
 	return self.themes
 end
 
-ThemeModel.setDefaultTheme = function(self, theme)
+function ThemeModel:setDefaultTheme(theme)
 	-- self.theme = theme
 	-- self.config.general.theme = theme.path
 end
 
-ThemeModel.getTheme = function(self)
+function ThemeModel:getTheme()
 	-- if love.keyboard.isDown("lshift") then
 	-- 	return self.themes[1] or self.theme
 	-- end

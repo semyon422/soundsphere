@@ -1,8 +1,8 @@
-local Class = require("Class")
+local class = require("class")
 
-local InputAnimationView = Class:new()
+local InputAnimationView = class()
 
-InputAnimationView.receive = function(self, event)
+function InputAnimationView:receive(event)
 	local key = event and event[1]
 	if key == self.input then
 		if event.name == "keypressed" then

@@ -1,15 +1,15 @@
-local Class			= require("Class")
-local Replay		= require("sphere.models.ReplayModel.Replay")
-local md5			= require("md5")
+local class = require("class")
+local Replay = require("sphere.models.ReplayModel.Replay")
+local md5 = require("md5")
 
-local ReplayModel = Class:new()
+local ReplayModel = class()
 
 ReplayModel.path = "userdata/replays"
 ReplayModel.mode = "record"
 
-ReplayModel.load = function(self)
+function ReplayModel:load()
 	if self.mode == "record" then
-		self.replay = Replay:new()
+		self.replay = Replay()
 	elseif self.mode == "replay" then
 		self.replay:reset()
 	end
@@ -17,17 +17,17 @@ ReplayModel.load = function(self)
 	self.replay.logicEngine = self.rhythmModel.logicEngine
 end
 
-ReplayModel.setMode = function(self, mode)
+function ReplayModel:setMode(mode)
 	self.mode = mode
 end
 
-ReplayModel.receive = function(self, event)
+function ReplayModel:receive(event)
 	if self.mode == "record" and event.virtual then
 		self.replay:receive(event)
 	end
 end
 
-ReplayModel.update = function(self)
+function ReplayModel:update()
 	if self.mode == "replay" then
 		local replay = self.replay
 		local nextEvent = replay:getNextEvent()
@@ -49,7 +49,7 @@ ReplayModel.update = function(self)
 	end
 end
 
-ReplayModel.saveReplay = function(self)
+function ReplayModel:saveReplay()
 	local replay = self.replay
 	replay.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
 	replay.inputMode = self.noteChartModel.noteChart.inputMode
@@ -64,8 +64,8 @@ ReplayModel.saveReplay = function(self)
 	return replayHash
 end
 
-ReplayModel.loadReplay = function(self, content)
-	local replay = Replay:new()
+function ReplayModel:loadReplay(content)
+	local replay = Replay()
 	if not content then
 		return replay
 	end

@@ -1,15 +1,15 @@
-local physfs	= require("physfs")
-local Class		= require("Class")
+local physfs = require("physfs")
+local class = require("class")
 
-local MountModel = Class:new()
+local MountModel = class()
 
-MountModel.construct = function(self)
+function MountModel:new()
 	self.mountStatuses = {}
 end
 
 MountModel.chartsPath = "userdata/charts"
 
-MountModel.load = function(self)
+function MountModel:load()
 	self.mountInfo = self.configModel.configs.mount
 	local mountStatuses = self.mountStatuses
 
@@ -25,7 +25,7 @@ MountModel.load = function(self)
 	end
 end
 
-MountModel.unload = function(self)
+function MountModel:unload()
 	for _, entry in ipairs(self.mountInfo) do
 		local path = entry[1]
 		if self.mountStatuses[path] == "mounted" then
@@ -34,11 +34,11 @@ MountModel.unload = function(self)
 	end
 end
 
-MountModel.getMountPoint = function(self, path)
+function MountModel:getMountPoint(path)
 	return self.chartsPath .. "/" .. path:gsub("\\", "/"):match("^.+/(.-)$")
 end
 
-MountModel.isMountPath = function(self, path)
+function MountModel:isMountPath(path)
 	for _, entry in ipairs(self.mountInfo) do
 		if entry[1]:gsub("\\", "/") == path:gsub("\\", "/") then
 			return true
@@ -46,7 +46,7 @@ MountModel.isMountPath = function(self, path)
 	end
 end
 
-MountModel.getRealPath = function(self, path)
+function MountModel:getRealPath(path)
 	for _, entry in ipairs(self.mountInfo) do
 		if path:find(entry[2]) == 1 then
 			return path:gsub(entry[2], entry[1])
@@ -54,7 +54,7 @@ MountModel.getRealPath = function(self, path)
 	end
 end
 
-MountModel.isAdded = function(self, path)
+function MountModel:isAdded(path)
 	for _, entry in ipairs(self.mountInfo) do
 		if entry[1] == path then
 			return true
@@ -62,16 +62,16 @@ MountModel.isAdded = function(self, path)
 	end
 end
 
-MountModel.addPath = function(self, path)
+function MountModel:addPath(path)
 	local mountInfo = self.mountInfo
 	mountInfo[#mountInfo + 1] = {path, self:getMountPoint(path)}
 end
 
-MountModel.mount = function(self, path)
+function MountModel:mount(path)
 	assert(physfs.mount(path, self:getMountPoint(path), true))
 end
 
-MountModel.unmount = function(self, path)
+function MountModel:unmount(path)
 	assert(physfs.unmount(path))
 end
 

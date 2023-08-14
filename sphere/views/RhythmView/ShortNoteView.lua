@@ -3,9 +3,9 @@ local math_util = require("math_util")
 local gfx_util = require("gfx_util")
 local just = require("just")
 
-local ShortNoteView = NoteView:new()
+local ShortNoteView = NoteView + {}
 
-ShortNoteView.draw = function(self)
+function ShortNoteView:draw()
 	local headView = self:getNotePart("Head")
 	local spriteBatch = headView:getSpriteBatch()
 	if not spriteBatch then
@@ -31,7 +31,7 @@ ShortNoteView.draw = function(self)
 	love.graphics.pop()
 end
 
-ShortNoteView.drawSelected = function(self)
+function ShortNoteView:drawSelected()
 	local hw = self:getNotePart("Head")
 	local w, h = hw:getDimensions()
 
@@ -45,7 +45,7 @@ ShortNoteView.drawSelected = function(self)
 	love.graphics.rectangle("line", x, y, _w - x, _h - y)
 end
 
-ShortNoteView.fillChords = function(self, chords, column)
+function ShortNoteView:fillChords(chords, column)
 	local startNoteData = self.graphicalNote.startNoteData
 
 	local time = startNoteData.timePoint.absoluteTime
@@ -55,7 +55,7 @@ ShortNoteView.fillChords = function(self, chords, column)
 	chord[column] = startNoteData.noteType
 end
 
-ShortNoteView.isVisible = function(self)
+function ShortNoteView:isVisible()
 	local color = self:getNotePart("Head"):getColor()
 	if not color then
 		return
@@ -63,7 +63,7 @@ ShortNoteView.isVisible = function(self)
 	return color[4] > 0
 end
 
-ShortNoteView.getTransformParams = function(self)
+function ShortNoteView:getTransformParams()
 	local hw = self:getNotePart("Head")
 	local w, h = hw:getDimensions()
 	local nw, nh = hw:get("w"), hw:get("h")

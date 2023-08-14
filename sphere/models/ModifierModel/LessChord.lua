@@ -1,6 +1,6 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 
-local LessChord = Modifier:new()
+local LessChord = Modifier + {}
 
 LessChord.type = "NoteChartModifier"
 LessChord.interfaceType = "stepper"
@@ -21,11 +21,11 @@ none: no chords
 4: every 4th chord removed
 5: every 5th chord removed]]
 
-LessChord.getString = function(self, config)
+function LessChord:getString(config)
 	return "LC"
 end
 
-LessChord.getSubString = function(self, config)
+function LessChord:getSubString(config)
 	if config.value == "none" then
 		return "N"
 	end
@@ -34,7 +34,7 @@ end
 
 -- TODO: Also remove LN + ShortNote chords
 --		 and LN + LN chords
-LessChord.apply = function(self, config)
+function LessChord:apply(config)
 	local configVal
 	if config.value ~= "none" then
 		configVal = tonumber(config.value)

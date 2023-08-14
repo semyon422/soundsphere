@@ -1,17 +1,17 @@
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 
-local MiscScoreSystem = ScoreSystem:new()
+local MiscScoreSystem = ScoreSystem + {}
 
 MiscScoreSystem.name = "misc"
 
-MiscScoreSystem.construct = function(self)
+function MiscScoreSystem:new()
 	self.ratio = 0
 	self.maxDeltaTime = 0
 	self.deltaTime = 0
 	self.earlylate = 0
 end
 
-MiscScoreSystem.hit = function(self, event)
+function MiscScoreSystem:hit(event)
 	local deltaTime = event.deltaTime
 	self.deltaTime = deltaTime
 	if math.abs(deltaTime) > math.abs(self.maxDeltaTime) then
@@ -24,11 +24,11 @@ MiscScoreSystem.hit = function(self, event)
 	self.earlylate = (counters.earlylate.early or 0) / (counters.earlylate.late or 1)
 end
 
-MiscScoreSystem.miss = function(self, event)
+function MiscScoreSystem:miss(event)
 	self.deltaTime = event.deltaTime
 end
 
-MiscScoreSystem.early = function(self)
+function MiscScoreSystem:early()
 	self.deltaTime = -math.huge
 end
 

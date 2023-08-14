@@ -1,7 +1,7 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 local NoteData = require("ncdk.NoteData")
 
-local AutoKeySound = Modifier:new()
+local AutoKeySound = Modifier + {}
 
 AutoKeySound.type = "NoteChartModifier"
 AutoKeySound.interfaceType = "toggle"
@@ -12,14 +12,14 @@ AutoKeySound.shortName = "AKS"
 
 AutoKeySound.description = "Key sounds will not depend on the input"
 
-AutoKeySound.getString = function(self, config)
+function AutoKeySound:getString(config)
 	if not config.value then
 		return
 	end
 	return Modifier.getString(self)
 end
 
-AutoKeySound.apply = function(self, config)
+function AutoKeySound:apply(config)
 	if not config.value then
 		return
 	end
@@ -30,7 +30,7 @@ AutoKeySound.apply = function(self, config)
 		local layerData = noteChart.layerDatas[layerDataIndex]
 		for _, noteData in ipairs(noteDatas) do
 			if noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart" then
-				local soundNoteData = NoteData:new(noteData.timePoint)
+				local soundNoteData = NoteData(noteData.timePoint)
 
 				soundNoteData.noteType = "SoundNote"
 				soundNoteData.sounds, noteData.sounds = noteData.sounds, {}

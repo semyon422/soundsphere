@@ -1,8 +1,8 @@
 local ShortGraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.ShortGraphicalNote")
 
-local ShortEditorNote = ShortGraphicalNote:extend()
+local ShortEditorNote = ShortGraphicalNote + {}
 
-ShortEditorNote.create = function(self, absoluteTime)
+function ShortEditorNote:create(absoluteTime)
 	local editorModel = self.editorModel
 	local ld = editorModel.layerData
 
@@ -17,7 +17,7 @@ ShortEditorNote.create = function(self, absoluteTime)
 	return self
 end
 
-ShortEditorNote.grab = function(self, t, part, deltaColumn, lockSnap)
+function ShortEditorNote:grab(t, part, deltaColumn, lockSnap)
 	local note = self
 
 	note.grabbedPart = part
@@ -33,36 +33,36 @@ ShortEditorNote.grab = function(self, t, part, deltaColumn, lockSnap)
 	note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
 end
 
-ShortEditorNote.drop = function(self, t)
+function ShortEditorNote:drop(t)
 	local editorModel = self.editorModel
 	local ld = editorModel.layerData
 	local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime)
 	self.startNoteData.timePoint = ld:checkTimePoint(dtp)
 end
 
-ShortEditorNote.updateGrabbed = function(self, t)
+function ShortEditorNote:updateGrabbed(t)
 	local editorModel = self.editorModel
 	editorModel:getDtpAbsolute(t - self.grabbedDeltaTime):clone(self.startNoteData.timePoint)
 end
 
-ShortEditorNote.copy = function(self, copyTimePoint)
+function ShortEditorNote:copy(copyTimePoint)
 	self.deltaStartTime = self.startNoteData.timePoint:sub(copyTimePoint)
 end
 
-ShortEditorNote.paste = function(self, timePoint)
+function ShortEditorNote:paste(timePoint)
 	local ld = self.editorModel.layerData
 
 	self.startNoteData = self.startNoteData:clone()
 	self.startNoteData.timePoint = ld:getTimePoint(timePoint:add(self.deltaStartTime))
 end
 
-ShortEditorNote.remove = function(self)
+function ShortEditorNote:remove()
 	local ld = self.editorModel.layerData
 
 	ld:removeNoteData(self.startNoteData, self.inputType, self.inputIndex)
 end
 
-ShortEditorNote.add = function(self)
+function ShortEditorNote:add()
 	local ld = self.editorModel.layerData
 
 	ld:addNoteData(self.startNoteData, self.inputType, self.inputIndex)

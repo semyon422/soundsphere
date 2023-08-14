@@ -15,7 +15,7 @@ local function loadNoteChart(path, index)
 end
 
 local function export(noteChart)
-	local nce = NoteChartExporter:new()
+	local nce = NoteChartExporter()
 	nce.noteChart = noteChart
 	nce.noteChartDataEntry = noteChart.metaData
 

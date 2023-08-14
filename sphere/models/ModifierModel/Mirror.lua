@@ -1,6 +1,6 @@
 local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 
-local Mirror = SwapModifier:new()
+local Mirror = SwapModifier + {}
 
 Mirror.type = "NoteChartModifier"
 Mirror.interfaceType = "stepper"
@@ -13,15 +13,15 @@ Mirror.values = {"all", "left", "right"}
 
 Mirror.description = "Mirror the note chart"
 
-Mirror.getString = function(self, config)
+function Mirror:getString(config)
 	return "MR"
 end
 
-Mirror.getSubString = function(self, config)
+function Mirror:getSubString(config)
 	return config.value:sub(1, 1):upper()
 end
 
-Mirror.getMap = function(self, config)
+function Mirror:getMap(config)
 	local noteChart = self.noteChart
 
 	local inputMode = noteChart.inputMode

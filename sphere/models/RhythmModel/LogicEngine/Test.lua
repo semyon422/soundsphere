@@ -3,13 +3,13 @@ local LogicEngine = require("sphere.models.RhythmModel.LogicEngine")
 local GraphicEngine = require("sphere.models.RhythmModel.GraphicEngine")
 local table_util = require("table_util")
 
-local NoteChart		= require("ncdk.NoteChart")
-local NoteData		= require("ncdk.NoteData")
+local NoteChart = require("ncdk.NoteChart")
+local NoteData = require("ncdk.NoteData")
 
 local rhythmModel = {}
 
-local logicEngine = LogicEngine:new()
-local graphicEngine = GraphicEngine:new()
+local logicEngine = LogicEngine()
+local graphicEngine = GraphicEngine()
 
 rhythmModel.logicEngine = logicEngine
 rhythmModel.graphicEngine = graphicEngine
@@ -49,7 +49,7 @@ end
 local function test(notes, events, states, graphicStates)
 	logicEngine.eventTime = 0  -- reset time on each test
 
-	local noteChart = NoteChart:new()
+	local noteChart = NoteChart()
 
 	local layerData = noteChart:getLayerData(1)
 	layerData:setTimeMode("absolute")
@@ -64,7 +64,7 @@ local function test(notes, events, states, graphicStates)
 			end
 			local timePoint = layerData:getTimePoint(time, -1)
 
-			local noteData = NoteData:new(timePoint)
+			local noteData = NoteData(timePoint)
 
 			noteData.noteType = "ShortNote"
 			if isAuto then
@@ -75,13 +75,13 @@ local function test(notes, events, states, graphicStates)
 		elseif type(time) == "table" then
 			local timePoint = layerData:getTimePoint(time[1], -1)
 
-			local startNoteData = NoteData:new(timePoint)
+			local startNoteData = NoteData(timePoint)
 			startNoteData.noteType = "LongNoteStart"
 			layerData:addNoteData(startNoteData, "key", 1)
 
 			timePoint = layerData:getTimePoint(time[2], -1)
 
-			local endNoteData = NoteData:new(timePoint)
+			local endNoteData = NoteData(timePoint)
 			endNoteData.noteType = "LongNoteEnd"
 			layerData:addNoteData(endNoteData, "key", 1)
 

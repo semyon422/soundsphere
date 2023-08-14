@@ -1,6 +1,6 @@
 local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 
-local Random = SwapModifier:new()
+local Random = SwapModifier + {}
 
 Random.type = "NoteChartModifier"
 Random.interfaceType = "stepper"
@@ -13,15 +13,15 @@ Random.values = {"all", "left", "right"}
 
 Random.description = "Randomize the note chart"
 
-Random.getString = function(self, config)
+function Random:getString(config)
 	return "RD"
 end
 
-Random.getSubString = function(self, config)
+function Random:getSubString(config)
 	return config.value:sub(1, 1):upper()
 end
 
-Random.getMap = function(self, config)
+function Random:getMap(config)
 	local noteChart = self.noteChart
 	local value = config.value
 

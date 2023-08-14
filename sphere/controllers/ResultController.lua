@@ -1,9 +1,9 @@
-local Class = require("Class")
+local class = require("class")
 local thread = require("thread")
 
-local ResultController = Class:new()
+local ResultController = class()
 
-ResultController.load = function(self)
+function ResultController:load()
 	self.selectModel:pullScore()
 
 	local selectModel = self.selectModel
@@ -18,7 +18,7 @@ end
 
 local readAsync = thread.async(function(...) return love.filesystem.read(...) end)
 
-ResultController.replayNoteChartAsync = function(self, mode, scoreEntry)
+function ResultController:replayNoteChartAsync(mode, scoreEntry)
 	if not self.selectModel:notechartExists() then
 		return
 	end

@@ -1,12 +1,12 @@
-local Class = require("Class")
+local class = require("class")
 local spherefonts = require("sphere.assets.fonts")
 local erfunc = require("libchart.erfunc")
 local just = require("just")
 local Format = require("sphere.views.Format")
 
-local MatchPlayersView = Class:new()
+local MatchPlayersView = class()
 
-MatchPlayersView.draw = function(self)
+function MatchPlayersView:draw()
 	local users = self.game.multiplayerModel.roomUsers
 	local window = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 

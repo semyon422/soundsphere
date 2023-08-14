@@ -1,4 +1,4 @@
-local Class = require("Class")
+local class = require("class")
 local gfx_util = require("gfx_util")
 local math_util = require("math_util")
 local spherefonts = require("sphere.assets.fonts")

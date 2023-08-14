@@ -1,7 +1,7 @@
 local JustConfig = require("sphere.JustConfig")
 local imgui = require("imgui")
 
-local config = JustConfig:new()
+local config = JustConfig()
 
 config.data = --[[data]] {
 	mania = {},

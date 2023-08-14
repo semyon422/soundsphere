@@ -1,6 +1,6 @@
 local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 
-local Shift = SwapModifier:new()
+local Shift = SwapModifier + {}
 
 Shift.type = "NoteChartModifier"
 Shift.interfaceType = "slider"
@@ -12,7 +12,7 @@ Shift.range = {-5, 5}
 
 Shift.description = "Shift the note chart"
 
-Shift.getString = function(self, config)
+function Shift:getString(config)
     if config.value > 0 then
         return "S+"
     elseif config.value < 0 then
@@ -20,11 +20,11 @@ Shift.getString = function(self, config)
     end
 end
 
-Shift.getSubString = function(self, config)
+function Shift:getSubString(config)
     return math.abs(config.value)
 end
 
-Shift.getMap = function(self, config)
+function Shift:getMap(config)
 	local noteChart = self.noteChart
 
 	local map = {}

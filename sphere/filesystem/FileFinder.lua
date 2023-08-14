@@ -23,22 +23,22 @@ end
 FileFinder.paths = {}
 FileFinder.fileLists = {}
 
-FileFinder.reset = function(self)
+function FileFinder:reset()
 	self.paths = {}
 	self.fileLists = {}
 end
 
-FileFinder.getType = function(self, fileName)
+function FileFinder:getType(fileName)
 	local ext = fileName:match("%.([^%.]+)$")
 	ext = ext and ext:lower()
 	return FileTypeMap[ext]
 end
 
-FileFinder.addPath = function(self, path)
+function FileFinder:addPath(path)
 	table.insert(self.paths, path)
 end
 
-FileFinder.getFileListRecursive = function(self, path, list, prefix)
+function FileFinder:getFileListRecursive(path, list, prefix)
 	list = list or {}
 	prefix = prefix or ""
 	local files = love.filesystem.getDirectoryItems(path)
@@ -53,7 +53,7 @@ FileFinder.getFileListRecursive = function(self, path, list, prefix)
 	return list
 end
 
-FileFinder.getFileList = function(self, path)
+function FileFinder:getFileList(path)
 	local fileLists = self.fileLists
 	if fileLists[path] then
 		return fileLists[path]
@@ -62,7 +62,7 @@ FileFinder.getFileList = function(self, path)
 	return fileLists[path]
 end
 
-FileFinder.findFile = function(self, fullFileName, _fileType)
+function FileFinder:findFile(fullFileName, _fileType)
 	if not fullFileName then
 		return
 	end

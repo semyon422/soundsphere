@@ -1,12 +1,12 @@
-local Class = require("Class")
+local class = require("class")
 local thread = require("thread")
 local InputMode = require("ncdk.InputMode")
 local SPH = require("sph.SPH")
 local NoteChartExporter = require("osu.NoteChartExporter")
 
-local SelectController = Class:new()
+local SelectController = class()
 
-SelectController.load = function(self)
+function SelectController:load()
 	local noteChartModel = self.noteChartModel
 	local selectModel = self.selectModel
 	local previewModel = self.previewModel
@@ -23,10 +23,10 @@ SelectController.load = function(self)
 	self:applyModifierMeta()
 end
 
-SelectController.applyModifierMeta = function(self)
+function SelectController:applyModifierMeta()
 	local state = {}
 	state.timeRate = 1
-	state.inputMode = InputMode:new()
+	state.inputMode = InputMode()
 
 	local item = self.selectModel.noteChartItem
 	if item then
@@ -37,16 +37,16 @@ SelectController.applyModifierMeta = function(self)
 	self.previewModel:setPitch(state.timeRate)
 end
 
-SelectController.beginUnload = function(self)
+function SelectController:beginUnload()
 	self.selectModel:setLock(true)
 end
 
-SelectController.unload = function(self)
+function SelectController:unload()
 	self.noteSkinModel:load()
 	self.configModel:write()
 end
 
-SelectController.update = function(self, dt)
+function SelectController:update(dt)
 	self.previewModel:update(dt)
 	self.selectModel:update()
 
@@ -93,7 +93,7 @@ SelectController.updateSession = thread.coro(function(self)
 	self.configModel:write("online")
 end)
 
-SelectController.openDirectory = function(self)
+function SelectController:openDirectory()
 	local noteChartItem = self.selectModel.noteChartItem
 	if not noteChartItem then
 		return
@@ -114,7 +114,7 @@ SelectController.openDirectory = function(self)
 	love.system.openURL(realPath)
 end
 
-SelectController.openWebNotechart = function(self)
+function SelectController:openWebNotechart()
 	local noteChartItem = self.selectModel.noteChartItem
 	if not noteChartItem then
 		return
@@ -124,7 +124,7 @@ SelectController.openWebNotechart = function(self)
 	self.onlineModel.onlineNotechartManager:openWebNotechart(hash, index)
 end
 
-SelectController.updateCache = function(self, force)
+function SelectController:updateCache(force)
 	local noteChartItem = self.selectModel.noteChartItem
 	if not noteChartItem then
 		return
@@ -133,7 +133,7 @@ SelectController.updateCache = function(self, force)
 	self.cacheModel:startUpdate(path, force)
 end
 
-SelectController.updateCacheCollection = function(self, path, force)
+function SelectController:updateCacheCollection(path, force)
 	local cacheModel = self.cacheModel
 	local state = cacheModel.shared.state
 	if state == 0 or state == 3 then
@@ -143,7 +143,7 @@ SelectController.updateCacheCollection = function(self, path, force)
 	end
 end
 
-SelectController.receive = function(self, event)
+function SelectController:receive(event)
 	if event.name == "filedropped" then
 		return self:filedropped(event[1])
 	end
@@ -153,7 +153,7 @@ local exts = {
 	mp3 = true,
 	ogg = true,
 }
-SelectController.filedropped = function(self, file)
+function SelectController:filedropped(file)
 	local path = file:getFilename():gsub("\\", "/")
 
 	local _name, ext = path:match("^(.+)%.(.-)$")
@@ -173,8 +173,8 @@ SelectController.filedropped = function(self, file)
 	self.cacheModel:startUpdate(chartSetPath, true)
 end
 
-SelectController.exportToOsu = function(self)
-	local nce = NoteChartExporter:new()
+function SelectController:exportToOsu()
+	local nce = NoteChartExporter()
 
 	local noteChartModel = self.noteChartModel
 	noteChartModel:load()

@@ -1,11 +1,11 @@
 local transform = require("gfx_util").transform
 local inside = require("table_util").inside
 local FileFinder = require("sphere.filesystem.FileFinder")
-local Class = require("Class")
+local class = require("class")
 
-local ImageValueView = Class:new()
+local ImageValueView = class()
 
-ImageValueView.load = function(self)
+function ImageValueView:load()
 	local images = {}
 	self.images = images
 	if not self.files then
@@ -16,7 +16,7 @@ ImageValueView.load = function(self)
 	end
 end
 
-ImageValueView.getDimensions = function(self, value)
+function ImageValueView:getDimensions(value)
 	local images = self.images
 	local overlap = self.overlap or 0
 
@@ -36,7 +36,7 @@ ImageValueView.getDimensions = function(self, value)
 	return width, height
 end
 
-ImageValueView.draw = function(self)
+function ImageValueView:draw()
 	local images = self.images
 	local overlap = self.overlap or 0
 

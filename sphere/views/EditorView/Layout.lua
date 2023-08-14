@@ -2,7 +2,7 @@ local gfx_util = require("gfx_util")
 
 local Layout = require("sphere.views.Layout")
 
-local _Layout = Layout:new()
+local _Layout = Layout()
 
 function _Layout:draw()
 	local width, height = love.graphics.getDimensions()

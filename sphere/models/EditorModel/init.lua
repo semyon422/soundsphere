@@ -1,4 +1,4 @@
-local Class = require("Class")
+local class = require("class")
 local Fraction = require("ncdk.Fraction")
 local AudioManager = require("sphere.models.EditorModel.AudioManager")
 local TimeManager = require("sphere.models.EditorModel.TimeManager")
@@ -15,24 +15,24 @@ local NoteManager = require("sphere.models.EditorModel.NoteManager")
 local Scroller = require("sphere.models.EditorModel.Scroller")
 local Metronome = require("sphere.models.EditorModel.Metronome")
 
-local EditorModel = Class:new()
+local EditorModel = class()
 
 EditorModel.tools = {"Select", "ShortNote", "LongNote", "SoundNote"}
 EditorModel.states = {"info", "audio", "timings", "notes"}
 
-EditorModel.construct = function(self)
-	self.noteChartLoader = NoteChartLoader:new()
-	self.mainAudio = MainAudio:new()
-	self.ncbtContext = NcbtContext:new()
-	self.intervalManager = IntervalManager:new()
-	self.graphsGenerator = GraphsGenerator:new()
-	self.editorChanges = EditorChanges:new()
-	self.timer = TimeManager:new()
-	self.audioManager = AudioManager:new()
-	self.noteManager = NoteManager:new()
-	self.graphicEngine = GraphicEngine:new()
-	self.scroller = Scroller:new()
-	self.metronome = Metronome:new()
+function EditorModel:new()
+	self.noteChartLoader = NoteChartLoader()
+	self.mainAudio = MainAudio()
+	self.ncbtContext = NcbtContext()
+	self.intervalManager = IntervalManager()
+	self.graphsGenerator = GraphsGenerator()
+	self.editorChanges = EditorChanges()
+	self.timer = TimeManager()
+	self.audioManager = AudioManager()
+	self.noteManager = NoteManager()
+	self.graphicEngine = GraphicEngine()
+	self.scroller = Scroller()
+	self.metronome = Metronome()
 
 	for _, v in pairs(self) do
 		v.editorModel = self
@@ -40,7 +40,7 @@ EditorModel.construct = function(self)
 	self.state = self.states[1]
 end
 
-EditorModel.load = function(self)
+function EditorModel:load()
 	self.loaded = true
 
 	local editor = self:getSettings()
@@ -49,7 +49,7 @@ EditorModel.load = function(self)
 	self.layerData = self.noteChartLoader:load()
 	local ld = self.layerData
 
-	self.changes = Changes:new()
+	self.changes = Changes()
 	ld:syncChanges(self.changes:get())
 
 	self.graphsGenerator:load()
@@ -76,17 +76,17 @@ EditorModel.load = function(self)
 	self.scroller:scrollSeconds(self.timer:getTime())
 end
 
-EditorModel.detectTempoOffset = function(self)
+function EditorModel:detectTempoOffset()
 	if self.mainAudio.soundData then
 		self.ncbtContext:detect(self.mainAudio.soundData)
 	end
 end
 
-EditorModel.applyTempoOffset = function(self)
+function EditorModel:applyTempoOffset()
 	self.ncbtContext:apply(self.layerData)
 end
 
-EditorModel.getSettings = function(self)
+function EditorModel:getSettings()
 	local editor = self.configModel.configs.settings.editor
 	if editor.speed <= 0 then
 		editor.speed = 1
@@ -95,25 +95,25 @@ EditorModel.getSettings = function(self)
 	return editor
 end
 
-EditorModel.getAudioSettings = function(self)
+function EditorModel:getAudioSettings()
 	return self.configModel.configs.settings.audio
 end
 
-EditorModel.undo = function(self)
+function EditorModel:undo()
 	self.editorChanges:undo()
 end
 
-EditorModel.redo = function(self)
+function EditorModel:redo()
 	self.editorChanges:redo()
 end
 
-EditorModel.setTime = function(self, time)
+function EditorModel:setTime(time)
 	self.timer:setTime(time)
 	self.audioManager:update(true)
 	self.mainAudio:update(true)
 end
 
-EditorModel.loadResources = function(self)
+function EditorModel:loadResources()
 	if not self.loaded then
 		return
 	end
@@ -131,7 +131,7 @@ EditorModel.loadResources = function(self)
 	self.resourcesLoaded = true
 end
 
-EditorModel.getFirstLastTime = function(self)
+function EditorModel:getFirstLastTime()
 	local audioManager = self.audioManager
 	local mainAudio = self.mainAudio
 	local ld = self.layerData
@@ -149,30 +149,30 @@ EditorModel.getFirstLastTime = function(self)
 	return firstTime, lastTime
 end
 
-EditorModel.genGraphs = function(self)
+function EditorModel:genGraphs()
 	local a, b = self:getFirstLastTime()
 	self.graphsGenerator:genDensityGraph(self.noteChart, a, b)
 	self.graphsGenerator:genIntervalDatasGraph(self.layerData, a, b)
 end
 
-EditorModel.getDtpAbsolute = function(self, time)
+function EditorModel:getDtpAbsolute(time)
 	local ld = self.layerData
 	local editor = self:getSettings()
 	return ld:getDynamicTimePointAbsolute(editor.snap, time)
 end
 
-EditorModel.unload = function(self)
+function EditorModel:unload()
 	self.loaded = false
 	self.audioManager:unload()
 	self.mainAudio:unload()
 	self.metronome:unload()
 end
 
-EditorModel.save = function(self)
+function EditorModel:save()
 	self.noteChartLoader:save()
 end
 
-EditorModel.play = function(self)
+function EditorModel:play()
 	if self.intervalManager:isGrabbed() then
 		return
 	end
@@ -181,23 +181,23 @@ EditorModel.play = function(self)
 	self.mainAudio:play()
 end
 
-EditorModel.pause = function(self)
+function EditorModel:pause()
 	self.timer:pause()
 	self.audioManager:pause()
 	self.mainAudio:pause()
 end
 
-EditorModel.getLogSpeed = function(self)
+function EditorModel:getLogSpeed()
 	local editor = self:getSettings()
 	return math.floor(10 * math.log(editor.speed) / math.log(2) + 0.5)
 end
 
-EditorModel.setLogSpeed = function(self, logSpeed)
+function EditorModel:setLogSpeed(logSpeed)
 	local editor = self:getSettings()
 	editor.speed = 2 ^ (logSpeed / 10)
 end
 
-EditorModel.getMouseTime = function(self, dy)
+function EditorModel:getMouseTime(dy)
 	dy = dy or 0
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local noteSkin = self.noteSkin
@@ -205,11 +205,11 @@ EditorModel.getMouseTime = function(self, dy)
 	return (self.timePoint.absoluteTime - noteSkin:getInverseTimePosition(my + dy) / editor.speed)
 end
 
-EditorModel.selectNote = function(self, note)
+function EditorModel:selectNote(note)
 	self.graphicEngine:selectNote(note, love.keyboard.isDown("lctrl"))
 end
 
-EditorModel.selectStart = function(self)
+function EditorModel:selectStart()
 	self.graphicEngine:selectStart()
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	self.selectRect = {mx, my, mx, my}
@@ -217,13 +217,13 @@ EditorModel.selectStart = function(self)
 	just.select(mx, my, mx, my)
 end
 
-EditorModel.selectEnd = function(self)
+function EditorModel:selectEnd()
 	self.graphicEngine:selectEnd()
 	self.selectRect = nil
 	just.select()
 end
 
-EditorModel.update = function(self)
+function EditorModel:update()
 	local editor = self:getSettings()
 	local noteSkin = self.noteSkin
 
@@ -256,14 +256,14 @@ EditorModel.update = function(self)
 	self.graphicEngine:update()
 end
 
-EditorModel.receive = function(self, event)
+function EditorModel:receive(event)
 	if event.name == "framestarted" then
 		local timer = self.timer
 		timer.eventTime = event.time
 	end
 end
 
-EditorModel.getSnap = function(self, j)
+function EditorModel:getSnap(j)
 	local editor = self:getSettings()
 	local snap = editor.snap
 	if type(j) == "table" then
@@ -279,7 +279,7 @@ EditorModel.getSnap = function(self, j)
 	return k
 end
 
-EditorModel.getTotalBeats = function(self)
+function EditorModel:getTotalBeats()
 	local ld = self.layerData
 	local range = ld.ranges.interval
 

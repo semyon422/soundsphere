@@ -1,7 +1,7 @@
-local FileFinder			= require("sphere.filesystem.FileFinder")
-local ShortGraphicalNote	= require("sphere.models.RhythmModel.GraphicEngine.ShortGraphicalNote")
-local LongGraphicalNote		= require("sphere.models.RhythmModel.GraphicEngine.LongGraphicalNote")
-local ImageNote				= require("sphere.models.RhythmModel.GraphicEngine.ImageNote")
+local FileFinder = require("sphere.filesystem.FileFinder")
+local ShortGraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.ShortGraphicalNote")
+local LongGraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.LongGraphicalNote")
+local ImageNote = require("sphere.models.RhythmModel.GraphicEngine.ImageNote")
 
 local GraphicalNoteFactory = {}
 
@@ -22,7 +22,7 @@ local notes = {
 	ImageNote = {ImageNote, getImageNoteType},
 }
 
-GraphicalNoteFactory.getNote = function(self, noteData)
+function GraphicalNoteFactory:getNote(noteData)
 	local classAndType = notes[noteData.noteType]
 	if not classAndType then
 		return
@@ -33,10 +33,7 @@ GraphicalNoteFactory.getNote = function(self, noteData)
 		noteType = noteType(noteData)
 	end
 
-	return classAndType[1]:new({
-		noteType = noteType,
-		startNoteData = noteData,
-	})
+	return classAndType[1](noteType, noteData)
 end
 
 return GraphicalNoteFactory

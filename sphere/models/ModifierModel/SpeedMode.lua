@@ -1,6 +1,6 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 
-local SpeedMode = Modifier:new()
+local SpeedMode = Modifier + {}
 
 SpeedMode.type = "NoteChartModifier"
 SpeedMode.interfaceType = "stepper"
@@ -15,16 +15,16 @@ SpeedMode.modeNames = {"A", "X", "C", "MIN", "MAX"}
 
 SpeedMode.description = "AMod, XMod, CMod, MinMod, MaxMod"
 
-SpeedMode.getString = function(self, config)
+function SpeedMode:getString(config)
 	local indexValue = self:toIndexValue(config.value)
 	return self.modeNames[indexValue]
 end
 
-SpeedMode.getSubString = function(self, config)
+function SpeedMode:getSubString(config)
 	return "MOD"
 end
 
-SpeedMode.applyTempo = function(self, tempo)
+function SpeedMode:applyTempo(tempo)
 	local noteChart = self.noteChart
 
 	for _, layerData in noteChart:getLayerDataIterator() do
@@ -34,7 +34,7 @@ SpeedMode.applyTempo = function(self, tempo)
 	noteChart:compute()
 end
 
-SpeedMode.applyConstant = function(self)
+function SpeedMode:applyConstant()
 	local noteChart = self.noteChart
 
 	for _, layerData in noteChart:getLayerDataIterator() do
@@ -51,7 +51,7 @@ SpeedMode.applyConstant = function(self)
 	noteChart:compute()
 end
 
-SpeedMode.apply = function(self, config)
+function SpeedMode:apply(config)
 	local mode = config.value
 	if mode == "x" then
 		return

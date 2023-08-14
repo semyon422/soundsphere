@@ -2,7 +2,7 @@ local LayerData = require("ncdk.LayerData")
 local Fraction = require("ncdk.Fraction")
 
 return function(layerData)
-	local newLayerData = LayerData:new()
+	local newLayerData = LayerData()
 	newLayerData:setTimeMode("interval")
 
 	local lastTimePoint = layerData.timePointList[#layerData.timePointList]

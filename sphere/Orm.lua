@@ -1,15 +1,13 @@
 local sqlite = require("ljsqlite3")
+local class = require("class")
 
-local Orm = {}
+local Orm = class()
 
 Orm.print_queries = false
 Orm.NULL = {}
 
 function Orm:new()
-	local object = {table_infos = {}}
-	setmetatable(object, self)
-	self.__index = self
-	return object
+	self.table_infos = {}
 end
 
 function Orm:open(db)

@@ -1,4 +1,4 @@
-local Class = require("Class")
+local class = require("class")
 local extractAsync = require("sphere.filesystem.extract")
 local downloadAsync = require("sphere.filesystem.download")
 local thread = require("thread")
@@ -6,7 +6,7 @@ local delay = require("delay")
 local http_util = require("http_util")
 local json = require("json")
 
-local OsudirectModel = Class:new()
+local OsudirectModel = class()
 
 OsudirectModel.rankedStatuses = {
 	{-3, "any"},
@@ -23,7 +23,7 @@ for i, d in ipairs(OsudirectModel.rankedStatuses) do
 	OsudirectModel.rankedStatusesMap[d[2]] = d[1]
 end
 
-OsudirectModel.load = function(self)
+function OsudirectModel:load()
 	self.statusBeatmap = {title = "LOADING", artist = ""}
 	self.items = {self.statusBeatmap}
 	self.processing = {}
@@ -31,14 +31,14 @@ OsudirectModel.load = function(self)
 	self.rankedStatus = "ranked"
 end
 
-OsudirectModel.setRankedStatus = function(self, status)
+function OsudirectModel:setRankedStatus(status)
 	self.rankedStatus = status
 	self.page = 1
 	self.items = {self.statusBeatmap}
 	self:searchNoDebounce()
 end
 
-OsudirectModel.update = function(self)
+function OsudirectModel:update()
 	local dl = thread.shared.download
 	for _, b in ipairs(self.processing) do
 		local status = dl[b.url]
@@ -56,13 +56,13 @@ OsudirectModel.update = function(self)
 	end
 end
 
-OsudirectModel.isChanged = function(self)
+function OsudirectModel:isChanged()
 	local changed = self.changed
 	self.changed = false
 	return changed
 end
 
-OsudirectModel.setBeatmap = function(self, beatmap)
+function OsudirectModel:setBeatmap(beatmap)
 	self.beatmap = beatmap
 	self.changed = true
 
@@ -78,13 +78,13 @@ end
 
 OsudirectModel.searchString = ""
 
-OsudirectModel.setSearchString = function(self, s)
+function OsudirectModel:setSearchString(s)
 	self.searchString = s
 	self:searchDebounce()
 end
 
 local empty = {}
-OsudirectModel.getDifficulties = function(self)
+function OsudirectModel:getDifficulties()
 	local beatmap = self.beatmap
 	return beatmap and beatmap.beatmaps or empty
 end
@@ -94,17 +94,17 @@ local requestAsync = thread.async(function(url)
 	return http.request(url)
 end)
 
-OsudirectModel.searchDebounce = function(self)
+function OsudirectModel:searchDebounce()
 	delay.debounce(self, "loadDebounce", 0.1, self.search, self)
 end
 
-OsudirectModel.searchNoDebounce = function(self)
+function OsudirectModel:searchNoDebounce()
 	coroutine.wrap(function()
 		self:search()
 	end)()
 end
 
-OsudirectModel.search = function(self)
+function OsudirectModel:search()
 	self.statusBeatmap.title = "LOADING"
 	self.items = {self.statusBeatmap}
 	self.page = 0
@@ -116,7 +116,7 @@ OsudirectModel.search = function(self)
 	end
 end
 
-OsudirectModel.searchRequest = function(self, searchString, page)
+function OsudirectModel:searchRequest(searchString, page)
 	local config = self.configModel.configs.urls.osu
 	local url = config.search .. "?" .. http_util.encode_query_string({
 		query = searchString,
@@ -145,7 +145,7 @@ OsudirectModel.searchRequest = function(self, searchString, page)
 	return err
 end
 
-OsudirectModel.searchNext = function(self)
+function OsudirectModel:searchNext()
 	self.page = self.page + 1
 
 	local searchString = self.searchString
@@ -171,12 +171,12 @@ OsudirectModel.searchNext = function(self)
 	self:setBeatmap(self.items[newPos])
 end
 
-OsudirectModel.getBackgroundUrl = function(self)
+function OsudirectModel:getBackgroundUrl()
 	local config = self.configModel.configs.urls.osu
 	return config.background:format(self.beatmap.id)
 end
 
-OsudirectModel.getPreviewUrl = function(self)
+function OsudirectModel:getPreviewUrl()
 	local config = self.configModel.configs.urls.osu
 	return config.preview:format(self.beatmap.id)
 end

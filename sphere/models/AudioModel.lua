@@ -1,9 +1,9 @@
-local Class = require("Class")
+local class = require("class")
 local audio = require("audio")
 
-local AudioModel = Class:new()
+local AudioModel = class()
 
-AudioModel.load = function(self)
+function AudioModel:load()
 	local device = self.configModel.configs.settings.audio.device
 	if device.period == 0 then
 		device.period = audio.default_dev_period

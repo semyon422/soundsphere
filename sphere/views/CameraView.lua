@@ -1,12 +1,12 @@
-local Class = require("Class")
+local class = require("class")
 local s3dc = require("s3dc")
 
-local CameraView = Class:new()
+local CameraView = class()
 
 CameraView.sensitivity = 0.5
 CameraView.speed = 500
 
-CameraView.load = function(self)
+function CameraView:load()
 	local perspective = self.game.configModel.configs.settings.graphics.perspective
 	self.camera = perspective.camera
 	if not self.camera or not self.draw_start then
@@ -15,7 +15,7 @@ CameraView.load = function(self)
 	self:loadCamera()
 end
 
-CameraView.loadCamera = function(self)
+function CameraView:loadCamera()
 	s3dc.load()
 	local w, h = love.graphics.getDimensions()
 	self.w, self.h = w, h
@@ -24,7 +24,7 @@ CameraView.loadCamera = function(self)
 	s3dc.rotate(perspective.pitch, perspective.yaw)
 end
 
-CameraView.unload = function(self)
+function CameraView:unload()
 	if not self.camera or not self.draw_start then
 		return
 	end
@@ -37,7 +37,7 @@ CameraView.unload = function(self)
 	self.game.gameplayController:saveCamera(x, y, z, s3dc.angle.pitch, s3dc.angle.yaw)
 end
 
-CameraView.receive = function(self, event)
+function CameraView:receive(event)
 	if not self.draw_start then
 		return
 	end
@@ -77,7 +77,7 @@ CameraView.receive = function(self, event)
 	end
 end
 
-CameraView.update = function(self, dt)
+function CameraView:update(dt)
 	if not self.draw_start then
 		return
 	end
@@ -110,7 +110,7 @@ CameraView.update = function(self, dt)
 	end
 end
 
-CameraView.draw = function(self)
+function CameraView:draw()
 	if not self.camera then
 		return
 	end

@@ -1,9 +1,9 @@
-local Class = require("Class")
+local class = require("class")
 local Fraction = require("ncdk.Fraction")
 
-local Scroller = Class:new()
+local Scroller = class()
 
-Scroller.updateRange = function(self)
+function Scroller:updateRange()
 	local editor = self.editorModel:getSettings()
 	local absoluteTime = self.editorModel.timePoint.absoluteTime
 
@@ -14,7 +14,7 @@ Scroller.updateRange = function(self)
 	end
 end
 
-Scroller._scrollTimePoint = function(self, timePoint)
+function Scroller:_scrollTimePoint(timePoint)
 	if not timePoint then
 		return
 	end
@@ -24,7 +24,7 @@ Scroller._scrollTimePoint = function(self, timePoint)
 	self:updateRange()
 end
 
-Scroller.scrollTimePoint = function(self, timePoint)
+function Scroller:scrollTimePoint(timePoint)
 	if not timePoint then
 		return
 	end
@@ -35,16 +35,16 @@ Scroller.scrollTimePoint = function(self, timePoint)
 	editorModel:setTime(timePoint.absoluteTime)
 end
 
-Scroller.scrollSeconds = function(self, absoluteTime)
+function Scroller:scrollSeconds(absoluteTime)
 	local timePoint = self.editorModel:getDtpAbsolute(absoluteTime)
 	self:scrollTimePoint(timePoint)
 end
 
-Scroller.scrollSecondsDelta = function(self, delta)
+function Scroller:scrollSecondsDelta(delta)
 	self:scrollSeconds(self.editorModel.timePoint.absoluteTime + delta)
 end
 
-Scroller.scrollSnaps = function(self, delta)
+function Scroller:scrollSnaps(delta)
 	if self.editorModel.intervalManager:isGrabbed() then
 		return
 	end
@@ -52,7 +52,7 @@ Scroller.scrollSnaps = function(self, delta)
 	self:scrollTimePoint(ld:getDynamicTimePoint(self:getNextSnapIntervalTime(self.editorModel.timePoint, delta)))
 end
 
-Scroller.getNextSnapIntervalTime = function(self, timePoint, delta)
+function Scroller:getNextSnapIntervalTime(timePoint, delta)
 	local editor = self.editorModel:getSettings()
 
 	local snap = editor.snap

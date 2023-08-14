@@ -1,11 +1,11 @@
 
-local Class = require("Class")
+local class = require("class")
 local gfx_util = require("gfx_util")
 local map = require("math_util").map
 
-local BackgroundView = Class:new()
+local BackgroundView = class()
 
-BackgroundView.draw = function(self, w, h, dim, parallax)
+function BackgroundView:draw(w, h, dim, parallax)
 	if dim == 1 then
 		return
 	end

@@ -1,4 +1,4 @@
-local Class = require("Class")
+local class = require("class")
 local delay = require("delay")
 local thread = require("thread")
 local enet = require("enet")
@@ -8,9 +8,9 @@ local remote = require("remote")
 remote.encode = buffer.encode
 remote.decode = buffer.decode
 
-local MultiplayerModel = Class:new()
+local MultiplayerModel = class()
 
-MultiplayerModel.construct = function(self)
+function MultiplayerModel:new()
 	self.status = "disconnected"
 	self.rooms = {}
 	self.users = {}
@@ -22,19 +22,19 @@ MultiplayerModel.construct = function(self)
 	self.isPlaying = false
 end
 
-MultiplayerModel.load = function(self)
+function MultiplayerModel:load()
 	self.host = enet.host_create()
 	self.stopRefresh = delay.every(0.1, self.refresh, self)
 end
 
-MultiplayerModel.unload = function(self)
+function MultiplayerModel:unload()
 	self:disconnect()
 	self.host:flush()
 	self.host = nil
 	self.stopRefresh()
 end
 
-MultiplayerModel.refresh = function(self)
+function MultiplayerModel:refresh()
 	local peer = self.peer
 	local room = self.room
 	if not peer or not room then
@@ -78,18 +78,18 @@ MultiplayerModel.connect = thread.coro(function(self)
 	connecting = false
 end)
 
-MultiplayerModel.disconnect = function(self)
+function MultiplayerModel:disconnect()
 	if self.status == "connected" then
 		self.server:disconnect()
 		self.status = "disconnecting"
 	end
 end
 
-MultiplayerModel.addMessage = function(self, message)
+function MultiplayerModel:addMessage(message)
 	table.insert(self.roomMessages, message)
 end
 
-MultiplayerModel.isHost = function(self)
+function MultiplayerModel:isHost()
 	local room = self.room
 	if not room then
 		return false
@@ -264,7 +264,7 @@ MultiplayerModel.login = remote.wrap(function(self)
 	local response, code, headers = api.auth.multiplayer:_post({key = key})
 end)
 
-MultiplayerModel.peerconnected = function(self, peer)
+function MultiplayerModel:peerconnected(peer)
 	print("connected")
 	self.status = "connected"
 	self.peer = peer
@@ -272,7 +272,7 @@ MultiplayerModel.peerconnected = function(self, peer)
 	self:login()
 end
 
-MultiplayerModel.peerdisconnected = function(self, peer)
+function MultiplayerModel:peerdisconnected(peer)
 	print("disconnected")
 	self.status = "disconnected"
 	self.peer = nil
@@ -286,7 +286,7 @@ MultiplayerModel.peerdisconnected = function(self, peer)
 	self.user = nil
 end
 
-MultiplayerModel.update = function(self)
+function MultiplayerModel:update()
 	if not self.server then
 		return
 	end
@@ -307,7 +307,7 @@ MultiplayerModel.update = function(self)
 	remote.update()
 end
 
-MultiplayerModel.downloadNoteChart = function(self)
+function MultiplayerModel:downloadNoteChart()
 	local setId = self.notechart.osuSetId
 	if self.downloadingBeatmap or not setId then
 		return

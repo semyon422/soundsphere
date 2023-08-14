@@ -2,16 +2,16 @@ local NoteSkinVsrg = require("sphere.models.NoteSkinModel.NoteSkinVsrg")
 local BasePlayfield = require("sphere.models.NoteSkinModel.BasePlayfield")
 local JustConfig = require("sphere.JustConfig")
 
-local BaseNoteSkin = NoteSkinVsrg:new()
+local BaseNoteSkin = NoteSkinVsrg + {}
 
 BaseNoteSkin.bgaTransform = {{1 / 2, -16 / 9 / 2}, {0, -7 / 9 / 2}, 0, {0, 16 / 9}, {0, 16 / 9}, 0, 0, 0, 0}
 
-BaseNoteSkin.setInputMode = function(self, inputMode, stringInputMode)
+function BaseNoteSkin:setInputMode(inputMode, stringInputMode)
 	self.inputMode = inputMode
 	self.stringInputMode = stringInputMode
 end
 
-BaseNoteSkin.getInputTable = function(self)
+function BaseNoteSkin:getInputTable()
 	local inputMode = self.inputMode
 	local inputs = {}
 
@@ -45,10 +45,10 @@ local function copyTable(t)
 end
 
 local configPath = "sphere/models/NoteSkinModel/BaseNoteSkinConfig.lua"
-BaseNoteSkin.load = function(self)
+function BaseNoteSkin:load()
 	BaseNoteSkin.configContent = BaseNoteSkin.configContent or love.filesystem.read(configPath)
 
-	local config = JustConfig:new({defaultContent = self.configContent}):fromFile(
+	local config = JustConfig({defaultContent = self.configContent}):fromFile(
 		"userdata/skins/base." .. self.stringInputMode .. ".config.lua"
 	)
 	self.config = config
@@ -141,9 +141,7 @@ BaseNoteSkin.load = function(self)
 		color = {0.25, 0.25, 0.25, 1},
 	})
 
-	local playfield = BasePlayfield:new({
-		noteskin = self
-	})
+	local playfield = BasePlayfield(self)
 
 	local judgementLineHeight = config:get("judgementLineHeight") or 4
 	playfield:addBga({transform = self.bgaTransform})

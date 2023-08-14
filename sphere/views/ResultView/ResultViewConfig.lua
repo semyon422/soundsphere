@@ -7,9 +7,9 @@ local BackgroundView = require("sphere.views.BackgroundView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
 
 local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
-local ScoreListView	= require("sphere.views.ResultView.ScoreListView")
+local ScoreListView = require("sphere.views.ResultView.ScoreListView")
 local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
-local MatchPlayersView	= require("sphere.views.GameplayView.MatchPlayersView")
+local MatchPlayersView = require("sphere.views.GameplayView.MatchPlayersView")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
 local RoundedRectangle = require("sphere.views.RoundedRectangle")
@@ -79,7 +79,7 @@ local drawGraph = function(self)
 	self.__index.draw(self, w, h)
 end
 
-local _ComboGraph = PointGraphView:new({
+local _ComboGraph = PointGraphView({
 	draw = drawGraph,
 	radius = 2,
 	backgroundColor = {0, 0, 0, 0.2},
@@ -97,7 +97,7 @@ end
 
 local perfectColor = {1, 1, 1, 1}
 local notPerfectColor = {1, 0.6, 0.4, 1}
-local _HitGraph = PointGraphView:new({
+local _HitGraph = PointGraphView({
 	draw = drawGraph,
 	radius = 2,
 	backgroundColor = {0, 0, 0, 0.2},
@@ -121,7 +121,7 @@ local function HitGraph(self)
 	_HitGraph:draw()
 end
 
-local _MissGraph = PointGraphView:new({
+local _MissGraph = PointGraphView({
 	draw = drawGraph,
 	radius = 4,
 	backgroundColor = {1, 1, 1, 1},
@@ -140,7 +140,7 @@ local function MissGraph(self)
 	_MissGraph:draw()
 end
 
-local _HpGraph = PointGraphView:new({
+local _HpGraph = PointGraphView({
 	draw = drawGraph,
 	radius = 2,
 	backgroundColor = {0, 0, 0, 0.2},

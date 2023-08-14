@@ -1,8 +1,8 @@
 local NoteSkin = require("sphere.models.NoteSkinModel.NoteSkin")
 
-local NoteSkinVsrg = NoteSkin:new()
+local NoteSkinVsrg = NoteSkin + {}
 
-NoteSkinVsrg.setColumns = function(self, columns)
+function NoteSkinVsrg:setColumns(columns)
 	self.columns = columns
 	local inputsCount = self.inputsCount
 
@@ -52,7 +52,7 @@ NoteSkinVsrg.setColumns = function(self, columns)
 	self.columns = x
 end
 
-NoteSkinVsrg.setInput = function(self, columns)
+function NoteSkinVsrg:setInput(columns)
 	for i, input in ipairs(columns) do
 		columns[input] = 1
 	end
@@ -60,7 +60,7 @@ NoteSkinVsrg.setInput = function(self, columns)
 	self.inputsCount = #columns
 end
 
-NoteSkinVsrg.getInputColumn = function(self, inputType, inputIndex)
+function NoteSkinVsrg:getInputColumn(inputType, inputIndex)
 	local input = inputType
 	if inputIndex then
 		input = inputType .. inputIndex
@@ -72,7 +72,7 @@ NoteSkinVsrg.getInputColumn = function(self, inputType, inputIndex)
 	end
 end
 
-NoteSkinVsrg.getColumnInput = function(self, column, split)
+function NoteSkinVsrg:getColumnInput(column, split)
 	column = (column - 1) % self.inputsCount + 1
 	local input = self.inputs[column]
 	if not split then
@@ -123,7 +123,7 @@ NoteSkinVsrg.color = function(timeState, noteView)
 end
 
 local bufferColor = {0, 0, 0, 0}
-NoteSkinVsrg.multiplyColors = function(self, source, color)
+function NoteSkinVsrg:multiplyColors(source, color)
 	if type(color) == "function" then
 		color = color()
 	end
@@ -133,7 +133,7 @@ NoteSkinVsrg.multiplyColors = function(self, source, color)
 	return bufferColor
 end
 
-NoteSkinVsrg.xwToSpace = function(self, x, w)
+function NoteSkinVsrg:xwToSpace(x, w)
 	local s = {}
 	local sum = 0
 	for i = 1, #w do
@@ -151,22 +151,22 @@ local function getFrame(a, deltaTime)
 	return math.floor(deltaTime * a.rate) % a.frames * (a.range[2] - a.range[1]) / (a.frames - 1) + a.range[1]
 end
 
-NoteSkinVsrg.getTimePosition = function(self, time)
+function NoteSkinVsrg:getTimePosition(time)
 	return self.hitposition + self.unit * time
 end
 
-NoteSkinVsrg.getInverseTimePosition = function(self, pos)
+function NoteSkinVsrg:getInverseTimePosition(pos)
 	return (pos - self.hitposition) / self.unit
 end
 
-NoteSkinVsrg.getPosition = function(self, timeState)
+function NoteSkinVsrg:getPosition(timeState)
 	if self.editor then
 		return self:getTimePosition(timeState.scaledAbsoluteDeltaTime)
 	end
 	return self:getTimePosition(timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
 end
 
-NoteSkinVsrg.getInverseColumnPosition = function(self, mx)
+function NoteSkinVsrg:getInverseColumnPosition(mx)
 	for i = 1, self.inputsCount do
 		local Head = self.notes.ShortNote.Head
 		local x, w = Head.x[i], Head.w[i]
@@ -179,7 +179,7 @@ NoteSkinVsrg.getInverseColumnPosition = function(self, mx)
 	end
 end
 
-NoteSkinVsrg.setShortNote = function(self, params, noteType)
+function NoteSkinVsrg:setShortNote(params, noteType)
 	local h = params.h or 0
 	local height = {}
 	for i = 1, self.inputsCount do
@@ -220,7 +220,7 @@ NoteSkinVsrg.setShortNote = function(self, params, noteType)
 	}}
 end
 
-NoteSkinVsrg.setLongNote = function(self, params)
+function NoteSkinVsrg:setLongNote(params)
 	local h = params.h or 0
 	local headHeight = {}
 	local tailHeight = {}
@@ -334,7 +334,7 @@ local bmsLayers = {
 	-- 0x0D,
 	-- 0x0E,
 }
-NoteSkinVsrg.addBga = function(self, params)
+function NoteSkinVsrg:addBga(params)
 	local imageHead = {
 		x = {},
 		y = {},
@@ -359,7 +359,7 @@ NoteSkinVsrg.addBga = function(self, params)
 	end
 end
 
-NoteSkinVsrg.setInputListIndex = function(self, input, index)
+function NoteSkinVsrg:setInputListIndex(input, index)
 	local inputs = self.inputs
 	index = index or 1
 
@@ -372,7 +372,7 @@ NoteSkinVsrg.setInputListIndex = function(self, input, index)
 	return i
 end
 
-NoteSkinVsrg.addImageNote = function(self, head, input, params, index)
+function NoteSkinVsrg:addImageNote(head, input, params, index)
 	local i = self:setInputListIndex(input, index)
 
 	head.x[i] = params.x or 0
@@ -382,7 +382,7 @@ NoteSkinVsrg.addImageNote = function(self, head, input, params, index)
 	head.color[i] = params.color or colors.clear
 end
 
-NoteSkinVsrg.addMeasureLine = function(self, params, index)
+function NoteSkinVsrg:addMeasureLine(params, index)
 	local i = self:setInputListIndex("measure1", index)
 
 	local Head = self.notes.LongNote.Head
@@ -396,7 +396,7 @@ NoteSkinVsrg.addMeasureLine = function(self, params, index)
 	Head.image[i] = params.image
 end
 
-NoteSkinVsrg.setLighting = function(self, params)
+function NoteSkinVsrg:setLighting(params)
 	if params.range then
 		params.frames = math.abs(params.range[2] - params.range[1]) + 1
 	else
@@ -507,7 +507,7 @@ local function getAnimationImage(animations, timeState)
 	return animation.image, getFrame(animation, deltaTime)
 end
 
-NoteSkinVsrg.setAnimation = function(self, params)
+function NoteSkinVsrg:setAnimation(params)
 	params.frames = math.abs(params.range[2] - params.range[1]) + 1
 	local note = {Head = {
 		x = function(timeState, _, column) return self.columns[column] + getAnimation(params.animations, timeState).x end,

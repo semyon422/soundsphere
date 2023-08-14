@@ -1,13 +1,13 @@
-local Class = require("Class")
+local class = require("class")
 local Changes = require("Changes")
 
-local EditorChanges = Class:new()
+local EditorChanges = class()
 
-EditorChanges.construct = function(self)
-	self.changes = Changes:new()
+function EditorChanges:new()
+	self.changes = Changes()
 end
 
-EditorChanges.undo = function(self)
+function EditorChanges:undo()
 	for i in self.changes:undo() do
 		self.editorModel.layerData:syncChanges(i - 1)
 		print("undo i", i - 1)
@@ -16,7 +16,7 @@ EditorChanges.undo = function(self)
 	print("undo", self.changes)
 end
 
-EditorChanges.redo = function(self)
+function EditorChanges:redo()
 	for i in self.changes:redo() do
 		self.editorModel.layerData:syncChanges(i)
 		print("redo i", i)
@@ -25,18 +25,18 @@ EditorChanges.redo = function(self)
 	print("redo", self.changes)
 end
 
-EditorChanges.reset = function(self)
+function EditorChanges:reset()
 	self.changes:reset()
 	self.editorModel.layerData:resetRedos()
 end
 
-EditorChanges.add = function(self)
+function EditorChanges:add()
 	local i = self.changes:add()
 	self.editorModel.layerData:syncChanges(i)
 	print("add i", i)
 end
 
-EditorChanges.next = function(self)
+function EditorChanges:next()
 	self.changes:next()
 	print("next", self.changes)
 end

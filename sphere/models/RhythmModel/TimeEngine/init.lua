@@ -1,16 +1,16 @@
-local Class				= require("Class")
-local math_util				= require("math_util")
-local Observable		= require("Observable")
-local TimeManager		= require("sphere.models.RhythmModel.TimeEngine.TimeManager")
+local class = require("class")
+local math_util = require("math_util")
+local Observable = require("Observable")
+local TimeManager = require("sphere.models.RhythmModel.TimeEngine.TimeManager")
 
-local TimeEngine = Class:new()
+local TimeEngine = class()
 
 TimeEngine.timeToPrepare = 2
 
-TimeEngine.construct = function(self)
-	self.observable = Observable:new()
+function TimeEngine:new()
+	self.observable = Observable()
 
-	self.timer = TimeManager:new()
+	self.timer = TimeManager()
 	self.timer.timeEngine = self
 end
 
@@ -22,7 +22,7 @@ TimeEngine.targetTimeRate = 1
 TimeEngine.baseTimeRate = 1
 TimeEngine.windUp = nil
 
-TimeEngine.load = function(self)
+function TimeEngine:load()
 	self.timer:pause()
 	self.timer:setRate(self.timeRate)
 	self.timer.adjustRate = self.adjustRate
@@ -41,7 +41,7 @@ TimeEngine.load = function(self)
 	end
 end
 
-TimeEngine.sync = function(self, event)
+function TimeEngine:sync(event)
 	local timer = self.timer
 
 	timer.eventTime = event.time
@@ -63,7 +63,7 @@ TimeEngine.sync = function(self, event)
 	self.currentVisualTime = self:getVisualTime()
 end
 
-TimeEngine.getVisualTime = function(self)
+function TimeEngine:getVisualTime()
 	local nearestTime = self:getNearestTime()
 	local currentTime = self.currentTime
 	if math.abs(currentTime - nearestTime) < 0.001 then
@@ -72,14 +72,14 @@ TimeEngine.getVisualTime = function(self)
 	return currentTime
 end
 
-TimeEngine.skipIntro = function(self)
+function TimeEngine:skipIntro()
 	local skipTime = self.minTime - self.timeToPrepare * self.timeRate
 	if self.currentTime < skipTime and self.timer.isPlaying then
 		self:setPosition(skipTime)
 	end
 end
 
-TimeEngine.updateWindUp = function(self)
+function TimeEngine:updateWindUp()
 	local startTime = self.noteChart.metaData.minTime
 	local endTime = self.noteChart.metaData.maxTime
 	local currentTime = self.currentTime
@@ -91,7 +91,7 @@ TimeEngine.updateWindUp = function(self)
 	self:setTimeRate(timeRate * self.baseTimeRate)
 end
 
-TimeEngine.increaseTimeRate = function(self, delta)
+function TimeEngine:increaseTimeRate(delta)
 	local target = self.targetTimeRate
 	local newTarget = math.floor((target + delta) / delta + 0.5) * delta
 
@@ -100,7 +100,7 @@ TimeEngine.increaseTimeRate = function(self, delta)
 	end
 end
 
-TimeEngine.setPosition = function(self, position)
+function TimeEngine:setPosition(position)
 	local timer = self.timer
 	local audioEngine = self.rhythmModel.audioEngine
 
@@ -114,26 +114,26 @@ TimeEngine.setPosition = function(self, position)
 	audioEngine.forcePosition = false
 end
 
-TimeEngine.pause = function(self)
+function TimeEngine:pause()
 	self.timer:pause()
 end
 
-TimeEngine.play = function(self)
+function TimeEngine:play()
 	self.timer:play()
 end
 
-TimeEngine.setBaseTimeRate = function(self, timeRate)
+function TimeEngine:setBaseTimeRate(timeRate)
 	self.baseTimeRate = timeRate
 	self:setTimeRate(timeRate)
 end
 
-TimeEngine.setTimeRate = function(self, timeRate)
+function TimeEngine:setTimeRate(timeRate)
 	self.targetTimeRate = timeRate
 	self.timeRate = timeRate
 	self.timer:setRate(timeRate)
 end
 
-TimeEngine.loadTimePoints = function(self)
+function TimeEngine:loadTimePoints()
 	local absoluteTimes = {}
 
 	local noteChart = self.noteChart
@@ -158,7 +158,7 @@ TimeEngine.loadTimePoints = function(self)
 	self.nextTimeIndex = 1
 end
 
-TimeEngine.updateNextTimeIndex = function(self)
+function TimeEngine:updateNextTimeIndex()
 	local timeList = self.absoluteTimeList
 	while true do
 		if
@@ -172,7 +172,7 @@ TimeEngine.updateNextTimeIndex = function(self)
 	end
 end
 
-TimeEngine.getNearestTime = function(self)
+function TimeEngine:getNearestTime()
 	local timeList = self.absoluteTimeList
 	local prevTime = timeList[self.nextTimeIndex - 1]
 	local nextTime = timeList[self.nextTimeIndex]

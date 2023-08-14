@@ -1,15 +1,15 @@
-local Class = require("Class")
+local class = require("class")
 local flux = require("flux")
 
-local PauseManager = Class:new()
+local PauseManager = class()
 
-PauseManager.load = function(self)
+function PauseManager:load()
 	self.state = "play"
 	self.progress = 0
 	self.needRetry = false
 end
 
-PauseManager.setPauseTimes = function(self, config)
+function PauseManager:setPauseTimes(config)
 	self.progressTime = {
 		["play-pause"] = config.playPause,
 		["pause-play"] = config.pausePlay,
@@ -18,7 +18,7 @@ PauseManager.setPauseTimes = function(self, config)
 	}
 end
 
-PauseManager.update = function(self, dt)
+function PauseManager:update(dt)
 	self:updateState()
 
 	if self.progress == 1 then
@@ -26,7 +26,7 @@ PauseManager.update = function(self, dt)
 	end
 end
 
-PauseManager.updateState = function(self)
+function PauseManager:updateState()
 	local state = self.state
 	local progress = self.progress
 
@@ -45,7 +45,7 @@ PauseManager.updateState = function(self)
 	end
 end
 
-PauseManager.changePlayState = function(self, newState)
+function PauseManager:changePlayState(newState)
 	local state = self.state
 	local progressTime = self.progressTime
 	local progressState = state .. "-" .. newState
@@ -60,7 +60,7 @@ PauseManager.changePlayState = function(self, newState)
 	self:startProgress(time)
 end
 
-PauseManager.startProgress = function(self, time)
+function PauseManager:startProgress(time)
 	self.progress = 0
 	if self.tween then
 		self.tween:stop()
@@ -74,7 +74,7 @@ PauseManager.startProgress = function(self, time)
 	self.tween = flux.to(self, time, {progress = 1}):ease("linear")
 end
 
-PauseManager.play = function(self)
+function PauseManager:play()
 	self.rhythmModel.timeEngine:play()
 	self.rhythmModel.audioEngine:play()
 	self.rhythmModel.inputManager:loadState()
@@ -82,7 +82,7 @@ PauseManager.play = function(self)
 	love.mouse.setVisible(false)
 end
 
-PauseManager.pause = function(self)
+function PauseManager:pause()
 	self.rhythmModel.timeEngine:pause()
 	self.rhythmModel.audioEngine:pause()
 	self.rhythmModel.inputManager:saveState()
@@ -90,7 +90,7 @@ PauseManager.pause = function(self)
 	love.mouse.setVisible(true)
 end
 
-PauseManager.retry = function(self)
+function PauseManager:retry()
 	self.needRetry = true
 	self.state = "play"
 end

@@ -1,9 +1,10 @@
-local Class = require("Class")
+local class = require("class")
 local NotePartView = require("sphere.views.RhythmView.NotePartView")
 
-local NoteView = Class:new()
+local NoteView = class()
 
-NoteView.construct = function(self)
+function NoteView:new(noteType)
+	self.noteType = noteType
 	self.startChord = {}
 	self.endChord = {}
 	self.middleChord = {}
@@ -11,26 +12,26 @@ end
 
 local noteParts = {}
 
-NoteView.getNotePart = function(self, name)
+function NoteView:getNotePart(name)
 	local part = noteParts[name]
 	if not part then
-		part = NotePartView:new({name = name})
+		part = NotePartView({name = name})
 		noteParts[name] = part
 	end
 	part.noteView = self
 	return part
 end
 
-NoteView.getDraw = function(self, quad, ...)
+function NoteView:getDraw(quad, ...)
 	if quad then
 		return quad, ...
 	end
 	return ...
 end
 
-NoteView.draw = function(self) end
+function NoteView:draw() end
 
-NoteView.isVisible = function(self)
+function NoteView:isVisible()
 	return true
 end
 

@@ -1,6 +1,6 @@
 local LibraryModel = require("sphere.models.LibraryModel")
 
-local NoteChartLibraryModel = LibraryModel:extend()
+local NoteChartLibraryModel = LibraryModel + {}
 
 NoteChartLibraryModel.setId = 1
 
@@ -10,7 +10,7 @@ local function evalPath(path)
 	return path:gsub("\\", "/"):gsub("/[^/]-/%.%./", "/")
 end
 
-NoteChartItem.getBackgroundPath = function(self)
+function NoteChartItem:getBackgroundPath()
 	local path = self.path
 	if not path or not self.stagePath then
 		return
@@ -30,7 +30,7 @@ NoteChartItem.getBackgroundPath = function(self)
 	return directoryPath
 end
 
-NoteChartItem.getAudioPathPreview = function(self)
+function NoteChartItem:getAudioPathPreview()
 	if not self.path or not self.audioPath then
 		return
 	end
@@ -45,7 +45,7 @@ NoteChartItem.getAudioPathPreview = function(self)
 	return directoryPath .. "/preview.ogg", 0
 end
 
-NoteChartItem.__index = function(self, k)
+function NoteChartItem:__index(k)
 	local raw = rawget(NoteChartItem, k)
 	if raw then
 		return raw
@@ -63,19 +63,19 @@ NoteChartItem.__index = function(self, k)
 	return noteChartData and noteChartData[k] or noteChart and noteChart[k]
 end
 
-NoteChartLibraryModel.loadObject = function(self, itemIndex)
+function NoteChartLibraryModel:loadObject(itemIndex)
 	return setmetatable({
 		noteChartLibraryModel = self,
 		itemIndex = itemIndex,
 	}, NoteChartItem)
 end
 
-NoteChartLibraryModel.clear = function(self)
+function NoteChartLibraryModel:clear()
 	self.slice = nil
 	self.itemsCount = 0
 end
 
-NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
+function NoteChartLibraryModel:setNoteChartSetId(setId)
 	self.setId = setId
 	local slice = self.cacheModel.cacheDatabase.noteChartSlices[setId]
 	self.slice = slice
@@ -86,7 +86,7 @@ NoteChartLibraryModel.setNoteChartSetId = function(self, setId)
 	self.itemsCount = slice.size
 end
 
-NoteChartLibraryModel.getItemIndex = function(self, noteChartDataId, noteChartId, noteChartSetId)
+function NoteChartLibraryModel:getItemIndex(noteChartDataId, noteChartId, noteChartSetId)
 	if not noteChartDataId or not noteChartId or not noteChartSetId then
 		return 1
 	end

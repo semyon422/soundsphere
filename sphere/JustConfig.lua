@@ -1,9 +1,9 @@
 local serpent = require("serpent")
-local Class = require("Class")
+local class = require("class")
 local just = require("just")
 local imgui = require("imgui")
 
-local JustConfig = Class:new()
+local JustConfig = class()
 
 function JustConfig:get(key)
 	return self.data[key]
@@ -51,7 +51,7 @@ function JustConfig:fromFile(path)
 	local content = love.filesystem.read(path)
 	local exists = content ~= nil
 	content = content or self.defaultContent
-	local config = assert(loadstring(content))()
+	local config = assert(loadstring(content, "@" .. path))()
 	config.content = content
 	config.path = path
 	return config, exists
@@ -91,7 +91,7 @@ end
 JustConfig.defaultContent = [=[
 local JustConfig = require("sphere.JustConfig")
 
-local config = JustConfig:new()
+local config = JustConfig()
 
 config.data = --[[data]] {} --[[/data]]
 

@@ -2,15 +2,15 @@ local ListView = require("sphere.views.ListView")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 local just = require("just")
 
-local OsudirectProcessingListView = ListView:new()
+local OsudirectProcessingListView = ListView()
 
 OsudirectProcessingListView.rows = 11
 
-OsudirectProcessingListView.reloadItems = function(self)
+function OsudirectProcessingListView:reloadItems()
 	self.items = self.game.osudirectModel.processing
 end
 
-OsudirectProcessingListView.drawItem = function(self, i, w, h)
+function OsudirectProcessingListView:drawItem(i, w, h)
 	local item = self.items[i]
 
 	just.row(true)

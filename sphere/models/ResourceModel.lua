@@ -1,8 +1,8 @@
-local Class = require("Class")
-local audio			= require("audio")
-local Video			= require("Video")
-local thread	= require("thread")
-local FileFinder	= require("sphere.filesystem.FileFinder")
+local class = require("class")
+local audio = require("audio")
+local Video = require("Video")
+local thread = require("thread")
+local FileFinder = require("sphere.filesystem.FileFinder")
 local table_util = require("table_util")
 
 local _newSoundDataAsync = thread.async(function(path, sample_gain)
@@ -58,7 +58,7 @@ local loadOjm = thread.async(function(path)
 		return false, err
 	end
 
-	local ojm = OJM:new(fileData:getFFIPointer(), fileData:getSize())
+	local ojm = OJM(fileData:getFFIPointer(), fileData:getSize())
 	local soundDatas = {}
 
 	for sampleIndex, sampleData in pairs(ojm.samples) do
@@ -80,9 +80,9 @@ local loadOjmAsync = function(path)
 	return soundDatas
 end
 
-local ResourceModel = Class:new()
+local ResourceModel = class()
 
-ResourceModel.construct = function(self)
+function ResourceModel:new()
 	self.all_resources = {
 		loaded = {},
 		loading = {},
@@ -104,7 +104,7 @@ for t, list in pairs(NoteChartTypes) do
 	end
 end
 
-ResourceModel.rewind = function(self)
+function ResourceModel:rewind()
 	for _, resource in pairs(self.all_resources.loaded) do
 		if resource.rewind then
 			resource:rewind()
@@ -112,7 +112,7 @@ ResourceModel.rewind = function(self)
 	end
 end
 
-ResourceModel.load = function(self, chartPath, noteChart, callback)
+function ResourceModel:load(chartPath, noteChart, callback)
 	local noteChartType = NoteChartTypeMap[noteChart.type]
 
 	local settings = self.configModel.configs.settings
@@ -163,7 +163,7 @@ ResourceModel.load = function(self, chartPath, noteChart, callback)
 	self:process()
 end
 
-ResourceModel.loadResource = function(self, path)
+function ResourceModel:loadResource(path)
 	local fileType = FileFinder:getType(path)
 	if fileType == "audio" then
 		self.all_resources.loaded[path] = newSoundDataAsync(path, self.sample_gain)
@@ -182,13 +182,13 @@ ResourceModel.loadResource = function(self, path)
 	end
 end
 
-ResourceModel.getResource = function(self, s)
+function ResourceModel:getResource(s)
 	local aliases = self.aliases
 	local resources = self.resources
 	return resources[aliases[s]]
 end
 
-ResourceModel.loadOJM = function(self, loaded, ojmPath)
+function ResourceModel:loadOJM(loaded, ojmPath)
 	for _, path in ipairs(loaded) do
 		if not path:find(ojmPath, 1, true) then
 			self.all_resources.loaded[path]:release()
@@ -199,7 +199,7 @@ ResourceModel.loadOJM = function(self, loaded, ojmPath)
 	self.all_resources.not_loaded = {[ojmPath] = true}
 end
 
-ResourceModel.loadResources = function(self, loaded, newResources)
+function ResourceModel:loadResources(loaded, newResources)
 	local new, old, all = table_util.array_update(newResources, loaded)
 
 	for _, path in ipairs(old) do
@@ -236,7 +236,7 @@ ResourceModel.process = thread.coro(function(self)
 	isProcessing = false
 end)
 
-ResourceModel.unloadAudio = function(self)
+function ResourceModel:unloadAudio()
 	local path = next(self.all_resources.loaded)
 	while path do
 		local fileType = FileFinder:getType(path)

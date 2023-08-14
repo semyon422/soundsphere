@@ -1,19 +1,19 @@
-local Class = require("Class")
+local class = require("class")
 local EditorNoteFactory = require("sphere.models.EditorModel.EditorNoteFactory")
 
-local NoteManager = Class:new()
+local NoteManager = class()
 
-NoteManager.construct = function(self)
+function NoteManager:new()
 	self.grabbedNotes = {}
 end
 
-NoteManager.getColumnOver = function(self)
+function NoteManager:getColumnOver()
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local noteSkin = self.editorModel.noteSkin
 	return noteSkin:getInverseColumnPosition(mx)
 end
 
-NoteManager.update = function(self)
+function NoteManager:update()
 	local editor = self.editorModel:getSettings()
 	local noteSkin = self.editorModel.noteSkin
 
@@ -32,7 +32,7 @@ NoteManager.update = function(self)
 	end
 end
 
-NoteManager.copyNotes = function(self, cut)
+function NoteManager:copyNotes(cut)
 	if cut then
 		self.editorModel.editorChanges:reset()
 	end
@@ -62,7 +62,7 @@ NoteManager.copyNotes = function(self, cut)
 	end
 end
 
-NoteManager.deleteNotes = function(self)
+function NoteManager:deleteNotes()
 	self.editorModel.editorChanges:reset()
 	local c = 0
 	-- local noteSkin = self.editorModel.noteSkin
@@ -77,7 +77,7 @@ NoteManager.deleteNotes = function(self)
 	return c
 end
 
-NoteManager.pasteNotes = function(self)
+function NoteManager:pasteNotes()
 	local copiedNotes = self.copiedNotes
 	if not copiedNotes then
 		return
@@ -92,7 +92,7 @@ NoteManager.pasteNotes = function(self)
 	self.editorModel.editorChanges:next()
 end
 
-NoteManager.grabNotes = function(self, part, mouseTime)
+function NoteManager:grabNotes(part, mouseTime)
 	local noteSkin = self.editorModel.noteSkin
 	local editor = self.editorModel:getSettings()
 
@@ -109,7 +109,7 @@ NoteManager.grabNotes = function(self, part, mouseTime)
 	end
 end
 
-NoteManager.dropNotes = function(self, mouseTime)
+function NoteManager:dropNotes(mouseTime)
 	local editor = self.editorModel:getSettings()
 	local grabbedNotes = self.grabbedNotes
 	self.grabbedNotes = {}
@@ -130,23 +130,23 @@ NoteManager.dropNotes = function(self, mouseTime)
 	self.editorModel.editorChanges:next()
 end
 
-NoteManager._removeNote = function(self, note)
+function NoteManager:_removeNote(note)
 	note:remove()
 	self.editorModel.editorChanges:add()
 end
 
-NoteManager.removeNote = function(self, note)
+function NoteManager:removeNote(note)
 	self.editorModel.editorChanges:reset()
 	self:_removeNote(note)
 	self.editorModel.editorChanges:next()
 end
 
-NoteManager._addNote = function(self, note)
+function NoteManager:_addNote(note)
 	note:add()
 	self.editorModel.editorChanges:add()
 end
 
-NoteManager.newNote = function(self, noteType, absoluteTime, inputType, inputIndex)
+function NoteManager:newNote(noteType, absoluteTime, inputType, inputIndex)
 	local note = EditorNoteFactory:newNote(noteType)
 	if not note then
 		return
@@ -160,7 +160,7 @@ NoteManager.newNote = function(self, noteType, absoluteTime, inputType, inputInd
 	return note:create(absoluteTime)
 end
 
-NoteManager.addNote = function(self, absoluteTime, inputType, inputIndex)
+function NoteManager:addNote(absoluteTime, inputType, inputIndex)
 	local editorModel = self.editorModel
 	editorModel.editorChanges:reset()
 	local editor = editorModel:getSettings()
@@ -188,7 +188,7 @@ NoteManager.addNote = function(self, absoluteTime, inputType, inputIndex)
 	end
 end
 
-NoteManager.flipNotes = function(self)
+function NoteManager:flipNotes()
 	local editorModel = self.editorModel
 	local noteSkin = self.editorModel.noteSkin
 

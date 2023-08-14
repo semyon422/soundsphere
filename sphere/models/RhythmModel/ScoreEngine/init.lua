@@ -1,15 +1,15 @@
-local Class				= require("Class")
-local Observable		= require("Observable")
-local ScoreSystemContainer	= require("sphere.models.RhythmModel.ScoreEngine.ScoreSystemContainer")
+local class = require("class")
+local Observable = require("Observable")
+local ScoreSystemContainer = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystemContainer")
 
-local ScoreEngine = Class:new()
+local ScoreEngine = class()
 
-ScoreEngine.construct = function(self)
-	self.observable = Observable:new()
-	self.scoreSystem = ScoreSystemContainer:new()
+function ScoreEngine:new()
+	self.observable = Observable()
+	self.scoreSystem = ScoreSystemContainer()
 end
 
-ScoreEngine.load = function(self)
+function ScoreEngine:load()
 	local scoreSystem = self.scoreSystem
 	scoreSystem.scoreEngine = self
 	scoreSystem:load()
@@ -28,7 +28,7 @@ ScoreEngine.load = function(self)
 	self.maxTime = self.noteChart.metaData.maxTime
 end
 
-ScoreEngine.update = function(self)
+function ScoreEngine:update()
 	local timeEngine = self.rhythmModel.timeEngine
 	local timer = timeEngine.timer
 	local currentTime = timeEngine.currentTime

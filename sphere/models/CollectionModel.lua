@@ -1,6 +1,6 @@
-local Class = require("Class")
+local class = require("class")
 
-local CollectionModel = Class:new()
+local CollectionModel = class()
 
 CollectionModel.basePath = "userdata/charts"
 
@@ -11,7 +11,7 @@ for i = 1, #ignoredNames do
 	ignoredNames[ignoredNames[i]] = true
 end
 
-CollectionModel.load = function(self)
+function CollectionModel:load()
 	self.config = self.configModel.configs.select
 	local collectionPath = self.config.collection
 	local basePath = self.basePath
@@ -54,7 +54,7 @@ CollectionModel.load = function(self)
 	self.items = items
 end
 
-CollectionModel.getItemIndex = function(self, path)
+function CollectionModel:getItemIndex(path)
 	local items = self.items
 
 	if not items then

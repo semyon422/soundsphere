@@ -1,28 +1,36 @@
-local Class = require("Class")
+local class = require("class")
 local NoteSkinData = require("sphere.models.NoteSkinModel.NoteSkinData")
 
-local NoteSkin = Class:new()
+local NoteSkin = class()
 
-NoteSkin.construct = function(self)
+function NoteSkin:new(skin)
 	self.notes = {}
 	self.inputs = {}
 	self.textures = {}
 	self.images = {}
 	self.blendModes = {}
 
-	self.data = NoteSkinData:new()
+	self.data = NoteSkinData()
 	self.data.noteSkin = self
+
+	if not skin then
+		return
+	end
+
+	for k, v in pairs(skin) do
+		self[k] = v
+	end
 end
 
-NoteSkin.loadData = function(self)
+function NoteSkin:loadData()
 	self.data:load()
 end
 
-NoteSkin.check = function(self, note)
+function NoteSkin:check(note)
 	return self.notes[note.noteType] and self.inputs[note.inputType .. note.inputIndex]
 end
 
-NoteSkin.getColumn = function(self, input, index)
+function NoteSkin:getColumn(input, index)
 	local inputs = self.inputs
 	index = index or 1
 
@@ -37,7 +45,7 @@ NoteSkin.getColumn = function(self, input, index)
 	end
 end
 
-NoteSkin.getValue = function(self, value, column, timeState, noteView)
+function NoteSkin:getValue(value, column, timeState, noteView)
 	if type(value) == "table" then
 		value = value[column]
 	end
@@ -47,7 +55,7 @@ NoteSkin.getValue = function(self, value, column, timeState, noteView)
 	return value
 end
 
-NoteSkin.get = function(self, noteView, part, key, timeState)
+function NoteSkin:get(noteView, part, key, timeState)
 	local note = noteView.graphicalNote
 	local noteType = noteView.noteType
 	local column = self:getColumn(note.inputType .. note.inputIndex, noteView.index)
@@ -60,12 +68,12 @@ NoteSkin.get = function(self, noteView, part, key, timeState)
 	return self:getValue(value, column, timeState, noteView)
 end
 
-NoteSkin.setTextures = function(self, textures)
+function NoteSkin:setTextures(textures)
 	self.textures = textures
 	return textures
 end
 
-NoteSkin.setImagesAuto = function(self, images)
+function NoteSkin:setImagesAuto(images)
 	images = images or {}
 	for i, texture in ipairs(self.textures) do
 		local k, v = next(texture)
@@ -74,7 +82,7 @@ NoteSkin.setImagesAuto = function(self, images)
 	return self:setImages(images)
 end
 
-NoteSkin.setImages = function(self, images)
+function NoteSkin:setImages(images)
 	local map = {}
 	for i, texture in ipairs(self.textures) do
 		local k, v = next(texture)
@@ -87,12 +95,12 @@ NoteSkin.setImages = function(self, images)
 	return images
 end
 
-NoteSkin.setBlendModes = function(self, blendModes)
+function NoteSkin:setBlendModes(blendModes)
 	self.blendModes = blendModes
 	return blendModes
 end
 
-NoteSkin.getDimensions = function(self, imageName)
+function NoteSkin:getDimensions(imageName)
 	local image = self.images[imageName]
 	if not image then
 		return 1, 1

@@ -1,19 +1,19 @@
-local Class = require("Class")
+local class = require("class")
 local erfunc = require("libchart.erfunc")
 local thread = require("thread")
 local ScoreDatabase = require("sphere.models.ScoreModel.ScoreDatabase")
 
-local ScoreModel = Class:new()
+local ScoreModel = class()
 
-ScoreModel.load = function(self)
+function ScoreModel:load()
 	ScoreDatabase:load()
 end
 
-ScoreModel.unload = function(self)
+function ScoreModel:unload()
 	ScoreDatabase:unload()
 end
 
-ScoreModel.transformScoreEntry = function(self, score)
+function ScoreModel:transformScoreEntry(score)
 	local window = self.configModel.configs.settings.gameplay.ratingHitTimingWindow
 	local s = erfunc.erf(window / (score.accuracy * math.sqrt(2)))
 	score.rating = score.difficulty * s
@@ -25,7 +25,7 @@ ScoreModel.transformScoreEntry = function(self, score)
 	end
 end
 
-ScoreModel.getScoreEntries = function(self, hash, index)
+function ScoreModel:getScoreEntries(hash, index)
 	local scores = ScoreDatabase:getScoreEntries(hash, index)
 	for i = 1, #scores do
 		self:transformScoreEntry(scores[i])
@@ -33,12 +33,12 @@ ScoreModel.getScoreEntries = function(self, hash, index)
 	return scores
 end
 
-ScoreModel.getScoreEntryById = function(self, id)
+function ScoreModel:getScoreEntryById(id)
 	local score = ScoreDatabase:selectScore(id)
 	return score and self:transformScoreEntry(score)
 end
 
-ScoreModel.insertScore = function(self, scoreSystemEntry, noteChartDataEntry, replayHash, modifiers)
+function ScoreModel:insertScore(scoreSystemEntry, noteChartDataEntry, replayHash, modifiers)
 	local score = ScoreDatabase:insertScore({
 		noteChartHash = noteChartDataEntry.hash,
 		noteChartIndex = noteChartDataEntry.index,
@@ -76,7 +76,7 @@ local sortScores = function(a, b)
 		return a.rating > b.rating
 	end
 end
-ScoreModel.calculateTopScore = function(self, scores)
+function ScoreModel:calculateTopScore(scores)
 	local counter = 0
 	table.sort(scores, sortScores)
 	for i, score in ipairs(scores) do
@@ -95,7 +95,7 @@ ScoreModel.calculateTopScore = function(self, scores)
 	end
 	return counter
 end
-ScoreModel.calculateTopScores = function(self)
+function ScoreModel:calculateTopScores()
 	local time = love.timer.getTime()
 	print("calculating top scores")
 	local map = {}
@@ -119,11 +119,11 @@ local calculateTopScores = thread.async(function()
 	local game = {}
 
 	local ConfigModel = require("sphere.models.ConfigModel")
-	game.configModel = ConfigModel:new()
+	game.configModel = ConfigModel()
 	game.configModel:read("settings")
 
 	local ScoreModel = require("sphere.models.ScoreModel")
-	local scoreModel = ScoreModel:new()
+	local scoreModel = ScoreModel()
 	scoreModel.game = game
 	game.scoreModel = scoreModel
 

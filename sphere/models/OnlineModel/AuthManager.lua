@@ -1,10 +1,10 @@
-local Class = require("Class")
-local thread	= require("thread")
+local class = require("class")
+local thread = require("thread")
 local inspect = require("inspect")
 
-local AuthManager = Class:new()
+local AuthManager = class()
 
-AuthManager.checkUserAsync = function(self)
+function AuthManager:checkUserAsync()
 	local webApi = self.webApi
 	local api = webApi.api
 	local config = self.config
@@ -20,7 +20,7 @@ AuthManager.checkUserAsync = function(self)
 end
 AuthManager.checkUser = thread.coro(AuthManager.checkUserAsync)
 
-AuthManager.checkSessionAsync = function(self)
+function AuthManager:checkSessionAsync()
 	local webApi = self.webApi
 	local api = webApi.api
 	local config = self.config
@@ -45,7 +45,7 @@ AuthManager.checkSessionAsync = function(self)
 end
 AuthManager.checkSession = thread.coro(AuthManager.checkSessionAsync)
 
-AuthManager.updateSessionAsync = function(self)
+function AuthManager:updateSessionAsync()
 	local webApi = self.webApi
 	local api = webApi.api
 	local config = self.config
@@ -74,7 +74,7 @@ AuthManager.updateSessionAsync = function(self)
 end
 AuthManager.updateSession = thread.coro(AuthManager.updateSessionAsync)
 
-AuthManager.quickGetKeyAsync = function(self)
+function AuthManager:quickGetKeyAsync()
 	local api = self.webApi.api
 	local config = self.config
 	config.quick_login_key = ""
@@ -93,7 +93,7 @@ AuthManager.quickGetKeyAsync = function(self)
 end
 AuthManager.quickGetKey = thread.coro(AuthManager.quickGetKeyAsync)
 
-AuthManager.quickGetTokenAsync = function(self)
+function AuthManager:quickGetTokenAsync()
 	local api = self.webApi.api
 	local config = self.config
 	local key = config.quick_login_key
@@ -123,7 +123,7 @@ AuthManager.quickGetTokenAsync = function(self)
 end
 AuthManager.quickGetToken = thread.coro(AuthManager.quickGetTokenAsync)
 
-AuthManager.quickLogin = function(self)
+function AuthManager:quickLogin()
 	print("quick login")
 	local config = self.config
 	local key = config.quick_login_key
@@ -135,7 +135,7 @@ AuthManager.quickLogin = function(self)
 	end
 end
 
-AuthManager.loginAsync = function(self, email, password)
+function AuthManager:loginAsync(email, password)
 	print("login")
 	local api = self.webApi.api
 	local config = self.config
@@ -162,7 +162,7 @@ AuthManager.loginAsync = function(self, email, password)
 end
 AuthManager.login = thread.coro(AuthManager.loginAsync)
 
-AuthManager.logoutAsync = function(self)
+function AuthManager:logoutAsync()
 	local webApi = self.webApi
 	local api = webApi.api
 	local config = self.config

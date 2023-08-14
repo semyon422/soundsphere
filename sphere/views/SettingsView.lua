@@ -66,7 +66,7 @@ local function intButtonsMs(id, v, label)
 	return imgui.intButtons(id, v * 1000, 1, label) / 1000
 end
 
-drawSection.gameplay = function(self)
+function drawSection:gameplay()
 	local settings = self.game.configModel.configs.settings
 	local g = settings.gameplay
 	local i = settings.input
@@ -154,7 +154,7 @@ local vsyncNames = {
 local function formatVsync(v)
 	return vsyncNames[v] or ""
 end
-drawSection.graphics = function(self)
+function drawSection:graphics()
 	local settings = self.game.configModel.configs.settings
 	local g = settings.graphics
 
@@ -231,7 +231,7 @@ local function deviceToString(d)
 	return d.driver or d.name
 	-- return ("%s - %s - %s - %s"):format(d.id, d.name, d.driver, d.flags)
 end
-drawSection.audio = function(self)
+function drawSection:audio()
 	local settings = self.game.configModel.configs.settings
 	local a = settings.audio
 
@@ -308,7 +308,7 @@ drawSection.audio = function(self)
 	end
 end
 
-drawSection.input = function(self)
+function drawSection:input()
 	local settings = self.game.configModel.configs.settings
 	local i = settings.input
 
@@ -317,7 +317,7 @@ drawSection.input = function(self)
 	i.screenshot.open = imgui.hotkey("screenshot.open", i.screenshot.open, "open screenshot")
 end
 
-drawSection.misc = function(self)
+function drawSection:misc()
 	local settings = self.game.configModel.configs.settings
 	local m = settings.miscellaneous
 

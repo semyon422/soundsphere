@@ -1,21 +1,21 @@
-local Class = require("Class")
+local class = require("class")
 local just = require("just")
 local spherefonts = require("sphere.assets.fonts")
 local gfx_util = require("gfx_util")
 
-local DropdownView = Class:new()
+local DropdownView = class()
 
 DropdownView.padding = 6
 DropdownView.font = {"Noto Sans", 20}
 
-DropdownView.scroll = function(self, delta) end
-DropdownView.select = function(self, i) end
+function DropdownView:scroll(delta) end
+function DropdownView:select(i) end
 
-DropdownView.getCount = function(self) end
-DropdownView.getPreview = function(self) end
-DropdownView.getItemText = function(self, i) end
+function DropdownView:getCount() end
+function DropdownView:getPreview() end
+function DropdownView:getItemText(i) end
 
-DropdownView.draw = function(self)
+function DropdownView:draw()
 	local tf = gfx_util.transform(self.transform):translate(self.x, self.y)
 	love.graphics.replaceTransform(tf)
 

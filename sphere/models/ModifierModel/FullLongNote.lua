@@ -1,7 +1,7 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 local NoteData = require("ncdk.NoteData")
 
-local FullLongNote = Modifier:new()
+local FullLongNote = Modifier + {}
 
 FullLongNote.type = "NoteChartModifier"
 FullLongNote.interfaceType = "slider"
@@ -13,15 +13,15 @@ FullLongNote.range = {0, 3}
 
 FullLongNote.description = "Replace short notes with long notes"
 
-FullLongNote.getString = function(self, config)
+function FullLongNote:getString(config)
 	return "FLN"
 end
 
-FullLongNote.getSubString = function(self, config)
+function FullLongNote:getSubString(config)
 	return config.value
 end
 
-FullLongNote.apply = function(self, config)
+function FullLongNote:apply(config)
 	self.notes = {}
 
 	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
@@ -55,7 +55,7 @@ FullLongNote.apply = function(self, config)
 	self.noteChart:compute()
 end
 
-FullLongNote.processNoteData = function(self, noteDataIndex)
+function FullLongNote:processNoteData(noteDataIndex)
 	local notes = self.notes
 	local n = notes[noteDataIndex]
 	if n.noteData.noteType ~= "ShortNote" then
@@ -107,7 +107,7 @@ FullLongNote.processNoteData = function(self, noteDataIndex)
 
 	n.noteData.noteType = "LongNoteStart"
 
-	local endNoteData = NoteData:new(endTimePoint)
+	local endNoteData = NoteData(endTimePoint)
 	endNoteData.noteType = "LongNoteEnd"
 
 	endNoteData.startNoteData = n.noteData
@@ -117,7 +117,7 @@ FullLongNote.processNoteData = function(self, noteDataIndex)
 	noteChart.layerDatas[n.layerDataIndex]:addNoteData(endNoteData, n.inputType, n.inputIndex)
 end
 
-FullLongNote.cleanTimePointList = function(self, timePointList, _n)
+function FullLongNote:cleanTimePointList(timePointList, _n)
 	local out = {}
 	out[#out + 1] = timePointList[1]
 

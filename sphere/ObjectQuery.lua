@@ -1,24 +1,24 @@
-local Class = require("Class")
+local class = require("class")
 
-local ObjectQuery = Class:new()
+local ObjectQuery = class()
 
-ObjectQuery.construct = function(self)
+function ObjectQuery:new()
 	self.joins = {}
 end
 
-ObjectQuery.setJoin = function(self, t, dbTable, on)
+function ObjectQuery:setJoin(t, dbTable, on)
 	table.insert(self.joins, {t .. " JOIN", dbTable, on})
 end
 
-ObjectQuery.setInnerJoin = function(self, dbTable, on)
+function ObjectQuery:setInnerJoin(dbTable, on)
 	self:setJoin("INNER", dbTable, on)
 end
 
-ObjectQuery.setLeftJoin = function(self, dbTable, on)
+function ObjectQuery:setLeftJoin(dbTable, on)
 	self:setJoin("LEFT", dbTable, on)
 end
 
-ObjectQuery.newBooleanCase = function(self, field, condition)
+function ObjectQuery:newBooleanCase(field, condition)
 	return ([[
 		CASE WHEN %s THEN TRUE
 		ELSE FALSE
@@ -26,7 +26,7 @@ ObjectQuery.newBooleanCase = function(self, field, condition)
 	]]):format(condition, field)
 end
 
-ObjectQuery.concatJoins = function(self)
+function ObjectQuery:concatJoins()
 	local out = {}
 	for _, join in ipairs(self.joins) do
 		table.insert(out, join[1] .. " " .. join[2] .. " ON " .. join[3])
@@ -34,7 +34,7 @@ ObjectQuery.concatJoins = function(self)
 	return table.concat(out, "\n")
 end
 
-ObjectQuery.getQueryParams = function(self)
+function ObjectQuery:getQueryParams()
 	local out = {}
 
 	table.insert(out, ("SELECT %s"):format(table.concat(self.fields, ", ")))
@@ -54,7 +54,7 @@ ObjectQuery.getQueryParams = function(self)
 	return table.concat(out, " ")
 end
 
-ObjectQuery.getCountQueryParams = function(self)
+function ObjectQuery:getCountQueryParams()
 	local out = {}
 
 	table.insert(out, "SELECT COUNT(1) as c")
@@ -71,7 +71,7 @@ ObjectQuery.getCountQueryParams = function(self)
 	return table.concat(out, " ")
 end
 
-ObjectQuery.getCount = function(self)
+function ObjectQuery:getCount()
 	local out = {}
 
 	table.insert(out, "SELECT COUNT(1) as c")

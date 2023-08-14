@@ -2,11 +2,11 @@ local ListView = require("sphere.views.ListView")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 local just = require("just")
 
-local OsudirectDifficultiesListView = ListView:new()
+local OsudirectDifficultiesListView = ListView()
 
 OsudirectDifficultiesListView.rows = 5
 
-OsudirectDifficultiesListView.reloadItems = function(self)
+function OsudirectDifficultiesListView:reloadItems()
 	self.items = self.game.osudirectModel:getDifficulties()
 	if self.itemIndex > #self.items then
 		self.targetItemIndex = 1
@@ -14,7 +14,7 @@ OsudirectDifficultiesListView.reloadItems = function(self)
 	end
 end
 
-OsudirectDifficultiesListView.drawItem = function(self, i, w, h)
+function OsudirectDifficultiesListView:drawItem(i, w, h)
 	local item = self.items[i]
 
 	just.indent(22)

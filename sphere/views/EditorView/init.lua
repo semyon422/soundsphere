@@ -14,10 +14,10 @@ local WaveformView = require("sphere.views.EditorView.WaveformView")
 local OnsetsView = require("sphere.views.EditorView.OnsetsView")
 local OnsetsDistView = require("sphere.views.EditorView.OnsetsDistView")
 
-local EditorView = ScreenView:new()
+local EditorView = ScreenView + {}
 
-EditorView.construct = function(self)
-	self.sequenceView = SequenceView:new()
+function EditorView:new()
+	self.sequenceView = SequenceView()
 end
 
 local loading
@@ -32,7 +32,7 @@ EditorView.load = thread.coro(function(self)
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	local playfield = noteSkin.playField
 
-	self.snapGridView = SnapGridView:new()
+	self.snapGridView = SnapGridView()
 	self.snapGridView.game = self.game
 	self.snapGridView.transform = playfield:newNoteskinTransform()
 	self.transform = playfield:newNoteskinTransform()
@@ -47,18 +47,18 @@ EditorView.load = thread.coro(function(self)
 	loading = false
 end)
 
-EditorView.update = function(self, dt)
+function EditorView:update(dt)
 	love.graphics.replaceTransform(gfx_util.transform(self.transform))
 	self.game.editorModel:update()
 	self.sequenceView:update(dt)
 end
 
-EditorView.receive = function(self, event)
+function EditorView:receive(event)
 	self.game.editorController:receive(event)
 	self.sequenceView:receive(event)
 end
 
-EditorView.draw = function(self)
+function EditorView:draw()
 	just.container("screen container", true)
 
 	local kp = just.keypressed
@@ -79,11 +79,11 @@ EditorView.draw = function(self)
 	just.container()
 end
 
-EditorView.quit = function(self)
+function EditorView:quit()
 	self:changeScreen("selectView")
 end
 
-EditorView.unload = function(self)
+function EditorView:unload()
 	self.game.editorController:unload()
 	self.sequenceView:unload()
 end

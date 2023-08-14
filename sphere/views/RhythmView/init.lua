@@ -1,12 +1,12 @@
-local Class = require("Class")
+local class = require("class")
 local NoteViewFactory = require("sphere.views.RhythmView.NoteViewFactory")
 local gfx_util = require("gfx_util")
 
-local RhythmView = Class:new()
+local RhythmView = class()
 
 RhythmView.mode = "default"
 
-RhythmView.processNotes = function(self, f)
+function RhythmView:processNotes(f)
 	for _, noteDrawer in ipairs(self.game.rhythmModel.graphicEngine.noteDrawers) do
 		for i = noteDrawer.startNoteIndex, noteDrawer.endNoteIndex do
 			f(self, noteDrawer.notes[i])
@@ -14,7 +14,7 @@ RhythmView.processNotes = function(self, f)
 	end
 end
 
-RhythmView.fillChord = function(self, note)
+function RhythmView:fillChord(note)
 	local noteSkin = self.game.noteSkinModel.noteSkin
 
 	local noteView = NoteViewFactory:getNoteView(note, self.mode)
@@ -33,7 +33,7 @@ RhythmView.fillChord = function(self, note)
 	end
 end
 
-RhythmView.drawNote = function(self, note)
+function RhythmView:drawNote(note)
 	local noteSkin = self.game.noteSkinModel.noteSkin
 
 	for j = 1, noteSkin:check(note) or 0 do
@@ -49,7 +49,7 @@ RhythmView.drawNote = function(self, note)
 	end
 end
 
-RhythmView.drawSelected = function(self, note)
+function RhythmView:drawSelected(note)
 	local noteSkin = self.game.noteSkinModel.noteSkin
 
 	for j = 1, noteSkin:check(note) or 0 do
@@ -66,9 +66,9 @@ RhythmView.drawSelected = function(self, note)
 	end
 end
 
-RhythmView.pressNote = function(self, noteData) end
+function RhythmView:pressNote(noteData) end
 
-RhythmView.draw = function(self)
+function RhythmView:draw()
 	love.graphics.replaceTransform(gfx_util.transform(self.transform))
 	love.graphics.setColor(1, 1, 1, 1)
 

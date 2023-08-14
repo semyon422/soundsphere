@@ -1,8 +1,8 @@
 
 local NoteChartFactory = require("notechart.NoteChartFactory")
-local Class = require("Class")
+local class = require("class")
 
-local NoteChartFinder = Class:new()
+local NoteChartFinder = class()
 
 local function lookup(directoryPath, recursive, checkSet)
 	local items = love.filesystem.getDirectoryItems(directoryPath)
@@ -42,7 +42,7 @@ local function lookup(directoryPath, recursive, checkSet)
 	end
 end
 
-NoteChartFinder.newFileIterator = function(self, directoryPath, recursive, checkSet)
+function NoteChartFinder:newFileIterator(directoryPath, recursive, checkSet)
 	return coroutine.wrap(function()
 		lookup(directoryPath, recursive, checkSet)
 	end)

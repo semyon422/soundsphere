@@ -1,11 +1,11 @@
-local Class = require("Class")
+local class = require("class")
 local FileFinder = require("sphere.filesystem.FileFinder")
 local math_util = require("math_util")
 local InputMode = require("ncdk.InputMode")
 
-local GameplayController = Class:new()
+local GameplayController = class()
 
-GameplayController.load = function(self)
+function GameplayController:load()
 	self.loaded = true
 
 	local rhythmModel = self.rhythmModel
@@ -22,7 +22,7 @@ GameplayController.load = function(self)
 
 	local state = {}
 	state.timeRate = 1
-	state.inputMode = InputMode:new()
+	state.inputMode = InputMode()
 	state.inputMode:set(noteChart.inputMode)
 
 	modifierModel:applyMeta(state)
@@ -92,14 +92,14 @@ GameplayController.load = function(self)
 	self.previewModel:stop()
 end
 
-GameplayController.getImporterSettings = function(self)
+function GameplayController:getImporterSettings()
 	local config = self.configModel.configs.settings
 	return {
 		midiConstantVolume = config.audio.midi.constantVolume
 	}
 end
 
-GameplayController.unload = function(self)
+function GameplayController:unload()
 	self.loaded = false
 
 	self.discordModel:setPresence({})
@@ -120,12 +120,12 @@ GameplayController.unload = function(self)
 	self.multiplayerModel:setIsPlaying(false)
 end
 
-GameplayController.update = function(self, dt)
+function GameplayController:update(dt)
 	self.replayModel:update()
 	self.rhythmModel:update(dt)
 end
 
-GameplayController.discordPlay = function(self)
+function GameplayController:discordPlay()
 	local noteChartDataEntry = self.noteChartModel.noteChartDataEntry
 	local rhythmModel = self.rhythmModel
 	local length = math.min(noteChartDataEntry.length, 3600 * 24)
@@ -142,7 +142,7 @@ GameplayController.discordPlay = function(self)
 	})
 end
 
-GameplayController.discordPause = function(self)
+function GameplayController:discordPause()
 	local noteChartDataEntry = self.noteChartModel.noteChartDataEntry
 	self.discordModel:setPresence({
 		state = "Playing (paused)",
@@ -154,7 +154,7 @@ GameplayController.discordPause = function(self)
 	})
 end
 
-GameplayController.changePlayState = function(self, state)
+function GameplayController:changePlayState(state)
 	if self.multiplayerModel.room then
 		return
 	end
@@ -168,11 +168,11 @@ GameplayController.changePlayState = function(self, state)
 	self.rhythmModel.pauseManager:changePlayState(state)
 end
 
-GameplayController.receive = function(self, event)
+function GameplayController:receive(event)
 	self.rhythmModel:receive(event)
 end
 
-GameplayController.retry = function(self)
+function GameplayController:retry()
 	local rhythmModel = self.rhythmModel
 
 	rhythmModel.inputManager:setMode("external")
@@ -190,17 +190,17 @@ GameplayController.retry = function(self)
 	self:play()
 end
 
-GameplayController.pause = function(self)
+function GameplayController:pause()
 	self.rhythmModel.pauseManager:pause()
 	self:discordPause()
 end
 
-GameplayController.play = function(self)
+function GameplayController:play()
 	self.rhythmModel.pauseManager:play()
 	self:discordPlay()
 end
 
-GameplayController.saveCamera = function(self, x, y, z, pitch, yaw)
+function GameplayController:saveCamera(x, y, z, pitch, yaw)
 	local perspective = self.configModel.configs.settings.graphics.perspective
 	perspective.x = x
 	perspective.y = y
@@ -209,11 +209,11 @@ GameplayController.saveCamera = function(self, x, y, z, pitch, yaw)
 	perspective.yaw = yaw
 end
 
-GameplayController.hasResult = function(self)
+function GameplayController:hasResult()
 	return self.rhythmModel:hasResult() and self.replayModel.mode ~= "replay"
 end
 
-GameplayController.saveScore = function(self)
+function GameplayController:saveScore()
 	local rhythmModel = self.rhythmModel
 	local noteChartModel = self.noteChartModel
 	local modifierModel = self.modifierModel
@@ -237,7 +237,7 @@ GameplayController.saveScore = function(self)
 	self.configModel.configs.select.scoreEntryId = scoreEntry.id
 end
 
-GameplayController.skip = function(self)
+function GameplayController:skip()
 	local rhythmModel = self.rhythmModel
 	local timeEngine = rhythmModel.timeEngine
 
@@ -251,11 +251,11 @@ GameplayController.skip = function(self)
 	rhythmModel.scoreEngine:update()
 end
 
-GameplayController.skipIntro = function(self)
+function GameplayController:skipIntro()
 	self.rhythmModel.timeEngine:skipIntro()
 end
 
-GameplayController.updateOffsets = function(self)
+function GameplayController:updateOffsets()
 	local rhythmModel = self.rhythmModel
 	local noteChartDataEntry = self.noteChartModel.noteChartDataEntry
 	local config = self.configModel.configs.settings
@@ -274,7 +274,7 @@ GameplayController.updateOffsets = function(self)
 	rhythmModel:setVisualOffset(visualOffset)
 end
 
-GameplayController.increasePlaySpeed = function(self, delta)
+function GameplayController:increasePlaySpeed(delta)
 	local speedModel = self.speedModel
 	speedModel:increase(delta)
 
@@ -283,7 +283,7 @@ GameplayController.increasePlaySpeed = function(self, delta)
 	self.notificationModel:notify("scroll speed: " .. speedModel.format[gameplay.speedType]:format(speedModel:get()))
 end
 
-GameplayController.increaseLocalOffset = function(self, delta)
+function GameplayController:increaseLocalOffset(delta)
 	local entry = self.noteChartModel.noteChartDataEntry
 	entry.localOffset = math_util.round((entry.localOffset or 0) + delta, delta)
 	self.cacheModel.chartRepo:updateNoteChartDataEntry(entry)

@@ -19,10 +19,10 @@ WebReplayController.getReplay = function(replay)
 	local content = file:read("*a")
 	file:close()
 
-	return Replay:new():fromString(content)
+	return Replay():fromString(content)
 end
 
-WebReplayController.POST = function(self)
+function WebReplayController:POST()
 	local params = self.params
 
 	local noteChart = WebNoteChartController.getNoteCharts(params.notechart)[1]
@@ -30,13 +30,13 @@ WebReplayController.POST = function(self)
 
 	local replay = WebReplayController.getReplay(params.replay)
 
-	local fastplayController = FastplayController:new()
+	local fastplayController = FastplayController()
 
-	local rhythmModel = RhythmModel:new()
-	local modifierModel = ModifierModel:new()
+	local rhythmModel = RhythmModel()
+	local modifierModel = ModifierModel()
 	local noteChartModel = {}
-	local difficultyModel = DifficultyModel:new()
-	local replayModel = ReplayModel:new()
+	local difficultyModel = DifficultyModel()
+	local replayModel = ReplayModel()
 
 	local game = {}
 	game.fastplayController = fastplayController
