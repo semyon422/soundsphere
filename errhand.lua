@@ -36,8 +36,10 @@ local function draw()
 	end
 	if imgui.button("vscode", "open in vscode") then
 		local line = message:match("^[^\n]+")
-		local files = line:split(": ")
-		local last_file = files[#files - 1]
+		local last_file
+		line:gsub("([^:]+:[^:]+):", function(file)
+			last_file = file
+		end)
 		print("code -g " .. last_file)
 		os.execute("code -g " .. last_file)
 		love.event.quit()
