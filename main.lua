@@ -29,7 +29,9 @@ end
 local typecheck = require("typecheck")
 if love.filesystem.getInfo("typecheck", "file") then
 	deco.add(typecheck.TypeDecorator())
+	deco.add(typecheck.ClassDecorator())
 	print("enabled typecheck.TypeDecorator")
+	print("enabled typecheck.ClassDecorator")
 end
 
 deco.replace_loader()
