@@ -1,6 +1,8 @@
 local sqlite = require("ljsqlite3")
 local class = require("class")
 
+---@class sphere.Orm
+---@operator call: sphere.Orm
 local Orm = class()
 
 Orm.print_queries = false
@@ -10,6 +12,7 @@ function Orm:new()
 	self.table_infos = {}
 end
 
+---@param db string
 function Orm:open(db)
 	self.c = sqlite.open(db)
 end
@@ -26,6 +29,10 @@ function Orm:commit()
 	return self.c:exec("COMMIT")
 end
 
+---@param object table?
+---@param row table
+---@param colnames table
+---@return table
 local function to_object(object, row, colnames)
 	object = object or {}
 	for i, k in ipairs(colnames) do
@@ -45,6 +52,8 @@ local function to_object(object, row, colnames)
 	return object
 end
 
+---@param s string|table
+---@return string
 local function escape_identifier(s)
 	if type(s) == "table" then
 		return s[1]
@@ -53,10 +62,14 @@ local function escape_identifier(s)
 	return '`' .. (s:gsub('`', '``')) .. '`'
 end
 
+---@param query string
 function Orm:exec(query)
-	return self.c:exec(query)
+	self.c:exec(query)
 end
 
+---@param query string
+---@param ... any?
+---@return ffi.cdata*
 function Orm:stmt(query, ...)
 	if self.print_queries then
 		local values = {...}
@@ -75,6 +88,8 @@ function Orm:stmt(query, ...)
 	return stmt
 end
 
+---@param ... any?
+---@return table?
 function Orm:query(...)
 	local stmt = self:stmt(...)
 
@@ -94,6 +109,8 @@ function Orm:query(...)
 	return objects
 end
 
+---@param table_name string
+---@return table?
 function Orm:table_info(table_name)
 	local info = self.table_infos[table_name]
 	if info then
@@ -104,12 +121,21 @@ function Orm:table_info(table_name)
 	return info
 end
 
+---@param table_name string
+---@param conditions string?
+---@param ... any?
+---@return table
 function Orm:select(table_name, conditions, ...)
 	return self:query(("SELECT * FROM %s %s"):format(
 		escape_identifier(table_name), conditions and "WHERE " .. conditions or ""
 	), ...) or {}
 end
 
+---@param table_name string
+---@param values table
+---@param conditions string?
+---@param ... any?
+---@return table?
 function Orm:update(table_name, values, conditions, ...)
 	local table_info = assert(self:table_info(table_name), "no such table: " .. table_name)
 
@@ -143,12 +169,19 @@ function Orm:update(table_name, values, conditions, ...)
 	), ...)
 end
 
+---@param table_name string
+---@param conditions string?
+---@param ... any?
 function Orm:delete(table_name, conditions, ...)
 	self:query(("DELETE FROM %s WHERE %s"):format(
 		escape_identifier(table_name), conditions
 	), ...)
 end
 
+---@param table_name string
+---@param values table
+---@param ignore boolean?
+---@return table
 function Orm:insert(table_name, values, ignore)
 	local table_info = assert(self:table_info(table_name), "no such table: " .. table_name)
 

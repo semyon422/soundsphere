@@ -1,8 +1,19 @@
+---@param points table
+---@param x number
+---@param y number
 local function addPoint(points, x, y)
 	table.insert(points, x)
 	table.insert(points, y)
 end
 
+---@param mode string
+---@param x number
+---@param y number
+---@param w number
+---@param h number
+---@param r number|table
+---@param rotateLeft boolean?
+---@param rotateRight boolean?
 local function rectangle(mode, x, y, w, h, r, rotateLeft, rotateRight)
 	local r1, r2, r3, r4 = r, r, r, r
 	if type(r) == "table" then
@@ -62,6 +73,14 @@ local function rectangle(mode, x, y, w, h, r, rotateLeft, rotateRight)
 	love.graphics.polygon(mode, points)
 end
 
+---@param mode string
+---@param x number
+---@param y number
+---@param w number
+---@param h number
+---@param r number|table
+---@param rotateLeft boolean?
+---@param rotateRight boolean?
 return function(mode, x, y, w, h, r, rotateLeft, rotateRight, rotateAll)
 	love.graphics.push()
 

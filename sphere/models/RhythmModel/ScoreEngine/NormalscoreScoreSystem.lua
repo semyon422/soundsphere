@@ -1,6 +1,8 @@
 local normalscore = require("libchart.normalscore3")
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 
+---@class sphere.NormalscoreScoreSystem: sphere.ScoreSystem
+---@operator call: sphere.NormalscoreScoreSystem
 local NormalscoreScoreSystem = ScoreSystem + {}
 
 NormalscoreScoreSystem.name = "normalscore"
@@ -9,6 +11,7 @@ function NormalscoreScoreSystem:load()
 	self.normalscore = normalscore:new()
 end
 
+---@param event table
 function NormalscoreScoreSystem:after(event)
 	local ns = self.normalscore
 
@@ -23,10 +26,13 @@ function NormalscoreScoreSystem:after(event)
 	self.enps = self.scoreEngine.baseEnps * event.timeRate
 end
 
+---@param range_name string
+---@param deltaTime number
 function NormalscoreScoreSystem:hit(range_name, deltaTime)
 	self.normalscore:hit(range_name, deltaTime)
 end
 
+---@param range_name string
 function NormalscoreScoreSystem:miss(range_name)
 	self.normalscore:miss(range_name)
 end

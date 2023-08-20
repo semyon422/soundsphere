@@ -1,5 +1,7 @@
 local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 
+---@class sphere.Random: sphere.SwapModifier
+---@operator call: sphere.Random
 local Random = SwapModifier + {}
 
 Random.type = "NoteChartModifier"
@@ -13,14 +15,20 @@ Random.values = {"all", "left", "right"}
 
 Random.description = "Randomize the note chart"
 
+---@param config table
+---@return string
 function Random:getString(config)
 	return "RD"
 end
 
+---@param config table
+---@return string
 function Random:getSubString(config)
 	return config.value:sub(1, 1):upper()
 end
 
+---@param config table
+---@return table
 function Random:getMap(config)
 	local noteChart = self.noteChart
 	local value = config.value

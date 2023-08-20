@@ -7,6 +7,8 @@ local class = require("class")
 local md5 = require("md5")
 local Orm = require("sphere.Orm")
 
+---@class sphere.CacheManager
+---@operator call: sphere.CacheManager
 local CacheManager = class()
 
 function CacheManager:new()
@@ -19,6 +21,8 @@ function CacheManager:new()
 	self.chartRepo = ChartRepo()
 end
 
+---@param entry table
+---@return table
 function CacheManager:getNoteChartSetEntry(entry)
 	local oldEntry = self.chartRepo:selectNoteChartSetEntry(entry.path)
 
@@ -37,6 +41,8 @@ function CacheManager:getNoteChartSetEntry(entry)
 	return entry
 end
 
+---@param entry table
+---@param isOldEntry boolean?
 function CacheManager:setNoteChartEntry(entry, isOldEntry)
 	local oldEntry = isOldEntry and entry or self.chartRepo:selectNoteChartEntry(entry.path)
 
@@ -47,6 +53,7 @@ function CacheManager:setNoteChartEntry(entry, isOldEntry)
 	end
 end
 
+---@param entry table
 function CacheManager:setNoteChartDataEntry(entry)
 	local oldEntry = self.chartRepo:selectNoteCharDataEntry(entry.hash, entry.index)
 
@@ -59,10 +66,12 @@ end
 
 ----------------------------------------------------------------
 
+---@param entry table
 function CacheManager:deleteNoteChartEntry(entry)
 	self.chartRepo:deleteNoteChartEntry(entry.path)
 end
 
+---@param entry table
 function CacheManager:deleteNoteChartSetEntry(entry)
 	self.chartRepo:deleteNoteChartSetEntry(entry.path)
 
@@ -108,6 +117,8 @@ function CacheManager:checkProgress()
 	end
 end
 
+---@param path string
+---@param force boolean?
 function CacheManager:generateCacheFull(path, force)
 	local path = path or "userdata/charts"
 	self.chartRepo:load()
@@ -129,6 +140,8 @@ function CacheManager:generateCacheFull(path, force)
 	self:checkProgress()
 end
 
+---@param directoryPath string
+---@param recursive boolean?
 function CacheManager:lookup(directoryPath, recursive)
 	local iterator = NoteChartFinder:newFileIterator(directoryPath, recursive, function(...)
 		return self:checkNoteChartSetEntry(...)
@@ -149,6 +162,8 @@ function CacheManager:lookup(directoryPath, recursive)
 	end
 end
 
+---@param path string
+---@return boolean
 function CacheManager:checkNoteChartSetEntry(path)
 	local entry = self.chartRepo:selectNoteChartSetEntry(path)
 	if not entry then
@@ -163,6 +178,8 @@ function CacheManager:checkNoteChartSetEntry(path)
 	return false
 end
 
+---@param noteChartSetPath string
+---@return table
 function CacheManager:processNoteChartSet(noteChartSetPath)
 	local info = love.filesystem.getInfo(noteChartSetPath)
 	local noteChartSetEntry = self:getNoteChartSetEntry({
@@ -182,6 +199,8 @@ function CacheManager:processNoteChartSet(noteChartSetPath)
 	return noteChartSetEntry
 end
 
+---@param noteChartPath string
+---@param noteChartSetEntry table
 function CacheManager:processNoteChartEntries(noteChartPath, noteChartSetEntry)
 	local info = love.filesystem.getInfo(noteChartPath)
 	local lastModified = info.modtime
@@ -207,6 +226,8 @@ function CacheManager:processNoteChartEntries(noteChartPath, noteChartSetEntry)
 	end
 end
 
+---@param path string
+---@param force boolean?
 function CacheManager:generate(path, force)
 	local entries = self.chartRepo:selectNoteChartSets(path)
 
@@ -238,10 +259,13 @@ function CacheManager:generate(path, force)
 	self.chartRepo:commit()
 end
 
+---@param noteChartSetEntry table
+---@param force boolean?
 function CacheManager:processNoteChartDataEntries(noteChartSetEntry, force)
 	local info = love.filesystem.getInfo(noteChartSetEntry.path)
 	if not info then
-		return self:deleteNoteChartSetEntry(noteChartSetEntry)
+		self:deleteNoteChartSetEntry(noteChartSetEntry)
+		return
 	end
 
 	local noteChartEntries = self.chartRepo:getNoteChartsAtSet(noteChartSetEntry.id)

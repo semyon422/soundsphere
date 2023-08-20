@@ -3,17 +3,28 @@ local just = require("just")
 local spherefonts = require("sphere.assets.fonts")
 local gfx_util = require("gfx_util")
 
+---@class sphere.DropdownView
+---@operator call: sphere.DropdownView
 local DropdownView = class()
 
 DropdownView.padding = 6
 DropdownView.font = {"Noto Sans", 20}
 
+---@param delta number
 function DropdownView:scroll(delta) end
+
+---@param i number
 function DropdownView:select(i) end
 
-function DropdownView:getCount() end
-function DropdownView:getPreview() end
-function DropdownView:getItemText(i) end
+---@return number
+function DropdownView:getCount() return 0 end
+
+---@return string
+function DropdownView:getPreview() return "" end
+
+---@param i number
+---@return string
+function DropdownView:getItemText(i) return "" end
 
 function DropdownView:draw()
 	local tf = gfx_util.transform(self.transform):translate(self.x, self.y)

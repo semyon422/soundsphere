@@ -1,6 +1,12 @@
 local math_util = require("math_util")
 local gfx_util = require("gfx_util")
 
+---@param self table
+---@param points number
+---@param pointOffset number
+---@param samplesPerPoint number
+---@param channel number
+---@return table
 local function getPointList(self, points, pointOffset, samplesPerPoint, channel)
 	local editorModel = self.game.editorModel
 	local soundData = editorModel.mainAudio.soundData
@@ -50,6 +56,12 @@ local prevSamplesPerPoint = 0
 local renderedPointOffset
 local pointDrawDelta
 
+---@param self table
+---@param pointStart number
+---@param newPointStart number
+---@param points number
+---@param samplesPerPoint number
+---@param channelCount number
 local function adjustPoints(self, pointStart, newPointStart, points, samplesPerPoint, channelCount)
 	for j = 0, channelCount - 1 do
 		local count = math.abs(pointStart - newPointStart)
@@ -77,6 +89,9 @@ local function adjustPoints(self, pointStart, newPointStart, points, samplesPerP
 	end
 end
 
+---@param self table
+---@param w number
+---@param h number
 local function loadWaveform(self, w, h)
 	local editorModel = self.game.editorModel
 	local soundData = editorModel.mainAudio.soundData

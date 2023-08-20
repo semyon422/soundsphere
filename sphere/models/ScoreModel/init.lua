@@ -3,6 +3,8 @@ local erfunc = require("libchart.erfunc")
 local thread = require("thread")
 local ScoreDatabase = require("sphere.models.ScoreModel.ScoreDatabase")
 
+---@class sphere.ScoreModel
+---@operator call: sphere.ScoreModel
 local ScoreModel = class()
 
 function ScoreModel:load()
@@ -13,6 +15,7 @@ function ScoreModel:unload()
 	ScoreDatabase:unload()
 end
 
+---@param score table
 function ScoreModel:transformScoreEntry(score)
 	local window = self.configModel.configs.settings.gameplay.ratingHitTimingWindow
 	local s = erfunc.erf(window / (score.accuracy * math.sqrt(2)))
@@ -25,6 +28,9 @@ function ScoreModel:transformScoreEntry(score)
 	end
 end
 
+---@param hash string
+---@param index number
+---@return table
 function ScoreModel:getScoreEntries(hash, index)
 	local scores = ScoreDatabase:getScoreEntries(hash, index)
 	for i = 1, #scores do
@@ -33,11 +39,19 @@ function ScoreModel:getScoreEntries(hash, index)
 	return scores
 end
 
+---@param id number
+---@return table
 function ScoreModel:getScoreEntryById(id)
 	local score = ScoreDatabase:selectScore(id)
-	return score and self:transformScoreEntry(score)
+	self:transformScoreEntry(score)
+	return score
 end
 
+---@param scoreSystemEntry table
+---@param noteChartDataEntry table
+---@param replayHash string
+---@param modifiers string
+---@return table
 function ScoreModel:insertScore(scoreSystemEntry, noteChartDataEntry, replayHash, modifiers)
 	local score = ScoreDatabase:insertScore({
 		noteChartHash = noteChartDataEntry.hash,
@@ -69,13 +83,19 @@ function ScoreModel:insertScore(scoreSystemEntry, noteChartDataEntry, replayHash
 	return score
 end
 
-local sortScores = function(a, b)
+---@param a table
+---@param b table
+---@return boolean
+local function sortScores(a, b)
 	if a.rating == b.rating then
 		return a.time < b.time
 	else
 		return a.rating > b.rating
 	end
 end
+
+---@param scores table
+---@return number
 function ScoreModel:calculateTopScore(scores)
 	local counter = 0
 	table.sort(scores, sortScores)
@@ -95,6 +115,7 @@ function ScoreModel:calculateTopScore(scores)
 	end
 	return counter
 end
+
 function ScoreModel:calculateTopScores()
 	local time = love.timer.getTime()
 	print("calculating top scores")

@@ -1,6 +1,8 @@
 local class = require("class")
 local GraphicalNoteFactory = require("sphere.models.RhythmModel.GraphicEngine.GraphicalNoteFactory")
 
+---@class sphere.NoteDrawer
+---@operator call: sphere.NoteDrawer
 local NoteDrawer = class()
 
 function NoteDrawer:load()

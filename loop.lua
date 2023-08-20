@@ -31,12 +31,15 @@ if love.system.getOS() == "Windows" then
 end
 
 local hasMidi
+
+---@return number
 local function getinportcount()
 	return hasMidi and LuaMidi.getinportcount() or 0
 end
 
 loop.quitting = false
-loop.quittingLoop = function()
+---@return number?
+function loop:quittingLoop()
 	love.event.pump()
 
 	for name, a, b, c, d, e, f in love.event.poll() do
@@ -65,7 +68,8 @@ loop.quittingLoop = function()
 end
 
 local framestarted = {name = "framestarted"}
-loop.run = function()
+---@return function
+function loop:run()
 	love.math.setRandomSeed(os.time())
 	math.randomseed(os.time())
 	love.timer.step()
@@ -79,7 +83,7 @@ loop.run = function()
 
 	return function()
 		if loop.quitting then
-			return loop.quittingLoop()
+			return loop:quittingLoop()
 		end
 
 		reqprof.start()
@@ -202,11 +206,14 @@ loop.callbacks = {
 }
 
 -- all events are from [time - dt, time]
-local clampEventTime = function(time)
+
+---@param time number
+---@return number
+local function clampEventTime(time)
 	return math.min(math.max(time, loop.time - loop.dt), loop.time)
 end
 
-loop.init = function()
+function loop:init()
 	local e = {}
 	for _, name in pairs(loop.callbacks) do
 		love[name] = function(...)
@@ -225,7 +232,7 @@ loop.init = function()
 	end
 end
 
-loop.quit = function()
+function loop:quit()
 	LuaMidi.gc()
 end
 

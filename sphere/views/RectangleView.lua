@@ -2,6 +2,8 @@
 local class = require("class")
 local transform = require("gfx_util").transform
 
+---@class sphere.RectangleView
+---@operator call: sphere.RectangleView
 local RectangleView = class()
 
 function RectangleView:draw()
@@ -10,6 +12,7 @@ function RectangleView:draw()
 	end
 end
 
+---@param rectangle table
 function RectangleView:drawRectangle(rectangle)
 	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)

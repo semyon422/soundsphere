@@ -4,6 +4,8 @@ local OsuNoteSkin = require("sphere.models.NoteSkinModel.OsuNoteSkin")
 local BaseNoteSkin = require("sphere.models.NoteSkinModel.BaseNoteSkin")
 local utf8validate = require("utf8validate")
 
+---@class sphere.NoteSkinModel
+---@operator call: sphere.NoteSkinModel
 local NoteSkinModel = class()
 
 function NoteSkinModel:new()
@@ -26,6 +28,8 @@ function NoteSkinModel:load()
 	-- print("T", love.timer.getTime() - t)
 end
 
+---@param ... string?
+---@return string
 local function combinePath(...)
 	local t = {}
 	for i = 1, select("#", ...) do
@@ -34,6 +38,9 @@ local function combinePath(...)
 	return table.concat(t, "/")
 end
 
+---@param tree table
+---@param list table
+---@param prefix string?
 function NoteSkinModel:treeToList(tree, list, prefix)
 	for _, item in ipairs(tree) do
 		if type(item) == "string" then
@@ -44,6 +51,8 @@ function NoteSkinModel:treeToList(tree, list, prefix)
 	end
 end
 
+---@param directoryPath string
+---@param tree table
 function NoteSkinModel:lookupTree(directoryPath, tree)
 	local items = love.filesystem.getDirectoryItems(directoryPath)
 
@@ -60,6 +69,8 @@ function NoteSkinModel:lookupTree(directoryPath, tree)
 	end
 end
 
+---@param tree table
+---@param prefix string?
 function NoteSkinModel:lookupSkins(tree, prefix)
 	local found = false
 	for _, item in ipairs(tree) do
@@ -92,6 +103,8 @@ function NoteSkinModel:loadNoteSkins()
 	end
 end
 
+---@param prefix string?
+---@param name string
 function NoteSkinModel:loadNoteSkin(prefix, name)
 	if name:lower():find("^.+%.lua$") then
 		table.insert(self.noteSkins, self:loadLua(prefix, name))
@@ -102,6 +115,9 @@ function NoteSkinModel:loadNoteSkin(prefix, name)
 	end
 end
 
+---@param prefix string?
+---@param name string
+---@return sphere.NoteSkin
 function NoteSkinModel:loadLua(prefix, name)
 	local path = combinePath(self.path, prefix, name)
 	local noteSkin = assert(love.filesystem.load(path))(path)
@@ -117,6 +133,9 @@ function NoteSkinModel:loadLua(prefix, name)
 	return noteSkin
 end
 
+---@param prefix string?
+---@param name string
+---@return table
 function NoteSkinModel:loadOsu(prefix, name)
 	local path = combinePath(self.path, prefix, name)
 	local noteSkins = {}
@@ -150,6 +169,9 @@ function NoteSkinModel:loadOsu(prefix, name)
 	return noteSkins
 end
 
+---@param inputMode ncdk.InputMode
+---@param stringInputMode string
+---@return sphere.BaseNoteSkin
 function NoteSkinModel:getBaseNoteSkin(inputMode, stringInputMode)
 	local noteSkin = BaseNoteSkin()
 	noteSkin.directoryPath = "resources"
@@ -158,6 +180,8 @@ function NoteSkinModel:getBaseNoteSkin(inputMode, stringInputMode)
 	return noteSkin
 end
 
+---@param inputMode string|ncdk.InputMode
+---@return table
 function NoteSkinModel:getNoteSkins(inputMode)
 	local stringInputMode = inputMode
 	if type(inputMode) == "string" then
@@ -183,10 +207,13 @@ function NoteSkinModel:getNoteSkins(inputMode)
 	return items
 end
 
+---@param noteSkin sphere.NoteSkin
 function NoteSkinModel:setDefaultNoteSkin(noteSkin)
 	self.config.gameplay["noteskin" .. noteSkin.inputMode] = noteSkin.path
 end
 
+---@param inputMode string|ncdk.InputMode
+---@return sphere.NoteSkin
 function NoteSkinModel:getNoteSkin(inputMode)
 	if type(inputMode) == "string" then
 		inputMode = ncdk.InputMode(inputMode)

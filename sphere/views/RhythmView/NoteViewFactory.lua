@@ -4,6 +4,8 @@ local LongNoteView = require("sphere.views.RhythmView.LongNoteView")
 local ImageNoteView = require("sphere.views.RhythmView.ImageNoteView")
 local VideoNoteView = require("sphere.views.RhythmView.VideoNoteView")
 
+---@class sphere.NoteViewFactory
+---@operator call: sphere.NoteViewFactory
 local NoteViewFactory = class()
 
 local notes = {
@@ -32,6 +34,9 @@ for _, c in pairs(notes) do
 	end
 end
 
+---@param graphicalNote sphere.GraphicalNote
+---@param mode string
+---@return sphere.NoteView?
 function NoteViewFactory:getNoteView(graphicalNote, mode)
 	return notes[mode][graphicalNote.noteType]
 end

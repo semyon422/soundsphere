@@ -2,6 +2,8 @@ local class = require("class")
 local delay = require("delay")
 local thread = require("thread")
 
+---@class sphere.PreviewModel
+---@operator call: sphere.PreviewModel
 local PreviewModel = class()
 
 function PreviewModel:load()
@@ -13,6 +15,8 @@ function PreviewModel:load()
 	self.targetPitch = 1
 end
 
+---@param audioPath string
+---@param previewTime number
 function PreviewModel:setAudioPathPreview(audioPath, previewTime)
 	if self.audioPath ~= audioPath or not self.audio then
 		self.audioPath = audioPath
@@ -50,10 +54,13 @@ function PreviewModel:update()
 	end
 end
 
+---@param pitch number
 function PreviewModel:setPitch(pitch)
 	self.targetPitch = pitch
 end
 
+---@param audioPath string?
+---@param previewTime number?
 function PreviewModel:loadPreviewDebounce(audioPath, previewTime)
 	self.audioPath = audioPath or self.audioPath
 	self.previewTime = previewTime or self.previewTime
@@ -72,14 +79,16 @@ function PreviewModel:loadPreview()
 
 	if not path then
 		loadingPreview = false
-		return self:stop()
+		self:stop()
+		return
 	end
 
 	if not path:find("^http") then
 		local info = love.filesystem.getInfo(path)
 		if not info then
 			loadingPreview = false
-			return self:stop()
+			self:stop()
+			return
 		end
 	end
 
@@ -101,7 +110,8 @@ function PreviewModel:loadPreview()
 
 	loadingPreview = false
 	if path ~= self.audioPath then
-		return self:loadPreview()
+		self:loadPreview()
+		return
 	end
 
 	if not audio then
@@ -163,6 +173,9 @@ local loadAudio = thread.async(function(path)
 	end
 end)
 
+---@param path string
+---@param type string?
+---@return love.Source
 function PreviewModel:loadAudio(path, type)
 	local source
 	if type == "http" then

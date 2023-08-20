@@ -13,14 +13,19 @@ function ScoreListView:reloadItems()
 	self.items = self.game.scoreLibraryModel.items
 end
 
+---@return number
 function ScoreListView:getItemIndex()
 	return self.game.selectModel.scoreItemIndex
 end
 
+---@param delta number
 function ScoreListView:scroll(delta)
 	self.game.selectModel:scrollScore(delta)
 end
 
+---@param i number
+---@param w number
+---@param h number
 function ScoreListView:drawItem(i, w, h)
 	local item = self.items[i]
 
@@ -62,7 +67,8 @@ function ScoreListView:drawItem(i, w, h)
 
 	local scoreSourceName = self.game.scoreLibraryModel.scoreSourceName
 	if scoreSourceName == "online" then
-		return self:drawItemOnline(i, w, h)
+		self:drawItemOnline(i, w, h)
+		return
 	end
 
 	just.row(true)

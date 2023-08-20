@@ -4,6 +4,8 @@ local InputMode = require("ncdk.InputMode")
 local SPH = require("sph.SPH")
 local NoteChartExporter = require("osu.NoteChartExporter")
 
+---@class sphere.SelectController
+---@operator call: sphere.SelectController
 local SelectController = class()
 
 function SelectController:load()
@@ -46,8 +48,8 @@ function SelectController:unload()
 	self.configModel:write()
 end
 
-function SelectController:update(dt)
-	self.previewModel:update(dt)
+function SelectController:update()
+	self.previewModel:update()
 	self.selectModel:update()
 
 	self.windowModel:setVsyncOnSelect(true)
@@ -124,6 +126,7 @@ function SelectController:openWebNotechart()
 	self.onlineModel.onlineNotechartManager:openWebNotechart(hash, index)
 end
 
+---@param force boolean?
 function SelectController:updateCache(force)
 	local noteChartItem = self.selectModel.noteChartItem
 	if not noteChartItem then
@@ -133,6 +136,8 @@ function SelectController:updateCache(force)
 	self.cacheModel:startUpdate(path, force)
 end
 
+---@param path string
+---@param force boolean?
 function SelectController:updateCacheCollection(path, force)
 	local cacheModel = self.cacheModel
 	local state = cacheModel.shared.state
@@ -143,9 +148,10 @@ function SelectController:updateCacheCollection(path, force)
 	end
 end
 
+---@param event table
 function SelectController:receive(event)
 	if event.name == "filedropped" then
-		return self:filedropped(event[1])
+		self:filedropped(event[1])
 	end
 end
 
@@ -153,6 +159,8 @@ local exts = {
 	mp3 = true,
 	ogg = true,
 }
+
+---@param file love.File
 function SelectController:filedropped(file)
 	local path = file:getFilename():gsub("\\", "/")
 
@@ -194,7 +202,7 @@ function SelectController:exportToOsu()
 	path = path:find("^.+/.$") and path:match("^(.+)/.$") or path
 	local fileName = path:match("^.+/(.-)$"):match("^(.+)%..-$")
 
-	return assert(love.filesystem.write(("userdata/export/%s.osu"):format(fileName), nce:export()))
+	assert(love.filesystem.write(("userdata/export/%s.osu"):format(fileName), nce:export()))
 end
 
 return SelectController

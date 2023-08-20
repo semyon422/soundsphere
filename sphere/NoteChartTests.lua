@@ -1,6 +1,9 @@
 local NoteChartExporter = require("osu.NoteChartExporter")
 local NoteChartFactory = require("notechart.NoteChartFactory")
 
+---@param path string
+---@param index number?
+---@return ncdk.NoteChart
 local function loadNoteChart(path, index)
 	local status, noteCharts = assert(NoteChartFactory:getNoteCharts(
 		path,
@@ -14,6 +17,8 @@ local function loadNoteChart(path, index)
 	return noteCharts[1]
 end
 
+---@param noteChart ncdk.NoteChart
+---@return string
 local function export(noteChart)
 	local nce = NoteChartExporter()
 	nce.noteChart = noteChart

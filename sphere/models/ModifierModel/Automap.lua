@@ -7,6 +7,8 @@ local NotePreprocessor = require("libchart.NotePreprocessor")
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 local AutomapOldConfig = require("sphere.models.ModifierModel.AutomapOldConfig")
 
+---@class sphere.Automap: sphere.Modifier
+---@operator call: sphere.Automap
 local Automap = Modifier + {}
 
 Automap.type = "NoteChartModifier"
@@ -19,14 +21,20 @@ Automap.range = {1, 26}
 
 Automap.description = "anyK to anyK conversion"
 
+---@param config table
+---@return string
 function Automap:getString(config)
 	return "AM"
 end
 
+---@param config table
+---@return string
 function Automap:getSubString(config)
-	return config.value
+	return tostring(config.value)
 end
 
+---@param config table
+---@param state table
 function Automap:applyMeta(config, state)
 	local columnCount = state.inputMode.key
 	if not columnCount or config.value == columnCount then
@@ -36,6 +44,7 @@ function Automap:applyMeta(config, state)
 	state.inputMode.key = config.value
 end
 
+---@param config table
 function Automap:apply(config)
 	self.old = config.old
 	self.targetMode = config.value
@@ -131,6 +140,7 @@ function Automap:processUpscaler()
 	self.noteChart.inputMode.key = targetMode
 end
 
+---@return table
 function Automap:getOldUpscalerNotes()
 	local am = Upscaler()
 	am.columns = AutomapOldConfig[self.targetMode][self.columnCount]
@@ -140,6 +150,7 @@ function Automap:getOldUpscalerNotes()
 	return notes
 end
 
+---@return table
 function Automap:getUpscalerNotes()
 	local am = NextUpscaler()
 	am.targetMode = self.targetMode

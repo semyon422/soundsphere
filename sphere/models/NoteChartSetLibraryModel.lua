@@ -1,11 +1,15 @@
 local LibraryModel = require("sphere.models.LibraryModel")
 
+---@class sphere.NoteChartSetLibraryModel: sphere.LibraryModel
+---@operator call: sphere.NoteChartSetLibraryModel
 local NoteChartSetLibraryModel = LibraryModel + {}
 
 NoteChartSetLibraryModel.collapse = false
 
 local NoteChartSetItem = {}
 
+---@param k any
+---@return any?
 function NoteChartSetItem:__index(k)
 	local model = self.noteChartSetLibraryModel
 	local entry = model.cacheModel.cacheDatabase.noteChartSetItems[self.itemIndex - 1]
@@ -17,6 +21,8 @@ function NoteChartSetItem:__index(k)
 	return noteChartData and noteChartData[k] or noteChart and noteChart[k]
 end
 
+---@param itemIndex number
+---@return table
 function NoteChartSetLibraryModel:loadObject(itemIndex)
 	return setmetatable({
 		noteChartSetLibraryModel = self,
@@ -51,6 +57,8 @@ function NoteChartSetLibraryModel:updateItems()
 	self.itemsCount = self.cacheModel.cacheDatabase.noteChartSetItemsCount
 end
 
+---@param hash string
+---@param index number
 function NoteChartSetLibraryModel:findNotechart(hash, index)
 	local params = self.cacheModel.cacheDatabase.queryParams
 
@@ -62,6 +70,10 @@ function NoteChartSetLibraryModel:findNotechart(hash, index)
 	self.itemsCount = self.cacheModel.cacheDatabase.noteChartSetItemsCount
 end
 
+---@param noteChartDataId number?
+---@param noteChartId number?
+---@param noteChartSetId number?
+---@return number
 function NoteChartSetLibraryModel:getItemIndex(noteChartDataId, noteChartId, noteChartSetId)
 	self.entry = self.entry or self.cacheModel.cacheDatabase.EntryStruct()
 

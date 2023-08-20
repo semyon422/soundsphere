@@ -3,8 +3,14 @@ local class = require("class")
 local gfx_util = require("gfx_util")
 local map = require("math_util").map
 
+---@class sphere.BackgroundView
+---@operator call: sphere.BackgroundView
 local BackgroundView = class()
 
+---@param w number
+---@param h number
+---@param dim number
+---@param parallax number
 function BackgroundView:draw(w, h, dim, parallax)
 	if dim == 1 then
 		return

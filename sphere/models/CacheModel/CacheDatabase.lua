@@ -6,6 +6,8 @@ local ffi = require("ffi")
 local byte = require("byte")
 local class = require("class")
 
+---@class sphere.CacheDatabase
+---@operator call: sphere.CacheDatabase
 local CacheDatabase = class()
 
 CacheDatabase.dbpath = "userdata/charts.db"
@@ -17,7 +19,8 @@ function CacheDatabase:load()
 	self.db = Orm()
 	local db = self.db
 	db:open(self.dbpath)
-	db:exec(love.filesystem.read("sphere/models/CacheModel/database.sql"))
+	local sql = love.filesystem.read("sphere/models/CacheModel/database.sql")
+	db:exec(sql)
 	self:attachScores()
 	self.loaded = true
 
@@ -66,6 +69,9 @@ end
 
 ----------------------------------------------------------------
 
+---@param t string
+---@param id number
+---@return table?
 function CacheDatabase:getCachedEntry(t, id)
 	return self.entryCaches[t]:getObject(id)
 end
@@ -101,6 +107,9 @@ ffi.metatype("EntryStruct", {__index = function(t, k)
 	end
 end})
 
+---@param object table
+---@param row table
+---@param colnames table
 local function fillObject(object, row, colnames)
 	for i, k in ipairs(colnames) do
 		local value = row[i]

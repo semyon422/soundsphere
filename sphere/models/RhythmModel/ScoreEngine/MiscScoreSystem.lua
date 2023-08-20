@@ -1,5 +1,7 @@
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 
+---@class sphere.MiscScoreSystem: sphere.ScoreSystem
+---@operator call: sphere.MiscScoreSystem
 local MiscScoreSystem = ScoreSystem + {}
 
 MiscScoreSystem.name = "misc"
@@ -11,6 +13,7 @@ function MiscScoreSystem:new()
 	self.earlylate = 0
 end
 
+---@param event table
 function MiscScoreSystem:hit(event)
 	local deltaTime = event.deltaTime
 	self.deltaTime = deltaTime
@@ -24,11 +27,13 @@ function MiscScoreSystem:hit(event)
 	self.earlylate = (counters.earlylate.early or 0) / (counters.earlylate.late or 1)
 end
 
+---@param event any
 function MiscScoreSystem:miss(event)
 	self.deltaTime = event.deltaTime
 end
 
-function MiscScoreSystem:early()
+---@param event any
+function MiscScoreSystem:early(event)
 	self.deltaTime = -math.huge
 end
 

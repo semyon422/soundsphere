@@ -14,11 +14,13 @@ function OsudirectListView:reloadItems()
 	end
 end
 
+---@param count number
 function OsudirectListView:scroll(count)
 	ListView.scroll(self, count)
 	self.game.osudirectModel:setBeatmap(self.items[self.targetItemIndex])
 end
 
+---@param ... any?
 function OsudirectListView:draw(...)
 	ListView.draw(self, ...)
 
@@ -36,6 +38,9 @@ function OsudirectListView:draw(...)
 	end
 end
 
+---@param i number
+---@param w number
+---@param h number
 function OsudirectListView:drawItem(i, w, h)
 	local item = self.items[i]
 

@@ -1,5 +1,7 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 
+---@class sphere.NoScratch: sphere.Modifier
+---@operator call: sphere.NoScratch
 local NoScratch = Modifier + {}
 
 NoScratch.type = "NoteChartModifier"
@@ -11,13 +13,17 @@ NoScratch.shortName = "NSC"
 
 NoScratch.description = "Remove scratch notes"
 
+---@param config table
+---@return string?
 function NoScratch:getString(config)
 	if not config.value then
 		return
 	end
-	return Modifier.getString(self)
+	return Modifier.getString(self, config)
 end
 
+---@param config table
+---@param state table
 function NoScratch:applyMeta(config, state)
 	if not config.value then
 		return
@@ -25,6 +31,7 @@ function NoScratch:applyMeta(config, state)
 	state.inputMode.scratch = nil
 end
 
+---@param config table
 function NoScratch:apply(config)
 	if not config.value then
 		return

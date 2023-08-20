@@ -1,6 +1,8 @@
 local class = require("class")
 local spherefonts = require("sphere.assets.fonts")
 
+---@class sphere.ModifierIconView
+---@operator call: sphere.ModifierIconView
 local ModifierIconView = class()
 
 local shapes = {
@@ -19,6 +21,10 @@ local mod_lines = {
 	{-6 / 64, 24 / 64},
 }
 
+---@param size number
+---@param shape string
+---@param str string?
+---@param substr string?
 function ModifierIconView:draw(size, shape, str, substr)
 	love.graphics.setColor(1, 1, 1, 1)
 
@@ -30,6 +36,9 @@ function ModifierIconView:draw(size, shape, str, substr)
 	self:drawText(lines, size, str, substr)
 end
 
+---@param lines table
+---@param size number
+---@param ... string?
 function ModifierIconView:drawText(lines, size, ...)
 	local fx = size / 8
 	local fy = size / 8
@@ -42,6 +51,8 @@ function ModifierIconView:drawText(lines, size, ...)
 	end
 end
 
+---@param size number
+---@param shape table
 function ModifierIconView:drawSquareBorder(size, shape)
 	local fx = size / 8
 	local fy = size / 8

@@ -1,6 +1,8 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 local NoteData = require("ncdk.NoteData")
 
+---@class sphere.AutoKeySound: sphere.Modifier
+---@operator call: sphere.AutoKeySound
 local AutoKeySound = Modifier + {}
 
 AutoKeySound.type = "NoteChartModifier"
@@ -12,13 +14,16 @@ AutoKeySound.shortName = "AKS"
 
 AutoKeySound.description = "Key sounds will not depend on the input"
 
+---@param config table
+---@return string?
 function AutoKeySound:getString(config)
 	if not config.value then
 		return
 	end
-	return Modifier.getString(self)
+	return Modifier.getString(self, config)
 end
 
+---@param config table
 function AutoKeySound:apply(config)
 	if not config.value then
 		return

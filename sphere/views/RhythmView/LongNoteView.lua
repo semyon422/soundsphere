@@ -2,6 +2,8 @@ local ShortNoteView = require("sphere.views.RhythmView.ShortNoteView")
 local gfx_util = require("gfx_util")
 local just = require("just")
 
+---@class sphere.LongNoteView: sphere.ShortNoteView
+---@operator call: sphere.LongNoteView
 local LongNoteView = ShortNoteView + {}
 
 function LongNoteView:draw()
@@ -90,6 +92,8 @@ function LongNoteView:drawSelected()
 	love.graphics.rectangle("line", x, ymin, _w - x, ymax - ymin)
 end
 
+---@param chords table
+---@param column number
 function LongNoteView:fillChords(chords, column)
 	local startNoteData = self.graphicalNote.startNoteData
 	local endNoteData = self.graphicalNote.endNoteData
@@ -113,6 +117,7 @@ end
 
 LongNoteView.getHeadTransformParams = LongNoteView.getTransformParams
 
+---@return number?...
 function LongNoteView:getTailTransformParams()
 	local tw = self:getNotePart("Tail")
 	local ets = self.graphicalNote.endTimeState
@@ -132,6 +137,7 @@ function LongNoteView:getTailTransformParams()
 		oy
 end
 
+---@return number?...
 function LongNoteView:getBodyTransformParams()
 	local hw = self:getNotePart("Head")
 	local tw = self:getNotePart("Tail")

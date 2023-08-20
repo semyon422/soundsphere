@@ -1,7 +1,14 @@
 local class = require("class")
 
+---@class sphere.StepperView
+---@operator call: sphere.StepperView
 local StepperView = class()
 
+---@param w number
+---@param h number
+---@return boolean
+---@return boolean
+---@return boolean
 function StepperView:isOver(w, h)
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 
@@ -12,6 +19,10 @@ function StepperView:isOver(w, h)
 		w - h <= mx and mx <= w and inh
 end
 
+---@param w number
+---@param h number
+---@param value number
+---@param count number
 function StepperView:draw(w, h, value, count)
 	love.graphics.setColor(1, 1, 1, 1)
 

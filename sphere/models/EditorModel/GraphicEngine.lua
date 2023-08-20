@@ -1,6 +1,8 @@
 local class = require("class")
 local EditorNoteFactory = require("sphere.models.EditorModel.EditorNoteFactory")
 
+---@class sphere.EditorGraphicEngine
+---@operator call: sphere.EditorGraphicEngine
 local GraphicEngine = class()
 
 function GraphicEngine:new()
@@ -17,18 +19,22 @@ end
 
 GraphicEngine.longNoteShortening = 0
 
+---@return number
 function GraphicEngine:getCurrentTime()
 	return self.editorModel.timePoint.absoluteTime
 end
 
+---@return number
 function GraphicEngine:getInputOffset()
 	return 0
 end
 
+---@return number
 function GraphicEngine:getVisualOffset()
 	return 0
 end
 
+---@return number
 function GraphicEngine:getVisualTimeRate()
 	local editor = self.editorModel.configModel.configs.settings.editor
 	return editor.speed
@@ -46,6 +52,8 @@ function GraphicEngine:selectEnd()
 	self.selecting = false
 end
 
+---@param note sphere.GraphicalNote?
+---@param keepOthers boolean?
 function GraphicEngine:selectNote(note, keepOthers)
 	if not note then
 		for _, _note in ipairs(self.notes) do
@@ -77,6 +85,11 @@ function GraphicEngine:selectNote(note, keepOthers)
 	end
 end
 
+---@param noteData ncdk.NoteData
+---@param editorModel sphere.EditorModel
+---@param inputType string
+---@param inputIndex number
+---@return sphere.GraphicalNote?
 function GraphicEngine:newNote(noteData, editorModel, inputType, inputIndex)
 	local note = EditorNoteFactory:getNote(noteData)
 	if not note then

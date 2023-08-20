@@ -12,14 +12,17 @@ function NoteChartListView:reloadItems()
 	self.items = self.game.noteChartLibraryModel.items
 end
 
+---@return number
 function NoteChartListView:getItemIndex()
 	return self.game.selectModel.noteChartItemIndex
 end
 
+---@param count number
 function NoteChartListView:scroll(count)
 	self.game.selectModel:scrollNoteChart(count)
 end
 
+---@param ... any?
 function NoteChartListView:draw(...)
 	ListView.draw(self, ...)
 
@@ -28,6 +31,9 @@ function NoteChartListView:draw(...)
 	end
 end
 
+---@param i number
+---@param w number
+---@param h number
 function NoteChartListView:drawItem(i, w, h)
 	local items = self.items
 	local item = items[i]

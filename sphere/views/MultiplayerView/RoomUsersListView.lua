@@ -11,6 +11,9 @@ function RoomUsersListView:reloadItems()
 	self.items = self.game.multiplayerModel.roomUsers
 end
 
+---@param i number
+---@param w number
+---@param h number
 function RoomUsersListView:drawItem(i, w, h)
 	local items = self.items
 	local user = items[i]

@@ -3,6 +3,8 @@ local FileFinder = require("sphere.filesystem.FileFinder")
 local class = require("class")
 local Animation = require("Animation")
 
+---@class sphere.ImageAnimationView
+---@operator call: sphere.ImageAnimationView
 local ImageAnimationView = class()
 
 function ImageAnimationView:load()
@@ -14,9 +16,10 @@ function ImageAnimationView:load()
 	self.animation = animation
 
 	if self.quad then
-		return self:loadQuads()
+		self:loadQuads()
+		return
 	end
-	return self:loadImages()
+	self:loadImages()
 end
 
 function ImageAnimationView:loadImages()
@@ -46,10 +49,12 @@ function ImageAnimationView:loadQuads()
 	self.quads = quads
 end
 
+---@param time number
 function ImageAnimationView:setTime(time)
 	self.animation.time = time
 end
 
+---@param cycles number
 function ImageAnimationView:setCycles(cycles)
 	self.animation.cycles = cycles
 end
@@ -102,6 +107,7 @@ function ImageAnimationView:draw()
 	)
 end
 
+---@param dt number
 function ImageAnimationView:update(dt)
 	self.animation:update(dt)
 end

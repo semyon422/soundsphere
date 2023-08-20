@@ -9,6 +9,8 @@ local ScoreSystems = {
 	require("sphere.models.RhythmModel.ScoreEngine.EntryScoreSystem"),
 }
 
+---@class sphere.ScoreSystemContainer
+---@operator call: sphere.ScoreSystemContainer
 local ScoreSystemContainer = class()
 
 function ScoreSystemContainer:load()
@@ -28,6 +30,7 @@ function ScoreSystemContainer:load()
 	end
 end
 
+---@return table
 function ScoreSystemContainer:getSlice()
 	local slice = {}
 	for _, scoreSystem in ipairs(self.scoreSystems) do
@@ -36,6 +39,7 @@ function ScoreSystemContainer:getSlice()
 	return slice
 end
 
+---@param event table
 function ScoreSystemContainer:receive(event)
 	if event.name ~= "NoteState" or not event.currentTime then
 		return

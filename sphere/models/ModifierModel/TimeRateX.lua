@@ -1,5 +1,7 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 
+---@class sphere.TimeRateX: sphere.Modifier
+---@operator call: sphere.TimeRateX
 local TimeRateX = Modifier + {}
 
 TimeRateX.type = "TimeEngineModifier"
@@ -14,6 +16,8 @@ TimeRateX.step = 0.05
 
 TimeRateX.description = "Change the time rate"
 
+---@param config table
+---@return string?
 function TimeRateX:getString(config)
 	local value = config.value
     if value ~= 1 then
@@ -21,6 +25,8 @@ function TimeRateX:getString(config)
 	end
 end
 
+---@param config table
+---@return string?
 function TimeRateX:getSubString(config)
 	local value = config.value
     if value ~= 1 then
@@ -28,6 +34,8 @@ function TimeRateX:getSubString(config)
 	end
 end
 
+---@param config table
+---@param state table
 function TimeRateX:applyMeta(config, state)
 	state.timeRate = state.timeRate * config.value
 end

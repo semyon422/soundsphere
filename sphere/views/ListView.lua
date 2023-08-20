@@ -2,6 +2,8 @@ local just = require("just")
 local flux = require("flux")
 local class = require("class")
 
+---@class sphere.ListView
+---@operator call: sphere.ListView
 local ListView = class()
 
 ListView.targetItemIndex = 1
@@ -13,14 +15,18 @@ function ListView:reloadItems()
 	self.items = {}
 end
 
+---@param delta number
 function ListView:scroll(delta)
 	self.targetItemIndex = math.min(math.max(self.targetItemIndex + delta, 1), #self.items)
 end
 
+---@return number
 function ListView:getItemIndex()
 	return self.targetItemIndex
 end
 
+---@param w number
+---@param h number
 function ListView:draw(w, h)
 	local itemIndex = assert(self:getItemIndex())
 	if self.itemIndex ~= itemIndex then

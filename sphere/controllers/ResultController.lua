@@ -1,6 +1,8 @@
 local class = require("class")
 local thread = require("thread")
 
+---@class sphere.ResultController
+---@operator call: sphere.ResultController
 local ResultController = class()
 
 function ResultController:load()
@@ -18,6 +20,9 @@ end
 
 local readAsync = thread.async(function(...) return love.filesystem.read(...) end)
 
+---@param mode string
+---@param scoreEntry table
+---@return boolean?
 function ResultController:replayNoteChartAsync(mode, scoreEntry)
 	if not self.selectModel:notechartExists() then
 		return

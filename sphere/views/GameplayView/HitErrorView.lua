@@ -4,6 +4,8 @@ local map = require("math_util").map
 local class = require("class")
 local inside = require("table_util").inside
 
+---@class sphere.HitErrorView
+---@operator call: sphere.HitErrorView
 local HitErrorView = class()
 
 function HitErrorView:draw()
@@ -57,6 +59,8 @@ function HitErrorView:drawOrigin()
 	)
 end
 
+---@param point table
+---@param fade number
 function HitErrorView:drawPoint(point, fade)
 	local color = self.color
 	local radius = self.radius

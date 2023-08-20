@@ -2,6 +2,8 @@ local class = require("class")
 local table_util = require("table_util")
 local remote = require("remote")
 
+---@class sphere.MultiplayerController
+---@operator call: sphere.MultiplayerController
 local MultiplayerController = class()
 
 function MultiplayerController:load()

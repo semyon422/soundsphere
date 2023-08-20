@@ -8,10 +8,13 @@ local Layout = require("sphere.views.EditorView.Layout")
 
 local tabs = {}
 
+---@param t string
+---@return string
 local function to_ms(t)
 	return math.floor(t * 1000) .. "ms"
 end
 
+---@param self table
 function tabs.info(self)
 	local md = self.game.noteChartModel.noteChart.metaData
 
@@ -48,6 +51,7 @@ function tabs.info(self)
 	love.graphics.pop()
 end
 
+---@param self table
 function tabs.audio(self)
 	local editorModel = self.game.editorModel
 
@@ -102,6 +106,7 @@ end
 local velocity = "1"
 local expand = {"0", "1"}
 
+---@param self table
 function tabs.timings(self)
 	local editorModel = self.game.editorModel
 	local editor = self.game.configModel.configs.settings.editor
@@ -210,6 +215,8 @@ function tabs.timings(self)
 end
 
 local qwerty = "qwerty"
+
+---@param self table
 function tabs.notes(self)
 	local editorModel = self.game.editorModel
 	local editor = self.game.configModel.configs.settings.editor

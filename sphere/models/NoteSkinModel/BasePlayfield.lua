@@ -1,9 +1,11 @@
 local PlayfieldVsrg = require("sphere.models.NoteSkinModel.PlayfieldVsrg")
 
+---@class sphere.BasePlayfield: sphere.PlayfieldVsrg
+---@operator call: sphere.BasePlayfield
 local BasePlayfield = PlayfieldVsrg + {}
 
 function BasePlayfield:addBaseProgressBar()
-	return self:addProgressBar({
+	self:addProgressBar({
 		x = 0,
 		y = 1070,
 		w = 1920,
@@ -16,7 +18,7 @@ function BasePlayfield:addBaseProgressBar()
 end
 
 function BasePlayfield:addBaseHpBar()
-	return self:addHpBar({
+	self:addHpBar({
 		x = 0,
 		y = 0,
 		w = 10,
@@ -29,7 +31,7 @@ function BasePlayfield:addBaseHpBar()
 end
 
 function BasePlayfield:addBaseScore()
-	return self:addScore({
+	self:addScore({
 		x = 0,
 		baseline = 52,
 		limit = 1906,
@@ -40,7 +42,7 @@ function BasePlayfield:addBaseScore()
 end
 
 function BasePlayfield:addBaseAccuracy()
-	return self:addAccuracy({
+	self:addAccuracy({
 		x = 0,
 		baseline = 94,
 		limit = 1905,
@@ -51,7 +53,7 @@ function BasePlayfield:addBaseAccuracy()
 end
 
 function BasePlayfield:addBaseCombo()
-	return self:addCombo({
+	self:addCombo({
 		x = -540,
 		baseline = 476,
 		limit = 1080,
@@ -63,7 +65,7 @@ function BasePlayfield:addBaseCombo()
 end
 
 function BasePlayfield:addBaseHitError()
-	return self:addHitError({
+	self:addHitError({
 		transform = self:newLaneCenterTransform(1080),
 		x = 0,
 		y = 1041,
@@ -83,9 +85,10 @@ function BasePlayfield:addBaseHitError()
 end
 
 function BasePlayfield:addBaseMatchPlayers()
-	return self:addMatchPlayers()
+	self:addMatchPlayers()
 end
 
+---@param elements table?
 function BasePlayfield:addBaseElements(elements)
 	if not elements then
 		self:addBaseProgressBar()

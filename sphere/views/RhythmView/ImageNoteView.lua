@@ -1,7 +1,10 @@
 local NoteView = require("sphere.views.RhythmView.NoteView")
 
+---@class sphere.ImageNoteView: sphere.NoteView
+---@operator call: sphere.ImageNoteView
 local ImageNoteView = NoteView + {}
 
+---@return any?
 function ImageNoteView:getDrawable()
 	local images = self.graphicalNote.startNoteData.images
 	local resourceModel = self.graphicalNote.graphicEngine.rhythmModel.resourceModel
@@ -18,6 +21,7 @@ function ImageNoteView:draw()
 	love.graphics.draw(drawable, self:getTransformParams())
 end
 
+---@return number?...
 function ImageNoteView:getTransformParams()
 	local hw = self:getNotePart("Head")
 	local w, h = self:getDrawable():getDimensions()

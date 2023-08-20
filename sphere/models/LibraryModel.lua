@@ -1,6 +1,8 @@
 local TimedCache = require("TimedCache")
 local class = require("class")
 
+---@class sphere.LibraryModel
+---@operator call: sphere.LibraryModel
 local LibraryModel = class()
 
 function LibraryModel:new()

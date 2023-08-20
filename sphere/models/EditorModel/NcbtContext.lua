@@ -2,6 +2,8 @@ local rbtree = require("rbtree")
 local ncbt = require("ncbt")
 local class = require("class")
 
+---@class sphere.NcbtContext
+---@operator call: sphere.NcbtContext
 local NcbtContext = class()
 
 function NcbtContext:load()
@@ -14,6 +16,7 @@ function NcbtContext:load()
 	self.binsSize = nil
 end
 
+---@param soundData audio.SoundData
 function NcbtContext:detect(soundData)
 	self.duration = soundData:getDuration()
 
@@ -34,6 +37,7 @@ function NcbtContext:detect(soundData)
 	self.binsSize = out.binsSize
 end
 
+---@param layerData ncdk.DynamicLayerData
 function NcbtContext:apply(layerData)
 	if not self.tempo then
 		return

@@ -2,6 +2,8 @@ local class = require("class")
 local NoteDrawer = require("sphere.models.RhythmModel.GraphicEngine.NoteDrawer")
 local flux = require("flux")
 
+---@class sphere.GraphicEngine
+---@operator call: sphere.GraphicEngine
 local GraphicEngine = class()
 
 GraphicEngine.visualOffset = 0
@@ -50,6 +52,7 @@ function GraphicEngine:setVisualTimeRate(visualTimeRate)
 	end
 end
 
+---@return number
 function GraphicEngine:getVisualTimeRate()
 	local timeRate = self.rhythmModel.timeEngine.timeRate
 	local visualTimeRate = self.visualTimeRate
@@ -59,14 +62,17 @@ function GraphicEngine:getVisualTimeRate()
 	return visualTimeRate
 end
 
+---@return number
 function GraphicEngine:getCurrentTime()
 	return self.rhythmModel.timeEngine.currentVisualTime
 end
 
+---@return number
 function GraphicEngine:getInputOffset()
 	return self.rhythmModel.logicEngine.inputOffset
 end
 
+---@return number
 function GraphicEngine:getVisualOffset()
 	return self.visualOffset
 end

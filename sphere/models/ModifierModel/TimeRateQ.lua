@@ -1,5 +1,7 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 
+---@class sphere.TimeRateQ: sphere.Modifier
+---@operator call: sphere.TimeRateQ
 local TimeRateQ = Modifier + {}
 
 TimeRateQ.type = "TimeEngineModifier"
@@ -13,6 +15,8 @@ TimeRateQ.range = {-10, 10}
 
 TimeRateQ.description = "Rate = 2^(x/10), Quaver issue 666"
 
+---@param config table
+---@return string?
 function TimeRateQ:getString(config)
     if config.value == -10 then
 		return config.value
@@ -21,6 +25,8 @@ function TimeRateQ:getString(config)
     end
 end
 
+---@param config table
+---@return string?
 function TimeRateQ:getSubString(config)
     if config.value == -10 then
 		return "Q"
@@ -28,6 +34,8 @@ function TimeRateQ:getSubString(config)
 end
 
 -- https://github.com/Quaver/Quaver/issues/666
+---@param config table
+---@param state table
 function TimeRateQ:applyMeta(config, state)
 	state.timeRate = state.timeRate * 2 ^ (0.1 * config.value)
 end

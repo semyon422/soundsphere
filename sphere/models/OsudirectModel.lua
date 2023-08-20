@@ -6,7 +6,11 @@ local delay = require("delay")
 local http_util = require("http_util")
 local json = require("json")
 
+---@class sphere.OsudirectModel
+---@operator call: sphere.OsudirectModel
 local OsudirectModel = class()
+
+OsudirectModel.changed = false
 
 OsudirectModel.rankedStatuses = {
 	{-3, "any"},
@@ -31,6 +35,7 @@ function OsudirectModel:load()
 	self.rankedStatus = "ranked"
 end
 
+---@param status string
 function OsudirectModel:setRankedStatus(status)
 	self.rankedStatus = status
 	self.page = 1
@@ -56,12 +61,14 @@ function OsudirectModel:update()
 	end
 end
 
+---@return boolean
 function OsudirectModel:isChanged()
 	local changed = self.changed
 	self.changed = false
 	return changed
 end
 
+---@param beatmap table
 function OsudirectModel:setBeatmap(beatmap)
 	self.beatmap = beatmap
 	self.changed = true
@@ -78,12 +85,15 @@ end
 
 OsudirectModel.searchString = ""
 
+---@param s string
 function OsudirectModel:setSearchString(s)
 	self.searchString = s
 	self:searchDebounce()
 end
 
 local empty = {}
+
+---@return table
 function OsudirectModel:getDifficulties()
 	local beatmap = self.beatmap
 	return beatmap and beatmap.beatmaps or empty
@@ -104,6 +114,7 @@ function OsudirectModel:searchNoDebounce()
 	end)()
 end
 
+---@return nil?
 function OsudirectModel:search()
 	self.statusBeatmap.title = "LOADING"
 	self.items = {self.statusBeatmap}
@@ -116,6 +127,9 @@ function OsudirectModel:search()
 	end
 end
 
+---@param searchString string
+---@param page number
+---@return table?
 function OsudirectModel:searchRequest(searchString, page)
 	local config = self.configModel.configs.urls.osu
 	local url = config.search .. "?" .. http_util.encode_query_string({
@@ -171,11 +185,13 @@ function OsudirectModel:searchNext()
 	self:setBeatmap(self.items[newPos])
 end
 
+---@return string
 function OsudirectModel:getBackgroundUrl()
 	local config = self.configModel.configs.urls.osu
 	return config.background:format(self.beatmap.id)
 end
 
+---@return string
 function OsudirectModel:getPreviewUrl()
 	local config = self.configModel.configs.urls.osu
 	return config.preview:format(self.beatmap.id)

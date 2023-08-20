@@ -1,24 +1,27 @@
 local ffi = require("ffi")
 local jit = require("jit")
 
-local load = ffi.load
+local ffi_load = ffi.load
 
-local _load = function(name)
+---@param name string
+---@return ffi.namespace*
+local function _load(name)
 	if jit.os == "Windows" then
-		return load("libiconv-2")
-	elseif jit.os == "Linux" then
-		return load("iconv")
+		return ffi_load("libiconv-2")
 	end
+	return ffi_load("iconv")
 end
 
 local iconv_preloader = {}
 
 iconv_preloader.name = "iconv"
 
-iconv_preloader.preload = function()
+---@param mod string
+---@return table
+function iconv_preloader.preload(mod)
 	ffi.load = _load
 	local iconv = require("aqua.iconv")
-	ffi.load = load
+	ffi.load = ffi_load
 	return iconv
 end
 

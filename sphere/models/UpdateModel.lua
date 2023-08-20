@@ -2,11 +2,16 @@ local class = require("class")
 local json = require("json")
 local thread = require("thread")
 
+---@class sphere.UpdateModel
+---@operator call: sphere.UpdateModel
 local UpdateModel = class()
 
 UpdateModel.status = ""
 
-local crossFiles = function(server, client)
+---@param server table
+---@param client table
+---@return table
+local function crossFiles(server, client)
 	local filemap = {}
 	for _, file in ipairs(server) do
 		local path = file.path
@@ -86,6 +91,7 @@ local async_crc32 = thread.async(function(...)
 	return require("crc32").hash(content)
 end)
 
+---@param status string
 function UpdateModel:setStatus(status)
 	self.status = status
 	print(status)

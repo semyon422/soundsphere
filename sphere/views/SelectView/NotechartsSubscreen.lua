@@ -19,6 +19,9 @@ local RoundedRectangle = require("sphere.views.RoundedRectangle")
 local Layout = require("sphere.views.SelectView.Layout")
 local SelectFrame = require("sphere.views.SelectView.SelectFrame")
 
+---@param w number
+---@param h number
+---@param _r number?
 local function drawFrameRect(w, h, _r)
 	local r, g, b, a = love.graphics.getColor()
 	love.graphics.setColor(0, 0, 0, 0.8)
@@ -26,6 +29,9 @@ local function drawFrameRect(w, h, _r)
 	love.graphics.setColor(r, g, b, a)
 end
 
+---@param w number
+---@param h number
+---@param _r number?
 local function drawFrameRect2(w, h, _r)
 	local r, g, b, a = love.graphics.getColor()
 	love.graphics.setColor(0.4, 0.4, 0.4, 0.7)
@@ -33,6 +39,7 @@ local function drawFrameRect2(w, h, _r)
 	love.graphics.setColor(r, g, b, a)
 end
 
+---@param self table
 local function ScoreList(self)
 	local w, h = Layout:move("column1row1")
 	drawFrameRect(w, h)
@@ -56,6 +63,7 @@ local function ScoreList(self)
 	end
 end
 
+---@param self table
 local function NoteChartSetList(self)
 	local w, h = Layout:move("column3")
 	love.graphics.setColor(0, 0, 0, 0.8)
@@ -77,6 +85,7 @@ local function NoteChartSetList(self)
 	end
 end
 
+---@param self table
 local function NoteChartList(self)
 	drawFrameRect(Layout:move("column2row2"))
 	drawFrameRect2(Layout:move("column2row2row1"))
@@ -94,6 +103,7 @@ local function NoteChartList(self)
 	NoteChartListView:draw(w, h)
 end
 
+---@param self table
 local function Cells(self)
 	local w, h = Layout:move("column2row1")
 
@@ -181,6 +191,8 @@ local function Cells(self)
 end
 
 local bannerGradient
+
+---@param self table
 local function BackgroundBanner(self)
 	bannerGradient = bannerGradient or gfx_util.newGradient(
 		"vertical",
@@ -199,6 +211,7 @@ local function BackgroundBanner(self)
 	just.clip()
 end
 
+---@param self table
 local function SearchField(self)
 	if not just.focused_id then
 		just.focus("SearchField")
@@ -232,6 +245,7 @@ local function SearchField(self)
 	love.graphics.translate(w + h / 2, 0)
 end
 
+---@param self table
 local function SortDropdown(self)
 	local w, h = Layout:move("column2", "header")
 	love.graphics.translate(w * 2 / 3, 15)
@@ -244,9 +258,13 @@ local function SortDropdown(self)
 	end
 end
 
+---@param f table
+---@return string
 local function filter_to_string(f)
 	return f.name
 end
+
+---@param self table
 local function NotechartFilterDropdown(self)
 	local w, h = Layout:move("column3")
 
@@ -263,6 +281,7 @@ local function NotechartFilterDropdown(self)
 	end
 end
 
+---@param self table
 local function ScoreFilterDropdown(self)
 	local w, h = Layout:move("column1")
 
@@ -279,6 +298,7 @@ local function ScoreFilterDropdown(self)
 	end
 end
 
+---@param self table
 local function ScoreSourceDropdown(self)
 	local w, h = Layout:move("column1")
 
@@ -295,6 +315,7 @@ local function ScoreSourceDropdown(self)
 	end
 end
 
+---@param self table
 local function GroupCheckbox(self)
 	local w, h = Layout:move("column2", "header")
 	w = w / 3
@@ -310,6 +331,7 @@ local function GroupCheckbox(self)
 	imgui.Label(self, "group", h * 2 / 3)
 end
 
+---@param self table
 local function ModifierIconGrid(self)
 	local w, h = Layout:move("column1row3")
 	drawFrameRect(w, h)
@@ -333,6 +355,7 @@ local function ModifierIconGrid(self)
 	ModifierIconGridView:draw(configModifier, w / 2 - 42, h, (h - 8) / 3, true)
 end
 
+---@param self table
 local function NotechartsSubscreen(self)
 	local _, h = Layout:move("column1", "footer")
 	local w = h * 1.5

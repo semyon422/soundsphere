@@ -2,16 +2,20 @@ local class = require("class")
 local extractAsync = require("sphere.filesystem.extract")
 local thread = require("thread")
 
+---@class sphere.MountController
+---@operator call: sphere.MountController
 local MountController = class()
 
+---@param event table
 function MountController:receive(event)
 	if event.name == "directorydropped" then
-		return self:directorydropped(event[1])
+		self:directorydropped(event[1])
 	elseif event.name == "filedropped" then
-		return self:filedropped(event[1])
+		self:filedropped(event[1])
 	end
 end
 
+---@param path string
 function MountController:directorydropped(path)
 	path = path:gsub("\\", "/")
 	local mountModel = self.mountModel
@@ -22,7 +26,8 @@ function MountController:directorydropped(path)
 	self.configModel:write("mount")
 end
 
-MountController.filedropped = thread.coro(function(self, file)
+---@param file love.File
+function MountController:filedropped(file)
 	local path = file:getFilename():gsub("\\", "/")
 	if not path:find("%.osz$") then
 		return
@@ -39,6 +44,7 @@ MountController.filedropped = thread.coro(function(self, file)
 	print("Extracted")
 
 	self.cacheModel:startUpdate(extractPath, true)
-end)
+end
+MountController.filedropped = thread.coro(MountController.filedropped)
 
 return MountController

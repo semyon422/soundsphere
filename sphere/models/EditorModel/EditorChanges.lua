@@ -1,6 +1,8 @@
 local class = require("class")
 local Changes = require("Changes")
 
+---@class sphere.EditorChanges
+---@operator call: sphere.EditorChanges
 local EditorChanges = class()
 
 function EditorChanges:new()

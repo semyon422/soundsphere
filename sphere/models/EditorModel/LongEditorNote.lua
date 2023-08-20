@@ -1,7 +1,11 @@
 local LongGraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.LongGraphicalNote")
 
+---@class sphere.LongEditorNote: sphere.LongGraphicalNote
+---@operator call: sphere.LongEditorNote
 local LongEditorNote = LongGraphicalNote + {}
 
+---@param absoluteTime number
+---@return sphere.LongEditorNote?
 function LongEditorNote:create(absoluteTime)
 	local editorModel = self.editorModel
 	local ld = editorModel.layerData
@@ -28,6 +32,10 @@ function LongEditorNote:create(absoluteTime)
 	return self
 end
 
+---@param t number
+---@param part string
+---@param deltaColumn number
+---@param lockSnap boolean
 function LongEditorNote:grab(t, part, deltaColumn, lockSnap)
 	local note = self
 
@@ -60,6 +68,7 @@ function LongEditorNote:grab(t, part, deltaColumn, lockSnap)
 	end
 end
 
+---@param t number
 function LongEditorNote:drop(t)
 	local editorModel = self.editorModel
 	local ld = editorModel.layerData
@@ -85,6 +94,7 @@ function LongEditorNote:drop(t)
 	end
 end
 
+---@param t number
 function LongEditorNote:updateGrabbed(t)
 	local editorModel = self.editorModel
 	if self.grabbedPart == "head" then
@@ -97,11 +107,13 @@ function LongEditorNote:updateGrabbed(t)
 	end
 end
 
+---@param copyTimePoint ncdk.IntervalTimePoint
 function LongEditorNote:copy(copyTimePoint)
 	self.deltaStartTime = self.startNoteData.timePoint:sub(copyTimePoint)
 	self.deltaEndTime = self.endNoteData.timePoint:sub(copyTimePoint)
 end
 
+---@param timePoint ncdk.IntervalTimePoint
 function LongEditorNote:paste(timePoint)
 	local ld = self.editorModel.layerData
 

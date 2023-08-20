@@ -1,5 +1,6 @@
 local ShortLogicalNote = require("sphere.models.RhythmModel.LogicEngine.ShortLogicalNote")
 local LongLogicalNote = require("sphere.models.RhythmModel.LogicEngine.LongLogicalNote")
+require("ncdk.NoteData")
 
 local LogicalNoteFactory = {}
 
@@ -12,6 +13,8 @@ local notes = {
 	ImageNote = {ShortLogicalNote},
 }
 
+---@param noteData ncdk.NoteData
+---@return sphere.LogicalNote?
 function LogicalNoteFactory:getNote(noteData)
 	local classAndData = notes[noteData.noteType]
 	if not classAndData then

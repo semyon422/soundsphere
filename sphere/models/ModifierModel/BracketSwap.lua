@@ -1,5 +1,7 @@
 local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 
+---@class sphere.BracketSwap: sphere.SwapModifier
+---@operator call: sphere.BracketSwap
 local BracketSwap = SwapModifier + {}
 
 BracketSwap.type = "NoteChartModifier"
@@ -11,6 +13,8 @@ BracketSwap.shortName = "BS"
 
 BracketSwap.description = "Brackets to connected chords"
 
+---@param config table
+---@return string?
 function BracketSwap:getString(config)
 	if not config.value then
 		return
@@ -23,6 +27,8 @@ BracketSwap.hardcodedMaps = {
 	[5] = {2, 1, 3, 5, 4}
 }
 
+---@param config table
+---@return table
 function BracketSwap:getMap(config)
 	local keyCount = self.noteChart.inputMode.key
 

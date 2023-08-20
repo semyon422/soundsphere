@@ -13,14 +13,19 @@ function ModifierListView:reloadItems()
 	self.items = self.game.modifierModel.config
 end
 
+---@return number
 function ModifierListView:getItemIndex()
 	return self.game.modifierModel.modifierItemIndex
 end
 
+---@param count number
 function ModifierListView:scroll(count)
 	self.game.modifierModel:scrollModifier(count)
 end
 
+---@param i number
+---@param w number
+---@param h number
 function ModifierListView:drawItem(i, w, h)
 	local item = self.items[i]
 	local w2 = w / 2

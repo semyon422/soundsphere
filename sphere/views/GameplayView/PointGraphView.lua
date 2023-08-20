@@ -1,6 +1,8 @@
 local gfx_util = require("gfx_util")
 local class = require("class")
 
+---@class sphere.PointGraphView
+---@operator call: sphere.PointGraphView
 local PointGraphView = class()
 
 local vertexformat = {
@@ -15,6 +17,7 @@ function PointGraphView:reload()
 	self:chechMesh(1)
 end
 
+---@param i number
 function PointGraphView:chechMesh(i)
 	if not self.mesh then
 		self.mesh = love.graphics.newMesh(vertexformat, 1, "points", "dynamic")
@@ -27,6 +30,8 @@ function PointGraphView:chechMesh(i)
 	end
 end
 
+---@param w number
+---@param h number
 function PointGraphView:draw(w, h)
 	if self.show and not self.show(self) then
 		return
@@ -63,6 +68,8 @@ function PointGraphView:draw(w, h)
 	love.graphics.setPointSize(1)
 end
 
+---@param i number
+---@param point table
 function PointGraphView:drawPoint(i, point)
 	local y, r, g, b, a = self:point(point)
 	if not y then

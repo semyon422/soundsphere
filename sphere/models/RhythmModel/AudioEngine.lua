@@ -2,6 +2,8 @@ local _audio = require("audio")
 local AudioContainer = require("audio.Container")
 local class = require("class")
 
+---@class sphere.RhythmAudioEngine
+---@operator call: sphere.RhythmAudioEngine
 local AudioEngine = class()
 
 AudioEngine.timeRate = 1
@@ -26,6 +28,7 @@ function AudioEngine:update()
 	self.foregroundContainer:update()
 end
 
+---@param event any
 function AudioEngine:receive(event)
 	if event.name == "LogicalNoteSound" then
 		self:playNote(event[1], event[2])
@@ -38,6 +41,8 @@ function AudioEngine:unload()
 	self.loaded = false
 end
 
+---@param noteData ncdk.NoteData
+---@param isBackground boolean?
 function AudioEngine:playNote(noteData, isBackground)
 	if not self.loaded or not noteData or not noteData.sounds then
 		return
@@ -46,6 +51,10 @@ function AudioEngine:playNote(noteData, isBackground)
 	self:playAudio(noteData.sounds, isBackground, noteData.stream, noteData.timePoint.absoluteTime)
 end
 
+---@param sounds table
+---@param isBackground boolean?
+---@param stream boolean?
+---@param offset number?
 function AudioEngine:playAudio(sounds, isBackground, stream, offset)
 	local currentTime = self.rhythmModel.timeEngine.currentTime
 	for i = 1, #sounds do
@@ -99,10 +108,14 @@ function AudioEngine:updateTimeRate()
 	self.timeRate = timeRate
 end
 
+---@return number?
+---@return number?
+---@return number?
 function AudioEngine:getPosition()
 	return self.backgroundContainer:getPosition()
 end
 
+---@param position number
 function AudioEngine:setPosition(position)
 	self.backgroundContainer:setPosition(position)
 	self.foregroundContainer:setPosition(position)

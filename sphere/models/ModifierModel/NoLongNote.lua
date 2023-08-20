@@ -1,5 +1,7 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 
+---@class sphere.NoLongNote: sphere.Modifier
+---@operator call: sphere.NoLongNote
 local NoLongNote = Modifier + {}
 
 NoLongNote.type = "NoteChartModifier"
@@ -11,13 +13,16 @@ NoLongNote.shortName = "NLN"
 
 NoLongNote.description = "Remove long notes"
 
+---@param config table
+---@return string?
 function NoLongNote:getString(config)
 	if not config.value then
 		return
 	end
-	return Modifier.getString(self)
+	return Modifier.getString(self, config)
 end
 
+---@param config table
 function NoLongNote:apply(config)
 	if not config.value then
 		return

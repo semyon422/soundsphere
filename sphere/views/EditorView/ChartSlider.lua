@@ -2,6 +2,9 @@ local just = require("just")
 local math_util = require("math_util")
 local theme = require("imgui.theme")
 
+---@param w number
+---@param h number
+---@return number
 local function getPosition(w, h)
 	local x, y = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local value = math_util.map(x, h / 2, w - h / 2, 0, 1)
@@ -52,7 +55,7 @@ return function(self, w, h)
 	end
 
 	local previewTime = self.game.noteChartModel.noteChart.metaData.previewTime
-	local x = math_util.map(previewTime, firstTime, lastTime, a, b)
+	local x = math_util.map(tonumber(previewTime), firstTime, lastTime, a, b)
 	love.graphics.setColor(0.1, 0.6, 1, 1)
 	love.graphics.setLineWidth(4)
 	love.graphics.line(x, pad, x, _h + pad)

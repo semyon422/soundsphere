@@ -6,6 +6,8 @@ local ScreenView = require("sphere.views.ScreenView")
 local SequenceView = require("sphere.views.SequenceView")
 local just = require("just")
 
+---@class sphere.GameplayView: sphere.ScreenView
+---@operator call: sphere.GameplayView
 local GameplayView = ScreenView + {}
 
 function GameplayView:new()
@@ -67,6 +69,7 @@ function GameplayView:draw()
 	end
 end
 
+---@param dt number
 function GameplayView:update(dt)
 	self.game.gameplayController:update(dt)
 
@@ -106,6 +109,7 @@ function GameplayView:update(dt)
 	self.sequenceView:update(dt)
 end
 
+---@param event table
 function GameplayView:receive(event)
 	self.game.gameplayController:receive(event)
 	self.sequenceView:receive(event)
@@ -113,11 +117,12 @@ end
 
 function GameplayView:quit()
 	if self.game.gameplayController:hasResult() then
-		return self:changeScreen("resultView")
+		self:changeScreen("resultView")
 	elseif self.game.multiplayerModel.room then
-		return self:changeScreen("multiplayerView")
+		self:changeScreen("multiplayerView")
+	else
+		self:changeScreen("selectView")
 	end
-	return self:changeScreen("selectView")
 end
 
 function GameplayView:keypressed()

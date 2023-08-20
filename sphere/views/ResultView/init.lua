@@ -5,6 +5,8 @@ local just = require("just")
 local Layout = require("sphere.views.ResultView.Layout")
 local ResultViewConfig = require("sphere.views.ResultView.ResultViewConfig")
 
+---@class sphere.ResultView: sphere.ScreenView
+---@operator call: sphere.ResultView
 local ResultView = ScreenView + {}
 
 local loading
@@ -72,7 +74,8 @@ end)
 
 function ResultView:quit()
 	if self.game.multiplayerModel.room then
-		return self:changeScreen("multiplayerView")
+		self:changeScreen("multiplayerView")
+		return
 	end
 	self:changeScreen("selectView")
 end

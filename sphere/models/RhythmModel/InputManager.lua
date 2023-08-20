@@ -1,6 +1,8 @@
 local class = require("class")
 local Observable = require("Observable")
 
+---@class sphere.InputManager
+---@operator call: sphere.InputManager
 local InputManager = class()
 
 InputManager.mode = "external"
@@ -9,21 +11,26 @@ function InputManager:new()
 	self.observable = Observable()
 end
 
+---@param mode string
 function InputManager:setMode(mode)
 	assert(mode == "external" or mode == "internal")
 	self.mode = mode
 end
 
+---@param event table
 function InputManager:send(event)
-	return self.observable:send(event)
+	self.observable:send(event)
 end
 
+---@param inputMode string
 function InputManager:setInputMode(inputMode)
 	self.inputMode = inputMode
 	self.state = {}
 	self.savedState = {}
 end
 
+---@param virtualKey string
+---@param state boolean
 function InputManager:setState(virtualKey, state)
 	self.state[virtualKey] = state
 end
@@ -44,6 +51,10 @@ function InputManager:saveState()
 end
 
 local virtualEvent = {virtual = true}
+
+---@param virtualKey string
+---@param state boolean
+---@param time number
 function InputManager:apply(virtualKey, state, time)
 	virtualEvent.time = math.floor(time * 1024) / 1024
 	virtualEvent.name = state and "keypressed" or "keyreleased"
@@ -51,9 +62,11 @@ function InputManager:apply(virtualKey, state, time)
 	self:send(virtualEvent)
 end
 
+---@param event table
 function InputManager:receive(event)
 	if event.virtual and self.mode == "internal" then
-		return self:send(event)
+		self:send(event)
+		return
 	end
 
 	local virtualKey, state = self.rhythmModel.inputModel:transformEvent(self.inputMode, event)

@@ -1,6 +1,8 @@
 local class = require("class")
 local gfx_util = require("gfx_util")
 
+---@class sphere.NoteSkinData
+---@operator call: sphere.NoteSkinData
 local NoteSkinData = class()
 
 function NoteSkinData:load()
@@ -10,6 +12,8 @@ function NoteSkinData:load()
 	self:loadImages()
 end
 
+---@param key string
+---@param path string
 function NoteSkinData:loadTexture(key, path)
 	local textures = self.textures
 	local spriteBatches = self.spriteBatches
@@ -76,11 +80,22 @@ function NoteSkinData:loadImages()
 	end
 end
 
+---@param note sphere.NoteView
+---@param part string
+---@param key string
+---@param timeState table
+---@return number
+---@return number
 function NoteSkinData:getDimensions(note, part, key, timeState)
 	local noteSkin = self.noteSkin
 	return noteSkin:getDimensions(noteSkin:get(note, part, key, timeState))
 end
 
+---@param note sphere.NoteView
+---@param part string
+---@param key string
+---@param timeState table
+---@return love.SpriteBatch?
 function NoteSkinData:getSpriteBatch(note, part, key, timeState)
 	local noteSkin = self.noteSkin
 	local imageName, frame = noteSkin:get(note, part, key, timeState)
@@ -97,6 +112,11 @@ function NoteSkinData:getSpriteBatch(note, part, key, timeState)
 	end
 end
 
+---@param note sphere.NoteView
+---@param part string
+---@param key string
+---@param timeState table
+---@return love.Quad?
 function NoteSkinData:getQuad(note, part, key, timeState)
 	local noteSkin = self.noteSkin
 	local imageName, frame = noteSkin:get(note, part, key, timeState)

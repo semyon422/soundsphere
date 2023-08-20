@@ -1,6 +1,8 @@
 local class = require("class")
 local NoteChartFactory = require("notechart.NoteChartFactory")
 
+---@class sphere.NoteChartModel
+---@operator call: sphere.NoteChartModel
 local NoteChartModel = class()
 
 function NoteChartModel:load()
@@ -22,6 +24,8 @@ function NoteChartModel:load()
 	self.noteChartDataEntry = self.cacheModel.chartRepo:selectNoteChartDataEntryById(config.noteChartDataEntryId)
 end
 
+---@param settings table?
+---@return ncdk.NoteChart?
 function NoteChartModel:loadNoteChart(settings)
 	local noteChartEntry = self.noteChartEntry
 	local noteChartDataEntry = self.noteChartDataEntry

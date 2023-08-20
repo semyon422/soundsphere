@@ -19,10 +19,14 @@ local function newKeyFrame(time)
 	}, Keyframe_mt)
 end
 
+---@class sphere.EditorAudioManager
+---@operator call: sphere.EditorAudioManager
 local AudioManager = class()
 
 AudioManager.time = 0
 
+---@param key table
+---@return number
 local function exTime(key)
 	return key.time
 end
@@ -51,6 +55,7 @@ function AudioManager:unload()
 	self:load()
 end
 
+---@param force boolean?
 function AudioManager:update(force)
 	local time = self.editorModel.timer:getTime()
 	if time == self.time and not force then
@@ -105,6 +110,7 @@ function AudioManager:pause()
 	end
 end
 
+---@return table
 function AudioManager:getCurrentSources()
 	local time = self.time
 
@@ -124,6 +130,8 @@ function AudioManager:getCurrentSources()
 	return b.key.sources
 end
 
+---@param time number
+---@return table
 function AudioManager:getNode(time)
 	local tree = self.tree
 	local n = tree:findex(time, exTime)
@@ -145,6 +153,7 @@ function AudioManager:getNode(time)
 	return n
 end
 
+---@param placedSource table
 function AudioManager:insert(placedSource)
 	local startTime, endTime = placedSource.offset, placedSource.offset + placedSource.duration
 
@@ -160,6 +169,7 @@ function AudioManager:insert(placedSource)
 	end
 end
 
+---@param placedSource table
 function AudioManager:remove(placedSource)
 	local n = self:getNode(placedSource.offset)
 
@@ -173,6 +183,7 @@ function AudioManager:remove(placedSource)
 	end
 end
 
+---@param noteChart ncdk.NoteChart
 function AudioManager:loadResources(noteChart)
 	local audioSettings = self.editorModel:getAudioSettings()
 	for noteDatas in noteChart:getInputIterator() do

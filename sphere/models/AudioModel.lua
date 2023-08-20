@@ -1,6 +1,7 @@
 local class = require("class")
 local audio = require("audio")
 
+---@class sphere.AudioModel
 local AudioModel = class()
 
 function AudioModel:load()

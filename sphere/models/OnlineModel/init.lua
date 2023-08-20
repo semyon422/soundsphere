@@ -4,6 +4,8 @@ local AuthManager = require("sphere.models.OnlineModel.AuthManager")
 local OnlineScoreManager = require("sphere.models.OnlineModel.OnlineScoreManager")
 local OnlineNotechartManager = require("sphere.models.OnlineModel.OnlineNotechartManager")
 
+---@class sphere.OnlineModel
+---@operator call: sphere.OnlineModel
 local OnlineModel = class()
 
 function OnlineModel:new()

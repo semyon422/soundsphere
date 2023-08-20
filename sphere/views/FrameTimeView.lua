@@ -5,6 +5,8 @@ local just = require("just")
 local imgui = require("imgui")
 local reqprof = require("reqprof")
 
+---@class sphere.FrameTimeView
+---@operator call: sphere.FrameTimeView
 local FrameTimeView = class()
 
 FrameTimeView.visible = false
@@ -208,16 +210,16 @@ function FrameTimeView:drawFPS()
 	end
 end
 
+---@param event table
 function FrameTimeView:receive(event)
 	if not self.visible then
 		return
 	end
 
 	if event.name == "keypressed" then
-		return self:keypressed(event[1])
-	end
-	if event.name == "wheelmoved" then
-		return self:wheelmoved(event[2])
+		self:keypressed(event[1])
+	elseif event.name == "wheelmoved" then
+		self:wheelmoved(event[2])
 	end
 end
 

@@ -5,6 +5,8 @@ local WindowModel = require("sphere.models.WindowModel")
 local thread = require("thread")
 local delay = require("delay")
 
+---@class sphere.UpdateController
+---@operator call: sphere.UpdateController
 local UpdateController = class()
 
 function UpdateController:new()
@@ -16,6 +18,7 @@ function UpdateController:new()
 	self.windowModel.configModel = self.configModel
 end
 
+---@return boolean?
 function UpdateController:updateAsync()
 	local updateModel = self.updateModel
 	local configModel = self.configModel

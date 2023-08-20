@@ -1,5 +1,7 @@
 local class = require("class")
 
+---@class sphere.CollectionModel
+---@operator call: sphere.CollectionModel
 local CollectionModel = class()
 
 CollectionModel.basePath = "userdata/charts"
@@ -54,6 +56,8 @@ function CollectionModel:load()
 	self.items = items
 end
 
+---@param path string
+---@return number
 function CollectionModel:getItemIndex(path)
 	local items = self.items
 

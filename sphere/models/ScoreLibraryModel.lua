@@ -1,6 +1,8 @@
 local thread = require("thread")
 local class = require("class")
 
+---@class sphere.ScoreLibraryModel
+---@operator call: sphere.ScoreLibraryModel
 local ScoreLibraryModel = class()
 
 ScoreLibraryModel.scoreSources = {
@@ -19,14 +21,18 @@ function ScoreLibraryModel:clear()
 	self.items = {}
 end
 
+---@param hash string?
 function ScoreLibraryModel:setHash(hash)
 	self.hash = hash or ""
 end
 
+---@param index number?
 function ScoreLibraryModel:setIndex(index)
 	self.index = index or 1
 end
 
+---@param scores table
+---@return table
 function ScoreLibraryModel:filterScores(scores)
 	local filters = self.configModel.configs.filters.score
 	local select = self.configModel.configs.select
@@ -51,6 +57,7 @@ function ScoreLibraryModel:filterScores(scores)
 	return newScores
 end
 
+---@return nil?
 function ScoreLibraryModel:updateItemsAsync()
 	local hash_index = self.hash .. self.index
 	self.items = {}
@@ -113,6 +120,8 @@ function ScoreLibraryModel:updateItemsLocal()
 	self.scoreSourceName = "local"
 end
 
+---@param scoreEntryId number
+---@return number
 function ScoreLibraryModel:getItemIndex(scoreEntryId)
 	local items = self.items
 
@@ -130,6 +139,8 @@ function ScoreLibraryModel:getItemIndex(scoreEntryId)
 	return 1
 end
 
+---@param score table
+---@return table
 function ScoreLibraryModel:transformOnlineScore(score)
 	local s = {
 		id = score.id,

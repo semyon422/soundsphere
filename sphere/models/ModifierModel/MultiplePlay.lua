@@ -2,6 +2,8 @@ local NoteData = require("ncdk.NoteData")
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 local MultiOverPlay = require("sphere.models.ModifierModel.MultiOverPlay")
 
+---@class sphere.MultiplePlay: sphere.Modifier
+---@operator call: sphere.MultiplePlay
 local MultiplePlay = Modifier + {}
 
 MultiplePlay.type = "NoteChartModifier"
@@ -14,16 +16,21 @@ MultiplePlay.range = {2, 4}
 
 MultiplePlay.description = "1 2 1 2 -> 13 24 13 24, doubles the input mode"
 
+---@param config table
+---@return string
 function MultiplePlay:getString(config)
-	return config.value
+	return tostring(config.value)
 end
 
+---@param config table
+---@return string
 function MultiplePlay:getSubString(config)
 	return "P"
 end
 
 MultiplePlay.applyMeta = MultiOverPlay.applyMeta
 
+---@param config table
 function MultiplePlay:apply(config)
 	local noteChart = self.noteChart
 	local value = config.value

@@ -2,10 +2,15 @@ local class = require("class")
 local cursor = require("sphere.cursor")
 local loop = require("loop")
 
+---@class sphere.WindowModel
+---@operator call: sphere.WindowModel
 local WindowModel = class()
 
 WindowModel.baseVsync = 1
 
+---@param mode table
+---@return number
+---@return number
 local function getDimensions(mode)
 	local flags = mode.flags
 	if flags.fullscreen then
@@ -61,6 +66,7 @@ function WindowModel:update()
 	loop.imguiShowDemoWindow = settings.miscellaneous.imguiShowDemoWindow
 end
 
+---@param event table
 function WindowModel:receive(event)
 	if event.name == "keypressed" and event[1] == "f10" then
 		local mode = self.mode
@@ -87,6 +93,8 @@ function WindowModel:setCursor()
 	end
 end
 
+---@param fullscreen boolean
+---@param fullscreentype string
 function WindowModel:setFullscreen(fullscreen, fullscreentype)
 	local mode = self.mode
 	local width, height
@@ -110,6 +118,7 @@ function WindowModel:setIcon()
 	end
 end
 
+---@param enabled boolean
 function WindowModel:setVsyncOnSelect(enabled)
 	local graphics = self.configModel.configs.settings.graphics
 	if not graphics.vsyncOnSelect then

@@ -1,7 +1,12 @@
 local class = require("class")
 
+---@class sphere.SequenceView
+---@operator call: sphere.SequenceView
 local SequenceView = class()
 
+---@param views table
+---@param out table?
+---@return table
 local function getViews(views, out)
 	out = out or {}
 	for _, view in ipairs(views) do
@@ -14,6 +19,7 @@ local function getViews(views, out)
 	return out
 end
 
+---@param config table
 function SequenceView:setSequenceConfig(config)
 	self.views = getViews(config)
 	self.viewById = {}
@@ -45,6 +51,8 @@ function SequenceView:unload()
 	end
 end
 
+---@param method string
+---@param ... any?
 function SequenceView:callMethod(method, ...)
 	if self.iterating then
 		return
@@ -61,10 +69,12 @@ function SequenceView:callMethod(method, ...)
 	self.iterating = false
 end
 
+---@param event table
 function SequenceView:receive(event)
 	self:callMethod("receive", event)
 end
 
+---@param dt number
 function SequenceView:update(dt)
 	self:callMethod("update", dt)
 end

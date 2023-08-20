@@ -1,8 +1,14 @@
 local class = require("class")
 local enps = require("libchart.enps")
 
+---@class sphere.DifficultyModel
+---@operator call: sphere.DifficultyModel
 local DifficultyModel = class()
 
+---@param noteChart ncdk.NoteChart
+---@return number
+---@return number
+---@return number
 function DifficultyModel:getDifficulty(noteChart)
 	local notes = {}
 

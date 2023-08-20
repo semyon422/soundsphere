@@ -1,7 +1,10 @@
 local class = require("class")
 
+---@class sphere.InputAnimationView
+---@operator call: sphere.InputAnimationView
 local InputAnimationView = class()
 
+---@param event table
 function InputAnimationView:receive(event)
 	local key = event and event[1]
 	if key == self.input then

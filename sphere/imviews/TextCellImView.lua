@@ -21,7 +21,7 @@ return function(w, h, align, name, value, isMono)
 	else
 		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 	end
-	gfx_util.printBaseline(value or 0, x, 45, limit, 1, align)
+	gfx_util.printBaseline(tostring(value or 0), x, 45, limit, 1, align)
 
 	just.next(w, h)
 end

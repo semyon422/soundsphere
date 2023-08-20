@@ -1,6 +1,8 @@
 local class = require("class")
 local math_util = require("math_util")
 
+---@class sphere.GraphsGenerator
+---@operator call: sphere.GraphsGenerator
 local GraphsGenerator = class()
 
 function GraphsGenerator:load()
@@ -8,6 +10,9 @@ function GraphsGenerator:load()
 	self.intervalDatasGraph = {n = 0}
 end
 
+---@param noteChart ncdk.NoteChart
+---@param firstTime number
+---@param lastTime number
 function GraphsGenerator:genDensityGraph(noteChart, firstTime, lastTime)
 	local notes = {}
 	for noteDatas in noteChart:getInputIterator() do
@@ -45,6 +50,9 @@ function GraphsGenerator:genDensityGraph(noteChart, firstTime, lastTime)
 	end
 end
 
+---@param layerData ncdk.DynamicLayerData
+---@param firstTime number
+---@param lastTime number
 function GraphsGenerator:genIntervalDatasGraph(layerData, firstTime, lastTime)
 	local intervalDatas = layerData.ranges.interval
 

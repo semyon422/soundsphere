@@ -1,11 +1,14 @@
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 
+---@class sphere.EntryScoreSystem: sphere.ScoreSystem
+---@operator call: sphere.EntryScoreSystem
 local EntryScoreSystem = ScoreSystem + {}
 
 EntryScoreSystem.name = "entry"
 
 function EntryScoreSystem:getSlice() end
 
+---@param event table
 function EntryScoreSystem:after(event)
 	local container = self.container
 

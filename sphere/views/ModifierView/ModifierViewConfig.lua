@@ -7,6 +7,7 @@ local ModifierListView = require("sphere.views.ModifierView.ModifierListView")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
+---@param self table
 local function Frames(self)
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 
@@ -24,6 +25,7 @@ local function Frames(self)
 	just.wheel_over(window_id, over)
 end
 
+---@param self table
 local function AvailableModifierList(self)
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(279, 144)
@@ -31,6 +33,7 @@ local function AvailableModifierList(self)
 	AvailableModifierListView:draw(454, 792)
 end
 
+---@param self table
 local function ModifierList(self)
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(733, 144)
@@ -38,6 +41,7 @@ local function ModifierList(self)
 	ModifierListView:draw(454, 792)
 end
 
+---@param self table
 local function AvailableModifierScrollBar(self)
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(279, 144)
@@ -51,6 +55,7 @@ local function AvailableModifierScrollBar(self)
 	end
 end
 
+---@param self table
 local function Buttons(self)
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(279 + 454 * 2, 144 + 72 * 10)
@@ -60,6 +65,7 @@ local function Buttons(self)
 	end
 end
 
+---@param self table
 local function Rectangle(self)
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.setColor(1, 1, 1, 1)

@@ -1,5 +1,6 @@
 local gfx_util = require("gfx_util")
 
+---@param key table
 local function exTime(key)
 	return key.time
 end

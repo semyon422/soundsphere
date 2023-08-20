@@ -3,11 +3,17 @@ local thread = require("thread")
 local json = require("json")
 local socket_url = require("socket.url")
 
+---@class sphere.WebApi
+---@operator call: sphere.WebApi
 local WebApi = class()
 
 WebApi.token = ""
 
-WebApi.processResponse = function(level, body, ...)
+---@param level number
+---@param body string
+---@param ... any?
+---@return any?...
+function WebApi.processResponse(level, body, ...)
 	if level == 2 then
 		return body, ...
 	end
@@ -31,7 +37,12 @@ WebApi.processResponse = function(level, body, ...)
 	return object, ...
 end
 
-WebApi.get = function(url, params)
+---@param url string
+---@param params table?
+---@return string?
+---@return string|number?
+---@return table?
+function WebApi.get(url, params)
 	local http = require("http")
 	local ltn12 = require("ltn12")
 
@@ -58,7 +69,14 @@ WebApi.get = function(url, params)
 	return table.concat(t), code, headers
 end
 
-WebApi.post = function(url, method, params, buffers)
+---@param url string
+---@param method string
+---@param params table?
+---@param buffers table?
+---@return string?
+---@return string|number?
+---@return table?
+function WebApi.post(url, method, params, buffers)
 	local json = require("json")
 	local http = require("http")
 	local ltn12 = require("ltn12")
@@ -95,6 +113,8 @@ WebApi.post = function(url, method, params, buffers)
 	return table.concat(t), code, _headers
 end
 
+---@param url string
+---@return table
 function WebApi:newResource(url)
 	url = socket_url.absolute(self.host, url)
 	return setmetatable({__url = url}, self.resource_mt)

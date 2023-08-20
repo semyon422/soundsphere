@@ -1,5 +1,7 @@
 local class = require("class")
 
+---@class sphere.NotificationModel
+---@operator call: sphere.NotificationModel
 local NotificationModel = class()
 
 function NotificationModel:new()
@@ -8,6 +10,7 @@ function NotificationModel:new()
 	self.delay = 1
 end
 
+---@param message string
 function NotificationModel:notify(message)
 	self.message = message
 	self.time = love.timer.getTime()

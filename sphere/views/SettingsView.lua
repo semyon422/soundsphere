@@ -29,6 +29,8 @@ local window_id = "settings window"
 
 local drawSection = {}
 
+---@param self table?
+---@return boolean?
 local function draw(self)
 	if not self then
 		return true
@@ -62,6 +64,10 @@ local function draw(self)
 	love.graphics.rectangle("line", 0, 0, w, h, r)
 end
 
+---@param id any
+---@param v number
+---@param label string
+---@return number
 local function intButtonsMs(id, v, label)
 	return imgui.intButtons(id, v * 1000, 1, label) / 1000
 end
@@ -143,6 +149,8 @@ function drawSection:gameplay()
 	i.timeRate.increase = imgui.hotkey("timeRate.increase", i.timeRate.increase, "increase")
 end
 
+---@param mode table
+---@return string
 local function formatMode(mode)
 	return mode.width .. "x" .. mode.height
 end
@@ -151,6 +159,9 @@ local vsyncNames = {
 	[0] = "disabled",
 	[-1] = "adaptive",
 }
+
+---@param v string
+---@return string
 local function formatVsync(v)
 	return vsyncNames[v] or ""
 end
@@ -224,9 +235,13 @@ local _formatModes = {
 	bass_sample = "bass sample",
 	bass_fx_tempo = "bass fx tempo",
 }
+
+---@param mode string
+---@return string
 local function formatModes(mode)
 	return _formatModes[mode] or mode
 end
+
 local function deviceToString(d)
 	return d.driver or d.name
 	-- return ("%s - %s - %s - %s"):format(d.id, d.name, d.driver, d.flags)

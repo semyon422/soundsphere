@@ -9,6 +9,11 @@ local _timings = require("sphere.models.RhythmModel.ScoreEngine.timings")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
+---@param id any
+---@param v number
+---@param w number
+---@param h number
+---@return number
 local function intButtons(id, v, w, h)
 	local _v = v
 	local mod = love.keyboard.isScancodeDown("lshift", "rshift")
@@ -28,10 +33,22 @@ local function intButtons(id, v, w, h)
 	return v
 end
 
+---@param id any
+---@param v number
+---@param w number
+---@param h number
+---@return number
 local function intButtonsMs(id, v, w, h)
 	return intButtons(id, v * 1000, w, h) / 1000
 end
 
+---@param t table
+---@param name string
+---@param id any
+---@param norm number
+---@param mins table?
+---@param w number
+---@param h number
 local function drawTimings(t, name, id, norm, mins, w, h)
 	local min1, min2 = 0, 0
 	if mins then

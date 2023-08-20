@@ -14,20 +14,24 @@ local TextCellImView = require("sphere.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
 local RoundedRectangle = require("sphere.views.RoundedRectangle")
 
-local inspect = require("inspect")
 local time_util = require("time_util")
 
-local showLoadedScore = function(self)
+---@param self table
+---@return boolean
+local function showLoadedScore(self)
 	local scoreEntry = self.game.rhythmModel.scoreEngine.scoreEntry
 	local scoreItem = self.game.selectModel.scoreItem
 	if not scoreEntry or not scoreItem then
-		return
+		return false
 	end
 	return scoreItem.id == scoreEntry.id
 end
 
 local Layout = require("sphere.views.ResultView.Layout")
 
+---@param w number
+---@param h number
+---@param _r number?
 local function drawFrameRect(w, h, _r)
 	local r, g, b, a = love.graphics.getColor()
 	love.graphics.setColor(0, 0, 0, 0.8)
@@ -35,6 +39,9 @@ local function drawFrameRect(w, h, _r)
 	love.graphics.setColor(r, g, b, a)
 end
 
+---@param w number
+---@param h number
+---@param _r number?
 local function drawFrameRect2(w, h, _r)
 	local r, g, b, a = love.graphics.getColor()
 	love.graphics.setColor(0.4, 0.4, 0.4, 0.7)
@@ -42,6 +49,7 @@ local function drawFrameRect2(w, h, _r)
 	love.graphics.setColor(r, g, b, a)
 end
 
+---@param self table
 local function Frames(self)
 	local w, h = Layout:move("base")
 	love.graphics.setColor(1, 1, 1, 0.2)
@@ -62,6 +70,7 @@ local function Frames(self)
 	RoundedRectangle("fill", 0, 0, w, h, 36, false, false, 1)
 end
 
+---@param self table
 local function Background(self)
 	local w, h = Layout:move("base")
 
@@ -70,7 +79,8 @@ local function Background(self)
 	BackgroundView:draw(w, h, dim, 0.01)
 end
 
-local drawGraph = function(self)
+---@param self table
+local function drawGraph(self)
 	local w, h = Layout:move("graphs")
 	local padding = 18 * math.sqrt(2) / 2
 	love.graphics.translate(padding, padding)
@@ -90,6 +100,8 @@ local _ComboGraph = PointGraphView({
 	end,
 	show = showLoadedScore
 })
+
+---@param self table
 local function ComboGraph(self)
 	_ComboGraph.game = self.game
 	_ComboGraph:draw()
@@ -116,6 +128,8 @@ local _HitGraph = PointGraphView({
 	end,
 	show = showLoadedScore
 })
+
+---@param self table
 local function HitGraph(self)
 	_HitGraph.game = self.game
 	_HitGraph:draw()
@@ -135,6 +149,8 @@ local _MissGraph = PointGraphView({
 	end,
 	show = showLoadedScore
 })
+
+---@param self table
 local function MissGraph(self)
 	_MissGraph.game = self.game
 	_MissGraph:draw()
@@ -160,11 +176,14 @@ local _HpGraph = PointGraphView({
 	end,
 	show = showLoadedScore
 })
+
+---@param self table
 local function HpGraph(self)
 	_HpGraph.game = self.game
 	_HpGraph:draw()
 end
 
+---@param self table
 local function ScoreList(self)
 	local w, h = Layout:move("column3")
 	drawFrameRect(w, h)
@@ -201,6 +220,7 @@ local function ScoreList(self)
 	end
 end
 
+---@param self table
 local function Title(self)
 	local noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry
 
@@ -217,6 +237,7 @@ local function Title(self)
 	just.text(creator_name)
 end
 
+---@param self table
 local function Judgements(self)
 	local show = showLoadedScore(self)
 	local scoreEngine = self.game.rhythmModel.scoreEngine
@@ -278,6 +299,11 @@ local function Judgements(self)
 end
 
 local selectorState = {}
+
+---@param item table
+---@param w number
+---@param h number
+---@return string?
 local function JudgementSelector(item, w, h)
 	local name = item[1]
 	if not item[2] then
@@ -304,6 +330,7 @@ local function JudgementSelector(item, w, h)
 	return ret
 end
 
+---@param self table
 local function JudgementsDropdown(self)
 	local w, h = Layout:move("column1row1")
 	h = 60
@@ -338,6 +365,7 @@ local function JudgementsDropdown(self)
 	end
 end
 
+---@param self table
 local function JudgementsAccuracy(self)
 	local show = showLoadedScore(self)
 	local scoreEngine = self.game.rhythmModel.scoreEngine
@@ -364,6 +392,7 @@ local function JudgementsAccuracy(self)
 	imgui.Label("j.acc", ("%3.2f%%"):format(judgements.accuracy(counter) * 100), h)
 end
 
+---@param self table
 local function NotechartInfo(self)
 	local erfunc = require("libchart.erfunc")
 	local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
@@ -637,6 +666,7 @@ local function NotechartInfo(self)
 	just.row()
 end
 
+---@param self table
 local function ModifierIconGrid(self)
 	local w, h = Layout:move("middle_sub")
 	-- drawFrameRect(w, h)
@@ -653,6 +683,7 @@ local function ModifierIconGrid(self)
 	ModifierIconGridView:draw(config, w - 72, h, h, true)
 end
 
+---@param self table
 local function BottomScreenMenu(self)
 	local w, h = Layout:move("title_right")
 
@@ -693,6 +724,7 @@ local function BottomScreenMenu(self)
 	just.row()
 end
 
+---@param self table
 local function MatchPlayers(self)
 	Layout:move("column1")
 	MatchPlayersView.game = self.game

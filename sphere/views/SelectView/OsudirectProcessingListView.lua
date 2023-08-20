@@ -10,6 +10,9 @@ function OsudirectProcessingListView:reloadItems()
 	self.items = self.game.osudirectModel.processing
 end
 
+---@param i number
+---@param w number
+---@param h number
 function OsudirectProcessingListView:drawItem(i, w, h)
 	local item = self.items[i]
 

@@ -49,6 +49,8 @@ local GameplayView = require("sphere.views.GameplayView")
 local MultiplayerView = require("sphere.views.MultiplayerView")
 local EditorView = require("sphere.views.EditorView")
 
+---@class sphere.GameController
+---@operator call: sphere.GameController
 local GameController = class()
 
 local deps = require("sphere.deps")
@@ -171,10 +173,11 @@ function GameController:unload()
 	self.configModel:write()
 end
 
+---@param dt number
 function GameController:update(dt)
 	self.discordModel:update()
 	self.notificationModel:update()
-	self.backgroundModel:update(dt)
+	self.backgroundModel:update()
 
 	self.multiplayerController:update()
 	self.osudirectModel:update()
@@ -189,13 +192,17 @@ function GameController:draw()
 	self.gameView:draw()
 end
 
+---@param event table
 function GameController:receive(event)
 	if event.name == "update" then
-		return self:update(event[1])
+		self:update(event[1])
+		return
 	elseif event.name == "draw" then
-		return self:draw()
+		self:draw()
+		return
 	elseif event.name == "quit" then
-		return self:unload()
+		self:unload()
+		return
 	end
 
 	self.gameView:receive(event)

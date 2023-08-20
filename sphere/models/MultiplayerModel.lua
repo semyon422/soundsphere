@@ -8,6 +8,8 @@ local remote = require("remote")
 remote.encode = buffer.encode
 remote.decode = buffer.decode
 
+---@class sphere.MultiplayerModel
+---@operator call: sphere.MultiplayerModel
 local MultiplayerModel = class()
 
 function MultiplayerModel:new()
@@ -85,10 +87,12 @@ function MultiplayerModel:disconnect()
 	end
 end
 
+---@param message string
 function MultiplayerModel:addMessage(message)
 	table.insert(self.roomMessages, message)
 end
 
+---@return boolean
 function MultiplayerModel:isHost()
 	local room = self.room
 	if not room then
@@ -264,6 +268,7 @@ MultiplayerModel.login = remote.wrap(function(self)
 	local response, code, headers = api.auth.multiplayer:_post({key = key})
 end)
 
+---@param peer any
 function MultiplayerModel:peerconnected(peer)
 	print("connected")
 	self.status = "connected"
@@ -272,6 +277,7 @@ function MultiplayerModel:peerconnected(peer)
 	self:login()
 end
 
+---@param peer any
 function MultiplayerModel:peerdisconnected(peer)
 	print("disconnected")
 	self.status = "disconnected"

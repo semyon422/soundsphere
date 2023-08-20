@@ -1,8 +1,11 @@
 local class = require("class")
 local NoteSkinData = require("sphere.models.NoteSkinModel.NoteSkinData")
 
+---@class sphere.NoteSkin
+---@operator call: sphere.NoteSkin
 local NoteSkin = class()
 
+---@param skin table?
 function NoteSkin:new(skin)
 	self.notes = {}
 	self.inputs = {}
@@ -26,10 +29,15 @@ function NoteSkin:loadData()
 	self.data:load()
 end
 
+---@param note sphere.GraphicalNote
+---@return number?
 function NoteSkin:check(note)
 	return self.notes[note.noteType] and self.inputs[note.inputType .. note.inputIndex]
 end
 
+---@param input string
+---@param index number?
+---@return number?
 function NoteSkin:getColumn(input, index)
 	local inputs = self.inputs
 	index = index or 1
@@ -45,6 +53,11 @@ function NoteSkin:getColumn(input, index)
 	end
 end
 
+---@param value any?
+---@param column number
+---@param timeState table?
+---@param noteView sphere.NoteView?
+---@return any?
 function NoteSkin:getValue(value, column, timeState, noteView)
 	if type(value) == "table" then
 		value = value[column]
@@ -55,6 +68,11 @@ function NoteSkin:getValue(value, column, timeState, noteView)
 	return value
 end
 
+---@param noteView sphere.NoteView
+---@param part string
+---@param key string
+---@param timeState table
+---@return any?
 function NoteSkin:get(noteView, part, key, timeState)
 	local note = noteView.graphicalNote
 	local noteType = noteView.noteType
@@ -68,11 +86,15 @@ function NoteSkin:get(noteView, part, key, timeState)
 	return self:getValue(value, column, timeState, noteView)
 end
 
+---@param textures table
+---@return table
 function NoteSkin:setTextures(textures)
 	self.textures = textures
 	return textures
 end
 
+---@param images table?
+---@return table
 function NoteSkin:setImagesAuto(images)
 	images = images or {}
 	for i, texture in ipairs(self.textures) do
@@ -82,6 +104,8 @@ function NoteSkin:setImagesAuto(images)
 	return self:setImages(images)
 end
 
+---@param images table
+---@return table
 function NoteSkin:setImages(images)
 	local map = {}
 	for i, texture in ipairs(self.textures) do
@@ -95,11 +119,16 @@ function NoteSkin:setImages(images)
 	return images
 end
 
+---@param blendModes table
+---@return table
 function NoteSkin:setBlendModes(blendModes)
 	self.blendModes = blendModes
 	return blendModes
 end
 
+---@param imageName string
+---@return number
+---@return number
 function NoteSkin:getDimensions(imageName)
 	local image = self.images[imageName]
 	if not image then

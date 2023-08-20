@@ -9,6 +9,9 @@ local imgui = require("imgui")
 local Layout = require("sphere.views.SelectView.Layout")
 local SelectFrame = require("sphere.views.SelectView.SelectFrame")
 
+---@param w number
+---@param h number
+---@param _r number?
 local function drawFrameRect(w, h, _r)
 	local r, g, b, a = love.graphics.getColor()
 	love.graphics.setColor(0, 0, 0, 0.8)
@@ -16,6 +19,9 @@ local function drawFrameRect(w, h, _r)
 	love.graphics.setColor(r, g, b, a)
 end
 
+---@param w number
+---@param h number
+---@param _r number?
 local function drawFrameRect2(w, h, _r)
 	local r, g, b, a = love.graphics.getColor()
 	love.graphics.setColor(0.4, 0.4, 0.4, 0.7)
@@ -23,6 +29,7 @@ local function drawFrameRect2(w, h, _r)
 	love.graphics.setColor(r, g, b, a)
 end
 
+---@param self table
 local function OsudirectList(self)
 	local w, h = Layout:move("column3")
 	drawFrameRect(w, h)
@@ -43,6 +50,7 @@ local function OsudirectList(self)
 	end
 end
 
+---@param self table
 local function OsudirectDifficultiesList(self)
 	local w, h = Layout:move("column2row2")
 	drawFrameRect(w, h)
@@ -56,6 +64,7 @@ local function OsudirectDifficultiesList(self)
 	OsudirectDifficultiesListView:draw(w, h)
 end
 
+---@param self table
 local function OsudirectProcessingList(self)
 	local w, h = Layout:move("column1")
 	drawFrameRect(w, h)
@@ -64,6 +73,7 @@ local function OsudirectProcessingList(self)
 	OsudirectProcessingListView:draw(w, h)
 end
 
+---@param self table
 local function OsudirectSearchField(self)
 	if not just.focused_id then
 		just.focus("OsudirectSearchField")
@@ -84,6 +94,7 @@ local function OsudirectSearchField(self)
 	end
 end
 
+---@param self table
 local function OsudirectRankedStatus(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
 
@@ -97,6 +108,7 @@ local function OsudirectRankedStatus(self)
 	end
 end
 
+---@param self table
 local function OsudirectSubscreen(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 

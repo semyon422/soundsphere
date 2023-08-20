@@ -3,6 +3,8 @@ local FileFinder = require("sphere.filesystem.FileFinder")
 local math_util = require("math_util")
 local InputMode = require("ncdk.InputMode")
 
+---@class sphere.GameplayController
+---@operator call: sphere.GameplayController
 local GameplayController = class()
 
 function GameplayController:load()
@@ -92,6 +94,7 @@ function GameplayController:load()
 	self.previewModel:stop()
 end
 
+---@return table
 function GameplayController:getImporterSettings()
 	local config = self.configModel.configs.settings
 	return {
@@ -120,9 +123,10 @@ function GameplayController:unload()
 	self.multiplayerModel:setIsPlaying(false)
 end
 
+---@param dt number
 function GameplayController:update(dt)
 	self.replayModel:update()
-	self.rhythmModel:update(dt)
+	self.rhythmModel:update()
 end
 
 function GameplayController:discordPlay()
@@ -154,6 +158,7 @@ function GameplayController:discordPause()
 	})
 end
 
+---@param state string
 function GameplayController:changePlayState(state)
 	if self.multiplayerModel.room then
 		return
@@ -168,6 +173,7 @@ function GameplayController:changePlayState(state)
 	self.rhythmModel.pauseManager:changePlayState(state)
 end
 
+---@param event table
 function GameplayController:receive(event)
 	self.rhythmModel:receive(event)
 end
@@ -200,6 +206,11 @@ function GameplayController:play()
 	self:discordPlay()
 end
 
+---@param x number
+---@param y number
+---@param z number
+---@param pitch number
+---@param yaw number
 function GameplayController:saveCamera(x, y, z, pitch, yaw)
 	local perspective = self.configModel.configs.settings.graphics.perspective
 	perspective.x = x
@@ -209,6 +220,7 @@ function GameplayController:saveCamera(x, y, z, pitch, yaw)
 	perspective.yaw = yaw
 end
 
+---@return boolean
 function GameplayController:hasResult()
 	return self.rhythmModel:hasResult() and self.replayModel.mode ~= "replay"
 end
@@ -274,6 +286,7 @@ function GameplayController:updateOffsets()
 	rhythmModel:setVisualOffset(visualOffset)
 end
 
+---@param delta number
 function GameplayController:increasePlaySpeed(delta)
 	local speedModel = self.speedModel
 	speedModel:increase(delta)
@@ -283,6 +296,7 @@ function GameplayController:increasePlaySpeed(delta)
 	self.notificationModel:notify("scroll speed: " .. speedModel.format[gameplay.speedType]:format(speedModel:get()))
 end
 
+---@param delta number
 function GameplayController:increaseLocalOffset(delta)
 	local entry = self.noteChartModel.noteChartDataEntry
 	entry.localOffset = math_util.round((entry.localOffset or 0) + delta, delta)

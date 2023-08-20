@@ -1,6 +1,8 @@
 local class = require("class")
 local inside = require("table_util").inside
 
+---@class sphere.JudgementView
+---@operator call: sphere.JudgementView
 local JudgementView = class()
 
 function JudgementView:load()
@@ -13,6 +15,7 @@ function JudgementView:load()
 	self.judgement = nil
 end
 
+---@param dt number
 function JudgementView:update(dt)
 	local judgementTable = inside(self, self.key)
 

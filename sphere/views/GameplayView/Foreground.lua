@@ -17,6 +17,7 @@ local PauseProgressBar = ProgressView({
 	getCurrent = function(self) return self.game.rhythmModel.pauseManager.progress end,
 })
 
+---@param self table
 local function Notification(self)
 	local w, h = Layout:move("header")
 
@@ -25,10 +26,13 @@ local function Notification(self)
 	gfx_util.printFrame(self.game.notificationModel.message, 0, 0, w, h, "center", "center")
 end
 
+---@param t number
+---@return string
 local function to_ms(t)
 	return math.floor(t * 1000) .. "ms"
 end
 
+---@param self table
 local function DebugMenu(self)
 	if not self.game.configModel.configs.settings.miscellaneous.showDebugMenu then
 		return

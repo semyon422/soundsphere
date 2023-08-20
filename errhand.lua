@@ -58,7 +58,9 @@ end
 
 local handlers = {}
 
-function handlers.keypressed(key, scancode)
+---@param key string
+---@param ... any?
+function handlers.keypressed(key, ...)
 	if key == "escape" then
 		love.event.quit()
 	elseif key == "c" and love.keyboard.isDown("lctrl", "rctrl") then

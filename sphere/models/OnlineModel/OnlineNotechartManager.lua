@@ -2,6 +2,8 @@ local class = require("class")
 local socket_url = require("socket.url")
 local thread = require("thread")
 
+---@class sphere.OnlineNotechartManager
+---@operator call: sphere.OnlineNotechartManager
 local OnlineNotechartManager = class()
 
 OnlineNotechartManager.openWebNotechart = thread.coro(function(self, hash, index)

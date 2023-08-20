@@ -1,6 +1,8 @@
 local class = require("class")
 local InputMode = require("ncdk.InputMode")
 
+---@class sphere.FastplayController
+---@operator call: sphere.FastplayController
 local FastplayController = class()
 
 function FastplayController:play()

@@ -2,6 +2,8 @@ local class = require("class")
 local delay = require("delay")
 local thread = require("thread")
 
+---@class sphere.SelectModel
+---@operator call: sphere.SelectModel
 local SelectModel = class()
 
 function SelectModel:new()
@@ -34,6 +36,7 @@ function SelectModel:load()
 	self:noDebouncePullNoteChartSet()
 end
 
+---@return boolean
 function SelectModel:isChanged()
 	local changed = self.changed
 	self.changed = false
@@ -44,17 +47,21 @@ function SelectModel:setChanged()
 	self.changed = true
 end
 
+---@return boolean
 function SelectModel:notechartExists()
 	local noteChartItem = self.noteChartItem
 	if noteChartItem then
-		return love.filesystem.getInfo(noteChartItem.path)
+		return love.filesystem.getInfo(noteChartItem.path) ~= nil
 	end
+	return false
 end
 
+---@return boolean
 function SelectModel:isPlayed()
-	return self:notechartExists() and self.scoreItem
+	return not not (self:notechartExists() and self.scoreItem)
 end
 
+---@param ... any?
 function SelectModel:debouncePullNoteChartSet(...)
 	delay.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self, ...)
 end
@@ -63,6 +70,8 @@ SelectModel.noDebouncePullNoteChartSet = thread.coro(function(self, ...)
 	self:pullNoteChartSet(...)
 end)
 
+---@param sortFunctionName string
+---@param noDebounce boolean?
 function SelectModel:setSortFunction(sortFunctionName, noDebounce)
 	if self.pullingNoteChartSet then
 		return
@@ -71,7 +80,8 @@ function SelectModel:setSortFunction(sortFunctionName, noDebounce)
 	config.sortFunction = sortFunctionName
 	self.sortModel.name = sortFunctionName
 	if noDebounce then
-		return self:noDebouncePullNoteChartSet()
+		self:noDebouncePullNoteChartSet()
+		return
 	end
 	self:debouncePullNoteChartSet()
 end
@@ -86,6 +96,7 @@ function SelectModel:changeCollapse()
 	self:debouncePullNoteChartSet()
 end
 
+---@param locked boolean
 function SelectModel:setLock(locked)
 	self.locked = locked
 end
@@ -101,6 +112,8 @@ function SelectModel:update()
 	self:debouncePullNoteChartSet()
 end
 
+---@param direction number?
+---@param destination number?
 function SelectModel:scrollCollection(direction, destination)
 	if self.pullingNoteChartSet then
 		return
@@ -131,12 +144,15 @@ function SelectModel:scrollRandom()
 	self:scrollNoteChartSet(nil, destination)
 end
 
+---@param item table
 function SelectModel:setConfig(item)
 	self.config.noteChartSetEntryId = item.setId
 	self.config.noteChartEntryId = item.noteChartId
 	self.config.noteChartDataEntryId = item.noteChartDataId
 end
 
+---@param direction number?
+---@param destination number?
 function SelectModel:scrollNoteChartSet(direction, destination)
 	local noteChartSetItems = self.noteChartSetLibraryModel.items
 
@@ -155,6 +171,8 @@ function SelectModel:scrollNoteChartSet(direction, destination)
 	self:pullNoteChart(oldNoteChartSetItem and oldNoteChartSetItem.setId == noteChartSetItem.setId)
 end
 
+---@param direction number?
+---@param destination number?
 function SelectModel:scrollNoteChart(direction, destination)
 	local noteChartItems = self.noteChartLibraryModel.items
 
@@ -176,6 +194,8 @@ function SelectModel:scrollNoteChart(direction, destination)
 	self:pullScore()
 end
 
+---@param direction number?
+---@param destination number?
 function SelectModel:scrollScore(direction, destination)
 	local scoreItems = self.scoreLibraryModel.items
 
@@ -191,6 +211,8 @@ function SelectModel:scrollScore(direction, destination)
 	self.config.scoreEntryId = scoreItem.id
 end
 
+---@param noUpdate boolean?
+---@param noPullNext boolean?
 function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 	if self.locked then
 		return
@@ -239,6 +261,8 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 	self.pullingNoteChartSet = false
 end
 
+---@param noUpdate boolean?
+---@param noPullNext boolean?
 function SelectModel:pullNoteChart(noUpdate, noPullNext)
 	local oldId = self.noteChartItem and self.noteChartItem.id
 
@@ -293,6 +317,7 @@ function SelectModel:findScore()
 	end
 end
 
+---@param noUpdate boolean?
 function SelectModel:pullScore(noUpdate)
 	local noteChartItems = self.noteChartLibraryModel.items
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]

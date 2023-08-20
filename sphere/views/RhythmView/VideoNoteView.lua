@@ -1,13 +1,17 @@
 local ImageNoteView = require("sphere.views.RhythmView.ImageNoteView")
 
+---@class sphere.VideoNoteView: sphere.ImageNoteView
+---@operator call: sphere.VideoNoteView
 local VideoNoteView = ImageNoteView + {}
 
+---@return any?
 function VideoNoteView:getVideo()
 	local images = self.graphicalNote.startNoteData.images
 	local resourceModel = self.graphicalNote.graphicEngine.rhythmModel.resourceModel
 	return resourceModel:getResource(images[1][1])
 end
 
+---@return love.Image?
 function VideoNoteView:getDrawable()
 	local video = self:getVideo()
 	if not video then

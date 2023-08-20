@@ -7,6 +7,9 @@ local CacheView = require("sphere.views.SelectView.CacheView")
 local Layout = require("sphere.views.SelectView.Layout")
 local SelectFrame = require("sphere.views.SelectView.SelectFrame")
 
+---@param w number
+---@param h number
+---@param _r number?
 local function drawFrameRect(w, h, _r)
 	local r, g, b, a = love.graphics.getColor()
 	love.graphics.setColor(0, 0, 0, 0.8)
@@ -14,6 +17,7 @@ local function drawFrameRect(w, h, _r)
 	love.graphics.setColor(r, g, b, a)
 end
 
+---@param self table
 local function Cache(self)
 	local w, h = Layout:move("column2row2row1")
 	drawFrameRect(w, h)
@@ -24,6 +28,7 @@ local function Cache(self)
 	CacheView:draw(w - h, h)
 end
 
+---@param self table
 local function CollectionList(self)
 	local w, h = Layout:move("column3")
 	drawFrameRect(w, h)
@@ -34,6 +39,7 @@ local function CollectionList(self)
 	SelectFrame()
 end
 
+---@param self table
 local function CollectionsSubscreen(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 

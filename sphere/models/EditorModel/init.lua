@@ -1,5 +1,4 @@
 local class = require("class")
-local Fraction = require("ncdk.Fraction")
 local AudioManager = require("sphere.models.EditorModel.AudioManager")
 local TimeManager = require("sphere.models.EditorModel.TimeManager")
 local GraphicEngine = require("sphere.models.EditorModel.GraphicEngine")
@@ -15,6 +14,8 @@ local NoteManager = require("sphere.models.EditorModel.NoteManager")
 local Scroller = require("sphere.models.EditorModel.Scroller")
 local Metronome = require("sphere.models.EditorModel.Metronome")
 
+---@class sphere.EditorModel
+---@operator call: sphere.EditorModel
 local EditorModel = class()
 
 EditorModel.tools = {"Select", "ShortNote", "LongNote", "SoundNote"}
@@ -86,6 +87,7 @@ function EditorModel:applyTempoOffset()
 	self.ncbtContext:apply(self.layerData)
 end
 
+---@return table
 function EditorModel:getSettings()
 	local editor = self.configModel.configs.settings.editor
 	if editor.speed <= 0 then
@@ -95,6 +97,7 @@ function EditorModel:getSettings()
 	return editor
 end
 
+---@return table
 function EditorModel:getAudioSettings()
 	return self.configModel.configs.settings.audio
 end
@@ -107,6 +110,7 @@ function EditorModel:redo()
 	self.editorChanges:redo()
 end
 
+---@param time number
 function EditorModel:setTime(time)
 	self.timer:setTime(time)
 	self.audioManager:update(true)
@@ -131,6 +135,8 @@ function EditorModel:loadResources()
 	self.resourcesLoaded = true
 end
 
+---@return number
+---@return number
 function EditorModel:getFirstLastTime()
 	local audioManager = self.audioManager
 	local mainAudio = self.mainAudio
@@ -155,6 +161,8 @@ function EditorModel:genGraphs()
 	self.graphsGenerator:genIntervalDatasGraph(self.layerData, a, b)
 end
 
+---@param time number
+---@return ncdk.IntervalTimePoint?
 function EditorModel:getDtpAbsolute(time)
 	local ld = self.layerData
 	local editor = self:getSettings()
@@ -187,6 +195,7 @@ function EditorModel:pause()
 	self.mainAudio:pause()
 end
 
+---@return number
 function EditorModel:getLogSpeed()
 	local editor = self:getSettings()
 	return math.floor(10 * math.log(editor.speed) / math.log(2) + 0.5)
@@ -197,14 +206,17 @@ function EditorModel:setLogSpeed(logSpeed)
 	editor.speed = 2 ^ (logSpeed / 10)
 end
 
+---@param dy number?
+---@return number
 function EditorModel:getMouseTime(dy)
 	dy = dy or 0
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local noteSkin = self.noteSkin
 	local editor = self:getSettings()
-	return (self.timePoint.absoluteTime - noteSkin:getInverseTimePosition(my + dy) / editor.speed)
+	return self.timePoint.absoluteTime - noteSkin:getInverseTimePosition(my + dy) / editor.speed
 end
 
+---@param note sphere.GraphicalNote
 function EditorModel:selectNote(note)
 	self.graphicEngine:selectNote(note, love.keyboard.isDown("lctrl"))
 end
@@ -256,6 +268,7 @@ function EditorModel:update()
 	self.graphicEngine:update()
 end
 
+---@param event table
 function EditorModel:receive(event)
 	if event.name == "framestarted" then
 		local timer = self.timer
@@ -263,6 +276,8 @@ function EditorModel:receive(event)
 	end
 end
 
+---@param j number
+---@return number
 function EditorModel:getSnap(j)
 	local editor = self:getSettings()
 	local snap = editor.snap
@@ -279,6 +294,8 @@ function EditorModel:getSnap(j)
 	return k
 end
 
+---@return number
+---@return number
 function EditorModel:getTotalBeats()
 	local ld = self.layerData
 	local range = ld.ranges.interval

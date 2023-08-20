@@ -19,6 +19,9 @@ local _newSoundDataAsync = thread.async(function(path, sample_gain)
 	return soundData
 end)
 
+---@param path string
+---@param sample_gain number
+---@return audio.SoundData?
 local function newSoundDataAsync(path, sample_gain)
 	local soundData = _newSoundDataAsync(path, sample_gain)
 	if not soundData then return end
@@ -32,6 +35,8 @@ local newImageDataAsync = thread.async(function(s)
 	return err
 end)
 
+---@param s string
+---@return love.Image?
 local function newImageAsync(s)
 	local imageData = newImageDataAsync(s)
 	if not imageData then return end
@@ -42,6 +47,8 @@ local newFileDataAsync = thread.async(function(path)
 	return love.filesystem.newFileData(path)
 end)
 
+---@param path string
+---@return video.Video?
 local function newVideoAsync(path)
 	local fileData = newFileDataAsync(path)
 	if not fileData then return end
@@ -69,17 +76,21 @@ local loadOjm = thread.async(function(path)
 	return soundDatas
 end)
 
-local loadOjmAsync = function(path)
+---@param path string
+---@return table?
+local function loadOjmAsync(path)
 	local soundDatas = loadOjm(path)
 	if not soundDatas then
 		return
 	end
 	for _, soundData in pairs(soundDatas) do
-		setmetatable(soundData, {__index = audio.SoundData})
+		setmetatable(soundData, audio.SoundData)
 	end
 	return soundDatas
 end
 
+---@class sphere.ResourceModel
+---@operator call: sphere.ResourceModel
 local ResourceModel = class()
 
 function ResourceModel:new()
@@ -112,6 +123,9 @@ function ResourceModel:rewind()
 	end
 end
 
+---@param chartPath string
+---@param noteChart ncdk.NoteChart
+---@param callback function
 function ResourceModel:load(chartPath, noteChart, callback)
 	local noteChartType = NoteChartTypeMap[noteChart.type]
 
@@ -163,6 +177,7 @@ function ResourceModel:load(chartPath, noteChart, callback)
 	self:process()
 end
 
+---@param path string
 function ResourceModel:loadResource(path)
 	local fileType = FileFinder:getType(path)
 	if fileType == "audio" then
@@ -182,12 +197,16 @@ function ResourceModel:loadResource(path)
 	end
 end
 
-function ResourceModel:getResource(s)
+---@param name string
+---@return any?
+function ResourceModel:getResource(name)
 	local aliases = self.aliases
 	local resources = self.resources
-	return resources[aliases[s]]
+	return resources[aliases[name]]
 end
 
+---@param loaded table
+---@param ojmPath string
 function ResourceModel:loadOJM(loaded, ojmPath)
 	for _, path in ipairs(loaded) do
 		if not path:find(ojmPath, 1, true) then
@@ -199,6 +218,8 @@ function ResourceModel:loadOJM(loaded, ojmPath)
 	self.all_resources.not_loaded = {[ojmPath] = true}
 end
 
+---@param loaded table
+---@param newResources table
 function ResourceModel:loadResources(loaded, newResources)
 	local new, old, all = table_util.array_update(newResources, loaded)
 

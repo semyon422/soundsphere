@@ -4,8 +4,12 @@ local class = require("class")
 local gfx_util = require("gfx_util")
 local spherefonts = require("sphere.assets.fonts")
 
+---@class sphere.CacheView
+---@operator call: sphere.CacheView
 local CacheView = class()
 
+---@param w number
+---@param h number
 function CacheView:draw(w, h)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 

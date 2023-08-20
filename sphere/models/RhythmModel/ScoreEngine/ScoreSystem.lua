@@ -1,12 +1,21 @@
 local class = require("class")
 
+---@class sphere.ScoreSystem
+---@operator call: sphere.ScoreSystem
 local ScoreSystem = class()
 
 ScoreSystem.notes = {}
 function ScoreSystem:load() end
+
+---@param event table
 function ScoreSystem:before(event) end
+
+---@param event table
 function ScoreSystem:after(event) end
 
+---@param self table
+---@param handler function|string|table?
+---@param event table
 local function handle(self, handler, event)
 	if type(handler) == "function" then
 		handler(self, event)
@@ -19,6 +28,7 @@ local function handle(self, handler, event)
 	end
 end
 
+---@param event table
 function ScoreSystem:receive(event)
 	if event.name ~= "NoteState" or not event.currentTime then
 		return
@@ -37,6 +47,7 @@ function ScoreSystem:receive(event)
 	self:after(event)
 end
 
+---@return table
 function ScoreSystem:getSlice()
 	local slice = {}
 	for k, v in pairs(self) do

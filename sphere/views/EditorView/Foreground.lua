@@ -4,6 +4,7 @@ local spherefonts = require("sphere.assets.fonts")
 
 local Layout = require("sphere.views.EditorView.Layout")
 
+---@param self table
 local function Hotkeys(self)
 	local editorModel = self.game.editorModel
 	local noteManager = editorModel.noteManager
@@ -43,6 +44,7 @@ local function Hotkeys(self)
 	end
 end
 
+---@param self table
 local function Notification(self)
 	local w, h = Layout:move("header")
 

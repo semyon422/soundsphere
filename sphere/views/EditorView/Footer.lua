@@ -1,9 +1,5 @@
-local class = require("class")
-local gfx_util = require("gfx_util")
-local math_util = require("math_util")
 local spherefonts = require("sphere.assets.fonts")
 local just = require("just")
-local Fraction = require("ncdk.Fraction")
 local time_util = require("time_util")
 local imgui = require("imgui")
 

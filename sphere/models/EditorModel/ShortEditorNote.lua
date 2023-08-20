@@ -1,7 +1,11 @@
 local ShortGraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.ShortGraphicalNote")
 
+---@class sphere.ShortEditorNote: sphere.ShortGraphicalNote
+---@operator call: sphere.ShortEditorNote
 local ShortEditorNote = ShortGraphicalNote + {}
 
+---@param absoluteTime number
+---@return sphere.ShortEditorNote?
 function ShortEditorNote:create(absoluteTime)
 	local editorModel = self.editorModel
 	local ld = editorModel.layerData
@@ -17,6 +21,10 @@ function ShortEditorNote:create(absoluteTime)
 	return self
 end
 
+---@param t number
+---@param part string
+---@param deltaColumn number
+---@param lockSnap boolean
 function ShortEditorNote:grab(t, part, deltaColumn, lockSnap)
 	local note = self
 
@@ -33,6 +41,7 @@ function ShortEditorNote:grab(t, part, deltaColumn, lockSnap)
 	note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
 end
 
+---@param t number
 function ShortEditorNote:drop(t)
 	local editorModel = self.editorModel
 	local ld = editorModel.layerData
@@ -40,15 +49,18 @@ function ShortEditorNote:drop(t)
 	self.startNoteData.timePoint = ld:checkTimePoint(dtp)
 end
 
+---@param t number
 function ShortEditorNote:updateGrabbed(t)
 	local editorModel = self.editorModel
 	editorModel:getDtpAbsolute(t - self.grabbedDeltaTime):clone(self.startNoteData.timePoint)
 end
 
+---@param copyTimePoint ncdk.IntervalTimePoint
 function ShortEditorNote:copy(copyTimePoint)
 	self.deltaStartTime = self.startNoteData.timePoint:sub(copyTimePoint)
 end
 
+---@param timePoint ncdk.IntervalTimePoint
 function ShortEditorNote:paste(timePoint)
 	local ld = self.editorModel.layerData
 

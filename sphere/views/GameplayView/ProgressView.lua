@@ -2,6 +2,8 @@ local class = require("class")
 local transform = require("gfx_util").transform
 local map = require("math_util").map
 
+---@class sphere.ProgressView
+---@operator call: sphere.ProgressView
 local ProgressView = class()
 
 function ProgressView:draw()
@@ -14,11 +16,22 @@ function ProgressView:draw()
 	love.graphics.rectangle("fill", x, y, w, h)
 end
 
+---@return number
 function ProgressView:getMin() return 0 end
+
+---@return number
 function ProgressView:getMax() return 1 end
+
+---@return number
 function ProgressView:getStart() return 0 end
+
+---@return number
 function ProgressView:getCurrent() return 0 end
 
+---@return number
+---@return number
+---@return number
+---@return number
 function ProgressView:getRectangle()
 	local direction = self.direction
 	local minTime = self:getMin()

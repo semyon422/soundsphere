@@ -2,6 +2,8 @@ local class = require("class")
 local thread = require("thread")
 local inspect = require("inspect")
 
+---@class sphere.AuthManager
+---@operator call: sphere.AuthManager
 local AuthManager = class()
 
 function AuthManager:checkUserAsync()
@@ -135,6 +137,8 @@ function AuthManager:quickLogin()
 	end
 end
 
+---@param email string
+---@param password string
 function AuthManager:loginAsync(email, password)
 	print("login")
 	local api = self.webApi.api

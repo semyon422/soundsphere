@@ -1,5 +1,7 @@
 local class = require("class")
 
+---@class sphere.ReplayConverter
+---@operator call: sphere.ReplayConverter
 local ReplayConverter = class()
 
 ReplayConverter.oldTimings = {
@@ -17,6 +19,7 @@ ReplayConverter.oldTimings = {
 	}
 }
 
+---@param object table
 function ReplayConverter:convertTimings(object)
 	local timings = object.timings
 	if not timings then
@@ -50,6 +53,8 @@ function ReplayConverter:convertTimings(object)
 	end
 end
 
+---@param c table
+---@param object table
 function ReplayConverter:convertModifier(c, object)
 	if c.value == nil then
 		for k, v in pairs(c) do
@@ -74,12 +79,14 @@ function ReplayConverter:convertModifier(c, object)
 	end
 end
 
+---@param object table
 function ReplayConverter:convertModifiers(object)
 	for _, c in ipairs(object.modifiers) do
 		self:convertModifier(c, object)
 	end
 end
 
+---@param object table
 function ReplayConverter:convert(object)
 	if object.modifiers then
 		self:convertModifiers(object)

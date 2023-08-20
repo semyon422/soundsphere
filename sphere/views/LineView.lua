@@ -2,6 +2,8 @@
 local class = require("class")
 local transform = require("gfx_util").transform
 
+---@class sphere.LineView
+---@operator call: sphere.LineView
 local LineView = class()
 
 function LineView:draw()
@@ -10,6 +12,7 @@ function LineView:draw()
 	end
 end
 
+---@param line table
 function LineView:drawLine(line)
 	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)

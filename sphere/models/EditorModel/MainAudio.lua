@@ -1,6 +1,8 @@
 local audio = require("audio")
 local class = require("class")
 
+---@class sphere.EditorMainAudio
+---@operator call: sphere.EditorMainAudio
 local MainAudio = class()
 
 function MainAudio:load()
@@ -9,11 +11,13 @@ function MainAudio:load()
 	self.duration = 0
 end
 
+---@return number
 function MainAudio:getAudioOffset()
 	local editor = self.editorModel:getSettings()
 	return self.offset + editor.audioOffset
 end
 
+---@return number
 function MainAudio:getWaveformOffset()
 	local editor = self.editorModel:getSettings()
 	return self.offset + editor.waveformOffset
@@ -28,6 +32,7 @@ function MainAudio:unload()
 	self.source = nil
 end
 
+---@return number?
 function MainAudio:getPosition()
 	local source = self.source
 	if not source then
@@ -39,6 +44,7 @@ function MainAudio:getPosition()
 	end
 end
 
+---@param noteChart ncdk.NoteChart
 function MainAudio:loadResources(noteChart)
 	local audioSettings = self.editorModel:getAudioSettings()
 	for noteDatas in noteChart:getInputIterator() do
@@ -58,12 +64,14 @@ function MainAudio:loadResources(noteChart)
 	end
 end
 
+---@return boolean
 function MainAudio:isPlayable()
 	local time = self.time
 	local offset = self:getAudioOffset()
 	return time >= offset and time < offset + self.duration
 end
 
+---@param force boolean?
 function MainAudio:update(force)
 	local source = self.source
 	if not source then

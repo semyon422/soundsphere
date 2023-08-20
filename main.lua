@@ -18,7 +18,11 @@ pkg.add("libchart")
 local deco = require("deco")
 deco.package_path = love.filesystem.getRequirePath()
 deco.read_file = love.filesystem.read
-deco.blacklist = {"3rd-deps"}
+deco.blacklist = {
+	"3rd-deps",
+	"aqua/byte.lua",
+	-- "sphere/views",
+}
 
 local reqprof = require("reqprof")
 if love.filesystem.getInfo("reqprof", "file") then
@@ -28,7 +32,7 @@ end
 
 local typecheck = require("typecheck")
 if love.filesystem.getInfo("typecheck", "file") then
-	-- typecheck.strict = true
+	typecheck.strict = true
 	deco.add(typecheck.TypeDecorator())
 	deco.add(typecheck.ClassDecorator())
 	print("enabled typecheck.TypeDecorator")
@@ -121,6 +125,6 @@ thread.coro(function()
 
 	local loop = require("loop")
 	loop:init()
-	defaultLoop = loop.run()
+	defaultLoop = loop:run()
 	loop:add(game)
 end)()

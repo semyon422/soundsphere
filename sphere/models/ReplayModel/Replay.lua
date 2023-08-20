@@ -4,6 +4,8 @@ local ReplayNanoChart = require("sphere.models.ReplayModel.ReplayNanoChart")
 local ReplayConverter = require("sphere.models.ReplayModel.ReplayConverter")
 local InputMode = require("ncdk.InputMode")
 
+---@class sphere.Replay
+---@operator call: sphere.Replay
 local Replay = class()
 
 function Replay:new()
@@ -13,6 +15,7 @@ function Replay:new()
 	self.eventOffset = 0
 end
 
+---@param event table
 function Replay:receive(event)
 	if not event.virtual then
 		return
@@ -34,10 +37,12 @@ function Replay:step()
 	self.eventOffset = math.min(self.eventOffset + 1, #self.events)
 end
 
+---@return table?
 function Replay:getNextEvent()
 	return self.events[self.eventOffset + 1]
 end
 
+---@return string
 function Replay:toString()
 	local content, size = self.replayNanoChart:encode(self.events, self.inputMode)
 	return json.encode({
@@ -54,6 +59,8 @@ function Replay:toString()
 	})
 end
 
+---@param s string
+---@return sphere.Replay
 function Replay:fromString(s)
 	local object = json.decode(s)
 

@@ -1,6 +1,8 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 local NoteData = require("ncdk.NoteData")
 
+---@class sphere.FullLongNote: sphere.Modifier
+---@operator call: sphere.FullLongNote
 local FullLongNote = Modifier + {}
 
 FullLongNote.type = "NoteChartModifier"
@@ -13,14 +15,19 @@ FullLongNote.range = {0, 3}
 
 FullLongNote.description = "Replace short notes with long notes"
 
+---@param config table
+---@return string
 function FullLongNote:getString(config)
 	return "FLN"
 end
 
+---@param config table
+---@return string
 function FullLongNote:getSubString(config)
-	return config.value
+	return tostring(config.value)
 end
 
+---@param config table
 function FullLongNote:apply(config)
 	self.notes = {}
 
@@ -55,6 +62,7 @@ function FullLongNote:apply(config)
 	self.noteChart:compute()
 end
 
+---@param noteDataIndex number
 function FullLongNote:processNoteData(noteDataIndex)
 	local notes = self.notes
 	local n = notes[noteDataIndex]
@@ -117,6 +125,9 @@ function FullLongNote:processNoteData(noteDataIndex)
 	noteChart.layerDatas[n.layerDataIndex]:addNoteData(endNoteData, n.inputType, n.inputIndex)
 end
 
+---@param timePointList table
+---@param _n table
+---@return table
 function FullLongNote:cleanTimePointList(timePointList, _n)
 	local out = {}
 	out[#out + 1] = timePointList[1]

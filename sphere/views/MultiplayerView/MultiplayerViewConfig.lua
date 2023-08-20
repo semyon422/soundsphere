@@ -18,6 +18,9 @@ local time_util = require("time_util")
 
 local Layout = require("sphere.views.MultiplayerView.Layout")
 
+---@param w number
+---@param h number
+---@param _r number?
 local function drawFrameRect(w, h, _r)
 	local r, g, b, a = love.graphics.getColor()
 	love.graphics.setColor(0, 0, 0, 0.8)
@@ -25,6 +28,7 @@ local function drawFrameRect(w, h, _r)
 	love.graphics.setColor(r, g, b, a)
 end
 
+---@param self table
 local function Frames(self)
 	local w, h = Layout:move("base")
 	love.graphics.setColor(1, 1, 1, 0.2)
@@ -49,6 +53,7 @@ local function Frames(self)
 	RoundedRectangle("fill", 0, 0, w, h, 36, false, false, 2)
 end
 
+---@param self table
 local function ScreenMenu(self)
 	local multiplayerModel = self.game.multiplayerModel
 
@@ -59,6 +64,7 @@ local function ScreenMenu(self)
 	end
 end
 
+---@param self table
 local function Cells(self)
 	local w, h = Layout:move("column2row1")
 
@@ -105,6 +111,7 @@ local function Cells(self)
 	just.row()
 end
 
+---@param self table
 local function Background(self)
 	local w, h = Layout:move("base")
 
@@ -114,6 +121,8 @@ local function Background(self)
 end
 
 local bannerGradient
+
+---@param self table
 local function BackgroundBanner(self)
 	bannerGradient = bannerGradient or gfx_util.newGradient(
 		"vertical",
@@ -132,6 +141,7 @@ local function BackgroundBanner(self)
 	just.clip()
 end
 
+---@param self table
 local function DownloadButton(self)
 	local w, h = Layout:move("column2", "header")
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
@@ -154,6 +164,7 @@ local function DownloadButton(self)
 	end
 end
 
+---@param self table
 local function Title(self)
 	local w, h = Layout:move("column2row2")
 	love.graphics.translate(22, 0)
@@ -165,6 +176,7 @@ local function Title(self)
 	TextCellImView(w, 52, "left", noteChartItem.creator, noteChartItem.name)
 end
 
+---@param self table
 local function ModifierIconGrid(self)
 	local w, h = Layout:move("column2row3")
 	-- drawFrameRect(w, h)
@@ -176,6 +188,7 @@ local function ModifierIconGrid(self)
 	ModifierIconGridView:draw(modifierModel.config, w - 42, h, h - 8)
 end
 
+---@param self table
 local function Header(self)
 	local w, h = Layout:move("column1", "header")
 
@@ -194,6 +207,7 @@ local function Header(self)
 	just.row()
 end
 
+---@param self table
 local function RoomUsersList(self)
 	local w, h = Layout:move("column1")
 
@@ -205,6 +219,8 @@ local noRoom = {
 	name = "No room"
 }
 local noUser = {}
+
+---@param self table
 local function RoomInfo(self)
 	local w, h = Layout:move("column2", "header")
 
@@ -215,6 +231,7 @@ local function RoomInfo(self)
 	gfx_util.printFrame(room.name, 22, 0, w, h, "left", "center")
 end
 
+---@param self table
 local function RoomSettings(self)
 	local w, h = Layout:move("column3")
 
@@ -277,6 +294,8 @@ local chat = {
 	message = "",
 	index = 1
 }
+
+---@param self table
 local function ChatWindow(self)
 	local _p = 10
 

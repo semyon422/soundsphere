@@ -3,6 +3,8 @@ local inside = require("table_util").inside
 local FileFinder = require("sphere.filesystem.FileFinder")
 local class = require("class")
 
+---@class sphere.ImageValueView
+---@operator call: sphere.ImageValueView
 local ImageValueView = class()
 
 function ImageValueView:load()
@@ -16,6 +18,9 @@ function ImageValueView:load()
 	end
 end
 
+---@param value table
+---@return number
+---@return number
 function ImageValueView:getDimensions(value)
 	local images = self.images
 	local overlap = self.overlap or 0

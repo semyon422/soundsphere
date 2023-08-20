@@ -12,6 +12,9 @@ local LogoImView = require("sphere.imviews.LogoImView")
 
 local Layout = require("sphere.views.SelectView.Layout")
 
+---@param w number
+---@param h number
+---@param _r number?
 local function drawFrameRect(w, h, _r)
 	local r, g, b, a = love.graphics.getColor()
 	love.graphics.setColor(0, 0, 0, 0.8)
@@ -19,6 +22,7 @@ local function drawFrameRect(w, h, _r)
 	love.graphics.setColor(r, g, b, a)
 end
 
+---@param self table
 local function Frames(self)
 	local w, h = Layout:move("base")
 	love.graphics.setColor(1, 1, 1, 0.2)
@@ -31,6 +35,7 @@ local function Frames(self)
 	drawFrameRect(w, h, 0)
 end
 
+---@param self table
 local function Background(self)
 	local w, h = Layout:move("base")
 
@@ -43,6 +48,7 @@ local function Background(self)
 	GaussianBlurView:draw(graphics.blur.select)
 end
 
+---@param self table
 local function Header(self)
 	local w, h = Layout:move("column1", "header")
 

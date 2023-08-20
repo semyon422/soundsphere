@@ -1,5 +1,7 @@
 local class = require("class")
 
+---@class sphere.InputView
+---@operator call: sphere.InputView
 local InputView = class()
 
 function InputView:load()
@@ -8,6 +10,7 @@ function InputView:load()
 	end
 end
 
+---@param event table
 function InputView:receive(event)
 	if not event.virtual then
 		return
@@ -23,6 +26,7 @@ function InputView:receive(event)
 	end
 end
 
+---@param value boolean
 function InputView:switchPressed(value)
 	if self.pressed then
 		self.pressed.hidden = not value

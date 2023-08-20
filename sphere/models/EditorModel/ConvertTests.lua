@@ -3,6 +3,8 @@ local ConvertMeasureToInterval = require("sphere.models.EditorModel.ConvertMeasu
 local NoteChart = require("ncdk.NoteChart")
 local Fraction = require("ncdk.Fraction")
 
+---@param n number
+---@return ncdk.Fraction
 local function F(n)
 	return Fraction:new(n, 1000, false)
 end

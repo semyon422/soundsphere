@@ -2,8 +2,11 @@ local RhythmView = require("sphere.views.RhythmView")
 local just = require("just")
 local gfx_util = require("gfx_util")
 
+---@class sphere.EditorRhythmView: sphere.RhythmModel
+---@operator call: sphere.EditorRhythmView
 local EditorRhythmView = RhythmView + {}
 
+---@param note sphere.GraphicalNote
 function EditorRhythmView:processNote(note)
 	local editorModel = self.game.editorModel
 	local noteManager = editorModel.noteManager
@@ -107,6 +110,7 @@ function EditorRhythmView:draw()
 	end
 end
 
+---@param f function
 function EditorRhythmView:processNotes(f)
 	local editorModel = self.game.editorModel
 	for _, graphicalNote in ipairs(editorModel.graphicEngine.notes) do

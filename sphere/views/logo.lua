@@ -1,6 +1,11 @@
 local logo = {}
 
-logo.draw = function(mode, x, y, size, segments)
+---@param mode string
+---@param x number
+---@param y number
+---@param size number
+---@param segments number?
+function logo.draw(mode, x, y, size, segments)
 	local scale = size / 48
 	segments = segments or 16
 	local dphi = -math.pi / 2 / segments

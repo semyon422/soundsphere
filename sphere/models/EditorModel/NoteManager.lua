@@ -1,12 +1,15 @@
 local class = require("class")
 local EditorNoteFactory = require("sphere.models.EditorModel.EditorNoteFactory")
 
+---@class sphere.EditorNoteManager
+---@operator call: sphere.EditorNoteManager
 local NoteManager = class()
 
 function NoteManager:new()
 	self.grabbedNotes = {}
 end
 
+---@return number
 function NoteManager:getColumnOver()
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local noteSkin = self.editorModel.noteSkin
@@ -32,6 +35,7 @@ function NoteManager:update()
 	end
 end
 
+---@param cut boolean?
 function NoteManager:copyNotes(cut)
 	if cut then
 		self.editorModel.editorChanges:reset()
@@ -62,6 +66,7 @@ function NoteManager:copyNotes(cut)
 	end
 end
 
+---@return number
 function NoteManager:deleteNotes()
 	self.editorModel.editorChanges:reset()
 	local c = 0
@@ -92,6 +97,8 @@ function NoteManager:pasteNotes()
 	self.editorModel.editorChanges:next()
 end
 
+---@param part string
+---@param mouseTime number
 function NoteManager:grabNotes(part, mouseTime)
 	local noteSkin = self.editorModel.noteSkin
 	local editor = self.editorModel:getSettings()
@@ -109,6 +116,7 @@ function NoteManager:grabNotes(part, mouseTime)
 	end
 end
 
+---@param mouseTime number
 function NoteManager:dropNotes(mouseTime)
 	local editor = self.editorModel:getSettings()
 	local grabbedNotes = self.grabbedNotes
@@ -130,22 +138,30 @@ function NoteManager:dropNotes(mouseTime)
 	self.editorModel.editorChanges:next()
 end
 
+---@param note sphere.GraphicalNote
 function NoteManager:_removeNote(note)
 	note:remove()
 	self.editorModel.editorChanges:add()
 end
 
+---@param note sphere.GraphicalNote
 function NoteManager:removeNote(note)
 	self.editorModel.editorChanges:reset()
 	self:_removeNote(note)
 	self.editorModel.editorChanges:next()
 end
 
+---@param note sphere.GraphicalNote
 function NoteManager:_addNote(note)
 	note:add()
 	self.editorModel.editorChanges:add()
 end
 
+---@param noteType string
+---@param absoluteTime number
+---@param inputType string
+---@param inputIndex number
+---@return sphere.GraphicalNote?
 function NoteManager:newNote(noteType, absoluteTime, inputType, inputIndex)
 	local note = EditorNoteFactory:newNote(noteType)
 	if not note then
@@ -160,6 +176,9 @@ function NoteManager:newNote(noteType, absoluteTime, inputType, inputIndex)
 	return note:create(absoluteTime)
 end
 
+---@param absoluteTime number
+---@param inputType string
+---@param inputIndex number
 function NoteManager:addNote(absoluteTime, inputType, inputIndex)
 	local editorModel = self.editorModel
 	editorModel.editorChanges:reset()

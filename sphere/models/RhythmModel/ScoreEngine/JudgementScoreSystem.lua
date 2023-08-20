@@ -1,5 +1,7 @@
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 
+---@class sphere.JudgementScoreSystem: sphere.ScoreSystem
+---@operator call: sphere.JudgementScoreSystem
 local JudgementScoreSystem = ScoreSystem + {}
 
 JudgementScoreSystem.name = "judgement"
@@ -29,6 +31,8 @@ JudgementScoreSystem.judgementSelectors = {
 	{"etternaJ%d", 1, 9},
 }
 
+---@param c table
+---@return number
 local function osuAccuracy(c)
 	local total = c["0"] + c["50"] + c["100"] + c["200"] + c["300"] + c["300g"]
 	return (c["50"] * 50 + c["100"] * 100 + c["200"] * 200 + (c["300"] + c["300g"]) * 300) / (total * 300)
@@ -151,7 +155,10 @@ function JudgementScoreSystem:load()
 	end
 end
 
-JudgementScoreSystem.getJudgement = function(_, judgements, deltaTime)
+---@param judgements table
+---@param deltaTime number
+---@return string|table?
+function JudgementScoreSystem:getJudgement(judgements, deltaTime)
 	for i, v in ipairs(judgements) do
 		if type(v) ~= "number" then
 			local prev = judgements[i - 1] or -math.huge
@@ -163,6 +170,7 @@ JudgementScoreSystem.getJudgement = function(_, judgements, deltaTime)
 	end
 end
 
+---@param event table
 function JudgementScoreSystem:hit(event)
 	local counters = self.counters
 	for name, judgements in pairs(self.judgements) do

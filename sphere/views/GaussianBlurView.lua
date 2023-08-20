@@ -2,8 +2,11 @@
 local class = require("class")
 local gfx_util = require("gfx_util")
 
+---@class sphere.GaussianBlurView
+---@operator call: sphere.GaussianBlurView
 local GaussianBlurView = class()
 
+---@param blur number
 function GaussianBlurView:draw(blur)
 	if blur == 0 then
 		return
@@ -46,6 +49,7 @@ function GaussianBlurView:createBlurShader()
 	self.direction = {1, 1}
 end
 
+---@param sigma number
 function GaussianBlurView:setSigma(sigma)
 	if sigma and self.sigma ~= sigma then
 		self.sigma = sigma

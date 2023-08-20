@@ -1,6 +1,7 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
-local map = require("math_util").map
 
+---@class sphere.WindUp: sphere.Modifier
+---@operator call: sphere.WindUp
 local WindUp = Modifier + {}
 
 WindUp.type = "TimeEngineModifier"
@@ -12,13 +13,17 @@ WindUp.shortName = "WU"
 
 WindUp.description = "Change time rate from 0.75 to 1.5 during the play"
 
+---@param config table
+---@return string?
 function WindUp:getString(config)
 	if not config.value then
 		return
 	end
-	return Modifier.getString(self)
+	return Modifier.getString(self, config)
 end
 
+---@param config table
+---@param state table
 function WindUp:applyMeta(config, state)
 	if not config.value then
 		return

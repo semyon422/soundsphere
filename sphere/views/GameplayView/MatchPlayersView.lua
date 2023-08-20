@@ -4,6 +4,8 @@ local erfunc = require("libchart.erfunc")
 local just = require("just")
 local Format = require("sphere.views.Format")
 
+---@class sphere.MatchPlayersView
+---@operator call: sphere.MatchPlayersView
 local MatchPlayersView = class()
 
 function MatchPlayersView:draw()

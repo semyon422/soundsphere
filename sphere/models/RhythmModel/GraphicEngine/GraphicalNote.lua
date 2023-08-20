@@ -1,7 +1,11 @@
 local class = require("class")
 
+---@class sphere.GraphicalNote
+---@operator call: sphere.GraphicalNote
 local GraphicalNote = class()
 
+---@param noteType string?
+---@param noteData ncdk.NoteData?
 function GraphicalNote:new(noteType, noteData)
 	self.noteType = noteType
 	self.startNoteData = noteData
@@ -9,16 +13,20 @@ end
 
 function GraphicalNote:update() end
 
+---@return string
 function GraphicalNote:getLogicalState()
 	local logicalNote = self.logicalNote
 	return logicalNote and logicalNote.state or "clear"
 end
 
+---@return number?
 function GraphicalNote:getPressedTime()
 	local logicalNote = self.logicalNote
 	return logicalNote and logicalNote.pressedTime
 end
 
+---@param time number
+---@return number
 function GraphicalNote:where(time)
 	local rate = self.graphicEngine:getVisualTimeRate()
 	time = time * rate / math.abs(rate)
@@ -32,18 +40,22 @@ function GraphicalNote:where(time)
 	end
 end
 
+---@return number
 function GraphicalNote:whereWillDraw()
 	return 0
 end
 
+---@return boolean
 function GraphicalNote:willDraw()
 	return self:whereWillDraw() == 0
 end
 
+---@return boolean
 function GraphicalNote:willDrawBeforeStart()
 	return self:whereWillDraw() == -1
 end
 
+---@return boolean
 function GraphicalNote:willDrawAfterEnd()
 	return self:whereWillDraw() == 1
 end

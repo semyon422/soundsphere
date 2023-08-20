@@ -4,8 +4,11 @@ local ConvertMeasureToInterval = require("sphere.models.EditorModel.ConvertMeasu
 local ConvertTests = require("sphere.models.EditorModel.ConvertTests")
 local DynamicLayerData = require("ncdk.DynamicLayerData")
 
+---@class sphere.EditorNoteChartLoader
+---@operator call: sphere.EditorNoteChartLoader
 local NoteChartLoader = class()
 
+---@return ncdk.DynamicLayerData
 function NoteChartLoader:load()
 	local ld = self.editorModel.noteChart:getLayerData(1)
 

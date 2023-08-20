@@ -11,14 +11,19 @@ function AvailableModifierListView:reloadItems()
 	self.items = self.game.modifierModel.modifiers
 end
 
+---@return number
 function AvailableModifierListView:getItemIndex()
 	return self.game.modifierModel.availableModifierItemIndex
 end
 
+---@param count number
 function AvailableModifierListView:scroll(count)
 	self.game.modifierModel:scrollAvailableModifier(count)
 end
 
+---@param i number
+---@param w number
+---@param h number
 function AvailableModifierListView:drawItem(i, w, h)
 	local item = self.items[i]
 	local prevItem = self.items[i - 1]

@@ -47,12 +47,14 @@ EditorView.load = thread.coro(function(self)
 	loading = false
 end)
 
+---@param dt number
 function EditorView:update(dt)
 	love.graphics.replaceTransform(gfx_util.transform(self.transform))
 	self.game.editorModel:update()
 	self.sequenceView:update(dt)
 end
 
+---@param event table
 function EditorView:receive(event)
 	self.game.editorController:receive(event)
 	self.sequenceView:receive(event)

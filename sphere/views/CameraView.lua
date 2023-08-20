@@ -1,6 +1,8 @@
 local class = require("class")
 local s3dc = require("s3dc")
 
+---@class sphere.CameraView
+---@operator call: sphere.CameraView
 local CameraView = class()
 
 CameraView.sensitivity = 0.5
@@ -37,6 +39,7 @@ function CameraView:unload()
 	self.game.gameplayController:saveCamera(x, y, z, s3dc.angle.pitch, s3dc.angle.yaw)
 end
 
+---@param event table
 function CameraView:receive(event)
 	if not self.draw_start then
 		return
@@ -77,6 +80,7 @@ function CameraView:receive(event)
 	end
 end
 
+---@param dt number
 function CameraView:update(dt)
 	if not self.draw_start then
 		return

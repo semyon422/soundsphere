@@ -5,6 +5,8 @@ local ImageNote = require("sphere.models.RhythmModel.GraphicEngine.ImageNote")
 
 local GraphicalNoteFactory = {}
 
+---@param noteData ncdk.NoteData
+---@return string
 local function getImageNoteType(noteData)
 	local image = noteData.images[1] and noteData.images[1][1]
 	if image and FileFinder:getType(image) == "video" then
@@ -22,6 +24,8 @@ local notes = {
 	ImageNote = {ImageNote, getImageNoteType},
 }
 
+---@param noteData ncdk.NoteData
+---@return sphere.GraphicalNote?
 function GraphicalNoteFactory:getNote(noteData)
 	local classAndType = notes[noteData.noteType]
 	if not classAndType then

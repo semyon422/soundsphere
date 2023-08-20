@@ -1,6 +1,8 @@
 local class = require("class")
 local JudgementScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.JudgementScoreSystem")
 
+---@class sphere.DeltaTimeJudgementView
+---@operator call: sphere.DeltaTimeJudgementView
 local DeltaTimeJudgementView = class()
 
 function DeltaTimeJudgementView:load()

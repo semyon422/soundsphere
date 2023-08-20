@@ -2,6 +2,8 @@ local class = require("class")
 local Replay = require("sphere.models.ReplayModel.Replay")
 local md5 = require("md5")
 
+---@class sphere.ReplayModel
+---@operator call: sphere.ReplayModel
 local ReplayModel = class()
 
 ReplayModel.path = "userdata/replays"
@@ -17,38 +19,44 @@ function ReplayModel:load()
 	self.replay.logicEngine = self.rhythmModel.logicEngine
 end
 
+---@param mode string
 function ReplayModel:setMode(mode)
 	self.mode = mode
 end
 
+---@param event table
 function ReplayModel:receive(event)
 	if self.mode == "record" and event.virtual then
 		self.replay:receive(event)
 	end
 end
 
+---@return nil?
 function ReplayModel:update()
-	if self.mode == "replay" then
-		local replay = self.replay
-		local nextEvent = replay:getNextEvent()
-		if not nextEvent then
-			return
-		end
+	if self.mode ~= "replay" then
+		return
+	end
 
-		local rhythmModel = self.rhythmModel
-		local timeEngine = rhythmModel.timeEngine
-		local logicEngine = rhythmModel.logicEngine
+	local replay = self.replay
+	local nextEvent = replay:getNextEvent()
+	if not nextEvent then
+		return
+	end
 
-		nextEvent.baseTime = nextEvent.baseTime or nextEvent.time
-		nextEvent.time = nextEvent.baseTime + logicEngine.inputOffset
-		if timeEngine.currentTime >= nextEvent.time then
-			rhythmModel:receive(nextEvent)
-			replay:step()
-			return self:update()
-		end
+	local rhythmModel = self.rhythmModel
+	local timeEngine = rhythmModel.timeEngine
+	local logicEngine = rhythmModel.logicEngine
+
+	nextEvent.baseTime = nextEvent.baseTime or nextEvent.time
+	nextEvent.time = nextEvent.baseTime + logicEngine.inputOffset
+	if timeEngine.currentTime >= nextEvent.time then
+		rhythmModel:receive(nextEvent)
+		replay:step()
+		return self:update()
 	end
 end
 
+---@return string
 function ReplayModel:saveReplay()
 	local replay = self.replay
 	replay.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
@@ -64,6 +72,8 @@ function ReplayModel:saveReplay()
 	return replayHash
 end
 
+---@param content string
+---@return sphere.Replay
 function ReplayModel:loadReplay(content)
 	local replay = Replay()
 	if not content then

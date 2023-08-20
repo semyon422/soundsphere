@@ -7,6 +7,8 @@ local NotechartsSubscreen = require("sphere.views.SelectView.NotechartsSubscreen
 local CollectionsSubscreen = require("sphere.views.SelectView.CollectionsSubscreen")
 local OsudirectSubscreen = require("sphere.views.SelectView.OsudirectSubscreen")
 
+---@class sphere.SelectView: sphere.ScreenView
+---@operator call: sphere.SelectView
 local SelectView = ScreenView + {}
 
 SelectView.subscreen = "notecharts"
@@ -24,10 +26,12 @@ function SelectView:unload()
 	self.game.selectController:unload()
 end
 
+---@param dt number
 function SelectView:update(dt)
-	self.game.selectController:update(dt)
+	self.game.selectController:update()
 end
 
+---@param event table
 function SelectView:receive(event)
 	self.game.selectController:receive(event)
 end
@@ -70,7 +74,8 @@ function SelectView:play()
 	local multiplayerModel = self.game.multiplayerModel
 	if multiplayerModel.room and not multiplayerModel.isPlaying then
 		multiplayerModel:pushNotechart()
-		return self:changeScreen("multiplayerView")
+		self:changeScreen("multiplayerView")
+		return
 	end
 
 	self:changeScreen("gameplayView")
@@ -108,6 +113,7 @@ function SelectView:switchToOsudirect()
 	just.focus()
 end
 
+---@param searchMode string
 function SelectView:setSearchMode(searchMode)
 	self.searchMode = searchMode
 end

@@ -1,6 +1,8 @@
 local class = require("class")
 local audio = require("audio")
 
+---@class sphere.Metronome
+---@operator call: sphere.Metronome
 local Metronome = class()
 
 local samplePath = "resources/metronome.ogg"
@@ -19,6 +21,7 @@ function Metronome:unload()
 	self.soundData:release()
 end
 
+
 function Metronome:updateNextTime()
 	local editorModel = self.editorModel
 	local timePoint = editorModel.timePoint
@@ -26,7 +29,9 @@ function Metronome:updateNextTime()
 	local currentTime = editorModel.timer:getTime()
 
 	if timePoint:tonumber() > currentTime then
-		return timePoint:tonumber()
+		self.nextTime = timePoint:tonumber()
+		self.isNextBeat = (timePoint.time % 1):tonumber() == 0
+		return
 	end
 
 	local id, t = editorModel.scroller:getNextSnapIntervalTime(timePoint, 1)

@@ -3,6 +3,8 @@ local class = require("class")
 local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
 local ChartRepo = require("sphere.models.CacheModel.ChartRepo")
 
+---@class sphere.CacheModel
+---@operator call: sphere.CacheModel
 local CacheModel = class()
 
 function CacheModel:new()
@@ -24,6 +26,9 @@ function CacheModel:load()
 	self.chartRepo:load()
 end
 
+---@param path string
+---@param force boolean?
+---@param callback function?
 function CacheModel:startUpdate(path, force, callback)
 	table.insert(self.tasks, {path, force, callback})
 end

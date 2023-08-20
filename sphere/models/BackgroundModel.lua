@@ -4,6 +4,8 @@ local gfx_util = require("gfx_util")
 local flux = require("flux")
 local delay = require("delay")
 
+---@class sphere.BackgroundModel
+---@operator call: sphere.BackgroundModel
 local BackgroundModel = class()
 
 BackgroundModel.alpha = 0
@@ -17,6 +19,7 @@ function BackgroundModel:load()
 	self.images = {self.emptyImage}
 end
 
+---@param path string
 function BackgroundModel:setBackgroundPath(path)
 	if self.path ~= path then
 		self.path = path
@@ -24,7 +27,7 @@ function BackgroundModel:setBackgroundPath(path)
 	end
 end
 
-function BackgroundModel:update(dt)
+function BackgroundModel:update()
 	if #self.images > 1 then
 		if self.alpha == 1 then
 			table.remove(self.images, 1)
@@ -35,6 +38,7 @@ function BackgroundModel:update(dt)
 	end
 end
 
+---@param image love.Image
 function BackgroundModel:setBackground(image)
 	local layer = math.min(#self.images + 1, 3)
 	self.images[layer] = image
@@ -43,15 +47,18 @@ function BackgroundModel:setBackground(image)
 	end
 end
 
+---@param path string?
 function BackgroundModel:loadBackgroundDebounce(path)
 	self.path = path or self.path
 	delay.debounce(self, "loadDebounce", 0.1, self.loadBackground, self)
 end
 
+
 function BackgroundModel:loadBackground()
 	local path = self.path
 	if not path then
-		return self:setBackground(self.emptyImage)
+		self:setBackground(self.emptyImage)
+		return
 	end
 
 	if not path:find("^http") then
@@ -74,11 +81,13 @@ function BackgroundModel:loadBackground()
 	end
 
 	if path ~= self.path then
-		return self:loadBackground()
+		self:loadBackground()
+		return
 	end
 
 	if image then
-		return self:setBackground(image)
+		self:setBackground(image)
+		return
 	end
 
 	self:setBackground(self.emptyImage)
@@ -137,6 +146,9 @@ local loadHttp = thread.async(function(url)
 	end
 end)
 
+---@param path string
+---@param type string?
+---@return love.Image?
 function BackgroundModel:loadImage(path, type)
 	local imageData
 	if type == "ojn" then

@@ -1,8 +1,16 @@
 local class = require("class")
 local ModifierIconView = require("sphere.views.ModifierView.ModifierIconView")
 
+---@class sphere.ModifierIconGridView
+---@operator call: sphere.ModifierIconGridView
 local ModifierIconGridView = class()
 
+---@param configModifier table|string
+---@param w number
+---@param h number
+---@param size number
+---@param noModifier boolean?
+---@param growUp boolean?
 function ModifierIconGridView:draw(configModifier, w, h, size, noModifier, growUp)
 	local modifierModel = self.game.modifierModel
 

@@ -16,6 +16,11 @@ local opts = {
 
 local timings = {}
 
+---@param a number
+---@param b number
+---@param c number
+---@param d number
+---@return table
 local function get(a, b, c, d)
 	return {
 		nearest = false,
@@ -32,6 +37,9 @@ timings.lr2 = get(-1, -0.2, 0.2, 0.2)
 local etterna = require("sphere.models.RhythmModel.ScoreEngine.etterna")
 
 local cachedEtterna = {}
+
+---@param judge number
+---@return table
 function timings.etterna(judge)
 	if cachedEtterna[judge] then
 		return cachedEtterna[judge]
@@ -44,6 +52,9 @@ function timings.etterna(judge)
 end
 
 local cachedOsu = {}
+
+---@param od number
+---@return table
 function timings.osu(od)
 	if cachedOsu[od] then
 		return cachedOsu[od]
@@ -55,10 +66,14 @@ function timings.osu(od)
 	return cachedOsu[od]
 end
 
+---@param t table
+---@return string
 local function ser(t)
 	return serpent.block(t, opts)
 end
 
+---@param t table
+---@return string
 function timings.getName(t)
 	local s = ser(t)
 	if s == ser(timings.soundsphere) then

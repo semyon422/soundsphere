@@ -1,15 +1,20 @@
 local LibraryModel = require("sphere.models.LibraryModel")
 
+---@class sphere.NoteChartLibraryModel: sphere.LibraryModel
+---@operator call: sphere.NoteChartLibraryModel
 local NoteChartLibraryModel = LibraryModel + {}
 
 NoteChartLibraryModel.setId = 1
 
 local NoteChartItem = {}
 
+---@param path string
+---@return string
 local function evalPath(path)
-	return path:gsub("\\", "/"):gsub("/[^/]-/%.%./", "/")
+	return (path:gsub("\\", "/"):gsub("/[^/]-/%.%./", "/"))
 end
 
+---@return string?
 function NoteChartItem:getBackgroundPath()
 	local path = self.path
 	if not path or not self.stagePath then
@@ -30,6 +35,8 @@ function NoteChartItem:getBackgroundPath()
 	return directoryPath
 end
 
+---@return string?
+---@return number?
 function NoteChartItem:getAudioPathPreview()
 	if not self.path or not self.audioPath then
 		return
@@ -45,6 +52,8 @@ function NoteChartItem:getAudioPathPreview()
 	return directoryPath .. "/preview.ogg", 0
 end
 
+---@param k any
+---@return any?
 function NoteChartItem:__index(k)
 	local raw = rawget(NoteChartItem, k)
 	if raw then
@@ -63,6 +72,8 @@ function NoteChartItem:__index(k)
 	return noteChartData and noteChartData[k] or noteChart and noteChart[k]
 end
 
+---@param itemIndex number
+---@return table
 function NoteChartLibraryModel:loadObject(itemIndex)
 	return setmetatable({
 		noteChartLibraryModel = self,
@@ -75,6 +86,7 @@ function NoteChartLibraryModel:clear()
 	self.itemsCount = 0
 end
 
+---@param setId number
 function NoteChartLibraryModel:setNoteChartSetId(setId)
 	self.setId = setId
 	local slice = self.cacheModel.cacheDatabase.noteChartSlices[setId]
@@ -86,6 +98,10 @@ function NoteChartLibraryModel:setNoteChartSetId(setId)
 	self.itemsCount = slice.size
 end
 
+---@param noteChartDataId number?
+---@param noteChartId number?
+---@param noteChartSetId number?
+---@return number
 function NoteChartLibraryModel:getItemIndex(noteChartDataId, noteChartId, noteChartSetId)
 	if not noteChartDataId or not noteChartId or not noteChartSetId then
 		return 1

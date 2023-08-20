@@ -1,5 +1,7 @@
 local class = require("class")
 
+---@param ... string
+---@return string
 local function sort(...)
 	local fields = {...}
 	for i, field in ipairs(fields) do
@@ -8,8 +10,12 @@ local function sort(...)
 	return table.concat(fields, ",")
 end
 
+---@class sphere.SortModel
+---@operator call: sphere.SortModel
 local SortModel = class()
 
+---@return string
+---@return boolean
 function SortModel:getOrderBy()
 	local f = self.sortItemsFunctions[self.name]
 	return f[1], f[2]

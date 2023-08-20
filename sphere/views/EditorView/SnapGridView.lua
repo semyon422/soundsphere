@@ -10,6 +10,8 @@ local Layout = require("sphere.views.EditorView.Layout")
 
 local SnapGridView = class()
 
+---@param timePoint ncdk.IntervalTimePoint
+---@return string
 local function getTimingText(timePoint)
 	local out = {}
 	if timePoint._tempoData then
@@ -24,6 +26,8 @@ local function getTimingText(timePoint)
 	return table.concat(out, ", ")
 end
 
+---@param timePoint ncdk.IntervalTimePoint
+---@return string
 local function getVelocityText(timePoint)
 	local out = {}
 	if timePoint._velocityData then
@@ -34,6 +38,12 @@ local function getVelocityText(timePoint)
 	return table.concat(out, ", ")
 end
 
+---@param field string
+---@param currentTime number
+---@param w number
+---@param h number
+---@param align string
+---@param getText function
 function SnapGridView:drawTimingObjects(field, currentTime, w, h, align, getText)
 	local editorModel = self.game.editorModel
 	local rangeTracker = editorModel.layerData.ranges.timePoint
@@ -78,6 +88,10 @@ local snaps = {
 	[8] = colors.green,
 }
 
+---@param timePoint ncdk.IntervalTimePoint
+---@param field string
+---@param currentTime number
+---@param width number
 function SnapGridView:drawSnap(timePoint, field, currentTime, width)
 	local editorModel = self.game.editorModel
 	local noteSkin = self.game.noteSkinModel.noteSkin
@@ -104,6 +118,9 @@ function SnapGridView:drawSnap(timePoint, field, currentTime, width)
 	love.graphics.pop()
 end
 
+---@param field string
+---@param currentTime number
+---@param width number
 function SnapGridView:drawComputedGrid(field, currentTime, width)
 	local editorModel = self.game.editorModel
 	local editor = self.game.configModel.configs.settings.editor
@@ -174,6 +191,8 @@ function SnapGridView:drawComputedGrid(field, currentTime, width)
 	love.graphics.setColor(1, 1, 1, 1)
 end
 
+---@param _w number
+---@param _h number
 function SnapGridView:drawTimings(_w, _h)
 	local editorModel = self.game.editorModel
 	local editorTimePoint = editorModel.timePoint
@@ -210,6 +229,10 @@ function SnapGridView:drawTimings(_w, _h)
 	love.graphics.pop()
 end
 
+---@param id any
+---@param w number
+---@param h number
+---@return boolean
 local function drag(id, w, h)
 	local over = just.is_over(w, h)
 	local _, active, hovered = just.button(id, over)
@@ -224,6 +247,7 @@ local function drag(id, w, h)
 	return just.active_id == id
 end
 
+---@param self table
 local function drawMouse(self)
 	local editorModel = self.game.editorModel
 	local dt = editorModel:getMouseTime() - editorModel.timePoint.absoluteTime

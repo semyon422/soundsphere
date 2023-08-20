@@ -2,6 +2,8 @@ local gfx_util = require("gfx_util")
 local FileFinder = require("sphere.filesystem.FileFinder")
 local class = require("class")
 
+---@class sphere.ImageView
+---@operator call: sphere.ImageView
 local ImageView = class()
 
 function ImageView:load()

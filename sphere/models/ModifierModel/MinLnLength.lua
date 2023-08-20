@@ -1,5 +1,7 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 
+---@class sphere.MinLnLength: sphere.Modifier
+---@operator call: sphere.MinLnLength
 local MinLnLength = Modifier + {}
 
 MinLnLength.type = "NoteChartModifier"
@@ -13,14 +15,19 @@ MinLnLength.step = 0.025
 
 MinLnLength.description = "Convert long notes to short notes if they are shorter than this length"
 
+---@param config table
+---@return string
 function MinLnLength:getString(config)
 	return "MLL"
 end
 
+---@param config table
+---@return string
 function MinLnLength:getSubString(config)
-	return config.value * 1000
+	return tostring(config.value * 1000)
 end
 
+---@param config table
 function MinLnLength:apply(config)
 	local duration = config.value
 	local noteChart = self.noteChart

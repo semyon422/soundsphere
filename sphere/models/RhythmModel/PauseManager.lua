@@ -1,6 +1,8 @@
 local class = require("class")
 local flux = require("flux")
 
+---@class sphere.PauseManager
+---@operator call: sphere.PauseManager
 local PauseManager = class()
 
 function PauseManager:load()
@@ -9,6 +11,7 @@ function PauseManager:load()
 	self.needRetry = false
 end
 
+---@param config table
 function PauseManager:setPauseTimes(config)
 	self.progressTime = {
 		["play-pause"] = config.playPause,
@@ -18,7 +21,7 @@ function PauseManager:setPauseTimes(config)
 	}
 end
 
-function PauseManager:update(dt)
+function PauseManager:update()
 	self:updateState()
 
 	if self.progress == 1 then
@@ -45,6 +48,7 @@ function PauseManager:updateState()
 	end
 end
 
+---@param newState string
 function PauseManager:changePlayState(newState)
 	local state = self.state
 	local progressTime = self.progressTime
@@ -60,6 +64,7 @@ function PauseManager:changePlayState(newState)
 	self:startProgress(time)
 end
 
+---@param time number?
 function PauseManager:startProgress(time)
 	self.progress = 0
 	if self.tween then
@@ -69,7 +74,8 @@ function PauseManager:startProgress(time)
 		return
 	elseif time == 0 then
 		self.progress = 1
-		return self:updateState()
+		self:updateState()
+		return
 	end
 	self.tween = flux.to(self, time, {progress = 1}):ease("linear")
 end

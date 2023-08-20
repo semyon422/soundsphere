@@ -3,14 +3,20 @@ local class = require("class")
 local just = require("just")
 local imgui = require("imgui")
 
+---@class sphere.JustConfig
+---@operator call: sphere.JustConfig
 local JustConfig = class()
 
+---@param key string
+---@return any?
 function JustConfig:get(key)
 	return self.data[key]
 end
 
-function JustConfig:set(key, ...)
-	self.data[key] = ...
+---@param key string
+---@param value any?
+function JustConfig:set(key, value)
+	self.data[key] = value
 end
 
 function JustConfig:init() end
@@ -47,6 +53,9 @@ function JustConfig:close()
 	end
 end
 
+---@param path string
+---@return sphere.JustConfig
+---@return boolean
 function JustConfig:fromFile(path)
 	local content = love.filesystem.read(path)
 	local exists = content ~= nil
@@ -81,6 +90,8 @@ local opts = {
 	end
 }
 
+---@param s string
+---@return string
 function JustConfig:export(s)
 	return (s:gsub(
 		"--%[%[data%]%].+--%[%[/data%]%]",

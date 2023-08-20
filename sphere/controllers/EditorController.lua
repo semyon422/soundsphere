@@ -3,6 +3,8 @@ local NoteChartExporter = require("sph.NoteChartExporter")
 local OsuNoteChartExporter = require("osu.NoteChartExporter")
 local FileFinder = require("sphere.filesystem.FileFinder")
 
+---@class sphere.EditorController
+---@operator call: sphere.EditorController
 local EditorController = class()
 
 function EditorController:load()
@@ -79,10 +81,11 @@ function EditorController:saveToOsu()
 	love.filesystem.write(path, exp:export())
 end
 
+---@param event table
 function EditorController:receive(event)
 	self.editorModel:receive(event)
 	if event.name == "filedropped" then
-		return self:filedropped(event[1])
+		self:filedropped(event[1])
 	end
 end
 
@@ -90,6 +93,8 @@ local exts = {
 	mp3 = true,
 	ogg = true,
 }
+
+---@param file love.File
 function EditorController:filedropped(file)
 	local path = file:getFilename():gsub("\\", "/")
 

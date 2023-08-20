@@ -3,6 +3,8 @@ local math_util = require("math_util")
 local gfx_util = require("gfx_util")
 local just = require("just")
 
+---@class sphere.ShortNoteView: sphere.NoteView
+---@operator call: sphere.ShortNoteView
 local ShortNoteView = NoteView + {}
 
 function ShortNoteView:draw()
@@ -45,6 +47,8 @@ function ShortNoteView:drawSelected()
 	love.graphics.rectangle("line", x, y, _w - x, _h - y)
 end
 
+---@param chords table
+---@param column number
 function ShortNoteView:fillChords(chords, column)
 	local startNoteData = self.graphicalNote.startNoteData
 
@@ -55,14 +59,16 @@ function ShortNoteView:fillChords(chords, column)
 	chord[column] = startNoteData.noteType
 end
 
+---@return boolean
 function ShortNoteView:isVisible()
 	local color = self:getNotePart("Head"):getColor()
 	if not color then
-		return
+		return false
 	end
 	return color[4] > 0
 end
 
+---@return number?...
 function ShortNoteView:getTransformParams()
 	local hw = self:getNotePart("Head")
 	local w, h = hw:getDimensions()

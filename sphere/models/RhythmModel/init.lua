@@ -9,6 +9,8 @@ local InputManager = require("sphere.models.RhythmModel.InputManager")
 local PauseManager = require("sphere.models.RhythmModel.PauseManager")
 require("sphere.models.RhythmModel.LogicEngine.Test")
 
+---@class sphere.RhythmModel
+---@operator call: sphere.RhythmModel
 local RhythmModel = class()
 
 function RhythmModel:new()
@@ -78,6 +80,7 @@ function RhythmModel:unloadLogicEngines()
 	self.logicEngine:unload()
 end
 
+---@param event table
 function RhythmModel:receive(event)
 	if event.name == "framestarted" then
 		self.timeEngine:sync(event)
@@ -87,16 +90,17 @@ function RhythmModel:receive(event)
 	self.inputManager:receive(event)
 end
 
-function RhythmModel:update(dt)
+function RhythmModel:update()
 	if self.timeEngine.timer.isPlaying then
 		self.logicEngine:update()
 	end
 	self.audioEngine:update()
 	self.scoreEngine:update()
-	self.graphicEngine:update(dt)
-	self.pauseManager:update(dt)
+	self.graphicEngine:update()
+	self.pauseManager:update()
 end
 
+---@return boolean
 function RhythmModel:hasResult()
 	local timeEngine = self.timeEngine
 	local base = self.scoreEngine.scoreSystem.base
@@ -112,26 +116,32 @@ function RhythmModel:hasResult()
 		entry.accuracy < math.huge
 end
 
+---@param windUp table?
 function RhythmModel:setWindUp(windUp)
 	self.timeEngine.windUp = windUp
 end
 
+---@param timeRate number
 function RhythmModel:setTimeRate(timeRate)
 	self.timeEngine:setBaseTimeRate(timeRate)
 end
 
+---@param autoplay boolean
 function RhythmModel:setAutoplay(autoplay)
 	self.logicEngine.autoplay = autoplay
 end
 
+---@param promode boolean
 function RhythmModel:setPromode(promode)
 	self.logicEngine.promode = promode
 end
 
+---@param adjustRate number
 function RhythmModel:setAdjustRate(adjustRate)
 	self.timeEngine.adjustRate = adjustRate
 end
 
+---@param noteChart ncdk.NoteChart
 function RhythmModel:setNoteChart(noteChart)
 	assert(noteChart)
 	self.noteChart = noteChart
@@ -141,44 +151,54 @@ function RhythmModel:setNoteChart(noteChart)
 	self.graphicEngine.noteChart = noteChart
 end
 
+---@param range table
 function RhythmModel:setDrawRange(range)
 	self.graphicEngine.range = range
 end
 
+---@param volume table
 function RhythmModel:setVolume(volume)
 	self.audioEngine.volume = volume
 	self.audioEngine:updateVolume()
 end
 
+---@param mode table
 function RhythmModel:setAudioMode(mode)
 	self.audioEngine.mode = mode
 end
 
+---@param visualTimeRate number
 function RhythmModel:setVisualTimeRate(visualTimeRate)
 	self.graphicEngine.visualTimeRate = visualTimeRate
 	self.graphicEngine.targetVisualTimeRate = visualTimeRate
 end
 
+---@param longNoteShortening number
 function RhythmModel:setLongNoteShortening(longNoteShortening)
 	self.graphicEngine.longNoteShortening = longNoteShortening
 end
 
+---@param timeToPrepare number
 function RhythmModel:setTimeToPrepare(timeToPrepare)
 	self.timeEngine.timeToPrepare = timeToPrepare
 end
 
+---@param offset number
 function RhythmModel:setInputOffset(offset)
 	self.logicEngine.inputOffset = math.floor(offset * 1024) / 1024
 end
 
+---@param offset number
 function RhythmModel:setVisualOffset(offset)
 	self.graphicEngine.visualOffset = offset
 end
 
+---@param ... any?
 function RhythmModel:setPauseTimes(...)
 	self.pauseManager:setPauseTimes(...)
 end
 
+---@param scaleSpeed boolean
 function RhythmModel:setVisualTimeRateScale(scaleSpeed)
 	self.graphicEngine.scaleSpeed = scaleSpeed
 end

@@ -1,6 +1,8 @@
 local discordrpc = require("discordRPC")
 local class = require("class")
 
+---@class sphere.DiscordModel
+---@operator call: sphere.DiscordModel
 local DiscordModel = class()
 
 DiscordModel.appId = "594443609668059149"
@@ -30,10 +32,13 @@ function DiscordModel:load()
 	self.nextUpdate = 0
 end
 
+---@param presence table
 function DiscordModel:setPresence(presence)
 	self.presence = self:validatePresence(presence)
 end
 
+---@param presence table
+---@return table
 function DiscordModel:validatePresence(presence)
 	presence.state				= presence.state			and presence.state			:sub(1, 127)
 	presence.details			= presence.details			and presence.details		:sub(1, 127)
@@ -59,38 +64,54 @@ function DiscordModel:update()
 		pcall(discordrpc.updatePresence, self.presence)
 		self.nextUpdate = love.timer.getTime() + 2
 	end
-	return discordrpc.runCallbacks()
+	discordrpc.runCallbacks()
 end
 
 function DiscordModel:unload()
-	return discordrpc.shutdown()
+	discordrpc.shutdown()
 end
 
+---@param userId any
+---@param username any
+---@param discriminator any
+---@param avatar any
 function DiscordModel:ready(userId, username, discriminator, avatar)
 	print(string.format("Discord: ready (%s, %s, %s, %s)", userId, username, discriminator, avatar))
 end
 
+---@param errorCode any
+---@param message any
 function DiscordModel:disconnected(errorCode, message)
 	print(string.format("Discord: disconnected (%d: %s)", errorCode, message))
 end
 
+---@param errorCode any
+---@param message any
 function DiscordModel:errored(errorCode, message)
 	print(string.format("Discord: error (%d: %s)", errorCode, message))
 end
 
+---@param joinSecret any
 function DiscordModel:joinGame(joinSecret)
 	print(string.format("Discord: join (%s)", joinSecret))
 end
 
+---@param spectateSecret any
 function DiscordModel:spectateGame(spectateSecret)
 	print(string.format("Discord: spectate (%s)", spectateSecret))
 end
 
+---@param userId any
+---@param username any
+---@param discriminator any
+---@param avatar any
 function DiscordModel:joinRequest(userId, username, discriminator, avatar)
 	print(string.format("Discord: join request (%s, %s, %s, %s)", userId, username, discriminator, avatar))
 	self:respond(userId, "yes")
 end
 
+---@param userId any
+---@param reply any
 function DiscordModel:respond(userId, reply)
 	discordrpc.respond(userId, "yes")
 end

@@ -2,10 +2,13 @@ local class = require("class")
 local NoteViewFactory = require("sphere.views.RhythmView.NoteViewFactory")
 local gfx_util = require("gfx_util")
 
+---@class sphere.RhythmView
+---@operator call: sphere.RhythmView
 local RhythmView = class()
 
 RhythmView.mode = "default"
 
+---@param f function
 function RhythmView:processNotes(f)
 	for _, noteDrawer in ipairs(self.game.rhythmModel.graphicEngine.noteDrawers) do
 		for i = noteDrawer.startNoteIndex, noteDrawer.endNoteIndex do
@@ -14,6 +17,7 @@ function RhythmView:processNotes(f)
 	end
 end
 
+---@param note sphere.GraphicalNote
 function RhythmView:fillChord(note)
 	local noteSkin = self.game.noteSkinModel.noteSkin
 
@@ -33,6 +37,7 @@ function RhythmView:fillChord(note)
 	end
 end
 
+---@param note sphere.GraphicalNote
 function RhythmView:drawNote(note)
 	local noteSkin = self.game.noteSkinModel.noteSkin
 
@@ -49,6 +54,7 @@ function RhythmView:drawNote(note)
 	end
 end
 
+---@param note sphere.GraphicalNote
 function RhythmView:drawSelected(note)
 	local noteSkin = self.game.noteSkinModel.noteSkin
 
@@ -66,6 +72,7 @@ function RhythmView:drawSelected(note)
 	end
 end
 
+---@param noteData ncdk.NoteData
 function RhythmView:pressNote(noteData) end
 
 function RhythmView:draw()

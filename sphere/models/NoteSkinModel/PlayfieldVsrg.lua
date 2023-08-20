@@ -16,13 +16,20 @@ local JudgementView = require("sphere.views.GameplayView.JudgementView")
 local DeltaTimeJudgementView = require("sphere.views.GameplayView.DeltaTimeJudgementView")
 local MatchPlayersView = require("sphere.views.GameplayView.MatchPlayersView")
 
+---@class sphere.PlayfieldVsrg
+---@operator call: sphere.PlayfieldVsrg
 local PlayfieldVsrg = class()
 
+---@param noteskin sphere.NoteSkin
 function PlayfieldVsrg:new(noteskin)
 	self.noteskin = noteskin
 	self.noteskin.playField = self
 end
 
+---@param width number
+---@param height number
+---@param align string
+---@return table
 function PlayfieldVsrg:newTransform(width, height, align)
 	local transform = {0, 0, 0, {0, 1 / height}, {0, 1 / height}, 0, 0, 0, 0}
 	if align == "center" then
@@ -33,6 +40,7 @@ function PlayfieldVsrg:newTransform(width, height, align)
 	return transform
 end
 
+---@return table
 function PlayfieldVsrg:newNoteskinTransform()
 	local height = self.noteskin.unit
 	local align = self.noteskin.align
@@ -49,6 +57,8 @@ function PlayfieldVsrg:newNoteskinTransform()
 	return transform
 end
 
+---@param height number
+---@return table
 function PlayfieldVsrg:newLaneCenterTransform(height)
 	local noteskin = self.noteskin
 	local align = noteskin.align
@@ -65,27 +75,36 @@ function PlayfieldVsrg:newLaneCenterTransform(height)
 	return transform
 end
 
+---@param width number
+---@param height number
+---@return table
 function PlayfieldVsrg:newFullTransform(width, height)
 	return {0, 0, 0, {1 / width, 0}, {0, 1 / height}, 0, 0, 0, 0}
 end
 
+---@param ... any?
+---@return any?
 function PlayfieldVsrg:add(...)
 	table.insert(self, ...)
 	return ...
 end
 
+---@return table
 function PlayfieldVsrg:enableCamera()
 	return self:add(CameraView({
 		draw_start = true,
 	}))
 end
 
+---@return table
 function PlayfieldVsrg:disableCamera()
 	return self:add(CameraView({
 		draw_end = true,
 	}))
 end
 
+---@param object table
+---@return table
 function PlayfieldVsrg:addRhythmView(object)
 	if not object.transform then
 		object.transform = self:newNoteskinTransform()
@@ -93,10 +112,14 @@ function PlayfieldVsrg:addRhythmView(object)
 	return self:add(RhythmView(object))
 end
 
+---@param object table
+---@return table
 function PlayfieldVsrg:addImageView(object)
 	return self:add(ImageView(object))
 end
 
+---@param object table?
+---@return table
 function PlayfieldVsrg:addNotes(object)
 	object = object or {}
 	if not object.transform then
@@ -112,6 +135,8 @@ function PlayfieldVsrg:addNotes(object)
 	return self:addRhythmView(object)
 end
 
+---@param object table?
+---@return table
 function PlayfieldVsrg:addLightings(object)
 	object = object or {}
 	object.mode = "lighting"
@@ -119,6 +144,8 @@ function PlayfieldVsrg:addLightings(object)
 	return self:addRhythmView(object)
 end
 
+---@param object table?
+---@return table
 function PlayfieldVsrg:addBga(object)
 	object = object or {}
 	object.mode = "bga"
@@ -126,6 +153,8 @@ function PlayfieldVsrg:addBga(object)
 	return self:addRhythmView(object)
 end
 
+---@param object table?
+---@return table
 function PlayfieldVsrg:addProgressBar(object)
 	object = object or {}
 	object.subscreen = "gameplay"
@@ -139,6 +168,8 @@ function PlayfieldVsrg:addProgressBar(object)
 	return self:add(object)
 end
 
+---@param object table?
+---@return table
 function PlayfieldVsrg:addHpBar(object)
 	object = object or {}
 	object.subscreen = "gameplay"
@@ -153,11 +184,16 @@ function PlayfieldVsrg:addHpBar(object)
 	return self:add(object)
 end
 
+---@param object table?
+---@return table
 function PlayfieldVsrg:addValueView(object)
 	object = object or {}
 	return self:add(ValueView(object))
 end
 
+
+---@param object table?
+---@return table
 function PlayfieldVsrg:addScore(object)
 	object = object or {}
 	object.subscreen = "gameplay"
@@ -177,6 +213,8 @@ function PlayfieldVsrg:addScore(object)
 	return self:add(object)
 end
 
+---@param object table?
+---@return table
 function PlayfieldVsrg:addAccuracy(object)
 	object = object or {}
 	object.subscreen = "gameplay"
@@ -190,6 +228,8 @@ function PlayfieldVsrg:addAccuracy(object)
 	return self:add(object)
 end
 
+---@param object table?
+---@return table
 function PlayfieldVsrg:addCombo(object)
 	object = object or {}
 	object.subscreen = "gameplay"
@@ -202,6 +242,8 @@ function PlayfieldVsrg:addCombo(object)
 	return self:add(object)
 end
 
+---@param object table
+---@return table
 function PlayfieldVsrg:addJudgement(object)
 	if not object.transform then
 		object.transform = self:newLaneCenterTransform(1080)
@@ -233,6 +275,8 @@ function PlayfieldVsrg:addJudgement(object)
 	}))
 end
 
+---@param object table
+---@return table
 function PlayfieldVsrg:addDeltaTimeJudgement(object)
 	if not object.transform then
 		object.transform = self:newLaneCenterTransform(1080)
@@ -266,6 +310,7 @@ function PlayfieldVsrg:addDeltaTimeJudgement(object)
 	}))
 end
 
+---@param object table
 function PlayfieldVsrg:addKeyImages(object)
 	local noteskin = self.noteskin
 	if not object.transform then
@@ -309,6 +354,7 @@ function PlayfieldVsrg:addKeyImages(object)
 	end
 end
 
+---@param object table
 function PlayfieldVsrg:addStaticKeyImages(object)
 	local noteskin = self.noteskin
 	if not object.transform then
@@ -331,6 +377,7 @@ function PlayfieldVsrg:addStaticKeyImages(object)
 	end
 end
 
+---@param object table
 function PlayfieldVsrg:addKeyImageAnimations(object)
 	local noteskin = self.noteskin
 	if not object.transform then
@@ -400,6 +447,8 @@ function PlayfieldVsrg:addKeyImageAnimations(object)
 	end
 end
 
+---@param object table
+---@return table?
 function PlayfieldVsrg:addColumnsBackground(object)
 	if not object then
 		return
@@ -434,6 +483,11 @@ function PlayfieldVsrg:addColumnsBackground(object)
 	}))
 end
 
+---@param bw number
+---@param noteskin sphere.NoteSkinVsrg
+---@param i number
+---@param inputs number
+---@return number
 local function getGuidelineX(bw, noteskin, i, inputs)
 	if bw < 0 then
 		if i <= inputs then
@@ -450,6 +504,7 @@ local function getGuidelineX(bw, noteskin, i, inputs)
 	end
 end
 
+---@param object table?
 function PlayfieldVsrg:addGuidelines(object)
 	if not object then
 		return
@@ -506,6 +561,9 @@ end
 local perfectColor = {1, 1, 1, 1}
 local notPerfectColor = {1, 0.6, 0.4, 1}
 local missColor = {1, 0.2, 0.2, 1}
+
+---@param object table?
+---@return table?
 function PlayfieldVsrg:addHitError(object)
 	if not object then
 		return
@@ -528,6 +586,7 @@ function PlayfieldVsrg:addHitError(object)
 	return self:add(HitErrorView(object))
 end
 
+---@return table
 function PlayfieldVsrg:addMatchPlayers()
 	local object = {}
 	object.subscreen = "gameplay"
@@ -543,6 +602,9 @@ function PlayfieldVsrg:addMatchPlayers()
 	return self:add(object)
 end
 
+---@param covers table?
+---@param x number?
+---@param w number?
 function PlayfieldVsrg:addLaneCovers(covers, x, w)
 	if not covers then
 		return
@@ -567,6 +629,8 @@ function PlayfieldVsrg:addLaneCovers(covers, x, w)
 	end
 end
 
+---@param object table
+---@return table?
 function PlayfieldVsrg:addLaneCover(object)
 	local noteskin = self.noteskin
 	local unit = noteskin.unit

@@ -3,6 +3,8 @@ local gfx_util = require("gfx_util")
 local inside = require("table_util").inside
 local class = require("class")
 
+---@class sphere.ValueView
+---@operator call: sphere.ValueView
 local ValueView = class()
 
 function ValueView:load()

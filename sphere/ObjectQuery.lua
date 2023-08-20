@@ -1,23 +1,35 @@
 local class = require("class")
 
+---@class sphere.ObjectQuery
+---@operator call: sphere.ObjectQuery
 local ObjectQuery = class()
 
 function ObjectQuery:new()
 	self.joins = {}
 end
 
+---@param t string
+---@param dbTable string
+---@param on string
 function ObjectQuery:setJoin(t, dbTable, on)
 	table.insert(self.joins, {t .. " JOIN", dbTable, on})
 end
 
+---@param dbTable string
+---@param on string
 function ObjectQuery:setInnerJoin(dbTable, on)
 	self:setJoin("INNER", dbTable, on)
 end
 
+---@param dbTable string
+---@param on string
 function ObjectQuery:setLeftJoin(dbTable, on)
 	self:setJoin("LEFT", dbTable, on)
 end
 
+---@param field string
+---@param condition string
+---@return string
 function ObjectQuery:newBooleanCase(field, condition)
 	return ([[
 		CASE WHEN %s THEN TRUE
@@ -26,6 +38,7 @@ function ObjectQuery:newBooleanCase(field, condition)
 	]]):format(condition, field)
 end
 
+---@return string
 function ObjectQuery:concatJoins()
 	local out = {}
 	for _, join in ipairs(self.joins) do
@@ -34,6 +47,7 @@ function ObjectQuery:concatJoins()
 	return table.concat(out, "\n")
 end
 
+---@return string
 function ObjectQuery:getQueryParams()
 	local out = {}
 
@@ -54,6 +68,7 @@ function ObjectQuery:getQueryParams()
 	return table.concat(out, " ")
 end
 
+---@return string
 function ObjectQuery:getCountQueryParams()
 	local out = {}
 
@@ -71,6 +86,7 @@ function ObjectQuery:getCountQueryParams()
 	return table.concat(out, " ")
 end
 
+---@return number
 function ObjectQuery:getCount()
 	local out = {}
 

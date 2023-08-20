@@ -1,5 +1,7 @@
 local class = require("class")
 
+---@class sphere.ThemeModel
+---@operator call: sphere.ThemeModel
 local ThemeModel = class()
 
 ThemeModel.path = "userdata/themes"
@@ -10,6 +12,7 @@ function ThemeModel:load()
 	-- return self:lookup(self.path)
 end
 
+---@param directoryPath string
 function ThemeModel:lookup(directoryPath)
 	for _, itemName in pairs(love.filesystem.getDirectoryItems(directoryPath)) do
 		local path = directoryPath .. "/" .. itemName
@@ -26,6 +29,7 @@ function ThemeModel:lookup(directoryPath)
 	end
 end
 
+---@return table
 function ThemeModel:getThemes()
 	return self.themes
 end

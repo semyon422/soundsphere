@@ -1,7 +1,10 @@
 local NoteSkin = require("sphere.models.NoteSkinModel.NoteSkin")
 
+---@class sphere.NoteSkinVsrg: sphere.NoteSkin
+---@operator call: sphere.NoteSkinVsrg
 local NoteSkinVsrg = NoteSkin + {}
 
+---@param columns table
 function NoteSkinVsrg:setColumns(columns)
 	self.columns = columns
 	local inputsCount = self.inputsCount
@@ -52,6 +55,7 @@ function NoteSkinVsrg:setColumns(columns)
 	self.columns = x
 end
 
+---@param columns table
 function NoteSkinVsrg:setInput(columns)
 	for i, input in ipairs(columns) do
 		columns[input] = 1
@@ -60,6 +64,9 @@ function NoteSkinVsrg:setInput(columns)
 	self.inputsCount = #columns
 end
 
+---@param inputType string
+---@param inputIndex number
+---@return number?
 function NoteSkinVsrg:getInputColumn(inputType, inputIndex)
 	local input = inputType
 	if inputIndex then
@@ -72,6 +79,10 @@ function NoteSkinVsrg:getInputColumn(inputType, inputIndex)
 	end
 end
 
+---@param column number
+---@param split boolean?
+---@return string
+---@return number?
 function NoteSkinVsrg:getColumnInput(column, split)
 	column = (column - 1) % self.inputsCount + 1
 	local input = self.inputs[column]
@@ -97,7 +108,11 @@ local colors = {
 }
 NoteSkinVsrg.colors = colors
 
-NoteSkinVsrg.color = function(timeState, noteView)
+---@param timeState table
+---@param noteView sphere.NoteView
+---@param column number
+---@return table
+function NoteSkinVsrg.color(timeState, noteView, column)
 	local logicalState = noteView.graphicalNote:getLogicalState()
 	if logicalState == "clear" or logicalState == "skipped" then
 		return colors.clear
@@ -123,6 +138,10 @@ NoteSkinVsrg.color = function(timeState, noteView)
 end
 
 local bufferColor = {0, 0, 0, 0}
+
+---@param source table
+---@param color table|function
+---@return table
 function NoteSkinVsrg:multiplyColors(source, color)
 	if type(color) == "function" then
 		color = color()
@@ -133,6 +152,9 @@ function NoteSkinVsrg:multiplyColors(source, color)
 	return bufferColor
 end
 
+---@param x table
+---@param w table
+---@return table
 function NoteSkinVsrg:xwToSpace(x, w)
 	local s = {}
 	local sum = 0
@@ -144,6 +166,9 @@ function NoteSkinVsrg:xwToSpace(x, w)
 	return s
 end
 
+---@param a table
+---@param deltaTime number
+---@return number?
 local function getFrame(a, deltaTime)
 	if not a.range then
 		return
@@ -151,21 +176,31 @@ local function getFrame(a, deltaTime)
 	return math.floor(deltaTime * a.rate) % a.frames * (a.range[2] - a.range[1]) / (a.frames - 1) + a.range[1]
 end
 
+---@param time number
+---@return number
 function NoteSkinVsrg:getTimePosition(time)
 	return self.hitposition + self.unit * time
 end
 
+---@param pos number
+---@return number
 function NoteSkinVsrg:getInverseTimePosition(pos)
 	return (pos - self.hitposition) / self.unit
 end
 
-function NoteSkinVsrg:getPosition(timeState)
+---@param timeState table
+---@param noteView sphere.NoteView
+---@param column number
+---@return number
+function NoteSkinVsrg:getPosition(timeState, noteView, column)
 	if self.editor then
 		return self:getTimePosition(timeState.scaledAbsoluteDeltaTime)
 	end
 	return self:getTimePosition(timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
 end
 
+---@param mx number
+---@return number?
 function NoteSkinVsrg:getInverseColumnPosition(mx)
 	for i = 1, self.inputsCount do
 		local Head = self.notes.ShortNote.Head
@@ -179,6 +214,8 @@ function NoteSkinVsrg:getInverseColumnPosition(mx)
 	end
 end
 
+---@param params table
+---@param noteType string?
 function NoteSkinVsrg:setShortNote(params, noteType)
 	local h = params.h or 0
 	local height = {}
@@ -220,6 +257,7 @@ function NoteSkinVsrg:setShortNote(params, noteType)
 	}}
 end
 
+---@param params table
 function NoteSkinVsrg:setLongNote(params)
 	local h = params.h or 0
 	local headHeight = {}
@@ -334,6 +372,8 @@ local bmsLayers = {
 	-- 0x0D,
 	-- 0x0E,
 }
+
+---@param params table?
 function NoteSkinVsrg:addBga(params)
 	local imageHead = {
 		x = {},
@@ -359,6 +399,9 @@ function NoteSkinVsrg:addBga(params)
 	end
 end
 
+---@param input string
+---@param index number?
+---@return number
 function NoteSkinVsrg:setInputListIndex(input, index)
 	local inputs = self.inputs
 	index = index or 1
@@ -372,6 +415,10 @@ function NoteSkinVsrg:setInputListIndex(input, index)
 	return i
 end
 
+---@param head table
+---@param input string
+---@param params table
+---@param index number?
 function NoteSkinVsrg:addImageNote(head, input, params, index)
 	local i = self:setInputListIndex(input, index)
 
@@ -382,6 +429,8 @@ function NoteSkinVsrg:addImageNote(head, input, params, index)
 	head.color[i] = params.color or colors.clear
 end
 
+---@param params table
+---@param index number?
 function NoteSkinVsrg:addMeasureLine(params, index)
 	local i = self:setInputListIndex("measure1", index)
 
@@ -396,6 +445,7 @@ function NoteSkinVsrg:addMeasureLine(params, index)
 	Head.image[i] = params.image
 end
 
+---@param params table
 function NoteSkinVsrg:setLighting(params)
 	if params.range then
 		params.frames = math.abs(params.range[2] - params.range[1]) + 1
@@ -430,7 +480,11 @@ function NoteSkinVsrg:setLighting(params)
 	end
 end
 
-local getAnimation = function(animations, timeState)
+---@param animations table
+---@param timeState table
+---@return table?
+---@return number?
+local function getAnimation(animations, timeState)
 	local beforeStart = animations.beforeStart
 	local afterStart = animations.afterStart
 	local between = animations.between
@@ -499,6 +553,10 @@ local getAnimation = function(animations, timeState)
 	return animation, currentTime - time
 end
 
+---@param animations table
+---@param timeState table
+---@return string?
+---@return number?
 local function getAnimationImage(animations, timeState)
 	local animation, deltaTime = getAnimation(animations, timeState)
 	if not animation then
@@ -507,6 +565,7 @@ local function getAnimationImage(animations, timeState)
 	return animation.image, getFrame(animation, deltaTime)
 end
 
+---@param params table
 function NoteSkinVsrg:setAnimation(params)
 	params.frames = math.abs(params.range[2] - params.range[1]) + 1
 	local note = {Head = {

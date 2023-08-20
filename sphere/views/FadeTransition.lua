@@ -2,12 +2,15 @@ local class = require("class")
 local flux = require("flux")
 local gfx_util = require("gfx_util")
 
+---@class sphere.FadeTransition
+---@operator call: sphere.FadeTransition
 local FadeTransition = class()
 
 FadeTransition.transiting = false
 FadeTransition.alpha = 1
 FadeTransition.phase = 0
 
+---@param callback function?
 function FadeTransition:transitIn(callback)
 	if self.transiting then
 		return
@@ -26,6 +29,7 @@ function FadeTransition:transitOut()
 	flux.to(self, 0.2, {alpha = 1}):ease("quadinout")
 end
 
+---@param dt number
 function FadeTransition:update(dt)
 	if not self.transiting then
 		return

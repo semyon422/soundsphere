@@ -2,15 +2,20 @@ local NoteSkinVsrg = require("sphere.models.NoteSkinModel.NoteSkinVsrg")
 local BasePlayfield = require("sphere.models.NoteSkinModel.BasePlayfield")
 local JustConfig = require("sphere.JustConfig")
 
+---@class sphere.BaseNoteSkin: sphere.NoteSkinVsrg
+---@operator call: sphere.BaseNoteSkin
 local BaseNoteSkin = NoteSkinVsrg + {}
 
 BaseNoteSkin.bgaTransform = {{1 / 2, -16 / 9 / 2}, {0, -7 / 9 / 2}, 0, {0, 16 / 9}, {0, 16 / 9}, 0, 0, 0, 0}
 
+---@param inputMode ncdk.InputMode
+---@param stringInputMode string
 function BaseNoteSkin:setInputMode(inputMode, stringInputMode)
 	self.inputMode = inputMode
 	self.stringInputMode = stringInputMode
 end
 
+---@return table
 function BaseNoteSkin:getInputTable()
 	local inputMode = self.inputMode
 	local inputs = {}
@@ -36,6 +41,8 @@ function BaseNoteSkin:getInputTable()
 	return allInputs
 end
 
+---@param t table
+---@return table
 local function copyTable(t)
 	local t2 = {}
 	for k, v in pairs(t) do

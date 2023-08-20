@@ -2,6 +2,8 @@
 local class = require("class")
 local transform = require("gfx_util").transform
 
+---@class sphere.CircleView
+---@operator call: sphere.CircleView
 local CircleView = class()
 
 function CircleView:draw()
@@ -10,6 +12,7 @@ function CircleView:draw()
 	end
 end
 
+---@param circle table
 function CircleView:drawCircle(circle)
 	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)

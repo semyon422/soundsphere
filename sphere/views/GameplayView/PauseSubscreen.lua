@@ -5,6 +5,7 @@ local just = require("just")
 local spherefonts = require("sphere.assets.fonts")
 local imgui = require("imgui")
 
+---@param self table
 local function BottomScreenMenu(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
@@ -24,6 +25,7 @@ local function BottomScreenMenu(self)
 	just.row()
 end
 
+---@param self table
 local function FailedText(self)
 	if not self.game.rhythmModel.scoreEngine.scoreSystem.hp:isFailed() then
 		return

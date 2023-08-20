@@ -42,10 +42,17 @@ logicEngine.timings = {
 }
 
 local auto_mt = {}
+
+---@param n number
+---@return table
 local function auto(n)
 	return setmetatable({n}, auto_mt)
 end
 
+---@param notes table
+---@param events table
+---@param states table
+---@param graphicStates table?
 local function test(notes, events, states, graphicStates)
 	logicEngine.eventTime = 0  -- reset time on each test
 
@@ -212,6 +219,8 @@ end
 
 -- 1 short note tests
 
+---@param offset number
+---@param rate number
 local function test1sn(offset, rate)
 test(
 	{0},

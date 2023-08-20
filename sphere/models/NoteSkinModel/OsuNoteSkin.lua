@@ -8,9 +8,13 @@ local ImageValueView = require("sphere.views.ImageValueView")
 
 local ImageProgressView = require("sphere.views.GameplayView.ImageProgressView")
 
+---@class sphere.OsuNoteSkin: sphere.NoteSkinVsrg
+---@operator call: sphere.OsuNoteSkin
 local OsuNoteSkin = NoteSkinVsrg + {}
 
-local toarray = function(s)
+---@param s string
+---@return table
+local function toarray(s)
 	if not s then
 		return {}
 	end
@@ -21,7 +25,10 @@ local toarray = function(s)
 	return array
 end
 
-local fromDefault = function(t, default)
+---@param t table
+---@param default table
+---@return table
+local function fromDefault(t, default)
 	local out = {}
 	for i, v in ipairs(default) do
 		out[i] = t[i] or v
@@ -29,13 +36,17 @@ local fromDefault = function(t, default)
 	return out
 end
 
-local fixColor = function(t)
+---@param t table
+---@return table
+local function fixColor(t)
 	for i, v in ipairs(t) do
 		t[i] = t[i] / 255
 	end
 	return t
 end
 
+---@param src table
+---@param dst table
 local function fillTable(src, dst)
 	for k, v in pairs(src) do
 		if type(v) ~= "table" then
@@ -46,6 +57,8 @@ local function fillTable(src, dst)
 	end
 end
 
+---@param src table
+---@param dst table
 local function copyDefaults(src, dst)
 	for k, default in pairs(src) do
 		local v = dst[k]
@@ -446,7 +459,10 @@ function OsuNoteSkin:load()
 	BasePlayfield.addBaseProgressBar(playfield)
 end
 
-local getNoteType = function(key, keymode)
+---@param key number
+---@param keymode number
+---@return string|number
+local function getNoteType(key, keymode)
 	if keymode % 2 == 1 then
 		local half = (keymode - 1) / 2
 		if (keymode + 1) / 2 == key then
@@ -485,6 +501,7 @@ local defaultJudgements = {
 	{"300g", "Hit300g", "mania-hit300g"},
 }
 
+---@param od number
 function OsuNoteSkin:addJudgements(od)
 	local mania = self.mania
 	local rate = self.skinini.General.AnimationFramerate
@@ -535,6 +552,10 @@ local chars = {
 	dot = ".",
 	percent = "%",
 }
+
+---@param prefix string
+---@return string|table?
+---@return number?
 function OsuNoteSkin:findCharFiles(prefix)
 	prefix = prefix:gsub("\\", "/"):lower()
 	local files = self.files[prefix:gsub("\\", "/"):lower()]
@@ -608,6 +629,7 @@ function OsuNoteSkin:addAccuracy()
 	}))
 end
 
+---@return table
 function OsuNoteSkin:getDefaultNoteImages()
 	local mania = self.mania
 	local keysCount = mania.Keys
@@ -624,6 +646,8 @@ function OsuNoteSkin:getDefaultNoteImages()
 	return images
 end
 
+---@return table
+---@return table
 function OsuNoteSkin:getDefaultKeyImages()
 	local mania = self.mania
 	local keysCount = mania.Keys
@@ -639,6 +663,9 @@ function OsuNoteSkin:getDefaultKeyImages()
 	return pressed, released
 end
 
+---@param images table
+---@return string|table
+---@return number
 function OsuNoteSkin:getMaxResolution(images)
 	local dpi = 0
 	local file
@@ -651,6 +678,9 @@ function OsuNoteSkin:getMaxResolution(images)
 	return file, dpi
 end
 
+---@param value string?
+---@param preferFrame boolean?
+---@return string|table?
 function OsuNoteSkin:findImage(value, preferFrame)
 	if not value then
 		return
@@ -683,6 +713,9 @@ function OsuNoteSkin:findImage(value, preferFrame)
 	return file
 end
 
+---@param value string?
+---@return string|table?
+---@return table?
 function OsuNoteSkin:findAnimation(value)
 	if not value then
 		return
@@ -729,6 +762,9 @@ function OsuNoteSkin:findAnimation(value)
 	return framesPath[dpi], {startFrame, endFrame}
 end
 
+---@param xl number
+---@param xr number
+---@param w number
 function OsuNoteSkin:addStages(xl, xr, w)
 	local mania = self.mania
 	local playfield = self.playField
@@ -789,7 +825,6 @@ function OsuNoteSkin:addStages(xl, xr, w)
 end
 
 function OsuNoteSkin:addHpBar()
-	local mania = self.mania
 	local playfield = self.playField
 
 	local right = self.columns[self.inputsCount] + self.width[self.inputsCount] + self.space[self.inputsCount + 1]
@@ -832,6 +867,7 @@ function OsuNoteSkin:addHpBar()
 	end
 end
 
+---@param keys number
 function OsuNoteSkin:setKeys(keys)
 	for _, mania in ipairs(self.skinini.Mania) do
 		if tonumber(mania.Keys) == keys then
@@ -841,6 +877,8 @@ function OsuNoteSkin:setKeys(keys)
 	end
 end
 
+---@param files table
+---@return table
 function OsuNoteSkin:processFiles(files)
 	local _files = {}
 
@@ -870,6 +908,8 @@ function OsuNoteSkin:processFiles(files)
 	return _files
 end
 
+---@param content string
+---@return table
 function OsuNoteSkin:parseSkinIni(content)
 	local skinini = {}
 	skinini.General = skinini.General or {}
@@ -915,7 +955,10 @@ function OsuNoteSkin:parseSkinIni(content)
 	return skinini
 end
 
-local tovalues = function(value, count)
+---@param value number
+---@param count number
+---@return table
+local function tovalues(value, count)
 	local t = {}
 	for i = 1, count do
 		t[i] = value
@@ -923,6 +966,7 @@ local tovalues = function(value, count)
 	return t
 end
 
+---@return table
 function OsuNoteSkin:getDefaultGeneralSection()
 	local general = {}
 
@@ -948,6 +992,7 @@ function OsuNoteSkin:getDefaultGeneralSection()
 	return general
 end
 
+---@return table
 function OsuNoteSkin:getDefaultFontsSection()
 	local fonts = {}
 
@@ -961,6 +1006,8 @@ function OsuNoteSkin:getDefaultFontsSection()
 	return fonts
 end
 
+---@param keys number
+---@return table
 function OsuNoteSkin:getDefaultManiaSection(keys)
 	local mania = {}
 

@@ -22,6 +22,8 @@ local FullLongNote = require("sphere.models.ModifierModel.FullLongNote")
 local LessChord = require("sphere.models.ModifierModel.LessChord")
 local MaxChord = require("sphere.models.ModifierModel.MaxChord")
 
+---@class sphere.ModifierModel
+---@operator call: sphere.ModifierModel
 local ModifierModel = class()
 
 local Modifiers = {
@@ -94,12 +96,14 @@ function ModifierModel:new()
 	self.availableModifierItemIndex = 1
 end
 
+---@return boolean
 function ModifierModel:isChanged()
 	local changed = self.changed
 	self.changed = false
 	return changed
 end
 
+---@param config table
 function ModifierModel:setConfig(config)
 	self.config = config
 	self.modifierItemIndex = math.min(math.max(self.modifierItemIndex or (#config + 1), 1), #config + 1)
@@ -119,6 +123,7 @@ function ModifierModel:setConfig(config)
 	end
 end
 
+---@param direction number
 function ModifierModel:scrollAvailableModifier(direction)
 	if not self.modifiers[self.availableModifierItemIndex + direction] then
 		return
@@ -126,6 +131,7 @@ function ModifierModel:scrollAvailableModifier(direction)
 	self.availableModifierItemIndex = self.availableModifierItemIndex + direction
 end
 
+---@param direction number
 function ModifierModel:scrollModifier(direction)
 	local newModifierItemIndex = self.modifierItemIndex + direction
 	if not self.config[newModifierItemIndex] and not self.config[newModifierItemIndex - 1] then
@@ -138,7 +144,7 @@ function ModifierModel:createModifiers()
 	local modifierByName = self.modifierByName
 	local modifierById = self.modifierById
 	for _, Modifier in ipairs(Modifiers) do
-		local modifier = Modifier + {}
+		local modifier = Modifier()
 		modifier.modifierModel = self
 		modifier.id = ModifierId[Modifier]
 		modifierByName[modifier.name] = modifier
@@ -151,6 +157,8 @@ function ModifierModel:createModifiers()
 	end
 end
 
+---@param modifierConfig table
+---@return sphere.Modifier
 function ModifierModel:getModifier(modifierConfig)
 	if type(modifierConfig) == "number" then
 		return self.modifierById[modifierConfig]
@@ -158,14 +166,19 @@ function ModifierModel:getModifier(modifierConfig)
 	return self.modifierByName[modifierConfig.name]
 end
 
+---@param Modifier sphere.Modifier
+---@return boolean
 function ModifierModel:isOneUseModifier(Modifier)
 	for _, OneUseModifier in ipairs(OneUseModifiers) do
 		if Modifier == OneUseModifier then
 			return true
 		end
 	end
+	return false
 end
 
+---@param modifier sphere.Modifier
+---@return number
 function ModifierModel:getMinimalModifierIndex(modifier)
 	local index = 1
 	for _, oneUseModifier in ipairs(self.oneUseModifiers) do
@@ -179,6 +192,7 @@ function ModifierModel:getMinimalModifierIndex(modifier)
 	return index
 end
 
+---@param modifier sphere.Modifier
 function ModifierModel:add(modifier)
 	modifier = modifier or self.modifiers[self.availableModifierItemIndex]
 	local modifierConfig = modifier:getDefaultConfig()
@@ -197,6 +211,7 @@ function ModifierModel:add(modifier)
 	self.changed = true
 end
 
+---@param modifierConfig table
 function ModifierModel:remove(modifierConfig)
 	modifierConfig = modifierConfig or self.config[self.modifierItemIndex]
 	if not modifierConfig then
@@ -223,6 +238,8 @@ function ModifierModel:remove(modifierConfig)
 	self.changed = true
 end
 
+---@param modifierConfig table
+---@param value any
 function ModifierModel:setModifierValue(modifierConfig, value)
 	modifierConfig = modifierConfig or self.config[self.modifierItemIndex]
 	if not modifierConfig then
@@ -233,6 +250,8 @@ function ModifierModel:setModifierValue(modifierConfig, value)
 	self.changed = true
 end
 
+---@param modifierConfig table
+---@param delta number
 function ModifierModel:increaseModifierValue(modifierConfig, delta)
 	modifierConfig = modifierConfig or self.config[self.modifierItemIndex]
 	if not modifierConfig then
@@ -254,6 +273,7 @@ function ModifierModel:increaseModifierValue(modifierConfig, delta)
 	self.changed = true
 end
 
+---@param noteChart ncdk.NoteChart
 function ModifierModel:apply(noteChart)
 	for _, modifierConfig in ipairs(self.config) do
 		local modifier = self:getModifier(modifierConfig)
@@ -264,6 +284,7 @@ function ModifierModel:apply(noteChart)
 	end
 end
 
+---@param state table
 function ModifierModel:applyMeta(state)
 	self.state = state
 	for _, modifierConfig in ipairs(self.config) do
@@ -274,6 +295,8 @@ function ModifierModel:applyMeta(state)
 	end
 end
 
+---@param config table
+---@return string
 function ModifierModel:getString(config)
 	config = config or self.config
 	local t = {}
@@ -291,6 +314,8 @@ function ModifierModel:getString(config)
 	return table.concat(t, " ")
 end
 
+---@param config table
+---@return string
 function ModifierModel:encode(config)
 	config = config or self.config
 	local t = {}
@@ -303,6 +328,8 @@ function ModifierModel:encode(config)
 	return table.concat(t, ";")
 end
 
+---@param encodedConfig string
+---@return table
 function ModifierModel:decode(encodedConfig)
 	local config = {}
 	for modifierId, modifierData in encodedConfig:gmatch("(%d+):([^;]+)") do
@@ -314,6 +341,7 @@ function ModifierModel:decode(encodedConfig)
 	return config
 end
 
+---@param oldConfig table
 function ModifierModel:fixOldFormat(oldConfig)
 	for _, modifierConfig in ipairs(oldConfig) do
 		local modifier = self:getModifier(modifierConfig)

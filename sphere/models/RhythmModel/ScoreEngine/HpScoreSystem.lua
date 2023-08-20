@@ -1,11 +1,14 @@
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 
+---@class sphere.HpScoreSystem: sphere.ScoreSystem
+---@operator call: sphere.HpScoreSystem
 local HpScoreSystem = ScoreSystem + {}
 
 HpScoreSystem.name = "hp"
 
 HpScoreSystem.max = 1000
 
+---@param notes number
 function HpScoreSystem:insertCounter(notes)
 	table.insert(self, {
 		notes = notes,
@@ -32,6 +35,7 @@ function HpScoreSystem:load()
 	end
 end
 
+---@return table
 function HpScoreSystem:getSlice()
 	local slice = {}
 	for _, v in ipairs(self) do
@@ -43,6 +47,8 @@ function HpScoreSystem:getSlice()
 	return slice
 end
 
+---@return number
+---@return number
 function HpScoreSystem:getCurrent()
 	for _, h in ipairs(self) do
 		if h.value > 0 then
@@ -52,6 +58,7 @@ function HpScoreSystem:getCurrent()
 	return 0, 1
 end
 
+---@return boolean
 function HpScoreSystem:isFailed()
 	local _h
 	for _, h in ipairs(self) do
@@ -63,7 +70,8 @@ function HpScoreSystem:isFailed()
 	return not _h
 end
 
-function HpScoreSystem:increase()
+---@param event table
+function HpScoreSystem:increase(event)
 	for _, h in ipairs(self) do
 		if h.value > 0 then
 			h.value = math.min(h.value + 1, self.max)
@@ -71,7 +79,8 @@ function HpScoreSystem:increase()
 	end
 end
 
-function HpScoreSystem:decrease()
+---@param event table
+function HpScoreSystem:decrease(event)
 	for _, h in ipairs(self) do
 		if h.value > 0 then
 			h.value = math.min(h.value - self.max / h.notes, self.max)

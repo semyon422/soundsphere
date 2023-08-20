@@ -4,8 +4,15 @@ local class = require("class")
 local spherefonts = require("sphere.assets.fonts")
 local gfx_util = require("gfx_util")
 
+---@class sphere.UserInfoView
+---@operator call: sphere.UserInfoView
 local UserInfoView = class()
 
+---@param w number
+---@param h number
+---@param username string
+---@param is_active boolean?
+---@return boolean?
 function UserInfoView:draw(w, h, username, is_active)
 	local changed, active, hovered = just.button(self, just.is_over(w, h))
 

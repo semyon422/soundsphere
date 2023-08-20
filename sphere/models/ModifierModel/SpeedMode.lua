@@ -1,5 +1,7 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 
+---@class sphere.SpeedMode: sphere.Modifier
+---@operator call: sphere.SpeedMode
 local SpeedMode = Modifier + {}
 
 SpeedMode.type = "NoteChartModifier"
@@ -15,15 +17,20 @@ SpeedMode.modeNames = {"A", "X", "C", "MIN", "MAX"}
 
 SpeedMode.description = "AMod, XMod, CMod, MinMod, MaxMod"
 
+---@param config table
+---@return string
 function SpeedMode:getString(config)
 	local indexValue = self:toIndexValue(config.value)
 	return self.modeNames[indexValue]
 end
 
+---@param config table
+---@return string
 function SpeedMode:getSubString(config)
 	return "MOD"
 end
 
+---@param tempo number
 function SpeedMode:applyTempo(tempo)
 	local noteChart = self.noteChart
 
@@ -51,6 +58,7 @@ function SpeedMode:applyConstant()
 	noteChart:compute()
 end
 
+---@param config table
 function SpeedMode:apply(config)
 	local mode = config.value
 	if mode == "x" then

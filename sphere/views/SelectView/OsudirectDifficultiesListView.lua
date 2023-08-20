@@ -14,6 +14,9 @@ function OsudirectDifficultiesListView:reloadItems()
 	end
 end
 
+---@param i number
+---@param w number
+---@param h number
 function OsudirectDifficultiesListView:drawItem(i, w, h)
 	local item = self.items[i]
 

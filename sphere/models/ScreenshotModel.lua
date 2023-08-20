@@ -1,10 +1,14 @@
 local class = require("class")
 
+---@class sphere.ScreenshotModel
+---@operator call: sphere.ScreenshotModel
 local ScreenshotModel = class()
 
 local prefix = "userdata/screenshots/screenshot "
 local path_fmt = prefix .. "%s.png"
 local pathn_fmt = prefix .. "%s (%s).png"
+
+---@return string
 local function get_path()
 	local date = os.date("%d.%m.%Y %H-%M-%S")
 
@@ -25,6 +29,7 @@ local function get_path()
 	return pathn_fmt:format(date, "?")
 end
 
+---@param open boolean?
 function ScreenshotModel:capture(open)
 	love.graphics.captureScreenshot(function(imageData)
 		local path = get_path()
@@ -36,6 +41,7 @@ function ScreenshotModel:capture(open)
 	end)
 end
 
+---@param event table
 function ScreenshotModel:receive(event)
 	if event.name ~= "keypressed" then
 		return

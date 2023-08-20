@@ -2,6 +2,8 @@ local thread = require("thread")
 local class = require("class")
 local inspect = require("inspect")
 
+---@class sphere.OnlineScoreManager
+---@operator call: sphere.OnlineScoreManager
 local OnlineScoreManager = class()
 
 local async_read = thread.async(function(...) return love.filesystem.read(...) end)

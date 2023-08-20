@@ -1,6 +1,8 @@
 local class = require("class")
 local math_util = require("math_util")
 
+---@class sphere.SpeedModel
+---@operator call: sphere.SpeedModel
 local SpeedModel = class()
 
 SpeedModel.types = {
@@ -20,6 +22,7 @@ SpeedModel.format = {
 
 local osuFactor = 7 / 96
 
+---@return number
 function SpeedModel:get()
 	local gameplay = self.configModel.configs.settings.gameplay
 	local speed = gameplay.speed
@@ -33,6 +36,7 @@ function SpeedModel:get()
 	return math_util.clamp(speed, range[1], range[2])
 end
 
+---@param newSpeed number
 function SpeedModel:set(newSpeed)
 	local gameplay = self.configModel.configs.settings.gameplay
 	local speedType = gameplay.speedType
@@ -48,6 +52,7 @@ function SpeedModel:set(newSpeed)
 	gameplay.speed = math_util.clamp(newSpeed, range[1], range[2])
 end
 
+---@param delta number
 function SpeedModel:increase(delta)
 	local gameplay = self.configModel.configs.settings.gameplay
 	local speed = gameplay.speed

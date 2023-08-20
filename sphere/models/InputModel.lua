@@ -1,5 +1,7 @@
 local class = require("class")
 
+---@class sphere.InputModel
+---@operator call: sphere.InputModel
 local InputModel = class()
 
 InputModel.inputMode = ""
@@ -11,6 +13,10 @@ InputModel.devices = {
 	"midi"
 }
 
+---@param inputMode string
+---@param event table
+---@return string?
+---@return boolean?
 function InputModel:transformEvent(inputMode, event)
 	local device = event.name:match("^(.+)pressed$") or event.name:match("^(.+)released$")
 	if not device then
@@ -55,6 +61,11 @@ function InputModel:transformEvent(inputMode, event)
 	return inputs[_i], state
 end
 
+---@param inputMode string
+---@param virtualKey string
+---@param device string
+---@param key string
+---@param index number
 function InputModel:setKey(inputMode, virtualKey, device, key, index)
 	local inputs = self:getInputs(inputMode)
 	local n = inputs[virtualKey]
@@ -78,6 +89,11 @@ function InputModel:setKey(inputMode, virtualKey, device, key, index)
 	deviceConfig[n][index] = key
 end
 
+---@param inputMode string
+---@param virtualKey string
+---@param device string
+---@param index number
+---@return string|number
 function InputModel:getKey(inputMode, virtualKey, device, index)
 	local inputs = self:getInputs(inputMode)
 	local n = inputs[virtualKey]
@@ -102,6 +118,8 @@ function InputModel:getKey(inputMode, virtualKey, device, index)
 	return keys[index] or "none"
 end
 
+---@param inputMode string
+---@return table
 function InputModel:getInputs(inputMode)
 	if inputMode == self.inputMode then
 		return self.inputs

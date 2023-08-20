@@ -1,5 +1,7 @@
 local class = require("class")
 
+---@class sphere.DirectoryManager
+---@operator call: sphere.DirectoryManager
 local DirectoryManager = class()
 
 local defaultDirectories = {

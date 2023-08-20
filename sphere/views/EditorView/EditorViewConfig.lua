@@ -3,6 +3,7 @@ local BackgroundView = require("sphere.views.BackgroundView")
 
 local Layout = require("sphere.views.EditorView.Layout")
 
+---@param self table
 local function Background(self)
 	local w, h = Layout:move("base")
 

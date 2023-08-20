@@ -2,6 +2,8 @@ local utf8 = require("utf8")
 local class = require("class")
 local erfunc = require("libchart.erfunc")
 
+---@class sphere.SearchModel
+---@operator call: sphere.SearchModel
 local SearchModel = class()
 
 SearchModel.filterString = ""
@@ -9,6 +11,8 @@ SearchModel.lampString = ""
 SearchModel.collection = {path = ""}
 SearchModel.stateCounter = 1
 
+---@param searchMode string
+---@param text string
 function SearchModel:setSearchString(searchMode, text)
 	if searchMode == "filter" then
 		self:setFilterString(text)
@@ -17,6 +21,7 @@ function SearchModel:setSearchString(searchMode, text)
 	end
 end
 
+---@param text string
 function SearchModel:setFilterString(text)
 	if text ~= self.filterString then
 		self.stateCounter = self.stateCounter + 1
@@ -24,6 +29,7 @@ function SearchModel:setFilterString(text)
 	self.filterString = text
 end
 
+---@param text string
 function SearchModel:setLampString(text)
 	if text ~= self.lampString then
 		self.stateCounter = self.stateCounter + 1
@@ -31,6 +37,7 @@ function SearchModel:setLampString(text)
 	self.lampString = text
 end
 
+---@param collection any?
 function SearchModel:setCollection(collection)
 	self.collection = collection
 end
@@ -136,6 +143,9 @@ for _, operator in ipairs(operators) do
 	end
 end
 
+---@param s string
+---@param conditions table?
+---@return string
 function SearchModel:transformSearchString(s, conditions)
 	local searchString = s
 	conditions = conditions or {}
@@ -169,6 +179,7 @@ function SearchModel:transformSearchString(s, conditions)
 	return table.concat(conditions, " AND ")
 end
 
+---@return table?
 function SearchModel:getFilter()
 	local configs = self.configModel.configs
 	local filters = configs.filters
@@ -181,6 +192,8 @@ function SearchModel:getFilter()
 	end
 end
 
+---@return string
+---@return string?
 function SearchModel:getConditions()
 	local configs = self.configModel.configs
 	local settings = configs.settings

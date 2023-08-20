@@ -2,6 +2,8 @@ local class = require("class")
 local NoteHandler = require("sphere.models.RhythmModel.LogicEngine.NoteHandler")
 local Observable = require("Observable")
 
+---@class sphere.LogicEngine
+---@operator call: sphere.LogicEngine
 local LogicEngine = class()
 
 LogicEngine.inputOffset = 0
@@ -55,6 +57,7 @@ function LogicEngine:update()
 	end
 end
 
+---@param event table
 function LogicEngine:receive(event)
 	if not event.virtual or self.autoplay then
 		return
@@ -70,14 +73,19 @@ function LogicEngine:receive(event)
 	self.eventTime = nil
 end
 
+---@param noteData ncdk.NoteData
+---@return sphere.LogicalNote?
 function LogicEngine:getLogicalNote(noteData)
 	return self.sharedLogicalNotes[noteData]
 end
 
+---@param event table
 function LogicEngine:sendScore(event)
 	self.rhythmModel.scoreEngine.scoreSystem:receive(event)
 end
 
+---@param noteData ncdk.NoteData
+---@param isBackground boolean?
 function LogicEngine:playSound(noteData, isBackground)
 	self.observable:send({
 		name = "LogicalNoteSound",
@@ -85,14 +93,17 @@ function LogicEngine:playSound(noteData, isBackground)
 	})
 end
 
+---@return number
 function LogicEngine:getEventTime()
 	return self.eventTime or self.rhythmModel.timeEngine.currentTime
 end
 
+---@return number
 function LogicEngine:getTimeRate()
 	return self.timeRate or self.rhythmModel.timeEngine.timeRate
 end
 
+---@return number
 function LogicEngine:getInputOffset()
 	return self.inputOffset
 end

@@ -1,16 +1,20 @@
 local class = require("class")
 local NanoChart = require("libchart.NanoChart")
-local json = require("json")
 local zlib = require("zlib")
 local mime = require("mime")
 
-
+---@class sphere.ReplayNanoChart
+---@operator call: sphere.ReplayNanoChart
 local ReplayNanoChart = class()
 
 function ReplayNanoChart:new()
 	self.nanoChart = NanoChart()
 end
 
+---@param inputMode ncdk.InputMode
+---@return table
+---@return table
+---@return number
 function ReplayNanoChart:getInputMap(inputMode)
 	local inputs = {}
 
@@ -42,6 +46,11 @@ function ReplayNanoChart:getInputMap(inputMode)
 end
 
 local emptyHash = string.char(0):rep(16)
+
+---@param events table
+---@param inputMode ncdk.InputMode
+---@return string
+---@return number
 function ReplayNanoChart:encode(events, inputMode)
 	local inputMap, reversedInputMap, inputs = self:getInputMap(inputMode)
 
@@ -59,6 +68,10 @@ function ReplayNanoChart:encode(events, inputMode)
 	return mime.b64(compressedContent), #content
 end
 
+---@param content string
+---@param size number
+---@param inputMode ncdk.InputMode
+---@return table
 function ReplayNanoChart:decode(content, size, inputMode)
 	local inputMap, reversedInputMap, inputs = self:getInputMap(inputMode)
 

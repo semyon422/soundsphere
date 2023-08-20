@@ -15,10 +15,12 @@ function CollectionListView:getItemIndex()
 	return self.game.selectModel.collectionItemIndex
 end
 
+---@param count number
 function CollectionListView:scroll(count)
 	self.game.selectModel:scrollCollection(count)
 end
 
+---@param ... any?
 function CollectionListView:draw(...)
 	ListView.draw(self, ...)
 
@@ -32,6 +34,9 @@ function CollectionListView:draw(...)
 	end
 end
 
+---@param i number
+---@param w number
+---@param h number
 function CollectionListView:drawItem(i, w, h)
 	local item = self.items[i]
 

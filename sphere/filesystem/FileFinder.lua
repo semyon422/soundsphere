@@ -13,7 +13,10 @@ for format, list in pairs(FileTypes) do
 	end
 end
 
-local removeExtension = function(fileName)
+---@param fileName string
+---@return string
+---@return string?
+local function removeExtension(fileName)
 	local ext = fileName:match("%.([^%.]+)$")
 	ext = ext and ext:lower()
 	local format = FileTypeMap[ext]
@@ -28,16 +31,23 @@ function FileFinder:reset()
 	self.fileLists = {}
 end
 
+---@param fileName string
+---@return string?
 function FileFinder:getType(fileName)
 	local ext = fileName:match("%.([^%.]+)$")
 	ext = ext and ext:lower()
 	return FileTypeMap[ext]
 end
 
+---@param path string
 function FileFinder:addPath(path)
 	table.insert(self.paths, path)
 end
 
+---@param path string
+---@param list table?
+---@param prefix string?
+---@return any
 function FileFinder:getFileListRecursive(path, list, prefix)
 	list = list or {}
 	prefix = prefix or ""
@@ -53,6 +63,8 @@ function FileFinder:getFileListRecursive(path, list, prefix)
 	return list
 end
 
+---@param path string
+---@return table
 function FileFinder:getFileList(path)
 	local fileLists = self.fileLists
 	if fileLists[path] then
@@ -62,6 +74,9 @@ function FileFinder:getFileList(path)
 	return fileLists[path]
 end
 
+---@param fullFileName string?
+---@param _fileType string?
+---@return string?
 function FileFinder:findFile(fullFileName, _fileType)
 	if not fullFileName then
 		return

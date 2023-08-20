@@ -3,6 +3,8 @@ local math_util = require("math_util")
 local Observable = require("Observable")
 local TimeManager = require("sphere.models.RhythmModel.TimeEngine.TimeManager")
 
+---@class sphere.TimeEngine
+---@operator call: sphere.TimeEngine
 local TimeEngine = class()
 
 TimeEngine.timeToPrepare = 2
@@ -41,6 +43,7 @@ function TimeEngine:load()
 	end
 end
 
+---@param event table
 function TimeEngine:sync(event)
 	local timer = self.timer
 
@@ -63,6 +66,7 @@ function TimeEngine:sync(event)
 	self.currentVisualTime = self:getVisualTime()
 end
 
+---@return number
 function TimeEngine:getVisualTime()
 	local nearestTime = self:getNearestTime()
 	local currentTime = self.currentTime
@@ -91,6 +95,7 @@ function TimeEngine:updateWindUp()
 	self:setTimeRate(timeRate * self.baseTimeRate)
 end
 
+---@param delta number
 function TimeEngine:increaseTimeRate(delta)
 	local target = self.targetTimeRate
 	local newTarget = math.floor((target + delta) / delta + 0.5) * delta
@@ -100,6 +105,7 @@ function TimeEngine:increaseTimeRate(delta)
 	end
 end
 
+---@param position number
 function TimeEngine:setPosition(position)
 	local timer = self.timer
 	local audioEngine = self.rhythmModel.audioEngine
@@ -122,11 +128,13 @@ function TimeEngine:play()
 	self.timer:play()
 end
 
+---@param timeRate number
 function TimeEngine:setBaseTimeRate(timeRate)
 	self.baseTimeRate = timeRate
 	self:setTimeRate(timeRate)
 end
 
+---@param timeRate any
 function TimeEngine:setTimeRate(timeRate)
 	self.targetTimeRate = timeRate
 	self.timeRate = timeRate
@@ -172,6 +180,7 @@ function TimeEngine:updateNextTimeIndex()
 	end
 end
 
+---@return number
 function TimeEngine:getNearestTime()
 	local timeList = self.absoluteTimeList
 	local prevTime = timeList[self.nextTimeIndex - 1]

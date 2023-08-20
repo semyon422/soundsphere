@@ -1,6 +1,8 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 local NoteData = require("ncdk.NoteData")
 
+---@class sphere.MaxChord
+---@operator call: sphere.MaxChord
 local MaxChord = Modifier + {}
 
 MaxChord.type = "NoteChartModifier"
@@ -14,18 +16,28 @@ MaxChord.step = 1
 
 MaxChord.description = "All chords will be <= modifier value"
 
+---@param config table
+---@return string
 function MaxChord:getString(config)
 	return "CH"
 end
 
+---@param config table
+---@return string
 function MaxChord:getSubString(config)
-	return config.value
+	return tostring(config.value)
 end
 
+---@param noteData ncdk.NoteData
+---@return boolean
 local function checkNote(noteData)
 	return noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart"
 end
 
+---@param noteDatas table
+---@param i number
+---@param dir number?
+---@return number
 local function getNextTime(noteDatas, i, dir)
 	dir = dir or 1
 	for j = i + dir, #noteDatas, dir do
@@ -37,10 +49,16 @@ local function getNextTime(noteDatas, i, dir)
 	return math.huge
 end
 
+---@param a table
+---@param b table
+---@return boolean
 local function sortByColumn(a, b)
 	return a.column < b.column
 end
 
+---@param line table
+---@param columns number
+---@return string
 local function getCounterKey(line, columns)  -- use bit.bor
 	local t = {}
 	for i = 1, columns do
@@ -52,6 +70,9 @@ local function getCounterKey(line, columns)  -- use bit.bor
 	return table.concat(t)
 end
 
+---@param t table
+---@param v any
+---@return any?
 local function removeValue(t, v)
 	for i, _v in ipairs(t) do
 		if _v == v then
@@ -69,6 +90,7 @@ local function zeroes(size)
 	return t
 end
 
+---@param config table
 function MaxChord:apply(config)
 	local maxChord = config.value
 	local noteChart = self.noteChart

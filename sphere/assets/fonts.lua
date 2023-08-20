@@ -15,7 +15,9 @@ local fontFamilyList = {
 	}
 }
 
-local getFirstFile = function(list)
+---@param list table?
+---@return string?
+local function getFirstFile(list)
 	if not list then
 		return
 	end
@@ -26,7 +28,10 @@ local getFirstFile = function(list)
 	end
 end
 
-fonts.get = function(filename, size)
+---@param filename string
+---@param size number
+---@return love.Font
+function fonts.get(filename, size)
 	if instances[filename] and instances[filename][size] then
 		return instances[filename][size]
 	end

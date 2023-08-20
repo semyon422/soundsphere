@@ -6,6 +6,8 @@ local AsyncTasksView = require("sphere.views.AsyncTasksView")
 local TextTooltipImView = require("sphere.imviews.TextTooltipImView")
 local ContextMenuImView = require("sphere.imviews.ContextMenuImView")
 
+---@class sphere.GameView
+---@operator call: sphere.GameView
 local GameView = class()
 
 function GameView:new()
@@ -21,6 +23,7 @@ function GameView:load()
 	self:setView(self.game.selectView)
 end
 
+---@param view sphere.ScreenView
 function GameView:_setView(view)
 	if self.view then
 		self.view:unload()
@@ -30,6 +33,8 @@ function GameView:_setView(view)
 	self.view:load()
 end
 
+---@param view sphere.ScreenView
+---@param noTransition boolean?
 function GameView:setView(view, noTransition)
 	if self.isChangingScreen then
 		return
@@ -38,7 +43,8 @@ function GameView:setView(view, noTransition)
 	view.gameView = self
 	if noTransition then
 		self.isChangingScreen = false
-		return self:_setView(view)
+		self:_setView(view)
+		return
 	end
 	self.fadeTransition:transitIn(function()
 		self:_setView(view)
@@ -54,6 +60,7 @@ function GameView:unload()
 	self.view:unload()
 end
 
+---@param dt number
 function GameView:update(dt)
 	self.fadeTransition:update(dt)
 	if not self.view then
@@ -93,6 +100,7 @@ function GameView:draw()
 	end
 end
 
+---@param event table
 function GameView:receive(event)
 	self.frameTimeView:receive(event)
 	if not self.view then
@@ -101,11 +109,14 @@ function GameView:receive(event)
 	self.view:receive(event)
 end
 
+---@param f function?
+---@param width number?
 function GameView:setContextMenu(f, width)
 	self.contextMenu = f
 	self.contextMenuWidth = width
 end
 
+---@param f function?
 function GameView:setModal(f)
 	local _f = self.modal
 	if not _f then

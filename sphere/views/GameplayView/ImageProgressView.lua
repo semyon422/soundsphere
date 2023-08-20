@@ -2,6 +2,8 @@ local transform = require("gfx_util").transform
 local ProgressView = require("sphere.views.GameplayView.ProgressView")
 local ImageView = require("sphere.views.ImageView")
 
+---@class sphere.ImageProgressView: sphere.ProgressView
+---@operator call: sphere.ImageProgressView
 local ImageProgressView = ProgressView + {}
 
 function ImageProgressView:load()
