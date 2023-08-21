@@ -320,7 +320,7 @@ function MultiplayerModel:downloadNoteChart()
 	end
 
 	self.downloadingBeatmap = {
-		setId = setId,
+		id = setId,
 		status = "",
 	}
 	self.osudirectModel:downloadBeatmapSet(self.downloadingBeatmap, function()
