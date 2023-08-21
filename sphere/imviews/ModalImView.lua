@@ -3,7 +3,7 @@ local just = require("just")
 local quit = false
 
 ---@param f function
----@param self table
+---@param self table?
 ---@return any?
 local function _draw(f, self)
 	just.key_over()
