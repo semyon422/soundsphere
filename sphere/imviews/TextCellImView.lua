@@ -12,7 +12,7 @@ return function(w, h, align, name, value, isMono)
 	end
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 16))
-	gfx_util.printBaseline(name, x, 19, limit, 1, align)
+	gfx_util.printBaseline(tostring(name), x, 19, limit, 1, align)
 
 	if isMono then
 		local font = spherefonts.get("Noto Sans Mono", 24)

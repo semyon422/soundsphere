@@ -21,7 +21,7 @@ end
 
 ---@param dt number
 function MultiplayerView:update(dt)
-	self.game.selectController:update(dt)
+	self.game.selectController:update()
 
 	local multiplayerModel = self.game.multiplayerModel
 	if not multiplayerModel.room then

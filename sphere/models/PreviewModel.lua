@@ -15,8 +15,8 @@ function PreviewModel:load()
 	self.targetPitch = 1
 end
 
----@param audioPath string
----@param previewTime number
+---@param audioPath string?
+---@param previewTime number?
 function PreviewModel:setAudioPathPreview(audioPath, previewTime)
 	if self.audioPath ~= audioPath or not self.audio then
 		self.audioPath = audioPath

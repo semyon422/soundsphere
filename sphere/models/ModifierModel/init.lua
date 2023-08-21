@@ -314,7 +314,7 @@ function ModifierModel:getString(config)
 	return table.concat(t, " ")
 end
 
----@param config table
+---@param config table?
 ---@return string
 function ModifierModel:encode(config)
 	config = config or self.config

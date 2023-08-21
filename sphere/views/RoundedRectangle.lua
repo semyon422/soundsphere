@@ -81,7 +81,7 @@ end
 ---@param r number|table
 ---@param rotateLeft boolean?
 ---@param rotateRight boolean?
-return function(mode, x, y, w, h, r, rotateLeft, rotateRight, rotateAll)
+local function rr(mode, x, y, w, h, r, rotateLeft, rotateRight, rotateAll)
 	love.graphics.push()
 
 	if not rotateAll or rotateAll == 0 then
@@ -103,3 +103,5 @@ return function(mode, x, y, w, h, r, rotateLeft, rotateRight, rotateAll)
 
 	love.graphics.pop()
 end
+
+return rr

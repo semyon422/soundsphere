@@ -92,7 +92,7 @@ end
 
 SelectController.updateSession = thread.coro(function(self)
 	self.onlineModel.authManager:updateSessionAsync()
-	self.configModel:write("online")
+	self.configModel:write()
 end)
 
 function SelectController:openDirectory()

@@ -11,6 +11,7 @@ function CollectionListView:reloadItems()
     self.selectedCollection = self.game.selectModel.collectionItem
 end
 
+---@return number
 function CollectionListView:getItemIndex()
 	return self.game.selectModel.collectionItemIndex
 end

@@ -19,7 +19,7 @@ function BackgroundModel:load()
 	self.images = {self.emptyImage}
 end
 
----@param path string
+---@param path string?
 function BackgroundModel:setBackgroundPath(path)
 	if self.path ~= path then
 		self.path = path

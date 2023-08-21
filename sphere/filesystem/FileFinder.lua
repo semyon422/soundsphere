@@ -47,7 +47,7 @@ end
 ---@param path string
 ---@param list table?
 ---@param prefix string?
----@return any
+---@return table
 function FileFinder:getFileListRecursive(path, list, prefix)
 	list = list or {}
 	prefix = prefix or ""

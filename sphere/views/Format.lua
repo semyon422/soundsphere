@@ -40,7 +40,7 @@ function Format.timeRate(timeRate)
 	return ("%.2f"):format(timeRate)
 end
 
----@param inputMode any
+---@param inputMode any?
 ---@return string
 function Format.inputMode(inputMode)
 	if type(inputMode) ~= "string" then
