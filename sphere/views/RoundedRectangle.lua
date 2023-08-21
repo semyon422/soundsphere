@@ -81,6 +81,7 @@ end
 ---@param r number|table
 ---@param rotateLeft boolean?
 ---@param rotateRight boolean?
+---@param rotateAll number?
 local function rr(mode, x, y, w, h, r, rotateLeft, rotateRight, rotateAll)
 	love.graphics.push()
 

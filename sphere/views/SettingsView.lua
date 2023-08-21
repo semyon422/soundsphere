@@ -160,7 +160,7 @@ local vsyncNames = {
 	[-1] = "adaptive",
 }
 
----@param v string
+---@param v number?
 ---@return string
 local function formatVsync(v)
 	return vsyncNames[v] or ""
