@@ -58,6 +58,7 @@ MultiplayerController.findNotechart = remote.wrap(function(self)
 	local items = self.noteChartSetLibraryModel.items
 
 	local selectModel = self.selectModel
+	self.selectModel:setLock(false)
 
 	mpModel.downloadingBeatmap = nil
 	local item = items[1]
@@ -81,6 +82,10 @@ MultiplayerController.findNotechart = remote.wrap(function(self)
 	selectModel:pullNoteChartSet(true)
 	mpModel.peer.setNotechartFound(false)
 end)
+
+function MultiplayerController:beginUnload()
+	self.selectModel:setLock(true)
+end
 
 function MultiplayerController:unload()
 	self.multiplayerModel:unload()
