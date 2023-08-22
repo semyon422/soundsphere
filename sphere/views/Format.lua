@@ -49,6 +49,7 @@ function Format.inputMode(inputMode)
 	inputMode = inputMode
 		:gsub("key", "K")
 		:gsub("scratch", "S")
+		:gsub("pedal", "P")
 	return inputMode
 end
 
