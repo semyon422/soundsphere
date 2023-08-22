@@ -3,7 +3,6 @@ local thread = require("thread")
 local Orm = require("sphere.Orm")
 local ObjectQuery = require("sphere.ObjectQuery")
 local ffi = require("ffi")
-local byte = require("byte")
 local class = require("class")
 
 ---@class sphere.CacheDatabase
@@ -26,19 +25,19 @@ function CacheDatabase:load()
 
 	self.noteChartSetItemsCount = 0
 	self.noteChartSetItems = {}
-	self.entryKeyToGlobalOffset = {}
-	self.noteChartSetIdToOffset = {}
 	self.noteChartItemsCount = 0
 	self.noteChartItems = {}
 	self.noteChartSlices = {}
-	self.entryKeyToLocalOffset = {}
+	self.set_id_to_global_offset = {}
+	self.id_to_global_offset = {}
+	self.id_to_local_offset = {}
 
 	local entryCaches = {}
 	for _, t in ipairs({"noteChartSets", "noteCharts", "noteChartDatas"}) do
 		entryCaches[t] = TimedCache()
 		entryCaches[t].timeout = 1
 		entryCaches[t].loadObject = function(_, id)
-			local status, entries = pcall(self.db.select, self.db, t, "id = ?", id)
+			local status, entries = pcall(db.select, db, t, "id = ?", id)
 			if not status then
 				return
 			end
@@ -86,26 +85,15 @@ end
 
 ffi.cdef([[
 	typedef struct {
-		uint32_t noteChartDataId;
-		uint32_t noteChartId;
-		uint32_t setId;
-		uint32_t scoreId;
+		int32_t noteChartDataId;
+		int32_t noteChartId;
+		int32_t setId;
+		int32_t scoreId;
 		bool lamp;
 	} EntryStruct
 ]])
 
 CacheDatabase.EntryStruct = ffi.typeof("EntryStruct")
-
-ffi.metatype("EntryStruct", {__index = function(t, k)
-	if k == "key" then
-		return
-			byte.double_to_string_le(t.noteChartDataId) ..
-			byte.double_to_string_le(t.noteChartId) ..
-			byte.double_to_string_le(t.setId)
-	elseif k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "scoreId" or k == "lamp" then
-		return rawget(t, k)
-	end
-end})
 
 ---@param object table
 ---@param row table
@@ -146,16 +134,19 @@ local _asyncQueryAll = thread.async(function(queryParams)
 	end
 	local t = {
 		noteChartSetItemsCount = self.noteChartSetItemsCount,
-		entryKeyToGlobalOffset = self.entryKeyToGlobalOffset,
-		noteChartSetIdToOffset = self.noteChartSetIdToOffset,
 		noteChartItemsCount = self.noteChartItemsCount,
 		noteChartSlices = self.noteChartSlices,
-		entryKeyToLocalOffset = self.entryKeyToLocalOffset,
+		set_id_to_global_offset = self.set_id_to_global_offset,
+		id_to_global_offset = self.id_to_global_offset,
+		id_to_local_offset = self.id_to_local_offset,
 		noteChartSetItems = ffi.string(self.noteChartSetItems, ffi.sizeof(self.noteChartSetItems)),
 		noteChartItems = ffi.string(self.noteChartItems, ffi.sizeof(self.noteChartItems)),
 	}
 	self:unload()
-	print("query all: " .. math.floor((love.timer.getTime() - time) * 1000) .. "ms")
+
+	local dt = math.floor((love.timer.getTime() - time) * 1000)
+	print("query all: " .. dt .. "ms")
+	print(("size: %d + %d bytes"):format(#t.noteChartSetItems, #t.noteChartItems))
 	return t
 end)
 
@@ -166,11 +157,11 @@ function CacheDatabase:asyncQueryAll()
 	end
 
 	self.noteChartSetItemsCount = t.noteChartSetItemsCount
-	self.entryKeyToGlobalOffset = t.entryKeyToGlobalOffset
-	self.noteChartSetIdToOffset = t.noteChartSetIdToOffset
+	self.id_to_global_offset = t.id_to_global_offset
+	self.set_id_to_global_offset = t.set_id_to_global_offset
 	self.noteChartItemsCount = t.noteChartItemsCount
 	self.noteChartSlices = t.noteChartSlices
-	self.entryKeyToLocalOffset = t.entryKeyToLocalOffset
+	self.id_to_local_offset = t.id_to_local_offset
 
 	local size = ffi.sizeof("EntryStruct")
 	self.noteChartSetItems = ffi.new("EntryStruct[?]", #t.noteChartSetItems / size)
@@ -210,11 +201,11 @@ function CacheDatabase:queryNoteChartSets()
 
 	local count = objectQuery:getCount()
 	local noteChartSets = ffi.new("EntryStruct[?]", count)
-	local entryKeyToGlobalOffset = {}
-	local noteChartSetIdToOffset = {}
+	local id_to_global_offset = {}
+	local set_id_to_global_offset = {}
 	self.noteChartSetItems = noteChartSets
-	self.entryKeyToGlobalOffset = entryKeyToGlobalOffset
-	self.noteChartSetIdToOffset = noteChartSetIdToOffset
+	self.id_to_global_offset = id_to_global_offset
+	self.set_id_to_global_offset = set_id_to_global_offset
 
 	local stmt = self.db:stmt(objectQuery:getQueryParams())
 	local colnames = {}
@@ -224,8 +215,8 @@ function CacheDatabase:queryNoteChartSets()
 	while row do
 		local entry = noteChartSets[i]
 		fillObject(entry, row, colnames)
-		noteChartSetIdToOffset[entry.setId] = i
-		entryKeyToGlobalOffset[entry.key] = i
+		set_id_to_global_offset[entry.setId] = i
+		id_to_global_offset[entry.noteChartId] = i
 		i = i + 1
 		row = stmt:step(row)
 	end
@@ -273,10 +264,10 @@ function CacheDatabase:queryNoteCharts()
 	local count = objectQuery:getCount()
 	local noteCharts = ffi.new("EntryStruct[?]", count)
 	local slices = {}
-	local entryKeyToLocalOffset = {}
+	local id_to_local_offset = {}
 	self.noteChartItems = noteCharts
 	self.noteChartSlices = slices
-	self.entryKeyToLocalOffset = entryKeyToLocalOffset
+	self.id_to_local_offset = id_to_local_offset
 
 	local stmt = self.db:stmt(objectQuery:getQueryParams())
 	local colnames = {}
@@ -298,7 +289,7 @@ function CacheDatabase:queryNoteCharts()
 		end
 		size = i - offset + 1
 		setId = entry.setId
-		entryKeyToLocalOffset[entry.key] = i - offset
+		id_to_local_offset[entry.noteChartId] = i - offset
 		i = i + 1
 		row = stmt:step(row)
 	end

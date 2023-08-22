@@ -70,20 +70,12 @@ function NoteChartSetLibraryModel:findNotechart(hash, index)
 	self.itemsCount = self.cacheModel.cacheDatabase.noteChartSetItemsCount
 end
 
----@param noteChartDataId number?
 ---@param noteChartId number?
 ---@param noteChartSetId number?
 ---@return number
-function NoteChartSetLibraryModel:getItemIndex(noteChartDataId, noteChartId, noteChartSetId)
-	self.entry = self.entry or self.cacheModel.cacheDatabase.EntryStruct()
-
-	local entry = self.entry
-	entry.noteChartDataId = noteChartDataId
-	entry.noteChartId = noteChartId
-	entry.setId = noteChartSetId
-	local key = entry.key
-
-	return (self.cacheModel.cacheDatabase.entryKeyToGlobalOffset[key] or self.cacheModel.cacheDatabase.noteChartSetIdToOffset[noteChartSetId] or 0) + 1
+function NoteChartSetLibraryModel:getItemIndex(noteChartId, noteChartSetId)
+	local cdb = self.cacheModel.cacheDatabase
+	return (cdb.id_to_global_offset[noteChartId] or cdb.set_id_to_global_offset[noteChartSetId] or 0) + 1
 end
 
 return NoteChartSetLibraryModel
