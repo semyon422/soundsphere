@@ -13,6 +13,7 @@ local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridVi
 local TextCellImView = require("sphere.imviews.TextCellImView")
 local BarCellImView = require("sphere.imviews.BarCellImView")
 local RoundedRectangle = require("sphere.views.RoundedRectangle")
+local Format = require("sphere.views.Format")
 
 local time_util = require("time_util")
 
@@ -168,12 +169,19 @@ end
 local function Title(self)
 	local w, h = Layout:move("column2row2")
 	love.graphics.translate(22, 0)
-	local noteChartItem = self.game.selectModel.noteChartItem or self.game.multiplayerModel.notechart
-	if not noteChartItem or not noteChartItem.title then
+	local item = self.game.selectModel.noteChartItem or self.game.multiplayerModel.notechart
+	if not item or not item.title then
 		return
 	end
-	TextCellImView(w, 52, "left", noteChartItem.artist, noteChartItem.title)
-	TextCellImView(w, 52, "left", noteChartItem.creator, noteChartItem.name)
+	TextCellImView(w, 52, "left", item.artist, item.title)
+
+	local baseTimeRate = self.game.modifierModel.state.timeRate
+	local difficulty = Format.difficulty((item.difficulty or 0) * baseTimeRate)
+
+	TextCellImView(72, h, "right", Format.inputMode(item.inputMode), difficulty, true)
+	just.sameline()
+	just.indent(44)
+	TextCellImView(w, 52, "left", item.creator, item.name)
 end
 
 ---@param self table
