@@ -1,20 +1,10 @@
 local class = require("class")
 
----@param ... string
----@return string
-local function sort(...)
-	local fields = {...}
-	for i, field in ipairs(fields) do
-		fields[i] = "noteChartDatas." .. field .. " ASC"
-	end
-	return table.concat(fields, ",")
-end
-
 ---@class sphere.SortModel
 ---@operator call: sphere.SortModel
 local SortModel = class()
 
----@return string
+---@return table
 ---@return boolean
 function SortModel:getOrderBy()
 	local f = self.sortItemsFunctions[self.name]
@@ -23,13 +13,13 @@ end
 
 -- 2nd value = isCollapseAllowed (group by setId)
 SortModel.sortItemsFunctions = {
-	id = {sort("id"), true},
-	title = {sort("title", "artist", "creator", "inputMode", "difficulty", "name", "id"), true},
-	artist = {sort("artist", "title", "creator", "inputMode", "difficulty", "name", "id"), true},
-	difficulty = {sort("difficulty", "name", "id"), false},
-	level = {sort("level", "id"), false},
-	length = {sort("length", "id"), false},
-	bpm = {sort("bpm", "id"), false},
+	id = {{"id"}, true},
+	title = {{"title", "artist", "id"}, true},
+	artist = {{"artist", "title", "id"}, true},
+	difficulty = {{"difficulty", "name", "id"}, false},
+	level = {{"level", "id"}, false},
+	length = {{"length", "id"}, false},
+	bpm = {{"bpm", "id"}, false},
 }
 
 SortModel.name = "title"

@@ -33,8 +33,13 @@ end
 function NoteChartSetLibraryModel:updateItems()
 	local params = self.cacheModel.cacheDatabase.queryParams
 
-	local isCollapseAllowed
-	params.orderBy, isCollapseAllowed = self.sortModel:getOrderBy()
+	local orderBy, isCollapseAllowed = self.sortModel:getOrderBy()
+	local fields = {}
+	for i, field in ipairs(orderBy) do
+		fields[i] = "noteChartDatas." .. field .. " ASC"
+	end
+	params.orderBy = table.concat(fields, ",")
+
 	if self.collapse and isCollapseAllowed then
 		params.groupBy = "noteCharts.setId"
 	else
