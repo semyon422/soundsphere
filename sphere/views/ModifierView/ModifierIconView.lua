@@ -22,7 +22,7 @@ local mod_lines = {
 }
 
 ---@param size number
----@param shape string
+---@param shape string?
 ---@param str string?
 ---@param substr string?
 function ModifierIconView:draw(size, shape, str, substr)

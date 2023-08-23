@@ -217,6 +217,8 @@ function Orm:insert(table_name, values, ignore)
 	return to_object(values, row, colnames)
 end
 
+---@param v any
+---@return any
 local function format_value(v)
 	local tv = type(v)
 	if tv == "string" then
@@ -262,6 +264,10 @@ local _format_cond = {
 	regex = "%s REGEXP %s",
 }
 
+---@param op string
+---@param k string
+---@param v any
+---@return string
 local function format_cond(op, k, v)
 	local fmt = _format_cond[op]
 	if type(fmt) == "function" then
@@ -270,7 +276,9 @@ local function format_cond(op, k, v)
 	return fmt:format(k, format_value(v))
 end
 
-function Orm:build_condition(t, prefix)
+---@param t table
+---@return string
+function Orm:build_condition(t)
 	local conds = {}
 
 	for k, v in pairs(t) do
@@ -279,10 +287,9 @@ function Orm:build_condition(t, prefix)
 			if not field then
 				field, op = k, "eq"
 			end
-			local p = prefix and prefix .. "." or ""
-			table.insert(conds, p .. format_cond(op, field, v))
+			table.insert(conds, format_cond(op, field, v))
 		elseif type(v) == "table" then
-			table.insert(conds, self:build_condition(v, prefix))
+			table.insert(conds, self:build_condition(v))
 		end
 	end
 
