@@ -1,4 +1,3 @@
-local utf8 = require("utf8")
 local class = require("class")
 local erfunc = require("libchart.erfunc")
 
@@ -42,7 +41,7 @@ function SearchModel:setCollection(collection)
 	self.collection = collection
 end
 
-local numberFields = {
+local number_fields = {
 	{
 		keys = {"difficulty", "d"},
 		field = "noteChartDatas.difficulty",
@@ -74,46 +73,48 @@ local numberFields = {
 	},
 	{
 		keys = {"longNotes", "ln"},
-		field = "noteChartDatas.longNoteRatio * 100",
+		field = "noteChartDatas.longNoteRatio",
+		transform = function(self, v)
+			return v / 100
+		end
 	},
-
 	{
 		keys = {"missCount", "m"},
 		field = "scores.missCount",
 	},
 	{
 		keys = {"accuracy", "a"},
-		field = "scores.accuracy * 1000",
+		field = "scores.accuracy",
+		transform = function(self, v)
+			return v / 1000
+		end
 	},
 	{
 		keys = {"score", "s"},
-		field = "-scores.accuracy",
+		field = "scores.accuracy",
+		flip = true,
 		transform = function(self, v)
 			if not tonumber(v) then
 				return
 			end
 			v = tonumber(v)
-			if v <= 0 then
-				return -1000
-			end
-			if v >= 10000 then
-				return 0
-			end
+			if v <= 0 then return 1000 end
+			if v >= 10000 then return 0 end
 			local window = self.configModel.configs.settings.gameplay.ratingHitTimingWindow
 			local accuracy = window / (erfunc.erfinv(v / 10000) * math.sqrt(2))
 			if accuracy ~= accuracy or math.abs(accuracy) == math.huge then
 				return 0
 			end
-			return -accuracy
+			return accuracy
 		end,
 	},
 }
 
-local numberFieldsMap = {}
-for _, config in ipairs(numberFields) do
+local fields_map = {}
+for _, config in ipairs(number_fields) do
 	for _, k in ipairs(config.keys) do
-		assert(not numberFieldsMap[k], "duplicate key: " .. k)
-		numberFieldsMap[k] = config
+		assert(not fields_map[k], "duplicate key: " .. k)
+		fields_map[k] = config
 	end
 end
 
@@ -128,55 +129,71 @@ local textFields = {
 	"inputMode",
 }
 
-local fieldLikePattern = {}
-for _, key in ipairs(textFields) do
-	table.insert(fieldLikePattern, ("noteChartDatas.%s LIKE <substring>"):format(key))
-end
-fieldLikePattern = "(" .. table.concat(fieldLikePattern, " OR ") .. ")"
+local operators = {
+	["="] = "eq",
+	["~="] = "ne",
+	["!="] = "ne",
+	[">"] = "gt",
+	["<"] = "lt",
+	[">="] = "gte",
+	["<="] = "lte",
+}
 
-local operators = {"=", ">", "<", ">=", "<=", "~=", "!="}
-local operatorsMap = {}
-for _, operator in ipairs(operators) do
-	operatorsMap[operator] = operator
-	if operator == "~=" then
-		operatorsMap[operator] = "!="
-	end
-end
+local inverse_operators = {
+	eq = "ne",
+	ne = "eq",
+	gt = "lte",
+	lt = "gte",
+	gte = "lt",
+	lte = "gt",
+}
+
+local flip_operators = {
+	gt = "lt",
+	lt = "gt",
+	gte = "lte",
+	lte = "gte",
+}
 
 ---@param s string
----@param conditions table?
----@return string
-function SearchModel:transformSearchString(s, conditions)
-	local searchString = s
-	conditions = conditions or {}
+---@param cond table?
+---@return table
+function SearchModel:transformSearchString(s, cond)
+	cond = cond or {}
 
-	for _, searchSubString in ipairs(searchString:split(" ")) do
-		local key, operator, value = searchSubString:match("^(.-)([=><~!]+)(.+)$")
-		if searchSubString == "!" or searchSubString == "~" then
-			table.insert(conditions, "scores.id IS NULL")
-		elseif key and operatorsMap[operator] then
-			local config = numberFieldsMap[key]
-			operator = operatorsMap[operator]
+	for _, _s in ipairs(s:split(" ")) do
+		local key, operator, value = _s:match("^(.-)([=><~!]+)(.+)$")
+		if _s == "!" or _s == "~" then
+			cond.scoreId__isnull = true
+		elseif key and operators[operator] then
+			local config = fields_map[key]
+			operator = operators[operator]
 			if config then
+				if config.inverse then
+					operator = inverse_operators[operator] or operator
+				end
+				if config.flip then
+					operator = flip_operators[operator] or operator
+				end
 				if config.transform then
 					value = config.transform(self, value)
 				else
 					value = tonumber(value)
 				end
 				if value then
-					table.insert(conditions, ("%s %s %s"):format(config.field, operator, value))
+					cond[config.field .. "__" .. operator] = value
 				end
 			end
-		elseif not key and searchSubString ~= "" then
-			table.insert(conditions, (fieldLikePattern:gsub("<substring>", ("%q"):format("%%" .. searchSubString .. "%%"))))
+		elseif not key and _s ~= "" then
+			local _cond = {"or"}
+			for _, k in ipairs(textFields) do
+				_cond["noteChartDatas." .. k .. "__contains"] = _s
+			end
+			table.insert(cond, _cond)
 		end
 	end
 
-	for i = 1, #conditions do
-		conditions[i] = "(" .. conditions[i] .. ")"
-	end
-
-	return table.concat(conditions, " AND ")
+	return cond
 end
 
 ---@return table?
@@ -192,23 +209,19 @@ function SearchModel:getFilter()
 	end
 end
 
----@return string
----@return string?
+---@return table
+---@return table?
 function SearchModel:getConditions()
 	local configs = self.configModel.configs
 	local settings = configs.settings
 
-	local conditions = {}
+	local cond = {}
 	local path = self.collection.path .. "/"
-	table.insert(
-		conditions,
-		("substr(noteCharts.path, 1, %d) = %q"):format(utf8.len(path), path)
-	)
+
+	cond.path__startswith = path
 
 	if not settings.miscellaneous.showNonManiaCharts then
-		table.insert(conditions, "noteChartDatas.inputMode != \"1osu\"")
-		table.insert(conditions, "noteChartDatas.inputMode != \"1taiko\"")
-		table.insert(conditions, "noteChartDatas.inputMode != \"1fruits\"")
+		cond["noteChartDatas.inputMode__notin"] = {"1osu", "1taiko", "1fruits"}
 	end
 
 	local filterString = self.filterString
@@ -218,16 +231,16 @@ function SearchModel:getConditions()
 			filterString = filterString .. " " .. filter.string
 		end
 		if filter.condition then
-			table.insert(conditions, filter.condition)
+			table.insert(cond, filter.condition)
 		end
 	end
 
 	if self.lampString == "" then
-		return self:transformSearchString(filterString, conditions)
+		return self:transformSearchString(filterString, cond)
 	end
 
 	return
-		self:transformSearchString(filterString, conditions),
+		self:transformSearchString(filterString, cond),
 		self:transformSearchString(self.lampString)
 end
 

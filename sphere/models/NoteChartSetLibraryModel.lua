@@ -1,4 +1,5 @@
 local LibraryModel = require("sphere.models.LibraryModel")
+local Orm = require("sphere.Orm")
 
 ---@class sphere.NoteChartSetLibraryModel: sphere.LibraryModel
 ---@operator call: sphere.NoteChartSetLibraryModel
@@ -47,16 +48,9 @@ function NoteChartSetLibraryModel:updateItems()
 	end
 
 	local where, lamp = self.searchModel:getConditions()
-	if where ~= "" then
-		params.where = where
-	else
-		params.where = nil
-	end
-	if lamp ~= "" then
-		params.lamp = lamp
-	else
-		params.lamp = nil
-	end
+
+	params.where = Orm:build_condition(where)
+	params.lamp = lamp and Orm:build_condition(lamp)
 
 	self.cacheModel.cacheDatabase:asyncQueryAll()
 	self.itemsCount = self.cacheModel.cacheDatabase.noteChartSetItemsCount

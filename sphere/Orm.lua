@@ -217,4 +217,81 @@ function Orm:insert(table_name, values, ignore)
 	return to_object(values, row, colnames)
 end
 
+local function format_value(v)
+	local tv = type(v)
+	if tv == "string" then
+		return ("%q"):format(v)
+	elseif tv == "boolean" then
+		return v and 1 or 0
+	elseif tv == "number" then
+		return v
+	end
+end
+
+local _format_cond = {
+	contains = function(k, v)
+		return ("%s LIKE %s"):format(k, format_value("%" .. v .. "%"))
+	end,
+	startswith = function(k, v)
+		return ("%s LIKE %s"):format(k, format_value(v .. "%"))
+	end,
+	endswith = function(k, v)
+		return ("%s LIKE %s"):format(k, format_value("%" .. v))
+	end,
+	["in"] = function(k, v)
+		local _v = {}
+		for i = 1, #v do
+			_v[i] = format_value(v[i])
+		end
+		return ("%s IN (%s)"):format(k, table.concat(_v, ", "))
+	end,
+	["notin"] = function(k, v)
+		local _v = {}
+		for i = 1, #v do
+			_v[i] = format_value(v[i])
+		end
+		return ("%s NOT IN (%s)"):format(k, table.concat(_v, ", "))
+	end,
+	eq = "%s = %s",
+	ne = "%s != %s",
+	isnull = "%s IS NULL",
+	gt = "%s > %s",
+	gte = "%s >= %s",
+	lt = "%s < %s",
+	lte = "%s <= %s",
+	regex = "%s REGEXP %s",
+}
+
+local function format_cond(op, k, v)
+	local fmt = _format_cond[op]
+	if type(fmt) == "function" then
+		return fmt(k, v)
+	end
+	return fmt:format(k, format_value(v))
+end
+
+function Orm:build_condition(t, prefix)
+	local conds = {}
+
+	for k, v in pairs(t) do
+		if type(k) == "string" then
+			local field, op = k:match("^(.+)__(.+)$")
+			if not field then
+				field, op = k, "eq"
+			end
+			local p = prefix and prefix .. "." or ""
+			table.insert(conds, p .. format_cond(op, field, v))
+		elseif type(v) == "table" then
+			table.insert(conds, self:build_condition(v, prefix))
+		end
+	end
+
+	for i = 1, #conds do
+		conds[i] = "(" .. conds[i] .. ")"
+	end
+
+	local op = t[1] == "or" and "OR" or "AND"
+	return table.concat(conds, (" %s "):format(op))
+end
+
 return Orm
