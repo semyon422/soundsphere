@@ -4,14 +4,22 @@ local rbtree = require("rbtree")
 
 local Keyframe_mt = {}
 
+---@param a table
+---@param b table
+---@return boolean
 function Keyframe_mt.__eq(a, b)
 	return a.time == b.time
 end
 
+---@param a table
+---@param b table
+---@return boolean
 function Keyframe_mt.__lt(a, b)
 	return a.time < b.time
 end
 
+---@param time number
+---@return table
 local function newKeyFrame(time)
 	return setmetatable({
 		time = time,

@@ -201,6 +201,7 @@ function EditorModel:getLogSpeed()
 	return math.floor(10 * math.log(editor.speed) / math.log(2) + 0.5)
 end
 
+---@param logSpeed number
 function EditorModel:setLogSpeed(logSpeed)
 	local editor = self:getSettings()
 	editor.speed = 2 ^ (logSpeed / 10)

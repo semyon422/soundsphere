@@ -175,7 +175,7 @@ end)
 
 ---@param path string
 ---@param type string?
----@return love.Source
+---@return love.Source?
 function PreviewModel:loadAudio(path, type)
 	local source
 	if type == "http" then
