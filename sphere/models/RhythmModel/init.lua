@@ -7,7 +7,7 @@ local AudioEngine = require("sphere.models.RhythmModel.AudioEngine")
 local TimeEngine = require("sphere.models.RhythmModel.TimeEngine")
 local InputManager = require("sphere.models.RhythmModel.InputManager")
 local PauseManager = require("sphere.models.RhythmModel.PauseManager")
-require("sphere.models.RhythmModel.LogicEngine.Test")
+-- require("sphere.models.RhythmModel.LogicEngine.Test")
 
 ---@class sphere.RhythmModel
 ---@operator call: sphere.RhythmModel
