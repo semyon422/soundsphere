@@ -49,9 +49,13 @@ function GameplayController:load()
 	rhythmModel:setDrawRange(noteSkin.range)
 	rhythmModel.inputManager:setInputMode(tostring(noteChart.inputMode))
 
-	rhythmModel.timings = config.gameplay.timings
+	local timings = config.gameplay.timings
+	if replayModel.mode == "replay" then
+		timings = replayModel.replay.timings
+	end
+	rhythmModel.timings = timings
+	replayModel.timings = timings
 
-	replayModel.timings = config.gameplay.timings
 	rhythmModel.inputManager.observable:add(replayModel)
 
 	rhythmModel:load()
