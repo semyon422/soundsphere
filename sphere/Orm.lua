@@ -88,6 +88,28 @@ function Orm:stmt(query, ...)
 	return stmt
 end
 
+---@param query string
+---@param ... any?
+---@return function
+function Orm:iter(query, ...)
+	local stmt = self:stmt(query, ...)
+
+	local colnames = {}
+	local i = 0
+	local row = {}
+
+	return function()
+		i = i + 1
+		row = stmt:step(row, colnames)
+
+		if row then
+			return i, row, colnames
+		end
+
+		stmt:close()
+	end
+end
+
 ---@param ... any?
 ---@return table?
 function Orm:query(...)

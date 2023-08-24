@@ -177,21 +177,17 @@ function CacheDatabase:queryNoteChartSets()
 	self.id_to_global_offset = id_to_global_offset
 	self.set_id_to_global_offset = set_id_to_global_offset
 
-	local stmt = self.db:stmt(objectQuery:getQueryParams())
-	local colnames = {}
-
-	local row = stmt:step({}, colnames)
-	local i = 0
-	while row do
-		local entry = noteChartSets[i]
+	local c = 0
+	for i, row, colnames in self.db:iter(objectQuery:getQueryParams()) do
+		local j = i - 1
+		local entry = noteChartSets[j]
 		fillObject(entry, row, colnames)
-		set_id_to_global_offset[entry.setId] = i
-		id_to_global_offset[entry.noteChartId] = i
-		i = i + 1
-		row = stmt:step(row)
+		set_id_to_global_offset[entry.setId] = j
+		id_to_global_offset[entry.noteChartId] = j
+		c = c + 1
 	end
-	stmt:close()
-	self.noteChartSetItemsCount = i
+
+	self.noteChartSetItemsCount = c
 end
 
 function CacheDatabase:queryNoteCharts()
@@ -239,38 +235,35 @@ function CacheDatabase:queryNoteCharts()
 	self.noteChartSlices = slices
 	self.id_to_local_offset = id_to_local_offset
 
-	local stmt = self.db:stmt(objectQuery:getQueryParams())
-	local colnames = {}
-
 	local offset = 0
 	local size = 0
 	local setId
-	local row = stmt:step({}, colnames)
-	local i = 0
-	while row do
-		local entry = noteCharts[i]
+	local c = 0
+	for i, row, colnames in self.db:iter(objectQuery:getQueryParams()) do
+		local j = i - 1
+		local entry = noteCharts[j]
 		fillObject(entry, row, colnames)
 		if setId and setId ~= entry.setId then
 			slices[setId] = {
 				offset = offset,
 				size = size,
 			}
-			offset = i
+			offset = j
 		end
-		size = i - offset + 1
+		size = j - offset + 1
 		setId = entry.setId
-		id_to_local_offset[entry.noteChartId] = i - offset
-		i = i + 1
-		row = stmt:step(row)
+		id_to_local_offset[entry.noteChartId] = j - offset
+		c = c + 1
 	end
+
 	if setId then
 		slices[setId] = {
 			offset = offset,
 			size = size,
 		}
 	end
-	stmt:close()
-	self.noteChartItemsCount = i
+
+	self.noteChartItemsCount = c
 end
 
 function CacheDatabase:reassignData()
