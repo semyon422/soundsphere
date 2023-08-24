@@ -39,12 +39,14 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 	elseif scoreEntry.replayHash then
 		content = readAsync(replayModel.path .. "/" .. scoreEntry.replayHash)
 	end
-
 	if not content then
 		return
 	end
 
 	local replay = replayModel:loadReplay(content)
+	if not replay then
+		return
+	end
 
 	if replay.modifiers then
 		modifierModel:setConfig(replay.modifiers)

@@ -73,13 +73,12 @@ function ReplayModel:saveReplay()
 end
 
 ---@param content string
----@return sphere.Replay
+---@return sphere.Replay?
 function ReplayModel:loadReplay(content)
-	local replay = Replay()
 	if not content then
-		return replay
+		return
 	end
-
+	local replay = Replay()
 	return replay:fromString(content)
 end
 

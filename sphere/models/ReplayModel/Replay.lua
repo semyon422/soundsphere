@@ -60,9 +60,13 @@ function Replay:toString()
 end
 
 ---@param s string
----@return sphere.Replay
+---@return sphere.Replay?
 function Replay:fromString(s)
-	local object = json.decode(s)
+	local ok, object = pcall(json.decode, s)
+
+	if not ok then
+		return
+	end
 
 	self.replayConverter:convert(object)
 
