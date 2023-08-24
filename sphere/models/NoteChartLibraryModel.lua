@@ -8,7 +8,7 @@ local path_util = require("path_util")
 local NoteChartLibraryModel = class()
 
 NoteChartLibraryModel.setId = 1
-NoteChartLibraryModel.itemsCount = 1
+NoteChartLibraryModel.itemsCount = 0
 
 function NoteChartLibraryModel:new()
 	local cache = ExpireTable()
