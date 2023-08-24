@@ -1,18 +1,35 @@
-local LibraryModel = require("sphere.models.LibraryModel")
+local class = require("class")
+local ExpireTable = require("ExpireTable")
+local table_util = require("table_util")
+local path_util = require("path_util")
 
----@class sphere.NoteChartLibraryModel: sphere.LibraryModel
+---@class sphere.NoteChartLibraryModel
 ---@operator call: sphere.NoteChartLibraryModel
-local NoteChartLibraryModel = LibraryModel + {}
+local NoteChartLibraryModel = class()
 
 NoteChartLibraryModel.setId = 1
+NoteChartLibraryModel.itemsCount = 1
+
+function NoteChartLibraryModel:new()
+	local cache = ExpireTable()
+	self.cache = cache
+	self.cache.load = function(_, k)
+		return self:loadObject(k)
+	end
+
+	self.items = newproxy(true)
+	local mt = getmetatable(self.items)
+	function mt.__index(_, i)
+		if i < 1 or i > self.itemsCount then return end
+		return cache:get(i)
+	end
+	function mt.__len()
+		return self.itemsCount
+	end
+end
 
 local NoteChartItem = {}
-
----@param path string
----@return string
-local function evalPath(path)
-	return (path:gsub("\\", "/"):gsub("/[^/]-/%.%./", "/"))
-end
+NoteChartItem.__index = NoteChartItem
 
 ---@return string?
 function NoteChartItem:getBackgroundPath()
@@ -29,7 +46,7 @@ function NoteChartItem:getBackgroundPath()
 	local stagePath = self.stagePath
 
 	if stagePath and stagePath ~= "" then
-		return evalPath(directoryPath .. "/" .. stagePath)
+		return path_util.eval_path(directoryPath .. "/" .. stagePath)
 	end
 
 	return directoryPath
@@ -46,46 +63,38 @@ function NoteChartItem:getAudioPathPreview()
 	local audioPath = self.audioPath
 
 	if audioPath and audioPath ~= "" then
-		return evalPath(directoryPath .. "/" .. audioPath), math.max(0, self.previewTime or 0)
+		return path_util.eval_path(directoryPath .. "/" .. audioPath), math.max(0, self.previewTime or 0)
 	end
 
 	return directoryPath .. "/preview.ogg", 0
 end
 
----@param k any
----@return any?
-function NoteChartItem:__index(k)
-	local raw = rawget(NoteChartItem, k)
-	if raw then
-		return raw
-	end
-	local model = self.noteChartLibraryModel
-
-	local slice = model.cacheModel.cacheDatabase.noteChartSlices[model.setId]
-	if not slice then
-		return
-	end
-	local entry = model.cacheModel.cacheDatabase.noteChartItems[slice.offset + self.itemIndex - 1]
-	if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "lamp" then
-		return entry[k]
-	end
-	local noteChart = model.cacheModel.cacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
-	local noteChartData = model.cacheModel.cacheDatabase:getCachedEntry("noteChartDatas", entry.noteChartDataId)
-	return noteChartData and noteChartData[k] or noteChart and noteChart[k]
-end
-
 ---@param itemIndex number
 ---@return table
 function NoteChartLibraryModel:loadObject(itemIndex)
-	return setmetatable({
-		noteChartLibraryModel = self,
+	local chartRepo = self.cacheModel.chartRepo
+	local slice = self.cacheModel.cacheDatabase.noteChartSlices[self.setId]
+	local entry = self.cacheModel.cacheDatabase.noteChartItems[slice.offset + itemIndex - 1]
+	local noteChart = chartRepo:selectNoteChartEntryById(entry.noteChartId)
+	local noteChartData = chartRepo:selectNoteChartDataEntryById(entry.noteChartDataId)
+
+	local item = {
+		noteChartDataId = entry.noteChartDataId,
+		noteChartId = entry.noteChartId,
+		setId = entry.setId,
+		lamp = entry.lamp,
 		itemIndex = itemIndex,
-	}, NoteChartItem)
+	}
+
+	table_util.copy(noteChart, item)
+	table_util.copy(noteChartData, item)
+
+	return setmetatable(item, NoteChartItem)
 end
 
 function NoteChartLibraryModel:clear()
-	self.slice = nil
 	self.itemsCount = 0
+	self.cache:new()
 end
 
 ---@param setId number
@@ -97,6 +106,7 @@ function NoteChartLibraryModel:setNoteChartSetId(setId)
 		return
 	end
 	self.itemsCount = slice.size
+	self.cache:new()
 end
 
 ---@param noteChartId number?

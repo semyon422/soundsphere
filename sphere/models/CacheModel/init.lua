@@ -40,7 +40,6 @@ end
 local isProcessing = false
 
 function CacheModel:update()
-	self.cacheDatabase:update()
 	if not isProcessing and #self.tasks > 0 then
 		self:process()
 	end

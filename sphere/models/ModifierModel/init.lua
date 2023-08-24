@@ -158,7 +158,7 @@ function ModifierModel:createModifiers()
 end
 
 ---@param modifierConfig table|number
----@return sphere.Modifier
+---@return sphere.Modifier?
 function ModifierModel:getModifier(modifierConfig)
 	if type(modifierConfig) == "number" then
 		return self.modifierById[modifierConfig]

@@ -1,34 +1,54 @@
-local LibraryModel = require("sphere.models.LibraryModel")
+local class = require("class")
+local ExpireTable = require("ExpireTable")
 local Orm = require("sphere.Orm")
+local table_util = require("table_util")
 
----@class sphere.NoteChartSetLibraryModel: sphere.LibraryModel
+---@class sphere.NoteChartSetLibraryModel
 ---@operator call: sphere.NoteChartSetLibraryModel
-local NoteChartSetLibraryModel = LibraryModel + {}
+local NoteChartSetLibraryModel = class()
+
+NoteChartSetLibraryModel.itemsCount = 0
+
+function NoteChartSetLibraryModel:new()
+	local cache = ExpireTable()
+	self.cache = cache
+	self.cache.load = function(_, k)
+		return self:loadObject(k)
+	end
+
+	self.items = newproxy(true)
+	local mt = getmetatable(self.items)
+	function mt.__index(_, i)
+		if i < 1 or i > self.itemsCount then return end
+		return cache:get(i)
+	end
+	function mt.__len()
+		return self.itemsCount
+	end
+end
 
 NoteChartSetLibraryModel.collapse = false
-
-local NoteChartSetItem = {}
-
----@param k any
----@return any?
-function NoteChartSetItem:__index(k)
-	local model = self.noteChartSetLibraryModel
-	local entry = model.cacheModel.cacheDatabase.noteChartSetItems[self.itemIndex - 1]
-	if k == "key" or k == "noteChartDataId" or k == "noteChartId" or k == "setId" or k == "lamp" then
-		return entry[k]
-	end
-	local noteChart = model.cacheModel.cacheDatabase:getCachedEntry("noteCharts", entry.noteChartId)
-	local noteChartData = model.cacheModel.cacheDatabase:getCachedEntry("noteChartDatas", entry.noteChartDataId)
-	return noteChartData and noteChartData[k] or noteChart and noteChart[k]
-end
 
 ---@param itemIndex number
 ---@return table
 function NoteChartSetLibraryModel:loadObject(itemIndex)
-	return setmetatable({
-		noteChartSetLibraryModel = self,
+	local chartRepo = self.cacheModel.chartRepo
+	local entry = self.cacheModel.cacheDatabase.noteChartSetItems[itemIndex - 1]
+	local noteChart = chartRepo:selectNoteChartEntryById(entry.noteChartId)
+	local noteChartData = chartRepo:selectNoteChartDataEntryById(entry.noteChartDataId)
+
+	local item = {
+		noteChartDataId = entry.noteChartDataId,
+		noteChartId = entry.noteChartId,
+		setId = entry.setId,
+		lamp = entry.lamp,
 		itemIndex = itemIndex,
-	}, NoteChartSetItem)
+	}
+
+	table_util.copy(noteChart, item)
+	table_util.copy(noteChartData, item)
+
+	return item
 end
 
 function NoteChartSetLibraryModel:updateItems()
@@ -54,6 +74,7 @@ function NoteChartSetLibraryModel:updateItems()
 
 	self.cacheModel.cacheDatabase:asyncQueryAll()
 	self.itemsCount = self.cacheModel.cacheDatabase.noteChartSetItemsCount
+	self.cache:new()
 end
 
 ---@param hash string
@@ -67,6 +88,7 @@ function NoteChartSetLibraryModel:findNotechart(hash, index)
 
 	self.cacheModel.cacheDatabase:asyncQueryAll()
 	self.itemsCount = self.cacheModel.cacheDatabase.noteChartSetItemsCount
+	self.cache:new()
 end
 
 ---@param noteChartId number?

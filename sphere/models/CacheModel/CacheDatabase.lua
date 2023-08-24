@@ -1,4 +1,3 @@
-local TimedCache = require("TimedCache")
 local thread = require("thread")
 local Orm = require("sphere.Orm")
 local ObjectQuery = require("sphere.ObjectQuery")
@@ -32,20 +31,6 @@ function CacheDatabase:load()
 	self.id_to_global_offset = {}
 	self.id_to_local_offset = {}
 
-	local entryCaches = {}
-	for _, t in ipairs({"noteChartSets", "noteCharts", "noteChartDatas"}) do
-		entryCaches[t] = TimedCache()
-		entryCaches[t].timeout = 1
-		entryCaches[t].loadObject = function(_, id)
-			local status, entries = pcall(db.select, db, t, "id = ?", id)
-			if not status then
-				return
-			end
-			return entries[1]
-		end
-	end
-	self.entryCaches = entryCaches
-
 	self.queryParams = {}
 end
 
@@ -64,21 +49,6 @@ end
 
 function CacheDatabase:detachScores()
 	self.db:exec("DETACH scores_db")
-end
-
-----------------------------------------------------------------
-
----@param t string
----@param id number
----@return table?
-function CacheDatabase:getCachedEntry(t, id)
-	return self.entryCaches[t]:getObject(id)
-end
-
-function CacheDatabase:update()
-	for _, entryCache in pairs(self.entryCaches) do
-		entryCache:update()
-	end
 end
 
 ----------------------------------------------------------------
