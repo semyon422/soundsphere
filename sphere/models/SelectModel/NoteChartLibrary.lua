@@ -3,14 +3,14 @@ local ExpireTable = require("ExpireTable")
 local table_util = require("table_util")
 local path_util = require("path_util")
 
----@class sphere.NoteChartLibraryModel
----@operator call: sphere.NoteChartLibraryModel
-local NoteChartLibraryModel = class()
+---@class sphere.NoteChartLibrary
+---@operator call: sphere.NoteChartLibrary
+local NoteChartLibrary = class()
 
-NoteChartLibraryModel.setId = 1
-NoteChartLibraryModel.itemsCount = 0
+NoteChartLibrary.setId = 1
+NoteChartLibrary.itemsCount = 0
 
-function NoteChartLibraryModel:new()
+function NoteChartLibrary:new()
 	local cache = ExpireTable()
 	self.cache = cache
 	self.cache.load = function(_, k)
@@ -71,7 +71,7 @@ end
 
 ---@param itemIndex number
 ---@return table
-function NoteChartLibraryModel:loadObject(itemIndex)
+function NoteChartLibrary:loadObject(itemIndex)
 	local chartRepo = self.cacheModel.chartRepo
 	local slice = self.cacheModel.cacheDatabase.noteChartSlices[self.setId]
 	local entry = self.cacheModel.cacheDatabase.noteChartItems[slice.offset + itemIndex - 1]
@@ -92,13 +92,13 @@ function NoteChartLibraryModel:loadObject(itemIndex)
 	return setmetatable(item, NoteChartItem)
 end
 
-function NoteChartLibraryModel:clear()
+function NoteChartLibrary:clear()
 	self.itemsCount = 0
 	self.cache:new()
 end
 
 ---@param setId number
-function NoteChartLibraryModel:setNoteChartSetId(setId)
+function NoteChartLibrary:setNoteChartSetId(setId)
 	self.setId = setId
 	local slice = self.cacheModel.cacheDatabase.noteChartSlices[setId]
 	if not slice then
@@ -111,8 +111,8 @@ end
 
 ---@param noteChartId number?
 ---@return number
-function NoteChartLibraryModel:getItemIndex(noteChartId)
+function NoteChartLibrary:getItemIndex(noteChartId)
 	return (self.cacheModel.cacheDatabase.id_to_local_offset[noteChartId] or 0) + 1
 end
 
-return NoteChartLibraryModel
+return NoteChartLibrary

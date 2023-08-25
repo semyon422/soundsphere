@@ -224,21 +224,22 @@ local function SearchField(self)
 
 	local delAll = love.keyboard.isDown("lctrl") and love.keyboard.isDown("backspace")
 
-	local text = self.game.searchModel.filterString
+	local searchModel = self.game.selectModel.searchModel
+	local text = searchModel.filterString
 	local changed, text = imgui.TextInput("SearchField", {text, "Filter..."}, nil, w / 2, h - padding * 2)
 	if changed == "text" then
 		if delAll then text = "" end
-		self.game.searchModel:setSearchString("filter", text)
+		searchModel:setSearchString("filter", text)
 	end
 
 	w, h = Layout:move("column3", "header")
 	love.graphics.translate(w / 2, padding)
 
-	local text = self.game.searchModel.lampString
+	local text = searchModel.lampString
 	local changed, text = imgui.TextInput("SearchFieldLamp", {text, "Lamp..."}, nil, w / 2, h - padding * 2)
 	if changed == "text" then
 		if delAll then text = "" end
-		self.game.searchModel:setSearchString("lamp", text)
+		searchModel:setSearchString("lamp", text)
 	end
 
 	w, h = Layout:move("column3", "header")
@@ -250,7 +251,7 @@ local function SortDropdown(self)
 	local w, h = Layout:move("column2", "header")
 	love.graphics.translate(w * 2 / 3, 15)
 
-	local sortModel = self.game.sortModel
+	local sortModel = self.game.selectModel.sortModel
 	local i = imgui.SpoilerList("SortDropdown", w / 3, h - 30, sortModel.names, sortModel.name)
 	local name = sortModel.names[i]
 	if name then
@@ -321,7 +322,7 @@ local function GroupCheckbox(self)
 	w = w / 3
 
 	love.graphics.translate(w, h / 6)
-	local collapse = self.game.noteChartSetLibraryModel.collapse
+	local collapse = self.game.selectModel.noteChartSetLibrary.collapse
 	if imgui.Checkbox(self, collapse, h * 2 / 3) then
 		self.game.selectModel:changeCollapse()
 	end

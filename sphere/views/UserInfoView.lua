@@ -12,7 +12,7 @@ local UserInfoView = class()
 ---@param h number
 ---@param username string
 ---@param is_active boolean?
----@return boolean?
+---@return number?
 function UserInfoView:draw(w, h, username, is_active)
 	local changed, active, hovered = just.button(self, just.is_over(w, h))
 

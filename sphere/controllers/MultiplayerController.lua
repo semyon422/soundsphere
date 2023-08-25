@@ -54,8 +54,9 @@ end
 
 MultiplayerController.findNotechart = remote.wrap(function(self)
 	local mpModel = self.multiplayerModel
-	self.noteChartSetLibraryModel:findNotechart(mpModel.notechart.hash or "", mpModel.notechart.index or 0)
-	local items = self.noteChartSetLibraryModel.items
+	local noteChartSetLibrary = self.selectModel.noteChartSetLibrary
+	noteChartSetLibrary:findNotechart(mpModel.notechart.hash or "", mpModel.notechart.index or 0)
+	local items = noteChartSetLibrary.items
 
 	local selectModel = self.selectModel
 	self.selectModel:setLock(false)

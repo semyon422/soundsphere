@@ -1,6 +1,10 @@
 local class = require("class")
 local delay = require("delay")
 local thread = require("thread")
+local NoteChartLibrary = require("sphere.models.SelectModel.NoteChartLibrary")
+local NoteChartSetLibrary = require("sphere.models.SelectModel.NoteChartSetLibrary")
+local SearchModel = require("sphere.models.SelectModel.SearchModel")
+local SortModel = require("sphere.models.SelectModel.SortModel")
 
 ---@class sphere.SelectModel
 ---@operator call: sphere.SelectModel
@@ -11,6 +15,10 @@ function SelectModel:new()
 	self.noteChartItemIndex = 1
 	self.scoreItemIndex = 1
 	self.pullingNoteChartSet = false
+	self.noteChartLibrary = NoteChartLibrary()
+	self.noteChartSetLibrary = NoteChartSetLibrary()
+	self.searchModel = SearchModel()
+	self.sortModel = SortModel()
 end
 
 SelectModel.debounceTime = 0.5
@@ -19,11 +27,17 @@ function SelectModel:load()
 	local config = self.configModel.configs.select
 	self.config = config
 
+	self.noteChartLibrary.cacheModel = self.cacheModel
+	self.noteChartSetLibrary.cacheModel = self.cacheModel
+	self.noteChartSetLibrary.sortModel = self.sortModel
+	self.noteChartSetLibrary.searchModel = self.searchModel
+	self.searchModel.configModel = self.configModel
+
 	self.searchModel:setFilterString(config.filterString)
 	self.searchModel:setLampString(config.lampString)
 	self.searchMode = config.searchMode
 	self.sortModel.name = config.sortFunction
-	self.noteChartSetLibraryModel.collapse = config.collapse
+	self.noteChartSetLibrary.collapse = config.collapse
 
 	self.noteChartSetStateCounter = 1
 	self.noteChartStateCounter = 1
@@ -92,7 +106,7 @@ function SelectModel:changeCollapse()
 	end
 	local config = self.config
 	config.collapse = not config.collapse
-	self.noteChartSetLibraryModel.collapse = config.collapse
+	self.noteChartSetLibrary.collapse = config.collapse
 	self:debouncePullNoteChartSet()
 end
 
@@ -137,7 +151,7 @@ function SelectModel:scrollCollection(direction, destination)
 end
 
 function SelectModel:scrollRandom()
-	local noteChartSetItems = self.noteChartSetLibraryModel.items
+	local noteChartSetItems = self.noteChartSetLibrary.items
 
 	local destination = math.random(1, #noteChartSetItems)
 
@@ -154,7 +168,7 @@ end
 ---@param direction number?
 ---@param destination number?
 function SelectModel:scrollNoteChartSet(direction, destination)
-	local noteChartSetItems = self.noteChartSetLibraryModel.items
+	local noteChartSetItems = self.noteChartSetLibrary.items
 
 	destination = math.min(math.max(destination or self.noteChartSetItemIndex + direction, 1), #noteChartSetItems)
 	if not noteChartSetItems[destination] or self.noteChartSetItemIndex == destination then
@@ -174,7 +188,7 @@ end
 ---@param direction number?
 ---@param destination number?
 function SelectModel:scrollNoteChart(direction, destination)
-	local noteChartItems = self.noteChartLibraryModel.items
+	local noteChartItems = self.noteChartLibrary.items
 
 	direction = direction or destination - self.noteChartItemIndex
 
@@ -222,11 +236,11 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 
 	if not noUpdate then
 		self.searchModel:setCollection(self.collectionItem)
-		self.noteChartSetLibraryModel:updateItems()
+		self.noteChartSetLibrary:updateItems()
 	end
 
-	local noteChartSetItems = self.noteChartSetLibraryModel.items
-	self.noteChartSetItemIndex = self.noteChartSetLibraryModel:getItemIndex(
+	local noteChartSetItems = self.noteChartSetLibrary.items
+	self.noteChartSetItemIndex = self.noteChartSetLibrary:getItemIndex(
 		self.config.noteChartEntryId,
 		self.config.noteChartSetEntryId
 	)
@@ -254,7 +268,7 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 	self.scoreItem = nil
 	self.changed = true
 
-	self.noteChartLibraryModel:clear()
+	self.noteChartLibrary:clear()
 	self.scoreLibraryModel:clear()
 
 	self.pullingNoteChartSet = false
@@ -265,10 +279,10 @@ end
 function SelectModel:pullNoteChart(noUpdate, noPullNext)
 	local oldId = self.noteChartItem and self.noteChartItem.id
 
-	self.noteChartLibraryModel:setNoteChartSetId(self.config.noteChartSetEntryId)
+	self.noteChartLibrary:setNoteChartSetId(self.config.noteChartSetEntryId)
 
-	local noteChartItems = self.noteChartLibraryModel.items
-	self.noteChartItemIndex = self.noteChartLibraryModel:getItemIndex(
+	local noteChartItems = self.noteChartLibrary.items
+	self.noteChartItemIndex = self.noteChartLibrary:getItemIndex(
 		self.config.noteChartEntryId
 	)
 
@@ -316,7 +330,7 @@ end
 
 ---@param noUpdate boolean?
 function SelectModel:pullScore(noUpdate)
-	local noteChartItems = self.noteChartLibraryModel.items
+	local noteChartItems = self.noteChartLibrary.items
 	local noteChartItem = noteChartItems[self.noteChartItemIndex]
 
 	if not noteChartItem then

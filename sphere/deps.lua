@@ -50,7 +50,6 @@ return {
 		"modifierModel",
 		"configModel",
 		"selectModel",
-		"noteChartSetLibraryModel",
 	},
 	resultController = {
 		"selectModel",
@@ -107,29 +106,16 @@ return {
 		"cacheModel",
 	},
 	inputModel = {"configModel"},
-	noteChartSetLibraryModel = {
-		"searchModel",
-		"sortModel",
-		"cacheModel",
-	},
-	noteChartLibraryModel = {
-		"cacheModel",
-	},
 	scoreLibraryModel = {
 		"configModel",
 		"onlineModel",
 		"scoreModel",
 	},
-	sortModel = {},
-	searchModel = {"configModel"},
 	selectModel = {
 		"configModel",
-		"searchModel",
-		"sortModel",
-		"noteChartSetLibraryModel",
-		"noteChartLibraryModel",
 		"scoreLibraryModel",
 		"collectionModel",
+		"cacheModel",
 	},
 	previewModel = {
 		"configModel",

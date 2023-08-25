@@ -3,13 +3,13 @@ local ExpireTable = require("ExpireTable")
 local Orm = require("sphere.Orm")
 local table_util = require("table_util")
 
----@class sphere.NoteChartSetLibraryModel
----@operator call: sphere.NoteChartSetLibraryModel
-local NoteChartSetLibraryModel = class()
+---@class sphere.NoteChartSetLibrary
+---@operator call: sphere.NoteChartSetLibrary
+local NoteChartSetLibrary = class()
 
-NoteChartSetLibraryModel.itemsCount = 0
+NoteChartSetLibrary.itemsCount = 0
 
-function NoteChartSetLibraryModel:new()
+function NoteChartSetLibrary:new()
 	local cache = ExpireTable()
 	self.cache = cache
 	self.cache.load = function(_, k)
@@ -27,11 +27,11 @@ function NoteChartSetLibraryModel:new()
 	end
 end
 
-NoteChartSetLibraryModel.collapse = false
+NoteChartSetLibrary.collapse = false
 
 ---@param itemIndex number
 ---@return table
-function NoteChartSetLibraryModel:loadObject(itemIndex)
+function NoteChartSetLibrary:loadObject(itemIndex)
 	local chartRepo = self.cacheModel.chartRepo
 	local entry = self.cacheModel.cacheDatabase.noteChartSetItems[itemIndex - 1]
 	local noteChart = chartRepo:selectNoteChartEntryById(entry.noteChartId)
@@ -51,7 +51,7 @@ function NoteChartSetLibraryModel:loadObject(itemIndex)
 	return item
 end
 
-function NoteChartSetLibraryModel:updateItems()
+function NoteChartSetLibrary:updateItems()
 	local params = self.cacheModel.cacheDatabase.queryParams
 
 	local orderBy, isCollapseAllowed = self.sortModel:getOrderBy()
@@ -79,7 +79,7 @@ end
 
 ---@param hash string
 ---@param index number
-function NoteChartSetLibraryModel:findNotechart(hash, index)
+function NoteChartSetLibrary:findNotechart(hash, index)
 	local params = self.cacheModel.cacheDatabase.queryParams
 
 	params.groupBy = nil
@@ -94,9 +94,9 @@ end
 ---@param noteChartId number?
 ---@param noteChartSetId number?
 ---@return number
-function NoteChartSetLibraryModel:getItemIndex(noteChartId, noteChartSetId)
+function NoteChartSetLibrary:getItemIndex(noteChartId, noteChartSetId)
 	local cdb = self.cacheModel.cacheDatabase
 	return (cdb.id_to_global_offset[noteChartId] or cdb.set_id_to_global_offset[noteChartSetId] or 0) + 1
 end
 
-return NoteChartSetLibraryModel
+return NoteChartSetLibrary
