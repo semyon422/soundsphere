@@ -3,8 +3,8 @@ local Format = {}
 ---@param score any
 ---@return string
 function Format.accuracy(score)
-	score = tonumber(score) or math.huge
-	if score >= 0.1 then
+	score = tonumber(score)
+	if not score or score >= 0.1 or score <= -0.1 then
 		return "100+"
 	end
 	return ("%2.2f"):format(score * 1000)
