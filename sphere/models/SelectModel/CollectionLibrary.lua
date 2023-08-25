@@ -1,10 +1,10 @@
 local class = require("class")
 
----@class sphere.CollectionModel
----@operator call: sphere.CollectionModel
-local CollectionModel = class()
+---@class sphere.CollectionLibrary
+---@operator call: sphere.CollectionLibrary
+local CollectionLibrary = class()
 
-CollectionModel.basePath = "userdata/charts"
+CollectionLibrary.basePath = "userdata/charts"
 
 local ignoredNames = {
 	".keep",
@@ -13,7 +13,7 @@ for i = 1, #ignoredNames do
 	ignoredNames[ignoredNames[i]] = true
 end
 
-function CollectionModel:load()
+function CollectionLibrary:load()
 	self.config = self.configModel.configs.select
 	local collectionPath = self.config.collection
 	local basePath = self.basePath
@@ -58,7 +58,7 @@ end
 
 ---@param path string
 ---@return number
-function CollectionModel:getItemIndex(path)
+function CollectionLibrary:getItemIndex(path)
 	local items = self.items
 
 	if not items then
@@ -75,4 +75,4 @@ function CollectionModel:getItemIndex(path)
 	return 1
 end
 
-return CollectionModel
+return CollectionLibrary
