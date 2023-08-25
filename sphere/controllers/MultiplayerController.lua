@@ -54,12 +54,12 @@ end
 
 MultiplayerController.findNotechart = remote.wrap(function(self)
 	local mpModel = self.multiplayerModel
-	local noteChartSetLibrary = self.selectModel.noteChartSetLibrary
-	noteChartSetLibrary:findNotechart(mpModel.notechart.hash or "", mpModel.notechart.index or 0)
-	local items = noteChartSetLibrary.items
-
 	local selectModel = self.selectModel
-	self.selectModel:setLock(false)
+
+	selectModel:findNotechart(mpModel.notechart.hash or "", mpModel.notechart.index or 0)
+	local items = selectModel.noteChartSetLibrary.items
+
+	selectModel:setLock(false)
 
 	mpModel.downloadingBeatmap = nil
 	local item = items[1]

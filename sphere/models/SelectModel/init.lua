@@ -5,6 +5,7 @@ local NoteChartLibrary = require("sphere.models.SelectModel.NoteChartLibrary")
 local NoteChartSetLibrary = require("sphere.models.SelectModel.NoteChartSetLibrary")
 local SearchModel = require("sphere.models.SelectModel.SearchModel")
 local SortModel = require("sphere.models.SelectModel.SortModel")
+local Orm = require("sphere.Orm")
 
 ---@class sphere.SelectModel
 ---@operator call: sphere.SelectModel
@@ -29,15 +30,12 @@ function SelectModel:load()
 
 	self.noteChartLibrary.cacheModel = self.cacheModel
 	self.noteChartSetLibrary.cacheModel = self.cacheModel
-	self.noteChartSetLibrary.sortModel = self.sortModel
-	self.noteChartSetLibrary.searchModel = self.searchModel
 	self.searchModel.configModel = self.configModel
 
 	self.searchModel:setFilterString(config.filterString)
 	self.searchModel:setLampString(config.lampString)
 	self.searchMode = config.searchMode
 	self.sortModel.name = config.sortFunction
-	self.noteChartSetLibrary.collapse = config.collapse
 
 	self.noteChartSetStateCounter = 1
 	self.noteChartStateCounter = 1
@@ -48,6 +46,46 @@ function SelectModel:load()
 	self.collectionItem = self.collectionModel.items[self.collectionItemIndex]
 
 	self:noDebouncePullNoteChartSet()
+end
+
+function SelectModel:updateSetItems()
+	local params = self.cacheModel.cacheDatabase.queryParams
+
+	local orderBy, isCollapseAllowed = self.sortModel:getOrderBy()
+	local fields = {}
+	for i, field in ipairs(orderBy) do
+		fields[i] = "noteChartDatas." .. field .. " ASC"
+	end
+	params.orderBy = table.concat(fields, ",")
+
+	if self.config.collapse and isCollapseAllowed then
+		params.groupBy = "noteCharts.setId"
+	else
+		params.groupBy = nil
+	end
+
+	local where, lamp = self.searchModel:getConditions()
+
+	params.where = Orm:build_condition(where)
+	params.lamp = lamp and Orm:build_condition(lamp)
+
+	self.cacheModel.cacheDatabase:asyncQueryAll()
+
+	self.noteChartSetLibrary:updateItems()
+end
+
+---@param hash string
+---@param index number
+function SelectModel:findNotechart(hash, index)
+	local params = self.cacheModel.cacheDatabase.queryParams
+
+	params.groupBy = nil
+	params.lamp = nil
+	params.where = ("noteChartDatas.hash = %q AND noteChartDatas.`index` = %d"):format(hash, index)
+
+	self.cacheModel.cacheDatabase:asyncQueryAll()
+
+	self.noteChartSetLibrary:updateItems()
 end
 
 ---@return boolean
@@ -106,8 +144,7 @@ function SelectModel:changeCollapse()
 	end
 	local config = self.config
 	config.collapse = not config.collapse
-	self.noteChartSetLibrary.collapse = config.collapse
-	self:debouncePullNoteChartSet()
+	self:noDebouncePullNoteChartSet()
 end
 
 ---@param locked boolean
@@ -236,7 +273,7 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 
 	if not noUpdate then
 		self.searchModel:setCollection(self.collectionItem)
-		self.noteChartSetLibrary:updateItems()
+		self:updateSetItems()
 	end
 
 	local noteChartSetItems = self.noteChartSetLibrary.items

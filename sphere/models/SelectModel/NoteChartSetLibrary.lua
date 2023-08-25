@@ -1,6 +1,5 @@
 local class = require("class")
 local ExpireTable = require("ExpireTable")
-local Orm = require("sphere.Orm")
 local table_util = require("table_util")
 
 ---@class sphere.NoteChartSetLibrary
@@ -27,8 +26,6 @@ function NoteChartSetLibrary:new()
 	end
 end
 
-NoteChartSetLibrary.collapse = false
-
 ---@param itemIndex number
 ---@return table
 function NoteChartSetLibrary:loadObject(itemIndex)
@@ -52,41 +49,6 @@ function NoteChartSetLibrary:loadObject(itemIndex)
 end
 
 function NoteChartSetLibrary:updateItems()
-	local params = self.cacheModel.cacheDatabase.queryParams
-
-	local orderBy, isCollapseAllowed = self.sortModel:getOrderBy()
-	local fields = {}
-	for i, field in ipairs(orderBy) do
-		fields[i] = "noteChartDatas." .. field .. " ASC"
-	end
-	params.orderBy = table.concat(fields, ",")
-
-	if self.collapse and isCollapseAllowed then
-		params.groupBy = "noteCharts.setId"
-	else
-		params.groupBy = nil
-	end
-
-	local where, lamp = self.searchModel:getConditions()
-
-	params.where = Orm:build_condition(where)
-	params.lamp = lamp and Orm:build_condition(lamp)
-
-	self.cacheModel.cacheDatabase:asyncQueryAll()
-	self.itemsCount = self.cacheModel.cacheDatabase.noteChartSetItemsCount
-	self.cache:new()
-end
-
----@param hash string
----@param index number
-function NoteChartSetLibrary:findNotechart(hash, index)
-	local params = self.cacheModel.cacheDatabase.queryParams
-
-	params.groupBy = nil
-	params.lamp = nil
-	params.where = ("noteChartDatas.hash = %q AND noteChartDatas.`index` = %d"):format(hash, index)
-
-	self.cacheModel.cacheDatabase:asyncQueryAll()
 	self.itemsCount = self.cacheModel.cacheDatabase.noteChartSetItemsCount
 	self.cache:new()
 end

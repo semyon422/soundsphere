@@ -322,7 +322,7 @@ local function GroupCheckbox(self)
 	w = w / 3
 
 	love.graphics.translate(w, h / 6)
-	local collapse = self.game.selectModel.noteChartSetLibrary.collapse
+	local collapse = self.game.configModel.configs.select.collapse
 	if imgui.Checkbox(self, collapse, h * 2 / 3) then
 		self.game.selectModel:changeCollapse()
 	end
