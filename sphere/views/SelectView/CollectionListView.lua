@@ -7,7 +7,7 @@ local CollectionListView = ListView()
 CollectionListView.rows = 11
 
 function CollectionListView:reloadItems()
-	self.items = self.game.collectionModel.items
+	self.items = self.game.selectModel.collectionLibrary.items
     self.selectedCollection = self.game.selectModel.collectionItem
 end
 

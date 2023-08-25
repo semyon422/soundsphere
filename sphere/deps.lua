@@ -82,10 +82,6 @@ return {
 	backgroundModel = {"configModel"},
 	configModel = {},
 	cacheModel = {},
-	collectionModel = {
-		"configModel",
-		"cacheModel",
-	},
 	discordModel = {},
 	difficultyModel = {},
 	editorModel = {
@@ -114,7 +110,6 @@ return {
 	selectModel = {
 		"configModel",
 		"scoreLibraryModel",
-		"collectionModel",
 		"cacheModel",
 	},
 	previewModel = {

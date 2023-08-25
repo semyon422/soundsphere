@@ -3,6 +3,7 @@ local delay = require("delay")
 local thread = require("thread")
 local NoteChartLibrary = require("sphere.models.SelectModel.NoteChartLibrary")
 local NoteChartSetLibrary = require("sphere.models.SelectModel.NoteChartSetLibrary")
+local CollectionLibrary = require("sphere.models.SelectModel.CollectionLibrary")
 local SearchModel = require("sphere.models.SelectModel.SearchModel")
 local SortModel = require("sphere.models.SelectModel.SortModel")
 local Orm = require("sphere.Orm")
@@ -20,6 +21,7 @@ SelectModel.debounceTime = 0.5
 function SelectModel:new()
 	self.noteChartLibrary = NoteChartLibrary()
 	self.noteChartSetLibrary = NoteChartSetLibrary()
+	self.collectionLibrary = CollectionLibrary()
 	self.searchModel = SearchModel()
 	self.sortModel = SortModel()
 end
@@ -31,6 +33,8 @@ function SelectModel:load()
 	self.noteChartLibrary.cacheModel = self.cacheModel
 	self.noteChartSetLibrary.cacheModel = self.cacheModel
 	self.searchModel.configModel = self.configModel
+	self.collectionLibrary.cacheModel = self.cacheModel
+	self.collectionLibrary.configModel = self.configModel
 
 	self.searchMode = config.searchMode
 
@@ -38,8 +42,10 @@ function SelectModel:load()
 	self.noteChartStateCounter = 1
 	self.scoreStateCounter = 1
 
-	self.collectionItemIndex = self.collectionModel:getItemIndex(config.collection)
-	self.collectionItem = self.collectionModel.items[self.collectionItemIndex]
+	self.collectionLibrary:load()
+
+	self.collectionItemIndex = self.collectionLibrary:getItemIndex(config.collection)
+	self.collectionItem = self.collectionLibrary.items[self.collectionItemIndex]
 
 	self:noDebouncePullNoteChartSet()
 end
@@ -149,7 +155,7 @@ function SelectModel:scrollCollection(direction, destination)
 		return
 	end
 
-	local collectionItems = self.collectionModel.items
+	local collectionItems = self.collectionLibrary.items
 
 	destination = math.min(math.max(destination or self.collectionItemIndex + direction, 1), #collectionItems)
 	if not collectionItems[destination] or self.collectionItemIndex == destination then
