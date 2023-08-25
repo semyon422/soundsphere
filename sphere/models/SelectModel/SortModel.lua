@@ -4,15 +4,8 @@ local class = require("class")
 ---@operator call: sphere.SortModel
 local SortModel = class()
 
----@return table
----@return boolean
-function SortModel:getOrderBy()
-	local f = self.sortItemsFunctions[self.name]
-	return f[1], f[2]
-end
-
 -- 2nd value = isCollapseAllowed (group by setId)
-SortModel.sortItemsFunctions = {
+SortModel.orders = {
 	id = {{"id"}, true},
 	title = {{"title", "artist", "id"}, true},
 	artist = {{"artist", "title", "id"}, true},

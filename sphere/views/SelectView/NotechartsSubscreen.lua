@@ -224,22 +224,24 @@ local function SearchField(self)
 
 	local delAll = love.keyboard.isDown("lctrl") and love.keyboard.isDown("backspace")
 
-	local searchModel = self.game.selectModel.searchModel
-	local text = searchModel.filterString
-	local changed, text = imgui.TextInput("SearchField", {text, "Filter..."}, nil, w / 2, h - padding * 2)
+	local config = self.game.configModel.configs.select
+	local selectModel = self.game.selectModel
+
+	local changed, text = imgui.TextInput("SearchField", {config.filterString, "Filter..."}, nil, w / 2, h - padding * 2)
 	if changed == "text" then
 		if delAll then text = "" end
-		searchModel:setSearchString("filter", text)
+		config.filterString = text
+		selectModel:debouncePullNoteChartSet()
 	end
 
 	w, h = Layout:move("column3", "header")
 	love.graphics.translate(w / 2, padding)
 
-	local text = searchModel.lampString
-	local changed, text = imgui.TextInput("SearchFieldLamp", {text, "Lamp..."}, nil, w / 2, h - padding * 2)
+	local changed, text = imgui.TextInput("SearchFieldLamp", {config.lampString, "Lamp..."}, nil, w / 2, h - padding * 2)
 	if changed == "text" then
 		if delAll then text = "" end
-		searchModel:setSearchString("lamp", text)
+		config.lampString = text
+		selectModel:debouncePullNoteChartSet()
 	end
 
 	w, h = Layout:move("column3", "header")
@@ -255,7 +257,7 @@ local function SortDropdown(self)
 	local i = imgui.SpoilerList("SortDropdown", w / 3, h - 30, sortModel.names, sortModel.name)
 	local name = sortModel.names[i]
 	if name then
-		self.game.selectModel:setSortFunction(name, true)
+		self.game.selectModel:setSortFunction(name)
 	end
 end
 

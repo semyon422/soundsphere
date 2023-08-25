@@ -50,7 +50,6 @@ end
 
 function SelectController:update()
 	self.previewModel:update()
-	self.selectModel:update()
 
 	self.windowModel:setVsyncOnSelect(true)
 

@@ -11,18 +11,18 @@ local Orm = require("sphere.Orm")
 ---@operator call: sphere.SelectModel
 local SelectModel = class()
 
+SelectModel.noteChartSetItemIndex = 1
+SelectModel.noteChartItemIndex = 1
+SelectModel.scoreItemIndex = 1
+SelectModel.pullingNoteChartSet = false
+SelectModel.debounceTime = 0.5
+
 function SelectModel:new()
-	self.noteChartSetItemIndex = 1
-	self.noteChartItemIndex = 1
-	self.scoreItemIndex = 1
-	self.pullingNoteChartSet = false
 	self.noteChartLibrary = NoteChartLibrary()
 	self.noteChartSetLibrary = NoteChartSetLibrary()
 	self.searchModel = SearchModel()
 	self.sortModel = SortModel()
 end
-
-SelectModel.debounceTime = 0.5
 
 function SelectModel:load()
 	local config = self.configModel.configs.select
@@ -32,15 +32,11 @@ function SelectModel:load()
 	self.noteChartSetLibrary.cacheModel = self.cacheModel
 	self.searchModel.configModel = self.configModel
 
-	self.searchModel:setFilterString(config.filterString)
-	self.searchModel:setLampString(config.lampString)
 	self.searchMode = config.searchMode
-	self.sortModel.name = config.sortFunction
 
 	self.noteChartSetStateCounter = 1
 	self.noteChartStateCounter = 1
 	self.scoreStateCounter = 1
-	self.searchStateCounter = self.searchModel.stateCounter
 
 	self.collectionItemIndex = self.collectionModel:getItemIndex(config.collection)
 	self.collectionItem = self.collectionModel.items[self.collectionItemIndex]
@@ -51,7 +47,7 @@ end
 function SelectModel:updateSetItems()
 	local params = self.cacheModel.cacheDatabase.queryParams
 
-	local orderBy, isCollapseAllowed = self.sortModel:getOrderBy()
+	local orderBy, isCollapseAllowed = unpack(self.sortModel.orders[self.config.sortFunction])
 	local fields = {}
 	for i, field in ipairs(orderBy) do
 		fields[i] = "noteChartDatas." .. field .. " ASC"
@@ -65,6 +61,8 @@ function SelectModel:updateSetItems()
 	end
 
 	local where, lamp = self.searchModel:getConditions()
+
+	where.path__startswith = self.collectionItem.path .. "/"
 
 	params.where = Orm:build_condition(where)
 	params.lamp = lamp and Orm:build_condition(lamp)
@@ -123,44 +121,25 @@ SelectModel.noDebouncePullNoteChartSet = thread.coro(function(self, ...)
 end)
 
 ---@param sortFunctionName string
----@param noDebounce boolean?
-function SelectModel:setSortFunction(sortFunctionName, noDebounce)
+function SelectModel:setSortFunction(sortFunctionName)
 	if self.pullingNoteChartSet then
 		return
 	end
-	local config = self.config
-	config.sortFunction = sortFunctionName
-	self.sortModel.name = sortFunctionName
-	if noDebounce then
-		self:noDebouncePullNoteChartSet()
-		return
-	end
-	self:debouncePullNoteChartSet()
+	self.config.sortFunction = sortFunctionName
+	self:noDebouncePullNoteChartSet()
 end
 
 function SelectModel:changeCollapse()
 	if self.pullingNoteChartSet then
 		return
 	end
-	local config = self.config
-	config.collapse = not config.collapse
+	self.config.collapse = not self.config.collapse
 	self:noDebouncePullNoteChartSet()
 end
 
 ---@param locked boolean
 function SelectModel:setLock(locked)
 	self.locked = locked
-end
-
-function SelectModel:update()
-	local stateCounter = self.searchModel.stateCounter
-	if self.searchStateCounter == stateCounter or self.pullingNoteChartSet then
-		return
-	end
-	self.config.filterString = self.searchModel.filterString
-	self.config.lampString = self.searchModel.lampString
-	self.searchStateCounter = stateCounter
-	self:debouncePullNoteChartSet()
 end
 
 ---@param direction number?
@@ -272,7 +251,6 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 	self.pullingNoteChartSet = true
 
 	if not noUpdate then
-		self.searchModel:setCollection(self.collectionItem)
 		self:updateSetItems()
 	end
 

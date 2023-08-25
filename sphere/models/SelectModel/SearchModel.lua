@@ -5,42 +5,6 @@ local erfunc = require("libchart.erfunc")
 ---@operator call: sphere.SearchModel
 local SearchModel = class()
 
-SearchModel.filterString = ""
-SearchModel.lampString = ""
-SearchModel.collection = {path = ""}
-SearchModel.stateCounter = 1
-
----@param searchMode string
----@param text string
-function SearchModel:setSearchString(searchMode, text)
-	if searchMode == "filter" then
-		self:setFilterString(text)
-	else
-		self:setLampString(text)
-	end
-end
-
----@param text string
-function SearchModel:setFilterString(text)
-	if text ~= self.filterString then
-		self.stateCounter = self.stateCounter + 1
-	end
-	self.filterString = text
-end
-
----@param text string
-function SearchModel:setLampString(text)
-	if text ~= self.lampString then
-		self.stateCounter = self.stateCounter + 1
-	end
-	self.lampString = text
-end
-
----@param collection any?
-function SearchModel:setCollection(collection)
-	self.collection = collection
-end
-
 local number_fields = {
 	{
 		keys = {"difficulty", "d"},
@@ -214,17 +178,16 @@ end
 function SearchModel:getConditions()
 	local configs = self.configModel.configs
 	local settings = configs.settings
+	local _select = configs.select
+
+	local filterString, lampString = _select.filterString, _select.lampString
 
 	local cond = {}
-	local path = self.collection.path .. "/"
-
-	cond.path__startswith = path
 
 	if not settings.miscellaneous.showNonManiaCharts then
 		cond["noteChartDatas.inputMode__notin"] = {"1osu", "1taiko", "1fruits"}
 	end
 
-	local filterString = self.filterString
 	local filter = self:getFilter()
 	if filter then
 		if filter.string then
@@ -241,7 +204,7 @@ function SearchModel:getConditions()
 
 	return
 		self:transformSearchString(filterString, cond),
-		self:transformSearchString(self.lampString)
+		self:transformSearchString(lampString)
 end
 
 return SearchModel
