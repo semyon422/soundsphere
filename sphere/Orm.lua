@@ -276,9 +276,10 @@ local _format_cond = {
 		end
 		return ("%s NOT IN (%s)"):format(k, table.concat(_v, ", "))
 	end,
+	isnull = "%s IS NULL",
+	isnotnull = "%s IS NOT NULL",
 	eq = "%s = %s",
 	ne = "%s != %s",
-	isnull = "%s IS NULL",
 	gt = "%s > %s",
 	gte = "%s >= %s",
 	lt = "%s < %s",
