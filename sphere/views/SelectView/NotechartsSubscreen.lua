@@ -253,8 +253,9 @@ local function SortDropdown(self)
 	local w, h = Layout:move("column2", "header")
 	love.graphics.translate(w * 2 / 3, 15)
 
+	local sortFunction = self.game.configModel.configs.select.sortFunction
 	local sortModel = self.game.selectModel.sortModel
-	local i = imgui.SpoilerList("SortDropdown", w / 3, h - 30, sortModel.names, sortModel.name)
+	local i = imgui.SpoilerList("SortDropdown", w / 3, h - 30, sortModel.names, sortFunction)
 	local name = sortModel.names[i]
 	if name then
 		self.game.selectModel:setSortFunction(name)
