@@ -151,8 +151,10 @@ function TimeEngine:loadTimePoints()
 	for _, layerData in noteChart:getLayerDataIterator() do
 		local timePointList = layerData.timePointList
 		for timePointIndex = 1, #timePointList do
-			local timePoint = timePointList[timePointIndex]
-			absoluteTimes[timePoint.absoluteTime] = true
+			local t = timePointList[timePointIndex].absoluteTime
+			if t == t then
+				absoluteTimes[t] = true
+			end
 		end
 	end
 
