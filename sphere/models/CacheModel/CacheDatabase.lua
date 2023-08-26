@@ -100,6 +100,7 @@ local _asyncQueryAll = thread.async(function(queryParams)
 	self.queryParams = queryParams
 	local status, err = pcall(self.queryAll, self)
 	if not status then
+		print(err)
 		return
 	end
 	local t = {

@@ -299,7 +299,7 @@ local function format_cond(op, k, v)
 end
 
 ---@param t table
----@return string
+---@return string?
 function Orm:build_condition(t)
 	local conds = {}
 
@@ -313,6 +313,10 @@ function Orm:build_condition(t)
 		elseif type(v) == "table" then
 			table.insert(conds, self:build_condition(v))
 		end
+	end
+
+	if #conds == 0 then
+		return
 	end
 
 	for i = 1, #conds do
