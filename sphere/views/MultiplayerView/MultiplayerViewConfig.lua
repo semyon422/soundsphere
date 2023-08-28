@@ -209,8 +209,19 @@ local function Header(self)
 	just.offset(0)
 
 	LogoImView("logo", h, 0.5)
-	if imgui.IconOnlyButton("quit game", icons("clear"), h, 0.5) then
-		love.event.quit()
+
+	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
+
+	local w = h
+	local gameView = self.game.gameView
+	if imgui.IconOnlyButton("settings", icons("settings"), h, 0.5) then
+		gameView:setModal(require("sphere.views.SettingsView"))
+	end
+	if imgui.TextOnlyButton("noteskins", "skins", w, h) then
+		gameView:setModal(require("sphere.views.NoteSkinView"))
+	end
+	if imgui.TextOnlyButton("input", "input", w, h) then
+		gameView:setModal(require("sphere.views.InputView"))
 	end
 	just.row()
 end
