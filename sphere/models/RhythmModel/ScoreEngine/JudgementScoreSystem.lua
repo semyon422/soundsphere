@@ -133,8 +133,21 @@ end
 function JudgementScoreSystem:load()
 	self.counter = 0
 
-	for name, judgements in pairs(self.scoreEngine.judgements) do
-		self.judgements[name] = judgements
+	local _j = self.scoreEngine.judgements
+	if _j.judgements then
+		for name, j in pairs(_j.judgements) do
+			self.judgements[name] = j
+		end
+	end
+	if _j.judgementLists then
+		for name, j in pairs(_j.judgementLists) do
+			self.judgementLists[name] = j
+		end
+	end
+	if _j.judgementSelectors then
+		for _, j in ipairs(_j.judgementSelectors) do
+			table.insert(self.judgementSelectors, j)
+		end
 	end
 
 	self.counters = {}
