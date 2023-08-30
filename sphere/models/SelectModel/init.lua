@@ -1,6 +1,7 @@
 local class = require("class")
 local delay = require("delay")
 local thread = require("thread")
+local path_util = require("path_util")
 local NoteChartLibrary = require("sphere.models.SelectModel.NoteChartLibrary")
 local NoteChartSetLibrary = require("sphere.models.SelectModel.NoteChartSetLibrary")
 local CollectionLibrary = require("sphere.models.SelectModel.CollectionLibrary")
@@ -90,6 +91,55 @@ function SelectModel:findNotechart(hash, index)
 	self.cacheModel.cacheDatabase:asyncQueryAll()
 
 	self.noteChartSetLibrary:updateItems()
+end
+
+---@return string?
+function SelectModel:getBackgroundPath()
+	local chart = self.noteChartItem
+	if not chart then
+		return
+	end
+
+	local path = chart.path
+	local stagePath = chart.stagePath
+	if not path or not stagePath then
+		return
+	end
+
+	if path:find("%.ojn$") or path:find("%.mid$") then
+		return path
+	end
+
+	local directoryPath = path:match("^(.+)/(.-)$") or ""
+
+	if stagePath and stagePath ~= "" then
+		return path_util.eval_path(directoryPath .. "/" .. stagePath)
+	end
+
+	return directoryPath
+end
+
+---@return string?
+---@return number?
+function SelectModel:getAudioPathPreview()
+	local chart = self.noteChartItem
+	if not chart then
+		return
+	end
+
+	local path = chart.path
+	local audioPath = chart.audioPath
+	if not path or not audioPath then
+		return
+	end
+
+	local directoryPath = path:match("^(.+)/(.-)$") or ""
+
+	if audioPath and audioPath ~= "" then
+		return path_util.eval_path(directoryPath .. "/" .. audioPath), math.max(0, self.previewTime or 0)
+	end
+
+	return directoryPath .. "/preview.ogg", 0
 end
 
 ---@return boolean

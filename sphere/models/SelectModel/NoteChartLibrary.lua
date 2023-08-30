@@ -1,7 +1,6 @@
 local class = require("class")
 local ExpireTable = require("ExpireTable")
 local table_util = require("table_util")
-local path_util = require("path_util")
 
 ---@class sphere.NoteChartLibrary
 ---@operator call: sphere.NoteChartLibrary
@@ -28,47 +27,6 @@ function NoteChartLibrary:new()
 	end
 end
 
-local NoteChartItem = {}
-NoteChartItem.__index = NoteChartItem
-
----@return string?
-function NoteChartItem:getBackgroundPath()
-	local path = self.path
-	if not path or not self.stagePath then
-		return
-	end
-
-	if path:find("%.ojn$") or path:find("%.mid$") then
-		return path
-	end
-
-	local directoryPath = path:match("^(.+)/(.-)$") or ""
-	local stagePath = self.stagePath
-
-	if stagePath and stagePath ~= "" then
-		return path_util.eval_path(directoryPath .. "/" .. stagePath)
-	end
-
-	return directoryPath
-end
-
----@return string?
----@return number?
-function NoteChartItem:getAudioPathPreview()
-	if not self.path or not self.audioPath then
-		return
-	end
-
-	local directoryPath = self.path:match("^(.+)/(.-)$") or ""
-	local audioPath = self.audioPath
-
-	if audioPath and audioPath ~= "" then
-		return path_util.eval_path(directoryPath .. "/" .. audioPath), math.max(0, self.previewTime or 0)
-	end
-
-	return directoryPath .. "/preview.ogg", 0
-end
-
 ---@param itemIndex number
 ---@return table
 function NoteChartLibrary:loadObject(itemIndex)
@@ -89,7 +47,7 @@ function NoteChartLibrary:loadObject(itemIndex)
 	table_util.copy(noteChart, item)
 	table_util.copy(noteChartData, item)
 
-	return setmetatable(item, NoteChartItem)
+	return item
 end
 
 function NoteChartLibrary:clear()

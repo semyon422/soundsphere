@@ -53,15 +53,10 @@ function SelectController:update()
 
 	self.windowModel:setVsyncOnSelect(true)
 
-	local noteChartItem = self.selectModel.noteChartItem
-	if self.selectModel:isChanged() then
-		local bgPath, audioPath, previewTime
-		if noteChartItem then
-			bgPath = noteChartItem:getBackgroundPath()
-			audioPath, previewTime = noteChartItem:getAudioPathPreview()
-		end
-		self.backgroundModel:setBackgroundPath(bgPath)
-		self.previewModel:setAudioPathPreview(audioPath, previewTime)
+	local selectModel = self.selectModel
+	if selectModel:isChanged() then
+		self.backgroundModel:setBackgroundPath(selectModel:getBackgroundPath())
+		self.previewModel:setAudioPathPreview(selectModel:getAudioPathPreview())
 		self:applyModifierMeta()
 	end
 
