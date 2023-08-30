@@ -8,12 +8,11 @@ local FileFinder = require("sphere.filesystem.FileFinder")
 local EditorController = class()
 
 function EditorController:load()
-	local noteChartModel = self.noteChartModel
+	local selectModel = self.selectModel
 	local editorModel = self.editorModel
 
-	noteChartModel:load()
-	noteChartModel:loadNoteChart()
-	local noteChart = noteChartModel.noteChart
+	local noteChart = selectModel:loadNoteChart()
+	local chartItem = selectModel.noteChartItem
 
 	local noteSkin = self.noteSkinModel:getNoteSkin(noteChart.inputMode)
 	noteSkin:loadData()
@@ -21,18 +20,18 @@ function EditorController:load()
 
 	editorModel.noteSkin = noteSkin
 	editorModel.noteChart = noteChart
-	editorModel.audioPath = noteChartModel.noteChartEntry.path:match("^(.+)/.-$") .. "/" .. noteChart.metaData.audioPath
+	editorModel.audioPath = chartItem.path:match("^(.+)/.-$") .. "/" .. noteChart.metaData.audioPath
 	editorModel:load()
 
 	self.previewModel:stop()
 
 	FileFinder:reset()
-	FileFinder:addPath(noteChartModel.noteChartEntry.path:match("^(.+)/.-$"))
+	FileFinder:addPath(chartItem.path:match("^(.+)/.-$"))
 	FileFinder:addPath(noteSkin.directoryPath)
 	FileFinder:addPath("userdata/hitsounds")
 	FileFinder:addPath("userdata/hitsounds/midi")
 
-	self.resourceModel:load(noteChartModel.noteChartEntry.path, noteChartModel.noteChart, function()
+	self.resourceModel:load(chartItem.path, noteChart, function()
 		editorModel:loadResources()
 	end)
 
@@ -50,32 +49,35 @@ function EditorController:unload()
 end
 
 function EditorController:save()
-	local noteChartModel = self.noteChartModel
+	local selectModel = self.selectModel
+	local editorModel = self.editorModel
 
 	self.editorModel:save()
 	self.editorModel:genGraphs()
 
 	local exp = NoteChartExporter()
-	exp.noteChart = noteChartModel.noteChart
+	exp.noteChart = editorModel.noteChart
 
-	local path = noteChartModel.noteChartEntry.path:gsub(".sph$", "") .. ".sph"
+	local path = selectModel.noteChartItem.path:gsub(".sph$", "") .. ".sph"
 
 	love.filesystem.write(path, exp:export())
 
-	self.cacheModel:startUpdate(noteChartModel.noteChartEntry.path:match("^(.+)/.-$"))
+	self.cacheModel:startUpdate(selectModel.noteChartItem.path:match("^(.+)/.-$"))
 end
 
 function EditorController:saveToOsu()
-	local noteChartModel = self.noteChartModel
+	local selectModel = self.selectModel
+	local editorModel = self.editorModel
 
 	self.editorModel:save()
 
+	local chartItem = selectModel.noteChartItem
 	local exp = OsuNoteChartExporter()
-	exp.noteChart = noteChartModel.noteChart
-	exp.noteChartEntry = self.noteChartModel.noteChartEntry
-	exp.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
+	exp.noteChart = editorModel.noteChart
+	exp.noteChartEntry = chartItem
+	exp.noteChartDataEntry = chartItem
 
-	local path = noteChartModel.noteChartEntry.path
+	local path = chartItem.path
 	path = path:gsub(".osu$", ""):gsub(".sph$", "") .. ".sph.osu"
 
 	love.filesystem.write(path, exp:export())

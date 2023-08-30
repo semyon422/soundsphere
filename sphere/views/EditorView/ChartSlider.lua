@@ -54,7 +54,7 @@ return function(self, w, h)
 		love.graphics.line(x, (1 - densityPoints[i]) * _h + pad, x2, (1 - densityPoints[i + 1]) * _h + pad)
 	end
 
-	local previewTime = self.game.noteChartModel.noteChart.metaData.previewTime
+	local previewTime = self.game.editorModel.noteChart.metaData.previewTime
 	local x = math_util.map(tonumber(previewTime), firstTime, lastTime, a, b)
 	love.graphics.setColor(0.1, 0.6, 1, 1)
 	love.graphics.setLineWidth(4)

@@ -5,7 +5,7 @@ return {
 	-- controllers
 
 	editorController = {
-		"noteChartModel",
+		"selectModel",
 		"editorModel",
 		"noteSkinModel",
 		"previewModel",
@@ -18,12 +18,12 @@ return {
 		"rhythmModel",
 		"replayModel",
 		"modifierModel",
-		"noteChartModel",
+		"selectModel",
 		"difficultyModel",
 	},
 	gameplayController = {
 		"rhythmModel",
-		"noteChartModel",
+		"selectModel",
 		"noteSkinModel",
 		"configModel",
 		"modifierModel",
@@ -61,7 +61,6 @@ return {
 		"fastplayController",
 	},
 	selectController = {
-		"noteChartModel",
 		"selectModel",
 		"previewModel",
 		"modifierModel",
@@ -97,10 +96,6 @@ return {
 	onlineModel = {"configModel"},
 	modifierModel = {},
 	noteSkinModel = {"configModel"},
-	noteChartModel = {
-		"configModel",
-		"cacheModel",
-	},
 	inputModel = {"configModel"},
 	scoreLibraryModel = {
 		"configModel",
@@ -134,7 +129,6 @@ return {
 	},
 	replayModel = {
 		"rhythmModel",
-		"noteChartModel",
 		"modifierModel",
 	},
 	speedModel = {"configModel"},

@@ -2,6 +2,7 @@ local class = require("class")
 local delay = require("delay")
 local thread = require("thread")
 local path_util = require("path_util")
+local NoteChartFactory = require("notechart.NoteChartFactory")
 local NoteChartLibrary = require("sphere.models.SelectModel.NoteChartLibrary")
 local NoteChartSetLibrary = require("sphere.models.SelectModel.NoteChartSetLibrary")
 local CollectionLibrary = require("sphere.models.SelectModel.CollectionLibrary")
@@ -140,6 +141,25 @@ function SelectModel:getAudioPathPreview()
 	end
 
 	return directoryPath .. "/preview.ogg", 0
+end
+
+function SelectModel:loadNoteChart(settings)
+	local chart = self.noteChartItem
+
+	local content = love.filesystem.read(chart.path)
+	if not content then
+		return
+	end
+
+	local status, noteCharts = NoteChartFactory:getNoteCharts(
+		chart.path,
+		content,
+		chart.index,
+		settings
+	)
+	assert(status, noteCharts)
+
+	return noteCharts[1]
 end
 
 ---@return boolean

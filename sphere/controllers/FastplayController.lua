@@ -22,14 +22,13 @@ function FastplayController:play()
 end
 
 function FastplayController:load()
-	local noteChartModel = self.noteChartModel
+	local selectModel = self.selectModel
 	local difficultyModel = self.difficultyModel
 	local rhythmModel = self.rhythmModel
 	local modifierModel = self.modifierModel
 	local replayModel = self.replayModel
-	noteChartModel:load()
 
-	local noteChart = noteChartModel:loadNoteChart()
+	local noteChart = selectModel:loadNoteChart()
 
 	local state = {}
 	state.timeRate = 1
@@ -56,7 +55,7 @@ function FastplayController:load()
 	scoreEngine.longNoteRatio = longNoteRatio
 	scoreEngine.longNoteArea = longNoteArea
 
-	scoreEngine.noteChartDataEntry = noteChartModel.noteChartDataEntry
+	scoreEngine.noteChartDataEntry = selectModel.noteChartItem
 
 	rhythmModel.timeEngine:sync({time = 0})
 	rhythmModel:loadLogicEngines()

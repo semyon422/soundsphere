@@ -8,17 +8,17 @@ local OnlineScoreManager = class()
 
 local async_read = thread.async(function(...) return love.filesystem.read(...) end)
 
-OnlineScoreManager.submit = thread.coro(function(self, noteChartEntry, noteChartDataEntry, replayHash)
+OnlineScoreManager.submit = thread.coro(function(self, chartItem, replayHash)
 	local webApi = self.webApi
 	local api = webApi.api
 
 	print("POST " .. api.scores)
-	local notechart_filename = noteChartEntry.path:match("^.+/(.-)$")
+	local notechart_filename = chartItem.path:match("^.+/(.-)$")
 	local response, code, headers = api.scores:post({
 		notechart_filename = notechart_filename,
 		notechart_filesize = 0,
-		notechart_hash = noteChartDataEntry.hash,
-		notechart_index = noteChartDataEntry.index,
+		notechart_hash = chartItem.hash,
+		notechart_index = chartItem.index,
 		replay_hash = replayHash,
 		replay_size = 0,
 	})
@@ -42,7 +42,7 @@ OnlineScoreManager.submit = thread.coro(function(self, noteChartEntry, noteChart
 	if not notechart.is_complete then
 		local file = notechart.file
 		if not file.uploaded then
-			local content = async_read(noteChartEntry.path)
+			local content = async_read(chartItem.path)
 			api.files[file.id]:put(nil, {
 				{content, name = "file", filename = notechart_filename},
 			})

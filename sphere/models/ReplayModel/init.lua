@@ -59,8 +59,8 @@ end
 ---@return string
 function ReplayModel:saveReplay()
 	local replay = self.replay
-	replay.noteChartDataEntry = self.noteChartModel.noteChartDataEntry
-	replay.inputMode = self.noteChartModel.noteChart.inputMode
+	replay.noteChartDataEntry = self.selectModel.noteChartItem
+	replay.inputMode = self.rhythmModel.noteChart.inputMode
 	replay.modifierTable = self.modifierModel.config
 	replay.timings = self.timings
 

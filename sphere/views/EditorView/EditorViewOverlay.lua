@@ -16,7 +16,7 @@ end
 
 ---@param self table
 function tabs.info(self)
-	local md = self.game.noteChartModel.noteChart.metaData
+	local md = self.game.editorModel.noteChart.metaData
 
 	imgui.setSize(400, 1080, 400, 55)
 	imgui.text("Chart info")
@@ -97,7 +97,7 @@ function tabs.audio(self)
 	wf.scale = imgui.slider1("wf.scale", wf.scale, "%0.2f", 0, 1, 0.01, "scale")
 
 	imgui.separator()
-	local md = self.game.noteChartModel.noteChart.metaData
+	local md = self.game.editorModel.noteChart.metaData
 	if imgui.button("set as preview", "set this moment as a preview") then
 		md.previewTime = editorModel.timePoint.absoluteTime
 	end

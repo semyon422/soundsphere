@@ -9,7 +9,6 @@ local NoteChartExporter = require("osu.NoteChartExporter")
 local SelectController = class()
 
 function SelectController:load()
-	local noteChartModel = self.noteChartModel
 	local selectModel = self.selectModel
 	local previewModel = self.previewModel
 
@@ -18,7 +17,6 @@ function SelectController:load()
 
 	self.selectModel:setLock(false)
 
-	noteChartModel:load()
 	selectModel:load()
 	previewModel:load()
 
@@ -176,23 +174,22 @@ function SelectController:filedropped(file)
 end
 
 function SelectController:exportToOsu()
-	local nce = NoteChartExporter()
+	local selectModel = self.selectModel
 
-	local noteChartModel = self.noteChartModel
-	noteChartModel:load()
-	noteChartModel:loadNoteChart()
-
-	self.modifierModel:apply(noteChartModel.noteChart)
-
-	nce.noteChart = noteChartModel.noteChart
-	nce.noteChartEntry = noteChartModel.noteChartEntry
-	nce.noteChartDataEntry = noteChartModel.noteChartDataEntry
-
-	if not noteChartModel.noteChartEntry then
+	local chartItem = selectModel.noteChartItem
+	if not chartItem then
 		return
 	end
 
-	local path = noteChartModel.noteChartEntry.path
+	local nce = NoteChartExporter()
+	local noteChart = selectModel:loadNoteChart()
+	self.modifierModel:apply(noteChart)
+
+	nce.noteChart = noteChart
+	nce.noteChartEntry = chartItem
+	nce.noteChartDataEntry = chartItem
+
+	local path = chartItem.path
 	path = path:find("^.+/.$") and path:match("^(.+)/.$") or path
 	local fileName = path:match("^.+/(.-)$"):match("^(.+)%..-$")
 

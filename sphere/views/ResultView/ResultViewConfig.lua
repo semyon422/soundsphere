@@ -222,7 +222,7 @@ end
 
 ---@param self table
 local function Title(self)
-	local noteChartDataEntry = self.game.noteChartModel.noteChartDataEntry
+	local chartItem = self.game.selectModel.noteChartItem
 
 	local w, h = Layout:move("title_middle")
 	drawFrameRect(w, h)
@@ -231,8 +231,8 @@ local function Title(self)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 36))
 
-	local artist_title = ("%s — %s"):format(noteChartDataEntry.artist, noteChartDataEntry.title)
-	local creator_name = ("%s — %s"):format(noteChartDataEntry.creator, noteChartDataEntry.name)
+	local artist_title = ("%s — %s"):format(chartItem.artist, chartItem.title)
+	local creator_name = ("%s — %s"):format(chartItem.creator, chartItem.name)
 	just.text(artist_title)
 	just.text(creator_name)
 end
@@ -713,10 +713,8 @@ local function BottomScreenMenu(self)
 	end
 	if scoreItem and scoreEntry and scoreItem.id == scoreEntry.id and not scoreItem.file then
 		if imgui.TextOnlyButton("submit", "resubmit", 72 * 2, h) then
-			local noteChartModel = self.game.noteChartModel
 			self.game.onlineModel.onlineScoreManager:submit(
-				noteChartModel.noteChartEntry,
-				noteChartModel.noteChartDataEntry,
+				self.game.selectModel.noteChartItem,
 				scoreItem.replayHash
 			)
 		end

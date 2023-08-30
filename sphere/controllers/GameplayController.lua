@@ -11,16 +11,15 @@ function GameplayController:load()
 	self.loaded = true
 
 	local rhythmModel = self.rhythmModel
-	local noteChartModel = self.noteChartModel
+	local selectModel = self.selectModel
 	local noteSkinModel = self.noteSkinModel
 	local configModel = self.configModel
 	local modifierModel = self.modifierModel
 	local difficultyModel = self.difficultyModel
 	local replayModel = self.replayModel
 
-	noteChartModel:load()
 
-	local noteChart = noteChartModel:loadNoteChart(self:getImporterSettings())
+	local noteChart = selectModel:loadNoteChart(self:getImporterSettings())
 
 	local state = {}
 	state.timeRate = 1
@@ -76,13 +75,15 @@ function GameplayController:load()
 
 	self:updateOffsets()
 
+	local chartItem = selectModel.noteChartItem
+
 	FileFinder:reset()
-	FileFinder:addPath(noteChartModel.noteChartEntry.path:match("^(.+)/.-$"))
+	FileFinder:addPath(chartItem.path:match("^(.+)/.-$"))
 	FileFinder:addPath(noteSkin.directoryPath)
 	FileFinder:addPath("userdata/hitsounds")
 	FileFinder:addPath("userdata/hitsounds/midi")
 
-	self.resourceModel:load(noteChartModel.noteChartEntry.path, noteChart, function()
+	self.resourceModel:load(chartItem.path, noteChart, function()
 		if not self.loaded then
 			return
 		end
@@ -134,30 +135,30 @@ function GameplayController:update(dt)
 end
 
 function GameplayController:discordPlay()
-	local noteChartDataEntry = self.noteChartModel.noteChartDataEntry
+	local chartItem = self.selectModel.noteChartItem
 	local rhythmModel = self.rhythmModel
-	local length = math.min(noteChartDataEntry.length, 3600 * 24)
+	local length = math.min(chartItem.length, 3600 * 24)
 
 	local timeEngine = rhythmModel.timeEngine
 	self.discordModel:setPresence({
 		state = "Playing",
 		details = ("%s - %s [%s]"):format(
-			noteChartDataEntry.artist,
-			noteChartDataEntry.title,
-			noteChartDataEntry.name
+			chartItem.artist,
+			chartItem.title,
+			chartItem.name
 		),
 		endTimestamp = math.floor(os.time() + (length - timeEngine.currentTime) / timeEngine.baseTimeRate)
 	})
 end
 
 function GameplayController:discordPause()
-	local noteChartDataEntry = self.noteChartModel.noteChartDataEntry
+	local chartItem = self.selectModel.noteChartItem
 	self.discordModel:setPresence({
 		state = "Playing (paused)",
 		details = ("%s - %s [%s]"):format(
-			noteChartDataEntry.artist,
-			noteChartDataEntry.title,
-			noteChartDataEntry.name
+			chartItem.artist,
+			chartItem.title,
+			chartItem.name
 		)
 	})
 end
@@ -231,21 +232,22 @@ end
 
 function GameplayController:saveScore()
 	local rhythmModel = self.rhythmModel
-	local noteChartModel = self.noteChartModel
 	local modifierModel = self.modifierModel
 	local scoreSystemEntry = rhythmModel.scoreEngine.scoreSystem.entry
+
+	local chartItem = self.selectModel.noteChartItem
 
 	local replayHash = self.replayModel:saveReplay()
 	local scoreEntry = self.scoreModel:insertScore(
 		scoreSystemEntry,
-		noteChartModel.noteChartDataEntry,
+		chartItem,
 		replayHash,
 		modifierModel:encode()
 	)
 
 	local base = rhythmModel.scoreEngine.scoreSystem.base
 	if base.hitCount / base.notesCount >= 0.5 then
-		self.onlineModel.onlineScoreManager:submit(noteChartModel.noteChartEntry, noteChartModel.noteChartDataEntry, replayHash)
+		self.onlineModel.onlineScoreManager:submit(chartItem, replayHash)
 	end
 
 	rhythmModel.scoreEngine.scoreEntry = scoreEntry
@@ -273,10 +275,10 @@ end
 
 function GameplayController:updateOffsets()
 	local rhythmModel = self.rhythmModel
-	local noteChartDataEntry = self.noteChartModel.noteChartDataEntry
+	local chartItem = self.selectModel.noteChartItem
 	local config = self.configModel.configs.settings
 
-	local localOffset = noteChartDataEntry.localOffset or 0
+	local localOffset = chartItem.localOffset or 0
 	local baseTimeRate = rhythmModel.timeEngine.baseTimeRate
 	local inputOffset = config.gameplay.offset.input + localOffset
 	local visualOffset = config.gameplay.offset.visual + localOffset
@@ -302,10 +304,13 @@ end
 
 ---@param delta number
 function GameplayController:increaseLocalOffset(delta)
-	local entry = self.noteChartModel.noteChartDataEntry
-	entry.localOffset = math_util.round((entry.localOffset or 0) + delta, delta)
-	self.cacheModel.chartRepo:updateNoteChartDataEntry(entry)
-	self.notificationModel:notify("local offset: " .. entry.localOffset * 1000 .. "ms")
+	local chartItem = self.selectModel.noteChartItem
+	chartItem.localOffset = math_util.round((chartItem.localOffset or 0) + delta, delta)
+	self.cacheModel.chartRepo:updateNoteChartDataEntry({
+		id = chartItem.noteChartDataId,
+		localOffset = chartItem.localOffset,
+	})
+	self.notificationModel:notify("local offset: " .. chartItem.localOffset * 1000 .. "ms")
 	self:updateOffsets()
 end
 
