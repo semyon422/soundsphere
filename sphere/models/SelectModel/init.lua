@@ -55,11 +55,12 @@ end
 function SelectModel:updateSetItems()
 	local params = self.cacheModel.cacheDatabase.queryParams
 
-	local orderBy, isCollapseAllowed = unpack(self.sortModel.orders[self.config.sortFunction])
+	local orderBy, isCollapseAllowed = self.sortModel:getOrder(self.config.sortFunction)
 	local fields = {}
 	for i, field in ipairs(orderBy) do
-		fields[i] = "noteChartDatas." .. field .. " ASC"
+		fields[i] = field .. " ASC"
 	end
+	table.insert(fields, "noteChartDatas.id ASC")
 	params.orderBy = table.concat(fields, ",")
 
 	if self.config.collapse and isCollapseAllowed then

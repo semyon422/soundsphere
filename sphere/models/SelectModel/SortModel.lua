@@ -4,18 +4,33 @@ local class = require("class")
 ---@operator call: sphere.SortModel
 local SortModel = class()
 
+function SortModel:getOrder(name)
+	local order = self.orders[name] or self.orders.id
+	return unpack(order)
+end
+
 -- 2nd value = isCollapseAllowed (group by setId)
 SortModel.orders = {
-	id = {{"id"}, true},
-	title = {{"title", "artist", "id"}, true},
-	artist = {{"artist", "title", "id"}, true},
-	difficulty = {{"difficulty", "name", "id"}, false},
-	level = {{"level", "id"}, false},
-	length = {{"length", "id"}, false},
-	bpm = {{"bpm", "id"}, false},
+	id = {{}, true},
+	title = {{"noteChartDatas.title", "noteChartDatas.artist"}, true},
+	artist = {{"noteChartDatas.artist", "noteChartDatas.title"}, true},
+	difficulty = {{"noteChartDatas.difficulty", "noteChartDatas.name"}, false},
+	level = {{"noteChartDatas.level"}, false},
+	length = {{"noteChartDatas.length"}, false},
+	bpm = {{"noteChartDatas.bpm"}, false},
+	["played top"] = {{"scores.id"}, false},
 }
 
 SortModel.name = "title"
-SortModel.names = {"id", "title", "artist", "difficulty", "level", "length", "bpm"}
+SortModel.names = {
+	"id",
+	"title",
+	"artist",
+	"difficulty",
+	"level",
+	"length",
+	"bpm",
+	"played top",
+}
 
 return SortModel
