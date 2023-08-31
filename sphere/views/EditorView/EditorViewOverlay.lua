@@ -8,7 +8,7 @@ local Layout = require("sphere.views.EditorView.Layout")
 
 local tabs = {}
 
----@param t string
+---@param t number
 ---@return string
 local function to_ms(t)
 	return math.floor(t * 1000) .. "ms"
