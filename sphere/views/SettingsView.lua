@@ -259,11 +259,10 @@ function drawSection:audio()
 		v.effects = imgui.slider1("v.effects", v.effects, "%0.2f", 0, 1, 0.01, "effects")
 		v.metronome = imgui.slider1("v.metronome", v.metronome, "%0.2f", 0, 1, 0.01, "metronome")
 	elseif a.volumeType == "logarithmic" then
-		local logk = 20 / math.log(10)
-		v.master = imgui.logslider("v.master", v.master, "%ddB", -60, 0, 1, logk, "master")
-		v.music = imgui.logslider("v.music", v.music, "%ddB", -60, 0, 1, logk, "music")
-		v.effects = imgui.logslider("v.effects", v.effects, "%ddB", -60, 0, 1, logk, "effects")
-		v.metronome = imgui.logslider("v.metronome", v.metronome, "%ddB", -60, 0, 1, logk, "metronome")
+		v.master = imgui.lfslider("v.master", v.master, "%ddB", -60, 0, 1, "master")
+		v.music = imgui.lfslider("v.music", v.music, "%ddB", -60, 0, 1, "music")
+		v.effects = imgui.lfslider("v.effects", v.effects, "%ddB", -60, 0, 1, "effects")
+		v.metronome = imgui.lfslider("v.metronome", v.metronome, "%ddB", -60, 0, 1, "metronome")
 	end
 
 	a.sampleGain = imgui.slider1("sampleGain", a.sampleGain, "+%0.0fdB", 0, 100, 1, "gain with clipping")

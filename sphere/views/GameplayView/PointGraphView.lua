@@ -23,7 +23,7 @@ function PointGraphView:chechMesh(i)
 		self.mesh = love.graphics.newMesh(vertexformat, 1, "points", "dynamic")
 		return
 	end
-	local po2 = 2 ^ math.ceil(math.log(i) / math.log(2))
+	local po2 = 2 ^ math.ceil(math.log(i, 2))
 	if po2 > self.mesh:getVertexCount() then
 		self.mesh = love.graphics.newMesh(vertexformat, po2, "points", "dynamic")
 		self.mesh:setVertices(self.vertices)

@@ -32,7 +32,7 @@ end
 ---@param timeRate number
 ---@return string
 function Format.timeRate(timeRate)
-	local exp = 10 * math.log(timeRate) / math.log(2)
+	local exp = 10 * math.log(timeRate, 2)
 	local roundedExp = math.floor(exp + 0.5)
 	if math.abs(exp - roundedExp) % 1 < 1e-2 and math.abs(exp) > 1e-2 then
 		return ("%dQ"):format(roundedExp)
