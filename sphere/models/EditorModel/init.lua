@@ -277,7 +277,7 @@ function EditorModel:receive(event)
 	end
 end
 
----@param j number
+---@param j number|table
 ---@return number
 function EditorModel:getSnap(j)
 	local editor = self:getSettings()
