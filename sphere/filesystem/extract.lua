@@ -1,20 +1,23 @@
 local thread = require("thread")
 
-return thread.async(function(archive, path, remove)
+return thread.async(function(archive, path)
 	require("love.filesystem")
 	local physfs = require("physfs")
 	local rcopy = require("rcopy")
 	local mount = path .. "_temp"
-	if not physfs.mount(archive, mount, true) then
-		if remove then
-			love.filesystem.remove(archive)
-		end
+
+	local fs = love.filesystem
+	if type(archive) == "string" then
+		fs = physfs
+	end
+
+	if not fs.mount(archive, mount, true) then
 		return nil, physfs.getLastError()
 	end
+
 	rcopy(mount, path)
-	assert(physfs.unmount(archive))
-	if remove then
-		love.filesystem.remove(archive)
-	end
+
+	assert(fs.unmount(archive))
+
 	return true
 end)
