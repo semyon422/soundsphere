@@ -75,11 +75,11 @@ function SelectController:update()
 		return
 	end
 
-	local time = love.timer.getTime()
-	if not self.startTime or time - self.startTime > 600 then
-		self:updateSession()
-		self.startTime = time
-	end
+	-- local time = love.timer.getTime()
+	-- if not self.startTime or time - self.startTime > 600 then
+	-- 	self:updateSession()
+	-- 	self.startTime = time
+	-- end
 end
 
 SelectController.updateSession = thread.coro(function(self)
