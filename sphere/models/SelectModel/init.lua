@@ -144,6 +144,8 @@ function SelectModel:getAudioPathPreview()
 	return directoryPath .. "/preview.ogg", 0
 end
 
+---@param settings table?
+---@return ncdk.NoteChart?
 function SelectModel:loadNoteChart(settings)
 	local chart = self.noteChartItem
 

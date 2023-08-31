@@ -4,6 +4,9 @@ local class = require("class")
 ---@operator call: sphere.SortModel
 local SortModel = class()
 
+---@param name string
+---@return table
+---@return boolean
 function SortModel:getOrder(name)
 	local order = self.orders[name] or self.orders.id
 	return unpack(order)
