@@ -6,6 +6,7 @@ return thread.async(function(url, saveDir, fallbackName)
 	local ltn12 = require("ltn12")
 	local thread = require("thread")
 	local path_util = require("path_util")
+	local http_util = require("http_util")
 
 	local one, code, headers, status_line = http.request({
 		url = url,
@@ -24,8 +25,8 @@ return thread.async(function(url, saveDir, fallbackName)
 	for header, value in pairs(headers) do
 		header = header:lower()
 		if header == "content-disposition" then
-			local filename = value:match("filename=\"(.-)\"$")
-			name = filename or name
+			local cd = http_util.parse_content_disposition(value)
+			name = cd.filename or name
 		elseif header == "content-length" then
 			size = tonumber(value) or size
 		end
