@@ -1,8 +1,9 @@
+local EditorNote = require("sphere.models.EditorModel.EditorNote")
 local LongGraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.LongGraphicalNote")
 
----@class sphere.LongEditorNote: sphere.LongGraphicalNote
+---@class sphere.LongEditorNote: sphere.EditorNote, sphere.LongGraphicalNote
 ---@operator call: sphere.LongEditorNote
-local LongEditorNote = LongGraphicalNote + {}
+local LongEditorNote = EditorNote + LongGraphicalNote
 
 ---@param absoluteTime number
 ---@return sphere.LongEditorNote?

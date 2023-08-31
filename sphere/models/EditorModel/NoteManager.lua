@@ -138,20 +138,20 @@ function NoteManager:dropNotes(mouseTime)
 	self.editorModel.editorChanges:next()
 end
 
----@param note sphere.GraphicalNote
+---@param note sphere.EditorNote
 function NoteManager:_removeNote(note)
 	note:remove()
 	self.editorModel.editorChanges:add()
 end
 
----@param note sphere.GraphicalNote
+---@param note sphere.EditorNote
 function NoteManager:removeNote(note)
 	self.editorModel.editorChanges:reset()
 	self:_removeNote(note)
 	self.editorModel.editorChanges:next()
 end
 
----@param note sphere.GraphicalNote
+---@param note sphere.EditorNote
 function NoteManager:_addNote(note)
 	note:add()
 	self.editorModel.editorChanges:add()
@@ -161,7 +161,7 @@ end
 ---@param absoluteTime number
 ---@param inputType string
 ---@param inputIndex number
----@return sphere.GraphicalNote?
+---@return sphere.EditorNote?
 function NoteManager:newNote(noteType, absoluteTime, inputType, inputIndex)
 	local note = EditorNoteFactory:newNote(noteType)
 	if not note then

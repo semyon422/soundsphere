@@ -52,7 +52,7 @@ function GraphicEngine:selectEnd()
 	self.selecting = false
 end
 
----@param note sphere.GraphicalNote?
+---@param note sphere.EditorNote?
 ---@param keepOthers boolean?
 function GraphicEngine:selectNote(note, keepOthers)
 	if not note then
@@ -89,7 +89,7 @@ end
 ---@param editorModel sphere.EditorModel
 ---@param inputType string
 ---@param inputIndex number
----@return sphere.GraphicalNote?
+---@return sphere.EditorNote?
 function GraphicEngine:newNote(noteData, editorModel, inputType, inputIndex)
 	local note = EditorNoteFactory:getNote(noteData)
 	if not note then

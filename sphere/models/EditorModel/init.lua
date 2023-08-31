@@ -217,7 +217,7 @@ function EditorModel:getMouseTime(dy)
 	return self.timePoint.absoluteTime - noteSkin:getInverseTimePosition(my + dy) / editor.speed
 end
 
----@param note sphere.GraphicalNote
+---@param note sphere.EditorNote
 function EditorModel:selectNote(note)
 	self.graphicEngine:selectNote(note, love.keyboard.isDown("lctrl"))
 end

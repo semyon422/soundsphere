@@ -15,7 +15,7 @@ local notes = {
 }
 
 ---@param noteData ncdk.NoteData
----@return sphere.GraphicalNote?
+---@return sphere.EditorNote?
 function EditorNoteFactory:getNote(noteData)
 	local classAndType = notes[noteData.noteType]
 	if not classAndType then
@@ -26,7 +26,7 @@ function EditorNoteFactory:getNote(noteData)
 end
 
 ---@param noteType string
----@return sphere.GraphicalNote?
+---@return sphere.EditorNote?
 function EditorNoteFactory:newNote(noteType)
 	local classAndType = notes[noteType]
 	if not classAndType then
