@@ -1,12 +1,10 @@
 local thread = require("thread")
 thread.shared.download = {}
 
-return thread.async(function(url, saveDir, fallbackName)
+return thread.async(function(url)
 	local http = require("http")
 	local ltn12 = require("ltn12")
 	local thread = require("thread")
-	local path_util = require("path_util")
-	local http_util = require("http_util")
 
 	local one, code, headers, status_line = http.request({
 		url = url,
@@ -14,26 +12,18 @@ return thread.async(function(url, saveDir, fallbackName)
 		sink = ltn12.sink.null(),
 	})
 	if not one then
-		return nil, code
+		return nil, code, headers, status_line
 	end
 	if code >= 300 then
-		return nil, status_line
+		return nil, code, headers, status_line
 	end
 
-	local name = fallbackName or url:match("^.+/(.-)$")
 	local size
 	for header, value in pairs(headers) do
 		header = header:lower()
-		if header == "content-disposition" then
-			local cd = http_util.parse_content_disposition(value)
-			name = cd.filename or name
-		elseif header == "content-length" then
+		if header == "content-length" then
 			size = tonumber(value) or size
 		end
-	end
-
-	if not size then
-		return nil, "Unknown file size"
 	end
 
 	thread.shared.download[url] = {
@@ -61,24 +51,17 @@ return thread.async(function(url, saveDir, fallbackName)
 		return true
 	end
 
-	one, code, _, status_line = http.request({
+	one, code, headers, status_line = http.request({
 		url = url,
 		method = "GET",
 		sink = sink,
 	})
 	if not one then
-		return nil, code
+		return nil, code, headers, status_line
 	end
 	if code >= 400 then
-		return nil, status_line
+		return nil, code, headers, status_line
 	end
 
-	name = path_util.fix_illegal(name)
-
-	require("love.filesystem")
-	local ok, err = love.filesystem.write(saveDir .. "/" .. name, table.concat(t))
-	if not ok then
-		return nil, err
-	end
-	return name
+	return table.concat(t), code, headers, status_line
 end)
