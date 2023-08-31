@@ -128,6 +128,7 @@ return {
 		"osudirectModel",
 	},
 	replayModel = {
+		"selectModel",
 		"rhythmModel",
 		"modifierModel",
 	},
