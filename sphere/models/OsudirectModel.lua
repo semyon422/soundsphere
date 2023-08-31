@@ -205,9 +205,7 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 	table.insert(self.processing, 1, beatmap)
 
 	local config = self.configModel.configs.urls.osu
-
 	local saveDir = "userdata/charts/downloads"
-
 	local url = config.download:format(beatmap.id)
 	beatmap.url = url
 
@@ -215,28 +213,38 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 	beatmap.status = "Downloading"
 
 	beatmap.isDownloading = true
-	local filename, err = downloadAsync(url, saveDir)
+	local data, code, headers, status_line = downloadAsync(url)
 	beatmap.isDownloading = false
 
-	if not filename then
-		beatmap.status = err
+	if not data then
+		beatmap.status = status_line
 		return
 	end
 
-	local savePath = saveDir .. "/" .. filename
-	print(("Downloaded: %s"):format(savePath))
+	local filename = url:match("^.+/(.-)$")
+	for header, value in pairs(headers) do
+		header = header:lower()
+		if header == "content-disposition" then
+			local cd = http_util.parse_content_disposition(value)
+			filename = cd.filename or filename
+		end
+	end
+
+	print(("Downloaded: %s"):format(filename))
 	if not filename:find("%.osz$") then
 		beatmap.status = "Unsupported file type"
 		print("Unsupported file type")
 		return
 	end
 
+	local filedata = love.filesystem.newFileData(data, filename)
+
 	local extractPath = saveDir .. "/" .. filename:match("^(.+)%.osz$")
 	print("Extracting")
 	beatmap.status = "Extracting"
-	local extracted = extractAsync(savePath, extractPath, true)
+	local extracted, err = extractAsync(filedata, extractPath)
 	if not extracted then
-		beatmap.status = "Extracting error"
+		beatmap.status = err or "Extracting error"
 		return
 	end
 	print(("Extracted to: %s"):format(extractPath))
