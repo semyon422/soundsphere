@@ -169,7 +169,7 @@ end
 function SelectModel:isChanged()
 	local changed = self.changed
 	self.changed = false
-	return changed
+	return changed == true
 end
 
 function SelectModel:setChanged()

@@ -111,9 +111,16 @@ function Modifier:setValue(config, value)
 	config.value = value
 end
 
+---@param modifierConfig table
+---@param state table
 function Modifier:applyMeta(modifierConfig, state) end
-function Modifier:apply(modifierConfig, state) end
+
+---@param modifierConfig table
+function Modifier:apply(modifierConfig) end
+
 function Modifier:update() end
+
+---@param event table
 function Modifier:receive(event) end
 
 function Modifier:checkValue(value)
