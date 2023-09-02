@@ -4,6 +4,7 @@ local downloadAsync = require("sphere.filesystem.download")
 local thread = require("thread")
 local delay = require("delay")
 local http_util = require("http_util")
+local path_util = require("path_util")
 local json = require("json")
 
 ---@class sphere.OsudirectModel
@@ -229,6 +230,8 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 			filename = cd.filename or filename
 		end
 	end
+
+	filename = path_util.fix_illegal(filename)
 
 	print(("Downloaded: %s"):format(filename))
 	if not filename:find("%.osz$") then
