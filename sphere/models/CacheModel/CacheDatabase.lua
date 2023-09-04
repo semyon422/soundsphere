@@ -141,6 +141,15 @@ function CacheDatabase:asyncQueryAll()
 	ffi.copy(self.noteChartItems, t.noteChartItems, #t.noteChartItems)
 end
 
+---@param t table
+---@param entry table
+---@param offset number
+local function chart_id_to_offset(t, entry, offset)
+	local c, d = entry.noteChartId, entry.noteChartDataId
+	t[c] = t[c] or {}
+	t[c][d] = offset
+end
+
 function CacheDatabase:queryNoteChartSets()
 	local params = self.queryParams
 
@@ -184,7 +193,7 @@ function CacheDatabase:queryNoteChartSets()
 		local entry = noteChartSets[j]
 		fillObject(entry, row, colnames)
 		set_id_to_global_offset[entry.setId] = j
-		id_to_global_offset[entry.noteChartId] = j
+		chart_id_to_offset(id_to_global_offset, entry, j)
 		c = c + 1
 	end
 
@@ -253,7 +262,7 @@ function CacheDatabase:queryNoteCharts()
 		end
 		size = j - offset + 1
 		setId = entry.setId
-		id_to_local_offset[entry.noteChartId] = j - offset
+		chart_id_to_offset(id_to_local_offset, entry, j - offset)
 		c = c + 1
 	end
 

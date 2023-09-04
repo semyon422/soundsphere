@@ -68,9 +68,11 @@ function NoteChartLibrary:setNoteChartSetId(setId)
 end
 
 ---@param noteChartId number?
+---@param noteChartDataId number?
 ---@return number
-function NoteChartLibrary:getItemIndex(noteChartId)
-	return (self.cacheModel.cacheDatabase.id_to_local_offset[noteChartId] or 0) + 1
+function NoteChartLibrary:getItemIndex(noteChartId, noteChartDataId)
+	local ids = self.cacheModel.cacheDatabase.id_to_local_offset
+	return (ids[noteChartId] and ids[noteChartId][noteChartDataId] or 0) + 1
 end
 
 return NoteChartLibrary

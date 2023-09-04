@@ -54,11 +54,14 @@ function NoteChartSetLibrary:updateItems()
 end
 
 ---@param noteChartId number?
+---@param noteChartDataId number?
 ---@param noteChartSetId number?
 ---@return number
-function NoteChartSetLibrary:getItemIndex(noteChartId, noteChartSetId)
+function NoteChartSetLibrary:getItemIndex(noteChartId, noteChartDataId, noteChartSetId)
 	local cdb = self.cacheModel.cacheDatabase
-	return (cdb.id_to_global_offset[noteChartId] or cdb.set_id_to_global_offset[noteChartSetId] or 0) + 1
+	local ids = cdb.id_to_global_offset
+	return (ids[noteChartId] and ids[noteChartId][noteChartDataId] or
+		cdb.set_id_to_global_offset[noteChartSetId] or 0) + 1
 end
 
 return NoteChartSetLibrary

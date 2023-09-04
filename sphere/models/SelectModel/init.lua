@@ -336,6 +336,7 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 	local noteChartSetItems = self.noteChartSetLibrary.items
 	self.noteChartSetItemIndex = self.noteChartSetLibrary:getItemIndex(
 		self.config.noteChartEntryId,
+		self.config.noteChartDataEntryId,
 		self.config.noteChartSetEntryId
 	)
 
@@ -377,7 +378,8 @@ function SelectModel:pullNoteChart(noUpdate, noPullNext)
 
 	local noteChartItems = self.noteChartLibrary.items
 	self.noteChartItemIndex = self.noteChartLibrary:getItemIndex(
-		self.config.noteChartEntryId
+		self.config.noteChartEntryId,
+		self.config.noteChartDataEntryId
 	)
 
 	if not noUpdate then
