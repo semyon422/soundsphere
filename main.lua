@@ -16,6 +16,11 @@ pkg.add("chartbase")
 pkg.add("libchart")
 pkg.add("tree/share/lua/5.1")
 
+if arg[2] == "test" then
+	local runner = require("luacov.runner")
+	runner.init()
+end
+
 local deco = require("deco")
 deco.package_path = love.filesystem.getRequirePath()
 deco.read_file = love.filesystem.read
@@ -102,8 +107,6 @@ end
 
 if arg[2] == "test" then
 	local testing = require("testing")
-	local runner = require("luacov.runner")
-	runner.init()
 
 	testing.blacklist = {
 		"3rd-deps",
