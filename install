@@ -2,3 +2,5 @@
 . ./setenv
 luarocks install lapis
 luarocks install luautf8
+luarocks install luacov
+luarocks install luacov-reporter-lcov

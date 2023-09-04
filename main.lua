@@ -14,12 +14,14 @@ pkg.add("aqua")
 pkg.add("ncdk")
 pkg.add("chartbase")
 pkg.add("libchart")
+pkg.add("tree/share/lua/5.1")
 
 local deco = require("deco")
 deco.package_path = love.filesystem.getRequirePath()
 deco.read_file = love.filesystem.read
 deco.blacklist = {
 	"3rd-deps",
+	"tree",
 	"aqua/byte.lua",
 	-- "sphere/views",
 }
@@ -96,6 +98,22 @@ function love.run()
 	return function()
 		return defaultLoop()
 	end
+end
+
+if arg[2] == "test" then
+	local testing = require("testing")
+	local runner = require("luacov.runner")
+	runner.init()
+
+	testing.blacklist = {
+		"3rd-deps",
+		"tree",
+		"libchart",
+		"userdata",
+	}
+
+	testing.test()
+	os.exit()
 end
 
 local thread = require("thread")

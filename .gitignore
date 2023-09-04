@@ -50,3 +50,5 @@ temp/*
 !share/.keep
 !temp/.keep
 graph.png
+luacov.stats.out
+lcov.info
