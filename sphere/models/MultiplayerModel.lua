@@ -2,11 +2,9 @@ local class = require("class")
 local delay = require("delay")
 local thread = require("thread")
 local enet = require("enet")
-local buffer = require("string.buffer")
 local remote = require("remote")
 
-remote.encode = buffer.encode
-remote.decode = buffer.decode
+remote.set_coder(require("string.buffer"))
 
 ---@class sphere.MultiplayerModel
 ---@operator call: sphere.MultiplayerModel
@@ -303,7 +301,7 @@ function MultiplayerModel:update()
 		if event.type == "connect" then
 			self:peerconnected(remote.peer(event.peer))
 		elseif event.type == "receive" then
-			remote.receive(event, self.handlers)
+			remote.receive(event.data, event.peer, self.handlers)
 		elseif event.type == "disconnect" then
 			self:peerdisconnected(remote.peer(event.peer))
 		end
