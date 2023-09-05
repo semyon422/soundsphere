@@ -119,6 +119,9 @@ if arg[2] == "test" then
 	os.exit()
 end
 
+local delay = require("delay")
+delay.set_timer(love.timer.getTime)
+
 local thread = require("thread")
 thread.coro(function()
 	local UpdateController = require("sphere.controllers.UpdateController")
