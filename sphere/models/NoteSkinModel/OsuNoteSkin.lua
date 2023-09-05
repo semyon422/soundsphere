@@ -457,6 +457,7 @@ function OsuNoteSkin:load()
 	})
 
 	BasePlayfield.addBaseProgressBar(playfield)
+	BasePlayfield.addMatchPlayers(playfield)
 end
 
 ---@param key number
