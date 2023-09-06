@@ -60,7 +60,6 @@ CacheModel.process = thread.coro(function(self)
 	local tasks = self.tasks
 	local task = table.remove(tasks, 1)
 	while task do
-		thread.pushTask({error = print})
 		updateCacheAsync(task[1], task[2])
 
 		if task[3] then
