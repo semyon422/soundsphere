@@ -472,7 +472,7 @@ function PlayfieldVsrg:addColumnsBackground(object)
 			x = noteskin.columns[i],
 			y = 0,
 			w = noteskin.width[i],
-			h = 480,
+			h = noteskin.unit,
 			rx = 0,
 			ry = 0
 		})
