@@ -40,8 +40,8 @@ end
 local typecheck = require("typecheck")
 if love.filesystem.getInfo("typecheck", "file") then
 	typecheck.strict = true
-	deco.add(typecheck.TypeDecorator())
-	deco.add(typecheck.ClassDecorator())
+	deco.add(require("typecheck.TypeDecorator")())
+	deco.add(require("typecheck.ClassDecorator")())
 	print("enabled typecheck.TypeDecorator")
 	print("enabled typecheck.ClassDecorator")
 end
