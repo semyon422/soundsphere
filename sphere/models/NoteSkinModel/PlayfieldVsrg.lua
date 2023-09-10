@@ -573,7 +573,7 @@ function PlayfieldVsrg:addHitError(object)
 	object.count = object.count or 1
 	object.key = "game.rhythmModel.scoreEngine.scoreSystem.sequence"
 	object.value = "misc.deltaTime"
-	object.unit = 0.16
+	object.unit = object.unit or 0.16
 	object.color = object.color or function(value, unit)
 		if math.abs(value) <= 0.016 then
 			return perfectColor
