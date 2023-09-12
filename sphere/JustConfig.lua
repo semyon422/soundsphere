@@ -60,7 +60,7 @@ function JustConfig:fromFile(path)
 	local content = love.filesystem.read(path)
 	local exists = content ~= nil
 	content = content or self.defaultContent
-	local config = assert(loadstring(content, "@" .. path))()
+	local config = assert(loadstring(content, "@" .. path))(path)
 	config.content = content
 	config.path = path
 	return config, exists
