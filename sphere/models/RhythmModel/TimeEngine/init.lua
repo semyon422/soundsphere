@@ -2,6 +2,7 @@ local class = require("class")
 local math_util = require("math_util")
 local Observable = require("Observable")
 local TimeManager = require("sphere.models.RhythmModel.TimeEngine.TimeManager")
+local NearestTime = require("sphere.models.RhythmModel.TimeEngine.NearestTime")
 
 ---@class sphere.TimeEngine
 ---@operator call: sphere.TimeEngine
@@ -11,6 +12,7 @@ TimeEngine.timeToPrepare = 2
 
 function TimeEngine:new()
 	self.observable = Observable()
+	self.nearestTime = NearestTime()
 
 	self.timer = TimeManager()
 	self.timer.timeEngine = self
@@ -20,7 +22,6 @@ TimeEngine.startTime = 0
 TimeEngine.currentTime = 0
 TimeEngine.currentVisualTime = 0
 TimeEngine.timeRate = 1
-TimeEngine.targetTimeRate = 1
 TimeEngine.baseTimeRate = 1
 TimeEngine.windUp = nil
 
@@ -28,7 +29,8 @@ function TimeEngine:load()
 	self.timer:pause()
 	self.timer:setRate(self.timeRate)
 	self.timer.adjustRate = self.adjustRate
-	self:loadTimePoints()
+
+	self.nearestTime:loadTimePoints(self.noteChart)
 
 	local t = -self.timeToPrepare * self.baseTimeRate
 	self.timer:setTime(t)
@@ -37,43 +39,22 @@ function TimeEngine:load()
 	self.currentTime = t
 	self.currentVisualTime = t
 
-	if self.noteChart then
-		self.minTime = self.noteChart.metaData.minTime
-		self.maxTime = self.noteChart.metaData.maxTime
-	end
+	self.minTime = self.noteChart.metaData.minTime
+	self.maxTime = self.noteChart.metaData.maxTime
 end
 
----@param event table
-function TimeEngine:sync(event)
+---@param time number
+function TimeEngine:sync(time)
 	local timer = self.timer
 
-	timer.eventTime = event.time
+	timer.eventTime = time
 
 	if self.windUp then
 		self:updateWindUp()
 	end
 
-	if self.timeRate ~= self.targetTimeRate then
-		timer:setRate(self.timeRate)
-	end
-
 	self.currentTime = timer:getTime()
-
-	if not self.nextTimeIndex then
-		return
-	end
-	self:updateNextTimeIndex()
-	self.currentVisualTime = self:getVisualTime()
-end
-
----@return number
-function TimeEngine:getVisualTime()
-	local nearestTime = self:getNearestTime()
-	local currentTime = self.currentTime
-	if math.abs(currentTime - nearestTime) < 0.001 then
-		return nearestTime
-	end
-	return currentTime
+	self.currentVisualTime = self.nearestTime:getVisualTime(self.currentTime, 0.001)
 end
 
 function TimeEngine:skipIntro()
@@ -84,8 +65,8 @@ function TimeEngine:skipIntro()
 end
 
 function TimeEngine:updateWindUp()
-	local startTime = self.noteChart.metaData.minTime
-	local endTime = self.noteChart.metaData.maxTime
+	local startTime = self.minTime
+	local endTime = self.maxTime
 	local currentTime = self.currentTime
 
 	local a, b = unpack(self.windUp)
@@ -93,16 +74,6 @@ function TimeEngine:updateWindUp()
 	timeRate = math.min(math.max(timeRate, a), b)
 
 	self:setTimeRate(timeRate * self.baseTimeRate)
-end
-
----@param delta number
-function TimeEngine:increaseTimeRate(delta)
-	local target = self.targetTimeRate
-	local newTarget = math.floor((target + delta) / delta + 0.5) * delta
-
-	if newTarget >= 0.1 then
-		self:setTimeRate(newTarget)
-	end
 end
 
 ---@param position number
@@ -120,14 +91,6 @@ function TimeEngine:setPosition(position)
 	audioEngine.forcePosition = false
 end
 
-function TimeEngine:pause()
-	self.timer:pause()
-end
-
-function TimeEngine:play()
-	self.timer:play()
-end
-
 ---@param timeRate number
 function TimeEngine:setBaseTimeRate(timeRate)
 	self.baseTimeRate = timeRate
@@ -136,67 +99,16 @@ end
 
 ---@param timeRate any
 function TimeEngine:setTimeRate(timeRate)
-	self.targetTimeRate = timeRate
 	self.timeRate = timeRate
 	self.timer:setRate(timeRate)
 end
 
-function TimeEngine:loadTimePoints()
-	local absoluteTimes = {}
-
-	local noteChart = self.noteChart
-	if not noteChart then
-		return
-	end
-	for _, layerData in noteChart:getLayerDataIterator() do
-		local timePointList = layerData.timePointList
-		for timePointIndex = 1, #timePointList do
-			local t = timePointList[timePointIndex].absoluteTime
-			if t == t then
-				absoluteTimes[t] = true
-			end
-		end
-	end
-
-	local absoluteTimeList = {}
-	for time in pairs(absoluteTimes) do
-		absoluteTimeList[#absoluteTimeList + 1] = time
-	end
-	table.sort(absoluteTimeList)
-
-	self.absoluteTimeList = absoluteTimeList
-	self.nextTimeIndex = 1
+function TimeEngine:pause()
+	self.timer:pause()
 end
 
-function TimeEngine:updateNextTimeIndex()
-	local timeList = self.absoluteTimeList
-	while true do
-		if
-			timeList[self.nextTimeIndex + 1] and
-			self.currentTime >= timeList[self.nextTimeIndex]
-		then
-			self.nextTimeIndex = self.nextTimeIndex + 1
-		else
-			break
-		end
-	end
-end
-
----@return number
-function TimeEngine:getNearestTime()
-	local timeList = self.absoluteTimeList
-	local prevTime = timeList[self.nextTimeIndex - 1]
-	local nextTime = timeList[self.nextTimeIndex]
-
-	if not prevTime then
-		return nextTime
-	end
-
-	local currentTime = self.currentTime
-	local prevDelta = math.abs(currentTime - prevTime)
-	local nextDelta = math.abs(currentTime - nextTime)
-
-	return prevDelta < nextDelta and prevTime or nextTime
+function TimeEngine:play()
+	self.timer:play()
 end
 
 return TimeEngine

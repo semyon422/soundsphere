@@ -57,7 +57,7 @@ function FastplayController:load()
 
 	scoreEngine.noteChartDataEntry = selectModel.noteChartItem
 
-	rhythmModel.timeEngine:sync({time = 0})
+	rhythmModel.timeEngine:sync(0)
 	rhythmModel:loadLogicEngines()
 	self.replayModel:load()
 end

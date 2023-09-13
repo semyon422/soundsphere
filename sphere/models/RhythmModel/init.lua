@@ -83,7 +83,7 @@ end
 ---@param event table
 function RhythmModel:receive(event)
 	if event.name == "framestarted" then
-		self.timeEngine:sync(event)
+		self.timeEngine:sync(event.time)
 		return
 	end
 

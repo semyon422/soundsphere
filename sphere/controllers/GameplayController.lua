@@ -66,10 +66,7 @@ function GameplayController:load()
 	scoreEngine.longNoteRatio = longNoteRatio
 	scoreEngine.longNoteArea = longNoteArea
 
-	rhythmModel.timeEngine:sync({
-		time = love.timer.getTime(),
-		delta = 0,
-	})
+	rhythmModel.timeEngine:sync(love.timer.getTime())
 	rhythmModel:loadAllEngines()
 	replayModel:load()
 
@@ -191,10 +188,7 @@ function GameplayController:retry()
 
 	rhythmModel:unloadAllEngines()
 	rhythmModel:load()
-	rhythmModel.timeEngine:sync({
-		time = love.timer.getTime(),
-		delta = 0,
-	})
+	rhythmModel.timeEngine:sync(love.timer.getTime())
 	rhythmModel:loadAllEngines()
 	self.replayModel:load()
 	self.resourceModel:rewind()
