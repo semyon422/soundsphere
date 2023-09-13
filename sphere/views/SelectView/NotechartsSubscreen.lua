@@ -178,6 +178,10 @@ local function Cells(self)
 	TextCellImView(w, h, "right", "miss count", missCount)
 	just.row()
 
+	if self.game.multiplayerModel.room then
+		return
+	end
+
 	w, h = Layout:move("column2row1")
 	love.graphics.translate(0, h / 2 - 55)
 	if imgui.TextOnlyButton("play auto", "AP", 55, 55) then
