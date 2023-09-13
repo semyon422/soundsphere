@@ -1,22 +1,23 @@
 local transform = require("gfx_util").transform
-local ProgressView = require("sphere.views.GameplayView.ProgressView")
+local RectangleProgressView = require("sphere.views.GameplayView.RectangleProgressView")
 local ImageView = require("sphere.views.ImageView")
 
----@class sphere.ImageProgressView: sphere.ProgressView
+---@class sphere.ImageProgressView: sphere.RectangleProgressView
 ---@operator call: sphere.ImageProgressView
-local ImageProgressView = ProgressView + {}
+local ImageProgressView = RectangleProgressView + {}
 
 function ImageProgressView:load()
-	ImageView.load(self)
+	self.imageView = ImageView({image = self.image})
+	self.imageView:load()
 
-	self.w, self.h = self.imageObject:getDimensions()
-	self.quad = love.graphics.newQuad(0, 0, 1, 1, self.imageObject)
+	self.w, self.h = self.imageView.imageObject:getDimensions()
+	self.quad = love.graphics.newQuad(0, 0, 1, 1, self.imageView.imageObject)
 end
 
 function ImageProgressView:draw()
-	local w, h = self.imageWidth, self.imageHeight
+	local iw = self.imageView
+	local w, h = iw.imageWidth, iw.imageHeight
 
-	local cw, ch = self.w, self.h
 	local sx = self.sx or 1
 	local sy = self.sy or 1
 	local ox = (self.ox or 0) * w
@@ -33,10 +34,10 @@ function ImageProgressView:draw()
 
 	local rx, ry, rw, rh = self:getRectangle()
 	local quad = self.quad
-	quad:setViewport(rx - self.x, ry - self.y, rw, rh, self.imageObject:getDimensions())
+	quad:setViewport(rx - self.x, ry - self.y, rw, rh, iw.imageObject:getDimensions())
 
 	love.graphics.draw(
-		self.imageObject,
+		iw.imageObject,
 		quad,
 		rx,
 		ry,

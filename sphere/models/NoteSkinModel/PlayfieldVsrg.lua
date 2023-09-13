@@ -8,7 +8,8 @@ local ImageAnimationView = require("sphere.views.ImageAnimationView")
 
 local EditorRhythmView = require("sphere.views.EditorView.EditorRhythmView")
 local RhythmView = require("sphere.views.RhythmView")
-local ProgressView = require("sphere.views.GameplayView.ProgressView")
+local RectangleProgressView = require("sphere.views.GameplayView.RectangleProgressView")
+local CircleProgressView = require("sphere.views.GameplayView.CircleProgressView")
 local HitErrorView = require("sphere.views.GameplayView.HitErrorView")
 local InputView = require("sphere.views.GameplayView.InputView")
 local InputAnimationView = require("sphere.views.GameplayView.InputAnimationView")
@@ -159,7 +160,22 @@ function PlayfieldVsrg:addProgressBar(object)
 	object = object or {}
 	object.subscreen = "gameplay"
 	if not getmetatable(object) then
-		object = ProgressView(object)
+		object = RectangleProgressView(object)
+	end
+	function object:getMin() return self.game.rhythmModel.timeEngine.minTime end
+	function object:getMax() return self.game.rhythmModel.timeEngine.maxTime end
+	function object:getStart() return self.game.rhythmModel.timeEngine.startTime end
+	function object:getCurrent() return self.game.rhythmModel.timeEngine.currentTime end
+	return self:add(object)
+end
+
+---@param object table?
+---@return table
+function PlayfieldVsrg:addCircleProgressBar(object)
+	object = object or {}
+	object.subscreen = "gameplay"
+	if not getmetatable(object) then
+		object = CircleProgressView(object)
 	end
 	function object:getMin() return self.game.rhythmModel.timeEngine.minTime end
 	function object:getMax() return self.game.rhythmModel.timeEngine.maxTime end
@@ -174,7 +190,7 @@ function PlayfieldVsrg:addHpBar(object)
 	object = object or {}
 	object.subscreen = "gameplay"
 	if not getmetatable(object) then
-		object = ProgressView(object)
+		object = RectangleProgressView(object)
 	end
 	function object:getMax() return self.game.rhythmModel.scoreEngine.scoreSystem.hp.max end
 	function object:getCurrent()

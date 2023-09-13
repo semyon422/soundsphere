@@ -7,6 +7,7 @@ local ImageView = require("sphere.views.ImageView")
 local ImageValueView = require("sphere.views.ImageValueView")
 
 local ImageProgressView = require("sphere.views.GameplayView.ImageProgressView")
+local CircleProgressView = require("sphere.views.GameplayView.CircleProgressView")
 
 ---@class sphere.OsuNoteSkin: sphere.NoteSkinVsrg
 ---@operator call: sphere.OsuNoteSkin
@@ -433,7 +434,22 @@ function OsuNoteSkin:load()
 
 	self:addCombo()
 	self:addScore()
-	self:addAccuracy()
+	local accObj = self:addAccuracy()
+
+	playfield:addProgressBar(CircleProgressView({
+		x = 0,
+		y = 0,
+		r = 10 * 1.6,
+		transform = self.playField:newTransform(1024, 768, "right"),
+		backgroundColor = {1, 1, 1, 0.6},
+		foregroundColor = {1, 1, 1, 1},
+		draw = function(self)
+			self.y = accObj.y + self.r
+			-- self.y = accObj.y + accObj.height / 2 * accObj.scale
+			self.x = accObj.x - accObj.width * accObj.scale - self.r
+			CircleProgressView.draw(self)
+		end,
+	}))
 
 	self:addJudgements(config:get("OverallDifficulty"))
 
@@ -456,7 +472,6 @@ function OsuNoteSkin:load()
 		count = 20,
 	})
 
-	BasePlayfield.addBaseProgressBar(playfield)
 	BasePlayfield.addMatchPlayers(playfield)
 end
 
@@ -614,7 +629,7 @@ function OsuNoteSkin:addAccuracy()
 	local fonts = self.skinini.Fonts
 	local files = self:findCharFiles(fonts.ScorePrefix)
 	local scoreConfig = self.scoreConfig
-	self.playField:addAccuracy(ImageValueView({
+	return self.playField:addAccuracy(ImageValueView({
 		transform = self.playField:newTransform(1024, 768, "right"),
 		x = 1024,
 		y = 0,
