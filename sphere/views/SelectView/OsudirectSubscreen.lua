@@ -125,9 +125,16 @@ local function OsudirectSubscreen(self)
 
 	w, h = Layout:move("column2row2row1")
 
+	local set = self.game.osudirectModel.beatmap
+	if not set then
+		return
+	end
+
+	local button_text = set.downloaded and "redownload" or "download"
+
 	just.indent(36)
-	if imgui.TextOnlyButton("download", "download", w - 72, h) then
-		self.game.osudirectModel:downloadBeatmapSet(self.game.osudirectModel.beatmap)
+	if imgui.TextOnlyButton("download", button_text, w - 72, h) then
+		self.game.osudirectModel:downloadBeatmapSet(set)
 	end
 end
 

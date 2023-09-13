@@ -74,6 +74,12 @@ function ChartRepo:getNoteChartsAtSet(setId)
 	return self.db:select("noteCharts", "setId = ?", setId)
 end
 
+---@param hashes table
+---@return table
+function ChartRepo:getNoteChartsByHashes(hashes)
+	return self.db:select("noteCharts", self.db:build_condition({hash__in = hashes}))
+end
+
 ----------------------------------------------------------------
 
 ---@param entry table

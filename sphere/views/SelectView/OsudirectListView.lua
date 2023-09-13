@@ -45,7 +45,12 @@ function OsudirectListView:drawItem(i, w, h)
 	local item = self.items[i]
 
 	just.indent(44)
+	if item.downloaded then
+		love.graphics.setColor(1, 1, 1, 0.5)
+	end
+
 	TextCellImView(math.huge, h, "left", item.artist, item.title)
+	love.graphics.setColor(1, 1, 1, 1)
 end
 
 return OsudirectListView

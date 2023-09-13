@@ -160,6 +160,21 @@ function OsudirectModel:searchRequest(searchString, page)
 	return err
 end
 
+---@param beatmaps table
+---@return table
+function OsudirectModel:getExistingHashes(beatmaps)
+	local hashes = {}
+	for _, beatmap in ipairs(beatmaps) do
+		table.insert(hashes, beatmap.beatmaps[1].checksum)
+	end
+	local foundCharts = self.cacheModel.chartRepo:getNoteChartsByHashes(hashes)
+	local foundHashes = {}
+	for _, chart in ipairs(foundCharts) do
+		foundHashes[chart.hash] = true
+	end
+	return foundHashes
+end
+
 function OsudirectModel:searchNext()
 	self.page = self.page + 1
 
@@ -176,7 +191,13 @@ function OsudirectModel:searchNext()
 
 	local newPos = #self.items
 	table.remove(self.items, newPos)
+
+	local hashes = self:getExistingHashes(beatmaps)
+
 	for _, beatmap in ipairs(beatmaps) do
+		if hashes[beatmap.beatmaps[1].checksum] then
+			beatmap.downloaded = true
+		end
 		table.insert(self.items, beatmap)
 	end
 
