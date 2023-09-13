@@ -233,7 +233,7 @@ end
 function EditorModel:selectEnd()
 	self.graphicEngine:selectEnd()
 	self.selectRect = nil
-	just.select()
+	just.unselect()
 end
 
 function EditorModel:update()

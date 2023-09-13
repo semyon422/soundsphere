@@ -624,6 +624,7 @@ function OsuNoteSkin:addScore()
 	self.playField:addScore(self.scoreConfig)
 end
 
+---@return sphere.ImageValueView
 function OsuNoteSkin:addAccuracy()
 	local fonts = self.skinini.Fonts
 	local files = self:findCharFiles(fonts.ScorePrefix)
