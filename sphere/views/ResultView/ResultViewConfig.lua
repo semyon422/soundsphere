@@ -287,6 +287,7 @@ local function Judgements(self)
 			just.emptyline(interval)
 		end
 	else
+		local count = perfect + notPerfect
 		imgui.ValueBar(w, lineHeight, perfect / count, "perfect", perfect)
 		just.emptyline(interval)
 		imgui.ValueBar(w, lineHeight, notPerfect / count, "not perfect", notPerfect)
