@@ -12,18 +12,18 @@ WebNoteChartController.getNoteCharts = function(notechart)
 	local content = file:read("*a")
 	file:close()
 
-	local status, noteCharts = NoteChartFactory:getNoteCharts(
+	local ok, noteCharts = NoteChartFactory:getNoteCharts(
 		notechart.path .. "." .. notechart.extension,
 		content,
 		notechart.index
 	)
-	return noteCharts
+	return ok, noteCharts
 end
 
 function WebNoteChartController:POST()
-	local noteCharts = WebNoteChartController.getNoteCharts(self.params.notechart)
-	if not noteCharts then
-		return {status = 404}
+	local ok, noteCharts = WebNoteChartController.getNoteCharts(self.params.notechart)
+	if not ok then
+		return {status = 500, json = {error = noteCharts}}
 	end
 
 	local noteChartDataEntries = {}
