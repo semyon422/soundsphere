@@ -436,7 +436,7 @@ function OsuNoteSkin:load()
 	self:addScore()
 	local accObj = self:addAccuracy()
 
-	playfield:addProgressBar(CircleProgressView({
+	playfield:addCircleProgressBar({
 		x = 0,
 		y = 0,
 		r = 10 * 1.6,
@@ -445,11 +445,10 @@ function OsuNoteSkin:load()
 		foregroundColor = {1, 1, 1, 1},
 		draw = function(self)
 			self.y = accObj.y + self.r
-			-- self.y = accObj.y + accObj.height / 2 * accObj.scale
 			self.x = accObj.x - accObj.width * accObj.scale - self.r
 			CircleProgressView.draw(self)
 		end,
-	}))
+	})
 
 	self:addJudgements(config:get("OverallDifficulty"))
 
