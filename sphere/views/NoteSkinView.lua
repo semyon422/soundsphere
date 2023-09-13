@@ -67,11 +67,13 @@ return ModalImView(function(self)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.rectangle("line", 0, 0, w, h, r)
 
-	if not selectedNoteSkin.config then
+	local config = selectedNoteSkin.config
+	if not config or not config.draw then
 		return
 	end
 
-	if selectedNoteSkin.config.draw then
+	do
+		local w, h = config.w or w, config.h or h
 		love.graphics.replaceTransform(_transform(transform))
 		love.graphics.translate(733, 240)
 		love.graphics.setColor(0, 0, 0, 0.8)
@@ -80,14 +82,11 @@ return ModalImView(function(self)
 
 		just.push()
 		imgui.Container(window_id .. "skin", w, h, _h / 3, _h * 2, scrollYconfig)
-
-		selectedNoteSkin.config:draw(w, h)
+		config:draw(w, h)
 		scrollYconfig = imgui.Container()
 		just.pop()
 
 		love.graphics.setColor(1, 1, 1, 1)
 		love.graphics.rectangle("line", 0, 0, w, h, r)
-
-		return
 	end
 end)
