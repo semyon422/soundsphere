@@ -4,6 +4,7 @@ local class = require("class")
 ---@operator call: sphere.NearestTime
 local NearestTime = class()
 
+---@param window number
 function NearestTime:new(window)
 	self.window = window
 	self.absoluteTimeList = {}

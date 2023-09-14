@@ -20,6 +20,7 @@ local function getDimensions(mode)
 	end
 end
 
+---@param graphics table
 function WindowModel:load(graphics)
 	self.graphics = graphics
 	self.mode = self.graphics.mode
