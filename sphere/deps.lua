@@ -13,6 +13,7 @@ return {
 		"resourceModel",
 		"windowModel",
 		"cacheModel",
+		"fileFinder",
 	},
 	fastplayController = {
 		"rhythmModel",
@@ -39,6 +40,7 @@ return {
 		"notificationModel",
 		"speedModel",
 		"cacheModel",
+		"fileFinder",
 	},
 	multiplayerController = {
 		"multiplayerModel",
@@ -116,7 +118,10 @@ return {
 		"modifierModel",
 	},
 	speedModel = {"configModel"},
-	resourceModel = {"configModel"},
+	resourceModel = {
+		"configModel",
+		"fileFinder",
+	},
 
 	-- views
 

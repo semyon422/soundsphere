@@ -8,6 +8,7 @@ local ScreenshotModel = require("sphere.app.ScreenshotModel")
 local AudioModel = require("sphere.app.AudioModel")
 
 local MountController = require("sphere.app.MountController")
+local FileFinder = require("sphere.app.FileFinder")
 local dirs = require("sphere.app.dirs")
 
 ---@class sphere.App
@@ -21,6 +22,7 @@ function App:new()
 	self.mountModel = MountModel()
 	self.screenshotModel = ScreenshotModel()
 	self.windowModel = WindowModel()
+	self.fileFinder = FileFinder()
 
 	-- self.mountController = MountController(self.configModel, self.mountModel)
 	-- mountController = {

@@ -67,6 +67,7 @@ function GameController:new()
 	self.discordModel = self.app.discordModel
 	self.mountModel = self.app.mountModel
 	self.windowModel = self.app.windowModel
+	self.fileFinder = self.app.fileFinder
 
 	self.backgroundModel = self.ui.backgroundModel
 	self.notificationModel = self.ui.notificationModel

@@ -1,5 +1,4 @@
 local gfx_util = require("gfx_util")
-local FileFinder = require("sphere.filesystem.FileFinder")
 local class = require("class")
 
 ---@class sphere.ImageView
@@ -7,7 +6,7 @@ local class = require("class")
 local ImageView = class()
 
 function ImageView:load()
-	local path = FileFinder:findFile(self.image)
+	local path = self.game.fileFinder:findFile(self.image)
 	if path then
 		local status, image = pcall(love.graphics.newImage, path)
 		if status then

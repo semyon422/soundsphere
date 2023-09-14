@@ -1,4 +1,4 @@
-local FileFinder = {}
+local class = require("class")
 
 local FileTypes = {
 	audio = {"wav", "ogg", "mp3"},
@@ -13,6 +13,19 @@ for format, list in pairs(FileTypes) do
 	end
 end
 
+---@class sphere.FileFinder
+---@operator call: sphere.FileFinder
+local FileFinder = class()
+
+function FileFinder:new()
+	self:reset()
+end
+
+function FileFinder:reset()
+	self.paths = {}
+	self.fileLists = {}
+end
+
 ---@param fileName string
 ---@return string
 ---@return string?
@@ -21,14 +34,6 @@ local function removeExtension(fileName)
 	ext = ext and ext:lower()
 	local format = FileTypeMap[ext]
 	return format and fileName:sub(1, -#ext - 2) or fileName, format
-end
-
-FileFinder.paths = {}
-FileFinder.fileLists = {}
-
-function FileFinder:reset()
-	self.paths = {}
-	self.fileLists = {}
 end
 
 ---@param fileName string

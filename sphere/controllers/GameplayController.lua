@@ -1,5 +1,4 @@
 local class = require("class")
-local FileFinder = require("sphere.filesystem.FileFinder")
 local math_util = require("math_util")
 local InputMode = require("ncdk.InputMode")
 
@@ -17,7 +16,7 @@ function GameplayController:load()
 	local modifierModel = self.modifierModel
 	local difficultyModel = self.difficultyModel
 	local replayModel = self.replayModel
-
+	local fileFinder = self.fileFinder
 
 	local noteChart = selectModel:loadNoteChart(self:getImporterSettings())
 
@@ -74,11 +73,11 @@ function GameplayController:load()
 
 	local chartItem = selectModel.noteChartItem
 
-	FileFinder:reset()
-	FileFinder:addPath(chartItem.path:match("^(.+)/.-$"))
-	FileFinder:addPath(noteSkin.directoryPath)
-	FileFinder:addPath("userdata/hitsounds")
-	FileFinder:addPath("userdata/hitsounds/midi")
+	fileFinder:reset()
+	fileFinder:addPath(chartItem.path:match("^(.+)/.-$"))
+	fileFinder:addPath(noteSkin.directoryPath)
+	fileFinder:addPath("userdata/hitsounds")
+	fileFinder:addPath("userdata/hitsounds/midi")
 
 	self.resourceModel:load(chartItem.path, noteChart, function()
 		if not self.loaded then

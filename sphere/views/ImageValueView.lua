@@ -1,6 +1,5 @@
 local transform = require("gfx_util").transform
 local inside = require("table_util").inside
-local FileFinder = require("sphere.filesystem.FileFinder")
 local class = require("class")
 
 ---@class sphere.ImageValueView
@@ -14,7 +13,7 @@ function ImageValueView:load()
 		return
 	end
 	for char, path in pairs(self.files) do
-		images[char] = love.graphics.newImage(FileFinder:findFile(path))
+		images[char] = love.graphics.newImage(self.game.fileFinder:findFile(path))
 	end
 end
 

@@ -2,7 +2,6 @@ local class = require("class")
 local audio = require("audio")
 local Video = require("Video")
 local thread = require("thread")
-local FileFinder = require("sphere.filesystem.FileFinder")
 local table_util = require("table_util")
 
 local _newSoundDataAsync = thread.async(function(path, sample_gain)
@@ -127,6 +126,8 @@ end
 ---@param noteChart ncdk.NoteChart
 ---@param callback function
 function ResourceModel:load(chartPath, noteChart, callback)
+	local fileFinder = self.fileFinder
+
 	local noteChartType = NoteChartTypeMap[noteChart.type]
 
 	local settings = self.configModel.configs.settings
@@ -153,13 +154,13 @@ function ResourceModel:load(chartPath, noteChart, callback)
 			for _, path in ipairs(sequence) do
 				local filePath
 				if fileType == "sound" then
-					filePath = FileFinder:findFile(path, "audio")
+					filePath = fileFinder:findFile(path, "audio")
 				elseif fileType == "image" then
 					if bga_image then
-						filePath = FileFinder:findFile(path, "image")
+						filePath = fileFinder:findFile(path, "image")
 					end
 					if bga_video and not filePath then
-						filePath = FileFinder:findFile(path, "video")
+						filePath = fileFinder:findFile(path, "video")
 					end
 				end
 				if filePath then
@@ -179,7 +180,7 @@ end
 
 ---@param path string
 function ResourceModel:loadResource(path)
-	local fileType = FileFinder:getType(path)
+	local fileType = self.fileFinder:getType(path)
 	if fileType == "audio" then
 		self.all_resources.loaded[path] = newSoundDataAsync(path, self.sample_gain)
 	elseif fileType == "image" then
@@ -258,14 +259,13 @@ ResourceModel.process = thread.coro(function(self)
 end)
 
 function ResourceModel:unloadAudio()
-	local path = next(self.all_resources.loaded)
-	while path do
-		local fileType = FileFinder:getType(path)
+	local fileFinder = self.fileFinder
+	for path, resource in pairs(self.all_resources.loaded) do
+		local fileType = fileFinder:getType(path)
 		if not fileType or fileType == "audio" then
-			self.all_resources.loaded[path]:release()
+			resource:release()
 			self.all_resources.loaded[path] = nil
 		end
-		path = next(self.all_resources.loaded)
 	end
 end
 

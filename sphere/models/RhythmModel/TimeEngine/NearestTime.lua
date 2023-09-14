@@ -11,6 +11,7 @@ function NearestTime:new(window)
 	self.nextTimeIndex = 1
 end
 
+---@param noteChart ncdk.NoteChart
 function NearestTime:loadTimePoints(noteChart)
 	local absoluteTimes = {}
 
@@ -34,7 +35,8 @@ function NearestTime:loadTimePoints(noteChart)
 	self.nextTimeIndex = 1
 end
 
----@return number
+---@param currentTime number
+---@return number?
 function NearestTime:getTime(currentTime)
 	local timeList = self.absoluteTimeList
 	while timeList[self.nextTimeIndex + 1] and currentTime >= timeList[self.nextTimeIndex] do
@@ -55,6 +57,7 @@ function NearestTime:getTime(currentTime)
 	return prevDelta < nextDelta and prevTime or nextTime
 end
 
+---@param current number
 ---@return number
 function NearestTime:getVisualTime(current)
 	local nearest = self:getTime(current)

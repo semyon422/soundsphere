@@ -1,5 +1,4 @@
 local transform = require("gfx_util").transform
-local FileFinder = require("sphere.filesystem.FileFinder")
 local class = require("class")
 local Animation = require("Animation")
 
@@ -23,20 +22,21 @@ function ImageAnimationView:load()
 end
 
 function ImageAnimationView:loadImages()
+	local fileFinder = self.game.fileFinder
 	local images = {}
 	local range = self.range
 	if not range then
-		images[0] = love.graphics.newImage(FileFinder:findFile(self.image))
+		images[0] = love.graphics.newImage(fileFinder:findFile(self.image))
 	else
 		for i = range[1], range[2], range[1] < range[2] and 1 or -1 do
-			images[i] = love.graphics.newImage(FileFinder:findFile(self.image:format(i)))
+			images[i] = love.graphics.newImage(fileFinder:findFile(self.image:format(i)))
 		end
 	end
 	self.images = images
 end
 
 function ImageAnimationView:loadQuads()
-	local image = love.graphics.newImage(FileFinder:findFile(self.image))
+	local image = love.graphics.newImage(self.game.fileFinder:findFile(self.image))
 	local w, h = image:getDimensions()
 	self.image = image
 
