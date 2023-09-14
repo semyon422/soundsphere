@@ -1,6 +1,5 @@
 local class = require("class")
-local extractAsync = require("sphere.filesystem.extract")
-local downloadAsync = require("sphere.filesystem.download")
+local fs_util = require("fs_util")
 local thread = require("thread")
 local delay = require("delay")
 local http_util = require("http_util")
@@ -235,7 +234,7 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 	beatmap.status = "Downloading"
 
 	beatmap.isDownloading = true
-	local data, code, headers, status_line = downloadAsync(url)
+	local data, code, headers, status_line = fs_util.downloadAsync(url)
 	beatmap.isDownloading = false
 
 	if not data then
@@ -266,7 +265,7 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 	local extractPath = saveDir .. "/" .. filename:match("^(.+)%.osz$")
 	print("Extracting")
 	beatmap.status = "Extracting"
-	local extracted, err = extractAsync(filedata, extractPath)
+	local extracted, err = fs_util.extractAsync(filedata, extractPath)
 	if not extracted then
 		beatmap.status = err or "Extracting error"
 		return

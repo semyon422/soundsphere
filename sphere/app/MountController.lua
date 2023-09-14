@@ -1,5 +1,5 @@
 local class = require("class")
-local extractAsync = require("sphere.filesystem.extract")
+local fs_util = require("fs_util")
 local thread = require("thread")
 
 ---@class sphere.MountController
@@ -36,7 +36,7 @@ function MountController:filedropped(file)
 	local extractPath = "userdata/charts/dropped/" .. path:match("^.+/(.-)%.osz$")
 
 	print(("Extracting to: %s"):format(extractPath))
-	local extracted = extractAsync(path, extractPath, false)
+	local extracted = fs_util.extractAsync(path, extractPath, false)
 	if not extracted then
 		print("Failed to extract")
 		return
