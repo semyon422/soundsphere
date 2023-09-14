@@ -12,7 +12,7 @@ TimeEngine.timeToPrepare = 2
 
 function TimeEngine:new()
 	self.observable = Observable()
-	self.nearestTime = NearestTime()
+	self.nearestTime = NearestTime(0.001)
 
 	self.timer = TimeManager()
 	self.timer.timeEngine = self
@@ -54,7 +54,7 @@ function TimeEngine:sync(time)
 	end
 
 	self.currentTime = timer:getTime()
-	self.currentVisualTime = self.nearestTime:getVisualTime(self.currentTime, 0.001)
+	self.currentVisualTime = self.nearestTime:getVisualTime(self.currentTime)
 end
 
 function TimeEngine:skipIntro()
@@ -84,7 +84,7 @@ function TimeEngine:setPosition(position)
 	audioEngine:setPosition(position)
 	timer:setTime(position)
 	self.currentTime = timer:getTime()
-	self.currentVisualTime = self:getVisualTime()
+	self.currentVisualTime = self.nearestTime:getVisualTime(self.currentTime)
 
 	audioEngine.forcePosition = true
 	self.rhythmModel.logicEngine:update()

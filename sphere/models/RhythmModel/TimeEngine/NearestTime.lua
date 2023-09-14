@@ -4,7 +4,8 @@ local class = require("class")
 ---@operator call: sphere.NearestTime
 local NearestTime = class()
 
-function NearestTime:new()
+function NearestTime:new(window)
+	self.window = window
 	self.absoluteTimeList = {}
 	self.nextTimeIndex = 1
 end
@@ -54,9 +55,9 @@ function NearestTime:getTime(currentTime)
 end
 
 ---@return number
-function NearestTime:getVisualTime(current, window)
+function NearestTime:getVisualTime(current)
 	local nearest = self:getTime(current)
-	if nearest and math.abs(current - nearest) <= window then
+	if nearest and math.abs(current - nearest) <= self.window then
 		return nearest
 	end
 	return current
