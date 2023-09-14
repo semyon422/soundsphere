@@ -1,10 +1,7 @@
 local class = require("class")
 
 local ScoreModel = require("sphere.models.ScoreModel")
-local NotificationModel = require("sphere.models.NotificationModel")
-local ThemeModel = require("sphere.models.ThemeModel")
 local OnlineModel = require("sphere.models.OnlineModel")
-local BackgroundModel = require("sphere.models.BackgroundModel")
 local ModifierModel = require("sphere.models.ModifierModel")
 local NoteSkinModel = require("sphere.models.NoteSkinModel")
 local InputModel = require("sphere.models.InputModel")
@@ -12,7 +9,6 @@ local CacheModel = require("sphere.models.CacheModel")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local ScoreLibraryModel = require("sphere.models.ScoreLibraryModel")
 local SelectModel = require("sphere.models.SelectModel")
-local PreviewModel = require("sphere.models.PreviewModel")
 local RhythmModel = require("sphere.models.RhythmModel")
 local OsudirectModel = require("sphere.models.OsudirectModel")
 local MultiplayerModel = require("sphere.models.MultiplayerModel")
@@ -28,14 +24,8 @@ local ResultController = require("sphere.controllers.ResultController")
 local MultiplayerController = require("sphere.controllers.MultiplayerController")
 local EditorController = require("sphere.controllers.EditorController")
 
-local GameView = require("sphere.views.GameView")
-local SelectView = require("sphere.views.SelectView")
-local ResultView = require("sphere.views.ResultView")
-local GameplayView = require("sphere.views.GameplayView")
-local MultiplayerView = require("sphere.views.MultiplayerView")
-local EditorView = require("sphere.views.EditorView")
-
 local App = require("sphere.app.App")
+local UserInterface = require("sphere.ui.UserInterface")
 
 ---@class sphere.GameController
 ---@operator call: sphere.GameController
@@ -47,6 +37,7 @@ function GameController:new()
 	self.game = self
 
 	self.app = App()
+	self.ui = UserInterface(self.app)
 
 	self.selectController = SelectController()
 	self.gameplayController = GameplayController()
@@ -55,26 +46,15 @@ function GameController:new()
 	self.multiplayerController = MultiplayerController()
 	self.editorController = EditorController()
 
-	self.gameView = GameView()
-	self.selectView = SelectView()
-	self.resultView = ResultView()
-	self.gameplayView = GameplayView()
-	self.multiplayerView = MultiplayerView()
-	self.editorView = EditorView()
-
-	self.notificationModel = NotificationModel()
-	self.themeModel = ThemeModel()
 	self.scoreModel = ScoreModel()
 	self.onlineModel = OnlineModel()
 	self.cacheModel = CacheModel()
-	self.backgroundModel = BackgroundModel()
 	self.modifierModel = ModifierModel()
 	self.noteSkinModel = NoteSkinModel()
 	self.inputModel = InputModel()
 	self.difficultyModel = DifficultyModel()
 	self.scoreLibraryModel = ScoreLibraryModel()
 	self.selectModel = SelectModel()
-	self.previewModel = PreviewModel()
 	self.rhythmModel = RhythmModel()
 	self.osudirectModel = OsudirectModel()
 	self.multiplayerModel = MultiplayerModel()
@@ -87,6 +67,17 @@ function GameController:new()
 	self.discordModel = self.app.discordModel
 	self.mountModel = self.app.mountModel
 	self.windowModel = self.app.windowModel
+
+	self.backgroundModel = self.ui.backgroundModel
+	self.notificationModel = self.ui.notificationModel
+	self.previewModel = self.ui.previewModel
+
+	self.gameView = self.ui.gameView
+	self.selectView = self.ui.selectView
+	self.resultView = self.ui.resultView
+	self.gameplayView = self.ui.gameplayView
+	self.multiplayerView = self.ui.multiplayerView
+	self.editorView = self.ui.editorView
 
 	for n, list in pairs(deps) do
 		for _, m in ipairs(list) do
@@ -108,27 +99,24 @@ function GameController:load()
 
 	self.modifierModel:setConfig(configModel.configs.modifier)
 
-	self.themeModel:load()
 	self.scoreModel:load()
 	self.onlineModel:load()
 	self.noteSkinModel:load()
 	self.cacheModel:load()
 	self.osudirectModel:load()
-	self.backgroundModel:load()
 	self.selectModel:load()
-	self.previewModel:load()
 
 	self.multiplayerController:load()
 
 	self.onlineModel.authManager:checkSession()
 	self.multiplayerModel:connect()
 
-	self.gameView:load()
+	self.ui:load()
 end
 
 function GameController:unload()
-	self.gameView:unload()
 	self.multiplayerController:unload()
+	self.ui:unload()
 	self.app:unload()
 end
 
@@ -136,19 +124,16 @@ end
 function GameController:update(dt)
 	self.app:update()
 
-	self.notificationModel:update()
-	self.backgroundModel:update()
-
 	self.multiplayerController:update()
 	self.osudirectModel:update()
 
 	self.cacheModel:update()
 
-	self.gameView:update(dt)
+	self.ui:update(dt)
 end
 
 function GameController:draw()
-	self.gameView:draw()
+	self.ui:draw()
 end
 
 ---@param event table
@@ -164,7 +149,7 @@ function GameController:receive(event)
 		return
 	end
 
-	self.gameView:receive(event)
+	self.ui:receive(event)
 	self.app:receive(event)
 end
 

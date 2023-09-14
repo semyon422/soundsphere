@@ -72,7 +72,6 @@ return {
 
 	-- models
 
-	backgroundModel = {"configModel"},
 	configModel = {},
 	cacheModel = {},
 	difficultyModel = {},
@@ -80,8 +79,6 @@ return {
 		"configModel",
 		"resourceModel",
 	},
-	notificationModel = {},
-	themeModel = {"configModel"},
 	scoreModel = {"configModel"},
 	onlineModel = {"configModel"},
 	modifierModel = {},
@@ -96,9 +93,6 @@ return {
 		"configModel",
 		"scoreLibraryModel",
 		"cacheModel",
-	},
-	previewModel = {
-		"configModel",
 	},
 	rhythmModel = {
 		"inputModel",

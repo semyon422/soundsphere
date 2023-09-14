@@ -11,7 +11,6 @@ local BackgroundModel = class()
 BackgroundModel.alpha = 0
 
 function BackgroundModel:load()
-	self.config = self.configModel.configs.select
 	self.noteChartDataEntryId = 0
 	self.path = ""
 

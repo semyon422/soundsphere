@@ -6,6 +6,11 @@ local thread = require("thread")
 ---@operator call: sphere.PreviewModel
 local PreviewModel = class()
 
+---@param configModel sphere.ConfigModel
+function PreviewModel:new(configModel)
+	self.configModel = configModel
+end
+
 function PreviewModel:load()
 	self.noteChartDataEntryId = 0
 	self.audioPath = ""
@@ -36,7 +41,7 @@ function PreviewModel:update()
 	if not audio:isPlaying() and love.window.hasFocus() then
 		audio:seek(self.position or 0)
 		audio:play()
-	elseif audio:isPlaying() and not love.window.hasFocus() and  muteOnUnfocus then
+	elseif audio:isPlaying() and not love.window.hasFocus() and muteOnUnfocus then
 		audio:pause()
 	end
 

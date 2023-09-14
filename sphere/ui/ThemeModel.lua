@@ -8,7 +8,7 @@ ThemeModel.path = "userdata/themes"
 
 function ThemeModel:load()
 	self.themes = {}
-	self.config = self.configModel.configs.settings
+	-- self.config = self.configModel.configs.settings
 	-- return self:lookup(self.path)
 end
 
