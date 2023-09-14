@@ -41,17 +41,4 @@ function ScreenshotModel:capture(open)
 	end)
 end
 
----@param event table
-function ScreenshotModel:receive(event)
-	if event.name ~= "keypressed" then
-		return
-	end
-
-	local screenshot = self.configModel.configs.settings.input.screenshot
-	if event[1] == screenshot.capture then
-		local open = love.keyboard.isDown(screenshot.open)
-		self:capture(open)
-	end
-end
-
 return ScreenshotModel

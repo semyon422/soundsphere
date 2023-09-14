@@ -4,8 +4,8 @@ local audio = require("audio")
 ---@class sphere.AudioModel
 local AudioModel = class()
 
-function AudioModel:load()
-	local device = self.configModel.configs.settings.audio.device
+---@param device table
+function AudioModel:load(device)
 	if device.period == 0 then
 		device.period = audio.default_dev_period
 	end

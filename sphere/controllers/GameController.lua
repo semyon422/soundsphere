@@ -1,10 +1,6 @@
 local class = require("class")
-local ConfigModel = require("sphere.models.ConfigModel")
+
 local ScoreModel = require("sphere.models.ScoreModel")
-local DiscordModel = require("sphere.models.DiscordModel")
-local MountModel = require("sphere.models.MountModel")
-local WindowModel = require("sphere.models.WindowModel")
-local DirectoryManager = require("sphere.filesystem.DirectoryManager")
 local NotificationModel = require("sphere.models.NotificationModel")
 local ThemeModel = require("sphere.models.ThemeModel")
 local OnlineModel = require("sphere.models.OnlineModel")
@@ -17,18 +13,14 @@ local DifficultyModel = require("sphere.models.DifficultyModel")
 local ScoreLibraryModel = require("sphere.models.ScoreLibraryModel")
 local SelectModel = require("sphere.models.SelectModel")
 local PreviewModel = require("sphere.models.PreviewModel")
-local UpdateModel = require("sphere.models.UpdateModel")
 local RhythmModel = require("sphere.models.RhythmModel")
 local OsudirectModel = require("sphere.models.OsudirectModel")
 local MultiplayerModel = require("sphere.models.MultiplayerModel")
 local ReplayModel = require("sphere.models.ReplayModel")
 local EditorModel = require("sphere.models.EditorModel")
 local SpeedModel = require("sphere.models.SpeedModel")
-local ScreenshotModel = require("sphere.models.ScreenshotModel")
-local AudioModel = require("sphere.models.AudioModel")
 local ResourceModel = require("sphere.models.ResourceModel")
 
-local MountController = require("sphere.controllers.MountController")
 local SelectController = require("sphere.controllers.SelectController")
 local GameplayController = require("sphere.controllers.GameplayController")
 local FastplayController = require("sphere.controllers.FastplayController")
@@ -43,6 +35,8 @@ local GameplayView = require("sphere.views.GameplayView")
 local MultiplayerView = require("sphere.views.MultiplayerView")
 local EditorView = require("sphere.views.EditorView")
 
+local App = require("sphere.app.App")
+
 ---@class sphere.GameController
 ---@operator call: sphere.GameController
 local GameController = class()
@@ -52,7 +46,8 @@ local deps = require("sphere.deps")
 function GameController:new()
 	self.game = self
 
-	self.mountController = MountController()
+	self.app = App()
+
 	self.selectController = SelectController()
 	self.gameplayController = GameplayController()
 	self.fastplayController = FastplayController()
@@ -67,13 +62,7 @@ function GameController:new()
 	self.multiplayerView = MultiplayerView()
 	self.editorView = EditorView()
 
-	self.directoryManager = DirectoryManager()
-
-	self.configModel = ConfigModel()
 	self.notificationModel = NotificationModel()
-	self.windowModel = WindowModel()
-	self.mountModel = MountModel()
-	self.screenshotModel = ScreenshotModel()
 	self.themeModel = ThemeModel()
 	self.scoreModel = ScoreModel()
 	self.onlineModel = OnlineModel()
@@ -86,16 +75,18 @@ function GameController:new()
 	self.scoreLibraryModel = ScoreLibraryModel()
 	self.selectModel = SelectModel()
 	self.previewModel = PreviewModel()
-	self.updateModel = UpdateModel()
 	self.rhythmModel = RhythmModel()
-	self.discordModel = DiscordModel()
 	self.osudirectModel = OsudirectModel()
 	self.multiplayerModel = MultiplayerModel()
 	self.replayModel = ReplayModel()
 	self.editorModel = EditorModel()
 	self.speedModel = SpeedModel()
-	self.audioModel = AudioModel()
 	self.resourceModel = ResourceModel()
+
+	self.configModel = self.app.configModel
+	self.discordModel = self.app.discordModel
+	self.mountModel = self.app.mountModel
+	self.windowModel = self.app.windowModel
 
 	for n, list in pairs(deps) do
 		for _, m in ipairs(list) do
@@ -105,22 +96,10 @@ function GameController:new()
 end
 
 function GameController:load()
+	self.app:load()
+
 	local configModel = self.configModel
 	local rhythmModel = self.rhythmModel
-
-	self.directoryManager:createDirectories()
-
-	configModel:open("settings", true)
-	configModel:open("select", true)
-	configModel:open("modifier", true)
-	configModel:open("input", true)
-	configModel:open("mount", true)
-	configModel:open("online", true)
-	configModel:open("urls")
-	configModel:open("judgements")
-	configModel:open("filters")
-	configModel:open("files")
-	configModel:read()
 
 	rhythmModel.timings = configModel.configs.settings.gameplay.timings
 	rhythmModel.judgements = configModel.configs.judgements
@@ -130,18 +109,14 @@ function GameController:load()
 	self.modifierModel:setConfig(configModel.configs.modifier)
 
 	self.themeModel:load()
-	self.mountModel:load()
-	self.windowModel:load()
 	self.scoreModel:load()
 	self.onlineModel:load()
 	self.noteSkinModel:load()
 	self.cacheModel:load()
 	self.osudirectModel:load()
-	self.discordModel:load()
 	self.backgroundModel:load()
 	self.selectModel:load()
 	self.previewModel:load()
-	self.audioModel:load()
 
 	self.multiplayerController:load()
 
@@ -153,22 +128,20 @@ end
 
 function GameController:unload()
 	self.gameView:unload()
-	self.discordModel:unload()
-	self.mountModel:unload()
 	self.multiplayerController:unload()
-	self.configModel:write()
+	self.app:unload()
 end
 
 ---@param dt number
 function GameController:update(dt)
-	self.discordModel:update()
+	self.app:update()
+
 	self.notificationModel:update()
 	self.backgroundModel:update()
 
 	self.multiplayerController:update()
 	self.osudirectModel:update()
 
-	self.windowModel:update()
 	self.cacheModel:update()
 
 	self.gameView:update(dt)
@@ -192,9 +165,7 @@ function GameController:receive(event)
 	end
 
 	self.gameView:receive(event)
-	self.windowModel:receive(event)
-	self.screenshotModel:receive(event)
-	self.mountController:receive(event)
+	self.app:receive(event)
 end
 
 return GameController

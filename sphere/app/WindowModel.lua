@@ -20,8 +20,8 @@ local function getDimensions(mode)
 	end
 end
 
-function WindowModel:load()
-	self.graphics = self.configModel.configs.settings.graphics
+function WindowModel:load(graphics)
+	self.graphics = graphics
 	self.mode = self.graphics.mode
 	local mode = self.mode
 	local flags = mode.flags
@@ -59,11 +59,9 @@ function WindowModel:update()
 		self:setCursor()
 	end
 
-	local settings = self.configModel.configs.settings
-	loop.fpslimit = settings.graphics.fps
-	loop.asynckey = settings.graphics.asynckey
-	loop.dwmflush = settings.graphics.dwmflush
-	loop.imguiShowDemoWindow = settings.miscellaneous.imguiShowDemoWindow
+	loop.fpslimit = graphics.fps
+	loop.asynckey = graphics.asynckey
+	loop.dwmflush = graphics.dwmflush
 end
 
 ---@param event table
@@ -120,7 +118,7 @@ end
 
 ---@param enabled boolean
 function WindowModel:setVsyncOnSelect(enabled)
-	local graphics = self.configModel.configs.settings.graphics
+	local graphics = self.graphics
 	if not graphics.vsyncOnSelect then
 		return
 	end

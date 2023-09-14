@@ -124,7 +124,7 @@ delay.set_timer(love.timer.getTime)
 
 local thread = require("thread")
 thread.coro(function()
-	local UpdateController = require("sphere.controllers.UpdateController")
+	local UpdateController = require("sphere.update.UpdateController")
 	local updateController = UpdateController()
 	local needRestart = updateController:updateAsync()
 	if needRestart then

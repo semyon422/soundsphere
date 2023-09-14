@@ -97,12 +97,10 @@ function UpdateModel:setStatus(status)
 	print(status)
 end
 
-function UpdateModel:updateFilesAsync()
-	local configModel = self.configModel
-	local configs = configModel.configs
+function UpdateModel:updateFilesAsync(urls, config_files)
 	self:setStatus("Checking for updates...")
 
-	local response = async_download(configs.urls.update)
+	local response = async_download(urls.update)
 	if not response then
 		self:setStatus("Can't download file list")
 		return
@@ -114,7 +112,7 @@ function UpdateModel:updateFilesAsync()
 		return
 	end
 
-	local client_filelist = configs.files
+	local client_filelist = config_files
 	local filelist = crossFiles(server_filelist, client_filelist)
 
 	local client_filemap = {}
@@ -179,11 +177,9 @@ function UpdateModel:updateFilesAsync()
 		client_filelist[k] = v
 	end
 
-	configModel:write()
-
 	return count > 0
 end
 
-UpdateModel.updateFiles = thread.coro(UpdateModel.updateFilesAsync)
+-- UpdateModel.updateFiles = thread.coro(UpdateModel.updateFilesAsync)
 
 return UpdateModel

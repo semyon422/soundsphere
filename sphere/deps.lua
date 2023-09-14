@@ -40,11 +40,6 @@ return {
 		"speedModel",
 		"cacheModel",
 	},
-	mountController = {
-		"mountModel",
-		"configModel",
-		"cacheModel",
-	},
 	multiplayerController = {
 		"multiplayerModel",
 		"modifierModel",
@@ -77,20 +72,15 @@ return {
 
 	-- models
 
-	audioModel = {"configModel"},
 	backgroundModel = {"configModel"},
 	configModel = {},
 	cacheModel = {},
-	discordModel = {},
 	difficultyModel = {},
 	editorModel = {
 		"configModel",
 		"resourceModel",
 	},
 	notificationModel = {},
-	windowModel = {"configModel"},
-	mountModel = {"configModel"},
-	screenshotModel = {"configModel"},
 	themeModel = {"configModel"},
 	scoreModel = {"configModel"},
 	onlineModel = {"configModel"},
@@ -110,7 +100,6 @@ return {
 	previewModel = {
 		"configModel",
 	},
-	updateModel = {"configModel"},
 	rhythmModel = {
 		"inputModel",
 		"resourceModel",

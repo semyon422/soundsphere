@@ -1,7 +1,7 @@
 local class = require("class")
-local UpdateModel = require("sphere.models.UpdateModel")
-local ConfigModel = require("sphere.models.ConfigModel")
-local WindowModel = require("sphere.models.WindowModel")
+local UpdateModel = require("sphere.update.UpdateModel")
+local ConfigModel = require("sphere.app.ConfigModel")
+local WindowModel = require("sphere.app.WindowModel")
 local thread = require("thread")
 local delay = require("delay")
 
@@ -13,9 +13,6 @@ function UpdateController:new()
 	self.updateModel = UpdateModel()
 	self.configModel = ConfigModel()
 	self.windowModel = WindowModel()
-
-	self.updateModel.configModel = self.configModel
-	self.windowModel.configModel = self.configModel
 end
 
 ---@return boolean?
@@ -28,6 +25,7 @@ function UpdateController:updateAsync()
 	configModel:open("files", true)
 	configModel:read()
 
+
 	local configs = configModel.configs
 
 	if
@@ -38,7 +36,7 @@ function UpdateController:updateAsync()
 		return
 	end
 
-	self.windowModel:load()
+	self.windowModel:load(configs.settings.graphics)
 
 	function love.update()
 		thread.update()
@@ -50,7 +48,13 @@ function UpdateController:updateAsync()
 		love.graphics.printf(updateModel.status, 0, 0, love.graphics.getWidth())
 	end
 
-	return updateModel:updateFilesAsync()
+	local updated = updateModel:updateFilesAsync(
+		configs.urls,
+		configs.files
+	)
+	configModel:write()
+
+	return updated
 end
 
 return UpdateController

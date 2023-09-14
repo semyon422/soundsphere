@@ -11,8 +11,9 @@ end
 
 MountModel.chartsPath = "userdata/charts"
 
-function MountModel:load()
-	self.mountInfo = self.configModel.configs.mount
+---@param mountInfo table
+function MountModel:load(mountInfo)
+	self.mountInfo = mountInfo
 	local mountStatuses = self.mountStatuses
 
 	for _, entry in ipairs(self.mountInfo) do

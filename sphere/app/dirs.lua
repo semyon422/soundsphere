@@ -1,10 +1,6 @@
-local class = require("class")
+local dirs = {}
 
----@class sphere.DirectoryManager
----@operator call: sphere.DirectoryManager
-local DirectoryManager = class()
-
-local defaultDirectories = {
+local dirs_list = {
 	"userdata",
 	"userdata/skins",
 	"userdata/charts",
@@ -16,12 +12,12 @@ local defaultDirectories = {
 	"userdata/screenshots",
 }
 
-function DirectoryManager:createDirectories()
-	for _, path in ipairs(defaultDirectories) do
+function dirs.create()
+	for _, path in ipairs(dirs_list) do
 		if not love.filesystem.getInfo(path) then
 			love.filesystem.createDirectory(path)
 		end
 	end
 end
 
-return DirectoryManager
+return dirs
