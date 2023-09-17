@@ -1,5 +1,5 @@
-local ChartRepo = require("sphere.models.CacheModel.ChartRepo")
-local NoteChartFinder = require("sphere.models.CacheModel.NoteChartFinder")
+local ChartRepo = require("sphere.persistence.CacheModel.ChartRepo")
+local NoteChartFinder = require("sphere.persistence.CacheModel.NoteChartFinder")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local NoteChartDataEntryFactory = require("notechart.NoteChartDataEntryFactory")
 local Log = require("Log")

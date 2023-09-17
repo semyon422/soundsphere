@@ -1,16 +1,13 @@
 local class = require("class")
 
-local ScoreModel = require("sphere.models.ScoreModel")
 local OnlineModel = require("sphere.models.OnlineModel")
 local ModifierModel = require("sphere.models.ModifierModel")
 local NoteSkinModel = require("sphere.models.NoteSkinModel")
 local InputModel = require("sphere.models.InputModel")
-local CacheModel = require("sphere.models.CacheModel")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local ScoreLibraryModel = require("sphere.models.ScoreLibraryModel")
 local SelectModel = require("sphere.models.SelectModel")
 local RhythmModel = require("sphere.models.RhythmModel")
-local OsudirectModel = require("sphere.models.OsudirectModel")
 local MultiplayerModel = require("sphere.models.MultiplayerModel")
 local ReplayModel = require("sphere.models.ReplayModel")
 local EditorModel = require("sphere.models.EditorModel")
@@ -24,6 +21,7 @@ local ResultController = require("sphere.controllers.ResultController")
 local MultiplayerController = require("sphere.controllers.MultiplayerController")
 local EditorController = require("sphere.controllers.EditorController")
 
+local Persistence = require("sphere.persistence.Persistence")
 local App = require("sphere.app.App")
 local UserInterface = require("sphere.ui.UserInterface")
 
@@ -36,8 +34,9 @@ local deps = require("sphere.deps")
 function GameController:new()
 	self.game = self
 
-	self.app = App()
-	self.ui = UserInterface(self.app)
+	self.persistence = Persistence()
+	self.app = App(self.persistence)
+	self.ui = UserInterface(self.persistence)
 
 	self.selectController = SelectController()
 	self.gameplayController = GameplayController()
@@ -46,9 +45,7 @@ function GameController:new()
 	self.multiplayerController = MultiplayerController()
 	self.editorController = EditorController()
 
-	self.scoreModel = ScoreModel()
 	self.onlineModel = OnlineModel()
-	self.cacheModel = CacheModel()
 	self.modifierModel = ModifierModel()
 	self.noteSkinModel = NoteSkinModel()
 	self.inputModel = InputModel()
@@ -56,18 +53,21 @@ function GameController:new()
 	self.scoreLibraryModel = ScoreLibraryModel()
 	self.selectModel = SelectModel()
 	self.rhythmModel = RhythmModel()
-	self.osudirectModel = OsudirectModel()
 	self.multiplayerModel = MultiplayerModel()
 	self.replayModel = ReplayModel()
 	self.editorModel = EditorModel()
 	self.speedModel = SpeedModel()
 	self.resourceModel = ResourceModel()
 
-	self.configModel = self.app.configModel
+	self.scoreModel = self.persistence.scoreModel
+	self.cacheModel = self.persistence.cacheModel
+	self.osudirectModel = self.persistence.osudirectModel
+	self.configModel = self.persistence.configModel
+	self.fileFinder = self.persistence.fileFinder
+
 	self.discordModel = self.app.discordModel
 	self.mountModel = self.app.mountModel
 	self.windowModel = self.app.windowModel
-	self.fileFinder = self.app.fileFinder
 
 	self.backgroundModel = self.ui.backgroundModel
 	self.notificationModel = self.ui.notificationModel
@@ -88,6 +88,7 @@ function GameController:new()
 end
 
 function GameController:load()
+	self.persistence:load()
 	self.app:load()
 
 	local configModel = self.configModel

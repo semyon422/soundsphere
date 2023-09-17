@@ -16,7 +16,7 @@ function ScoreDatabase:load()
 	local db = self.db
 	db:open(self.dbpath)
 
-	local sql = love.filesystem.read("sphere/models/ScoreModel/database.sql")
+	local sql = love.filesystem.read("sphere/persistence/ScoreModel/database.sql")
 	db:exec(sql)
 
 	self:insertDefaultInfo()
@@ -102,7 +102,7 @@ function ScoreDatabase:updateSchema()
 
 	while info.version < defaultInfo.version do
 		info.version = info.version + 1
-		self.db:exec(love.filesystem.read(("sphere/models/ScoreModel/migrate%s.sql"):format(info.version)))
+		self.db:exec(love.filesystem.read(("sphere/persistence/ScoreModel/migrate%s.sql"):format(info.version)))
 		print("schema was updated", info.version)
 	end
 	self:updateInfo("version", defaultInfo.version)

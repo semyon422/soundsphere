@@ -16,11 +16,11 @@ local EditorView = require("sphere.views.EditorView")
 ---@operator call: sphere.UserInterface
 local UserInterface = class()
 
----@param app sphere.App
-function UserInterface:new(app)
+---@param persistence sphere.Persistence
+function UserInterface:new(persistence)
 	self.backgroundModel = BackgroundModel()
 	self.notificationModel = NotificationModel()
-	self.previewModel = PreviewModel(app.configModel)
+	self.previewModel = PreviewModel(persistence.configModel)
 	self.themeModel = ThemeModel()
 
 	self.gameView = GameView()

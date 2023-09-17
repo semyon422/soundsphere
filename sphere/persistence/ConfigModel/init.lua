@@ -6,7 +6,7 @@ local serpent = require("serpent")
 local ConfigModel = class()
 
 ConfigModel.userdataPath = "userdata"
-ConfigModel.configModelPath = "sphere/models/ConfigModel"
+ConfigModel.configModelPath = "sphere/persistence/ConfigModel"
 
 function ConfigModel:new()
 	self.configs = {}

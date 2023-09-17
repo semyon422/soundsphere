@@ -1,7 +1,7 @@
 local thread = require("thread")
 local class = require("class")
-local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
-local ChartRepo = require("sphere.models.CacheModel.ChartRepo")
+local CacheDatabase = require("sphere.persistence.CacheModel.CacheDatabase")
+local ChartRepo = require("sphere.persistence.CacheModel.ChartRepo")
 
 ---@class sphere.CacheModel
 ---@operator call: sphere.CacheModel
@@ -46,7 +46,7 @@ function CacheModel:update()
 end
 
 local updateCacheAsync = thread.async(function(path, force)
-	local CacheManager = require("sphere.models.CacheModel.CacheManager")
+	local CacheManager = require("sphere.persistence.CacheModel.CacheManager")
 	local cacheManager = CacheManager()
 	cacheManager:generateCacheFull(path, force)
 end)

@@ -1,4 +1,4 @@
-local FileFinder = require("sphere.app.FileFinder")
+local FileFinder = require("sphere.persistence.FileFinder")
 local ShortGraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.ShortGraphicalNote")
 local LongGraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.LongGraphicalNote")
 local ImageNote = require("sphere.models.RhythmModel.GraphicEngine.ImageNote")

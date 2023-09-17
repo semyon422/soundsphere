@@ -1,7 +1,7 @@
 local class = require("class")
 local erfunc = require("libchart.erfunc")
 local thread = require("thread")
-local ScoreDatabase = require("sphere.models.ScoreModel.ScoreDatabase")
+local ScoreDatabase = require("sphere.persistence.ScoreModel.ScoreDatabase")
 
 ---@class sphere.ScoreModel
 ---@operator call: sphere.ScoreModel

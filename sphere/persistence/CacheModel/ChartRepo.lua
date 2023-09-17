@@ -17,7 +17,7 @@ function ChartRepo:load()
 	self.db = Orm()
 	local db = self.db
 	db:open(self.dbpath)
-	local sql = love.filesystem.read("sphere/models/CacheModel/database.sql")
+	local sql = love.filesystem.read("sphere/persistence/CacheModel/database.sql")
 	db:exec(sql)
 end
 

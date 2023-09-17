@@ -17,7 +17,7 @@ function CacheDatabase:load()
 	self.db = Orm()
 	local db = self.db
 	db:open(self.dbpath)
-	local sql = love.filesystem.read("sphere/models/CacheModel/database.sql")
+	local sql = love.filesystem.read("sphere/persistence/CacheModel/database.sql")
 	db:exec(sql)
 	self:attachScores()
 	self.loaded = true
@@ -94,7 +94,7 @@ end
 local _asyncQueryAll = thread.async(function(queryParams)
 	local time = love.timer.getTime()
 	local ffi = require("ffi")
-	local CacheDatabase = require("sphere.models.CacheModel.CacheDatabase")
+	local CacheDatabase = require("sphere.persistence.CacheModel.CacheDatabase")
 	local self = CacheDatabase()
 	self:load()
 	self.queryParams = queryParams

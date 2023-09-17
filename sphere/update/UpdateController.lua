@@ -1,6 +1,6 @@
 local class = require("class")
 local UpdateModel = require("sphere.update.UpdateModel")
-local ConfigModel = require("sphere.app.ConfigModel")
+local ConfigModel = require("sphere.persistence.ConfigModel")
 local WindowModel = require("sphere.app.WindowModel")
 local thread = require("thread")
 local delay = require("delay")
