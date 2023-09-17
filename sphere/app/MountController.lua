@@ -6,13 +6,13 @@ local thread = require("thread")
 ---@operator call: sphere.MountController
 local MountController = class()
 
----@param event table
-function MountController:receive(event)
-	if event.name == "directorydropped" then
-		self:directorydropped(event[1])
-	elseif event.name == "filedropped" then
-		self:filedropped(event[1])
-	end
+---@param configModel sphere.ConfigModel
+---@param mountModel sphere.MountModel
+---@param cacheModel sphere.CacheModel
+function MountController:new(configModel, mountModel, cacheModel)
+	self.configModel = configModel
+	self.mountModel = mountModel
+	self.cacheModel = cacheModel
 end
 
 ---@param path string
@@ -23,7 +23,7 @@ function MountController:directorydropped(path)
 		self.mountModel:addPath(path)
 	end
 	self.mountModel:mount(path)
-	self.configModel:write("mount")
+	self.configModel:write()
 end
 
 ---@param file love.File

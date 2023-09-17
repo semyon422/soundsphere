@@ -22,12 +22,7 @@ function App:new(persistence)
 
 	self.persistence = persistence
 
-	-- self.mountController = MountController(self.configModel, self.mountModel)
-	-- mountController = {
-	-- 	"mountModel",
-	-- 	"configModel",
-	-- 	"cacheModel",
-	-- },
+	self.mountController = MountController(persistence.configModel, self.mountModel, persistence.cacheModel)
 end
 
 function App:load()
@@ -52,8 +47,18 @@ end
 ---@param event table
 function App:receive(event)
 	self.windowModel:receive(event)
-	-- self.screenshotModel:receive(event)  -- fix screenshot capture
-	-- self.mountController:receive(event)  -- fix folder drop
+
+	local screenshot = self.persistence.configModel.configs.settings.input.screenshot
+	local mountController = self.mountController
+
+	if event.name == "directorydropped" then
+		mountController:directorydropped(event[1])
+	elseif event.name == "filedropped" then
+		mountController:filedropped(event[1])
+	elseif event.name == "keypressed" and event[1] == screenshot.capture then
+		local open = love.keyboard.isDown(screenshot.open)
+		self.screenshotModel:capture(open)
+	end
 end
 
 return App
