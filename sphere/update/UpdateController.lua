@@ -38,7 +38,7 @@ function UpdateController:updateAsync()
 
 	self.windowModel:load(configs.settings.graphics)
 
-	function love.update()
+	function love.update(dt)
 		thread.update()
 		delay.update()
 		self.windowModel:update()

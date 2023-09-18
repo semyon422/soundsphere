@@ -7,17 +7,21 @@ local LuaMidi = require("luamidi")
 local flux = require("flux")
 local reqprof = require("reqprof")
 
-local loop = Observable()
+-- Static class
 
-loop.fpslimit = 240
-loop.time = 0
-loop.dt = 0
-loop.eventTime = 0
-loop.startTime = 0
-loop.stats = {}
-loop.asynckey = false
-loop.dwmflush = false
-loop.timings = {
+---@class sphere.Loop: util.Observable
+---@operator call: sphere.Loop
+local Loop = Observable + {}
+
+Loop.fpslimit = 240
+Loop.time = 0
+Loop.dt = 0
+Loop.eventTime = 0
+Loop.startTime = 0
+Loop.stats = {}
+Loop.asynckey = false
+Loop.dwmflush = false
+Loop.timings = {
 	event = 0,
 	update = 0,
 	draw = 0,
@@ -37,14 +41,14 @@ local function getinportcount()
 	return hasMidi and LuaMidi.getinportcount() or 0
 end
 
-loop.quitting = false
+Loop.quitting = false
 ---@return number?
-function loop:quittingLoop()
+function Loop:quittingLoop()
 	love.event.pump()
 
 	for name, a, b, c, d, e, f in love.event.poll() do
 		if name == "quit" then
-			loop:send({name = "quit"})
+			Loop:send({name = "quit"})
 			return 0
 		end
 	end
@@ -53,7 +57,7 @@ function loop:quittingLoop()
 	delay.update()
 
 	if thread.current == 0 then
-		loop:send({name = "quit"})
+		Loop:send({name = "quit"})
 		return 0
 	end
 
@@ -69,45 +73,45 @@ end
 
 local framestarted = {name = "framestarted"}
 ---@return function
-function loop:run()
+function Loop:run()
 	love.math.setRandomSeed(os.time())
 	math.randomseed(os.time())
 	love.timer.step()
 
 	local fpsLimitTime = love.timer.getTime()
-	loop.time = fpsLimitTime
-	loop.startTime = fpsLimitTime
-	loop.dt = 0
+	Loop.time = fpsLimitTime
+	Loop.startTime = fpsLimitTime
+	Loop.dt = 0
 
 	hasMidi = LuaMidi.getinportcount() > 0
 
 	return function()
-		if loop.quitting then
-			return loop:quittingLoop()
+		if Loop.quitting then
+			return Loop:quittingLoop()
 		end
 
 		reqprof.start()
 
-		if loop.asynckey and asynckey.start then
+		if Loop.asynckey and asynckey.start then
 			asynckey.start()
 		end
 
-		loop.dt = love.timer.step()
-		loop.time = love.timer.getTime()
+		Loop.dt = love.timer.step()
+		Loop.time = love.timer.getTime()
 
-		local timingsEvent = loop.time
+		local timingsEvent = Loop.time
 
 		love.event.pump()
 
-		framestarted.time = loop.time
-		framestarted.dt = loop.dt
-		loop:send(framestarted)
+		framestarted.time = Loop.time
+		framestarted.dt = Loop.dt
+		Loop:send(framestarted)
 
-		local asynckeyWorking = loop.asynckey and asynckey.events
+		local asynckeyWorking = Loop.asynckey and asynckey.events
 		if asynckeyWorking then
 			if love.window.hasFocus() then
 				for event in asynckey.events do
-					loop.eventTime = event.time
+					Loop.eventTime = event.time
 					if event.state then
 						love.keypressed(event.key, event.key)
 					else
@@ -119,11 +123,11 @@ function loop:run()
 			end
 		end
 
-		loop.eventTime = loop.time - loop.dt / 2
+		Loop.eventTime = Loop.time - Loop.dt / 2
 		for name, a, b, c, d, e, f in love.event.poll() do
 			if name == "quit" then
 				if not love.quit or not love.quit() then
-					loop.quit()
+					Loop:quit()
 					return a or 0
 				end
 			end
@@ -146,15 +150,15 @@ function loop:run()
 		end
 
 		local timingsUpdate = love.timer.getTime()
-		loop.timings.event = timingsUpdate - timingsEvent
+		Loop.timings.event = timingsUpdate - timingsEvent
 
 		thread.update()
 		delay.update()
-		flux.update(loop.dt)
-		love.update(loop.dt)
+		flux.update(Loop.dt)
+		love.update(Loop.dt)
 
 		local timingsDraw = love.timer.getTime()
-		loop.timings.update = timingsDraw - timingsUpdate
+		Loop.timings.update = timingsDraw - timingsUpdate
 
 		local frameEndTime
 		if love.graphics and love.graphics.isActive() then
@@ -163,25 +167,25 @@ function loop:run()
 			love.draw()
 			just._end()
 			love.graphics.origin()
-			love.graphics.getStats(loop.stats)
+			love.graphics.getStats(Loop.stats)
 			love.graphics.present() -- all new events are read when present is called
-			if dwmapi and loop.dwmflush then
+			if dwmapi and Loop.dwmflush then
 				dwmapi.DwmFlush()
 			end
 			frameEndTime = love.timer.getTime()
 		end
 
 		local timingsSleep = love.timer.getTime()
-		loop.timings.draw = timingsSleep - timingsDraw
+		Loop.timings.draw = timingsSleep - timingsDraw
 
-		if loop.fpslimit > 0 then
-			fpsLimitTime = math.max(fpsLimitTime + 1 / loop.fpslimit, frameEndTime)
+		if Loop.fpslimit > 0 then
+			fpsLimitTime = math.max(fpsLimitTime + 1 / Loop.fpslimit, frameEndTime)
 			love.timer.sleep(fpsLimitTime - frameEndTime)
 		end
 	end
 end
 
-loop.callbacks = {
+Loop.callbacks = {
 	"update",
 	"draw",
 	"textinput",
@@ -210,30 +214,30 @@ loop.callbacks = {
 ---@param time number
 ---@return number
 local function clampEventTime(time)
-	return math.min(math.max(time, loop.time - loop.dt), loop.time)
+	return math.min(math.max(time, Loop.time - Loop.dt), Loop.time)
 end
 
-function loop:init()
+function Loop:init()
 	local e = {}
-	for _, name in pairs(loop.callbacks) do
+	for _, name in pairs(Loop.callbacks) do
 		love[name] = function(...)
 			local icb = just.callbacks[name]
 			if icb and icb(...) then return end
 			e[1], e[2], e[3], e[4], e[5], e[6] = ...
 			e.name = name
-			e.time = clampEventTime(loop.eventTime)
-			return loop:send(e)
+			e.time = clampEventTime(Loop.eventTime)
+			return Loop:send(e)
 		end
 	end
 	love.quit = function(...)
 		print("Quitting")
-		loop.quitting = true
+		Loop.quitting = true
 		return true
 	end
 end
 
-function loop:quit()
+function Loop:quit()
 	LuaMidi.gc()
 end
 
-return loop
+return Loop
