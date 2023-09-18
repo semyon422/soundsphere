@@ -4,11 +4,11 @@ local just = require("just")
 local spherefonts = require("sphere.assets.fonts")
 local imgui = require("imgui")
 
-local ProgressView = require("sphere.views.GameplayView.ProgressView")
+local RectangleProgressView = require("sphere.views.GameplayView.RectangleProgressView")
 
 local transformFull = {0, 0, 0, {1 / 1920, 0}, {0, 1 / 1080}, 0, 0, 0, 0}
 
-local PauseProgressBar = ProgressView({
+local PauseProgressBar = RectangleProgressView({
 	x = 0, y = 0, w = 1920, h = 20,
 	color = {1, 1, 1, 1},
 	transform = transformFull,
