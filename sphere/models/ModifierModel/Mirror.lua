@@ -40,6 +40,11 @@ function Mirror:getMap(config)
 	for inputType, inputCount in pairs(inputMode) do
 		map[inputType] = {}
 		local submap = map[inputType]
+
+		for i = 1, inputCount do
+			submap[i] = i
+		end
+
 		local halfFloor = math.floor(inputCount / 2)
 		local halfCeil = math.ceil(inputCount / 2)
 		if value == "all" then
@@ -56,6 +61,8 @@ function Mirror:getMap(config)
 			end
 		end
 	end
+
+	print(require("inspect")(map))
 
 	return map
 end
