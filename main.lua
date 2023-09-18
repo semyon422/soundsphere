@@ -94,7 +94,7 @@ if moddedgame and moddedgame.type == "directory" then
 	assert(physfs.mount(root .. "/moddedgame", "/", false))
 end
 
-require("preloaders.preloadall")
+require("preload")
 
 local love_run = require("love_run")
 love.load = function() end  -- for compatibility with old conf.lua

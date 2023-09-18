@@ -16,7 +16,7 @@ package_add("ncdk")
 package_add("chartbase")
 package_add("libchart")
 
-require("preloaders.preloadall")
+require("preload")
 require("aqua.string")
 
 package.loaded.utf8 = require("lua-utf8")

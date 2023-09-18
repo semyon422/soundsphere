@@ -12,17 +12,13 @@ local function _load(name)
 	return ffi_load("iconv")
 end
 
-local iconv_preloader = {}
-
-iconv_preloader.name = "iconv"
-
 ---@param mod string
 ---@return table
-function iconv_preloader.preload(mod)
+local function preload(mod)
 	ffi.load = _load
 	local iconv = require("aqua.iconv")
 	ffi.load = ffi_load
 	return iconv
 end
 
-return iconv_preloader
+return preload
