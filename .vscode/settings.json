@@ -43,4 +43,7 @@
     "coverage-gutters.highlightdark": "rgba(0, 122, 30, 0.0)",
     "coverage-gutters.partialHighlightDark": "rgba(163, 149, 0, 0.4)",
     "coverage-gutters.noHighlightDark": "rgba(255, 191, 63, 0.3)",
+    "Lua.diagnostics.neededFileStatus": {
+        "no-unknown": "None"
+    },
 }
