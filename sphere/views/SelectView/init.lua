@@ -46,7 +46,6 @@ function SelectView:draw()
 	if kp("f1") then self.gameView:setModal(require("sphere.views.ModifierView"))
 	elseif kp("f2") then self.game.selectModel:scrollRandom()
 	elseif kp("lctrl") then self:changeSearchMode()
-	elseif kp("lshift") then self.game.selectModel:changeCollapse()
 	end
 	if self.subscreen == "notecharts" then
 		if kp("return") then self:play()

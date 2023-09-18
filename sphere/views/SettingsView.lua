@@ -73,9 +73,11 @@ local function intButtonsMs(id, v, label)
 end
 
 function drawSection:gameplay()
-	local settings = self.game.configModel.configs.settings
+	local configs = self.game.configModel.configs
+	local settings = configs.settings
 	local g = settings.gameplay
 	local i = settings.input
+	local s = configs.select
 
 	local speedModel = self.game.speedModel
 
@@ -103,6 +105,9 @@ function drawSection:gameplay()
 	g.offsetScale.visual = imgui.checkbox("offsetScale.visual", g.offsetScale.visual, "visual offset * time rate")
 	g.lastMeanValues = imgui.intButtons("lastMeanValues", g.lastMeanValues, 1, "last mean values")
 	g.ratingHitTimingWindow = intButtonsMs("ratingHitTimingWindow", g.ratingHitTimingWindow, "rating hit timing window")
+
+	imgui.separator()
+	s.collapse = imgui.checkbox("s.collapse", s.collapse, "group charts if applicable")
 
 	imgui.separator()
 	just.indent(10)

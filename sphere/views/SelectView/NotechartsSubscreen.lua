@@ -328,15 +328,15 @@ local function GroupCheckbox(self)
 	local w, h = Layout:move("column2", "header")
 	w = w / 3
 
-	love.graphics.translate(w, h / 6)
-	local collapse = self.game.configModel.configs.select.collapse
-	if imgui.Checkbox(self, collapse, h * 2 / 3) then
-		self.game.selectModel:changeCollapse()
-	end
-	just.sameline()
+	love.graphics.translate(w - h / 6, 0)
+
+	local count = #self.game.selectModel.noteChartSetLibrary.items
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
-	imgui.Label(self, "group", h * 2 / 3)
+
+	local text = "charts: " .. count
+	gfx_util.printFrame(text, 0, 0, w, h, "right", "center")
+	just.next(w, h)
 end
 
 ---@param self table

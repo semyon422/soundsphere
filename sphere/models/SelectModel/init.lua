@@ -208,14 +208,6 @@ function SelectModel:setSortFunction(sortFunctionName)
 	self:noDebouncePullNoteChartSet()
 end
 
-function SelectModel:changeCollapse()
-	if self.pullingNoteChartSet then
-		return
-	end
-	self.config.collapse = not self.config.collapse
-	self:noDebouncePullNoteChartSet()
-end
-
 ---@param locked boolean
 function SelectModel:setLock(locked)
 	self.locked = locked
