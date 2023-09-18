@@ -4,7 +4,7 @@ local NoteChartFactory = require("notechart.NoteChartFactory")
 
 local WebNoteChartController = {}
 
-WebNoteChartController.getNoteCharts = function(notechart)
+function WebNoteChartController.getNoteCharts(notechart)
 	local file = io.open(notechart.path, "r")
 	if not file then
 		return
@@ -12,18 +12,18 @@ WebNoteChartController.getNoteCharts = function(notechart)
 	local content = file:read("*a")
 	file:close()
 
-	local ok, noteCharts = NoteChartFactory:getNoteCharts(
+	local noteCharts, err = NoteChartFactory:getNoteCharts(
 		notechart.path .. "." .. notechart.extension,
 		content,
 		notechart.index
 	)
-	return ok, noteCharts
+	return noteCharts, err
 end
 
 function WebNoteChartController:POST()
-	local ok, noteCharts = WebNoteChartController.getNoteCharts(self.params.notechart)
-	if not ok then
-		return {status = 500, json = {error = noteCharts}}
+	local noteCharts, err = WebNoteChartController.getNoteCharts(self.params.notechart)
+	if not noteCharts then
+		return {status = 500, json = {error = err}}
 	end
 
 	local noteChartDataEntries = {}

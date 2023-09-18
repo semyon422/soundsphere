@@ -25,9 +25,9 @@ end
 function WebReplayController:POST()
 	local params = self.params
 
-	local ok, noteCharts = WebNoteChartController.getNoteCharts(params.notechart)
-	if not ok then
-		return {status = 500, json = {error = noteCharts}}
+	local noteCharts, err = WebNoteChartController.getNoteCharts(params.notechart)
+	if not noteCharts then
+		return {status = 500, json = {error = err}}
 	end
 
 	local noteChart = noteCharts[1]
