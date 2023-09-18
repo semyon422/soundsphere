@@ -194,8 +194,10 @@ function OsudirectModel:searchNext()
 	local hashes = self:getExistingHashes(beatmaps)
 
 	for _, beatmap in ipairs(beatmaps) do
-		if hashes[beatmap.beatmaps[1].checksum] then
-			beatmap.downloaded = true
+		for _, b in ipairs(beatmap.beatmaps) do
+			if hashes[b.checksum] then
+				beatmap.downloaded = true
+			end
 		end
 		table.insert(self.items, beatmap)
 	end
