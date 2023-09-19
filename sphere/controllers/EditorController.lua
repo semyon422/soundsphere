@@ -41,11 +41,7 @@ end
 function EditorController:unload()
 	self.editorModel:unload()
 
-	local graphics = self.configModel.configs.settings.graphics
-	local flags = graphics.mode.flags
-	if graphics.vsyncOnSelect and flags.vsync == 0 then
-		flags.vsync = self.windowModel.baseVsync
-	end
+	self.windowModel:setVsyncOnSelect(true)
 end
 
 function EditorController:save()
