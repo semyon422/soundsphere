@@ -21,8 +21,8 @@ require("aqua.string")
 
 package.loaded.utf8 = require("lua-utf8")
 
-local WebReplayController = require("sphere.controllers.WebReplayController")
-local WebNoteChartController = require("sphere.controllers.WebNoteChartController")
+local WebReplayController = require("sphere.web.WebReplayController")
+local WebNoteChartController = require("sphere.web.WebNoteChartController")
 
 app:match("/replay", json_params(respond_to(WebReplayController)))
 app:match("/notechart", json_params(respond_to(WebNoteChartController)))

@@ -1,5 +1,5 @@
 local FastplayController = require("sphere.controllers.FastplayController")
-local WebNoteChartController = require("sphere.controllers.WebNoteChartController")
+local WebNoteChartController = require("sphere.web.WebNoteChartController")
 
 local Replay = require("sphere.models.ReplayModel.Replay")
 local ReplayModel = require("sphere.models.ReplayModel")
