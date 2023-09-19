@@ -6,6 +6,7 @@ local just = require("just")
 local LuaMidi = require("luamidi")
 local flux = require("flux")
 local reqprof = require("reqprof")
+local sleep = require("sleep")
 
 -- Static class
 
@@ -180,7 +181,7 @@ function Loop:run()
 
 		if Loop.fpslimit > 0 then
 			fpsLimitTime = math.max(fpsLimitTime + 1 / Loop.fpslimit, frameEndTime)
-			love.timer.sleep(fpsLimitTime - frameEndTime)
+			sleep(fpsLimitTime - frameEndTime)
 		end
 	end
 end
