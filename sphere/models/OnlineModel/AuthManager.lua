@@ -4,7 +4,13 @@ local inspect = require("inspect")
 
 ---@class sphere.AuthManager
 ---@operator call: sphere.AuthManager
+---@field config table
 local AuthManager = class()
+
+---@param webApi sphere.WebApi
+function AuthManager:new(webApi)
+	self.webApi = webApi
+end
 
 function AuthManager:checkUserAsync()
 	local webApi = self.webApi

@@ -7,6 +7,7 @@ local socket_url = require("socket.url")
 ---@operator call: sphere.WebApi
 local WebApi = class()
 
+WebApi.host = ""
 WebApi.token = ""
 
 ---@param level number

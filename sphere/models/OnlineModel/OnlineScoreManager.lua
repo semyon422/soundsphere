@@ -6,6 +6,11 @@ local inspect = require("inspect")
 ---@operator call: sphere.OnlineScoreManager
 local OnlineScoreManager = class()
 
+---@param webApi sphere.WebApi
+function OnlineScoreManager:new(webApi)
+	self.webApi = webApi
+end
+
 local async_read = thread.async(function(...) return love.filesystem.read(...) end)
 
 OnlineScoreManager.submit = thread.coro(function(self, chartItem, replayHash)

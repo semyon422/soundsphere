@@ -4,7 +4,13 @@ local thread = require("thread")
 
 ---@class sphere.OnlineNotechartManager
 ---@operator call: sphere.OnlineNotechartManager
+---@field urls table
 local OnlineNotechartManager = class()
+
+---@param webApi sphere.WebApi
+function OnlineNotechartManager:new(webApi)
+	self.webApi = webApi
+end
 
 OnlineNotechartManager.openWebNotechart = thread.coro(function(self, hash, index)
 	local api = self.webApi.api

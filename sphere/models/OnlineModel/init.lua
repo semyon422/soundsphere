@@ -8,22 +8,19 @@ local OnlineNotechartManager = require("sphere.models.OnlineModel.OnlineNotechar
 ---@operator call: sphere.OnlineModel
 local OnlineModel = class()
 
-function OnlineModel:new()
+---@param configModel sphere.ConfigModel
+function OnlineModel:new(configModel)
+	self.configModel = configModel
 	self.webApi = WebApi()
-	self.authManager = AuthManager()
-	self.onlineScoreManager = OnlineScoreManager()
-	self.onlineNotechartManager = OnlineNotechartManager()
+	self.authManager = AuthManager(self.webApi)
+	self.onlineScoreManager = OnlineScoreManager(self.webApi)
+	self.onlineNotechartManager = OnlineNotechartManager(self.webApi)
 end
 
 function OnlineModel:load()
 	local webApi = self.webApi
-	local onlineScoreManager = self.onlineScoreManager
 	local onlineNotechartManager = self.onlineNotechartManager
 	local authManager = self.authManager
-
-	authManager.onlineModel = self
-	onlineScoreManager.onlineModel = self
-	onlineNotechartManager.onlineModel = self
 
 	local configs = self.configModel.configs
 	webApi.token = configs.online.token
@@ -32,10 +29,6 @@ function OnlineModel:load()
 
 	authManager.config = configs.online
 	onlineNotechartManager.urls = configs.urls
-
-	onlineNotechartManager.webApi = webApi
-	onlineScoreManager.webApi = webApi
-	authManager.webApi = webApi
 end
 
 return OnlineModel

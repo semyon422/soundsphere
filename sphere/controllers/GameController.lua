@@ -45,7 +45,7 @@ function GameController:new()
 	self.multiplayerController = MultiplayerController()
 	self.editorController = EditorController()
 
-	self.onlineModel = OnlineModel()
+	self.onlineModel = OnlineModel(self.app.configModel)
 	self.modifierModel = ModifierModel()
 	self.noteSkinModel = NoteSkinModel()
 	self.inputModel = InputModel()
