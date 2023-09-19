@@ -1,24 +1,25 @@
-local cursor = {}
+local class = require("class")
 
-function cursor:setCircleCursor()
-	if not self.circleCursor then
-		self:createCircle()
+---@class sphere.Cursor
+local Cursor = class()
+
+function Cursor:createCursors()
+	self:createCircle()
+	self:createArrow()
+end
+
+---@param name string
+function Cursor:setCursor(name)
+	if name == "circle" then
+		love.mouse.setCursor(self.circleCursor)
+	elseif name == "arrow" then
+		love.mouse.setCursor(self.arrowCursor)
+	else
+		love.mouse.setCursor()
 	end
-	love.mouse.setCursor(self.circleCursor)
 end
 
-function cursor:setArrowCursor()
-	if not self.arrowCursor then
-		self:createArrow()
-	end
-	love.mouse.setCursor(self.arrowCursor)
-end
-
-function cursor:setSystemCursor()
-	love.mouse.setCursor()
-end
-
-function cursor:createCircle()
+function Cursor:createCircle()
 	local oldCanvas = love.graphics.getCanvas()
 	local canvas = love.graphics.newCanvas(32, 32)
 	love.graphics.setCanvas(canvas)
@@ -29,7 +30,7 @@ function cursor:createCircle()
 	self.circleCursor = love.mouse.newCursor(canvas:newImageData(), 16, 16)
 end
 
-function cursor:createArrow()
+function Cursor:createArrow()
 	local oldCanvas = love.graphics.getCanvas()
 	local canvas = love.graphics.newCanvas(32, 32)
 	love.graphics.setCanvas(canvas)
@@ -41,4 +42,4 @@ function cursor:createArrow()
 	self.arrowCursor = love.mouse.newCursor(canvas:newImageData(), 0, 0)
 end
 
-return cursor
+return Cursor

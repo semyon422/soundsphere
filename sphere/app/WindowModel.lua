@@ -1,10 +1,14 @@
 local class = require("class")
-local cursor = require("sphere.cursor")
+local Cursor = require("sphere.app.Cursor")
 local loop = require("loop")
 
 ---@class sphere.WindowModel
 ---@operator call: sphere.WindowModel
 local WindowModel = class()
+
+function WindowModel:new()
+	self.cursor = Cursor()
+end
 
 WindowModel.baseVsync = 1
 
@@ -38,9 +42,10 @@ function WindowModel:load(graphics)
 	self.fullscreen = flags.fullscreen
 	self.fullscreentype = flags.fullscreentype
 	self.vsync = flags.vsync
-	self.cursor = self.graphics.cursor
+	self.cursor_name = self.graphics.cursor
 
-	self:setCursor()
+	self.cursor:createCursors()
+	self.cursor:setCursor(self.cursor_name)
 end
 
 function WindowModel:update()
@@ -55,9 +60,9 @@ function WindowModel:update()
 		self.fullscreentype = flags.fullscreentype
 		self:setFullscreen(self.fullscreen, self.fullscreentype)
 	end
-	if self.cursor ~= graphics.cursor then
-		self.cursor = graphics.cursor
-		self:setCursor()
+	if self.cursor_name ~= graphics.cursor then
+		self.cursor_name = graphics.cursor
+		self.cursor:setCursor(self.cursor_name)
 	end
 
 	loop.fpslimit = graphics.fps
@@ -77,18 +82,6 @@ function WindowModel:receive(event)
 		self.fullscreen = not self.fullscreen
 		mode.flags.fullscreen = self.fullscreen
 		self:setFullscreen(self.fullscreen, mode.flags.fullscreentype)
-	elseif event.name == "mousemoved" then
-		self:setCursor()
-	end
-end
-
-function WindowModel:setCursor()
-	if self.cursor == "circle" then
-		cursor:setCircleCursor()
-	elseif self.cursor == "arrow" then
-		cursor:setArrowCursor()
-	elseif self.cursor == "system" then
-		cursor:setSystemCursor()
 	end
 end
 
