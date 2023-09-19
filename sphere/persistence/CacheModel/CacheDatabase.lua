@@ -1,6 +1,6 @@
 local thread = require("thread")
-local Orm = require("sphere.Orm")
-local ObjectQuery = require("sphere.ObjectQuery")
+local Orm = require("Orm")
+local ObjectQuery = require("ObjectQuery")
 local ffi = require("ffi")
 local class = require("class")
 

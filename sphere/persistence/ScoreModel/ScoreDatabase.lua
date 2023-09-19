@@ -1,4 +1,4 @@
-local Orm = require("sphere.Orm")
+local Orm = require("Orm")
 
 local ScoreDatabase = {}
 

@@ -8,7 +8,7 @@ local NoteChartSetLibrary = require("sphere.models.SelectModel.NoteChartSetLibra
 local CollectionLibrary = require("sphere.models.SelectModel.CollectionLibrary")
 local SearchModel = require("sphere.models.SelectModel.SearchModel")
 local SortModel = require("sphere.models.SelectModel.SortModel")
-local Orm = require("sphere.Orm")
+local Orm = require("Orm")
 
 ---@class sphere.SelectModel
 ---@operator call: sphere.SelectModel

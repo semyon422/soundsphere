@@ -5,7 +5,7 @@ local NoteChartDataEntryFactory = require("notechart.NoteChartDataEntryFactory")
 local Log = require("Log")
 local class = require("class")
 local md5 = require("md5")
-local Orm = require("sphere.Orm")
+local Orm = require("Orm")
 
 ---@class sphere.CacheManager
 ---@operator call: sphere.CacheManager

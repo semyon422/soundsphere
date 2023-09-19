@@ -1,5 +1,5 @@
 local class = require("class")
-local Orm = require("sphere.Orm")
+local Orm = require("Orm")
 local utf8 = require("utf8")
 
 ---@class sphere.ChartRepo
