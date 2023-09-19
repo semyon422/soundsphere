@@ -7,7 +7,10 @@ local ImageView = require("sphere.views.ImageView")
 local ImageProgressView = RectangleProgressView + {}
 
 function ImageProgressView:load()
-	self.imageView = ImageView({image = self.image})
+	self.imageView = ImageView({
+		game = self.game,
+		image = self.image,
+	})
 	self.imageView:load()
 
 	self.w, self.h = self.imageView.imageObject:getDimensions()
