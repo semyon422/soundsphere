@@ -92,7 +92,11 @@ end
 ---@operator call: sphere.ResourceModel
 local ResourceModel = class()
 
-function ResourceModel:new()
+---@param configModel sphere.ConfigModel
+---@param fileFinder sphere.FileFinder
+function ResourceModel:new(configModel, fileFinder)
+	self.configModel = configModel
+	self.fileFinder = fileFinder
 	self.all_resources = {
 		loaded = {},
 		loading = {},

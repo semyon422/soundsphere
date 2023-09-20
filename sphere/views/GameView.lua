@@ -1,4 +1,3 @@
-local just = require("just")
 local class = require("class")
 local FadeTransition = require("sphere.views.FadeTransition")
 local FrameTimeView = require("sphere.views.FrameTimeView")
@@ -10,7 +9,9 @@ local ContextMenuImView = require("sphere.imviews.ContextMenuImView")
 ---@operator call: sphere.GameView
 local GameView = class()
 
-function GameView:new()
+---@param game sphere.GameController
+function GameView:new(game)
+	self.game = game
 	self.fadeTransition = FadeTransition()
 	self.frameTimeView = FrameTimeView()
 end

@@ -11,7 +11,14 @@ ScoreLibraryModel.scoreSources = {
 }
 ScoreLibraryModel.scoreSourceName = "local"
 
-function ScoreLibraryModel:new()
+---@param configModel sphere.ConfigModel
+---@param onlineModel sphere.OnlineModel
+---@param scoreModel sphere.ScoreModel
+function ScoreLibraryModel:new(configModel, onlineModel, scoreModel)
+	self.configModel = configModel
+	self.onlineModel = onlineModel
+	self.scoreModel = scoreModel
+
 	self.hash = ""
 	self.index = 1
 	self.items = {}

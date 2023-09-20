@@ -20,7 +20,14 @@ SelectModel.scoreItemIndex = 1
 SelectModel.pullingNoteChartSet = false
 SelectModel.debounceTime = 0.5
 
-function SelectModel:new()
+---@param configModel sphere.ConfigModel
+---@param scoreLibraryModel sphere.ScoreLibraryModel
+---@param cacheModel sphere.CacheModel
+function SelectModel:new(configModel, scoreLibraryModel, cacheModel)
+	self.configModel = configModel
+	self.scoreLibraryModel = scoreLibraryModel
+	self.cacheModel = cacheModel
+
 	self.noteChartLibrary = NoteChartLibrary()
 	self.noteChartSetLibrary = NoteChartSetLibrary()
 	self.collectionLibrary = CollectionLibrary()

@@ -16,7 +16,9 @@ local OnsetsDistView = require("sphere.views.EditorView.OnsetsDistView")
 
 local EditorView = ScreenView + {}
 
-function EditorView:new()
+---@param game sphere.GameController
+function EditorView:new(game)
+	self.game = game
 	self.sequenceView = SequenceView()
 end
 

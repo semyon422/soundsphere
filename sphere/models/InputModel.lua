@@ -13,6 +13,11 @@ InputModel.devices = {
 	"midi"
 }
 
+---@param configModel sphere.ConfigModel
+function InputModel:new(configModel)
+	self.configModel = configModel
+end
+
 ---@param inputMode string
 ---@param event table
 ---@return string?

@@ -9,6 +9,15 @@ local ReplayModel = class()
 ReplayModel.path = "userdata/replays"
 ReplayModel.mode = "record"
 
+---@param selectModel sphere.SelectModel
+---@param rhythmModel sphere.RhythmModel
+---@param modifierModel sphere.ModifierModel
+function ReplayModel:new(selectModel, rhythmModel, modifierModel)
+	self.selectModel = selectModel
+	self.rhythmModel = rhythmModel
+	self.modifierModel = modifierModel
+end
+
 function ReplayModel:load()
 	if self.mode == "record" then
 		self.replay = Replay()

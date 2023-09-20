@@ -17,18 +17,19 @@ local EditorView = require("sphere.views.EditorView")
 local UserInterface = class()
 
 ---@param persistence sphere.Persistence
-function UserInterface:new(persistence)
+---@param game sphere.GameController
+function UserInterface:new(persistence, game)
 	self.backgroundModel = BackgroundModel()
 	self.notificationModel = NotificationModel()
 	self.previewModel = PreviewModel(persistence.configModel)
 	self.themeModel = ThemeModel()
 
-	self.gameView = GameView()
-	self.selectView = SelectView()
-	self.resultView = ResultView()
-	self.gameplayView = GameplayView()
-	self.multiplayerView = MultiplayerView()
-	self.editorView = EditorView()
+	self.gameView = GameView(game)
+	self.selectView = SelectView(game)
+	self.resultView = ResultView(game)
+	self.gameplayView = GameplayView(game)
+	self.multiplayerView = MultiplayerView(game)
+	self.editorView = EditorView(game)
 end
 
 function UserInterface:load()

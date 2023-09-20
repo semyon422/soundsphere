@@ -1,9 +1,4 @@
-
-
 return {
-
-	-- controllers
-
 	editorController = {
 		"selectModel",
 		"editorModel",
@@ -71,64 +66,4 @@ return {
 		"osudirectModel",
 		"windowModel",
 	},
-
-	-- models
-
-	configModel = {},
-	cacheModel = {},
-	difficultyModel = {},
-	editorModel = {
-		"configModel",
-		"resourceModel",
-	},
-	scoreModel = {"configModel"},
-	onlineModel = {"configModel"},
-	modifierModel = {},
-	noteSkinModel = {"configModel"},
-	inputModel = {"configModel"},
-	scoreLibraryModel = {
-		"configModel",
-		"onlineModel",
-		"scoreModel",
-	},
-	selectModel = {
-		"configModel",
-		"scoreLibraryModel",
-		"cacheModel",
-	},
-	rhythmModel = {
-		"inputModel",
-		"resourceModel",
-	},
-	osudirectModel = {
-		"configModel",
-		"cacheModel",
-	},
-	multiplayerModel = {
-		"rhythmModel",
-		"configModel",
-		"modifierModel",
-		"selectModel",
-		"onlineModel",
-		"osudirectModel",
-	},
-	replayModel = {
-		"selectModel",
-		"rhythmModel",
-		"modifierModel",
-	},
-	speedModel = {"configModel"},
-	resourceModel = {
-		"configModel",
-		"fileFinder",
-	},
-
-	-- views
-
-	gameView = {"game"},
-	selectView = {"game"},
-	resultView = {"game"},
-	gameplayView = {"game"},
-	multiplayerView = {"game"},
-	editorView = {"game"},
 }

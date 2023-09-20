@@ -13,7 +13,12 @@ local PauseManager = require("sphere.models.RhythmModel.PauseManager")
 ---@operator call: sphere.RhythmModel
 local RhythmModel = class()
 
-function RhythmModel:new()
+---@param inputModel sphere.InputModel
+---@param resourceModel sphere.ResourceModel
+function RhythmModel:new(inputModel, resourceModel)
+	self.inputModel = inputModel
+	self.resourceModel = resourceModel
+
 	self.inputManager = InputManager()
 	self.pauseManager = PauseManager()
 	self.timeEngine = TimeEngine()

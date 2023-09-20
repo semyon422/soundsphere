@@ -8,7 +8,9 @@ local utf8validate = require("utf8validate")
 ---@operator call: sphere.NoteSkinModel
 local NoteSkinModel = class()
 
-function NoteSkinModel:new()
+---@param configModel sphere.ConfigModel
+function NoteSkinModel:new(configModel)
+	self.configModel = configModel
 	self.items = {}
 end
 

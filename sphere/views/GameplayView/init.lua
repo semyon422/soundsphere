@@ -10,7 +10,9 @@ local just = require("just")
 ---@operator call: sphere.GameplayView
 local GameplayView = ScreenView + {}
 
-function GameplayView:new()
+---@param game sphere.GameController
+function GameplayView:new(game)
+	self.game = game
 	self.sequenceView = SequenceView()
 end
 

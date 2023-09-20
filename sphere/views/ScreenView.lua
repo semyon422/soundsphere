@@ -3,6 +3,11 @@ local class = require("class")
 ---@class sphere.ScreenView
 local ScreenView = class()
 
+---@param game sphere.GameController
+function ScreenView:new(game)
+	self.game = game
+end
+
 ---@param screenName string
 ---@param noTransition boolean?
 function ScreenView:changeScreen(screenName, noTransition)

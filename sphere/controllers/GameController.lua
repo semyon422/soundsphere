@@ -32,11 +32,9 @@ local GameController = class()
 local deps = require("sphere.deps")
 
 function GameController:new()
-	self.game = self
-
 	self.persistence = Persistence()
 	self.app = App(self.persistence)
-	self.ui = UserInterface(self.persistence)
+	self.ui = UserInterface(self.persistence, self)
 
 	self.selectController = SelectController()
 	self.gameplayController = GameplayController()
@@ -45,19 +43,47 @@ function GameController:new()
 	self.multiplayerController = MultiplayerController()
 	self.editorController = EditorController()
 
-	self.onlineModel = OnlineModel(self.app.configModel)
+	self.onlineModel = OnlineModel(self.persistence.configModel)
 	self.modifierModel = ModifierModel()
-	self.noteSkinModel = NoteSkinModel()
-	self.inputModel = InputModel()
+	self.noteSkinModel = NoteSkinModel(self.persistence.configModel)
+	self.inputModel = InputModel(self.persistence.configModel)
 	self.difficultyModel = DifficultyModel()
-	self.scoreLibraryModel = ScoreLibraryModel()
-	self.selectModel = SelectModel()
-	self.rhythmModel = RhythmModel()
-	self.multiplayerModel = MultiplayerModel()
-	self.replayModel = ReplayModel()
-	self.editorModel = EditorModel()
-	self.speedModel = SpeedModel()
-	self.resourceModel = ResourceModel()
+	self.scoreLibraryModel = ScoreLibraryModel(
+		self.persistence.configModel,
+		self.onlineModel,
+		self.persistence.scoreModel
+	)
+	self.selectModel = SelectModel(
+		self.persistence.configModel,
+		self.scoreLibraryModel,
+		self.persistence.cacheModel
+	)
+	self.resourceModel = ResourceModel(
+		self.persistence.configModel,
+		self.persistence.fileFinder
+	)
+	self.rhythmModel = RhythmModel(
+		self.inputModel,
+		self.resourceModel
+	)
+	self.multiplayerModel = MultiplayerModel(
+		self.rhythmModel,
+		self.persistence.configModel,
+		self.modifierModel,
+		self.selectModel,
+		self.onlineModel,
+		self.persistence.osudirectModel
+	)
+	self.replayModel = ReplayModel(
+		self.selectModel,
+		self.rhythmModel,
+		self.modifierModel
+	)
+	self.editorModel = EditorModel(
+		self.persistence.configModel,
+		self.resourceModel
+	)
+	self.speedModel = SpeedModel(self.persistence.configModel)
 
 	self.scoreModel = self.persistence.scoreModel
 	self.cacheModel = self.persistence.cacheModel

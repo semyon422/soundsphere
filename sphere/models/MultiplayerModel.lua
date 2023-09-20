@@ -10,7 +10,20 @@ remote.set_coder(require("string.buffer"))
 ---@operator call: sphere.MultiplayerModel
 local MultiplayerModel = class()
 
-function MultiplayerModel:new()
+---@param rhythmModel sphere.RhythmModel
+---@param configModel sphere.ConfigModel
+---@param modifierModel sphere.ModifierModel
+---@param selectModel sphere.SelectModel
+---@param onlineModel sphere.OnlineModel
+---@param osudirectModel sphere.OsudirectModel
+function MultiplayerModel:new(rhythmModel, configModel, modifierModel, selectModel, onlineModel, osudirectModel)
+	self.rhythmModel = rhythmModel
+	self.configModel = configModel
+	self.modifierModel = modifierModel
+	self.selectModel = selectModel
+	self.onlineModel = onlineModel
+	self.osudirectModel = osudirectModel
+
 	self.status = "disconnected"
 	self.rooms = {}
 	self.users = {}

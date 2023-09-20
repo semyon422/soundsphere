@@ -22,6 +22,11 @@ SpeedModel.format = {
 
 local osuFactor = 7 / 96
 
+---@param configModel sphere.ConfigModel
+function SpeedModel:new(configModel)
+	self.configModel = configModel
+end
+
 ---@return number
 function SpeedModel:get()
 	local gameplay = self.configModel.configs.settings.gameplay

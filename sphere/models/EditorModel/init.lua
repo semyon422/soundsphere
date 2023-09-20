@@ -21,7 +21,12 @@ local EditorModel = class()
 EditorModel.tools = {"Select", "ShortNote", "LongNote", "SoundNote"}
 EditorModel.states = {"info", "audio", "timings", "notes"}
 
-function EditorModel:new()
+---@param configModel sphere.ConfigModel
+---@param resourceModel sphere.ResourceModel
+function EditorModel:new(configModel, resourceModel)
+	self.configModel = configModel
+	self.resourceModel = resourceModel
+
 	self.noteChartLoader = NoteChartLoader()
 	self.mainAudio = MainAudio()
 	self.ncbtContext = NcbtContext()
