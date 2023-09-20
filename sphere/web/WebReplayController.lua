@@ -60,23 +60,18 @@ function WebReplayController:POST()
 
 	rhythmModel.judgements = {}
 	rhythmModel.settings = require("sphere.models.ConfigModel.settings")
-	rhythmModel.timings = rhythmModel.settings.gameplay.timings
 	rhythmModel.hp = rhythmModel.settings.gameplay.hp
 
 	selectModel.loadNoteChart = function() return noteChart end
 	selectModel.noteChartItem = noteChart.metaData
-
-	fastplayController.game = game
 
 	modifierModel:setConfig(replay.modifiers)
 	modifierModel:fixOldFormat(replay.modifiers)
 
 	rhythmModel.timings = replay.timings
 	replayModel.replay = replay
-	replayModel:setMode("replay")
-	rhythmModel.inputManager:setMode("internal")
 
-	fastplayController:play()
+	fastplayController:play(replay)
 
 	local score = rhythmModel.scoreEngine.scoreSystem:getSlice()
 

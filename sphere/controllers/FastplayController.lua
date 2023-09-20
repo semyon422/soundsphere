@@ -5,45 +5,47 @@ local InputMode = require("ncdk.InputMode")
 ---@operator call: sphere.FastplayController
 local FastplayController = class()
 
-function FastplayController:play()
-	self:load()
-
-	local rhythmModel = self.rhythmModel
-	local replayModel = self.replayModel
-	local timeEngine = rhythmModel.timeEngine
-
-	timeEngine:play()
-	timeEngine.currentTime = math.huge
-	replayModel:update()
-	rhythmModel.logicEngine:update()
-	rhythmModel.scoreEngine:update()
-
-	self:unload()
-end
-
-function FastplayController:load()
-	local selectModel = self.selectModel
-	local difficultyModel = self.difficultyModel
-	local rhythmModel = self.rhythmModel
+---@param noteChart ncdk.NoteChart
+---@param replay sphere.Replay
+---@return table
+function FastplayController:applyModifiers(noteChart, replay)
 	local modifierModel = self.modifierModel
-	local replayModel = self.replayModel
-
-	local noteChart = selectModel:loadNoteChart()
 
 	local state = {}
 	state.timeRate = 1
 	state.inputMode = InputMode()
 	state.inputMode:set(noteChart.inputMode)
 
+	-- if replay.modifiers then
+	-- 	modifierModel:setConfig(replay.modifiers)
+	-- 	modifierModel:fixOldFormat(replay.modifiers)
+	-- end
+
 	modifierModel:applyMeta(state)
 	modifierModel:apply(noteChart)
 
-	rhythmModel:setTimeRate(modifierModel.state.timeRate)
-	rhythmModel:setWindUp(modifierModel.state.windUp)
-	rhythmModel:setNoteChart(noteChart)
-	rhythmModel.noteChart = noteChart
+	return state
+end
 
-	replayModel.timings = rhythmModel.timings
+---@param replay sphere.Replay
+function FastplayController:play(replay)
+	local selectModel = self.selectModel
+	local difficultyModel = self.difficultyModel
+	local rhythmModel = self.rhythmModel
+	local replayModel = self.replayModel
+
+	local noteChart = selectModel:loadNoteChart()
+	local state = self:applyModifiers(noteChart, replay)
+
+	rhythmModel.timings = replay.timings
+	replayModel.replay = replay
+
+	rhythmModel:setTimeRate(state.timeRate)
+	rhythmModel:setWindUp(state.windUp)
+	rhythmModel:setNoteChart(noteChart)
+
+	replayModel:setMode("replay")
+	rhythmModel.inputManager:setMode("internal")
 	rhythmModel.inputManager.observable:add(replayModel)
 
 	rhythmModel:load()
@@ -59,11 +61,14 @@ function FastplayController:load()
 
 	rhythmModel.timeEngine:sync(0)
 	rhythmModel:loadLogicEngines()
-	self.replayModel:load()
-end
+	replayModel:load()
 
-function FastplayController:unload()
-	local rhythmModel = self.rhythmModel
+	rhythmModel.timeEngine:play()
+	rhythmModel.timeEngine.currentTime = math.huge
+	replayModel:update()
+	rhythmModel.logicEngine:update()
+	rhythmModel.scoreEngine:update()
+
 	rhythmModel:unloadAllEngines()
 end
 

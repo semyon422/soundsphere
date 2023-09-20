@@ -20,17 +20,10 @@ end
 
 local readAsync = thread.async(function(...) return love.filesystem.read(...) end)
 
----@param mode string
 ---@param scoreEntry table
----@return boolean?
-function ResultController:replayNoteChartAsync(mode, scoreEntry)
-	if not self.selectModel:notechartExists() then
-		return
-	end
-
+---@return string?
+function ResultController:getReplayDataAsync(scoreEntry)
 	local replayModel = self.replayModel
-	local rhythmModel = self.rhythmModel
-	local modifierModel = self.modifierModel
 	local webApi = self.onlineModel.webApi
 
 	local content
@@ -39,46 +32,66 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 	elseif scoreEntry.replayHash then
 		content = readAsync(replayModel.path .. "/" .. scoreEntry.replayHash)
 	end
+
+	return content
+end
+
+---@param mode string
+---@param scoreEntry table
+---@return boolean?
+function ResultController:replayNoteChartAsync(mode, scoreEntry)
+	if not scoreEntry or not self.selectModel:notechartExists() then
+		return
+	end
+
+	local content = self:getReplayDataAsync(scoreEntry)
 	if not content then
 		return
 	end
+
+	local replayModel = self.replayModel
 
 	local replay = replayModel:loadReplay(content)
 	if not replay then
 		return
 	end
 
+	local rhythmModel = self.rhythmModel
+	local modifierModel = self.modifierModel
+
 	if replay.modifiers then
 		modifierModel:setConfig(replay.modifiers)
 		modifierModel:fixOldFormat(replay.modifiers)
 	end
 
-	if mode == "replay" or mode == "result" then
-		rhythmModel.timings = replay.timings
-		rhythmModel.scoreEngine.scoreEntry = scoreEntry
-		self.replayModel.replay = replay
-		rhythmModel.inputManager:setMode("internal")
-		self.replayModel:setMode("replay")
-	elseif mode == "retry" then
+	if mode == "retry" then
 		rhythmModel.inputManager:setMode("external")
-		self.replayModel:setMode("record")
-	end
-
-	if mode ~= "result" then
+		replayModel:setMode("record")
 		return
 	end
 
-	self.fastplayController:play()
-
+	rhythmModel.timings = replay.timings
 	rhythmModel.scoreEngine.scoreEntry = scoreEntry
+	replayModel.replay = replay
+
+	rhythmModel.inputManager:setMode("internal")
+	replayModel:setMode("replay")
+
+	if mode == "replay" then
+		return
+	end
+
+	self.fastplayController:play(replay)
+
 	local config = self.configModel.configs.select
 	config.scoreEntryId = scoreEntry.id
+
+	rhythmModel.scoreEngine.scoreEntry = scoreEntry
+
 	rhythmModel.inputManager:setMode("external")
-	self.replayModel:setMode("record")
+	replayModel:setMode("record")
 
 	return true
 end
-
-ResultController.replayNoteChart = thread.coro(ResultController.replayNoteChartAsync)
 
 return ResultController
