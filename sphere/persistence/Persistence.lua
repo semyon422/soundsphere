@@ -16,7 +16,7 @@ function Persistence:new()
 	self.cacheModel = CacheModel()
 	self.configModel = ConfigModel()
 	self.scoreModel = ScoreModel()
-	self.osudirectModel = OsudirectModel()
+	self.osudirectModel = OsudirectModel(self.configModel, self.cacheModel)
 	self.fileFinder = FileFinder()
 end
 

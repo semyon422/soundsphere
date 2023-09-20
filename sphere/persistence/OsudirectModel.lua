@@ -27,6 +27,18 @@ for i, d in ipairs(OsudirectModel.rankedStatuses) do
 	OsudirectModel.rankedStatusesMap[d[2]] = d[1]
 end
 
+---@param configModel sphere.ConfigModel
+---@param cacheModel sphere.CacheModel
+function OsudirectModel:new(configModel, cacheModel)
+	self.configModel = configModel
+	self.cacheModel = cacheModel
+	self.statusBeatmap = {title = "LOADING", artist = ""}
+	self.items = {self.statusBeatmap}
+	self.processing = {}
+	self.page = 1
+	self.rankedStatus = "ranked"
+end
+
 function OsudirectModel:load()
 	self.statusBeatmap = {title = "LOADING", artist = ""}
 	self.items = {self.statusBeatmap}
