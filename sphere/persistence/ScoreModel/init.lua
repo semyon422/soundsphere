@@ -7,6 +7,11 @@ local ScoreDatabase = require("sphere.persistence.ScoreModel.ScoreDatabase")
 ---@operator call: sphere.ScoreModel
 local ScoreModel = class()
 
+---@param configModel sphere.ConfigModel
+function ScoreModel:new(configModel)
+	self.configModel = configModel
+end
+
 function ScoreModel:load()
 	ScoreDatabase:load()
 end
