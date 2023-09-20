@@ -36,6 +36,9 @@ function ProgressView:getNormTime()
 	return math.min(math.max(time, -1), 1)
 end
 
+---@param t number
+---@return number
+---@return number
 local function form(t)
 	if t < 0 then
 		return 1 + t, -t
@@ -43,6 +46,9 @@ local function form(t)
 	return 0, t
 end
 
+---@param t number
+---@return number
+---@return number
 local function invf(t)
 	local x, w = form(t)
 	return x ~= 0 and 0 or w, 1 - w
