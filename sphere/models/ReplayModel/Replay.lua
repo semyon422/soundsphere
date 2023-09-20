@@ -46,8 +46,8 @@ end
 function Replay:toString()
 	local content, size = self.replayNanoChart:encode(self.events, self.inputMode)
 	return json.encode({
-		hash = self.noteChartDataEntry.hash,
-		index = self.noteChartDataEntry.index,
+		hash = self.hash,
+		index = self.index,
 		inputMode = tostring(self.inputMode),
 		modifiers = self.modifierTable,
 		player = "Player",

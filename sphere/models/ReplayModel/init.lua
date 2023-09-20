@@ -9,11 +9,9 @@ local ReplayModel = class()
 ReplayModel.path = "userdata/replays"
 ReplayModel.mode = "record"
 
----@param selectModel sphere.SelectModel
 ---@param rhythmModel sphere.RhythmModel
 ---@param modifierModel sphere.ModifierModel
-function ReplayModel:new(selectModel, rhythmModel, modifierModel)
-	self.selectModel = selectModel
+function ReplayModel:new(rhythmModel, modifierModel)
 	self.rhythmModel = rhythmModel
 	self.modifierModel = modifierModel
 end
@@ -65,10 +63,13 @@ function ReplayModel:update()
 	end
 end
 
+---@param hash string
+---@param index number
 ---@return string
-function ReplayModel:saveReplay()
+function ReplayModel:saveReplay(hash, index)
 	local replay = self.replay
-	replay.noteChartDataEntry = self.selectModel.noteChartItem
+	replay.hash = hash
+	replay.index = index
 	replay.inputMode = self.rhythmModel.noteChart.inputMode
 	replay.modifierTable = self.modifierModel.config
 	replay.timings = self.timings

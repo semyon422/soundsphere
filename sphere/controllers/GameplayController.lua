@@ -230,7 +230,7 @@ function GameplayController:saveScore()
 
 	local chartItem = self.selectModel.noteChartItem
 
-	local replayHash = self.replayModel:saveReplay()
+	local replayHash = self.replayModel:saveReplay(chartItem.hash, chartItem.index)
 	local scoreEntry = self.scoreModel:insertScore(
 		scoreSystemEntry,
 		chartItem,

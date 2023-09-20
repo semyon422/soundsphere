@@ -39,31 +39,19 @@ function WebReplayController:POST()
 	local rhythmModel = RhythmModel()
 	local modifierModel = ModifierModel()
 	local difficultyModel = DifficultyModel()
-	local replayModel = ReplayModel()
-	local selectModel = {}
-
-	local game = {}
-	game.fastplayController = fastplayController
-	game.rhythmModel = rhythmModel
-	game.modifierModel = modifierModel
-	game.difficultyModel = difficultyModel
-	game.replayModel = replayModel
-	game.selectModel = selectModel
-
-	for n, list in pairs(deps) do
-		for _, m in ipairs(list) do
-			if game[n] then
-				game[n][m] = game[m]
-			end
-		end
-	end
+	local replayModel = ReplayModel(
+		nil,
+		rhythmModel,
+		modifierModel
+	)
+	fastplayController.rhythmModel = rhythmModel
+	fastplayController.replayModel = replayModel
+	fastplayController.modifierModel = modifierModel
+	fastplayController.difficultyModel = difficultyModel
 
 	rhythmModel.judgements = {}
 	rhythmModel.settings = require("sphere.models.ConfigModel.settings")
 	rhythmModel.hp = rhythmModel.settings.gameplay.hp
-
-	selectModel.loadNoteChart = function() return noteChart end
-	selectModel.noteChartItem = noteChart.metaData
 
 	modifierModel:setConfig(replay.modifiers)
 	modifierModel:fixOldFormat(replay.modifiers)
@@ -71,7 +59,7 @@ function WebReplayController:POST()
 	rhythmModel.timings = replay.timings
 	replayModel.replay = replay
 
-	fastplayController:play(replay)
+	fastplayController:play(noteChart, replay)
 
 	local score = rhythmModel.scoreEngine.scoreSystem:getSlice()
 

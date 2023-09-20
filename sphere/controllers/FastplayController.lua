@@ -27,14 +27,13 @@ function FastplayController:applyModifiers(noteChart, replay)
 	return state
 end
 
+---@param noteChart ncdk.NoteChart
 ---@param replay sphere.Replay
-function FastplayController:play(replay)
-	local selectModel = self.selectModel
+function FastplayController:play(noteChart, replay)
 	local difficultyModel = self.difficultyModel
 	local rhythmModel = self.rhythmModel
 	local replayModel = self.replayModel
 
-	local noteChart = selectModel:loadNoteChart()
 	local state = self:applyModifiers(noteChart, replay)
 
 	rhythmModel.timings = replay.timings
@@ -56,8 +55,6 @@ function FastplayController:play(replay)
 	scoreEngine.baseEnps = enps
 	scoreEngine.longNoteRatio = longNoteRatio
 	scoreEngine.longNoteArea = longNoteArea
-
-	scoreEngine.noteChartDataEntry = selectModel.noteChartItem
 
 	rhythmModel.timeEngine:sync(0)
 	rhythmModel:loadLogicEngines()

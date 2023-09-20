@@ -81,7 +81,8 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 		return
 	end
 
-	self.fastplayController:play(replay)
+	local noteChart = self.selectModel:loadNoteChart()
+	self.fastplayController:play(noteChart, replay)
 
 	local config = self.configModel.configs.select
 	config.scoreEntryId = scoreEntry.id

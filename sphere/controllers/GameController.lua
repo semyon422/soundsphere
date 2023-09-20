@@ -75,7 +75,6 @@ function GameController:new()
 		self.persistence.osudirectModel
 	)
 	self.replayModel = ReplayModel(
-		self.selectModel,
 		self.rhythmModel,
 		self.modifierModel
 	)

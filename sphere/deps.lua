@@ -14,7 +14,6 @@ return {
 		"rhythmModel",
 		"replayModel",
 		"modifierModel",
-		"selectModel",
 		"difficultyModel",
 	},
 	gameplayController = {
