@@ -9,6 +9,7 @@ local GraphicEngine = class()
 GraphicEngine.visualOffset = 0
 GraphicEngine.longNoteShortening = 0
 GraphicEngine.scaleSpeed = false
+GraphicEngine.constant = false
 
 function GraphicEngine:load()
 	self.noteCount = 0

@@ -30,6 +30,15 @@ function SpeedMode:getSubString(config)
 	return "MOD"
 end
 
+---@param config table
+---@param state table
+function SpeedMode:applyMeta(config, state)
+	local mode = config.value
+	if mode == "constant" then
+		state.constant = true
+	end
+end
+
 ---@param tempo number
 function SpeedMode:applyTempo(tempo)
 	local noteChart = self.noteChart
@@ -41,30 +50,11 @@ function SpeedMode:applyTempo(tempo)
 	noteChart:compute()
 end
 
-function SpeedMode:applyConstant()
-	local noteChart = self.noteChart
-
-	for _, layerData in noteChart:getLayerDataIterator() do
-		layerData:setPrimaryTempo(0)
-		for velocityDataIndex = 1, layerData:getVelocityDataCount() do
-			local velocityData = layerData:getVelocityData(velocityDataIndex)
-
-			velocityData.currentSpeed = 1
-			velocityData.localSpeed = 1
-			velocityData.globalSpeed = 1
-		end
-	end
-
-	noteChart:compute()
-end
-
 ---@param config table
 function SpeedMode:apply(config)
 	local mode = config.value
-	if mode == "x" then
+	if mode == "x" or mode == "constant" then
 		return
-	elseif mode == "constant" then
-		self:applyConstant()
 	end
 
 	local noteChart = self.noteChart

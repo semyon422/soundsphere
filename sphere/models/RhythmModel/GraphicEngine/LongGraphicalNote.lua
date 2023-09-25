@@ -29,8 +29,8 @@ function LongGraphicalNote:update()
 
 	local startTimePoint = self.startNoteData.timePoint
 	local endTimePoint = self.endNoteData.timePoint
-	local startVisualTime = startTimePoint:getVisualTime(self.currentTimePoint)
-	local endVisualTime = endTimePoint:getVisualTime(self.currentTimePoint)
+	local startVisualTime = self:getVisualTime(startTimePoint)
+	local endVisualTime = self:getVisualTime(endTimePoint)
 
 	self.startTimeState = self.startTimeState or {}
 	local startTimeState = self.startTimeState
@@ -73,6 +73,13 @@ function LongGraphicalNote:update()
 	startTimeState.endTimeState = endTimeState
 end
 
+---@param time number
+function LongGraphicalNote:clampAbsoluteTime(time)
+	time = math.max(time, self.startNoteData.timePoint.absoluteTime)
+	time = math.min(time, self.endNoteData.timePoint.absoluteTime)
+	return time
+end
+
 ---@return number
 function LongGraphicalNote:getFakeVisualStartTime()
 	local currentTimePoint = self.currentTimePoint
@@ -80,22 +87,26 @@ function LongGraphicalNote:getFakeVisualStartTime()
 
 	local logicalState = self:getLogicalState()
 	if logicalState == "endPassed" then
-		return self.endNoteData.timePoint:getVisualTime(currentTimePoint)
+		return self:getVisualTime(self.endNoteData.timePoint)
 	end
 	if logicalState ~= "startPassedPressed" then
-		return fakeTimePoint:getVisualTime(currentTimePoint)
+		return self:getVisualTime(fakeTimePoint)
 	end
 
 	local offsetSum = self.graphicEngine:getVisualOffset() - self.graphicEngine:getInputOffset()
-
 	local globalSpeed = currentTimePoint.velocityData and currentTimePoint.velocityData.globalSpeed or 1
+
+	if self.graphicEngine.constant then
+		local fakeStartTime = currentTimePoint.absoluteTime - offsetSum / globalSpeed
+		fakeTimePoint.absoluteTime = self:clampAbsoluteTime(fakeStartTime)
+		fakeTimePoint.index = self.layerData:interpolateTimePointAbsolute(fakeTimePoint.index, fakeTimePoint)
+		return fakeTimePoint.absoluteTime
+	end
+
 	fakeTimePoint.visualTime = currentTimePoint.visualTime - offsetSum / globalSpeed
 	fakeTimePoint.index = self.layerData:interpolateTimePointVisual(fakeTimePoint.index, fakeTimePoint)
 
-	local fakeStartTime = fakeTimePoint.absoluteTime
-	fakeStartTime = math.max(fakeStartTime, self.startNoteData.timePoint.absoluteTime)
-	fakeStartTime = math.min(fakeStartTime, self.endNoteData.timePoint.absoluteTime)
-	fakeTimePoint.absoluteTime = fakeStartTime
+	fakeTimePoint.absoluteTime = self:clampAbsoluteTime(fakeTimePoint.absoluteTime)
 	fakeTimePoint.index = self.layerData:interpolateTimePointAbsolute(fakeTimePoint.index, fakeTimePoint)
 
 	return fakeTimePoint:getVisualTime(self.currentTimePoint)

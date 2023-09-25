@@ -34,8 +34,9 @@ function GameplayController:load()
 	local config = configModel.configs.settings
 
 	rhythmModel:setAdjustRate(config.audio.adjustRate)
-	rhythmModel:setTimeRate(modifierModel.state.timeRate)
-	rhythmModel:setWindUp(modifierModel.state.windUp)
+	rhythmModel:setTimeRate(state.timeRate)
+	rhythmModel:setWindUp(state.windUp)
+	rhythmModel:setConstantSpeed(state.constant)
 	rhythmModel:setVolume(config.audio.volume)
 	rhythmModel:setAudioMode(config.audio.mode)
 	rhythmModel:setLongNoteShortening(config.gameplay.longNoteShortening)

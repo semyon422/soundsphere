@@ -6,7 +6,7 @@ local ShortGraphicalNote = GraphicalNote + {}
 
 function ShortGraphicalNote:update()
 	local timePoint = self.startNoteData.timePoint
-	local visualTime = timePoint:getVisualTime(self.currentTimePoint)
+	local visualTime = self:getVisualTime(timePoint)
 
 	self.startTimeState = self.startTimeState or {}
 	local startTimeState = self.startTimeState

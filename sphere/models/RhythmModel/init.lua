@@ -141,6 +141,11 @@ function RhythmModel:setPromode(promode)
 	self.logicEngine.promode = promode
 end
 
+---@param promode boolean
+function RhythmModel:setConstantSpeed(constant)
+	self.graphicEngine.constant = constant
+end
+
 ---@param adjustRate number
 function RhythmModel:setAdjustRate(adjustRate)
 	self.timeEngine.adjustRate = adjustRate

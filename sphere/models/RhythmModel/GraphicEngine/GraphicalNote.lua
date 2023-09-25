@@ -25,6 +25,15 @@ function GraphicalNote:getPressedTime()
 	return logicalNote and logicalNote.pressedTime
 end
 
+---@param timePoint ncdk.TimePoint
+---@return number
+function GraphicalNote:getVisualTime(timePoint)
+	if self.graphicEngine.constant then
+		return timePoint.absoluteTime
+	end
+	return timePoint:getVisualTime(self.currentTimePoint)
+end
+
 ---@param time number
 ---@return number
 function GraphicalNote:where(time)
