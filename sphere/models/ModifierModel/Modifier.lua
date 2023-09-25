@@ -118,18 +118,6 @@ function Modifier:applyMeta(modifierConfig, state) end
 ---@param modifierConfig table
 function Modifier:apply(modifierConfig) end
 
-function Modifier:update() end
-
----@param event table
-function Modifier:receive(event) end
-
-function Modifier:checkValue(value)
-	-- local range = self.range
-	-- if value >= range[1] and value <= range[2] and value % 1 == 0 then
-	-- 	return true
-	-- end
-end
-
 ---@param config table
 ---@return string?
 function Modifier:getString(config)

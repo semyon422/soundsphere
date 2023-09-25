@@ -21,8 +21,6 @@ function ScoreEngine:load()
 
 	self.enps = self.baseEnps * self.baseTimeRate
 
-	self.ratingDifficulty = self.enps * (1 + (self.longNoteRatio * (1 + self.longNoteArea)) * 0.25)
-
 	self.pausesCount = 0
 	self.paused = false
 

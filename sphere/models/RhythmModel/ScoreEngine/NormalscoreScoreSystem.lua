@@ -22,8 +22,6 @@ function NormalscoreScoreSystem:after(event)
 	self.accuracy = score_not_adjusted
 	self.accuracyAdjusted = ns.score
 	self.adjustRatio = ns.score / score_not_adjusted
-
-	self.enps = self.scoreEngine.baseEnps * event.timeRate
 end
 
 ---@param range_name string
