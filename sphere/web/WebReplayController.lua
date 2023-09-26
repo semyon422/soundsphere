@@ -65,6 +65,7 @@ function WebReplayController:POST()
 	return {json = {
 		score = score,
 		inputMode = tostring(noteChart.inputMode),
+		difficulty = rhythmModel.scoreEngine.enps,
 		modifiers = replay.modifiers,
 		modifiersEncoded = modifierModel:encode(replay.modifiers),
 		modifiersString = modifierModel:getString(replay.modifiers),
