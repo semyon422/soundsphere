@@ -50,7 +50,7 @@ function WebReplayController:POST()
 	fastplayController.difficultyModel = difficultyModel
 
 	rhythmModel.judgements = {}
-	rhythmModel.settings = require("sphere.models.ConfigModel.settings")
+	rhythmModel.settings = require("sphere.persistence.ConfigModel.settings")
 	rhythmModel.hp = rhythmModel.settings.gameplay.hp
 
 	modifierModel:setConfig(replay.modifiers)
