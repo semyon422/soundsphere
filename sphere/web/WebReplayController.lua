@@ -40,7 +40,6 @@ function WebReplayController:POST()
 	local modifierModel = ModifierModel()
 	local difficultyModel = DifficultyModel()
 	local replayModel = ReplayModel(
-		nil,
 		rhythmModel,
 		modifierModel
 	)
