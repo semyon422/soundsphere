@@ -1,6 +1,7 @@
 local class = require("class")
 local math_util = require("math_util")
 local InputMode = require("ncdk.InputMode")
+local TempoRange = require("notechart.TempoRange")
 
 ---@class sphere.GameplayController
 ---@operator call: sphere.GameplayController
@@ -18,7 +19,11 @@ function GameplayController:load()
 	local replayModel = self.replayModel
 	local fileFinder = self.fileFinder
 
+	local config = configModel.configs.settings
+
 	local noteChart = selectModel:loadNoteChart(self:getImporterSettings())
+
+	self:applyTempo(noteChart, config.gameplay.tempoFactor, config.gameplay.primaryTempo)
 
 	local state = {}
 	state.timeRate = 1
@@ -30,8 +35,6 @@ function GameplayController:load()
 
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
 	noteSkin:loadData()
-
-	local config = configModel.configs.settings
 
 	rhythmModel:setAdjustRate(config.audio.adjustRate)
 	rhythmModel:setTimeRate(state.timeRate)
@@ -94,6 +97,35 @@ function GameplayController:load()
 	self.multiplayerModel:setIsPlaying(true)
 
 	self.previewModel:stop()
+end
+
+---@param tempo number
+local function applyTempo(noteChart, tempo)
+	for _, layerData in noteChart:getLayerDataIterator() do
+		layerData:setPrimaryTempo(tempo)
+	end
+	noteChart:compute()
+end
+
+---@param tempoFactor string
+function GameplayController:applyTempo(noteChart, tempoFactor, primaryTempo)
+	if tempoFactor == "primary" then
+		applyTempo(noteChart, primaryTempo)
+		return
+	end
+
+	if tempoFactor == "average" and noteChart.metaData.avgTempo then
+		applyTempo(noteChart, noteChart.metaData.avgTempo)
+		return
+	end
+
+	local minTime = noteChart.metaData.minTime
+	local maxTime = noteChart.metaData.maxTime
+
+	local t = {}
+	t.average, t.minimum, t.maximum = TempoRange:find(noteChart, minTime, maxTime)
+
+	applyTempo(noteChart, t[tempoFactor])
 end
 
 ---@return table

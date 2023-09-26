@@ -103,6 +103,12 @@ function drawSection:gameplay()
 	g.offset.visual = intButtonsMs("visual offset", g.offset.visual, "visual offset")
 	g.offsetScale.input = imgui.checkbox("offsetScale.input", g.offsetScale.input, "input offset * time rate")
 	g.offsetScale.visual = imgui.checkbox("offsetScale.visual", g.offsetScale.visual, "visual offset * time rate")
+
+	g.tempoFactor = imgui.combo("tempoFactor", g.tempoFactor, {"average", "primary", "minimum", "maximum"}, nil, "tempo factor")
+	if g.tempoFactor == "primary" then
+		g.primaryTempo = imgui.slider1("primaryTempo", g.primaryTempo, "%d bpm", 60, 240, 1, "primary tempo")
+	end
+
 	g.lastMeanValues = imgui.intButtons("lastMeanValues", g.lastMeanValues, 1, "last mean values")
 	g.ratingHitTimingWindow = intButtonsMs("ratingHitTimingWindow", g.ratingHitTimingWindow, "rating hit timing window")
 

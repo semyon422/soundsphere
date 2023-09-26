@@ -2,7 +2,7 @@ local class = require("class")
 local InputMode = require("ncdk.InputMode")
 
 local AutoKeySound = require("sphere.models.ModifierModel.AutoKeySound")
-local SpeedMode = require("sphere.models.ModifierModel.SpeedMode")
+local ConstSpeed = require("sphere.models.ModifierModel.ConstSpeed")
 local TimeRateQ = require("sphere.models.ModifierModel.TimeRateQ")
 local TimeRateX = require("sphere.models.ModifierModel.TimeRateX")
 local WindUp = require("sphere.models.ModifierModel.WindUp")
@@ -28,7 +28,7 @@ local ModifierModel = class()
 
 local Modifiers = {
 	AutoKeySound,
-	SpeedMode,
+	ConstSpeed,
 	TimeRateQ,
 	TimeRateX,
 	WindUp,
@@ -53,7 +53,7 @@ local ModifierId = {
 	-- [AutoPlay] = 0,
 	-- [ProMode] = 1,
 	[AutoKeySound] = 2,
-	[SpeedMode] = 3,
+	[ConstSpeed] = 3,
 	[TimeRateQ] = 4,
 	[TimeRateX] = 5,
 	[WindUp] = 6,
@@ -79,7 +79,7 @@ local ModifierId = {
 
 local OneUseModifiers = {
 	AutoKeySound,
-	SpeedMode,
+	ConstSpeed,
 	TimeRateQ,
 	TimeRateX,
 	WindUp,

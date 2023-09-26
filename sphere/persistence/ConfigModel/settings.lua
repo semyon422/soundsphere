@@ -59,6 +59,8 @@ return {
 		scaleSpeed = false,
 		speedType = "default",
 		speed = 1,
+		tempoFactor = "average",  -- "average", "primary", "minimum", "maximum"
+		primaryTempo = 120,
 		time = {
 			pausePlay = 0.5,
 			pauseRetry = 0.5,
