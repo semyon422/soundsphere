@@ -57,6 +57,23 @@ function TimeEngine:sync(time)
 	self.currentVisualTime = self.nearestTime:getVisualTime(self.currentTime)
 end
 
+function TimeEngine:stepTimePoint(is_left)
+	local nt = self.nearestTime
+	local time
+	if is_left then
+		time = nt:getPrevTime(self.currentTime)
+	else
+		time = nt:getNextTime(self.currentTime)
+	end
+	if time then
+		self:setPosition(time)
+	end
+end
+
+function TimeEngine:stepTime(dt)
+	self:setPosition(math_util.round(self.currentTime + dt, math.abs(dt)))
+end
+
 function TimeEngine:skipIntro()
 	local skipTime = self.minTime - self.timeToPrepare * self.timeRate
 	if self.currentTime < skipTime and self.timer.isPlaying then
