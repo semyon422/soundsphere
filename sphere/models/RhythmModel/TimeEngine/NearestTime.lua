@@ -19,9 +19,7 @@ function NearestTime:loadTimePoints(noteChart)
 		local timePointList = layerData.timePointList
 		for timePointIndex = 1, #timePointList do
 			local t = timePointList[timePointIndex].absoluteTime
-			if t == t then
-				absoluteTimes[t] = true
-			end
+			absoluteTimes[t] = true
 		end
 	end
 
