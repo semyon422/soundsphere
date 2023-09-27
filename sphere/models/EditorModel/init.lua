@@ -13,6 +13,7 @@ local EditorChanges = require("sphere.models.EditorModel.EditorChanges")
 local NoteManager = require("sphere.models.EditorModel.NoteManager")
 local Scroller = require("sphere.models.EditorModel.Scroller")
 local Metronome = require("sphere.models.EditorModel.Metronome")
+local pattern_analyzer = require("libchart.pattern_analyzer")
 
 ---@class sphere.EditorModel
 ---@operator call: sphere.EditorModel
@@ -54,6 +55,8 @@ function EditorModel:load()
 
 	self.layerData = self.noteChartLoader:load()
 	local ld = self.layerData
+
+	self.patterns_analyzed = pattern_analyzer.analyze(self.noteChart:getLayerData(1))
 
 	self.changes = Changes()
 	ld:syncChanges(self.changes:get())
