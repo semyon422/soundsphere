@@ -20,7 +20,6 @@ function EditorController:load()
 
 	editorModel.noteSkin = noteSkin
 	editorModel.noteChart = noteChart
-	editorModel.audioPath = chartItem.path:match("^(.+)/.-$") .. "/" .. noteChart.metaData.audioPath
 	editorModel:load()
 
 	self.previewModel:stop()
