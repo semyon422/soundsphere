@@ -1,7 +1,7 @@
 local class = require("class")
 local thread = require("thread")
 local InputMode = require("ncdk.InputMode")
-local SPH = require("sph.SPH")
+local Sph = require("sph.Sph")
 local NoteChartExporter = require("osu.NoteChartExporter")
 
 ---@class sphere.SelectController
@@ -166,7 +166,7 @@ function SelectController:filedropped(file)
 
 	love.filesystem.createDirectory(chartSetPath)
 	assert(love.filesystem.write(chartSetPath .. "/" .. audioName .. "." .. ext, file:read()))
-	assert(love.filesystem.write(chartSetPath .. "/" .. audioName .. ".sph", SPH:getDefault({
+	assert(love.filesystem.write(chartSetPath .. "/" .. audioName .. ".sph", Sph:getDefault({
 		audio = audioName .. "." .. ext
 	})))
 
