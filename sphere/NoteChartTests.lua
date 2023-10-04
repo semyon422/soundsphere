@@ -5,13 +5,11 @@ local NoteChartFactory = require("notechart.NoteChartFactory")
 ---@param index number?
 ---@return ncdk.NoteChart
 local function loadNoteChart(path, index)
-	local noteCharts = assert(NoteChartFactory:getNoteCharts(
+	return assert(NoteChartFactory:getNoteChart(
 		path,
 		love.filesystem.read(path),
 		index or 1
 	))
-
-	return noteCharts[1]
 end
 
 ---@param noteChart ncdk.NoteChart

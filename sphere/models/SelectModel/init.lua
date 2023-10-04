@@ -161,14 +161,12 @@ function SelectModel:loadNoteChart(settings)
 		return
 	end
 
-	local noteCharts = assert(NoteChartFactory:getNoteCharts(
+	return assert(NoteChartFactory:getNoteChart(
 		chart.path,
 		content,
 		chart.index,
 		settings
 	))
-
-	return noteCharts[1]
 end
 
 ---@return boolean

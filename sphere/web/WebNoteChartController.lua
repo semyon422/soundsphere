@@ -4,20 +4,39 @@ local NoteChartFactory = require("notechart.NoteChartFactory")
 
 local WebNoteChartController = {}
 
-function WebNoteChartController.getNoteCharts(notechart)
-	local file = io.open(notechart.path, "r")
+local function read_file(path)
+	local file, err = io.open(path, "r")
 	if not file then
-		return
+		return nil, err
 	end
 	local content = file:read("*a")
 	file:close()
+	return content
+end
 
-	local noteCharts, err = NoteChartFactory:getNoteCharts(
+function WebNoteChartController.getNoteCharts(notechart)
+	local content, err = read_file(notechart.path)
+	if not content then
+		return nil, err
+	end
+
+	return NoteChartFactory:getNoteCharts(
+		notechart.path .. "." .. notechart.extension,
+		content
+	)
+end
+
+function WebNoteChartController.getNoteChart(notechart)
+	local content, err = read_file(notechart.path)
+	if not content then
+		return nil, err
+	end
+
+	return NoteChartFactory:getNoteChart(
 		notechart.path .. "." .. notechart.extension,
 		content,
 		notechart.index
 	)
-	return noteCharts, err
 end
 
 function WebNoteChartController:POST()

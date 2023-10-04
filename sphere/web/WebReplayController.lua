@@ -7,8 +7,6 @@ local ModifierModel = require("sphere.models.ModifierModel")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local RhythmModel = require("sphere.models.RhythmModel")
 
-local deps = require("sphere.deps")
-
 local WebReplayController = {}
 
 WebReplayController.getReplay = function(replay)
@@ -25,12 +23,10 @@ end
 function WebReplayController:POST()
 	local params = self.params
 
-	local noteCharts, err = WebNoteChartController.getNoteCharts(params.notechart)
-	if not noteCharts then
+	local noteChart, err = WebNoteChartController.getNoteChart(params.notechart)
+	if not noteChart then
 		return {status = 500, json = {error = err}}
 	end
-
-	local noteChart = noteCharts[1]
 
 	local replay = WebReplayController.getReplay(params.replay)
 

@@ -306,11 +306,12 @@ function CacheManager:processNoteChartDataEntries(noteChartSetEntry, force)
 			print(path)
 			local noteCharts, err = NoteChartFactory:getNoteCharts(path, content)
 			if noteCharts then
-				for _, noteChart in ipairs(noteCharts) do
+				for index, noteChart in ipairs(noteCharts) do
 					local entry = noteChart.metaData
-					local difficulty, longNoteRatio, longNoteArea = DifficultyModel:getDifficulty(noteChart)
+					local difficulty, longNoteRatio = DifficultyModel:getDifficulty(noteChart)
 					entry.difficulty = difficulty
 					entry.longNoteRatio = longNoteRatio
+					entry.index = index
 					entry.hash = hash
 					self:setNoteChartDataEntry(entry)
 					self:setNoteChartEntry(noteChartEntry)
