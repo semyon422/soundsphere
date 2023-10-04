@@ -1,7 +1,7 @@
 local ChartRepo = require("sphere.persistence.CacheModel.ChartRepo")
 local NoteChartFinder = require("sphere.persistence.CacheModel.NoteChartFinder")
 local DifficultyModel = require("sphere.models.DifficultyModel")
-local NoteChartDataEntryFactory = require("notechart.NoteChartDataEntryFactory")
+local NoteChartFactory = require("notechart.NoteChartFactory")
 local Log = require("Log")
 local class = require("class")
 local md5 = require("md5")
@@ -303,16 +303,20 @@ function CacheManager:processNoteChartDataEntries(noteChartSetEntry, force)
 		if not force and self.chartRepo:selectNoteCharDataEntry(hash, 1) then
 			self:setNoteChartEntry(noteChartEntry)
 		else
-			local entries, noteCharts = NoteChartDataEntryFactory:getEntries(path, content, hash, noteChartEntry)
-			if entries then
-				for i, entry in ipairs(entries) do
-					local noteChart = noteCharts[i]
+			print(path)
+			local noteCharts, err = NoteChartFactory:getNoteCharts(path, content)
+			if noteCharts then
+				for _, noteChart in ipairs(noteCharts) do
+					local entry = noteChart.metaData
 					local difficulty, longNoteRatio, longNoteArea = DifficultyModel:getDifficulty(noteChart)
 					entry.difficulty = difficulty
 					entry.longNoteRatio = longNoteRatio
+					entry.hash = hash
 					self:setNoteChartDataEntry(entry)
-					self:setNoteChartEntry(entry.noteChartEntry)
+					self:setNoteChartEntry(noteChartEntry)
 				end
+			else
+				print(err)
 			end
 		end
 	end
