@@ -49,7 +49,7 @@ function ModifierListView:drawItem(i, w, h)
 	local modifier = self.game.modifierModel:getModifier(item)
 	if not modifier then
 		TextCellImView(w2 - 44, 72, "left", "", "Deleted modifier")
-	elseif modifier.interfaceType == "toggle" then
+	elseif type(modifier.defaultValue) == "boolean" then
 		just.indent((w2 - h) / 2)
 		w2 = 72
 		local over = SwitchView:isOver(w2, h)
@@ -66,7 +66,7 @@ function ModifierListView:drawItem(i, w, h)
 			self.game.modifierModel:setModifierValue(item, value)
 		end
 		SwitchView:draw(w2, h, value)
-	elseif modifier.interfaceType == "slider" then
+	elseif type(modifier.defaultValue) == "number" then
 		just.indent(-w2)
 		TextCellImView(w2, 72, "right", "", item.value)
 
@@ -83,7 +83,7 @@ function ModifierListView:drawItem(i, w, h)
 			self.game.modifierModel:increaseModifierValue(item, delta)
 		end
 		SliderView:draw(w2, h, value)
-	elseif modifier.interfaceType == "stepper" then
+	elseif type(modifier.defaultValue) == "string" then
 		TextCellImView(w2, 72, "center", "", item.value)
 		just.indent(-w2)
 

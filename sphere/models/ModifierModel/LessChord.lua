@@ -4,8 +4,6 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 ---@operator call: sphere.LessChord
 local LessChord = Modifier + {}
 
-LessChord.interfaceType = "stepper"
-
 LessChord.name = "LessChord"
 
 LessChord.defaultValue = "none"

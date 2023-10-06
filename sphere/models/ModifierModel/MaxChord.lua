@@ -5,8 +5,6 @@ local NoteData = require("ncdk.NoteData")
 ---@operator call: sphere.MaxChord
 local MaxChord = Modifier + {}
 
-MaxChord.interfaceType = "slider"
-
 MaxChord.name = "MaxChord"
 
 MaxChord.defaultValue = 1

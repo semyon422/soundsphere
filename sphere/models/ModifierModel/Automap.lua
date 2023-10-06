@@ -11,8 +11,6 @@ local AutomapOldConfig = require("sphere.models.ModifierModel.AutomapOldConfig")
 ---@operator call: sphere.Automap
 local Automap = Modifier + {}
 
-Automap.interfaceType = "slider"
-
 Automap.name = "Automap"
 
 Automap.defaultValue = 10

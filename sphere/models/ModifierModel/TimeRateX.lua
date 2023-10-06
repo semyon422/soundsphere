@@ -4,8 +4,6 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 ---@operator call: sphere.TimeRateX
 local TimeRateX = Modifier + {}
 
-TimeRateX.interfaceType = "slider"
-
 TimeRateX.name = "TimeRateX"
 
 TimeRateX.defaultValue = 1

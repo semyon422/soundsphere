@@ -4,8 +4,6 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 ---@operator call: sphere.ConstSpeed
 local ConstSpeed = Modifier + {}
 
-ConstSpeed.interfaceType = "toggle"
-
 ConstSpeed.name = "ConstSpeed"
 ConstSpeed.defaultValue = true
 ConstSpeed.values = {false, true}

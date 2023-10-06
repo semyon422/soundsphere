@@ -5,8 +5,6 @@ local NoteData = require("ncdk.NoteData")
 ---@operator call: sphere.AutoKeySound
 local AutoKeySound = Modifier + {}
 
-AutoKeySound.interfaceType = "toggle"
-
 AutoKeySound.defaultValue = true
 AutoKeySound.name = "AutoKeySound"
 AutoKeySound.shortName = "AKS"

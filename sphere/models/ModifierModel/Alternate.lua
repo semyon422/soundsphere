@@ -4,8 +4,6 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 ---@operator call: sphere.Alternate
 local Alternate = Modifier + {}
 
-Alternate.interfaceType = "stepper"
-
 Alternate.name = "Alternate"
 
 Alternate.defaultValue = "key"

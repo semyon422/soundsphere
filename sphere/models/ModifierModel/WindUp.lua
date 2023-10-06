@@ -4,8 +4,6 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 ---@operator call: sphere.WindUp
 local WindUp = Modifier + {}
 
-WindUp.interfaceType = "toggle"
-
 WindUp.defaultValue = true
 WindUp.name = "WindUp"
 WindUp.shortName = "WU"
