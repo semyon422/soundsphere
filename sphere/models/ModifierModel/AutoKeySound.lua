@@ -15,6 +15,7 @@ AutoKeySound.description = "Key sounds will not depend on the input"
 
 ---@param config table
 ---@return string?
+---@return string?
 function AutoKeySound:getString(config)
 	if not config.value then
 		return

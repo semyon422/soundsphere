@@ -16,14 +16,9 @@ MultiOverPlay.description = "1 2 1 2 -> 12 34 12 34, doubles the input mode"
 
 ---@param config table
 ---@return string
-function MultiOverPlay:getString(config)
-	return tostring(config.value)
-end
-
----@param config table
 ---@return string
-function MultiOverPlay:getSubString(config)
-	return "OP"
+function MultiOverPlay:getString(config)
+	return tostring(config.value), "OP"
 end
 
 ---@param config table

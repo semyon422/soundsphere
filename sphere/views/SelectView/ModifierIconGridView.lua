@@ -38,7 +38,7 @@ function ModifierIconGridView:draw(configModifier, w, h, size, noModifier, growU
 		if modifierConfig then
 			local modifier = modifierModel:getModifier(modifierConfig)
 			if modifier then
-				local modifierString = modifier:getString(modifierConfig)
+				local modifierString, modifierSubString = modifier:getString(modifierConfig)
 				if modifierString then
 					local y = size * (row - 1)
 					if growUp then
@@ -51,7 +51,7 @@ function ModifierIconGridView:draw(configModifier, w, h, size, noModifier, growU
 						love.graphics.pop()
 						break
 					end
-					ModifierIconView:draw(size, nil, modifierString, modifier:getSubString(modifierConfig))
+					ModifierIconView:draw(size, nil, modifierString, modifierSubString)
 					love.graphics.pop()
 					drawIndex = drawIndex + 1
 				end

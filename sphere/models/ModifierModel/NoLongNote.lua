@@ -14,6 +14,7 @@ NoLongNote.description = "Remove long notes"
 
 ---@param config table
 ---@return string?
+---@return string?
 function NoLongNote:getString(config)
 	if not config.value then
 		return

@@ -16,14 +16,9 @@ FullLongNote.description = "Replace short notes with long notes"
 
 ---@param config table
 ---@return string
-function FullLongNote:getString(config)
-	return "FLN"
-end
-
----@param config table
 ---@return string
-function FullLongNote:getSubString(config)
-	return tostring(config.value)
+function FullLongNote:getString(config)
+	return "FLN", tostring(config.value)
 end
 
 ---@param config table

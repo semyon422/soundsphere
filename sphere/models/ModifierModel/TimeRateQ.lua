@@ -16,19 +16,12 @@ TimeRateQ.description = "Rate = 2^(x/10), Quaver issue 666"
 
 ---@param config table
 ---@return string?
+---@return string?
 function TimeRateQ:getString(config)
     if config.value == -10 then
-		return config.value
+		return config.value, "Q"
 	elseif config.value ~= 0 then
 		return config.value .. "Q"
-    end
-end
-
----@param config table
----@return string?
-function TimeRateQ:getSubString(config)
-    if config.value == -10 then
-		return "Q"
     end
 end
 

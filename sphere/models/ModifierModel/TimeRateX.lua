@@ -17,19 +17,11 @@ TimeRateX.description = "Change the time rate"
 
 ---@param config table
 ---@return string?
+---@return string?
 function TimeRateX:getString(config)
 	local value = config.value
     if value ~= 1 then
-		return math.floor(value) .. "."
-	end
-end
-
----@param config table
----@return string?
-function TimeRateX:getSubString(config)
-	local value = config.value
-    if value ~= 1 then
-		return tostring(value - math.floor(value)):sub(3) .. "X"
+		return math.floor(value) .. ".", tostring(value - math.floor(value)):sub(3) .. "X"
 	end
 end
 

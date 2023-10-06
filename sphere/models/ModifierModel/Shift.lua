@@ -15,18 +15,13 @@ Shift.description = "Shift the note chart"
 
 ---@param config table
 ---@return string?
+---@return string?
 function Shift:getString(config)
     if config.value > 0 then
-        return "S+"
+        return "S+", math.abs(config.value)
     elseif config.value < 0 then
-        return "S-"
+        return "S-", math.abs(config.value)
     end
-end
-
----@param config table
----@return number
-function Shift:getSubString(config)
-    return math.abs(config.value)
 end
 
 ---@param config table

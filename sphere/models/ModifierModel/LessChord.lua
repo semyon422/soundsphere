@@ -12,7 +12,8 @@ LessChord.defaultValue = "none"
 LessChord.range = {1, 8}
 LessChord.values = {"none", "-5", "-4", "-3", "2", "3", "4", "5"}
 
-LessChord.description = [[Stepper values are:
+LessChord.description = [[
+Stepper values are:
 none: no chords
 -5: every 5th chord kept
 -4: every 4th chord kept
@@ -24,17 +25,9 @@ none: no chords
 
 ---@param config table
 ---@return string
-function LessChord:getString(config)
-	return "LC"
-end
-
----@param config table
 ---@return string
-function LessChord:getSubString(config)
-	if config.value == "none" then
-		return "N"
-	end
-	return config.value
+function LessChord:getString(config)
+	return "LC", config.value == "none" and "N" or tostring(config.value)
 end
 
 -- TODO: Also remove LN + ShortNote chords

@@ -22,14 +22,9 @@ Automap.description = "anyK to anyK conversion"
 
 ---@param config table
 ---@return string
-function Automap:getString(config)
-	return "AM"
-end
-
----@param config table
 ---@return string
-function Automap:getSubString(config)
-	return tostring(config.value)
+function Automap:getString(config)
+	return "AM", tostring(config.value)
 end
 
 ---@param config table

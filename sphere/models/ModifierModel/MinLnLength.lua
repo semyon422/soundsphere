@@ -16,14 +16,9 @@ MinLnLength.description = "Convert long notes to short notes if they are shorter
 
 ---@param config table
 ---@return string
-function MinLnLength:getString(config)
-	return "MLL"
-end
-
----@param config table
 ---@return string
-function MinLnLength:getSubString(config)
-	return tostring(config.value * 1000)
+function MinLnLength:getString(config)
+	return "MLL", tostring(config.value * 1000)
 end
 
 ---@param config table

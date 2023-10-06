@@ -16,14 +16,9 @@ Mirror.description = "Mirror the note chart"
 
 ---@param config table
 ---@return string
-function Mirror:getString(config)
-	return "MR"
-end
-
----@param config table
 ---@return string
-function Mirror:getSubString(config)
-	return config.value:sub(1, 1):upper()
+function Mirror:getString(config)
+	return "MR", config.value:sub(1, 1):upper()
 end
 
 ---@param config table

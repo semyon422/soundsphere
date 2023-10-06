@@ -14,6 +14,7 @@ NoScratch.description = "Remove scratch notes"
 
 ---@param config table
 ---@return string?
+---@return string?
 function NoScratch:getString(config)
 	if not config.value then
 		return

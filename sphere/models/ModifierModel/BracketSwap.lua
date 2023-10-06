@@ -14,11 +14,12 @@ BracketSwap.description = "Brackets to connected chords"
 
 ---@param config table
 ---@return string?
+---@return string?
 function BracketSwap:getString(config)
 	if not config.value then
 		return
 	end
-	return SwapModifier.getString(self)
+	return SwapModifier.getString(self, config)
 end
 
 BracketSwap.hardcodedMaps = {

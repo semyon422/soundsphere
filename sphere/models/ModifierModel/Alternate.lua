@@ -16,14 +16,9 @@ Alternate.description = "1 1 1 1 -> 1 2 1 2, doubles the input mode"
 
 ---@param config table
 ---@return string
-function Alternate:getString(config)
-	return "Alt"
-end
-
----@param config table
 ---@return string
-function Alternate:getSubString(config)
-	return config.value:sub(1, 1):upper()
+function Alternate:getString(config)
+	return "Alt", config.value:sub(1, 1):upper()
 end
 
 function Alternate:applyMeta(config, state)

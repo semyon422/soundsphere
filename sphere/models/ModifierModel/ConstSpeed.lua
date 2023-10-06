@@ -13,20 +13,12 @@ ConstSpeed.description = "Notes are moving with constant speed"
 
 ---@param config table
 ---@return string?
+---@return string?
 function ConstSpeed:getString(config)
 	if not config.value then
 		return
 	end
-	return "CON"
-end
-
----@param config table
----@return string?
-function ConstSpeed:getSubString(config)
-	if not config.value then
-		return
-	end
-	return "ST"
+	return "CON", "ST"
 end
 
 ---@param config table

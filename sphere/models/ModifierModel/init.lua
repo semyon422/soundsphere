@@ -304,8 +304,8 @@ function ModifierModel:getString(config)
 		local modifier = self:getModifier(modifierConfig)
 		if modifier then
 			local modifierString = ""
-			modifierString = modifierString .. (modifier:getString(modifierConfig) or "")
-			modifierString = modifierString .. (modifier:getSubString(modifierConfig) or "")
+			local s, subs = modifier:getString(modifierConfig)
+			modifierString = modifierString .. (s or "") .. (subs or "")
 			if #modifierString > 0 then
 				table.insert(t, modifierString)
 			end

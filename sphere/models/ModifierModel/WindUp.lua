@@ -14,6 +14,7 @@ WindUp.description = "Change time rate from 0.75 to 1.5 during the play"
 
 ---@param config table
 ---@return string?
+---@return string?
 function WindUp:getString(config)
 	if not config.value then
 		return

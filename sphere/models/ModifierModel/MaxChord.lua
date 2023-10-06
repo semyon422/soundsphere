@@ -17,14 +17,9 @@ MaxChord.description = "All chords will be <= modifier value"
 
 ---@param config table
 ---@return string
-function MaxChord:getString(config)
-	return "CH"
-end
-
----@param config table
 ---@return string
-function MaxChord:getSubString(config)
-	return tostring(config.value)
+function MaxChord:getString(config)
+	return "CH", tostring(config.value)
 end
 
 ---@param noteData ncdk.NoteData

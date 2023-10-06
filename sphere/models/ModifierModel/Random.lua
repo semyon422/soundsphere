@@ -16,14 +16,9 @@ Random.description = "Randomize the note chart"
 
 ---@param config table
 ---@return string
-function Random:getString(config)
-	return "RD"
-end
-
----@param config table
 ---@return string
-function Random:getSubString(config)
-	return config.value:sub(1, 1):upper()
+function Random:getString(config)
+	return "RD", config.value:sub(1, 1):upper()
 end
 
 ---@param config table

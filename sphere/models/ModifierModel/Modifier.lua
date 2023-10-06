@@ -119,13 +119,10 @@ function Modifier:applyMeta(modifierConfig, state) end
 function Modifier:apply(modifierConfig) end
 
 ---@param config table
+---@return string
 ---@return string?
 function Modifier:getString(config)
 	return self.shortName or self.name
 end
-
----@param config table
----@return string?
-function Modifier:getSubString(config) end
 
 return Modifier
