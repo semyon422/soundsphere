@@ -4,7 +4,6 @@ local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 ---@operator call: sphere.Random
 local Random = SwapModifier + {}
 
-Random.type = "NoteChartModifier"
 Random.interfaceType = "stepper"
 
 Random.name = "Random"

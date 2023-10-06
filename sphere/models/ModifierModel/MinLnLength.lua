@@ -4,7 +4,6 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 ---@operator call: sphere.MinLnLength
 local MinLnLength = Modifier + {}
 
-MinLnLength.type = "NoteChartModifier"
 MinLnLength.interfaceType = "slider"
 
 MinLnLength.name = "MinLnLength"

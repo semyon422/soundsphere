@@ -6,8 +6,6 @@ local MultiOverPlay = require("sphere.models.ModifierModel.MultiOverPlay")
 ---@operator call: sphere.MultiplePlay
 local MultiplePlay = Modifier + {}
 
-MultiplePlay.type = "NoteChartModifier"
-
 MultiplePlay.name = "MultiplePlay"
 MultiplePlay.interfaceType = "stepper"
 

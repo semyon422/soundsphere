@@ -4,7 +4,6 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 ---@operator call: sphere.NoLongNote
 local NoLongNote = Modifier + {}
 
-NoLongNote.type = "NoteChartModifier"
 NoLongNote.interfaceType = "toggle"
 
 NoLongNote.defaultValue = true

@@ -4,7 +4,6 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 ---@operator call: sphere.WindUp
 local WindUp = Modifier + {}
 
-WindUp.type = "TimeEngineModifier"
 WindUp.interfaceType = "toggle"
 
 WindUp.defaultValue = true

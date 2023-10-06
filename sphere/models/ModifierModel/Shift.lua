@@ -4,7 +4,6 @@ local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 ---@operator call: sphere.Shift
 local Shift = SwapModifier + {}
 
-Shift.type = "NoteChartModifier"
 Shift.interfaceType = "slider"
 
 Shift.name = "Shift"

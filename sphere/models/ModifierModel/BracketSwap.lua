@@ -4,7 +4,6 @@ local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 ---@operator call: sphere.BracketSwap
 local BracketSwap = SwapModifier + {}
 
-BracketSwap.type = "NoteChartModifier"
 BracketSwap.interfaceType = "toggle"
 
 BracketSwap.defaultValue = true

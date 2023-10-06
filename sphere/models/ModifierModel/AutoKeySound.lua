@@ -5,7 +5,6 @@ local NoteData = require("ncdk.NoteData")
 ---@operator call: sphere.AutoKeySound
 local AutoKeySound = Modifier + {}
 
-AutoKeySound.type = "NoteChartModifier"
 AutoKeySound.interfaceType = "toggle"
 
 AutoKeySound.defaultValue = true

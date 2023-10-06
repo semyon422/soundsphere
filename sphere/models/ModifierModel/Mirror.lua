@@ -4,7 +4,6 @@ local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 ---@operator call: sphere.Mirror
 local Mirror = SwapModifier + {}
 
-Mirror.type = "NoteChartModifier"
 Mirror.interfaceType = "stepper"
 
 Mirror.name = "Mirror"

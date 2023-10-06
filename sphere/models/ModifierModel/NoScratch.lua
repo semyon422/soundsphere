@@ -4,7 +4,6 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 ---@operator call: sphere.NoScratch
 local NoScratch = Modifier + {}
 
-NoScratch.type = "NoteChartModifier"
 NoScratch.interfaceType = "toggle"
 
 NoScratch.defaultValue = true

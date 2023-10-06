@@ -5,7 +5,6 @@ local NoteData = require("ncdk.NoteData")
 ---@operator call: sphere.FullLongNote
 local FullLongNote = Modifier + {}
 
-FullLongNote.type = "NoteChartModifier"
 FullLongNote.interfaceType = "slider"
 
 FullLongNote.name = "FullLongNote"
