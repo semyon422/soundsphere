@@ -16,7 +16,11 @@ Automap.interfaceType = "slider"
 Automap.name = "Automap"
 
 Automap.defaultValue = 10
-Automap.range = {1, 26}
+Automap.values = {}
+
+for i = 1, 26 do
+	table.insert(Automap.values, i)
+end
 
 Automap.description = "anyK to anyK conversion"
 

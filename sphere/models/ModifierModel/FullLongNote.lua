@@ -10,7 +10,7 @@ FullLongNote.interfaceType = "slider"
 FullLongNote.name = "FullLongNote"
 
 FullLongNote.defaultValue = 0
-FullLongNote.range = {0, 3}
+FullLongNote.values = {0, 1, 2, 3}
 
 FullLongNote.description = "Replace short notes with long notes"
 

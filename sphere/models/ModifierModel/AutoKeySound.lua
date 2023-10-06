@@ -10,6 +10,7 @@ AutoKeySound.interfaceType = "toggle"
 AutoKeySound.defaultValue = true
 AutoKeySound.name = "AutoKeySound"
 AutoKeySound.shortName = "AKS"
+AutoKeySound.values = {false, true}
 
 AutoKeySound.description = "Key sounds will not depend on the input"
 

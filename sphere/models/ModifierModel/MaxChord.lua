@@ -10,8 +10,11 @@ MaxChord.interfaceType = "slider"
 MaxChord.name = "MaxChord"
 
 MaxChord.defaultValue = 1
-MaxChord.range = {1, 10}
-MaxChord.step = 1
+MaxChord.values = {}
+
+for i = 1, 10 do
+	table.insert(MaxChord.values, i)
+end
 
 MaxChord.description = "All chords will be <= modifier value"
 

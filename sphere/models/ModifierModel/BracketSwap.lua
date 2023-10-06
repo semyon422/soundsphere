@@ -9,6 +9,7 @@ BracketSwap.interfaceType = "toggle"
 BracketSwap.defaultValue = true
 BracketSwap.name = "BracketSwap"
 BracketSwap.shortName = "BS"
+BracketSwap.values = {false, true}
 
 BracketSwap.description = "Brackets to connected chords"
 

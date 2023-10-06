@@ -8,6 +8,7 @@ ConstSpeed.interfaceType = "toggle"
 
 ConstSpeed.name = "ConstSpeed"
 ConstSpeed.defaultValue = true
+ConstSpeed.values = {false, true}
 
 ConstSpeed.description = "Notes are moving with constant speed"
 

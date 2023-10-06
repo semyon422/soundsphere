@@ -8,8 +8,14 @@ Shift.interfaceType = "slider"
 
 Shift.name = "Shift"
 
-Shift.defaultValue = 0
-Shift.range = {-5, 5}
+Shift.defaultValue = 1
+Shift.values = {}
+
+for i = -5, 5 do
+	if i ~= 0 then
+		table.insert(Shift.values, i)
+	end
+end
 
 Shift.description = "Shift the note chart"
 

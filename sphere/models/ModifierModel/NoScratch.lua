@@ -9,6 +9,7 @@ NoScratch.interfaceType = "toggle"
 NoScratch.defaultValue = true
 NoScratch.name = "NoScratch"
 NoScratch.shortName = "NSC"
+NoScratch.values = {false, true}
 
 NoScratch.description = "Remove scratch notes"
 

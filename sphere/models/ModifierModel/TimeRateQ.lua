@@ -10,7 +10,11 @@ TimeRateQ.name = "TimeRateQ"
 
 TimeRateQ.defaultValue = 0
 TimeRateQ.format = "%3s"
-TimeRateQ.range = {-10, 10}
+TimeRateQ.values = {}
+
+for i = -10, 10 do
+	table.insert(TimeRateQ.values, i)
+end
 
 TimeRateQ.description = "Rate = 2^(x/10), Quaver issue 666"
 

@@ -9,8 +9,14 @@ MinLnLength.interfaceType = "slider"
 MinLnLength.name = "MinLnLength"
 
 MinLnLength.defaultValue = 0.4
-MinLnLength.range = {0, 40}
-MinLnLength.step = 0.025
+MinLnLength.values = {}
+
+for i = 0, 39 do
+	table.insert(MinLnLength.values, i * 0.025)  -- [0, 1)
+end
+for i = 0, 40 do
+	table.insert(MinLnLength.values, 1 + i * 0.1)
+end
 
 MinLnLength.description = "Convert long notes to short notes if they are shorter than this length"
 

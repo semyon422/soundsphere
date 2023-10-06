@@ -9,7 +9,6 @@ Mirror.interfaceType = "stepper"
 Mirror.name = "Mirror"
 
 Mirror.defaultValue = "all"
-Mirror.range = {1, 3}
 Mirror.values = {"all", "left", "right"}
 
 Mirror.description = "Mirror the note chart"

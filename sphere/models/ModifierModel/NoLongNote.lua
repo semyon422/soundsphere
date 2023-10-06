@@ -9,6 +9,7 @@ NoLongNote.interfaceType = "toggle"
 NoLongNote.defaultValue = true
 NoLongNote.name = "NoLongNote"
 NoLongNote.shortName = "NLN"
+NoLongNote.values = {false, true}
 
 NoLongNote.description = "Remove long notes"
 

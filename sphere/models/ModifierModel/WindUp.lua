@@ -9,6 +9,7 @@ WindUp.interfaceType = "toggle"
 WindUp.defaultValue = true
 WindUp.name = "WindUp"
 WindUp.shortName = "WU"
+WindUp.values = {false, true}
 
 WindUp.description = "Change time rate from 0.75 to 1.5 during the play"
 
