@@ -4,22 +4,10 @@ local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
 ---@operator call: sphere.BracketSwap
 local BracketSwap = SwapModifier + {}
 
-BracketSwap.defaultValue = true
 BracketSwap.name = "BracketSwap"
 BracketSwap.shortName = "BS"
-BracketSwap.values = {false, true}
 
 BracketSwap.description = "Brackets to connected chords"
-
----@param config table
----@return string?
----@return string?
-function BracketSwap:getString(config)
-	if not config.value then
-		return
-	end
-	return SwapModifier.getString(self, config)
-end
 
 BracketSwap.hardcodedMaps = {
 	[4] = {1, 3, 2, 4},

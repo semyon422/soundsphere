@@ -18,7 +18,6 @@ end
 Modifier.version = 0
 Modifier.name = ""
 Modifier.format = "%d"
-Modifier.defaultValue = 0
 
 ---@param config table
 ---@return string
@@ -38,10 +37,10 @@ function Modifier:decode(configData)
 end
 
 ---@param s string
----@return string|boolean|number
+---@return any?
 function Modifier:decodeValue(s)
-	if type(self.defaultValue) == "boolean" then
-		return s == "true"
+	if type(self.defaultValue) == "nil" then
+		return nil
 	elseif type(self.defaultValue) == "number" then
 		return tonumber(s) or 0
 	end

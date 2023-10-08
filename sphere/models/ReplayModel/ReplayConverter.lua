@@ -55,6 +55,7 @@ end
 
 ---@param c table
 ---@param object table
+---@return boolean
 function ReplayConverter:convertModifier(c, object)
 	if c.value == nil then
 		for k, v in pairs(c) do
@@ -64,8 +65,10 @@ function ReplayConverter:convertModifier(c, object)
 		end
 	end
 	if c.value == nil then
-		c.value = true
-		return
+		return true
+	end
+	if c.value == false then
+		return false
 	end
 
 	if not object.timings then
@@ -77,13 +80,19 @@ function ReplayConverter:convertModifier(c, object)
 			c.value = c.value + 1
 		end
 	end
+
+	return true
 end
 
 ---@param object table
 function ReplayConverter:convertModifiers(object)
+	local new_modifiers = {}
 	for _, c in ipairs(object.modifiers) do
-		self:convertModifier(c, object)
+		if self:convertModifier(c, object) then
+			table.insert(new_modifiers, c)
+		end
 	end
+	object.modifiers = new_modifiers
 end
 
 ---@param object table

@@ -4,38 +4,19 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 ---@operator call: sphere.NoScratch
 local NoScratch = Modifier + {}
 
-NoScratch.defaultValue = true
 NoScratch.name = "NoScratch"
 NoScratch.shortName = "NSC"
-NoScratch.values = {false, true}
 
 NoScratch.description = "Remove scratch notes"
 
 ---@param config table
----@return string?
----@return string?
-function NoScratch:getString(config)
-	if not config.value then
-		return
-	end
-	return Modifier.getString(self, config)
-end
-
----@param config table
 ---@param state table
 function NoScratch:applyMeta(config, state)
-	if not config.value then
-		return
-	end
 	state.inputMode.scratch = nil
 end
 
 ---@param config table
 function NoScratch:apply(config)
-	if not config.value then
-		return
-	end
-
 	local noteChart = self.noteChart
 
 	noteChart.inputMode.scratch = nil
