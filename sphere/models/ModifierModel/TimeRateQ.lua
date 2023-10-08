@@ -7,7 +7,6 @@ local TimeRateQ = Modifier + {}
 TimeRateQ.name = "TimeRateQ"
 
 TimeRateQ.defaultValue = 0
-TimeRateQ.format = "%3s"
 TimeRateQ.values = {}
 
 for i = -10, 10 do

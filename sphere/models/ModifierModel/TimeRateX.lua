@@ -7,7 +7,6 @@ local TimeRateX = Modifier + {}
 TimeRateX.name = "TimeRateX"
 
 TimeRateX.defaultValue = 1
-TimeRateX.format = "%0.2f"
 TimeRateX.values = {}
 
 for i = 10, 40 do  -- [0.5, 2]

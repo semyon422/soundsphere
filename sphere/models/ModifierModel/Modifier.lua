@@ -17,7 +17,6 @@ end
 
 Modifier.version = 0
 Modifier.name = ""
-Modifier.format = "%d"
 
 ---@param config table
 ---@return string
