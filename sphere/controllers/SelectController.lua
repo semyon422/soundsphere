@@ -14,6 +14,7 @@ function SelectController:load()
 
 	self.configModel:write()
 	self.modifierModel:setConfig(self.configModel.configs.modifier)
+	self.modifierSelectModel:updateAdded()
 
 	self.selectModel:setLock(false)
 
@@ -66,7 +67,7 @@ function SelectController:update()
 		self.previewModel:loadPreviewDebounce(previewUrl)
 	end
 
-	if self.modifierModel:isChanged() then
+	if self.modifierSelectModel:isChanged() then
 		self.multiplayerModel:pushModifiers()
 		self:applyModifierMeta()
 	end

@@ -55,6 +55,7 @@ return {
 		"selectModel",
 		"previewModel",
 		"modifierModel",
+		"modifierSelectModel",
 		"noteSkinModel",
 		"configModel",
 		"backgroundModel",

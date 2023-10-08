@@ -8,31 +8,34 @@ local AvailableModifierListView = ListView()
 AvailableModifierListView.rows = 11
 
 function AvailableModifierListView:reloadItems()
-	self.items = self.game.modifierModel.modifiers
+	self.items = self.game.modifierSelectModel.modifiers
 end
 
 ---@return number
 function AvailableModifierListView:getItemIndex()
-	return self.game.modifierModel.availableModifierItemIndex
+	return self.game.modifierSelectModel.availableModifierIndex
 end
 
 ---@param count number
 function AvailableModifierListView:scroll(count)
-	self.game.modifierModel:scrollAvailableModifier(count)
+	self.game.modifierSelectModel:scrollAvailableModifier(count)
 end
 
 ---@param i number
 ---@param w number
 ---@param h number
 function AvailableModifierListView:drawItem(i, w, h)
+	local modifierSelectModel = self.game.modifierSelectModel
+	local modifierModel = self.game.modifierModel
+
 	local item = self.items[i]
 	local prevItem = self.items[i - 1]
 
 	local id = "available modifier" .. i
 	local changed, active, hovered = just.button(id, just.is_over(w, h))
 	if changed then
-		local modifier = self.game.modifierModel.modifiers[i]
-		self.game.modifierModel:add(modifier)
+		local modifier = modifierSelectModel.modifiers[i]
+		modifierSelectModel:add(modifier)
 	end
 
 	if hovered then
@@ -42,21 +45,23 @@ function AvailableModifierListView:drawItem(i, w, h)
 	end
 	love.graphics.setColor(1, 1, 1, 1)
 
-	if item.oneUse and item.added then
+	if modifierSelectModel:isOneUse(item) and modifierSelectModel:isAdded(item) then
 		love.graphics.setColor(1, 1, 1, 0.5)
 	end
 
+	local mod = modifierModel:getModifier(item)
+
 	just.row(true)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
-	gfx_util.printFrame(item.name, 44, 0, w - 44, h, "left", "center")
+	gfx_util.printFrame(mod.name, 44, 0, w - 44, h, "left", "center")
 	if just.mouse_over(id, just.is_over(w, h), "mouse") then
-		self.game.gameView.tooltip = item.description
+		self.game.gameView.tooltip = mod.description
 	end
 
 	love.graphics.setColor(1, 1, 1, 1)
-	if not prevItem or prevItem.oneUse ~= item.oneUse then
+	if not prevItem or modifierSelectModel:isOneUse(prevItem) ~= modifierSelectModel:isOneUse(item) then
 		local text = "One use modifiers"
-		if not item.oneUse then
+		if not modifierSelectModel:isOneUse(item) then
 			text = "Sequential modifiers"
 		end
 		love.graphics.setFont(spherefonts.get("Noto Sans", 16))

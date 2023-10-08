@@ -2,6 +2,7 @@ local class = require("class")
 
 local OnlineModel = require("sphere.models.OnlineModel")
 local ModifierModel = require("sphere.models.ModifierModel")
+local ModifierSelectModel = require("sphere.models.ModifierSelectModel")
 local NoteSkinModel = require("sphere.models.NoteSkinModel")
 local InputModel = require("sphere.models.InputModel")
 local DifficultyModel = require("sphere.models.DifficultyModel")
@@ -45,6 +46,7 @@ function GameController:new()
 
 	self.onlineModel = OnlineModel(self.persistence.configModel)
 	self.modifierModel = ModifierModel()
+	self.modifierSelectModel = ModifierSelectModel(self.modifierModel)
 	self.noteSkinModel = NoteSkinModel(self.persistence.configModel)
 	self.inputModel = InputModel(self.persistence.configModel)
 	self.difficultyModel = DifficultyModel()
@@ -125,6 +127,7 @@ function GameController:load()
 	rhythmModel.settings = configModel.configs.settings
 
 	self.modifierModel:setConfig(configModel.configs.modifier)
+	self.modifierSelectModel:updateAdded()
 
 	self.scoreModel:load()
 	self.onlineModel:load()
