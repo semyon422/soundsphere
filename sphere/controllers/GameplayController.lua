@@ -288,7 +288,7 @@ function GameplayController:saveScore()
 		difficulty = self.playContext.enps,
 		pausesCount = scoreEngine.pausesCount,
 	}
-	local scoreEntry = self.scoreModel:insertScore(scoreEntryTable, chartItem)
+	local scoreEntry = self.scoreModel:insertScore(scoreEntryTable)
 
 	local base = scoreSystem.base
 	if base.hitCount / base.notesCount >= 0.5 then

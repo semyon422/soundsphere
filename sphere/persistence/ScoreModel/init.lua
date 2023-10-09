@@ -44,25 +44,14 @@ function ScoreModel:getScoreEntries(hash, index)
 	return scores
 end
 
----@param id number
+---@param scoreEntry table
 ---@return table
-function ScoreModel:getScoreEntryById(id)
-	local score = ScoreDatabase:selectScore(id)
-	self:transformScoreEntry(score)
-	return score
-end
-
----@param scoreEntryTable table
----@param noteChartDataEntry table
----@param replayHash string
----@param modifiers string
----@return table
-function ScoreModel:insertScore(scoreEntryTable, noteChartDataEntry)
-	local score = ScoreDatabase:insertScore(scoreEntryTable)
+function ScoreModel:insertScore(scoreEntry)
+	local score = ScoreDatabase:insertScore(scoreEntry)
 
 	local scoreEntries = self:getScoreEntries(
-		noteChartDataEntry.hash,
-		noteChartDataEntry.index
+		scoreEntry.noteChartHash,
+		scoreEntry.noteChartIndex
 	)
 	self:calculateTopScore(scoreEntries)
 
