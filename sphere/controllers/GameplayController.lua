@@ -283,7 +283,7 @@ function GameplayController:saveScore()
 		missCount = scoreSystem.base.missCount,
 		mean = scoreSystem.normalscore.normalscore.mean,
 		earlylate = scoreSystem.misc.earlylate,
-		inputMode = scoreEngine.inputMode,
+		inputMode = tostring(rhythmModel.noteChart.inputMode),
 		timeRate = rhythmModel.timeEngine.baseTimeRate,
 		difficulty = self.playContext.enps,
 		pausesCount = scoreEngine.pausesCount,

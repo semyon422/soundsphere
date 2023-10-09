@@ -16,8 +16,6 @@ function ScoreEngine:load()
 	scoreSystem.scoreEngine = self
 	scoreSystem:load()
 
-	self.inputMode = tostring(self.noteChart.inputMode)
-
 	self.pausesCount = 0
 	self.paused = false
 

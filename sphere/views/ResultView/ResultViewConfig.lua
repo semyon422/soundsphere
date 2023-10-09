@@ -397,11 +397,13 @@ end
 local function NotechartInfo(self)
 	local erfunc = require("libchart.erfunc")
 	local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
-	local normalscore = self.game.rhythmModel.scoreEngine.scoreSystem.normalscore
+
+	local rhythmModel = self.game.rhythmModel
+	local normalscore = rhythmModel.scoreEngine.scoreSystem.normalscore
 
 	local noteChartItem = self.game.selectModel.noteChartItem
 	local scoreItem = self.game.selectModel.scoreItem
-	local scoreEngine = self.game.rhythmModel.scoreEngine
+	local scoreEngine = rhythmModel.scoreEngine
 	local playContext = self.game.playContext
 
 	if not scoreItem then
@@ -423,7 +425,7 @@ local function NotechartInfo(self)
 
 	local show = showLoadedScore(self)
 
-	local baseTimeRate = show and self.game.rhythmModel.timeEngine.baseTimeRate or scoreItem.timeRate
+	local baseTimeRate = show and rhythmModel.timeEngine.baseTimeRate or scoreItem.timeRate
 
 	local baseBpm = noteChartItem.bpm
 	local baseLength = noteChartItem.length
@@ -433,7 +435,7 @@ local function NotechartInfo(self)
 	local bpm = baseBpm * baseTimeRate
 	local length = baseLength / baseTimeRate
 	local difficulty = show and playContext.enps or scoreItem.difficulty
-	local inputMode = show and scoreEngine.inputMode or scoreItem.inputMode
+	local inputMode = show and tostring(rhythmModel.noteChart.inputMode) or scoreItem.inputMode
 
 	local w, h = Layout:move("title_left")
 	love.graphics.translate(22, 15)

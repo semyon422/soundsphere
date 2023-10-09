@@ -56,8 +56,8 @@ function ScoreListView:drawItem(i, w, h)
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
 		rating = s * playContext.enps
 
-		timeRate = scoreEngine.timeRate or timeRate
-		inputMode = scoreEngine.inputMode or inputMode
+		timeRate = self.game.rhythmModel.timeEngine.baseTimeRate or timeRate
+		inputMode = tostring(self.game.rhythmModel.noteChart.inputMode) or inputMode
 	end
 
 	if rating ~= rating then
