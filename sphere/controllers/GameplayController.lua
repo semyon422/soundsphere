@@ -257,7 +257,8 @@ end
 function GameplayController:saveScore()
 	local rhythmModel = self.rhythmModel
 	local modifierModel = self.modifierModel
-	local scoreSystemEntry = rhythmModel.scoreEngine.scoreSystem.entry
+	local scoreEngine = rhythmModel.scoreEngine
+	local scoreSystem = scoreEngine.scoreSystem
 
 	local chartItem = self.selectModel.noteChartItem
 
@@ -272,24 +273,24 @@ function GameplayController:saveScore()
 		noteChartIndex = chartItem.index,
 		playerName = "Player",
 		time = os.time(),
-		accuracy = scoreSystemEntry.accuracy,
-		maxCombo = scoreSystemEntry.maxCombo,
+		accuracy = scoreSystem.normalscore.accuracyAdjusted,
+		maxCombo = scoreSystem.base.maxCombo,
 		modifiers = modifierModel:encode(),
 		replayHash = replayHash,
-		ratio = scoreSystemEntry.ratio,
-		perfect = scoreSystemEntry.perfect,
-		notPerfect = scoreSystemEntry.notPerfect,
-		missCount = scoreSystemEntry.missCount,
-		mean = scoreSystemEntry.mean,
-		earlylate = scoreSystemEntry.earlylate,
-		inputMode = scoreSystemEntry.inputMode,
-		timeRate = scoreSystemEntry.timeRate,
+		ratio = scoreSystem.misc.ratio,
+		perfect = scoreSystem.judgement.counters.soundsphere.perfect,
+		notPerfect = scoreSystem.judgement.counters.soundsphere["not perfect"],
+		missCount = scoreSystem.base.missCount,
+		mean = scoreSystem.normalscore.normalscore.mean,
+		earlylate = scoreSystem.misc.earlylate,
+		inputMode = scoreEngine.inputMode,
+		timeRate = scoreEngine.baseTimeRate,
 		difficulty = self.playContext.enps,
-		pausesCount = scoreSystemEntry.pausesCount,
+		pausesCount = scoreEngine.pausesCount,
 	}
 	local scoreEntry = self.scoreModel:insertScore(scoreEntryTable, chartItem)
 
-	local base = rhythmModel.scoreEngine.scoreSystem.base
+	local base = scoreSystem.base
 	if base.hitCount / base.notesCount >= 0.5 then
 		self.onlineModel.onlineScoreManager:submit(chartItem, replayHash)
 	end

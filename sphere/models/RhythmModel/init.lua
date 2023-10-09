@@ -109,7 +109,7 @@ end
 function RhythmModel:hasResult()
 	local timeEngine = self.timeEngine
 	local base = self.scoreEngine.scoreSystem.base
-	local entry = self.scoreEngine.scoreSystem.entry
+	local accuracy = self.scoreEngine.scoreSystem.normalscore.accuracyAdjusted
 
 	return
 		not self.logicEngine.autoplay and
@@ -117,8 +117,8 @@ function RhythmModel:hasResult()
 		not self.timeEngine.windUp and
 		timeEngine.currentTime >= timeEngine.minTime and
 		base.hitCount > 0 and
-		entry.accuracy > 0 and
-		entry.accuracy < math.huge
+		accuracy > 0 and
+		accuracy < math.huge
 end
 
 ---@param windUp table?
