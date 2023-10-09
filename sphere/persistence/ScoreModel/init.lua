@@ -52,32 +52,13 @@ function ScoreModel:getScoreEntryById(id)
 	return score
 end
 
----@param scoreSystemEntry table
+---@param scoreEntryTable table
 ---@param noteChartDataEntry table
 ---@param replayHash string
 ---@param modifiers string
 ---@return table
-function ScoreModel:insertScore(scoreSystemEntry, noteChartDataEntry, replayHash, modifiers)
-	local score = ScoreDatabase:insertScore({
-		noteChartHash = noteChartDataEntry.hash,
-		noteChartIndex = noteChartDataEntry.index,
-		playerName = "Player",
-		time = os.time(),
-		accuracy = scoreSystemEntry.accuracy,
-		maxCombo = scoreSystemEntry.maxCombo,
-		modifiers = modifiers,
-		replayHash = replayHash,
-		ratio = scoreSystemEntry.ratio,
-		perfect = scoreSystemEntry.perfect,
-		notPerfect = scoreSystemEntry.notPerfect,
-		missCount = scoreSystemEntry.missCount,
-		mean = scoreSystemEntry.mean,
-		earlylate = scoreSystemEntry.earlylate,
-		inputMode = scoreSystemEntry.inputMode,
-		timeRate = scoreSystemEntry.timeRate,
-		difficulty = scoreSystemEntry.difficulty,
-		pausesCount = scoreSystemEntry.pausesCount,
-	})
+function ScoreModel:insertScore(scoreEntryTable, noteChartDataEntry)
+	local score = ScoreDatabase:insertScore(scoreEntryTable)
 
 	local scoreEntries = self:getScoreEntries(
 		noteChartDataEntry.hash,

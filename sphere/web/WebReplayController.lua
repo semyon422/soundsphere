@@ -6,6 +6,7 @@ local ReplayModel = require("sphere.models.ReplayModel")
 local ModifierModel = require("sphere.models.ModifierModel")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local RhythmModel = require("sphere.models.RhythmModel")
+local PlayContext = require("sphere.models.PlayContext")
 
 local WebReplayController = {}
 
@@ -32,6 +33,7 @@ function WebReplayController:POST()
 
 	local fastplayController = FastplayController()
 
+	local playContext = PlayContext()
 	local rhythmModel = RhythmModel()
 	local modifierModel = ModifierModel()
 	local difficultyModel = DifficultyModel()
@@ -43,6 +45,7 @@ function WebReplayController:POST()
 	fastplayController.replayModel = replayModel
 	fastplayController.modifierModel = modifierModel
 	fastplayController.difficultyModel = difficultyModel
+	fastplayController.playContext = playContext
 
 	rhythmModel.judgements = {}
 	rhythmModel.settings = require("sphere.persistence.ConfigModel.settings")
@@ -61,7 +64,7 @@ function WebReplayController:POST()
 	return {json = {
 		score = score,
 		inputMode = tostring(noteChart.inputMode),
-		difficulty = rhythmModel.scoreEngine.enps,
+		difficulty = playContext.enps,
 		modifiers = replay.modifiers,
 		modifiersEncoded = modifierModel:encode(replay.modifiers),
 		modifiersString = modifierModel:getString(replay.modifiers),

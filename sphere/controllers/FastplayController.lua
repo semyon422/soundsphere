@@ -33,6 +33,7 @@ function FastplayController:play(noteChart, replay)
 	local difficultyModel = self.difficultyModel
 	local rhythmModel = self.rhythmModel
 	local replayModel = self.replayModel
+	local playContext = self.playContext
 
 	local state = self:applyModifiers(noteChart, replay)
 
@@ -49,11 +50,9 @@ function FastplayController:play(noteChart, replay)
 
 	rhythmModel:load()
 
-	local scoreEngine = rhythmModel.scoreEngine
-
 	local enps, longNoteRatio = difficultyModel:getDifficulty(noteChart, state.timeRate)
-	scoreEngine.enps = enps
-	scoreEngine.longNoteRatio = longNoteRatio
+	playContext.enps = enps
+	playContext.longNoteRatio = longNoteRatio
 
 	rhythmModel.timeEngine:sync(0)
 	rhythmModel:loadLogicEngines()

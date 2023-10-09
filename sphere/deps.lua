@@ -15,6 +15,7 @@ return {
 		"replayModel",
 		"modifierModel",
 		"difficultyModel",
+		"playContext",
 	},
 	gameplayController = {
 		"rhythmModel",
@@ -35,6 +36,7 @@ return {
 		"speedModel",
 		"cacheModel",
 		"fileFinder",
+		"playContext",
 	},
 	multiplayerController = {
 		"multiplayerModel",

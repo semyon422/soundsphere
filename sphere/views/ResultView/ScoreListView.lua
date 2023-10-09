@@ -47,13 +47,14 @@ function ScoreListView:drawItem(i, w, h)
 	local rating = item.rating
 	local timeRate = item.timeRate
 	local inputMode = item.inputMode
+	local playContext = self.game.playContext
 
 	if loaded then
 		local erfunc = require("libchart.erfunc")
 		local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 		local normalscore = scoreEngine.scoreSystem.normalscore
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-		rating = s * scoreEngine.enps
+		rating = s * playContext.enps
 
 		timeRate = scoreEngine.timeRate or timeRate
 		inputMode = scoreEngine.inputMode or inputMode

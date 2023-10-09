@@ -23,7 +23,6 @@ function EntryScoreSystem:after(event)
 	self.notPerfect = container.judgement.counters.soundsphere["not perfect"]
 	self.inputMode = self.scoreEngine.inputMode
 	self.timeRate = self.scoreEngine.baseTimeRate
-	self.difficulty = self.scoreEngine.enps
 	self.pausesCount = self.scoreEngine.pausesCount
 end
 

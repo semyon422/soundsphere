@@ -18,6 +18,7 @@ function GameplayController:load()
 	local difficultyModel = self.difficultyModel
 	local replayModel = self.replayModel
 	local fileFinder = self.fileFinder
+	local playContext = self.playContext
 
 	local config = configModel.configs.settings
 
@@ -62,11 +63,9 @@ function GameplayController:load()
 
 	rhythmModel:load()
 
-	local scoreEngine = rhythmModel.scoreEngine
-
 	local enps, longNoteRatio = difficultyModel:getDifficulty(noteChart, state.timeRate)
-	scoreEngine.enps = enps
-	scoreEngine.longNoteRatio = longNoteRatio
+	playContext.enps = enps
+	playContext.longNoteRatio = longNoteRatio
 
 	rhythmModel.timeEngine:sync(love.timer.getTime())
 	rhythmModel:loadAllEngines()
@@ -267,12 +266,28 @@ function GameplayController:saveScore()
 		chartItem.index,
 		modifierModel.config
 	)
-	local scoreEntry = self.scoreModel:insertScore(
-		scoreSystemEntry,
-		chartItem,
-		replayHash,
-		modifierModel:encode()
-	)
+
+	local scoreEntryTable = {
+		noteChartHash = chartItem.hash,
+		noteChartIndex = chartItem.index,
+		playerName = "Player",
+		time = os.time(),
+		accuracy = scoreSystemEntry.accuracy,
+		maxCombo = scoreSystemEntry.maxCombo,
+		modifiers = modifierModel:encode(),
+		replayHash = replayHash,
+		ratio = scoreSystemEntry.ratio,
+		perfect = scoreSystemEntry.perfect,
+		notPerfect = scoreSystemEntry.notPerfect,
+		missCount = scoreSystemEntry.missCount,
+		mean = scoreSystemEntry.mean,
+		earlylate = scoreSystemEntry.earlylate,
+		inputMode = scoreSystemEntry.inputMode,
+		timeRate = scoreSystemEntry.timeRate,
+		difficulty = self.playContext.enps,
+		pausesCount = scoreSystemEntry.pausesCount,
+	}
+	local scoreEntry = self.scoreModel:insertScore(scoreEntryTable, chartItem)
 
 	local base = rhythmModel.scoreEngine.scoreSystem.base
 	if base.hitCount / base.notesCount >= 0.5 then
