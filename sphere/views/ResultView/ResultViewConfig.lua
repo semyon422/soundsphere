@@ -19,7 +19,7 @@ local time_util = require("time_util")
 ---@param self table
 ---@return boolean
 local function showLoadedScore(self)
-	local scoreEntry = self.game.rhythmModel.scoreEngine.scoreEntry
+	local scoreEntry = self.game.playContext.scoreEntry
 	local scoreItem = self.game.selectModel.scoreItem
 	if not scoreEntry or not scoreItem then
 		return false
@@ -416,7 +416,7 @@ local function NotechartInfo(self)
 		topScoreItem = scoreItem
 	end
 
-	local scoreEntry = scoreEngine.scoreEntry
+	local scoreEntry = self.game.playContext.scoreEntry
 	if not scoreEntry then
 		return
 	end
@@ -697,8 +697,7 @@ local function BottomScreenMenu(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	local scoreItem = self.game.selectModel.scoreItem
-	local scoreEngine = self.game.rhythmModel.scoreEngine
-	local scoreEntry = scoreEngine.scoreEntry
+	local scoreEntry = self.game.playContext.scoreEntry
 
 	w, h = Layout:move("graphs_sup_right")
 	love.graphics.setColor(0, 0, 0, 0.8)

@@ -70,8 +70,8 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 		return
 	end
 
+	self.playContext.scoreEntry = scoreEntry
 	rhythmModel.timings = replay.timings
-	rhythmModel.scoreEngine.scoreEntry = scoreEntry
 	replayModel.replay = replay
 
 	rhythmModel.inputManager:setMode("internal")
@@ -83,11 +83,6 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 
 	local noteChart = self.selectModel:loadNoteChart()
 	self.fastplayController:play(noteChart, replay)
-
-	local config = self.configModel.configs.select
-	config.scoreEntryId = scoreEntry.id
-
-	rhythmModel.scoreEngine.scoreEntry = scoreEntry
 
 	rhythmModel.inputManager:setMode("external")
 	replayModel:setMode("record")

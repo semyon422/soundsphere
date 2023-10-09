@@ -295,7 +295,7 @@ function GameplayController:saveScore()
 		self.onlineModel.onlineScoreManager:submit(chartItem, replayHash)
 	end
 
-	rhythmModel.scoreEngine.scoreEntry = scoreEntry
+	self.playContext.scoreEntry = scoreEntry
 
 	self.configModel.configs.select.scoreEntryId = scoreEntry.id
 end

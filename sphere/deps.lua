@@ -52,6 +52,7 @@ return {
 		"onlineModel",
 		"configModel",
 		"fastplayController",
+		"playContext",
 	},
 	selectController = {
 		"selectModel",
