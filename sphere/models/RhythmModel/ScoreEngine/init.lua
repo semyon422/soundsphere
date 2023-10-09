@@ -1,5 +1,4 @@
 local class = require("class")
-local Observable = require("Observable")
 local ScoreSystemContainer = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystemContainer")
 
 ---@class sphere.ScoreEngine
@@ -7,7 +6,6 @@ local ScoreSystemContainer = require("sphere.models.RhythmModel.ScoreEngine.Scor
 local ScoreEngine = class()
 
 function ScoreEngine:new()
-	self.observable = Observable()
 	self.scoreSystem = ScoreSystemContainer()
 end
 
