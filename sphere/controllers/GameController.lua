@@ -76,10 +76,7 @@ function GameController:new()
 		self.onlineModel,
 		self.persistence.osudirectModel
 	)
-	self.replayModel = ReplayModel(
-		self.rhythmModel,
-		self.modifierModel
-	)
+	self.replayModel = ReplayModel(self.rhythmModel)
 	self.editorModel = EditorModel(
 		self.persistence.configModel,
 		self.resourceModel
