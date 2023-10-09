@@ -6,13 +6,12 @@ local enps = require("libchart.enps")
 local DifficultyModel = class()
 
 ---@param noteChart ncdk.NoteChart
+---@param timeRate number?
 ---@return number
 ---@return number
----@return number
-function DifficultyModel:getDifficulty(noteChart)
+function DifficultyModel:getDifficulty(noteChart, timeRate)
 	local notes = {}
 
-	local longAreaSum = 0
 	local longNoteCount = 0
 	local minTime = math.huge
 	local maxTime = -math.huge
@@ -38,17 +37,15 @@ function DifficultyModel:getDifficulty(noteChart)
 				longNoteCount = longNoteCount + 1
 				minTime = math.min(minTime, et)
 				maxTime = math.max(maxTime, et)
-				longAreaSum = longAreaSum + et - st
 			end
 		end
 	end
 	table.sort(notes, function(a, b) return a.time < b.time end)
 
-	local enpsValue, aStrain, generalizedKeymode, strains = enps.getEnps(notes)
-	local longArea = longAreaSum / (maxTime - minTime) / generalizedKeymode
+	local enpsValue = enps.getEnps(notes)
 	local longRatio = longNoteCount / #notes
 
-	return enpsValue, longRatio, longArea
+	return enpsValue * (timeRate or 1), longRatio
 end
 
 return DifficultyModel

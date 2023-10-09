@@ -19,8 +19,6 @@ function ScoreEngine:load()
 	self.inputMode = tostring(self.noteChart.inputMode)
 	self.baseTimeRate = self.rhythmModel.timeEngine.baseTimeRate
 
-	self.enps = self.baseEnps * self.baseTimeRate
-
 	self.pausesCount = 0
 	self.paused = false
 

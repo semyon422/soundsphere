@@ -64,10 +64,9 @@ function GameplayController:load()
 
 	local scoreEngine = rhythmModel.scoreEngine
 
-	local enps, longNoteRatio, longNoteArea = difficultyModel:getDifficulty(noteChart)
-	scoreEngine.baseEnps = enps
+	local enps, longNoteRatio = difficultyModel:getDifficulty(noteChart, state.timeRate)
+	scoreEngine.enps = enps
 	scoreEngine.longNoteRatio = longNoteRatio
-	scoreEngine.longNoteArea = longNoteArea
 
 	rhythmModel.timeEngine:sync(love.timer.getTime())
 	rhythmModel:loadAllEngines()
