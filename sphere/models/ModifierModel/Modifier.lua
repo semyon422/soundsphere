@@ -19,34 +19,6 @@ Modifier.version = 0
 Modifier.name = ""
 
 ---@param config table
----@return string
-function Modifier:encode(config)
-	local version = config.version or 0
-	return ("%d,%s"):format(version, config.value)
-end
-
----@param configData string
----@return table
-function Modifier:decode(configData)
-	local config = self:getDefaultConfig()
-	local version, value = configData:match("^(%d+),(.+)$")
-	config.version = tonumber(version)
-	config.value = self:decodeValue(value)
-	return config
-end
-
----@param s string
----@return any?
-function Modifier:decodeValue(s)
-	if type(self.defaultValue) == "nil" then
-		return nil
-	elseif type(self.defaultValue) == "number" then
-		return tonumber(s) or 0
-	end
-	return s
-end
-
----@param config table
 ---@return any
 function Modifier:getValue(config)
 	return config.value

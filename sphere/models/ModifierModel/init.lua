@@ -33,9 +33,12 @@ local Modifiers = {
 	LessChord = 23,
 	MaxChord = 24,
 }
+ModifierModel.Modifiers = Modifiers
 
 local ModifiersByName = {}
 local ModifiersById = {}
+ModifierModel.ModifiersByName = ModifiersByName
+ModifierModel.ModifiersById = ModifiersById
 
 for name, id in pairs(Modifiers) do
 	local M = require("sphere.models.ModifierModel." .. name)
@@ -134,33 +137,6 @@ function ModifierModel:getString(config)
 		end
 	end
 	return table.concat(t, " ")
-end
-
----@param config table?
----@return string
-function ModifierModel:encode(config)
-	config = config or self.config
-	local t = {}
-	for _, modifierConfig in ipairs(config) do
-		local mod = self:getModifier(modifierConfig.name)
-		if mod then
-			table.insert(t, ("%d:%s"):format(Modifiers[mod.name], mod:encode(modifierConfig)))
-		end
-	end
-	return table.concat(t, ";")
-end
-
----@param encodedConfig string
----@return table
-function ModifierModel:decode(encodedConfig)
-	local config = {}
-	for modifierId, modifierData in encodedConfig:gmatch("(%d+):([^;]+)") do
-		local mod = self:getModifier(tonumber(modifierId))
-		if mod then
-			table.insert(config, mod:decode(modifierData))
-		end
-	end
-	return config
 end
 
 ---@param oldConfig table

@@ -2,6 +2,7 @@ local class = require("class")
 local math_util = require("math_util")
 local InputMode = require("ncdk.InputMode")
 local TempoRange = require("notechart.TempoRange")
+local ModifierEncoder = require("sphere.models.ModifierEncoder")
 
 ---@class sphere.GameplayController
 ---@operator call: sphere.GameplayController
@@ -275,7 +276,7 @@ function GameplayController:saveScore()
 		time = os.time(),
 		accuracy = scoreSystem.normalscore.accuracyAdjusted,
 		maxCombo = scoreSystem.base.maxCombo,
-		modifiers = modifierModel:encode(),
+		modifiers = ModifierEncoder:encode(modifierModel.config),
 		replayHash = replayHash,
 		ratio = scoreSystem.misc.ratio,
 		perfect = scoreSystem.judgement.counters.soundsphere.perfect,

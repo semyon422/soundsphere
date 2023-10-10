@@ -7,6 +7,7 @@ local ModifierModel = require("sphere.models.ModifierModel")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local RhythmModel = require("sphere.models.RhythmModel")
 local PlayContext = require("sphere.models.PlayContext")
+local ModifierEncoder = require("sphere.models.ModifierEncoder")
 
 local WebReplayController = {}
 
@@ -66,7 +67,7 @@ function WebReplayController:POST()
 		inputMode = tostring(noteChart.inputMode),
 		difficulty = playContext.enps,
 		modifiers = replay.modifiers,
-		modifiersEncoded = modifierModel:encode(replay.modifiers),
+		modifiersEncoded = ModifierEncoder:encode(replay.modifiers),
 		modifiersString = modifierModel:getString(replay.modifiers),
 	}}
 end

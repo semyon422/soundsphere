@@ -1,5 +1,6 @@
 local class = require("class")
 local ModifierIconView = require("sphere.views.ModifierView.ModifierIconView")
+local ModifierEncoder = require("sphere.models.ModifierEncoder")
 
 ---@class sphere.ModifierIconGridView
 ---@operator call: sphere.ModifierIconGridView
@@ -15,7 +16,7 @@ function ModifierIconGridView:draw(configModifier, w, h, size, noModifier, growU
 	local modifierModel = self.game.modifierModel
 
 	if type(configModifier) == "string" then
-		configModifier = modifierModel:decode(configModifier)
+		configModifier = ModifierEncoder:decode(configModifier)
 	end
 	configModifier = configModifier or {}
 

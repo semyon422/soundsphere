@@ -2,6 +2,7 @@ local ListView = require("sphere.views.ListView")
 local just = require("just")
 local imgui = require("imgui")
 local spherefonts = require("sphere.assets.fonts")
+local ModifierEncoder = require("sphere.models.ModifierEncoder")
 
 local RoomUsersListView = ListView()
 
@@ -46,7 +47,7 @@ function RoomUsersListView:drawItem(i, w, h)
 
 	local configModifier = user.modifiers
 	if type(configModifier) == "string" then
-		configModifier = modifierModel:decode(configModifier)
+		configModifier = ModifierEncoder:decode(configModifier)
 	end
 	configModifier = configModifier or {}
 	local modifiers = modifierModel:getString(configModifier)
