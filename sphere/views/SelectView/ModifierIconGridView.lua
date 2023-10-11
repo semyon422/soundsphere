@@ -1,6 +1,7 @@
 local class = require("class")
 local ModifierIconView = require("sphere.views.ModifierView.ModifierIconView")
 local ModifierEncoder = require("sphere.models.ModifierEncoder")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.ModifierIconGridView
 ---@operator call: sphere.ModifierIconGridView
@@ -13,8 +14,6 @@ local ModifierIconGridView = class()
 ---@param noModifier boolean?
 ---@param growUp boolean?
 function ModifierIconGridView:draw(configModifier, w, h, size, noModifier, growUp)
-	local modifierModel = self.game.modifierModel
-
 	if type(configModifier) == "string" then
 		configModifier = ModifierEncoder:decode(configModifier)
 	end
@@ -37,7 +36,7 @@ function ModifierIconGridView:draw(configModifier, w, h, size, noModifier, growU
 		local column = (drawIndex - 1) % columns + 1
 		local modifierConfig = configModifier[modifierIndex]
 		if modifierConfig then
-			local modifier = modifierModel:getModifier(modifierConfig.name)
+			local modifier = ModifierModel:getModifier(modifierConfig.name)
 			if modifier then
 				local modifierString, modifierSubString = modifier:getString(modifierConfig)
 				if modifierString then

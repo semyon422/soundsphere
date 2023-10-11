@@ -12,17 +12,17 @@ local MultiplayerModel = class()
 
 ---@param rhythmModel sphere.RhythmModel
 ---@param configModel sphere.ConfigModel
----@param modifierModel sphere.ModifierModel
 ---@param selectModel sphere.SelectModel
 ---@param onlineModel sphere.OnlineModel
 ---@param osudirectModel sphere.OsudirectModel
-function MultiplayerModel:new(rhythmModel, configModel, modifierModel, selectModel, onlineModel, osudirectModel)
+---@param playContext sphere.PlayContext
+function MultiplayerModel:new(rhythmModel, configModel, selectModel, onlineModel, osudirectModel, playContext)
 	self.rhythmModel = rhythmModel
 	self.configModel = configModel
-	self.modifierModel = modifierModel
 	self.selectModel = selectModel
 	self.onlineModel = onlineModel
 	self.osudirectModel = osudirectModel
+	self.playContext = playContext
 
 	self.status = "disconnected"
 	self.rooms = {}
@@ -169,7 +169,7 @@ MultiplayerModel.createRoom = remote.wrap(function(self, name, password)
 		return
 	end
 	self.selectedRoom = nil
-	self.peer._setModifiers(self.modifierModel.config)
+	self.peer._setModifiers(self.playContext.modifiers)
 	self:pushNotechart()
 end)
 
@@ -194,7 +194,7 @@ MultiplayerModel.pushModifiers = remote.wrap(function(self)
 	if not self.peer then
 		return
 	end
-	self.peer._setModifiers(self.modifierModel.config)
+	self.peer._setModifiers(self.playContext.modifiers)
 end)
 
 local async_read = thread.async(function(...) return love.filesystem.read(...) end)

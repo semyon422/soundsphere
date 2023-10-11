@@ -1,5 +1,6 @@
 local class = require("class")
 local InputMode = require("ncdk.InputMode")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.FastplayController
 ---@operator call: sphere.FastplayController
@@ -9,8 +10,6 @@ local FastplayController = class()
 ---@param replay sphere.Replay
 ---@return table
 function FastplayController:applyModifiers(noteChart, replay)
-	local modifierModel = self.modifierModel
-
 	local state = {}
 	state.timeRate = 1
 	state.inputMode = InputMode(noteChart.inputMode)
@@ -20,8 +19,9 @@ function FastplayController:applyModifiers(noteChart, replay)
 	-- 	modifierModel:fixOldFormat(replay.modifiers)
 	-- end
 
-	modifierModel:applyMeta(state)
-	modifierModel:apply(noteChart)
+	local modifiers = self.playContext.modifiers
+	ModifierModel:applyMeta(modifiers, state)
+	ModifierModel:apply(modifiers, noteChart)
 
 	return state
 end

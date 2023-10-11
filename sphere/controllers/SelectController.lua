@@ -1,8 +1,8 @@
 local class = require("class")
 local thread = require("thread")
-local InputMode = require("ncdk.InputMode")
 local Sph = require("sph.Sph")
 local NoteChartExporter = require("osu.NoteChartExporter")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.SelectController
 ---@operator call: sphere.SelectController
@@ -13,7 +13,7 @@ function SelectController:load()
 	local previewModel = self.previewModel
 
 	self.configModel:write()
-	self.modifierModel:setConfig(self.configModel.configs.modifier)
+	self.playContext.modifiers = self.configModel.configs.modifier
 	self.modifierSelectModel:updateAdded()
 
 	self.selectModel:setLock(false)
@@ -33,7 +33,7 @@ function SelectController:applyModifierMeta()
 		playContext:setInputMode(item.inputMode)
 	end
 
-	self.modifierModel:applyMeta(playContext.state)
+	ModifierModel:applyMeta(playContext.modifiers, playContext.state)
 	self.previewModel:setPitch(playContext.state.timeRate)
 end
 
@@ -183,7 +183,7 @@ function SelectController:exportToOsu()
 
 	local nce = NoteChartExporter()
 	local noteChart = selectModel:loadNoteChart()
-	self.modifierModel:apply(noteChart)
+	ModifierModel:apply(self.playContext.modifiers, noteChart)
 
 	nce.noteChart = noteChart
 	nce.noteChartEntry = chartItem

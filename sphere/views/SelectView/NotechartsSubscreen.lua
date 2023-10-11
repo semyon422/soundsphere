@@ -345,10 +345,8 @@ local function ModifierIconGrid(self)
 	drawFrameRect(w, h)
 	love.graphics.translate(21, 4)
 
-	local modifierModel = self.game.modifierModel
-
 	ModifierIconGridView.game = self.game
-	ModifierIconGridView:draw(modifierModel.config, w - 42, h, (h - 8) / 2)
+	ModifierIconGridView:draw(self.game.playContext.modifiers, w - 42, h, (h - 8) / 2)
 
 	w, h = Layout:move("column1row2")
 	love.graphics.translate(21, 4)

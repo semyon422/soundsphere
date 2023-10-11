@@ -2,6 +2,7 @@ local ListView = require("sphere.views.ListView")
 local just = require("just")
 local gfx_util = require("gfx_util")
 local spherefonts = require("sphere.assets.fonts")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 local AvailableModifierListView = ListView()
 
@@ -26,7 +27,6 @@ end
 ---@param h number
 function AvailableModifierListView:drawItem(i, w, h)
 	local modifierSelectModel = self.game.modifierSelectModel
-	local modifierModel = self.game.modifierModel
 
 	local item = self.items[i]
 	local prevItem = self.items[i - 1]
@@ -49,7 +49,7 @@ function AvailableModifierListView:drawItem(i, w, h)
 		love.graphics.setColor(1, 1, 1, 0.5)
 	end
 
-	local mod = modifierModel:getModifier(item)
+	local mod = ModifierModel:getModifier(item)
 
 	just.row(true)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))

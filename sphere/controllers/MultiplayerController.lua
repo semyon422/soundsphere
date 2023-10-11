@@ -14,7 +14,7 @@ function MultiplayerController:load()
 			if key == "notechart" then
 				self:findNotechart()
 			elseif key == "modifiers" and not mpModel:isHost() then
-				self.modifierModel:setConfig(value)
+				self.playContext.modifiers = value
 				self.configModel.configs.modifier = value
 				mpModel.modifiers = table_util.deepcopy(value)
 			elseif key == "roomUsers" then
@@ -32,7 +32,7 @@ function MultiplayerController:load()
 			end
 			if not mpModel.room.isFreeModifiers then
 				local modifiers = table_util.deepcopy(mpModel.modifiers)
-				self.modifierModel:setConfig(modifiers)
+				self.playContext.modifiers = modifiers
 				self.configModel.configs.modifier = modifiers
 			end
 			if not mpModel.room.isFreeNotechart then

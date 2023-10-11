@@ -1,5 +1,6 @@
 local class = require("class")
 local thread = require("thread")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.ResultController
 ---@operator call: sphere.ResultController
@@ -57,11 +58,10 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 	end
 
 	local rhythmModel = self.rhythmModel
-	local modifierModel = self.modifierModel
 
 	if replay.modifiers then
-		modifierModel:setConfig(replay.modifiers)
-		modifierModel:fixOldFormat(replay.modifiers)
+		self.playContext.modifiers = replay.modifiers
+		ModifierModel:fixOldFormat(replay.modifiers)
 	end
 
 	if mode == "retry" then

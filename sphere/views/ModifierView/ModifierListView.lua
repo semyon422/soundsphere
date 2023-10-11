@@ -3,13 +3,14 @@ local just = require("just")
 local TextCellImView = require("sphere.imviews.TextCellImView")
 local SliderView = require("sphere.views.SliderView")
 local StepperView = require("sphere.views.StepperView")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 local ModifierListView = ListView()
 
 ModifierListView.rows = 11
 
 function ModifierListView:reloadItems()
-	self.items = self.game.modifierModel.config
+	self.items = self.game.playContext.modifiers
 end
 
 ---@return number
@@ -27,7 +28,6 @@ end
 ---@param h number
 function ModifierListView:drawItem(i, w, h)
 	local modifierSelectModel = self.game.modifierSelectModel
-	local modifierModel = self.game.modifierModel
 
 	local item = self.items[i]
 	local w2 = w / 2
@@ -48,7 +48,7 @@ function ModifierListView:drawItem(i, w, h)
 	just.indent(44)
 	TextCellImView(w2 - 44, 72, "left", "", item.name)
 
-	local modifier = modifierModel:getModifier(item.name)
+	local modifier = ModifierModel:getModifier(item.name)
 	if not modifier then
 		TextCellImView(w2 - 44, 72, "left", "", "Deleted modifier")
 	elseif modifier.defaultValue == nil then
@@ -64,10 +64,10 @@ function ModifierListView:drawItem(i, w, h)
 		local delta = just.wheel_over(item, over)
 		local new_value = just.slider(item, over, pos, value)
 		if new_value then
-			modifierModel:setModifierValue(item, modifier:fromNormValue(new_value))
+			ModifierModel:setModifierValue(item, modifier:fromNormValue(new_value))
 			modifierSelectModel:change()
 		elseif delta then
-			modifierModel:increaseModifierValue(item, delta)
+			ModifierModel:increaseModifierValue(item, delta)
 			modifierSelectModel:change()
 		end
 		SliderView:draw(w2, h, value)
@@ -86,10 +86,10 @@ function ModifierListView:drawItem(i, w, h)
 		local changedRight = just.button(id .. "R", overRight)
 
 		if changedLeft or delta == -1 then
-			modifierModel:increaseModifierValue(item, -1)
+			ModifierModel:increaseModifierValue(item, -1)
 			modifierSelectModel:change()
 		elseif changedRight or delta == 1 then
-			modifierModel:increaseModifierValue(item, 1)
+			ModifierModel:increaseModifierValue(item, 1)
 			modifierSelectModel:change()
 		end
 		StepperView:draw(w2, h, value, count)

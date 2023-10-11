@@ -1,15 +1,16 @@
 local class = require("class")
 local InputMode = require("ncdk.InputMode")
 
+---@class sphere.PlayContext
+---@operator call: sphere.PlayContext
 local PlayContext = class()
 
----@param modifierModel sphere.ModifierModel
-function PlayContext:new(modifierModel)
+function PlayContext:new()
 	self.state = {
 		timeRate = 1,
 		inputMode = InputMode(),
 	}
-	self.modifierModel = modifierModel
+	self.modifiers = {}
 end
 
 ---@param inputMode ncdk.InputMode|string

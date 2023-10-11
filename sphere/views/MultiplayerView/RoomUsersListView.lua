@@ -3,6 +3,7 @@ local just = require("just")
 local imgui = require("imgui")
 local spherefonts = require("sphere.assets.fonts")
 local ModifierEncoder = require("sphere.models.ModifierEncoder")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 local RoomUsersListView = ListView()
 
@@ -43,14 +44,12 @@ function RoomUsersListView:drawItem(i, w, h)
 		name = name .. " playing"
 	end
 
-	local modifierModel = self.game.modifierModel
-
 	local configModifier = user.modifiers
 	if type(configModifier) == "string" then
 		configModifier = ModifierEncoder:decode(configModifier)
 	end
 	configModifier = configModifier or {}
-	local modifiers = modifierModel:getString(configModifier)
+	local modifiers = ModifierModel:getString(configModifier)
 
 	local title = user.notechart.title or ""
 	local diffname = user.notechart.name or ""

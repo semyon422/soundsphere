@@ -1,5 +1,6 @@
 local class = require("class")
 local table_util = require("table_util")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.ModifierSelectModel
 ---@operator call: sphere.ModifierSelectModel
@@ -39,9 +40,9 @@ local OneUseModifiers = {
 	"NoLongNote",
 }
 
----@param modifierModel sphere.ModifierModel
-function ModifierSelectModel:new(modifierModel)
-	self.modifierModel = modifierModel
+---@param playContext sphere.PlayContext
+function ModifierSelectModel:new(playContext)
+	self.playContext = playContext
 	self.modifierIndex = 1
 	self.availableModifierIndex = 1
 
@@ -66,7 +67,7 @@ function ModifierSelectModel:updateAdded()
 	for _, name in ipairs(Modifiers) do
 		self.addedModifiers[name] = 0
 	end
-	for _, c in ipairs(self.modifierModel.config) do
+	for _, c in ipairs(self.playContext.modifiers) do
 		self.addedModifiers[c.name] = self.addedModifiers[c.name] + 1
 	end
 end
@@ -87,7 +88,7 @@ end
 ---@param direction number
 function ModifierSelectModel:scrollModifier(direction)
 	local index = self.modifierIndex + direction
-	if index < 1 or index > #self.modifierModel.config + 1 then
+	if index < 1 or index > #self.playContext.modifiers + 1 then
 		return
 	end
 	self.modifierIndex = index
@@ -124,7 +125,7 @@ function ModifierSelectModel:add(modifier)
 		end
 		index = minimalModifierIndex
 	end
-	self.modifierModel:add(modifier, index)
+	ModifierModel:add(self.playContext.modifiers, modifier, index)
 	self.modifierIndex = index + 1
 	self.addedModifiers[modifier] = self.addedModifiers[modifier] + 1
 	self:change()
@@ -132,8 +133,9 @@ end
 
 ---@param index number
 function ModifierSelectModel:remove(index)
-	local modifierConfig = self.modifierModel:remove(index)
-	if not self.modifierModel.config[self.modifierIndex] then
+	local modifiers = self.playContext.modifiers
+	local modifierConfig = ModifierModel:remove(modifiers, index)
+	if not modifiers[self.modifierIndex] then
 		self.modifierIndex = math.max(self.modifierIndex - 1, 0)
 	end
 	if modifierConfig then

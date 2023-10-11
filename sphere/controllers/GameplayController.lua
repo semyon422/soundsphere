@@ -3,6 +3,7 @@ local math_util = require("math_util")
 local InputMode = require("ncdk.InputMode")
 local TempoRange = require("notechart.TempoRange")
 local ModifierEncoder = require("sphere.models.ModifierEncoder")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.GameplayController
 ---@operator call: sphere.GameplayController
@@ -15,7 +16,6 @@ function GameplayController:load()
 	local selectModel = self.selectModel
 	local noteSkinModel = self.noteSkinModel
 	local configModel = self.configModel
-	local modifierModel = self.modifierModel
 	local difficultyModel = self.difficultyModel
 	local replayModel = self.replayModel
 	local fileFinder = self.fileFinder
@@ -31,8 +31,8 @@ function GameplayController:load()
 	state.timeRate = 1
 	state.inputMode = InputMode(noteChart.inputMode)
 
-	modifierModel:applyMeta(state)
-	modifierModel:apply(noteChart)
+	ModifierModel:applyMeta(self.playContext.modifiers, state)
+	ModifierModel:apply(self.playContext.modifiers, noteChart)
 
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
 	noteSkin:loadData()
@@ -256,16 +256,16 @@ end
 
 function GameplayController:saveScore()
 	local rhythmModel = self.rhythmModel
-	local modifierModel = self.modifierModel
 	local scoreEngine = rhythmModel.scoreEngine
 	local scoreSystem = scoreEngine.scoreSystem
 
 	local chartItem = self.selectModel.noteChartItem
 
+	local modifiers = self.playContext.modifiers
 	local replayHash = self.replayModel:saveReplay(
 		chartItem.hash,
 		chartItem.index,
-		modifierModel.config
+		modifiers
 	)
 
 	local scoreEntryTable = {
@@ -275,7 +275,7 @@ function GameplayController:saveScore()
 		time = os.time(),
 		accuracy = scoreSystem.normalscore.accuracyAdjusted,
 		maxCombo = scoreSystem.base.maxCombo,
-		modifiers = ModifierEncoder:encode(modifierModel.config),
+		modifiers = ModifierEncoder:encode(modifiers),
 		replayHash = replayHash,
 		ratio = scoreSystem.misc.ratio,
 		perfect = scoreSystem.judgement.counters.soundsphere.perfect,

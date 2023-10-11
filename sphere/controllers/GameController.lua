@@ -1,7 +1,6 @@
 local class = require("class")
 
 local OnlineModel = require("sphere.models.OnlineModel")
-local ModifierModel = require("sphere.models.ModifierModel")
 local ModifierSelectModel = require("sphere.models.ModifierSelectModel")
 local NoteSkinModel = require("sphere.models.NoteSkinModel")
 local InputModel = require("sphere.models.InputModel")
@@ -46,8 +45,6 @@ function GameController:new()
 	self.editorController = EditorController()
 
 	self.onlineModel = OnlineModel(self.persistence.configModel)
-	self.modifierModel = ModifierModel()
-	self.modifierSelectModel = ModifierSelectModel(self.modifierModel)
 	self.noteSkinModel = NoteSkinModel(self.persistence.configModel)
 	self.inputModel = InputModel(self.persistence.configModel)
 	self.difficultyModel = DifficultyModel()
@@ -69,22 +66,22 @@ function GameController:new()
 		self.inputModel,
 		self.resourceModel
 	)
-	self.multiplayerModel = MultiplayerModel(
-		self.rhythmModel,
-		self.persistence.configModel,
-		self.modifierModel,
-		self.selectModel,
-		self.onlineModel,
-		self.persistence.osudirectModel
-	)
 	self.replayModel = ReplayModel(self.rhythmModel)
 	self.editorModel = EditorModel(
 		self.persistence.configModel,
 		self.resourceModel
 	)
 	self.speedModel = SpeedModel(self.persistence.configModel)
-
-	self.playContext = PlayContext(self.modifierModel)
+	self.playContext = PlayContext()
+	self.modifierSelectModel = ModifierSelectModel(self.playContext)
+	self.multiplayerModel = MultiplayerModel(
+		self.rhythmModel,
+		self.persistence.configModel,
+		self.selectModel,
+		self.onlineModel,
+		self.persistence.osudirectModel,
+		self.playContext
+	)
 
 	self.scoreModel = self.persistence.scoreModel
 	self.cacheModel = self.persistence.cacheModel
@@ -126,7 +123,7 @@ function GameController:load()
 	rhythmModel.hp = configModel.configs.settings.gameplay.hp
 	rhythmModel.settings = configModel.configs.settings
 
-	self.modifierModel:setConfig(configModel.configs.modifier)
+	self.playContext.modifiers = configModel.configs.modifier
 	self.modifierSelectModel:updateAdded()
 
 	self.scoreModel:load()

@@ -676,15 +676,14 @@ local function ModifierIconGrid(self)
 	-- drawFrameRect(w, h)
 	love.graphics.translate(36, 0)
 
-	local modifierModel = self.game.modifierModel
 	local selectModel = self.game.selectModel
-	local config = modifierModel.config
+	local modifiers = self.game.playContext.modifiers
 	if not showLoadedScore(self) and selectModel.scoreItem then
-		config = selectModel.scoreItem.modifiers
+		modifiers = selectModel.scoreItem.modifiers
 	end
 
 	ModifierIconGridView.game = self.game
-	ModifierIconGridView:draw(config, w - 72, h, h, true)
+	ModifierIconGridView:draw(modifiers, w - 72, h, h, true)
 end
 
 ---@param self table

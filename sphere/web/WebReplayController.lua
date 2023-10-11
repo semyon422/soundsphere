@@ -36,15 +36,10 @@ function WebReplayController:POST()
 
 	local playContext = PlayContext()
 	local rhythmModel = RhythmModel()
-	local modifierModel = ModifierModel()
 	local difficultyModel = DifficultyModel()
-	local replayModel = ReplayModel(
-		rhythmModel,
-		modifierModel
-	)
+	local replayModel = ReplayModel(rhythmModel)
 	fastplayController.rhythmModel = rhythmModel
 	fastplayController.replayModel = replayModel
-	fastplayController.modifierModel = modifierModel
 	fastplayController.difficultyModel = difficultyModel
 	fastplayController.playContext = playContext
 
@@ -52,8 +47,8 @@ function WebReplayController:POST()
 	rhythmModel.settings = require("sphere.persistence.ConfigModel.settings")
 	rhythmModel.hp = rhythmModel.settings.gameplay.hp
 
-	modifierModel:setConfig(replay.modifiers)
-	modifierModel:fixOldFormat(replay.modifiers)
+	playContext.modifiers = replay.modifiers
+	ModifierModel:fixOldFormat(replay.modifiers)
 
 	rhythmModel.timings = replay.timings
 	replayModel.replay = replay
@@ -68,7 +63,7 @@ function WebReplayController:POST()
 		difficulty = playContext.enps,
 		modifiers = replay.modifiers,
 		modifiersEncoded = ModifierEncoder:encode(replay.modifiers),
-		modifiersString = modifierModel:getString(replay.modifiers),
+		modifiersString = ModifierModel:getString(replay.modifiers),
 	}}
 end
 

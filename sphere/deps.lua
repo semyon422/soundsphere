@@ -13,7 +13,6 @@ return {
 	fastplayController = {
 		"rhythmModel",
 		"replayModel",
-		"modifierModel",
 		"difficultyModel",
 		"playContext",
 	},
@@ -22,7 +21,6 @@ return {
 		"selectModel",
 		"noteSkinModel",
 		"configModel",
-		"modifierModel",
 		"difficultyModel",
 		"replayModel",
 		"multiplayerModel",
@@ -40,15 +38,14 @@ return {
 	},
 	multiplayerController = {
 		"multiplayerModel",
-		"modifierModel",
 		"configModel",
 		"selectModel",
+		"playContext",
 	},
 	resultController = {
 		"selectModel",
 		"replayModel",
 		"rhythmModel",
-		"modifierModel",
 		"onlineModel",
 		"configModel",
 		"fastplayController",
@@ -57,7 +54,6 @@ return {
 	selectController = {
 		"selectModel",
 		"previewModel",
-		"modifierModel",
 		"modifierSelectModel",
 		"noteSkinModel",
 		"configModel",
