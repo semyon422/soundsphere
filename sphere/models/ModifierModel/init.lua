@@ -1,6 +1,5 @@
 local class = require("class")
 local table_util = require("table_util")
-local InputMode = require("ncdk.InputMode")
 
 ---@class sphere.ModifierModel
 ---@operator call: sphere.ModifierModel
@@ -46,17 +45,9 @@ for name, id in pairs(Modifiers) do
 	ModifiersById[id] = M
 end
 
-function ModifierModel:new()
-	self.modifierObject = {}
-end
-
 ---@param config table
 function ModifierModel:setConfig(config)
 	self.config = config
-	self.state = {
-		timeRate = 1,
-		inputMode = InputMode(),
-	}
 end
 
 ---@param nameOrId string|number?
@@ -95,13 +86,13 @@ end
 
 ---@param noteChart ncdk.NoteChart
 function ModifierModel:apply(noteChart)
+	local obj = {}
+	obj.noteChart = noteChart
 	for _, modifierConfig in ipairs(self.config) do
 		local mod = self:getModifier(modifierConfig.name)
 		if mod then
-			local obj = self.modifierObject
 			table_util.clear(obj)
 			setmetatable(obj, mod)
-			obj.noteChart = noteChart
 			obj:apply(modifierConfig)
 		end
 	end
@@ -109,11 +100,10 @@ end
 
 ---@param state table
 function ModifierModel:applyMeta(state)
-	self.state = state
+	local obj = {}
 	for _, modifierConfig in ipairs(self.config) do
 		local mod = self:getModifier(modifierConfig.name)
 		if mod then
-			local obj = self.modifierObject
 			table_util.clear(obj)
 			setmetatable(obj, mod)
 			obj:applyMeta(modifierConfig, state)

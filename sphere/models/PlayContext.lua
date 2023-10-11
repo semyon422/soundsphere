@@ -12,15 +12,14 @@ function PlayContext:new(modifierModel)
 	self.modifierModel = modifierModel
 end
 
----@param chartItem table
-function PlayContext:setChartItem(chartItem)
-	self.chartItem = chartItem
+---@param inputMode ncdk.InputMode|string
+function PlayContext:setInputMode(inputMode)
+	self.inputMode = InputMode(inputMode)
+end
 
-	local state = self.state
-	state.timeRate = 1
-	state.inputMode = InputMode(chartItem.inputMode)
-
-	self.modifierModel:applyMeta(state)
+function PlayContext:reset()
+	self.state.timeRate = 1
+	self.state.inputMode = InputMode()
 end
 
 return PlayContext

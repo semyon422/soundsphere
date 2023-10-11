@@ -68,5 +68,6 @@ return {
 		"cacheModel",
 		"osudirectModel",
 		"windowModel",
+		"playContext",
 	},
 }

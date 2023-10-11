@@ -13,8 +13,7 @@ function FastplayController:applyModifiers(noteChart, replay)
 
 	local state = {}
 	state.timeRate = 1
-	state.inputMode = InputMode()
-	state.inputMode:set(noteChart.inputMode)
+	state.inputMode = InputMode(noteChart.inputMode)
 
 	-- if replay.modifiers then
 	-- 	modifierModel:setConfig(replay.modifiers)

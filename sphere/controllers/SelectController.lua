@@ -25,17 +25,16 @@ function SelectController:load()
 end
 
 function SelectController:applyModifierMeta()
-	local state = {}
-	state.timeRate = 1
-	state.inputMode = InputMode()
+	local playContext = self.playContext
+	playContext:reset()
 
 	local item = self.selectModel.noteChartItem
 	if item then
-		state.inputMode:set(item.inputMode)
+		playContext:setInputMode(item.inputMode)
 	end
 
-	self.modifierModel:applyMeta(state)
-	self.previewModel:setPitch(state.timeRate)
+	self.modifierModel:applyMeta(playContext.state)
+	self.previewModel:setPitch(playContext.state.timeRate)
 end
 
 function SelectController:beginUnload()

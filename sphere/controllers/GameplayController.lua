@@ -29,8 +29,7 @@ function GameplayController:load()
 
 	local state = {}
 	state.timeRate = 1
-	state.inputMode = InputMode()
-	state.inputMode:set(noteChart.inputMode)
+	state.inputMode = InputMode(noteChart.inputMode)
 
 	modifierModel:applyMeta(state)
 	modifierModel:apply(noteChart)
