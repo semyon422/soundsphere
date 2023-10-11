@@ -40,6 +40,8 @@ local OneUseModifiers = {
 	"NoLongNote",
 }
 
+ModifierSelectModel.changed = false
+
 ---@param playContext sphere.PlayContext
 function ModifierSelectModel:new(playContext)
 	self.playContext = playContext
@@ -72,6 +74,7 @@ function ModifierSelectModel:updateAdded()
 	end
 end
 
+---@param modifier string
 ---@return boolean
 function ModifierSelectModel:isAdded(modifier)
 	return self.addedModifiers[modifier] > 0

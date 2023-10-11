@@ -39,10 +39,10 @@ function ModifierEncoder:decode(s)
 	local config = {}
 	for id, version, value in s:gmatch("(%d+):([^;^,]+),([^;^,]+)") do
 		id = tonumber(id)
-		local name = ModifiersById[id]
-		if name then
+		local mod = ModifiersById[id]
+		if mod then
 			local mconfig = {
-				name = name,
+				name = mod.name,
 				version = tonumber(version),
 				value = decodeValue(value),
 			}

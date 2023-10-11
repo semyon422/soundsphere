@@ -7,19 +7,19 @@ local ModifierModel = require("sphere.models.ModifierModel")
 ---@operator call: sphere.ModifierIconGridView
 local ModifierIconGridView = class()
 
----@param configModifier table|string
+---@param modifiers table|string
 ---@param w number
 ---@param h number
 ---@param size number
 ---@param noModifier boolean?
 ---@param growUp boolean?
-function ModifierIconGridView:draw(configModifier, w, h, size, noModifier, growUp)
-	if type(configModifier) == "string" then
-		configModifier = ModifierEncoder:decode(configModifier)
+function ModifierIconGridView:draw(modifiers, w, h, size, noModifier, growUp)
+	if type(modifiers) == "string" then
+		modifiers = ModifierEncoder:decode(modifiers)
 	end
-	configModifier = configModifier or {}
+	modifiers = modifiers or {}
 
-	if noModifier and #configModifier == 0 then
+	if noModifier and #modifiers == 0 then
 		ModifierIconView:draw(size, "empty", "NO", "MOD")
 	end
 
@@ -34,7 +34,7 @@ function ModifierIconGridView:draw(configModifier, w, h, size, noModifier, growU
 	while true do
 		local row = math.floor((drawIndex - 1) / columns) + 1
 		local column = (drawIndex - 1) % columns + 1
-		local modifierConfig = configModifier[modifierIndex]
+		local modifierConfig = modifiers[modifierIndex]
 		if modifierConfig then
 			local modifier = ModifierModel:getModifier(modifierConfig.name)
 			if modifier then
@@ -46,7 +46,7 @@ function ModifierIconGridView:draw(configModifier, w, h, size, noModifier, growU
 					end
 					love.graphics.push()
 					love.graphics.translate(size * (column - 1), y)
-					if drawIndex == maxIndex and #configModifier + drawIndex - modifierIndex > maxIndex then
+					if drawIndex == maxIndex and #modifiers + drawIndex - modifierIndex > maxIndex then
 						ModifierIconView:draw(size, "empty", "...")
 						love.graphics.pop()
 						break
