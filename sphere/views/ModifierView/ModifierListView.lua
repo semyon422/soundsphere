@@ -46,9 +46,9 @@ function ModifierListView:drawItem(i, w, h)
 
 	just.row(true)
 	just.indent(44)
-	TextCellImView(w2 - 44, 72, "left", "", item.name)
+	TextCellImView(w2 - 44, 72, "left", "", ModifierModel.Modifiers[item.id])
 
-	local modifier = ModifierModel:getModifier(item.name)
+	local modifier = ModifierModel:getModifier(item.id)
 	if not modifier then
 		TextCellImView(w2 - 44, 72, "left", "", "Deleted modifier")
 	elseif modifier.defaultValue == nil then

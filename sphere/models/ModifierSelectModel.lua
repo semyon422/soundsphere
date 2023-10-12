@@ -70,7 +70,8 @@ function ModifierSelectModel:updateAdded()
 		self.addedModifiers[name] = 0
 	end
 	for _, c in ipairs(self.playContext.modifiers) do
-		self.addedModifiers[c.name] = self.addedModifiers[c.name] + 1
+		local name = ModifierModel.Modifiers[c.id]
+		self.addedModifiers[name] = self.addedModifiers[name] + 1
 	end
 end
 
@@ -137,13 +138,13 @@ end
 ---@param index number
 function ModifierSelectModel:remove(index)
 	local modifiers = self.playContext.modifiers
-	local modifierConfig = ModifierModel:remove(modifiers, index)
+	local modifier = ModifierModel:remove(modifiers, index)
 	if not modifiers[self.modifierIndex] then
 		self.modifierIndex = math.max(self.modifierIndex - 1, 0)
 	end
-	if modifierConfig then
-		local modifier = modifierConfig.name
-		self.addedModifiers[modifier] = self.addedModifiers[modifier] - 1
+	if modifier then
+		local name = ModifierModel.Modifiers[modifier.id]
+		self.addedModifiers[name] = self.addedModifiers[name] - 1
 	end
 	self:change()
 end

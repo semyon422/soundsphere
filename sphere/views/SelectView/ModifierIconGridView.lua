@@ -36,7 +36,7 @@ function ModifierIconGridView:draw(modifiers, w, h, size, noModifier, growUp)
 		local column = (drawIndex - 1) % columns + 1
 		local modifierConfig = modifiers[modifierIndex]
 		if modifierConfig then
-			local modifier = ModifierModel:getModifier(modifierConfig.name)
+			local modifier = ModifierModel:getModifier(modifierConfig.id)
 			if modifier then
 				local modifierString, modifierSubString = modifier:getString(modifierConfig)
 				if modifierString then

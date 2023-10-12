@@ -1,4 +1,5 @@
 local class = require("class")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.ReplayConverter
 ---@operator call: sphere.ReplayConverter
@@ -59,11 +60,21 @@ end
 function ReplayConverter:convertModifier(c, object)
 	if c.value == nil then
 		for k, v in pairs(c) do
-			if k ~= "name" then
+			if k ~= "name" and k ~= "version" and k ~= "id" then
 				c.value = v
 			end
 		end
 	end
+
+	if c.name then
+		c.id = ModifierModel.Modifiers[c.name]
+		if not c.id then
+			return false
+		end
+		c.name = nil
+		return true
+	end
+
 	if c.value == nil then
 		return true
 	end

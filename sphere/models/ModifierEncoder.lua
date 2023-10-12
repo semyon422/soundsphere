@@ -1,8 +1,4 @@
 local class = require("class")
-local ModifierModel = require("sphere.models.ModifierModel")
-
-local Modifiers = ModifierModel.Modifiers
-local ModifiersById = ModifierModel.ModifiersById
 
 local ModifierEncoder = class()
 
@@ -10,16 +6,13 @@ local ModifierEncoder = class()
 ---@return string
 function ModifierEncoder:encode(config)
 	local t = {}
-	for _, modifierConfig in ipairs(config) do
-		local id = Modifiers[modifierConfig.name]
-		if id then
-			local encoded = ("%d:%d,%s"):format(
-				Modifiers[modifierConfig.name],
-				modifierConfig.version,
-				modifierConfig.value
-			)
-			table.insert(t, encoded)
-		end
+	for _, modifier in ipairs(config) do
+		local encoded = ("%d:%d,%s"):format(
+			modifier.id,
+			modifier.version,
+			modifier.value
+		)
+		table.insert(t, encoded)
 	end
 	return table.concat(t, ";")
 end
@@ -38,16 +31,12 @@ end
 function ModifierEncoder:decode(s)
 	local config = {}
 	for id, version, value in s:gmatch("(%d+):([^;^,]+),([^;^,]+)") do
-		id = tonumber(id)
-		local mod = ModifiersById[id]
-		if mod then
-			local mconfig = {
-				name = mod.name,
-				version = tonumber(version),
-				value = decodeValue(value),
-			}
-			table.insert(config, mconfig)
-		end
+		local mconfig = {
+			id = tonumber(id),
+			version = tonumber(version),
+			value = decodeValue(value),
+		}
+		table.insert(config, mconfig)
 	end
 	return config
 end

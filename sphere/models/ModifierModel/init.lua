@@ -36,13 +36,15 @@ ModifierModel.Modifiers = Modifiers
 
 local ModifiersByName = {}
 local ModifiersById = {}
-ModifierModel.ModifiersByName = ModifiersByName
-ModifierModel.ModifiersById = ModifiersById
 
 for name, id in pairs(Modifiers) do
 	local M = require("sphere.models.ModifierModel." .. name)
 	ModifiersByName[name] = M
 	ModifiersById[id] = M
+end
+
+for name, id in pairs(Modifiers) do
+	Modifiers[id] = name
 end
 
 ---@param nameOrId string|number?
@@ -56,7 +58,11 @@ end
 ---@param index number
 function ModifierModel:add(modifiers, modifier, index)
 	local mod = assert(self:getModifier(modifier))
-	table.insert(modifiers, index, mod:getDefaultConfig())
+	table.insert(modifiers, index, {
+		id = Modifiers[modifier],
+		version = mod.version,
+		value = mod.defaultValue
+	})
 end
 
 ---@param modifiers table
@@ -69,29 +75,28 @@ end
 ---@param modifier table
 ---@param value any
 function ModifierModel:setModifierValue(modifier, value)
-	local mod = assert(self:getModifier(modifier.name))
-	mod:setValue(modifier, value)
+	modifier.value = value
 end
 
 ---@param modifier table
 ---@param delta number
 function ModifierModel:increaseModifierValue(modifier, delta)
-	local mod = assert(self:getModifier(modifier.name))
+	local mod = assert(self:getModifier(modifier.id))
 	local indexValue = mod:toIndexValue(modifier.value)
-	mod:setValue(modifier, mod:fromIndexValue(indexValue + delta))
+	modifier.value = mod:fromIndexValue(indexValue + delta)
 end
 
 ---@param modifiers table
 ---@param noteChart ncdk.NoteChart
 function ModifierModel:apply(modifiers, noteChart)
 	local obj = {}
-	for _, modifierConfig in ipairs(modifiers) do
-		local mod = self:getModifier(modifierConfig.name)
+	for _, modifier in ipairs(modifiers) do
+		local mod = self:getModifier(modifier.id)
 		if mod then
 			table_util.clear(obj)
 			obj.noteChart = noteChart
 			setmetatable(obj, mod)
-			obj:apply(modifierConfig)
+			obj:apply(modifier)
 		end
 	end
 end
@@ -100,12 +105,12 @@ end
 ---@param state table
 function ModifierModel:applyMeta(modifiers, state)
 	local obj = {}
-	for _, modifierConfig in ipairs(modifiers) do
-		local mod = self:getModifier(modifierConfig.name)
+	for _, modifier in ipairs(modifiers) do
+		local mod = self:getModifier(modifier.id)
 		if mod then
 			table_util.clear(obj)
 			setmetatable(obj, mod)
-			obj:applyMeta(modifierConfig, state)
+			obj:applyMeta(modifier, state)
 		end
 	end
 end
@@ -114,10 +119,10 @@ end
 ---@return string
 function ModifierModel:getString(modifiers)
 	local t = {}
-	for _, modifierConfig in ipairs(modifiers) do
-		local mod = self:getModifier(modifierConfig.name)
+	for _, modifier in ipairs(modifiers) do
+		local mod = self:getModifier(modifier.id)
 		if mod then
-			local s, subs = mod:getString(modifierConfig)
+			local s, subs = mod:getString(modifier)
 			local str = (s or "") .. (subs or "")
 			if #str > 0 then
 				table.insert(t, str)
@@ -129,11 +134,11 @@ end
 
 ---@param modifiers table
 function ModifierModel:fixOldFormat(modifiers)
-	for _, modifierConfig in ipairs(modifiers) do
-		local mod = self:getModifier(modifierConfig.name)
+	for _, modifier in ipairs(modifiers) do
+		local mod = self:getModifier(modifier.id)
 		if mod then
-			if type(modifierConfig.value) == "number" and type(mod.defaultValue) == "string" then
-				modifierConfig.value = mod:fromIndexValue(modifierConfig.value)
+			if type(modifier.value) == "number" and type(mod.defaultValue) == "string" then
+				modifier.value = mod:fromIndexValue(modifier.value)
 			end
 		end
 	end

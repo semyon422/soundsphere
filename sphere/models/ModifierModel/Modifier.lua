@@ -6,23 +6,8 @@ local table_util = require("table_util")
 ---@operator call: sphere.Modifier
 local Modifier = class()
 
----@return table
-function Modifier:getDefaultConfig()
-	return {
-		name = self.name,
-		version = self.version,
-		value = self.defaultValue
-	}
-end
-
 Modifier.version = 0
 Modifier.name = ""
-
----@param config table
----@return any
-function Modifier:getValue(config)
-	return config.value
-end
 
 ---@param value any
 ---@return number
@@ -55,12 +40,6 @@ end
 ---@return number
 function Modifier:getCount()
 	return #self.values
-end
-
----@param config table
----@param value any
-function Modifier:setValue(config, value)
-	config.value = value
 end
 
 ---@param modifierConfig table
