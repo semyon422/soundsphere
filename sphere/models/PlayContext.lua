@@ -15,7 +15,7 @@ end
 
 ---@param inputMode ncdk.InputMode|string
 function PlayContext:setInputMode(inputMode)
-	self.inputMode = InputMode(inputMode)
+	self.state.inputMode = InputMode(inputMode)
 end
 
 function PlayContext:reset()
