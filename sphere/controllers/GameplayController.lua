@@ -333,7 +333,8 @@ function GameplayController:increaseLocalOffset(delta)
 	local chartItem = self.selectModel.noteChartItem
 	chartItem.localOffset = math_util.round((chartItem.localOffset or 0) + delta, delta)
 	self.cacheModel.chartRepo:updateNoteChartDataEntry({
-		id = chartItem.noteChartDataId,
+		hash = chartItem.hash,
+		index = chartItem.index,
 		localOffset = chartItem.localOffset,
 	})
 	self.notificationModel:notify("local offset: " .. chartItem.localOffset * 1000 .. "ms")
