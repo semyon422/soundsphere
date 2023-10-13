@@ -1,20 +1,20 @@
 local class = require("class")
+local serpent = require("serpent")
+local json = require("json")
+local md5 = require("md5")
 
 local ModifierEncoder = class()
 
 ---@param config table
 ---@return string
 function ModifierEncoder:encode(config)
-	local t = {}
-	for _, modifier in ipairs(config) do
-		local encoded = ("%d:%d,%s"):format(
-			modifier.id,
-			modifier.version,
-			modifier.value
-		)
-		table.insert(t, encoded)
-	end
-	return table.concat(t, ";")
+	return json.encode(config)
+end
+
+---@param config table
+---@return string
+function ModifierEncoder:hash(config)
+	return md5.sumhexa(serpent.line(config, {sortkeys = true, comment = false, compact = true}))
 end
 
 ---@param s string
@@ -29,14 +29,18 @@ end
 ---@param s string
 ---@return table
 function ModifierEncoder:decode(s)
+	local ok, err = pcall(json.decode, s)
+	if ok then
+		return err
+	end
+
 	local config = {}
 	for id, version, value in s:gmatch("(%d+):([^;^,]+),([^;^,]+)") do
-		local mconfig = {
+		table.insert(config, {
 			id = tonumber(id),
 			version = tonumber(version),
 			value = decodeValue(value),
-		}
-		table.insert(config, mconfig)
+		})
 	end
 	return config
 end
