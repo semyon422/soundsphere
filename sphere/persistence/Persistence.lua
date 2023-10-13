@@ -26,7 +26,7 @@ function Persistence:load()
 	local configModel = self.configModel
 	configModel:open("settings", true)
 	configModel:open("select", true)
-	configModel:open("modifier", true)
+	configModel:open("play", true)
 	configModel:open("input", true)
 	configModel:open("mount", true)
 	configModel:open("online", true)

@@ -63,15 +63,15 @@ end
 
 ---@param hash string
 ---@param index number
----@param modifiers table
+---@param playContext sphere.PlayContext
 ---@return string
-function ReplayModel:saveReplay(hash, index, modifiers)
+function ReplayModel:saveReplay(hash, index, playContext)
 	local replay = self.replay
 	replay.hash = hash
 	replay.index = index
 	replay.inputMode = self.rhythmModel.noteChart.inputMode
-	replay.modifierTable = modifiers
 	replay.timings = self.timings
+	playContext:save(replay)
 
 	local replayString = replay:toString()
 	local replayHash = md5.sumhexa(replayString)

@@ -3,17 +3,24 @@ local thread = require("thread")
 local Sph = require("sph.Sph")
 local NoteChartExporter = require("osu.NoteChartExporter")
 local ModifierModel = require("sphere.models.ModifierModel")
+local InputMode = require("ncdk.InputMode")
 
 ---@class sphere.SelectController
 ---@operator call: sphere.SelectController
 local SelectController = class()
+
+function SelectController:new()
+	self.state = {
+		inputMode = InputMode(),
+	}
+end
 
 function SelectController:load()
 	local selectModel = self.selectModel
 	local previewModel = self.previewModel
 
 	self.configModel:write()
-	self.playContext.modifiers = self.configModel.configs.modifier
+	self.playContext:load(self.configModel.configs.play)
 	self.modifierSelectModel:updateAdded()
 
 	self.selectModel:setLock(false)
@@ -25,16 +32,18 @@ function SelectController:load()
 end
 
 function SelectController:applyModifierMeta()
+	self.state.inputMode = InputMode()
+
 	local playContext = self.playContext
-	playContext:reset()
+	playContext:load(self.configModel.configs.play)
 
 	local item = self.selectModel.noteChartItem
 	if item then
-		playContext:setInputMode(item.inputMode)
+		self.state.inputMode:set(item.inputMode)
 	end
 
-	ModifierModel:applyMeta(playContext.modifiers, playContext.state)
-	self.previewModel:setPitch(playContext.state.timeRate)
+	ModifierModel:applyMeta(playContext.modifiers, self.state)
+	self.previewModel:setPitch(playContext.rate)
 end
 
 function SelectController:beginUnload()
@@ -42,6 +51,7 @@ function SelectController:beginUnload()
 end
 
 function SelectController:unload()
+	self.playContext:save(self.configModel.configs.play)
 	self.noteSkinModel:load()
 	self.configModel:write()
 end

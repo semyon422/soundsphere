@@ -47,7 +47,7 @@ function WebReplayController:POST()
 	rhythmModel.settings = require("sphere.persistence.ConfigModel.settings")
 	rhythmModel.hp = rhythmModel.settings.gameplay.hp
 
-	playContext.modifiers = replay.modifiers
+	self.playContext:load(replay)
 	ModifierModel:fixOldFormat(replay.modifiers)
 
 	rhythmModel.timings = replay.timings

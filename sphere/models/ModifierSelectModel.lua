@@ -8,9 +8,6 @@ local ModifierSelectModel = class()
 
 local Modifiers = {
 	"AutoKeySound",
-	"ConstSpeed",
-	"TimeRateQ",
-	"TimeRateX",
 	"WindUp",
 	"NoScratch",
 	"NoLongNote",
@@ -32,9 +29,6 @@ ModifierSelectModel.modifiers = Modifiers
 
 local OneUseModifiers = {
 	"AutoKeySound",
-	"ConstSpeed",
-	"TimeRateQ",
-	"TimeRateX",
 	"WindUp",
 	"NoScratch",
 	"NoLongNote",

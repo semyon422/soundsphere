@@ -26,10 +26,10 @@ function ScoreModel:transformScoreEntry(score)
 	local s = erfunc.erf(window / (score.accuracy * math.sqrt(2)))
 	score.rating = score.difficulty * s
 	score.score = s * 10000
-	if tonumber(score.isTop) == 1 then
-		score.isTop = true
+	if tonumber(score.is_top) == 1 then
+		score.is_top = true
 	else
-		score.isTop = false
+		score.is_top = false
 	end
 end
 
@@ -50,8 +50,8 @@ function ScoreModel:insertScore(scoreEntry)
 	local score = ScoreDatabase:insertScore(scoreEntry)
 
 	local scoreEntries = self:getScoreEntries(
-		scoreEntry.noteChartHash,
-		scoreEntry.noteChartIndex
+		scoreEntry.chart_hash,
+		scoreEntry.chart_index
 	)
 	self:calculateTopScore(scoreEntries)
 
@@ -75,15 +75,15 @@ function ScoreModel:calculateTopScore(scores)
 	local counter = 0
 	table.sort(scores, sortScores)
 	for i, score in ipairs(scores) do
-		if i == 1 and not score.isTop then
+		if i == 1 and not score.is_top then
 			ScoreDatabase:updateScore({
 				id = score.id,
-				isTop = true,
+				is_top = true,
 			})
-		elseif i > 1 and score.isTop then
+		elseif i > 1 and score.is_top then
 			ScoreDatabase:updateScore({
 				id = score.id,
-				isTop = false,
+				is_top = false,
 			})
 		end
 		counter = counter + 1
@@ -97,9 +97,9 @@ function ScoreModel:calculateTopScores()
 	local map = {}
 	for _, score in ipairs(ScoreDatabase:selectAllScores()) do
 		self:transformScoreEntry(score)
-		map[score.noteChartHash] = map[score.noteChartHash] or {}
-		map[score.noteChartHash][score.noteChartIndex] = map[score.noteChartHash][score.noteChartIndex] or {}
-		table.insert(map[score.noteChartHash][score.noteChartIndex], score)
+		map[score.chart_hash] = map[score.chart_hash] or {}
+		map[score.chart_hash][score.chart_index] = map[score.chart_hash][score.chart_index] or {}
+		table.insert(map[score.chart_hash][score.chart_index], score)
 	end
 
 	local counter = 0

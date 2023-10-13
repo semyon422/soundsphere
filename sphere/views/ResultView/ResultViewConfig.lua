@@ -275,8 +275,8 @@ local function Judgements(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	local perfect = show and counter.perfect or scoreItem.perfect or 0
-	local notPerfect = show and counter["not perfect"] or scoreItem.notPerfect or 0
-	local miss = show and base.missCount or scoreItem.missCount or 0
+	local notPerfect = show and counter["not perfect"] or scoreItem.not_perfect or 0
+	local miss = show and base.missCount or scoreItem.miss or 0
 
 	local interval = 5
 	local lineHeight = 40
@@ -435,7 +435,7 @@ local function NotechartInfo(self)
 	local bpm = baseBpm * baseTimeRate
 	local length = baseLength / baseTimeRate
 	local difficulty = show and playContext.enps or scoreItem.difficulty
-	local inputMode = show and tostring(rhythmModel.noteChart.inputMode) or scoreItem.inputMode
+	local inputMode = show and tostring(rhythmModel.noteChart.inputMode) or scoreItem.inputmode
 
 	local w, h = Layout:move("title_left")
 	love.graphics.translate(22, 15)
@@ -656,7 +656,7 @@ local function NotechartInfo(self)
 	-- end
 	-- TextCellImView(w, 55, "right", "early/late", earlylate)
 
-	TextCellImView(w, 55, "right", "pauses", scoreItem.pausesCount)
+	TextCellImView(w, 55, "right", "pauses", scoreItem.pauses)
 
 	if show then
 		local adjustRatio = normalscore.adjustRatio
@@ -717,7 +717,7 @@ local function BottomScreenMenu(self)
 		if imgui.TextOnlyButton("submit", "resubmit", 72 * 2, h) then
 			self.game.onlineModel.onlineScoreManager:submit(
 				self.game.selectModel.noteChartItem,
-				scoreItem.replayHash
+				scoreItem.replay_hash
 			)
 		end
 	end

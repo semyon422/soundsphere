@@ -28,19 +28,18 @@ function GameplayController:load()
 	self:applyTempo(noteChart, config.gameplay.tempoFactor, config.gameplay.primaryTempo)
 
 	local state = {}
-	state.timeRate = 1
 	state.inputMode = InputMode(noteChart.inputMode)
 
-	ModifierModel:applyMeta(self.playContext.modifiers, state)
-	ModifierModel:apply(self.playContext.modifiers, noteChart)
+	ModifierModel:applyMeta(playContext.modifiers, state)
+	ModifierModel:apply(playContext.modifiers, noteChart)
 
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
 	noteSkin:loadData()
 
 	rhythmModel:setAdjustRate(config.audio.adjustRate)
-	rhythmModel:setTimeRate(state.timeRate)
+	rhythmModel:setTimeRate(playContext.rate)
 	rhythmModel:setWindUp(state.windUp)
-	rhythmModel:setConstantSpeed(state.constant)
+	rhythmModel:setConstantSpeed(playContext.const)
 	rhythmModel:setVolume(config.audio.volume)
 	rhythmModel:setAudioMode(config.audio.mode)
 	rhythmModel:setLongNoteShortening(config.gameplay.longNoteShortening)
@@ -63,7 +62,7 @@ function GameplayController:load()
 
 	rhythmModel:load()
 
-	local enps, longNoteRatio = difficultyModel:getDifficulty(noteChart, state.timeRate)
+	local enps, longNoteRatio = difficultyModel:getDifficulty(noteChart, playContext.rate)
 	playContext.enps = enps
 	playContext.longNoteRatio = longNoteRatio
 
@@ -258,35 +257,35 @@ function GameplayController:saveScore()
 	local rhythmModel = self.rhythmModel
 	local scoreEngine = rhythmModel.scoreEngine
 	local scoreSystem = scoreEngine.scoreSystem
+	local playContext = self.playContext
 
 	local chartItem = self.selectModel.noteChartItem
 
-	local modifiers = self.playContext.modifiers
 	local replayHash = self.replayModel:saveReplay(
 		chartItem.hash,
 		chartItem.index,
-		modifiers
+		playContext
 	)
 
 	local scoreEntryTable = {
-		noteChartHash = chartItem.hash,
-		noteChartIndex = chartItem.index,
-		playerName = "Player",
+		chart_hash = chartItem.hash,
+		chart_index = chartItem.index,
 		time = os.time(),
 		accuracy = scoreSystem.normalscore.accuracyAdjusted,
-		maxCombo = scoreSystem.base.maxCombo,
-		modifiers = ModifierEncoder:encode(modifiers),
-		replayHash = replayHash,
+		max_combo = scoreSystem.base.maxCombo,
+		modifiers = ModifierEncoder:encode(playContext.modifiers),
+		rate = playContext.rate,
+		const = playContext.const,
+		replay_hash = replayHash,
 		ratio = scoreSystem.misc.ratio,
 		perfect = scoreSystem.judgement.counters.soundsphere.perfect,
-		notPerfect = scoreSystem.judgement.counters.soundsphere["not perfect"],
-		missCount = scoreSystem.base.missCount,
+		not_perfect = scoreSystem.judgement.counters.soundsphere["not perfect"],
+		miss = scoreSystem.base.missCount,
 		mean = scoreSystem.normalscore.normalscore.mean,
 		earlylate = scoreSystem.misc.earlylate,
-		inputMode = tostring(rhythmModel.noteChart.inputMode),
-		timeRate = rhythmModel.timeEngine.baseTimeRate,
+		inputmode = tostring(rhythmModel.noteChart.inputMode),
 		difficulty = self.playContext.enps,
-		pausesCount = scoreEngine.pausesCount,
+		pauses = scoreEngine.pausesCount,
 	}
 	local scoreEntry = self.scoreModel:insertScore(scoreEntryTable)
 

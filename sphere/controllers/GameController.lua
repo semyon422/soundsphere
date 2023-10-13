@@ -12,6 +12,7 @@ local MultiplayerModel = require("sphere.models.MultiplayerModel")
 local ReplayModel = require("sphere.models.ReplayModel")
 local EditorModel = require("sphere.models.EditorModel")
 local SpeedModel = require("sphere.models.SpeedModel")
+local TimeRateModel = require("sphere.models.TimeRateModel")
 local ResourceModel = require("sphere.models.ResourceModel")
 local PlayContext = require("sphere.models.PlayContext")
 
@@ -72,6 +73,7 @@ function GameController:new()
 		self.resourceModel
 	)
 	self.speedModel = SpeedModel(self.persistence.configModel)
+	self.timeRateModel = TimeRateModel(self.persistence.configModel)
 	self.playContext = PlayContext()
 	self.modifierSelectModel = ModifierSelectModel(self.playContext)
 	self.multiplayerModel = MultiplayerModel(
@@ -123,7 +125,7 @@ function GameController:load()
 	rhythmModel.hp = configModel.configs.settings.gameplay.hp
 	rhythmModel.settings = configModel.configs.settings
 
-	self.playContext.modifiers = configModel.configs.modifier
+	self.playContext:load(configModel.configs.play)
 	self.modifierSelectModel:updateAdded()
 
 	self.scoreModel:load()

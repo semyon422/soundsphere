@@ -71,7 +71,7 @@ local function Cells(self)
 
 	local multiplayerModel = self.game.multiplayerModel
 
-	local baseTimeRate = self.game.playContext.state.timeRate
+	local baseTimeRate = self.game.playContext.rate
 	local noteChartItem = self.game.selectModel.noteChartItem or multiplayerModel.notechart
 
 	local bpm = 0
@@ -175,7 +175,7 @@ local function Title(self)
 	end
 	TextCellImView(w, 52, "left", item.artist, item.title)
 
-	local baseTimeRate = self.game.playContext.state.timeRate
+	local baseTimeRate = self.game.playContext.rate
 	local difficulty = Format.difficulty((item.difficulty or 0) * baseTimeRate)
 
 	TextCellImView(72, h, "right", Format.inputMode(item.inputMode), difficulty, true)

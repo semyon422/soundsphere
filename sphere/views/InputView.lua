@@ -21,7 +21,7 @@ return ModalImView(function(self)
 
 	imgui.setSize(w, h, _w, _h)
 
-	local inputMode = tostring(self.game.playContext.state.inputMode)
+	local inputMode = tostring(self.game.selectController.state.inputMode)
 	local inputs = self.game.inputModel:getInputs(inputMode)
 	local devices = self.game.inputModel.devices
 

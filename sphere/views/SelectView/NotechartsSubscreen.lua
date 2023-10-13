@@ -107,7 +107,7 @@ end
 local function Cells(self)
 	local w, h = Layout:move("column2row1")
 
-	local baseTimeRate = self.game.playContext.state.timeRate
+	local baseTimeRate = self.game.playContext.rate
 	local noteChartItem = self.game.selectModel.noteChartItem
 	local scoreItem = self.game.selectModel.scoreItem
 
@@ -136,7 +136,7 @@ local function Cells(self)
 		score = scoreItem.score or 0
 		difficulty = scoreItem.difficulty or 0
 		accuracy = scoreItem.accuracy or 0
-		missCount = scoreItem.missCount or 0
+		missCount = scoreItem.miss or 0
 		if score ~= score then
 			score = 0
 		end

@@ -23,7 +23,7 @@ return ModalImView(function(self)
 		return true
 	end
 
-	local inputMode = self.game.playContext.state.inputMode
+	local inputMode = self.game.selectController.state.inputMode
 	selectedNoteSkin = self.game.noteSkinModel:getNoteSkin(inputMode)
 	if not selectedNoteSkin then
 		return true

@@ -30,8 +30,8 @@ function ResultController:getReplayDataAsync(scoreEntry)
 	local content
 	if scoreEntry.file then
 		content = webApi.api.files[scoreEntry.file.id]:__get({download = true})
-	elseif scoreEntry.replayHash then
-		content = readAsync(replayModel.path .. "/" .. scoreEntry.replayHash)
+	elseif scoreEntry.replay_hash then
+		content = readAsync(replayModel.path .. "/" .. scoreEntry.replay_hash)
 	end
 
 	return content
@@ -60,7 +60,7 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 	local rhythmModel = self.rhythmModel
 
 	if replay.modifiers then
-		self.playContext.modifiers = replay.modifiers
+		self.playContext:load(replay)
 		ModifierModel:fixOldFormat(replay.modifiers)
 	end
 

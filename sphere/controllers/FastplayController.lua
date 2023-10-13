@@ -11,7 +11,6 @@ local FastplayController = class()
 ---@return table
 function FastplayController:applyModifiers(noteChart, replay)
 	local state = {}
-	state.timeRate = 1
 	state.inputMode = InputMode(noteChart.inputMode)
 
 	-- if replay.modifiers then
@@ -39,7 +38,7 @@ function FastplayController:play(noteChart, replay)
 	rhythmModel.timings = replay.timings
 	replayModel.replay = replay
 
-	rhythmModel:setTimeRate(state.timeRate)
+	rhythmModel:setTimeRate(playContext.rate)
 	rhythmModel:setWindUp(state.windUp)
 	rhythmModel:setNoteChart(noteChart)
 
@@ -49,7 +48,7 @@ function FastplayController:play(noteChart, replay)
 
 	rhythmModel:load()
 
-	local enps, longNoteRatio = difficultyModel:getDifficulty(noteChart, state.timeRate)
+	local enps, longNoteRatio = difficultyModel:getDifficulty(noteChart, playContext.rate)
 	playContext.enps = enps
 	playContext.longNoteRatio = longNoteRatio
 

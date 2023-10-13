@@ -166,9 +166,9 @@ function CacheDatabase:queryNoteChartSets()
 	}
 	objectQuery:setInnerJoin("noteCharts", "noteChartDatas.hash = noteCharts.hash")
 	objectQuery:setLeftJoin("scores", [[
-		noteChartDatas.hash = scores.noteChartHash AND
-		noteChartDatas.`index` = scores.noteChartIndex AND
-		scores.isTop = TRUE
+		noteChartDatas.hash = scores.chart_hash AND
+		noteChartDatas.`index` = scores.chart_index AND
+		scores.is_top = TRUE
 	]])
 
 	if params.lamp then
@@ -217,9 +217,9 @@ function CacheDatabase:queryNoteCharts()
 	}
 	objectQuery:setInnerJoin("noteCharts", "noteChartDatas.hash = noteCharts.hash")
 	objectQuery:setLeftJoin("scores", [[
-		noteChartDatas.hash = scores.noteChartHash AND
-		noteChartDatas.`index` = scores.noteChartIndex AND
-		scores.isTop = TRUE
+		noteChartDatas.hash = scores.chart_hash AND
+		noteChartDatas.`index` = scores.chart_index AND
+		scores.is_top = TRUE
 	]])
 
 	if params.lamp then
