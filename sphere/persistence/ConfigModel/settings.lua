@@ -69,21 +69,6 @@ return {
 			playRetry = 0.5,
 			prepare = 2
 		},
-		timings = {
-			nearest = false,
-			ShortNote = {
-				hit = {-0.12, 0.12},
-				miss = {-0.16, 0.16}
-			},
-			LongNoteStart = {
-				hit = {-0.12, 0.12},
-				miss = {-0.16, 0.16},
-			},
-			LongNoteEnd = {
-				hit = {-0.12, 0.12},
-				miss = {-0.16, 0.16}
-			}
-		}
 	},
 	graphics = {
 		asynckey = false,

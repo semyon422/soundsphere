@@ -70,7 +70,6 @@ function ReplayModel:saveReplay(hash, index, playContext)
 	replay.hash = hash
 	replay.index = index
 	replay.inputMode = self.rhythmModel.noteChart.inputMode
-	replay.timings = self.timings
 	playContext:save(replay)
 
 	local replayString = replay:toString()

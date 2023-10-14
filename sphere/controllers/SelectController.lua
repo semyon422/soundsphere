@@ -35,7 +35,6 @@ function SelectController:applyModifierMeta()
 	self.state.inputMode = InputMode()
 
 	local playContext = self.playContext
-	playContext:load(self.configModel.configs.play)
 
 	local item = self.selectModel.noteChartItem
 	if item then

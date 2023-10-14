@@ -73,8 +73,8 @@ function GameController:new()
 		self.resourceModel
 	)
 	self.speedModel = SpeedModel(self.persistence.configModel)
-	self.timeRateModel = TimeRateModel(self.persistence.configModel)
 	self.playContext = PlayContext()
+	self.timeRateModel = TimeRateModel(self.persistence.configModel, self.playContext)
 	self.modifierSelectModel = ModifierSelectModel(self.playContext)
 	self.multiplayerModel = MultiplayerModel(
 		self.rhythmModel,
@@ -120,7 +120,7 @@ function GameController:load()
 	local configModel = self.configModel
 	local rhythmModel = self.rhythmModel
 
-	rhythmModel.timings = configModel.configs.settings.gameplay.timings
+	rhythmModel.timings = configModel.configs.play.timings
 	rhythmModel.judgements = configModel.configs.judgements
 	rhythmModel.hp = configModel.configs.settings.gameplay.hp
 	rhythmModel.settings = configModel.configs.settings

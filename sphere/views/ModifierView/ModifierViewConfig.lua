@@ -64,7 +64,6 @@ local function Buttons(self)
 
 	local configs = self.game.configModel.configs
 	local g = configs.settings.gameplay
-	local p = configs.play
 
 	local timeRateModel = self.game.timeRateModel
 	local range = timeRateModel.range[g.rateType]
@@ -78,7 +77,8 @@ local function Buttons(self)
 
 	g.rateType = imgui.combo("rateType", g.rateType, timeRateModel.types, nil, "rate type")
 
-	p.const = imgui.checkbox("const", p.const, "const")
+	local playContext = self.game.playContext
+	playContext.const = imgui.checkbox("const", playContext.const, "const")
 
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(279 + 454 * 2, 144 + 72 * 10)

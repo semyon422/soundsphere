@@ -93,28 +93,28 @@ return ModalImView(function(self)
 	local _h2 = 55
 	local quit = false
 
-	local gameplay = self.game.configModel.configs.settings.gameplay
+	local playContext = self.game.playContext
 
 	just.row(true)
 	just.indent(10)
 	imgui.Label("presets label", "Timings presets:", _h2)
 	if imgui.TextButton("default timings", "soundsphere", 200, _h2) then
-		gameplay.timings = table_util.deepcopy(_timings.soundsphere)
+		playContext.timings = table_util.deepcopy(_timings.soundsphere)
 	end
 	if imgui.TextButton("lr2 timings", "LR2", 100, _h2) then
-		gameplay.timings = table_util.deepcopy(_timings.lr2)
+		playContext.timings = table_util.deepcopy(_timings.lr2)
 	end
 	if imgui.TextButton("osu timings", "osu OD" .. osuOD, 150, _h2) then
-		gameplay.timings = table_util.deepcopy(_timings.osu(osuOD))
+		playContext.timings = table_util.deepcopy(_timings.osu(osuOD))
 		osuOD = (osuOD + 1) % 11
 	end
 	if imgui.TextButton("etterna timings", "J" .. etternaJudgement, 150, _h2) then
-		gameplay.timings = table_util.deepcopy(_timings.etterna(etternaJudgement))
+		playContext.timings = table_util.deepcopy(_timings.etterna(etternaJudgement))
 		etternaJudgement = etternaJudgement % 9 + 1
 	end
 	just.row()
 
-	local timings = gameplay.timings
+	local timings = playContext.timings
 
 	just.indent(10)
 	just.text("Current preset: " .. _timings.getName(timings))

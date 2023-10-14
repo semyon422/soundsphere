@@ -21,17 +21,19 @@ TimeRateModel.format = {
 }
 
 ---@param configModel sphere.ConfigModel
-function TimeRateModel:new(configModel)
+---@param playContext sphere.PlayContext
+function TimeRateModel:new(configModel, playContext)
 	self.configModel = configModel
+	self.playContext = playContext
 end
 
 ---@return number
 function TimeRateModel:get()
 	local gameplay = self.configModel.configs.settings.gameplay
-	local play = self.configModel.configs.play
+	local playContext = self.playContext
 
 	local rateType = gameplay.rateType
-	local rate = play.rate
+	local rate = playContext.rate
 
 	if rateType == "exp" then
 		rate = 10 * math.log(rate, 2)
@@ -43,7 +45,7 @@ end
 ---@param newRate number
 function TimeRateModel:set(newRate)
 	local gameplay = self.configModel.configs.settings.gameplay
-	local play = self.configModel.configs.play
+	local playContext = self.playContext
 
 	local rateType = gameplay.rateType
 	local rate = newRate
@@ -55,7 +57,7 @@ function TimeRateModel:set(newRate)
 		rate = 2 ^ (rate / 10)
 	end
 
-	play.rate = rate
+	playContext.rate = rate
 end
 
 ---@param delta number
