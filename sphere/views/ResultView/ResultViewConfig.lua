@@ -418,14 +418,14 @@ local function NotechartInfo(self)
 		topScoreItem = scoreItem
 	end
 
-	local scoreEntry = self.game.playContext.scoreEntry
+	local scoreEntry = playContext.scoreEntry
 	if not scoreEntry then
 		return
 	end
 
 	local show = showLoadedScore(self)
 
-	local baseTimeRate = show and rhythmModel.timeEngine.baseTimeRate or scoreItem.timeRate
+	local baseTimeRate = show and playContext.rate or scoreItem.rate
 
 	local baseBpm = noteChartItem.bpm
 	local baseLength = noteChartItem.length
@@ -465,7 +465,7 @@ local function NotechartInfo(self)
 	love.graphics.setFont(font)
 
 	just.indent(36)
-	just.text(("%0.2fx"):format(show and baseTimeRate or scoreItem.timeRate))
+	just.text(("%0.2fx"):format(show and baseTimeRate or scoreItem.rate))
 
 	local hp = scoreEngine.scoreSystem.hp
 	if show and hp then

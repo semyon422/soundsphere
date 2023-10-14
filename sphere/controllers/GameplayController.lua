@@ -275,7 +275,7 @@ function GameplayController:saveScore()
 		max_combo = scoreSystem.base.maxCombo,
 		modifiers = ModifierEncoder:encode(playContext.modifiers),
 		rate = playContext.rate,
-		const = playContext.const,
+		const = playContext.const and 1 or 0,
 		replay_hash = replayHash,
 		ratio = scoreSystem.misc.ratio,
 		perfect = scoreSystem.judgement.counters.soundsphere.perfect,

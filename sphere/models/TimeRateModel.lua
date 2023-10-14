@@ -11,7 +11,7 @@ TimeRateModel.types = {
 }
 
 TimeRateModel.range = {
-	default = {0.5, 2, 0.01},
+	default = {0.5, 2, 0.05},
 	exp = {-10, 10, 1},
 }
 

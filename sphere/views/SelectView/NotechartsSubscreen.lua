@@ -132,11 +132,15 @@ local function Cells(self)
 	local difficulty = 0
 	local accuracy = 0
 	local missCount = 0
+	local rate = 1
+	local const = false
 	if scoreItem then
 		score = scoreItem.score or 0
 		difficulty = scoreItem.difficulty or 0
 		accuracy = scoreItem.accuracy or 0
 		missCount = scoreItem.miss or 0
+		rate = scoreItem.rate or 1
+		const = scoreItem.const or false
 		if score ~= score then
 			score = 0
 		end
@@ -176,6 +180,14 @@ local function Cells(self)
 	just.row(true)
 	TextCellImView(w, h, "right", "difficulty", Format.difficulty(difficulty))
 	TextCellImView(w, h, "right", "miss count", missCount)
+
+	just.row(true)
+	local const_str = ""
+	if const then
+		const_str = "const"
+	end
+	TextCellImView(w, h, "right", "", const_str)
+	TextCellImView(w, h, "right", "rate", Format.timeRate(rate))
 	just.row()
 
 	if self.game.multiplayerModel.room then
@@ -343,10 +355,36 @@ end
 local function ModifierIconGrid(self)
 	local w, h = Layout:move("column1row3")
 	drawFrameRect(w, h)
+
+	local right_w = h * 0.9
+
+	love.graphics.translate(w - 21 - right_w, 4)
+
+	imgui.setSize(right_w, h - 8, right_w / 2, (h - 8) / 2)
+
+	local configs = self.game.configModel.configs
+	local g = configs.settings.gameplay
+
+	local timeRateModel = self.game.timeRateModel
+	local range = timeRateModel.range[g.rateType]
+	local format = timeRateModel.format[g.rateType]
+	local newRate = imgui.knob(
+		"rate knob",
+		timeRateModel:get(),
+		range[1], range[2], range[3], 1000,
+		format:format(timeRateModel:get())
+	)
+
+	if newRate ~= timeRateModel:get() then
+		self.game.modifierSelectModel:change()
+	end
+	timeRateModel:set(newRate)
+
+	local w, h = Layout:move("column1row3")
 	love.graphics.translate(21, 4)
 
 	ModifierIconGridView.game = self.game
-	ModifierIconGridView:draw(self.game.playContext.modifiers, w - 42, h, (h - 8) / 2)
+	ModifierIconGridView:draw(self.game.playContext.modifiers, w - 42 - right_w, h, (h - 8) / 2)
 
 	w, h = Layout:move("column1row2")
 	love.graphics.translate(21, 4)

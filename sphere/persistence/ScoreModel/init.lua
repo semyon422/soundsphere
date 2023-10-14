@@ -31,6 +31,11 @@ function ScoreModel:transformScoreEntry(score)
 	else
 		score.is_top = false
 	end
+	if tonumber(score.const) == 1 then
+		score.const = true
+	else
+		score.const = false
+	end
 end
 
 ---@param hash string
