@@ -426,6 +426,7 @@ local function NotechartInfo(self)
 	local show = showLoadedScore(self)
 
 	local baseTimeRate = show and playContext.rate or scoreItem.rate
+	local const = show and playContext.const or scoreItem.const
 
 	local baseBpm = noteChartItem.bpm
 	local baseLength = noteChartItem.length
@@ -465,7 +466,11 @@ local function NotechartInfo(self)
 	love.graphics.setFont(font)
 
 	just.indent(36)
-	just.text(("%0.2fx"):format(show and baseTimeRate or scoreItem.rate))
+	just.text(("%0.2fx"):format(baseTimeRate))
+	if const then
+		just.sameline()
+		just.text("c")
+	end
 
 	local hp = scoreEngine.scoreSystem.hp
 	if show and hp then
