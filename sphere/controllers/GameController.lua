@@ -15,6 +15,7 @@ local SpeedModel = require("sphere.models.SpeedModel")
 local TimeRateModel = require("sphere.models.TimeRateModel")
 local ResourceModel = require("sphere.models.ResourceModel")
 local PlayContext = require("sphere.models.PlayContext")
+local PauseModel = require("sphere.models.PauseModel")
 
 local SelectController = require("sphere.controllers.SelectController")
 local GameplayController = require("sphere.controllers.GameplayController")
@@ -67,6 +68,7 @@ function GameController:new()
 		self.inputModel,
 		self.resourceModel
 	)
+	self.pauseModel = PauseModel(self.persistence.configModel, self.rhythmModel)
 	self.replayModel = ReplayModel(self.rhythmModel)
 	self.editorModel = EditorModel(
 		self.persistence.configModel,

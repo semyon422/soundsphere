@@ -35,6 +35,7 @@ return {
 		"cacheModel",
 		"fileFinder",
 		"playContext",
+		"pauseModel",
 	},
 	multiplayerController = {
 		"multiplayerModel",

@@ -18,6 +18,7 @@ function GameplayController:load()
 	local configModel = self.configModel
 	local difficultyModel = self.difficultyModel
 	local replayModel = self.replayModel
+	local pauseModel = self.pauseModel
 	local fileFinder = self.fileFinder
 	local playContext = self.playContext
 
@@ -44,7 +45,6 @@ function GameplayController:load()
 	rhythmModel:setTimeToPrepare(config.gameplay.time.prepare)
 	rhythmModel:setVisualTimeRate(config.gameplay.speed)
 	rhythmModel:setVisualTimeRateScale(config.gameplay.scaleSpeed)
-	rhythmModel:setPauseTimes(config.gameplay.time)
 
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel:setDrawRange(noteSkin.range)
@@ -66,6 +66,7 @@ function GameplayController:load()
 	rhythmModel.timeEngine:sync(love.timer.getTime())
 	rhythmModel:loadAllEngines()
 	replayModel:load()
+	pauseModel:load()
 
 	self:updateOffsets()
 
@@ -153,6 +154,7 @@ end
 
 ---@param dt number
 function GameplayController:update(dt)
+	self.pauseModel:update()
 	self.replayModel:update()
 	self.rhythmModel:update()
 end
@@ -198,7 +200,7 @@ function GameplayController:changePlayState(state)
 		self:discordPause()
 	end
 
-	self.rhythmModel.pauseManager:changePlayState(state)
+	self.pauseModel:changePlayState(state)
 end
 
 ---@param event table
@@ -216,18 +218,19 @@ function GameplayController:retry()
 	rhythmModel:load()
 	rhythmModel.timeEngine:sync(love.timer.getTime())
 	rhythmModel:loadAllEngines()
+	self.pauseModel:load()
 	self.replayModel:load()
 	self.resourceModel:rewind()
 	self:play()
 end
 
 function GameplayController:pause()
-	self.rhythmModel.pauseManager:pause()
+	self.pauseModel:pause()
 	self:discordPause()
 end
 
 function GameplayController:play()
-	self.rhythmModel.pauseManager:play()
+	self.pauseModel:play()
 	self:discordPlay()
 end
 

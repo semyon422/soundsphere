@@ -6,7 +6,6 @@ local GraphicEngine = require("sphere.models.RhythmModel.GraphicEngine")
 local AudioEngine = require("sphere.models.RhythmModel.AudioEngine")
 local TimeEngine = require("sphere.models.RhythmModel.TimeEngine")
 local InputManager = require("sphere.models.RhythmModel.InputManager")
-local PauseManager = require("sphere.models.RhythmModel.PauseManager")
 -- require("sphere.models.RhythmModel.LogicEngine.Test")
 
 ---@class sphere.RhythmModel
@@ -20,7 +19,6 @@ function RhythmModel:new(inputModel, resourceModel)
 	self.resourceModel = resourceModel
 
 	self.inputManager = InputManager()
-	self.pauseManager = PauseManager()
 	self.timeEngine = TimeEngine()
 	self.scoreEngine = ScoreEngine()
 	self.audioEngine = AudioEngine()
@@ -28,7 +26,6 @@ function RhythmModel:new(inputModel, resourceModel)
 	self.graphicEngine = GraphicEngine()
 	self.observable = Observable()
 	self.inputManager.rhythmModel = self
-	self.pauseManager.rhythmModel = self
 	self.timeEngine.rhythmModel = self
 	self.scoreEngine.rhythmModel = self
 	self.audioEngine.rhythmModel = self
@@ -54,7 +51,6 @@ function RhythmModel:loadAllEngines()
 	self:loadLogicEngines()
 	self.audioEngine:load()
 	self.graphicEngine:load()
-	self.pauseManager:load()
 end
 
 function RhythmModel:loadLogicEngines()
@@ -82,6 +78,18 @@ function RhythmModel:unloadLogicEngines()
 	self.logicEngine:unload()
 end
 
+function RhythmModel:play()
+	self.timeEngine:play()
+	self.audioEngine:play()
+	self.inputManager:loadState()
+end
+
+function RhythmModel:pause()
+	self.timeEngine:pause()
+	self.audioEngine:pause()
+	self.inputManager:saveState()
+end
+
 ---@param event table
 function RhythmModel:receive(event)
 	if event.name == "framestarted" then
@@ -99,7 +107,6 @@ function RhythmModel:update()
 	self.audioEngine:update()
 	self.scoreEngine:update()
 	self.graphicEngine:update()
-	self.pauseManager:update()
 end
 
 ---@return boolean
@@ -203,11 +210,6 @@ end
 ---@param offset number
 function RhythmModel:setVisualOffset(offset)
 	self.graphicEngine.visualOffset = offset
-end
-
----@param ... any?
-function RhythmModel:setPauseTimes(...)
-	self.pauseManager:setPauseTimes(...)
 end
 
 ---@param scaleSpeed boolean

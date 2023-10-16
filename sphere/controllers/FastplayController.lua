@@ -13,11 +13,6 @@ function FastplayController:applyModifiers(noteChart, replay)
 	local state = {}
 	state.inputMode = InputMode(noteChart.inputMode)
 
-	-- if replay.modifiers then
-	-- 	modifierModel:setConfig(replay.modifiers)
-	-- 	modifierModel:fixOldFormat(replay.modifiers)
-	-- end
-
 	local modifiers = self.playContext.modifiers
 	ModifierModel:applyMeta(modifiers, state)
 	ModifierModel:apply(modifiers, noteChart)
