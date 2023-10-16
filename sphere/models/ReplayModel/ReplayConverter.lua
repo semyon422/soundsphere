@@ -117,6 +117,7 @@ function ReplayConverter:convertModifiers(replay)
 		end
 	end
 	replay.modifiers = new_modifiers
+	ModifierModel:fixOldFormat(replay.modifiers)
 end
 
 ---@param replay table
@@ -128,6 +129,7 @@ function ReplayConverter:convert(replay)
 	if replay.modifiers then
 		self:convertModifiers(replay)
 	end
+	replay.modifiers = replay.modifiers or {}
 	self:convertTimings(replay)
 end
 

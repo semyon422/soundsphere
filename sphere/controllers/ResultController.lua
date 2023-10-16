@@ -59,10 +59,7 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 
 	local rhythmModel = self.rhythmModel
 
-	if replay.modifiers then
-		self.playContext:load(replay)
-		ModifierModel:fixOldFormat(replay.modifiers)
-	end
+	self.playContext:load(replay)
 
 	if mode == "retry" then
 		rhythmModel.inputManager:setMode("external")
@@ -71,7 +68,7 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 	end
 
 	self.playContext.scoreEntry = scoreEntry
-	rhythmModel.timings = replay.timings
+	rhythmModel:setTimings(replay.timings)
 	replayModel.replay = replay
 
 	rhythmModel.inputManager:setMode("internal")

@@ -120,7 +120,6 @@ function GameController:load()
 	local configModel = self.configModel
 	local rhythmModel = self.rhythmModel
 
-	rhythmModel.timings = configModel.configs.play.timings
 	rhythmModel.judgements = configModel.configs.judgements
 	rhythmModel.hp = configModel.configs.settings.gameplay.hp
 	rhythmModel.settings = configModel.configs.settings

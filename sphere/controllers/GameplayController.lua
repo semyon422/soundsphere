@@ -37,26 +37,23 @@ function GameplayController:load()
 	noteSkin:loadData()
 
 	rhythmModel:setAdjustRate(config.audio.adjustRate)
-	rhythmModel:setTimeRate(playContext.rate)
-	rhythmModel:setWindUp(state.windUp)
-	rhythmModel:setConstantSpeed(playContext.const)
 	rhythmModel:setVolume(config.audio.volume)
 	rhythmModel:setAudioMode(config.audio.mode)
+
 	rhythmModel:setLongNoteShortening(config.gameplay.longNoteShortening)
 	rhythmModel:setTimeToPrepare(config.gameplay.time.prepare)
 	rhythmModel:setVisualTimeRate(config.gameplay.speed)
 	rhythmModel:setVisualTimeRateScale(config.gameplay.scaleSpeed)
 	rhythmModel:setPauseTimes(config.gameplay.time)
+
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel:setDrawRange(noteSkin.range)
 	rhythmModel.inputManager:setInputMode(tostring(noteChart.inputMode))
 
-	local timings = playContext.timings
-	if replayModel.mode == "replay" then
-		timings = replayModel.replay.timings
-	end
-	rhythmModel.timings = timings
-	replayModel.timings = timings
+	rhythmModel:setWindUp(state.windUp)
+	rhythmModel:setTimeRate(playContext.rate)
+	rhythmModel:setConstantSpeed(playContext.const)
+	rhythmModel:setTimings(playContext.timings)
 
 	rhythmModel.inputManager.observable:add(replayModel)
 

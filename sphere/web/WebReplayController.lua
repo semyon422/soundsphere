@@ -50,7 +50,7 @@ function WebReplayController:POST()
 	self.playContext:load(replay)
 	ModifierModel:fixOldFormat(replay.modifiers)
 
-	rhythmModel.timings = replay.timings
+	rhythmModel:setTimings(replay.timings)
 	replayModel.replay = replay
 
 	fastplayController:play(noteChart, replay)

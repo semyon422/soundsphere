@@ -35,9 +35,6 @@ function FastplayController:play(noteChart, replay)
 
 	local state = self:applyModifiers(noteChart, replay)
 
-	rhythmModel.timings = replay.timings
-	replayModel.replay = replay
-
 	rhythmModel:setTimeRate(playContext.rate)
 	rhythmModel:setWindUp(state.windUp)
 	rhythmModel:setNoteChart(noteChart)

@@ -44,13 +44,10 @@ end
 
 function RhythmModel:load()
 	local scoreEngine = self.scoreEngine
-	local logicEngine = self.logicEngine
 
 	scoreEngine.judgements = self.judgements
 	scoreEngine.hp = self.hp
 	scoreEngine.settings = self.settings
-
-	logicEngine.timings = self.timings
 end
 
 function RhythmModel:loadAllEngines()
@@ -119,6 +116,11 @@ function RhythmModel:hasResult()
 		base.hitCount > 0 and
 		accuracy > 0 and
 		accuracy < math.huge
+end
+
+---@param timings table?
+function RhythmModel:setTimings(timings)
+	self.logicEngine.timings = timings
 end
 
 ---@param windUp table?
