@@ -8,9 +8,13 @@ local AudioEngine = class()
 
 AudioEngine.timeRate = 1
 
-function AudioEngine:new()
+---@param timeEngine sphere.TimeEngine
+---@param resourceModel sphere.ResourceModel
+function AudioEngine:new(timeEngine, resourceModel)
 	self.backgroundContainer = AudioContainer()
 	self.foregroundContainer = AudioContainer()
+	self.timeEngine = timeEngine
+	self.resourceModel = resourceModel
 end
 
 function AudioEngine:updateVolume()
@@ -56,24 +60,22 @@ end
 ---@param stream boolean?
 ---@param offset number?
 function AudioEngine:playAudio(sounds, isBackground, stream, offset)
-	local currentTime = self.rhythmModel.timeEngine.currentTime
+	local currentTime = self.timeEngine.currentTime
 	for i = 1, #sounds do
 		local mode = stream and self.mode.primary or self.mode.secondary
 
-		local soundData = self.rhythmModel.resourceModel:getResource(sounds[i][1])
+		local soundData = self.resourceModel:getResource(sounds[i][1])
 
 		if soundData then
 			local audio = _audio.newSource(soundData, mode)
 			audio.offset = offset or currentTime
 			audio:setBaseVolume(sounds[i][2])
 			local shouldPlay = true
-			if self.forcePosition then
 				local p = currentTime - audio.offset
 				if p >= audio:getDuration() then
 					shouldPlay = false
-				else
-					audio:setPosition(p)
-				end
+			elseif isBackground and currentTime - offset > 0.1 then
+				audio:setPosition(p)
 			end
 			if shouldPlay then
 				if isBackground then
@@ -99,7 +101,7 @@ function AudioEngine:pause()
 end
 
 function AudioEngine:updateTimeRate()
-	local timeRate = self.rhythmModel.timeEngine.timeRate
+	local timeRate = self.timeEngine.timeRate
 	if self.timeRate == timeRate then
 		return
 	end

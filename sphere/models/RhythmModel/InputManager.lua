@@ -7,8 +7,12 @@ local InputManager = class()
 
 InputManager.mode = "external"
 
-function InputManager:new()
+---@param timeEngine sphere.TimeEngine
+---@param inputModel sphere.InputModel
+function InputManager:new(timeEngine, inputModel)
 	self.observable = Observable()
+	self.timeEngine = timeEngine
+	self.inputModel = inputModel
 end
 
 ---@param mode string
@@ -36,7 +40,7 @@ function InputManager:setState(virtualKey, state)
 end
 
 function InputManager:loadState()
-	local currentTime = self.rhythmModel.timeEngine.currentTime
+	local currentTime = self.timeEngine.currentTime
 	for virtualKey, state in pairs(self.state) do
 		if state ~= self.savedState[virtualKey] then
 			self:apply(virtualKey, state, currentTime)
@@ -69,12 +73,12 @@ function InputManager:receive(event)
 		return
 	end
 
-	local virtualKey, state = self.rhythmModel.inputModel:transformEvent(self.inputMode, event)
+	local virtualKey, state = self.inputModel:transformEvent(self.inputMode, event)
 	if not virtualKey then return end
 
 	self:setState(virtualKey, state)
 
-	local timeEngine = self.rhythmModel.timeEngine
+	local timeEngine = self.timeEngine
 	local isPlaying = timeEngine.timer.isPlaying
 	if not isPlaying then return end
 

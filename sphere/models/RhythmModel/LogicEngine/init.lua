@@ -8,8 +8,12 @@ local LogicEngine = class()
 
 LogicEngine.inputOffset = 0
 
-function LogicEngine:new()
+---@param timeEngine sphere.TimeEngine
+---@param scoreEngine sphere.ScoreEngine
+function LogicEngine:new(timeEngine, scoreEngine)
 	self.observable = Observable()
+	self.timeEngine = timeEngine
+	self.scoreEngine = scoreEngine
 end
 
 function LogicEngine:load()
@@ -81,7 +85,7 @@ end
 
 ---@param event table
 function LogicEngine:sendScore(event)
-	self.rhythmModel.scoreEngine.scoreSystem:receive(event)
+	self.scoreEngine.scoreSystem:receive(event)
 end
 
 ---@param noteData ncdk.NoteData
@@ -95,12 +99,12 @@ end
 
 ---@return number
 function LogicEngine:getEventTime()
-	return self.eventTime or self.rhythmModel.timeEngine.currentTime
+	return self.eventTime or self.timeEngine.currentTime
 end
 
 ---@return number
 function LogicEngine:getTimeRate()
-	return self.timeRate or self.rhythmModel.timeEngine.timeRate
+	return self.timeRate or self.timeEngine.timeRate
 end
 
 ---@return number

@@ -18,20 +18,17 @@ function RhythmModel:new(inputModel, resourceModel)
 	self.inputModel = inputModel
 	self.resourceModel = resourceModel
 
-	self.inputManager = InputManager()
 	self.timeEngine = TimeEngine()
-	self.scoreEngine = ScoreEngine()
-	self.audioEngine = AudioEngine()
-	self.logicEngine = LogicEngine()
-	self.graphicEngine = GraphicEngine()
+	self.inputManager = InputManager(self.timeEngine, inputModel)
+	self.scoreEngine = ScoreEngine(self.timeEngine)
+	self.audioEngine = AudioEngine(self.timeEngine, resourceModel)
+	self.logicEngine = LogicEngine(self.timeEngine, self.scoreEngine)
+	self.graphicEngine = GraphicEngine(self.timeEngine, self.logicEngine)
 	self.observable = Observable()
-	self.inputManager.rhythmModel = self
-	self.timeEngine.rhythmModel = self
-	self.scoreEngine.rhythmModel = self
-	self.audioEngine.rhythmModel = self
-	self.logicEngine.rhythmModel = self
-	self.graphicEngine.rhythmModel = self
-	self.observable.rhythmModel = self
+
+	self.timeEngine.audioEngine = self.audioEngine
+	self.timeEngine.logicEngine = self.logicEngine
+	self.graphicEngine.resourceModel = self.resourceModel
 
 	self.inputManager.observable:add(self.logicEngine)
 	self.inputManager.observable:add(self.observable)

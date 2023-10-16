@@ -7,7 +7,7 @@ local NoteDrawer = class()
 
 function NoteDrawer:load()
 	local graphicEngine = self.graphicEngine
-	local logicEngine = graphicEngine.rhythmModel.logicEngine
+	local logicEngine = graphicEngine.logicEngine
 
 	local layerData = self.layerData
 

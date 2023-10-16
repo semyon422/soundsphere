@@ -5,8 +5,10 @@ local ScoreSystemContainer = require("sphere.models.RhythmModel.ScoreEngine.Scor
 ---@operator call: sphere.ScoreEngine
 local ScoreEngine = class()
 
-function ScoreEngine:new()
+---@param timeEngine sphere.TimeEngine
+function ScoreEngine:new(timeEngine)
 	self.scoreSystem = ScoreSystemContainer()
+	self.timeEngine = timeEngine
 end
 
 function ScoreEngine:load()
@@ -22,7 +24,7 @@ function ScoreEngine:load()
 end
 
 function ScoreEngine:update()
-	local timeEngine = self.rhythmModel.timeEngine
+	local timeEngine = self.timeEngine
 	local timer = timeEngine.timer
 	local currentTime = timeEngine.currentTime
 
