@@ -71,11 +71,13 @@ function AudioEngine:playAudio(sounds, isBackground, stream, offset)
 			audio.offset = offset or currentTime
 			audio:setBaseVolume(sounds[i][2])
 			local shouldPlay = true
+			if self.forcePosition then
 				local p = currentTime - audio.offset
 				if p >= audio:getDuration() then
 					shouldPlay = false
-			elseif isBackground and currentTime - offset > 0.1 then
-				audio:setPosition(p)
+				else
+					audio:setPosition(p)
+				end
 			end
 			if shouldPlay then
 				if isBackground then
