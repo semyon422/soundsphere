@@ -47,7 +47,7 @@ function WebReplayController:POST()
 	rhythmModel.settings = require("sphere.persistence.ConfigModel.settings")
 	rhythmModel.hp = rhythmModel.settings.gameplay.hp
 
-	self.playContext:load(replay)
+	playContext:load(replay)
 	ModifierModel:fixOldFormat(replay.modifiers)
 
 	rhythmModel:setTimings(replay.timings)
@@ -61,8 +61,10 @@ function WebReplayController:POST()
 		score = score,
 		inputMode = tostring(noteChart.inputMode),
 		difficulty = playContext.enps,
+		playContext = playContext,
 		modifiers = replay.modifiers,
 		modifiersEncoded = ModifierEncoder:encode(replay.modifiers),
+		modifiersHash = ModifierEncoder:hash(replay.modifiers),
 		modifiersString = ModifierModel:getString(replay.modifiers),
 	}}
 end

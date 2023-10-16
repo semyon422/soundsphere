@@ -16,7 +16,6 @@ function BaseScoreSystem:new()
 	self.combo = 0
 	self.maxCombo = 0
 	self.currentTime = 0
-	self.timeRate = 0
 
 	self.isMiss = false
 	self.isLongNoteComboBreak = false
@@ -34,8 +33,6 @@ function BaseScoreSystem:before(event)
 	self.currentTime = event.currentTime
 	self.isMiss = false
 	self.isLongNoteComboBreak = false
-
-	self.timeRate =  math.abs(event.timeRate)
 
 	self.notesCount = event.notesCount
 end
