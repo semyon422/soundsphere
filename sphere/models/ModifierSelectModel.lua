@@ -27,7 +27,6 @@ local Modifiers = {
 ModifierSelectModel.modifiers = Modifiers
 
 local OneUseModifiers = {
-	"AutoKeySound",
 	"WindUp",
 	"NoScratch",
 	"NoLongNote",
