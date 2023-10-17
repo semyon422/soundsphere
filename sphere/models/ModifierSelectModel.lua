@@ -7,7 +7,6 @@ local ModifierModel = require("sphere.models.ModifierModel")
 local ModifierSelectModel = class()
 
 local Modifiers = {
-	"AutoKeySound",
 	"WindUp",
 	"NoScratch",
 	"NoLongNote",
