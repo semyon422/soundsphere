@@ -113,6 +113,8 @@ function drawSection:gameplay()
 	g.lastMeanValues = imgui.intButtons("lastMeanValues", g.lastMeanValues, 1, "last mean values")
 	g.ratingHitTimingWindow = intButtonsMs("ratingHitTimingWindow", g.ratingHitTimingWindow, "rating hit timing window")
 
+	g.autoKeySound = imgui.checkbox("autoKeySound", g.autoKeySound, "auto key sound")
+
 	imgui.separator()
 	s.collapse = imgui.checkbox("s.collapse", s.collapse, "group charts if applicable")
 

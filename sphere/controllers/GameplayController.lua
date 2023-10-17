@@ -4,6 +4,7 @@ local InputMode = require("ncdk.InputMode")
 local TempoRange = require("notechart.TempoRange")
 local ModifierEncoder = require("sphere.models.ModifierEncoder")
 local ModifierModel = require("sphere.models.ModifierModel")
+local NoteData = require("ncdk.NoteData")
 
 ---@class sphere.GameplayController
 ---@operator call: sphere.GameplayController
@@ -27,6 +28,9 @@ function GameplayController:load()
 	local noteChart = selectModel:loadNoteChart(self:getImporterSettings())
 
 	self:applyTempo(noteChart, config.gameplay.tempoFactor, config.gameplay.primaryTempo)
+	if config.gameplay.autoKeySound then
+		self:applyAutoKeysound(noteChart)
+	end
 
 	local state = {}
 	state.inputMode = InputMode(noteChart.inputMode)
@@ -121,6 +125,23 @@ function GameplayController:applyTempo(noteChart, tempoFactor, primaryTempo)
 	t.average, t.minimum, t.maximum = TempoRange:find(noteChart, minTime, maxTime)
 
 	applyTempo(noteChart, t[tempoFactor])
+end
+
+---@param noteChart ncdk.NoteChart
+function GameplayController:applyAutoKeysound(noteChart)
+	for noteDatas, _, _, layerDataIndex in noteChart:getInputIterator() do
+		local layerData = noteChart.layerDatas[layerDataIndex]
+		for _, noteData in ipairs(noteDatas) do
+			if noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart" then
+				local soundNoteData = NoteData(noteData.timePoint)
+
+				soundNoteData.noteType = "SoundNote"
+				soundNoteData.sounds, noteData.sounds = noteData.sounds, {}
+
+				layerData:addNoteData(soundNoteData, "auto", 0)
+			end
+		end
+	end
 end
 
 ---@return table

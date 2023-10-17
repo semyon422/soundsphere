@@ -72,6 +72,7 @@ return {
 	},
 	graphics = {
 		asynckey = false,
+		autoKeySound = false,
 		blur = {
 			gameplay = 0,
 			result = 0,
