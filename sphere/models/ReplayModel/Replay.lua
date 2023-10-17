@@ -49,12 +49,13 @@ function Replay:toString()
 		hash = self.hash,
 		index = self.index,
 		inputMode = tostring(self.inputMode),
-		modifiers = self.modifierTable,
+		modifiers = self.modifiers,
+		rate = self.rate,
+		const = self.const,
 		player = "Player",
 		time = os.time(),
 		events = content,
 		size = size,
-		type = "NanoChart",
 		timings = self.timings
 	})
 end
@@ -72,10 +73,12 @@ function Replay:fromString(s)
 
 	self.hash = object.hash
 	self.index = object.index
-	self.modifiers = object.modifiers
 	self.player = object.player
 	self.time = object.time
 	self.timings = object.timings
+	self.modifiers = object.modifiers
+	self.rate = object.rate
+	self.const = object.const
 
 	if not object.inputMode then
 		self.events = {}

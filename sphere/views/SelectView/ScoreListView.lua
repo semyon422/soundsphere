@@ -40,11 +40,11 @@ function ScoreListView:drawItem(i, w, h)
 	just.indent(22)
 	TextCellImView(w, h, "right", i == 1 and "rank" or "", item.rank)
 	TextCellImView(w, h, "right", i == 1 and "rating" or "", Format.difficulty(item.rating))
-	TextCellImView(w, h, "right", i == 1 and "time rate" or "", Format.timeRate(item.timeRate))
+	TextCellImView(w, h, "right", i == 1 and "time rate" or "", Format.timeRate(item.rate))
 	if just.mouse_over(i .. "a", just.is_over(-w, h), "mouse") then
-		self.game.gameView.tooltip = ("%0.2fX"):format(item.timeRate)
+		self.game.gameView.tooltip = ("%0.2fX"):format(item.rate)
 	end
-	TextCellImView(w * 2, h, "right", item.time ~= 0 and time_util.time_ago_in_words(item.time) or "never", Format.inputMode(item.inputMode))
+	TextCellImView(w * 2, h, "right", item.time ~= 0 and time_util.time_ago_in_words(item.time) or "never", Format.inputMode(item.inputmode))
 	if just.mouse_over(i .. "b", just.is_over(-w * 2, h), "mouse") then
 		self.game.gameView.tooltip = os.date("%c", item.time)
 	end

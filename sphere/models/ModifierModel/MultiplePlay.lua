@@ -7,10 +7,9 @@ local MultiOverPlay = require("sphere.models.ModifierModel.MultiOverPlay")
 local MultiplePlay = Modifier + {}
 
 MultiplePlay.name = "MultiplePlay"
-MultiplePlay.interfaceType = "stepper"
 
 MultiplePlay.defaultValue = 2
-MultiplePlay.range = {2, 4}
+MultiplePlay.values = {2, 3, 4}
 
 MultiplePlay.description = "1 2 1 2 -> 13 24 13 24, doubles the input mode"
 

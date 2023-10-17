@@ -1,5 +1,6 @@
 local class = require("class")
 local thread = require("thread")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.ResultController
 ---@operator call: sphere.ResultController
@@ -29,8 +30,8 @@ function ResultController:getReplayDataAsync(scoreEntry)
 	local content
 	if scoreEntry.file then
 		content = webApi.api.files[scoreEntry.file.id]:__get({download = true})
-	elseif scoreEntry.replayHash then
-		content = readAsync(replayModel.path .. "/" .. scoreEntry.replayHash)
+	elseif scoreEntry.replay_hash then
+		content = readAsync(replayModel.path .. "/" .. scoreEntry.replay_hash)
 	end
 
 	return content
@@ -57,12 +58,8 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 	end
 
 	local rhythmModel = self.rhythmModel
-	local modifierModel = self.modifierModel
 
-	if replay.modifiers then
-		modifierModel:setConfig(replay.modifiers)
-		modifierModel:fixOldFormat(replay.modifiers)
-	end
+	self.playContext:load(replay)
 
 	if mode == "retry" then
 		rhythmModel.inputManager:setMode("external")
@@ -70,8 +67,8 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 		return
 	end
 
-	rhythmModel.timings = replay.timings
-	rhythmModel.scoreEngine.scoreEntry = scoreEntry
+	self.playContext.scoreEntry = scoreEntry
+	rhythmModel:setTimings(replay.timings)
 	replayModel.replay = replay
 
 	rhythmModel.inputManager:setMode("internal")
@@ -83,11 +80,6 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 
 	local noteChart = self.selectModel:loadNoteChart()
 	self.fastplayController:play(noteChart, replay)
-
-	local config = self.configModel.configs.select
-	config.scoreEntryId = scoreEntry.id
-
-	rhythmModel.scoreEngine.scoreEntry = scoreEntry
 
 	rhythmModel.inputManager:setMode("external")
 	replayModel:setMode("record")

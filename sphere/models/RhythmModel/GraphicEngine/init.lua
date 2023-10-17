@@ -11,6 +11,13 @@ GraphicEngine.longNoteShortening = 0
 GraphicEngine.scaleSpeed = false
 GraphicEngine.constant = false
 
+---@param timeEngine sphere.TimeEngine
+---@param logicEngine sphere.LogicEngine
+function GraphicEngine:new(timeEngine, logicEngine)
+	self.timeEngine = timeEngine
+	self.logicEngine = logicEngine
+end
+
 function GraphicEngine:load()
 	self.noteCount = 0
 	self.noteDrawers = {}
@@ -55,7 +62,7 @@ end
 
 ---@return number
 function GraphicEngine:getVisualTimeRate()
-	local timeRate = self.rhythmModel.timeEngine.timeRate
+	local timeRate = self.timeEngine.timeRate
 	local visualTimeRate = self.visualTimeRate
 	if not self.scaleSpeed then
 		visualTimeRate = visualTimeRate / timeRate
@@ -65,12 +72,12 @@ end
 
 ---@return number
 function GraphicEngine:getCurrentTime()
-	return self.rhythmModel.timeEngine.currentVisualTime
+	return self.timeEngine.currentVisualTime
 end
 
 ---@return number
 function GraphicEngine:getInputOffset()
-	return self.rhythmModel.logicEngine.inputOffset
+	return self.logicEngine.inputOffset
 end
 
 ---@return number

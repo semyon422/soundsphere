@@ -96,7 +96,7 @@ end
 ---@param position number
 function TimeEngine:setPosition(position)
 	local timer = self.timer
-	local audioEngine = self.rhythmModel.audioEngine
+	local audioEngine = self.audioEngine
 
 	audioEngine:setPosition(position)
 	timer:setTime(position)
@@ -104,7 +104,7 @@ function TimeEngine:setPosition(position)
 	self.currentVisualTime = self.nearestTime:getVisualTime(self.currentTime)
 
 	audioEngine.forcePosition = true
-	self.rhythmModel.logicEngine:update()
+	self.logicEngine:update()
 	audioEngine.forcePosition = false
 end
 

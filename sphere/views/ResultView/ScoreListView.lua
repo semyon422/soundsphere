@@ -30,33 +30,34 @@ function ScoreListView:drawItem(i, w, h)
 	local item = self.items[i]
 
 	local scoreEngine = self.game.rhythmModel.scoreEngine
-	local scoreEntry = scoreEngine.scoreEntry
-	local loaded = scoreEntry and scoreEntry.replayHash == item.replayHash
+	local scoreEntry = self.game.playContext.scoreEntry
+	local loaded = scoreEntry and scoreEntry.replay_hash == item.replay_hash
 
 	if just.button(item, just.is_over(w, h)) then
 		self.screenView:loadScore(i)
 	end
 
-	if item.isTop then
+	if item.is_top then
 		love.graphics.circle("fill", 44, 36, 7)
 	end
-	if loaded or item.isTop then
+	if loaded or item.is_top then
 		love.graphics.circle("line", 44, 36, 7)
 	end
 
 	local rating = item.rating
-	local timeRate = item.timeRate
-	local inputMode = item.inputMode
+	local timeRate = item.rate
+	local inputMode = item.inputmode
+	local playContext = self.game.playContext
 
 	if loaded then
 		local erfunc = require("libchart.erfunc")
 		local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 		local normalscore = scoreEngine.scoreSystem.normalscore
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-		rating = s * scoreEngine.enps
+		rating = s * playContext.enps
 
-		timeRate = scoreEngine.timeRate or timeRate
-		inputMode = scoreEngine.inputMode or inputMode
+		timeRate = self.game.rhythmModel.timeEngine.baseTimeRate or timeRate
+		inputMode = tostring(self.game.rhythmModel.noteChart.inputMode) or inputMode
 	end
 
 	if rating ~= rating then

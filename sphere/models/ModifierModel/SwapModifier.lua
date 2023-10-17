@@ -4,8 +4,6 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 ---@operator call: sphere.SwapModifier
 local SwapModifier = Modifier + {}
 
-SwapModifier.interfaceType = "toggle"
-
 SwapModifier.name = "SwapModifier"
 
 ---@param config table

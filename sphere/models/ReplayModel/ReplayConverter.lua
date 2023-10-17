@@ -1,4 +1,5 @@
 local class = require("class")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.ReplayConverter
 ---@operator call: sphere.ReplayConverter
@@ -19,11 +20,11 @@ ReplayConverter.oldTimings = {
 	}
 }
 
----@param object table
-function ReplayConverter:convertTimings(object)
-	local timings = object.timings
+---@param replay table
+function ReplayConverter:convertTimings(replay)
+	local timings = replay.timings
 	if not timings then
-		object.timings = self.oldTimings
+		replay.timings = self.oldTimings
 		return
 	end
 
@@ -54,21 +55,47 @@ function ReplayConverter:convertTimings(object)
 end
 
 ---@param c table
----@param object table
-function ReplayConverter:convertModifier(c, object)
+---@param replay table
+---@return boolean
+function ReplayConverter:convertModifier(c, replay)
 	if c.value == nil then
 		for k, v in pairs(c) do
-			if k ~= "name" then
+			if k ~= "name" and k ~= "version" and k ~= "id" then
 				c.value = v
 			end
 		end
 	end
-	if c.value == nil then
-		c.value = true
-		return
+
+	if c.name then
+
+		-- deleted modifiers
+		if c.name == "TimeRateQ" then
+			replay.rate = replay.rate * 2 ^ (0.1 * c.value)
+		elseif c.name == "TimeRateX" then
+			replay.rate = replay.rate * c.value
+		elseif c.name == "ConstSpeed" then
+			replay.const = true
+		elseif c.name == "SpeedMode" and c.value == "constant" then
+			replay.const = true
+		end
+
+		c.id = ModifierModel.Modifiers[c.name]
+		if not c.id then
+			return false
+		end
+		c.name = nil
+
+		return true
 	end
 
-	if not object.timings then
+	if c.value == nil then
+		return true
+	end
+	if c.value == false then
+		return false
+	end
+
+	if not replay.timings then
 		if c.name == "Automap" then
 			c.old = true
 		elseif c.name == "MultiOverPlay" then
@@ -77,22 +104,33 @@ function ReplayConverter:convertModifier(c, object)
 			c.value = c.value + 1
 		end
 	end
+
+	return true
 end
 
----@param object table
-function ReplayConverter:convertModifiers(object)
-	for _, c in ipairs(object.modifiers) do
-		self:convertModifier(c, object)
+---@param replay table
+function ReplayConverter:convertModifiers(replay)
+	local new_modifiers = {}
+	for _, c in ipairs(replay.modifiers) do
+		if self:convertModifier(c, replay) then
+			table.insert(new_modifiers, c)
+		end
 	end
+	replay.modifiers = new_modifiers
+	ModifierModel:fixOldFormat(replay.modifiers)
 end
 
----@param object table
-function ReplayConverter:convert(object)
-	if object.modifiers then
-		self:convertModifiers(object)
+---@param replay table
+function ReplayConverter:convert(replay)
+	replay.rate = replay.rate or 1
+	if not replay.const then
+		replay.const = false
 	end
-
-	self:convertTimings(object)
+	if replay.modifiers then
+		self:convertModifiers(replay)
+	end
+	replay.modifiers = replay.modifiers or {}
+	self:convertTimings(replay)
 end
 
 return ReplayConverter

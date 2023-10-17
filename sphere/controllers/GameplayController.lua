@@ -2,6 +2,8 @@ local class = require("class")
 local math_util = require("math_util")
 local InputMode = require("ncdk.InputMode")
 local TempoRange = require("notechart.TempoRange")
+local ModifierEncoder = require("sphere.models.ModifierEncoder")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.GameplayController
 ---@operator call: sphere.GameplayController
@@ -14,10 +16,11 @@ function GameplayController:load()
 	local selectModel = self.selectModel
 	local noteSkinModel = self.noteSkinModel
 	local configModel = self.configModel
-	local modifierModel = self.modifierModel
 	local difficultyModel = self.difficultyModel
 	local replayModel = self.replayModel
+	local pauseModel = self.pauseModel
 	local fileFinder = self.fileFinder
+	local playContext = self.playContext
 
 	local config = configModel.configs.settings
 
@@ -26,52 +29,44 @@ function GameplayController:load()
 	self:applyTempo(noteChart, config.gameplay.tempoFactor, config.gameplay.primaryTempo)
 
 	local state = {}
-	state.timeRate = 1
-	state.inputMode = InputMode()
-	state.inputMode:set(noteChart.inputMode)
+	state.inputMode = InputMode(noteChart.inputMode)
 
-	modifierModel:applyMeta(state)
-	modifierModel:apply(noteChart)
+	ModifierModel:applyMeta(playContext.modifiers, state)
+	ModifierModel:apply(playContext.modifiers, noteChart)
 
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
 	noteSkin:loadData()
 
 	rhythmModel:setAdjustRate(config.audio.adjustRate)
-	rhythmModel:setTimeRate(state.timeRate)
-	rhythmModel:setWindUp(state.windUp)
-	rhythmModel:setConstantSpeed(state.constant)
 	rhythmModel:setVolume(config.audio.volume)
 	rhythmModel:setAudioMode(config.audio.mode)
+
 	rhythmModel:setLongNoteShortening(config.gameplay.longNoteShortening)
 	rhythmModel:setTimeToPrepare(config.gameplay.time.prepare)
 	rhythmModel:setVisualTimeRate(config.gameplay.speed)
 	rhythmModel:setVisualTimeRateScale(config.gameplay.scaleSpeed)
-	rhythmModel:setPauseTimes(config.gameplay.time)
+
 	rhythmModel:setNoteChart(noteChart)
 	rhythmModel:setDrawRange(noteSkin.range)
 	rhythmModel.inputManager:setInputMode(tostring(noteChart.inputMode))
 
-	local timings = config.gameplay.timings
-	if replayModel.mode == "replay" then
-		timings = replayModel.replay.timings
-	end
-	rhythmModel.timings = timings
-	replayModel.timings = timings
+	rhythmModel:setWindUp(state.windUp)
+	rhythmModel:setTimeRate(playContext.rate)
+	rhythmModel:setConstantSpeed(playContext.const)
+	rhythmModel:setTimings(playContext.timings)
 
 	rhythmModel.inputManager.observable:add(replayModel)
 
 	rhythmModel:load()
 
-	local scoreEngine = rhythmModel.scoreEngine
-
-	local enps, longNoteRatio, longNoteArea = difficultyModel:getDifficulty(noteChart)
-	scoreEngine.baseEnps = enps
-	scoreEngine.longNoteRatio = longNoteRatio
-	scoreEngine.longNoteArea = longNoteArea
+	local enps, longNoteRatio = difficultyModel:getDifficulty(noteChart, playContext.rate)
+	playContext.enps = enps
+	playContext.longNoteRatio = longNoteRatio
 
 	rhythmModel.timeEngine:sync(love.timer.getTime())
 	rhythmModel:loadAllEngines()
 	replayModel:load()
+	pauseModel:load()
 
 	self:updateOffsets()
 
@@ -159,6 +154,7 @@ end
 
 ---@param dt number
 function GameplayController:update(dt)
+	self.pauseModel:update()
 	self.replayModel:update()
 	self.rhythmModel:update()
 end
@@ -204,7 +200,7 @@ function GameplayController:changePlayState(state)
 		self:discordPause()
 	end
 
-	self.rhythmModel.pauseManager:changePlayState(state)
+	self.pauseModel:changePlayState(state)
 end
 
 ---@param event table
@@ -222,18 +218,19 @@ function GameplayController:retry()
 	rhythmModel:load()
 	rhythmModel.timeEngine:sync(love.timer.getTime())
 	rhythmModel:loadAllEngines()
+	self.pauseModel:load()
 	self.replayModel:load()
 	self.resourceModel:rewind()
 	self:play()
 end
 
 function GameplayController:pause()
-	self.rhythmModel.pauseManager:pause()
+	self.pauseModel:pause()
 	self:discordPause()
 end
 
 function GameplayController:play()
-	self.rhythmModel.pauseManager:play()
+	self.pauseModel:play()
 	self:discordPlay()
 end
 
@@ -258,25 +255,46 @@ end
 
 function GameplayController:saveScore()
 	local rhythmModel = self.rhythmModel
-	local modifierModel = self.modifierModel
-	local scoreSystemEntry = rhythmModel.scoreEngine.scoreSystem.entry
+	local scoreEngine = rhythmModel.scoreEngine
+	local scoreSystem = scoreEngine.scoreSystem
+	local playContext = self.playContext
 
 	local chartItem = self.selectModel.noteChartItem
 
-	local replayHash = self.replayModel:saveReplay(chartItem.hash, chartItem.index)
-	local scoreEntry = self.scoreModel:insertScore(
-		scoreSystemEntry,
-		chartItem,
-		replayHash,
-		modifierModel:encode()
+	local replayHash = self.replayModel:saveReplay(
+		chartItem.hash,
+		chartItem.index,
+		playContext
 	)
 
-	local base = rhythmModel.scoreEngine.scoreSystem.base
+	local scoreEntryTable = {
+		chart_hash = chartItem.hash,
+		chart_index = chartItem.index,
+		time = os.time(),
+		accuracy = scoreSystem.normalscore.accuracyAdjusted,
+		max_combo = scoreSystem.base.maxCombo,
+		modifiers = ModifierEncoder:encode(playContext.modifiers),
+		rate = playContext.rate,
+		const = playContext.const and 1 or 0,
+		replay_hash = replayHash,
+		ratio = scoreSystem.misc.ratio,
+		perfect = scoreSystem.judgement.counters.soundsphere.perfect,
+		not_perfect = scoreSystem.judgement.counters.soundsphere["not perfect"],
+		miss = scoreSystem.base.missCount,
+		mean = scoreSystem.normalscore.normalscore.mean,
+		earlylate = scoreSystem.misc.earlylate,
+		inputmode = tostring(rhythmModel.noteChart.inputMode),
+		difficulty = self.playContext.enps,
+		pauses = scoreEngine.pausesCount,
+	}
+	local scoreEntry = self.scoreModel:insertScore(scoreEntryTable)
+
+	local base = scoreSystem.base
 	if base.hitCount / base.notesCount >= 0.5 then
 		self.onlineModel.onlineScoreManager:submit(chartItem, replayHash)
 	end
 
-	rhythmModel.scoreEngine.scoreEntry = scoreEntry
+	self.playContext.scoreEntry = scoreEntry
 
 	self.configModel.configs.select.scoreEntryId = scoreEntry.id
 end

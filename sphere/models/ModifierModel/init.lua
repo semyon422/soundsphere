@@ -1,353 +1,144 @@
 local class = require("class")
-local InputMode = require("ncdk.InputMode")
-
-local AutoKeySound = require("sphere.models.ModifierModel.AutoKeySound")
-local ConstSpeed = require("sphere.models.ModifierModel.ConstSpeed")
-local TimeRateQ = require("sphere.models.ModifierModel.TimeRateQ")
-local TimeRateX = require("sphere.models.ModifierModel.TimeRateX")
-local WindUp = require("sphere.models.ModifierModel.WindUp")
-local NoScratch = require("sphere.models.ModifierModel.NoScratch")
-local NoLongNote = require("sphere.models.ModifierModel.NoLongNote")
-local Automap = require("sphere.models.ModifierModel.Automap")
-local MultiplePlay = require("sphere.models.ModifierModel.MultiplePlay")
-local MinLnLength = require("sphere.models.ModifierModel.MinLnLength")
-local Alternate = require("sphere.models.ModifierModel.Alternate")
-local Alternate2 = require("sphere.models.ModifierModel.Alternate2")
-local MultiOverPlay = require("sphere.models.ModifierModel.MultiOverPlay")
-local Shift = require("sphere.models.ModifierModel.Shift")
-local Mirror = require("sphere.models.ModifierModel.Mirror")
-local Random = require("sphere.models.ModifierModel.Random")
-local BracketSwap = require("sphere.models.ModifierModel.BracketSwap")
-local FullLongNote = require("sphere.models.ModifierModel.FullLongNote")
-local LessChord = require("sphere.models.ModifierModel.LessChord")
-local MaxChord = require("sphere.models.ModifierModel.MaxChord")
+local table_util = require("table_util")
 
 ---@class sphere.ModifierModel
 ---@operator call: sphere.ModifierModel
 local ModifierModel = class()
 
 local Modifiers = {
-	AutoKeySound,
-	ConstSpeed,
-	TimeRateQ,
-	TimeRateX,
-	WindUp,
-	NoScratch,
-	NoLongNote,
-	Automap,
-	MultiplePlay,
-	MultiOverPlay,
-	Alternate,
-	Alternate2,
-	Shift,
-	Mirror,
-	Random,
-	BracketSwap,
-	MaxChord,
-	LessChord,
-	FullLongNote,
-	MinLnLength,
+	-- AutoPlay = 0,
+	-- ProMode = 1,
+	AutoKeySound = 2,
+	-- ConstSpeed = 3,
+	-- TimeRateQ = 4,
+	-- TimeRateX = 5,
+	WindUp = 6,
+	-- AudioClip = 7,
+	NoScratch = 8,
+	NoLongNote = 9,
+	-- NoMeasureLine = 10,
+	Automap = 11,
+	MultiplePlay = 12,
+	MultiOverPlay = 13,
+	Alternate = 14,
+	Shift = 15,
+	Mirror = 16,
+	Random = 17,
+	BracketSwap = 18,
+	FullLongNote = 19,
+	MinLnLength = 20,
+	-- ToOsu = 21,
+	Alternate2 = 22,
+	LessChord = 23,
+	MaxChord = 24,
 }
+ModifierModel.Modifiers = Modifiers
 
-local ModifierId = {
-	-- [AutoPlay] = 0,
-	-- [ProMode] = 1,
-	[AutoKeySound] = 2,
-	[ConstSpeed] = 3,
-	[TimeRateQ] = 4,
-	[TimeRateX] = 5,
-	[WindUp] = 6,
-	-- [AudioClip] = 7,
-	[NoScratch] = 8,
-	[NoLongNote] = 9,
-	-- [NoMeasureLine] = 10,
-	[Automap] = 11,
-	[MultiplePlay] = 12,
-	[MultiOverPlay] = 13,
-	[Alternate] = 14,
-	[Shift] = 15,
-	[Mirror] = 16,
-	[Random] = 17,
-	[BracketSwap] = 18,
-	[FullLongNote] = 19,
-	[MinLnLength] = 20,
-	-- [ToOsu] = 21,
-	[Alternate2] = 22,
-	[LessChord] = 23,
-	[MaxChord] = 24,
-}
+local ModifiersByName = {}
+local ModifiersById = {}
 
-local OneUseModifiers = {
-	AutoKeySound,
-	ConstSpeed,
-	TimeRateQ,
-	TimeRateX,
-	WindUp,
-	NoScratch,
-	NoLongNote,
-}
-
-function ModifierModel:new()
-	self.modifiers = {}
-	self.oneUseModifiers = {}
-	self.modifierByName = {}
-	self.modifierById = {}
-	self:createModifiers()
-	self.availableModifierItemIndex = 1
+for name, id in pairs(Modifiers) do
+	local M = require("sphere.models.ModifierModel." .. name)
+	ModifiersByName[name] = M
+	ModifiersById[id] = M
 end
 
----@return boolean
-function ModifierModel:isChanged()
-	local changed = self.changed
-	self.changed = false
-	return changed
+for name, id in pairs(Modifiers) do
+	Modifiers[id] = name
 end
 
----@param config table
-function ModifierModel:setConfig(config)
-	self.config = config
-	self.modifierItemIndex = math.min(math.max(self.modifierItemIndex or (#config + 1), 1), #config + 1)
-	self.changed = true
-	self.state = {
-		timeRate = 1,
-		inputMode = InputMode(),
-	}
-	for _, modifier in pairs(self.modifierByName) do
-		modifier.added = false
-	end
-	for _, modifierConfig in ipairs(self.config) do
-		local modifier = self:getModifier(modifierConfig)
-		if modifier then
-			modifier.added = true
-		end
-	end
-end
-
----@param direction number
-function ModifierModel:scrollAvailableModifier(direction)
-	if not self.modifiers[self.availableModifierItemIndex + direction] then
-		return
-	end
-	self.availableModifierItemIndex = self.availableModifierItemIndex + direction
-end
-
----@param direction number
-function ModifierModel:scrollModifier(direction)
-	local newModifierItemIndex = self.modifierItemIndex + direction
-	if not self.config[newModifierItemIndex] and not self.config[newModifierItemIndex - 1] then
-		return
-	end
-	self.modifierItemIndex = newModifierItemIndex
-end
-
-function ModifierModel:createModifiers()
-	local modifierByName = self.modifierByName
-	local modifierById = self.modifierById
-	for _, Modifier in ipairs(Modifiers) do
-		local modifier = Modifier()
-		modifier.modifierModel = self
-		modifier.id = ModifierId[Modifier]
-		modifierByName[modifier.name] = modifier
-		modifierById[modifier.id] = modifier
-		table.insert(self.modifiers, modifier)
-		if self:isOneUseModifier(Modifier) then
-			modifier.oneUse = true
-			table.insert(self.oneUseModifiers, modifier)
-		end
-	end
-end
-
----@param modifierConfig table|number
+---@param nameOrId string|number?
 ---@return sphere.Modifier?
-function ModifierModel:getModifier(modifierConfig)
-	if type(modifierConfig) == "number" then
-		return self.modifierById[modifierConfig]
-	end
-	return self.modifierByName[modifierConfig.name]
+function ModifierModel:getModifier(nameOrId)
+	return ModifiersByName[nameOrId] or ModifiersById[nameOrId]
 end
 
----@param Modifier sphere.Modifier
----@return boolean
-function ModifierModel:isOneUseModifier(Modifier)
-	for _, OneUseModifier in ipairs(OneUseModifiers) do
-		if Modifier == OneUseModifier then
-			return true
-		end
-	end
-	return false
+---@param modifiers table
+---@param modifier string
+---@param index number
+function ModifierModel:add(modifiers, modifier, index)
+	local mod = assert(self:getModifier(modifier))
+	table.insert(modifiers, index, {
+		id = Modifiers[modifier],
+		version = mod.version,
+		value = mod.defaultValue
+	})
 end
 
----@param modifier sphere.Modifier
----@return number
-function ModifierModel:getMinimalModifierIndex(modifier)
-	local index = 1
-	for _, oneUseModifier in ipairs(self.oneUseModifiers) do
-		if oneUseModifier.added then
-			index = index + 1
-		end
-		if modifier == oneUseModifier then
-			return index
-		end
-	end
-	return index
+---@param modifiers table
+---@param index number
+---@return table?
+function ModifierModel:remove(modifiers, index)
+	return table.remove(modifiers, index)
 end
 
----@param modifier sphere.Modifier
-function ModifierModel:add(modifier)
-	modifier = modifier or self.modifiers[self.availableModifierItemIndex]
-	local modifierConfig = modifier:getDefaultConfig()
-	local config = self.config
-	local minimalModifierIndex = self:getMinimalModifierIndex(modifier)
-	local index = math.max(self.modifierItemIndex, minimalModifierIndex)
-	if modifier.oneUse then
-		if modifier.added then
-			return
-		end
-		index = minimalModifierIndex
-	end
-	table.insert(config, index, modifierConfig)
-	self.modifierItemIndex = index + 1
-	modifier.added = true
-	self.changed = true
-end
-
----@param modifierConfig table
-function ModifierModel:remove(modifierConfig)
-	modifierConfig = modifierConfig or self.config[self.modifierItemIndex]
-	if not modifierConfig then
-		return
-	end
-	for i, foundModifierConfig in ipairs(self.config) do
-		if foundModifierConfig == modifierConfig then
-			table.remove(self.config, i)
-			break
-		end
-	end
-	if not self.config[self.modifierItemIndex] then
-		self.modifierItemIndex = math.max(self.modifierItemIndex - 1, 0)
-	end
-	local modifier = self:getModifier(modifierConfig)
-	for i, foundModifierConfig in ipairs(self.config) do
-		if foundModifierConfig.name == modifierConfig.name then
-			return
-		end
-	end
-	if modifier then
-		modifier.added = false
-	end
-	self.changed = true
-end
-
----@param modifierConfig table
+---@param modifier table
 ---@param value any
-function ModifierModel:setModifierValue(modifierConfig, value)
-	modifierConfig = modifierConfig or self.config[self.modifierItemIndex]
-	if not modifierConfig then
-		return
-	end
-	local modifier = self:getModifier(modifierConfig)
-	modifier:setValue(modifierConfig, value)
-	self.changed = true
+function ModifierModel:setModifierValue(modifier, value)
+	modifier.value = value
 end
 
----@param modifierConfig table
+---@param modifier table
 ---@param delta number
-function ModifierModel:increaseModifierValue(modifierConfig, delta)
-	modifierConfig = modifierConfig or self.config[self.modifierItemIndex]
-	if not modifierConfig then
-		return
-	end
-	local modifier = self:getModifier(modifierConfig)
-	if type(modifier.defaultValue) == "number" then
-		modifier:setValue(modifierConfig, modifierConfig.value + delta * modifier.step)
-	elseif type(modifier.defaultValue) == "boolean" then
-		local value = false
-		if delta == 1 then
-			value = true
-		end
-		modifier:setValue(modifierConfig, value)
-	elseif type(modifier.defaultValue) == "string" then
-		local indexValue = modifier:toIndexValue(modifierConfig.value)
-		modifier:setValue(modifierConfig, modifier:fromIndexValue(indexValue + delta * modifier.step))
-	end
-	self.changed = true
+function ModifierModel:increaseModifierValue(modifier, delta)
+	local mod = assert(self:getModifier(modifier.id))
+	local indexValue = mod:toIndexValue(modifier.value)
+	modifier.value = mod:fromIndexValue(indexValue + delta)
 end
 
+---@param modifiers table
 ---@param noteChart ncdk.NoteChart
-function ModifierModel:apply(noteChart)
-	for _, modifierConfig in ipairs(self.config) do
-		local modifier = self:getModifier(modifierConfig)
-		if modifier then
-			modifier.noteChart = noteChart
-			modifier:apply(modifierConfig)
+function ModifierModel:apply(modifiers, noteChart)
+	local obj = {}
+	for _, modifier in ipairs(modifiers) do
+		local mod = self:getModifier(modifier.id)
+		if mod then
+			table_util.clear(obj)
+			obj.noteChart = noteChart
+			setmetatable(obj, mod)
+			obj:apply(modifier)
 		end
 	end
 end
 
+---@param modifiers table
 ---@param state table
-function ModifierModel:applyMeta(state)
-	self.state = state
-	for _, modifierConfig in ipairs(self.config) do
-		local modifier = self:getModifier(modifierConfig)
-		if modifier then
-			modifier:applyMeta(modifierConfig, state)
+function ModifierModel:applyMeta(modifiers, state)
+	local obj = {}
+	for _, modifier in ipairs(modifiers) do
+		local mod = self:getModifier(modifier.id)
+		if mod then
+			table_util.clear(obj)
+			setmetatable(obj, mod)
+			obj:applyMeta(modifier, state)
 		end
 	end
 end
 
----@param config table
+---@param modifiers table
 ---@return string
-function ModifierModel:getString(config)
-	config = config or self.config
+function ModifierModel:getString(modifiers)
 	local t = {}
-	for _, modifierConfig in ipairs(config) do
-		local modifier = self:getModifier(modifierConfig)
-		if modifier then
-			local modifierString = ""
-			local s, subs = modifier:getString(modifierConfig)
-			modifierString = modifierString .. (s or "") .. (subs or "")
-			if #modifierString > 0 then
-				table.insert(t, modifierString)
+	for _, modifier in ipairs(modifiers) do
+		local mod = self:getModifier(modifier.id)
+		if mod then
+			local s, subs = mod:getString(modifier)
+			local str = (s or "") .. (subs or "")
+			if #str > 0 then
+				table.insert(t, str)
 			end
 		end
 	end
 	return table.concat(t, " ")
 end
 
----@param config table?
----@return string
-function ModifierModel:encode(config)
-	config = config or self.config
-	local t = {}
-	for _, modifierConfig in ipairs(config) do
-		local modifier = self:getModifier(modifierConfig)
-		if modifier then
-			table.insert(t, ("%d:%s"):format(modifier.id, modifier:encode(modifierConfig)))
-		end
-	end
-	return table.concat(t, ";")
-end
-
----@param encodedConfig string
----@return table
-function ModifierModel:decode(encodedConfig)
-	local config = {}
-	for modifierId, modifierData in encodedConfig:gmatch("(%d+):([^;]+)") do
-		local modifier = self:getModifier(tonumber(modifierId))
-		if modifier then
-			table.insert(config, modifier:decode(modifierData))
-		end
-	end
-	return config
-end
-
----@param oldConfig table
-function ModifierModel:fixOldFormat(oldConfig)
-	for _, modifierConfig in ipairs(oldConfig) do
-		local modifier = self:getModifier(modifierConfig)
-		if modifier then
-			if type(modifierConfig.value) == "number" and type(modifier.defaultValue) == "string" then
-				modifierConfig.value = modifier:fromIndexValue(modifierConfig.value)
+---@param modifiers table
+function ModifierModel:fixOldFormat(modifiers)
+	for _, modifier in ipairs(modifiers) do
+		local mod = self:getModifier(modifier.id)
+		if mod then
+			if type(modifier.value) == "number" and type(mod.defaultValue) == "string" then
+				modifier.value = mod:fromIndexValue(modifier.value)
 			end
 		end
 	end

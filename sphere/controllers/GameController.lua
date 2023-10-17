@@ -1,7 +1,7 @@
 local class = require("class")
 
 local OnlineModel = require("sphere.models.OnlineModel")
-local ModifierModel = require("sphere.models.ModifierModel")
+local ModifierSelectModel = require("sphere.models.ModifierSelectModel")
 local NoteSkinModel = require("sphere.models.NoteSkinModel")
 local InputModel = require("sphere.models.InputModel")
 local DifficultyModel = require("sphere.models.DifficultyModel")
@@ -12,7 +12,10 @@ local MultiplayerModel = require("sphere.models.MultiplayerModel")
 local ReplayModel = require("sphere.models.ReplayModel")
 local EditorModel = require("sphere.models.EditorModel")
 local SpeedModel = require("sphere.models.SpeedModel")
+local TimeRateModel = require("sphere.models.TimeRateModel")
 local ResourceModel = require("sphere.models.ResourceModel")
+local PlayContext = require("sphere.models.PlayContext")
+local PauseModel = require("sphere.models.PauseModel")
 
 local SelectController = require("sphere.controllers.SelectController")
 local GameplayController = require("sphere.controllers.GameplayController")
@@ -44,7 +47,6 @@ function GameController:new()
 	self.editorController = EditorController()
 
 	self.onlineModel = OnlineModel(self.persistence.configModel)
-	self.modifierModel = ModifierModel()
 	self.noteSkinModel = NoteSkinModel(self.persistence.configModel)
 	self.inputModel = InputModel(self.persistence.configModel)
 	self.difficultyModel = DifficultyModel()
@@ -66,23 +68,24 @@ function GameController:new()
 		self.inputModel,
 		self.resourceModel
 	)
-	self.multiplayerModel = MultiplayerModel(
-		self.rhythmModel,
-		self.persistence.configModel,
-		self.modifierModel,
-		self.selectModel,
-		self.onlineModel,
-		self.persistence.osudirectModel
-	)
-	self.replayModel = ReplayModel(
-		self.rhythmModel,
-		self.modifierModel
-	)
+	self.pauseModel = PauseModel(self.persistence.configModel, self.rhythmModel)
+	self.replayModel = ReplayModel(self.rhythmModel)
 	self.editorModel = EditorModel(
 		self.persistence.configModel,
 		self.resourceModel
 	)
 	self.speedModel = SpeedModel(self.persistence.configModel)
+	self.playContext = PlayContext()
+	self.timeRateModel = TimeRateModel(self.persistence.configModel, self.playContext)
+	self.modifierSelectModel = ModifierSelectModel(self.playContext)
+	self.multiplayerModel = MultiplayerModel(
+		self.rhythmModel,
+		self.persistence.configModel,
+		self.selectModel,
+		self.onlineModel,
+		self.persistence.osudirectModel,
+		self.playContext
+	)
 
 	self.scoreModel = self.persistence.scoreModel
 	self.cacheModel = self.persistence.cacheModel
@@ -119,12 +122,12 @@ function GameController:load()
 	local configModel = self.configModel
 	local rhythmModel = self.rhythmModel
 
-	rhythmModel.timings = configModel.configs.settings.gameplay.timings
 	rhythmModel.judgements = configModel.configs.judgements
 	rhythmModel.hp = configModel.configs.settings.gameplay.hp
 	rhythmModel.settings = configModel.configs.settings
 
-	self.modifierModel:setConfig(configModel.configs.modifier)
+	self.playContext:load(configModel.configs.play)
+	self.modifierSelectModel:updateAdded()
 
 	self.scoreModel:load()
 	self.onlineModel:load()

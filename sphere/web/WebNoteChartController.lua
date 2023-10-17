@@ -48,10 +48,9 @@ function WebNoteChartController:POST()
 	local noteChartDataEntries = {}
 	for _, noteChart in ipairs(noteCharts) do
 		local noteChartDataEntry = noteChart.metaData
-		local difficulty, longNoteRatio, longNoteArea = DifficultyModel:getDifficulty(noteChart)
+		local difficulty, longNoteRatio = DifficultyModel:getDifficulty(noteChart)
 		noteChartDataEntry.difficulty = difficulty
 		noteChartDataEntry.longNoteRatio = longNoteRatio
-		noteChartDataEntry.longNoteArea = longNoteArea
 		table.insert(noteChartDataEntries, noteChartDataEntry)
 	end
 

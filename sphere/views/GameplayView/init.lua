@@ -57,7 +57,7 @@ function GameplayView:draw()
 	Foreground(self)
 	just.container()
 
-	local state = self.game.rhythmModel.pauseManager.state
+	local state = self.game.pauseModel.state
 	local multiplayerModel = self.game.multiplayerModel
 	local isPlaying = multiplayerModel.room and multiplayerModel.isPlaying
 	if
@@ -75,14 +75,14 @@ end
 function GameplayView:update(dt)
 	self.game.gameplayController:update(dt)
 
-	local state = self.game.rhythmModel.pauseManager.state
+	local state = self.game.pauseModel.state
 	if state == "play" then
 		self.subscreen = ""
 	elseif state == "pause" then
 		self.subscreen = "pause"
 	end
 
-	if self.game.rhythmModel.pauseManager.needRetry then
+	if self.game.pauseModel.needRetry then
 		self.failed = false
 		self:retry()
 	end
@@ -144,7 +144,7 @@ function GameplayView:keypressed()
 	local gameplayController = self.game.gameplayController
 
 	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
-	local state = self.game.rhythmModel.pauseManager.state
+	local state = self.game.pauseModel.state
 	if state == "play" then
 		if kp(input.pause) and not shift then gameplayController:changePlayState("pause")
 		elseif kp(input.pause) and shift then self:quit()
@@ -161,7 +161,7 @@ function GameplayView:keypressed()
 end
 
 function GameplayView:keyreleased()
-	local state = self.game.rhythmModel.pauseManager.state
+	local state = self.game.pauseModel.state
 	local input = self.game.configModel.configs.settings.input
 	local gameplayController = self.game.gameplayController
 

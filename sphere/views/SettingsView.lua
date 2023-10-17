@@ -78,6 +78,7 @@ function drawSection:gameplay()
 	local g = settings.gameplay
 	local i = settings.input
 	local s = configs.select
+	local p = configs.play
 
 	local speedModel = self.game.speedModel
 
@@ -92,7 +93,7 @@ function drawSection:gameplay()
 		self.game.gameView:setModal(TimingsModalView)
 	end
 	just.sameline()
-	g.timings.nearest = imgui.checkbox("nearest", g.timings.nearest, "nearest input")
+	p.timings.nearest = imgui.checkbox("nearest", p.timings.nearest, "nearest input")
 
 	g.actionOnFail = imgui.combo("actionOnFail", g.actionOnFail, {"none", "pause", "quit"}, nil, "action on fail")
 	g.scaleSpeed = imgui.checkbox("scaleSpeed", g.scaleSpeed, "scale scroll speed with rate")

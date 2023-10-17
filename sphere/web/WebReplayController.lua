@@ -6,6 +6,8 @@ local ReplayModel = require("sphere.models.ReplayModel")
 local ModifierModel = require("sphere.models.ModifierModel")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local RhythmModel = require("sphere.models.RhythmModel")
+local PlayContext = require("sphere.models.PlayContext")
+local ModifierEncoder = require("sphere.models.ModifierEncoder")
 
 local WebReplayController = {}
 
@@ -32,26 +34,23 @@ function WebReplayController:POST()
 
 	local fastplayController = FastplayController()
 
+	local playContext = PlayContext()
 	local rhythmModel = RhythmModel()
-	local modifierModel = ModifierModel()
 	local difficultyModel = DifficultyModel()
-	local replayModel = ReplayModel(
-		rhythmModel,
-		modifierModel
-	)
+	local replayModel = ReplayModel(rhythmModel)
 	fastplayController.rhythmModel = rhythmModel
 	fastplayController.replayModel = replayModel
-	fastplayController.modifierModel = modifierModel
 	fastplayController.difficultyModel = difficultyModel
+	fastplayController.playContext = playContext
 
 	rhythmModel.judgements = {}
 	rhythmModel.settings = require("sphere.persistence.ConfigModel.settings")
 	rhythmModel.hp = rhythmModel.settings.gameplay.hp
 
-	modifierModel:setConfig(replay.modifiers)
-	modifierModel:fixOldFormat(replay.modifiers)
+	playContext:load(replay)
+	ModifierModel:fixOldFormat(replay.modifiers)
 
-	rhythmModel.timings = replay.timings
+	rhythmModel:setTimings(replay.timings)
 	replayModel.replay = replay
 
 	fastplayController:play(noteChart, replay)
@@ -61,10 +60,12 @@ function WebReplayController:POST()
 	return {json = {
 		score = score,
 		inputMode = tostring(noteChart.inputMode),
-		difficulty = rhythmModel.scoreEngine.enps,
+		difficulty = playContext.enps,
+		playContext = playContext,
 		modifiers = replay.modifiers,
-		modifiersEncoded = modifierModel:encode(replay.modifiers),
-		modifiersString = modifierModel:getString(replay.modifiers),
+		modifiersEncoded = ModifierEncoder:encode(replay.modifiers),
+		modifiersHash = ModifierEncoder:hash(replay.modifiers),
+		modifiersString = ModifierModel:getString(replay.modifiers),
 	}}
 end
 

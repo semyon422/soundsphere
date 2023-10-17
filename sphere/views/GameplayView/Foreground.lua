@@ -14,7 +14,7 @@ local PauseProgressBar = RectangleProgressView({
 	transform = transformFull,
 	direction = "left-right",
 	mode = "+",
-	getCurrent = function(self) return self.game.rhythmModel.pauseManager.progress end,
+	getCurrent = function(self) return self.game.pauseModel.progress end,
 })
 
 ---@param self table

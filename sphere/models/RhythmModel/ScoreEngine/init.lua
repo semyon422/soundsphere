@@ -1,25 +1,20 @@
 local class = require("class")
-local Observable = require("Observable")
 local ScoreSystemContainer = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystemContainer")
 
 ---@class sphere.ScoreEngine
 ---@operator call: sphere.ScoreEngine
 local ScoreEngine = class()
 
-function ScoreEngine:new()
-	self.observable = Observable()
+---@param timeEngine sphere.TimeEngine
+function ScoreEngine:new(timeEngine)
 	self.scoreSystem = ScoreSystemContainer()
+	self.timeEngine = timeEngine
 end
 
 function ScoreEngine:load()
 	local scoreSystem = self.scoreSystem
 	scoreSystem.scoreEngine = self
 	scoreSystem:load()
-
-	self.inputMode = tostring(self.noteChart.inputMode)
-	self.baseTimeRate = self.rhythmModel.timeEngine.baseTimeRate
-
-	self.enps = self.baseEnps * self.baseTimeRate
 
 	self.pausesCount = 0
 	self.paused = false
@@ -29,7 +24,7 @@ function ScoreEngine:load()
 end
 
 function ScoreEngine:update()
-	local timeEngine = self.rhythmModel.timeEngine
+	local timeEngine = self.timeEngine
 	local timer = timeEngine.timer
 	local currentTime = timeEngine.currentTime
 

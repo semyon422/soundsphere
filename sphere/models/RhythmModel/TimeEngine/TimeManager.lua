@@ -13,7 +13,7 @@ end
 ---@return number?
 ---@return number?
 function TimeManager:getAdjustTime()
-	return self.timeEngine.rhythmModel.audioEngine:getPosition()
+	return self.timeEngine.audioEngine:getPosition()
 end
 
 ---@return number?

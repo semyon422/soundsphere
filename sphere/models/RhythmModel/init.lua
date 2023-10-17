@@ -6,7 +6,6 @@ local GraphicEngine = require("sphere.models.RhythmModel.GraphicEngine")
 local AudioEngine = require("sphere.models.RhythmModel.AudioEngine")
 local TimeEngine = require("sphere.models.RhythmModel.TimeEngine")
 local InputManager = require("sphere.models.RhythmModel.InputManager")
-local PauseManager = require("sphere.models.RhythmModel.PauseManager")
 -- require("sphere.models.RhythmModel.LogicEngine.Test")
 
 ---@class sphere.RhythmModel
@@ -19,22 +18,17 @@ function RhythmModel:new(inputModel, resourceModel)
 	self.inputModel = inputModel
 	self.resourceModel = resourceModel
 
-	self.inputManager = InputManager()
-	self.pauseManager = PauseManager()
 	self.timeEngine = TimeEngine()
-	self.scoreEngine = ScoreEngine()
-	self.audioEngine = AudioEngine()
-	self.logicEngine = LogicEngine()
-	self.graphicEngine = GraphicEngine()
+	self.inputManager = InputManager(self.timeEngine, inputModel)
+	self.scoreEngine = ScoreEngine(self.timeEngine)
+	self.audioEngine = AudioEngine(self.timeEngine, resourceModel)
+	self.logicEngine = LogicEngine(self.timeEngine, self.scoreEngine)
+	self.graphicEngine = GraphicEngine(self.timeEngine, self.logicEngine)
 	self.observable = Observable()
-	self.inputManager.rhythmModel = self
-	self.pauseManager.rhythmModel = self
-	self.timeEngine.rhythmModel = self
-	self.scoreEngine.rhythmModel = self
-	self.audioEngine.rhythmModel = self
-	self.logicEngine.rhythmModel = self
-	self.graphicEngine.rhythmModel = self
-	self.observable.rhythmModel = self
+
+	self.timeEngine.audioEngine = self.audioEngine
+	self.timeEngine.logicEngine = self.logicEngine
+	self.graphicEngine.resourceModel = self.resourceModel
 
 	self.inputManager.observable:add(self.logicEngine)
 	self.inputManager.observable:add(self.observable)
@@ -44,20 +38,16 @@ end
 
 function RhythmModel:load()
 	local scoreEngine = self.scoreEngine
-	local logicEngine = self.logicEngine
 
 	scoreEngine.judgements = self.judgements
 	scoreEngine.hp = self.hp
 	scoreEngine.settings = self.settings
-
-	logicEngine.timings = self.timings
 end
 
 function RhythmModel:loadAllEngines()
 	self:loadLogicEngines()
 	self.audioEngine:load()
 	self.graphicEngine:load()
-	self.pauseManager:load()
 end
 
 function RhythmModel:loadLogicEngines()
@@ -85,6 +75,18 @@ function RhythmModel:unloadLogicEngines()
 	self.logicEngine:unload()
 end
 
+function RhythmModel:play()
+	self.timeEngine:play()
+	self.audioEngine:play()
+	self.inputManager:loadState()
+end
+
+function RhythmModel:pause()
+	self.timeEngine:pause()
+	self.audioEngine:pause()
+	self.inputManager:saveState()
+end
+
 ---@param event table
 function RhythmModel:receive(event)
 	if event.name == "framestarted" then
@@ -102,14 +104,13 @@ function RhythmModel:update()
 	self.audioEngine:update()
 	self.scoreEngine:update()
 	self.graphicEngine:update()
-	self.pauseManager:update()
 end
 
 ---@return boolean
 function RhythmModel:hasResult()
 	local timeEngine = self.timeEngine
 	local base = self.scoreEngine.scoreSystem.base
-	local entry = self.scoreEngine.scoreSystem.entry
+	local accuracy = self.scoreEngine.scoreSystem.normalscore.accuracyAdjusted
 
 	return
 		not self.logicEngine.autoplay and
@@ -117,8 +118,13 @@ function RhythmModel:hasResult()
 		not self.timeEngine.windUp and
 		timeEngine.currentTime >= timeEngine.minTime and
 		base.hitCount > 0 and
-		entry.accuracy > 0 and
-		entry.accuracy < math.huge
+		accuracy > 0 and
+		accuracy < math.huge
+end
+
+---@param timings table?
+function RhythmModel:setTimings(timings)
+	self.logicEngine.timings = timings
 end
 
 ---@param windUp table?
@@ -201,11 +207,6 @@ end
 ---@param offset number
 function RhythmModel:setVisualOffset(offset)
 	self.graphicEngine.visualOffset = offset
-end
-
----@param ... any?
-function RhythmModel:setPauseTimes(...)
-	self.pauseManager:setPauseTimes(...)
 end
 
 ---@param scaleSpeed boolean

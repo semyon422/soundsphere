@@ -43,8 +43,8 @@ local number_fields = {
 		end
 	},
 	{
-		keys = {"missCount", "m"},
-		field = "scores.missCount",
+		keys = {"miss", "m"},
+		field = "scores.miss",
 	},
 	{
 		keys = {"accuracy", "a"},

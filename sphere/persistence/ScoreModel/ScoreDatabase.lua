@@ -5,7 +5,7 @@ local ScoreDatabase = {}
 ScoreDatabase.dbpath = "userdata/scores.db"
 
 local defaultInfo = {
-	version = 4
+	version = 5
 }
 
 function ScoreDatabase:load()
@@ -60,7 +60,7 @@ end
 ---@param index number
 ---@return table
 function ScoreDatabase:getScoreEntries(hash, index)
-	return self.db:select("scores", "noteChartHash = ? AND noteChartIndex = ?", hash, index)
+	return self.db:select("scores", "chart_hash = ? AND chart_index = ?", hash, index)
 end
 
 ---@return table

@@ -1,19 +1,27 @@
 local class = require("class")
 local thread = require("thread")
-local InputMode = require("ncdk.InputMode")
 local Sph = require("sph.Sph")
 local NoteChartExporter = require("osu.NoteChartExporter")
+local ModifierModel = require("sphere.models.ModifierModel")
+local InputMode = require("ncdk.InputMode")
 
 ---@class sphere.SelectController
 ---@operator call: sphere.SelectController
 local SelectController = class()
+
+function SelectController:new()
+	self.state = {
+		inputMode = InputMode(),
+	}
+end
 
 function SelectController:load()
 	local selectModel = self.selectModel
 	local previewModel = self.previewModel
 
 	self.configModel:write()
-	self.modifierModel:setConfig(self.configModel.configs.modifier)
+	self.playContext:load(self.configModel.configs.play)
+	self.modifierSelectModel:updateAdded()
 
 	self.selectModel:setLock(false)
 
@@ -24,17 +32,17 @@ function SelectController:load()
 end
 
 function SelectController:applyModifierMeta()
-	local state = {}
-	state.timeRate = 1
-	state.inputMode = InputMode()
+	self.state.inputMode = InputMode()
+
+	local playContext = self.playContext
 
 	local item = self.selectModel.noteChartItem
 	if item then
-		state.inputMode:set(item.inputMode)
+		self.state.inputMode:set(item.inputMode)
 	end
 
-	self.modifierModel:applyMeta(state)
-	self.previewModel:setPitch(state.timeRate)
+	ModifierModel:applyMeta(playContext.modifiers, self.state)
+	self.previewModel:setPitch(playContext.rate)
 end
 
 function SelectController:beginUnload()
@@ -42,6 +50,7 @@ function SelectController:beginUnload()
 end
 
 function SelectController:unload()
+	self.playContext:save(self.configModel.configs.play)
 	self.noteSkinModel:load()
 	self.configModel:write()
 end
@@ -66,7 +75,7 @@ function SelectController:update()
 		self.previewModel:loadPreviewDebounce(previewUrl)
 	end
 
-	if self.modifierModel:isChanged() then
+	if self.modifierSelectModel:isChanged() then
 		self.multiplayerModel:pushModifiers()
 		self:applyModifierMeta()
 	end
@@ -183,7 +192,7 @@ function SelectController:exportToOsu()
 
 	local nce = NoteChartExporter()
 	local noteChart = selectModel:loadNoteChart()
-	self.modifierModel:apply(noteChart)
+	ModifierModel:apply(self.playContext.modifiers, noteChart)
 
 	nce.noteChart = noteChart
 	nce.noteChartEntry = chartItem

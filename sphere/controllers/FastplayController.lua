@@ -1,5 +1,6 @@
 local class = require("class")
 local InputMode = require("ncdk.InputMode")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.FastplayController
 ---@operator call: sphere.FastplayController
@@ -9,20 +10,12 @@ local FastplayController = class()
 ---@param replay sphere.Replay
 ---@return table
 function FastplayController:applyModifiers(noteChart, replay)
-	local modifierModel = self.modifierModel
-
 	local state = {}
-	state.timeRate = 1
-	state.inputMode = InputMode()
-	state.inputMode:set(noteChart.inputMode)
+	state.inputMode = InputMode(noteChart.inputMode)
 
-	-- if replay.modifiers then
-	-- 	modifierModel:setConfig(replay.modifiers)
-	-- 	modifierModel:fixOldFormat(replay.modifiers)
-	-- end
-
-	modifierModel:applyMeta(state)
-	modifierModel:apply(noteChart)
+	local modifiers = self.playContext.modifiers
+	ModifierModel:applyMeta(modifiers, state)
+	ModifierModel:apply(modifiers, noteChart)
 
 	return state
 end
@@ -33,13 +26,11 @@ function FastplayController:play(noteChart, replay)
 	local difficultyModel = self.difficultyModel
 	local rhythmModel = self.rhythmModel
 	local replayModel = self.replayModel
+	local playContext = self.playContext
 
 	local state = self:applyModifiers(noteChart, replay)
 
-	rhythmModel.timings = replay.timings
-	replayModel.replay = replay
-
-	rhythmModel:setTimeRate(state.timeRate)
+	rhythmModel:setTimeRate(playContext.rate)
 	rhythmModel:setWindUp(state.windUp)
 	rhythmModel:setNoteChart(noteChart)
 
@@ -49,12 +40,9 @@ function FastplayController:play(noteChart, replay)
 
 	rhythmModel:load()
 
-	local scoreEngine = rhythmModel.scoreEngine
-
-	local enps, longNoteRatio, longNoteArea = difficultyModel:getDifficulty(noteChart)
-	scoreEngine.baseEnps = enps
-	scoreEngine.longNoteRatio = longNoteRatio
-	scoreEngine.longNoteArea = longNoteArea
+	local enps, longNoteRatio = difficultyModel:getDifficulty(noteChart, playContext.rate)
+	playContext.enps = enps
+	playContext.longNoteRatio = longNoteRatio
 
 	rhythmModel.timeEngine:sync(0)
 	rhythmModel:loadLogicEngines()

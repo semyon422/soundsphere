@@ -19,7 +19,7 @@ local time_util = require("time_util")
 ---@param self table
 ---@return boolean
 local function showLoadedScore(self)
-	local scoreEntry = self.game.rhythmModel.scoreEngine.scoreEntry
+	local scoreEntry = self.game.playContext.scoreEntry
 	local scoreItem = self.game.selectModel.scoreItem
 	if not scoreEntry or not scoreItem then
 		return false
@@ -275,8 +275,8 @@ local function Judgements(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	local perfect = show and counter.perfect or scoreItem.perfect or 0
-	local notPerfect = show and counter["not perfect"] or scoreItem.notPerfect or 0
-	local miss = show and base.missCount or scoreItem.missCount or 0
+	local notPerfect = show and counter["not perfect"] or scoreItem.not_perfect or 0
+	local miss = show and base.missCount or scoreItem.miss or 0
 
 	local interval = 5
 	local lineHeight = 40
@@ -397,11 +397,14 @@ end
 local function NotechartInfo(self)
 	local erfunc = require("libchart.erfunc")
 	local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
-	local normalscore = self.game.rhythmModel.scoreEngine.scoreSystem.normalscore
+
+	local rhythmModel = self.game.rhythmModel
+	local normalscore = rhythmModel.scoreEngine.scoreSystem.normalscore
 
 	local noteChartItem = self.game.selectModel.noteChartItem
 	local scoreItem = self.game.selectModel.scoreItem
-	local scoreEngine = self.game.rhythmModel.scoreEngine
+	local scoreEngine = rhythmModel.scoreEngine
+	local playContext = self.game.playContext
 
 	if not scoreItem then
 		return
@@ -415,14 +418,15 @@ local function NotechartInfo(self)
 		topScoreItem = scoreItem
 	end
 
-	local scoreEntry = scoreEngine.scoreEntry
+	local scoreEntry = playContext.scoreEntry
 	if not scoreEntry then
 		return
 	end
 
 	local show = showLoadedScore(self)
 
-	local baseTimeRate = show and self.game.rhythmModel.scoreEngine.baseTimeRate or scoreItem.timeRate
+	local baseTimeRate = show and playContext.rate or scoreItem.rate
+	local const = show and playContext.const or scoreItem.const
 
 	local baseBpm = noteChartItem.bpm
 	local baseLength = noteChartItem.length
@@ -431,8 +435,8 @@ local function NotechartInfo(self)
 
 	local bpm = baseBpm * baseTimeRate
 	local length = baseLength / baseTimeRate
-	local difficulty = show and scoreEngine.enps or scoreItem.difficulty
-	local inputMode = show and scoreEngine.inputMode or scoreItem.inputMode
+	local difficulty = show and playContext.enps or scoreItem.difficulty
+	local inputMode = show and tostring(rhythmModel.noteChart.inputMode) or scoreItem.inputmode
 
 	local w, h = Layout:move("title_left")
 	love.graphics.translate(22, 15)
@@ -462,7 +466,11 @@ local function NotechartInfo(self)
 	love.graphics.setFont(font)
 
 	just.indent(36)
-	just.text(("%0.2fx"):format(show and baseTimeRate or scoreItem.timeRate))
+	just.text(("%0.2fx"):format(baseTimeRate))
+	if const then
+		just.sameline()
+		just.text("c")
+	end
 
 	local hp = scoreEngine.scoreSystem.hp
 	if show and hp then
@@ -506,7 +514,7 @@ local function NotechartInfo(self)
 
 	if scoreEntry.id == scoreItem.id then
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-		rating = s * scoreEngine.enps
+		rating = s * playContext.enps
 	end
 
 	local bestScore = ("%d"):format(topScoreItem.score)
@@ -653,7 +661,7 @@ local function NotechartInfo(self)
 	-- end
 	-- TextCellImView(w, 55, "right", "early/late", earlylate)
 
-	TextCellImView(w, 55, "right", "pauses", scoreItem.pausesCount)
+	TextCellImView(w, 55, "right", "pauses", scoreItem.pauses)
 
 	if show then
 		local adjustRatio = normalscore.adjustRatio
@@ -673,15 +681,14 @@ local function ModifierIconGrid(self)
 	-- drawFrameRect(w, h)
 	love.graphics.translate(36, 0)
 
-	local modifierModel = self.game.modifierModel
 	local selectModel = self.game.selectModel
-	local config = modifierModel.config
+	local modifiers = self.game.playContext.modifiers
 	if not showLoadedScore(self) and selectModel.scoreItem then
-		config = selectModel.scoreItem.modifiers
+		modifiers = selectModel.scoreItem.modifiers
 	end
 
 	ModifierIconGridView.game = self.game
-	ModifierIconGridView:draw(config, w - 72, h, h, true)
+	ModifierIconGridView:draw(modifiers, w - 72, h, h, true)
 end
 
 ---@param self table
@@ -696,8 +703,7 @@ local function BottomScreenMenu(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	local scoreItem = self.game.selectModel.scoreItem
-	local scoreEngine = self.game.rhythmModel.scoreEngine
-	local scoreEntry = scoreEngine.scoreEntry
+	local scoreEntry = self.game.playContext.scoreEntry
 
 	w, h = Layout:move("graphs_sup_right")
 	love.graphics.setColor(0, 0, 0, 0.8)
@@ -716,7 +722,7 @@ local function BottomScreenMenu(self)
 		if imgui.TextOnlyButton("submit", "resubmit", 72 * 2, h) then
 			self.game.onlineModel.onlineScoreManager:submit(
 				self.game.selectModel.noteChartItem,
-				scoreItem.replayHash
+				scoreItem.replay_hash
 			)
 		end
 	end

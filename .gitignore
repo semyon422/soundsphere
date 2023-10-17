@@ -26,6 +26,7 @@ userdata/judgements.lua
 userdata/files.lua
 userdata/urls.lua
 userdata/filters.lua
+userdata/play.lua
 userdata/avatar.png
 userdata/lasterror.txt
 

@@ -57,6 +57,7 @@ return {
 		actionOnFail = "none",
 		ratingHitTimingWindow = 0.032,
 		scaleSpeed = false,
+		rateType = "default",
 		speedType = "default",
 		speed = 1,
 		tempoFactor = "average",  -- "average", "primary", "minimum", "maximum"
@@ -68,21 +69,6 @@ return {
 			playRetry = 0.5,
 			prepare = 2
 		},
-		timings = {
-			nearest = false,
-			ShortNote = {
-				hit = {-0.12, 0.12},
-				miss = {-0.16, 0.16}
-			},
-			LongNoteStart = {
-				hit = {-0.12, 0.12},
-				miss = {-0.16, 0.16},
-			},
-			LongNoteEnd = {
-				hit = {-0.12, 0.12},
-				miss = {-0.16, 0.16}
-			}
-		}
 	},
 	graphics = {
 		asynckey = false,

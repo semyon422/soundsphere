@@ -10,10 +10,8 @@ ReplayModel.path = "userdata/replays"
 ReplayModel.mode = "record"
 
 ---@param rhythmModel sphere.RhythmModel
----@param modifierModel sphere.ModifierModel
-function ReplayModel:new(rhythmModel, modifierModel)
+function ReplayModel:new(rhythmModel)
 	self.rhythmModel = rhythmModel
-	self.modifierModel = modifierModel
 end
 
 function ReplayModel:load()
@@ -65,14 +63,14 @@ end
 
 ---@param hash string
 ---@param index number
+---@param playContext sphere.PlayContext
 ---@return string
-function ReplayModel:saveReplay(hash, index)
+function ReplayModel:saveReplay(hash, index, playContext)
 	local replay = self.replay
 	replay.hash = hash
 	replay.index = index
 	replay.inputMode = self.rhythmModel.noteChart.inputMode
-	replay.modifierTable = self.modifierModel.config
-	replay.timings = self.timings
+	playContext:save(replay)
 
 	local replayString = replay:toString()
 	local replayHash = md5.sumhexa(replayString)
