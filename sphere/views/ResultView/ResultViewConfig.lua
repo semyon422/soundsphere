@@ -107,6 +107,27 @@ local function ComboGraph(self)
 	_ComboGraph:draw()
 end
 
+local _EarlyHitGraph = PointGraphView({
+	draw = drawGraph,
+	radius = 4,
+	backgroundColor = {1, 1, 1, 1},
+	backgroundRadius = 6,
+	point = function(self, point)
+		if not point.base.isEarlyHit then
+			return
+		end
+		local y = point.misc.deltaTime / 0.16 / 2 + 0.5
+		return y, 0.4, 0.35, 0.8, 1
+	end,
+	show = showLoadedScore
+})
+
+---@param self table
+local function EarlyHitGraph(self)
+	_EarlyHitGraph.game = self.game
+	_EarlyHitGraph:draw()
+end
+
 local perfectColor = {1, 1, 1, 1}
 local notPerfectColor = {1, 0.6, 0.4, 1}
 local _HitGraph = PointGraphView({
@@ -749,6 +770,7 @@ return function(self)
 	ComboGraph(self)
 	HpGraph(self)
 	MissGraph(self)
+	EarlyHitGraph(self)
 	BottomScreenMenu(self)
 	Judgements(self)
 	JudgementsDropdown(self)

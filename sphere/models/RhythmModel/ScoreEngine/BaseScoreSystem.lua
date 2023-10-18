@@ -18,6 +18,7 @@ function BaseScoreSystem:new()
 	self.currentTime = 0
 
 	self.isMiss = false
+	self.isEarlyHit = false
 	self.isLongNoteComboBreak = false
 
 	self.counters = {}
@@ -32,6 +33,7 @@ function BaseScoreSystem:before(event)
 
 	self.currentTime = event.currentTime
 	self.isMiss = false
+	self.isEarlyHit = false
 	self.isLongNoteComboBreak = false
 
 	self.notesCount = event.notesCount
@@ -64,6 +66,7 @@ end
 ---@param event table
 function BaseScoreSystem:earlyHit(event)
 	self.earlyHitCount = self.earlyHitCount + 1
+	self.isEarlyHit = true
 end
 
 ---@param event table
