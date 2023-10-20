@@ -91,6 +91,7 @@ local textFields = {
 	"tags",
 	"creator",
 	"inputMode",
+	"audioPath",
 }
 
 local operators = {
