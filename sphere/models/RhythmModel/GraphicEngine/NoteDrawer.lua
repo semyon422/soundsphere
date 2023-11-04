@@ -5,6 +5,14 @@ local GraphicalNoteFactory = require("sphere.models.RhythmModel.GraphicEngine.Gr
 ---@operator call: sphere.NoteDrawer
 local NoteDrawer = class()
 
+local function sort_const(a, b)
+	return a.startNoteData.timePoint:compare(b.startNoteData.timePoint, "absolute")
+end
+
+local function sort_visual(a, b)
+	return a.startNoteData.timePoint:compare(b.startNoteData.timePoint, "visual")
+end
+
 function NoteDrawer:load()
 	local graphicEngine = self.graphicEngine
 	local logicEngine = graphicEngine.logicEngine
@@ -30,9 +38,12 @@ function NoteDrawer:load()
 		end
 	end
 
-	table.sort(notes, function(a, b)
-		return a.startNoteData.timePoint:compare(b.startNoteData.timePoint, "visual")
-	end)
+	if graphicEngine.constant then
+		table.sort(notes, sort_const)
+	else
+		table.sort(notes, sort_visual)
+	end
+
 	for i, note in ipairs(notes) do
 		note.nextNote = notes[i + 1]
 	end
