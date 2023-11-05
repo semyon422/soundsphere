@@ -901,7 +901,7 @@ end
 function OsuNoteSkin:removeExtLower(file_name)
 	local name, ext = file_name:lower():match("^(.+)%.(.-)$")
 	if not name or not supportedImageFormats[ext] then
-		return file_name
+		return file_name:lower()
 	end
 	return name, ext
 end
