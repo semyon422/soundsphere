@@ -517,9 +517,11 @@ local defaultJudgements = {
 }
 
 ---@param od number
-function OsuNoteSkin:addJudgements(od)
+function OsuNoteSkin:addJudgements(od)  -- TriggerScoreIncrease
 	local mania = self.mania
-	local rate = self.skinini.General.AnimationFramerate
+
+	local rate = 20
+	local duration = 0.22
 
 	local judgements = {}
 	for i, jd in ipairs(defaultJudgements) do
@@ -530,13 +532,11 @@ function OsuNoteSkin:addJudgements(od)
 		end
 		if path then
 			local judgement = {name, path, range}
-			if rate > 0 then
-				judgement.rate = rate
-			elseif range then
-				judgement.rate = range[2] - range[1] + 1
-			else
-				judgement.rate = 1
+			local frames = 1
+			if range then
+				frames = range[2] - range[1] + 1
 			end
+			judgement.cycles = rate * duration / frames
 			table.insert(judgements, judgement)
 		end
 	end
@@ -551,6 +551,7 @@ function OsuNoteSkin:addJudgements(od)
 		scale = 480 / 768,
 		transform = self.playField:newLaneCenterTransform(480),
 		key = "osuOD" .. od,
+		rate = rate,
 		judgements = judgements,
 	})
 end

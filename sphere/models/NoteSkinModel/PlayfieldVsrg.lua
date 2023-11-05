@@ -276,6 +276,7 @@ function PlayfieldVsrg:addJudgement(object)
 			range = judgement[3],
 			quad = judgement[4],
 			rate = judgement.rate or object.rate,
+			cycles = judgement.cycles or object.cycles,
 		})
 		judgements[judgement[1]] = config
 		self:add(config)

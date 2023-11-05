@@ -8,7 +8,7 @@ local ImageAnimationView = class()
 
 function ImageAnimationView:load()
 	local animation = Animation()
-	animation.cycles = 1
+	animation.cycles = self.cycles or 1
 	animation.range = self.range or {0, 0}
 	animation.rate = self.rate
 	animation.time = math.huge
