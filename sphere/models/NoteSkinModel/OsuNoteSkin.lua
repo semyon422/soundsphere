@@ -702,7 +702,8 @@ function OsuNoteSkin:findImage(value, preferFrame)
 		return
 	end
 
-	local files = self.files[value:gsub("\\", "/"):lower()]
+	value = self:removeExtLower(value:gsub("\\", "/"))
+	local files = self.files[value]
 	if not files then
 		return
 	end
@@ -737,7 +738,7 @@ function OsuNoteSkin:findAnimation(value)
 		return
 	end
 
-	value = value:gsub("\\", "/"):lower()
+	value = self:removeExtLower(value:gsub("\\", "/"))
 	local files = self.files[value]
 	if not files then
 		return
@@ -893,13 +894,24 @@ function OsuNoteSkin:setKeys(keys)
 	end
 end
 
+---@param file_name string
+---@return string
+---@return string?
+function OsuNoteSkin:removeExtLower(file_name)
+	local name, ext = file_name:lower():match("^(.+)%.(.-)$")
+	if not name or not supportedImageFormats[ext] then
+		return file_name
+	end
+	return name, ext
+end
+
 ---@param files table
 ---@return table
 function OsuNoteSkin:processFiles(files)
 	local _files = {}
 
 	for _, file in ipairs(files) do
-		local key1, ext = file:lower():match("^(.+)%.(.-)$")
+		local key1, ext = self:removeExtLower(file)
 		if supportedImageFormats[ext] then
 			local key2, dpi = key1:match("^(.+)@(%d+)x$")
 			key2 = key2 or key1
