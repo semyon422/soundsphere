@@ -114,6 +114,8 @@ function drawSection:gameplay()
 	g.ratingHitTimingWindow = intButtonsMs("ratingHitTimingWindow", g.ratingHitTimingWindow, "rating hit timing window")
 
 	g.autoKeySound = imgui.checkbox("autoKeySound", g.autoKeySound, "auto key sound")
+	g.eventBasedRender = imgui.checkbox("eventBasedRender", g.eventBasedRender, "event based render (experimental)")
+	g.swapVelocityType = imgui.checkbox("swapVelocityType", g.swapVelocityType, "swap 'current' and 'local' velocity (experimental)")
 
 	imgui.separator()
 	s.collapse = imgui.checkbox("s.collapse", s.collapse, "group charts if applicable")

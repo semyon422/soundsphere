@@ -1,5 +1,6 @@
 local class = require("class")
 local NoteDrawer = require("sphere.models.RhythmModel.GraphicEngine.NoteDrawer")
+local TimeToEvent = require("sphere.models.RhythmModel.GraphicEngine.TimeToEvent")
 local flux = require("flux")
 
 ---@class sphere.GraphicEngine
@@ -10,6 +11,7 @@ GraphicEngine.visualOffset = 0
 GraphicEngine.longNoteShortening = 0
 GraphicEngine.scaleSpeed = false
 GraphicEngine.constant = false
+GraphicEngine.eventBasedRender = false
 
 ---@param timeEngine sphere.TimeEngine
 ---@param logicEngine sphere.LogicEngine
@@ -22,14 +24,23 @@ function GraphicEngine:load()
 	self.noteCount = 0
 	self.noteDrawers = {}
 
+	local layerEvents = {}
+
+	local eventRange = 1 / self.visualTimeRate
+
 	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
+		local layerData = self.noteChart.layerDatas[layerDataIndex]
 		local noteDrawer = NoteDrawer({
-			layerData = self.noteChart.layerDatas[layerDataIndex],
+			layerData = layerData,
 			noteDatas = noteDatas,
 			inputType = inputType,
 			inputIndex = inputIndex,
 			graphicEngine = self
 		})
+		if self.eventBasedRender then
+			layerEvents[layerDataIndex] = layerEvents[layerDataIndex] or TimeToEvent(layerData, eventRange)
+			noteDrawer.events = layerEvents[layerDataIndex]
+		end
 		noteDrawer:load()
 		table.insert(self.noteDrawers, noteDrawer)
 	end

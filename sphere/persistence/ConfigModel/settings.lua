@@ -44,6 +44,9 @@ return {
 			shift = false,
 			notes = 20,
 		},
+		autoKeySound = false,
+		eventBasedRender = false,
+		swapVelocityType = false,
 		lastMeanValues = 10,
 		longNoteShortening = 0,
 		offset = {
@@ -72,7 +75,6 @@ return {
 	},
 	graphics = {
 		asynckey = false,
-		autoKeySound = false,
 		blur = {
 			gameplay = 0,
 			result = 0,

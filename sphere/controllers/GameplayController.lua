@@ -31,6 +31,9 @@ function GameplayController:load()
 	if config.gameplay.autoKeySound then
 		self:applyAutoKeysound(noteChart)
 	end
+	if config.gameplay.swapVelocityType then
+		self:swapVelocityType(noteChart)
+	end
 
 	local state = {}
 	state.inputMode = InputMode(noteChart.inputMode)
@@ -41,6 +44,7 @@ function GameplayController:load()
 	local noteSkin = noteSkinModel:getNoteSkin(noteChart.inputMode)
 	noteSkin:loadData()
 
+	rhythmModel.graphicEngine.eventBasedRender = config.gameplay.eventBasedRender
 	rhythmModel:setAdjustRate(config.audio.adjustRate)
 	rhythmModel:setVolume(config.audio.volume)
 	rhythmModel:setAudioMode(config.audio.mode)
@@ -102,6 +106,17 @@ end
 local function applyTempo(noteChart, tempo)
 	for _, layerData in noteChart:getLayerDataIterator() do
 		layerData:setPrimaryTempo(tempo)
+	end
+	noteChart:compute()
+end
+
+---@param noteChart ncdk.NoteChart
+function GameplayController:swapVelocityType(noteChart)
+	for _, layerData in noteChart:getLayerDataIterator() do
+		layerData.tempoMultiplyTarget = "local"
+		for _, vd in ipairs(layerData.velocityDatas) do
+			vd.localSpeed, vd.currentSpeed = vd.currentSpeed, vd.localSpeed
+		end
 	end
 	noteChart:compute()
 end

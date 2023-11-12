@@ -10,9 +10,16 @@ RhythmView.mode = "default"
 
 ---@param f function
 function RhythmView:processNotes(f)
-	for _, noteDrawer in ipairs(self.game.rhythmModel.graphicEngine.noteDrawers) do
-		for i = noteDrawer.startNoteIndex, noteDrawer.endNoteIndex do
-			f(self, noteDrawer.notes[i])
+	local graphicEngine = self.game.rhythmModel.graphicEngine
+	for _, noteDrawer in ipairs(graphicEngine.noteDrawers) do
+		if graphicEngine.eventBasedRender then
+			for note in pairs(noteDrawer.visibleNotes) do
+				f(self, note)
+			end
+		else
+			for i = noteDrawer.startNoteIndex, noteDrawer.endNoteIndex do
+				f(self, noteDrawer.notes[i])
+			end
 		end
 	end
 end

@@ -18,12 +18,15 @@ function NoteDrawer:load()
 	local logicEngine = graphicEngine.logicEngine
 
 	local layerData = self.layerData
+	self.eventOffset = 0
 
 	self.currentTimePointIndex = 1
 	self.currentTimePoint = layerData:newTimePoint()
 
 	self.notes = {}
 	local notes = self.notes
+
+	self.noteByTimePoint = {}
 
 	for _, noteData in ipairs(self.noteDatas) do
 		local note = GraphicalNoteFactory:getNote(noteData)
@@ -35,6 +38,7 @@ function NoteDrawer:load()
 			note.inputType = self.inputType
 			note.inputIndex = self.inputIndex
 			table.insert(notes, note)
+			self.noteByTimePoint[noteData.timePoint] = note
 		end
 	end
 
@@ -50,6 +54,8 @@ function NoteDrawer:load()
 
 	self.startNoteIndex = 1
 	self.endNoteIndex = 0
+
+	self.visibleNotes = {}
 end
 
 function NoteDrawer:updateCurrentTime()
@@ -60,6 +66,41 @@ function NoteDrawer:updateCurrentTime()
 end
 
 function NoteDrawer:update()
+	if self.graphicEngine.eventBasedRender then
+		return self:updateEventBased()
+	end
+	return self:updateSorted()
+end
+
+function NoteDrawer:updateEventBased()
+	self:updateCurrentTime()
+
+	local currentTime = self.currentTimePoint.absoluteTime
+	while self.eventOffset < #self.events do
+		local event = self.events[self.eventOffset + 1]
+		if event.time > currentTime then
+			break
+		end
+		self.eventOffset = self.eventOffset + 1
+		if event.action == "show" then
+			local note = self.noteByTimePoint[event.timePoint]
+			if note then
+				self.visibleNotes[note] = true
+			end
+		elseif event.action == "hide" then
+			local note = self.noteByTimePoint[event.timePoint]
+			if note then
+				self.visibleNotes[note] = nil
+			end
+		end
+	end
+
+	for note in pairs(self.visibleNotes) do
+		note:update()
+	end
+end
+
+function NoteDrawer:updateSorted()
 	self:updateCurrentTime()
 
 	local notes = self.notes

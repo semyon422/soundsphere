@@ -26,10 +26,10 @@ function NearestTime:loadTimePoints(noteChart)
 		local tp = timePointList[i]
 		local next_tp = timePointList[i + 1]
 
-		if tp.visualSpeed <= th and next_tp.visualSpeed > th then
+		if tp.currentSpeed <= th and next_tp.currentSpeed > th then
 			table.insert(timeList, tp.absoluteTime)
 		end
-		if tp.visualSpeed > th and next_tp.visualSpeed <= th then
+		if tp.currentSpeed > th and next_tp.currentSpeed <= th then
 			table.insert(timeList, tp.absoluteTime)
 		end
 	end
