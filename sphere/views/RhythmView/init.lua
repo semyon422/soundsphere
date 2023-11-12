@@ -13,7 +13,7 @@ function RhythmView:processNotes(f)
 	local graphicEngine = self.game.rhythmModel.graphicEngine
 	for _, noteDrawer in ipairs(graphicEngine.noteDrawers) do
 		if graphicEngine.eventBasedRender then
-			for note in pairs(noteDrawer.visibleNotes) do
+			for _, note in ipairs(noteDrawer.visibleNotesList) do
 				f(self, note)
 			end
 		else

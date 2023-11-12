@@ -1,5 +1,6 @@
 local class = require("class")
 local GraphicalNoteFactory = require("sphere.models.RhythmModel.GraphicEngine.GraphicalNoteFactory")
+local table_util = require("table_util")
 
 ---@class sphere.NoteDrawer
 ---@operator call: sphere.NoteDrawer
@@ -56,6 +57,7 @@ function NoteDrawer:load()
 	self.endNoteIndex = 0
 
 	self.visibleNotes = {}
+	self.visibleNotesList = {}
 end
 
 function NoteDrawer:updateCurrentTime()
@@ -95,9 +97,15 @@ function NoteDrawer:updateEventBased()
 		end
 	end
 
+	local visibleNotesList = self.visibleNotesList
+	table_util.clear(visibleNotesList)
+
 	for note in pairs(self.visibleNotes) do
 		note:update()
+		table.insert(visibleNotesList, note)
 	end
+
+	table.sort(visibleNotesList, sort_const)
 end
 
 function NoteDrawer:updateSorted()
