@@ -19,7 +19,7 @@ local function intersect(self, _tp, svdt, isFirst, isLast, next_tp)
 end
 
 ---@param ld ncdk.LayerData
----@param range number
+---@param range table
 ---@return table
 local function TimeToEvent(ld, range)
 	local events = {}
@@ -30,8 +30,8 @@ local function TimeToEvent(ld, range)
 		for i = 1, #tps do
 			local _tp = tps[i]  -- current time is from here
 			local next_tp = tps[i + 1]  -- to here
-			local showTime = intersect(tp, _tp, range, i == 1, i == #tps, next_tp)
-			local hideTime = intersect(tp, _tp, -range, i == 1, i == #tps, next_tp)
+			local showTime = intersect(tp, _tp, range[2], i == 1, i == #tps, next_tp)
+			local hideTime = intersect(tp, _tp, range[1], i == 1, i == #tps, next_tp)
 			if showTime then
 				table.insert(events, {
 					time = showTime,

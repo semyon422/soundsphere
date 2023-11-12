@@ -26,7 +26,10 @@ function GraphicEngine:load()
 
 	local layerEvents = {}
 
-	local eventRange = 1 / self.visualTimeRate
+	local range = {
+		self.range[1] / self.visualTimeRate,
+		self.range[2] / self.visualTimeRate,
+	}
 
 	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
 		local layerData = self.noteChart.layerDatas[layerDataIndex]
@@ -38,7 +41,7 @@ function GraphicEngine:load()
 			graphicEngine = self
 		})
 		if self.eventBasedRender then
-			layerEvents[layerDataIndex] = layerEvents[layerDataIndex] or TimeToEvent(layerData, eventRange)
+			layerEvents[layerDataIndex] = layerEvents[layerDataIndex] or TimeToEvent(layerData, range)
 			noteDrawer.events = layerEvents[layerDataIndex]
 		end
 		noteDrawer:load()
