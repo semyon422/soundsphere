@@ -39,7 +39,26 @@ function NoteDrawer:load()
 			note.inputType = self.inputType
 			note.inputIndex = self.inputIndex
 			table.insert(notes, note)
-			self.noteByTimePoint[noteData.timePoint] = note
+
+			if self.graphicEngine.eventBasedRender then
+				local endNoteData = note.startNoteData.endNoteData
+				if not endNoteData then
+					self.noteByTimePoint[note.startNoteData.timePoint] = {
+						note = note,
+						show = true,
+						hide = true,
+					}
+				else
+					self.noteByTimePoint[note.startNoteData.timePoint] = {
+						note = note,
+						show = true,
+					}
+					self.noteByTimePoint[endNoteData.timePoint] = {
+						note = note,
+						hide = true,
+					}
+				end
+			end
 		end
 	end
 
@@ -85,14 +104,14 @@ function NoteDrawer:updateEventBased()
 		end
 		self.eventOffset = self.eventOffset + 1
 		if event.action == "show" then
-			local note = self.noteByTimePoint[event.timePoint]
-			if note then
-				self.visibleNotes[note] = true
+			local noteInfo = self.noteByTimePoint[event.timePoint]
+			if noteInfo and noteInfo.show then
+				self.visibleNotes[noteInfo.note] = true
 			end
 		elseif event.action == "hide" then
-			local note = self.noteByTimePoint[event.timePoint]
-			if note then
-				self.visibleNotes[note] = nil
+			local noteInfo = self.noteByTimePoint[event.timePoint]
+			if noteInfo and noteInfo.hide then
+				self.visibleNotes[noteInfo.note] = nil
 			end
 		end
 	end
