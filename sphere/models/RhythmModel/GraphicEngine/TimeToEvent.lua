@@ -1,19 +1,22 @@
-local function intersect(self, _tp, svdt, isFirst, isLast, next_tp)
+local function intersect(tps, j, i, svdt)
+	local tp = tps[j]
+	local _tp = tps[i]
+	local next_tp = tps[i + 1]
+
 	local globalSpeed = _tp.globalSpeed
-	local localSpeed = self.localSpeed
-	local targetVisualTime = self.visualTime - svdt / globalSpeed / localSpeed
+	local localSpeed = tp.localSpeed
+	local targetVisualTime = tp.visualTime - svdt / globalSpeed / localSpeed
 	local targetTime = (targetVisualTime - _tp.visualTime) / _tp.currentSpeed + _tp.absoluteTime
-	if isFirst and isLast then
+	if #tps == 1 then
 		return targetTime
 	end
-	if isLast then
+	if i == #tps then
 		return targetTime >= _tp.absoluteTime and targetTime
 	end
-	if isFirst then
+	if i == 1 then
 		return targetTime < next_tp.absoluteTime and targetTime
 	end
-	if targetTime >= _tp.absoluteTime and
-	targetTime < next_tp.absoluteTime then
+	if targetTime >= _tp.absoluteTime and targetTime < next_tp.absoluteTime then
 		return targetTime
 	end
 end
@@ -28,21 +31,21 @@ local function TimeToEvent(ld, range)
 	for j = 1, #tps do
 		local tp = tps[j]
 		for i = 1, #tps do
-			local _tp = tps[i]  -- current time is from here
-			local next_tp = tps[i + 1]  -- to here
-			local showTime = intersect(tp, _tp, range[2], i == 1, i == #tps, next_tp)
-			local hideTime = intersect(tp, _tp, range[1], i == 1, i == #tps, next_tp)
-			if showTime then
+			local _tp = tps[i]  -- current time is from i to i+1
+			local rightTime = intersect(tps, j, i, range[2])
+			local leftTime = intersect(tps, j, i, range[1])
+			local speed = _tp.globalSpeed * tp.localSpeed * _tp.currentSpeed
+			if rightTime then
 				table.insert(events, {
-					time = showTime,
-					action = "show",
+					time = rightTime,
+					action = speed >= 0 and "show" or "hide",
 					timePoint = tp,
 				})
 			end
-			if hideTime then
+			if leftTime then
 				table.insert(events, {
-					time = hideTime,
-					action = "hide",
+					time = leftTime,
+					action = speed >= 0 and "hide" or "show",
 					timePoint = tp,
 				})
 			end
