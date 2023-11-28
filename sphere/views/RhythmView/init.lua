@@ -27,55 +27,53 @@ end
 ---@param note sphere.GraphicalNote
 function RhythmView:fillChord(note)
 	local noteSkin = self.game.noteSkinModel.noteSkin
-
 	local noteView = NoteViewFactory:getNoteView(note, self.mode)
-	if noteView then
-		noteView.index = 1
-		noteView.noteSkin = noteSkin
-		noteView.graphicalNote = note
+	if not noteView then
+		return
+	end
 
-		local column = noteSkin:getColumn(note.inputType .. note.inputIndex)
-		if column and column <= noteSkin.inputsCount then
-		-- if column and column <= inputsCount and noteView:isVisible() then
-			if noteView.fillChords then
-				noteView:fillChords(self.chords, column)
-			end
-		end
+	noteView.noteSkin = noteSkin
+	noteView.graphicalNote = note
+
+	local column = noteSkin:getColumns(note)[1]
+	if column and column <= noteSkin.columnsCount and noteView.fillChords then
+		noteView:fillChords(self.chords, column)
 	end
 end
 
 ---@param note sphere.GraphicalNote
 function RhythmView:drawNote(note)
 	local noteSkin = self.game.noteSkinModel.noteSkin
+	local noteView = NoteViewFactory:getNoteView(note, self.mode)
+	if not noteView then
+		return
+	end
 
-	for j = 1, noteSkin:check(note) or 0 do
-		local noteView = NoteViewFactory:getNoteView(note, self.mode)
-		if noteView then
-			noteView.index = j
-			noteView.chords = self.chords
-			noteView.noteSkin = noteSkin
-			noteView.graphicalNote = note
-			noteView.rhythmView = self
-			noteView:draw()
-		end
+	for _, column in ipairs(noteSkin:getColumns(note)) do
+		noteView.column = column
+		noteView.chords = self.chords
+		noteView.noteSkin = noteSkin
+		noteView.graphicalNote = note
+		noteView.rhythmView = self
+		noteView:draw()
 	end
 end
 
 ---@param note sphere.GraphicalNote
 function RhythmView:drawSelected(note)
 	local noteSkin = self.game.noteSkinModel.noteSkin
+	local noteView = NoteViewFactory:getNoteView(note, self.mode)
+	if not (noteView and noteView.drawSelected and note.selected) then
+		return
+	end
 
-	for j = 1, noteSkin:check(note) or 0 do
-		local noteView = NoteViewFactory:getNoteView(note, self.mode)
-		-- if noteView and noteView.drawSelected then
-		if noteView and noteView.drawSelected and note.selected then
-			noteView.index = j
-			noteView.chords = self.chords
-			noteView.noteSkin = noteSkin
-			noteView.graphicalNote = note
-			noteView.rhythmView = self
-			noteView:drawSelected()
-		end
+	for _, column in ipairs(noteSkin:getColumns(note)) do
+		noteView.column = column
+		noteView.chords = self.chords
+		noteView.noteSkin = noteSkin
+		noteView.graphicalNote = note
+		noteView.rhythmView = self
+		noteView:drawSelected()
 	end
 end
 

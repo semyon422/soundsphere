@@ -62,7 +62,7 @@ function EditorRhythmView:draw()
 
 	if editorModel.state == "notes" then
 		if editor.tool == "ShortNote" or editor.tool == "LongNote" then
-			for i = 1, noteSkin.inputsCount do
+			for i = 1, noteSkin.columnsCount do
 				local x = noteSkin:getValue(Head.x, i)
 				local w = noteSkin:getValue(Head.w, i)
 				local h = noteSkin:getValue(Head.h, 1)

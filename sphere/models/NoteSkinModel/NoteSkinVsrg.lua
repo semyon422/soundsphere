@@ -7,15 +7,28 @@ local NoteSkinVsrg = NoteSkin + {}
 ---@param columns table
 function NoteSkinVsrg:setColumns(columns)
 	self.columns = columns
-	local inputsCount = self.inputsCount
+
+	if columns.inputs then
+		local t = {}
+		for _, d in pairs(columns.inputs) do
+			local input, column = unpack(d)
+			t[input] = t[input] or {}
+			table.insert(t[input], column)
+		end
+		self.input_to_columns = t
+	end
+
+	self.autoColumnsCount = columns.count or self.autoColumnsCount
+	self.columnsCount = self.autoColumnsCount
+	local cc = self.columnsCount
 
 	assert(columns.width, "columns.width is required")
-	assert(#columns.width == inputsCount, "table columns.width should contain " .. inputsCount .. " values")
+	assert(#columns.width == cc, "table columns.width should contain " .. cc .. " values")
 
 	assert(columns.space or columns.position, "either columns.space or columns.position is required")
 	assert(not (columns.space and columns.position), "columns.space and columns.position are mutually exclusive")
 	if columns.space then
-		assert(#columns.space == inputsCount + 1, "table columns.space should contain " .. inputsCount + 1 .. " values")
+		assert(#columns.space == cc + 1, "table columns.space should contain " .. cc + 1 .. " values")
 	elseif columns.position then
 		columns.space = self:xwToSpace(columns.position, columns.width)
 	end
@@ -55,13 +68,17 @@ function NoteSkinVsrg:setColumns(columns)
 	self.columns = x
 end
 
----@param columns table
-function NoteSkinVsrg:setInput(columns)
-	for i, input in ipairs(columns) do
-		columns[input] = 1
+---@param inputs table
+function NoteSkinVsrg:setInput(inputs)
+	local input_to_columns = {
+		key1 = {3, 4}
+	}
+	for i, input in ipairs(inputs) do
+		input_to_columns[input] = {i}  -- table of values here because of split stages
 	end
-	self.inputs = columns
-	self.inputsCount = #columns
+	self.input_to_columns = input_to_columns
+	self.autoColumnsCount = #inputs
+	self.columnsCount = #inputs
 end
 
 ---@param inputType string
@@ -72,24 +89,32 @@ function NoteSkinVsrg:getInputColumn(inputType, inputIndex)
 	if inputIndex then
 		input = inputType .. inputIndex
 	end
-	for i = 1, self.inputsCount do
-		if self.inputs[i] == input then
-			return i
-		end
-	end
+	return self.input_to_columns[input][1]
 end
 
 ---@param column number
 ---@param split boolean?
----@return string
----@return number?
-function NoteSkinVsrg:getColumnInput(column, split)
-	column = (column - 1) % self.inputsCount + 1
-	local input = self.inputs[column]
-	if not split then
-		return input
+---@return table
+function NoteSkinVsrg:getColumnInputs(column, split)
+	column = (column - 1) % self.columnsCount + 1
+
+	local inputs = {}
+	for input, columns in pairs(self.input_to_columns) do
+		for _, _column in pairs(columns) do
+			if _column == column then
+				table.insert(inputs, input)
+			end
+		end
 	end
 
+	return inputs
+end
+
+---@param column number
+---@return string
+---@return number
+function NoteSkinVsrg:getFirstColumnInputSplit(column)
+	local input = self:getColumnInputs(column)[1]
 	local inputType, inputIndex = input:match("^(.-)(%d+)$")
 	return inputType, tonumber(inputIndex)
 end
@@ -202,7 +227,7 @@ end
 ---@param mx number
 ---@return number?
 function NoteSkinVsrg:getInverseColumnPosition(mx)
-	for i = 1, self.inputsCount do
+	for i = 1, self.columnsCount do
 		local Head = self.notes.ShortNote.Head
 		local x, w = Head.x[i], Head.w[i]
 		if w < 0 then
@@ -219,25 +244,25 @@ end
 function NoteSkinVsrg:setShortNote(params, noteType)
 	local h = params.h or 0
 	local height = {}
-	for i = 1, self.inputsCount do
+	for i = 1, self.columnsCount do
 		height[i] = h
 	end
 
 	local image = params.image
 	if type(params.image) ~= "table" then
 		image = {}
-		for i = 1, self.inputsCount do
+		for i = 1, self.columnsCount do
 			image[i] = params.image
 		end
 	end
 
 	local color = {}
-	for i = 1, self.inputsCount do
+	for i = 1, self.columnsCount do
 		color[i] = params.color or self.color
 	end
 
 	local oy = {}
-	for i = 1, self.inputsCount do
+	for i = 1, self.columnsCount do
 		oy[i] = 1
 	end
 
@@ -262,7 +287,7 @@ function NoteSkinVsrg:setLongNote(params)
 	local h = params.h or 0
 	local headHeight = {}
 	local tailHeight = {}
-	for i = 1, self.inputsCount do
+	for i = 1, self.columnsCount do
 		headHeight[i] = h
 		tailHeight[i] = h
 	end
@@ -270,45 +295,45 @@ function NoteSkinVsrg:setLongNote(params)
 	local tail = params.tail
 	if type(params.tail) ~= "table" then
 		tail = {}
-		for i = 1, self.inputsCount do
+		for i = 1, self.columnsCount do
 			tail[i] = params.tail
 		end
 	end
 	local body = params.body
 	if type(params.body) ~= "table" then
 		body = {}
-		for i = 1, self.inputsCount do
+		for i = 1, self.columnsCount do
 			body[i] = params.body
 		end
 	end
 	local head = params.head
 	if type(params.head) ~= "table" then
 		head = {}
-		for i = 1, self.inputsCount do
+		for i = 1, self.columnsCount do
 			head[i] = params.head
 		end
 	end
 	local style = params.style
 	if type(params.style) ~= "table" then
 		style = {}
-		for i = 1, self.inputsCount do
+		for i = 1, self.columnsCount do
 			style[i] = params.style
 		end
 	end
 
 	local color = {}
-	for i = 1, self.inputsCount do
+	for i = 1, self.columnsCount do
 		color[i] = self.color
 	end
 
 	local headOy = {}
 	local tailOy = {}
-	for i = 1, self.inputsCount do
+	for i = 1, self.columnsCount do
 		headOy[i] = 1
 		tailOy[i] = 1
 	end
 	local bh = {}
-	for i = 1, self.inputsCount do
+	for i = 1, self.columnsCount do
 		bh[i] = 0
 	end
 
@@ -403,14 +428,15 @@ end
 ---@param index number?
 ---@return number
 function NoteSkinVsrg:setInputListIndex(input, index)
-	local inputs = self.inputs
+	local input_to_columns = self.input_to_columns
 	index = index or 1
 
-	local i = self:getColumn(input, index)
+	local i = input_to_columns[input] and input_to_columns[input][index]
 	if not i then
-		i = #inputs + 1
-		inputs[i] = input
-		inputs[input] = math.max(inputs[input] or 1, index)
+		self.autoColumnsCount = self.autoColumnsCount + 1
+		i = self.autoColumnsCount
+		input_to_columns[input] = input_to_columns[input] or {}
+		input_to_columns[input][index] = i
 	end
 	return i
 end

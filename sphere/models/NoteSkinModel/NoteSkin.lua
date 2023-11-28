@@ -8,7 +8,6 @@ local NoteSkin = class()
 ---@param skin table?
 function NoteSkin:new(skin)
 	self.notes = {}
-	self.inputs = {}
 	self.textures = {}
 	self.images = {}
 	self.blendModes = {}
@@ -29,28 +28,12 @@ function NoteSkin:loadData()
 	self.data:load()
 end
 
+local no_columns = {}
+
 ---@param note sphere.GraphicalNote
----@return number?
-function NoteSkin:check(note)
-	return self.notes[note.noteType] and self.inputs[note.inputType .. note.inputIndex]
-end
-
----@param input string
----@param index number?
----@return number?
-function NoteSkin:getColumn(input, index)
-	local inputs = self.inputs
-	index = index or 1
-
-	local c = 0
-	for i = 1, #inputs do
-		if inputs[i] == input then
-			c = c + 1
-			if c == index then
-				return i
-			end
-		end
-	end
+---@return table
+function NoteSkin:getColumns(note)
+	return self.notes[note.noteType] and self.input_to_columns[note.inputType .. note.inputIndex] or no_columns
 end
 
 ---@param value any?
@@ -74,9 +57,8 @@ end
 ---@param timeState table
 ---@return any?
 function NoteSkin:get(noteView, part, key, timeState)
-	local note = noteView.graphicalNote
 	local noteType = noteView.noteType
-	local column = self:getColumn(note.inputType .. note.inputIndex, noteView.index)
+	local column = noteView.column
 
 	local value =
 		self.notes[noteType] and

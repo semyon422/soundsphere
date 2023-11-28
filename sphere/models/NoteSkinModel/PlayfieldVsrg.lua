@@ -333,7 +333,7 @@ function PlayfieldVsrg:addKeyImages(object)
 	if not object.transform then
 		object.transform = self:newNoteskinTransform()
 	end
-	for i = 1, noteskin.inputsCount do
+	for i = 1, noteskin.columnsCount do
 		local pressed
 		local released
 		if object.pressed and object.pressed[i] then
@@ -361,7 +361,7 @@ function PlayfieldVsrg:addKeyImages(object)
 			})
 		end
 		local key = InputView({
-			input = noteskin.inputs[i],
+			inputs = noteskin:getColumnInputs(i),
 			pressed = pressed,
 			released = released,
 		})
@@ -377,7 +377,7 @@ function PlayfieldVsrg:addStaticKeyImages(object)
 	if not object.transform then
 		object.transform = self:newNoteskinTransform()
 	end
-	for i = 1, noteskin.inputsCount do
+	for i = 1, noteskin.columnsCount do
 		if object.image and object.image[i] then
 			local image = ImageView({
 				x = noteskin.columns[i],
@@ -400,7 +400,7 @@ function PlayfieldVsrg:addKeyImageAnimations(object)
 	if not object.transform then
 		object.transform = self:newNoteskinTransform()
 	end
-	for i = 1, noteskin.inputsCount do
+	for i = 1, noteskin.columnsCount do
 		local pressed, hold, released
 		local color = object.color and object.color[i]
 		if object.pressed and object.pressed[i] then
@@ -452,7 +452,7 @@ function PlayfieldVsrg:addKeyImageAnimations(object)
 			})
 		end
 		local key = InputAnimationView({
-			input = noteskin.inputs[i],
+			inputs = noteskin:getColumnInputs(i),
 			pressed = pressed,
 			hold = hold,
 			released = released,
@@ -474,9 +474,8 @@ function PlayfieldVsrg:addColumnsBackground(object)
 		object.transform = self:newNoteskinTransform()
 	end
 	local noteskin = self.noteskin
-	local inputs = noteskin.inputsCount
 	local rectangles = {}
-	for i = 1, inputs do
+	for i = 1, noteskin.columnsCount do
 		local color = object.color[i]
 		if type(object.color[1]) == "number" then
 			color = object.color
@@ -530,8 +529,8 @@ function PlayfieldVsrg:addGuidelines(object)
 		object.transform = self:newNoteskinTransform()
 	end
 	local noteskin = self.noteskin
-	local inputs = noteskin.inputsCount
-	for i = 1, inputs + 1 do
+	local columns = noteskin.columnsCount
+	for i = 1, columns + 1 do
 		local bw = object.w and object.w[i]
 		local bh = object.h and object.h[i]
 		local by = object.y and object.y[i]
@@ -543,12 +542,12 @@ function PlayfieldVsrg:addGuidelines(object)
 			end
 
 			local lbw = bw
-			if object.mode == "symmetric" and i > inputs / 2 + 1 then
+			if object.mode == "symmetric" and i > columns / 2 + 1 then
 				lbw = -bw
 			end
 
 			self:add(ImageView({
-				x = getGuidelineX(bw, noteskin, i, inputs),
+				x = getGuidelineX(bw, noteskin, i, columns),
 				y = by,
 				w = lbw,
 				h = bh,
@@ -558,11 +557,11 @@ function PlayfieldVsrg:addGuidelines(object)
 			}))
 			if object.both and noteskin.space[i] ~= 0 then
 				local rbw = bw
-				if object.mode == "symmetric" and i > inputs / 2 then
+				if object.mode == "symmetric" and i > columns / 2 then
 					rbw = -bw
 				end
 				self:add(ImageView({
-					x = getGuidelineX(-bw, noteskin, i, inputs),
+					x = getGuidelineX(-bw, noteskin, i, columns),
 					y = by,
 					w = rbw,
 					h = bh,

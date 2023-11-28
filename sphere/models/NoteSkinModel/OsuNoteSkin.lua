@@ -149,7 +149,7 @@ function OsuNoteSkin:load()
 
 	local columns = self.columns
 	local width = self.width
-	local ninputs = self.inputsCount
+	local ninputs = self.columnsCount
 	local ninputs2 = math.floor(ninputs / 2)
 
 	local textures = {}
@@ -845,7 +845,8 @@ end
 function OsuNoteSkin:addHpBar()
 	local playfield = self.playField
 
-	local right = self.columns[self.inputsCount] + self.width[self.inputsCount] + self.space[self.inputsCount + 1]
+	local cc = self.columnsCount
+	local right = self.columns[cc] + self.width[cc] + self.space[cc + 1]
 
 	local scoreBarBg = self:findImage("scorebar-bg")
 	if scoreBarBg then

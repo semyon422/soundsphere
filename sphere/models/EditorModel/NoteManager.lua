@@ -28,7 +28,7 @@ function NoteManager:update()
 		local column = self:getColumnOver()
 		if column then
 			column = column - note.grabbedDeltaColumn
-			local inputType, inputIndex = noteSkin:getColumnInput(column, true)
+			local inputType, inputIndex = noteSkin:getFirstColumnInputSplit(column)
 			note.inputType = inputType
 			note.inputIndex = inputIndex
 		end
@@ -221,9 +221,9 @@ function NoteManager:flipNotes()
 	end
 
 	for _, note in ipairs(notes) do
-		local columns = noteSkin.inputsCount
+		local columns = noteSkin.columnsCount
 		local column = columns - noteSkin:getInputColumn(note.inputType, note.inputIndex) + 1
-		local inputType, inputIndex = noteSkin:getColumnInput(column, true)
+		local inputType, inputIndex = noteSkin:getFirstColumnInputSplit(column)
 		note.inputType = inputType
 		note.inputIndex = inputIndex
 		self:_addNote(note)

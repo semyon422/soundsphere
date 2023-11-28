@@ -8,6 +8,7 @@ function InputView:load()
 	if self.pressed then
 		self.pressed.hidden = true
 	end
+	self.count = 0
 end
 
 ---@param event table
@@ -17,12 +18,28 @@ function InputView:receive(event)
 	end
 
 	local key = event and event[1]
-	if key == self.input then
-		if event.name == "keypressed" then
-			self:switchPressed(true)
-		elseif event.name == "keyreleased" then
-			self:switchPressed(false)
+
+	local found
+	for _, input in ipairs(self.inputs) do
+		if key == input then
+			found = true
+			break
 		end
+	end
+	if not found then
+		return
+	end
+
+	if event.name == "keypressed" then
+		self.count = self.count + 1
+	elseif event.name == "keyreleased" then
+		self.count = self.count - 1
+	end
+
+	if self.count > 0 then
+		self:switchPressed(true)
+	else
+		self:switchPressed(false)
 	end
 end
 
