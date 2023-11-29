@@ -5,9 +5,10 @@ require("ncdk.NoteData")
 local LogicalNoteFactory = {}
 
 local notes = {
-	ShortNote = {ShortLogicalNote, true, true},
-	LongNoteStart = {LongLogicalNote, true, true},
-	LaserNoteStart = {LongLogicalNote, true, true},
+	ShortNote = {ShortLogicalNote, true, true, true},
+	LongNoteStart = {LongLogicalNote, true, true, true},
+	LaserNoteStart = {LongLogicalNote, true, true, true},
+	DrumrollNoteStart = {LongLogicalNote, true, true, false},
 	LineNoteStart = {ShortLogicalNote},
 	SoundNote = {ShortLogicalNote},
 	ImageNote = {ShortLogicalNote},
@@ -23,7 +24,8 @@ function LogicalNoteFactory:getNote(noteData)
 
 	local isPlayable = classAndData[2]
 	local isScorable = classAndData[3]
-	return classAndData[1](noteData, isPlayable, isScorable)
+	local isInputMatchable = classAndData[4]
+	return classAndData[1](noteData, isPlayable, isScorable, isInputMatchable)
 end
 
 return LogicalNoteFactory

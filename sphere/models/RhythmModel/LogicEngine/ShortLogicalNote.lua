@@ -7,10 +7,12 @@ local ShortLogicalNote = LogicalNote + {}
 ---@param noteData ncdk.NoteData
 ---@param isPlayable boolean?
 ---@param isScorable boolean?
-function ShortLogicalNote:new(noteData, isPlayable, isScorable)
+---@param isInputMatchable boolean?
+function ShortLogicalNote:new(noteData, isPlayable, isScorable, isInputMatchable)
 	self.startNoteData = noteData
 	self.isPlayable = isPlayable
 	self.isScorable = isScorable
+	self.isInputMatchable = isInputMatchable
 	self.noteData = nil
 	self.state = "clear"
 end
@@ -30,6 +32,9 @@ end
 
 ---@param timeState string
 function ShortLogicalNote:processTimeState(timeState)
+	if self.isInputMatchable and not self.inputMatched then
+		self.keyState = false
+	end
 	local keyState = self.keyState
 	if keyState and timeState == "too early" then
 		self:switchState("clear")
@@ -91,6 +96,7 @@ function ShortLogicalNote:processAuto()
 	end
 
 	self.keyState = true
+	self.inputMatched = true  -- need for promode
 	self.logicEngine:playSound(self.startNoteData, not self.isPlayable)
 
 	self.eventTime = self:getNoteTime()

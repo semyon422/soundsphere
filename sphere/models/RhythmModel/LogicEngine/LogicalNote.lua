@@ -49,7 +49,7 @@ end
 
 ---@return sphere.LogicalNote?
 function LogicalNote:getNext()
-	return self.noteHandler.notes[self.index + 1]
+	return self.nextNote
 end
 
 ---@return sphere.LogicalNote?

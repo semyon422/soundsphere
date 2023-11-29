@@ -56,7 +56,8 @@ function Replay:toString()
 		time = os.time(),
 		events = content,
 		size = size,
-		timings = self.timings
+		timings = self.timings,
+		single = self.single,
 	})
 end
 
@@ -79,6 +80,7 @@ function Replay:fromString(s)
 	self.modifiers = object.modifiers
 	self.rate = object.rate
 	self.const = object.const
+	self.single = object.single
 
 	if not object.inputMode then
 		self.events = {}

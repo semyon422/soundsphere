@@ -147,7 +147,12 @@ function RhythmModel:setPromode(promode)
 	self.logicEngine.promode = promode
 end
 
----@param promode boolean
+---@param singleHandler boolean
+function RhythmModel:setSingleHandler(singleHandler)
+	self.logicEngine.singleHandler = singleHandler
+end
+
+---@param constant boolean
 function RhythmModel:setConstantSpeed(constant)
 	self.graphicEngine.constant = constant
 end

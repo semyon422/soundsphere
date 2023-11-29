@@ -62,6 +62,7 @@ function GameplayController:load()
 	rhythmModel:setTimeRate(playContext.rate)
 	rhythmModel:setConstantSpeed(playContext.const)
 	rhythmModel:setTimings(playContext.timings)
+	rhythmModel:setSingleHandler(playContext.single)
 
 	rhythmModel.inputManager.observable:add(replayModel)
 

@@ -7,6 +7,7 @@ local Observable = require("Observable")
 local LogicEngine = class()
 
 LogicEngine.inputOffset = 0
+LogicEngine.singleHandler = false
 
 ---@param timeEngine sphere.TimeEngine
 ---@param scoreEngine sphere.ScoreEngine
@@ -16,25 +17,37 @@ function LogicEngine:new(timeEngine, scoreEngine)
 	self.scoreEngine = scoreEngine
 end
 
+function LogicEngine:getNoteHandler(input)
+	if self.singleHandler then
+		input = 1
+	end
+
+	local noteHandler = self.noteHandlers[input]
+	if not noteHandler then
+		noteHandler = NoteHandler({
+			logicNoteDatas = {},
+			logicEngine = self
+		})
+		self.noteHandlers[input] = noteHandler
+	end
+
+	return noteHandler
+end
+
 function LogicEngine:load()
 	self.sharedLogicalNotes = {}
 	self.noteHandlers = {}
 
 	-- many layers can be here
 	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
-		local key = inputType .. inputIndex
-
-		local noteHandler = self.noteHandlers[key]
-		if not noteHandler then
-			noteHandler = NoteHandler({
-				noteDatas = {},
-				logicEngine = self
-			})
-			self.noteHandlers[key] = noteHandler
-		end
+		local input = inputType .. inputIndex
+		local noteHandler = self:getNoteHandler(input)
 
 		for _, noteData in ipairs(noteDatas) do
-			table.insert(noteHandler.noteDatas, noteData)
+			table.insert(noteHandler.logicNoteDatas, {
+				noteData = noteData,
+				input = input,
+			})
 		end
 	end
 
@@ -67,13 +80,14 @@ function LogicEngine:receive(event)
 		return
 	end
 
-	local noteHandler = self.noteHandlers[event[1]]
+	local input = event[1]
+	local noteHandler = self:getNoteHandler(input)
 	if not noteHandler then
 		return
 	end
 
 	self.eventTime = event.time
-	noteHandler:setKeyState(event.name == "keypressed")
+	noteHandler:setKeyState(event.name == "keypressed", input)
 	self.eventTime = nil
 end
 

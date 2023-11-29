@@ -79,6 +79,7 @@ local function Buttons(self)
 
 	local playContext = self.game.playContext
 	playContext.const = imgui.checkbox("const", playContext.const, "const")
+	playContext.single = imgui.checkbox("single", playContext.single, "single handler mode (taiko)")
 
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(279 + 454 * 2, 144 + 72 * 10)

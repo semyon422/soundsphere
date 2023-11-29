@@ -10,6 +10,7 @@ function PlayContext:load(t)
 	self.rate = t.rate
 	self.const = t.const
 	self.timings = t.timings
+	self.single = t.single
 end
 
 ---@param t table
@@ -18,6 +19,7 @@ function PlayContext:save(t)
 	t.rate = self.rate
 	t.const = self.const
 	t.timings = self.timings
+	t.single = self.single
 end
 
 return PlayContext

@@ -8,11 +8,13 @@ local LongLogicalNote = LogicalNote + {}
 ---@param noteData ncdk.NoteData
 ---@param isPlayable boolean?
 ---@param isScorable boolean?
-function LongLogicalNote:new(noteData, isPlayable, isScorable)
+---@param isInputMatchable boolean?
+function LongLogicalNote:new(noteData, isPlayable, isScorable, isInputMatchable)
 	self.startNoteData = noteData
 	self.endNoteData = noteData.endNoteData
 	self.isPlayable = isPlayable
 	self.isScorable = isScorable
+	self.isInputMatchable = isInputMatchable
 	self.noteData = nil
 	self.state = "clear"
 end
@@ -35,6 +37,10 @@ end
 ---@param startTimeState string
 ---@param endTimeState string
 function LongLogicalNote:processTimeState(startTimeState, endTimeState)
+	if self.isInputMatchable and not self.inputMatched then
+		self.keyState = false
+	end
+
 	local lastState = self.state
 
 	local keyState = self.keyState
@@ -203,6 +209,7 @@ function LongLogicalNote:processAuto()
 	local nextNote = self:getNextPlayable()
 	if deltaStartTime >= 0 and not self.keyState then
 		self.keyState = true
+		self.inputMatched = true
 		self.logicEngine:playSound(self.startNoteData, not self.isPlayable)
 
 		self.eventTime = self:getNoteTime("start")
