@@ -56,7 +56,7 @@ function ShortNoteView:fillChords(chords, column)
 	chords[time] = chords[time] or {}
 	local chord = chords[time]
 
-	chord[column] = startNoteData.noteType
+	chord[column] = startNoteData
 end
 
 ---@return boolean

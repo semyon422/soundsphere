@@ -103,7 +103,7 @@ function LongNoteView:fillChords(chords, column)
 		chords[time] = chords[time] or {}
 		local chord = chords[time]
 
-		chord[column] = startNoteData.noteType
+		chord[column] = startNoteData
 	end
 
 	if endNoteData then
@@ -111,7 +111,7 @@ function LongNoteView:fillChords(chords, column)
 		chords[time] = chords[time] or {}
 		local chord = chords[time]
 
-		chord[column] = endNoteData.noteType
+		chord[column] = endNoteData
 	end
 end
 
