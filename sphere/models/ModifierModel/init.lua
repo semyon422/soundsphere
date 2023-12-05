@@ -31,6 +31,7 @@ local Modifiers = {
 	Alternate2 = 22,
 	LessChord = 23,
 	MaxChord = 24,
+	Taiko = 25,
 }
 ModifierModel.Modifiers = Modifiers
 

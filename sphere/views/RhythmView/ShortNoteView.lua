@@ -51,12 +51,12 @@ end
 ---@param column number
 function ShortNoteView:fillChords(chords, column)
 	local startNoteData = self.graphicalNote.startNoteData
-
 	local time = startNoteData.timePoint.absoluteTime
+
 	chords[time] = chords[time] or {}
 	local chord = chords[time]
-
-	chord[column] = startNoteData
+	chord[column] = chord[column] or {}
+	table.insert(chord[column], startNoteData)
 end
 
 ---@return boolean

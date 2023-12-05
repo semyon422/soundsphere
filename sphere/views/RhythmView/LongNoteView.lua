@@ -102,16 +102,16 @@ function LongNoteView:fillChords(chords, column)
 		local time = startNoteData.timePoint.absoluteTime
 		chords[time] = chords[time] or {}
 		local chord = chords[time]
-
-		chord[column] = startNoteData
+		chord[column] = chord[column] or {}
+		table.insert(chord[column], startNoteData)
 	end
 
 	if endNoteData then
 		local time = endNoteData.timePoint.absoluteTime
 		chords[time] = chords[time] or {}
 		local chord = chords[time]
-
-		chord[column] = endNoteData
+		chord[column] = chord[column] or {}
+		table.insert(chord[column], endNoteData)
 	end
 end
 

@@ -13,6 +13,7 @@ local Modifiers = {
 	"Automap",
 	"MultiplePlay",
 	"MultiOverPlay",
+	"Taiko",
 	"Alternate",
 	"Alternate2",
 	"Shift",
