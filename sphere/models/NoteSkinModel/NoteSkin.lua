@@ -28,6 +28,9 @@ function NoteSkin:loadData()
 	self.data:load()
 end
 
+---@param inputMode string
+function NoteSkin:load(inputMode) end
+
 local no_columns = {}
 
 ---@param note sphere.GraphicalNote

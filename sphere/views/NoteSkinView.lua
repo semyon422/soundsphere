@@ -23,13 +23,13 @@ return ModalImView(function(self)
 		return true
 	end
 
-	local inputMode = self.game.selectController.state.inputMode
+	local inputMode = tostring(self.game.selectController.state.inputMode)
 	selectedNoteSkin = self.game.noteSkinModel:getNoteSkin(inputMode)
 	if not selectedNoteSkin then
 		return true
 	end
 
-	local items = self.game.noteSkinModel:getNoteSkins(inputMode)
+	local skinInfos = self.game.noteSkinModel:getSkinInfos(inputMode)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
@@ -45,10 +45,9 @@ return ModalImView(function(self)
 	imgui.Container(window_id, w, h, _h / 3, _h * 2, scrollY)
 
 	local itemHeight = 44
-	for i = 1, #items do
-		local noteSkin = items[i]
-		local name = noteSkin.name
-		if selectedNoteSkin == noteSkin then
+	for i, skinInfo in ipairs(skinInfos) do
+		local name = skinInfo.name
+		if selectedNoteSkin.path == skinInfo:getPath() then
 			love.graphics.setColor(1, 1, 1, 0.1)
 			love.graphics.rectangle("fill", 0, 0, w, itemHeight)
 			love.graphics.setColor(1, 1, 1, 1)
@@ -57,7 +56,7 @@ return ModalImView(function(self)
 			just.sameline()
 		end
 		if imgui.TextOnlyButton("skin item" .. i, name, w, itemHeight, "left") then
-			self.game.noteSkinModel:setDefaultNoteSkin(items[i])
+			self.game.noteSkinModel:setDefaultNoteSkin(inputMode, skinInfo:getPath())
 		end
 	end
 

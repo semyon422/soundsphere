@@ -51,7 +51,6 @@ end
 
 function SelectController:unload()
 	self.playContext:save(self.configModel.configs.play)
-	self.noteSkinModel:load()
 	self.configModel:write()
 end
 

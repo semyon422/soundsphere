@@ -1,19 +1,13 @@
 local NoteSkinVsrg = require("sphere.models.NoteSkinModel.NoteSkinVsrg")
 local BasePlayfield = require("sphere.models.NoteSkinModel.BasePlayfield")
 local JustConfig = require("sphere.JustConfig")
+local InputMode = require("ncdk.InputMode")
 
 ---@class sphere.BaseNoteSkin: sphere.NoteSkinVsrg
 ---@operator call: sphere.BaseNoteSkin
 local BaseNoteSkin = NoteSkinVsrg + {}
 
 BaseNoteSkin.bgaTransform = {{1 / 2, -16 / 9 / 2}, {0, -7 / 9 / 2}, 0, {0, 16 / 9}, {0, 16 / 9}, 0, 0, 0, 0}
-
----@param inputMode ncdk.InputMode
----@param stringInputMode string
-function BaseNoteSkin:setInputMode(inputMode, stringInputMode)
-	self.inputMode = inputMode
-	self.stringInputMode = stringInputMode
-end
 
 ---@return table
 function BaseNoteSkin:getInputTable()
@@ -52,7 +46,12 @@ local function copyTable(t)
 end
 
 local configPath = "sphere/models/NoteSkinModel/BaseNoteSkinConfig.lua"
-function BaseNoteSkin:load()
+
+
+function BaseNoteSkin:load(inputMode)
+	self.inputMode = InputMode(inputMode)
+	self.stringInputMode = inputMode
+
 	BaseNoteSkin.configContent = BaseNoteSkin.configContent or love.filesystem.read(configPath)
 
 	local config = JustConfig({defaultContent = self.configContent}):fromFile(
@@ -60,8 +59,7 @@ function BaseNoteSkin:load()
 	)
 	self.config = config
 
-	self.name = self.stringInputMode .. " base skin"
-	self.inputMode = self.inputMode
+	self.name = "base skin"
 	self.range = {-1, 1}
 	self.unit = 480
 	self.hitposition = config:get("hitposition") or 450
