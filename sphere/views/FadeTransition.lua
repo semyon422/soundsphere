@@ -12,9 +12,6 @@ FadeTransition.phase = 0
 
 ---@param callback function?
 function FadeTransition:transitIn(callback)
-	if self.transiting then
-		return
-	end
 	self.callback = callback
 	self.transiting = true
 	self.phase = 1
