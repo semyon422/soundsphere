@@ -24,7 +24,7 @@ function NoteSkinData:loadTexture(key, path)
 	else
 		texture = gfx_util.newPixel(1, 1, 1, 1)
 	end
-	texture:setWrap("repeat", "repeat")
+	texture:setWrap("clamp", "repeat")
 
 	local spriteBatch = love.graphics.newSpriteBatch(texture, 1000)
 
