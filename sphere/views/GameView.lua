@@ -35,22 +35,12 @@ function GameView:_setView(view)
 end
 
 ---@param view sphere.ScreenView
----@param noTransition boolean?
-function GameView:setView(view, noTransition)
-	if self.isChangingScreen then
-		return
-	end
-	self.isChangingScreen = true
+function GameView:setView(view)
 	view.gameView = self
-	if noTransition then
-		self.isChangingScreen = false
+	self.fadeTransition:transit(function()
+		self.fadeTransition:transitAsync(1, 0)
 		self:_setView(view)
-		return
-	end
-	self.fadeTransition:transitIn(function()
-		self:_setView(view)
-		self.fadeTransition:transitOut()
-		self.isChangingScreen = false
+		self.fadeTransition:transitAsync(0, 1)
 	end)
 end
 
@@ -63,7 +53,7 @@ end
 
 ---@param dt number
 function GameView:update(dt)
-	self.fadeTransition:update(dt)
+	self.fadeTransition:update()
 	if not self.view then
 		return
 	end

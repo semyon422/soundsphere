@@ -9,10 +9,9 @@ function ScreenView:new(game)
 end
 
 ---@param screenName string
----@param noTransition boolean?
-function ScreenView:changeScreen(screenName, noTransition)
+function ScreenView:changeScreen(screenName)
 	self:beginUnload()
-	self.gameView:setView(self.game[screenName], noTransition)
+	self.gameView:setView(self.game[screenName])
 end
 
 function ScreenView:load() end
