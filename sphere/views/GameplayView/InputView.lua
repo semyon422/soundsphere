@@ -36,6 +36,7 @@ function InputView:receive(event)
 		self.count = self.count - 1
 	end
 
+	self.count = math.max(self.count, 0)  -- first event can be release
 	if self.count > 0 then
 		self:switchPressed(true)
 	else
