@@ -155,7 +155,7 @@ function Loop:run()
 
 		thread.update()
 		delay.update()
-		flux.update(Loop.dt)
+		flux.update(math.min(Loop.dt, 1 / 60))
 		love.update(Loop.dt)
 
 		local timingsDraw = love.timer.getTime()
