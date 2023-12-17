@@ -145,7 +145,7 @@ function SelectModel:getAudioPathPreview()
 	local directoryPath = path:match("^(.+)/(.-)$") or ""
 
 	if audioPath and audioPath ~= "" then
-		return path_util.eval_path(directoryPath .. "/" .. audioPath), math.max(0, chart.previewTime or 0)
+		return path_util.eval_path(directoryPath .. "/" .. audioPath), math.max(0, tonumber(chart.previewTime) or 0)
 	end
 
 	return directoryPath .. "/preview.ogg", 0
