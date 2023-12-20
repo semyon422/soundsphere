@@ -1,5 +1,6 @@
 local class = require("class")
-local UpdateModel = require("sphere.update.UpdateModel")
+local Updater = require("sphere.update.Updater")
+local UpdaterIO = require("sphere.update.UpdaterIO")
 local ConfigModel = require("sphere.persistence.ConfigModel")
 local WindowModel = require("sphere.app.WindowModel")
 local thread = require("thread")
@@ -10,21 +11,20 @@ local delay = require("delay")
 local UpdateController = class()
 
 function UpdateController:new()
-	self.updateModel = UpdateModel()
+	self.updater = Updater(UpdaterIO())
 	self.configModel = ConfigModel()
 	self.windowModel = WindowModel()
 end
 
 ---@return boolean?
 function UpdateController:updateAsync()
-	local updateModel = self.updateModel
+	local updater = self.updater
 	local configModel = self.configModel
 
 	configModel:open("settings")
 	configModel:open("urls")
 	configModel:open("files", true)
 	configModel:read()
-
 
 	local configs = configModel.configs
 
@@ -45,16 +45,21 @@ function UpdateController:updateAsync()
 	end
 
 	function love.draw()
-		love.graphics.printf(updateModel.status, 0, 0, love.graphics.getWidth())
+		love.graphics.printf(updater.status, 0, 0, love.graphics.getWidth())
 	end
 
-	local updated = updateModel:updateFilesAsync(
-		configs.urls,
+	local updated, new_files = updater:updateFilesAsync(
+		configs.urls.update,
 		configs.files
 	)
+	if not updated then
+		return
+	end
+
+	configs.files = new_files
 	configModel:write()
 
-	return updated
+	return true
 end
 
 return UpdateController
