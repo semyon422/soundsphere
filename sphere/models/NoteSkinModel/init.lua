@@ -19,7 +19,7 @@ end
 NoteSkinModel.path = "userdata/skins"
 
 function NoteSkinModel:load()
-	self.inputMode = ""
+	self.inputMode = nil
 	self.config = self.configModel.configs.settings
 
 	local tree = {}
