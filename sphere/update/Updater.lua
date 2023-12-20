@@ -45,6 +45,7 @@ function Updater:getActionLists(server_filelist, client_filelist)
 
 	local download = {}
 	local remove = {}
+	local found = {}
 
 	for _, file in ipairs(filelist) do
 		if not file.hash then
@@ -53,11 +54,13 @@ function Updater:getActionLists(server_filelist, client_filelist)
 			local _hash = self.updater_io:crc32Async(file.path)
 			if _hash ~= file.hash then
 				table.insert(download, file.path)
+			else
+				table.insert(found, file.path)
 			end
 		end
 	end
 
-	return download, remove
+	return download, remove, found
 end
 
 ---@param status string
@@ -84,7 +87,11 @@ function Updater:updateFilesAsync(update_url, client_filelist)
 	-- TODO: move it to server file list after few months
 	local prefix = update_url:match("^(.*)/.-$") .. "/soundsphere"
 
-	local download, remove = self:getActionLists(server_filelist, client_filelist)
+	local download, remove, found = self:getActionLists(server_filelist, client_filelist)
+
+	for _, path in ipairs(found) do
+		self:setStatus("found: " .. path)
+	end
 
 	local count = 0
 	for _, path in ipairs(download) do
