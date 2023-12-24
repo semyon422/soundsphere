@@ -162,4 +162,29 @@ function NoteSkinModel:getNoteSkin(inputMode)
 	return self.noteSkin
 end
 
+---@param inputMode string
+---@return sphere.SkinInfo
+function NoteSkinModel:getSkinInfo(inputMode)
+	local skinInfos = self:getSkinInfos(inputMode)
+
+	local sel_path = self.config.gameplay["noteskin" .. inputMode]
+	if sel_path then
+		for _, skinInfo in ipairs(skinInfos) do
+			if skinInfo:getPath() == sel_path then
+				return skinInfo
+			end
+		end
+	end
+
+	return skinInfos[1]
+end
+
+---@param inputMode string
+---@return sphere.NoteSkin
+function NoteSkinModel:loadNoteSkin(inputMode)
+	local skinInfo = self:getSkinInfo(inputMode)
+	self.noteSkin = skinInfo:loadSkin(inputMode)
+	return self.noteSkin
+end
+
 return NoteSkinModel

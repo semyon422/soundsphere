@@ -14,7 +14,7 @@ function EditorController:load()
 	local noteChart = selectModel:loadNoteChart()
 	local chartItem = selectModel.noteChartItem
 
-	local noteSkin = self.noteSkinModel:getNoteSkin(tostring(noteChart.inputMode))
+	local noteSkin = self.noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))
 	noteSkin:loadData()
 	noteSkin.editor = true
 

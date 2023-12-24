@@ -41,7 +41,7 @@ function GameplayController:load()
 	ModifierModel:applyMeta(playContext.modifiers, state)
 	ModifierModel:apply(playContext.modifiers, noteChart)
 
-	local noteSkin = noteSkinModel:getNoteSkin(tostring(noteChart.inputMode))
+	local noteSkin = noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))
 	noteSkin:loadData()
 
 	rhythmModel.graphicEngine.eventBasedRender = config.gameplay.eventBasedRender
