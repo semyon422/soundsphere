@@ -91,10 +91,9 @@ if root == sourceBase then
 	assert(physfs.mount(root, "/", true))
 end
 
-local moddedgame = love.filesystem.getInfo("moddedgame")
-if moddedgame and moddedgame.type == "directory" then
-	assert(physfs.mount(root .. "/moddedgame", "/", false))
-end
+local modloader = require("modloader")
+modloader:setRoot(root)
+modloader:load()
 
 require("preload")
 
