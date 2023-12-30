@@ -80,6 +80,17 @@ elseif jit.os == "Linux" then
 	ffi.cdef("int chdir(const char *path);")
 	ffi.C.chdir(root)
 	pkg.addc("bin/linux64")
+elseif jit.os == "OSX" then
+	local ldlp = os.getenv("DYLD_FALLBACK_LIBRARY_PATH")
+	if not ldlp or not ldlp:find("bin/mac64") then
+		ffi.cdef("int setenv(const char *name, const char *value, int overwrite);")
+		ffi.C.setenv("DYLD_FALLBACK_LIBRARY_PATH", root .. "/bin/mac64", true)
+		--os.execute(("%q %q &"):format(arg[-2], arg[1]))
+		--return os.exit()
+	end
+	ffi.cdef("int chdir(const char *path);")
+	ffi.C.chdir(root)
+	pkg.addc("bin/mac64")
 end
 
 love.errhand = require("errhand")
