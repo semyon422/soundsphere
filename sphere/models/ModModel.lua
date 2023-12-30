@@ -12,14 +12,10 @@ local Mod = class()
 ---@param name string
 ---@param mount boolean
 ---@param mountPath? string
----@param load? fun(self: self, game: sphere.GameController)
----@param update? fun(self: self, game: sphere.GameController, dt: number)
-function Mod:new(name, mount, mountPath, load, update)
+function Mod:new(name, mount, mountPath)
     self.name = name
     self.mount = mount
     self.mountPath = mountPath
-    self.load = load
-    self.update = update
 end
 
 return Mod
