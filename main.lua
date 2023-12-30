@@ -93,7 +93,7 @@ end
 
 local modloader = require("modloader")
 modloader:setRoot(root)
-modloader:load()
+local mods = modloader:load()
 
 require("preload")
 
@@ -144,7 +144,7 @@ thread.coro(function()
 	})
 
 	local GameController = require("sphere.controllers.GameController")
-	local game = GameController()
+	local game = GameController(mods)
 
 	game:load()
 

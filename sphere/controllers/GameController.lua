@@ -34,7 +34,10 @@ local GameController = class()
 
 local deps = require("sphere.deps")
 
-function GameController:new()
+---@param mods sphere.Mod[]
+function GameController:new(mods)
+	self.mods = mods
+
 	self.persistence = Persistence()
 	self.app = App(self.persistence)
 	self.ui = UserInterface(self.persistence, self)
@@ -116,6 +119,12 @@ function GameController:new()
 end
 
 function GameController:load()
+	for _, mod in pairs(self.mods) do
+		if mod.load then
+			mod:load(self)
+		end
+	end
+
 	self.persistence:load()
 	self.app:load()
 
@@ -160,6 +169,12 @@ function GameController:update(dt)
 	self.cacheModel:update()
 
 	self.ui:update(dt)
+
+	for _, mod in pairs(self.mods) do
+		if mod.update then
+			mod:update(self)
+		end
+	end
 end
 
 function GameController:draw()

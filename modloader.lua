@@ -1,22 +1,30 @@
 local physfs = require("physfs")
 
 local ModLoader = {}
-local modsDirectory = "moddedgame"
+local modsDirectoryPath = "moddedgame"
 
----@return string[]
+---@return sphere.Mod[] 
 function ModLoader:getMods()
+    local modsScriptFiles = {}
+
+    for _, file in ipairs(love.filesystem.getDirectoryItems(modsDirectoryPath)) do
+        if file:match(".lua$") then
+            local name = file:gsub(".lua$", "")
+            table.insert(modsScriptFiles, name)
+        end
+    end
+
     local mods = {}
 
-    for _, file in ipairs(love.filesystem.getDirectoryItems(modsDirectory)) do
-        if love.filesystem.getInfo(modsDirectory .. "/" .. file, "directory") then
-            table.insert(mods, file)
-        end
+    for _, scriptFile in pairs(modsScriptFiles) do
+        local mod = require(modsDirectoryPath .. "/".. scriptFile)
+        table.insert(mods, mod)
     end
 
     return mods
 end
 
----@param mods string[]
+---@param mods sphere.Mod[] 
 ---@return boolean
 ---@return string[]
 function ModLoader:checkForConflicts(mods)
@@ -45,17 +53,19 @@ function ModLoader:checkForConflicts(mods)
         end
     end
 
-    for _, mod in ipairs(mods) do
-        checkDirectory(modsDirectory .. "/" .. mod, "")
+    for _, mod in pairs(mods) do
+        if mod.mount then
+            checkDirectory(modsDirectoryPath .. "/" .. mod.mountPath, "")
+        end
     end
 
     return conflictFound, conflicts
 end
 
----@param path string
-function ModLoader:mount(path)
-    assert(physfs.mount(self.root .. "/" .. modsDirectory .."/" .. path, "/", false))
-    print(path .. " mounted")
+---@param mod sphere.Mod[] 
+function ModLoader:mount(mod)
+    assert(physfs.mount(self.root .. "/" .. modsDirectoryPath .."/" .. mod.mountPath, "/", false))
+    print(mod.name .. " mounted")
 end
 
 ---@param path string
@@ -63,9 +73,8 @@ function ModLoader:setRoot(path)
     self.root = path
 end
 
+---@return sphere.Mod[]
 function ModLoader:load()
-    physfs.setWriteDir(self.root)
-
     local mods = self:getMods()
 
     local conflictFound, conflicts_path = self:checkForConflicts(mods)
@@ -74,13 +83,19 @@ function ModLoader:load()
         for _, file in pairs(conflicts_path) do
             print("Conflict: " .. file)
         end
-        
+
         error("Two or more mods are modifying the same file. Check the console for details.")
     end
 
+    physfs.setWriteDir(self.root)
+
     for _, mod in ipairs(mods) do
-        self:mount(mod)
+        if mod.mount then
+            self:mount(mod)
+        end
     end
+
+    return mods
 end
 
 return ModLoader
