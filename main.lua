@@ -19,8 +19,10 @@ pkg.add("tree/share/lua/5.1")
 require("aqua.string")
 
 if arg[2] == "test" then
-	local runner = require("luacov.runner")
-	runner.init()
+	local ok, err = pcall(require, "luacov.runner")
+	if ok then
+		err.init()
+	end
 end
 
 local deco = require("deco")
