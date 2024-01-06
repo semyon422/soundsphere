@@ -130,6 +130,8 @@ if arg[2] == "test" then
 		"userdata",
 	}
 
+	testing.get_time = love.timer.getTime
+
 	testing.test()
 	os.exit()
 end
