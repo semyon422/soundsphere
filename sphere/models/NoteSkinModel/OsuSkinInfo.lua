@@ -25,7 +25,7 @@ function OsuSkinInfo:matchInput(inputMode)  -- allow only Xkey input mode
 		return false
 	end
 
-	return keys >= 1 and keys <= 18
+	return true
 end
 
 ---@param inputMode string

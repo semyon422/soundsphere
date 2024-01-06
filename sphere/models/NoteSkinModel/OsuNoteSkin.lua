@@ -894,6 +894,7 @@ function OsuNoteSkin:setKeys(keys)
 			return
 		end
 	end
+	self.mania = {Keys = keys}
 end
 
 ---@param file_name string
@@ -975,11 +976,6 @@ function OsuNoteSkin:parseSkinIni(content)
 		local keys = tonumber(mania.Keys)
 		if keys then
 			skinnedKeys[keys] = true
-		end
-	end
-	for i = 1, 18 do
-		if not skinnedKeys[i] then
-			table.insert(skinini.Mania, {Keys = i})
 		end
 	end
 	return skinini
