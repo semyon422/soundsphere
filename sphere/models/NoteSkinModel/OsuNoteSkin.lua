@@ -1106,7 +1106,7 @@ function OsuNoteSkin:getDefaultManiaSection(keys)
 end
 
 function OsuNoteSkin:fixManiaValues()
-	if self.config.data.DisableFixes then
+	if self.config.data.DisableLimits then
 		return
 	end
 
