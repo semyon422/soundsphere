@@ -5,7 +5,7 @@ local NoteChartFactory = require("notechart.NoteChartFactory")
 local Log = require("Log")
 local class = require("class")
 local md5 = require("md5")
-local Orm = require("Orm")
+local sql_util = require("rdb.sql_util")
 
 ---@class sphere.CacheManager
 ---@operator call: sphere.CacheManager
@@ -208,7 +208,7 @@ function CacheManager:processNoteChartEntries(noteChartPath, noteChartSetEntry)
 
 	if entry then
 		if entry.lastModified ~= lastModified then
-			entry.hash = Orm.NULL
+			entry.hash = sql_util.NULL
 			entry.lastModified = lastModified
 			entry.setId = noteChartSetEntry.id
 			self:setNoteChartEntry(entry, true)

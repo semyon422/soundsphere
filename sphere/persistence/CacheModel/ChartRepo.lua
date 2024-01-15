@@ -1,6 +1,8 @@
 local class = require("class")
-local Orm = require("Orm")
-local utf8 = require("utf8")
+local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
+local TableOrm = require("rdb.TableOrm")
+local Models = require("rdb.Models")
+local autoload = require("autoload")
 
 ---@class sphere.ChartRepo
 ---@operator call: sphere.ChartRepo
@@ -14,11 +16,19 @@ function ChartRepo:load()
 	end
 	self.loaded = true
 
-	self.db = Orm()
-	local db = self.db
+	local db = LjsqliteDatabase()
+	self.db = db
+
 	db:open(self.dbpath)
 	local sql = love.filesystem.read("sphere/persistence/CacheModel/database.sql")
 	db:exec(sql)
+
+	local _models = autoload("sphere.persistence.CacheModel.models")
+	local orm = TableOrm(db)
+	local models = Models(_models, orm)
+
+	self.orm = orm
+	self.models = models
 end
 
 function ChartRepo:unload()
@@ -30,118 +40,113 @@ function ChartRepo:unload()
 end
 
 function ChartRepo:begin()
-	self.db:begin()
+	-- self.db:begin()
 end
 
 function ChartRepo:commit()
-	self.db:commit()
+	-- self.db:commit()
 end
 
 ----------------------------------------------------------------
 
 ---@param entry table
----@return table
 function ChartRepo:insertNoteChartEntry(entry)
-	return self.db:insert("noteCharts", entry, true)
+	self.models.noteCharts:create(entry, true)
 end
 
 ---@param entry table
----@return table?
 function ChartRepo:updateNoteChartEntry(entry)
-	return self.db:update("noteCharts", entry, "path = ?", entry.path)
+	self.models.noteCharts:update(entry, {path = entry.path})
 end
 
 ---@param path string
----@return table?
+---@return rdb.ModelRow?
 function ChartRepo:selectNoteChartEntry(path)
-	return self.db:select("noteCharts", "path = ?", path)[1]
+	return self.models.noteCharts:find({path = path})
 end
 
 ---@param id number
----@return table?
+---@return rdb.ModelRow?
 function ChartRepo:selectNoteChartEntryById(id)
-	return self.db:select("noteCharts", "id = ?", id)[1]
+	return self.models.noteCharts:find({id = id})
 end
 
 ---@param path string
 function ChartRepo:deleteNoteChartEntry(path)
-	self.db:delete("noteCharts", "path = ?", path)
+	self.models.noteCharts:delete({path = path})
 end
 
 ---@param setId number
----@return table
+---@return rdb.ModelRow[]
 function ChartRepo:getNoteChartsAtSet(setId)
-	return self.db:select("noteCharts", "setId = ?", setId)
+	return self.models.noteCharts:select({setId = setId})
 end
 
 ---@param hashes table
----@return table
+---@return rdb.ModelRow[]
 function ChartRepo:getNoteChartsByHashes(hashes)
-	return self.db:select("noteCharts", self.db:build_condition({hash__in = hashes}))
+	return self.models.noteCharts:select({hash__in = hashes})
 end
 
 ----------------------------------------------------------------
 
 ---@param entry table
----@return table
+---@return rdb.ModelRow?
 function ChartRepo:insertNoteChartSetEntry(entry)
-	return self.db:insert("noteChartSets", entry, true)
+	return self.models.noteChartSets:create(entry, true)
 end
 
 ---@param entry table
----@return table?
 function ChartRepo:updateNoteChartSetEntry(entry)
-	return self.db:update("noteChartSets", entry, "path = ?", entry.path)
+	self.models.noteChartSets:update(entry, {path = entry.path})
 end
 
 ---@param path string
----@return table?
+---@return rdb.ModelRow?
 function ChartRepo:selectNoteChartSetEntry(path)
-	return self.db:select("noteChartSets", "path = ?", path)[1]
+	return self.models.noteChartSets:find({path = path})
 end
 
 ---@param id number
----@return table?
+---@return rdb.ModelRow?
 function ChartRepo:selectNoteChartSetEntryById(id)
-	return self.db:select("noteChartSets", "id = ?", id)[1]
+	return self.models.noteChartSets:find({id = id})
 end
 
 ---@param path string
 function ChartRepo:deleteNoteChartSetEntry(path)
-	self.db:delete("noteChartSets", "path = ?", path)
+	self.models.noteChartSets:delete({path = path})
 end
 
 ---@param path string
----@return table
+---@return rdb.ModelRow[]
 function ChartRepo:selectNoteChartSets(path)
-	return self.db:select("noteChartSets", "substr(path, 1, ?) = ?", utf8.len(path), path)
+	return self.models.noteChartSets:select({path__startswith = path})
 end
 
 ----------------------------------------------------------------
 
 ---@param entry table
----@return table
 function ChartRepo:insertNoteChartDataEntry(entry)
-	return self.db:insert("noteChartDatas", entry, true)
+	self.models.noteChartDatas:create(entry, true)
 end
 
 ---@param entry table
----@return table?
 function ChartRepo:updateNoteChartDataEntry(entry)
-	return self.db:update("noteChartDatas", entry, "hash = ? and `index` = ?", entry.hash, entry.index)
+	self.models.noteChartDatas:update(entry, {hash = entry.hash, index = entry.index})
 end
 
 ---@param hash string
 ---@param index number
----@return table?
+---@return rdb.ModelRow?
 function ChartRepo:selectNoteCharDataEntry(hash, index)
-	return self.db:select("noteChartDatas", "hash = ? and `index` = ?", hash, index)[1]
+	return self.models.noteChartDatas:select({hash = hash, index = index})
 end
 
 ---@param id number
----@return table?
+---@return rdb.ModelRow?
 function ChartRepo:selectNoteChartDataEntryById(id)
-	return self.db:select("noteChartDatas", "id = ?", id)[1]
+	return self.models.noteChartDatas:find({id = id})
 end
 
 return ChartRepo
