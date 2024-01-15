@@ -3,7 +3,8 @@ local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
 local TableOrm = require("rdb.TableOrm")
 local Models = require("rdb.Models")
 local autoload = require("autoload")
-local ObjectQuery = require("ObjectQuery")
+local table_util = require("table_util")
+local sql_util = require("rdb.sql_util")
 local ffi = require("ffi")
 local class = require("class")
 
@@ -75,6 +76,13 @@ ffi.cdef([[
 		bool lamp;
 	} EntryStruct
 ]])
+
+local select_columns = {
+	"noteChartDataId",
+	"noteChartId",
+	"setId",
+	"scoreId",
+}
 
 CacheDatabase.EntryStruct = ffi.typeof("EntryStruct")
 
@@ -164,25 +172,23 @@ end
 function CacheDatabase:queryNoteChartSets()
 	local params = self.queryParams
 
-	local objectQuery = ObjectQuery()
-
-	objectQuery.table = "chartset_list"
-	objectQuery.fields = {
-		"noteChartDataId",
-		"noteChartId",
-		"setId",
-		"scoreId",
-	}
+	local columns = table_util.copy(select_columns)
 
 	if params.lamp then
-		table.insert(objectQuery.fields, objectQuery:newBooleanCase("lamp", params.lamp))
+		local case = ("CASE WHEN %s THEN TRUE ELSE FALSE END __boolean_lamp"):format(
+			sql_util.bind(sql_util.conditions(params.lamp))
+		)
+		table.insert(columns, case)
 	end
 
-	objectQuery.where = params.where
-	objectQuery.groupBy = params.groupBy
-	objectQuery.orderBy = params.orderBy
+	local options = {
+		columns = columns,
+		group = params.groupBy,
+		order = params.orderBy,
+	}
 
-	local count = self.db:query(objectQuery:getCountQuery())[1].c
+	local count = self.orm:count("chartset_list", params.where, options)
+
 	local noteChartSets = ffi.new("EntryStruct[?]", count)
 	local id_to_global_offset = {}
 	local set_id_to_global_offset = {}
@@ -190,8 +196,9 @@ function CacheDatabase:queryNoteChartSets()
 	self.id_to_global_offset = id_to_global_offset
 	self.set_id_to_global_offset = set_id_to_global_offset
 
+	local objs = self.orm:select("chartset_list", params.where, options)
 	local c = 0
-	for i, row in self.db:iter(objectQuery:getQueryParams()) do
+	for i, row in ipairs(objs) do
 		local j = i - 1
 		local entry = noteChartSets[j]
 		fillObject(entry, row)
@@ -206,34 +213,28 @@ end
 function CacheDatabase:queryNoteCharts()
 	local params = self.queryParams
 
-	local objectQuery = ObjectQuery()
-
-	self:load()
-
-	objectQuery.table = "chartset_list"
-	objectQuery.fields = {
-		"noteChartDataId",
-		"noteChartId",
-		"setId",
-		"scoreId",
-	}
+	local columns = table_util.copy(select_columns)
 
 	if params.lamp then
-		table.insert(objectQuery.fields, objectQuery:newBooleanCase("lamp", params.lamp))
+		local case = ("CASE WHEN %s THEN TRUE ELSE FALSE END __boolean_lamp"):format(
+			sql_util.bind(sql_util.conditions(params.lamp))
+		)
+		table.insert(columns, case)
 	end
 
-	objectQuery.where = params.where
-	objectQuery.groupBy = nil
-	objectQuery.orderBy = [[
-		setId ASC,
-		length(inputMode) ASC,
-		inputMode ASC,
-		difficulty ASC,
-		name ASC,
-		noteChartDataId ASC
-	]]
+	local options = {
+		columns = columns,
+		order = {
+			"setId ASC",
+			"length(inputMode) ASC",
+			"inputMode ASC",
+			"difficulty ASC",
+			"name ASC",
+			"noteChartDataId ASC",
+		},
+	}
 
-	local count = self.db:query(objectQuery:getCountQuery())[1].c
+	local count = self.orm:count("chartset_list", params.where, options)
 
 	local noteCharts = ffi.new("EntryStruct[?]", count)
 	local slices = {}
@@ -242,11 +243,13 @@ function CacheDatabase:queryNoteCharts()
 	self.noteChartSlices = slices
 	self.id_to_local_offset = id_to_local_offset
 
+	local objs = self.orm:select("chartset_list", params.where, options)
+
 	local offset = 0
 	local size = 0
 	local setId
 	local c = 0
-	for i, row in self.db:iter(objectQuery:getQueryParams()) do
+	for i, row in ipairs(objs) do
 		local j = i - 1
 		local entry = noteCharts[j]
 		fillObject(entry, row)

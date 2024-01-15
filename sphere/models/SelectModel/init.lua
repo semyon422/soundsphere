@@ -8,7 +8,6 @@ local NoteChartSetLibrary = require("sphere.models.SelectModel.NoteChartSetLibra
 local CollectionLibrary = require("sphere.models.SelectModel.CollectionLibrary")
 local SearchModel = require("sphere.models.SelectModel.SearchModel")
 local SortModel = require("sphere.models.SelectModel.SortModel")
-local Orm = require("Orm")
 
 ---@class sphere.SelectModel
 ---@operator call: sphere.SelectModel
@@ -68,10 +67,10 @@ function SelectModel:updateSetItems()
 		fields[i] = field .. " ASC"
 	end
 	table.insert(fields, "noteChartDataId ASC")
-	params.orderBy = table.concat(fields, ",")
+	params.orderBy = fields
 
 	if self.config.collapse and isCollapseAllowed then
-		params.groupBy = "setId"
+		params.groupBy = {"setId"}
 	else
 		params.groupBy = nil
 	end
@@ -80,8 +79,8 @@ function SelectModel:updateSetItems()
 
 	where.path__startswith = self.collectionItem.path .. "/"
 
-	params.where = Orm:build_condition(where)
-	params.lamp = lamp and Orm:build_condition(lamp)
+	params.where = where
+	params.lamp = lamp
 
 	self.cacheModel.cacheDatabase:asyncQueryAll()
 
