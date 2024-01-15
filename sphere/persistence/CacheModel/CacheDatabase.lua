@@ -1,5 +1,8 @@
 local thread = require("thread")
-local Orm = require("Orm")
+local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
+local TableOrm = require("rdb.TableOrm")
+local Models = require("rdb.Models")
+local autoload = require("autoload")
 local ObjectQuery = require("ObjectQuery")
 local ffi = require("ffi")
 local class = require("class")
@@ -14,12 +17,22 @@ function CacheDatabase:load()
 	if self.loaded then
 		return
 	end
-	self.db = Orm()
-	local db = self.db
+
+	local db = LjsqliteDatabase()
+	self.db = db
+
 	db:open(self.dbpath)
 	local sql = love.filesystem.read("sphere/persistence/CacheModel/database.sql")
 	db:exec(sql)
 	self:attachScores()
+
+	local _models = autoload("sphere.persistence.CacheModel.models")
+	local orm = TableOrm(db)
+	local models = Models(_models, orm)
+
+	self.orm = orm
+	self.models = models
+
 	self.loaded = true
 
 	self.noteChartSetItemsCount = 0
@@ -67,21 +80,19 @@ CacheDatabase.EntryStruct = ffi.typeof("EntryStruct")
 
 ---@param object table
 ---@param row table
----@param colnames table
-local function fillObject(object, row, colnames)
-	for i, k in ipairs(colnames) do
-		local value = row[i]
+local function fillObject(object, row)
+	for k, v in pairs(row) do
 		if k:find("^__boolean_") then
 			k = k:sub(11)
-			if tonumber(value) == 1 then
-				value = true
+			if tonumber(v) == 1 then
+				v = true
 			else
-				value = false
+				v = false
 			end
-		elseif type(value) == "cdata" then
-			value = tonumber(value) or value
+		elseif type(v) == "cdata" then
+			v = tonumber(v) or v
 		end
-		object[k] = value or 0
+		object[k] = v or 0
 	end
 end
 
@@ -155,8 +166,6 @@ function CacheDatabase:queryNoteChartSets()
 
 	local objectQuery = ObjectQuery()
 
-	objectQuery.db = self.db
-
 	objectQuery.table = "noteChartDatas"
 	objectQuery.fields = {
 		"noteChartDatas.id AS noteChartDataId",
@@ -179,7 +188,7 @@ function CacheDatabase:queryNoteChartSets()
 	objectQuery.groupBy = params.groupBy
 	objectQuery.orderBy = params.orderBy
 
-	local count = objectQuery:getCount()
+	local count = self.db:query(objectQuery:getCountQuery())[1].c
 	local noteChartSets = ffi.new("EntryStruct[?]", count)
 	local id_to_global_offset = {}
 	local set_id_to_global_offset = {}
@@ -188,10 +197,10 @@ function CacheDatabase:queryNoteChartSets()
 	self.set_id_to_global_offset = set_id_to_global_offset
 
 	local c = 0
-	for i, row, colnames in self.db:iter(objectQuery:getQueryParams()) do
+	for i, row in self.db:iter(objectQuery:getQueryParams()) do
 		local j = i - 1
 		local entry = noteChartSets[j]
-		fillObject(entry, row, colnames)
+		fillObject(entry, row)
 		set_id_to_global_offset[entry.setId] = j
 		chart_id_to_offset(id_to_global_offset, entry, j)
 		c = c + 1
@@ -206,7 +215,6 @@ function CacheDatabase:queryNoteCharts()
 	local objectQuery = ObjectQuery()
 
 	self:load()
-	objectQuery.db = self.db
 
 	objectQuery.table = "noteChartDatas"
 	objectQuery.fields = {
@@ -237,7 +245,8 @@ function CacheDatabase:queryNoteCharts()
 		noteChartDatas.id ASC
 	]]
 
-	local count = objectQuery:getCount()
+	local count = self.db:query(objectQuery:getCountQuery())[1].c
+
 	local noteCharts = ffi.new("EntryStruct[?]", count)
 	local slices = {}
 	local id_to_local_offset = {}
@@ -249,10 +258,10 @@ function CacheDatabase:queryNoteCharts()
 	local size = 0
 	local setId
 	local c = 0
-	for i, row, colnames in self.db:iter(objectQuery:getQueryParams()) do
+	for i, row in self.db:iter(objectQuery:getQueryParams()) do
 		local j = i - 1
 		local entry = noteCharts[j]
-		fillObject(entry, row, colnames)
+		fillObject(entry, row)
 		if setId and setId ~= entry.setId then
 			slices[setId] = {
 				offset = offset,
