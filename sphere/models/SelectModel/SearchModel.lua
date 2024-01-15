@@ -8,11 +8,11 @@ local SearchModel = class()
 local number_fields = {
 	{
 		keys = {"difficulty", "d"},
-		field = "noteChartDatas.difficulty",
+		field = "difficulty",
 	},
 	{
 		keys = {"length", "l"},
-		field = "noteChartDatas.length",
+		field = "length",
 		transform = function(self, v)
 			if tonumber(v) then
 				return tonumber(v)
@@ -25,37 +25,37 @@ local number_fields = {
 	},
 	{
 		keys = {"bpm", "b"},
-		field = "noteChartDatas.bpm",
+		field = "bpm",
 	},
 	{
 		keys = {"noteCount", "nc"},
-		field = "noteChartDatas.noteCount",
+		field = "noteCount",
 	},
 	{
 		keys = {"level", "lv"},
-		field = "noteChartDatas.level",
+		field = "level",
 	},
 	{
 		keys = {"longNotes", "ln"},
-		field = "noteChartDatas.longNoteRatio",
+		field = "longNoteRatio",
 		transform = function(self, v)
 			return v / 100
 		end
 	},
 	{
 		keys = {"miss", "m"},
-		field = "scores.miss",
+		field = "miss",
 	},
 	{
 		keys = {"accuracy", "a"},
-		field = "scores.accuracy",
+		field = "accuracy",
 		transform = function(self, v)
 			return v / 1000
 		end
 	},
 	{
 		keys = {"score", "s"},
-		field = "scores.accuracy",
+		field = "accuracy",
 		flip = true,
 		transform = function(self, v)
 			if not tonumber(v) then
@@ -152,7 +152,7 @@ function SearchModel:transformSearchString(s, cond)
 		elseif not key and _s ~= "" then
 			local _cond = {"or"}
 			for _, k in ipairs(textFields) do
-				_cond["noteChartDatas." .. k .. "__contains"] = _s
+				_cond[k .. "__contains"] = _s
 			end
 			table.insert(cond, _cond)
 		end
@@ -186,7 +186,7 @@ function SearchModel:getConditions()
 	local cond = {}
 
 	if not settings.miscellaneous.showNonManiaCharts then
-		cond["noteChartDatas.inputMode__notin"] = {"1osu", "1taiko", "1fruits"}
+		cond.inputMode__notin = {"1osu", "1taiko", "1fruits"}
 	end
 
 	local filter = self:getFilter()

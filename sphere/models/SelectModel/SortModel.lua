@@ -15,13 +15,13 @@ end
 -- 2nd value = isCollapseAllowed (group by setId)
 SortModel.orders = {
 	id = {{}, true},
-	title = {{"noteChartDatas.title", "noteChartDatas.artist"}, true},
-	artist = {{"noteChartDatas.artist", "noteChartDatas.title"}, true},
-	difficulty = {{"noteChartDatas.difficulty", "noteChartDatas.name"}, false},
-	level = {{"noteChartDatas.level"}, false},
-	length = {{"noteChartDatas.length"}, false},
-	bpm = {{"noteChartDatas.bpm"}, false},
-	["played top"] = {{"scores.id"}, false},
+	title = {{"title", "artist"}, true},
+	artist = {{"artist", "title"}, true},
+	difficulty = {{"difficulty", "name"}, false},
+	level = {{"level"}, false},
+	length = {{"length"}, false},
+	bpm = {{"bpm"}, false},
+	["played top"] = {{"scoreId"}, false},
 }
 
 SortModel.name = "title"

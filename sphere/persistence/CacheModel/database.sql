@@ -1,15 +1,3 @@
-CREATE TABLE IF NOT EXISTS `noteCharts` (
-    `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    `path` TEXT NOT NULL UNIQUE,
-    `hash` TEXT,
-    `setId` INTEGER,
-    `lastModified` INTEGER
-);
-CREATE TABLE IF NOT EXISTS `noteChartSets` (
-    `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    `path` TEXT NOT NULL UNIQUE,
-    `lastModified` INTEGER
-);
 CREATE TABLE IF NOT EXISTS `noteChartDatas` (
     `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     `hash` TEXT NOT NULL,
@@ -34,3 +22,40 @@ CREATE TABLE IF NOT EXISTS `noteChartDatas` (
     `localOffset` REAL DEFAULT 0.0,
     UNIQUE(`hash`, `index`)
 );
+
+CREATE TABLE IF NOT EXISTS `noteCharts` (
+    `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    `path` TEXT NOT NULL UNIQUE,
+    `hash` TEXT,
+    `setId` INTEGER,
+    `lastModified` INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS `noteChartSets` (
+    `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    `path` TEXT NOT NULL UNIQUE,
+    `lastModified` INTEGER
+);
+
+CREATE INDEX IF NOT EXISTS noteCharts_hash_idx ON noteCharts (`hash`);
+CREATE INDEX IF NOT EXISTS noteCharts_setId_idx ON noteCharts (`setId`);
+CREATE INDEX IF NOT EXISTS noteChartDatas1_idx ON noteChartDatas (`inputMode`, `name`, `difficulty`);
+
+CREATE TEMP VIEW IF NOT EXISTS chartset_list AS 
+
+SELECT
+noteChartDatas.id AS noteChartDataId,
+noteCharts.id AS noteChartId,
+scores.id AS scoreId,
+noteCharts.setId,
+noteCharts.path,
+scores.accuracy,
+scores.miss,
+noteChartDatas.*
+
+FROM noteChartDatas
+INNER JOIN noteCharts ON noteChartDatas.hash = noteCharts.hash
+LEFT JOIN scores ON
+noteChartDatas.hash = scores.chart_hash AND
+noteChartDatas.`index` = scores.chart_index AND
+scores.is_top = TRUE;

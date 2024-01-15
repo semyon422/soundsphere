@@ -67,11 +67,11 @@ function SelectModel:updateSetItems()
 	for i, field in ipairs(orderBy) do
 		fields[i] = field .. " ASC"
 	end
-	table.insert(fields, "noteChartDatas.id ASC")
+	table.insert(fields, "noteChartDataId ASC")
 	params.orderBy = table.concat(fields, ",")
 
 	if self.config.collapse and isCollapseAllowed then
-		params.groupBy = "noteCharts.setId"
+		params.groupBy = "setId"
 	else
 		params.groupBy = nil
 	end

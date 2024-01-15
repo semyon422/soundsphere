@@ -166,19 +166,13 @@ function CacheDatabase:queryNoteChartSets()
 
 	local objectQuery = ObjectQuery()
 
-	objectQuery.table = "noteChartDatas"
+	objectQuery.table = "chartset_list"
 	objectQuery.fields = {
-		"noteChartDatas.id AS noteChartDataId",
-		"noteCharts.id AS noteChartId",
-		"noteCharts.setId",
-		"scores.id AS scoreId",
+		"noteChartDataId",
+		"noteChartId",
+		"setId",
+		"scoreId",
 	}
-	objectQuery:setInnerJoin("noteCharts", "noteChartDatas.hash = noteCharts.hash")
-	objectQuery:setLeftJoin("scores", [[
-		noteChartDatas.hash = scores.chart_hash AND
-		noteChartDatas.`index` = scores.chart_index AND
-		scores.is_top = TRUE
-	]])
 
 	if params.lamp then
 		table.insert(objectQuery.fields, objectQuery:newBooleanCase("lamp", params.lamp))
@@ -216,19 +210,13 @@ function CacheDatabase:queryNoteCharts()
 
 	self:load()
 
-	objectQuery.table = "noteChartDatas"
+	objectQuery.table = "chartset_list"
 	objectQuery.fields = {
-		"noteChartDatas.id AS noteChartDataId",
-		"noteCharts.id AS noteChartId",
-		"noteCharts.setId",
-		"scores.id AS scoreId",
+		"noteChartDataId",
+		"noteChartId",
+		"setId",
+		"scoreId",
 	}
-	objectQuery:setInnerJoin("noteCharts", "noteChartDatas.hash = noteCharts.hash")
-	objectQuery:setLeftJoin("scores", [[
-		noteChartDatas.hash = scores.chart_hash AND
-		noteChartDatas.`index` = scores.chart_index AND
-		scores.is_top = TRUE
-	]])
 
 	if params.lamp then
 		table.insert(objectQuery.fields, objectQuery:newBooleanCase("lamp", params.lamp))
@@ -237,12 +225,12 @@ function CacheDatabase:queryNoteCharts()
 	objectQuery.where = params.where
 	objectQuery.groupBy = nil
 	objectQuery.orderBy = [[
-		noteCharts.setId ASC,
-		length(noteChartDatas.inputMode) ASC,
-		noteChartDatas.inputMode ASC,
-		noteChartDatas.difficulty ASC,
-		noteChartDatas.name ASC,
-		noteChartDatas.id ASC
+		setId ASC,
+		length(inputMode) ASC,
+		inputMode ASC,
+		difficulty ASC,
+		name ASC,
+		noteChartDataId ASC
 	]]
 
 	local count = self.db:query(objectQuery:getCountQuery())[1].c

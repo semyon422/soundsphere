@@ -10,13 +10,13 @@ end
 return {
 	notechart = {
 		{name = "No filter"},
-		{name = "4K", condition = {["noteChartDatas.inputMode"] = "4key"}},
-		{name = "5K", condition = {["noteChartDatas.inputMode"] = "5key"}},
-		{name = "6K", condition = {["noteChartDatas.inputMode"] = "6key"}},
-		{name = "7K", condition = {["noteChartDatas.inputMode"] = "7key"}},
-		{name = "8K", condition = {["noteChartDatas.inputMode"] = "8key"}},
-		{name = "9K", condition = {["noteChartDatas.inputMode"] = "9key"}},
-		{name = "10K", condition = {["noteChartDatas.inputMode"] = "10key"}},
+		{name = "4K", condition = {inputMode = "4key"}},
+		{name = "5K", condition = {inputMode = "5key"}},
+		{name = "6K", condition = {inputMode = "6key"}},
+		{name = "7K", condition = {inputMode = "7key"}},
+		{name = "8K", condition = {inputMode = "8key"}},
+		{name = "9K", condition = {inputMode = "9key"}},
+		{name = "10K", condition = {inputMode = "10key"}},
 	},
 	score = {
 		{name = "No filter"},
