@@ -218,9 +218,7 @@ function CacheDatabase:getNoteChartItemsAtSet(setId)
 		},
 	}
 
-	local t = love.timer.getTime()
 	local objs = self.orm:select("chartset_list", where, options)
-	print("getNoteChartItemsAtSet", love.timer.getTime() - t)
 	for _, obj in ipairs(objs) do
 		fillObject(obj, obj)
 	end
