@@ -38,12 +38,8 @@ function CacheDatabase:load()
 
 	self.noteChartSetItemsCount = 0
 	self.noteChartSetItems = {}
-	self.noteChartItemsCount = 0
-	self.noteChartItems = {}
-	self.noteChartSlices = {}
 	self.set_id_to_global_offset = {}
 	self.id_to_global_offset = {}
-	self.id_to_local_offset = {}
 
 	self.queryParams = {}
 end
@@ -77,6 +73,8 @@ ffi.cdef([[
 	} EntryStruct
 ]])
 
+CacheDatabase.EntryStruct = ffi.typeof("EntryStruct")
+
 local select_columns = {
 	"noteChartDataId",
 	"noteChartId",
@@ -84,30 +82,14 @@ local select_columns = {
 	"scoreId",
 }
 
-CacheDatabase.EntryStruct = ffi.typeof("EntryStruct")
-
 ---@param object table
 ---@param row table
 local function fillObject(object, row)
-	for k, v in pairs(row) do
-		if k:find("^__boolean_") then
-			k = k:sub(11)
-			if tonumber(v) == 1 then
-				v = true
-			else
-				v = false
-			end
-		elseif type(v) == "cdata" then
-			v = tonumber(v) or v
-		end
-		object[k] = v or 0
-	end
-end
-
-function CacheDatabase:queryAll()
-	self:queryNoteChartSets()
-	self:queryNoteCharts()
-	self:reassignData()
+	object.noteChartDataId = tonumber(row.noteChartDataId) or 0
+	object.noteChartId = tonumber(row.noteChartId) or 0
+	object.setId = tonumber(row.setId) or 0
+	object.scoreId = tonumber(row.scoreId) or 0
+	object.lamp = tonumber(row.lamp) ~= 0
 end
 
 local _asyncQueryAll = thread.async(function(queryParams)
@@ -117,26 +99,22 @@ local _asyncQueryAll = thread.async(function(queryParams)
 	local self = CacheDatabase()
 	self:load()
 	self.queryParams = queryParams
-	local status, err = pcall(self.queryAll, self)
+	local status, err = pcall(self.queryNoteChartSets, self)
 	if not status then
 		print(err)
 		return
 	end
 	local t = {
 		noteChartSetItemsCount = self.noteChartSetItemsCount,
-		noteChartItemsCount = self.noteChartItemsCount,
-		noteChartSlices = self.noteChartSlices,
 		set_id_to_global_offset = self.set_id_to_global_offset,
 		id_to_global_offset = self.id_to_global_offset,
-		id_to_local_offset = self.id_to_local_offset,
 		noteChartSetItems = ffi.string(self.noteChartSetItems, ffi.sizeof(self.noteChartSetItems)),
-		noteChartItems = ffi.string(self.noteChartItems, ffi.sizeof(self.noteChartItems)),
 	}
 	self:unload()
 
 	local dt = math.floor((love.timer.getTime() - time) * 1000)
 	print("query all: " .. dt .. "ms")
-	print(("size: %d + %d bytes"):format(#t.noteChartSetItems, #t.noteChartItems))
+	print(("size: %d bytes"):format(#t.noteChartSetItems))
 	return t
 end)
 
@@ -149,15 +127,10 @@ function CacheDatabase:asyncQueryAll()
 	self.noteChartSetItemsCount = t.noteChartSetItemsCount
 	self.id_to_global_offset = t.id_to_global_offset
 	self.set_id_to_global_offset = t.set_id_to_global_offset
-	self.noteChartItemsCount = t.noteChartItemsCount
-	self.noteChartSlices = t.noteChartSlices
-	self.id_to_local_offset = t.id_to_local_offset
 
 	local size = ffi.sizeof("EntryStruct")
 	self.noteChartSetItems = ffi.new("EntryStruct[?]", #t.noteChartSetItems / size)
-	self.noteChartItems = ffi.new("EntryStruct[?]", #t.noteChartItems / size)
 	ffi.copy(self.noteChartSetItems, t.noteChartSetItems, #t.noteChartSetItems)
-	ffi.copy(self.noteChartItems, t.noteChartItems, #t.noteChartItems)
 end
 
 ---@param t table
@@ -175,10 +148,13 @@ function CacheDatabase:queryNoteChartSets()
 	local columns = table_util.copy(select_columns)
 
 	if params.lamp then
-		local case = ("CASE WHEN %s THEN TRUE ELSE FALSE END __boolean_lamp"):format(
+		local case = ("CASE WHEN %s THEN TRUE ELSE FALSE END"):format(
 			sql_util.bind(sql_util.conditions(params.lamp))
 		)
-		table.insert(columns, case)
+		if params.groupBy then
+			case = ("max(%s)"):format(case)
+		end
+		table.insert(columns, case .. " AS lamp")
 	end
 
 	local options = {
@@ -187,16 +163,20 @@ function CacheDatabase:queryNoteChartSets()
 		order = params.orderBy,
 	}
 
-	local count = self.orm:count("chartset_list", params.where, options)
+	if params.groupBy then
+		columns[4] = "max(scoreId)"
+	end
 
-	local noteChartSets = ffi.new("EntryStruct[?]", count)
+	local objs = self.orm:select("chartset_list", params.where, options)
+	print("count", #objs)
+
+	local noteChartSets = ffi.new("EntryStruct[?]", #objs)
 	local id_to_global_offset = {}
 	local set_id_to_global_offset = {}
 	self.noteChartSetItems = noteChartSets
 	self.id_to_global_offset = id_to_global_offset
 	self.set_id_to_global_offset = set_id_to_global_offset
 
-	local objs = self.orm:select("chartset_list", params.where, options)
 	local c = 0
 	for i, row in ipairs(objs) do
 		local j = i - 1
@@ -210,13 +190,17 @@ function CacheDatabase:queryNoteChartSets()
 	self.noteChartSetItemsCount = c
 end
 
-function CacheDatabase:queryNoteCharts()
+---@param setId number
+---@return rdb.ModelRow[]
+function CacheDatabase:getNoteChartItemsAtSet(setId)
 	local params = self.queryParams
 
-	local columns = table_util.copy(select_columns)
+	local columns = {"*"}
+	local where = table_util.copy(params.where)
+	where.setId = setId
 
 	if params.lamp then
-		local case = ("CASE WHEN %s THEN TRUE ELSE FALSE END __boolean_lamp"):format(
+		local case = ("CASE WHEN %s THEN TRUE ELSE FALSE END lamp"):format(
 			sql_util.bind(sql_util.conditions(params.lamp))
 		)
 		table.insert(columns, case)
@@ -234,78 +218,14 @@ function CacheDatabase:queryNoteCharts()
 		},
 	}
 
-	local count = self.orm:count("chartset_list", params.where, options)
-
-	local noteCharts = ffi.new("EntryStruct[?]", count)
-	local slices = {}
-	local id_to_local_offset = {}
-	self.noteChartItems = noteCharts
-	self.noteChartSlices = slices
-	self.id_to_local_offset = id_to_local_offset
-
-	local objs = self.orm:select("chartset_list", params.where, options)
-
-	local offset = 0
-	local size = 0
-	local setId
-	local c = 0
-	for i, row in ipairs(objs) do
-		local j = i - 1
-		local entry = noteCharts[j]
-		fillObject(entry, row)
-		if setId and setId ~= entry.setId then
-			slices[setId] = {
-				offset = offset,
-				size = size,
-			}
-			offset = j
-		end
-		size = j - offset + 1
-		setId = entry.setId
-		chart_id_to_offset(id_to_local_offset, entry, j - offset)
-		c = c + 1
+	local t = love.timer.getTime()
+	local objs = self.orm:select("chartset_list", where, options)
+	print("getNoteChartItemsAtSet", love.timer.getTime() - t)
+	for _, obj in ipairs(objs) do
+		fillObject(obj, obj)
 	end
 
-	if setId then
-		slices[setId] = {
-			offset = offset,
-			size = size,
-		}
-	end
-
-	self.noteChartItemsCount = c
-end
-
-function CacheDatabase:reassignData()
-	if not self.queryParams.groupBy then
-		return
-	end
-
-	for i = 0, self.noteChartSetItemsCount - 1 do
-		local entry = self.noteChartSetItems[i]
-		local setId = entry.setId
-		local slice = self.noteChartSlices[setId]
-
-		local lastScoreId = 0
-		local currentEntry = entry
-		local lamp = false
-
-		for j = slice.offset, slice.offset + slice.size - 1 do
-			local entry = self.noteChartItems[j]
-			if entry.lamp then
-				lamp = true
-			end
-			if entry.scoreId > lastScoreId then
-				lastScoreId = entry.scoreId
-				currentEntry = entry
-			end
-		end
-
-		entry.noteChartDataId = currentEntry.noteChartDataId
-		entry.noteChartId = currentEntry.noteChartId
-		entry.scoreId = currentEntry.scoreId
-		entry.lamp = lamp
-	end
+	return objs
 end
 
 return CacheDatabase
