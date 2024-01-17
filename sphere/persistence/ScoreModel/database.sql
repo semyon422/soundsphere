@@ -1,7 +1,3 @@
-CREATE TABLE IF NOT EXISTS `info` (
-	`key` NOT NULL PRIMARY KEY,
-	`value` TEXT NOT NULL
-);
 CREATE TABLE IF NOT EXISTS `scores` (
 	`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	`chart_hash` TEXT NOT NULL,
@@ -24,3 +20,5 @@ CREATE TABLE IF NOT EXISTS `scores` (
 	`difficulty` REAL,
 	`pauses` REAL
 );
+CREATE INDEX IF NOT EXISTS scores_chart_hash_index_idx ON scores (`chart_hash`, `chart_hash`);
+CREATE INDEX IF NOT EXISTS scores_is_top_idx ON scores (`is_top`) WHERE is_top = 1;

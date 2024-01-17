@@ -39,7 +39,9 @@ CREATE TABLE IF NOT EXISTS `noteChartSets` (
 
 CREATE INDEX IF NOT EXISTS noteCharts_hash_idx ON noteCharts (`hash`);
 CREATE INDEX IF NOT EXISTS noteCharts_setId_idx ON noteCharts (`setId`);
-CREATE INDEX IF NOT EXISTS noteChartDatas1_idx ON noteChartDatas (`inputMode`, `name`, `difficulty`);
+CREATE INDEX IF NOT EXISTS noteChartDatas_inputMode_idx ON noteChartDatas (`inputMode`);
+CREATE INDEX IF NOT EXISTS noteChartDatas_difficulty_idx ON noteChartDatas (`difficulty`);
+CREATE INDEX IF NOT EXISTS noteChartDatas_name_idx ON noteChartDatas (`name`);
 
 CREATE TEMP VIEW IF NOT EXISTS chartset_list AS 
 
