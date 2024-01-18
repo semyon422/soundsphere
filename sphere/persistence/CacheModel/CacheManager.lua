@@ -1,4 +1,5 @@
 local ChartRepo = require("sphere.persistence.CacheModel.ChartRepo")
+local ChartsDatabase = require("sphere.persistence.CacheModel.ChartsDatabase")
 local NoteChartFinder = require("sphere.persistence.CacheModel.NoteChartFinder")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local NoteChartFactory = require("notechart.NoteChartFactory")
@@ -11,14 +12,23 @@ local sql_util = require("rdb.sql_util")
 ---@operator call: sphere.CacheManager
 local CacheManager = class()
 
-function CacheManager:new()
+function CacheManager:new(cdb)
 	self.log = Log()
 	self.log.console = true
 	self.log.path = "userdata/cache.log"
 
 	self.state = 0
 
-	self.chartRepo = ChartRepo()
+	self.cdb = cdb
+	self.chartRepo = ChartRepo(cdb)
+end
+
+function CacheManager:begin()
+	self.cdb.orm:begin()
+end
+
+function CacheManager:commit()
+	self.cdb.orm:commit()
 end
 
 ---@param entry table
@@ -98,8 +108,8 @@ function CacheManager:checkProgress()
 	if self.noteChartSetCount >= self.countNext then
 		self.countNext = self.countNext + self.countDelta
 
-		self.chartRepo:commit()
-		self.chartRepo:begin()
+		self:commit()
+		self:begin()
 	end
 
 	local thread = require("thread")
@@ -121,15 +131,14 @@ end
 ---@param force boolean?
 function CacheManager:generateCacheFull(path, force)
 	local path = path or "userdata/charts"
-	self.chartRepo:load()
 
 	self:resetProgress()
 	self.state = 1
 	self:checkProgress()
 
-	self.chartRepo:begin()
+	self:begin()
 	self:lookup(path, false)
-	self.chartRepo:commit()
+	self:commit()
 
 	self.state = 2
 	self:checkProgress()
@@ -231,7 +240,7 @@ end
 function CacheManager:generate(path, force)
 	local entries = self.chartRepo:selectNoteChartSets(path)
 
-	self.chartRepo:begin()
+	self:begin()
 	for i = 1, #entries do
 		local status, err = xpcall(function()
 			return self:processNoteChartDataEntries(entries[i], force)
@@ -244,19 +253,19 @@ function CacheManager:generate(path, force)
 		end
 
 		if i % 100 == 0 then
-			self.chartRepo:commit()
-			self.chartRepo:begin()
+			self:commit()
+			self:begin()
 		end
 
 		self.cachePercent = (i - 1) / #entries * 100
 		self:checkProgress()
 
 		if self.needStop then
-			self.chartRepo:commit()
+			self:commit()
 			return
 		end
 	end
-	self.chartRepo:commit()
+	self:commit()
 end
 
 ---@param noteChartSetEntry table

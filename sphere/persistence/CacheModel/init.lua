@@ -2,6 +2,7 @@ local thread = require("thread")
 local class = require("class")
 local CacheDatabase = require("sphere.persistence.CacheModel.CacheDatabase")
 local ChartRepo = require("sphere.persistence.CacheModel.ChartRepo")
+local ChartsDatabase = require("sphere.persistence.CacheModel.ChartsDatabase")
 
 ---@class sphere.CacheModel
 ---@operator call: sphere.CacheModel
@@ -19,11 +20,15 @@ function CacheModel:load()
 	}
 	self.shared = thread.shared.cache
 
-	self.cacheDatabase = CacheDatabase()
-	self.cacheDatabase:load()
+	self.cdb = ChartsDatabase()
+	self.cdb:load()
 
-	self.chartRepo = ChartRepo()
-	self.chartRepo:load()
+	self.cacheDatabase = CacheDatabase(self.cdb)
+	self.chartRepo = ChartRepo(self.cdb)
+end
+
+function CacheModel:unload()
+	self.cdb:unload()
 end
 
 ---@param path string
@@ -47,8 +52,15 @@ end
 
 local updateCacheAsync = thread.async(function(path, force)
 	local CacheManager = require("sphere.persistence.CacheModel.CacheManager")
-	local cacheManager = CacheManager()
+	local ChartsDatabase = require("sphere.persistence.CacheModel.ChartsDatabase")
+
+	local cdb = ChartsDatabase()
+	cdb:load()
+
+	local cacheManager = CacheManager(cdb)
 	cacheManager:generateCacheFull(path, force)
+
+	cdb:unload()
 end)
 
 CacheModel.process = thread.coro(function(self)

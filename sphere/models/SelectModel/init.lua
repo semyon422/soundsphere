@@ -2,6 +2,7 @@ local class = require("class")
 local delay = require("delay")
 local thread = require("thread")
 local path_util = require("path_util")
+local table_util = require("table_util")
 local NoteChartFactory = require("notechart.NoteChartFactory")
 local NoteChartLibrary = require("sphere.models.SelectModel.NoteChartLibrary")
 local NoteChartSetLibrary = require("sphere.models.SelectModel.NoteChartSetLibrary")
@@ -59,45 +60,32 @@ function SelectModel:load()
 end
 
 function SelectModel:updateSetItems()
-	local params = self.cacheModel.cacheDatabase.queryParams
+	local params = {}
 
-	local orderBy, isCollapseAllowed = self.sortModel:getOrder(self.config.sortFunction)
-	local fields = {}
-	for i, field in ipairs(orderBy) do
-		fields[i] = field .. " ASC"
-	end
-	table.insert(fields, "noteChartDataId ASC")
-	params.orderBy = fields
+	local order, group_allowed = self.sortModel:getOrder(self.config.sortFunction)
 
-	if self.config.collapse and isCollapseAllowed then
-		params.groupBy = {"setId"}
-	else
-		params.groupBy = nil
+	params.order = table_util.copy(order)
+	table.insert(params.order, "noteChartDataId")
+
+	if self.config.collapse and group_allowed then
+		params.group = {"setId"}
 	end
 
 	local where, lamp = self.searchModel:getConditions()
-
 	where.path__startswith = self.collectionItem.path .. "/"
 
 	params.where = where
 	params.lamp = lamp
 
-	self.cacheModel.cacheDatabase:asyncQueryAll()
-
+	self.cacheModel.cacheDatabase:queryAsync(params)
 	self.noteChartSetLibrary:updateItems()
 end
 
 ---@param hash string
 ---@param index number
 function SelectModel:findNotechart(hash, index)
-	local params = self.cacheModel.cacheDatabase.queryParams
-
-	params.groupBy = nil
-	params.lamp = nil
-	params.where = ("noteChartDatas.hash = %q AND noteChartDatas.`index` = %d"):format(hash, index)
-
-	self.cacheModel.cacheDatabase:asyncQueryAll()
-
+	local params = {where = {hash = hash, index = index}}
+	self.cacheModel.cacheDatabase:queryAsync(params)
 	self.noteChartSetLibrary:updateItems()
 end
 

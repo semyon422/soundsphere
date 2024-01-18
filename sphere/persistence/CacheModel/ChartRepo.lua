@@ -1,50 +1,11 @@
 local class = require("class")
-local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
-local TableOrm = require("rdb.TableOrm")
-local Models = require("rdb.Models")
-local autoload = require("autoload")
 
 ---@class sphere.ChartRepo
 ---@operator call: sphere.ChartRepo
 local ChartRepo = class()
 
-ChartRepo.dbpath = "userdata/charts.db"
-
-function ChartRepo:load()
-	if self.loaded then
-		return
-	end
-	self.loaded = true
-
-	local db = LjsqliteDatabase()
-	self.db = db
-
-	db:open(self.dbpath)
-	local sql = love.filesystem.read("sphere/persistence/CacheModel/database.sql")
-	db:exec(sql)
-
-	local _models = autoload("sphere.persistence.CacheModel.models")
-	local orm = TableOrm(db)
-	local models = Models(_models, orm)
-
-	self.orm = orm
-	self.models = models
-end
-
-function ChartRepo:unload()
-	if not self.loaded then
-		return
-	end
-	self.loaded = false
-	self.db:close()
-end
-
-function ChartRepo:begin()
-	-- self.db:begin()
-end
-
-function ChartRepo:commit()
-	-- self.db:commit()
+function ChartRepo:new(cdb)
+	self.models = cdb.models
 end
 
 ----------------------------------------------------------------
