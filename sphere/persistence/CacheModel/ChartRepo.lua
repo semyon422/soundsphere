@@ -4,6 +4,7 @@ local class = require("class")
 ---@operator call: sphere.ChartRepo
 local ChartRepo = class()
 
+---@param cdb sphere.ChartsDatabase
 function ChartRepo:new(cdb)
 	self.models = cdb.models
 end

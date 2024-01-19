@@ -1,4 +1,3 @@
-
 local NoteChartFactory = require("notechart.NoteChartFactory")
 local class = require("class")
 
@@ -6,19 +5,28 @@ local class = require("class")
 ---@operator call: sphere.NoteChartFinder
 local NoteChartFinder = class()
 
----@param directoryPath string
----@param recursive boolean
----@param checkSet function
-local function lookup(directoryPath, recursive, checkSet)
-	local items = love.filesystem.getDirectoryItems(directoryPath)
+---@param checkDir function
+---@param checkFile function
+---@param fs table
+function NoteChartFinder:new(checkDir, checkFile, fs)
+	self.checkDir = checkDir
+	self.checkFile = checkFile
+	self.fs = fs
+end
+
+---@param dir string
+function NoteChartFinder:lookupAsync(dir)
+	local items = self.fs.getDirectoryItems(dir)
 
 	local chartPaths = false
-	for _, itemName in ipairs(items) do
-		local path = directoryPath .. "/" .. itemName
-		local info = love.filesystem.getInfo(path)
+	for _, item in ipairs(items) do
+		local path = dir .. "/" .. item
+		local info = self.fs.getInfo(path)
 		if info and info.type == "file" and NoteChartFactory:isRelatedContainer(path) then
 			chartPaths = true
-			coroutine.yield(path, directoryPath)
+			if self.checkFile(path) then
+				coroutine.yield(path, dir)
+			end
 		end
 	end
 	if chartPaths then
@@ -26,34 +34,34 @@ local function lookup(directoryPath, recursive, checkSet)
 	end
 
 	local containerPaths = false
-	for _, itemName in ipairs(items) do
-		local path = directoryPath .. "/" .. itemName
-		local info = love.filesystem.getInfo(path)
-		if info and info.type == "file" and NoteChartFactory:isUnrelatedContainer(path) and checkSet(path) then
+	for _, item in ipairs(items) do
+		local path = dir .. "/" .. item
+		local info = self.fs.getInfo(path)
+		if info and info.type == "file" and NoteChartFactory:isUnrelatedContainer(path) and self.checkFile(path) then
 			containerPaths = true
-			coroutine.yield(path, path)
+			if self.checkFile(path) then
+				coroutine.yield(path, path)
+			end
 		end
 	end
 	if containerPaths then
 		return
 	end
 
-	for _, itemName in ipairs(items) do
-		local path = directoryPath .. "/" .. itemName
-		local info = love.filesystem.getInfo(path)
-		if info and (info.type == "directory" or info.type == "symlink") and (recursive or checkSet(path)) then
-			lookup(path, recursive, checkSet)
+	for _, item in ipairs(items) do
+		local path = dir .. "/" .. item
+		local info = self.fs.getInfo(path)
+		if info and (info.type == "directory" or info.type == "symlink") and self.checkDir(path) then
+			self:lookupAsync(path)
 		end
 	end
 end
 
----@param directoryPath string
----@param recursive boolean
----@param checkSet function
+---@param dir string
 ---@return function
-function NoteChartFinder:newFileIterator(directoryPath, recursive, checkSet)
+function NoteChartFinder:newFileIterator(dir)
 	return coroutine.wrap(function()
-		lookup(directoryPath, recursive, checkSet)
+		self:lookupAsync(dir)
 	end)
 end
 

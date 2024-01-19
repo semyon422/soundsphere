@@ -1,9 +1,7 @@
 local ChartRepo = require("sphere.persistence.CacheModel.ChartRepo")
-local ChartsDatabase = require("sphere.persistence.CacheModel.ChartsDatabase")
 local NoteChartFinder = require("sphere.persistence.CacheModel.NoteChartFinder")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local NoteChartFactory = require("notechart.NoteChartFactory")
-local Log = require("Log")
 local class = require("class")
 local md5 = require("md5")
 local sql_util = require("rdb.sql_util")
@@ -13,14 +11,35 @@ local sql_util = require("rdb.sql_util")
 local CacheManager = class()
 
 function CacheManager:new(cdb)
-	self.log = Log()
-	self.log.console = true
-	self.log.path = "userdata/cache.log"
-
 	self.state = 0
 
 	self.cdb = cdb
 	self.chartRepo = ChartRepo(cdb)
+
+	local function checkDir(path)
+		return self:checkDir(path)
+	end
+	local function checkFile(path)
+		return true
+	end
+
+	self.noteChartFinder = NoteChartFinder(checkDir, checkFile, love.filesystem)
+end
+
+---@param path string
+---@return boolean
+function CacheManager:checkDir(path)
+	local entry = self.chartRepo:selectNoteChartSetEntry(path)
+	if not entry then
+		return true
+	end
+
+	local info = love.filesystem.getInfo(path)
+	if info and entry.lastModified ~= info.modtime then
+		return true
+	end
+
+	return false
 end
 
 function CacheManager:begin()
@@ -31,24 +50,26 @@ function CacheManager:commit()
 	self.cdb.orm:commit()
 end
 
----@param entry table
+---@param path string
+---@param lastModified number
 ---@return table
-function CacheManager:getNoteChartSetEntry(entry)
-	local oldEntry = self.chartRepo:selectNoteChartSetEntry(entry.path)
+function CacheManager:getNoteChartSetEntry(path, lastModified)
+	local oldEntry = self.chartRepo:selectNoteChartSetEntry(path)
 
-	if oldEntry and oldEntry.lastModified == entry.lastModified then
+	if oldEntry and oldEntry.lastModified == lastModified then
 		return oldEntry
 	end
 
 	if not oldEntry then
-		entry = self.chartRepo:insertNoteChartSetEntry(entry)
-	else
-		oldEntry.lastModified = entry.lastModified
-		self.chartRepo:updateNoteChartSetEntry(entry)
-		entry = oldEntry
+		return self.chartRepo:insertNoteChartSetEntry({
+			path = path,
+			lastModified = lastModified,
+		})
 	end
 
-	return entry
+	oldEntry.lastModified = lastModified
+	self.chartRepo:updateNoteChartSetEntry(oldEntry)
+	return oldEntry
 end
 
 ---@param entry table
@@ -152,9 +173,7 @@ end
 ---@param directoryPath string
 ---@param recursive boolean?
 function CacheManager:lookup(directoryPath, recursive)
-	local iterator = NoteChartFinder:newFileIterator(directoryPath, recursive, function(...)
-		return self:checkNoteChartSetEntry(...)
-	end)
+	local iterator = self.noteChartFinder:newFileIterator(directoryPath)
 
 	local noteChartSetPath
 	local noteChartSetEntry
@@ -171,30 +190,11 @@ function CacheManager:lookup(directoryPath, recursive)
 	end
 end
 
----@param path string
----@return boolean
-function CacheManager:checkNoteChartSetEntry(path)
-	local entry = self.chartRepo:selectNoteChartSetEntry(path)
-	if not entry then
-		return true
-	end
-
-	local info = love.filesystem.getInfo(path)
-	if info and entry.lastModified ~= info.modtime then
-		return true
-	end
-
-	return false
-end
-
 ---@param noteChartSetPath string
 ---@return table
 function CacheManager:processNoteChartSet(noteChartSetPath)
 	local info = love.filesystem.getInfo(noteChartSetPath)
-	local noteChartSetEntry = self:getNoteChartSetEntry({
-		path = noteChartSetPath,
-		lastModified = info.modtime
-	})
+	local noteChartSetEntry = self:getNoteChartSetEntry(noteChartSetPath, info.modtime)
 	self.noteChartSetCount = self.noteChartSetCount + 1
 
 	local cachedEntries = self.chartRepo:getNoteChartsAtSet(noteChartSetEntry.id)
@@ -247,9 +247,9 @@ function CacheManager:generate(path, force)
 		end, debug.traceback)
 
 		if not status then
-			self.log:write("error", entries[i].id)
-			self.log:write("error", entries[i].path)
-			self.log:write("error", err)
+			print(entries[i].id)
+			print(entries[i].path)
+			print(err)
 		end
 
 		if i % 100 == 0 then
