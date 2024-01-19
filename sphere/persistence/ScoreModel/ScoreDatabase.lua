@@ -11,7 +11,10 @@ local user_version = 0
 local _models = {}
 local scores = {}
 scores.table_name = "scores"
-scores.types = {}
+scores.types = {
+	is_top = "boolean",
+	const = "boolean",
+}
 scores.relations = {}
 _models.scores = scores
 

@@ -26,16 +26,6 @@ function ScoreModel:transformScoreEntry(score)
 	local s = erfunc.erf(window / (score.accuracy * math.sqrt(2)))
 	score.rating = score.difficulty * s
 	score.score = s * 10000
-	if tonumber(score.is_top) == 1 then
-		score.is_top = true
-	else
-		score.is_top = false
-	end
-	if tonumber(score.const) == 1 then
-		score.const = true
-	else
-		score.const = false
-	end
 end
 
 ---@param hash string
