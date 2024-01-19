@@ -43,36 +43,41 @@ local function get_files()
 	end
 
 	local ncf = NoteChartFinder(checkDir, checkFile, fs)
-	local iterator = ncf:newFileIterator("root")
+	local iterator = ncf:iter("root")
 
 	return items, iterator
 end
 
 local function iter(iterator)
-	local chartset_dirs = {}
-	local chart_files = {}
+	local chartfile_sets = {}
+	local chartfiles = {}
 
-	local _dir
-	for path, dir in iterator do
-		if dir ~= _dir then
-			_dir = dir
-			table.insert(chartset_dirs, dir)
+	for typ, dir, checked_items, all_items in iterator do
+		if typ == "related" then
+			table.insert(chartfile_sets, dir)
+			for _, item in ipairs(checked_items) do
+				table.insert(chartfiles, dir .. "/" .. item)
+			end
+		elseif typ == "unrelated" then
+			for _, item in ipairs(checked_items) do
+				table.insert(chartfile_sets, dir .. "/" .. item)
+				table.insert(chartfiles, dir .. "/" .. item)
+			end
 		end
-		table.insert(chart_files, path)
 	end
 
-	return chartset_dirs, chart_files
+	return chartfile_sets, chartfiles
 end
 
 function test.not_cached(t)
 	local items, iterator = get_files()
-	local chartset_dirs, chart_files = iter(iterator)
+	local chartfile_sets, chartfiles = iter(iterator)
 
-	t:teq(chartset_dirs, {
+	t:teq(chartfile_sets, {
 		"root/rel_charts/chartset",
 		"root/unrel_charts/chart.ojn",
 	})
-	t:teq(chart_files, {
+	t:teq(chartfiles, {
 		"root/rel_charts/chartset/chart.osu",
 		"root/unrel_charts/chart.ojn",
 	})
@@ -83,10 +88,10 @@ function test.chartsets_cached(t)
 	items["root/rel_charts/chartset"].cached = true
 	items["root/unrel_charts/chart.ojn"].cached = true
 
-	local chartset_dirs, chart_files = iter(iterator)
+	local chartfile_sets, chartfiles = iter(iterator)
 
-	t:teq(chartset_dirs, {})
-	t:teq(chart_files, {})
+	t:teq(chartfile_sets, {})
+	t:teq(chartfiles, {})
 end
 
 function test.new_charts(t)
@@ -100,13 +105,13 @@ function test.new_charts(t)
 	items["root/unrel_charts/chart2.ojn"] = {type = "file"}
 	table.insert(items["root/unrel_charts"], "chart2.ojn")
 
-	local chartset_dirs, chart_files = iter(iterator)
+	local chartfile_sets, chartfiles = iter(iterator)
 
-	t:teq(chartset_dirs, {
+	t:teq(chartfile_sets, {
 		"root/rel_charts/chartset",
 		"root/unrel_charts/chart2.ojn",
 	})
-	t:teq(chart_files, {
+	t:teq(chartfiles, {
 		"root/rel_charts/chartset/chart2.osu",
 		"root/unrel_charts/chart2.ojn",
 	})

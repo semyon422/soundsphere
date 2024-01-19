@@ -1,19 +1,23 @@
 CREATE TABLE IF NOT EXISTS `chartfiles` (
 	`id` INTEGER PRIMARY KEY,
-	`path` TEXT NOT NULL UNIQUE,
+	`dir` TEXT NOT NULL,
+	`name` TEXT NOT NULL,
 	`status` INTEGER NOT NULL,
 	`hash` TEXT,
 	`chartfile_set_id` INTEGER,
 	`modified_at` INTEGER,
-	`size` INTEGER
+	`size` INTEGER,
+	UNIQUE(`dir`, `name`)
 );
 
 CREATE TABLE IF NOT EXISTS `chartfile_sets` (
 	`id` INTEGER PRIMARY KEY,
-	`path` TEXT NOT NULL UNIQUE,
+	`dir` TEXT NOT NULL,
+	`name` TEXT NOT NULL,
 	`status` INTEGER NOT NULL DEFAULT 0,
 	`chart_files_count` INTEGER NOT NULL DEFAULT 0,
-	`modified_at` INTEGER NOT NULL
+	`modified_at` INTEGER NOT NULL,
+	UNIQUE(`dir`, `name`)
 );
 
 CREATE TABLE IF NOT EXISTS `charts` (
