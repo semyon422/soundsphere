@@ -1,23 +1,23 @@
-CREATE TABLE IF NOT EXISTS `chart_files` (
-	`id` INTEGER NOT NULL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS `chartfiles` (
+	`id` INTEGER PRIMARY KEY,
 	`path` TEXT NOT NULL UNIQUE,
-	`status` INTEGER,
+	`status` INTEGER NOT NULL,
 	`hash` TEXT,
-	`chartset_dir_id` INTEGER,
+	`chartfile_set_id` INTEGER,
 	`modified_at` INTEGER,
 	`size` INTEGER
 );
 
-CREATE TABLE IF NOT EXISTS `chartset_dirs` (
-	`id` INTEGER NOT NULL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS `chartfile_sets` (
+	`id` INTEGER PRIMARY KEY,
 	`path` TEXT NOT NULL UNIQUE,
-	`status` INTEGER,
-	`chart_files_count` INTEGER,
-	`modified_at` INTEGER
+	`status` INTEGER NOT NULL DEFAULT 0,
+	`chart_files_count` INTEGER NOT NULL DEFAULT 0,
+	`modified_at` INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS `charts` (
-	`id` INTEGER NOT NULL PRIMARY KEY,
+	`id` INTEGER PRIMARY KEY,
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
 	`title` TEXT,
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `charts` (
 );
 
 CREATE TABLE IF NOT EXISTS `chart_difficulty` (
-	`id` INTEGER NOT NULL PRIMARY KEY,
+	`id` INTEGER PRIMARY KEY,
 	`input_mode` TEXT,
 	`notes_count` INTEGER,
 	`long_notes_count` INTEGER,
@@ -66,8 +66,8 @@ CREATE TABLE IF NOT EXISTS `chart_difficulty` (
 	`msd_difficulty_data` REAL
 )
 
-CREATE TABLE IF NOT EXISTS `play_contexts` (
-	`id` INTEGER NOT NULL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS `play_configs` (
+	`id` INTEGER PRIMARY KEY,
 	`modifiers` TEXT,
 	`rate` REAL,
 	`const` INTEGER,
@@ -76,26 +76,26 @@ CREATE TABLE IF NOT EXISTS `play_contexts` (
 )
 
 CREATE TABLE IF NOT EXISTS `chart_play_presets` (
-	`id` INTEGER NOT NULL PRIMARY KEY,
+	`id` INTEGER PRIMARY KEY,
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
-	`play_context_id` INTEGER,
+	`play_config_id` INTEGER,
 	`chart_difficulty_id` INTEGER
 )
 
 CREATE TABLE IF NOT EXISTS `collections` (
-	`id` INTEGER NOT NULL PRIMARY KEY,
+	`id` INTEGER PRIMARY KEY,
 	`name` TEXT
 )
 
 CREATE TABLE IF NOT EXISTS `chart_collections` (
-	`id` INTEGER NOT NULL PRIMARY KEY,
+	`id` INTEGER PRIMARY KEY,
 	`collection_id` INTEGER,
 	`chart_play_preset_id` INTEGER,
 )
 
 CREATE TABLE IF NOT EXISTS `chart_plays` (  -- scores
-	`id` INTEGER NOT NULL PRIMARY KEY,
+	`id` INTEGER PRIMARY KEY,
 	`chart_play_preset_id` INTEGER,
 	`is_top` REAL DEFAULT 0,
 	`time` REAL,
