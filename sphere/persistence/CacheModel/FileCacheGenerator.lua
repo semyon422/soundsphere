@@ -17,37 +17,37 @@ function FileCacheGenerator:lookup(root_dir)
 	local iterator = self.noteChartFinder:iter(root_dir)
 	local chartfile_set
 
-	local typ, dir, item, modtime = iterator()
+	local typ, dir, name, modtime = iterator()
 	while typ do
 		local res
 		if typ == "related_dir" then
-			chartfile_set = self:processChartfileSet(dir, modtime)
+			chartfile_set = self:processChartfileSet(dir, name, modtime)
 		elseif typ == "related" then
-			self:processChartfile(dir .. "/" .. item, chartfile_set.id, modtime)
+			self:processChartfile(dir, name, chartfile_set.id, modtime)
 		elseif typ == "related_all" then
-			self.chartRepo:deleteChartfiles({dir = dir, name__notin = item})
+			self.chartRepo:deleteChartfiles({dir = dir, name__notin = name})
 		elseif typ == "unrelated_dir" then
 		elseif typ == "unrelated" then
-			chartfile_set = self:processChartfileSet(dir .. "/" .. item, modtime)
-			self:processChartfile(dir .. "/" .. item, chartfile_set.id, modtime)
+			chartfile_set = self:processChartfileSet(dir, name, modtime)
+			self:processChartfile(dir, name, chartfile_set.id, modtime)
 		elseif typ == "unrelated_all" then
-			self.chartRepo:deleteChartfiles({dir = dir, name__notin = item})
-			self.chartRepo:deleteChartfileSets({dir = dir, name__notin = item})
+			self.chartRepo:deleteChartfiles({dir = dir, name__notin = name})
+			self.chartRepo:deleteChartfileSets({dir = dir, name__notin = name})
 		elseif typ == "directory_dir" then
 		elseif typ == "directory" then
-			res = self:shouldScan(dir .. "/" .. item, modtime)
+			res = self:shouldScan(dir, name, modtime)
 		elseif typ == "directory_all" then
-			self.chartRepo:deleteChartfileSets({dir = dir, name__notin = item})
+			self.chartRepo:deleteChartfileSets({dir = dir, name__notin = name})
 		end
-		typ, dir, item, modtime = iterator(res)
+		typ, dir, name, modtime = iterator(res)
 	end
 end
 
 ---@param path string
 ---@param modified_at number
 ---@return boolean
-function FileCacheGenerator:shouldScan(path, modified_at)
-	local chartfile_set = self.chartRepo:selectChartfileSet(path)
+function FileCacheGenerator:shouldScan(dir, name, modified_at)
+	local chartfile_set = self.chartRepo:selectChartfileSet(dir, name)
 	if not chartfile_set then
 		return true
 	end
@@ -59,8 +59,8 @@ end
 
 ---@param path string
 ---@return table
-function FileCacheGenerator:processChartfileSet(path, modified_at)
-	local chartfile_set = self.chartRepo:selectChartfileSet(path)
+function FileCacheGenerator:processChartfileSet(dir, name, modified_at)
+	local chartfile_set = self.chartRepo:selectChartfileSet(dir, name)
 
 	if chartfile_set then
 		chartfile_set.modified_at = modified_at
@@ -69,19 +69,21 @@ function FileCacheGenerator:processChartfileSet(path, modified_at)
 	end
 
 	return self.chartRepo:insertChartfileSet({
-		path = path,
+		dir = dir,
+		name = name,
 		modified_at = modified_at,
 	})
 end
 
----@param chartfile_path string
+---@param dir string
 ---@param chartfile_set_id number
-function FileCacheGenerator:processChartfile(chartfile_path, chartfile_set_id, modified_at)
-	local chartfile = self.chartRepo:selectChartfile(chartfile_path)
+function FileCacheGenerator:processChartfile(dir, name, chartfile_set_id, modified_at)
+	local chartfile = self.chartRepo:selectChartfile(dir, name)
 
 	if not chartfile then
 		self.chartRepo:insertChartfile({
-			path = chartfile_path,
+			dir = dir,
+			name = name,
 			modified_at = modified_at,
 			chartfile_set_id = chartfile_set_id,
 		})

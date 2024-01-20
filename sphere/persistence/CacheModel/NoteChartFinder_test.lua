@@ -48,22 +48,26 @@ local function iter(items, iterator)
 
 	local typ, dir, item, modtime = iterator()
 	while typ do
+		local path
+		if type(item) == "string" then
+			path = dir .. "/" .. item
+		end
 		local res
 		if typ == "related_dir" then
-			table.insert(chartfile_sets, dir)
+			table.insert(chartfile_sets, path)
 		elseif typ == "related" then
-			if not items[dir .. "/" .. item].cached then
-				table.insert(chartfiles, dir .. "/" .. item)
+			if not items[path].cached then
+				table.insert(chartfiles, path)
 			end
 		elseif typ == "unrelated_dir" then
 		elseif typ == "unrelated" then
-			if not items[dir .. "/" .. item].cached then
-				table.insert(chartfile_sets, dir .. "/" .. item)
-				table.insert(chartfiles, dir .. "/" .. item)
+			if not items[path].cached then
+				table.insert(chartfile_sets, path)
+				table.insert(chartfiles, path)
 			end
 		elseif typ == "directory_dir" then
 		elseif typ == "directory" then
-			res = not items[dir .. "/" .. item].cached
+			res = not items[path].cached
 		end
 		typ, dir, item, modtime = iterator(res)
 	end
