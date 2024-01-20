@@ -11,7 +11,6 @@ local BackgroundModel = class()
 BackgroundModel.alpha = 0
 
 function BackgroundModel:load()
-	self.noteChartDataEntryId = 0
 	self.path = ""
 
 	self.emptyImage = gfx_util.newPixel(0.25, 0.25, 0.25, 1)

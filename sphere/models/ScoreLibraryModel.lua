@@ -127,9 +127,9 @@ function ScoreLibraryModel:updateItemsLocal()
 	self.scoreSourceName = "local"
 end
 
----@param scoreEntryId number
+---@param score_id number
 ---@return number
-function ScoreLibraryModel:getItemIndex(scoreEntryId)
+function ScoreLibraryModel:getItemIndex(score_id)
 	local items = self.items
 
 	if not items then
@@ -138,7 +138,7 @@ function ScoreLibraryModel:getItemIndex(scoreEntryId)
 
 	for i = 1, #items do
 		local item = items[i]
-		if item.id == scoreEntryId then
+		if item.id == score_id then
 			return i
 		end
 	end

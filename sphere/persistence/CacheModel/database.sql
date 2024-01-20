@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `chartmetas` (
 	`name` TEXT,
 	`creator` TEXT,
 	`level` REAL,
-	`input_mode` TEXT,
+	`inputmode` TEXT,
 	`source` TEXT,
 	`tags` TEXT,
 	`audio` TEXT,
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `chartmetas` (
 
 CREATE INDEX IF NOT EXISTS chartfiles_hash_idx ON chartfiles (`hash`);
 CREATE INDEX IF NOT EXISTS chartfiles_set_id_idx ON chartfiles (`set_id`);
-CREATE INDEX IF NOT EXISTS chartmetas_input_mode_idx ON chartmetas (`input_mode`);
+CREATE INDEX IF NOT EXISTS chartmetas_inputmode_idx ON chartmetas (`inputmode`);
 CREATE INDEX IF NOT EXISTS chartmetas_name_idx ON chartmetas (`name`);
 
 CREATE TEMP VIEW IF NOT EXISTS chartset_list AS
@@ -65,7 +65,7 @@ SELECT
 chartmetas.id AS chartmeta_id,
 chartfiles.id AS chartfile_id,
 scores.id AS score_id,
-chartfiles.set_id,
+chartfiles.set_id AS chartfile_set_id,
 chartfiles.dir || "/" || chartfiles.name as path,
 scores.accuracy,
 scores.miss,

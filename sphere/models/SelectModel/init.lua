@@ -65,10 +65,10 @@ function SelectModel:updateSetItems()
 	local order, group_allowed = self.sortModel:getOrder(self.config.sortFunction)
 
 	params.order = table_util.copy(order)
-	table.insert(params.order, "noteChartDataId")
+	table.insert(params.order, "chartmeta_id")
 
 	if self.config.collapse and group_allowed then
-		params.group = {"setId"}
+		params.group = {"chartfile_set_id"}
 	end
 
 	local where, lamp = self.searchModel:getConditions()
@@ -238,9 +238,9 @@ end
 
 ---@param item table
 function SelectModel:setConfig(item)
-	self.config.noteChartSetEntryId = item.setId
-	self.config.noteChartEntryId = item.noteChartId
-	self.config.noteChartDataEntryId = item.noteChartDataId
+	self.config.chartfile_set_id = item.chartfile_set_id
+	self.config.chartfile_id = item.chartfile_id
+	self.config.chartmeta_id = item.chartmeta_id
 end
 
 ---@param direction number?
@@ -260,7 +260,7 @@ function SelectModel:scrollNoteChartSet(direction, destination)
 	self.noteChartSetItem = noteChartSetItem
 	self:setConfig(noteChartSetItem)
 
-	self:pullNoteChart(oldNoteChartSetItem and oldNoteChartSetItem.setId == noteChartSetItem.setId)
+	self:pullNoteChart(oldNoteChartSetItem and oldNoteChartSetItem.chartfile_set_id == noteChartSetItem.chartfile_set_id)
 end
 
 ---@param direction number?
@@ -300,7 +300,7 @@ function SelectModel:scrollScore(direction, destination)
 	local scoreItem = scoreItems[self.scoreItemIndex]
 	self.scoreItem = scoreItem
 
-	self.config.scoreEntryId = scoreItem.id
+	self.config.score_id = scoreItem.id
 end
 
 ---@param noUpdate boolean?
@@ -318,9 +318,9 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 
 	local noteChartSetItems = self.noteChartSetLibrary.items
 	self.noteChartSetItemIndex = self.noteChartSetLibrary:getItemIndex(
-		self.config.noteChartEntryId,
-		self.config.noteChartDataEntryId,
-		self.config.noteChartSetEntryId
+		self.config.chartfile_id,
+		self.config.chartmeta_id,
+		self.config.chartfile_set_id
 	)
 
 	if not noUpdate then
@@ -330,7 +330,7 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 	local noteChartSetItem = noteChartSetItems[self.noteChartSetItemIndex]
 	self.noteChartSetItem = noteChartSetItem
 	if noteChartSetItem then
-		self.config.noteChartSetEntryId = noteChartSetItem.setId
+		self.config.chartfile_set_id = noteChartSetItem.chartfile_set_id
 		self.pullingNoteChartSet = false
 		if not noPullNext then
 			self:pullNoteChart(noUpdate)
@@ -338,9 +338,9 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 		return
 	end
 
-	self.config.noteChartSetEntryId = 0
-	self.config.noteChartEntryId = 0
-	self.config.noteChartDataEntryId = 0
+	self.config.chartfile_set_id = 0
+	self.config.chartfile_id = 0
+	self.config.chartmeta_id = 0
 
 	self.noteChartItem = nil
 	self.scoreItem = nil
@@ -357,12 +357,12 @@ end
 function SelectModel:pullNoteChart(noUpdate, noPullNext)
 	local oldId = self.noteChartItem and self.noteChartItem.id
 
-	self.noteChartLibrary:setNoteChartSetId(self.config.noteChartSetEntryId)
+	self.noteChartLibrary:setNoteChartSetId(self.config.chartfile_set_id)
 
 	local noteChartItems = self.noteChartLibrary.items
 	self.noteChartItemIndex = self.noteChartLibrary:getItemIndex(
-		self.config.noteChartEntryId,
-		self.config.noteChartDataEntryId
+		self.config.chartfile_id,
+		self.config.chartmeta_id
 	)
 
 	if not noUpdate then
@@ -373,16 +373,16 @@ function SelectModel:pullNoteChart(noUpdate, noPullNext)
 	self.changed = true
 
 	if noteChartItem then
-		self.config.noteChartEntryId = noteChartItem.noteChartId
-		self.config.noteChartDataEntryId = noteChartItem.noteChartDataId
+		self.config.chartfile_id = noteChartItem.chartfile_id
+		self.config.chartmeta_id = noteChartItem.chartmeta_id
 		if not noPullNext then
 			self:pullScore(oldId and oldId == noteChartItem.id)
 		end
 		return
 	end
 
-	self.config.noteChartEntryId = 0
-	self.config.noteChartDataEntryId = 0
+	self.config.chartfile_id = 0
+	self.config.chartmeta_id = 0
 
 	self.scoreItem = nil
 
@@ -398,12 +398,12 @@ SelectModel.updateScoreOnline = thread.coro(SelectModel.updateScoreOnlineAsync)
 
 function SelectModel:findScore()
 	local scoreItems = self.scoreLibraryModel.items
-	self.scoreItemIndex = self.scoreLibraryModel:getItemIndex(self.config.scoreEntryId) or 1
+	self.scoreItemIndex = self.scoreLibraryModel:getItemIndex(self.config.score_id) or 1
 
 	local scoreItem = scoreItems[self.scoreItemIndex]
 	self.scoreItem = scoreItem
 	if scoreItem then
-		self.config.scoreEntryId = scoreItem.id
+		self.config.score_id = scoreItem.id
 	end
 end
 

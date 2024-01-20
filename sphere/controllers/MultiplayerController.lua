@@ -65,9 +65,9 @@ MultiplayerController.findNotechart = remote.wrap(function(self)
 	local item = items[1]
 	if item then
 		mpModel.noteChartItem = {
-			setId = item.setId,
-			noteChartId = item.noteChartId,
-			noteChartDataId = item.noteChartDataId,
+			chartfile_set_id = item.chartfile_set_id,
+			chartfile_id = item.chartfile_id,
+			chartmeta_id = item.chartmeta_id,
 		}
 		selectModel:setConfig(item)
 		selectModel:pullNoteChartSet(true)
@@ -75,9 +75,9 @@ MultiplayerController.findNotechart = remote.wrap(function(self)
 		return
 	end
 	selectModel:setConfig({
-		setId = 0,
-		noteChartId = 0,
-		noteChartDataId = 0,
+		chartfile_set_id = 0,
+		chartfile_id = 0,
+		chartmeta_id = 0,
 	})
 	mpModel.noteChartItem = nil
 	selectModel:pullNoteChartSet(true)

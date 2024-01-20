@@ -217,9 +217,9 @@ MultiplayerModel.pushNotechart = remote.wrap(function(self)
 	end
 
 	self.noteChartItem = {
-		setId = nc.setId,
-		noteChartId = nc.noteChartId,
-		noteChartDataId = nc.noteChartDataId,
+		chartfile_set_id = nc.chartfile_set_id,
+		chartfile_id = nc.chartfile_id,
+		chartmeta_id = nc.chartmeta_id,
 	}
 	self.notechart = {
 		hash = nc.hash,

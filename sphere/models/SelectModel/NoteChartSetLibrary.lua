@@ -31,13 +31,13 @@ end
 function NoteChartSetLibrary:loadObject(itemIndex)
 	local chartRepo = self.cacheModel.chartRepo
 	local entry = self.cacheModel.cacheDatabase.noteChartSetItems[itemIndex - 1]
-	local noteChart = chartRepo:selectNoteChartEntryById(entry.noteChartId)
-	local noteChartData = chartRepo:selectNoteChartDataEntryById(entry.noteChartDataId)
+	local noteChart = chartRepo:selectNoteChartEntryById(entry.chartfile_id)
+	local noteChartData = chartRepo:selectNoteChartDataEntryById(entry.chartmeta_id)
 
 	local item = {
-		noteChartDataId = entry.noteChartDataId,
-		noteChartId = entry.noteChartId,
-		setId = entry.setId,
+		chartmeta_id = entry.chartmeta_id,
+		chartfile_id = entry.chartfile_id,
+		chartfile_set_id = entry.chartfile_set_id,
 		lamp = entry.lamp,
 		itemIndex = itemIndex,
 	}
@@ -53,14 +53,14 @@ function NoteChartSetLibrary:updateItems()
 	self.cache:new()
 end
 
----@param noteChartId number?
----@param noteChartDataId number?
+---@param chartfile_id number?
+---@param chartmeta_id number?
 ---@param noteChartSetId number?
 ---@return number
-function NoteChartSetLibrary:getItemIndex(noteChartId, noteChartDataId, noteChartSetId)
+function NoteChartSetLibrary:getItemIndex(chartfile_id, chartmeta_id, noteChartSetId)
 	local cdb = self.cacheModel.cacheDatabase
 	local ids = cdb.id_to_global_offset
-	return (ids[noteChartId] and ids[noteChartId][noteChartDataId] or
+	return (ids[chartfile_id] and ids[chartfile_id][chartmeta_id] or
 		cdb.set_id_to_global_offset[noteChartSetId] or 0) + 1
 end
 

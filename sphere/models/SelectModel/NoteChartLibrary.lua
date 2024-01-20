@@ -6,7 +6,7 @@ local table_util = require("table_util")
 ---@operator call: sphere.NoteChartLibrary
 local NoteChartLibrary = class()
 
-NoteChartLibrary.setId = 0
+NoteChartLibrary.set_id = 0
 NoteChartLibrary.itemsCount = 0
 
 function NoteChartLibrary:new()
@@ -17,21 +17,21 @@ function NoteChartLibrary:clear()
 	self.items = {}
 end
 
----@param setId number
-function NoteChartLibrary:setNoteChartSetId(setId)
-	if setId == self.setId then
+---@param set_id number
+function NoteChartLibrary:setNoteChartSetId(set_id)
+	if set_id == self.set_id then
 		return
 	end
-	self.setId = setId
-	self.items = self.cacheModel.cacheDatabase:getNoteChartItemsAtSet(setId)
+	self.set_id = set_id
+	self.items = self.cacheModel.cacheDatabase:getNoteChartItemsAtSet(set_id)
 end
 
----@param noteChartId number?
----@param noteChartDataId number?
+---@param chartfile_id number?
+---@param chartmeta_id number?
 ---@return number
-function NoteChartLibrary:getItemIndex(noteChartId, noteChartDataId)
+function NoteChartLibrary:getItemIndex(chartfile_id, chartmeta_id)
 	for i, chart in ipairs(self.items) do
-		if chart.noteChartId == noteChartId and chart.noteChartDataId == noteChartDataId then
+		if chart.chartfile_id == chartfile_id and chart.chartmeta_id == chartmeta_id then
 			return i
 		end
 	end

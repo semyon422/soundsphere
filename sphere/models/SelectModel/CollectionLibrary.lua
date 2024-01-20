@@ -19,8 +19,8 @@ function CollectionLibrary:load()
 	local basePath = self.basePath
 
 	local dict = {}
-	for _, chartSetData in ipairs(self.cacheModel.chartRepo:selectNoteChartSets(self.basePath)) do
-		local parent = chartSetData.path:match("^(.+)/.-$")
+	for _, chartSetData in ipairs(self.cacheModel.chartRepo:selectChartfileSetsAtPath(self.basePath)) do
+		local parent = chartSetData.dir
 		dict[parent] = (dict[parent] or 0) + 1
 	end
 

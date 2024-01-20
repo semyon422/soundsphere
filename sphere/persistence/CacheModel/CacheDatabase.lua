@@ -22,10 +22,10 @@ end
 
 ffi.cdef([[
 	typedef struct {
-		int32_t noteChartDataId;
-		int32_t noteChartId;
-		int32_t setId;
-		int32_t scoreId;
+		int32_t chartmeta_id;
+		int32_t chartfile_id;
+		int32_t chartfile_set_id;
+		int32_t score_id;
 		bool lamp;
 	} EntryStruct
 ]])
@@ -84,7 +84,7 @@ end
 ---@param entry table
 ---@param offset number
 local function chart_id_to_offset(t, entry, offset)
-	local c, d = entry.noteChartId, entry.noteChartDataId
+	local c, d = entry.chartfile_id, entry.chartmeta_id
 	t[c] = t[c] or {}
 	t[c][d] = offset
 end
@@ -93,10 +93,10 @@ function CacheDatabase:queryNoteChartSets()
 	local params = self.queryParams
 
 	local columns = {
-		"noteChartDataId",
-		"noteChartId",
-		"setId",
-		"scoreId",
+		"chartmeta_id",
+		"chartfile_id",
+		"chartfile_set_id",
+		"score_id",
 	}
 
 	if params.lamp then
@@ -116,7 +116,7 @@ function CacheDatabase:queryNoteChartSets()
 	}
 
 	if params.group then
-		columns[4] = "max(scoreId)"
+		columns[4] = "max(score_id)"
 	end
 
 	local objs = self.models.chartset_list:select(params.where, options)
@@ -133,12 +133,12 @@ function CacheDatabase:queryNoteChartSets()
 	for i, row in ipairs(objs) do
 		local j = i - 1
 		local entry = noteChartSets[j]
-		entry.noteChartDataId = row.noteChartDataId
-		entry.noteChartId = row.noteChartId
-		entry.setId = row.setId
-		entry.scoreId = row.scoreId or 0
+		entry.chartmeta_id = row.chartmeta_id
+		entry.chartfile_id = row.chartfile_id
+		entry.chartfile_set_id = row.chartfile_set_id
+		entry.score_id = row.score_id or 0
 		entry.lamp = row.lamp
-		set_id_to_global_offset[entry.setId] = j
+		set_id_to_global_offset[entry.chartfile_set_id] = j
 		chart_id_to_offset(id_to_global_offset, entry, j)
 		c = c + 1
 	end
@@ -146,14 +146,14 @@ function CacheDatabase:queryNoteChartSets()
 	self.noteChartSetItemsCount = c
 end
 
----@param setId number
+---@param chartfile_set_id number
 ---@return rdb.ModelRow[]
-function CacheDatabase:getNoteChartItemsAtSet(setId)
+function CacheDatabase:getNoteChartItemsAtSet(chartfile_set_id)
 	local params = self.queryParams
 
 	local columns = {"*"}
 	local where = table_util.copy(params.where)
-	where.setId = setId
+	where.chartfile_set_id = chartfile_set_id
 
 	if params.lamp then
 		local case = ("CASE WHEN %s THEN TRUE ELSE FALSE END lamp"):format(
@@ -165,12 +165,11 @@ function CacheDatabase:getNoteChartItemsAtSet(setId)
 	local options = {
 		columns = columns,
 		order = {
-			"setId",
-			"length(inputMode)",
-			"inputMode",
+			"length(inputmode)",
+			"inputmode",
 			"difficulty",
 			"name",
-			"noteChartDataId",
+			"chartmeta_id",
 		},
 	}
 

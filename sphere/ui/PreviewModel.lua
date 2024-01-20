@@ -12,7 +12,6 @@ function PreviewModel:new(configModel)
 end
 
 function PreviewModel:load()
-	self.noteChartDataEntryId = 0
 	self.audioPath = ""
 	self.previewTime = 0
 	self.volume = 0

@@ -12,7 +12,7 @@ function SortModel:getOrder(name)
 	return unpack(order)
 end
 
--- 2nd value = isCollapseAllowed (group by setId)
+-- 2nd value = isCollapseAllowed (group by chartfile_set_id)
 SortModel.orders = {
 	id = {{}, true},
 	title = {{"title", "artist"}, true},
@@ -21,7 +21,7 @@ SortModel.orders = {
 	level = {{"level"}, false},
 	length = {{"length"}, false},
 	bpm = {{"bpm"}, false},
-	["played top"] = {{"scoreId"}, false},
+	["played top"] = {{"score_id"}, false},
 }
 
 SortModel.name = "title"

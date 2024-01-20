@@ -129,7 +129,7 @@ function SearchModel:transformSearchString(s, cond)
 	for _, _s in ipairs(s:split(" ")) do
 		local key, operator, value = _s:match("^(.-)([=><~!]+)(.+)$")
 		if _s == "!" or _s == "~" then
-			cond.scoreId__isnull = true
+			cond.score_id__isnull = true
 		elseif key and operators[operator] then
 			local config = fields_map[key]
 			operator = operators[operator]
