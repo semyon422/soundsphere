@@ -9,6 +9,9 @@ CREATE TABLE IF NOT EXISTS `chartfiles` (
 	UNIQUE(`dir`, `name`)
 );
 
+CREATE INDEX IF NOT EXISTS chartfiles_hash_idx ON chartfiles (`hash`);
+CREATE INDEX IF NOT EXISTS chartfiles_set_id_idx ON chartfiles (`set_id`);
+
 CREATE TABLE IF NOT EXISTS `chartfile_sets` (
 	`id` INTEGER PRIMARY KEY,
 	`dir` TEXT NOT NULL,
@@ -54,23 +57,60 @@ CREATE TABLE IF NOT EXISTS `chartmetas` (
 	`chart_preview` TEXT
 );
 
-CREATE INDEX IF NOT EXISTS chartfiles_hash_idx ON chartfiles (`hash`);
-CREATE INDEX IF NOT EXISTS chartfiles_set_id_idx ON chartfiles (`set_id`);
 CREATE INDEX IF NOT EXISTS chartmetas_inputmode_idx ON chartmetas (`inputmode`);
 CREATE INDEX IF NOT EXISTS chartmetas_name_idx ON chartmetas (`name`);
 
-CREATE TEMP VIEW IF NOT EXISTS chartset_list AS
+CREATE TABLE IF NOT EXISTS `chart_difficulty` (
+	`id` INTEGER PRIMARY KEY,
+	`inputmode` TEXT,
+	`notes_count` INTEGER,
+	`long_notes_count` INTEGER,
+	`density_data` TEXT,
+	`sv_data` TEXT,
+	`enps_difficulty` REAL,
+	`osu_difficulty` REAL,
+	`msd_difficulty` REAL,
+	`msd_difficulty_data` TEXT
+)
 
+CREATE TABLE IF NOT EXISTS `play_configs` (
+	`id` INTEGER PRIMARY KEY,
+	`modifiers` TEXT,
+	`rate` REAL,
+	`const` INTEGER,
+	`timings` TEXT,
+	`single` INTEGER
+)
+
+CREATE TABLE IF NOT EXISTS `chart_play_presets` (
+	`id` INTEGER PRIMARY KEY,
+	`hash` TEXT NOT NULL,
+	`index` INTEGER NOT NULL,
+	`play_config_id` INTEGER,
+	`chart_difficulty_id` INTEGER
+)
+
+CREATE TABLE IF NOT EXISTS `collections` (
+	`id` INTEGER PRIMARY KEY,
+	`name` TEXT
+)
+
+CREATE TABLE IF NOT EXISTS `chart_collections` (
+	`id` INTEGER PRIMARY KEY,
+	`collection_id` INTEGER,
+	`chart_play_preset_id` INTEGER,
+)
+
+CREATE TEMP VIEW IF NOT EXISTS chartset_list AS
 SELECT
 chartmetas.id AS chartmeta_id,
 chartfiles.id AS chartfile_id,
 scores.id AS score_id,
 chartfiles.set_id AS chartfile_set_id,
-chartfiles.dir || "/" || chartfiles.name as path,
+chartfiles.dir || "/" || chartfiles.name AS path,
 scores.accuracy,
 scores.miss,
 chartmetas.*
-
 FROM chartmetas
 INNER JOIN chartfiles ON chartmetas.hash = chartfiles.hash
 LEFT JOIN scores ON
