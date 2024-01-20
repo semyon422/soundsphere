@@ -28,12 +28,6 @@ local function get_files()
 			type = "file",
 		},
 	}
-	local function checkDir(path)
-		return not items[path].cached
-	end
-	local function checkFile(path)
-		return not items[path].cached
-	end
 	local fs = {}
 	function fs.getDirectoryItems(path)
 		return items[path]
@@ -42,28 +36,36 @@ local function get_files()
 		return items[path]
 	end
 
-	local ncf = NoteChartFinder(checkDir, checkFile, fs)
+	local ncf = NoteChartFinder(fs)
 	local iterator = ncf:iter("root")
 
 	return items, iterator
 end
 
-local function iter(iterator)
+local function iter(items, iterator)
 	local chartfile_sets = {}
 	local chartfiles = {}
 
-	for typ, dir, checked_items, all_items in iterator do
-		if typ == "related" then
+	local typ, dir, item, modtime = iterator()
+	while typ do
+		local res
+		if typ == "related_dir" then
 			table.insert(chartfile_sets, dir)
-			for _, item in ipairs(checked_items) do
+		elseif typ == "related" then
+			if not items[dir .. "/" .. item].cached then
 				table.insert(chartfiles, dir .. "/" .. item)
 			end
+		elseif typ == "unrelated_dir" then
 		elseif typ == "unrelated" then
-			for _, item in ipairs(checked_items) do
+			if not items[dir .. "/" .. item].cached then
 				table.insert(chartfile_sets, dir .. "/" .. item)
 				table.insert(chartfiles, dir .. "/" .. item)
 			end
+		elseif typ == "directory_dir" then
+		elseif typ == "directory" then
+			res = not items[dir .. "/" .. item].cached
 		end
+		typ, dir, item, modtime = iterator(res)
 	end
 
 	return chartfile_sets, chartfiles
@@ -71,7 +73,7 @@ end
 
 function test.not_cached(t)
 	local items, iterator = get_files()
-	local chartfile_sets, chartfiles = iter(iterator)
+	local chartfile_sets, chartfiles = iter(items, iterator)
 
 	t:teq(chartfile_sets, {
 		"root/rel_charts/chartset",
@@ -88,7 +90,7 @@ function test.chartsets_cached(t)
 	items["root/rel_charts/chartset"].cached = true
 	items["root/unrel_charts/chart.ojn"].cached = true
 
-	local chartfile_sets, chartfiles = iter(iterator)
+	local chartfile_sets, chartfiles = iter(items, iterator)
 
 	t:teq(chartfile_sets, {})
 	t:teq(chartfiles, {})
@@ -105,7 +107,7 @@ function test.new_charts(t)
 	items["root/unrel_charts/chart2.ojn"] = {type = "file"}
 	table.insert(items["root/unrel_charts"], "chart2.ojn")
 
-	local chartfile_sets, chartfiles = iter(iterator)
+	local chartfile_sets, chartfiles = iter(items, iterator)
 
 	t:teq(chartfile_sets, {
 		"root/rel_charts/chartset",

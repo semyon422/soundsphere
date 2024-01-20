@@ -5,36 +5,33 @@ local class = require("class")
 ---@operator call: sphere.NoteChartFinder
 local NoteChartFinder = class()
 
----@param checkDir function
----@param checkFile function
 ---@param fs table
-function NoteChartFinder:new(checkDir, checkFile, fs)
-	self.checkDir = checkDir
-	self.checkFile = checkFile
+function NoteChartFinder:new(fs)
 	self.fs = fs
 end
 
 ---@param dir string
 function NoteChartFinder:lookupAsync(dir)
 	local items = self.fs.getDirectoryItems(dir)
+	local dir_info = self.fs.getInfo(dir)
 
 	local all_items = {}
-	local checked_items = {}
 
 	local chartPaths = false
 	for _, item in ipairs(items) do
 		local path = dir .. "/" .. item
 		local info = self.fs.getInfo(path)
 		if info and info.type == "file" and NoteChartFactory:isRelatedContainer(path) then
-			chartPaths = true
-			if self.checkFile(path) then
-				table.insert(checked_items, item)
+			if not chartPaths then
+				chartPaths = true
+				coroutine.yield("related_dir", dir, nil, dir_info.modtime)
 			end
+			coroutine.yield("related", dir, item, info.modtime)
 			table.insert(all_items, item)
 		end
 	end
 	if chartPaths then
-		coroutine.yield("related", dir, checked_items, all_items)
+		coroutine.yield("related_all", dir, all_items, dir_info.modtime)
 		return
 	end
 
@@ -42,31 +39,35 @@ function NoteChartFinder:lookupAsync(dir)
 	for _, item in ipairs(items) do
 		local path = dir .. "/" .. item
 		local info = self.fs.getInfo(path)
-		if info and info.type == "file" and NoteChartFactory:isUnrelatedContainer(path) and self.checkFile(path) then
-			containerPaths = true
-			if self.checkFile(path) then
-				table.insert(checked_items, item)
+		if info and info.type == "file" and NoteChartFactory:isUnrelatedContainer(path) then
+			if not containerPaths then
+				containerPaths = true
+				coroutine.yield("unrelated_dir", dir, nil, dir_info.modtime)
 			end
+			coroutine.yield("unrelated", dir, item, info.modtime)
 			table.insert(all_items, item)
 		end
 	end
 	if containerPaths then
-		coroutine.yield("unrelated", dir, checked_items, all_items)
+		coroutine.yield("unrelated_all", dir, all_items, dir_info.modtime)
 		return
 	end
 
+	coroutine.yield("directory_dir", dir, nil, dir_info.modtime)
+
+	local checked_items = {}
 	for _, item in ipairs(items) do
 		local path = dir .. "/" .. item
 		local info = self.fs.getInfo(path)
 		if info and (info.type == "directory" or info.type == "symlink") then
-			if self.checkDir(path) then
+			if coroutine.yield("directory", dir, item, info.modtime) then
 				table.insert(checked_items, item)
 			end
 			table.insert(all_items, item)
 		end
 	end
 
-	coroutine.yield("directories", dir, checked_items, all_items)
+	coroutine.yield("directory_all", dir, all_items, dir_info.modtime)
 
 	for _, item in ipairs(checked_items) do
 		self:lookupAsync(dir .. "/" .. item)
