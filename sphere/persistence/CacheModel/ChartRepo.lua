@@ -11,104 +11,107 @@ end
 
 ----------------------------------------------------------------
 
----@param entry table
-function ChartRepo:insertNoteChartEntry(entry)
-	self.models.noteCharts:create(entry, true)
+---@param dir string
+---@param name string
+---@return table?
+function ChartRepo:selectChartfileSet(dir, name)
+	return self.models.chartfile_sets:find({dir = assert(dir), name = assert(name)})
 end
 
----@param entry table
-function ChartRepo:updateNoteChartEntry(entry)
-	self.models.noteCharts:update(entry, {path = entry.path})
+---@param chartfile_set table
+---@return table?
+function ChartRepo:insertChartfileSet(chartfile_set)
+	return self.models.chartfile_sets:create(chartfile_set)
 end
 
----@param path string
----@return rdb.ModelRow?
-function ChartRepo:selectNoteChartEntry(path)
-	return self.models.noteCharts:find({path = path})
+---@param chartfile_set table
+function ChartRepo:updateChartfileSet(chartfile_set)
+	self.models.chartfile_sets:update(chartfile_set, {id = assert(chartfile_set.id)})
 end
 
----@param id number
----@return rdb.ModelRow?
-function ChartRepo:selectNoteChartEntryById(id)
-	return self.models.noteCharts:find({id = id})
-end
-
----@param path string
-function ChartRepo:deleteNoteChartEntry(path)
-	self.models.noteCharts:delete({path = path})
-end
-
----@param setId number
----@return rdb.ModelRow[]
-function ChartRepo:getNoteChartsAtSet(setId)
-	return self.models.noteCharts:select({setId = setId})
-end
-
----@param hashes table
----@return rdb.ModelRow[]
-function ChartRepo:getNoteChartsByHashes(hashes)
-	return self.models.noteCharts:select({hash__in = hashes})
-end
-
-----------------------------------------------------------------
-
----@param entry table
----@return rdb.ModelRow?
-function ChartRepo:insertNoteChartSetEntry(entry)
-	return self.models.noteChartSets:create(entry, true)
-end
-
----@param entry table
-function ChartRepo:updateNoteChartSetEntry(entry)
-	self.models.noteChartSets:update(entry, {path = entry.path})
-end
-
----@param path string
----@return rdb.ModelRow?
-function ChartRepo:selectNoteChartSetEntry(path)
-	return self.models.noteChartSets:find({path = path})
+---@param conds table
+function ChartRepo:deleteChartfileSets(conds)
+	self.models.chartfile_sets:delete(conds)
 end
 
 ---@param id number
----@return rdb.ModelRow?
-function ChartRepo:selectNoteChartSetEntryById(id)
-	return self.models.noteChartSets:find({id = id})
+---@return table?
+function ChartRepo:selectChartfileSetById(id)
+	return self.models.chartfile_sets:find({id = assert(id)})
 end
 
----@param path string
-function ChartRepo:deleteNoteChartSetEntry(path)
-	self.models.noteChartSets:delete({path = path})
+--------------------------------------------------------------------------------
+
+---@param dir string
+---@param name string
+---@return table?
+function ChartRepo:selectChartfile(dir, name)
+	return self.models.chartfiles:find({dir = assert(dir), name = assert(name)})
 end
 
----@param path string
----@return rdb.ModelRow[]
-function ChartRepo:selectNoteChartSets(path)
-	return self.models.noteChartSets:select({path__startswith = path})
+---@param chartfile table
+---@return table?
+function ChartRepo:insertChartfile(chartfile)
+	return self.models.chartfiles:create(chartfile)
 end
 
-----------------------------------------------------------------
-
----@param entry table
-function ChartRepo:insertNoteChartDataEntry(entry)
-	self.models.noteChartDatas:create(entry, true)
+---@param chartfile table
+function ChartRepo:updateChartfile(chartfile)
+	self.models.chartfiles:update(chartfile, {id = assert(chartfile.id)})
 end
 
----@param entry table
-function ChartRepo:updateNoteChartDataEntry(entry)
-	self.models.noteChartDatas:update(entry, {hash = entry.hash, index = entry.index})
+---@param conds table
+function ChartRepo:deleteChartfiles(conds)
+	self.models.chartfiles:delete(conds)
+end
+
+---@return table
+function ChartRepo:selectUnhashedChartfiles()
+	return self.models.chartfiles:select({hash__isnull = true})
+end
+
+---@param id number
+---@return table?
+function ChartRepo:selectChartfileById(id)
+	return self.models.chartfiles:find({id = assert(id)})
+end
+
+-- ---@param setId number
+-- ---@return rdb.ModelRow[]
+-- function ChartRepo:getNoteChartsAtSet(setId)
+-- 	return self.models.noteCharts:select({setId = setId})
+-- end
+
+-- ---@param hashes table
+-- ---@return rdb.ModelRow[]
+-- function ChartRepo:getNoteChartsByHashes(hashes)
+-- 	return self.models.noteCharts:select({hash__in = hashes})
+-- end
+
+--------------------------------------------------------------------------------
+
+---@param chartmeta table
+---@return table?
+function ChartRepo:insertChartmeta(chartmeta)
+	return self.models.chartmetas:create(chartmeta)
+end
+
+---@param chartmeta table
+function ChartRepo:updateChartmeta(chartmeta)
+	self.models.chartmetas:update(chartmeta, {id = assert(chartmeta.id)})
 end
 
 ---@param hash string
 ---@param index number
----@return rdb.ModelRow?
-function ChartRepo:selectNoteCharDataEntry(hash, index)
-	return self.models.noteChartDatas:select({hash = hash, index = index})
+---@return table?
+function ChartRepo:selectChartmeta(hash, index)
+	return self.models.chartmetas:find({hash = assert(hash), index = assert(index)})
 end
 
 ---@param id number
----@return rdb.ModelRow?
-function ChartRepo:selectNoteChartDataEntryById(id)
-	return self.models.noteChartDatas:find({id = id})
+---@return table?
+function ChartRepo:selectChartmetaById(id)
+	return self.models.chartmetas:find({id = assert(id)})
 end
 
 return ChartRepo

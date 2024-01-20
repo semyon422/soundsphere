@@ -5,7 +5,7 @@ local class = require("class")
 ---@operator call: sphere.NoteChartFinder
 local NoteChartFinder = class()
 
----@param fs table
+---@param fs love.filesystem
 function NoteChartFinder:new(fs)
 	self.fs = fs
 end

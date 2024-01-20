@@ -43,7 +43,8 @@ function FileCacheGenerator:lookup(root_dir)
 	end
 end
 
----@param path string
+---@param dir string
+---@param name string
 ---@param modified_at number
 ---@return boolean
 function FileCacheGenerator:shouldScan(dir, name, modified_at)
@@ -57,14 +58,17 @@ function FileCacheGenerator:shouldScan(dir, name, modified_at)
 	return false
 end
 
----@param path string
+---@param dir string
+---@param name string
 ---@return table
 function FileCacheGenerator:processChartfileSet(dir, name, modified_at)
 	local chartfile_set = self.chartRepo:selectChartfileSet(dir, name)
 
 	if chartfile_set then
-		chartfile_set.modified_at = modified_at
-		self.chartRepo:updateChartfileSet(chartfile_set)
+		if chartfile_set.modified_at ~= modified_at then
+			chartfile_set.modified_at = modified_at
+			self.chartRepo:updateChartfileSet(chartfile_set)
+		end
 		return chartfile_set
 	end
 
@@ -76,8 +80,9 @@ function FileCacheGenerator:processChartfileSet(dir, name, modified_at)
 end
 
 ---@param dir string
----@param chartfile_set_id number
-function FileCacheGenerator:processChartfile(dir, name, chartfile_set_id, modified_at)
+---@param name string
+---@param set_id number
+function FileCacheGenerator:processChartfile(dir, name, set_id, modified_at)
 	local chartfile = self.chartRepo:selectChartfile(dir, name)
 
 	if not chartfile then
@@ -85,7 +90,7 @@ function FileCacheGenerator:processChartfile(dir, name, chartfile_set_id, modifi
 			dir = dir,
 			name = name,
 			modified_at = modified_at,
-			chartfile_set_id = chartfile_set_id,
+			set_id = set_id,
 		})
 		return
 	end
