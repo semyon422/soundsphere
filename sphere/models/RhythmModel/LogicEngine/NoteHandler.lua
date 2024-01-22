@@ -121,6 +121,10 @@ end
 
 ---@param state boolean
 function NoteHandler:setKeyState(state, input)
+	if not self.notes then
+		return
+	end
+
 	self:update()
 
 	local hnote = self:getCurrentNote()
