@@ -97,8 +97,8 @@ function SelectModel:getBackgroundPath()
 	end
 
 	local path = chart.path
-	local stagePath = chart.stagePath
-	if not path or not stagePath then
+	local background_path = chart.background_path
+	if not path or not background_path then
 		return
 	end
 
@@ -108,8 +108,8 @@ function SelectModel:getBackgroundPath()
 
 	local directoryPath = path:match("^(.+)/(.-)$") or ""
 
-	if stagePath and stagePath ~= "" then
-		return path_util.eval_path(directoryPath .. "/" .. stagePath)
+	if background_path and background_path ~= "" then
+		return path_util.eval_path(directoryPath .. "/" .. background_path)
 	end
 
 	return directoryPath
@@ -124,15 +124,15 @@ function SelectModel:getAudioPathPreview()
 	end
 
 	local path = chart.path
-	local audioPath = chart.audioPath
-	if not path or not audioPath then
+	local audio_path = chart.audio_path
+	if not path or not audio_path then
 		return
 	end
 
 	local directoryPath = path:match("^(.+)/(.-)$") or ""
 
-	if audioPath and audioPath ~= "" then
-		return path_util.eval_path(directoryPath .. "/" .. audioPath), math.max(0, tonumber(chart.previewTime) or 0)
+	if audio_path and audio_path ~= "" then
+		return path_util.eval_path(directoryPath .. "/" .. audio_path), math.max(0, tonumber(chart.preview_time) or 0)
 	end
 
 	return directoryPath .. "/preview.ogg", 0
