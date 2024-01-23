@@ -5,6 +5,10 @@ local LogicalNoteFactory = require("sphere.models.RhythmModel.LogicEngine.Logica
 ---@operator call: sphere.NoteHandler
 local NoteHandler = class()
 
+function NoteHandler:new()
+	self.notes = {}
+end
+
 function NoteHandler:load()
 	self.notes = {}
 	local notes = self.notes
@@ -121,10 +125,6 @@ end
 
 ---@param state boolean
 function NoteHandler:setKeyState(state, input)
-	if not self.notes then
-		return
-	end
-
 	self:update()
 
 	local hnote = self:getCurrentNote()
