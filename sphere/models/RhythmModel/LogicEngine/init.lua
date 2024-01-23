@@ -24,12 +24,11 @@ function LogicEngine:getNoteHandler(input)
 
 	local noteHandler = self.noteHandlers[input]
 	if not noteHandler then
-		noteHandler = NoteHandler({
-			logicNoteDatas = {},
-			logicEngine = self
-		})
+		noteHandler = NoteHandler()
 		self.noteHandlers[input] = noteHandler
 	end
+
+	noteHandler.logicEngine = self
 
 	return noteHandler
 end

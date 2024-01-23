@@ -7,6 +7,7 @@ local NoteHandler = class()
 
 function NoteHandler:new()
 	self.notes = {}
+	self.logicNoteDatas = {}
 end
 
 function NoteHandler:load()
