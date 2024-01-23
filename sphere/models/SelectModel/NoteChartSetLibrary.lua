@@ -31,8 +31,8 @@ end
 function NoteChartSetLibrary:loadObject(itemIndex)
 	local chartRepo = self.cacheModel.chartRepo
 	local entry = self.cacheModel.cacheDatabase.noteChartSetItems[itemIndex - 1]
-	local noteChart = chartRepo:selectNoteChartEntryById(entry.chartfile_id)
-	local noteChartData = chartRepo:selectNoteChartDataEntryById(entry.chartmeta_id)
+	local noteChart = chartRepo:selectChartfileById(entry.chartfile_id)
+	local noteChartData = chartRepo:selectChartmetaById(entry.chartmeta_id)
 
 	local item = {
 		chartmeta_id = entry.chartmeta_id,

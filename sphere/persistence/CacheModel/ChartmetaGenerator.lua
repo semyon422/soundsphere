@@ -24,6 +24,7 @@ function ChartmetaGenerator:generate(full, after)
 	for i, chartfile in ipairs(chartfiles) do
 		local status, err = self:processChartfile(chartfile, full)
 
+		local noteCharts
 		if not status then
 			print(chartfile.id)
 			print(chartfile.dir .. "/" .. chartfile.name)
@@ -31,17 +32,18 @@ function ChartmetaGenerator:generate(full, after)
 		elseif status == "reused" then
 			self.reused = self.reused + 1
 		elseif status == "cached" then
-			self.cached = self.cached + err
+			self.cached = self.cached + #err
+			noteCharts = err
 		end
 
-		if after and after(i, #chartfiles, chartfile) then
+		if after and after(i, #chartfiles, chartfile, noteCharts) then
 			return
 		end
 	end
 end
 
 ---@param chartfile table
----@param full boolean?
+---@param full table?
 function ChartmetaGenerator:processChartfile(chartfile, full)
 	local path = chartfile.dir .. "/" .. chartfile.name
 
@@ -61,13 +63,28 @@ function ChartmetaGenerator:processChartfile(chartfile, full)
 	end
 
 	for index, noteChart in ipairs(noteCharts) do
-		local chartmeta = noteChart.metaData
-		chartmeta.index = index
-		chartmeta.hash = hash
+		local md = noteChart.metaData
+		local chartmeta = {
+			hash = hash,
+			index = index,
+			title = md.title,
+			artist = md.artist,
+			name = md.name,
+			creator = md.creator,
+			level = md.level,
+			source = md.source,
+			inputmode = md.inputMode,
+			tags = md.tags,
+			audio = md.audioPath,
+			background = md.stagePath,
+			preview_time = md.previewTime,
+			format = md.format,
+			tempo = md.bpm,
+		}
 		self:setChartmeta(chartmeta)
 	end
 
-	return "cached", #noteCharts
+	return "cached", noteCharts
 end
 
 ---@param chartmeta table

@@ -9,6 +9,7 @@ local DifficultyModel = class()
 ---@param timeRate number?
 ---@return number
 ---@return number
+---@return number
 function DifficultyModel:getDifficulty(noteChart, timeRate)
 	local notes = {}
 
@@ -43,9 +44,8 @@ function DifficultyModel:getDifficulty(noteChart, timeRate)
 	table.sort(notes, function(a, b) return a.time < b.time end)
 
 	local enpsValue = enps.getEnps(notes)
-	local longRatio = longNoteCount / #notes
 
-	return enpsValue * (timeRate or 1), longRatio
+	return enpsValue * (timeRate or 1), longNoteCount, #notes
 end
 
 return DifficultyModel

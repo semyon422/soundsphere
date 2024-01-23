@@ -11,6 +11,7 @@ userdata/hitsounds
 userdata/testcharts
 !userdata/hitsounds/midi
 
+userdata/data.db
 userdata/charts.db
 userdata/scores.db
 userdata/main.log

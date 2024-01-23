@@ -120,4 +120,34 @@ function ChartRepo:selectChartmetaById(id)
 	return self.models.chartmetas:find({id = assert(id)})
 end
 
+--------------------------------------------------------------------------------
+
+---@param chartdiff table
+---@return table?
+function ChartRepo:insertChartdiff(chartdiff)
+	return self.models.chartdiffs:create(chartdiff)
+end
+
+---@param chartdiff table
+function ChartRepo:updateChartdiff(chartdiff)
+	self.models.chartdiffs:update(chartdiff, {id = assert(chartdiff.id)})
+end
+
+---@param hash string
+---@param index number
+---@return table?
+function ChartRepo:selectChartdiff(hash, index)
+	return self.models.chartdiffs:find({
+		hash = assert(hash),
+		index = assert(index),
+		play_config_id__isnull = true,
+	})
+end
+
+---@param id number
+---@return table?
+function ChartRepo:selectChartdiffById(id)
+	return self.models.chartdiffs:find({id = assert(id)})
+end
+
 return ChartRepo

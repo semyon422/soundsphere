@@ -2,6 +2,7 @@ local ChartRepo = require("sphere.persistence.CacheModel.ChartRepo")
 local NoteChartFinder = require("sphere.persistence.CacheModel.NoteChartFinder")
 local FileCacheGenerator = require("sphere.persistence.CacheModel.FileCacheGenerator")
 local ChartmetaGenerator = require("sphere.persistence.CacheModel.ChartmetaGenerator")
+local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGenerator")
 local NoteChartFactory = require("notechart.NoteChartFactory")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local class = require("class")
@@ -20,6 +21,7 @@ function CacheManager:new(cdb)
 	self.noteChartFinder = NoteChartFinder(love.filesystem)
 	self.fileCacheGenerator = FileCacheGenerator(self.chartRepo, self.noteChartFinder)
 	self.chartmetaGenerator = ChartmetaGenerator(self.chartRepo, NoteChartFactory, love.filesystem)
+	self.chartdiffGenerator = ChartdiffGenerator(self.chartRepo, DifficultyModel)
 end
 
 function CacheManager:begin()
@@ -75,8 +77,14 @@ function CacheManager:generateCacheFull(path, force)
 	print("done1")
 
 	self:begin()
-	self.chartmetaGenerator:generate(false, function(i, n, chartfile)
+	self.chartmetaGenerator:generate(false, function(i, n, chartfile, noteCharts)
 		print(chartfile.dir .. "/" .. chartfile.name)
+
+		if noteCharts then
+			for j, noteChart in ipairs(noteCharts) do
+				self.chartdiffGenerator:create(noteChart, chartfile.hash, j)
+			end
+		end
 
 		self.noteChartSetCount = 0
 		self.noteChartCount = i

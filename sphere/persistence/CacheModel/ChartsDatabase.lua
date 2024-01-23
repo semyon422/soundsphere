@@ -18,14 +18,12 @@ function ChartsDatabase:new()
 end
 
 function ChartsDatabase:load()
-	self.db:open("userdata/charts.db")
+	self.db:open("userdata/data.db")
 	local sql = assert(love.filesystem.read("sphere/persistence/CacheModel/database.sql"))
 	self.db:exec(sql)
-	self.orm:attach("userdata/scores.db", "scores_db")
 end
 
 function ChartsDatabase:unload()
-	self.orm:detach("scores_db")
 	self.db:close()
 end
 
