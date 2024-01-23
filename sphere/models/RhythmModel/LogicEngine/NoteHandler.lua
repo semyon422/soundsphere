@@ -5,11 +5,6 @@ local LogicalNoteFactory = require("sphere.models.RhythmModel.LogicEngine.Logica
 ---@operator call: sphere.NoteHandler
 local NoteHandler = class()
 
-function NoteHandler:new()
-	self.notes = {}
-	self.logicNoteDatas = {}
-end
-
 function NoteHandler:load()
 	self.notes = {}
 	local notes = self.notes
