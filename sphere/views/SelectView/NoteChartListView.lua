@@ -43,10 +43,10 @@ function NoteChartListView:drawItem(i, w, h)
 	local baseTimeRate = self.game.playContext.rate
 
 	local difficulty = Format.difficulty((item.difficulty or 0) * baseTimeRate)
-	local inputMode = item.inputMode
+	local inputMode = item.inputmode
 	local name = item.name
 	local creator = item.creator
-	if items[i - 1] and items[i - 1].inputMode == inputMode then
+	if items[i - 1] and items[i - 1].inputmode == inputMode then
 		inputMode = ""
 	end
 	if items[i - 1] and items[i - 1].creator == creator then

@@ -452,7 +452,7 @@ local function NotechartInfo(self)
 	local baseBpm = noteChartItem.bpm
 	local baseLength = noteChartItem.length
 	local baseDifficulty = noteChartItem.difficulty
-	local baseInputMode = noteChartItem.inputMode
+	local baseInputMode = noteChartItem.inputmode
 
 	local bpm = baseBpm * baseTimeRate
 	local length = baseLength / baseTimeRate

@@ -178,7 +178,7 @@ local function Title(self)
 	local baseTimeRate = self.game.playContext.rate
 	local difficulty = Format.difficulty((item.difficulty or 0) * baseTimeRate)
 
-	TextCellImView(72, h, "right", Format.inputMode(item.inputMode), difficulty, true)
+	TextCellImView(72, h, "right", Format.inputMode(item.inputmode), difficulty, true)
 	just.sameline()
 	just.indent(44)
 	TextCellImView(w, 52, "left", item.creator, item.name)
