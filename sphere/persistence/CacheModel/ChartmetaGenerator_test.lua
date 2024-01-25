@@ -83,7 +83,7 @@ function test.all(t)
 	local fs = get_fs(items)
 
 	local function getNoteCharts(path, content)
-		return {{metaData = {}}}
+		return {{chartmeta = {}}}
 	end
 
 	local cg = ChartmetaGenerator(chartRepo, {getNoteCharts = getNoteCharts}, fs)

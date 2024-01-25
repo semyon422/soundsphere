@@ -28,8 +28,8 @@ local number_fields = {
 		field = "bpm",
 	},
 	{
-		keys = {"noteCount", "nc"},
-		field = "noteCount",
+		keys = {"notes_count", "nc"},
+		field = "notes_count",
 	},
 	{
 		keys = {"level", "lv"},
@@ -91,7 +91,7 @@ local textFields = {
 	"tags",
 	"creator",
 	"inputMode",
-	"audioPath",
+	"audio_path",
 }
 
 local operators = {
@@ -186,7 +186,7 @@ function SearchModel:getConditions()
 	local cond = {}
 
 	if not settings.miscellaneous.showNonManiaCharts then
-		cond.inputMode__notin = {"1osu", "1taiko", "1fruits"}
+		cond.inputmode__notin = {"1osu", "1taiko", "1fruits"}
 	end
 
 	local filter = self:getFilter()

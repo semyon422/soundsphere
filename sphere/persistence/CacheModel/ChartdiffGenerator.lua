@@ -25,7 +25,7 @@ function ChartdiffGenerator:create(noteChart, hash, index)
 	self.chartRepo:insertChartdiff({
 		hash = hash,
 		index = index,
-		inputmode = tostring(noteChart.metaData.inputMode),
+		inputmode = noteChart.chartmeta.inputmode,
 		notes_count = notes_count,
 		long_notes_count = long_notes_count,
 		enps_difficulty = difficulty,

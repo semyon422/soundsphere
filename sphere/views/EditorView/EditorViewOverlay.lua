@@ -16,7 +16,7 @@ end
 
 ---@param self table
 function tabs.info(self)
-	local md = self.game.editorModel.noteChart.metaData
+	local md = self.game.editorModel.noteChart.chartmeta
 
 	imgui.setSize(400, 1080, 400, 55)
 	imgui.text("Chart info")
@@ -27,11 +27,11 @@ function tabs.info(self)
 	md.name = imgui.input("name input", md.name, "name")
 	md.creator = imgui.input("creator input", md.creator, "creator")
 	md.level = imgui.input("level input", md.level, "level")
-	md.audioPath = imgui.input("audioPath input", md.audioPath, "audioPath")
-	md.stagePath = imgui.input("stagePath input", md.stagePath, "stagePath")
-	md.previewTime = imgui.input("previewTime input", md.previewTime, "previewTime")
+	md.audio_path = imgui.input("audio_path input", md.audio_path, "audio_path")
+	md.background_path = imgui.input("background_path input", md.background_path, "background_path")
+	md.preview_time = imgui.input("preview_time input", md.preview_time, "preview_time")
 	md.bpm = imgui.input("bpm input", md.bpm, "bpm")
-	md.inputMode = imgui.input("inputMode input", md.inputMode, "inputMode")
+	md.inputmode = imgui.input("inputmode input", md.inputmode, "inputmode")
 
 	imgui.separator()
 
@@ -97,9 +97,9 @@ function tabs.audio(self)
 	wf.scale = imgui.slider1("wf.scale", wf.scale, "%0.2f", 0, 1, 0.01, "scale")
 
 	imgui.separator()
-	local md = self.game.editorModel.noteChart.metaData
+	local md = self.game.editorModel.noteChart.chartmeta
 	if imgui.button("set as preview", "set this moment as a preview") then
-		md.previewTime = editorModel.timePoint.absoluteTime
+		md.preview_time = editorModel.timePoint.absoluteTime
 	end
 end
 

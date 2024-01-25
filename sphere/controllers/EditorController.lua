@@ -69,8 +69,7 @@ function EditorController:saveToOsu()
 	local chartItem = selectModel.noteChartItem
 	local exp = OsuNoteChartExporter()
 	exp.noteChart = editorModel.noteChart
-	exp.noteChartEntry = chartItem
-	exp.noteChartDataEntry = chartItem
+	exp.chartmeta = chartItem
 
 	local path = chartItem.path
 	path = path:gsub(".osu$", ""):gsub(".sph$", "") .. ".sph.osu"

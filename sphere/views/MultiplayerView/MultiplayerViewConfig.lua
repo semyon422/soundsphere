@@ -76,7 +76,7 @@ local function Cells(self)
 
 	local bpm = 0
 	local length = 0
-	local noteCount = 0
+	local notes_count = 0
 	local level = 0
 	local longNoteRatio = 0
 	local localOffset = 0
@@ -84,7 +84,7 @@ local function Cells(self)
 	if noteChartItem then
 		bpm = (noteChartItem.bpm or 0) * baseTimeRate
 		length = (noteChartItem.length or 0) / baseTimeRate
-		noteCount = noteChartItem.noteCount or 0
+		notes_count = noteChartItem.notes_count or 0
 		level = noteChartItem.level or 0
 		longNoteRatio = noteChartItem.longNoteRatio or 0
 		localOffset = noteChartItem.localOffset or 0
@@ -101,7 +101,7 @@ local function Cells(self)
 	just.indent(22)
 	TextCellImView(w, h, "right", "bpm", ("%d"):format(bpm))
 	TextCellImView(w, h, "right", "duration", time_util.format(length))
-	TextCellImView(w, h, "right", "notes", noteCount)
+	TextCellImView(w, h, "right", "notes", notes_count)
 	TextCellImView(w, h, "right", "level", level)
 
 	just.row(true)

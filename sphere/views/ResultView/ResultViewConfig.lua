@@ -465,7 +465,7 @@ local function NotechartInfo(self)
 	w = w - 44
 	local wr = 0.70
 
-	TextCellImView(w * (1 - wr), 55, "right", "notes", noteChartItem.noteCount)
+	TextCellImView(w * (1 - wr), 55, "right", "notes", noteChartItem.notes_count)
 	just.sameline()
 	TextCellImView(w * wr, 55, "right", "duration",
 		length == baseLength and time_util.format(baseLength) or

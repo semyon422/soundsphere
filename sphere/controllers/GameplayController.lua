@@ -129,13 +129,13 @@ function GameplayController:applyTempo(noteChart, tempoFactor, primaryTempo)
 		return
 	end
 
-	if tempoFactor == "average" and noteChart.metaData.avgTempo then
-		applyTempo(noteChart, noteChart.metaData.avgTempo)
+	if tempoFactor == "average" and noteChart.chartmeta.tempo_avg then
+		applyTempo(noteChart, noteChart.chartmeta.tempo_avg)
 		return
 	end
 
-	local minTime = noteChart.metaData.minTime
-	local maxTime = noteChart.metaData.maxTime
+	local minTime = noteChart.chartmeta.start_time
+	local maxTime = minTime + noteChart.chartmeta.duration
 
 	local t = {}
 	t.average, t.minimum, t.maximum = TempoRange:find(noteChart, minTime, maxTime)

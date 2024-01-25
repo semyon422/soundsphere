@@ -12,19 +12,19 @@ function PreviewModel:new(configModel)
 end
 
 function PreviewModel:load()
-	self.audioPath = ""
-	self.previewTime = 0
+	self.audio_path = ""
+	self.preview_time = 0
 	self.volume = 0
 	self.pitch = 1
 	self.targetPitch = 1
 end
 
----@param audioPath string?
----@param previewTime number?
-function PreviewModel:setAudioPathPreview(audioPath, previewTime)
-	if self.audioPath ~= audioPath or not self.audio then
-		self.audioPath = audioPath
-		self.previewTime = previewTime
+---@param audio_path string?
+---@param preview_time number?
+function PreviewModel:setAudioPathPreview(audio_path, preview_time)
+	if self.audio_path ~= audio_path or not self.audio then
+		self.audio_path = audio_path
+		self.preview_time = preview_time
 		self:loadPreviewDebounce()
 	end
 end
@@ -63,11 +63,11 @@ function PreviewModel:setPitch(pitch)
 	self.targetPitch = pitch
 end
 
----@param audioPath string?
----@param previewTime number?
-function PreviewModel:loadPreviewDebounce(audioPath, previewTime)
-	self.audioPath = audioPath or self.audioPath
-	self.previewTime = previewTime or self.previewTime
+---@param audio_path string?
+---@param preview_time number?
+function PreviewModel:loadPreviewDebounce(audio_path, preview_time)
+	self.audio_path = audio_path or self.audio_path
+	self.preview_time = preview_time or self.preview_time
 	delay.debounce(self, "loadDebounce", 0.1, self.loadPreview, self)
 end
 
@@ -78,8 +78,8 @@ function PreviewModel:loadPreview()
 	end
 	loadingPreview = true
 
-	local path = self.audioPath
-	local position = self.previewTime
+	local path = self.audio_path
+	local position = self.preview_time
 
 	if not path then
 		loadingPreview = false
@@ -113,7 +113,7 @@ function PreviewModel:loadPreview()
 	end
 
 	loadingPreview = false
-	if path ~= self.audioPath then
+	if path ~= self.audio_path then
 		self:loadPreview()
 		return
 	end

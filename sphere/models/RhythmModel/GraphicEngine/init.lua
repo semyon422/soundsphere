@@ -21,7 +21,7 @@ function GraphicEngine:new(timeEngine, logicEngine)
 end
 
 function GraphicEngine:load()
-	self.noteCount = 0
+	self.notes_count = 0
 	self.noteDrawers = {}
 
 	local layerEvents = {}

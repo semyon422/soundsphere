@@ -19,8 +19,8 @@ function ScoreEngine:load()
 	self.pausesCount = 0
 	self.paused = false
 
-	self.minTime = self.noteChart.metaData.minTime
-	self.maxTime = self.noteChart.metaData.maxTime
+	self.minTime = self.noteChart.chartmeta.start_time
+	self.maxTime = self.minTime + self.noteChart.chartmeta.duration
 end
 
 function ScoreEngine:update()

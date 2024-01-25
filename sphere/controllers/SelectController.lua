@@ -194,8 +194,7 @@ function SelectController:exportToOsu()
 	ModifierModel:apply(self.playContext.modifiers, noteChart)
 
 	nce.noteChart = noteChart
-	nce.noteChartEntry = chartItem
-	nce.noteChartDataEntry = chartItem
+	nce.chartmeta = chartItem
 
 	local path = chartItem.path
 	path = path:find("^.+/.$") and path:match("^(.+)/.$") or path

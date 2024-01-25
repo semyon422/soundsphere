@@ -63,24 +63,9 @@ function ChartmetaGenerator:processChartfile(chartfile, full)
 	end
 
 	for index, noteChart in ipairs(noteCharts) do
-		local md = noteChart.metaData
-		local chartmeta = {
-			hash = hash,
-			index = index,
-			title = md.title,
-			artist = md.artist,
-			name = md.name,
-			creator = md.creator,
-			level = md.level,
-			source = md.source,
-			inputmode = md.inputMode,
-			tags = md.tags,
-			audio_path = md.audioPath,
-			background_path = md.stagePath,
-			preview_time = md.previewTime,
-			format = md.format,
-			tempo = md.bpm,
-		}
+		local chartmeta = noteChart.chartmeta
+		chartmeta.hash = hash
+		chartmeta.index = index
 		self:setChartmeta(chartmeta)
 	end
 
