@@ -80,10 +80,12 @@ CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`long_notes_count` INTEGER,
 	`density_data` TEXT,
 	`sv_data` TEXT,
-	`enps_difficulty` REAL,
-	`osu_difficulty` REAL,
-	`msd_difficulty` REAL,
-	`msd_difficulty_data` TEXT,
+	`enps_diff` REAL,
+	`osu_diff` REAL,
+	`msd_diff` REAL,
+	`msd_diff_data` TEXT,
+	`user_diff` REAL,
+	`user_diff_data` TEXT,
 	UNIQUE(`hash`, `index`, `play_config_id`)
 );
 
@@ -104,7 +106,6 @@ CREATE TABLE IF NOT EXISTS `scores` (
 	`pauses` REAL
 );
 
-
 CREATE TABLE IF NOT EXISTS `collections` (
 	`id` INTEGER PRIMARY KEY,
 	`name` TEXT
@@ -113,7 +114,7 @@ CREATE TABLE IF NOT EXISTS `collections` (
 CREATE TABLE IF NOT EXISTS `chart_collections` (
 	`id` INTEGER PRIMARY KEY,
 	`collection_id` INTEGER,
-	`chart_play_preset_id` INTEGER
+	`chartdiff_id` INTEGER
 );
 
 CREATE TEMP VIEW IF NOT EXISTS chartset_list AS
@@ -125,8 +126,17 @@ chartfiles.set_id AS chartfile_set_id,
 chartfiles.dir || "/" || chartfiles.name AS path,
 scores.accuracy,
 scores.miss,
-chartdiffs.enps_difficulty AS difficulty,
-chartmetas.*
+chartmetas.*,
+chartdiffs.notes_count,
+chartdiffs.long_notes_count,
+chartdiffs.density_data,
+chartdiffs.sv_data,
+chartdiffs.enps_diff,
+chartdiffs.osu_diff,
+chartdiffs.msd_diff,
+chartdiffs.msd_diff_data,
+chartdiffs.user_diff,
+chartdiffs.user_diff_data
 FROM chartmetas
 INNER JOIN chartfiles ON
 chartmetas.hash = chartfiles.hash

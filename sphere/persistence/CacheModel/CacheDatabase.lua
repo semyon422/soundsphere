@@ -97,6 +97,7 @@ function CacheDatabase:queryNoteChartSets()
 		"chartfile_id",
 		"chartfile_set_id",
 		"score_id",
+		params.difficulty .. " AS difficulty",
 	}
 
 	if params.lamp then
@@ -151,7 +152,10 @@ end
 function CacheDatabase:getNoteChartItemsAtSet(chartfile_set_id)
 	local params = self.queryParams
 
-	local columns = {"*"}
+	local columns = {
+		"*",
+		params.difficulty .. " AS difficulty",
+	}
 	local where = table_util.copy(params.where)
 	where.chartfile_set_id = chartfile_set_id
 

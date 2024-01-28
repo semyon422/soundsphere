@@ -76,6 +76,7 @@ function SelectModel:updateSetItems()
 
 	params.where = where
 	params.lamp = lamp
+	params.difficulty = "enps_diff"
 
 	self.cacheModel.cacheDatabase:queryAsync(params)
 	self.noteChartSetLibrary:updateItems()
@@ -84,7 +85,10 @@ end
 ---@param hash string
 ---@param index number
 function SelectModel:findNotechart(hash, index)
-	local params = {where = {hash = hash, index = index}}
+	local params = {
+		where = {hash = hash, index = index},
+		difficulty = "enps_diff",
+	}
 	self.cacheModel.cacheDatabase:queryAsync(params)
 	self.noteChartSetLibrary:updateItems()
 end
