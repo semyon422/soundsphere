@@ -7,7 +7,7 @@ local class = require("class")
 local ModLoader = class()
 
 local modsDirectoryPath = "moddedgame"
-local mountPath = "mount"
+local scriptFileName = "mod.lua"
 
 ---@param path string
 function ModLoader:new(path)
@@ -20,9 +20,9 @@ local function getMods()
     local modDirs = love.filesystem.getDirectoryItems(modsDirectoryPath)
 
     for _, dir in ipairs(modDirs) do
-        local modPath = modsDirectoryPath .. "/" .. dir .. "/mod.lua"
+        local modPath = modsDirectoryPath .. "/" .. dir .. "/" .. scriptFileName
         local modModule = love.filesystem.getInfo(modPath)
-        local mountDir = love.filesystem.getInfo(modsDirectoryPath .. "/" .. dir .. "/" .. mountPath)
+        local mountDir = love.filesystem.getInfo(modsDirectoryPath .. "/" .. dir .. "/")
 
         local mod = {
             scriptFile = nil,
@@ -32,7 +32,7 @@ local function getMods()
         }
 
         if modModule then
-            mod.scriptFile = love.filesystem.load(modsDirectoryPath .. "/" .. dir .. "/mod.lua")
+            mod.scriptFile = love.filesystem.load(modsDirectoryPath .. "/" .. dir .. "/" .. scriptFileName)
         end
 
         if modModule or mountDir then
@@ -60,7 +60,9 @@ local function hasConflict(modPath, filePath, fileMap, conflicts)
                 table.insert(conflicts, fullPath)
             end
 
-            fileMap[fullPath] = true
+            if file ~= "mod.lua" then
+                fileMap[fullPath] = true
+            end
         end
     end
 end
@@ -74,7 +76,7 @@ local function checkForConflicts(mods)
 
     for _, mod in pairs(mods) do
         if mod.mount then
-            hasConflict(modsDirectoryPath .. "/" .. mod.directory .. "/" .. mountPath, "", fileMap, conflicts)
+            hasConflict(modsDirectoryPath .. "/" .. mod.directory .. "/", "", fileMap, conflicts)
         end
     end
 
@@ -84,7 +86,7 @@ end
 ---@param root string
 ---@param directory string
 local function mount(root, directory)
-    local success, err = physfs.mount(root .. "/" .. modsDirectoryPath .. "/" .. directory .. "/" .. mountPath, "/", false)
+    local success, err = physfs.mount(root .. "/" .. modsDirectoryPath .. "/" .. directory .. "/", "/", false)
     success = success and true or false
 
     if not success then
@@ -106,8 +108,6 @@ function ModLoader:loadMods()
     end
 
     for _, mod in ipairs(mods) do
-        package.add(modsDirectoryPath .. "/" .. mod.directory)
-
         if mod.mount then
             mount(self.root, mod.directory)
         end
