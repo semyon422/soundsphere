@@ -91,11 +91,10 @@ if root == sourceBase then
 	assert(physfs.mount(root, "/", true))
 end
 
-local modloader = require("modloader")
-modloader:setRoot(root)
-local mods = modloader:load()
-
 require("preload")
+
+local modloader = require("modloader")(root)
+modloader:loadMods()
 
 local love_run = require("love_run")
 love.load = function() end  -- for compatibility with old conf.lua
@@ -144,7 +143,7 @@ thread.coro(function()
 	})
 
 	local GameController = require("sphere.controllers.GameController")
-	local game = GameController(mods)
+	local game = GameController()
 
 	game:load()
 

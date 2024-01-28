@@ -1,101 +1,159 @@
 local physfs = require("physfs")
+local package = require("aqua.package")
+local class = require("class")
 
-local ModLoader = {}
+---@class sphere.ModLoader
+---@operator call: sphere.ModLoader
+local ModLoader = class()
+
 local modsDirectoryPath = "moddedgame"
+local mountPath = "mount"
 
----@return sphere.Mod[] 
-function ModLoader:getMods()
-    local modsScriptFiles = {}
+---@param path string
+function ModLoader:new(path)
+    self.root = path
+end
 
-    for _, file in ipairs(love.filesystem.getDirectoryItems(modsDirectoryPath)) do
-        if file:match(".lua$") then
-            local name = file:gsub(".lua$", "")
-            table.insert(modsScriptFiles, name)
-        end
+---@param modModule table
+---@param mountDir table
+---@return boolean
+local function isValidMod(modModule, mountDir)
+    return (modModule ~= nil) or (mountDir ~= nil)
+end
+
+---@param dir string
+---@param modModule table
+---@param mountDir table
+---@return table
+local function createMod(dir, modModule, mountDir)
+    local mod = {
+        scriptFile = nil,
+        instance = nil,
+        directory = dir,
+        mount = mountDir ~= nil
+    }
+
+    if modModule then
+        local modPath = modsDirectoryPath .. "/" .. dir .. "/mod.lua"
+        mod.scriptFile = modPath:gsub(".lua$", "")
     end
 
-    local mods = {}
+    return mod
+end
 
-    for _, scriptFile in pairs(modsScriptFiles) do
-        local mod = require(modsDirectoryPath .. "/".. scriptFile)
-        table.insert(mods, mod)
+---@return table[]
+local function getMods()
+    local mods = {}
+    local modDirs = love.filesystem.getDirectoryItems(modsDirectoryPath)
+
+    for _, dir in ipairs(modDirs) do
+        local modPath = modsDirectoryPath .. "/" .. dir .. "/mod.lua"
+        local modModule = love.filesystem.getInfo(modPath)
+        local mountDir = love.filesystem.getInfo(modsDirectoryPath .. "/" .. dir .. "/" .. mountPath)
+
+        if isValidMod(modModule, mountDir) then
+            local mod = createMod(dir, modModule, mountDir)
+            package.add(modsDirectoryPath .. "/" .. dir)
+            table.insert(mods, mod)
+        end
     end
 
     return mods
 end
 
----@param mods sphere.Mod[] 
+---@param modPath string
+---@param filePath string
+---@param fileMap table
+---@param conflicts string[]
 ---@return boolean
----@return string[]
-function ModLoader:checkForConflicts(mods)
+local function hasConflict(modPath, filePath, fileMap, conflicts)
     local conflictFound = false
-    local conflicts = {}
 
-    local file_map = {}
+    local path = modPath .. filePath
+    for _, file in ipairs(love.filesystem.getDirectoryItems(path)) do
+        local fullPath = filePath .. "/" .. file
 
-    ---@param modPath string
-    ---@param filePath string
-    local function checkDirectory(modPath, filePath)
-        local path = modPath .. filePath
-        for _, file in ipairs(love.filesystem.getDirectoryItems(path)) do
-            local full_path = filePath .. "/" .. file
-
-            if love.filesystem.getInfo(modPath .. full_path, "directory") then
-                checkDirectory(modPath, full_path)
-            else
-                if file_map[full_path] ~= nil then
-                    conflictFound = true
-                    table.insert(conflicts, full_path)
-                end
-
-                file_map[full_path] = true
+        if love.filesystem.getInfo(modPath .. fullPath, "directory") then
+            hasConflict(modPath, fullPath, fileMap, conflicts)
+        else
+            if fileMap[fullPath] ~= nil then
+                conflictFound = true
+                table.insert(conflicts, fullPath)
             end
+
+            fileMap[fullPath] = true
         end
     end
 
+    return conflictFound
+end
+
+---@param mods table[]
+---@return boolean
+---@return string[]
+local function checkForConflicts(mods)
+    local conflictFound = false
+    local conflicts = {}
+
+    local fileMap = {}
+
     for _, mod in pairs(mods) do
         if mod.mount then
-            checkDirectory(modsDirectoryPath .. "/" .. mod.mountPath, "")
+            hasConflict(modsDirectoryPath .. "/" .. mountPath, "", fileMap, conflicts)
         end
     end
 
     return conflictFound, conflicts
 end
 
----@param mod sphere.Mod[] 
-function ModLoader:mount(mod)
-    assert(physfs.mount(self.root .. "/" .. modsDirectoryPath .."/" .. mod.mountPath, "/", false))
-    print(mod.name .. " mounted")
+---@param root string
+---@param mod table
+---@return boolean
+local function mount(root, mod)
+    local success, error = physfs.mount(root .. "/" .. modsDirectoryPath .. "/" .. mod.directory .. "/" .. mountPath, "/", false)
+    success = success and true or false
+
+    if error then
+        print("Error mounting mod: " .. error)
+    end
+
+    return success
 end
 
----@param path string
-function ModLoader:setRoot(path)
-    self.root = path
-end
+function ModLoader:loadMods()
+    local mods = getMods()
 
----@return sphere.Mod[]
-function ModLoader:load()
-    local mods = self:getMods()
-
-    local conflictFound, conflicts_path = self:checkForConflicts(mods)
+    local conflictFound, conflictsPath = checkForConflicts(mods)
 
     if conflictFound then
-        for _, file in pairs(conflicts_path) do
+        for _, file in pairs(conflictsPath) do
             print("Conflict: " .. file)
         end
 
         error("Two or more mods are modifying the same file. Check the console for details.")
     end
 
-    physfs.setWriteDir(self.root)
+    for _, mod in pairs(mods) do
+        if mod.mount == true then
+            local result = mount(self.root, mod)
 
-    for _, mod in ipairs(mods) do
-        if mod.mount then
-            self:mount(mod)
+            if result == false then
+                mod = nil
+            end
         end
     end
 
-    return mods
+    for _, mod in pairs(mods) do
+        if mod.scriptFile then
+            mod.instance = require(mod.scriptFile)
+        end
+    end
+
+    for _, mod in pairs(mods) do
+        if mod.instance and mod.instance.init then
+            mod.instance:init(mods)
+        end
+    end
 end
 
 return ModLoader
