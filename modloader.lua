@@ -53,7 +53,6 @@ local function getMods()
 
         if isValidMod(modModule, mountDir) then
             local mod = createMod(dir, modModule, mountDir)
-            package.add(modsDirectoryPath .. "/" .. dir)
             table.insert(mods, mod)
         end
     end
@@ -134,6 +133,8 @@ function ModLoader:loadMods()
     end
 
     for _, mod in pairs(mods) do
+        package.add(modsDirectoryPath .. "/" .. mod.directory)
+
         if mod.mount == true then
             local result = mount(self.root, mod)
 
