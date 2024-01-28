@@ -17,13 +17,16 @@ function LogicEngine:new(timeEngine, scoreEngine)
 	self.scoreEngine = scoreEngine
 end
 
-function LogicEngine:getNoteHandler(input)
+function LogicEngine:getNoteHandler(input, create)
 	if self.singleHandler then
 		input = 1
 	end
 
 	local noteHandler = self.noteHandlers[input]
 	if not noteHandler then
+		if not create then
+			return
+		end
 		noteHandler = NoteHandler({
 			logicNoteDatas = {},
 			logicEngine = self
@@ -41,7 +44,7 @@ function LogicEngine:load()
 	-- many layers can be here
 	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
 		local input = inputType .. inputIndex
-		local noteHandler = self:getNoteHandler(input)
+		local noteHandler = self:getNoteHandler(input, true)
 
 		for _, noteData in ipairs(noteDatas) do
 			table.insert(noteHandler.logicNoteDatas, {

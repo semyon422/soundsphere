@@ -12,7 +12,7 @@ Modifier.name = ""
 ---@param value any
 ---@return number
 function Modifier:toNormValue(value)
-	local index = table_util.indexof(self.values, value)
+	local index = self:toIndexValue(value)
 	return (index - 1) / (#self.values - 1)
 end
 
