@@ -360,6 +360,9 @@ function drawSection:misc()
 	if imgui.button("error button", "error") then
 		error("error")
 	end
+	if imgui.button("calc top scores", "calc top scores") then
+		self.game.scoreModel:asyncCalculateTopScores()
+	end
 
 	just.indent(8)
 	just.text("Commit: " .. version.commit)

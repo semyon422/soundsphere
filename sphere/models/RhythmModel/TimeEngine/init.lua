@@ -49,12 +49,12 @@ function TimeEngine:sync(time)
 
 	timer.eventTime = time
 
+	self.currentTime = timer:getTime()
+	self.currentVisualTime = self.nearestTime:getVisualTime(self.currentTime)
+
 	if self.windUp then
 		self:updateWindUp()
 	end
-
-	self.currentTime = timer:getTime()
-	self.currentVisualTime = self.nearestTime:getVisualTime(self.currentTime)
 end
 
 function TimeEngine:stepTimePoint(is_left)
@@ -82,9 +82,9 @@ function TimeEngine:skipIntro()
 end
 
 function TimeEngine:updateWindUp()
-	local startTime = self.minTime
-	local endTime = self.maxTime
 	local currentTime = self.currentTime
+	local startTime = self.minTime or currentTime
+	local endTime = self.maxTime or currentTime
 
 	local a, b = unpack(self.windUp)
 	local timeRate = math_util.map(currentTime, startTime, endTime, a, b)

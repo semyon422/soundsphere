@@ -1,0 +1,4 @@
+#!/bin/bash
+cd "$(dirname "$0")"
+export DYLD_FALLBACK_LIBRARY_PATH=$PWD/bin/mac64
+/Applications/love.app/Contents/MacOS/love .

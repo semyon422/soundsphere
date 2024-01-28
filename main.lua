@@ -19,8 +19,10 @@ pkg.add("tree/share/lua/5.1")
 require("aqua.string")
 
 if arg[2] == "test" then
-	local runner = require("luacov.runner")
-	runner.init()
+	local ok, err = pcall(require, "luacov.runner")
+	if ok then
+		err.init()
+	end
 end
 
 local deco = require("deco")
@@ -80,6 +82,17 @@ elseif jit.os == "Linux" then
 	ffi.cdef("int chdir(const char *path);")
 	ffi.C.chdir(root)
 	pkg.addc("bin/linux64")
+elseif jit.os == "OSX" then
+	local ldlp = os.getenv("DYLD_FALLBACK_LIBRARY_PATH")
+	if not ldlp or not ldlp:find("bin/mac64") then
+		ffi.cdef("int setenv(const char *name, const char *value, int overwrite);")
+		ffi.C.setenv("DYLD_FALLBACK_LIBRARY_PATH", root .. "/bin/mac64", true)
+		--os.execute(("%q %q &"):format(arg[-2], arg[1]))
+		--return os.exit()
+	end
+	ffi.cdef("int chdir(const char *path);")
+	ffi.C.chdir(root)
+	pkg.addc("bin/mac64")
 end
 
 love.errhand = require("errhand")
@@ -114,6 +127,8 @@ if arg[2] == "test" then
 		"libchart",
 		"userdata",
 	}
+
+	testing.get_time = love.timer.getTime
 
 	testing.test()
 	os.exit()
