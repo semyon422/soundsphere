@@ -21,8 +21,8 @@ local section = sections[1]
 
 local scrollY = {}
 
-local w, h = 768, 1080 / 2
-local _w, _h = w / 2, 55
+local w, h = 1024, 1080 / 2
+local _h = 55
 local r = 8
 
 local window_id = "settings window"
@@ -36,7 +36,7 @@ local function draw(self)
 		return true
 	end
 
-	imgui.setSize(w, h, _w, _h)
+	imgui.setSize(w, h, w / 2, _h)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
@@ -48,11 +48,17 @@ local function draw(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	just.push()
+	just.push()
+	local tabsw
+	section, tabsw = imgui.vtabs("settings tabs", section, sections)
+	just.pop()
+	love.graphics.translate(tabsw, 0)
 
-	section = imgui.tabs("settings tabs", section, sections)
+	local inner_w = w - tabsw
+	imgui.setSize(inner_w, h, inner_w / 2, _h)
 
 	scrollY[section] = scrollY[section] or 0
-	imgui.Container(window_id, w, h - _h, _h / 3, _h * 2, scrollY[section])
+	imgui.Container(window_id, inner_w, h, _h / 3, _h * 2, scrollY[section])
 
 	drawSection[section](self)
 	just.emptyline(8)
@@ -89,7 +95,7 @@ function drawSection:gameplay()
 
 	g.speedType = imgui.combo("speedType", g.speedType, speedModel.types, nil, "speed type")
 
-	if imgui.TextButton("open timings", "timings", _w / 2, _h) then
+	if imgui.TextButton("open timings", "timings", w / 4, _h) then
 		self.game.gameView:setModal(TimingsModalView)
 	end
 	just.sameline()
