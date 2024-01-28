@@ -151,5 +151,9 @@ return {
 		showFPS = false,
 		showTasks = false,
 		showDebugMenu = false,
+	},
+	select = {
+		collapse = true,
+		diff_column = "enps_diff",
 	}
 }

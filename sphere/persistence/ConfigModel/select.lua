@@ -1,5 +1,4 @@
 return {
-	collapse = true,
 	collection = "",
 	chartmeta_id = 1,
 	chartfile_id = 1,

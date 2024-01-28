@@ -60,6 +60,8 @@ function SelectModel:load()
 end
 
 function SelectModel:updateSetItems()
+	local config = self.configModel.configs.settings.select
+
 	local params = {}
 
 	local order, group_allowed = self.sortModel:getOrder(self.config.sortFunction)
@@ -67,7 +69,7 @@ function SelectModel:updateSetItems()
 	params.order = table_util.copy(order)
 	table.insert(params.order, "chartmeta_id")
 
-	if self.config.collapse and group_allowed then
+	if config.collapse and group_allowed then
 		params.group = {"chartfile_set_id"}
 	end
 
@@ -76,7 +78,7 @@ function SelectModel:updateSetItems()
 
 	params.where = where
 	params.lamp = lamp
-	params.difficulty = "enps_diff"
+	params.difficulty = config.diff_column
 
 	self.cacheModel.cacheDatabase:queryAsync(params)
 	self.noteChartSetLibrary:updateItems()
@@ -85,9 +87,10 @@ end
 ---@param hash string
 ---@param index number
 function SelectModel:findNotechart(hash, index)
+	local config = self.configModel.configs.settings.select
 	local params = {
 		where = {hash = hash, index = index},
-		difficulty = "enps_diff",
+		difficulty = config.diff_column,
 	}
 	self.cacheModel.cacheDatabase:queryAsync(params)
 	self.noteChartSetLibrary:updateItems()

@@ -12,9 +12,9 @@ local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 
 
 local sections = {
 	"gameplay",
+	"select",
 	"graphics",
 	"audio",
-	"input",
 	"misc",
 }
 local section = sections[1]
@@ -83,7 +83,6 @@ function drawSection:gameplay()
 	local settings = configs.settings
 	local g = settings.gameplay
 	local i = settings.input
-	local s = configs.select
 	local p = configs.play
 
 	local speedModel = self.game.speedModel
@@ -122,9 +121,6 @@ function drawSection:gameplay()
 	g.autoKeySound = imgui.checkbox("autoKeySound", g.autoKeySound, "auto key sound")
 	g.eventBasedRender = imgui.checkbox("eventBasedRender", g.eventBasedRender, "event based render (experimental)")
 	g.swapVelocityType = imgui.checkbox("swapVelocityType", g.swapVelocityType, "swap 'current' and 'local' velocity (experimental)")
-
-	imgui.separator()
-	s.collapse = imgui.checkbox("s.collapse", s.collapse, "group charts if applicable")
 
 	imgui.separator()
 	just.indent(10)
@@ -169,6 +165,39 @@ function drawSection:gameplay()
 	just.text("time rate")
 	i.timeRate.decrease = imgui.hotkey("timeRate.decrease", i.timeRate.decrease, "decrease")
 	i.timeRate.increase = imgui.hotkey("timeRate.increase", i.timeRate.increase, "increase")
+end
+
+local diff_columns = {
+	"enps_diff",
+	"osu_diff",
+	"msd_diff",
+	"user_diff",
+}
+local diff_columns_names = {
+	enps_diff = "enps",
+	osu_diff = "osu",
+	msd_diff = "msd",
+	user_diff = "user",
+}
+---@param v number?
+---@return string
+local function format_diff_columns(v)
+	return diff_columns_names[v] or ""
+end
+
+function drawSection:select()
+	local settings = self.game.configModel.configs.settings
+	local i = settings.input
+	local s = settings.select
+
+	s.diff_column = imgui.combo("diff_column", s.diff_column, diff_columns, format_diff_columns, "difficulty")
+	s.collapse = imgui.checkbox("s.collapse", s.collapse, "group charts if applicable")
+
+	imgui.separator()
+
+	i.selectRandom = imgui.hotkey("selectRandom", i.selectRandom, "select random")
+	i.screenshot.capture = imgui.hotkey("screenshot.capture", i.screenshot.capture, "capture screenshot")
+	i.screenshot.open = imgui.hotkey("screenshot.open", i.screenshot.open, "open screenshot")
 end
 
 ---@param mode table
@@ -342,15 +371,6 @@ function drawSection:audio()
 		if d.init then s = s .. "init " end
 		imgui.text(s)
 	end
-end
-
-function drawSection:input()
-	local settings = self.game.configModel.configs.settings
-	local i = settings.input
-
-	i.selectRandom = imgui.hotkey("selectRandom", i.selectRandom, "select random")
-	i.screenshot.capture = imgui.hotkey("screenshot.capture", i.screenshot.capture, "capture screenshot")
-	i.screenshot.open = imgui.hotkey("screenshot.open", i.screenshot.open, "open screenshot")
 end
 
 function drawSection:misc()
