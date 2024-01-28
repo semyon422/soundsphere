@@ -14,33 +14,6 @@ function ModLoader:new(path)
     self.root = path
 end
 
----@param modModule table
----@param mountDir table
----@return boolean
-local function isValidMod(modModule, mountDir)
-    return (modModule ~= nil) or (mountDir ~= nil)
-end
-
----@param dir string
----@param modModule table
----@param mountDir table
----@return table
-local function createMod(dir, modModule, mountDir)
-    local mod = {
-        scriptFile = nil,
-        instance = nil,
-        directory = dir,
-        mount = mountDir ~= nil
-    }
-
-    if modModule then
-        local modPath = modsDirectoryPath .. "/" .. dir .. "/mod.lua"
-        mod.scriptFile = modPath:gsub(".lua$", "")
-    end
-
-    return mod
-end
-
 ---@return table[]
 local function getMods()
     local mods = {}
@@ -51,8 +24,18 @@ local function getMods()
         local modModule = love.filesystem.getInfo(modPath)
         local mountDir = love.filesystem.getInfo(modsDirectoryPath .. "/" .. dir .. "/" .. mountPath)
 
-        if isValidMod(modModule, mountDir) then
-            local mod = createMod(dir, modModule, mountDir)
+        local mod = {
+            scriptFile = nil,
+            instance = nil,
+            directory = dir,
+            mount = mountDir ~= nil
+        }
+
+        if modModule then
+            mod.scriptFile = love.filesystem.load(modsDirectoryPath .. "/" .. dir .. "/mod.lua")
+        end
+
+        if modModule or mountDir then
             table.insert(mods, mod)
         end
     end
@@ -64,11 +47,9 @@ end
 ---@param filePath string
 ---@param fileMap table
 ---@param conflicts string[]
----@return boolean
 local function hasConflict(modPath, filePath, fileMap, conflicts)
-    local conflictFound = false
-
     local path = modPath .. filePath
+
     for _, file in ipairs(love.filesystem.getDirectoryItems(path)) do
         local fullPath = filePath .. "/" .. file
 
@@ -76,82 +57,70 @@ local function hasConflict(modPath, filePath, fileMap, conflicts)
             hasConflict(modPath, fullPath, fileMap, conflicts)
         else
             if fileMap[fullPath] ~= nil then
-                conflictFound = true
                 table.insert(conflicts, fullPath)
             end
 
             fileMap[fullPath] = true
         end
     end
-
-    return conflictFound
 end
 
 ---@param mods table[]
----@return boolean
 ---@return string[]
 local function checkForConflicts(mods)
-    local conflictFound = false
     local conflicts = {}
 
     local fileMap = {}
 
     for _, mod in pairs(mods) do
         if mod.mount then
-            hasConflict(modsDirectoryPath .. "/" .. mountPath, "", fileMap, conflicts)
+            hasConflict(modsDirectoryPath .. "/" .. mod.directory .. "/" .. mountPath, "", fileMap, conflicts)
         end
     end
 
-    return conflictFound, conflicts
+    return conflicts
 end
 
 ---@param root string
----@param mod table
----@return boolean
-local function mount(root, mod)
-    local success, error = physfs.mount(root .. "/" .. modsDirectoryPath .. "/" .. mod.directory .. "/" .. mountPath, "/", false)
+---@param directory string
+local function mount(root, directory)
+    local success, err = physfs.mount(root .. "/" .. modsDirectoryPath .. "/" .. directory .. "/" .. mountPath, "/", false)
     success = success and true or false
 
-    if error then
-        print("Error mounting mod: " .. error)
+    if not success then
+        error("Error mounting mod: " .. err)
     end
-
-    return success
 end
 
 function ModLoader:loadMods()
     local mods = getMods()
 
-    local conflictFound, conflictsPath = checkForConflicts(mods)
+    local conflicts = checkForConflicts(mods)
 
-    if conflictFound then
-        for _, file in pairs(conflictsPath) do
+    if #conflicts ~= 0 then
+        for _, file in ipairs(conflicts) do
             print("Conflict: " .. file)
         end
 
         error("Two or more mods are modifying the same file. Check the console for details.")
     end
 
-    for _, mod in pairs(mods) do
+    for _, mod in ipairs(mods) do
         package.add(modsDirectoryPath .. "/" .. mod.directory)
 
-        if mod.mount == true then
-            local result = mount(self.root, mod)
-
-            if result == false then
-                mod = nil
-            end
+        if mod.mount then
+            mount(self.root, mod.directory)
         end
     end
 
     for _, mod in pairs(mods) do
         if mod.scriptFile then
-            mod.instance = require(mod.scriptFile)
+            mod.instance = mod.scriptFile()
         end
     end
 
     for _, mod in pairs(mods) do
-        if mod.instance and mod.instance.init then
+        if mod.instance then
             mod.instance:init(mods)
         end
     end
