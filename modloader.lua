@@ -1,5 +1,4 @@
 local physfs = require("physfs")
-local package = require("aqua.package")
 local class = require("class")
 
 ---@class sphere.ModLoader
@@ -22,22 +21,18 @@ local function getMods()
     for _, dir in ipairs(modDirs) do
         local modPath = modsDirectoryPath .. "/" .. dir .. "/" .. scriptFileName
         local modModule = love.filesystem.getInfo(modPath)
-        local mountDir = love.filesystem.getInfo(modsDirectoryPath .. "/" .. dir .. "/")
 
         local mod = {
             scriptFile = nil,
             instance = nil,
             directory = dir,
-            mount = mountDir ~= nil
         }
 
         if modModule then
-            mod.scriptFile = love.filesystem.load(modsDirectoryPath .. "/" .. dir .. "/" .. scriptFileName)
+            mod.scriptFile = assert(love.filesystem.load(modPath))
         end
 
-        if modModule or mountDir then
-            table.insert(mods, mod)
-        end
+        table.insert(mods, mod)
     end
 
     return mods
@@ -60,7 +55,7 @@ local function hasConflict(modPath, filePath, fileMap, conflicts)
                 table.insert(conflicts, fullPath)
             end
 
-            if file ~= "mod.lua" then
+            if file ~= scriptFileName then
                 fileMap[fullPath] = true
             end
         end
@@ -75,9 +70,7 @@ local function checkForConflicts(mods)
     local fileMap = {}
 
     for _, mod in pairs(mods) do
-        if mod.mount then
-            hasConflict(modsDirectoryPath .. "/" .. mod.directory .. "/", "", fileMap, conflicts)
-        end
+        hasConflict(modsDirectoryPath .. "/" .. mod.directory .. "/", "", fileMap, conflicts)
     end
 
     return conflicts
@@ -107,13 +100,9 @@ function ModLoader:loadMods()
         error("Two or more mods are modifying the same file. Check the console for details.")
     end
 
-    for _, mod in ipairs(mods) do
-        if mod.mount then
-            mount(self.root, mod.directory)
-        end
-    end
-
     for _, mod in pairs(mods) do
+        mount(self.root, mod.directory)
+
         if mod.scriptFile then
             mod.instance = mod.scriptFile()
         end
