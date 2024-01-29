@@ -18,6 +18,18 @@ local function drawFrameRect(w, h, _r)
 end
 
 ---@param self table
+local function CacheStatus(self)
+	local cacheStatus = self.game.cacheModel.cacheStatus
+
+	local w, h = Layout:move("column1")
+	drawFrameRect(w, h)
+
+	imgui.text("chartfile_sets: " .. cacheStatus.chartfile_sets)
+	imgui.text("chartfiles: " .. cacheStatus.chartfiles)
+	imgui.text("chartmetas: " .. cacheStatus.chartmetas)
+end
+
+---@param self table
 local function Cache(self)
 	local w, h = Layout:move("column2row2row1")
 	drawFrameRect(w, h)
@@ -64,5 +76,6 @@ end
 return function(self)
 	CollectionList(self)
 	Cache(self)
+	CacheStatus(self)
 	CollectionsSubscreen(self)
 end

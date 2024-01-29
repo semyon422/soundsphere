@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS `chartfile_sets` (
 	`id` INTEGER PRIMARY KEY,
 	`dir` TEXT NOT NULL,
 	`name` TEXT NOT NULL,
-	`status` INTEGER NOT NULL DEFAULT 0,
 	`modified_at` INTEGER NOT NULL,
 	UNIQUE(`dir`, `name`)
 );

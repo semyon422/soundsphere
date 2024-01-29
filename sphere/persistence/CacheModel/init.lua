@@ -3,6 +3,7 @@ local class = require("class")
 local CacheDatabase = require("sphere.persistence.CacheModel.CacheDatabase")
 local ChartRepo = require("sphere.persistence.CacheModel.ChartRepo")
 local ChartsDatabase = require("sphere.persistence.CacheModel.ChartsDatabase")
+local CacheStatus = require("sphere.persistence.CacheModel.CacheStatus")
 
 ---@class sphere.CacheModel
 ---@operator call: sphere.CacheModel
@@ -25,6 +26,9 @@ function CacheModel:load()
 
 	self.cacheDatabase = CacheDatabase(self.cdb)
 	self.chartRepo = ChartRepo(self.cdb)
+	self.cacheStatus = CacheStatus(self.chartRepo)
+
+	self.cacheStatus:update()
 end
 
 function CacheModel:unload()

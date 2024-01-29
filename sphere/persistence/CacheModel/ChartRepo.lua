@@ -46,6 +46,11 @@ function ChartRepo:selectChartfileSetsAtPath(dir)
 	return self.models.chartfile_sets:select({dir__startswith = dir})
 end
 
+---@return number
+function ChartRepo:countChartfileSets()
+	return self.models.chartfile_sets:count()
+end
+
 --------------------------------------------------------------------------------
 
 ---@param dir string
@@ -80,6 +85,11 @@ end
 ---@return table?
 function ChartRepo:selectChartfileById(id)
 	return self.models.chartfiles:find({id = assert(id)})
+end
+
+---@return number
+function ChartRepo:countChartfiles()
+	return self.models.chartfiles:count()
 end
 
 -- ---@param setId number
@@ -118,6 +128,11 @@ end
 ---@return table?
 function ChartRepo:selectChartmetaById(id)
 	return self.models.chartmetas:find({id = assert(id)})
+end
+
+---@return number
+function ChartRepo:countChartmetas()
+	return self.models.chartmetas:count()
 end
 
 --------------------------------------------------------------------------------

@@ -63,6 +63,7 @@ function CacheManager:generateCacheFull(path, force)
 	local path = path or "userdata/charts"
 
 	self:resetProgress()
+
 	self.state = 1
 	self:checkProgress()
 
@@ -71,10 +72,7 @@ function CacheManager:generateCacheFull(path, force)
 	self:commit()
 
 	self.state = 2
-	-- self:checkProgress()
-	-- self:checkProgress()
-
-	print("done1")
+	self:checkProgress()
 
 	self:begin()
 	self.chartmetaGenerator:generate(false, function(i, n, chartfile, noteCharts)
@@ -102,8 +100,7 @@ function CacheManager:generateCacheFull(path, force)
 	self:commit()
 
 	self.state = 3
-
-	print("done2")
+	self:checkProgress()
 end
 
 return CacheManager
