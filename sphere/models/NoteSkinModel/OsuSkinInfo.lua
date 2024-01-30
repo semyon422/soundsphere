@@ -17,14 +17,7 @@ end
 
 ---@param inputMode string
 ---@return boolean
-function OsuSkinInfo:matchInput(inputMode)  -- allow only Xkey input mode
-	local _inputMode = InputMode(inputMode)
-
-	local keys = _inputMode.key
-	if not keys or next(_inputMode, "key") then
-		return false
-	end
-
+function OsuSkinInfo:matchInput(inputMode)
 	return true
 end
 
@@ -32,7 +25,6 @@ end
 ---@return sphere.OsuNoteSkin?
 function OsuSkinInfo:loadSkin(inputMode)
 	local _inputMode = InputMode(inputMode)
-	local keys = _inputMode.key
 
 	local path = self:getPath()
 	print("load " .. path)
@@ -49,7 +41,7 @@ function OsuSkinInfo:loadSkin(inputMode)
 	noteSkin.directoryPath = self.dir
 	noteSkin.fileName = self.file_name
 	noteSkin.skinini = skinini
-	noteSkin:setKeys(keys)
+	noteSkin:setKeys(_inputMode:getColumns())
 	noteSkin.inputMode = _inputMode
 	local ok, err = xpcall(noteSkin.load, debug.traceback, noteSkin)
 	if not ok then

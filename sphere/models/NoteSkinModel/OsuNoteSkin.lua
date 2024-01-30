@@ -14,14 +14,19 @@ local CircleProgressView = require("sphere.views.GameplayView.CircleProgressView
 local OsuNoteSkin = NoteSkinVsrg + {}
 
 ---@param s string
+---@param tn boolean?
 ---@return table
-local function toarray(s)
+local function toarray(s, tn)
 	if not s then
 		return {}
 	end
 	local array = s:split(",")
 	for i, v in ipairs(array) do
-		array[i] = tonumber(v)
+		if tn then
+			array[i] = tonumber(v)
+		else
+			array[i] = v
+		end
 	end
 	return array
 end
@@ -66,7 +71,7 @@ local function copyDefaults(src, dst)
 		if not v then
 			dst[k] = default
 		elseif type(default) == "table" then
-			local arr = toarray(v)
+			local arr = toarray(v, true)
 			if k:find("Colour") then
 				fixColor(arr)
 			end
@@ -88,6 +93,7 @@ function OsuNoteSkin:load()
 	OsuNoteSkin.configContent = OsuNoteSkin.configContent or love.filesystem.read(configPath)
 
 	local skinini = self.skinini
+	local inputMode = self.inputMode
 
 	local mania = self.mania
 	local keysCount = tonumber(mania.Keys)
@@ -99,7 +105,7 @@ function OsuNoteSkin:load()
 	copyDefaults(defaultMania, mania)
 
 	local config, exists = JustConfig({defaultContent = self.configContent}):fromFile(
-		self.path:sub(1, -9) .. keysCount .. "key.config.lua"
+		self.path:sub(1, -9) .. tostring(inputMode) .. ".config.lua"
 	)
 	self.config = config
 	config.skinIniPath = self.path
@@ -119,11 +125,14 @@ function OsuNoteSkin:load()
 	self.unit = 480
 	self.hitposition = mania.HitPosition
 
-	local keys = {}
-	for i = 1, keysCount do
-		keys[i] = "key" .. i
+	local inputs = mania["Inputs" .. tostring(inputMode)]
+	if inputs then
+		local inputs_array = toarray(inputs)
+		assert(#inputs_array == keysCount, "invalid size of Inputs")
+		self:setInput(inputs_array)
+	else
+		self:setInput(inputMode:getInputs())
 	end
-	self:setInput(keys)
 
 	local SplitStages = mania.SplitStages == 1 and keysCount > 1
 
@@ -956,7 +965,7 @@ function OsuNoteSkin:parseSkinIni(content)
 			skinini[section] = skinini[section] or {}
 			if section == "Mania" then
 				block = {}
-				table.insert(skinini[section], block)
+				table.insert(skinini.Mania, block)
 			else
 				block = skinini[section]
 			end
@@ -971,13 +980,6 @@ function OsuNoteSkin:parseSkinIni(content)
 	copyDefaults(self:getDefaultGeneralSection(), skinini.General)
 	copyDefaults(self:getDefaultFontsSection(), skinini.Fonts)
 
-	local skinnedKeys = {}
-	for i, mania in ipairs(skinini.Mania) do
-		local keys = tonumber(mania.Keys)
-		if keys then
-			skinnedKeys[keys] = true
-		end
-	end
 	return skinini
 end
 

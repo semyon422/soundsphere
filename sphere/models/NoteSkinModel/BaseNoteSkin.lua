@@ -9,32 +9,6 @@ local BaseNoteSkin = NoteSkinVsrg + {}
 
 BaseNoteSkin.bgaTransform = {{1 / 2, -16 / 9 / 2}, {0, -7 / 9 / 2}, 0, {0, 16 / 9}, {0, 16 / 9}, 0, 0, 0, 0}
 
----@return table
-function BaseNoteSkin:getInputTable()
-	local inputMode = self.inputMode
-	local inputs = {}
-
-	for inputType, inputCount in pairs(inputMode) do
-		inputs[#inputs + 1] = {inputType, inputCount}
-	end
-
-	table.sort(inputs, function(a, b)
-		if a[2] ~= b[2] then
-			return a[2] > b[2]
-		else
-			return a[1] < b[1]
-		end
-	end)
-
-	local allInputs = {}
-	for _, input in ipairs(inputs) do
-		for i = 1, input[2] do
-			table.insert(allInputs, input[1] .. i)
-		end
-	end
-	return allInputs
-end
-
 ---@param t table
 ---@return table
 local function copyTable(t)
@@ -46,7 +20,6 @@ local function copyTable(t)
 end
 
 local configPath = "sphere/models/NoteSkinModel/BaseNoteSkinConfig.lua"
-
 
 function BaseNoteSkin:load(inputMode)
 	self.inputMode = InputMode(inputMode)
@@ -66,7 +39,7 @@ function BaseNoteSkin:load(inputMode)
 	self.columnWidth = config:get("noteWidth") or 48
 	self.noteHeight = config:get("noteHeight") or 24
 
-	local inputs = self:getInputTable()
+	local inputs = self.inputMode:getInputs()
 	self:setInput(inputs)
 
 	local width = {}
