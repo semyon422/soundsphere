@@ -165,4 +165,9 @@ function ChartRepo:selectChartdiffById(id)
 	return self.models.chartdiffs:find({id = assert(id)})
 end
 
+---@return number
+function ChartRepo:countChartdiffs()
+	return self.models.chartdiffs:count()
+end
+
 return ChartRepo

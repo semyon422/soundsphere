@@ -27,6 +27,11 @@ local function CacheStatus(self)
 	imgui.text("chartfile_sets: " .. cacheStatus.chartfile_sets)
 	imgui.text("chartfiles: " .. cacheStatus.chartfiles)
 	imgui.text("chartmetas: " .. cacheStatus.chartmetas)
+	imgui.text("chartdiffs: " .. cacheStatus.chartdiffs)
+
+	if imgui.button("cacheStatus update", "update") then
+		cacheStatus:update()
+	end
 end
 
 ---@param self table

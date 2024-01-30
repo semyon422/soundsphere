@@ -15,6 +15,7 @@ function CacheStatus:update()
 	self.chartfile_sets = chartRepo:countChartfileSets()
 	self.chartfiles = chartRepo:countChartfiles()
 	self.chartmetas = chartRepo:countChartmetas()
+	self.chartdiffs = chartRepo:countChartdiffs()
 end
 
 return CacheStatus
