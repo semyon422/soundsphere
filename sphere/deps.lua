@@ -26,7 +26,7 @@ return {
 		"multiplayerModel",
 		"previewModel",
 		"discordModel",
-		"scoreModel",
+		"chartRepo",
 		"onlineModel",
 		"resourceModel",
 		"windowModel",

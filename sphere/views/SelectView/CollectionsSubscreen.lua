@@ -60,13 +60,7 @@ end
 local function CollectionsSubscreen(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-	local w, h = Layout:move("column1", "footer")
-
-	if imgui.TextOnlyButton("calc top scores", "calc top scores", w / 2, h) then
-		self.game.scoreModel:asyncCalculateTopScores()
-	end
-
-	w, h = Layout:move("column3", "footer")
+	local w, h = Layout:move("column3", "footer")
 
 	just.row(true)
 	if imgui.TextOnlyButton("notecharts", "notecharts", w / 2, h) then

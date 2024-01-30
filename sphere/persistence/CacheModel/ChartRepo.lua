@@ -170,4 +170,35 @@ function ChartRepo:countChartdiffs()
 	return self.models.chartdiffs:count()
 end
 
+---@return table
+function ChartRepo:selectAllScores()
+	return self.models.scores:select()
+end
+
+---@param id number
+---@return table?
+function ChartRepo:selectScore(id)
+	return self.models.scores:find({id = id})
+end
+
+---@param score table
+---@return table?
+function ChartRepo:insertScore(score)
+	return self.models.scores:create(score, true)
+end
+
+---@param score table
+---@return table?
+function ChartRepo:updateScore(score)
+	return self.models.scores:update(score, {id = score.id})
+end
+
+---@param hash string
+---@param index number
+---@return table
+function ChartRepo:getScores(hash, index)
+	return {}
+	-- return self.models.scores:select({chart_hash = hash, chart_index = index})
+end
+
 return ChartRepo

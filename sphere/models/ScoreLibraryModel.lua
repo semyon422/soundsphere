@@ -13,11 +13,11 @@ ScoreLibraryModel.scoreSourceName = "local"
 
 ---@param configModel sphere.ConfigModel
 ---@param onlineModel sphere.OnlineModel
----@param scoreModel sphere.ScoreModel
-function ScoreLibraryModel:new(configModel, onlineModel, scoreModel)
+---@param chartRepo sphere.ChartRepo
+function ScoreLibraryModel:new(configModel, onlineModel, chartRepo)
 	self.configModel = configModel
 	self.onlineModel = onlineModel
-	self.scoreModel = scoreModel
+	self.chartRepo = chartRepo
 
 	self.hash = ""
 	self.index = 1
@@ -112,7 +112,7 @@ function ScoreLibraryModel:updateItemsOnline()
 end
 
 function ScoreLibraryModel:updateItemsLocal()
-	local scoreEntries = self.scoreModel:getScoreEntries(
+	local scoreEntries = self.chartRepo:getScores(
 		self.hash,
 		self.index
 	)

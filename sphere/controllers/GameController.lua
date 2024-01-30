@@ -53,7 +53,7 @@ function GameController:new()
 	self.scoreLibraryModel = ScoreLibraryModel(
 		self.persistence.configModel,
 		self.onlineModel,
-		self.persistence.scoreModel
+		self.persistence.chartRepo
 	)
 	self.selectModel = SelectModel(
 		self.persistence.configModel,
@@ -87,7 +87,6 @@ function GameController:new()
 		self.playContext
 	)
 
-	self.scoreModel = self.persistence.scoreModel
 	self.cacheModel = self.persistence.cacheModel
 	self.osudirectModel = self.persistence.osudirectModel
 	self.configModel = self.persistence.configModel
@@ -129,7 +128,6 @@ function GameController:load()
 	self.playContext:load(configModel.configs.play)
 	self.modifierSelectModel:updateAdded()
 
-	self.scoreModel:load()
 	self.onlineModel:load()
 	self.noteSkinModel:load()
 	self.cacheModel:load()
