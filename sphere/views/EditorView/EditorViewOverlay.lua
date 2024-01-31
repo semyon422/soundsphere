@@ -30,7 +30,7 @@ function tabs.info(self)
 	md.audio_path = imgui.input("audio_path input", md.audio_path, "audio_path")
 	md.background_path = imgui.input("background_path input", md.background_path, "background_path")
 	md.preview_time = imgui.input("preview_time input", md.preview_time, "preview_time")
-	md.bpm = imgui.input("bpm input", md.bpm, "bpm")
+	md.tempo = imgui.input("tempo input", md.tempo, "tempo")
 	md.inputmode = imgui.input("inputmode input", md.inputmode, "inputmode")
 
 	imgui.separator()
