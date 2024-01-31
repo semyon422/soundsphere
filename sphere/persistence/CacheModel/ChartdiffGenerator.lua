@@ -26,6 +26,15 @@ function ChartdiffGenerator:compute(noteChart, rate)
 end
 
 ---@param chartdiff table
+---@param chartmeta table
+function ChartdiffGenerator:fillMeta(chartdiff, chartmeta)
+	local rate = chartdiff.rate
+
+	chartdiff.tempo = chartmeta.tempo * rate
+	chartdiff.duration = chartmeta.tempo / rate
+end
+
+---@param chartdiff table
 function ChartdiffGenerator:createUpdateChartdiff(chartdiff)
 	local _chartdiff = self.chartRepo:selectChartdiff(chartdiff)
 	if not _chartdiff then

@@ -1,4 +1,5 @@
 local thread = require("thread")
+local erfunc = require("libchart.erfunc")
 local class = require("class")
 
 ---@class sphere.ScoreLibrary
@@ -64,8 +65,9 @@ function ScoreLibrary:filterScores(scores)
 	return newScores
 end
 
+---@param chartmeta table
 ---@return nil?
-function ScoreLibrary:updateItemsAsync()
+function ScoreLibrary:updateItemsAsync(chartmeta)
 	local hash_index = self.hash .. self.index
 	self.items = {}
 
@@ -73,7 +75,7 @@ function ScoreLibrary:updateItemsAsync()
 	if select.scoreSourceName == "online" then
 		self:updateItemsOnline()
 	else
-		self:updateItemsLocal()
+		self:updateItemsLocal(chartmeta)
 	end
 
 	if self.hash .. self.index ~= hash_index then
@@ -111,19 +113,32 @@ function ScoreLibrary:updateItemsOnline()
 	end
 end
 
-function ScoreLibrary:updateItemsLocal()
-	local scoreEntries = self.cacheModel.chartRepo:getScores(
+---@param score table
+function ScoreLibrary:fillScoreRating(score)
+	local window = self.configModel.configs.settings.gameplay.ratingHitTimingWindow
+	local s = erfunc.erf(window / (score.accuracy * math.sqrt(2)))
+	score.rating = score.difficulty * s
+	score.score = s * 10000
+end
+
+---@param chartmeta table
+function ScoreLibrary:updateItemsLocal(chartmeta)
+	local scores = self.cacheModel.chartRepo:getScores(
 		self.hash,
 		self.index
 	)
-	-- table.sort(scoreEntries, function(a, b)
-	-- 	return a.rating > b.rating
-	-- end)
-	scoreEntries = self:filterScores(scoreEntries)
-	for i = 1, #scoreEntries do
-		scoreEntries[i].rank = i
+	for i, score in ipairs(scores) do
+		self.cacheModel.chartdiffGenerator:fillMeta(score, chartmeta)
+		self:fillScoreRating(score)
 	end
-	self.items = scoreEntries
+	table.sort(scores, function(a, b)
+		return a.rating > b.rating
+	end)
+	scores = self:filterScores(scores)
+	for i, score in ipairs(scores) do
+		scores[i].rank = i
+	end
+	self.items = scores
 	self.scoreSourceName = "local"
 end
 

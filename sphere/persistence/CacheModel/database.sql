@@ -152,8 +152,8 @@ chartdiffs.rate IS 1.0
 CREATE TEMP VIEW IF NOT EXISTS scores_list AS
 SELECT
 scores.id AS score_id,
-chartdiffs.id AS chartdiff_id,
 scores.*,
+chartdiffs.enps_diff AS difficulty,
 chartdiffs.hash,
 chartdiffs.`index`,
 chartdiffs.modifiers,

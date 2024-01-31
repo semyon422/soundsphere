@@ -47,6 +47,7 @@ function GameplayController:load()
 	chartdiff.modifiers = playContext.modifiers
 	chartdiff.hash = chartItem.hash
 	chartdiff.index = chartItem.index
+	cacheModel.chartdiffGenerator:fillMeta(chartdiff, chartItem)
 	self.chartdiff = chartdiff
 
 	local noteSkin = noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))

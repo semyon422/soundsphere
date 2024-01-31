@@ -403,7 +403,7 @@ function SelectModel:pullNoteChart(noUpdate, noPullNext)
 end
 
 function SelectModel:updateScoreOnlineAsync()
-	self.scoreLibrary:updateItemsAsync()
+	self.scoreLibrary:updateItemsAsync(self.noteChartItem)
 	self:findScore()
 end
 
@@ -442,7 +442,7 @@ function SelectModel:pullScore(noUpdate)
 			)
 			return
 		end
-		self.scoreLibrary:updateItems()
+		self.scoreLibrary:updateItems(self.noteChartItem)
 	end
 
 	self:findScore()
