@@ -53,7 +53,7 @@ function GameController:new()
 	self.scoreLibraryModel = ScoreLibraryModel(
 		self.persistence.configModel,
 		self.onlineModel,
-		self.persistence.chartRepo
+		self.persistence.cacheModel.chartRepo
 	)
 	self.selectModel = SelectModel(
 		self.persistence.configModel,

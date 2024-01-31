@@ -6,7 +6,6 @@ local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGener
 local NoteChartFactory = require("notechart.NoteChartFactory")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local class = require("class")
-local md5 = require("md5")
 
 ---@class sphere.CacheManager
 ---@operator call: sphere.CacheManager

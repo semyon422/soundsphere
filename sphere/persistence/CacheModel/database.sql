@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS `chartmetas` (
 	`osu_beatmapset_id` INTEGER,
 	`osu_ranked_status` INTEGER,
 	`tempo` REAL,
+	`duration` REAL,
 	`has_video` INTEGER,
 	`has_storyboard` INTEGER,
 	`has_subtitles` INTEGER,
@@ -60,20 +61,13 @@ CREATE TABLE IF NOT EXISTS `chartmetas` (
 CREATE INDEX IF NOT EXISTS chartmetas_inputmode_idx ON chartmetas (`inputmode`);
 CREATE INDEX IF NOT EXISTS chartmetas_name_idx ON chartmetas (`name`);
 
-CREATE TABLE IF NOT EXISTS `play_configs` (
-	`id` INTEGER PRIMARY KEY,
-	`modifiers` TEXT,
-	`rate` REAL,
-	`const` INTEGER,
-	`timings` TEXT,
-	`single` INTEGER
-);
-
 CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`id` INTEGER PRIMARY KEY,
-	`play_config_id` INTEGER,
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
+	`modifiers` TEXT,
+	`rate` REAL DEFAULT 1.0,
+
 	`inputmode` TEXT,
 	`notes_count` INTEGER,
 	`long_notes_count` INTEGER,
@@ -85,12 +79,16 @@ CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`msd_diff_data` TEXT,
 	`user_diff` REAL,
 	`user_diff_data` TEXT,
-	UNIQUE(`hash`, `index`, `play_config_id`)
+	UNIQUE(`hash`, `index`, `modifiers`, `rate`)
 );
 
 CREATE TABLE IF NOT EXISTS `scores` (
 	`id` INTEGER PRIMARY KEY,
 	`chartdiff_id` INTEGER,
+	`const` INTEGER,
+	`timings` TEXT,
+	`single` INTEGER,
+
 	`is_top` REAL DEFAULT 0,
 	`time` REAL,
 	`accuracy` REAL,
@@ -120,6 +118,7 @@ CREATE TEMP VIEW IF NOT EXISTS chartset_list AS
 SELECT
 chartmetas.id AS chartmeta_id,
 chartfiles.id AS chartfile_id,
+chartdiffs.id AS chartdiff_id,
 scores.id AS score_id,
 chartfiles.set_id AS chartfile_set_id,
 chartfiles.dir || "/" || chartfiles.name AS path,
@@ -145,4 +144,7 @@ chartmetas.`index` = chartdiffs.`index`
 LEFT JOIN scores ON
 chartdiffs.id = scores.chartdiff_id AND
 scores.is_top = TRUE
-WHERE chartdiffs.play_config_id IS NULL;
+WHERE
+chartdiffs.modifiers IS NULL AND
+chartdiffs.rate IS 1.0
+;

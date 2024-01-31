@@ -450,7 +450,7 @@ local function NotechartInfo(self)
 	local const = show and playContext.const or scoreItem.const
 
 	local baseBpm = noteChartItem.bpm
-	local baseLength = noteChartItem.length
+	local baseLength = noteChartItem.duration
 	local baseDifficulty = noteChartItem.difficulty
 	local baseInputMode = noteChartItem.inputmode
 

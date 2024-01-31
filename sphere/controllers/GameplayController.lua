@@ -18,11 +18,13 @@ function GameplayController:load()
 	local noteSkinModel = self.noteSkinModel
 	local configModel = self.configModel
 	local difficultyModel = self.difficultyModel
+	local cacheModel = self.cacheModel
 	local replayModel = self.replayModel
 	local pauseModel = self.pauseModel
 	local fileFinder = self.fileFinder
 	local playContext = self.playContext
 
+	local chartItem = self.selectModel.noteChartItem
 	local config = configModel.configs.settings
 
 	local noteChart = selectModel:loadNoteChart(self:getImporterSettings())
@@ -40,6 +42,12 @@ function GameplayController:load()
 
 	ModifierModel:applyMeta(playContext.modifiers, state)
 	ModifierModel:apply(playContext.modifiers, noteChart)
+
+	local chartdiff = cacheModel.chartdiffGenerator:compute(noteChart, playContext.rate)
+	chartdiff.modifiers = playContext.modifiers
+	chartdiff.hash = chartItem.hash
+	chartdiff.index = chartItem.index
+	self.chartdiff = chartdiff
 
 	local noteSkin = noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))
 	noteSkin:loadData()
@@ -199,7 +207,7 @@ end
 function GameplayController:discordPlay()
 	local chartItem = self.selectModel.noteChartItem
 	local rhythmModel = self.rhythmModel
-	local length = math.min(chartItem.length, 3600 * 24)
+	local length = math.min(chartItem.duration, 3600 * 24)
 
 	local timeEngine = rhythmModel.timeEngine
 	self.discordModel:setPresence({
@@ -304,15 +312,18 @@ function GameplayController:saveScore()
 		playContext
 	)
 
-	local scoreEntryTable = {
-		chart_hash = chartItem.hash,
-		chart_index = chartItem.index,
+	local chartdiff = self.cacheModel.chartdiffGenerator:createUpdateChartdiff(self.chartdiff)
+
+	local score = {
+		chartdiff_id = chartdiff.id,
+		const = playContext.const,
+		-- timings = playContext.timings,
+		single = playContext.single,
+
+		is_top = false,
 		time = os.time(),
 		accuracy = scoreSystem.normalscore.accuracyAdjusted,
 		max_combo = scoreSystem.base.maxCombo,
-		modifiers = ModifierEncoder:encode(playContext.modifiers),
-		rate = playContext.rate,
-		const = playContext.const and 1 or 0,
 		replay_hash = replayHash,
 		ratio = scoreSystem.misc.ratio,
 		perfect = scoreSystem.judgement.counters.soundsphere.perfect,
@@ -320,11 +331,9 @@ function GameplayController:saveScore()
 		miss = scoreSystem.base.missCount,
 		mean = scoreSystem.normalscore.normalscore.mean,
 		earlylate = scoreSystem.misc.earlylate,
-		inputmode = tostring(rhythmModel.noteChart.inputMode),
-		difficulty = self.playContext.enps,
 		pauses = scoreEngine.pausesCount,
 	}
-	local scoreEntry = self.chartRepo:insertScore(scoreEntryTable)
+	local scoreEntry = self.cacheModel.chartRepo:insertScore(score)
 
 	local base = scoreSystem.base
 	if base.hitCount / base.notesCount >= 0.5 then

@@ -120,7 +120,7 @@ local function Cells(self)
 	local format = ""
 	if noteChartItem then
 		bpm = (noteChartItem.bpm or 0) * baseTimeRate
-		length = (noteChartItem.length or 0) / baseTimeRate
+		length = (noteChartItem.duration or 0) / baseTimeRate
 		notes_count = noteChartItem.notes_count or 0
 		level = noteChartItem.level or 0
 		longNoteRatio = noteChartItem.longNoteRatio or 0

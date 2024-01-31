@@ -144,18 +144,31 @@ function ChartRepo:insertChartdiff(chartdiff)
 end
 
 ---@param chartdiff table
+---@return table?
 function ChartRepo:updateChartdiff(chartdiff)
-	self.models.chartdiffs:update(chartdiff, {id = assert(chartdiff.id)})
+	return self.models.chartdiffs:update(chartdiff, {id = assert(chartdiff.id)})[1]
 end
 
 ---@param hash string
 ---@param index number
 ---@return table?
-function ChartRepo:selectChartdiff(hash, index)
+function ChartRepo:selectDefaultChartdiff(hash, index)
 	return self.models.chartdiffs:find({
 		hash = assert(hash),
 		index = assert(index),
-		play_config_id__isnull = true,
+		modifiers__isnull = true,
+		rate = 1,
+	})
+end
+
+---@param chartdiff table
+---@return table?
+function ChartRepo:selectChartdiff(chartdiff)
+	return self.models.chartdiffs:find({
+		hash = assert(chartdiff.hash),
+		index = assert(chartdiff.index),
+		modifiers = assert(chartdiff.modifiers),
+		rate = assert(chartdiff.rate),
 	})
 end
 
