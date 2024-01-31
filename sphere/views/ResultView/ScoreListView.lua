@@ -10,7 +10,7 @@ ScoreListView.rows = 5
 
 function ScoreListView:reloadItems()
 	self.stateCounter = self.game.selectModel.scoreStateCounter
-	self.items = self.game.scoreLibraryModel.items
+	self.items = self.game.selectModel.scoreLibrary.items
 end
 
 ---@return number
@@ -66,7 +66,7 @@ function ScoreListView:drawItem(i, w, h)
 
 	local cw = (w - 44) / 5
 
-	local scoreSourceName = self.game.scoreLibraryModel.scoreSourceName
+	local scoreSourceName = self.game.selectModel.scoreLibrary.scoreSourceName
 	if scoreSourceName == "online" then
 		self:drawItemOnline(i, w, h)
 		return

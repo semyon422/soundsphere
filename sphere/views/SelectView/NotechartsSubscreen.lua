@@ -326,7 +326,7 @@ local function ScoreSourceDropdown(self)
 	h = 60
 	love.graphics.translate(w * (3 / 4 - size) - 26, (72 - h) / 2)
 
-	local sources = self.game.scoreLibraryModel.scoreSources
+	local sources = self.game.selectModel.scoreLibrary.scoreSources
 	local config = self.game.configModel.configs.select
 	local i = imgui.SpoilerList("ScoreSourceDropdown", w * size, h, sources, config.scoreSourceName)
 	if i then

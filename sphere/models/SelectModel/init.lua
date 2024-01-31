@@ -7,6 +7,7 @@ local NoteChartFactory = require("notechart.NoteChartFactory")
 local NoteChartLibrary = require("sphere.models.SelectModel.NoteChartLibrary")
 local NoteChartSetLibrary = require("sphere.models.SelectModel.NoteChartSetLibrary")
 local CollectionLibrary = require("sphere.models.SelectModel.CollectionLibrary")
+local ScoreLibrary = require("sphere.models.SelectModel.ScoreLibrary")
 local SearchModel = require("sphere.models.SelectModel.SearchModel")
 local SortModel = require("sphere.models.SelectModel.SortModel")
 
@@ -21,11 +22,10 @@ SelectModel.pullingNoteChartSet = false
 SelectModel.debounceTime = 0.5
 
 ---@param configModel sphere.ConfigModel
----@param scoreLibraryModel sphere.ScoreLibraryModel
 ---@param cacheModel sphere.CacheModel
-function SelectModel:new(configModel, scoreLibraryModel, cacheModel)
+---@param onlineModel sphere.OnlineModel
+function SelectModel:new(configModel, cacheModel, onlineModel)
 	self.configModel = configModel
-	self.scoreLibraryModel = scoreLibraryModel
 	self.cacheModel = cacheModel
 
 	self.noteChartLibrary = NoteChartLibrary()
@@ -33,6 +33,12 @@ function SelectModel:new(configModel, scoreLibraryModel, cacheModel)
 	self.collectionLibrary = CollectionLibrary()
 	self.searchModel = SearchModel()
 	self.sortModel = SortModel()
+
+	self.scoreLibrary = ScoreLibrary(
+		configModel,
+		onlineModel,
+		cacheModel
+	)
 end
 
 function SelectModel:load()
@@ -296,7 +302,7 @@ end
 ---@param direction number?
 ---@param destination number?
 function SelectModel:scrollScore(direction, destination)
-	local scoreItems = self.scoreLibraryModel.items
+	local scoreItems = self.scoreLibrary.items
 
 	destination = math.min(math.max(destination or self.scoreItemIndex + direction, 1), #scoreItems)
 	if not scoreItems[destination] or self.scoreItemIndex == destination then
@@ -354,7 +360,7 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 	self.changed = true
 
 	self.noteChartLibrary:clear()
-	self.scoreLibraryModel:clear()
+	self.scoreLibrary:clear()
 
 	self.pullingNoteChartSet = false
 end
@@ -393,19 +399,19 @@ function SelectModel:pullNoteChart(noUpdate, noPullNext)
 
 	self.scoreItem = nil
 
-	self.scoreLibraryModel:clear()
+	self.scoreLibrary:clear()
 end
 
 function SelectModel:updateScoreOnlineAsync()
-	self.scoreLibraryModel:updateItemsAsync()
+	self.scoreLibrary:updateItemsAsync()
 	self:findScore()
 end
 
 SelectModel.updateScoreOnline = thread.coro(SelectModel.updateScoreOnlineAsync)
 
 function SelectModel:findScore()
-	local scoreItems = self.scoreLibraryModel.items
-	self.scoreItemIndex = self.scoreLibraryModel:getItemIndex(self.config.score_id) or 1
+	local scoreItems = self.scoreLibrary.items
+	self.scoreItemIndex = self.scoreLibrary:getItemIndex(self.config.score_id) or 1
 
 	local scoreItem = scoreItems[self.scoreItemIndex]
 	self.scoreItem = scoreItem
@@ -425,18 +431,18 @@ function SelectModel:pullScore(noUpdate)
 
 	if not noUpdate then
 		self.scoreStateCounter = self.scoreStateCounter + 1
-		self.scoreLibraryModel:setHash(noteChartItem.hash)
-		self.scoreLibraryModel:setIndex(noteChartItem.index)
+		self.scoreLibrary:setHash(noteChartItem.hash)
+		self.scoreLibrary:setIndex(noteChartItem.index)
 
 		local select = self.configModel.configs.select
 		if select.scoreSourceName == "online" then
-			self.scoreLibraryModel:clear()
+			self.scoreLibrary:clear()
 			delay.debounce(self, "scoreDebounce", self.debounceTime,
 				self.updateScoreOnlineAsync, self
 			)
 			return
 		end
-		self.scoreLibraryModel:updateItems()
+		self.scoreLibrary:updateItems()
 	end
 
 	self:findScore()

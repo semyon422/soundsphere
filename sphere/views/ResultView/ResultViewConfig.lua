@@ -431,9 +431,9 @@ local function NotechartInfo(self)
 		return
 	end
 
-	local topScoreItem = self.game.scoreLibraryModel.items[1]
+	local topScoreItem = self.game.selectModel.scoreLibrary.items[1]
 	if topScoreItem == scoreItem then
-		topScoreItem = self.game.scoreLibraryModel.items[2]
+		topScoreItem = self.game.selectModel.scoreLibrary.items[2]
 	end
 	if not topScoreItem then
 		topScoreItem = scoreItem

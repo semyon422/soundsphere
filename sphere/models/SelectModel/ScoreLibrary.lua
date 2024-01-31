@@ -1,46 +1,46 @@
 local thread = require("thread")
 local class = require("class")
 
----@class sphere.ScoreLibraryModel
----@operator call: sphere.ScoreLibraryModel
-local ScoreLibraryModel = class()
+---@class sphere.ScoreLibrary
+---@operator call: sphere.ScoreLibrary
+local ScoreLibrary = class()
 
-ScoreLibraryModel.scoreSources = {
+ScoreLibrary.scoreSources = {
 	"local",
 	"online",
 }
-ScoreLibraryModel.scoreSourceName = "local"
+ScoreLibrary.scoreSourceName = "local"
 
 ---@param configModel sphere.ConfigModel
 ---@param onlineModel sphere.OnlineModel
----@param chartRepo sphere.ChartRepo
-function ScoreLibraryModel:new(configModel, onlineModel, chartRepo)
+---@param cacheModel sphere.CacheModel
+function ScoreLibrary:new(configModel, onlineModel, cacheModel)
 	self.configModel = configModel
 	self.onlineModel = onlineModel
-	self.chartRepo = chartRepo
+	self.cacheModel = cacheModel
 
 	self.hash = ""
 	self.index = 1
 	self.items = {}
 end
 
-function ScoreLibraryModel:clear()
+function ScoreLibrary:clear()
 	self.items = {}
 end
 
 ---@param hash string?
-function ScoreLibraryModel:setHash(hash)
+function ScoreLibrary:setHash(hash)
 	self.hash = hash or ""
 end
 
 ---@param index number?
-function ScoreLibraryModel:setIndex(index)
+function ScoreLibrary:setIndex(index)
 	self.index = index or 1
 end
 
 ---@param scores table
 ---@return table
-function ScoreLibraryModel:filterScores(scores)
+function ScoreLibrary:filterScores(scores)
 	local filters = self.configModel.configs.filters.score
 	local select = self.configModel.configs.select
 	local index
@@ -65,7 +65,7 @@ function ScoreLibraryModel:filterScores(scores)
 end
 
 ---@return nil?
-function ScoreLibraryModel:updateItemsAsync()
+function ScoreLibrary:updateItemsAsync()
 	local hash_index = self.hash .. self.index
 	self.items = {}
 
@@ -81,9 +81,9 @@ function ScoreLibraryModel:updateItemsAsync()
 	end
 end
 
-ScoreLibraryModel.updateItems = thread.coro(ScoreLibraryModel.updateItemsAsync)
+ScoreLibrary.updateItems = thread.coro(ScoreLibrary.updateItemsAsync)
 
-function ScoreLibraryModel:updateItemsOnline()
+function ScoreLibrary:updateItemsOnline()
 	local api = self.onlineModel.webApi.api
 
 	print("GET " .. api.notecharts)
@@ -111,8 +111,8 @@ function ScoreLibraryModel:updateItemsOnline()
 	end
 end
 
-function ScoreLibraryModel:updateItemsLocal()
-	local scoreEntries = self.chartRepo:getScores(
+function ScoreLibrary:updateItemsLocal()
+	local scoreEntries = self.cacheModel.chartRepo:getScores(
 		self.hash,
 		self.index
 	)
@@ -129,7 +129,7 @@ end
 
 ---@param score_id number
 ---@return number
-function ScoreLibraryModel:getItemIndex(score_id)
+function ScoreLibrary:getItemIndex(score_id)
 	local items = self.items
 
 	if not items then
@@ -148,7 +148,7 @@ end
 
 ---@param score table
 ---@return table
-function ScoreLibraryModel:transformOnlineScore(score)
+function ScoreLibrary:transformOnlineScore(score)
 	local s = {
 		id = score.id,
 		chart_hash = "",
@@ -178,4 +178,4 @@ function ScoreLibraryModel:transformOnlineScore(score)
 	return score
 end
 
-return ScoreLibraryModel
+return ScoreLibrary

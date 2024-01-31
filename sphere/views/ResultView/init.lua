@@ -44,7 +44,7 @@ ResultView.loadScore = thread.coro(function(self, itemIndex)
 	loading = true
 	local scoreEntry = self.game.selectModel.scoreItem
 	if itemIndex then
-		scoreEntry = self.game.scoreLibraryModel.items[itemIndex]
+		scoreEntry = self.game.selectModel.scoreLibrary.items[itemIndex]
 	end
 	self.game.resultController:replayNoteChartAsync("result", scoreEntry)
 	if itemIndex then

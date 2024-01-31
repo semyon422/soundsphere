@@ -5,7 +5,6 @@ local ModifierSelectModel = require("sphere.models.ModifierSelectModel")
 local NoteSkinModel = require("sphere.models.NoteSkinModel")
 local InputModel = require("sphere.models.InputModel")
 local DifficultyModel = require("sphere.models.DifficultyModel")
-local ScoreLibraryModel = require("sphere.models.ScoreLibraryModel")
 local SelectModel = require("sphere.models.SelectModel")
 local RhythmModel = require("sphere.models.RhythmModel")
 local MultiplayerModel = require("sphere.models.MultiplayerModel")
@@ -50,15 +49,10 @@ function GameController:new()
 	self.noteSkinModel = NoteSkinModel(self.persistence.configModel)
 	self.inputModel = InputModel(self.persistence.configModel)
 	self.difficultyModel = DifficultyModel()
-	self.scoreLibraryModel = ScoreLibraryModel(
-		self.persistence.configModel,
-		self.onlineModel,
-		self.persistence.cacheModel.chartRepo
-	)
 	self.selectModel = SelectModel(
 		self.persistence.configModel,
-		self.scoreLibraryModel,
-		self.persistence.cacheModel
+		self.persistence.cacheModel,
+		self.onlineModel
 	)
 	self.resourceModel = ResourceModel(
 		self.persistence.configModel,
