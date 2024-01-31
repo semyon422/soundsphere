@@ -54,7 +54,7 @@ function ScoreListView:drawItem(i, w, h)
 		local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 		local normalscore = scoreEngine.scoreSystem.normalscore
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-		rating = s * playContext.enps
+		rating = s * playContext.chartdiff.enps_diff
 
 		timeRate = self.game.rhythmModel.timeEngine.baseTimeRate or timeRate
 		inputMode = tostring(self.game.rhythmModel.noteChart.inputMode) or inputMode

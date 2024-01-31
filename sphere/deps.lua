@@ -13,7 +13,7 @@ return {
 	fastplayController = {
 		"rhythmModel",
 		"replayModel",
-		"difficultyModel",
+		"cacheModel",
 		"playContext",
 	},
 	gameplayController = {

@@ -23,9 +23,9 @@ end
 ---@param noteChart ncdk.NoteChart
 ---@param replay sphere.Replay
 function FastplayController:play(noteChart, replay)
-	local difficultyModel = self.difficultyModel
 	local rhythmModel = self.rhythmModel
 	local replayModel = self.replayModel
+	local cacheModel = self.cacheModel
 	local playContext = self.playContext
 
 	local state = self:applyModifiers(noteChart, replay)
@@ -40,9 +40,9 @@ function FastplayController:play(noteChart, replay)
 
 	rhythmModel:load()
 
-	local enps, longNoteRatio = difficultyModel:getDifficulty(noteChart, playContext.rate)
-	playContext.enps = enps
-	playContext.longNoteRatio = longNoteRatio
+	local chartdiff = cacheModel.chartdiffGenerator:compute(noteChart, playContext.rate)
+	chartdiff.modifiers = playContext.modifiers
+	playContext.chartdiff = chartdiff
 
 	rhythmModel.timeEngine:sync(0)
 	rhythmModel:loadLogicEngines()

@@ -60,7 +60,6 @@ function WebReplayController:POST()
 	return {json = {
 		score = score,
 		inputMode = tostring(noteChart.inputMode),
-		difficulty = playContext.enps,
 		playContext = playContext,
 		modifiers = replay.modifiers,
 		modifiersEncoded = ModifierEncoder:encode(replay.modifiers),

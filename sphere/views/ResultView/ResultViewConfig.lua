@@ -456,7 +456,7 @@ local function NotechartInfo(self)
 
 	local bpm = baseBpm * baseTimeRate
 	local length = baseLength / baseTimeRate
-	local difficulty = show and playContext.enps or scoreItem.difficulty
+	local difficulty = show and playContext.chartdiff.enps_diff or scoreItem.difficulty
 	local inputMode = show and tostring(rhythmModel.noteChart.inputMode) or scoreItem.inputmode
 
 	local w, h = Layout:move("title_left")
@@ -535,7 +535,7 @@ local function NotechartInfo(self)
 
 	if scoreEntry.id == scoreItem.id then
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-		rating = s * playContext.enps
+		rating = s * playContext.chartdiff.enps_diff
 	end
 
 	local bestScore = ("%d"):format(topScoreItem.score)

@@ -17,7 +17,6 @@ function GameplayController:load()
 	local selectModel = self.selectModel
 	local noteSkinModel = self.noteSkinModel
 	local configModel = self.configModel
-	local difficultyModel = self.difficultyModel
 	local cacheModel = self.cacheModel
 	local replayModel = self.replayModel
 	local pauseModel = self.pauseModel
@@ -74,12 +73,7 @@ function GameplayController:load()
 	rhythmModel:setSingleHandler(playContext.single)
 
 	rhythmModel.inputManager.observable:add(replayModel)
-
 	rhythmModel:load()
-
-	local enps, longNoteRatio = difficultyModel:getDifficulty(noteChart, playContext.rate)
-	playContext.enps = enps
-	playContext.longNoteRatio = longNoteRatio
 
 	rhythmModel.timeEngine:sync(love.timer.getTime())
 	rhythmModel:loadAllEngines()
