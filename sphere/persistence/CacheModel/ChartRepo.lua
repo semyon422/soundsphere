@@ -210,8 +210,10 @@ end
 ---@param index number
 ---@return table
 function ChartRepo:getScores(hash, index)
-	return {}
-	-- return self.models.scores:select({chart_hash = hash, chart_index = index})
+	return self.models.scores_list:select({
+		hash = assert(hash),
+		index = assert(index),
+	})
 end
 
 return ChartRepo

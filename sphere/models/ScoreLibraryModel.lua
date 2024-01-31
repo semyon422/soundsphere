@@ -116,9 +116,9 @@ function ScoreLibraryModel:updateItemsLocal()
 		self.hash,
 		self.index
 	)
-	table.sort(scoreEntries, function(a, b)
-		return a.rating > b.rating
-	end)
+	-- table.sort(scoreEntries, function(a, b)
+	-- 	return a.rating > b.rating
+	-- end)
 	scoreEntries = self:filterScores(scoreEntries)
 	for i = 1, #scoreEntries do
 		scoreEntries[i].rank = i

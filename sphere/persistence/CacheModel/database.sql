@@ -148,3 +148,28 @@ WHERE
 chartdiffs.modifiers IS NULL AND
 chartdiffs.rate IS 1.0
 ;
+
+CREATE TEMP VIEW IF NOT EXISTS scores_list AS
+SELECT
+scores.id AS score_id,
+chartdiffs.id AS chartdiff_id,
+scores.*,
+chartdiffs.hash,
+chartdiffs.`index`,
+chartdiffs.modifiers,
+chartdiffs.rate,
+chartdiffs.inputmode,
+chartdiffs.notes_count,
+chartdiffs.long_notes_count,
+chartdiffs.density_data,
+chartdiffs.sv_data,
+chartdiffs.enps_diff,
+chartdiffs.osu_diff,
+chartdiffs.msd_diff,
+chartdiffs.msd_diff_data,
+chartdiffs.user_diff,
+chartdiffs.user_diff_data
+FROM scores
+LEFT JOIN chartdiffs ON
+scores.chartdiff_id = chartdiffs.id
+;
