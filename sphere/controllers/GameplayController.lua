@@ -47,7 +47,7 @@ function GameplayController:load()
 	chartdiff.hash = chartItem.hash
 	chartdiff.index = chartItem.index
 	cacheModel.chartdiffGenerator:fillMeta(chartdiff, chartItem)
-	self.chartdiff = chartdiff
+	playContext.chartdiff = chartdiff
 
 	local noteSkin = noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))
 	noteSkin:loadData()
@@ -307,7 +307,7 @@ function GameplayController:saveScore()
 		playContext
 	)
 
-	local chartdiff = self.cacheModel.chartdiffGenerator:createUpdateChartdiff(self.chartdiff)
+	local chartdiff = self.cacheModel.chartdiffGenerator:createUpdateChartdiff(self.playContext.chartdiff)
 
 	local score = {
 		chartdiff_id = chartdiff.id,
