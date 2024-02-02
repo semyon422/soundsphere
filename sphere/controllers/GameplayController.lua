@@ -310,7 +310,11 @@ function GameplayController:saveScore()
 	local chartdiff = self.cacheModel.chartdiffGenerator:createUpdateChartdiff(self.playContext.chartdiff)
 
 	local score = {
-		chartdiff_id = chartdiff.id,
+		hash = chartdiff.hash,
+		index = chartdiff.index,
+		modifiers = chartdiff.modifiers,
+		rate = chartdiff.rate,
+
 		const = playContext.const,
 		-- timings = playContext.timings,
 		single = playContext.single,

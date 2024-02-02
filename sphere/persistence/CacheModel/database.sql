@@ -55,7 +55,8 @@ CREATE TABLE IF NOT EXISTS `chartmetas` (
 	`audio_channels` INTEGER,
 	`used_columns` INTEGER,
 	`comment` TEXT,
-	`chart_preview` TEXT
+	`chart_preview` TEXT,
+	UNIQUE(`hash`, `index`)
 );
 
 CREATE INDEX IF NOT EXISTS chartmetas_inputmode_idx ON chartmetas (`inputmode`);
@@ -84,7 +85,11 @@ CREATE TABLE IF NOT EXISTS `chartdiffs` (
 
 CREATE TABLE IF NOT EXISTS `scores` (
 	`id` INTEGER PRIMARY KEY,
-	`chartdiff_id` INTEGER,
+	`hash` TEXT NOT NULL,
+	`index` INTEGER NOT NULL,
+	`modifiers` TEXT DEFAULT "",
+	`rate` REAL DEFAULT 1.0,
+
 	`const` INTEGER,
 	`timings` TEXT,
 	`single` INTEGER,
@@ -102,6 +107,9 @@ CREATE TABLE IF NOT EXISTS `scores` (
 	`earlylate` REAL,
 	`pauses` REAL
 );
+
+CREATE INDEX IF NOT EXISTS scores_hash_index_idx ON scores (`hash`, `index`, `is_top`)
+WHERE is_top = 1;
 
 CREATE TABLE IF NOT EXISTS `collections` (
 	`id` INTEGER PRIMARY KEY,
@@ -142,8 +150,9 @@ LEFT JOIN chartdiffs ON
 chartmetas.hash = chartdiffs.hash AND
 chartmetas.`index` = chartdiffs.`index`
 LEFT JOIN scores ON
-chartdiffs.id = scores.chartdiff_id AND
-scores.is_top = TRUE
+chartmetas.hash = scores.hash AND
+chartmetas.`index` = scores.`index` AND
+scores.is_top = 1
 WHERE
 chartdiffs.modifiers = "" AND
 chartdiffs.rate = 1.0
@@ -171,5 +180,8 @@ chartdiffs.user_diff,
 chartdiffs.user_diff_data
 FROM scores
 LEFT JOIN chartdiffs ON
-scores.chartdiff_id = chartdiffs.id
+scores.hash = chartdiffs.hash AND
+scores.`index` = chartdiffs.`index` AND
+scores.modifiers = chartdiffs.modifiers AND
+scores.rate = chartdiffs.rate
 ;
