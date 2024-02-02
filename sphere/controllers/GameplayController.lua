@@ -328,7 +328,7 @@ function GameplayController:saveScore()
 		earlylate = scoreSystem.misc.earlylate,
 		pauses = scoreEngine.pausesCount,
 	}
-	local scoreEntry = self.cacheModel.chartRepo:insertScore(score)
+	local scoreEntry = self.cacheModel.chartRepo:insertScore(score, chartdiff)
 
 	local base = scoreSystem.base
 	if base.hitCount / base.notesCount >= 0.5 then

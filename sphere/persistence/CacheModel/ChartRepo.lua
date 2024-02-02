@@ -156,7 +156,7 @@ function ChartRepo:selectDefaultChartdiff(hash, index)
 	return self.models.chartdiffs:find({
 		hash = assert(hash),
 		index = assert(index),
-		modifiers__isnull = true,
+		modifiers = "",
 		rate = 1,
 	})
 end
@@ -194,10 +194,36 @@ function ChartRepo:selectScore(id)
 	return self.models.scores:find({id = id})
 end
 
----@param score table
+---@param _score table
+---@param chartdiff table
 ---@return table?
-function ChartRepo:insertScore(score)
-	return self.models.scores:create(score, true)
+function ChartRepo:insertScore(_score, chartdiff)
+	local score = self.models.scores:create(_score, true)
+
+	local scores = self:getScores(chartdiff.hash, chartdiff.index)
+	self:calculateTopScore(scores)
+
+	return score
+end
+
+---@param scores table
+function ChartRepo:calculateTopScore(scores)
+	table.sort(scores, function(a, b)
+		return a.accuracy < b.accuracy
+	end)
+	for i, score in ipairs(scores) do
+		if i == 1 and not score.is_top then
+			self:updateScore({
+				id = score.id,
+				is_top = true,
+			})
+		elseif i > 1 and score.is_top then
+			self:updateScore({
+				id = score.id,
+				is_top = false,
+			})
+		end
+	end
 end
 
 ---@param score table

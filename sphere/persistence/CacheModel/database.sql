@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`id` INTEGER PRIMARY KEY,
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
-	`modifiers` TEXT,
+	`modifiers` TEXT DEFAULT "",
 	`rate` REAL DEFAULT 1.0,
 
 	`inputmode` TEXT,
@@ -145,8 +145,8 @@ LEFT JOIN scores ON
 chartdiffs.id = scores.chartdiff_id AND
 scores.is_top = TRUE
 WHERE
-chartdiffs.modifiers IS NULL AND
-chartdiffs.rate IS 1.0
+chartdiffs.modifiers = "" AND
+chartdiffs.rate = 1.0
 ;
 
 CREATE TEMP VIEW IF NOT EXISTS scores_list AS
