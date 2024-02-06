@@ -21,6 +21,8 @@ SortModel.orders = {
 	level = {{"level"}, false},
 	length = {{"length"}, false},
 	bpm = {{"bpm"}, false},
+	modtime = {{"modified_at"}, false},
+	["set modtime"] = {{"set_modified_at"}, true},
 	["played top"] = {{"score_id"}, false},
 }
 
@@ -33,6 +35,8 @@ SortModel.names = {
 	"level",
 	"length",
 	"bpm",
+	"modtime",
+	"set modtime",
 	"played top",
 }
 

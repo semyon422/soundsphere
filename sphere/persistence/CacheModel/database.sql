@@ -130,6 +130,8 @@ chartdiffs.id AS chartdiff_id,
 scores.id AS score_id,
 chartfiles.set_id AS chartfile_set_id,
 chartfiles.dir || "/" || chartfiles.name AS path,
+chartfiles.modified_at,
+chartfile_sets.modified_at AS set_modified_at,
 scores.accuracy,
 scores.miss,
 chartmetas.*,
@@ -146,6 +148,8 @@ chartdiffs.user_diff_data
 FROM chartmetas
 INNER JOIN chartfiles ON
 chartmetas.hash = chartfiles.hash
+INNER JOIN chartfile_sets ON
+chartfiles.set_id = chartfile_sets.id
 LEFT JOIN chartdiffs ON
 chartmetas.hash = chartdiffs.hash AND
 chartmetas.`index` = chartdiffs.`index`
