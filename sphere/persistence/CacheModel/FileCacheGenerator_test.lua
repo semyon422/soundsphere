@@ -1,3 +1,4 @@
+local sql_util = require("rdb.sql_util")
 local FileCacheGenerator = require("sphere.persistence.CacheModel.FileCacheGenerator")
 
 local test = {}
@@ -296,12 +297,12 @@ function test.complex(t)
 	chartRepo = get_fake_chartRepo(actions, chartfiles, chartfile_sets)
 
 	files = {
-		{"directory_dir", "root", "", 0},
+		{"directory_dir", ".", "root", 0},
 		{"directory", "root", "osucharts", 0},
 		{"directory", "root", "jamcharts", 0},
 		{"directory_all", "root", {"osucharts", "jamcharts"}, 0},
 
-		{"directory_dir", "root/osucharts", "", 0},
+		{"directory_dir", "root", "osucharts", 0},
 		{"directory_all", "root/osucharts", {"chartset1", "chartset2"}, 0},
 	}
 
@@ -310,7 +311,14 @@ function test.complex(t)
 	fcg = FileCacheGenerator(chartRepo, noteChartFinder)
 
 	fcg:lookup("charts")
-	-- print(require("inspect")(actions))
+
+	t:assert(not fcg:shouldScan("root/osucharts", "chartset1", 0))
+	t:assert(fcg:shouldScan("root/osucharts", "chartset1", 1))
+	fcg:processChartfileSet("root/osucharts", "chartset1", 0)
+	fcg:processChartfileSet("root/osucharts", "chartset1", 1)
+	fcg:processChartfile("root/osucharts/chartset1", "a", 0, 0)
+	fcg:processChartfile("root/osucharts/chartset1", "a", 0, 1)
+	print(require("inspect")(actions))
 
 	t:tdeq(actions, {
 		{"ss", "root", "osucharts"},
@@ -322,7 +330,27 @@ function test.complex(t)
 		{"ds", {
 			dir = "root/osucharts",
 			name__notin = {"chartset1", "chartset2"}
-		}}
+		}},
+
+		{"ss", "root/osucharts", "chartset1"},
+		{"ss", "root/osucharts", "chartset1"},
+
+		{"ss", "root/osucharts", "chartset1"},
+		{"ss", "root/osucharts", "chartset1"},
+		{"us", {
+			modified_at = 1,
+			dir = "root/osucharts",
+			name = "chartset1",
+		}},
+
+		{"sc", "root/osucharts/chartset1", "a"},
+		{"sc", "root/osucharts/chartset1", "a"},
+		{"uc", {
+			modified_at = 1,
+			hash = sql_util.NULL,
+			dir = "root/osucharts/chartset1",
+			name = "a",
+		}},
 	})
 end
 
