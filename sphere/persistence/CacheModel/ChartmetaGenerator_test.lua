@@ -95,11 +95,6 @@ function test.all(t)
 
 	-- print(require("inspect")(actions))
 	t:tdeq(actions, {
-		{"uc", {
-			hash = "9a0364b9e99bb480dd25e1f0284c8555",
-			dir = "charts",
-			name = "a"
-		}},
 		{"sm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
 		{"sm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
 		{"im", {
@@ -107,11 +102,16 @@ function test.all(t)
 			index = 1
 		}},
 		{"uc", {
+			hash = "9a0364b9e99bb480dd25e1f0284c8555",
+			dir = "charts",
+			name = "a"
+		}},
+		{"sm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
+		{"uc", {
 			dir = "charts",
 			hash = "9a0364b9e99bb480dd25e1f0284c8555",
 			name = "b"
 		}},
-		{"sm", "9a0364b9e99bb480dd25e1f0284c8555", 1}
 	})
 end
 
