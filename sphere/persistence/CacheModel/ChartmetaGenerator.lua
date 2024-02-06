@@ -50,10 +50,9 @@ function ChartmetaGenerator:processChartfile(chartfile, full)
 	local content = assert(self.fs.read(path))
 	local hash = md5.sumhexa(content)
 
-	chartfile.hash = hash
-	self.chartRepo:updateChartfile(chartfile)
-
 	if not full and self.chartRepo:selectChartmeta(hash, 1) then
+		chartfile.hash = hash
+		self.chartRepo:updateChartfile(chartfile)
 		return "reused"
 	end
 
@@ -68,6 +67,9 @@ function ChartmetaGenerator:processChartfile(chartfile, full)
 		chartmeta.index = index
 		self:setChartmeta(chartmeta)
 	end
+
+	chartfile.hash = hash
+	self.chartRepo:updateChartfile(chartfile)
 
 	return "cached", noteCharts
 end
