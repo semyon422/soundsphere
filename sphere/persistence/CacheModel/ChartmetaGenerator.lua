@@ -43,7 +43,7 @@ function ChartmetaGenerator:generate(full, after)
 end
 
 ---@param chartfile table
----@param full table?
+---@param full boolean?
 function ChartmetaGenerator:processChartfile(chartfile, full)
 	local path = chartfile.dir .. "/" .. chartfile.name
 

@@ -134,7 +134,7 @@ function CacheDatabase:queryNoteChartSets()
 	for i, row in ipairs(objs) do
 		local j = i - 1
 		local entry = noteChartSets[j]
-		entry.chartmeta_id = row.chartmeta_id
+		entry.chartmeta_id = row.chartmeta_id or 0
 		entry.chartfile_id = row.chartfile_id
 		entry.chartfile_set_id = row.chartfile_set_id
 		entry.score_id = row.score_id or 0

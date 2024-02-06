@@ -134,6 +134,7 @@ chartfiles.modified_at,
 chartfile_sets.modified_at AS set_modified_at,
 scores.accuracy,
 scores.miss,
+chartfiles.hash,
 chartmetas.*,
 chartdiffs.notes_count,
 chartdiffs.long_notes_count,
@@ -145,21 +146,20 @@ chartdiffs.msd_diff,
 chartdiffs.msd_diff_data,
 chartdiffs.user_diff,
 chartdiffs.user_diff_data
-FROM chartmetas
-INNER JOIN chartfiles ON
-chartmetas.hash = chartfiles.hash
+FROM chartfiles
+LEFT JOIN chartmetas ON
+chartfiles.hash = chartmetas.hash
 INNER JOIN chartfile_sets ON
 chartfiles.set_id = chartfile_sets.id
 LEFT JOIN chartdiffs ON
 chartmetas.hash = chartdiffs.hash AND
-chartmetas.`index` = chartdiffs.`index`
+chartmetas.`index` = chartdiffs.`index` AND
+chartdiffs.modifiers = "" AND
+chartdiffs.rate = 1.0
 LEFT JOIN scores ON
 chartmetas.hash = scores.hash AND
 chartmetas.`index` = scores.`index` AND
 scores.is_top = 1
-WHERE
-chartdiffs.modifiers = "" AND
-chartdiffs.rate = 1.0
 ;
 
 CREATE TEMP VIEW IF NOT EXISTS scores_list AS

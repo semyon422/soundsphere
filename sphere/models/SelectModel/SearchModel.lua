@@ -186,7 +186,11 @@ function SearchModel:getConditions()
 	local cond = {}
 
 	if not settings.miscellaneous.showNonManiaCharts then
-		cond.inputmode__notin = {"1osu", "1taiko", "1fruits"}
+		table.insert(cond, {
+			"or",
+			inputmode__notin = {"1osu", "1taiko", "1fruits"},
+			inputmode__isnull = true,
+		})
 	end
 
 	local filter = self:getFilter()
