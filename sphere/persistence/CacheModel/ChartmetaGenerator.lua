@@ -8,27 +8,28 @@ local ChartmetaGenerator = class()
 ---@param chartRepo sphere.ChartRepo
 ---@param noteChartFactory notechart.NoteChartFactory
 ---@param fs love.filesystem
-function ChartmetaGenerator:new(chartRepo, noteChartFactory, fs)
+---@param after function?
+---@param error_handler function?
+function ChartmetaGenerator:new(chartRepo, noteChartFactory, fs, after, error_handler)
 	self.chartRepo = chartRepo
 	self.noteChartFactory = noteChartFactory
 	self.fs = fs
+	self.after = after
+	self.error_handler = error_handler
 	self.reused = 0
 	self.cached = 0
 end
 
 ---@param full boolean?
----@param after function?
-function ChartmetaGenerator:generate(full, after)
+function ChartmetaGenerator:generate(full)
 	local chartfiles = self.chartRepo:selectUnhashedChartfiles()
 
 	for i, chartfile in ipairs(chartfiles) do
 		local status, err = self:processChartfile(chartfile, full)
 
 		local noteCharts
-		if not status then
-			print(chartfile.id)
-			print(chartfile.dir .. "/" .. chartfile.name)
-			print(err)
+		if not status and self.error_handler then
+			self.error_handler(chartfile, err)
 		elseif status == "reused" then
 			self.reused = self.reused + 1
 		elseif status == "cached" then
@@ -36,7 +37,7 @@ function ChartmetaGenerator:generate(full, after)
 			noteCharts = err
 		end
 
-		if after and after(i, #chartfiles, chartfile, noteCharts) then
+		if self.after and self.after(i, #chartfiles, chartfile, noteCharts) then
 			return
 		end
 	end

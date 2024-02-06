@@ -19,8 +19,44 @@ function CacheManager:new(cdb)
 
 	self.noteChartFinder = NoteChartFinder(love.filesystem)
 	self.fileCacheGenerator = FileCacheGenerator(self.chartRepo, self.noteChartFinder)
-	self.chartmetaGenerator = ChartmetaGenerator(self.chartRepo, NoteChartFactory, love.filesystem)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartRepo, DifficultyModel)
+
+	local function after(i, n, chartfile, noteCharts)
+		print(chartfile.dir .. "/" .. chartfile.name)
+
+		if noteCharts then
+			for j, noteChart in ipairs(noteCharts) do
+				self.chartdiffGenerator:create(noteChart, chartfile.hash, j)
+			end
+		end
+
+		self.noteChartSetCount = 0
+		self.noteChartCount = i
+		self.cachePercent = (i - 1) / n * 100
+		self:checkProgress()
+
+		if self.needStop then
+			return true
+		end
+		if i % 100 == 0 then
+			self:commit()
+			self:begin()
+		end
+	end
+
+	local function error_handler(chartfile, err)
+		print(chartfile.id)
+		print(chartfile.dir .. "/" .. chartfile.name)
+		print(err)
+	end
+
+	self.chartmetaGenerator = ChartmetaGenerator(
+		self.chartRepo,
+		NoteChartFactory,
+		love.filesystem,
+		after,
+		error_handler
+	)
 end
 
 function CacheManager:begin()
@@ -74,28 +110,7 @@ function CacheManager:generateCacheFull(path, force)
 	self:checkProgress()
 
 	self:begin()
-	self.chartmetaGenerator:generate(false, function(i, n, chartfile, noteCharts)
-		print(chartfile.dir .. "/" .. chartfile.name)
-
-		if noteCharts then
-			for j, noteChart in ipairs(noteCharts) do
-				self.chartdiffGenerator:create(noteChart, chartfile.hash, j)
-			end
-		end
-
-		self.noteChartSetCount = 0
-		self.noteChartCount = i
-		self.cachePercent = (i - 1) / n * 100
-		self:checkProgress()
-
-		if self.needStop then
-			return true
-		end
-		if i % 100 == 0 then
-			self:commit()
-			self:begin()
-		end
-	end)
+	self.chartmetaGenerator:generate(false)
 	self:commit()
 
 	self.state = 3
