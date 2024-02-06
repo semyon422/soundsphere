@@ -318,7 +318,7 @@ function test.complex(t)
 	fcg:processChartfileSet("root/osucharts", "chartset1", 1)
 	fcg:processChartfile("root/osucharts/chartset1", "a", 0, 0)
 	fcg:processChartfile("root/osucharts/chartset1", "a", 0, 1)
-	print(require("inspect")(actions))
+	-- print(require("inspect")(actions))
 
 	t:tdeq(actions, {
 		{"ss", "root", "osucharts"},
