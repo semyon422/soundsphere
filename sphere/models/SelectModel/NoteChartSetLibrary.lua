@@ -29,22 +29,10 @@ end
 ---@param itemIndex number
 ---@return table
 function NoteChartSetLibrary:loadObject(itemIndex)
-	local chartRepo = self.cacheModel.chartRepo
-	local entry = self.cacheModel.cacheDatabase.noteChartSetItems[itemIndex - 1]
-	local noteChart = chartRepo:selectChartfileById(entry.chartfile_id)
-	local noteChartData = chartRepo:selectChartmetaById(entry.chartmeta_id)
-
-	local item = {
-		chartmeta_id = entry.chartmeta_id,
-		chartfile_id = entry.chartfile_id,
-		chartfile_set_id = entry.chartfile_set_id,
-		lamp = entry.lamp,
-		itemIndex = itemIndex,
-	}
-
-	table_util.copy(noteChart, item)
-	table_util.copy(noteChartData, item)
-
+	local cacheDatabase = self.cacheModel.cacheDatabase
+	local entry = cacheDatabase.noteChartSetItems[itemIndex - 1]
+	local item = cacheDatabase:getNoteChartSetItem(entry.chartfile_id, entry.chartmeta_id)
+	item.lamp = entry.lamp
 	return item
 end
 

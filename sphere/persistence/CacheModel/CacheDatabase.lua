@@ -182,4 +182,21 @@ function CacheDatabase:getNoteChartItemsAtSet(chartfile_set_id)
 	return objs
 end
 
+---@param chartfile_id number
+---@param chartmeta_id number
+---@return rdb.ModelRow
+function CacheDatabase:getNoteChartSetItem(chartfile_id, chartmeta_id)
+	local where = {
+		chartfile_id = chartfile_id,
+		{
+			"or",
+			chartmeta_id = chartmeta_id,
+			chartmeta_id__isnull = true,
+		},
+	}
+
+	local obj = self.models.chartset_list:find(where)
+	return obj
+end
+
 return CacheDatabase

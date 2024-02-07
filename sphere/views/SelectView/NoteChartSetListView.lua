@@ -46,8 +46,11 @@ function NoteChartSetListView:drawItem(i, w, h)
 		love.graphics.circle("line", 22, 36, 7)
 	end
 
+	local artist = item.artist or ""
+	local title = item.title or item.chartfile_set_name
+
 	just.indent(44)
-	TextCellImView(math.huge, h, "left", item.artist, item.title)
+	TextCellImView(math.huge, h, "left", artist, title)
 end
 
 return NoteChartSetListView
