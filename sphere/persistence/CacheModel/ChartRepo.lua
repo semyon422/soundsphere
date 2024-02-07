@@ -53,11 +53,11 @@ end
 
 --------------------------------------------------------------------------------
 
----@param dir string
+---@param set_id number
 ---@param name string
 ---@return table?
-function ChartRepo:selectChartfile(dir, name)
-	return self.models.chartfiles:find({dir = assert(dir), name = assert(name)})
+function ChartRepo:selectChartfile(set_id, name)
+	return self.models.chartfiles:find({set_id = assert(set_id), name = assert(name)})
 end
 
 ---@param chartfile table
@@ -76,9 +76,10 @@ function ChartRepo:deleteChartfiles(conds)
 	self.models.chartfiles:delete(conds)
 end
 
+---@param path string
 ---@return table
-function ChartRepo:selectUnhashedChartfiles()
-	return self.models.chartfiles:select({hash__isnull = true})
+function ChartRepo:selectUnhashedChartfiles(path)
+	return self.models.unhashed_chartfiles:select({path__startswith = assert(path)})
 end
 
 ---@param id number

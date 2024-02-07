@@ -21,8 +21,9 @@ function ChartmetaGenerator:new(chartRepo, noteChartFactory, fs, after, error_ha
 end
 
 ---@param full boolean?
-function ChartmetaGenerator:generate(full)
-	local chartfiles = self.chartRepo:selectUnhashedChartfiles()
+---@param path string
+function ChartmetaGenerator:generate(full, path)
+	local chartfiles = self.chartRepo:selectUnhashedChartfiles(path)
 
 	for i, chartfile in ipairs(chartfiles) do
 		local status, err = self:processChartfile(chartfile, full)
@@ -46,7 +47,7 @@ end
 ---@param chartfile table
 ---@param full boolean?
 function ChartmetaGenerator:processChartfile(chartfile, full)
-	local path = chartfile.dir .. "/" .. chartfile.name
+	local path = chartfile.path
 
 	local content = assert(self.fs.read(path))
 	local hash = md5.sumhexa(content)

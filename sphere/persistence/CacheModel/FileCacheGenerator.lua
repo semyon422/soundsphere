@@ -21,17 +21,17 @@ function FileCacheGenerator:lookup(root_dir)
 	while typ do
 		local res
 		if typ == "related_dir" then
-			chartfile_set = self:processChartfileSet(dir, name, modtime)
+			chartfile_set = self:processChartfileSet(dir, name, modtime, false)
 		elseif typ == "related" then
-			self:processChartfile(dir, name, chartfile_set.id, modtime)
+			self:processChartfile(chartfile_set.id, name, modtime)
 		elseif typ == "related_all" then
-			self.chartRepo:deleteChartfiles({dir = dir, name__notin = name})
+			self.chartRepo:deleteChartfiles({set_id = chartfile_set.id, name__notin = name})
 		elseif typ == "unrelated_dir" then
 		elseif typ == "unrelated" then
-			chartfile_set = self:processChartfileSet(dir, name, modtime)
-			self:processChartfile(dir, name, chartfile_set.id, modtime)
+			chartfile_set = self:processChartfileSet(dir, name, modtime, true)
+			self:processChartfile(chartfile_set.id, name, modtime)
 		elseif typ == "unrelated_all" then
-			self.chartRepo:deleteChartfiles({dir = dir, name__notin = name})
+			self.chartRepo:deleteChartfiles({set_id = chartfile_set.id, name__notin = name})
 			self.chartRepo:deleteChartfileSets({dir = dir, name__notin = name})
 		elseif typ == "directory_dir" then
 		elseif typ == "directory" then
@@ -60,8 +60,10 @@ end
 
 ---@param dir string
 ---@param name string
+---@param modified_at number
+---@param is_file boolean
 ---@return table
-function FileCacheGenerator:processChartfileSet(dir, name, modified_at)
+function FileCacheGenerator:processChartfileSet(dir, name, modified_at, is_file)
 	local chartfile_set = self.chartRepo:selectChartfileSet(dir, name)
 
 	if chartfile_set then
@@ -76,18 +78,18 @@ function FileCacheGenerator:processChartfileSet(dir, name, modified_at)
 		dir = dir,
 		name = name,
 		modified_at = modified_at,
+		is_file = is_file,
 	})
 end
 
----@param dir string
 ---@param name string
 ---@param set_id number
-function FileCacheGenerator:processChartfile(dir, name, set_id, modified_at)
-	local chartfile = self.chartRepo:selectChartfile(dir, name)
+---@param modified_at number
+function FileCacheGenerator:processChartfile(set_id, name, modified_at)
+	local chartfile = self.chartRepo:selectChartfile(set_id, name)
 
 	if not chartfile then
 		self.chartRepo:insertChartfile({
-			dir = dir,
 			name = name,
 			modified_at = modified_at,
 			set_id = set_id,

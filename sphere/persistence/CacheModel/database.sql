@@ -1,12 +1,11 @@
 CREATE TABLE IF NOT EXISTS `chartfiles` (
 	`id` INTEGER PRIMARY KEY,
-	`dir` TEXT NOT NULL,
 	`name` TEXT NOT NULL,
 	`hash` TEXT,
 	`set_id` INTEGER NOT NULL,
 	`modified_at` INTEGER NOT NULL,
 	`size` INTEGER,
-	UNIQUE(`dir`, `name`)
+	UNIQUE(`set_id`, `name`)
 );
 
 CREATE INDEX IF NOT EXISTS chartfiles_hash_idx ON chartfiles (`hash`);
@@ -17,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `chartfile_sets` (
 	`dir` TEXT NOT NULL,
 	`name` TEXT NOT NULL,
 	`modified_at` INTEGER NOT NULL,
+	`is_file` INTEGER NOT NULL,
 	UNIQUE(`dir`, `name`)
 );
 
@@ -122,6 +122,20 @@ CREATE TABLE IF NOT EXISTS `chart_collections` (
 	`chartdiff_id` INTEGER
 );
 
+CREATE TEMP VIEW IF NOT EXISTS unhashed_chartfiles AS
+SELECT
+CASE WHEN chartfile_sets.is_file THEN
+chartfile_sets.dir || "/" || chartfiles.name
+ELSE
+chartfile_sets.dir || "/" || chartfile_sets.name || "/" || chartfiles.name
+END path,
+chartfiles.*
+FROM chartfiles
+INNER JOIN chartfile_sets ON
+chartfiles.set_id = chartfile_sets.id
+WHERE hash IS NULL
+;
+
 CREATE TEMP VIEW IF NOT EXISTS chartset_list AS
 SELECT
 chartmetas.id AS chartmeta_id,
@@ -129,7 +143,11 @@ chartfiles.id AS chartfile_id,
 chartdiffs.id AS chartdiff_id,
 scores.id AS score_id,
 chartfiles.set_id AS chartfile_set_id,
-chartfiles.dir || "/" || chartfiles.name AS path,
+CASE WHEN chartfile_sets.is_file THEN
+chartfile_sets.dir || "/" || chartfiles.name
+ELSE
+chartfile_sets.dir || "/" || chartfile_sets.name || "/" || chartfiles.name
+END path,
 chartfiles.name AS chartfile_name,
 chartfile_sets.name AS chartfile_set_name,
 chartfiles.modified_at,

@@ -3,12 +3,6 @@ local ChartmetaGenerator = require("sphere.persistence.CacheModel.ChartmetaGener
 
 local test = {}
 
-local function get_path(dir, name)
-	if type(dir) == "table" then
-		return dir.dir .. "/" .. dir.name
-	end
-	return dir .. "/" .. name
-end
 local function get_hi(hash, index)
 	if type(hash) == "table" then
 		return hash.hash .. "/" .. hash.index
@@ -27,13 +21,13 @@ local function get_fake_chartRepo(actions, chartfiles, chartmetas)
 			end
 		end
 		table.sort(cfs, function(a, b)
-			return get_path(a) < get_path(b)
+			return a.path < b.path
 		end)
 		return cfs
 	end
 	function chartRepo:updateChartfile(chartfile)
 		table.insert(actions, {"uc", table_util.deepcopy(chartfile)})
-		chartfiles[get_path(chartfile)] = chartfile
+		chartfiles[chartfile.path] = chartfile
 		return chartfile
 	end
 	function chartRepo:selectChartmeta(hash, index)
@@ -63,14 +57,12 @@ local function get_fs(items)
 end
 
 function test.all(t)
-	local chartfiles = {
+	local chartfiles = {  -- unhashed_chartfiles
 		["charts/a"] = {
-			dir = "charts",
-			name = "a",
+			path = "charts/a",
 		},
 		["charts/b"] = {
-			dir = "charts",
-			name = "b",
+			path = "charts/b",
 		},
 	}
 
@@ -95,12 +87,12 @@ function test.all(t)
 
 	cg.after = function() return true end
 
-	cg:generate(false)
+	cg:generate(false, "")
 
 	t:eq(cg.cached, 1)
 	t:eq(cg.reused, 0)
 
-	cg:generate(false)
+	cg:generate(false, "")
 
 	t:eq(cg.cached, 1)
 	t:eq(cg.reused, 1)
@@ -108,12 +100,12 @@ function test.all(t)
 	cg.after = function() return false end
 
 	chartfiles["charts/a"].hash = nil
-	cg:generate(false)
+	cg:generate(false, "")
 	t:eq(cg.reused, 2)
 	t:assert(chartfiles["charts/a"].hash)
 
 	chartfiles["charts/a"].hash = nil
-	cg:generate(true)
+	cg:generate(true, "")
 	t:eq(cg.cached, 2)
 	t:assert(chartfiles["charts/a"].hash)
 
@@ -124,7 +116,7 @@ function test.all(t)
 		actual_chartfile = chartfile
 		actual_error = err
 	end
-	cg:generate(true)
+	cg:generate(true, "")
 	t:eq(cg.cached, 2)
 	t:eq(actual_error, chart_error)
 	t:eq(actual_chartfile, chartfiles["charts/a"])
@@ -140,21 +132,18 @@ function test.all(t)
 		}},
 		{"uc", {
 			hash = "9a0364b9e99bb480dd25e1f0284c8555",
-			dir = "charts",
-			name = "a",
+			path = "charts/a",
 		}},
 		{"sm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
 		{"uc", {
-			dir = "charts",
 			hash = "9a0364b9e99bb480dd25e1f0284c8555",
-			name = "b",
+			path = "charts/b",
 		}},
 
 		{"sm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
 		{"uc", {
 			hash = "9a0364b9e99bb480dd25e1f0284c8555",
-			dir = "charts",
-			name = "a",
+			path = "charts/a",
 		}},
 
 		{"sm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
@@ -164,8 +153,7 @@ function test.all(t)
 		}},
 		{"uc", {
 			hash = "9a0364b9e99bb480dd25e1f0284c8555",
-			dir = "charts",
-			name = "a",
+			path = "charts/a",
 		}},
 	})
 end

@@ -3,46 +3,45 @@ local FileCacheGenerator = require("sphere.persistence.CacheModel.FileCacheGener
 
 local test = {}
 
-local function get_path(dir, name)
-	if type(dir) == "table" then
-		return dir.dir .. "/" .. dir.name
-	end
-	return dir .. "/" .. name
-end
-
 local function get_fake_chartRepo(actions, chartfiles, chartfile_sets)
 	local chartRepo = {}
 
+	local file_id, set_id = 0, 0
+
 	function chartRepo:selectChartfileSet(dir, name)
 		table.insert(actions, {"ss", dir, name})
-		return chartfile_sets[get_path(dir, name)]
+		return chartfile_sets[dir .. "/" .. name]
 	end
 	function chartRepo:insertChartfileSet(chartfile_set)
 		table.insert(actions, {"is", chartfile_set})
-		chartfile_sets[get_path(chartfile_set)] = chartfile_set
+		chartfile_sets[chartfile_set.dir .. "/" .. chartfile_set.name] = chartfile_set
+		set_id = set_id + 1
+		chartfile_set.id = set_id
 		return chartfile_set
 	end
 	function chartRepo:updateChartfileSet(chartfile_set)
 		table.insert(actions, {"us", chartfile_set})
-		chartfile_sets[get_path(chartfile_set)] = chartfile_set
+		chartfile_sets[chartfile_set.dir .. "/" .. chartfile_set.name] = chartfile_set
 		return chartfile_set
 	end
 	function chartRepo:deleteChartfileSets(conds)
 		table.insert(actions, {"ds", conds})
 	end
 
-	function chartRepo:selectChartfile(dir, name)
-		table.insert(actions, {"sc", dir, name})
-		return chartfiles[get_path(dir, name)]
+	function chartRepo:selectChartfile(set_id, name)
+		table.insert(actions, {"sc", set_id, name})
+		return chartfiles[set_id .. "/" .. name]
 	end
 	function chartRepo:insertChartfile(chartfile)
 		table.insert(actions, {"ic", chartfile})
-		chartfiles[get_path(chartfile)] = chartfile
+		chartfiles[chartfile.set_id .. "/" .. chartfile.name] = chartfile
+		file_id = file_id + 1
+		chartfile.id = file_id
 		return chartfile
 	end
 	function chartRepo:updateChartfile(chartfile)
 		table.insert(actions, {"uc", chartfile})
-		chartfiles[get_path(chartfile)] = chartfile
+		chartfiles[chartfile.set_id .. "/" .. chartfile.name] = chartfile
 		return chartfile
 	end
 	function chartRepo:deleteChartfiles(conds)
@@ -88,25 +87,29 @@ function test.rel_root(t)
 	t:tdeq(actions, {
 		{"ss", ".", "chartset"},
 		{"is", {
+			id = 1,
 			modified_at = 0,
 			dir = ".",
 			name = "chartset",
+			is_file = false,
 		}},
-		{"sc", "chartset", "a"},
+		{"sc", 1, "a"},
 		{"ic", {
+			id = 1,
 			modified_at = 1,
-			dir = "chartset",
+			set_id = 1,
 			name = "a",
 		}},
-		{"sc", "chartset", "b"},
+		{"sc", 1, "b"},
 		{"ic", {
+			id = 2,
 			modified_at = 2,
-			dir = "chartset",
+			set_id = 1,
 			name = "b",
 		}},
 		{"dc", {
-			dir = "chartset",
-			name__notin = {"a", "b", "c"}
+			set_id = 1,
+			name__notin = {"a", "b", "c"},
 		}},
 	})
 end
@@ -132,31 +135,37 @@ function test.unrel_root(t)
 	t:tdeq(actions, {
 		{"ss", "charts", "a"},
 		{"is", {
+			id = 1,
 			modified_at = 1,
 			dir = "charts",
 			name = "a",
+			is_file = true,
 		}},
-		{"sc", "charts", "a"},
+		{"sc", 1, "a"},
 		{"ic", {
+			id = 1,
 			modified_at = 1,
-			dir = "charts",
+			set_id = 1,
 			name = "a",
 		}},
 		{"ss", "charts", "b"},
 		{"is", {
+			id = 2,
 			modified_at = 2,
 			dir = "charts",
 			name = "b",
+			is_file = true,
 		}},
-		{"sc", "charts", "b"},
+		{"sc", 2, "b"},
 		{"ic", {
+			id = 2,
 			modified_at = 2,
-			dir = "charts",
+			set_id = 2,
 			name = "b",
 		}},
 		{"dc", {
-			dir = "charts",
-			name__notin = {"a", "b", "c"}
+			set_id = 2,
+			name__notin = {"a", "b", "c"},
 		}},
 		{"ds", {
 			dir = "charts",
@@ -217,74 +226,88 @@ function test.complex(t)
 		}},
 		{"ss", "root/osucharts", "chartset1"},
 		{"is", {
+			id = 1,
 			modified_at = 0,
 			dir = "root/osucharts",
 			name = "chartset1",
+			is_file = false,
 		}},
-		{"sc", "root/osucharts/chartset1", "a"},
+		{"sc", 1, "a"},
 		{"ic", {
+			id = 1,
 			modified_at = 0,
-			dir = "root/osucharts/chartset1",
+			set_id = 1,
 			name = "a",
 		}},
-		{"sc", "root/osucharts/chartset1", "b"},
+		{"sc", 1, "b"},
 		{"ic", {
+			id = 2,
 			modified_at = 0,
-			dir = "root/osucharts/chartset1",
+			set_id = 1,
 			name = "b",
 		}},
 		{"dc", {
-			dir = "root/osucharts/chartset1",
+			set_id = 1,
 			name__notin = {"a", "b"}
 		}},
 		{"ss", "root/osucharts", "chartset2"},
 		{"is", {
+			id = 2,
 			modified_at = 0,
 			dir = "root/osucharts",
 			name = "chartset2",
+			is_file = false,
 		}},
-		{"sc", "root/osucharts/chartset2", "a"},
+		{"sc", 2, "a"},
 		{"ic", {
+			id = 3,
 			modified_at = 0,
-			dir = "root/osucharts/chartset2",
+			set_id = 2,
 			name = "a",
 		}},
-		{"sc", "root/osucharts/chartset2", "b"},
+		{"sc", 2, "b"},
 		{"ic", {
+			id = 4,
 			modified_at = 0,
-			dir = "root/osucharts/chartset2",
+			set_id = 2,
 			name = "b",
 		}},
 		{"dc", {
-			dir = "root/osucharts/chartset2",
+			set_id = 2,
 			name__notin = {"a", "b"}
 		}},
 		{"ss", "root/jamcharts", "a"},
 		{"is", {
+			id = 3,
 			modified_at = 0,
 			dir = "root/jamcharts",
 			name = "a",
+			is_file = true,
 		}},
-		{"sc", "root/jamcharts", "a"},
+		{"sc", 3, "a"},
 		{"ic", {
+			id = 5,
 			modified_at = 0,
-			dir = "root/jamcharts",
+			set_id = 3,
 			name = "a",
 		}},
 		{"ss", "root/jamcharts", "b"},
 		{"is", {
+			id = 4,
 			modified_at = 0,
 			dir = "root/jamcharts",
 			name = "b",
+			is_file = true,
 		}},
-		{"sc", "root/jamcharts", "b"},
+		{"sc", 4, "b"},
 		{"ic", {
+			id = 6,
 			modified_at = 0,
-			dir = "root/jamcharts",
+			set_id = 4,
 			name = "b",
 		}},
 		{"dc", {
-			dir = "root/jamcharts",
+			set_id = 4,
 			name__notin = {"a", "b"}
 		}},
 		{"ds", {
@@ -314,10 +337,10 @@ function test.complex(t)
 
 	t:assert(not fcg:shouldScan("root/osucharts", "chartset1", 0))
 	t:assert(fcg:shouldScan("root/osucharts", "chartset1", 1))
-	fcg:processChartfileSet("root/osucharts", "chartset1", 0)
-	fcg:processChartfileSet("root/osucharts", "chartset1", 1)
-	fcg:processChartfile("root/osucharts/chartset1", "a", 0, 0)
-	fcg:processChartfile("root/osucharts/chartset1", "a", 0, 1)
+	fcg:processChartfileSet("root/osucharts", "chartset1", 0, false)
+	fcg:processChartfileSet("root/osucharts", "chartset1", 1, false)
+	fcg:processChartfile(1, "a", 0)
+	fcg:processChartfile(1, "a", 1)
 	-- print(require("inspect")(actions))
 
 	t:tdeq(actions, {
@@ -338,17 +361,20 @@ function test.complex(t)
 		{"ss", "root/osucharts", "chartset1"},
 		{"ss", "root/osucharts", "chartset1"},
 		{"us", {
+			id = 1,
 			modified_at = 1,
 			dir = "root/osucharts",
 			name = "chartset1",
+			is_file = false,
 		}},
 
-		{"sc", "root/osucharts/chartset1", "a"},
-		{"sc", "root/osucharts/chartset1", "a"},
+		{"sc", 1, "a"},
+		{"sc", 1, "a"},
 		{"uc", {
+			id = 1,
 			modified_at = 1,
 			hash = sql_util.NULL,
-			dir = "root/osucharts/chartset1",
+			set_id = 1,
 			name = "a",
 		}},
 	})

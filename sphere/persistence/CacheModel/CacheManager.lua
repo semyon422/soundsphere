@@ -22,7 +22,7 @@ function CacheManager:new(cdb)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartRepo, DifficultyModel)
 
 	local function after(i, n, chartfile, noteCharts)
-		print(chartfile.dir .. "/" .. chartfile.name)
+		print(chartfile.path)
 
 		if noteCharts then
 			for j, noteChart in ipairs(noteCharts) do
@@ -46,7 +46,7 @@ function CacheManager:new(cdb)
 
 	local function error_handler(chartfile, err)
 		print(chartfile.id)
-		print(chartfile.dir .. "/" .. chartfile.name)
+		print(chartfile.path)
 		print(err)
 	end
 
@@ -110,7 +110,7 @@ function CacheManager:generateCacheFull(path, force)
 	self:checkProgress()
 
 	self:begin()
-	self.chartmetaGenerator:generate(false)
+	self.chartmetaGenerator:generate(false, path)
 	self:commit()
 
 	self.state = 3
