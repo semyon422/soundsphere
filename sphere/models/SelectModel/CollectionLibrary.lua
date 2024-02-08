@@ -22,18 +22,18 @@ function CollectionLibrary:load()
 	self.config = self.configModel.configs.select
 	local collectionPath = self.config.collection
 
+	local root_charts = 0
+
 	local dict = {}
 	for _, chartfile_set in ipairs(self.cacheModel.chartRepo:selectChartfileSetsAtPath()) do
-		local dir = chartfile_set.dir or "."
-		dict[dir] = (dict[dir] or 0) + 1
+		local dir = chartfile_set.dir
+		if dir then
+			dict[dir] = (dict[dir] or 0) + 1
+		end
+		root_charts = root_charts + 1
 	end
 
-	local items = {{
-		path = "",
-		shortPath = "",
-		name = "/",
-		count = 0,
-	}}
+	local items = {}
 	for path, count in pairs(dict) do
 		local dir, name = path:match("^(.+)/(.-)$")
 		local collection = {
@@ -48,6 +48,14 @@ function CollectionLibrary:load()
 		end
 	end
 	table.sort(items, function(a, b) return a.path < b.path end)
+
+	table.insert(items, 1, {
+		path = nil,
+		shortPath = "",
+		name = "/",
+		count = root_charts,
+	})
+
 	self.collection = self.collection or items[1]
 
 	self.items = items

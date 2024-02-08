@@ -74,7 +74,11 @@ function SelectModel:updateSetItems()
 	end
 
 	local where, lamp = self.searchModel:getConditions()
-	-- where.path__startswith = self.collectionItem.path .. "/"
+
+	local path = self.collectionItem.path
+	if path then
+		where.path__startswith = path
+	end
 
 	params.where = where
 	params.lamp = lamp
