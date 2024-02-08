@@ -16,7 +16,7 @@ local App = class()
 function App:new(persistence)
 	self.audioModel = AudioModel()
 	self.discordModel = DiscordModel()
-	self.mountModel = MountModel()
+	self.mountModel = MountModel(persistence.cacheModel)
 	self.screenshotModel = ScreenshotModel()
 	self.windowModel = WindowModel()
 
@@ -30,7 +30,7 @@ function App:load()
 
 	local configModel = self.persistence.configModel
 	self.audioModel:load(configModel.configs.settings.audio.device)
-	self.mountModel:load(configModel.configs.mount)
+	self.mountModel:load()
 	self.windowModel:load(configModel.configs.settings.graphics)
 end
 

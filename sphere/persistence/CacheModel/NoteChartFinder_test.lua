@@ -1,8 +1,9 @@
 local NoteChartFinder = require("sphere.persistence.CacheModel.NoteChartFinder")
+local path_util = require("path_util")
 
 local test = {}
 
-local function get_files()
+local function get_files(prefix, dir)
 	local items = {
 		["root"] = {
 			type = "directory",
@@ -37,37 +38,40 @@ local function get_files()
 	end
 
 	local ncf = NoteChartFinder(fs)
-	local iterator = ncf:iter("root")
+	local iterator = ncf:iter(prefix, dir)
 
 	return items, iterator
 end
 
-local function iter(items, iterator)
+local function iter(items, iterator, prefix)
 	local chartfile_sets = {}
 	local chartfiles = {}
 
 	local typ, dir, item, modtime = iterator()
 	while typ do
-		local path
+		local path = path_util.join(prefix, dir)
+		local path_np = dir
 		if type(item) == "string" then
-			path = dir .. "/" .. item
+			path = path_util.join(prefix, dir, item)
+			path_np = path_util.join(dir, item)
 		end
+		local not_cached = not items[path].cached
 		local res
 		if typ == "related_dir" then
-			table.insert(chartfile_sets, path)
+			table.insert(chartfile_sets, path_np)
 		elseif typ == "related" then
-			if not items[path].cached then
-				table.insert(chartfiles, path)
+			if not_cached then
+				table.insert(chartfiles, path_np)
 			end
 		elseif typ == "unrelated_dir" then
 		elseif typ == "unrelated" then
-			if not items[path].cached then
-				table.insert(chartfile_sets, path)
-				table.insert(chartfiles, path)
+			if not_cached then
+				table.insert(chartfile_sets, path_np)
+				table.insert(chartfiles, path_np)
 			end
 		elseif typ == "directory_dir" then
 		elseif typ == "directory" then
-			res = not items[path].cached
+			res = not_cached
 		end
 		typ, dir, item, modtime = iterator(res)
 	end
@@ -76,8 +80,8 @@ local function iter(items, iterator)
 end
 
 function test.not_cached(t)
-	local items, iterator = get_files()
-	local chartfile_sets, chartfiles = iter(items, iterator)
+	local items, iterator = get_files(nil, "root")
+	local chartfile_sets, chartfiles = iter(items, iterator, nil)
 
 	t:teq(chartfile_sets, {
 		"root/rel_charts/chartset",
@@ -90,18 +94,18 @@ function test.not_cached(t)
 end
 
 function test.chartsets_cached(t)
-	local items, iterator = get_files()
+	local items, iterator = get_files(nil, "root")
 	items["root/rel_charts/chartset"].cached = true
 	items["root/unrel_charts/chart.ojn"].cached = true
 
-	local chartfile_sets, chartfiles = iter(items, iterator)
+	local chartfile_sets, chartfiles = iter(items, iterator, nil)
 
 	t:teq(chartfile_sets, {})
 	t:teq(chartfiles, {})
 end
 
 function test.new_charts(t)
-	local items, iterator = get_files()
+	local items, iterator = get_files(nil, "root")
 	items["root/rel_charts/chartset/chart.osu"].cached = true
 	items["root/unrel_charts/chart.ojn"].cached = true
 
@@ -111,7 +115,7 @@ function test.new_charts(t)
 	items["root/unrel_charts/chart2.ojn"] = {type = "file"}
 	table.insert(items["root/unrel_charts"], "chart2.ojn")
 
-	local chartfile_sets, chartfiles = iter(items, iterator)
+	local chartfile_sets, chartfiles = iter(items, iterator, nil)
 
 	t:teq(chartfile_sets, {
 		"root/rel_charts/chartset",
@@ -120,6 +124,34 @@ function test.new_charts(t)
 	t:teq(chartfiles, {
 		"root/rel_charts/chartset/chart2.osu",
 		"root/unrel_charts/chart2.ojn",
+	})
+end
+
+function test.not_cached_prefixed(t)
+	local items, iterator = get_files("root", nil)
+	local chartfile_sets, chartfiles = iter(items, iterator, "root")
+
+	-- print(require("inspect")(chartfile_sets))
+	t:teq(chartfile_sets, {
+		"rel_charts/chartset",
+		"unrel_charts/chart.ojn",
+	})
+	t:teq(chartfiles, {
+		"rel_charts/chartset/chart.osu",
+		"unrel_charts/chart.ojn",
+	})
+end
+
+function test.not_cached_prefixed_string(t)
+	local items, iterator = get_files("root", "rel_charts")
+	local chartfile_sets, chartfiles = iter(items, iterator, "root")
+
+	-- print(require("inspect")(chartfile_sets))
+	t:teq(chartfile_sets, {
+		"rel_charts/chartset",
+	})
+	t:teq(chartfiles, {
+		"rel_charts/chartset/chart.osu",
 	})
 end
 

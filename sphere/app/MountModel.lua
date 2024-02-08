@@ -5,90 +5,77 @@ local class = require("class")
 ---@operator call: sphere.MountModel
 local MountModel = class()
 
-function MountModel:new()
-	self.mountStatuses = {}
+---@param cacheModel sphere.CacheModel
+function MountModel:new(cacheModel)
+	self.cacheModel = cacheModel
 end
 
-MountModel.chartsPath = "userdata/charts"
-
----@param mountInfo table
-function MountModel:load(mountInfo)
-	self.mountInfo = mountInfo
-	local mountStatuses = self.mountStatuses
-
-	for _, entry in ipairs(self.mountInfo) do
-		entry[1] = entry[1]:match("^(.-)[/]*$")
-		entry[2] = entry[2]:match("^(.-)[/]*$")
-		local path, mountpoint = entry[1], entry[2]
-		local mountStatus = "mounted"
-		if not physfs.mount(path, mountpoint, true) then
-			mountStatus = physfs.getLastError()
-		end
-		mountStatuses[path] = mountStatus
+function MountModel:load()
+	self.status = {}
+	local cf_locations = self.cacheModel.chartRepo:selectChartfileLocations()
+	self.cf_locations = cf_locations
+	for _, cf_location in ipairs(cf_locations) do
+		self:mountLocation(cf_location)
 	end
 end
 
 function MountModel:unload()
-	for _, entry in ipairs(self.mountInfo) do
-		local path = entry[1]
-		if self.mountStatuses[path] == "mounted" then
+	for path, status in pairs(self.status) do
+		if status == "mounted" then
 			physfs.unmount(path)
 		end
 	end
 end
 
----@param path string
+---@param cf_location table
+function MountModel:mountLocation(cf_location)
+	local path = cf_location.path
+	local status = "mounted"
+	if not physfs.mount(path, self:getMountPoint(cf_location), true) then
+		status = physfs.getLastError()
+	end
+	self.status[path] = status
+end
+
+---@param cf_location table
 ---@return string
-function MountModel:getMountPoint(path)
-	return self.chartsPath .. "/" .. path:gsub("\\", "/"):match("^.+/(.-)$")
+function MountModel:getMountPoint(cf_location)
+	return "mounted_charts/" .. cf_location.id
 end
 
 ---@param path string
----@return boolean
-function MountModel:isMountPath(path)
-	for _, entry in ipairs(self.mountInfo) do
-		if entry[1]:gsub("\\", "/") == path:gsub("\\", "/") then
-			return true
-		end
+function MountModel:createLocation(path)
+	path = path:gsub("\\", "/")
+
+	local chartRepo = self.cacheModel.chartRepo
+
+	local cf_location = chartRepo:selectChartfileLocation(path)
+	if cf_location then
+		return
 	end
-	return false
+
+	cf_location = chartRepo:insertChartfileLocation({
+		path = path,
+		name = path:match("^.+/(.-)$"),
+	})
+
+	self:mountLocation(cf_location)
 end
 
 ---@param path string
 ---@return string?
 function MountModel:getRealPath(path)
-	for _, entry in ipairs(self.mountInfo) do
-		if path:find(entry[2]) == 1 then
-			return (path:gsub(entry[2], entry[1]))
-		end
+	local realDirectory = love.filesystem.getRealDirectory(path)
+	if not realDirectory then
+		return
 	end
-end
 
----@param path string
----@return boolean
-function MountModel:isAdded(path)
-	for _, entry in ipairs(self.mountInfo) do
-		if entry[1] == path then
-			return true
-		end
+	local cf_location = self.cacheModel.chartRepo:selectChartfileLocation(path)
+	if not cf_location then
+		return realDirectory .. "/" .. path
 	end
-	return false
-end
 
----@param path string
-function MountModel:addPath(path)
-	local mountInfo = self.mountInfo
-	mountInfo[#mountInfo + 1] = {path, self:getMountPoint(path)}
-end
-
----@param path string
-function MountModel:mount(path)
-	assert(physfs.mount(path, self:getMountPoint(path), true))
-end
-
----@param path string
-function MountModel:unmount(path)
-	assert(physfs.unmount(path))
+	return cf_location.path .. "/" .. path
 end
 
 return MountModel

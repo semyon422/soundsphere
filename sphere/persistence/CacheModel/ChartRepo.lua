@@ -1,4 +1,5 @@
 local class = require("class")
+local sql_util = require("rdb.sql_util")
 
 ---@class sphere.ChartRepo
 ---@operator call: sphere.ChartRepo
@@ -15,7 +16,10 @@ end
 ---@param name string
 ---@return table?
 function ChartRepo:selectChartfileSet(dir, name)
-	return self.models.chartfile_sets:find({dir = assert(dir), name = assert(name)})
+	return self.models.chartfile_sets:find({
+		dir = dir or sql_util.NULL,
+		name = assert(name),
+	})
 end
 
 ---@param chartfile_set table
@@ -77,9 +81,13 @@ function ChartRepo:deleteChartfiles(conds)
 end
 
 ---@param path string
+---@param location_id number
 ---@return table
-function ChartRepo:selectUnhashedChartfiles(path)
-	return self.models.unhashed_chartfiles:select({path__startswith = assert(path)})
+function ChartRepo:selectUnhashedChartfiles(path, location_id)
+	return self.models.unhashed_chartfiles:select({
+		path__startswith = path,
+		location_id = assert(location_id),
+	})
 end
 
 ---@param id number
@@ -241,6 +249,23 @@ function ChartRepo:getScores(hash, index)
 		hash = assert(hash),
 		index = assert(index),
 	})
+end
+
+---@return table
+function ChartRepo:selectChartfileLocations()
+	return self.models.chartfile_locations:select()
+end
+
+---@param path string
+---@return table?
+function ChartRepo:selectChartfileLocation(path)
+	return self.models.chartfile_locations:find({path = assert(path)})
+end
+
+---@param chartfile_location table
+---@return table?
+function ChartRepo:insertChartfileLocation(chartfile_location)
+	return self.models.chartfile_locations:create(chartfile_location)
 end
 
 return ChartRepo

@@ -1,4 +1,5 @@
 local sql_util = require("rdb.sql_util")
+local path_util = require("path_util")
 local FileCacheGenerator = require("sphere.persistence.CacheModel.FileCacheGenerator")
 
 local test = {}
@@ -10,18 +11,18 @@ local function get_fake_chartRepo(actions, chartfiles, chartfile_sets)
 
 	function chartRepo:selectChartfileSet(dir, name)
 		table.insert(actions, {"ss", dir, name})
-		return chartfile_sets[dir .. "/" .. name]
+		return chartfile_sets[path_util.join(dir, name)]
 	end
 	function chartRepo:insertChartfileSet(chartfile_set)
 		table.insert(actions, {"is", chartfile_set})
-		chartfile_sets[chartfile_set.dir .. "/" .. chartfile_set.name] = chartfile_set
+		chartfile_sets[path_util.join(chartfile_set.dir, chartfile_set.name)] = chartfile_set
 		set_id = set_id + 1
 		chartfile_set.id = set_id
 		return chartfile_set
 	end
 	function chartRepo:updateChartfileSet(chartfile_set)
 		table.insert(actions, {"us", chartfile_set})
-		chartfile_sets[chartfile_set.dir .. "/" .. chartfile_set.name] = chartfile_set
+		chartfile_sets[path_util.join(chartfile_set.dir, chartfile_set.name)] = chartfile_set
 		return chartfile_set
 	end
 	function chartRepo:deleteChartfileSets(conds)
@@ -30,18 +31,18 @@ local function get_fake_chartRepo(actions, chartfiles, chartfile_sets)
 
 	function chartRepo:selectChartfile(set_id, name)
 		table.insert(actions, {"sc", set_id, name})
-		return chartfiles[set_id .. "/" .. name]
+		return chartfiles[path_util.join(set_id, name)]
 	end
 	function chartRepo:insertChartfile(chartfile)
 		table.insert(actions, {"ic", chartfile})
-		chartfiles[chartfile.set_id .. "/" .. chartfile.name] = chartfile
+		chartfiles[path_util.join(chartfile.set_id, chartfile.name)] = chartfile
 		file_id = file_id + 1
 		chartfile.id = file_id
 		return chartfile
 	end
 	function chartRepo:updateChartfile(chartfile)
 		table.insert(actions, {"uc", chartfile})
-		chartfiles[chartfile.set_id .. "/" .. chartfile.name] = chartfile
+		chartfiles[path_util.join(chartfile.set_id, chartfile.name)] = chartfile
 		return chartfile
 	end
 	function chartRepo:deleteChartfiles(conds)
@@ -71,7 +72,7 @@ function test.rel_root(t)
 	local chartRepo = get_fake_chartRepo(actions, chartfiles, chartfile_sets)
 
 	local files = {
-		{"related_dir", ".", "chartset", 0},
+		{"related_dir", nil, "chartset", 0},
 		{"related", "chartset", "a", 1},
 		{"related", "chartset", "b", 2},
 		-- {"related", "chartset", "c", 3},
@@ -81,17 +82,18 @@ function test.rel_root(t)
 	local noteChartFinder = get_fake_ncf(files)
 
 	local fcg = FileCacheGenerator(chartRepo, noteChartFinder)
-	fcg:lookup("chartset")
+	fcg:lookup("chartset", 1, nil)
 
 	-- print(require("inspect")(actions))
 	t:tdeq(actions, {
-		{"ss", ".", "chartset"},
+		{"ss", nil, "chartset"},
 		{"is", {
 			id = 1,
 			modified_at = 0,
-			dir = ".",
+			dir = nil,
 			name = "chartset",
 			is_file = false,
+			location_id = 1,
 		}},
 		{"sc", 1, "a"},
 		{"ic", {
@@ -119,7 +121,7 @@ function test.unrel_root(t)
 	local chartRepo = get_fake_chartRepo(actions, chartfiles, chartfile_sets)
 
 	local files = {
-		{"unrelated_dir", ".", "charts", 0},
+		{"unrelated_dir", nil, "charts", 0},
 		{"unrelated", "charts", "a", 1},
 		{"unrelated", "charts", "b", 2},
 		-- {"unrelated", "charts", "c", 3},
@@ -129,7 +131,7 @@ function test.unrel_root(t)
 	local noteChartFinder = get_fake_ncf(files)
 
 	local fcg = FileCacheGenerator(chartRepo, noteChartFinder)
-	fcg:lookup("charts")
+	fcg:lookup("charts", 1, nil)
 
 	-- print(require("inspect")(actions))
 	t:tdeq(actions, {
@@ -140,6 +142,7 @@ function test.unrel_root(t)
 			dir = "charts",
 			name = "a",
 			is_file = true,
+			location_id = 1,
 		}},
 		{"sc", 1, "a"},
 		{"ic", {
@@ -155,6 +158,7 @@ function test.unrel_root(t)
 			dir = "charts",
 			name = "b",
 			is_file = true,
+			location_id = 1,
 		}},
 		{"sc", 2, "b"},
 		{"ic", {
@@ -169,7 +173,8 @@ function test.unrel_root(t)
 		}},
 		{"ds", {
 			dir = "charts",
-			name__notin = {"a", "b", "c"}
+			name__notin = {"a", "b", "c"},
+			location_id = 1,
 		}},
 	})
 end
@@ -179,7 +184,7 @@ function test.complex(t)
 	local chartRepo = get_fake_chartRepo(actions, chartfiles, chartfile_sets)
 
 	local files = {
-		{"directory_dir", ".", "root", 0},
+		{"directory_dir", nil, "root", 0},
 		{"directory", "root", "osucharts", 0},
 		{"directory", "root", "jamcharts", 0},
 		{"directory_all", "root", {"osucharts", "jamcharts"}, 0},
@@ -208,7 +213,7 @@ function test.complex(t)
 	local noteChartFinder = get_fake_ncf(files)
 
 	local fcg = FileCacheGenerator(chartRepo, noteChartFinder)
-	fcg:lookup("charts")
+	fcg:lookup("charts", 1, nil)
 	-- print(require("inspect")(actions))
 
 	t:tdeq(actions, {
@@ -216,13 +221,15 @@ function test.complex(t)
 		{"ss", "root", "jamcharts"},
 		{"ds", {
 			dir = "root",
-			name__notin = {"osucharts", "jamcharts"}
+			name__notin = {"osucharts", "jamcharts"},
+			location_id = 1,
 		}},
 		{"ss", "root/osucharts", "chartset1"},
 		{"ss", "root/osucharts", "chartset2"},
 		{"ds", {
 			dir = "root/osucharts",
-			name__notin = {"chartset1", "chartset2"}
+			name__notin = {"chartset1", "chartset2"},
+			location_id = 1,
 		}},
 		{"ss", "root/osucharts", "chartset1"},
 		{"is", {
@@ -231,6 +238,7 @@ function test.complex(t)
 			dir = "root/osucharts",
 			name = "chartset1",
 			is_file = false,
+			location_id = 1,
 		}},
 		{"sc", 1, "a"},
 		{"ic", {
@@ -257,6 +265,7 @@ function test.complex(t)
 			dir = "root/osucharts",
 			name = "chartset2",
 			is_file = false,
+			location_id = 1,
 		}},
 		{"sc", 2, "a"},
 		{"ic", {
@@ -283,6 +292,7 @@ function test.complex(t)
 			dir = "root/jamcharts",
 			name = "a",
 			is_file = true,
+			location_id = 1,
 		}},
 		{"sc", 3, "a"},
 		{"ic", {
@@ -298,6 +308,7 @@ function test.complex(t)
 			dir = "root/jamcharts",
 			name = "b",
 			is_file = true,
+			location_id = 1,
 		}},
 		{"sc", 4, "b"},
 		{"ic", {
@@ -312,7 +323,8 @@ function test.complex(t)
 		}},
 		{"ds", {
 			dir = "root/jamcharts",
-			name__notin = {"a", "b"}
+			name__notin = {"a", "b"},
+			location_id = 1,
 		}}
 	})
 
@@ -320,7 +332,7 @@ function test.complex(t)
 	chartRepo = get_fake_chartRepo(actions, chartfiles, chartfile_sets)
 
 	files = {
-		{"directory_dir", ".", "root", 0},
+		{"directory_dir", nil, "root", 0},
 		{"directory", "root", "osucharts", 0},
 		{"directory", "root", "jamcharts", 0},
 		{"directory_all", "root", {"osucharts", "jamcharts"}, 0},
@@ -333,12 +345,24 @@ function test.complex(t)
 
 	fcg = FileCacheGenerator(chartRepo, noteChartFinder)
 
-	fcg:lookup("charts")
+	fcg:lookup("charts", 1, nil)
 
 	t:assert(not fcg:shouldScan("root/osucharts", "chartset1", 0))
 	t:assert(fcg:shouldScan("root/osucharts", "chartset1", 1))
-	fcg:processChartfileSet("root/osucharts", "chartset1", 0, false)
-	fcg:processChartfileSet("root/osucharts", "chartset1", 1, false)
+	fcg:processChartfileSet({
+		dir = "root/osucharts",
+		name = "chartset1",
+		modified_at = 0,
+		is_file = false,
+		location_id = 1,
+	})
+	fcg:processChartfileSet({
+		dir = "root/osucharts",
+		name = "chartset1",
+		modified_at = 1,
+		is_file = false,
+		location_id = 1,
+	})
 	fcg:processChartfile(1, "a", 0)
 	fcg:processChartfile(1, "a", 1)
 	-- print(require("inspect")(actions))
@@ -348,11 +372,13 @@ function test.complex(t)
 		{"ss", "root", "jamcharts"},
 		{"ds", {
 			dir = "root",
-			name__notin = {"osucharts", "jamcharts"}
+			name__notin = {"osucharts", "jamcharts"},
+			location_id = 1,
 		}},
 		{"ds", {
 			dir = "root/osucharts",
-			name__notin = {"chartset1", "chartset2"}
+			name__notin = {"chartset1", "chartset2"},
+			location_id = 1,
 		}},
 
 		{"ss", "root/osucharts", "chartset1"},
@@ -366,6 +392,7 @@ function test.complex(t)
 			dir = "root/osucharts",
 			name = "chartset1",
 			is_file = false,
+			location_id = 1,
 		}},
 
 		{"sc", 1, "a"},

@@ -21,7 +21,7 @@ return ModalImView(function(self)
 	end
 
 	local mountModel = self.game.mountModel
-	local items = self.game.configModel.configs.mount
+	local items = mountModel.cf_locations
 	selectedItem = selectedItem or items[1]
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
@@ -37,9 +37,8 @@ return ModalImView(function(self)
 	imgui.Container(window_id, w, h, _h / 3, _h * 2, scrollY)
 
 	imgui.List("mount points", w, h / 3, _h / 2, _h, scrollYlist)
-	for i = 1, #items do
-		local item = items[i]
-		local name = item[2]
+	for i, item in ipairs(items) do
+		local name = item.name
 		if selectedItem == item then
 			name = "> " .. name
 		end
@@ -50,25 +49,26 @@ return ModalImView(function(self)
 	scrollYlist = imgui.List()
 
 	if selectedItem then
+		local path = selectedItem.path
 		just.indent(8)
-		just.text("Status: " .. (mountModel.mountStatuses[selectedItem[1]] or "unknown"))
+		just.text("Status: " .. (mountModel.status[path] or "unknown"))
 		just.indent(8)
 		just.text("Real path: ")
 		just.indent(8)
-		just.text(selectedItem[1], w)
+		just.text(path, w)
 		if imgui.TextButton("open dir", "Open", 200, _h) then
-			love.system.openURL(selectedItem[1])
+			love.system.openURL(path)
 		end
 		just.sameline()
-		if imgui.TextButton("remove dir", "Remove", 200, _h) then
-			for i = 1, #items do
-				if items[i] == selectedItem then
-					table.remove(items, i)
-					selectedItem = nil
-					break
-				end
-			end
-		end
+		-- if imgui.TextButton("remove dir", "Remove", 200, _h) then
+		-- 	for i = 1, #items do
+		-- 		if items[i] == selectedItem then
+		-- 			table.remove(items, i)
+		-- 			selectedItem = nil
+		-- 			break
+		-- 		end
+		-- 	end
+		-- end
 	end
 
 	scrollY = imgui.Container()

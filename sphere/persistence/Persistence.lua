@@ -33,6 +33,8 @@ function Persistence:load()
 	configModel:open("filters")
 	configModel:open("files")
 	configModel:read()
+
+	self.cacheModel:load()
 end
 
 function Persistence:unload()

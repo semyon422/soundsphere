@@ -101,18 +101,7 @@ function SelectController:openDirectory()
 		return
 	end
 	local path = noteChartItem.path:match("^(.+)/.-$")
-
-	local realDirectory = love.filesystem.getRealDirectory(path)
-	if not realDirectory then
-		return
-	end
-
-	local realPath
-	if self.mountModel:isMountPath(realDirectory) then
-		realPath = self.mountModel:getRealPath(path)
-	else
-		realPath = realDirectory .. "/" .. path
-	end
+	local realPath = self.mountModel:getRealPath(path)
 	love.system.openURL(realPath)
 end
 

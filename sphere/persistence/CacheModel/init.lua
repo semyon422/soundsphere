@@ -64,7 +64,8 @@ local updateCacheAsync = thread.async(function(path, force)
 	cdb:load()
 
 	local cacheManager = CacheManager(cdb)
-	cacheManager:generateCacheFull(path, force)
+	-- cacheManager:generateCacheFull(path, force)
+	cacheManager:generateCacheFull(nil, 1, "mounted_charts/1")
 
 	cdb:unload()
 end)

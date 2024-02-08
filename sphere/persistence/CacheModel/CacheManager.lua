@@ -93,24 +93,23 @@ function CacheManager:checkProgress()
 end
 
 ---@param path string
----@param force boolean?
-function CacheManager:generateCacheFull(path, force)
-	local path = path or "userdata/charts"
-
+---@param location_id number
+---@param location_prefix string?
+function CacheManager:generateCacheFull(path, location_id, location_prefix)
 	self:resetProgress()
 
 	self.state = 1
 	self:checkProgress()
 
 	self:begin()
-	self.fileCacheGenerator:lookup(path)
+	self.fileCacheGenerator:lookup(path, location_id, location_prefix)
 	self:commit()
 
 	self.state = 2
 	self:checkProgress()
 
 	self:begin()
-	self.chartmetaGenerator:generate(false, path)
+	self.chartmetaGenerator:generate(false, path, location_id, location_prefix)
 	self:commit()
 
 	self.state = 3

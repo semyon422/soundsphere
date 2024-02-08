@@ -124,7 +124,6 @@ function GameController:load()
 
 	self.onlineModel:load()
 	self.noteSkinModel:load()
-	self.cacheModel:load()
 	self.osudirectModel:load()
 	self.selectModel:load()
 

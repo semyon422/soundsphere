@@ -17,13 +17,7 @@ end
 
 ---@param path string
 function MountController:directorydropped(path)
-	path = path:gsub("\\", "/")
-	local mountModel = self.mountModel
-	if not mountModel:isAdded(path) then
-		self.mountModel:addPath(path)
-	end
-	self.mountModel:mount(path)
-	self.configModel:write()
+	self.mountModel:createLocation(path)
 end
 
 ---@param file love.File

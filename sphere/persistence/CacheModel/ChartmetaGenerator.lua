@@ -1,4 +1,5 @@
 local class = require("class")
+local path_util = require("path_util")
 local md5 = require("md5")
 
 ---@class sphere.ChartmetaGenerator
@@ -22,11 +23,11 @@ end
 
 ---@param full boolean?
 ---@param path string
-function ChartmetaGenerator:generate(full, path)
-	local chartfiles = self.chartRepo:selectUnhashedChartfiles(path)
+function ChartmetaGenerator:generate(full, path, location_id, location_prefix)
+	local chartfiles = self.chartRepo:selectUnhashedChartfiles(path, location_id)
 
 	for i, chartfile in ipairs(chartfiles) do
-		local status, err = self:processChartfile(chartfile, full)
+		local status, err = self:processChartfile(chartfile, full, location_prefix)
 
 		local noteCharts
 		if not status and self.error_handler then
@@ -46,8 +47,9 @@ end
 
 ---@param chartfile table
 ---@param full boolean?
-function ChartmetaGenerator:processChartfile(chartfile, full)
-	local path = chartfile.path
+---@param location_prefix string?
+function ChartmetaGenerator:processChartfile(chartfile, full, location_prefix)
+	local path = path_util.join(location_prefix, chartfile.path)
 
 	local content = assert(self.fs.read(path))
 	local hash = md5.sumhexa(content)

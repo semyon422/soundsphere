@@ -17,7 +17,14 @@ CREATE TABLE IF NOT EXISTS `chartfile_sets` (
 	`name` TEXT NOT NULL,
 	`modified_at` INTEGER NOT NULL,
 	`is_file` INTEGER NOT NULL,
+	`location_id` INTEGER NOT NULL,
 	UNIQUE(`dir`, `name`)
+);
+
+CREATE TABLE IF NOT EXISTS `chartfile_locations` (
+	`id` INTEGER PRIMARY KEY,
+	`path` TEXT NOT NULL UNIQUE,
+	`name` TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS `chartmetas` (
@@ -129,6 +136,7 @@ chartfile_sets.dir || "/" || chartfiles.name
 ELSE
 chartfile_sets.dir || "/" || chartfile_sets.name || "/" || chartfiles.name
 END path,
+chartfile_sets.location_id,
 chartfiles.*
 FROM chartfiles
 INNER JOIN chartfile_sets ON
@@ -148,6 +156,7 @@ chartfile_sets.dir || "/" || chartfiles.name
 ELSE
 chartfile_sets.dir || "/" || chartfile_sets.name || "/" || chartfiles.name
 END path,
+chartfile_sets.location_id,
 chartfiles.name AS chartfile_name,
 chartfile_sets.name AS chartfile_set_name,
 chartfiles.modified_at,

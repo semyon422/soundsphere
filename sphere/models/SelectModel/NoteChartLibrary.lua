@@ -24,6 +24,9 @@ function NoteChartLibrary:setNoteChartSetId(set_id)
 	end
 	self.set_id = set_id
 	self.items = self.cacheModel.cacheDatabase:getNoteChartItemsAtSet(set_id)
+	for i, chart in ipairs(self.items) do
+		chart.path = "mounted_charts/" .. chart.location_id .. "/" .. chart.path
+	end
 end
 
 ---@param chartfile_id number?
