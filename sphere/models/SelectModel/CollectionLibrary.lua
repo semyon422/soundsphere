@@ -4,8 +4,6 @@ local class = require("class")
 ---@operator call: sphere.CollectionLibrary
 local CollectionLibrary = class()
 
-CollectionLibrary.basePath = "userdata/charts"
-
 local ignoredNames = {
 	".keep",
 }
@@ -13,37 +11,36 @@ for i = 1, #ignoredNames do
 	ignoredNames[ignoredNames[i]] = true
 end
 
+---@param cacheModel sphere.CacheModel
+---@param configModel sphere.ConfigModel
+function CollectionLibrary:new(cacheModel, configModel)
+	self.cacheModel = cacheModel
+	self.configModel = configModel
+end
+
 function CollectionLibrary:load()
 	self.config = self.configModel.configs.select
 	local collectionPath = self.config.collection
-	local basePath = self.basePath
 
 	local dict = {}
-	for _, chartSetData in ipairs(self.cacheModel.chartRepo:selectChartfileSetsAtPath(self.basePath)) do
-		local parent = chartSetData.dir
-		dict[parent] = (dict[parent] or 0) + 1
-	end
-
-	local directoryItems = love.filesystem.getDirectoryItems(basePath)
-	for _, name in ipairs(directoryItems) do
-		if not ignoredNames[name] then
-			local path = basePath .. "/" .. name
-			dict[path] = dict[path] or 0
-		end
+	for _, chartfile_set in ipairs(self.cacheModel.chartRepo:selectChartfileSetsAtPath()) do
+		local dir = chartfile_set.dir or "."
+		dict[dir] = (dict[dir] or 0) + 1
 	end
 
 	local items = {{
-		path = basePath,
-		shortPath = "/",
+		path = "",
+		shortPath = "",
 		name = "/",
-		count = 0
+		count = 0,
 	}}
 	for path, count in pairs(dict) do
+		local dir, name = path:match("^(.+)/(.-)$")
 		local collection = {
 			path = path,
-			shortPath = path:gsub(basePath .. "/", ""),
-			name = path:match("^.+/(.-)$"),
-			count = count
+			shortPath = dir or "",
+			name = name or path,
+			count = count,
 		}
 		items[#items + 1] = collection
 		if path == collectionPath then

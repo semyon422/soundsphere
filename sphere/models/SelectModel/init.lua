@@ -28,10 +28,10 @@ function SelectModel:new(configModel, cacheModel, onlineModel)
 	self.configModel = configModel
 	self.cacheModel = cacheModel
 
-	self.noteChartLibrary = NoteChartLibrary()
-	self.noteChartSetLibrary = NoteChartSetLibrary()
-	self.collectionLibrary = CollectionLibrary()
-	self.searchModel = SearchModel()
+	self.noteChartLibrary = NoteChartLibrary(cacheModel)
+	self.noteChartSetLibrary = NoteChartSetLibrary(cacheModel)
+	self.collectionLibrary = CollectionLibrary(cacheModel, configModel)
+	self.searchModel = SearchModel(configModel)
 	self.sortModel = SortModel()
 
 	self.scoreLibrary = ScoreLibrary(
@@ -44,12 +44,6 @@ end
 function SelectModel:load()
 	local config = self.configModel.configs.select
 	self.config = config
-
-	self.noteChartLibrary.cacheModel = self.cacheModel
-	self.noteChartSetLibrary.cacheModel = self.cacheModel
-	self.searchModel.configModel = self.configModel
-	self.collectionLibrary.cacheModel = self.cacheModel
-	self.collectionLibrary.configModel = self.configModel
 
 	self.searchMode = config.searchMode
 

@@ -5,6 +5,11 @@ local erfunc = require("libchart.erfunc")
 ---@operator call: sphere.SearchModel
 local SearchModel = class()
 
+---@param configModel sphere.ConfigModel
+function SearchModel:new(configModel)
+	self.configModel = configModel
+end
+
 local number_fields = {
 	{
 		keys = {"difficulty", "d"},

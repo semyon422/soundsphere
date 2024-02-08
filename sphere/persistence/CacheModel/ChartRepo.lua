@@ -44,7 +44,7 @@ function ChartRepo:selectChartfileSetById(id)
 	return self.models.chartfile_sets:find({id = assert(id)})
 end
 
----@param dir string
+---@param dir string?
 ---@return table
 function ChartRepo:selectChartfileSetsAtPath(dir)
 	return self.models.chartfile_sets:select({dir__startswith = dir})

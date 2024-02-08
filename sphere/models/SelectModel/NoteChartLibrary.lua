@@ -1,6 +1,4 @@
 local class = require("class")
-local ExpireTable = require("ExpireTable")
-local table_util = require("table_util")
 
 ---@class sphere.NoteChartLibrary
 ---@operator call: sphere.NoteChartLibrary
@@ -9,7 +7,9 @@ local NoteChartLibrary = class()
 NoteChartLibrary.set_id = 0
 NoteChartLibrary.itemsCount = 0
 
-function NoteChartLibrary:new()
+---@param cacheModel sphere.CacheModel
+function NoteChartLibrary:new(cacheModel)
+	self.cacheModel = cacheModel
 	self.items = {}
 end
 

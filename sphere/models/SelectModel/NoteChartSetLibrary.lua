@@ -8,7 +8,10 @@ local NoteChartSetLibrary = class()
 
 NoteChartSetLibrary.itemsCount = 0
 
-function NoteChartSetLibrary:new()
+---@param cacheModel sphere.CacheModel
+function NoteChartSetLibrary:new(cacheModel)
+	self.cacheModel = cacheModel
+
 	local cache = ExpireTable()
 	self.cache = cache
 	self.cache.load = function(_, k)
