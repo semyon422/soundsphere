@@ -51,8 +51,8 @@ function ChartRepo:selectChartfileSetsAtPath(dir)
 end
 
 ---@return number
-function ChartRepo:countChartfileSets()
-	return self.models.chartfile_sets:count()
+function ChartRepo:countChartfileSets(conds)
+	return self.models.chartfile_sets:count(conds)
 end
 
 --------------------------------------------------------------------------------
@@ -84,7 +84,8 @@ end
 ---@param location_id number
 ---@return table
 function ChartRepo:selectUnhashedChartfiles(path, location_id)
-	return self.models.unhashed_chartfiles:select({
+	return self.models.located_chartfiles:select({
+		hash__isnull = true,
 		path__startswith = path,
 		location_id = assert(location_id),
 	})
@@ -97,8 +98,8 @@ function ChartRepo:selectChartfileById(id)
 end
 
 ---@return number
-function ChartRepo:countChartfiles()
-	return self.models.chartfiles:count()
+function ChartRepo:countChartfiles(conds)
+	return self.models.located_chartfiles:count(conds)
 end
 
 -- ---@param setId number

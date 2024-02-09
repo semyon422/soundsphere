@@ -129,19 +129,17 @@ CREATE TABLE IF NOT EXISTS `chart_collections` (
 	`chartdiff_id` INTEGER
 );
 
-CREATE TEMP VIEW IF NOT EXISTS unhashed_chartfiles AS
+CREATE TEMP VIEW IF NOT EXISTS located_chartfiles AS
 SELECT
-CASE WHEN chartfile_sets.is_file THEN
-chartfile_sets.dir || "/" || chartfiles.name
-ELSE
-chartfile_sets.dir || "/" || chartfile_sets.name || "/" || chartfiles.name
+CASE WHEN chartfile_sets.is_file
+THEN chartfile_sets.dir || "/" || chartfiles.name
+ELSE chartfile_sets.dir || "/" || chartfile_sets.name || "/" || chartfiles.name
 END path,
 chartfile_sets.location_id,
 chartfiles.*
 FROM chartfiles
 INNER JOIN chartfile_sets ON
 chartfiles.set_id = chartfile_sets.id
-WHERE hash IS NULL
 ;
 
 CREATE TEMP VIEW IF NOT EXISTS chartset_list AS
@@ -151,10 +149,9 @@ chartfiles.id AS chartfile_id,
 chartdiffs.id AS chartdiff_id,
 scores.id AS score_id,
 chartfiles.set_id AS chartfile_set_id,
-CASE WHEN chartfile_sets.is_file THEN
-chartfile_sets.dir || "/" || chartfiles.name
-ELSE
-chartfile_sets.dir || "/" || chartfile_sets.name || "/" || chartfiles.name
+CASE WHEN chartfile_sets.is_file
+THEN chartfile_sets.dir || "/" || chartfiles.name
+ELSE chartfile_sets.dir || "/" || chartfile_sets.name || "/" || chartfiles.name
 END path,
 chartfile_sets.location_id,
 chartfiles.name AS chartfile_name,

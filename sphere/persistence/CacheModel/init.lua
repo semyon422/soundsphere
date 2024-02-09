@@ -37,11 +37,10 @@ function CacheModel:unload()
 	self.cdb:unload()
 end
 
----@param path string
----@param force boolean?
+---@param args string
 ---@param callback function?
-function CacheModel:startUpdate(path, force, callback)
-	table.insert(self.tasks, {path, force, callback})
+function CacheModel:startUpdate(args, callback)
+	table.insert(self.tasks, {args, callback})
 end
 
 function CacheModel:stopUpdate()
@@ -56,7 +55,8 @@ function CacheModel:update()
 	end
 end
 
-local updateCacheAsync = thread.async(function(path, force)
+local updateCacheAsync = thread.async(function(path, location_id, location_prefix)
+	print(path, location_id, location_prefix)
 	local CacheManager = require("sphere.persistence.CacheModel.CacheManager")
 	local ChartsDatabase = require("sphere.persistence.CacheModel.ChartsDatabase")
 
@@ -64,8 +64,7 @@ local updateCacheAsync = thread.async(function(path, force)
 	cdb:load()
 
 	local cacheManager = CacheManager(cdb)
-	-- cacheManager:generateCacheFull(path, force)
-	cacheManager:generateCacheFull(nil, 1, "mounted_charts/1")
+	cacheManager:generateCacheFull(path, location_id, location_prefix)
 
 	cdb:unload()
 end)
@@ -79,10 +78,10 @@ CacheModel.process = thread.coro(function(self)
 	local tasks = self.tasks
 	local task = table.remove(tasks, 1)
 	while task do
-		updateCacheAsync(task[1], task[2])
+		updateCacheAsync(unpack(task[1]))
 
-		if task[3] then
-			task[3]()
+		if task[2] then
+			task[2]()
 		end
 
 		task = table.remove(tasks, 1)

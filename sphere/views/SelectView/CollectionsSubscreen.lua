@@ -2,7 +2,6 @@ local just = require("just")
 local spherefonts = require("sphere.assets.fonts")
 local imgui = require("imgui")
 local CollectionListView = require("sphere.views.SelectView.CollectionListView")
-local CacheView = require("sphere.views.SelectView.CacheView")
 
 local Layout = require("sphere.views.SelectView.Layout")
 local SelectFrame = require("sphere.views.SelectView.SelectFrame")
@@ -15,34 +14,6 @@ local function drawFrameRect(w, h, _r)
 	love.graphics.setColor(0, 0, 0, 0.8)
 	love.graphics.rectangle("fill", 0, 0, w, h, _r or 36)
 	love.graphics.setColor(r, g, b, a)
-end
-
----@param self table
-local function CacheStatus(self)
-	local cacheStatus = self.game.cacheModel.cacheStatus
-
-	local w, h = Layout:move("column1")
-	drawFrameRect(w, h)
-
-	imgui.text("chartfile_sets: " .. cacheStatus.chartfile_sets)
-	imgui.text("chartfiles: " .. cacheStatus.chartfiles)
-	imgui.text("chartmetas: " .. cacheStatus.chartmetas)
-	imgui.text("chartdiffs: " .. cacheStatus.chartdiffs)
-
-	if imgui.button("cacheStatus update", "update") then
-		cacheStatus:update()
-	end
-end
-
----@param self table
-local function Cache(self)
-	local w, h = Layout:move("column2row2row1")
-	drawFrameRect(w, h)
-
-	love.graphics.translate(h / 2, 0)
-
-	CacheView.game = self.game
-	CacheView:draw(w - h, h)
 end
 
 ---@param self table
@@ -74,7 +45,5 @@ end
 
 return function(self)
 	CollectionList(self)
-	Cache(self)
-	CacheStatus(self)
 	CollectionsSubscreen(self)
 end

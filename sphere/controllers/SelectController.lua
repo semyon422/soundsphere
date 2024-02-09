@@ -117,21 +117,21 @@ end
 
 ---@param force boolean?
 function SelectController:updateCache(force)
-	local noteChartItem = self.selectModel.noteChartItem
-	if not noteChartItem then
+	local chart = self.selectModel.noteChartItem
+	if not chart then
 		return
 	end
-	local path = noteChartItem.path:match("^(.+)/.-$")
-	self.cacheModel:startUpdate(path, force)
+	local path = chart.path:match("^(.+)/.-$")
+	self.cacheModel:startUpdate({path, chart.location_id, "mounted_charts/" .. chart.location_id})
 end
 
 ---@param path string
----@param force boolean?
-function SelectController:updateCacheCollection(path, force)
+---@param location_id string
+function SelectController:updateCacheCollection(path, location_id)
 	local cacheModel = self.cacheModel
 	local state = cacheModel.shared.state
 	if state == 0 or state == 3 then
-		cacheModel:startUpdate(path, force)
+		cacheModel:startUpdate({path, location_id, "mounted_charts/" .. location_id})
 	else
 		cacheModel:stopUpdate()
 	end
