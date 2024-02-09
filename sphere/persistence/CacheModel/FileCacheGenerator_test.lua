@@ -173,9 +173,39 @@ function test.unrel_root(t)
 		}},
 		{"ds", {
 			dir = "charts",
+			dir__isnull = false,
 			name__notin = {"a", "b", "c"},
 			location_id = 1,
 		}},
+	})
+end
+
+function test.root_packs(t)
+	local actions, chartfiles, chartfile_sets = {}, {}, {}
+	local chartRepo = get_fake_chartRepo(actions, chartfiles, chartfile_sets)
+
+	-- prefix ~= nil and dir == nil
+	local files = {
+		{"directory_dir", nil, nil, 0},
+		{"directory", nil, "osucharts", 0},
+		{"directory", nil, "jamcharts", 0},
+		{"directory_all", nil, {"osucharts", "jamcharts"}, 0},
+	}
+
+	local noteChartFinder = get_fake_ncf(files)
+
+	local fcg = FileCacheGenerator(chartRepo, noteChartFinder)
+	fcg:lookup("charts", 1, nil)
+
+	-- print(require("inspect")(actions))
+	t:tdeq(actions, {
+		{"ss", nil, "osucharts"},
+		{"ss", nil, "jamcharts"},
+		{"ds", {
+			dir__isnull = true,
+			location_id = 1,
+			name__notin = {"osucharts", "jamcharts"},
+		}}
 	})
 end
 
@@ -221,6 +251,7 @@ function test.complex(t)
 		{"ss", "root", "jamcharts"},
 		{"ds", {
 			dir = "root",
+			dir__isnull = false,
 			name__notin = {"osucharts", "jamcharts"},
 			location_id = 1,
 		}},
@@ -228,6 +259,7 @@ function test.complex(t)
 		{"ss", "root/osucharts", "chartset2"},
 		{"ds", {
 			dir = "root/osucharts",
+			dir__isnull = false,
 			name__notin = {"chartset1", "chartset2"},
 			location_id = 1,
 		}},
@@ -323,6 +355,7 @@ function test.complex(t)
 		}},
 		{"ds", {
 			dir = "root/jamcharts",
+			dir__isnull = false,
 			name__notin = {"a", "b"},
 			location_id = 1,
 		}}
@@ -372,11 +405,13 @@ function test.complex(t)
 		{"ss", "root", "jamcharts"},
 		{"ds", {
 			dir = "root",
+			dir__isnull = false,
 			name__notin = {"osucharts", "jamcharts"},
 			location_id = 1,
 		}},
 		{"ds", {
 			dir = "root/osucharts",
+			dir__isnull = false,
 			name__notin = {"chartset1", "chartset2"},
 			location_id = 1,
 		}},

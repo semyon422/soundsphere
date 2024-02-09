@@ -48,6 +48,7 @@ function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
 			self.chartRepo:deleteChartfiles({set_id = chartfile_set.id, name__notin = name})
 			self.chartRepo:deleteChartfileSets({
 				dir = dir,
+				dir__isnull = not dir,
 				name__notin = name,
 				location_id = location_id,
 			})
@@ -57,6 +58,7 @@ function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
 		elseif typ == "directory_all" then
 			self.chartRepo:deleteChartfileSets({
 				dir = dir,
+				dir__isnull = not dir,
 				name__notin = name,
 				location_id = location_id,
 			})

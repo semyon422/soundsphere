@@ -1,5 +1,4 @@
 local class = require("class")
-local sql_util = require("rdb.sql_util")
 
 ---@class sphere.ChartRepo
 ---@operator call: sphere.ChartRepo
@@ -17,7 +16,8 @@ end
 ---@return table?
 function ChartRepo:selectChartfileSet(dir, name)
 	return self.models.chartfile_sets:find({
-		dir = dir or sql_util.NULL,
+		dir = dir,
+		dir__isnull = not dir,
 		name = assert(name),
 	})
 end
