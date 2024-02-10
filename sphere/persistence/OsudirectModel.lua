@@ -178,7 +178,7 @@ function OsudirectModel:getExistingHashes(beatmaps)
 	for _, beatmap in ipairs(beatmaps) do
 		table.insert(hashes, beatmap.beatmaps[1].checksum)
 	end
-	local foundCharts = self.cacheModel.chartRepo:getNoteChartsByHashes(hashes)
+	local foundCharts = self.cacheModel.chartRepo:getChartfilesByHashes(hashes)
 	local foundHashes = {}
 	for _, chart in ipairs(foundCharts) do
 		foundHashes[chart.hash] = true
@@ -288,11 +288,7 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 
 	beatmap.status = "Caching"
 
-	local c = coroutine.running()
-	self.cacheModel:startUpdate(extractPath, true, function()
-		coroutine.resume(c)
-	end)
-	coroutine.yield()
+	self.cacheModel:startUpdateAsync({chartview.dir, chartview.location_id, "mounted_charts/" .. chartview.location_id})
 
 	for i, v in ipairs(self.processing) do
 		if v == beatmap then

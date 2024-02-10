@@ -102,17 +102,11 @@ function ChartRepo:countChartfiles(conds)
 	return self.models.located_chartfiles:count(conds)
 end
 
--- ---@param setId number
--- ---@return rdb.ModelRow[]
--- function ChartRepo:getNoteChartsAtSet(setId)
--- 	return self.models.noteCharts:select({setId = setId})
--- end
-
--- ---@param hashes table
--- ---@return rdb.ModelRow[]
--- function ChartRepo:getNoteChartsByHashes(hashes)
--- 	return self.models.noteCharts:select({hash__in = hashes})
--- end
+---@param hashes table
+---@return rdb.ModelRow[]
+function ChartRepo:getChartfilesByHashes(hashes)
+	return self.models.chartfiles:select({hash__in = hashes})
+end
 
 --------------------------------------------------------------------------------
 

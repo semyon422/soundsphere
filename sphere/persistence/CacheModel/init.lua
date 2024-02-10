@@ -43,6 +43,15 @@ function CacheModel:startUpdate(args, callback)
 	table.insert(self.tasks, {args, callback})
 end
 
+---@param args string
+function CacheModel:startUpdateAsync(args)
+	local c = coroutine.running()
+	table.insert(self.tasks, {args, function()
+		coroutine.resume(c)
+	end})
+	coroutine.yield()
+end
+
 function CacheModel:stopUpdate()
 	self.shared.stop = true
 end
