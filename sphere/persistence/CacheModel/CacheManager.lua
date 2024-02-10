@@ -92,9 +92,9 @@ function CacheManager:checkProgress()
 	end
 end
 
----@param path string
+---@param path string?
 ---@param location_id number
----@param location_prefix string?
+---@param location_prefix string
 function CacheManager:generateCacheFull(path, location_id, location_prefix)
 	self:resetProgress()
 
@@ -109,7 +109,7 @@ function CacheManager:generateCacheFull(path, location_id, location_prefix)
 	self:checkProgress()
 
 	self:begin()
-	self.chartmetaGenerator:generate(false, path, location_id, location_prefix)
+	self.chartmetaGenerator:generate(path, location_id, location_prefix, false)
 	self:commit()
 
 	self.state = 3

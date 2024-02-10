@@ -125,7 +125,7 @@ function SelectController:updateCache(force)
 	self.cacheModel:startUpdate({path, chart.location_id, "mounted_charts/" .. chart.location_id})
 end
 
----@param path string
+---@param path string?
 ---@param location_id string
 function SelectController:updateCacheCollection(path, location_id)
 	local cacheModel = self.cacheModel

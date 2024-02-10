@@ -11,7 +11,7 @@ end
 
 ----------------------------------------------------------------
 
----@param dir string
+---@param dir string?
 ---@param name string
 ---@return table?
 function ChartRepo:selectChartfileSet(dir, name)
@@ -80,7 +80,7 @@ function ChartRepo:deleteChartfiles(conds)
 	self.models.chartfiles:delete(conds)
 end
 
----@param path string
+---@param path string?
 ---@param location_id number
 ---@return table
 function ChartRepo:selectUnhashedChartfiles(path, location_id)

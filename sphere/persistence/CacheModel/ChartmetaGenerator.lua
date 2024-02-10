@@ -21,13 +21,18 @@ function ChartmetaGenerator:new(chartRepo, noteChartFactory, fs, after, error_ha
 	self.cached = 0
 end
 
----@param full boolean?
----@param path string
-function ChartmetaGenerator:generate(full, path, location_id, location_prefix)
+---@param path string?
+---@param location_id number
+---@param location_prefix string?
+---@param not_reuse boolean?
+function ChartmetaGenerator:generate(path, location_id, location_prefix, not_reuse)
 	local chartfiles = self.chartRepo:selectUnhashedChartfiles(path, location_id)
 
 	for i, chartfile in ipairs(chartfiles) do
-		local status, err = self:processChartfile(chartfile, full, location_prefix)
+		local full_path = path_util.join(location_prefix, chartfile.path)
+		local content = assert(self.fs.read(full_path))
+
+		local status, err = self:processChartfile(chartfile, content, not_reuse)
 
 		local noteCharts
 		if not status and self.error_handler then
@@ -46,21 +51,18 @@ function ChartmetaGenerator:generate(full, path, location_id, location_prefix)
 end
 
 ---@param chartfile table
----@param full boolean?
----@param location_prefix string?
-function ChartmetaGenerator:processChartfile(chartfile, full, location_prefix)
-	local path = path_util.join(location_prefix, chartfile.path)
-
-	local content = assert(self.fs.read(path))
+---@param content string
+---@param not_reuse boolean?
+function ChartmetaGenerator:processChartfile(chartfile, content, not_reuse)
 	local hash = md5.sumhexa(content)
 
-	if not full and self.chartRepo:selectChartmeta(hash, 1) then
+	if not not_reuse and self.chartRepo:selectChartmeta(hash, 1) then
 		chartfile.hash = hash
 		self.chartRepo:updateChartfile(chartfile)
 		return "reused"
 	end
 
-	local noteCharts, err = self.noteChartFactory:getNoteCharts(path, content)
+	local noteCharts, err = self.noteChartFactory:getNoteCharts(chartfile.name, content)
 	if not noteCharts then
 		return nil, err
 	end

@@ -12,7 +12,7 @@ function FileCacheGenerator:new(chartRepo, noteChartFinder)
 	self.noteChartFinder = noteChartFinder
 end
 
----@param root_dir string
+---@param root_dir string?
 ---@param location_id number
 ---@param location_prefix string?
 function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
@@ -67,7 +67,7 @@ function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
 	end
 end
 
----@param dir string
+---@param dir string?
 ---@param name string
 ---@param modified_at number
 ---@return boolean

@@ -87,12 +87,12 @@ function test.all(t)
 
 	cg.after = function() return true end
 
-	cg:generate(false, "")
+	cg:generate("", 1)
 
 	t:eq(cg.cached, 1)
 	t:eq(cg.reused, 0)
 
-	cg:generate(false, "")
+	cg:generate("", 1)
 
 	t:eq(cg.cached, 1)
 	t:eq(cg.reused, 1)
@@ -100,12 +100,12 @@ function test.all(t)
 	cg.after = function() return false end
 
 	chartfiles["charts/a"].hash = nil
-	cg:generate(false, "")
+	cg:generate("", 1)
 	t:eq(cg.reused, 2)
 	t:assert(chartfiles["charts/a"].hash)
 
 	chartfiles["charts/a"].hash = nil
-	cg:generate(true, "")
+	cg:generate("", 1, nil, true)
 	t:eq(cg.cached, 2)
 	t:assert(chartfiles["charts/a"].hash)
 
@@ -116,7 +116,7 @@ function test.all(t)
 		actual_chartfile = chartfile
 		actual_error = err
 	end
-	cg:generate(true, "")
+	cg:generate("", 1, nil, true)
 	t:eq(cg.cached, 2)
 	t:eq(actual_error, chart_error)
 	t:eq(actual_chartfile, chartfiles["charts/a"])
