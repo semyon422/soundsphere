@@ -89,14 +89,14 @@ end
 
 local textFields = {
 	"hash",
+	"path",
 	"artist",
 	"title",
 	"name",
 	"source",
 	"tags",
 	"creator",
-	"inputMode",
-	"audio_path",
+	"inputmode",
 }
 
 local operators = {

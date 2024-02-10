@@ -33,26 +33,28 @@ end
 ---@return table
 function NoteChartSetLibrary:loadObject(itemIndex)
 	local cacheDatabase = self.cacheModel.cacheDatabase
-	local entry = cacheDatabase.noteChartSetItems[itemIndex - 1]
-	local item = cacheDatabase:getNoteChartSetItem(entry.chartfile_id, entry.chartmeta_id)
-	item.lamp = entry.lamp
-	return item
+	local _chartview = cacheDatabase.chartviews[itemIndex - 1]
+	local chartview = cacheDatabase:getChartview(_chartview.chartfile_id, _chartview.chartmeta_id)
+	chartview.lamp = _chartview.lamp
+	return chartview
 end
 
 function NoteChartSetLibrary:updateItems()
-	self.itemsCount = self.cacheModel.cacheDatabase.noteChartSetItemsCount
+	self.itemsCount = self.cacheModel.cacheDatabase.chartviews_count
 	self.cache:new()
 end
 
----@param chartfile_id number?
----@param chartmeta_id number?
----@param noteChartSetId number?
+---@param chartview table
 ---@return number
-function NoteChartSetLibrary:getItemIndex(chartfile_id, chartmeta_id, noteChartSetId)
+function NoteChartSetLibrary:indexof(chartview)
+	local chartfile_id = chartview.chartfile_id
+	local chartmeta_id = chartview.chartmeta_id
+	local set_id = chartview.chartfile_set_id
+
 	local cdb = self.cacheModel.cacheDatabase
 	local ids = cdb.id_to_global_offset
 	return (ids[chartfile_id] and ids[chartfile_id][chartmeta_id] or
-		cdb.set_id_to_global_offset[noteChartSetId] or 0) + 1
+		cdb.set_id_to_global_offset[set_id] or 0) + 1
 end
 
 return NoteChartSetLibrary

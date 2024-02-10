@@ -313,11 +313,7 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 	end
 
 	local items = self.noteChartSetLibrary.items
-	self.chartview_set_index = self.noteChartSetLibrary:getItemIndex(
-		self.config.chartfile_id,
-		self.config.chartmeta_id,
-		self.config.chartfile_set_id
-	)
+	self.chartview_set_index = self.noteChartSetLibrary:indexof(self.config)
 
 	if not noUpdate then
 		self.noteChartSetStateCounter = self.noteChartSetStateCounter + 1

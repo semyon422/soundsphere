@@ -8,12 +8,13 @@ local class = require("class")
 ---@operator call: sphere.CacheDatabase
 local CacheDatabase = class()
 
+---@param cdb sphere.ChartsDatabase
 function CacheDatabase:new(cdb)
-	self.noteChartSetItemsCount = 0
-	self.noteChartSetItems = {}
+	self.chartviews_count = 0
+	self.chartviews = {}
 	self.set_id_to_global_offset = {}
 	self.id_to_global_offset = {}
-	self.queryParams = {}
+	self.params = {}
 
 	self.models = cdb.models
 end
@@ -42,7 +43,7 @@ local _queryAsync = thread.async(function(params)
 	cdb:load()
 
 	local self = CacheDatabase(cdb)
-	self.queryParams = params
+	self.params = params
 	local status, err = pcall(self.queryNoteChartSets, self)
 	cdb:unload()
 
@@ -51,33 +52,33 @@ local _queryAsync = thread.async(function(params)
 		return
 	end
 	local t = {
-		noteChartSetItemsCount = self.noteChartSetItemsCount,
+		chartviews_count = self.chartviews_count,
 		set_id_to_global_offset = self.set_id_to_global_offset,
 		id_to_global_offset = self.id_to_global_offset,
-		noteChartSetItems = ffi.string(self.noteChartSetItems, ffi.sizeof(self.noteChartSetItems)),
+		chartviews = ffi.string(self.chartviews, ffi.sizeof(self.chartviews)),
 	}
 
 	local dt = math.floor((love.timer.getTime() - time) * 1000)
 	print("query all: " .. dt .. "ms")
-	print(("size: %d bytes"):format(#t.noteChartSetItems))
+	print(("size: %d bytes"):format(#t.chartviews))
 	return t
 end)
 
 ---@param params table
 function CacheDatabase:queryAsync(params)
-	self.queryParams = params
+	self.params = params
 	local t = _queryAsync(params)
 	if not t then
 		return
 	end
 
-	self.noteChartSetItemsCount = t.noteChartSetItemsCount
+	self.chartviews_count = t.chartviews_count
 	self.id_to_global_offset = t.id_to_global_offset
 	self.set_id_to_global_offset = t.set_id_to_global_offset
 
 	local size = ffi.sizeof("EntryStruct")
-	self.noteChartSetItems = ffi.new("EntryStruct[?]", #t.noteChartSetItems / size)
-	ffi.copy(self.noteChartSetItems, t.noteChartSetItems, #t.noteChartSetItems)
+	self.chartviews = ffi.new("EntryStruct[?]", #t.chartviews / size)
+	ffi.copy(self.chartviews, t.chartviews, #t.chartviews)
 end
 
 ---@param t table
@@ -90,7 +91,7 @@ local function chart_id_to_offset(t, entry, offset)
 end
 
 function CacheDatabase:queryNoteChartSets()
-	local params = self.queryParams
+	local params = self.params
 
 	local columns = {
 		"chartmeta_id",
@@ -126,7 +127,7 @@ function CacheDatabase:queryNoteChartSets()
 	local noteChartSets = ffi.new("EntryStruct[?]", #objs)
 	local id_to_global_offset = {}
 	local set_id_to_global_offset = {}
-	self.noteChartSetItems = noteChartSets
+	self.chartviews = noteChartSets
 	self.id_to_global_offset = id_to_global_offset
 	self.set_id_to_global_offset = set_id_to_global_offset
 
@@ -144,13 +145,13 @@ function CacheDatabase:queryNoteChartSets()
 		c = c + 1
 	end
 
-	self.noteChartSetItemsCount = c
+	self.chartviews_count = c
 end
 
 ---@param chartfile_set_id number
 ---@return rdb.ModelRow[]
 function CacheDatabase:getChartviewsAtSet(chartfile_set_id)
-	local params = self.queryParams
+	local params = self.params
 
 	local columns = {
 		"*",
@@ -185,7 +186,7 @@ end
 ---@param chartfile_id number
 ---@param chartmeta_id number
 ---@return rdb.ModelRow
-function CacheDatabase:getNoteChartSetItem(chartfile_id, chartmeta_id)
+function CacheDatabase:getChartview(chartfile_id, chartmeta_id)
 	local where = {
 		chartfile_id = chartfile_id,
 		{
