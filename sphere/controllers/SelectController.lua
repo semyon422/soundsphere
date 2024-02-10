@@ -71,8 +71,8 @@ function SelectController:update()
 	if osudirectModel:isChanged() then
 		local backgroundUrl = osudirectModel:getBackgroundUrl()
 		local previewUrl = osudirectModel:getPreviewUrl()
-		self.backgroundModel:loadBackgroundDebounce(backgroundUrl)
-		self.previewModel:loadPreviewDebounce(previewUrl)
+		self.backgroundModel:setBackgroundPath(backgroundUrl)
+		self.previewModel:setAudioPathPreview(previewUrl)
 	end
 
 	if self.modifierSelectModel:isChanged() then

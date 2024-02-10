@@ -6,6 +6,10 @@ local thread = require("thread")
 ---@operator call: sphere.PreviewModel
 local PreviewModel = class()
 
+PreviewModel.preview_time = 0
+PreviewModel.position = 0
+PreviewModel.mode = "absolute"
+
 ---@param configModel sphere.ConfigModel
 function PreviewModel:new(configModel)
 	self.configModel = configModel
@@ -13,7 +17,6 @@ end
 
 function PreviewModel:load()
 	self.audio_path = ""
-	self.preview_time = 0
 	self.volume = 0
 	self.pitch = 1
 	self.targetPitch = 1
@@ -21,10 +24,12 @@ end
 
 ---@param audio_path string?
 ---@param preview_time number?
-function PreviewModel:setAudioPathPreview(audio_path, preview_time)
+---@param mode string?
+function PreviewModel:setAudioPathPreview(audio_path, preview_time, mode)
 	if self.audio_path ~= audio_path or not self.audio then
 		self.audio_path = audio_path
 		self.preview_time = preview_time
+		self.mode = mode
 		self:loadPreviewDebounce()
 	end
 end
@@ -38,7 +43,7 @@ function PreviewModel:update()
 		return
 	end
 	if not audio:isPlaying() and love.window.hasFocus() then
-		audio:seek(self.position or 0)
+		audio:seek(self.position)
 		audio:play()
 	elseif audio:isPlaying() and not love.window.hasFocus() and muteOnUnfocus then
 		audio:pause()
@@ -63,11 +68,7 @@ function PreviewModel:setPitch(pitch)
 	self.targetPitch = pitch
 end
 
----@param audio_path string?
----@param preview_time number?
-function PreviewModel:loadPreviewDebounce(audio_path, preview_time)
-	self.audio_path = audio_path or self.audio_path
-	self.preview_time = preview_time or self.preview_time
+function PreviewModel:loadPreviewDebounce()
 	delay.debounce(self, "loadDebounce", 0.1, self.loadPreview, self)
 end
 
@@ -79,7 +80,6 @@ function PreviewModel:loadPreview()
 	loadingPreview = true
 
 	local path = self.audio_path
-	local position = self.preview_time
 
 	if not path then
 		loadingPreview = false
@@ -124,11 +124,16 @@ function PreviewModel:loadPreview()
 
 	self.audio = audio
 	self.path = path
+
+	local position = self.preview_time
+	if self.mode == "relative" then
+		position = audio:getDuration() * position
+	end
 	self.position = position
 
 	local volumeConfig = self.configModel.configs.settings.audio.volume
 	local volume = volumeConfig.master * volumeConfig.music
-	audio:seek(position or 0)
+	audio:seek(position)
 	audio:setVolume(volume)
 	audio:setPitch(self.pitch)
 	audio:play()

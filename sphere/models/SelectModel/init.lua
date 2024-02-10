@@ -122,19 +122,29 @@ end
 
 ---@return string?
 ---@return number?
+---@return string?
 function SelectModel:getAudioPathPreview()
 	local chartview = self.chartview
 	if not chartview then
 		return
 	end
 
+	local mode = "absolute"
+
 	local audio_path = chartview.audio_path
 	if not audio_path or audio_path == "" then
-		return path_util.join(chartview.location_dir, "preview.ogg"), 0
+		return path_util.join(chartview.location_dir, "preview.ogg"), 0, mode
 	end
 
-	local preview_time = math.max(0, tonumber(chartview.preview_time) or 0)
-	return path_util.join(chartview.location_dir, audio_path), preview_time
+	local full_path = path_util.join(chartview.location_dir, audio_path)
+	local preview_time = chartview.preview_time
+
+	if preview_time < 0 and chartview.format == "osu" then
+		mode = "relative"
+		preview_time = 0.4
+	end
+
+	return full_path, preview_time, mode
 end
 
 ---@param settings table?
