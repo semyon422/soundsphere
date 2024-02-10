@@ -100,9 +100,11 @@ function SelectController:openDirectory()
 	if not noteChartItem then
 		return
 	end
-	local path = noteChartItem.path:match("^(.+)/.-$")
-	local realPath = self.mountModel:getRealPath(path)
-	love.system.openURL(realPath)
+	local realDirectory = love.filesystem.getRealDirectory(noteChartItem.path)
+
+	-- local path = noteChartItem.path:match("^(.+)/.-$")
+	-- local realPath = self.mountModel:getRealPath(path)
+	love.system.openURL(realDirectory .. "/" .. noteChartItem.location_path:match("^(.+)/.-$"))
 end
 
 function SelectController:openWebNotechart()

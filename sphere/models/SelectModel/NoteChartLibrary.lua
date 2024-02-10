@@ -26,6 +26,7 @@ function NoteChartLibrary:setNoteChartSetId(set_id)
 	self.items = self.cacheModel.cacheDatabase:getNoteChartItemsAtSet(set_id)
 	for i, chart in ipairs(self.items) do
 		chart.location_prefix = "mounted_charts/" .. chart.location_id
+		chart.location_path = chart.path
 		chart.path = chart.location_prefix .. "/" .. chart.path
 	end
 end
