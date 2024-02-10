@@ -72,7 +72,7 @@ local function Cells(self)
 	local multiplayerModel = self.game.multiplayerModel
 
 	local baseTimeRate = self.game.playContext.rate
-	local noteChartItem = self.game.selectModel.noteChartItem or multiplayerModel.notechart
+	local chartview = self.game.selectModel.chartview or multiplayerModel.notechart
 
 	local bpm = 0
 	local length = 0
@@ -81,14 +81,14 @@ local function Cells(self)
 	local longNoteRatio = 0
 	local localOffset = 0
 	local format = ""
-	if noteChartItem then
-		bpm = (noteChartItem.tempo or 0) * baseTimeRate
-		length = (noteChartItem.duration or 0) / baseTimeRate
-		notes_count = noteChartItem.notes_count or 0
-		level = noteChartItem.level or 0
-		longNoteRatio = noteChartItem.longNoteRatio or 0
-		localOffset = noteChartItem.localOffset or 0
-		format = noteChartItem.format or ""
+	if chartview then
+		bpm = (chartview.tempo or 0) * baseTimeRate
+		length = (chartview.duration or 0) / baseTimeRate
+		notes_count = chartview.notes_count or 0
+		level = chartview.level or 0
+		longNoteRatio = chartview.longNoteRatio or 0
+		localOffset = chartview.localOffset or 0
+		format = chartview.format or ""
 	end
 
 	love.graphics.translate(0, h - 118)
@@ -159,7 +159,7 @@ local function DownloadButton(self)
 		imgui.Label("beatmap status", beatmap.status, h)
 	else
 		just.indent(w / 2)
-		if imgui.TextOnlyButton("Download", multiplayerModel.noteChartItem and "Redownload" or "Download", 144, h) then
+		if imgui.TextOnlyButton("Download", multiplayerModel.chartview and "Redownload" or "Download", 144, h) then
 			multiplayerModel:downloadNoteChart()
 		end
 	end
@@ -169,19 +169,19 @@ end
 local function Title(self)
 	local w, h = Layout:move("column2row2")
 	love.graphics.translate(22, 0)
-	local item = self.game.selectModel.noteChartItem or self.game.multiplayerModel.notechart
-	if not item or not item.title then
+	local chartview = self.game.selectModel.chartview or self.game.multiplayerModel.notechart
+	if not chartview or not chartview.title then
 		return
 	end
-	TextCellImView(w, 52, "left", item.artist, item.title)
+	TextCellImView(w, 52, "left", chartview.artist, chartview.title)
 
 	local baseTimeRate = self.game.playContext.rate
-	local difficulty = Format.difficulty((item.difficulty or 0) * baseTimeRate)
+	local difficulty = Format.difficulty((chartview.difficulty or 0) * baseTimeRate)
 
-	TextCellImView(72, h, "right", Format.inputMode(item.inputmode), difficulty, true)
+	TextCellImView(72, h, "right", Format.inputMode(chartview.inputmode), difficulty, true)
 	just.sameline()
 	just.indent(44)
-	TextCellImView(w, 52, "left", item.creator, item.name)
+	TextCellImView(w, 52, "left", chartview.creator, chartview.name)
 end
 
 ---@param self table

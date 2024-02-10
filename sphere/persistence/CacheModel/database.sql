@@ -142,7 +142,7 @@ INNER JOIN chartfile_sets ON
 chartfiles.set_id = chartfile_sets.id
 ;
 
-CREATE TEMP VIEW IF NOT EXISTS chartset_list AS
+CREATE TEMP VIEW IF NOT EXISTS chartviews AS
 SELECT
 chartmetas.id AS chartmeta_id,
 chartfiles.id AS chartfile_id,

@@ -13,7 +13,7 @@ function EditorController:load()
 	local fileFinder = self.fileFinder
 
 	local noteChart = selectModel:loadNoteChart()
-	local chart = selectModel.noteChartItem
+	local chartview = selectModel.chartview
 
 	local noteSkin = self.noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))
 	noteSkin:loadData()
@@ -26,12 +26,12 @@ function EditorController:load()
 	self.previewModel:stop()
 
 	fileFinder:reset()
-	fileFinder:addPath(chart.location_dir)
+	fileFinder:addPath(chartview.location_dir)
 	fileFinder:addPath(noteSkin.directoryPath)
 	fileFinder:addPath("userdata/hitsounds")
 	fileFinder:addPath("userdata/hitsounds/midi")
 
-	self.resourceModel:load(chart.name, noteChart, function()
+	self.resourceModel:load(chartview.name, noteChart, function()
 		editorModel:loadResources()
 	end)
 
@@ -54,11 +54,11 @@ function EditorController:save()
 	local exp = NoteChartExporter()
 	exp.noteChart = editorModel.noteChart
 
-	local path = selectModel.noteChartItem.path:gsub(".sph$", "") .. ".sph"
+	local path = selectModel.chartview.path:gsub(".sph$", "") .. ".sph"
 
 	love.filesystem.write(path, exp:export())
 
-	self.cacheModel:startUpdate(selectModel.noteChartItem.path:match("^(.+)/.-$"))
+	self.cacheModel:startUpdate(selectModel.chartview.path:match("^(.+)/.-$"))
 end
 
 function EditorController:saveToOsu()
@@ -67,12 +67,12 @@ function EditorController:saveToOsu()
 
 	self.editorModel:save()
 
-	local chartItem = selectModel.noteChartItem
+	local chartview = selectModel.chartview
 	local exp = OsuNoteChartExporter()
 	exp.noteChart = editorModel.noteChart
-	exp.chartmeta = chartItem
+	exp.chartmeta = chartview
 
-	local path = chartItem.path
+	local path = chartview.path
 	path = path:gsub(".osu$", ""):gsub(".sph$", "") .. ".sph.osu"
 
 	love.filesystem.write(path, exp:export())

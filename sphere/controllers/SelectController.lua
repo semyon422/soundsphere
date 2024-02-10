@@ -37,9 +37,9 @@ function SelectController:applyModifierMeta()
 
 	local playContext = self.playContext
 
-	local item = self.selectModel.noteChartItem
-	if item then
-		self.state.inputMode:set(item.inputmode)
+	local chartview = self.selectModel.chartview
+	if chartview then
+		self.state.inputMode:set(chartview.inputmode)
 	end
 
 	ModifierModel:applyMeta(playContext.modifiers, self.state)
@@ -97,34 +97,34 @@ SelectController.updateSession = thread.coro(function(self)
 end)
 
 function SelectController:openDirectory()
-	local chart = self.selectModel.noteChartItem
-	if not chart then
+	local chartview = self.selectModel.chartview
+	if not chartview then
 		return
 	end
-	local realDirectory = love.filesystem.getRealDirectory(chart.location_prefix)
+	local realDirectory = love.filesystem.getRealDirectory(chartview.location_prefix)
 
 	-- local path = chart.path:match("^(.+)/.-$")
 	-- local realPath = self.mountModel:getRealPath(path)
-	love.system.openURL(path_util.join(realDirectory, chart.dir))
+	love.system.openURL(path_util.join(realDirectory, chartview.dir))
 end
 
 function SelectController:openWebNotechart()
-	local chart = self.selectModel.noteChartItem
-	if not chart then
+	local chartview = self.selectModel.chartview
+	if not chartview then
 		return
 	end
 
-	local hash, index = chart.hash, chart.index
+	local hash, index = chartview.hash, chartview.index
 	self.onlineModel.onlineNotechartManager:openWebNotechart(hash, index)
 end
 
 ---@param force boolean?
 function SelectController:updateCache(force)
-	local chart = self.selectModel.noteChartItem
-	if not chart then
+	local chartview = self.selectModel.chartview
+	if not chartview then
 		return
 	end
-	self.cacheModel:startUpdate({chart.dir, chart.location_id, "mounted_charts/" .. chart.location_id})
+	self.cacheModel:startUpdate({chartview.dir, chartview.location_id, "mounted_charts/" .. chartview.location_id})
 end
 
 ---@param location_id string
@@ -174,8 +174,8 @@ end
 function SelectController:exportToOsu()
 	local selectModel = self.selectModel
 
-	local chartItem = selectModel.noteChartItem
-	if not chartItem then
+	local chartview = selectModel.chartview
+	if not chartview then
 		return
 	end
 
@@ -184,9 +184,9 @@ function SelectController:exportToOsu()
 	ModifierModel:apply(self.playContext.modifiers, noteChart)
 
 	nce.noteChart = noteChart
-	nce.chartmeta = chartItem
+	nce.chartmeta = chartview
 
-	local path = chartItem.path
+	local path = chartview.path
 	path = path:find("^.+/.$") and path:match("^(.+)/.$") or path
 	local fileName = path:match("^.+/(.-)$"):match("^(.+)%..-$")
 

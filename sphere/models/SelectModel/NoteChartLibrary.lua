@@ -24,7 +24,7 @@ function NoteChartLibrary:setNoteChartSetId(set_id)
 		return
 	end
 	self.set_id = set_id
-	self.items = self.cacheModel.cacheDatabase:getNoteChartItemsAtSet(set_id)
+	self.items = self.cacheModel.cacheDatabase:getChartviewsAtSet(set_id)
 	for i, chart in ipairs(self.items) do
 		chart.location_prefix = path_util.join("mounted_charts", chart.location_id)
 		chart.location_dir = path_util.join("mounted_charts", chart.location_id, chart.dir)

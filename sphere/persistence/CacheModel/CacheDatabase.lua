@@ -120,7 +120,7 @@ function CacheDatabase:queryNoteChartSets()
 		columns[4] = "max(score_id)"
 	end
 
-	local objs = self.models.chartset_list:select(params.where, options)
+	local objs = self.models.chartviews:select(params.where, options)
 	print("count", #objs)
 
 	local noteChartSets = ffi.new("EntryStruct[?]", #objs)
@@ -149,7 +149,7 @@ end
 
 ---@param chartfile_set_id number
 ---@return rdb.ModelRow[]
-function CacheDatabase:getNoteChartItemsAtSet(chartfile_set_id)
+function CacheDatabase:getChartviewsAtSet(chartfile_set_id)
 	local params = self.queryParams
 
 	local columns = {
@@ -177,7 +177,7 @@ function CacheDatabase:getNoteChartItemsAtSet(chartfile_set_id)
 		},
 	}
 
-	local objs = self.models.chartset_list:select(where, options)
+	local objs = self.models.chartviews:select(where, options)
 
 	return objs
 end
@@ -195,7 +195,7 @@ function CacheDatabase:getNoteChartSetItem(chartfile_id, chartmeta_id)
 		},
 	}
 
-	local obj = self.models.chartset_list:find(where)
+	local obj = self.models.chartviews:find(where)
 	return obj
 end
 

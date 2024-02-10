@@ -204,40 +204,40 @@ MultiplayerModel.pushNotechart = remote.wrap(function(self)
 		return
 	end
 
-	local nc = self.selectModel.noteChartItem
-	if not nc then
+	local chartview = self.selectModel.chartview
+	if not chartview then
 		return
 	end
 
-	local path = nc.path
+	local path = chartview.path
 	local osuSetId
 	if path:find("%.osu$") then
 		local content = async_read(path)
 		osuSetId = tonumber(content:match("BeatmapSetID:%s*(%d+)"))
 	end
 
-	self.noteChartItem = {
-		chartfile_set_id = nc.chartfile_set_id,
-		chartfile_id = nc.chartfile_id,
-		chartmeta_id = nc.chartmeta_id,
+	self.chartview = {
+		chartfile_set_id = chartview.chartfile_set_id,
+		chartfile_id = chartview.chartfile_id,
+		chartmeta_id = chartview.chartmeta_id,
 	}
 	self.notechart = {
-		hash = nc.hash,
-		index = nc.index,
-		format = nc.format,
-		title = nc.title,
-		artist = nc.artist,
-		source = nc.source,
-		tags = nc.tags,
-		name = nc.name,
-		creator = nc.creator,
-		level = nc.level,
-		inputnode = nc.inputmode,
-		notes_count = nc.notes_count,
-		duration = nc.duration,
-		tempo = nc.tempo,
-		difficulty = nc.difficulty,
-		longNoteRatio = nc.longNoteRatio,
+		hash = chartview.hash,
+		index = chartview.index,
+		format = chartview.format,
+		title = chartview.title,
+		artist = chartview.artist,
+		source = chartview.source,
+		tags = chartview.tags,
+		name = chartview.name,
+		creator = chartview.creator,
+		level = chartview.level,
+		inputnode = chartview.inputmode,
+		notes_count = chartview.notes_count,
+		duration = chartview.duration,
+		tempo = chartview.tempo,
+		difficulty = chartview.difficulty,
+		longNoteRatio = chartview.longNoteRatio,
 		osuSetId = osuSetId,
 	}
 	self.peer._setNotechart(self.notechart)

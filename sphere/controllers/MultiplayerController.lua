@@ -27,7 +27,7 @@ function MultiplayerController:load()
 			end
 		end,
 		startMatch = function(peer)
-			if mpModel.isPlaying or not mpModel.noteChartItem then
+			if mpModel.isPlaying or not mpModel.chartview then
 				return
 			end
 			if not mpModel.room.isFreeModifiers then
@@ -36,7 +36,7 @@ function MultiplayerController:load()
 				self.configModel.configs.modifier = modifiers
 			end
 			if not mpModel.room.isFreeNotechart then
-				self.selectModel:setConfig(mpModel.noteChartItem)
+				self.selectModel:setConfig(mpModel.chartview)
 			end
 			mpModel:setIsPlaying(true)
 		end,
@@ -64,7 +64,7 @@ MultiplayerController.findNotechart = remote.wrap(function(self)
 	mpModel.downloadingBeatmap = nil
 	local item = items[1]
 	if item then
-		mpModel.noteChartItem = {
+		mpModel.chartview = {
 			chartfile_set_id = item.chartfile_set_id,
 			chartfile_id = item.chartfile_id,
 			chartmeta_id = item.chartmeta_id,
@@ -79,7 +79,7 @@ MultiplayerController.findNotechart = remote.wrap(function(self)
 		chartfile_id = 0,
 		chartmeta_id = 0,
 	})
-	mpModel.noteChartItem = nil
+	mpModel.chartview = nil
 	selectModel:pullNoteChartSet(true)
 	mpModel.peer.setNotechartFound(false)
 end)

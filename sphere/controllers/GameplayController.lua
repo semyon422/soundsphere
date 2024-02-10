@@ -23,7 +23,7 @@ function GameplayController:load()
 	local fileFinder = self.fileFinder
 	local playContext = self.playContext
 
-	local chart = self.selectModel.noteChartItem
+	local chartview = self.selectModel.chartview
 	local config = configModel.configs.settings
 
 	local noteChart = selectModel:loadNoteChart(self:getImporterSettings())
@@ -44,9 +44,9 @@ function GameplayController:load()
 
 	local chartdiff = cacheModel.chartdiffGenerator:compute(noteChart, playContext.rate)
 	chartdiff.modifiers = playContext.modifiers
-	chartdiff.hash = chart.hash
-	chartdiff.index = chart.index
-	cacheModel.chartdiffGenerator:fillMeta(chartdiff, chart)
+	chartdiff.hash = chartview.hash
+	chartdiff.index = chartview.index
+	cacheModel.chartdiffGenerator:fillMeta(chartdiff, chartview)
 	playContext.chartdiff = chartdiff
 
 	local noteSkin = noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))
@@ -83,12 +83,12 @@ function GameplayController:load()
 	self:updateOffsets()
 
 	fileFinder:reset()
-	fileFinder:addPath(chart.location_dir)
+	fileFinder:addPath(chartview.location_dir)
 	fileFinder:addPath(noteSkin.directoryPath)
 	fileFinder:addPath("userdata/hitsounds")
 	fileFinder:addPath("userdata/hitsounds/midi")
 
-	self.resourceModel:load(chart.name, noteChart, function()
+	self.resourceModel:load(chartview.name, noteChart, function()
 		if not self.loaded then
 			return
 		end
@@ -198,30 +198,30 @@ function GameplayController:update(dt)
 end
 
 function GameplayController:discordPlay()
-	local chartItem = self.selectModel.noteChartItem
+	local chartview = self.selectModel.chartview
 	local rhythmModel = self.rhythmModel
-	local length = math.min(chartItem.duration, 3600 * 24)
+	local length = math.min(chartview.duration, 3600 * 24)
 
 	local timeEngine = rhythmModel.timeEngine
 	self.discordModel:setPresence({
 		state = "Playing",
 		details = ("%s - %s [%s]"):format(
-			chartItem.artist,
-			chartItem.title,
-			chartItem.name
+			chartview.artist,
+			chartview.title,
+			chartview.name
 		),
 		endTimestamp = math.floor(os.time() + (length - timeEngine.currentTime) / timeEngine.baseTimeRate)
 	})
 end
 
 function GameplayController:discordPause()
-	local chartItem = self.selectModel.noteChartItem
+	local chartview = self.selectModel.chartview
 	self.discordModel:setPresence({
 		state = "Playing (paused)",
 		details = ("%s - %s [%s]"):format(
-			chartItem.artist,
-			chartItem.title,
-			chartItem.name
+			chartview.artist,
+			chartview.title,
+			chartview.name
 		)
 	})
 end
@@ -297,11 +297,11 @@ function GameplayController:saveScore()
 	local scoreSystem = scoreEngine.scoreSystem
 	local playContext = self.playContext
 
-	local chartItem = self.selectModel.noteChartItem
+	local chartview = self.selectModel.chartview
 
 	local replayHash = self.replayModel:saveReplay(
-		chartItem.hash,
-		chartItem.index,
+		chartview.hash,
+		chartview.index,
 		playContext
 	)
 
@@ -334,7 +334,7 @@ function GameplayController:saveScore()
 
 	local base = scoreSystem.base
 	if base.hitCount / base.notesCount >= 0.5 then
-		self.onlineModel.onlineScoreManager:submit(chartItem, replayHash)
+		self.onlineModel.onlineScoreManager:submit(chartview, replayHash)
 	end
 
 	self.playContext.scoreEntry = scoreEntry
@@ -362,10 +362,10 @@ end
 
 function GameplayController:updateOffsets()
 	local rhythmModel = self.rhythmModel
-	local chartItem = self.selectModel.noteChartItem
+	local chartview = self.selectModel.chartview
 	local config = self.configModel.configs.settings
 
-	local localOffset = chartItem.localOffset or 0
+	local localOffset = chartview.localOffset or 0
 	local baseTimeRate = rhythmModel.timeEngine.baseTimeRate
 	local inputOffset = config.gameplay.offset.input + localOffset
 	local visualOffset = config.gameplay.offset.visual + localOffset
@@ -391,14 +391,14 @@ end
 
 ---@param delta number
 function GameplayController:increaseLocalOffset(delta)
-	local chartItem = self.selectModel.noteChartItem
-	chartItem.localOffset = math_util.round((chartItem.localOffset or 0) + delta, delta)
+	local chartview = self.selectModel.chartview
+	chartview.localOffset = math_util.round((chartview.localOffset or 0) + delta, delta)
 	self.cacheModel.chartRepo:updateNoteChartDataEntry({
-		hash = chartItem.hash,
-		index = chartItem.index,
-		localOffset = chartItem.localOffset,
+		hash = chartview.hash,
+		index = chartview.index,
+		localOffset = chartview.localOffset,
 	})
-	self.notificationModel:notify("local offset: " .. chartItem.localOffset * 1000 .. "ms")
+	self.notificationModel:notify("local offset: " .. chartview.localOffset * 1000 .. "ms")
 	self:updateOffsets()
 end
 

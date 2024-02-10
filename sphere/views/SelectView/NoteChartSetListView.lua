@@ -13,7 +13,7 @@ end
 
 ---@return number
 function NoteChartSetListView:getItemIndex()
-	return self.game.selectModel.noteChartSetItemIndex
+	return self.game.selectModel.chartview_set_index
 end
 
 ---@param count number

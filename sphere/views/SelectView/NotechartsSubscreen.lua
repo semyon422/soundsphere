@@ -108,7 +108,7 @@ local function Cells(self)
 	local w, h = Layout:move("column2row1")
 
 	local baseTimeRate = self.game.playContext.rate
-	local noteChartItem = self.game.selectModel.noteChartItem
+	local chartview = self.game.selectModel.chartview
 	local scoreItem = self.game.selectModel.scoreItem
 
 	local bpm = 0
@@ -118,14 +118,14 @@ local function Cells(self)
 	local longNoteRatio = 0
 	local localOffset = 0
 	local format = ""
-	if noteChartItem then
-		bpm = (noteChartItem.tempo or 0) * baseTimeRate
-		length = (noteChartItem.duration or 0) / baseTimeRate
-		notes_count = noteChartItem.notes_count or 0
-		level = noteChartItem.level or 0
-		longNoteRatio = noteChartItem.longNoteRatio or 0
-		localOffset = noteChartItem.localOffset or 0
-		format = noteChartItem.format or ""
+	if chartview then
+		bpm = (chartview.tempo or 0) * baseTimeRate
+		length = (chartview.duration or 0) / baseTimeRate
+		notes_count = chartview.notes_count or 0
+		level = chartview.level or 0
+		longNoteRatio = chartview.longNoteRatio or 0
+		localOffset = chartview.localOffset or 0
+		format = chartview.format or ""
 	end
 
 	local score = 0

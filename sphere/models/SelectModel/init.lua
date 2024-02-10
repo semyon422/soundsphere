@@ -15,8 +15,8 @@ local SortModel = require("sphere.models.SelectModel.SortModel")
 ---@operator call: sphere.SelectModel
 local SelectModel = class()
 
-SelectModel.noteChartSetItemIndex = 1
-SelectModel.noteChartItemIndex = 1
+SelectModel.chartview_set_index = 1
+SelectModel.chartview_index = 1
 SelectModel.scoreItemIndex = 1
 SelectModel.pullingNoteChartSet = false
 SelectModel.debounceTime = 0.5
@@ -102,55 +102,55 @@ end
 
 ---@return string?
 function SelectModel:getBackgroundPath()
-	local chart = self.noteChartItem
-	if not chart then
+	local chartview = self.chartview
+	if not chartview then
 		return
 	end
 
-	local background_path = chart.background_path
+	local background_path = chartview.background_path
 	if not background_path or background_path == "" then
 		return
 	end
 
-	local name = chart.name
+	local name = chartview.name
 	if name:find("%.ojn$") or name:find("%.mid$") then
-		return chart.path
+		return chartview.path
 	end
 
-	return path_util.join(chart.location_dir, background_path)
+	return path_util.join(chartview.location_dir, background_path)
 end
 
 ---@return string?
 ---@return number?
 function SelectModel:getAudioPathPreview()
-	local chart = self.noteChartItem
-	if not chart then
+	local chartview = self.chartview
+	if not chartview then
 		return
 	end
 
-	local audio_path = chart.audio_path
+	local audio_path = chartview.audio_path
 	if not audio_path or audio_path == "" then
-		return path_util.join(chart.location_dir, "preview.ogg"), 0
+		return path_util.join(chartview.location_dir, "preview.ogg"), 0
 	end
 
-	local preview_time = math.max(0, tonumber(chart.preview_time) or 0)
-	return path_util.join(chart.location_dir, audio_path), preview_time
+	local preview_time = math.max(0, tonumber(chartview.preview_time) or 0)
+	return path_util.join(chartview.location_dir, audio_path), preview_time
 end
 
 ---@param settings table?
 ---@return ncdk.NoteChart?
 function SelectModel:loadNoteChart(settings)
-	local chart = self.noteChartItem
+	local chartview = self.chartview
 
-	local content = love.filesystem.read(chart.location_path)
+	local content = love.filesystem.read(chartview.location_path)
 	if not content then
 		return
 	end
 
 	return assert(NoteChartFactory:getNoteChart(
-		chart.chartfile_name,
+		chartview.chartfile_name,
 		content,
-		chart.index,
+		chartview.index,
 		settings
 	))
 end
@@ -168,9 +168,9 @@ end
 
 ---@return boolean
 function SelectModel:notechartExists()
-	local chart = self.noteChartItem
-	if chart then
-		return love.filesystem.getInfo(chart.location_path) ~= nil
+	local chartview = self.chartview
+	if chartview then
+		return love.filesystem.getInfo(chartview.location_path) ~= nil
 	end
 	return false
 end
@@ -245,39 +245,38 @@ end
 function SelectModel:scrollNoteChartSet(direction, destination)
 	local items = self.noteChartSetLibrary.items
 
-	destination = math.min(math.max(destination or self.noteChartSetItemIndex + direction, 1), #items)
-	if not items[destination] or self.noteChartSetItemIndex == destination then
+	destination = math.min(math.max(destination or self.chartview_set_index + direction, 1), #items)
+	if not items[destination] or self.chartview_set_index == destination then
 		return
 	end
-	self.noteChartSetItemIndex = destination
 
-	local oldNoteChartSetItem = self.noteChartSetItem
+	local old_chartview_set = items[self.chartview_set_index]
+	self.chartview_set_index = destination
 
-	local noteChartSetItem = items[self.noteChartSetItemIndex]
-	self.noteChartSetItem = noteChartSetItem
-	self:setConfig(noteChartSetItem)
+	local chartview_set = items[destination]
+	self:setConfig(chartview_set)
 
-	self:pullNoteChart(oldNoteChartSetItem and oldNoteChartSetItem.chartfile_set_id == noteChartSetItem.chartfile_set_id)
+	self:pullNoteChart(old_chartview_set and old_chartview_set.chartfile_set_id == chartview_set.chartfile_set_id)
 end
 
 ---@param direction number?
 ---@param destination number?
 function SelectModel:scrollNoteChart(direction, destination)
-	local noteChartItems = self.noteChartLibrary.items
+	local items = self.noteChartLibrary.items
 
-	direction = direction or destination - self.noteChartItemIndex
+	direction = direction or destination - self.chartview_index
 
-	destination = math.min(math.max(destination or self.noteChartItemIndex + direction, 1), #noteChartItems)
-	if not noteChartItems[destination] or self.noteChartItemIndex == destination then
+	destination = math.min(math.max(destination or self.chartview_index + direction, 1), #items)
+	if not items[destination] or self.chartview_index == destination then
 		return
 	end
-	self.noteChartItemIndex = destination
+	self.chartview_index = destination
 
-	local noteChartItem = noteChartItems[self.noteChartItemIndex]
-	self.noteChartItem = noteChartItem
+	local chartview = items[self.chartview_index]
+	self.chartview = chartview
 	self.changed = true
 
-	self:setConfig(noteChartItem)
+	self:setConfig(chartview)
 
 	self:pullNoteChartSet(true, true)
 	self:pullScore()
@@ -286,15 +285,15 @@ end
 ---@param direction number?
 ---@param destination number?
 function SelectModel:scrollScore(direction, destination)
-	local scoreItems = self.scoreLibrary.items
+	local items = self.scoreLibrary.items
 
-	destination = math.min(math.max(destination or self.scoreItemIndex + direction, 1), #scoreItems)
-	if not scoreItems[destination] or self.scoreItemIndex == destination then
+	destination = math.min(math.max(destination or self.scoreItemIndex + direction, 1), #items)
+	if not items[destination] or self.scoreItemIndex == destination then
 		return
 	end
 	self.scoreItemIndex = destination
 
-	local scoreItem = scoreItems[self.scoreItemIndex]
+	local scoreItem = items[self.scoreItemIndex]
 	self.scoreItem = scoreItem
 
 	self.config.score_id = scoreItem.id
@@ -313,8 +312,8 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 		self:updateSetItems()
 	end
 
-	local noteChartSetItems = self.noteChartSetLibrary.items
-	self.noteChartSetItemIndex = self.noteChartSetLibrary:getItemIndex(
+	local items = self.noteChartSetLibrary.items
+	self.chartview_set_index = self.noteChartSetLibrary:getItemIndex(
 		self.config.chartfile_id,
 		self.config.chartmeta_id,
 		self.config.chartfile_set_id
@@ -324,10 +323,9 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 		self.noteChartSetStateCounter = self.noteChartSetStateCounter + 1
 	end
 
-	local noteChartSetItem = noteChartSetItems[self.noteChartSetItemIndex]
-	self.noteChartSetItem = noteChartSetItem
-	if noteChartSetItem then
-		self.config.chartfile_set_id = noteChartSetItem.chartfile_set_id
+	local chartview_set = items[self.chartview_set_index]
+	if chartview_set then
+		self.config.chartfile_set_id = chartview_set.chartfile_set_id
 		self.pullingNoteChartSet = false
 		if not noPullNext then
 			self:pullNoteChart(noUpdate)
@@ -339,7 +337,7 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 	self.config.chartfile_id = 0
 	self.config.chartmeta_id = 0
 
-	self.noteChartItem = nil
+	self.chartview = nil
 	self.scoreItem = nil
 	self.changed = true
 
@@ -352,12 +350,12 @@ end
 ---@param noUpdate boolean?
 ---@param noPullNext boolean?
 function SelectModel:pullNoteChart(noUpdate, noPullNext)
-	local oldId = self.noteChartItem and self.noteChartItem.id
+	local oldId = self.chartview and self.chartview.id
 
 	self.noteChartLibrary:setNoteChartSetId(self.config.chartfile_set_id)
 
-	local noteChartItems = self.noteChartLibrary.items
-	self.noteChartItemIndex = self.noteChartLibrary:getItemIndex(
+	local items = self.noteChartLibrary.items
+	self.chartview_index = self.noteChartLibrary:getItemIndex(
 		self.config.chartfile_id,
 		self.config.chartmeta_id
 	)
@@ -365,15 +363,15 @@ function SelectModel:pullNoteChart(noUpdate, noPullNext)
 	if not noUpdate then
 		self.noteChartStateCounter = self.noteChartStateCounter + 1
 	end
-	local noteChartItem = noteChartItems[self.noteChartItemIndex]
-	self.noteChartItem = noteChartItem
+	local chartview = items[self.chartview_index]
+	self.chartview = chartview
 	self.changed = true
 
-	if noteChartItem then
-		self.config.chartfile_id = noteChartItem.chartfile_id
-		self.config.chartmeta_id = noteChartItem.chartmeta_id
+	if chartview then
+		self.config.chartfile_id = chartview.chartfile_id
+		self.config.chartmeta_id = chartview.chartmeta_id
 		if not noPullNext then
-			self:pullScore(oldId and oldId == noteChartItem.id)
+			self:pullScore(oldId and oldId == chartview.id)
 		end
 		return
 	end
@@ -387,7 +385,7 @@ function SelectModel:pullNoteChart(noUpdate, noPullNext)
 end
 
 function SelectModel:updateScoreOnlineAsync()
-	self.scoreLibrary:updateItemsAsync(self.noteChartItem)
+	self.scoreLibrary:updateItemsAsync(self.chartview)
 	self:findScore()
 end
 
@@ -406,17 +404,17 @@ end
 
 ---@param noUpdate boolean?
 function SelectModel:pullScore(noUpdate)
-	local noteChartItems = self.noteChartLibrary.items
-	local noteChartItem = noteChartItems[self.noteChartItemIndex]
+	local items = self.noteChartLibrary.items
+	local chartview = items[self.chartview_index]
 
-	if not noteChartItem then
+	if not chartview then
 		return
 	end
 
 	if not noUpdate then
 		self.scoreStateCounter = self.scoreStateCounter + 1
-		self.scoreLibrary:setHash(noteChartItem.hash)
-		self.scoreLibrary:setIndex(noteChartItem.index)
+		self.scoreLibrary:setHash(chartview.hash)
+		self.scoreLibrary:setIndex(chartview.index)
 
 		local select = self.configModel.configs.select
 		if select.scoreSourceName == "online" then
@@ -426,7 +424,7 @@ function SelectModel:pullScore(noUpdate)
 			)
 			return
 		end
-		self.scoreLibrary:updateItems(self.noteChartItem)
+		self.scoreLibrary:updateItems(self.chartview)
 	end
 
 	self:findScore()
