@@ -1,4 +1,5 @@
 local class = require("class")
+local path_util = require("path_util")
 local NoteChartExporter = require("sph.NoteChartExporter")
 local OsuNoteChartExporter = require("osu.NoteChartExporter")
 
@@ -12,7 +13,7 @@ function EditorController:load()
 	local fileFinder = self.fileFinder
 
 	local noteChart = selectModel:loadNoteChart()
-	local chartItem = selectModel.noteChartItem
+	local chart = selectModel.noteChartItem
 
 	local noteSkin = self.noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))
 	noteSkin:loadData()
@@ -25,12 +26,12 @@ function EditorController:load()
 	self.previewModel:stop()
 
 	fileFinder:reset()
-	fileFinder:addPath(chartItem.path:match("^(.+)/.-$"))
+	fileFinder:addPath(chart.location_dir)
 	fileFinder:addPath(noteSkin.directoryPath)
 	fileFinder:addPath("userdata/hitsounds")
 	fileFinder:addPath("userdata/hitsounds/midi")
 
-	self.resourceModel:load(chartItem.path, noteChart, function()
+	self.resourceModel:load(chart.name, noteChart, function()
 		editorModel:loadResources()
 	end)
 

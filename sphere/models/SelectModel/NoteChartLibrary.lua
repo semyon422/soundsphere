@@ -1,4 +1,5 @@
 local class = require("class")
+local path_util = require("path_util")
 
 ---@class sphere.NoteChartLibrary
 ---@operator call: sphere.NoteChartLibrary
@@ -25,9 +26,9 @@ function NoteChartLibrary:setNoteChartSetId(set_id)
 	self.set_id = set_id
 	self.items = self.cacheModel.cacheDatabase:getNoteChartItemsAtSet(set_id)
 	for i, chart in ipairs(self.items) do
-		chart.location_prefix = "mounted_charts/" .. chart.location_id
-		chart.location_path = chart.path
-		chart.path = chart.location_prefix .. "/" .. chart.path
+		chart.location_prefix = path_util.join("mounted_charts", chart.location_id)
+		chart.location_dir = path_util.join("mounted_charts", chart.location_id, chart.dir)
+		chart.location_path = path_util.join("mounted_charts", chart.location_id, chart.path)
 	end
 end
 

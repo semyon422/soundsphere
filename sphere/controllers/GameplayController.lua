@@ -1,8 +1,8 @@
 local class = require("class")
 local math_util = require("math_util")
+local path_util = require("path_util")
 local InputMode = require("ncdk.InputMode")
 local TempoRange = require("notechart.TempoRange")
-local ModifierEncoder = require("sphere.models.ModifierEncoder")
 local ModifierModel = require("sphere.models.ModifierModel")
 local NoteData = require("ncdk.NoteData")
 
@@ -23,7 +23,7 @@ function GameplayController:load()
 	local fileFinder = self.fileFinder
 	local playContext = self.playContext
 
-	local chartItem = self.selectModel.noteChartItem
+	local chart = self.selectModel.noteChartItem
 	local config = configModel.configs.settings
 
 	local noteChart = selectModel:loadNoteChart(self:getImporterSettings())
@@ -44,9 +44,9 @@ function GameplayController:load()
 
 	local chartdiff = cacheModel.chartdiffGenerator:compute(noteChart, playContext.rate)
 	chartdiff.modifiers = playContext.modifiers
-	chartdiff.hash = chartItem.hash
-	chartdiff.index = chartItem.index
-	cacheModel.chartdiffGenerator:fillMeta(chartdiff, chartItem)
+	chartdiff.hash = chart.hash
+	chartdiff.index = chart.index
+	cacheModel.chartdiffGenerator:fillMeta(chartdiff, chart)
 	playContext.chartdiff = chartdiff
 
 	local noteSkin = noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))
@@ -82,15 +82,13 @@ function GameplayController:load()
 
 	self:updateOffsets()
 
-	local chartItem = selectModel.noteChartItem
-
 	fileFinder:reset()
-	fileFinder:addPath(chartItem.path:match("^(.+)/.-$"))
+	fileFinder:addPath(chart.location_dir)
 	fileFinder:addPath(noteSkin.directoryPath)
 	fileFinder:addPath("userdata/hitsounds")
 	fileFinder:addPath("userdata/hitsounds/midi")
 
-	self.resourceModel:load(chartItem.path, noteChart, function()
+	self.resourceModel:load(chart.name, noteChart, function()
 		if not self.loaded then
 			return
 		end

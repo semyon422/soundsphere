@@ -107,23 +107,17 @@ function SelectModel:getBackgroundPath()
 		return
 	end
 
-	local path = chart.path
 	local background_path = chart.background_path
-	if not path or not background_path then
+	if not background_path or background_path == "" then
 		return
 	end
 
-	if path:find("%.ojn$") or path:find("%.mid$") then
-		return path
+	local name = chart.name
+	if name:find("%.ojn$") or name:find("%.mid$") then
+		return chart.path
 	end
 
-	local directoryPath = path:match("^(.+)/(.-)$") or ""
-
-	if background_path and background_path ~= "" then
-		return path_util.eval_path(directoryPath .. "/" .. background_path)
-	end
-
-	return directoryPath
+	return path_util.join(chart.location_dir, background_path)
 end
 
 ---@return string?
@@ -134,19 +128,13 @@ function SelectModel:getAudioPathPreview()
 		return
 	end
 
-	local path = chart.path
 	local audio_path = chart.audio_path
-	if not path or not audio_path then
-		return
+	if not audio_path or audio_path == "" then
+		return path_util.join(chart.location_dir, "preview.ogg"), 0
 	end
 
-	local directoryPath = path:match("^(.+)/(.-)$") or ""
-
-	if audio_path and audio_path ~= "" then
-		return path_util.eval_path(directoryPath .. "/" .. audio_path), math.max(0, tonumber(chart.preview_time) or 0)
-	end
-
-	return directoryPath .. "/preview.ogg", 0
+	local preview_time = math.max(0, tonumber(chart.preview_time) or 0)
+	return path_util.join(chart.location_dir, audio_path), preview_time
 end
 
 ---@param settings table?
@@ -154,13 +142,13 @@ end
 function SelectModel:loadNoteChart(settings)
 	local chart = self.noteChartItem
 
-	local content = love.filesystem.read(chart.path)
+	local content = love.filesystem.read(chart.location_path)
 	if not content then
 		return
 	end
 
 	return assert(NoteChartFactory:getNoteChart(
-		chart.path,
+		chart.chartfile_name,
 		content,
 		chart.index,
 		settings
@@ -180,9 +168,9 @@ end
 
 ---@return boolean
 function SelectModel:notechartExists()
-	local noteChartItem = self.noteChartItem
-	if noteChartItem then
-		return love.filesystem.getInfo(noteChartItem.path) ~= nil
+	local chart = self.noteChartItem
+	if chart then
+		return love.filesystem.getInfo(chart.location_path) ~= nil
 	end
 	return false
 end
@@ -240,10 +228,8 @@ function SelectModel:scrollCollection(direction, destination)
 end
 
 function SelectModel:scrollRandom()
-	local noteChartSetItems = self.noteChartSetLibrary.items
-
-	local destination = math.random(1, #noteChartSetItems)
-
+	local items = self.noteChartSetLibrary.items
+	local destination = math.random(1, #items)
 	self:scrollNoteChartSet(nil, destination)
 end
 
@@ -257,17 +243,17 @@ end
 ---@param direction number?
 ---@param destination number?
 function SelectModel:scrollNoteChartSet(direction, destination)
-	local noteChartSetItems = self.noteChartSetLibrary.items
+	local items = self.noteChartSetLibrary.items
 
-	destination = math.min(math.max(destination or self.noteChartSetItemIndex + direction, 1), #noteChartSetItems)
-	if not noteChartSetItems[destination] or self.noteChartSetItemIndex == destination then
+	destination = math.min(math.max(destination or self.noteChartSetItemIndex + direction, 1), #items)
+	if not items[destination] or self.noteChartSetItemIndex == destination then
 		return
 	end
 	self.noteChartSetItemIndex = destination
 
 	local oldNoteChartSetItem = self.noteChartSetItem
 
-	local noteChartSetItem = noteChartSetItems[self.noteChartSetItemIndex]
+	local noteChartSetItem = items[self.noteChartSetItemIndex]
 	self.noteChartSetItem = noteChartSetItem
 	self:setConfig(noteChartSetItem)
 

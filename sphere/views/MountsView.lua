@@ -143,7 +143,7 @@ function section_draw.locations(self, inner_w)
 
 	local cache_text = get_cache_text(self)
 	if imgui.button("cache_button", cache_text) then
-		self.game.selectController:updateCacheCollection(nil, selected_cfl.id)
+		self.game.selectController:updateCacheLocation(selected_cfl.id)
 	end
 
 	imgui.text("chartfile_sets: " .. location_info.chartfile_sets)

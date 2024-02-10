@@ -1,5 +1,6 @@
 local class = require("class")
 local thread = require("thread")
+local path_util = require("path_util")
 local Sph = require("sph.Sph")
 local NoteChartExporter = require("osu.NoteChartExporter")
 local ModifierModel = require("sphere.models.ModifierModel")
@@ -96,24 +97,24 @@ SelectController.updateSession = thread.coro(function(self)
 end)
 
 function SelectController:openDirectory()
-	local noteChartItem = self.selectModel.noteChartItem
-	if not noteChartItem then
+	local chart = self.selectModel.noteChartItem
+	if not chart then
 		return
 	end
-	local realDirectory = love.filesystem.getRealDirectory(noteChartItem.path)
+	local realDirectory = love.filesystem.getRealDirectory(chart.location_prefix)
 
-	-- local path = noteChartItem.path:match("^(.+)/.-$")
+	-- local path = chart.path:match("^(.+)/.-$")
 	-- local realPath = self.mountModel:getRealPath(path)
-	love.system.openURL(realDirectory .. "/" .. noteChartItem.location_path:match("^(.+)/.-$"))
+	love.system.openURL(path_util.join(realDirectory, chart.dir))
 end
 
 function SelectController:openWebNotechart()
-	local noteChartItem = self.selectModel.noteChartItem
-	if not noteChartItem then
+	local chart = self.selectModel.noteChartItem
+	if not chart then
 		return
 	end
 
-	local hash, index = noteChartItem.hash, noteChartItem.index
+	local hash, index = chart.hash, chart.index
 	self.onlineModel.onlineNotechartManager:openWebNotechart(hash, index)
 end
 
@@ -123,17 +124,15 @@ function SelectController:updateCache(force)
 	if not chart then
 		return
 	end
-	local path = chart.path:match("^(.+)/.-$")
-	self.cacheModel:startUpdate({path, chart.location_id, "mounted_charts/" .. chart.location_id})
+	self.cacheModel:startUpdate({chart.dir, chart.location_id, "mounted_charts/" .. chart.location_id})
 end
 
----@param path string?
 ---@param location_id string
-function SelectController:updateCacheCollection(path, location_id)
+function SelectController:updateCacheLocation(location_id)
 	local cacheModel = self.cacheModel
 	local state = cacheModel.shared.state
 	if state == 0 or state == 3 then
-		cacheModel:startUpdate({path, location_id, "mounted_charts/" .. location_id})
+		cacheModel:startUpdate({nil, location_id, "mounted_charts/" .. location_id})
 	else
 		cacheModel:stopUpdate()
 	end

@@ -153,14 +153,18 @@ CASE WHEN chartfile_sets.is_file
 THEN chartfile_sets.dir || "/" || chartfiles.name
 ELSE chartfile_sets.dir || "/" || chartfile_sets.name || "/" || chartfiles.name
 END path,
+CASE WHEN chartfile_sets.is_file
+THEN chartfile_sets.dir
+ELSE chartfile_sets.dir || "/" || chartfile_sets.name
+END dir,
 chartfile_sets.location_id,
-chartfiles.name AS chartfile_name,
 chartfile_sets.name AS chartfile_set_name,
-chartfiles.modified_at,
 chartfile_sets.modified_at AS set_modified_at,
+chartfiles.name AS chartfile_name,
+chartfiles.modified_at,
+chartfiles.hash,
 scores.accuracy,
 scores.miss,
-chartfiles.hash,
 chartmetas.*,
 chartdiffs.notes_count,
 chartdiffs.long_notes_count,
