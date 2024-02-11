@@ -53,7 +53,7 @@ function SelectModel:load()
 
 	self.collectionLibrary:load()
 
-	self.collectionItemIndex = self.collectionLibrary:getItemIndex(config.collection)
+	self.collectionItemIndex = self.collectionLibrary:indexof(config.collection)
 	self.collectionItem = self.collectionLibrary.items[self.collectionItemIndex]
 
 	self:noDebouncePullNoteChartSet()

@@ -1,8 +1,13 @@
 local class = require("class")
+local dpairs = require("dpairs")
+local table_util = require("table_util")
+local path_util = require("path_util")
 
 ---@class sphere.CollectionLibrary
 ---@operator call: sphere.CollectionLibrary
 local CollectionLibrary = class()
+
+-- CollectionLibrary.dir = "10key"
 
 local ignoredNames = {
 	".keep",
@@ -18,66 +23,98 @@ function CollectionLibrary:new(cacheModel, configModel)
 	self.configModel = configModel
 end
 
+function CollectionLibrary:getTree()
+	local tree = {
+		count = 0,
+		path = nil,
+		items = {},
+	}
+
+	for _, chartfile_set in ipairs(self.cacheModel.chartRepo:selectChartfileSetsAtPath()) do
+		local dir = chartfile_set.dir
+		local t = tree
+		t.count = t.count + 1
+		if dir then
+			local tpath = {}
+			for i, k in ipairs(dir:split("/")) do
+				tpath[i] = k
+				t.items[k] = t.items[k] or {
+					count = 0,
+					path = path_util.join(unpack(tpath)),
+					items = {},
+				}
+				t = t.items[k]
+				t.count = t.count + 1
+			end
+		end
+	end
+
+	return tree
+end
+
 function CollectionLibrary:load()
 	self.config = self.configModel.configs.select
 	local collectionPath = self.config.collection
 
-	local root_charts = 0
+	local tree = self:getTree()
 
-	local dict = {}
-	for _, chartfile_set in ipairs(self.cacheModel.chartRepo:selectChartfileSetsAtPath()) do
-		local dir = chartfile_set.dir
-		if dir then
-			dict[dir] = (dict[dir] or 0) + 1
+	local upper_tree
+	if self.dir then
+		for _, k in ipairs(self.dir:split("/")) do
+			upper_tree = tree
+			tree = tree.items[k]
 		end
-		root_charts = root_charts + 1
 	end
 
 	local items = {}
-	for path, count in pairs(dict) do
-		local dir, name = path:match("^(.+)/(.-)$")
+	self.items = items
+
+	for k, subtree in dpairs(tree.items) do
 		local collection = {
-			path = path,
-			shortPath = dir or "",
-			name = name or path,
-			count = count,
+			path = subtree.path,
+			shortPath = "",
+			-- shortPath = subtree.path,
+			name = k,
+			count = subtree.count,
 		}
 		items[#items + 1] = collection
-		if path == collectionPath then
+		if k == collectionPath then
 			self.collection = collection
 		end
 	end
 	table.sort(items, function(a, b) return a.path < b.path end)
 
-	table.insert(items, 1, {
-		path = nil,
-		shortPath = "",
-		name = "/",
-		count = root_charts,
-	})
+	if not self.dir then
+		table.insert(items, 1, {
+			path = nil,
+			shortPath = "",
+			name = "/",
+			count = tree.count,
+		})
+	else
+		table.insert(items, 1, {
+			path = upper_tree.path,
+			shortPath = upper_tree.path,
+			name = "..",
+			count = upper_tree.count,
+		})
+		table.insert(items, 2, {
+			path = tree.path,
+			shortPath = tree.path,
+			name = ".",
+			count = tree.count,
+		})
+	end
 
 	self.collection = self.collection or items[1]
-
-	self.items = items
 end
 
 ---@param path string
 ---@return number
-function CollectionLibrary:getItemIndex(path)
-	local items = self.items
-
-	if not items then
-		return 1
-	end
-
-	for i = 1, #items do
-		local collection = items[i]
-		if collection.path == path then
-			return i
-		end
-	end
-
-	return 1
+function CollectionLibrary:indexof(path)
+	return table_util.indexof(self.items, path, function(c)
+		return c.path
+	end) or 1
 end
 
 return CollectionLibrary
