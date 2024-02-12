@@ -26,9 +26,14 @@ end
 function CollectionLibrary:getTree()
 	local tree = {
 		count = 0,
+		selected = 1,
+		depth = 0,
 		path = nil,
+		name = "/",
+		indexes = {},
 		items = {},
 	}
+	tree.items[1] = tree
 
 	for _, chartfile_set in ipairs(self.cacheModel.chartRepo:selectChartfileSetsAtPath()) do
 		local dir = chartfile_set.dir
@@ -36,14 +41,28 @@ function CollectionLibrary:getTree()
 		t.count = t.count + 1
 		if dir then
 			local tpath = {}
+			local depth = 0
 			for i, k in ipairs(dir:split("/")) do
+				depth = depth + 1
 				tpath[i] = k
-				t.items[k] = t.items[k] or {
-					count = 0,
-					path = path_util.join(unpack(tpath)),
-					items = {},
-				}
-				t = t.items[k]
+				local index = t.indexes[k]
+				local item = t.items[index]
+				if not item then
+					item = {
+						count = 0,
+						selected = 1,
+						depth = depth,
+						path = path_util.join(unpack(tpath)),
+						name = k,
+						indexes = {},
+						items = {t},
+					}
+					item.items[2] = item
+					index = #t.items + 1
+					t.indexes[k] = index
+					t.items[index] = item
+				end
+				t = item
 				t.count = t.count + 1
 			end
 		end
@@ -52,59 +71,20 @@ function CollectionLibrary:getTree()
 	return tree
 end
 
+function CollectionLibrary:enter(tree)
+	self.tree = tree
+	self.items = tree.items
+end
+
 function CollectionLibrary:load()
 	self.config = self.configModel.configs.select
 	local collectionPath = self.config.collection
 
 	local tree = self:getTree()
 
-	local upper_tree
-	if self.dir then
-		for _, k in ipairs(self.dir:split("/")) do
-			upper_tree = tree
-			tree = tree.items[k]
-		end
-	end
-
 	local items = {}
-	self.items = items
-
-	for k, subtree in dpairs(tree.items) do
-		local collection = {
-			path = subtree.path,
-			shortPath = "",
-			-- shortPath = subtree.path,
-			name = k,
-			count = subtree.count,
-		}
-		items[#items + 1] = collection
-		if k == collectionPath then
-			self.collection = collection
-		end
-	end
-	table.sort(items, function(a, b) return a.path < b.path end)
-
-	if not self.dir then
-		table.insert(items, 1, {
-			path = nil,
-			shortPath = "",
-			name = "/",
-			count = tree.count,
-		})
-	else
-		table.insert(items, 1, {
-			path = upper_tree.path,
-			shortPath = upper_tree.path,
-			name = "..",
-			count = upper_tree.count,
-		})
-		table.insert(items, 2, {
-			path = tree.path,
-			shortPath = tree.path,
-			name = ".",
-			count = tree.count,
-		})
-	end
+	self.tree = tree
+	self.items = tree.items
 
 	self.collection = self.collection or items[1]
 end

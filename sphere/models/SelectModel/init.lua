@@ -215,22 +215,25 @@ end
 
 ---@param direction number?
 ---@param destination number?
-function SelectModel:scrollCollection(direction, destination)
+---@param force boolean?
+function SelectModel:scrollCollection(direction, destination, force)
 	if self.pullingNoteChartSet then
 		return
 	end
 
-	local collectionItems = self.collectionLibrary.items
+	local collectionLibrary = self.collectionLibrary
+	local collectionItems = collectionLibrary.items
+	local selected = collectionLibrary.tree.selected
 
-	destination = math.min(math.max(destination or self.collectionItemIndex + direction, 1), #collectionItems)
-	if not collectionItems[destination] or self.collectionItemIndex == destination then
+	destination = math.min(math.max(destination or selected + direction, 1), #collectionItems)
+	if not collectionItems[destination] or not force and selected == destination then
 		return
 	end
-	self.collectionItemIndex = destination
+	collectionLibrary.tree.selected = destination
 
 	local oldCollectionItem = self.collectionItem
 
-	local collectionItem = collectionItems[self.collectionItemIndex]
+	local collectionItem = collectionItems[destination]
 	self.collectionItem = collectionItem
 	self.config.collection = collectionItem.path
 

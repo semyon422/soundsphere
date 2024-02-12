@@ -53,7 +53,7 @@ function SelectView:draw()
 		end
 		NotechartsSubscreen(self)
 	elseif self.subscreen == "collections" then
-		if kp("return") or kp("tab") then self:switchToNoteCharts()
+		if kp("tab") then self:switchToNoteCharts()
 		end
 		CollectionsSubscreen(self)
 	elseif self.subscreen == "osudirect" then
