@@ -61,7 +61,6 @@ return {
 		"backgroundModel",
 		"multiplayerModel",
 		"onlineModel",
-		"mountModel",
 		"cacheModel",
 		"osudirectModel",
 		"windowModel",

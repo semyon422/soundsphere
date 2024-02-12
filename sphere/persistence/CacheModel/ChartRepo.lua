@@ -257,6 +257,12 @@ function ChartRepo:selectChartfileLocation(path)
 	return self.models.chartfile_locations:find({path = assert(path)})
 end
 
+---@param id number
+---@return table?
+function ChartRepo:selectChartfileLocationById(id)
+	return self.models.chartfile_locations:find({id = assert(id)})
+end
+
 ---@param chartfile_location table
 ---@return table?
 function ChartRepo:insertChartfileLocation(chartfile_location)

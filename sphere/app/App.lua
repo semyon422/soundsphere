@@ -1,7 +1,6 @@
 local class = require("class")
 
 local DiscordModel = require("sphere.app.DiscordModel")
-local MountModel = require("sphere.app.MountModel")
 local WindowModel = require("sphere.app.WindowModel")
 local ScreenshotModel = require("sphere.app.ScreenshotModel")
 local AudioModel = require("sphere.app.AudioModel")
@@ -16,13 +15,12 @@ local App = class()
 function App:new(persistence)
 	self.audioModel = AudioModel()
 	self.discordModel = DiscordModel()
-	self.mountModel = MountModel(persistence.cacheModel)
 	self.screenshotModel = ScreenshotModel()
 	self.windowModel = WindowModel()
 
 	self.persistence = persistence
 
-	self.mountController = MountController(persistence.configModel, self.mountModel, persistence.cacheModel)
+	self.mountController = MountController(persistence.configModel, persistence.cacheModel)
 end
 
 function App:load()
@@ -30,13 +28,11 @@ function App:load()
 
 	local configModel = self.persistence.configModel
 	self.audioModel:load(configModel.configs.settings.audio.device)
-	self.mountModel:load()
 	self.windowModel:load(configModel.configs.settings.graphics)
 end
 
 function App:unload()
 	self.discordModel:unload()
-	self.mountModel:unload()
 end
 
 function App:update()

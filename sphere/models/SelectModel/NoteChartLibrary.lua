@@ -25,10 +25,15 @@ function NoteChartLibrary:setNoteChartSetId(set_id)
 	end
 	self.set_id = set_id
 	self.items = self.cacheModel.cacheDatabase:getChartviewsAtSet(set_id)
-	for i, chart in ipairs(self.items) do
-		chart.location_prefix = path_util.join("mounted_charts", chart.location_id)
-		chart.location_dir = path_util.join("mounted_charts", chart.location_id, chart.dir)
-		chart.location_path = path_util.join("mounted_charts", chart.location_id, chart.path)
+	if #self.items == 0 then
+		return
+	end
+	local location = self.cacheModel.chartRepo:selectChartfileLocationById(self.items[1].location_id)
+	local prefix = self.cacheModel.locationManager:getPrefix(location)
+	for _, chart in ipairs(self.items) do
+		chart.location_prefix = prefix
+		chart.location_dir = path_util.join(prefix, chart.dir)
+		chart.location_path = path_util.join(prefix, chart.path)
 	end
 end
 

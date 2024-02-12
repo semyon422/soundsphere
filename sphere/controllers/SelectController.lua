@@ -101,11 +101,11 @@ function SelectController:openDirectory()
 	if not chartview then
 		return
 	end
-	local realDirectory = love.filesystem.getRealDirectory(chartview.location_prefix)
-
-	-- local path = chart.path:match("^(.+)/.-$")
-	-- local realPath = self.mountModel:getRealPath(path)
-	love.system.openURL(path_util.join(realDirectory, chartview.dir))
+	local location = self.cacheModel.chartRepo:selectChartfileLocationById(chartview.location_id)
+	if not location then
+		return
+	end
+	love.system.openURL(path_util.join(location.path, chartview.dir))
 end
 
 function SelectController:openWebNotechart()
@@ -124,7 +124,7 @@ function SelectController:updateCache(force)
 	if not chartview then
 		return
 	end
-	self.cacheModel:startUpdate({chartview.dir, chartview.location_id, "mounted_charts/" .. chartview.location_id})
+	self.cacheModel:startUpdate(chartview.dir, chartview.location_id)
 end
 
 ---@param location_id string
@@ -132,7 +132,7 @@ function SelectController:updateCacheLocation(location_id)
 	local cacheModel = self.cacheModel
 	local state = cacheModel.shared.state
 	if state == 0 or state == 3 then
-		cacheModel:startUpdate({nil, location_id, "mounted_charts/" .. location_id})
+		cacheModel:startUpdate(nil, location_id)
 	else
 		cacheModel:stopUpdate()
 	end
@@ -142,7 +142,14 @@ end
 function SelectController:receive(event)
 	if event.name == "filedropped" then
 		self:filedropped(event[1])
+	elseif event.name == "directorydropped" then
+		self:filedropped(event[1])
 	end
+end
+
+---@param path string
+function SelectController:directorydropped(path)
+	self.cacheModel.locationManager:createLocation(path)
 end
 
 local exts = {

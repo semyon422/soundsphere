@@ -87,7 +87,6 @@ function GameController:new()
 	self.fileFinder = self.persistence.fileFinder
 
 	self.discordModel = self.app.discordModel
-	self.mountModel = self.app.mountModel
 	self.windowModel = self.app.windowModel
 
 	self.backgroundModel = self.ui.backgroundModel

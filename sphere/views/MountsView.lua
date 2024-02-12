@@ -14,7 +14,7 @@ local w, h = 1024, 1080 / 2
 local _w, _h = w / 2, 55
 local r = 8
 local window_id = "MountsView"
-local selected_cfl
+local selected_loc
 local location_info
 
 local sections = {
@@ -97,20 +97,20 @@ local modal = ModalImView(function(self)
 end)
 
 function section_draw.locations(self, inner_w)
-	local mountModel = self.game.mountModel
-	local cf_locations = mountModel.cf_locations
+	local locationManager = self.game.cacheModel.locationManager
+	local locations = locationManager.locations
 
 	local list_w = inner_w / 3
 
 	just.push()
 	imgui.List("mount points", list_w, h, _h / 2, _h, scrollYlist)
-	for i, item in ipairs(cf_locations) do
-		local cf_location = item.name
-		if selected_cfl == item then
-			cf_location = "> " .. cf_location
+	for i, item in ipairs(locations) do
+		local location = item.name
+		if selected_loc == item then
+			location = "> " .. location
 		end
-		if imgui.TextOnlyButton("mount item" .. i, cf_location, w, _h * theme.size, "left") or not selected_cfl then
-			selected_cfl = item
+		if imgui.TextOnlyButton("mount item" .. i, location, w, _h * theme.size, "left") or not selected_loc then
+			selected_loc = item
 			location_info = get_location_info(self, item.id)
 		end
 	end
@@ -119,17 +119,17 @@ function section_draw.locations(self, inner_w)
 
 	love.graphics.translate(list_w, 0)
 
-	if not selected_cfl then
+	if not selected_loc then
 		return
 	end
 
-	local path = selected_cfl.path
+	local path = selected_loc.path
 	just.indent(8)
-	just.text("Status: " .. (mountModel.status[path] or "unknown"))
+	just.text("Status: " .. (selected_loc.status or "unknown"))
 	just.indent(8)
 	just.text("Real path: ")
 	just.indent(8)
-	imgui.url("open dir", path, path)
+	imgui.url("open dir", selected_loc.relative_path or path, path)
 	-- just.sameline()
 	-- if imgui.TextButton("remove dir", "Remove", 200, _h) then
 	-- 	for i = 1, #items do
@@ -143,7 +143,7 @@ function section_draw.locations(self, inner_w)
 
 	local cache_text = get_cache_text(self)
 	if imgui.button("cache_button", cache_text) then
-		self.game.selectController:updateCacheLocation(selected_cfl.id)
+		self.game.selectController:updateCacheLocation(selected_loc.id)
 	end
 
 	imgui.text("chartfile_sets: " .. location_info.chartfile_sets)

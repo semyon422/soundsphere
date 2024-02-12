@@ -7,17 +7,10 @@ local thread = require("thread")
 local MountController = class()
 
 ---@param configModel sphere.ConfigModel
----@param mountModel sphere.MountModel
 ---@param cacheModel sphere.CacheModel
-function MountController:new(configModel, mountModel, cacheModel)
+function MountController:new(configModel, cacheModel)
 	self.configModel = configModel
-	self.mountModel = mountModel
 	self.cacheModel = cacheModel
-end
-
----@param path string
-function MountController:directorydropped(path)
-	self.mountModel:createLocation(path)
 end
 
 ---@param file love.File
