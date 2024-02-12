@@ -7,8 +7,8 @@ local CollectionListView = ListView()
 CollectionListView.rows = 11
 
 function CollectionListView:reloadItems()
-	self.items = self.game.selectModel.collectionLibrary.items
-    self.selectedCollection = self.game.selectModel.collectionItem
+	self.stateCounter = 0
+	self.items = self.game.selectModel.collectionLibrary.tree.items
 end
 
 ---@return number
@@ -36,7 +36,8 @@ function CollectionListView:draw(...)
 	elseif kp("home") then self:scroll(-math.huge)
 	elseif kp("end") then self:scroll(math.huge)
 	elseif kp("return") then
-		collectionLibrary:enter(self.game.selectModel.collectionItem)
+		self.stateCounter = self.stateCounter + 1
+		collectionLibrary:enter()
 		self.game.selectModel:scrollCollection(0, nil, true)
 	end
 end
@@ -55,10 +56,15 @@ function CollectionListView:drawItem(i, w, h)
 		name = ".."
 	end
 
-	TextCellImView(72, h, "right", "", item.count ~= 0 and item.count or "", true)
+	local items = ""
+	if #item.items > 1 then
+		items = #item.items
+	end
+
+	TextCellImView(72, h, "right", items, item.count ~= 0 and item.count or "", true)
 	just.sameline()
 	just.indent(44)
-	TextCellImView(math.huge, h, "left", item.path, name)
+	TextCellImView(math.huge, h, "left", "", name)
 end
 
 return CollectionListView

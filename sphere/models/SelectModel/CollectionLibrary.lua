@@ -7,20 +7,9 @@ local path_util = require("path_util")
 ---@operator call: sphere.CollectionLibrary
 local CollectionLibrary = class()
 
--- CollectionLibrary.dir = "10key"
-
-local ignoredNames = {
-	".keep",
-}
-for i = 1, #ignoredNames do
-	ignoredNames[ignoredNames[i]] = true
-end
-
 ---@param cacheModel sphere.CacheModel
----@param configModel sphere.ConfigModel
-function CollectionLibrary:new(cacheModel, configModel)
+function CollectionLibrary:new(cacheModel)
 	self.cacheModel = cacheModel
-	self.configModel = configModel
 end
 
 function CollectionLibrary:getTree()
@@ -50,14 +39,13 @@ function CollectionLibrary:getTree()
 				if not item then
 					item = {
 						count = 0,
-						selected = 1,
+						selected = 2,
 						depth = depth,
 						path = path_util.join(unpack(tpath)),
 						name = k,
 						indexes = {},
 						items = {t},
 					}
-					item.items[2] = item
 					index = #t.items + 1
 					t.indexes[k] = index
 					t.items[index] = item
@@ -71,30 +59,40 @@ function CollectionLibrary:getTree()
 	return tree
 end
 
-function CollectionLibrary:enter(tree)
-	self.tree = tree
-	self.items = tree.items
+function CollectionLibrary:enter()
+	local node = self.tree.items[self.tree.selected]
+	if #node.items > 1 then
+		self.tree = node
+	end
 end
 
 function CollectionLibrary:load()
-	self.config = self.configModel.configs.select
-	local collectionPath = self.config.collection
-
 	local tree = self:getTree()
 
-	local items = {}
+	self.root_tree = tree
 	self.tree = tree
-	self.items = tree.items
-
-	self.collection = self.collection or items[1]
 end
 
----@param path string
----@return number
-function CollectionLibrary:indexof(path)
-	return table_util.indexof(self.items, path, function(c)
-		return c.path
-	end) or 1
+function CollectionLibrary:setPath(path)
+	if not path then
+		self.tree = self.root_tree
+		return
+	end
+	local tree = self.root_tree
+
+	local keys = path:split("/")
+	for i = 1, #keys do
+		local index = tree.indexes[keys[i]]
+		if index then
+			tree.selected = index
+			if i < #keys then
+				tree = tree.items[index]
+				self.tree = tree
+			end
+		else
+			return
+		end
+	end
 end
 
 return CollectionLibrary

@@ -30,7 +30,7 @@ function SelectModel:new(configModel, cacheModel, onlineModel)
 
 	self.noteChartLibrary = NoteChartLibrary(cacheModel)
 	self.noteChartSetLibrary = NoteChartSetLibrary(cacheModel)
-	self.collectionLibrary = CollectionLibrary(cacheModel, configModel)
+	self.collectionLibrary = CollectionLibrary(cacheModel)
 	self.searchModel = SearchModel(configModel)
 	self.sortModel = SortModel()
 
@@ -53,8 +53,7 @@ function SelectModel:load()
 
 	self.collectionLibrary:load()
 
-	self.collectionItemIndex = self.collectionLibrary:indexof(config.collection)
-	self.collectionItem = self.collectionLibrary.items[self.collectionItemIndex]
+	self.collectionLibrary:setPath(config.collection)
 
 	self:noDebouncePullNoteChartSet()
 end
@@ -75,7 +74,10 @@ function SelectModel:updateSetItems()
 
 	local where, lamp = self.searchModel:getConditions()
 
-	local path = self.collectionItem.path
+	local collectionLibrary = self.collectionLibrary
+	local collectionItem = collectionLibrary.tree.items[collectionLibrary.tree.selected]
+
+	local path = collectionItem.path
 	if path then
 		where.path__startswith = path
 	end
@@ -222,22 +224,22 @@ function SelectModel:scrollCollection(direction, destination, force)
 	end
 
 	local collectionLibrary = self.collectionLibrary
-	local collectionItems = collectionLibrary.items
+	local items = collectionLibrary.tree.items
 	local selected = collectionLibrary.tree.selected
 
-	destination = math.min(math.max(destination or selected + direction, 1), #collectionItems)
-	if not collectionItems[destination] or not force and selected == destination then
+	destination = math.min(math.max(destination or selected + direction, 1), #items)
+	if not items[destination] or not force and selected == destination then
 		return
 	end
+
+	local old_item = items[collectionLibrary.tree.selected]
+
 	collectionLibrary.tree.selected = destination
 
-	local oldCollectionItem = self.collectionItem
+	local item = items[destination]
+	self.config.collection = item.path
 
-	local collectionItem = collectionItems[destination]
-	self.collectionItem = collectionItem
-	self.config.collection = collectionItem.path
-
-	self:debouncePullNoteChartSet(oldCollectionItem and oldCollectionItem.path == collectionItem.path)
+	self:debouncePullNoteChartSet(old_item and old_item.path == item.path)
 end
 
 function SelectModel:scrollRandom()
