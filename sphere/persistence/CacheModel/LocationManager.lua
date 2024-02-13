@@ -14,6 +14,7 @@ function LocationManager:new(chartRepo, fs, root, prefix)
 	self.fs = fs
 	self.root = root
 	self.prefix = prefix
+	self.mounted = {}
 end
 
 function LocationManager:load()
@@ -25,60 +26,68 @@ end
 
 function LocationManager:unload()
 	for _, location in ipairs(self.locations) do
-		self.fs.unmount(location.path)
+		if self.mounted[location.id] then
+			self.fs.unmount(location.path)
+			self.mounted[location.id] = nil
+		end
 	end
 end
 
 ---@param location table
 function LocationManager:mountLocation(location)
 	local path = location.path
-	local mp = self:getMountPoint(location)
-	if not mp then
+	if location.is_relative then
 		location.status = "direct access"
-		location.relative_path = location.path:sub(#self.root + 2)
-	elseif self.fs.mount(path, mp, true) then
-		location.status = "mounted"
-		location.mount_point = mp
-	else
-		location.status = "errored"
+		return
 	end
+	if self.mounted[location.id] then
+		location.status = "mounted"
+		return
+	end
+	local mp = path_util.join(self.prefix, location.id)
+	if self.fs.mount(path, mp, true) then
+		self.mounted[location.id] = true
+		location.status = "mounted"
+		return
+	end
+	location.status = "errored"
 end
 
 ---@param location table
 ---@return string
 function LocationManager:getPrefix(location)
-	local a, b = location.path:find(self.root)
-	if a == 1 then
-		return location.path:sub(b + 2)
+	if location.is_relative then
+		return location.path
 	end
 	return path_util.join(self.prefix, location.id)
 end
 
----@param location table
----@return string?
-function LocationManager:getMountPoint(location)
-	if not location.path:find(self.root) then
-		return path_util.join(self.prefix, location.id)
-	end
-end
+---@param loc table
+function LocationManager:createLocation(loc)
+	loc.path = loc.path:gsub("\\", "/")
 
----@param path string OS dependent, absolute
-function LocationManager:createLocation(path)
-	path = path:gsub("\\", "/")
+	local a, b = loc.path:find(self.root)
+	if a == 1 then
+		loc.path = loc.path:sub(b + 2)
+		loc.is_relative = true
+	end
+
+	if not loc.name then
+		loc.name = loc.path:match("^.+/(.-)$") or loc.path
+	end
 
 	local chartRepo = self.chartRepo
 
-	local location = chartRepo:selectChartfileLocation(path)
+	local location = chartRepo:selectChartfileLocation(loc.path)
 	if location then
 		return
 	end
 
-	location = chartRepo:insertChartfileLocation({
-		path = path,
-		name = path:match("^.+/(.-)$"),
-	})
+	loc.is_relative = not not loc.is_relative
+	loc.is_internal = not not loc.is_internal
+	chartRepo:insertChartfileLocation(loc)
 
-	self:mountLocation(location)
+	self:load()
 end
 
 return LocationManager

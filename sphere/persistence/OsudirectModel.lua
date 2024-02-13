@@ -288,7 +288,7 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 
 	beatmap.status = "Caching"
 
-	self.cacheModel:startUpdateAsync({chartview.dir, chartview.location_id, "mounted_charts/" .. chartview.location_id})
+	self.cacheModel:startUpdateAsync(chartview.dir, chartview.location_id)
 
 	for i, v in ipairs(self.processing) do
 		if v == beatmap then

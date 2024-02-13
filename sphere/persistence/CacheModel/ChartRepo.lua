@@ -269,4 +269,10 @@ function ChartRepo:insertChartfileLocation(chartfile_location)
 	return self.models.chartfile_locations:create(chartfile_location)
 end
 
+---@param chartfile_location table
+---@return table?
+function ChartRepo:updateChartfileLocation(chartfile_location)
+	return self.models.chartfile_locations:update(chartfile_location, {id = chartfile_location.id})
+end
+
 return ChartRepo

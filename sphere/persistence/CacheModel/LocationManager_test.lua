@@ -29,19 +29,21 @@ function test.all(t)
 
 	local lm = LocationManager(chartRepo, fs, "/game", "prefix")
 
-	lm:createLocation("/dir")
-	lm:createLocation("/game/dir")
-	lm:createLocation("/game/dir")
+	lm:createLocation({path = "/dir"})
+	lm:createLocation({path = "/game/dir"})
+	lm:createLocation({path = "/game/dir"})
 
 	t:eq(#locations, 2)
 
 	local loc1 = chartRepo:selectChartfileLocationById(1)
+	t:eq(loc1.is_relative, false)
+	t:eq(loc1.path, "/dir")
 	t:eq(lm:getPrefix(loc1), "prefix/1")
-	t:eq(lm:getMountPoint(loc1), "prefix/1")
 
 	local loc2 = chartRepo:selectChartfileLocationById(2)
+	t:eq(loc2.is_relative, true)
+	t:eq(loc2.path, "dir")
 	t:eq(lm:getPrefix(loc2), "dir")
-	t:eq(lm:getMountPoint(loc2), nil)
 end
 
 return test

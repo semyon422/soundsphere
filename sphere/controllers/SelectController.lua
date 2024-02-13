@@ -143,13 +143,15 @@ function SelectController:receive(event)
 	if event.name == "filedropped" then
 		self:filedropped(event[1])
 	elseif event.name == "directorydropped" then
-		self:filedropped(event[1])
+		self:directorydropped(event[1])
 	end
 end
 
 ---@param path string
 function SelectController:directorydropped(path)
-	self.cacheModel.locationManager:createLocation(path)
+	self.cacheModel.locationManager:createLocation({
+		path = path,
+	})
 end
 
 local exts = {

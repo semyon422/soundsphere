@@ -47,9 +47,7 @@ function App:receive(event)
 	local screenshot = self.persistence.configModel.configs.settings.input.screenshot
 	local mountController = self.mountController
 
-	if event.name == "directorydropped" then
-		mountController:directorydropped(event[1])
-	elseif event.name == "filedropped" then
+	if event.name == "filedropped" then
 		mountController:filedropped(event[1])
 	elseif event.name == "keypressed" and event[1] == screenshot.capture then
 		local open = love.keyboard.isDown(screenshot.open)

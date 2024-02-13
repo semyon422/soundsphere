@@ -124,12 +124,16 @@ function section_draw.locations(self, inner_w)
 	end
 
 	local path = selected_loc.path
+	if selected_loc.is_internal then
+		just.indent(8)
+		just.text("Internal")
+	end
 	just.indent(8)
 	just.text("Status: " .. (selected_loc.status or "unknown"))
 	just.indent(8)
 	just.text("Real path: ")
 	just.indent(8)
-	imgui.url("open dir", selected_loc.relative_path or path, path)
+	imgui.url("open dir", path, path)
 	-- just.sameline()
 	-- if imgui.TextButton("remove dir", "Remove", 200, _h) then
 	-- 	for i = 1, #items do
