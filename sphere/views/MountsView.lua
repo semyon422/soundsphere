@@ -32,11 +32,10 @@ local function get_cache_text(self)
 
 	local text = ""
 	if state == 1 then
-		text = ("searching for charts: %d"):format(shared.noteChartCount)
+		text = ("searching for charts: %d"):format(shared.chartfiles_count)
 	elseif state == 2 then
-		text = ("creating cache: %0.2f%%"):format(shared.cachePercent)
-	elseif state == 3 then
-		text = "complete"
+		local pos = (shared.chartfiles_current - 1) / (shared.chartfiles_count - 1)
+		text = ("creating cache: %0.2f%%"):format(pos * 100)
 	elseif state == 0 then
 		text = "update"
 	end

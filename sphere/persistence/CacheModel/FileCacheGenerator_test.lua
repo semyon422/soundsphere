@@ -81,7 +81,7 @@ function test.rel_root(t)
 
 	local noteChartFinder = get_fake_ncf(files)
 
-	local fcg = FileCacheGenerator(chartRepo, noteChartFinder)
+	local fcg = FileCacheGenerator(chartRepo, noteChartFinder, function() end)
 	fcg:lookup("chartset", 1, nil)
 
 	-- print(require("inspect")(actions))
@@ -130,7 +130,7 @@ function test.unrel_root(t)
 
 	local noteChartFinder = get_fake_ncf(files)
 
-	local fcg = FileCacheGenerator(chartRepo, noteChartFinder)
+	local fcg = FileCacheGenerator(chartRepo, noteChartFinder, function() end)
 	fcg:lookup("charts", 1, nil)
 
 	-- print(require("inspect")(actions))
@@ -194,7 +194,7 @@ function test.root_packs(t)
 
 	local noteChartFinder = get_fake_ncf(files)
 
-	local fcg = FileCacheGenerator(chartRepo, noteChartFinder)
+	local fcg = FileCacheGenerator(chartRepo, noteChartFinder, function() end)
 	fcg:lookup("charts", 1, nil)
 
 	-- print(require("inspect")(actions))
@@ -242,7 +242,7 @@ function test.complex(t)
 
 	local noteChartFinder = get_fake_ncf(files)
 
-	local fcg = FileCacheGenerator(chartRepo, noteChartFinder)
+	local fcg = FileCacheGenerator(chartRepo, noteChartFinder, function() end)
 	fcg:lookup("charts", 1, nil)
 	-- print(require("inspect")(actions))
 
@@ -376,7 +376,7 @@ function test.complex(t)
 
 	noteChartFinder = get_fake_ncf(files)
 
-	fcg = FileCacheGenerator(chartRepo, noteChartFinder)
+	fcg = FileCacheGenerator(chartRepo, noteChartFinder, function() end)
 
 	fcg:lookup("charts", 1, nil)
 

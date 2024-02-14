@@ -32,8 +32,8 @@ end
 function CacheModel:load()
 	thread.shared.cache = {
 		state = 0,
-		noteChartCount = 0,
-		cachePercent = 0,
+		chartfiles_count = 0,
+		chartfiles_current = 0,
 	}
 	self.shared = thread.shared.cache
 
@@ -111,7 +111,6 @@ CacheModel.process = thread.coro(function(self)
 	local tasks = self.tasks
 	local task = table.remove(tasks, 1)
 	while task do
-		print(task.location_id, type(task.location_id))
 		local location = self.chartRepo:selectChartfileLocationById(task.location_id)
 		local prefix = self.locationManager:getPrefix(location)
 		updateCacheAsync(task.path, task.location_id, prefix)

@@ -24,7 +24,7 @@ function ChartRepo:selectChartfileSet(dir, name)
 end
 
 ---@param chartfile_set table
----@return table?
+---@return table
 function ChartRepo:insertChartfileSet(chartfile_set)
 	return self.models.chartfile_sets:create(chartfile_set)
 end
@@ -66,7 +66,7 @@ function ChartRepo:selectChartfile(set_id, name)
 end
 
 ---@param chartfile table
----@return table?
+---@return table
 function ChartRepo:insertChartfile(chartfile)
 	return self.models.chartfiles:create(chartfile)
 end
@@ -117,7 +117,7 @@ end
 --------------------------------------------------------------------------------
 
 ---@param chartmeta table
----@return table?
+---@return table
 function ChartRepo:insertChartmeta(chartmeta)
 	return self.models.chartmetas:create(chartmeta)
 end
@@ -153,7 +153,7 @@ end
 --------------------------------------------------------------------------------
 
 ---@param chartdiff table
----@return table?
+---@return table
 function ChartRepo:insertChartdiff(chartdiff)
 	return self.models.chartdiffs:create(chartdiff)
 end
@@ -211,9 +211,9 @@ end
 
 ---@param _score table
 ---@param chartdiff table
----@return table?
+---@return table
 function ChartRepo:insertScore(_score, chartdiff)
-	local score = self.models.scores:create(_score, true)
+	local score = self.models.scores:create(_score)
 
 	local scores = self:getScores(chartdiff.hash, chartdiff.index)
 	self:calculateTopScore(scores)
@@ -275,7 +275,7 @@ function ChartRepo:selectChartfileLocationById(id)
 end
 
 ---@param chartfile_location table
----@return table?
+---@return table
 function ChartRepo:insertChartfileLocation(chartfile_location)
 	return self.models.chartfile_locations:create(chartfile_location)
 end

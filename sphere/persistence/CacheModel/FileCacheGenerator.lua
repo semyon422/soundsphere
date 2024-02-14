@@ -7,9 +7,11 @@ local FileCacheGenerator = class()
 
 ---@param chartRepo sphere.ChartRepo
 ---@param noteChartFinder sphere.NoteChartFinder
-function FileCacheGenerator:new(chartRepo, noteChartFinder)
+---@param handle function
+function FileCacheGenerator:new(chartRepo, noteChartFinder, handle)
 	self.chartRepo = chartRepo
 	self.noteChartFinder = noteChartFinder
+	self.handle = handle
 end
 
 ---@param root_dir string?
@@ -17,7 +19,8 @@ end
 ---@param location_prefix string?
 function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
 	local iterator = self.noteChartFinder:iter(location_prefix, root_dir)
-	local chartfile_set
+	local chartfile_set, chartfile
+	local handle = self.handle
 
 	local typ, dir, name, modtime = iterator()
 	while typ do
@@ -31,7 +34,8 @@ function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
 				location_id = location_id,
 			})
 		elseif typ == "related" then
-			self:processChartfile(chartfile_set.id, name, modtime)
+			chartfile = self:processChartfile(chartfile_set.id, name, modtime)
+			handle(chartfile)
 		elseif typ == "related_all" then
 			self.chartRepo:deleteChartfiles({set_id = chartfile_set.id, name__notin = name})
 		elseif typ == "unrelated_dir" then
@@ -43,7 +47,8 @@ function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
 				is_file = true,
 				location_id = location_id,
 			})
-			self:processChartfile(chartfile_set.id, name, modtime)
+			chartfile = self:processChartfile(chartfile_set.id, name, modtime)
+			handle(chartfile)
 		elseif typ == "unrelated_all" then
 			self.chartRepo:deleteChartfiles({set_id = chartfile_set.id, name__notin = name})
 			self.chartRepo:deleteChartfileSets({
@@ -113,16 +118,16 @@ end
 ---@param name string
 ---@param set_id number
 ---@param modified_at number
+---@return table
 function FileCacheGenerator:processChartfile(set_id, name, modified_at)
 	local chartfile = self.chartRepo:selectChartfile(set_id, name)
 
 	if not chartfile then
-		self.chartRepo:insertChartfile({
+		return self.chartRepo:insertChartfile({
 			name = name,
 			modified_at = modified_at,
 			set_id = set_id,
 		})
-		return
 	end
 
 	if chartfile.modified_at ~= modified_at then
@@ -130,6 +135,8 @@ function FileCacheGenerator:processChartfile(set_id, name, modified_at)
 		chartfile.modified_at = modified_at
 		self.chartRepo:updateChartfile(chartfile)
 	end
+
+	return chartfile
 end
 
 return FileCacheGenerator
