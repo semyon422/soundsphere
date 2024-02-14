@@ -62,6 +62,13 @@ function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
 				name__notin = name,
 				location_id = location_id,
 			})
+		elseif typ == "not_found" then
+			self.chartRepo:deleteChartfileSets({
+				dir = dir,
+				dir__isnull = not dir,
+				name = name,
+				location_id = location_id,
+			})
 		end
 		typ, dir, name, modtime = iterator(res)
 	end

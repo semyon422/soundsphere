@@ -72,6 +72,7 @@ local function iter(items, iterator, prefix)
 		elseif typ == "directory_dir" then
 		elseif typ == "directory" then
 			res = not_cached
+		elseif typ == "not_found" then
 		end
 		typ, dir, item, modtime = iterator(res)
 	end

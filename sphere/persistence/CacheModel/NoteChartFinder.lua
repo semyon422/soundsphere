@@ -30,7 +30,8 @@ function NoteChartFinder:lookupAsync(prefix, dir)
 	local items = self.fs.getDirectoryItems(prefix_dir)
 	local dir_info = self.fs.getInfo(prefix_dir)
 	if not dir_info then
-		print("missing" .. prefix_dir)
+		local a, b = get_dir(dir)
+		coroutine.yield("not_found", a, b, nil)
 		return
 	end
 
