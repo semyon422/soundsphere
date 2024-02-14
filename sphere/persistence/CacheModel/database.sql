@@ -5,11 +5,11 @@ CREATE TABLE IF NOT EXISTS `chartfiles` (
 	`set_id` INTEGER NOT NULL,
 	`modified_at` INTEGER NOT NULL,
 	`size` INTEGER,
+	FOREIGN KEY (set_id) REFERENCES chartfile_sets(id) ON DELETE CASCADE,
 	UNIQUE(`set_id`, `name`)
 );
 
 CREATE INDEX IF NOT EXISTS chartfiles_hash_idx ON chartfiles (`hash`);
-CREATE INDEX IF NOT EXISTS chartfiles_set_id_idx ON chartfiles (`set_id`);
 
 CREATE TABLE IF NOT EXISTS `chartfile_sets` (
 	`id` INTEGER PRIMARY KEY,
@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS `chartfile_sets` (
 	`modified_at` INTEGER NOT NULL,
 	`is_file` INTEGER NOT NULL,
 	`location_id` INTEGER NOT NULL,
+	FOREIGN KEY (location_id) REFERENCES chartfile_locations(id) ON DELETE CASCADE,
 	UNIQUE(`dir`, `name`)
 );
 

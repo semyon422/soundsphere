@@ -23,6 +23,7 @@ function ChartsDatabase:load()
 	self.db:open("userdata/data.db")
 	local sql = assert(love.filesystem.read("sphere/persistence/CacheModel/database.sql"))
 	self.db:exec(sql)
+	self.db:exec("PRAGMA foreign_keys = ON;")
 	self:updateSchema()
 end
 
