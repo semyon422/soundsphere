@@ -28,7 +28,11 @@ function NoteChartFinder:lookupAsync(prefix, dir)
 	local prefix_dir = path_util.join(prefix, dir)
 
 	local items = self.fs.getDirectoryItems(prefix_dir)
-	local dir_info = assert(self.fs.getInfo(prefix_dir), prefix_dir)
+	local dir_info = self.fs.getInfo(prefix_dir)
+	if not dir_info then
+		print("missing" .. prefix_dir)
+		return
+	end
 
 	local all_items = {}
 

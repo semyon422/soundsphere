@@ -5,8 +5,6 @@ local WindowModel = require("sphere.app.WindowModel")
 local ScreenshotModel = require("sphere.app.ScreenshotModel")
 local AudioModel = require("sphere.app.AudioModel")
 
-local MountController = require("sphere.app.MountController")
-
 ---@class sphere.App
 ---@operator call: sphere.App
 local App = class()
@@ -19,8 +17,6 @@ function App:new(persistence)
 	self.windowModel = WindowModel()
 
 	self.persistence = persistence
-
-	self.mountController = MountController(persistence.configModel, persistence.cacheModel)
 end
 
 function App:load()
@@ -45,11 +41,8 @@ function App:receive(event)
 	self.windowModel:receive(event)
 
 	local screenshot = self.persistence.configModel.configs.settings.input.screenshot
-	local mountController = self.mountController
 
-	if event.name == "filedropped" then
-		mountController:filedropped(event[1])
-	elseif event.name == "keypressed" and event[1] == screenshot.capture then
+	if event.name == "keypressed" and event[1] == screenshot.capture then
 		local open = love.keyboard.isDown(screenshot.open)
 		self.screenshotModel:capture(open)
 	end

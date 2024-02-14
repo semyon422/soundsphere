@@ -1,6 +1,7 @@
 local class = require("class")
 local thread = require("thread")
 local path_util = require("path_util")
+local fs_util = require("fs_util")
 local Sph = require("sph.Sph")
 local NoteChartExporter = require("osu.NoteChartExporter")
 local ModifierModel = require("sphere.models.ModifierModel")
@@ -154,30 +155,57 @@ function SelectController:directorydropped(path)
 	})
 end
 
+local filedropped_handlers = {}
+
+function filedropped_handlers.new_chart(self, path, data)
+	local _name, ext = path:match("^(.+)%.(.-)$")
+	local audioName = _name:match("^.+/(.-)$")
+	local location_path = path_util.join("editor", os.time() .. " " .. audioName)
+	local chartSetPath = path_util.join("userdata/charts", location_path)
+
+	love.filesystem.createDirectory(chartSetPath)
+	assert(love.filesystem.write(chartSetPath .. "/" .. audioName .. "." .. ext, data))
+	assert(love.filesystem.write(chartSetPath .. "/" .. audioName .. ".sph", Sph:getDefault({
+		audio = audioName .. "." .. ext
+	})))
+
+	self.cacheModel:startUpdate(location_path, 1)
+end
+
+function filedropped_handlers.add_zip(self, path, data)
+	local location_path = path_util.join("dropped", path:match("^.+/(.-)%.osz$"))
+	local extractPath = path_util.join("userdata/charts", location_path)
+
+	print(("Extracting to: %s"):format(extractPath))
+	print(path, extractPath)
+	local extracted = fs_util.extractAsync(path, extractPath, false)
+	if not extracted then
+		print("Failed to extract")
+		return
+	end
+	print("Extracted")
+
+	self.cacheModel:startUpdate(location_path, 1)
+end
+filedropped_handlers.add_zip = thread.coro(filedropped_handlers.add_zip)
+
 local exts = {
-	mp3 = true,
-	ogg = true,
+	mp3 = filedropped_handlers.new_chart,
+	ogg = filedropped_handlers.new_chart,
+	osz = filedropped_handlers.add_zip,
 }
 
 ---@param file love.File
 function SelectController:filedropped(file)
 	local path = file:getFilename():gsub("\\", "/")
 
-	local _name, ext = path:match("^(.+)%.(.-)$")
-	if not exts[ext] then
+	local ext = path:match("^.+%.(.-)$")
+	local handler = exts[ext]
+	if not handler then
 		return
 	end
 
-	local audioName = _name:match("^.+/(.-)$")
-	local chartSetPath = "userdata/charts/editor/" .. os.time() .. " " .. audioName
-
-	love.filesystem.createDirectory(chartSetPath)
-	assert(love.filesystem.write(chartSetPath .. "/" .. audioName .. "." .. ext, file:read()))
-	assert(love.filesystem.write(chartSetPath .. "/" .. audioName .. ".sph", Sph:getDefault({
-		audio = audioName .. "." .. ext
-	})))
-
-	self.cacheModel:startUpdate(chartSetPath, true)
+	handler(self, path, file)
 end
 
 function SelectController:exportToOsu()
