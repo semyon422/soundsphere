@@ -237,10 +237,11 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 		return
 	end
 
+	local location = self.cacheModel.chartRepo:selectChartfileLocationById(1)
+
 	table.insert(self.processing, 1, beatmap)
 
 	local config = self.configModel.configs.urls.osu
-	local saveDir = "userdata/charts/downloads"
 	local url = config.download:format(beatmap.id)
 	beatmap.url = url
 
@@ -276,7 +277,8 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 
 	local filedata = love.filesystem.newFileData(data, filename)
 
-	local extractPath = saveDir .. "/" .. filename:match("^(.+)%.osz$")
+	local location_path = path_util.join("downloads", filename:match("^(.+)%.osz$"))
+	local extractPath = path_util.join(location.path, location_path)
 	print("Extracting")
 	beatmap.status = "Extracting"
 	local extracted, err = fs_util.extractAsync(filedata, extractPath)
@@ -288,7 +290,7 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 
 	beatmap.status = "Caching"
 
-	self.cacheModel:startUpdateAsync(chartview.dir, chartview.location_id)
+	self.cacheModel:startUpdateAsync(location_path, location.id)
 
 	for i, v in ipairs(self.processing) do
 		if v == beatmap then
