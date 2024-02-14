@@ -35,6 +35,9 @@ function NoteChartSetLibrary:loadObject(itemIndex)
 	local cacheDatabase = self.cacheModel.cacheDatabase
 	local _chartview = cacheDatabase.chartviews[itemIndex - 1]
 	local chartview = cacheDatabase:getChartview(_chartview.chartfile_id, _chartview.chartmeta_id)
+	if not chartview then
+		return {}
+	end
 	chartview.lamp = _chartview.lamp
 	return chartview
 end
