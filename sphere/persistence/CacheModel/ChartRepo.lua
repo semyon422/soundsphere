@@ -1,4 +1,5 @@
 local class = require("class")
+local sql_util = require("rdb.sql_util")
 
 ---@class sphere.ChartRepo
 ---@operator call: sphere.ChartRepo
@@ -75,6 +76,11 @@ function ChartRepo:updateChartfile(chartfile)
 	self.models.chartfiles:update(chartfile, {id = assert(chartfile.id)})
 end
 
+---@param conds table?
+function ChartRepo:resetChartfileHash(conds)
+	self.models.chartfiles:update({hash = sql_util.NULL}, conds)
+end
+
 ---@param conds table
 function ChartRepo:deleteChartfiles(conds)
 	self.models.chartfiles:delete(conds)
@@ -137,6 +143,11 @@ end
 ---@return number
 function ChartRepo:countChartmetas()
 	return self.models.chartmetas:count()
+end
+
+---@param conds table
+function ChartRepo:deleteChartmetas(conds)
+	self.models.chartmetas:delete(conds)
 end
 
 --------------------------------------------------------------------------------
@@ -273,6 +284,11 @@ end
 ---@return table?
 function ChartRepo:updateChartfileLocation(chartfile_location)
 	return self.models.chartfile_locations:update(chartfile_location, {id = chartfile_location.id})
+end
+
+---@param location_id number
+function ChartRepo:deleteLocation(location_id)
+	self.models.chartfile_locations:delete({id = assert(location_id)})
 end
 
 return ChartRepo

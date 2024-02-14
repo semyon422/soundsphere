@@ -104,15 +104,21 @@ function section_draw.locations(self, inner_w)
 
 	just.push()
 	imgui.List("mount points", list_w, h, _h / 2, _h, scrollYlist)
+	local has_selected
 	for i, item in ipairs(locations) do
 		local location = item.name
 		if selected_loc == item then
 			location = "> " .. location
+			has_selected = true
 		end
 		if imgui.TextOnlyButton("mount item" .. i, location, w, _h * theme.size, "left") or not selected_loc then
 			selected_loc = item
 			location_info = get_location_info(self, item.id)
+			has_selected = true
 		end
+	end
+	if not has_selected then
+		selected_loc = nil
 	end
 	scrollYlist = imgui.List()
 	just.pop()
@@ -134,16 +140,6 @@ function section_draw.locations(self, inner_w)
 	just.text("Real path: ")
 	just.indent(8)
 	imgui.url("open dir", path, path)
-	-- just.sameline()
-	-- if imgui.TextButton("remove dir", "Remove", 200, _h) then
-	-- 	for i = 1, #items do
-	-- 		if items[i] == selectedItem then
-	-- 			table.remove(items, i)
-	-- 			selectedItem = nil
-	-- 			break
-	-- 		end
-	-- 	end
-	-- end
 
 	local cache_text = get_cache_text(self)
 	if imgui.button("cache_button", cache_text) then
@@ -155,6 +151,17 @@ function section_draw.locations(self, inner_w)
 		location_info.hashed_chartfiles,
 		location_info.chartfiles
 	))
+
+	if imgui.button("reset dir", "delete charts cache") then
+		locationManager:deleteCharts(selected_loc.id)
+		location_info = get_location_info(self, selected_loc.id)
+		self.game.selectModel:noDebouncePullNoteChartSet()
+	end
+	if not selected_loc.is_internal and imgui.button("delete dir", "delete location") then
+		locationManager:deleteLocation(selected_loc.id)
+		locationManager:load()
+		self.game.selectModel:noDebouncePullNoteChartSet()
+	end
 end
 
 function section_draw.metadata(self)
@@ -163,6 +170,10 @@ function section_draw.metadata(self)
 	imgui.text("chartdiffs: " .. cacheStatus.chartdiffs)
 	if imgui.button("cacheStatus update", "update") then
 		cacheStatus:update()
+	end
+	if imgui.button("delete", "delete chartmetas, reset chartfiles") then
+		self.game.cacheModel.chartRepo:deleteChartmetas()
+		self.game.cacheModel.chartRepo:resetChartfileHash()
 	end
 end
 

@@ -90,4 +90,14 @@ function LocationManager:createLocation(loc)
 	self:load()
 end
 
+function LocationManager:deleteCharts(location_id)
+	self.chartRepo:deleteChartfileSets({
+		location_id = assert(location_id),
+	})
+end
+
+function LocationManager:deleteLocation(location_id)
+	self.chartRepo:deleteLocation(location_id)
+end
+
 return LocationManager
