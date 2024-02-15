@@ -28,7 +28,7 @@ function NoteChartLibrary:setNoteChartSetId(set_id)
 	if #self.items == 0 then
 		return
 	end
-	local location = self.cacheModel.chartRepo:selectChartfileLocationById(self.items[1].location_id)
+	local location = self.cacheModel.chartRepo:selectLocationById(self.items[1].location_id)
 	local prefix = self.cacheModel.locationManager:getPrefix(location)
 	for _, chart in ipairs(self.items) do
 		chart.location_prefix = prefix

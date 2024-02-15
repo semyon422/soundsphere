@@ -258,37 +258,37 @@ function ChartRepo:getScores(hash, index)
 end
 
 ---@return table
-function ChartRepo:selectChartfileLocations()
-	return self.models.chartfile_locations:select()
+function ChartRepo:selectLocations()
+	return self.models.locations:select()
 end
 
 ---@param path string
 ---@return table?
-function ChartRepo:selectChartfileLocation(path)
-	return self.models.chartfile_locations:find({path = assert(path)})
+function ChartRepo:selectLocation(path)
+	return self.models.locations:find({path = assert(path)})
 end
 
 ---@param id number
 ---@return table?
-function ChartRepo:selectChartfileLocationById(id)
-	return self.models.chartfile_locations:find({id = assert(id)})
+function ChartRepo:selectLocationById(id)
+	return self.models.locations:find({id = assert(id)})
 end
 
----@param chartfile_location table
+---@param location table
 ---@return table
-function ChartRepo:insertChartfileLocation(chartfile_location)
-	return self.models.chartfile_locations:create(chartfile_location)
+function ChartRepo:insertLocation(location)
+	return self.models.locations:create(location)
 end
 
----@param chartfile_location table
+---@param location table
 ---@return table?
-function ChartRepo:updateChartfileLocation(chartfile_location)
-	return self.models.chartfile_locations:update(chartfile_location, {id = chartfile_location.id})
+function ChartRepo:updateLocation(location)
+	return self.models.locations:update(location, {id = location.id})
 end
 
 ---@param location_id number
 function ChartRepo:deleteLocation(location_id)
-	self.models.chartfile_locations:delete({id = assert(location_id)})
+	self.models.locations:delete({id = assert(location_id)})
 end
 
 return ChartRepo

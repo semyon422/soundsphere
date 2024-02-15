@@ -111,7 +111,7 @@ CacheModel.process = thread.coro(function(self)
 	local tasks = self.tasks
 	local task = table.remove(tasks, 1)
 	while task do
-		local location = self.chartRepo:selectChartfileLocationById(task.location_id)
+		local location = self.chartRepo:selectLocationById(task.location_id)
 		local prefix = self.locationManager:getPrefix(location)
 		updateCacheAsync(task.path, task.location_id, prefix)
 

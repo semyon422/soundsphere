@@ -237,7 +237,7 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 		return
 	end
 
-	local location = self.cacheModel.chartRepo:selectChartfileLocationById(1)
+	local location = self.cacheModel.chartRepo:selectLocationById(1)
 
 	table.insert(self.processing, 1, beatmap)
 

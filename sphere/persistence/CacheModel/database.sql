@@ -18,11 +18,11 @@ CREATE TABLE IF NOT EXISTS `chartfile_sets` (
 	`modified_at` INTEGER NOT NULL,
 	`is_file` INTEGER NOT NULL,
 	`location_id` INTEGER NOT NULL,
-	FOREIGN KEY (location_id) REFERENCES chartfile_locations(id) ON DELETE CASCADE,
+	FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE,
 	UNIQUE(`dir`, `name`)
 );
 
-CREATE TABLE IF NOT EXISTS `chartfile_locations` (
+CREATE TABLE IF NOT EXISTS `locations` (
 	`id` INTEGER PRIMARY KEY,
 	`path` TEXT NOT NULL UNIQUE,
 	`name` TEXT NOT NULL,

@@ -18,7 +18,7 @@ function LocationManager:new(chartRepo, fs, root, prefix)
 end
 
 function LocationManager:load()
-	self.locations = self.chartRepo:selectChartfileLocations()
+	self.locations = self.chartRepo:selectLocations()
 	for _, location in ipairs(self.locations) do
 		self:mountLocation(location)
 	end
@@ -78,14 +78,14 @@ function LocationManager:createLocation(loc)
 
 	local chartRepo = self.chartRepo
 
-	local location = chartRepo:selectChartfileLocation(loc.path)
+	local location = chartRepo:selectLocation(loc.path)
 	if location then
 		return
 	end
 
 	loc.is_relative = not not loc.is_relative
 	loc.is_internal = not not loc.is_internal
-	chartRepo:insertChartfileLocation(loc)
+	chartRepo:insertLocation(loc)
 
 	self:load()
 end
