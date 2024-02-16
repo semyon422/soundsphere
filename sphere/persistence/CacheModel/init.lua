@@ -102,18 +102,22 @@ local updateCacheAsync = thread.async(function(path, location_id, location_prefi
 	cdb:unload()
 end)
 
-CacheModel.process = thread.coro(function(self)
+function CacheModel:process()
 	if isProcessing then
 		return
 	end
 	isProcessing = true
+
 
 	local tasks = self.tasks
 	local task = table.remove(tasks, 1)
 	while task do
 		local location = self.chartRepo:selectLocationById(task.location_id)
 		local prefix = self.locationManager:getPrefix(location)
+
+		self.cdb:unload()
 		updateCacheAsync(task.path, task.location_id, prefix)
+		self.cdb:load()
 
 		if task.callback then
 			task.callback()
@@ -123,6 +127,8 @@ CacheModel.process = thread.coro(function(self)
 	end
 
 	isProcessing = false
-end)
+end
+
+CacheModel.process = thread.coro(CacheModel.process)
 
 return CacheModel
