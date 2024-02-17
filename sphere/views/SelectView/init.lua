@@ -42,6 +42,8 @@ function SelectView:draw()
 	Layout:draw()
 	SelectViewConfig(self)
 
+	local cacheModel = self.game.cacheModel
+
 	local kp = just.keypressed
 	if kp("f1") then self.gameView:setModal(require("sphere.views.ModifierView"))
 	elseif kp("f2") then self.game.selectModel:scrollRandom()
@@ -58,13 +60,24 @@ function SelectView:draw()
 		CollectionsSubscreen(self)
 	elseif self.subscreen == "osudirect" then
 		if kp("escape") or kp("tab") then
-			self.game.cacheModel:startUpdate("downloads", 1)
+			cacheModel:startUpdate("downloads", 1)
 			self:switchToCollections()
 		end
 		OsudirectSubscreen(self)
 	end
 
 	just.container()
+
+	if cacheModel.isProcessing then
+		just.container("cache task container", true)
+		love.graphics.origin()
+		local w, h = love.graphics.getDimensions()
+		love.graphics.setColor(0, 0, 0, 0.5)
+		love.graphics.rectangle("fill", 0, 0, w, h)
+		just.wheel_over("cache task container", true)
+		just.mouse_over("cache task container", true, "mouse")
+		just.container()
+	end
 end
 
 function SelectView:play()

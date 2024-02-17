@@ -80,10 +80,8 @@ function CacheModel:stopUpdate()
 	self.shared.stop = true
 end
 
-local isProcessing = false
-
 function CacheModel:update()
-	if not isProcessing and #self.tasks > 0 then
+	if not self.isProcessing and #self.tasks > 0 then
 		self:process()
 	end
 end
@@ -103,11 +101,10 @@ local updateCacheAsync = thread.async(function(path, location_id, location_prefi
 end)
 
 function CacheModel:process()
-	if isProcessing then
+	if self.isProcessing then
 		return
 	end
-	isProcessing = true
-
+	self.isProcessing = true
 
 	local tasks = self.tasks
 	local task = table.remove(tasks, 1)
@@ -126,7 +123,7 @@ function CacheModel:process()
 		task = table.remove(tasks, 1)
 	end
 
-	isProcessing = false
+	self.isProcessing = false
 end
 
 CacheModel.process = thread.coro(CacheModel.process)
