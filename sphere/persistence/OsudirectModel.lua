@@ -288,10 +288,6 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 	end
 	print(("Extracted to: %s"):format(extractPath))
 
-	beatmap.status = "Caching"
-
-	self.cacheModel:startUpdateAsync(location_path, location.id)
-
 	for i, v in ipairs(self.processing) do
 		if v == beatmap then
 			table.remove(self.processing, i)

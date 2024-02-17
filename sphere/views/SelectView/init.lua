@@ -57,7 +57,9 @@ function SelectView:draw()
 		end
 		CollectionsSubscreen(self)
 	elseif self.subscreen == "osudirect" then
-		if kp("escape") or kp("tab") then self:switchToCollections()
+		if kp("escape") or kp("tab") then
+			self.game.cacheModel:startUpdate("downloads", 1)
+			self:switchToCollections()
 		end
 		OsudirectSubscreen(self)
 	end
