@@ -44,7 +44,9 @@ function SelectController:applyModifierMeta()
 	end
 
 	ModifierModel:applyMeta(playContext.modifiers, self.state)
-	self.previewModel:setPitch(playContext.rate * chartview.rate)
+
+	local rate = chartview.rate or 1
+	self.previewModel:setPitch(playContext.rate * rate)
 end
 
 function SelectController:beginUnload()

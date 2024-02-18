@@ -104,11 +104,15 @@ local function NoteChartList(self)
 end
 
 ---@param self table
-local function Cells(self)
+local function ChartCells(self)
 	local w, h = Layout:move("column2row1")
 
 	local chartview = self.game.selectModel.chartview
-	local scoreItem = self.game.selectModel.scoreItem
+
+	if not chartview.chartdiff_id then
+		return
+	end
+
 	local baseTimeRate = self.game.playContext.rate * chartview.rate
 
 	local bpm = 0
@@ -126,24 +130,6 @@ local function Cells(self)
 		longNoteRatio = chartview.longNoteRatio or 0
 		localOffset = chartview.localOffset or 0
 		format = chartview.format or ""
-	end
-
-	local score = 0
-	local difficulty = 0
-	local accuracy = 0
-	local missCount = 0
-	local rate = 1
-	local const = false
-	if scoreItem then
-		score = scoreItem.score or 0
-		difficulty = scoreItem.difficulty or 0
-		accuracy = scoreItem.accuracy or 0
-		missCount = scoreItem.miss or 0
-		rate = scoreItem.rate or 1
-		const = scoreItem.const or false
-		if score ~= score then
-			score = 0
-		end
 	end
 
 	love.graphics.translate(0, h - 118)
@@ -164,30 +150,6 @@ local function Cells(self)
 	BarCellImView(2 * w, h, "right", "long notes", longNoteRatio)
 	TextCellImView(w, h, "right", "offset", localOffset * 1000)
 	TextCellImView(w, h, "right", "format", format)
-	just.row()
-
-	w, h = Layout:move("column1row2")
-	drawFrameRect(w, h)
-
-	love.graphics.translate(w / 2, 6)
-	w = (w - 44) / 4
-	h = 50
-
-	just.row(true)
-	TextCellImView(w, h, "right", "score", math.floor(score))
-	TextCellImView(w, h, "right", "accuracy", Format.accuracy(accuracy))
-
-	just.row(true)
-	TextCellImView(w, h, "right", "difficulty", Format.difficulty(difficulty))
-	TextCellImView(w, h, "right", "miss count", missCount)
-
-	just.row(true)
-	local const_str = ""
-	if const then
-		const_str = "const"
-	end
-	TextCellImView(w, h, "right", "", const_str)
-	TextCellImView(w, h, "right", "rate", Format.timeRate(rate))
 	just.row()
 
 	if self.game.multiplayerModel.room then
@@ -215,6 +177,56 @@ local function Cells(self)
 	love.graphics.translate(10, h / 2 - 55 / 2)
 	ModifierIconGridView.game = self.game
 	ModifierIconGridView:draw(chartview.modifiers, w / 2, 55 * 2, 55)
+end
+
+---@param self table
+local function ScoreCells(self)
+	local w, h = Layout:move("column1row2")
+	drawFrameRect(w, h)
+
+	local scoreItem = self.game.selectModel.scoreItem
+	if not scoreItem then
+		return
+	end
+
+	local score = 0
+	local difficulty = 0
+	local accuracy = 0
+	local missCount = 0
+	local rate = 1
+	local const = false
+	if scoreItem then
+		score = scoreItem.score or 0
+		difficulty = scoreItem.difficulty or 0
+		accuracy = scoreItem.accuracy or 0
+		missCount = scoreItem.miss or 0
+		rate = scoreItem.rate or 1
+		const = scoreItem.const or false
+		if score ~= score then
+			score = 0
+		end
+	end
+
+	love.graphics.translate(w / 2, 6)
+	w = (w - 44) / 4
+	h = 50
+
+	just.row(true)
+	TextCellImView(w, h, "right", "score", math.floor(score))
+	TextCellImView(w, h, "right", "accuracy", Format.accuracy(accuracy))
+
+	just.row(true)
+	TextCellImView(w, h, "right", "difficulty", Format.difficulty(difficulty))
+	TextCellImView(w, h, "right", "miss count", missCount)
+
+	just.row(true)
+	local const_str = ""
+	if const then
+		const_str = "const"
+	end
+	TextCellImView(w, h, "right", "", const_str)
+	TextCellImView(w, h, "right", "rate", Format.timeRate(rate))
+	just.row()
 end
 
 local bannerGradient
@@ -506,7 +518,8 @@ return function(self)
 	NoteChartSetList(self)
 	NoteChartList(self)
 	ScoreList(self)
-	Cells(self)
+	ChartCells(self)
+	ScoreCells(self)
 	SearchField(self)
 	SortDropdown(self)
 	NotechartFilterDropdown(self)
