@@ -40,11 +40,11 @@ function SelectController:applyModifierMeta()
 
 	local chartview = self.selectModel.chartview
 	if chartview then
-		self.state.inputMode:set(chartview.inputmode)
+		self.state.inputMode:set(chartview.chartdiff_inputmode)
 	end
 
 	ModifierModel:applyMeta(playContext.modifiers, self.state)
-	self.previewModel:setPitch(playContext.rate)
+	self.previewModel:setPitch(playContext.rate * chartview.rate)
 end
 
 function SelectController:beginUnload()

@@ -1,4 +1,5 @@
 local path_util = require("path_util")
+local chartdiffs = require("sphere.persistence.CacheModel.models.chartdiffs")
 
 local chartviews = {}
 
@@ -7,6 +8,7 @@ chartviews.table_name = "chartviews"
 chartviews.types = {
 	lamp = "boolean",
 	set_is_file = "boolean",
+	modifiers = chartdiffs.types.modifiers,
 }
 
 chartviews.relations = {}

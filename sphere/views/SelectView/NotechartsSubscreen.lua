@@ -107,9 +107,9 @@ end
 local function Cells(self)
 	local w, h = Layout:move("column2row1")
 
-	local baseTimeRate = self.game.playContext.rate
 	local chartview = self.game.selectModel.chartview
 	local scoreItem = self.game.selectModel.scoreItem
+	local baseTimeRate = self.game.playContext.rate * chartview.rate
 
 	local bpm = 0
 	local length = 0
@@ -195,7 +195,7 @@ local function Cells(self)
 	end
 
 	w, h = Layout:move("column2row1")
-	love.graphics.translate(0, h / 2 - 55)
+	love.graphics.translate(w - 55, h / 2 - 55)
 	if imgui.TextOnlyButton("play auto", "AP", 55, 55) then
 		self.game.rhythmModel:setAutoplay(true)
 		self:play()
@@ -204,6 +204,17 @@ local function Cells(self)
 		self.game.rhythmModel:setPromode(true)
 		self:play()
 	end
+
+	w, h = Layout:move("column2row1")
+	love.graphics.translate(12, h / 2 - 55 / 2 - 35)
+	if chartview.rate ~= 1 then
+		just.text(Format.timeRate(chartview.rate))
+	end
+
+	w, h = Layout:move("column2row1")
+	love.graphics.translate(10, h / 2 - 55 / 2)
+	ModifierIconGridView.game = self.game
+	ModifierIconGridView:draw(chartview.modifiers, w / 2, 55 * 2, 55)
 end
 
 local bannerGradient
