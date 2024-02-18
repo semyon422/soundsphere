@@ -44,14 +44,14 @@ function NoteChartListView:drawItem(i, w, h)
 
 	local difficulty = item.difficulty and Format.difficulty(item.difficulty * baseTimeRate) or ""
 
-	local inputmode = item.inputmode and Format.inputMode(item.inputmode) or ""
+	local inputmode = item.chartdiff_inputmode and Format.inputMode(item.chartdiff_inputmode) or ""
 	local creator = item.creator or ""
 	local name = item.name or item.chartfile_name
 
-	if items[i - 1] and items[i - 1].inputmode == inputmode then
+	if items[i - 1] and items[i - 1].chartdiff_inputmode == item.chartdiff_inputmode then
 		inputmode = ""
 	end
-	if items[i - 1] and items[i - 1].creator == creator then
+	if items[i - 1] and items[i - 1].creator == item.creator then
 		creator = ""
 	end
 
