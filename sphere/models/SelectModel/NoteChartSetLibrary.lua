@@ -1,6 +1,5 @@
 local class = require("class")
 local ExpireTable = require("ExpireTable")
-local table_util = require("table_util")
 
 ---@class sphere.NoteChartSetLibrary
 ---@operator call: sphere.NoteChartSetLibrary
@@ -34,7 +33,7 @@ end
 function NoteChartSetLibrary:loadObject(itemIndex)
 	local cacheDatabase = self.cacheModel.cacheDatabase
 	local _chartview = cacheDatabase.chartviews[itemIndex - 1]
-	local chartview = cacheDatabase:getChartview(_chartview.chartfile_id, _chartview.chartmeta_id)
+	local chartview = cacheDatabase:getChartview(_chartview)
 	if not chartview then
 		return {}
 	end
@@ -51,13 +50,15 @@ end
 ---@return number
 function NoteChartSetLibrary:indexof(chartview)
 	local chartfile_id = chartview.chartfile_id
-	local chartmeta_id = chartview.chartmeta_id
+	local chartdiff_id = chartview.chartdiff_id
 	local set_id = chartview.chartfile_set_id
 
 	local cdb = self.cacheModel.cacheDatabase
-	local ids = cdb.id_to_global_offset
-	return (ids[chartfile_id] and ids[chartfile_id][chartmeta_id] or
-		cdb.set_id_to_global_offset[set_id] or 0) + 1
+	return
+		cdb.chartdiff_id_to_global_index[chartdiff_id] or
+		cdb.chartfile_id_to_global_index[chartfile_id] or
+		cdb.set_id_to_global_index[set_id] or
+		1
 end
 
 return NoteChartSetLibrary

@@ -89,7 +89,7 @@ end
 
 local textFields = {
 	"hash",
-	"path",
+	"chartfile_name",
 	"artist",
 	"title",
 	"name",

@@ -37,10 +37,18 @@ function NoteChartLibrary:setNoteChartSetId(set_id)
 	end
 end
 
----@param chartfile_id number?
----@param chartmeta_id number?
+---@param chartview table
 ---@return number
-function NoteChartLibrary:getItemIndex(chartfile_id, chartmeta_id)
+function NoteChartLibrary:indexof(chartview)
+	local chartfile_id = chartview.chartfile_id
+	local chartmeta_id = chartview.chartmeta_id
+	local chartdiff_id = chartview.chartdiff_id
+
+	for i, chart in ipairs(self.items) do
+		if chart.chartfile_id == chartfile_id and chart.chartdiff_id == chartdiff_id then
+			return i
+		end
+	end
 	for i, chart in ipairs(self.items) do
 		if chart.chartfile_id == chartfile_id and chart.chartmeta_id == chartmeta_id then
 			return i

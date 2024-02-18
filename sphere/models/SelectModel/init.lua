@@ -253,6 +253,7 @@ function SelectModel:setConfig(item)
 	self.config.chartfile_set_id = item.chartfile_set_id
 	self.config.chartfile_id = item.chartfile_id
 	self.config.chartmeta_id = item.chartmeta_id
+	self.config.chartdiff_id = item.chartdiff_id
 end
 
 ---@param direction number?
@@ -344,9 +345,10 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 		return
 	end
 
-	self.config.chartfile_set_id = 0
-	self.config.chartfile_id = 0
-	self.config.chartmeta_id = 0
+	self.config.chartfile_set_id = nil
+	self.config.chartfile_id = nil
+	self.config.chartmeta_id = nil
+	self.config.chartdiff_id = nil
 
 	self.chartview = nil
 	self.scoreItem = nil
@@ -366,10 +368,7 @@ function SelectModel:pullNoteChart(noUpdate, noPullNext)
 	self.noteChartLibrary:setNoteChartSetId(self.config.chartfile_set_id)
 
 	local items = self.noteChartLibrary.items
-	self.chartview_index = self.noteChartLibrary:getItemIndex(
-		self.config.chartfile_id,
-		self.config.chartmeta_id
-	)
+	self.chartview_index = self.noteChartLibrary:indexof(self.config)
 
 	if not noUpdate then
 		self.noteChartStateCounter = self.noteChartStateCounter + 1
@@ -381,14 +380,16 @@ function SelectModel:pullNoteChart(noUpdate, noPullNext)
 	if chartview then
 		self.config.chartfile_id = chartview.chartfile_id
 		self.config.chartmeta_id = chartview.chartmeta_id
+		self.config.chartdiff_id = chartview.chartdiff_id
 		if not noPullNext then
 			self:pullScore(oldId and oldId == chartview.id)
 		end
 		return
 	end
 
-	self.config.chartfile_id = 0
-	self.config.chartmeta_id = 0
+	self.config.chartfile_id = nil
+	self.config.chartmeta_id = nil
+	self.config.chartdiff_id = nil
 
 	self.scoreItem = nil
 

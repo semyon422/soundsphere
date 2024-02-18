@@ -12,8 +12,9 @@ local CacheDatabase = class()
 function CacheDatabase:new(cdb)
 	self.chartviews_count = 0
 	self.chartviews = {}
-	self.set_id_to_global_offset = {}
-	self.id_to_global_offset = {}
+	self.set_id_to_global_index = {}
+	self.chartfile_id_to_global_index = {}
+	self.chartdiff_id_to_global_index = {}
 	self.params = {}
 
 	self.models = cdb.models
@@ -23,9 +24,10 @@ end
 
 ffi.cdef([[
 	typedef struct {
-		int32_t chartmeta_id;
 		int32_t chartfile_id;
 		int32_t chartfile_set_id;
+		int32_t chartmeta_id;
+		int32_t chartdiff_id;
 		int32_t score_id;
 		bool lamp;
 	} EntryStruct
@@ -53,8 +55,9 @@ local _queryAsync = thread.async(function(params)
 	end
 	local t = {
 		chartviews_count = self.chartviews_count,
-		set_id_to_global_offset = self.set_id_to_global_offset,
-		id_to_global_offset = self.id_to_global_offset,
+		set_id_to_global_index = self.set_id_to_global_index,
+		chartfile_id_to_global_index = self.chartfile_id_to_global_index,
+		chartdiff_id_to_global_index = self.chartdiff_id_to_global_index,
 		chartviews = ffi.string(self.chartviews, ffi.sizeof(self.chartviews)),
 	}
 
@@ -73,30 +76,23 @@ function CacheDatabase:queryAsync(params)
 	end
 
 	self.chartviews_count = t.chartviews_count
-	self.id_to_global_offset = t.id_to_global_offset
-	self.set_id_to_global_offset = t.set_id_to_global_offset
+	self.set_id_to_global_index = t.set_id_to_global_index
+	self.chartfile_id_to_global_index = t.chartfile_id_to_global_index
+	self.chartdiff_id_to_global_index = t.chartdiff_id_to_global_index
 
 	local size = ffi.sizeof("EntryStruct")
 	self.chartviews = ffi.new("EntryStruct[?]", #t.chartviews / size)
 	ffi.copy(self.chartviews, t.chartviews, #t.chartviews)
 end
 
----@param t table
----@param entry table
----@param offset number
-local function chart_id_to_offset(t, entry, offset)
-	local c, d = entry.chartfile_id, entry.chartmeta_id
-	t[c] = t[c] or {}
-	t[c][d] = offset
-end
-
 function CacheDatabase:queryNoteChartSets()
 	local params = self.params
 
 	local columns = {
-		"chartmeta_id",
 		"chartfile_id",
 		"chartfile_set_id",
+		"chartmeta_id",
+		"chartdiff_id",
 		"score_id",
 		params.difficulty .. " AS difficulty",
 	}
@@ -125,23 +121,26 @@ function CacheDatabase:queryNoteChartSets()
 	print("count", #objs)
 
 	local noteChartSets = ffi.new("EntryStruct[?]", #objs)
-	local id_to_global_offset = {}
-	local set_id_to_global_offset = {}
+	local chartfile_id_to_global_index = {}
+	local chartdiff_id_to_global_index = {}
+	local set_id_to_global_index = {}
 	self.chartviews = noteChartSets
-	self.id_to_global_offset = id_to_global_offset
-	self.set_id_to_global_offset = set_id_to_global_offset
+	self.chartfile_id_to_global_index = chartfile_id_to_global_index
+	self.chartdiff_id_to_global_index = chartdiff_id_to_global_index
+	self.set_id_to_global_index = set_id_to_global_index
 
 	local c = 0
 	for i, row in ipairs(objs) do
-		local j = i - 1
-		local entry = noteChartSets[j]
-		entry.chartmeta_id = row.chartmeta_id or 0
+		local entry = noteChartSets[i - 1]
 		entry.chartfile_id = row.chartfile_id
 		entry.chartfile_set_id = row.chartfile_set_id
+		entry.chartmeta_id = row.chartmeta_id or 0
+		entry.chartdiff_id = row.chartdiff_id or 0
 		entry.score_id = row.score_id or 0
 		entry.lamp = row.lamp
-		set_id_to_global_offset[entry.chartfile_set_id] = j
-		chart_id_to_offset(id_to_global_offset, entry, j)
+		set_id_to_global_index[entry.chartfile_set_id] = i
+		chartfile_id_to_global_index[entry.chartfile_id] = i
+		chartdiff_id_to_global_index[entry.chartdiff_id] = i
 		c = c + 1
 	end
 
@@ -175,6 +174,7 @@ function CacheDatabase:getChartviewsAtSet(chartfile_set_id)
 			"difficulty",
 			"name",
 			"chartmeta_id",
+			"chartdiff_id",
 		},
 	}
 
@@ -183,20 +183,36 @@ function CacheDatabase:getChartviewsAtSet(chartfile_set_id)
 	return objs
 end
 
----@param chartfile_id number
----@param chartmeta_id number
+---@param _chartview table
 ---@return rdb.ModelRow
-function CacheDatabase:getChartview(chartfile_id, chartmeta_id)
-	local where = {
-		chartfile_id = chartfile_id,
-		{
-			"or",
-			chartmeta_id = chartmeta_id,
-			chartmeta_id__isnull = true,
-		},
-	}
+function CacheDatabase:getChartview(_chartview)
+	local chartfile_id = _chartview.chartfile_id
+	local chartmeta_id = _chartview.chartmeta_id
+	local chartdiff_id = _chartview.chartdiff_id
 
-	local obj = self.models.chartviews:find(where)
+	local obj = self.models.chartviews:find({
+		chartfile_id = chartfile_id,
+		chartdiff_id = chartdiff_id,
+		chartdiff_id__isnull = not chartdiff_id,
+	})
+	if obj then
+		return obj
+	end
+
+	obj = self.models.chartviews:find({
+		chartfile_id = chartfile_id,
+		chartmeta_id = chartmeta_id,
+		chartmeta_id__isnull = not chartmeta_id,
+	})
+	if obj then
+		return obj
+	end
+
+	obj = self.models.chartviews:find({
+		chartfile_id = chartfile_id,
+		chartmeta_id__isnull = true,
+	})
+
 	return obj
 end
 
