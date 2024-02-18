@@ -83,43 +83,24 @@ function test.all(t)
 		return {{chartmeta = {}}}
 	end
 
-	local cg = ChartmetaGenerator(chartRepo, {getNoteCharts = getNoteCharts}, fs)
+	local cg = ChartmetaGenerator(chartRepo, {getNoteCharts = getNoteCharts})
 
-	cg.after = function() return true end
-
-	cg:generate("", 1)
-
-	t:eq(cg.cached, 1)
-	t:eq(cg.reused, 0)
-
-	cg:generate("", 1)
-
-	t:eq(cg.cached, 1)
-	t:eq(cg.reused, 1)
-
-	cg.after = function() return false end
+	t:eq(cg:generate(chartfiles["charts/a"], "content"), "cached")
+	t:eq(cg:generate(chartfiles["charts/b"], "content"), "reused")
 
 	chartfiles["charts/a"].hash = nil
-	cg:generate("", 1)
-	t:eq(cg.reused, 2)
+	t:eq(cg:generate(chartfiles["charts/a"], "content"), "reused")
 	t:assert(chartfiles["charts/a"].hash)
 
 	chartfiles["charts/a"].hash = nil
-	cg:generate("", 1, nil, true)
-	t:eq(cg.cached, 2)
+	t:eq(cg:generate(chartfiles["charts/a"], "content", true), "cached")
 	t:assert(chartfiles["charts/a"].hash)
 
 	chart_error = "err"
-	local actual_chartfile, actual_error
 	chartfiles["charts/a"].hash = nil
-	cg.error_handler = function(chartfile, err)
-		actual_chartfile = chartfile
-		actual_error = err
-	end
-	cg:generate("", 1, nil, true)
-	t:eq(cg.cached, 2)
+	local ok, actual_error = cg:generate(chartfiles["charts/a"], "content", true)
+	t:eq(ok, nil)
 	t:eq(actual_error, chart_error)
-	t:eq(actual_chartfile, chartfiles["charts/a"])
 	t:assert(not chartfiles["charts/a"].hash)
 
 	-- print(require("inspect")(actions))

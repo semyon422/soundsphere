@@ -86,13 +86,13 @@ function ChartRepo:deleteChartfiles(conds)
 	self.models.chartfiles:delete(conds)
 end
 
----@param path string?
 ---@param location_id number
+---@param set_id number?
 ---@return table
-function ChartRepo:selectUnhashedChartfiles(path, location_id)
+function ChartRepo:selectUnhashedChartfiles(location_id, set_id)
 	return self.models.located_chartfiles:select({
 		hash__isnull = true,
-		path__startswith = path,
+		set_id = set_id,
 		location_id = assert(location_id),
 	})
 end
@@ -101,6 +101,12 @@ end
 ---@return table?
 function ChartRepo:selectChartfileById(id)
 	return self.models.chartfiles:find({id = assert(id)})
+end
+
+---@param set_id number
+---@return table
+function ChartRepo:selectChartfilesAtSet(set_id)
+	return self.models.chartfiles:select({set_id = assert(set_id)})
 end
 
 ---@return number

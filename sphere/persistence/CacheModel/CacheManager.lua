@@ -6,6 +6,7 @@ local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGener
 local NoteChartFactory = require("notechart.NoteChartFactory")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local class = require("class")
+local path_util = require("path_util")
 
 ---@class sphere.CacheManager
 ---@operator call: sphere.CacheManager
@@ -26,44 +27,8 @@ function CacheManager:new(cdb)
 		end
 	end
 	self.fileCacheGenerator = FileCacheGenerator(self.chartRepo, self.noteChartFinder, handle_file_cache)
-
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartRepo, DifficultyModel)
-
-	local function after(i, n, chartfile, noteCharts)
-		print(chartfile.path)
-
-		if noteCharts then
-			for j, noteChart in ipairs(noteCharts) do
-				self.chartdiffGenerator:create(noteChart, chartfile.hash, j)
-			end
-		end
-
-		self.chartfiles_count = n
-		self.chartfiles_current = i
-		self:checkProgress()
-
-		if self.needStop then
-			return true
-		end
-		if i % 100 == 0 then
-			self:commit()
-			self:begin()
-		end
-	end
-
-	local function error_handler(chartfile, err)
-		print(chartfile.id)
-		print(chartfile.path)
-		print(err)
-	end
-
-	self.chartmetaGenerator = ChartmetaGenerator(
-		self.chartRepo,
-		NoteChartFactory,
-		love.filesystem,
-		after,
-		error_handler
-	)
+	self.chartmetaGenerator = ChartmetaGenerator(self.chartRepo, NoteChartFactory)
 end
 
 function CacheManager:begin()
@@ -97,6 +62,29 @@ function CacheManager:checkProgress()
 	end
 end
 
+function CacheManager:processChartfile(chartfile, location_prefix)
+	print(chartfile.path)
+
+	local full_path = path_util.join(location_prefix, chartfile.path)
+	local content = assert(love.filesystem.read(full_path))
+
+	local ok, err = self.chartmetaGenerator:generate(chartfile, content, false)
+
+	if not ok then
+		print(chartfile.id)
+		print(err)
+		return
+	end
+
+	if not err then
+		return
+	end
+
+	for j, noteChart in ipairs(err) do
+		self.chartdiffGenerator:create(noteChart, chartfile.hash, j)
+	end
+end
+
 ---@param path string?
 ---@param location_id number
 ---@param location_prefix string
@@ -113,8 +101,34 @@ function CacheManager:generateCacheFull(path, location_id, location_prefix)
 	self.state = 2
 	self:checkProgress()
 
+	local chartfile_set, set_id
+	local dir, name = NoteChartFinder.get_dir_name(path)
+	if name then
+		chartfile_set = self.chartRepo:selectChartfileSet(dir, name)
+	end
+	if chartfile_set then
+		set_id = chartfile_set.id
+		print("chartfile_set.id = " .. set_id)
+	end
+
+	local chartfiles = self.chartRepo:selectUnhashedChartfiles(location_id, set_id)
+	self.chartfiles_count = #chartfiles
+
 	self:begin()
-	self.chartmetaGenerator:generate(path, location_id, location_prefix, false)
+	for i, chartfile in ipairs(chartfiles) do
+		self.chartfiles_current = i
+
+		self:processChartfile(chartfile, location_prefix)
+		self:checkProgress()
+
+		if self.needStop then
+			break
+		end
+		if i % 100 == 0 then
+			self:commit()
+			self:begin()
+		end
+	end
 	self:commit()
 
 	self.state = 0

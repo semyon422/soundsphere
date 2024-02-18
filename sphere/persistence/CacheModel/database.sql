@@ -13,7 +13,7 @@ CREATE INDEX IF NOT EXISTS chartfiles_hash_idx ON chartfiles (`hash`);
 
 CREATE TABLE IF NOT EXISTS `chartfile_sets` (
 	`id` INTEGER PRIMARY KEY,
-	`dir` TEXT NOT NULL,
+	`dir` TEXT,
 	`name` TEXT NOT NULL,
 	`modified_at` INTEGER NOT NULL,
 	`is_file` INTEGER NOT NULL,
@@ -134,11 +134,11 @@ CREATE TABLE IF NOT EXISTS `chart_collections` (
 
 CREATE TEMP VIEW IF NOT EXISTS located_chartfiles AS
 SELECT
-CASE WHEN chartfile_sets.is_file
-THEN chartfile_sets.dir || "/" || chartfiles.name
-ELSE chartfile_sets.dir || "/" || chartfile_sets.name || "/" || chartfiles.name
-END path,
 chartfile_sets.location_id,
+chartfile_sets.is_file AS set_is_file,
+chartfile_sets.dir AS set_dir,
+chartfile_sets.name AS set_name,
+chartfiles.name AS chartfile_name,
 chartfiles.*
 FROM chartfiles
 INNER JOIN chartfile_sets ON
@@ -161,7 +161,9 @@ THEN chartfile_sets.dir
 ELSE chartfile_sets.dir || "/" || chartfile_sets.name
 END dir,
 chartfile_sets.location_id,
-chartfile_sets.name AS chartfile_set_name,
+chartfile_sets.is_file AS set_is_file,
+chartfile_sets.dir AS set_dir,
+chartfile_sets.name AS set_name,
 chartfile_sets.modified_at AS set_modified_at,
 chartfiles.name AS chartfile_name,
 chartfiles.modified_at,

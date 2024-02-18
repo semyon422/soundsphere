@@ -11,7 +11,7 @@ function NoteChartFinder:new(fs)
 	self.fs = fs
 end
 
-local function get_dir(dir)
+local function get_dir_name(dir)
 	if not dir then
 		return
 	end
@@ -21,6 +21,7 @@ local function get_dir(dir)
 	end
 	return nil, dir
 end
+NoteChartFinder.get_dir_name = get_dir_name
 
 ---@param prefix string?
 ---@param dir string?
@@ -30,7 +31,7 @@ function NoteChartFinder:lookupAsync(prefix, dir)
 	local items = self.fs.getDirectoryItems(prefix_dir)
 	local dir_info = self.fs.getInfo(prefix_dir)
 	if not dir_info then
-		local a, b = get_dir(dir)
+		local a, b = get_dir_name(dir)
 		coroutine.yield("not_found", a, b, nil)
 		return
 	end
@@ -43,7 +44,7 @@ function NoteChartFinder:lookupAsync(prefix, dir)
 		if info and info.type == "file" and NoteChartFactory:isRelatedContainer(item) then
 			if not chartPaths then
 				chartPaths = true
-				local a, b = get_dir(dir)
+				local a, b = get_dir_name(dir)
 				coroutine.yield("related_dir", a, b, dir_info.modtime)
 			end
 			coroutine.yield("related", dir, item, info.modtime)
@@ -61,7 +62,7 @@ function NoteChartFinder:lookupAsync(prefix, dir)
 		if info and info.type == "file" and NoteChartFactory:isUnrelatedContainer(item) then
 			if not containerPaths then
 				containerPaths = true
-				local a, b = get_dir(dir)
+				local a, b = get_dir_name(dir)
 				coroutine.yield("unrelated_dir", a, b, dir_info.modtime)
 			end
 			coroutine.yield("unrelated", dir, item, info.modtime)
@@ -73,7 +74,7 @@ function NoteChartFinder:lookupAsync(prefix, dir)
 		return
 	end
 
-	local a, b = get_dir(dir)
+	local a, b = get_dir_name(dir)
 	coroutine.yield("directory_dir", a, b, dir_info.modtime)
 
 	local checked_items = {}
