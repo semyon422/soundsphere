@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `chartfile_sets` (
 	`is_file` INTEGER NOT NULL,
 	`location_id` INTEGER NOT NULL,
 	FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE,
-	UNIQUE(`dir`, `name`)
+	UNIQUE(`location_id`, `dir`, `name`)
 );
 
 CREATE TABLE IF NOT EXISTS `locations` (
