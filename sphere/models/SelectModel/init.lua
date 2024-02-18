@@ -79,7 +79,7 @@ function SelectModel:updateSetItems()
 
 	local path = collectionItem.path
 	if path then
-		where.path__startswith = path
+		where.set_dir__startswith = path
 	end
 
 	params.where = where

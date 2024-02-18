@@ -152,14 +152,6 @@ chartfiles.id AS chartfile_id,
 chartdiffs.id AS chartdiff_id,
 scores.id AS score_id,
 chartfiles.set_id AS chartfile_set_id,
-CASE WHEN chartfile_sets.is_file
-THEN chartfile_sets.dir || "/" || chartfiles.name
-ELSE chartfile_sets.dir || "/" || chartfile_sets.name || "/" || chartfiles.name
-END path,
-CASE WHEN chartfile_sets.is_file
-THEN chartfile_sets.dir
-ELSE chartfile_sets.dir || "/" || chartfile_sets.name
-END dir,
 chartfile_sets.location_id,
 chartfile_sets.is_file AS set_is_file,
 chartfile_sets.dir AS set_dir,
