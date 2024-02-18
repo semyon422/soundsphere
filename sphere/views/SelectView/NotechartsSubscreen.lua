@@ -381,6 +381,13 @@ local function ModifierIconGrid(self)
 	timeRateModel:set(newRate)
 
 	local w, h = Layout:move("column1row3")
+	love.graphics.translate(w - 21 - right_w, 4)
+	love.graphics.translate(8, h - 42)
+	local inputMode = self.game.selectController.state.inputMode
+	local inputmode = Format.inputMode(tostring(inputMode)) or ""
+	just.text(inputmode)
+
+	local w, h = Layout:move("column1row3")
 	love.graphics.translate(21, 4)
 
 	ModifierIconGridView.game = self.game
