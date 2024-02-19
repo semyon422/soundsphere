@@ -117,7 +117,13 @@ function CacheDatabase:queryNoteChartSets()
 		columns[4] = "max(score_id)"
 	end
 
-	local objs = self.models.chartviews:select(params.where, options)
+	local where = table_util.copy(params.where)
+	local model = self.models.chartviews
+	if params.chartdiffs_list then
+		model = self.models.chartdiffviews
+	end
+
+	local objs = model:select(where, options)
 	print("count", #objs)
 
 	local noteChartSets = ffi.new("EntryStruct[?]", #objs)
@@ -147,9 +153,9 @@ function CacheDatabase:queryNoteChartSets()
 	self.chartviews_count = c
 end
 
----@param chartfile_set_id number
+---@param chartview table
 ---@return rdb.ModelRow[]
-function CacheDatabase:getChartviewsAtSet(chartfile_set_id)
+function CacheDatabase:getChartviewsAtSet(chartview)
 	local params = self.params
 
 	local columns = {
@@ -157,13 +163,19 @@ function CacheDatabase:getChartviewsAtSet(chartfile_set_id)
 		params.difficulty .. " AS difficulty",
 	}
 	local where = table_util.copy(params.where)
-	where.chartfile_set_id = chartfile_set_id
+	where.chartfile_set_id = chartview.chartfile_set_id
 
 	if params.lamp then
 		local case = ("CASE WHEN %s THEN TRUE ELSE FALSE END lamp"):format(
 			sql_util.bind(sql_util.conditions(params.lamp))
 		)
 		table.insert(columns, case)
+	end
+
+	local model = self.models.chartviews
+	if params.chartdiffs_list then
+		model = self.models.chartdiffviews
+		where.chartmeta_id = chartview.chartmeta_id
 	end
 
 	local options = {
@@ -178,7 +190,7 @@ function CacheDatabase:getChartviewsAtSet(chartfile_set_id)
 		},
 	}
 
-	local objs = self.models.chartviews:select(where, options)
+	local objs = model:select(where, options)
 
 	return objs
 end

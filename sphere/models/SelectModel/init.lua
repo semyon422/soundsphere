@@ -68,7 +68,8 @@ function SelectModel:updateSetItems()
 	params.order = table_util.copy(order)
 	table.insert(params.order, "chartmeta_id")
 
-	if config.collapse and group_allowed then
+	local group = group_allowed and config.collapse and not config.chartdiffs_list
+	if group then
 		params.group = {"chartfile_set_id"}
 	end
 
@@ -85,6 +86,7 @@ function SelectModel:updateSetItems()
 	params.where = where
 	params.lamp = lamp
 	params.difficulty = config.diff_column
+	params.chartdiffs_list = config.chartdiffs_list
 
 	self.cacheModel.cacheDatabase:queryAsync(params)
 	self.noteChartSetLibrary:updateItems()
@@ -272,7 +274,12 @@ function SelectModel:scrollNoteChartSet(direction, destination)
 	local chartview_set = items[destination]
 	self:setConfig(chartview_set)
 
-	self:pullNoteChart(old_chartview_set and old_chartview_set.chartfile_set_id == chartview_set.chartfile_set_id)
+	local config = self.configModel.configs.settings.select
+	if not old_chartview_set or config.chartdiffs_list then
+		return self:pullNoteChart()
+	end
+
+	self:pullNoteChart(old_chartview_set.chartfile_set_id == chartview_set.chartfile_set_id)
 end
 
 ---@param direction number?
@@ -365,7 +372,9 @@ end
 function SelectModel:pullNoteChart(noUpdate, noPullNext)
 	local oldId = self.chartview and self.chartview.id
 
-	self.noteChartLibrary:setNoteChartSetId(self.config.chartfile_set_id)
+	if not noUpdate then
+		self.noteChartLibrary:setNoteChartSetId(self.config)
+	end
 
 	local items = self.noteChartLibrary.items
 	self.chartview_index = self.noteChartLibrary:indexof(self.config)

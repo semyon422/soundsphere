@@ -154,6 +154,7 @@ return {
 	},
 	select = {
 		collapse = true,
+		chartdiffs_list = false,
 		diff_column = "enps_diff",
 	}
 }

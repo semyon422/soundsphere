@@ -5,7 +5,6 @@ local path_util = require("path_util")
 ---@operator call: sphere.NoteChartLibrary
 local NoteChartLibrary = class()
 
-NoteChartLibrary.set_id = 0
 NoteChartLibrary.itemsCount = 0
 
 ---@param cacheModel sphere.CacheModel
@@ -18,13 +17,9 @@ function NoteChartLibrary:clear()
 	self.items = {}
 end
 
----@param set_id number
-function NoteChartLibrary:setNoteChartSetId(set_id)
-	if set_id == self.set_id then
-		return
-	end
-	self.set_id = set_id
-	self.items = self.cacheModel.cacheDatabase:getChartviewsAtSet(set_id)
+---@param chartview table
+function NoteChartLibrary:setNoteChartSetId(chartview)
+	self.items = self.cacheModel.cacheDatabase:getChartviewsAtSet(chartview)
 	if #self.items == 0 then
 		return
 	end

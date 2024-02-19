@@ -101,6 +101,18 @@ local function NoteChartList(self)
 
 	NoteChartListView.game = self.game
 	NoteChartListView:draw(w, h)
+
+	w, h = Layout:move("column2row2row2")
+
+	h = 60
+	love.graphics.translate(w - (72 - h) / 2 - h, (72 - h) / 2)
+
+	local config = self.game.configModel.configs.settings.select
+
+	if imgui.Checkbox("chartdiffs list cb", config.chartdiffs_list, h) then
+		config.chartdiffs_list = not config.chartdiffs_list
+		self.game.selectModel:noDebouncePullNoteChartSet()
+	end
 end
 
 ---@param self table
@@ -109,7 +121,7 @@ local function ChartCells(self)
 
 	local chartview = self.game.selectModel.chartview
 
-	if not chartview.chartdiff_id then
+	if not chartview or not chartview.chartdiff_id then
 		return
 	end
 

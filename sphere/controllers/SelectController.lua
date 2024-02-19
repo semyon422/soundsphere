@@ -39,9 +39,11 @@ function SelectController:applyModifierMeta()
 	local playContext = self.playContext
 
 	local chartview = self.selectModel.chartview
-	if chartview then
-		self.state.inputMode:set(chartview.chartdiff_inputmode)
+	if not chartview then
+		return
 	end
+
+	self.state.inputMode:set(chartview.chartdiff_inputmode)
 
 	ModifierModel:applyMeta(playContext.modifiers, self.state)
 

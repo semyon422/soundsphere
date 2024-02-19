@@ -192,6 +192,51 @@ chartmetas.`index` = scores.`index` AND
 scores.is_top = 1
 ;
 
+CREATE TEMP VIEW IF NOT EXISTS chartdiffviews AS
+SELECT
+chartmetas.id AS chartmeta_id,
+chartfiles.id AS chartfile_id,
+chartdiffs.id AS chartdiff_id,
+scores.id AS score_id,
+chartfiles.set_id AS chartfile_set_id,
+chartfile_sets.location_id,
+chartfile_sets.is_file AS set_is_file,
+chartfile_sets.dir AS set_dir,
+chartfile_sets.name AS set_name,
+chartfile_sets.modified_at AS set_modified_at,
+chartfiles.name AS chartfile_name,
+chartfiles.modified_at,
+chartfiles.hash,
+scores.accuracy,
+scores.miss,
+chartmetas.*,
+chartdiffs.modifiers,
+chartdiffs.rate,
+chartdiffs.inputmode AS chartdiff_inputmode,
+chartdiffs.notes_count,
+chartdiffs.long_notes_count,
+chartdiffs.density_data,
+chartdiffs.sv_data,
+chartdiffs.enps_diff,
+chartdiffs.osu_diff,
+chartdiffs.msd_diff,
+chartdiffs.msd_diff_data,
+chartdiffs.user_diff,
+chartdiffs.user_diff_data
+FROM chartfiles
+LEFT JOIN chartmetas ON
+chartfiles.hash = chartmetas.hash
+INNER JOIN chartfile_sets ON
+chartfiles.set_id = chartfile_sets.id
+LEFT JOIN chartdiffs ON
+chartmetas.hash = chartdiffs.hash AND
+chartmetas.`index` = chartdiffs.`index`
+LEFT JOIN scores ON
+chartmetas.hash = scores.hash AND
+chartmetas.`index` = scores.`index` AND
+scores.is_top = 1
+;
+
 CREATE TEMP VIEW IF NOT EXISTS scores_list AS
 SELECT
 scores.id AS score_id,
