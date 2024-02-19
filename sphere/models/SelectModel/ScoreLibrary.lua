@@ -65,9 +65,10 @@ function ScoreLibrary:filterScores(scores)
 	return newScores
 end
 
----@param chartmeta table
+---@param chartview table
+---@param exact boolean?
 ---@return nil?
-function ScoreLibrary:updateItemsAsync(chartmeta)
+function ScoreLibrary:updateItemsAsync(chartview, exact)
 	local hash_index = self.hash .. self.index
 	self.items = {}
 
@@ -75,11 +76,11 @@ function ScoreLibrary:updateItemsAsync(chartmeta)
 	if select.scoreSourceName == "online" then
 		self:updateItemsOnline()
 	else
-		self:updateItemsLocal(chartmeta)
+		self:updateItemsLocal(chartview, exact)
 	end
 
 	if self.hash .. self.index ~= hash_index then
-		return self:updateItemsAsync()
+		return self:updateItemsAsync(chartview, exact)
 	end
 end
 
@@ -121,14 +122,18 @@ function ScoreLibrary:fillScoreRating(score)
 	score.score = s * 10000
 end
 
----@param chartmeta table
-function ScoreLibrary:updateItemsLocal(chartmeta)
-	local scores = self.cacheModel.chartRepo:getScores(
-		self.hash,
-		self.index
-	)
+---@param chartview table
+---@param exact boolean?
+function ScoreLibrary:updateItemsLocal(chartview, exact)
+	local scores
+	if exact then
+		scores = self.cacheModel.chartRepo:getScoresExact(chartview)
+	else
+		scores = self.cacheModel.chartRepo:getScores(chartview)
+	end
+
 	for i, score in ipairs(scores) do
-		self.cacheModel.chartdiffGenerator:fillMeta(score, chartmeta)
+		self.cacheModel.chartdiffGenerator:fillMeta(score, chartview)
 		self:fillScoreRating(score)
 	end
 	table.sort(scores, function(a, b)

@@ -253,13 +253,23 @@ function ChartRepo:updateScore(score)
 	return self.models.scores:update(score, {id = score.id})
 end
 
----@param hash string
----@param index number
+---@param chartview table
 ---@return table
-function ChartRepo:getScores(hash, index)
+function ChartRepo:getScores(chartview)
 	return self.models.scores_list:select({
-		hash = assert(hash),
-		index = assert(index),
+		hash = assert(chartview.hash),
+		index = assert(chartview.index),
+	})
+end
+
+---@param chartview table
+---@return table
+function ChartRepo:getScoresExact(chartview)
+	return self.models.scores_list:select({
+		hash = assert(chartview.hash),
+		index = assert(chartview.index),
+		modifiers = assert(chartview.modifiers),
+		rate = assert(chartview.rate),
 	})
 end
 

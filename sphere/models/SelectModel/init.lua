@@ -370,7 +370,7 @@ end
 ---@param noUpdate boolean?
 ---@param noPullNext boolean?
 function SelectModel:pullNoteChart(noUpdate, noPullNext)
-	local oldId = self.chartview and self.chartview.id
+	local old_chartview = self.chartview
 
 	if not noUpdate then
 		self.noteChartLibrary:setNoteChartSetId(self.config)
@@ -390,8 +390,8 @@ function SelectModel:pullNoteChart(noUpdate, noPullNext)
 		self.config.chartfile_id = chartview.chartfile_id
 		self.config.chartmeta_id = chartview.chartmeta_id
 		self.config.chartdiff_id = chartview.chartdiff_id
-		if not noPullNext then
-			self:pullScore(oldId and oldId == chartview.id)
+		if not noPullNext and old_chartview then
+			self:pullScore()
 		end
 		return
 	end
@@ -432,21 +432,27 @@ function SelectModel:pullScore(noUpdate)
 		return
 	end
 
-	if not noUpdate then
-		self.scoreStateCounter = self.scoreStateCounter + 1
-		self.scoreLibrary:setHash(chartview.hash)
-		self.scoreLibrary:setIndex(chartview.index)
-
-		local select = self.configModel.configs.select
-		if select.scoreSourceName == "online" then
-			self.scoreLibrary:clear()
-			delay.debounce(self, "scoreDebounce", self.debounceTime,
-				self.updateScoreOnlineAsync, self
-			)
-			return
-		end
-		self.scoreLibrary:updateItems(self.chartview)
+	if noUpdate then
+		self:findScore()
+		return
 	end
+
+	self.scoreStateCounter = self.scoreStateCounter + 1
+	self.scoreLibrary:setHash(chartview.hash)
+	self.scoreLibrary:setIndex(chartview.index)
+
+	local select = self.configModel.configs.select
+	if select.scoreSourceName == "online" then
+		self.scoreLibrary:clear()
+		delay.debounce(self, "scoreDebounce", self.debounceTime,
+			self.updateScoreOnlineAsync, self
+		)
+		return
+	end
+
+	local config = self.configModel.configs.settings.select
+	local exact = config.chartdiffs_list
+	self.scoreLibrary:updateItems(self.chartview, exact)
 
 	self:findScore()
 end

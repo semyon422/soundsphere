@@ -23,7 +23,7 @@ SortModel.orders = {
 	bpm = {{"bpm"}, false},
 	modtime = {{"modified_at"}, false},
 	["set modtime"] = {{"set_modified_at"}, true},
-	["played top"] = {{"score_id"}, false},
+	["last played"] = {{"score_time"}, false},
 }
 
 SortModel.name = "title"
@@ -37,7 +37,7 @@ SortModel.names = {
 	"bpm",
 	"modtime",
 	"set modtime",
-	"played top",
+	"last played",
 }
 
 return SortModel

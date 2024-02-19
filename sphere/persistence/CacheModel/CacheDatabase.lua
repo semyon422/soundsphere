@@ -28,7 +28,6 @@ ffi.cdef([[
 		int32_t chartfile_set_id;
 		int32_t chartmeta_id;
 		int32_t chartdiff_id;
-		int32_t score_id;
 		bool lamp;
 	} EntryStruct
 ]])
@@ -93,7 +92,6 @@ function CacheDatabase:queryNoteChartSets()
 		"chartfile_set_id",
 		"chartmeta_id",
 		"chartdiff_id",
-		"score_id",
 		params.difficulty .. " AS difficulty",
 	}
 
@@ -112,10 +110,6 @@ function CacheDatabase:queryNoteChartSets()
 		group = params.group,
 		order = params.order,
 	}
-
-	if params.group then
-		columns[4] = "max(score_id)"
-	end
 
 	local where = table_util.copy(params.where)
 	local model = self.models.chartviews
@@ -142,7 +136,6 @@ function CacheDatabase:queryNoteChartSets()
 		entry.chartfile_set_id = row.chartfile_set_id
 		entry.chartmeta_id = row.chartmeta_id or 0
 		entry.chartdiff_id = row.chartdiff_id or 0
-		entry.score_id = row.score_id or 0
 		entry.lamp = row.lamp
 		set_id_to_global_index[entry.chartfile_set_id] = i
 		chartfile_id_to_global_index[entry.chartfile_id] = i
