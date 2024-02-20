@@ -42,6 +42,34 @@ function TimeRateModel:get()
 	return rate
 end
 
+---@param rate number
+---@return string
+function TimeRateModel:getRateType(rate)
+	local gameplay = self.configModel.configs.settings.gameplay
+
+	local is_exp, is_default
+
+	if math.abs(rate - math_util.round(rate, self.range.default[3])) % 1 < 1e-6 then
+		is_default = true
+	end
+
+	local exp = 10 * math.log(rate, 2)
+	if math.abs(exp - math.floor(exp + 0.5)) % 1 < 1e-6 then
+		is_exp = true
+	end
+
+	if gameplay.rateType == "exp" and is_exp then
+		return "exp"
+	end
+	if gameplay.rateType == "default" and is_default then
+		return "default"
+	end
+	if is_exp then
+		return "exp"
+	end
+	return "default"
+end
+
 ---@param newRate number
 function TimeRateModel:set(newRate)
 	local gameplay = self.configModel.configs.settings.gameplay

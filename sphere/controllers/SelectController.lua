@@ -43,12 +43,10 @@ function SelectController:applyModifierMeta()
 		return
 	end
 
-	self.state.inputMode:set(chartview.chartdiff_inputmode)
+	self.previewModel:setPitch(playContext.rate)
+	self.state.inputMode:set(chartview.inputmode)
 
 	ModifierModel:applyMeta(playContext.modifiers, self.state)
-
-	local rate = chartview.rate or 1
-	self.previewModel:setPitch(playContext.rate * rate)
 end
 
 function SelectController:beginUnload()
@@ -69,6 +67,7 @@ function SelectController:update()
 	if selectModel:isChanged() then
 		self.backgroundModel:setBackgroundPath(selectModel:getBackgroundPath())
 		self.previewModel:setAudioPathPreview(selectModel:getAudioPathPreview())
+		self.playContext:load(self.configModel.configs.play)
 		self:applyModifierMeta()
 	end
 

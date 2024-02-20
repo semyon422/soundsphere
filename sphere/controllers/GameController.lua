@@ -49,11 +49,6 @@ function GameController:new()
 	self.noteSkinModel = NoteSkinModel(self.persistence.configModel)
 	self.inputModel = InputModel(self.persistence.configModel)
 	self.difficultyModel = DifficultyModel()
-	self.selectModel = SelectModel(
-		self.persistence.configModel,
-		self.persistence.cacheModel,
-		self.onlineModel
-	)
 	self.resourceModel = ResourceModel(
 		self.persistence.configModel,
 		self.persistence.fileFinder
@@ -79,6 +74,12 @@ function GameController:new()
 		self.onlineModel,
 		self.persistence.osudirectModel,
 		self.playContext
+	)
+	self.selectModel = SelectModel(
+		self.persistence.configModel,
+		self.persistence.cacheModel,
+		self.onlineModel,
+		self.timeRateModel
 	)
 
 	self.cacheModel = self.persistence.cacheModel

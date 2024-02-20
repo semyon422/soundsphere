@@ -125,7 +125,7 @@ local function ChartCells(self)
 		return
 	end
 
-	local baseTimeRate = self.game.playContext.rate * chartview.rate
+	local baseTimeRate = self.game.playContext.rate
 
 	local bpm = 0
 	local length = 0
@@ -169,7 +169,7 @@ local function ChartCells(self)
 	end
 
 	w, h = Layout:move("column2row1")
-	love.graphics.translate(w - 55, h / 2 - 55)
+	love.graphics.translate(0, h / 2 - 55)
 	if imgui.TextOnlyButton("play auto", "AP", 55, 55) then
 		self.game.rhythmModel:setAutoplay(true)
 		self:play()
@@ -178,17 +178,6 @@ local function ChartCells(self)
 		self.game.rhythmModel:setPromode(true)
 		self:play()
 	end
-
-	w, h = Layout:move("column2row1")
-	love.graphics.translate(12, h / 2 - 55 / 2 - 35)
-	if chartview.rate ~= 1 then
-		just.text(Format.timeRate(chartview.rate))
-	end
-
-	w, h = Layout:move("column2row1")
-	love.graphics.translate(10, h / 2 - 55 / 2)
-	ModifierIconGridView.game = self.game
-	ModifierIconGridView:draw(chartview.modifiers, w / 2, 55 * 2, 55)
 end
 
 ---@param self table

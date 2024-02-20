@@ -24,9 +24,11 @@ SelectModel.debounceTime = 0.5
 ---@param configModel sphere.ConfigModel
 ---@param cacheModel sphere.CacheModel
 ---@param onlineModel sphere.OnlineModel
-function SelectModel:new(configModel, cacheModel, onlineModel)
+---@param timeRateModel sphere.TimeRateModel
+function SelectModel:new(configModel, cacheModel, onlineModel, timeRateModel)
 	self.configModel = configModel
 	self.cacheModel = cacheModel
+	self.timeRateModel = timeRateModel
 
 	self.noteChartLibrary = NoteChartLibrary(cacheModel)
 	self.noteChartSetLibrary = NoteChartSetLibrary(cacheModel)
@@ -201,6 +203,9 @@ end
 
 SelectModel.noDebouncePullNoteChartSet = thread.coro(function(self, ...)
 	self:pullNoteChartSet(...)
+	if self.chartview then
+		self:setConfig(self.chartview)
+	end
 end)
 
 ---@param sortFunctionName string
@@ -250,12 +255,23 @@ function SelectModel:scrollRandom()
 	self:scrollNoteChartSet(nil, destination)
 end
 
----@param item table
-function SelectModel:setConfig(item)
-	self.config.chartfile_set_id = item.chartfile_set_id
-	self.config.chartfile_id = item.chartfile_id
-	self.config.chartmeta_id = item.chartmeta_id
-	self.config.chartdiff_id = item.chartdiff_id
+---@param chartview table
+function SelectModel:setConfig(chartview)
+	self.config.chartfile_set_id = chartview.chartfile_set_id
+	self.config.chartfile_id = chartview.chartfile_id
+	self.config.chartmeta_id = chartview.chartmeta_id
+	self.config.chartdiff_id = chartview.chartdiff_id
+
+	local config = self.configModel.configs.settings.select
+	if not config.chartdiffs_list then
+		return
+	end
+	self.configModel.configs.play.modifiers = chartview.modifiers
+	self.configModel.configs.play.rate = chartview.rate
+
+	local gameplay = self.configModel.configs.settings.gameplay
+	local timeRateModel = self.timeRateModel
+	gameplay.rateType = timeRateModel:getRateType(chartview.rate)
 end
 
 ---@param direction number?
