@@ -118,7 +118,7 @@ end
 function ScoreLibrary:fillScoreRating(score)
 	local window = self.configModel.configs.settings.gameplay.ratingHitTimingWindow
 	local s = erfunc.erf(window / (score.accuracy * math.sqrt(2)))
-	score.rating = score.difficulty * s
+	score.rating = (score.difficulty or 0) * s
 	score.score = s * 10000
 end
 

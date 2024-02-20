@@ -1,7 +1,9 @@
 local class = require("class")
 local json = require("json")
 local stbl = require("stbl")
+local table_util = require("table_util")
 local md5 = require("md5")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 local ModifierEncoder = class()
 
@@ -34,31 +36,183 @@ end
 ---@return table
 function ModifierEncoder:decode(s)
 	local ok, err = pcall(stbl.decode, s)
-	if ok then
-		local t = {}
-		for i, m in ipairs(err) do
-			t[i] = {
-				id = m[1],
-				version = m[2],
-				value = m[3],
-			}
-		end
-		return t
+	if not ok then
+		return {}
 	end
-	ok, err = pcall(json.decode, s)
-	if ok then
-		return err
+	local t = {}
+	for i, m in ipairs(err) do
+		t[i] = {
+			id = m[1],
+			version = m[2],
+			value = m[3],
+		}
+	end
+	return t
+end
+
+--[[
+AMod, 0Q, 1.2X, AltK, AM10
+14:0,key;11:0,10
+[{"id":19,"version":0,"value":3}]
+]]
+
+local mods_encoded_since = 1633689604
+
+local ids = ModifierModel.Modifiers
+local ids_inv = table_util.invert(ModifierModel.Modifiers)
+
+local function parse_mod_from_name(s)
+	if s == "AMod" or s == "XMod" or s == "ToOsu" or s:match("^(.+)dB$") then
+		return {}
+	elseif s == "CMod" then
+		return {const = true}
+	elseif s:match("^(.+)Q$") then
+		return {rate = 2 ^ (tonumber(s:match("^(.+)Q$")) / 10)}
+	elseif s:match("^(.+)X$") then
+		return {rate = tonumber(s:match("^(.+)X$"))}
+	elseif s:match("^Alt(.)$") then
+		return {modifier = {
+			id = ids.Alternate,
+			version = 0,
+			value = s:match("^Alt(.)$") == "K" and "key" or "scratch",
+		}}
+	elseif s:match("^Alt2(.)$") then
+		return {modifier = {
+			id = ids.Alternate2,
+			version = 0,
+			value = s:match("^Alt2(.)$") == "K" and "key" or "scratch",
+		}}
+	elseif s:match("^AM(.+)$") then
+		return {modifier = {
+			id = ids.Automap,
+			version = 0,
+			value = tonumber(s:match("^AM(.+)$")),
+		}}
+	elseif s == "DP" then
+		return {modifier = {
+			id = ids.MultiplePlay,
+			version = 0,
+			value = 2,
+		}}
+	elseif s == "TP" then
+		return {modifier = {
+			id = ids.MultiplePlay,
+			version = 0,
+			value = 3,
+		}}
+	elseif s == "QP" then
+		return {modifier = {
+			id = ids.MultiplePlay,
+			version = 0,
+			value = 4,
+		}}
+	elseif s == "DO" then
+		return {modifier = {
+			id = ids.MultiOverPlay,
+			version = 0,
+			value = 2,
+		}}
+	elseif s == "TO" then
+		return {modifier = {
+			id = ids.MultiOverPlay,
+			version = 0,
+			value = 3,
+		}}
+	elseif s == "QO" then
+		return {modifier = {
+			id = ids.MultiOverPlay,
+			version = 0,
+			value = 4,
+		}}
+	elseif s == "NLN" then
+		return {modifier = {
+			id = ids.NoLongNote,
+			version = 0,
+		}}
+	elseif s == "BS" then
+		return {modifier = {
+			id = ids.BracketSwap,
+			version = 0,
+		}}
+	elseif s == "NoScratch" then
+		return {modifier = {
+			id = ids.NoScratch,
+			version = 0,
+		}}
+	elseif s:match("^RD(.)$") then
+		local v = s:match("^RD(.)$")
+		return {modifier = {
+			id = ids.Random,
+			version = 0,
+			value = v == "A" and "all" or v == "L" and "left" or v == "R" and "right",
+		}}
+	elseif s:match("^Mirror(.)$") then
+		local v = s:match("^Mirror(.)$")
+		return {modifier = {
+			id = ids.Mirror,
+			version = 0,
+			value = v == "A" and "all" or v == "L" and "left" or v == "R" and "right",
+		}}
+	elseif s:match("^FLN(.)$") then
+		return {modifier = {
+			id = ids.FullLongNote,
+			version = 0,
+			value = tonumber(s:match("^FLN(.)$")),
+		}}
+	end
+	error(s)
+end
+
+---@param score table
+---@return table
+---@return number
+---@return boolean
+function ModifierEncoder:decodeOld(score)
+	local mods = score.modifiers
+	local time = score.time
+	local rate = 1
+	local const = false
+	local config = {}
+
+	if time >= mods_encoded_since then
+		rate = score.rate
 	end
 
-	local config = {}
-	for id, version, value in s:gmatch("(%d+):([^;^,]+),([^;^,]+)") do
-		table.insert(config, {
-			id = tonumber(id),
-			version = tonumber(version),
-			value = decodeValue(value),
-		})
+	if mods == "" or mods == "[]" then
+		return config, rate, const
 	end
-	return config
+
+	local ok, err = pcall(json.decode, mods)
+	if ok then
+		return err, rate, const
+	end
+
+	if time >= mods_encoded_since then
+		for id, version, value in mods:gmatch("(%d+):([^;^,]+),([^;^,]+)") do
+			if ids_inv[id] then
+				table.insert(config, {
+					id = tonumber(id),
+					version = tonumber(version),
+					value = decodeValue(value),
+				})
+			end
+		end
+		return config, rate, const
+	end
+
+	for _, mod in ipairs(mods:split(", ")) do
+		local info = parse_mod_from_name(mod)
+		if info.rate then
+			rate = rate * info.rate
+		end
+		if info.const then
+			const = info.const
+		end
+		if info.modifier then
+			table.insert(config, info.modifier)
+		end
+	end
+	return config, rate, const
 end
 
 return ModifierEncoder
