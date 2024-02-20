@@ -195,7 +195,13 @@ function CacheDatabase:getChartview(_chartview)
 	local chartmeta_id = _chartview.chartmeta_id
 	local chartdiff_id = _chartview.chartdiff_id
 
-	local obj = self.models.chartviews:find({
+	local params = self.params
+	local model = self.models.chartviews
+	if params.chartdiffs_list then
+		model = self.models.chartdiffviews
+	end
+
+	local obj = model:find({
 		chartfile_id = chartfile_id,
 		chartdiff_id = chartdiff_id,
 		chartdiff_id__isnull = not chartdiff_id,
@@ -204,7 +210,7 @@ function CacheDatabase:getChartview(_chartview)
 		return obj
 	end
 
-	obj = self.models.chartviews:find({
+	obj = model:find({
 		chartfile_id = chartfile_id,
 		chartmeta_id = chartmeta_id,
 		chartmeta_id__isnull = not chartmeta_id,
@@ -213,7 +219,7 @@ function CacheDatabase:getChartview(_chartview)
 		return obj
 	end
 
-	obj = self.models.chartviews:find({
+	obj = model:find({
 		chartfile_id = chartfile_id,
 		chartmeta_id__isnull = true,
 	})

@@ -274,9 +274,16 @@ function SelectModel:scrollNoteChartSet(direction, destination)
 	local chartview_set = items[destination]
 	self:setConfig(chartview_set)
 
-	local config = self.configModel.configs.settings.select
-	if not old_chartview_set or config.chartdiffs_list then
+	if not old_chartview_set then
 		return self:pullNoteChart()
+	end
+
+	local config = self.configModel.configs.settings.select
+	if config.chartdiffs_list then
+		return self:pullNoteChart(
+			old_chartview_set.chartfile_id == chartview_set.chartfile_id and
+			old_chartview_set.chartmeta_id == chartview_set.chartmeta_id
+		)
 	end
 
 	self:pullNoteChart(old_chartview_set.chartfile_set_id == chartview_set.chartfile_set_id)
