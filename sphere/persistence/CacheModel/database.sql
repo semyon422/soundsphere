@@ -104,7 +104,6 @@ CREATE TABLE IF NOT EXISTS `scores` (
 	`timings` TEXT,
 	`single` INTEGER,
 
-	`is_top` REAL DEFAULT 0,
 	`time` REAL,
 	`accuracy` REAL,
 	`max_combo` REAL,
@@ -118,8 +117,7 @@ CREATE TABLE IF NOT EXISTS `scores` (
 	`pauses` REAL
 );
 
-CREATE INDEX IF NOT EXISTS scores_hash_index_idx ON scores (`hash`, `index`, `is_top`)
-WHERE is_top = 1;
+CREATE INDEX IF NOT EXISTS scores_himr_idx ON scores (`hash`, `index`, `modifiers`, `rate`);
 
 CREATE TABLE IF NOT EXISTS `collections` (
 	`id` INTEGER PRIMARY KEY,

@@ -317,7 +317,6 @@ function GameplayController:saveScore()
 		-- timings = playContext.timings,
 		single = playContext.single,
 
-		is_top = false,
 		time = os.time(),
 		accuracy = scoreSystem.normalscore.accuracyAdjusted,
 		max_combo = scoreSystem.base.maxCombo,
@@ -330,7 +329,7 @@ function GameplayController:saveScore()
 		earlylate = scoreSystem.misc.earlylate,
 		pauses = scoreEngine.pausesCount,
 	}
-	local scoreEntry = self.cacheModel.chartRepo:insertScore(score, chartdiff)
+	local scoreEntry = self.cacheModel.chartRepo:insertScore(score)
 
 	local base = scoreSystem.base
 	if base.hitCount / base.notesCount >= 0.5 then

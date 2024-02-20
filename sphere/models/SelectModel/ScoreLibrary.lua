@@ -173,7 +173,6 @@ function ScoreLibrary:transformOnlineScore(score)
 		id = score.id,
 		chart_hash = "",
 		chart_index = 1,
-		is_top = false,
 		player_name = score.user.name,
 		time = score.created_at,
 		accuracy = score.accuracy,

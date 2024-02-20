@@ -37,10 +37,8 @@ function ScoreListView:drawItem(i, w, h)
 		self.screenView:loadScore(i)
 	end
 
-	if item.is_top then
+	if loaded then
 		love.graphics.circle("fill", 44, 36, 7)
-	end
-	if loaded or item.is_top then
 		love.graphics.circle("line", 44, 36, 7)
 	end
 
