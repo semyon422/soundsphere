@@ -248,6 +248,14 @@ function ChartRepo:getScoresExact(chartview)
 end
 
 ---@return table
+function ChartRepo:getScoresWithMissingChartdiffs()
+	return self.models.scores_list:select({
+		chartdiff_id__isnull = true,
+		chartmeta_id__isnotnull = true,
+	})
+end
+
+---@return table
 function ChartRepo:selectLocations()
 	return self.models.locations:select()
 end

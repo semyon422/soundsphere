@@ -257,6 +257,8 @@ CREATE TEMP VIEW IF NOT EXISTS scores_list AS
 SELECT
 scores.id AS score_id,
 scores.*,
+chartmetas.id AS chartmeta_id,
+chartdiffs.id AS chartdiff_id,
 chartdiffs.enps_diff AS difficulty,
 chartdiffs.hash,
 chartdiffs.`index`,
@@ -279,4 +281,7 @@ scores.hash = chartdiffs.hash AND
 scores.`index` = chartdiffs.`index` AND
 scores.modifiers = chartdiffs.modifiers AND
 scores.rate = chartdiffs.rate
+LEFT JOIN chartmetas ON
+scores.hash = chartmetas.hash AND
+scores.`index` = chartmetas.`index`
 ;

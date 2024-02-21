@@ -170,6 +170,9 @@ function section_draw.metadata(self)
 	if imgui.button("cacheStatus update", "update") then
 		cacheStatus:update()
 	end
+	if imgui.button("getScoresWithMissingChartdiffs", "getScoresWithMissingChartdiffs") then
+		print(#self.game.cacheModel.chartRepo:getScoresWithMissingChartdiffs())
+	end
 	if imgui.button("delete", "delete chartmetas, reset chartfiles") then
 		self.game.cacheModel.chartRepo:deleteChartmetas()
 		self.game.cacheModel.chartRepo:resetChartfileHash()
