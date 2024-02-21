@@ -104,17 +104,17 @@ CREATE TABLE IF NOT EXISTS `scores` (
 	`timings` TEXT,
 	`single` INTEGER,
 
-	`time` REAL,
+	`time` INTEGER,
 	`accuracy` REAL,
-	`max_combo` REAL,
+	`max_combo` INTEGER,
 	`replay_hash` TEXT,
 	`ratio` REAL,
-	`perfect` REAL,
-	`not_perfect` REAL,
-	`miss` REAL,
+	`perfect` INTEGER,
+	`not_perfect` INTEGER,
+	`miss` INTEGER,
 	`mean` REAL,
 	`earlylate` REAL,
-	`pauses` REAL
+	`pauses` INTEGER
 );
 
 CREATE INDEX IF NOT EXISTS scores_himr_idx ON scores (`hash`, `index`, `modifiers`, `rate`);
