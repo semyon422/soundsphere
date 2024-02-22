@@ -157,9 +157,9 @@ chartfile_sets.modified_at AS set_modified_at,
 chartfiles.name AS chartfile_name,
 chartfiles.modified_at,
 chartfiles.hash,
-scores.accuracy,
-scores.miss,
-scores.time AS score_time,
+MIN(scores.accuracy) AS accuracy,
+MIN(scores.miss) AS miss,
+MAX(scores.time) AS score_time,
 chartmetas.*,
 chartdiffs.modifiers,
 chartdiffs.rate,
@@ -184,19 +184,12 @@ chartmetas.hash = chartdiffs.hash AND
 chartmetas.`index` = chartdiffs.`index` AND
 chartdiffs.modifiers = "" AND
 chartdiffs.rate = 1.0
-LEFT JOIN (
-	SELECT
-	hash, `index`, modifiers, rate,
-	MIN(accuracy) AS accuracy,
-	MIN(miss) AS miss,
-	MAX(time) AS time
-	FROM scores
-	GROUP BY hash, `index`, modifiers, rate
-) scores ON
+LEFT JOIN scores ON
 chartmetas.hash = scores.hash AND
 chartmetas.`index` = scores.`index` AND
 scores.modifiers = "" AND
 scores.rate = 1.0
+GROUP BY scores.hash, scores.`index`, scores.modifiers, scores.rate
 ;
 
 CREATE TEMP VIEW IF NOT EXISTS chartdiffviews AS
@@ -213,9 +206,9 @@ chartfile_sets.modified_at AS set_modified_at,
 chartfiles.name AS chartfile_name,
 chartfiles.modified_at,
 chartfiles.hash,
-scores.accuracy,
-scores.miss,
-scores.time AS score_time,
+MIN(scores.accuracy) AS accuracy,
+MIN(scores.miss) AS miss,
+MAX(scores.time) AS score_time,
 chartmetas.*,
 chartdiffs.modifiers,
 chartdiffs.rate,
@@ -238,19 +231,12 @@ chartfiles.set_id = chartfile_sets.id
 LEFT JOIN chartdiffs ON
 chartmetas.hash = chartdiffs.hash AND
 chartmetas.`index` = chartdiffs.`index`
-LEFT JOIN (
-	SELECT
-	hash, `index`, modifiers, rate,
-	MIN(accuracy) AS accuracy,
-	MIN(miss) AS miss,
-	MAX(time) AS time
-	FROM scores
-	GROUP BY hash, `index`, modifiers, rate
-) scores ON
+LEFT JOIN scores ON
 chartmetas.hash = scores.hash AND
 chartmetas.`index` = scores.`index` AND
 chartdiffs.modifiers = scores.modifiers AND
 chartdiffs.rate = scores.rate
+GROUP BY scores.hash, scores.`index`, scores.modifiers, scores.rate
 ;
 
 CREATE TEMP VIEW IF NOT EXISTS scores_list AS
