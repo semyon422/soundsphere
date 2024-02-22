@@ -103,6 +103,12 @@ function ChartRepo:selectChartfileById(id)
 	return self.models.chartfiles:find({id = assert(id)})
 end
 
+---@param hash string
+---@return table?
+function ChartRepo:selectChartfileByHash(hash)
+	return self.models.located_chartfiles:find({hash = assert(hash)})
+end
+
 ---@param set_id number
 ---@return table
 function ChartRepo:selectChartfilesAtSet(set_id)

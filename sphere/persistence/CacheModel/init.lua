@@ -1,6 +1,7 @@
 local thread = require("thread")
 local class = require("class")
 local physfs = require("physfs")
+local path_util = require("path_util")
 local CacheDatabase = require("sphere.persistence.CacheModel.CacheDatabase")
 local ChartRepo = require("sphere.persistence.CacheModel.ChartRepo")
 local ChartsDatabase = require("sphere.persistence.CacheModel.ChartsDatabase")
@@ -9,6 +10,8 @@ local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGener
 local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
 local OldScoresMigrator = require("sphere.persistence.CacheModel.OldScoresMigrator")
 local DifficultyModel = require("sphere.models.DifficultyModel")
+local NoteChartFactory = require("notechart.NoteChartFactory")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.CacheModel
 ---@operator call: sphere.CacheModel
@@ -130,5 +133,38 @@ function CacheModel:process()
 end
 
 CacheModel.process = thread.coro(CacheModel.process)
+
+function CacheModel:computeScoresWithMissingChartdiffs()
+	local chartRepo = self.chartRepo
+	local scores = chartRepo:getScoresWithMissingChartdiffs()
+
+	for _, score in ipairs(scores) do
+		local chartfile = chartRepo:selectChartfileByHash(score.hash)
+		local chartmeta = chartRepo:selectChartmeta(score.hash, score.index)
+		if chartfile and chartmeta then
+			local location = self.chartRepo:selectLocationById(chartfile.location_id)
+			local prefix = self.locationManager:getPrefix(location)
+
+			local full_path = path_util.join(prefix, chartfile.path)
+			local content = assert(love.filesystem.read(full_path))
+
+			local noteChart, err = NoteChartFactory:getNoteChart(chartfile.name, content, score.index)
+			if not noteChart then
+				return nil, err
+			else
+				ModifierModel:apply(score.modifiers, noteChart)
+
+				local chartdiff = self.chartdiffGenerator:compute(noteChart, score.rate)
+				chartdiff.modifiers = score.modifiers
+				chartdiff.hash = score.hash
+				chartdiff.index = score.index
+
+				self.chartdiffGenerator:fillMeta(chartdiff, chartmeta)
+
+				self.chartdiffGenerator:createUpdateChartdiff(chartdiff)
+			end
+		end
+	end
+end
 
 return CacheModel

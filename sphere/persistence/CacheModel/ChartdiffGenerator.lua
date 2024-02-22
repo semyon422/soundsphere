@@ -31,7 +31,7 @@ function ChartdiffGenerator:fillMeta(chartdiff, chartmeta)
 	local rate = chartdiff.rate
 
 	chartdiff.tempo = chartmeta.tempo * rate
-	chartdiff.duration = chartmeta.tempo / rate
+	chartdiff.duration = chartmeta.duration / rate
 end
 
 ---@param chartdiff table
