@@ -189,10 +189,12 @@ function ModifierEncoder:decodeOld(score)
 
 	if time >= mods_encoded_since then
 		for id, version, value in mods:gmatch("(%d+):([^;^,]+),([^;^,]+)") do
+			id = tonumber(id)
+			version = tonumber(version)
 			if ids_inv[id] then
 				table.insert(config, {
-					id = tonumber(id),
-					version = tonumber(version),
+					id = id,
+					version = version,
 					value = decodeValue(value),
 				})
 			end
