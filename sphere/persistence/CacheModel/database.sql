@@ -48,6 +48,8 @@ CREATE TABLE IF NOT EXISTS `chartmetas` (
 	`preview_time` REAL,
 	`osu_beatmap_id` INTEGER,
 	`osu_beatmapset_id` INTEGER,
+	`osu_od` REAL,
+	`osu_hp` REAL,
 	`osu_ranked_status` INTEGER,
 	`tempo` REAL,
 	`duration` REAL,
