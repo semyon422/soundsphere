@@ -78,8 +78,7 @@ function GameController:new()
 	self.selectModel = SelectModel(
 		self.persistence.configModel,
 		self.persistence.cacheModel,
-		self.onlineModel,
-		self.timeRateModel
+		self.onlineModel
 	)
 
 	self.cacheModel = self.persistence.cacheModel

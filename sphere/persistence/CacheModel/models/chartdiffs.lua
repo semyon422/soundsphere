@@ -1,4 +1,5 @@
 local ModifierEncoder = require("sphere.models.ModifierEncoder")
+local int_rates = require("libchart.int_rates")
 
 local modifiers = {}
 
@@ -26,6 +27,8 @@ chartdiffs.table_name = "chartdiffs"
 
 chartdiffs.types = {
 	modifiers = modifiers,
+	rate = int_rates,
+	is_exp_rate = "boolean",
 }
 
 chartdiffs.relations = {}

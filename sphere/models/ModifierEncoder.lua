@@ -3,6 +3,7 @@ local json = require("json")
 local stbl = require("stbl")
 local table_util = require("table_util")
 local md5 = require("md5")
+local int_rates = require("libchart.int_rates")
 local ModifierModel = require("sphere.models.ModifierModel")
 
 local ModifierEncoder = class()
@@ -67,7 +68,7 @@ local function parse_mod_from_name(s)
 	elseif s == "CMod" then
 		return {const = true}
 	elseif s:match("^(.+)Q$") then
-		return {rate = 2 ^ (tonumber(s:match("^(.+)Q$")) / 10)}
+		return {rate = 2 ^ (tonumber(s:match("^(.+)Q$")) / 10), is_exp_rate = true}
 	elseif s:match("^(.+)X$") then
 		return {rate = tonumber(s:match("^(.+)X$"))}
 	elseif s:match("^Alt(.)$") then
@@ -163,10 +164,17 @@ local function parse_mod_from_name(s)
 	error(s)
 end
 
+local function _is_exp_rate(x)
+	local exp = 10 * math.log(x, 2)
+	local roundedExp = math.floor(exp + 0.5)
+	if roundedExp % 10 == 0 then
+		return false
+	end
+	return math.abs(exp - roundedExp) % 1 < 1e-2 and math.abs(exp) > 1e-2
+end
+
 ---@param score table
 ---@return table
----@return number
----@return boolean
 function ModifierEncoder:decodeOld(score)
 	local mods = score.modifiers
 	local time = score.time
@@ -178,13 +186,25 @@ function ModifierEncoder:decodeOld(score)
 		rate = score.rate
 	end
 
+	local is_exp_rate = _is_exp_rate(rate)
+
 	if mods == "" or mods == "[]" then
-		return config, rate, const
+		return {
+			modifiers = config,
+			rate = int_rates.round(rate),
+			const = const,
+			is_exp_rate = is_exp_rate,
+		}
 	end
 
 	local ok, err = pcall(json.decode, mods)
 	if ok then
-		return err, rate, const
+		return {
+			modifiers = err,
+			rate = int_rates.round(rate),
+			const = const,
+			is_exp_rate = is_exp_rate,
+		}
 	end
 
 	if time >= mods_encoded_since then
@@ -199,7 +219,12 @@ function ModifierEncoder:decodeOld(score)
 				})
 			end
 		end
-		return config, rate, const
+		return {
+			modifiers = config,
+			rate = int_rates.round(rate),
+			const = const,
+			is_exp_rate = is_exp_rate,
+		}
 	end
 
 	for _, mod in ipairs(mods:split(", ")) do
@@ -210,11 +235,20 @@ function ModifierEncoder:decodeOld(score)
 		if info.const then
 			const = info.const
 		end
+		if info.is_exp_rate then
+			is_exp_rate = info.is_exp_rate
+		end
 		if info.modifier then
 			table.insert(config, info.modifier)
 		end
 	end
-	return config, rate, const
+
+	return {
+		modifiers = config,
+		rate = int_rates.round(rate),
+		const = const,
+		is_exp_rate = is_exp_rate,
+	}
 end
 
 return ModifierEncoder

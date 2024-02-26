@@ -125,6 +125,13 @@ end
 ---@param chartview table
 ---@param exact boolean?
 function ScoreLibrary:updateItemsLocal(chartview, exact)
+	self.scoreSourceName = "local"
+
+	if not chartview.hash then
+		self.items = {}
+		return
+	end
+
 	local scores
 	if exact then
 		scores = self.cacheModel.chartRepo:getScoresExact(chartview)
@@ -144,7 +151,6 @@ function ScoreLibrary:updateItemsLocal(chartview, exact)
 		scores[i].rank = i
 	end
 	self.items = scores
-	self.scoreSourceName = "local"
 end
 
 ---@param score_id number

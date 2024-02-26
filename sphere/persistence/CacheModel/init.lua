@@ -158,6 +158,7 @@ function CacheModel:computeScoresWithMissingChartdiffs()
 				chartdiff.modifiers = score.modifiers
 				chartdiff.hash = score.hash
 				chartdiff.index = score.index
+				chartdiff.is_exp_rate = score.is_exp_rate
 
 				self.chartdiffGenerator:fillMeta(chartdiff, chartmeta)
 

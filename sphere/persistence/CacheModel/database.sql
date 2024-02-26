@@ -77,8 +77,10 @@ CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`id` INTEGER PRIMARY KEY,
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
-	`modifiers` TEXT DEFAULT "",
-	`rate` REAL DEFAULT 1.0,
+	`modifiers` TEXT NOT NULL DEFAULT "",
+	`rate` INTEGER NOT NULL DEFAULT 1000,
+
+	`is_exp_rate` INTEGER NOT NULL DEFAULT 0,
 
 	`inputmode` TEXT,
 	`notes_count` INTEGER,
@@ -104,8 +106,10 @@ CREATE TABLE IF NOT EXISTS `scores` (
 	`id` INTEGER PRIMARY KEY,
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
-	`modifiers` TEXT DEFAULT "",
-	`rate` REAL DEFAULT 1.0,
+	`modifiers` TEXT NOT NULL DEFAULT "",
+	`rate` INTEGER NOT NULL DEFAULT 1000,
+
+	`is_exp_rate` INTEGER NOT NULL DEFAULT 0,
 
 	`const` INTEGER,
 	`timings` TEXT,
@@ -170,6 +174,7 @@ MAX(scores.time) AS score_time,
 chartmetas.*,
 chartdiffs.modifiers,
 chartdiffs.rate,
+chartdiffs.is_exp_rate,
 chartdiffs.inputmode AS chartdiff_inputmode,
 chartdiffs.notes_count,
 chartdiffs.long_notes_count,
@@ -190,12 +195,12 @@ LEFT JOIN chartdiffs ON
 chartmetas.hash = chartdiffs.hash AND
 chartmetas.`index` = chartdiffs.`index` AND
 chartdiffs.modifiers = "" AND
-chartdiffs.rate = 1.0
+chartdiffs.rate = 1000
 LEFT JOIN scores ON
 chartmetas.hash = scores.hash AND
 chartmetas.`index` = scores.`index` AND
 scores.modifiers = "" AND
-scores.rate = 1.0
+scores.rate = 1000
 GROUP BY chartfile_id, chartmeta_id, chartdiff_id, scores.hash, scores.`index`, scores.modifiers, scores.rate
 ;
 
@@ -219,6 +224,7 @@ MAX(scores.time) AS score_time,
 chartmetas.*,
 chartdiffs.modifiers,
 chartdiffs.rate,
+chartdiffs.is_exp_rate,
 chartdiffs.inputmode AS chartdiff_inputmode,
 chartdiffs.notes_count,
 chartdiffs.long_notes_count,
