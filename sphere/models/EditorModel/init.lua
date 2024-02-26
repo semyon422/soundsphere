@@ -56,7 +56,7 @@ function EditorModel:load()
 	self.layerData = self.noteChartLoader:load()
 	local ld = self.layerData
 
-	self.patterns_analyzed = pattern_analyzer.analyze(self.noteChart:getLayerData(1))
+	self.patterns_analyzed = pattern_analyzer.format(pattern_analyzer.analyze(self.noteChart:getLayerData(1)))
 
 	self.changes = Changes()
 	ld:syncChanges(self.changes:get())
