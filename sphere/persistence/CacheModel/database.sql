@@ -72,7 +72,6 @@ CREATE TABLE IF NOT EXISTS `chartmetas` (
 );
 
 CREATE INDEX IF NOT EXISTS chartmetas_inputmode_idx ON chartmetas (`inputmode`);
-CREATE INDEX IF NOT EXISTS chartmetas_name_idx ON chartmetas (`name`);
 
 CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`id` INTEGER PRIMARY KEY,
@@ -94,6 +93,12 @@ CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`user_diff_data` TEXT,
 	UNIQUE(`hash`, `index`, `modifiers`, `rate`)
 );
+
+CREATE INDEX IF NOT EXISTS chartdiffs_inputmode_idx ON chartdiffs (`inputmode`);
+CREATE INDEX IF NOT EXISTS chartdiffs_enps_idx ON chartdiffs (`enps_diff`);
+CREATE INDEX IF NOT EXISTS chartdiffs_osu_idx ON chartdiffs (`osu_diff`);
+CREATE INDEX IF NOT EXISTS chartdiffs_msd_idx ON chartdiffs (`msd_diff`);
+CREATE INDEX IF NOT EXISTS chartdiffs_user_idx ON chartdiffs (`user_diff`);
 
 CREATE TABLE IF NOT EXISTS `scores` (
 	`id` INTEGER PRIMARY KEY,
