@@ -27,7 +27,7 @@ end
 ---@param s string
 ---@return any?
 local function decodeValue(s)
-	if s == "nil" then
+	if s == "nil" or s == "true" then
 		return nil
 	end
 	return tonumber(s) or s
