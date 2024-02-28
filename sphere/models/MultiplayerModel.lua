@@ -209,7 +209,7 @@ MultiplayerModel.pushNotechart = remote.wrap(function(self)
 		return
 	end
 
-	local path = chartview.path
+	local path = chartview.location_path
 	local osuSetId
 	if path:find("%.osu$") then
 		local content = async_read(path)

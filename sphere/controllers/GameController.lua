@@ -67,18 +67,18 @@ function GameController:new()
 	self.playContext = PlayContext()
 	self.timeRateModel = TimeRateModel(self.persistence.configModel, self.playContext)
 	self.modifierSelectModel = ModifierSelectModel(self.playContext)
+	self.selectModel = SelectModel(
+		self.persistence.configModel,
+		self.persistence.cacheModel,
+		self.onlineModel,
+		self.playContext
+	)
 	self.multiplayerModel = MultiplayerModel(
 		self.rhythmModel,
 		self.persistence.configModel,
 		self.selectModel,
 		self.onlineModel,
 		self.persistence.osudirectModel,
-		self.playContext
-	)
-	self.selectModel = SelectModel(
-		self.persistence.configModel,
-		self.persistence.cacheModel,
-		self.onlineModel,
 		self.playContext
 	)
 
