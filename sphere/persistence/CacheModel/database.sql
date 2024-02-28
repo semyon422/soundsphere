@@ -198,10 +198,8 @@ chartdiffs.modifiers = "" AND
 chartdiffs.rate = 1000
 LEFT JOIN scores ON
 chartmetas.hash = scores.hash AND
-chartmetas.`index` = scores.`index` AND
-scores.modifiers = "" AND
-scores.rate = 1000
-GROUP BY chartfile_id, chartmeta_id, chartdiff_id, scores.hash, scores.`index`, scores.modifiers, scores.rate
+chartmetas.`index` = scores.`index`
+GROUP BY chartfile_id, chartmeta_id, chartdiff_id, scores.hash, scores.`index`
 ;
 
 CREATE TEMP VIEW IF NOT EXISTS chartdiffviews AS
