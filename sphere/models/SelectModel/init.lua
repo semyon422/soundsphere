@@ -24,9 +24,11 @@ SelectModel.debounceTime = 0.5
 ---@param configModel sphere.ConfigModel
 ---@param cacheModel sphere.CacheModel
 ---@param onlineModel sphere.OnlineModel
-function SelectModel:new(configModel, cacheModel, onlineModel)
+---@param playContext sphere.PlayContext
+function SelectModel:new(configModel, cacheModel, onlineModel, playContext)
 	self.configModel = configModel
 	self.cacheModel = cacheModel
+	self.playContext = playContext
 
 	self.noteChartLibrary = NoteChartLibrary(cacheModel)
 	self.noteChartSetLibrary = NoteChartSetLibrary(cacheModel)
@@ -264,8 +266,10 @@ function SelectModel:setConfig(chartview)
 	if not config.chartdiffs_list then
 		return
 	end
-	self.configModel.configs.play.modifiers = chartview.modifiers or {}
-	self.configModel.configs.play.rate = chartview.rate or 1
+
+	local playContext = self.playContext
+	playContext.modifiers = chartview.modifiers or {}
+	playContext.rate = chartview.rate or 1
 
 	local gameplay = self.configModel.configs.settings.gameplay
 	gameplay.rateType = chartview.is_exp_rate and "exp" or "default"

@@ -67,7 +67,6 @@ function SelectController:update()
 	if selectModel:isChanged() then
 		self.backgroundModel:setBackgroundPath(selectModel:getBackgroundPath())
 		self.previewModel:setAudioPathPreview(selectModel:getAudioPathPreview())
-		self.playContext:load(self.configModel.configs.play)
 		self:applyModifierMeta()
 	end
 
