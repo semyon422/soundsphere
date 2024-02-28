@@ -136,7 +136,7 @@ function CacheDatabase:queryNoteChartSets()
 		entry.chartfile_set_id = row.chartfile_set_id
 		entry.chartmeta_id = row.chartmeta_id or 0
 		entry.chartdiff_id = row.chartdiff_id or 0
-		entry.lamp = row.lamp
+		entry.lamp = row.lamp or 0
 		set_id_to_global_index[entry.chartfile_set_id] = i
 		chartfile_id_to_global_index[entry.chartfile_id] = i
 		chartdiff_id_to_global_index[entry.chartdiff_id] = i
