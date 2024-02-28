@@ -45,10 +45,10 @@ function ChartRepo:selectChartfileSetById(id)
 	return self.models.chartfile_sets:find({id = assert(id)})
 end
 
----@param dir string?
+---@param location_id number?
 ---@return table
-function ChartRepo:selectChartfileSetsAtPath(dir)
-	return self.models.chartfile_sets:select({dir__startswith = dir})
+function ChartRepo:selectChartfileSetsAtLocation(location_id)
+	return self.models.chartfile_sets:select({location_id = location_id})
 end
 
 ---@return number

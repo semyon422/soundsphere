@@ -44,6 +44,7 @@ function SelectModel:new(configModel, cacheModel, onlineModel, playContext)
 end
 
 function SelectModel:load()
+	local settings = self.configModel.configs.settings
 	local config = self.configModel.configs.select
 	self.config = config
 
@@ -53,9 +54,8 @@ function SelectModel:load()
 	self.noteChartStateCounter = 1
 	self.scoreStateCounter = 1
 
-	self.collectionLibrary:load()
-
-	self.collectionLibrary:setPath(config.collection)
+	self.collectionLibrary:load(settings.select.locations_in_collections)
+	self.collectionLibrary:setPath(config.collection, config.location_id)
 
 	self:noDebouncePullNoteChartSet()
 end
@@ -84,6 +84,7 @@ function SelectModel:updateSetItems()
 	if path then
 		where.set_dir__startswith = path
 	end
+	where.location_id = collectionItem.location_id
 
 	params.where = where
 	params.lamp = lamp
@@ -245,6 +246,7 @@ function SelectModel:scrollCollection(direction, destination, force)
 
 	local item = items[destination]
 	self.config.collection = item.path
+	self.config.location_id = item.location_id
 
 	self:debouncePullNoteChartSet(old_item and old_item.path == item.path)
 end

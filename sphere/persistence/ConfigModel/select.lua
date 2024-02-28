@@ -1,5 +1,6 @@
 return {
-	collection = "",
+	collection = nil,
+	location_id = nil,
 	chartmeta_id = 1,
 	chartfile_id = 1,
 	chartfile_set_id = 1,
