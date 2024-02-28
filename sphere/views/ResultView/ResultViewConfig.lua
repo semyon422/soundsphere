@@ -449,13 +449,13 @@ local function NotechartInfo(self)
 	local baseTimeRate = show and playContext.rate or scoreItem.rate
 	local const = show and playContext.const or scoreItem.const
 
-	local baseBpm = scoreItem.tempo
+	local baseBpm = chartview.tempo
 	local baseLength = chartview.duration
 	local baseDifficulty = chartview.difficulty
 	local baseInputMode = chartview.inputmode
 
-	local bpm = baseBpm * baseTimeRate
-	local length = baseLength / baseTimeRate
+	local bpm = scoreItem.tempo
+	local length = scoreItem.duration
 	local difficulty = show and playContext.chartdiff.enps_diff or scoreItem.difficulty
 	local inputMode = show and tostring(rhythmModel.noteChart.inputMode) or scoreItem.inputmode
 
@@ -487,7 +487,7 @@ local function NotechartInfo(self)
 	love.graphics.setFont(font)
 
 	just.indent(36)
-	just.text(("%0.2fx"):format(baseTimeRate))
+	just.text(("%0.3fx"):format(baseTimeRate))
 	if const then
 		just.sameline()
 		just.text("c")
