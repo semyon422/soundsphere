@@ -4,21 +4,20 @@ local class = require("class")
 ---@operator call: sphere.CacheStatus
 local CacheStatus = class()
 
----@param chartRepo sphere.ChartRepo
 ---@param chartfilesRepo sphere.ChartfilesRepo
-function CacheStatus:new(chartRepo, chartfilesRepo)
-	self.chartRepo = chartRepo
+---@param chartmetasRepo sphere.ChartmetasRepo
+---@param chartdiffsRepo sphere.ChartdiffsRepo
+function CacheStatus:new(chartfilesRepo, chartmetasRepo, chartdiffsRepo)
 	self.chartfilesRepo = chartfilesRepo
+	self.chartmetasRepo = chartmetasRepo
+	self.chartdiffsRepo = chartdiffsRepo
 end
 
 function CacheStatus:update()
-	local chartRepo = self.chartRepo
-	local chartfilesRepo = self.chartfilesRepo
-
-	self.chartfile_sets = chartfilesRepo:countChartfileSets()
-	self.chartfiles = chartfilesRepo:countChartfiles()
-	self.chartmetas = chartRepo:countChartmetas()
-	self.chartdiffs = chartRepo:countChartdiffs()
+	self.chartfile_sets = self.chartfilesRepo:countChartfileSets()
+	self.chartfiles = self.chartfilesRepo:countChartfiles()
+	self.chartmetas = self.chartmetasRepo:countChartmetas()
+	self.chartdiffs = self.chartdiffsRepo:countChartdiffs()
 end
 
 return CacheStatus

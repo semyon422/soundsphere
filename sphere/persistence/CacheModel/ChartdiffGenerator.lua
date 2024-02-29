@@ -4,10 +4,10 @@ local class = require("class")
 ---@operator call: sphere.ChartdiffGenerator
 local ChartdiffGenerator = class()
 
----@param chartRepo sphere.ChartRepo
+---@param chartdiffsRepo sphere.ChartdiffsRepo
 ---@param difficultyModel sphere.DifficultyModel
-function ChartdiffGenerator:new(chartRepo, difficultyModel)
-	self.chartRepo = chartRepo
+function ChartdiffGenerator:new(chartdiffsRepo, difficultyModel)
+	self.chartdiffsRepo = chartdiffsRepo
 	self.difficultyModel = difficultyModel
 end
 
@@ -36,19 +36,19 @@ end
 
 ---@param chartdiff table
 function ChartdiffGenerator:createUpdateChartdiff(chartdiff)
-	local _chartdiff = self.chartRepo:selectChartdiff(chartdiff)
+	local _chartdiff = self.chartdiffsRepo:selectChartdiff(chartdiff)
 	if not _chartdiff then
-		return self.chartRepo:insertChartdiff(chartdiff)
+		return self.chartdiffsRepo:insertChartdiff(chartdiff)
 	end
 	chartdiff.id = _chartdiff.id
-	return self.chartRepo:updateChartdiff(chartdiff)
+	return self.chartdiffsRepo:updateChartdiff(chartdiff)
 end
 
 ---@param noteChart ncdk.NoteChart
 ---@param hash string
 ---@param index number
 function ChartdiffGenerator:create(noteChart, hash, index)
-	local chartdiff = self.chartRepo:selectDefaultChartdiff(hash, index)
+	local chartdiff = self.chartdiffsRepo:selectDefaultChartdiff(hash, index)
 	if chartdiff then
 		return
 	end
@@ -57,7 +57,7 @@ function ChartdiffGenerator:create(noteChart, hash, index)
 	chartdiff.hash = hash
 	chartdiff.index = index
 
-	self.chartRepo:insertChartdiff(chartdiff)
+	self.chartdiffsRepo:insertChartdiff(chartdiff)
 end
 
 return ChartdiffGenerator

@@ -1,10 +1,11 @@
-local ChartRepo = require("sphere.persistence.CacheModel.ChartRepo")
 local LocationsRepo = require("sphere.persistence.CacheModel.LocationsRepo")
 local NoteChartFinder = require("sphere.persistence.CacheModel.NoteChartFinder")
 local FileCacheGenerator = require("sphere.persistence.CacheModel.FileCacheGenerator")
 local ChartmetaGenerator = require("sphere.persistence.CacheModel.ChartmetaGenerator")
 local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGenerator")
 local ChartfilesRepo = require("sphere.persistence.CacheModel.ChartfilesRepo")
+local ChartdiffsRepo = require("sphere.persistence.CacheModel.ChartdiffsRepo")
+local ChartmetasRepo = require("sphere.persistence.CacheModel.ChartmetasRepo")
 local NoteChartFactory = require("notechart.NoteChartFactory")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local ModifierModel = require("sphere.models.ModifierModel")
@@ -22,10 +23,11 @@ function CacheManager:new(gdb)
 	self.state = 0
 
 	self.gdb = gdb
-	self.chartRepo = ChartRepo(gdb)
 	self.locationsRepo = LocationsRepo(gdb)
 	self.scoresRepo = ScoresRepo(gdb)
 	self.chartfilesRepo = ChartfilesRepo(gdb)
+	self.chartdiffsRepo = ChartdiffsRepo(self.gdb)
+	self.chartmetasRepo = ChartmetasRepo(self.gdb)
 
 	self.noteChartFinder = NoteChartFinder(love.filesystem)
 
@@ -35,9 +37,9 @@ function CacheManager:new(gdb)
 			self:checkProgress()
 		end
 	end
-	self.fileCacheGenerator = FileCacheGenerator(self.chartRepo, self.noteChartFinder, handle_file_cache)
-	self.chartdiffGenerator = ChartdiffGenerator(self.chartRepo, DifficultyModel)
-	self.chartmetaGenerator = ChartmetaGenerator(self.chartRepo, self.chartfilesRepo, NoteChartFactory)
+	self.fileCacheGenerator = FileCacheGenerator(self.chartfilesRepo, self.noteChartFinder, handle_file_cache)
+	self.chartdiffGenerator = ChartdiffGenerator(self.chartdiffsRepo, DifficultyModel)
+	self.chartmetaGenerator = ChartmetaGenerator(self.chartmetasRepo, self.chartfilesRepo, NoteChartFactory)
 
 	self.locationManager = LocationManager(
 		self.locationsRepo,
@@ -153,7 +155,7 @@ function CacheManager:generateCacheFull(path, location_id, location_prefix)
 end
 
 function CacheManager:computeScoresWithMissingChartdiffs()
-	local chartRepo = self.chartRepo
+	local chartmetasRepo = self.chartmetasRepo
 	local scoresRepo = self.scoresRepo
 	local chartfilesRepo = self.chartfilesRepo
 	local scores = scoresRepo:getScoresWithMissingChartdiffs()
@@ -165,7 +167,7 @@ function CacheManager:computeScoresWithMissingChartdiffs()
 
 	for i, score in ipairs(scores) do
 		local chartfile = chartfilesRepo:selectChartfileByHash(score.hash)
-		local chartmeta = chartRepo:selectChartmeta(score.hash, score.index)
+		local chartmeta = chartmetasRepo:selectChartmeta(score.hash, score.index)
 		if chartfile and chartmeta then
 			local location = self.locationsRepo:selectLocationById(chartfile.location_id)
 			local prefix = self.locationManager:getPrefix(location)

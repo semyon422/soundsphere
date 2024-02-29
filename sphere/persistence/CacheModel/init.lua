@@ -3,7 +3,8 @@ local class = require("class")
 local physfs = require("physfs")
 local path_util = require("path_util")
 local CacheDatabase = require("sphere.persistence.CacheModel.CacheDatabase")
-local ChartRepo = require("sphere.persistence.CacheModel.ChartRepo")
+local ChartdiffsRepo = require("sphere.persistence.CacheModel.ChartdiffsRepo")
+local ChartmetasRepo = require("sphere.persistence.CacheModel.ChartmetasRepo")
 local LocationsRepo = require("sphere.persistence.CacheModel.LocationsRepo")
 local ScoresRepo = require("sphere.persistence.CacheModel.ScoresRepo")
 local GameDatabase = require("sphere.persistence.CacheModel.GameDatabase")
@@ -32,12 +33,13 @@ function CacheModel:new()
 
 	self.gdb = GameDatabase(migrations)
 	self.cacheDatabase = CacheDatabase(self.gdb)
-	self.chartRepo = ChartRepo(self.gdb)
+	self.chartdiffsRepo = ChartdiffsRepo(self.gdb)
+	self.chartmetasRepo = ChartmetasRepo(self.gdb)
 	self.locationsRepo = LocationsRepo(self.gdb)
 	self.scoresRepo = ScoresRepo(self.gdb)
 	self.chartfilesRepo = ChartfilesRepo(self.gdb)
-	self.cacheStatus = CacheStatus(self.chartRepo, self.chartfilesRepo)
-	self.chartdiffGenerator = ChartdiffGenerator(self.chartRepo, DifficultyModel)
+	self.cacheStatus = CacheStatus(self.chartfilesRepo, self.chartmetasRepo, self.chartdiffsRepo)
+	self.chartdiffGenerator = ChartdiffGenerator(self.chartdiffsRepo, DifficultyModel)
 	self.locationManager = LocationManager(
 		self.locationsRepo,
 		self.chartfilesRepo,
@@ -46,7 +48,7 @@ function CacheModel:new()
 		"mounted_charts"
 	)
 
-	self.oldScoresMigrator = OldScoresMigrator(self.chartRepo)
+	self.oldScoresMigrator = OldScoresMigrator(self.gdb)
 end
 
 function CacheModel:load()

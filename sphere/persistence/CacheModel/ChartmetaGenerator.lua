@@ -6,11 +6,11 @@ local md5 = require("md5")
 ---@operator call: sphere.ChartmetaGenerator
 local ChartmetaGenerator = class()
 
----@param chartRepo sphere.ChartRepo
+---@param chartmetasRepo sphere.ChartmetasRepo
 ---@param chartfilesRepo sphere.ChartfilesRepo
 ---@param noteChartFactory notechart.NoteChartFactory
-function ChartmetaGenerator:new(chartRepo, chartfilesRepo, noteChartFactory)
-	self.chartRepo = chartRepo
+function ChartmetaGenerator:new(chartmetasRepo, chartfilesRepo, noteChartFactory)
+	self.chartmetasRepo = chartmetasRepo
 	self.chartfilesRepo = chartfilesRepo
 	self.noteChartFactory = noteChartFactory
 end
@@ -23,7 +23,7 @@ end
 function ChartmetaGenerator:generate(chartfile, content, not_reuse)
 	local hash = md5.sumhexa(content)
 
-	if not not_reuse and self.chartRepo:selectChartmeta(hash, 1) then
+	if not not_reuse and self.chartmetasRepo:selectChartmeta(hash, 1) then
 		chartfile.hash = hash
 		self.chartfilesRepo:updateChartfile(chartfile)
 		return "reused"
@@ -49,13 +49,13 @@ end
 
 ---@param chartmeta table
 function ChartmetaGenerator:setChartmeta(chartmeta)
-	local old = self.chartRepo:selectChartmeta(chartmeta.hash, chartmeta.index)
+	local old = self.chartmetasRepo:selectChartmeta(chartmeta.hash, chartmeta.index)
 	if not old then
-		self.chartRepo:insertChartmeta(chartmeta)
+		self.chartmetasRepo:insertChartmeta(chartmeta)
 		return
 	end
 	chartmeta.id = old.id
-	self.chartRepo:updateChartmeta(chartmeta)
+	self.chartmetasRepo:updateChartmeta(chartmeta)
 end
 
 return ChartmetaGenerator

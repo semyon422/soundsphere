@@ -7,14 +7,12 @@ local ModifierEncoder = require("sphere.models.ModifierEncoder")
 ---@operator call: sphere.OldScoresMigrator
 local OldScoresMigrator = class()
 
----@param chartRepo sphere.ChartRepo
-function OldScoresMigrator:new(chartRepo)
-	self.chartRepo = chartRepo
+---@param gdb sphere.GameDatabase
+function OldScoresMigrator:new(gdb)
+	self.gdb = gdb
 end
 
 function OldScoresMigrator:migrate()
-	local chartRepo = self.chartRepo
-
 	local db = LjsqliteDatabase()
 	local orm = TableOrm(db)
 
@@ -29,7 +27,7 @@ function OldScoresMigrator:migrate()
 		local score = self:convertScore(old_score)
 		table.insert(new_scores, score)
 	end
-	chartRepo.models.scores:insert(new_scores)
+	self.gdb.models.scores:insert(new_scores)
 end
 
 function OldScoresMigrator:convertScore(old_score)

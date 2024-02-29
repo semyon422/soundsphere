@@ -172,7 +172,7 @@ function section_draw.database(self)
 		cacheStatus:update()
 	end
 	if imgui.button("delete chartmetas", "delete chartmetas, reset chartfiles") then
-		self.game.cacheModel.chartRepo:deleteChartmetas()
+		self.game.cacheModel.chartmetasRepo:deleteChartmetas()
 		self.game.cacheModel.chartfilesRepo:resetChartfileHash()
 	end
 
