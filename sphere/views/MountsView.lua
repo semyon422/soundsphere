@@ -191,7 +191,7 @@ function section_draw.database(self)
 		local count = cacheModel.shared.chartfiles_count
 		local current = cacheModel.shared.chartfiles_current
 
-		local progress = ("%0.2f%% %s/%s"):format(current / count, current, count)
+		local progress = ("%0.2f%% %s/%s"):format(current / count * 100, current, count)
 
 		if imgui.button("stopTask", progress) then
 			cacheModel:stopTask()
