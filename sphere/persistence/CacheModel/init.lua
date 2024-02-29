@@ -4,7 +4,7 @@ local physfs = require("physfs")
 local path_util = require("path_util")
 local CacheDatabase = require("sphere.persistence.CacheModel.CacheDatabase")
 local ChartRepo = require("sphere.persistence.CacheModel.ChartRepo")
-local ChartsDatabase = require("sphere.persistence.CacheModel.ChartsDatabase")
+local GameDatabase = require("sphere.persistence.CacheModel.GameDatabase")
 local CacheStatus = require("sphere.persistence.CacheModel.CacheStatus")
 local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGenerator")
 local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
@@ -27,9 +27,9 @@ function CacheModel:new()
 		self.oldScoresMigrator:migrate()
 	end
 
-	self.cdb = ChartsDatabase(migrations)
-	self.cacheDatabase = CacheDatabase(self.cdb)
-	self.chartRepo = ChartRepo(self.cdb)
+	self.gdb = GameDatabase(migrations)
+	self.cacheDatabase = CacheDatabase(self.gdb)
+	self.chartRepo = ChartRepo(self.gdb)
 	self.cacheStatus = CacheStatus(self.chartRepo)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartRepo, DifficultyModel)
 	self.locationManager = LocationManager(
@@ -50,7 +50,7 @@ function CacheModel:load()
 	}
 	self.shared = thread.shared.cache
 
-	self.cdb:load()
+	self.gdb:load()
 	self.cacheStatus:update()
 
 	self.locationManager:load()
@@ -63,7 +63,7 @@ function CacheModel:load()
 end
 
 function CacheModel:unload()
-	self.cdb:unload()
+	self.gdb:unload()
 end
 
 ---@param path string
@@ -109,12 +109,12 @@ end
 local runTaskAsync = thread.async(function(task)
 	print(require("inspect")(task))
 	local CacheManager = require("sphere.persistence.CacheModel.CacheManager")
-	local ChartsDatabase = require("sphere.persistence.CacheModel.ChartsDatabase")
+	local GameDatabase = require("sphere.persistence.CacheModel.GameDatabase")
 
-	local cdb = ChartsDatabase()
-	cdb:load()
+	local gdb = GameDatabase()
+	gdb:load()
 
-	local cacheManager = CacheManager(cdb)
+	local cacheManager = CacheManager(gdb)
 
 	if task.type == "update_cache" then
 		cacheManager:generateCacheFull(task.path, task.location_id, task.location_prefix)
@@ -122,7 +122,7 @@ local runTaskAsync = thread.async(function(task)
 		cacheManager:computeScoresWithMissingChartdiffs()
 	end
 
-	cdb:unload()
+	gdb:unload()
 end)
 
 function CacheModel:process()
@@ -140,9 +140,9 @@ function CacheModel:process()
 			task.location_prefix = prefix
 		end
 
-		self.cdb:unload()
+		self.gdb:unload()
 		runTaskAsync(task)
-		self.cdb:load()
+		self.gdb:load()
 
 		if task.callback then
 			task.callback()

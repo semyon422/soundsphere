@@ -5,9 +5,9 @@ local sql_util = require("rdb.sql_util")
 ---@operator call: sphere.ChartRepo
 local ChartRepo = class()
 
----@param cdb sphere.ChartsDatabase
-function ChartRepo:new(cdb)
-	self.models = cdb.models
+---@param gdb sphere.GameDatabase
+function ChartRepo:new(gdb)
+	self.models = gdb.models
 end
 
 ----------------------------------------------------------------

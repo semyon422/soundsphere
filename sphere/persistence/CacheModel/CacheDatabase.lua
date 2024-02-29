@@ -8,8 +8,8 @@ local class = require("class")
 ---@operator call: sphere.CacheDatabase
 local CacheDatabase = class()
 
----@param cdb sphere.ChartsDatabase
-function CacheDatabase:new(cdb)
+---@param gdb sphere.GameDatabase
+function CacheDatabase:new(gdb)
 	self.chartviews_count = 0
 	self.chartviews = {}
 	self.set_id_to_global_index = {}
@@ -17,7 +17,7 @@ function CacheDatabase:new(cdb)
 	self.chartdiff_id_to_global_index = {}
 	self.params = {}
 
-	self.models = cdb.models
+	self.models = gdb.models
 end
 
 ----------------------------------------------------------------
@@ -38,15 +38,15 @@ local _queryAsync = thread.async(function(params)
 	local time = love.timer.getTime()
 	local ffi = require("ffi")
 	local CacheDatabase = require("sphere.persistence.CacheModel.CacheDatabase")
-	local ChartsDatabase = require("sphere.persistence.CacheModel.ChartsDatabase")
+	local GameDatabase = require("sphere.persistence.CacheModel.GameDatabase")
 
-	local cdb = ChartsDatabase()
-	cdb:load()
+	local gdb = GameDatabase()
+	gdb:load()
 
-	local self = CacheDatabase(cdb)
+	local self = CacheDatabase(gdb)
 	self.params = params
 	local status, err = pcall(self.queryNoteChartSets, self)
-	cdb:unload()
+	gdb:unload()
 
 	if not status then
 		print(err)

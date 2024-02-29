@@ -4,14 +4,14 @@ local TableOrm = require("rdb.TableOrm")
 local Models = require("rdb.Models")
 local autoload = require("autoload")
 
----@class sphere.ChartsDatabase
----@operator call: sphere.ChartsDatabase
-local ChartsDatabase = class()
+---@class sphere.GameDatabase
+---@operator call: sphere.GameDatabase
+local GameDatabase = class()
 
 local user_version = 1
 
 ---@param migrations table?
-function ChartsDatabase:new(migrations)
+function GameDatabase:new(migrations)
 	self.migrations = migrations or {}
 
 	local db = LjsqliteDatabase()
@@ -22,7 +22,7 @@ function ChartsDatabase:new(migrations)
 	self.models = Models(_models, self.orm)
 end
 
-function ChartsDatabase:load()
+function GameDatabase:load()
 	self.db:open("userdata/data.db")
 	local sql = assert(love.filesystem.read("sphere/persistence/CacheModel/database.sql"))
 	self.db:exec(sql)
@@ -30,15 +30,15 @@ function ChartsDatabase:load()
 	self:migrate()
 end
 
-function ChartsDatabase:unload()
+function GameDatabase:unload()
 	self.db:close()
 end
 
-function ChartsDatabase:migrate()
+function GameDatabase:migrate()
 	local count = self.orm:migrate(user_version, self.migrations)
 	if count > 0 then
 		print("migrations applied: " .. count)
 	end
 end
 
-return ChartsDatabase
+return GameDatabase
