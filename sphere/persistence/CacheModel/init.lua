@@ -84,9 +84,9 @@ function CacheModel:startUpdate(path, location_id)
 	})
 end
 
-function CacheModel:computeScoresWithMissingChartdiffs()
+function CacheModel:computeChartdiffs()
 	table.insert(self.tasks, {
-		type = "update_scores_chartdiffs",
+		type = "update_chartdiffs",
 	})
 end
 
@@ -126,8 +126,8 @@ local runTaskAsync = thread.async(function(task)
 
 	if task.type == "update_cache" then
 		cacheManager:generateCacheFull(task.path, task.location_id, task.location_prefix)
-	elseif task.type == "update_scores_chartdiffs" then
-		cacheManager:computeScoresWithMissingChartdiffs()
+	elseif task.type == "update_chartdiffs" then
+		cacheManager:computeChartdiffs()
 	end
 
 	gdb:unload()

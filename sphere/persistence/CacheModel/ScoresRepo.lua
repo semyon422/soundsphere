@@ -47,8 +47,8 @@ function ScoresRepo:getScoresExact(chartview)
 	return self.models.scores_list:select({
 		hash = assert(chartview.hash),
 		index = assert(chartview.index),
-		modifiers = assert(chartview.modifiers),
-		rate = assert(chartview.rate),
+		modifiers = chartview.modifiers or {},
+		rate = chartview.rate or 1,
 	})
 end
 

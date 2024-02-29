@@ -39,8 +39,8 @@ function ChartdiffsRepo:selectChartdiff(chartdiff)
 	return self.models.chartdiffs:find({
 		hash = assert(chartdiff.hash),
 		index = assert(chartdiff.index),
-		modifiers = assert(chartdiff.modifiers),
-		rate = assert(chartdiff.rate),
+		modifiers = chartdiff.modifiers or {},
+		rate = chartdiff.rate or 1,
 	})
 end
 
@@ -53,6 +53,11 @@ end
 ---@return number
 function ChartdiffsRepo:countChartdiffs()
 	return self.models.chartdiffs:count()
+end
+
+---@param conds table
+function ChartdiffsRepo:deleteChartdiffs(conds)
+	self.models.chartdiffs:delete(conds)
 end
 
 return ChartdiffsRepo

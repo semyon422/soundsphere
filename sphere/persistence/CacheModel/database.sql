@@ -154,6 +154,21 @@ INNER JOIN chartfile_sets ON
 chartfiles.set_id = chartfile_sets.id
 ;
 
+CREATE TEMP VIEW IF NOT EXISTS chartmetas_diffs_missing AS
+SELECT
+chartmetas.id,
+chartmetas.hash,
+chartmetas.`index`
+FROM chartmetas
+LEFT JOIN chartdiffs ON
+chartmetas.hash = chartdiffs.hash AND
+chartmetas.`index` = chartdiffs.`index` AND
+chartdiffs.modifiers = "" AND
+chartdiffs.rate = 1000
+WHERE
+chartdiffs.id IS NULL
+;
+
 CREATE TEMP VIEW IF NOT EXISTS chartviews AS
 SELECT
 chartmetas.id AS chartmeta_id,

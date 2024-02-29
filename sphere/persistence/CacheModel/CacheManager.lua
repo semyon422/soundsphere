@@ -154,17 +154,47 @@ function CacheManager:generateCacheFull(path, location_id, location_prefix)
 	self:checkProgress()
 end
 
-function CacheManager:computeScoresWithMissingChartdiffs()
+function CacheManager:computeChartdiffs()
 	local chartmetasRepo = self.chartmetasRepo
 	local scoresRepo = self.scoresRepo
 	local chartfilesRepo = self.chartfilesRepo
+
 	local scores = scoresRepo:getScoresWithMissingChartdiffs()
+	local chartmetas = chartmetasRepo:getChartmetasWithMissingChartdiffs()
 
 	self.state = 2
-	self.chartfiles_count = #scores
+	self.chartfiles_count = #chartmetas + #scores
 	self.chartfiles_current = 0
 	self:checkProgress()
 
+	print("computing default chartdiffs")
+	for i, chartmeta in ipairs(chartmetas) do
+		local chartfile = chartfilesRepo:selectChartfileByHash(chartmeta.hash)
+		if chartfile then
+			local location = self.locationsRepo:selectLocationById(chartfile.location_id)
+			local prefix = self.locationManager:getPrefix(location)
+
+			local full_path = path_util.join(prefix, chartfile.path)
+			local content = assert(love.filesystem.read(full_path))
+
+			local noteChart, err = NoteChartFactory:getNoteChart(chartfile.name, content, chartmeta.index)
+			if not noteChart then
+				return nil, err
+			else
+				local chartdiff = self.chartdiffGenerator:compute(noteChart)
+				chartdiff.hash = chartmeta.hash
+				chartdiff.index = chartmeta.index
+				self.chartdiffGenerator:createUpdateChartdiff(chartdiff)
+			end
+		end
+		self.chartfiles_current = self.chartfiles_current + 1
+		self:checkProgress()
+		if self.needStop then
+			break
+		end
+	end
+
+	print("computing modified chartdiffs")
 	for i, score in ipairs(scores) do
 		local chartfile = chartfilesRepo:selectChartfileByHash(score.hash)
 		local chartmeta = chartmetasRepo:selectChartmeta(score.hash, score.index)
@@ -187,12 +217,10 @@ function CacheManager:computeScoresWithMissingChartdiffs()
 				chartdiff.index = score.index
 				chartdiff.is_exp_rate = score.is_exp_rate
 
-				self.chartdiffGenerator:fillMeta(chartdiff, chartmeta)
-
 				self.chartdiffGenerator:createUpdateChartdiff(chartdiff)
 			end
 		end
-		self.chartfiles_current = i
+		self.chartfiles_current = self.chartfiles_current + 1
 		self:checkProgress()
 		if self.needStop then
 			break

@@ -43,4 +43,9 @@ function ChartmetasRepo:deleteChartmetas(conds)
 	self.models.chartmetas:delete(conds)
 end
 
+---@return table
+function ChartmetasRepo:getChartmetasWithMissingChartdiffs()
+	return self.models.chartmetas_diffs_missing:select()
+end
+
 return ChartmetasRepo

@@ -168,25 +168,24 @@ function section_draw.database(self)
 	imgui.text("chartmetas: " .. cacheStatus.chartmetas)
 	imgui.text("chartdiffs: " .. cacheStatus.chartdiffs)
 
-	if imgui.button("cacheStatus update", "update") then
+	if imgui.button("cacheStatus update", "update status") then
 		cacheStatus:update()
 	end
-	if imgui.button("delete chartmetas", "delete chartmetas, reset chartfiles") then
-		self.game.cacheModel.chartmetasRepo:deleteChartmetas()
+	if imgui.button("reset chartfiles", "reset chartfiles.hash") then
 		self.game.cacheModel.chartfilesRepo:resetChartfileHash()
 	end
-
-	imgui.separator()
-	imgui.text("Score migration")
-	if imgui.button("getScoresWithMissingChartdiffs", "getScoresWithMissingChartdiffs") then
-		print(#self.game.cacheModel.scoresRepo:getScoresWithMissingChartdiffs())
+	if imgui.button("delete chartmetas", "delete chartmetas") then
+		self.game.cacheModel.chartmetasRepo:deleteChartmetas()
+	end
+	if imgui.button("delete chartdiffs", "delete chartdiffs") then
+		self.game.cacheModel.chartdiffsRepo:deleteChartdiffs()
 	end
 
 	local cacheModel = self.game.cacheModel
 	local state = cacheModel.shared.state
 	if state == 0 or state == 3 then
-		if imgui.button("computeScoresWithMissingChartdiffs", "compute missing chartdiffs") then
-			cacheModel:computeScoresWithMissingChartdiffs()
+		if imgui.button("computeScores", "compute chartdiffs") then
+			cacheModel:computeChartdiffs()
 		end
 	else
 		local count = cacheModel.shared.chartfiles_count
