@@ -83,7 +83,7 @@ function test.all(t)
 		return {{chartmeta = {}}}
 	end
 
-	local cg = ChartmetaGenerator(chartRepo, {getNoteCharts = getNoteCharts})
+	local cg = ChartmetaGenerator(chartRepo, chartRepo, {getNoteCharts = getNoteCharts})
 
 	t:eq(cg:generate(chartfiles["charts/a"], "content"), "cached")
 	t:eq(cg:generate(chartfiles["charts/b"], "content"), "reused")

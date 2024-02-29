@@ -44,12 +44,12 @@ local function get_cache_text(self)
 end
 
 local function get_location_info(self, location_id)
-	local chartRepo = self.game.cacheModel.chartRepo
+	local chartfilesRepo = self.game.cacheModel.chartfilesRepo
 
 	return {
-		chartfile_sets = chartRepo:countChartfileSets({location_id = location_id}),
-		chartfiles = chartRepo:countChartfiles({location_id = location_id}),
-		hashed_chartfiles = chartRepo:countChartfiles({
+		chartfile_sets = chartfilesRepo:countChartfileSets({location_id = location_id}),
+		chartfiles = chartfilesRepo:countChartfiles({location_id = location_id}),
+		hashed_chartfiles = chartfilesRepo:countChartfiles({
 			location_id = location_id,
 			hash__isnotnull = true,
 		}),
@@ -173,7 +173,7 @@ function section_draw.database(self)
 	end
 	if imgui.button("delete chartmetas", "delete chartmetas, reset chartfiles") then
 		self.game.cacheModel.chartRepo:deleteChartmetas()
-		self.game.cacheModel.chartRepo:resetChartfileHash()
+		self.game.cacheModel.chartfilesRepo:resetChartfileHash()
 	end
 
 	imgui.separator()

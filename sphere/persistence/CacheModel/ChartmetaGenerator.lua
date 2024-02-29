@@ -7,9 +7,11 @@ local md5 = require("md5")
 local ChartmetaGenerator = class()
 
 ---@param chartRepo sphere.ChartRepo
+---@param chartfilesRepo sphere.ChartfilesRepo
 ---@param noteChartFactory notechart.NoteChartFactory
-function ChartmetaGenerator:new(chartRepo, noteChartFactory)
+function ChartmetaGenerator:new(chartRepo, chartfilesRepo, noteChartFactory)
 	self.chartRepo = chartRepo
+	self.chartfilesRepo = chartfilesRepo
 	self.noteChartFactory = noteChartFactory
 end
 
@@ -23,7 +25,7 @@ function ChartmetaGenerator:generate(chartfile, content, not_reuse)
 
 	if not not_reuse and self.chartRepo:selectChartmeta(hash, 1) then
 		chartfile.hash = hash
-		self.chartRepo:updateChartfile(chartfile)
+		self.chartfilesRepo:updateChartfile(chartfile)
 		return "reused"
 	end
 
@@ -40,7 +42,7 @@ function ChartmetaGenerator:generate(chartfile, content, not_reuse)
 	end
 
 	chartfile.hash = hash
-	self.chartRepo:updateChartfile(chartfile)
+	self.chartfilesRepo:updateChartfile(chartfile)
 
 	return "cached", noteCharts
 end

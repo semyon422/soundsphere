@@ -27,7 +27,7 @@ function test.all(t)
 	local fs = {}
 	function fs.mount() return true end
 
-	local lm = LocationManager(chartRepo, fs, "/game", "prefix")
+	local lm = LocationManager(chartRepo, chartRepo, fs, "/game", "prefix")
 
 	lm:createLocation({path = "/dir"})
 	lm:createLocation({path = "/game/dir"})

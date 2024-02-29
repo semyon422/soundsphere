@@ -5,15 +5,18 @@ local class = require("class")
 local CacheStatus = class()
 
 ---@param chartRepo sphere.ChartRepo
-function CacheStatus:new(chartRepo)
+---@param chartfilesRepo sphere.ChartfilesRepo
+function CacheStatus:new(chartRepo, chartfilesRepo)
 	self.chartRepo = chartRepo
+	self.chartfilesRepo = chartfilesRepo
 end
 
 function CacheStatus:update()
 	local chartRepo = self.chartRepo
+	local chartfilesRepo = self.chartfilesRepo
 
-	self.chartfile_sets = chartRepo:countChartfileSets()
-	self.chartfiles = chartRepo:countChartfiles()
+	self.chartfile_sets = chartfilesRepo:countChartfileSets()
+	self.chartfiles = chartfilesRepo:countChartfiles()
 	self.chartmetas = chartRepo:countChartmetas()
 	self.chartdiffs = chartRepo:countChartdiffs()
 end

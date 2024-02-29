@@ -5,11 +5,11 @@ local sql_util = require("rdb.sql_util")
 ---@operator call: sphere.FileCacheGenerator
 local FileCacheGenerator = class()
 
----@param chartRepo sphere.ChartRepo
+---@param chartfilesRepo sphere.ChartfilesRepo
 ---@param noteChartFinder sphere.NoteChartFinder
 ---@param handle function
-function FileCacheGenerator:new(chartRepo, noteChartFinder, handle)
-	self.chartRepo = chartRepo
+function FileCacheGenerator:new(chartfilesRepo, noteChartFinder, handle)
+	self.chartfilesRepo = chartfilesRepo
 	self.noteChartFinder = noteChartFinder
 	self.handle = handle
 end
@@ -37,7 +37,7 @@ function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
 			chartfile = self:processChartfile(chartfile_set.id, name, modtime)
 			handle(chartfile)
 		elseif typ == "related_all" then
-			self.chartRepo:deleteChartfiles({set_id = chartfile_set.id, name__notin = name})
+			self.chartfilesRepo:deleteChartfiles({set_id = chartfile_set.id, name__notin = name})
 		elseif typ == "unrelated_dir" then
 		elseif typ == "unrelated" then
 			chartfile_set = self:processChartfileSet({
@@ -50,8 +50,8 @@ function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
 			chartfile = self:processChartfile(chartfile_set.id, name, modtime)
 			handle(chartfile)
 		elseif typ == "unrelated_all" then
-			self.chartRepo:deleteChartfiles({set_id = chartfile_set.id, name__notin = name})
-			self.chartRepo:deleteChartfileSets({
+			self.chartfilesRepo:deleteChartfiles({set_id = chartfile_set.id, name__notin = name})
+			self.chartfilesRepo:deleteChartfileSets({
 				dir = dir,
 				dir__isnull = not dir,
 				name__notin = name,
@@ -61,14 +61,14 @@ function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
 		elseif typ == "directory" then
 			res = self:shouldScan(dir, name, modtime)
 		elseif typ == "directory_all" then
-			self.chartRepo:deleteChartfileSets({
+			self.chartfilesRepo:deleteChartfileSets({
 				dir = dir,
 				dir__isnull = not dir,
 				name__notin = name,
 				location_id = location_id,
 			})
 		elseif typ == "not_found" then
-			self.chartRepo:deleteChartfileSets({
+			self.chartfilesRepo:deleteChartfileSets({
 				dir = dir,
 				dir__isnull = not dir,
 				name = name,
@@ -84,7 +84,7 @@ end
 ---@param modified_at number
 ---@return boolean
 function FileCacheGenerator:shouldScan(dir, name, modified_at)
-	local chartfile_set = self.chartRepo:selectChartfileSet(dir, name)
+	local chartfile_set = self.chartfilesRepo:selectChartfileSet(dir, name)
 	if not chartfile_set then
 		return true
 	end
@@ -97,7 +97,7 @@ end
 ---@param chartfile_set table
 ---@return table
 function FileCacheGenerator:processChartfileSet(chartfile_set)
-	local _chartfile_set = self.chartRepo:selectChartfileSet(
+	local _chartfile_set = self.chartfilesRepo:selectChartfileSet(
 		chartfile_set.dir,
 		chartfile_set.name
 	)
@@ -105,12 +105,12 @@ function FileCacheGenerator:processChartfileSet(chartfile_set)
 	if _chartfile_set then
 		if _chartfile_set.modified_at ~= chartfile_set.modified_at then
 			_chartfile_set.modified_at = chartfile_set.modified_at
-			self.chartRepo:updateChartfileSet(_chartfile_set)
+			self.chartfilesRepo:updateChartfileSet(_chartfile_set)
 		end
 		return _chartfile_set
 	end
 
-	_chartfile_set = self.chartRepo:insertChartfileSet(chartfile_set)
+	_chartfile_set = self.chartfilesRepo:insertChartfileSet(chartfile_set)
 
 	return _chartfile_set
 end
@@ -120,10 +120,10 @@ end
 ---@param modified_at number
 ---@return table
 function FileCacheGenerator:processChartfile(set_id, name, modified_at)
-	local chartfile = self.chartRepo:selectChartfile(set_id, name)
+	local chartfile = self.chartfilesRepo:selectChartfile(set_id, name)
 
 	if not chartfile then
-		return self.chartRepo:insertChartfile({
+		return self.chartfilesRepo:insertChartfile({
 			name = name,
 			modified_at = modified_at,
 			set_id = set_id,
@@ -133,7 +133,7 @@ function FileCacheGenerator:processChartfile(set_id, name, modified_at)
 	if chartfile.modified_at ~= modified_at then
 		chartfile.hash = sql_util.NULL
 		chartfile.modified_at = modified_at
-		self.chartRepo:updateChartfile(chartfile)
+		self.chartfilesRepo:updateChartfile(chartfile)
 	end
 
 	return chartfile

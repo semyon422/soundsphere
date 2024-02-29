@@ -178,7 +178,7 @@ function OsudirectModel:getExistingHashes(beatmaps)
 	for _, beatmap in ipairs(beatmaps) do
 		table.insert(hashes, beatmap.beatmaps[1].checksum)
 	end
-	local foundCharts = self.cacheModel.chartRepo:getChartfilesByHashes(hashes)
+	local foundCharts = self.cacheModel.chartfilesRepo:getChartfilesByHashes(hashes)
 	local foundHashes = {}
 	for _, chart in ipairs(foundCharts) do
 		foundHashes[chart.hash] = true

@@ -58,10 +58,10 @@ function CollectionLibrary:getTree(locations_in_collections)
 	}
 	tree.items[1] = tree
 
-	local chartRepo = self.cacheModel.chartRepo
+	local chartfilesRepo = self.cacheModel.chartfilesRepo
 	local locationsRepo = self.cacheModel.locationsRepo
 	if not locations_in_collections then
-		for _, chartfile_set in ipairs(chartRepo:selectChartfileSetsAtLocation()) do
+		for _, chartfile_set in ipairs(chartfilesRepo:selectChartfileSetsAtLocation()) do
 			process_chartfile_set(chartfile_set.dir, tree)
 		end
 	else
@@ -78,7 +78,7 @@ function CollectionLibrary:getTree(locations_in_collections)
 				items = {tree},
 			}
 			table.insert(tree.items, subtree)
-			for _, chartfile_set in ipairs(chartRepo:selectChartfileSetsAtLocation(location.id)) do
+			for _, chartfile_set in ipairs(chartfilesRepo:selectChartfileSetsAtLocation(location.id)) do
 				process_chartfile_set(chartfile_set.dir, subtree, location.id)
 			end
 		end

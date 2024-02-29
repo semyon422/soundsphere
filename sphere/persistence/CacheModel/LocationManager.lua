@@ -6,11 +6,13 @@ local path_util = require("path_util")
 local LocationManager = class()
 
 ---@param locationsRepo sphere.LocationsRepo
+---@param chartfilesRepo sphere.ChartfilesRepo
 ---@param fs love.filesystem
 ---@param root string OS dependent, absolute
 ---@param prefix string
-function LocationManager:new(locationsRepo, fs, root, prefix)
+function LocationManager:new(locationsRepo, chartfilesRepo, fs, root, prefix)
 	self.locationsRepo = locationsRepo
+	self.chartfilesRepo = chartfilesRepo
 	self.fs = fs
 	self.root = root
 	self.prefix = prefix
@@ -91,7 +93,7 @@ function LocationManager:createLocation(loc)
 end
 
 function LocationManager:deleteCharts(location_id)
-	self.locationsRepo:deleteChartfileSets({
+	self.chartfilesRepo:deleteChartfileSets({
 		location_id = assert(location_id),
 	})
 end

@@ -10,6 +10,7 @@ local GameDatabase = require("sphere.persistence.CacheModel.GameDatabase")
 local CacheStatus = require("sphere.persistence.CacheModel.CacheStatus")
 local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGenerator")
 local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
+local ChartfilesRepo = require("sphere.persistence.CacheModel.ChartfilesRepo")
 local OldScoresMigrator = require("sphere.persistence.CacheModel.OldScoresMigrator")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 
@@ -34,10 +35,12 @@ function CacheModel:new()
 	self.chartRepo = ChartRepo(self.gdb)
 	self.locationsRepo = LocationsRepo(self.gdb)
 	self.scoresRepo = ScoresRepo(self.gdb)
-	self.cacheStatus = CacheStatus(self.chartRepo)
+	self.chartfilesRepo = ChartfilesRepo(self.gdb)
+	self.cacheStatus = CacheStatus(self.chartRepo, self.chartfilesRepo)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartRepo, DifficultyModel)
 	self.locationManager = LocationManager(
 		self.locationsRepo,
+		self.chartfilesRepo,
 		physfs,
 		love.filesystem.getWorkingDirectory(),
 		"mounted_charts"

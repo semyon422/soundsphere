@@ -4,6 +4,7 @@ local NoteChartFinder = require("sphere.persistence.CacheModel.NoteChartFinder")
 local FileCacheGenerator = require("sphere.persistence.CacheModel.FileCacheGenerator")
 local ChartmetaGenerator = require("sphere.persistence.CacheModel.ChartmetaGenerator")
 local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGenerator")
+local ChartfilesRepo = require("sphere.persistence.CacheModel.ChartfilesRepo")
 local NoteChartFactory = require("notechart.NoteChartFactory")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local ModifierModel = require("sphere.models.ModifierModel")
@@ -24,6 +25,7 @@ function CacheManager:new(gdb)
 	self.chartRepo = ChartRepo(gdb)
 	self.locationsRepo = LocationsRepo(gdb)
 	self.scoresRepo = ScoresRepo(gdb)
+	self.chartfilesRepo = ChartfilesRepo(gdb)
 
 	self.noteChartFinder = NoteChartFinder(love.filesystem)
 
@@ -35,10 +37,11 @@ function CacheManager:new(gdb)
 	end
 	self.fileCacheGenerator = FileCacheGenerator(self.chartRepo, self.noteChartFinder, handle_file_cache)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartRepo, DifficultyModel)
-	self.chartmetaGenerator = ChartmetaGenerator(self.chartRepo, NoteChartFactory)
+	self.chartmetaGenerator = ChartmetaGenerator(self.chartRepo, self.chartfilesRepo, NoteChartFactory)
 
 	self.locationManager = LocationManager(
 		self.locationsRepo,
+		self.chartfilesRepo,
 		nil,
 		love.filesystem.getWorkingDirectory(),
 		"mounted_charts"
@@ -118,14 +121,14 @@ function CacheManager:generateCacheFull(path, location_id, location_prefix)
 	local chartfile_set, set_id
 	local dir, name = NoteChartFinder.get_dir_name(path)
 	if name then
-		chartfile_set = self.chartRepo:selectChartfileSet(dir, name)
+		chartfile_set = self.chartfilesRepo:selectChartfileSet(dir, name)
 	end
 	if chartfile_set then
 		set_id = chartfile_set.id
 		print("chartfile_set.id = " .. set_id)
 	end
 
-	local chartfiles = self.chartRepo:selectUnhashedChartfiles(location_id, set_id)
+	local chartfiles = self.chartfilesRepo:selectUnhashedChartfiles(location_id, set_id)
 	self.chartfiles_count = #chartfiles
 
 	self:begin()
@@ -152,6 +155,7 @@ end
 function CacheManager:computeScoresWithMissingChartdiffs()
 	local chartRepo = self.chartRepo
 	local scoresRepo = self.scoresRepo
+	local chartfilesRepo = self.chartfilesRepo
 	local scores = scoresRepo:getScoresWithMissingChartdiffs()
 
 	self.state = 2
@@ -160,7 +164,7 @@ function CacheManager:computeScoresWithMissingChartdiffs()
 	self:checkProgress()
 
 	for i, score in ipairs(scores) do
-		local chartfile = chartRepo:selectChartfileByHash(score.hash)
+		local chartfile = chartfilesRepo:selectChartfileByHash(score.hash)
 		local chartmeta = chartRepo:selectChartmeta(score.hash, score.index)
 		if chartfile and chartmeta then
 			local location = self.locationsRepo:selectLocationById(chartfile.location_id)
