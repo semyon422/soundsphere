@@ -28,7 +28,7 @@ function ChartdiffsRepo:selectDefaultChartdiff(hash, index)
 	return self.models.chartdiffs:find({
 		hash = assert(hash),
 		index = assert(index),
-		modifiers = "",
+		modifiers = {},
 		rate = 1,
 	})
 end
@@ -58,6 +58,16 @@ end
 ---@param conds table
 function ChartdiffsRepo:deleteChartdiffs(conds)
 	self.models.chartdiffs:delete(conds)
+end
+
+---@param chartdiff table
+function ChartdiffsRepo:createUpdateChartdiff(chartdiff)
+	local _chartdiff = self:selectChartdiff(chartdiff)
+	if not _chartdiff then
+		return self:insertChartdiff(chartdiff)
+	end
+	chartdiff.id = _chartdiff.id
+	return self:updateChartdiff(chartdiff)
 end
 
 return ChartdiffsRepo

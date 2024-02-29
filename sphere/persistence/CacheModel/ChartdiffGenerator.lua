@@ -12,17 +12,16 @@ function ChartdiffGenerator:new(chartdiffsRepo, difficultyModel)
 end
 
 ---@param noteChart ncdk.NoteChart
----@param rate number?
+---@param rate number
 function ChartdiffGenerator:compute(noteChart, rate)
-	local difficulty, long_notes_count, notes_count = self.difficultyModel:getDifficulty(noteChart, rate)
-
-	return {
-		inputmode = tostring(noteChart.inputMode),
-		notes_count = notes_count,
-		long_notes_count = long_notes_count,
-		enps_diff = difficulty,
+	local chartdiff = {
 		rate = rate,
+		inputmode = tostring(noteChart.inputMode),
 	}
+
+	self.difficultyModel:compute(chartdiff, noteChart, rate)
+
+	return chartdiff
 end
 
 ---@param chartdiff table
@@ -34,16 +33,6 @@ function ChartdiffGenerator:fillMeta(chartdiff, chartmeta)
 	chartdiff.duration = chartmeta.duration / rate
 end
 
----@param chartdiff table
-function ChartdiffGenerator:createUpdateChartdiff(chartdiff)
-	local _chartdiff = self.chartdiffsRepo:selectChartdiff(chartdiff)
-	if not _chartdiff then
-		return self.chartdiffsRepo:insertChartdiff(chartdiff)
-	end
-	chartdiff.id = _chartdiff.id
-	return self.chartdiffsRepo:updateChartdiff(chartdiff)
-end
-
 ---@param noteChart ncdk.NoteChart
 ---@param hash string
 ---@param index number
@@ -53,7 +42,7 @@ function ChartdiffGenerator:create(noteChart, hash, index)
 		return
 	end
 
-	chartdiff = self:compute(noteChart)
+	chartdiff = self:compute(noteChart, 1)
 	chartdiff.hash = hash
 	chartdiff.index = index
 

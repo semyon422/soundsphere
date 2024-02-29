@@ -181,10 +181,10 @@ function CacheManager:computeChartdiffs()
 			if not noteChart then
 				return nil, err
 			else
-				local chartdiff = self.chartdiffGenerator:compute(noteChart)
+				local chartdiff = self.chartdiffGenerator:compute(noteChart, 1)
 				chartdiff.hash = chartmeta.hash
 				chartdiff.index = chartmeta.index
-				self.chartdiffGenerator:createUpdateChartdiff(chartdiff)
+				self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
 			end
 		end
 		self.chartfiles_current = self.chartfiles_current + 1
@@ -217,7 +217,7 @@ function CacheManager:computeChartdiffs()
 				chartdiff.index = score.index
 				chartdiff.is_exp_rate = score.is_exp_rate
 
-				self.chartdiffGenerator:createUpdateChartdiff(chartdiff)
+				self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
 			end
 		end
 		self.chartfiles_current = self.chartfiles_current + 1
