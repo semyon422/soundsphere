@@ -20,7 +20,16 @@ local CacheModel = class()
 function CacheModel:new()
 	self.tasks = {}
 
-	self.cdb = ChartsDatabase()
+	local migrations = {}
+	setmetatable(migrations, {__index = function(_, k)
+		local data = love.filesystem.read(("sphere/persistence/CacheModel/migrate%s.sql"):format(k))
+		return data
+	end})
+	migrations[1] = function()
+		self.oldScoresMigrator:migrate()
+	end
+
+	self.cdb = ChartsDatabase(migrations)
 	self.cacheDatabase = CacheDatabase(self.cdb)
 	self.chartRepo = ChartRepo(self.cdb)
 	self.cacheStatus = CacheStatus(self.chartRepo)

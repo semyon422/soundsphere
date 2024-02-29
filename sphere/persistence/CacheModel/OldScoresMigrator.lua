@@ -19,8 +19,9 @@ function OldScoresMigrator:migrate()
 	local orm = TableOrm(db)
 
 	db:open("userdata/scores.db")
-
 	local scores = orm:select("scores")
+	db:close()
+
 	print("total scores: " .. #scores)
 
 	local new_scores = {}
@@ -28,13 +29,7 @@ function OldScoresMigrator:migrate()
 		local score = self:convertScore(old_score)
 		table.insert(new_scores, score)
 	end
-	orm:begin()
-	print("begin")
 	chartRepo.models.scores:insert(new_scores)
-	print("commit")
-	orm:commit()
-
-	db:close()
 end
 
 function OldScoresMigrator:convertScore(old_score)

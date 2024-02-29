@@ -8,9 +8,12 @@ local autoload = require("autoload")
 ---@operator call: sphere.ChartsDatabase
 local ChartsDatabase = class()
 
-local user_version = 0
+local user_version = 1
 
-function ChartsDatabase:new()
+---@param migrations table?
+function ChartsDatabase:new(migrations)
+	self.migrations = migrations or {}
+
 	local db = LjsqliteDatabase()
 	self.db = db
 
@@ -24,20 +27,15 @@ function ChartsDatabase:load()
 	local sql = assert(love.filesystem.read("sphere/persistence/CacheModel/database.sql"))
 	self.db:exec(sql)
 	self.db:exec("PRAGMA foreign_keys = ON;")
-	self:updateSchema()
+	self:migrate()
 end
 
 function ChartsDatabase:unload()
 	self.db:close()
 end
 
-function ChartsDatabase:updateSchema()
-	local migrations = setmetatable({}, {__index = function(_, k)
-		local data = love.filesystem.read(("sphere/persistence/CacheModel/migrate%s.sql"):format(k))
-		return data
-	end})
-
-	local count = self.orm:migrate(user_version, migrations)
+function ChartsDatabase:migrate()
+	local count = self.orm:migrate(user_version, self.migrations)
 	if count > 0 then
 		print("migrations applied: " .. count)
 	end

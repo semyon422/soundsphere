@@ -383,9 +383,6 @@ function drawSection:misc()
 	m.showFPS = imgui.checkbox("showFPS", m.showFPS, "show FPS")
 	m.showTasks = imgui.checkbox("showTasks", m.showTasks, "show tasks")
 	m.showDebugMenu = imgui.checkbox("showDebugMenu", m.showDebugMenu, "show debug menu")
-	if imgui.button("migrate scores", "migrate scores") then
-		self.game.cacheModel.oldScoresMigrator:migrate()
-	end
 	if imgui.button("error button", "error") then
 		error("error")
 	end

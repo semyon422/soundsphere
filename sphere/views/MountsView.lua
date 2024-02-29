@@ -19,7 +19,7 @@ local location_info
 
 local sections = {
 	"locations",
-	"metadata",
+	"database",
 }
 local section = sections[1]
 
@@ -163,22 +163,26 @@ function section_draw.locations(self, inner_w)
 	end
 end
 
-function section_draw.metadata(self)
+function section_draw.database(self)
 	local cacheStatus = self.game.cacheModel.cacheStatus
 	imgui.text("chartmetas: " .. cacheStatus.chartmetas)
 	imgui.text("chartdiffs: " .. cacheStatus.chartdiffs)
+
 	if imgui.button("cacheStatus update", "update") then
 		cacheStatus:update()
 	end
+	if imgui.button("delete chartmetas", "delete chartmetas, reset chartfiles") then
+		self.game.cacheModel.chartRepo:deleteChartmetas()
+		self.game.cacheModel.chartRepo:resetChartfileHash()
+	end
+
+	imgui.separator()
+	imgui.text("Score migration")
 	if imgui.button("getScoresWithMissingChartdiffs", "getScoresWithMissingChartdiffs") then
 		print(#self.game.cacheModel.chartRepo:getScoresWithMissingChartdiffs())
 	end
 	if imgui.button("computeScoresWithMissingChartdiffs", "computeScoresWithMissingChartdiffs") then
 		self.game.cacheModel:computeScoresWithMissingChartdiffs()
-	end
-	if imgui.button("delete", "delete chartmetas, reset chartfiles") then
-		self.game.cacheModel.chartRepo:deleteChartmetas()
-		self.game.cacheModel.chartRepo:resetChartfileHash()
 	end
 end
 
