@@ -10,8 +10,6 @@ local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGener
 local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
 local OldScoresMigrator = require("sphere.persistence.CacheModel.OldScoresMigrator")
 local DifficultyModel = require("sphere.models.DifficultyModel")
-local NoteChartFactory = require("notechart.NoteChartFactory")
-local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.CacheModel
 ---@operator call: sphere.CacheModel
@@ -72,8 +70,15 @@ end
 ---@param location_id number
 function CacheModel:startUpdate(path, location_id)
 	table.insert(self.tasks, {
+		type = "update_cache",
 		path = path,
 		location_id = location_id,
+	})
+end
+
+function CacheModel:computeScoresWithMissingChartdiffs()
+	table.insert(self.tasks, {
+		type = "update_scores_chartdiffs",
 	})
 end
 
@@ -91,7 +96,7 @@ function CacheModel:startUpdateAsync(path, location_id)
 	coroutine.yield()
 end
 
-function CacheModel:stopUpdate()
+function CacheModel:stopTask()
 	self.shared.stop = true
 end
 
@@ -101,8 +106,8 @@ function CacheModel:update()
 	end
 end
 
-local updateCacheAsync = thread.async(function(path, location_id, location_prefix)
-	print(path, location_id, location_prefix)
+local runTaskAsync = thread.async(function(task)
+	print(require("inspect")(task))
 	local CacheManager = require("sphere.persistence.CacheModel.CacheManager")
 	local ChartsDatabase = require("sphere.persistence.CacheModel.ChartsDatabase")
 
@@ -110,7 +115,12 @@ local updateCacheAsync = thread.async(function(path, location_id, location_prefi
 	cdb:load()
 
 	local cacheManager = CacheManager(cdb)
-	cacheManager:generateCacheFull(path, location_id, location_prefix)
+
+	if task.type == "update_cache" then
+		cacheManager:generateCacheFull(task.path, task.location_id, task.location_prefix)
+	elseif task.type == "update_scores_chartdiffs" then
+		cacheManager:computeScoresWithMissingChartdiffs()
+	end
 
 	cdb:unload()
 end)
@@ -124,11 +134,14 @@ function CacheModel:process()
 	local tasks = self.tasks
 	local task = table.remove(tasks, 1)
 	while task do
-		local location = self.chartRepo:selectLocationById(task.location_id)
-		local prefix = self.locationManager:getPrefix(location)
+		if task.type == "update_cache" then
+			local location = self.chartRepo:selectLocationById(task.location_id)
+			local prefix = self.locationManager:getPrefix(location)
+			task.location_prefix = prefix
+		end
 
 		self.cdb:unload()
-		updateCacheAsync(task.path, task.location_id, prefix)
+		runTaskAsync(task)
 		self.cdb:load()
 
 		if task.callback then
@@ -142,39 +155,5 @@ function CacheModel:process()
 end
 
 CacheModel.process = thread.coro(CacheModel.process)
-
-function CacheModel:computeScoresWithMissingChartdiffs()
-	local chartRepo = self.chartRepo
-	local scores = chartRepo:getScoresWithMissingChartdiffs()
-
-	for _, score in ipairs(scores) do
-		local chartfile = chartRepo:selectChartfileByHash(score.hash)
-		local chartmeta = chartRepo:selectChartmeta(score.hash, score.index)
-		if chartfile and chartmeta then
-			local location = self.chartRepo:selectLocationById(chartfile.location_id)
-			local prefix = self.locationManager:getPrefix(location)
-
-			local full_path = path_util.join(prefix, chartfile.path)
-			local content = assert(love.filesystem.read(full_path))
-
-			local noteChart, err = NoteChartFactory:getNoteChart(chartfile.name, content, score.index)
-			if not noteChart then
-				return nil, err
-			else
-				ModifierModel:apply(score.modifiers, noteChart)
-
-				local chartdiff = self.chartdiffGenerator:compute(noteChart, score.rate)
-				chartdiff.modifiers = score.modifiers
-				chartdiff.hash = score.hash
-				chartdiff.index = score.index
-				chartdiff.is_exp_rate = score.is_exp_rate
-
-				self.chartdiffGenerator:fillMeta(chartdiff, chartmeta)
-
-				self.chartdiffGenerator:createUpdateChartdiff(chartdiff)
-			end
-		end
-	end
-end
 
 return CacheModel

@@ -137,7 +137,7 @@ function SelectController:updateCacheLocation(location_id)
 	if state == 0 or state == 3 then
 		cacheModel:startUpdate(nil, location_id)
 	else
-		cacheModel:stopUpdate()
+		cacheModel:stopTask()
 	end
 end
 

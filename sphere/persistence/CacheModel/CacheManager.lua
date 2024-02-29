@@ -5,6 +5,8 @@ local ChartmetaGenerator = require("sphere.persistence.CacheModel.ChartmetaGener
 local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGenerator")
 local NoteChartFactory = require("notechart.NoteChartFactory")
 local DifficultyModel = require("sphere.models.DifficultyModel")
+local ModifierModel = require("sphere.models.ModifierModel")
+local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
 local class = require("class")
 local path_util = require("path_util")
 
@@ -29,6 +31,13 @@ function CacheManager:new(cdb)
 	self.fileCacheGenerator = FileCacheGenerator(self.chartRepo, self.noteChartFinder, handle_file_cache)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartRepo, DifficultyModel)
 	self.chartmetaGenerator = ChartmetaGenerator(self.chartRepo, NoteChartFactory)
+
+	self.locationManager = LocationManager(
+		self.chartRepo,
+		nil,
+		love.filesystem.getWorkingDirectory(),
+		"mounted_charts"
+	)
 end
 
 function CacheManager:begin()
@@ -130,6 +139,53 @@ function CacheManager:generateCacheFull(path, location_id, location_prefix)
 		end
 	end
 	self:commit()
+
+	self.state = 0
+	self:checkProgress()
+end
+
+function CacheManager:computeScoresWithMissingChartdiffs()
+	local chartRepo = self.chartRepo
+	local scores = chartRepo:getScoresWithMissingChartdiffs()
+
+	self.state = 2
+	self.chartfiles_count = #scores
+	self.chartfiles_current = 0
+	self:checkProgress()
+
+	for i, score in ipairs(scores) do
+		local chartfile = chartRepo:selectChartfileByHash(score.hash)
+		local chartmeta = chartRepo:selectChartmeta(score.hash, score.index)
+		if chartfile and chartmeta then
+			local location = self.chartRepo:selectLocationById(chartfile.location_id)
+			local prefix = self.locationManager:getPrefix(location)
+
+			local full_path = path_util.join(prefix, chartfile.path)
+			local content = assert(love.filesystem.read(full_path))
+
+			local noteChart, err = NoteChartFactory:getNoteChart(chartfile.name, content, score.index)
+			if not noteChart then
+				return nil, err
+			else
+				ModifierModel:apply(score.modifiers, noteChart)
+
+				local chartdiff = self.chartdiffGenerator:compute(noteChart, score.rate)
+				chartdiff.modifiers = score.modifiers
+				chartdiff.hash = score.hash
+				chartdiff.index = score.index
+				chartdiff.is_exp_rate = score.is_exp_rate
+
+				self.chartdiffGenerator:fillMeta(chartdiff, chartmeta)
+
+				self.chartdiffGenerator:createUpdateChartdiff(chartdiff)
+			end
+		end
+		self.chartfiles_current = i
+		self:checkProgress()
+		if self.needStop then
+			break
+		end
+	end
 
 	self.state = 0
 	self:checkProgress()

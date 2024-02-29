@@ -181,8 +181,22 @@ function section_draw.database(self)
 	if imgui.button("getScoresWithMissingChartdiffs", "getScoresWithMissingChartdiffs") then
 		print(#self.game.cacheModel.chartRepo:getScoresWithMissingChartdiffs())
 	end
-	if imgui.button("computeScoresWithMissingChartdiffs", "computeScoresWithMissingChartdiffs") then
-		self.game.cacheModel:computeScoresWithMissingChartdiffs()
+
+	local cacheModel = self.game.cacheModel
+	local state = cacheModel.shared.state
+	if state == 0 or state == 3 then
+		if imgui.button("computeScoresWithMissingChartdiffs", "compute missing chartdiffs") then
+			cacheModel:computeScoresWithMissingChartdiffs()
+		end
+	else
+		local count = cacheModel.shared.chartfiles_count
+		local current = cacheModel.shared.chartfiles_current
+
+		local progress = ("%0.2f%% %s/%s"):format(current / count, current, count)
+
+		if imgui.button("stopTask", progress) then
+			cacheModel:stopTask()
+		end
 	end
 end
 
