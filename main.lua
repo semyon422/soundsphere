@@ -124,9 +124,9 @@ if arg[2] == "test" then
 	local testing = require("testing")
 
 	testing.blacklist = {
+		".git",
 		"3rd-deps",
 		"tree",
-		"libchart",
 		"userdata",
 	}
 
