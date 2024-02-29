@@ -8,6 +8,7 @@ local NoteChartFactory = require("notechart.NoteChartFactory")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local ModifierModel = require("sphere.models.ModifierModel")
 local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
+local ScoresRepo = require("sphere.persistence.CacheModel.ScoresRepo")
 local class = require("class")
 local path_util = require("path_util")
 
@@ -15,12 +16,14 @@ local path_util = require("path_util")
 ---@operator call: sphere.CacheManager
 local CacheManager = class()
 
-function CacheManager:new(cdb)
+---@param gdb sphere.GameDatabase
+function CacheManager:new(gdb)
 	self.state = 0
 
-	self.cdb = cdb
-	self.chartRepo = ChartRepo(cdb)
-	self.locationsRepo = LocationsRepo(cdb)
+	self.gdb = gdb
+	self.chartRepo = ChartRepo(gdb)
+	self.locationsRepo = LocationsRepo(gdb)
+	self.scoresRepo = ScoresRepo(gdb)
 
 	self.noteChartFinder = NoteChartFinder(love.filesystem)
 
@@ -43,11 +46,11 @@ function CacheManager:new(cdb)
 end
 
 function CacheManager:begin()
-	self.cdb.orm:begin()
+	self.gdb.orm:begin()
 end
 
 function CacheManager:commit()
-	self.cdb.orm:commit()
+	self.gdb.orm:commit()
 end
 
 ----------------------------------------------------------------
@@ -148,7 +151,8 @@ end
 
 function CacheManager:computeScoresWithMissingChartdiffs()
 	local chartRepo = self.chartRepo
-	local scores = chartRepo:getScoresWithMissingChartdiffs()
+	local scoresRepo = self.scoresRepo
+	local scores = scoresRepo:getScoresWithMissingChartdiffs()
 
 	self.state = 2
 	self.chartfiles_count = #scores

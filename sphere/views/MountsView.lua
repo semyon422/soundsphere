@@ -179,7 +179,7 @@ function section_draw.database(self)
 	imgui.separator()
 	imgui.text("Score migration")
 	if imgui.button("getScoresWithMissingChartdiffs", "getScoresWithMissingChartdiffs") then
-		print(#self.game.cacheModel.chartRepo:getScoresWithMissingChartdiffs())
+		print(#self.game.cacheModel.scoresRepo:getScoresWithMissingChartdiffs())
 	end
 
 	local cacheModel = self.game.cacheModel

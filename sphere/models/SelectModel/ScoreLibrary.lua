@@ -134,9 +134,9 @@ function ScoreLibrary:updateItemsLocal(chartview, exact)
 
 	local scores
 	if exact then
-		scores = self.cacheModel.chartRepo:getScoresExact(chartview)
+		scores = self.cacheModel.scoresRepo:getScoresExact(chartview)
 	else
-		scores = self.cacheModel.chartRepo:getScores(chartview)
+		scores = self.cacheModel.scoresRepo:getScores(chartview)
 	end
 
 	for i, score in ipairs(scores) do
