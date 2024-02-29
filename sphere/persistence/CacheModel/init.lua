@@ -1,8 +1,7 @@
 local thread = require("thread")
 local class = require("class")
 local physfs = require("physfs")
-local path_util = require("path_util")
-local CacheDatabase = require("sphere.persistence.CacheModel.CacheDatabase")
+local ChartviewsRepo = require("sphere.persistence.CacheModel.ChartviewsRepo")
 local ChartdiffsRepo = require("sphere.persistence.CacheModel.ChartdiffsRepo")
 local ChartmetasRepo = require("sphere.persistence.CacheModel.ChartmetasRepo")
 local LocationsRepo = require("sphere.persistence.CacheModel.LocationsRepo")
@@ -32,7 +31,7 @@ function CacheModel:new()
 	end
 
 	self.gdb = GameDatabase(migrations)
-	self.cacheDatabase = CacheDatabase(self.gdb)
+	self.chartviewsRepo = ChartviewsRepo(self.gdb)
 	self.chartdiffsRepo = ChartdiffsRepo(self.gdb)
 	self.chartmetasRepo = ChartmetasRepo(self.gdb)
 	self.locationsRepo = LocationsRepo(self.gdb)

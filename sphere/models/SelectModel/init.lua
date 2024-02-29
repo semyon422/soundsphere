@@ -91,7 +91,7 @@ function SelectModel:updateSetItems()
 	params.difficulty = config.diff_column
 	params.chartdiffs_list = config.chartdiffs_list
 
-	self.cacheModel.cacheDatabase:queryAsync(params)
+	self.cacheModel.chartviewsRepo:queryAsync(params)
 	self.noteChartSetLibrary:updateItems()
 end
 
@@ -103,7 +103,7 @@ function SelectModel:findNotechart(hash, index)
 		where = {hash = hash, index = index},
 		difficulty = config.diff_column,
 	}
-	self.cacheModel.cacheDatabase:queryAsync(params)
+	self.cacheModel.chartviewsRepo:queryAsync(params)
 	self.noteChartSetLibrary:updateItems()
 end
 

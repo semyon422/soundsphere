@@ -19,7 +19,7 @@ end
 
 ---@param chartview table
 function NoteChartLibrary:setNoteChartSetId(chartview)
-	self.items = self.cacheModel.cacheDatabase:getChartviewsAtSet(chartview)
+	self.items = self.cacheModel.chartviewsRepo:getChartviewsAtSet(chartview)
 	if #self.items == 0 then
 		return
 	end

@@ -4,12 +4,12 @@ local sql_util = require("rdb.sql_util")
 local ffi = require("ffi")
 local class = require("class")
 
----@class sphere.CacheDatabase
----@operator call: sphere.CacheDatabase
-local CacheDatabase = class()
+---@class sphere.ChartviewsRepo
+---@operator call: sphere.ChartviewsRepo
+local ChartviewsRepo = class()
 
 ---@param gdb sphere.GameDatabase
-function CacheDatabase:new(gdb)
+function ChartviewsRepo:new(gdb)
 	self.chartviews_count = 0
 	self.chartviews = {}
 	self.set_id_to_global_index = {}
@@ -29,21 +29,21 @@ ffi.cdef([[
 		int32_t chartmeta_id;
 		int32_t chartdiff_id;
 		bool lamp;
-	} EntryStruct
+	} chartview_struct
 ]])
 
-CacheDatabase.EntryStruct = ffi.typeof("EntryStruct")
+ChartviewsRepo.chartview_struct = ffi.typeof("chartview_struct")
 
 local _queryAsync = thread.async(function(params)
 	local time = love.timer.getTime()
 	local ffi = require("ffi")
-	local CacheDatabase = require("sphere.persistence.CacheModel.CacheDatabase")
+	local ChartviewsRepo = require("sphere.persistence.CacheModel.ChartviewsRepo")
 	local GameDatabase = require("sphere.persistence.CacheModel.GameDatabase")
 
 	local gdb = GameDatabase()
 	gdb:load()
 
-	local self = CacheDatabase(gdb)
+	local self = ChartviewsRepo(gdb)
 	self.params = params
 	local status, err = pcall(self.queryNoteChartSets, self)
 	gdb:unload()
@@ -67,7 +67,7 @@ local _queryAsync = thread.async(function(params)
 end)
 
 ---@param params table
-function CacheDatabase:queryAsync(params)
+function ChartviewsRepo:queryAsync(params)
 	self.params = params
 	local t = _queryAsync(params)
 	if not t then
@@ -79,12 +79,12 @@ function CacheDatabase:queryAsync(params)
 	self.chartfile_id_to_global_index = t.chartfile_id_to_global_index
 	self.chartdiff_id_to_global_index = t.chartdiff_id_to_global_index
 
-	local size = ffi.sizeof("EntryStruct")
-	self.chartviews = ffi.new("EntryStruct[?]", #t.chartviews / size)
+	local size = ffi.sizeof("chartview_struct")
+	self.chartviews = ffi.new("chartview_struct[?]", #t.chartviews / size)
 	ffi.copy(self.chartviews, t.chartviews, #t.chartviews)
 end
 
-function CacheDatabase:queryNoteChartSets()
+function ChartviewsRepo:queryNoteChartSets()
 	local params = self.params
 
 	local columns = {
@@ -120,7 +120,7 @@ function CacheDatabase:queryNoteChartSets()
 	local objs = model:select(where, options)
 	print("count", #objs)
 
-	local noteChartSets = ffi.new("EntryStruct[?]", #objs)
+	local noteChartSets = ffi.new("chartview_struct[?]", #objs)
 	local chartfile_id_to_global_index = {}
 	local chartdiff_id_to_global_index = {}
 	local set_id_to_global_index = {}
@@ -148,7 +148,7 @@ end
 
 ---@param chartview table
 ---@return rdb.ModelRow[]
-function CacheDatabase:getChartviewsAtSet(chartview)
+function ChartviewsRepo:getChartviewsAtSet(chartview)
 	local params = self.params
 
 	local columns = {
@@ -190,7 +190,7 @@ end
 
 ---@param _chartview table
 ---@return rdb.ModelRow
-function CacheDatabase:getChartview(_chartview)
+function ChartviewsRepo:getChartview(_chartview)
 	local chartfile_id = _chartview.chartfile_id
 	local chartmeta_id = _chartview.chartmeta_id
 	local chartdiff_id = _chartview.chartdiff_id
@@ -227,4 +227,4 @@ function CacheDatabase:getChartview(_chartview)
 	return obj
 end
 
-return CacheDatabase
+return ChartviewsRepo

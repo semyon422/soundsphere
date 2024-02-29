@@ -31,9 +31,9 @@ end
 ---@param itemIndex number
 ---@return table
 function NoteChartSetLibrary:loadObject(itemIndex)
-	local cacheDatabase = self.cacheModel.cacheDatabase
-	local _chartview = cacheDatabase.chartviews[itemIndex - 1]
-	local chartview = cacheDatabase:getChartview(_chartview)
+	local chartviewsRepo = self.cacheModel.chartviewsRepo
+	local _chartview = chartviewsRepo.chartviews[itemIndex - 1]
+	local chartview = chartviewsRepo:getChartview(_chartview)
 	if not chartview then
 		return {}
 	end
@@ -42,7 +42,7 @@ function NoteChartSetLibrary:loadObject(itemIndex)
 end
 
 function NoteChartSetLibrary:updateItems()
-	self.itemsCount = self.cacheModel.cacheDatabase.chartviews_count
+	self.itemsCount = self.cacheModel.chartviewsRepo.chartviews_count
 	self.cache:new()
 end
 
@@ -53,7 +53,7 @@ function NoteChartSetLibrary:indexof(chartview)
 	local chartdiff_id = chartview.chartdiff_id
 	local set_id = chartview.chartfile_set_id
 
-	local cdb = self.cacheModel.cacheDatabase
+	local cdb = self.cacheModel.chartviewsRepo
 	return
 		cdb.chartdiff_id_to_global_index[chartdiff_id] or
 		cdb.chartfile_id_to_global_index[chartfile_id] or
