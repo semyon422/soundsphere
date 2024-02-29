@@ -1,4 +1,5 @@
 local ChartRepo = require("sphere.persistence.CacheModel.ChartRepo")
+local LocationsRepo = require("sphere.persistence.CacheModel.LocationsRepo")
 local NoteChartFinder = require("sphere.persistence.CacheModel.NoteChartFinder")
 local FileCacheGenerator = require("sphere.persistence.CacheModel.FileCacheGenerator")
 local ChartmetaGenerator = require("sphere.persistence.CacheModel.ChartmetaGenerator")
@@ -19,6 +20,7 @@ function CacheManager:new(cdb)
 
 	self.cdb = cdb
 	self.chartRepo = ChartRepo(cdb)
+	self.locationsRepo = LocationsRepo(cdb)
 
 	self.noteChartFinder = NoteChartFinder(love.filesystem)
 
@@ -33,7 +35,7 @@ function CacheManager:new(cdb)
 	self.chartmetaGenerator = ChartmetaGenerator(self.chartRepo, NoteChartFactory)
 
 	self.locationManager = LocationManager(
-		self.chartRepo,
+		self.locationsRepo,
 		nil,
 		love.filesystem.getWorkingDirectory(),
 		"mounted_charts"
@@ -157,7 +159,7 @@ function CacheManager:computeScoresWithMissingChartdiffs()
 		local chartfile = chartRepo:selectChartfileByHash(score.hash)
 		local chartmeta = chartRepo:selectChartmeta(score.hash, score.index)
 		if chartfile and chartmeta then
-			local location = self.chartRepo:selectLocationById(chartfile.location_id)
+			local location = self.locationsRepo:selectLocationById(chartfile.location_id)
 			local prefix = self.locationManager:getPrefix(location)
 
 			local full_path = path_util.join(prefix, chartfile.path)

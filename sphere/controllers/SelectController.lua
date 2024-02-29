@@ -104,7 +104,7 @@ function SelectController:openDirectory()
 	if not chartview then
 		return
 	end
-	local location = self.cacheModel.chartRepo:selectLocationById(chartview.location_id)
+	local location = self.cacheModel.locationsRepo:selectLocationById(chartview.location_id)
 	if not location then
 		return
 	end

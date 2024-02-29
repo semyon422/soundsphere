@@ -261,38 +261,4 @@ function ChartRepo:getScoresWithMissingChartdiffs()
 	})
 end
 
----@return table
-function ChartRepo:selectLocations()
-	return self.models.locations:select()
-end
-
----@param path string
----@return table?
-function ChartRepo:selectLocation(path)
-	return self.models.locations:find({path = assert(path)})
-end
-
----@param id number
----@return table?
-function ChartRepo:selectLocationById(id)
-	return self.models.locations:find({id = assert(id)})
-end
-
----@param location table
----@return table
-function ChartRepo:insertLocation(location)
-	return self.models.locations:create(location)
-end
-
----@param location table
----@return table?
-function ChartRepo:updateLocation(location)
-	return self.models.locations:update(location, {id = location.id})
-end
-
----@param location_id number
-function ChartRepo:deleteLocation(location_id)
-	self.models.locations:delete({id = assert(location_id)})
-end
-
 return ChartRepo

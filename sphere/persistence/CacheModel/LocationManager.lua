@@ -5,12 +5,12 @@ local path_util = require("path_util")
 ---@operator call: sphere.LocationManager
 local LocationManager = class()
 
----@param chartRepo sphere.ChartRepo
+---@param locationsRepo sphere.LocationsRepo
 ---@param fs love.filesystem
 ---@param root string OS dependent, absolute
 ---@param prefix string
-function LocationManager:new(chartRepo, fs, root, prefix)
-	self.chartRepo = chartRepo
+function LocationManager:new(locationsRepo, fs, root, prefix)
+	self.locationsRepo = locationsRepo
 	self.fs = fs
 	self.root = root
 	self.prefix = prefix
@@ -18,7 +18,7 @@ function LocationManager:new(chartRepo, fs, root, prefix)
 end
 
 function LocationManager:load()
-	self.locations = self.chartRepo:selectLocations()
+	self.locations = self.locationsRepo:selectLocations()
 	for _, location in ipairs(self.locations) do
 		self:mountLocation(location)
 	end
@@ -76,28 +76,28 @@ function LocationManager:createLocation(loc)
 		loc.name = loc.path:match("^.+/(.-)$") or loc.path
 	end
 
-	local chartRepo = self.chartRepo
+	local locationsRepo = self.locationsRepo
 
-	local location = chartRepo:selectLocation(loc.path)
+	local location = locationsRepo:selectLocation(loc.path)
 	if location then
 		return
 	end
 
 	loc.is_relative = not not loc.is_relative
 	loc.is_internal = not not loc.is_internal
-	chartRepo:insertLocation(loc)
+	locationsRepo:insertLocation(loc)
 
 	self:load()
 end
 
 function LocationManager:deleteCharts(location_id)
-	self.chartRepo:deleteChartfileSets({
+	self.locationsRepo:deleteChartfileSets({
 		location_id = assert(location_id),
 	})
 end
 
 function LocationManager:deleteLocation(location_id)
-	self.chartRepo:deleteLocation(location_id)
+	self.locationsRepo:deleteLocation(location_id)
 end
 
 return LocationManager

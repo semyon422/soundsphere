@@ -4,6 +4,7 @@ local physfs = require("physfs")
 local path_util = require("path_util")
 local CacheDatabase = require("sphere.persistence.CacheModel.CacheDatabase")
 local ChartRepo = require("sphere.persistence.CacheModel.ChartRepo")
+local LocationsRepo = require("sphere.persistence.CacheModel.LocationsRepo")
 local GameDatabase = require("sphere.persistence.CacheModel.GameDatabase")
 local CacheStatus = require("sphere.persistence.CacheModel.CacheStatus")
 local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGenerator")
@@ -30,10 +31,11 @@ function CacheModel:new()
 	self.gdb = GameDatabase(migrations)
 	self.cacheDatabase = CacheDatabase(self.gdb)
 	self.chartRepo = ChartRepo(self.gdb)
+	self.locationsRepo = LocationsRepo(self.gdb)
 	self.cacheStatus = CacheStatus(self.chartRepo)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartRepo, DifficultyModel)
 	self.locationManager = LocationManager(
-		self.chartRepo,
+		self.locationsRepo,
 		physfs,
 		love.filesystem.getWorkingDirectory(),
 		"mounted_charts"
@@ -135,7 +137,7 @@ function CacheModel:process()
 	local task = table.remove(tasks, 1)
 	while task do
 		if task.type == "update_cache" then
-			local location = self.chartRepo:selectLocationById(task.location_id)
+			local location = self.locationsRepo:selectLocationById(task.location_id)
 			local prefix = self.locationManager:getPrefix(location)
 			task.location_prefix = prefix
 		end
