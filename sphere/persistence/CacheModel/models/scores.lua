@@ -10,7 +10,7 @@ scores.types = {
 	single = "boolean",
 	modifiers = chartdiffs.types.modifiers,
 	rate = int_rates,
-	is_exp_rate = "boolean",
+	rate_type = chartdiffs.types.rate_type,
 }
 
 scores.relations = {}

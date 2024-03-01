@@ -58,7 +58,7 @@ function OldScoresMigrator:convertScore(old_score)
 	score.modifiers = info.modifiers
 	score.rate = info.rate
 	score.const = info.const
-	score.is_exp_rate = info.is_exp_rate
+	score.rate_type = info.is_exp_rate and "exp" or "linear"
 
 	return score
 end

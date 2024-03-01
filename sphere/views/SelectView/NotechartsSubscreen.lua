@@ -390,8 +390,8 @@ local function ModifierIconGrid(self)
 	local g = configs.settings.gameplay
 
 	local timeRateModel = self.game.timeRateModel
-	local range = timeRateModel.range[g.rateType]
-	local format = timeRateModel.format[g.rateType]
+	local range = timeRateModel.range[g.rate_type]
+	local format = timeRateModel.format[g.rate_type]
 	local newRate = imgui.knob(
 		"rate knob",
 		timeRateModel:get(),

@@ -46,7 +46,7 @@ function GameplayController:load()
 	chartdiff.modifiers = playContext.modifiers
 	chartdiff.hash = chartview.hash
 	chartdiff.index = chartview.index
-	chartdiff.is_exp_rate = config.rateType == "exp"
+	chartdiff.rate_type = config.rate_type
 	cacheModel.chartdiffGenerator:fillMeta(chartdiff, chartview)
 	playContext.chartdiff = chartdiff
 

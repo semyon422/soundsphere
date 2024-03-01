@@ -60,7 +60,7 @@ return {
 		actionOnFail = "none",
 		ratingHitTimingWindow = 0.032,
 		scaleSpeed = false,
-		rateType = "default",
+		rate_type = "linear",
 		speedType = "default",
 		speed = 1,
 		tempoFactor = "average",  -- "average", "primary", "minimum", "maximum"

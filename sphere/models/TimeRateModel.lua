@@ -7,17 +7,17 @@ local int_rates = require("libchart.int_rates")
 local TimeRateModel = class()
 
 TimeRateModel.types = {
-	"default",
+	"linear",
 	"exp",
 }
 
 TimeRateModel.range = {
-	default = {0.5, 2, 0.05},
+	linear = {0.5, 2, 0.05},
 	exp = {-10, 10, 1},
 }
 
 TimeRateModel.format = {
-	default = "%0.2f",
+	linear = "%0.2f",
 	exp = "%0.f",
 }
 
@@ -33,10 +33,10 @@ function TimeRateModel:get()
 	local gameplay = self.configModel.configs.settings.gameplay
 	local playContext = self.playContext
 
-	local rateType = gameplay.rateType
+	local rate_type = gameplay.rate_type
 	local rate = playContext.rate
 
-	if rateType == "exp" then
+	if rate_type == "exp" then
 		rate = int_rates.get_exp(rate, 10)
 	end
 
@@ -48,13 +48,13 @@ function TimeRateModel:set(newRate)
 	local gameplay = self.configModel.configs.settings.gameplay
 	local playContext = self.playContext
 
-	local rateType = gameplay.rateType
+	local rate_type = gameplay.rate_type
 	local rate = newRate
 
-	local range = self.range[rateType]
+	local range = self.range[rate_type]
 	rate = math_util.clamp(rate, range[1], range[2])
 
-	if rateType == "exp" then
+	if rate_type == "exp" then
 		rate = 2 ^ (rate / 10)
 	end
 
@@ -64,8 +64,8 @@ end
 ---@param delta number
 function TimeRateModel:increase(delta)
 	local gameplay = self.configModel.configs.settings.gameplay
-	local rateType = gameplay.rateType
-	local range = self.range[rateType]
+	local rate_type = gameplay.rate_type
+	local range = self.range[rate_type]
 	local rate = self:get() + delta * range[3]
 	rate = math_util.round(rate, range[3])
 	self:set(rate)

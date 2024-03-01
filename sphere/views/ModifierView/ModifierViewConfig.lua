@@ -66,8 +66,8 @@ local function Buttons(self)
 	local g = configs.settings.gameplay
 
 	local timeRateModel = self.game.timeRateModel
-	local range = timeRateModel.range[g.rateType]
-	local format = timeRateModel.format[g.rateType]
+	local range = timeRateModel.range[g.rate_type]
+	local format = timeRateModel.format[g.rate_type]
 	local newRate = imgui.slider1("rate", timeRateModel:get(), format, range[1], range[2], range[3], "play rate")
 
 	if newRate ~= timeRateModel:get() then
@@ -75,7 +75,7 @@ local function Buttons(self)
 	end
 	timeRateModel:set(newRate)
 
-	g.rateType = imgui.combo("rateType", g.rateType, timeRateModel.types, nil, "rate type")
+	g.rate_type = imgui.combo("rate_type", g.rate_type, timeRateModel.types, nil, "rate type")
 
 	local playContext = self.game.playContext
 	playContext.const = imgui.checkbox("const", playContext.const, "const")

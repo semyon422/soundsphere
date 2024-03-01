@@ -11,7 +11,7 @@ chartviews.types = {
 	set_is_file = "boolean",
 	modifiers = chartdiffs.types.modifiers,
 	rate = int_rates,
-	is_exp_rate = "boolean",
+	rate_type = chartdiffs.types.rate_type,
 }
 
 chartviews.relations = {}
