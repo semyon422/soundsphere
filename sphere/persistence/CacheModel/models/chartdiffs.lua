@@ -1,6 +1,6 @@
 local ModifierEncoder = require("sphere.models.ModifierEncoder")
 local int_rates = require("libchart.int_rates")
-local enum = require("rdb.enum")
+local Enum = require("rdb.Enum")
 
 local modifiers = {}
 
@@ -22,7 +22,7 @@ function modifiers.decode(t)
 	return ModifierEncoder:decode(t)
 end
 
-local rate_type = enum({
+local rate_type = Enum({
 	linear = 0,
 	exp = 1,
 })
