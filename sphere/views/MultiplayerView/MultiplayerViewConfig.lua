@@ -86,7 +86,7 @@ local function Cells(self)
 		length = (chartview.duration or 0) / baseTimeRate
 		notes_count = chartview.notes_count or 0
 		level = chartview.level or 0
-		longNoteRatio = chartview.longNoteRatio or 0
+		longNoteRatio = (chartview.long_notes_count or 0) / (chartview.notes_count or 0)
 		localOffset = chartview.localOffset or 0
 		format = chartview.format or ""
 	end
