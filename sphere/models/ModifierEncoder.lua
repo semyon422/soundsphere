@@ -68,7 +68,8 @@ local function parse_mod_from_name(s)
 	elseif s == "CMod" then
 		return {const = true}
 	elseif s:match("^(.+)Q$") then
-		return {rate = 2 ^ (tonumber(s:match("^(.+)Q$")) / 10), is_exp_rate = true}
+		local q = tonumber(s:match("^(.+)Q$"))
+		return {rate = 2 ^ (q / 10), is_exp_rate = q ~= 0}
 	elseif s:match("^(.+)X$") then
 		return {rate = tonumber(s:match("^(.+)X$"))}
 	elseif s:match("^Alt(.)$") then
