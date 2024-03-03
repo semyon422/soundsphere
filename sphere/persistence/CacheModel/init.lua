@@ -125,7 +125,7 @@ local runTaskAsync = thread.async(function(task)
 	local cacheManager = CacheManager(gdb)
 
 	if task.type == "update_cache" then
-		cacheManager:generateCacheFull(task.path, task.location_id, task.location_prefix)
+		cacheManager:computeCacheLocation(task.path, task.location_id)
 	elseif task.type == "update_chartdiffs" then
 		cacheManager:computeChartdiffs()
 	end
@@ -142,12 +142,6 @@ function CacheModel:process()
 	local tasks = self.tasks
 	local task = table.remove(tasks, 1)
 	while task do
-		if task.type == "update_cache" then
-			local location = self.locationsRepo:selectLocationById(task.location_id)
-			local prefix = self.locationManager:getPrefix(location)
-			task.location_prefix = prefix
-		end
-
 		self.gdb:unload()
 		runTaskAsync(task)
 		self.gdb:load()

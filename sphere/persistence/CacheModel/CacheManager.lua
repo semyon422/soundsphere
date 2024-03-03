@@ -106,8 +106,10 @@ end
 
 ---@param path string?
 ---@param location_id number
----@param location_prefix string
-function CacheManager:generateCacheFull(path, location_id, location_prefix)
+function CacheManager:computeCacheLocation(path, location_id)
+	local location = self.locationsRepo:selectLocationById(location_id)
+	local location_prefix = self.locationManager:getPrefix(location)
+
 	self:resetProgress()
 
 	self.state = 1
