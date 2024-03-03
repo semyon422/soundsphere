@@ -185,12 +185,18 @@ function section_draw.locations(self, inner_w)
 		location_info.chartfiles
 	))
 
-	if imgui.button("reset dir", "delete charts cache") then
+	imgui.separator()
+
+	local inactive = not love.keyboard.isDown("lshift")
+	imgui.text("Hold left shift to make buttons below active")
+
+	if imgui.button("reset dir", "delete charts cache", inactive) then
 		locationManager:deleteCharts(selected_loc.id)
 		location_info = get_location_info(self, selected_loc.id)
 		self.game.selectModel:noDebouncePullNoteChartSet()
 	end
-	if not selected_loc.is_internal and imgui.button("delete dir", "delete location") then
+
+	if not selected_loc.is_internal and imgui.button("delete dir", "delete location", inactive) then
 		locationManager:deleteLocation(selected_loc.id)
 		locationManager:load()
 		self.game.selectModel:noDebouncePullNoteChartSet()
@@ -205,15 +211,6 @@ function section_draw.database(self)
 	if imgui.button("cacheStatus update", "update status") then
 		cacheStatus:update()
 	end
-	if imgui.button("reset chartfiles", "reset chartfiles.hash") then
-		self.game.cacheModel.chartfilesRepo:resetChartfileHash()
-	end
-	if imgui.button("delete chartmetas", "delete chartmetas") then
-		self.game.cacheModel.chartmetasRepo:deleteChartmetas()
-	end
-	if imgui.button("delete chartdiffs", "delete chartdiffs") then
-		self.game.cacheModel.chartdiffsRepo:deleteChartdiffs()
-	end
 
 	local cacheModel = self.game.cacheModel
 	local state = cacheModel.shared.state
@@ -221,6 +218,21 @@ function section_draw.database(self)
 		if imgui.button("computeScores", "compute chartdiffs") then
 			cacheModel:computeChartdiffs()
 		end
+	end
+
+	imgui.separator()
+
+	local inactive = not love.keyboard.isDown("lshift")
+	imgui.text("Hold left shift to make buttons below active")
+
+	if imgui.button("reset chartfiles", "reset chartfiles.hash", inactive) then
+		self.game.cacheModel.chartfilesRepo:resetChartfileHash()
+	end
+	if imgui.button("delete chartmetas", "delete chartmetas", inactive) then
+		self.game.cacheModel.chartmetasRepo:deleteChartmetas()
+	end
+	if imgui.button("delete chartdiffs", "delete chartdiffs", inactive) then
+		self.game.cacheModel.chartdiffsRepo:deleteChartdiffs()
 	end
 end
 
