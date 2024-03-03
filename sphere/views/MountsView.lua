@@ -56,7 +56,37 @@ local function get_location_info(self, location_id)
 	}
 end
 
-local modal = ModalImView(function(self)
+local modal
+
+local function ui_lock(self)
+	if not self.game.cacheModel.isProcessing then
+		self.game.gameView.modal = modal
+		modal(self)
+		return
+	end
+	modal(self)
+	just.container("cache task container", true)
+	love.graphics.origin()
+	local w, h = love.graphics.getDimensions()
+	love.graphics.setColor(0, 0, 0, 0.75)
+	love.graphics.rectangle("fill", 0, 0, w, h)
+	just.wheel_over("cache task container", true)
+	just.mouse_over("cache task container", true, "mouse")
+
+	local cacheModel = self.game.cacheModel
+	local count = cacheModel.shared.chartfiles_count
+	local current = cacheModel.shared.chartfiles_current
+	love.graphics.setColor(1, 1, 1, 1)
+	imgui.text(("%s/%s"):format(current, count))
+	imgui.text(("%0.2f%%"):format(current / count * 100))
+	if imgui.button("stopTask", "stop task") then
+		cacheModel:stopTask()
+	end
+
+	just.container()
+end
+
+modal = ModalImView(function(self)
 	if not self then
 		return true
 	end
@@ -93,6 +123,10 @@ local modal = ModalImView(function(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.rectangle("line", 0, 0, w, h, r)
+
+	if self.game.cacheModel.isProcessing then
+		self.game.gameView.modal = ui_lock
+	end
 end)
 
 function section_draw.locations(self, inner_w)
@@ -186,15 +220,6 @@ function section_draw.database(self)
 	if state == 0 or state == 3 then
 		if imgui.button("computeScores", "compute chartdiffs") then
 			cacheModel:computeChartdiffs()
-		end
-	else
-		local count = cacheModel.shared.chartfiles_count
-		local current = cacheModel.shared.chartfiles_current
-
-		local progress = ("%0.2f%% %s/%s"):format(current / count * 100, current, count)
-
-		if imgui.button("stopTask", progress) then
-			cacheModel:stopTask()
 		end
 	end
 end

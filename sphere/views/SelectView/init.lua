@@ -67,17 +67,6 @@ function SelectView:draw()
 	end
 
 	just.container()
-
-	if cacheModel.isProcessing then
-		just.container("cache task container", true)
-		love.graphics.origin()
-		local w, h = love.graphics.getDimensions()
-		love.graphics.setColor(0, 0, 0, 0.5)
-		love.graphics.rectangle("fill", 0, 0, w, h)
-		just.wheel_over("cache task container", true)
-		just.mouse_over("cache task container", true, "mouse")
-		just.container()
-	end
 end
 
 function SelectView:play()
