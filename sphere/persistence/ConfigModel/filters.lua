@@ -10,13 +10,16 @@ end
 return {
 	notechart = {
 		{name = "No filter"},
-		{name = "4K", condition = {inputmode = "4key"}},
-		{name = "5K", condition = {inputmode = "5key"}},
-		{name = "6K", condition = {inputmode = "6key"}},
-		{name = "7K", condition = {inputmode = "7key"}},
-		{name = "8K", condition = {inputmode = "8key"}},
-		{name = "9K", condition = {inputmode = "9key"}},
-		{name = "10K", condition = {inputmode = "10key"}},
+		{name = "Played", condition = {
+			accuracy__isnotnull = true
+		}},
+		{name = "4K", condition = {chartdiff_inputmode = "4key"}},
+		{name = "5K", condition = {chartdiff_inputmode = "5key"}},
+		{name = "6K", condition = {chartdiff_inputmode = "6key"}},
+		{name = "7K", condition = {chartdiff_inputmode = "7key"}},
+		{name = "8K", condition = {chartdiff_inputmode = "8key"}},
+		{name = "9K", condition = {chartdiff_inputmode = "9key"}},
+		{name = "10K", condition = {chartdiff_inputmode = "10key"}},
 	},
 	score = {
 		{name = "No filter"},
