@@ -51,6 +51,7 @@ function Replay:toString()
 		inputMode = tostring(self.inputMode),
 		modifiers = self.modifiers,
 		rate = self.rate,
+		rate_type = self.rate_type,
 		const = self.const,
 		player = "Player",
 		time = os.time(),

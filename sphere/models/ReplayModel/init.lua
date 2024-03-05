@@ -61,15 +61,15 @@ function ReplayModel:update()
 	end
 end
 
----@param hash string
----@param index number
+---@param chartdiff table
 ---@param playContext sphere.PlayContext
 ---@return string
-function ReplayModel:saveReplay(hash, index, playContext)
+function ReplayModel:saveReplay(chartdiff, playContext)
 	local replay = self.replay
-	replay.hash = hash
-	replay.index = index
+	replay.hash = chartdiff.hash
+	replay.index = chartdiff.index
 	replay.inputMode = self.rhythmModel.noteChart.inputMode
+	replay.rate_type = chartdiff.rate_type
 	playContext:save(replay)
 
 	local replayString = replay:toString()

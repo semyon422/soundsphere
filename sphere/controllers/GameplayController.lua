@@ -46,7 +46,7 @@ function GameplayController:load()
 	chartdiff.modifiers = playContext.modifiers
 	chartdiff.hash = chartview.hash
 	chartdiff.index = chartview.index
-	chartdiff.rate_type = config.rate_type
+	chartdiff.rate_type = config.gameplay.rate_type
 	cacheModel.chartdiffGenerator:fillMeta(chartdiff, chartview)
 	playContext.chartdiff = chartdiff
 
@@ -301,8 +301,7 @@ function GameplayController:saveScore()
 	local chartview = self.selectModel.chartview
 
 	local replayHash = self.replayModel:saveReplay(
-		chartview.hash,
-		chartview.index,
+		self.playContext.chartdiff,
 		playContext
 	)
 
@@ -313,6 +312,7 @@ function GameplayController:saveScore()
 		index = chartdiff.index,
 		modifiers = chartdiff.modifiers,
 		rate = chartdiff.rate,
+		rate_type = chartdiff.rate_type,
 
 		const = playContext.const,
 		-- timings = playContext.timings,
