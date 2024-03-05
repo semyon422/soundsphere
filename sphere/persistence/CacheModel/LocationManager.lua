@@ -1,5 +1,6 @@
 local class = require("class")
 local path_util = require("path_util")
+local table_util = require("table_util")
 
 ---@class sphere.LocationManager
 ---@operator call: sphere.LocationManager
@@ -20,10 +21,12 @@ function LocationManager:new(locationsRepo, chartfilesRepo, fs, root, prefix)
 end
 
 function LocationManager:load()
-	self.locations = self.locationsRepo:selectLocations()
+	self:createDefaultLocation()
+	self:selectLocations()
 	for _, location in ipairs(self.locations) do
 		self:mountLocation(location)
 	end
+	self:selectLocation(1)
 end
 
 function LocationManager:unload()
@@ -33,6 +36,36 @@ function LocationManager:unload()
 			self.mounted[location.id] = nil
 		end
 	end
+end
+
+function LocationManager:selectLocations()
+	self.locations = self.locationsRepo:selectLocations()
+end
+
+---@param id number
+function LocationManager:selectLocation(id)
+	self.selected_id = id
+	local index = table_util.indexof(self.locations, self.selected_id, function(loc)
+		return loc.id
+	end)
+
+	if not index then
+		self.selected_id = 1
+		index = 1
+	end
+
+	self.selected_loc = self.locations[index]
+
+	local chartfilesRepo = self.chartfilesRepo
+
+	self.location_info = {
+		chartfile_sets = chartfilesRepo:countChartfileSets({location_id = id}),
+		chartfiles = chartfilesRepo:countChartfiles({location_id = id}),
+		hashed_chartfiles = chartfilesRepo:countChartfiles({
+			location_id = id,
+			hash__isnotnull = true,
+		}),
+	}
 end
 
 ---@param location table
@@ -64,19 +97,13 @@ function LocationManager:getPrefix(location)
 	return path_util.join(self.prefix, location.id)
 end
 
----@param loc table
-function LocationManager:createLocation(loc)
-	loc.path = loc.path:gsub("\\", "/")
-
-	local a, b = loc.path:find(self.root)
-	if a == 1 then
-		loc.path = loc.path:sub(b + 2)
-		loc.is_relative = true
-	end
-
-	if not loc.name then
-		loc.name = loc.path:match("^.+/(.-)$") or loc.path
-	end
+function LocationManager:createDefaultLocation()
+	local loc = {
+		path = "userdata/charts",
+		name = "soundsphere",
+		is_relative = true,
+		is_internal = true,
+	}
 
 	local locationsRepo = self.locationsRepo
 
@@ -85,11 +112,25 @@ function LocationManager:createLocation(loc)
 		return
 	end
 
-	loc.is_relative = not not loc.is_relative
-	loc.is_internal = not not loc.is_internal
 	locationsRepo:insertLocation(loc)
+end
 
-	self:load()
+---@param path string
+function LocationManager:updateLocationPath(path)
+	local loc = self.selected_loc
+	if loc.is_internal then
+		return
+	end
+
+	loc.path = path:gsub("\\", "/")
+
+	local a, b = path:find(self.root)
+	if a == 1 then
+		loc.path = loc.path:sub(b + 2)
+		loc.is_relative = true
+	end
+
+	self.locationsRepo:updateLocation(loc)
 end
 
 function LocationManager:deleteCharts(location_id)

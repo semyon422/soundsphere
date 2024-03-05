@@ -1,5 +1,6 @@
 local just = require("just")
 local imgui = require("imgui")
+local table_util = require("table_util")
 local ModalImView = require("sphere.imviews.ModalImView")
 local _transform = require("gfx_util").transform
 local spherefonts = require("sphere.assets.fonts")
@@ -14,8 +15,6 @@ local w, h = 1024, 1080 / 2
 local _w, _h = w / 2, 55
 local r = 8
 local window_id = "MountsView"
-local selected_loc
-local location_info
 
 local sections = {
 	"locations",
@@ -24,37 +23,6 @@ local sections = {
 local section = sections[1]
 
 local section_draw = {}
-
-local function get_cache_text(self)
-	local cacheModel = self.game.cacheModel
-	local shared = cacheModel.shared
-	local state = shared.state
-
-	local text = ""
-	if state == 1 then
-		text = ("searching for charts: %d"):format(shared.chartfiles_count)
-	elseif state == 2 then
-		local pos = (shared.chartfiles_current - 1) / (shared.chartfiles_count - 1)
-		text = ("creating cache: %0.2f%%"):format(pos * 100)
-	elseif state == 0 then
-		text = "update"
-	end
-
-	return text
-end
-
-local function get_location_info(self, location_id)
-	local chartfilesRepo = self.game.cacheModel.chartfilesRepo
-
-	return {
-		chartfile_sets = chartfilesRepo:countChartfileSets({location_id = location_id}),
-		chartfiles = chartfilesRepo:countChartfiles({location_id = location_id}),
-		hashed_chartfiles = chartfilesRepo:countChartfiles({
-			location_id = location_id,
-			hash__isnotnull = true,
-		}),
-	}
-end
 
 local modal
 
@@ -130,37 +98,47 @@ modal = ModalImView(function(self)
 end)
 
 function section_draw.locations(self, inner_w)
+	local locationsRepo = self.game.cacheModel.locationsRepo
 	local locationManager = self.game.cacheModel.locationManager
 	local locations = locationManager.locations
 
 	local list_w = inner_w / 3
 
+	local selected_loc_id = locationManager.selected_id
+
 	just.push()
-	imgui.List("mount points", list_w, h, _h / 2, _h, scrollYlist)
-	local has_selected
+	imgui.List("mount points", list_w, h - _h, _h / 2, _h, scrollYlist)
 	for i, item in ipairs(locations) do
-		local location = item.name
-		if selected_loc == item then
-			location = "> " .. location
-			has_selected = true
+		local name = item.name
+		if selected_loc_id == item.id then
+			name = "> " .. name
 		end
-		if imgui.TextOnlyButton("mount item" .. i, location, w, _h * theme.size, "left") or not selected_loc then
-			selected_loc = item
-			location_info = get_location_info(self, item.id)
-			has_selected = true
+		if imgui.TextOnlyButton("mount item" .. i, name, w, _h * theme.size, "left") or not selected_loc_id then
+			locationManager:selectLocation(item.id)
 		end
-	end
-	if not has_selected then
-		selected_loc = nil
 	end
 	scrollYlist = imgui.List()
+
+	if imgui.TextButton("create loc", "create location", list_w, _h) then
+		local location = locationsRepo:insertLocation({
+			name = "unnamed",
+			is_relative = false,
+			is_internal = false,
+		})
+		locationManager:selectLocations()
+		locationManager:selectLocation(location.id)
+	end
+
 	just.pop()
 
 	love.graphics.translate(list_w, 0)
 
+	local selected_loc = locationManager.selected_loc
 	if not selected_loc then
 		return
 	end
+
+	local location_info = locationManager.location_info
 
 	local path = selected_loc.path
 	if selected_loc.is_internal then
@@ -172,11 +150,21 @@ function section_draw.locations(self, inner_w)
 	just.indent(8)
 	just.text("Real path: ")
 	just.indent(8)
-	imgui.url("open dir", path, path)
+	if path then
+		imgui.url("open dir", path, path)
+	else
+		just.text("not specified")
+	end
 
-	local cache_text = get_cache_text(self)
-	if imgui.button("cache_button", cache_text) then
-		self.game.selectController:updateCacheLocation(selected_loc.id)
+	if not selected_loc.is_internal then
+		local loc_name = imgui.input("loc name", selected_loc.name, "name")
+		if loc_name ~= selected_loc.name then
+			locationsRepo:updateLocation({
+				id = selected_loc.id,
+				name = loc_name,
+			})
+			locationManager:selectLocations()
+		end
 	end
 
 	imgui.text("chartfile_sets: " .. location_info.chartfile_sets)
@@ -185,6 +173,10 @@ function section_draw.locations(self, inner_w)
 		location_info.chartfiles
 	))
 
+	if imgui.button("cache_button", "update") then
+		self.game.selectController:updateCacheLocation(selected_loc.id)
+	end
+
 	imgui.separator()
 
 	local inactive = not love.keyboard.isDown("lshift")
@@ -192,13 +184,13 @@ function section_draw.locations(self, inner_w)
 
 	if imgui.button("reset dir", "delete charts cache", inactive) then
 		locationManager:deleteCharts(selected_loc.id)
-		location_info = get_location_info(self, selected_loc.id)
 		self.game.selectModel:noDebouncePullNoteChartSet()
 	end
 
 	if not selected_loc.is_internal and imgui.button("delete dir", "delete location", inactive) then
 		locationManager:deleteLocation(selected_loc.id)
-		locationManager:load()
+		locationManager:selectLocations()
+		locationManager:selectLocation(1)
 		self.game.selectModel:noDebouncePullNoteChartSet()
 	end
 end

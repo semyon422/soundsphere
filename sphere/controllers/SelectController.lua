@@ -152,9 +152,7 @@ end
 
 ---@param path string
 function SelectController:directorydropped(path)
-	self.cacheModel.locationManager:createLocation({
-		path = path,
-	})
+	self.cacheModel.locationManager:updateLocationPath(path)
 end
 
 local filedropped_handlers = {}

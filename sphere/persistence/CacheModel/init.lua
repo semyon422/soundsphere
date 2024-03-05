@@ -62,12 +62,6 @@ function CacheModel:load()
 	self.cacheStatus:update()
 
 	self.locationManager:load()
-	self.locationManager:createLocation({
-		path = "userdata/charts",
-		name = "soundsphere",
-		is_relative = true,
-		is_internal = true,
-	})
 end
 
 function CacheModel:unload()

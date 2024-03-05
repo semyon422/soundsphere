@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `chartfile_sets` (
 
 CREATE TABLE IF NOT EXISTS `locations` (
 	`id` INTEGER PRIMARY KEY,
-	`path` TEXT NOT NULL UNIQUE,
+	`path` TEXT UNIQUE,
 	`name` TEXT NOT NULL,
 	`is_relative` INTEGER NOT NULL,
 	`is_internal` INTEGER NOT NULL
