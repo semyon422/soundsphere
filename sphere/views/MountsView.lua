@@ -164,6 +164,7 @@ function section_draw.locations(self, inner_w)
 				name = loc_name,
 			})
 			locationManager:selectLocations()
+			locationManager:selectLocation(selected_loc.id)
 		end
 	end
 
