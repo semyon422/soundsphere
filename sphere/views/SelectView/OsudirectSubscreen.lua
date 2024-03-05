@@ -134,7 +134,7 @@ local function OsudirectSubscreen(self)
 
 	just.indent(36)
 	if imgui.TextOnlyButton("download", button_text, w - 72, h) then
-		self.game.osudirectModel:downloadBeatmapSet(set)
+		self.game.osudirectModel:download(set)
 	end
 end
 

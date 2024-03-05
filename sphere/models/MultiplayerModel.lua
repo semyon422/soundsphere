@@ -251,14 +251,6 @@ MultiplayerModel.pullModifiers = remote.wrap(function(self)
 	self.handlers.set(self.peer, "modifiers", modifiers)
 end)
 
-MultiplayerModel.pullNotechart = remote.wrap(function(self)
-	local notechart = self.peer.getRoomNotechart()
-	if not notechart then
-		return
-	end
-	self.handlers.set(self.peer, "notechart", notechart)
-end)
-
 MultiplayerModel.login = remote.wrap(function(self)
 	local api = self.onlineModel.webApi.api
 
@@ -324,7 +316,7 @@ function MultiplayerModel:update()
 	remote.update()
 end
 
-function MultiplayerModel:downloadNoteChart()
+MultiplayerModel.downloadNoteChart = remote.wrap(function(self)
 	local setId = self.notechart.osuSetId
 	if self.downloadingBeatmap or not setId then
 		return
@@ -334,10 +326,15 @@ function MultiplayerModel:downloadNoteChart()
 		id = setId,
 		status = "",
 	}
-	self.osudirectModel:downloadBeatmapSet(self.downloadingBeatmap, function()
-		self.downloadingBeatmap.status = "done"
-		self:pullNotechart()
-	end)
-end
+	self.osudirectModel:downloadAsync(self.downloadingBeatmap)
+
+	self.downloadingBeatmap.status = "done"
+
+	local notechart = self.peer.getRoomNotechart()
+	if not notechart then
+		return
+	end
+	self.handlers.set(self.peer, "notechart", notechart)
+end)
 
 return MultiplayerModel

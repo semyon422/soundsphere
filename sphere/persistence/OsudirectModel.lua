@@ -232,7 +232,7 @@ function OsudirectModel:getPreviewUrl()
 	return config.preview:format(self.beatmap.id)
 end
 
-OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback)
+function OsudirectModel:downloadAsync(beatmap)
 	if not beatmap or beatmap == self.statusBeatmap then
 		return
 	end
@@ -294,10 +294,8 @@ OsudirectModel.downloadBeatmapSet = thread.coro(function(self, beatmap, callback
 			break
 		end
 	end
+end
 
-	if callback then
-		callback()
-	end
-end)
+OsudirectModel.download = thread.coro(OsudirectModel.downloadAsync)
 
 return OsudirectModel
