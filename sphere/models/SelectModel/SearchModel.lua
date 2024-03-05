@@ -208,7 +208,7 @@ function SearchModel:getConditions()
 		end
 	end
 
-	if self.lampString == "" then
+	if lampString == "" then
 		return self:transformSearchString(filterString, cond)
 	end
 
