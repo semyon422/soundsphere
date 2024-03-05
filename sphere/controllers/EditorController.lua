@@ -54,11 +54,12 @@ function EditorController:save()
 	local exp = NoteChartExporter()
 	exp.noteChart = editorModel.noteChart
 
-	local path = selectModel.chartview.path:gsub(".sph$", "") .. ".sph"
+	local chartview = selectModel.chartview
+	local path = chartview.location_path:gsub(".sph$", "") .. ".sph"
 
-	love.filesystem.write(path, exp:export())
+	assert(love.filesystem.write(path, exp:export()))
 
-	self.cacheModel:startUpdate(selectModel.chartview.path:match("^(.+)/.-$"))
+	self.cacheModel:startUpdate(chartview.dir, chartview.location_id)
 end
 
 function EditorController:saveToOsu()
@@ -72,10 +73,10 @@ function EditorController:saveToOsu()
 	exp.noteChart = editorModel.noteChart
 	exp.chartmeta = chartview
 
-	local path = chartview.path
+	local path = chartview.location_path
 	path = path:gsub(".osu$", ""):gsub(".sph$", "") .. ".sph.osu"
 
-	love.filesystem.write(path, exp:export())
+	assert(love.filesystem.write(path, exp:export()))
 end
 
 ---@param event table
