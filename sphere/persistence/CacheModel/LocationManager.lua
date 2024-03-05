@@ -31,10 +31,7 @@ end
 
 function LocationManager:unload()
 	for _, location in ipairs(self.locations) do
-		if self.mounted[location.id] then
-			self.fs.unmount(location.path)
-			self.mounted[location.id] = nil
-		end
+		self:unmountLocation(location)
 	end
 end
 
@@ -66,6 +63,15 @@ function LocationManager:selectLocation(id)
 			hash__isnotnull = true,
 		}),
 	}
+end
+
+---@param location table
+function LocationManager:unmountLocation(location)
+	if not self.mounted[location.id] then
+		return
+	end
+	self.fs.unmount(location.path)
+	self.mounted[location.id] = nil
 end
 
 ---@param location table
@@ -122,6 +128,8 @@ function LocationManager:updateLocationPath(path)
 		return
 	end
 
+	self:unmountLocation(loc)
+
 	loc.path = path:gsub("\\", "/")
 
 	local a, b = path:find(self.root)
@@ -131,6 +139,7 @@ function LocationManager:updateLocationPath(path)
 	end
 
 	self.locationsRepo:updateLocation(loc)
+	self:mountLocation(loc)
 end
 
 function LocationManager:deleteCharts(location_id)
