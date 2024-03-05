@@ -214,7 +214,7 @@ chartdiffs.rate = 1000
 LEFT JOIN scores ON
 chartmetas.hash = scores.hash AND
 chartmetas.`index` = scores.`index`
-GROUP BY chartfile_id, chartmeta_id, chartdiff_id, scores.hash, scores.`index`
+GROUP BY chartfile_set_id, chartfile_id, chartmeta_id, chartdiff_id, scores.hash, scores.`index`
 ;
 
 CREATE TEMP VIEW IF NOT EXISTS chartdiffviews AS
@@ -262,7 +262,7 @@ chartmetas.hash = scores.hash AND
 chartmetas.`index` = scores.`index` AND
 chartdiffs.modifiers = scores.modifiers AND
 chartdiffs.rate = scores.rate
-GROUP BY chartfile_id, chartmeta_id, chartdiff_id, scores.hash, scores.`index`, scores.modifiers, scores.rate
+GROUP BY chartfile_set_id, chartfile_id, chartmeta_id, chartdiff_id, scores.hash, scores.`index`, scores.modifiers, scores.rate
 ;
 
 CREATE TEMP VIEW IF NOT EXISTS scores_list AS
