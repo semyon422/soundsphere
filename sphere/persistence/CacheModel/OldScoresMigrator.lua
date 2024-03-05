@@ -7,16 +7,22 @@ local ModifierEncoder = require("sphere.models.ModifierEncoder")
 ---@operator call: sphere.OldScoresMigrator
 local OldScoresMigrator = class()
 
+local old_db_path = "userdata/scores.db"
+
 ---@param gdb sphere.GameDatabase
 function OldScoresMigrator:new(gdb)
 	self.gdb = gdb
 end
 
 function OldScoresMigrator:migrate()
+	if not love.filesystem.getInfo(old_db_path, "file") then
+		return
+	end
+
 	local db = LjsqliteDatabase()
 	local orm = TableOrm(db)
 
-	db:open("userdata/scores.db")
+	db:open(old_db_path)
 	local scores = orm:select("scores")
 	db:close()
 
