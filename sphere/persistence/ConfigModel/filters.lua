@@ -10,9 +10,8 @@ end
 return {
 	notechart = {
 		{name = "No filter"},
-		{name = "Played", condition = {
-			accuracy__isnotnull = true
-		}},
+		{name = "Played", condition = {accuracy__isnotnull = true}},
+		{name = "Not played", condition = {accuracy__isnull = true}},
 		{name = "4K", condition = {chartdiff_inputmode = "4key"}},
 		{name = "5K", condition = {chartdiff_inputmode = "5key"}},
 		{name = "6K", condition = {chartdiff_inputmode = "6key"}},
