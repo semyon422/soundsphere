@@ -107,11 +107,7 @@ function CollectionLibrary:setPath(path, location_id)
 	local tree = self.root_tree
 	self.tree = tree
 
-	if not self.locations_in_collections then
-		if not path then
-			return
-		end
-	else
+	if self.locations_in_collections then
 		if not path and not location_id then
 			return
 		elseif location_id then
@@ -122,6 +118,11 @@ function CollectionLibrary:setPath(path, location_id)
 		elseif path then
 			return
 		end
+	end
+
+	if not path then
+		self.tree = tree
+		return
 	end
 
 	local keys = path:split("/")
