@@ -84,8 +84,14 @@ function GameplayController:load()
 	self:updateOffsets()
 
 	fileFinder:reset()
-	fileFinder:addPath(chartview.location_dir)
-	fileFinder:addPath(noteSkin.directoryPath)
+
+	if config.gameplay.skin_resources_top_priority then
+		fileFinder:addPath(noteSkin.directoryPath)
+		fileFinder:addPath(chartview.location_dir)
+	else
+		fileFinder:addPath(chartview.location_dir)
+		fileFinder:addPath(noteSkin.directoryPath)
+	end
 	fileFinder:addPath("userdata/hitsounds")
 	fileFinder:addPath("userdata/hitsounds/midi")
 

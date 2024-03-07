@@ -122,6 +122,8 @@ function drawSection:gameplay()
 	g.eventBasedRender = imgui.checkbox("eventBasedRender", g.eventBasedRender, "event based render (experimental)")
 	g.swapVelocityType = imgui.checkbox("swapVelocityType", g.swapVelocityType, "swap 'current' and 'local' velocity (experimental)")
 
+	g.skin_resources_top_priority = imgui.checkbox("skin_resources_top_priority", g.skin_resources_top_priority, "top priority for skin resources")
+
 	imgui.separator()
 	just.indent(10)
 	just.text("gauge/hp")

@@ -72,6 +72,7 @@ return {
 			playRetry = 0.5,
 			prepare = 2
 		},
+		skin_resources_top_priority = false,
 	},
 	graphics = {
 		asynckey = false,

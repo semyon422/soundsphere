@@ -10,6 +10,7 @@ local EditorController = class()
 function EditorController:load()
 	local selectModel = self.selectModel
 	local editorModel = self.editorModel
+	local configModel = self.configModel
 	local fileFinder = self.fileFinder
 
 	local noteChart = selectModel:loadNoteChart()
@@ -26,8 +27,13 @@ function EditorController:load()
 	self.previewModel:stop()
 
 	fileFinder:reset()
-	fileFinder:addPath(chartview.location_dir)
-	fileFinder:addPath(noteSkin.directoryPath)
+	if configModel.configs.settings.gameplay.skin_resources_top_priority then
+		fileFinder:addPath(noteSkin.directoryPath)
+		fileFinder:addPath(chartview.location_dir)
+	else
+		fileFinder:addPath(chartview.location_dir)
+		fileFinder:addPath(noteSkin.directoryPath)
+	end
 	fileFinder:addPath("userdata/hitsounds")
 	fileFinder:addPath("userdata/hitsounds/midi")
 
