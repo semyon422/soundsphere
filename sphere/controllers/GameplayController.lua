@@ -397,6 +397,7 @@ end
 
 ---@param delta number
 function GameplayController:increaseLocalOffset(delta)
+	do return end
 	local chartview = self.selectModel.chartview
 	chartview.localOffset = math_util.round((chartview.localOffset or 0) + delta, delta)
 	self.cacheModel.chartRepo:updateNoteChartDataEntry({
