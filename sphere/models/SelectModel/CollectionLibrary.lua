@@ -104,26 +104,40 @@ function CollectionLibrary:load(locations_in_collections)
 end
 
 function CollectionLibrary:setPath(path, location_id)
-	local tree = self.root_tree
-	self.tree = tree
-
+	self.tree = self.root_tree
 	if self.locations_in_collections then
-		if not path and not location_id then
-			return
-		elseif location_id then
-			local index = table_util.indexof(tree.items, location_id, function(node)
-				return node.location_id
-			end)
-			tree = tree.items[index]
-		elseif path then
-			return
-		end
+		return self:setPathLic(path, location_id)
 	end
+	return self:setPathP(path)
+end
 
-	if not path then
-		self.tree = tree
+function CollectionLibrary:setPathLic(path, location_id)
+	local tree = self.tree
+
+	if not location_id then
 		return
 	end
+
+	local index = table_util.indexof(tree.items, location_id, function(node)
+		return node.location_id
+	end)
+	tree.selected = index or 1
+
+	if not path then
+		return
+	end
+
+	self.tree = tree.items[tree.selected]
+
+	self:setPathP(path)
+end
+
+function CollectionLibrary:setPathP(path)
+	if not path then
+		return
+	end
+
+	local tree = self.tree
 
 	local keys = path:split("/")
 	for i = 1, #keys do
