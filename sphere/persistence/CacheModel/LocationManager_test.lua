@@ -23,15 +23,31 @@ function test.all(t)
 		location.id = #locations
 		return location
 	end
+	function chartRepo:updateLocation(location)
+		local i = table_util.indexof(locations, location.id, function(l) return l.id end)
+		local loc = locations[i]
+		table_util.copy(location, loc)
+	end
+
+	local chartfilesRepo = {}
+	function chartfilesRepo:countChartfileSets() return 0 end
+	function chartfilesRepo:countChartfiles() return 0 end
+	function chartfilesRepo:countChartfiles() return 0 end
 
 	local fs = {}
 	function fs.mount() return true end
 
-	local lm = LocationManager(chartRepo, chartRepo, fs, "/game", "prefix")
+	local lm = LocationManager(chartRepo, chartfilesRepo, fs, "/game", "prefix")
 
-	lm:createLocation({path = "/dir"})
-	lm:createLocation({path = "/game/dir"})
-	lm:createLocation({path = "/game/dir"})
+	chartRepo:insertLocation({})
+	chartRepo:insertLocation({})
+
+	lm:selectLocations()
+
+	lm:selectLocation(1)
+	lm:updateLocationPath("/dir")
+	lm:selectLocation(2)
+	lm:updateLocationPath("/game/dir")
 
 	t:eq(#locations, 2)
 

@@ -131,6 +131,7 @@ function LocationManager:updateLocationPath(path)
 	self:unmountLocation(loc)
 
 	loc.path = path:gsub("\\", "/")
+	loc.is_relative = false
 
 	local a, b = path:find(self.root)
 	if a == 1 then
