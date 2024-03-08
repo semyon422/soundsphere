@@ -9,7 +9,7 @@ local function get_fake_chartRepo(actions, chartfiles, chartfile_sets)
 
 	local file_id, set_id = 0, 0
 
-	function chartRepo:selectChartfileSet(dir, name)
+	function chartRepo:selectChartfileSet(dir, name, location_id)
 		table.insert(actions, {"ss", dir, name})
 		return chartfile_sets[path_util.join(dir, name)]
 	end

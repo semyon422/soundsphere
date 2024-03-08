@@ -59,7 +59,7 @@ function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
 			})
 		elseif typ == "directory_dir" then
 		elseif typ == "directory" then
-			res = self:shouldScan(dir, name, modtime)
+			res = self:shouldScan(dir, name, modtime, location_id)
 		elseif typ == "directory_all" then
 			self.chartfilesRepo:deleteChartfileSets({
 				dir = dir,
@@ -82,9 +82,10 @@ end
 ---@param dir string?
 ---@param name string
 ---@param modified_at number
+---@param location_id number
 ---@return boolean
-function FileCacheGenerator:shouldScan(dir, name, modified_at)
-	local chartfile_set = self.chartfilesRepo:selectChartfileSet(dir, name)
+function FileCacheGenerator:shouldScan(dir, name, modified_at, location_id)
+	local chartfile_set = self.chartfilesRepo:selectChartfileSet(dir, name, location_id)
 	if not chartfile_set then
 		return true
 	end
@@ -99,7 +100,8 @@ end
 function FileCacheGenerator:processChartfileSet(chartfile_set)
 	local _chartfile_set = self.chartfilesRepo:selectChartfileSet(
 		chartfile_set.dir,
-		chartfile_set.name
+		chartfile_set.name,
+		chartfile_set.location_id
 	)
 
 	if _chartfile_set then

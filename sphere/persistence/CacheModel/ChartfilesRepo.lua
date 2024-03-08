@@ -14,12 +14,14 @@ end
 
 ---@param dir string?
 ---@param name string
+---@param location_id number
 ---@return table?
-function ChartfilesRepo:selectChartfileSet(dir, name)
+function ChartfilesRepo:selectChartfileSet(dir, name, location_id)
 	return self.models.chartfile_sets:find({
 		dir = dir,
 		dir__isnull = not dir,
 		name = assert(name),
+		location_id = assert(location_id),
 	})
 end
 

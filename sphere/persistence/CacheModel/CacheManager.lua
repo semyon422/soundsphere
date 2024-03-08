@@ -125,7 +125,7 @@ function CacheManager:computeCacheLocation(path, location_id)
 	local chartfile_set, set_id
 	local dir, name = NoteChartFinder.get_dir_name(path)
 	if name then
-		chartfile_set = self.chartfilesRepo:selectChartfileSet(dir, name)
+		chartfile_set = self.chartfilesRepo:selectChartfileSet(dir, name, location_id)
 	end
 	if chartfile_set then
 		set_id = chartfile_set.id
