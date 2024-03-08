@@ -236,6 +236,10 @@ function tabs.notes(self)
 			editor.tool = editorModel.tools[i]
 		end
 	end
+
+	if imgui.button("changeType", "change type") then
+		editorModel.noteManager:changeType()
+	end
 end
 
 return function(self)

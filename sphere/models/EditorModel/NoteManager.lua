@@ -1,5 +1,8 @@
 local class = require("class")
+local Fraction = require("ncdk.Fraction")
 local EditorNoteFactory = require("sphere.models.EditorModel.EditorNoteFactory")
+local ShortEditorNote = require("sphere.models.EditorModel.ShortEditorNote")
+local LongEditorNote = require("sphere.models.EditorModel.LongEditorNote")
 
 ---@class sphere.EditorNoteManager
 ---@operator call: sphere.EditorNoteManager
@@ -80,6 +83,47 @@ function NoteManager:deleteNotes()
 	end
 	self.editorModel.editorChanges:next()
 	return c
+end
+
+function NoteManager:changeType()
+	local editorModel = self.editorModel
+	local ld = editorModel.layerData
+	local editor = self.editorModel:getSettings()
+
+	-- self.editorModel.editorChanges:reset()
+
+	for _, note in ipairs(self.editorModel.graphicEngine.selectedNotes) do
+		note:remove()
+		if not note.endNoteData then
+			local startNoteData = note.startNoteData
+			startNoteData.noteType = "LongNoteStart"
+
+			local tp = startNoteData.timePoint
+
+			local tp2 = ld:getTimePoint(tp:add(Fraction(1, editor.snap)))
+			local endNoteData = assert(ld:getNoteData(tp2, note.inputType, note.inputIndex))
+			endNoteData.noteType = "LongNoteEnd"
+			note.endNoteData = endNoteData
+
+			endNoteData.startNoteData = startNoteData
+			startNoteData.endNoteData = endNoteData
+
+			setmetatable(note, LongEditorNote)
+		else
+			local startNoteData = note.startNoteData
+			startNoteData.noteType = "ShortNote"
+			startNoteData.endNoteData = nil
+			note.endNoteData.startNoteData = nil
+			note.endNoteData = nil
+
+			setmetatable(note, ShortEditorNote)
+		end
+		note:add()
+	end
+
+	self.editorModel.graphicEngine:reset()
+
+	-- self.editorModel.editorChanges:next()
 end
 
 function NoteManager:pasteNotes()
