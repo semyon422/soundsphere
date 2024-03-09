@@ -15,6 +15,7 @@ local TimeRateModel = require("sphere.models.TimeRateModel")
 local ResourceModel = require("sphere.models.ResourceModel")
 local PlayContext = require("sphere.models.PlayContext")
 local PauseModel = require("sphere.models.PauseModel")
+local JoystickModel = require("sphere.models.JoystickModel")
 
 local SelectController = require("sphere.controllers.SelectController")
 local GameplayController = require("sphere.controllers.GameplayController")
@@ -81,6 +82,8 @@ function GameController:new()
 		self.persistence.osudirectModel,
 		self.playContext
 	)
+
+	self.joystickModel = JoystickModel()
 
 	self.cacheModel = self.persistence.cacheModel
 	self.osudirectModel = self.persistence.osudirectModel
@@ -172,6 +175,7 @@ function GameController:receive(event)
 
 	self.ui:receive(event)
 	self.app:receive(event)
+	self.joystickModel:receive(event)
 end
 
 return GameController
