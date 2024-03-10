@@ -26,6 +26,7 @@ NoteChartFinder.get_dir_name = get_dir_name
 ---@param prefix string?
 ---@param dir string?
 function NoteChartFinder:lookupAsync(prefix, dir)
+	print("scan dir", prefix, dir)
 	local prefix_dir = path_util.join(prefix, dir)
 
 	local items = self.fs.getDirectoryItems(prefix_dir)

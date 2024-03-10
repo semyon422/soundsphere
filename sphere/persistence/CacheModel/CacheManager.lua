@@ -107,6 +107,8 @@ end
 ---@param path string?
 ---@param location_id number
 function CacheManager:computeCacheLocation(path, location_id)
+	print("start caching", path, location_id)
+
 	local location = self.locationsRepo:selectLocationById(location_id)
 	local location_prefix = self.locationManager:getPrefix(location)
 
@@ -116,6 +118,7 @@ function CacheManager:computeCacheLocation(path, location_id)
 	self:checkProgress()
 
 	self:begin()
+	print("fileCacheGenerator.lookup", path, location_id, location_prefix)
 	self.fileCacheGenerator:lookup(path, location_id, location_prefix)
 	self:commit()
 
