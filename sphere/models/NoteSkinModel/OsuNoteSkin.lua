@@ -97,11 +97,12 @@ function OsuNoteSkin:load()
 
 	local mania = self.mania
 	local keysCount = tonumber(mania.Keys)
+	local SpecialStyle = tonumber(mania.SpecialStyle) or 0
 
 	local baseMania = {}
 	fillTable(mania, baseMania)
 
-	local defaultMania = self:getDefaultManiaSection(keysCount)
+	local defaultMania = self:getDefaultManiaSection(keysCount, SpecialStyle)
 	copyDefaults(defaultMania, mania)
 
 	local config, exists = JustConfig({defaultContent = self.configContent}):fromFile(
@@ -486,7 +487,20 @@ end
 ---@param key number
 ---@param keymode number
 ---@return string|number
-local function getNoteType(key, keymode)
+local function getNoteType(key, keymode, SpecialStyle)
+	if SpecialStyle == 1 then
+		if key == 1 then
+			return "S"
+		end
+		key = key - 1
+		keymode = keymode - 1
+	elseif SpecialStyle == 2 then
+		if key == keymode then
+			return "S"
+		end
+		keymode = keymode - 1
+	end
+
 	if keymode % 2 == 1 then
 		local half = (keymode - 1) / 2
 		if (keymode + 1) / 2 == key then
@@ -498,23 +512,15 @@ local function getNoteType(key, keymode)
 				return 2
 			end
 		end
-	else
-		local half = keymode / 2
-		if key <= keymode / 2 then
-			if (half - key + 1) % 2 == 1 then
-				return 1
-			else
-				return 2
-			end
-		else
-			if (half - key + 1) % 2 == 1 then
-				return 2
-			else
-				return 1
-			end
-		end
 	end
+
+	local odd = (keymode / 2 - key + 1) % 2 == 1
+	local same = key <= keymode / 2
+	return odd == same and 1 or 2
 end
+
+assert(getNoteType(1, 4, 0) == 2)
+assert(getNoteType(1, 5, 0) == 2)
 
 local defaultJudgements = {
 	{"0", "Hit0", "mania-hit0"},
@@ -663,7 +669,7 @@ function OsuNoteSkin:getDefaultNoteImages()
 	local images = {}
 	for i = 1, keysCount do
 		local ni = "NoteImage" .. (i - 1)
-		local mn = "mania-note" .. getNoteType(i, keysCount)
+		local mn = "mania-note" .. getNoteType(i, keysCount, mania.SpecialStyle)
 		table.insert(images, {ni .. "L", mn .. "L"})
 		table.insert(images, {ni .. "T", mn .. "T"})
 		table.insert(images, {ni .. "H", mn .. "H"})
@@ -682,7 +688,7 @@ function OsuNoteSkin:getDefaultKeyImages()
 	local released = {}
 	for i = 1, keysCount do
 		local ni = "KeyImage" .. (i - 1)
-		local mn = "mania-key" .. getNoteType(i, keysCount)
+		local mn = "mania-key" .. getNoteType(i, keysCount, mania.SpecialStyle)
 		pressed[i] = mn .. "D"
 		released[i] = mn
 	end
@@ -1035,8 +1041,9 @@ function OsuNoteSkin:getDefaultFontsSection()
 end
 
 ---@param keys number
+---@param SpecialStyle number?
 ---@return table
-function OsuNoteSkin:getDefaultManiaSection(keys)
+function OsuNoteSkin:getDefaultManiaSection(keys, SpecialStyle)
 	local mania = {}
 
 	mania.Keys = keys
@@ -1086,6 +1093,8 @@ function OsuNoteSkin:getDefaultManiaSection(keys)
 	mania.Hit300 = "mania-hit300"
 	mania.Hit300g = "mania-hit300g"
 
+	local spst = SpecialStyle or mania.SpecialStyle
+
 	for i = 0, keys - 1 do
 		mania["KeyFlipWhenUpsideDown" .. i] = 1
 		mania["KeyFlipWhenUpsideDown" .. i .. "D"] = 1
@@ -1096,12 +1105,12 @@ function OsuNoteSkin:getDefaultManiaSection(keys)
 		mania["NoteBodyStyle" .. i] = 1
 		mania["Colour" .. i + 1] = {0, 0, 0, 1}
 		mania["ColourLight" .. i + 1] = {55 / 255, 1, 1}
-		mania["KeyImage" .. i] = "mania-key" .. getNoteType(i + 1, keys)
-		mania["KeyImage" .. i .. "D"] = "mania-key" .. getNoteType(i + 1, keys) .. "D"
-		mania["NoteImage" .. i] = "mania-note" .. getNoteType(i + 1, keys)
-		mania["NoteImage" .. i .. "H"] = "mania-note" .. getNoteType(i + 1, keys) .. "H"
-		mania["NoteImage" .. i .. "L"] = "mania-note" .. getNoteType(i + 1, keys) .. "L"
-		mania["NoteImage" .. i .. "T"] = "mania-note" .. getNoteType(i + 1, keys) .. "T"
+		mania["KeyImage" .. i] = "mania-key" .. getNoteType(i + 1, keys, spst)
+		mania["KeyImage" .. i .. "D"] = "mania-key" .. getNoteType(i + 1, keys, spst) .. "D"
+		mania["NoteImage" .. i] = "mania-note" .. getNoteType(i + 1, keys, spst)
+		mania["NoteImage" .. i .. "H"] = "mania-note" .. getNoteType(i + 1, keys, spst) .. "H"
+		mania["NoteImage" .. i .. "L"] = "mania-note" .. getNoteType(i + 1, keys, spst) .. "L"
+		mania["NoteImage" .. i .. "T"] = "mania-note" .. getNoteType(i + 1, keys, spst) .. "T"
 	end
 
 	return mania
