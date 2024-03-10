@@ -79,6 +79,7 @@ return {
 			deact_w = 0.1111111111111111
 		},
 		skin_resources_top_priority = false,
+		selected_filters = {},
 	},
 	graphics = {
 		asynckey = false,

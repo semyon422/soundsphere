@@ -316,12 +316,9 @@ local function NotechartFilterDropdown(self)
 	h = 60
 	love.graphics.translate(w * (1 - size) - 26, (72 - h) / 2)
 
-	local filters = self.game.configModel.configs.filters.notechart
-	local config = self.game.configModel.configs.select
-	local i = imgui.SpoilerList("NotechartFilterDropdown", w * size, h, filters, config.filterName, filter_to_string)
-	if i then
-		config.filterName = filters[i].name
-		self.game.selectModel:noDebouncePullNoteChartSet()
+	local gameView = self.game.gameView
+	if imgui.TextButton("open filters", "filters", w * size, h) then
+		gameView:setModal(require("sphere.views.SelectView.FiltersView"))
 	end
 end
 

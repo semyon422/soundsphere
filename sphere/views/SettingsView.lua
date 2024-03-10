@@ -31,8 +31,8 @@ local drawSection = {}
 
 ---@param self table?
 ---@return boolean?
-local function draw(self)
-	if not self then
+local function draw(self, quit)
+	if quit then
 		return true
 	end
 

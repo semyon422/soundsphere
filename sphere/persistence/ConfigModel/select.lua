@@ -13,4 +13,5 @@ return {
 	filterString = "",
 	lampString = "",
 	sortFunction = "title",
+	selected_filters = {},
 }

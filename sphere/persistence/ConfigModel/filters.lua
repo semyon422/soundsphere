@@ -2,23 +2,43 @@ local function newInputModeScoreFilter(name, inputMode)
 	return {
 		name = name,
 		check = function(score)
-			return score.inputMode == inputMode
+			return score.inputmode == inputMode
 		end
 	}
 end
 
 return {
 	notechart = {
-		{name = "No filter"},
-		{name = "Played", condition = {accuracy__isnotnull = true}},
-		{name = "Not played", condition = {accuracy__isnull = true}},
-		{name = "4K", condition = {chartdiff_inputmode = "4key"}},
-		{name = "5K", condition = {chartdiff_inputmode = "5key"}},
-		{name = "6K", condition = {chartdiff_inputmode = "6key"}},
-		{name = "7K", condition = {chartdiff_inputmode = "7key"}},
-		{name = "8K", condition = {chartdiff_inputmode = "8key"}},
-		{name = "9K", condition = {chartdiff_inputmode = "9key"}},
-		{name = "10K", condition = {chartdiff_inputmode = "10key"}},
+		{
+			name = "original input mode",
+			{name = "4K", conds = {inputmode__startswith = "4key"}},
+			{name = "5K", conds = {inputmode__startswith = "5key"}},
+			{name = "6K", conds = {inputmode__startswith = "6key"}},
+			{name = "7K", conds = {inputmode__startswith = "7key"}},
+			{name = "8K", conds = {inputmode__startswith = "8key"}},
+			{name = "9K", conds = {inputmode__startswith = "9key"}},
+			{name = "10K", conds = {inputmode__startswith = "10key"}},
+		},
+		{
+			name = "actual input mode",
+			{name = "4K", conds = {chartdiff_inputmode__startswith = "4key"}},
+			{name = "5K", conds = {chartdiff_inputmode__startswith = "5key"}},
+			{name = "6K", conds = {chartdiff_inputmode__startswith = "6key"}},
+			{name = "7K", conds = {chartdiff_inputmode__startswith = "7key"}},
+			{name = "8K", conds = {chartdiff_inputmode__startswith = "8key"}},
+			{name = "9K", conds = {chartdiff_inputmode__startswith = "9key"}},
+			{name = "10K", conds = {chartdiff_inputmode__startswith = "10key"}},
+		},
+		{
+			name = "(not) played",
+			{name = "played", conds = {accuracy__isnotnull = true}},
+			{name = "not played", conds = {accuracy__isnull = true}},
+		},
+		{
+			name = "scratch",
+			{name = "has scratch", conds = {inputmode__contains = "scratch"}},
+			{name = "has not scratch", conds = {inputmode__notcontains = "scratch"}},
+		},
 	},
 	score = {
 		{name = "No filter"},

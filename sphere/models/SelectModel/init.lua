@@ -10,6 +10,7 @@ local CollectionLibrary = require("sphere.models.SelectModel.CollectionLibrary")
 local ScoreLibrary = require("sphere.models.SelectModel.ScoreLibrary")
 local SearchModel = require("sphere.models.SelectModel.SearchModel")
 local SortModel = require("sphere.models.SelectModel.SortModel")
+local FilterModel = require("sphere.models.SelectModel.FilterModel")
 
 ---@class sphere.SelectModel
 ---@operator call: sphere.SelectModel
@@ -34,6 +35,7 @@ function SelectModel:new(configModel, cacheModel, onlineModel, playContext)
 	self.noteChartSetLibrary = NoteChartSetLibrary(cacheModel)
 	self.collectionLibrary = CollectionLibrary(cacheModel)
 	self.searchModel = SearchModel(configModel)
+	self.filterModel = FilterModel(configModel)
 	self.sortModel = SortModel()
 
 	self.scoreLibrary = ScoreLibrary(
@@ -57,6 +59,8 @@ function SelectModel:load()
 	self.collectionLibrary:load(settings.select.locations_in_collections)
 	self.collectionLibrary:setPath(config.collection, config.location_id)
 
+	self.filterModel:apply()
+
 	self:noDebouncePullNoteChartSet()
 end
 
@@ -76,6 +80,7 @@ function SelectModel:updateSetItems()
 	end
 
 	local where, lamp = self.searchModel:getConditions()
+	table_util.append(where, self.filterModel.combined_filters)
 
 	local collectionLibrary = self.collectionLibrary
 	local collectionItem = collectionLibrary.tree.items[collectionLibrary.tree.selected]

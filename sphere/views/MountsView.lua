@@ -54,8 +54,8 @@ local function ui_lock(self)
 	just.container()
 end
 
-modal = ModalImView(function(self)
-	if not self then
+modal = ModalImView(function(self, quit)
+	if quit then
 		return true
 	end
 

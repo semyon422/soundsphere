@@ -15,8 +15,8 @@ local r = 8
 local window_id = "NoteSkinView"
 
 local selectedNoteSkin
-return ModalImView(function(self)
-	if not self then
+return ModalImView(function(self, quit)
+	if quit then
 		if selectedNoteSkin and selectedNoteSkin.config then
 			selectedNoteSkin.config:close()
 		end

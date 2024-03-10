@@ -65,8 +65,8 @@ end
 local osuOD = 0
 local etternaJudgement = 1
 
-return ModalImView(function(self)
-	if not self then
+return ModalImView(function(self, quit)
+	if quit then
 		return true
 	end
 

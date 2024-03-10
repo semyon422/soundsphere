@@ -114,7 +114,7 @@ function GameView:setModal(f)
 		self.modal = f
 		return
 	end
-	if not _f() then
+	if not _f(self, true) then
 		return
 	end
 	self.modal = f
