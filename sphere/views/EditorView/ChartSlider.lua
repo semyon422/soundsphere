@@ -65,7 +65,7 @@ return function(self, w, h)
 
 	local x = math_util.map(math.min(math.max(value, 0), 1), 0, 1, a, b)
 	love.graphics.setColor(1, 1, 1, 1)
-	theme.circle(h, x, h / 2)
+	theme.fillrect(h, h, x - h / 2, 0)
 
 	just.next(w, h)
 
