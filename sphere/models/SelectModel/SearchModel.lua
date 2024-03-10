@@ -5,14 +5,19 @@ local erfunc = require("libchart.erfunc")
 ---@operator call: sphere.SearchModel
 local SearchModel = class()
 
+---@param configModel sphere.ConfigModel
+function SearchModel:new(configModel)
+	self.configModel = configModel
+end
+
 local number_fields = {
 	{
 		keys = {"difficulty", "d"},
-		field = "noteChartDatas.difficulty",
+		field = "difficulty",
 	},
 	{
 		keys = {"length", "l"},
-		field = "noteChartDatas.length",
+		field = "length",
 		transform = function(self, v)
 			if tonumber(v) then
 				return tonumber(v)
@@ -25,37 +30,37 @@ local number_fields = {
 	},
 	{
 		keys = {"bpm", "b"},
-		field = "noteChartDatas.bpm",
+		field = "bpm",
 	},
 	{
-		keys = {"noteCount", "nc"},
-		field = "noteChartDatas.noteCount",
+		keys = {"notes_count", "nc"},
+		field = "notes_count",
 	},
 	{
 		keys = {"level", "lv"},
-		field = "noteChartDatas.level",
+		field = "level",
 	},
 	{
 		keys = {"longNotes", "ln"},
-		field = "noteChartDatas.longNoteRatio",
+		field = "longNoteRatio",
 		transform = function(self, v)
 			return v / 100
 		end
 	},
 	{
 		keys = {"miss", "m"},
-		field = "scores.miss",
+		field = "miss",
 	},
 	{
 		keys = {"accuracy", "a"},
-		field = "scores.accuracy",
+		field = "accuracy",
 		transform = function(self, v)
 			return v / 1000
 		end
 	},
 	{
 		keys = {"score", "s"},
-		field = "scores.accuracy",
+		field = "accuracy",
 		flip = true,
 		transform = function(self, v)
 			if not tonumber(v) then
@@ -84,14 +89,14 @@ end
 
 local textFields = {
 	"hash",
+	"chartfile_name",
 	"artist",
 	"title",
 	"name",
 	"source",
 	"tags",
 	"creator",
-	"inputMode",
-	"audioPath",
+	"inputmode",
 }
 
 local operators = {
@@ -129,7 +134,7 @@ function SearchModel:transformSearchString(s, cond)
 	for _, _s in ipairs(s:split(" ")) do
 		local key, operator, value = _s:match("^(.-)([=><~!]+)(.+)$")
 		if _s == "!" or _s == "~" then
-			cond.scoreId__isnull = true
+			cond.accuracy__isnull = true
 		elseif key and operators[operator] then
 			local config = fields_map[key]
 			operator = operators[operator]
@@ -152,7 +157,7 @@ function SearchModel:transformSearchString(s, cond)
 		elseif not key and _s ~= "" then
 			local _cond = {"or"}
 			for _, k in ipairs(textFields) do
-				_cond["noteChartDatas." .. k .. "__contains"] = _s
+				_cond[k .. "__contains"] = _s
 			end
 			table.insert(cond, _cond)
 		end
@@ -186,7 +191,11 @@ function SearchModel:getConditions()
 	local cond = {}
 
 	if not settings.miscellaneous.showNonManiaCharts then
-		cond["noteChartDatas.inputMode__notin"] = {"1osu", "1taiko", "1fruits"}
+		table.insert(cond, {
+			"or",
+			inputmode__notin = {"1osu", "1taiko", "1fruits"},
+			inputmode__isnull = true,
+		})
 	end
 
 	local filter = self:getFilter()
@@ -199,7 +208,7 @@ function SearchModel:getConditions()
 		end
 	end
 
-	if self.lampString == "" then
+	if lampString == "" then
 		return self:transformSearchString(filterString, cond)
 	end
 

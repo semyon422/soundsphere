@@ -12,17 +12,17 @@ local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 
 
 local sections = {
 	"gameplay",
+	"select",
 	"graphics",
 	"audio",
-	"input",
 	"misc",
 }
 local section = sections[1]
 
 local scrollY = {}
 
-local w, h = 768, 1080 / 2
-local _w, _h = w / 2, 55
+local w, h = 1024, 1080 / 2
+local _h = 55
 local r = 8
 
 local window_id = "settings window"
@@ -31,12 +31,12 @@ local drawSection = {}
 
 ---@param self table?
 ---@return boolean?
-local function draw(self)
-	if not self then
+local function draw(self, quit)
+	if quit then
 		return true
 	end
 
-	imgui.setSize(w, h, _w, _h)
+	imgui.setSize(w, h, w / 2, _h)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
@@ -48,11 +48,17 @@ local function draw(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	just.push()
+	just.push()
+	local tabsw
+	section, tabsw = imgui.vtabs("settings tabs", section, sections)
+	just.pop()
+	love.graphics.translate(tabsw, 0)
 
-	section = imgui.tabs("settings tabs", section, sections)
+	local inner_w = w - tabsw
+	imgui.setSize(inner_w, h, inner_w / 2, _h)
 
 	scrollY[section] = scrollY[section] or 0
-	imgui.Container(window_id, w, h - _h, _h / 3, _h * 2, scrollY[section])
+	imgui.Container(window_id, inner_w, h, _h / 3, _h * 2, scrollY[section])
 
 	drawSection[section](self)
 	just.emptyline(8)
@@ -77,7 +83,6 @@ function drawSection:gameplay()
 	local settings = configs.settings
 	local g = settings.gameplay
 	local i = settings.input
-	local s = configs.select
 	local p = configs.play
 
 	local speedModel = self.game.speedModel
@@ -89,7 +94,7 @@ function drawSection:gameplay()
 
 	g.speedType = imgui.combo("speedType", g.speedType, speedModel.types, nil, "speed type")
 
-	if imgui.TextButton("open timings", "timings", _w / 2, _h) then
+	if imgui.TextButton("open timings", "timings", w / 4, _h) then
 		self.game.gameView:setModal(TimingsModalView)
 	end
 	just.sameline()
@@ -117,8 +122,7 @@ function drawSection:gameplay()
 	g.eventBasedRender = imgui.checkbox("eventBasedRender", g.eventBasedRender, "event based render (experimental)")
 	g.swapVelocityType = imgui.checkbox("swapVelocityType", g.swapVelocityType, "swap 'current' and 'local' velocity (experimental)")
 
-	imgui.separator()
-	s.collapse = imgui.checkbox("s.collapse", s.collapse, "group charts if applicable")
+	g.skin_resources_top_priority = imgui.checkbox("skin_resources_top_priority", g.skin_resources_top_priority, "top priority for skin resources")
 
 	imgui.separator()
 	just.indent(10)
@@ -136,6 +140,14 @@ function drawSection:gameplay()
 	i.pause = imgui.hotkey("pause", i.pause, "pause")
 	i.skipIntro = imgui.hotkey("skipIntro", i.skipIntro, "skip intro")
 	i.quickRestart = imgui.hotkey("quickRestart", i.quickRestart, "quick restart")
+
+	imgui.separator()
+	imgui.text("Analog scratch (restart required)")
+	local ansc = g.analog_scratch
+	ansc.act_w = imgui.intButtons("act_w", ansc.act_w * 180, 1, "activation speed (grad per second)") / 180
+	ansc.deact_w = imgui.intButtons("deact_w", ansc.deact_w * 180, 1, "deactivation speed (grad per second)") / 180
+	ansc.act_period = intButtonsMs("act_period", ansc.act_period, "activation period (ms)")
+	ansc.deact_period = intButtonsMs("deact_period", ansc.deact_period, "deactivation period (ms)")
 
 	imgui.separator()
 	just.indent(10)
@@ -163,6 +175,39 @@ function drawSection:gameplay()
 	just.text("time rate")
 	i.timeRate.decrease = imgui.hotkey("timeRate.decrease", i.timeRate.decrease, "decrease")
 	i.timeRate.increase = imgui.hotkey("timeRate.increase", i.timeRate.increase, "increase")
+end
+
+local diff_columns = {
+	"enps_diff",
+	"osu_diff",
+	"msd_diff",
+	"user_diff",
+}
+local diff_columns_names = {
+	enps_diff = "enps",
+	osu_diff = "osu",
+	msd_diff = "msd",
+	user_diff = "user",
+}
+---@param v number?
+---@return string
+local function format_diff_columns(v)
+	return diff_columns_names[v] or ""
+end
+
+function drawSection:select()
+	local settings = self.game.configModel.configs.settings
+	local i = settings.input
+	local s = settings.select
+
+	s.diff_column = imgui.combo("diff_column", s.diff_column, diff_columns, format_diff_columns, "difficulty")
+	s.collapse = imgui.checkbox("s.collapse", s.collapse, "group charts if applicable")
+
+	imgui.separator()
+
+	i.selectRandom = imgui.hotkey("selectRandom", i.selectRandom, "select random")
+	i.screenshot.capture = imgui.hotkey("screenshot.capture", i.screenshot.capture, "capture screenshot")
+	i.screenshot.open = imgui.hotkey("screenshot.open", i.screenshot.open, "open screenshot")
 end
 
 ---@param mode table
@@ -336,15 +381,6 @@ function drawSection:audio()
 		if d.init then s = s .. "init " end
 		imgui.text(s)
 	end
-end
-
-function drawSection:input()
-	local settings = self.game.configModel.configs.settings
-	local i = settings.input
-
-	i.selectRandom = imgui.hotkey("selectRandom", i.selectRandom, "select random")
-	i.screenshot.capture = imgui.hotkey("screenshot.capture", i.screenshot.capture, "capture screenshot")
-	i.screenshot.open = imgui.hotkey("screenshot.open", i.screenshot.open, "open screenshot")
 end
 
 function drawSection:misc()

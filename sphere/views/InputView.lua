@@ -14,8 +14,8 @@ local _w, _h = w / 2, 55
 local r = 8
 local window_id = "InputView"
 
-return ModalImView(function(self)
-	if not self then
+return ModalImView(function(self, quit)
+	if quit then
 		return true
 	end
 
@@ -62,6 +62,7 @@ return ModalImView(function(self)
 		just.indent(8)
 		imgui.Label("input label" .. i, virtualKey, _h)
 	end
+
 	just.emptyline(8)
 
 	scrollY = imgui.Container()

@@ -42,6 +42,8 @@ function SelectView:draw()
 	Layout:draw()
 	SelectViewConfig(self)
 
+	local cacheModel = self.game.cacheModel
+
 	local kp = just.keypressed
 	if kp("f1") then self.gameView:setModal(require("sphere.views.ModifierView"))
 	elseif kp("f2") then self.game.selectModel:scrollRandom()
@@ -53,11 +55,13 @@ function SelectView:draw()
 		end
 		NotechartsSubscreen(self)
 	elseif self.subscreen == "collections" then
-		if kp("return") or kp("tab") then self:switchToNoteCharts()
+		if kp("tab") then self:switchToNoteCharts()
 		end
 		CollectionsSubscreen(self)
 	elseif self.subscreen == "osudirect" then
-		if kp("escape") or kp("tab") then self:switchToCollections()
+		if kp("escape") or kp("tab") then
+			cacheModel:startUpdate("downloads", 1)
+			self:switchToCollections()
 		end
 		OsudirectSubscreen(self)
 	end

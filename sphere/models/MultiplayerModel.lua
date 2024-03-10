@@ -204,40 +204,40 @@ MultiplayerModel.pushNotechart = remote.wrap(function(self)
 		return
 	end
 
-	local nc = self.selectModel.noteChartItem
-	if not nc then
+	local chartview = self.selectModel.chartview
+	if not chartview then
 		return
 	end
 
-	local path = nc.path
+	local path = chartview.location_path
 	local osuSetId
 	if path:find("%.osu$") then
 		local content = async_read(path)
 		osuSetId = tonumber(content:match("BeatmapSetID:%s*(%d+)"))
 	end
 
-	self.noteChartItem = {
-		setId = nc.setId,
-		noteChartId = nc.noteChartId,
-		noteChartDataId = nc.noteChartDataId,
+	self.chartview = {
+		chartfile_set_id = chartview.chartfile_set_id,
+		chartfile_id = chartview.chartfile_id,
+		chartmeta_id = chartview.chartmeta_id,
 	}
 	self.notechart = {
-		hash = nc.hash,
-		index = nc.index,
-		format = nc.format,
-		title = nc.title,
-		artist = nc.artist,
-		source = nc.source,
-		tags = nc.tags,
-		name = nc.name,
-		creator = nc.creator,
-		level = nc.level,
-		inputMode = nc.inputMode,
-		noteCount = nc.noteCount,
-		length = nc.length,
-		bpm = nc.bpm,
-		difficulty = nc.difficulty,
-		longNoteRatio = nc.longNoteRatio,
+		hash = chartview.hash,
+		index = chartview.index,
+		format = chartview.format,
+		title = chartview.title,
+		artist = chartview.artist,
+		source = chartview.source,
+		tags = chartview.tags,
+		name = chartview.name,
+		creator = chartview.creator,
+		level = chartview.level,
+		inputnode = chartview.inputmode,
+		notes_count = chartview.notes_count,
+		duration = chartview.duration,
+		tempo = chartview.tempo,
+		difficulty = chartview.difficulty,
+		longNoteRatio = chartview.longNoteRatio,
 		osuSetId = osuSetId,
 	}
 	self.peer._setNotechart(self.notechart)
@@ -249,14 +249,6 @@ MultiplayerModel.pullModifiers = remote.wrap(function(self)
 		return
 	end
 	self.handlers.set(self.peer, "modifiers", modifiers)
-end)
-
-MultiplayerModel.pullNotechart = remote.wrap(function(self)
-	local notechart = self.peer.getRoomNotechart()
-	if not notechart then
-		return
-	end
-	self.handlers.set(self.peer, "notechart", notechart)
 end)
 
 MultiplayerModel.login = remote.wrap(function(self)
@@ -324,7 +316,7 @@ function MultiplayerModel:update()
 	remote.update()
 end
 
-function MultiplayerModel:downloadNoteChart()
+MultiplayerModel.downloadNoteChart = remote.wrap(function(self)
 	local setId = self.notechart.osuSetId
 	if self.downloadingBeatmap or not setId then
 		return
@@ -334,10 +326,15 @@ function MultiplayerModel:downloadNoteChart()
 		id = setId,
 		status = "",
 	}
-	self.osudirectModel:downloadBeatmapSet(self.downloadingBeatmap, function()
-		self.downloadingBeatmap.status = "done"
-		self:pullNotechart()
-	end)
-end
+	self.osudirectModel:downloadAsync(self.downloadingBeatmap)
+
+	self.downloadingBeatmap.status = "done"
+
+	local notechart = self.peer.getRoomNotechart()
+	if not notechart then
+		return
+	end
+	self.handlers.set(self.peer, "notechart", notechart)
+end)
 
 return MultiplayerModel

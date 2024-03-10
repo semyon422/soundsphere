@@ -1,78 +1,55 @@
 local class = require("class")
-local ExpireTable = require("ExpireTable")
-local table_util = require("table_util")
+local path_util = require("path_util")
 
 ---@class sphere.NoteChartLibrary
 ---@operator call: sphere.NoteChartLibrary
 local NoteChartLibrary = class()
 
-NoteChartLibrary.setId = 1
 NoteChartLibrary.itemsCount = 0
 
-function NoteChartLibrary:new()
-	local cache = ExpireTable()
-	self.cache = cache
-	self.cache.load = function(_, k)
-		return self:loadObject(k)
-	end
-
-	self.items = newproxy(true)
-	local mt = getmetatable(self.items)
-	function mt.__index(_, i)
-		if i < 1 or i > self.itemsCount then return end
-		return cache:get(i)
-	end
-	function mt.__len()
-		return self.itemsCount
-	end
-end
-
----@param itemIndex number
----@return table
-function NoteChartLibrary:loadObject(itemIndex)
-	local chartRepo = self.cacheModel.chartRepo
-	local slice = self.cacheModel.cacheDatabase.noteChartSlices[self.setId]
-	local entry = self.cacheModel.cacheDatabase.noteChartItems[slice.offset + itemIndex - 1]
-	local noteChart = chartRepo:selectNoteChartEntryById(entry.noteChartId)
-	local noteChartData = chartRepo:selectNoteChartDataEntryById(entry.noteChartDataId)
-
-	local item = {
-		noteChartDataId = entry.noteChartDataId,
-		noteChartId = entry.noteChartId,
-		setId = entry.setId,
-		lamp = entry.lamp,
-		itemIndex = itemIndex,
-	}
-
-	table_util.copy(noteChart, item)
-	table_util.copy(noteChartData, item)
-
-	return item
+---@param cacheModel sphere.CacheModel
+function NoteChartLibrary:new(cacheModel)
+	self.cacheModel = cacheModel
+	self.items = {}
 end
 
 function NoteChartLibrary:clear()
-	self.itemsCount = 0
-	self.cache:new()
+	self.items = {}
 end
 
----@param setId number
-function NoteChartLibrary:setNoteChartSetId(setId)
-	self.setId = setId
-	local slice = self.cacheModel.cacheDatabase.noteChartSlices[setId]
-	if not slice then
-		self.itemsCount = 0
+---@param chartview table
+function NoteChartLibrary:setNoteChartSetId(chartview)
+	self.items = self.cacheModel.chartviewsRepo:getChartviewsAtSet(chartview)
+	if #self.items == 0 then
 		return
 	end
-	self.itemsCount = slice.size
-	self.cache:new()
+	local location = self.cacheModel.locationsRepo:selectLocationById(self.items[1].location_id)
+	local prefix = self.cacheModel.locationManager:getPrefix(location)
+	for _, chart in ipairs(self.items) do
+		chart.location_prefix = prefix
+		chart.location_dir = path_util.join(prefix, chart.dir)
+		chart.location_path = path_util.join(prefix, chart.path)
+	end
 end
 
----@param noteChartId number?
----@param noteChartDataId number?
+---@param chartview table
 ---@return number
-function NoteChartLibrary:getItemIndex(noteChartId, noteChartDataId)
-	local ids = self.cacheModel.cacheDatabase.id_to_local_offset
-	return (ids[noteChartId] and ids[noteChartId][noteChartDataId] or 0) + 1
+function NoteChartLibrary:indexof(chartview)
+	local chartfile_id = chartview.chartfile_id
+	local chartmeta_id = chartview.chartmeta_id
+	local chartdiff_id = chartview.chartdiff_id
+
+	for i, chart in ipairs(self.items) do
+		if chart.chartfile_id == chartfile_id and chart.chartdiff_id == chartdiff_id then
+			return i
+		end
+	end
+	for i, chart in ipairs(self.items) do
+		if chart.chartfile_id == chartfile_id and chart.chartmeta_id == chartmeta_id then
+			return i
+		end
+	end
+	return 1
 end
 
 return NoteChartLibrary

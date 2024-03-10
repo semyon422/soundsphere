@@ -14,7 +14,7 @@ end
 
 ---@return number
 function NoteChartListView:getItemIndex()
-	return self.game.selectModel.noteChartItemIndex
+	return self.game.selectModel.chartview_index
 end
 
 ---@param count number
@@ -41,19 +41,26 @@ function NoteChartListView:drawItem(i, w, h)
 	just.indent(18)
 
 	local baseTimeRate = self.game.playContext.rate
-
-	local difficulty = Format.difficulty((item.difficulty or 0) * baseTimeRate)
-	local inputMode = item.inputMode
-	local name = item.name
-	local creator = item.creator
-	if items[i - 1] and items[i - 1].inputMode == inputMode then
-		inputMode = ""
+	if self.game.configModel.configs.settings.select.chartdiffs_list then
+		baseTimeRate = 1
 	end
-	if items[i - 1] and items[i - 1].creator == creator then
+
+	local difficulty = item.difficulty and Format.difficulty(item.difficulty * baseTimeRate) or ""
+
+	local inputmode = item.chartdiff_inputmode and Format.inputMode(item.chartdiff_inputmode) or ""
+	local creator = item.creator or ""
+	local name = item.name or item.chartfile_name
+
+	if items[i - 1] and items[i - 1].chartdiff_inputmode == item.chartdiff_inputmode then
+		inputmode = ""
+	end
+	if items[i - 1] and items[i - 1].creator == item.creator then
 		creator = ""
 	end
 
-	TextCellImView(72, h, "right", Format.inputMode(inputMode), difficulty, true)
+	love.graphics.setColor(1, 1, 1, 1)
+
+	TextCellImView(72, h, "right", inputmode, difficulty, true)
 	just.sameline()
 
 	if item.lamp then
@@ -62,6 +69,9 @@ function NoteChartListView:drawItem(i, w, h)
 	end
 	just.indent(44)
 
+	if not item.chartmeta_id then
+		love.graphics.setColor(1, 1, 1, 0.5)
+	end
 	TextCellImView(math.huge, h, "left", creator, name)
 end
 

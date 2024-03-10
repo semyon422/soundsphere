@@ -13,7 +13,7 @@ return {
 	fastplayController = {
 		"rhythmModel",
 		"replayModel",
-		"difficultyModel",
+		"cacheModel",
 		"playContext",
 	},
 	gameplayController = {
@@ -26,7 +26,6 @@ return {
 		"multiplayerModel",
 		"previewModel",
 		"discordModel",
-		"scoreModel",
 		"onlineModel",
 		"resourceModel",
 		"windowModel",
@@ -61,7 +60,6 @@ return {
 		"backgroundModel",
 		"multiplayerModel",
 		"onlineModel",
-		"mountModel",
 		"cacheModel",
 		"osudirectModel",
 		"windowModel",

@@ -2,7 +2,6 @@ local class = require("class")
 
 local CacheModel = require("sphere.persistence.CacheModel")
 local ConfigModel = require("sphere.persistence.ConfigModel")
-local ScoreModel = require("sphere.persistence.ScoreModel")
 local OsudirectModel = require("sphere.persistence.OsudirectModel")
 local FileFinder = require("sphere.persistence.FileFinder")
 
@@ -15,7 +14,6 @@ local Persistence = class()
 function Persistence:new()
 	self.cacheModel = CacheModel()
 	self.configModel = ConfigModel()
-	self.scoreModel = ScoreModel(self.configModel)
 	self.osudirectModel = OsudirectModel(self.configModel, self.cacheModel)
 	self.fileFinder = FileFinder()
 end
@@ -28,13 +26,14 @@ function Persistence:load()
 	configModel:open("select", true)
 	configModel:open("play", true)
 	configModel:open("input", true)
-	configModel:open("mount", true)
 	configModel:open("online", true)
 	configModel:open("urls")
 	configModel:open("judgements")
 	configModel:open("filters")
 	configModel:open("files")
 	configModel:read()
+
+	self.cacheModel:load()
 end
 
 function Persistence:unload()

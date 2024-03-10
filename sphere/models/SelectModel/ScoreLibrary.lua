@@ -1,46 +1,47 @@
 local thread = require("thread")
+local erfunc = require("libchart.erfunc")
 local class = require("class")
 
----@class sphere.ScoreLibraryModel
----@operator call: sphere.ScoreLibraryModel
-local ScoreLibraryModel = class()
+---@class sphere.ScoreLibrary
+---@operator call: sphere.ScoreLibrary
+local ScoreLibrary = class()
 
-ScoreLibraryModel.scoreSources = {
+ScoreLibrary.scoreSources = {
 	"local",
 	"online",
 }
-ScoreLibraryModel.scoreSourceName = "local"
+ScoreLibrary.scoreSourceName = "local"
 
 ---@param configModel sphere.ConfigModel
 ---@param onlineModel sphere.OnlineModel
----@param scoreModel sphere.ScoreModel
-function ScoreLibraryModel:new(configModel, onlineModel, scoreModel)
+---@param cacheModel sphere.CacheModel
+function ScoreLibrary:new(configModel, onlineModel, cacheModel)
 	self.configModel = configModel
 	self.onlineModel = onlineModel
-	self.scoreModel = scoreModel
+	self.cacheModel = cacheModel
 
 	self.hash = ""
 	self.index = 1
 	self.items = {}
 end
 
-function ScoreLibraryModel:clear()
+function ScoreLibrary:clear()
 	self.items = {}
 end
 
 ---@param hash string?
-function ScoreLibraryModel:setHash(hash)
+function ScoreLibrary:setHash(hash)
 	self.hash = hash or ""
 end
 
 ---@param index number?
-function ScoreLibraryModel:setIndex(index)
+function ScoreLibrary:setIndex(index)
 	self.index = index or 1
 end
 
 ---@param scores table
 ---@return table
-function ScoreLibraryModel:filterScores(scores)
+function ScoreLibrary:filterScores(scores)
 	local filters = self.configModel.configs.filters.score
 	local select = self.configModel.configs.select
 	local index
@@ -64,8 +65,10 @@ function ScoreLibraryModel:filterScores(scores)
 	return newScores
 end
 
+---@param chartview table
+---@param exact boolean?
 ---@return nil?
-function ScoreLibraryModel:updateItemsAsync()
+function ScoreLibrary:updateItemsAsync(chartview, exact)
 	local hash_index = self.hash .. self.index
 	self.items = {}
 
@@ -73,17 +76,17 @@ function ScoreLibraryModel:updateItemsAsync()
 	if select.scoreSourceName == "online" then
 		self:updateItemsOnline()
 	else
-		self:updateItemsLocal()
+		self:updateItemsLocal(chartview, exact)
 	end
 
 	if self.hash .. self.index ~= hash_index then
-		return self:updateItemsAsync()
+		return self:updateItemsAsync(chartview, exact)
 	end
 end
 
-ScoreLibraryModel.updateItems = thread.coro(ScoreLibraryModel.updateItemsAsync)
+ScoreLibrary.updateItems = thread.coro(ScoreLibrary.updateItemsAsync)
 
-function ScoreLibraryModel:updateItemsOnline()
+function ScoreLibrary:updateItemsOnline()
 	local api = self.onlineModel.webApi.api
 
 	print("GET " .. api.notecharts)
@@ -111,25 +114,48 @@ function ScoreLibraryModel:updateItemsOnline()
 	end
 end
 
-function ScoreLibraryModel:updateItemsLocal()
-	local scoreEntries = self.scoreModel:getScoreEntries(
-		self.hash,
-		self.index
-	)
-	table.sort(scoreEntries, function(a, b)
-		return a.rating > b.rating
-	end)
-	scoreEntries = self:filterScores(scoreEntries)
-	for i = 1, #scoreEntries do
-		scoreEntries[i].rank = i
-	end
-	self.items = scoreEntries
-	self.scoreSourceName = "local"
+---@param score table
+function ScoreLibrary:fillScoreRating(score)
+	local window = self.configModel.configs.settings.gameplay.ratingHitTimingWindow
+	local s = erfunc.erf(window / (score.accuracy * math.sqrt(2)))
+	score.rating = (score.difficulty or 0) * s
+	score.score = s * 10000
 end
 
----@param scoreEntryId number
+---@param chartview table
+---@param exact boolean?
+function ScoreLibrary:updateItemsLocal(chartview, exact)
+	self.scoreSourceName = "local"
+
+	if not chartview.hash then
+		self.items = {}
+		return
+	end
+
+	local scores
+	if exact then
+		scores = self.cacheModel.scoresRepo:getScoresExact(chartview)
+	else
+		scores = self.cacheModel.scoresRepo:getScores(chartview)
+	end
+
+	for i, score in ipairs(scores) do
+		self.cacheModel.chartdiffGenerator:fillMeta(score, chartview)
+		self:fillScoreRating(score)
+	end
+	table.sort(scores, function(a, b)
+		return a.rating > b.rating
+	end)
+	scores = self:filterScores(scores)
+	for i, score in ipairs(scores) do
+		scores[i].rank = i
+	end
+	self.items = scores
+end
+
+---@param score_id number
 ---@return number
-function ScoreLibraryModel:getItemIndex(scoreEntryId)
+function ScoreLibrary:getItemIndex(score_id)
 	local items = self.items
 
 	if not items then
@@ -138,7 +164,7 @@ function ScoreLibraryModel:getItemIndex(scoreEntryId)
 
 	for i = 1, #items do
 		local item = items[i]
-		if item.id == scoreEntryId then
+		if item.id == score_id then
 			return i
 		end
 	end
@@ -148,12 +174,11 @@ end
 
 ---@param score table
 ---@return table
-function ScoreLibraryModel:transformOnlineScore(score)
+function ScoreLibrary:transformOnlineScore(score)
 	local s = {
 		id = score.id,
 		chart_hash = "",
 		chart_index = 1,
-		is_top = false,
 		player_name = score.user.name,
 		time = score.created_at,
 		accuracy = score.accuracy,
@@ -178,4 +203,4 @@ function ScoreLibraryModel:transformOnlineScore(score)
 	return score
 end
 
-return ScoreLibraryModel
+return ScoreLibrary

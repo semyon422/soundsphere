@@ -1,6 +1,5 @@
 local class = require("class")
 local ExpireTable = require("ExpireTable")
-local table_util = require("table_util")
 
 ---@class sphere.NoteChartSetLibrary
 ---@operator call: sphere.NoteChartSetLibrary
@@ -8,7 +7,10 @@ local NoteChartSetLibrary = class()
 
 NoteChartSetLibrary.itemsCount = 0
 
-function NoteChartSetLibrary:new()
+---@param cacheModel sphere.CacheModel
+function NoteChartSetLibrary:new(cacheModel)
+	self.cacheModel = cacheModel
+
 	local cache = ExpireTable()
 	self.cache = cache
 	self.cache.load = function(_, k)
@@ -29,39 +31,34 @@ end
 ---@param itemIndex number
 ---@return table
 function NoteChartSetLibrary:loadObject(itemIndex)
-	local chartRepo = self.cacheModel.chartRepo
-	local entry = self.cacheModel.cacheDatabase.noteChartSetItems[itemIndex - 1]
-	local noteChart = chartRepo:selectNoteChartEntryById(entry.noteChartId)
-	local noteChartData = chartRepo:selectNoteChartDataEntryById(entry.noteChartDataId)
-
-	local item = {
-		noteChartDataId = entry.noteChartDataId,
-		noteChartId = entry.noteChartId,
-		setId = entry.setId,
-		lamp = entry.lamp,
-		itemIndex = itemIndex,
-	}
-
-	table_util.copy(noteChart, item)
-	table_util.copy(noteChartData, item)
-
-	return item
+	local chartviewsRepo = self.cacheModel.chartviewsRepo
+	local _chartview = chartviewsRepo.chartviews[itemIndex - 1]
+	local chartview = chartviewsRepo:getChartview(_chartview)
+	if not chartview then
+		return {}
+	end
+	chartview.lamp = _chartview.lamp
+	return chartview
 end
 
 function NoteChartSetLibrary:updateItems()
-	self.itemsCount = self.cacheModel.cacheDatabase.noteChartSetItemsCount
+	self.itemsCount = self.cacheModel.chartviewsRepo.chartviews_count
 	self.cache:new()
 end
 
----@param noteChartId number?
----@param noteChartDataId number?
----@param noteChartSetId number?
+---@param chartview table
 ---@return number
-function NoteChartSetLibrary:getItemIndex(noteChartId, noteChartDataId, noteChartSetId)
-	local cdb = self.cacheModel.cacheDatabase
-	local ids = cdb.id_to_global_offset
-	return (ids[noteChartId] and ids[noteChartId][noteChartDataId] or
-		cdb.set_id_to_global_offset[noteChartSetId] or 0) + 1
+function NoteChartSetLibrary:indexof(chartview)
+	local chartfile_id = chartview.chartfile_id
+	local chartdiff_id = chartview.chartdiff_id
+	local set_id = chartview.chartfile_set_id
+
+	local cdb = self.cacheModel.chartviewsRepo
+	return
+		cdb.chartdiff_id_to_global_index[chartdiff_id] or
+		cdb.chartfile_id_to_global_index[chartfile_id] or
+		cdb.set_id_to_global_index[set_id] or
+		1
 end
 
 return NoteChartSetLibrary

@@ -41,8 +41,8 @@ local password = ""
 	end
 ]]
 
-return ModalImView(function(self)
-	if not self then
+return ModalImView(function(self, quit)
+	if quit then
 		return true
 	end
 

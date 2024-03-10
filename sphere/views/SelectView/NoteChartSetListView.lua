@@ -13,7 +13,7 @@ end
 
 ---@return number
 function NoteChartSetListView:getItemIndex()
-	return self.game.selectModel.noteChartSetItemIndex
+	return self.game.selectModel.chartview_set_index
 end
 
 ---@param count number
@@ -46,8 +46,11 @@ function NoteChartSetListView:drawItem(i, w, h)
 		love.graphics.circle("line", 22, 36, 7)
 	end
 
+	local artist = item.artist or ""
+	local title = item.title or item.set_name
+
 	just.indent(44)
-	TextCellImView(math.huge, h, "left", item.artist, item.title)
+	TextCellImView(math.huge, h, "left", artist, title)
 end
 
 return NoteChartSetListView

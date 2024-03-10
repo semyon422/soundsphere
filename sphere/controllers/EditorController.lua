@@ -1,4 +1,5 @@
 local class = require("class")
+local path_util = require("path_util")
 local NoteChartExporter = require("sph.NoteChartExporter")
 local OsuNoteChartExporter = require("osu.NoteChartExporter")
 
@@ -9,10 +10,11 @@ local EditorController = class()
 function EditorController:load()
 	local selectModel = self.selectModel
 	local editorModel = self.editorModel
+	local configModel = self.configModel
 	local fileFinder = self.fileFinder
 
 	local noteChart = selectModel:loadNoteChart()
-	local chartItem = selectModel.noteChartItem
+	local chartview = selectModel.chartview
 
 	local noteSkin = self.noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))
 	noteSkin:loadData()
@@ -25,12 +27,17 @@ function EditorController:load()
 	self.previewModel:stop()
 
 	fileFinder:reset()
-	fileFinder:addPath(chartItem.path:match("^(.+)/.-$"))
-	fileFinder:addPath(noteSkin.directoryPath)
+	if configModel.configs.settings.gameplay.skin_resources_top_priority then
+		fileFinder:addPath(noteSkin.directoryPath)
+		fileFinder:addPath(chartview.location_dir)
+	else
+		fileFinder:addPath(chartview.location_dir)
+		fileFinder:addPath(noteSkin.directoryPath)
+	end
 	fileFinder:addPath("userdata/hitsounds")
 	fileFinder:addPath("userdata/hitsounds/midi")
 
-	self.resourceModel:load(chartItem.path, noteChart, function()
+	self.resourceModel:load(chartview.name, noteChart, function()
 		editorModel:loadResources()
 	end)
 
@@ -53,11 +60,12 @@ function EditorController:save()
 	local exp = NoteChartExporter()
 	exp.noteChart = editorModel.noteChart
 
-	local path = selectModel.noteChartItem.path:gsub(".sph$", "") .. ".sph"
+	local chartview = selectModel.chartview
+	local path = chartview.location_path:gsub(".sph$", "") .. ".sph"
 
-	love.filesystem.write(path, exp:export())
+	assert(love.filesystem.write(path, exp:export()))
 
-	self.cacheModel:startUpdate(selectModel.noteChartItem.path:match("^(.+)/.-$"))
+	self.cacheModel:startUpdate(chartview.dir, chartview.location_id)
 end
 
 function EditorController:saveToOsu()
@@ -66,16 +74,15 @@ function EditorController:saveToOsu()
 
 	self.editorModel:save()
 
-	local chartItem = selectModel.noteChartItem
+	local chartview = selectModel.chartview
 	local exp = OsuNoteChartExporter()
 	exp.noteChart = editorModel.noteChart
-	exp.noteChartEntry = chartItem
-	exp.noteChartDataEntry = chartItem
+	exp.chartmeta = chartview
 
-	local path = chartItem.path
+	local path = chartview.location_path
 	path = path:gsub(".osu$", ""):gsub(".sph$", "") .. ".sph.osu"
 
-	love.filesystem.write(path, exp:export())
+	assert(love.filesystem.write(path, exp:export()))
 end
 
 ---@param event table

@@ -1,8 +1,8 @@
 local class = require("class")
 local math_util = require("math_util")
+local path_util = require("path_util")
 local InputMode = require("ncdk.InputMode")
 local TempoRange = require("notechart.TempoRange")
-local ModifierEncoder = require("sphere.models.ModifierEncoder")
 local ModifierModel = require("sphere.models.ModifierModel")
 local NoteData = require("ncdk.NoteData")
 
@@ -17,12 +17,13 @@ function GameplayController:load()
 	local selectModel = self.selectModel
 	local noteSkinModel = self.noteSkinModel
 	local configModel = self.configModel
-	local difficultyModel = self.difficultyModel
+	local cacheModel = self.cacheModel
 	local replayModel = self.replayModel
 	local pauseModel = self.pauseModel
 	local fileFinder = self.fileFinder
 	local playContext = self.playContext
 
+	local chartview = self.selectModel.chartview
 	local config = configModel.configs.settings
 
 	local noteChart = selectModel:loadNoteChart(self:getImporterSettings())
@@ -40,6 +41,14 @@ function GameplayController:load()
 
 	ModifierModel:applyMeta(playContext.modifiers, state)
 	ModifierModel:apply(playContext.modifiers, noteChart)
+
+	local chartdiff = cacheModel.chartdiffGenerator:compute(noteChart, playContext.rate)
+	chartdiff.modifiers = playContext.modifiers
+	chartdiff.hash = chartview.hash
+	chartdiff.index = chartview.index
+	chartdiff.rate_type = config.gameplay.rate_type
+	cacheModel.chartdiffGenerator:fillMeta(chartdiff, chartview)
+	playContext.chartdiff = chartdiff
 
 	local noteSkin = noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))
 	noteSkin:loadData()
@@ -65,12 +74,7 @@ function GameplayController:load()
 	rhythmModel:setSingleHandler(playContext.single)
 
 	rhythmModel.inputManager.observable:add(replayModel)
-
 	rhythmModel:load()
-
-	local enps, longNoteRatio = difficultyModel:getDifficulty(noteChart, playContext.rate)
-	playContext.enps = enps
-	playContext.longNoteRatio = longNoteRatio
 
 	rhythmModel.timeEngine:sync(love.timer.getTime())
 	rhythmModel:loadAllEngines()
@@ -79,15 +83,19 @@ function GameplayController:load()
 
 	self:updateOffsets()
 
-	local chartItem = selectModel.noteChartItem
-
 	fileFinder:reset()
-	fileFinder:addPath(chartItem.path:match("^(.+)/.-$"))
-	fileFinder:addPath(noteSkin.directoryPath)
+
+	if config.gameplay.skin_resources_top_priority then
+		fileFinder:addPath(noteSkin.directoryPath)
+		fileFinder:addPath(chartview.location_dir)
+	else
+		fileFinder:addPath(chartview.location_dir)
+		fileFinder:addPath(noteSkin.directoryPath)
+	end
 	fileFinder:addPath("userdata/hitsounds")
 	fileFinder:addPath("userdata/hitsounds/midi")
 
-	self.resourceModel:load(chartItem.path, noteChart, function()
+	self.resourceModel:load(chartview.name, noteChart, function()
 		if not self.loaded then
 			return
 		end
@@ -129,13 +137,13 @@ function GameplayController:applyTempo(noteChart, tempoFactor, primaryTempo)
 		return
 	end
 
-	if tempoFactor == "average" and noteChart.metaData.avgTempo then
-		applyTempo(noteChart, noteChart.metaData.avgTempo)
+	if tempoFactor == "average" and noteChart.chartmeta.tempo_avg then
+		applyTempo(noteChart, noteChart.chartmeta.tempo_avg)
 		return
 	end
 
-	local minTime = noteChart.metaData.minTime
-	local maxTime = noteChart.metaData.maxTime
+	local minTime = noteChart.chartmeta.start_time
+	local maxTime = minTime + noteChart.chartmeta.duration
 
 	local t = {}
 	t.average, t.minimum, t.maximum = TempoRange:find(noteChart, minTime, maxTime)
@@ -197,30 +205,30 @@ function GameplayController:update(dt)
 end
 
 function GameplayController:discordPlay()
-	local chartItem = self.selectModel.noteChartItem
+	local chartview = self.selectModel.chartview
 	local rhythmModel = self.rhythmModel
-	local length = math.min(chartItem.length, 3600 * 24)
+	local length = math.min(chartview.duration, 3600 * 24)
 
 	local timeEngine = rhythmModel.timeEngine
 	self.discordModel:setPresence({
 		state = "Playing",
 		details = ("%s - %s [%s]"):format(
-			chartItem.artist,
-			chartItem.title,
-			chartItem.name
+			chartview.artist,
+			chartview.title,
+			chartview.name
 		),
 		endTimestamp = math.floor(os.time() + (length - timeEngine.currentTime) / timeEngine.baseTimeRate)
 	})
 end
 
 function GameplayController:discordPause()
-	local chartItem = self.selectModel.noteChartItem
+	local chartview = self.selectModel.chartview
 	self.discordModel:setPresence({
 		state = "Playing (paused)",
 		details = ("%s - %s [%s]"):format(
-			chartItem.artist,
-			chartItem.title,
-			chartItem.name
+			chartview.artist,
+			chartview.title,
+			chartview.name
 		)
 	})
 end
@@ -296,23 +304,29 @@ function GameplayController:saveScore()
 	local scoreSystem = scoreEngine.scoreSystem
 	local playContext = self.playContext
 
-	local chartItem = self.selectModel.noteChartItem
+	local chartview = self.selectModel.chartview
 
 	local replayHash = self.replayModel:saveReplay(
-		chartItem.hash,
-		chartItem.index,
+		self.playContext.chartdiff,
 		playContext
 	)
 
-	local scoreEntryTable = {
-		chart_hash = chartItem.hash,
-		chart_index = chartItem.index,
+	local chartdiff = self.cacheModel.chartdiffsRepo:createUpdateChartdiff(self.playContext.chartdiff)
+
+	local score = {
+		hash = chartdiff.hash,
+		index = chartdiff.index,
+		modifiers = chartdiff.modifiers,
+		rate = chartdiff.rate,
+		rate_type = chartdiff.rate_type,
+
+		const = playContext.const,
+		-- timings = playContext.timings,
+		single = playContext.single,
+
 		time = os.time(),
 		accuracy = scoreSystem.normalscore.accuracyAdjusted,
 		max_combo = scoreSystem.base.maxCombo,
-		modifiers = ModifierEncoder:encode(playContext.modifiers),
-		rate = playContext.rate,
-		const = playContext.const and 1 or 0,
 		replay_hash = replayHash,
 		ratio = scoreSystem.misc.ratio,
 		perfect = scoreSystem.judgement.counters.soundsphere.perfect,
@@ -320,20 +334,18 @@ function GameplayController:saveScore()
 		miss = scoreSystem.base.missCount,
 		mean = scoreSystem.normalscore.normalscore.mean,
 		earlylate = scoreSystem.misc.earlylate,
-		inputmode = tostring(rhythmModel.noteChart.inputMode),
-		difficulty = self.playContext.enps,
 		pauses = scoreEngine.pausesCount,
 	}
-	local scoreEntry = self.scoreModel:insertScore(scoreEntryTable)
+	local scoreEntry = self.cacheModel.scoresRepo:insertScore(score)
 
 	local base = scoreSystem.base
 	if base.hitCount / base.notesCount >= 0.5 then
-		self.onlineModel.onlineScoreManager:submit(chartItem, replayHash)
+		self.onlineModel.onlineScoreManager:submit(chartview, replayHash)
 	end
 
 	self.playContext.scoreEntry = scoreEntry
 
-	self.configModel.configs.select.scoreEntryId = scoreEntry.id
+	self.configModel.configs.select.score_id = scoreEntry.id
 end
 
 function GameplayController:skip()
@@ -356,10 +368,10 @@ end
 
 function GameplayController:updateOffsets()
 	local rhythmModel = self.rhythmModel
-	local chartItem = self.selectModel.noteChartItem
+	local chartview = self.selectModel.chartview
 	local config = self.configModel.configs.settings
 
-	local localOffset = chartItem.localOffset or 0
+	local localOffset = chartview.localOffset or 0
 	local baseTimeRate = rhythmModel.timeEngine.baseTimeRate
 	local inputOffset = config.gameplay.offset.input + localOffset
 	local visualOffset = config.gameplay.offset.visual + localOffset
@@ -385,14 +397,15 @@ end
 
 ---@param delta number
 function GameplayController:increaseLocalOffset(delta)
-	local chartItem = self.selectModel.noteChartItem
-	chartItem.localOffset = math_util.round((chartItem.localOffset or 0) + delta, delta)
+	do return end
+	local chartview = self.selectModel.chartview
+	chartview.localOffset = math_util.round((chartview.localOffset or 0) + delta, delta)
 	self.cacheModel.chartRepo:updateNoteChartDataEntry({
-		hash = chartItem.hash,
-		index = chartItem.index,
-		localOffset = chartItem.localOffset,
+		hash = chartview.hash,
+		index = chartview.index,
+		localOffset = chartview.localOffset,
 	})
-	self.notificationModel:notify("local offset: " .. chartItem.localOffset * 1000 .. "ms")
+	self.notificationModel:notify("local offset: " .. chartview.localOffset * 1000 .. "ms")
 	self:updateOffsets()
 end
 

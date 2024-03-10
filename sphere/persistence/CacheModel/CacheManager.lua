@@ -1,114 +1,78 @@
-local ChartRepo = require("sphere.persistence.CacheModel.ChartRepo")
+local LocationsRepo = require("sphere.persistence.CacheModel.LocationsRepo")
 local NoteChartFinder = require("sphere.persistence.CacheModel.NoteChartFinder")
-local DifficultyModel = require("sphere.models.DifficultyModel")
+local FileCacheGenerator = require("sphere.persistence.CacheModel.FileCacheGenerator")
+local ChartmetaGenerator = require("sphere.persistence.CacheModel.ChartmetaGenerator")
+local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGenerator")
+local ChartfilesRepo = require("sphere.persistence.CacheModel.ChartfilesRepo")
+local ChartdiffsRepo = require("sphere.persistence.CacheModel.ChartdiffsRepo")
+local ChartmetasRepo = require("sphere.persistence.CacheModel.ChartmetasRepo")
 local NoteChartFactory = require("notechart.NoteChartFactory")
-local Log = require("Log")
+local DifficultyModel = require("sphere.models.DifficultyModel")
+local ModifierModel = require("sphere.models.ModifierModel")
+local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
+local ScoresRepo = require("sphere.persistence.CacheModel.ScoresRepo")
 local class = require("class")
-local md5 = require("md5")
-local Orm = require("Orm")
+local path_util = require("path_util")
 
 ---@class sphere.CacheManager
 ---@operator call: sphere.CacheManager
 local CacheManager = class()
 
-function CacheManager:new()
-	self.log = Log()
-	self.log.console = true
-	self.log.path = "userdata/cache.log"
-
+---@param gdb sphere.GameDatabase
+function CacheManager:new(gdb)
 	self.state = 0
 
-	self.chartRepo = ChartRepo()
+	self.gdb = gdb
+	self.locationsRepo = LocationsRepo(gdb)
+	self.scoresRepo = ScoresRepo(gdb)
+	self.chartfilesRepo = ChartfilesRepo(gdb)
+	self.chartdiffsRepo = ChartdiffsRepo(self.gdb)
+	self.chartmetasRepo = ChartmetasRepo(self.gdb)
+
+	self.noteChartFinder = NoteChartFinder(love.filesystem)
+
+	local function handle_file_cache(chartfile)
+		self.chartfiles_count = self.chartfiles_count + 1
+		if self.chartfiles_count % 100 == 0 then
+			self:checkProgress()
+		end
+	end
+	self.fileCacheGenerator = FileCacheGenerator(self.chartfilesRepo, self.noteChartFinder, handle_file_cache)
+	self.chartdiffGenerator = ChartdiffGenerator(self.chartdiffsRepo, DifficultyModel)
+	self.chartmetaGenerator = ChartmetaGenerator(self.chartmetasRepo, self.chartfilesRepo, NoteChartFactory)
+
+	self.locationManager = LocationManager(
+		self.locationsRepo,
+		self.chartfilesRepo,
+		nil,
+		love.filesystem.getWorkingDirectory(),
+		"mounted_charts"
+	)
 end
 
----@param entry table
----@return table
-function CacheManager:getNoteChartSetEntry(entry)
-	local oldEntry = self.chartRepo:selectNoteChartSetEntry(entry.path)
-
-	if oldEntry and oldEntry.lastModified == entry.lastModified then
-		return oldEntry
-	end
-
-	if not oldEntry then
-		entry = self.chartRepo:insertNoteChartSetEntry(entry)
-	else
-		oldEntry.lastModified = entry.lastModified
-		self.chartRepo:updateNoteChartSetEntry(entry)
-		entry = oldEntry
-	end
-
-	return entry
+function CacheManager:begin()
+	self.gdb.orm:begin()
 end
 
----@param entry table
----@param isOldEntry boolean?
-function CacheManager:setNoteChartEntry(entry, isOldEntry)
-	local oldEntry = isOldEntry and entry or self.chartRepo:selectNoteChartEntry(entry.path)
-
-	if not oldEntry then
-		self.chartRepo:insertNoteChartEntry(entry)
-	else
-		self.chartRepo:updateNoteChartEntry(entry)
-	end
-end
-
----@param entry table
-function CacheManager:setNoteChartDataEntry(entry)
-	local oldEntry = self.chartRepo:selectNoteCharDataEntry(entry.hash, entry.index)
-
-	if not oldEntry then
-		self.chartRepo:insertNoteChartDataEntry(entry)
-	else
-		self.chartRepo:updateNoteChartDataEntry(entry)
-	end
-end
-
-----------------------------------------------------------------
-
----@param entry table
-function CacheManager:deleteNoteChartEntry(entry)
-	self.chartRepo:deleteNoteChartEntry(entry.path)
-end
-
----@param entry table
-function CacheManager:deleteNoteChartSetEntry(entry)
-	self.chartRepo:deleteNoteChartSetEntry(entry.path)
-
-	local noteChartsAtSet = self.chartRepo:getNoteChartsAtSet(entry.id)
-	for i = 1, #noteChartsAtSet do
-		self:deleteNoteChartEntry(noteChartsAtSet[i])
-	end
+function CacheManager:commit()
+	self.gdb.orm:commit()
 end
 
 ----------------------------------------------------------------
 
 function CacheManager:resetProgress()
-	self.noteChartSetCount = self.noteChartSets and #self.noteChartSets or 0
-	self.noteChartCount = self.noteCharts and #self.noteCharts or 0
-	self.cachePercent = 0
-
-	self.countDelta = 100
-	self.countNext = self.noteChartSetCount + self.countDelta
-
+	self.chartfiles_count = 0
+	self.chartfiles_current = 0
 	self.state = 0
 end
 
 function CacheManager:checkProgress()
-	if self.noteChartSetCount >= self.countNext then
-		self.countNext = self.countNext + self.countDelta
-
-		self.chartRepo:commit()
-		self.chartRepo:begin()
-	end
-
 	local thread = require("thread")
 	thread:update()
 
 	local cache = thread.shared.cache
-	cache.noteChartSetCount = self.noteChartSetCount
-	cache.noteChartCount = self.noteChartCount
-	cache.cachePercent = self.cachePercent
+	cache.chartfiles_count = self.chartfiles_count
+	cache.chartfiles_current = self.chartfiles_current
 	cache.state = self.state
 
 	if cache.stop then
@@ -117,210 +81,156 @@ function CacheManager:checkProgress()
 	end
 end
 
----@param path string
----@param force boolean?
-function CacheManager:generateCacheFull(path, force)
-	local path = path or "userdata/charts"
-	self.chartRepo:load()
+function CacheManager:processChartfile(chartfile, location_prefix)
+	print(chartfile.path)
+
+	local full_path = path_util.join(location_prefix, chartfile.path)
+	local content = assert(love.filesystem.read(full_path))
+
+	local ok, err = self.chartmetaGenerator:generate(chartfile, content, false)
+
+	if not ok then
+		print(chartfile.id)
+		print(err)
+		return
+	end
+
+	if not err then
+		return
+	end
+
+	for j, noteChart in ipairs(err) do
+		self.chartdiffGenerator:create(noteChart, chartfile.hash, j)
+	end
+end
+
+---@param path string?
+---@param location_id number
+function CacheManager:computeCacheLocation(path, location_id)
+	local location = self.locationsRepo:selectLocationById(location_id)
+	local location_prefix = self.locationManager:getPrefix(location)
 
 	self:resetProgress()
+
 	self.state = 1
 	self:checkProgress()
 
-	self.chartRepo:begin()
-	self:lookup(path, false)
-	self.chartRepo:commit()
+	self:begin()
+	self.fileCacheGenerator:lookup(path, location_id, location_prefix)
+	self:commit()
 
 	self.state = 2
 	self:checkProgress()
 
-	self:generate(path, force)
-
-	self.state = 3
-	self:checkProgress()
-end
-
----@param directoryPath string
----@param recursive boolean?
-function CacheManager:lookup(directoryPath, recursive)
-	local iterator = NoteChartFinder:newFileIterator(directoryPath, recursive, function(...)
-		return self:checkNoteChartSetEntry(...)
-	end)
-
-	local noteChartSetPath
-	local noteChartSetEntry
-	for path, dirPath in iterator do
-		if dirPath ~= noteChartSetPath then
-			noteChartSetPath = dirPath
-			noteChartSetEntry = self:processNoteChartSet(dirPath)
-			self:checkProgress()
-		end
-		self:processNoteChartEntries(path, noteChartSetEntry)
-		if self.needStop then
-			return
-		end
+	local chartfile_set, set_id
+	local dir, name = NoteChartFinder.get_dir_name(path)
+	if name then
+		chartfile_set = self.chartfilesRepo:selectChartfileSet(dir, name, location_id)
 	end
-end
-
----@param path string
----@return boolean
-function CacheManager:checkNoteChartSetEntry(path)
-	local entry = self.chartRepo:selectNoteChartSetEntry(path)
-	if not entry then
-		return true
+	if chartfile_set then
+		set_id = chartfile_set.id
+		print("chartfile_set.id = " .. set_id)
 	end
 
-	local info = love.filesystem.getInfo(path)
-	if info and entry.lastModified ~= info.modtime then
-		return true
-	end
+	local chartfiles = self.chartfilesRepo:selectUnhashedChartfiles(location_id, set_id)
+	self.chartfiles_count = #chartfiles
 
-	return false
-end
+	self:begin()
+	for i, chartfile in ipairs(chartfiles) do
+		self.chartfiles_current = i
 
----@param noteChartSetPath string
----@return table
-function CacheManager:processNoteChartSet(noteChartSetPath)
-	local info = love.filesystem.getInfo(noteChartSetPath)
-	local noteChartSetEntry = self:getNoteChartSetEntry({
-		path = noteChartSetPath,
-		lastModified = info.modtime
-	})
-	self.noteChartSetCount = self.noteChartSetCount + 1
-
-	local cachedEntries = self.chartRepo:getNoteChartsAtSet(noteChartSetEntry.id)
-	for i = 1, #cachedEntries do
-		local info = love.filesystem.getInfo(cachedEntries[i].path)
-		if not info then
-			self:deleteNoteChartEntry(cachedEntries[i])
-		end
-	end
-
-	return noteChartSetEntry
-end
-
----@param noteChartPath string
----@param noteChartSetEntry table
-function CacheManager:processNoteChartEntries(noteChartPath, noteChartSetEntry)
-	local info = love.filesystem.getInfo(noteChartPath)
-	local lastModified = info.modtime
-	local entry = self.chartRepo:selectNoteChartEntry(noteChartPath)
-
-	if entry then
-		if entry.lastModified ~= lastModified then
-			entry.hash = Orm.NULL
-			entry.lastModified = lastModified
-			entry.setId = noteChartSetEntry.id
-			self:setNoteChartEntry(entry, true)
-		elseif entry.setId ~= noteChartSetEntry.id then
-			entry.setId = noteChartSetEntry.id
-			self:setNoteChartEntry(entry, true)
-		end
-	else
-		self:setNoteChartEntry({
-			path = noteChartPath,
-			lastModified = lastModified,
-			setId = noteChartSetEntry.id
-		})
-		self.noteChartCount = self.noteChartCount + 1
-	end
-end
-
----@param path string
----@param force boolean?
-function CacheManager:generate(path, force)
-	local entries = self.chartRepo:selectNoteChartSets(path)
-
-	self.chartRepo:begin()
-	for i = 1, #entries do
-		local status, err = xpcall(function()
-			return self:processNoteChartDataEntries(entries[i], force)
-		end, debug.traceback)
-
-		if not status then
-			self.log:write("error", entries[i].id)
-			self.log:write("error", entries[i].path)
-			self.log:write("error", err)
-		end
-
-		if i % 100 == 0 then
-			self.chartRepo:commit()
-			self.chartRepo:begin()
-		end
-
-		self.cachePercent = (i - 1) / #entries * 100
+		self:processChartfile(chartfile, location_prefix)
 		self:checkProgress()
 
 		if self.needStop then
-			self.chartRepo:commit()
-			return
+			break
+		end
+		if i % 100 == 0 then
+			self:commit()
+			self:begin()
 		end
 	end
-	self.chartRepo:commit()
+	self:commit()
+
+	self.state = 0
+	self:checkProgress()
 end
 
----@param noteChartSetEntry table
----@param force boolean?
-function CacheManager:processNoteChartDataEntries(noteChartSetEntry, force)
-	local info = love.filesystem.getInfo(noteChartSetEntry.path)
-	if not info then
-		self:deleteNoteChartSetEntry(noteChartSetEntry)
-		return
-	end
+function CacheManager:computeChartdiffs()
+	local chartmetasRepo = self.chartmetasRepo
+	local scoresRepo = self.scoresRepo
+	local chartfilesRepo = self.chartfilesRepo
 
-	local noteChartEntries = self.chartRepo:getNoteChartsAtSet(noteChartSetEntry.id)
+	local scores = scoresRepo:getScoresWithMissingChartdiffs()
+	local chartmetas = chartmetasRepo:getChartmetasWithMissingChartdiffs()
 
-	local newNoteChartEntries = {}
-	for i = 1, #noteChartEntries do
-		local noteChartEntry = noteChartEntries[i]
-		if not noteChartEntry.hash or force then
-			newNoteChartEntries[#newNoteChartEntries + 1] = noteChartEntry
-		end
-	end
-	noteChartEntries = newNoteChartEntries
+	self.state = 2
+	self.chartfiles_count = #chartmetas + #scores
+	self.chartfiles_current = 0
+	self:checkProgress()
 
-	local fileContent = {}
-	local fileHash = {}
+	print("computing default chartdiffs")
+	for i, chartmeta in ipairs(chartmetas) do
+		local chartfile = chartfilesRepo:selectChartfileByHash(chartmeta.hash)
+		if chartfile then
+			local location = self.locationsRepo:selectLocationById(chartfile.location_id)
+			local prefix = self.locationManager:getPrefix(location)
 
-	for i = 1, #noteChartEntries do
-		local path = noteChartEntries[i].path
-		if not fileContent[path] then
-			local content = love.filesystem.read(path)
+			local full_path = path_util.join(prefix, chartfile.path)
+			local content = assert(love.filesystem.read(full_path))
 
-			fileContent[path] = content
-			fileHash[path] = md5.sumhexa(content)
-		end
-	end
-
-	for i = 1, #noteChartEntries do
-		local path = noteChartEntries[i].path
-
-		local noteChartEntry = noteChartEntries[i]
-		local content = fileContent[path]
-		local hash = fileHash[path]
-		noteChartEntry.hash = hash
-
-		if not force and self.chartRepo:selectNoteCharDataEntry(hash, 1) then
-			self:setNoteChartEntry(noteChartEntry)
-		else
-			print(path)
-			local noteCharts, err = NoteChartFactory:getNoteCharts(path, content)
-			if noteCharts then
-				for index, noteChart in ipairs(noteCharts) do
-					local entry = noteChart.metaData
-					local difficulty, longNoteRatio = DifficultyModel:getDifficulty(noteChart)
-					entry.difficulty = difficulty
-					entry.longNoteRatio = longNoteRatio
-					entry.index = index
-					entry.hash = hash
-					self:setNoteChartDataEntry(entry)
-					self:setNoteChartEntry(noteChartEntry)
-				end
+			local noteChart, err = NoteChartFactory:getNoteChart(chartfile.name, content, chartmeta.index)
+			if not noteChart then
+				return nil, err
 			else
-				print(err)
+				local chartdiff = self.chartdiffGenerator:compute(noteChart, 1)
+				chartdiff.hash = chartmeta.hash
+				chartdiff.index = chartmeta.index
+				self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
 			end
 		end
+		self.chartfiles_current = self.chartfiles_current + 1
+		self:checkProgress()
+		if self.needStop then
+			break
+		end
 	end
+
+	print("computing modified chartdiffs")
+	for i, score in ipairs(scores) do
+		local chartfile = chartfilesRepo:selectChartfileByHash(score.hash)
+		local chartmeta = chartmetasRepo:selectChartmeta(score.hash, score.index)
+		if chartfile and chartmeta then
+			local location = self.locationsRepo:selectLocationById(chartfile.location_id)
+			local prefix = self.locationManager:getPrefix(location)
+
+			local full_path = path_util.join(prefix, chartfile.path)
+			local content = assert(love.filesystem.read(full_path))
+
+			local noteChart, err = NoteChartFactory:getNoteChart(chartfile.name, content, score.index)
+			if not noteChart then
+				return nil, err
+			else
+				ModifierModel:apply(score.modifiers, noteChart)
+
+				local chartdiff = self.chartdiffGenerator:compute(noteChart, score.rate)
+				chartdiff.modifiers = score.modifiers
+				chartdiff.hash = score.hash
+				chartdiff.index = score.index
+				chartdiff.rate_type = score.rate_type
+
+				self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
+			end
+		end
+		self.chartfiles_current = self.chartfiles_current + 1
+		self:checkProgress()
+		if self.needStop then
+			break
+		end
+	end
+
+	self.state = 0
+	self:checkProgress()
 end
 
 return CacheManager

@@ -243,7 +243,7 @@ end
 
 ---@param self table
 local function Title(self)
-	local chartItem = self.game.selectModel.noteChartItem
+	local chartview = self.game.selectModel.chartview
 
 	local w, h = Layout:move("title_middle")
 	drawFrameRect(w, h)
@@ -252,8 +252,8 @@ local function Title(self)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 36))
 
-	local artist_title = ("%s — %s"):format(chartItem.artist, chartItem.title)
-	local creator_name = ("%s — %s"):format(chartItem.creator, chartItem.name)
+	local artist_title = ("%s — %s"):format(chartview.artist, chartview.title)
+	local creator_name = ("%s — %s"):format(chartview.creator, chartview.name)
 	just.text(artist_title)
 	just.text(creator_name)
 end
@@ -422,7 +422,7 @@ local function NotechartInfo(self)
 	local rhythmModel = self.game.rhythmModel
 	local normalscore = rhythmModel.scoreEngine.scoreSystem.normalscore
 
-	local noteChartItem = self.game.selectModel.noteChartItem
+	local chartview = self.game.selectModel.chartview
 	local scoreItem = self.game.selectModel.scoreItem
 	local scoreEngine = rhythmModel.scoreEngine
 	local playContext = self.game.playContext
@@ -431,9 +431,9 @@ local function NotechartInfo(self)
 		return
 	end
 
-	local topScoreItem = self.game.scoreLibraryModel.items[1]
+	local topScoreItem = self.game.selectModel.scoreLibrary.items[1]
 	if topScoreItem == scoreItem then
-		topScoreItem = self.game.scoreLibraryModel.items[2]
+		topScoreItem = self.game.selectModel.scoreLibrary.items[2]
 	end
 	if not topScoreItem then
 		topScoreItem = scoreItem
@@ -449,14 +449,14 @@ local function NotechartInfo(self)
 	local baseTimeRate = show and playContext.rate or scoreItem.rate
 	local const = show and playContext.const or scoreItem.const
 
-	local baseBpm = noteChartItem.bpm
-	local baseLength = noteChartItem.length
-	local baseDifficulty = noteChartItem.difficulty
-	local baseInputMode = noteChartItem.inputMode
+	local baseBpm = chartview.tempo
+	local baseLength = chartview.duration
+	local baseDifficulty = chartview.difficulty
+	local baseInputMode = chartview.inputmode
 
-	local bpm = baseBpm * baseTimeRate
-	local length = baseLength / baseTimeRate
-	local difficulty = show and playContext.enps or scoreItem.difficulty
+	local bpm = scoreItem.tempo
+	local length = scoreItem.duration
+	local difficulty = show and playContext.chartdiff.enps_diff or scoreItem.difficulty
 	local inputMode = show and tostring(rhythmModel.noteChart.inputMode) or scoreItem.inputmode
 
 	local w, h = Layout:move("title_left")
@@ -465,14 +465,14 @@ local function NotechartInfo(self)
 	w = w - 44
 	local wr = 0.70
 
-	TextCellImView(w * (1 - wr), 55, "right", "notes", noteChartItem.noteCount)
+	TextCellImView(w * (1 - wr), 55, "right", "notes", chartview.notes_count)
 	just.sameline()
 	TextCellImView(w * wr, 55, "right", "duration",
 		length == baseLength and time_util.format(baseLength) or
 		("%s→%s"):format(time_util.format(baseLength), time_util.format(length))
 	)
 
-	TextCellImView(w * (1 - wr), 55, "right", "level", noteChartItem.level)
+	TextCellImView(w * (1 - wr), 55, "right", "level", chartview.level)
 	just.sameline()
 	TextCellImView(w * wr, 55, "right", "bpm",
 		bpm == baseBpm and math.floor(baseBpm + 0.5) or
@@ -487,7 +487,7 @@ local function NotechartInfo(self)
 	love.graphics.setFont(font)
 
 	just.indent(36)
-	just.text(("%0.2fx"):format(baseTimeRate))
+	just.text(("%0.3fx"):format(baseTimeRate))
 	if const then
 		just.sameline()
 		just.text("c")
@@ -535,7 +535,7 @@ local function NotechartInfo(self)
 
 	if scoreEntry.id == scoreItem.id then
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-		rating = s * playContext.enps
+		rating = s * playContext.chartdiff.enps_diff
 	end
 
 	local bestScore = ("%d"):format(topScoreItem.score)
@@ -742,7 +742,7 @@ local function BottomScreenMenu(self)
 	if scoreItem and scoreEntry and scoreItem.id == scoreEntry.id and not scoreItem.file then
 		if imgui.TextOnlyButton("submit", "resubmit", 72 * 2, h) then
 			self.game.onlineModel.onlineScoreManager:submit(
-				self.game.selectModel.noteChartItem,
+				self.game.selectModel.chartview,
 				scoreItem.replay_hash
 			)
 		end

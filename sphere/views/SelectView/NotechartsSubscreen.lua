@@ -101,31 +101,93 @@ local function NoteChartList(self)
 
 	NoteChartListView.game = self.game
 	NoteChartListView:draw(w, h)
+
+	w, h = Layout:move("column2row2row2")
+
+	h = 60
+	love.graphics.translate(w - (72 - h) / 2 - h, (72 - h) / 2)
+
+	local config = self.game.configModel.configs.settings.select
+
+	if imgui.Checkbox("chartdiffs list cb", config.chartdiffs_list, h) then
+		config.chartdiffs_list = not config.chartdiffs_list
+		self.game.selectModel:noDebouncePullNoteChartSet()
+	end
 end
 
 ---@param self table
-local function Cells(self)
+local function ChartCells(self)
 	local w, h = Layout:move("column2row1")
 
+	local chartview = self.game.selectModel.chartview
+
+	if not chartview or not chartview.chartdiff_id then
+		return
+	end
+
 	local baseTimeRate = self.game.playContext.rate
-	local noteChartItem = self.game.selectModel.noteChartItem
-	local scoreItem = self.game.selectModel.scoreItem
 
 	local bpm = 0
 	local length = 0
-	local noteCount = 0
+	local notes_count = 0
 	local level = 0
 	local longNoteRatio = 0
 	local localOffset = 0
 	local format = ""
-	if noteChartItem then
-		bpm = (noteChartItem.bpm or 0) * baseTimeRate
-		length = (noteChartItem.length or 0) / baseTimeRate
-		noteCount = noteChartItem.noteCount or 0
-		level = noteChartItem.level or 0
-		longNoteRatio = noteChartItem.longNoteRatio or 0
-		localOffset = noteChartItem.localOffset or 0
-		format = noteChartItem.format or ""
+	if chartview then
+		bpm = (chartview.tempo or 0) * baseTimeRate
+		length = (chartview.duration or 0) / baseTimeRate
+		notes_count = chartview.notes_count or 0
+		level = chartview.level or 0
+		longNoteRatio = (chartview.long_notes_count or 0) / (chartview.notes_count or 0)
+		localOffset = chartview.localOffset or 0
+		format = chartview.format or ""
+	end
+
+	love.graphics.translate(0, h - 118)
+	w = (w - 44) / 4
+	h = 50
+
+	love.graphics.setColor(1, 1, 1, 1)
+
+	just.row(true)
+	just.indent(22)
+	TextCellImView(w, h, "right", "bpm", math.floor(bpm + 0.5))
+	TextCellImView(w, h, "right", "duration", time_util.format(length))
+	TextCellImView(w, h, "right", "notes", notes_count)
+	TextCellImView(w, h, "right", "level", level)
+
+	just.row(true)
+	just.indent(22)
+	BarCellImView(2 * w, h, "right", "long notes", longNoteRatio)
+	TextCellImView(w, h, "right", "offset", localOffset * 1000)
+	TextCellImView(w, h, "right", "format", format)
+	just.row()
+
+	if self.game.multiplayerModel.room then
+		return
+	end
+
+	w, h = Layout:move("column2row1")
+	love.graphics.translate(0, h / 2 - 55)
+	if imgui.TextOnlyButton("play auto", "AP", 55, 55) then
+		self.game.rhythmModel:setAutoplay(true)
+		self:play()
+	end
+	if imgui.TextOnlyButton("play pro", "PM", 55, 55) then
+		self.game.rhythmModel:setPromode(true)
+		self:play()
+	end
+end
+
+---@param self table
+local function ScoreCells(self)
+	local w, h = Layout:move("column1row2")
+	drawFrameRect(w, h)
+
+	local scoreItem = self.game.selectModel.scoreItem
+	if not scoreItem then
+		return
 	end
 
 	local score = 0
@@ -145,29 +207,6 @@ local function Cells(self)
 			score = 0
 		end
 	end
-
-	love.graphics.translate(0, h - 118)
-	w = (w - 44) / 4
-	h = 50
-
-	love.graphics.setColor(1, 1, 1, 1)
-
-	just.row(true)
-	just.indent(22)
-	TextCellImView(w, h, "right", "bpm", math.floor(bpm + 0.5))
-	TextCellImView(w, h, "right", "duration", time_util.format(length))
-	TextCellImView(w, h, "right", "notes", noteCount)
-	TextCellImView(w, h, "right", "level", level)
-
-	just.row(true)
-	just.indent(22)
-	BarCellImView(2 * w, h, "right", "long notes", longNoteRatio)
-	TextCellImView(w, h, "right", "offset", localOffset * 1000)
-	TextCellImView(w, h, "right", "format", format)
-	just.row()
-
-	w, h = Layout:move("column1row2")
-	drawFrameRect(w, h)
 
 	love.graphics.translate(w / 2, 6)
 	w = (w - 44) / 4
@@ -189,21 +228,6 @@ local function Cells(self)
 	TextCellImView(w, h, "right", "", const_str)
 	TextCellImView(w, h, "right", "rate", Format.timeRate(rate))
 	just.row()
-
-	if self.game.multiplayerModel.room then
-		return
-	end
-
-	w, h = Layout:move("column2row1")
-	love.graphics.translate(0, h / 2 - 55)
-	if imgui.TextOnlyButton("play auto", "AP", 55, 55) then
-		self.game.rhythmModel:setAutoplay(true)
-		self:play()
-	end
-	if imgui.TextOnlyButton("play pro", "PM", 55, 55) then
-		self.game.rhythmModel:setPromode(true)
-		self:play()
-	end
 end
 
 local bannerGradient
@@ -292,12 +316,9 @@ local function NotechartFilterDropdown(self)
 	h = 60
 	love.graphics.translate(w * (1 - size) - 26, (72 - h) / 2)
 
-	local filters = self.game.configModel.configs.filters.notechart
-	local config = self.game.configModel.configs.select
-	local i = imgui.SpoilerList("NotechartFilterDropdown", w * size, h, filters, config.filterName, filter_to_string)
-	if i then
-		config.filterName = filters[i].name
-		self.game.selectModel:noDebouncePullNoteChartSet()
+	local gameView = self.game.gameView
+	if imgui.TextButton("open filters", "filters", w * size, h) then
+		gameView:setModal(require("sphere.views.SelectView.FiltersView"))
 	end
 end
 
@@ -326,7 +347,7 @@ local function ScoreSourceDropdown(self)
 	h = 60
 	love.graphics.translate(w * (3 / 4 - size) - 26, (72 - h) / 2)
 
-	local sources = self.game.scoreLibraryModel.scoreSources
+	local sources = self.game.selectModel.scoreLibrary.scoreSources
 	local config = self.game.configModel.configs.select
 	local i = imgui.SpoilerList("ScoreSourceDropdown", w * size, h, sources, config.scoreSourceName)
 	if i then
@@ -366,8 +387,8 @@ local function ModifierIconGrid(self)
 	local g = configs.settings.gameplay
 
 	local timeRateModel = self.game.timeRateModel
-	local range = timeRateModel.range[g.rateType]
-	local format = timeRateModel.format[g.rateType]
+	local range = timeRateModel.range[g.rate_type]
+	local format = timeRateModel.format[g.rate_type]
 	local newRate = imgui.knob(
 		"rate knob",
 		timeRateModel:get(),
@@ -379,6 +400,13 @@ local function ModifierIconGrid(self)
 		self.game.modifierSelectModel:change()
 	end
 	timeRateModel:set(newRate)
+
+	local w, h = Layout:move("column1row3")
+	love.graphics.translate(w - 21 - right_w, 4)
+	love.graphics.translate(8, h - 42)
+	local inputMode = self.game.selectController.state.inputMode
+	local inputmode = Format.inputMode(tostring(inputMode)) or ""
+	just.text(inputmode)
 
 	local w, h = Layout:move("column1row3")
 	love.graphics.translate(21, 4)
@@ -488,7 +516,8 @@ return function(self)
 	NoteChartSetList(self)
 	NoteChartList(self)
 	ScoreList(self)
-	Cells(self)
+	ChartCells(self)
+	ScoreCells(self)
 	SearchField(self)
 	SortDropdown(self)
 	NotechartFilterDropdown(self)

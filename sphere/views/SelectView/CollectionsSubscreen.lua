@@ -2,7 +2,6 @@ local just = require("just")
 local spherefonts = require("sphere.assets.fonts")
 local imgui = require("imgui")
 local CollectionListView = require("sphere.views.SelectView.CollectionListView")
-local CacheView = require("sphere.views.SelectView.CacheView")
 
 local Layout = require("sphere.views.SelectView.Layout")
 local SelectFrame = require("sphere.views.SelectView.SelectFrame")
@@ -18,17 +17,6 @@ local function drawFrameRect(w, h, _r)
 end
 
 ---@param self table
-local function Cache(self)
-	local w, h = Layout:move("column2row2row1")
-	drawFrameRect(w, h)
-
-	love.graphics.translate(h / 2, 0)
-
-	CacheView.game = self.game
-	CacheView:draw(w - h, h)
-end
-
----@param self table
 local function CollectionList(self)
 	local w, h = Layout:move("column3")
 	drawFrameRect(w, h)
@@ -37,6 +25,16 @@ local function CollectionList(self)
 	CollectionListView.game = self.game
 	CollectionListView:draw(w, h)
 	SelectFrame()
+
+	love.graphics.translate(w - 16, 0)
+
+	local list = CollectionListView
+	local count = #list.items - 1
+	local pos = (list.visualItemIndex - 1) / count
+	local newScroll = imgui.ScrollBar("ncs_sb", pos, 16, h, count / list.rows)
+	if newScroll then
+		list:scroll(math.floor(count * newScroll + 1) - list.itemIndex)
+	end
 end
 
 ---@param self table
@@ -53,10 +51,22 @@ local function CollectionsSubscreen(self)
 		self:switchToOsudirect()
 	end
 	just.row()
+
+	w, h = Layout:move("column3", "header")
+
+	local padding = 15
+	love.graphics.translate(0, padding)
+
+	local config = self.game.configModel.configs.settings.select
+	if imgui.Checkbox("locs_in_colls cb", config.locations_in_collections, h - padding * 2) then
+		config.locations_in_collections = not config.locations_in_collections
+		self.game.selectModel.collectionLibrary:load(config.locations_in_collections)
+	end
+	just.sameline()
+	imgui.Label("locs_in_colls cb", "show locations", h - padding * 2)
 end
 
 return function(self)
 	CollectionList(self)
-	Cache(self)
 	CollectionsSubscreen(self)
 end

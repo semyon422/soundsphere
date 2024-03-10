@@ -2,7 +2,7 @@
 
 root = true
 
-[*.{lua,json,toml}]
+[*.{lua,json,toml,sql}]
 # charset = utf-8
 indent_style = tab
 # indent_size = 4

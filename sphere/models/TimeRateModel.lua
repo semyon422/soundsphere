@@ -1,22 +1,23 @@
 local class = require("class")
 local math_util = require("math_util")
+local int_rates = require("libchart.int_rates")
 
 ---@class sphere.TimeRateModel
 ---@operator call: sphere.TimeRateModel
 local TimeRateModel = class()
 
 TimeRateModel.types = {
-	"default",
+	"linear",
 	"exp",
 }
 
 TimeRateModel.range = {
-	default = {0.25, 4, 0.05},
+	linear = {0.25, 4, 0.05},
 	exp = {-20, 20, 1},
 }
 
 TimeRateModel.format = {
-	default = "%0.2f",
+	linear = "%0.2f",
 	exp = "%0.f",
 }
 
@@ -32,11 +33,11 @@ function TimeRateModel:get()
 	local gameplay = self.configModel.configs.settings.gameplay
 	local playContext = self.playContext
 
-	local rateType = gameplay.rateType
+	local rate_type = gameplay.rate_type
 	local rate = playContext.rate
 
-	if rateType == "exp" then
-		rate = 10 * math.log(rate, 2)
+	if rate_type == "exp" then
+		rate = int_rates.get_exp(rate, 10)
 	end
 
 	return rate
@@ -47,24 +48,24 @@ function TimeRateModel:set(newRate)
 	local gameplay = self.configModel.configs.settings.gameplay
 	local playContext = self.playContext
 
-	local rateType = gameplay.rateType
+	local rate_type = gameplay.rate_type
 	local rate = newRate
 
-	local range = self.range[rateType]
+	local range = self.range[rate_type]
 	rate = math_util.clamp(rate, range[1], range[2])
 
-	if rateType == "exp" then
+	if rate_type == "exp" then
 		rate = 2 ^ (rate / 10)
 	end
 
-	playContext.rate = rate
+	playContext.rate = int_rates.round(rate)
 end
 
 ---@param delta number
 function TimeRateModel:increase(delta)
 	local gameplay = self.configModel.configs.settings.gameplay
-	local rateType = gameplay.rateType
-	local range = self.range[rateType]
+	local rate_type = gameplay.rate_type
+	local range = self.range[rate_type]
 	local rate = self:get() + delta * range[3]
 	rate = math_util.round(rate, range[3])
 	self:set(rate)

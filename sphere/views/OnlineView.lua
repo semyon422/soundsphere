@@ -9,8 +9,8 @@ local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 
 local email = ""
 local password = ""
 
-return ModalImView(function(self)
-	if not self then
+return ModalImView(function(self, quit)
+	if quit then
 		return true
 	end
 

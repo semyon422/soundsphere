@@ -1,78 +1,157 @@
 local class = require("class")
+local dpairs = require("dpairs")
+local table_util = require("table_util")
+local path_util = require("path_util")
 
 ---@class sphere.CollectionLibrary
 ---@operator call: sphere.CollectionLibrary
 local CollectionLibrary = class()
 
-CollectionLibrary.basePath = "userdata/charts"
-
-local ignoredNames = {
-	".keep",
-}
-for i = 1, #ignoredNames do
-	ignoredNames[ignoredNames[i]] = true
+---@param cacheModel sphere.CacheModel
+function CollectionLibrary:new(cacheModel)
+	self.cacheModel = cacheModel
 end
 
-function CollectionLibrary:load()
-	self.config = self.configModel.configs.select
-	local collectionPath = self.config.collection
-	local basePath = self.basePath
-
-	local dict = {}
-	for _, chartSetData in ipairs(self.cacheModel.chartRepo:selectNoteChartSets(self.basePath)) do
-		local parent = chartSetData.path:match("^(.+)/.-$")
-		dict[parent] = (dict[parent] or 0) + 1
-	end
-
-	local directoryItems = love.filesystem.getDirectoryItems(basePath)
-	for _, name in ipairs(directoryItems) do
-		if not ignoredNames[name] then
-			local path = basePath .. "/" .. name
-			dict[path] = dict[path] or 0
+local function process_chartfile_set(dir, tree, location_id)
+	local t = tree
+	t.count = t.count + 1
+	if dir then
+		local tpath = {}
+		local depth = tree.depth
+		for i, k in ipairs(dir:split("/")) do
+			depth = depth + 1
+			tpath[i] = k
+			local index = t.indexes[k]
+			local item = t.items[index]
+			if not item then
+				item = {
+					count = 0,
+					selected = 2,
+					depth = depth,
+					path = path_util.join(unpack(tpath)),
+					location_id = location_id,
+					name = k,
+					indexes = {},
+					items = {t},
+				}
+				index = #t.items + 1
+				t.indexes[k] = index
+				t.items[index] = item
+			end
+			t = item
+			t.count = t.count + 1
 		end
 	end
+end
 
-	local items = {{
-		path = basePath,
-		shortPath = "/",
+---@param locations_in_collections boolean
+function CollectionLibrary:getTree(locations_in_collections)
+	local tree = {
+		count = 0,
+		selected = 1,
+		depth = 0,
+		path = nil,
+		location_id = nil,
 		name = "/",
-		count = 0
-	}}
-	for path, count in pairs(dict) do
-		local collection = {
-			path = path,
-			shortPath = path:gsub(basePath .. "/", ""),
-			name = path:match("^.+/(.-)$"),
-			count = count
-		}
-		items[#items + 1] = collection
-		if path == collectionPath then
-			self.collection = collection
+		indexes = {},
+		items = {},
+	}
+	tree.items[1] = tree
+
+	local chartfilesRepo = self.cacheModel.chartfilesRepo
+	local locationsRepo = self.cacheModel.locationsRepo
+	if not locations_in_collections then
+		for _, chartfile_set in ipairs(chartfilesRepo:selectChartfileSetsAtLocation()) do
+			process_chartfile_set(chartfile_set.dir, tree)
+		end
+	else
+		local locations = locationsRepo:selectLocations()
+		for _, location in ipairs(locations) do
+			local subtree = {
+				count = 0,
+				selected = 2,
+				depth = 1,
+				path = nil,
+				location_id = location.id,
+				name = location.name,
+				indexes = {},
+				items = {tree},
+			}
+			table.insert(tree.items, subtree)
+			for _, chartfile_set in ipairs(chartfilesRepo:selectChartfileSetsAtLocation(location.id)) do
+				process_chartfile_set(chartfile_set.dir, subtree, location.id)
+			end
 		end
 	end
-	table.sort(items, function(a, b) return a.path < b.path end)
-	self.collection = self.collection or items[1]
 
-	self.items = items
+	return tree
 end
 
----@param path string
----@return number
-function CollectionLibrary:getItemIndex(path)
-	local items = self.items
+function CollectionLibrary:enter()
+	local node = self.tree.items[self.tree.selected]
+	if #node.items > 1 then
+		self.tree = node
+	end
+end
 
-	if not items then
-		return 1
+---@param locations_in_collections boolean
+function CollectionLibrary:load(locations_in_collections)
+	local tree = self:getTree(locations_in_collections)
+
+	self.locations_in_collections = locations_in_collections
+	self.root_tree = tree
+	self.tree = tree
+end
+
+function CollectionLibrary:setPath(path, location_id)
+	self.tree = self.root_tree
+	if self.locations_in_collections then
+		return self:setPathLic(path, location_id)
+	end
+	return self:setPathP(path)
+end
+
+function CollectionLibrary:setPathLic(path, location_id)
+	local tree = self.tree
+
+	if not location_id then
+		return
 	end
 
-	for i = 1, #items do
-		local collection = items[i]
-		if collection.path == path then
-			return i
+	local index = table_util.indexof(tree.items, location_id, function(node)
+		return node.location_id
+	end)
+	tree.selected = index or 1
+
+	if not path then
+		return
+	end
+
+	self.tree = tree.items[tree.selected]
+
+	self:setPathP(path)
+end
+
+function CollectionLibrary:setPathP(path)
+	if not path then
+		return
+	end
+
+	local tree = self.tree
+
+	local keys = path:split("/")
+	for i = 1, #keys do
+		local index = tree.indexes[keys[i]]
+		if index then
+			tree.selected = index
+			if i < #keys then
+				tree = tree.items[index]
+				self.tree = tree
+			end
+		else
+			return
 		end
 	end
-
-	return 1
 end
 
 return CollectionLibrary

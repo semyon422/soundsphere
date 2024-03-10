@@ -60,7 +60,7 @@ return {
 		actionOnFail = "none",
 		ratingHitTimingWindow = 0.032,
 		scaleSpeed = false,
-		rateType = "default",
+		rate_type = "linear",
 		speedType = "default",
 		speed = 1,
 		tempoFactor = "average",  -- "average", "primary", "minimum", "maximum"
@@ -72,6 +72,14 @@ return {
 			playRetry = 0.5,
 			prepare = 2
 		},
+		analog_scratch = {
+			act_period = 0.1,
+			act_w = 0.3333333333333333,
+			deact_period = 0.05,
+			deact_w = 0.1111111111111111
+		},
+		skin_resources_top_priority = false,
+		selected_filters = {},
 	},
 	graphics = {
 		asynckey = false,
@@ -151,5 +159,11 @@ return {
 		showFPS = false,
 		showTasks = false,
 		showDebugMenu = false,
+	},
+	select = {
+		collapse = true,
+		chartdiffs_list = false,
+		diff_column = "enps_diff",
+		locations_in_collections = false,
 	}
 }

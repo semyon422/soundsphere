@@ -1,5 +1,7 @@
 local class = require("class")
 local thread = require("thread")
+local path_util = require("path_util")
+local fs_util = require("fs_util")
 local Sph = require("sph.Sph")
 local NoteChartExporter = require("osu.NoteChartExporter")
 local ModifierModel = require("sphere.models.ModifierModel")
@@ -36,13 +38,15 @@ function SelectController:applyModifierMeta()
 
 	local playContext = self.playContext
 
-	local item = self.selectModel.noteChartItem
-	if item then
-		self.state.inputMode:set(item.inputMode)
+	local chartview = self.selectModel.chartview
+	if not chartview then
+		return
 	end
 
-	ModifierModel:applyMeta(playContext.modifiers, self.state)
 	self.previewModel:setPitch(playContext.rate)
+	self.state.inputMode:set(chartview.inputmode)
+
+	ModifierModel:applyMeta(playContext.modifiers, self.state)
 end
 
 function SelectController:beginUnload()
@@ -70,8 +74,8 @@ function SelectController:update()
 	if osudirectModel:isChanged() then
 		local backgroundUrl = osudirectModel:getBackgroundUrl()
 		local previewUrl = osudirectModel:getPreviewUrl()
-		self.backgroundModel:loadBackgroundDebounce(backgroundUrl)
-		self.previewModel:loadPreviewDebounce(previewUrl)
+		self.backgroundModel:setBackgroundPath(backgroundUrl)
+		self.previewModel:setAudioPathPreview(previewUrl)
 	end
 
 	if self.modifierSelectModel:isChanged() then
@@ -96,55 +100,44 @@ SelectController.updateSession = thread.coro(function(self)
 end)
 
 function SelectController:openDirectory()
-	local noteChartItem = self.selectModel.noteChartItem
-	if not noteChartItem then
+	local chartview = self.selectModel.chartview
+	if not chartview then
 		return
 	end
-	local path = noteChartItem.path:match("^(.+)/.-$")
-
-	local realDirectory = love.filesystem.getRealDirectory(path)
-	if not realDirectory then
+	local location = self.cacheModel.locationsRepo:selectLocationById(chartview.location_id)
+	if not location then
 		return
 	end
-
-	local realPath
-	if self.mountModel:isMountPath(realDirectory) then
-		realPath = self.mountModel:getRealPath(path)
-	else
-		realPath = realDirectory .. "/" .. path
-	end
-	love.system.openURL(realPath)
+	love.system.openURL(path_util.join(location.path, chartview.dir))
 end
 
 function SelectController:openWebNotechart()
-	local noteChartItem = self.selectModel.noteChartItem
-	if not noteChartItem then
+	local chartview = self.selectModel.chartview
+	if not chartview then
 		return
 	end
 
-	local hash, index = noteChartItem.hash, noteChartItem.index
+	local hash, index = chartview.hash, chartview.index
 	self.onlineModel.onlineNotechartManager:openWebNotechart(hash, index)
 end
 
 ---@param force boolean?
 function SelectController:updateCache(force)
-	local noteChartItem = self.selectModel.noteChartItem
-	if not noteChartItem then
+	local chartview = self.selectModel.chartview
+	if not chartview then
 		return
 	end
-	local path = noteChartItem.path:match("^(.+)/.-$")
-	self.cacheModel:startUpdate(path, force)
+	self.cacheModel:startUpdate(chartview.dir, chartview.location_id)
 end
 
----@param path string
----@param force boolean?
-function SelectController:updateCacheCollection(path, force)
+---@param location_id string
+function SelectController:updateCacheLocation(location_id)
 	local cacheModel = self.cacheModel
 	local state = cacheModel.shared.state
 	if state == 0 or state == 3 then
-		cacheModel:startUpdate(path, force)
+		cacheModel:startUpdate(nil, location_id)
 	else
-		cacheModel:stopUpdate()
+		cacheModel:stopTask()
 	end
 end
 
@@ -152,40 +145,74 @@ end
 function SelectController:receive(event)
 	if event.name == "filedropped" then
 		self:filedropped(event[1])
+	elseif event.name == "directorydropped" then
+		self:directorydropped(event[1])
 	end
 end
 
+---@param path string
+function SelectController:directorydropped(path)
+	self.cacheModel.locationManager:updateLocationPath(path)
+end
+
+local filedropped_handlers = {}
+
+function filedropped_handlers.new_chart(self, path, data)
+	local _name, ext = path:match("^(.+)%.(.-)$")
+	local audioName = _name:match("^.+/(.-)$")
+	local location_path = path_util.join("editor", os.time() .. " " .. audioName)
+	local chartSetPath = path_util.join("userdata/charts", location_path)
+
+	love.filesystem.createDirectory(chartSetPath)
+	assert(love.filesystem.write(chartSetPath .. "/" .. audioName .. "." .. ext, data))
+	assert(love.filesystem.write(chartSetPath .. "/" .. audioName .. ".sph", Sph:getDefault({
+		audio = audioName .. "." .. ext
+	})))
+
+	self.cacheModel:startUpdate(location_path, 1)
+end
+
+function filedropped_handlers.add_zip(self, path, data)
+	local location_path = path_util.join("dropped", path:match("^.+/(.-)%.osz$"))
+	local extractPath = path_util.join("userdata/charts", location_path)
+
+	print(("Extracting to: %s"):format(extractPath))
+	print(path, extractPath)
+	local extracted = fs_util.extractAsync(path, extractPath, false)
+	if not extracted then
+		print("Failed to extract")
+		return
+	end
+	print("Extracted")
+
+	self.cacheModel:startUpdate(location_path, 1)
+end
+filedropped_handlers.add_zip = thread.coro(filedropped_handlers.add_zip)
+
 local exts = {
-	mp3 = true,
-	ogg = true,
+	mp3 = filedropped_handlers.new_chart,
+	ogg = filedropped_handlers.new_chart,
+	osz = filedropped_handlers.add_zip,
 }
 
 ---@param file love.File
 function SelectController:filedropped(file)
 	local path = file:getFilename():gsub("\\", "/")
 
-	local _name, ext = path:match("^(.+)%.(.-)$")
-	if not exts[ext] then
+	local ext = path:match("^.+%.(.-)$")
+	local handler = exts[ext]
+	if not handler then
 		return
 	end
 
-	local audioName = _name:match("^.+/(.-)$")
-	local chartSetPath = "userdata/charts/editor/" .. os.time() .. " " .. audioName
-
-	love.filesystem.createDirectory(chartSetPath)
-	assert(love.filesystem.write(chartSetPath .. "/" .. audioName .. "." .. ext, file:read()))
-	assert(love.filesystem.write(chartSetPath .. "/" .. audioName .. ".sph", Sph:getDefault({
-		audio = audioName .. "." .. ext
-	})))
-
-	self.cacheModel:startUpdate(chartSetPath, true)
+	handler(self, path, file)
 end
 
 function SelectController:exportToOsu()
 	local selectModel = self.selectModel
 
-	local chartItem = selectModel.noteChartItem
-	if not chartItem then
+	local chartview = selectModel.chartview
+	if not chartview then
 		return
 	end
 
@@ -194,10 +221,9 @@ function SelectController:exportToOsu()
 	ModifierModel:apply(self.playContext.modifiers, noteChart)
 
 	nce.noteChart = noteChart
-	nce.noteChartEntry = chartItem
-	nce.noteChartDataEntry = chartItem
+	nce.chartmeta = chartview
 
-	local path = chartItem.path
+	local path = chartview.path
 	path = path:find("^.+/.$") and path:match("^(.+)/.$") or path
 	local fileName = path:match("^.+/(.-)$"):match("^(.+)%..-$")
 

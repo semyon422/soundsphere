@@ -10,7 +10,7 @@ ScoreListView.rows = 5
 
 function ScoreListView:reloadItems()
 	self.stateCounter = self.game.selectModel.scoreStateCounter
-	self.items = self.game.scoreLibraryModel.items
+	self.items = self.game.selectModel.scoreLibrary.items
 end
 
 ---@return number
@@ -37,10 +37,8 @@ function ScoreListView:drawItem(i, w, h)
 		self.screenView:loadScore(i)
 	end
 
-	if item.is_top then
+	if loaded then
 		love.graphics.circle("fill", 44, 36, 7)
-	end
-	if loaded or item.is_top then
 		love.graphics.circle("line", 44, 36, 7)
 	end
 
@@ -54,7 +52,7 @@ function ScoreListView:drawItem(i, w, h)
 		local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 		local normalscore = scoreEngine.scoreSystem.normalscore
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-		rating = s * playContext.enps
+		rating = s * playContext.chartdiff.enps_diff
 
 		timeRate = self.game.rhythmModel.timeEngine.baseTimeRate or timeRate
 		inputMode = tostring(self.game.rhythmModel.noteChart.inputMode) or inputMode
@@ -66,7 +64,7 @@ function ScoreListView:drawItem(i, w, h)
 
 	local cw = (w - 44) / 5
 
-	local scoreSourceName = self.game.scoreLibraryModel.scoreSourceName
+	local scoreSourceName = self.game.selectModel.scoreLibrary.scoreSourceName
 	if scoreSourceName == "online" then
 		self:drawItemOnline(i, w, h)
 		return

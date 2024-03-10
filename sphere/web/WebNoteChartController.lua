@@ -47,11 +47,11 @@ function WebNoteChartController:POST()
 
 	local noteChartDataEntries = {}
 	for _, noteChart in ipairs(noteCharts) do
-		local noteChartDataEntry = noteChart.metaData
+		local chartmeta = noteChart.chartmeta
 		local difficulty, longNoteRatio = DifficultyModel:getDifficulty(noteChart)
-		noteChartDataEntry.difficulty = difficulty
-		noteChartDataEntry.longNoteRatio = longNoteRatio
-		table.insert(noteChartDataEntries, noteChartDataEntry)
+		chartmeta.difficulty = difficulty
+		chartmeta.longNoteRatio = longNoteRatio
+		table.insert(noteChartDataEntries, chartmeta)
 	end
 
 	return {status = 200, json = {notecharts = noteChartDataEntries}}
