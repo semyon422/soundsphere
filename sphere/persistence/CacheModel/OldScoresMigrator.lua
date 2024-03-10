@@ -28,12 +28,10 @@ function OldScoresMigrator:migrate()
 
 	print("total scores: " .. #scores)
 
-	local new_scores = {}
 	for _, old_score in ipairs(scores) do
 		local score = self:convertScore(old_score)
-		table.insert(new_scores, score)
+		self.gdb.models.scores:create(score)
 	end
-	self.gdb.models.scores:insert(new_scores)
 end
 
 function OldScoresMigrator:convertScore(old_score)
