@@ -486,6 +486,7 @@ end
 
 ---@param key number
 ---@param keymode number
+---@param SpecialStyle number
 ---@return string|number
 local function getNoteType(key, keymode, SpecialStyle)
 	if SpecialStyle == 1 then
@@ -504,7 +505,10 @@ local function getNoteType(key, keymode, SpecialStyle)
 	if keymode % 2 == 1 then
 		local half = (keymode - 1) / 2
 		if (keymode + 1) / 2 == key then
-			return "S"
+			if SpecialStyle == 0 then
+				return "S"
+			end
+			return 2
 		else
 			if (half - key + 1) % 2 == 1 then
 				return 1
