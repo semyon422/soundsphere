@@ -83,7 +83,7 @@ function GameController:new()
 		self.playContext
 	)
 
-	self.joystickModel = JoystickModel()
+	self.joystickModel = JoystickModel(self.persistence.configModel)
 
 	self.cacheModel = self.persistence.cacheModel
 	self.osudirectModel = self.persistence.osudirectModel
@@ -147,6 +147,8 @@ end
 ---@param dt number
 function GameController:update(dt)
 	self.app:update()
+
+	self.joystickModel:update(dt)
 
 	self.multiplayerController:update()
 	self.osudirectModel:update()

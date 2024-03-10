@@ -63,16 +63,6 @@ return ModalImView(function(self)
 		imgui.Label("input label" .. i, virtualKey, _h)
 	end
 
-	if currentDevice == "joystick" then
-		local joystickModel = self.game.joystickModel
-		imgui.separator()
-		for uuid, props in pairs(joystickModel.data) do
-			imgui.text(uuid)
-			for k, v in ipairs(props) do
-				imgui.text(("%s = %0.3g"):format(k, v))
-			end
-		end
-	end
 	just.emptyline(8)
 
 	scrollY = imgui.Container()

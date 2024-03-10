@@ -72,6 +72,12 @@ return {
 			playRetry = 0.5,
 			prepare = 2
 		},
+		analog_scratch = {
+			act_period = 0.1,
+			act_w = 0.3333333333333333,
+			deact_period = 0.05,
+			deact_w = 0.1111111111111111
+		},
 		skin_resources_top_priority = false,
 	},
 	graphics = {

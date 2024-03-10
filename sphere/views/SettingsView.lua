@@ -142,6 +142,14 @@ function drawSection:gameplay()
 	i.quickRestart = imgui.hotkey("quickRestart", i.quickRestart, "quick restart")
 
 	imgui.separator()
+	imgui.text("Analog scratch (restart required)")
+	local ansc = g.analog_scratch
+	ansc.act_w = imgui.intButtons("act_w", ansc.act_w * 180, 1, "activation speed (grad per second)") / 180
+	ansc.deact_w = imgui.intButtons("deact_w", ansc.deact_w * 180, 1, "deactivation speed (grad per second)") / 180
+	ansc.act_period = intButtonsMs("act_period", ansc.act_period, "activation period (ms)")
+	ansc.deact_period = intButtonsMs("deact_period", ansc.deact_period, "deactivation period (ms)")
+
+	imgui.separator()
 	just.indent(10)
 	just.text("time to")
 	g.time.prepare = imgui.slider1("time.prepare", g.time.prepare, "%0.1f", 0.5, 3, 0.1, "prepare")
