@@ -1,6 +1,7 @@
 local class = require("class")
 local delay = require("delay")
 local thread = require("thread")
+local audio = require("audio")
 
 ---@class sphere.PreviewModel
 ---@operator call: sphere.PreviewModel
@@ -90,15 +91,6 @@ function PreviewModel:loadPreview()
 		return
 	end
 
-	if not path:find("^http") then
-		local info = love.filesystem.getInfo(path)
-		if not info then
-			loadingPreview = false
-			self:stop()
-			return
-		end
-	end
-
 	if self.audio then
 		if self.path ~= path then
 			self:stop()
@@ -172,21 +164,12 @@ local loadHttp = thread.async(function(url)
 	end
 end)
 
-local loadAudio = thread.async(function(path)
-	require("love.filesystem")
-	require("love.audio")
-	require("love.sound")
-
-	local info = love.filesystem.getInfo(path)
-	if not info then
-		return
-	end
-
-	local status, source = pcall(love.audio.newSource, path, "stream")
+local function loadAudio(path)
+	local status, source = pcall(audio.newFileSource, path)
 	if status then
 		return source
 	end
-end)
+end
 
 ---@param path string
 ---@param type string?

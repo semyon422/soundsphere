@@ -29,6 +29,8 @@ function NoteChartLibrary:setNoteChartSetId(chartview)
 		chart.location_prefix = prefix
 		chart.location_dir = path_util.join(prefix, chart.dir)
 		chart.location_path = path_util.join(prefix, chart.path)
+		chart.real_dir = path_util.join(location.path, chart.dir)
+		chart.real_path = path_util.join(location.path, chart.path)
 	end
 end
 
