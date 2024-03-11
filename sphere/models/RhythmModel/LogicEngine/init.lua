@@ -27,10 +27,7 @@ function LogicEngine:getNoteHandler(input, create)
 		if not create then
 			return
 		end
-		noteHandler = NoteHandler({
-			logicNoteDatas = {},
-			logicEngine = self
-		})
+		noteHandler = NoteHandler(self)
 		self.noteHandlers[input] = noteHandler
 	end
 
