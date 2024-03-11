@@ -44,7 +44,10 @@ function PreviewModel:update()
 	end
 	if not audio:isPlaying() and love.window.hasFocus() then
 		audio:seek(self.position)
-		audio:play()
+		if not audio:play() then
+			self.audio = nil  -- invalid audio
+			return
+		end
 	elseif audio:isPlaying() and not love.window.hasFocus() and muteOnUnfocus then
 		audio:pause()
 	end
@@ -136,7 +139,10 @@ function PreviewModel:loadPreview()
 	audio:seek(position)
 	audio:setVolume(volume)
 	audio:setPitch(self.pitch)
-	audio:play()
+	if not audio:play() then
+		self.audio = nil  -- invalid audio
+		return
+	end
 	self.volume = volume
 end
 
