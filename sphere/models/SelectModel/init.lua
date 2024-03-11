@@ -437,6 +437,9 @@ function SelectModel:pullNoteChart(noUpdate, noPullNext)
 end
 
 function SelectModel:updateScoreOnlineAsync()
+	if not self.chartview then
+		return
+	end
 	self.scoreLibrary:updateItemsAsync(self.chartview)
 	self:findScore()
 end
