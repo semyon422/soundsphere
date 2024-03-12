@@ -85,11 +85,13 @@ function SelectModel:updateSetItems()
 	local collectionLibrary = self.collectionLibrary
 	local collectionItem = collectionLibrary.tree.items[collectionLibrary.tree.selected]
 
-	local path = collectionItem.path
-	if path then
-		where.set_dir__startswith = path
+	if collectionItem then
+		local path = collectionItem.path
+		if path then
+			where.set_dir__startswith = path
+		end
+		where.location_id = collectionItem.location_id
 	end
-	where.location_id = collectionItem.location_id
 
 	params.where = where
 	params.lamp = lamp
