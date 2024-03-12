@@ -142,9 +142,9 @@ function Loop:run()
 			local a, b, c, d = LuaMidi.getMessage(i)
 			while a do
 				if a == 144 and c ~= 0 then
-					love.midipressed(b, c, d)
+					love.midipressed(tonumber(b), c, d)
 				elseif a == 128 or c == 0 then
-					love.midireleased(b, c, d)
+					love.midireleased(tonumber(b), c, d)
 				end
 				a, b, c, d = LuaMidi.getMessage(i)
 			end
@@ -220,10 +220,45 @@ local function clampEventTime(time)
 	return math.min(math.max(time, Loop.time - Loop.dt), Loop.time)
 end
 
+local function transformInputEvent(name, ...)
+	if name == "keypressed" then
+		return "keyboard", 1, select(2, ...), true
+	elseif name == "keyreleased" then
+		return "keyboard", 1, select(2, ...), false
+	elseif name == "gamepadpressed" then
+		return "gamepad", select(1, ...):getID(), select(2, ...), true
+	elseif name == "gamepadreleased" then
+		return "gamepad", select(1, ...):getID(), select(2, ...), false
+	elseif name == "joystickpressed" then
+		return "joystick", select(1, ...):getID(), select(2, ...), true
+	elseif name == "joystickreleased" then
+		return "joystick", select(1, ...):getID(), select(2, ...), false
+	elseif name == "midipressed" then
+		return "midi", 1, select(1, ...), true
+	elseif name == "midireleased" then
+		return "midi", 1, select(1, ...), false
+	end
+end
+
+local re = {}
+local function resend_transformed(...)
+	if not ... then
+		return
+	end
+	local name = "inputchanged"
+	local icb = just.callbacks[name]
+	if icb and icb(...) then return end
+	re[1], re[2], re[3], re[4], re[5], re[6] = ...
+	re.name = name
+	re.time = clampEventTime(Loop.eventTime)
+	return Loop:send(re)
+end
+
 function Loop:init()
 	local e = {}
 	for _, name in pairs(Loop.callbacks) do
 		love[name] = function(...)
+			resend_transformed(transformInputEvent(name, ...))
 			local icb = just.callbacks[name]
 			if icb and icb(...) then return end
 			e[1], e[2], e[3], e[4], e[5], e[6] = ...

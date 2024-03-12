@@ -13,7 +13,7 @@ function JoystickModel:new(configModel)
 	self.configModel = configModel
 end
 
-function JoystickModel:getScratchState(id, axis)
+function JoystickModel:getScratchState(id, axis, joystick)
 	local data = self.data
 	data[id] = data[id] or {}
 	if data[id][axis] then
@@ -24,9 +24,9 @@ function JoystickModel:getScratchState(id, axis)
 
 	local analogScratch = AnalogScratch(cfg.act_period, cfg.deact_period, cfg.act_w, cfg.deact_w)
 	local scratchMapper = ScratchMapper(analogScratch, function(state, is_right)
-		local key = ("%s%s (%s)"):format(is_right and "+" or "-", axis, id)
+		local key = ("%s%s"):format(is_right and "+" or "-", axis)
 		local name = state and "joystickpressed" or "joystickreleased"
-		love.event.push(name, key, key)
+		love.event.push(name, joystick, key)
 	end)
 	data[id][axis] = {
 		analogScratch = analogScratch,
@@ -43,7 +43,7 @@ function JoystickModel:receive(event)
 	local joystick, axis, value = unpack(event)
 	local id = joystick:getID()
 
-	local state = self:getScratchState(id, axis)
+	local state = self:getScratchState(id, axis, joystick)
 	state.value = value
 end
 

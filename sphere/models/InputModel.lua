@@ -6,12 +6,6 @@ local InputModel = class()
 
 InputModel.inputMode = ""
 InputModel.inputs = {}
-InputModel.devices = {
-	"keyboard",
-	"gamepad",
-	"joystick",
-	"midi"
-}
 
 ---@param configModel sphere.ConfigModel
 function InputModel:new(configModel)
@@ -23,43 +17,30 @@ end
 ---@return string?
 ---@return boolean?
 function InputModel:transformEvent(inputMode, event)
-	local device = event.name:match("^(.+)pressed$") or event.name:match("^(.+)released$")
-	if not device then
+	if event.name ~= "inputchanged" then
 		return
 	end
 
-	if device == "key" then
-		device = "keyboard"
-	end
-
-	local state = true
-	if event.name:find("^.+released$") then
-		state = false
-	end
-
-	local key = event[2]
-	if device == "midi" then
-		key = event[1]
-	end
+	local device, id, key, state = event[1], event[2], event[3], event[4]
 
 	local config = self.configModel.configs.input
 	local inputConfig = config[inputMode]
-	local deviceConfig = inputConfig and inputConfig[device]
-
-	if not deviceConfig then
-		return
-	end
 
 	local _i
-	for i, k in pairs(deviceConfig) do
-		if type(k) == "table" then
-			for _, _k in pairs(k) do
-				if _k == key then
+	for i, binds in pairs(inputConfig) do
+		if type(binds) == "table" then
+			for _, bind in pairs(binds) do
+				local _key, _device, _id = unpack(bind, 1, 3)
+				if _key == key and _device == device and _id == id then
 					_i = i
 					break
 				end
 			end
 		end
+	end
+
+	if not _i then
+		return
 	end
 
 	local inputs = self:getInputs(inputMode)
@@ -68,59 +49,70 @@ end
 
 ---@param inputMode string
 ---@param virtualKey string
----@param device string
----@param key string
 ---@param index number
-function InputModel:setKey(inputMode, virtualKey, device, key, index)
+---@param device string
+---@param device_id string
+---@param key string
+function InputModel:setKey(inputMode, virtualKey, index, device, device_id, key)
 	local inputs = self:getInputs(inputMode)
 	local n = inputs[virtualKey]
-
-	if device == "midi" then
-		key = tonumber(key)
-	end
 
 	local config = self.configModel.configs.input
 
 	config[inputMode] = config[inputMode] or {}
 	local inputConfig = config[inputMode]
 
-	inputConfig[device] = inputConfig[device] or {}
-	local deviceConfig = inputConfig[device]
+	inputConfig[n] = inputConfig[n] or {}
+	local binds = inputConfig[n]
 
-	if type(deviceConfig[n]) ~= "table" then
-		deviceConfig[n] = {}
+	if not key then
+		binds[index] = nil
+		return
 	end
 
-	deviceConfig[n][index] = key
+	binds[index] = {key, device, device_id}
 end
 
 ---@param inputMode string
 ---@param virtualKey string
----@param device string
 ---@param index number
----@return string|number
-function InputModel:getKey(inputMode, virtualKey, device, index)
+---@return string|number?
+function InputModel:getKey(inputMode, virtualKey, index)
 	local inputs = self:getInputs(inputMode)
 	local n = inputs[virtualKey]
 
 	local config = self.configModel.configs.input
 	local inputConfig = config[inputMode]
 	if not inputConfig then
-		return "none"
+		return
 	end
 
-	local deviceConfig = inputConfig[device]
-	if not deviceConfig then
-		return "none"
+	local bind = inputConfig[n] and inputConfig[n][index]
+	if not bind then
+		return
 	end
 
-	local keys = deviceConfig[n]
+	return unpack(bind, 1, 3)
+end
 
-	if type(keys) ~= "table" then
-		return "none"
+---@param inputMode string
+---@return number
+function InputModel:getBindsCount(inputMode)
+	local max_index = 0
+
+	local config = self.configModel.configs.input
+	local inputConfig = config[inputMode]
+	if not inputConfig then
+		return max_index
 	end
 
-	return keys[index] or "none"
+	for _, binds in pairs(inputConfig) do
+		for i in ipairs(binds) do
+			max_index = math.max(max_index, i)
+		end
+	end
+
+	return max_index
 end
 
 ---@param inputMode string
