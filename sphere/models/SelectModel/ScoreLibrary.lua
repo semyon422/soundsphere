@@ -127,7 +127,7 @@ end
 function ScoreLibrary:updateItemsLocal(chartview, exact)
 	self.scoreSourceName = "local"
 
-	if not chartview.hash then
+	if not chartview.hash or not chartview.index then
 		self.items = {}
 		return
 	end
