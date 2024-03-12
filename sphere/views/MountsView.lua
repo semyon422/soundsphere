@@ -206,11 +206,8 @@ function section_draw.database(self)
 	end
 
 	local cacheModel = self.game.cacheModel
-	local state = cacheModel.shared.state
-	if state == 0 or state == 3 then
-		if imgui.button("computeScores", "compute chartdiffs") then
-			cacheModel:computeChartdiffs()
-		end
+	if imgui.button("computeScores", "compute chartdiffs") then
+		cacheModel:computeChartdiffs()
 	end
 
 	imgui.separator()
@@ -221,11 +218,20 @@ function section_draw.database(self)
 	if imgui.button("reset chartfiles", "reset chartfiles.hash", inactive) then
 		self.game.cacheModel.chartfilesRepo:resetChartfileHash()
 	end
-	if imgui.button("delete chartmetas", "delete chartmetas", inactive) then
-		self.game.cacheModel.chartmetasRepo:deleteChartmetas()
-	end
 	if imgui.button("delete chartdiffs", "delete chartdiffs", inactive) then
 		self.game.cacheModel.chartdiffsRepo:deleteChartdiffs()
+	end
+
+	imgui.separator()
+	imgui.text("chartmetas deletion")
+	if imgui.button("delete chartmetas", "delete all chartmetas", inactive) then
+		self.game.cacheModel.chartmetasRepo:deleteChartmetas()
+	end
+	for _, format in ipairs({"bms", "ksh", "mid", "ojn", "osu", "qua", "sph", "sm"}) do
+		if imgui.button("delete chartmetas " .. format, format, inactive) then
+			self.game.cacheModel.chartmetasRepo:deleteChartmetas({format = format})
+		end
+		just.sameline()
 	end
 end
 

@@ -143,6 +143,7 @@ CREATE TABLE IF NOT EXISTS `chart_collections` (
 
 CREATE TEMP VIEW IF NOT EXISTS located_chartfiles AS
 SELECT
+chartmetas.id AS chartmeta_id,
 chartfile_sets.location_id,
 chartfile_sets.is_file AS set_is_file,
 chartfile_sets.dir AS set_dir,
@@ -152,6 +153,8 @@ chartfiles.*
 FROM chartfiles
 INNER JOIN chartfile_sets ON
 chartfiles.set_id = chartfile_sets.id
+LEFT JOIN chartmetas ON
+chartfiles.hash = chartmetas.hash
 ;
 
 CREATE TEMP VIEW IF NOT EXISTS chartmetas_diffs_missing AS

@@ -93,7 +93,7 @@ end
 ---@return table
 function ChartfilesRepo:selectUnhashedChartfiles(location_id, set_id)
 	return self.models.located_chartfiles:select({
-		hash__isnull = true,
+		{"or", hash__isnull = true, chartmeta_id__isnull = true},
 		set_id = set_id,
 		location_id = assert(location_id),
 	})
