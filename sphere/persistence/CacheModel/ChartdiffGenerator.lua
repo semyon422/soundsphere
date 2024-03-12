@@ -29,8 +29,8 @@ end
 function ChartdiffGenerator:fillMeta(chartdiff, chartmeta)
 	local rate = chartdiff.rate
 
-	chartdiff.tempo = chartmeta.tempo * rate
-	chartdiff.duration = chartmeta.duration / rate
+	chartdiff.tempo = (chartmeta.tempo or 0) * rate
+	chartdiff.duration = (chartmeta.duration or 0) / rate
 end
 
 ---@param noteChart ncdk.NoteChart
