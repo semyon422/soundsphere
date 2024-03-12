@@ -26,6 +26,10 @@ function InputModel:transformEvent(inputMode, event)
 	local config = self.configModel.configs.input
 	local inputConfig = config[inputMode]
 
+	if not inputConfig then
+		return
+	end
+
 	local _i
 	for i, binds in pairs(inputConfig) do
 		if type(binds) == "table" then
