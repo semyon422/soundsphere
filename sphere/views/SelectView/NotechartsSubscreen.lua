@@ -105,11 +105,12 @@ local function NoteChartList(self)
 	w, h = Layout:move("column2row2row2")
 
 	h = 60
-	love.graphics.translate(w - (72 - h) / 2 - h, (72 - h) / 2)
+	local _w = 2.2 * h
+	love.graphics.translate(w - (72 - h) / 2 - _w, (72 - h) / 2)
 
 	local config = self.game.configModel.configs.settings.select
 
-	if imgui.Checkbox("chartdiffs list cb", config.chartdiffs_list, h) then
+	if imgui.TextCheckbox("chartdiffs list cb", config.chartdiffs_list, "modded", _w, h) then
 		config.chartdiffs_list = not config.chartdiffs_list
 		self.game.selectModel:noDebouncePullNoteChartSet()
 	end
