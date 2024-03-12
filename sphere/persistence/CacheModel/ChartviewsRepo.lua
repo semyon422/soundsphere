@@ -175,6 +175,7 @@ function ChartviewsRepo:getChartviewsAtSet(chartview)
 		columns = columns,
 		order = {
 			"length(inputmode)",
+			"chartdiff_inputmode",
 			"inputmode",
 			"difficulty",
 			"name",
