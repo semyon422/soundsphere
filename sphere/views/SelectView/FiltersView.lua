@@ -8,7 +8,7 @@ local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 
 
 local scrollY = 0
 
-local w, h = 768, 1080 / 2
+local w, h = 768, 768
 local _w, _h = w / 2, 55
 local r = 8
 local window_id = "FiltersView"
@@ -35,7 +35,7 @@ return ModalImView(function(self, quit)
 
 	just.push()
 
-	imgui.Container(window_id, w, h - _h, _h / 3, _h * 2, scrollY)
+	imgui.Container(window_id, w, h, _h / 3, _h * 2, scrollY)
 
 	local filters = self.game.configModel.configs.filters.notechart
 

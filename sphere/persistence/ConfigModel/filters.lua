@@ -39,6 +39,16 @@ return {
 			{name = "has scratch", conds = {inputmode__contains = "scratch"}},
 			{name = "has not scratch", conds = {inputmode__notcontains = "scratch"}},
 		},
+		{
+			name = "chartmeta",
+			{name = "has chartmeta", conds = {chartmeta_id__isnotnull = true}},
+			{name = "has not chartmeta", conds = {chartmeta_id__isnull = true}},
+		},
+		{
+			name = "chartdiff",
+			{name = "has chartdiff", conds = {chartdiff_id__isnotnull = true}},
+			{name = "has not chartdiff", conds = {chartdiff_id__isnull = true}},
+		},
 	},
 	score = {
 		{name = "No filter"},
