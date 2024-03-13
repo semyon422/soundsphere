@@ -7,6 +7,11 @@ local LuaMidi = require("luamidi")
 local flux = require("flux")
 local reqprof = require("reqprof")
 local sleep = require("sleep")
+local jit = require("jit")
+
+if jit.os == "Windows" then
+	sleep = love.timer.sleep
+end
 
 -- Static class
 
