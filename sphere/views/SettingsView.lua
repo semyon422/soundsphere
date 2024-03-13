@@ -344,8 +344,14 @@ function drawSection:audio()
 
 	local audioInfo = audio.getInfo()
 	imgui.text("Latency: " .. audioInfo.latency .. "ms")
+	local buffer_over_period = math.ceil(a.device.buffer / a.device.period)
+
 	a.device.period = imgui.slider1("d.period", a.device.period, "%dms", 1, 50, 1, "update period")
-	a.device.buffer = imgui.slider1("d.buffer", a.device.buffer, "%dms", 1, 50, 1, "buffer length")
+	just.sameline()
+	imgui.indent()
+	imgui.url("update period", "link", "https://www.un4seen.com/doc/#bass/BASS_CONFIG_DEV_PERIOD.html", true)
+
+	a.device.buffer = imgui.slider1("d.buffer", buffer_over_period, "%dx" .. a.device.period .. "ms", 2, 10, 1, "buffer length") * a.device.period
 	just.sameline()
 	imgui.indent()
 	imgui.url("dev buffer link", "link", "https://www.un4seen.com/doc/#bass/BASS_CONFIG_DEV_BUFFER.html", true)
