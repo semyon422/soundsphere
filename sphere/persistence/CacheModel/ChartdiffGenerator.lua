@@ -36,17 +36,25 @@ end
 ---@param noteChart ncdk.NoteChart
 ---@param hash string
 ---@param index number
+---@return table?
+---@return string?
 function ChartdiffGenerator:create(noteChart, hash, index)
 	local chartdiff = self.chartdiffsRepo:selectDefaultChartdiff(hash, index)
 	if chartdiff then
-		return
+		return chartdiff
 	end
 
-	chartdiff = self:compute(noteChart, 1)
+	local ok, chartdiff = xpcall(self.compute, debug.traceback, self, noteChart, 1)
+	if not ok then
+		return nil, chartdiff
+	end
+
 	chartdiff.hash = hash
 	chartdiff.index = index
 
 	self.chartdiffsRepo:insertChartdiff(chartdiff)
+
+	return chartdiff
 end
 
 return ChartdiffGenerator

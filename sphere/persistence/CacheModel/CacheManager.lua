@@ -87,20 +87,22 @@ function CacheManager:processChartfile(chartfile, location_prefix)
 	local full_path = path_util.join(location_prefix, chartfile.path)
 	local content = assert(love.filesystem.read(full_path))
 
-	local ok, err = self.chartmetaGenerator:generate(chartfile, content, false)
+	local ok, notecharts = self.chartmetaGenerator:generate(chartfile, content, false)
 
 	if not ok then
-		print(chartfile.id)
-		print(err)
+		print(notecharts)
 		return
 	end
 
-	if not err then
+	if not notecharts then
 		return
 	end
 
-	for j, noteChart in ipairs(err) do
-		self.chartdiffGenerator:create(noteChart, chartfile.hash, j)
+	for j, noteChart in ipairs(notecharts) do
+		local ok, err = self.chartdiffGenerator:create(noteChart, chartfile.hash, j)
+		if not ok then
+			print(err)
+		end
 	end
 end
 
