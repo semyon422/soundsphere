@@ -29,6 +29,13 @@ return {
 			{name = "9K", conds = {chartdiff_inputmode__startswith = "9key"}},
 			{name = "10K", conds = {chartdiff_inputmode__startswith = "10key"}},
 		},
+		(function()
+			local filter = {name = "format"}
+			for i, format in ipairs({"osu", "qua", "sm", "ksh", "bms", "mid", "ojn", "sph"}) do
+				filter[i] = {name = format, conds = {format = format}}
+			end
+			return filter
+		end)(),
 		{
 			name = "(not) played",
 			{name = "played", conds = {accuracy__isnotnull = true}},
