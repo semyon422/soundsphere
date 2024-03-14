@@ -1,6 +1,6 @@
 local class = require("class")
 local math_util = require("math_util")
-local path_util = require("path_util")
+local sql_util = require("rdb.sql_util")
 local InputMode = require("ncdk.InputMode")
 local TempoRange = require("notechart.TempoRange")
 local ModifierModel = require("sphere.models.ModifierModel")
@@ -367,22 +367,10 @@ function GameplayController:skipIntro()
 end
 
 function GameplayController:updateOffsets()
-	local rhythmModel = self.rhythmModel
-	local chartview = self.selectModel.chartview
-	local config = self.configModel.configs.settings
+	local input_offset, visual_offset = self.offsetModel:getInputVisual()
 
-	local localOffset = chartview.localOffset or 0
-	local baseTimeRate = rhythmModel.timeEngine.baseTimeRate
-	local inputOffset = config.gameplay.offset.input + localOffset
-	local visualOffset = config.gameplay.offset.visual + localOffset
-	if config.gameplay.offsetScale.input then
-		inputOffset = inputOffset * baseTimeRate
-	end
-	if config.gameplay.offsetScale.visual then
-		visualOffset = visualOffset * baseTimeRate
-	end
-	rhythmModel:setInputOffset(inputOffset)
-	rhythmModel:setVisualOffset(visualOffset)
+	self.rhythmModel:setInputOffset(input_offset)
+	self.rhythmModel:setVisualOffset(visual_offset)
 end
 
 ---@param delta number
@@ -397,15 +385,31 @@ end
 
 ---@param delta number
 function GameplayController:increaseLocalOffset(delta)
-	do return end
 	local chartview = self.selectModel.chartview
-	chartview.localOffset = math_util.round((chartview.localOffset or 0) + delta, delta)
-	self.cacheModel.chartRepo:updateNoteChartDataEntry({
-		hash = chartview.hash,
-		index = chartview.index,
-		localOffset = chartview.localOffset,
+
+	chartview.offset = chartview.offset or self.offsetModel:getDefaultLocal()
+	chartview.offset = math_util.round(chartview.offset + delta, delta)
+
+	self.cacheModel.chartmetasRepo:updateChartmeta({
+		id = chartview.chartmeta_id,
+		offset = chartview.offset,
 	})
-	self.notificationModel:notify("local offset: " .. chartview.localOffset * 1000 .. "ms")
+
+	self.notificationModel:notify("local offset: " .. chartview.offset * 1000 .. "ms")
+	self:updateOffsets()
+end
+
+function GameplayController:resetLocalOffset()
+	local chartview = self.selectModel.chartview
+
+	chartview.offset = nil
+	self.cacheModel.chartmetasRepo:updateChartmeta({
+		id = chartview.chartmeta_id,
+		offset = sql_util.NULL,
+	})
+
+	self.notificationModel:notify("local offset reseted: " .. self.offsetModel:getDefaultLocal() * 1000 .. "ms")
+
 	self:updateOffsets()
 end
 

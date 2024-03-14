@@ -16,6 +16,7 @@ local ResourceModel = require("sphere.models.ResourceModel")
 local PlayContext = require("sphere.models.PlayContext")
 local PauseModel = require("sphere.models.PauseModel")
 local JoystickModel = require("sphere.models.JoystickModel")
+local OffsetModel = require("sphere.models.OffsetModel")
 
 local SelectController = require("sphere.controllers.SelectController")
 local GameplayController = require("sphere.controllers.GameplayController")
@@ -81,6 +82,10 @@ function GameController:new()
 		self.onlineModel,
 		self.persistence.osudirectModel,
 		self.playContext
+	)
+	self.offsetModel = OffsetModel(
+		self.persistence.configModel,
+		self.selectModel
 	)
 
 	self.joystickModel = JoystickModel(self.persistence.configModel)

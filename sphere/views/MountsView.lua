@@ -196,6 +196,7 @@ function section_draw.locations(self, inner_w)
 	end
 end
 
+local formats = {"bms", "ksh", "mid", "ojn", "osu", "qua", "sph", "sm"}
 function section_draw.database(self)
 	local cacheStatus = self.game.cacheModel.cacheStatus
 	imgui.text("chartmetas: " .. cacheStatus.chartmetas)
@@ -227,7 +228,7 @@ function section_draw.database(self)
 	if imgui.button("delete chartmetas", "delete all chartmetas", inactive) then
 		self.game.cacheModel.chartmetasRepo:deleteChartmetas()
 	end
-	for _, format in ipairs({"bms", "ksh", "mid", "ojn", "osu", "qua", "sph", "sm"}) do
+	for _, format in ipairs(formats) do
 		if imgui.button("delete chartmetas " .. format, format, inactive) then
 			self.game.cacheModel.chartmetasRepo:deleteChartmetas({format = format})
 		end

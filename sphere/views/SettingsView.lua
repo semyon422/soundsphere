@@ -15,6 +15,7 @@ local sections = {
 	"select",
 	"graphics",
 	"audio",
+	"offsets",
 	"misc",
 }
 local section = sections[1]
@@ -105,10 +106,6 @@ function drawSection:gameplay()
 	g.longNoteShortening = imgui.slider1(
 		"shortening", g.longNoteShortening * 1000, "%dms", -300, 0, 10,
 		"visual LN shortening") / 1000
-	g.offset.input = intButtonsMs("input offset", g.offset.input, "input offset")
-	g.offset.visual = intButtonsMs("visual offset", g.offset.visual, "visual offset")
-	g.offsetScale.input = imgui.checkbox("offsetScale.input", g.offsetScale.input, "input offset * time rate")
-	g.offsetScale.visual = imgui.checkbox("offsetScale.visual", g.offsetScale.visual, "visual offset * time rate")
 
 	g.tempoFactor = imgui.combo("tempoFactor", g.tempoFactor, {"average", "primary", "minimum", "maximum"}, nil, "tempo factor")
 	if g.tempoFactor == "primary" then
@@ -157,12 +154,6 @@ function drawSection:gameplay()
 	g.time.pausePlay = imgui.slider1("time.pausePlay", g.time.pausePlay, "%0.1f", 0, 2, 0.1, "pause-play")
 	g.time.playRetry = imgui.slider1("time.playRetry", g.time.playRetry, "%0.1f", 0, 2, 0.1, "play-retry")
 	g.time.pauseRetry = imgui.slider1("time.pauseRetry", g.time.pauseRetry, "%0.1f", 0, 2, 0.1, "pause-retry")
-
-	imgui.separator()
-	just.indent(10)
-	just.text("offset")
-	i.offset.decrease = imgui.hotkey("offset.decrease", i.offset.decrease, "decrease")
-	i.offset.increase = imgui.hotkey("offset.increase", i.offset.increase, "increase")
 
 	imgui.separator()
 	just.indent(10)
@@ -296,6 +287,7 @@ local _formatModes = {
 	bass_sample = "bass sample",
 	bass_fx_tempo = "bass fx tempo",
 }
+local audio_modes = {"bass_sample", "bass_fx_tempo"}
 
 ---@param mode string
 ---@return string
@@ -334,9 +326,9 @@ function drawSection:audio()
 
 	local mode = a.mode
 	mode.primary = imgui.combo(
-		"mode.primary", mode.primary, {"bass_sample", "bass_fx_tempo"}, formatModes, "primary audio mode")
+		"mode.primary", mode.primary, audio_modes, formatModes, "primary audio mode")
 	mode.secondary = imgui.combo(
-		"mode.secondary", mode.secondary, {"bass_sample", "bass_fx_tempo"}, formatModes, "secondary audio mode")
+		"mode.secondary", mode.secondary, audio_modes, formatModes, "secondary audio mode")
 
 	a.midi.constantVolume = imgui.checkbox("midi.constantVolume", a.midi.constantVolume, "midi constant volume")
 
@@ -387,6 +379,42 @@ function drawSection:audio()
 		if d.init then s = s .. "init " end
 		imgui.text(s)
 	end
+end
+
+local formats = {"osu", "qua", "sm", "ksh"}
+-- local formats = {"osu", "qua", "sm", "ksh", "bms", "mid", "ojn", "sph"}
+function drawSection:offsets()
+	local settings = self.game.configModel.configs.settings
+	local g = settings.gameplay
+	local i = settings.input
+	local of = g.offset_format
+	local oam = g.offset_audio_mode
+
+	imgui.text("global offsets")
+	g.offset.input = intButtonsMs("input offset", g.offset.input, "input offset")
+	g.offset.visual = intButtonsMs("visual offset", g.offset.visual, "visual offset")
+	-- g.offsetScale.input = imgui.checkbox("offsetScale.input", g.offsetScale.input, "input offset * time rate")
+	-- g.offsetScale.visual = imgui.checkbox("offsetScale.visual", g.offsetScale.visual, "visual offset * time rate")
+
+	imgui.separator()
+	imgui.text("format offsets")
+
+	for _, format in ipairs(formats) do
+		of[format] = intButtonsMs("offset " .. format, of[format], format)
+	end
+
+	imgui.separator()
+	imgui.text("primary audio mode offsets")
+
+	for _, audio_mode in ipairs(audio_modes) do
+		oam[audio_mode] = intButtonsMs("offset " .. audio_mode, oam[audio_mode], formatModes(audio_mode))
+	end
+
+	imgui.separator()
+	imgui.text("local offset controls")
+	i.offset.decrease = imgui.hotkey("offset.decrease", i.offset.decrease, "decrease")
+	i.offset.increase = imgui.hotkey("offset.increase", i.offset.increase, "increase")
+	i.offset.reset = imgui.hotkey("offset.reset", i.offset.reset, "reset")
 end
 
 function drawSection:misc()

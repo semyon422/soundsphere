@@ -79,7 +79,7 @@ local function Cells(self)
 	local notes_count = 0
 	local level = 0
 	local longNoteRatio = 0
-	local localOffset = 0
+	local localOffset = ""
 	local format = ""
 	if chartview then
 		bpm = (chartview.tempo or 0) * baseTimeRate
@@ -87,7 +87,7 @@ local function Cells(self)
 		notes_count = chartview.notes_count or 0
 		level = chartview.level or 0
 		longNoteRatio = (chartview.long_notes_count or 0) / (chartview.notes_count or 0)
-		localOffset = chartview.localOffset or 0
+		localOffset = chartview.offset or ""
 		format = chartview.format or ""
 	end
 
@@ -107,7 +107,7 @@ local function Cells(self)
 	just.row(true)
 	just.indent(22)
 	BarCellImView(2 * w, h, "right", "long notes", longNoteRatio)
-	TextCellImView(w, h, "right", "offset", localOffset * 1000)
+	TextCellImView(w, h, "right", "offset", localOffset)
 	TextCellImView(w, h, "right", "format", format)
 	just.row()
 end

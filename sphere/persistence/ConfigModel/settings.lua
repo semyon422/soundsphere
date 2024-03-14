@@ -57,6 +57,20 @@ return {
 			input = false,
 			visual = false
 		},
+		offset_format = {
+			bms = 0,
+			ksh = 0,
+			mid = 0,
+			ojn = 0,
+			osu = 20,
+			qua = 20,
+			sph = 0,
+			sm = -50,
+		},
+		offset_audio_mode = {
+			bass_sample = 0,
+			bass_fx_tempo = -20,
+		},
 		actionOnFail = "none",
 		ratingHitTimingWindow = 0.032,
 		scaleSpeed = false,
@@ -134,7 +148,8 @@ return {
 		pause = "escape",
 		offset = {
 			decrease = "-",
-			increase = "="
+			increase = "=",
+			reset = "delete",
 		},
 		playSpeed = {
 			decrease = "f3",
