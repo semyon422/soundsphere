@@ -153,7 +153,8 @@ function SelectModel:getAudioPathPreview()
 	local full_path = path_util.join(chartview.real_dir, audio_path)
 	local preview_time = chartview.preview_time
 
-	if preview_time < 0 and chartview.format == "osu" then
+	local format = chartview.format
+	if preview_time < 0 and (format == "osu" or format == "qua") then
 		mode = "relative"
 		preview_time = 0.4
 	end

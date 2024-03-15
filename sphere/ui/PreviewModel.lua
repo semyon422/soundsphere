@@ -124,6 +124,7 @@ function PreviewModel:loadPreview()
 	if self.mode == "relative" then
 		position = audio:getDuration() * position
 	end
+	position = math.max(position, 0)
 	self.position = position
 
 	local volumeConfig = self.configModel.configs.settings.audio.volume
