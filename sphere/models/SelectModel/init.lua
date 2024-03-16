@@ -121,14 +121,14 @@ function SelectModel:getBackgroundPath()
 		return
 	end
 
+	local name = chartview.chartfile_name
+	if name:find("%.ojn$") or name:find("%.mid$") then
+		return chartview.location_path
+	end
+
 	local background_path = chartview.background_path
 	if not background_path or background_path == "" then
 		return
-	end
-
-	local name = chartview.name
-	if name:find("%.ojn$") or name:find("%.mid$") then
-		return chartview.path
 	end
 
 	return path_util.join(chartview.location_dir, background_path)

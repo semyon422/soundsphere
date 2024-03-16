@@ -37,7 +37,7 @@ function EditorController:load()
 	fileFinder:addPath("userdata/hitsounds")
 	fileFinder:addPath("userdata/hitsounds/midi")
 
-	self.resourceModel:load(chartview.name, noteChart, function()
+	self.resourceModel:load(chartview.location_path, noteChart, function()
 		editorModel:loadResources()
 	end)
 
