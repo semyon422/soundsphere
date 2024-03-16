@@ -282,7 +282,7 @@ function SelectModel:setConfig(chartview)
 	playContext.rate = chartview.rate or 1
 
 	local gameplay = self.configModel.configs.settings.gameplay
-	gameplay.rate_type = chartview.rate_type
+	gameplay.rate_type = chartview.rate_type or gameplay.rate_type  -- no nil
 end
 
 ---@param direction number?
