@@ -439,16 +439,6 @@ function SelectModel:pullNoteChart(noUpdate, noPullNext)
 	self.scoreLibrary:clear()
 end
 
-function SelectModel:updateScoreOnlineAsync()
-	if not self.chartview then
-		return
-	end
-	self.scoreLibrary:updateItemsAsync(self.chartview)
-	self:findScore()
-end
-
-SelectModel.updateScoreOnline = thread.coro(SelectModel.updateScoreOnlineAsync)
-
 function SelectModel:findScore()
 	local scoreItems = self.scoreLibrary.items
 	self.scoreItemIndex = self.scoreLibrary:getItemIndex(self.config.score_id) or 1
@@ -458,6 +448,11 @@ function SelectModel:findScore()
 	if scoreItem then
 		self.config.score_id = scoreItem.id
 	end
+end
+
+function SelectModel:updateScoresAsync()
+	self.scoreLibrary:updateItemsAsync(self.chartview)
+	self:findScore()
 end
 
 ---@param noUpdate boolean?
@@ -475,14 +470,12 @@ function SelectModel:pullScore(noUpdate)
 	end
 
 	self.scoreStateCounter = self.scoreStateCounter + 1
-	self.scoreLibrary:setHash(chartview.hash)
-	self.scoreLibrary:setIndex(chartview.index)
 
 	local select = self.configModel.configs.select
 	if select.scoreSourceName == "online" then
 		self.scoreLibrary:clear()
 		delay.debounce(self, "scoreDebounce", self.debounceTime,
-			self.updateScoreOnlineAsync, self
+			self.updateScoresAsync, self
 		)
 		return
 	end

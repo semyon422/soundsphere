@@ -10,7 +10,6 @@ ScoreLibrary.scoreSources = {
 	"local",
 	"online",
 }
-ScoreLibrary.scoreSourceName = "local"
 
 ---@param configModel sphere.ConfigModel
 ---@param onlineModel sphere.OnlineModel
@@ -20,23 +19,11 @@ function ScoreLibrary:new(configModel, onlineModel, cacheModel)
 	self.onlineModel = onlineModel
 	self.cacheModel = cacheModel
 
-	self.hash = ""
-	self.index = 1
 	self.items = {}
 end
 
 function ScoreLibrary:clear()
 	self.items = {}
-end
-
----@param hash string?
-function ScoreLibrary:setHash(hash)
-	self.hash = hash or ""
-end
-
----@param index number?
-function ScoreLibrary:setIndex(index)
-	self.index = index or 1
 end
 
 ---@param scores table
@@ -69,30 +56,35 @@ end
 ---@param exact boolean?
 ---@return nil?
 function ScoreLibrary:updateItemsAsync(chartview, exact)
-	local hash_index = self.hash .. self.index
+	if not chartview.hash or not chartview.index then
+		self.items = {}
+		return
+	end
+
 	self.items = {}
 
 	local select = self.configModel.configs.select
 	if select.scoreSourceName == "online" then
-		self:updateItemsOnline()
+		self:updateItemsOnline(chartview)
 	else
 		self:updateItemsLocal(chartview, exact)
 	end
 
-	if self.hash .. self.index ~= hash_index then
-		return self:updateItemsAsync(chartview, exact)
-	end
+	-- if self.hash .. self.index ~= hash_index then
+	-- 	return self:updateItemsAsync(chartview, exact)
+	-- end
 end
 
 ScoreLibrary.updateItems = thread.coro(ScoreLibrary.updateItemsAsync)
 
-function ScoreLibrary:updateItemsOnline()
+---@param chartview table
+function ScoreLibrary:updateItemsOnline(chartview)
 	local api = self.onlineModel.webApi.api
 
 	print("GET " .. api.notecharts)
 	local notecharts = api.notecharts:get({
-		hash = self.hash,
-		index = self.index,
+		hash = chartview.hash,
+		index = chartview.index,
 	})
 	local id = notecharts and notecharts[1] and notecharts[1].id
 
@@ -107,10 +99,9 @@ function ScoreLibrary:updateItemsOnline()
 		modifierset = true,
 	})
 	self.items = scores or {}
-	self.scoreSourceName = "online"
 
 	for i, score in ipairs(self.items) do
-		self.items[i] = self:transformOnlineScore(score)
+		self.items[i] = self:transformOnlineScore(score, chartview)
 	end
 end
 
@@ -125,13 +116,6 @@ end
 ---@param chartview table
 ---@param exact boolean?
 function ScoreLibrary:updateItemsLocal(chartview, exact)
-	self.scoreSourceName = "local"
-
-	if not chartview.hash or not chartview.index then
-		self.items = {}
-		return
-	end
-
 	local scores
 	if exact then
 		scores = self.cacheModel.scoresRepo:getScoresExact(chartview)
@@ -148,7 +132,7 @@ function ScoreLibrary:updateItemsLocal(chartview, exact)
 	end)
 	scores = self:filterScores(scores)
 	for i, score in ipairs(scores) do
-		scores[i].rank = i
+		score.rank = i
 	end
 	self.items = scores
 end
@@ -174,7 +158,7 @@ end
 
 ---@param score table
 ---@return table
-function ScoreLibrary:transformOnlineScore(score)
+function ScoreLibrary:transformOnlineScore(score, chartview)
 	local s = {
 		id = score.id,
 		chart_hash = "",
@@ -199,6 +183,7 @@ function ScoreLibrary:transformOnlineScore(score)
 	}
 	for k, v in pairs(s) do
 		score[k] = v
+		self.cacheModel.chartdiffGenerator:fillMeta(score, chartview)
 	end
 	return score
 end

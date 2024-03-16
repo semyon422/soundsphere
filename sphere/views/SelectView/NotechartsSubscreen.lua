@@ -353,7 +353,7 @@ local function ScoreSourceDropdown(self)
 	local i = imgui.SpoilerList("ScoreSourceDropdown", w * size, h, sources, config.scoreSourceName)
 	if i then
 		config.scoreSourceName = sources[i]
-		self.game.selectModel:updateScoreOnline()
+		self.game.selectModel:pullScore()
 	end
 end
 
