@@ -379,6 +379,7 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 	local chartview_set = items[self.chartview_set_index]
 	if chartview_set then
 		self.config.chartfile_set_id = chartview_set.chartfile_set_id
+		self.config.chartmeta_id = chartview_set.chartmeta_id  -- required by chartdiffs_list
 		self.pullingNoteChartSet = false
 		if not noPullNext then
 			self:pullNoteChart(noUpdate)
