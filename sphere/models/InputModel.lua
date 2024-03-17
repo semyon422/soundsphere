@@ -143,4 +143,10 @@ function InputModel:getInputs(inputMode)
 	return inputs
 end
 
+---@param inputMode string
+function InputModel:resetInputs(inputMode)
+	local config = self.configModel.configs.input
+	config[inputMode] = {}
+end
+
 return InputModel

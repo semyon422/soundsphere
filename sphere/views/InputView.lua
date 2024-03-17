@@ -40,13 +40,14 @@ return ModalImView(function(self, quit)
 
 	imgui.Container(window_id, w, h, _h / 3, _h * 2, scrollY)
 
+	local inputModel = self.game.inputModel
+
 	local font = love.graphics.getFont()
 	local max_vk_width = 0
 	for i = 1, #inputs do
 		max_vk_width = math.max(max_vk_width, font:getWidth(inputs[i]))
 	end
 
-	local inputModel = self.game.inputModel
 	local binds_count = inputModel:getBindsCount(inputMode)
 
 	local inputIdPattern = "input hotkey %s %s"
@@ -75,6 +76,10 @@ return ModalImView(function(self, quit)
 			end
 		end
 		just.next()
+	end
+
+	if imgui.button("reset bindings", "reset") then
+		inputModel:resetInputs(inputMode)
 	end
 
 	just.emptyline(8)
