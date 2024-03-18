@@ -19,8 +19,8 @@ end
 function PreviewModel:load()
 	self.audio_path = ""
 	self.volume = 0
-	self.pitch = 1
-	self.targetPitch = 1
+	self.rate = 1
+	self.target_rate = 1
 end
 
 ---@param audio_path string?
@@ -60,16 +60,16 @@ function PreviewModel:update()
 		self.volume = volume
 	end
 
-	local timeRate = self.targetPitch
-	if self.pitch ~= timeRate then
-		audio:setPitch(timeRate)
-		self.pitch = timeRate
+	local target_rate = self.target_rate
+	if self.rate ~= target_rate then
+		audio:setRate(target_rate)
+		self.rate = target_rate
 	end
 end
 
----@param pitch number
-function PreviewModel:setPitch(pitch)
-	self.targetPitch = pitch
+---@param rate number
+function PreviewModel:setRate(rate)
+	self.target_rate = rate
 end
 
 function PreviewModel:loadPreviewDebounce()
@@ -131,7 +131,11 @@ function PreviewModel:loadPreview()
 	local volume = volumeConfig.master * volumeConfig.music
 	audio:seek(position)
 	audio:setVolume(volume)
-	audio:setPitch(self.pitch)
+	if audio.setRate then
+		audio:setRate(self.rate)
+	else
+		audio:setPitch(self.rate)
+	end
 	if not audio:play() then
 		self.audio = nil  -- invalid audio
 		return

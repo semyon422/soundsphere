@@ -43,7 +43,7 @@ function SelectController:applyModifierMeta()
 		return
 	end
 
-	self.previewModel:setPitch(playContext.rate)
+	self.previewModel:setRate(playContext.rate)
 	self.state.inputMode:set(chartview.inputmode)
 
 	ModifierModel:applyMeta(playContext.modifiers, self.state)
