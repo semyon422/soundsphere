@@ -12,11 +12,18 @@ function MultiplayerController:load()
 		set = function(peer, key, value)
 			mpModel[key] = value
 			if key == "room" then
+				local room = value
 				if not mpModel:isHost() then
 					self:findNotechart()
-					self.playContext.modifiers = value.modifiers
-					self.playContext.rate = value.rate
-					self.playContext.const = value.rate
+					if not room.is_free_modifiers then
+						self.playContext.modifiers = room.modifiers
+					end
+					if not room.is_free_const then
+						self.playContext.const = room.const
+					end
+					if not room.is_free_rate then
+						self.playContext.rate = room.rate
+					end
 				end
 			end
 		end,
@@ -26,12 +33,11 @@ function MultiplayerController:load()
 			end
 			local room = mpModel.room
 			if not mpModel:isHost() then
-				if not room.is_free_modifiers then
-					local modifiers = table_util.deepcopy(room.modifiers)
-					self.playContext.modifiers = modifiers
-				end
 				if not room.is_free_notechart then
 					self.selectModel:setConfig(mpModel.chartview)
+				end
+				if not room.is_free_modifiers then
+					self.playContext.modifiers = room.modifiers
 				end
 				if not room.is_free_const then
 					self.playContext.const = room.const
