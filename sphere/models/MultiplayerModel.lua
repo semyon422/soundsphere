@@ -27,8 +27,6 @@ function MultiplayerModel:new(rhythmModel, configModel, selectModel, onlineModel
 	self.status = "disconnected"
 	self.rooms = {}
 	self.users = {}
-	self.roomUsers = {}
-	self.modifiers = {}
 	self.notechart = {}
 	self.roomMessages = {}
 
@@ -37,7 +35,7 @@ end
 
 function MultiplayerModel:load()
 	self.host = enet.host_create()
-	self.stopRefresh = delay.every(0.1, self.refresh, self)
+	self.stopRefresh = delay.every(0.5, self.refresh, self)
 end
 
 function MultiplayerModel:unload()
@@ -54,7 +52,7 @@ function MultiplayerModel:refresh()
 		return
 	end
 
-	self.roomUsers = peer.getRoomUsers() or {}
+	self.room = peer.getRoom()
 
 	local scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
 	if not scoreSystem.base then
@@ -109,7 +107,7 @@ function MultiplayerModel:isHost()
 	if not room then
 		return false
 	end
-	return room.hostPeerId == self.user.peerId
+	return room.host_user_id == self.user.id
 end
 
 MultiplayerModel.switchReady = remote.wrap(function(self)
@@ -137,29 +135,35 @@ MultiplayerModel.stopMatch = remote.wrap(function(self)
 	self.peer._stopMatch()
 end)
 
-MultiplayerModel.setHost = remote.wrap(function(self, peerId)
-	self.peer._setHost(peerId)
+MultiplayerModel.setHost = remote.wrap(function(self, user_id)
+	self.peer._setHost(user_id)
 end)
 
-MultiplayerModel.kickUser = remote.wrap(function(self, peerId)
-	self.peer._kickUser(peerId)
+MultiplayerModel.kickUser = remote.wrap(function(self, user_id)
+	self.peer._kickUser(user_id)
 end)
 
-MultiplayerModel.setFreeModifiers = remote.wrap(function(self, isFreeModifiers)
-	if not self:isHost() then
-		return
-	end
-	self.room.isFreeModifiers = isFreeModifiers
-	self.peer.setFreeModifiers(isFreeModifiers)
+MultiplayerModel.setFreeModifiers = remote.wrap(function(self, is_free_modifiers)
+	self.room.is_free_modifiers = is_free_modifiers
+	self.peer.setFreeModifiers(is_free_modifiers)
 	self.room = self.peer.getRoom()
 end)
 
-MultiplayerModel.setFreeNotechart = remote.wrap(function(self, isFreeNotechart)
-	if not self:isHost() then
-		return
-	end
-	self.room.isFreeNotechart = isFreeNotechart
-	self.peer.setFreeNotechart(isFreeNotechart)
+MultiplayerModel.setFreeNotechart = remote.wrap(function(self, is_free_notechart)
+	self.room.is_free_notechart = is_free_notechart
+	self.peer.setFreeNotechart(is_free_notechart)
+	self.room = self.peer.getRoom()
+end)
+
+MultiplayerModel.setFreeRate = remote.wrap(function(self, is_free_rate)
+	self.room.is_free_rate = is_free_rate
+	self.peer.setFreeRate(is_free_rate)
+	self.room = self.peer.getRoom()
+end)
+
+MultiplayerModel.setFreeConst = remote.wrap(function(self, is_free_const)
+	self.room.is_free_const = is_free_const
+	self.peer.setFreeConst(is_free_const)
 	self.room = self.peer.getRoom()
 end)
 
@@ -182,12 +186,10 @@ MultiplayerModel.joinRoom = remote.wrap(function(self, password)
 end)
 
 MultiplayerModel.leaveRoom = remote.wrap(function(self)
-	if self.peer.leaveRoom() then
-		self.room = nil
-		self.selectedRoom = nil
-		self.roomUsers = {}
-		self.roomMessages = {}
-	end
+	self.peer.leaveRoom()
+	self.room = nil
+	self.selectedRoom = nil
+	self.roomMessages = {}
 end)
 
 MultiplayerModel.pushModifiers = remote.wrap(function(self)
@@ -216,11 +218,7 @@ MultiplayerModel.pushNotechart = remote.wrap(function(self)
 		osuSetId = tonumber(content:match("BeatmapSetID:%s*(%d+)"))
 	end
 
-	self.chartview = {
-		chartfile_set_id = chartview.chartfile_set_id,
-		chartfile_id = chartview.chartfile_id,
-		chartmeta_id = chartview.chartmeta_id,
-	}
+	self.chartview = chartview
 	self.notechart = {
 		hash = chartview.hash,
 		index = chartview.index,
@@ -228,27 +226,19 @@ MultiplayerModel.pushNotechart = remote.wrap(function(self)
 		title = chartview.title,
 		artist = chartview.artist,
 		source = chartview.source,
-		tags = chartview.tags,
 		name = chartview.name,
 		creator = chartview.creator,
 		level = chartview.level,
-		inputnode = chartview.inputmode,
+		inputmode = chartview.inputmode,
 		notes_count = chartview.notes_count,
 		duration = chartview.duration,
 		tempo = chartview.tempo,
 		difficulty = chartview.difficulty,
-		longNoteRatio = chartview.longNoteRatio,
+		long_notes_count = chartview.long_notes_count,
 		osuSetId = osuSetId,
 	}
 	self.peer._setNotechart(self.notechart)
-end)
-
-MultiplayerModel.pullModifiers = remote.wrap(function(self)
-	local modifiers = self.peer.getRoomModifiers()
-	if not modifiers then
-		return
-	end
-	self.handlers.set(self.peer, "modifiers", modifiers)
+	self.peer._setNotechartFound(true)
 end)
 
 MultiplayerModel.login = remote.wrap(function(self)
@@ -288,7 +278,6 @@ function MultiplayerModel:peerdisconnected(peer)
 
 	self.rooms = {}
 	self.users = {}
-	self.roomUsers = {}
 	self.roomMessages = {}
 	self.room = nil
 	self.selectedRoom = nil
@@ -327,14 +316,8 @@ MultiplayerModel.downloadNoteChart = remote.wrap(function(self)
 		status = "",
 	}
 	self.osudirectModel:downloadAsync(self.downloadingBeatmap)
-
 	self.downloadingBeatmap.status = "done"
-
-	local notechart = self.peer.getRoomNotechart()
-	if not notechart then
-		return
-	end
-	self.handlers.set(self.peer, "notechart", notechart)
+	self.peer.setNotechartFound(false)
 end)
 
 return MultiplayerModel

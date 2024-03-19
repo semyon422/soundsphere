@@ -9,8 +9,10 @@ local RoomUsersListView = ListView()
 
 RoomUsersListView.rows = 9
 
+local empty = {}
 function RoomUsersListView:reloadItems()
-	self.items = self.game.multiplayerModel.roomUsers
+	local room = self.game.multiplayerModel.room
+	self.items = room and room.users or empty
 end
 
 ---@param i number
@@ -37,7 +39,7 @@ function RoomUsersListView:drawItem(i, w, h)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local name = user.name
-	if room.hostPeerId == user.peerId then
+	if room.host_user_id == user.id then
 		name = name .. " host"
 	end
 	if user.isPlaying then
@@ -55,13 +57,13 @@ function RoomUsersListView:drawItem(i, w, h)
 	local diffname = user.notechart.name or ""
 
 	local description = ""
-	if room.isFreeNotechart then
+	if room.is_free_notechart then
 		description = ("%s - %s"):format(title, diffname)
-		if room.isFreeModifiers then
+		if room.is_free_modifiers then
 			description = description .. "\n"
 		end
 	end
-	if room.isFreeModifiers then
+	if room.is_free_modifiers then
 		description = description .. modifiers
 	end
 
@@ -74,7 +76,7 @@ function RoomUsersListView:drawItem(i, w, h)
 	imgui.Label(user, description, h)
 	just.row()
 
-	if not multiplayerModel:isHost() or room.hostPeerId == user.peerId then
+	if not multiplayerModel:isHost() or room.host_user_id == user.id then
 		return
 	end
 
@@ -87,11 +89,11 @@ function RoomUsersListView:drawItem(i, w, h)
 			just.text(user.name)
 			love.graphics.line(0, 0, 200, 0)
 			if imgui.TextOnlyButton("Kick", "Kick", width, 55) then
-				multiplayerModel:kickUser(user.peerId)
+				multiplayerModel:kickUser(user.id)
 				close = true
 			end
 			if imgui.TextOnlyButton("Give host", "Give host", width, 55) then
-				multiplayerModel:setHost(user.peerId)
+				multiplayerModel:setHost(user.id)
 				close = true
 			end
 			if imgui.TextOnlyButton("Close", "Close", width, 55) then

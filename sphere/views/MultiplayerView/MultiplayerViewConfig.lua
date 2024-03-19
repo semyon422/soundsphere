@@ -261,19 +261,29 @@ local function RoomSettings(self)
 	local _h = 55
 	local isHost = multiplayerModel:isHost()
 	if isHost then
-		if imgui.Checkbox("Free chart", room.isFreeNotechart, _h) then
-			multiplayerModel:setFreeNotechart(not room.isFreeNotechart)
+		if imgui.Checkbox("Free chart", room.is_free_notechart, _h) then
+			multiplayerModel:setFreeNotechart(not room.is_free_notechart)
 		end
 		just.sameline()
 		imgui.Label("Free chart", "Free chart", _h)
 
-		if imgui.Checkbox("Free mods", room.isFreeModifiers, _h) then
-			multiplayerModel:setFreeModifiers(not room.isFreeModifiers)
+		if imgui.Checkbox("Free mods", room.is_free_modifiers, _h) then
+			multiplayerModel:setFreeModifiers(not room.is_free_modifiers)
 		end
 		just.sameline()
 		imgui.Label("Free mods", "Free mods", _h)
 
-		just.emptyline(36)
+		if imgui.Checkbox("Free const", room.is_free_const, _h) then
+			multiplayerModel:setFreeConst(not room.is_free_const)
+		end
+		just.sameline()
+		imgui.Label("Free const", "Free const", _h)
+
+		if imgui.Checkbox("Free rate", room.is_free_rate, _h) then
+			multiplayerModel:setFreeRate(not room.is_free_rate)
+		end
+		just.sameline()
+		imgui.Label("Free rate", "Free rate", _h)
 	end
 
 	if imgui.Checkbox("Ready", user.isReady, _h) then
@@ -285,12 +295,12 @@ local function RoomSettings(self)
 	w, h = Layout:move("column3")
 	love.graphics.translate(36, h - 72 * 3)
 
-	if isHost or room.isFreeNotechart then
+	if isHost or room.is_free_notechart then
 		if imgui.TextOnlyButton("Select chart", "Select", w - 72, 72) then
 			self:changeScreen("selectView")
 		end
 	end
-	if isHost or room.isFreeModifiers then
+	if isHost or room.is_free_modifiers then
 		if imgui.TextOnlyButton("Modifiers", "Modifiers", w - 72, 72) then
 			self.game.gameView:setModal(require("sphere.views.ModifierView"))
 		end

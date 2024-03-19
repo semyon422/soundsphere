@@ -9,7 +9,12 @@ local Format = require("sphere.views.Format")
 local MatchPlayersView = class()
 
 function MatchPlayersView:draw()
-	local users = self.game.multiplayerModel.roomUsers
+	local room = self.game.multiplayerModel.room
+	local users = room and room.users
+	if not users then
+		return
+	end
+
 	local window = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 
 	local scores = {}

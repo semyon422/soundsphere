@@ -11,18 +11,10 @@ function MultiplayerController:load()
 	mpModel.handlers = {
 		set = function(peer, key, value)
 			mpModel[key] = value
-			if key == "notechart" then
-				self:findNotechart()
-			elseif key == "modifiers" and not mpModel:isHost() then
-				self.playContext.modifiers = value
-				self.configModel.configs.modifier = value
-				mpModel.modifiers = table_util.deepcopy(value)
-			elseif key == "roomUsers" then
-				for _, user in ipairs(value) do
-					if user.peerId == mpModel.user.peerId then
-						mpModel.user = user
-						break
-					end
+			if key == "room" then
+				if not mpModel:isHost() then
+					self:findNotechart()
+					self.playContext.modifiers = value.modifiers
 				end
 			end
 		end,
@@ -30,13 +22,21 @@ function MultiplayerController:load()
 			if mpModel.isPlaying or not mpModel.chartview then
 				return
 			end
-			if not mpModel.room.isFreeModifiers then
-				local modifiers = table_util.deepcopy(mpModel.modifiers)
-				self.playContext.modifiers = modifiers
-				self.configModel.configs.modifier = modifiers
-			end
-			if not mpModel.room.isFreeNotechart then
-				self.selectModel:setConfig(mpModel.chartview)
+			local room = mpModel.room
+			if not mpModel:isHost() then
+				if not room.is_free_modifiers then
+					local modifiers = table_util.deepcopy(room.modifiers)
+					self.playContext.modifiers = modifiers
+				end
+				if not room.is_free_notechart then
+					self.selectModel:setConfig(mpModel.chartview)
+				end
+				if not room.is_free_const then
+					self.playContext.const = room.const
+				end
+				if not room.is_free_rate then
+					self.playContext.rate = room.rate
+				end
 			end
 			mpModel:setIsPlaying(true)
 		end,
@@ -56,20 +56,24 @@ MultiplayerController.findNotechart = remote.wrap(function(self)
 	local mpModel = self.multiplayerModel
 	local selectModel = self.selectModel
 
-	selectModel:findNotechart(mpModel.notechart.hash or "", mpModel.notechart.index or 0)
+	local hash = mpModel.notechart.hash or ""
+	local index = mpModel.notechart.index or 0
+	if self.hash == hash and self.index == index then
+		return
+	end
+	self.hash = hash
+	self.index = index
+
+	selectModel:findNotechart(hash, index)
 	local items = selectModel.noteChartSetLibrary.items
 
 	selectModel:setLock(false)
 
 	mpModel.downloadingBeatmap = nil
-	local item = items[1]
-	if item then
-		mpModel.chartview = {
-			chartfile_set_id = item.chartfile_set_id,
-			chartfile_id = item.chartfile_id,
-			chartmeta_id = item.chartmeta_id,
-		}
-		selectModel:setConfig(item)
+	local chartview = items[1]
+	if chartview then
+		mpModel.chartview = chartview
+		selectModel:setConfig(chartview)
 		selectModel:pullNoteChartSet(true)
 		mpModel.peer.setNotechartFound(true)
 		return
