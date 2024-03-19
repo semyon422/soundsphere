@@ -15,6 +15,8 @@ function MultiplayerController:load()
 				if not mpModel:isHost() then
 					self:findNotechart()
 					self.playContext.modifiers = value.modifiers
+					self.playContext.rate = value.rate
+					self.playContext.const = value.rate
 				end
 			end
 		end,
@@ -56,14 +58,15 @@ MultiplayerController.findNotechart = remote.wrap(function(self)
 	local mpModel = self.multiplayerModel
 	local selectModel = self.selectModel
 
-	local hash = mpModel.notechart.hash or ""
-	local index = mpModel.notechart.index or 0
+	local hash = mpModel.room.notechart.hash or ""
+	local index = mpModel.room.notechart.index or 0
 	if self.hash == hash and self.index == index then
 		return
 	end
 	self.hash = hash
 	self.index = index
 
+	print("find", hash, index)
 	selectModel:findNotechart(hash, index)
 	local items = selectModel.noteChartSetLibrary.items
 

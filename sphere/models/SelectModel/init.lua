@@ -112,6 +112,10 @@ function SelectModel:findNotechart(hash, index)
 	}
 	self.cacheModel.chartviewsRepo:queryAsync(params)
 	self.noteChartSetLibrary:updateItems()
+	local chartview_set = self.noteChartSetLibrary.items[1]
+	if chartview_set then
+		self.noteChartLibrary:setNoteChartSetId(chartview_set)
+	end
 end
 
 ---@return string?

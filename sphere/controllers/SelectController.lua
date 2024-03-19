@@ -79,7 +79,7 @@ function SelectController:update()
 	end
 
 	if self.modifierSelectModel:isChanged() then
-		self.multiplayerModel:pushModifiers()
+		self.multiplayerModel:pushPlayContext()
 		self:applyModifierMeta()
 	end
 

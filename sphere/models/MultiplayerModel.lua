@@ -27,7 +27,6 @@ function MultiplayerModel:new(rhythmModel, configModel, selectModel, onlineModel
 	self.status = "disconnected"
 	self.rooms = {}
 	self.users = {}
-	self.notechart = {}
 	self.roomMessages = {}
 
 	self.isPlaying = false
@@ -192,11 +191,11 @@ MultiplayerModel.leaveRoom = remote.wrap(function(self)
 	self.roomMessages = {}
 end)
 
-MultiplayerModel.pushModifiers = remote.wrap(function(self)
-	if not self.peer then
-		return
-	end
+MultiplayerModel.pushPlayContext = remote.wrap(function(self)
+	if not self.peer then return end
 	self.peer._setModifiers(self.playContext.modifiers)
+	self.peer._setRate(self.playContext.rate)
+	self.peer._setConst(self.playContext.const)
 end)
 
 local async_read = thread.async(function(...) return love.filesystem.read(...) end)
@@ -219,7 +218,7 @@ MultiplayerModel.pushNotechart = remote.wrap(function(self)
 	end
 
 	self.chartview = chartview
-	self.notechart = {
+	local notechart = {
 		hash = chartview.hash,
 		index = chartview.index,
 		format = chartview.format,
@@ -237,7 +236,7 @@ MultiplayerModel.pushNotechart = remote.wrap(function(self)
 		long_notes_count = chartview.long_notes_count,
 		osuSetId = osuSetId,
 	}
-	self.peer._setNotechart(self.notechart)
+	self.peer._setNotechart(notechart)
 	self.peer._setNotechartFound(true)
 end)
 
@@ -306,7 +305,7 @@ function MultiplayerModel:update()
 end
 
 MultiplayerModel.downloadNoteChart = remote.wrap(function(self)
-	local setId = self.notechart.osuSetId
+	local setId = self.room.notechart.osuSetId
 	if self.downloadingBeatmap or not setId then
 		return
 	end

@@ -149,7 +149,11 @@ local function DownloadButton(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local multiplayerModel = self.game.multiplayerModel
-	local notechart = multiplayerModel.notechart
+	if not multiplayerModel.room then
+		return
+	end
+
+	local notechart = multiplayerModel.room.notechart
 	if not notechart.osuSetId then
 		return
 	end
