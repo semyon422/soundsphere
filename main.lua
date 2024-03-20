@@ -5,6 +5,10 @@ require("ltn12")
 require("enet")
 require("socket")
 
+if arg[2] == "debug" then
+    require("lldebugger").start()
+end
+
 local pkg = require("aqua.package")
 pkg.reset()
 pkg.addc("3rd-deps/lib")
