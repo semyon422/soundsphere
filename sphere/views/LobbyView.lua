@@ -9,50 +9,24 @@ local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 
 local name = ""
 local password = ""
 
---[[
-	local status = multiplayerModel.status
-	if status == "disconnected" and imgui.Button("Connect") then
-		multiplayerModel:connect()
-	elseif status == "connected" and imgui.Button("Disconnect") then
-		multiplayerModel:disconnect()
-	elseif status == "connecting" then
-		imgui.Text("Connecting...")
-	elseif status == "disconnecting" then
-		imgui.Text("Disconnecting...")
-	end
+local w, h = 1024, 1080 / 2
+local scrollY = 0
+local _h = 55
 
-	if multiplayerModel.peer then
-		if multiplayerModel.user then
-			imgui.SameLine()
-			imgui.Text("logged in as " .. multiplayerModel.user.name)
-		end
-		if imgui.BeginListBox("Players", {0, 150}) then
-			for i = 1, #multiplayerModel.users do
-				local user = multiplayerModel.users[i]
-				local isSelected = multiplayerModel.user == user
-				imgui.Selectable_Bool(user.name, isSelected)
+local sections = {"rooms", "players"}
+local section = sections[1]
 
-				if isSelected then
-					imgui.SetItemDefaultFocus()
-				end
-			end
-			imgui.EndListBox()
-		end
-	end
-]]
+local section_draw = {}
 
-return ModalImView(function(self, quit)
+local modal = ModalImView(function(self, quit)
 	if quit then
 		return true
 	end
 
-	local multiplayerModel = self.game.multiplayerModel
-
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	love.graphics.replaceTransform(_transform(transform))
-	love.graphics.translate(279 + 454 * 3 / 4, 1080 / 4)
-	local w, h = 454 * 1.5, 1080 / 2
+	love.graphics.translate((1920 - w) / 2, (1080 - h) / 2)
 	local r = 8
 
 	imgui.setSize(w, h, w / 2, 55)
@@ -61,16 +35,38 @@ return ModalImView(function(self, quit)
 	love.graphics.rectangle("fill", 0, 0, w, h, r)
 	love.graphics.setColor(1, 1, 1, 1)
 
-	just.clip(love.graphics.rectangle, "fill", 0, 0, w, h, r)
-
 	local window_id = "ContextMenuImView"
-	local over = just.is_over(w, h)
-	just.container(window_id, over)
-	just.button(window_id, over)
-	just.wheel_over(window_id, over)
 
-	local close = false
+	just.push()
+	imgui.Container(window_id, w, h, _h / 3, _h * 2, scrollY)
 
+	just.push()
+	local tabsw
+	section, tabsw = imgui.vtabs("lobby tabs", section, sections)
+	just.pop()
+
+	local inner_w = w - tabsw
+	imgui.setSize(inner_w, h, inner_w / 2, _h)
+	love.graphics.translate(tabsw, 0)
+
+
+	love.graphics.setColor(1, 1, 1, 1)
+	local close = section_draw[section](self, inner_w)
+	just.emptyline(8)
+
+	scrollY = imgui.Container()
+	just.pop()
+
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.rectangle("line", 0, 0, w, h, r)
+
+	return close
+end)
+
+function section_draw.rooms(self, inner_w)
+	local multiplayerModel = self.game.multiplayerModel
+
+	local close
 	local status = multiplayerModel.status
 	if status ~= "connected" then
 		imgui.text(status)
@@ -83,7 +79,7 @@ return ModalImView(function(self, quit)
 		password = imgui.input("LobbyView password", password, "Password")
 
 		just.sameline()
-		just.offset(w - 144)
+		just.offset(inner_w - 144)
 		if imgui.button("Create", "Create") and name ~= "" then
 			multiplayerModel:createRoom(name, password)
 		end
@@ -99,7 +95,7 @@ return ModalImView(function(self, quit)
 			just.row(true)
 			imgui.label(i, name)
 			if not multiplayerModel.room then
-				just.offset(w - 144)
+				just.offset(inner_w - 144)
 				if imgui.button(i, "Join") then
 					multiplayerModel.selectedRoom = room
 					multiplayerModel:joinRoom("")
@@ -108,14 +104,14 @@ return ModalImView(function(self, quit)
 			end
 			just.row()
 			love.graphics.setColor(1, 1, 1, 0.2)
-			love.graphics.line(0, 0, w, 0)
+			love.graphics.line(0, 0, inner_w, 0)
 			love.graphics.setColor(1, 1, 1, 1)
 		end
 	elseif not multiplayerModel.room then
 		imgui.text(multiplayerModel.selectedRoom.name)
 		password = imgui.input("LobbyView password", password, "Password")
 		just.sameline()
-		just.offset(w - 144)
+		just.offset(inner_w - 144)
 		if imgui.button("LobbyView join", "Join") then
 			multiplayerModel:joinRoom(password)
 			just.focus()
@@ -128,12 +124,17 @@ return ModalImView(function(self, quit)
 		close = true
 		self.game.gameView.view:changeScreen("multiplayerView")
 	end
-
-	just.container()
-	just.clip()
-
-	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.rectangle("line", 0, 0, w, h, r)
-
 	return close
-end)
+end
+
+function section_draw.players(self, inner_w)
+	local users = self.game.multiplayerModel.users
+	if not users then
+		return
+	end
+	for _, user in ipairs(users) do
+		imgui.text(user.name)
+	end
+end
+
+return modal
