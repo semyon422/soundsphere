@@ -152,15 +152,6 @@ thread.coro(function()
 		return love.event.quit("restart")
 	end
 
-	require("luamidi")
-
-	setmetatable(_G, {
-		__newindex = function(a, b, c)
-			print(a, b, c, debug.traceback())
-			rawset(a, b, c)
-		end
-	})
-
 	local GameController = require("sphere.controllers.GameController")
 	local game = GameController()
 

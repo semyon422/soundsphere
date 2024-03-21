@@ -3,11 +3,12 @@ local thread = require("thread")
 local delay = require("delay")
 local asynckey = require("asynckey")
 local just = require("just")
-local LuaMidi = require("luamidi")
 local flux = require("flux")
 local reqprof = require("reqprof")
 local sleep = require("sleep")
 local jit = require("jit")
+
+local MidiInputFactory = require("native.midi.MidiInputFactory")
 
 if jit.os == "Windows" then
 	sleep = love.timer.sleep
@@ -38,13 +39,6 @@ if love.system.getOS() == "Windows" then
 	local ffi = require("ffi")
 	dwmapi = ffi.load("dwmapi")
 	ffi.cdef("void DwmFlush();")
-end
-
-local hasMidi
-
----@return number
-local function getinportcount()
-	return hasMidi and LuaMidi.getinportcount() or 0
 end
 
 Loop.quitting = false
@@ -89,7 +83,15 @@ function Loop:run()
 	Loop.startTime = fpsLimitTime
 	Loop.dt = 0
 
-	hasMidi = LuaMidi.getinportcount() > 0
+	local midiInputFactory = MidiInputFactory()
+	local midiInput = midiInputFactory:getMidiInput()
+
+	setmetatable(_G, {
+		__newindex = function(a, b, c)
+			print("__newindex", a, b, c, debug.traceback())
+			rawset(a, b, c)
+		end
+	})
 
 	return function()
 		if Loop.quitting then
@@ -142,16 +144,11 @@ function Loop:run()
 			end
 		end
 
-		for i = 0, getinportcount() - 1 do
-			-- command, note, velocity, delta-time-to-last-event
-			local a, b, c, d = LuaMidi.getMessage(i)
-			while a do
-				if a == 144 and c ~= 0 then
-					love.midipressed(tonumber(b), c, d)
-				elseif a == 128 or c == 0 then
-					love.midireleased(tonumber(b), c, d)
-				end
-				a, b, c, d = LuaMidi.getMessage(i)
+		for port, note, status in midiInput:events() do
+			if status then
+				love.midipressed(note)
+			else
+				love.midireleased(note)
 			end
 		end
 
