@@ -36,14 +36,17 @@ function RoomUsersListView:drawItem(i, w, h)
 		love.graphics.setColor(1, 0.3, 0.1, 1)
 	end
 	love.graphics.rectangle("fill", 0, 0, 12, h)
+
+	if room.host_user_id == user.id then
+		love.graphics.setColor(1, 0.7, 0.1, 1)
+		love.graphics.rectangle("fill", 12, 0, 12, h)
+	end
+
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local name = user.name
-	if room.host_user_id == user.id then
-		name = name .. " host"
-	end
 	if user.isPlaying then
-		name = name .. " playing"
+		name = name .. " (playing)"
 	end
 
 	local configModifier = user.modifiers
@@ -68,7 +71,7 @@ function RoomUsersListView:drawItem(i, w, h)
 	end
 
 	just.row(true)
-	just.indent(18)
+	just.indent(30)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 	imgui.Label(user, name, h)
 	just.offset(w / 2)
