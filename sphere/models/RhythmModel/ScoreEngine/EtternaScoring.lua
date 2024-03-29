@@ -2,7 +2,7 @@
 --- SOURCE: https://github.com/etternagame/etterna/blob/master/Themes/_fallback/Scripts/10%20Scores.lua
 
 local class = require("class")
-
+local erfunc = require("libchart.erfunc")
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 
 ---@class sphere.EtternaScoring: sphere.ScoreSystem
@@ -67,23 +67,15 @@ function Judge:new(j)
     }
 end
 
-local a1 = 0.254829592
-local a2 = -0.284496736
-local a3 = 1.421413741
-local a4 = -1.453152027
-local a5 = 1.061405429
-local p = 0.3275911
-
 local function pointsMultiplier(x)
     local sign = 1
 
-    if x < 0 then sign = -1 end
+    if x < 0 then
+		sign = -1
+	end
 
     x = math.abs(x)
-
-    local t = 1.0 / (1.0 + p * x)
-    local y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t *
-                  math.exp(-x * x)
+	local y = erfunc.erf(x)
 
     return sign * y
 end
@@ -173,8 +165,8 @@ function EtternaScoring:getTimings()
     }
 end
 
-function Judge:getOrderedCounterNames() return
-	orderedCounters
+function Judge:getOrderedCounterNames()
+	return orderedCounters
 end
 
 EtternaScoring.notes = {
