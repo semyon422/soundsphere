@@ -1,6 +1,7 @@
 local ScreenView = require("sphere.views.ScreenView")
 local thread = require("thread")
 local just = require("just")
+local table_util = require("table_util")
 
 local Layout = require("sphere.views.ResultView.Layout")
 local ResultViewConfig = require("sphere.views.ResultView.ResultViewConfig")
@@ -19,6 +20,28 @@ ResultView.load = thread.coro(function(self)
 	if self.prevView == self.game.selectView then
 		self.game.resultController:replayNoteChartAsync("result", self.game.selectModel.scoreItem)
 	end
+
+	local scoreSystems = self.game.rhythmModel.scoreEngine.scoreSystem
+	self.judgementScoreSystems = {
+		scoreSystems.soundsphere,
+		scoreSystems.quaver,
+		scoreSystems.osuMania,
+		scoreSystems.etterna
+	}
+	self.judgements = {}
+
+	for _, scoreSystem in pairs(self.judgementScoreSystems) do
+		table_util.copy(scoreSystem.judges, self.judgements)
+	end
+
+	local config = self.game.configModel.configs.select
+	local selectedJudgement = config.judgements
+
+	if not self.judgements[selectedJudgement] then
+		local k, _ = next(self.judgements)
+		config.judgements = k
+	end
+
 	loading = false
 end)
 

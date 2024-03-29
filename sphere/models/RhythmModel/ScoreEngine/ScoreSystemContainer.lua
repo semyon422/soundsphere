@@ -6,6 +6,10 @@ local ScoreSystems = {
 	require("sphere.models.RhythmModel.ScoreEngine.JudgementScoreSystem"),
 	require("sphere.models.RhythmModel.ScoreEngine.NormalscoreScoreSystem"),
 	require("sphere.models.RhythmModel.ScoreEngine.MiscScoreSystem"),
+	require("sphere.models.RhythmModel.ScoreEngine.SoundsphereScoring"),
+	require("sphere.models.RhythmModel.ScoreEngine.OsuManiaScoring"),
+	require("sphere.models.RhythmModel.ScoreEngine.QuaverScoring"),
+	require("sphere.models.RhythmModel.ScoreEngine.EtternaScoring")
 }
 
 ---@class sphere.ScoreSystemContainer
