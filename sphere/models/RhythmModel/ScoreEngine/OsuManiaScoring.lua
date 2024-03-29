@@ -141,8 +141,9 @@ function OsuManiaScoring:miss(event)
     end
 end
 
-function OsuManiaScoring:getTimings(judgementName)
-    return self.judges[judgementName]:getTimings()
+function OsuManiaScoring:getTimings(od)
+	local judge = Judge(od)
+    return judge:getTimings()
 end
 
 OsuManiaScoring.notes = {

@@ -98,16 +98,18 @@ function Judge:getOrderedCounterNames()
 	return orderedCounters
 end
 
+local stdWindows = {
+	marvelous = 0.018,
+	perfect = 0.043,
+	great = 0.076,
+	good = 0.106,
+	okay = 0.127,
+	miss = 0.164
+}
+
 function QuaverScoring:load()
 	self.judges = {
-		[self.metadata.name] = Judge({
-			marvelous = 0.018,
-			perfect = 0.043,
-			great = 0.076,
-			good = 0.106,
-			okay = 0.127,
-			miss = 0.164
-		})
+		[self.metadata.name] = Judge(stdWindows)
 	}
 end
 
@@ -135,8 +137,9 @@ function QuaverScoring:miss()
 	end
 end
 
-function QuaverScoring:getTimings(judgementName)
-	return self.judges[judgementName]:getTimings()
+function QuaverScoring:getTimings()
+	local judge = Judge(stdWindows)
+	return judge:getTimings()
 end
 
 QuaverScoring.notes = {
