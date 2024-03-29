@@ -285,10 +285,12 @@ local function Judgements(self)
 	local judgeName = self.game.configModel.configs.select.judgements
 	local judge = self.judgements[judgeName]
 	local judgementLists = judge:getOrderedCounterNames()
-	local count = judge.notes
-	local miss = judge.counters.miss
+	local counters = judge.counters
 
-	local base = scoreEngine.scoreSystem.base
+	local perfect = show and counters.perfect or scoreItem.perfect or 0
+	local notPerfect = show and counters["not perfect"] or scoreItem.not_perfect or 0
+	local miss = show and judge.counters.miss or scoreItem.miss or 0
+	local notes = show and judge.notes or perfect + notPerfect + miss
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
@@ -298,20 +300,19 @@ local function Judgements(self)
 
 	if show then
 		for _, name in ipairs(judgementLists) do
-			imgui.ValueBar(w, lineHeight, judge.counters[name] / count, name, judge.counters[name])
+			imgui.ValueBar(w, lineHeight, counters[name] / notes, name, counters[name])
 			just.emptyline(interval)
 		end
 	else
-		count = perfect + notPerfect
-		imgui.ValueBar(w, lineHeight, perfect / count, "perfect", perfect)
+		imgui.ValueBar(w, lineHeight, perfect / notes, "perfect", perfect)
 		just.emptyline(interval)
-		imgui.ValueBar(w, lineHeight, notPerfect / count, "not perfect", notPerfect)
+		imgui.ValueBar(w, lineHeight, notPerfect / notes, "not perfect", notPerfect)
 	end
 
 	Layout:move("column1row2")
 	love.graphics.translate(padding, -padding + h - lineHeight)
 
-	imgui.ValueBar(w, lineHeight, miss / count, "miss", miss)
+	imgui.ValueBar(w, lineHeight, miss / notes, "miss", miss)
 end
 
 local selectorState = {}
@@ -380,11 +381,9 @@ end
 ---@param self table
 local function JudgementsAccuracy(self)
 	local show = showLoadedScore(self)
-	local scoreEngine = self.game.rhythmModel.scoreEngine
 	local scoreItem = self.game.selectModel.scoreItem
-	local judgement = scoreEngine.scoreSystem.judgement
 
-	if not show or not judgement or not scoreItem then
+	if not show or not scoreItem then
 		return
 	end
 

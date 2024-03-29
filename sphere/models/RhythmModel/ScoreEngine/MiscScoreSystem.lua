@@ -21,10 +21,13 @@ function MiscScoreSystem:hit(event)
 		self.maxDeltaTime = deltaTime
 	end
 
-	local counters = self.container.judgement.counters
+	local soundsphereJudge = self.container.soundsphere.judges["Soundsphere"]
+	local earlyLate = soundsphereJudge.earlyLate
+	local counters = soundsphereJudge.counters
+	local notes = soundsphereJudge.notes
 
-	self.ratio = (counters.soundsphere.perfect or 0) / (counters.all.count or 1)
-	self.earlylate = (counters.earlylate.early or 0) / (counters.earlylate.late or 1)
+	self.ratio = (counters.perfect or 0) / (notes or 1)
+	self.earlylate = (earlyLate.early or 0) / (earlyLate.late or 1)
 end
 
 ---@param event any

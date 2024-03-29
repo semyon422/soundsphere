@@ -34,7 +34,7 @@ timings.soundsphere = get(-0.16, -0.12, 0.12, 0.16)
 
 timings.lr2 = get(-1, -0.2, 0.2, 0.2)
 
-local etterna = require("sphere.models.RhythmModel.ScoreEngine.etterna")
+local etterna = require("sphere.models.RhythmModel.ScoreEngine.EtternaScoring")
 
 local cachedEtterna = {}
 
@@ -44,10 +44,7 @@ function timings.etterna(judge)
 	if cachedEtterna[judge] then
 		return cachedEtterna[judge]
 	end
-	local d = etterna[judge]
-	local hit, miss = d[4] / 1000, d[5] / 1000
-	cachedEtterna[judge] = get(-miss, -hit, hit, miss)
-	cachedEtterna[judge].nearest = true
+	cachedEtterna[judge] = etterna:getTimings()
 	return cachedEtterna[judge]
 end
 

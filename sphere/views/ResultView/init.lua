@@ -10,6 +10,7 @@ local ResultViewConfig = require("sphere.views.ResultView.ResultViewConfig")
 ---@operator call: sphere.ResultView
 local ResultView = ScreenView + {}
 
+
 local loading
 ResultView.load = thread.coro(function(self)
 	if loading then
@@ -21,18 +22,7 @@ ResultView.load = thread.coro(function(self)
 		self.game.resultController:replayNoteChartAsync("result", self.game.selectModel.scoreItem)
 	end
 
-	local scoreSystems = self.game.rhythmModel.scoreEngine.scoreSystem
-	self.judgementScoreSystems = {
-		scoreSystems.soundsphere,
-		scoreSystems.quaver,
-		scoreSystems.osuMania,
-		scoreSystems.etterna
-	}
-	self.judgements = {}
-
-	for _, scoreSystem in pairs(self.judgementScoreSystems) do
-		table_util.copy(scoreSystem.judges, self.judgements)
-	end
+	self:updateJudgements()
 
 	local config = self.game.configModel.configs.select
 	local selectedJudgement = config.judgements
@@ -44,6 +34,22 @@ ResultView.load = thread.coro(function(self)
 
 	loading = false
 end)
+
+function ResultView:updateJudgements()
+	local scoreSystems = self.game.rhythmModel.scoreEngine.scoreSystem
+	self.judgementScoreSystems = {
+		scoreSystems["soundsphere"],
+		scoreSystems["quaver"],
+		scoreSystems["osuMania"],
+		scoreSystems["etterna"]
+	}
+
+	self.judgements = {}
+
+	for _, scoreSystem in pairs(scoreSystems) do
+		table_util.copy(scoreSystem.judges, self.judgements)
+	end
+end
 
 function ResultView:draw()
 	just.container("screen container", true)
@@ -72,6 +78,7 @@ ResultView.loadScore = thread.coro(function(self, itemIndex)
 	self.game.resultController:replayNoteChartAsync("result", scoreEntry)
 	if itemIndex then
 		self.game.selectModel:scrollScore(nil, itemIndex)
+		self:updateJudgements()
 	end
 	loading = false
 end)

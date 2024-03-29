@@ -1,15 +1,15 @@
-local ScoreSystem                = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
+local ScoreSystem           = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 
 ---@class sphere.SoundsphereScoring: sphere.ScoreSystem
 ---@operator call: sphere.SoundsphereScoring
-local SoundsphereScoring         = ScoreSystem + {}
+local SoundsphereScoring    = ScoreSystem + {}
 
-SoundsphereScoring.name          = "soundsphere"
-SoundsphereScoring.metadata      = {
+SoundsphereScoring.name     = "soundsphere"
+SoundsphereScoring.metadata = {
 	name = "Soundsphere",
 }
 
-local orderedCounterNames        = { "perfect", "not perfect" }
+local orderedCounterNames   = { "perfect", "not perfect" }
 
 function SoundsphereScoring:load()
 	self.judges = {
@@ -18,6 +18,10 @@ function SoundsphereScoring:load()
 				perfect = 0,
 				["not perfect"] = 0,
 				miss = 0
+			},
+			earlyLate = {
+				early = 0,
+				late = 0
 			},
 			notes = 0,
 			getOrderedCounterNames = function()
@@ -32,7 +36,15 @@ function SoundsphereScoring:hit(event)
 
 	judge.notes = judge.notes + 1
 
-	if math.abs(event.deltaTime) < 0.016 then
+	local delta = event.deltaTime
+
+	if delta < 0 then
+		judge.earlyLate.early = judge.earlyLate.early + 1
+	else
+		judge.earlyLate.late = judge.earlyLate.late + 1
+	end
+
+	if math.abs(delta) < 0.016 then
 		judge.counters.perfect = judge.counters.perfect + 1
 		return
 	end
