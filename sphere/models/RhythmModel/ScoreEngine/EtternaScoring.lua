@@ -1,3 +1,6 @@
+--- SOURCE: https://github.com/etternagame/etterna
+--- SOURCE: https://github.com/etternagame/etterna/blob/master/Themes/_fallback/Scripts/10%20Scores.lua
+
 local class = require("class")
 
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
@@ -64,14 +67,14 @@ function Judge:new(j)
     }
 end
 
-local function pointsMultiplier(x)
-    local a1 = 0.254829592
-    local a2 = -0.284496736
-    local a3 = 1.421413741
-    local a4 = -1.453152027
-    local a5 = 1.061405429
-    local p = 0.3275911
+local a1 = 0.254829592
+local a2 = -0.284496736
+local a3 = 1.421413741
+local a4 = -1.453152027
+local a5 = 1.061405429
+local p = 0.3275911
 
+local function pointsMultiplier(x)
     local sign = 1
 
     if x < 0 then sign = -1 end
