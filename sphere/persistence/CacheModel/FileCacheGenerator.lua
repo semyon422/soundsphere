@@ -25,19 +25,20 @@ function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
 	local typ, dir, name, modtime = iterator()
 	while typ do
 		local res
-		if typ == "related_dir" then
+		if name and typ == "related_dir" then
 			chartfile_set = self:processChartfileSet({
 				dir = dir,
-				name = name,
+				name = assert(name),
 				modified_at = modtime,
 				is_file = false,
 				location_id = location_id,
 			})
-		elseif typ == "related" then
+		elseif chartfile_set and typ == "related" then
 			chartfile = self:processChartfile(chartfile_set.id, name, modtime)
 			handle(chartfile)
-		elseif typ == "related_all" then
+		elseif chartfile_set and typ == "related_all" then
 			self.chartfilesRepo:deleteChartfiles({set_id = chartfile_set.id, name__notin = name})
+			chartfile_set = nil
 		elseif typ == "unrelated_dir" then
 		elseif typ == "unrelated" then
 			chartfile_set = self:processChartfileSet({

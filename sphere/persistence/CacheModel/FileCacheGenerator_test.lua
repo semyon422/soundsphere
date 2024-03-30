@@ -116,6 +116,24 @@ function test.rel_root(t)
 	})
 end
 
+function test.rel_root_noname_invalid(t)
+	local actions, chartfiles, chartfile_sets = {}, {}, {}
+	local chartRepo = get_fake_chartRepo(actions, chartfiles, chartfile_sets)
+
+	local files = {
+		{"related_dir", nil, nil, 0},
+		{"related", nil, "a", 1},
+		{"related_all", nil, {"a"}, 0},
+	}
+
+	local noteChartFinder = get_fake_ncf(files)
+
+	local fcg = FileCacheGenerator(chartRepo, noteChartFinder, function() end)
+	fcg:lookup("chartset", 1, nil)
+
+	t:tdeq(actions, {})
+end
+
 function test.unrel_root(t)
 	local actions, chartfiles, chartfile_sets = {}, {}, {}
 	local chartRepo = get_fake_chartRepo(actions, chartfiles, chartfile_sets)
