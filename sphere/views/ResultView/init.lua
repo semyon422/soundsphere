@@ -10,7 +10,6 @@ local ResultViewConfig = require("sphere.views.ResultView.ResultViewConfig")
 ---@operator call: sphere.ResultView
 local ResultView = ScreenView + {}
 
-
 local loading
 ResultView.load = thread.coro(function(self)
 	if loading then
@@ -37,17 +36,23 @@ end)
 
 function ResultView:updateJudgements()
 	local scoreSystems = self.game.rhythmModel.scoreEngine.scoreSystem
-	self.judgementScoreSystems = {
-		scoreSystems["soundsphere"],
-		scoreSystems["quaver"],
-		scoreSystems["osuMania"],
-		scoreSystems["etterna"]
+	self.selectors = {
+		scoreSystems["soundsphere"].metadata,
+		scoreSystems["quaver"].metadata,
+		scoreSystems["osuMania"].metadata,
+		scoreSystems["etterna"].metadata
 	}
 
 	self.judgements = {}
 
 	for _, scoreSystem in pairs(scoreSystems) do
 		table_util.copy(scoreSystem.judges, self.judgements)
+	end
+
+	local judgementScoreSystem = scoreSystems.judgement
+	for _, judge in ipairs(judgementScoreSystem.judgementList) do
+		table.insert(self.selectors, judge)
+		table_util.copy(judgementScoreSystem.judges[judge.name], self.judgements)
 	end
 end
 

@@ -356,7 +356,7 @@ local function JudgementsDropdown(self)
 	local size = 1 / 2
 	love.graphics.translate(w * (1 - size) - 26, (72 - h) / 2)
 
-	local items = self.judgementScoreSystems
+	local items = self.selectors
 
 	local config = self.game.configModel.configs.select
 	local preview = config.judgements
@@ -368,7 +368,7 @@ local function JudgementsDropdown(self)
 		love.graphics.rectangle("fill", 0, 0, w, h * s * #items)
 		love.graphics.setColor(1, 1, 1, 1)
 		for i, item in ipairs(items) do
-			local v = JudgementSelector(item.metadata, w * size - h * (1 - s), h * s)
+			local v = JudgementSelector(item, w * size - h * (1 - s), h * s)
 			if v then
 				config.judgements = v
 				just.focus()
