@@ -31,6 +31,7 @@ function SoundsphereScoring:load()
     }
 end
 
+---@param event table
 function SoundsphereScoring:hit(event)
     local judge = self.judges[self.metadata.name]
 

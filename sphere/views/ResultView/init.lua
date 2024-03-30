@@ -49,7 +49,7 @@ function ResultView:updateJudgements()
 		table_util.copy(scoreSystem.judges, self.judgements)
 	end
 
-	local judgementScoreSystem = scoreSystems.judgement
+	local judgementScoreSystem = scoreSystems["judgement"]
 	for _, judge in ipairs(judgementScoreSystem.judgementList) do
 		table.insert(self.selectors, judge)
 		table_util.copy(judgementScoreSystem.judges[judge.name], self.judgements)

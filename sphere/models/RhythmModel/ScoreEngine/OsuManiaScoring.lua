@@ -16,6 +16,7 @@ local Judge = class()
 
 local orderedCounters = {"perfect", "great", "good", "ok", "meh"}
 
+---@param od number
 function Judge:new(od)
     self.accuracy = 1
     self.notes = 0
@@ -56,6 +57,8 @@ function Judge:new(od)
     self.windowReleaseMultiplier = 1.5
 end
 
+---@param key string
+---@param deltaTime number
 function Judge:addCounter(key, deltaTime)
     self.notes = self.notes + 1
     self.counters[key] = self.counters[key] + 1
@@ -63,6 +66,7 @@ function Judge:addCounter(key, deltaTime)
     self.lastUpdateTime = deltaTime
 end
 
+---@param event table
 function Judge:processEvent(event)
     local isRelease = event.newState == "endPassed" or event.newState == "endMissedPassed"
 
@@ -114,7 +118,10 @@ function Judge:getTimings()
     }
 end
 
-function Judge:getOrderedCounterNames() return orderedCounters end
+---@return table
+function Judge:getOrderedCounterNames()
+	return orderedCounters
+end
 
 function OsuManiaScoring:load()
     self.judges = {}
@@ -127,6 +134,7 @@ function OsuManiaScoring:load()
     end
 end
 
+---@param event table
 function OsuManiaScoring:hit(event)
     for _, judge in pairs(self.judges) do
         judge:processEvent(event)
@@ -134,6 +142,7 @@ function OsuManiaScoring:hit(event)
     end
 end
 
+---@param event table
 function OsuManiaScoring:miss(event)
     for _, judge in pairs(self.judges) do
         judge:addCounter("miss", event.deltaTime)
@@ -141,6 +150,8 @@ function OsuManiaScoring:miss(event)
     end
 end
 
+---@param od number
+---@return table
 function OsuManiaScoring:getTimings(od)
 	local judge = Judge(od)
     return judge:getTimings()

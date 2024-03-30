@@ -35,6 +35,7 @@ local Judge = class()
 
 local orderedCounters = {"marvelous", "perfect", "great", "bad", "boo"}
 
+---@param j number
 function Judge:new(j)
     self.difficulty = judgeDifficulty[j]
     self.accuracy = 0
@@ -67,6 +68,8 @@ function Judge:new(j)
     }
 end
 
+---@param x number
+---@return number
 local function pointsMultiplier(x)
     local sign = 1
 
@@ -80,6 +83,8 @@ local function pointsMultiplier(x)
     return sign * y
 end
 
+---@param deltaTime number
+---@return number
 function Judge:getPoints(deltaTime)
     if deltaTime <= self.ridic then return self.maxPoints end
 
@@ -97,6 +102,7 @@ function Judge:getPoints(deltaTime)
     return self.missWeight
 end
 
+---@param deltaTime number
 function Judge:hit(deltaTime)
     if deltaTime > hitWindow then
         self:miss()
@@ -144,6 +150,7 @@ function EtternaScoring:miss()
     end
 end
 
+---@param event table
 function EtternaScoring:hit(event)
     for _, judge in pairs(self.judges) do
         judge:hit(event.deltaTime)
@@ -165,6 +172,7 @@ function EtternaScoring:getTimings()
     }
 end
 
+---@return table
 function Judge:getOrderedCounterNames()
 	return orderedCounters
 end

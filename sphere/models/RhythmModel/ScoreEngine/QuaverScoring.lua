@@ -15,6 +15,7 @@ local Judge = class()
 
 local orderedCounters = {"marvelous", "perfect", "great", "good", "okay"}
 
+---@param windows table
 function Judge:new(windows)
 	self.windows = windows
 	self.accuracy = 0
@@ -43,6 +44,7 @@ function Judge:new(windows)
 	}
 end
 
+---@param event table
 function Judge:setCounter(event)
 	local deltaTime = math.abs(event.deltaTime)
 
@@ -94,6 +96,7 @@ function Judge:getTimings()
 	}
 end
 
+---@return table
 function Judge:getOrderedCounterNames()
 	return orderedCounters
 end
@@ -113,6 +116,7 @@ function QuaverScoring:load()
 	}
 end
 
+---@param event table
 function QuaverScoring:hit(event)
 	for _, judge in pairs(self.judges) do
 		judge.notes = judge.notes + 1
