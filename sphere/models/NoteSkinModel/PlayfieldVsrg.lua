@@ -281,10 +281,10 @@ function PlayfieldVsrg:addJudgement(object)
 		judgements[judgement[1]] = config
 		self:add(config)
 	end
-	local key = "game.rhythmModel.scoreEngine.scoreSystem.judgement.counters"
-	if object.key then
-		key = key .. "." .. object.key
-	end
+	local key = ("game.rhythmModel.scoreEngine.scoreSystem.%s.judges.%s.counters"):format(
+		object.score_system,
+		object.judge
+	)
 	return self:add(JudgementView({
 		key = key,
 		judgements = judgements,
