@@ -312,7 +312,7 @@ function GameplayController:saveScore()
 	)
 
 	local chartdiff = self.cacheModel.chartdiffsRepo:createUpdateChartdiff(self.playContext.chartdiff)
-
+	local judge = scoreSystem.soundsphere.judges["Soundsphere"]
 	local score = {
 		hash = chartdiff.hash,
 		index = chartdiff.index,
@@ -329,8 +329,8 @@ function GameplayController:saveScore()
 		max_combo = scoreSystem.base.maxCombo,
 		replay_hash = replayHash,
 		ratio = scoreSystem.misc.ratio,
-		perfect = scoreSystem.judgement.counters.soundsphere.perfect,
-		not_perfect = scoreSystem.judgement.counters.soundsphere["not perfect"],
+		perfect = judge.counters.perfect,
+		not_perfect = judge.counters["not perfect"],
 		miss = scoreSystem.base.missCount,
 		mean = scoreSystem.normalscore.normalscore.mean,
 		earlylate = scoreSystem.misc.earlylate,

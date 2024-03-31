@@ -263,9 +263,8 @@ local function Judgements(self)
 	local show = showLoadedScore(self)
 	local scoreEngine = self.game.rhythmModel.scoreEngine
 	local scoreItem = self.game.selectModel.scoreItem
-	local judgement = scoreEngine.scoreSystem.judgement
 
-	if not judgement or not scoreItem then
+	if not self.judgements or not scoreItem then
 		return
 	end
 
@@ -283,41 +282,37 @@ local function Judgements(self)
 
 	w = w - padding * 2
 
-	local counterName = self.game.configModel.configs.select.judgements
-	local counters = judgement.counters
-	local judgementLists = judgement.judgementLists
-	local counter = counters[counterName]
+	local judgeName = self.game.configModel.configs.select.judgements
+	local judge = self.judgements[judgeName]
+	local judgementLists = judge:getOrderedCounterNames()
+	local counters = judge.counters
 
-	local base = scoreEngine.scoreSystem.base
-
-	local count = counters.all.count
+	local perfect = show and counters.perfect or scoreItem.perfect or 0
+	local notPerfect = show and counters["not perfect"] or scoreItem.not_perfect or 0
+	local miss = show and judge.counters.miss or scoreItem.miss or 0
+	local notes = show and judge.notes or perfect + notPerfect + miss
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
-
-	local perfect = show and counter.perfect or scoreItem.perfect or 0
-	local notPerfect = show and counter["not perfect"] or scoreItem.not_perfect or 0
-	local miss = show and base.missCount or scoreItem.miss or 0
 
 	local interval = 5
 	local lineHeight = 40
 
 	if show then
-		for _, name in ipairs(judgementLists[counterName]) do
-			imgui.ValueBar(w, lineHeight, counters[counterName][name] / count, name, counters[counterName][name])
+		for _, name in ipairs(judgementLists) do
+			imgui.ValueBar(w, lineHeight, counters[name] / notes, name, counters[name])
 			just.emptyline(interval)
 		end
 	else
-		count = perfect + notPerfect
-		imgui.ValueBar(w, lineHeight, perfect / count, "perfect", perfect)
+		imgui.ValueBar(w, lineHeight, perfect / notes, "perfect", perfect)
 		just.emptyline(interval)
-		imgui.ValueBar(w, lineHeight, notPerfect / count, "not perfect", notPerfect)
+		imgui.ValueBar(w, lineHeight, notPerfect / notes, "not perfect", notPerfect)
 	end
 
 	Layout:move("column1row2")
 	love.graphics.translate(padding, -padding + h - lineHeight)
 
-	imgui.ValueBar(w, lineHeight, miss / count, "miss", miss)
+	imgui.ValueBar(w, lineHeight, miss / notes, "miss", miss)
 end
 
 local selectorState = {}
@@ -327,11 +322,12 @@ local selectorState = {}
 ---@param h number
 ---@return string?
 local function JudgementSelector(item, w, h)
-	local name = item[1]
-	if not item[2] then
+	local name = item.name
+	if not item.range then
 		return imgui.TextOnlyButton(name .. "judgement", name, w, h, "center") and name
 	end
-	selectorState[name] = selectorState[name] or item[2]
+
+	selectorState[name] = selectorState[name] or item.range[1]
 	local v = selectorState[name]
 
 	local text = name:format(selectorState[name])
@@ -341,10 +337,10 @@ local function JudgementSelector(item, w, h)
 	if imgui.TextOnlyButton(name .. "judgement", text, w - h * 2, h, "center") then
 		ret = text
 	end
-	if imgui.TextOnlyButton(name .. "judgement<", "<", h, h, "center") and v > item[2] then
+	if imgui.TextOnlyButton(name .. "judgement<", "<", h, h, "center") and v > item.range[1] then
 		selectorState[name] = v - 1
 	end
-	if imgui.TextOnlyButton(name .. "judgement>", ">", h, h, "center") and v < item[3] then
+	if imgui.TextOnlyButton(name .. "judgement>", ">", h, h, "center") and v < item.range[2] then
 		selectorState[name] = v + 1
 	end
 	just.row()
@@ -360,12 +356,7 @@ local function JudgementsDropdown(self)
 	local size = 1 / 2
 	love.graphics.translate(w * (1 - size) - 26, (72 - h) / 2)
 
-	local judgement = self.game.rhythmModel.scoreEngine.scoreSystem.judgement
-	if not judgement then
-		return
-	end
-
-	local items = judgement.judgementSelectors
+	local items = self.selectors
 
 	local config = self.game.configModel.configs.select
 	local preview = config.judgements
@@ -390,19 +381,16 @@ end
 ---@param self table
 local function JudgementsAccuracy(self)
 	local show = showLoadedScore(self)
-	local scoreEngine = self.game.rhythmModel.scoreEngine
 	local scoreItem = self.game.selectModel.scoreItem
-	local judgement = scoreEngine.scoreSystem.judgement
 
-	if not show or not judgement or not scoreItem then
+	if not show or not scoreItem then
 		return
 	end
 
 	local counterName = self.game.configModel.configs.select.judgements
-	local counter = judgement.counters[counterName]
-	local judgements = judgement.judgements[counterName]
+	local judge = self.judgements[counterName]
 
-	if not judgements.accuracy then
+	if not judge.accuracy then
 		return
 	end
 
@@ -411,7 +399,7 @@ local function JudgementsAccuracy(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans Mono", 32))
-	imgui.Label("j.acc", ("%3.2f%%"):format(judgements.accuracy(counter) * 100), h)
+	imgui.Label("j.acc", ("%3.2f%%"):format(judge.accuracy * 100), h)
 end
 
 ---@param self table

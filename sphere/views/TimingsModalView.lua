@@ -112,6 +112,9 @@ return ModalImView(function(self, quit)
 		playContext.timings = table_util.deepcopy(_timings.etterna(etternaJudgement))
 		etternaJudgement = etternaJudgement % 9 + 1
 	end
+	if imgui.TextButton("quaver timings", "quaver", 150, _h2) then
+		playContext.timings = table_util.deepcopy(_timings.quaver)
+	end
 	just.row()
 
 	local timings = playContext.timings

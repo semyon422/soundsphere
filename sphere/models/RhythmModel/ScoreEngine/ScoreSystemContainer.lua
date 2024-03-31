@@ -3,9 +3,13 @@ local class = require("class")
 local ScoreSystems = {
 	require("sphere.models.RhythmModel.ScoreEngine.BaseScoreSystem"),
 	require("sphere.models.RhythmModel.ScoreEngine.HpScoreSystem"),
-	require("sphere.models.RhythmModel.ScoreEngine.JudgementScoreSystem"),
 	require("sphere.models.RhythmModel.ScoreEngine.NormalscoreScoreSystem"),
 	require("sphere.models.RhythmModel.ScoreEngine.MiscScoreSystem"),
+	require("sphere.models.RhythmModel.ScoreEngine.SoundsphereScoring"),
+	require("sphere.models.RhythmModel.ScoreEngine.OsuManiaScoring"),
+	require("sphere.models.RhythmModel.ScoreEngine.QuaverScoring"),
+	require("sphere.models.RhythmModel.ScoreEngine.EtternaScoring"),
+	require("sphere.models.RhythmModel.ScoreEngine.JudgementScoreSystem")
 }
 
 ---@class sphere.ScoreSystemContainer
