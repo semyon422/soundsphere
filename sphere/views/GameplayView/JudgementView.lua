@@ -6,31 +6,19 @@ local inside = require("table_util").inside
 local JudgementView = class()
 
 function JudgementView:load()
-	local judgementTable = inside(self, self.key) or {}
-	local counters = {}
-	self.counters = counters
-	for name in pairs(self.judgements) do
-		counters[name] = judgementTable[name]
-	end
 	self.judgement = nil
 end
 
 ---@param dt number
 function JudgementView:update(dt)
-	local judgementTable = inside(self, self.key)
+	local judge = inside(self, self.key)
 
-	local counters = self.counters
-	local judgement
-	for name in pairs(self.judgements) do
-		if judgementTable[name] ~= counters[name] then
-			counters[name] = judgementTable[name]
-			judgement = name
-		end
-	end
-	self.judgement = judgement
-	if not judgement then
+	local judgement = judge.lastCounter
+	if not judgement or judgement == self.judgement then
 		return
 	end
+	self.judgement = judgement
+
 	for name, view in pairs(self.judgements) do
 		if name == judgement then
 			view:setTime(0)
