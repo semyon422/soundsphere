@@ -10,11 +10,39 @@ local BackgroundModel = class()
 
 BackgroundModel.alpha = 0
 
+local defaultBackgroundsPath = "userdata/backgrounds"
+
 function BackgroundModel:load()
 	self.path = ""
 
 	self.emptyImage = gfx_util.newPixel(0.25, 0.25, 0.25, 1)
 	self.images = {self.emptyImage}
+
+	local dir = love.filesystem.getDirectoryItems(defaultBackgroundsPath)
+
+	if not dir or #dir == 0 then
+		return
+	end
+
+	self.defaultImages = {}
+	for _, item in ipairs(dir) do
+		local path = defaultBackgroundsPath .. "/" .. item
+		local status, imageData = pcall(love.image.newImageData, path)
+
+		if status then
+			local image = love.graphics.newImage(imageData)
+			table.insert(self.defaultImages, image)
+		end
+	end
+end
+
+function BackgroundModel:getDefaultImage()
+	if not self.defaultImages then
+		return self.emptyImage
+	end
+
+	local randomIndex = love.math.random(#self.defaultImages)
+	return self.defaultImages[randomIndex]
 end
 
 ---@param path string?
@@ -55,14 +83,14 @@ end
 function BackgroundModel:loadBackground()
 	local path = self.path
 	if not path then
-		self:setBackground(self.emptyImage)
+		self:setBackground(self:getDefaultImage())
 		return
 	end
 
 	if not path:find("^http") then
 		local info = love.filesystem.getInfo(path)
 		if not info or info.type == "directory" then
-			self:setBackground(self.emptyImage)
+			self:setBackground(self:getDefaultImage())
 			return
 		end
 	end
