@@ -16,8 +16,8 @@ local number_fields = {
 		field = "difficulty",
 	},
 	{
-		keys = {"length", "l"},
-		field = "length",
+		keys = {"duration", "l"},
+		field = "duration",
 		transform = function(self, v)
 			if tonumber(v) then
 				return tonumber(v)
