@@ -127,7 +127,7 @@ function CacheManager:computeCacheLocation(path, location_id)
 	self.state = 2
 	self:checkProgress()
 
-	local chartfile_set, set_id
+	local chartfile_set, set_id, unhashed_path
 	local dir, name = NoteChartFinder.get_dir_name(path)
 	if name then
 		chartfile_set = self.chartfilesRepo:selectChartfileSet(dir, name, location_id)
@@ -135,9 +135,12 @@ function CacheManager:computeCacheLocation(path, location_id)
 	if chartfile_set then
 		set_id = chartfile_set.id
 		print("chartfile_set.id = " .. set_id)
+	else
+		unhashed_path = path
 	end
 
-	local chartfiles = self.chartfilesRepo:selectUnhashedChartfiles(location_id, set_id)
+	print("chartfilesRepo.selectUnhashedChartfiles", unhashed_path, location_id, set_id)
+	local chartfiles = self.chartfilesRepo:selectUnhashedChartfiles(unhashed_path, location_id, set_id)
 	self.chartfiles_count = #chartfiles
 
 	self:begin()
