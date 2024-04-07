@@ -2,6 +2,7 @@ local class = require("class")
 local FadeTransition = require("sphere.views.FadeTransition")
 local FrameTimeView = require("sphere.views.FrameTimeView")
 local AsyncTasksView = require("sphere.views.AsyncTasksView")
+local CacheView = require("sphere.views.CacheView")
 local TextTooltipImView = require("sphere.imviews.TextTooltipImView")
 local ContextMenuImView = require("sphere.imviews.ContextMenuImView")
 
@@ -89,6 +90,8 @@ function GameView:draw()
 	if showTasks then
 		AsyncTasksView()
 	end
+
+	CacheView(self)
 end
 
 ---@param event table

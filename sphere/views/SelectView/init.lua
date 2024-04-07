@@ -60,7 +60,6 @@ function SelectView:draw()
 		CollectionsSubscreen(self)
 	elseif self.subscreen == "osudirect" then
 		if kp("escape") or kp("tab") then
-			cacheModel:startUpdate("downloads", 1)
 			self:switchToCollections()
 		end
 		OsudirectSubscreen(self)
