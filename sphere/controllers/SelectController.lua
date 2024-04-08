@@ -205,7 +205,9 @@ function SelectController:filedropped(file)
 		return
 	end
 
-	handler(self, path, file)
+	file:open("r")
+	local data = file:read()
+	handler(self, path, data)
 end
 
 function SelectController:exportToOsu()
