@@ -2,6 +2,10 @@ local class = require("class")
 local path_util = require("path_util")
 local NoteChartExporter = require("sph.NoteChartExporter")
 local OsuNoteChartExporter = require("osu.NoteChartExporter")
+local NanoChart = require("libchart.NanoChart")
+local zlib = require("zlib")
+local stbl = require("stbl")
+local SphPreview = require("sph.SphPreview")
 
 ---@class sphere.EditorController
 ---@operator call: sphere.EditorController
@@ -83,6 +87,61 @@ function EditorController:saveToOsu()
 	path = path:gsub(".osu$", ""):gsub(".sph$", "") .. ".sph.osu"
 
 	assert(love.filesystem.write(path, exp:export()))
+end
+
+function EditorController:saveToNanoChart()
+	local selectModel = self.selectModel
+	local editorModel = self.editorModel
+
+	self.editorModel:save()
+
+	local nanoChart = NanoChart()
+
+	local abs_notes = {}
+
+	for noteDatas, inputType, inputIndex, layerDataIndex in editorModel.noteChart:getInputIterator() do
+		for _, noteData in ipairs(noteDatas) do
+			if inputType == "key" and (noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart") then
+				abs_notes[#abs_notes + 1] = {
+					time = noteData.timePoint.absoluteTime,
+					type = 1,
+					input = 1,
+				}
+			end
+		end
+	end
+
+	local emptyHash = string.char(0):rep(16)
+	local content = nanoChart:encode(emptyHash, editorModel.noteChart.inputMode.key, abs_notes)
+	local compressedContent = zlib.compress_s(content)
+
+	local chartview = selectModel.chartview
+
+	local path = chartview.real_path
+
+	local f = assert(io.open(path .. ".nanochart_compressed", "w"))
+	f:write(compressedContent)
+	f:close()
+	local f = assert(io.open(path .. ".nanochart", "w"))
+	f:write(content)
+	f:close()
+
+	local exp = NoteChartExporter()
+	exp.noteChart = editorModel.noteChart
+	local sph_chart = exp:export()
+
+	local content, lines = SphPreview:encodeSphLines(exp.sph.sphLines)
+	local compressedContent = zlib.compress_s(content)
+
+	local f = assert(io.open(path .. ".preview_compressed", "w"))
+	f:write(compressedContent)
+	f:close()
+	local f = assert(io.open(path .. ".preview", "w"))
+	f:write(content)
+	f:close()
+	-- local f = assert(io.open(path .. ".preview_lines", "w"))
+	-- f:write(require("inspect")(lines))
+	-- f:close()
 end
 
 ---@param event table

@@ -42,6 +42,9 @@ function tabs.info(self)
 	if imgui.button("save to osu btn", "save to osu") then
 		self.game.editorController:saveToOsu()
 	end
+	if imgui.button("save to nanochart btn", "save to nanochart") then
+		self.game.editorController:saveToNanoChart()
+	end
 
 	love.graphics.push("all")
 	love.graphics.setColor(1, 1, 1, 0.75)
