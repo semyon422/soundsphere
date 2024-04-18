@@ -1,8 +1,6 @@
 local class = require("class")
 local NoteChartFactory = require("notechart.NoteChartFactory")
-local ShortGraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.ShortGraphicalNote")
-local PreviewGraphicEngine = require("sphere.ui.ChartPreviewModel.PreviewGraphicEngine")
-local GraphicalNoteFactory = require("sphere.models.RhythmModel.GraphicEngine.GraphicalNoteFactory")
+local GraphicEngine = require("sphere.models.RhythmModel.GraphicEngine")
 
 ---@class sphere.ChartPreviewModel
 ---@operator call: sphere.ChartPreviewModel
@@ -13,9 +11,14 @@ local ChartPreviewModel = class()
 ---@param game table
 function ChartPreviewModel:new(configModel, previewModel, game)
 	self.configModel = configModel
+	self.previewModel = previewModel
 	self.game = game
 	self.notes = {}
-	self.previewGraphicEngine = PreviewGraphicEngine(previewModel)
+	self.visualTimeInfo = {
+		time = 0,
+		rate = 0,
+	}
+	self.graphicEngine = GraphicEngine(self.visualTimeInfo)
 end
 
 function ChartPreviewModel:setChartview(chartview)
@@ -36,34 +39,23 @@ function ChartPreviewModel:setChartview(chartview)
 	noteSkin:loadData()
 	noteSkin.editor = true
 
-	local notes = {}
+	local config = self.configModel.configs.settings
+	self.graphicEngine.visualTimeRate = config.gameplay.speed
+	self.graphicEngine.targetVisualTimeRate = config.gameplay.speed
+	self.graphicEngine.scaleSpeed = config.gameplay.scaleSpeed
 
-	local ctp = noteChart.layerDatas[1]:newTimePoint()
-	ctp.absoluteTime = 0
-
-	for noteDatas, inputType, inputIndex, layerDataIndex in noteChart:getInputIterator() do
-		for _, noteData in ipairs(noteDatas) do
-			local note = GraphicalNoteFactory:getNote(noteData)
-			if note then
-				note.currentTimePoint = ctp
-				note.graphicEngine = self.previewGraphicEngine
-				-- note.layerData = layerData
-				-- note.logicalNote = logicEngine:getLogicalNote(noteData)
-				note.inputType = inputType
-				note.inputIndex = inputIndex
-				note:update()
-				table.insert(notes, note)
-			end
-		end
-	end
-
-	self.notes = notes
+	self.graphicEngine.range = noteSkin.range
+	self.graphicEngine:setNoteChart(noteChart)
+	self.graphicEngine:load()
 end
 
 function ChartPreviewModel:update()
-	for _, note in ipairs(self.notes) do
-		note:update()
+	self.visualTimeInfo.time = self.previewModel:getTime()
+	self.visualTimeInfo.rate = self.previewModel.rate
+	if not self.graphicEngine.noteDrawers then
+		return
 	end
+	self.graphicEngine:update()
 end
 
 return ChartPreviewModel

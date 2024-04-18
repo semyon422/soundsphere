@@ -16,11 +16,15 @@ function TimeEngine:new()
 
 	self.timer = TimeManager()
 	self.timer.timeEngine = self
+
+	self.visualTimeInfo = {
+		time = 0,
+		rate = 0,
+	}
 end
 
 TimeEngine.startTime = 0
 TimeEngine.currentTime = 0
-TimeEngine.currentVisualTime = 0
 TimeEngine.timeRate = 1
 TimeEngine.baseTimeRate = 1
 TimeEngine.windUp = nil
@@ -37,7 +41,8 @@ function TimeEngine:load()
 
 	self.startTime = t
 	self.currentTime = t
-	self.currentVisualTime = t
+	self.visualTimeInfo.time = t
+	self.visualTimeInfo.rate = self.timeRate
 
 	self.minTime = self.noteChart.chartmeta.start_time
 	self.maxTime = self.minTime + self.noteChart.chartmeta.duration
@@ -50,7 +55,7 @@ function TimeEngine:sync(time)
 	timer.eventTime = time
 
 	self.currentTime = timer:getTime()
-	self.currentVisualTime = self.nearestTime:getVisualTime(self.currentTime)
+	self.visualTimeInfo.time = self.nearestTime:getVisualTime(self.currentTime)
 
 	if self.windUp then
 		self:updateWindUp()
@@ -101,7 +106,7 @@ function TimeEngine:setPosition(position)
 	audioEngine:setPosition(position)
 	timer:setTime(position)
 	self.currentTime = timer:getTime()
-	self.currentVisualTime = self.nearestTime:getVisualTime(self.currentTime)
+	self.visualTimeInfo.time = self.nearestTime:getVisualTime(self.currentTime)
 
 	audioEngine.forcePosition = true
 	self.logicEngine:update()
@@ -118,6 +123,7 @@ end
 function TimeEngine:setTimeRate(timeRate)
 	self.timeRate = timeRate
 	self.timer:setRate(timeRate)
+	self.visualTimeInfo.rate = timeRate
 end
 
 function TimeEngine:pause()

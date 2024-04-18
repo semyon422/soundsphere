@@ -13,11 +13,16 @@ GraphicEngine.scaleSpeed = false
 GraphicEngine.constant = false
 GraphicEngine.eventBasedRender = false
 
----@param timeEngine sphere.TimeEngine
----@param logicEngine sphere.LogicEngine
-function GraphicEngine:new(timeEngine, logicEngine)
-	self.timeEngine = timeEngine
+---@param visualTimeInfo table
+---@param logicEngine sphere.LogicEngine?
+function GraphicEngine:new(visualTimeInfo, logicEngine)
+	self.visualTimeInfo = visualTimeInfo
 	self.logicEngine = logicEngine
+end
+
+---@param noteChart ncdk.NoteChart
+function GraphicEngine:setNoteChart(noteChart)
+	self.noteChart = noteChart
 end
 
 function GraphicEngine:load()
@@ -41,7 +46,7 @@ function GraphicEngine:load()
 			graphicEngine = self
 		})
 		if self.eventBasedRender then
-			layerEvents[layerDataIndex] = layerEvents[layerDataIndex] or TimeToEvent(layerData, range)
+			layerEvents[layerDataIndex] = layerEvents[layerDataIndex] or TimeToEvent(layerData.timePointList, range)
 			noteDrawer.events = layerEvents[layerDataIndex]
 		end
 		noteDrawer:load()
@@ -76,7 +81,7 @@ end
 
 ---@return number
 function GraphicEngine:getVisualTimeRate()
-	local timeRate = self.timeEngine.timeRate
+	local timeRate = self.visualTimeInfo.rate
 	local visualTimeRate = self.visualTimeRate
 	if not self.scaleSpeed then
 		visualTimeRate = visualTimeRate / timeRate
@@ -86,12 +91,20 @@ end
 
 ---@return number
 function GraphicEngine:getCurrentTime()
-	return self.timeEngine.currentVisualTime
+	return self.visualTimeInfo.time
 end
 
 ---@return number
 function GraphicEngine:getInputOffset()
-	return self.logicEngine.inputOffset
+	local logicEngine = self.logicEngine
+	return logicEngine and logicEngine.inputOffset or 0
+end
+
+---@param noteData ncdk.NoteData
+---@return sphere.LogicalNote?
+function GraphicEngine:getLogicalNote(noteData)
+	local logicEngine = self.logicEngine
+	return logicEngine and logicEngine:getLogicalNote(noteData)
 end
 
 ---@return number

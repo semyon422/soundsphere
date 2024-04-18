@@ -6,9 +6,11 @@ local ChartPreviewRhythmView = RhythmView + {}
 
 ---@param f function
 function ChartPreviewRhythmView:processNotes(f)
-	local chartPreviewModel = self.game.chartPreviewModel
-	for _, graphicalNote in ipairs(chartPreviewModel.notes) do
-		f(self, graphicalNote)
+	local graphicEngine = self.game.chartPreviewModel.graphicEngine
+	for _, noteDrawer in ipairs(graphicEngine.noteDrawers) do
+		for i = noteDrawer.startNoteIndex, noteDrawer.endNoteIndex do
+			f(self, noteDrawer.notes[i])
+		end
 	end
 end
 

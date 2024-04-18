@@ -16,7 +16,6 @@ end
 
 function NoteDrawer:load()
 	local graphicEngine = self.graphicEngine
-	local logicEngine = graphicEngine.logicEngine
 
 	local layerData = self.layerData
 	self.eventOffset = 0
@@ -35,7 +34,7 @@ function NoteDrawer:load()
 			note.currentTimePoint = self.currentTimePoint
 			note.graphicEngine = graphicEngine
 			note.layerData = layerData
-			note.logicalNote = logicEngine:getLogicalNote(noteData)
+			note.logicalNote = graphicEngine:getLogicalNote(noteData)
 			note.inputType = self.inputType
 			note.inputIndex = self.inputIndex
 			table.insert(notes, note)

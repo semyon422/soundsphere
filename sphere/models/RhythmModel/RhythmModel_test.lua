@@ -8,8 +8,13 @@ local NoteData = require("ncdk.NoteData")
 
 local rhythmModel = {}
 
+local visualTimeInfo = {
+	rate = 1,
+	time = 0,
+}
+
 local logicEngine = LogicEngine()
-local graphicEngine = GraphicEngine()
+local graphicEngine = GraphicEngine(visualTimeInfo, logicEngine)
 
 rhythmModel.logicEngine = logicEngine
 rhythmModel.graphicEngine = graphicEngine
@@ -24,7 +29,6 @@ logicEngine.inputOffset = 0
 graphicEngine.range = {-2, 2}
 
 rhythmModel.timeEngine = logicEngine  -- use logic engine as time engine (timeRate)
-rhythmModel.timeEngine.currentVisualTime = 0
 
 logicEngine.timings = {
 	ShortNote = {
@@ -103,7 +107,7 @@ local function test(notes, events, states, graphicStates)
 	graphicEngine.noteChart = noteChart
 
 	local newStates = {}
-	rhythmModel.scoreEngine = {
+	logicEngine.scoreEngine = {
 		scoreSystem = {receive = function(self, event)
 			local eventCopy = {
 				currentTime = event.currentTime,
@@ -116,10 +120,10 @@ local function test(notes, events, states, graphicStates)
 		end},
 	}
 
+	graphicEngine.visualTimeRate = 1
+
 	logicEngine:load()
 	graphicEngine:load()
-
-	graphicEngine.visualTimeRate = 1
 
 	local newGraphicStates = {}
 
@@ -143,7 +147,7 @@ local function test(notes, events, states, graphicStates)
 		logicEngine:update()
 	end
 	local function updateGraphics(time)
-		rhythmModel.timeEngine.currentVisualTime = time
+		visualTimeInfo.time = time
 		graphicEngine:update()
 		local state = {}
 		table.insert(newGraphicStates, state)
@@ -203,8 +207,8 @@ local function test(notes, events, states, graphicStates)
 		return
 	end
 
-	-- print(require("inspect")(graphicStates))
-	-- print(require("inspect")(newGraphicStates))
+	print(require("inspect")(graphicStates))
+	print(require("inspect")(newGraphicStates))
 
 	assert(table_util.deepequal(graphicStates, newGraphicStates))
 end

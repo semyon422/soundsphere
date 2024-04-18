@@ -40,6 +40,12 @@ function GraphicEngine:getVisualTimeRate()
 	return editor.speed
 end
 
+---@param noteData ncdk.NoteData
+---@return sphere.LogicalNote?
+function GraphicEngine:getLogicalNote(noteData)
+	return
+end
+
 function GraphicEngine:selectStart()
 	for _, note in ipairs(self.notes) do
 		note.selected = false

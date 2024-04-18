@@ -23,12 +23,11 @@ function RhythmModel:new(inputModel, resourceModel)
 	self.scoreEngine = ScoreEngine(self.timeEngine)
 	self.audioEngine = AudioEngine(self.timeEngine, resourceModel)
 	self.logicEngine = LogicEngine(self.timeEngine, self.scoreEngine)
-	self.graphicEngine = GraphicEngine(self.timeEngine, self.logicEngine)
+	self.graphicEngine = GraphicEngine(self.timeEngine.visualTimeInfo, self.logicEngine)
 	self.observable = Observable()
 
 	self.timeEngine.audioEngine = self.audioEngine
 	self.timeEngine.logicEngine = self.logicEngine
-	self.graphicEngine.resourceModel = self.resourceModel
 
 	self.inputManager.observable:add(self.logicEngine)
 	self.inputManager.observable:add(self.observable)
@@ -169,7 +168,7 @@ function RhythmModel:setNoteChart(noteChart)
 	self.timeEngine.noteChart = noteChart
 	self.scoreEngine.noteChart = noteChart
 	self.logicEngine.noteChart = noteChart
-	self.graphicEngine.noteChart = noteChart
+	self.graphicEngine:setNoteChart(noteChart)
 end
 
 ---@param range table

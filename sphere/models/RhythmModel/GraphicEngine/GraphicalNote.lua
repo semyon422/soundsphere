@@ -15,13 +15,13 @@ function GraphicalNote:update() end
 
 ---@return string
 function GraphicalNote:getLogicalState()
-	local logicalNote = self.logicalNote
+	local logicalNote = self.graphicEngine:getLogicalNote(self.startNoteData)
 	return logicalNote and logicalNote.state or "clear"
 end
 
 ---@return number?
 function GraphicalNote:getPressedTime()
-	local logicalNote = self.logicalNote
+	local logicalNote = self.graphicEngine:getLogicalNote(self.startNoteData)
 	return logicalNote and logicalNote.pressedTime
 end
 
