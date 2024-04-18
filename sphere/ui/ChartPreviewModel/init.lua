@@ -2,6 +2,7 @@ local class = require("class")
 local NoteChartFactory = require("notechart.NoteChartFactory")
 local ShortGraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.ShortGraphicalNote")
 local PreviewGraphicEngine = require("sphere.ui.ChartPreviewModel.PreviewGraphicEngine")
+local GraphicalNoteFactory = require("sphere.models.RhythmModel.GraphicEngine.GraphicalNoteFactory")
 
 ---@class sphere.ChartPreviewModel
 ---@operator call: sphere.ChartPreviewModel
@@ -42,10 +43,8 @@ function ChartPreviewModel:setChartview(chartview)
 
 	for noteDatas, inputType, inputIndex, layerDataIndex in noteChart:getInputIterator() do
 		for _, noteData in ipairs(noteDatas) do
-			local input = inputType .. inputIndex
-			local t = noteData.noteType
-			if t == "ShortNote" or t == "LongNoteStart" or t == "LaserNoteStart" then
-				local note = ShortGraphicalNote("ShortNote", noteData)
+			local note = GraphicalNoteFactory:getNote(noteData)
+			if note then
 				note.currentTimePoint = ctp
 				note.graphicEngine = self.previewGraphicEngine
 				-- note.layerData = layerData
