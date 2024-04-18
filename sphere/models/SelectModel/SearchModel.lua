@@ -41,8 +41,8 @@ local number_fields = {
 		field = "level",
 	},
 	{
-		keys = {"longNotes", "ln"},
-		field = "longNoteRatio",
+		keys = {"ln"},
+		field = "long_notes_ratio",
 		transform = function(self, v)
 			return v / 100
 		end
