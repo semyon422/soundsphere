@@ -101,6 +101,7 @@ function GameController:new()
 	self.backgroundModel = self.ui.backgroundModel
 	self.notificationModel = self.ui.notificationModel
 	self.previewModel = self.ui.previewModel
+	self.chartPreviewModel = self.ui.chartPreviewModel
 
 	self.gameView = self.ui.gameView
 	self.selectView = self.ui.selectView

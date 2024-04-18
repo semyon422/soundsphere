@@ -67,6 +67,7 @@ function SelectController:update()
 	if selectModel:isChanged() then
 		self.backgroundModel:setBackgroundPath(selectModel:getBackgroundPath())
 		self.previewModel:setAudioPathPreview(selectModel:getAudioPathPreview())
+		self.chartPreviewModel:setChartview(selectModel.chartview)
 		self:applyModifierMeta()
 	end
 
