@@ -1,3 +1,8 @@
+---@param tps ncdk.TimePoint[]
+---@param j number
+---@param i number
+---@param svdt number
+---@return number|false?
 local function intersect(tps, j, i, svdt)
 	local tp = tps[j]
 	local _tp = tps[i]
@@ -21,13 +26,12 @@ local function intersect(tps, j, i, svdt)
 	end
 end
 
----@param ld ncdk.LayerData
----@param range table
+---@param tps ncdk.TimePoint[]
+---@param range number[]
 ---@return table
-local function TimeToEvent(ld, range)
+local function TimeToEvent(tps, range)
 	local events = {}
 
-	local tps = ld.timePointList
 	for j = 1, #tps do
 		local tp = tps[j]
 		for i = 1, #tps do

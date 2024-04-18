@@ -13,7 +13,7 @@ function test.basic(t)
 
 	nc:compute()
 
-	local events = TimeToEvent(ld, {-1, 1})
+	local events = TimeToEvent(ld.timePointList, {-1, 1})
 	t:eq(#events, 2)
 	t:eq(events[1].time, -1)
 	t:eq(events[1].action, "show")
@@ -34,7 +34,7 @@ function test.local_1(t)
 
 	nc:compute()
 
-	local events = TimeToEvent(ld, {-1, 1})
+	local events = TimeToEvent(ld.timePointList, {-1, 1})
 	t:eq(#events, 4)
 end
 
